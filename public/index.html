@@ -1,0 +1,140 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Visualization Mockup</title>
+  <link rel="shortcut icon" type='image/x-icon' href='favicon.ico' />
+  <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
+  <link rel="stylesheet" href="css/style.css" type="text/css" />
+  <link rel="stylesheet" href="css/iThing.css" type="text/css"/>
+</head>
+<body>
+  <script src="js/lib/jquery.min.js"></script>
+  <script src="js/lib/d3.v4.min.js" charset="utf-8"></script>
+  <script src="js/lib/dateslider/jquery-ui.min.js"></script>
+  <script src="js/lib/dateslider/jQDateRangeSlider-withRuler-min.js"></script>
+
+  <div class="container-fluid">
+    <h1 id="titleheader">Energy Usage</h1>
+    <img src="images/logo.png" id="logo" width="175px" height="70px"/>
+    <br>
+
+    <div class="col-md-2" style="padding-top: 35px">
+      <p style="text-decoration: underline">Energy Type:</p>
+      <div class="radio">
+        <label><input type="radio" name="energyTypes" value="Electricity" checked="checked">Electricity</label>
+      </div>
+      <div class="radio">
+        <label><input type="radio" name="energyTypes" value="Wind">Wind</label>
+      </div>
+      <div class="radio">
+        <label><input type="radio" name="energyTypes" value="NaturalGas">Natural Gas</label>
+      </div>
+      <div class="radio">
+        <label><input type="radio" name="energyTypes" value="Solar">Solar</label>
+      </div>
+
+      <br>
+
+      <p style="text-decoration: underline">Graph Type:</p>
+      <div class="radio">
+        <label><input type="radio" name="graphTypes" value="Bar" checked="checked">Bar</label>
+      </div>
+      <div class="radio">
+        <label><input type="radio" name="graphTypes" value="Line">Line</label>
+      </div>
+      <div class="radio">
+        <label><input type="radio" name="graphTypes" value="Map">Map</label>
+      </div>
+      <br>
+
+      <div id="viewBuildings">
+        <p style="text-decoration: underline">View Buildings:</p>
+        <div class="checkbox">
+          <label><input type="checkbox" value="chapin" checked>Chapin</label>
+        </div>
+        <div class="checkbox">
+          <label><input type="checkbox" value="aldrich" checked>Aldrich</label>
+        </div>
+        <div class="checkbox">
+          <label><input type="checkbox" value="brannon" checked>Brannon</label>
+        </div>
+        <div class="checkbox">
+          <label><input type="checkbox" value="sciencecenter" checked>Science Center</label>
+        </div>
+        <div class="checkbox">
+          <label><input type="checkbox" value="peet" checked>Peet</label>
+        </div>
+        <div class="checkbox">
+          <label><input type="checkbox" value="609" checked>609</label>
+        </div>
+        <br>
+      </div>
+
+      <div class="checkbox">
+        <label><input type="checkbox" value="overlayweather">Overlay Weather</label>
+      </div>
+      <div class="checkbox">
+        <label><input type="checkbox" value="scaling">kWh/m scaling</label>
+      </div>
+      <br>
+
+      <button type="button" id="changeButton" class="btn btn-primary">Change!</button>
+    </div>
+    <div class="col-md-8">
+          <div  id="dateslider"></div>
+    </div>
+
+    <div id="displayGraphBar"></div>
+    <svg width="960" height="500" id="displayGraphLine"></svg>
+    <div id="displayGraphMap">
+        <img id="mappicture" src="images/map.png" alt="Beloit College Map" width="1266" height="550">
+    </div>
+  </div>
+
+  <script src="js/displayGraphBarScript.js"></script>
+  <script src="js/displayGraphLineScript.js"></script>
+  <script>
+    $(document).ready(function() {
+      resetAll();
+      $("#displayGraphBar").show();
+      
+      $('#changeButton').click(function() {
+        resetAll();
+        $("#displayGraph" + $('input[name="graphTypes"]:checked').val()).show();
+
+        if ($("#displayGraphMap").is(":visible")) {
+          $("#viewBuildings").hide();
+        }
+      });
+
+      function resetAll() {
+        $("#displayGraphBar").hide();
+        $("#displayGraphLine").hide();
+        $("#displayGraphMap").hide();
+        $("#viewBuildings").show();
+      }
+
+    });
+
+    var months = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sept", "Oct", "Nov", "Dec"];
+    $("#dateslider").dateRangeSlider({
+      bounds: {min: new Date(2016, 0, 1), max: new Date(2016, 8, 9, 1, 0, 0)},
+      defaultValues: {min: new Date(2016, 2, 25), max: new Date(2016, 5, 7)},
+      scales: [{
+        first: function(value){ return value; },
+        end: function(value) {return value; },
+        next: function(value){
+          var next = new Date(value);
+          return new Date(next.setMonth(value.getMonth() + 1));
+        },
+        label: function(value){
+          return months[value.getMonth()];
+        },
+        format: function(tickContainer, tickStart, tickEnd){
+          tickContainer.addClass("myCustomClass");
+        }
+      }]
+    });
+  </script>
+</body>
+</html>

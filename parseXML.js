@@ -1,10 +1,3 @@
-/**
- * Created by lucas on 9/25/2016.
- */
-
-
-
-
 var http = require('http');
 var parseString = require('xml2js').parseString;
 var url = "http://144.89.8.12/sm101.xml";
