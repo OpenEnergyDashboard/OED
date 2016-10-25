@@ -27,8 +27,11 @@ function parseAll(callback) {
 
 	for (var i = 10; i <= 22; i++) {
 		url = 'http://144.89.8.' + i + '/sm101.xml';
+		console.log(url); // the ip adress is correct here
+		var ip = url.match(/^.*?(\d+\.\d+\.\d+\.\d+).*/)[1]; //and this generates the correct address
+		// TODO: make this get the correct ips
 		getXML(url, function () {
-			var ip = url.match(/^.*?(\d+\.\d+\.\d+\.\d).*/)[1]; //matches an ip address
+			console.log('ip in parse: ' + ip ); //ips are incorrect here ( all 144.89.8.22 or the last address used)
 			var meter = {'name': val, 'ip': ip};
 			callback(meter);
 		});
