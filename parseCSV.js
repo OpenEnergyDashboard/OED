@@ -12,7 +12,7 @@ var val ='';
             res.on('end', function () {
                 // parse csv
                 CSV.parse(csv, function (err, result) {
-                    val+=result;
+                    val = result;
                     callback(val);
                 })
             });
@@ -20,7 +20,7 @@ var val ='';
         req.on('error', function (err) {
             // debug error
         });
-    };
+    }
 
 //currently returns minute csv file. Increment int<number>.csv to scale.
     function parseAll(callback) {

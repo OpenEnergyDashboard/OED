@@ -1,25 +1,27 @@
-var mysql      = require('mysql');
-var info = require('./private/login.js');
-var parseCSV = require('./parseCSV.js');
-var connection = mysql.createConnection({
+var mysql		= require('mysql');
+// var info 		= require('./private/login.js');
+var parseCSV 	= require('./parseCSV.js');
+var connection 	= mysql.createConnection({
     host     : 'localhost',
-    user     : info.usr,
-    password : info.pswd,
+    port     : 32769,
+    user     : 'root', //username and password to mysql server running in Docker, not to anything real.
+    password : 'guest',
     database : 'meter_data'
 });
 
-var values = parseCSV.parse();
-console.log(values);
+parseCSV.parse(function(val){
+	console.log(val);
+});
+
 connection.connect();
 
-
 //TODO add appropriate json to right spot
- for(var i = 0; i < values.length; i++){
-     var post  = values[i]
-     var query = connection.query('INSERT INTO meters SET ?', post, function(err, result) {
-         // Finish
-     });
- }
+//  for(var i = 0; i < values.length; i++){
+//      var post  = values[i];
+//      var query = connection.query('INSERT INTO meters SET ?', post, function(err, result) {
+//          // Finish
+//      });
+//  }
 
 //shows I can connect to the db. 
 connection.query('SELECT 1 + 1 AS solution', function(err, rows, fields) {

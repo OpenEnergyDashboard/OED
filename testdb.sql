@@ -19,7 +19,7 @@ CREATE TABLE IF NOT EXISTS readings (
 
 -- Insert a new meter
 INSERT INTO meters(name, ipAddress)
-    VALUES (?);
+    VALUES (?, ?);
 
 -- Add a new timestamp based on a meter's name
 
