@@ -11,15 +11,16 @@ function insertMeters() {
 	parseXML.parseXML(function (meter) {
 		console.log(meter['name']);
 		console.log(meter['ip']);
-		connPool.getConnection(function (error, conn) {
-			if (error) {
-				console.log(error);
+		connPool.getConnection(function (err, conn) {
+			if (err) {
+				console.log("error on get connection: " + err);
 			}
 			else {
-				conn.query('INSERT INTO meters (name, ipAddress) VALUES (?, ?);', [meter['name'], meter['ip']]);
-				conn.release();
+				conn.query('INSERT INTO meters (name, ipAddress) VALUES (?, ?);', [meter['name'], meter['ip']], function (err) {
+					conn.release();
+					if (err) console.log(err);
+				});
 			}
-
 		});
 
 	});
@@ -29,6 +30,6 @@ function insertMeters() {
 insertMeters();
 //with this statement not all meters are added to the database
 //without this statement the program will not terminate
-connPool.end(function (err) {
-	console.log(err);
-});
+// connPool.end(function (err) {
+// 	console.log(err);
+// });
