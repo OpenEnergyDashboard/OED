@@ -1,7 +1,9 @@
 var http = require('http');
 var CSV = require('csv');
+var parseXLSX = require('./parseXLSX.js');
 var url = "http://144.89.8.12/sm101.xml";
 var val ='';
+var ips = parseXLSX.parseXLSX('ips.xlsx');
     function getCSV(url,callback) {
         var req = http.get(url, function (res) {
             // save the data
@@ -24,8 +26,8 @@ var val ='';
 
 //currently returns minute csv file. Increment int<number>.csv to scale.
     function parseAll(callback) {
-        for (var i = 10; i <= 22; i++) {
-            url = 'http://144.89.8.' + i + '/int4.csv';
+        for (ip in ips) {
+            url = 'http://' + ips[ip].ip + '/int4.csv';
             getCSV(url,function () {
                 //freed val from callback hell
                 console.log(val);
@@ -34,3 +36,6 @@ var val ='';
     }
 exports.parse =parseAll;
 parseAll();
+
+//this syntax seems to work for calling functions from other files.
+//console.log(parseXLSX.parseXLSX('ips.xlsx')[0].ip);
