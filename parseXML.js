@@ -1,7 +1,9 @@
 var http = require('http');
 var parseString = require('xml2js').parseString;
+var parseXLSX = require('./parseXLSX.js');
 var url = "http://144.89.8.12/sm101.xml";
 var val = '';
+var ips = parseXLSX.parseXLSX('ips.xlsx');
 function getXML (url,callback) {
     var req = http.get(url, function (res) {
         // save the data
@@ -24,8 +26,8 @@ function getXML (url,callback) {
 };
 
 function parseAll(callback) {
-    for(var i = 10;i<=22;i++){
-        url = 'http://144.89.8.'+i+'/sm101.xml';
+    for(ip in ips){
+        url = 'http://'+ips[ip].ip+'/sm101.xml';
         getXML(url,function(){
             console.log(val);
         });
