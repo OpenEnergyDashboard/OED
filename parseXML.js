@@ -14,22 +14,26 @@ function getXML (url,callback) {
         res.on('end', function () {
             // parse xml
             parseString(xml, function (err, result) {
-                val+=result;
+                val = result['Maverick']['NodeID'][0];
                 callback(val);
             })
         });
     });
 
-    req.on('error', function (err) {
-        // debug error
-    });
-};
+	req.on('error', function (err) {
+		// debug error
+	});
+}
 
 function parseAll(callback) {
     for(ip in ips){
         url = 'http://'+ips[ip].ip+'/sm101.xml';
+		//TODO: make this get the correct ips
         getXML(url,function(){
             console.log(val);
+			var meter = {'name:':val,'ip':ips[ip]}
+			callback(meter);
+			
         });
     }
 }
