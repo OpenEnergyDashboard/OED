@@ -1,35 +1,42 @@
-var mysql = require('mysql');
+var pg = require('pg');
 var parseXML = require('./parseXML');
-var connPool = mysql.createPool({
+
+var config = {
+	user: 'capstone',
+	database: 'capstone',
+	password: 'guest', // server running in docker
 	host: 'localhost',
-	port: 32769,
-	user: 'root', //username and password to mysql server running in Docker, not to anything real.
-	password: 'guest',
-	database: 'meter_data'
-});
+	port: 5432,
+	max: 10,
+	idleTimeoutMillis: 30000
+};
+
+var pool = new pg.Pool(config);
+
+
 function insertMeters() {
 	parseXML.parseXML(function (meter) {
-		console.log(meter['name']);
-		console.log(meter['ip']);
-		connPool.getConnection(function (err, conn) {
+		// console.log(meter);
+		// console.log("one " + meter['name']);
+		// console.log("one " + meter['ip']);
+		pool.connect(function (err, client, done) {
 			if (err) {
-				console.log("error on get connection: " + err);
+				return console.error("error on get connection: " + err);
 			}
-			else {
-				conn.query('INSERT INTO meters (name, ipAddress) VALUES (?, ?);', [meter['name'], meter['ip']], function (err) {
-					conn.release();
-					if (err) console.log(err);
-				});
-			}
+			client.query('INSERT INTO meters (name, ipAddress) VALUES ($1, $2);', [meter['name'], meter['ip']], function (err, result) {
+				done(); //release connection back to the pool
+				if (err) return console.error("error inserting meters " + err);
+				//console.log(result.rows[0].number+"x");
+			});
+
 		});
 
 	});
 
 }
-//TODO: figure out how to end while still adding all meters
+//catches error from idle host
+pool.on('error', function (err, client) {
+	console.error('idle client error', err.message, err.stack)
+});
 insertMeters();
-//with this statement not all meters are added to the database
-//without this statement the program will not terminate
-// connPool.end(function (err) {
-// 	console.log(err);
-// });
+
