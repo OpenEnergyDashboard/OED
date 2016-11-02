@@ -15,10 +15,8 @@ var pool = new pg.Pool(config);
 
 
 function insertMeters() {
+	// TODO: decouple this from parse xml so that it will work with whatever json we give it
 	parseXML.parseXML(function (meter) {
-		// console.log(meter);
-		// console.log("one " + meter['name']);
-		// console.log("one " + meter['ip']);
 		pool.connect(function (err, client, done) {
 			if (err) {
 				return console.error("error on get connection: " + err);
