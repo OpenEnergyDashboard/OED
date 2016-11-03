@@ -4,6 +4,7 @@ var CSV = require('csv');
 var url = "http://144.89.8.12/sm101.xml";
 var val ='';
 
+    // gets the csv data from the meter corresponding to the given url
     function getCSV(url, meter_id, callback) {
         var req = http.get(url, function (res) {
             // save the data
@@ -34,7 +35,7 @@ var val ='';
             });
         }
     }
-exports.parse =parseAll;
+exports.parse = parseAll;
 //parseAll();
 exports.parseMeterCSV = getCSV;
 

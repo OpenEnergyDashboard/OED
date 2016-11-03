@@ -13,14 +13,12 @@ var config = {
 
 var pool = new pg.Pool(config);
 
-
+// inserts new meters into the db based on info from parseXML
 function insertMeters() {
 	// TODO: decouple this from parse xml so that it will work with whatever json we give it
 	parseXML.parseXML(function (meter) {
 		pool.connect(function (err, client, done) {
-			if (err) {
-				return console.error("error on get connection: " + err);
-			}
+			if (err) return console.error("error on get connection: " + err);
 			client.query('INSERT INTO meters (name, ipAddress) VALUES ($1, $2);', [meter['name'], meter['ip']], function (err, result) {
 				done(); //release connection back to the pool
 				if (err) return console.error("error inserting meters " + err);
@@ -30,7 +28,6 @@ function insertMeters() {
 		});
 
 	});
-
 }
 //catches error from idle host
 pool.on('error', function (err, client) {

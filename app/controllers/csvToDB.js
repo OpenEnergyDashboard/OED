@@ -14,32 +14,31 @@ var config = {
 
 var pool = new pg.Pool(config);
 
-
+// gets all the meters in the db
 function getMeters(callback) {
 	pool.connect(function (err, client, done) {
 		if (err) return console.error("error on get connection: " + err);
-
 		client.query('SELECT * FROM meters', function (err, result) {
 			done(); //release connection back to the pool
-			if (err) return console.error("error inserting meters " + err);
+			if (err) return console.error("error querying for meters " + err);
 			result = result.rows; //array of json objects
 			callback(result);
-			//console.log(result);
 		});
 
 	});
 }
-
+//todo: form correct url based on a desired data resolution
+// gets data from all meters and insert into db.
 function getData() {
 	getMeters(function (meters) {
 		for (var i in meters) {
 			var meter = meters[i];
-			// console.log(meter);
-			var url = 'http://' + meter['ipaddress'] + '/int2.csv';
+			//var url = 'http://' + meter['ipaddress'] + '/int4.csv'; // gets weekly data
+			var url = 'http://' + meter['ipaddress'] + '/int2.csv'; //gets hourly data
 			parseCSV.parseMeterCSV(url, meter['id'], function (readings, id) {
 				//console.log(readings);
 				for (var j in readings) {
-					var timestamp = parseTimestamp(readings[j][1], function (timestamp) {
+					parseTimestamp(readings[j][1], function (timestamp) {
 						var data = {meter_id: id, reading: readings[j][0], timestamp: timestamp};
 						upsertReading(data, function (result) {
 							//console.log(result);
@@ -51,6 +50,8 @@ function getData() {
 	});
 }
 
+// Inserts a reading to the db. fails on conflict
+//I can't think of a reason to use this over upsertReading()
 function insertReading(data, callback) {
 	pool.connect(function (err, client, done) {
 		if (err) return console.error("error on get connection " + err);
@@ -63,6 +64,8 @@ function insertReading(data, callback) {
 	});
 }
 
+// Attempts to insert a reading and on conflict updates the existing reading
+// data format: { meter_id: <value>, reading: <value>, timestamp: < YYYY-MM-DD HH:mm:ss > } with time in 24 hr format.
 function upsertReading(data, callback) {
 	pool.connect(function (err, client, done) {
 		if (err) return console.error("error on get connection " + err);
@@ -74,6 +77,7 @@ function upsertReading(data, callback) {
 	});
 }
 
+//takes in a single reading and returns the properly formed timestamp
 function parseTimestamp(raw, callback) {
 	var stamp = moment(raw, 'HH:mm:ss MM/DD/YY');
 	stamp = stamp.format('YYYY-MM-DD HH:mm:ss');
@@ -85,6 +89,8 @@ function parseTimestamp(raw, callback) {
 pool.on('error', function (err, client) {
 	console.error('idle client error', err.message, err.stack)
 });
+
+
 //getData();
 exports.upsertData = upsertReading;
 exports.pollMeters = getData;
