@@ -35,13 +35,13 @@ function getData() {
 		for (var i in meters) {
 			var meter = meters[i];
 			// console.log(meter);
-			var url = 'http://' + meter['ipaddress'] + '/int4.csv';
+			var url = 'http://' + meter['ipaddress'] + '/int2.csv';
 			parseCSV.parseMeterCSV(url, meter['id'], function (readings, id) {
 				//console.log(readings);
 				for (var j in readings) {
 					var timestamp = parseTimestamp(readings[j][1], function (timestamp) {
 						var data = {meter_id: id, reading: readings[j][0], timestamp: timestamp};
-						insertReading(data, function (result) {
+						upsertReading(data, function (result) {
 							//console.log(result);
 						});
 					});
@@ -85,5 +85,6 @@ function parseTimestamp(raw, callback) {
 pool.on('error', function (err, client) {
 	console.error('idle client error', err.message, err.stack)
 });
-getData();
+//getData();
 exports.upsertData = upsertReading;
+exports.pollMeters = getData;
