@@ -1,5 +1,4 @@
 var pg = require('pg');
-var parseXML = require('./parseXML');
 var parseCSV = require('./parseCSV');
 var moment = require('moment');
 
@@ -42,7 +41,7 @@ function getData() {
 				for (var j in readings) {
 					var timestamp = parseTimestamp(readings[j][1], function (timestamp) {
 						var data = {meter_id: id, reading: readings[j][0], timestamp: timestamp};
-						insertReading(data, function(result){
+						insertReading(data, function (result) {
 							//console.log(result);
 						});
 					});
@@ -52,7 +51,7 @@ function getData() {
 	});
 }
 
-function insertReading(data, callback){
+function insertReading(data, callback) {
 	pool.connect(function (err, client, done) {
 		if (err) return console.error("error on get connection " + err);
 		client.query('INSERT INTO readings (meter_id, reading, read_timestamp) VALUES ($1, $2, $3);',
@@ -61,6 +60,17 @@ function insertReading(data, callback){
 				if (err) console.error("error inserting readings " + err);
 				callback(result);
 			});
+	});
+}
+
+function upsertReading(data, callback) {
+	pool.connect(function (err, client, done) {
+		if (err) return console.error("error on get connection " + err);
+		client.query('INSERT INTO readings (meter_id, reading, read_timestamp) VALUES ($1, $2, $3) ON CONFLICT (meter_id, read_timestamp) DO UPDATE SET reading = EXCLUDED.reading;', [data['meter_id'], data['reading'], data['timestamp']], function (err, result) {
+			done();
+			if (err) console.error("error inserting readings " + err);
+			callback(result);
+		});
 	});
 }
 
@@ -76,3 +86,4 @@ pool.on('error', function (err, client) {
 	console.error('idle client error', err.message, err.stack)
 });
 getData();
+exports.upsertData = upsertReading;

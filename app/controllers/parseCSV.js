@@ -1,9 +1,9 @@
 var http = require('http');
 var CSV = require('csv');
-var parseXLSX = require('./parseXLSX.js');
+
 var url = "http://144.89.8.12/sm101.xml";
 var val ='';
-var ips = parseXLSX.parseXLSX('ips.xlsx');
+
     function getCSV(url, meter_id, callback) {
         var req = http.get(url, function (res) {
             // save the data
