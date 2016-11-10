@@ -20,6 +20,9 @@
     "q": "~1.4.1",
     "serve-favicon": "~2.3.0",
     "xlsx": "~0.8.0",
-    "xml2js": "^0.4.17"
+    "xml2js": "^0.4.17",
+    "winston": "~2.3.0",
+    "fs": "0.0.1-security",
+    "nodemailer": "~2.6.4"
   }
 }
