@@ -5,9 +5,9 @@ let url = "http://144.89.8.12/sm101.xml";
 let val = '';
 let ips = parseXLSX.parseXLSX('ips.xlsx');
 function getXML (url, ip, callback) {
-    var req = http.get(url, res => {
+    let req = http.get(url, res => {
         // save the data
-        var xml = '';
+        let xml = '';
         res.on('data', chunk => {
             xml += chunk;
         });

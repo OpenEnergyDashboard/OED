@@ -5,7 +5,7 @@ let url = "http://144.89.8.12/sm101.xml";
 let val ='';
 
 function getCSV(url, meter_id, callback) {
-    var req = http.get(url, (res) => {
+    let req = http.get(url, (res) => {
         // save the data
         let csv = '';
         res.on('data', (chunk) => {
