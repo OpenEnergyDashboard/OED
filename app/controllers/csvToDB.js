@@ -1,8 +1,8 @@
-var pg = require('pg');
-var parseCSV = require('./parseCSV');
-var moment = require('moment');
+let pg = require('pg');
+let parseCSV = require('./parseCSV');
+let moment = require('moment');
 
-var config = {
+let config = {
 	user: 'capstone',
 	database: 'capstone',
 	password: 'guest', // server running in docker
@@ -12,35 +12,34 @@ var config = {
 	idleTimeoutMillis: 30000
 };
 
-var pool = new pg.Pool(config);
+let pool = new pg.Pool(config);
 
 // gets all the meters in the db
 function getMeters(callback) {
-	pool.connect(function (err, client, done) {
+	pool.connect((err, client, done) => {
 		if (err) return console.error("error on get connection: " + err);
-		client.query('SELECT * FROM meters', function (err, result) {
+		client.query('SELECT * FROM meters', (err, result) => {
 			done(); //release connection back to the pool
 			if (err) return console.error("error querying for meters " + err);
 			result = result.rows; //array of json objects
 			callback(result);
 		});
-
 	});
 }
 //todo: form correct url based on a desired data resolution
 // gets data from all meters and insert into db.
 function getData() {
-	getMeters(function (meters) {
-		for (var i in meters) {
-			var meter = meters[i];
+	getMeters((meters) => {
+		for (let i in meters) {
+			let meter = meters[i];
 			//var url = 'http://' + meter['ipaddress'] + '/int4.csv'; // gets weekly data
-			var url = 'http://' + meter['ipaddress'] + '/int2.csv'; //gets hourly data
-			parseCSV.parseMeterCSV(url, meter['id'], function (readings, id) {
+			let url = 'http://' + meter['ipaddress'] + '/int2.csv'; //gets hourly data
+			parseCSV.parseMeterCSV(url, meter['id'], (readings, id) => {
 				//console.log(readings);
-				for (var j in readings) {
-					parseTimestamp(readings[j][1], function (timestamp) {
-						var data = {meter_id: id, reading: readings[j][0], timestamp: timestamp};
-						upsertReading(data, function (result) {
+				for (let j in readings) {
+					parseTimestamp(readings[j][1], (timestamp) => {
+						let data = {meter_id: id, reading: readings[j][0], timestamp: timestamp};
+						upsertReading(data, (result) => {
 							//console.log(result);
 						});
 					});
@@ -53,7 +52,7 @@ function getData() {
 // Inserts a reading to the db. fails on conflict
 //I can't think of a reason to use this over upsertReading()
 function insertReading(data, callback) {
-	pool.connect(function (err, client, done) {
+	pool.connect((err, client, done) => {
 		if (err) return console.error("error on get connection " + err);
 		client.query('INSERT INTO readings (meter_id, reading, read_timestamp) VALUES ($1, $2, $3);',
 			[data['meter_id'], data['reading'], data['timestamp']], function (err, result) {
@@ -79,14 +78,14 @@ function upsertReading(data, callback) {
 
 //takes in a single reading and returns the properly formed timestamp
 function parseTimestamp(raw, callback) {
-	var stamp = moment(raw, 'HH:mm:ss MM/DD/YY');
+	let stamp = moment(raw, 'HH:mm:ss MM/DD/YY');
 	stamp = stamp.format('YYYY-MM-DD HH:mm:ss');
 	callback(stamp);
 }
 
 
 //catches error from idle host
-pool.on('error', function (err, client) {
+pool.on('error', (err, client) => {
 	console.error('idle client error', err.message, err.stack)
 });
 
