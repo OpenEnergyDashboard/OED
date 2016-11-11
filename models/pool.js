@@ -1,6 +1,6 @@
-var mysql = require('mysql');
+let mysql = require('mysql');
 
-var pool  = mysql.createPool({
+let pool  = mysql.createPool({
     host     : 'localhost',
     user     : 'root',
     password : 'guest',

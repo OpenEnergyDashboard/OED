@@ -1,19 +1,19 @@
-var http = require('http');
-var parseString = require('xml2js').parseString;
-var parseXLSX = require('./parseXLSX.js');
-var url = "http://144.89.8.12/sm101.xml";
-var val = '';
-var ips = parseXLSX.parseXLSX('ips.xlsx');
+let http = require('http');
+let parseString = require('xml2js').parseString;
+let parseXLSX = require('./parseXLSX.js');
+let url = "http://144.89.8.12/sm101.xml";
+let val = '';
+let ips = parseXLSX.parseXLSX('ips.xlsx');
 function getXML (url, ip, callback) {
-    var req = http.get(url, function (res) {
+    let req = http.get(url, res => {
         // save the data
-        var xml = '';
-        res.on('data', function (chunk) {
+        let xml = '';
+        res.on('data', chunk => {
             xml += chunk;
         });
-        res.on('end', function () {
+        res.on('end', () => {
             // parse xml
-            parseString(xml, function (err, result) {
+            parseString(xml, (err, result) => {
                 val = result['Maverick']['NodeID'][0];
 				val = {name: val, ip: ip};
                 callback(val);
@@ -21,19 +21,18 @@ function getXML (url, ip, callback) {
         });
     });
 
-	req.on('error', function (err) {
+	req.on('error', err => {
 		console.error(err);
 	});
 }
 
 function parseAll(callback) {
-    for(var k in ips){
-		var ip = ips[k].ip;
+    for(let k in ips){
+		let ip = ips[k].ip;
 		url = 'http://'+ip+'/sm101.xml';
-        getXML(url, ip, function(meter){
+        getXML(url, ip, meter => {
 			console.log(meter);
 			callback(meter);
-			
         });
     }
 }
