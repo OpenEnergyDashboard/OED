@@ -4,9 +4,8 @@ CREATE TABLE IF NOT EXISTS meters (
   name VARCHAR(50) UNIQUE NOT NULL,
   ipAddress VARCHAR(20)
 );
-
+-- create readings table
 CREATE TABLE IF NOT EXISTS readings (
-  id SERIAL NOT NULL ,
   meter_id INT NOT NULL REFERENCES meters(id),
   reading INT NOT NULL,
   read_timestamp TIMESTAMP NOT NULL,
@@ -36,3 +35,9 @@ FROM readings
 GROUP BY meter_id, read_timestamp
 HAVING COUNT(*)>1
 ORDER BY meter_id ASC ;
+
+-- query to upsert a reading (insert, update reading on duplicate primary key)
+INSERT INTO readings (meter_id, reading, read_timestamp)
+VALUES ($1, $2, $3)
+ON CONFLICT (meter_id, read_timestamp)
+DO UPDATE SET reading = EXCLUDED.reading;

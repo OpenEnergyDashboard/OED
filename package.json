@@ -15,10 +15,14 @@
     "moment": "^2.15.2",
     "morgan": "~1.7.0",
     "mysql": "^2.11.1",
+    "node-cron": "^1.1.2",
     "pg": "^6.1.0",
     "q": "~1.4.1",
     "serve-favicon": "~2.3.0",
     "xlsx": "~0.8.0",
-    "xml2js": "^0.4.17"
+    "xml2js": "^0.4.17",
+    "winston": "~2.3.0",
+    "fs": "0.0.1-security",
+    "nodemailer": "~2.6.4"
   }
 }

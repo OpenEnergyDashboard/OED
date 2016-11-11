@@ -13,7 +13,7 @@ let config = {
 
 let pool = new pg.Pool(config);
 
-
+// inserts new meters into the db based on info from parseXML
 function insertMeters() {
 	// TODO: decouple this from parse xml so that it will work with whatever json we give it
 	parseXML.parseXML((meter) => {
