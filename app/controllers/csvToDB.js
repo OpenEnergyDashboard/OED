@@ -1,9 +1,9 @@
-var pg = require('pg');
-var parseXML = require('./parseXML');
-var parseCSV = require('./parseCSV');
-var moment = require('moment');
+let pg = require('pg');
+let parseXML = require('./parseXML');
+let parseCSV = require('./parseCSV');
+let moment = require('moment');
 
-var config = {
+let config = {
 	user: 'capstone',
 	database: 'capstone',
 	password: 'guest', // server running in docker
@@ -13,36 +13,32 @@ var config = {
 	idleTimeoutMillis: 30000
 };
 
-var pool = new pg.Pool(config);
+let pool = new pg.Pool(config);
 
 
 function getMeters(callback) {
-	pool.connect(function (err, client, done) {
+	pool.connect((err, client, done) => {
 		if (err) return console.error("error on get connection: " + err);
-
-		client.query('SELECT * FROM meters', function (err, result) {
+		client.query('SELECT * FROM meters', (err, result) => {
 			done(); //release connection back to the pool
 			if (err) return console.error("error inserting meters " + err);
 			result = result.rows; //array of json objects
 			callback(result);
-			//console.log(result);
 		});
-
 	});
 }
 
 function getData() {
-	getMeters(function (meters) {
-		for (var i in meters) {
-			var meter = meters[i];
-			// console.log(meter);
-			var url = 'http://' + meter['ipaddress'] + '/int4.csv';
-			parseCSV.parseMeterCSV(url, meter['id'], function (readings, id) {
+	getMeters((meters) => {
+		for (let i in meters) {
+			let meter = meters[i];
+			let url = 'http://' + meter['ipaddress'] + '/int4.csv';
+			parseCSV.parseMeterCSV(url, meter['id'], (readings, id) => {
 				//console.log(readings);
-				for (var j in readings) {
-					var timestamp = parseTimestamp(readings[j][1], function (timestamp) {
-						var data = {meter_id: id, reading: readings[j][0], timestamp: timestamp};
-						insertReading(data, function(result){
+				for (let j in readings) {
+					let timestamp = parseTimestamp(readings[j][1], (timestamp) => {
+						let data = {meter_id: id, reading: readings[j][0], timestamp: timestamp};
+						insertReading(data, (result) =>{
 							//console.log(result);
 						});
 					});
@@ -53,10 +49,10 @@ function getData() {
 }
 
 function insertReading(data, callback){
-	pool.connect(function (err, client, done) {
+	pool.connect((err, client, done) => {
 		if (err) return console.error("error on get connection " + err);
 		client.query('INSERT INTO readings (meter_id, reading, read_timestamp) VALUES ($1, $2, $3);',
-			[data['meter_id'], data['reading'], data['timestamp']], function (err, result) {
+			[data['meter_id'], data['reading'], data['timestamp']], (err, result) => {
 				done();
 				if (err) console.error("error inserting readings " + err);
 				callback(result);
@@ -65,14 +61,14 @@ function insertReading(data, callback){
 }
 
 function parseTimestamp(raw, callback) {
-	var stamp = moment(raw, 'HH:mm:ss MM/DD/YY');
+	let stamp = moment(raw, 'HH:mm:ss MM/DD/YY');
 	stamp = stamp.format('YYYY-MM-DD HH:mm:ss');
 	callback(stamp);
 }
 
 
 //catches error from idle host
-pool.on('error', function (err, client) {
+pool.on('error', (err, client) => {
 	console.error('idle client error', err.message, err.stack)
 });
 getData();
