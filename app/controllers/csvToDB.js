@@ -1,4 +1,4 @@
-let pool = require('./pgPool').pool;
+let pool = require('./../../models/pgPool').pool;
 let parseCSV = require('./parseCSV');
 let moment = require('moment');
 
