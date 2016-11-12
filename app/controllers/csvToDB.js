@@ -1,18 +1,6 @@
-let pg = require('pg');
+let pool = require('./pgPool').pool;
 let parseCSV = require('./parseCSV');
 let moment = require('moment');
-
-let config = {
-	user: 'capstone',
-	database: 'capstone',
-	password: 'guest', // server running in docker
-	host: 'localhost',
-	port: 5432,
-	max: 10,
-	idleTimeoutMillis: 30000
-};
-
-let pool = new pg.Pool(config);
 
 // gets all the meters in the db
 function getMeters(callback) {
@@ -82,12 +70,6 @@ function parseTimestamp(raw, callback) {
 	stamp = stamp.format('YYYY-MM-DD HH:mm:ss');
 	callback(stamp);
 }
-
-
-//catches error from idle host
-pool.on('error', (err, client) => {
-	console.error('idle client error', err.message, err.stack)
-});
 
 
 //getData();
