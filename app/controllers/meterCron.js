@@ -3,6 +3,10 @@ const Meter = require('./../../models/Meter');
 const Reading = require('./../../models/Reading');
 const readMamacData = require('./readMamacData');
 
+/**
+ * Pulls new data for all the meters in the database.
+ * This assumes that every meter is a MAMAC meter with a valid IP address.
+ */
 function updateAllMeters() {
 	Meter.getAll()
 		.then(meters => {

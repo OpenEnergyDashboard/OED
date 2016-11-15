@@ -14,19 +14,32 @@ class Meter {
         this.ipAddress = ipAddress;
     }
 
-    static getByName(name) {
+	/**
+	 * Returns a promise to retrieve the meter with the given name from the database.
+	 * @param name
+	 * @returns {Promise.<Meter>}
+	 */
+	static getByName(name) {
         return db.one("SELECT id, name, ipaddress FROM meters WHERE name=${name}", {name: name})
             .then(row => {
                 return new Meter(row['id'], row['name'], row['ipaddress'])
             })
     }
 
-    static getAll() {
+	/**
+	 * Returns a promise to get all of the meters from the database
+	 * @returns {Promise.<array.<Meter>>}
+	 */
+	static getAll() {
 	    return db.any("SELECT * FROM meters")
 		    .then(rows => rows.map(row => new Meter(row['id'], row['name'], row['ipaddress'])))
     }
 
-    insert() {
+	/**
+	 * Returns a promise to insert this meter into the database
+	 * @returns {Promise.<>}
+	 */
+	insert() {
 	    let meter = this;
 	    return new Promise((resolve, reject) => {
 		    if (this.id != undefined) {
@@ -39,7 +52,11 @@ class Meter {
 	    })
     }
 
-    readings() {
+	/**
+	 * Returns a promise to get all of the readings for this meter from the database.
+	 * @returns {Promise.<Array.<Reading>>}
+	 */
+	readings() {
 	    return Reading.getAllByMeterID(this.id)
     }
 }

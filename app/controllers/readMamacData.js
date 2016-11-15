@@ -10,8 +10,14 @@ function parseTimestamp(raw) {
 	return moment(raw, 'HH:mm:ss MM/DD/YY').format('YYYY-MM-DD HH:mm:ss');
 }
 
+/**
+ * Returns a promise containing all the readings currently stored on the given meter's hardware.
+ * The promise will reject if the meter doesn't have an IP address.
+ * @param meter
+ * @returns {Promise.<array.<Reading>>}
+ */
 function readMamacData(meter) {
-	// First get a promise that's just the meter itself (or an error if it
+	// First get a promise that's just the meter itself (or an error if it doesn't have an IP address)
 	return Promise.resolve(meter)
 		.then(meter => {
 				if (!meter.ipAddress) throw new Error(`${meter} doesn't have an IP address to read data from`);

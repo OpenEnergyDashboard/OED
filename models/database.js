@@ -1,5 +1,6 @@
 let pgp = require('pg-promise')();
 
+// Database configuration
 let config = {
     user: 'capstone',
     database: 'capstone',
