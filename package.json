@@ -10,19 +10,20 @@
     "cookie-parser": "~1.4.3",
     "csv": "^1.1.0",
     "debug": "~2.2.0",
+    "es6-promisify": "^5.0.0",
     "express": "~4.13.4",
+    "fs": "0.0.1-security",
     "jade": "~1.11.0",
     "moment": "^2.15.2",
     "morgan": "~1.7.0",
-    "mysql": "^2.11.1",
     "node-cron": "^1.1.2",
-    "pg": "^6.1.0",
-    "q": "~1.4.1",
+    "nodemailer": "~2.6.4",
+    "pg-promise": "^5.3.5",
+    "request": "^2.78.0",
+    "request-promise-native": "^1.0.3",
     "serve-favicon": "~2.3.0",
-    "xlsx": "~0.8.0",
-    "xml2js": "^0.4.17",
     "winston": "~2.3.0",
-    "fs": "0.0.1-security",
-    "nodemailer": "~2.6.4"
+    "xlsx": "~0.8.0",
+    "xml2js": "^0.4.17"
   }
 }
