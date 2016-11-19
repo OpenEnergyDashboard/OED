@@ -10,6 +10,7 @@
     "cookie-parser": "~1.4.3",
     "csv": "^1.1.0",
     "debug": "~2.2.0",
+    "dotenv": "^2.0.0",
     "es6-promisify": "^5.0.0",
     "express": "~4.13.4",
     "fs": "0.0.1-security",

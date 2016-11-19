@@ -1,14 +1,16 @@
-let pgp = require('pg-promise')();
+const pgp = require('pg-promise')();
+const path = require('path');
+require('dotenv').config({path: path.join(__dirname, '..', '.env')});
 
 // Database configuration
-let config = {
-    user: 'capstone',
-    database: 'capstone',
-    password: 'guest', // server running in docker
-    host: 'localhost',
-    port: 5432,
+const config = {
+    user: process.env.DB_USER,
+    database: process.env.DB_DATABASE,
+    password: process.env.DB_PASSWORD,
+    host: process.env.DB_HOST,
+    port: process.env.DB_PORT
 };
 
-let db = pgp(config);
+const db = pgp(config);
 
 module.exports = db;
