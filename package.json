@@ -25,5 +25,8 @@
     "winston": "~2.3.0",
     "xlsx": "~0.8.0",
     "xml2js": "^0.4.17"
+  },
+  "devDependencies": {
+    "eslint": "^3.10.2"
   }
 }
