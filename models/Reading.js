@@ -1,4 +1,3 @@
-'use strict';
 const db = require('./database');
 
 class Reading {
@@ -9,10 +8,12 @@ class Reading {
 	 * @param {Date} timestamp
 	 */
 	constructor(meterID, reading, timestamp) {
-		if (!timestamp instanceof Date) throw new Error(`Timestamp must be a date, was ${timestamp}, type ${typeof timestamp}`);
+		if (!(timestamp instanceof Date)) {
+			throw new Error(`Timestamp must be a date, was ${timestamp}, type ${typeof timestamp}`);
+		}
 		this.meterID = meterID;
 		this.reading = reading;
-		this.timestamp = timestamp
+		this.timestamp = timestamp;
 	}
 
 	/**
@@ -21,13 +22,11 @@ class Reading {
 	 * @returns {Promise.<>}
 	 */
 	static insertAll(readings) {
-		return db.tx(t => {
-			return t.batch(
-				readings.map(r => {
-					t.none('INSERT INTO readings (meter_id, reading, read_timestamp) VALUES (${meterID}, ${reading}, ${timestamp})', r)
-				})
+		return db.tx(t => t.batch(
+			readings.map(r =>
+				t.none('INSERT INTO readings (meter_id, reading, read_timestamp) VALUES (${meterID}, ${reading}, ${timestamp})', r)
 			)
-		})
+		));
 	}
 
 	/**
@@ -37,10 +36,10 @@ class Reading {
 	 */
 	static insertOrUpdateAll(readings) {
 		return db.tx(t => t.batch(
-			readings.map(r => {
+			readings.map(r =>
 				t.none('INSERT INTO readings (meter_id, reading, read_timestamp) VALUES (${meterID}, ${reading}, ${timestamp}) ON CONFLICT (meter_id, read_timestamp) DO UPDATE SET read_timestamp=${timestamp}', r)
-			})
-		))
+			)
+		));
 	}
 
 	/**
@@ -49,8 +48,8 @@ class Reading {
 	 * @returns {Promise.<array.<Reading>>}
 	 */
 	static getAllByMeterID(meterID) {
-		return db.any('SELECT meter_id, reading, read_timestamp FROM readings WHERE meter_id = ${meterID}', {meterID: meterID})
-			.then(rows => rows.map(row => new Reading(row['meter_id'], row['reading'], row['read_timestamp'])))
+		return db.any('SELECT meter_id, reading, read_timestamp FROM readings WHERE meter_id = ${meterID}', { meterID: meterID })
+			.then(rows => rows.map(row => new Reading(row.meter_id, row.reading, row.read_timestamp)));
 	}
 
 
@@ -59,7 +58,7 @@ class Reading {
 	 * @returns {Promise.<>}
 	 */
 	insert() {
-		return db.none('INSERT INTO readings (meter_id, reading, read_timestamp) VALUES (${meterID}, ${reading}, ${timestamp})', this)
+		return db.none('INSERT INTO readings (meter_id, reading, read_timestamp) VALUES (${meterID}, ${reading}, ${timestamp})', this);
 	}
 
 	/**
