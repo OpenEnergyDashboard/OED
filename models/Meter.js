@@ -21,10 +21,26 @@ class Meter {
 	 */
 	static getByName(name) {
         return db.one("SELECT id, name, ipaddress FROM meters WHERE name=${name}", {name: name})
-            .then(row => {
+            .then((row) => {
                 return new Meter(row['id'], row['name'], row['ipaddress'])
-            })
+            }).catch((err) => {
+				console.log('Error while performing GET specific meter by name query: ' + err);
+			});
     }
+
+	/**
+	 * Returns a promise to retrieve the meter with the given id from the database.
+	 * @param id
+	 * @returns {Promise.<Meter>}
+	 */
+	static getByID(id) {
+		return db.one("SELECT id, name, ipaddress FROM meters WHERE id=${id}", {id: id})
+			.then(row => {
+				return new Meter(row['id'], row['name'], row['ipaddress'])
+			}).catch((err) => {
+				console.log('Error while performing GET specific meter by id query: ' + err);
+			});
+	}
 
 	/**
 	 * Returns a promise to get all of the meters from the database
@@ -33,6 +49,9 @@ class Meter {
 	static getAll() {
 	    return db.any("SELECT * FROM meters")
 		    .then(rows => rows.map(row => new Meter(row['id'], row['name'], row['ipaddress'])))
+			.catch((err) => {
+				console.log('Error while performing GET all meters query: ' + err);
+			});
     }
 
 	/**
@@ -47,9 +66,11 @@ class Meter {
 		    } else {
 			    resolve(meter)
 		    }
-	    }).then(meter => {
+	    }).then((meter) => {
 		    return db.none("INSERT INTO meters(name, ipaddress) VALUES (${name}, ${ipAddress})", meter);
-	    })
+	    }).catch((err) => {
+			console.log("Error while performing INSERT meter query: " + err);
+		});
     }
 
 	/**

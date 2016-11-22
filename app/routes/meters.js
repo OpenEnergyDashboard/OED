@@ -1,27 +1,19 @@
 let express = require('express');
-const db = require('../../models/database');
+const Meter = require('../../models/Meter');
 let router = express.Router();
 
 /* GET all meters */
 router.get('/', (req, res) => {
-    db.any("SELECT * FROM Meters")
-        .then((rows) => {
-            res.json(rows);
-        })
-        .catch(() => {
-            console.log("Error while performing GET all meters query");
-        });
+    Meter.getAll().then((rows) => {
+        res.json(rows);
+    });
 });
 
 /* GET a specific user by id */
 router.get('/:meter_id', (req, res) => {
-    db.one("SELECT * FROM Meters WHERE meter_id = ${meter_id}", {meter_id: req.params.meter_id})
-        .then((row) => {
-            res.json(row)
-        })
-        .catch(() => {
-            console.log('Error while performing GET specific meter by id query');
-        });
+    Meter.getByID(req.params.meter_id).then((rows) => {
+        res.json(rows);
+    });
 });
 
 module.exports = router;

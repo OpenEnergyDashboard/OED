@@ -7,7 +7,7 @@ let cookieParser = require('cookie-parser');
 let bodyParser = require('body-parser');
 
 let users = require('./app/routes/users');
-let meters = require('./app/routes/users');
+let meters = require('./app/routes/meters');
 
 app.use(favicon(path.join(__dirname, 'public', 'favicon.ico')));
 app.use(logger('dev'));
@@ -16,8 +16,8 @@ app.use(bodyParser.urlencoded({ extended: false }));
 app.use(cookieParser());
 app.use(express.static(path.join(__dirname, 'public')));
 
-app.use('/users', users);
-app.use('/meters', meters);
+app.use('/api/users', users);
+app.use('/api/meters', meters);
 
 // catch 404 and forward to error handler
 app.use((req, res, next) => {

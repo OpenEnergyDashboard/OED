@@ -12,8 +12,8 @@ function insertMeters() {
 	);
 }
 
-insertMeters()
-	.then(() => console.log("Done inserting!"))
-	.catch(err => console.error(err));
+// insertMeters()
+// 	.then(() => console.log("Done inserting!"))
+// 	.catch(err => console.error(err));
 
 exports.insertMeters = insertMeters;
