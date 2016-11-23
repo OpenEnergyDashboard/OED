@@ -20,8 +20,6 @@ class User {
         return db.one("SELECT * FROM users WHERE id=${id}", {id: id})
             .then(row => {
                 return new User(row['id'], row['name'])
-            }).catch((err) => {
-                console.log('Error while performing GET specific user by id query: ' + err);
             });
     }
 
@@ -31,10 +29,7 @@ class User {
      */
     static getAll() {
         return db.any("SELECT * FROM users")
-            .then(rows => rows.map(row => new User(row['id'], row['name'])))
-            .catch((err) => {
-                console.log('Error while performing GET all users query: ' + err);
-            });
+            .then(rows => rows.map(row => new User(row['id'], row['name'])));
     }
 
     /**
@@ -42,7 +37,7 @@ class User {
      * @returns {Promise.<>}
      */
     insert() {
-        let user = this;
+        const user = this;
         return new Promise((resolve, reject) => {
             if (this.id != undefined) {
                 reject(Error("Attempt to insert a user that already has an ID"))

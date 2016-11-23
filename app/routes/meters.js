@@ -6,6 +6,8 @@ let router = express.Router();
 router.get('/', (req, res) => {
     Meter.getAll().then((rows) => {
         res.json(rows);
+    }).catch((err) => {
+        console.log('Error while performing GET all meters query: ' + err);
     });
 });
 
@@ -13,6 +15,8 @@ router.get('/', (req, res) => {
 router.get('/:meter_id', (req, res) => {
     Meter.getByID(req.params.meter_id).then((rows) => {
         res.json(rows);
+    }).catch((err) => {
+        console.log('Error while performing GET specific meter by id query: ' + err);
     });
 });
 

@@ -23,9 +23,7 @@ class Meter {
         return db.one("SELECT id, name, ipaddress FROM meters WHERE name=${name}", {name: name})
             .then((row) => {
                 return new Meter(row['id'], row['name'], row['ipaddress'])
-            }).catch((err) => {
-				console.log('Error while performing GET specific meter by name query: ' + err);
-			});
+            });
     }
 
 	/**
@@ -37,8 +35,6 @@ class Meter {
 		return db.one("SELECT id, name, ipaddress FROM meters WHERE id=${id}", {id: id})
 			.then(row => {
 				return new Meter(row['id'], row['name'], row['ipaddress'])
-			}).catch((err) => {
-				console.log('Error while performing GET specific meter by id query: ' + err);
 			});
 	}
 
@@ -48,10 +44,7 @@ class Meter {
 	 */
 	static getAll() {
 	    return db.any("SELECT * FROM meters")
-		    .then(rows => rows.map(row => new Meter(row['id'], row['name'], row['ipaddress'])))
-			.catch((err) => {
-				console.log('Error while performing GET all meters query: ' + err);
-			});
+		    .then(rows => rows.map(row => new Meter(row['id'], row['name'], row['ipaddress'])));
     }
 
 	/**
@@ -68,9 +61,7 @@ class Meter {
 		    }
 	    }).then((meter) => {
 		    return db.none("INSERT INTO meters(name, ipaddress) VALUES (${name}, ${ipAddress})", meter);
-	    }).catch((err) => {
-			console.log("Error while performing INSERT meter query: " + err);
-		});
+	    });
     }
 
 	/**
