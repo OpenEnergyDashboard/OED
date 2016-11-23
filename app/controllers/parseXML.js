@@ -38,15 +38,3 @@ function allMetersPromises() {
 
 exports.allMeters = allMetersPromises;
 // parseAll();
-
-/*
-	To do tomorrow:
-		Get rid of the non-promise code in parseXML.js. Make sure it isn't used elsewhere.
-		Promisify parseCSV.js
-
-		Unit tests (?)
-
-		Actually do the whole gap detection thing.
-
-		Take a look at meterCron.js. It looks like it's calling pollMeters(), but I can't find that.
- */

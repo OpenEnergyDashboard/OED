@@ -1,50 +1,22 @@
 let express = require('express');
-let pool = require('./../../models/pool.js').pool;
+const User = require('../../models/User');
 let router = express.Router();
 
 /* GET all users */
 router.get('/', (req, res) => {
-    pool.getConnection((err, connection) => {
-        if (err) {
-            connection.release();
-            res.json({"code": 100, "status": "Error in connection database"});
-            return;
-        }
-        connection.query("SELECT * FROM Users", (err, rows) => {
-            connection.release();
-            if (!err) {
-                res.json(rows);
-            }
-            else {
-                console.log('Error while performing GET all users query');
-            }
-        });
-        connection.on('error', err => {
-            res.json({"code": 100, "status": "Error in connection to database"});
-        });
+    User.getAll().then((rows) => {
+        res.json(rows);
+    }).catch((err) => {
+        console.log('Error while performing GET all users query: ' + err);
     });
 });
 
 /* GET a specific user by id */
 router.get('/:user_id', (req, res) => {
-    pool.getConnection((err, connection) => {
-        if (err) {
-            connection.release();
-            res.json({"code": 100, "status": "Error in connection database"});
-            return;
-        }
-        connection.query("SELECT * FROM Users WHERE user_id = ?", req.params.user_id, (err, user) => {
-            connection.release();
-            if (!err) {
-                res.json(user);
-            }
-            else {
-                console.log('Error while performing GET specific user by id query');
-            }
-        });
-        connection.on('error', err => {
-            res.json({"code": 100, "status": "Error in connection to database"});
-        });
+    User.getByID(req.params.user_id).then((rows) => {
+        res.json(rows);
+    }).catch((err) => {
+        console.log('Error while performing GET specific user by id query: ' + err);
     });
 });
 
