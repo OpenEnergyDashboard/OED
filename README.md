@@ -8,12 +8,12 @@ This web application is designed to display environmental information about Belo
 2. Clone this repository
 3. Run ```npm install```
 4. Install PostgreSQL, start the PostgreSQL server, and create the database using sql/testdb.sql.
-5. Create a .env file in the root directory of the project with the following, replacing (?) with the desired information:
-&nbsp;&nbsp;&nbsp;&nbsp;SERVER_PORT=?
-&nbsp;&nbsp;&nbsp;&nbsp;DB_USER=?
-&nbsp;&nbsp;&nbsp;&nbsp;DB_DATABASE=?
-&nbsp;&nbsp;&nbsp;&nbsp;DB_PASSWORD=?
-&nbsp;&nbsp;&nbsp;&nbsp;DB_HOST=?
+5. Create a .env file in the root directory of the project with the following, replacing (?) with the desired information: <br>
+&nbsp;&nbsp;&nbsp;&nbsp;SERVER_PORT=?<br>
+&nbsp;&nbsp;&nbsp;&nbsp;DB_USER=?<br>
+&nbsp;&nbsp;&nbsp;&nbsp;DB_DATABASE=?<br>
+&nbsp;&nbsp;&nbsp;&nbsp;DB_PASSWORD=?<br>
+&nbsp;&nbsp;&nbsp;&nbsp;DB_HOST=?<br>
 &nbsp;&nbsp;&nbsp;&nbsp;DB_PORT=?
 6. Run ```npm start```
 
