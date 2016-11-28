@@ -1,5 +1,3 @@
-CREATE DATABASE environmental_dashboard;
-
 -- create meters table
 CREATE TABLE IF NOT EXISTS meters (
   id SERIAL PRIMARY KEY,
