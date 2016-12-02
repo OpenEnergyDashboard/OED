@@ -1,5 +1,7 @@
 'use strict';
-const db = require('./database');
+const database = require('./database');
+const db = database.db;
+const sqlFile = database.sqlFile;
 const Reading = require('./Reading');
 
 class Meter {
@@ -15,12 +17,20 @@ class Meter {
     }
 
 	/**
+	 * Returns a promise to create the meters table.
+	 * @return {Promise.<>}
+	 */
+	static createTable() {
+		return db.none(sqlFile('meter/create_meters_table.sql'))
+	}
+
+	/**
 	 * Returns a promise to retrieve the meter with the given name from the database.
 	 * @param name
 	 * @returns {Promise.<Meter>}
 	 */
 	static getByName(name) {
-        return db.one("SELECT id, name, ipaddress FROM meters WHERE name=${name}", {name: name})
+        return db.one(sqlFile('meter/get_meter_by_name.sql'), {name: name})
             .then((row) => {
                 return new Meter(row['id'], row['name'], row['ipaddress'])
             });
@@ -32,7 +42,7 @@ class Meter {
 	 * @returns {Promise.<Meter>}
 	 */
 	static getByID(id) {
-		return db.one("SELECT id, name, ipaddress FROM meters WHERE id=${id}", {id: id})
+		return db.one(sqlFile('meter/get_meter_by_id.sql'), {id: id})
 			.then(row => {
 				return new Meter(row['id'], row['name'], row['ipaddress'])
 			});
@@ -43,7 +53,7 @@ class Meter {
 	 * @returns {Promise.<array.<Meter>>}
 	 */
 	static getAll() {
-	    return db.any("SELECT * FROM meters")
+	    return db.any(sqlFile('meter/get_all_meters.sql'))
 		    .then(rows => rows.map(row => new Meter(row['id'], row['name'], row['ipaddress'])));
     }
 
@@ -60,7 +70,7 @@ class Meter {
 			    resolve(meter)
 		    }
 	    }).then((meter) => {
-		    return db.none("INSERT INTO meters(name, ipaddress) VALUES (${name}, ${ipAddress})", meter);
+		    return db.none(sqlFile('meter/insert_new_meter.sql'), meter);
 	    });
     }
 

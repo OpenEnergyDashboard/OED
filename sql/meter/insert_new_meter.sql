@@ -1,0 +1,1 @@
+INSERT INTO meters(name, ipaddress) VALUES (${name}, ${ipAddress});
