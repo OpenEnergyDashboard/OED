@@ -1,0 +1,1 @@
+SELECT id, name, ipaddress FROM meters WHERE id=${id};

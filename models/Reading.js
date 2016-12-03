@@ -1,5 +1,7 @@
 'use strict';
-const db = require('./database');
+const database = require('./database');
+const db = database.db;
+const sqlFile = database.sqlFile;
 
 class Reading {
 	/**
@@ -16,6 +18,14 @@ class Reading {
 	}
 
 	/**
+	 * Returns a promise to create the readings table.
+	 * @return {Promise.<>}
+	 */
+	static createTable() {
+		return db.none(sqlFile('reading/create_readings_table.sql'))
+	}
+
+	/**
 	 * Returns a promise to insert all of the given readings into the database (as a transaction)
 	 * @param {array<Reading>} readings the readings to insert
 	 * @returns {Promise.<>}
@@ -24,7 +34,7 @@ class Reading {
 		return db.tx(t => {
 			return t.batch(
 				readings.map(r => {
-					t.none('INSERT INTO readings (meter_id, reading, read_timestamp) VALUES (${meterID}, ${reading}, ${timestamp})', r)
+					t.none(sqlFile('reading/insert_new_reading.sql'), r)
 				})
 			)
 		})
@@ -38,7 +48,7 @@ class Reading {
 	static insertOrUpdateAll(readings) {
 		return db.tx(t => t.batch(
 			readings.map(r => {
-				t.none('INSERT INTO readings (meter_id, reading, read_timestamp) VALUES (${meterID}, ${reading}, ${timestamp}) ON CONFLICT (meter_id, read_timestamp) DO UPDATE SET read_timestamp=${timestamp}', r)
+				t.none(sqlFile('reading/insert_or_update_reading.sql'), r)
 			})
 		))
 	}
@@ -49,7 +59,7 @@ class Reading {
 	 * @returns {Promise.<array.<Reading>>}
 	 */
 	static getAllByMeterID(meterID) {
-		return db.any('SELECT meter_id, reading, read_timestamp FROM readings WHERE meter_id = ${meterID}', {meterID: meterID})
+		return db.any(sqlFile('reading/get_all_readings_by_meter_id.sql'), {meterID: meterID})
 			.then(rows => rows.map(row => new Reading(row['meter_id'], row['reading'], row['read_timestamp'])))
 	}
 
@@ -59,7 +69,7 @@ class Reading {
 	 * @returns {Promise.<>}
 	 */
 	insert() {
-		return db.none('INSERT INTO readings (meter_id, reading, read_timestamp) VALUES (${meterID}, ${reading}, ${timestamp})', this)
+		return db.none(sqlFile('reading/insert_new_reading.sql'), this)
 	}
 
 	/**
@@ -67,7 +77,7 @@ class Reading {
 	 * @returns {Promise.<>}
 	 */
 	insertOrUpdate() {
-		return db.none('INSERT INTO readings (meter_id, reading, read_timestamp) VALUES (${meterID}, ${reading}, ${timestamp}) ON CONFLICT (meter_id, read_timestamp) DO UPDATE SET timestamp=${timestamp}', this);
+		return db.none(sqlFile('reading/insert_or_update_reading.sql'), this);
 	}
 
 	toString() {
