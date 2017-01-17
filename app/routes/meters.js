@@ -1,50 +1,22 @@
 let express = require('express');
-let pool = require('./../../models/pool.js').pool;
+const Meter = require('../../models/Meter');
 let router = express.Router();
 
 /* GET all meters */
 router.get('/', (req, res) => {
-    pool.getConnection((err, connection) => {
-        if (err) {
-            connection.release();
-            res.json({"code": 100, "status": "Error in connection database"});
-            return;
-        }
-        connection.query("SELECT * FROM Meters", (err, rows) => {
-            connection.release();
-            if (!err) {
-                res.json(rows);
-            }
-            else {
-                console.log('Error while performing GET all meters query');
-            }
-        });
-        connection.on('error', (err) => {
-            res.json({"code": 100, "status": "Error in connection to database"});
-        });
+    Meter.getAll().then((rows) => {
+        res.json(rows);
+    }).catch((err) => {
+        console.log('Error while performing GET all meters query: ' + err);
     });
 });
 
 /* GET a specific user by id */
 router.get('/:meter_id', (req, res) => {
-    pool.getConnection((err, connection) => {
-        if (err) {
-            connection.release();
-            res.json({"code": 100, "status": "Error in connection database"});
-            return;
-        }
-        connection.query("SELECT * FROM Meters WHERE meter_id = ?", req.params.meter_id, (err, user) => {
-            connection.release();
-            if (!err) {
-                res.json(user);
-            }
-            else {
-                console.log('Error while performing GET specific meter by id query');
-            }
-        });
-        connection.on('error', err => {
-            res.json({"code": 100, "status": "Error in connection to database"});
-        });
+    Meter.getByID(req.params.meter_id).then((rows) => {
+        res.json(rows);
+    }).catch((err) => {
+        console.log('Error while performing GET specific meter by id query: ' + err);
     });
 });
 

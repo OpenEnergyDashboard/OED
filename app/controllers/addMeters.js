@@ -1,4 +1,4 @@
-const parseXML = require('./parseXML');
+let parseXML = require('./parseXML');
 
 /**
  * A promise that inserts all meters from ips.xlsx into the database.
@@ -12,9 +12,8 @@ function insertMeters() {
 	);
 }
 
+// insertMeters()
+// 	.then(() => console.log("Done inserting!"))
+// 	.catch(err => console.error(err));
+
 exports.insertMeters = insertMeters;
-/*
-insertMeters()
-	.then(() => console.log("Done inserting!"))
-	.catch(err => console.error(err));
-*/
