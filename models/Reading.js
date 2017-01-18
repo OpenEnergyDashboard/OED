@@ -63,6 +63,19 @@ class Reading {
 			.then(rows => rows.map(row => new Reading(row['meter_id'], row['reading'], row['read_timestamp'])))
 	}
 
+    /**
+	 * Returns a promise to get all of the readings for this meter within (inclusive) a specified date range from the database.
+	 * If no startDate is specified, all readings from the beginning of time to the endDate are returned.
+	 * If no endDate is specified, all readings after and including the startDate are returned.
+     * @param meterID
+     * @param {Date} startDate
+     * @param {Date} endDate
+     * @returns {Promise.<array.<Reading>>}
+     */
+	static getReadingsByMeterIDAndDateRange(meterID, startDate, endDate) {
+        return db.any(sqlFile('reading/get_readings_by_meter_id_and_date_range.sql'), {meterID: meterID, startDate: startDate, endDate: endDate})
+            .then(rows => rows.map(row => new Reading(row['meter_id'], row['reading'], row['read_timestamp'])))
+	}
 
 	/**
 	 * Returns a promise to insert this reading into the database.
