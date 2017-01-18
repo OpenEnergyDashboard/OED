@@ -4,7 +4,7 @@
  * Module dependencies.
  */
 
-let app = require('../app');
+let app = require('../server/app');
 let debug = require('debug')('meterdatagetter:server');
 let http = require('http');
 

@@ -3,7 +3,7 @@ let http = require('http');
 let parseString = require('xml2js').parseString;
 let parseXLSX = require('./parseXLSX.js');
 
-const Meter = require('./../../models/Meter');
+const Meter = require('../models/Meter');
 const reqPromise = require('request-promise-native');
 const promisify = require('es6-promisify');
 const parseXMLPromisified = promisify(parseString);

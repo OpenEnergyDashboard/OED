@@ -4,7 +4,7 @@ const csv = require('csv');
 const parseCsv = promisify(csv.parse);
 const moment = require('moment');
 
-const Reading = require('./../../models/Reading');
+const Reading = require('../models/Reading');
 
 function parseTimestamp(raw) {
 	return moment(raw, 'HH:mm:ss MM/DD/YY').format('YYYY-MM-DD HH:mm:ss');

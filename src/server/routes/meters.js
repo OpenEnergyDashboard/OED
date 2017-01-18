@@ -1,6 +1,6 @@
 let express = require('express');
-const Meter = require('../../models/Meter');
-const Reading = require('../../models/Reading');
+const Meter = require('../models/Meter');
+const Reading = require('../models/Reading');
 let router = express.Router();
 
 /**

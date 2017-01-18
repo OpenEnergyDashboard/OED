@@ -18,6 +18,7 @@ This web application is designed to display environmental information about Belo
 &nbsp;&nbsp;&nbsp;&nbsp;DB_PASSWORD=?<br>
 &nbsp;&nbsp;&nbsp;&nbsp;DB_HOST=?<br>
 &nbsp;&nbsp;&nbsp;&nbsp;DB_PORT=?
+1. Run ```npm run build``` to create the Webpack bundle for production, otherwise run ```npm run dev``` for development.
 1. Run ```npm start```
 
 ### Contact: ###
