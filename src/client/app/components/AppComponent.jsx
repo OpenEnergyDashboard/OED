@@ -1,4 +1,6 @@
 import React from 'react';
+import DashboardComponent from './DashboardComponent.jsx'
+import LogoComponent from './LogoComponent.jsx'
 
 export default class AppComponent extends React.Component {
 
@@ -8,7 +10,10 @@ export default class AppComponent extends React.Component {
 
     render() {
         return (
-            <h1>Hello World</h1>
+            <div>
+                <LogoComponent url="../old-mockup/images/logo.png"/>
+                <DashboardComponent />
+            </div>
         );
     }
 }
