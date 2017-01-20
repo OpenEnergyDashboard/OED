@@ -3,7 +3,8 @@
   "version": "0.0.0",
   "private": true,
   "scripts": {
-    "start": "node ./bin/www"
+    "start": "node ./bin/www",
+    "lint": "./node_modules/.bin/eslint app/controllers/**/*.js models/**/*.js"
   },
   "dependencies": {
     "body-parser": "~1.15.1",
@@ -25,5 +26,12 @@
     "winston": "~2.3.0",
     "xlsx": "~0.8.0",
     "xml2js": "^0.4.17"
+  },
+  "devDependencies": {
+    "eslint": "^3.10.2",
+    "eslint-config-airbnb": "^13.0.0",
+    "eslint-plugin-import": "^2.2.0",
+    "eslint-plugin-jsx-a11y": "^2.2.3",
+    "eslint-plugin-react": "^6.7.1"
   }
 }

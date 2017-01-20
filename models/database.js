@@ -1,14 +1,14 @@
 const pgp = require('pg-promise')();
 const path = require('path');
-require('dotenv').config({path: path.join(__dirname, '..', '.env')});
+require('dotenv').config({ path: path.join(__dirname, '..', '.env') });
 
 // Database configuration
 const config = {
-    user: process.env.DB_USER,
-    database: process.env.DB_DATABASE,
-    password: process.env.DB_PASSWORD,
-    host: process.env.DB_HOST,
-    port: process.env.DB_PORT
+	user: process.env.DB_USER,
+	database: process.env.DB_DATABASE,
+	password: process.env.DB_PASSWORD,
+	host: process.env.DB_HOST,
+	port: process.env.DB_PORT
 };
 
 /**
@@ -33,7 +33,7 @@ const loadedSqlFiles = {};
 function sqlFile(filePath) {
 	const sqlFilePath = path.join(sqlFilesDir, filePath);
 	if (loadedSqlFiles[sqlFilePath] === undefined) {
-		loadedSqlFiles[sqlFilePath] = new pgp.QueryFile(path.join(sqlFilesDir, filePath), {minify: true});
+		loadedSqlFiles[sqlFilePath] = new pgp.QueryFile(path.join(sqlFilesDir, filePath), { minify: true });
 	}
 	return loadedSqlFiles[sqlFilePath];
 }

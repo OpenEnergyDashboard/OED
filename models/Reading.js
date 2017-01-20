@@ -1,5 +1,5 @@
-'use strict';
 const database = require('./database');
+
 const db = database.db;
 const sqlFile = database.sqlFile;
 
@@ -11,10 +11,12 @@ class Reading {
 	 * @param {Date} timestamp
 	 */
 	constructor(meterID, reading, timestamp) {
-		if (!timestamp instanceof Date) throw new Error(`Timestamp must be a date, was ${timestamp}, type ${typeof timestamp}`);
+		if (!(timestamp instanceof Date)) {
+			throw new Error(`Timestamp must be a date, was ${timestamp}, type ${typeof timestamp}`);
+		}
 		this.meterID = meterID;
 		this.reading = reading;
-		this.timestamp = timestamp
+		this.timestamp = timestamp;
 	}
 
 	/**
@@ -22,7 +24,7 @@ class Reading {
 	 * @return {Promise.<>}
 	 */
 	static createTable() {
-		return db.none(sqlFile('reading/create_readings_table.sql'))
+		return db.none(sqlFile('reading/create_readings_table.sql'));
 	}
 
 	/**
@@ -31,13 +33,9 @@ class Reading {
 	 * @returns {Promise.<>}
 	 */
 	static insertAll(readings) {
-		return db.tx(t => {
-			return t.batch(
-				readings.map(r => {
-					t.none(sqlFile('reading/insert_new_reading.sql'), r)
-				})
-			)
-		})
+		return db.tx(t => t.batch(
+			readings.map(r => t.none(sqlFile('reading/insert_new_reading.sql'), r))
+		));
 	}
 
 	/**
@@ -47,10 +45,8 @@ class Reading {
 	 */
 	static insertOrUpdateAll(readings) {
 		return db.tx(t => t.batch(
-			readings.map(r => {
-				t.none(sqlFile('reading/insert_or_update_reading.sql'), r)
-			})
-		))
+			readings.map(r => t.none(sqlFile('reading/insert_or_update_reading.sql'), r))
+		));
 	}
 
 	/**
@@ -59,8 +55,8 @@ class Reading {
 	 * @returns {Promise.<array.<Reading>>}
 	 */
 	static getAllByMeterID(meterID) {
-		return db.any(sqlFile('reading/get_all_readings_by_meter_id.sql'), {meterID: meterID})
-			.then(rows => rows.map(row => new Reading(row['meter_id'], row['reading'], row['read_timestamp'])))
+		return db.any(sqlFile('reading/get_all_readings_by_meter_id.sql'), { meterID: meterID })
+			.then(rows => rows.map(row => new Reading(row.meter_id, row.reading, row.read_timestamp)));
 	}
 
     /**
@@ -82,7 +78,7 @@ class Reading {
 	 * @returns {Promise.<>}
 	 */
 	insert() {
-		return db.none(sqlFile('reading/insert_new_reading.sql'), this)
+		return db.none(sqlFile('reading/insert_new_reading.sql'), this);
 	}
 
 	/**
