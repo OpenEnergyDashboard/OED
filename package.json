@@ -6,7 +6,7 @@
     "start": "node ./src/bin/www",
     "dev": "webpack -d --watch",
     "build": "webpack -p",
-    "lint": "./node_modules/.bin/eslint app/controllers/**/*.js models/**/*.js"
+    "lint": "./node_modules/.bin/eslint src/client/app/**/*.js src/client/app/**/*.jsx src/server/**/*.js src/server/**/*.jsx"
   },
   "dependencies": {
     "babel-loader": "^6.2.10",
@@ -38,11 +38,11 @@
   },
   "devDependencies": {
     "babel-core": "^6.21.0",
-	"eslint": "^3.10.2",
-	"eslint-config-airbnb": "^13.0.0",
-	"eslint-plugin-import": "^2.2.0",
-	"eslint-plugin-jsx-a11y": "^2.2.3",
-	"eslint-plugin-react": "^6.7.1",
+    "eslint": "^3.10.2",
+    "eslint-config-airbnb": "^13.0.0",
+    "eslint-plugin-import": "^2.2.0",
+    "eslint-plugin-jsx-a11y": "^2.2.3",
+    "eslint-plugin-react": "^6.7.1",
     "redux-devtools": "^3.3.2",
     "webpack": "^1.14.0"
   },
