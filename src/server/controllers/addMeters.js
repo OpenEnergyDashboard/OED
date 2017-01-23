@@ -1,4 +1,4 @@
-let parseXML = require('./parseXML');
+const parseXML = require('./parseXML');
 
 /**
  * A promise that inserts all meters from ips.xlsx into the database.
