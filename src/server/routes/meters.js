@@ -1,17 +1,20 @@
-let express = require('express');
+const express = require('express');
 const Meter = require('../models/Meter');
 const Reading = require('../models/Reading');
-let router = express.Router();
+
+const router = express.Router();
 
 /**
  * GET information on all meters
  */
 router.get('/', (req, res) => {
-    Meter.getAll().then((rows) => {
-        res.json(rows);
-    }).catch((err) => {
-        console.log('Error while performing GET all meters query: ' + err);
-    });
+	Meter.getAll()
+		.then(rows => {
+			res.json(rows);
+		})
+		.catch(err => {
+			console.log(`Error while performing GET all meters query: ${err}`);
+		});
 });
 
 /**
@@ -19,11 +22,13 @@ router.get('/', (req, res) => {
  * @param {int} meter_id
  */
 router.get('/:meter_id', (req, res) => {
-    Meter.getByID(req.params.meter_id).then((rows) => {
-        res.json(rows);
-    }).catch((err) => {
-        console.log('Error while performing GET specific meter by id query: ' + err);
-    });
+	Meter.getByID(req.params.meter_id)
+		.then(rows => {
+			res.json(rows);
+		})
+		.catch(err => {
+			console.log(`Error while performing GET specific meter by id query: ${err}`);
+		});
 });
 
 /**
@@ -33,19 +38,23 @@ router.get('/:meter_id', (req, res) => {
  * @param {Date} [endDate]
  */
 router.get('/readings/:meter_id', (req, res) => {
-    if (req.query.startDate || req.query.endDate) {
-        Reading.getReadingsByMeterIDAndDateRange(req.params.meter_id, req.query.startDate, req.query.endDate).then((rows) => {
-            res.json(rows);
-        }).catch((err) => {
-            console.log('Error while performing GET specific meter readings with date range query: ' + err);
-        });
-    } else {
-        Reading.getAllByMeterID(req.params.meter_id).then((rows) => {
-            res.json(rows);
-        }).catch((err) => {
-            console.log('Error while performing GET all readings from specific meter by id query: ' + err);
-        });
-    }
+	if (req.query.startDate || req.query.endDate) {
+		Reading.getReadingsByMeterIDAndDateRange(req.params.meter_id, req.query.startDate, req.query.endDate)
+			.then(rows => {
+				res.json(rows);
+			})
+			.catch(err => {
+				console.log(`Error while performing GET specific meter readings with date range query: ${err}`);
+			});
+	} else {
+		Reading.getAllByMeterID(req.params.meter_id)
+			.then(rows => {
+				res.json(rows);
+			})
+			.catch(err => {
+				console.log(`Error while performing GET all readings from specific meter by id query: ${err}`);
+			});
+	}
 });
 
 module.exports = router;

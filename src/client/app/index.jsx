@@ -13,5 +13,5 @@ import reducer from './reducers'
 //     document.getElementById('root')
 // );
 render(
-    <AppComponent/>, document.getElementById('root')
+	<AppComponent/>, document.getElementById('root')
 );
