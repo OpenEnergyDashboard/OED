@@ -8,5 +8,8 @@ node_modules
 # Private
 private
 
+# Build files
+/src/client/public/*
+
 # Environment Variables
 .env

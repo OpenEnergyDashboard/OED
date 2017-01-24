@@ -2,10 +2,9 @@ const reqPromise = require('request-promise-native');
 const promisify = require('es6-promisify');
 const csv = require('csv');
 const moment = require('moment');
+const Reading = require('../models/Reading');
 
 const parseCsv = promisify(csv.parse);
-
-const Reading = require('./../../models/Reading');
 
 function parseTimestamp(raw) {
 	return moment(raw, 'HH:mm:ss MM/DD/YY').format('YYYY-MM-DD HH:mm:ss');

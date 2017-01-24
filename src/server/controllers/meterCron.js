@@ -1,6 +1,6 @@
 const cron = require('node-cron');
-const Meter = require('./../../models/Meter');
-const Reading = require('./../../models/Reading');
+const Meter = require('../models/Meter');
+const Reading = require('../models/Reading');
 const readMamacData = require('./readMamacData');
 
 /**

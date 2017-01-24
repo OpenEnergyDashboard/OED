@@ -1,7 +1,7 @@
 const parseString = require('xml2js').parseString;
 const parseXLSX = require('./parseXLSX.js');
 
-const Meter = require('./../../models/Meter');
+const Meter = require('../models/Meter');
 const reqPromise = require('request-promise-native');
 const promisify = require('es6-promisify');
 
