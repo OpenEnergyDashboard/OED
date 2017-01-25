@@ -5,6 +5,15 @@ const Reading = require('../models/Reading');
 const router = express.Router();
 
 /**
+ * Takes in an array of row objects and reformats the timestamp from ISO 8601 format to the number
+ * of milliseconds since January 1st, 1970 and groups each reading with each timestamp.
+ * @param rows
+ */
+function formatReadings(rows) {
+	return rows.map(row => [new Date(row.timestamp).valueOf(), row.reading]);
+}
+
+/**
  * GET information on all meters
  */
 router.get('/', (req, res) => {
@@ -41,7 +50,7 @@ router.get('/readings/:meter_id', (req, res) => {
 	if (req.query.startDate || req.query.endDate) {
 		Reading.getReadingsByMeterIDAndDateRange(req.params.meter_id, req.query.startDate, req.query.endDate)
 			.then(rows => {
-				res.json(rows);
+				res.json(formatReadings(rows));
 			})
 			.catch(err => {
 				console.log(`Error while performing GET specific meter readings with date range query: ${err}`);
@@ -49,7 +58,7 @@ router.get('/readings/:meter_id', (req, res) => {
 	} else {
 		Reading.getAllByMeterID(req.params.meter_id)
 			.then(rows => {
-				res.json(rows);
+				res.json(formatReadings(rows));
 			})
 			.catch(err => {
 				console.log(`Error while performing GET all readings from specific meter by id query: ${err}`);

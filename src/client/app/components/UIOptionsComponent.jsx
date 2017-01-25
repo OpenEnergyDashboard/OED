@@ -1,6 +1,5 @@
 import React from 'react';
 
-
 export default class UIOptionsComponent extends React.Component {
 
 	constructor(props) {
