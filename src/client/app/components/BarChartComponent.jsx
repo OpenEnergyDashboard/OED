@@ -2,12 +2,15 @@ import React from 'react';
 import ReactHighcharts from 'react-highcharts';
 import axios from 'axios';
 
-export default class ChartComponent extends React.Component {
+export default class BarChartComponent extends React.Component {
 
 	constructor(props) {
 		super(props);
 		this.state = {
 			config: {
+				chart: {
+					type: 'column'
+				},
 				title: {
 					text: null
 				},
@@ -23,16 +26,23 @@ export default class ChartComponent extends React.Component {
 				},
 				yAxis: {
 					title: {
-						text: 'kWh/m'
+						text: 'kWh'
 					},
-					plotLines: [{
-						value: 0,
-						width: 1,
-						color: '#808080'
-					}]
+					min: 0
 				},
 				tooltip: {
-					valueSuffix: ' kWh/m'
+					headerFormat: '<span style="font-size:10px">{point.key}</span><table>',
+					pointFormat: '<tr><td style="color:{series.color};padding:0">{series.name}: </td>' +
+					'<td style="padding:0"><b>{point.y:.1f} kWh</b></td></tr>',
+					footerFormat: '</table>',
+					shared: true,
+					useHTML: true
+				},
+				plotOptions: {
+					column: {
+						pointPadding: 0.2,
+						borderWidth: 0
+					}
 				},
 				legend: {
 					layout: 'vertical',
@@ -44,7 +54,7 @@ export default class ChartComponent extends React.Component {
 					enabled: false
 				},
 				series: [{
-					name: 'Test data',
+					name: 'Meter readings',
 					data: []
 				}]
 			}
@@ -52,7 +62,7 @@ export default class ChartComponent extends React.Component {
 	}
 
 	componentWillMount() {
-		axios.get('/api/meters/readings/3')
+		axios.get('/api/meters/readings/6')
 			.then(response => {
 				const chart = this.chart;
 				chart.series[0].setData(response.data);
@@ -65,7 +75,7 @@ export default class ChartComponent extends React.Component {
 	render() {
 		return (
 			<div className="col-md-8">
-				<ReactHighcharts config={this.state.config} ref={c => { this.chart = c.chart;}} />
+				<ReactHighcharts config={this.state.config} ref={c => { this.chart = c.chart; }} />
 			</div>
 		);
 	}
