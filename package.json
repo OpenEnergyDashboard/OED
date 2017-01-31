@@ -6,7 +6,8 @@
     "start": "node ./src/bin/www",
     "dev": "webpack -d --watch",
     "build": "webpack -p",
-    "lint": "./node_modules/.bin/eslint src/client/app/**/*.js src/client/app/**/*.jsx src/server/**/*.js src/server/**/*.jsx"
+    "lint": "./node_modules/.bin/eslint src/client/app/**/*.js src/client/app/**/*.jsx src/server/**/*.js src/server/**/*.jsx",
+	"test": "./node_modules/.bin/mocha \"src/server/test/**/*.js\""
   },
   "dependencies": {
     "babel-loader": "^6.2.10",
@@ -38,11 +39,15 @@
   },
   "devDependencies": {
     "babel-core": "^6.21.0",
+    "chai": "^3.5.0",
+    "chai-as-promised": "^6.0.0",
     "eslint": "^3.10.2",
     "eslint-config-airbnb": "^13.0.0",
     "eslint-plugin-import": "^2.2.0",
     "eslint-plugin-jsx-a11y": "^2.2.3",
     "eslint-plugin-react": "^6.7.1",
+    "mocha": "^3.2.0",
+    "mock-require": "^2.0.1",
     "redux-devtools": "^3.3.2",
     "webpack": "^1.14.0"
   },
