@@ -14,23 +14,26 @@ const router = express.Router();
  */
 router.post('/', (req, res) => {
 	User.getByEmail(req.body.email)
-		.then(row => Promise.all([
-			Promise.resolve(row),
-			bcrypt.compare(req.body.password, row.passwordHash)
+		.catch(() => {
+			throw new Error('User not found');
+		})
+		.then(user => Promise.all([
+			Promise.resolve(user),
+			bcrypt.compare(req.body.password, user.passwordHash)
 		])).then(isValid => {
 			if (isValid[1]) {
-				const token = jwt.sign({ data: isValid[0].id }, process.env.TOKEN_SECRET, {
-					expiresIn: 86400 // expires in one day
-				});
-				res.json({
-					token: token
-				});
+				const token = jwt.sign({ data: isValid[0].id }, process.env.TOKEN_SECRET, { expiresIn: 86400 });
+				res.json({ token: token	});
 			} else {
-				res.status(401).send({ text: 'Not authorized' });
+				throw new Error('Unauthorized password');
 			}
 		})
 		.catch(err => {
-			console.log(err);
+			if (err.message === 'Unauthorized password' || err.message === 'User not found') {
+				res.status(401).send({ text: 'Not authorized' });
+			} else {
+				res.status(500).send({ text: 'Internal Server Error' });
+			}
 		});
 });
 
