@@ -1,1 +1,1 @@
-INSERT INTO users(name) VALUES (${name})
+INSERT INTO users(email) VALUES (${email})

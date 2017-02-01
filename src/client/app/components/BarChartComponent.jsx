@@ -3,7 +3,6 @@ import ReactHighcharts from 'react-highcharts';
 import axios from 'axios';
 
 export default class BarChartComponent extends React.Component {
-
 	constructor(props) {
 		super(props);
 		this.state = {

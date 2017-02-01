@@ -3,7 +3,6 @@ import ReactHighstock from 'react-highcharts/ReactHighstock';
 import axios from 'axios';
 
 export default class LineChartComponent extends React.Component {
-
 	constructor(props) {
 		super(props);
 		this.state = {
