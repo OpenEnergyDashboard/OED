@@ -23,7 +23,7 @@ function promiseRetrieveMeterFromUrlAndIp(url, ip) {
 		.then(raw => parseXMLPromisified(raw))
 		.then(xml => {
 			const name = xml.Maverick.NodeID[0];
-			return new Meter(undefined, name, ip);
+			return new Meter(undefined, name, ip, true, Meter.type.MAMAC);
 		});
 }
 
