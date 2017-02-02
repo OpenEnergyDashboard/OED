@@ -1,6 +1,5 @@
 import React from 'react';
 import LogoComponent from './LogoComponent';
-import LoginComponent from './LoginComponent';
 
 export default function HeaderComponent() {
 	const titleStyle = {
@@ -10,7 +9,6 @@ export default function HeaderComponent() {
 		<div>
 			<LogoComponent url="./app/images/logo.png" />
 			<h1 style={titleStyle}>Environmental Dashboard</h1>
-			<LoginComponent />
 		</div>
 	);
 }

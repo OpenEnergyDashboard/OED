@@ -1,5 +1,7 @@
 import React from 'react';
 import axios from 'axios';
+import { browserHistory } from 'react-router';
+import HeaderComponent from './HeaderComponent';
 
 export default class LoginComponent extends React.Component {
 	constructor(props) {
@@ -26,31 +28,36 @@ export default class LoginComponent extends React.Component {
 			password: this.state.password
 		})
 		.then(response => {
-			console.log(response);
+			localStorage.setItem('token', response.data.token);
+			browserHistory.push('/admin');
 		})
-		.catch(error => {
-			console.log(error);
-		});
+		.catch(console.log);
 	}
 
 	render() {
 		const formStyle = {
-			maxWidth: '200px',
-			float: 'right',
-			marginRight: '75px'
+			maxWidth: '500px',
+			margin: 'auto',
+			width: '50%'
+		};
+		const buttonStyle = {
+			marginTop: '10px'
 		};
 		return (
-			<form style={formStyle} onSubmit={this.handleSubmit}>
-				<div className="input-group">
-					<span className="input-group-addon"><i className="glyphicon glyphicon-user" /></span>
-					<input type="text" className="form-control" placeholder="Email" value={this.state.value} onChange={this.handleEmailChange} />
-				</div>
-				<div className="input-group">
-					<span className="input-group-addon"><i className="glyphicon glyphicon-lock" /></span>
-					<input type="password" className="form-control" placeholder="Password" value={this.state.value} onChange={this.handlePasswordChange} />
-				</div>
-				<input className="btn btn-default" type="submit" value="Login" />
-			</form>
+			<div>
+				<HeaderComponent />
+				<form style={formStyle} onSubmit={this.handleSubmit}>
+					<div className="input-group">
+						<span className="input-group-addon"><i className="glyphicon glyphicon-user" /></span>
+						<input type="text" className="form-control" placeholder="Email" value={this.state.value} onChange={this.handleEmailChange} />
+					</div>
+					<div className="input-group">
+						<span className="input-group-addon"><i className="glyphicon glyphicon-lock" /></span>
+						<input type="password" className="form-control" placeholder="Password" value={this.state.value} onChange={this.handlePasswordChange} />
+					</div>
+					<input style={buttonStyle} className="btn btn-default" type="submit" value="Login" />
+				</form>
+			</div>
 		);
 	}
 }
