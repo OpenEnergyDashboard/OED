@@ -53,8 +53,9 @@ export default class LineChartComponent extends React.Component {
 	componentWillMount() {
 		axios.get('/api/meters/readings/6')
 			.then(response => {
-				const chart = this.chart;
-				chart.series[0].setData(response.data);
+				const configToUpdate = this.state.config;
+				configToUpdate.series[0].data = response.data;
+				this.setState({ configToUpdate: response.data });
 			})
 			.catch(error => {
 				console.log(error);
@@ -64,7 +65,7 @@ export default class LineChartComponent extends React.Component {
 	render() {
 		return (
 			<div className="col-md-8">
-				<ReactHighstock config={this.state.config} ref={c => { this.chart = c.chart; }} />
+				<ReactHighstock config={this.state.config} />
 			</div>
 		);
 	}
