@@ -1,16 +1,23 @@
+const express = require('express');
 const jwt = require('jsonwebtoken');
 const path = require('path');
 require('dotenv').config({ path: path.join(__dirname, '..', '..', '..', '.env') });
 
-module.exports = (req, res, next) => {
-	const token = req.headers.token || req.body.token || req.query.token;
+const router = express.Router();
+
+/**
+ * Route for verifying a JWT.
+ * @param token
+ */
+router.post('/', (req, res) => {
+	const token = req.body.token;
 	if (token) {
-		jwt.verify(token, process.env.TOKEN_SECRET, (err, decoded) => {
+		jwt.verify(token, process.env.TOKEN_SECRET, err => {
 			if (err) {
 				res.status(401).json({ success: false, message: 'Failed to authenticate token.' });
+			} else {
+				res.status(200).json({ success: true });
 			}
-			req.decoded = decoded;
-			next();
 		});
 	} else {
 		res.status(403).send({
@@ -18,4 +25,6 @@ module.exports = (req, res, next) => {
 			message: 'No token provided.'
 		});
 	}
-};
+});
+
+module.exports = router;
