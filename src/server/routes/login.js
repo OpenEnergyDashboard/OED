@@ -20,9 +20,9 @@ router.post('/', (req, res) => {
 		.then(user => Promise.all([
 			Promise.resolve(user),
 			bcrypt.compare(req.body.password, user.passwordHash)
-		])).then(isValid => {
-			if (isValid[1]) {
-				const token = jwt.sign({ data: isValid[0].id }, process.env.TOKEN_SECRET, { expiresIn: 86400 });
+		])).then(([user, isValid]) => {
+			if (isValid) {
+				const token = jwt.sign({ data: user.id }, process.env.TOKEN_SECRET, { expiresIn: 86400 });
 				res.json({ token: token	});
 			} else {
 				throw new Error('Unauthorized password');

@@ -53,9 +53,13 @@ export default class LineChartComponent extends React.Component {
 	componentWillMount() {
 		axios.get('/api/meters/readings/6')
 			.then(response => {
-				const configToUpdate = this.state.config;
-				configToUpdate.series[0].data = response.data;
-				this.setState({ configToUpdate: response.data });
+				this.setState(prevState => {
+					const seriesCopy = Object.assign({}, prevState.config.series[0]);
+					seriesCopy.data = response.data;
+					return {
+						config: Object.assign({}, prevState.config, { series: [seriesCopy].concat(prevState.config.series.slice(1)) })
+					};
+				});
 			})
 			.catch(error => {
 				console.log(error);

@@ -32,6 +32,7 @@ export default class LoginComponent extends React.Component {
 			browserHistory.push('/admin');
 		})
 		.catch(console.log);
+		this.setState({ email: '', password: '' });
 	}
 
 	render() {
@@ -49,11 +50,11 @@ export default class LoginComponent extends React.Component {
 				<form style={formStyle} onSubmit={this.handleSubmit}>
 					<div className="input-group">
 						<span className="input-group-addon"><i className="glyphicon glyphicon-user" /></span>
-						<input type="text" className="form-control" placeholder="Email" value={this.state.value} onChange={this.handleEmailChange} />
+						<input type="text" className="form-control" placeholder="Email" value={this.state.email} onChange={this.handleEmailChange} />
 					</div>
 					<div className="input-group">
 						<span className="input-group-addon"><i className="glyphicon glyphicon-lock" /></span>
-						<input type="password" className="form-control" placeholder="Password" value={this.state.value} onChange={this.handlePasswordChange} />
+						<input type="password" className="form-control" placeholder="Password" value={this.state.password} onChange={this.handlePasswordChange} />
 					</div>
 					<input style={buttonStyle} className="btn btn-default" type="submit" value="Login" />
 				</form>
