@@ -68,7 +68,7 @@ export default class LineChartComponent extends React.Component {
 
 	render() {
 		return (
-			<div className="col-md-8">
+			<div className="col-xs-11">
 				<ReactHighstock config={this.state.config} />
 			</div>
 		);

@@ -4,26 +4,27 @@ import LogoComponent from './LogoComponent';
 
 export default function HeaderComponent(props) {
 	const titleStyle = {
-		textAlign: 'center'
+		display: 'inline-block',
 	};
 	const divRightStyle = {
 		float: 'right',
-		marginRight: '75px'
+		marginTop: '5px',
+		marginRight: '20px'
 	};
 	const loginLinkStyle = {
-		display: localStorage.getItem('token') || props.renderLoginButton === 'false' ? 'none' : 'block'
+		display: localStorage.getItem('token') || props.renderLoginButton === 'false' ? 'none' : 'inline'
 	};
 	const adminLinkStyle = {
-		display: localStorage.getItem('token') ? 'block' : 'none'
+		display: localStorage.getItem('token') ? 'inline' : 'none'
 	};
 	return (
-		<div>
-			<LogoComponent url="./app/images/logo.png" />
+		<div className="text-center">
+			<Link to="/"><LogoComponent url="./app/images/logo.png" /></Link>
+			<h1 style={titleStyle}>Environmental Dashboard</h1>
 			<div style={divRightStyle}>
 				<Link style={loginLinkStyle} to="/login"><button className="btn btn-default">Log in</button></Link>
 				<Link style={adminLinkStyle} to="/admin"><button className="btn btn-default">Admin panel</button></Link>
 			</div>
-			<h1 style={titleStyle}>Environmental Dashboard</h1>
 		</div>
 	);
 }
