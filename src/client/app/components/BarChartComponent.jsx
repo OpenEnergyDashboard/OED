@@ -3,7 +3,6 @@ import ReactHighcharts from 'react-highcharts';
 import axios from 'axios';
 
 export default class BarChartComponent extends React.Component {
-
 	constructor(props) {
 		super(props);
 		this.state = {
@@ -64,8 +63,13 @@ export default class BarChartComponent extends React.Component {
 	componentWillMount() {
 		axios.get('/api/meters/readings/6')
 			.then(response => {
-				const chart = this.chart;
-				chart.series[0].setData(response.data);
+				this.setState(prevState => {
+					const seriesCopy = Object.assign({}, prevState.config.series[0]);
+					seriesCopy.data = response.data;
+					return {
+						config: Object.assign({}, prevState.config, { series: [seriesCopy].concat(prevState.config.series.slice(1)) })
+					};
+				});
 			})
 			.catch(error => {
 				console.log(error);
@@ -74,8 +78,8 @@ export default class BarChartComponent extends React.Component {
 
 	render() {
 		return (
-			<div className="col-md-8">
-				<ReactHighcharts config={this.state.config} ref={c => { this.chart = c.chart; }} />
+			<div className="col-xs-11">
+				<ReactHighcharts config={this.state.config} />
 			</div>
 		);
 	}

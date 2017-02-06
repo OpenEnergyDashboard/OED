@@ -8,7 +8,7 @@ export default function UIOptionsComponent() {
 		paddingTop: '35px'
 	};
 	return (
-		<div className="col-md-2" style={divPadding}>
+		<div className="col-xs-1" style={divPadding}>
 			<p style={labelStyle}>Energy Type:</p>
 			<div className="radio">
 				<label><input type="radio" name="energyTypes" value="Electricity" defaultChecked />Electricity</label>

@@ -1,6 +1,6 @@
 import React from 'react';
 import { render } from 'react-dom';
-import AppComponent from './components/AppComponent';
+import RouteComponent from './components/RouteComponent';
 // import { createStore } from 'redux'
 // import { Provider } from 'react-redux'
 // import reducer from './reducers'
@@ -12,6 +12,8 @@ import AppComponent from './components/AppComponent';
 //     </Provider>,
 //     document.getElementById('root')
 // );
+
 render(
-	<AppComponent />, document.getElementById('root')
+	<RouteComponent />,
+	document.getElementById('root')
 );
