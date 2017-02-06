@@ -10,7 +10,9 @@ const readMamacData = require('./readMamacData');
 function updateAllMeters() {
 	Meter.getAll()
 		.then(meters =>
-				meters.map(meter =>
+			meters
+				.filter(m => m.enabled && m.type === Meter.type.MAMAC)
+				.map(meter =>
 					readMamacData(meter).then(Reading.insertOrUpdateAll)
 				)
 		)

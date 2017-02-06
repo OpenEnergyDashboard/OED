@@ -17,6 +17,7 @@ module.exports = {
 		"dot-notation": "warn",
 		"radix": ["error", "as-needed"],
 		"no-useless-constructor": ["warn"],
+		"no-param-reassign": 0,
 
 		"react/jsx-indent": ["error", "tab"], // Still tabs, not spaces
 		"react/no-direct-mutation-state": ["error"],

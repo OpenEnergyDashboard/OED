@@ -6,11 +6,13 @@ const sqlFile = database.sqlFile;
 class User {
 	/**
 	 * @param id This users's ID. Should be undefined if the user is being newly created
-	 * @param name This user's name
+	 * @param email This user's email
+	 * @param passwordHash The user's passwordHash
 	 */
-	constructor(id, name) {
+	constructor(id, email, passwordHash) {
 		this.id = id;
-		this.name = name;
+		this.email = email;
+		this.passwordHash = passwordHash;
 	}
 
 	/**
@@ -28,7 +30,18 @@ class User {
 	 */
 	static getByID(id) {
 		return db.one(sqlFile('user/get_user_by_id.sql'), { id: id })
-			.then(row => new User(row.id, row.name));
+			.then(row => new User(row.id, row.email));
+	}
+
+	/**
+	 * Returns a promise to retrieve the user with the given email from the database.
+	 * This exposes the user's password_hash and should only be used for authentication purposes.
+	 * @param email
+	 * @returns {Promise.<User>}
+	 */
+	static getByEmail(email) {
+		return db.one(sqlFile('user/get_user_by_email.sql'), { email: email })
+			.then(row => new User(row.id, row.email, row.password_hash));
 	}
 
 	/**
@@ -37,7 +50,7 @@ class User {
 	 */
 	static getAll() {
 		return db.any(sqlFile('user/get_all_users.sql'))
-			.then(rows => rows.map(row => new User(row.id, row.name)));
+			.then(rows => rows.map(row => new User(row.id, row.email)));
 	}
 
 	/**
