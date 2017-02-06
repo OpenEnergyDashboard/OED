@@ -15,7 +15,7 @@ config.database = {
 	port: process.env.DB_TEST_PORT || process.env.DB_PORT
 };
 
-const db = require('../models/database').db;
+const { db, sqlFile } = require('../models/database');
 const Meter = require('../models/Meter');
 const Reading = require('../models/Reading');
 const mocha = require('mocha');
@@ -23,6 +23,8 @@ const mocha = require('mocha');
 function recreateDB() {
 	return db.none('DROP TABLE IF EXISTS readings')
 		.then(() => db.none('DROP TABLE IF EXISTS meters'))
+		.then(() => db.none('DROP TYPE meter_type'))
+		.then(() => db.none(sqlFile('meter/create_meter_types_enum.sql')))
 		.then(Meter.createTable)
 		.then(Reading.createTable);
 }
@@ -31,7 +33,7 @@ mocha.describe('Database Tests', () => {
 	mocha.beforeEach(recreateDB);
 
 	mocha.it('saves and retrieves a meter', () => {
-		const meter = new Meter(undefined, 'Meter', null);
+		const meter = new Meter(undefined, 'Meter', null, false, Meter.type.MAMAC);
 		const getMeter = meter.insert()
 			.then(() => Meter.getByName(meter.name));
 		return chai.expect(getMeter).to.eventually.have.property('name', meter.name);
