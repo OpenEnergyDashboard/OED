@@ -8,6 +8,8 @@ const app = require('../server/app');
 const debug = require('debug')('meterdatagetter:server');
 const http = require('http');
 
+const serverPort = require('../server/config').serverPort;
+
 /**
  * Normalize a port into a number, string, or false.
  */
@@ -33,7 +35,7 @@ function normalizePort(val) {
  * Get port from environment and store in Express.
  */
 
-const port = normalizePort(process.env.SERVER_PORT || '3000');
+const port = normalizePort(serverPort);
 app.set('port', port);
 
 

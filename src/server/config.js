@@ -14,4 +14,7 @@ config.database = {
 	port: process.env.DB_PORT
 };
 
+config.secretToken = process.env.TOKEN_SECRET;
+config.serverPort = process.env.SERVER_PORT;
+
 module.exports = config;

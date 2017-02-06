@@ -2,8 +2,7 @@ const express = require('express');
 const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
 const User = require('../models/User');
-const path = require('path');
-require('dotenv').config({ path: path.join(__dirname, '..', '..', '..', '.env') });
+const secretToken = require('../config').secretToken;
 
 const router = express.Router();
 
@@ -22,7 +21,7 @@ router.post('/', (req, res) => {
 			bcrypt.compare(req.body.password, user.passwordHash)
 		])).then(([user, isValid]) => {
 			if (isValid) {
-				const token = jwt.sign({ data: user.id }, process.env.TOKEN_SECRET, { expiresIn: 86400 });
+				const token = jwt.sign({ data: user.id }, secretToken, { expiresIn: 86400 });
 				res.json({ token: token	});
 			} else {
 				throw new Error('Unauthorized password');

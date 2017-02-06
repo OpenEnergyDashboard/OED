@@ -1,7 +1,6 @@
 const express = require('express');
 const jwt = require('jsonwebtoken');
-const path = require('path');
-require('dotenv').config({ path: path.join(__dirname, '..', '..', '..', '.env') });
+const secretToken = require('../config').secretToken;
 
 const router = express.Router();
 
@@ -12,7 +11,7 @@ const router = express.Router();
 router.post('/', (req, res) => {
 	const token = req.body.token;
 	if (token) {
-		jwt.verify(token, process.env.TOKEN_SECRET, err => {
+		jwt.verify(token, secretToken, err => {
 			if (err) {
 				res.status(401).json({ success: false, message: 'Failed to authenticate token.' });
 			} else {
