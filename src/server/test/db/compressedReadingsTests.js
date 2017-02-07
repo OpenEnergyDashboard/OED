@@ -56,4 +56,17 @@ mocha.describe('Compressed Readings', () => {
 		const expectedSecondCompressedRate = reading3.reading;
 		chai.expect(compressedReadings[1].reading_rate).to.be.closeTo(expectedSecondCompressedRate, 0.0001);
 	}));
+
+	mocha.it('compresses readings that overlap an end point', () => db.task(function* runTest(t) {
+		const reading1 = new Reading(meter.id, 100, timestamp1.toDate(), timestamp2.toDate());
+		const reading2 = new Reading(meter.id, 200, timestamp2.toDate(), timestamp3.toDate());
+		yield Reading.insertAll([reading1, reading2], t);
+		const startTimestamp = timestamp1.clone().add(30, 'minutes');
+		const endTimestamp = timestamp3;
+
+		const compressedReadings = yield Reading.getCompressedReadings(meter.id, startTimestamp.toDate(), endTimestamp.toDate(), 1);
+		// The compression rate should weight the first reading half as much as the second one because its intersect time is half as long.
+		const expectedFirstCompressedRate = ((0.5 * reading1.reading) + reading2.reading) / 1.5;
+		expect(compressedReadings[0].reading_rate).to.be.closeTo(expectedFirstCompressedRate, 0.0001);
+	}));
 });

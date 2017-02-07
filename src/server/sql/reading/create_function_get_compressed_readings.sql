@@ -1,3 +1,7 @@
+/**
+	This function compresses the readings for a meter over a given date range to a given number of even intervals, and
+	returns a query
+ */
 CREATE OR REPLACE FUNCTION compressed_readings(
 	meter_id INTEGER,
 	from_timestamp TIMESTAMP = '-infinity',
@@ -10,14 +14,17 @@ CREATE OR REPLACE FUNCTION compressed_readings(
 		real_end_timestamp TIMESTAMP;
 	BEGIN
 		/*
-			Shrink our region so that it starts at the beginning of the first eligible reading and ends at the end of the last
-			one.
+			Shrink our region so that it starts at either the beginning of the first eligible reading or from_timestamp's place
+			if it intersects that reading, and ends at the end of the last eligible reading or to_timestamp's place in that reading
+			if it falls inside that range.
 		*/
 		SELECT
-			MIN(readings.start_timestamp), MAX(readings.end_timestamp)
+			greatest(MIN(readings.start_timestamp), from_timestamp), least(MAX(readings.end_timestamp), to_timestamp)
 		INTO real_start_timestamp, real_end_timestamp
 		FROM readings
-		WHERE readings.meter_id = $1 AND readings.start_timestamp >= $2 AND readings.end_timestamp <= $3;
+			-- We do WHERE readings.end_timestamp >= from_timestamp to catch readings that hang off the left end of our range.
+			-- Likewise with readings.start_timestamp <= to_timestamp
+		WHERE readings.meter_id = $1 AND readings.end_timestamp >= from_timestamp AND readings.start_timestamp <= to_timestamp;
 
 		point_width := (real_end_timestamp - real_start_timestamp) / num_points;
 
