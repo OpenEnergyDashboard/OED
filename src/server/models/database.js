@@ -44,4 +44,9 @@ function createSchema() {
 		.then(Reading.createTable);
 }
 
-module.exports = { db, sqlFile, createSchema };
+module.exports = {
+	db,
+	sqlFile,
+	createSchema,
+	pgp
+};
