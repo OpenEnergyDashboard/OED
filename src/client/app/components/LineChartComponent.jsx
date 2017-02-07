@@ -3,7 +3,6 @@ import ReactHighstock from 'react-highcharts/ReactHighstock';
 import axios from 'axios';
 
 export default class LineChartComponent extends React.Component {
-
 	constructor(props) {
 		super(props);
 		this.state = {
@@ -54,8 +53,13 @@ export default class LineChartComponent extends React.Component {
 	componentWillMount() {
 		axios.get('/api/meters/readings/6')
 			.then(response => {
-				const chart = this.chart;
-				chart.series[0].setData(response.data);
+				this.setState(prevState => {
+					const seriesCopy = Object.assign({}, prevState.config.series[0]);
+					seriesCopy.data = response.data;
+					return {
+						config: Object.assign({}, prevState.config, { series: [seriesCopy].concat(prevState.config.series.slice(1)) })
+					};
+				});
 			})
 			.catch(error => {
 				console.log(error);
@@ -64,8 +68,8 @@ export default class LineChartComponent extends React.Component {
 
 	render() {
 		return (
-			<div className="col-md-8">
-				<ReactHighstock config={this.state.config} ref={c => { this.chart = c.chart; }} />
+			<div className="col-xs-11">
+				<ReactHighstock config={this.state.config} />
 			</div>
 		);
 	}

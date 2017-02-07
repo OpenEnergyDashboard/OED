@@ -17,7 +17,8 @@ This web application is designed to display environmental information about Belo
 &nbsp;&nbsp;&nbsp;&nbsp;DB_DATABASE=? // The database you just created, so likely environmental_dashboard<br>
 &nbsp;&nbsp;&nbsp;&nbsp;DB_PASSWORD=?<br>
 &nbsp;&nbsp;&nbsp;&nbsp;DB_HOST=?<br>
-&nbsp;&nbsp;&nbsp;&nbsp;DB_PORT=?
+&nbsp;&nbsp;&nbsp;&nbsp;DB_PORT=? <br>
+&nbsp;&nbsp;&nbsp;&nbsp;TOKEN_SECRET=? // Token for authentication
 1. Run ```npm run build``` to create the Webpack bundle for production, otherwise run ```npm run dev``` for development.
 1. Run ```npm start```
 
