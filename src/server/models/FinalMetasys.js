@@ -7,7 +7,6 @@ const readCsv = require('../controllers/readCSV');
  * @return {Promise.<array.<array>>}
  */
 
-// what is this returning??
 var array = [];
 var i = 1;
 readCsv('PowerMon1.csv')
