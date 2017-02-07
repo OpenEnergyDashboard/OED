@@ -31,11 +31,12 @@ class Meter {
 
 	/**
 	 * Returns a promise to retrieve the meter with the given name from the database.
-	 * @param name
+	 * @param name the meter's name
+	 * @param conn the connection to use. Defaults to the default database connection.
 	 * @returns {Promise.<Meter>}
 	 */
-	static getByName(name) {
-		return db.one(sqlFile('meter/get_meter_by_name.sql'), { name: name })
+	static getByName(name, conn = db) {
+		return conn.one(sqlFile('meter/get_meter_by_name.sql'), { name: name })
 			.then(Meter.mapRow);
 	}
 
@@ -45,27 +46,30 @@ class Meter {
 	/**
 	 * Returns a promise to retrieve the meter with the given id from the database.
 	 * @param id
+ 	 * @param conn the connection to use. Defaults to the default database connection.
 	 * @returns {Promise.<Meter>}
 	 */
-	static getByID(id) {
-		return db.one(sqlFile('meter/get_meter_by_id.sql'), { id: id })
+	static getByID(id, conn = db) {
+		return conn.one(sqlFile('meter/get_meter_by_id.sql'), { id: id })
 			.then(Meter.mapRow);
 	}
 
 	/**
 	 * Returns a promise to get all of the meters from the database
+	 * @param conn the connection to use. Defaults to the default database connection.
 	 * @returns {Promise.<array.<Meter>>}
 	 */
-	static getAll() {
-		return db.any(sqlFile('meter/get_all_meters.sql'))
+	static getAll(conn = db) {
+		return conn.any(sqlFile('meter/get_all_meters.sql'))
 			.then(rows => rows.map(Meter.mapRow));
 	}
 
 	/**
 	 * Returns a promise to insert this meter into the database
+	 * @param conn the connection to use. Defaults to the default database connection.
 	 * @returns {Promise.<>}
 	 */
-	insert() {
+	insert(conn = db) {
 		const meter = this;
 		return new Promise((resolve, reject) => {
 			if (meter.id !== undefined) {
@@ -73,15 +77,16 @@ class Meter {
 			} else {
 				resolve(meter);
 			}
-		}).then(m => db.none(sqlFile('meter/insert_new_meter.sql'), m));
+		}).then(m => conn.none(sqlFile('meter/insert_new_meter.sql'), m));
 	}
 
 	/**
 	 * Returns a promise to get all of the readings for this meter from the database.
+	 * @param conn the connection to use. Defaults to the default database connection.
 	 * @returns {Promise.<Array.<Reading>>}
 	 */
-	readings() {
-		return Reading.getAllByMeterID(this.id);
+	readings(conn = db) {
+		return Reading.getAllByMeterID(this.id, conn);
 	}
 }
 

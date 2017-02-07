@@ -1,4 +1,4 @@
-CREATE FUNCTION compressed_readings(
+CREATE OR REPLACE FUNCTION compressed_readings(
 	meter_id INTEGER,
 	from_timestamp TIMESTAMP = '-infinity',
 	to_timestamp TIMESTAMP = 'infinity',
@@ -32,14 +32,14 @@ CREATE FUNCTION compressed_readings(
 				compressed.start AS reading_start,
 				extract(EPOCH FROM least(r.end_timestamp, compressed.start + point_width) - greatest(r.start_timestamp, compressed.start)) AS duration
 			FROM readings r
-			INNER JOIN generate_series(real_start_timestamp, real_end_timestamp, point_width) compressed(start) ON
-						(r.start_timestamp, r.end_timestamp) OVERLAPS (compressed.start, compressed.start + point_width)
+			INNER JOIN generate_series(real_start_timestamp, real_end_timestamp - point_width, point_width) compressed(start) ON
+					r.start_timestamp <= compressed.start + point_width AND r.end_timestamp >= compressed.start
 		)
 		SELECT
 			sum(r.reading_kw * r.duration) / sum(r.duration) AS reading_rate,
 			r.reading_start AS start_timestamp,
 			r.reading_start + point_width AS end_timestamp
 		FROM readings_by_compression_point r
-		GROUP BY r.reading_start;
+		GROUP BY r.reading_start ORDER BY r.reading_start ASC;
 	END;
 	$$ LANGUAGE plpgsql;
