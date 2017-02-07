@@ -30,6 +30,15 @@ class Meter {
 	}
 
 	/**
+	 * Returns a promise to create the meter_type type.
+	 * This needs to be run before Meter.createTable().
+	 * @return {Promise<void>}
+	 */
+	static createMeterTypesEnum() {
+		return db.none(sqlFile('meter/create_meter_types_enum.sql'));
+	}
+
+	/**
 	 * Returns a promise to retrieve the meter with the given name from the database.
 	 * @param name
 	 * @returns {Promise.<Meter>}
