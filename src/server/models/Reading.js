@@ -12,14 +12,12 @@ class Reading {
 	 * @param {Date} endTimestamp
 	 */
 	constructor(meterID, reading, startTimestamp, endTimestamp) {
-		/*
 		if (!(startTimestamp instanceof Date)) {
 			throw new Error(`startTimestamp must be a date, was ${startTimestamp}, type ${typeof startTimestamp}`);
 		}
 		if (!(endTimestamp instanceof Date)) {
 			throw new Error(`endTimestamp must be a date, was ${endTimestamp}, type ${typeof endTimestamp}`);
 		}
-		*/
 		this.meterID = meterID;
 		this.reading = reading;
 		this.startTimestamp = startTimestamp;
