@@ -23,7 +23,7 @@ const mocha = require('mocha');
 function recreateDB() {
 	return db.none('DROP TABLE IF EXISTS readings')
 		.then(() => db.none('DROP TABLE IF EXISTS meters'))
-		.then(() => db.none('DROP TYPE meter_type'))
+		.then(() => db.none('DROP TYPE IF EXISTS meter_type'))
 		.then(() => db.none(sqlFile('meter/create_meter_types_enum.sql')))
 		.then(Meter.createTable)
 		.then(Reading.createTable);
