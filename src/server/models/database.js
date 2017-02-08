@@ -41,7 +41,8 @@ function createSchema() {
 	/* eslint-enable global-require */
 	return Meter.createMeterTypesEnum()
 		.then(Meter.createTable)
-		.then(Reading.createTable);
+		.then(Reading.createTable)
+		.then(db.none(sqlFile('reading/create_function_get_compressed_readings.sql')));
 }
 
 module.exports = {
