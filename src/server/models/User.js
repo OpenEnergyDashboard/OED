@@ -28,9 +28,9 @@ class User {
 	 * @param id
 	 * @returns {Promise.<User>}
 	 */
-	static getByID(id) {
-		return db.one(sqlFile('user/get_user_by_id.sql'), { id: id })
-			.then(row => new User(row.id, row.email));
+	static async getByID(id) {
+		const row = await db.one(sqlFile('user/get_user_by_id.sql'), { id: id });
+		return new User(row.id, row.email);
 	}
 
 	/**
@@ -39,35 +39,34 @@ class User {
 	 * @param email
 	 * @returns {Promise.<User>}
 	 */
-	static getByEmail(email) {
-		return db.one(sqlFile('user/get_user_by_email.sql'), { email: email })
-			.then(row => new User(row.id, row.email, row.password_hash));
+	static async getByEmail(email) {
+		const row = await db.one(sqlFile('user/get_user_by_email.sql'), { email: email });
+		return new User(row.id, row.email, row.password_hash);
 	}
 
 	/**
 	 * Returns a promise to get all of the user from the database
 	 * @returns {Promise.<array.<User>>}
 	 */
-	static getAll() {
-		return db.any(sqlFile('user/get_all_users.sql'))
-			.then(rows => rows.map(row => new User(row.id, row.email)));
+	static async getAll() {
+		const rows = await db.any(sqlFile('user/get_all_users.sql'));
+		return rows.map(row => new User(row.id, row.email));
 	}
 
 	/**
 	 * Returns a promise to insert this user into the database
 	 * @returns {Promise.<>}
 	 */
-	insert() {
+	async insert() {
 		const user = this;
-		return new Promise((resolve, reject) => {
-			if (this.id !== undefined) {
-				reject(Error('Attempt to insert a user that already has an ID'));
-			} else {
-				resolve(user);
-			}
-		})
-			.then(u => db.none(sqlFile('user/insert_new_user.sql'), u))
-			.catch(err => console.log(`Error while performing INSERT user query: ${err}`));
+		if (user.id !== undefined) {
+			throw new Error('Attempted to insert a user that already has an ID');
+		}
+		try {
+			await db.none(sqlFile('user/insert_new_user.sql'), user);
+		} catch (err) {
+			console.log(`Error while performing INSERT user query: ${err}`);
+		}
 	}
 }
 

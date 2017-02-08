@@ -4,7 +4,6 @@ const Reading = require('./Reading');
 const db = database.db;
 const sqlFile = database.sqlFile;
 
-
 class Meter {
 	/**
 	 * @param id This meter's ID. Should be undefined if the meter is being newly created
@@ -43,9 +42,9 @@ class Meter {
 	 * @param name
 	 * @returns {Promise.<Meter>}
 	 */
-	static getByName(name) {
-		return db.one(sqlFile('meter/get_meter_by_name.sql'), { name: name })
-			.then(Meter.mapRow);
+	static async getByName(name) {
+		const row = await db.one(sqlFile('meter/get_meter_by_name.sql'), { name: name });
+		return Meter.mapRow(row);
 	}
 
 	static mapRow(row) {
@@ -56,33 +55,30 @@ class Meter {
 	 * @param id
 	 * @returns {Promise.<Meter>}
 	 */
-	static getByID(id) {
-		return db.one(sqlFile('meter/get_meter_by_id.sql'), { id: id })
-			.then(Meter.mapRow);
+	static async getByID(id) {
+		const row = await db.one(sqlFile('meter/get_meter_by_id.sql'), { id: id });
+		return Meter.mapRow(row);
 	}
 
 	/**
 	 * Returns a promise to get all of the meters from the database
 	 * @returns {Promise.<array.<Meter>>}
 	 */
-	static getAll() {
-		return db.any(sqlFile('meter/get_all_meters.sql'))
-			.then(rows => rows.map(Meter.mapRow));
+	static async getAll() {
+		const rows = await db.any(sqlFile('meter/get_all_meters.sql'));
+		return rows.map(Meter.mapRow);
 	}
 
 	/**
 	 * Returns a promise to insert this meter into the database
 	 * @returns {Promise.<>}
 	 */
-	insert() {
+	async insert() {
 		const meter = this;
-		return new Promise((resolve, reject) => {
-			if (meter.id !== undefined) {
-				reject(Error('Attempt to insert a meter that already has an ID'));
-			} else {
-				resolve(meter);
-			}
-		}).then(m => db.none(sqlFile('meter/insert_new_meter.sql'), m));
+		if (meter.id !== undefined) {
+			throw new Error('Attempt to insert a meter that already has an ID');
+		}
+		await db.none(sqlFile('meter/insert_new_meter.sql'), meter);
 	}
 
 	/**
