@@ -4,16 +4,18 @@ const parseXML = require('./parseXML');
  * A promise that inserts all meters from ips.xlsx into the database.
  * @returns {Promise.<*>}
  */
-function insertMeters() {
-	return Promise.all(
-		parseXML.allMeters()
-			// TODO: use a pg-promise task here (maybe?)
-			.map(promise => promise.then(meter => meter.insert()))
-	);
+async function insertMeters() {
+	const meters = await Promise.all(parseXML.allMeters());
+	return await Promise.all(meters.map(m => m.insert()));
 }
 
-// insertMeters()
-// 	.then(() => console.log("Done inserting!"))
-// 	.catch(err => console.error(err));
+// (async function insertMetersWrapper() {
+// 	try {
+// 		await insertMeters();
+// 		console.log('Done inserting meters');
+// 	} catch (err) {
+// 		console.error(err);
+// 	}
+// }());
 
 exports.insertMeters = insertMeters;
