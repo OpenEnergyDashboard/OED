@@ -2,8 +2,7 @@ const express = require('express');
 const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
 const User = require('../models/User');
-const path = require('path');
-require('dotenv').config({ path: path.join(__dirname, '..', '..', '..', '.env') });
+const secretToken = require('../config').secretToken;
 
 const router = express.Router();
 
@@ -12,29 +11,23 @@ const router = express.Router();
  * @param {String} email
  * @param {String} Password
  */
-router.post('/', (req, res) => {
-	User.getByEmail(req.body.email)
-		.catch(() => {
-			throw new Error('User not found');
-		})
-		.then(user => Promise.all([
-			Promise.resolve(user),
-			bcrypt.compare(req.body.password, user.passwordHash)
-		])).then(([user, isValid]) => {
-			if (isValid) {
-				const token = jwt.sign({ data: user.id }, process.env.TOKEN_SECRET, { expiresIn: 86400 });
-				res.json({ token: token	});
-			} else {
-				throw new Error('Unauthorized password');
-			}
-		})
-		.catch(err => {
-			if (err.message === 'Unauthorized password' || err.message === 'User not found') {
-				res.status(401).send({ text: 'Not authorized' });
-			} else {
-				res.status(500).send({ text: 'Internal Server Error' });
-			}
-		});
+router.post('/', async (req, res) => {
+	try {
+		const user = await User.getByEmail(req.body.email);
+		const isValid = await bcrypt.compare(req.body.password, user.passwordHash);
+		if (isValid) {
+			const token = jwt.sign({ data: user.id }, secretToken, { expiresIn: 86400 });
+			res.json({ token: token });
+		} else {
+			throw new Error('Unauthorized password');
+		}
+	} catch (err) {
+		if (err.message === 'Unauthorized password' || err.message === 'No data returned from the query.') {
+			res.status(401).send({ text: 'Not authorized' });
+		} else {
+			res.status(500).send({ text: 'Internal Server Error' });
+		}
+	}
 });
 
 module.exports = router;

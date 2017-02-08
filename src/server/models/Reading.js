@@ -41,10 +41,11 @@ class Reading {
 	/**
 	 * Returns a promise to insert or update all of the given readings into the database (as a transaction)
 	 * @param {array<Reading>} readings the readings to insert or update
+	 * @param conn
 	 * @returns {Promise.<>}
 	 */
-	static insertOrUpdateAll(readings) {
-		return db.tx(t => t.batch(
+	static insertOrUpdateAll(readings, conn = db) {
+		return conn.tx(t => t.batch(
 			readings.map(r => t.none(sqlFile('reading/insert_or_update_reading.sql'), r))
 		));
 	}
@@ -54,9 +55,9 @@ class Reading {
 	 * @param meterID The id of the meter to find readings for
 	 * @returns {Promise.<array.<Reading>>}
 	 */
-	static getAllByMeterID(meterID) {
-		return db.any(sqlFile('reading/get_all_readings_by_meter_id.sql'), { meterID: meterID })
-			.then(rows => rows.map(row => new Reading(row.meter_id, row.reading, row.read_timestamp)));
+	static async getAllByMeterID(meterID) {
+		const rows = await db.any(sqlFile('reading/get_all_readings_by_meter_id.sql'), { meterID: meterID });
+		return rows.map(row => new Reading(row.meter_id, row.reading, row.read_timestamp));
 	}
 
 	/**
@@ -68,9 +69,9 @@ class Reading {
 	 * @param {Date} endDate
 	 * @returns {Promise.<array.<Reading>>}
 	 */
-	static getReadingsByMeterIDAndDateRange(meterID, startDate, endDate) {
-		return db.any(sqlFile('reading/get_readings_by_meter_id_and_date_range.sql'), { meterID: meterID, startDate: startDate, endDate: endDate })
-			.then(rows => rows.map(row => new Reading(row.meter_id, row.reading, row.read_timestamp)));
+	static async getReadingsByMeterIDAndDateRange(meterID, startDate, endDate) {
+		const rows = await db.any(sqlFile('reading/get_readings_by_meter_id_and_date_range.sql'), { meterID: meterID, startDate: startDate, endDate: endDate });
+		return rows.map(row => new Reading(row.meter_id, row.reading, row.reading_timestamp));
 	}
 
 	/**

@@ -1,21 +1,12 @@
 const pgp = require('pg-promise')();
 const path = require('path');
-require('dotenv').config({ path: path.join(__dirname, '..', '..', '..', '.env') });
-
-// Database configuration
-const config = {
-	user: process.env.DB_USER,
-	database: process.env.DB_DATABASE,
-	password: process.env.DB_PASSWORD,
-	host: process.env.DB_HOST,
-	port: process.env.DB_PORT
-};
+const config = require('../config');
 
 /**
  * The connection to the database
  * @type {pgPromise.IDatabase}
  */
-const db = pgp(config);
+const db = pgp(config.database);
 
 const sqlFilesDir = path.join(__dirname, '..', 'sql');
 
@@ -38,7 +29,26 @@ function sqlFile(filePath) {
 	return loadedSqlFiles[sqlFilePath];
 }
 
+/**
+ * Returns a promise to create the database schema.
+ * @return {Promise<void>}
+ */
+async function createSchema() {
+	// We need to require these here instead of at the top to prevent circular dependency issues.
+	/* eslint-disable global-require */
+	const Meter = require('./Meter');
+	const Reading = require('./Reading');
+	const User = require('./User');
+	/* eslint-enable global-require */
+	await Meter.createMeterTypesEnum();
+	await Meter.createTable();
+	await Reading.createTable();
+	await User.createTable();
+}
+
 module.exports = {
-	db: db,
-	sqlFile: sqlFile
+	db,
+	sqlFile,
+	createSchema,
+	pgp
 };
