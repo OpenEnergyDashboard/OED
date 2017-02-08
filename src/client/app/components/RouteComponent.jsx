@@ -15,7 +15,6 @@ function requireAuth(nextState, replace) {
 	}
 	const token = localStorage.getItem('token');
 	if (!token) {
-		console.log('Inside the stupid container');
 		redirectRoute();
 		return;
 	}

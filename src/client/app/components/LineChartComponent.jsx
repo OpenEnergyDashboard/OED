@@ -1,8 +1,8 @@
 import React from 'react';
 import ReactHighstock from 'react-highcharts/ReactHighstock';
-import axios from 'axios';
+import { fetchGraphDataIfNeeded } from '../actions';
 
-export default class LineChartComponent extends React.Component {
+export default class ReduxLineChartComponent extends React.Component {
 	constructor(props) {
 		super(props);
 		this.state = {
@@ -43,7 +43,7 @@ export default class LineChartComponent extends React.Component {
 					enabled: false
 				},
 				series: [{
-					name: 'Meter readings',
+					name: '',
 					data: []
 				}]
 			}
@@ -51,19 +51,18 @@ export default class LineChartComponent extends React.Component {
 	}
 
 	componentWillMount() {
-		axios.get('/api/meters/readings/6')
-			.then(response => {
-				this.setState(prevState => {
-					const seriesCopy = Object.assign({}, prevState.config.series[0]);
-					seriesCopy.data = response.data;
-					return {
-						config: Object.assign({}, prevState.config, { series: [seriesCopy].concat(prevState.config.series.slice(1)) })
-					};
-				});
-			})
-			.catch(error => {
-				console.log(error);
-			});
+		this.props.dispatch(fetchGraphDataIfNeeded());
+	}
+
+	componentWillReceiveProps(nextProps) {
+		this.setState(prevState => {
+			const seriesCopy = Object.assign({}, prevState.config.series[0]);
+			seriesCopy.data = nextProps.data;
+			seriesCopy.name = `Meter ${nextProps.meterID}`;
+			return {
+				config: Object.assign({}, prevState.config, { series: [seriesCopy].concat(prevState.config.series.slice(1)) })
+			};
+		});
 	}
 
 	render() {

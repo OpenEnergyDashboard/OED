@@ -7,7 +7,7 @@ module.exports = {
     ],
 	"rules": {
 		"no-tabs": 0, // We're using tabs instead of spaces
-		"indent": ["error", "tab"], // We're using ONLY tabs instead of spaces
+		"indent": ["error", "tab", { "SwitchCase": 1 }], // We're using ONLY tabs instead of spaces
 		"max-len": ["warn", {"code": 150, "tabWidth": 4, "ignoreStrings": true}],
 		"no-template-curly-in-string": 0, // pg-promise needs curly braces in strings
 		"arrow-body-style": ["error", "as-needed"], // Only use braces in => functions when we need to,

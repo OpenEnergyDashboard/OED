@@ -1,6 +1,6 @@
 import React from 'react';
 import ReactHighcharts from 'react-highcharts';
-import axios from 'axios';
+import { fetchGraphDataIfNeeded } from '../actions';
 
 export default class BarChartComponent extends React.Component {
 	constructor(props) {
@@ -30,12 +30,7 @@ export default class BarChartComponent extends React.Component {
 					min: 0
 				},
 				tooltip: {
-					headerFormat: '<span style="font-size:10px">{point.key}</span><table>',
-					pointFormat: '<tr><td style="color:{series.color};padding:0">{series.name}: </td>' +
-					'<td style="padding:0"><b>{point.y:.1f} kWh</b></td></tr>',
-					footerFormat: '</table>',
-					shared: true,
-					useHTML: true
+					valueSuffix: ' kWh'
 				},
 				plotOptions: {
 					column: {
@@ -53,7 +48,7 @@ export default class BarChartComponent extends React.Component {
 					enabled: false
 				},
 				series: [{
-					name: 'Meter readings',
+					name: '',
 					data: []
 				}]
 			}
@@ -61,19 +56,18 @@ export default class BarChartComponent extends React.Component {
 	}
 
 	componentWillMount() {
-		axios.get('/api/meters/readings/6')
-			.then(response => {
-				this.setState(prevState => {
-					const seriesCopy = Object.assign({}, prevState.config.series[0]);
-					seriesCopy.data = response.data;
-					return {
-						config: Object.assign({}, prevState.config, { series: [seriesCopy].concat(prevState.config.series.slice(1)) })
-					};
-				});
-			})
-			.catch(error => {
-				console.log(error);
-			});
+		this.props.dispatch(fetchGraphDataIfNeeded());
+	}
+
+	componentWillReceiveProps(nextProps) {
+		this.setState(prevState => {
+			const seriesCopy = Object.assign({}, prevState.config.series[0]);
+			seriesCopy.data = nextProps.data;
+			seriesCopy.name = `Meter ${nextProps.meterID}`;
+			return {
+				config: Object.assign({}, prevState.config, { series: [seriesCopy].concat(prevState.config.series.slice(1)) })
+			};
+		});
 	}
 
 	render() {
