@@ -33,15 +33,17 @@ function sqlFile(filePath) {
  * Returns a promise to create the database schema.
  * @return {Promise<void>}
  */
-function createSchema() {
+async function createSchema() {
 	// We need to require these here instead of at the top to prevent circular dependency issues.
 	/* eslint-disable global-require */
 	const Meter = require('./Meter');
 	const Reading = require('./Reading');
+	const User = require('./User');
 	/* eslint-enable global-require */
-	return Meter.createMeterTypesEnum()
-		.then(Meter.createTable)
-		.then(Reading.createTable);
+	await Meter.createMeterTypesEnum();
+	await Meter.createTable();
+	await Reading.createTable();
+	await User.createTable();
 }
 
 module.exports = {

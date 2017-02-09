@@ -16,29 +16,28 @@ function formatReadings(rows) {
 /**
  * GET information on all meters
  */
-router.get('/', (req, res) => {
-	Meter.getAll()
-		.then(rows => {
-			res.json(rows);
-		})
-		.catch(err => {
-			console.log(`Error while performing GET all meters query: ${err}`);
-		});
+router.get('/', async (req, res) => {
+	try {
+		const rows = await Meter.getAll();
+		res.json(rows);
+	} catch (err) {
+		console.error(`Error while performing GET all meters query: ${err}`);
+	}
 });
 
 /**
  * GET information for a specific meter by id
  * @param {int} meter_id
  */
-router.get('/:meter_id', (req, res) => {
-	Meter.getByID(req.params.meter_id)
-		.then(rows => {
-			res.json(rows);
-		})
-		.catch(err => {
-			console.log(`Error while performing GET specific meter by id query: ${err}`);
-		});
+router.get('/:meter_id', async (req, res) => {
+	try {
+		const rows = await Meter.getByID(req.params.meter_id);
+		res.json(rows);
+	} catch (err) {
+		console.error(`Error while performing GET specific meter by id query: ${err}`);
+	}
 });
+
 
 /**
  * GET meter readings by meter id
@@ -46,23 +45,21 @@ router.get('/:meter_id', (req, res) => {
  * @param {Date} [startDate]
  * @param {Date} [endDate]
  */
-router.get('/readings/:meter_id', (req, res) => {
+router.get('/readings/:meter_id', async (req, res) => {
 	if (req.query.startDate || req.query.endDate) {
-		Reading.getReadingsByMeterIDAndDateRange(req.params.meter_id, req.query.startDate, req.query.endDate)
-			.then(rows => {
-				res.json(formatReadings(rows));
-			})
-			.catch(err => {
-				console.log(`Error while performing GET specific meter readings with date range query: ${err}`);
-			});
+		try {
+			const rows = await Reading.getReadingsByMeterIDAndDateRange(req.params.meter_id, req.query.startDate, req.query.endDate);
+			res.json(formatReadings(rows));
+		} catch (err) {
+			console.error(`Error while performing GET specific meter readings with date range query: ${err}`);
+		}
 	} else {
-		Reading.getAllByMeterID(req.params.meter_id)
-			.then(rows => {
-				res.json(formatReadings(rows));
-			})
-			.catch(err => {
-				console.log(`Error while performing GET all readings from specific meter by id query: ${err}`);
-			});
+		try {
+			const rows = await Reading.getAllByMeterID(req.params.meter_id);
+			res.json(formatReadings(rows));
+		} catch (err) {
+			console.error(`Error while performing GET all readings from specific meter by id query: ${err}`);
+		}
 	}
 });
 

@@ -1,11 +1,12 @@
 const { createSchema, pgp } = require('../server/models/database');
 
-createSchema()
-	.then(() => {
+(async function createSchemaWrapper() {
+	try {
+		await createSchema();
 		console.log('Schema created');
-	})
-	.catch(err => {
-		console.error('Error creating schema');
-		console.error(err);
-	})
-	.then(() => pgp.end());
+	} catch (err) {
+		console.error(`Error creating schema: ${err}`);
+	} finally {
+		pgp.end();
+	}
+}());
