@@ -6,6 +6,8 @@ const cookieParser = require('cookie-parser');
 const bodyParser = require('body-parser');
 const users = require('./routes/users');
 const meters = require('./routes/meters');
+const login = require('./routes/login');
+const verification = require('./routes/verification');
 
 const app = express();
 
@@ -18,6 +20,12 @@ app.use(express.static(path.join(__dirname, '..', 'client')));
 
 app.use('/api/users', users);
 app.use('/api/meters', meters);
+app.use('/api/login', login);
+app.use('/api/verification', verification);
+
+app.get('*', (req, res) => {
+	res.sendFile(path.resolve(__dirname, '..', 'client', 'index.html'));
+});
 
 // catch 404 and forward to error handler
 app.use((req, res, next) => {
