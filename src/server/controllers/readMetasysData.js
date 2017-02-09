@@ -24,17 +24,17 @@ function readMetasysData(filename) {
 				meterReading = parseInt(meterReading);
 
 				//meterID
-				meter.getByName(filename.replace('.csv', ''))
+			/*	meter.getByName(filename.replace('.csv', ''))
 					.then(meter => {
 						let meterID = meter.id;
 						;
 					})
-
+			*/
 				/* We have hourly trend and monthly trend for Metasys data. We just read hourly trend.
 				 * So, we skip one line as we go through the data
 				 */
 				if ((i % 2 != 0)) {
-					const reading = new Reading(getMeterID(), meterReading, time);
+					const reading = new Reading(14, meterReading, time);
 					array.push(reading);
 				}
 				i++;
