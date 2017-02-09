@@ -1,18 +1,18 @@
 const promisify = require('es6-promisify');
 const Reading = require('./../models/Reading');
-const readCsv = require('readCSV');
+const readCsv = require('./readCSV');
 const meter = require('./../models/Meter');
 /**
  * Reads CSV file passed to input all the Metasys readings into database.
  * @param fileName the filename to read
  */
+
 function readMetasysData(filename) {
 	const array = [];
 	let i = 1;
-	return readCsv(filename)
+	return readCsv('./../controllers/' + filename)
 		.then(rows => {
 			for (const row of rows) {
-
 				//timestamp
 				let timestamp = row[0];
 				timestamp = timestamp.toLocaleString();
@@ -24,14 +24,17 @@ function readMetasysData(filename) {
 				meterReading = parseInt(meterReading);
 
 				//meterID
-				let meterID = meter.getByName(filename.replace('.csv',''));
-				console.log(meterID);
+				meter.getByName(filename.replace('.csv', ''))
+					.then(meter => {
+						let meterID = meter.id;
+						;
+					})
 
 				/* We have hourly trend and monthly trend for Metasys data. We just read hourly trend.
 				 * So, we skip one line as we go through the data
 				 */
 				if ((i % 2 != 0)) {
-					const reading = new Reading(meterID, meterReading, time);
+					const reading = new Reading(getMeterID(), meterReading, time);
 					array.push(reading);
 				}
 				i++;
@@ -39,7 +42,6 @@ function readMetasysData(filename) {
 			return array;
 		})
 		.then(Reading.insertAll)
-		.then(console.log('done inserting'))
 		.catch(console.error);
 }
 module.exports = readMetasysData;
