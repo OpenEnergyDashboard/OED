@@ -21,6 +21,7 @@ module.exports = {
 
 		"react/jsx-indent": ["error", "tab"], // Still tabs, not spaces
 		"react/no-direct-mutation-state": ["error"],
+		"class-methods-use-this": "off",
 		"react/prefer-stateless-function": ["warn"], // Stateless functions are usually better than a class when possible
 		"react/sort-prop-types": "off", // This is just ridiculous
 		"react/prop-types": "off",

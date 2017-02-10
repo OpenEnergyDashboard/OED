@@ -72,7 +72,7 @@ export default class BarChartComponent extends React.Component {
 
 	render() {
 		return (
-			<div className="col-xs-11">
+			<div className="col-xs-10">
 				<ReactHighcharts config={this.state.config} />
 			</div>
 		);

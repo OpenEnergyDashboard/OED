@@ -1,12 +1,12 @@
 import React from 'react';
-import UIOptionsComponent from './UIOptionsComponent';
+import UIOptionsContainer from '../containers/UIOptionsContainer';
 import LineChartContainer from '../containers/LineChartContainer';
 import BarChartContainer from '../containers/BarChartContainer';
 
 export default function DashboardComponent() {
 	return (
 		<div className="container-fluid">
-			<UIOptionsComponent />
+			<UIOptionsContainer />
 			<LineChartContainer />
 			<BarChartContainer />
 		</div>
