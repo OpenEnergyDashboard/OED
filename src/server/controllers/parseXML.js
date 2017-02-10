@@ -18,13 +18,11 @@ const ips = parseXLSX.parseXLSX('ips.xlsx');
  * @param ip The ip of the meter being created
  * @returns {Promise.<Meter>}
  */
-function promiseRetrieveMeterFromUrlAndIp(url, ip) {
-	return reqPromise(url)
-		.then(raw => parseXMLPromisified(raw))
-		.then(xml => {
-			const name = xml.Maverick.NodeID[0];
-			return new Meter(undefined, name, ip, true, Meter.type.MAMAC);
-		});
+async function promiseRetrieveMeterFromUrlAndIp(url, ip) {
+	const raw = await reqPromise(url);
+	const xml = await parseXMLPromisified(raw);
+	const name = xml.Maverick.NodeID[0];
+	return new Meter(undefined, name, ip, true, Meter.type.MAMAC);
 }
 
 /**
@@ -36,4 +34,3 @@ function allMetersPromises() {
 }
 
 exports.allMeters = allMetersPromises;
-// parseAll();

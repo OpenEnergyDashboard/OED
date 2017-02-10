@@ -10,13 +10,9 @@ const parseCsv = promisify(csv.parse);
  * @param fileName the filename to read
  * @return {Promise.<array.<array>>}
  */
-function readCSV(fileName) {
-	return readFile(fileName)
-		.then(buffer => buffer.toString())
-		.then(parseCsv);
+async function readCSV(fileName) {
+	const buffer = await readFile(fileName);
+	return await parseCsv(buffer.toString());
 }
-
-readCSV('../Aldrich_1st.csv')
-	.then(console.log);
 
 module.exports = readCSV;
