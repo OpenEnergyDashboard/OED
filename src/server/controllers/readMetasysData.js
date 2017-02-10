@@ -1,48 +1,43 @@
 const promisify = require('es6-promisify');
 const Reading = require('./../models/Reading');
 const readCsv = require('./readCSV');
-const meter = require('./../models/Meter');
+const Meter = require('./../models/Meter');
 /**
  * Reads CSV file passed to input all the Metasys readings into database.
  * @param fileName the filename to read
  */
 
-function readMetasysData(filename) {
-	const array = [];
+async function readMetasysData(filename) {
+	const readingArr = [];
 	let i = 1;
-	return readCsv('./../controllers/' + filename)
-		.then(rows => {
-			for (const row of rows) {
-				//timestamp
-				let timestamp = row[0];
-				timestamp = timestamp.toLocaleString();
-				const time = new Date(timestamp);
+	const rows = await readCsv('./../controllers/' + filename);
+	for (const row of rows) {
+		//timestamp
+		const timestamp = row[0].toLocaleString();
+		const time = new Date(timestamp);
 
-				//meterReading
-				let meterReading = row[3];
-				meterReading = meterReading.replace('kWh', '');
-				meterReading = parseInt(meterReading);
+		//meterReading
+		let meterReading = row[3];
+		meterReading = meterReading.replace('kWh', '');
+		meterReading = parseInt(meterReading);
 
-				//meterID
-			/*	meter.getByName(filename.replace('.csv', ''))
-					.then(meter => {
-						let meterID = meter.id;
-						;
-					})
-			*/
-				/* We have hourly trend and monthly trend for Metasys data. We just read hourly trend.
-				 * So, we skip one line as we go through the data
-				 */
-				if ((i % 2 != 0)) {
-					const reading = new Reading(14, meterReading, time);
-					array.push(reading);
-				}
-				i++;
-			}
-			return array;
-		})
-		.then(Reading.insertAll)
-		.catch(console.error);
+		//meterInformation
+		const meter = await Meter.getByName(filename.replace('.csv', ''));
+
+		/* We have hourly trend and monthly trend for Metasys data. We just read hourly trend.
+		 * So, we skip one line as we go through the data
+		 */
+		if ((i % 2 != 0)) {
+			const reading = new Reading(meter.id, meterReading, time);
+			readingArr.push(reading);
+		}
+		i++;
+	}
+	try {
+		Reading.insertAll(readingArr);
+	} catch (err) {
+		console.error(err);
+	}
 }
 module.exports = readMetasysData;
 
