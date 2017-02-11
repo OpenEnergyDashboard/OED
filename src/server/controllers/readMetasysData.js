@@ -2,15 +2,15 @@ const promisify = require('es6-promisify');
 const Reading = require('./../models/Reading');
 const readCsv = require('./readCSV');
 const Meter = require('./../models/Meter');
+
 /**
  * Reads CSV file passed to input all the Metasys readings into database.
  * @param fileName the filename to read
  */
-
 async function readMetasysData(filename) {
 	const readingArr = [];
 	let i = 1;
-	const rows = await readCsv('./../controllers/' + filename);
+	const rows = await readCsv('./../legacy_data/' + filename);
 	for (const row of rows) {
 		//timestamp
 		const timestamp = row[0].toLocaleString();
@@ -40,6 +40,3 @@ async function readMetasysData(filename) {
 	}
 }
 module.exports = readMetasysData;
-
-
-
