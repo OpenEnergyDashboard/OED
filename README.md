@@ -2,6 +2,13 @@
 
 This web application is designed to display environmental information about Beloit College or other institutions to users.
 
+### Built With: ###
+Highcharts - Javascript library used to generate data charts ([highcharts.com](http://www.highcharts.com))
+
+PostgreSQL - Database management system ([postgresql.org](https://www.postgresql.org))
+
+Node - Javascript runtime environment ([nodejs.org](https://nodejs.org/en/))
+
 ### Developer installation: ###
 
 1. Install Node, npm, and git.
@@ -23,6 +30,19 @@ This web application is designed to display environmental information about Belo
 1. Run ```npm run build``` to create the Webpack bundle for production, otherwise run ```npm run dev``` for development.
 1. Run ```npm start```
 
+### Authors ###
+
+This application was created by a team of Beloit College CS students led by Prof. Steven Huss-Lederman
+
+For a list of contributors, [click here](https://github.com/beloitcollegecomputerscience/ED-JS/graphs/contributors)
+
+### Licensing ###
+
+This project is licensed under the GNU General Public License v3.0
+
+See the full licensing agreement [here](https://github.com/beloitcollegecomputerscience/ED-JS/blob/README/License.txt)
+
 ### Contact: ###
 
 Send us an email, open a GitHub issue, or make a pull request.
+
