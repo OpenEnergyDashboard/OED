@@ -1,6 +1,7 @@
 import React from 'react';
 import ReactHighstock from 'react-highcharts/ReactHighstock';
 import axios from 'axios';
+import _ from 'lodash';
 
 export default class LineChartComponent extends React.Component {
 	constructor(props) {
@@ -53,13 +54,7 @@ export default class LineChartComponent extends React.Component {
 	componentWillMount() {
 		axios.get('/api/meters/readings/6')
 			.then(response => {
-				this.setState(prevState => {
-					const seriesCopy = Object.assign({}, prevState.config.series[0]);
-					seriesCopy.data = response.data;
-					return {
-						config: Object.assign({}, prevState.config, { series: [seriesCopy].concat(prevState.config.series.slice(1)) })
-					};
-				});
+				this.setState(prevState => ({ config: _.merge(prevState.config, { series: [{ data: response.data }] }) }));
 			})
 			.catch(error => {
 				console.log(error);
