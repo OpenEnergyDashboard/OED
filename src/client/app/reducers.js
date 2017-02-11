@@ -1,12 +1,12 @@
-import { REQUEST_GRAPH_DATA, RECEIVE_GRAPH_DATA, REQUEST_METER_DATA, RECEIVE_METER_DATA } from './actions';
+import * as actionModule from './actions';
 
 function graph(state = {}, action) {
 	switch (action.type) {
-		case REQUEST_GRAPH_DATA:
+		case actionModule.REQUEST_GRAPH_DATA:
 			return Object.assign({}, state, {
 				isFetching: true
 			});
-		case RECEIVE_GRAPH_DATA:
+		case actionModule.RECEIVE_GRAPH_DATA:
 			return Object.assign({}, state, {
 				isFetching: false,
 				data: action.data
@@ -18,14 +18,18 @@ function graph(state = {}, action) {
 
 function meters(state = {}, action) {
 	switch (action.type) {
-		case REQUEST_METER_DATA:
+		case actionModule.REQUEST_METER_DATA:
 			return Object.assign({}, state, {
 				isFetching: true
 			});
-		case RECEIVE_METER_DATA:
+		case actionModule.RECEIVE_METER_DATA:
 			return Object.assign({}, state, {
 				isFetching: false,
 				data: action.data
+			});
+		case actionModule.DISPLAY_SELECTED_METERS:
+			return Object.assign({}, state, {
+				selected: action.selectedMeters
 			});
 		default:
 			return state;
@@ -44,13 +48,15 @@ const defaultState = {
 
 function rootReducer(state = defaultState, action) {
 	switch (action.type) {
-		case REQUEST_GRAPH_DATA:
-		case RECEIVE_GRAPH_DATA:
+		case actionModule.CHANGE_DEFAULT_METER_TO_DISPLAY:
+		case actionModule.REQUEST_GRAPH_DATA:
+		case actionModule.RECEIVE_GRAPH_DATA:
 			return Object.assign({}, state, {
 				graph: graph(state.graph, action)
 			});
-		case REQUEST_METER_DATA:
-		case RECEIVE_METER_DATA:
+		case actionModule.REQUEST_METER_DATA:
+		case actionModule.RECEIVE_METER_DATA:
+		case actionModule.DISPLAY_SELECTED_METERS:
 			return Object.assign({}, state, {
 				meters: meters(state.meters, action)
 			});

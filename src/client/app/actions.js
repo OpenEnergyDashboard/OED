@@ -4,6 +4,8 @@ export const REQUEST_GRAPH_DATA = 'REQUEST_GRAPH_DATA';
 export const RECEIVE_GRAPH_DATA = 'RECEIVE_GRAPH_DATA';
 export const REQUEST_METER_DATA = 'REQUEST_METER_DATA';
 export const RECEIVE_METER_DATA = 'RECEIVE_METER_DATA';
+export const DISPLAY_SELECTED_METERS = 'DISPLAY_SELECTED_METERS';
+export const CHANGE_DEFAULT_METER_TO_DISPLAY = 'CHANGE_DEFAULT_METER_TO_DISPLAY';
 
 export function requestGraphData(meterID) {
 	return {
@@ -30,6 +32,20 @@ export function receiveMeterData(data) {
 	return {
 		type: RECEIVE_METER_DATA,
 		data
+	};
+}
+
+export function displaySelectedMeters(selectedMeters) {
+	return {
+		type: DISPLAY_SELECTED_METERS,
+		selectedMeters
+	};
+}
+
+export function changeDefaultMeterToDisplay(meterID) {
+	return {
+		type: CHANGE_DEFAULT_METER_TO_DISPLAY,
+		meterID
 	};
 }
 

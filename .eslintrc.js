@@ -18,6 +18,7 @@ module.exports = {
 		"radix": ["error", "as-needed"],
 		"no-useless-constructor": ["warn"],
 		"no-param-reassign": 0,
+		"no-plusplus": ["warn", { "allowForLoopAfterthoughts": true }],
 
 		"react/jsx-indent": ["error", "tab"], // Still tabs, not spaces
 		"react/no-direct-mutation-state": ["error"],
