@@ -1,8 +1,9 @@
 import React from 'react';
 import ReactHighstock from 'react-highcharts/ReactHighstock';
 import { fetchGraphDataIfNeeded } from '../actions';
+import _ from 'lodash';
 
-export default class ReduxLineChartComponent extends React.Component {
+export default class LineChartComponent extends React.Component {
 	constructor(props) {
 		super(props);
 		this.state = {
@@ -55,14 +56,7 @@ export default class ReduxLineChartComponent extends React.Component {
 	}
 
 	componentWillReceiveProps(nextProps) {
-		this.setState(prevState => {
-			const seriesCopy = Object.assign({}, prevState.config.series[0]);
-			seriesCopy.data = nextProps.data;
-			seriesCopy.name = `Meter ${nextProps.meterID}`;
-			return {
-				config: Object.assign({}, prevState.config, { series: [seriesCopy].concat(prevState.config.series.slice(1)) })
-			};
-		});
+		this.setState(prevState => ({ config: _.merge(prevState.config, { series: [{ data: response.data }] }) }));
 	}
 
 	render() {

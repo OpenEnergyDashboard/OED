@@ -1,6 +1,7 @@
 import React from 'react';
 import ReactHighcharts from 'react-highcharts';
 import { fetchGraphDataIfNeeded } from '../actions';
+import _ from 'lodash';
 
 export default class BarChartComponent extends React.Component {
 	constructor(props) {
@@ -60,14 +61,7 @@ export default class BarChartComponent extends React.Component {
 	}
 
 	componentWillReceiveProps(nextProps) {
-		this.setState(prevState => {
-			const seriesCopy = Object.assign({}, prevState.config.series[0]);
-			seriesCopy.data = nextProps.data;
-			seriesCopy.name = `Meter ${nextProps.meterID}`;
-			return {
-				config: Object.assign({}, prevState.config, { series: [seriesCopy].concat(prevState.config.series.slice(1)) })
-			};
-		});
+		this.setState(prevState => ({ config: _.merge(prevState.config, { series: [{ data: response.data }] }) }));
 	}
 
 	render() {

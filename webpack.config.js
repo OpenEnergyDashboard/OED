@@ -1,3 +1,4 @@
+const LodashModuleReplacementPlugin = require('lodash-webpack-plugin');
 const webpack = require('webpack');
 const path = require('path');
 
@@ -21,7 +22,10 @@ const config = {
 				loader: 'babel'
 			}
 		]
-	}
+	},
+	plugins: [
+		new LodashModuleReplacementPlugin()
+	]
 };
 
 module.exports = config;
