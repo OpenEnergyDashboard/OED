@@ -1,8 +1,12 @@
 // Script to add meters from a .xlsx file
-
+const reqPromise = require('request-promise-native');
 const XLSX = require('xlsx');
+const promisify = require('es6-promisify');
+const parseString = require('xml2js').parseString;
+const Meter = require('../server/models/Meter');
 
-// Get IPs
+const parseXMLPromisified = promisify(parseString);
+
 function parseXLSX(filename) {
 	const workbook = XLSX.readFile(filename);
 	// This isn't a property so we don't want dot-notation
@@ -10,9 +14,6 @@ function parseXLSX(filename) {
 	return XLSX.utils.sheet_to_json(worksheet);
 }
 
-const ips = parseXLSX('This should be a filename');
-
-// get information about meters from IPs
 
 /**
  * Creates a promise to create a Mamac meter based on a URL to grab XML from and an IP address for the meter.
@@ -26,10 +27,26 @@ async function getMeterInfo(url, ip) {
 	const raw = await reqPromise(url);
 	const xml = await parseXMLPromisified(raw);
 	const name = xml.Maverick.NodeID[0];
-	// ----------------id-------name---ip--enabled--type
 	return new Meter(undefined, name, ip, true, Meter.type.MAMAC);
 }
 
-function makeURL (){
+function allMeters(ips) {
 	return ips.map(ip => getMeterInfo(`http://${ip.ip}/sm101.xml`, ip.ip));
 }
+
+async function insertMeters(ips) {
+	const meters = await Promise.all(allMeters(ips));
+	return await Promise.all(meters.map(m => m.insert()));
+}
+
+async function insertMetersWrapper(filename) {
+	const ips = parseXLSX(filename);
+	try {
+		await insertMeters(ips);
+		console.log('Done inserting meters'); // eslint-disable-line no-console
+	} catch (err) {
+		console.error(err); // eslint-disable-line no-console
+	}
+}
+const filename = 'src/scripts/ips.xlsx';
+insertMetersWrapper(filename);
