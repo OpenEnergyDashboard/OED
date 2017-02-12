@@ -63,7 +63,6 @@ function shouldFetchGraphData(state, meterID) {
 }
 
 function shouldFetchMeterData(state) {
-	// Should fetch if we are not fetching and we do not have meter data
 	return !state.meters.isFetching && !state.meters.data;
 }
 
@@ -87,9 +86,15 @@ export function fetchMeterDataIfNeeded() {
 }
 
 export function changeSelectedMeters(selectedMeters) {
-	selectedMeters.forEach(meterID => fetchGraphDataIfNeeded(meterID));
 	return {
 		type: CHANGE_SELECTED_METERS,
 		selectedMeters
+	};
+}
+
+export function changeDisplayedMeters(selectedMeters) {
+	return dispatch => {
+		dispatch(changeSelectedMeters(selectedMeters));
+		selectedMeters.forEach(meterID => dispatch(fetchGraphDataIfNeeded(meterID)));
 	};
 }

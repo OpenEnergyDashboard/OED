@@ -56,7 +56,7 @@ export default class BarChartComponent extends React.Component {
 	}
 
 	componentWillReceiveProps(nextProps) {
-		this.setState(prevState => ({ config: _.merge(prevState.config, { series: [{ data: nextProps.readings }] }) }));
+		this.setState(prevState => ({ config: _.merge(prevState.config, { series: nextProps.series }) }));
 	}
 
 	render() {

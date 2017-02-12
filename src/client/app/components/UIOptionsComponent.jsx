@@ -1,5 +1,5 @@
 import React from 'react';
-import { fetchMeterDataIfNeeded, changeSelectedMeters } from '../actions';
+import { fetchMeterDataIfNeeded, changeDisplayedMeters } from '../actions';
 
 export default class UIOptionsComponent extends React.Component {
 	constructor(props) {
@@ -32,7 +32,7 @@ export default class UIOptionsComponent extends React.Component {
 				values.push(parseInt(options[i].value));
 			}
 		}
-		this.props.dispatch(changeSelectedMeters(values));
+		this.props.dispatch(changeDisplayedMeters(values));
 	}
 
 	render() {

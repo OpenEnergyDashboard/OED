@@ -9,7 +9,7 @@ export default class DashboardComponent extends React.Component {
 		this.props.dispatch(fetchGraphDataIfNeeded());
 	}
 
-	static render() {
+	render() {
 		return (
 			<div className="container-fluid">
 				<UIOptionsContainer />
