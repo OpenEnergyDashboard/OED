@@ -1,12 +1,12 @@
 import React from 'react';
 import HeaderComponent from './HeaderComponent';
-import DashboardComponent from './DashboardComponent';
+import DashboardContainer from '../containers/DashboardContainer';
 
 export default function HomeComponent() {
 	return (
 		<div>
 			<HeaderComponent renderLoginButton="true" />
-			<DashboardComponent />
+			<DashboardContainer />
 		</div>
 	);
 }

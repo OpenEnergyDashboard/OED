@@ -1,16 +1,16 @@
+import _ from 'lodash';
 import * as actionModule from './actions';
 
 function graph(state = {}, action) {
 	switch (action.type) {
+		case actionModule.CHANGE_DEFAULT_METER_TO_DISPLAY:
+			return Object.assign({}, state, {
+				defaultMeterToDisplay: action.meterID
+			});
 		case actionModule.REQUEST_GRAPH_DATA:
-			return Object.assign({}, state, {
-				isFetching: true
-			});
+			return _.merge(state, { data: { [action.meterID]: { isFetching: true, readings: [] } } });
 		case actionModule.RECEIVE_GRAPH_DATA:
-			return Object.assign({}, state, {
-				isFetching: false,
-				data: action.data
-			});
+			return _.merge(state, { data: { [action.meterID]: { isFetching: false, readings: action.data } } });
 		default:
 			return state;
 	}
@@ -27,7 +27,7 @@ function meters(state = {}, action) {
 				isFetching: false,
 				data: action.data
 			});
-		case actionModule.DISPLAY_SELECTED_METERS:
+		case actionModule.CHANGE_SELECTED_METERS:
 			return Object.assign({}, state, {
 				selected: action.selectedMeters
 			});
@@ -38,8 +38,8 @@ function meters(state = {}, action) {
 
 const defaultState = {
 	graph: {
-		meterID: 6,
-		isFetching: false,
+		defaultMeterToDisplay: 6,
+		data: {}
 	},
 	meters: {
 		isFetching: false,
@@ -56,7 +56,7 @@ function rootReducer(state = defaultState, action) {
 			});
 		case actionModule.REQUEST_METER_DATA:
 		case actionModule.RECEIVE_METER_DATA:
-		case actionModule.DISPLAY_SELECTED_METERS:
+		case actionModule.CHANGE_SELECTED_METERS:
 			return Object.assign({}, state, {
 				meters: meters(state.meters, action)
 			});

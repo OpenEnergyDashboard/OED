@@ -3,7 +3,10 @@ import UIOptionsComponent from '../components/UIOptionsComponent';
 
 function mapStateToProps(state) {
 	return {
-		meterNames: state.meters.data ? state.meters.data.map(m => m.name.trim()).sort() : [],
+		meterInfo: state.meters.data ? {
+			names: state.meters.data.map(m => m.name.trim()),
+			ids: state.meters.data.map(m => m.id)
+		} : { names: [], ids: [] },
 		selectedMeters: state.meters.selected ? state.meters.selected : []
 	};
 }

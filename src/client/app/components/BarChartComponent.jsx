@@ -1,6 +1,5 @@
 import React from 'react';
 import ReactHighcharts from 'react-highcharts';
-import { fetchGraphDataIfNeeded } from '../actions';
 import _ from 'lodash';
 
 export default class BarChartComponent extends React.Component {
@@ -56,12 +55,8 @@ export default class BarChartComponent extends React.Component {
 		};
 	}
 
-	componentWillMount() {
-		this.props.dispatch(fetchGraphDataIfNeeded());
-	}
-
 	componentWillReceiveProps(nextProps) {
-		this.setState(prevState => ({ config: _.merge(prevState.config, { series: [{ data: response.data }] }) }));
+		this.setState(prevState => ({ config: _.merge(prevState.config, { series: [{ data: nextProps.readings }] }) }));
 	}
 
 	render() {

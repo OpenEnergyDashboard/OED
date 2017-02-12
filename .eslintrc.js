@@ -24,7 +24,8 @@ module.exports = {
 		"react/no-direct-mutation-state": ["error"],
 		"class-methods-use-this": "off",
 		"react/prefer-stateless-function": ["warn"], // Stateless functions are usually better than a class when possible
-		"react/sort-prop-types": "off", // This is just ridiculous
+		"react/sort-comp": ["off"],
+		"react/sort-prop-types": "off",
 		"react/prop-types": "off",
 		"react/jsx-space-before-closing": ["warn"],
 
