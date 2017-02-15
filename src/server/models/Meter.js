@@ -4,7 +4,6 @@ const Reading = require('./Reading');
 const db = database.db;
 const sqlFile = database.sqlFile;
 
-
 class Meter {
 	/**
 	 * @param id This meter's ID. Should be undefined if the meter is being newly created
@@ -44,9 +43,9 @@ class Meter {
 	 * @param conn the connection to use. Defaults to the default database connection.
 	 * @returns {Promise.<Meter>}
 	 */
-	static getByName(name, conn = db) {
-		return conn.one(sqlFile('meter/get_meter_by_name.sql'), { name: name })
-			.then(Meter.mapRow);
+	static async getByName(name, conn = db) {
+		const row = await conn.one(sqlFile('meter/get_meter_by_name.sql'), { name: name });
+		return Meter.mapRow(row);
 	}
 
 	static mapRow(row) {
@@ -58,9 +57,9 @@ class Meter {
  	 * @param conn the connection to use. Defaults to the default database connection.
 	 * @returns {Promise.<Meter>}
 	 */
-	static getByID(id, conn = db) {
-		return conn.one(sqlFile('meter/get_meter_by_id.sql'), { id: id })
-			.then(Meter.mapRow);
+	static async getByID(id, conn = db) {
+		const row = await conn.one(sqlFile('meter/get_meter_by_id.sql'), { id: id });
+		return Meter.mapRow(row);
 	}
 
 	/**
@@ -68,9 +67,9 @@ class Meter {
 	 * @param conn the connection to use. Defaults to the default database connection.
 	 * @returns {Promise.<array.<Meter>>}
 	 */
-	static getAll(conn = db) {
-		return conn.any(sqlFile('meter/get_all_meters.sql'))
-			.then(rows => rows.map(Meter.mapRow));
+	static async getAll(conn = db) {
+		const rows = await conn.any(sqlFile('meter/get_all_meters.sql'));
+		return rows.map(Meter.mapRow);
 	}
 
 	/**
@@ -78,15 +77,12 @@ class Meter {
 	 * @param conn the connection to use. Defaults to the default database connection.
 	 * @returns {Promise.<>}
 	 */
-	insert(conn = db) {
+	async insert(conn = db) {
 		const meter = this;
-		return new Promise((resolve, reject) => {
-			if (meter.id !== undefined) {
-				reject(Error('Attempt to insert a meter that already has an ID'));
-			} else {
-				resolve(meter);
-			}
-		}).then(m => conn.none(sqlFile('meter/insert_new_meter.sql'), m));
+		if (meter.id !== undefined) {
+			throw new Error('Attempt to insert a meter that already has an ID');
+		}
+		await conn.none(sqlFile('meter/insert_new_meter.sql'), meter);
 	}
 
 	/**

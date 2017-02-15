@@ -7,23 +7,23 @@ const readMamacData = require('./readMamacData');
  * Pulls new data for all the meters in the database.
  * This assumes that every meter is a MAMAC meter with a valid IP address.
  */
-function updateAllMeters() {
-	Meter.getAll()
-		.then(meters =>
-			meters
-				.filter(m => m.enabled && m.type === Meter.type.MAMAC)
-				.map(meter =>
-					readMamacData(meter).then(Reading.insertOrUpdateAll)
-				)
-		)
-		.then(promises => Promise.all(promises))
-		.then(() => console.log('Update finished'))
-		.catch(console.error);
+async function updateAllMeters() {
+	try {
+		const meters = await Meter.getAll();
+		// Do all the network requests in parallel.
+		const readingInsertBatches = await Promise.all(meters.filter(m => m.enabled && m.type === Meter.type.MAMAC).map(readMamacData));
+		// Flatten the batches (an array of arrays) into a single array.
+		const allReadingsToInsert = [].concat(...readingInsertBatches);
+		await Reading.insertOrUpdateAll(allReadingsToInsert);
+		console.log('Update finished');
+	} catch (err) {
+		console.error(err);
+	}
 }
 
 // Runs every hour, five minutes after. (ie 23:05, 00:05, ...)
 cron.schedule('0 5 * * * *', () => {
 	const time = new Date();
-	console.log(`getting meter data ${time.getHours()}:${time.getMinutes()}:${time.getSeconds()}`);
+	console.log(`Getting meter data ${time.getHours()}:${time.getMinutes()}:${time.getSeconds()}`);
 	updateAllMeters();
 });

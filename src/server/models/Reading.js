@@ -66,9 +66,9 @@ class Reading {
 	 * @param conn the connection to use. Defaults to the default database connection.
 	 * @returns {Promise.<array.<Reading>>}
 	 */
-	static getAllByMeterID(meterID, conn = db) {
-		return conn.any(sqlFile('reading/get_all_readings_by_meter_id.sql'), { meterID: meterID })
-			.then(rows => rows.map(Reading.mapRow));
+	static async getAllByMeterID(meterID, conn = db) {
+		const rows = await conn.any(sqlFile('reading/get_all_readings_by_meter_id.sql'), { meterID: meterID });
+		return rows.map(Reading.mapRow);
 	}
 
 	/**
@@ -81,9 +81,9 @@ class Reading {
 	 * @param conn the connection to use. Defaults to the default database connection.
 	 * @returns {Promise.<array.<Reading>>}
 	 */
-	static getReadingsByMeterIDAndDateRange(meterID, startDate, endDate, conn = db) {
-		return conn.any(sqlFile('reading/get_readings_by_meter_id_and_date_range.sql'), { meterID: meterID, startDate: startDate, endDate: endDate })
-			.then(rows => rows.map(Reading.mapRow));
+	static async getReadingsByMeterIDAndDateRange(meterID, startDate, endDate, conn = db) {
+		const rows = await conn.any(sqlFile('reading/get_readings_by_meter_id_and_date_range.sql'), { meterID: meterID, startDate: startDate, endDate: endDate });
+		return rows.map(Reading.mapRow);
 	}
 
 	/**
@@ -91,8 +91,8 @@ class Reading {
 	 * @param conn the connection to use. Defaults to the default database connection.
 	 * @returns {Promise.<>}
 	 */
-	insert(conn = db) {
-		return conn.none(sqlFile('reading/insert_new_reading.sql'), this);
+	async insert(conn = db) {
+		await conn.none(sqlFile('reading/insert_new_reading.sql'), this);
 	}
 
 	/**
@@ -100,8 +100,8 @@ class Reading {
 	 * @param conn the connection to use. Defaults to the default database connection.
 	 * @returns {Promise.<>}
 	 */
-	insertOrUpdate(conn = db) {
-		return conn.none(sqlFile('reading/insert_or_update_reading.sql'), this);
+	async insertOrUpdate(conn = db) {
+		await conn.none(sqlFile('reading/insert_or_update_reading.sql'), this);
 	}
 
 	/**
@@ -115,8 +115,8 @@ class Reading {
 	 * @param conn the connection to use. Defaults to the default database connection.
 	 * @return {Promise<array<{reading_rate: number, start_timestamp: Date, end_timestamp: Date}>>}
 	 */
-	static getCompressedReadings(meterID, fromTimestamp = null, toTimestamp = null, numPoints = 500, conn = db) {
-		return conn.func('compressed_readings', [meterID, fromTimestamp || '-infinity', toTimestamp || 'infinity', numPoints]);
+	static async getCompressedReadings(meterID, fromTimestamp = null, toTimestamp = null, numPoints = 500, conn = db) {
+		return await conn.func('compressed_readings', [meterID, fromTimestamp || '-infinity', toTimestamp || 'infinity', numPoints]);
 	}
 
 	toString() {
