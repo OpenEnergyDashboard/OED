@@ -30,4 +30,4 @@ async function updateAllMeters() {
 // 	updateAllMeters();
 // });
 
-exports.getAllMeterReadings = updateAllMeters();
+module.exports = updateAllMeters();

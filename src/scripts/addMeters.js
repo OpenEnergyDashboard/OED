@@ -30,14 +30,25 @@ async function getMeterInfo(url, ip) {
 	return new Meter(undefined, name, ip, true, Meter.type.MAMAC);
 }
 
+/**
+ *
+ * @param ips The IPs of the meters
+ * @returns {Array.<Promise.<Meter>>}
+ */
 function allMeters(ips) {
 	return ips.map(ip => getMeterInfo(`http://${ip.ip}/sm101.xml`, ip.ip));
 }
 
+/**
+ * promises to insert the meters into the database
+ * @param ips IPs of the meters
+ * @returns {Promise.<>}
+ */
 async function insertMeters(ips) {
 	const meters = await Promise.all(allMeters(ips));
 	return await Promise.all(meters.map(m => m.insert()));
 }
+
 
 async function insertMetersWrapper(filename) {
 	const ips = parseXLSX(filename);
