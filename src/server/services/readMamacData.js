@@ -7,7 +7,7 @@ const Reading = require('../models/Reading');
 const parseCsv = promisify(csv.parse);
 
 function parseTimestamp(raw) {
-	return moment(raw, 'HH:mm:ss MM/DD/YY').toDate();
+	return moment(raw, 'HH:mm:ss MM/DD/YY');
 }
 
 /**
@@ -27,7 +27,12 @@ function readMamacData(meter) {
 			reqPromise(`http://${m.ipAddress}/int2.csv`).then(parseCsv)
 		])).then(([m, rawReadings]) => {
 			if (!m.id) throw new Error(`${m} doesn't have an id to associate readings with`);
-			return rawReadings.map(raw => new Reading(m.id, parseInt(raw[0]), parseTimestamp(raw[1])));
+			return rawReadings.map(raw => new Reading(
+				m.id,
+				parseInt(raw[0]),
+				parseTimestamp(raw[1]).subtract(1, 'hours').toDate(),
+				parseTimestamp(raw[1]).toDate())
+			);
 		});
 }
 
