@@ -51,7 +51,11 @@ export default class LineChartComponent extends React.Component {
 	}
 
 	componentWillReceiveProps(nextProps) {
-		this.setState(prevState => ({ config: _.merge(prevState.config, { series: nextProps.series }) }));
+		this.setState(prevState => {
+			const clonedState = _.cloneDeep(prevState);
+			clonedState.config.series = [];
+			return { config: _.merge(clonedState.config, { series: nextProps.series }) };
+		});
 	}
 
 	render() {
