@@ -1,4 +1,3 @@
-// const cron = require('node-cron');
 const Meter = require('../models/Meter');
 const Reading = require('../models/Reading');
 const readMamacData = require('./readMamacData');
@@ -23,11 +22,5 @@ async function updateAllMeters() {
 	}
 }
 
-// // Runs every hour, five minutes after. (ie 23:05, 00:05, ...)
-// cron.schedule('0 5 * * * *', () => {
-// 	const time = new Date();
-// 	console.log(`Getting meter data ${time.getHours()}:${time.getMinutes()}:${time.getSeconds()}`);
-// 	updateAllMeters();
-// });
 
 module.exports = updateAllMeters();
