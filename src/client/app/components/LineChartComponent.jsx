@@ -3,6 +3,10 @@ import ReactHighstock from 'react-highcharts/ReactHighstock';
 import _ from 'lodash';
 
 export default class LineChartComponent extends React.Component {
+	/**
+	 * Initializes the configuration object passed down to <ReactHighcharts />, a React wrapper library for Highcharts
+	 * @param props The props passed down through LineChartContainer
+	 */
 	constructor(props) {
 		super(props);
 		this.state = {
@@ -50,6 +54,12 @@ export default class LineChartComponent extends React.Component {
 		};
 	}
 
+	/**
+	 * 	Updates the chart's series with the new data received from LineChartContainer
+	 * 	Sets the old config's series to [] to remove existing series before merging in the new data
+	 * 	Deep cloning of the object is required to copy the full object
+	 * 	@param nextProps The props received from LineChartContainer
+	 */
 	componentWillReceiveProps(nextProps) {
 		this.setState(prevState => {
 			const clonedState = _.cloneDeep(prevState);
@@ -58,6 +68,9 @@ export default class LineChartComponent extends React.Component {
 		});
 	}
 
+	/**
+	 * @returns JSX to create a line chart with the given Highcharts config
+	 */
 	render() {
 		return (
 			<div className="col-xs-10">

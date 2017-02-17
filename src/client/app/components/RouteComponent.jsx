@@ -6,6 +6,11 @@ import LoginComponent from './LoginComponent';
 import AdminComponent from './AdminComponent';
 import NotFoundComponent from './NotFoundComponent';
 
+/**
+ * Middleware function that requires proper authentication for a page route
+ * @param nextState The next state of the router
+ * @param replace Function that allows a route redirect
+ */
 function requireAuth(nextState, replace) {
 	function redirectRoute() {
 		replace({
@@ -14,17 +19,25 @@ function requireAuth(nextState, replace) {
 		});
 	}
 	const token = localStorage.getItem('token');
+	// Redirect route to login page if the auth token does not exist
 	if (!token) {
 		redirectRoute();
 		return;
 	}
+	// Verify that the auth token is valid
 	axios.post('/api/verification/', { token }, { validateStatus: status => (status >= 200 && status < 300) || (status === 401 || status === 403) })
 		.then(res => {
+			// Route to login page if the auth token is not valid
 			if (!res.data.success) browserHistory.push('/login');
 		})
 		.catch(err => console.log(err));
 }
 
+/**
+ * React component that controls the app's routes
+ * Note that '/admin' requires authentication
+ * @returns JSX to create the RouteComponent
+ */
 export default function RouteComponent() {
 	return (
 		<Router history={browserHistory}>

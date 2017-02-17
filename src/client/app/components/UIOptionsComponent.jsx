@@ -2,6 +2,10 @@ import React from 'react';
 import { fetchMeterDataIfNeeded, changeDisplayedMeters } from '../actions';
 
 export default class UIOptionsComponent extends React.Component {
+	/**
+	 * Initializes the component's state, binds all functions to 'this' UIOptionsComponent
+	 * @param props The props passed down through the UIOptionsContainer
+	 */
 	constructor(props) {
 		super(props);
 		this.state = {
@@ -14,15 +18,27 @@ export default class UIOptionsComponent extends React.Component {
 		this.handleMeterSelect = this.handleMeterSelect.bind(this);
 	}
 
+	/**
+	 * Called when this component mounts
+	 * Dispatches a Redux action to fetch meter information
+	 */
 	componentWillMount() {
 		this.props.dispatch(fetchMeterDataIfNeeded());
 	}
 
+	/**
+	 * Called when this component receives new props
+	 * Sets the component's state to the new props
+	 */
 	componentWillReceiveProps(nextProps) {
 		this.setState({ meterInfo: nextProps.meterInfo });
 		this.setState({ selectedMeters: nextProps.selectedMeters });
 	}
 
+	/**
+	 * Dispatches a Redux action to change the displayed meters on the ids of the meters selected
+	 * @param e The event fired
+	 */
 	handleMeterSelect(e) {
 		e.preventDefault();
 		const options = e.target.options;
@@ -35,6 +51,9 @@ export default class UIOptionsComponent extends React.Component {
 		this.props.dispatch(changeDisplayedMeters(values));
 	}
 
+	/**
+	 * @returns JSX to create the UI options side-panel (includes dynamic rendering of meter information for selection)
+	 */
 	render() {
 		const labelStyle = {
 			textDecoration: 'underline'

@@ -1,6 +1,11 @@
 import { connect } from 'react-redux';
 import UIOptionsComponent from '../components/UIOptionsComponent';
 
+/**
+ * Maps the Redux store object to props to be passed down to child components
+ * @param state The new Redux store object
+ * @returns object The new object containing information about meter names and ids
+ */
 function mapStateToProps(state) {
 	if (state.meters.data) {
 		state.meters.data.sort((a, b) => {
@@ -20,4 +25,7 @@ function mapStateToProps(state) {
 	};
 }
 
+/**
+ * Connects changes to the Redux store to UIOptionsComponent via mapStateToProps
+ */
 export default connect(mapStateToProps)(UIOptionsComponent);
