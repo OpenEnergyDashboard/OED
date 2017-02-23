@@ -1,3 +1,7 @@
+/* This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this
+ * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
+
 /*
   The groups table contains a row for each group in the database.
   Groups have child groups, which can have child groups, and so on. This forms a Directed Acyclic Graph (DAG).
