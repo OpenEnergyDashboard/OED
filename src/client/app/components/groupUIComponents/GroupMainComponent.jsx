@@ -5,6 +5,8 @@ import ChildGBoxComponent from './ChildGBoxComponent';
 import ChildMBoxComponent from './ChildMBoxComponent';
 import ListGBoxComponent from './ListGBoxComponent';
 import ListMBoxComponent from './ListMBoxComponent';
+import EditGroupComponent from './EditGroupComponent';
+import GroupViewComponent from './GroupViewComponent';
 
 
 
@@ -22,6 +24,8 @@ return (
 
            <div style={center}>
                <h1>Group Main Page</h1>
+               <GroupViewComponent/>
+
            </div>
 
 
