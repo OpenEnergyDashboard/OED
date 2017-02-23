@@ -5,7 +5,7 @@ import HomeComponent from './HomeComponent';
 import LoginComponent from './LoginComponent';
 import AdminComponent from './AdminComponent';
 import NotFoundComponent from './NotFoundComponent';
-import GroupComponent from './GroupComponent';
+import GroupComponent from './groupUIComponents/GroupMainComponent';
 
 function requireAuth(nextState, replace) {
     function redirectRoute() {
