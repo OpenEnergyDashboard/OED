@@ -37,6 +37,7 @@
     "pg-promise": "^5.3.5",
     "react": "^15.4.2",
     "react-dom": "^15.4.2",
+    "react-dropzone": "^3.11.0",
     "react-highcharts": "^11.5.0",
     "react-redux": "^5.0.2",
     "react-router": "^3.0.2",
