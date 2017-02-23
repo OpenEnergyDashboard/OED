@@ -7,6 +7,7 @@ import ListGBoxComponent from './ListGBoxComponent';
 import ListMBoxComponent from './ListMBoxComponent';
 import EditGroupComponent from './EditGroupComponent';
 import GroupViewComponent from './GroupViewComponent';
+import ChildBox from './ChildBoxComponent';
 
 
 
