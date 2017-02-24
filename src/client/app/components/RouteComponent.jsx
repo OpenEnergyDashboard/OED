@@ -6,6 +6,7 @@ import LoginComponent from './LoginComponent';
 import AdminComponent from './AdminComponent';
 import NotFoundComponent from './NotFoundComponent';
 import GroupComponent from './groupUIComponents/GroupMainComponent';
+import EditGroupComponent from './groupUIComponents/EditGroupComponent';
 
 function requireAuth(nextState, replace) {
     function redirectRoute() {
@@ -34,6 +35,7 @@ export default function RouteComponent() {
             <Route path="/login" component={LoginComponent} />
             <Route path="/admin" component={AdminComponent} onEnter={requireAuth} />
             <Route path="/group" component={GroupComponent} />
+            <Route path="/editGroup" component={EditGroupComponent} />
             <Route path="*" component={NotFoundComponent} />
         </Router>
     );
