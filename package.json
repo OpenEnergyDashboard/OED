@@ -3,12 +3,12 @@
   "version": "0.0.0",
   "private": true,
   "scripts": {
-    "start": "node --harmony-async-await ./src/bin/www",
+    "start": "node ./src/bin/www",
     "dev": "webpack -d --watch",
     "build": "webpack -p",
     "lint": "./node_modules/.bin/eslint src/client/app/**/*.js src/client/app/**/*.jsx src/server/**/*.js src/server/**/*.jsx",
-    "test": "./node_modules/.bin/mocha --harmony-async-await \"src/server/test/**/*.js\"",
-    "createdb": "node --harmony-async-await ./src/scripts/createDB.js"
+    "test": "./node_modules/.bin/mocha \"src/server/test/**/*.js\"",
+    "createdb": "node ./src/scripts/createDB.js"
   },
   "dependencies": {
     "axios": "^0.15.3",
