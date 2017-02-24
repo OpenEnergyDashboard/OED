@@ -8,6 +8,12 @@ export default class ChildBox extends React.Component {
         this.state = {};
     }
     render () {
+
+        const boxStyle = {
+            display: "inline-block",
+            width: "100",
+            height: "100"
+        }
         return <div><h1>I am a ChildBox!</h1></div>;
     }
 }
