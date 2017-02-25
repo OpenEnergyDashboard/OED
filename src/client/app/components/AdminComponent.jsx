@@ -1,5 +1,6 @@
 import React from 'react';
 import Dropzone from 'react-dropzone';
+import axios from 'axios';
 
 
 export default class AdminComponent extends React.Component {
@@ -9,7 +10,11 @@ export default class AdminComponent extends React.Component {
 	}
 
 	handleOnDrop(file) {
-		console.log(file);
+		axios.post('/api/fileProcessing/', { file })
+			.then(response => {
+				console.log(response);
+			})
+			.catch(console.log);
 	}
 
 	render() {

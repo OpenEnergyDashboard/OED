@@ -25,7 +25,8 @@ const config = {
 	},
 	plugins: [
 		new LodashModuleReplacementPlugin()
-	]
+	],
+	externals: ['xlsx']
 };
 
 module.exports = config;
