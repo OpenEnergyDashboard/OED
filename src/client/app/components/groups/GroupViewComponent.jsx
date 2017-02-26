@@ -1,6 +1,12 @@
+/* This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this
+ * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
+
 //This component is for viewing a single group via child box components + some buttons
 import React from 'react';
 import {Link} from 'react-router';
+
+
 import ChildMeterBox from './ChildMeterBoxComponent';
 import ChildGroupBox from './ChildGroupBoxComponent';
 import EditGroupComponent from './EditGroupComponent';
