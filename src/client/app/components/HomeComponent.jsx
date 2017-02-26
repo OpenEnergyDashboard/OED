@@ -5,7 +5,7 @@ import DashboardComponent from './DashboardComponent';
 export default function HomeComponent() {
 	return (
 		<div>
-			<HeaderComponent renderLoginButton="true" />
+			<HeaderComponent renderLoginButton="true"/>
 			<DashboardComponent />
 		</div>
 	);

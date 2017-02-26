@@ -9,7 +9,6 @@ import {Link} from 'react-router';
 
 import ChildMeterBox from './ChildMeterBoxComponent';
 import ChildGroupBox from './ChildGroupBoxComponent';
-import EditGroupComponent from './EditGroupComponent';
 
 
 export default function GroupViewComponent(props) {
@@ -43,6 +42,7 @@ export default function GroupViewComponent(props) {
 
 			<ChildMeterBox meters={meters}/>
 			<ChildGroupBox groups={meters}/>
+			//todo: switch from a link to a button creating an edit component
 			<Link style={buttonStyle} to="/editGroup">
 				<button className="btn btn-default">Edit Group</button>
 			</Link>

@@ -26,7 +26,6 @@ export default function ChildMetersBox(props) {
 	);
 
 
-
 	return (
 		<div style={boxStyle}>
 			<h3>Child Meters:</h3>

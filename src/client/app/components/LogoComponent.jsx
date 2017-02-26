@@ -9,6 +9,6 @@ export default function LogoComponent(props) {
 		position: 'absolute'
 	};
 	return (
-		<img src={props.url} alt="Logo" style={imgStyle} />
+		<img src={props.url} alt="Logo" style={imgStyle}/>
 	);
 }

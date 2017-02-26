@@ -26,7 +26,6 @@ export default function ChildGroupsBox(props) {
 	);
 
 
-
 	return (
 		<div style={boxStyle}>
 			<h3>Child Groups:</h3>
