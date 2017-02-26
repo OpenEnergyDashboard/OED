@@ -1,13 +1,25 @@
+/* This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this
+ * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
+
 import React from 'react';
 import { fetchMetersDataIfNeeded } from '../actions/meters';
 import { changeSelectedMeters } from '../actions/graph';
 
 export default class UIOptionsComponent extends React.Component {
+	/**
+	 * Initializes the component's state, binds all functions to 'this' UIOptionsComponent
+	 * @param props The props passed down through the UIOptionsContainer
+	 */
 	constructor(props) {
 		super(props);
 		this.handleMeterSelect = this.handleMeterSelect.bind(this);
 	}
 
+	/**
+	 * Called when this component mounts
+	 * Dispatches a Redux action to fetch meter information
+	 */
 	componentWillMount() {
 		this.props.fetchMetersDataIfNeeded();
 	}
@@ -25,6 +37,9 @@ export default class UIOptionsComponent extends React.Component {
 		this.props.selectMeters(selectedMeters);
 	}
 
+	/**
+	 * @returns JSX to create the UI options side-panel (includes dynamic rendering of meter information for selection)
+	 */
 	render() {
 		const labelStyle = {
 			textDecoration: 'underline'

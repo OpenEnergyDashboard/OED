@@ -1,4 +1,7 @@
-const cron = require('node-cron');
+/* This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this
+ * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
+
 const Meter = require('../models/Meter');
 const Reading = require('../models/Reading');
 const readMamacData = require('./readMamacData');
@@ -8,6 +11,8 @@ const readMamacData = require('./readMamacData');
  * This assumes that every meter is a MAMAC meter with a valid IP address.
  */
 async function updateAllMeters() {
+	const time = new Date();
+	console.log(`Getting meter data ${time.toISOString()}`); // eslint-disable-line no-console
 	try {
 		const meters = await Meter.getAll();
 		// Do all the network requests in parallel.
@@ -15,15 +20,11 @@ async function updateAllMeters() {
 		// Flatten the batches (an array of arrays) into a single array.
 		const allReadingsToInsert = [].concat(...readingInsertBatches);
 		await Reading.insertOrUpdateAll(allReadingsToInsert);
-		console.log('Update finished');
+		console.log('Update finished'); // eslint-disable-line no-console
 	} catch (err) {
-		console.error(err);
+		console.error(err); // eslint-disable-line no-console
 	}
 }
 
-// Runs every hour, five minutes after. (ie 23:05, 00:05, ...)
-cron.schedule('0 5 * * * *', () => {
-	const time = new Date();
-	console.log(`Getting meter data ${time.getHours()}:${time.getMinutes()}:${time.getSeconds()}`);
-	updateAllMeters();
-});
+
+module.exports = updateAllMeters();

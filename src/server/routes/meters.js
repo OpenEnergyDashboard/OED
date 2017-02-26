@@ -1,3 +1,7 @@
+/* This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this
+ * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
+
 const express = require('express');
 const moment = require('moment');
 const Meter = require('../models/Meter');
@@ -8,10 +12,10 @@ const router = express.Router();
 /**
  * Takes in an array of row objects and reformats the timestamp from ISO 8601 format to the number
  * of milliseconds since January 1st, 1970 and groups each reading with each timestamp.
- * @param rows
+ * @param {Array<Reading>} rows
  */
 function formatReadings(rows) {
-	return rows.map(row => [new Date(row.timestamp).valueOf(), row.reading]);
+	return rows.map(row => [new Date(row.startTimestamp).valueOf(), row.reading]);
 }
 
 /**

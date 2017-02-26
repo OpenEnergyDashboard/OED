@@ -1,16 +1,6 @@
--- create meters table
-CREATE TABLE IF NOT EXISTS meters (
-  id SERIAL PRIMARY KEY,
-  name VARCHAR(50) UNIQUE NOT NULL,
-  ipAddress VARCHAR(20)
-);
--- create readings table
-CREATE TABLE IF NOT EXISTS readings (
-  meter_id INT NOT NULL REFERENCES meters(id),
-  reading INT NOT NULL,
-  read_timestamp TIMESTAMP NOT NULL,
-  PRIMARY KEY (meter_id, read_timestamp)
-);
+/* This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this
+ * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
 
 /*
   The groups table contains a row for each group in the database.

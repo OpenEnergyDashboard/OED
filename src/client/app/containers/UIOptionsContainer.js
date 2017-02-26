@@ -1,3 +1,7 @@
+/* This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this
+ * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
+
 import _ from 'lodash';
 import { connect } from 'react-redux';
 import UIOptionsComponent from '../components/UIOptionsComponent';
@@ -23,4 +27,7 @@ function mapDispatchToProps(dispatch) {
 	};
 }
 
+/**
+ * Connects changes to the Redux store to UIOptionsComponent via mapStateToProps
+ */
 export default connect(mapStateToProps, mapDispatchToProps)(UIOptionsComponent);
