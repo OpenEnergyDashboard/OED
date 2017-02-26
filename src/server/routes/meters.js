@@ -1,4 +1,5 @@
 const express = require('express');
+const moment = require('moment');
 const Meter = require('../models/Meter');
 const Reading = require('../models/Reading');
 
@@ -38,6 +39,13 @@ router.get('/:meter_id', async (req, res) => {
 	}
 });
 
+function parseMillisecondTimestamp(timestamp) {
+	if (timestamp !== undefined) {
+		return moment(parseInt(timestamp)).toDate();
+	} else {
+		return null;
+	}
+}
 
 /**
  * GET meter readings by meter id
@@ -46,9 +54,13 @@ router.get('/:meter_id', async (req, res) => {
  * @param {Date} [endDate]
  */
 router.get('/readings/:meter_id', async (req, res) => {
-	if (req.query.startDate || req.query.endDate) {
+	if (req.query.startTimestamp || req.query.endTimestamp) {
 		try {
-			const rows = await Reading.getReadingsByMeterIDAndDateRange(req.params.meter_id, req.query.startDate, req.query.endDate);
+			const rows = await Reading.getReadingsByMeterIDAndDateRange(
+				req.params.meter_id,
+				parseMillisecondTimestamp(req.query.startTimestamp),
+				parseMillisecondTimestamp(req.query.endTimestamp)
+			);
 			res.json(formatReadings(rows));
 		} catch (err) {
 			console.error(`Error while performing GET specific meter readings with date range query: ${err}`);

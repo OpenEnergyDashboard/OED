@@ -1,23 +1,26 @@
+import _ from 'lodash';
 import { connect } from 'react-redux';
 import UIOptionsComponent from '../components/UIOptionsComponent';
+import { changeSelectedMeters } from '../actions/graph';
+import { fetchMetersDataIfNeeded } from '../actions/meters';
 
+/**
+ * @param {State} state
+ * @return {{meterInfo: *, selectedMeters: Array}}
+ */
 function mapStateToProps(state) {
-	if (state.meters.data) {
-		state.meters.data.sort((a, b) => {
-			a = a.name.trim().toLowerCase();
-			b = b.name.trim().toLowerCase();
-			if (a < b) return -1;
-			else if (a > b) return 1;
-			return 0;
-		});
-	}
+	const sortedMeters = _.sortBy(_.values(state.meters.byMeterID).map(meter => ({ id: meter.id, name: meter.name.trim() })), 'name');
 	return {
-		meterInfo: state.meters.data ? {
-			names: state.meters.data.map(m => m.name.trim()),
-			ids: state.meters.data.map(m => m.id)
-		} : { names: [], ids: [] },
-		selectedMeters: state.meters.selected ? state.meters.selected : []
+		meters: sortedMeters,
+		selectedMeters: state.graph.selectedMeters
 	};
 }
 
-export default connect(mapStateToProps)(UIOptionsComponent);
+function mapDispatchToProps(dispatch) {
+	return {
+		selectMeters: newSelectedMeterIDs => dispatch(changeSelectedMeters(newSelectedMeterIDs)),
+		fetchMetersDataIfNeeded: () => dispatch(fetchMetersDataIfNeeded())
+	};
+}
+
+export default connect(mapStateToProps, mapDispatchToProps)(UIOptionsComponent);

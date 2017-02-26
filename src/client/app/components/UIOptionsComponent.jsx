@@ -1,38 +1,28 @@
 import React from 'react';
-import { fetchMeterDataIfNeeded, changeDisplayedMeters } from '../actions';
+import { fetchMetersDataIfNeeded } from '../actions/meters';
+import { changeSelectedMeters } from '../actions/graph';
 
 export default class UIOptionsComponent extends React.Component {
 	constructor(props) {
 		super(props);
-		this.state = {
-			meterInfo: {
-				names: [],
-				ids: []
-			},
-			selectedMeters: []
-		};
 		this.handleMeterSelect = this.handleMeterSelect.bind(this);
 	}
 
 	componentWillMount() {
-		this.props.dispatch(fetchMeterDataIfNeeded());
-	}
-
-	componentWillReceiveProps(nextProps) {
-		this.setState({ meterInfo: nextProps.meterInfo });
-		this.setState({ selectedMeters: nextProps.selectedMeters });
+		this.props.fetchMetersDataIfNeeded();
 	}
 
 	handleMeterSelect(e) {
 		e.preventDefault();
 		const options = e.target.options;
-		const values = [];
+		const selectedMeters = [];
+		// We can't map here because this is a collection of DOM elements, not an array.
 		for (let i = 0; i < options.length; i++) {
 			if (options[i].selected) {
-				values.push(parseInt(options[i].value));
+				selectedMeters.push(parseInt(options[i].value));
 			}
 		}
-		this.props.dispatch(changeDisplayedMeters(values));
+		this.props.selectMeters(selectedMeters);
 	}
 
 	render() {
@@ -49,7 +39,9 @@ export default class UIOptionsComponent extends React.Component {
 						<div className="form-group">
 							<p style={labelStyle}>Select meters:</p>
 							<select multiple className="form-control" id="meterList" size="8" onChange={this.handleMeterSelect}>
-								{this.state.meterInfo.names.map((name, index) => <option key={index} value={this.state.meterInfo.ids[index]}>{name}</option>)}
+								{this.props.meters.map(meter =>
+									<option key={meter.id} value={meter.id}>{meter.name}</option>
+								)}
 							</select>
 						</div>
 					</div>

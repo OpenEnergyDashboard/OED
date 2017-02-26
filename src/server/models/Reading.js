@@ -71,7 +71,7 @@ class Reading {
 	 */
 	static async getReadingsByMeterIDAndDateRange(meterID, startDate, endDate) {
 		const rows = await db.any(sqlFile('reading/get_readings_by_meter_id_and_date_range.sql'), { meterID: meterID, startDate: startDate, endDate: endDate });
-		return rows.map(row => new Reading(row.meter_id, row.reading, row.reading_timestamp));
+		return rows.map(row => new Reading(row.meter_id, row.reading, row.read_timestamp));
 	}
 
 	/**

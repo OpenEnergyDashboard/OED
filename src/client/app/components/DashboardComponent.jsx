@@ -1,20 +1,14 @@
 import React from 'react';
-import { fetchGraphDataIfNeeded } from '../actions';
 import UIOptionsContainer from '../containers/UIOptionsContainer';
-import LineChartContainer from '../containers/LineChartContainer';
-import BarChartContainer from '../containers/BarChartContainer';
+import NewLineChartContainer from '../containers/NewLineChartContainer';
 
 export default class DashboardComponent extends React.Component {
-	componentWillMount() {
-		this.props.dispatch(fetchGraphDataIfNeeded());
-	}
 
 	render() {
 		return (
 			<div className="container-fluid">
 				<UIOptionsContainer />
-				<LineChartContainer />
-				<BarChartContainer />
+				<NewLineChartContainer />
 			</div>
 		);
 	}
