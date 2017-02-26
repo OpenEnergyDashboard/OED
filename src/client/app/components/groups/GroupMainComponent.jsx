@@ -24,8 +24,13 @@ const viewComp = {
     marginRight: "5%"
 };
 
+const boxStyle  = {
+	//todo: testing hack
+	border: "1px solid green"
+};
+
 return (
-        <div>
+        <div style={boxStyle}>
            <HeaderComponent renderLoginButton="false" renderGroupButton="false" />
 
            <div style={center}>
