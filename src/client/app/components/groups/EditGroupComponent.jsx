@@ -5,7 +5,7 @@
 //This component is the main page of the edit group page.
 import React from 'react';
 import ListBox from './ListBoxComponent';
-import {Link} from 'react-router';
+import { Link } from 'react-router';
 
 export default class EditGroupComponent extends React.Component {
 
@@ -15,16 +15,30 @@ export default class EditGroupComponent extends React.Component {
 	}
 
 	render() {
+		const boxStyle = {
+			marginLeft: '10%',
+			marginRight: '10%',
+			// todo: testing hack
+			border: "1px solid red"
+		};
 
 		const titleStyle = {
 			justifyContent: "center",
 			alignItems: "center",
 			textAlign: "center"
 		};
-		//The back button right now just links back to the group page. Ideally we can create a back button component.
+		// The back button right now just links back to the group page. Ideally we can create a back button component.
 		const backButton = {
 			float: "right"
 		};
+
+		// todo: remove this absurd testing hack
+		// I'm reusing this from the other class until it can pass props
+		const meters = [
+			{name: "one"},
+			{name: "two"},
+			{name: "three"}
+		];
 
 		return (
 			<div>
@@ -32,7 +46,8 @@ export default class EditGroupComponent extends React.Component {
 					<h1>Edit Group Pane</h1>
 				</div>
 
-				<div>
+				<div style={boxStyle}>
+					<ListBox groups={meters}/>
 					<Link style={backButton} to="/group">
 						<button className="btn btn-default">Back to Groups</button>
 					</Link>

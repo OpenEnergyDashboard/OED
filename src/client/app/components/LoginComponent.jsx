@@ -1,12 +1,12 @@
 import React from 'react';
 import axios from 'axios';
-import {browserHistory} from 'react-router';
+import { browserHistory } from 'react-router';
 import HeaderComponent from './HeaderComponent';
 
 export default class LoginComponent extends React.Component {
 	constructor(props) {
 		super(props);
-		this.state = {email: '', password: ''};
+		this.state = { email: '', password: '' };
 
 		this.handleEmailChange = this.handleEmailChange.bind(this);
 		this.handlePasswordChange = this.handlePasswordChange.bind(this);
@@ -14,11 +14,11 @@ export default class LoginComponent extends React.Component {
 	}
 
 	handleEmailChange(e) {
-		this.setState({email: e.target.value});
+		this.setState({ email: e.target.value });
 	}
 
 	handlePasswordChange(e) {
-		this.setState({password: e.target.value});
+		this.setState({ password: e.target.value });
 	}
 
 	handleSubmit(e) {
@@ -32,7 +32,7 @@ export default class LoginComponent extends React.Component {
 				browserHistory.push('/admin');
 			})
 			.catch(console.log);
-		this.setState({email: '', password: ''});
+		this.setState({ email: '', password: '' });
 	}
 
 	render() {
@@ -46,19 +46,23 @@ export default class LoginComponent extends React.Component {
 		};
 		return (
 			<div>
-				<HeaderComponent renderLoginButton="false" renderGroupButton="false"/>
+				<HeaderComponent renderLoginButton="false" renderGroupButton="false" />
 				<form style={formStyle} onSubmit={this.handleSubmit}>
 					<div className="input-group">
-						<span className="input-group-addon"><i className="glyphicon glyphicon-user"/></span>
-						<input type="text" className="form-control" placeholder="Email" value={this.state.email}
-							   onChange={this.handleEmailChange}/>
+						<span className="input-group-addon"><i className="glyphicon glyphicon-user" /></span>
+						<input
+  type="text" className="form-control" placeholder="Email" value={this.state.email}
+  onChange={this.handleEmailChange}
+						/>
 					</div>
 					<div className="input-group">
-						<span className="input-group-addon"><i className="glyphicon glyphicon-lock"/></span>
-						<input type="password" className="form-control" placeholder="Password"
-							   value={this.state.password} onChange={this.handlePasswordChange}/>
+						<span className="input-group-addon"><i className="glyphicon glyphicon-lock" /></span>
+						<input
+  type="password" className="form-control" placeholder="Password"
+  value={this.state.password} onChange={this.handlePasswordChange}
+						/>
 					</div>
-					<input style={buttonStyle} className="btn btn-default" type="submit" value="Login"/>
+					<input style={buttonStyle} className="btn btn-default" type="submit" value="Login" />
 				</form>
 			</div>
 		);

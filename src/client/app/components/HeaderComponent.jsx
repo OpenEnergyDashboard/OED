@@ -1,5 +1,5 @@
 import React from 'react';
-import {Link} from 'react-router';
+import { Link } from 'react-router';
 import LogoComponent from './LogoComponent';
 
 export default function HeaderComponent(props) {
@@ -22,7 +22,7 @@ export default function HeaderComponent(props) {
 	};
 	return (
 		<div className="text-center">
-			<Link to="/"><LogoComponent url="./app/images/logo.png"/></Link>
+			<Link to="/"><LogoComponent url="./app/images/logo.png" /> </Link>
 			<h1 style={titleStyle}>Environmental Dashboard</h1>
 			<div style={divRightStyle}>
 				<Link style={loginLinkStyle} to="/login">

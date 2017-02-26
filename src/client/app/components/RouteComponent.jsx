@@ -1,5 +1,5 @@
 import React from 'react';
-import {Router, Route, browserHistory} from 'react-router';
+import { Router, Route, browserHistory } from 'react-router';
 import axios from 'axios';
 import HomeComponent from './HomeComponent';
 import LoginComponent from './LoginComponent';
@@ -12,7 +12,7 @@ function requireAuth(nextState, replace) {
 	function redirectRoute() {
 		replace({
 			pathname: '/login',
-			state: {nextPathname: nextState.location.pathname}
+			state: { nextPathname: nextState.location.pathname }
 		});
 	}
 
@@ -22,7 +22,7 @@ function requireAuth(nextState, replace) {
 		redirectRoute();
 		return;
 	}
-	axios.post('/api/verification/', {token}, {validateStatus: status => (status >= 200 && status < 300) || (status === 401 || status === 403)})
+	axios.post('/api/verification/', { token }, { validateStatus: status => (status >= 200 && status < 300) || (status === 401 || status === 403) })
 		.then(res => {
 			if (!res.data.success) browserHistory.push('/login');
 		})
@@ -32,12 +32,12 @@ function requireAuth(nextState, replace) {
 export default function RouteComponent() {
 	return (
 		<Router history={browserHistory}>
-			<Route path="/" component={HomeComponent}/>
-			<Route path="/login" component={LoginComponent}/>
-			<Route path="/admin" component={AdminComponent} onEnter={requireAuth}/>
-			<Route path="/group" component={GroupComponent}/>
-			<Route path="/editGroup" component={EditGroupComponent}/>
-			<Route path="*" component={NotFoundComponent}/>
+			<Route path="/" component={HomeComponent} />
+			<Route path="/login" component={LoginComponent} />
+			<Route path="/admin" component={AdminComponent} onEnter={requireAuth} />
+			<Route path="/group" component={GroupComponent} />
+			<Route path="/editGroup" component={EditGroupComponent} />
+			<Route path="*" component={NotFoundComponent} />
 		</Router>
 	);
 }

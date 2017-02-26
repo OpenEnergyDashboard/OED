@@ -64,7 +64,7 @@ export default class BarChartComponent extends React.Component {
 	componentWillMount() {
 		axios.get('/api/meters/readings/6')
 			.then(response => {
-				this.setState(prevState => ({config: _.merge(prevState.config, {series: [{data: response.data}]})}));
+				this.setState(prevState => ({ config: _.merge(prevState.config, { series: [{ data: response.data }] }) }));
 			})
 			.catch(error => {
 				console.log(error);
@@ -74,7 +74,7 @@ export default class BarChartComponent extends React.Component {
 	render() {
 		return (
 			<div className="col-xs-11">
-				<ReactHighcharts config={this.state.config}/>
+				<ReactHighcharts config={this.state.config} />
 			</div>
 		);
 	}
