@@ -18,7 +18,7 @@ import { stringifyTimeInterval } from '../util';
 /**
  * @type {State~Readings}
  */
-export const defaultState = {
+const defaultState = {
 	byMeterID: {}
 };
 
@@ -48,7 +48,7 @@ function readingsForTimeInterval(state = {}, action) {
  * @param action
  * @return {State~Readings}
  */
-export function readings(state = defaultState, action) {
+export default function readings(state = defaultState, action) {
 	switch (action.type) {
 		case readingsActions.RECEIVE_READINGS:
 		case readingsActions.REQUEST_READINGS: {

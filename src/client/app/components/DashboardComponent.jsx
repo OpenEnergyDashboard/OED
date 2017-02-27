@@ -4,23 +4,16 @@
 
 import React from 'react';
 import UIOptionsContainer from '../containers/UIOptionsContainer';
-import NewLineChartContainer from '../containers/NewLineChartContainer';
+import NewLineChartContainer from '../containers/LineChartContainer';
 
 /**
- * React component that controls the dashboard and fetches graph data upon mounting
- * @param props The props passed down by DashboardContainer, used to get a handle on the dispatch function
+ * React component that controls the dashboard
  */
-export default class DashboardComponent extends React.Component {
-
-	/**
-	 * @return JSX of Redux containers to create the dashboard
-	 */
-	render() {
-		return (
-			<div className="container-fluid">
-				<UIOptionsContainer />
-				<NewLineChartContainer />
-			</div>
-		);
-	}
+export default function DashboardComponent() {
+	return (
+		<div className="container-fluid">
+			<UIOptionsContainer />
+			<NewLineChartContainer />
+		</div>
+	);
 }

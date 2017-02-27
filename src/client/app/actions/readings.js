@@ -23,10 +23,10 @@ function fetchReadings(meterID, startTimestamp, endTimestamp) {
 		dispatch(requestReadings(meterID, startTimestamp, endTimestamp));
 		// This ensures that we don't send undefined timestamps to the server.
 		let axiosParams;
-		if (startTimestamp || endTimestamp) {
-			axiosParams = { startTimestamp, endTimestamp };
-		} else {
+		if (stringifyTimeInterval(startTimestamp, endTimestamp) === 'all') {
 			axiosParams = {};
+		} else {
+			axiosParams = { startTimestamp, endTimestamp };
 		}
 		return axios.get(`/api/meters/readings/${meterID}`, {
 			params: axiosParams

@@ -5,13 +5,9 @@
  */
 
 import { combineReducers } from 'redux';
-import { meters, defaultState as defaultMetersState } from './meters';
-import { readings, defaultState as defaultReadingsState } from './readings';
-import { graph, defaultState as defaultGraphState } from './graph';
-
-import * as metersActions from '../actions/meters';
-import * as readingsActions from '../actions/readings';
-import * as graphActions from '../actions/graph';
+import meters from './meters';
+import readings from './readings';
+import graph from './graph';
 
 /**
  * @typedef {Object} State

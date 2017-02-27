@@ -17,7 +17,7 @@ import * as graphActions from '../actions/graph';
 /**
  * @type {State~Graph}
  */
-export const defaultState = {
+const defaultState = {
 	selectedMeters: []
 };
 
@@ -26,7 +26,7 @@ export const defaultState = {
  * @param action
  * @return {State~Graph}
  */
-export function graph(state = { selectedMeters: [] }, action) {
+export default function graph(state = defaultState, action) {
 	switch (action.type) {
 		case graphActions.SELECT_METER:
 			return {

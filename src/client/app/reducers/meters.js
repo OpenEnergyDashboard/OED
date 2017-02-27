@@ -13,7 +13,7 @@ import * as metersActions from '../actions/meters';
  * @property {Object<number, Object>} byMeterID
  */
 
-export const defaultState = {
+const defaultState = {
 	isFetching: false,
 	byMeterID: {}
 };
@@ -23,7 +23,7 @@ export const defaultState = {
  * @param action
  * @return {State~Meters}
  */
-export function meters(state = defaultState, action) {
+export default function meters(state = defaultState, action) {
 	switch (action.type) {
 		case metersActions.REQUEST_METERS_DATA:
 			return {

@@ -22,7 +22,6 @@ function fetchMetersData() {
 		dispatch(requestMetersData());
 		return axios.get('/api/meters')
 			.then(response => {
-				console.log(response.data);
 				dispatch(receiveMetersData(response.data));
 			});
 	};
