@@ -53,7 +53,7 @@ const defaultConfig = {
 	}]
 };
 
-class ReduxLineChartComponent extends React.Component {
+export default class LineChartComponent extends React.Component {
 
 	constructor(props) {
 		super(props);
@@ -164,5 +164,3 @@ class ReduxLineChartComponent extends React.Component {
 		);
 	}
 }
-
-export default ReduxLineChartComponent;
