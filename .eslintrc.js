@@ -24,6 +24,14 @@ module.exports = {
 		"no-param-reassign": 0,
 		"no-plusplus": ["warn", { "allowForLoopAfterthoughts": true }],
 
+		// AirBnB disallows these syntax forms and also ForInStatement and ForOfStatement.
+		// We want to use both of those. They play nicely with await and are more readable than .forEach.
+		'no-restricted-syntax': [
+			'error',
+			'LabeledStatement',
+			'WithStatement',
+		],
+
 		"react/jsx-indent": ["error", "tab"], // Still tabs, not spaces
 		"react/no-direct-mutation-state": ["error"],
 		"class-methods-use-this": "off",

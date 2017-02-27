@@ -1,39 +1,50 @@
-/* This Source Code Form is subject to the terms of the Mozilla Public
+/*
+ * This Source Code Form is subject to the terms of the Mozilla Public
  * License, v. 2.0. If a copy of the MPL was not distributed with this
- * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
+ * file, You can obtain one at http://mozilla.org/MPL/2.0/.
+ */
 
 import { connect } from 'react-redux';
 import LineChartComponent from '../components/LineChartComponent';
+import { fetchReadingsIfNeeded } from '../actions/readings';
+import { stringifyTimeInterval } from '../util';
 
 /**
- * Maps the Redux store object to props to be passed down to child components
- * @param state The new Redux store object
- * @returns series The new series object containing meter readings for Highcharts
+ * @param {State} state
  */
-export function mapStateToProps(state) {
-	function getMeterNameById(meterID) {
-		let name = '';
-		state.meters.data.forEach(meter => {
-			if (meterID === meter.id) name = meter.name;
-		});
-		return name;
+function mapStateToProps(state) {
+	const startTimestamp = state.graph.startTimestamp;
+	const endTimestamp = state.graph.endTimestamp;
+	const timeInterval = stringifyTimeInterval(startTimestamp, endTimestamp);
+
+	const series = {};
+	const notLoadedMeters = [];
+	let isLoading = false;
+
+	for (const meterID of state.graph.selectedMeters) {
+		if (state.readings.byMeterID[meterID][timeInterval] === undefined || state.readings.byMeterID[meterID][timeInterval].isFetching) {
+			isLoading = true;
+			if (state.readings.byMeterID[meterID][timeInterval] === undefined) {
+				notLoadedMeters.push(meterID);
+			}
+		} else {
+			series[meterID] = { name: state.meters.byMeterID[meterID].name, data: state.readings.byMeterID[meterID][timeInterval].readings };
+		}
 	}
-	let series = {};
-	if (state.meters.selected) {
-		series = state.meters.selected.map(meterID => ({
-			name: getMeterNameById(meterID),
-			data: state.graph.data[meterID].readings
-		}));
-	} else {
-		series = [{
-			name: state.meters.data ? getMeterNameById(state.graph.defaultMeterToDisplay) : '',
-			data: state.graph.data[state.graph.defaultMeterToDisplay].readings
-		}];
-	}
-	return { series };
+	return {
+		isLoading,
+		series,
+		notLoadedMeters,
+		selectedMeters: state.graph.selectedMeters,
+		startTimestamp,
+		endTimestamp
+	};
 }
 
-/**
- * Connects changes to the Redux store to LineChartComponent via mapStateToProps
- */
-export default connect(mapStateToProps)(LineChartComponent);
+function mapDispatchToProps(dispatch) {
+	return {
+		fetchNewReadings: (meterID, startTimestamp, endTimestamp) => dispatch(fetchReadingsIfNeeded(meterID, startTimestamp, endTimestamp))
+	};
+}
+
+export default connect(mapStateToProps, mapDispatchToProps)(LineChartComponent);

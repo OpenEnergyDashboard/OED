@@ -3,7 +3,6 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
 
 import React from 'react';
-import { fetchMeterDataIfNeeded, changeDisplayedMeters } from '../actions';
 
 export default class UIOptionsComponent extends React.Component {
 	/**
@@ -12,13 +11,6 @@ export default class UIOptionsComponent extends React.Component {
 	 */
 	constructor(props) {
 		super(props);
-		this.state = {
-			meterInfo: {
-				names: [],
-				ids: []
-			},
-			selectedMeters: []
-		};
 		this.handleMeterSelect = this.handleMeterSelect.bind(this);
 	}
 
@@ -27,32 +19,20 @@ export default class UIOptionsComponent extends React.Component {
 	 * Dispatches a Redux action to fetch meter information
 	 */
 	componentWillMount() {
-		this.props.dispatch(fetchMeterDataIfNeeded());
+		this.props.fetchMetersDataIfNeeded();
 	}
 
-	/**
-	 * Called when this component receives new props
-	 * Sets the component's state to the new props
-	 */
-	componentWillReceiveProps(nextProps) {
-		this.setState({ meterInfo: nextProps.meterInfo });
-		this.setState({ selectedMeters: nextProps.selectedMeters });
-	}
-
-	/**
-	 * Dispatches a Redux action to change the displayed meters on the ids of the meters selected
-	 * @param e The event fired
-	 */
 	handleMeterSelect(e) {
 		e.preventDefault();
 		const options = e.target.options;
-		const values = [];
+		const selectedMeters = [];
+		// We can't map here because this is a collection of DOM elements, not an array.
 		for (let i = 0; i < options.length; i++) {
 			if (options[i].selected) {
-				values.push(parseInt(options[i].value));
+				selectedMeters.push(parseInt(options[i].value));
 			}
 		}
-		this.props.dispatch(changeDisplayedMeters(values));
+		this.props.selectMeters(selectedMeters);
 	}
 
 	/**
@@ -72,7 +52,9 @@ export default class UIOptionsComponent extends React.Component {
 						<div className="form-group">
 							<p style={labelStyle}>Select meters:</p>
 							<select multiple className="form-control" id="meterList" size="8" onChange={this.handleMeterSelect}>
-								{this.state.meterInfo.names.map((name, index) => <option key={index} value={this.state.meterInfo.ids[index]}>{name}</option>)}
+								{this.props.meters.map(meter =>
+									<option key={meter.id} value={meter.id}>{meter.name}</option>
+								)}
 							</select>
 						</div>
 					</div>
