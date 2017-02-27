@@ -79,7 +79,7 @@ mocha.describe('Compressed Readings', () => {
 		yield new Meter(undefined, 'Meter3', null, false, Meter.type.MAMAC).insert(t);
 		const meter2 = yield Meter.getByName('Meter2', t);
 		const meter3 = yield Meter.getByName('Meter3', t);
-		const readingMeter1 = new Reading(meter.id, 100, timestamp1.toDate(), timestamp2.toDate());
+		const readingMeter1 = new Reading(meter.id, 100, timestamp1, timestamp2);
 		const readingMeter2 = new Reading(meter2.id, 200, timestamp1.toDate(), timestamp2.toDate());
 		const readingMeter3 = new Reading(meter3.id, 300, timestamp1.toDate(), timestamp2.toDate());
 		yield Reading.insertAll([readingMeter1, readingMeter2, readingMeter3], t);
