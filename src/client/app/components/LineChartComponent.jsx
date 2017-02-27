@@ -157,7 +157,6 @@ class ReduxLineChartComponent extends React.Component {
 	}
 
 	render() {
-		// TODO: There's some sort of problem with the interaction between refs and react-router, especially when returning to the chart
 		return (
 			<div className="col-xs-10">
 				<ReactHighstock config={this.state.config} ref={this.setupChartRef} />
