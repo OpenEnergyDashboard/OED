@@ -3,8 +3,6 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
 
 import React from 'react';
-import { fetchMetersDataIfNeeded } from '../actions/meters';
-import { changeSelectedMeters } from '../actions/graph';
 
 export default class UIOptionsComponent extends React.Component {
 	/**
