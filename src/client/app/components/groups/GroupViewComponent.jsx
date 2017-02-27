@@ -8,7 +8,6 @@ import { Link } from 'react-router';
 
 import ChildMeterBox from './ChildMeterBoxComponent';
 import ChildGroupBox from './ChildGroupBoxComponent';
-// import EditGroupComponent from './EditGroupComponent';
 
 
 export default function GroupViewComponent(props) {

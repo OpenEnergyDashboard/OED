@@ -2,29 +2,26 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
 
-//Box classes for displaying child meters and groups
+// Box classes for displaying child meters and groups
 import React from 'react';
 
-export default function ChildGroupsBox(props) {
-
-
+export default function ChildGroupBox(props) {
 	const boxStyle = {
-		display: "inline-block",
-		width: "200px",
-		alignSelf: "right",
-		marginLeft: "40%",
-		marginRight: "10%",
-		//todo: testing hack
-		border: "1px solid purple"
+		display: 'inline-block',
+		width: '200px',
+		alignSelf: 'right',
+		marginLeft: '40%',
+		marginRight: '10%',
+		// todo: testing hack
+		border: '1px solid purple'
 	};
 	const listStyle = {
-		textAlign: "left"
+		textAlign: 'left'
 	};
 
-	const groups = props.groups.map((group) =>
+	const groups = props.groups.map(group =>
 		<li>{group.name}</li>
 	);
-
 
 
 	return (
@@ -33,5 +30,4 @@ export default function ChildGroupsBox(props) {
 			<ul style={listStyle}>{groups}</ul>
 		</div>
 	);
-
 }

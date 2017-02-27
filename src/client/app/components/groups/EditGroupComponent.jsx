@@ -9,35 +9,51 @@ import { Link } from 'react-router';
 
 export default class EditGroupComponent extends React.Component {
 
-    constructor(props) {
-        super(props);
-        this.state = {
-        };
-    }
+	constructor(props) {
+		super(props);
+		this.state = {};
+	}
 
-    render () {
+	render() {
+		const boxStyle = {
+			marginLeft: '10%',
+			marginRight: '10%',
+			// todo: testing hack
+			border: "1px solid red"
+		};
 
-        const titleStyle = {
-            justifyContent: "center",
-            alignItems: "center",
-            textAlign: "center"
-        };
-        //The back button right now just links back to the group page. Ideally we can create a back button component.
-        const backButton = {
-            float: "right"
-        };
+		const titleStyle = {
+			justifyContent: "center",
+			alignItems: "center",
+			textAlign: "center"
+		};
+		// The back button right now just links back to the group page. Ideally we can create a back button component.
+		const backButton = {
+			float: "right"
+		};
 
-        return (
-            <div>
-            <div style={titleStyle}>
-                <h1>Edit Group Pane</h1>
-            </div>
+		// todo: remove this absurd testing hack
+		// I'm reusing this from the other class until it can pass props
+		const meters = [
+			{name: "one"},
+			{name: "two"},
+			{name: "three"}
+		];
 
-            <div>
-                <Link style={backButton} to="/group"><button className="btn btn-default">Back to Groups</button></Link>
-            </div>
-            </div>
+		return (
+			<div>
+				<div style={titleStyle}>
+					<h1>Edit Group Pane</h1>
+				</div>
 
-        );
-    }
+				<div style={boxStyle}>
+					<ListBox groups={meters}/>
+					<Link style={backButton} to="/group">
+						<button className="btn btn-default">Back to Groups</button>
+					</Link>
+				</div>
+			</div>
+
+		);
+	}
 }
