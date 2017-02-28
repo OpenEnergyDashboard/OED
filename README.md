@@ -38,9 +38,12 @@ For a list of contributors, [click here](https://github.com/beloitcollegecompute
 
 ### Licensing ###
 
-This project is licensed under the GNU General Public License v3.0
+This project is licensed under the MPL version 2.0.
 
 See the full licensing agreement [here](https://github.com/beloitcollegecomputerscience/ED-JS/blob/README/License.txt)
+
+### Contributions ###
+We welcome others to contribute to this project by writing code for submission or collaborating with us. Please feel free to contact us if you are interested.
 
 ### Contact: ###
 
