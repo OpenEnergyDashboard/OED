@@ -5,6 +5,9 @@
  */
 
 import { connect } from 'react-redux';
+import LineChartComponent from '../components/LineChartComponent';
+import { fetchReadingsIfNeeded } from '../actions/readings';
+import { stringifyTimeInterval } from '../util';
 import ReduxLineChartComponent from '../components/LineChartComponent';
 import { fetchReadingsIfNeeded, fetchNeededReadings } from '../actions/readings';
 
@@ -43,4 +46,4 @@ function mapDispatchToProps(dispatch) {
 	};
 }
 
-export default connect(mapStateToProps, mapDispatchToProps)(ReduxLineChartComponent);
+export default connect(mapStateToProps, mapDispatchToProps)(LineChartComponent);
