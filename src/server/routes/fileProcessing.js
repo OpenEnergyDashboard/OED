@@ -1,18 +1,21 @@
 const express = require('express');
-const readCSV = require('../services/readCSV');
+const readCSVFromString = require('../services/readCSV').readCSVFromString;
+const multer = require('multer');
 
 const router = express.Router();
 
-router.post('/', async (req, res) => {
+// The upload here ensures that the file is saved to server RAM rather than disk
+const upload = multer({ storage: multer.memoryStorage() });
+router.post('/', upload.single('csvFile'), async (req, res) => {
 	try {
-		const file = req.body.file;
-		const data = await readCSV(file);
+		// Grab and save the data
+		const data = await readCSVFromString(req.file.buffer.toString('utf8'));
 		console.log(data);
 		res.status(200);
 	} catch (err) {
-		//todo Change the status to a good one so John does not burst a gasket.
-		res.status(201).send({ text: 'Invalid file.' });
+		res.status(400).send({ text: 'Invalid file.' });
 		console.log('it broke, fix it.');
+		console.log(err);
 	}
 });
 
