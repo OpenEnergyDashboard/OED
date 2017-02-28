@@ -7,6 +7,7 @@
 import React from 'react';
 import ReactHighstock from 'react-highcharts/ReactHighstock';
 import _ from 'lodash';
+import TimeInterval from '../../../common/TimeInterval';
 
 const defaultConfig = {
 	title: {
@@ -72,7 +73,7 @@ class ReduxLineChartComponent extends React.Component {
 
 	componentWillReceiveProps(nextProps) {
 		for (const meterID of nextProps.notLoadedMeters) {
-			nextProps.fetchNewReadings(meterID, nextProps.startTimestamp, nextProps.endTimestamp);
+			nextProps.fetchNewReadings(meterID, nextProps.timeInterval);
 		}
 		this.updateChartForNewProps(nextProps);
 	}
@@ -144,16 +145,13 @@ class ReduxLineChartComponent extends React.Component {
 	}
 
 	onChartExtremesChange({ min, max }) {
-		// Math.round(undefined) === NaN. We only want to round if the new extremes aren't undefined.
-		if (min !== undefined) {
-			min = Math.round(min);
-		}
-		if (max !== undefined) {
-			max = Math.round(max);
-		}
+		min = (min && Math.round(min)) || null;
+		max = (max && Math.round(max)) || null;
+		const timeInterval = new TimeInterval(min, max);
 		for (const meterID of this.props.selectedMeters) {
-			this.props.fetchNewReadings(meterID, min, max);
+			this.props.fetchNewReadings(meterID, timeInterval);
 		}
+		// this.props.fetchManyNewReadings(this.props.selectedMeters, min, max);
 	}
 
 	render() {

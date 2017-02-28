@@ -6,17 +6,13 @@
 
 import { connect } from 'react-redux';
 import ReduxLineChartComponent from '../components/LineChartComponent';
-import { fetchReadingsIfNeeded } from '../actions/readings';
-import { stringifyTimeInterval } from '../util';
+import { fetchReadingsIfNeeded, fetchNeededReadings } from '../actions/readings';
 
 /**
  * @param {State} state
  */
 function mapStateToProps(state) {
-	const startTimestamp = state.graph.startTimestamp;
-	const endTimestamp = state.graph.endTimestamp;
-	const timeInterval = stringifyTimeInterval(startTimestamp, endTimestamp);
-
+	const timeInterval = state.graph.timeInterval;
 	const series = {};
 	const notLoadedMeters = [];
 	let isLoading = false;
@@ -36,14 +32,14 @@ function mapStateToProps(state) {
 		series,
 		notLoadedMeters,
 		selectedMeters: state.graph.selectedMeters,
-		startTimestamp,
-		endTimestamp
+		timeInterval
 	};
 }
 
 function mapDispatchToProps(dispatch) {
 	return {
-		fetchNewReadings: (meterID, startTimestamp, endTimestamp) => dispatch(fetchReadingsIfNeeded(meterID, startTimestamp, endTimestamp))
+		fetchNewReadings: (meterID, timeInterval) => dispatch(fetchReadingsIfNeeded(meterID, timeInterval)),
+		fetchManyNewReadings: (meterIDs, timeInterval) => dispatch(fetchNeededReadings(meterIDs, timeInterval))
 	};
 }
 

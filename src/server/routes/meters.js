@@ -3,9 +3,10 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
 
 const express = require('express');
-const moment = require('moment');
+const _ = require('lodash');
 const Meter = require('../models/Meter');
 const Reading = require('../models/Reading');
+const TimeInterval = require('../../common/TimeInterval');
 
 const router = express.Router();
 
@@ -15,7 +16,7 @@ const router = express.Router();
  * @param {Array<Reading>} rows
  */
 function formatReadings(rows) {
-	return rows.map(row => [new Date(row.startTimestamp).valueOf(), row.reading]);
+	return rows.map(row => [new Date(row.start_timestamp).valueOf(), row.reading_rate]);
 }
 
 /**
@@ -43,39 +44,22 @@ router.get('/:meter_id', async (req, res) => {
 	}
 });
 
-function parseMillisecondTimestamp(timestamp) {
-	if (timestamp !== undefined) {
-		return moment(parseInt(timestamp)).toDate();
-	} else {
-		return null;
-	}
-}
-
 /**
  * GET meter readings by meter id
- * @param {int} meter_id
+ * @param {array.<int>} meter_ids
  * @param {Date} [startDate]
  * @param {Date} [endDate]
  */
-router.get('/readings/:meter_id', async (req, res) => {
-	if (req.query.startTimestamp || req.query.endTimestamp) {
-		try {
-			const rows = await Reading.getReadingsByMeterIDAndDateRange(
-				req.params.meter_id,
-				parseMillisecondTimestamp(req.query.startTimestamp),
-				parseMillisecondTimestamp(req.query.endTimestamp)
-			);
-			res.json(formatReadings(rows));
-		} catch (err) {
-			console.error(`Error while performing GET specific meter readings with date range query: ${err}`);
-		}
-	} else {
-		try {
-			const rows = await Reading.getAllByMeterID(req.params.meter_id);
-			res.json(formatReadings(rows));
-		} catch (err) {
-			console.error(`Error while performing GET all readings from specific meter by id query: ${err}`);
-		}
+router.get('/readings/:meter_ids', async (req, res) => {
+	// We can't do .map(parseInt) here because map would give parseInt a radix value of the current array position.
+	const meterIDs = req.params.meter_ids.split(',').map(s => parseInt(s));
+	const timeInterval = TimeInterval.fromString(req.query.timeInterval);
+	try {
+		const rawCompressedReadings = await Reading.getCompressedReadings(meterIDs, timeInterval.startTimestamp, timeInterval.endTimestamp, 25);
+		const formattedCompressedReadings = _.mapValues(rawCompressedReadings, formatReadings);
+		res.json(formattedCompressedReadings);
+	} catch (err) {
+		console.error(`Error while performing GET readings for meters ${meterIDs} with time interval ${timeInterval}: ${err}`);
 	}
 });
 

@@ -5,47 +5,58 @@
  */
 
 import axios from 'axios';
-import { stringifyTimeInterval } from '../util';
 
 export const REQUEST_READINGS = 'REQUEST_READINGS';
 export const RECEIVE_READINGS = 'RECEIVE_READINGS';
+export const REQUEST_MANY_READINGS = 'REQUEST_MANY_READINGS';
+export const RECEIVE_MANY_READINGS = 'RECEIVE_MANY_READINGS';
 
-function receiveReadings(meterID, startTimestamp, endTimestamp, readings) {
-	return { type: RECEIVE_READINGS, meterID, startTimestamp, endTimestamp, readings };
+/**
+ * @param {int} meterID
+ * @param {TimeInterval} timeInterval
+ * @param readings
+ * @return {{type: string, meterID: *, timeInterval: *, readings: *}}
+ */
+function receiveReadings(meterID, timeInterval, readings) {
+	return { type: RECEIVE_READINGS, meterID, timeInterval, readings };
 }
 
-function requestReadings(meterID, startTimestamp, endTimestamp) {
-	return { type: REQUEST_READINGS, meterID, startTimestamp, endTimestamp };
+/**
+ * @param meterID
+ * @param {TimeInterval} timeInterval
+ * @return {{type: string, meterID: *, timeInterval: *}}
+ */
+function requestReadings(meterID, timeInterval) {
+	return { type: REQUEST_READINGS, meterID, timeInterval };
 }
 
-function fetchReadings(meterID, startTimestamp, endTimestamp) {
+/**
+ * @param meterID
+ * @param {TimeInterval} timeInterval
+ * @return {function(*)}
+ */
+function fetchReadings(meterID, timeInterval) {
 	return dispatch => {
-		dispatch(requestReadings(meterID, startTimestamp, endTimestamp));
+		dispatch(requestReadings(meterID, timeInterval));
 		// This ensures that we don't send undefined timestamps to the server.
-		let axiosParams;
-		if (stringifyTimeInterval(startTimestamp, endTimestamp) === 'all') {
-			axiosParams = {};
-		} else {
-			axiosParams = { startTimestamp, endTimestamp };
-		}
 		return axios.get(`/api/meters/readings/${meterID}`, {
-			params: axiosParams
-		}).then(response => dispatch(receiveReadings(meterID, startTimestamp, endTimestamp, response.data)));
+			params: {
+				timeInterval: timeInterval.toString()
+			}
+		}).then(response => dispatch(receiveReadings(meterID, timeInterval, response.data[meterID])));
 	};
 }
 
 /**
  * @param {State} state
  * @param {number} meterID
- * @param startTimestamp
- * @param endTimestamp
+ * @param {TimeInterval} timeInterval
  */
-function shouldFetchReadings(state, meterID, startTimestamp, endTimestamp) {
+function shouldFetchReadings(state, meterID, timeInterval) {
 	const readingsForMeterID = state.readings.byMeterID[meterID];
 	if (readingsForMeterID === undefined) {
 		return true;
 	}
-	const timeInterval = stringifyTimeInterval(startTimestamp, endTimestamp);
 	if (readingsForMeterID[timeInterval] === undefined) {
 		return true;
 	}
@@ -53,10 +64,49 @@ function shouldFetchReadings(state, meterID, startTimestamp, endTimestamp) {
 	return readingsForTimeInterval === undefined || !readingsForTimeInterval.isFetching;
 }
 
-export function fetchReadingsIfNeeded(meterID, startTimestamp, endTimestamp) {
+export function fetchReadingsIfNeeded(meterID, timeInterval) {
 	return (dispatch, getState) => {
-		if (shouldFetchReadings(getState(), meterID, startTimestamp, endTimestamp)) {
-			return dispatch(fetchReadings(meterID, startTimestamp, endTimestamp));
+		if (shouldFetchReadings(getState(), meterID, timeInterval)) {
+			return dispatch(fetchReadings(meterID, timeInterval));
+		}
+		return Promise.resolve();
+	};
+}
+
+function requestManyReadings(meterIDs, timeInterval) {
+	return { type: REQUEST_MANY_READINGS, meterIDs, timeInterval };
+}
+
+function receiveManyReadings(meterIDs, timeInterval, readings) {
+	return { type: RECEIVE_MANY_READINGS, meterIDs, timeInterval, readings };
+}
+
+function fetchManyReadings(meterIDs, timeInterval) {
+	return dispatch => {
+		dispatch(requestManyReadings(meterIDs, timeInterval));
+		// The api expects the meter ids to be a comma-separated list.
+		const stringifiedMeterIDs = meterIDs.join(',');
+		return axios.get(`/api/meters/readings/${stringifiedMeterIDs}`, {
+			params: { timeInterval: timeInterval.toString() }
+		}).then(response => {
+			console.log(response.data);
+			return dispatch(receiveManyReadings(meterIDs, timeInterval, response.data));
+		});
+	};
+}
+
+/**
+ * Fetches readings for the given meterIDs if they are not already fetched or being fetched
+ * @param {Array.<int>} meterIDs
+ * @param {TimeInterval} timeInterval The time interval to fetch readings for
+ * @return {*} An action to fetch the needed readings
+ */
+export function fetchNeededReadings(meterIDs, timeInterval) {
+	return (dispatch, getState) => {
+		const state = getState();
+		const meterIDsToFetch = meterIDs.filter(id => shouldFetchReadings(state, id, timeInterval));
+		if (meterIDsToFetch.length > 0) {
+			return dispatch(fetchManyReadings(meterIDsToFetch, timeInterval));
 		}
 		return Promise.resolve();
 	};
