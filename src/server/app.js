@@ -8,6 +8,7 @@ const users = require('./routes/users');
 const meters = require('./routes/meters');
 const login = require('./routes/login');
 const verification = require('./routes/verification');
+const groups = require('./routes/groups');
 
 const app = express();
 
@@ -21,6 +22,7 @@ app.use(express.static(path.join(__dirname, '..', 'client')));
 app.use('/api/users', users);
 app.use('/api/meters', meters);
 app.use('/api/login', login);
+app.use('/api/groups', groups);
 app.use('/api/verification', verification);
 
 app.get('*', (req, res) => {

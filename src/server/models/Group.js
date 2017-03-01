@@ -74,10 +74,21 @@ class Group {
 	 * @param conn the connection to be used, defaults to the default database connection.
 	 * @returns {Promise.<*>}
 	 */
-	static async getImmediateMetersbyGroupID(id, conn = db) {
+	static async getImmediateMetersByGroupID(id, conn = db) {
 		const rows = await conn.any(sqlFile('group/get_immediate_meters_by_group_id.sql'), { id: id });
-		return Meter.mapRow(rows);
+		return rows.map(Meter.mapRow);
+	}
+
+	/**
+	 * Returns a promise to retrieve all the child groups of the group whose id is given.
+	 * @param id the id of the group whose children are to be retrieved
+	 * @param conn he connection to be used, defaults to the default database connection.
+	 * @returns {Promise.<Group>}
+	 */
+	static async getImmediateGroupsByGroupID(id, conn = db) {
+		const rows = await conn.any(sqlFile('group/get_immediate_groups_by_group_id.sql'), { id: id });
+		return rows.map(Group.mapRow);
 	}
 
 }
-
+module.exports = Group;

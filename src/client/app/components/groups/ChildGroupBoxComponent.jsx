@@ -6,6 +6,7 @@
 import React from 'react';
 
 export default function ChildGroupBox(props) {
+
 	const boxStyle = {
 		display: 'inline-block',
 		width: '200px',
@@ -20,7 +21,7 @@ export default function ChildGroupBox(props) {
 	};
 
 	const groups = props.groups.map(group =>
-		<li>{group.name}</li>
+		(<li>{group.name}</li>)
 	);
 
 

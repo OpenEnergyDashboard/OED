@@ -20,7 +20,7 @@ export default function ChildMeterBox(props) {
 	};
 
 	const meters = props.meters.map(meter =>
-		<li>{meter.name}</li>
+		(<li>{meter.name}</li>)
 	);
 
 

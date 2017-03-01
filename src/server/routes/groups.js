@@ -7,6 +7,9 @@ const Group = require('../models/Group');
 
 const router = express.Router();
 
+/**
+ * GET information on all groups.
+ */
 router.get('/', async (req, res) => {
 	try {
 		const rows = await Group.getAll();
@@ -15,3 +18,21 @@ router.get('/', async (req, res) => {
 		console.error(`Error while preforming GET all groups query: ${err}`); // eslint-disable-line no-console
 	}
 });
+
+/**
+ * GET meters that are immediate children of a given group
+ * @param int group_id
+ */
+router.get('/children/:group_id', async (req, res) => {
+	try {
+		const [meters, groups] = await Promise.all([
+			Group.getImmediateMetersByGroupID(req.params.group_id),
+			Group.getImmediateGroupsByGroupID(req.params.group_id)
+		]);
+		res.json({ meters, groups });
+	} catch (err) {
+		console.error(`Error while preforming GET on all immediate children (meters and groups) of specific group: ${err}`); // eslint-disable-line no-console, max-len
+	}
+});
+
+module.exports = router;
