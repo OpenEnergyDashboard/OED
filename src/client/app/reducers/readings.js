@@ -74,7 +74,34 @@ export default function readings(state = defaultState, action) {
 				}
 			};
 		}
+		case readingsActions.REQUEST_MANY_READINGS: {
+			const timeInterval = action.timeInterval;
+			const newState = {
+				...state,
+				byMeterID: {
+					...state.byMeterID
+				}
+			};
+			for (const meterID of action.meterIDs) {
+				newState.byMeterID[meterID][timeInterval] = { ...newState.byMeterID[meterID][timeInterval], isFetching: true };
+			}
+			return newState;
+		}
+		case readingsActions.RECEIVE_MANY_READINGS: {
+			const timeInterval = action.timeInterval;
+			const newState = {
+				...state,
+				byMeterID: {
+					...state.byMeterID
+				}
+			};
 
+			for (const meterID of action.meterIDs) {
+				const readingsForMeter = action.readings[meterID];
+				newState.byMeterID[meterID][timeInterval] = { isFetching: false, readings: readingsForMeter };
+			}
+			return newState;
+		}
 		default:
 			return state;
 	}

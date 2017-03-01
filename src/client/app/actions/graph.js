@@ -5,6 +5,7 @@
  */
 
 import { fetchNeededReadings } from './readings';
+import TimeInterval from '../../../common/TimeInterval';
 
 export const SELECT_METER = 'SELECT_METER';
 export const UNSELECT_METER = 'UNSELECT_METER';
@@ -20,18 +21,35 @@ export function unselectMeter(meterID) {
 	return { type: UNSELECT_METER, meterID };
 }
 
-export function changeSelectedMeters(meterIDs) {
-	return { type: CHANGE_SELECTED_METERS, meterIDs };
+function fetchNeededReadingsForGraph(meterIDs, timeInterval) {
+	return dispatch => {
+		dispatch(fetchNeededReadings(meterIDs, timeInterval));
+		dispatch(fetchNeededReadings(meterIDs, TimeInterval.unbounded()));
+	};
 }
 
-export function setGraphZoom(timeInterval) {
+export function changeSelectedMeters(meterIDs) {
+	return (dispatch, getState) => {
+		// TODO: Factor this out into a function
+		dispatch({ type: CHANGE_SELECTED_METERS, meterIDs });
+		const state = getState();
+		dispatch(fetchNeededReadingsForGraph(state.graph.selectedMeters, state.graph.timeInterval));
+	};
+}
+
+function setGraphZoom(timeInterval) {
 	return { type: SET_GRAPH_ZOOM, timeInterval };
 }
 
-function changeGraphZoom(timeInterval) {
+function shouldChangeGraphZoom(state, timeInterval) {
+	return !state.graph.timeInterval.equals(timeInterval);
+}
+
+export function changeGraphZoomIfNeeded(timeInterval) {
 	return (dispatch, getState) => {
-		const state = getState();
-		dispatch(setGraphZoom(timeInterval));
-		dispatch(fetchNeededReadings(state.graph.selectedMeters, timeInterval));
+		if (shouldChangeGraphZoom(getState())) {
+			dispatch(setGraphZoom(timeInterval));
+			dispatch(fetchNeededReadingsForGraph(getState().graph.selectedMeters, timeInterval));
+		}
 	};
 }

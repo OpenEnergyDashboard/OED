@@ -8,16 +8,21 @@ const moment = require('moment');
 
 class TimeInterval {
 	constructor(startTimestamp, endTimestamp) {
-		this.startTimestamp = startTimestamp && moment(startTimestamp);
-		this.endTimestamp = endTimestamp && moment(endTimestamp);
-		this.isBounded = this.startTimestamp && this.endTimestamp;
+		this.startTimestamp = startTimestamp && moment.utc(startTimestamp);
+		this.endTimestamp = endTimestamp && moment.utc(endTimestamp);
+		this.isBounded = (this.startTimestamp !== null) && (this.endTimestamp !== null);
 	}
 
 	toString() {
 		if (this.isBounded) {
-			return `${this.startTimestamp.format()} - ${this.endTimestamp.format()}`;
+			// Using '_' as a separator character since it doesn't appear in ISO dates
+			return `${this.startTimestamp.format()}_${this.endTimestamp.format()}`;
 		}
 		return 'all';
+	}
+
+	equals(other) {
+		return (other instanceof TimeInterval) && this.toString() === other.toString();
 	}
 
 	valueOf() {
@@ -41,7 +46,8 @@ class TimeInterval {
 		if (stringified === 'all') {
 			return TimeInterval.unbounded();
 		}
-		const [startTimestamp, endTimestamp] = stringified.split('-').map(timestamp => moment(parseInt(timestamp)));
+		// Using '_' as a separator character since it doesn't appear in ISO dates
+		const [startTimestamp, endTimestamp] = stringified.split('_').map(timestamp => moment(timestamp));
 		return new TimeInterval(startTimestamp, endTimestamp);
 	}
 }
