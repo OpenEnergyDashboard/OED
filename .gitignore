@@ -13,3 +13,6 @@ private
 
 # Environment Variables
 .env
+
+# CSV files
+*.csv
