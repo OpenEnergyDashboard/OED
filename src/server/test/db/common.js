@@ -1,8 +1,8 @@
-const chai = require('chai');
-const chaiAsPromised = require('chai-as-promised');
+/* This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this
+ * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
 
-chai.use(chaiAsPromised);
-const config = require('../config');
+const config = require('../../config');
 
 // This swaps us to the test database for running test.
 // TODO: Fix up configuration between different environments. Maybe use the config npm package.
@@ -15,24 +15,14 @@ config.database = {
 	port: process.env.DB_TEST_PORT || process.env.DB_PORT
 };
 
-const { db, createSchema } = require('../models/database');
-const Meter = require('../models/Meter');
-const mocha = require('mocha');
+const { db, createSchema } = require('../../models/database');
 
 function recreateDB() {
 	return db.none('DROP TABLE IF EXISTS readings')
 		.then(() => db.none('DROP TABLE IF EXISTS meters'))
 		.then(() => db.none('DROP TYPE IF EXISTS meter_type'))
+		.then(() => db.none('DROP FUNCTION IF EXISTS compressed_readings(INTEGER, TIMESTAMP, TIMESTAMP, INTEGER);'))
 		.then(createSchema);
 }
 
-mocha.describe('Database Tests', () => {
-	mocha.beforeEach(recreateDB);
-
-	mocha.it('saves and retrieves a meter', () => {
-		const meter = new Meter(undefined, 'Meter', null, false, Meter.type.MAMAC);
-		const getMeter = meter.insert()
-			.then(() => Meter.getByName(meter.name));
-		return chai.expect(getMeter).to.eventually.have.property('name', meter.name);
-	});
-});
+module.exports.recreateDB = recreateDB;

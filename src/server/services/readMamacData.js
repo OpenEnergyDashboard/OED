@@ -1,3 +1,7 @@
+/* This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this
+ * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
+
 const reqPromise = require('request-promise-native');
 const promisify = require('es6-promisify');
 const csv = require('csv');
@@ -7,7 +11,7 @@ const Reading = require('../models/Reading');
 const parseCsv = promisify(csv.parse);
 
 function parseTimestamp(raw) {
-	return moment(raw, 'HH:mm:ss MM/DD/YY').toDate();
+	return moment(raw, 'HH:mm:ss MM/DD/YY');
 }
 
 /**
@@ -27,7 +31,12 @@ function readMamacData(meter) {
 			reqPromise(`http://${m.ipAddress}/int2.csv`).then(parseCsv)
 		])).then(([m, rawReadings]) => {
 			if (!m.id) throw new Error(`${m} doesn't have an id to associate readings with`);
-			return rawReadings.map(raw => new Reading(m.id, parseInt(raw[0]), parseTimestamp(raw[1])));
+			return rawReadings.map(raw => new Reading(
+				m.id,
+				parseInt(raw[0]),
+				parseTimestamp(raw[1]).subtract(1, 'hours').toDate(),
+				parseTimestamp(raw[1]).toDate())
+			);
 		});
 }
 
