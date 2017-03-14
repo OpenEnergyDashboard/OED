@@ -13,4 +13,6 @@ private
 
 # Environment Variables
 .env
-/node_modules/
+
+# CSV files
+*.csv

@@ -15,8 +15,8 @@ Node - Javascript runtime environment ([nodejs.org](https://nodejs.org/en/))
 1. Clone this repository.
 1. Run ```npm install``` in the project root directory.
 1. Install PostgreSQL, start the PostgreSQL server, and connect to it via psql.
-1. In psql, run ```CREATE DATABASE environmental_dashboard``` to create the database.
-1. Still in psql, run ```CREATE DATABASE environmental_dashboard_testing``` to create a database for automated tests.
+1. In psql, run ```CREATE DATABASE environmental_dashboard;``` to create the database.
+1. Still in psql, run ```CREATE DATABASE environmental_dashboard_testing;``` to create a database for automated tests.
 1. Create a .env file in the root directory of the project with the following, replacing (?) with the desired information: <br>
 &nbsp;&nbsp;&nbsp;&nbsp;SERVER_PORT=? // The port that the server should run on. 3000 is a good default choice<br>
 &nbsp;&nbsp;&nbsp;&nbsp;DB_USER=? // The user that should be used to connect to postgres<br>
@@ -38,9 +38,12 @@ For a list of contributors, [click here](https://github.com/beloitcollegecompute
 
 ### Licensing ###
 
-This project is licensed under the GNU General Public License v3.0
+This project is licensed under the MPL version 2.0.
 
 See the full licensing agreement [here](https://github.com/beloitcollegecomputerscience/ED-JS/blob/README/License.txt)
+
+### Contributions ###
+We welcome others to contribute to this project by writing code for submission or collaborating with us. Please feel free to contact us if you are interested.
 
 ### Contact: ###
 
