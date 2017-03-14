@@ -8,7 +8,8 @@
     "build": "webpack -p",
     "lint": "./node_modules/.bin/eslint src/client/app/**/*.js src/client/app/**/*.jsx src/server/**/*.js src/server/**/*.jsx",
     "test": "./node_modules/.bin/mocha \"src/server/test/**/*.js\"",
-    "createdb": "node ./src/scripts/createDB.js"
+    "createdb": "node ./src/scripts/createDB.js",
+	"updatemeters": "node ./src/server/services/updateMeters.js"
   },
   "dependencies": {
     "axios": "^0.15.3",

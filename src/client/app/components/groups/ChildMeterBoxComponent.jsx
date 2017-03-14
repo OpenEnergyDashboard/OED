@@ -5,29 +5,76 @@
 // Box classes for displaying child meters and groups
 import React from 'react';
 
-export default function ChildMeterBox(props) {
-	const boxStyle = {
-		display: 'inline-block',
-		width: '200px',
-		alignSelf: 'left',
-		marginLeft: '10%',
-		marginRight: '10%',
-		// todo: testing hack
-		border: '1px solid black'
-	};
-	const listStyle = {
-		textAlign: 'left'
-	};
+export default class ChildMeterBox extends React.Component {
 
-	const meters = props.meters.map(meter =>
-		(<li>{meter.name}</li>)
-	);
+	/**
+	 * Initializes the component's state, binds all functions to 'this' UIOptionsComponent
+	 * @param props The props passed down through the UIOptionsContainer
+	 */
+	constructor(props) {
+		super(props);
+		this.handleMeterSelect = this.handleMeterSelect.bind(this);
+	}
+
+	/**
+	 * Called when this component mounts
+	 * Dispatches a Redux action to fetch meter information
+	 */
+	componentWillMount() {
+		this.props.fetchMetersDataIfNeeded();
+	}
+
+	handleMeterSelect(e) {
+		e.preventDefault();
+		const options = e.target.options;
+		const selectedMeters = [];
+		// We can't map here because this is a collection of DOM elements, not an array.
+		for (let i = 0; i < options.length; i++) {
+			if (options[i].selected) {
+				selectedMeters.push(parseInt(options[i].value));
+			}
+		}
+		this.props.selectMeters(selectedMeters);
+	}
+
+	render() {
+		const boxStyle = {
+			display: 'inline-block',
+			width: '200px',
+			alignSelf: 'left',
+			marginLeft: '10%',
+			marginRight: '10%',
+			// todo: testing hack
+			border: '1px solid black'
+		};
+		const listStyle = {
+			textAlign: 'left'
+		};
+
+		const labelStyle = {
+			textDecoration: 'underline'
+		};
+		const divPadding = {
+			paddingTop: '35px'
+		};
+
+		const meters = this.props.meters.map(meter =>
+			(<li>{meter.name}</li>)
+		);
 
 
-	return (
-		<div style={boxStyle}>
-			<h3>Child Meters:</h3>
-			<ul style={listStyle}>{meters}</ul>
-		</div>
-	);
+		return (
+			<div style={boxStyle}>
+				<h3>Child Meters:</h3>
+				<div className="form-group">
+					<p style={labelStyle}>Select meters:</p>
+					<select multiple className="form-control" id="meterList" size="8" onClick={this.handleMeterSelect}>
+						{this.props.meters.map(meter =>
+							<option key={meter.id} value={meter.id}>{meter.name}</option>
+						)}
+					</select>
+				</div>
+			</div>
+		);
+	}
 }
