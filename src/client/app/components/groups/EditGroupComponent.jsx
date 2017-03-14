@@ -2,9 +2,8 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
 
-//This component is the main page of the edit group page.
+// This component is the main page of the edit group page.
 import React from 'react';
-import ListBox from './ListBoxComponent';
 import { Link } from 'react-router';
 
 export default class EditGroupComponent extends React.Component {
@@ -47,7 +46,8 @@ export default class EditGroupComponent extends React.Component {
 				</div>
 
 				<div style={boxStyle}>
-					<ListBox groups={meters}/>
+					<p>This will either be the page for editing a group or made into an overlay component.
+						Not worth the time to switch this into a Redux component, so leaving as is.</p>
 					<Link style={backButton} to="/group">
 						<button className="btn btn-default">Back to Groups</button>
 					</Link>

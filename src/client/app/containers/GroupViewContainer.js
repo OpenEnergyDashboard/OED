@@ -4,7 +4,7 @@
  */
 
 import { connect } from 'react-redux';
-import ChildMeterBoxComponent from '../components/groups/ChildMeterBoxComponent';
+import GroupViewComponent from '../components/groups/GroupViewComponent';
 import { fetchMetersDataIfNeeded } from '../actions/meters';
 import { changeSelectedMeters } from '../actions/graph';
 
@@ -27,4 +27,4 @@ function mapDispatchToProps(dispatch) {
 	};
 }
 
-export default connect(mapStateToProps, mapDispatchToProps)(ChildMeterBoxComponent);
+export default connect(mapStateToProps, mapDispatchToProps)(GroupViewComponent);

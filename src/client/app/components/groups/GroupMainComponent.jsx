@@ -1,52 +1,59 @@
 /* This Source Code Form is subject to the terms of the Mozilla Public
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
-
+// TODO: turn this into a redux component so we can display multiple view components
 // This is the main component for the groups display page
 import { Link } from 'react-router';
 import React from 'react';
 
-import HeaderComponent from '../HeaderComponent';
-import GroupViewComponent from './GroupViewComponent';
+import LogoComponent from '../LogoComponent';
+import GroupViewContainer from '../../containers/GroupViewContainer';
 
 
+export default function GroupComponent() {
 
-export default function GroupComponent(props) {
 	const center = {
-
-		justifyContent: 'center',
-		alignItems: 'center',
-		textAlign: 'center'
+		display: 'table',
+		tableLayout: 'auto',
+		width: '100%'
 	};
 	const backButton = {
 		float: 'right',
 		width: '15%',
 	};
-	const viewComp = {
-		float: 'left',
-		width: '80%',
-		marginRight: '5%'
-	};
 
 	const boxStyle = {
 		// todo: testing hack
-		border: '1px solid green'
+		display: 'inline-block',
+		textAlign: 'center',
+		width: '100%'
 	};
 
+	const footerStyle = {
+		width: '100%',
+		position: 'fixed',
+		bottom: '0'
+	};
+
+	// todo: The back link currently messes with the react display on the main page
 	return (
-		<div style={boxStyle}>
-			<HeaderComponent renderLoginButton="false" renderGroupButton="false" />
+		<div>
+		<div className="groupDisplay">
+			<Link to="/"><LogoComponent url="./app/images/logo.png" /> </Link>
+			<h1 style={boxStyle}>Group Main Page</h1>
 
 			<div style={center}>
-				<h1>Group Main Page</h1>
-				<GroupViewComponent name="bannana" />
-				<Link style={backButton} to="/">
-					<button className="btn btn-default">Back to Dashboard</button>
-				</Link>
-
-
+				<GroupViewContainer />
+				<GroupViewContainer />
+				<GroupViewContainer />
 			</div>
 
+		</div>
+			<div style={footerStyle}>
+			<Link style={backButton} to="/">
+				<button className="btn btn-default">Back to Dashboard</button>
+			</Link>
+		</div>
 		</div>
 	);
 }
