@@ -6,6 +6,7 @@
 
 import { Line } from 'react-chartjs-2';
 import { connect } from 'react-redux';
+import 'chartjs-plugin-zoom';
 import { fetchReadingsIfNeeded } from '../actions/readings';
 import { stringifyTimeInterval } from '../util';
 
@@ -65,6 +66,14 @@ function mapStateToProps(state) {
 		tooltips: {
 			mode: 'nearest',
 			intersect: false
+		},
+		pan: {
+			enabled: true,
+			mode: 'x'
+		},
+		zoom: {
+			enabled: true,
+			mode: 'x',
 		}
 	};
 
