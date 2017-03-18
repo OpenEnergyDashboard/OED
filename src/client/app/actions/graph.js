@@ -4,9 +4,11 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/.
  */
 
+import { fetchReadingsIfNeeded } from './readings';
+
 export const SELECT_METER = 'SELECT_METER';
 export const UNSELECT_METER = 'UNSELECT_METER';
-export const CHANGE_SELECTED_METERS = 'CHANGE_SELECTED_METERS';
+export const UPDATE_SELECTED_METERS = 'UPDATE_SELECTED_METERS';
 export const SET_GRAPH_ZOOM = 'CHANGE_GRAPH_ZOOM';
 
 
@@ -18,8 +20,18 @@ export function unselectMeter(meterID) {
 	return { type: UNSELECT_METER, meterID };
 }
 
+export function updateSelectedMeters(meterIDs) {
+	return { type: UPDATE_SELECTED_METERS, meterIDs };
+}
+
 export function changeSelectedMeters(meterIDs) {
-	return { type: CHANGE_SELECTED_METERS, meterIDs };
+	return (dispatch, getState) => {
+		dispatch(updateSelectedMeters(meterIDs));
+		for (const meterID of meterIDs) {
+			dispatch(fetchReadingsIfNeeded(meterID, getState().graph.startTimestamp, getState().graph.endTimestamp));
+		}
+		return Promise.resolve();
+	};
 }
 
 export function setGraphZoom(startTimestamp, endTimestamp) {

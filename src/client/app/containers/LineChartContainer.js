@@ -4,8 +4,8 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/.
  */
 
+import { Line } from 'react-chartjs-2';
 import { connect } from 'react-redux';
-import LineChartComponent from '../components/LineChartComponent';
 import { fetchReadingsIfNeeded } from '../actions/readings';
 import { stringifyTimeInterval } from '../util';
 
@@ -16,28 +16,62 @@ function mapStateToProps(state) {
 	const startTimestamp = state.graph.startTimestamp;
 	const endTimestamp = state.graph.endTimestamp;
 	const timeInterval = stringifyTimeInterval(startTimestamp, endTimestamp);
+	const data = { datasets: [] };
+	const colors = ['LightBlue', 'GoldenRod', 'Black', 'OrangeRed', 'LightSeaGreen', 'LightSlateGray', 'Purple'];
+	let colorPointer = 0;
 
-	const series = {};
-	const notLoadedMeters = [];
-	let isLoading = false;
+	function getColor() {
+		const color = colors[colorPointer];
+		colorPointer = (colorPointer + 1) % colors.length;
+		return color;
+	}
 
 	for (const meterID of state.graph.selectedMeters) {
-		if (state.readings.byMeterID[meterID][timeInterval] === undefined || state.readings.byMeterID[meterID][timeInterval].isFetching) {
-			isLoading = true;
-			if (state.readings.byMeterID[meterID][timeInterval] === undefined) {
-				notLoadedMeters.push(meterID);
+		if (!(state.readings.byMeterID[meterID][timeInterval] === undefined || state.readings.byMeterID[meterID][timeInterval].isFetching)) {
+			if (state.readings.byMeterID[meterID][timeInterval] !== undefined) {
+				data.datasets.push({
+					label: state.meters.byMeterID[meterID].name,
+					data: state.readings.byMeterID[meterID][timeInterval].readings.map(arr => ({ x: arr[0], y: arr[1] })),
+					fill: false,
+					borderColor: getColor()
+				});
 			}
-		} else {
-			series[meterID] = { name: state.meters.byMeterID[meterID].name, data: state.readings.byMeterID[meterID][timeInterval].readings };
 		}
 	}
+
+	const options = {
+		animation: {
+			duration: 0
+		},
+		elements: {
+			point: {
+				radius: 0
+			}
+		},
+		scales: {
+			xAxes: [{
+				type: 'time'
+			}],
+			yAxes: [{
+				scaleLabel: {
+					display: true,
+					labelString: 'kWh'
+				},
+				ticks: {
+					beginAtZero: true
+				}
+			}]
+		},
+		tooltips: {
+			mode: 'nearest',
+			intersect: false
+		}
+	};
+
 	return {
-		isLoading,
-		series,
-		notLoadedMeters,
-		selectedMeters: state.graph.selectedMeters,
-		startTimestamp,
-		endTimestamp
+		data,
+		options,
+		redraw: true
 	};
 }
 
@@ -47,4 +81,4 @@ function mapDispatchToProps(dispatch) {
 	};
 }
 
-export default connect(mapStateToProps, mapDispatchToProps)(LineChartComponent);
+export default connect(mapStateToProps, mapDispatchToProps)(Line);

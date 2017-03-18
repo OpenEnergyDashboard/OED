@@ -38,7 +38,7 @@ export default function graph(state = defaultState, action) {
 				...state,
 				selectedMeters: state.selectedMeters.filter(meterID => meterID !== action.meterID)
 			};
-		case graphActions.CHANGE_SELECTED_METERS:
+		case graphActions.UPDATE_SELECTED_METERS:
 			return {
 				...state,
 				selectedMeters: action.meterIDs
