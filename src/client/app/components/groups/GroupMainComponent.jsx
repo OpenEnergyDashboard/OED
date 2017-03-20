@@ -9,9 +9,7 @@ import React from 'react';
 import LogoComponent from '../LogoComponent';
 import GroupViewContainer from '../../containers/GroupViewContainer';
 
-
 export default function GroupComponent() {
-
 	const center = {
 		display: 'table',
 		tableLayout: 'auto',
@@ -38,22 +36,24 @@ export default function GroupComponent() {
 	// todo: The back link currently messes with the react display on the main page
 	return (
 		<div>
-		<div className="groupDisplay">
-			<Link to="/"><LogoComponent url="./app/images/logo.png" /> </Link>
-			<h1 style={boxStyle}>Group Main Page</h1>
+			<div className="groupDisplay">
+				<Link to="/"><LogoComponent url="./app/images/logo.png" /> </Link>
+				<h1 style={boxStyle}>Group Main Page</h1>
 
-			<div style={center}>
-				<GroupViewContainer />
-				<GroupViewContainer />
-				<GroupViewContainer />
+				<div style={center}>
+					<GroupViewContainer />
+					<GroupViewContainer />
+					<GroupViewContainer />
+					<GroupViewContainer />
+					<GroupViewContainer />
+				</div>
+
 			</div>
-
-		</div>
 			<div style={footerStyle}>
-			<Link style={backButton} to="/">
-				<button className="btn btn-default">Back to Dashboard</button>
-			</Link>
-		</div>
+				<Link style={backButton} to="/">
+					<button className="btn btn-default">Back to Dashboard</button>
+				</Link>
+			</div>
 		</div>
 	);
 }
