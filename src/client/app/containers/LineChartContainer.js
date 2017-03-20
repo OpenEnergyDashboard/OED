@@ -7,7 +7,6 @@
 import { Line } from 'react-chartjs-2';
 import { connect } from 'react-redux';
 import 'chartjs-plugin-zoom';
-import { fetchReadingsIfNeeded } from '../actions/readings';
 import { stringifyTimeInterval } from '../util';
 
 /**
@@ -84,10 +83,4 @@ function mapStateToProps(state) {
 	};
 }
 
-function mapDispatchToProps(dispatch) {
-	return {
-		fetchNewReadings: (meterID, startTimestamp, endTimestamp) => dispatch(fetchReadingsIfNeeded(meterID, startTimestamp, endTimestamp))
-	};
-}
-
-export default connect(mapStateToProps, mapDispatchToProps)(Line);
+export default connect(mapStateToProps)(Line);

@@ -36,6 +36,14 @@ class Reading {
 		return db.none(sqlFile('reading/create_readings_table.sql'));
 	}
 
+	/**
+	 * Returns a promise to create the compressed readings function.
+	 * @return {Promise.<>}
+	 */
+	static createCompressedReadingsFunction() {
+		return db.none(sqlFile('reading/create_function_get_compressed_readings.sql'));
+	}
+
 	static mapRow(row) {
 		return new Reading(row.meter_id, row.reading, row.start_timestamp, row.end_timestamp);
 	}
