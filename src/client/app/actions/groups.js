@@ -20,9 +20,8 @@ export function receiveGroupsData(data) {
 function fetchGroupsData() {
 	return dispatch => {
 		dispatch(requestGroupsData());
-		// todo: make sure this is the proper call, get DB up
-		// make this use the
-		return axios.get('/api/groups/children/1')
+		// This will get all groups data if exists.
+		return axios.get('/api/groups/')
 			.then(response => {
 				dispatch(receiveGroupsData(response.data));
 			});
