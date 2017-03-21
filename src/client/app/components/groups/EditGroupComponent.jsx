@@ -10,7 +10,7 @@ export default class EditGroupComponent extends React.Component {
 
 	constructor(props) {
 		super(props);
-		this.state = {};
+		this.state = { childGroup: {}, childMeter: {} };
 	}
 
 	render() {
@@ -18,25 +18,25 @@ export default class EditGroupComponent extends React.Component {
 			marginLeft: '10%',
 			marginRight: '10%',
 			// todo: testing hack
-			border: "1px solid red"
+			border: '1px solid red'
 		};
 
 		const titleStyle = {
-			justifyContent: "center",
-			alignItems: "center",
-			textAlign: "center"
+			justifyContent: 'center',
+			alignItems: 'center',
+			textAlign: 'center'
 		};
 		// The back button right now just links back to the group page. Ideally we can create a back button component.
 		const backButton = {
-			float: "right"
+			float: 'right'
 		};
 
 		// todo: remove this absurd testing hack
 		// I'm reusing this from the other class until it can pass props
 		const meters = [
-			{name: "one"},
-			{name: "two"},
-			{name: "three"}
+			{ name: 'one' },
+			{ name: 'two' },
+			{ name: 'three' }
 		];
 
 		return (

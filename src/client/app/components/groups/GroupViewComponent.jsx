@@ -67,9 +67,9 @@ export default class GroupViewComponent extends React.Component {
 	 */
 	componentWillMount() {
 		this.props.fetchMetersDataIfNeeded();
+		this.props.fetchGroupsDataIfNeeded();
 	}
-	/*
-	componentDidMount() {
+	/* Switch this in for groups) {
 		axios.get('/api/groups/children/1')
 			.then(res => {
 				this.setState({ groups: res.data.groups });
@@ -90,17 +90,17 @@ export default class GroupViewComponent extends React.Component {
 						)}
 					</select>
 				</div>
-
-				<div style={this.selBox}>
-					<p style={this.labelStyle}>Child Groups:</p>
-					<select multiple className="form-control" id="meterList" size="8" onClick={this.handleMeterSelect}>
-						{this.props.meters.map(meter =>
-							<option key={meter.id} value={meter.id}>{meter.name}</option>
-						)}
-					</select>
-				</div>
-
-				<Link style={this.buttonStyle} to="/editGroup">
+				{/* Removing this for now until groups is fully set up
+				 <div style={this.selBox}>
+				 <p style={this.labelStyle}>Child Groups:</p>
+				 <select multiple className="form-control" id="meterList" size="8" onClick={this.handleMeterSelect}>
+				 {this.props.groups.map(group =>
+				 <option key={group.id} value={group.id}>{group.name}</option>
+				 )}
+				 </select>
+				 </div>
+				 */
+				}				<Link style={this.buttonStyle} to="/editGroup">
 					<button className="btn btn-default">Edit Group</button>
 				</Link>
 			</div>

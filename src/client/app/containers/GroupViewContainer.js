@@ -7,6 +7,7 @@ import { connect } from 'react-redux';
 import GroupViewComponent from '../components/groups/GroupViewComponent';
 import { fetchMetersDataIfNeeded } from '../actions/meters';
 import { changeSelectedMeters } from '../actions/graph';
+import { fetchGroupsDataIfNeeded } from '../actions/groups';
 
 /**
  * @param {State} state
@@ -14,8 +15,10 @@ import { changeSelectedMeters } from '../actions/graph';
  */
 function mapStateToProps(state) {
 	const sortedMeters = _.sortBy(_.values(state.meters.byMeterID).map(meter => ({ id: meter.id, name: meter.name.trim() })), 'name');
+	const sortedGroups = _.sortBy(_.values(state.groups.byGroupID).map(group => ({ id: group.id, name: group.name.trim() })), 'name');
 	return {
 		meters: sortedMeters,
+		groups: sortedGroups,
 		selectedMeters: state.graph.selectedMeters
 	};
 }
@@ -23,7 +26,8 @@ function mapStateToProps(state) {
 function mapDispatchToProps(dispatch) {
 	return {
 		selectMeters: newSelectedMeterIDs => dispatch(changeSelectedMeters(newSelectedMeterIDs)),
-		fetchMetersDataIfNeeded: () => dispatch(fetchMetersDataIfNeeded())
+		fetchMetersDataIfNeeded: () => dispatch(fetchMetersDataIfNeeded()),
+		fetchGroupsDataIfNeeded: () => dispatch(fetchGroupsDataIfNeeded())
 	};
 }
 
