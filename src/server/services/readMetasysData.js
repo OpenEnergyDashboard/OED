@@ -22,7 +22,7 @@ async function readMetasysData(filePath) {
 		const timestamp = row[0].toLocaleString();
 		const start_timestamp = new Date(timestamp);
 		let end_timestamp = new Date(timestamp);
-		end_timestamp.setHours(end_timestamp.getHours()+1);
+	//	end_timestamp.setHours(end_timestamp.getHours()+1);
 
 		//meterReading
 		let meterReading = row[3];
