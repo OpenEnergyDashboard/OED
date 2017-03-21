@@ -8,12 +8,14 @@ import { combineReducers } from 'redux';
 import meters from './meters';
 import readings from './readings';
 import graph from './graph';
+import groups from './groups';
 
 /**
  * @typedef {Object} State
  * @property {State~Meters} meters
  * @property {State~Readings} readings
  * @property {State~Graph} graph
+ * @property {State~Groups} groups
  */
 
 /**
@@ -21,4 +23,4 @@ import graph from './graph';
  * @param action
  * @return {State}
  */
-export default combineReducers({ meters, readings, graph });
+export default combineReducers({ meters, readings, graph, groups });

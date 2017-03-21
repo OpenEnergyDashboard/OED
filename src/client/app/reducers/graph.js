@@ -10,6 +10,7 @@ import * as graphActions from '../actions/graph';
 /**
  * @typedef {Object} State~Graph
  * @property {Array.<number>} selectedMeters
+ * @property {Array.<number>} selectedGroups
  * @property {(number|undefined)} startTimestamp
  * @property {(number|undefined)} endTimestamp
  */
@@ -18,7 +19,8 @@ import * as graphActions from '../actions/graph';
  * @type {State~Graph}
  */
 const defaultState = {
-	selectedMeters: []
+	selectedMeters: [],
+	selectedGroups: []
 };
 
 /**
@@ -33,10 +35,18 @@ export default function graph(state = defaultState, action) {
 				...state,
 				selectedMeters: _.union(state.selectedMeters, [action.meterID])
 			};
+		case graphActions.SELECT_GROUP:
+			return {
+				...state, selectedGroups: _.union(state.selectedGroups, [action.groupID])
+			};
 		case graphActions.UNSELECT_METER:
 			return {
 				...state,
 				selectedMeters: state.selectedMeters.filter(meterID => meterID !== action.meterID)
+			};
+		case graphActions.UNSELECT_GROUP:
+			return {
+				...state, selectedGroups: state.selectedGroups.filter(groupID => groupID !== action.groupID)
 			};
 		case graphActions.CHANGE_SELECTED_METERS:
 			return {

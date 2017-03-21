@@ -10,7 +10,7 @@ export default class EditGroupComponent extends React.Component {
 
 	constructor(props) {
 		super(props);
-		this.state = { childGroup: {}, childMeter: {} };
+		this.state = {};
 	}
 
 	render() {

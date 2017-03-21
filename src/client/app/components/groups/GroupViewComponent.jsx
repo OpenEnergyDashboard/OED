@@ -47,6 +47,7 @@ export default class GroupViewComponent extends React.Component {
 		};
 
 		this.handleMeterSelect = this.handleMeterSelect.bind(this);
+		this.handleGroupSelect = this.handleGroupSelect.bind(this);
 	}
 
 	handleMeterSelect(e) {
@@ -60,6 +61,19 @@ export default class GroupViewComponent extends React.Component {
 			}
 		}
 		this.props.selectMeters(selectedMeters);
+	}
+
+	handleGroupSelect(e) {
+		e.preventDefault();
+		const options = e.target.options;
+		const selectedGroups = [];
+		// We can't map here because this is a collection of DOM elements, not an array.
+		for (let i = 0; i < options.length; i++) {
+			if (options[i].selected) {
+				selectedGroups.push(parseInt(options[i].value));
+			}
+		}
+		this.props.selectGroups(selectedGroups);
 	}
 
 	/**
@@ -90,17 +104,17 @@ export default class GroupViewComponent extends React.Component {
 						)}
 					</select>
 				</div>
-				{/* Removing this for now until groups is fully set up
-				 <div style={this.selBox}>
-				 <p style={this.labelStyle}>Child Groups:</p>
-				 <select multiple className="form-control" id="meterList" size="8" onClick={this.handleMeterSelect}>
-				 {this.props.groups.map(group =>
-				 <option key={group.id} value={group.id}>{group.name}</option>
-				 )}
-				 </select>
-				 </div>
-				 */
-				}				<Link style={this.buttonStyle} to="/editGroup">
+				{/* Removing this for now until groups is fully set up*/
+				}
+				<div style={this.selBox}>
+					<p style={this.labelStyle}>Child Groups:</p>
+					<select multiple className="form-control" id="meterList" size="8" onClick={this.handleGroupSelect}>
+						{this.props.groups.map(group =>
+							<option key={group.id} value={group.id}>{group.name}</option>
+						)}
+					</select>
+				</div>
+				<Link style={this.buttonStyle} to="/editGroup">
 					<button className="btn btn-default">Edit Group</button>
 				</Link>
 			</div>
