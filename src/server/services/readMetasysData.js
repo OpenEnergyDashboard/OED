@@ -1,4 +1,7 @@
+
 const Reading = require('./../models/Reading');
+
+
 const readCsv = require('./readCSV');
 const Meter = require('./../models/Meter');
 
@@ -16,6 +19,7 @@ async function readMetasysData(filePath) {
 	const rows = await readCsv(filePath);
 	//meterInformation
 	const meter	= await Meter.getByName(fileName.replace('.csv', ''));
+
 	let i = 0;
 
 	for (const row of rows) {
@@ -24,6 +28,7 @@ async function readMetasysData(filePath) {
 		const start_timestamp = new Date(timestamp);
 		let end_timestamp = new Date(timestamp);
 		end_timestamp.setHours(end_timestamp.getHours()+1);
+
 
 		//meterReading
 		let meterReading = row[3];
@@ -40,6 +45,7 @@ async function readMetasysData(filePath) {
 		i++;
 	}
 	try {
+		//inserting all the data from an array into database and catching error when it occurs.
 		Reading.insertAll(readingArr);
 	} catch (err) {
 		console.error(err);
