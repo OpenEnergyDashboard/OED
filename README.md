@@ -1,4 +1,4 @@
-# Environmental Dashboard - Beloit College #
+# Open Environmental Dashboard - Beloit College #
 
 This web application is designed to display environmental information about Beloit College or other institutions to users.
 
@@ -40,7 +40,7 @@ For a list of contributors, [click here](https://github.com/beloitcollegecompute
 
 This project is licensed under the MPL version 2.0.
 
-See the full licensing agreement [here](https://github.com/beloitcollegecomputerscience/ED-JS/blob/README/License.txt)
+See the full licensing agreement [here](https://github.com/beloitcollegecomputerscience/ED-JS/blob/master/License.txt)
 
 ### Contributions ###
 We welcome others to contribute to this project by writing code for submission or collaborating with us. Please feel free to contact us if you are interested.

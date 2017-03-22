@@ -7,15 +7,12 @@
 import { Line } from 'react-chartjs-2';
 import { connect } from 'react-redux';
 import 'chartjs-plugin-zoom';
-import { stringifyTimeInterval } from '../util';
 
 /**
  * @param {State} state
  */
 function mapStateToProps(state) {
-	const startTimestamp = state.graph.startTimestamp;
-	const endTimestamp = state.graph.endTimestamp;
-	const timeInterval = stringifyTimeInterval(startTimestamp, endTimestamp);
+	const timeInterval = state.graph.timeInterval;
 	const data = { datasets: [] };
 	const colors = ['LightBlue', 'GoldenRod', 'Black', 'OrangeRed', 'LightSeaGreen', 'LightSlateGray', 'Purple'];
 	let colorPointer = 0;

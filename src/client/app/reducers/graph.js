@@ -5,20 +5,21 @@
  */
 
 import _ from 'lodash';
+import TimeInterval from '../../../common/TimeInterval';
 import * as graphActions from '../actions/graph';
 
 /**
  * @typedef {Object} State~Graph
  * @property {Array.<number>} selectedMeters
- * @property {(number|undefined)} startTimestamp
- * @property {(number|undefined)} endTimestamp
+ * @property {TimeInterval} timeInterval
  */
 
 /**
  * @type {State~Graph}
  */
 const defaultState = {
-	selectedMeters: []
+	selectedMeters: [],
+	timeInterval: TimeInterval.unbounded()
 };
 
 /**
@@ -42,6 +43,11 @@ export default function graph(state = defaultState, action) {
 			return {
 				...state,
 				selectedMeters: action.meterIDs
+			};
+		case graphActions.SET_GRAPH_ZOOM:
+			return {
+				...state,
+				timeInterval: action.timeInterval
 			};
 		default:
 			return state;
