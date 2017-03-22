@@ -20,8 +20,6 @@ async function readMetasysData(filePath) {
 	//meterInformation
 	const meter	= await Meter.getByName(fileName.replace('.csv', ''));
 
-	let i = 0;
-
 	for (const row of rows) {
 		//timestamp. end time stamp
 		const timestamp = row[0].toLocaleString();
