@@ -14,7 +14,6 @@ async function readMetasysData(filePath) {
 	const fileName = fileNameArray.pop();
 	//list of readings
 	const rows = await readCsv(filePath);
-	const rows = await readCsv(filePath);
 	//meterInformation
 	const meter	= await Meter.getByName(fileName.replace('.csv', ''));
 	let i = 0;
