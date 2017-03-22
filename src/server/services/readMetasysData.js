@@ -14,15 +14,17 @@ async function readMetasysData(filePath) {
 	const fileName = fileNameArray.pop();
 	//list of readings
 	const rows = await readCsv(filePath);
+	const rows = await readCsv(filePath);
 	//meterInformation
 	const meter	= await Meter.getByName(fileName.replace('.csv', ''));
+	let i = 0;
 
 	for (const row of rows) {
-		//timestamp
+		//timestamp. end time stamp
 		const timestamp = row[0].toLocaleString();
 		const start_timestamp = new Date(timestamp);
 		let end_timestamp = new Date(timestamp);
-	//	end_timestamp.setHours(end_timestamp.getHours()+1);
+		end_timestamp.setHours(end_timestamp.getHours()+1);
 
 		//meterReading
 		let meterReading = row[3];
