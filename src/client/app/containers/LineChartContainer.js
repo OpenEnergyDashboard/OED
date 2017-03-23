@@ -5,6 +5,7 @@
  */
 
 import { Line } from 'react-chartjs-2';
+import moment from 'moment';
 import { connect } from 'react-redux';
 import 'chartjs-plugin-zoom';
 
@@ -28,7 +29,7 @@ function mapStateToProps(state) {
 			if (state.readings.byMeterID[meterID][timeInterval] !== undefined) {
 				data.datasets.push({
 					label: state.meters.byMeterID[meterID].name,
-					data: state.readings.byMeterID[meterID][timeInterval].readings.map(arr => ({ x: arr[0], y: arr[1] })),
+					data: state.readings.byMeterID[meterID][timeInterval].readings.map(arr => ({ x: arr[0], y: arr[1].toFixed(2) })),
 					fill: false,
 					borderColor: getColor()
 				});
@@ -61,7 +62,12 @@ function mapStateToProps(state) {
 		},
 		tooltips: {
 			mode: 'nearest',
-			intersect: false
+			intersect: false,
+			backgroundColor: 'rgba(0,0,0,0.6)',
+			callbacks: {
+				title: tooltipItems => `${moment(tooltipItems[0].xLabel).format('MMMM DD, YYYY hh:mm a')}`,
+				label: tooltipItems => `${tooltipItems.yLabel} kWh`
+			}
 		},
 		pan: {
 			enabled: true,

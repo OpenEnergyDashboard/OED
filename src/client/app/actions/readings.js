@@ -24,7 +24,7 @@ function shouldFetchReadings(state, meterID, timeInterval) {
 		return true;
 	}
 	const readingsForTimeInterval = state.readings.byMeterID[meterID][timeInterval];
-	return readingsForTimeInterval === undefined || !readingsForTimeInterval.isFetching;
+	return readingsForTimeInterval === undefined && !readingsForTimeInterval.isFetching;
 }
 
 function requestManyReadings(meterIDs, timeInterval) {
