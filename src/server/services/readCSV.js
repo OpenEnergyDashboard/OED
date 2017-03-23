@@ -18,7 +18,4 @@ async function readCSV(fileName) {
 	const buffer = await readFile(fileName);
 	return await parseCsv(buffer.toString());
 }
-
-
-
 module.exports = readCSV;

@@ -1,7 +1,5 @@
 
 const Reading = require('./../models/Reading');
-
-
 const readCsv = require('./readCSV');
 const Meter = require('./../models/Meter');
 
