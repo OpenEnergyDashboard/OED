@@ -6,7 +6,7 @@ import _ from 'lodash';
 import { connect } from 'react-redux';
 import UIOptionsComponent from '../components/UIOptionsComponent';
 import { changeSelectedMeters } from '../actions/graph';
-import { fetchMetersDataIfNeeded } from '../actions/meters';
+import { fetchMetersDetailsIfNeeded } from '../actions/meters';
 
 /**
  * @param {State} state
@@ -23,7 +23,7 @@ function mapStateToProps(state) {
 function mapDispatchToProps(dispatch) {
 	return {
 		selectMeters: newSelectedMeterIDs => dispatch(changeSelectedMeters(newSelectedMeterIDs)),
-		fetchMetersDataIfNeeded: () => dispatch(fetchMetersDataIfNeeded())
+		fetchMetersDataIfNeeded: () => dispatch(fetchMetersDetailsIfNeeded())
 	};
 }
 
