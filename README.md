@@ -1,4 +1,4 @@
-Environmental Dashboard - Beloit College
+# Environmental Dashboard - Beloit College #
 
 This web application is designed to display environmental information about Beloit College or other institutions to users.
 
