@@ -2,6 +2,7 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
 
+const moment = require('moment');
 const database = require('./database');
 
 const db = database.db;
@@ -126,8 +127,8 @@ class Reading {
 	 * @return {Promise<object<int, array<{reading_rate: number, start_timestamp: Date, end_timestamp: Date}>>>}
 	 */
 	static async getCompressedReadings(meterIDs, fromTimestamp = null, toTimestamp = null, numPoints = 500, conn = db) {
-		fromTimestamp = fromTimestamp && fromTimestamp.toDate();
-		toTimestamp = toTimestamp && toTimestamp.toDate();
+		fromTimestamp = fromTimestamp && moment(fromTimestamp).toDate();
+		toTimestamp = toTimestamp && moment(toTimestamp).toDate();
 		const allCompressedReadings = await conn.func('compressed_readings', [meterIDs, fromTimestamp || '-infinity', toTimestamp || 'infinity', numPoints]);
 
 		// Separate the result rows by meter_id and return a nested object.
