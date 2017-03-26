@@ -7,6 +7,7 @@
 import React from 'react';
 import ReactHighstock from 'react-highcharts/ReactHighstock';
 import _ from 'lodash';
+import TimeInterval from '../../../common/TimeInterval';
 
 const defaultConfig = {
 	title: {
@@ -47,6 +48,9 @@ const defaultConfig = {
 	credits: {
 		enabled: false
 	},
+	navigator: {
+		adaptToUpdatedData: false
+	},
 	series: [{
 		name: '',
 		data: []
@@ -71,13 +75,12 @@ export default class LineChartComponent extends React.Component {
 	}
 
 	componentWillReceiveProps(nextProps) {
-		for (const meterID of nextProps.notLoadedMeters) {
-			nextProps.fetchNewReadings(meterID, nextProps.startTimestamp, nextProps.endTimestamp);
-		}
 		this.updateChartForNewProps(nextProps);
 	}
 
 	updateChartSeriesForNewProps(nextProps) {
+		const mainID = id => `main-${id}`;
+
 		const oldSelectedMeterIDs = Object.keys(this.props.series);
 		const newSelectedMeterIDs = Object.keys(nextProps.series);
 
@@ -87,21 +90,63 @@ export default class LineChartComponent extends React.Component {
 
 		let shouldRedraw = false;
 		for (const meterID of meterIDsToRemove) {
-			this.chart.get(meterID).remove(false);
+			this.chart.get(mainID(meterID)).remove(false);
 			shouldRedraw = true;
 		}
 		for (const meterID of meterIDsToAdd) {
 			this.chart.addSeries({
-				id: meterID,
+				id: mainID(meterID),
 				name: nextProps.series[meterID].name,
 				data: nextProps.series[meterID].data,
-				showInNavigator: true
+				showInNavigator: false
 			}, false);
 			shouldRedraw = true;
 		}
 		for (const meterID of meterIDsToChange) {
 			const oldSeriesData = this.props.series[meterID];
 			const newSeriesData = nextProps.series[meterID];
+			if (!(_.isEqual(oldSeriesData, newSeriesData))) {
+				const series = this.chart.get(mainID(meterID));
+				series.setData(newSeriesData.data);
+				shouldRedraw = true;
+			}
+		}
+
+		const navID = id => `nav-${id}`;
+
+		const oldSelectedNavigatorMeterIDs = Object.keys(this.props.navigatorSeries);
+		const newSelectedNavigatorMeterIDs = Object.keys(nextProps.navigatorSeries);
+
+		const navigatorMeterIDsToRemove = _.without(oldSelectedNavigatorMeterIDs, ...newSelectedNavigatorMeterIDs);
+		const navigatorMeterIDsToAdd = _.without(newSelectedNavigatorMeterIDs, ...oldSelectedNavigatorMeterIDs);
+		const navigatorMeterIDsToChange = _.intersection(oldSelectedNavigatorMeterIDs, newSelectedNavigatorMeterIDs);
+
+		for (const meterID of navigatorMeterIDsToRemove) {
+			this.chart.get(navID(meterID)).remove(false);
+			shouldRedraw = true;
+		}
+		for (const meterID of navigatorMeterIDsToAdd) {
+			this.chart.addSeries({
+				id: navID(meterID),
+				name: nextProps.navigatorSeries[meterID].name,
+				data: nextProps.navigatorSeries[meterID].data,
+				showInNavigator: true,
+				enableMouseTracking: false,
+				lineWidth: 0,
+				marker: {
+					enabled: false,
+					states: {
+						hover: {
+							enabled: false
+						}
+					}
+				}
+			}, false);
+			shouldRedraw = true;
+		}
+		for (const meterID of navigatorMeterIDsToChange) {
+			const oldSeriesData = this.props.navigatorSeries[meterID];
+			const newSeriesData = nextProps.navigatorSeries[meterID];
 			if (!(_.isEqual(oldSeriesData, newSeriesData))) {
 				const series = this.chart.get(meterID);
 				series.setData(newSeriesData.data);
@@ -144,16 +189,13 @@ export default class LineChartComponent extends React.Component {
 	}
 
 	onChartExtremesChange({ min, max }) {
-		// Math.round(undefined) === NaN. We only want to round if the new extremes aren't undefined.
-		if (min !== undefined) {
-			min = Math.round(min);
+		if (this.props.isLoading) {
+			return;
 		}
-		if (max !== undefined) {
-			max = Math.round(max);
-		}
-		for (const meterID of this.props.selectedMeters) {
-			this.props.fetchNewReadings(meterID, min, max);
-		}
+		min = (min && Math.round(min)) || null;
+		max = (max && Math.round(max)) || null;
+		const timeInterval = new TimeInterval(min, max);
+		this.props.onGraphZoomChange(timeInterval);
 	}
 
 	render() {

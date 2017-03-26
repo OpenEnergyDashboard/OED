@@ -6,6 +6,8 @@ const pgp = require('pg-promise')();
 const path = require('path');
 const config = require('../config');
 
+require('./patch-moment-type');
+
 /**
  * The connection to the database
  * @type {pgPromise.IDatabase}
