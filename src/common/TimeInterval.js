@@ -25,6 +25,11 @@ class TimeInterval {
 		return (other instanceof TimeInterval) && this.toString() === other.toString();
 	}
 
+	/**
+	 * Returns TimeInterval.toString() so that using a time interval as an object key will
+	 * have reasonable behaviour.
+	 * @return {*}
+	 */
 	valueOf() {
 		return this.toString();
 	}

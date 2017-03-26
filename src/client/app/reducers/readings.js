@@ -27,7 +27,7 @@ const defaultState = {
 export default function readings(state = defaultState, action) {
 	switch (action.type) {
 		case readingsActions.REQUEST_MANY_READINGS: {
-			const timeInterval = action.timeInterval.toString();
+			const timeInterval = action.timeInterval;
 			const newState = {
 				...state,
 				byMeterID: {
