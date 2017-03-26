@@ -5,40 +5,75 @@
  */
 
 import axios from 'axios';
+// import fetchMetersDetailsIfNeeded from './meters';
 
-export const REQUEST_GROUPS_DATA = 'REQUEST_GROUPS_DATA';
-export const RECEIVE_GROUPS_DATA = 'RECEIVE_GROUPS_DATA';
+export const REQUEST_GROUPS_DETAILS = 'REQUEST_GROUPS_DETAILS';
+export const RECEIVE_GROUPS_DETAILS = 'RECEIVE_GROUPS_DETAILS';
 
-export function requestGroupsData() {
-	return { type: REQUEST_GROUPS_DATA };
+export const REQUEST_GROUP_CHILDREN = 'REQUEST_GROUP_CHILDREN';
+export const RECEIVE_GROUP_CHILDREN = 'RECEIVE_GROUP_CHILDREN';
+
+export function requestGroupsDetails() {
+	return { type: REQUEST_GROUPS_DETAILS };
 }
 
-export function receiveGroupsData(data) {
-	return { type: RECEIVE_GROUPS_DATA, data };
+export function receiveGroupsDetails(data) {
+	return { type: RECEIVE_GROUPS_DETAILS, data };
 }
 
-function fetchGroupsData() {
+function fetchGroupsDetails() {
 	return dispatch => {
-		dispatch(requestGroupsData());
+		dispatch(requestGroupsDetails());
 		// This will get all groups data if exists.
 		return axios.get('/api/groups/')
 			.then(response => {
-				dispatch(receiveGroupsData(response.data));
+				dispatch(receiveGroupsDetails(response.data));
 			});
 	};
 }
 
+
 /**
  * @param {State} state
  */
-function shouldFetchGroupsData(state) {
-	return state.groups.isFetching || state.groups.groups === undefined;
+function shouldFetchGroupsDetails(state) {
+	return !state.groups.isFetching && state.groups.groups === undefined;
 }
 
-export function fetchGroupsDataIfNeeded() {
+export function fetchGroupsDetailsIfNeeded() {
 	return (dispatch, getState) => {
-		if (shouldFetchGroupsData(getState())) {
-			return dispatch(fetchGroupsData());
+		if (shouldFetchGroupsDetails(getState())) {
+			return dispatch(fetchGroupsDetails());
+		}
+		return Promise.resolve();
+	};
+}
+
+export function requestGroupChildren(groupID) {
+	return { type: REQUEST_GROUP_CHILDREN, groupID };
+}
+
+export function receiveGroupChildren(groupID, data) {
+	return { type: RECEIVE_GROUP_CHILDREN, groupID, data };
+}
+
+function shouldFetchGroupChildren(state, groupID) {
+	const group = state.groups.byGroupID[groupID];
+	return (group.childGroups.length === 0 && group.childMeters.length === 0) && !group.isFetching;
+}
+
+function fetchGroupChildren(groupID) {
+	return dispatch => {
+		dispatch(requestGroupChildren(groupID));
+		return axios.get(`api/groups/children/${groupID}`)
+			.then(response => dispatch(receiveGroupChildren(groupID, response.data)));
+	};
+}
+
+export function fetchGroupChildrenIfNeeded(groupID) {
+	return (dispatch, getState) => {
+		if (shouldFetchGroupChildren(getState(), groupID)) {
+			return dispatch(fetchGroupChildren(groupID));
 		}
 		return Promise.resolve();
 	};

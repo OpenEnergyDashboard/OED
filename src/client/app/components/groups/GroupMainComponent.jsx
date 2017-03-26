@@ -5,55 +5,64 @@
 // This is the main component for the groups display page
 import { Link } from 'react-router';
 import React from 'react';
-
 import LogoComponent from '../LogoComponent';
 import GroupViewContainer from '../../containers/GroupViewContainer';
 
-export default function GroupComponent() {
-	const center = {
-		display: 'table',
-		tableLayout: 'auto',
-		width: '100%'
-	};
-	const backButton = {
-		float: 'right',
-		width: '15%',
-	};
+export default class GroupComponent extends React.Component {
 
-	const boxStyle = {
-		// todo: testing hack
-		display: 'inline-block',
-		textAlign: 'center',
-		width: '100%'
-	};
+	constructor(props) {
+		super(props);
+	}
 
-	const footerStyle = {
-		width: '100%',
-		position: 'fixed',
-		bottom: '0'
-	};
+	componentWillMount() {
+		this.props.fetchGroupsDetailsIfNeeded();
+		this.props.fetchMetersDetailsIfNeeded();
+	}
 
-	// todo: The back link currently messes with the react display on the main page
-	return (
-		<div>
-			<div className="groupDisplay">
-				<Link to="/"><LogoComponent url="./app/images/logo.png" /> </Link>
-				<h1 style={boxStyle}>Group Main Page</h1>
+	render() {
+		const center = {
+			display: 'table',
+			tableLayout: 'auto',
+			width: '100%'
+		};
+		const backButton = {
+			float: 'right',
+			width: '15%',
+		};
 
-				<div style={center}>
-					<GroupViewContainer />
-					<GroupViewContainer />
-					<GroupViewContainer />
-					<GroupViewContainer />
-					<GroupViewContainer />
+		const boxStyle = {
+			// todo: testing hack
+			display: 'inline-block',
+			textAlign: 'center',
+			width: '100%'
+		};
+
+		const footerStyle = {
+			width: '100%',
+			position: 'fixed',
+			bottom: '0'
+		};
+
+		// todo: The back link currently messes with the react display on the main page
+		return (
+			<div>
+				<div className="groupDisplay">
+					<Link to="/"><LogoComponent url="./app/images/logo.png" /> </Link>
+					<h1 style={boxStyle}>Group Main Page</h1>
+
+					<div style={center}>
+						{this.props.groups.map(group =>
+							<GroupViewContainer key={group.id} id={group.id} name={group.name} />
+						)}
+					</div>
+
 				</div>
-
+				<div style={footerStyle}>
+					<Link style={backButton} to="/">
+						<button className="btn btn-default">Back to Dashboard</button>
+					</Link>
+				</div>
 			</div>
-			<div style={footerStyle}>
-				<Link style={backButton} to="/">
-					<button className="btn btn-default">Back to Dashboard</button>
-				</Link>
-			</div>
-		</div>
-	);
+		);
+	}
 }

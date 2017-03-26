@@ -16,13 +16,7 @@ export default class ChildMeterBox extends React.Component {
 		this.handleMeterSelect = this.handleMeterSelect.bind(this);
 	}
 
-	/**
-	 * Called when this component mounts
-	 * Dispatches a Redux action to fetch meter information
-	 */
-	componentWillMount() {
-		this.props.fetchMetersDataIfNeeded();
-	}
+
 
 	handleMeterSelect(e) {
 		e.preventDefault();

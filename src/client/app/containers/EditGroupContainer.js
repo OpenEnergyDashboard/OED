@@ -6,7 +6,7 @@ import _ from 'lodash';
 import { connect } from 'react-redux';
 import EditGroupComponent from '../components/groups/GroupViewComponent';
 import { fetchMetersDetailsIfNeeded } from '../actions/meters';
-import { fetchGroupsDataIfNeeded } from '../actions/groups';
+import { fetchGroupsDetailsIfNeeded } from '../actions/groups';
 import { changeSelectedMeters, changeSelectedGroups } from '../actions/graph';
 
 /**
@@ -19,17 +19,13 @@ function mapStateToProps(state) {
 	return {
 		meters: sortedMeters,
 		groups: sortedGroups,
-		selectedMeters: state.graph.selectedMeters,
-		selectedGroups: state.graph.selectedGroups
 	};
 }
 
 function mapDispatchToProps(dispatch) {
 	return {
-		selectMeters: newSelectedMeterIDs => dispatch(changeSelectedMeters(newSelectedMeterIDs)),
-		selectGroups: newSelectedGroupsIDs => dispatch(changeSelectedGroups(newSelectedGroupsIDs)),
 		fetchMetersDataIfNeeded: () => dispatch(fetchMetersDetailsIfNeeded()),
-		fetchGroupsDataIfNeeded: () => dispatch(fetchGroupsDataIfNeeded())
+		fetchGroupsDataIfNeeded: () => dispatch(fetchGroupsDetailsIfNeeded())
 	};
 }
 

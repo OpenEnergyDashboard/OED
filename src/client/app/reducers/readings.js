@@ -64,7 +64,7 @@ export default function readings(state = defaultState, action) {
 				}
 			};
 		}
-		case metersActions.RECEIVE_METERS_DATA: {
+		case metersActions.RECEIVE_METERS_DETAILS: {
 			const newEmptyReadingsByMeterID = {};
 			for (const { id } of action.data) {
 				newEmptyReadingsByMeterID[id] = {};

@@ -5,14 +5,24 @@
 // This component is for viewing a single group via child box components + some buttons
 import React from 'react';
 import { Link } from 'react-router';
-import axios from 'axios';
+import ChildMeterBoxContainer from '../../containers/ChildMeterBoxContainer';
+import ChildGroupBoxContainer from '../../containers/ChildGroupBoxContainer';
 
 
 export default class GroupViewComponent extends React.Component {
 
 	constructor(props) {
 		super(props);
-		this.name = props.name;
+	}
+
+
+	componentWillMount() {
+		this.props.fetchGroupChildren(this.props.id);
+	}
+
+	// todo: Have edit button render something to edit the group
+	// todo: Look into switching to a table cell display to handle many groups showing
+	render() {
 		// Right now this just links, ideally it will put the edit component up as an overlay
 		this.buttonStyle = {
 			marginTop: '10px',
@@ -29,10 +39,6 @@ export default class GroupViewComponent extends React.Component {
 			display: 'tableCell'
 		};
 
-		this.state = {
-			groups: [],
-			meters: [],
-		};
 
 		this.selBox = {
 			marginLeft: '5%',
@@ -46,74 +52,12 @@ export default class GroupViewComponent extends React.Component {
 			textDecoration: 'underline'
 		};
 
-		this.handleMeterSelect = this.handleMeterSelect.bind(this);
-		this.handleGroupSelect = this.handleGroupSelect.bind(this);
-	}
 
-	handleMeterSelect(e) {
-		e.preventDefault();
-		const options = e.target.options;
-		const selectedMeters = [];
-		// We can't map here because this is a collection of DOM elements, not an array.
-		for (let i = 0; i < options.length; i++) {
-			if (options[i].selected) {
-				selectedMeters.push(parseInt(options[i].value));
-			}
-		}
-		this.props.selectMeters(selectedMeters);
-	}
-
-	handleGroupSelect(e) {
-		e.preventDefault();
-		const options = e.target.options;
-		const selectedGroups = [];
-		// We can't map here because this is a collection of DOM elements, not an array.
-		for (let i = 0; i < options.length; i++) {
-			if (options[i].selected) {
-				selectedGroups.push(parseInt(options[i].value));
-			}
-		}
-		this.props.selectGroups(selectedGroups);
-	}
-
-	/**
-	 * TODO: This just loads meters in place of working groups until those work
-	 */
-	componentWillMount() {
-		this.props.fetchMetersDataIfNeeded();
-		this.props.fetchGroupsDataIfNeeded();
-	}
-	/* Switch this in for groups) {
-		axios.get('/api/groups/children/1')
-			.then(res => {
-				this.setState({ groups: res.data.groups });
-				this.setState({ meters: res.data.meters });
-			});
-	}
-*/ // todo: Have edit button render something to edit the group
-	// todo: Look into switching to a table cell display to handle many groups showing
-	render() {
 		return (
 			<div style={this.groupStyle}>
-				<h2>Group Name: {this.name}</h2>
-				<div style={this.selBox}>
-					<p style={this.labelStyle}>Child Meters:</p>
-					<select multiple className="form-control" id="meterList" size="8" onClick={this.handleMeterSelect}>
-						{this.props.meters.map(meter =>
-							<option key={meter.id} value={meter.id}>{meter.name}</option>
-						)}
-					</select>
-				</div>
-				{/* Removing this for now until groups is fully set up*/
-				}
-				<div style={this.selBox}>
-					<p style={this.labelStyle}>Child Groups:</p>
-					<select multiple className="form-control" id="meterList" size="8" onClick={this.handleGroupSelect}>
-						{this.props.groups.map(group =>
-							<option key={group.id} value={group.id}>{group.name}</option>
-						)}
-					</select>
-				</div>
+				<h2> Group name: {this.props.name} </h2>
+				<ChildMeterBoxContainer parentID={this.props.id} />
+				<ChildGroupBoxContainer parentID={this.props.id} />
 				<Link style={this.buttonStyle} to="/editGroup">
 					<button className="btn btn-default">Edit Group</button>
 				</Link>

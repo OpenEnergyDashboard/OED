@@ -15,7 +15,9 @@ import * as groupsActions from '../actions/groups';
 
 const defaultState = {
 	isFetching: false,
-	byGroupID: {}
+	byGroupID: {},
+	selectedGroups: [],
+	selectedMeters: [],
 };
 
 /**
@@ -25,17 +27,60 @@ const defaultState = {
  */
 export default function groups(state = defaultState, action) {
 	switch (action.type) {
-		case groupsActions.REQUEST_GROUPS_DATA:
+		case groupsActions.REQUEST_GROUPS_DETAILS:
 			return {
 				...state,
 				isFetching: true
 			};
-		case groupsActions.RECEIVE_GROUPS_DATA:
+		case groupsActions.RECEIVE_GROUPS_DETAILS: {
+			// add new fields to each group object
+			const newGroups = action.data.map(group => {
+				return {
+					...group,
+					isFetching: false,
+					childGroups: [],
+					childMeters: [],
+				};
+			});
+			const newGroupsByID = _.keyBy(newGroups, 'id');
 			return {
 				...state,
 				isFetching: false,
-				byGroupID: _.keyBy(action.data, group => group.id)
+				byGroupID: {
+					...newGroupsByID,
+				}
 			};
+		}
+
+		case groupsActions.REQUEST_GROUP_CHILDREN: {
+			return {
+				...state,
+				byGroupID: {
+					...state.byGroupID,
+					[action.groupID]: {
+						...state.byGroupID[action.groupID],
+						isFetching: true,
+					}
+				}
+
+			};
+		}
+
+		case groupsActions.RECEIVE_GROUP_CHILDREN: {
+			return {
+				...state,
+				byGroupID: {
+					...state.byGroupID,
+					[action.groupID]: {
+						...state.byGroupID[action.groupID],
+						isFetching: false,
+						childGroups: action.data.groups,
+						childMeters: action.data.meters,
+					}
+				}
+			};
+		}
+
 		default:
 			return state;
 	}

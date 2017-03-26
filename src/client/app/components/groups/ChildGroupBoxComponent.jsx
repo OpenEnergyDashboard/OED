@@ -5,30 +5,37 @@
 // Box classes for displaying child meters and groups
 import React from 'react';
 
-export default function ChildGroupBox(props) {
+export default class ChildGroupBox extends React.Component {
 
-	const boxStyle = {
-		display: 'inline-block',
-		width: '200px',
-		alignSelf: 'right',
-		marginLeft: '40%',
-		marginRight: '10%',
-		// todo: testing hack
-		border: '1px solid purple'
-	};
-	const listStyle = {
-		textAlign: 'left'
-	};
-
-	const groups = props.groups.map(group =>
-		(<li>{group.name}</li>)
-	);
+	constructor(props) {
+		super(props);
+	}
 
 
-	return (
-		<div style={boxStyle}>
-			<h3>Child Groups:</h3>
-			<ul style={listStyle}>{groups}</ul>
-		</div>
-	);
+	render() {
+		const boxStyle = {
+			display: 'inline-block',
+			width: '200px',
+			alignSelf: 'right',
+			marginLeft: '40%',
+			marginRight: '10%',
+			// todo: testing hack
+			border: '1px solid purple'
+		};
+		const listStyle = {
+			textAlign: 'left'
+		};
+
+		const groups = this.props.groups.map(group =>
+			(<li>{group.name}</li>)
+		);
+
+
+		return (
+			<div style={boxStyle}>
+				<h3>Child Groups:</h3>
+				<ul style={listStyle}>{groups}</ul>
+			</div>
+		);
+	}
 }

@@ -8,4 +8,4 @@ log='/example/path/to/log_file'
 
 # The following two lines should NOT need to be edited except by devs.
 toRun=${project}'/src/server/services/updateMeters.js'
-node --harmony-async-await &>> ${log} ${toRun} &
+node &>> ${log} ${toRun} &

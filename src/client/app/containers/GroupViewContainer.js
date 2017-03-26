@@ -2,34 +2,27 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at http://mozilla.org/MPL/2.0/.
  */
-import _ from 'lodash';
+
 import { connect } from 'react-redux';
 import GroupViewComponent from '../components/groups/GroupViewComponent';
-import { fetchMetersDetailsIfNeeded } from '../actions/meters';
-import { changeSelectedMeters, changeSelectedGroups } from '../actions/graph';
-import { fetchGroupsDataIfNeeded } from '../actions/groups';
+import { fetchGroupChildrenIfNeeded } from '../actions/groups';
+
 
 /**
  * @param {State} state
- * @return {{meterInfo: *, selectedMeters: Array}}
+ * @param {ownProps} ownProps
+ * @return {{name: name of this group}, {id: id of this group}, {childGroups: list of objects describing child groups}, {childMeters: list of objects describing child meters}
  */
-function mapStateToProps(state) {
-	const sortedMeters = _.sortBy(_.values(state.meters.byMeterID).map(meter => ({ id: meter.id, name: meter.name.trim() })), 'name');
-	const sortedGroups = _.sortBy(_.values(state.groups.byGroupID).map(group => ({ id: group.id, name: group.name.trim() })), 'name');
+function mapStateToProps(state, ownProps) {
 	return {
-		meters: sortedMeters,
-		groups: sortedGroups,
-		selectedMeters: state.graph.selectedMeters,
-		selectedGroups: state.graph.selectedGroups
+		name: ownProps.name,
+		id: ownProps.id,
 	};
 }
 
 function mapDispatchToProps(dispatch) {
 	return {
-		selectMeters: newSelectedMeterIDs => dispatch(changeSelectedMeters(newSelectedMeterIDs)),
-		selectGroups: newSelectedGroupIDs => dispatch(changeSelectedGroups(newSelectedGroupIDs)),
-		fetchMetersDataIfNeeded: () => dispatch(fetchMetersDetailsIfNeeded()),
-		fetchGroupsDataIfNeeded: () => dispatch(fetchGroupsDataIfNeeded())
+		fetchGroupChildren: id => dispatch(fetchGroupChildrenIfNeeded(id)),
 	};
 }
 

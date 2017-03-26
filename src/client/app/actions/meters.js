@@ -6,15 +6,15 @@
 
 import axios from 'axios';
 
-export const REQUEST_METERS_DATA = 'REQUEST_METERS_DATA';
-export const RECEIVE_METERS_DATA = 'RECEIVE_METERS_DATA';
+export const REQUEST_METERS_DETAILS = 'REQUEST_METERS_DETAILS';
+export const RECEIVE_METERS_DETAILS = 'RECEIVE_METERS_DETAILS';
 
 export function requestMetersDetails() {
-	return { type: REQUEST_METERS_DATA };
+	return { type: REQUEST_METERS_DETAILS };
 }
 
 export function receiveMetersDetails(data) {
-	return { type: RECEIVE_METERS_DATA, data };
+	return { type: RECEIVE_METERS_DETAILS, data };
 }
 
 function fetchMetersDetails() {
@@ -31,7 +31,7 @@ function fetchMetersDetails() {
  * @param {State} state
  */
 function shouldFetchMetersDetails(state) {
-	return state.meters.isFetching || state.meters.meters === undefined;
+	return !state.meters.isFetching && state.meters.meters === undefined;
 }
 
 export function fetchMetersDetailsIfNeeded() {

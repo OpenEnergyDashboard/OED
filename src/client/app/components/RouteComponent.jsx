@@ -9,7 +9,7 @@ import HomeComponent from './HomeComponent';
 import LoginComponent from './LoginComponent';
 import AdminComponent from './AdminComponent';
 import NotFoundComponent from './NotFoundComponent';
-import GroupComponent from './groups/GroupMainComponent';
+import GroupContainer from '../containers/GroupMainContainer';
 import EditGroupComponent from './groups/EditGroupComponent';
 
 /**
@@ -51,7 +51,7 @@ export default function RouteComponent() {
 			<Route path="/" component={HomeComponent} />
 			<Route path="/login" component={LoginComponent} />
 			<Route path="/admin" component={AdminComponent} onEnter={requireAuth} />
-			<Route path="/group" component={GroupComponent} />
+			<Route path="/group" component={GroupContainer} />
 			<Route path="/editGroup" component={EditGroupComponent} />
 			<Route path="*" component={NotFoundComponent} />
 		</Router>
