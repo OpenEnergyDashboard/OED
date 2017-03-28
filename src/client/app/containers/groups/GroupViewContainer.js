@@ -16,9 +16,10 @@ import { fetchGroupChildrenIfNeeded } from '../../actions/groups';
 
 
 /**
+ * Pass the ID and Name of the group on to the component.
  * @param {State} state
- * @param {ownProps} ownProps
- * @return {{name: name of this group}, {id: id of this group}, {childGroups: list of objects describing child groups}, {childMeters: list of objects describing child meters}
+ * @param ownProps: ID and Name, passed to this container by GroupMainComponent
+ * @return {{name: name of this group}, {id: id of this group}}
  */
 function mapStateToProps(state, ownProps) {
 	return {

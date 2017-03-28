@@ -13,18 +13,18 @@ export const RECEIVE_GROUPS_DETAILS = 'RECEIVE_GROUPS_DETAILS';
 export const REQUEST_GROUP_CHILDREN = 'REQUEST_GROUP_CHILDREN';
 export const RECEIVE_GROUP_CHILDREN = 'RECEIVE_GROUP_CHILDREN';
 
-export function requestGroupsDetails() {
+function requestGroupsDetails() {
 	return { type: REQUEST_GROUPS_DETAILS };
 }
 
-export function receiveGroupsDetails(data) {
+function receiveGroupsDetails(data) {
 	return { type: RECEIVE_GROUPS_DETAILS, data };
 }
 
 function fetchGroupsDetails() {
 	return dispatch => {
 		dispatch(requestGroupsDetails());
-		// This will get all groups data if exists.
+		// Returns the names and IDs of all groups in the groups table.
 		return axios.get('/api/groups/')
 			.then(response => {
 				dispatch(receiveGroupsDetails(response.data));
@@ -40,6 +40,9 @@ function shouldFetchGroupsDetails(state) {
 	return !state.groups.isFetching && state.groups.groups === undefined;
 }
 
+/**
+ * @returns {function(*, *)}
+ */
 export function fetchGroupsDetailsIfNeeded() {
 	return (dispatch, getState) => {
 		if (shouldFetchGroupsDetails(getState())) {
@@ -49,16 +52,17 @@ export function fetchGroupsDetailsIfNeeded() {
 	};
 }
 
-export function requestGroupChildren(groupID) {
+function requestGroupChildren(groupID) {
 	return { type: REQUEST_GROUP_CHILDREN, groupID };
 }
 
-export function receiveGroupChildren(groupID, data) {
+function receiveGroupChildren(groupID, data) {
 	return { type: RECEIVE_GROUP_CHILDREN, groupID, data };
 }
 
 function shouldFetchGroupChildren(state, groupID) {
 	const group = state.groups.byGroupID[groupID];
+	// Check that the group has no children of any kind AND that it is not being fetched.
 	return (group.childGroups.length === 0 && group.childMeters.length === 0) && !group.isFetching;
 }
 
@@ -69,7 +73,11 @@ function fetchGroupChildren(groupID) {
 			.then(response => dispatch(receiveGroupChildren(groupID, response.data)));
 	};
 }
-
+/**
+ *
+ * @param groupID
+ * @returns {function(*, *)}
+ */
 export function fetchGroupChildrenIfNeeded(groupID) {
 	return (dispatch, getState) => {
 		if (shouldFetchGroupChildren(getState(), groupID)) {

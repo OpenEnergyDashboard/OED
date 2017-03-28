@@ -8,7 +8,7 @@ const Group = require('../models/Group');
 const router = express.Router();
 
 /**
- * GET information on all groups.
+ * GET IDs and names of all groups
  */
 router.get('/', async (req, res) => {
 	try {
@@ -20,8 +20,9 @@ router.get('/', async (req, res) => {
 });
 
 /**
- * GET meters that are immediate children of a given group
+ * GET meters and groups that are immediate children of a given group
  * @param int group_id
+ * @return {[int], [int]}  child meter IDs and child group IDs
  */
 router.get('/children/:group_id', async (req, res) => {
 	try {
