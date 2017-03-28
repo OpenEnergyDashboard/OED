@@ -53,12 +53,14 @@ const defaultConfig = {
 	}]
 };
 
+
 export default class LineChartComponent extends React.Component {
 
 	constructor(props) {
 		super(props);
 		this.onChartExtremesChange = this.onChartExtremesChange.bind(this);
 		this.setupChartRef = this.setupChartRef.bind(this);
+		this.onExportClick = this.onExportClick.bind(this);
 		this.state = {
 			config: _.merge({}, defaultConfig, { xAxis: { events: { afterSetExtremes: this.onChartExtremesChange } } })
 		};
@@ -155,12 +157,25 @@ export default class LineChartComponent extends React.Component {
 			this.props.fetchNewReadings(meterID, min, max);
 		}
 	}
+	onExportClick() {
+		const length = this.props.selectedMeters[0];
+		const data = this.props.series[length].data;
+		const name = this.props.series[length].name;
+		data.forEach(function(currentValue) {
+			console.log(parseFloat(currentValue[0]));
+		});
+		//console.log(data);
+		console.log(name);
+		//console.log(length);
+	}
 
 	render() {
 		return (
 			<div className="col-xs-10">
 				<ReactHighstock config={this.state.config} ref={this.setupChartRef} />
+				<button onClick={this.onExportClick}>Export</button>
 			</div>
+
 		);
 	}
 }
