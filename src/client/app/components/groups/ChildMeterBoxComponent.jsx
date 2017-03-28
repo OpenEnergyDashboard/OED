@@ -16,8 +16,6 @@ export default class ChildMeterBox extends React.Component {
 		this.handleMeterSelect = this.handleMeterSelect.bind(this);
 	}
 
-
-
 	handleMeterSelect(e) {
 		e.preventDefault();
 		const options = e.target.options;
@@ -41,25 +39,13 @@ export default class ChildMeterBox extends React.Component {
 			// todo: testing hack
 			//border: '1px solid black'
 		};
-		const listStyle = {
-			textAlign: 'left'
-		};
-
 		const labelStyle = {
 			textDecoration: 'underline'
 		};
-		const divPadding = {
-			paddingTop: '35px'
-		};
-
-		const meters = this.props.meters.map(meter =>
-			(<li>{meter.name}</li>)
-		);
-
 
 		return (
 			<div style={boxStyle}>
-				<h3><u>Child Meters</u></h3>
+				<h3>Child Meters</h3>
 				<div className="form-group">
 					<p style={labelStyle}>Select meters:</p>
 					<select multiple className="form-control" id="meterList" size="8" onClick={this.handleMeterSelect}>

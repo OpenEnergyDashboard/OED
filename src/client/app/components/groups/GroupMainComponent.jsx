@@ -55,7 +55,7 @@ export default class GroupComponent extends React.Component {
 
 					<div className="col-xs-10">
 						{this.props.groups.map(group =>
-							<GroupViewContainer key={group.id} id={group.id} name={group.name} />
+							<div className="col-xs-12"><GroupViewContainer key={group.id} id={group.id} name={group.name} /></div>
 						)}
 					</div>
 
