@@ -9,7 +9,7 @@ import HomeComponent from './HomeComponent';
 import LoginComponent from './LoginComponent';
 import AdminComponent from './AdminComponent';
 import NotFoundComponent from './NotFoundComponent';
-import GroupContainer from '../containers/GroupMainContainer';
+import GroupContainer from '../containers/groups/GroupMainContainer';
 import EditGroupComponent from './groups/EditGroupComponent';
 
 /**

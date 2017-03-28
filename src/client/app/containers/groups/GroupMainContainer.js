@@ -2,12 +2,19 @@
  * This Source Code Form is subject to the terms of the Mozilla Public
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at http://mozilla.org/MPL/2.0/.
+ *
+ */
+
+/*
+ * This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this
+ * file, You can obtain one at http://mozilla.org/MPL/2.0/.
  */
 import _ from 'lodash';
 import { connect } from 'react-redux';
-import { fetchMetersDetailsIfNeeded } from '../actions/meters';
-import { fetchGroupsDetailsIfNeeded } from '../actions/groups';
-import GroupMainComponent from '../components/groups/GroupMainComponent';
+import { fetchMetersDetailsIfNeeded } from '../../actions/meters';
+import { fetchGroupsDetailsIfNeeded } from '../../actions/groups';
+import GroupMainComponent from '../../components/groups/GroupMainComponent';
 
 
 function mapStateToProps(state) {

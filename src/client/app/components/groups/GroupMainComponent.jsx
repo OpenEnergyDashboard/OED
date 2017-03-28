@@ -6,7 +6,7 @@
 import { Link } from 'react-router';
 import React from 'react';
 import LogoComponent from '../LogoComponent';
-import GroupViewContainer from '../../containers/GroupViewContainer';
+import GroupViewContainer from '../../containers/groups/GroupViewContainer';
 
 export default class GroupComponent extends React.Component {
 
