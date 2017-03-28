@@ -46,11 +46,14 @@ export default class GroupComponent extends React.Component {
 		// todo: The back link currently messes with the react display on the main page
 		return (
 			<div>
-				<div className="groupDisplay">
+				<div className="groupDisplay col-xs-12">
 					<Link to="/"><LogoComponent url="./app/images/logo.png" /> </Link>
 					<h1 style={boxStyle}>Group Main Page</h1>
+					<div className="col-xs-2">
+						<p>Sidebar here.</p>
+					</div>
 
-					<div style={center}>
+					<div className="col-xs-10">
 						{this.props.groups.map(group =>
 							<GroupViewContainer key={group.id} id={group.id} name={group.name} />
 						)}

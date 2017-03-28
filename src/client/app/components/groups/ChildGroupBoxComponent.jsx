@@ -18,9 +18,9 @@ export default class ChildGroupBox extends React.Component {
 			width: '200px',
 			alignSelf: 'right',
 			marginLeft: '40%',
-			marginRight: '10%',
+			marginRight: '10%'
 			// todo: testing hack
-			border: '1px solid purple'
+			//border: '1px solid purple'
 		};
 		const listStyle = {
 			textAlign: 'left'

@@ -37,9 +37,9 @@ export default class ChildMeterBox extends React.Component {
 			width: '200px',
 			alignSelf: 'left',
 			marginLeft: '10%',
-			marginRight: '10%',
+			marginRight: '10%'
 			// todo: testing hack
-			border: '1px solid black'
+			//border: '1px solid black'
 		};
 		const listStyle = {
 			textAlign: 'left'
@@ -59,7 +59,7 @@ export default class ChildMeterBox extends React.Component {
 
 		return (
 			<div style={boxStyle}>
-				<h3>Child Meters:</h3>
+				<h3><u>Child Meters</u></h3>
 				<div className="form-group">
 					<p style={labelStyle}>Select meters:</p>
 					<select multiple className="form-control" id="meterList" size="8" onClick={this.handleMeterSelect}>

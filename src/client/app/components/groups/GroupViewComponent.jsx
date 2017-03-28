@@ -39,11 +39,17 @@ export default class GroupViewComponent extends React.Component {
 			display: 'tableCell'
 		};
 
+		this.boxStyle = {
+			// todo: testing hack
+			display: 'inline-block',
+			textAlign: 'center',
+			width: '100%'
+		};
+
 
 		this.selBox = {
 			marginLeft: '5%',
 			marginRight: '5%',
-			border: '1px solid blue',
 			width: '40%',
 			display: 'inline-block'
 		};
@@ -55,10 +61,19 @@ export default class GroupViewComponent extends React.Component {
 
 		return (
 			<div style={this.groupStyle}>
-				<h2> Group name: {this.props.name} </h2>
-				<ChildMeterBoxContainer parentID={this.props.id} />
-				<ChildGroupBoxContainer parentID={this.props.id} />
-				<Link style={this.buttonStyle} to="/editGroup">
+				<div className="col-xs-12">
+					<h2 style={this.boxStyle}> {this.props.name} </h2>
+				</div>
+				<div className="row">
+					<div className="col-xs-6">
+						<ChildMeterBoxContainer parentID={this.props.id} />
+					</div>
+					<div className="col-xs-6">
+						<ChildGroupBoxContainer parentID={this.props.id} />
+					</div>
+				</div>
+
+					<Link style={this.buttonStyle} to="/editGroup">
 					<button className="btn btn-default">Edit Group</button>
 				</Link>
 			</div>
