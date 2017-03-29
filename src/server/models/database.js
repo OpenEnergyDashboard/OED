@@ -6,6 +6,8 @@ const pgp = require('pg-promise')();
 const path = require('path');
 const config = require('../config');
 
+require('./patch-moment-type');
+
 /**
  * The connection to the database
  * @type {pgPromise.IDatabase}
@@ -47,6 +49,7 @@ async function createSchema() {
 	await Meter.createMeterTypesEnum();
 	await Meter.createTable();
 	await Reading.createTable();
+	await Reading.createCompressedReadingsFunction();
 	await User.createTable();
 	await db.none(sqlFile('reading/create_function_get_compressed_readings.sql'));
 }
