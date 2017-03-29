@@ -20,12 +20,21 @@ function formatReadings(rows) {
 }
 
 /**
+ * Defines the format in which we want to send meters and controls what information we send to the client.
+ * @param meter
+ * @returns {{id, name}}
+ */
+function formatMeterForResponse(meter) {
+	return { id: meter.id, name: meter.name };
+}
+
+/**
  * GET information on all meters
  */
 router.get('/', async (req, res) => {
 	try {
 		const rows = await Meter.getAll();
-		res.json(rows);
+		res.json(rows.map(formatMeterForResponse));
 	} catch (err) {
 		console.error(`Error while performing GET all meters query: ${err}`);
 	}
@@ -37,8 +46,8 @@ router.get('/', async (req, res) => {
  */
 router.get('/:meter_id', async (req, res) => {
 	try {
-		const rows = await Meter.getByID(req.params.meter_id);
-		res.json(rows);
+		const meter = await Meter.getByID(req.params.meter_id);
+		res.json(formatMeterForResponse(meter));
 	} catch (err) {
 		console.error(`Error while performing GET specific meter by id query: ${err}`);
 	}
