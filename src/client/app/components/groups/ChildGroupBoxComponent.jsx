@@ -22,7 +22,7 @@ export default class ChildGroupBox extends React.Component {
 				selectedGroups.push(parseInt(options[i].value));
 			}
 		}
-		this.props.changeSelectedGroups(selectedGroups);
+		this.props.selectGroups(selectedGroups);
 	}
 
 

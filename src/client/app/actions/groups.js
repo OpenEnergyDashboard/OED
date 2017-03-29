@@ -14,6 +14,7 @@ export const REQUEST_GROUP_CHILDREN = 'REQUEST_GROUP_CHILDREN';
 export const RECEIVE_GROUP_CHILDREN = 'RECEIVE_GROUP_CHILDREN';
 
 export const CHANGE_SELECTED_GROUPS = 'CHANGE_SELECTED_GROUPS';
+export const GROUPSUI_CHANGE_SELECTED_METERS = 'GROUPSUI_CHANGE_SELECTED_METERS';
 
 function requestGroupsDetails() {
 	return { type: REQUEST_GROUPS_DETAILS };
@@ -89,7 +90,16 @@ export function fetchGroupChildrenIfNeeded(groupID) {
 	};
 }
 
-
+/**
+ *
+ * @param groupIDs
+ * @return {{type: string, groupIDs: *}}
+ */
 export function changeSelectedGroups(groupIDs) {
 	return { type: CHANGE_SELECTED_GROUPS, groupIDs };
+}
+
+
+export function groupsUIchangeSelectedMeters(meterIDs) {
+	return { type: GROUPSUI_CHANGE_SELECTED_METERS, meterIDs};
 }

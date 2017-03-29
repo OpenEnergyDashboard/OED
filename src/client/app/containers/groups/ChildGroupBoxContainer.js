@@ -23,7 +23,7 @@ function mapStateToProps(state, ownProps) {
 
 function mapDispatchToProps(dispatch) {
 	return {
-		changeSelectedGroups: IDs => dispatch(changeSelectedGroups(IDs))
+		selectGroups: IDs => dispatch(changeSelectedGroups(IDs))
 	};
 }
 

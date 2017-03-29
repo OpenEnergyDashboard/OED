@@ -88,6 +88,12 @@ export default function groups(state = defaultState, action) {
 				selectedGroups: action.groupIDs
 			};
 
+		case groupsActions.GROUPSUI_CHANGE_SELECTED_METERS:
+			return {
+				...state,
+				selectedMeters: action.meterIDs,
+			};
+
 		default:
 			return state;
 	}

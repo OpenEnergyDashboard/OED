@@ -8,9 +8,10 @@
 
 import { connect } from 'react-redux';
 import ChildMeterBoxComponent from '../../components/groups/ChildMeterBoxComponent';
+import { groupsUIchangeSelectedMeters } from '../../actions/groups';
 
 function mapStateToProps(state, ownProps) {
-	const meters =  state.groups.byGroupID[ownProps.parentID].childMeters.map(meterID => {
+	const meters = state.groups.byGroupID[ownProps.parentID].childMeters.map(meterID => {
 		const meter = state.meters.byMeterID[meterID];
 		return {
 			id: meter.id,
@@ -22,7 +23,7 @@ function mapStateToProps(state, ownProps) {
 
 function mapDispatchToProps(dispatch) {
 	return {
-		foo: 'bar',
+		selectMeters: IDs => dispatch(groupsUIchangeSelectedMeters(IDs))
 	};
 }
 

@@ -51,7 +51,7 @@ export default class ChildMeterBox extends React.Component {
 				<h3>Child Meters:</h3>
 				<div className="form-group">
 					<p style={labelStyle}>Select meters:</p>
-					<select multiple className="form-control" id="meterList" size="8" onClick={this.handleMeterSelect}>
+					<select multiple className="form-control" id="meterList" size="8" onChange={this.handleMeterSelect}>
 						{this.props.meters.map(meter =>
 							<option key={meter.id} value={meter.id}>{meter.name}</option>
 						)}
