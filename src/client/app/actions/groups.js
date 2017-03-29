@@ -13,6 +13,8 @@ export const RECEIVE_GROUPS_DETAILS = 'RECEIVE_GROUPS_DETAILS';
 export const REQUEST_GROUP_CHILDREN = 'REQUEST_GROUP_CHILDREN';
 export const RECEIVE_GROUP_CHILDREN = 'RECEIVE_GROUP_CHILDREN';
 
+export const CHANGE_SELECTED_GROUPS = 'CHANGE_SELECTED_GROUPS';
+
 function requestGroupsDetails() {
 	return { type: REQUEST_GROUPS_DETAILS };
 }
@@ -85,4 +87,9 @@ export function fetchGroupChildrenIfNeeded(groupID) {
 		}
 		return Promise.resolve();
 	};
+}
+
+
+export function changeSelectedGroups(groupIDs) {
+	return { type: CHANGE_SELECTED_GROUPS, groupIDs };
 }

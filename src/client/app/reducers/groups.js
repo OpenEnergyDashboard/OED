@@ -82,6 +82,12 @@ export default function groups(state = defaultState, action) {
 			};
 		}
 
+		case groupsActions.CHANGE_SELECTED_GROUPS:
+			return {
+				...state,
+				selectedGroups: action.groupIDs
+			};
+
 		default:
 			return state;
 	}

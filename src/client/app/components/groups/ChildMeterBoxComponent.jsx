@@ -17,7 +17,6 @@ export default class ChildMeterBox extends React.Component {
 	}
 
 
-
 	handleMeterSelect(e) {
 		e.preventDefault();
 		const options = e.target.options;
@@ -41,20 +40,10 @@ export default class ChildMeterBox extends React.Component {
 			// todo: testing hack
 			border: '1px solid black'
 		};
-		const listStyle = {
-			textAlign: 'left'
-		};
 
 		const labelStyle = {
 			textDecoration: 'underline'
 		};
-		const divPadding = {
-			paddingTop: '35px'
-		};
-
-		const meters = this.props.meters.map(meter =>
-			(<li>{meter.name}</li>)
-		);
 
 
 		return (
