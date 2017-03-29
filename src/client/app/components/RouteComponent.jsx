@@ -34,7 +34,7 @@ function requireAuth(nextState, replace) {
 			// Route to login page if the auth token is not valid
 			if (!res.data.success) browserHistory.push('/login');
 		})
-		.catch(err => console.error(err));
+		.catch(console.error);
 }
 
 /**
