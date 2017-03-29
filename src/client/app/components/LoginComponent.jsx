@@ -47,11 +47,11 @@ export default class LoginComponent extends React.Component {
 			email: this.state.email,
 			password: this.state.password
 		})
-			.then(response => {
-				localStorage.setItem('token', response.data.token);
-				browserHistory.push('/admin');
-			})
-			.catch(console.log);
+		.then(response => {
+			localStorage.setItem('token', response.data.token);
+			browserHistory.push('/admin');
+		})
+		.catch(console.error);
 		this.setState({ email: '', password: '' });
 	}
 
@@ -69,21 +69,15 @@ export default class LoginComponent extends React.Component {
 		};
 		return (
 			<div>
-				<HeaderComponent renderLoginButton="false" renderGroupButton="false" />
+				<HeaderComponent renderLoginButton="false" />
 				<form style={formStyle} onSubmit={this.handleSubmit}>
 					<div className="input-group">
 						<span className="input-group-addon"><i className="glyphicon glyphicon-user" /></span>
-						<input
-  type="text" className="form-control" placeholder="Email" value={this.state.email}
-  onChange={this.handleEmailChange}
-						/>
+						<input type="text" className="form-control" placeholder="Email" value={this.state.email} onChange={this.handleEmailChange} />
 					</div>
 					<div className="input-group">
 						<span className="input-group-addon"><i className="glyphicon glyphicon-lock" /></span>
-						<input
-  type="password" className="form-control" placeholder="Password"
-  value={this.state.password} onChange={this.handlePasswordChange}
-						/>
+						<input type="password" className="form-control" placeholder="Password" value={this.state.password} onChange={this.handlePasswordChange} />
 					</div>
 					<input style={buttonStyle} className="btn btn-default" type="submit" value="Login" />
 				</form>

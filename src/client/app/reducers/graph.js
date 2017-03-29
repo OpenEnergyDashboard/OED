@@ -5,14 +5,13 @@
  */
 
 import _ from 'lodash';
+import TimeInterval from '../../../common/TimeInterval';
 import * as graphActions from '../actions/graph';
 
 /**
  * @typedef {Object} State~Graph
  * @property {Array.<number>} selectedMeters
- * @property {Array.<number>} selectedGroups
- * @property {(number|undefined)} startTimestamp
- * @property {(number|undefined)} endTimestamp
+ * @property {TimeInterval} timeInterval
  */
 
 /**
@@ -20,7 +19,7 @@ import * as graphActions from '../actions/graph';
  */
 const defaultState = {
 	selectedMeters: [],
-	selectedGroups: []
+	timeInterval: TimeInterval.unbounded()
 };
 
 /**
@@ -30,28 +29,16 @@ const defaultState = {
  */
 export default function graph(state = defaultState, action) {
 	switch (action.type) {
-		case graphActions.SELECT_METER:
-			return {
-				...state,
-				selectedMeters: _.union(state.selectedMeters, [action.meterID])
-			};
-		case graphActions.SELECT_GROUP:
-			return {
-				...state, selectedGroups: _.union(state.selectedGroups, [action.groupID])
-			};
-		case graphActions.UNSELECT_METER:
-			return {
-				...state,
-				selectedMeters: state.selectedMeters.filter(meterID => meterID !== action.meterID)
-			};
-		case graphActions.UNSELECT_GROUP:
-			return {
-				...state, selectedGroups: state.selectedGroups.filter(groupID => groupID !== action.groupID)
-			};
-		case graphActions.CHANGE_SELECTED_METERS:
+
+		case graphActions.UPDATE_SELECTED_METERS:
 			return {
 				...state,
 				selectedMeters: action.meterIDs
+			};
+		case graphActions.SET_GRAPH_ZOOM:
+			return {
+				...state,
+				timeInterval: action.timeInterval
 			};
 		default:
 			return state;

@@ -1,13 +1,13 @@
-# Environmental Dashboard - Beloit College #
+# Open Energy Dashboard #
 
-This web application is designed to display environmental information about Beloit College or other institutions to users.
+This web application is designed to display energy information about Beloit College or other institutions to users.
 
 ### Built With: ###
-Highcharts - Javascript library used to generate data charts ([highcharts.com](http://www.highcharts.com))
+Chart.js - Javascript library used to generate data charts ([chartjs.org](http://www.chartjs.org))
 
 PostgreSQL - Database management system ([postgresql.org](https://www.postgresql.org))
 
-Node - Javascript runtime environment ([nodejs.org](https://nodejs.org/en/))
+Node.js - Javascript runtime environment ([nodejs.org](https://nodejs.org/en/))
 
 ### Developer installation: ###
 
@@ -40,7 +40,7 @@ For a list of contributors, [click here](https://github.com/beloitcollegecompute
 
 This project is licensed under the MPL version 2.0.
 
-See the full licensing agreement [here](https://github.com/beloitcollegecomputerscience/ED-JS/blob/README/License.txt)
+See the full licensing agreement [here](https://github.com/beloitcollegecomputerscience/ED-JS/blob/master/License.txt)
 
 ### Contributions ###
 We welcome others to contribute to this project by writing code for submission or collaborating with us. Please feel free to contact us if you are interested.
