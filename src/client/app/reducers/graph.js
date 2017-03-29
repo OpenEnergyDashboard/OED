@@ -29,16 +29,7 @@ const defaultState = {
  */
 export default function graph(state = defaultState, action) {
 	switch (action.type) {
-		case graphActions.SELECT_METER:
-			return {
-				...state,
-				selectedMeters: _.union(state.selectedMeters, [action.meterID])
-			};
-		case graphActions.UNSELECT_METER:
-			return {
-				...state,
-				selectedMeters: state.selectedMeters.filter(meterID => meterID !== action.meterID)
-			};
+
 		case graphActions.UPDATE_SELECTED_METERS:
 			return {
 				...state,

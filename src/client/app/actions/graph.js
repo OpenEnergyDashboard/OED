@@ -8,19 +8,9 @@ import { fetchNeededReadings } from './readings';
 import TimeInterval from '../../../common/TimeInterval';
 
 
-export const SELECT_METER = 'SELECT_METER';
-export const UNSELECT_METER = 'UNSELECT_METER';
 export const UPDATE_SELECTED_METERS = 'UPDATE_SELECTED_METERS';
 export const SET_GRAPH_ZOOM = 'CHANGE_GRAPH_ZOOM';
 
-
-export function selectMeter(meterID) {
-	return { type: SELECT_METER, meterID };
-}
-
-export function unselectMeter(meterID) {
-	return { type: UNSELECT_METER, meterID };
-}
 
 export function updateSelectedMeters(meterIDs) {
 	return { type: UPDATE_SELECTED_METERS, meterIDs };
