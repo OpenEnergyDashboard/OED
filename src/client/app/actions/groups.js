@@ -5,7 +5,7 @@
  */
 
 import axios from 'axios';
-// import fetchMetersDetailsIfNeeded from './meters';
+import _ from 'lodash';
 
 export const REQUEST_GROUPS_DETAILS = 'REQUEST_GROUPS_DETAILS';
 export const RECEIVE_GROUPS_DETAILS = 'RECEIVE_GROUPS_DETAILS';
@@ -39,7 +39,7 @@ function fetchGroupsDetails() {
  * @param {State} state
  */
 function shouldFetchGroupsDetails(state) {
-	return !state.groups.isFetching && state.groups.groups === undefined;
+	return !state.groups.isFetching && _.isEmpty(state.groups.byGroupID);
 }
 
 /**
