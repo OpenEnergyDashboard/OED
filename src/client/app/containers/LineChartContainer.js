@@ -25,15 +25,14 @@ function mapStateToProps(state) {
 	}
 
 	for (const meterID of state.graph.selectedMeters) {
-		if (!(state.readings.byMeterID[meterID][timeInterval] === undefined || state.readings.byMeterID[meterID][timeInterval].isFetching)) {
-			if (state.readings.byMeterID[meterID][timeInterval] !== undefined) {
-				data.datasets.push({
-					label: state.meters.byMeterID[meterID].name,
-					data: state.readings.byMeterID[meterID][timeInterval].readings.map(arr => ({ x: arr[0], y: arr[1].toFixed(2) })),
-					fill: false,
-					borderColor: getColor()
-				});
-			}
+		const readingsData = state.readings.byMeterID[meterID][timeInterval];
+		if (readingsData !== undefined && !readingsData.isFetching) {
+			data.datasets.push({
+				label: state.meters.byMeterID[meterID].name,
+				data: state.readings.byMeterID[meterID][timeInterval].readings.map(arr => ({ x: arr[0], y: arr[1].toFixed(2) })),
+				fill: false,
+				borderColor: getColor()
+			});
 		}
 	}
 
