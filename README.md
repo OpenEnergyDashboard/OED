@@ -1,6 +1,6 @@
-# Open Environmental Dashboard - Beloit College #
+# Open Energy Dashboard #
 
-This web application is designed to display environmental information about Beloit College or other institutions to users.
+This web application is designed to display energy information about Beloit College or other institutions to users.
 
 ### Built With: ###
 Chart.js - Javascript library used to generate data charts ([chartjs.org](http://www.chartjs.org))

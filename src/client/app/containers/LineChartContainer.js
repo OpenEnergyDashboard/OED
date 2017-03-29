@@ -15,9 +15,9 @@ import 'chartjs-plugin-zoom';
 function mapStateToProps(state) {
 	const timeInterval = state.graph.timeInterval;
 	const data = { datasets: [] };
+	// getColor() cycles through the colors, wrapping around the end to the beginning
 	const colors = ['LightBlue', 'GoldenRod', 'Black', 'OrangeRed', 'LightSeaGreen', 'LightSlateGray', 'Purple'];
 	let colorPointer = 0;
-
 	function getColor() {
 		const color = colors[colorPointer];
 		colorPointer = (colorPointer + 1) % colors.length;
@@ -63,9 +63,10 @@ function mapStateToProps(state) {
 			mode: 'nearest',
 			intersect: false,
 			backgroundColor: 'rgba(0,0,0,0.6)',
+			displayColors: false,
 			callbacks: {
-				title: tooltipItems => `${moment(tooltipItems[0].xLabel).format('MMMM DD, YYYY hh:mm a')}`,
-				label: tooltipItems => `${tooltipItems.yLabel} kWh`
+				title: tooltipItems => `${moment(tooltipItems[0].xLabel).format('dddd, MMM DD, YYYY hh:mm a')}`,
+				label: tooltipItems => `${data.datasets[tooltipItems.datasetIndex].label}: ${tooltipItems.yLabel} kWh`
 			}
 		},
 		pan: {
