@@ -7,7 +7,7 @@
 const updateMeters = require('../server/services/updateMeters');
 const stopDB = require('../server/models/database').stopDB;
 
-async function fetchNewMamacDataWrapper() {
+async function updateMamacMeters() {
 	console.log('Fetching new Mamac meter data');
 	try {
 		await updateMeters();
@@ -19,4 +19,4 @@ async function fetchNewMamacDataWrapper() {
 	}
 }
 
-fetchNewMamacDataWrapper();
+updateMamacMeters();
