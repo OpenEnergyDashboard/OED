@@ -9,7 +9,8 @@
     "lint": "./node_modules/.bin/eslint src/client/app/**/*.js src/client/app/**/*.jsx src/server/**/*.js src/server/**/*.jsx src/scripts/**/*.js",
     "test": "./node_modules/.bin/mocha \"src/server/test/**/*.js\"",
     "createdb": "node ./src/scripts/createDB.js",
-	"addmeters": "node ./src/scripts/addMeters.js"
+	"addMeters": "node ./src/scripts/addMeters.js",
+	"fetchMamacReadings": "node ./src/scripts/fetchNewMamacData.js"
   },
   "dependencies": {
     "axios": "^0.15.3",
