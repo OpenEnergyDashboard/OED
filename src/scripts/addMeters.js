@@ -5,9 +5,11 @@
 // Script to add meters from a .xlsx file
 const reqPromise = require('request-promise-native');
 const XLSX = require('xlsx');
+const path = require('path');
 const promisify = require('es6-promisify');
 const parseString = require('xml2js').parseString;
 const Meter = require('../server/models/Meter');
+const stopDB = require('../server/models/database').stopDB;
 
 const parseXMLPromisified = promisify(parseString);
 
@@ -55,13 +57,25 @@ async function insertMeters(ips) {
 
 
 async function insertMetersWrapper(filename) {
-	const ips = parseXLSX(filename);
 	try {
+		const ips = parseXLSX(filename);
 		await insertMeters(ips);
 		console.log('Done inserting meters'); // eslint-disable-line no-console
 	} catch (err) {
+		console.error('Error importing meters: ');
 		console.error(err); // eslint-disable-line no-console
+	} finally {
+		stopDB();
 	}
 }
-const filename = 'src/scripts/ips.xlsx';
-insertMetersWrapper(filename);
+
+// The first two elements are 'node' and the name of the file. We only want arguments passed to it.
+const args = process.argv.slice(2);
+if (args.length !== 1) {
+	console.error(`Expected one argument (path to meters xlsx file), but got ${args.length} instead`);
+} else {
+	const absolutePath = path.resolve(args[0]);
+	console.log(`Importing meters from ${absolutePath}`);
+	insertMetersWrapper(absolutePath);
+}
+
