@@ -95,11 +95,11 @@ export function fetchGroupChildrenIfNeeded(groupID) {
  * @param groupIDs
  * @return {{type: string, groupIDs: *}}
  */
-export function changeSelectedGroups(groupIDs) {
-	return { type: CHANGE_SELECTED_GROUPS, groupIDs };
+export function changeSelectedGroups(parentID, groupIDs) {
+	return { type: CHANGE_SELECTED_GROUPS, parentID, groupIDs };
 }
 
 
-export function groupsUIchangeSelectedMeters(meterIDs) {
-	return { type: GROUPSUI_CHANGE_SELECTED_METERS, meterIDs};
+export function groupsUIchangeSelectedMeters(parentID, meterIDs) {
+	return { type: GROUPSUI_CHANGE_SELECTED_METERS, parentID, meterIDs };
 }

@@ -21,9 +21,9 @@ function mapStateToProps(state, ownProps) {
 	return { meters };
 }
 
-function mapDispatchToProps(dispatch) {
+function mapDispatchToProps(dispatch, ownProps) {
 	return {
-		selectMeters: IDs => dispatch(groupsUIchangeSelectedMeters(IDs))
+		selectMeters: meterIDs => dispatch(groupsUIchangeSelectedMeters(ownProps.parentID, meterIDs))
 	};
 }
 

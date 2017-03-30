@@ -21,9 +21,9 @@ function mapStateToProps(state, ownProps) {
 	return { groups };
 }
 
-function mapDispatchToProps(dispatch) {
+function mapDispatchToProps(dispatch, ownProps) {
 	return {
-		selectGroups: IDs => dispatch(changeSelectedGroups(IDs))
+		selectGroups: groupIDs => dispatch(changeSelectedGroups(ownProps.parentID, groupIDs))
 	};
 }
 

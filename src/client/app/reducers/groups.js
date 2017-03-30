@@ -15,8 +15,6 @@ import * as groupsActions from '../actions/groups';
 const defaultState = {
 	isFetching: false,
 	byGroupID: {},
-	selectedGroups: [],
-	selectedMeters: [],
 };
 
 /**
@@ -40,6 +38,8 @@ export default function groups(state = defaultState, action) {
 				isFetching: false,
 				childGroups: [],
 				childMeters: [],
+				selectedGroups: [],
+				selectedMeters: [],
 			}));
 			// newGroups is an array: this converts it into a nested object where the key to each group is its ID.
 			// Without this, byGroupID will not be keyed by group ID.
@@ -82,17 +82,31 @@ export default function groups(state = defaultState, action) {
 			};
 		}
 
-		case groupsActions.CHANGE_SELECTED_GROUPS:
+		case groupsActions.CHANGE_SELECTED_GROUPS: {
 			return {
 				...state,
-				selectedGroups: action.groupIDs
+				byGroupID: {
+					...state.byGroupID,
+					[action.parentID]: {
+						...state.byGroupID[action.parentID],
+						selectedMeters: action.groupIDs,
+					}
+				}
 			};
+		}
 
-		case groupsActions.GROUPSUI_CHANGE_SELECTED_METERS:
+		case groupsActions.GROUPSUI_CHANGE_SELECTED_METERS: {
 			return {
 				...state,
-				selectedMeters: action.meterIDs,
+				byGroupID: {
+					...state.byGroupID,
+					[action.parentID]: {
+						...state.byGroupID[action.parentID],
+						selectedMeters: action.meterIDs,
+					}
+				}
 			};
+		}
 
 		default:
 			return state;
