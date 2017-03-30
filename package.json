@@ -6,7 +6,7 @@
     "start": "node ./src/bin/www",
     "dev": "webpack -d --watch",
     "build": "webpack -p",
-    "lint": "./node_modules/.bin/eslint src/client/app/**/*.js src/client/app/**/*.jsx src/server/**/*.js src/server/**/*.jsx",
+    "lint": "./node_modules/.bin/eslint src/client/app/**/*.js src/client/app/**/*.jsx src/server/**/*.js src/server/**/*.jsx src/scripts/**/*.js",
     "test": "./node_modules/.bin/mocha \"src/server/test/**/*.js\"",
     "createdb": "node ./src/scripts/createDB.js",
 	"addmeters": "node ./src/scripts/addMeters.js"

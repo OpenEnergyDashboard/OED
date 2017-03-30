@@ -60,10 +60,10 @@ async function insertMetersWrapper(filename) {
 	try {
 		const ips = parseXLSX(filename);
 		await insertMeters(ips);
-		console.log('Done inserting meters'); // eslint-disable-line no-console
+		console.log('Done inserting meters');
 	} catch (err) {
 		console.error('Error importing meters: ');
-		console.error(err); // eslint-disable-line no-console
+		console.error(err);
 	} finally {
 		stopDB();
 	}
