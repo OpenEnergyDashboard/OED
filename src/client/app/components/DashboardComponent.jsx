@@ -4,7 +4,7 @@
 
 import React from 'react';
 import UIOptionsContainer from '../containers/UIOptionsContainer';
-import NewLineChartContainer from '../containers/LineChartContainer';
+import LineChartContainer from '../containers/LineChartContainer';
 
 /**
  * React component that controls the dashboard
@@ -13,7 +13,9 @@ export default function DashboardComponent() {
 	return (
 		<div className="container-fluid">
 			<UIOptionsContainer />
-			<NewLineChartContainer />
+			<div className="col-xs-10">
+				<LineChartContainer />
+			</div>
 		</div>
 	);
 }
