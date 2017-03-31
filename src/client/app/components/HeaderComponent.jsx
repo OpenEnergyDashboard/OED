@@ -35,6 +35,7 @@ export default function HeaderComponent(props) {
 			<div style={divRightStyle}>
 				<Link style={loginLinkStyle} to="/login"><button className="btn btn-default">Log in</button></Link>
 				<Link style={adminLinkStyle} to="/admin"><button className="btn btn-default">Admin panel</button></Link>
+				<Link to="/group"><button className="btn btn-primary">Groups</button></Link>
 			</div>
 		</div>
 	);
