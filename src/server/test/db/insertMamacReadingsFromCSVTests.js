@@ -1,0 +1,43 @@
+/*
+ * This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this
+ * file, You can obtain one at http://mozilla.org/MPL/2.0/.
+ */
+
+const chai = require('chai');
+const chaiAsPromised = require('chai-as-promised');
+const moment = require('moment');
+const path = require('path');
+
+chai.use(chaiAsPromised);
+const expect = chai.expect;
+
+const recreateDB = require('./common').recreateDB;
+const db = require('../../models/database').db;
+const Meter = require('../../models/Meter');
+const insertFromCSV = require('../../services/loadMamacReadingsFromCSVFile');
+
+const mocha = require('mocha');
+
+mocha.describe('Insert Mamac readings from a file', () => {
+	mocha.beforeEach(recreateDB);
+	let meter;
+	mocha.beforeEach(() => db.task(function* setupTests(t) {
+		yield new Meter(undefined, 'Meter', null, false, Meter.type.MAMAC).insert(t);
+		meter = yield Meter.getByName('Meter', t);
+	}));
+
+	mocha.it('loads the correct number of rows from a file', () => {
+		const testFilePath = path.join(__dirname, 'test-readings.csv');
+		const readingDuration = moment.duration(1, 'hours');
+		return insertFromCSV(testFilePath, meter, readingDuration)
+			.then(() => db.one('SELECT COUNT(*) as count FROM readings'))
+			.then(({ count }) => expect(parseInt(count)).to.equal(1440));
+	});
+
+	mocha.it('errors correctly on an invalid file', () => {
+		const testFilePath = path.join(__dirname, 'test-readings-invalid.csv');
+		const readingDuration = moment.duration(1, 'hours');
+		return expect(insertFromCSV(testFilePath, meter, readingDuration)).to.eventually.be.rejected;
+	});
+});
