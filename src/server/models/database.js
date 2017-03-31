@@ -54,9 +54,18 @@ async function createSchema() {
 	await db.none(sqlFile('reading/create_function_get_compressed_readings.sql'));
 }
 
+/**
+ * Closes the connection pool and stops pg-promise
+ * Only call this to avoid the 30 second script timeout before pg-promise closes connections.
+ */
+function stopDB() {
+	pgp.end();
+}
+
 module.exports = {
 	db,
 	sqlFile,
 	createSchema,
-	pgp
+	pgp,
+	stopDB
 };
