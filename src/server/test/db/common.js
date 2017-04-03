@@ -17,12 +17,20 @@ config.database = {
 
 const { db, createSchema } = require('../../models/database');
 
-function recreateDB() {
-	return db.none('DROP TABLE IF EXISTS readings')
-		.then(() => db.none('DROP TABLE IF EXISTS meters'))
-		.then(() => db.none('DROP TYPE IF EXISTS meter_type'))
-		.then(() => db.none('DROP FUNCTION IF EXISTS compressed_readings(INTEGER, TIMESTAMP, TIMESTAMP, INTEGER);'))
-		.then(createSchema);
+async function recreateDB() {
+	await db.none('DROP VIEW IF EXISTS groups_deep_meters');
+	await db.none('DROP VIEW IF EXISTS groups_deep_children');
+	await db.none('DROP VIEW IF EXISTS meters_deep_children');
+	await db.none('DROP TABLE IF EXISTS meters_immediate_children');
+	await db.none('DROP TABLE IF EXISTS groups_immediate_children');
+	await db.none('DROP TABLE IF EXISTS groups_immediate_meters');
+	await db.none('DROP TABLE IF EXISTS groups');
+	await db.none('DROP TABLE IF EXISTS users');
+	await db.none('DROP TABLE IF EXISTS readings');
+	await db.none('DROP TABLE IF EXISTS meters');
+	await db.none('DROP TYPE IF EXISTS meter_type');
+	await db.none('DROP FUNCTION IF EXISTS compressed_readings(INTEGER[], TIMESTAMP, TIMESTAMP, INTEGER);');
+	await createSchema();
 }
 
 module.exports.recreateDB = recreateDB;

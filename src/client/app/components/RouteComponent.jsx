@@ -9,7 +9,7 @@ import HomeComponent from './HomeComponent';
 import LoginComponent from './LoginComponent';
 import AdminComponent from './AdminComponent';
 import NotFoundComponent from './NotFoundComponent';
-import GroupContainer from '../containers/GroupMainContainer';
+import GroupContainer from '../containers/groups/GroupMainContainer';
 import EditGroupComponent from './groups/EditGroupComponent';
 
 /**
@@ -37,7 +37,7 @@ function requireAuth(nextState, replace) {
 			// Route to login page if the auth token is not valid
 			if (!res.data.success) browserHistory.push('/login');
 		})
-		.catch(err => console.log(err));
+		.catch(console.error);
 }
 
 /**

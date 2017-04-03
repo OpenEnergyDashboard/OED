@@ -3,7 +3,6 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
 
 const database = require('./database');
-const Meter = require('./Meter');
 
 const db = database.db;
 const sqlFile = database.sqlFile;
@@ -25,6 +24,19 @@ class Group {
 	 */
 	static createTables() {
 		return db.none(sqlFile('group/create_groups_tables.sql'));
+	}
+
+	/**
+	 * Returns a promise to insert this group into the db
+	 * @param conn the connection to be used, defaults to the default database connection.
+	 * @return {Promise.<void>}
+	 */
+	async insert(conn = db) {
+		const group = this;
+		if (group.id !== undefined) {
+			throw new Error('Attempt to insert a group that already has an ID');
+		}
+		await conn.none(sqlFile('group/insert_new_group.sql'), group);
 	}
 
 	/**
@@ -69,7 +81,7 @@ class Group {
 	}
 
 	/**
-	 * Returns a promise to retrieve all meters that are immediate children of the group with the given id.
+	 * Returns a promise to retrieve the IDs of all meters that are immediate children of the group with the given id.
 	 * @param id The id of the group whose meters you are desirous of seeing.
 	 * @param conn the connection to be used, defaults to the default database connection.
 	 * @returns {Promise.<*>}
@@ -77,19 +89,29 @@ class Group {
 	static async getImmediateMetersByGroupID(id, conn = db) {
 		const rows = await conn.any(sqlFile('group/get_immediate_meters_by_group_id.sql'), { id: id });
 		return rows.map(row => row.id);
-
 	}
 
 	/**
-	 * Returns a promise to retrieve all the child groups of the group whose id is given.
+	 * Returns a promise to retrieve the IDs of all the child groups of the group whose id is given.
 	 * @param id the id of the group whose children are to be retrieved
-	 * @param conn he connection to be used, defaults to the default database connection.
+	 * @param conn the connection to be used, defaults to the default database connection.
 	 * @returns {Promise.<*>}
 	 */
 	static async getImmediateGroupsByGroupID(id, conn = db) {
 		const rows = await conn.any(sqlFile('group/get_immediate_groups_by_group_id.sql'), { id: id });
 		return rows.map(row => row.id);
+	}
 
+	/**
+	 * Returns a promise to associate this group with a child group
+	 * @param childID ID of the meter to be the child
+	 * @param conn the connection to be used, defaults to the default database connection.
+	 * @return {Promise.<void>}
+	 */
+	async associateWithChildGroup(childID, conn = db) {
+		// Confirm that such a group exists
+		const child = await Group.getByID(childID, conn);
+		await conn.none(sqlFile('group/associate_child_group_with_parent_group.sql'), { parent_id: this.id, child_id: child.id });
 	}
 
 }

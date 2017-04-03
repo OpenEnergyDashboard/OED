@@ -36,19 +36,19 @@ export default class ChildMeterBox extends React.Component {
 			alignSelf: 'left',
 			marginLeft: '10%',
 			marginRight: '10%'
-			// todo: testing hack
-			//border: '1px solid black'
+
 		};
+
+
 		const labelStyle = {
 			textDecoration: 'underline'
 		};
-
 		return (
 			<div style={boxStyle}>
 				<h3>Child Meters</h3>
 				<div className="form-group">
 					<p style={labelStyle}>Select meters:</p>
-					<select multiple className="form-control" id="meterList" size="8" onClick={this.handleMeterSelect}>
+					<select multiple className="form-control" id="meterList" size="8" onChange={this.handleMeterSelect}>
 						{this.props.meters.map(meter =>
 							<option key={meter.id} value={meter.id}>{meter.name}</option>
 						)}

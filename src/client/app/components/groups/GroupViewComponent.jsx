@@ -5,8 +5,8 @@
 // This component is for viewing a single group via child box components + some buttons
 import React from 'react';
 import { Link } from 'react-router';
-import ChildMeterBoxContainer from '../../containers/ChildMeterBoxContainer';
-import ChildGroupBoxContainer from '../../containers/ChildGroupBoxContainer';
+import ChildMeterBoxContainer from '../../containers/groups/ChildMeterBoxContainer';
+import ChildGroupBoxContainer from '../../containers/groups/ChildGroupBoxContainer';
 
 
 export default class GroupViewComponent extends React.Component {
