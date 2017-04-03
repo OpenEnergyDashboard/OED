@@ -27,4 +27,4 @@ async function updateAllMeters() {
 }
 
 
-module.exports = updateAllMeters();
+module.exports = updateAllMeters;

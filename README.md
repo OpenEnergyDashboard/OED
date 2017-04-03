@@ -27,6 +27,8 @@ Node.js - Javascript runtime environment ([nodejs.org](https://nodejs.org/en/))
 &nbsp;&nbsp;&nbsp;&nbsp;DB_PORT=? // The port for your postgres db, likely 5432<br>
 &nbsp;&nbsp;&nbsp;&nbsp;TOKEN_SECRET=? // Token for authentication. Generate something secure and random
 1. Run ```npm run createdb``` to create the database schema.
+1. Run `npm run addMamacMeters` to load mamac meters from an `.xlsx` file.
+1. Run `npm run updateMamacMeters` to fetch new data for mamac meters in the database.
 1. Run ```npm run build``` to create the Webpack bundle for production, otherwise run ```npm run dev``` for development.
 1. Run ```npm start```
 

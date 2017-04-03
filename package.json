@@ -6,10 +6,12 @@
     "start": "node ./src/bin/www",
     "dev": "webpack -d --watch",
     "build": "webpack -p",
-    "lint": "./node_modules/.bin/eslint src/client/app/**/*.js src/client/app/**/*.jsx src/server/**/*.js src/server/**/*.jsx",
+    "lint": "./node_modules/.bin/eslint src/client/app/**/*.js src/client/app/**/*.jsx src/server/**/*.js src/server/**/*.jsx src/scripts/**/*.js",
     "test": "./node_modules/.bin/mocha \"src/server/test/**/*.js\"",
     "createdb": "node ./src/scripts/createDB.js",
-	"updatemeters": "node ./src/server/services/updateMeters.js"
+	"addMamacMeters": "node ./src/scripts/addMamacMeters.js",
+	"updateMamacMeters": "node ./src/scripts/updateMamacMeters.js"
+
   },
   "dependencies": {
     "axios": "^0.15.3",

@@ -6,6 +6,5 @@ project='/example/path/to/project/ED-JS'
 # Log file -- Fill in the absolute path to the file you wish to log to.
 log='/example/path/to/log_file'
 
-# The following two lines should NOT need to be edited except by devs.
-toRun=${project}'/src/server/services/updateMeters.js'
-node &>> ${log} ${toRun} &
+# The following line should NOT need to be edited except by devs.
+npm --prefix ${project} run --silent updateMamacMeters &>> ${log} &
