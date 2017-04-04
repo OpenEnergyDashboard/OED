@@ -46,6 +46,7 @@
     "request": "^2.78.0",
     "request-promise-native": "^1.0.3",
     "serve-favicon": "~2.3.0",
+    "stream-buffer": "^1.0.0",
     "winston": "~2.3.0",
     "xlsx": "~0.8.0",
     "xml2js": "^0.4.17"

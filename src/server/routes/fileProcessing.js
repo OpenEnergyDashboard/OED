@@ -1,4 +1,5 @@
 const express = require('express');
+const streamBuffers = require('stream-buffer');
 const readCSVFromString = require('../services/readCSV').readCSVFromString;
 const multer = require('multer');
 
@@ -8,8 +9,12 @@ const router = express.Router();
 const upload = multer({ storage: multer.memoryStorage() });
 router.post('/', upload.single('csvFile'), async (req, res) => {
 	try {
-		// Grab and save the data
 		const data = await readCSVFromString(req.file.buffer.toString('utf8'));
+		const myReadableStreamBuffer = new streamBuffers.ReadableStreamBuffer({
+			frequency: 10,
+			chunkSize: 2048
+		});
+		myReadableStreamBuffer.put(req.file.buffer);
 		console.log(data);
 		res.status(200);
 	} catch (err) {
