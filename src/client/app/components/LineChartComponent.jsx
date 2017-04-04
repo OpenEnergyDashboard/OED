@@ -8,6 +8,7 @@ import React from 'react';
 import ReactHighstock from 'react-highcharts/ReactHighstock';
 import _ from 'lodash';
 
+
 const defaultConfig = {
 	title: {
 		text: null
@@ -158,15 +159,16 @@ export default class LineChartComponent extends React.Component {
 		}
 	}
 	onExportClick() {
-		const length = this.props.selectedMeters[0];
-		const data = this.props.series[length].data;
-		const name = this.props.series[length].name;
-		data.forEach(function(currentValue) {
+		const meters = this.props.selectedMeters[0];
+		const data = this.props.series[meters].data;
+		const name = this.props.series[meters].name;
+		/** data.forEach(function(currentValue) {
 			console.log(parseFloat(currentValue[0]));
-		});
-		//console.log(data);
+		}); */
+		console.log(data);
 		console.log(name);
 		//console.log(length);
+		console.log(this.store.getState());
 	}
 
 	render() {
