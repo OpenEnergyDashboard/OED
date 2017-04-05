@@ -53,6 +53,15 @@ function shouldFetchReadings(state, meterID, startTimestamp, endTimestamp) {
 	return readingsForTimeInterval === undefined || !readingsForTimeInterval.isFetching;
 }
 
+function testExport(stateSeries) {
+	if (stateSeries === undefined) {
+		return false;
+	}
+	console.log(stateSeries);
+	return true;
+	// return stateSeries === undefined;
+}
+
 export function fetchReadingsIfNeeded(meterID, startTimestamp, endTimestamp) {
 	return (dispatch, getState) => {
 		if (shouldFetchReadings(getState(), meterID, startTimestamp, endTimestamp)) {
@@ -61,3 +70,15 @@ export function fetchReadingsIfNeeded(meterID, startTimestamp, endTimestamp) {
 		return Promise.resolve();
 	};
 }
+
+export function exportReadings(series) {
+	return (dispatch, getState) => {
+		if (testExport(getState())) {
+			console.log('resolved');
+			return Promise.resolve();
+		}
+		console.log('rejected');
+		return Promise.reject();
+	};
+}
+
