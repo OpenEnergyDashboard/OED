@@ -4,48 +4,86 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/.
  */
 
+import { Line } from 'react-chartjs-2';
+import moment from 'moment';
 import { connect } from 'react-redux';
-import LineChartComponent from '../components/LineChartComponent';
-import { fetchReadingsIfNeeded, exportReadings } from '../actions/readings';
-import { stringifyTimeInterval } from '../util';
+import 'chartjs-plugin-zoom';
 
 /**
  * @param {State} state
  */
 function mapStateToProps(state) {
-	const startTimestamp = state.graph.startTimestamp;
-	const endTimestamp = state.graph.endTimestamp;
-	const timeInterval = stringifyTimeInterval(startTimestamp, endTimestamp);
-
-	const series = {};
-	const notLoadedMeters = [];
-	let isLoading = false;
+	const timeInterval = state.graph.timeInterval;
+	const data = { datasets: [] };
+	// getColor() cycles through the colors, wrapping around the end to the beginning
+	const colors = ['LightBlue', 'GoldenRod', 'Black', 'OrangeRed', 'LightSeaGreen', 'LightSlateGray', 'Purple'];
+	let colorPointer = 0;
+	function getColor() {
+		const color = colors[colorPointer];
+		colorPointer = (colorPointer + 1) % colors.length;
+		return color;
+	}
 
 	for (const meterID of state.graph.selectedMeters) {
-		if (state.readings.byMeterID[meterID][timeInterval] === undefined || state.readings.byMeterID[meterID][timeInterval].isFetching) {
-			isLoading = true;
-			if (state.readings.byMeterID[meterID][timeInterval] === undefined) {
-				notLoadedMeters.push(meterID);
-			}
-		} else {
-			series[meterID] = { name: state.meters.byMeterID[meterID].name, data: state.readings.byMeterID[meterID][timeInterval].readings };
+		const readingsData = state.readings.byMeterID[meterID][timeInterval];
+		if (readingsData !== undefined && !readingsData.isFetching) {
+			data.datasets.push({
+				label: state.meters.byMeterID[meterID].name,
+				data: state.readings.byMeterID[meterID][timeInterval].readings.map(arr => ({ x: arr[0], y: arr[1].toFixed(2) })),
+				fill: false,
+				borderColor: getColor()
+			});
 		}
 	}
+
+	const options = {
+		animation: {
+			duration: 0
+		},
+		elements: {
+			point: {
+				radius: 0
+			}
+		},
+		scales: {
+			xAxes: [{
+				type: 'time'
+			}],
+			yAxes: [{
+				scaleLabel: {
+					display: true,
+					labelString: 'kWh'
+				},
+				ticks: {
+					beginAtZero: true
+				}
+			}]
+		},
+		tooltips: {
+			mode: 'nearest',
+			intersect: false,
+			backgroundColor: 'rgba(0,0,0,0.6)',
+			displayColors: false,
+			callbacks: {
+				title: tooltipItems => `${moment(tooltipItems[0].xLabel).format('dddd, MMM DD, YYYY hh:mm a')}`,
+				label: tooltipItems => `${data.datasets[tooltipItems.datasetIndex].label}: ${tooltipItems.yLabel} kWh`
+			}
+		},
+		pan: {
+			enabled: true,
+			mode: 'x'
+		},
+		zoom: {
+			enabled: true,
+			mode: 'x',
+		}
+	};
+
 	return {
-		isLoading,
-		series,
-		notLoadedMeters,
-		selectedMeters: state.graph.selectedMeters,
-		startTimestamp,
-		endTimestamp
+		data,
+		options,
+		redraw: true
 	};
 }
 
-function mapDispatchToProps(dispatch) {
-	return {
-		fetchNewReadings: (meterID, startTimestamp, endTimestamp) => dispatch(fetchReadingsIfNeeded(meterID, startTimestamp, endTimestamp)),
-		exportReadings: series => dispatch(exportReadings(series))
-	};
-}
-
-export default connect(mapStateToProps, mapDispatchToProps)(LineChartComponent);
+export default connect(mapStateToProps)(Line);

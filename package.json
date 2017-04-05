@@ -1,14 +1,16 @@
 {
-  "name": "meterdatagetter",
+  "name": "Open-Energy-Dashboard",
   "version": "0.0.0",
   "private": true,
   "scripts": {
     "start": "node ./src/bin/www",
     "dev": "webpack -d --watch",
     "build": "webpack -p",
-    "lint": "./node_modules/.bin/eslint src/client/app/**/*.js src/client/app/**/*.jsx src/server/**/*.js src/server/**/*.jsx",
+    "lint": "./node_modules/.bin/eslint src/client/app/**/*.js src/client/app/**/*.jsx src/server/**/*.js src/server/**/*.jsx src/scripts/**/*.js",
     "test": "./node_modules/.bin/mocha \"src/server/test/**/*.js\"",
-    "createdb": "node ./src/scripts/createDB.js"
+    "createdb": "node ./src/scripts/createDB.js",
+	"addMamacMeters": "node ./src/scripts/addMamacMeters.js",
+	"updateMamacMeters": "node ./src/scripts/updateMamacMeters.js"
   },
   "dependencies": {
     "axios": "^0.15.3",
@@ -21,6 +23,8 @@
     "babel-preset-react": "^6.16.0",
     "bcryptjs": "^2.4.3",
     "body-parser": "~1.15.1",
+    "chart.js": "^2.5.0",
+    "chartjs-plugin-zoom": "^0.4.5",
     "cookie-parser": "~1.4.3",
     "csv": "^1.1.0",
     "debug": "~2.2.0",
@@ -28,7 +32,6 @@
     "es6-promisify": "^5.0.0",
     "express": "~4.13.4",
     "fs": "0.0.1-security",
-    "highcharts": "^5.0.7",
     "jsonwebtoken": "^7.2.1",
     "lodash": "^4.17.4",
     "lodash-webpack-plugin": "^0.11.0",
@@ -37,8 +40,8 @@
     "nodemailer": "~2.6.4",
     "pg-promise": "^5.3.5",
     "react": "^15.4.2",
+    "react-chartjs-2": "^2.0.5",
     "react-dom": "^15.4.2",
-    "react-highcharts": "^11.5.0",
     "react-redux": "^5.0.2",
     "react-router": "^3.0.2",
     "redux": "^3.6.0",
