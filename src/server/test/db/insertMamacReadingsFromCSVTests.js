@@ -15,7 +15,7 @@ const expect = chai.expect;
 const recreateDB = require('./common').recreateDB;
 const db = require('../../models/database').db;
 const Meter = require('../../models/Meter');
-const insertFromCSV = require('../../services/loadMamacReadingsFromCSVFile');
+const loadMamacReadingsFromCsvFile = require('../../services/loadMamacReadingsFromCsvFile');
 
 const mocha = require('mocha');
 
@@ -30,7 +30,7 @@ mocha.describe('Insert Mamac readings from a file', () => {
 	mocha.it('loads the correct number of rows from a file', () => {
 		const testFilePath = path.join(__dirname, 'test-readings.csv');
 		const readingDuration = moment.duration(1, 'hours');
-		return insertFromCSV(testFilePath, meter, readingDuration)
+		return loadMamacReadingsFromCsvFile(testFilePath, meter, readingDuration)
 			.then(() => db.one('SELECT COUNT(*) as count FROM readings'))
 			.then(({ count }) => expect(parseInt(count)).to.equal(1440));
 	});
@@ -38,6 +38,16 @@ mocha.describe('Insert Mamac readings from a file', () => {
 	mocha.it('errors correctly on an invalid file', () => {
 		const testFilePath = path.join(__dirname, 'test-readings-invalid.csv');
 		const readingDuration = moment.duration(1, 'hours');
-		return expect(insertFromCSV(testFilePath, meter, readingDuration)).to.eventually.be.rejected;
+		return expect(loadMamacReadingsFromCsvFile(testFilePath, meter, readingDuration)).to.eventually.be.rejected;
+	});
+	mocha.it('rolls back correctly when it rejects', async () => {
+		const testFilePath = path.join(__dirname, 'test-readings-invalid.csv');
+		const readingDuration = moment.duration(1, 'hours');
+		try {
+			await loadMamacReadingsFromCsvFile(testFilePath, meter, readingDuration);
+		} catch (e) {
+			const { count } = await db.one('SELECT COUNT(*) as count FROM readings');
+			expect(parseInt(count)).to.equal(0);
+		}
 	});
 });
