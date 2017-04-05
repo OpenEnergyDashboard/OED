@@ -6,8 +6,9 @@
 
 import { connect } from 'react-redux';
 import LineChartComponent from '../components/LineChartComponent';
-import { fetchReadingsIfNeeded } from '../actions/readings';
+import { fetchReadingsIfNeeded, exportReadings } from '../actions/readings';
 import { stringifyTimeInterval } from '../util';
+
 
 /**
  * @param {State} state
@@ -43,8 +44,8 @@ function mapStateToProps(state) {
 
 function mapDispatchToProps(dispatch) {
 	return {
-		fetchNewReadings: (meterID, startTimestamp, endTimestamp) => dispatch(fetchReadingsIfNeeded(meterID, startTimestamp, endTimestamp))
-		exportReadings: (meterID, startTimestamp, endTimestamp) => dispatch(fetchReadingsIfNeeded(meterID, startTimestamp, endTimestamp))
+		fetchNewReadings: (meterID, startTimestamp, endTimestamp) => dispatch(fetchReadingsIfNeeded(meterID, startTimestamp, endTimestamp)),
+		exportReadings: (series) => dispatch(exportReadings(series))
 	};
 }
 

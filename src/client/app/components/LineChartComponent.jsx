@@ -159,16 +159,17 @@ export default class LineChartComponent extends React.Component {
 		}
 	}
 	onExportClick() {
-		const meters = this.props.selectedMeters[0];
-		const data = this.props.series[meters].data;
-		const name = this.props.series[meters].name;
+		//const meters = this.props.selectedMeters[0];
+		//const data = this.props.series[meters].data;
+		//const name = this.props.series[meters].name;
 		/** data.forEach(function(currentValue) {
 			console.log(parseFloat(currentValue[0]));
 		}); */
-		console.log(data);
-		console.log(name);
+		//console.log(data);
+		//console.log(name);
 		//console.log(length);
-		console.log(this.store.getState());
+		//console.log(this.store.getState()); */
+		this.props.exportReadings();
 	}
 
 	render() {

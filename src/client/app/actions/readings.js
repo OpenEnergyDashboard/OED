@@ -61,3 +61,22 @@ export function fetchReadingsIfNeeded(meterID, startTimestamp, endTimestamp) {
 		return Promise.resolve();
 	};
 }
+
+	function exportData(test){
+		if (test === undefined){
+			return false;
+		}else {
+			console.log(test);
+			return true;
+		}
+	}
+
+export function exportReadings(series){
+		return (dispatch, getState) => {
+			if (exportData(getState())) {
+				console.log("resolved")
+				return Promise.resolve();
+			}
+			return Promise.reject();
+		};
+	}
