@@ -46,6 +46,15 @@ function fetchManyReadings(meterIDs, timeInterval) {
 	};
 }
 
+function testExport(stateSeries) {
+	if (stateSeries === undefined) {
+		return false;
+	}
+	console.log(stateSeries);
+	return true;
+	// return stateSeries === undefined;
+}
+
 /**
  * Fetches readings for the given meterIDs if they are not already fetched or being fetched
  * @param {Array.<int>} meterIDs
@@ -63,21 +72,14 @@ export function fetchNeededReadings(meterIDs, timeInterval) {
 	};
 }
 
-	function exportData(test){
-		if (test === undefined){
-			return false;
-		}else {
-			console.log(test);
-			return true;
+export function exportReadings(series) {
+	return (dispatch, getState) => {
+		if (testExport(getState())) {
+			console.log('resolved');
+			return Promise.resolve();
 		}
-	}
+		console.log('rejected');
+		return Promise.reject();
+	};
+}
 
-export function exportReadings(series){
-		return (dispatch, getState) => {
-			if (exportData(getState())) {
-				console.log("resolved")
-				return Promise.resolve();
-			}
-			return Promise.reject();
-		};
-	}
