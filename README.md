@@ -46,9 +46,9 @@ See the full licensing agreement [here](https://github.com/beloitcollegecomputer
 
 ### Contributions ###
 
-We welcome others to contribute to this project by writing code for submission or collaborating with us. Before contributing, please sign our CLA [here](https://goo.gl/forms/eSBFPoGA0ycdKtzi2).
+We welcome others to contribute to this project by writing code for submission or collaborating with us. Before contributing, please sign our Contributor License Agreement [here](https://goo.gl/forms/eSBFPoGA0ycdKtzi2).
 If you have any questions or concerns feel free to email us at oed@beloit.edu.
 ### Contact: ###
 
-To contact us, send an email to oed@beloit.edu.
+To contact us, send an email to oed@beloit.edu or open an issue on GitHub.
 
