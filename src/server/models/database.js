@@ -50,6 +50,7 @@ async function createSchema() {
 	await Meter.createTable();
 	await Reading.createTable();
 	await Reading.createCompressedReadingsFunction();
+	await Reading.createAggregateReadingsFunction();
 	await User.createTable();
 	await db.none(sqlFile('reading/create_function_get_compressed_readings.sql'));
 }

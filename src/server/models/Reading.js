@@ -39,6 +39,14 @@ class Reading {
 		return db.none(sqlFile('reading/create_function_get_compressed_readings.sql'));
 	}
 
+	/**
+	 * Returns a promise to create the aggregate readings function.
+	 * @return {Promise.<>}
+	 */
+	static createAggregateReadingsFunction() {
+		return db.none(sqlFile('reading/create_function_get_aggregate_readings.sql'));
+	}
+
 	static mapRow(row) {
 		return new Reading(row.meter_id, row.reading, row.start_timestamp, row.end_timestamp);
 	}
@@ -116,12 +124,12 @@ class Reading {
 	}
 
 	/**
-	 * Gets a number of compressed readings that approximate the given time range for the given meter.
+	 * Gets a number of compressed readings that approximate the given time range for the given meters.
 	 *
 	 * Compressed readings are in kilowatts.
 	 * @param meterIDs an array of ids for meters whose points are being compressed
 	 * @param fromTimestamp An optional start point for the time range.
-	 * @param toTimestamp An optional end point for the time range
+	 * @param toTimestamp An optional end point for the time range.
 	 * @param numPoints The number of points to compress to. Defaults to 500
 	 * @param conn the connection to use. Defaults to the default database connection.
 	 * @return {Promise<object<int, array<{reading_rate: number, start_timestamp: Date, end_timestamp: Date}>>>}
@@ -130,6 +138,35 @@ class Reading {
 		fromTimestamp = fromTimestamp && moment(fromTimestamp).toDate();
 		toTimestamp = toTimestamp && moment(toTimestamp).toDate();
 		const allCompressedReadings = await conn.func('compressed_readings', [meterIDs, fromTimestamp || '-infinity', toTimestamp || 'infinity', numPoints]);
+
+		// Separate the result rows by meter_id and return a nested object.
+		const compressedReadingsByMeterID = {};
+		for (const row of allCompressedReadings) {
+			if (compressedReadingsByMeterID[row.meter_id] === undefined) {
+				compressedReadingsByMeterID[row.meter_id] = [];
+			}
+			compressedReadingsByMeterID[row.meter_id].push(
+				{ reading_rate: row.reading_rate, start_timestamp: row.start_timestamp, end_timestamp: row.end_timestamp }
+			);
+		}
+		return compressedReadingsByMeterID;
+	}
+
+	/**
+	 * Gets a number of aggregate readings across the given time interval for the given meters.
+	 *
+	 * Compressed readings are in kilowatts.
+	 * @param meterIDs an array of ids for meters whose points are being compressed
+	 * @param duration A moment time interval over which to sum the readings
+	 * @param fromTimestamp An optional start point for the beginning of the entire time range.
+	 * @param toTimestamp An optional end point for the end of the entire time range.
+	 * @param conn the connection to use. Defaults to the default database connection.
+	 * @return {Promise<object<int, array<{reading_rate: number, start_timestamp: Date, end_timestamp: Date}>>>}
+	 */
+	static async getAggregateReadings(meterIDs, duration, fromTimestamp = null, toTimestamp = null, conn = db) {
+		fromTimestamp = fromTimestamp && moment(fromTimestamp).toDate();
+		toTimestamp = toTimestamp && moment(toTimestamp).toDate();
+		const allCompressedReadings = await conn.func('aggregate_readings', [meterIDs, duration, fromTimestamp || '-infinity', toTimestamp || 'infinity']);
 
 		// Separate the result rows by meter_id and return a nested object.
 		const compressedReadingsByMeterID = {};

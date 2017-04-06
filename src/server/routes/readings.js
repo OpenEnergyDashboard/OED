@@ -1,0 +1,58 @@
+/* This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this
+ * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
+
+const express = require('express');
+const _ = require('lodash');
+const Reading = require('../models/Reading');
+const TimeInterval = require('../../common/TimeInterval');
+
+const router = express.Router();
+
+/**
+ * Takes in an array of row objects and reformats the timestamp from ISO 8601 format to the number
+ * of milliseconds since January 1st, 1970 and groups each reading with each timestamp.
+ * @param {Array<Reading>} rows
+ */
+function formatReadings(rows) {
+	return rows.map(row => [new Date(row.start_timestamp).valueOf(), row.reading_rate]);
+}
+
+/**
+ * GET meter readings by meter id for line chart
+ * @param {array.<int>} meter_ids
+ * @param {Date} [startDate]
+ * @param {Date} [endDate]
+ */
+router.get('/line/:meter_ids', async (req, res) => {
+	// We can't do .map(parseInt) here because map would give parseInt a radix value of the current array position.
+	const meterIDs = req.params.meter_ids.split(',').map(s => parseInt(s));
+	const timeInterval = TimeInterval.fromString(req.query.timeInterval);
+	try {
+		const rawCompressedReadings = await Reading.getCompressedReadings(meterIDs, timeInterval.startTimestamp, timeInterval.endTimestamp, 100);
+		const formattedCompressedReadings = _.mapValues(rawCompressedReadings, formatReadings);
+		res.json(formattedCompressedReadings);
+	} catch (err) {
+		console.error(`Error while performing GET readings for line with meters ${meterIDs} with time interval ${timeInterval}: ${err}`);
+	}
+});
+
+/**
+ * GET meter readings by meter id for bar chart
+ * @param {array.<int>} meter_ids
+ * @param {Date} [startDate]
+ * @param {Date} [endDate]
+ */
+router.get('/bar/:meter_ids', async (req, res) => {
+	// We can't do .map(parseInt) here because map would give parseInt a radix value of the current array position.
+	const meterIDs = req.params.meter_ids.split(',').map(s => parseInt(s));
+	const timeInterval = TimeInterval.fromString(req.query.timeInterval);
+	try {
+		const aggregateReadings = await Reading.getAggregateReadings(meterIDs, req.query.duration, timeInterval.startTimestamp, timeInterval.endTimestamp);
+		res.json(aggregateReadings);
+	} catch (err) {
+		console.error(`Error while performing GET readings for bar with meters ${meterIDs} with time interval ${timeInterval}: ${err}`);
+	}
+});
+
+module.exports = router;

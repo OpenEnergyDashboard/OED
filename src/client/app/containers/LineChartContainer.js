@@ -25,11 +25,11 @@ function mapStateToProps(state) {
 	}
 
 	for (const meterID of state.graph.selectedMeters) {
-		const readingsData = state.readings.byMeterID[meterID][timeInterval];
+		const readingsData = state.readings.line.byMeterID[meterID][timeInterval];
 		if (readingsData !== undefined && !readingsData.isFetching) {
 			data.datasets.push({
 				label: state.meters.byMeterID[meterID].name,
-				data: state.readings.byMeterID[meterID][timeInterval].readings.map(arr => ({ x: arr[0], y: arr[1].toFixed(2) })),
+				data: state.readings.line.byMeterID[meterID][timeInterval].readings.map(arr => ({ x: arr[0], y: arr[1].toFixed(2) })),
 				fill: false,
 				borderColor: getColor()
 			});

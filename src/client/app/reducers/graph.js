@@ -4,7 +4,6 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/.
  */
 
-import _ from 'lodash';
 import TimeInterval from '../../../common/TimeInterval';
 import * as graphActions from '../actions/graph';
 
@@ -29,7 +28,6 @@ const defaultState = {
  */
 export default function graph(state = defaultState, action) {
 	switch (action.type) {
-
 		case graphActions.UPDATE_SELECTED_METERS:
 			return {
 				...state,

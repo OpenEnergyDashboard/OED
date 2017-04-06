@@ -16,14 +16,14 @@ export const RECEIVE_MANY_READINGS = 'RECEIVE_MANY_READINGS';
  * @param {TimeInterval} timeInterval
  */
 function shouldFetchReadings(state, meterID, timeInterval) {
-	const readingsForMeterID = state.readings.byMeterID[meterID];
+	const readingsForMeterID = state.readings.line.byMeterID[meterID];
 	if (readingsForMeterID === undefined) {
 		return true;
 	}
 	if (readingsForMeterID[timeInterval] === undefined) {
 		return true;
 	}
-	const readingsForTimeInterval = state.readings.byMeterID[meterID][timeInterval];
+	const readingsForTimeInterval = state.readings.line.byMeterID[meterID][timeInterval];
 	return readingsForTimeInterval === undefined && !readingsForTimeInterval.isFetching;
 }
 
@@ -40,7 +40,7 @@ function fetchManyReadings(meterIDs, timeInterval) {
 		dispatch(requestManyReadings(meterIDs, timeInterval));
 		// The api expects the meter ids to be a comma-separated list.
 		const stringifiedMeterIDs = meterIDs.join(',');
-		return axios.get(`/api/meters/readings/${stringifiedMeterIDs}`, {
+		return axios.get(`/api/readings/line/${stringifiedMeterIDs}`, {
 			params: { timeInterval: timeInterval.toString() }
 		}).then(response => dispatch(receiveManyReadings(meterIDs, timeInterval, response.data)));
 	};

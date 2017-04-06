@@ -16,7 +16,12 @@ import * as readingsActions from '../actions/readings';
  * @type {State~Readings}
  */
 const defaultState = {
-	byMeterID: {}
+	line: {
+		byMeterID: {}
+	},
+	bar: {
+		byMeterID: {}
+	}
 };
 
 /**
@@ -30,17 +35,19 @@ export default function readings(state = defaultState, action) {
 			const timeInterval = action.timeInterval;
 			const newState = {
 				...state,
-				byMeterID: {
-					...state.byMeterID
+				line: {
+					byMeterID: {
+						...state.line.byMeterID
+					}
 				}
 			};
 			for (const meterID of action.meterIDs) {
-				if (newState.byMeterID[meterID] === undefined) {
-					newState.byMeterID[meterID] = {};
-				} else if (newState.byMeterID[meterID][timeInterval] === undefined) {
-					newState.byMeterID[meterID][timeInterval] = { isFetching: true };
+				if (newState.line.byMeterID[meterID] === undefined) {
+					newState.line.byMeterID[meterID] = {};
+				} else if (newState.line.byMeterID[meterID][timeInterval] === undefined) {
+					newState.line.byMeterID[meterID][timeInterval] = { isFetching: true };
 				} else {
-					newState.byMeterID[meterID][timeInterval] = { ...newState.byMeterID[meterID][timeInterval], isFetching: true };
+					newState.line.byMeterID[meterID][timeInterval] = { ...newState.line.byMeterID[meterID][timeInterval], isFetching: true };
 				}
 			}
 			return newState;
@@ -49,13 +56,15 @@ export default function readings(state = defaultState, action) {
 			const timeInterval = action.timeInterval;
 			const newState = {
 				...state,
-				byMeterID: {
-					...state.byMeterID
+				line: {
+					byMeterID: {
+						...state.line.byMeterID
+					}
 				}
 			};
 			for (const meterID of action.meterIDs) {
 				const readingsForMeter = action.readings[meterID];
-				newState.byMeterID[meterID][timeInterval] = { isFetching: false, readings: readingsForMeter };
+				newState.line.byMeterID[meterID][timeInterval] = { isFetching: false, readings: readingsForMeter };
 			}
 			return newState;
 		}
