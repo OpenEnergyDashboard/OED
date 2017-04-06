@@ -12,6 +12,7 @@ export default class UIOptionsComponent extends React.Component {
 	constructor(props) {
 		super(props);
 		this.handleMeterSelect = this.handleMeterSelect.bind(this);
+		this.exportReading = this.exportReading.bind(this);
 	}
 
 	/**
@@ -22,6 +23,9 @@ export default class UIOptionsComponent extends React.Component {
 		this.props.fetchMetersDataIfNeeded();
 	}
 
+	exportReading() {
+		console.log(this.props.exportVals);
+	}
 	handleMeterSelect(e) {
 		e.preventDefault();
 		const options = e.target.options;
@@ -93,6 +97,7 @@ export default class UIOptionsComponent extends React.Component {
 					<br />
 					<button type="button" id="changeButton" className="btn btn-primary">Change!</button>
 				</div>
+				<div><button onClick={this.exportReading}>Export!</button></div>
 			</div>
 		);
 	}
