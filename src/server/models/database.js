@@ -2,7 +2,15 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
 
-const pgp = require('pg-promise')();
+const pgp = require('pg-promise')({
+	// This sets the style of returned durations so that Moment can parse them
+	connect: (client, dc, fresh) => {
+		// Only set the style on fresh connections
+		if (fresh === true || fresh === undefined) {
+			client.query('SET intervalStyle = iso_8601');
+		}
+	}
+});
 const path = require('path');
 const config = require('../config');
 
