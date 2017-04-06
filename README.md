@@ -46,7 +46,7 @@ See the full licensing agreement [here](https://github.com/beloitcollegecomputer
 
 ### Contributions ###
 
-We welcome others to contribute to this project by writing code for submission or collaborating with us. Before contributing, please sign our Contributor License Agreement [here](https://goo.gl/forms/eSBFPoGA0ycdKtzi2).
+We welcome others to contribute to this project by writing code for submission or collaborating with us. Before contributing, please sign our Contributor License Agreement [here](https://goo.gl/forms/nR9MtVHUOqYn8WbP2).
 If you have any questions or concerns feel free to email us at oed@beloit.edu.
 ### Contact: ###
 
