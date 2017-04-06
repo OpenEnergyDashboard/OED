@@ -31,7 +31,7 @@ const defaultState = {
  */
 export default function readings(state = defaultState, action) {
 	switch (action.type) {
-		case readingsActions.REQUEST_MANY_READINGS: {
+		case readingsActions.REQUEST_LINE_READINGS: {
 			const timeInterval = action.timeInterval;
 			const newState = {
 				...state,
@@ -52,7 +52,7 @@ export default function readings(state = defaultState, action) {
 			}
 			return newState;
 		}
-		case readingsActions.RECEIVE_MANY_READINGS: {
+		case readingsActions.RECEIVE_LINE_READINGS: {
 			const timeInterval = action.timeInterval;
 			const newState = {
 				...state,
@@ -65,6 +65,43 @@ export default function readings(state = defaultState, action) {
 			for (const meterID of action.meterIDs) {
 				const readingsForMeter = action.readings[meterID];
 				newState.line.byMeterID[meterID][timeInterval] = { isFetching: false, readings: readingsForMeter };
+			}
+			return newState;
+		}
+		case readingsActions.REQUEST_BAR_READINGS: {
+			const timeInterval = action.timeInterval;
+			const newState = {
+				...state,
+				bar: {
+					byMeterID: {
+						...state.bar.byMeterID
+					}
+				}
+			};
+			for (const meterID of action.meterIDs) {
+				if (newState.bar.byMeterID[meterID] === undefined) {
+					newState.bar.byMeterID[meterID] = {};
+				} else if (newState.bar.byMeterID[meterID][timeInterval] === undefined) {
+					newState.bar.byMeterID[meterID][timeInterval] = { isFetching: true };
+				} else {
+					newState.bar.byMeterID[meterID][timeInterval] = { ...newState.bar.byMeterID[meterID][timeInterval], isFetching: true };
+				}
+			}
+			return newState;
+		}
+		case readingsActions.RECEIVE_BAR_READINGS: {
+			const timeInterval = action.timeInterval;
+			const newState = {
+				...state,
+				bar: {
+					byMeterID: {
+						...state.bar.byMeterID
+					}
+				}
+			};
+			for (const meterID of action.meterIDs) {
+				const readingsForMeter = action.readings[meterID];
+				newState.bar.byMeterID[meterID][timeInterval] = { isFetching: false, readings: readingsForMeter };
 			}
 			return newState;
 		}

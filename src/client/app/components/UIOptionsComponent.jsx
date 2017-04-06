@@ -3,6 +3,8 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
 
 import React from 'react';
+import Slider from 'react-rangeslider';
+import 'react-rangeslider/lib/index.css';
 
 export default class UIOptionsComponent extends React.Component {
 	/**
@@ -12,6 +14,11 @@ export default class UIOptionsComponent extends React.Component {
 	constructor(props) {
 		super(props);
 		this.handleMeterSelect = this.handleMeterSelect.bind(this);
+		this.handleBarDurationChange = this.handleBarDurationChange.bind(this);
+		this.handleBarDurationChangeComplete = this.handleBarDurationChangeComplete.bind(this);
+		this.state = {
+			barDuration: 30
+		};
 	}
 
 	/**
@@ -33,6 +40,15 @@ export default class UIOptionsComponent extends React.Component {
 			}
 		}
 		this.props.selectMeters(selectedMeters);
+	}
+
+	handleBarDurationChange(value) {
+		this.setState({ barDuration: value });
+	}
+
+	handleBarDurationChangeComplete(e) {
+		e.preventDefault();
+		// TODO Dispatch redux action to fetch new bar chart data if needed
 	}
 
 	/**
@@ -58,20 +74,6 @@ export default class UIOptionsComponent extends React.Component {
 							</select>
 						</div>
 					</div>
-					<p style={labelStyle}>Energy Type:</p>
-					<div className="radio">
-						<label><input type="radio" name="energyTypes" value="Electricity" defaultChecked />Electricity</label>
-					</div>
-					<div className="radio">
-						<label><input type="radio" name="energyTypes" value="Wind" />Wind</label>
-					</div>
-					<div className="radio">
-						<label><input type="radio" name="energyTypes" value="NaturalGas" />Natural Gas</label>
-					</div>
-					<div className="radio">
-						<label><input type="radio" name="energyTypes" value="Solar" />Solar</label>
-					</div>
-					<br />
 					<p style={labelStyle}>Graph Type:</p>
 					<div className="radio">
 						<label><input type="radio" name="graphTypes" value="Line" defaultChecked />Line</label>
@@ -82,16 +84,8 @@ export default class UIOptionsComponent extends React.Component {
 					<div className="radio">
 						<label><input type="radio" name="graphTypes" value="Map" />Map</label>
 					</div>
-					<br />
-					<p style={labelStyle}>Other options:</p>
-					<div className="checkbox">
-						<label><input type="checkbox" value="overlayweather" />Overlay Weather</label>
-					</div>
-					<div className="checkbox">
-						<label><input type="checkbox" value="scaling" />kWh scaling</label>
-					</div>
-					<br />
-					<button type="button" id="changeButton" className="btn btn-primary">Change!</button>
+					<p style={labelStyle}>Bar chart interval (days):</p>
+					<Slider min={1} max={365} value={this.state.barDuration} onChange={this.handleBarDurationChange} onChangeComplete={this.handleBarDurationChangeComplete} />
 				</div>
 			</div>
 		);

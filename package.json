@@ -9,8 +9,8 @@
     "lint": "./node_modules/.bin/eslint src/client/app/**/*.js src/client/app/**/*.jsx src/server/**/*.js src/server/**/*.jsx src/scripts/**/*.js",
     "test": "./node_modules/.bin/mocha \"src/server/test/**/*.js\"",
     "createdb": "node ./src/scripts/createDB.js",
-	"addMamacMeters": "node ./src/scripts/addMamacMeters.js",
-	"updateMamacMeters": "node ./src/scripts/updateMamacMeters.js"
+    "addMamacMeters": "node ./src/scripts/addMamacMeters.js",
+    "updateMamacMeters": "node ./src/scripts/updateMamacMeters.js"
   },
   "dependencies": {
     "axios": "^0.15.3",
@@ -42,6 +42,7 @@
     "react": "^15.4.2",
     "react-chartjs-2": "^2.0.5",
     "react-dom": "^15.4.2",
+    "react-rangeslider": "^2.0.1",
     "react-redux": "^5.0.2",
     "react-router": "^3.0.2",
     "redux": "^3.6.0",
@@ -57,6 +58,7 @@
     "babel-core": "^6.21.0",
     "chai": "^3.5.0",
     "chai-as-promised": "^6.0.0",
+    "css-loader": "^0.28.0",
     "eslint": "^3.10.2",
     "eslint-config-airbnb": "^13.0.0",
     "eslint-plugin-import": "^2.2.0",
@@ -65,6 +67,7 @@
     "mocha": "^3.2.0",
     "mock-require": "^2.0.1",
     "redux-devtools": "^3.3.2",
+    "style-loader": "^0.16.1",
     "webpack": "^1.14.0"
   }
 }

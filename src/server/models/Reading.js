@@ -163,7 +163,7 @@ class Reading {
 	 * @param conn the connection to use. Defaults to the default database connection.
 	 * @return {Promise<object<int, array<{reading_rate: number, start_timestamp: Date, end_timestamp: Date}>>>}
 	 */
-	static async getAggregateReadings(meterIDs, duration, fromTimestamp = null, toTimestamp = null, conn = db) {
+	static async getAggregateReadings(meterIDs, duration = '30 days', fromTimestamp = null, toTimestamp = null, conn = db) {
 		fromTimestamp = fromTimestamp && moment(fromTimestamp).toDate();
 		toTimestamp = toTimestamp && moment(toTimestamp).toDate();
 		const allCompressedReadings = await conn.func('aggregate_readings', [meterIDs, duration, fromTimestamp || '-infinity', toTimestamp || 'infinity']);
