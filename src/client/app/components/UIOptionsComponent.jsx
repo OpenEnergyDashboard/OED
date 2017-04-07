@@ -17,8 +17,10 @@ export default class UIOptionsComponent extends React.Component {
 		this.handleMeterSelect = this.handleMeterSelect.bind(this);
 		this.handleBarDurationChange = this.handleBarDurationChange.bind(this);
 		this.handleBarDurationChangeComplete = this.handleBarDurationChangeComplete.bind(this);
+		this.handleChangeChartType = this.handleChangeChartType.bind(this);
 		this.state = {
-			barDuration: 30 // barDuration in days
+			barDuration: 30, // barDuration in days
+			chartType: 'line'
 		};
 	}
 
@@ -60,6 +62,11 @@ export default class UIOptionsComponent extends React.Component {
 		this.props.changeDuration(moment.duration(this.state.barDuration, 'days').toISOString());
 	}
 
+	handleChangeChartType(e) {
+		this.setState({ chartType: e.target.value });
+		this.props.changeChartType(e.target.value);
+	}
+
 	/**
 	 * @returns JSX to create the UI options side-panel (includes dynamic rendering of meter information for selection)
 	 */
@@ -85,13 +92,10 @@ export default class UIOptionsComponent extends React.Component {
 					</div>
 					<p style={labelStyle}>Graph Type:</p>
 					<div className="radio">
-						<label><input type="radio" name="graphTypes" value="Line" defaultChecked />Line</label>
+						<label><input type="radio" name="chartTypes" value="line" onChange={this.handleChangeChartType} checked={this.state.chartType === 'line'} />Line</label>
 					</div>
 					<div className="radio">
-						<label><input type="radio" name="graphTypes" value="Bar" />Bar</label>
-					</div>
-					<div className="radio">
-						<label><input type="radio" name="graphTypes" value="Map" />Map</label>
+						<label><input type="radio" name="chartTypes" value="bar" onChange={this.handleChangeChartType} checked={this.state.chartType === 'bar'} />Bar</label>
 					</div>
 					<p style={labelStyle}>Bar chart interval (days):</p>
 					<Slider min={1} max={365} value={this.state.barDuration} onChange={this.handleBarDurationChange} onChangeComplete={this.handleBarDurationChangeComplete} />

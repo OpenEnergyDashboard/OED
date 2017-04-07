@@ -10,8 +10,16 @@ import TimeInterval from '../../../common/TimeInterval';
 
 export const UPDATE_SELECTED_METERS = 'UPDATE_SELECTED_METERS';
 export const UPDATE_BAR_DURATION = 'UPDATE_BAR_DURATION';
+export const CHANGE_CHART_TO_RENDER = 'CHANGE_CHART_TO_RENDER';
 export const SET_GRAPH_ZOOM = 'CHANGE_GRAPH_ZOOM';
 
+/**
+ * @param {string} chartType is either 'line' or 'bar'
+ * @returns {*} An action needed to change the chart type
+ */
+export function changeChartToRender(chartType) {
+	return { type: CHANGE_CHART_TO_RENDER, chartType };
+}
 
 export function updateSelectedMeters(meterIDs) {
 	return { type: UPDATE_SELECTED_METERS, meterIDs };

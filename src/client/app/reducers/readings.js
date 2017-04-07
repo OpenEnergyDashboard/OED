@@ -82,7 +82,8 @@ export default function readings(state = defaultState, action) {
 			for (const meterID of action.meterIDs) {
 				if (newState.bar.byMeterID[meterID] === undefined) {
 					newState.bar.byMeterID[meterID] = {};
-				} else if (newState.bar.byMeterID[meterID][timeInterval] === undefined) {
+				}
+				if (newState.bar.byMeterID[meterID][timeInterval] === undefined) {
 					newState.bar.byMeterID[meterID][timeInterval] = {};
 				} else if (newState.bar.byMeterID[meterID][timeInterval][barDuration] === undefined) {
 					newState.bar.byMeterID[meterID][timeInterval][barDuration] = { isFetching: true };

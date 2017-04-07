@@ -135,7 +135,6 @@ class Reading {
 	 */
 	static async getCompressedReadings(meterIDs, fromTimestamp = null, toTimestamp = null, numPoints = 500, conn = db) {
 		const allCompressedReadings = await conn.func('compressed_readings', [meterIDs, fromTimestamp || '-infinity', toTimestamp || 'infinity', numPoints]);
-
 		// Separate the result rows by meter_id and return a nested object.
 		const compressedReadingsByMeterID = {};
 		for (const row of allCompressedReadings) {
@@ -161,10 +160,7 @@ class Reading {
 	 * @return {Promise<object<int, array<{reading_rate: number, start_timestamp: Date, end_timestamp: Date}>>>}
 	 */
 	static async getAggregateReadings(meterIDs, duration, fromTimestamp = null, toTimestamp = null, conn = db) {
-		fromTimestamp = fromTimestamp && moment(fromTimestamp).toDate();
-		toTimestamp = toTimestamp && moment(toTimestamp).toDate();
 		const allCompressedReadings = await conn.func('aggregate_readings', [meterIDs, duration, fromTimestamp || '-infinity', toTimestamp || 'infinity']);
-
 		// Separate the result rows by meter_id and return a nested object.
 		const compressedReadingsByMeterID = {};
 		for (const row of allCompressedReadings) {

@@ -20,7 +20,8 @@ import * as graphActions from '../actions/graph';
 const defaultState = {
 	selectedMeters: [],
 	timeInterval: TimeInterval.unbounded(),
-	barDuration: moment.duration(1, 'month').toISOString()
+	barDuration: moment.duration(1, 'month').toISOString(),
+	chartToRender: 'line'
 };
 
 /**
@@ -44,6 +45,11 @@ export default function graph(state = defaultState, action) {
 			return {
 				...state,
 				timeInterval: action.timeInterval
+			};
+		case graphActions.CHANGE_CHART_TO_RENDER:
+			return {
+				...state,
+				chartToRender: action.chartType
 			};
 		default:
 			return state;

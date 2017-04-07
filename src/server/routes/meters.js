@@ -8,15 +8,6 @@ const Meter = require('../models/Meter');
 const router = express.Router();
 
 /**
- * Takes in an array of row objects and reformats the timestamp from ISO 8601 format to the number
- * of milliseconds since January 1st, 1970 and groups each reading with each timestamp.
- * @param {Array<Reading>} rows
- */
-function formatReadings(rows) {
-	return rows.map(row => [row.start_timestamp.valueOf(), row.reading_rate]);
-}
-
-/**
  * Defines the format in which we want to send meters and controls what information we send to the client.
  * @param meter
  * @returns {{id, name}}
