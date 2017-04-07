@@ -19,15 +19,15 @@ function mapStateToProps(state) {
 	const data = { datasets: [] };
 	for (const meterID of state.graph.selectedMeters) {
 		const readingsData = state.readings.byMeterID[meterID][timeInterval];
-		//console.log(readingsData);
 		if (readingsData !== undefined && !readingsData.isFetching) {
 			data.datasets.push({
 				label: state.meters.byMeterID[meterID].name,
-				id: state.meters.byMeterID[meterID],
+				id: state.meters.byMeterID[meterID].id,
+				timestamp: state.readings.byMeterID[meterID][timeInterval].start_timestamp,
 				exportVals: state.readings.byMeterID[meterID][timeInterval].readings.map(arr => ({ x: arr[0], y: arr[1] }))
 			});
 		}
-	} //console.log(data);
+	}
 	return {
 		meters: sortedMeters,
 		selectedMeters: state.graph.selectedMeters,

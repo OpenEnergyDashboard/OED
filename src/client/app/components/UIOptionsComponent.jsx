@@ -3,6 +3,7 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
 
 import React from 'react';
+import graphExport from '../actions/exportData';
 
 export default class UIOptionsComponent extends React.Component {
 	/**
@@ -23,8 +24,13 @@ export default class UIOptionsComponent extends React.Component {
 		this.props.fetchMetersDataIfNeeded();
 	}
 
+	/**
+	 * Called when Export button is clicked.
+	 * Passes an object containing the selected meter data to a function for export.
+	 */
 	exportReading() {
-		console.log(this.props.exportVals);
+		const compressedData = this.props.exportVals.datasets;
+		graphExport(compressedData);
 	}
 	handleMeterSelect(e) {
 		e.preventDefault();
