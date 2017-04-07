@@ -14,5 +14,6 @@ private
 # Environment Variables
 .env
 
-# CSV files
+# CSV files (except ones needed for database tests)
 *.csv
+!/src/server/test/**/*.csv
