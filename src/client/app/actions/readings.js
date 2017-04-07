@@ -45,7 +45,6 @@ function fetchManyReadings(meterIDs, timeInterval) {
 		}).then(response => dispatch(receiveManyReadings(meterIDs, timeInterval, response.data)));
 	};
 }
-
 /**
  * Fetches readings for the given meterIDs if they are not already fetched or being fetched
  * @param {Array.<int>} meterIDs

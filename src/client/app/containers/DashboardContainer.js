@@ -6,6 +6,6 @@ import { connect } from 'react-redux';
 import DashboardComponent from '../components/DashboardComponent';
 
 /**
- * Connects and passes down the Redux dispatch function to DashboardComponent
+ * Connects and passes down the Redux dispatch function to ExportComponent
  */
 export default connect()(DashboardComponent);
