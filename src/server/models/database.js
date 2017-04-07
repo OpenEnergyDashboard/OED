@@ -1,6 +1,12 @@
+/* This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this
+ * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
+
 const pgp = require('pg-promise')();
 const path = require('path');
 const config = require('../config');
+
+require('./patch-moment-type');
 
 /**
  * The connection to the database
@@ -43,13 +49,23 @@ async function createSchema() {
 	await Meter.createMeterTypesEnum();
 	await Meter.createTable();
 	await Reading.createTable();
+	await Reading.createCompressedReadingsFunction();
 	await User.createTable();
 	await db.none(sqlFile('reading/create_function_get_compressed_readings.sql'));
+}
+
+/**
+ * Closes the connection pool and stops pg-promise
+ * Only call this to avoid the 30 second script timeout before pg-promise closes connections.
+ */
+function stopDB() {
+	pgp.end();
 }
 
 module.exports = {
 	db,
 	sqlFile,
 	createSchema,
-	pgp
+	pgp,
+	stopDB
 };

@@ -1,3 +1,8 @@
+/* This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this
+ * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
+
+const moment = require('moment');
 const database = require('./database');
 
 const db = database.db;
@@ -8,16 +13,10 @@ class Reading {
 	 * Creates a new reading
 	 * @param meterID
 	 * @param reading
-	 * @param {Date} startTimestamp
-	 * @param {Date} endTimestamp
+	 * @param {moment.Moment} startTimestamp
+	 * @param {moment.Moment} endTimestamp
 	 */
 	constructor(meterID, reading, startTimestamp, endTimestamp) {
-		if (!(startTimestamp instanceof Date)) {
-			throw new Error(`startTimestamp must be a date, was ${startTimestamp}, type ${typeof startTimestamp}`);
-		}
-		if (!(endTimestamp instanceof Date)) {
-			throw new Error(`endTimestamp must be a date, was ${endTimestamp}, type ${typeof endTimestamp}`);
-		}
 		this.meterID = meterID;
 		this.reading = reading;
 		this.startTimestamp = startTimestamp;
@@ -32,6 +31,14 @@ class Reading {
 		return db.none(sqlFile('reading/create_readings_table.sql'));
 	}
 
+	/**
+	 * Returns a promise to create the compressed readings function.
+	 * @return {Promise.<>}
+	 */
+	static createCompressedReadingsFunction() {
+		return db.none(sqlFile('reading/create_function_get_compressed_readings.sql'));
+	}
+
 	static mapRow(row) {
 		return new Reading(row.meter_id, row.reading, row.start_timestamp, row.end_timestamp);
 	}
@@ -43,9 +50,10 @@ class Reading {
 	 * @returns {Promise.<>}
 	 */
 	static insertAll(readings, conn = db) {
-		return conn.tx(t => t.batch(
-			readings.map(r => t.none(sqlFile('reading/insert_new_reading.sql'), r))
-		));
+		return conn.tx(t => t.sequence(function seq(i) {
+			const seqT = this;
+			return readings[i] && readings[i].insert(conn = seqT);
+		}));
 	}
 
 	/**
@@ -55,9 +63,10 @@ class Reading {
 	 * @returns {Promise.<>}
 	 */
 	static insertOrUpdateAll(readings, conn = db) {
-		return conn.tx(t => t.batch(
-			readings.map(r => t.none(sqlFile('reading/insert_or_update_reading.sql'), r))
-		));
+		return conn.tx(t => t.sequence(function seq(i) {
+			const seqT = this;
+			return readings[i] && readings[i].insertOrUpdate(conn = seqT);
+		}));
 	}
 
 	/**
@@ -82,7 +91,11 @@ class Reading {
 	 * @returns {Promise.<array.<Reading>>}
 	 */
 	static async getReadingsByMeterIDAndDateRange(meterID, startDate, endDate, conn = db) {
-		const rows = await conn.any(sqlFile('reading/get_readings_by_meter_id_and_date_range.sql'), { meterID: meterID, startDate: startDate, endDate: endDate });
+		const rows = await conn.any(sqlFile('reading/get_readings_by_meter_id_and_date_range.sql'), {
+			meterID: meterID,
+			startDate: startDate,
+			endDate: endDate
+		});
 		return rows.map(Reading.mapRow);
 	}
 
@@ -91,8 +104,8 @@ class Reading {
 	 * @param conn the connection to use. Defaults to the default database connection.
 	 * @returns {Promise.<>}
 	 */
-	async insert(conn = db) {
-		await conn.none(sqlFile('reading/insert_new_reading.sql'), this);
+	insert(conn = db) {
+		return conn.none(sqlFile('reading/insert_new_reading.sql'), this);
 	}
 
 	/**
@@ -108,16 +121,31 @@ class Reading {
 	 * Gets a number of compressed readings that approximate the given time range for the given meter.
 	 *
 	 * Compressed readings are in kilowatts.
-	 * @param meterID the id of the meter whose points are being compressed
+	 * @param meterIDs an array of ids for meters whose points are being compressed
 	 * @param fromTimestamp An optional start point for the time range.
 	 * @param toTimestamp An optional end point for the time range
 	 * @param numPoints The number of points to compress to. Defaults to 500
 	 * @param conn the connection to use. Defaults to the default database connection.
-	 * @return {Promise<array<{reading_rate: number, start_timestamp: Date, end_timestamp: Date}>>}
+	 * @return {Promise<object<int, array<{reading_rate: number, start_timestamp: Date, end_timestamp: Date}>>>}
 	 */
-	static async getCompressedReadings(meterID, fromTimestamp = null, toTimestamp = null, numPoints = 500, conn = db) {
-		return await conn.func('compressed_readings', [meterID, fromTimestamp || '-infinity', toTimestamp || 'infinity', numPoints]);
+	static async getCompressedReadings(meterIDs, fromTimestamp = null, toTimestamp = null, numPoints = 500, conn = db) {
+		fromTimestamp = fromTimestamp && moment(fromTimestamp).toDate();
+		toTimestamp = toTimestamp && moment(toTimestamp).toDate();
+		const allCompressedReadings = await conn.func('compressed_readings', [meterIDs, fromTimestamp || '-infinity', toTimestamp || 'infinity', numPoints]);
+
+		// Separate the result rows by meter_id and return a nested object.
+		const compressedReadingsByMeterID = {};
+		for (const row of allCompressedReadings) {
+			if (compressedReadingsByMeterID[row.meter_id] === undefined) {
+				compressedReadingsByMeterID[row.meter_id] = [];
+			}
+			compressedReadingsByMeterID[row.meter_id].push(
+				{ reading_rate: row.reading_rate, start_timestamp: row.start_timestamp, end_timestamp: row.end_timestamp }
+			);
+		}
+		return compressedReadingsByMeterID;
 	}
+
 
 	toString() {
 		return `Reading [id: ${this.id}, reading: ${this.reading}, timestamp: ${this.timestamp}]`;

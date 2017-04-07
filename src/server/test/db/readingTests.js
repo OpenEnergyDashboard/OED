@@ -1,3 +1,6 @@
+/* This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this
+ * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
 
 const chai = require('chai');
 const chaiAsPromised = require('chai-as-promised');
@@ -33,4 +36,15 @@ mocha.describe('Readings', () => {
 		expect(readingPostInsert.endTimestamp.getTime()).to.equal(endTimestamp.toDate().getTime());
 		expect(readingPostInsert).to.have.property('reading', readingPreInsert.reading);
 	}));
+	mocha.it('can be saved in bulk', async () => {
+		const startTimestamp1 = moment('2017-01-01');
+		const endTimestamp1 = moment(startTimestamp1).add(1, 'hour');
+		const startTimestamp2 = moment(endTimestamp1).add(1, 'hour');
+		const endTimestamp2 = moment(startTimestamp2).add(1, 'hour');
+		const reading1 = new Reading(meter.id, 1, startTimestamp1, endTimestamp1);
+		const reading2 = new Reading(meter.id, 1, startTimestamp2, endTimestamp2);
+		await Reading.insertAll([reading1, reading2]);
+		const retrievedReadings = await Reading.getAllByMeterID(meter.id);
+		expect(retrievedReadings).to.have.length(2);
+	});
 });
