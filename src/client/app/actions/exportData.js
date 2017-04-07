@@ -1,3 +1,5 @@
+import moment from 'moment';
+
 /**
  * A function that converts the compressed meter data into a CSV formatted string.
  * @param items The compressed meter data.
@@ -5,18 +7,19 @@
  */
 
 function convertToCSV(items) {
-	let csvOutput = 'id:,readings:\n';
+	let csvOutput = 'id:,readings:,timestamp:\n';
 	items.forEach(set => {
 		const data = set.exportVals;
 		const id = set.id;
 		let isStart = true;
 		data.forEach(reading => {
 			const info = reading.y;
+			const timeStamp = moment(reading.x).format('dddd MMM DD YYYY hh:mm a');
 			if (isStart) {
-				csvOutput += `${id},${info} \n`;
+				csvOutput += `${id},${info} kwh, ${timeStamp} \n`;
 				isStart = false;
 			} else {
-				csvOutput += `${id},${info} \n`;
+				csvOutput += `${id},${info} kwh, ${timeStamp} \n`;
 			}
 		});
 	});
