@@ -27,6 +27,8 @@ Node.js - Javascript runtime environment ([nodejs.org](https://nodejs.org/en/))
 &nbsp;&nbsp;&nbsp;&nbsp;DB_PORT=? // The port for your postgres db, likely 5432<br>
 &nbsp;&nbsp;&nbsp;&nbsp;TOKEN_SECRET=? // Token for authentication. Generate something secure and random
 1. Run ```npm run createdb``` to create the database schema.
+1. Run `npm run addMamacMeters` to load mamac meters from an `.xlsx` file.
+1. Run `npm run updateMamacMeters` to fetch new data for mamac meters in the database.
 1. Run ```npm run build``` to create the Webpack bundle for production, otherwise run ```npm run dev``` for development.
 1. Run ```npm start```
 
@@ -43,9 +45,10 @@ This project is licensed under the MPL version 2.0.
 See the full licensing agreement [here](https://github.com/beloitcollegecomputerscience/ED-JS/blob/master/License.txt)
 
 ### Contributions ###
-We welcome others to contribute to this project by writing code for submission or collaborating with us. Please feel free to contact us if you are interested.
 
+We welcome others to contribute to this project by writing code for submission or collaborating with us. Before contributing, please sign our Contributor License Agreement [here](https://goo.gl/forms/nR9MtVHUOqYn8WbP2).
+If you have any questions or concerns feel free to email us at oed@beloit.edu.
 ### Contact: ###
 
-Send us an email, open a GitHub issue, or make a pull request.
+To contact us, send an email to oed@beloit.edu or open an issue on GitHub.
 
