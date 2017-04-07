@@ -4,6 +4,7 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/.
  */
 
+import moment from 'moment';
 import TimeInterval from '../../../common/TimeInterval';
 import * as graphActions from '../actions/graph';
 
@@ -18,7 +19,8 @@ import * as graphActions from '../actions/graph';
  */
 const defaultState = {
 	selectedMeters: [],
-	timeInterval: TimeInterval.unbounded()
+	timeInterval: TimeInterval.unbounded(),
+	barDuration: moment.duration(1, 'month').toISOString()
 };
 
 /**
@@ -32,6 +34,11 @@ export default function graph(state = defaultState, action) {
 			return {
 				...state,
 				selectedMeters: action.meterIDs
+			};
+		case graphActions.UPDATE_BAR_DURATION:
+			return {
+				...state,
+				barDuration: action.barDuration
 			};
 		case graphActions.SET_GRAPH_ZOOM:
 			return {

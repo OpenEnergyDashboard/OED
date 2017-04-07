@@ -4,11 +4,12 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/.
  */
 
-import { fetchNeededReadings } from './readings';
+import { fetchAllNeededReadings, fetchBarNeededReadings } from './readings';
 import TimeInterval from '../../../common/TimeInterval';
 
 
 export const UPDATE_SELECTED_METERS = 'UPDATE_SELECTED_METERS';
+export const UPDATE_BAR_DURATION = 'UPDATE_BAR_DURATION';
 export const SET_GRAPH_ZOOM = 'CHANGE_GRAPH_ZOOM';
 
 
@@ -16,18 +17,30 @@ export function updateSelectedMeters(meterIDs) {
 	return { type: UPDATE_SELECTED_METERS, meterIDs };
 }
 
+export function updateBarDuration(barDuration) {
+	return { type: UPDATE_BAR_DURATION, barDuration };
+}
+
+export function changeBarDuration(barDuration) {
+	return (dispatch, state) => {
+		dispatch(updateBarDuration(barDuration));
+		dispatch(fetchBarNeededReadings(state().graph.timeInterval));
+		return Promise.resolve();
+	};
+}
+
 export function changeSelectedMeters(meterIDs) {
 	return (dispatch, state) => {
 		dispatch(updateSelectedMeters(meterIDs));
-		dispatch(fetchNeededReadings(meterIDs, state().graph.timeInterval));
+		dispatch(fetchAllNeededReadings(meterIDs, state().graph.timeInterval));
 		return Promise.resolve();
 	};
 }
 
 function fetchNeededReadingsForGraph(meterIDs, timeInterval) {
 	return dispatch => {
-		dispatch(fetchNeededReadings(meterIDs, timeInterval));
-		dispatch(fetchNeededReadings(meterIDs, TimeInterval.unbounded()));
+		dispatch(fetchAllNeededReadings(meterIDs, timeInterval));
+		dispatch(fetchAllNeededReadings(meterIDs, TimeInterval.unbounded()));
 	};
 }
 

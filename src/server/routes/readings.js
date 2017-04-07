@@ -4,6 +4,7 @@
 
 const express = require('express');
 const _ = require('lodash');
+const moment = require('moment');
 const Reading = require('../models/Reading');
 const TimeInterval = require('../../common/TimeInterval');
 
@@ -47,8 +48,9 @@ router.get('/bar/:meter_ids', async (req, res) => {
 	// We can't do .map(parseInt) here because map would give parseInt a radix value of the current array position.
 	const meterIDs = req.params.meter_ids.split(',').map(s => parseInt(s));
 	const timeInterval = TimeInterval.fromString(req.query.timeInterval);
+	const barDuration = moment.duration(req.query.barDuration);
 	try {
-		const aggregateReadings = await Reading.getAggregateReadings(meterIDs, req.query.duration, timeInterval.startTimestamp, timeInterval.endTimestamp);
+		const aggregateReadings = await Reading.getAggregateReadings(meterIDs, barDuration, timeInterval.startTimestamp, timeInterval.endTimestamp);
 		res.json(aggregateReadings);
 	} catch (err) {
 		console.error(`Error while performing GET readings for bar with meters ${meterIDs} with time interval ${timeInterval}: ${err}`);

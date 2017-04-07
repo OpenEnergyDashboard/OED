@@ -70,6 +70,7 @@ export default function readings(state = defaultState, action) {
 		}
 		case readingsActions.REQUEST_BAR_READINGS: {
 			const timeInterval = action.timeInterval;
+			const barDuration = action.barDuration;
 			const newState = {
 				...state,
 				bar: {
@@ -82,15 +83,18 @@ export default function readings(state = defaultState, action) {
 				if (newState.bar.byMeterID[meterID] === undefined) {
 					newState.bar.byMeterID[meterID] = {};
 				} else if (newState.bar.byMeterID[meterID][timeInterval] === undefined) {
-					newState.bar.byMeterID[meterID][timeInterval] = { isFetching: true };
+					newState.bar.byMeterID[meterID][timeInterval] = {};
+				} else if (newState.bar.byMeterID[meterID][timeInterval][barDuration] === undefined) {
+					newState.bar.byMeterID[meterID][timeInterval][barDuration] = { isFetching: true };
 				} else {
-					newState.bar.byMeterID[meterID][timeInterval] = { ...newState.bar.byMeterID[meterID][timeInterval], isFetching: true };
+					newState.bar.byMeterID[meterID][timeInterval][barDuration] = { ...newState.bar.byMeterID[meterID][timeInterval][barDuration], isFetching: true };
 				}
 			}
 			return newState;
 		}
 		case readingsActions.RECEIVE_BAR_READINGS: {
 			const timeInterval = action.timeInterval;
+			const barDuration = action.barDuration;
 			const newState = {
 				...state,
 				bar: {
@@ -101,7 +105,7 @@ export default function readings(state = defaultState, action) {
 			};
 			for (const meterID of action.meterIDs) {
 				const readingsForMeter = action.readings[meterID];
-				newState.bar.byMeterID[meterID][timeInterval] = { isFetching: false, readings: readingsForMeter };
+				newState.bar.byMeterID[meterID][timeInterval][barDuration] = { isFetching: false, readings: readingsForMeter };
 			}
 			return newState;
 		}

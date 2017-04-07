@@ -4,6 +4,7 @@
 
 import React from 'react';
 import Slider from 'react-rangeslider';
+import moment from 'moment';
 import 'react-rangeslider/lib/index.css';
 
 export default class UIOptionsComponent extends React.Component {
@@ -17,7 +18,7 @@ export default class UIOptionsComponent extends React.Component {
 		this.handleBarDurationChange = this.handleBarDurationChange.bind(this);
 		this.handleBarDurationChangeComplete = this.handleBarDurationChangeComplete.bind(this);
 		this.state = {
-			barDuration: 30
+			barDuration: 30 // barDuration in days
 		};
 	}
 
@@ -42,13 +43,21 @@ export default class UIOptionsComponent extends React.Component {
 		this.props.selectMeters(selectedMeters);
 	}
 
+	/**
+	 * Called when a user drags the bar duration slider
+	 * Stores the temporary value in the component's state
+	 */
 	handleBarDurationChange(value) {
 		this.setState({ barDuration: value });
 	}
 
+	/**
+	 * Called when a user stops dragging the bar duration slider
+	 * Dispatches a Redux action to update the bar duration in the Redux state
+	 */
 	handleBarDurationChangeComplete(e) {
 		e.preventDefault();
-		// TODO Dispatch redux action to fetch new bar chart data if needed
+		this.props.changeDuration(moment.duration(this.state.barDuration, 'days').toISOString());
 	}
 
 	/**

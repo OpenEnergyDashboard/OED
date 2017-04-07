@@ -33,8 +33,9 @@ function shouldFetchLineReadings(state, meterID, timeInterval) {
  * @param {State} state
  * @param {number} meterID
  * @param {TimeInterval} timeInterval
+ * @param {ISO duration string} barDuration
  */
-function shouldFetchBarReadings(state, meterID, timeInterval) {
+function shouldFetchBarReadings(state, meterID, timeInterval, barDuration) {
 	const readingsForMeterID = state.readings.bar.byMeterID[meterID];
 	if (readingsForMeterID === undefined) {
 		return true;
@@ -42,8 +43,11 @@ function shouldFetchBarReadings(state, meterID, timeInterval) {
 	if (readingsForMeterID[timeInterval] === undefined) {
 		return true;
 	}
-	const readingsForTimeInterval = state.readings.bar.byMeterID[meterID][timeInterval];
-	return readingsForTimeInterval === undefined && !readingsForTimeInterval.isFetching;
+	if (readingsForMeterID[timeInterval][barDuration] === undefined) {
+		return true;
+	}
+	const readingsForTimeIntervalAndDuration = state.readings.bar.byMeterID[meterID][timeInterval][barDuration];
+	return readingsForTimeIntervalAndDuration === undefined && !readingsForTimeIntervalAndDuration.isFetching;
 }
 
 function requestLineReadings(meterIDs, timeInterval) {
@@ -54,12 +58,12 @@ function receiveLineReadings(meterIDs, timeInterval, readings) {
 	return { type: RECEIVE_LINE_READINGS, meterIDs, timeInterval, readings };
 }
 
-function requestBarReadings(meterIDs, timeInterval) {
-	return { type: REQUEST_BAR_READINGS, meterIDs, timeInterval };
+function requestBarReadings(meterIDs, timeInterval, barDuration) {
+	return { type: REQUEST_BAR_READINGS, meterIDs, timeInterval, barDuration };
 }
 
-function receiveBarReadings(meterIDs, timeInterval, readings) {
-	return { type: RECEIVE_BAR_READINGS, meterIDs, timeInterval, readings };
+function receiveBarReadings(meterIDs, timeInterval, barDuration, readings) {
+	return { type: RECEIVE_BAR_READINGS, meterIDs, timeInterval, barDuration, readings };
 }
 
 function fetchLineReadings(meterIDs, timeInterval) {
@@ -74,26 +78,27 @@ function fetchLineReadings(meterIDs, timeInterval) {
 }
 
 function fetchBarReadings(meterIDs, timeInterval) {
-	return dispatch => {
-		dispatch(requestBarReadings(meterIDs, timeInterval));
+	return (dispatch, getState) => {
+		const barDuration = getState().graph.barDuration;
+		dispatch(requestBarReadings(meterIDs, timeInterval, barDuration));
 		const stringifiedMeterIDs = meterIDs.join(',');
 		return axios.get(`/api/readings/bar/${stringifiedMeterIDs}`, {
-			params: { timeInterval: timeInterval.toString() }
-		}).then(response => dispatch(receiveBarReadings(meterIDs, timeInterval, response.data)));
+			params: { timeInterval: timeInterval.toString(), barDuration }
+		}).then(response => dispatch(receiveBarReadings(meterIDs, timeInterval, barDuration, response.data)));
 	};
 }
 
 /**
- * Fetches readings for the given meterIDs if they are not already fetched or being fetched
+ * Fetches readings for all charts for the given meterIDs if they are not already fetched or being fetched
  * @param {Array.<int>} meterIDs
- * @param {TimeInterval} timeInterval The time interval to fetch readings for
+ * @param {TimeInterval} timeInterval The time interval to fetch readings for on the line chart
  * @return {*} An action to fetch the needed readings
  */
-export function fetchNeededReadings(meterIDs, timeInterval) {
+export function fetchAllNeededReadings(meterIDs, timeInterval) {
 	return (dispatch, getState) => {
 		const state = getState();
 		const meterIDsToFetchForLine = meterIDs.filter(id => shouldFetchLineReadings(state, id, timeInterval));
-		const meterIDsToFetchForBar = meterIDs.filter(id => shouldFetchBarReadings(state, id, timeInterval));
+		const meterIDsToFetchForBar = meterIDs.filter(id => shouldFetchBarReadings(state, id, timeInterval, state.graph.barDuration));
 
 		if (meterIDsToFetchForLine.length > 0 && meterIDsToFetchForBar.length > 0) {
 			return Promise.all([
@@ -103,6 +108,22 @@ export function fetchNeededReadings(meterIDs, timeInterval) {
 		} else if (meterIDsToFetchForLine.length > 0 && meterIDsToFetchForBar.length === 0) {
 			return dispatch(fetchLineReadings(meterIDsToFetchForLine, timeInterval));
 		} else if (meterIDsToFetchForBar.length === 0 && meterIDsToFetchForBar.length > 0) {
+			return dispatch(fetchBarReadings(meterIDsToFetchForBar, timeInterval));
+		}
+		return Promise.resolve();
+	};
+}
+
+/**
+ * Fetches readings for the bar chart of all selected meterIDs if they are not already fetched or being fetched
+ * @param {TimeInterval} timeInterval The time interval to fetch readings for on the bar chart
+ * @return {*} An action to fetch the needed readings
+ */
+export function fetchBarNeededReadings(timeInterval) {
+	return (dispatch, getState) => {
+		const state = getState();
+		const meterIDsToFetchForBar = state.graph.selectedMeters.filter(id => shouldFetchBarReadings(state, id, timeInterval, state.graph.barDuration));
+		if (meterIDsToFetchForBar.length > 0) {
 			return dispatch(fetchBarReadings(meterIDsToFetchForBar, timeInterval));
 		}
 		return Promise.resolve();

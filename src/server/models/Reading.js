@@ -157,13 +157,13 @@ class Reading {
 	 *
 	 * Compressed readings are in kilowatts.
 	 * @param meterIDs an array of ids for meters whose points are being compressed
-	 * @param duration A moment time interval over which to sum the readings
+	 * @param duration A moment time duration over which to sum the readings
 	 * @param fromTimestamp An optional start point for the beginning of the entire time range.
 	 * @param toTimestamp An optional end point for the end of the entire time range.
 	 * @param conn the connection to use. Defaults to the default database connection.
 	 * @return {Promise<object<int, array<{reading_rate: number, start_timestamp: Date, end_timestamp: Date}>>>}
 	 */
-	static async getAggregateReadings(meterIDs, duration = '30 days', fromTimestamp = null, toTimestamp = null, conn = db) {
+	static async getAggregateReadings(meterIDs, duration, fromTimestamp = null, toTimestamp = null, conn = db) {
 		fromTimestamp = fromTimestamp && moment(fromTimestamp).toDate();
 		toTimestamp = toTimestamp && moment(toTimestamp).toDate();
 		const allCompressedReadings = await conn.func('aggregate_readings', [meterIDs, duration, fromTimestamp || '-infinity', toTimestamp || 'infinity']);
