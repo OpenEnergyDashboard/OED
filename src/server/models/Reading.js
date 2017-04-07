@@ -2,7 +2,6 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
 
-const moment = require('moment');
 const database = require('./database');
 
 const db = database.db;
@@ -13,8 +12,8 @@ class Reading {
 	 * Creates a new reading
 	 * @param meterID
 	 * @param reading
-	 * @param {Date} startTimestamp
-	 * @param {Date} endTimestamp
+	 * @param {Moment} startTimestamp
+	 * @param {Moment} endTimestamp
 	 */
 	constructor(meterID, reading, startTimestamp, endTimestamp) {
 		this.meterID = meterID;
@@ -128,15 +127,13 @@ class Reading {
 	 *
 	 * Compressed readings are in kilowatts.
 	 * @param meterIDs an array of ids for meters whose points are being compressed
-	 * @param fromTimestamp An optional start point for the time range.
-	 * @param toTimestamp An optional end point for the time range.
+	 * @param {Moment?} fromTimestamp An optional start point for the time range.
+	 * @param {Moment?} toTimestamp An optional end point for the time range
 	 * @param numPoints The number of points to compress to. Defaults to 500
 	 * @param conn the connection to use. Defaults to the default database connection.
 	 * @return {Promise<object<int, array<{reading_rate: number, start_timestamp: Date, end_timestamp: Date}>>>}
 	 */
 	static async getCompressedReadings(meterIDs, fromTimestamp = null, toTimestamp = null, numPoints = 500, conn = db) {
-		fromTimestamp = fromTimestamp && moment(fromTimestamp).toDate();
-		toTimestamp = toTimestamp && moment(toTimestamp).toDate();
 		const allCompressedReadings = await conn.func('compressed_readings', [meterIDs, fromTimestamp || '-infinity', toTimestamp || 'infinity', numPoints]);
 
 		// Separate the result rows by meter_id and return a nested object.

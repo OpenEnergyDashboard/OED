@@ -27,13 +27,13 @@ mocha.describe('Readings', () => {
 	mocha.it('can be saved and retrieved', () => db.task(function* runTest(t) {
 		const startTimestamp = moment('2017-01-01');
 		const endTimestamp = moment('2017-01-01').add(1, 'hour');
-		const readingPreInsert = new Reading(meter.id, 10, startTimestamp.toDate(), endTimestamp.toDate());
+		const readingPreInsert = new Reading(meter.id, 10, startTimestamp, endTimestamp);
 		yield readingPreInsert.insert(t);
 		const retrievedReadings = yield Reading.getAllByMeterID(meter.id, t);
 		expect(retrievedReadings).to.have.lengthOf(1);
 		const readingPostInsert = retrievedReadings[0];
-		expect(readingPostInsert.startTimestamp.getTime()).to.equal(startTimestamp.toDate().getTime());
-		expect(readingPostInsert.endTimestamp.getTime()).to.equal(endTimestamp.toDate().getTime());
+		expect(readingPostInsert.startTimestamp.isSame(startTimestamp)).to.equal(true);
+		expect(readingPostInsert.endTimestamp.isSame(endTimestamp)).to.equal(true);
 		expect(readingPostInsert).to.have.property('reading', readingPreInsert.reading);
 	}));
 });

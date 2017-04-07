@@ -38,6 +38,7 @@
     "moment": "^2.15.2",
     "morgan": "~1.7.0",
     "nodemailer": "~2.6.4",
+    "pg": "^5.1.0",
     "pg-promise": "^5.3.5",
     "react": "^15.4.2",
     "react-chartjs-2": "^2.0.5",
