@@ -44,7 +44,7 @@ function mapStateToProps(state) {
 		}
 	}
     // Converts the label set into an array for Chart.js and sorts the labels based on the first date of the time interval
-	data.labels = Array.from(labelsSet).sort((x, y) => moment(x.split('-')[0]).format('x') - moment(y.split('-')[0]).format('x'));
+	data.labels = Array.from(labelsSet).sort((x, y) => moment(x.split(' - ')[0], 'MMM DD, YYYY, hh:mm a').format('x') - moment(y.split(' - ')[0], 'MMM DD, YYYY, hh:mm a').format('x'));
 
 	const options = {
 		animation: {
@@ -63,7 +63,7 @@ function mapStateToProps(state) {
 				}
 			}],
 			yAxes: [{
-				stacked: false,
+				stacked: state.graph.barStacking,
 				scaleLabel: {
 					display: true,
 					labelString: 'kWh'
