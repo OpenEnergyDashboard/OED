@@ -4,8 +4,13 @@
 
 const path = require('path');
 
-// Load .env configuration
-require('dotenv').config({ path: path.join(__dirname, '..', '..', '.env') });
+// Try to load the .env file
+try {
+	require('dotenv').config({ path: path.join(__dirname, '..', '..', '.env') }); // eslint-disable-line global-require
+} catch (err) {
+	console.log("Couldn't load a .env file");
+}
+
 
 const config = {};
 
