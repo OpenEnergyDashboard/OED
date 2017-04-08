@@ -13,9 +13,9 @@ const pgp = require('pg-promise')({
 });
 const path = require('path');
 const config = require('../config');
+const patchMomentType = require('./patch-moment-type');
 
-require('./patch-moment-type');
-
+patchMomentType(pgp);
 /**
  * The connection to the database
  * @type {pgPromise.IDatabase}
