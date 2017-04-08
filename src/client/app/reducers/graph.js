@@ -21,7 +21,8 @@ const defaultState = {
 	selectedMeters: [],
 	timeInterval: TimeInterval.unbounded(),
 	barDuration: moment.duration(1, 'month').toISOString(),
-	chartToRender: 'line'
+	chartToRender: 'line',
+	barStacking: false
 };
 
 /**
@@ -50,6 +51,11 @@ export default function graph(state = defaultState, action) {
 			return {
 				...state,
 				chartToRender: action.chartType
+			};
+		case graphActions.CHANGE_BAR_STACKING:
+			return {
+				...state,
+				barStacking: !state.barStacking
 			};
 		default:
 			return state;

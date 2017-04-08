@@ -11,6 +11,7 @@ import TimeInterval from '../../../common/TimeInterval';
 export const UPDATE_SELECTED_METERS = 'UPDATE_SELECTED_METERS';
 export const UPDATE_BAR_DURATION = 'UPDATE_BAR_DURATION';
 export const CHANGE_CHART_TO_RENDER = 'CHANGE_CHART_TO_RENDER';
+export const CHANGE_BAR_STACKING = 'CHANGE_BAR_STACKING';
 export const SET_GRAPH_ZOOM = 'CHANGE_GRAPH_ZOOM';
 
 /**
@@ -19,6 +20,10 @@ export const SET_GRAPH_ZOOM = 'CHANGE_GRAPH_ZOOM';
  */
 export function changeChartToRender(chartType) {
 	return { type: CHANGE_CHART_TO_RENDER, chartType };
+}
+
+export function changeBarStacking() {
+	return { type: CHANGE_BAR_STACKING };
 }
 
 export function updateSelectedMeters(meterIDs) {
