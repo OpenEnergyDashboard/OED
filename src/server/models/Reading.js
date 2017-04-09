@@ -49,9 +49,10 @@ class Reading {
 	 * @returns {Promise.<>}
 	 */
 	static insertAll(readings, conn = db) {
-		return conn.tx(t => t.batch(
-			readings.map(r => t.none(sqlFile('reading/insert_new_reading.sql'), r))
-		));
+		return conn.tx(t => t.sequence(function seq(i) {
+			const seqT = this;
+			return readings[i] && readings[i].insert(conn = seqT);
+		}));
 	}
 
 	/**
@@ -61,9 +62,10 @@ class Reading {
 	 * @returns {Promise.<>}
 	 */
 	static insertOrUpdateAll(readings, conn = db) {
-		return conn.tx(t => t.batch(
-			readings.map(r => t.none(sqlFile('reading/insert_or_update_reading.sql'), r))
-		));
+		return conn.tx(t => t.sequence(function seq(i) {
+			const seqT = this;
+			return readings[i] && readings[i].insertOrUpdate(conn = seqT);
+		}));
 	}
 
 	/**
@@ -101,8 +103,8 @@ class Reading {
 	 * @param conn the connection to use. Defaults to the default database connection.
 	 * @returns {Promise.<>}
 	 */
-	async insert(conn = db) {
-		await conn.none(sqlFile('reading/insert_new_reading.sql'), this);
+	insert(conn = db) {
+		return conn.none(sqlFile('reading/insert_new_reading.sql'), this);
 	}
 
 	/**
