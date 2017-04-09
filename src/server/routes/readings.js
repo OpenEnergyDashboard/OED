@@ -15,8 +15,12 @@ const router = express.Router();
  * of milliseconds since January 1st, 1970 and groups each reading with each timestamp.
  * @param {Array<Reading>} rows
  */
-function formatReadings(rows) {
+function formatLineReadings(rows) {
 	return rows.map(row => [row.start_timestamp.valueOf(), row.reading_rate]);
+}
+
+function formatBarReadings(rows) {
+	return rows.map(row => [row.start_timestamp.valueOf(), row.reading_sum]);
 }
 
 /**
@@ -31,7 +35,7 @@ router.get('/line/:meter_ids', async (req, res) => {
 	const timeInterval = TimeInterval.fromString(req.query.timeInterval);
 	try {
 		const rawCompressedReadings = await Reading.getCompressedReadings(meterIDs, timeInterval.startTimestamp, timeInterval.endTimestamp, 100);
-		const formattedCompressedReadings = _.mapValues(rawCompressedReadings, formatReadings);
+		const formattedCompressedReadings = _.mapValues(rawCompressedReadings, formatLineReadings);
 		res.json(formattedCompressedReadings);
 	} catch (err) {
 		console.error(`Error while performing GET readings for line with meters ${meterIDs} with time interval ${timeInterval}: ${err}`);
@@ -51,7 +55,7 @@ router.get('/bar/:meter_ids', async (req, res) => {
 	const barDuration = moment.duration(req.query.barDuration);
 	try {
 		const aggregateReadings = await Reading.getAggregateReadings(meterIDs, barDuration, timeInterval.startTimestamp, timeInterval.endTimestamp);
-		const formattedAggregateReadings = _.mapValues(aggregateReadings, formatReadings);
+		const formattedAggregateReadings = _.mapValues(aggregateReadings, formatBarReadings);
 		res.json(formattedAggregateReadings);
 	} catch (err) {
 		console.error(`Error while performing GET readings for bar with meters ${meterIDs} with time interval ${timeInterval}: ${err}`);

@@ -26,40 +26,38 @@ mocha.describe('Aggregate Readings', () => {
 	const timestamp4 = timestamp3.clone().add(1, 'hour');
 	const timestamp5 = timestamp4.clone().add(1, 'hour');
 
-	mocha.beforeEach(() => db.task(function* setupBeforeEach(t) {
-		yield new Meter(undefined, 'Meter', null, false, Meter.type.MAMAC).insert(t);
-		meter = yield Meter.getByName('Meter', t);
+	mocha.beforeEach(() => db.task(async t => {
+		await new Meter(undefined, 'Meter', null, false, Meter.type.MAMAC).insert(t);
+		meter = await Meter.getByName('Meter', t);
 	}));
 
-	mocha.it('aggregate readings with no specified time interval', () => db.task(function* runTest(t) {
+	mocha.it('aggregate readings with no specified time interval', () => db.task(async t => {
 		const reading1 = new Reading(meter.id, 100, timestamp1, timestamp2);
 		const reading2 = new Reading(meter.id, 200, timestamp2, timestamp3);
 		const reading3 = new Reading(meter.id, 300, timestamp3, timestamp4);
 		const reading4 = new Reading(meter.id, 400, timestamp4, timestamp5);
-		yield Reading.insertAll([reading1, reading2, reading3, reading4], t);
+		await Reading.insertAll([reading1, reading2, reading3, reading4], t);
 
-		const aggregateReadings = yield Reading.getAggregateReadings([meter.id], moment.duration(2, 'h'));
+		const aggregateReadings = await Reading.getAggregateReadings([meter.id], moment.duration(2, 'h'));
 		expect(aggregateReadings[meter.id]).to.have.lengthOf(2);
 		const expectedFirstCompressedRate = reading1.reading + reading2.reading;
-		expect(aggregateReadings[meter.id][0].reading_rate).to.equal(expectedFirstCompressedRate);
+		expect(aggregateReadings[meter.id][0].reading_sum).to.equal(expectedFirstCompressedRate);
 		const expectedSecondCompressedRate = reading3.reading + reading4.reading;
-		expect(aggregateReadings[meter.id][1].reading_rate).to.equal(expectedSecondCompressedRate);
+		expect(aggregateReadings[meter.id][1].reading_sum).to.equal(expectedSecondCompressedRate);
 	}));
 
-	mocha.it('aggregate readings with time interval', () => db.task(function* runTest(t) {
-		const reading1 = new Reading(meter.id, 100, timestamp1, timestamp2);
-		const reading2 = new Reading(meter.id, 200, timestamp2, timestamp3);
-		const reading3 = new Reading(meter.id, 300, timestamp3, timestamp4);
+	mocha.it('aggregate readings with time interval', () => db.task(async t => {
+		const reading1 = new Reading(meter.id, 10, timestamp1, timestamp2);
+		const reading2 = new Reading(meter.id, 100, timestamp2, timestamp3);
+		const reading3 = new Reading(meter.id, 1000, timestamp3, timestamp4);
 		const reading4 = new Reading(meter.id, 400, timestamp4, timestamp5);
-		yield Reading.insertAll([reading1, reading2, reading3, reading4], t);
+		await Reading.insertAll([reading1, reading2, reading3, reading4], t);
 
 		const startTimestamp = timestamp1.clone().add(30, 'minutes');
-		const endTimestamp = timestamp3;
-		const aggregateReadings = yield Reading.getAggregateReadings([meter.id], moment.duration(2, 'h'), startTimestamp, endTimestamp);
+		const endTimestamp = startTimestamp.clone().add(2, 'hours');
+		const aggregateReadings = await Reading.getAggregateReadings([meter.id], moment.duration(2, 'h'), startTimestamp, endTimestamp);
 		expect(aggregateReadings[meter.id]).to.have.lengthOf(1);
-		const expectedFirstCompressedRate = reading2.reading + reading3.reading;
-		expect(aggregateReadings[meter.id][0].reading_rate).to.equal(expectedFirstCompressedRate);
-		const expectedSecondCompressedRate = reading4.reading;
-		expect(aggregateReadings[meter.id][1].reading_rate).to.equal(expectedSecondCompressedRate);
+		const expectedFirstCompressedRate = (reading1.reading / 2) + reading2.reading + (reading3.reading / 2);
+		expect(aggregateReadings[meter.id][0].reading_sum).to.equal(expectedFirstCompressedRate);
 	}));
 });

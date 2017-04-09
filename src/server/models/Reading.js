@@ -157,7 +157,7 @@ class Reading {
 	 * @param fromTimestamp An optional start point for the beginning of the entire time range.
 	 * @param toTimestamp An optional end point for the end of the entire time range.
 	 * @param conn the connection to use. Defaults to the default database connection.
-	 * @return {Promise<object<int, array<{reading_rate: number, start_timestamp: Date, end_timestamp: Date}>>>}
+	 * @return {Promise<object<int, array<{reading_sum: number, start_timestamp: Date, end_timestamp: Date}>>>}
 	 */
 	static async getAggregateReadings(meterIDs, duration, fromTimestamp = null, toTimestamp = null, conn = db) {
 		const allCompressedReadings = await conn.func('aggregate_readings', [meterIDs, duration, fromTimestamp || '-infinity', toTimestamp || 'infinity']);
@@ -168,7 +168,7 @@ class Reading {
 				compressedReadingsByMeterID[row.meter_id] = [];
 			}
 			compressedReadingsByMeterID[row.meter_id].push(
-				{ reading_rate: row.reading_rate, start_timestamp: row.start_timestamp, end_timestamp: row.end_timestamp }
+				{ reading_sum: row.reading_sum, start_timestamp: row.start_timestamp, end_timestamp: row.end_timestamp }
 			);
 		}
 		return compressedReadingsByMeterID;
