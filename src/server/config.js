@@ -3,10 +3,14 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
 
 const path = require('path');
-
+const fs = require('fs');
+const dotenv = require('dotenv');
 // Try to load the .env file
+
+const envPath = path.join(__dirname, '..', '..', '.env');
 try {
-	require('dotenv').config({ path: path.join(__dirname, '..', '..', '.env') }); // eslint-disable-line global-require
+	fs.accessSync(envPath);
+	dotenv.config({ path: envPath });
 } catch (err) {
 	console.log("Couldn't load a .env file");
 }
