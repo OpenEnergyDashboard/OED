@@ -33,6 +33,7 @@ export default function groups(state = defaultState, action) {
 			// add new fields to each group object:
 			// isFetching flag for each group
 			// arrays to store the IDs of child groups and Meters. We get all other data from other parts of state.
+			// TODO: action.data isn't an array, looks like a lot of stuff at least for me -PT
 			const newGroups = action.data.map(group => ({
 				...group,
 				isFetching: false,

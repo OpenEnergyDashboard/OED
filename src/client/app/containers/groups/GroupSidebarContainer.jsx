@@ -8,7 +8,7 @@ import _ from 'lodash';
 import { connect } from 'react-redux';
 import { fetchMetersDetailsIfNeeded } from '../../actions/meters';
 import { fetchGroupsDetailsIfNeeded } from '../../actions/groups';
-import GroupMainComponent from '../../components/groups/GroupMainComponent';
+import GroupSidebarComponent from '../../components/groups/GroupSidebarComponent';
 
 
 function mapStateToProps(state) {
@@ -28,4 +28,4 @@ function mapDispatchToProps(dispatch) {
 	};
 }
 
-export default connect(mapStateToProps, mapDispatchToProps)(GroupMainComponent);
+export default connect(mapStateToProps, mapDispatchToProps)(GroupSidebarComponent);
