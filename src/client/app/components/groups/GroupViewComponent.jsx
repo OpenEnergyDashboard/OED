@@ -21,9 +21,6 @@ export default class GroupViewComponent extends React.Component {
 		this.props.fetchGroupChildren(this.props.id);
 	}
 
-	componentWillReceiveProps() {
-		this.render();
-	}
 
 	// todo: Have edit button render something to edit the group
 	// todo: Look into switching to a table cell display to handle many groups showing
@@ -78,7 +75,7 @@ export default class GroupViewComponent extends React.Component {
 					</div>
 				</div>
 
-					<Link style={this.buttonStyle} to="/editGroup">
+				<Link style={this.buttonStyle} to="/editGroup">
 					<button className="btn btn-default">Edit Group</button>
 				</Link>
 			</div>

@@ -19,8 +19,8 @@ import { fetchGroupChildrenIfNeeded } from '../../actions/groups';
  */
 function mapStateToProps(state, ownProps) {
 	return {
-		name: ownProps.name,
 		id: ownProps.id,
+		name: state.groups.byGroupID[ownProps.id].name,
 	};
 }
 
