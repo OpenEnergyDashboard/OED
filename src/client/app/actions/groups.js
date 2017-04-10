@@ -15,6 +15,7 @@ export const RECEIVE_GROUP_CHILDREN = 'RECEIVE_GROUP_CHILDREN';
 
 export const CHANGE_SELECTED_GROUPS = 'CHANGE_SELECTED_GROUPS';
 export const GROUPSUI_CHANGE_SELECTED_METERS = 'GROUPSUI_CHANGE_SELECTED_METERS';
+export const UPDATE_SELECTED_GROUPS = 'UPDATE_SELECTED_GROUPS';
 
 function requestGroupsDetails() {
 	return { type: REQUEST_GROUPS_DETAILS };
@@ -65,6 +66,7 @@ function receiveGroupChildren(groupID, data) {
 
 function shouldFetchGroupChildren(state, groupID) {
 	const group = state.groups.byGroupID[groupID];
+	console.log(state.groups.byGroupID);
 	// Check that the group has no children of any kind AND that it is not being fetched.
 	return (group.childGroups.length === 0 && group.childMeters.length === 0) && !group.isFetching;
 }
@@ -90,6 +92,10 @@ export function fetchGroupChildrenIfNeeded(groupID) {
 	};
 }
 
+export function switchSelectedGroups(groupIDs) {
+	return { type: UPDATE_SELECTED_GROUPS, groupIDs };
+}
+
 /**
  *
  * @param groupIDs
@@ -99,6 +105,9 @@ export function changeSelectedGroups(parentID, groupIDs) {
 	return { type: CHANGE_SELECTED_GROUPS, parentID, groupIDs };
 }
 
+export function updateSelectedGroups(groupIDs) {
+	return switchSelectedGroups(groupIDs);
+}
 
 export function groupsUIchangeSelectedMeters(parentID, meterIDs) {
 	return { type: GROUPSUI_CHANGE_SELECTED_METERS, parentID, meterIDs };

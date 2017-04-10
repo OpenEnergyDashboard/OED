@@ -7,22 +7,23 @@
 import _ from 'lodash';
 import { connect } from 'react-redux';
 import { fetchMetersDetailsIfNeeded } from '../../actions/meters';
-import { fetchGroupsDetailsIfNeeded } from '../../actions/groups';
+import { fetchGroupsDetailsIfNeeded, updateSelectedGroups } from '../../actions/groups';
 import GroupSidebarComponent from '../../components/groups/GroupSidebarComponent';
 
 
 function mapStateToProps(state) {
 	const sortedGroups = _.sortBy(_.values(state.groups.byGroupID).map(group => ({ id: group.id, name: group.name.trim() })), 'name');
-	const sortedMeters = _.sortBy(_.values(state.meters.byMeterID).map(meter => ({ id: meter.id, name: meter.name.trim() })), 'name');
+	console.log(sortedGroups);
 	return {
 		groups: sortedGroups,
-		meters: sortedMeters
+		selectedGroups: state.groups.selectedGroups
 	};
 }
 
 
 function mapDispatchToProps(dispatch) {
 	return {
+		selectGroups: newSelectedGroupIDs => dispatch(updateSelectedGroups(newSelectedGroupIDs)),
 		fetchGroupsDetailsIfNeeded: () => dispatch(fetchGroupsDetailsIfNeeded()),
 		fetchMetersDetailsIfNeeded: () => dispatch(fetchMetersDetailsIfNeeded()),
 	};

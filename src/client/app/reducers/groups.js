@@ -15,6 +15,7 @@ import * as groupsActions from '../actions/groups';
 const defaultState = {
 	isFetching: false,
 	byGroupID: {},
+	selectedGroups: []
 };
 
 /**
@@ -90,7 +91,7 @@ export default function groups(state = defaultState, action) {
 					...state.byGroupID,
 					[action.parentID]: {
 						...state.byGroupID[action.parentID],
-						selectedMeters: action.groupIDs,
+						selectedGroups: action.groupIDs,
 					}
 				}
 			};
@@ -106,6 +107,13 @@ export default function groups(state = defaultState, action) {
 						selectedMeters: action.meterIDs,
 					}
 				}
+			};
+		}
+
+		case groupsActions.UPDATE_SELECTED_GROUPS: {
+			return {
+				...state,
+				selectedGroups: action.groupIDs,
 			};
 		}
 

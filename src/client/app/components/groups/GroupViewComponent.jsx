@@ -17,7 +17,12 @@ export default class GroupViewComponent extends React.Component {
 
 
 	componentWillMount() {
+		console.log(this.props.id);
 		this.props.fetchGroupChildren(this.props.id);
+	}
+
+	componentWillReceiveProps() {
+		this.render();
 	}
 
 	// todo: Have edit button render something to edit the group

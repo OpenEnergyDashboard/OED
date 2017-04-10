@@ -26,6 +26,7 @@ export default class GroupSidebarComponent extends React.Component {
 				selectedGroups.push(parseInt(options[i].value));
 			}
 		}
+		console.log(selectedGroups);
 		this.props.selectGroups(selectedGroups);
 	}
 

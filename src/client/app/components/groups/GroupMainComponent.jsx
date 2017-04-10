@@ -17,6 +17,7 @@ export default class GroupComponent extends React.Component {
 	componentWillMount() {
 		this.props.fetchGroupsDetailsIfNeeded();
 		this.props.fetchMetersDetailsIfNeeded();
+		this.props.selectGroups(this.props.selectedGroups);
 	}
 
 	render() {
@@ -52,10 +53,9 @@ export default class GroupComponent extends React.Component {
 					<div className="col-xs-2">
 						<GroupSidebarContainer></GroupSidebarContainer>
 					</div>
-
 					<div className="col-xs-10">
-						{this.props.groups.map(group =>
-							<div className="col-xs-12"><GroupViewContainer key={group.id} id={group.id} name={group.name} /></div>
+						{this.props.selectedGroups.map(group =>
+							<div className="col-xs-12"><GroupViewContainer key={group[0]} id={group[0]} name={group.name} /></div>
 						)}
 					</div>
 
