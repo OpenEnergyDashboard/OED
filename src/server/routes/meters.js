@@ -16,7 +16,7 @@ const router = express.Router();
  * @param {Array<Reading>} rows
  */
 function formatReadings(rows) {
-	return rows.map(row => [new Date(row.start_timestamp).valueOf(), row.reading_rate]);
+	return rows.map(row => [row.start_timestamp.valueOf(), row.reading_rate]);
 }
 
 /**
