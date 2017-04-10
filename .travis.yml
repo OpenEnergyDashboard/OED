@@ -4,6 +4,9 @@ node_js:
 services:
   - postgresql
 
+addons:
+  postgresql: "9.6"
+
 env:
   - DB_USER=test DB_PASSWORD=test DB_DATABASE=travis_ci_test DB_TEST_DATABASE=travis_ci_test DB_HOST=localhost DB_PORT=5432 TOKEN_SECRET=travis SERVER_PORT=3000
 
