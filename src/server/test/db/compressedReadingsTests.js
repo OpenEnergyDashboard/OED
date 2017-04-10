@@ -32,13 +32,13 @@ mocha.describe('Compressed Readings', () => {
 	}));
 
 	mocha.it('compresses readings', () => db.task(function* runTest(t) {
-		const reading1 = new Reading(meter.id, 100, timestamp1.toDate(), timestamp2.toDate());
-		const reading2 = new Reading(meter.id, 200, timestamp2.toDate(), timestamp3.toDate());
-		const reading3 = new Reading(meter.id, 300, timestamp3.toDate(), timestamp4.toDate());
+		const reading1 = new Reading(meter.id, 100, timestamp1, timestamp2);
+		const reading2 = new Reading(meter.id, 200, timestamp2, timestamp3);
+		const reading3 = new Reading(meter.id, 300, timestamp3, timestamp4);
 		yield Reading.insertAll([reading1, reading2, reading3], t);
 
 		// Compress the three points to two points.
-		const compressedReadings = yield Reading.getCompressedReadings([meter.id], timestamp1.toDate(), timestamp4.toDate(), 2, t);
+		const compressedReadings = yield Reading.getCompressedReadings([meter.id], timestamp1, timestamp4, 2, t);
 		expect(compressedReadings[meter.id]).to.have.lengthOf(2);
 		const expectedFirstCompressedRate = ((reading1.reading) + (reading2.reading * 0.5)) / 1.5;
 		expect(compressedReadings[meter.id][0].reading_rate).to.be.closeTo(expectedFirstCompressedRate, 0.0001);
@@ -47,13 +47,13 @@ mocha.describe('Compressed Readings', () => {
 	}));
 
 	mocha.it('compresses readings with a gap', () => db.task(function* runTest(t) {
-		const reading1 = new Reading(meter.id, 100, timestamp1.toDate(), timestamp2.toDate());
-		const reading2 = new Reading(meter.id, 200, timestamp2.toDate(), timestamp3.toDate());
-		const reading3 = new Reading(meter.id, 300, timestamp4.toDate(), timestamp5.toDate());
+		const reading1 = new Reading(meter.id, 100, timestamp1, timestamp2);
+		const reading2 = new Reading(meter.id, 200, timestamp2, timestamp3);
+		const reading3 = new Reading(meter.id, 300, timestamp4, timestamp5);
 		yield Reading.insertAll([reading1, reading2, reading3], t);
 
 		// Compress the three points to two points.
-		const compressedReadings = yield Reading.getCompressedReadings([meter.id], timestamp1.toDate(), timestamp5.toDate(), 2, t);
+		const compressedReadings = yield Reading.getCompressedReadings([meter.id], timestamp1, timestamp5, 2, t);
 		chai.expect(compressedReadings[meter.id]).to.have.lengthOf(2);
 		const expectedFirstCompressedRate = ((reading1.reading) + (reading2.reading)) / 2;
 		chai.expect(compressedReadings[meter.id][0].reading_rate).to.be.closeTo(expectedFirstCompressedRate, 0.0001);
@@ -62,13 +62,13 @@ mocha.describe('Compressed Readings', () => {
 	}));
 
 	mocha.it('compresses readings that overlap an end point', () => db.task(function* runTest(t) {
-		const reading1 = new Reading(meter.id, 100, timestamp1.toDate(), timestamp2.toDate());
-		const reading2 = new Reading(meter.id, 200, timestamp2.toDate(), timestamp3.toDate());
+		const reading1 = new Reading(meter.id, 100, timestamp1, timestamp2);
+		const reading2 = new Reading(meter.id, 200, timestamp2, timestamp3);
 		yield Reading.insertAll([reading1, reading2], t);
 		const startTimestamp = timestamp1.clone().add(30, 'minutes');
 		const endTimestamp = timestamp3;
 
-		const compressedReadings = yield Reading.getCompressedReadings([meter.id], startTimestamp.toDate(), endTimestamp.toDate(), 1, t);
+		const compressedReadings = yield Reading.getCompressedReadings([meter.id], startTimestamp, endTimestamp, 1, t);
 		// The compression rate should weight the first reading half as much as the second one because its intersect time is half as long.
 		const expectedFirstCompressedRate = ((0.5 * reading1.reading) + reading2.reading) / 1.5;
 		expect(compressedReadings[meter.id][0].reading_rate).to.be.closeTo(expectedFirstCompressedRate, 0.0001);
@@ -80,8 +80,8 @@ mocha.describe('Compressed Readings', () => {
 		const meter2 = yield Meter.getByName('Meter2', t);
 		const meter3 = yield Meter.getByName('Meter3', t);
 		const readingMeter1 = new Reading(meter.id, 100, timestamp1, timestamp2);
-		const readingMeter2 = new Reading(meter2.id, 200, timestamp1.toDate(), timestamp2.toDate());
-		const readingMeter3 = new Reading(meter3.id, 300, timestamp1.toDate(), timestamp2.toDate());
+		const readingMeter2 = new Reading(meter2.id, 200, timestamp1, timestamp2);
+		const readingMeter3 = new Reading(meter3.id, 300, timestamp1, timestamp2);
 		yield Reading.insertAll([readingMeter1, readingMeter2, readingMeter3], t);
 		const compressedReadings = yield Reading.getCompressedReadings([meter.id, meter2.id], null, null, 1, t);
 		expect(Object.keys(compressedReadings)).to.have.lengthOf(2);

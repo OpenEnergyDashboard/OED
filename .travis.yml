@@ -1,0 +1,18 @@
+dist: trusty
+sudo: false
+
+language: node_js
+node_js:
+  - "7"
+services:
+  - postgresql
+
+addons:
+  postgresql: "9.6"
+
+env:
+  - DB_USER=test DB_PASSWORD=test DB_DATABASE=travis_ci_test DB_TEST_DATABASE=travis_ci_test DB_HOST=localhost DB_PORT=5432 TOKEN_SECRET=travis SERVER_PORT=3000
+
+before_script:
+  - psql -c 'CREATE DATABASE travis_ci_test' -U postgres
+  - psql -c "CREATE USER test WITH PASSWORD 'test';" -U postgres
