@@ -36,4 +36,29 @@ mocha.describe('Readings', () => {
 		expect(readingPostInsert.endTimestamp.isSame(endTimestamp)).to.equal(true);
 		expect(readingPostInsert).to.have.property('reading', readingPreInsert.reading);
 	}));
+	mocha.it('can be saved in bulk', async () => {
+		const startTimestamp1 = moment('2017-01-01');
+		const endTimestamp1 = moment(startTimestamp1).add(1, 'hour');
+		const startTimestamp2 = moment(endTimestamp1).add(1, 'hour');
+		const endTimestamp2 = moment(startTimestamp2).add(1, 'hour');
+		const reading1 = new Reading(meter.id, 1, startTimestamp1, endTimestamp1);
+		const reading2 = new Reading(meter.id, 1, startTimestamp2, endTimestamp2);
+		await Reading.insertAll([reading1, reading2]);
+		const retrievedReadings = await Reading.getAllByMeterID(meter.id);
+		expect(retrievedReadings).to.have.length(2);
+	});
+	mocha.it('can be saved/updated in bulk', async () => {
+		const startTimestamp1 = moment('2017-01-01');
+		const endTimestamp1 = moment(startTimestamp1).add(1, 'hour');
+		const startTimestamp2 = moment(endTimestamp1).add(1, 'hour');
+		const endTimestamp2 = moment(startTimestamp2).add(1, 'hour');
+		const reading1 = new Reading(meter.id, 1, startTimestamp1, endTimestamp1);
+		const reading2 = new Reading(meter.id, 1, startTimestamp2, endTimestamp2);
+		// Insert reading 1 (so it will be updated)
+		await reading1.insert();
+		const reading1Updated = new Reading(meter.id, 2, startTimestamp1, endTimestamp1);
+		await Reading.insertOrUpdateAll([reading1Updated, reading2]);
+		const retrievedReadings = await Reading.getAllByMeterID(meter.id);
+		expect(retrievedReadings).to.have.length(2);
+	});
 });
