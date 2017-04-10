@@ -1,4 +1,5 @@
 # Open Energy Dashboard #
+[![Build Status](https://travis-ci.org/beloitcollegecomputerscience/OED.svg?branch=master)](https://travis-ci.org/beloitcollegecomputerscience/OED)
 
 This web application is designed to display energy information about Beloit College or other institutions to users.
 
