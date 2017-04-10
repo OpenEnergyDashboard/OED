@@ -1,7 +1,10 @@
 const express = require('express');
-const streamBuffers = require('stream-buffer');
+const Reading = require('../models/Reading');
+const moment = require('moment');
+const streamBuffers = require('stream-buffers');
 const readCSVFromString = require('../services/readCSV').readCSVFromString;
 const multer = require('multer');
+const streamToDB = require('../services/loadFromCsvStream');
 
 const router = express.Router();
 
@@ -15,6 +18,16 @@ router.post('/', upload.single('csvFile'), async (req, res) => {
 			chunkSize: 2048
 		});
 		myReadableStreamBuffer.put(req.file.buffer);
+		// TODO ensure that we are getting Readings appropriately.
+		streamToDB(myReadableStreamBuffer, row => {
+			const id = row[0];
+			const readRate = row[1];
+
+			const startTimestamp = moment(row[2], 'HH:mm:ss MM/DD/YYYY');
+			const endTimestamp = moment(row[3], 'HH:mm:ss MM/DD/YYYY');
+			return new Reading(id, readRate, startTimestamp, endTimestamp);
+			// TODO Fix the third paramter, Simon will know.
+		}, (readings, tx) => Reading.insertAll(readings, tx).then(() => console.log('Inserted!')));
 		console.log(data);
 		res.status(200);
 	} catch (err) {
