@@ -13,7 +13,6 @@ import GroupSidebarComponent from '../../components/groups/GroupSidebarComponent
 
 function mapStateToProps(state) {
 	const sortedGroups = _.sortBy(_.values(state.groups.byGroupID).map(group => ({ id: group.id, name: group.name.trim() })), 'name');
-	console.log(sortedGroups);
 	return {
 		groups: sortedGroups,
 		selectedGroups: state.groups.selectedGroups

@@ -8,11 +8,11 @@ import { Link } from 'react-router';
 import ChildMeterBoxContainer from '../../containers/groups/ChildMeterBoxContainer';
 import ChildGroupBoxContainer from '../../containers/groups/ChildGroupBoxContainer';
 
-
 export default class GroupViewComponent extends React.Component {
 
 	constructor(props) {
 		super(props);
+		this.state = { showModal: false};
 	}
 
 
@@ -21,6 +21,13 @@ export default class GroupViewComponent extends React.Component {
 		this.props.fetchGroupChildren(this.props.id);
 	}
 
+	close() {
+		this.setState({ showModal: false });
+	}
+
+	open() {
+		this.setState({ showModal: true });
+	}
 
 	// todo: Have edit button render something to edit the group
 	// todo: Look into switching to a table cell display to handle many groups showing
@@ -62,23 +69,32 @@ export default class GroupViewComponent extends React.Component {
 
 
 		return (
-			<div style={this.groupStyle}>
-				<div className="col-xs-12">
-					<h2 style={this.boxStyle}> {this.props.name} </h2>
-				</div>
-				<div className="row">
-					<div className="col-xs-6">
-						<ChildMeterBoxContainer parentID={this.props.id} />
+			<div>
+				<div style={this.groupStyle}>
+					<div className="col-xs-12">
+						<h2 style={this.boxStyle}> {this.props.name} </h2>
 					</div>
-					<div className="col-xs-6">
-						<ChildGroupBoxContainer parentID={this.props.id} />
+					<div className="row">
+						<div className="col-xs-6">
+							<ChildMeterBoxContainer parentID={this.props.id} />
+						</div>
+						<div className="col-xs-6">
+							<ChildGroupBoxContainer parentID={this.props.id} />
+						</div>
 					</div>
+
+					<Button bsStyle="primary" bsSize="large" onClick={this.open}>
+						Launch demo modal
+					</Button>
+
+					<Modal>
+
+					</Modal>
+
 				</div>
 
-				<Link style={this.buttonStyle} to="/editGroup">
-					<button className="btn btn-default">Edit Group</button>
-				</Link>
 			</div>
+
 		);
 	}
 }
