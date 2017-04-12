@@ -133,8 +133,19 @@ class Group {
 	 * @return {Promise.<void>}
 	 */
 	static async getDeepGroupsByGroupID(id, conn = db) {
-		const rows = await conn.any(sqlFile('group/get_deep_groups_by_group_id.sql'), { id: id });
+		const rows = await conn.any(sqlFile('group/get_deep_groups_by_group_id.sql'), { id });
 		return rows.map(row => row.child_id);
+	}
+
+	/**
+	 * Returns a promise to retrieve all the IDs of deep child meters of the group with the given ID.
+	 * @param id
+	 * @param conn
+	 * @return {Promise.<void>}
+	 */
+	static async getDeepMetersByGroupID(id, conn = db) {
+		const rows = await conn.any(sqlFile('group/get_deep_meters_by_group_id.sql'), { id });
+		return rows.map(row => row.meter_id);
 	}
 
 }
