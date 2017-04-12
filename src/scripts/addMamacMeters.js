@@ -55,7 +55,6 @@ async function insertMeters(ips) {
 	return await Promise.all(meters.map(m => m.insert()));
 }
 
-
 async function insertMetersWrapper(filename) {
 	try {
 		const ips = parseXLSX(filename);

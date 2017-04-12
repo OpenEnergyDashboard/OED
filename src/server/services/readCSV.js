@@ -19,4 +19,15 @@ async function readCSV(fileName) {
 	return await parseCsv(buffer.toString());
 }
 
-module.exports = readCSV;
+/**
+ * Returns a promise to read a given CSV file from the server.
+ * @param buffer fileName and the file to read
+ * @returns {Promise.<array, <array>>}
+ */
+async function readCSVFromString(buffer) {
+	const bufferContent = buffer.toString('utf8');
+	return await parseCsv(bufferContent);
+}
+
+exports.readCSV = readCSV;
+exports.readCSVFromString = readCSVFromString;

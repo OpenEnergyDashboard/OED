@@ -9,6 +9,7 @@ const logger = require('morgan');
 const cookieParser = require('cookie-parser');
 const bodyParser = require('body-parser');
 const users = require('./routes/users');
+const fileProcessing = require('./routes/fileProcessing');
 const meters = require('./routes/meters');
 const login = require('./routes/login');
 const verification = require('./routes/verification');
@@ -26,6 +27,7 @@ app.use('/api/users', users);
 app.use('/api/meters', meters);
 app.use('/api/login', login);
 app.use('/api/verification', verification);
+app.use('/api/fileProcessing', fileProcessing);
 
 app.get('*', (req, res) => {
 	res.sendFile(path.resolve(__dirname, '..', 'client', 'index.html'));
