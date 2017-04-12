@@ -23,7 +23,8 @@ async function setupGroupsAndMeters() {
 	await Promise.all([groupA, groupB, groupC].map(group => group.insert()));
 	const meterA = new Meter(undefined, 'Meter A', null, false, Meter.type.MAMAC);
 	const meterB = new Meter(undefined, 'Meter B', null, false, Meter.type.MAMAC);
-	await Promise.all([meterA, meterB].map(meter => meter.insert()));
+	const meterC = new Meter(undefined, 'Meter C', null, false, Meter.type.METASYS);
+	await Promise.all([meterA, meterB, meterC].map(meter => meter.insert()));
 }
 
 mocha.describe('Groups', () => {
@@ -42,6 +43,14 @@ mocha.describe('Groups', () => {
 			await parent.associateWithChildGroup(child.id);
 			const childrenOfParent = await (Group.getImmediateGroupsByGroupID(parent.id));
 			expect(childrenOfParent).to.deep.equal([child.id]);
+		});
+
+		mocha.it('can be given a child meter', async () => {
+			const parent = await Group.getByName('Group A');
+			const meter = await Meter.getByName('Meter A');
+			await parent.associateWithChildMeter(meter.id);
+			const metersOfParent = await (Group.getImmediateMetersByGroupID(parent.id));
+			expect(metersOfParent).to.deep.equal([meter.id]);
 		});
 	});
 });

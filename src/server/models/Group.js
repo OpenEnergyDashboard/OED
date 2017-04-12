@@ -3,6 +3,7 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
 
 const database = require('./database');
+const Meter = require('./Meter');
 
 const db = database.db;
 const sqlFile = database.sqlFile;
@@ -112,6 +113,17 @@ class Group {
 		// Confirm that such a group exists
 		const child = await Group.getByID(childID, conn);
 		await conn.none(sqlFile('group/associate_child_group_with_parent_group.sql'), { parent_id: this.id, child_id: child.id });
+	}
+
+	/**
+	 * Returns a promise to make the meter with the given ID an immediate child of this group.
+	 * @param childID
+	 * @param conn
+	 * @return {Promise.<void>}
+	 */
+	async associateWithChildMeter(childID, conn = db) {
+		const meter = await Meter.getByID(childID, conn);
+		await conn.none(sqlFile('group/associate_child_meter_with_parent_group.sql'), { group_id: this.id, meter_id: meter.id });
 	}
 
 }
