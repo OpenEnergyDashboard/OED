@@ -89,7 +89,7 @@ class Group {
 	 */
 	static async getImmediateMetersByGroupID(id, conn = db) {
 		const rows = await conn.any(sqlFile('group/get_immediate_meters_by_group_id.sql'), { id: id });
-		return rows.map(row => row.id);
+		return rows.map(row => row.meter_id);
 	}
 
 	/**
@@ -100,7 +100,7 @@ class Group {
 	 */
 	static async getImmediateGroupsByGroupID(id, conn = db) {
 		const rows = await conn.any(sqlFile('group/get_immediate_groups_by_group_id.sql'), { id: id });
-		return rows.map(row => row.id);
+		return rows.map(row => row.child_id);
 	}
 
 	/**
@@ -124,6 +124,17 @@ class Group {
 	async associateWithChildMeter(childID, conn = db) {
 		const meter = await Meter.getByID(childID, conn);
 		await conn.none(sqlFile('group/associate_child_meter_with_parent_group.sql'), { group_id: this.id, meter_id: meter.id });
+	}
+
+	/**
+	 *  Returns a promise to retrieve all the IDs of the deep child groups of the group with the given ID.
+	 * @param id
+	 * @param conn
+	 * @return {Promise.<void>}
+	 */
+	static async getDeepGroupsByGroupID(id, conn = db) {
+		const rows = await conn.any(sqlFile('group/get_deep_groups_by_group_id.sql'), { id: id });
+		return rows.map(row => row.child_id);
 	}
 
 }

@@ -52,5 +52,15 @@ mocha.describe('Groups', () => {
 			const metersOfParent = await (Group.getImmediateMetersByGroupID(parent.id));
 			expect(metersOfParent).to.deep.equal([meter.id]);
 		});
+
+		mocha.it('can be given a deep child group', async () => {
+			const parent = await Group.getByName('Group A');
+			const child = await Group.getByName('Group B');
+			const grandchild = await Group.getByName('Group C');
+			await parent.associateWithChildGroup(child.id);
+			await child.associateWithChildGroup(grandchild.id);
+			const deepChildrenOfParent = await Group.getDeepGroupsByGroupID(parent.id);
+			expect(deepChildrenOfParent.sort()).to.deep.equal([child.id, grandchild.id].sort());
+		});
 	});
 });
