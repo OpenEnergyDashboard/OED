@@ -112,8 +112,8 @@ class Reading {
 	 * @param conn the connection to use. Defaults to the default database connection.
 	 * @returns {Promise.<>}
 	 */
-	async insertOrUpdate(conn = db) {
-		await conn.none(sqlFile('reading/insert_or_update_reading.sql'), this);
+	insertOrUpdate(conn = db) {
+		return conn.none(sqlFile('reading/insert_or_update_reading.sql'), this);
 	}
 
 	/**
