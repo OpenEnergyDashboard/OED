@@ -10,23 +10,23 @@ const Meter = require('./../models/Meter');
 async function readMetasysData(filePath) {
 	const readingArr = [];
 	let i = 1;
-	//getting filename
-	const fileNameArray = filePath.split("/");
+	// getting filename
+	const fileNameArray = filePath.split('/');
 	const fileName = fileNameArray.pop();
-	//list of readings
+	// list of readings
 	const rows = await readCsv(filePath);
-	//meterInformation
+	// meterInformation
 	const meter	= await Meter.getByName(fileName.replace('.csv', ''));
 
 	for (const row of rows) {
-		//timestamp. end time stamp
+		// timestamp. end time stamp
 		const timestamp = row[0].toLocaleString();
 		const start_timestamp = new Date(timestamp);
-		let end_timestamp = new Date(timestamp);
-		end_timestamp.setHours(end_timestamp.getHours()+1);
+		const end_timestamp = new Date(timestamp);
+		end_timestamp.setHours(end_timestamp.getHours() + 1);
 
 
-		//meterReading
+		// meterReading
 		let meterReading = row[3];
 		meterReading = meterReading.replace('kWh', '');
 		meterReading = parseInt(meterReading);
@@ -41,7 +41,7 @@ async function readMetasysData(filePath) {
 		i++;
 	}
 	try {
-		//inserting all the data from an array into database and catching error when it occurs.
+		// inserting all the data from an array into database and catching error when it occurs.
 		Reading.insertAll(readingArr);
 	} catch (err) {
 		console.error(err);

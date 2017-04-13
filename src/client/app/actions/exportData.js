@@ -33,7 +33,7 @@ function downloadCSV(inputCSV) {
 	const csvContent = `data:text/csv;charset=utf-8,${inputCSV}`;
 	const encodedUri = encodeURI(csvContent);
 	const link = document.createElement('a');
-	let fileName = window.prompt('Input a file name;', 'csvData');
+	let fileName = 'exportedDataOED';
 	fileName += '.csv';
 	link.setAttribute('href', encodedUri);
 	link.setAttribute('download', fileName);

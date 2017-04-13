@@ -102,8 +102,10 @@ export default class UIOptionsComponent extends React.Component {
 					</div>
 					<br />
 					<button type="button" id="changeButton" className="btn btn-primary">Change!</button>
+					<br />
+					<button onClick={this.exportReading}>Export!</button>
 				</div>
-				<div><button onClick={this.exportReading}>Export!</button></div>
+
 			</div>
 		);
 	}
