@@ -43,6 +43,7 @@
     "react": "^15.4.2",
     "react-chartjs-2": "^2.0.5",
     "react-dom": "^15.4.2",
+    "react-dropdown": "^1.2.1",
     "react-dropzone": "^3.11.0",
     "react-highcharts": "^11.5.0",
     "react-redux": "^5.0.2",

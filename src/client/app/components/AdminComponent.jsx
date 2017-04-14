@@ -5,6 +5,7 @@
 import React from 'react';
 import Dropzone from 'react-dropzone';
 import axios from 'axios';
+import MeterDropDownContainer from '../containers/MeterDropdownContainer';
 
 
 export default class AdminComponent extends React.Component {
@@ -12,6 +13,7 @@ export default class AdminComponent extends React.Component {
 		super(props);
 		this.handleOnDrop = this.handleOnDrop.bind(this);
 	}
+
 
 	handleOnDrop(files) {
 		const file = files[0];
@@ -31,11 +33,10 @@ export default class AdminComponent extends React.Component {
 				<p>Admin panel</p>
 				<button>AddMeter</button>
 				<Dropzone onDrop={this.handleOnDrop}>
-					<div> Add in a CSV file here: </div>
+					<div> Add in a CSV file here:</div>
 				</Dropzone>
+				<MeterDropDownContainer />
 			</div>
 		);
 	}
-
-
 }
