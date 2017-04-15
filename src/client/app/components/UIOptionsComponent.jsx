@@ -3,7 +3,7 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
 
 import React from 'react';
-import graphExport from '../actions/exportData';
+import graphExport from '../services/exportData';
 
 export default class UIOptionsComponent extends React.Component {
 	/**
