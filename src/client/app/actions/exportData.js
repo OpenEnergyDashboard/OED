@@ -1,7 +1,11 @@
+/* This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this
+ * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
+
 import moment from 'moment';
 
 /**
- * A function that converts the compressed meter data into a CSV formatted string.
+ * Function to converts the compressed meter data into a CSV formatted string.
  * @param items The compressed meter data.
  * @returns output A string containing the CSV formatted compressed meter data.
  */
@@ -11,30 +15,23 @@ function convertToCSV(items) {
 	items.forEach(set => {
 		const data = set.exportVals;
 		const id = set.id;
-		let isStart = true;
 		data.forEach(reading => {
 			const info = reading.y;
 			const timeStamp = moment(reading.x).format('dddd MMM DD YYYY hh:mm a');
-			if (isStart) {
-				csvOutput += `${id},${info} kwh, ${timeStamp} \n`;
-				isStart = false;
-			} else {
-				csvOutput += `${id},${info} kwh, ${timeStamp} \n`;
-			}
+			csvOutput += `${id},${info} kwh, ${timeStamp} \n`;
 		});
 	});
 	return csvOutput;
 }
 /**
- * A function to download the formatted CSV file to the users computer.
+ * Function to download the formatted CSV file to the users computer.
  * @param inputCSV A String containing the formatted CSV data.
  */
 function downloadCSV(inputCSV) {
 	const csvContent = `data:text/csv;charset=utf-8,${inputCSV}`;
 	const encodedUri = encodeURI(csvContent);
 	const link = document.createElement('a');
-	let fileName = 'exportedDataOED';
-	fileName += '.csv';
+	const fileName = 'exportedDataOED.csv';
 	link.setAttribute('href', encodedUri);
 	link.setAttribute('download', fileName);
 	document.body.appendChild(link);
