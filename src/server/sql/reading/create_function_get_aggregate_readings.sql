@@ -39,8 +39,11 @@ CREATE OR REPLACE FUNCTION aggregate_readings(
 			agg.start + real_duration
 		FROM readings r
 		INNER JOIN unnest(meter_ids) specific_meter(id) ON r.meter_id = specific_meter.id
-			INNER JOIN generate_series(real_start_timestamp, real_end_timestamp - INTERVAL '1 second', real_duration) agg(start)
-			ON (r.start_timestamp, r.end_timestamp) OVERLAPS (agg.start, agg.start + real_duration)
+			INNER JOIN generate_series(real_start_timestamp, real_end_timestamp, real_duration) agg(start)
+				ON
+					(r.start_timestamp, r.end_timestamp) OVERLAPS (agg.start, agg.start + real_duration)
+					AND
+					(agg.start, agg.start + duration) OVERLAPS (real_start_timestamp, real_end_timestamp)
 		GROUP BY(r.meter_id, agg.start)
 		ORDER BY r.meter_id, agg.start;
 	END;
