@@ -42,7 +42,7 @@ export default function graph(state = defaultState, action) {
 				...state,
 				barDuration: action.barDuration
 			};
-		case graphActions.SET_GRAPH_ZOOM:
+		case graphActions.CHANGE_GRAPH_ZOOM:
 			return {
 				...state,
 				timeInterval: action.timeInterval

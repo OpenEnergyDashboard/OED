@@ -12,7 +12,7 @@ export const UPDATE_SELECTED_METERS = 'UPDATE_SELECTED_METERS';
 export const UPDATE_BAR_DURATION = 'UPDATE_BAR_DURATION';
 export const CHANGE_CHART_TO_RENDER = 'CHANGE_CHART_TO_RENDER';
 export const CHANGE_BAR_STACKING = 'CHANGE_BAR_STACKING';
-export const SET_GRAPH_ZOOM = 'CHANGE_GRAPH_ZOOM';
+export const CHANGE_GRAPH_ZOOM = 'CHANGE_GRAPH_ZOOM';
 
 /**
  * @param {string} chartType is either 'line' or 'bar'
@@ -57,8 +57,8 @@ function fetchNeededReadingsForGraph(meterIDs, timeInterval) {
 	};
 }
 
-function setGraphZoom(timeInterval) {
-	return { type: SET_GRAPH_ZOOM, timeInterval };
+function changeGraphZoom(timeInterval) {
+	return { type: CHANGE_GRAPH_ZOOM, timeInterval };
 }
 
 function shouldChangeGraphZoom(state, timeInterval) {
@@ -68,7 +68,7 @@ function shouldChangeGraphZoom(state, timeInterval) {
 export function changeGraphZoomIfNeeded(timeInterval) {
 	return (dispatch, getState) => {
 		if (shouldChangeGraphZoom(getState())) {
-			dispatch(setGraphZoom(timeInterval));
+			dispatch(changeGraphZoom(timeInterval));
 			dispatch(fetchNeededReadingsForGraph(getState().graph.selectedMeters, timeInterval));
 		}
 	};

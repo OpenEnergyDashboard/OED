@@ -34,7 +34,7 @@ function shouldFetchMetersData(state) {
 	return state.meters.isFetching || state.meters.meters === undefined;
 }
 
-export function fetchMetersDataIfNeeded() {
+export function fetchMetersDetailsIfNeeded() {
 	return (dispatch, getState) => {
 		if (shouldFetchMetersData(getState())) {
 			return dispatch(fetchMetersData());

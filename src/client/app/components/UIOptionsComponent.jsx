@@ -18,7 +18,7 @@ export default class UIOptionsComponent extends React.Component {
 		this.handleBarDurationChange = this.handleBarDurationChange.bind(this);
 		this.handleBarDurationChangeComplete = this.handleBarDurationChangeComplete.bind(this);
 		this.handleChangeChartType = this.handleChangeChartType.bind(this);
-		this.handleToggleBarStacking = this.handleToggleBarStacking.bind(this);
+		this.handleChangeBarStacking = this.handleChangeBarStacking.bind(this);
 		this.state = {
 			barDuration: 30, // barDuration in days
 			chartType: 'line'
@@ -30,7 +30,7 @@ export default class UIOptionsComponent extends React.Component {
 	 * Dispatches a Redux action to fetch meter information
 	 */
 	componentWillMount() {
-		this.props.fetchMetersDataIfNeeded();
+		this.props.fetchMetersDetailsIfNeeded();
 	}
 
 	handleMeterSelect(e) {
@@ -60,8 +60,8 @@ export default class UIOptionsComponent extends React.Component {
 		this.props.changeChartType(e.target.value);
 	}
 
-	handleToggleBarStacking() {
-		this.props.toggleBarStacking();
+	handleChangeBarStacking() {
+		this.props.changeBarStacking();
 	}
 
 	/**
@@ -95,7 +95,7 @@ export default class UIOptionsComponent extends React.Component {
 						<label><input type="radio" name="chartTypes" value="bar" onChange={this.handleChangeChartType} checked={this.state.chartType === 'bar'} />Bar</label>
 					</div>
 					<div className="checkbox">
-						<label><input type="checkbox" onChange={this.handleToggleBarStacking} />Bar stacking</label>
+						<label><input type="checkbox" onChange={this.handleChangeBarStacking} />Bar stacking</label>
 					</div>
 					<p style={labelStyle}>Bar chart interval (days):</p>
 					<Slider min={1} max={365} value={this.state.barDuration} onChange={this.handleBarDurationChange} onChangeComplete={this.handleBarDurationChangeComplete} />

@@ -34,7 +34,7 @@ async function readMetasysData(filePath) {
 		/* We have hourly trend and monthly trend for Metasys data. We just read hourly trend.
 		 * So, we skip one line as we go through the data
 		 */
-		if ((i % 2 !== 0)) {
+		if (i % 2 !== 0) {
 			const reading = new Reading(meter.id, meterReading, startTimestamp, endTimestamp);
 			readingArr.push(reading);
 		}
