@@ -22,8 +22,8 @@ Node.js - Javascript runtime environment ([nodejs.org](https://nodejs.org/en/))
 ```
 SERVER_PORT=?              // The port that the server should run on. 3000 is a good default choice
 DB_USER=?                  // The user that should be used to connect to postgres
-DB_DATABASE=?              // The database you just created, so likely environmental_dashboard
-DB_TEST_DATABASE=?         // The test database you just created, so likely environmental_dashboard_testing
+DB_DATABASE=?              // The database you just created, so likely oed
+DB_TEST_DATABASE=?         // The test database you just created, so likely oed_testing
 DB_PASSWORD=?              // The password for your postgres user
 DB_HOST=?                  // The host for your postgres db, likely localhost
 DB_PORT=?                  // The port for your postgres db, likely 5432
