@@ -4,8 +4,8 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/.
  */
 
-import { fetchAllNeededReadings, fetchNeededBarReadings } from './readings';
-import TimeInterval from '../../../common/TimeInterval';
+import { fetchNeededLineReadings } from './lineReadings';
+import { fetchNeededBarReadings } from './barReadings';
 
 export const UPDATE_SELECTED_METERS = 'UPDATE_SELECTED_METERS';
 export const UPDATE_BAR_DURATION = 'UPDATE_BAR_DURATION';
@@ -44,15 +44,19 @@ export function changeBarDuration(barDuration) {
 export function changeSelectedMeters(meterIDs) {
 	return (dispatch, state) => {
 		dispatch(updateSelectedMeters(meterIDs));
-		dispatch(fetchAllNeededReadings(meterIDs, state().graph.timeInterval));
+		// Nesting dispatches to preserve that updateSelectedMeters() is called before fetching readings
+		dispatch(dispatch2 => {
+			dispatch2(fetchNeededLineReadings(state().graph.timeInterval));
+			dispatch2(fetchNeededBarReadings(state().graph.timeInterval));
+		});
 		return Promise.resolve();
 	};
 }
 
-function fetchNeededReadingsForGraph(meterIDs, timeInterval) {
+function fetchNeededReadingsForGraph(timeInterval) {
 	return dispatch => {
-		dispatch(fetchAllNeededReadings(meterIDs, timeInterval));
-		dispatch(fetchAllNeededReadings(meterIDs, TimeInterval.unbounded()));
+		dispatch(fetchNeededLineReadings(timeInterval));
+		dispatch(fetchNeededBarReadings(timeInterval));
 	};
 }
 
@@ -68,7 +72,7 @@ export function changeGraphZoomIfNeeded(timeInterval) {
 	return (dispatch, getState) => {
 		if (shouldChangeGraphZoom(getState())) {
 			dispatch(changeGraphZoom(timeInterval));
-			dispatch(fetchNeededReadingsForGraph(getState().graph.selectedMeters, timeInterval));
+			dispatch(fetchNeededReadingsForGraph(timeInterval));
 		}
 	};
 }
