@@ -34,20 +34,20 @@ export function updateBarDuration(barDuration) {
 }
 
 export function changeBarDuration(barDuration) {
-	return (dispatch, state) => {
+	return (dispatch, getState) => {
 		dispatch(updateBarDuration(barDuration));
-		dispatch(fetchNeededBarReadings(state().graph.timeInterval));
+		dispatch(fetchNeededBarReadings(getState().graph.timeInterval));
 		return Promise.resolve();
 	};
 }
 
 export function changeSelectedMeters(meterIDs) {
-	return (dispatch, state) => {
+	return (dispatch, getState) => {
 		dispatch(updateSelectedMeters(meterIDs));
 		// Nesting dispatches to preserve that updateSelectedMeters() is called before fetching readings
 		dispatch(dispatch2 => {
-			dispatch2(fetchNeededLineReadings(state().graph.timeInterval));
-			dispatch2(fetchNeededBarReadings(state().graph.timeInterval));
+			dispatch2(fetchNeededLineReadings(getState().graph.timeInterval));
+			dispatch2(fetchNeededBarReadings(getState().graph.timeInterval));
 		});
 		return Promise.resolve();
 	};

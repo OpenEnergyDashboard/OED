@@ -8,7 +8,12 @@
 import * as readingsActions from '../actions/barReadings';
 
 /**
- * @type {State~Readings}
+ * @typedef {Object} State~BarReadings
+ * @property {Object<number, Object>} byMeterID
+ */
+
+/**
+ * @type {State~BarReadings}
  */
 const defaultState = {
 	byMeterID: {}

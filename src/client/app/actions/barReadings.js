@@ -13,7 +13,7 @@ export const RECEIVE_BAR_READINGS = 'RECEIVE_BAR_READINGS';
  * @param {State} state
  * @param {number} meterID
  * @param {TimeInterval} timeInterval
- * @param {Moment duration} barDuration
+ * @param {Moment.Duration} barDuration
  */
 function shouldFetchBarReadings(state, meterID, timeInterval, barDuration) {
 	const readingsForMeterID = state.readings.bar.byMeterID[meterID];
