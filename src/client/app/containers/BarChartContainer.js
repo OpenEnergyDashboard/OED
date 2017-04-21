@@ -9,6 +9,7 @@ import { Bar } from 'react-chartjs-2';
 import moment from 'moment';
 import { connect } from 'react-redux';
 import 'chartjs-plugin-zoom';
+import GraphColors from '../utils/GraphColors';
 
 /**
  * @param {State} state
@@ -17,20 +18,13 @@ function mapStateToProps(state) {
 	const timeInterval = state.graph.timeInterval;
 	const barDuration = state.graph.barDuration;
 	const data = { datasets: [] };
-	// getColor() cycles through the colors, wrapping around the end to the beginning
-	const colors = ['LightBlue', 'GoldenRod', 'Black', 'OrangeRed', 'LightSeaGreen', 'LightSlateGray', 'Purple'];
-	let colorPointer = 0;
-	function getColor() {
-		const color = colors[colorPointer];
-		colorPointer = (colorPointer + 1) % colors.length;
-		return color;
-	}
+	const graphColors = new GraphColors();
 
 	const labelsSet = new Set();
 	for (const meterID of state.graph.selectedMeters) {
 		const readingsData = state.readings.bar.byMeterID[meterID][timeInterval][barDuration];
 		if (readingsData !== undefined && !readingsData.isFetching) {
-			const color = getColor();
+			const color = graphColors.getColor();
 			data.datasets.push({
 				label: state.meters.byMeterID[meterID].name,
 				data: readingsData.readings.map(arr => arr[1]),
@@ -39,7 +33,7 @@ function mapStateToProps(state) {
 			});
 			// Add only the unique time intervals to the label set
 			for (const element of _.flatten(readingsData.readings.map(arr => arr[0]))) {
-				labelsSet.add(`${moment(element).format('MMM DD, YYYY, hh:mm a')} - ${moment(element).add(moment.duration(barDuration)).format('MMM DD, YYYY, hh:mm a')}`);
+				labelsSet.add(`${moment(element).format('MMM DD, YYYY, hh:mm a')} - ${moment(element).add(barDuration).format('MMM DD, YYYY, hh:mm a')}`);
 			}
 		}
 	}

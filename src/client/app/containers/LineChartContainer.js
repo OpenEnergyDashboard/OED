@@ -8,6 +8,7 @@ import { Line } from 'react-chartjs-2';
 import moment from 'moment';
 import { connect } from 'react-redux';
 import 'chartjs-plugin-zoom';
+import GraphColors from '../utils/GraphColors';
 
 /**
  * @param {State} state
@@ -15,14 +16,7 @@ import 'chartjs-plugin-zoom';
 function mapStateToProps(state) {
 	const timeInterval = state.graph.timeInterval;
 	const data = { datasets: [] };
-	// getColor() cycles through the colors, wrapping around the end to the beginning
-	const colors = ['LightBlue', 'GoldenRod', 'Black', 'OrangeRed', 'LightSeaGreen', 'LightSlateGray', 'Purple'];
-	let colorPointer = 0;
-	function getColor() {
-		const color = colors[colorPointer];
-		colorPointer = (colorPointer + 1) % colors.length;
-		return color;
-	}
+	const graphColors = new GraphColors();
 
 	for (const meterID of state.graph.selectedMeters) {
 		const readingsData = state.readings.line.byMeterID[meterID][timeInterval];
@@ -31,7 +25,7 @@ function mapStateToProps(state) {
 				label: state.meters.byMeterID[meterID].name,
 				data: readingsData.readings.map(arr => ({ x: arr[0], y: arr[1].toFixed(2) })),
 				fill: false,
-				borderColor: getColor()
+				borderColor: graphColors.getColor()
 			});
 		}
 	}

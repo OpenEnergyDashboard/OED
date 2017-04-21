@@ -7,7 +7,7 @@
 	This function sums the readings for an array of meters over a given duration that is repeated over a given time interval,
 	and	returns a query
  */
-CREATE OR REPLACE FUNCTION aggregate_readings(
+CREATE OR REPLACE FUNCTION barchart_readings(
 	meter_ids INTEGER[],
 	duration INTERVAL,
 	from_timestamp TIMESTAMP = '-infinity',
@@ -42,7 +42,7 @@ CREATE OR REPLACE FUNCTION aggregate_readings(
 			INNER JOIN generate_series(real_start_timestamp, real_end_timestamp, real_duration) agg(start)
 				ON
 					(r.start_timestamp, r.end_timestamp) OVERLAPS (agg.start, agg.start + real_duration)
-					AND
+					AND -- generate_series is an end-inclusive range, so we make it an open interval with the second OVERLAPS statement
 					(agg.start, agg.start + duration) OVERLAPS (real_start_timestamp, real_end_timestamp)
 		GROUP BY(r.meter_id, agg.start)
 		ORDER BY r.meter_id, agg.start;

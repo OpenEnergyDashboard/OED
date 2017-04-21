@@ -11,7 +11,6 @@ export const RECEIVE_LINE_READINGS = 'RECEIVE_LINE_READINGS';
 export const REQUEST_BAR_READINGS = 'REQUEST_BAR_READINGS';
 export const RECEIVE_BAR_READINGS = 'RECEIVE_BAR_READINGS';
 
-
 /**
  * @param {State} state
  * @param {number} meterID
@@ -33,7 +32,7 @@ function shouldFetchLineReadings(state, meterID, timeInterval) {
  * @param {State} state
  * @param {number} meterID
  * @param {TimeInterval} timeInterval
- * @param {ISO duration string} barDuration
+ * @param {Moment duration} barDuration
  */
 function shouldFetchBarReadings(state, meterID, timeInterval, barDuration) {
 	const readingsForMeterID = state.readings.bar.byMeterID[meterID];
@@ -83,7 +82,7 @@ function fetchBarReadings(meterIDs, timeInterval) {
 		dispatch(requestBarReadings(meterIDs, timeInterval, barDuration));
 		const stringifiedMeterIDs = meterIDs.join(',');
 		return axios.get(`/api/readings/bar/${stringifiedMeterIDs}`, {
-			params: { timeInterval: timeInterval.toString(), barDuration }
+			params: { timeInterval: timeInterval.toString(), barDuration: barDuration.toISOString() }
 		}).then(response => dispatch(receiveBarReadings(meterIDs, timeInterval, barDuration, response.data)));
 	};
 }
@@ -119,7 +118,7 @@ export function fetchAllNeededReadings(meterIDs, timeInterval) {
  * @param {TimeInterval} timeInterval The time interval to fetch readings for on the bar chart
  * @return {*} An action to fetch the needed readings
  */
-export function fetchBarNeededReadings(timeInterval) {
+export function fetchNeededBarReadings(timeInterval) {
 	return (dispatch, getState) => {
 		const state = getState();
 		const meterIDsToFetchForBar = state.graph.selectedMeters.filter(id => shouldFetchBarReadings(state, id, timeInterval, state.graph.barDuration));

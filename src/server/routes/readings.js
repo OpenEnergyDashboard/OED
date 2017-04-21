@@ -54,9 +54,9 @@ router.get('/bar/:meter_ids', async (req, res) => {
 	const timeInterval = TimeInterval.fromString(req.query.timeInterval);
 	const barDuration = moment.duration(req.query.barDuration);
 	try {
-		const aggregateReadings = await Reading.getAggregateReadings(meterIDs, barDuration, timeInterval.startTimestamp, timeInterval.endTimestamp);
-		const formattedAggregateReadings = _.mapValues(aggregateReadings, formatBarReadings);
-		res.json(formattedAggregateReadings);
+		const barchartReadings = await Reading.getBarchartReadings(meterIDs, barDuration, timeInterval.startTimestamp, timeInterval.endTimestamp);
+		const formattedBarchartReadings = _.mapValues(barchartReadings, formatBarReadings);
+		res.json(formattedBarchartReadings);
 	} catch (err) {
 		console.error(`Error while performing GET readings for bar with meters ${meterIDs} with time interval ${timeInterval}: ${err}`);
 	}

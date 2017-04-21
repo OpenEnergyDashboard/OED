@@ -22,7 +22,7 @@ function recreateDB() {
 		.then(() => db.none('DROP TABLE IF EXISTS meters'))
 		.then(() => db.none('DROP TYPE IF EXISTS meter_type'))
 		.then(() => db.none('DROP FUNCTION IF EXISTS compressed_readings(INTEGER[], TIMESTAMP, TIMESTAMP, INTEGER);'))
-		.then(() => db.none('DROP FUNCTION IF EXISTS aggregate_readings(INTEGER[], INTERVAL, TIMESTAMP, TIMESTAMP);'))
+		.then(() => db.none('DROP FUNCTION IF EXISTS barchart_readings(INTEGER[], INTERVAL, TIMESTAMP, TIMESTAMP);'))
 		.then(createSchema);
 }
 

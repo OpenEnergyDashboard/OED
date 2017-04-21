@@ -8,11 +8,10 @@ import moment from 'moment';
 import TimeInterval from '../../../common/TimeInterval';
 import * as graphActions from '../actions/graph';
 
-/**
- * @typedef {Object} State~Graph
- * @property {Array.<number>} selectedMeters
- * @property {TimeInterval} timeInterval
- */
+export const chartTypes = {
+	line: 'line',
+	bar: 'bar'
+};
 
 /**
  * @type {State~Graph}
@@ -20,8 +19,8 @@ import * as graphActions from '../actions/graph';
 const defaultState = {
 	selectedMeters: [],
 	timeInterval: TimeInterval.unbounded(),
-	barDuration: moment.duration(1, 'month').toISOString(),
-	chartToRender: 'line',
+	barDuration: moment.duration(1, 'month'),
+	chartToRender: chartTypes.line,
 	barStacking: false
 };
 

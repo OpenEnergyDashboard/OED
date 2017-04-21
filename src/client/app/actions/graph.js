@@ -4,9 +4,8 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/.
  */
 
-import { fetchAllNeededReadings, fetchBarNeededReadings } from './readings';
+import { fetchAllNeededReadings, fetchNeededBarReadings } from './readings';
 import TimeInterval from '../../../common/TimeInterval';
-
 
 export const UPDATE_SELECTED_METERS = 'UPDATE_SELECTED_METERS';
 export const UPDATE_BAR_DURATION = 'UPDATE_BAR_DURATION';
@@ -15,7 +14,7 @@ export const CHANGE_BAR_STACKING = 'CHANGE_BAR_STACKING';
 export const CHANGE_GRAPH_ZOOM = 'CHANGE_GRAPH_ZOOM';
 
 /**
- * @param {string} chartType is either 'line' or 'bar'
+ * @param {string} chartType is either chartTypes.line or chartTypes.bar
  * @returns {*} An action needed to change the chart type
  */
 export function changeChartToRender(chartType) {
@@ -37,7 +36,7 @@ export function updateBarDuration(barDuration) {
 export function changeBarDuration(barDuration) {
 	return (dispatch, state) => {
 		dispatch(updateBarDuration(barDuration));
-		dispatch(fetchBarNeededReadings(state().graph.timeInterval));
+		dispatch(fetchNeededBarReadings(state().graph.timeInterval));
 		return Promise.resolve();
 	};
 }

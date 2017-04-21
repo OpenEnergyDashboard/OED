@@ -6,6 +6,7 @@ import React from 'react';
 import UIOptionsContainer from '../containers/UIOptionsContainer';
 import LineChartContainer from '../containers/LineChartContainer';
 import BarChartContainer from '../containers/BarChartContainer';
+import { chartTypes } from '../reducers/graph';
 
 /**
  * React component that controls the dashboard
@@ -15,7 +16,7 @@ export default function DashboardComponent(props) {
 		<div className="container-fluid">
 			<UIOptionsContainer />
 			<div className="col-xs-10">
-				{props.chartToRender === 'line' ? <LineChartContainer /> : <BarChartContainer />}
+				{props.chartToRender === chartTypes.line ? <LineChartContainer /> : <BarChartContainer />}
 			</div>
 		</div>
 	);

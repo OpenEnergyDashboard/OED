@@ -22,7 +22,7 @@ export default function HeaderComponent(props) {
 	};
 	const loginLinkStyle = {
 		// Displays the login button link only if the user is not logged in or is explicitly told to display by the parent component
-		display: localStorage.getItem('token') || props.renderLoginButton === false ? 'none' : 'inline'
+		display: (localStorage.getItem('token') || props.renderLoginButton === false) ? 'none' : 'inline'
 	};
 	const adminLinkStyle = {
 		// Displays the admin button link only if the user is logged in (auth token exists)

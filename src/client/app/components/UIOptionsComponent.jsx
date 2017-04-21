@@ -6,6 +6,7 @@ import React from 'react';
 import Slider from 'react-rangeslider';
 import moment from 'moment';
 import 'react-rangeslider/lib/index.css';
+import { chartTypes } from '../reducers/graph';
 
 export default class UIOptionsComponent extends React.Component {
 	/**
@@ -20,8 +21,7 @@ export default class UIOptionsComponent extends React.Component {
 		this.handleChangeChartType = this.handleChangeChartType.bind(this);
 		this.handleChangeBarStacking = this.handleChangeBarStacking.bind(this);
 		this.state = {
-			barDuration: 30, // barDuration in days
-			chartType: 'line'
+			barDuration: 30 // barDuration in days
 		};
 	}
 
@@ -46,17 +46,22 @@ export default class UIOptionsComponent extends React.Component {
 		this.props.selectMeters(selectedMeters);
 	}
 
+	/**
+	 * Stores temporary barDuration until slider is released, used to update the UI of the slider
+	 */
 	handleBarDurationChange(value) {
 		this.setState({ barDuration: value });
 	}
 
+	/**
+	 * Called when the user releases the slider, dispatch action on temporary state variable
+	 */
 	handleBarDurationChangeComplete(e) {
 		e.preventDefault();
-		this.props.changeDuration(moment.duration(this.state.barDuration, 'days').toISOString());
+		this.props.changeDuration(moment.duration(this.state.barDuration, 'days'));
 	}
 
 	handleChangeChartType(e) {
-		this.setState({ chartType: e.target.value });
 		this.props.changeChartType(e.target.value);
 	}
 
@@ -89,10 +94,10 @@ export default class UIOptionsComponent extends React.Component {
 					</div>
 					<p style={labelStyle}>Graph Type:</p>
 					<div className="radio">
-						<label><input type="radio" name="chartTypes" value="line" onChange={this.handleChangeChartType} checked={this.state.chartType === 'line'} />Line</label>
+						<label><input type="radio" name="chartTypes" value={chartTypes.line} onChange={this.handleChangeChartType} checked={this.props.chartToRender === chartTypes.line} />Line</label>
 					</div>
 					<div className="radio">
-						<label><input type="radio" name="chartTypes" value="bar" onChange={this.handleChangeChartType} checked={this.state.chartType === 'bar'} />Bar</label>
+						<label><input type="radio" name="chartTypes" value={chartTypes.bar} onChange={this.handleChangeChartType} checked={this.props.chartToRender === chartTypes.bar} />Bar</label>
 					</div>
 					<div className="checkbox">
 						<label><input type="checkbox" onChange={this.handleChangeBarStacking} />Bar stacking</label>

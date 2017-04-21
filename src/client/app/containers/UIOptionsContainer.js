@@ -16,7 +16,8 @@ function mapStateToProps(state) {
 	const sortedMeters = _.sortBy(_.values(state.meters.byMeterID).map(meter => ({ id: meter.id, name: meter.name.trim() })), 'name');
 	return {
 		meters: sortedMeters,
-		selectedMeters: state.graph.selectedMeters
+		selectedMeters: state.graph.selectedMeters,
+		chartToRender: state.graph.chartToRender
 	};
 }
 

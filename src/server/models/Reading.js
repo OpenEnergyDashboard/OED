@@ -39,11 +39,11 @@ class Reading {
 	}
 
 	/**
-	 * Returns a promise to create the aggregate readings function.
+	 * Returns a promise to create the barchart readings function.
 	 * @return {Promise.<>}
 	 */
-	static createAggregateReadingsFunction() {
-		return db.none(sqlFile('reading/create_function_get_aggregate_readings.sql'));
+	static createBarchartReadingsFunction() {
+		return db.none(sqlFile('reading/create_function_get_barchart_readings.sql'));
 	}
 
 	static mapRow(row) {
@@ -151,7 +151,7 @@ class Reading {
 	}
 
 	/**
-	 * Gets a number of aggregate readings across the given time interval for the given meters.
+	 * Gets barchart readings for every meter across the given time interval for a duration.
 	 *
 	 * Compressed readings are in kilowatts.
 	 * @param meterIDs an array of ids for meters whose points are being compressed
@@ -161,19 +161,19 @@ class Reading {
 	 * @param conn the connection to use. Defaults to the default database connection.
 	 * @return {Promise<object<int, array<{reading_sum: number, start_timestamp: Date, end_timestamp: Date}>>>}
 	 */
-	static async getAggregateReadings(meterIDs, duration, fromTimestamp = null, toTimestamp = null, conn = db) {
-		const allCompressedReadings = await conn.func('aggregate_readings', [meterIDs, duration, fromTimestamp || '-infinity', toTimestamp || 'infinity']);
+	static async getBarchartReadings(meterIDs, duration, fromTimestamp = null, toTimestamp = null, conn = db) {
+		const allBarchartReadings = await conn.func('barchart_readings', [meterIDs, duration, fromTimestamp || '-infinity', toTimestamp || 'infinity']);
 		// Separate the result rows by meter_id and return a nested object.
-		const compressedReadingsByMeterID = {};
-		for (const row of allCompressedReadings) {
-			if (compressedReadingsByMeterID[row.meter_id] === undefined) {
-				compressedReadingsByMeterID[row.meter_id] = [];
+		const barchartReadingsByMeterID = {};
+		for (const row of allBarchartReadings) {
+			if (barchartReadingsByMeterID[row.meter_id] === undefined) {
+				barchartReadingsByMeterID[row.meter_id] = [];
 			}
-			compressedReadingsByMeterID[row.meter_id].push(
+			barchartReadingsByMeterID[row.meter_id].push(
 				{ reading_sum: row.reading_sum, start_timestamp: row.start_timestamp, end_timestamp: row.end_timestamp }
 			);
 		}
-		return compressedReadingsByMeterID;
+		return barchartReadingsByMeterID;
 	}
 
 

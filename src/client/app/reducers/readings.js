@@ -8,11 +8,6 @@
 import * as readingsActions from '../actions/readings';
 
 /**
- * @typedef {Object} State~Readings
- * @property {Object.<number, Object.<string, State~Readings~ReadingsForTimeInterval>>} byMeterID
- */
-
-/**
  * @type {State~Readings}
  */
 const defaultState = {
