@@ -10,23 +10,23 @@ const Meter = require('./../models/Meter');
 async function readMetasysData(filePath) {
 	const readingArr = [];
 	let i = 1;
-	//getting filename
-	const fileNameArray = filePath.split("/");
+	// getting filename
+	const fileNameArray = filePath.split('/');
 	const fileName = fileNameArray.pop();
-	//list of readings
+	// list of readings
 	const rows = await readCsv(filePath);
-	//meterInformation
+	// meterInformation
 	const meter	= await Meter.getByName(fileName.replace('.csv', ''));
 
 	for (const row of rows) {
-		//timestamp. end time stamp
+		// timestamp. end time stamp
 		const timestamp = row[0].toLocaleString();
-		const start_timestamp = new Date(timestamp);
-		let end_timestamp = new Date(timestamp);
-		end_timestamp.setHours(end_timestamp.getHours()+1);
+		const startTimestamp = new Date(timestamp);
+		const endTimestamp = new Date(timestamp);
+		endTimestamp.setHours(endTimestamp.getHours() + 1);
 
 
-		//meterReading
+		// meterReading
 		let meterReading = row[3];
 		meterReading = meterReading.replace('kWh', '');
 		meterReading = parseInt(meterReading);
@@ -34,14 +34,14 @@ async function readMetasysData(filePath) {
 		/* We have hourly trend and monthly trend for Metasys data. We just read hourly trend.
 		 * So, we skip one line as we go through the data
 		 */
-		if ((i % 2 != 0)) {
-			const reading = new Reading(meter.id, meterReading, start_timestamp, end_timestamp);
+		if (i % 2 !== 0) {
+			const reading = new Reading(meter.id, meterReading, startTimestamp, endTimestamp);
 			readingArr.push(reading);
 		}
 		i++;
 	}
 	try {
-		//inserting all the data from an array into database and catching error when it occurs.
+		// inserting all the data from an array into database and catching error when it occurs.
 		Reading.insertAll(readingArr);
 	} catch (err) {
 		console.error(err);

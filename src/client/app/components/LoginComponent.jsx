@@ -69,7 +69,7 @@ export default class LoginComponent extends React.Component {
 		};
 		return (
 			<div>
-				<HeaderComponent renderLoginButton="false" />
+				<HeaderComponent renderLoginButton={false} />
 				<form style={formStyle} onSubmit={this.handleSubmit}>
 					<div className="input-group">
 						<span className="input-group-addon"><i className="glyphicon glyphicon-user" /></span>
