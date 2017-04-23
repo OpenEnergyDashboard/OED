@@ -5,11 +5,11 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/.
  */
 
-import * as readingsActions from '../actions/readings';
+import * as readingsActions from '../actions/lineReadings';
 
 /**
- * @typedef {Object} State~Readings
- * @property {Object.<number, Object.<string, State~Readings~ReadingsForTimeInterval>>} byMeterID
+ * @typedef {Object} State~BarReadings
+ * @property {Object<number, Object>} byMeterID
  */
 
 /**
@@ -26,7 +26,7 @@ const defaultState = {
  */
 export default function readings(state = defaultState, action) {
 	switch (action.type) {
-		case readingsActions.REQUEST_MANY_READINGS: {
+		case readingsActions.REQUEST_LINE_READINGS: {
 			const timeInterval = action.timeInterval;
 			const newState = {
 				...state,
@@ -45,7 +45,7 @@ export default function readings(state = defaultState, action) {
 			}
 			return newState;
 		}
-		case readingsActions.RECEIVE_MANY_READINGS: {
+		case readingsActions.RECEIVE_LINE_READINGS: {
 			const timeInterval = action.timeInterval;
 			const newState = {
 				...state,

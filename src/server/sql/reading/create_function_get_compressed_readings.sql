@@ -3,7 +3,7 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
 
 /**
-	This function compresses the readings for a meter over a given date range to a given number of even intervals, and
+	This function compresses the readings for an array of meters over a given date range to a given number of even intervals, and
 	returns a query
  */
 CREATE OR REPLACE FUNCTION compressed_readings(

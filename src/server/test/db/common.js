@@ -17,20 +17,21 @@ config.database = {
 
 const { db, createSchema } = require('../../models/database');
 
-async function recreateDB() {
-	await db.none('DROP VIEW IF EXISTS groups_deep_meters');
-	await db.none('DROP VIEW IF EXISTS groups_deep_children');
-	await db.none('DROP VIEW IF EXISTS meters_deep_children');
-	await db.none('DROP TABLE IF EXISTS meters_immediate_children');
-	await db.none('DROP TABLE IF EXISTS groups_immediate_children');
-	await db.none('DROP TABLE IF EXISTS groups_immediate_meters');
-	await db.none('DROP TABLE IF EXISTS groups');
-	await db.none('DROP TABLE IF EXISTS users');
-	await db.none('DROP TABLE IF EXISTS readings');
-	await db.none('DROP TABLE IF EXISTS meters');
-	await db.none('DROP TYPE IF EXISTS meter_type');
-	await db.none('DROP FUNCTION IF EXISTS compressed_readings(INTEGER[], TIMESTAMP, TIMESTAMP, INTEGER);');
-	await createSchema();
+function recreateDB() {
+	return db.none('DROP VIEW IF EXISTS groups_deep_meters')
+		.then(() => db.none('DROP VIEW IF EXISTS groups_deep_children'))
+		.then(() => db.none('DROP VIEW IF EXISTS meters_deep_children'))
+		.then(() => db.none('DROP TABLE IF EXISTS meters_immediate_children'))
+		.then(() => db.none('DROP TABLE IF EXISTS groups_immediate_children'))
+		.then(() => db.none('DROP TABLE IF EXISTS groups_immediate_meters'))
+		.then(() => db.none('DROP TABLE IF EXISTS groups'))
+		.then(() => db.none('DROP TABLE IF EXISTS users'))
+		.then(() => db.none('DROP TABLE IF EXISTS readings'))
+		.then(() => db.none('DROP TABLE IF EXISTS meters'))
+		.then(() => db.none('DROP TYPE IF EXISTS meter_type'))
+		.then(() => db.none('DROP FUNCTION IF EXISTS compressed_readings(INTEGER[], TIMESTAMP, TIMESTAMP, INTEGER);'))
+		.then(() => db.none('DROP FUNCTION IF EXISTS barchart_readings(INTEGER[], INTERVAL, TIMESTAMP, TIMESTAMP);'))
+		.then(createSchema);
 }
 
 module.exports.recreateDB = recreateDB;
