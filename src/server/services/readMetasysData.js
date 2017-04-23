@@ -21,9 +21,9 @@ async function readMetasysData(filePath) {
 	for (const row of rows) {
 		// timestamp. end time stamp
 		const timestamp = row[0].toLocaleString();
-		const start_timestamp = new Date(timestamp);
-		const end_timestamp = new Date(timestamp);
-		end_timestamp.setHours(end_timestamp.getHours() + 1);
+		const startTimestamp = new Date(timestamp);
+		const endTimestamp = new Date(timestamp);
+		endTimestamp.setHours(endTimestamp.getHours() + 1);
 
 
 		// meterReading
@@ -34,8 +34,8 @@ async function readMetasysData(filePath) {
 		/* We have hourly trend and monthly trend for Metasys data. We just read hourly trend.
 		 * So, we skip one line as we go through the data
 		 */
-		if ((i % 2 != 0)) {
-			const reading = new Reading(meter.id, meterReading, start_timestamp, end_timestamp);
+		if (i % 2 !== 0) {
+			const reading = new Reading(meter.id, meterReading, startTimestamp, endTimestamp);
 			readingArr.push(reading);
 		}
 		i++;

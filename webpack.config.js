@@ -8,6 +8,7 @@ const path = require('path');
 
 const BUILD_DIR = path.resolve(__dirname, 'src/client/public');
 const APP_DIR = path.resolve(__dirname, 'src/client/app');
+const COMMON_DIR = path.resolve(__dirname, 'src/common');
 
 const config = {
 	entry: ['babel-polyfill', `${APP_DIR}/index.jsx`],
@@ -22,8 +23,12 @@ const config = {
 		loaders: [
 			{
 				test: /\.jsx?/,
-				include: APP_DIR,
+				include: [APP_DIR, COMMON_DIR],
 				loader: 'babel'
+			},
+			{
+				test: /\.css$/,
+				loader: 'style-loader!css-loader'
 			}
 		]
 	},
