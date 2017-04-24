@@ -51,11 +51,11 @@ export default class GroupComponent extends React.Component {
 					<Link to="/"><LogoComponent url="./app/images/logo.png" /> </Link>
 					<h1 style={boxStyle}>Group Main Page</h1>
 					<div className="col-xs-2">
-						<GroupSidebarContainer></GroupSidebarContainer>
+						<GroupSidebarContainer />
 					</div>
 					<div className="col-xs-10">
 						{this.props.selectedGroups.map(groupID =>
-							<div className="col-xs-12"><GroupViewContainer key={groupID} id={groupID} /></div>
+							<div key={groupID} className="col-xs-12"><GroupViewContainer key={groupID} id={groupID} /></div>
 						)}
 					</div>
 
