@@ -4,7 +4,6 @@
 
 // This component is for viewing a single group via child box components + some buttons
 import React from 'react';
-import { Link } from 'react-router';
 import ChildMeterBoxContainer from '../../containers/groups/ChildMeterBoxContainer';
 import ChildGroupBoxContainer from '../../containers/groups/ChildGroupBoxContainer';
 
@@ -12,7 +11,7 @@ export default class GroupViewComponent extends React.Component {
 
 	constructor(props) {
 		super(props);
-		this.state = { showModal: false};
+		this.state = { showModal: false };
 	}
 
 
@@ -82,15 +81,6 @@ export default class GroupViewComponent extends React.Component {
 							<ChildGroupBoxContainer parentID={this.props.id} />
 						</div>
 					</div>
-
-					<Button bsStyle="primary" bsSize="large" onClick={this.open}>
-						Launch demo modal
-					</Button>
-
-					<Modal>
-
-					</Modal>
-
 				</div>
 
 			</div>
