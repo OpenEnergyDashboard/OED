@@ -29,10 +29,6 @@ app.use('/api/readings', readings);
 app.use('/api/login', login);
 app.use('/api/verification', verification);
 
-app.get('*', (req, res) => {
-	res.sendFile(path.resolve(__dirname, '..', 'client', 'index.html'));
-});
-
 // catch 404 and forward to error handler
 app.use((req, res, next) => {
 	const err = new Error('Not Found');
@@ -44,6 +40,11 @@ app.use((err, req, res) => {
 	res.status(err.status || 500);
 	if (err.status === 404) res.send(`<h1>${err.status} Not found</h1>`);
 	else res.send(`<h1>${err.status} Server Error</h1>`);
+});
+
+// This is after the other app.XXX entries as having it before seems to cause issues. See OED issue #86.
+app.get('*', (req, res) => {
+	res.sendFile(path.resolve(__dirname, '..', 'client', 'index.html'));
 });
 
 module.exports = app;
