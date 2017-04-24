@@ -4,6 +4,7 @@
 
 // This component is for viewing a single group via child box components + some buttons
 import React from 'react';
+import { Modal, Button } from 'react-bootstrap';
 import ChildMeterBoxContainer from '../../containers/groups/ChildMeterBoxContainer';
 import ChildGroupBoxContainer from '../../containers/groups/ChildGroupBoxContainer';
 
@@ -12,11 +13,12 @@ export default class GroupViewComponent extends React.Component {
 	constructor(props) {
 		super(props);
 		this.state = { showModal: false };
+		this.open = this.open.bind(this);
+		this.close = this.close.bind(this);
 	}
 
 
 	componentWillMount() {
-		console.log(this.props.id);
 		this.props.fetchGroupChildren(this.props.id);
 	}
 
@@ -81,6 +83,24 @@ export default class GroupViewComponent extends React.Component {
 							<ChildGroupBoxContainer parentID={this.props.id} />
 						</div>
 					</div>
+					<Button bsStyle="primary" onClick={this.open}>Modal!</Button>
+				</div>
+
+				<div className="static-modal">
+					<Modal show={this.state.showModal} onHide={this.close}>
+						<Modal.Header closeButton>
+							<Modal.Title>Modal title</Modal.Title>
+						</Modal.Header>
+
+						<Modal.Body>
+							One fine body...
+						</Modal.Body>
+
+						<Modal.Footer>
+							<Button onClick={this.close}>Close</Button>
+						</Modal.Footer>
+
+					</Modal>
 				</div>
 
 			</div>
