@@ -42,7 +42,6 @@ app.use((err, req, res) => {
 	else res.send(`<h1>${err.status} Server Error</h1>`);
 });
 
-// This is after the other app.XXX entries as having it before seems to cause issues. See OED issue #86.
 app.get('*', (req, res) => {
 	res.sendFile(path.resolve(__dirname, '..', 'client', 'index.html'));
 });
