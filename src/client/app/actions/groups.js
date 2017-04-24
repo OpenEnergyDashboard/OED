@@ -66,7 +66,6 @@ function receiveGroupChildren(groupID, data) {
 
 function shouldFetchGroupChildren(state, groupID) {
 	const group = state.groups.byGroupID[groupID];
-	console.log(state.groups.byGroupID);
 	// Check that the group has no children of any kind AND that it is not being fetched.
 	return (group.childGroups.length === 0 && group.childMeters.length === 0) && !group.isFetching;
 }
