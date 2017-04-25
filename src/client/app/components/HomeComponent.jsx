@@ -5,6 +5,8 @@
 import React from 'react';
 import HeaderComponent from './HeaderComponent';
 import DashboardContainer from '../containers/DashboardContainer';
+import ExportContainer from '../containers/ExportContainer';
+
 
 /**
  * Top-level React component that controls the home page
@@ -15,6 +17,7 @@ export default function HomeComponent() {
 		<div>
 			<HeaderComponent renderLoginButton />
 			<DashboardContainer />
+			<ExportContainer />
 		</div>
 	);
 }

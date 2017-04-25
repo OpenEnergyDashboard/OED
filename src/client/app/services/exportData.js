@@ -11,14 +11,14 @@ import moment from 'moment';
  */
 
 function convertToCSV(items) {
-	let csvOutput = 'id:,readings:,timestamp:\n';
+	let csvOutput = 'Label,Readings,Timestamp\n';
 	items.forEach(set => {
 		const data = set.exportVals;
-		const id = set.id;
+		const label = set.label;
 		data.forEach(reading => {
 			const info = reading.y;
 			const timeStamp = moment(reading.x).format('dddd MMM DD YYYY hh:mm a');
-			csvOutput += `${id},${info} kwh, ${timeStamp} \n`;
+			csvOutput += `${label},${info} kwh, ${timeStamp}\n`;
 		});
 	});
 	return csvOutput;
@@ -27,16 +27,17 @@ function convertToCSV(items) {
  * Function to download the formatted CSV file to the users computer.
  * @param inputCSV A String containing the formatted CSV data.
  */
-function downloadCSV(inputCSV) {
-	const csvContent = `data:text/csv;charset=utf-8,${inputCSV}`;
-	const encodedUri = encodeURI(csvContent);
-	const link = document.createElement('a');
-	const fileName = 'exportedDataOED.csv';
-	link.setAttribute('href', encodedUri);
-	link.setAttribute('download', fileName);
-	document.body.appendChild(link);
+function downloadCSV(inputCSV, fileName) {
+	const element = document.createElement('a');
+	element.setAttribute('href', `data:text/csv;charset=utf-8,${encodeURIComponent(inputCSV)}`);
+	element.setAttribute('download', fileName);
 
-	link.click(); // This will download the data file
+	element.style.display = 'none';
+	document.body.appendChild(element);
+
+	element.click();
+
+	document.body.removeChild(element);
 }
 /**
  * Function to export compressed data from the graph currently displaying. May be used for routing if more export options are added
@@ -44,5 +45,5 @@ function downloadCSV(inputCSV) {
  */
 export default function graphExport(dataSets) {
 	const dataToExport = convertToCSV(dataSets);
-	downloadCSV(dataToExport);
+	downloadCSV(dataToExport, 'test.csv');
 }

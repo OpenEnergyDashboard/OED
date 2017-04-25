@@ -7,21 +7,12 @@ import graphExport from '../services/exportData';
 
 export default class ExportComponent extends React.Component {
 	/**
-	 * Initializes the component's state, binds all functions to 'this' UIOptionsComponent
+	 * Initializes the component's state, binds all functions to 'this' ExportComponent
 	 * @param props The props passed down through the UIOptionsContainer
 	 */
 	constructor(props) {
 		super(props);
-		this.handleMeterSelect = this.handleMeterSelect.bind(this);
 		this.exportReading = this.exportReading.bind(this);
-	}
-
-	/**
-	 * Called when this component mounts
-	 * Dispatches a Redux action to fetch meter information
-	 */
-	componentWillMount() {
-		this.props.fetchMetersDataIfNeeded();
 	}
 
 	/**
@@ -31,19 +22,6 @@ export default class ExportComponent extends React.Component {
 	exportReading() {
 		const compressedData = this.props.exportVals.datasets;
 		graphExport(compressedData);
-	}
-
-	handleMeterSelect(e) {
-		e.preventDefault();
-		const options = e.target.options;
-		const selectedMeters = [];
-		// We can't map here because this is a collection of DOM elements, not an array.
-		for (let i = 0; i < options.length; i++) {
-			if (options[i].selected) {
-				selectedMeters.push(parseInt(options[i].value));
-			}
-		}
-		this.props.selectMeters(selectedMeters);
 	}
 
 	render() {
