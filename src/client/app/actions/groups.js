@@ -13,9 +13,9 @@ export const RECEIVE_GROUPS_DETAILS = 'RECEIVE_GROUPS_DETAILS';
 export const REQUEST_GROUP_CHILDREN = 'REQUEST_GROUP_CHILDREN';
 export const RECEIVE_GROUP_CHILDREN = 'RECEIVE_GROUP_CHILDREN';
 
-export const CHANGE_SELECTED_GROUPS = 'CHANGE_SELECTED_GROUPS';
-export const GROUPSUI_CHANGE_SELECTED_METERS = 'GROUPSUI_CHANGE_SELECTED_METERS';
-export const UPDATE_SELECTED_GROUPS = 'UPDATE_SELECTED_GROUPS';
+export const GROUPSUI_CHANGE_SELECTED_GROUPS_PER_GROUP = 'GROUPSUI_CHANGE_SELECTED_GROUPS_PER_GROUP';
+export const GROUPSUI_CHANGE_SELECTED_METERS_PER_GROUP = 'GROUPSUI_CHANGE_SELECTED_METERS_PER_GROUP';
+export const GROUPSUI_CHANGE_DISPLAYED_GROUPS = 'GROUPSUI_CHANGE_DISPLAYED_GROUPS';
 
 function requestGroupsDetails() {
 	return { type: REQUEST_GROUPS_DETAILS };
@@ -92,7 +92,7 @@ export function fetchGroupChildrenIfNeeded(groupID) {
 }
 
 export function switchSelectedGroups(groupIDs) {
-	return { type: UPDATE_SELECTED_GROUPS, groupIDs };
+	return { type: GROUPSUI_CHANGE_DISPLAYED_GROUPS, groupIDs };
 }
 
 /**
@@ -101,7 +101,7 @@ export function switchSelectedGroups(groupIDs) {
  * @return {{type: string, groupIDs: *}}
  */
 export function changeSelectedGroups(parentID, groupIDs) {
-	return { type: CHANGE_SELECTED_GROUPS, parentID, groupIDs };
+	return { type: GROUPSUI_CHANGE_SELECTED_GROUPS_PER_GROUP, parentID, groupIDs };
 }
 
 export function updateSelectedGroups(groupIDs) {
@@ -109,5 +109,5 @@ export function updateSelectedGroups(groupIDs) {
 }
 
 export function groupsUIchangeSelectedMeters(parentID, meterIDs) {
-	return { type: GROUPSUI_CHANGE_SELECTED_METERS, parentID, meterIDs };
+	return { type: GROUPSUI_CHANGE_SELECTED_METERS_PER_GROUP, parentID, meterIDs };
 }
