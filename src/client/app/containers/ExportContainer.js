@@ -31,7 +31,7 @@ function mapStateToProps(state) {
 			data.datasets.push({
 				label: state.meters.byMeterID[meterID].name,
 				id: state.meters.byMeterID[meterID].id,
-				timestamp: state.readings.bar.byMeterID[meterID][timeInterval][barDuration].start_timestamp,
+				timestamp: state.readings.bar.byMeterID[meterID][timeInterval][barDuration].timestamp,
 				exportVals: state.readings.bar.byMeterID[meterID][timeInterval][barDuration].readings.map(arr => ({ x: arr[0], y: arr[1] }))
 			});
 		}
