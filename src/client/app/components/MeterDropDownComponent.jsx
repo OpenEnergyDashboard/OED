@@ -3,16 +3,24 @@
  */
 import React from 'react';
 
-export default function MeterDropDownComponent(props) {
-	console.log(props);
-	const handleMeterSelect = () => {
-		console.log('it works m8');
-	};
-	return (
-		<select multiple onChange={handleMeterSelect}>
-			{props.meters.map(meter =>
-				<option key={meter.id} value={meter.id}>{meter.name}</option>
-			)}
-		</select>
-	);
+export default class MeterDropDownComponent extends React.Component {
+	constructor(props) {
+		super(props);
+		console.log(props);
+		this.handleMeterSelect = this.handleMeterSelect.bind(this);
+	}
+
+	handleMeterSelect(event) {
+		this.setState({ selectedMeter: event.target.value });
+	}
+
+	render() {
+		return (
+			<select onChange={this.handleMeterSelect}>
+				{this.props.meters.map(meter =>
+					<option key={meter.id} value={meter.id}>{meter.name}</option>
+				)}
+			</select>
+		);
+	}
 }
