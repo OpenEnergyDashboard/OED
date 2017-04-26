@@ -4,6 +4,8 @@
 
 import moment from 'moment';
 
+
+
 /**
  * Function to converts the compressed meter data into a CSV formatted string.
  * @param items The compressed meter data.
@@ -18,7 +20,7 @@ function convertToCSV(items) {
 		data.forEach(reading => {
 			const info = reading.y;
 			const timeStamp = moment(reading.x).format('dddd MMM DD YYYY hh:mm a');
-			csvOutput += `${label},${info} kwh, ${timeStamp}\n`;
+			csvOutput += `${label},${info} kwh, ${timeStamp}\n`; // this assumes that meter readings are in kwh
 		});
 	});
 	return csvOutput;
@@ -39,11 +41,12 @@ function downloadCSV(inputCSV, fileName) {
 
 	document.body.removeChild(element);
 }
+
 /**
  * Function to export compressed data from the graph currently displaying. May be used for routing if more export options are added
  * @param dataSets An Object. The compressed data from each meter currently selected in the graph.
  */
-export default function graphExport(dataSets) {
+export default function graphExport(dataSets, name) {
 	const dataToExport = convertToCSV(dataSets);
-	downloadCSV(dataToExport, 'test.csv');
+	downloadCSV(dataToExport, name);
 }

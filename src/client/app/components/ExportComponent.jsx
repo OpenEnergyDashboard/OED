@@ -3,6 +3,7 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
 
 import React from 'react';
+import moment from 'moment';
 import graphExport from '../services/exportData';
 
 export default class ExportComponent extends React.Component {
@@ -21,7 +22,10 @@ export default class ExportComponent extends React.Component {
 	 */
 	exportReading() {
 		const compressedData = this.props.exportVals.datasets;
-		graphExport(compressedData);
+		let time = compressedData[0].exportVals[0].x;
+		time = moment(time).format('ddddMMMDDYYYY');
+		const name = `oedExport${time}.csv`;
+		graphExport(compressedData,	name);
 	}
 
 	render() {
