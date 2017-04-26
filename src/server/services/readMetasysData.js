@@ -6,7 +6,7 @@ const moment = require('moment');
  * Reads CSV file passed to input all the Metasys readings into database.
  * @param filePath the filePath to read
  */
-async function readMetasysData(filePath, readingInterval, readingRepetition, cumulativeIndicator,conn) {
+async function readMetasysData(filePath, readingInterval, readingRepetition, cumulativeIndicator) {
 	//arrays to store readings and rows
 	const readingArray = [];
 	const rowArray = [];
@@ -82,7 +82,7 @@ async function readMetasysData(filePath, readingInterval, readingRepetition, cum
 	try {
 		console.log("About to insert");
 		//inserting all the data from an array into database and catching error when it occurs.
-		Reading.insertAll(readingArray,conn).then(() => console.log("Done"));
+		Reading.insertAll(readingArray).then(() => console.log("Done"));
 	} catch (err) {
 		console.error(err);
 	}
