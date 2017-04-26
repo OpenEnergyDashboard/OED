@@ -27,13 +27,12 @@ mocha.describe('Insert Metasys readings from a file', () => {
 		meter = await Meter.getByName('Meter', t);
 	}));
 
-	mocha.it('loads the correct number of rows from a file', () => db.task(async t => {
+	mocha.it('loads the correct number of rows from a file', () => {
 		const testFilePath = path.join(__dirname, 'Meter.csv');
-		// readMetasysData(filepath, interval, repetition)
-		await readMetasysData(testFilePath, 30, 1, false,t);
-		const count = await db.one('SELECT COUNT(*) as count FROM readings');
-		expect(parseInt(count)).to.equal(225);
-			// .then(() => db.one('SELECT COUNT(*) as count FROM readings'))
-			// .then(({ count }) => expect(parseInt(count)).to.equal(225));
-	}));
+	//	const readingDuration = moment.duration(1, 'hours');
+		// readMetasysData(filepath, interval, repetition, cumulative & reset)
+		return readMetasysData(testFilePath, 30,1, false)
+			.then(() => db.one('SELECT COUNT(*) as count FROM readings'))
+			.then(({ count }) => expect(parseInt(count)).to.equal(225));
+	});
 });
