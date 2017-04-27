@@ -23,6 +23,13 @@ export function changeSelectedMeters(meterIDs) {
 		return Promise.resolve();
 	};
 }
+export function changeSelectedBuilding(meterIDs,timeInterval) {
+	return (dispatch, state) => {
+		dispatch(updateSelectedMeters(meterIDs));
+		dispatch(fetchNeededReadings(meterIDs, timeInterval));
+		return Promise.resolve();
+	};
+}
 
 function fetchNeededReadingsForGraph(meterIDs, timeInterval) {
 	return dispatch => {
