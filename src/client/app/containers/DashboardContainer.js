@@ -5,7 +5,10 @@
 import { connect } from 'react-redux';
 import DashboardComponent from '../components/DashboardComponent';
 
-/**
- * Connects and passes down the Redux dispatch function to DashboardComponent
- */
-export default connect()(DashboardComponent);
+function mapStateToProps(state) {
+	return {
+		chartToRender: state.graph.chartToRender,
+	};
+}
+
+export default connect(mapStateToProps)(DashboardComponent);
