@@ -3,33 +3,7 @@
 
 # BE AWARE: If you change to another base image, you
 # may need to enable the apt-get clean in SECTION: INSTALL POSTGRES
-FROM ubuntu
-
-# ----------------------------
-# SECTION: ENVIRONMENT SETUP
-# ----------------------------
-    # Disable pretty-printing for warnings
-    ENV DEBIAN_FRONTEND noninteractive
-
-# ----------------------------
-# SECTION: INSTALL POSTGRES
-# ----------------------------
-    # Key for PostgreSQL repository 
-    RUN apt-key adv --keyserver hkp://p80.pool.sks-keyservers.net:80 \
-        --recv-keys B97B0AFCAA1A47F044F244A07FCC7D46ACCC4CF8
-
-    # Repository containing PostgreSQL 9.6
-    RUN echo "deb http://apt.postgresql.org/pub/repos/apt/ precise-pgdg main" \
-        > /etc/apt/sources.list.d/pgdg.list
-
-    # Update package lists
-    RUN apt-get update 
-    # Install PSP for convenience
-    RUN apt-get install -y python-software-properties software-properties-common 
-    # Install PostgreSQL
-    RUN apt-get install -y postgresql-9.6 postgresql-client-9.6 postgresql-contrib-9.6
-    # Manually clean up; this is normally not required.
-    # RUN apt-get clean
+FROM postgres:9.6
 
 # ----------------------------
 # SECTION: CONFIGURE POSTGRES
