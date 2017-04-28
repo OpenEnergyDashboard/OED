@@ -18,7 +18,7 @@ FROM ubuntu
     RUN apt-key adv --keyserver hkp://p80.pool.sks-keyservers.net:80 \
         --recv-keys B97B0AFCAA1A47F044F244A07FCC7D46ACCC4CF8
 
-    # Repository containing PostgreSQL 9.3
+    # Repository containing PostgreSQL 9.6
     RUN echo "deb http://apt.postgresql.org/pub/repos/apt/ precise-pgdg main" \
         > /etc/apt/sources.list.d/pgdg.list
 
@@ -27,7 +27,7 @@ FROM ubuntu
     # Install PSP for convenience
     RUN apt-get install -y python-software-properties software-properties-common 
     # Install PostgreSQL
-    RUN apt-get install -y postgresql-9.3 postgresql-client-9.3 postgresql-contrib-9.3
+    RUN apt-get install -y postgresql-9.6 postgresql-client-9.6 postgresql-contrib-9.6
     # Manually clean up; this is normally not required.
     # RUN apt-get clean
 
@@ -44,8 +44,8 @@ FROM ubuntu
         createdb -O opened oed_testing
     
     # Allow remote connections on all addresses
-    RUN echo "host all all 0.0.0.0/0 md5" >> /etc/postgresql/9.3/main/pg_hba.conf
-    RUN echo "listen_addresses='*'" >> /etc/postgresql/9.3/main/postgresql.conf
+    RUN echo "host all all 0.0.0.0/0 md5" >> /etc/postgresql/9.6/main/pg_hba.conf
+    RUN echo "listen_addresses='*'" >> /etc/postgresql/9.6/main/postgresql.conf
 
 # ----------------------------
 # SECTION: CONFIGURE CONTAINER
@@ -57,6 +57,6 @@ FROM ubuntu
     VOLUME  ["/etc/postgresql", "/var/log/postgresql", "/var/lib/postgresql"]
 
     # Set the default command to run when starting the container
-    CMD ["/usr/lib/postgresql/9.3/bin/postgres",\
-         "-D", "/var/lib/postgresql/9.3/main",\
-         "-c", "config_file=/etc/postgresql/9.3/main/postgresql.conf"]
+    CMD ["/usr/lib/postgresql/9.6/bin/postgres",\
+         "-D", "/var/lib/postgresql/9.6/main",\
+         "-c", "config_file=/etc/postgresql/9.6/main/postgresql.conf"]
