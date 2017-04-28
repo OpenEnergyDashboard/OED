@@ -14,6 +14,17 @@ Node.js - Javascript runtime environment ([nodejs.org](https://nodejs.org/en/))
 
 You can either install PostgreSQL on your computer or use Docker.
 
+#### With Docker ####
+
+1. Install Docker, Node, npm, and git.
+1. Clone this repository.
+1. Run ```npm install``` in the project root directory.
+1. Run ```docker/start_psql_container.sh```.
+1. Everything from here is the same as above, after setting up the database.
+1. Once you're done working, ```docker/stop_psql_container.sh```.
+
+If you have issues with Docker, you may need to run the scripts with ```sudo```.
+
 #### Without Docker ####
 
 1. Install Node, npm, and git.
@@ -38,15 +49,6 @@ TOKEN_SECRET=?             // Token for authentication. Generate something secur
 1. Run `npm run updateMamacMeters` to fetch new data for mamac meters in the database.
 1. Run ```npm run build``` to create the Webpack bundle for production, otherwise run ```npm run dev``` for development.
 1. Run ```npm start```
-
-#### With Docker ####
-
-1. Install Node, npm, and git.
-1. Clone this repository.
-1. Run ```npm install``` in the project root directory.
-1. Run ```docker/start_psql_container.sh```.
-1. Everything from here is the same as above, after setting up the database.
-1. Once you're done working, ```docker/stop_psql_container.sh```.
 
 ### Authors ###
 
