@@ -148,5 +148,16 @@ class Group {
 		return rows.map(row => row.meter_id);
 	}
 
+	/**
+	 * Change the name of this group
+	 * @param new_name New name for the group
+	 * @param conn the connection to be used, defaults to the default database connection.
+	 * @return {Promise.<void>}
+	 */
+	async rename(new_name, conn = db) {
+		const group = this;
+		await conn.none(sqlFile('group/rename_group.sql'), { new_name, id: this.id });
+	}
+
 }
 module.exports = Group;

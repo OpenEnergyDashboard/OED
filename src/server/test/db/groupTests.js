@@ -35,6 +35,21 @@ mocha.describe('Groups', () => {
 		const groupPostInsert = await Group.getByName(groupPreInsert.name);
 		expect(groupPostInsert).to.have.property('name', groupPreInsert.name);
 	});
+	mocha.it('can be renamed', async () => {
+		let larry = new Group(undefined, 'Larry');
+		await larry.insert();
+		// pull larry back out of the db so that we get his ID
+		larry = await Group.getByName('Larry');
+		// rename 'Larry' -> 'Bob'
+		await larry.rename('Bob');
+		// bob should be larry, but renamed
+		const bob = await Group.getByID(larry.id);
+		// expect(bob).to.have.property('name', 'Bob');
+		expect(bob.id).to.equal(larry.id);
+		expect(bob.name).to.deep.equal('Bob');
+
+		expect(bob).to.have.property('name', 'Bob');
+	});
 	mocha.describe('With groups and meters set up', () => {
 		mocha.beforeEach(setupGroupsAndMeters);
 		mocha.it('can be given a child group', async () => {
