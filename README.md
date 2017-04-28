@@ -12,6 +12,10 @@ Node.js - Javascript runtime environment ([nodejs.org](https://nodejs.org/en/))
 
 ### Developer installation: ###
 
+You can either install PostgreSQL on your computer or use Docker.
+
+#### Without Docker ####
+
 1. Install Node, npm, and git.
 1. Clone this repository.
 1. Run ```npm install``` in the project root directory.
@@ -34,6 +38,19 @@ TOKEN_SECRET=?             // Token for authentication. Generate something secur
 1. Run `npm run updateMamacMeters` to fetch new data for mamac meters in the database.
 1. Run ```npm run build``` to create the Webpack bundle for production, otherwise run ```npm run dev``` for development.
 1. Run ```npm start```
+
+#### With Docker ####
+
+1. Install Node, npm, and git.
+1. Clone this repository.
+1. Run ```npm install``` in the project root directory.
+1. Run ```docker build -t oed_postgres ./docker```. This will take a while.
+1. Copy the ```docker/docker.env``` file to ```.env```.
+1. Run ```docker run -d -P --name oed_database oed_postgres```. 
+1. Run ```docker ps``` and look for something like ```0.0.0.0:32771->5432/tcp```. 
+1. Edit ```.env``` to reflect the correct database port; in the example it would be 32771. Also change the token secret. 
+1. Everything from here is the same as above, after setting up the database.
+1. Once you're done working, run ```docker stop oed_test```. Optionally you can run ```docker rm oed_test``` in order to completely remove the container from your system.
 
 ### Authors ###
 
