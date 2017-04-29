@@ -12,12 +12,22 @@ import { chartTypes } from '../reducers/graph';
  * React component that controls the dashboard
  */
 export default function DashboardComponent(props) {
+	const divPadding = {
+		paddingTop: '35px'
+	};
+	const ChartToRender = (props.chartToRender === chartTypes.line) ? LineChartContainer : BarChartContainer;
 	return (
 		<div className="container-fluid">
-			<UIOptionsContainer />
-			<div className="col-xs-10">
-				{props.chartToRender === chartTypes.line ? <LineChartContainer /> : <BarChartContainer />}
-			</div>
+			{ props.drawUIOptions ? (
+				<div>
+					<div className="col-xs-2" style={divPadding}>
+						<UIOptionsContainer />
+					</div>
+					<div className="col-xs-10">
+						<ChartToRender />
+					</div>
+				</div>
+			) : (<ChartToRender />)}
 		</div>
 	);
 }

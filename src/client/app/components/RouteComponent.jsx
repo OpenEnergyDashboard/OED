@@ -5,7 +5,7 @@
 import React from 'react';
 import { Router, Route, browserHistory } from 'react-router';
 import axios from 'axios';
-import HomeComponent from './HomeComponent';
+import HomeContainer from '../containers/HomeContainer';
 import LoginComponent from './LoginComponent';
 import AdminComponent from './AdminComponent';
 import NotFoundComponent from './NotFoundComponent';
@@ -45,7 +45,7 @@ function requireAuth(nextState, replace) {
 export default function RouteComponent() {
 	return (
 		<Router history={browserHistory}>
-			<Route path="/" component={HomeComponent} />
+			<Route path="/" component={HomeContainer} />
 			<Route path="/login" component={LoginComponent} />
 			<Route path="/admin" component={AdminComponent} onEnter={requireAuth} />
 			<Route path="*" component={NotFoundComponent} />
