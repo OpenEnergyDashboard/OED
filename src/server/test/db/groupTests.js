@@ -11,7 +11,6 @@ chai.use(chaiAsPromised);
 const expect = chai.expect;
 
 const recreateDB = require('./common').recreateDB;
-const db = require('../../models/database').db;
 const Group = require('../../models/Group');
 const Meter = require('../../models/Meter');
 const mocha = require('mocha');
@@ -97,6 +96,19 @@ mocha.describe('Groups', () => {
 
 			expect(deepMetersOfParent.sort()).to.deep.equal(expectedMeters);
 			expect(deepGroupsOfParent.sort()).to.deep.equal(expectedGroups);
+		});
+
+		mocha.it('can disown child groups', async () => {
+			const parent = await Group.getByName('A');
+			const lovedChild = await Group.getByName('B');
+			const impendingOrphan = await Group.getByName('C');
+			await parent.associateWithChildGroup(lovedChild.id);
+			await parent.associateWithChildGroup(impendingOrphan.id);
+			let children = await Group.getImmediateGroupsByGroupID(parent.id);
+			expect(children.sort()).to.deep.equal([lovedChild.id, impendingOrphan.id].sort());
+			await parent.disownGroup(impendingOrphan.id);
+			children = await Group.getImmediateGroupsByGroupID(parent.id);
+			expect(children).to.deep.equal([lovedChild.id]);
 		});
 	});
 });

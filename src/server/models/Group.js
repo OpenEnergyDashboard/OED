@@ -150,13 +150,22 @@ class Group {
 
 	/**
 	 * Change the name of this group
-	 * @param new_name New name for the group
+	 * @param newName New name for the group
 	 * @param conn the connection to be used, defaults to the default database connection.
 	 * @return {Promise.<void>}
 	 */
-	async rename(new_name, conn = db) {
-		const group = this;
-		await conn.none(sqlFile('group/rename_group.sql'), { new_name, id: this.id });
+	async rename(newName, conn = db) {
+		await conn.none(sqlFile('group/rename_group.sql'), { new_name: newName, id: this.id });
+	}
+
+	/**
+	 * Returns a promise to remove the group with childID from the children of this group.
+	 * @param childID The child group to be disowned
+	 * @param conn the connection to be used.
+	 * @return {Promise.<void>}
+	 */
+	async disownGroup(childID, conn = db) {
+		await conn.none(sqlFile('group/disown_child_group.sql'), { parent_id: this.id, child_id: childID });
 	}
 
 }
