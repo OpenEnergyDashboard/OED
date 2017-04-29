@@ -39,7 +39,7 @@ export default function HeaderComponent(props) {
 				<h1 style={titleStyle}>Open Energy Dashboard</h1>
 			</div>
 			<div style={divRightStyle}>
-				{(props.renderOptionsButton && window.innerWidth < 1000) ? <UIModalComponent /> : null}
+				{(props.renderOptionsButton && props.drawUIOptionsButton) ? <UIModalComponent /> : null}
 				<Link style={loginLinkStyle} to="/login"><Button bsStyle="default">Log In</Button></Link>
 				<Link style={adminLinkStyle} to="/admin"><Button bsStyle="default">Admin panel</Button></Link>
 			</div>
