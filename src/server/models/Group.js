@@ -109,7 +109,7 @@ class Group {
 	 * @param conn the connection to be used, defaults to the default database connection.
 	 * @return {Promise.<void>}
 	 */
-	async associateWithChildGroup(childID, conn = db) {
+	async adoptGroup(childID, conn = db) {
 		// Confirm that such a group exists
 		const child = await Group.getByID(childID, conn);
 		await conn.none(sqlFile('group/associate_child_group_with_parent_group.sql'), { parent_id: this.id, child_id: child.id });
@@ -121,7 +121,7 @@ class Group {
 	 * @param conn
 	 * @return {Promise.<void>}
 	 */
-	async associateWithChildMeter(childID, conn = db) {
+	async adoptMeter(childID, conn = db) {
 		const meter = await Meter.getByID(childID, conn);
 		await conn.none(sqlFile('group/associate_child_meter_with_parent_group.sql'), { group_id: this.id, meter_id: meter.id });
 	}

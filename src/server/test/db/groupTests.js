@@ -53,7 +53,7 @@ mocha.describe('Groups', () => {
 		mocha.it('can be given a child group', async () => {
 			const parent = await Group.getByName('A');
 			const child = await Group.getByName('B');
-			await parent.associateWithChildGroup(child.id);
+			await parent.adoptGroup(child.id);
 			const childrenOfParent = await (Group.getImmediateGroupsByGroupID(parent.id));
 			expect(childrenOfParent).to.deep.equal([child.id]);
 		});
@@ -61,7 +61,7 @@ mocha.describe('Groups', () => {
 		mocha.it('can be given a child meter', async () => {
 			const parent = await Group.getByName('A');
 			const meter = await Meter.getByName('A');
-			await parent.associateWithChildMeter(meter.id);
+			await parent.adoptMeter(meter.id);
 			const metersOfParent = await (Group.getImmediateMetersByGroupID(parent.id));
 			expect(metersOfParent).to.deep.equal([meter.id]);
 		});
@@ -70,8 +70,8 @@ mocha.describe('Groups', () => {
 			const parent = await Group.getByName('A');
 			const child = await Group.getByName('B');
 			const grandchild = await Group.getByName('C');
-			await parent.associateWithChildGroup(child.id);
-			await child.associateWithChildGroup(grandchild.id);
+			await parent.adoptGroup(child.id);
+			await child.adoptGroup(grandchild.id);
 			const deepChildrenOfParent = await Group.getDeepGroupsByGroupID(parent.id);
 			expect(deepChildrenOfParent.sort()).to.deep.equal([child.id, grandchild.id].sort());
 		});
@@ -83,11 +83,11 @@ mocha.describe('Groups', () => {
 			const immediateMeter = await Meter.getByName('A');
 			const childsMeter = await Meter.getByName('B');
 			const grandchildsMeter = await Meter.getByName('C');
-			await parent.associateWithChildMeter(immediateMeter.id);
-			await parent.associateWithChildGroup(child.id);
-			await child.associateWithChildMeter(childsMeter.id);
-			await child.associateWithChildGroup(grandchild.id);
-			await grandchild.associateWithChildMeter(grandchildsMeter.id);
+			await parent.adoptMeter(immediateMeter.id);
+			await parent.adoptGroup(child.id);
+			await child.adoptMeter(childsMeter.id);
+			await child.adoptGroup(grandchild.id);
+			await grandchild.adoptMeter(grandchildsMeter.id);
 
 			const deepMetersOfParent = await Group.getDeepMetersByGroupID(parent.id);
 			const deepGroupsOfParent = await Group.getDeepGroupsByGroupID(parent.id);
@@ -103,8 +103,8 @@ mocha.describe('Groups', () => {
 			const lovedChild = await Group.getByName('B');
 			const impendingOrphan = await Group.getByName('C');
 
-			await parent.associateWithChildGroup(lovedChild.id);
-			await parent.associateWithChildGroup(impendingOrphan.id);
+			await parent.adoptGroup(lovedChild.id);
+			await parent.adoptGroup(impendingOrphan.id);
 
 			let children = await Group.getImmediateGroupsByGroupID(parent.id);
 			expect(children.sort()).to.deep.equal([lovedChild.id, impendingOrphan.id].sort());
@@ -119,8 +119,8 @@ mocha.describe('Groups', () => {
 			const lovedMeter = await Meter.getByName('A');
 			const impendingOrphan = await Meter.getByName('B');
 
-			await parent.associateWithChildMeter(lovedMeter.id);
-			await parent.associateWithChildMeter(impendingOrphan.id);
+			await parent.adoptMeter(lovedMeter.id);
+			await parent.adoptMeter(impendingOrphan.id);
 
 			let meters = await Group.getImmediateMetersByGroupID(parent.id);
 			expect(meters.sort()).to.deep.equal([lovedMeter.id, impendingOrphan.id].sort());
