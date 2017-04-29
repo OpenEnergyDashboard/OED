@@ -21,7 +21,7 @@ Node.js - Javascript runtime environment ([nodejs.org](https://nodejs.org/en/))
 1. Update meters with ```docker-compose run --rm web npm run updateMamacMeters```.
 1. For production, run the app with ```docker-compose up```. 
 For development, use ```docker-compose run --rm --service-ports web ./devstart.sh```, which will enable watching rebuild and serve the app locally.
-```--service-ports```
+```--service-ports``` is required because by default only ```docker-compose up``` opens the ports.
 1. Stop the app and remove containers with ```docker-compose down```. 
 
 Configuration is in ```docker-config.yml```. See especially the ```environment:``` section for the ```web``` service.
