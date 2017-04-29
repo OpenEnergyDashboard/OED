@@ -168,5 +168,14 @@ class Group {
 		await conn.none(sqlFile('group/disown_child_group.sql'), { parent_id: this.id, child_id: childID });
 	}
 
+	/**
+	 * Returns a promise to remove the group with childID from the children of this group.
+	 * @param childID The child group to be disowned
+	 * @param conn the connection to be used.
+	 * @return {Promise.<void>}
+	 */
+	async disownMeter(meterID, conn = db) {
+		await conn.none(sqlFile('group/disown_child_meter.sql'), { parent_id: this.id, meter_id: meterID });
+	}
 }
 module.exports = Group;

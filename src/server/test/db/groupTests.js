@@ -102,13 +102,32 @@ mocha.describe('Groups', () => {
 			const parent = await Group.getByName('A');
 			const lovedChild = await Group.getByName('B');
 			const impendingOrphan = await Group.getByName('C');
+
 			await parent.associateWithChildGroup(lovedChild.id);
 			await parent.associateWithChildGroup(impendingOrphan.id);
+
 			let children = await Group.getImmediateGroupsByGroupID(parent.id);
 			expect(children.sort()).to.deep.equal([lovedChild.id, impendingOrphan.id].sort());
+
 			await parent.disownGroup(impendingOrphan.id);
 			children = await Group.getImmediateGroupsByGroupID(parent.id);
 			expect(children).to.deep.equal([lovedChild.id]);
+		});
+
+		mocha.it('can disown child meters', async () => {
+			const parent = await Group.getByName('A');
+			const lovedMeter = await Meter.getByName('A');
+			const impendingOrphan = await Meter.getByName('B');
+
+			await parent.associateWithChildMeter(lovedMeter.id);
+			await parent.associateWithChildMeter(impendingOrphan.id);
+
+			let meters = await Group.getImmediateMetersByGroupID(parent.id);
+			expect(meters.sort()).to.deep.equal([lovedMeter.id, impendingOrphan.id].sort());
+
+			await parent.disownMeter(impendingOrphan.id);
+			meters = await Group.getImmediateMetersByGroupID(parent.id);
+			expect(meters).to.deep.equal([lovedMeter.id]);
 		});
 	});
 });
