@@ -15,7 +15,7 @@ import UIModalComponent from './UIModalComponent';
  */
 export default function HeaderComponent(props) {
 	const titleStyle = {
-		display: 'inline-block',
+		display: 'inline-block'
 	};
 	const divRightStyle = {
 		float: 'right',
@@ -39,7 +39,9 @@ export default function HeaderComponent(props) {
 				<h1 style={titleStyle}>Open Energy Dashboard</h1>
 			</div>
 			<div style={divRightStyle}>
-				{(props.renderOptionsButton && props.drawUIOptionsButton) ? <UIModalComponent /> : null}
+				<div className="visible-sm visible-xs">
+					{(props.renderOptionsButton) ? <UIModalComponent /> : null}
+				</div>
 				<Link style={loginLinkStyle} to="/login"><Button bsStyle="default">Log In</Button></Link>
 				<Link style={adminLinkStyle} to="/admin"><Button bsStyle="default">Admin panel</Button></Link>
 			</div>

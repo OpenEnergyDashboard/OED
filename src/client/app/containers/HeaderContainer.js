@@ -9,7 +9,6 @@ function mapStateToProps(state, ownProps) {
 	return {
 		renderLoginButton: ownProps.renderLoginButton,
 		renderOptionsButton: ownProps.renderOptionsButton,
-		drawUIOptionsButton: state.uiOptions.windowDimensions.width < 1000
 	};
 }
 

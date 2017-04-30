@@ -5,7 +5,7 @@
 import React from 'react';
 import axios from 'axios';
 import { browserHistory } from 'react-router';
-import HeaderContainer from '../containers/HeaderContainer';
+import HeaderComponent from '../components/HeaderComponent';
 
 export default class LoginComponent extends React.Component {
 	/**
@@ -69,7 +69,7 @@ export default class LoginComponent extends React.Component {
 		};
 		return (
 			<div>
-				<HeaderContainer renderLoginButton={false} />
+				<HeaderComponent renderLoginButton={false} />
 				<form style={formStyle} onSubmit={this.handleSubmit}>
 					<div className="input-group">
 						<span className="input-group-addon"><i className="glyphicon glyphicon-user" /></span>

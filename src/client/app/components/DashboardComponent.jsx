@@ -18,16 +18,14 @@ export default function DashboardComponent(props) {
 	const ChartToRender = (props.chartToRender === chartTypes.line) ? LineChartContainer : BarChartContainer;
 	return (
 		<div className="container-fluid">
-			{ props.drawUIOptions ? (
-				<div>
-					<div className="col-xs-2" style={divPadding}>
-						<UIOptionsContainer />
-					</div>
-					<div className="col-xs-10">
-						<ChartToRender />
-					</div>
+			<div>
+				<div className="col-xs-2 hidden-sm hidden-xs" style={divPadding}>
+					<UIOptionsContainer />
 				</div>
-			) : (<ChartToRender />)}
+				<div className="col-xs-10">
+					<ChartToRender />
+				</div>
+			</div>
 		</div>
 	);
 }

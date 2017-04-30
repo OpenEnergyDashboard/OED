@@ -9,7 +9,6 @@ import meters from './meters';
 import lineReadings from './lineReadings';
 import barReadings from './barReadings';
 import graph from './graph';
-import uiOptions from './uiOptions';
 
 /**
  * @typedef {Object} State
@@ -17,7 +16,6 @@ import uiOptions from './uiOptions';
  * @property {State~LineReadings} lineReadings
  * @property {State~BarReadings} barReadings
  * @property {State~Graph} graph
- * @property {State-UIOptions} uiOptions
  */
 
 /**
@@ -25,4 +23,4 @@ import uiOptions from './uiOptions';
  * @param action
  * @return {State}
  */
-export default combineReducers({ meters, readings: combineReducers({ line: lineReadings, bar: barReadings }), graph, uiOptions });
+export default combineReducers({ meters, readings: combineReducers({ line: lineReadings, bar: barReadings }), graph });

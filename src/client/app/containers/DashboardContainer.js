@@ -8,7 +8,6 @@ import DashboardComponent from '../components/DashboardComponent';
 function mapStateToProps(state) {
 	return {
 		chartToRender: state.graph.chartToRender,
-		drawUIOptions: state.uiOptions.windowDimensions.width >= 1000
 	};
 }
 
