@@ -12,19 +12,24 @@ Node.js - Javascript runtime environment ([nodejs.org](https://nodejs.org/en/))
 
 ### Developer installation: ###
 
+You can either use Docker Compose to install the app and PostgreSQL in containers, or install PostgreSQL on your system.
+
 #### With Docker ####
 
-1. You need Docker and Docker-Compose
-1. In the main directory, run ```docker-compose build``` (depending on your environment, you may need ```sudo``` for these commands).
-1. Create the schema with ```docker-compose run --rm web npm run createdb```. To clarify: ```docker-compose run --rm web``` means run the following command, in the ```web``` container (the one containing the OED NodeJS app). **NOTE:** this can sometimes fail; just try running it again. It fails due to PostgreSQL taking too long to set itself up.
-1. Import meters with ```docker-compose run --rm web npm run addMamacMeters <meters file>```. The OED directory is mounted in the docker container, so any files that are there will be included; files outside of that directory, however, will not be.
-1. Update meters with ```docker-compose run --rm web npm run updateMamacMeters```.
-1. For production, run the app with ```docker-compose up```. 
-For development, use ```docker-compose run --rm --service-ports web ./devstart.sh```, which will enable watching rebuild and serve the app locally.
+Depending on your environment, you may need ```sudo``` for these commands.
+
+1. In the main directory, run ```docker-compose build```. 
+This may take some time, as it installs the Node dependencies in the container.
+1. Set up the database with ```docker-compose run --rm web scripts/init.sh <excel file>```. 
+To clarify: ```docker-compose run --rm web``` means run the following command, in the ```web``` container (the one containing the OED NodeJS app). 
+You can either provide an Excel file with the IPs of some Mamac meters, in which case the database will be populated, or enter NONE, which will skip populating it.
+1. For production, run the app with ```docker-compose up -d```. This starts the app in the background.
+For development, use ```docker-compose run --rm --service-ports web scripts/devstart.sh```, which will enable watching rebuild and serve the app locally.
 ```--service-ports``` is required because by default only ```docker-compose up``` opens the ports.
-1. Stop the app and remove containers with ```docker-compose down```. 
+1. Stop the app with ```docker-compose stop```. This means that next time, you can skip the built and init steps. You can get rid of the database with ```docker-compose down```.
 
 Configuration is in ```docker-config.yml```. See especially the ```environment:``` section for the ```web``` service.
+By default, the app will run on the port 3000 with secret key ?, which should definitely be changed.
 
 #### Without Docker ####
 
