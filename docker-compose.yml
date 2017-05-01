@@ -10,6 +10,7 @@ services:
             - SERVER_PORT=3000
             - DB_USER=opened
             - DB_DATABASE=oed
+            - DB_TEST_DATABASE=oed_testing
             - DB_PASSWORD=opened
             - DB_HOST=database # Docker will set this hostname
             - DB_PORT=5432
