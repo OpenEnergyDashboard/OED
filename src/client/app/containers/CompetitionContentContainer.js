@@ -6,7 +6,7 @@ import _ from 'lodash';
 import { connect } from 'react-redux';
 import CompetitionContent from '../components/CompetitionContent';
 // import { changeSelectedMeters } from '../actions/graph';
-import { fetchMetersDataIfNeeded } from '../actions/meters';
+import { fetchMetersDetailsIfNeeded } from '../actions/meters';
 import { changeSelectedBuilding } from '../actions/graph';
 // import { stringifyTimeInterval } from '../util';
 
@@ -29,11 +29,11 @@ function mapStateToProps(state) {
 		return color;
 	}
 	for (const meterID of state.graph.selectedMeters) {
-		const readingsData = state.readings.byMeterID[meterID][timeInterval];
+		const readingsData = state.readings.line.byMeterID[meterID][timeInterval];
 		if (readingsData !== undefined && !readingsData.isFetching) {
 			data.datasets.push({
 				label: state.meters.byMeterID[meterID].name,
-				data: state.readings.byMeterID[meterID][timeInterval].readings.map(arr => ({ x: arr[0], y: arr[1].toFixed(2) })),
+				data: readingsData.readings.map(arr => ({ x: arr[0], y: arr[1].toFixed(2) })),
 				fill: true,
 				borderColor: getColor()
 			});
@@ -68,7 +68,7 @@ function mapStateToProps(state) {
 function mapDispatchToProps(dispatch) {
 	return {
 		// selectMeters: newSelectedMeterIDs => dispatch(changeSelectedMeters(newSelectedMeterIDs)),
-		fetchMetersDataIfNeeded: () => dispatch(fetchMetersDataIfNeeded()),
+		fetchMetersDataIfNeeded: () => dispatch(fetchMetersDetailsIfNeeded()),
 		selectMeters: (newSelectedMeterIDs,timeInterval) => dispatch(changeSelectedBuilding(newSelectedMeterIDs,timeInterval))
 		// fetchNewReadings: (meterID, startTimestamp, endTimestamp) => dispatch(fetchReadingsIfNeeded(meterID, startTimestamp, endTimestamp))
 	};

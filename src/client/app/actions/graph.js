@@ -52,10 +52,10 @@ export function changeSelectedMeters(meterIDs) {
 		return Promise.resolve();
 	};
 }
-export function changeSelectedBuilding(meterIDs,timeInterval) {
-	return (dispatch, state) => {
+export function changeSelectedBuilding(meterIDs, timeInterval) {
+	return dispatch => {
 		dispatch(updateSelectedMeters(meterIDs));
-		dispatch(fetchNeededReadings(meterIDs, timeInterval));
+		dispatch(fetchNeededLineReadings(timeInterval,2000));
 		return Promise.resolve();
 	};
 }

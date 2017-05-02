@@ -13,7 +13,8 @@ export default class CompetitionBuilding extends React.Component {
        id:"",
        compareDate:"",
 			 diff:0,
-			 options:{}
+			 options:{},
+			 data:[[0,0][0,0],0,0,0,0,0]
       }
 	};
 
@@ -22,18 +23,22 @@ export default class CompetitionBuilding extends React.Component {
 	 * Dispatches a Redux action to fetch meter information
 	 */
 	 componentWillReceiveProps(nextProps) {
+		 this.setState({data:nextProps.data});
 		 if(nextProps.thisMeter!=this.props.thisMeter){
 			 document.getElementById("week"+this.props.id).className="on";
  	    document.getElementById("month"+this.props.id).className="";
 			document.getElementById("day"+this.props.id).className="";
 		 }
-		 if(nextProps.data.length==3){
+		 if(nextProps.data.length==6){
 			//  alert(parseFloat(nextProps.data[2]));
 			this.setState({diff:parseFloat(nextProps.data[2])});
 		  this.setState({options:{
 				animation: {
 						duration: 10
 					},
+				legend:{
+					display:false
+				},
 				scales:{
 					xAxes:[{
 						// stacked:true
@@ -41,7 +46,8 @@ export default class CompetitionBuilding extends React.Component {
 					yAxes:[{
 						stacked:true
 					}]
-				}
+				},
+
 			}});
 
 		 }
@@ -140,6 +146,19 @@ export default class CompetitionBuilding extends React.Component {
       }
    }, 10)
 }
+generateLabelArray(current){
+	let array = ["","","","","","","",""];
+	let weekdays = ["Sunday","Monday","Tuesday","Wednesday","Thursday","Friday","Saturday"];
+	for(let i = 0; i<array.length; i++){
+		if(i<=current){
+			array[i]=weekdays[i];
+		}
+		else{
+			array[i]=weekdays[i-1];
+		}
+	}
+	return array;
+}
 
 	// handleMeterSelect(e) {
 	// 	e.preventDefault();
@@ -161,8 +180,30 @@ export default class CompetitionBuilding extends React.Component {
 		let dates = [];
 		let barDisplay = "";
 		let radarDisplay = "";
-		let dataPack1 = this.props.data[0];
-		let dataPack2 = this.props.data[1];
+		let dataPack1,dataPack2,dataPack3,dataPack4,dataPack5,dataPack6,dataPack7,dataPack8,color1,color2,color3,color4,color5,color6,color7,color8;
+		let labels = this.generateLabelArray(this.state.data[5]);
+
+		if(this.state.data[3]!=undefined){
+			// alert(this.state.data.toSource());
+	  dataPack1 = this.state.data[3][0];
+		dataPack2 = this.state.data[3][1];
+		dataPack3 =this.state.data[3][2];
+		dataPack4 =this.state.data[3][3];
+		dataPack5 =this.state.data[3][4];
+		dataPack6 =this.state.data[3][5];
+		dataPack7 =this.state.data[3][6];
+		dataPack8 =this.state.data[3][7];
+		color1=this.state.data[4][0];
+		color2=this.state.data[4][1];
+		color3=this.state.data[4][2];
+		color4=this.state.data[4][3];
+		color5=this.state.data[4][4];
+		color6=this.state.data[4][5];
+		color7=this.state.data[4][6];
+		color8=this.state.data[4][7];
+
+	}
+
 		switch (this.props.type) {
 			case "week":
 				dates = ["Past Week","This Week"];
@@ -187,28 +228,85 @@ export default class CompetitionBuilding extends React.Component {
         labels: dates,
         datasets: [
         {
-            label: '',
-            data: dataPack1,
-						backgroundColor: "rgba(55, 160, 225, 0.7)",
-						hoverBackgroundColor: "rgba(55, 160, 225, 0.7)",
-						hoverBorderWidth: 2,
+            label: labels[0],
+	          data: dataPack1,
+						backgroundColor: color1,
+						hoverBackgroundColor: color1,
+						borderWidth: 2,
+						borderColor:"rgba(225, 225, 225, 1)",
 						hoverBorderColor: 'lightgrey'
         },
         {
-            label: '',
+            label: labels[1],
             data: dataPack2,
-						backgroundColor: ["rgba(225, 58, 55, 0.7)","rgba(231,145,145,0.7)"],
-						hoverBackgroundColor: ["rgba(225, 58, 55, 0.7)","rgba(231,145,145,0.7)"],
-						hoverBorderWidth: 2,
+						backgroundColor: color2,
+						hoverBackgroundColor: color2,
+						borderWidth: 2,
+						borderColor:"rgba(225, 225, 225, 1)",
 						hoverBorderColor: 'lightgrey'
-        },
+         },
+				{
+						label: labels[2],
+						data: dataPack3,
+						backgroundColor: color3,
+						hoverBackgroundColor: color3,
+						borderWidth: 2,
+						borderColor:"rgba(225, 225, 225, 1)",
+						hoverBorderColor: 'lightgrey'
+				},
+				{
+						label: labels[3],
+						data: dataPack4,
+						backgroundColor: color4,
+						hoverBackgroundColor: color4,
+						borderWidth: 2,
+						borderColor:"rgba(225, 225, 225, 1)",
+						hoverBorderColor: 'lightgrey'
+				},
+				{
+						label: labels[4],
+						data: dataPack5,
+						backgroundColor: color5,
+						hoverBackgroundColor: color5,
+						borderWidth: 2,
+						borderColor:"rgba(225, 225, 225, 1)",
+						hoverBorderColor: 'lightgrey'
+				},
+				{
+						label: labels[5],
+						data: dataPack6,
+						backgroundColor: color6,
+						hoverBackgroundColor: color6,
+						borderWidth: 2,
+						borderColor:"rgba(225, 225, 225, 1)",
+						hoverBorderColor: 'lightgrey'
+				},
+				{
+						label: labels[6],
+						data: dataPack7,
+						backgroundColor: color7,
+						hoverBackgroundColor: color7,
+						borderWidth: 2,
+						borderColor:"rgba(225, 225, 225, 1)",
+						hoverBorderColor: 'lightgrey'
+				},
+				{
+						label: labels[7],
+						data: dataPack8,
+						backgroundColor: color8,
+						hoverBackgroundColor: color8,
+						borderWidth: 2,
+						borderColor:"rgba(225, 225, 225, 1)",
+						hoverBorderColor: 'lightgrey'
+				}
+
         ]
     };
 
 		return (
       <div className="competitionBuildingCon">
         <div className="banner">
-          <span className="lgNumber"></span><span className="lgNumber"id={this.state.id}>{Math.round(this.state.diff*100)/100}</span><span id="unit">kW</span>
+          <span className="sm"></span><span className="lgNumber"id={this.state.id}>{Math.round(this.state.diff*100)/100}</span><span id="unit">kWh</span>
           <div className="dateTime"><span className="date">{this.state.weekday}<br/>{this.state.currentDate}</span></div>
         </div>
         <div className="info" >
@@ -222,9 +320,13 @@ export default class CompetitionBuilding extends React.Component {
 				<div className=" buildingSide">
 					<ul>
 						<li id={"week"+this.props.id}onClick={() => this.handleTimeChange("week")} className="on">Week</li>
-						<li id={"month"+this.props.id} onClick={() => this.handleTimeChange("month")} >Month</li>
+						<li id={"month"+this.props.id} onClick={() => this.handleTimeChange("month")} >4 Weeks</li>
 						<li id={"day"+this.props.id} onClick={() => this.handleTimeChange("day")}>Day</li>
 					</ul>
+				</div>
+				<div className="buildingStats">
+					Past Total:<br/>{Math.round(this.state.data[1][0]*100)/100} KWH<br/><br/>
+					Current Usage: <br/>{Math.round(this.state.data[0][1]*100)/100} KWH
 				</div>
 
 			</div>
