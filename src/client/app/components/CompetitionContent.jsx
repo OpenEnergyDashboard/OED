@@ -54,17 +54,19 @@ filterDataforGraph(prop,type){
     let currentTime = prop.data.datasets[0]['data'][prop.data.datasets[0]['data'].length-1]['x'];
 
     const startThisWeek = moment(currentTime).startOf(currentGraph);
-    const startLastWeek = moment(currentTime).startOf(currentGraph).subtract(daysToSubstract,'days');
+    const startLastWeek = moment(currentTime).startOf(currentGraph).subtract(1,type);
     const dayThisWeek =moment(currentTime);
-    const dayLastWeek =moment(currentTime).subtract(daysToSubstract,'days');
+    const dayLastWeek =moment(currentTime).subtract(1,type);
     let pastWeekTotal=0;
     let pastWeekEqul=0;
     let thisWeekEqul=0;
+
     let datapacks=[[[],[]],[[],[]],[[],[]],[[],[]],[[],[]],[[],[]],[[],[]],[[],[]]];
+    let datapacks2=[[[],[]],[[],[]]];
     let color=[[0,0],[0,0],[0,0],[0,0],[0,0],[0,0],[0,0],[0,0]];
 
     let data=[];
-    if(type=="week"||type=="month"){
+    if(type=="week"){
       //what day is current day
       let currentWeekday = dayThisWeek.day();
     for (const reading of prop.data.datasets[0]['data']) {
@@ -81,22 +83,7 @@ filterDataforGraph(prop,type){
           datapacks[moment(reading['x']).day()][1].push([reading['x'],parseFloat(reading['y'])]);
           color[moment(reading['x']).day()][1]="rgba(55, 160, 225, 0.7)";
         }
-    //  if (moment(reading['x']).isAfter(startLastWeek)&&moment(reading['x']).isBefore(startThisWeek)) {
-    //    pastWeekTotal+=parseFloat(reading['y']);
-    //    if(moment(reading['x']).isBefore(dayLastWeek)){
-    //      pastWeekEqul+=parseFloat(reading['y']);
-    //      datapacks[moment(reading['x']).day()][0]+=parseFloat(reading['y']);
-    //      color[moment(reading['x']).day()][0]="rgba(55, 160, 225, 0.7)";
-    //    }
-    //    else{
-    //      datapacks[moment(reading['x']).day()+1][0]+=parseFloat(reading['y']);
-    //      color[moment(reading['x']).day()+1][0]="rgba(225, 58, 55, 0.7)";
-    //    }
-    //  }else if(moment(reading['x']).isAfter(startThisWeek)&&moment(reading['x']).isBefore(dayThisWeek)){
-    //      thisWeekEqul+=parseFloat(reading['y']);
-    //      datapacks[moment(reading['x']).day()][1]+=parseFloat(reading['y']);
-    //      color[moment(reading['x']).day()][1]="rgba(55, 160, 225, 0.7)";
-    //    }
+
 
    }
    let newDatapacks=[[0,0],[0,0],[0,0],[0,0],[0,0],[0,0],[0,0],[0,0]];
@@ -121,28 +108,39 @@ filterDataforGraph(prop,type){
      }
    }
 
-   data = [[pastWeekEqul,thisWeekEqul],[pastWeekTotal,projectedThisWeek],projectedThisWeek-pastWeekTotal,newDatapacks,color,currentWeekday];
+   data = [[pastWeekEqul,thisWeekEqul],[pastWeekTotal,projectedThisWeek],projectedThisWeek-pastWeekTotal,newDatapacks,color,currentWeekday,"week"];
     this.setState({data:data});
    }
-    //  else if(type=="day"){
-    //    let plotLabel=[];
-    //    let pastValue=[];
-    //    for (const reading of prop.data.datasets[0]['data']) {
-    //     if (moment(reading['x']).isAfter(startLastWeek)&&moment(reading['x']).isBefore(moment(startLastWeek).endOf("day"))) {
-    //       pastWeekTotal+=parseFloat(reading['y']);
-    //       plotLabel.push(reading['x']);
-    //       pastValue.push(reading['y']);
-    //       // if(moment(reading['x']).isAfter(startLastWeek)&&moment(reading['x']).isBefore(dayLastWeek)){
-    //       //   pastWeekEqul+=parseFloat(reading['y']);
-    //       // }
-    //     }
-    //     // else if(moment(reading['x']).isAfter(startThisWeek)&&moment(reading['x']).isBefore(dayThisWeek)){
-    //     //     thisWeekEqul+=parseFloat(reading['y']);
-    //     //   }
-     //
-    //   }
-    //   data=[plotLabel,pastValue];
-    //  }
+   if(type=="month"){
+     for (const reading of prop.data.datasets[0]['data']) {
+       if (moment(reading['x']).isAfter(startLastWeek)&&moment(reading['x']).isBefore(startThisWeek)) {
+         if(moment(reading['x']).isBefore(dayLastWeek)){
+           datapacks2[0][0].push([reading['x'],parseFloat(reading['y'])]);
+           color[0][0]="rgba(55, 160, 225, 0.7)";
+         }
+         else{
+           datapacks2[1][0].push([reading['x'],parseFloat(reading['y'])]);
+           color[1][0]="rgba(225, 58, 55, 0.7)";
+         }
+       }else if(moment(reading['x']).isAfter(startThisWeek)&&moment(reading['x']).isBefore(dayThisWeek)){
+           datapacks2[0][1].push([reading['x'],parseFloat(reading['y'])]);
+           color[moment(reading['x']).day()][1]="rgba(55, 160, 225, 0.7)";
+         }
+
+    }
+    let newDatapacks=[[0,0],[0,0]];
+    for(let i=0;i<datapacks2.length;i++){
+      newDatapacks[i][0]= this.findUsageSum(datapacks2[i][0]);
+      newDatapacks[i][1]= this.findUsageSum(datapacks2[i][1]);
+    }
+    pastWeekEqul=newDatapacks[0][0];
+    thisWeekEqul=newDatapacks[0][1];
+    pastWeekTotal=newDatapacks[0][0]+newDatapacks[1][0];
+    let projectedThisWeek=thisWeekEqul/(pastWeekEqul/pastWeekTotal);
+    newDatapacks[1][1]=projectedThisWeek-thisWeekEqul;
+    data = [[pastWeekEqul,thisWeekEqul],[pastWeekTotal,projectedThisWeek],projectedThisWeek-pastWeekTotal,newDatapacks,color,'0',"month"];
+     this.setState({data:data});
+   }
 
 
 
@@ -151,13 +149,13 @@ findUsageSum(dataPoints){
   let sum=0;
   let last,current,diff;
   if(dataPoints.length>=2){
-
     for(let i=1;i<dataPoints.length-1;i++){
       current = dataPoints[i][0];
       last = dataPoints[i-1][0];
       diff = moment.duration(moment(current).diff(moment(last))).asHours();
       sum+=(dataPoints[i][1]+dataPoints[i-1][1])*diff/2;
     }
+
     return sum;
   }
   else if(dataPoints.length==0){
@@ -169,7 +167,8 @@ findUsageSum(dataPoints){
 componentWillMount(){
   let currentTime=moment().valueOf();
   let startingPoint=moment().subtract(31,"days").valueOf();
-  let timeInterval =new TimeInterval(startingPoint,currentTime);
+  const timeInterval = new TimeInterval(parseInt(startingPoint), parseInt(currentTime));
+  alert(timeInterval);
   this.setState({timeInterval:timeInterval});
   let selectedMeters = [];
   selectedMeters.push(parseInt(1));
@@ -200,30 +199,32 @@ handleTimeChange(type){
 
 }
 handleBuildingChange(id){
-
-  let selectedMeters = [];
-  selectedMeters.push(parseInt(id));
+  //get data for this building
+  let selectedMeters = [id];
   this.props.selectMeters(selectedMeters,"all");
-  // if（this.state.buildingOn!=null）{
-  //   document.getElementById(this.state.buildingOn).className="";
-  //   document.getElementById("b"+this.state.buildingOn).id="b"+id;
-  // }else{
-  //   document.getElementById("b-1").id="b"+id;
-  // }
-  // alert(this.state.buildingOn);
+  //get week data
+  this.filterDataforGraph(this.props,"week");
+  //if a different building is clicked
   if(this.state.buildingOn!=id){
+  //set state to week(always show week first).
   this.setState({currentGraph:"week"});
+  // style change for the past building.
   document.getElementById(this.state.buildingOn).className="";
+  //set current building.
   this.setState({buildingOn: id});
+  //change style for the currently showing building.
   document.getElementById(id).className="on";
+  //if there exist a "past building"(not first time clicking), change past building div to be next.
   if(document.getElementById("pastBuilding")!=null){
     document.getElementById("pastBuilding").id="nextBuilding";
   }
-  if(this.state.id1!=this.state.buildingOn){
+  //swap id1 and id2.
+  if(this.state.id1!=id){
     this.setState({id1: id});
   }else{
     this.setState({id2: id});
   }
+  //set current building to be past and next to be current.
   document.getElementById("currentBuilding").id="pastBuilding";
   document.getElementById("nextBuilding").id="currentBuilding";
 
@@ -233,7 +234,7 @@ handleBuildingChange(id){
 
  	render() {
     let navList = this.props.meters.map(meter =>
-      <li className="navLi " key={meter.id} id={meter.id} onClick={() =>this.handleBuildingChange(meter.id)}>{meter.name}</li>
+      <li className="navLi " key={meter.id} id={meter.id} onClick={() =>this.handleBuildingChange(meter.id)}>{meter.name}{meter.id}</li>
     );
     // if(this.state.switchBuilding=="true"){
     //   let newCurrent = <div id="currentBuilding"><CompetitionBuilding id="2" meters={this.props.meters} dispatch={this.props.fetchMetersDataIfNeeded}/></div>;

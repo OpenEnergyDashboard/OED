@@ -12,6 +12,7 @@ export default class CompetitionBuilding extends React.Component {
        weekday:"",
        id:"",
        compareDate:"",
+			 currentGraph:"week",
 			 diff:0,
 			 options:{},
 			 data:[[0,0][0,0],0,0,0,0,0]
@@ -29,7 +30,7 @@ export default class CompetitionBuilding extends React.Component {
  	    document.getElementById("month"+this.props.id).className="";
 			document.getElementById("day"+this.props.id).className="";
 		 }
-		 if(nextProps.data.length==6){
+		 if(nextProps.data.length==7){
 			//  alert(parseFloat(nextProps.data[2]));
 			this.setState({diff:parseFloat(nextProps.data[2])});
 		  this.setState({options:{
@@ -177,6 +178,10 @@ generateLabelArray(current){
 	 * @returns JSX to create the UI options side-panel (includes dynamic rendering of meter information for selection)
 	 */
 	render() {
+		// let datatype=weekData;
+		// if(this.props.data[6]=="month"){
+		// 	datatype=monthData;
+		// }
 		let dates = [];
 		let barDisplay = "";
 		let radarDisplay = "";
@@ -185,22 +190,6 @@ generateLabelArray(current){
 
 		if(this.state.data[3]!=undefined){
 			// alert(this.state.data.toSource());
-	  dataPack1 = this.state.data[3][0];
-		dataPack2 = this.state.data[3][1];
-		dataPack3 =this.state.data[3][2];
-		dataPack4 =this.state.data[3][3];
-		dataPack5 =this.state.data[3][4];
-		dataPack6 =this.state.data[3][5];
-		dataPack7 =this.state.data[3][6];
-		dataPack8 =this.state.data[3][7];
-		color1=this.state.data[4][0];
-		color2=this.state.data[4][1];
-		color3=this.state.data[4][2];
-		color4=this.state.data[4][3];
-		color5=this.state.data[4][4];
-		color6=this.state.data[4][5];
-		color7=this.state.data[4][6];
-		color8=this.state.data[4][7];
 
 	}
 
@@ -224,77 +213,77 @@ generateLabelArray(current){
 				break;
 		}
 
-		let data1 = {
+		let weekData = {
         labels: dates,
         datasets: [
         {
             label: labels[0],
-	          data: dataPack1,
-						backgroundColor: color1,
-						hoverBackgroundColor: color1,
+	          data: this.state.data[3][0],
+						backgroundColor: this.state.data[4][0],
+						hoverBackgroundColor: this.state.data[4][0],
 						borderWidth: 2,
 						borderColor:"rgba(225, 225, 225, 1)",
 						hoverBorderColor: 'lightgrey'
         },
         {
             label: labels[1],
-            data: dataPack2,
-						backgroundColor: color2,
-						hoverBackgroundColor: color2,
+            data: this.state.data[3][1],
+						backgroundColor: this.state.data[4][1],
+						hoverBackgroundColor: this.state.data[4][1],
 						borderWidth: 2,
 						borderColor:"rgba(225, 225, 225, 1)",
 						hoverBorderColor: 'lightgrey'
          },
 				{
 						label: labels[2],
-						data: dataPack3,
-						backgroundColor: color3,
-						hoverBackgroundColor: color3,
+						data:this.state.data[3][2],
+						backgroundColor: this.state.data[4][2],
+						hoverBackgroundColor: this.state.data[4][2],
 						borderWidth: 2,
 						borderColor:"rgba(225, 225, 225, 1)",
 						hoverBorderColor: 'lightgrey'
 				},
 				{
 						label: labels[3],
-						data: dataPack4,
-						backgroundColor: color4,
-						hoverBackgroundColor: color4,
+						data: this.state.data[3][3],
+						backgroundColor: this.state.data[4][3],
+						hoverBackgroundColor: this.state.data[4][3],
 						borderWidth: 2,
 						borderColor:"rgba(225, 225, 225, 1)",
 						hoverBorderColor: 'lightgrey'
 				},
 				{
 						label: labels[4],
-						data: dataPack5,
-						backgroundColor: color5,
-						hoverBackgroundColor: color5,
+						data: this.state.data[3][4],
+						backgroundColor: this.state.data[4][4],
+						hoverBackgroundColor: this.state.data[4][4],
 						borderWidth: 2,
 						borderColor:"rgba(225, 225, 225, 1)",
 						hoverBorderColor: 'lightgrey'
 				},
 				{
 						label: labels[5],
-						data: dataPack6,
-						backgroundColor: color6,
-						hoverBackgroundColor: color6,
+						data: this.state.data[3][5],
+						backgroundColor: this.state.data[4][5],
+						hoverBackgroundColor: this.state.data[4][5],
 						borderWidth: 2,
 						borderColor:"rgba(225, 225, 225, 1)",
 						hoverBorderColor: 'lightgrey'
 				},
 				{
 						label: labels[6],
-						data: dataPack7,
-						backgroundColor: color7,
-						hoverBackgroundColor: color7,
+						data: this.state.data[3][6],
+						backgroundColor: this.state.data[4][6],
+						hoverBackgroundColor: this.state.data[4][6],
 						borderWidth: 2,
 						borderColor:"rgba(225, 225, 225, 1)",
 						hoverBorderColor: 'lightgrey'
 				},
 				{
 						label: labels[7],
-						data: dataPack8,
-						backgroundColor: color8,
-						hoverBackgroundColor: color8,
+						data: this.state.data[3][7],
+						backgroundColor: this.state.data[4][7],
+						hoverBackgroundColor: this.state.data[4][7],
 						borderWidth: 2,
 						borderColor:"rgba(225, 225, 225, 1)",
 						hoverBorderColor: 'lightgrey'
@@ -302,6 +291,35 @@ generateLabelArray(current){
 
         ]
     };
+
+		let monthData = {
+        labels: dates,
+        datasets: [
+        {
+            label: "",
+	          data: this.state.data[3][0],
+						backgroundColor: "rgba(55, 160, 225, 0.7)",
+						hoverBackgroundColor: "rgba(55, 160, 225, 0.7)",
+						borderWidth: 2,
+						borderColor:"rgba(225, 225, 225, 1)",
+						hoverBorderColor: 'lightgrey'
+        },
+        {
+            label: "",
+            data: this.state.data[3][1],
+						backgroundColor: ["rgba(225, 58, 55, 0.7)","rgba(225, 58, 55, 0.5)"],
+						hoverBackgroundColor: ["rgba(225, 58, 55, 0.7)","rgba(225, 58, 55, 0.5)"],
+						borderWidth: 2,
+						borderColor:"rgba(225, 225, 225, 1)",
+						hoverBorderColor: 'lightgrey'
+         }
+
+        ]
+    };
+		let datatype=weekData;
+		if(this.props.data[6]=="month"){
+			datatype=monthData;
+		}
 
 		return (
       <div className="competitionBuildingCon">
@@ -311,16 +329,16 @@ generateLabelArray(current){
         </div>
         <div className="info" >
 					<div className="buildingBar" style={{display:barDisplay}}>
-						<Bar  ref="barChart" data={data1} options={this.state.options}/>
+						<Bar  ref="barChart" data={datatype} options={this.state.options}/>
 					</div>
 					<div className="buildingRadar" style={{display:radarDisplay}}>
-						<Radar ref="RadarChart" data={data1} options={this.state.options}/>
+						<Radar ref="RadarChart" data={datatype} options={this.state.options}/>
 					</div>
         </div>
 				<div className=" buildingSide">
 					<ul>
 						<li id={"week"+this.props.id}onClick={() => this.handleTimeChange("week")} className="on">Week</li>
-						<li id={"month"+this.props.id} onClick={() => this.handleTimeChange("month")} >4 Weeks</li>
+						<li id={"month"+this.props.id} onClick={() => this.handleTimeChange("month")} >Month</li>
 						<li id={"day"+this.props.id} onClick={() => this.handleTimeChange("day")}>Day</li>
 					</ul>
 				</div>
