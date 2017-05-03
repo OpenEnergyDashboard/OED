@@ -2,6 +2,10 @@ import React from 'react';
 import { Bar,Radar } from 'react-chartjs-2';
 import moment from 'moment';
 import 'chartjs-plugin-zoom';
+
+/**
+ * component for displaying graph for individual buildings.
+ */
 export default class CompetitionBuilding extends React.Component {
 
 	constructor(props) {
@@ -10,11 +14,15 @@ export default class CompetitionBuilding extends React.Component {
        meters:[],
        currentDate:"",
        weekday:"",
+			 //id of this building/meter
        id:"",
-       compareDate:"",
+			 //current graph type week/month/day
 			 currentGraph:"week",
+			 //projected difference between this week/month/day and past
 			 diff:0,
+			 //options for graph
 			 options:{},
+			 //data for graph use
 			 data:[[0,0][0,0],0,0,0,0,0]
       }
 	};
@@ -25,13 +33,14 @@ export default class CompetitionBuilding extends React.Component {
 	 */
 	 componentWillReceiveProps(nextProps) {
 		 this.setState({data:nextProps.data});
+		 //this part has problems.
 		 if(nextProps.thisMeter!=this.props.thisMeter){
 			 document.getElementById("week"+this.props.id).className="on";
  	    document.getElementById("month"+this.props.id).className="";
 			document.getElementById("day"+this.props.id).className="";
 		 }
 		 if(nextProps.data.length==7){
-			//  alert(parseFloat(nextProps.data[2]));
+			//set options
 			this.setState({diff:parseFloat(nextProps.data[2])});
 		  this.setState({options:{
 				animation: {
@@ -52,28 +61,21 @@ export default class CompetitionBuilding extends React.Component {
 			}});
 
 		 }
-		 else{
-		 }
-	 // 	for (const meterID of nextProps.notLoadedMeters) {
-	 // 		nextProps.fetchNewReadings(meterID, nextProps.startTimestamp, nextProps.endTimestamp);
-	 // 	}
-	 // 	  this.setState({series:nextProps.series});
 	 	}
+
+	/**
+	 * sets some states
+	 */
 	componentWillMount() {
-		// this.props.fetchMetersDataIfNeeded();
     let currentDate=this.currentDate();
-    // this.setState({weekday: "Friday"});
     this.setState({currentDate: currentDate});
     let id = "lgNumber"+this.props.id;
     this.setState({id: id});
-    //find date in last week for compareing.
-    // this.setState({currentDate: currentDate});
-    this.setState({compareDate: "03/17/17"});
 
 	}
-	// componentDidMount(){
-	// 		this.refs.barChart.type="horizontal";
-	// }
+	/**
+	 * this is not used
+	 */
   componentDidUpdate(newProps){
     if(newProps.thisMeter!=this.props.thisMeter){
     //numberFlip
@@ -87,7 +89,9 @@ export default class CompetitionBuilding extends React.Component {
     }
 
   }
-
+	/**
+	 * find current date and weekday to display -could use momentjs
+	 */
   currentDate(){
     let today = new Date();
     let dd = today.getDate();
@@ -117,24 +121,30 @@ export default class CompetitionBuilding extends React.Component {
         this.setState({weekday: "Saturday"});
         break;
     }
-
     if(dd<10) {
         dd='0'+dd
     }
-
     if(mm<10) {
         mm='0'+mm
     }
-
     return today = mm+'/'+dd+'/'+yyyy;
   }
+
+	/**
+	 * changing graph type.
+	 *@type the type clicked
+	 */
 	handleTimeChange(type){
 		if(this.props.type!=type){
+			//style change
 	    document.getElementById(this.props.type+this.props.id).className="";
 	    document.getElementById(type+this.props.id).className="on";
 			this.props.handleTimeChange(type);
 		}
 	}
+	/**
+	 * this is not used
+	 */
   numberFlip(element,current,limit){
     let self = this;
    setTimeout(function () {
@@ -146,52 +156,36 @@ export default class CompetitionBuilding extends React.Component {
          self.numberFlip(element,current,limit);
       }
    }, 10)
-}
-generateLabelArray(current){
-	let array = ["","","","","","","",""];
-	let weekdays = ["Sunday","Monday","Tuesday","Wednesday","Thursday","Friday","Saturday"];
-	for(let i = 0; i<array.length; i++){
-		if(i<=current){
-			array[i]=weekdays[i];
-		}
-		else{
-			array[i]=weekdays[i-1];
-		}
 	}
-	return array;
-}
-
-	// handleMeterSelect(e) {
-	// 	e.preventDefault();
-	// 	const options = e.target.options;
-	// 	const selectedMeters = [];
-	// 	// We can't map here because this is a collection of DOM elements, not an array.
-	// 	for (let i = 0; i < options.length; i++) {
-	// 		if (options[i].selected) {
-	// 			selectedMeters.push(parseInt(options[i].value));
-	// 		}
-	// 	}
-	// 	this.props.selectMeters(selectedMeters);
-	// }
-
 	/**
-	 * @returns JSX to create the UI options side-panel (includes dynamic rendering of meter information for selection)
+	 * set the labels for week graph
+	 *@current current weekday in number 0-7 (0 is sunday)
 	 */
+	generateLabelArray(current){
+		let array = ["","","","","","","",""];
+		let weekdays = ["Sunday","Monday","Tuesday","Wednesday","Thursday","Friday","Saturday"];
+		for(let i = 0; i<array.length; i++){
+			if(i<=current){
+				array[i]=weekdays[i];
+			}
+			else{
+				array[i]=weekdays[i-1];
+			}
+		}
+		return array;
+	}
+
 	render() {
-		// let datatype=weekData;
-		// if(this.props.data[6]=="month"){
-		// 	datatype=monthData;
-		// }
 		let dates = [];
 		let barDisplay = "";
 		let radarDisplay = "";
-		let dataPack1,dataPack2,dataPack3,dataPack4,dataPack5,dataPack6,dataPack7,dataPack8,color1,color2,color3,color4,color5,color6,color7,color8;
+		// let dataPack1,dataPack2,dataPack3,dataPack4,dataPack5,dataPack6,dataPack7,dataPack8,color1,color2,color3,color4,color5,color6,color7,color8;
 		let labels = this.generateLabelArray(this.state.data[5]);
-
-		if(this.state.data[3]!=undefined){
-			// alert(this.state.data.toSource());
-
-	}
+		//
+		// if(this.state.data[3]!=undefined){
+		// 	// alert(this.state.data.toSource());
+		//
+		// }
 
 		switch (this.props.type) {
 			case "week":
@@ -212,7 +206,7 @@ generateLabelArray(current){
 				// dataPack2 = [];
 				break;
 		}
-
+		//data for week graph
 		let weekData = {
         labels: dates,
         datasets: [
@@ -291,7 +285,7 @@ generateLabelArray(current){
 
         ]
     };
-
+		//data for month graph
 		let monthData = {
         labels: dates,
         datasets: [

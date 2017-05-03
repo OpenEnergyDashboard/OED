@@ -4,7 +4,9 @@ import AppliancesGridComponent from './AppliancesGridComponent';
 import AppliancesOptionsComponent from './AppliancesOptionsComponent';
 import ApplianceAddComponent from './ApplianceAddComponent';
 
-
+/**
+ * Component for appliance page
+ */
 export default class AppliancesPageComponent extends React.Component {
 
 	constructor(props) {
@@ -22,25 +24,20 @@ export default class AppliancesPageComponent extends React.Component {
 			scrollClick:0,
 			displayAdd:'none'
 
-			//current additional energy usage
-			// virtualAppliancesOn:0
-
     }
-	// 	this.onChangeHandler=this.onChangeHandler.bind(this);
 	 };
+	 /**
+ 	 * click on one appliance -
+	 * option popup if not on, if the appliance is already on, clicking turns it off
+ 	 * @param id the id of the clicked appliance
+	 * @usage unit usage of the clicked appliance.
+ 	 */
 	applianceClickHandler(id,usage){
 	  //change the status of click appliance to either on or off + keep track of added energyusage.
 		const VACopy = this.state.virtualAppliances.slice();
-    // let unitEnergy
-		// let VAOCopy=this.state.virtualAppliancesOn;
 		 if(this.state.virtualAppliances[id].status==="off"){
 			this.setState({displayOption:'block'});
 			this.setState({clicked:id});
-			//
-			// 	VACopy[id].status="on";
-			// // VAOCopy+=energyUsage;
-      // unitEnergy=this.state.unitEnergy+usage;
-      // this.setState({unitEnergy: unitEnergy});
 		 }
 		 else{
 			VACopy[id].status="off";
@@ -55,21 +52,26 @@ export default class AppliancesPageComponent extends React.Component {
 
 		 }
 		 this.setState({virtualAppliances: VACopy});
-		//  this.setState({virtualAppliancesOn: VAOCopy});
-
-
-		//change the status of click appliance to either on or off.-ends here
 
 	 }
+	 /**
+		* opens up popup for adding new appliance
+		*/
 	 handleAdd(){
 		 this.setState({displayAdd:'block'});
 
 	 }
+	 /**
+	  * close popup
+	  */
 	 closeHandler(){
 		 this.setState({displayOption:'none'});
 		 this.setState({displayAdd:'none'});
 
  	 }
+	 /**
+	  * save option inputs + close popup
+	  */
 	 saveOptionsHandler(number,hoursPerTime,dw,timesPerDW,shared){
 		 let id=this.state.clicked;
 		 let sharedFraction = 1;
@@ -82,13 +84,8 @@ export default class AppliancesPageComponent extends React.Component {
 			VACopy[id].dw=dw;
 			VACopy[id].shared=shared;
 			VACopy[id].timesPerDW=timesPerDW;
-		 // VAOCopy+=energyUsage;
-		//  unitEnergy=this.state.unitEnergy+usage;
-		//  this.setState({unitEnergy: unitEnergy});
-		// console.log(hoursPerTime);
-
-		//usage of this newly added appliances
 		if(shared=='Yes'){
+			//shared assumes sharing between two people
 			sharedFraction = 0.5;
 		}
 		if(dw=='weekly'){
@@ -102,6 +99,9 @@ export default class AppliancesPageComponent extends React.Component {
 		this.setState({currentEnergy:newEnergy});
 		//end here
 		}
+		/**
+		 * save inputs to add new appliance
+		 */
 		saveAddHandler(name,usage){
  		 let newId=this.state.virtualAppliances.length+1;
 		 const VACopy = this.state.virtualAppliances.slice();
@@ -119,8 +119,11 @@ export default class AppliancesPageComponent extends React.Component {
 		 });
 		 this.setState({virtualAppliances: VACopy});
 		 this.setState({displayAdd:'none'});
- 		//end here
  		}
+
+		/**
+		 * click to scroll appliance list
+		 */
 		handlePrev(){
 			if(this.state.scrollClick>0){
 				let list = document.getElementById("appliancesList");
@@ -130,6 +133,9 @@ export default class AppliancesPageComponent extends React.Component {
 				this.setState({scrollClick:newScrollClick});
 			}
 		}
+		/**
+		 * click to scroll appliance list
+		 */
 		handleNext(){
 			if(this.state.scrollClick<this.state.virtualAppliances.length-3){
 				let list = document.getElementById("appliancesList");
@@ -295,23 +301,6 @@ export default class AppliancesPageComponent extends React.Component {
 	}
 
 	render(){
-		// const appliancesListStyle = {
-		// 	listStyle: 'none',
-    //   width:'100vw',
-    //   height:'80px',
-    //   top:'50px',
-		// 	position: 'absolute',
-		// 	align:'center'
-		// };
-
-    // const gridStyle = {
-    //   width:'100vw',
-    //   bottom:'100px',
-    //   height:'43vh',
-    //   position: 'absolute'
-    // };
-
-
 
 		let appliances;
 		let maskClass="mask on";

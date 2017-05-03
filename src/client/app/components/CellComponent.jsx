@@ -1,19 +1,15 @@
 import React from 'react';
-// import CellComponent from './CellComponent';
-// import AppliancesGridComponent from './AppliancesGridComponent';
 
+/**
+ * component for one cell in the number displaying grid.
+ */
 export default class CellComponent extends React.Component {
-
-
-
 	render(){
-		// const tableStyle = {
-		// 	width: '80%',
-    //   height:'100%'
-		// };
+			//calculate price
 		  let roundedCost = "";
       let value =this.props.unitEnergy*this.props.peoplePerBuilding*this.props.constant;
 			let cost =value*0.08;
+			//convert to cent if low price.
 			if(cost<1){
 				roundedCost = Math.round(cost*100)+"¢";
 			}
@@ -22,17 +18,6 @@ export default class CellComponent extends React.Component {
 				roundedCost=roundedCost.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
 			}
 				let roundedValue= Math.round(value*10)/10;
-		// let appliances;
-		// if(this.state.virtualAppliances){
-		// 	appliances = this.state.virtualAppliances.map(appliance=>{
-		// 		//please check this key value(might have problem)
-		// 			return (
-		// 				<ApplianceComponent key= {appliance.applianceId} appliance = {appliance} status={appliance.status} handler={this.props.handler}/>
-		// 			);
-    //
-    //
-		// 	});
-		// }
 		return(
 
       <td>

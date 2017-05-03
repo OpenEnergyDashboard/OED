@@ -1,8 +1,8 @@
 import React from 'react';
 
-// import ApplianceComponent from './ApplianceComponent';
-// import AppliancesGridComponent from './AppliancesGridComponent';
-
+/**
+ * component for individual appliance to be turned on/off
+ */
 export default class ApplianceComponent extends React.Component {
 
 	constructor(props) {
@@ -10,12 +10,13 @@ export default class ApplianceComponent extends React.Component {
     this.state={
       info1:'block',
 			info2:'none'
-			//current additional energy usage
-			// virtualAppliancesOn:0
 
     }
 
 	};
+	/**
+	 * handle hover on appliance
+	 */
 	mouseEnterHandler(){
 		this.setState({info1: 'none'});
 		this.setState({info2: 'block'});

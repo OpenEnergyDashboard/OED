@@ -1,7 +1,9 @@
 import React from 'react';
 import CellComponent from './CellComponent';
-// import AppliancesGridComponent from './AppliancesGridComponent';
 
+/**
+ * component for displaying calculated number in a grid
+ */
 export default class AppliancesPageComponent extends React.Component {
 
 

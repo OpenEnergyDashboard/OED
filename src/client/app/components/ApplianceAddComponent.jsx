@@ -1,10 +1,14 @@
 import React from 'react';
-// import ApplianceComponent from './ApplianceComponent';
-// import AppliancesGridComponent from './AppliancesGridComponent';
 
 
+/**
+ * Component for popup dialog for adding a new appliance
+ * need to validate input
+ */
 export default class ApplianceAddComponent extends React.Component {
-
+	/**
+	 * Initializes the component's state. by default daily is checked and the device is not shared
+	 */
 	constructor(props) {
 		super(props);
     this.state={
@@ -14,21 +18,10 @@ export default class ApplianceAddComponent extends React.Component {
     }
 
 	};
-	radioHandler(){
-		if(this.refs.daily.checked==true){
-			this.setState({radioChecked: 'daily'});
-		}else{
-			this.setState({radioChecked: 'weekly'});
-		}
-	}
-	sharedHandler(){
-		if(this.state.shared=="No"){
-			this.setState({shared: "Yes"});
-		}
-		else{
-			this.setState({shared: "No"});
-		}
-	}
+
+	/**
+	 * handles saving of options
+	 */
 	saveHandler(name,usage){
 		if(name=="" || usage==""){
 			alert('Please fill in all inputs');
@@ -39,6 +32,9 @@ export default class ApplianceAddComponent extends React.Component {
 			this.props.saveHandler(name,usage);
 		}
 	}
+	/**
+	 * close option popup
+	 */
 	closeHandler(){
 		this.refs.name.value="";
 		this.refs.usage.value="";

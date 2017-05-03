@@ -1,6 +1,8 @@
 import React from 'react';
 
-
+/**
+ * component for the option popup when turning on an appliance
+ */
 export default class AppliancesOptionsComponent extends React.Component {
 
 	constructor(props) {
@@ -12,6 +14,9 @@ export default class AppliancesOptionsComponent extends React.Component {
     }
 
 	};
+	/**
+	 * handles checking daily/weely radio
+	 */
 	radioHandler(){
 		if(this.refs.daily.checked==true){
 			this.setState({radioChecked: 'daily'});
@@ -19,6 +24,9 @@ export default class AppliancesOptionsComponent extends React.Component {
 			this.setState({radioChecked: 'weekly'});
 		}
 	}
+	/**
+	 * handles checking shared checkbox
+	 */
 	sharedHandler(){
 		if(this.state.shared=="No"){
 			this.setState({shared: "Yes"});
@@ -27,6 +35,9 @@ export default class AppliancesOptionsComponent extends React.Component {
 			this.setState({shared: "No"});
 		}
 	}
+	/**
+	 * saving options
+	 */
 	saveHandler(number,hoursPerTime,minutesPerTime,dw,timesPerDW,shared){
 		if(number==""||timesPerDW==""||(hoursPerTime==""&&minutesPerTime=="")){
 			alert('Please fill in all inputs');
@@ -72,44 +83,6 @@ export default class AppliancesOptionsComponent extends React.Component {
 		}else{
 			optionsClass='pop option';
 		}
-
-    // let optionStyle = {
-		// 	opacity:1,
-		// 	position: 'fixed',
-		// 	position:'absolute',
-		// 	height:  '50vh',
-		// 	width:'40vw',
-		// 	top:'top',
-		// 	left:'30vw',
-		// 	backgroundColor:'#fff',
-		// 	color:'#111',
-		// 	borderRadius: '10px',
-		// 	zIndex:'500',
-		// 	transition: 'top 1s',
-		// 	boxShadow: '0 0 20px #808080',
-		// 	display:this.props.display
-		//
-		// };
-		// const maskStyle = {
-		// 	opacity:0.3,
-		// 	position: 'fixed',
-		// 	position:'absolute',
-		// 	height:  '100vh',
-		// 	width:'100vw',
-		// 	top:'0vh',
-		// 	left:'0vw',
-		// 	backgroundColor:'#111',
-		// 	zIndex:'400',
-		// 	display:this.props.display
-		// };
-		// const itemStyle = {
-		// 	position:'absolute',
-		// 	height:  '80%',
-		// 	width:'90%',
-		// 	top:'10%',
-		// 	left:'5%',
-		//
-		// };
 		const buttonStyle = {
 			float:'right',
 			position:'relative',
