@@ -3,13 +3,14 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
 
 import React from 'react';
+import { Button } from 'react-bootstrap';
 import moment from 'moment';
 import graphExport from '../services/exportData';
 
 export default class ExportComponent extends React.Component {
 	/**
 	 * Initializes the component's state, binds all functions to 'this' ExportComponent
-	 * @param props The props passed down through the UIOptionsContainer
+	 * @param props The props passed down through the ExportContainer
 	 */
 	constructor(props) {
 		super(props);
@@ -23,12 +24,17 @@ export default class ExportComponent extends React.Component {
 	exportReading() {
 		const compressedData = this.props.exportVals.datasets;
 		let time = compressedData[0].exportVals[0].x;
+		const chart = compressedData[0].currentChart;
 		time = moment(time).format('ddddMMMDDYYYY');
-		const name = `oedExport${time}.csv`;
+		const name = `oedExport${time}${chart}.csv`;
 		graphExport(compressedData,	name);
 	}
 
 	render() {
-		return (<button onClick={this.exportReading}>Export!</button>);
+		return (
+			<div>
+				<Button bsStyle="default" onClick={this.exportReading}>Export!</Button>
+			</div>
+		);
 	}
 }

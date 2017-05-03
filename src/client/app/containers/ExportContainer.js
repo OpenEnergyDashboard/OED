@@ -4,6 +4,7 @@
 
 import { connect } from 'react-redux';
 import ExportComponent from '../components/ExportComponent';
+import { chartTypes } from '../reducers/graph';
 
 /**
  * @param {State} state
@@ -17,21 +18,23 @@ function mapStateToProps(state) {
 	const barDuration = state.graph.barDuration;
 
 	for (const meterID of state.graph.selectedMeters) {
-		if (chart === 'line') {
+		if (chart === chartTypes.line) {
 			readingsData = state.readings.line.byMeterID[meterID][timeInterval];
 		}		else { readingsData = state.readings.bar.byMeterID[meterID][timeInterval][barDuration]; }
-		if (readingsData !== undefined && !readingsData.isFetching && chart === 'line') {
+		if (readingsData !== undefined && !readingsData.isFetching && chart === chartTypes.line) {
 			data.datasets.push({
 				label: state.meters.byMeterID[meterID].name,
 				id: state.meters.byMeterID[meterID].id,
 				timestamp: state.readings.line.byMeterID[meterID][timeInterval].start_timestamp,
+				currentChart: chart,
 				exportVals: state.readings.line.byMeterID[meterID][timeInterval].readings.map(arr => ({ x: arr[0], y: arr[1] }))
 			});
-		} else if (readingsData !== undefined && !readingsData.isFetching && chart === 'bar') {
+		} else if (readingsData !== undefined && !readingsData.isFetching && chart === chartTypes.bar) {
 			data.datasets.push({
 				label: state.meters.byMeterID[meterID].name,
 				id: state.meters.byMeterID[meterID].id,
 				timestamp: state.readings.bar.byMeterID[meterID][timeInterval][barDuration].timestamp,
+				currentChart: chart,
 				exportVals: state.readings.bar.byMeterID[meterID][timeInterval][barDuration].readings.map(arr => ({ x: arr[0], y: arr[1] }))
 			});
 		}
