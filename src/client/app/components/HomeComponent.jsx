@@ -5,7 +5,6 @@
 import React from 'react';
 import HeaderComponent from './HeaderComponent';
 import DashboardContainer from '../containers/DashboardContainer';
-import ExportContainer from '../containers/ExportContainer';
 
 
 /**
@@ -17,7 +16,6 @@ export default function HomeComponent() {
 		<div>
 			<HeaderComponent renderLoginButton />
 			<DashboardContainer />
-			<ExportContainer />
 		</div>
 	);
 }

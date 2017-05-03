@@ -7,6 +7,8 @@ import Slider from 'react-rangeslider';
 import moment from 'moment';
 import 'react-rangeslider/lib/index.css';
 import { chartTypes } from '../reducers/graph';
+import ExportContainer from '../containers/ExportContainer';
+
 
 export default class UIOptionsComponent extends React.Component {
 	/**
@@ -104,6 +106,9 @@ export default class UIOptionsComponent extends React.Component {
 					</div>
 					<p style={labelStyle}>Bar chart interval (days):</p>
 					<Slider min={1} max={365} value={this.state.barDuration} onChange={this.handleBarDurationChange} onChangeComplete={this.handleBarDurationChangeComplete} />
+					<div>
+						<ExportContainer />
+					</div>
 				</div>
 			</div>
 		);
