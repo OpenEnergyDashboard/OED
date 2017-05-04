@@ -1,7 +1,3 @@
-/* This Source Code Form is subject to the terms of the Mozilla Public
- * License, v. 2.0. If a copy of the MPL was not distributed with this
- * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
-
 import _ from 'lodash';
 import { connect } from 'react-redux';
 import CompetitionContent from '../components/CompetitionContent';
@@ -9,10 +5,9 @@ import { fetchMetersDetailsIfNeeded } from '../actions/meters';
 import { changeSelectedBuilding } from '../actions/graph';
 
 function mapStateToProps(state) {
-
 	const sortedMeters = _.sortBy(_.values(state.meters.byMeterID).map(meter => ({ id: meter.id, name: meter.name.trim() })), 'name');
-	const sortedMeterID = sortedMeters.map(meter =>(meter.id));
-	const timeInterval = "all";
+	// const sortedMeterID = sortedMeters.map(meter => (meter.id));
+	const timeInterval = 'all';
 	const data = { datasets: [] };
 	// getColor() cycles through the colors, wrapping around the end to the beginning
 	const colors = ['LightBlue', 'GoldenRod', 'Black', 'OrangeRed', 'LightSeaGreen', 'LightSlateGray', 'Purple'];
@@ -36,9 +31,9 @@ function mapStateToProps(state) {
 
 	return {
 		meters: sortedMeters,
-		data:data,
-		redraw:true,
-		timeInterval:timeInterval
+		data: data,
+		redraw: true,
+		timeInterval: timeInterval
 
 	};
 }
@@ -47,7 +42,7 @@ function mapDispatchToProps(dispatch) {
 	return {
 		// selectMeters: newSelectedMeterIDs => dispatch(changeSelectedMeters(newSelectedMeterIDs)),
 		fetchMetersDataIfNeeded: () => dispatch(fetchMetersDetailsIfNeeded()),
-		selectMeters: (newSelectedMeterIDs,timeInterval) => dispatch(changeSelectedBuilding(newSelectedMeterIDs,timeInterval))
+		selectMeters: (newSelectedMeterIDs, timeInterval) => dispatch(changeSelectedBuilding(newSelectedMeterIDs, timeInterval))
 		// fetchNewReadings: (meterID, startTimestamp, endTimestamp) => dispatch(fetchReadingsIfNeeded(meterID, startTimestamp, endTimestamp))
 	};
 }

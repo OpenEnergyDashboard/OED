@@ -55,7 +55,7 @@ export function changeSelectedMeters(meterIDs) {
 export function changeSelectedBuilding(meterIDs, timeInterval) {
 	return dispatch => {
 		dispatch(updateSelectedMeters(meterIDs));
-		dispatch(fetchNeededLineReadings(timeInterval,1300));
+		dispatch(fetchNeededLineReadings(timeInterval, 1300));
 		return Promise.resolve();
 	};
 }

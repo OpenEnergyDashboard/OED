@@ -50,12 +50,12 @@ function fetchLineReadings(meterIDs, timeInterval, numPoints) {
  * @param {TimeInterval} timeInterval The time interval to fetch readings for on the line chart
  * @return {*} An action to fetch the needed readings
  */
-export function fetchNeededLineReadings(timeInterval,numPoints=100) {
+export function fetchNeededLineReadings(timeInterval, numPoints = 100) {
 	return (dispatch, getState) => {
 		const state = getState();
 		const meterIDsToFetchForLine = state.graph.selectedMeters.filter(id => shouldFetchLineReadings(state, id, timeInterval));
 		if (meterIDsToFetchForLine.length > 0) {
-			return dispatch(fetchLineReadings(meterIDsToFetchForLine, timeInterval,numPoints));
+			return dispatch(fetchLineReadings(meterIDsToFetchForLine, timeInterval, numPoints));
 		}
 		return Promise.resolve();
 	};

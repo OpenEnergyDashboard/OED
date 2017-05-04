@@ -5,20 +5,10 @@ import CompetitionContentContainer from '../containers/CompetitionContentContain
 /**
  * competition page
  */
-export default class CompetitionComponent extends React.Component {
-
-	constructor(props) {
-		super(props);
-	}
-
-
-
-	render() {
-
-		return (
-    <div>
-      <CompetitionContentContainer />
-    </div>
-  );
-	}
+export default function CompetitionComponent() {
+	return (
+		<div>
+			<CompetitionContentContainer />
+		</div>
+	);
 }

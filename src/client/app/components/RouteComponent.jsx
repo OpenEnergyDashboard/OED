@@ -1,7 +1,3 @@
-/* This Source Code Form is subject to the terms of the Mozilla Public
- * License, v. 2.0. If a copy of the MPL was not distributed with this
- * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
-
 import React from 'react';
 import { Router, Route, browserHistory } from 'react-router';
 import axios from 'axios';
@@ -42,7 +38,7 @@ function requireAuth(nextState, replace) {
 /**
  * React component that controls the app's routes
  * Note that '/admin' requires authentication
- * @returns JSX to create the RouteComponent
+ * @returns XML to create the RouteComponent
  */
 export default function RouteComponent() {
 	return (
@@ -50,8 +46,8 @@ export default function RouteComponent() {
 			<Route path="/" component={HomeComponent} />
 			<Route path="/login" component={LoginComponent} />
 			<Route path="/admin" component={AdminComponent} onEnter={requireAuth} />
-			<Route path="/va" component={AppliancesPageComponent}/>
-			<Route path="/c" component={CompetitionComponent}/>
+			<Route path="/va" component={AppliancesPageComponent} />
+			<Route path="/c" component={CompetitionComponent} />
 			<Route path="*" component={NotFoundComponent} />
 		</Router>
 	);

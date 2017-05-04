@@ -11,83 +11,76 @@ export default class ApplianceAddComponent extends React.Component {
 	 */
 	constructor(props) {
 		super(props);
-    this.state={
-      radioChecked:'daily',
-			shared:"No"
+		this.state = {
+			radioChecked: 'daily',
+			shared: 'No'
 
-    }
-
-	};
+		};
+		this.closeHandler = this.closeHandler.bind(this);
+	}
 
 	/**
 	 * handles saving of options
 	 */
-	saveHandler(name,usage){
-		if(name=="" || usage==""){
+	saveHandler(name, usage) {
+		if (name === '' || usage === '') {
 			alert('Please fill in all inputs');
-		}
-		else{
-			this.refs.name.value="";
-			this.refs.usage.value="";
-			this.props.saveHandler(name,usage);
+		} else {
+			document.getElementById('newName').value = '';
+			document.getElementById('newUsage').value = '';
+			this.props.saveHandler(name, usage);
 		}
 	}
 	/**
 	 * close option popup
 	 */
-	closeHandler(){
-		this.refs.name.value="";
-		this.refs.usage.value="";
+	closeHandler() {
+		document.getElementById('newName').value = '';
+		document.getElementById('newUsage').value = '';
 		this.props.closeHandler();
 	}
 
 
-	render(){
-		let o=0;
-		let m=0;
-		let addClass='pop add';
-		if(this.props.display=='block'){
-			addClass='pop add on';
-		}else{
-			addClass='pop add';
+	render() {
+		let addClass = 'pop add';
+		if (this.props.display === 'block') {
+			addClass = 'pop add on';
+		} else {
+			addClass = 'pop add';
 		}
 
 
 		const buttonStyle = {
-			float:'right',
-			position:'relative',
-			marginLeft:'10px'
+			float: 'right',
+			position: 'relative',
+			marginLeft: '10px'
 		};
 		const buttonListStyle = {
-			float:'right'
-			//need to be fixed for viewport ratio
-		};
-		const radioStyle = {
-			fontWeight:'bold',
-			marginRight:'20px'
+			float: 'right'
+			// need to be fixed for viewport ratio
 		};
 
 		return (
 			<div>
 
-	      <div className={addClass} ref="appliancesOptions">
-					<div className = 'popInner'>
-						<div>
-
-							<label>Appliance Name</label><br/>
-							<input type="text" ref="name"/>
-						</div><br />
-		        <div>
-		          <label>Hourly Usage(kW)</label><br/>
-		          <input type="text" ref="usage"/>
-		        </div>
-
-						<div style={buttonListStyle}>
-							<button  style={buttonStyle} type="button" id="close" className="btn btn-primary" onClick={this.closeHandler.bind(this)}>Cancel</button>
-							<button  style={buttonStyle} type="button" id="submit" className="btn btn-primary" onClick={()=>{this.saveHandler(this.refs.name.value,this.refs.usage.value);}}>Add Appliance</button>
-						</div>
+				<div className={addClass}>
+					<div className="popInner">
+						<form>
+							<div>
+								<label>Appliance Name</label><br />
+								<input type="text" id="newName" />
+							</div><br />
+							<div>
+								<label>Hourly Usage(kW)</label><br />
+								<input type="text" id="newUsage" />
+							</div>
+							<div style={buttonListStyle}>
+								<button style={buttonStyle} type="button" id="close" className="btn btn-primary" onClick={this.closeHandler}>Cancel</button>
+								<button style={buttonStyle} type="button" id="submit" className="btn btn-primary" onClick={() => { this.saveHandler(document.getElementById('newName').value, document.getElementById('newUsage').value); }}>Add Appliance</button>
+							</div>
+						</form>
 					</div>
-	      </div>
+				</div>
 			</div>
 		);
 	}

@@ -7,98 +7,97 @@ export default class AppliancesOptionsComponent extends React.Component {
 
 	constructor(props) {
 		super(props);
-    this.state={
-      radioChecked:'daily',
-			shared:"No"
+		this.state = {
+			radioChecked: 'daily',
+			shared: 'No'
 
-    }
-
-	};
+		};
+		this.radioHandler = this.radioHandler.bind(this);
+		this.sharedHandler = this.sharedHandler.bind(this);
+		this.closeHandler = this.closeHandler.bind(this);
+	}
 	/**
 	 * handles checking daily/weely radio
 	 */
-	radioHandler(){
-		if(this.refs.daily.checked==true){
-			this.setState({radioChecked: 'daily'});
-		}else{
-			this.setState({radioChecked: 'weekly'});
+	radioHandler() {
+		if (document.getElementById('daily').checked === true) {
+			this.setState({ radioChecked: 'daily' });
+		} else {
+			this.setState({ radioChecked: 'weekly' });
 		}
 	}
 	/**
 	 * handles checking shared checkbox
 	 */
-	sharedHandler(){
-		if(this.state.shared=="No"){
-			this.setState({shared: "Yes"});
-		}
-		else{
-			this.setState({shared: "No"});
+	sharedHandler() {
+		if (this.state.shared === 'No') {
+			this.setState({ shared: 'Yes' });
+		}		else {
+			this.setState({ shared: 'No' });
 		}
 	}
 	/**
 	 * saving options
 	 */
-	saveHandler(number,hoursPerTime,minutesPerTime,dw,timesPerDW,shared){
-		if(number==""||timesPerDW==""||(hoursPerTime==""&&minutesPerTime=="")){
+	saveHandler(number, hoursPerTime, minutesPerTime, dw, timesPerDW, shared) {
+		if (number === '' || timesPerDW === '' || (hoursPerTime === '' && minutesPerTime === '')) {
 			alert('Please fill in all inputs');
-		}
-		else{
+		}		else {
 			let newHoursPerTime = hoursPerTime;
-			if(minutesPerTime!==""){
-				 newHoursPerTime = minutesPerTime/60;
-				 newHoursPerTime=Math.round(newHoursPerTime * 100) / 100;
-				if(hoursPerTime!=""){
-					newHoursPerTime+=parseInt(hoursPerTime);
+			if (minutesPerTime !== '') {
+				newHoursPerTime = minutesPerTime / 60;
+				newHoursPerTime = Math.round(newHoursPerTime * 100) / 100;
+				if (hoursPerTime !== '') {
+					newHoursPerTime += parseInt(hoursPerTime);
 				}
 			}
-			this.refs.number.value="";
-			this.refs.hoursPerTime.value="";
-			this.refs.timesPerDW.value="";
-			this.refs.minutesPerTime.value="";
-			this.refs.daily.checked=true;
-			this.setState({shared: "No"});
-			this.setState({radioChecked: 'daily'});
-			this.refs.shared.checked=false;
-			this.props.saveHandler(number,newHoursPerTime,dw,timesPerDW,shared);
+			document.getElementById('numberOfAppliances').value = '';
+			document.getElementById('hoursPerTime').value = '';
+			document.getElementById('timesPerDW').value = '';
+			document.getElementById('minutesPerTime').value = '';
+			document.getElementById('daily').checked = true;
+			this.setState({ shared: 'No' });
+			this.setState({ radioChecked: 'daily' });
+			document.getElementById('shared').checked = false;
+			this.props.saveHandler(number, newHoursPerTime, dw, timesPerDW, shared);
 		}
 	}
-	closeHandler(){
-		this.refs.number.value="";
-		this.refs.hoursPerTime.value="";
-		this.refs.timesPerDW.value="";
-		this.refs.daily.checked=true;
-		this.refs.shared.checked=false;
-		this.setState({shared: "No"});
-		this.setState({radioChecked: 'daily'});
+	closeHandler() {
+		document.getElementById('numberOfAppliances').value = '';
+		document.getElementById('hoursPerTime').value = '';
+		document.getElementById('timesPerDW').value = '';
+		document.getElementById('minutesPerTime').value = '';
+		document.getElementById('daily').checked = true;
+		document.getElementById('shared').checked = false;
+		this.setState({ shared: 'No' });
+		this.setState({ radioChecked: 'daily' });
 		this.props.closeHandler();
 	}
 
 
-	render(){
-		let o=0;
-		let m=0;
-		let optionsClass='pop option';
-		if(this.props.display=='block'){
-			optionsClass='pop option on';
-		}else{
-			optionsClass='pop option';
+	render() {
+		let optionsClass = 'pop option';
+		if (this.props.display === 'block') {
+			optionsClass = 'pop option on';
+		} else {
+			optionsClass = 'pop option';
 		}
 		const buttonStyle = {
-			float:'right',
-			position:'relative',
-			marginLeft:'10px'
+			float: 'right',
+			position: 'relative',
+			marginLeft: '10px'
 		};
 		const buttonListStyle = {
-			float:'right'
-			//need to be fixed for viewport ratio
+			float: 'right'
+			// need to be fixed for viewport ratio
 		};
 		const radioStyle = {
-			fontWeight:'bold',
-			marginRight:'20px'
+			fontWeight: 'bold',
+			marginRight: '20px'
 		};
 		const inlineRight = {
-			left:'40%',
-			position:"absolute"
+			left: '40%',
+			position: 'absolute'
 		};
 		const inlineLeft = {
 		};
@@ -106,35 +105,36 @@ export default class AppliancesOptionsComponent extends React.Component {
 		return (
 			<div>
 
-	      <div className={optionsClass} ref="appliancesOptions">
-					<div className = 'popInner'>
-						<div>
-
-							<label>How many of this appliance</label><br/>
-							<input type="text" ref="number"/>
-						</div><br />
-		        <div>
-		          <label style={inlineLeft}>Hours per time</label><label style={inlineRight}>Minutes per time</label><br/>
-		          <input style={inlineLeft} type="text" ref="hoursPerTime"/><input style={inlineRight} type="text" ref="minutesPerTime"/>
-		        </div>
-						<br />
-						<div>
-							<div className="radio">
-							 	<label style={radioStyle}><input type="radio" ref="daily" name='times' value="perDay" defaultChecked onChange={this.radioHandler.bind(this)}/>Times Per Day</label>
-								<label  style={radioStyle}><input type="radio" ref="weekly" name='times' value="perWeek" onChange={this.radioHandler.bind(this)}/>Times Per Week</label>
-						 	</div>
-						 	<input type="text" ref="timesPerDW"/>
-					  </div>
-						<br />
-						<div className="checkbox">
-							<label><input type="checkbox" ref="shared" value="shared" onChange={this.sharedHandler.bind(this)}/>Shared Device</label>
-						</div>
-						<div style={buttonListStyle}>
-							<button  style={buttonStyle} type="button" id="close" className="btn btn-primary" onClick={this.closeHandler.bind(this)}>Cancel</button>
-							<button  style={buttonStyle} type="button" id="submit" className="btn btn-primary" onClick={()=>{this.saveHandler(this.refs.number.value,this.refs.hoursPerTime.value,this.refs.minutesPerTime.value,this.state.radioChecked,this.refs.timesPerDW.value,this.state.shared);}}>Save Options</button>
-						</div>
+				<div className={optionsClass} id="appliancesOptions">
+					<div className="popInner">
+						<form>
+							<div>
+								<label>How many of this appliance</label><br />
+								<input type="text" id="numberOfAppliances" />
+							</div><br />
+							<div>
+								<label style={inlineLeft}>Hours per time</label><label style={inlineRight}>Minutes per time</label><br />
+								<input style={inlineLeft} type="text" id="hoursPerTime" /><input style={inlineRight} type="text" id="minutesPerTime" />
+							</div>
+							<br />
+							<div>
+								<div className="radio">
+									<label style={radioStyle}><input type="radio" id="daily" name="times" value="perDay" defaultChecked onChange={this.radioHandler} />Times Per Day</label>
+									<label style={radioStyle}><input type="radio" id="weekly" name="times" value="perWeek" onChange={this.radioHandler} />Times Per Week</label>
+								</div>
+								<input type="text" id="timesPerDW" />
+							</div>
+							<br />
+							<div className="checkbox">
+								<label><input type="checkbox" id="shared" value="shared" onChange={this.sharedHandler} />Shared Device</label>
+							</div>
+							<div style={buttonListStyle}>
+								<button style={buttonStyle} type="button" id="close" className="btn btn-primary" onClick={this.closeHandler}>Cancel</button>
+								<button style={buttonStyle} type="button" id="submit" className="btn btn-primary" onClick={() => { this.saveHandler(document.getElementById('numberOfAppliances').value, document.getElementById('hoursPerTime').value, document.getElementById('minutesPerTime').value, this.state.radioChecked, document.getElementById('timesPerDW').value, this.state.shared); }}>Save Options</button>
+							</div>
+						</form>
 					</div>
-	      </div>
+				</div>
 			</div>
 		);
 	}

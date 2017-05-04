@@ -33,7 +33,7 @@ router.get('/line/:meter_ids', async (req, res) => {
 	// We can't do .map(parseInt) here because map would give parseInt a radix value of the current array position.
 	const meterIDs = req.params.meter_ids.split(',').map(s => parseInt(s));
 	const timeInterval = TimeInterval.fromString(req.query.timeInterval);
-	const numPoints = req.query.numPoints ? req.query.numPoints:100;
+	const numPoints = req.query.numPoints ? req.query.numPoints : 100;
 	try {
 		const rawCompressedReadings = await Reading.getCompressedReadings(meterIDs, timeInterval.startTimestamp, timeInterval.endTimestamp, numPoints);
 		const formattedCompressedReadings = _.mapValues(rawCompressedReadings, formatLineReadings);
