@@ -357,12 +357,12 @@ border:none;
 }
 .competitionCenter #currentBuilding{
    z-index: 100;
-   animation: currentBuilding 1s;
+   animation: currentBuilding 0.8s;
 }
 .competitionCenter #pastBuilding{
    z-index: 100;
    left:-100vw;
-   animation: pastBuilding 1s;
+   animation: pastBuilding 0.8s;
 
 }
 .buildingSide{

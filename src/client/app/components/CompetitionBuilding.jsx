@@ -34,17 +34,19 @@ export default class CompetitionBuilding extends React.Component {
 		this.setState({ data: nextProps.data });
 		// this part has problems.
 		if (nextProps.thisMeter !== this.props.thisMeter) {
-			document.getElementById(`week${this.props.id}`).className = 'on';
-			document.getElementById(`month${this.props.id}`).className = '';
-			document.getElementById(`day${this.props.id}`).className = '';
+			document.getElementById('weekb1').className = 'on';
+			document.getElementById('monthb1').className = '';
+			document.getElementById('dayb1').className = '';
+			document.getElementById('weekb2').className = 'on';
+			document.getElementById('monthb2').className = '';
+			document.getElementById('dayb2').className = '';
 		}
 		if (nextProps.data.length === 7) {
 			// set options
 			this.setState({ diff: parseFloat(nextProps.data[2]) });
 			this.setState({ options: {
-				animation: {
-					duration: 10
-				},
+				animationSteps: 20,
+				animationEasing: 'easeInOutQuad',
 				legend: {
 					display: false
 				},
@@ -117,7 +119,7 @@ export default class CompetitionBuilding extends React.Component {
 				this.setState({ weekday: 'Saturday' });
 				break;
 			default:
-				this.setState({ weekday: 'Saturday' });
+				this.setState({ weekday: 'Sunday' });
 				break;
 		}
 		if (dd < 10) {
@@ -333,9 +335,9 @@ export default class CompetitionBuilding extends React.Component {
 					</div>
 				</div>
 				<div className=" buildingSide">
-					<button id={`week${this.props.id}`}onClick={() => this.handleTimeChange('week')} className="on">Week</button>
-					<button id={`month${this.props.id}`} onClick={() => this.handleTimeChange('month')} >Month</button>
-					<button id={`day${this.props.id}`} onClick={() => this.handleTimeChange('day')}>Day</button>
+					<button id={`week${this.props.id}`} onClick={() => this.handleTimeChange('week')} className="on">{this.props.id}Week</button>
+					<button id={`month${this.props.id}`} onClick={() => this.handleTimeChange('month')} >{this.props.id}Month</button>
+					<button id={`day${this.props.id}`} onClick={() => this.handleTimeChange('day')}>{this.props.id}Day</button>
 				</div>
 				<div className="buildingStats">
 					Past Total:<br />{Math.round(this.state.data[1][0] * 100) / 100} KWH<br /><br />

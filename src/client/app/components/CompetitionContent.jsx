@@ -29,6 +29,7 @@ export default class CompetitionComponent extends React.Component {
 
 
 	componentWillReceiveProps(nextProps) {
+		// everytime it gets data, so when first load and when building change
 		if (nextProps.data.datasets.length !== 0) {
         // if dataset has data process data for graph
 			this.filterDataforGraph(nextProps, this.state.currentGraph);
@@ -183,15 +184,15 @@ export default class CompetitionComponent extends React.Component {
 		this.filterDataforGraph(this.props, type);
 	}
 	handleBuildingChange(id) {
-		// get data for this building
-		const selectedMeters = [id];
-		this.props.selectMeters(selectedMeters, 'all');
-		// get week data
-		this.filterDataforGraph(this.props, 'week');
 		// if a different building is clicked
 		if (this.state.buildingOn !== id) {
 			// set state to week(always show week first).
 			this.setState({ currentGraph: 'week' });
+			// get data for this building
+			const selectedMeters = [id];
+			this.props.selectMeters(selectedMeters, 'all');
+			// get week data
+			this.filterDataforGraph(this.props, 'week');
 			// style change for the past building.
 			document.getElementById(this.state.buildingOn).className = '';
 			// set current building.
