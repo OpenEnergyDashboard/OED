@@ -176,7 +176,7 @@ export default class CompetitionComponent extends React.Component {
 		this.props.fetchMetersDataIfNeeded();
 	}
   /**
-   * on graph type change, process data again (may have problem)
+   * on graph type change, process data again
    * @type type of graph
    */
 	handleTimeChange(type) {
@@ -217,7 +217,7 @@ export default class CompetitionComponent extends React.Component {
 
 	render() {
 		const navList = this.props.meters.map(meter =>
-			<button className="navLi " key={meter.id} id={meter.id} onClick={() => this.handleBuildingChange(meter.id)}>{meter.name}{meter.id}</button>
+			<button className="navLi " key={meter.id} id={meter.id} onClick={() => this.handleBuildingChange(meter.id)}>{meter.name}</button>
   );
 		return (
 			<div className="competitionCon">

@@ -113,14 +113,14 @@ export default class AppliancesOptionsComponent extends React.Component {
 								<input type="text" id="numberOfAppliances" />
 							</div><br />
 							<div>
-								<label style={inlineLeft}>Hours per time</label><label style={inlineRight}>Minutes per time</label><br />
+								<label style={inlineLeft}>Hours per use</label><label style={inlineRight}>Minutes per use</label><br />
 								<input style={inlineLeft} type="text" id="hoursPerTime" /><input style={inlineRight} type="text" id="minutesPerTime" />
 							</div>
 							<br />
 							<div>
 								<div className="radio">
-									<label style={radioStyle}><input type="radio" id="daily" name="times" value="perDay" defaultChecked onChange={this.radioHandler} />Times Per Day</label>
-									<label style={radioStyle}><input type="radio" id="weekly" name="times" value="perWeek" onChange={this.radioHandler} />Times Per Week</label>
+									<label style={radioStyle}><input type="radio" id="daily" name="times" value="perDay" defaultChecked onChange={this.radioHandler} />Uses Per Day</label>
+									<label style={radioStyle}><input type="radio" id="weekly" name="times" value="perWeek" onChange={this.radioHandler} />Uses Per Week</label>
 								</div>
 								<input type="text" id="timesPerDW" />
 							</div>

@@ -26,13 +26,8 @@ export default class CompetitionBuilding extends React.Component {
 		};
 	}
 
-	/**
-	 * Called when this component mounts
-	 * Dispatches a Redux action to fetch meter information
-	 */
 	componentWillReceiveProps(nextProps) {
 		this.setState({ data: nextProps.data });
-		// this part has problems.
 		if (nextProps.thisMeter !== this.props.thisMeter) {
 			document.getElementById('weekb1').className = 'on';
 			document.getElementById('monthb1').className = '';
@@ -335,9 +330,9 @@ export default class CompetitionBuilding extends React.Component {
 					</div>
 				</div>
 				<div className=" buildingSide">
-					<button id={`week${this.props.id}`} onClick={() => this.handleTimeChange('week')} className="on">{this.props.id}Week</button>
-					<button id={`month${this.props.id}`} onClick={() => this.handleTimeChange('month')} >{this.props.id}Month</button>
-					<button id={`day${this.props.id}`} onClick={() => this.handleTimeChange('day')}>{this.props.id}Day</button>
+					<button id={`week${this.props.id}`} onClick={() => this.handleTimeChange('week')} className="on">Week</button>
+					<button id={`month${this.props.id}`} onClick={() => this.handleTimeChange('month')} >Month</button>
+					{/*<button id={`day${this.props.id}`} onClick={() => this.handleTimeChange('day')}>Day</button> */}
 				</div>
 				<div className="buildingStats">
 					Past Total:<br />{Math.round(this.state.data[1][0] * 100) / 100} KWH<br /><br />
