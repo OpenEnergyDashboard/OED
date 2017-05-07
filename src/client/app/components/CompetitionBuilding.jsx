@@ -332,7 +332,7 @@ export default class CompetitionBuilding extends React.Component {
 				<div className=" buildingSide">
 					<button id={`week${this.props.id}`} onClick={() => this.handleTimeChange('week')} className="on">Week</button>
 					<button id={`month${this.props.id}`} onClick={() => this.handleTimeChange('month')} >Month</button>
-					{/*<button id={`day${this.props.id}`} onClick={() => this.handleTimeChange('day')}>Day</button> */}
+					{/* <button id={`day${this.props.id}`} onClick={() => this.handleTimeChange('day')}>Day</button> */}
 				</div>
 				<div className="buildingStats">
 					Past Total:<br />{Math.round(this.state.data[1][0] * 100) / 100} KWH<br /><br />
