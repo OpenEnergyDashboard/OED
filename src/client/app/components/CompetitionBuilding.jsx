@@ -22,7 +22,7 @@ export default class CompetitionBuilding extends React.Component {
 			// options for graph
 			options: {},
 			// data for graph use
-			data: [[0, 0], [0, 0], 0, 0, 0, 0, 0]
+			data: [[0, 0], [0, 0], [0,0,0,0,0,0,0,0], [0,0,0,0,0,0,0,0], 0, 0, 0]
 		};
 	}
 	// if the "day" button is added in later, remove the two comments.
@@ -330,8 +330,8 @@ export default class CompetitionBuilding extends React.Component {
 					</div>
 				</div>
 				<div className=" buildingSide">
-					<button id={`week${this.props.id}`} onClick={() => this.handleTimeChange('week')} className="on">Week</button>
-					<button id={`month${this.props.id}`} onClick={() => this.handleTimeChange('month')} >Month</button>
+					<button className="" id={`week${this.props.id}`} onClick={() => this.handleTimeChange('week')} className="on">Week</button>
+					<button className="" id={`month${this.props.id}`} onClick={() => this.handleTimeChange('month')} >Month</button>
 					{/* <button id={`day${this.props.id}`} onClick={() => this.handleTimeChange('day')}>Day</button>*/}
 				</div>
 				<div className="buildingStats">

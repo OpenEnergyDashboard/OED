@@ -42,6 +42,7 @@ export default class CompetitionComponent extends React.Component {
    * there duplicate code in this part
    */
 	filterDataforGraph(prop, type) {
+		alert(prop.data.datasets.toSource());
 		const currentGraph = type;
 		// find latest time
 		const currentTime = prop.data.datasets[0].data[prop.data.datasets[0].data.length - 1].x;
@@ -166,13 +167,13 @@ export default class CompetitionComponent extends React.Component {
 	componentWillMount() {
 		const currentTime = moment().valueOf();
 		const startingPoint = moment().subtract(31, 'days').valueOf();
-		const timeInterval = new TimeInterval(parseInt(startingPoint), parseInt(currentTime));
+		const timeInterval = new TimeInterval(startingPoint, currentTime);
 		// time interval is not working. ideally get only the most recent 31 days of data.
 		this.setState({ timeInterval: timeInterval });
 		const selectedMeters = [];
 		selectedMeters.push(parseInt(1));
 		// currently getting all data
-		this.props.selectMeters(selectedMeters, 'all');
+		this.props.selectMeters(selectedMeters, "all");
 		this.props.fetchMetersDataIfNeeded();
 	}
   /**
