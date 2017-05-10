@@ -1,0 +1,423 @@
+.appliancesCon{
+  width:100vw;
+  height:100vh;
+  overflow: hidden;
+  /*background-color:#19e2cd;*/
+  color:#fff;
+}
+.appliancesWrap{
+  width:80%;
+  height:80%;
+  min-height: 520px;
+  min-width: 900px;
+  position:relative;
+  margin: auto;
+  top:10%;
+  /*background-color: #111;*/
+}
+.mask{
+  opacity:0;
+  position:absolute;
+  height:100%;
+  width:100vw;
+  top:0;
+  left:0;
+  background-color:#111;
+  z-index:-2;
+  transition:opacity 0.3s;
+}
+.mask.on{
+  z-index:400;
+  opacity:0.3;
+}
+.pop{
+  opacity:0;
+  position:absolute;
+  background-color:#fff;
+  color:#111;
+  border-radius: 10px;
+  z-index:-1;
+  box-shadow:0 0 20px #808080;
+  /*display:none;*/
+  transition: opacity 0.4s, top 0.5s;
+}
+.pop.option{
+  height:64%;
+  width:50%;
+  top:10%;
+  left:25%;
+}
+.pop.add{
+  height:34%;
+  width:50%;
+  top:25%;
+  left:25%;
+}
+.pop.on{
+  z-index:500;
+  opacity:1;
+  top:14%;
+  /*display:block;*/
+}
+.pop.add.on{
+  top:29%;
+}
+.popInner{
+  position:absolute;
+  height:80%;
+  width:90%;
+  top:10%;
+  left:5%;
+}
+.appliance{
+	padding:0 0 0 0;
+    /*float:left;*/
+    height: 80px;
+    width:160px;
+    margin-bottom: 30px;
+    /*margin-right:20px;*/
+    position:relative;
+    cursor:pointer;
+    text-align:center;
+    border: 2px solid #19e2cd;
+    border-radius:10px;
+    opacity: 0.5;
+    color: #111;
+}
+.appliance.on{
+  background-color:#19e2cd;
+}
+.info1{
+  position:absolute;
+  top:12%;
+  width:100%;
+  height:76%;
+  text-align:center;
+  transition: opacity 0.5s;
+  opacity:1;
+  font-size: 13px;
+}
+.info2{
+  position:absolute;
+  top:8%;
+  width:100%;
+  height:84%;
+  text-align:center;
+  transition: opacity 0.5s;
+  opacity:0;
+  font-size:14px;
+}
+.appliance.on .info1,.appliance.on .info2{
+  background-color:#19e2cd;
+
+}
+.appliance:hover .info1{
+  opacity:0;
+}
+.appliance:hover .info2{
+  opacity:1;
+}
+.arrow{
+  cursor:pointer;
+}
+.appliancesListCon{
+  position: absolute;
+  top: 50%;
+  margin-top: -205px;
+  height: 410px;
+  width: 160px;
+  /*background-color: #fff;*/
+  overflow: hidden;
+}
+.ulWrap{
+  height:100%;
+  width: 160px;
+  top:0;
+  left: 5%;
+  position: absolute;
+  /*background-color: #fff;*/
+}
+.ulWrap #upArrow{
+  transform:rotate(180deg);
+  width: 130px;
+  height: 65px;
+  position: absolute;
+  top:0;
+  left: 15px;
+  cursor:pointer;
+  opacity: 0.1;
+border:none;
+  transition: opacity 0.1s;
+
+}
+.ulWrap #downArrow{
+	border:none;
+  width: 130px;
+  height: 65px;
+  position: absolute;
+  bottom:0;
+  left: 15px;
+  cursor: pointer;
+  opacity: 0.1;
+  transition: opacity 0.1s;
+}
+.ulWrap #upArrow:hover,.ulWrap #downArrow:hover{
+  opacity: 0.3;
+}
+.appliancesList{
+
+  list-style:none;
+  width:120px;
+  left: 0;
+  top:0;
+  position:absolute;
+  text-align:center;
+  padding:0;
+  /*background-color: #111;*/
+}
+.appliancesGrid{
+  position:absolute;
+  width:70%;
+  height:80%;
+  right: 0;
+  top: 10%;
+  color: white;
+}
+
+.addNew{
+  line-height: 80px;
+}
+.competitionCon{
+  width: 100vw;
+  height: 100vh;
+  position: absolute;
+  overflow: hidden;
+  background-color:  #19e2cd ;
+}
+.competitionCon .nav{
+	top:4.5%;
+  height: 91%;
+  width: 10%;
+  position: absolute;
+  right:2vw;
+
+}
+/*.competitionCon .nav ul{*/
+  /*padding:0px;*/
+  /*list-style: none;*/
+  /*height: 91%;*/
+  /*width: 100%;*/
+  /*top: 4.5%;*/
+  /*position: absolute;*/
+/*}*/
+.competitionCon .nav button{
+	border:none;
+	background: none;
+  text-align: center;
+  height:7vh;
+  width: 100%;
+  line-height: 7vh;
+  opacity: 0.6;
+  font-size: 2vh;
+  color: white;
+  cursor: pointer;
+  transition: opacity 0.2s,font-size 0.2s;
+  animation: appear2 1.2s;
+
+}
+.competitionCon .nav button span{
+  position: relative;
+  top: -0.1vh;
+}
+.competitionCon .nav button.on{
+  opacity:1;
+  font-size: 2.2vh;
+  animation:buildingOn 1.8s infinite;
+}
+.competitionCon .nav button:hover{
+  opacity:1;
+  font-size: 2.2vh;
+}
+
+.competitionCenter{
+  position: relative;
+  height: 60%;
+  width: 50%;
+  margin:auto;
+  /*background-color: #fff;*/
+  top:15%;
+	font-family: "Trebuchet MS", Arial, serif;
+}
+.competitionBuildingCon{
+  height: 100%;
+  width: 100%;
+  position: absolute;
+  top: 0;
+  left:0;
+  transition: left 1s ease-in-out, opacity 1s;
+  /*background-color: #fff;*/
+}
+
+.competitionBuildingCon .banner{
+  height: 25%;
+  width: 100%;
+  position: relative;
+  left: 0;
+  top: 0;
+  /*background-color: black;*/
+}
+.competitionBuildingCon .banner .sm{
+  color: white;
+  font-size: 12px;
+}
+@keyframes appear {
+    from {bottom: 30px; opacity: 0}
+    to {bottom: 0; opacity:100}
+}
+@keyframes appear2{
+  0% {opacity: 0}
+  50% {opacity: 0}
+  100% {opacity:0.6}
+}
+@keyframes buildingOn {
+    0% {opacity:0.7 }
+    50% {opacity:1}
+    100% {opacity:0.7}
+}
+.competitionBuildingCon .banner .lgNumber{
+  font-size: 11vh;
+  color: #fff;
+  line-height: 100%;
+  /*animation: appear 0.2s;*/
+  position: relative;
+
+}
+.competitionBuildingCon .banner #unit{
+  font-size: 5vh;
+  color: #fff;
+}
+.competitionBuildingCon .banner .dateTime{
+  position: relative;
+  height: 100%;
+  width: 40%;
+  float: right;
+	font-family: "arial", serif;
+  /*background-color: #fff;*/
+}
+.competitionBuildingCon .banner .dateTime span{
+  font-size:5vh;
+  position: absolute;
+  bottom:1vh;
+  right: 0;
+  color: #fff;
+}
+.info{
+  height: 75%;
+  width: 100%;
+  position: relative;
+  top:5%;
+  color: white;
+  font-size: 3vh;
+  letter-spacing: 1px;
+  line-height: 7vh;
+  font-family: 'arial';
+}
+.info .buildingBar, .info .buildingRadar{
+  width: 100%;
+  height: 100%;
+}
+.info span{
+  color:  grey;
+	font-family: "Times", serif;
+  font-size: 6vh;
+}
+.building{
+
+}
+.competitionBuildingCon.current{
+  left:0;
+  opacity: 1;
+  z-index: 100;
+}
+.competitionBuildingCon.next{
+  left:100vh;
+  opacity: 0;
+  z-index: -100;
+}
+.competitionCenter #currentBuilding,.competitionCenter #pastBuilding,.competitionCenter #nextBuilding{
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  top: 0;
+
+}
+.competitionCenter #nextBuilding{
+  left:100vh;
+  opacity: 0;
+}
+.competitionCenter #currentBuilding{
+   z-index: 100;
+   animation: currentBuilding 0.8s;
+}
+.competitionCenter #pastBuilding{
+   z-index: 100;
+   left:-100vw;
+   animation: pastBuilding 0.8s;
+
+}
+.buildingSide{
+  position: absolute;
+  height: 26%;
+  top: 50%;
+  width: 12%;
+  left: -17%;
+}
+/*.buildingSide ul{*/
+  /*position: relative;*/
+  /*padding:0;*/
+  /*width: 100%;*/
+  /*height:100%;*/
+  /*list-style: none;*/
+  /*text-align: center;*/
+/*}*/
+.buildingSide button{
+	width:100%;
+	text-align: center;
+	border:none;
+  font-size:13px;
+  margin-bottom: 20%;
+  border-radius: 4px;
+  cursor: pointer;
+  opacity: 0.3;
+  transition: opacity 0.3s,background-color 0.3s;
+}
+.buildingSide button:hover{
+  opacity: 0.3;
+  background-color: white;
+}
+.buildingSide button.on{
+  opacity: 0.8;
+  background-color: white;
+}
+.buildingStats{
+  position:absolute;
+  top:50%;
+  right: -17%;
+  width: 20%;
+  height: 40%;
+  color:white;
+}
+
+
+
+@keyframes currentBuilding {
+  0%{left:100vw;opcaity:0}
+  50%{left:0px}
+  100%{opacity:1}
+
+}
+@keyframes pastBuilding {
+  0%{left:0px;opcaity:1}
+  50%{left:-100vw}
+  100%{opacity:0}
+}

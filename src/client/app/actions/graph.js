@@ -52,6 +52,13 @@ export function changeSelectedMeters(meterIDs) {
 		return Promise.resolve();
 	};
 }
+export function changeSelectedBuilding(meterIDs, timeInterval) {
+	return dispatch => {
+		dispatch(updateSelectedMeters(meterIDs));
+		dispatch(fetchNeededLineReadings(timeInterval, 1300));
+		return Promise.resolve();
+	};
+}
 
 function fetchNeededReadingsForGraph(timeInterval) {
 	return dispatch => {

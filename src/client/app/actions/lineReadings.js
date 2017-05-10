@@ -34,13 +34,13 @@ function receiveLineReadings(meterIDs, timeInterval, readings) {
 	return { type: RECEIVE_LINE_READINGS, meterIDs, timeInterval, readings };
 }
 
-function fetchLineReadings(meterIDs, timeInterval) {
+function fetchLineReadings(meterIDs, timeInterval, numPoints) {
 	return dispatch => {
 		dispatch(requestLineReadings(meterIDs, timeInterval));
 		// The api expects the meter ids to be a comma-separated list.
 		const stringifiedMeterIDs = meterIDs.join(',');
 		return axios.get(`/api/readings/line/${stringifiedMeterIDs}`, {
-			params: { timeInterval: timeInterval.toString() }
+			params: { timeInterval: timeInterval.toString(), numPoints }
 		}).then(response => dispatch(receiveLineReadings(meterIDs, timeInterval, response.data)));
 	};
 }
@@ -50,12 +50,12 @@ function fetchLineReadings(meterIDs, timeInterval) {
  * @param {TimeInterval} timeInterval The time interval to fetch readings for on the line chart
  * @return {*} An action to fetch the needed readings
  */
-export function fetchNeededLineReadings(timeInterval) {
+export function fetchNeededLineReadings(timeInterval, numPoints = 100) {
 	return (dispatch, getState) => {
 		const state = getState();
 		const meterIDsToFetchForLine = state.graph.selectedMeters.filter(id => shouldFetchLineReadings(state, id, timeInterval));
 		if (meterIDsToFetchForLine.length > 0) {
-			return dispatch(fetchLineReadings(meterIDsToFetchForLine, timeInterval));
+			return dispatch(fetchLineReadings(meterIDsToFetchForLine, timeInterval, numPoints));
 		}
 		return Promise.resolve();
 	};
