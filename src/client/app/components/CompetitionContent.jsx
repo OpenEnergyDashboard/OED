@@ -32,7 +32,7 @@ export default class CompetitionComponent extends React.Component {
 		// everytime it gets data, so when first load and when building change
 		if (nextProps.data.datasets.length !== 0) {
         // if dataset has data process data for graph
-			this.filterDataforGraph(nextProps, this.state.currentGraph);
+			this.filterDataforGraph(nextProps, 'week');
 		}
 	}
   /**

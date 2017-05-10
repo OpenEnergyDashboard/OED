@@ -25,16 +25,16 @@ export default class CompetitionBuilding extends React.Component {
 			data: [[0, 0], [0, 0], 0, 0, 0, 0, 0]
 		};
 	}
-
+	// if the "day" button is added in later, remove the two comments.
 	componentWillReceiveProps(nextProps) {
 		this.setState({ data: nextProps.data });
 		if (nextProps.thisMeter !== this.props.thisMeter) {
 			document.getElementById('weekb1').className = 'on';
 			document.getElementById('monthb1').className = '';
-			document.getElementById('dayb1').className = '';
+			// document.getElementById('dayb1').className = '';
 			document.getElementById('weekb2').className = 'on';
 			document.getElementById('monthb2').className = '';
-			document.getElementById('dayb2').className = '';
+			// document.getElementById('dayb2').className = '';
 		}
 		if (nextProps.data.length === 7) {
 			// set options
@@ -332,7 +332,7 @@ export default class CompetitionBuilding extends React.Component {
 				<div className=" buildingSide">
 					<button id={`week${this.props.id}`} onClick={() => this.handleTimeChange('week')} className="on">Week</button>
 					<button id={`month${this.props.id}`} onClick={() => this.handleTimeChange('month')} >Month</button>
-					{/* <button id={`day${this.props.id}`} onClick={() => this.handleTimeChange('day')}>Day</button> */}
+					{/* <button id={`day${this.props.id}`} onClick={() => this.handleTimeChange('day')}>Day</button>*/}
 				</div>
 				<div className="buildingStats">
 					Past Total:<br />{Math.round(this.state.data[1][0] * 100) / 100} KWH<br /><br />

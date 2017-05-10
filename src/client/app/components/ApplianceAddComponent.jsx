@@ -3,7 +3,7 @@ import React from 'react';
 
 /**
  * Component for popup dialog for adding a new appliance
- * need to validate input
+ * need to validate input!!
  */
 export default class ApplianceAddComponent extends React.Component {
 	/**

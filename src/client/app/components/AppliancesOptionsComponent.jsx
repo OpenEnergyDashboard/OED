@@ -2,6 +2,8 @@ import React from 'react';
 
 /**
  * component for the option popup when turning on an appliance
+ * The input need to be validated!!(right now only, there will be alert if required fields are left empty. But more validations need
+ * eg. min, max number etc.)
  */
 export default class AppliancesOptionsComponent extends React.Component {
 
@@ -17,7 +19,7 @@ export default class AppliancesOptionsComponent extends React.Component {
 		this.closeHandler = this.closeHandler.bind(this);
 	}
 	/**
-	 * handles checking daily/weely radio
+	 * handles checking daily/weeKly radio
 	 */
 	radioHandler() {
 		if (document.getElementById('daily').checked === true) {
