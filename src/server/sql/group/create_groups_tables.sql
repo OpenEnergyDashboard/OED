@@ -24,7 +24,7 @@ CREATE TABLE groups_immediate_children (
   The groups_deep_children view provides a logical table with a row for each (parent, deep child) relationship in the tree.
  */
 CREATE VIEW groups_deep_children AS
-	/* This recursive common table expression (CTE) starts at each node in the graph and iterates.
+	/* This recursive common table expression (CTE) starts at each no-e in the graph and iterates.
       At each iteration, it adds new rows to the result set for each newly discovered deep child relationship.
   */
 	WITH RECURSIVE deep_children(parent_id, child_id) AS (

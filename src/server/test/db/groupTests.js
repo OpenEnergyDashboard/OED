@@ -56,6 +56,8 @@ mocha.describe('Groups', () => {
 			await parent.adoptGroup(child.id);
 			const childrenOfParent = await (Group.getImmediateGroupsByGroupID(parent.id));
 			expect(childrenOfParent).to.deep.equal([child.id]);
+			const parentsOfChild = await child.getParents();
+			expect(parentsOfChild).to.deep.equal([parent.id]);
 		});
 
 		mocha.it('can be given a child meter', async () => {
@@ -128,6 +130,60 @@ mocha.describe('Groups', () => {
 			await parent.disownMeter(impendingOrphan.id);
 			meters = await Group.getImmediateMetersByGroupID(parent.id);
 			expect(meters).to.deep.equal([lovedMeter.id]);
+		});
+
+		mocha.it('can be deleted', async () => {
+			const unwanted = await Group.getByName('A');
+			const parent = await Group.getByName('B');
+			const child = await Group.getByName('C');
+			const meter = await Meter.getByName('A');
+
+			// both unwanted and child are children of parent
+			await parent.adoptGroup(unwanted.id);
+			await parent.adoptGroup(child.id);
+
+			// child is a child of unwanted
+			await unwanted.adoptGroup(child.id);
+
+			// meter is a child meter of unwanted
+			await unwanted.adoptMeter(meter.id);
+
+			// that we have all three groups
+			let allGroups = await Group.getAll();
+			allGroups = allGroups.map(g => g.id);
+			expect(allGroups.sort()).to.deep.equal([unwanted.id, parent.id, child.id].sort());
+
+			// Verify that both unwanted and child are children of parent
+			let childrenOfParent = await Group.getImmediateGroupsByGroupID(parent.id);
+			expect(childrenOfParent.sort()).to.deep.equal([unwanted.id, child.id].sort());
+
+			// Verify that both unwanted and parent are parents of child
+			let parentsOfChild = await child.getParents();
+			expect(parentsOfChild.sort()).to.deep.equal([unwanted.id, parent.id].sort());
+
+			// Verify that meter is the sole child meter of unwanted
+			let metersOfUnwanted = await Group.getImmediateMetersByGroupID(unwanted.id);
+			expect(metersOfUnwanted).to.deep.equal([meter.id]);
+
+			// Delete unwanted group
+			await Group.delete(unwanted.id);
+
+			// Verify that child is the sole child of parent
+			childrenOfParent = await Group.getImmediateGroupsByGroupID(parent.id);
+			expect(childrenOfParent).to.deep.equal([child.id]);
+
+			// Verify that parent is the sole parent of child
+			parentsOfChild = await child.getParents();
+			expect(parentsOfChild).to.deep.equal([parent.id]);
+
+			// Verify unwanted has no child meters
+			metersOfUnwanted = await Group.getImmediateMetersByGroupID(unwanted.id);
+			expect(metersOfUnwanted).to.deep.equal([]);
+
+			// Verify that unwanted has been deleted from the groups table
+			allGroups = await Group.getAll();
+			allGroups = allGroups.map(g => g.id);
+			expect(allGroups.sort()).to.deep.equal([parent.id, child.id].sort());
 		});
 	});
 });

@@ -177,5 +177,25 @@ class Group {
 	async disownMeter(meterID, conn = db) {
 		await conn.none(sqlFile('group/disown_child_meter.sql'), { parent_id: this.id, meter_id: meterID });
 	}
+
+	/**
+	 * Returns a promise to retrieve an array of the group IDs of the parent groups of this group
+	 * @param conn The connection to be used. Defaults to the default database connection.
+	 * @return {Promise<IArrayExt<any>>}
+	 */
+	async getParents(conn = db) {
+		const rows = await conn.any(sqlFile('group/get_parents_by_group_id.sql'), { child_id: this.id });
+		return rows.map(row => row.parent_id);
+	}
+
+	/**
+	 * Returns a promise to delete a group and purge all trace of it form the memories of its parents and children
+	 * @param groupID The ID of the group to be deleted
+	 * @param conn The connection to be used. Defaults to (*GASP!*) the default database connection
+	 * @return {Promise.<void>}
+	 */
+	static async delete(groupID, conn = db) {
+		await conn.none(sqlFile('group/delete_group.sql'), { id: groupID });
+	}
 }
 module.exports = Group;
