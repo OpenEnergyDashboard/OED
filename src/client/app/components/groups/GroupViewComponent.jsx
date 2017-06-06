@@ -85,25 +85,8 @@ export default class GroupViewComponent extends React.Component {
 					</div>
 					<Button bsStyle="primary" onClick={this.open}>Modal!</Button>
 				</div>
-
-				<div className="static-modal">
-					<Modal show={this.state.showModal} onHide={this.close}>
-						<Modal.Header closeButton>
-							<Modal.Title>Modal title</Modal.Title>
-						</Modal.Header>
-
-						<Modal.Body>
-							One fine body...
-						</Modal.Body>
-
-						<Modal.Footer>
-							<Button onClick={this.close}>Close</Button>
-						</Modal.Footer>
-
-					</Modal>
-				</div>
-
 			</div>
+			<ed
 
 		);
 	}

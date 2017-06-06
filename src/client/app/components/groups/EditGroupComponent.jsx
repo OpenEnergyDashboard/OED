@@ -4,7 +4,8 @@
 
 // This component is the main page of the edit group page.
 import React from 'react';
-import { Link } from 'react-router';
+import { Modal, Button } from 'react-bootstrap';
+
 
 export default class EditGroupComponent extends React.Component {
 
@@ -45,15 +46,24 @@ export default class EditGroupComponent extends React.Component {
 					<h1>Edit Group Pane</h1>
 				</div>
 
-				<div style={boxStyle}>
-					<p>This will either be the page for editing a group or made into an overlay component.
-						Not worth the time to switch this into a Redux component, so leaving as is.</p>
-					<Link style={backButton} to="/group">
-						<button className="btn btn-default">Back to Groups</button>
-					</Link>
+				<div className="static-modal">
+					<Modal show={this.state.showModal} onHide={this.close}>
+						<Modal.Header closeButton>
+							<Modal.Title>Modal title</Modal.Title>
+						</Modal.Header>
+
+						<Modal.Body>
+					One fine body...
+				</Modal.Body>
+
+						<Modal.Footer>
+							<Button onClick={this.close}>Close</Button>
+						</Modal.Footer>
+
+					</Modal>
 				</div>
 			</div>
-
 		);
 	}
 }
+

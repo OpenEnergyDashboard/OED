@@ -46,10 +46,20 @@ export default function groups(state = defaultState, action) {
 			// newGroups is an array: this converts it into a nested object where the key to each group is its ID.
 			// Without this, byGroupID will not be keyed by group ID.
 			const newGroupsByID = _.keyBy(newGroups, 'id');
+			// Note that there is an `isFetching` for groups as a whole AND one for each group.
 			return {
 				...state,
 				isFetching: false,
 				byGroupID: newGroupsByID,
+
+				// todo: this is not going to be used immediately, is there anywhere else to set it?
+				// I don't think so, but I'm trying to avoid getting bogged down in this for now, I can change it later.
+				showEditGroupModal: false,
+
+				// todo: Is this necessary? Is there anywhere else I can set it? Do the proper thinking!
+				// This will be set to a copy of a group being edited to store the edits, my plan is for it to be null
+				// whenever a group is not being edited. -JKM
+				groupInEditing: null,
 			};
 		}
 
@@ -114,6 +124,16 @@ export default function groups(state = defaultState, action) {
 			return {
 				...state,
 				selectedGroups: action.groupIDs,
+			};
+		}
+
+		case groupsActions.SHOW_EDIT_GROUP_MODAL: {
+			return {
+				...state,
+				groupInEditing: {
+					...state.byGroupID[action.groupID],
+					id: action.groupID,
+				}
 			};
 		}
 

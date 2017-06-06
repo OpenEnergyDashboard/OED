@@ -17,6 +17,8 @@ export const GROUPSUI_CHANGE_SELECTED_GROUPS_PER_GROUP = 'GROUPSUI_CHANGE_SELECT
 export const GROUPSUI_CHANGE_SELECTED_METERS_PER_GROUP = 'GROUPSUI_CHANGE_SELECTED_METERS_PER_GROUP';
 export const GROUPSUI_CHANGE_DISPLAYED_GROUPS = 'GROUPSUI_CHANGE_DISPLAYED_GROUPS';
 
+export const SHOW_EDIT_GROUP_MODAL = 'SHOW_EDIT_GROUP_MODAL';
+
 function requestGroupsDetails() {
 	return { type: REQUEST_GROUPS_DETAILS };
 }
@@ -111,3 +113,10 @@ export function updateSelectedGroups(groupIDs) {
 export function groupsUIchangeSelectedMeters(parentID, meterIDs) {
 	return { type: GROUPSUI_CHANGE_SELECTED_METERS_PER_GROUP, parentID, meterIDs };
 }
+
+// TODO: I was orignally going to write a separate action to populate the data. Reviewer, which is better?
+// Populate `groupInEditing` then make the modal visible
+export function showEditGroupModal (groupID) {
+	return { type: SHOW_EDIT_GROUP_MODAL, groupID };
+}
+
