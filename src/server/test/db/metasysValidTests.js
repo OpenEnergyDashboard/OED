@@ -19,20 +19,21 @@ const readMetasysData = require('../../services/readMetasysData');
 
 const mocha = require('mocha');
 
+
 mocha.describe('Insert Metasys readings from a file', () => {
 	mocha.beforeEach(recreateDB);
 	let meter;
-	mocha.beforeEach(() => db.task(async t => {
-		await new Meter(undefined, 'Meter', null, false, Meter.type.METASYS).insert(t);
-		meter = await Meter.getByName('Meter', t);
+	mocha.beforeEach(() => db.task(function* setupTests(t) {
+		yield new Meter(undefined, 'Meter', null, false, Meter.type.METASYS).insert(t);
+		meter = yield Meter.getByName('Meter', t);
 	}));
 
 	mocha.it('loads the correct number of rows from a file', () => {
 		const testFilePath = path.join(__dirname, 'Meter.csv');
-	//	const readingDuration = moment.duration(1, 'hours');
+		//const readingDuration = moment.duration(1, 'hours');
 		// readMetasysData(filepath, interval, repetition, cumulative & reset)
-		return readMetasysData(testFilePath, 30,1, false)
+		return readMetasysData(testFilePath, 30, 1, false)
 			.then(() => db.one('SELECT COUNT(*) as count FROM readings'))
-			.then(({ count }) => expect(parseInt(count)).to.equal(225));
+			.then(({count}) => expect(parseInt(count)).to.equal(93));
 	});
 });

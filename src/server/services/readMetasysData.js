@@ -2,6 +2,8 @@ const Reading = require('./../models/Reading');
 const readCsv = require('./readCSV');
 const Meter = require('./../models/Meter');
 const moment = require('moment');
+const path = require('path');
+
 /**
  * Reads CSV file passed to input all the Metasys readings into database.
  * @param filePath the filePath to read
@@ -12,9 +14,9 @@ async function readMetasysData(filePath, readingInterval, readingRepetition, cum
 	const rowArray = [];
 
 	//getting filename
-	const fileNameArray = filePath.split("/");
-	const fileName = fileNameArray.pop();
-
+	// const fileNameArray = filePath.split("/");
+	// const fileName = fileNameArray.pop();
+	const fileName = path.basename(filePath);
 	//list of readings
 	const rows = await readCsv(filePath);
 
@@ -53,7 +55,6 @@ async function readMetasysData(filePath, readingInterval, readingRepetition, cum
 				meterReading = rowArray[index - readingRepetition][3];
 				meterReading = meterReading.replace(' kW', '');
 				meterReading = Math.round(parseFloat(meterReading));
-				console.log(meterReading);
 			}
 			//To handle cumulative readings that resets at midnight
 			if(meterReading < 0){
@@ -77,14 +78,18 @@ async function readMetasysData(filePath, readingInterval, readingRepetition, cum
 	//pushing last reading into array
 	const reading = new Reading(meter.id,meterReadingEnd,start_timestamp.toDate(),end_timestamp.toDate());
 	readingArray.push(reading);
-
+    // console.log(readingArray);
+    // console.log(index);
 	// //Insert into database
 	try {
-		console.log("About to insert");
+		// console.log("About to insert");
 		//inserting all the data from an array into database and catching error when it occurs.
-		Reading.insertAll(readingArray).then(() => console.log("Done"));
+		console.log("About to insert");
+		await Reading.insertAll(readingArray);
+		console.log("Done");
 	} catch (err) {
 		console.error(err);
 	}
 }
 module.exports = readMetasysData;
+
