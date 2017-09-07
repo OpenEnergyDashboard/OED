@@ -17,14 +17,14 @@ const config = {
 		filename: 'bundle.js'
 	},
 	resolve: {
-		extensions: ['', '.js', '.jsx']
+		extensions: ['.js', '.jsx']
 	},
 	module: {
-		loaders: [
+		rules: [
 			{
 				test: /\.jsx?/,
 				include: [APP_DIR, COMMON_DIR],
-				loader: 'babel'
+				loader: 'babel-loader'
 			},
 			{
 				test: /\.css$/,
@@ -36,5 +36,16 @@ const config = {
 		new LodashModuleReplacementPlugin()
 	]
 };
+
+if (process.env.NODE_ENV === 'production') {
+	config.plugins.push(
+		new webpack.DefinePlugin({
+			'process.env': {
+				NODE_ENV: JSON.stringify('production')
+			}
+		}),
+		new webpack.optimize.UglifyJsPlugin()
+	);
+}
 
 module.exports = config;
