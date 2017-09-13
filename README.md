@@ -20,7 +20,7 @@ Depending on your environment, you may need ```sudo``` for these commands.
 
 1. In the main directory, run ```docker-compose build```. 
 This may take some time, as it installs the Node dependencies in the container.
-1. Set up the database with ```docker-compose run --rm web scripts/init.sh <excel file>```. 
+1. Set up Node environment and the database with ```docker-compose run --rm web scripts/init.sh <excel file>```. 
 To clarify: ```docker-compose run --rm web``` means run the following command, in the ```web``` container (the one containing the OED NodeJS app). 
 You can either provide an Excel file with the IPs of some Mamac meters, in which case the database will be populated, or enter NONE, which will skip populating it.
 1. For production, run the app with ```docker-compose up -d```. This starts the app in the background.

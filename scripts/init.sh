@@ -1,10 +1,12 @@
 #!/bin/bash
-# Try to set up the datbase, retrying to work around 
 
 if [ "$1" == "" ]; then 
     echo "You must provide a filename to get meters from, or the word NONE."
     exit 1
 fi
+
+# Install NPM dependencies
+npm install
 
 create_error=0 # Boolean
 
