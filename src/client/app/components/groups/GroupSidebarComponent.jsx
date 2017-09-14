@@ -1,8 +1,8 @@
 /* This Source Code Form is subject to the terms of the Mozilla Public
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
+
 // This is the main component for the groups display page
-import { Link } from 'react-router';
 import React from 'react';
 
 export default class GroupSidebarComponent extends React.Component {
@@ -33,18 +33,17 @@ export default class GroupSidebarComponent extends React.Component {
 		const labelStyle = {
 			textDecoration: 'underline'
 		};
+		const divPadding = {
+			paddingTop: '35px'
+		};
 		return (
-			<div>
-				<h3>Sidebar</h3>
-
-				<div className="form-group">
-					<p style={labelStyle}>Select groups:</p>
-					<select multiple className="form-control" id="groupList" size="8" onChange={this.handleGroupSelect}>
-						{this.props.groups.map(group =>
-							<option key={group.id} value={group.id}>{group.name}</option>
-						)}
-					</select>
-				</div>
+			<div className="form-group" style={divPadding}>
+				<p style={labelStyle}>Select groups:</p>
+				<select multiple className="form-control" id="groupList" size="8" onChange={this.handleGroupSelect}>
+					{this.props.groups.map(group =>
+						<option key={group.id} value={group.id}>{group.name}</option>
+					)}
+				</select>
 			</div>
 		);
 	}

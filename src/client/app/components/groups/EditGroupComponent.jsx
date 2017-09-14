@@ -15,35 +15,16 @@ export default class EditGroupComponent extends React.Component {
 	}
 
 	render() {
-		const boxStyle = {
-			marginLeft: '10%',
-			marginRight: '10%',
-			// todo: testing hack
-			border: '1px solid red'
-		};
-
 		const titleStyle = {
 			justifyContent: 'center',
 			alignItems: 'center',
 			textAlign: 'center'
 		};
-		// The back button right now just links back to the group page. Ideally we can create a back button component.
-		const backButton = {
-			float: 'right'
-		};
-
-		// todo: remove this absurd testing hack
-		// I'm reusing this from the other class until it can pass props
-		const meters = [
-			{ name: 'one' },
-			{ name: 'two' },
-			{ name: 'three' }
-		];
 
 		return (
 			<div>
 				<div style={titleStyle}>
-					<h1>Edit Group Pane</h1>
+					<h1>Edit Group</h1>
 				</div>
 
 				<div className="static-modal">
@@ -53,8 +34,8 @@ export default class EditGroupComponent extends React.Component {
 						</Modal.Header>
 
 						<Modal.Body>
-					One fine body...
-				</Modal.Body>
+							Placeholder text
+						</Modal.Body>
 
 						<Modal.Footer>
 							<Button onClick={this.close}>Close</Button>
