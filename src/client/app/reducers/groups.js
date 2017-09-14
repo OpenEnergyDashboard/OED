@@ -127,16 +127,6 @@ export default function groups(state = defaultState, action) {
 			};
 		}
 
-		case groupsActions.SHOW_EDIT_GROUP_MODAL: {
-			return {
-				...state,
-				groupInEditing: {
-					...state.byGroupID[action.groupID],
-					id: action.groupID,
-				}
-			};
-		}
-
 		default:
 			return state;
 	}
