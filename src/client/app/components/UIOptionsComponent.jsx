@@ -7,6 +7,8 @@ import Slider from 'react-rangeslider';
 import moment from 'moment';
 import 'react-rangeslider/lib/index.css';
 import { chartTypes } from '../reducers/graph';
+import ExportContainer from '../containers/ExportContainer';
+
 
 export default class UIOptionsComponent extends React.Component {
 	/**
@@ -94,14 +96,15 @@ export default class UIOptionsComponent extends React.Component {
 					<label><input type="radio" name="chartTypes" value={chartTypes.bar} onChange={this.handleChangeChartType} checked={this.props.chartToRender === chartTypes.bar} />Bar</label>
 				</div>
 				{this.props.chartToRender === chartTypes.bar &&
-					<div>
-						<div className="checkbox">
-							<label><input type="checkbox" onChange={this.handleChangeBarStacking} />Bar stacking</label>
-						</div>
-						<p style={labelStyle}>Bar chart interval (days):</p>
-						<Slider min={1} max={365} value={this.state.barDuration} onChange={this.handleBarDurationChange} onChangeComplete={this.handleBarDurationChangeComplete} />
+				<div>
+					<div className="checkbox">
+						<label><input type="checkbox" onChange={this.handleChangeBarStacking} />Bar stacking</label>
 					</div>
+					<p style={labelStyle}>Bar chart interval (days):</p>
+					<Slider min={1} max={365} value={this.state.barDuration} onChange={this.handleBarDurationChange} onChangeComplete={this.handleBarDurationChangeComplete} />
+				</div>
 				}
+				<ExportContainer />
 			</div>
 		);
 	}
