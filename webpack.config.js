@@ -32,6 +32,7 @@ const config = {
 			}
 		]
 	},
+	devtool: 'source-map',
 	plugins: [
 		new LodashModuleReplacementPlugin()
 	]
@@ -44,7 +45,7 @@ if (process.env.NODE_ENV === 'production') {
 				NODE_ENV: JSON.stringify('production')
 			}
 		}),
-		new webpack.optimize.UglifyJsPlugin()
+		new webpack.optimize.UglifyJsPlugin({ sourceMap: true })
 	);
 }
 
