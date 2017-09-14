@@ -25,26 +25,14 @@ export default class ChildGroupBox extends React.Component {
 		this.props.selectGroups(selectedGroups);
 	}
 
-
 	render() {
-		const boxStyle = {
-			display: 'inline-block',
-			width: '200px',
-			alignSelf: 'right',
-			marginLeft: '40%',
-			marginRight: '10%'
-			// todo: testing hack
-			//border: '1px solid purple'
-		};
-
 		const labelStyle = {
 			textDecoration: 'underline'
 		};
 
-
 		return (
-			<div style={boxStyle}>
-				<h3>Child Groups:</h3>
+			<div>
+				<h4>Child Groups:</h4>
 				<div className="form-group">
 					<p style={labelStyle}>Select groups:</p>
 					<select multiple className="form-control" id="groupList" size="8" onChange={this.handleGroupSelect}>

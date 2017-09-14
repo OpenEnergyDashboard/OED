@@ -51,7 +51,7 @@ export default function RouteComponent() {
 			<Route path="/" component={HomeComponent} />
 			<Route path="/login" component={LoginComponent} />
 			<Route path="/admin" component={AdminComponent} onEnter={requireAuth} />
-			<Route path="/group" component={GroupContainer} />
+			<Route path="/groups" component={GroupContainer} onEnter={requireAuth} />
 			<Route path="/editGroup" component={EditGroupComponent} />
 			<Route path="*" component={NotFoundComponent} />
 		</Router>

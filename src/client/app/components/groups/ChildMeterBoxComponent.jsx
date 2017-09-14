@@ -30,22 +30,12 @@ export default class ChildMeterBox extends React.Component {
 	}
 
 	render() {
-		const boxStyle = {
-			display: 'inline-block',
-			width: '200px',
-			alignSelf: 'left',
-			marginLeft: '10%',
-			marginRight: '10%'
-
-		};
-
-
 		const labelStyle = {
 			textDecoration: 'underline'
 		};
 		return (
-			<div style={boxStyle}>
-				<h3>Child Meters</h3>
+			<div>
+				<h4>Child Meters</h4>
 				<div className="form-group">
 					<p style={labelStyle}>Select meters:</p>
 					<select multiple className="form-control" id="meterList" size="8" onChange={this.handleMeterSelect}>

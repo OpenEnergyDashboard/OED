@@ -11,9 +11,7 @@ export default function ListBox(props) {
 		width: '200px',
 		alignSelf: 'right',
 		marginLeft: '40%',
-		marginRight: '10%',
-		// todo: testing hack
-		border: '1px solid purple'
+		marginRight: '10%'
 	};
 	const listStyle = {
 		textAlign: 'left'
