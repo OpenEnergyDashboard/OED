@@ -32,6 +32,7 @@ TOKEN_SECRET=?             // Token for authentication. Generate something secur
 8. Run ```npm run createdb``` to create the database schema.
 1. Run `npm run addMamacMeters` to load mamac meters from an `.xlsx` file.
 1. Run `npm run updateMamacMeters` to fetch new data for mamac meters in the database.
+1. Run `npm run createUser` and follow the directions to create a new admin user.
 1. Run ```npm run build``` to create the Webpack bundle for production, otherwise run ```npm run dev``` for development.
 1. Run ```npm start```
 
