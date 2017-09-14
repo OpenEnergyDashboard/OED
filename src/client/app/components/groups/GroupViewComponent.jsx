@@ -86,8 +86,6 @@ export default class GroupViewComponent extends React.Component {
 					<Button bsStyle="primary" onClick={this.open}>Modal!</Button>
 				</div>
 			</div>
-			<ed
-
 		);
 	}
 }
