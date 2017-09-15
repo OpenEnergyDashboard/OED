@@ -51,17 +51,14 @@ function terminateReadline(message) {
 	const password = output[1];
 
 	if (password.length < 8) {
-		terminateReadline('Weak password, no user created');
-	}
-	const hasUpperCase = /[A-Z]/.test(password);
-	const hasLowerCase = /[a-z]/.test(password);
-	const hasNumbers = /\d/.test(password);
-	const hasNonAlphas = /\W/.test(password);
-	if (hasUpperCase + hasLowerCase + hasNumbers + hasNonAlphas < 3) {
-		terminateReadline('Weak password, no user created');
+		terminateReadline('Password must be at least eight characters, no user created');
 	}
 
 	const admin = new User(undefined, email, bcrypt.hashSync(password, 10));
-	await admin.insert();
-	terminateReadline('User created');
+	try {
+		await admin.insert();
+		terminateReadline('User created');
+	} catch (err) {
+		terminateReadline('User already exists, no additional user created');
+	}
 })();

@@ -3,5 +3,4 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
 
 INSERT INTO users(email, password_hash)
-VALUES (${email}, ${passwordHash})
-ON CONFLICT (email) DO UPDATE SET email=${email};
+VALUES (${email}, ${passwordHash});
