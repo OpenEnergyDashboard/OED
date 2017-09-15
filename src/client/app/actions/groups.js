@@ -104,10 +104,6 @@ export function changeSelectedGroups(parentID, groupIDs) {
 	return { type: GROUPSUI_CHANGE_SELECTED_GROUPS_PER_GROUP, parentID, groupIDs };
 }
 
-export function updateSelectedGroups(groupIDs) {
-	return switchSelectedGroups(groupIDs);
-}
-
 export function groupsUIchangeSelectedMeters(parentID, meterIDs) {
 	return { type: GROUPSUI_CHANGE_SELECTED_METERS_PER_GROUP, parentID, meterIDs };
 }
