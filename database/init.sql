@@ -1,0 +1,3 @@
+CREATE USER opened WITH PASSWORD 'opened';
+CREATE DATABASE oed WITH OWNER opened;
+CREATE DATABASE oed_testing WITH OWNER opened;
