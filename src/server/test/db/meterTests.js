@@ -14,14 +14,23 @@ const Meter = require('../../models/Meter');
 
 const mocha = require('mocha');
 
+function expectMetersToBeEquivalent(expected, actual) {
+	expect(actual).to.have.property('name', expected.name);
+	expect(actual).to.have.property('enabled', expected.enabled);
+	expect(actual).to.have.property('type', expected.type);
+}
+
 mocha.describe('Meters', () => {
 	mocha.beforeEach(recreateDB);
-	mocha.it('can be saved and retrieved', () => db.task(function* runTest(t) {
+	mocha.it('can be saved and retrieved', async () => {
 		const meterPreInsert = new Meter(undefined, 'Meter', null, false, Meter.type.MAMAC);
-		yield meterPreInsert.insert(t);
-		const meterPostInsert = yield Meter.getByName(meterPreInsert.name, t);
-		expect(meterPostInsert).to.have.property('name', meterPreInsert.name);
-	}));
+		await meterPreInsert.insert();
+		const meterPostInsertByName = await Meter.getByName(meterPreInsert.name);
+		expectMetersToBeEquivalent(meterPreInsert, meterPostInsertByName);
+		// Need to get ID this way because preInsert doesn't have one
+		const meterPostInsertByID = await Meter.getByID(meterPostInsertByName.id);
+		expectMetersToBeEquivalent(meterPreInsert, meterPostInsertByID);
+	});
 
 	mocha.it('can use the default connection in methods', () => new Meter(undefined, 'Meter', null, false, Meter.type.MAMAC).insert()
 		.catch(() => chai.fail()));
