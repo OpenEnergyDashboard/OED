@@ -66,11 +66,7 @@ class User {
 		if (user.id !== undefined) {
 			throw new Error('Attempted to insert a user that already has an ID');
 		}
-		try {
-			await db.none(sqlFile('user/insert_new_user.sql'), user);
-		} catch (err) {
-			console.log(`Error while performing INSERT user query: ${err}`);
-		}
+		return await db.none(sqlFile('user/insert_new_user.sql'), user);
 	}
 }
 
