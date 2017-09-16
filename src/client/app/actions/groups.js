@@ -91,20 +91,29 @@ export function fetchGroupChildrenIfNeeded(groupID) {
 	};
 }
 
-export function switchSelectedGroups(groupIDs) {
+export function changeDisplayedGroups(groupIDs) {
 	return { type: GROUPSUI_CHANGE_DISPLAYED_GROUPS, groupIDs };
 }
 
 /**
- *
- * @param groupIDs
+ * Change the selected child groups of a group.
+ * This is tracked on a per-group basis. (I.e., each group has its own list of selected child groups.)
+ * @param parentID The ID of the group whose subgroups are being selected
+ * @param groupIDs The IDs of the new set of selected subgroups
  * @return {{type: string, groupIDs: *}}
  */
-export function changeSelectedGroups(parentID, groupIDs) {
+export function changeSelectedGroupsOfGroup(parentID, groupIDs) {
 	return { type: GROUPSUI_CHANGE_SELECTED_GROUPS_PER_GROUP, parentID, groupIDs };
 }
 
-export function groupsUIchangeSelectedMeters(parentID, meterIDs) {
+/**
+ * Change which child meters of a group are selected.
+ * This is tracked on a per-group basis.
+ * @param parentID The ID of the group whose subgroups are being selected
+ * @param meterIDs The IDs of the new set of selected child meters
+ * @return {{type: string, parentID: *, meterIDs: *}}
+ */
+export function changeSelectedMetersOfGroup(parentID, meterIDs) {
 	return { type: GROUPSUI_CHANGE_SELECTED_METERS_PER_GROUP, parentID, meterIDs };
 }
 

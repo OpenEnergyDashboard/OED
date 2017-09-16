@@ -7,7 +7,7 @@
 import _ from 'lodash';
 import { connect } from 'react-redux';
 import { fetchMetersDetailsIfNeeded } from '../../actions/meters';
-import { fetchGroupsDetailsIfNeeded, switchSelectedGroups } from '../../actions/groups';
+import { fetchGroupsDetailsIfNeeded, changeDisplayedGroups } from '../../actions/groups';
 import GroupMainComponent from '../../components/groups/GroupMainComponent';
 
 
@@ -25,7 +25,7 @@ function mapStateToProps(state) {
 
 function mapDispatchToProps(dispatch) {
 	return {
-		selectGroups: newSelectedGroupIDs => dispatch(switchSelectedGroups(newSelectedGroupIDs)),
+		selectGroups: newSelectedGroupIDs => dispatch(changeDisplayedGroups(newSelectedGroupIDs)),
 		fetchGroupsDetailsIfNeeded: () => dispatch(fetchGroupsDetailsIfNeeded()),
 		fetchMetersDetailsIfNeeded: () => dispatch(fetchMetersDetailsIfNeeded()),
 	};
