@@ -42,9 +42,7 @@ function terminateReadline(message) {
 	try {
 		emailResult = await askEmail();
 	} catch (err) {
-		console.log('Invalid email, no user created');
-		rl.close();
-		process.exit(0);
+		terminateReadline('Invalid email, no user created');
 	}
 	const output = await askPassword(emailResult);
 	const email = output[0];
