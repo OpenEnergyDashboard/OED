@@ -17,6 +17,10 @@ export const GROUPSUI_CHANGE_SELECTED_GROUPS_PER_GROUP = 'GROUPSUI_CHANGE_SELECT
 export const GROUPSUI_CHANGE_SELECTED_METERS_PER_GROUP = 'GROUPSUI_CHANGE_SELECTED_METERS_PER_GROUP';
 export const GROUPSUI_CHANGE_DISPLAYED_GROUPS = 'GROUPSUI_CHANGE_DISPLAYED_GROUPS';
 
+export const CREATE_NEW_GROUP = 'CREATE_NEW_GROUP';
+export const EDIT_GROUP_NAME = 'EDIT_GROUP_NAME';
+
+
 function requestGroupsDetails() {
 	return { type: REQUEST_GROUPS_DETAILS };
 }
@@ -117,3 +121,10 @@ export function changeSelectedMetersOfGroup(parentID, meterIDs) {
 	return { type: GROUPSUI_CHANGE_SELECTED_METERS_PER_GROUP, parentID, meterIDs };
 }
 
+export function createNewGroup() {
+	return { type: CREATE_NEW_GROUP };
+}
+
+export function editGroupName(newName) {
+	return { type: EDIT_GROUP_NAME, newName };
+}
