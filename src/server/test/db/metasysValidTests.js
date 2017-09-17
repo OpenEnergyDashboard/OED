@@ -24,12 +24,12 @@ mocha.describe('Insert Metasys readings from a file', () => {
 	mocha.beforeEach(recreateDB);
 	let meter;
 	mocha.beforeEach(() => db.task(function* setupTests(t) {
-		yield new Meter(undefined, 'Meter', null, false, Meter.type.METASYS).insert(t);
-		meter = yield Meter.getByName('Meter', t);
+		yield new Meter(undefined, 'metasys-valid', null, false, Meter.type.METASYS).insert(t);
+		meter = yield Meter.getByName('metasys-valid', t);
 	}));
 
 	mocha.it('loads the correct number of rows from a file', () => {
-		const testFilePath = path.join(__dirname, 'Meter.csv');
+		const testFilePath = path.join(__dirname, 'metasys-valid.csv');
 		return readMetasysData(testFilePath, 30, 1, true)
 			 //what is this doing?
 			.then(() => db.one('SELECT COUNT(*) as count FROM readings'))

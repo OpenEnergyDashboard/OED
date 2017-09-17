@@ -22,12 +22,12 @@ const mocha = require('mocha');
 		mocha.beforeEach(recreateDB);
 		let meter;
 		mocha.beforeEach(() => db.task(function* setupTests(t) {
-			yield new Meter(undefined, 'MeterDuplicate', null, false, Meter.type.METASYS).insert(t);
-			meter = yield Meter.getByName('MeterDuplicate', t);
+			yield new Meter(undefined, 'metasys-duplicate', null, false, Meter.type.METASYS).insert(t);
+			meter = yield Meter.getByName('metasys-duplicate', t);
 		}));
 
 		mocha.it('handles duplicate readings', () => {
-			const testFilePath = path.join(__dirname, 'MeterDuplicate.csv');
+			const testFilePath = path.join(__dirname, 'metasys-duplicate.csv');
 			return readMetasysData(testFilePath, 60, 2, false)
 			//what is this doing?
 				.then(() => db.one('SELECT COUNT(*) as count FROM readings'))
