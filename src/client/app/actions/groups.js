@@ -20,6 +20,7 @@ export const GROUPSUI_CHANGE_DISPLAYED_GROUPS = 'GROUPSUI_CHANGE_DISPLAYED_GROUP
 export const CREATE_NEW_GROUP = 'CREATE_NEW_GROUP';
 export const EDIT_GROUP_NAME = 'EDIT_GROUP_NAME';
 export const ADOPT_CHILD_GROUPS = 'ADOPT_CHILD_GROUPS';
+export const DISOWN_CHILD_GROUPS = 'DISOWN_CHILD_GROUPS';
 
 
 function requestGroupsDetails() {
@@ -137,4 +138,8 @@ export function editGroupName(newName) {
  */
 export function adoptChildGroups(groupIDs) {
 	return { type: ADOPT_CHILD_GROUPS, groupIDs };
+}
+
+export function disownChildGroups(groupIDs) {
+	return { type: DISOWN_CHILD_GROUPS, groupIDs };
 }

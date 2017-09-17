@@ -157,6 +157,17 @@ export default function groups(state = defaultState, action) {
 			};
 		}
 
+		case groupsActions.DISOWN_CHILD_GROUPS: {
+			const remaining = _.difference(state.groupInEditing.childGroups, action.groupIDs);
+			return {
+				...state,
+				groupInEditing: {
+					...state.groupInEditing,
+					childGroups: remaining
+				}
+			};
+		}
+
 		default:
 			return state;
 	}
