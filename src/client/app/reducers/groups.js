@@ -31,10 +31,14 @@ export default function groups(state = defaultState, action) {
 				isFetching: true
 			};
 		case groupsActions.RECEIVE_GROUPS_DETAILS: {
-			// add new fields to each group object:
-			// isFetching flag for each group
-			// arrays to store the IDs of child groups and Meters. We get all other data from other parts of state.
-			// TODO: action.data isn't an array, looks like a lot of stuff at least for me -PT
+			/*
+			 add new fields to each group object:
+			 isFetching flag for each group
+			 arrays to store the IDs of child groups and Meters. We get all other data from other parts of state.
+
+			 NOTE: if you get an error here saying `action.data.map` is not a function, please comment on
+			 this issue: https://github.com/beloitcollegecomputerscience/OED/issues/86
+			 */
 			const newGroups = action.data.map(group => ({
 				...group,
 				isFetching: false,
@@ -51,14 +55,6 @@ export default function groups(state = defaultState, action) {
 				...state,
 				isFetching: false,
 				byGroupID: newGroupsByID,
-
-				// todo: this is not going to be used immediately, is there anywhere else to set it?
-				// I don't think so, but I'm trying to avoid getting bogged down in this for now, I can change it later.
-				showEditGroupModal: false,
-
-				// todo: Is this necessary? Is there anywhere else I can set it? Do the proper thinking!
-				// This will be set to a copy of a group being edited to store the edits, my plan is for it to be null
-				// whenever a group is not being edited. -JKM
 				groupInEditing: null,
 			};
 		}
@@ -124,16 +120,6 @@ export default function groups(state = defaultState, action) {
 			return {
 				...state,
 				selectedGroups: action.groupIDs,
-			};
-		}
-
-		case groupsActions.SHOW_EDIT_GROUP_MODAL: {
-			return {
-				...state,
-				groupInEditing: {
-					...state.byGroupID[action.groupID],
-					id: action.groupID,
-				}
 			};
 		}
 

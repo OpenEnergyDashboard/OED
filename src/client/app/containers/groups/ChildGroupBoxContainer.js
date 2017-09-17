@@ -8,7 +8,7 @@
 
 import { connect } from 'react-redux';
 import ChildGroupBoxComponent from '../../components/groups/ChildGroupBoxComponent';
-import { changeSelectedGroups } from '../../actions/groups';
+import { changeSelectedGroupsOfGroup } from '../../actions/groups';
 
 function mapStateToProps(state, ownProps) {
 	const groups = state.groups.byGroupID[ownProps.parentID].childGroups.map(groupID => {
@@ -23,7 +23,7 @@ function mapStateToProps(state, ownProps) {
 
 function mapDispatchToProps(dispatch, ownProps) {
 	return {
-		selectGroups: groupIDs => dispatch(changeSelectedGroups(ownProps.parentID, groupIDs))
+		selectGroups: groupIDs => dispatch(changeSelectedGroupsOfGroup(ownProps.parentID, groupIDs))
 	};
 }
 
