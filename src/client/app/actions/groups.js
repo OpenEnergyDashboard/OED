@@ -19,6 +19,7 @@ export const GROUPSUI_CHANGE_DISPLAYED_GROUPS = 'GROUPSUI_CHANGE_DISPLAYED_GROUP
 
 export const CREATE_NEW_GROUP = 'CREATE_NEW_GROUP';
 export const EDIT_GROUP_NAME = 'EDIT_GROUP_NAME';
+export const ADOPT_CHILD_GROUPS = 'ADOPT_CHILD_GROUPS';
 
 
 function requestGroupsDetails() {
@@ -127,4 +128,13 @@ export function createNewGroup() {
 
 export function editGroupName(newName) {
 	return { type: EDIT_GROUP_NAME, newName };
+}
+
+/**
+ * Add a list of group IDs as child groups of the group in editing
+ * @param groupIDs An array of the group IDs (as integers) to be added as children
+ * @return {{type: string, groupIDs: [Int]}}
+ */
+export function adoptChildGroups(groupIDs) {
+	return { type: ADOPT_CHILD_GROUPS, groupIDs };
 }

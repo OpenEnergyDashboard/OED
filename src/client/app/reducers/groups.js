@@ -144,6 +144,19 @@ export default function groups(state = defaultState, action) {
 			};
 		}
 
+		case groupsActions.ADOPT_CHILD_GROUPS: {
+			const validGroups = Object.keys(state.byGroupID).map(id => parseInt(id));
+			const realGroups = _.intersection(validGroups, action.groupIDs);
+			const children = _.union(state.groupInEditing.childGroups, realGroups);
+			return {
+				...state,
+				groupInEditing: {
+					...state.groupInEditing,
+					childGroups: children
+				}
+			};
+		}
+
 		default:
 			return state;
 	}
