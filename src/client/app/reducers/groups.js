@@ -145,6 +145,7 @@ export default function groups(state = defaultState, action) {
 		}
 
 		case groupsActions.ADOPT_CHILD_GROUPS: {
+			// todo: this check may not actually be necessary
 			const validGroups = Object.keys(state.byGroupID).map(id => parseInt(id));
 			const realGroups = _.intersection(validGroups, action.groupIDs);
 			const children = _.union(state.groupInEditing.childGroups, realGroups);
@@ -164,6 +165,28 @@ export default function groups(state = defaultState, action) {
 				groupInEditing: {
 					...state.groupInEditing,
 					childGroups: remaining
+				}
+			};
+		}
+
+		case groupsActions.ADOPT_CHILD_METERS: {
+			const children = _.union(state.groupInEditing.childMeters, action.meterIDs);
+			return {
+				...state,
+				groupInEditing: {
+					...state.groupInEditing,
+					childMeters: children
+				}
+			};
+		}
+
+		case groupsActions.DISOWN_CHILD_METERS: {
+			const remaining = _.difference(state.groupInEditing.childMeters, action.meterIDs);
+			return {
+				...state,
+				groupInEditing: {
+					...state.groupInEditing,
+					childMeters: remaining
 				}
 			};
 		}

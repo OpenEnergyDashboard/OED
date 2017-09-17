@@ -21,6 +21,8 @@ export const CREATE_NEW_GROUP = 'CREATE_NEW_GROUP';
 export const EDIT_GROUP_NAME = 'EDIT_GROUP_NAME';
 export const ADOPT_CHILD_GROUPS = 'ADOPT_CHILD_GROUPS';
 export const DISOWN_CHILD_GROUPS = 'DISOWN_CHILD_GROUPS';
+export const ADOPT_CHILD_METERS = 'ADOPT_CHILD_METERS';
+export const DISOWN_CHILD_METERS = 'DISOWN_CHILD_METERS';
 
 
 function requestGroupsDetails() {
@@ -142,4 +144,12 @@ export function adoptChildGroups(groupIDs) {
 
 export function disownChildGroups(groupIDs) {
 	return { type: DISOWN_CHILD_GROUPS, groupIDs };
+}
+
+export function adoptChildMeters(meterIDs) {
+	return { type: ADOPT_CHILD_METERS, meterIDs };
+}
+
+export function disownChildMeters(meterIDs) {
+	return { type: DISOWN_CHILD_METERS, meterIDs };
 }
