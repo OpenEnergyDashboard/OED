@@ -5,8 +5,7 @@
 // Box classes for displaying child meters and groups
 import React from 'react';
 
-export default class ChildGroupBox extends React.Component {
-
+export default class GroupBoxComponent extends React.Component {
 	constructor(props) {
 		super(props);
 		this.handleGroupSelect = this.handleGroupSelect.bind(this);
@@ -29,10 +28,8 @@ export default class ChildGroupBox extends React.Component {
 		const labelStyle = {
 			textDecoration: 'underline'
 		};
-
 		return (
 			<div>
-				<h4>Child Groups:</h4>
 				<div className="form-group">
 					<p style={labelStyle}>Select groups:</p>
 					<select multiple className="form-control" id="groupList" size="8" onChange={this.handleGroupSelect}>

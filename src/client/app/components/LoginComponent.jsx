@@ -49,7 +49,7 @@ export default class LoginComponent extends React.Component {
 		})
 		.then(response => {
 			localStorage.setItem('token', response.data.token);
-			browserHistory.push('/admin');
+			browserHistory.push('/');
 		})
 		.catch(console.error);
 		this.setState({ email: '', password: '' });

@@ -6,6 +6,7 @@ import React from 'react';
 import GroupViewContainer from '../../containers/groups/GroupViewContainer';
 import GroupSidebarContainer from '../../containers/groups/GroupSidebarContainer';
 import HeaderComponent from '../HeaderComponent';
+import CreateGroupContainer from '../../containers/groups/CreateGroupContainer';
 
 export default class GroupComponent extends React.Component {
 	componentWillMount() {
@@ -15,19 +16,40 @@ export default class GroupComponent extends React.Component {
 	}
 
 	render() {
+		let GroupDisplay = null;
+		if (this.props.groupDisplay === 'view') {
+			GroupDisplay = (
+				<div>
+					<div className="col-xs-2">
+						<GroupSidebarContainer />
+					</div>
+					<div className="col-xs-4">
+						{this.props.selectedGroups.map(groupID =>
+							<GroupViewContainer key={groupID} id={groupID} />
+						)}
+					</div>
+				</div>
+			);
+		} else if (this.props.groupDisplay === 'edit') {
+			GroupDisplay = (
+				<div>
+					TODO
+				</div>
+			);
+		} else { // create groups
+			GroupDisplay = (
+				<div>
+					<CreateGroupContainer />
+				</div>
+			);
+		}
+
 		return (
 			<div>
 				<HeaderComponent title="Groups" />
 				<div className="container-fluid">
 					<div className="col-xs-11">
-						<div className="col-xs-2">
-							<GroupSidebarContainer />
-						</div>
-						<div className="col-xs-4">
-							{this.props.selectedGroups.map(groupID =>
-								<GroupViewContainer key={groupID} id={groupID} />
-							)}
-						</div>
+						{ GroupDisplay }
 					</div>
 				</div>
 			</div>

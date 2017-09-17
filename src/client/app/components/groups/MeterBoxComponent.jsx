@@ -5,7 +5,7 @@
 // Box classes for displaying child meters and groups
 import React from 'react';
 
-export default class ChildMeterBox extends React.Component {
+export default class MeterBoxComponent extends React.Component {
 
 	/**
 	 * Initializes the component's state, binds all functions to 'this' UIOptionsComponent
@@ -35,7 +35,6 @@ export default class ChildMeterBox extends React.Component {
 		};
 		return (
 			<div>
-				<h4>Child Meters</h4>
 				<div className="form-group">
 					<p style={labelStyle}>Select meters:</p>
 					<select multiple className="form-control" id="meterList" size="8" onChange={this.handleMeterSelect}>
