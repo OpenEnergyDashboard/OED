@@ -30,10 +30,15 @@ mocha.describe('Insert Metasys readings from a file', () => {
 
 	mocha.it('loads the correct number of rows from a file', () => {
 		const testFilePath = path.join(__dirname, 'Meter.csv');
-		//const readingDuration = moment.duration(1, 'hours');
-		// readMetasysData(filepath, interval, repetition, cumulative & reset)
-		return readMetasysData(testFilePath, 30, 1, false)
+		return readMetasysData(testFilePath, 30, 1, true)
+			 //what is this doing?
 			.then(() => db.one('SELECT COUNT(*) as count FROM readings'))
-			.then(({count}) => expect(parseInt(count)).to.equal(93));
+			.then(({count}) => expect(parseInt(count)).to.equal(125));
 	});
+
+
+
+    //reads the cumulativeReading properly
+	//reads the gap properly
+
 });
