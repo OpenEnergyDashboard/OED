@@ -17,6 +17,14 @@ export const GROUPSUI_CHANGE_SELECTED_GROUPS_PER_GROUP = 'GROUPSUI_CHANGE_SELECT
 export const GROUPSUI_CHANGE_SELECTED_METERS_PER_GROUP = 'GROUPSUI_CHANGE_SELECTED_METERS_PER_GROUP';
 export const GROUPSUI_CHANGE_DISPLAYED_GROUPS = 'GROUPSUI_CHANGE_DISPLAYED_GROUPS';
 
+export const CREATE_NEW_GROUP = 'CREATE_NEW_GROUP';
+export const EDIT_GROUP_NAME = 'EDIT_GROUP_NAME';
+
+export const CHANGE_CHILD_METERS = 'CHANGE_CHILD_METERS';
+export const CHANGE_CHILD_GROUPS = 'CHANGE_CHILD_GROUPS';
+
+export const GROUPSUI_CHANGE_DISPLAY_MODE = 'GROUPSUI_CHANGE_DISPLAY_MODE';
+
 function requestGroupsDetails() {
 	return { type: REQUEST_GROUPS_DETAILS };
 }
@@ -117,3 +125,40 @@ export function changeSelectedMetersOfGroup(parentID, meterIDs) {
 	return { type: GROUPSUI_CHANGE_SELECTED_METERS_PER_GROUP, parentID, meterIDs };
 }
 
+/**
+ * Set state.groups.groupInEditing to a blank group
+ * @return {{type: string}}
+ */
+export function createNewGroup() {
+	return { type: CREATE_NEW_GROUP };
+}
+
+/**
+ * Change the name of the group in editing
+ * @param newName The new name
+ * @return {{type: string, newName: String}}
+ */
+export function editGroupName(newName) {
+	return { type: EDIT_GROUP_NAME, newName };
+}
+/**
+ * Change the child groups of the group in editing
+ * @param groupIDs IDs of the new child groups
+ * @return {{type: string, groupIDs: [Int]}}
+ */
+export function changeChildGroups(groupIDs) {
+	return { type: CHANGE_CHILD_GROUPS, groupIDs };
+}
+
+/**
+ * Change the child meters of the group in editing
+ * @param meterIDs IDs of the new set of child meters
+ * @return {{type: string, meterIDs: [Int]}}
+ */
+export function changeChildMeters(meterIDs) {
+	return { type: CHANGE_CHILD_METERS, meterIDs };
+}
+
+export function changeDisplayMode(newMode) {
+	return { type: GROUPSUI_CHANGE_DISPLAY_MODE, newMode };
+}
