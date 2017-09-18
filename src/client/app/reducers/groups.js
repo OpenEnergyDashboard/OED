@@ -128,6 +128,11 @@ export default function groups(state = defaultState, action) {
 			return {
 				...state,
 				groupInEditing: {
+					// True when the changes are successfully inserted into the db OR the user cancels the editing
+					// OR when no changes have been made
+					free: true,
+					// True when a request to insert the changes into the DB has been sent
+					submitted: false,
 					name: '',
 					childGroups: [],
 					childMeters: []
@@ -140,7 +145,8 @@ export default function groups(state = defaultState, action) {
 				...state,
 				groupInEditing: {
 					...state.groupInEditing,
-					name: action.newName
+					name: action.newName,
+					free: false
 				}
 			};
 		}
@@ -150,7 +156,8 @@ export default function groups(state = defaultState, action) {
 				...state,
 				groupInEditing: {
 					...state.groupInEditing,
-					childGroups: action.groupIDs
+					childGroups: action.groupIDs,
+					free: false
 				}
 			};
 		}
@@ -160,7 +167,8 @@ export default function groups(state = defaultState, action) {
 				...state,
 				groupInEditing: {
 					...state.groupInEditing,
-					childMeters: action.meterIDs
+					childMeters: action.meterIDs,
+					free: false
 				}
 			};
 		}
@@ -174,6 +182,16 @@ export default function groups(state = defaultState, action) {
 				};
 			}
 			return state;
+		}
+
+		case groupsActions.SUBMIT_GROUP_IN_EDITING: {
+			return {
+				...state,
+				groupInEditing: {
+					...state.groupInEditing,
+					submitted: true
+				}
+			};
 		}
 
 		default:

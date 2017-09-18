@@ -25,6 +25,8 @@ export const CHANGE_CHILD_GROUPS = 'CHANGE_CHILD_GROUPS';
 
 export const GROUPSUI_CHANGE_DISPLAY_MODE = 'GROUPSUI_CHANGE_DISPLAY_MODE';
 
+export const SUBMIT_GROUP_IN_EDITING = 'SUBMIT_GROUP_IN_EDITING';
+
 function requestGroupsDetails() {
 	return { type: REQUEST_GROUPS_DETAILS };
 }
@@ -161,4 +163,31 @@ export function changeChildMeters(meterIDs) {
 
 export function changeDisplayMode(newMode) {
 	return { type: GROUPSUI_CHANGE_DISPLAY_MODE, newMode };
+}
+
+function submitGroupInEditing() {
+	return { type: SUBMIT_GROUP_IN_EDITING };
+}
+
+function shouldSubmitGroupInEditing(state) {
+	// Should submit if there are uncommitted changes and they have not already been submitted
+	return !(state.groups.groupInEditing.free || state.groups.groupInEditing.submitted);
+}
+
+function creatingNewGroup(state) {
+	return (state.groups.groupInEditing.id === undefined);
+}
+
+
+function submitGroupInEditingIfNeeded() {
+	return (dispatch, getState) => {
+		if (shouldSubmitGroupInEditing(getState())) {
+			if (creatingNewGroup(getState())) {
+				// post
+			} else {
+				// put
+			}
+		}
+		return Promise.resolve();
+	};
 }
