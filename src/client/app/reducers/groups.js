@@ -15,7 +15,9 @@ import * as groupsActions from '../actions/groups';
 const defaultState = {
 	isFetching: false,
 	byGroupID: {},
-	selectedGroups: []
+	selectedGroups: [],
+	groupInEditing: {},
+	displayMode: 'view'
 };
 
 /**
@@ -55,7 +57,6 @@ export default function groups(state = defaultState, action) {
 				...state,
 				isFetching: false,
 				byGroupID: newGroupsByID,
-				groupInEditing: null,
 			};
 		}
 
@@ -121,6 +122,58 @@ export default function groups(state = defaultState, action) {
 				...state,
 				selectedGroups: action.groupIDs,
 			};
+		}
+
+		case groupsActions.CREATE_NEW_GROUP: {
+			return {
+				...state,
+				groupInEditing: {
+					name: '',
+					childGroups: [],
+					childMeters: []
+				}
+			};
+		}
+
+		case groupsActions.EDIT_GROUP_NAME: {
+			return {
+				...state,
+				groupInEditing: {
+					...state.groupInEditing,
+					name: action.newName
+				}
+			};
+		}
+
+		case groupsActions.CHANGE_CHILD_GROUPS: {
+			return {
+				...state,
+				groupInEditing: {
+					...state.groupInEditing,
+					childGroups: action.groupIDs
+				}
+			};
+		}
+
+		case groupsActions.CHANGE_CHILD_METERS: {
+			return {
+				...state,
+				groupInEditing: {
+					...state.groupInEditing,
+					childMeters: action.meterIDs
+				}
+			};
+		}
+
+		case groupsActions.GROUPSUI_CHANGE_DISPLAY_MODE: {
+			const validModes = ['view', 'edit', 'create'];
+			if (_.includes(validModes, action.newMode)) {
+				return {
+					...state,
+					displayMode: action.newMode
+				};
+			}
+			return state;
 		}
 
 		default:
