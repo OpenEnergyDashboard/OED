@@ -27,12 +27,12 @@ const mocha = require('mocha');
 		}));
 
 		mocha.it('handles duplicate readings', () => {
-			const testFilePath = path.join(__dirname, 'metasys-duplicate.csv');
+			const testFilePath = path.join(__dirname, 'data', 'metasys-duplicate.csv');
 			return readMetasysData(testFilePath, 60, 2, false)
 			//what is this doing?
 				.then(() => db.one('SELECT COUNT(*) as count FROM readings'))
 				.then(({count}) => expect(parseInt(count)).to.equal(37));
-		})
+		});
 	});
 
 

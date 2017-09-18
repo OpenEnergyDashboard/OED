@@ -22,27 +22,26 @@ const readMetasysData = require('../../services/readMetasysData');
 
 const mocha = require('mocha');
 
-
 mocha.describe('Insert Metasys readings from a file', () => {
 	mocha.beforeEach(recreateDB);
 	let meter;
-	mocha.beforeEach(() => db.task(function* setupTests(t) {
-		yield new Meter(undefined, 'metasys-invalid', null, false, Meter.type.METASYS).insert(t);
-		meter = yield Meter.getByName('metasys-invalid', t);
-	}));
+	mocha.beforeEach(async () => {
+		await new Meter(undefined, 'metasys-invalid', null, false, Meter.type.METASYS).insert();
+		meter = await Meter.getByName('metasys-invalid');
+	});
 	// shows error but on console.
 	mocha.it('errors correctly on an invalid file', () => {
-		const testFilePath = path.join(__dirname, 'metasys-invalid.csv');
+		const testFilePath = path.join(__dirname, 'data', 'metasys-invalid.csv');
 		return expect(readMetasysData(testFilePath, 30, 1, false)).to.eventually.be.rejected;
 	});
 	//problem with reading invalid dates. test passes even when we are expecting 5 in the case of error.
 	mocha.it('rolls back correctly when it rejects', async () => {
-		const testFilePath = path.join(__dirname, 'metasys-invalid.csv');
+		const testFilePath = path.join(__dirname, 'data', 'metasys-invalid.csv');
 		try {
 			await readMetasysData(testFilePath, 30, 1, false);
 		} catch (e) {
-			const  {count}  = await db.one('SELECT COUNT(*) as count FROM readings');
-			expect(parseInt(count)).to.equal(5);
+			const {count} = await db.one('SELECT COUNT(*) as count FROM readings');
+			expect(parseInt(count)).to.equal(0);
 		}
 	});
 });
