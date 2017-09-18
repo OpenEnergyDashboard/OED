@@ -23,6 +23,7 @@ export const EDIT_GROUP_NAME = 'EDIT_GROUP_NAME';
 export const CHANGE_CHILD_METERS = 'CHANGE_CHILD_METERS';
 export const CHANGE_CHILD_GROUPS = 'CHANGE_CHILD_GROUPS';
 
+export const GROUPSUI_CHANGE_DISPLAY_MODE = 'GROUPSUI_CHANGE_DISPLAY_MODE';
 
 function requestGroupsDetails() {
 	return { type: REQUEST_GROUPS_DETAILS };
@@ -156,4 +157,8 @@ export function changeChildGroups(groupIDs) {
  */
 export function changeChildMeters(meterIDs) {
 	return { type: CHANGE_CHILD_METERS, meterIDs };
+}
+
+export function changeDisplayMode(newMode) {
+	return { type: GROUPSUI_CHANGE_DISPLAY_MODE, newMode };
 }

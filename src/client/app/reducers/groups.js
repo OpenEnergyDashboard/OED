@@ -17,6 +17,7 @@ const defaultState = {
 	byGroupID: {},
 	selectedGroups: [],
 	groupInEditing: {},
+	displayMode: 'view'
 };
 
 /**
@@ -162,6 +163,17 @@ export default function groups(state = defaultState, action) {
 					childMeters: action.meterIDs
 				}
 			};
+		}
+
+		case groupsActions.GROUPSUI_CHANGE_DISPLAY_MODE: {
+			const validModes = ['view', 'edit', 'create'];
+			if (_.includes(validModes, action.newMode)) {
+				return {
+					...state,
+					displayMode: action.newMode
+				};
+			}
+			return state;
 		}
 
 		default:
