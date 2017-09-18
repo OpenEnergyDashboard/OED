@@ -183,14 +183,39 @@ function creatingNewGroup(state) {
 	return (state.groups.groupInEditing.id === undefined);
 }
 
+function postGroupInEditing(group) {
+	return dispatch => {
+		dispatch(submitGroupInEditing());
+		return axios.post('api/groups/create', group)
+			.then(/* process submission */);
+	};
+}
+
+function putGroupInEditing(group) {
+	return dispatch => {
+		dispatch(submitGroupInEditing());
+		return axios.put('api/groups/nonexistant_as_of_yet', group)
+			.then(/* process submission */);
+	};
+}
 
 function submitGroupInEditingIfNeeded() {
 	return (dispatch, getState) => {
 		if (shouldSubmitGroupInEditing(getState())) {
+			const rawGroup = getState().groups.groupInEditing;
+			const group = {
+				name: rawGroup.name,
+				childGroups: rawGroup.childGroups,
+				childMeters: rawGroup.childMeters,
+			};
 			if (creatingNewGroup(getState())) {
-				// post
+				postGroupInEditing(group);
 			} else {
-				// put
+				const groupWithID = {
+					...group,
+					id: rawGroup.id
+				};
+				putGroupInEditing(groupWithID);
 			}
 		}
 		return Promise.resolve();
