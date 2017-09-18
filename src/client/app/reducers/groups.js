@@ -135,19 +135,22 @@ export default function groups(state = defaultState, action) {
 		}
 
 		case groupsActions.CREATE_NEW_GROUP: {
-			return {
-				...state,
-				groupInEditing: {
-					// True when the changes are successfully inserted into the db OR the user cancels the editing
-					// OR when no changes have been made
-					free: true,
-					// True when a request to insert the changes into the DB has been sent
-					submitted: false,
-					name: '',
-					childGroups: [],
-					childMeters: []
-				}
-			};
+			if (state.groupInEditing.free || _.isEmpty(state.groupInEditing)) {
+				return {
+					...state,
+					groupInEditing: {
+						// True when the changes are successfully inserted into the db OR the user cancels the editing
+						// OR when no changes have been made
+						free: true,
+						// True when a request to insert the changes into the DB has been sent
+						submitted: false,
+						name: '',
+						childGroups: [],
+						childMeters: []
+					}
+				};
+			}
+			return state;
 		}
 
 		case groupsActions.EDIT_GROUP_NAME: {
