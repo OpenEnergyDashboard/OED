@@ -7,7 +7,7 @@
 
 import { connect } from 'react-redux';
 import GroupBoxComponent from '../../components/groups/GroupBoxComponent';
-import { changeSelectedGroupsOfGroup } from '../../actions/groups';
+import { changeSelectedGroupsOfGroup, changeChildGroups } from '../../actions/groups';
 
 function mapStateToProps(state, ownProps) {
 	let groups = null;
@@ -33,8 +33,13 @@ function mapStateToProps(state, ownProps) {
 }
 
 function mapDispatchToProps(dispatch, ownProps) {
+	if (ownProps.parentID) {
+		return {
+			selectGroups: groupIDs => dispatch(changeSelectedGroupsOfGroup(ownProps.parentID, groupIDs))
+		};
+	}
 	return {
-		selectGroups: groupIDs => dispatch(changeSelectedGroupsOfGroup(ownProps.parentID, groupIDs))
+		selectGroups: groupIDs => dispatch(changeChildGroups(groupIDs)),
 	};
 }
 

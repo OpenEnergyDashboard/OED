@@ -10,14 +10,25 @@ import GroupBoxContainer from '../../containers/groups/GroupBoxContainer';
 export default class CreateGroupComponent extends React.Component {
 	constructor(props) {
 		super(props);
-		this.state = {
-			name: ''
-		};
 		this.handleNameChange = this.handleNameChange.bind(this);
+		this.handleCreateGroup = this.handleCreateGroup.bind(this);
+		this.handleReturnToView = this.handleReturnToView.bind(this);
+	}
+
+	componentWillMount() {
+		this.props.createNewGroup();
 	}
 
 	handleNameChange(e) {
-		this.setState({ name: e.target.value });
+		this.props.editGroupName(e.target.value);
+	}
+
+	handleCreateGroup() {
+		// TODO create group
+	}
+
+	handleReturnToView() {
+		this.props.changeDisplayMode('view');
 	}
 
 	render() {
@@ -27,14 +38,19 @@ export default class CreateGroupComponent extends React.Component {
 		const underlineStyle = {
 			textDecoration: 'underline'
 		};
+		const centerTextStyle = {
+			textAlign: 'center'
+		};
 		return (
 			<div style={divStyle} className="col-xs-6">
-				<h3>Create a new group</h3>
-				<p style={underlineStyle}>Name</p>
+				<h3 style={centerTextStyle}>Create a New Group</h3>
+				<p style={underlineStyle}>Name:</p>
 				<FormControl type="text" placeholder="Name" onChange={this.handleNameChange} />
+				<br />
 				<MeterBoxContainer />
 				<GroupBoxContainer />
-				<Button type="submit">Create group</Button>
+				<Button type="submit" onClick={this.handleCreateGroup}>Create group</Button>
+				<Button className="pull-right" type="submit" onClick={this.handleReturnToView}>Return to groups overview</Button>
 			</div>
 		);
 	}

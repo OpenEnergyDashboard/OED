@@ -11,21 +11,15 @@ import GroupBoxContainer from '../../containers/groups/GroupBoxContainer';
 export default class GroupViewComponent extends React.Component {
 	constructor(props) {
 		super(props);
-		this.state = { showModal: false };
-		this.open = this.open.bind(this);
-		this.close = this.close.bind(this);
+		this.handleEditGroup = this.handleEditGroup.bind(this);
 	}
 
 	componentWillMount() {
 		this.props.fetchGroupChildren(this.props.id);
 	}
 
-	close() {
-		this.setState({ showModal: false });
-	}
-
-	open() {
-		this.setState({ showModal: true });
+	handleEditGroup() {
+		// TODO edit group with id this.props.id
 	}
 
 	render() {
@@ -45,7 +39,7 @@ export default class GroupViewComponent extends React.Component {
 						<GroupBoxContainer parentID={this.props.id} />
 					</div>
 				</div>
-				<Button bsStyle="default" onClick={this.open}>Edit group</Button>
+				<Button bsStyle="default" onClick={this.handleEditGroup}>Edit group</Button>
 			</div>
 		);
 	}

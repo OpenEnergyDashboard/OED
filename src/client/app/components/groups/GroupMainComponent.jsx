@@ -17,7 +17,20 @@ export default class GroupComponent extends React.Component {
 
 	render() {
 		let GroupDisplay = null;
-		if (this.props.groupDisplay === 'view') {
+		if (this.props.displayMode === 'create') {
+
+			GroupDisplay = (
+				<div>
+					<CreateGroupContainer />
+				</div>
+			);
+		} else if (this.props.displayMode === 'edit') {
+			GroupDisplay = (
+				<div>
+					TODO
+				</div>
+			);
+		} else { // view groups
 			GroupDisplay = (
 				<div>
 					<div className="col-xs-2">
@@ -28,18 +41,6 @@ export default class GroupComponent extends React.Component {
 							<GroupViewContainer key={groupID} id={groupID} />
 						)}
 					</div>
-				</div>
-			);
-		} else if (this.props.groupDisplay === 'edit') {
-			GroupDisplay = (
-				<div>
-					TODO
-				</div>
-			);
-		} else { // create groups
-			GroupDisplay = (
-				<div>
-					<CreateGroupContainer />
 				</div>
 			);
 		}

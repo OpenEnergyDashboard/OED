@@ -7,7 +7,7 @@
 
 import { connect } from 'react-redux';
 import MeterBoxComponent from '../../components/groups/MeterBoxComponent';
-import { changeSelectedMetersOfGroup } from '../../actions/groups';
+import { changeSelectedMetersOfGroup, changeChildMeters } from '../../actions/groups';
 
 function mapStateToProps(state, ownProps) {
 	let meters = null;
@@ -33,8 +33,13 @@ function mapStateToProps(state, ownProps) {
 }
 
 function mapDispatchToProps(dispatch, ownProps) {
+	if (ownProps.parentID) {
+		return {
+			selectMeters: meterIDs => dispatch(changeSelectedMetersOfGroup(ownProps.parentID, meterIDs))
+		};
+	}
 	return {
-		selectMeters: meterIDs => dispatch(changeSelectedMetersOfGroup(ownProps.parentID, meterIDs))
+		selectMeters: meterIDs => dispatch(changeChildMeters(meterIDs)),
 	};
 }
 
