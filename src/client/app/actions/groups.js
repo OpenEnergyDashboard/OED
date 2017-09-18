@@ -24,6 +24,7 @@ export const CHANGE_CHILD_METERS = 'CHANGE_CHILD_METERS';
 export const CHANGE_CHILD_GROUPS = 'CHANGE_CHILD_GROUPS';
 
 export const GROUPSUI_CHANGE_DISPLAY_MODE = 'GROUPSUI_CHANGE_DISPLAY_MODE';
+export const CANCEL_GROUP_EDITING = 'CANCEL_GROUP_EDITING';
 
 export const SUBMIT_GROUP_IN_EDITING = 'SUBMIT_GROUP_IN_EDITING';
 
@@ -125,6 +126,10 @@ export function changeSelectedGroupsOfGroup(parentID, groupIDs) {
  */
 export function changeSelectedMetersOfGroup(parentID, meterIDs) {
 	return { type: GROUPSUI_CHANGE_SELECTED_METERS_PER_GROUP, parentID, meterIDs };
+}
+
+export function cancelGroupEditing() {
+	return { type: CANCEL_GROUP_EDITING };
 }
 
 /**

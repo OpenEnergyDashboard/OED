@@ -124,6 +124,16 @@ export default function groups(state = defaultState, action) {
 			};
 		}
 
+		case groupsActions.CANCEL_GROUP_EDITING: {
+			return {
+				...state,
+				groupInEditing: {
+					...state.groupInEditing,
+					free: true
+				}
+			};
+		}
+
 		case groupsActions.CREATE_NEW_GROUP: {
 			return {
 				...state,
