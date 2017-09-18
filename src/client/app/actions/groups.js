@@ -19,10 +19,9 @@ export const GROUPSUI_CHANGE_DISPLAYED_GROUPS = 'GROUPSUI_CHANGE_DISPLAYED_GROUP
 
 export const CREATE_NEW_GROUP = 'CREATE_NEW_GROUP';
 export const EDIT_GROUP_NAME = 'EDIT_GROUP_NAME';
-export const ADOPT_CHILD_GROUPS = 'ADOPT_CHILD_GROUPS';
-export const DISOWN_CHILD_GROUPS = 'DISOWN_CHILD_GROUPS';
-export const ADOPT_CHILD_METERS = 'ADOPT_CHILD_METERS';
-export const DISOWN_CHILD_METERS = 'DISOWN_CHILD_METERS';
+
+export const CHANGE_CHILD_METERS = 'CHANGE_CHILD_METERS';
+export const CHANGE_CHILD_GROUPS = 'CHANGE_CHILD_GROUPS';
 
 
 function requestGroupsDetails() {
@@ -125,31 +124,36 @@ export function changeSelectedMetersOfGroup(parentID, meterIDs) {
 	return { type: GROUPSUI_CHANGE_SELECTED_METERS_PER_GROUP, parentID, meterIDs };
 }
 
+/**
+ * Set state.groups.groupInEditing to a blank group
+ * @return {{type: string}}
+ */
 export function createNewGroup() {
 	return { type: CREATE_NEW_GROUP };
 }
 
+/**
+ * Change the name of the group in editing
+ * @param newName The new name
+ * @return {{type: string, newName: String}}
+ */
 export function editGroupName(newName) {
 	return { type: EDIT_GROUP_NAME, newName };
 }
-
 /**
- * Add a list of group IDs as child groups of the group in editing
- * @param groupIDs An array of the group IDs (as integers) to be added as children
+ * Change the child groups of the group in editing
+ * @param groupIDs IDs of the new child groups
  * @return {{type: string, groupIDs: [Int]}}
  */
-export function adoptChildGroups(groupIDs) {
-	return { type: ADOPT_CHILD_GROUPS, groupIDs };
+export function changeChildGroups(groupIDs) {
+	return { type: CHANGE_CHILD_GROUPS, groupIDs };
 }
 
-export function disownChildGroups(groupIDs) {
-	return { type: DISOWN_CHILD_GROUPS, groupIDs };
-}
-
-export function adoptChildMeters(meterIDs) {
-	return { type: ADOPT_CHILD_METERS, meterIDs };
-}
-
-export function disownChildMeters(meterIDs) {
-	return { type: DISOWN_CHILD_METERS, meterIDs };
+/**
+ * Change the child meters of the group in editing
+ * @param meterIDs IDs of the new set of child meters
+ * @return {{type: string, meterIDs: [Int]}}
+ */
+export function changeChildMeters(meterIDs) {
+	return { type: CHANGE_CHILD_METERS, meterIDs };
 }
