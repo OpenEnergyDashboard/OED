@@ -35,10 +35,4 @@ mocha.describe('Insert Metasys readings from a file', () => {
 			.then(() => db.one('SELECT COUNT(*) as count FROM readings'))
 			.then(({count}) => expect(parseInt(count)).to.equal(125));
 	});
-
-
-
-    //reads the cumulativeReading properly
-	//reads the gap properly
-
 });
