@@ -6,7 +6,7 @@ import React from 'react';
 
 /**
  * React component that creates an logo image from a file path
- * @param props The props from the parent component which includes a path url
+ * @param props The props from the parent component which includes a path url and the logoStateChanged dispatcher
  * @return JSX to create logo image
  */
 export default function LogoComponent(props) {
@@ -18,6 +18,12 @@ export default function LogoComponent(props) {
 		position: 'absolute'
 	};
 	return (
-		<img src={props.url} alt="Logo" style={imgStyle} />
+		<img
+			src={props.url}
+			alt="Logo"
+			style={imgStyle}
+			onMouseEnter={() => props.logoStateChanged(true)}
+			onMouseOut={() => props.logoStateChanged(false)}
+		/>
 	);
 }
