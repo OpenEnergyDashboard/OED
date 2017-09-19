@@ -4,9 +4,11 @@
 
 import { connect } from 'react-redux';
 import LogoComponent from '../components/LogoComponent';
-import logoStateChanged from '../actions/logo';
+import { logoStateChanged } from '../actions/logo';
 
 /**
+ * Maps the Redux state to props for the LogoComponent.
+ * Only cares about state.logo.showColored
  * @param {State} state The current Redux state
  */
 function mapStateToProps(state) {
@@ -16,6 +18,10 @@ function mapStateToProps(state) {
 	};
 }
 
+/**
+ * Maps the logoStateChanged() dispatcher to a prop for LogoComponent to call on mouse events
+ * @param {Function} dispatch the React-Redux dispatch() function
+ */
 function mapDispatchToProps(dispatch) {
 	return {
 		logoStateChanged: showColored => dispatch(logoStateChanged(showColored))

@@ -4,6 +4,9 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/.
  */
 
+/**
+ * Event fired when the logo's state has changed from colored to b&w or vice versa
+ */
 export const LOGO_STATE_CHANGED = 'LOGO_STATE_CHANGED';
 
 /**

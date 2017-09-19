@@ -6,6 +6,10 @@
 
 import * as logosActions from '../actions/logo';
 
+/**
+ * @typedef {Object} State~Logo
+ * @property {bool} showColored Whether or not to show the colored version of the logo
+ */
 const defaultState = {
 	showColored: false,
 };
