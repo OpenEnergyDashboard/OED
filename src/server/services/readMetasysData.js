@@ -6,7 +6,10 @@ const path = require('path');
 
 /**
  * Reads CSV file passed to input all the Metasys readings into database.
- * @param filePath the filePath to read
+ * @param filePath  the filePath to read the metasys data
+ * @param readingInterval  value of the reading interval. For example 60 minutes, 30 minutes.
+ * @param readingRepetition value is 1 if reading is not duplicated. 2 if repeated twice and so on.
+ * @param  cumulativeIndicator false if readings are not cumulative and vice-versa.
  */
 async function readMetasysData(filePath, readingInterval, readingRepetition, cumulativeIndicator) {
 	//arrays to store readings and rows
@@ -76,20 +79,12 @@ async function readMetasysData(filePath, readingInterval, readingRepetition, cum
 	let meterReadingEnd = lastRow[3].replace(' kW', '');
 	meterReadingEnd = Math.round(parseFloat(meterReadingEnd));
 	//pushing last reading into array
-	const reading = new Reading(meter.id,meterReadingEnd,start_timestamp.toDate(),end_timestamp.toDate());
+	const reading = new Reading(meter.id, meterReadingEnd, start_timestamp.toDate(), end_timestamp.toDate());
 	readingArray.push(reading);
     // console.log(readingArray);
     // console.log(index);
 	// //Insert into database
-	try {
-		// console.log("About to insert");
-		//inserting all the data from an array into database and catching error when it occurs.
-		console.log("About to insert");
-		await Reading.insertAll(readingArray);
-		console.log("Done");
-	} catch (err) {
-		console.error(err);
-	}
+	return await Reading.insertAll(readingArray);
 }
 module.exports = readMetasysData;
 

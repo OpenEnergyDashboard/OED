@@ -3,7 +3,6 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at http://mozilla.org/MPL/2.0/.
  */
-
 const chai = require('chai');
 const chaiAsPromised = require('chai-as-promised');
 const moment = require('moment');
@@ -21,22 +20,25 @@ const mocha = require('mocha');
 	mocha.describe('Insert Metasys readings from a file', () => {
 		mocha.beforeEach(recreateDB);
 		let meter;
-		mocha.beforeEach(() => db.task(function* setupTests(t) {
-			yield new Meter(undefined, 'metasys-duplicate', null, false, Meter.type.METASYS).insert(t);
-			meter = yield Meter.getByName('metasys-duplicate', t);
-		}));
+		mocha.beforeEach(async () => {
+			await new Meter(undefined, 'metasys-duplicate', null, false, Meter.type.METASYS).insert();
+			meter = await Meter.getByName('metasys-duplicate');
+		});
 
 		mocha.it('handles duplicate readings', () => {
 			const testFilePath = path.join(__dirname, 'data', 'metasys-duplicate.csv');
 			return readMetasysData(testFilePath, 60, 2, false)
-			//what is this doing?
 				.then(() => db.one('SELECT COUNT(*) as count FROM readings'))
 				.then(({count}) => expect(parseInt(count)).to.equal(37));
 		});
+
+		mocha.it('handles cumulative readings', () => {
+			const testFilePath = path.join(__dirname, 'data', 'metasys-duplicate.csv');
+			return readMetasysData(testFilePath, 60, 2, true)
+				.then(() => db.one(' SELECT reading FROM readings LIMIT 1'))
+				.then(({reading}) => expect(parseInt(reading)).to.equal(280));
+		});
 	});
 
-
-	//reads the cumulativeReading properly
-	//reads the gap properly
 
 
