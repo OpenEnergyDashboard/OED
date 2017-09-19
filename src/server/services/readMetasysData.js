@@ -23,8 +23,6 @@ async function readMetasysData(filePath, readingInterval, readingRepetition, cum
 	const rowArray = [];
 
 	//getting filename
-	// const fileNameArray = filePath.split("/");
-	// const fileName = fileNameArray.pop();
 	const fileName = path.basename(filePath);
 	//list of readings
 	const rows = await readCsv(filePath);
@@ -87,9 +85,6 @@ async function readMetasysData(filePath, readingInterval, readingRepetition, cum
 	//pushing last reading into array
 	const reading = new Reading(meter.id, meterReadingEnd, start_timestamp.toDate(), end_timestamp.toDate());
 	readingArray.push(reading);
-    // console.log(readingArray);
-    // console.log(index);
-	// //Insert into database
 	return await Reading.insertAll(readingArray);
 }
 module.exports = readMetasysData;

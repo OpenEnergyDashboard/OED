@@ -29,12 +29,12 @@ mocha.describe('Insert Metasys readings from a file', () => {
 		await new Meter(undefined, 'metasys-invalid', null, false, Meter.type.METASYS).insert();
 		meter = await Meter.getByName('metasys-invalid');
 	});
-	// shows error but on console.
+
 	mocha.it('errors correctly on an invalid file', () => {
 		const testFilePath = path.join(__dirname, 'data', 'metasys-invalid.csv');
 		return expect(readMetasysData(testFilePath, 30, 1, false)).to.eventually.be.rejected;
 	});
-	//problem with reading invalid dates. test passes even when we are expecting 5 in the case of error.
+
 	mocha.it('rolls back correctly when it rejects', async () => {
 		const testFilePath = path.join(__dirname, 'data', 'metasys-invalid.csv');
 		try {

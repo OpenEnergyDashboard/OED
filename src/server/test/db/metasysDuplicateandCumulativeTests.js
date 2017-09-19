@@ -25,18 +25,18 @@ const mocha = require('mocha');
 			meter = await Meter.getByName('metasys-duplicate');
 		});
 
-		mocha.it('handles duplicate readings', () => {
+		mocha.it('handles duplicate readings', async () => {
 			const testFilePath = path.join(__dirname, 'data', 'metasys-duplicate.csv');
-			return readMetasysData(testFilePath, 60, 2, false)
-				.then(() => db.one('SELECT COUNT(*) as count FROM readings'))
-				.then(({count}) => expect(parseInt(count)).to.equal(37));
+			await readMetasysData(testFilePath, 60, 2, false);
+			const {count} = await db.one('SELECT COUNT(*) as count FROM readings');
+			expect(parseInt(count)).to.equal(37);
 		});
 
-		mocha.it('handles cumulative readings', () => {
+		mocha.it('handles cumulative readings',async () => {
 			const testFilePath = path.join(__dirname, 'data', 'metasys-duplicate.csv');
-			return readMetasysData(testFilePath, 60, 2, true)
-				.then(() => db.one(' SELECT reading FROM readings LIMIT 1'))
-				.then(({reading}) => expect(parseInt(reading)).to.equal(280));
+			await readMetasysData(testFilePath, 60, 2, true);
+			const {reading} = await db.one('SELECT reading FROM readings LIMIT 1');
+			expect(parseInt(reading)).to.equal(280);
 		});
 	});
 

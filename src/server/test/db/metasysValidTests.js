@@ -28,11 +28,10 @@ mocha.describe('Insert Metasys readings from a file', () => {
 		meter = await Meter.getByName('metasys-valid');
 	});
 
-	mocha.it('loads the correct number of rows from a file', () => {
+	mocha.it('loads the correct number of rows from a file', async () => {
 		const testFilePath = path.join(__dirname, 'data', 'metasys-valid.csv');
-		return readMetasysData(testFilePath, 30, 1, true)
-			 //what is this doing?
-			.then(() => db.one('SELECT COUNT(*) as count FROM readings'))
-			.then(({count}) => expect(parseInt(count)).to.equal(125));
+		await readMetasysData(testFilePath, 30, 1, true);
+		const {count} = await db.one('SELECT COUNT(*) as count FROM readings');
+		expect(parseInt(count)).to.equal(125);
 	});
 });
