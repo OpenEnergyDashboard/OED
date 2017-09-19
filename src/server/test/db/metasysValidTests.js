@@ -23,10 +23,10 @@ const mocha = require('mocha');
 mocha.describe('Insert Metasys readings from a file', () => {
 	mocha.beforeEach(recreateDB);
 	let meter;
-	mocha.beforeEach(() => db.task(function* setupTests(t) {
-		yield new Meter(undefined, 'metasys-valid', null, false, Meter.type.METASYS).insert(t);
-		meter = yield Meter.getByName('metasys-valid', t);
-	}));
+	mocha.beforeEach(async () => {
+		await new Meter(undefined, 'metasys-valid', null, false, Meter.type.METASYS).insert();
+		meter = await Meter.getByName('metasys-valid');
+	});
 
 	mocha.it('loads the correct number of rows from a file', () => {
 		const testFilePath = path.join(__dirname, 'data', 'metasys-valid.csv');
