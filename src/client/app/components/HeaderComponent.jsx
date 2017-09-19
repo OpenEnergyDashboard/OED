@@ -4,7 +4,7 @@
 
 import React from 'react';
 import { Link } from 'react-router';
-import LogoComponent from './LogoComponent';
+import LogoContainer from '../containers/LogoContainer';
 
 /**
  * React component that controls the header strip at the top of all pages
@@ -32,7 +32,7 @@ export default function HeaderComponent(props) {
 
 		<div className="container-fluid">
 			<div className="col-xs-4">
-				<Link to="/"><LogoComponent url="./app/images/logo.png" /></Link>
+				<Link to="/"><LogoContainer /></Link>
 			</div>
 			<div className="col-xs-4 text-center">
 				<h1 style={titleStyle}>Open Energy Dashboard</h1>
