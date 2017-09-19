@@ -4,7 +4,7 @@
 
 import React from 'react';
 import { Link } from 'react-router';
-import LogoContainer from '../containers/LogoContainer.js';
+import LogoContainer from '../containers/LogoContainer';
 
 /**
  * React component that controls the header strip at the top of all pages
@@ -28,13 +28,11 @@ export default function HeaderComponent(props) {
 		// Displays the admin button link only if the user is logged in (auth token exists)
 		display: localStorage.getItem('token') ? 'inline' : 'none'
 	};
-	// Display the appropriate logo
-	const logoUrl = props.showColoredLogo ? './app/images/logo.png' : './app/images/logo_bw.png';
 	return (
 
 		<div className="container-fluid">
 			<div className="col-xs-4">
-				<Link to="/"><LogoContainer url={logoUrl} /></Link>
+				<Link to="/"><LogoContainer /></Link>
 			</div>
 			<div className="col-xs-4 text-center">
 				<h1 style={titleStyle}>Open Energy Dashboard</h1>

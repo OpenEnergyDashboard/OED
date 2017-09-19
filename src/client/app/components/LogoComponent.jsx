@@ -6,7 +6,7 @@ import React from 'react';
 
 /**
  * React component that creates an logo image from a file path
- * @param props The props from the parent component which includes a path url and the logoStateChanged dispatcher
+ * @param props The props from the parent component which includes a showColoredLogo bool and the logoStateChanged dispatcher
  * @return JSX to create logo image
  */
 export default function LogoComponent(props) {
@@ -17,9 +17,13 @@ export default function LogoComponent(props) {
 		left: '30px',
 		position: 'absolute'
 	};
+
+	// Display the appropriate logo
+	const logoUrl = props.showColoredLogo ? './app/images/logo.png' : './app/images/logo_bw.png';
+
 	return (
 		<img
-			src={props.url}
+			src={logoUrl}
 			alt="Logo"
 			style={imgStyle}
 			onMouseEnter={() => props.logoStateChanged(true)}
