@@ -5,6 +5,8 @@
 const express = require('express');
 const Group = require('../models/Group');
 
+const _ = require('lodash');
+
 const router = express.Router();
 
 /**
@@ -76,8 +78,46 @@ router.post('/create', async (req, res) => {
 		await req.group.childMeters.forEach(mid => newGroup.adoptMeter(mid));
 		const inDB = Group.getByID(newGroup.id);
 		console.log(inDB);
+		// todo: the rest of this
 	} catch (err) {
-		console.error(`Error while inserting new group ${req.group}`); //eslint-disable-line no-console
+		console.error(`Error while inserting new group ${err}`); // eslint-disable-line no-console
+	}
+});
+
+router.put('/edit', async (req, res) => {
+	try {
+		const currentGroup = Group.getByID(req.group.id);
+		if (req.group.name !== currentGroup.name) {
+			await currentGroup.rename(req.group.name);
+		}
+
+		const currentChildGroups = Group.getImmediateGroupsByGroupID(currentGroup.id);
+
+		const adoptedGroups = _.difference(req.group.childGroups, currentChildGroups);
+		if (adoptedGroups !== []) {
+			await adoptedGroups.forEach(gid => currentGroup.adoptGroup(gid));
+		}
+
+		const disownedGroups = _.difference(currentChildGroups, req.group.childGroups);
+		if (disownedGroups !== []) {
+			await disownedGroups.forEach(gid => currentGroup.disownGroup(gid));
+		}
+
+
+		const currentChildMeters = Group.getImmediateMetersByGroupID(currentGroup.id);
+
+		const adoptedMeters = _.difference(req.group.childMeters, currentChildMeters);
+		if (adoptedMeters !== []) {
+			await adoptedMeters.forEach(mid => currentGroup.adoptMeter(mid));
+		}
+
+		const disownedMeters = _.difference(currentChildMeters, req.group.childMeters);
+		if (disownedMeters !== []) {
+			await disownedMeters.forEach(mid => currentGroup.disownMeter(mid));
+		}
+		// todo: return something to show that the thing worked
+	} catch (err) {
+		console.error(`Error while editing existing group: ${err}`); // eslint-disable-line no-console
 	}
 });
 module.exports = router;
