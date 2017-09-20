@@ -124,7 +124,7 @@ export default function groups(state = defaultState, action) {
 			};
 		}
 
-		case groupsActions.CANCEL_GROUP_EDITING: {
+		case groupsActions.MARK_GROUP_IN_EDITING_CLEAN: {
 			return {
 				...state,
 				groupInEditing: {

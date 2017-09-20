@@ -24,7 +24,7 @@ export const CHANGE_CHILD_METERS = 'CHANGE_CHILD_METERS';
 export const CHANGE_CHILD_GROUPS = 'CHANGE_CHILD_GROUPS';
 
 export const GROUPSUI_CHANGE_DISPLAY_MODE = 'GROUPSUI_CHANGE_DISPLAY_MODE';
-export const CANCEL_GROUP_EDITING = 'CANCEL_GROUP_EDITING';
+export const MARK_GROUP_IN_EDITING_CLEAN = 'MARK_GROUP_IN_EDITING_CLEAN';
 
 export const MARK_GROUP_IN_EDITING_SUBMITTED = 'MARK_GROUP_IN_EDITING_SUBMITTED';
 
@@ -129,7 +129,7 @@ export function changeSelectedMetersOfGroup(parentID, meterIDs) {
 }
 
 export function cancelGroupEditing() {
-	return { type: CANCEL_GROUP_EDITING };
+	return { type: MARK_GROUP_IN_EDITING_CLEAN };
 }
 
 /**
@@ -194,7 +194,7 @@ function submitNewGroup(group) {
 function submitGroupEdits(group) {
 	return dispatch => {
 		dispatch(markGroupInEditingSubmitted());
-		return axios.put('api/groups/nonexistant_as_of_yet', group)
+		return axios.put('api/groups/edit', group)
 			.then(/* process submission */);
 	};
 }
