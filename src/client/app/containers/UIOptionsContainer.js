@@ -10,14 +10,15 @@ import { fetchMetersDetailsIfNeeded } from '../actions/meters';
 
 /**
  * @param {State} state
- * @return {{meterInfo: *, selectedMeters: Array}}
+ * @return {{meterInfo: *, selectedMeters: Array, filterTerm: string}}
  */
 function mapStateToProps(state) {
 	const sortedMeters = _.sortBy(_.values(state.meters.byMeterID).map(meter => ({ id: meter.id, name: meter.name.trim() })), 'name');
 	return {
 		meters: sortedMeters,
 		selectedMeters: state.graph.selectedMeters,
-		chartToRender: state.graph.chartToRender
+		chartToRender: state.graph.chartToRender,
+		filterTerm: state.metersFilter.metersFilterTerm,
 	};
 }
 
