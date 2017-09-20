@@ -68,4 +68,16 @@ router.get('/deep/meters/:group_id', async (req, res) => {
 	}
 });
 
+router.post('/create', async (req, res) => {
+	try {
+		const newGroup = new Group(undefined, req.group.name);
+		await newGroup.insert();
+		await req.group.childGroups.forEach(gid => newGroup.adoptGroup(gid));
+		await req.group.childMeters.forEach(mid => newGroup.adoptMeter(mid));
+		const inDB = Group.getByID(newGroup.id);
+		console.log(inDB);
+	} catch (err) {
+		console.error(`Error while inserting new group ${req.group}`); //eslint-disable-line no-console
+	}
+});
 module.exports = router;
