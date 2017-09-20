@@ -33,6 +33,7 @@ mocha.describe('Groups', () => {
 		await groupPreInsert.insert();
 		const groupPostInsert = await Group.getByName(groupPreInsert.name);
 		expect(groupPostInsert).to.have.property('name', groupPreInsert.name);
+		expect(groupPostInsert).to.have.property('id', groupPreInsert.id);
 	});
 	mocha.it('can be renamed', async () => {
 		let larry = new Group(undefined, 'Larry');

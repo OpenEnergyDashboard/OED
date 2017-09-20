@@ -37,7 +37,9 @@ class Group {
 		if (group.id !== undefined) {
 			throw new Error('Attempt to insert a group that already has an ID');
 		}
-		await conn.none(sqlFile('group/insert_new_group.sql'), group);
+		const resp = await conn.one(sqlFile('group/insert_new_group.sql'), group);
+		// resp = { id: 42 }, hence this line
+		this.id = resp.id;
 	}
 
 	/**
