@@ -187,7 +187,7 @@ function submitNewGroup(group) {
 	return dispatch => {
 		dispatch(markGroupInEditingSubmitted());
 		return axios.post('api/groups/create', group)
-			.then(/* process submission */);
+			.then(/* process response code */);
 	};
 }
 
@@ -195,11 +195,11 @@ function submitGroupEdits(group) {
 	return dispatch => {
 		dispatch(markGroupInEditingSubmitted());
 		return axios.put('api/groups/edit', group)
-			.then(/* process submission */);
+			.then(/* process response code */);
 	};
 }
 
-function submitGroupInEditingIfNeeded() {
+export function submitGroupInEditingIfNeeded() {
 	return (dispatch, getState) => {
 		if (shouldSubmitGroupInEditing(getState())) {
 			const rawGroup = getState().groups.groupInEditing;

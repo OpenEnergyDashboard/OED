@@ -76,11 +76,11 @@ router.post('/create', async (req, res) => {
 		await newGroup.insert();
 		await req.group.childGroups.forEach(gid => newGroup.adoptGroup(gid));
 		await req.group.childMeters.forEach(mid => newGroup.adoptMeter(mid));
-		const inDB = Group.getByID(newGroup.id);
-		console.log(inDB);
-		// todo: the rest of this
+
+		res.sendStatus(201);
 	} catch (err) {
 		console.error(`Error while inserting new group ${err}`); // eslint-disable-line no-console
+		res.sendStatus(500);
 	}
 });
 
@@ -115,9 +115,11 @@ router.put('/edit', async (req, res) => {
 		if (disownedMeters !== []) {
 			await disownedMeters.forEach(mid => currentGroup.disownMeter(mid));
 		}
-		// todo: return something to show that the thing worked
+
+		res.sendStatus(202);
 	} catch (err) {
 		console.error(`Error while editing existing group: ${err}`); // eslint-disable-line no-console
+		res.sendStatus(500);
 	}
 });
 module.exports = router;
