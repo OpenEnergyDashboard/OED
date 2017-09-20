@@ -129,19 +129,19 @@ export default function groups(state = defaultState, action) {
 				...state,
 				groupInEditing: {
 					...state.groupInEditing,
-					free: true
+					dirty: false
 				}
 			};
 		}
 
 		case groupsActions.CREATE_NEW_GROUP: {
-			if (state.groupInEditing.free || _.isEmpty(state.groupInEditing)) {
+			if (state.groupInEditing.dirty || _.isEmpty(state.groupInEditing)) {
 				return {
 					...state,
 					groupInEditing: {
-						// True when the changes are successfully inserted into the db OR the user cancels the editing
+						// False when the changes are successfully inserted into the db OR the user cancels the editing
 						// OR when no changes have been made
-						free: true,
+						dirty: false,
 						// True when a request to insert the changes into the DB has been sent
 						submitted: false,
 						name: '',
@@ -159,7 +159,7 @@ export default function groups(state = defaultState, action) {
 				groupInEditing: {
 					...state.groupInEditing,
 					name: action.newName,
-					free: false
+					dirty: true
 				}
 			};
 		}
@@ -170,7 +170,7 @@ export default function groups(state = defaultState, action) {
 				groupInEditing: {
 					...state.groupInEditing,
 					childGroups: action.groupIDs,
-					free: false
+					dirty: true
 				}
 			};
 		}
@@ -181,7 +181,7 @@ export default function groups(state = defaultState, action) {
 				groupInEditing: {
 					...state.groupInEditing,
 					childMeters: action.meterIDs,
-					free: false
+					dirty: true
 				}
 			};
 		}
@@ -197,7 +197,7 @@ export default function groups(state = defaultState, action) {
 			return state;
 		}
 
-		case groupsActions.SUBMIT_GROUP_IN_EDITING: {
+		case groupsActions.MARK_GROUP_IN_EDITING_SUBMITTED: {
 			return {
 				...state,
 				groupInEditing: {

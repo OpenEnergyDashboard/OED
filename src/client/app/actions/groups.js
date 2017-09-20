@@ -26,7 +26,7 @@ export const CHANGE_CHILD_GROUPS = 'CHANGE_CHILD_GROUPS';
 export const GROUPSUI_CHANGE_DISPLAY_MODE = 'GROUPSUI_CHANGE_DISPLAY_MODE';
 export const CANCEL_GROUP_EDITING = 'CANCEL_GROUP_EDITING';
 
-export const SUBMIT_GROUP_IN_EDITING = 'SUBMIT_GROUP_IN_EDITING';
+export const MARK_GROUP_IN_EDITING_SUBMITTED = 'MARK_GROUP_IN_EDITING_SUBMITTED';
 
 function requestGroupsDetails() {
 	return { type: REQUEST_GROUPS_DETAILS };
@@ -170,30 +170,30 @@ export function changeDisplayMode(newMode) {
 	return { type: GROUPSUI_CHANGE_DISPLAY_MODE, newMode };
 }
 
-function submitGroupInEditing() {
-	return { type: SUBMIT_GROUP_IN_EDITING };
+function markGroupInEditingSubmitted() {
+	return { type: MARK_GROUP_IN_EDITING_SUBMITTED };
 }
 
 function shouldSubmitGroupInEditing(state) {
 	// Should submit if there are uncommitted changes and they have not already been submitted
-	return !(state.groups.groupInEditing.free || state.groups.groupInEditing.submitted);
+	return state.groups.groupInEditing.dirty && !(state.groups.groupInEditing.submitted);
 }
 
 function creatingNewGroup(state) {
 	return (state.groups.groupInEditing.id === undefined);
 }
 
-function postGroupInEditing(group) {
+function submitNewGroup(group) {
 	return dispatch => {
-		dispatch(submitGroupInEditing());
+		dispatch(markGroupInEditingSubmitted());
 		return axios.post('api/groups/create', group)
 			.then(/* process submission */);
 	};
 }
 
-function putGroupInEditing(group) {
+function submitGroupEdits(group) {
 	return dispatch => {
-		dispatch(submitGroupInEditing());
+		dispatch(markGroupInEditingSubmitted());
 		return axios.put('api/groups/nonexistant_as_of_yet', group)
 			.then(/* process submission */);
 	};
@@ -209,13 +209,13 @@ function submitGroupInEditingIfNeeded() {
 				childMeters: rawGroup.childMeters,
 			};
 			if (creatingNewGroup(getState())) {
-				postGroupInEditing(group);
-			} else {
+				return dispatch(submitNewGroup(group));
+			} else { // eslint-disable-line no-else-return
 				const groupWithID = {
 					...group,
 					id: rawGroup.id
 				};
-				putGroupInEditing(groupWithID);
+				return dispatch(submitGroupEdits(groupWithID));
 			}
 		}
 		return Promise.resolve();
