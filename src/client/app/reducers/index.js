@@ -6,6 +6,7 @@
 
 import { combineReducers } from 'redux';
 import meters from './meters';
+import metersFilter from './meters_filter';
 import lineReadings from './lineReadings';
 import barReadings from './barReadings';
 import graph from './graph';
@@ -23,4 +24,4 @@ import graph from './graph';
  * @param action
  * @return {State}
  */
-export default combineReducers({ meters, readings: combineReducers({ line: lineReadings, bar: barReadings }), graph });
+export default combineReducers({ meters, metersFilter, readings: combineReducers({ line: lineReadings, bar: barReadings }), graph });
