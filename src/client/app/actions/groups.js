@@ -17,7 +17,7 @@ export const GROUPSUI_CHANGE_SELECTED_GROUPS_PER_GROUP = 'GROUPSUI_CHANGE_SELECT
 export const GROUPSUI_CHANGE_SELECTED_METERS_PER_GROUP = 'GROUPSUI_CHANGE_SELECTED_METERS_PER_GROUP';
 export const GROUPSUI_CHANGE_DISPLAYED_GROUPS = 'GROUPSUI_CHANGE_DISPLAYED_GROUPS';
 
-export const CREATE_NEW_GROUP = 'CREATE_NEW_GROUP';
+export const CREATE_NEW_BLANK_GROUP = 'CREATE_NEW_BLANK_GROUP';
 export const EDIT_GROUP_NAME = 'EDIT_GROUP_NAME';
 
 export const CHANGE_CHILD_METERS = 'CHANGE_CHILD_METERS';
@@ -136,8 +136,8 @@ export function cancelGroupEditing() {
  * Set state.groups.groupInEditing to a blank group
  * @return {{type: string}}
  */
-export function createNewGroup() {
-	return { type: CREATE_NEW_GROUP };
+export function createNewBlankGroup() {
+	return { type: CREATE_NEW_BLANK_GROUP };
 }
 
 /**

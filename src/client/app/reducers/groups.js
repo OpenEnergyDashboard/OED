@@ -134,7 +134,7 @@ export default function groups(state = defaultState, action) {
 			};
 		}
 
-		case groupsActions.CREATE_NEW_GROUP: {
+		case groupsActions.CREATE_NEW_BLANK_GROUP: {
 			if (state.groupInEditing.dirty || _.isEmpty(state.groupInEditing)) {
 				return {
 					...state,
