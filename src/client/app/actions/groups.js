@@ -159,6 +159,11 @@ export function changeChildMeters(meterIDs) {
 	return { type: CHANGE_CHILD_METERS, meterIDs };
 }
 
+/**
+ * Change the display mode of the groups page
+ * @param newMode Either 'view', 'edit', or 'create'
+ * @return {{type: string, newMode: String}}
+ */
 export function changeDisplayMode(newMode) {
 	return { type: GROUPSUI_CHANGE_DISPLAY_MODE, newMode };
 }

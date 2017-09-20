@@ -2,14 +2,15 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
 
-// This is the main component for the groups display page
+// This is the sidebar component for the groups view page
 import React from 'react';
+import { Button } from 'react-bootstrap';
 
 export default class GroupSidebarComponent extends React.Component {
-
 	constructor(props) {
 		super(props);
 		this.handleGroupSelect = this.handleGroupSelect.bind(this);
+		this.handleCreateGroup = this.handleCreateGroup.bind(this);
 	}
 
 	componentWillMount() {
@@ -29,6 +30,10 @@ export default class GroupSidebarComponent extends React.Component {
 		this.props.selectGroups(selectedGroups);
 	}
 
+	handleCreateGroup() {
+		this.props.changeDisplayMode('create');
+	}
+
 	render() {
 		const labelStyle = {
 			textDecoration: 'underline'
@@ -38,12 +43,14 @@ export default class GroupSidebarComponent extends React.Component {
 		};
 		return (
 			<div className="form-group" style={divPadding}>
-				<p style={labelStyle}>Select groups:</p>
+				<p style={labelStyle}>View groups:</p>
 				<select multiple className="form-control" id="groupList" size="8" onChange={this.handleGroupSelect}>
 					{this.props.groups.map(group =>
 						<option key={group.id} value={group.id}>{group.name}</option>
 					)}
 				</select>
+				<br />
+				<Button bsStyle="default" onClick={this.handleCreateGroup}>Create new group</Button>
 			</div>
 		);
 	}

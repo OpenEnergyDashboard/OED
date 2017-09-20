@@ -18,7 +18,8 @@ function mapStateToProps(state) {
 	return {
 		groups: sortedGroups,
 		meters: sortedMeters,
-		selectedGroups: selectGroups
+		selectedGroups: selectGroups,
+		displayMode: state.groups.displayMode
 	};
 }
 

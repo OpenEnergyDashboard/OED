@@ -5,30 +5,23 @@
 // This component is for viewing a single group via child box components + some buttons
 import React from 'react';
 import { Button } from 'react-bootstrap';
-import ChildMeterBoxContainer from '../../containers/groups/ChildMeterBoxContainer';
-import ChildGroupBoxContainer from '../../containers/groups/ChildGroupBoxContainer';
+import MeterBoxContainer from '../../containers/groups/MeterBoxContainer';
+import GroupBoxContainer from '../../containers/groups/GroupBoxContainer';
 
 export default class GroupViewComponent extends React.Component {
 	constructor(props) {
 		super(props);
-		this.state = { showModal: false };
-		this.open = this.open.bind(this);
-		this.close = this.close.bind(this);
+		this.handleEditGroup = this.handleEditGroup.bind(this);
 	}
 
 	componentWillMount() {
 		this.props.fetchGroupChildren(this.props.id);
 	}
 
-	close() {
-		this.setState({ showModal: false });
+	handleEditGroup() {
+		// TODO edit group with id this.props.id
 	}
 
-	open() {
-		this.setState({ showModal: true });
-	}
-
-	// TODO: Have edit button render something to edit the group
 	render() {
 		const nameStyle = {
 			textAlign: 'center'
@@ -38,13 +31,15 @@ export default class GroupViewComponent extends React.Component {
 				<h2 style={nameStyle}>{this.props.name}</h2>
 				<div className="row">
 					<div className="col-xs-6">
-						<ChildMeterBoxContainer parentID={this.props.id} />
+						<h4>Child meters:</h4>
+						<MeterBoxContainer parentID={this.props.id} />
 					</div>
 					<div className="col-xs-6">
-						<ChildGroupBoxContainer parentID={this.props.id} />
+						<h4>Child groups:</h4>
+						<GroupBoxContainer parentID={this.props.id} />
 					</div>
 				</div>
-				<Button bsStyle="default" onClick={this.open}>Edit Group</Button>
+				<Button bsStyle="default" onClick={this.handleEditGroup}>Edit group</Button>
 			</div>
 		);
 	}

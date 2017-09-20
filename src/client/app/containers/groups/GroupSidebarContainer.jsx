@@ -4,12 +4,12 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/.
  *
  */
+
 import _ from 'lodash';
 import { connect } from 'react-redux';
 import { fetchMetersDetailsIfNeeded } from '../../actions/meters';
-import { fetchGroupsDetailsIfNeeded, changeDisplayedGroups } from '../../actions/groups';
+import { fetchGroupsDetailsIfNeeded, changeDisplayedGroups, changeDisplayMode } from '../../actions/groups';
 import GroupSidebarComponent from '../../components/groups/GroupSidebarComponent';
-
 
 function mapStateToProps(state) {
 	const sortedGroups = _.sortBy(_.values(state.groups.byGroupID).map(group => ({ id: group.id, name: group.name.trim() })), 'name');
@@ -25,6 +25,7 @@ function mapDispatchToProps(dispatch) {
 		selectGroups: newSelectedGroupIDs => dispatch(changeDisplayedGroups(newSelectedGroupIDs)),
 		fetchGroupsDetailsIfNeeded: () => dispatch(fetchGroupsDetailsIfNeeded()),
 		fetchMetersDetailsIfNeeded: () => dispatch(fetchMetersDetailsIfNeeded()),
+		changeDisplayMode: newMode => dispatch(changeDisplayMode(newMode))
 	};
 }
 
