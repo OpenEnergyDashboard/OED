@@ -29,6 +29,8 @@ export const MARK_GROUP_IN_EDITING_CLEAN = 'MARK_GROUP_IN_EDITING_CLEAN';
 export const MARK_GROUP_IN_EDITING_SUBMITTED = 'MARK_GROUP_IN_EDITING_SUBMITTED';
 export const MARK_GROUP_IN_EDITING_NOT_SUBMITTED = 'MARK_GROUP_IN_EDITING_NOT_SUBMITTED';
 
+export const MARK_GROUPS_BY_ID_OUTDATED = 'MARK_GROUPS_BY_ID_OUTDATED';
+
 function requestGroupsDetails() {
 	return { type: REQUEST_GROUPS_DETAILS };
 }
@@ -48,12 +50,15 @@ function fetchGroupsDetails() {
 	};
 }
 
+function markGroupsOutdated() {
+	return { type: MARK_GROUPS_BY_ID_OUTDATED };
+}
 
 /**
  * @param {State} state
  */
 function shouldFetchGroupsDetails(state) {
-	return !state.groups.isFetching && _.isEmpty(state.groups.byGroupID);
+	return !state.groups.isFetching && state.groups.outdated;
 }
 
 /**
@@ -199,6 +204,7 @@ function submitNewGroup(group) {
 		dispatch(markGroupInEditingSubmitted());
 		return axios.post('api/groups/create', group)
 			.then(() => {
+				dispatch(markGroupsOutdated());
 				dispatch(cancelGroupEditing());
 				dispatch(changeDisplayMode('view'));
 			})

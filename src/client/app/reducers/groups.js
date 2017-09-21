@@ -10,11 +10,13 @@ import * as groupsActions from '../actions/groups';
 /**
  * @typedef {Object} State~Groups
  * @property {boolean} isFetching
+ * @property {boolean} outdated
  * @property {Object<number, Object>} byGroupID
  * @property {Object} groupInEditing
  */
 const defaultState = {
 	isFetching: false,
+	outdated: true,
 	byGroupID: {},
 	selectedGroups: [],
 	groupInEditing: {
@@ -59,6 +61,7 @@ export default function groups(state = defaultState, action) {
 			return {
 				...state,
 				isFetching: false,
+				outdated: false,
 				byGroupID: newGroupsByID,
 			};
 		}
@@ -217,6 +220,13 @@ export default function groups(state = defaultState, action) {
 					...state.groupInEditing,
 					submitted: false
 				}
+			};
+		}
+
+		case groupsActions.MARK_GROUPS_BY_ID_OUTDATED: {
+			return {
+				...state,
+				outdated: true
 			};
 		}
 
