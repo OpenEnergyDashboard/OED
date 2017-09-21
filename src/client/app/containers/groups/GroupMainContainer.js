@@ -14,7 +14,7 @@ import GroupMainComponent from '../../components/groups/GroupMainComponent';
 function mapStateToProps(state) {
 	const sortedGroups = _.sortBy(_.values(state.groups.byGroupID).map(group => ({ id: group.id, name: group.name.trim() })), 'name');
 	const sortedMeters = _.sortBy(_.values(state.meters.byMeterID).map(meter => ({ id: meter.id, name: meter.name.trim() })), 'name');
-	const selectGroups = undefined ? [] : state.groups.selectedGroups;
+	const selectGroups = state.groups.selectedGroups;
 	return {
 		groups: sortedGroups,
 		meters: sortedMeters,
