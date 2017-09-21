@@ -137,7 +137,7 @@ export default function groups(state = defaultState, action) {
 		}
 
 		case groupsActions.CREATE_NEW_BLANK_GROUP: {
-			if (state.groupInEditing.dirty) {
+			if (!state.groupInEditing.dirty) {
 				return {
 					...state,
 					groupInEditing: {
