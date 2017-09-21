@@ -27,18 +27,24 @@ mocha.describe('Insert Mamac readings from a file', () => {
 		meter = await Meter.getByName('Meter');
 	});
 
-	mocha.it('loads the correct number of rows from a file', () => {
+	mocha.it('loads the correct number of rows from a file', async () => {
 		const testFilePath = path.join(__dirname, 'test-readings.csv');
 		const readingDuration = moment.duration(1, 'hours');
-		return loadMamacReadingsFromCsvFile(testFilePath, meter, readingDuration)
-			.then(() => db.one('SELECT COUNT(*) as count FROM readings'))
-			.then(({ count }) => expect(parseInt(count)).to.equal(20));
+		await loadMamacReadingsFromCsvFile(testFilePath, meter, readingDuration);
+		const { count } = await db.one('SELECT COUNT(*) as count FROM readings');
+		expect(parseInt(count)).to.equal(20);
 	});
 
-	mocha.it('errors correctly on an invalid file', () => {
+	mocha.it('errors correctly on an invalid file', async () => {
 		const testFilePath = path.join(__dirname, 'test-readings-invalid.csv');
 		const readingDuration = moment.duration(1, 'hours');
-		return expect(loadMamacReadingsFromCsvFile(testFilePath, meter, readingDuration)).to.eventually.be.rejected;
+
+		try {
+			await loadMamacReadingsFromCsvFile(testFilePath, meter, readingDuration);
+			expect.fail('should have thrown an exception');
+		} catch (e) {
+			// We want this to error
+		}
 	});
 	mocha.it('rolls back correctly when it rejects', async () => {
 		const testFilePath = path.join(__dirname, 'test-readings-invalid.csv');
