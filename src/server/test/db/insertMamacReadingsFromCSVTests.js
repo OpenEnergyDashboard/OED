@@ -22,10 +22,10 @@ const mocha = require('mocha');
 mocha.describe('Insert Mamac readings from a file', () => {
 	mocha.beforeEach(recreateDB);
 	let meter;
-	mocha.beforeEach(() => db.task(function* setupTests(t) {
-		yield new Meter(undefined, 'Meter', null, false, Meter.type.MAMAC).insert(t);
-		meter = yield Meter.getByName('Meter', t);
-	}));
+	mocha.beforeEach(async () => {
+		await new Meter(undefined, 'Meter', null, false, Meter.type.MAMAC).insert();
+		meter = await Meter.getByName('Meter');
+	});
 
 	mocha.it('loads the correct number of rows from a file', () => {
 		const testFilePath = path.join(__dirname, 'test-readings.csv');
