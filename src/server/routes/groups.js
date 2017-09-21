@@ -72,10 +72,10 @@ router.get('/deep/meters/:group_id', async (req, res) => {
 
 router.post('/create', async (req, res) => {
 	try {
-		const newGroup = new Group(undefined, req.group.name);
+		const newGroup = new Group(undefined, req.body.name);
 		await newGroup.insert();
-		await req.group.childGroups.map(gid => newGroup.adoptGroup(gid));
-		await req.group.childMeters.map(mid => newGroup.adoptMeter(mid));
+		await req.body.childGroups.map(gid => newGroup.adoptGroup(gid));
+		await req.body.childMeters.map(mid => newGroup.adoptMeter(mid));
 
 		res.sendStatus(201);
 	} catch (err) {
@@ -86,19 +86,19 @@ router.post('/create', async (req, res) => {
 
 router.put('/edit', async (req, res) => {
 	try {
-		const currentGroup = Group.getByID(req.group.id);
-		if (req.group.name !== currentGroup.name) {
-			await currentGroup.rename(req.group.name);
+		const currentGroup = Group.getByID(req.body.id);
+		if (req.body.name !== currentGroup.name) {
+			await currentGroup.rename(req.body.name);
 		}
 
 		const currentChildGroups = Group.getImmediateGroupsByGroupID(currentGroup.id);
 
-		const adoptedGroups = _.difference(req.group.childGroups, currentChildGroups);
+		const adoptedGroups = _.difference(req.body.childGroups, currentChildGroups);
 		if (adoptedGroups.length === 0) {
 			await Promise.all(adoptedGroups.map(gid => currentGroup.adoptGroup(gid)));
 		}
 
-		const disownedGroups = _.difference(currentChildGroups, req.group.childGroups);
+		const disownedGroups = _.difference(currentChildGroups, req.body.childGroups);
 		if (disownedGroups.length === 0) {
 			await Promise.all(disownedGroups.map(gid => currentGroup.disownGroup(gid)));
 		}
@@ -106,12 +106,12 @@ router.put('/edit', async (req, res) => {
 		// Compute meters differences and adopt/disown to make changes
 		const currentChildMeters = Group.getImmediateMetersByGroupID(currentGroup.id);
 
-		const adoptedMeters = _.difference(req.group.childMeters, currentChildMeters);
+		const adoptedMeters = _.difference(req.body.childMeters, currentChildMeters);
 		if (adoptedMeters.length === 0) {
 			await Promise.all(adoptedMeters.map(mid => currentGroup.adoptMeter(mid)));
 		}
 
-		const disownedMeters = _.difference(currentChildMeters, req.group.childMeters);
+		const disownedMeters = _.difference(currentChildMeters, req.body.childMeters);
 		if (disownedMeters.length === 0) {
 			await Promise.All(disownedMeters.map(mid => currentGroup.disownMeter(mid)));
 		}
