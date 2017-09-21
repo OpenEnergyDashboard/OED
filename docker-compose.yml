@@ -1,0 +1,41 @@
+version: "2"
+services:
+    # Database service. It's PostgreSQL, see the
+    # Dockerfile in ./database
+    database:
+        build: ./database/
+        environment:
+            - PGDATA=/var/lib/postgresql/data/pgdata
+              # Custom PGDATA per recommendations from official Docker page
+        volumes: 
+            - ./postgres-data:/var/lib/postgresql/data/pgdata
+    web:
+        # Configuration variables for the app.
+        environment:
+            - SERVER_PORT=3000
+            - DB_USER=opened
+            - DB_DATABASE=oed
+            - DB_TEST_DATABASE=oed_testing
+            - DB_PASSWORD=opened
+            - DB_HOST=database # Docker will set this hostname
+            - DB_PORT=5432
+            - TOKEN_SECRET=?
+        # Set the correct build environment.
+        build: ./
+        # Link to the database so the app can persist data
+        links:
+            - database
+        # Load the source code into the container
+        # Using a volume allows autorebuild to work
+        volumes:
+            - ./:/usr/src/app
+        # Map the default port.
+        ports:
+            - "3000:3000"
+              # For production you might want something like:
+              # - "80:3000"
+        # Don't bring this up without the DB
+        depends_on:
+            - database
+        # Lets docker-compose up work right
+        command: ["npm", "start"]

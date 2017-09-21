@@ -32,7 +32,7 @@ mocha.describe('Insert Mamac readings from a file', () => {
 		const readingDuration = moment.duration(1, 'hours');
 		return loadMamacReadingsFromCsvFile(testFilePath, meter, readingDuration)
 			.then(() => db.one('SELECT COUNT(*) as count FROM readings'))
-			.then(({ count }) => expect(parseInt(count)).to.equal(1440));
+			.then(({ count }) => expect(parseInt(count)).to.equal(20));
 	});
 
 	mocha.it('errors correctly on an invalid file', () => {

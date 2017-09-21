@@ -8,6 +8,7 @@ const path = require('path');
 
 const BUILD_DIR = path.resolve(__dirname, 'src/client/public');
 const APP_DIR = path.resolve(__dirname, 'src/client/app');
+const COMMON_DIR = path.resolve(__dirname, 'src/common');
 
 const config = {
 	entry: ['babel-polyfill', `${APP_DIR}/index.jsx`],
@@ -16,21 +17,37 @@ const config = {
 		filename: 'bundle.js'
 	},
 	resolve: {
-		extensions: ['', '.js', '.jsx']
+		extensions: ['.js', '.jsx']
 	},
 	module: {
-		loaders: [
+		rules: [
 			{
 				test: /\.jsx?/,
-				include: APP_DIR,
-				loader: 'babel'
+				include: [APP_DIR, COMMON_DIR],
+				loader: 'babel-loader'
+			},
+			{
+				test: /\.css$/,
+				loader: 'style-loader!css-loader'
 			}
 		]
 	},
+	devtool: 'source-map',
 	plugins: [
 		new LodashModuleReplacementPlugin()
 	],
 	externals: ['xlsx']
 };
+
+if (process.env.NODE_ENV === 'production') {
+	config.plugins.push(
+		new webpack.DefinePlugin({
+			'process.env': {
+				NODE_ENV: JSON.stringify('production')
+			}
+		}),
+		new webpack.optimize.UglifyJsPlugin({ sourceMap: true })
+	);
+}
 
 module.exports = config;

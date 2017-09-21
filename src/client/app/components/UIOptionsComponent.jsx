@@ -3,6 +3,12 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
 
 import React from 'react';
+import Slider from 'react-rangeslider';
+import moment from 'moment';
+import 'react-rangeslider/lib/index.css';
+import { chartTypes } from '../reducers/graph';
+import ExportContainer from '../containers/ExportContainer';
+
 
 export default class UIOptionsComponent extends React.Component {
 	/**
@@ -12,6 +18,13 @@ export default class UIOptionsComponent extends React.Component {
 	constructor(props) {
 		super(props);
 		this.handleMeterSelect = this.handleMeterSelect.bind(this);
+		this.handleBarDurationChange = this.handleBarDurationChange.bind(this);
+		this.handleBarDurationChangeComplete = this.handleBarDurationChangeComplete.bind(this);
+		this.handleChangeChartType = this.handleChangeChartType.bind(this);
+		this.handleChangeBarStacking = this.handleChangeBarStacking.bind(this);
+		this.state = {
+			barDuration: 30 // barDuration in days
+		};
 	}
 
 	/**
@@ -19,7 +32,7 @@ export default class UIOptionsComponent extends React.Component {
 	 * Dispatches a Redux action to fetch meter information
 	 */
 	componentWillMount() {
-		this.props.fetchMetersDataIfNeeded();
+		this.props.fetchMetersDetailsIfNeeded();
 	}
 
 	handleMeterSelect(e) {
@@ -33,6 +46,29 @@ export default class UIOptionsComponent extends React.Component {
 			}
 		}
 		this.props.selectMeters(selectedMeters);
+	}
+
+	/**
+	 * Stores temporary barDuration until slider is released, used to update the UI of the slider
+	 */
+	handleBarDurationChange(value) {
+		this.setState({ barDuration: value });
+	}
+
+	/**
+	 * Called when the user releases the slider, dispatch action on temporary state variable
+	 */
+	handleBarDurationChangeComplete(e) {
+		e.preventDefault();
+		this.props.changeDuration(moment.duration(this.state.barDuration, 'days'));
+	}
+
+	handleChangeChartType(e) {
+		this.props.changeChartType(e.target.value);
+	}
+
+	handleChangeBarStacking() {
+		this.props.changeBarStacking();
 	}
 
 	/**
@@ -58,40 +94,21 @@ export default class UIOptionsComponent extends React.Component {
 							</select>
 						</div>
 					</div>
-					<p style={labelStyle}>Energy Type:</p>
-					<div className="radio">
-						<label><input type="radio" name="energyTypes" value="Electricity" defaultChecked />Electricity</label>
-					</div>
-					<div className="radio">
-						<label><input type="radio" name="energyTypes" value="Wind" />Wind</label>
-					</div>
-					<div className="radio">
-						<label><input type="radio" name="energyTypes" value="NaturalGas" />Natural Gas</label>
-					</div>
-					<div className="radio">
-						<label><input type="radio" name="energyTypes" value="Solar" />Solar</label>
-					</div>
-					<br />
 					<p style={labelStyle}>Graph Type:</p>
 					<div className="radio">
-						<label><input type="radio" name="graphTypes" value="Line" defaultChecked />Line</label>
+						<label><input type="radio" name="chartTypes" value={chartTypes.line} onChange={this.handleChangeChartType} checked={this.props.chartToRender === chartTypes.line} />Line</label>
 					</div>
 					<div className="radio">
-						<label><input type="radio" name="graphTypes" value="Bar" />Bar</label>
-					</div>
-					<div className="radio">
-						<label><input type="radio" name="graphTypes" value="Map" />Map</label>
-					</div>
-					<br />
-					<p style={labelStyle}>Other options:</p>
-					<div className="checkbox">
-						<label><input type="checkbox" value="overlayweather" />Overlay Weather</label>
+						<label><input type="radio" name="chartTypes" value={chartTypes.bar} onChange={this.handleChangeChartType} checked={this.props.chartToRender === chartTypes.bar} />Bar</label>
 					</div>
 					<div className="checkbox">
-						<label><input type="checkbox" value="scaling" />kWh scaling</label>
+						<label><input type="checkbox" onChange={this.handleChangeBarStacking} />Bar stacking</label>
 					</div>
-					<br />
-					<button type="button" id="changeButton" className="btn btn-primary">Change!</button>
+					<p style={labelStyle}>Bar chart interval (days):</p>
+					<Slider min={1} max={365} value={this.state.barDuration} onChange={this.handleBarDurationChange} onChangeComplete={this.handleBarDurationChangeComplete} />
+					<div>
+						<ExportContainer />
+					</div>
 				</div>
 			</div>
 		);

@@ -4,7 +4,8 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/.
  */
 
-import { Line } from 'react-chartjs-2';
+import _ from 'lodash';
+import { Bar } from 'react-chartjs-2';
 import moment from 'moment';
 import { connect } from 'react-redux';
 import 'chartjs-plugin-zoom';
@@ -15,20 +16,29 @@ import GraphColors from '../utils/GraphColors';
  */
 function mapStateToProps(state) {
 	const timeInterval = state.graph.timeInterval;
+	const barDuration = state.graph.barDuration;
 	const data = { datasets: [] };
 	const graphColors = new GraphColors();
 
+	const labelsSet = new Set();
 	for (const meterID of state.graph.selectedMeters) {
-		const readingsData = state.readings.line.byMeterID[meterID][timeInterval];
+		const readingsData = state.readings.bar.byMeterID[meterID][timeInterval][barDuration];
 		if (readingsData !== undefined && !readingsData.isFetching) {
+			const color = graphColors.getColor();
 			data.datasets.push({
 				label: state.meters.byMeterID[meterID].name,
-				data: readingsData.readings.map(arr => ({ x: arr[0], y: arr[1].toFixed(2) })),
-				fill: false,
-				borderColor: graphColors.getColor()
+				data: readingsData.readings.map(arr => arr[1]),
+				backgroundColor: color,
+				hoverBackgroundColor: color
 			});
+			// Add only the unique time intervals to the label set
+			for (const element of _.flatten(readingsData.readings.map(arr => arr[0]))) {
+				labelsSet.add(`${moment(element).format('MMM DD, YYYY, hh:mm a')} - ${moment(element).add(barDuration).format('MMM DD, YYYY, hh:mm a')}`);
+			}
 		}
 	}
+    // Converts the label set into an array for Chart.js and sorts the labels based on the first date of the time interval
+	data.labels = Array.from(labelsSet).sort((x, y) => moment(x.split(' - ')[0], 'MMM DD, YYYY, hh:mm a').format('x') - moment(y.split(' - ')[0], 'MMM DD, YYYY, hh:mm a').format('x'));
 
 	const options = {
 		animation: {
@@ -41,9 +51,13 @@ function mapStateToProps(state) {
 		},
 		scales: {
 			xAxes: [{
-				type: 'time'
+				stacked: state.graph.barStacking,
+				gridLines: {
+					display: true
+				}
 			}],
 			yAxes: [{
+				stacked: state.graph.barStacking,
 				scaleLabel: {
 					display: true,
 					labelString: 'kWh'
@@ -59,17 +73,8 @@ function mapStateToProps(state) {
 			backgroundColor: 'rgba(0,0,0,0.6)',
 			displayColors: false,
 			callbacks: {
-				title: tooltipItems => `${moment(tooltipItems[0].xLabel).format('dddd, MMM DD, YYYY hh:mm a')}`,
 				label: tooltipItems => `${data.datasets[tooltipItems.datasetIndex].label}: ${tooltipItems.yLabel} kWh`
 			}
-		},
-		pan: {
-			enabled: true,
-			mode: 'x'
-		},
-		zoom: {
-			enabled: true,
-			mode: 'x',
 		}
 	};
 
@@ -80,4 +85,4 @@ function mapStateToProps(state) {
 	};
 }
 
-export default connect(mapStateToProps)(Line);
+export default connect(mapStateToProps)(Bar);
