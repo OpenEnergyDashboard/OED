@@ -17,13 +17,16 @@ export const GROUPSUI_CHANGE_SELECTED_GROUPS_PER_GROUP = 'GROUPSUI_CHANGE_SELECT
 export const GROUPSUI_CHANGE_SELECTED_METERS_PER_GROUP = 'GROUPSUI_CHANGE_SELECTED_METERS_PER_GROUP';
 export const GROUPSUI_CHANGE_DISPLAYED_GROUPS = 'GROUPSUI_CHANGE_DISPLAYED_GROUPS';
 
-export const CREATE_NEW_GROUP = 'CREATE_NEW_GROUP';
+export const CREATE_NEW_BLANK_GROUP = 'CREATE_NEW_BLANK_GROUP';
 export const EDIT_GROUP_NAME = 'EDIT_GROUP_NAME';
 
 export const CHANGE_CHILD_METERS = 'CHANGE_CHILD_METERS';
 export const CHANGE_CHILD_GROUPS = 'CHANGE_CHILD_GROUPS';
 
 export const GROUPSUI_CHANGE_DISPLAY_MODE = 'GROUPSUI_CHANGE_DISPLAY_MODE';
+export const MARK_GROUP_IN_EDITING_CLEAN = 'MARK_GROUP_IN_EDITING_CLEAN';
+
+export const MARK_GROUP_IN_EDITING_SUBMITTED = 'MARK_GROUP_IN_EDITING_SUBMITTED';
 
 function requestGroupsDetails() {
 	return { type: REQUEST_GROUPS_DETAILS };
@@ -125,12 +128,16 @@ export function changeSelectedMetersOfGroup(parentID, meterIDs) {
 	return { type: GROUPSUI_CHANGE_SELECTED_METERS_PER_GROUP, parentID, meterIDs };
 }
 
+export function cancelGroupEditing() {
+	return { type: MARK_GROUP_IN_EDITING_CLEAN };
+}
+
 /**
  * Set state.groups.groupInEditing to a blank group
  * @return {{type: string}}
  */
-export function createNewGroup() {
-	return { type: CREATE_NEW_GROUP };
+export function createNewBlankGroup() {
+	return { type: CREATE_NEW_BLANK_GROUP };
 }
 
 /**
@@ -166,4 +173,56 @@ export function changeChildMeters(meterIDs) {
  */
 export function changeDisplayMode(newMode) {
 	return { type: GROUPSUI_CHANGE_DISPLAY_MODE, newMode };
+}
+
+function markGroupInEditingSubmitted() {
+	return { type: MARK_GROUP_IN_EDITING_SUBMITTED };
+}
+
+function shouldSubmitGroupInEditing(state) {
+	// Should submit if there are uncommitted changes and they have not already been submitted
+	return state.groups.groupInEditing.dirty && !(state.groups.groupInEditing.submitted);
+}
+
+function creatingNewGroup(state) {
+	return (state.groups.groupInEditing.id === undefined);
+}
+
+function submitNewGroup(group) {
+	return dispatch => {
+		dispatch(markGroupInEditingSubmitted());
+		return axios.post('api/groups/create', group)
+			.then(/* process response code */);
+	};
+}
+
+function submitGroupEdits(group) {
+	return dispatch => {
+		dispatch(markGroupInEditingSubmitted());
+		return axios.put('api/groups/edit', group)
+			.then(/* process response code */);
+	};
+}
+
+export function submitGroupInEditingIfNeeded() {
+	return (dispatch, getState) => {
+		if (shouldSubmitGroupInEditing(getState())) {
+			const rawGroup = getState().groups.groupInEditing;
+			const group = {
+				name: rawGroup.name,
+				childGroups: rawGroup.childGroups,
+				childMeters: rawGroup.childMeters,
+			};
+			if (creatingNewGroup(getState())) {
+				return dispatch(submitNewGroup(group));
+			} else { // eslint-disable-line no-else-return
+				const groupWithID = {
+					...group,
+					id: rawGroup.id
+				};
+				return dispatch(submitGroupEdits(groupWithID));
+			}
+		}
+		return Promise.resolve();
+	};
 }

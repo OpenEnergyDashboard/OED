@@ -16,7 +16,9 @@ const defaultState = {
 	isFetching: false,
 	byGroupID: {},
 	selectedGroups: [],
-	groupInEditing: {},
+	groupInEditing: {
+		dirty: false
+	},
 	displayMode: 'view'
 };
 
@@ -124,15 +126,33 @@ export default function groups(state = defaultState, action) {
 			};
 		}
 
-		case groupsActions.CREATE_NEW_GROUP: {
+		case groupsActions.MARK_GROUP_IN_EDITING_CLEAN: {
 			return {
 				...state,
 				groupInEditing: {
-					name: '',
-					childGroups: [],
-					childMeters: []
+					...state.groupInEditing,
+					dirty: false
 				}
 			};
+		}
+
+		case groupsActions.CREATE_NEW_BLANK_GROUP: {
+			if (state.groupInEditing.dirty) {
+				return {
+					...state,
+					groupInEditing: {
+						// False when the changes are successfully inserted into the db OR the user cancels the editing
+						// OR when no changes have been made
+						dirty: false,
+						// True when a request to insert the changes into the DB has been sent
+						submitted: false,
+						name: '',
+						childGroups: [],
+						childMeters: []
+					}
+				};
+			}
+			return state;
 		}
 
 		case groupsActions.EDIT_GROUP_NAME: {
@@ -140,7 +160,8 @@ export default function groups(state = defaultState, action) {
 				...state,
 				groupInEditing: {
 					...state.groupInEditing,
-					name: action.newName
+					name: action.newName,
+					dirty: true
 				}
 			};
 		}
@@ -150,7 +171,8 @@ export default function groups(state = defaultState, action) {
 				...state,
 				groupInEditing: {
 					...state.groupInEditing,
-					childGroups: action.groupIDs
+					childGroups: action.groupIDs,
+					dirty: true
 				}
 			};
 		}
@@ -160,7 +182,8 @@ export default function groups(state = defaultState, action) {
 				...state,
 				groupInEditing: {
 					...state.groupInEditing,
-					childMeters: action.meterIDs
+					childMeters: action.meterIDs,
+					dirty: true
 				}
 			};
 		}
@@ -174,6 +197,16 @@ export default function groups(state = defaultState, action) {
 				};
 			}
 			return state;
+		}
+
+		case groupsActions.MARK_GROUP_IN_EDITING_SUBMITTED: {
+			return {
+				...state,
+				groupInEditing: {
+					...state.groupInEditing,
+					submitted: true
+				}
+			};
 		}
 
 		default:
