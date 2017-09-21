@@ -77,7 +77,7 @@ router.post('/create', async (req, res) => {
 		await req.body.childGroups.map(gid => newGroup.adoptGroup(gid));
 		await req.body.childMeters.map(mid => newGroup.adoptMeter(mid));
 
-		res.sendStatus(201);
+		res.sendStatus(200);
 	} catch (err) {
 		console.error(`Error while inserting new group ${err}`); // eslint-disable-line no-console
 		res.sendStatus(500);
@@ -116,7 +116,7 @@ router.put('/edit', async (req, res) => {
 			await Promise.All(disownedMeters.map(mid => currentGroup.disownMeter(mid)));
 		}
 
-		res.sendStatus(202);
+		res.sendStatus(200);
 	} catch (err) {
 		console.error(`Error while editing existing group: ${err}`); // eslint-disable-line no-console
 		res.sendStatus(500);
