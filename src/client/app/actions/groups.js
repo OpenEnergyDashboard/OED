@@ -27,6 +27,7 @@ export const GROUPSUI_CHANGE_DISPLAY_MODE = 'GROUPSUI_CHANGE_DISPLAY_MODE';
 export const MARK_GROUP_IN_EDITING_CLEAN = 'MARK_GROUP_IN_EDITING_CLEAN';
 
 export const MARK_GROUP_IN_EDITING_SUBMITTED = 'MARK_GROUP_IN_EDITING_SUBMITTED';
+export const MARK_GROUP_IN_EDITING_NOT_SUBMITTED = 'MARK_GROUP_IN_EDITING_NOT_SUBMITTED';
 
 function requestGroupsDetails() {
 	return { type: REQUEST_GROUPS_DETAILS };
@@ -179,6 +180,10 @@ function markGroupInEditingSubmitted() {
 	return { type: MARK_GROUP_IN_EDITING_SUBMITTED };
 }
 
+function markGroupInEditingNotSubmitted() {
+	return { type: MARK_GROUP_IN_EDITING_NOT_SUBMITTED };
+}
+
 function shouldSubmitGroupInEditing(state) {
 	// Should submit if there are uncommitted changes and they have not already been submitted
 	return state.groups.groupInEditing.dirty && !(state.groups.groupInEditing.submitted);
@@ -188,11 +193,19 @@ function creatingNewGroup(state) {
 	return (state.groups.groupInEditing.id === undefined);
 }
 
+
 function submitNewGroup(group) {
 	return dispatch => {
 		dispatch(markGroupInEditingSubmitted());
 		return axios.post('api/groups/create', group)
-			.then(/* process response code */);
+			.then(() => {
+				dispatch(cancelGroupEditing());
+				dispatch(changeDisplayMode('view'));
+			})
+			.catch(error => {
+				dispatch(markGroupInEditingNotSubmitted());
+				console.error(error);
+			});
 	};
 }
 

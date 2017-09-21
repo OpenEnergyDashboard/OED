@@ -11,6 +11,7 @@ import * as groupsActions from '../actions/groups';
  * @typedef {Object} State~Groups
  * @property {boolean} isFetching
  * @property {Object<number, Object>} byGroupID
+ * @property {Object} groupInEditing
  */
 const defaultState = {
 	isFetching: false,
@@ -205,6 +206,16 @@ export default function groups(state = defaultState, action) {
 				groupInEditing: {
 					...state.groupInEditing,
 					submitted: true
+				}
+			};
+		}
+
+		case groupsActions.MARK_GROUP_IN_EDITING_NOT_SUBMITTED: {
+			return {
+				...state,
+				groupInEditing: {
+					...state.groupInEditing,
+					submitted: false
 				}
 			};
 		}
