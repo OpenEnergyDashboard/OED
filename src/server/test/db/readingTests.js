@@ -19,23 +19,23 @@ const mocha = require('mocha');
 mocha.describe('Readings', () => {
 	mocha.beforeEach(recreateDB);
 	let meter;
-	mocha.beforeEach(() => db.task(function* setupTests(t) {
-		yield new Meter(undefined, 'Meter', null, false, Meter.type.MAMAC).insert(t);
-		meter = yield Meter.getByName('Meter', t);
-	}));
+	mocha.beforeEach(async () => {
+		await new Meter(undefined, 'Meter', null, false, Meter.type.MAMAC).insert();
+		meter = await Meter.getByName('Meter');
+	});
 
-	mocha.it('can be saved and retrieved', () => db.task(function* runTest(t) {
+	mocha.it('can be saved and retrieved', async () => {
 		const startTimestamp = moment('2017-01-01');
 		const endTimestamp = moment('2017-01-01').add(1, 'hour');
 		const readingPreInsert = new Reading(meter.id, 10, startTimestamp, endTimestamp);
-		yield readingPreInsert.insert(t);
-		const retrievedReadings = yield Reading.getAllByMeterID(meter.id, t);
+		await readingPreInsert.insert();
+		const retrievedReadings = await Reading.getAllByMeterID(meter.id);
 		expect(retrievedReadings).to.have.lengthOf(1);
 		const readingPostInsert = retrievedReadings[0];
 		expect(readingPostInsert.startTimestamp.isSame(startTimestamp)).to.equal(true);
 		expect(readingPostInsert.endTimestamp.isSame(endTimestamp)).to.equal(true);
 		expect(readingPostInsert).to.have.property('reading', readingPreInsert.reading);
-	}));
+	});
 	mocha.it('can be saved in bulk', async () => {
 		const startTimestamp1 = moment('2017-01-01');
 		const endTimestamp1 = moment(startTimestamp1).add(1, 'hour');
