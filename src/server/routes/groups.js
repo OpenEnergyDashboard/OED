@@ -74,8 +74,8 @@ router.post('/create', async (req, res) => {
 	try {
 		const newGroup = new Group(undefined, req.group.name);
 		await newGroup.insert();
-		await req.group.childGroups.forEach(gid => newGroup.adoptGroup(gid));
-		await req.group.childMeters.forEach(mid => newGroup.adoptMeter(mid));
+		await req.group.childGroups.map(gid => newGroup.adoptGroup(gid));
+		await req.group.childMeters.map(mid => newGroup.adoptMeter(mid));
 
 		res.sendStatus(201);
 	} catch (err) {
@@ -94,26 +94,26 @@ router.put('/edit', async (req, res) => {
 		const currentChildGroups = Group.getImmediateGroupsByGroupID(currentGroup.id);
 
 		const adoptedGroups = _.difference(req.group.childGroups, currentChildGroups);
-		if (adoptedGroups !== []) {
-			await adoptedGroups.forEach(gid => currentGroup.adoptGroup(gid));
+		if (adoptedGroups.length === 0) {
+			await Promise.all(adoptedGroups.map(gid => currentGroup.adoptGroup(gid)));
 		}
 
 		const disownedGroups = _.difference(currentChildGroups, req.group.childGroups);
-		if (disownedGroups !== []) {
-			await disownedGroups.forEach(gid => currentGroup.disownGroup(gid));
+		if (disownedGroups.length === 0) {
+			await Promise.all(disownedGroups.map(gid => currentGroup.disownGroup(gid)));
 		}
 
-
+		// Compute meters differences and adopt/disown to make changes
 		const currentChildMeters = Group.getImmediateMetersByGroupID(currentGroup.id);
 
 		const adoptedMeters = _.difference(req.group.childMeters, currentChildMeters);
-		if (adoptedMeters !== []) {
-			await adoptedMeters.forEach(mid => currentGroup.adoptMeter(mid));
+		if (adoptedMeters.length === 0) {
+			await Promise.all(adoptedMeters.map(mid => currentGroup.adoptMeter(mid)));
 		}
 
 		const disownedMeters = _.difference(currentChildMeters, req.group.childMeters);
-		if (disownedMeters !== []) {
-			await disownedMeters.forEach(mid => currentGroup.disownMeter(mid));
+		if (disownedMeters.length === 0) {
+			await Promise.All(disownedMeters.map(mid => currentGroup.disownMeter(mid)));
 		}
 
 		res.sendStatus(202);
@@ -122,4 +122,5 @@ router.put('/edit', async (req, res) => {
 		res.sendStatus(500);
 	}
 });
+
 module.exports = router;
