@@ -68,6 +68,7 @@ async function createSchema() {
 	await Preferences.createTable();
 	await Group.createTables();
 	await db.none(sqlFile('reading/create_function_get_compressed_readings.sql'));
+	await Reading.createCompressedReadingsMaterializedViews();
 }
 
 /**

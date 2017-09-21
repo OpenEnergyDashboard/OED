@@ -54,6 +54,19 @@ class Reading {
 		return db.none(sqlFile('reading/create_function_get_barchart_readings.sql'));
 	}
 
+	/**
+	 * Returns a promise to create the function and materialized views that aggregate
+	 * readings by various time intervals.
+	 * @return {Promise<void>}
+	 */
+	static createCompressedReadingsMaterializedViews(conn = db) {
+		return conn.none(sqlFile('reading/create_compressed_reading_views.sql'));
+	}
+
+	static refreshCompressedReadings(conn = db) {
+		return conn.none(sqlFile('reading/refresh_materialized_views.sql'));
+	}
+
 	static mapRow(row) {
 		return new Reading(row.meter_id, row.reading, row.start_timestamp, row.end_timestamp);
 	}
