@@ -74,8 +74,8 @@ router.post('/create', async (req, res) => {
 	try {
 		const newGroup = new Group(undefined, req.body.name);
 		await newGroup.insert();
-		await req.body.childGroups.map(gid => newGroup.adoptGroup(gid));
-		await req.body.childMeters.map(mid => newGroup.adoptMeter(mid));
+		await Promise.all(req.body.childGroups.map(gid => newGroup.adoptGroup(gid)));
+		await Promise.all(req.body.childMeters.map(mid => newGroup.adoptMeter(mid)));
 
 		res.sendStatus(200);
 	} catch (err) {
