@@ -8,7 +8,7 @@
 import _ from 'lodash';
 import { connect } from 'react-redux';
 import CreateGroupComponent from '../../components/groups/CreateGroupComponent';
-import { createNewGroup, editGroupName, changeDisplayMode } from '../../actions/groups';
+import { createNewBlankGroup, editGroupName, changeDisplayMode, submitGroupInEditingIfNeeded } from '../../actions/groups';
 
 function mapStateToProps(state) {
 	const sortedGroups = _.sortBy(_.values(state.groups.byGroupID).map(group => ({ id: group.id, name: group.name.trim() })), 'name');
@@ -19,7 +19,8 @@ function mapStateToProps(state) {
 
 function mapDispatchToProps(dispatch) {
 	return {
-		createNewGroup: () => dispatch(createNewGroup()),
+		createNewBlankGroup: () => dispatch(createNewBlankGroup()),
+		submitGroupInEditingIfNeeded: () => dispatch(submitGroupInEditingIfNeeded()),
 		editGroupName: name => dispatch(editGroupName(name)),
 		changeDisplayMode: newMode => dispatch(changeDisplayMode(newMode))
 	};
