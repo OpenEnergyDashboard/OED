@@ -16,7 +16,7 @@ export default class CreateGroupComponent extends React.Component {
 	}
 
 	componentWillMount() {
-		this.props.createNewGroup();
+		this.props.createNewBlankGroup();
 	}
 
 	handleNameChange(e) {
@@ -24,7 +24,7 @@ export default class CreateGroupComponent extends React.Component {
 	}
 
 	handleCreateGroup() {
-		// TODO create group
+		this.props.submitGroupInEditingIfNeeded();
 	}
 
 	handleReturnToView() {
