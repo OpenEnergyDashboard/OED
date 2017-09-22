@@ -6,6 +6,7 @@
 
 import axios from 'axios';
 
+// View and fetching actions
 export const REQUEST_GROUPS_DETAILS = 'REQUEST_GROUPS_DETAILS';
 export const RECEIVE_GROUPS_DETAILS = 'RECEIVE_GROUPS_DETAILS';
 
@@ -16,21 +17,7 @@ export const CHANGE_SELECTED_GROUPS_PER_GROUP = 'CHANGE_SELECTED_GROUPS_PER_GROU
 export const CHANGE_SELECTED_METERS_PER_GROUP = 'CHANGE_SELECTED_METERS_PER_GROUP';
 export const CHANGE_DISPLAYED_GROUPS = 'CHANGE_DISPLAYED_GROUPS';
 
-export const CREATE_NEW_BLANK_GROUP = 'CREATE_NEW_BLANK_GROUP';
-export const BEGIN_EDITING_GROUP = 'BEGIN_EDITING_GROUP';
-export const EDIT_GROUP_NAME = 'EDIT_GROUP_NAME';
-
-export const CHANGE_CHILD_METERS = 'CHANGE_CHILD_METERS';
-export const CHANGE_CHILD_GROUPS = 'CHANGE_CHILD_GROUPS';
-
-export const CHANGE_GROUPS_UI_DISPLAY_MODE = 'CHANGE_GROUPS_UI_DISPLAY_MODE';
-export const MARK_GROUP_IN_EDITING_CLEAN = 'MARK_GROUP_IN_EDITING_CLEAN';
-
-export const MARK_GROUP_IN_EDITING_SUBMITTED = 'MARK_GROUP_IN_EDITING_SUBMITTED';
-export const MARK_GROUP_IN_EDITING_NOT_SUBMITTED = 'MARK_GROUP_IN_EDITING_NOT_SUBMITTED';
-
-export const MARK_GROUPS_BY_ID_OUTDATED = 'MARK_GROUPS_BY_ID_OUTDATED';
-export const MARK_ONE_GROUP_OUTDATED = 'MARK_ONE_GROUP_OUTDATED';
+// Viewing and fetching functions
 
 function requestGroupsDetails() {
 	return { type: REQUEST_GROUPS_DETAILS };
@@ -131,8 +118,35 @@ export function changeSelectedMetersOfGroup(parentID, meterIDs) {
 	return { type: CHANGE_SELECTED_METERS_PER_GROUP, parentID, meterIDs };
 }
 
-export function cancelGroupEditing() {
-	return { type: MARK_GROUP_IN_EDITING_CLEAN };
+
+/*
+ * The following are the action definitions and functions related to creation and editing of groups.
+ * The functions are listed generally in the same order as the related action definitions.
+ */
+export const CHANGE_GROUPS_UI_DISPLAY_MODE = 'CHANGE_GROUPS_UI_DISPLAY_MODE';
+
+export const CREATE_NEW_BLANK_GROUP = 'CREATE_NEW_BLANK_GROUP';
+export const BEGIN_EDITING_GROUP = 'BEGIN_EDITING_GROUP';
+
+export const EDIT_GROUP_NAME = 'EDIT_GROUP_NAME';
+export const CHANGE_CHILD_GROUPS = 'CHANGE_CHILD_GROUPS';
+export const CHANGE_CHILD_METERS = 'CHANGE_CHILD_METERS';
+
+export const MARK_GROUP_IN_EDITING_SUBMITTED = 'MARK_GROUP_IN_EDITING_SUBMITTED';
+export const MARK_GROUP_IN_EDITING_NOT_SUBMITTED = 'MARK_GROUP_IN_EDITING_NOT_SUBMITTED';
+
+export const MARK_GROUP_IN_EDITING_CLEAN = 'MARK_GROUP_IN_EDITING_CLEAN';
+
+export const MARK_GROUPS_BY_ID_OUTDATED = 'MARK_GROUPS_BY_ID_OUTDATED';
+export const MARK_ONE_GROUP_OUTDATED = 'MARK_ONE_GROUP_OUTDATED';
+
+/**
+ * Change the display mode of the groups page
+ * @param newMode Either 'view', 'edit', or 'create'
+ * @return {{type: string, newMode: String}}
+ */
+export function changeDisplayMode(newMode) {
+	return { type: CHANGE_GROUPS_UI_DISPLAY_MODE, newMode };
 }
 
 /**
@@ -143,14 +157,22 @@ export function createNewBlankGroup() {
 	return { type: CREATE_NEW_BLANK_GROUP };
 }
 
+
+// Fire the action to actually overwrite `groupInEditing`
 function beginEditingGroup(groupID) {
 	return { type: BEGIN_EDITING_GROUP, groupID };
 }
 
+// Check if `groupInEditing` is clean (can it be overwritten).
 function canBeginEditing(state) {
 	return !state.groups.groupInEditing.dirty;
 }
 
+/**
+ * Copy the group with the given ID into `groupInEditing` if allowed.
+ * @param groupID The ID of the group to be edited
+ * @return {function(*, *)}
+ */
 export function beginEditingIfPossible(groupID) {
 	return (dispatch, getState) => {
 		if (canBeginEditing(getState())) {
@@ -168,6 +190,7 @@ export function beginEditingIfPossible(groupID) {
 export function editGroupName(newName) {
 	return { type: EDIT_GROUP_NAME, newName };
 }
+
 /**
  * Change the child groups of the group in editing
  * @param groupIDs IDs of the new child groups
@@ -176,7 +199,6 @@ export function editGroupName(newName) {
 export function changeChildGroups(groupIDs) {
 	return { type: CHANGE_CHILD_GROUPS, groupIDs };
 }
-
 /**
  * Change the child meters of the group in editing
  * @param meterIDs IDs of the new set of child meters
@@ -186,14 +208,6 @@ export function changeChildMeters(meterIDs) {
 	return { type: CHANGE_CHILD_METERS, meterIDs };
 }
 
-/**
- * Change the display mode of the groups page
- * @param newMode Either 'view', 'edit', or 'create'
- * @return {{type: string, newMode: String}}
- */
-export function changeDisplayMode(newMode) {
-	return { type: CHANGE_GROUPS_UI_DISPLAY_MODE, newMode };
-}
 
 function markGroupInEditingSubmitted() {
 	return { type: MARK_GROUP_IN_EDITING_SUBMITTED };
@@ -203,10 +217,29 @@ function markGroupInEditingNotSubmitted() {
 	return { type: MARK_GROUP_IN_EDITING_NOT_SUBMITTED };
 }
 
+/**
+ * Use this to cancel group editing and allow `groupInEditing` to be overwritten later.
+ * @return {{type: string}}
+ */
+export function markGroupInEditingClean() {
+	return { type: MARK_GROUP_IN_EDITING_CLEAN };
+}
+
+/*
+ * Mark all the data in `byGroupID` as outdated.
+ * This data is out of date when the name of a group may have changed, or when a group ahs been created.
+ * groupDetails will be re-fetched at the next opportunity.
+ */
 function markGroupsOutdated() {
 	return { type: MARK_GROUPS_BY_ID_OUTDATED };
 }
 
+/*
+ * Mark a single group as outdated.
+ * This data is out of date when its children may have changed.
+ * This is not essential at the moment, but will become essential when we try to limit the number of times we fetch all
+ * groups.
+ */
 function markOneGroupOutdated(groupID) {
 	return { type: MARK_ONE_GROUP_OUTDATED, groupID };
 }
@@ -227,7 +260,7 @@ function submitNewGroup(group) {
 		return axios.post('api/groups/create', group)
 			.then(() => {
 				dispatch(markGroupsOutdated());
-				dispatch(cancelGroupEditing());
+				dispatch(markGroupInEditingClean());
 				dispatch(changeDisplayMode('view'));
 			})
 			.catch(error => {
@@ -244,7 +277,7 @@ function submitGroupEdits(group) {
 			.then(() => {
 				dispatch(markGroupsOutdated());
 				dispatch(markOneGroupOutdated(group.id));
-				dispatch(cancelGroupEditing());
+				dispatch(markGroupInEditingClean());
 				dispatch(changeDisplayMode('view'));
 			})
 			.catch(error => {
