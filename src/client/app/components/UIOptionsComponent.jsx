@@ -4,6 +4,8 @@
 
 import React from 'react';
 import Slider from 'react-rangeslider';
+import { MultiSelect } from 'react-selectize';
+import 'react-selectize/themes/bootstrap3.css';
 import moment from 'moment';
 import 'react-rangeslider/lib/index.css';
 import { chartTypes } from '../reducers/graph';
@@ -35,16 +37,12 @@ export default class UIOptionsComponent extends React.Component {
 		this.props.fetchMetersDetailsIfNeeded();
 	}
 
-	handleMeterSelect(e) {
-		e.preventDefault();
-		const options = e.target.options;
-		const selectedMeters = [];
-		// We can't map here because this is a collection of DOM elements, not an array.
-		for (let i = 0; i < options.length; i++) {
-			if (options[i].selected) {
-				selectedMeters.push(parseInt(options[i].value));
-			}
-		}
+	/**
+	 * Handles a change in meter selection
+	 * @param {Object[]} selection An array of {label: string, value: any} representing the current selection
+	 */
+	handleMeterSelect(selection) {
+		const selectedMeters = selection.map(item => item.value);
 		this.props.selectMeters(selectedMeters);
 	}
 
@@ -81,24 +79,24 @@ export default class UIOptionsComponent extends React.Component {
 		const divPadding = {
 			paddingTop: '35px'
 		};
+		const divBottomPadding = {
+			paddingBottom: '3px'
+		};
+		const multiSelectStyle = {
+			maxWidth: '100%',
+		};
+		const selectOptions = this.props.meters.map(meter => ({ label: meter.name, value: meter.id }));
 		return (
 			<div className="col-xs-2" style={divPadding}>
 				<div className="col-xs-11">
-					<div>
-						<div className="form-group">
-							<p style={labelStyle}>Select meters:</p>
-							<select multiple className="form-control" id="meterList" size="8" onChange={this.handleMeterSelect}>
-								{this.props.meters.map(meter =>
-									<option key={meter.id} value={meter.id}>{meter.name}</option>
-								)}
-							</select>
-						</div>
+					<p style={labelStyle}>Meters:</p>
+					<div style={divBottomPadding}>
+						<MultiSelect options={selectOptions} placeholder="Select Meters" theme="bootstrap3" style={multiSelectStyle} onValuesChange={this.handleMeterSelect} />
 					</div>
 					<p style={labelStyle}>Graph Type:</p>
 					<div className="radio">
 						<label><input type="radio" name="chartTypes" value={chartTypes.line} onChange={this.handleChangeChartType} checked={this.props.chartToRender === chartTypes.line} />Line</label>
-					</div>
-					<div className="radio">
+						&nbsp; &nbsp; { /* For alignment. */ }
 						<label><input type="radio" name="chartTypes" value={chartTypes.bar} onChange={this.handleChangeChartType} checked={this.props.chartToRender === chartTypes.bar} />Bar</label>
 					</div>
 					<div className="checkbox">
