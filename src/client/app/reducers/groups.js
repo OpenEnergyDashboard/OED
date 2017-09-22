@@ -32,6 +32,7 @@ const defaultState = {
  */
 export default function groups(state = defaultState, action) {
 	switch (action.type) {
+		// The following are reducers related to viewing and fetching groups data
 		case groupsActions.REQUEST_GROUPS_DETAILS:
 			return {
 				...state,
@@ -98,6 +99,13 @@ export default function groups(state = defaultState, action) {
 			};
 		}
 
+		case groupsActions.CHANGE_DISPLAYED_GROUPS: {
+			return {
+				...state,
+				selectedGroups: action.groupIDs,
+			};
+		}
+
 		case groupsActions.CHANGE_SELECTED_GROUPS_PER_GROUP: {
 			return {
 				...state,
@@ -124,21 +132,16 @@ export default function groups(state = defaultState, action) {
 			};
 		}
 
-		case groupsActions.CHANGE_DISPLAYED_GROUPS: {
-			return {
-				...state,
-				selectedGroups: action.groupIDs,
-			};
-		}
-
-		case groupsActions.MARK_GROUP_IN_EDITING_CLEAN: {
-			return {
-				...state,
-				groupInEditing: {
-					...state.groupInEditing,
-					dirty: false
-				}
-			};
+		// The following are reducers related to creating and editing groups
+		case groupsActions.CHANGE_GROUPS_UI_DISPLAY_MODE: {
+			const validModes = ['view', 'edit', 'create'];
+			if (_.includes(validModes, action.newMode)) {
+				return {
+					...state,
+					displayMode: action.newMode
+				};
+			}
+			return state;
 		}
 
 		case groupsActions.CREATE_NEW_BLANK_GROUP: {
@@ -155,6 +158,25 @@ export default function groups(state = defaultState, action) {
 						childGroups: [],
 						childMeters: []
 					}
+				};
+			}
+			return state;
+		}
+
+		case groupsActions.BEGIN_EDITING_GROUP: {
+			if (!state.groupInEditing.dirty) {
+				const currentGroup = state.byGroupID[action.groupID];
+				const toEdit = {
+					dirty: false,
+					submitted: false,
+					id: currentGroup.id,
+					name: currentGroup.name,
+					childGroups: currentGroup.childGroups,
+					childMeters: currentGroup.childMeters
+				};
+				return {
+					...state,
+					groupInEditing: toEdit
 				};
 			}
 			return state;
@@ -193,17 +215,6 @@ export default function groups(state = defaultState, action) {
 			};
 		}
 
-		case groupsActions.CHANGE_GROUPS_UI_DISPLAY_MODE: {
-			const validModes = ['view', 'edit', 'create'];
-			if (_.includes(validModes, action.newMode)) {
-				return {
-					...state,
-					displayMode: action.newMode
-				};
-			}
-			return state;
-		}
-
 		case groupsActions.MARK_GROUP_IN_EDITING_SUBMITTED: {
 			return {
 				...state,
@@ -220,6 +231,16 @@ export default function groups(state = defaultState, action) {
 				groupInEditing: {
 					...state.groupInEditing,
 					submitted: false
+				}
+			};
+		}
+
+		case groupsActions.MARK_GROUP_IN_EDITING_CLEAN: {
+			return {
+				...state,
+				groupInEditing: {
+					...state.groupInEditing,
+					dirty: false
 				}
 			};
 		}
@@ -244,24 +265,6 @@ export default function groups(state = defaultState, action) {
 			};
 		}
 
-		case groupsActions.BEGIN_EDITING_GROUP: {
-			if (!state.groupInEditing.dirty) {
-				const currentGroup = state.byGroupID[action.groupID];
-				const toEdit = {
-					dirty: false,
-					submitted: false,
-					id: currentGroup.id,
-					name: currentGroup.name,
-					childGroups: currentGroup.childGroups,
-					childMeters: currentGroup.childMeters
-				};
-				return {
-					...state,
-					groupInEditing: toEdit
-				};
-			}
-			return state;
-		}
 
 		default:
 			return state;
