@@ -5,7 +5,6 @@
  */
 
 import axios from 'axios';
-import _ from 'lodash';
 
 export const REQUEST_GROUPS_DETAILS = 'REQUEST_GROUPS_DETAILS';
 export const RECEIVE_GROUPS_DETAILS = 'RECEIVE_GROUPS_DETAILS';
@@ -30,6 +29,7 @@ export const MARK_GROUP_IN_EDITING_SUBMITTED = 'MARK_GROUP_IN_EDITING_SUBMITTED'
 export const MARK_GROUP_IN_EDITING_NOT_SUBMITTED = 'MARK_GROUP_IN_EDITING_NOT_SUBMITTED';
 
 export const MARK_GROUPS_BY_ID_OUTDATED = 'MARK_GROUPS_BY_ID_OUTDATED';
+export const MARK_ONE_GROUP_OUTDATED = 'MARK_ONE_GROUP_OUTDATED';
 
 function requestGroupsDetails() {
 	return { type: REQUEST_GROUPS_DETAILS };
@@ -48,10 +48,6 @@ function fetchGroupsDetails() {
 				dispatch(receiveGroupsDetails(response.data));
 			});
 	};
-}
-
-function markGroupsOutdated() {
-	return { type: MARK_GROUPS_BY_ID_OUTDATED };
 }
 
 /**
@@ -83,8 +79,8 @@ function receiveGroupChildren(groupID, data) {
 
 function shouldFetchGroupChildren(state, groupID) {
 	const group = state.groups.byGroupID[groupID];
-	// Check that the group has no children of any kind AND that it is not being fetched.
-	return (group.childGroups.length === 0 && group.childMeters.length === 0) && !group.isFetching;
+	// Check that the group is outdated AND that it is not being fetched.
+	return group.outdated && !group.isFetching;
 }
 
 function fetchGroupChildren(groupID) {
@@ -189,6 +185,14 @@ function markGroupInEditingNotSubmitted() {
 	return { type: MARK_GROUP_IN_EDITING_NOT_SUBMITTED };
 }
 
+function markGroupsOutdated() {
+	return { type: MARK_GROUPS_BY_ID_OUTDATED };
+}
+
+function markOneGroupOutdated(groupID) {
+	return { type: MARK_ONE_GROUP_OUTDATED, groupID };
+}
+
 function shouldSubmitGroupInEditing(state) {
 	// Should submit if there are uncommitted changes and they have not already been submitted
 	return state.groups.groupInEditing.dirty && !(state.groups.groupInEditing.submitted);
@@ -219,7 +223,16 @@ function submitGroupEdits(group) {
 	return dispatch => {
 		dispatch(markGroupInEditingSubmitted());
 		return axios.put('api/groups/edit', group)
-			.then(/* process response code */);
+			.then(() => {
+				dispatch(markGroupsOutdated());
+				dispatch(markOneGroupOutdated(group.id));
+				dispatch(cancelGroupEditing());
+				dispatch(changeDisplayMode('view'));
+			})
+			.catch(error => {
+				dispatch(markGroupInEditingNotSubmitted());
+				console.error(error);
+			});
 	};
 }
 

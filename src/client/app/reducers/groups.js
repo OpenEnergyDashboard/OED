@@ -49,6 +49,7 @@ export default function groups(state = defaultState, action) {
 			const newGroups = action.data.map(group => ({
 				...group,
 				isFetching: false,
+				outdated: true,
 				childGroups: [],
 				childMeters: [],
 				selectedGroups: [],
@@ -227,6 +228,19 @@ export default function groups(state = defaultState, action) {
 			return {
 				...state,
 				outdated: true
+			};
+		}
+
+		case groupsActions.MARK_ONE_GROUP_OUTDATED: {
+			return {
+				...state,
+				byGroupID: {
+					...state.byGroupID,
+					[action.groupID]: {
+						...state.byGroupID[action.groupID],
+						outdated: true
+					}
+				}
 			};
 		}
 
