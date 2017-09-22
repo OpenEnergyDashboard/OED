@@ -98,7 +98,7 @@ export default function groups(state = defaultState, action) {
 			};
 		}
 
-		case groupsActions.GROUPSUI_CHANGE_SELECTED_GROUPS_PER_GROUP: {
+		case groupsActions.CHANGE_SELECTED_GROUPS_PER_GROUP: {
 			return {
 				...state,
 				byGroupID: {
@@ -111,7 +111,7 @@ export default function groups(state = defaultState, action) {
 			};
 		}
 
-		case groupsActions.GROUPSUI_CHANGE_SELECTED_METERS_PER_GROUP: {
+		case groupsActions.CHANGE_SELECTED_METERS_PER_GROUP: {
 			return {
 				...state,
 				byGroupID: {
@@ -124,7 +124,7 @@ export default function groups(state = defaultState, action) {
 			};
 		}
 
-		case groupsActions.GROUPSUI_CHANGE_DISPLAYED_GROUPS: {
+		case groupsActions.CHANGE_DISPLAYED_GROUPS: {
 			return {
 				...state,
 				selectedGroups: action.groupIDs,
@@ -193,7 +193,7 @@ export default function groups(state = defaultState, action) {
 			};
 		}
 
-		case groupsActions.GROUPSUI_CHANGE_DISPLAY_MODE: {
+		case groupsActions.CHANGE_GROUPS_UI_DISPLAY_MODE: {
 			const validModes = ['view', 'edit', 'create'];
 			if (_.includes(validModes, action.newMode)) {
 				return {

@@ -12,9 +12,9 @@ export const RECEIVE_GROUPS_DETAILS = 'RECEIVE_GROUPS_DETAILS';
 export const REQUEST_GROUP_CHILDREN = 'REQUEST_GROUP_CHILDREN';
 export const RECEIVE_GROUP_CHILDREN = 'RECEIVE_GROUP_CHILDREN';
 
-export const GROUPSUI_CHANGE_SELECTED_GROUPS_PER_GROUP = 'GROUPSUI_CHANGE_SELECTED_GROUPS_PER_GROUP';
-export const GROUPSUI_CHANGE_SELECTED_METERS_PER_GROUP = 'GROUPSUI_CHANGE_SELECTED_METERS_PER_GROUP';
-export const GROUPSUI_CHANGE_DISPLAYED_GROUPS = 'GROUPSUI_CHANGE_DISPLAYED_GROUPS';
+export const CHANGE_SELECTED_GROUPS_PER_GROUP = 'CHANGE_SELECTED_GROUPS_PER_GROUP';
+export const CHANGE_SELECTED_METERS_PER_GROUP = 'CHANGE_SELECTED_METERS_PER_GROUP';
+export const CHANGE_DISPLAYED_GROUPS = 'CHANGE_DISPLAYED_GROUPS';
 
 export const CREATE_NEW_BLANK_GROUP = 'CREATE_NEW_BLANK_GROUP';
 export const BEGIN_EDITING_GROUP = 'BEGIN_EDITING_GROUP';
@@ -23,7 +23,7 @@ export const EDIT_GROUP_NAME = 'EDIT_GROUP_NAME';
 export const CHANGE_CHILD_METERS = 'CHANGE_CHILD_METERS';
 export const CHANGE_CHILD_GROUPS = 'CHANGE_CHILD_GROUPS';
 
-export const GROUPSUI_CHANGE_DISPLAY_MODE = 'GROUPSUI_CHANGE_DISPLAY_MODE';
+export const CHANGE_GROUPS_UI_DISPLAY_MODE = 'CHANGE_GROUPS_UI_DISPLAY_MODE';
 export const MARK_GROUP_IN_EDITING_CLEAN = 'MARK_GROUP_IN_EDITING_CLEAN';
 
 export const MARK_GROUP_IN_EDITING_SUBMITTED = 'MARK_GROUP_IN_EDITING_SUBMITTED';
@@ -106,7 +106,7 @@ export function fetchGroupChildrenIfNeeded(groupID) {
 }
 
 export function changeDisplayedGroups(groupIDs) {
-	return { type: GROUPSUI_CHANGE_DISPLAYED_GROUPS, groupIDs };
+	return { type: CHANGE_DISPLAYED_GROUPS, groupIDs };
 }
 
 /**
@@ -117,7 +117,7 @@ export function changeDisplayedGroups(groupIDs) {
  * @return {{type: string, groupIDs: *}}
  */
 export function changeSelectedGroupsOfGroup(parentID, groupIDs) {
-	return { type: GROUPSUI_CHANGE_SELECTED_GROUPS_PER_GROUP, parentID, groupIDs };
+	return { type: CHANGE_SELECTED_GROUPS_PER_GROUP, parentID, groupIDs };
 }
 
 /**
@@ -128,7 +128,7 @@ export function changeSelectedGroupsOfGroup(parentID, groupIDs) {
  * @return {{type: string, parentID: *, meterIDs: *}}
  */
 export function changeSelectedMetersOfGroup(parentID, meterIDs) {
-	return { type: GROUPSUI_CHANGE_SELECTED_METERS_PER_GROUP, parentID, meterIDs };
+	return { type: CHANGE_SELECTED_METERS_PER_GROUP, parentID, meterIDs };
 }
 
 export function cancelGroupEditing() {
@@ -192,7 +192,7 @@ export function changeChildMeters(meterIDs) {
  * @return {{type: string, newMode: String}}
  */
 export function changeDisplayMode(newMode) {
-	return { type: GROUPSUI_CHANGE_DISPLAY_MODE, newMode };
+	return { type: CHANGE_GROUPS_UI_DISPLAY_MODE, newMode };
 }
 
 function markGroupInEditingSubmitted() {
