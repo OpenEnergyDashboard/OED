@@ -244,6 +244,25 @@ export default function groups(state = defaultState, action) {
 			};
 		}
 
+		case groupsActions.BEGIN_EDITING_GROUP: {
+			if (!state.groupInEditing.dirty) {
+				const currentGroup = state.byGroupID[action.groupID];
+				const toEdit = {
+					dirty: false,
+					submitted: false,
+					id: currentGroup.id,
+					name: currentGroup.name,
+					childGroups: currentGroup.childGroups,
+					childMeters: currentGroup.childMeters
+				};
+				return {
+					...state,
+					groupInEditing: toEdit
+				};
+			}
+			return state;
+		}
+
 		default:
 			return state;
 	}

@@ -17,6 +17,7 @@ export const GROUPSUI_CHANGE_SELECTED_METERS_PER_GROUP = 'GROUPSUI_CHANGE_SELECT
 export const GROUPSUI_CHANGE_DISPLAYED_GROUPS = 'GROUPSUI_CHANGE_DISPLAYED_GROUPS';
 
 export const CREATE_NEW_BLANK_GROUP = 'CREATE_NEW_BLANK_GROUP';
+export const BEGIN_EDITING_GROUP = 'BEGIN_EDITING_GROUP';
 export const EDIT_GROUP_NAME = 'EDIT_GROUP_NAME';
 
 export const CHANGE_CHILD_METERS = 'CHANGE_CHILD_METERS';
@@ -140,6 +141,23 @@ export function cancelGroupEditing() {
  */
 export function createNewBlankGroup() {
 	return { type: CREATE_NEW_BLANK_GROUP };
+}
+
+function beginEditingGroup(groupID) {
+	return { type: BEGIN_EDITING_GROUP, groupID };
+}
+
+function canBeginEditing(state) {
+	return !state.groups.groupInEditing.dirty;
+}
+
+export function beginEditingIfPossible(groupID) {
+	return (dispatch, getState) => {
+		if (canBeginEditing(getState())) {
+			dispatch(fetchGroupChildrenIfNeeded(groupID));
+			dispatch(beginEditingGroup(groupID));
+		}
+	};
 }
 
 /**
