@@ -157,7 +157,6 @@ export function createNewBlankGroup() {
 	return { type: CREATE_NEW_BLANK_GROUP };
 }
 
-
 // Fire the action to actually overwrite `groupInEditing`
 function beginEditingGroup(groupID) {
 	return { type: BEGIN_EDITING_GROUP, groupID };
@@ -208,17 +207,18 @@ export function changeChildMeters(meterIDs) {
 	return { type: CHANGE_CHILD_METERS, meterIDs };
 }
 
-
+// Record whether or not a request to submit edits to the database has been sent
 function markGroupInEditingSubmitted() {
 	return { type: MARK_GROUP_IN_EDITING_SUBMITTED };
 }
-
 function markGroupInEditingNotSubmitted() {
 	return { type: MARK_GROUP_IN_EDITING_NOT_SUBMITTED };
 }
 
 /**
  * Use this to cancel group editing and allow `groupInEditing` to be overwritten later.
+ * `groupInEditing` is dirty when it is storing changes that have not yet been committed to the database.
+ * It is not clean until a request to store the changes has received a successful response.
  * @return {{type: string}}
  */
 export function markGroupInEditingClean() {
@@ -233,7 +233,6 @@ export function markGroupInEditingClean() {
 function markGroupsOutdated() {
 	return { type: MARK_GROUPS_BY_ID_OUTDATED };
 }
-
 /*
  * Mark a single group as outdated.
  * This data is out of date when its children may have changed.
@@ -250,10 +249,15 @@ function shouldSubmitGroupInEditing(state) {
 }
 
 function creatingNewGroup(state) {
+	// If the group in editing lacks an ID, we are creating a new group
 	return (state.groups.groupInEditing.id === undefined);
 }
 
-
+/*
+ * The `submitNewGroup` and `submitGroupEdits` functions are called by
+ * `submitGroupInEditingIfNeeded` to handle sending the API request
+ * and processing the response.
+ */
 function submitNewGroup(group) {
 	return dispatch => {
 		dispatch(markGroupInEditingSubmitted());
@@ -269,7 +273,6 @@ function submitNewGroup(group) {
 			});
 	};
 }
-
 function submitGroupEdits(group) {
 	return dispatch => {
 		dispatch(markGroupInEditingSubmitted());
@@ -287,6 +290,13 @@ function submitGroupEdits(group) {
 	};
 }
 
+/**
+ * Checks if `groupInEditing` is dirty and not not submitted.
+ * If this is the case, decides whether it is a new group
+ * being created, or an old group being edited, and calls the
+ * appropriate helper function to handle the request.
+ * @return {function(*, *)}
+ */
 export function submitGroupInEditingIfNeeded() {
 	return (dispatch, getState) => {
 		if (shouldSubmitGroupInEditing(getState())) {
