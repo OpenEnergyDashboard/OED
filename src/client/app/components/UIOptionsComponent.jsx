@@ -8,6 +8,7 @@ import moment from 'moment';
 import 'react-rangeslider/lib/index.css';
 import { chartTypes } from '../reducers/graph';
 import ExportContainer from '../containers/ExportContainer';
+import MetersFilterContainer from '../containers/MetersFilterContainer';
 
 
 export default class UIOptionsComponent extends React.Component {
@@ -85,12 +86,19 @@ export default class UIOptionsComponent extends React.Component {
 			<div className="col-xs-2" style={divPadding}>
 				<div className="col-xs-11">
 					<div>
+						<MetersFilterContainer />
 						<div className="form-group">
 							<p style={labelStyle}>Select meters:</p>
 							<select multiple className="form-control" id="meterList" size="8" onChange={this.handleMeterSelect}>
-								{this.props.meters.map(meter =>
-									<option key={meter.id} value={meter.id}>{meter.name}</option>
-								)}
+								{ this.props.meters.map(meter => {
+									// Only return the meters that meet the filter criterion
+									// TODO: If nicknames and descriptions are ever added, this MUST match on those too.
+									if (meter.name.toLowerCase().includes(this.props.filterTerm.toLowerCase())) {
+										return <option key={meter.id} value={meter.id}>{meter.name}</option>;
+									}
+									return null;
+								})
+								}
 							</select>
 						</div>
 					</div>
