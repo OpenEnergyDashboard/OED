@@ -116,6 +116,10 @@ export default class UIOptionsComponent extends React.Component {
 		const divBottomPadding = {
 			paddingBottom: '15px'
 		};
+		const radioButtonInlinePadding = {
+			display: 'inline-block',
+			width: '10px',
+		};
 		const multiSelectStyle = {
 			maxWidth: '100%',
 		};
@@ -138,7 +142,7 @@ export default class UIOptionsComponent extends React.Component {
 					<p style={labelStyle}>Graph Type:</p>
 					<div className="radio">
 						<label><input type="radio" name="chartTypes" value={chartTypes.line} onChange={this.handleChangeChartType} checked={this.props.chartToRender === chartTypes.line} />Line</label>
-						&nbsp; &nbsp; { /* For alignment. */ }
+						<div style={radioButtonInlinePadding} />
 						<label><input type="radio" name="chartTypes" value={chartTypes.bar} onChange={this.handleChangeChartType} checked={this.props.chartToRender === chartTypes.bar} />Bar</label>
 					</div>
 					<div className="checkbox">
