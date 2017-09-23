@@ -114,7 +114,7 @@ export default class UIOptionsComponent extends React.Component {
 			paddingTop: '35px'
 		};
 		const divBottomPadding = {
-			paddingBottom: '3px'
+			paddingBottom: '15px'
 		};
 		const multiSelectStyle = {
 			maxWidth: '100%',
