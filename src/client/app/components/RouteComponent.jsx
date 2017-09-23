@@ -5,7 +5,7 @@
 import React from 'react';
 import { Router, Route, browserHistory } from 'react-router';
 import axios from 'axios';
-import HomeComponent from './HomeComponent';
+import HomeComponent from '../components/HomeComponent';
 import LoginComponent from './LoginComponent';
 import AdminComponent from './AdminComponent';
 import NotFoundComponent from './NotFoundComponent';

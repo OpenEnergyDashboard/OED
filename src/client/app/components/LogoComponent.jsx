@@ -11,10 +11,10 @@ import React from 'react';
  */
 export default function LogoComponent(props) {
 	const imgStyle = {
-		width: '136px',
-		height: '90px',
+		maxWidth: '100%',
+		height: 'auto',
 		top: '10px',
-		left: '30px',
+		// left: '30px',
 		position: 'absolute'
 	};
 	return (
