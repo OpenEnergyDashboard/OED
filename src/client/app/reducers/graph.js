@@ -10,7 +10,8 @@ import * as graphActions from '../actions/graph';
 
 export const chartTypes = {
 	line: 'line',
-	bar: 'bar'
+	bar: 'bar',
+	compare: 'compare'
 };
 
 /**

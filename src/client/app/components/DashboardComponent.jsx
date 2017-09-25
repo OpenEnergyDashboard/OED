@@ -6,6 +6,7 @@ import React from 'react';
 import UIOptionsContainer from '../containers/UIOptionsContainer';
 import LineChartContainer from '../containers/LineChartContainer';
 import BarChartContainer from '../containers/BarChartContainer';
+import CompareChartContainer from '../containers/CompareChartContainer'
 import { chartTypes } from '../reducers/graph';
 
 /**
@@ -15,7 +16,17 @@ export default function DashboardComponent(props) {
 	const divPadding = {
 		paddingTop: '35px'
 	};
-	const ChartToRender = (props.chartToRender === chartTypes.line) ? LineChartContainer : BarChartContainer;
+	let ChartToRender = '';
+	if (props.chartToRender === chartTypes.line) {
+		 ChartToRender = LineChartContainer;
+	}
+	else if (props.chartToRender === chartTypes.compare) {
+		ChartToRender = CompareChartContainer;
+	}
+	else {
+		 ChartToRender = BarChartContainer;
+	}
+
 	return (
 		<div className="container-fluid">
 			<div>
