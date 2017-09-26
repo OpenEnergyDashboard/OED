@@ -18,7 +18,6 @@ export default class GroupComponent extends React.Component {
 	render() {
 		let GroupDisplay = null;
 		if (this.props.displayMode === 'create') {
-
 			GroupDisplay = (
 				<div>
 					<CreateGroupContainer />

@@ -5,6 +5,7 @@
  *
  */
 
+import _ from 'lodash';
 import { connect } from 'react-redux';
 import MeterBoxComponent from '../../components/groups/MeterBoxComponent';
 import { changeSelectedMetersOfGroup, changeChildMeters } from '../../actions/groups';
@@ -29,7 +30,7 @@ function mapStateToProps(state, ownProps) {
 		});
 	}
 
-	return { meters };
+	return { meters: _.sortBy(meters, 'name') };
 }
 
 function mapDispatchToProps(dispatch, ownProps) {

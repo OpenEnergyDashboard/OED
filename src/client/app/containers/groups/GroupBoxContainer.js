@@ -5,13 +5,14 @@
  *
  */
 
+import _ from 'lodash';
 import { connect } from 'react-redux';
 import GroupBoxComponent from '../../components/groups/GroupBoxComponent';
 import { changeSelectedGroupsOfGroup, changeChildGroups } from '../../actions/groups';
 
 function mapStateToProps(state, ownProps) {
 	let groups = null;
-	if (ownProps.groupID) {
+	if (ownProps.parentID) {
 		groups = state.groups.byGroupID[ownProps.parentID].childGroups.map(groupID => {
 			const group = state.groups.byGroupID[groupID];
 			return {
@@ -29,7 +30,9 @@ function mapStateToProps(state, ownProps) {
 		});
 	}
 
-	return { groups };
+	return {
+		groups: _.sortBy(groups, 'name')
+	};
 }
 
 function mapDispatchToProps(dispatch, ownProps) {
