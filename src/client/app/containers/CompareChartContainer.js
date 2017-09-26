@@ -23,21 +23,22 @@ function mapStateToProps(state) {
 	for (const meterID of state.graph.selectedMeters) {
 		const readingsData = state.readings.bar.byMeterID[meterID][timeInterval][barDuration];
 		if (readingsData !== undefined && !readingsData.isFetching) {
-			const color = graphColors.getColor();
+			const color1 = graphColors.getColor();
+			const color2 = graphColors.getColor();
 			data.datasets.push({
 				label: state.meters.byMeterID[meterID].name,
-				data: readingsData.readings.map(arr => arr[1]),
-				backgroundColor: color,
-				hoverBackgroundColor: color
+				data: [readingsData.readings[0][1],readingsData.readings[1][1]],
+				backgroundColor: color1,
+				hoverBackgroundColor: color1
 			});
-            // Add only the unique time intervals to the label set
-			for (const element of _.flatten(readingsData.readings.map(arr => arr[0]))) {
-				labelsSet.add(`${moment(element).format('MMM DD, YYYY, hh:mm a')} - ${moment(element).add(barDuration).format('MMM DD, YYYY, hh:mm a')}`);
-			}
+			// groups readings by meter
+			labelsSet.add(state.meters.byMeterID[meterID].name);
+			console.log(readingsData.readings[0][1]);
+			console.log(readingsData.readings[1][1]);
 		}
 	}
-    // Converts the label set into an array for Chart.js and sorts the labels based on the first date of the time interval
-	data.labels = Array.from(labelsSet).sort((x, y) => moment(x.split(' - ')[0], 'MMM DD, YYYY, hh:mm a').format('x') - moment(y.split(' - ')[0], 'MMM DD, YYYY, hh:mm a').format('x'));
+    //
+	data.labels = Array.from(labelsSet);
 
 	const options = {
 		animation: {
@@ -56,7 +57,7 @@ function mapStateToProps(state) {
 				}
 			}],
 			yAxes: [{
-				stacked: true,
+				stacked: false,
 				scaleLabel: {
 					display: true,
 					labelString: 'kWh'
