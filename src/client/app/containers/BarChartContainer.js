@@ -8,7 +8,6 @@ import _ from 'lodash';
 import { Bar } from 'react-chartjs-2';
 import moment from 'moment';
 import { connect } from 'react-redux';
-import 'chartjs-plugin-zoom';
 import GraphColors from '../utils/GraphColors';
 
 /**

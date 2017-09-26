@@ -4,7 +4,9 @@
 
 import React from 'react';
 import { Link } from 'react-router';
+import { Button } from 'react-bootstrap';
 import LogoComponent from './LogoComponent';
+import UIModalComponent from './UIModalComponent';
 
 /**
  * React component that controls the header strip at the top of all pages
@@ -13,7 +15,7 @@ import LogoComponent from './LogoComponent';
  */
 export default function HeaderComponent(props) {
 	const titleStyle = {
-		display: 'inline-block',
+		display: 'inline-block'
 	};
 	const divRightStyle = {
 		float: 'right',
@@ -29,7 +31,6 @@ export default function HeaderComponent(props) {
 		display: localStorage.getItem('token') ? 'inline' : 'none'
 	};
 	return (
-
 		<div className="container-fluid">
 			<div className="col-xs-4">
 				<Link to="/"><LogoComponent url="./app/images/logo.png" /></Link>
@@ -38,8 +39,11 @@ export default function HeaderComponent(props) {
 				<h1 style={titleStyle}>Open Energy Dashboard</h1>
 			</div>
 			<div style={divRightStyle}>
-				<Link style={loginLinkStyle} to="/login"><button className="btn btn-default">Log in</button></Link>
-				<Link style={adminLinkStyle} to="/admin"><button className="btn btn-default">Admin panel</button></Link>
+				<div className="visible-sm visible-xs">
+					{(props.renderOptionsButton) ? <UIModalComponent /> : null}
+				</div>
+				<Link style={loginLinkStyle} to="/login"><Button bsStyle="default">Log In</Button></Link>
+				<Link style={adminLinkStyle} to="/admin"><Button bsStyle="default">Admin panel</Button></Link>
 			</div>
 		</div>
 	);

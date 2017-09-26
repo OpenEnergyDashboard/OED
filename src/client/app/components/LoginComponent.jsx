@@ -5,7 +5,7 @@
 import React from 'react';
 import axios from 'axios';
 import { browserHistory } from 'react-router';
-import HeaderComponent from './HeaderComponent';
+import HeaderComponent from '../components/HeaderComponent';
 
 export default class LoginComponent extends React.Component {
 	/**
