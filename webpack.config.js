@@ -11,7 +11,7 @@ const APP_DIR = path.resolve(__dirname, 'src/client/app');
 const COMMON_DIR = path.resolve(__dirname, 'src/common');
 
 const config = {
-	entry: ['babel-polyfill', `${APP_DIR}/index.jsx`],
+	entry: ['babel-polyfill', path.resolve(APP_DIR, 'index.jsx')],
 	output: {
 		path: BUILD_DIR,
 		filename: 'bundle.js'
