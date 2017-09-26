@@ -10,10 +10,13 @@ import * as groupsActions from '../actions/groups';
 /**
  * @typedef {Object} State~Groups
  * @property {boolean} isFetching
+ * @property {boolean} outdated
  * @property {Object<number, Object>} byGroupID
+ * @property {Object} groupInEditing
  */
 const defaultState = {
 	isFetching: false,
+	outdated: true,
 	byGroupID: {},
 	selectedGroups: [],
 	groupInEditing: {
@@ -29,6 +32,7 @@ const defaultState = {
  */
 export default function groups(state = defaultState, action) {
 	switch (action.type) {
+		// The following are reducers related to viewing and fetching groups data
 		case groupsActions.REQUEST_GROUPS_DETAILS:
 			return {
 				...state,
@@ -46,6 +50,7 @@ export default function groups(state = defaultState, action) {
 			const newGroups = action.data.map(group => ({
 				...group,
 				isFetching: false,
+				outdated: true,
 				childGroups: [],
 				childMeters: [],
 				selectedGroups: [],
@@ -58,6 +63,7 @@ export default function groups(state = defaultState, action) {
 			return {
 				...state,
 				isFetching: false,
+				outdated: false,
 				byGroupID: newGroupsByID,
 			};
 		}
@@ -93,7 +99,14 @@ export default function groups(state = defaultState, action) {
 			};
 		}
 
-		case groupsActions.GROUPSUI_CHANGE_SELECTED_GROUPS_PER_GROUP: {
+		case groupsActions.CHANGE_DISPLAYED_GROUPS: {
+			return {
+				...state,
+				selectedGroups: action.groupIDs,
+			};
+		}
+
+		case groupsActions.CHANGE_SELECTED_GROUPS_PER_GROUP: {
 			return {
 				...state,
 				byGroupID: {
@@ -106,7 +119,7 @@ export default function groups(state = defaultState, action) {
 			};
 		}
 
-		case groupsActions.GROUPSUI_CHANGE_SELECTED_METERS_PER_GROUP: {
+		case groupsActions.CHANGE_SELECTED_METERS_PER_GROUP: {
 			return {
 				...state,
 				byGroupID: {
@@ -119,25 +132,20 @@ export default function groups(state = defaultState, action) {
 			};
 		}
 
-		case groupsActions.GROUPSUI_CHANGE_DISPLAYED_GROUPS: {
-			return {
-				...state,
-				selectedGroups: action.groupIDs,
-			};
-		}
-
-		case groupsActions.MARK_GROUP_IN_EDITING_CLEAN: {
-			return {
-				...state,
-				groupInEditing: {
-					...state.groupInEditing,
-					dirty: false
-				}
-			};
+		// The following are reducers related to creating and editing groups
+		case groupsActions.CHANGE_GROUPS_UI_DISPLAY_MODE: {
+			const validModes = ['view', 'edit', 'create'];
+			if (_.includes(validModes, action.newMode)) {
+				return {
+					...state,
+					displayMode: action.newMode
+				};
+			}
+			return state;
 		}
 
 		case groupsActions.CREATE_NEW_BLANK_GROUP: {
-			if (state.groupInEditing.dirty) {
+			if (!state.groupInEditing.dirty) {
 				return {
 					...state,
 					groupInEditing: {
@@ -150,6 +158,25 @@ export default function groups(state = defaultState, action) {
 						childGroups: [],
 						childMeters: []
 					}
+				};
+			}
+			return state;
+		}
+
+		case groupsActions.BEGIN_EDITING_GROUP: {
+			if (!state.groupInEditing.dirty) {
+				const currentGroup = state.byGroupID[action.groupID];
+				const toEdit = {
+					dirty: false,
+					submitted: false,
+					id: currentGroup.id,
+					name: currentGroup.name,
+					childGroups: currentGroup.childGroups,
+					childMeters: currentGroup.childMeters
+				};
+				return {
+					...state,
+					groupInEditing: toEdit
 				};
 			}
 			return state;
@@ -188,17 +215,6 @@ export default function groups(state = defaultState, action) {
 			};
 		}
 
-		case groupsActions.GROUPSUI_CHANGE_DISPLAY_MODE: {
-			const validModes = ['view', 'edit', 'create'];
-			if (_.includes(validModes, action.newMode)) {
-				return {
-					...state,
-					displayMode: action.newMode
-				};
-			}
-			return state;
-		}
-
 		case groupsActions.MARK_GROUP_IN_EDITING_SUBMITTED: {
 			return {
 				...state,
@@ -208,6 +224,47 @@ export default function groups(state = defaultState, action) {
 				}
 			};
 		}
+
+		case groupsActions.MARK_GROUP_IN_EDITING_NOT_SUBMITTED: {
+			return {
+				...state,
+				groupInEditing: {
+					...state.groupInEditing,
+					submitted: false
+				}
+			};
+		}
+
+		case groupsActions.MARK_GROUP_IN_EDITING_CLEAN: {
+			return {
+				...state,
+				groupInEditing: {
+					...state.groupInEditing,
+					dirty: false
+				}
+			};
+		}
+
+		case groupsActions.MARK_GROUPS_BY_ID_OUTDATED: {
+			return {
+				...state,
+				outdated: true
+			};
+		}
+
+		case groupsActions.MARK_ONE_GROUP_OUTDATED: {
+			return {
+				...state,
+				byGroupID: {
+					...state.byGroupID,
+					[action.groupID]: {
+						...state.byGroupID[action.groupID],
+						outdated: true
+					}
+				}
+			};
+		}
+
 
 		default:
 			return state;

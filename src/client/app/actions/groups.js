@@ -5,28 +5,19 @@
  */
 
 import axios from 'axios';
-import _ from 'lodash';
 
+// View and fetching actions
 export const REQUEST_GROUPS_DETAILS = 'REQUEST_GROUPS_DETAILS';
 export const RECEIVE_GROUPS_DETAILS = 'RECEIVE_GROUPS_DETAILS';
 
 export const REQUEST_GROUP_CHILDREN = 'REQUEST_GROUP_CHILDREN';
 export const RECEIVE_GROUP_CHILDREN = 'RECEIVE_GROUP_CHILDREN';
 
-export const GROUPSUI_CHANGE_SELECTED_GROUPS_PER_GROUP = 'GROUPSUI_CHANGE_SELECTED_GROUPS_PER_GROUP';
-export const GROUPSUI_CHANGE_SELECTED_METERS_PER_GROUP = 'GROUPSUI_CHANGE_SELECTED_METERS_PER_GROUP';
-export const GROUPSUI_CHANGE_DISPLAYED_GROUPS = 'GROUPSUI_CHANGE_DISPLAYED_GROUPS';
+export const CHANGE_SELECTED_GROUPS_PER_GROUP = 'CHANGE_SELECTED_GROUPS_PER_GROUP';
+export const CHANGE_SELECTED_METERS_PER_GROUP = 'CHANGE_SELECTED_METERS_PER_GROUP';
+export const CHANGE_DISPLAYED_GROUPS = 'CHANGE_DISPLAYED_GROUPS';
 
-export const CREATE_NEW_BLANK_GROUP = 'CREATE_NEW_BLANK_GROUP';
-export const EDIT_GROUP_NAME = 'EDIT_GROUP_NAME';
-
-export const CHANGE_CHILD_METERS = 'CHANGE_CHILD_METERS';
-export const CHANGE_CHILD_GROUPS = 'CHANGE_CHILD_GROUPS';
-
-export const GROUPSUI_CHANGE_DISPLAY_MODE = 'GROUPSUI_CHANGE_DISPLAY_MODE';
-export const MARK_GROUP_IN_EDITING_CLEAN = 'MARK_GROUP_IN_EDITING_CLEAN';
-
-export const MARK_GROUP_IN_EDITING_SUBMITTED = 'MARK_GROUP_IN_EDITING_SUBMITTED';
+// Viewing and fetching functions
 
 function requestGroupsDetails() {
 	return { type: REQUEST_GROUPS_DETAILS };
@@ -47,12 +38,11 @@ function fetchGroupsDetails() {
 	};
 }
 
-
 /**
  * @param {State} state
  */
 function shouldFetchGroupsDetails(state) {
-	return !state.groups.isFetching && _.isEmpty(state.groups.byGroupID);
+	return !state.groups.isFetching && state.groups.outdated;
 }
 
 /**
@@ -77,8 +67,8 @@ function receiveGroupChildren(groupID, data) {
 
 function shouldFetchGroupChildren(state, groupID) {
 	const group = state.groups.byGroupID[groupID];
-	// Check that the group has no children of any kind AND that it is not being fetched.
-	return (group.childGroups.length === 0 && group.childMeters.length === 0) && !group.isFetching;
+	// Check that the group is outdated AND that it is not being fetched.
+	return group.outdated && !group.isFetching;
 }
 
 function fetchGroupChildren(groupID) {
@@ -103,7 +93,7 @@ export function fetchGroupChildrenIfNeeded(groupID) {
 }
 
 export function changeDisplayedGroups(groupIDs) {
-	return { type: GROUPSUI_CHANGE_DISPLAYED_GROUPS, groupIDs };
+	return { type: CHANGE_DISPLAYED_GROUPS, groupIDs };
 }
 
 /**
@@ -114,7 +104,7 @@ export function changeDisplayedGroups(groupIDs) {
  * @return {{type: string, groupIDs: *}}
  */
 export function changeSelectedGroupsOfGroup(parentID, groupIDs) {
-	return { type: GROUPSUI_CHANGE_SELECTED_GROUPS_PER_GROUP, parentID, groupIDs };
+	return { type: CHANGE_SELECTED_GROUPS_PER_GROUP, parentID, groupIDs };
 }
 
 /**
@@ -125,11 +115,38 @@ export function changeSelectedGroupsOfGroup(parentID, groupIDs) {
  * @return {{type: string, parentID: *, meterIDs: *}}
  */
 export function changeSelectedMetersOfGroup(parentID, meterIDs) {
-	return { type: GROUPSUI_CHANGE_SELECTED_METERS_PER_GROUP, parentID, meterIDs };
+	return { type: CHANGE_SELECTED_METERS_PER_GROUP, parentID, meterIDs };
 }
 
-export function cancelGroupEditing() {
-	return { type: MARK_GROUP_IN_EDITING_CLEAN };
+
+/*
+ * The following are the action definitions and functions related to creation and editing of groups.
+ * The functions are listed generally in the same order as the related action definitions.
+ */
+export const CHANGE_GROUPS_UI_DISPLAY_MODE = 'CHANGE_GROUPS_UI_DISPLAY_MODE';
+
+export const CREATE_NEW_BLANK_GROUP = 'CREATE_NEW_BLANK_GROUP';
+export const BEGIN_EDITING_GROUP = 'BEGIN_EDITING_GROUP';
+
+export const EDIT_GROUP_NAME = 'EDIT_GROUP_NAME';
+export const CHANGE_CHILD_GROUPS = 'CHANGE_CHILD_GROUPS';
+export const CHANGE_CHILD_METERS = 'CHANGE_CHILD_METERS';
+
+export const MARK_GROUP_IN_EDITING_SUBMITTED = 'MARK_GROUP_IN_EDITING_SUBMITTED';
+export const MARK_GROUP_IN_EDITING_NOT_SUBMITTED = 'MARK_GROUP_IN_EDITING_NOT_SUBMITTED';
+
+export const MARK_GROUP_IN_EDITING_CLEAN = 'MARK_GROUP_IN_EDITING_CLEAN';
+
+export const MARK_GROUPS_BY_ID_OUTDATED = 'MARK_GROUPS_BY_ID_OUTDATED';
+export const MARK_ONE_GROUP_OUTDATED = 'MARK_ONE_GROUP_OUTDATED';
+
+/**
+ * Change the display mode of the groups page
+ * @param newMode Either 'view', 'edit', or 'create'
+ * @return {{type: string, newMode: String}}
+ */
+export function changeDisplayMode(newMode) {
+	return { type: CHANGE_GROUPS_UI_DISPLAY_MODE, newMode };
 }
 
 /**
@@ -140,6 +157,30 @@ export function createNewBlankGroup() {
 	return { type: CREATE_NEW_BLANK_GROUP };
 }
 
+// Fire the action to actually overwrite `groupInEditing`
+function beginEditingGroup(groupID) {
+	return { type: BEGIN_EDITING_GROUP, groupID };
+}
+
+// Check if `groupInEditing` is clean (can it be overwritten).
+function canBeginEditing(state) {
+	return !state.groups.groupInEditing.dirty;
+}
+
+/**
+ * Copy the group with the given ID into `groupInEditing` if allowed.
+ * @param groupID The ID of the group to be edited
+ * @return {function(*, *)}
+ */
+export function beginEditingIfPossible(groupID) {
+	return (dispatch, getState) => {
+		if (canBeginEditing(getState())) {
+			dispatch(fetchGroupChildrenIfNeeded(groupID));
+			dispatch(beginEditingGroup(groupID));
+		}
+	};
+}
+
 /**
  * Change the name of the group in editing
  * @param newName The new name
@@ -148,6 +189,7 @@ export function createNewBlankGroup() {
 export function editGroupName(newName) {
 	return { type: EDIT_GROUP_NAME, newName };
 }
+
 /**
  * Change the child groups of the group in editing
  * @param groupIDs IDs of the new child groups
@@ -156,7 +198,6 @@ export function editGroupName(newName) {
 export function changeChildGroups(groupIDs) {
 	return { type: CHANGE_CHILD_GROUPS, groupIDs };
 }
-
 /**
  * Change the child meters of the group in editing
  * @param meterIDs IDs of the new set of child meters
@@ -166,17 +207,40 @@ export function changeChildMeters(meterIDs) {
 	return { type: CHANGE_CHILD_METERS, meterIDs };
 }
 
-/**
- * Change the display mode of the groups page
- * @param newMode Either 'view', 'edit', or 'create'
- * @return {{type: string, newMode: String}}
- */
-export function changeDisplayMode(newMode) {
-	return { type: GROUPSUI_CHANGE_DISPLAY_MODE, newMode };
-}
-
+// Record whether or not a request to submit edits to the database has been sent
 function markGroupInEditingSubmitted() {
 	return { type: MARK_GROUP_IN_EDITING_SUBMITTED };
+}
+function markGroupInEditingNotSubmitted() {
+	return { type: MARK_GROUP_IN_EDITING_NOT_SUBMITTED };
+}
+
+/**
+ * Use this to cancel group editing and allow `groupInEditing` to be overwritten later.
+ * `groupInEditing` is dirty when it is storing changes that have not yet been committed to the database.
+ * It is not clean until a request to store the changes has received a successful response.
+ * @return {{type: string}}
+ */
+export function markGroupInEditingClean() {
+	return { type: MARK_GROUP_IN_EDITING_CLEAN };
+}
+
+/*
+ * Mark all the data in `byGroupID` as outdated.
+ * This data is out of date when the name of a group may have changed, or when a group ahs been created.
+ * groupDetails will be re-fetched at the next opportunity.
+ */
+function markGroupsOutdated() {
+	return { type: MARK_GROUPS_BY_ID_OUTDATED };
+}
+/*
+ * Mark a single group as outdated.
+ * This data is out of date when its children may have changed.
+ * This is not essential at the moment, but will become essential when we try to limit the number of times we fetch all
+ * groups.
+ */
+function markOneGroupOutdated(groupID) {
+	return { type: MARK_ONE_GROUP_OUTDATED, groupID };
 }
 
 function shouldSubmitGroupInEditing(state) {
@@ -185,25 +249,54 @@ function shouldSubmitGroupInEditing(state) {
 }
 
 function creatingNewGroup(state) {
+	// If the group in editing lacks an ID, we are creating a new group
 	return (state.groups.groupInEditing.id === undefined);
 }
 
+/*
+ * The `submitNewGroup` and `submitGroupEdits` functions are called by
+ * `submitGroupInEditingIfNeeded` to handle sending the API request
+ * and processing the response.
+ */
 function submitNewGroup(group) {
 	return dispatch => {
 		dispatch(markGroupInEditingSubmitted());
 		return axios.post('api/groups/create', group)
-			.then(/* process response code */);
+			.then(() => {
+				dispatch(markGroupsOutdated());
+				dispatch(markGroupInEditingClean());
+				dispatch(changeDisplayMode('view'));
+			})
+			.catch(error => {
+				dispatch(markGroupInEditingNotSubmitted());
+				console.error(error);
+			});
 	};
 }
-
 function submitGroupEdits(group) {
 	return dispatch => {
 		dispatch(markGroupInEditingSubmitted());
 		return axios.put('api/groups/edit', group)
-			.then(/* process response code */);
+			.then(() => {
+				dispatch(markGroupsOutdated());
+				dispatch(markOneGroupOutdated(group.id));
+				dispatch(markGroupInEditingClean());
+				dispatch(changeDisplayMode('view'));
+			})
+			.catch(error => {
+				dispatch(markGroupInEditingNotSubmitted());
+				console.error(error);
+			});
 	};
 }
 
+/**
+ * Checks if `groupInEditing` is dirty and not not submitted.
+ * If this is the case, decides whether it is a new group
+ * being created, or an old group being edited, and calls the
+ * appropriate helper function to handle the request.
+ * @return {function(*, *)}
+ */
 export function submitGroupInEditingIfNeeded() {
 	return (dispatch, getState) => {
 		if (shouldSubmitGroupInEditing(getState())) {

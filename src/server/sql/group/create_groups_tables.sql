@@ -4,7 +4,7 @@
 
 CREATE TABLE groups (
 	id SERIAL PRIMARY KEY NOT NULL,
-	name VARCHAR(50) UNIQUE NOT NULL
+	name VARCHAR(50) UNIQUE NOT NULL CHECK (char_length(name) >= 1)
 );
 
 /*
