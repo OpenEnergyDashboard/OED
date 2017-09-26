@@ -4,11 +4,9 @@
 
 import React from 'react';
 import Slider from 'react-rangeslider';
-import { MultiSelect } from 'react-selectize';
-import 'react-selectize/themes/bootstrap3.css';
 import moment from 'moment';
 import 'react-rangeslider/lib/index.css';
-import '../styles/react-selectize-css.css';
+import MultiSelectComponent from './MultiSelectComponent';
 import { chartTypes } from '../reducers/graph';
 import ExportContainer from '../containers/ExportContainer';
 import { DATA_TYPE_METER, metersFilterReduce } from '../utils/Datasources';
@@ -45,6 +43,7 @@ export default class UIOptionsComponent extends React.Component {
 	handleDatasourceSelect(selection) {
 		// Only load meters
 		const selectedMeters = selection.reduce(metersFilterReduce, []);
+		console.log(selectedMeters);
 		this.props.selectMeters(selectedMeters);
 		// Only load groups
 		// TODO: Uncomment when groups graphing is implemented
@@ -92,9 +91,6 @@ export default class UIOptionsComponent extends React.Component {
 			display: 'inline-block',
 			width: '10px',
 		};
-		const multiSelectStyle = {
-			maxWidth: '100%',
-		};
 
 		// Construct the options of the MultiSelect. Because value can be any JavaScript object, here we load it with both the type
 		// and ID. Currently this is useless, but when groups graphing is introduced it will be important
@@ -104,12 +100,14 @@ export default class UIOptionsComponent extends React.Component {
 				value: meter.id,
 			}
 		));
+
+
 		return (
 			<div className="col-xs-2" style={divPadding}>
 				<div className="col-xs-11">
 					<p style={labelStyle}>Meters:</p>
 					<div style={divBottomPadding}>
-						<MultiSelect options={selectOptions} placeholder="Select Meters" theme="bootstrap3" style={multiSelectStyle} onValuesChange={this.handleDatasourceSelect} />
+						<MultiSelectComponent options={selectOptions} placeholder="Select Meters" onValuesChange={this.handleDatasourceSelect} />
 					</div>
 					<p style={labelStyle}>Graph Type:</p>
 					<div className="radio">
