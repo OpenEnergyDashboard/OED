@@ -8,6 +8,7 @@ import { MultiSelect } from 'react-selectize';
 import 'react-selectize/themes/bootstrap3.css';
 import moment from 'moment';
 import 'react-rangeslider/lib/index.css';
+import '../styles/react-selectize-css.css';
 import { chartTypes } from '../reducers/graph';
 import ExportContainer from '../containers/ExportContainer';
 import { DATA_TYPE_METER, metersFilterReduce } from '../utils/Datasources';

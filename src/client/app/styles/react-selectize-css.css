@@ -1,0 +1,4 @@
+.react-selectize.root-node .react-selectize-control {
+	max-height: 200px;
+	overflow-y: scroll;
+}
