@@ -20,23 +20,29 @@ function mapStateToProps(state) {
 	const graphColors = new GraphColors();
 
 	const labelsSet = new Set();
+	const timeSet = new Set();
 	for (const meterID of state.graph.selectedMeters) {
 		const readingsData = state.readings.bar.byMeterID[meterID][timeInterval][barDuration];
 		if (readingsData !== undefined && !readingsData.isFetching) {
+			for (const element of _.flatten(readingsData.readings.map(arr => arr[0]))) {
+				timeSet.add(`${moment(element).format('MMM DD, YYYY, hh:mm a')} - ${moment(element).add(barDuration).format('MMM DD, YYYY, hh:mm a')}`);
+			}
 			const color1 = graphColors.getColor();
 			const color2 = graphColors.getColor();
 			data.datasets.push({
-				label: readingsData.readings.map(arr => arr[0]),
+				label: Array.from(timeSet)[0],
 				data: [readingsData.readings[0][1]],
 				backgroundColor: color1,
 				hoverBackgroundColor: color1
 			},
 				{
-					label: readingsData.readings.map(arr => arr[0]),
+					label: Array.from(timeSet)[1],
 					data: [readingsData.readings[1][1]],
 					backgroundColor: color2,
 					hoverBackgroundColor: color2
 				});
+			//sorts the data so that one doesn't cover up the other
+			data.datasets.sort((a, b) => a.data[0] - b.data[0]);
 
 			// groups readings by meter
 			labelsSet.add(state.meters.byMeterID[meterID].name);
@@ -62,7 +68,7 @@ function mapStateToProps(state) {
 				}
 			}],
 			yAxes: [{
-				stacked: true,
+				stacked: false,
 				scaleLabel: {
 					display: true,
 					labelString: 'kWh'
