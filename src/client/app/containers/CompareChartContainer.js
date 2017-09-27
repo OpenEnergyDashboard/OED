@@ -26,15 +26,20 @@ function mapStateToProps(state) {
 			const color1 = graphColors.getColor();
 			const color2 = graphColors.getColor();
 			data.datasets.push({
-				label: state.meters.byMeterID[meterID].name,
-				data: [readingsData.readings[0][1],readingsData.readings[1][1]],
+				label: readingsData.readings.map(arr => arr[0]),
+				data: [readingsData.readings[0][1]],
 				backgroundColor: color1,
 				hoverBackgroundColor: color1
-			});
+			},
+				{
+					label: readingsData.readings.map(arr => arr[0]),
+					data: [readingsData.readings[1][1]],
+					backgroundColor: color2,
+					hoverBackgroundColor: color2
+				});
+
 			// groups readings by meter
 			labelsSet.add(state.meters.byMeterID[meterID].name);
-			console.log(readingsData.readings[0][1]);
-			console.log(readingsData.readings[1][1]);
 		}
 	}
     //
@@ -51,13 +56,13 @@ function mapStateToProps(state) {
 		},
 		scales: {
 			xAxes: [{
-				stacked: false,
+				stacked: true,
 				gridLines: {
 					display: true
 				}
 			}],
 			yAxes: [{
-				stacked: false,
+				stacked: true,
 				scaleLabel: {
 					display: true,
 					labelString: 'kWh'
