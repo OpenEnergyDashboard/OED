@@ -24,6 +24,7 @@ function mapStateToProps(state) {
 	for (const meterID of state.graph.selectedMeters) {
 		const readingsData = state.readings.bar.byMeterID[meterID][timeInterval][barDuration];
 		if (readingsData !== undefined && !readingsData.isFetching) {
+		    // Converts unix time stamp to something nicer
 			for (const element of _.flatten(readingsData.readings.map(arr => arr[0]))) {
 				timeSet.add(`${moment(element).format('MMM DD, YYYY, hh:mm a')} - ${moment(element).add(barDuration).format('MMM DD, YYYY, hh:mm a')}`);
 			}
@@ -41,7 +42,7 @@ function mapStateToProps(state) {
 					backgroundColor: color2,
 					hoverBackgroundColor: color2
 				});
-			//sorts the data so that one doesn't cover up the other
+			// sorts the data so that one doesn't cover up the other
 			data.datasets.sort((a, b) => a.data[0] - b.data[0]);
 
 			// groups readings by meter
