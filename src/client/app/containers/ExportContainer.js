@@ -19,12 +19,8 @@ function mapStateToProps(state) {
 
 	for (const meterID of state.graph.selectedMeters) {
 		if (chart === chartTypes.line) {
-			if (state.readings.line.byMeterID[meterID] === undefined) {
-				console.warn('state.reading.line.byMeterID[', meterID, '] is UNDEFINED (in ExportContainer)');
-			} else {
-				readingsData = state.readings.line.byMeterID[meterID][timeInterval];
-			}
-		} else if (chart === chartTypes.bar) { readingsData = state.readings.bar.byMeterID[meterID][timeInterval][barDuration]; }
+			readingsData = state.readings.line.byMeterID[meterID][timeInterval];
+		}		else if (chart === chartTypes.bar) { readingsData = state.readings.bar.byMeterID[meterID][timeInterval][barDuration]; }
 		if (readingsData !== undefined && !readingsData.isFetching && chart === chartTypes.line) {
 			data.datasets.push({
 				label: state.meters.byMeterID[meterID].name,

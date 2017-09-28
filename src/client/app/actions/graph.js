@@ -43,11 +43,9 @@ export function changeBarDuration(barDuration) {
 
 export function changeSelectedMeters(meterIDs) {
 	return (dispatch, getState) => {
-		console.log("dispatch function from changeSelectedMeters")
 		dispatch(updateSelectedMeters(meterIDs));
 		// Nesting dispatches to preserve that updateSelectedMeters() is called before fetching readings
 		dispatch(dispatch2 => {
-			console.log("dispatch2 function from changeSelectedMeters");
 			dispatch2(fetchNeededLineReadings(getState().graph.timeInterval));
 			dispatch2(fetchNeededBarReadings(getState().graph.timeInterval));
 		});

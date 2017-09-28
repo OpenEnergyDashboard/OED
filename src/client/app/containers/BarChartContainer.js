@@ -22,9 +22,6 @@ function mapStateToProps(state) {
 
 	const labelsSet = new Set();
 	for (const meterID of state.graph.selectedMeters) {
-		if (state.readings.line.byMeterID[meterID] === undefined) {
-			console.log('UNDEFINED in BarChartContainer for meterID ', meterID);
-		}
 		const readingsData = state.readings.bar.byMeterID[meterID][timeInterval][barDuration];
 		if (readingsData !== undefined && !readingsData.isFetching) {
 			const color = graphColors.getColor();
