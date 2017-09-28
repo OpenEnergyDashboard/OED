@@ -18,6 +18,11 @@ export default class RouteComponent extends React.Component {
 		this.requireAuth = this.requireAuth.bind(this);
 	}
 
+	shouldComponentUpdate() {
+		// To ignore warning: [react-router] You cannot change 'Router routes'; it will be ignored
+		return false;
+	}
+
 	componentWillReceiveProps(nextProps) {
 		if (!_.isEmpty(nextProps.notification)) {
 			this.notificationSystem.addNotification(nextProps.notification);

@@ -51,14 +51,19 @@ export default class LoginComponent extends React.Component {
 			localStorage.setItem('token', response.data.token);
 			browserHistory.push('/admin');
 		})
-		.catch(() => {
+		.catch(err => {
+			if (err.response.status === 401) {
+				this.props.showNotification({
+					message: 'Invalid email/password combination',
+					level: 'error',
+					position: 'tr',
+					autoDismiss: 3
+				});
+			} else {
+				console.error(err);
+			}
 			this.inputEmail.focus();
-			this.props.sendNotification({
-				message: 'Invalid email/password combination',
-				level: 'error',
-				position: 'tr',
-				autoDismiss: 3
-			});
+
 		});
 		this.setState({ email: '', password: '' });
 	}

@@ -4,15 +4,15 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/.
  */
 
-export const SEND_NOTIFICATION = 'SEND_NOTIFICATION';
+export const SHOW_NOTIFICATION = 'SHOW_NOTIFICATION';
 export const CLEAR_NOTIFICATIONS = 'CLEAR_NOTIFICATIONS';
 
 /**
  * @param notification object containing { message, level, position, autoDismiss }
  * @returns {{type: string, notification: *}}
  */
-export function sendNotification(notification) {
-	return { type: SEND_NOTIFICATION, notification };
+export function showNotification(notification) {
+	return { type: SHOW_NOTIFICATION, notification };
 }
 
 export function clearNotifications() {

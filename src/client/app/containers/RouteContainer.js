@@ -6,12 +6,12 @@
 
 import { connect } from 'react-redux';
 import RouteComponent from '../components/RouteComponent';
-import { clearNotifications } from '../actions/topLevel';
+import { clearNotifications } from '../actions/notifications';
 
 
 function mapStateToProps(state) {
 	return {
-		notification: state.topLevel.notification,
+		notification: state.notifications.notification,
 	};
 }
 

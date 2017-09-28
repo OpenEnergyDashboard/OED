@@ -4,11 +4,11 @@
 
 import { connect } from 'react-redux';
 import LoginComponent from '../components/LoginComponent';
-import { sendNotification } from '../actions/topLevel';
+import { showNotification } from '../actions/notifications';
 
 function mapDispatchToProps(dispatch) {
 	return {
-		sendNotification: notification => dispatch(sendNotification(notification))
+		showNotification: notification => dispatch(showNotification(notification))
 	};
 }
 

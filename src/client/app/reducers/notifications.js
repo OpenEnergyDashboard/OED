@@ -4,7 +4,7 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/.
  */
 
-import * as topLevelActions from '../actions/topLevel';
+import * as topLevelActions from '../actions/notifications';
 
 const defaultState = {
 	notification: {}
@@ -12,7 +12,7 @@ const defaultState = {
 
 export default function topLevel(state = defaultState, action) {
 	switch (action.type) {
-		case topLevelActions.SEND_NOTIFICATION:
+		case topLevelActions.SHOW_NOTIFICATION:
 			return {
 				...state,
 				notification: action.notification
