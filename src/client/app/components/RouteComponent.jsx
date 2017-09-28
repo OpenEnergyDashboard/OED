@@ -10,7 +10,6 @@ import LoginComponent from './LoginComponent';
 import AdminComponent from './AdminComponent';
 import NotFoundComponent from './NotFoundComponent';
 import GroupContainer from '../containers/groups/GroupMainContainer';
-import EditGroupComponent from './groups/EditGroupComponent';
 
 /**
  * Middleware function that requires proper authentication for a page route
@@ -52,7 +51,6 @@ export default function RouteComponent() {
 			<Route path="/login" component={LoginComponent} />
 			<Route path="/admin" component={AdminComponent} onEnter={requireAuth} />
 			<Route path="/groups" component={GroupContainer} onEnter={requireAuth} />
-			<Route path="/editGroup" component={EditGroupComponent} />
 			<Route path="*" component={NotFoundComponent} />
 		</Router>
 	);

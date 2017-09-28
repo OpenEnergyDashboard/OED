@@ -19,7 +19,8 @@ export default class GroupViewComponent extends React.Component {
 	}
 
 	handleEditGroup() {
-		// TODO edit group with id this.props.id
+		this.props.changeDisplayMode('edit');
+		this.props.beginEditingIfPossible(this.props.id);
 	}
 
 	render() {
