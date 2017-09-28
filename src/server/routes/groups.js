@@ -3,9 +3,10 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
 
 const express = require('express');
-const Group = require('../models/Group');
-
 const _ = require('lodash');
+const validate = require('jsonschema').validate;
+
+const Group = require('../models/Group');
 
 const router = express.Router();
 
@@ -71,6 +72,37 @@ router.get('/deep/meters/:group_id', async (req, res) => {
 });
 
 router.post('/create', async (req, res) => {
+	const validGroup = {
+		type: 'object',
+		minProperties: 3,
+		maxProperties: 3,
+		required: ['name', 'childGroups', 'childMeters'],
+		properties: {
+			name: {
+				type: 'string',
+				minLength: 1,
+			},
+			childGroups: {
+				type: 'array',
+				uniqueItems: true,
+				items: {
+					type: 'integer'
+				},
+			},
+			childMeters: {
+				type: 'array',
+				uniqueItems: true,
+				items: {
+					type: 'integer'
+				},
+			}
+		}
+	};
+
+	if (!validate(req.body, validGroup).valid) {
+		res.status(400);
+	}
+
 	try {
 		const newGroup = new Group(undefined, req.body.name);
 		await newGroup.insert();
@@ -85,6 +117,40 @@ router.post('/create', async (req, res) => {
 });
 
 router.put('/edit', async (req, res) => {
+	const validGroup = {
+		type: 'object',
+		minProperties: 4,
+		maxProperties: 4,
+		required: ['id', 'name', 'childGroups', 'childMeters'],
+		properties: {
+			id: {
+				type: 'integer'
+			},
+			name: {
+				type: 'string',
+				minLength: 1,
+			},
+			childGroups: {
+				type: 'array',
+				uniqueItems: true,
+				items: {
+					type: 'integer'
+				},
+			},
+			childMeters: {
+				type: 'array',
+				uniqueItems: true,
+				items: {
+					type: 'integer'
+				},
+			}
+		}
+	};
+
+	if (!validate(req.body, validGroup).valid) {
+		res.status(400);
+	}
+
 	try {
 		const currentGroup = Group.getByID(req.body.id);
 		if (req.body.name !== currentGroup.name) {
