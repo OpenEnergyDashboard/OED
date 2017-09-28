@@ -51,7 +51,15 @@ export default class LoginComponent extends React.Component {
 			localStorage.setItem('token', response.data.token);
 			browserHistory.push('/admin');
 		})
-		.catch(console.error);
+		.catch(() => {
+			this.inputEmail.focus();
+			this.props.sendNotification({
+				message: 'Invalid email/password combination',
+				level: 'error',
+				position: 'tr',
+				autoDismiss: 3
+			});
+		});
 		this.setState({ email: '', password: '' });
 	}
 
@@ -73,7 +81,7 @@ export default class LoginComponent extends React.Component {
 				<form style={formStyle} onSubmit={this.handleSubmit}>
 					<div className="input-group">
 						<span className="input-group-addon"><i className="glyphicon glyphicon-user" /></span>
-						<input type="text" className="form-control" placeholder="Email" value={this.state.email} onChange={this.handleEmailChange} />
+						<input type="text" className="form-control" placeholder="Email" ref={c => { this.inputEmail = c; }} value={this.state.email} onChange={this.handleEmailChange} />
 					</div>
 					<div className="input-group">
 						<span className="input-group-addon"><i className="glyphicon glyphicon-lock" /></span>
