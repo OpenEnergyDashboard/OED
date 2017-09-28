@@ -14,29 +14,38 @@ import '../styles/react-selectize-css.css';
 export default class MultiSelectComponent extends React.Component {
 	constructor(props) {
 		super(props);
-		this.onValuesChange = this.onValuesChange.bind(this);
+		this.onValuesChangeInternal = this.onValuesChangeInternal.bind(this);
+		this.onValuesAdd = this.onValuesAdd.bind(this);
+		this.onValuesRemove = this.onValuesRemove.bind(this);
 		this.buildRemoveItemFromSelected = this.buildRemoveItemFromSelected.bind(this);
 		this.renderValue = this.renderValue.bind(this);
 		// selectedOptions holds a list of the options that have been selected
 		this.state = { selectedOptions: [] };
-		this.style = { ...this.props.style, maxWidth: '120%' };
+		this.style = { ...this.props.style, maxWidth: '140%' };
 	}
 
-	onValuesChange(items) {
+	onValuesAdd(items) {
+		const newItems = _.filter(items, () => true)
+		this.onValuesChangeInternal('Added an item', newItems);
+	}
+	onValuesRemove(items) { this.onValuesChangeInternal('Removed an item', items); }
+
+	onValuesChangeInternal(reason, items) {
+		console.log(`${reason} ... onValuesChangeInternal(`, items, ')');
 		// Defer to the underlying MultiSelect when it has a state change
 		// Note that the MSC state selectedOptions is in fact the canonical source of truth
 		this.setState({ selectedOptions: items });
-		// Propagate the event
 		this.props.onValuesChange(items);
 	}
 
+	// Returns a function that removes the given item from the current selection
 	buildRemoveItemFromSelected(item) {
 		// Remove only the item(s) with the same value as the given item
-		return () => {
-			const newSelectedOptions = _.reject(this.state.selectedOptions, candidate => item.value === candidate.value && item.type === candidate.type);
-			// Inform both the parent and the underlying MultiSelect that something changed ("bilateral dispatch")
-			this.onValuesChange(newSelectedOptions);
-		};
+		return (() => {
+			const newSelectedOptions = _.reject(this.state.selectedOptions,
+					candidate => item.value === candidate.value && item.type === candidate.type);
+			this.onValuesRemove(newSelectedOptions);
+		});
 	}
 
 	renderValue(item) {
@@ -54,7 +63,7 @@ export default class MultiSelectComponent extends React.Component {
 
 	render() {
 		return (
-			<MultiSelect theme="bootstrap3" placeholder={this.props.placeholder} style={this.style} onValuesChange={this.onValuesChange} renderValue={this.renderValue} options={this.props.options} values={this.state.selectedOptions} />
+			<MultiSelect theme="bootstrap3" placeholder={this.props.placeholder} style={this.style} onValuesChange={this.onValuesAdd} renderValue={this.renderValue} options={this.props.options} values={this.state.selectedOptions} />
 		);
 	}
 }

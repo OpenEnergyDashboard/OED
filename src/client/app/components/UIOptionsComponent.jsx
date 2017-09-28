@@ -43,7 +43,7 @@ export default class UIOptionsComponent extends React.Component {
 	handleDatasourceSelect(selection) {
 		// Only load meters
 		const selectedMeters = selection.reduce(metersFilterReduce, []);
-		console.log(selectedMeters);
+		console.log("handleDatasourceSelect(" + selection + ") -> this.props.selectMeters(" + selectedMeters + ")");
 		this.props.selectMeters(selectedMeters);
 		// Only load groups
 		// TODO: Uncomment when groups graphing is implemented
