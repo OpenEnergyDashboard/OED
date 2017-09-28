@@ -99,7 +99,7 @@ router.post('/create', async (req, res) => {
 	};
 
 	if (!validate(req.body, validGroup).valid) {
-		res.status(400);
+		res.sendStatus(400);
 	}
 
 	try {
@@ -146,7 +146,7 @@ router.put('/edit', async (req, res) => {
 	};
 
 	if (!validate(req.body, validGroup).valid) {
-		res.status(400);
+		res.sendStatus(400);
 	}
 
 	try {
@@ -183,6 +183,26 @@ router.put('/edit', async (req, res) => {
 		res.sendStatus(200);
 	} catch (err) {
 		console.error(`Error while editing existing group: ${err}`); // eslint-disable-line no-console
+		res.sendStatus(500);
+	}
+});
+
+router.delete('/delete', async (req, res) => {
+	const validParams = {
+		type: 'object',
+		maxProperties: 1,
+		required: ['id'],
+		properties: {
+			id: { type: 'integer' }
+		}
+	};
+	if (!validate(req.body, validParams).valid) {
+		res.sendStatus(400);
+	}
+	try {
+		await Group.delete(req.body.id);
+	} catch (err) {
+		console.error(`Error while deleting group ${err}`); // eslint-disable-line no-console
 		res.sendStatus(500);
 	}
 });
