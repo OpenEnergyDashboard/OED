@@ -74,7 +74,6 @@ router.get('/deep/meters/:group_id', async (req, res) => {
 router.post('/create', async (req, res) => {
 	const validGroup = {
 		type: 'object',
-		minProperties: 3,
 		maxProperties: 3,
 		required: ['name', 'childGroups', 'childMeters'],
 		properties: {
@@ -119,7 +118,6 @@ router.post('/create', async (req, res) => {
 router.put('/edit', async (req, res) => {
 	const validGroup = {
 		type: 'object',
-		minProperties: 4,
 		maxProperties: 4,
 		required: ['id', 'name', 'childGroups', 'childMeters'],
 		properties: {
