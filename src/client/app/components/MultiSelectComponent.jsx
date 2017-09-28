@@ -6,7 +6,7 @@ import PropTypes from 'prop-types';
 import React from 'react';
 import Select from 'react-select';
 import 'react-select/dist/react-select.css';
-import '../styles/react-selectize-css.css';
+import '../styles/react-select-css.css';
 
 export default class MultiSelectComponent extends React.Component {
 	constructor(props) {
@@ -33,6 +33,7 @@ export default class MultiSelectComponent extends React.Component {
 				style={this.props.style}
 				onChange={this.onValuesChangeInternal}
 				clearable={false}
+				closeOnSelect={false}
 			/>
 		);
 	}
@@ -44,6 +45,6 @@ MultiSelectComponent.propTypes = {
 		label: PropTypes.string.isRequired,
 		type: PropTypes.string.isRequired,
 		value: PropTypes.number,
-	})).isRequired,
+	})),
 	onValuesChange: PropTypes.func.isRequired,
 };

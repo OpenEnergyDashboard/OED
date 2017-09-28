@@ -30,4 +30,5 @@ export function groupsFilterReduce(tgt, item) {
 	if (item.type === DATA_TYPE_GROUP) {
 		tgt.push(item.value);
 	}
+	return tgt;
 }
