@@ -2,6 +2,7 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
 
+import _ from 'lodash';
 import React from 'react';
 import Slider from 'react-rangeslider';
 import moment from 'moment';
@@ -9,7 +10,7 @@ import 'react-rangeslider/lib/index.css';
 import MultiSelectComponent from './MultiSelectComponent';
 import { chartTypes } from '../reducers/graph';
 import ExportContainer from '../containers/ExportContainer';
-import { DATA_TYPE_METER, metersFilterReduce } from '../utils/Datasources';
+import { DATA_TYPE_METER, DATA_TYPE_GROUP, metersFilterReduce, groupsFilterReduce } from '../utils/Datasources';
 
 export default class UIOptionsComponent extends React.Component {
 	/**
@@ -30,10 +31,11 @@ export default class UIOptionsComponent extends React.Component {
 
 	/**
 	 * Called when this component mounts
-	 * Dispatches a Redux action to fetch meter information
+	 * Dispatches a Redux action to fetch meter and group information
 	 */
 	componentWillMount() {
 		this.props.fetchMetersDetailsIfNeeded();
+		this.props.fetchGroupsDetailsIfNeeded();
 	}
 
 	/**
@@ -41,13 +43,12 @@ export default class UIOptionsComponent extends React.Component {
 	 * @param {Object[]} selection An array of {label: string, value: {type: string, id: int}} representing the current selection
 	 */
 	handleDatasourceSelect(selection) {
-		// Only load meters
+		// Announce newly selected meters
 		const selectedMeters = selection.reduce(metersFilterReduce, []);
 		this.props.selectMeters(selectedMeters);
-		// Only load groups
-		// TODO: Uncomment when groups graphing is implemented
-		// const selectedGroups = selection.reduce(groupsFilterReduce, []);
-		// this.props.selectGroups(selectedGroups);
+		// Announce newly selected groups
+		const selectedGroups = selection.reduce(groupsFilterReduce, []);
+		this.props.selectGroups(selectedGroups);
 	}
 
 	/**
@@ -91,14 +92,21 @@ export default class UIOptionsComponent extends React.Component {
 			width: '10px',
 		};
 
-		// Construct the options of the MultiSelect. Because value can be any JavaScript object, here we load it with both the type
-		// and ID. Currently this is useless, but when groups graphing is introduced it will be important
-		const selectOptions = this.props.meters.map(meter => (
+		// Construct the options of the MultiSelect. Because value can be any JavaScript object, here we load it with both the type and ID.
+		const selectOptionsMeters = this.props.meters.map(meter => (
 			{ 	label: meter.name,
 				type: DATA_TYPE_METER,
 				value: meter.id,
 			}
 		));
+		const selectOptionsGroups = this.props.groups.map(group => (
+			{
+				label: group.name,
+				type: DATA_TYPE_GROUP,
+				value: group.id,
+			}
+		));
+		const selectOptions = _.concat(selectOptionsGroups, selectOptionsMeters);
 
 
 		return (
