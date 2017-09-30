@@ -6,9 +6,10 @@ import React from 'react';
 import Slider from 'react-rangeslider';
 import moment from 'moment';
 import 'react-rangeslider/lib/index.css';
+import MultiSelectComponent from './MultiSelectComponent';
 import { chartTypes } from '../reducers/graph';
 import ExportContainer from '../containers/ExportContainer';
-
+import { DATA_TYPE_METER, metersFilterReduce } from '../utils/Datasources';
 
 export default class UIOptionsComponent extends React.Component {
 	/**
@@ -17,7 +18,7 @@ export default class UIOptionsComponent extends React.Component {
 	 */
 	constructor(props) {
 		super(props);
-		this.handleMeterSelect = this.handleMeterSelect.bind(this);
+		this.handleDatasourceSelect = this.handleDatasourceSelect.bind(this);
 		this.handleBarDurationChange = this.handleBarDurationChange.bind(this);
 		this.handleBarDurationChangeComplete = this.handleBarDurationChangeComplete.bind(this);
 		this.handleChangeChartType = this.handleChangeChartType.bind(this);
@@ -35,17 +36,18 @@ export default class UIOptionsComponent extends React.Component {
 		this.props.fetchMetersDetailsIfNeeded();
 	}
 
-	handleMeterSelect(e) {
-		e.preventDefault();
-		const options = e.target.options;
-		const selectedMeters = [];
-		// We can't map here because this is a collection of DOM elements, not an array.
-		for (let i = 0; i < options.length; i++) {
-			if (options[i].selected) {
-				selectedMeters.push(parseInt(options[i].value));
-			}
-		}
+	/**
+	 * Handles a change in data source selection
+	 * @param {Object[]} selection An array of {label: string, value: {type: string, id: int}} representing the current selection
+	 */
+	handleDatasourceSelect(selection) {
+		// Only load meters
+		const selectedMeters = selection.reduce(metersFilterReduce, []);
 		this.props.selectMeters(selectedMeters);
+		// Only load groups
+		// TODO: Uncomment when groups graphing is implemented
+		// const selectedGroups = selection.reduce(groupsFilterReduce, []);
+		// this.props.selectGroups(selectedGroups);
 	}
 
 	/**
@@ -81,24 +83,35 @@ export default class UIOptionsComponent extends React.Component {
 		const divPadding = {
 			paddingTop: '35px'
 		};
+		const divBottomPadding = {
+			paddingBottom: '15px'
+		};
+		const radioButtonInlinePadding = {
+			display: 'inline-block',
+			width: '10px',
+		};
+
+		// Construct the options of the MultiSelect. Because value can be any JavaScript object, here we load it with both the type
+		// and ID. Currently this is useless, but when groups graphing is introduced it will be important
+		const selectOptions = this.props.meters.map(meter => (
+			{ 	label: meter.name,
+				type: DATA_TYPE_METER,
+				value: meter.id,
+			}
+		));
+
+
 		return (
 			<div className="col-xs-2" style={divPadding}>
 				<div className="col-xs-11">
-					<div>
-						<div className="form-group">
-							<p style={labelStyle}>Select meters:</p>
-							<select multiple className="form-control" id="meterList" size="8" onChange={this.handleMeterSelect}>
-								{this.props.meters.map(meter =>
-									<option key={meter.id} value={meter.id}>{meter.name}</option>
-								)}
-							</select>
-						</div>
+					<p style={labelStyle}>Meters:</p>
+					<div style={divBottomPadding}>
+						<MultiSelectComponent options={selectOptions} placeholder="Select Meters" onValuesChange={this.handleDatasourceSelect} />
 					</div>
 					<p style={labelStyle}>Graph Type:</p>
 					<div className="radio">
 						<label><input type="radio" name="chartTypes" value={chartTypes.line} onChange={this.handleChangeChartType} checked={this.props.chartToRender === chartTypes.line} />Line</label>
-					</div>
-					<div className="radio">
+						<div style={radioButtonInlinePadding} />
 						<label><input type="radio" name="chartTypes" value={chartTypes.bar} onChange={this.handleChangeChartType} checked={this.props.chartToRender === chartTypes.bar} />Bar</label>
 					</div>
 					<div className="checkbox">
