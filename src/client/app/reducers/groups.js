@@ -92,6 +92,7 @@ export default function groups(state = defaultState, action) {
 					[action.groupID]: {
 						...state.byGroupID[action.groupID],
 						isFetching: false,
+						outdated: false,
 						childGroups: action.data.groups,
 						childMeters: action.data.meters,
 					}
