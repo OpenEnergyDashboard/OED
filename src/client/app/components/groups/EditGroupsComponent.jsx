@@ -49,7 +49,7 @@ export default class EditGroupsComponent extends React.Component {
 		};
 		return (
 			<div style={divStyle} className="col-xs-6">
-				<h3 style={centerTextStyle}>Create a New Group</h3>
+				<h3 style={centerTextStyle}>Edit Group</h3>
 				<p style={underlineStyle}>Name:</p>
 				<FormControl type="text" placeholder="Name" value={this.state.name} onChange={this.handleNameChange} />
 				<br />

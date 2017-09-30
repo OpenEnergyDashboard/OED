@@ -5,8 +5,7 @@
 // This component is for viewing a single group via child box components + some buttons
 import React from 'react';
 import { Button } from 'react-bootstrap';
-import MeterBoxContainer from '../../containers/groups/MeterBoxContainer';
-import GroupBoxContainer from '../../containers/groups/GroupBoxContainer';
+import DatasourceBoxContainer from '../../containers/groups/DatasourceBoxContainer';
 
 export default class GroupViewComponent extends React.Component {
 	constructor(props) {
@@ -33,11 +32,11 @@ export default class GroupViewComponent extends React.Component {
 				<div className="row">
 					<div className="col-xs-6">
 						<h4>Child meters:</h4>
-						<MeterBoxContainer parentID={this.props.id} />
+						<DatasourceBoxContainer type="meter" selection="children" parentID={this.props.id} />
 					</div>
 					<div className="col-xs-6">
 						<h4>Child groups:</h4>
-						<GroupBoxContainer parentID={this.props.id} />
+						<DatasourceBoxContainer type="group" selection="children" parentID={this.props.id} />
 					</div>
 				</div>
 				<Button bsStyle="default" onClick={this.handleEditGroup}>Edit group</Button>

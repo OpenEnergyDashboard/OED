@@ -2,8 +2,9 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
 
-// Box classes for displaying child meters and groups
 import React from 'react';
+import MultiSelectComponent from '../MultiSelectComponent';
+import { DATA_TYPE_GROUP, groupsFilterReduce } from '../../utils/Datasources';
 
 export default class GroupBoxComponent extends React.Component {
 	constructor(props) {
@@ -11,16 +12,8 @@ export default class GroupBoxComponent extends React.Component {
 		this.handleGroupSelect = this.handleGroupSelect.bind(this);
 	}
 
-	handleGroupSelect(e) {
-		e.preventDefault();
-		const options = e.target.options;
-		const selectedGroups = [];
-		// We can't map here because this is a collection of DOM elements, not an array.
-		for (let i = 0; i < options.length; i++) {
-			if (options[i].selected) {
-				selectedGroups.push(parseInt(options[i].value));
-			}
-		}
+	handleGroupSelect(selection) {
+		const selectedGroups = selection.reduce(groupsFilterReduce, []);
 		this.props.selectGroups(selectedGroups);
 	}
 
@@ -28,15 +21,19 @@ export default class GroupBoxComponent extends React.Component {
 		const labelStyle = {
 			textDecoration: 'underline'
 		};
+		const selectOptions = this.props.groups.map(group => (
+			{
+				label: group.name,
+				type: DATA_TYPE_GROUP,
+				value: group.id,
+			}
+		));
+
 		return (
 			<div>
 				<div className="form-group">
 					<p style={labelStyle}>Select groups:</p>
-					<select multiple className="form-control" id="groupList" size="8" onChange={this.handleGroupSelect}>
-						{this.props.groups.map(group =>
-							<option key={group.id} value={group.id}>{group.name}</option>
-						)}
-					</select>
+					<MultiSelectComponent options={selectOptions} placeholder="Select groups" onValuesChange={this.handleGroupSelect} />
 				</div>
 			</div>
 		);
