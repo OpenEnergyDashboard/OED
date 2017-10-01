@@ -21,9 +21,6 @@ export default class DatasourceBoxComponent extends React.Component {
 	}
 
 	render() {
-		const labelStyle = {
-			textDecoration: 'underline'
-		};
 		const selectOptions = this.props.datasource.map(element => (
 			{
 				label: element.name,
@@ -33,12 +30,7 @@ export default class DatasourceBoxComponent extends React.Component {
 		));
 
 		return (
-			<div>
-				<div className="form-group">
-					<p style={labelStyle}>Select {this.props.type}s:</p>
-					<MultiSelectComponent options={selectOptions} placeholder={`Select ${this.props.type}s`} onValuesChange={this.handleDatasourceSelect} />
-				</div>
-			</div>
+			<MultiSelectComponent options={selectOptions} placeholder={`Select ${this.props.type}s`} onValuesChange={this.handleDatasourceSelect} />
 		);
 	}
 }

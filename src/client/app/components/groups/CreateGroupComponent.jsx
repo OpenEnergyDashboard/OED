@@ -46,8 +46,12 @@ export default class CreateGroupComponent extends React.Component {
 				<p style={underlineStyle}>Name:</p>
 				<FormControl type="text" placeholder="Name" onChange={this.handleNameChange} />
 				<br />
+				<p style={underlineStyle}>Select meters:</p>
 				<DatasourceBoxContainer type="meter" selection="all" />
+				<br />
+				<p style={underlineStyle}>Select groups:</p>
 				<DatasourceBoxContainer type="group" selection="all" />
+				<br />
 				<Button type="submit" onClick={this.handleCreateGroup}>Create group</Button>
 				<Button className="pull-right" type="submit" onClick={this.handleReturnToView}>Return to groups overview</Button>
 			</div>

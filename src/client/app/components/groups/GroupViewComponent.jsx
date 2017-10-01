@@ -2,7 +2,6 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
 
-// This component is for viewing a single group via child box components + some buttons
 import React from 'react';
 import { Button } from 'react-bootstrap';
 import DatasourceBoxContainer from '../../containers/groups/DatasourceBoxContainer';
@@ -26,6 +25,9 @@ export default class GroupViewComponent extends React.Component {
 		const nameStyle = {
 			textAlign: 'center'
 		};
+		const buttonPadding = {
+			marginTop: '10px'
+		};
 		return (
 			<div>
 				<h2 style={nameStyle}>{this.props.name}</h2>
@@ -39,7 +41,7 @@ export default class GroupViewComponent extends React.Component {
 						<DatasourceBoxContainer type="group" selection="children" parentID={this.props.id} />
 					</div>
 				</div>
-				<Button bsStyle="default" onClick={this.handleEditGroup}>Edit group</Button>
+				<Button style={buttonPadding} bsStyle="default" onClick={this.handleEditGroup}>Edit group</Button>
 			</div>
 		);
 	}
