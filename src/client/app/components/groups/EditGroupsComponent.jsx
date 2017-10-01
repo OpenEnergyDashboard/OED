@@ -55,22 +55,22 @@ export default class EditGroupsComponent extends React.Component {
 	}
 
 	handleMoveChildMetersToUnusedMeters() {
-		this.props.changeChildMeters(_.difference(this.props.childMeters, this.state.selectedMeters));
+		this.props.changeChildMeters(_.difference(this.props.childMeters.map(meter => meter.id), this.state.selectedMeters));
 		this.setState({ selectedMeters: [] });
 	}
 
 	handleMoveUnusedMetersToChildMeters() {
-		this.props.changeChildMeters(_.union(this.props.childMeters, this.state.unusedMeters));
+		this.props.changeChildMeters(_.union(this.props.childMeters.map(meter => meter.id), this.state.unusedMeters));
 		this.setState({ unusedMeters: [] });
 	}
 
 	handleMoveChildGroupsToUnusedGroups() {
-		this.props.changeChildGroups(_.difference(this.props.childGroups, this.state.selectedGroups));
+		this.props.changeChildGroups(_.difference(this.props.childGroups.map(group => group.id), this.state.selectedGroups));
 		this.setState({ selectedGroups: [] });
 	}
 
 	handleMoveUnusedGroupsToChildGroups() {
-		this.props.changeChildGroups(_.union(this.props.childGroups, this.state.unusedGroups));
+		this.props.changeChildGroups(_.union(this.props.childGroups.map(group => group.id), this.state.unusedGroups));
 		this.setState({ unusedGroups: [] });
 	}
 
@@ -90,6 +90,13 @@ export default class EditGroupsComponent extends React.Component {
 	render() {
 		const divStyle = {
 			paddingTop: '35px'
+		};
+		const leftRightButtonsDivStyle = {
+			marginTop: '34px'
+		};
+		const leftRightButtonStyle = {
+			width: '50%',
+			margin: '0 auto'
 		};
 		const underlineStyle = {
 			textDecoration: 'underline'
@@ -113,11 +120,11 @@ export default class EditGroupsComponent extends React.Component {
 							selectDatasource={this.handleUpdatedSelectedMeters}
 						/>
 					</div>
-					<div className="col-xs-2">
-						<Button onClick={this.handleMoveUnusedMetersToChildMeters}>
+					<div className="col-xs-2" style={leftRightButtonsDivStyle}>
+						<Button onClick={this.handleMoveUnusedMetersToChildMeters} style={leftRightButtonStyle}>
 							<Glyphicon glyph="chevron-left" />
 						</Button>
-						<Button onClick={this.handleMoveChildMetersToUnusedMeters}>
+						<Button onClick={this.handleMoveChildMetersToUnusedMeters} style={leftRightButtonStyle}>
 							<Glyphicon glyph="chevron-right" />
 						</Button>
 					</div>
@@ -131,6 +138,8 @@ export default class EditGroupsComponent extends React.Component {
 						/>
 					</div>
 				</div>
+				<br />
+				<br />
 				<div className="row">
 					<div className="col-xs-5">
 						<p>Selected groups</p>
@@ -141,11 +150,11 @@ export default class EditGroupsComponent extends React.Component {
 							selectDatasource={this.handleUpdateSelectedGroups}
 						/>
 					</div>
-					<div className="col-xs-2">
-						<Button onClick={this.handleMoveUnusedGroupsToChildGroups}>
+					<div className="col-xs-2" style={leftRightButtonsDivStyle}>
+						<Button onClick={this.handleMoveUnusedGroupsToChildGroups} style={leftRightButtonStyle}>
 							<Glyphicon glyph="chevron-left" />
 						</Button>
-						<Button onClick={this.handleMoveChildGroupsToUnusedGroups}>
+						<Button onClick={this.handleMoveChildGroupsToUnusedGroups} style={leftRightButtonStyle}>
 							<Glyphicon glyph="chevron-right" />
 						</Button>
 					</div>
@@ -167,4 +176,3 @@ export default class EditGroupsComponent extends React.Component {
 		);
 	}
 }
-
