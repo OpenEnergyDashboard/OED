@@ -21,16 +21,32 @@ export default class DatasourceBoxComponent extends React.Component {
 	}
 
 	render() {
-		const selectOptions = this.props.datasource.map(element => (
+		const options = this.props.datasource.map(element => (
 			{
 				label: element.name,
 				type: this.props.type === 'meters' ? DATA_TYPE_METER : DATA_TYPE_GROUP,
 				value: element.id,
 			}
 		));
+		let selectedOptions = null;
+		if (this.props.selectedOptions) {
+			selectedOptions = this.props.selectedOptions.map(element => (
+				{
+					label: element.name,
+					type: this.props.type === 'meters' ? DATA_TYPE_METER : DATA_TYPE_GROUP,
+					value: element.id,
+				}
+			));
+		}
+
 
 		return (
-			<MultiSelectComponent options={selectOptions} placeholder={`Select ${this.props.type}s`} onValuesChange={this.handleDatasourceSelect} />
+			<MultiSelectComponent
+				options={options}
+				selectedOptions={selectedOptions}
+				placeholder={`Select ${this.props.type}s`}
+				onValuesChange={this.handleDatasourceSelect}
+			/>
 		);
 	}
 }

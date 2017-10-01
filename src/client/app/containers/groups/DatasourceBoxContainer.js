@@ -10,8 +10,7 @@ import { changeSelectedMetersOfGroup, changeSelectedGroupsOfGroup, changeChildMe
 
 // ownProps.selection may be 'children', 'all', or 'custom'
 // if ownProps.selection is 'children', ownProps must have a 'parentID' property
-// if ownProps.selection is 'selection', ownProps must have both a 'datasource' and 'selectDatasource' property
-// ownProps.type may be 'meter' or 'group'
+// if ownProps.selection is 'custom', ownProps must have both a 'datasource' and 'selectDatasource' prop (and optional selectedOptions prop)
 function mapStateToProps(state, ownProps) {
 	let datasource = null;
 	if (ownProps.selection === 'all') {
@@ -60,6 +59,7 @@ function mapStateToProps(state, ownProps) {
 
 	return {
 		datasource: _.sortBy(datasource, 'name'),
+		selectedOptions: ownProps.selectedOptions ? ownProps.selectedOptions : undefined,
 		type: ownProps.type
 	};
 }

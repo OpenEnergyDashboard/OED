@@ -14,9 +14,13 @@ export default class EditGroupsComponent extends React.Component {
 		this.state = {
 			name: this.props.name,
 			selectedMeters: [],
+			defaultSelectedMeters: [],
 			unusedMeters: [],
+			defaultUnusedMeters: [],
 			selectedGroups: [],
-			unusedGroups: []
+			defaultSelectedGroups: [],
+			unusedGroups: [],
+			defaultUnusedGroups: []
 		};
 		this.handleNameChange = this.handleNameChange.bind(this);
 		this.handleUpdatedSelectedMeters = this.handleUpdatedSelectedMeters.bind(this);
@@ -56,22 +60,22 @@ export default class EditGroupsComponent extends React.Component {
 
 	handleMoveChildMetersToUnusedMeters() {
 		this.props.changeChildMeters(_.difference(this.props.childMeters.map(meter => meter.id), this.state.selectedMeters));
-		this.setState({ selectedMeters: [] });
+		this.setState({ selectedMeters: [], defaultSelectedMeters: [] });
 	}
 
 	handleMoveUnusedMetersToChildMeters() {
 		this.props.changeChildMeters(_.union(this.props.childMeters.map(meter => meter.id), this.state.unusedMeters));
-		this.setState({ unusedMeters: [] });
+		this.setState({ unusedMeters: [], defaultUnusedMeters: [] });
 	}
 
 	handleMoveChildGroupsToUnusedGroups() {
 		this.props.changeChildGroups(_.difference(this.props.childGroups.map(group => group.id), this.state.selectedGroups));
-		this.setState({ selectedGroups: [] });
+		this.setState({ selectedGroups: [], defaultSelectedGroups: [] });
 	}
 
 	handleMoveUnusedGroupsToChildGroups() {
 		this.props.changeChildGroups(_.union(this.props.childGroups.map(group => group.id), this.state.unusedGroups));
-		this.setState({ unusedGroups: [] });
+		this.setState({ unusedGroups: [], defaultUnusedGroups: [] });
 	}
 
 	handleEditGroup() {
@@ -112,11 +116,12 @@ export default class EditGroupsComponent extends React.Component {
 				<br />
 				<div className="row">
 					<div className="col-xs-5">
-						<p>Selected meters</p>
+						<p style={underlineStyle}>Child meters:</p>
 						<DatasourceBoxContainer
 							type="meter"
 							selection="custom"
 							datasource={this.props.childMeters}
+							selectedOptions={this.state.defaultSelectedMeters}
 							selectDatasource={this.handleUpdatedSelectedMeters}
 						/>
 					</div>
@@ -129,11 +134,12 @@ export default class EditGroupsComponent extends React.Component {
 						</Button>
 					</div>
 					<div className="col-xs-5">
-						<p>Unused meters</p>
+						<p style={underlineStyle}>Unused meters:</p>
 						<DatasourceBoxContainer
 							type="meter"
 							selection="custom"
 							datasource={this.props.allMetersExceptChildMeters}
+							selectedOptions={this.state.defaultUnusedMeters}
 							selectDatasource={this.handleUpdateUnusedMeters}
 						/>
 					</div>
@@ -142,11 +148,12 @@ export default class EditGroupsComponent extends React.Component {
 				<br />
 				<div className="row">
 					<div className="col-xs-5">
-						<p>Selected groups</p>
+						<p style={underlineStyle}>Child groups:</p>
 						<DatasourceBoxContainer
 							type="group"
 							selection="custom"
 							datasource={this.props.childGroups}
+							selectedOptions={this.state.defaultSelectedGroups}
 							selectDatasource={this.handleUpdateSelectedGroups}
 						/>
 					</div>
@@ -159,11 +166,12 @@ export default class EditGroupsComponent extends React.Component {
 						</Button>
 					</div>
 					<div className="col-xs-5">
-						<p>Unused groups</p>
+						<p style={underlineStyle}>Unused groups:</p>
 						<DatasourceBoxContainer
 							type="group"
 							selection="custom"
 							datasource={this.props.allGroupsExceptChildGroups}
+							selectedOptions={this.state.defaultUnusedGroups}
 							selectDatasource={this.handleUpdateUnusedGroups}
 						/>
 					</div>
