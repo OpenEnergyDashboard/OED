@@ -2,6 +2,7 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
 
+import _ from 'lodash';
 import React from 'react';
 import Slider from 'react-rangeslider';
 import moment from 'moment';
@@ -9,7 +10,7 @@ import 'react-rangeslider/lib/index.css';
 import MultiSelectComponent from './MultiSelectComponent';
 import { chartTypes } from '../reducers/graph';
 import ExportContainer from '../containers/ExportContainer';
-import { DATA_TYPE_METER, metersFilterReduce } from '../utils/Datasources';
+import { DATA_TYPE_METER, DATA_TYPE_GROUP, uniqueStringID } from '../utils/Datasources';
 
 export default class UIOptionsComponent extends React.Component {
 	/**
@@ -24,30 +25,43 @@ export default class UIOptionsComponent extends React.Component {
 		this.handleChangeChartType = this.handleChangeChartType.bind(this);
 		this.handleChangeBarStacking = this.handleChangeBarStacking.bind(this);
 		this.state = {
-			barDuration: 30 // barDuration in days
+			// barDuration in days
+			barDuration: 30,
+			// the currently selected set of datasources
+			selectedMeters: [],
+			selectedGroups: []
 		};
 	}
 
 	/**
 	 * Called when this component mounts
-	 * Dispatches a Redux action to fetch meter information
+	 * Dispatches a Redux action to fetch meter and group information
 	 */
 	componentWillMount() {
 		this.props.fetchMetersDetailsIfNeeded();
+		this.props.fetchGroupsDetailsIfNeeded();
 	}
 
 	/**
 	 * Handles a change in data source selection
-	 * @param {Object[]} selection An array of {label: string, value: {type: string, id: int}} representing the current selection
+	 * @param {Object[]} selection An array of {label: string, value: { type: string, id: number } } representing the current selection
+	 * @param {String} type Whether to modify the selected groups or selected meters
 	 */
-	handleDatasourceSelect(selection) {
-		// Only load meters
-		const selectedMeters = selection.reduce(metersFilterReduce, []);
-		this.props.selectMeters(selectedMeters);
-		// Only load groups
-		// TODO: Uncomment when groups graphing is implemented
-		// const selectedGroups = selection.reduce(groupsFilterReduce, []);
-		// this.props.selectGroups(selectedGroups);
+	handleDatasourceSelect(selection, type) {
+		// Sync selection between the two datasource selection boxes
+		let selectedGroups = {};
+		let selectedMeters = {};
+		if (type === DATA_TYPE_GROUP) {
+			selectedMeters = this.state.selectedMeters;
+			selectedGroups = selection;
+			this.setState({ ...this.state, selectedGroups: selection });
+		} else if (type === DATA_TYPE_METER) {
+			selectedGroups = this.state.selectedGroups;
+			selectedMeters = selection;
+			this.setState({ ...this.state, selectedMeters: selection });
+		}
+		// Propagate the selection of new datasources
+		this.props.selectDatasources(_.union(selectedGroups, selectedMeters).map(item => item.data));
 	}
 
 	/**
@@ -91,22 +105,32 @@ export default class UIOptionsComponent extends React.Component {
 			width: '10px',
 		};
 
-		// Construct the options of the MultiSelect. Because value can be any JavaScript object, here we load it with both the type
-		// and ID. Currently this is useless, but when groups graphing is introduced it will be important
-		const selectOptions = this.props.meters.map(meter => (
+		// Construct the options of the MultiSelect. Because value can be any JavaScript object, here we load it with both the type and ID.
+		// The "value" item is used by the MultiSelect to track what has been selected. It must be a UNIQUE number or string.
+		const selectOptionsMeters = this.props.meters.map(meter => (
+			{ 	label: meter.name,
+				data: { id: meter.id, type: DATA_TYPE_METER },
+				value: uniqueStringID(DATA_TYPE_METER, meter.name, meter.id),
+			}
+		));
+		const selectOptionsGroups = this.props.groups.map(group => (
 			{
-				label: meter.name,
-				type: DATA_TYPE_METER,
-				value: meter.id,
+				label: group.name,
+				data: { id: group.id, type: DATA_TYPE_GROUP },
+				value: uniqueStringID(DATA_TYPE_GROUP, group.name, group.id),
 			}
 		));
 
 		return (
 			<div className="col-xs-2" style={divPadding}>
 				<div className="col-xs-11">
+					<p style={labelStyle}>Groups:</p>
+					<div style={divBottomPadding}>
+						<MultiSelectComponent options={selectOptionsGroups} placeholder="Select Groups" onValuesChange={selection => this.handleDatasourceSelect(selection, DATA_TYPE_GROUP)} />
+					</div>
 					<p style={labelStyle}>Meters:</p>
 					<div style={divBottomPadding}>
-						<MultiSelectComponent options={selectOptions} placeholder="Select Meters" onValuesChange={this.handleDatasourceSelect} />
+						<MultiSelectComponent options={selectOptionsMeters} placeholder="Select Meters" onValuesChange={selection => this.handleDatasourceSelect(selection, DATA_TYPE_METER)} />
 					</div>
 					<p style={labelStyle}>Graph Type:</p>
 					<div className="radio">
