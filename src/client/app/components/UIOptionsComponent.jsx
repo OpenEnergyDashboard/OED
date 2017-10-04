@@ -25,7 +25,11 @@ export default class UIOptionsComponent extends React.Component {
 		this.handleChangeChartType = this.handleChangeChartType.bind(this);
 		this.handleChangeBarStacking = this.handleChangeBarStacking.bind(this);
 		this.state = {
-			barDuration: 30 // barDuration in days
+			// barDuration in days
+			barDuration: 30,
+			// the currently selected set of datasources
+			selectedMeters: [],
+			selectedGroups: []
 		};
 	}
 
@@ -41,10 +45,23 @@ export default class UIOptionsComponent extends React.Component {
 	/**
 	 * Handles a change in data source selection
 	 * @param {Object[]} selection An array of {label: string, value: { type: string, id: number } } representing the current selection
+	 * @param {String} type Whether to modify the selected groups or selected meters
 	 */
-	handleDatasourceSelect(selection) {
+	handleDatasourceSelect(selection, type) {
+		// Sync selection between the two datasource selection boxes
+		let selectedGroups = {};
+		let selectedMeters = {};
+		if (type === DATA_TYPE_GROUP) {
+			selectedMeters = this.state.selectedMeters;
+			selectedGroups = selection;
+			this.setState({ ...this.state, selectedGroups: selection });
+		} else if (type === DATA_TYPE_METER) {
+			selectedGroups = this.state.selectedGroups;
+			selectedMeters = selection;
+			this.setState({ ...this.state, selectedMeters: selection });
+		}
 		// Propagate the selection of new datasources
-		this.props.selectDatasources(selection.map(item => item.data));
+		this.props.selectDatasources(_.union(selectedGroups, selectedMeters).map(item => item.data));
 	}
 
 	/**
@@ -103,15 +120,18 @@ export default class UIOptionsComponent extends React.Component {
 				value: uniqueStringID(DATA_TYPE_GROUP, group.name, group.id),
 			}
 		));
-		const selectOptions = _.concat(selectOptionsGroups, selectOptionsMeters);
 
 
 		return (
 			<div className="col-xs-2" style={divPadding}>
 				<div className="col-xs-11">
+					<p style={labelStyle}>Groups:</p>
+					<div style={divBottomPadding}>
+						<MultiSelectComponent options={selectOptionsGroups} placeholder="Select Groups" onValuesChange={selection => this.handleDatasourceSelect(selection, DATA_TYPE_GROUP)} />
+					</div>
 					<p style={labelStyle}>Meters:</p>
 					<div style={divBottomPadding}>
-						<MultiSelectComponent options={selectOptions} placeholder="Select Meters" onValuesChange={this.handleDatasourceSelect} />
+						<MultiSelectComponent options={selectOptionsMeters} placeholder="Select Meters" onValuesChange={selection => this.handleDatasourceSelect(selection, DATA_TYPE_METER)} />
 					</div>
 					<p style={labelStyle}>Graph Type:</p>
 					<div className="radio">
