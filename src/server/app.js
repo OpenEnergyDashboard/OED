@@ -30,6 +30,7 @@ app.use('/api/readings', readings);
 app.use('/api/login', login);
 app.use('/api/verification', verification);
 app.use('/api/fileProcessing', fileProcessing);
+//    /api/fp/6
 
 app.get('*', (req, res) => {
 	res.sendFile(path.resolve(__dirname, '..', 'client', 'index.html'));

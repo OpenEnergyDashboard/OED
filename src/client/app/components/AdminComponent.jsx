@@ -20,7 +20,7 @@ export default class AdminComponent extends React.Component {
 		console.log(file);
 		const data = new FormData();
 		data.append('csvFile', file);
-		axios.post('/api/fileProcessing/', data)
+		axios.post('/api/fileProcessing/meter_ID', data)
 			.then(response => {
 				console.log(response);
 			})
