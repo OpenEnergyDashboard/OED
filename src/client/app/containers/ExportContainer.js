@@ -5,6 +5,7 @@
 import { connect } from 'react-redux';
 import ExportComponent from '../components/ExportComponent';
 import { chartTypes } from '../reducers/graph';
+import { DATA_TYPE_GROUP, DATA_TYPE_METER } from '../utils/Datasources';
 
 /**
  * @param {State} state
@@ -17,26 +18,32 @@ function mapStateToProps(state) {
 	const chart = state.graph.chartToRender;
 	const barDuration = state.graph.barDuration;
 
-	for (const meterID of state.graph.selectedMeters) {
-		if (chart === chartTypes.line) {
-			readingsData = state.readings.line.byMeterID[meterID][timeInterval];
-		}		else if (chart === chartTypes.bar) { readingsData = state.readings.bar.byMeterID[meterID][timeInterval][barDuration]; }
-		if (readingsData !== undefined && !readingsData.isFetching && chart === chartTypes.line) {
-			data.datasets.push({
-				label: state.meters.byMeterID[meterID].name,
-				id: state.meters.byMeterID[meterID].id,
-				timestamp: state.readings.line.byMeterID[meterID][timeInterval].start_timestamp,
-				currentChart: chart,
-				exportVals: state.readings.line.byMeterID[meterID][timeInterval].readings.map(arr => ({ x: arr[0], y: arr[1] }))
-			});
-		} else if (readingsData !== undefined && !readingsData.isFetching && chart === chartTypes.bar) {
-			data.datasets.push({
-				label: state.meters.byMeterID[meterID].name,
-				id: state.meters.byMeterID[meterID].id,
-				timestamp: state.readings.bar.byMeterID[meterID][timeInterval][barDuration].timestamp,
-				currentChart: chart,
-				exportVals: state.readings.bar.byMeterID[meterID][timeInterval][barDuration].readings.map(arr => ({ x: arr[0], y: arr[1] }))
-			});
+	for (const datasourceID of state.graph.selectedDatasources) {
+		// Extract state info into datasets props. Doesn't work for groups right now! TODO TODO
+		if (datasourceID.type === DATA_TYPE_GROUP) {
+			console.error('UNIMPLEMENTED: mapStateToProps for ExportContainer cannot handle groups.');
+		} else if (datasourceID.type === DATA_TYPE_METER) {
+			const meterID = datasourceID.id;
+			if (chart === chartTypes.line) {
+				readingsData = state.readings.line.byMeterID[meterID][timeInterval];
+			}		else if (chart === chartTypes.bar) { readingsData = state.readings.bar.byMeterID[meterID][timeInterval][barDuration]; }
+			if (readingsData !== undefined && !readingsData.isFetching && chart === chartTypes.line) {
+				data.datasets.push({
+					label: state.meters.byMeterID[meterID].name,
+					id: state.meters.byMeterID[meterID].id,
+					timestamp: state.readings.line.byMeterID[meterID][timeInterval].start_timestamp,
+					currentChart: chart,
+					exportVals: state.readings.line.byMeterID[meterID][timeInterval].readings.map(arr => ({ x: arr[0], y: arr[1] }))
+				});
+			} else if (readingsData !== undefined && !readingsData.isFetching && chart === chartTypes.bar) {
+				data.datasets.push({
+					label: state.meters.byMeterID[meterID].name,
+					id: state.meters.byMeterID[meterID].id,
+					timestamp: state.readings.bar.byMeterID[meterID][timeInterval][barDuration].timestamp,
+					currentChart: chart,
+					exportVals: state.readings.bar.byMeterID[meterID][timeInterval][barDuration].readings.map(arr => ({ x: arr[0], y: arr[1] }))
+				});
+			}
 		}
 	}
 	return {

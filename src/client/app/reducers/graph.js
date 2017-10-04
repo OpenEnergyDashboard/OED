@@ -17,7 +17,7 @@ export const chartTypes = {
  * @type {State~Graph}
  */
 const defaultState = {
-	selectedMeters: [],
+	selectedDatasources: [],
 	timeInterval: TimeInterval.unbounded(),
 	barDuration: moment.duration(1, 'month'),
 	chartToRender: chartTypes.line,
@@ -31,10 +31,10 @@ const defaultState = {
  */
 export default function graph(state = defaultState, action) {
 	switch (action.type) {
-		case graphActions.UPDATE_SELECTED_METERS:
+		case graphActions.UPDATE_SELECTED_DATASOURCES:
 			return {
 				...state,
-				selectedMeters: action.meterIDs
+				selectedDatasources: action.datasourceIDs
 			};
 		case graphActions.UPDATE_BAR_DURATION:
 			return {
