@@ -10,7 +10,7 @@ import 'react-rangeslider/lib/index.css';
 import MultiSelectComponent from './MultiSelectComponent';
 import { chartTypes } from '../reducers/graph';
 import ExportContainer from '../containers/ExportContainer';
-import { DATA_TYPE_METER, DATA_TYPE_GROUP, metersFilterReduce, groupsFilterReduce } from '../utils/Datasources';
+import { DATA_TYPE_METER, DATA_TYPE_GROUP, uniqueStringID } from '../utils/Datasources';
 
 export default class UIOptionsComponent extends React.Component {
 	/**
@@ -40,15 +40,11 @@ export default class UIOptionsComponent extends React.Component {
 
 	/**
 	 * Handles a change in data source selection
-	 * @param {Object[]} selection An array of {label: string, value: {type: string, id: int}} representing the current selection
+	 * @param {Object[]} selection An array of {label: string, value: { type: string, id: number } } representing the current selection
 	 */
 	handleDatasourceSelect(selection) {
-		// Announce newly selected meters
-		const selectedMeters = selection.reduce(metersFilterReduce, []);
-		this.props.selectMeters(selectedMeters);
-		// Announce newly selected groups
-		const selectedGroups = selection.reduce(groupsFilterReduce, []);
-		this.props.selectGroups(selectedGroups);
+		// Propagate the selection of new datasources
+		this.props.selectDatasources(selection.map(item => item.data));
 	}
 
 	/**
@@ -93,17 +89,18 @@ export default class UIOptionsComponent extends React.Component {
 		};
 
 		// Construct the options of the MultiSelect. Because value can be any JavaScript object, here we load it with both the type and ID.
+		// The "value" item is used by the MultiSelect to track what has been selected. It must be a UNIQUE number or string.
 		const selectOptionsMeters = this.props.meters.map(meter => (
 			{ 	label: meter.name,
-				type: DATA_TYPE_METER,
-				value: meter.id,
+				data: { id: meter.id, type: DATA_TYPE_METER },
+				value: uniqueStringID(DATA_TYPE_METER, meter.name, meter.id),
 			}
 		));
 		const selectOptionsGroups = this.props.groups.map(group => (
 			{
 				label: group.name,
-				type: DATA_TYPE_GROUP,
-				value: group.id,
+				data: { id: group.id, type: DATA_TYPE_GROUP },
+				value: uniqueStringID(DATA_TYPE_GROUP, group.name, group.id),
 			}
 		));
 		const selectOptions = _.concat(selectOptionsGroups, selectOptionsMeters);
