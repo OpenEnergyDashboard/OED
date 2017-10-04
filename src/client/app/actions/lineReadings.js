@@ -39,7 +39,7 @@ function fetchLineReadings(meterIDs, timeInterval) {
 		dispatch(requestLineReadings(meterIDs, timeInterval));
 		// The api expects the meter ids to be a comma-separated list.
 		const stringifiedMeterIDs = meterIDs.join(',');
-		return axios.get(`/api/readings/line/${stringifiedMeterIDs}`, {
+		return axios.get(`/api/readings/line/meters/${stringifiedMeterIDs}`, {
 			params: { timeInterval: timeInterval.toString() }
 		}).then(response => dispatch(receiveLineReadings(meterIDs, timeInterval, response.data)));
 	};
