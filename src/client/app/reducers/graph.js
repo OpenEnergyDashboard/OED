@@ -20,7 +20,7 @@ export const chartTypes = {
 const defaultState = {
 	selectedMeters: [],
 	timeInterval: TimeInterval.unbounded(),
-	barDuration: moment.duration(7, 'days'),
+	barDuration: moment.duration(1, 'month'),
 	compareTimeInterval: TimeInterval.unbounded(),
 	compareDuration: moment.duration(7, 'days'),
 	chartToRender: chartTypes.line,
