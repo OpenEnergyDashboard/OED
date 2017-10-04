@@ -150,7 +150,7 @@ router.put('/edit', async (req, res) => {
 	}
 
 	try {
-		const currentGroup = Group.getByID(req.body.id);
+		const currentGroup = await Group.getByID(req.body.id);
 		if (req.body.name !== currentGroup.name) {
 			await currentGroup.rename(req.body.name);
 		}
