@@ -155,7 +155,7 @@ router.put('/edit', async (req, res) => {
 			await currentGroup.rename(req.body.name);
 		}
 
-		const currentChildGroups = Group.getImmediateGroupsByGroupID(currentGroup.id);
+		const currentChildGroups = await Group.getImmediateGroupsByGroupID(currentGroup.id);
 
 		const adoptedGroups = _.difference(req.body.childGroups, currentChildGroups);
 		if (adoptedGroups.length === 0) {
@@ -168,7 +168,7 @@ router.put('/edit', async (req, res) => {
 		}
 
 		// Compute meters differences and adopt/disown to make changes
-		const currentChildMeters = Group.getImmediateMetersByGroupID(currentGroup.id);
+		const currentChildMeters = await Group.getImmediateMetersByGroupID(currentGroup.id);
 
 		const adoptedMeters = _.difference(req.body.childMeters, currentChildMeters);
 		if (adoptedMeters.length === 0) {
@@ -177,7 +177,7 @@ router.put('/edit', async (req, res) => {
 
 		const disownedMeters = _.difference(currentChildMeters, req.body.childMeters);
 		if (disownedMeters.length === 0) {
-			await Promise.All(disownedMeters.map(mid => currentGroup.disownMeter(mid)));
+			await Promise.all(disownedMeters.map(mid => currentGroup.disownMeter(mid)));
 		}
 
 		res.sendStatus(200);
