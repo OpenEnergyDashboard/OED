@@ -98,7 +98,7 @@ export default class UIOptionsComponent extends React.Component {
 				<div className="radio">
 					<label><input type="radio" name="chartTypes" value={chartTypes.compare} onChange={this.handleChangeChartType} checked={this.props.chartToRender === chartTypes.compare} />Compare</label>
 				</div>
-				{this.props.chartToRender !== chartTypes.line &&
+				{this.props.chartToRender === chartTypes.bar &&
 				<div>
 					<p style={labelStyle}>Bar chart interval (days):</p>
 					<Slider min={1} max={365} value={this.state.barDuration} onChange={this.handleBarDurationChange} onChangeComplete={this.handleBarDurationChangeComplete} />

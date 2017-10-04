@@ -6,6 +6,7 @@
 
 import { fetchNeededLineReadings } from './lineReadings';
 import { fetchNeededBarReadings } from './barReadings';
+import { fetchNeededCompareReadings } from './compareReadings';
 
 export const UPDATE_SELECTED_METERS = 'UPDATE_SELECTED_METERS';
 export const UPDATE_BAR_DURATION = 'UPDATE_BAR_DURATION';
@@ -48,6 +49,7 @@ export function changeSelectedMeters(meterIDs) {
 		dispatch(dispatch2 => {
 			dispatch2(fetchNeededLineReadings(getState().graph.timeInterval));
 			dispatch2(fetchNeededBarReadings(getState().graph.timeInterval));
+			dispatch2(fetchNeededCompareReadings(getState().graph.timeInterval));
 		});
 		return Promise.resolve();
 	};

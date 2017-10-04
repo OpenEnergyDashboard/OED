@@ -10,15 +10,15 @@ import moment from 'moment';
 import { connect } from 'react-redux';
 import GraphColors from '../utils/GraphColors';
 
+
 /**
  * @param {State} state
  */
 function mapStateToProps(state) {
-	const timeInterval = state.graph.timeInterval;
-	const barDuration = state.graph.barDuration;
+	const timeInterval = state.graph.compareTimeInterval;
+	const barDuration = state.graph.compareDuration;
 	const data = { datasets: [] };
 	const graphColors = new GraphColors();
-
 	const labelsSet = new Set();
 	const timeSet = new Set();
 	for (const meterID of state.graph.selectedMeters) {
@@ -28,17 +28,21 @@ function mapStateToProps(state) {
 			for (const element of _.flatten(readingsData.readings.map(arr => arr[0]))) {
 				timeSet.add(`${moment(element).format('MMM DD, YYYY, hh:mm a')} - ${moment(element).add(barDuration).format('MMM DD, YYYY, hh:mm a')}`);
 			}
+			console.log(readingsData);
+			labelsSet.add('Last week');
+			labelsSet.add('This week');
 			const color1 = graphColors.getColor();
 			const color2 = graphColors.getColor();
 			data.datasets.push({
-				label: Array.from(timeSet)[0],
-				data: [readingsData.readings[0][1]],
+				label: Array.from(timeSet)[readingsData.readings.length - 2],
+				data: [readingsData.readings[readingsData.readings.length - 2][1], (readingsData.readings[readingsData.readings.length - 2][1] / 7) * 4], // this is most cared about on wednesdays so on average...
 				backgroundColor: color1,
 				hoverBackgroundColor: color1
 			},
 				{
-					label: Array.from(timeSet)[1],
-					data: [readingsData.readings[1][1]],
+					label: Array.from(timeSet)[readingsData.readings.length - 1],
+					data: [readingsData.readings[readingsData.readings.length - 1][1], (((readingsData.readings[readingsData.readings.length - 1][1]) / 4)
+					/ (readingsData.readings[readingsData.readings.length - 2][1] / 7)) * 7],
 					backgroundColor: color2,
 					hoverBackgroundColor: color2
 				});
@@ -46,7 +50,7 @@ function mapStateToProps(state) {
 			data.datasets.sort((a, b) => a.data[0] - b.data[0]);
 
 			// groups readings by meter
-			labelsSet.add(state.meters.byMeterID[meterID].name);
+			// labelsSet.add(state.meters.byMeterID[meterID].name);
 		}
 	}
     //
