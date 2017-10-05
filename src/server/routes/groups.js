@@ -7,6 +7,7 @@ const _ = require('lodash');
 const validate = require('jsonschema').validate;
 
 const Group = require('../models/Group');
+const authenticator = require('./authenticator');
 
 const router = express.Router();
 
@@ -70,6 +71,8 @@ router.get('/deep/meters/:group_id', async (req, res) => {
 		console.error(`Error while preforming GET on all deep child meters of specific group: ${err}`); // eslint-disable-line no-console
 	}
 });
+
+router.use(authenticator);
 
 router.post('/create', async (req, res) => {
 	const validGroup = {
