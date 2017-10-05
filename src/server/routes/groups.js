@@ -103,18 +103,19 @@ router.post('/create', async (req, res) => {
 
 	if (!validate(req.body, validGroup).valid) {
 		res.sendStatus(400);
-	}
+	} // eslint-disable-line brace-style
+	else {
+		try {
+			const newGroup = new Group(undefined, req.body.name);
+			await newGroup.insert();
+			await Promise.all(req.body.childGroups.map(gid => newGroup.adoptGroup(gid)));
+			await Promise.all(req.body.childMeters.map(mid => newGroup.adoptMeter(mid)));
 
-	try {
-		const newGroup = new Group(undefined, req.body.name);
-		await newGroup.insert();
-		await Promise.all(req.body.childGroups.map(gid => newGroup.adoptGroup(gid)));
-		await Promise.all(req.body.childMeters.map(mid => newGroup.adoptMeter(mid)));
-
-		res.sendStatus(200);
-	} catch (err) {
-		console.error(`Error while inserting new group ${err}`); // eslint-disable-line no-console
-		res.sendStatus(500);
+			res.sendStatus(200);
+		} catch (err) {
+			console.error(`Error while inserting new group ${err}`); // eslint-disable-line no-console
+			res.sendStatus(500);
+		}
 	}
 });
 
@@ -150,43 +151,44 @@ router.put('/edit', async (req, res) => {
 
 	if (!validate(req.body, validGroup).valid) {
 		res.sendStatus(400);
-	}
+	} // eslint-disable-line brace-style
+	else {
+		try {
+			const currentGroup = await Group.getByID(req.body.id);
+			if (req.body.name !== currentGroup.name) {
+				await currentGroup.rename(req.body.name);
+			}
 
-	try {
-		const currentGroup = await Group.getByID(req.body.id);
-		if (req.body.name !== currentGroup.name) {
-			await currentGroup.rename(req.body.name);
+			const currentChildGroups = await Group.getImmediateGroupsByGroupID(currentGroup.id);
+
+			const adoptedGroups = _.difference(req.body.childGroups, currentChildGroups);
+			if (adoptedGroups.length === 0) {
+				await Promise.all(adoptedGroups.map(gid => currentGroup.adoptGroup(gid)));
+			}
+
+			const disownedGroups = _.difference(currentChildGroups, req.body.childGroups);
+			if (disownedGroups.length === 0) {
+				await Promise.all(disownedGroups.map(gid => currentGroup.disownGroup(gid)));
+			}
+
+			// Compute meters differences and adopt/disown to make changes
+			const currentChildMeters = await Group.getImmediateMetersByGroupID(currentGroup.id);
+
+			const adoptedMeters = _.difference(req.body.childMeters, currentChildMeters);
+			if (adoptedMeters.length === 0) {
+				await Promise.all(adoptedMeters.map(mid => currentGroup.adoptMeter(mid)));
+			}
+
+			const disownedMeters = _.difference(currentChildMeters, req.body.childMeters);
+			if (disownedMeters.length === 0) {
+				await Promise.all(disownedMeters.map(mid => currentGroup.disownMeter(mid)));
+			}
+
+			res.sendStatus(200);
+		} catch (err) {
+			console.error(`Error while editing existing group: ${err}`); // eslint-disable-line no-console
+			res.sendStatus(500);
 		}
-
-		const currentChildGroups = await Group.getImmediateGroupsByGroupID(currentGroup.id);
-
-		const adoptedGroups = _.difference(req.body.childGroups, currentChildGroups);
-		if (adoptedGroups.length === 0) {
-			await Promise.all(adoptedGroups.map(gid => currentGroup.adoptGroup(gid)));
-		}
-
-		const disownedGroups = _.difference(currentChildGroups, req.body.childGroups);
-		if (disownedGroups.length === 0) {
-			await Promise.all(disownedGroups.map(gid => currentGroup.disownGroup(gid)));
-		}
-
-		// Compute meters differences and adopt/disown to make changes
-		const currentChildMeters = await Group.getImmediateMetersByGroupID(currentGroup.id);
-
-		const adoptedMeters = _.difference(req.body.childMeters, currentChildMeters);
-		if (adoptedMeters.length === 0) {
-			await Promise.all(adoptedMeters.map(mid => currentGroup.adoptMeter(mid)));
-		}
-
-		const disownedMeters = _.difference(currentChildMeters, req.body.childMeters);
-		if (disownedMeters.length === 0) {
-			await Promise.all(disownedMeters.map(mid => currentGroup.disownMeter(mid)));
-		}
-
-		res.sendStatus(200);
-	} catch (err) {
-		console.error(`Error while editing existing group: ${err}`); // eslint-disable-line no-console
-		res.sendStatus(500);
 	}
 });
 
@@ -201,13 +203,15 @@ router.delete('/delete', async (req, res) => {
 	};
 	if (!validate(req.body, validParams).valid) {
 		res.sendStatus(400);
-	}
-	try {
-		await Group.delete(req.body.id);
-		res.sendStatus(200);
-	} catch (err) {
-		console.error(`Error while deleting group ${err}`); // eslint-disable-line no-console
-		res.sendStatus(500);
+	} // eslint-disable-line brace-style
+	else {
+		try {
+			await Group.delete(req.body.id);
+			res.sendStatus(200);
+		} catch (err) {
+			console.error(`Error while deleting group ${err}`); // eslint-disable-line no-console
+			res.sendStatus(500);
+		}
 	}
 });
 
