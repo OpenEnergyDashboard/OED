@@ -8,6 +8,7 @@ import { fetchNeededLineReadings } from './lineReadings';
 import { fetchNeededBarReadings } from './barReadings';
 
 export const UPDATE_SELECTED_METERS = 'UPDATE_SELECTED_METERS';
+export const UPDATE_SELECTED_GROUPS = 'UPDATE_SELECTED_GROUPS';
 export const UPDATE_BAR_DURATION = 'UPDATE_BAR_DURATION';
 export const CHANGE_CHART_TO_RENDER = 'CHANGE_CHART_TO_RENDER';
 export const CHANGE_BAR_STACKING = 'CHANGE_BAR_STACKING';
@@ -29,6 +30,10 @@ export function updateSelectedMeters(meterIDs) {
 	return { type: UPDATE_SELECTED_METERS, meterIDs };
 }
 
+export function updateSelectedGroups(groupIDs) {
+	return { type: UPDATE_SELECTED_GROUPS, groupIDs };
+}
+
 export function updateBarDuration(barDuration) {
 	return { type: UPDATE_BAR_DURATION, barDuration };
 }
@@ -44,6 +49,18 @@ export function changeBarDuration(barDuration) {
 export function changeSelectedMeters(meterIDs) {
 	return (dispatch, getState) => {
 		dispatch(updateSelectedMeters(meterIDs));
+		// Nesting dispatches to preserve that updateSelectedMeters() is called before fetching readings
+		dispatch(dispatch2 => {
+			dispatch2(fetchNeededLineReadings(getState().graph.timeInterval));
+			dispatch2(fetchNeededBarReadings(getState().graph.timeInterval));
+		});
+		return Promise.resolve();
+	};
+}
+
+export function changeSelectedGroups(groupIDs) {
+	return (dispatch, getState) => {
+		dispatch(updateSelectedGroups(groupIDs));
 		// Nesting dispatches to preserve that updateSelectedMeters() is called before fetching readings
 		dispatch(dispatch2 => {
 			dispatch2(fetchNeededLineReadings(getState().graph.timeInterval));
