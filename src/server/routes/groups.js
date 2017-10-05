@@ -77,9 +77,10 @@ router.use(authenticator);
 router.post('/create', async (req, res) => {
 	const validGroup = {
 		type: 'object',
-		maxProperties: 3,
-		required: ['name', 'childGroups', 'childMeters'],
+		maxProperties: 4,
+		required: ['token', 'name', 'childGroups', 'childMeters'],
 		properties: {
+			token: { type: 'string' },
 			name: {
 				type: 'string',
 				minLength: 1,
@@ -122,12 +123,11 @@ router.post('/create', async (req, res) => {
 router.put('/edit', async (req, res) => {
 	const validGroup = {
 		type: 'object',
-		maxProperties: 4,
-		required: ['id', 'name', 'childGroups', 'childMeters'],
+		maxProperties: 5,
+		required: ['token', 'id', 'name', 'childGroups', 'childMeters'],
 		properties: {
-			id: {
-				type: 'integer'
-			},
+			token: { type: 'string' },
+			id: { type: 'integer' },
 			name: {
 				type: 'string',
 				minLength: 1,
@@ -195,9 +195,10 @@ router.put('/edit', async (req, res) => {
 router.delete('/delete', async (req, res) => {
 	const validParams = {
 		type: 'object',
-		maxProperties: 1,
-		required: ['id'],
+		maxProperties: 2,
+		required: ['token', 'id'],
 		properties: {
+			token: { type: 'string' },
 			id: { type: 'integer' }
 		}
 	};
