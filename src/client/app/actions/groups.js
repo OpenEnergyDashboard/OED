@@ -308,6 +308,7 @@ export function submitGroupInEditingIfNeeded() {
 		if (shouldSubmitGroupInEditing(getState())) {
 			const rawGroup = getState().groups.groupInEditing;
 			const group = {
+				token: localStorage.getItem('token'),
 				name: rawGroup.name,
 				childGroups: rawGroup.childGroups,
 				childMeters: rawGroup.childMeters,
@@ -330,15 +331,16 @@ export function submitGroupInEditingIfNeeded() {
 export function deleteGroup() {
 	return (dispatch, getState) => {
 		dispatch(markGroupInEditingDirty());
-		const params = { id: getState().groups.groupInEditing.id };
+		const params = {
+			id: getState().groups.groupInEditing.id,
+			token: localStorage.getItem('token')
+		};
 		return axios.delete('api/groups/delete', params)
 			.then(() => {
 				dispatch(markGroupsOutdated());
 				dispatch(markGroupInEditingClean());
 				dispatch(changeDisplayMode('view'));
 			})
-			.catch(error => {
-				console.error(error);
-			});
+			.catch(console.error);
 	};
 }

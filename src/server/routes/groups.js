@@ -104,8 +104,7 @@ router.post('/create', async (req, res) => {
 
 	if (!validate(req.body, validGroup).valid) {
 		res.sendStatus(400);
-	} // eslint-disable-line brace-style
-	else {
+	} else {
 		try {
 			const newGroup = new Group(undefined, req.body.name);
 			await newGroup.insert();
@@ -151,8 +150,7 @@ router.put('/edit', async (req, res) => {
 
 	if (!validate(req.body, validGroup).valid) {
 		res.sendStatus(400);
-	} // eslint-disable-line brace-style
-	else {
+	} else {
 		try {
 			const currentGroup = await Group.getByID(req.body.id);
 			if (req.body.name !== currentGroup.name) {
@@ -204,8 +202,7 @@ router.delete('/delete', async (req, res) => {
 	};
 	if (!validate(req.body, validParams).valid) {
 		res.sendStatus(400);
-	} // eslint-disable-line brace-style
-	else {
+	} else {
 		try {
 			await Group.delete(req.body.id);
 			res.sendStatus(200);
