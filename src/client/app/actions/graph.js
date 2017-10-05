@@ -7,7 +7,7 @@
 import { fetchNeededLineReadings } from './lineReadings';
 import { fetchNeededBarReadings } from './barReadings';
 
-export const UPDATE_SELECTED_DATASOURCES = 'UPDATE_SELECTED_DATASOURCES';
+export const UPDATE_SELECTED_METERS = 'UPDATE_SELECTED_METERS';
 export const UPDATE_BAR_DURATION = 'UPDATE_BAR_DURATION';
 export const CHANGE_CHART_TO_RENDER = 'CHANGE_CHART_TO_RENDER';
 export const CHANGE_BAR_STACKING = 'CHANGE_BAR_STACKING';
@@ -25,11 +25,8 @@ export function changeBarStacking() {
 	return { type: CHANGE_BAR_STACKING };
 }
 
-/**
- * @param {{type: String, id: number}} datasourceIDs
- */
-export function updateSelectedDatasources(datasourceIDs) {
-	return { type: UPDATE_SELECTED_DATASOURCES, datasourceIDs };
+export function updateSelectedMeters(meterIDs) {
+	return { type: UPDATE_SELECTED_METERS, meterIDs };
 }
 
 export function updateBarDuration(barDuration) {
@@ -44,12 +41,9 @@ export function changeBarDuration(barDuration) {
 	};
 }
 
-/**
- * @param {{type: String, id: number}} datasourceIDs
- */
-export function changeSelectedDatasources(datasourceIDs) {
+export function changeSelectedMeters(meterIDs) {
 	return (dispatch, getState) => {
-		dispatch(updateSelectedDatasources(datasourceIDs));
+		dispatch(updateSelectedMeters(meterIDs));
 		// Nesting dispatches to preserve that updateSelectedMeters() is called before fetching readings
 		dispatch(dispatch2 => {
 			dispatch2(fetchNeededLineReadings(getState().graph.timeInterval));

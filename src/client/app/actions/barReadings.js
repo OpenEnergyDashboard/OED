@@ -3,90 +3,49 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at http://mozilla.org/MPL/2.0/.
  */
-import _ from 'lodash';
+
 import axios from 'axios';
-import { DATA_TYPE_GROUP, DATA_TYPE_METER, metersFilterReduce, groupsFilterReduce } from '../utils/Datasources';
 
 export const REQUEST_BAR_READINGS = 'REQUEST_BAR_READINGS';
 export const RECEIVE_BAR_READINGS = 'RECEIVE_BAR_READINGS';
 
 /**
  * @param {State} state
- * @param {{type: String, id: number}} datasource
+ * @param {number} meterID
  * @param {TimeInterval} timeInterval
  * @param {Moment.Duration} barDuration
  */
-function shouldFetchBarReadings(state, datasource, timeInterval, barDuration) {
-	// Figure out whether to look in the groups or meters data array
-	let datasourceReadingsArray = [];
-	if (datasource.type === DATA_TYPE_METER) {
-		datasourceReadingsArray = state.readings.bar.byMeterID;
-	} else if (datasource.type === DATA_TYPE_GROUP) {
-		datasourceReadingsArray = state.readings.bar.byGroupID;
-	} else {
-		console.error('Cannot perform shouldFetchBarReadings for datasource type ', datasource.type);
-		return false;
-	}
-
-	const readingsForDatasource = datasourceReadingsArray[datasource.id];
-	// Check that the reading is there
-	if (readingsForDatasource === undefined) {
+function shouldFetchBarReadings(state, meterID, timeInterval, barDuration) {
+	const readingsForMeterID = state.readings.bar.byMeterID[meterID];
+	if (readingsForMeterID === undefined) {
 		return true;
 	}
-	if (readingsForDatasource[timeInterval] === undefined) {
+	if (readingsForMeterID[timeInterval] === undefined) {
 		return true;
 	}
-	if (readingsForDatasource[timeInterval][barDuration] === undefined) {
+	if (readingsForMeterID[timeInterval][barDuration] === undefined) {
 		return true;
 	}
-	// Look up the data for the given bar duration and time
-	const readingsForTimeIntervalAndDuration = datasourceReadingsArray[datasource.id][timeInterval][barDuration];
-	// If there's no data for the time interval, and a request for that data isn't in progress,
-	// return true so a request for that data can be initiated.
+	const readingsForTimeIntervalAndDuration = state.readings.bar.byMeterID[meterID][timeInterval][barDuration];
 	return readingsForTimeIntervalAndDuration === undefined && !readingsForTimeIntervalAndDuration.isFetching;
 }
 
-function requestBarReadings(datasourceIDs, timeInterval, barDuration) {
-	return { type: REQUEST_BAR_READINGS, datasourceIDs, timeInterval, barDuration };
+function requestBarReadings(meterIDs, timeInterval, barDuration) {
+	return { type: REQUEST_BAR_READINGS, meterIDs, timeInterval, barDuration };
 }
 
-function receiveBarReadings(datasourceIDs, timeInterval, barDuration, readings) {
-	return { type: RECEIVE_BAR_READINGS, datasourceIDs, timeInterval, barDuration, readings };
+function receiveBarReadings(meterIDs, timeInterval, barDuration, readings) {
+	return { type: RECEIVE_BAR_READINGS, meterIDs, timeInterval, barDuration, readings };
 }
 
-function fetchBarReadings(datasourceIDs, timeInterval) {
+function fetchBarReadings(meterIDs, timeInterval) {
 	return (dispatch, getState) => {
 		const barDuration = getState().graph.barDuration;
-		dispatch(requestBarReadings(datasourceIDs, timeInterval, barDuration));
-
-		// Extract seperate lists of meters and groups to be fetched.
-		// These lists still have type information.
-		const meterIDs = _.reduce(datasourceIDs, (t, i) => metersFilterReduce(t, i, true), []);
-		const groupIDs = _.reduce(datasourceIDs, (t, i) => groupsFilterReduce(t, i, true), []);
-
-		const promises = [];
-		if (groupIDs.length > 0) {
-			// API wants a string of comma seperated numerical IDs.
-			const stringifiedGroupIDs = groupIDs.map(group => group.id).join(',');
-			console.warn(`Unimplemented request issued for group bar readings! Groups: ${stringifiedGroupIDs}`);
-			// TODO: This is not the right URL!
-			const groupsDataPromise = axios.get(`/api/readings/bar/${stringifiedGroupIDs}`, {
-				params: { timeInterval: timeInterval.toString(), barDuration: barDuration.toISOString() }
-			}).then(response => dispatch(receiveBarReadings(groupIDs, timeInterval, barDuration, response.data)));
-			promises.push(groupsDataPromise);
-		}
-		if (meterIDs.length > 0) {
-			// API wants a string of comma seperated numerical IDs.
-			const stringifiedMeterIDs = meterIDs.map(meter => meter.id).join(',');
-			const metersDataPromise = axios.get(`/api/readings/bar/${stringifiedMeterIDs}`, {
-				params: { timeInterval: timeInterval.toString(), barDuration: barDuration.toISOString() }
-			}).then(response => {
-				console.log(response.data);
-				dispatch(receiveBarReadings(meterIDs, timeInterval, barDuration, response.data));
-			});
-			promises.push(metersDataPromise);
-		}
-		return Promise.all(promises);
+		dispatch(requestBarReadings(meterIDs, timeInterval, barDuration));
+		const stringifiedMeterIDs = meterIDs.join(',');
+		return axios.get(`/api/readings/bar/${stringifiedMeterIDs}`, {
+			params: { timeInterval: timeInterval.toString(), barDuration: barDuration.toISOString() }
+		}).then(response => dispatch(receiveBarReadings(meterIDs, timeInterval, barDuration, response.data)));
 	};
 }
 
@@ -98,11 +57,9 @@ function fetchBarReadings(datasourceIDs, timeInterval) {
 export function fetchNeededBarReadings(timeInterval) {
 	return (dispatch, getState) => {
 		const state = getState();
-		const datasourceIDsToFetchForBar = state.graph.selectedDatasources.filter(
-			id => shouldFetchBarReadings(state, id, timeInterval, state.graph.barDuration)
-		);
-		if (datasourceIDsToFetchForBar.length > 0) {
-			return dispatch(fetchBarReadings(datasourceIDsToFetchForBar, timeInterval));
+		const meterIDsToFetchForBar = state.graph.selectedMeters.filter(id => shouldFetchBarReadings(state, id, timeInterval, state.graph.barDuration));
+		if (meterIDsToFetchForBar.length > 0) {
+			return dispatch(fetchBarReadings(meterIDsToFetchForBar, timeInterval));
 		}
 		return Promise.resolve();
 	};
