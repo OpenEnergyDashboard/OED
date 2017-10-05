@@ -6,6 +6,7 @@
  */
 
 import * as readingsActions from '../actions/lineReadings';
+import { DATA_TYPE_METER, DATA_TYPE_GROUP } from '../utils/Datasources';
 
 /**
  * @typedef {Object} State~BarReadings
@@ -16,7 +17,8 @@ import * as readingsActions from '../actions/lineReadings';
  * @type {State~Readings}
  */
 const defaultState = {
-	byMeterID: {}
+	byMeterID: {},
+	byGroupID: {}
 };
 
 /**
@@ -32,15 +34,30 @@ export default function readings(state = defaultState, action) {
 				...state,
 				byMeterID: {
 					...state.byMeterID
+				},
+				byGroupID: {
+					...state.byGroupID
 				}
 			};
-			for (const meterID of action.meterIDs) {
-				if (newState.byMeterID[meterID] === undefined) {
-					newState.byMeterID[meterID] = {};
-				} else if (newState.byMeterID[meterID][timeInterval] === undefined) {
-					newState.byMeterID[meterID][timeInterval] = { isFetching: true };
-				} else {
-					newState.byMeterID[meterID][timeInterval] = { ...newState.byMeterID[meterID][timeInterval], isFetching: true };
+			if (action.dstype === DATA_TYPE_METER) {
+				for (const meterID of action.dsIDs) {
+					if (newState.byMeterID[meterID] === undefined) {
+						newState.byMeterID[meterID] = {};
+					} else if (newState.byMeterID[meterID][timeInterval] === undefined) {
+						newState.byMeterID[meterID][timeInterval] = { isFetching: true };
+					} else {
+						newState.byMeterID[meterID][timeInterval] = { ...newState.byMeterID[meterID][timeInterval], isFetching: true };
+					}
+				}
+			} else if (action.dstype === DATA_TYPE_GROUP) {
+				for (const groupID of action.dsIDs) {
+					if (newState.byGroupID[groupID] === undefined) {
+						newState.byGroupID[groupID] = {};
+					} else if (newState.byGroupID[groupID][timeInterval] === undefined) {
+						newState.byGroupID[groupID][timeInterval] = { isFetching: true };
+					} else {
+						newState.byGroupID[groupID][timeInterval] = { ...newState.byGroupID[groupID][timeInterval], isFetching: true };
+					}
 				}
 			}
 			return newState;
@@ -50,13 +67,25 @@ export default function readings(state = defaultState, action) {
 			const newState = {
 				...state,
 				byMeterID: {
-					...state.byMeterID
+					...state.byMeterID,
+				},
+				byGroupID: {
+					...state.byGroupID
 				}
 			};
-			for (const meterID of action.meterIDs) {
-				const readingsForMeter = action.readings[meterID];
-				newState.byMeterID[meterID][timeInterval] = { isFetching: false, readings: readingsForMeter };
+
+			if (action.dstype === DATA_TYPE_METER) {
+				for (const meterID of action.dsIDs) {
+					const readingsForMeter = action.readings[meterID];
+					newState.byMeterID[meterID][timeInterval] = { isFetching: false, readings: readingsForMeter };
+				}
+			} else if (action.dstype === DATA_TYPE_GROUP) {
+				for (const groupID of action.dsIDs) {
+					const readingsForGroup = action.readings[groupID];
+					newState.byGroupID[groupID][timeInterval] = { isFetching: false, readings: readingsForGroup };
+				}
 			}
+
 			return newState;
 		}
 		default:

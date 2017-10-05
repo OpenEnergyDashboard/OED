@@ -9,7 +9,7 @@ import 'react-rangeslider/lib/index.css';
 import MultiSelectComponent from './MultiSelectComponent';
 import { chartTypes } from '../reducers/graph';
 import ExportContainer from '../containers/ExportContainer';
-import { DATA_TYPE_METER, metersFilterReduce } from '../utils/Datasources';
+import { DATA_TYPE_METER, DATA_TYPE_GROUP, metersFilterReduce, groupsFilterReduce } from '../utils/Datasources';
 
 export default class UIOptionsComponent extends React.Component {
 	/**
@@ -34,20 +34,20 @@ export default class UIOptionsComponent extends React.Component {
 	 */
 	componentWillMount() {
 		this.props.fetchMetersDetailsIfNeeded();
+		this.props.fetchGroupsDetailsIfNeeded();
 	}
 
 	/**
 	 * Handles a change in data source selection
 	 * @param {Object[]} selection An array of {label: string, value: {type: string, id: int}} representing the current selection
+	 * @param {String} type either DATA_TYPE_GROUPS or DATA_TYPE_METERS
 	 */
-	handleDatasourceSelect(selection) {
-		// Only load meters
-		const selectedMeters = selection.reduce(metersFilterReduce, []);
-		this.props.selectMeters(selectedMeters);
-		// Only load groups
-		// TODO: Uncomment when groups graphing is implemented
-		// const selectedGroups = selection.reduce(groupsFilterReduce, []);
-		// this.props.selectGroups(selectedGroups);
+	handleDatasourceSelect(selection, type) {
+		if (type === DATA_TYPE_METER) {
+			this.props.selectMeters(selection.reduce(metersFilterReduce, []));
+		} else if (type === DATA_TYPE_GROUP) {
+			this.props.selectGroups(selection.reduce(groupsFilterReduce, []));
+		}
 	}
 
 	/**
@@ -93,10 +93,18 @@ export default class UIOptionsComponent extends React.Component {
 
 		// Construct the options of the MultiSelect. Because value can be any JavaScript object, here we load it with both the type
 		// and ID. Currently this is useless, but when groups graphing is introduced it will be important
-		const selectOptions = this.props.meters.map(meter => (
+		const meterSelectOptions = this.props.meters.map(meter => (
 			{ 	label: meter.name,
 				type: DATA_TYPE_METER,
-				value: meter.id,
+				value: meter.id
+			}
+		));
+
+		const groupSelectOptions = this.props.groups.map(group => (
+			{
+				label: group.name,
+				type: DATA_TYPE_GROUP,
+				value: group.id
 			}
 		));
 
@@ -104,9 +112,13 @@ export default class UIOptionsComponent extends React.Component {
 		return (
 			<div className="col-xs-2" style={divPadding}>
 				<div className="col-xs-11">
+					<p style={labelStyle}>Groups:</p>
+					<div style={divBottomPadding}>
+						<MultiSelectComponent options={groupSelectOptions} placeholder="Select Groups" onValuesChange={s => this.handleDatasourceSelect(s, DATA_TYPE_GROUP)} />
+					</div>
 					<p style={labelStyle}>Meters:</p>
 					<div style={divBottomPadding}>
-						<MultiSelectComponent options={selectOptions} placeholder="Select Meters" onValuesChange={this.handleDatasourceSelect} />
+						<MultiSelectComponent options={meterSelectOptions} placeholder="Select Meters" onValuesChange={s => this.handleDatasourceSelect(s, DATA_TYPE_METER)} />
 					</div>
 					<p style={labelStyle}>Graph Type:</p>
 					<div className="radio">

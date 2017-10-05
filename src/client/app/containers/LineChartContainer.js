@@ -18,11 +18,25 @@ function mapStateToProps(state) {
 	const data = { datasets: [] };
 	const graphColors = new GraphColors();
 
+	// Add all meters data to the chart
 	for (const meterID of state.graph.selectedMeters) {
 		const readingsData = state.readings.line.byMeterID[meterID][timeInterval];
 		if (readingsData !== undefined && !readingsData.isFetching) {
 			data.datasets.push({
 				label: state.meters.byMeterID[meterID].name,
+				data: readingsData.readings.map(arr => ({ x: arr[0], y: arr[1].toFixed(2) })),
+				fill: false,
+				borderColor: graphColors.getColor()
+			});
+		}
+	}
+
+	// Add all groups data to the chart
+	for (const groupID of state.graph.selectedGroups) {
+		const readingsData = state.readings.line.byGroupID[groupID][timeInterval];
+		if (readingsData !== undefined && !readingsData.isFetching) {
+			data.datasets.push({
+				label: state.groups.byGroupID[groupID].name,
 				data: readingsData.readings.map(arr => ({ x: arr[0], y: arr[1].toFixed(2) })),
 				fill: false,
 				borderColor: graphColors.getColor()
