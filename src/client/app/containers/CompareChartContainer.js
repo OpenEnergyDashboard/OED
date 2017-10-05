@@ -21,6 +21,11 @@ function mapStateToProps(state) {
 	const graphColors = new GraphColors();
 	const labelsSet = new Set();
 	const timeSet = new Set();
+	let cw = 0;
+	let lw = 0;
+	let clw = 0;
+	const soFar = moment().diff(moment().startOf('week'), 'days');
+	console.log(soFar);
 	for (const meterID of state.graph.selectedMeters) {
 		const readingsData = state.readings.bar.byMeterID[meterID][timeInterval][barDuration];
 		if (readingsData !== undefined && !readingsData.isFetching) {
@@ -28,21 +33,33 @@ function mapStateToProps(state) {
 			for (const element of _.flatten(readingsData.readings.map(arr => arr[0]))) {
 				timeSet.add(`${moment(element).format('MMM DD, YYYY, hh:mm a')} - ${moment(element).add(barDuration).format('MMM DD, YYYY, hh:mm a')}`);
 			}
-			console.log(readingsData);
+			// Calculate cw
+			for (let i = 1; i <= soFar; i++) {
+				cw += readingsData.readings[readingsData.readings.length - i][1];
+			}
+			// Calculate lw
+			for (let i = 0; i < 7; i++) {
+				lw += readingsData.readings[readingsData.readings.length - (8 + i) - soFar][1];
+			}
+
+			// Calculate clw
+			for (let i = 1; i <= soFar; i++) {
+				clw += readingsData.readings[readingsData.readings.length - i - 7][1];
+			}
+			console.log(`current: ${cw}. current last week: ${clw}. Total last week: ${lw}. future: ${(cw / clw) * lw}`);
 			labelsSet.add('Last week');
 			labelsSet.add('This week');
 			const color1 = graphColors.getColor();
 			const color2 = graphColors.getColor();
 			data.datasets.push({
 				label: Array.from(timeSet)[readingsData.readings.length - 2],
-				data: [readingsData.readings[readingsData.readings.length - 2][1], (readingsData.readings[readingsData.readings.length - 2][1] / 7) * 4], // this is most cared about on wednesdays so on average...
+				data: [lw, (cw / clw) * lw],
 				backgroundColor: color1,
 				hoverBackgroundColor: color1
 			},
 				{
 					label: Array.from(timeSet)[readingsData.readings.length - 1],
-					data: [readingsData.readings[readingsData.readings.length - 1][1], (((readingsData.readings[readingsData.readings.length - 1][1]) / 4)
-					/ (readingsData.readings[readingsData.readings.length - 2][1] / 7)) * 7],
+					data: [clw, cw],
 					backgroundColor: color2,
 					hoverBackgroundColor: color2
 				});
