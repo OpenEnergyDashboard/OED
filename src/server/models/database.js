@@ -59,7 +59,6 @@ async function createSchema() {
 	await Meter.createTable();
 	await Reading.createTable();
 	await Reading.createCompressedReadingsFunction();
-	await Reading.createCompressedGroupsReadingsFunction();
 	await Reading.createBarchartReadingsFunction();
 	await User.createTable();
 	await Group.createTables();

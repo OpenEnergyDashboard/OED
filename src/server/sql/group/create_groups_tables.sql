@@ -109,10 +109,10 @@ CREATE VIEW groups_deep_meters AS
 
 	WITH all_deep_meters(group_id, meter_id) AS (
 			SELECT DISTINCT -- Distinct because two children might include the same meter, and we only want it once.
-				COALESCE(gdc.parent_id, gim.group_id) AS group_id,
+				gdc.parent_id AS group_id,
 				gim.meter_id
 			FROM groups_deep_children gdc
-				RIGHT JOIN groups_immediate_meters gim ON gdc.parent_id = gim.group_id OR gdc.child_id = gim.group_id
+				INNER JOIN groups_immediate_meters gim ON gdc.parent_id = gim.group_id OR gdc.child_id = gim.group_id
 	)
 	SELECT
 		adm.group_id AS group_id,

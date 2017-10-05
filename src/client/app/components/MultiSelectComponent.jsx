@@ -51,7 +51,8 @@ MultiSelectComponent.propTypes = {
 	placeholder: PropTypes.string,
 	options: PropTypes.arrayOf(PropTypes.shape({
 		label: PropTypes.string.isRequired,
-		value: PropTypes.any,
+		type: PropTypes.string.isRequired,
+		value: PropTypes.number,
 	})),
 	selectedOptions: PropTypes.arrayOf(PropTypes.shape({
 		label: PropTypes.string.isRequired,

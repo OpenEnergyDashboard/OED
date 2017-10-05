@@ -8,7 +8,6 @@ import moment from 'moment';
 import { connect } from 'react-redux';
 import 'chartjs-plugin-zoom';
 import GraphColors from '../utils/GraphColors';
-import { DATA_TYPE_GROUP, DATA_TYPE_METER } from '../utils/Datasources';
 
 /**
  * @param {State} state
@@ -18,23 +17,11 @@ function mapStateToProps(state) {
 	const data = { datasets: [] };
 	const graphColors = new GraphColors();
 
-	for (const datasourceID of state.graph.selectedDatasources) {
-		// Contains the actual data being displayed
-		let readingsData = {};
-		// Contains metainfo about the data being displayed
-		let datasource = {};
-		// Figure out which table to look up the data in, and do that.
-		if (datasourceID.type === DATA_TYPE_METER) {
-			datasource = state.meters.byMeterID[datasourceID.id];
-			readingsData = state.readings.line.byMeterID[datasourceID.id][timeInterval];
-		} else if (datasourceID.type === DATA_TYPE_GROUP) {
-			datasource = state.groups.byGroupID[datasourceID.id];
-			readingsData = state.readings.line.byGroupID[datasourceID.id][timeInterval];
-		}
-
+	for (const meterID of state.graph.selectedMeters) {
+		const readingsData = state.readings.line.byMeterID[meterID][timeInterval];
 		if (readingsData !== undefined && !readingsData.isFetching) {
 			data.datasets.push({
-				label: datasource.name,
+				label: state.meters.byMeterID[meterID].name,
 				data: readingsData.readings.map(arr => ({ x: arr[0], y: arr[1].toFixed(2) })),
 				fill: false,
 				borderColor: graphColors.getColor()
