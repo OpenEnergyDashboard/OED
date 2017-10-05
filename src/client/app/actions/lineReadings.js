@@ -5,6 +5,7 @@
  */
 
 import axios from 'axios';
+import { DATA_TYPE_METER, DATA_TYPE_GROUP } from '../utils/Datasources';
 
 export const REQUEST_LINE_READINGS = 'REQUEST_LINE_READINGS';
 export const RECEIVE_LINE_READINGS = 'RECEIVE_LINE_READINGS';
@@ -13,16 +14,24 @@ export const RECEIVE_LINE_READINGS = 'RECEIVE_LINE_READINGS';
  * @param {State} state
  * @param {number} meterID
  * @param {TimeInterval} timeInterval
+ * @param {String} type either DATA_TYPE_METER, DATA_TYPE_GROUP
  */
-function shouldFetchLineReadings(state, meterID, timeInterval) {
-	const readingsForMeterID = state.readings.line.byMeterID[meterID];
-	if (readingsForMeterID === undefined) {
+function shouldFetchLineReadings(state, dsID, timeInterval, type) {
+	let dsArray;
+	if (type === DATA_TYPE_GROUP) {
+		dsArray = state.readings.line.byGroupID;
+	} else if (type === DATA_TYPE_METER) {
+		dsArray = state.readings.line.byMeterID;
+	}
+
+	const readingsForID = dsArray[dsID];
+	if (readingsForID === undefined) {
 		return true;
 	}
-	if (readingsForMeterID[timeInterval] === undefined) {
+	if (readingsForID[timeInterval] === undefined) {
 		return true;
 	}
-	const readingsForTimeInterval = state.readings.line.byMeterID[meterID][timeInterval];
+	const readingsForTimeInterval = dsArray[dsID][timeInterval];
 	return readingsForTimeInterval === undefined && !readingsForTimeInterval.isFetching;
 }
 
@@ -34,12 +43,16 @@ function receiveLineReadings(meterIDs, timeInterval, readings) {
 	return { type: RECEIVE_LINE_READINGS, meterIDs, timeInterval, readings };
 }
 
-function fetchLineReadings(meterIDs, timeInterval) {
+function fetchLineReadings(dsIDs, timeInterval, type) {
 	return dispatch => {
-		dispatch(requestLineReadings(meterIDs, timeInterval));
+		dispatch(requestLineReadings(dsIDs, timeInterval));
 		// The api expects the meter ids to be a comma-separated list.
-		const stringifiedMeterIDs = meterIDs.join(',');
-		return axios.get(`/api/readings/line/meters/${stringifiedMeterIDs}`, {
+		const stringifiedIDs = dsIDs.join(',');
+		let endpoint;
+		if (type === DATA_TYPE_GROUP) {
+			endpoint = '/api/readings/line/meters';
+		}
+		return axios.get(`${endpoint}/${stringifiedMeterIDs}`, {
 			params: { timeInterval: timeInterval.toString() }
 		}).then(response => dispatch(receiveLineReadings(meterIDs, timeInterval, response.data)));
 	};

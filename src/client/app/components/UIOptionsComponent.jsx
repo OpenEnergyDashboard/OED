@@ -94,7 +94,8 @@ export default class UIOptionsComponent extends React.Component {
 		// Construct the options of the MultiSelect. Because value can be any JavaScript object, here we load it with both the type
 		// and ID. Currently this is useless, but when groups graphing is introduced it will be important
 		const selectOptions = this.props.meters.map(meter => (
-			{ 	label: meter.name,
+			{
+				label: meter.name,
 				type: DATA_TYPE_METER,
 				value: meter.id,
 			}
