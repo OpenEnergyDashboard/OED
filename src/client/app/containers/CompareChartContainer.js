@@ -25,14 +25,13 @@ function mapStateToProps(state) {
 	let lw = 0;
 	let clw = 0;
 	const soFar = moment().diff(moment().startOf('week'), 'days');
-	console.log(soFar);
 	for (const meterID of state.graph.selectedMeters) {
 		const readingsData = state.readings.bar.byMeterID[meterID][timeInterval][barDuration];
 		if (readingsData !== undefined && !readingsData.isFetching) {
 		    // Converts unix time stamp to something nicer
-			for (const element of _.flatten(readingsData.readings.map(arr => arr[0]))) {
-				timeSet.add(`${moment(element).format('MMM DD, YYYY, hh:mm a')} - ${moment(element).add(barDuration).format('MMM DD, YYYY, hh:mm a')}`);
-			}
+            // for (const element of _.flatten(readingsData.readings.map(arr => arr[0]))) {
+				// timeSet.add(`${moment(element).format('MMM DD, YYYY, hh:mm a')} - ${moment(element).add(barDuration).format('MMM DD, YYYY, hh:mm a')}`);
+            // }
 			// Calculate cw
 			for (let i = 1; i <= soFar; i++) {
 				cw += readingsData.readings[readingsData.readings.length - i][1];
@@ -51,14 +50,13 @@ function mapStateToProps(state) {
 			labelsSet.add('This week');
 			const color1 = graphColors.getColor();
 			const color2 = graphColors.getColor();
+			const color3 = graphColors.getColor();
 			data.datasets.push({
-				label: Array.from(timeSet)[readingsData.readings.length - 2],
 				data: [lw, (cw / clw) * lw],
-				backgroundColor: color1,
-				hoverBackgroundColor: color1
+				backgroundColor: [color1, color3],
+				hoverBackgroundColor: [color1, color3]
 			},
 				{
-					label: Array.from(timeSet)[readingsData.readings.length - 1],
 					data: [clw, cw],
 					backgroundColor: color2,
 					hoverBackgroundColor: color2
@@ -100,13 +98,16 @@ function mapStateToProps(state) {
 				}
 			}]
 		},
+		legend: {
+			display: false
+		},
 		tooltips: {
 			mode: 'nearest',
 			intersect: false,
 			backgroundColor: 'rgba(0,0,0,0.6)',
 			displayColors: false,
 			callbacks: {
-				label: tooltipItems => `${data.datasets[tooltipItems.datasetIndex].label}: ${tooltipItems.yLabel} kWh`
+				label: tooltipItems => `Used: ${tooltipItems.yLabel} kWh`
 			}
 		}
 	};
