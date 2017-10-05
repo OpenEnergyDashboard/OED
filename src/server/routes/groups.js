@@ -201,6 +201,7 @@ router.delete('/delete', async (req, res) => {
 	}
 	try {
 		await Group.delete(req.body.id);
+		res.sendStatus(200);
 	} catch (err) {
 		console.error(`Error while deleting group ${err}`); // eslint-disable-line no-console
 		res.sendStatus(500);
