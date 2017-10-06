@@ -22,14 +22,17 @@ router.post('/:meter_id', upload.single('csvFile'), async (req, res) => {
 		streamToDB(myReadableStreamBuffer, row => {
 			//change the type of file being read. So, my guess is I need to change the content here.
 			//MAMAC Sample log file.
-			const id =  req.params.meter_id;
+			const id =  parseInt(req.params.meter_id);
 			const readRate = row[0];
 			const endTimestamp = moment(row[1], 'HH:mm:ss MM/DD/YYYY');
 			const startTimestamp = moment(row[1], 'HH:mm:ss MM/DD/YYYY').subtract(60,'minutes');
+			// console.log(`readRate: ${readRate}`);
 			return new Reading(id, readRate, startTimestamp, endTimestamp);
 			// TODO Fix the third paramter, Simon will know.
-		}, (readings, tx) => Reading.insertAll(readings, tx).then(() => console.log('Inserted!')));
-		console.log(data);
+		}, (readings, tx) => Reading.insertAll(readings, tx).then(() => console.log('Inserted!')).catch(e => {
+			console.error(`Error inserting readings ${readings}`)
+		}));
+
 		res.status(200);
 	} catch (err) {
 		res.status(400).send({ text: 'Invalid file.' });

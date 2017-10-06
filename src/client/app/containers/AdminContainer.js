@@ -10,7 +10,7 @@ import AdminComponent from '../components/AdminComponent';
  */
 function mapStateToProps(state) {
 	return {
-		meterID: state.admin.selectedMeters,
+		meterID: state.admin.selectedMeter,
 	};
 }
 
