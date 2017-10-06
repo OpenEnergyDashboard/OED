@@ -8,6 +8,7 @@ import _ from 'lodash';
 import { Bar } from 'react-chartjs-2';
 import moment from 'moment';
 import { connect } from 'react-redux';
+import datalabels from 'chartjs-plugin-datalabels';
 import GraphColors from '../utils/GraphColors';
 
 
@@ -18,9 +19,7 @@ function mapStateToProps(state) {
 	const timeInterval = state.graph.compareTimeInterval;
 	const barDuration = state.graph.compareDuration;
 	const data = { datasets: [] };
-	const graphColors = new GraphColors();
 	const labelsSet = new Set();
-	const timeSet = new Set();
 	let cw = 0;
 	let lw = 0;
 	let clw = 0;
@@ -28,10 +27,6 @@ function mapStateToProps(state) {
 	for (const meterID of state.graph.selectedMeters) {
 		const readingsData = state.readings.bar.byMeterID[meterID][timeInterval][barDuration];
 		if (readingsData !== undefined && !readingsData.isFetching) {
-		    // Converts unix time stamp to something nicer
-            // for (const element of _.flatten(readingsData.readings.map(arr => arr[0]))) {
-				// timeSet.add(`${moment(element).format('MMM DD, YYYY, hh:mm a')} - ${moment(element).add(barDuration).format('MMM DD, YYYY, hh:mm a')}`);
-            // }
 			// Calculate cw
 			for (let i = 1; i <= soFar; i++) {
 				cw += readingsData.readings[readingsData.readings.length - i][1];
@@ -45,27 +40,31 @@ function mapStateToProps(state) {
 			for (let i = 1; i <= soFar; i++) {
 				clw += readingsData.readings[readingsData.readings.length - i - 7][1];
 			}
-			console.log(`current: ${cw}. current last week: ${clw}. Total last week: ${lw}. future: ${(cw / clw) * lw}`);
 			labelsSet.add('Last week');
 			labelsSet.add('This week');
-			const color1 = graphColors.getColor();
-			const color2 = graphColors.getColor();
-			const color3 = graphColors.getColor();
+			const color1 = 'rgba(173, 216, 230, 1)';
+			const color2 = 'rgba(218, 165, 32, 1)';
+			const color3 = 'rgba(173, 216, 230, 0.5)';
 			data.datasets.push({
-				data: [lw, (cw / clw) * lw],
+				data: [lw, Math.round((cw / clw) * lw)],
 				backgroundColor: [color1, color3],
-				hoverBackgroundColor: [color1, color3]
+				hoverBackgroundColor: [color1, color3],
+				datalabels: {
+					anchor: 'end',
+					align: 'start',
+				}
 			},
 				{
 					data: [clw, cw],
 					backgroundColor: color2,
-					hoverBackgroundColor: color2
+					hoverBackgroundColor: color2,
+					datalabels: {
+						anchor: 'end',
+						align: 'start',
+					}
 				});
 			// sorts the data so that one doesn't cover up the other
 			data.datasets.sort((a, b) => a.data[0] - b.data[0]);
-
-			// groups readings by meter
-			// labelsSet.add(state.meters.byMeterID[meterID].name);
 		}
 	}
     //
@@ -101,13 +100,15 @@ function mapStateToProps(state) {
 		legend: {
 			display: false
 		},
-		tooltips: {
-			mode: 'nearest',
-			intersect: false,
-			backgroundColor: 'rgba(0,0,0,0.6)',
-			displayColors: false,
-			callbacks: {
-				label: tooltipItems => `Used: ${tooltipItems.yLabel} kWh`
+		 tooltips: {
+			enabled: false
+		 	},
+		plugins: {
+			datalabels: {
+				color: 'black',
+				font: {
+					weight: 'bold'
+				}
 			}
 		}
 	};

@@ -61,6 +61,11 @@ function mapStateToProps(state) {
 				title: tooltipItems => `${moment(tooltipItems[0].xLabel).format('dddd, MMM DD, YYYY hh:mm a')}`,
 				label: tooltipItems => `${data.datasets[tooltipItems.datasetIndex].label}: ${tooltipItems.yLabel} kWh`
 			}
+		},
+		plugins: {
+			datalabels: {
+				display: false
+			}
 		}
 	};
 
