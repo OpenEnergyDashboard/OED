@@ -20,7 +20,10 @@ function mapStateToProps(state) {
 	for (const groupID of state.graph.selectedGroups) {
 		if (chart === chartTypes.line) {
 			readingsData = state.readings.line.byGroupID[groupID][timeInterval];
-		}		else if (chart === chartTypes.bar) { readingsData = state.readings.bar.byGroupID[groupID][timeInterval][barDuration]; }
+		} else if (chart === chartTypes.bar) {
+			console.error('UNIMPLEMENTED: Export for group bar charts.');
+		}
+
 		if (readingsData !== undefined && !readingsData.isFetching && chart === chartTypes.line) {
 			data.datasets.push({
 				label: state.groups.byGroupID[groupID].name,
@@ -31,20 +34,16 @@ function mapStateToProps(state) {
 			});
 		} else if (readingsData !== undefined && !readingsData.isFetching && chart === chartTypes.bar) {
 			console.error('UNIMPLEMENTED: Export for group bar charts.');
-			/*data.datasets.push({
-				label: state.meters.byMeterID[meterID].name,
-				id: state.meters.byMeterID[meterID].id,
-				timestamp: state.readings.bar.byMeterID[meterID][timeInterval][barDuration].timestamp,
-				currentChart: chart,
-				exportVals: state.readings.bar.byMeterID[meterID][timeInterval][barDuration].readings.map(arr => ({ x: arr[0], y: arr[1] }))
-			});*/
 		}
 	}
 
 	for (const meterID of state.graph.selectedMeters) {
 		if (chart === chartTypes.line) {
 			readingsData = state.readings.line.byMeterID[meterID][timeInterval];
-		}		else if (chart === chartTypes.bar) { readingsData = state.readings.bar.byMeterID[meterID][timeInterval][barDuration]; }
+		} else if (chart === chartTypes.bar) {
+			readingsData = state.readings.bar.byMeterID[meterID][timeInterval][barDuration];
+		}
+
 		if (readingsData !== undefined && !readingsData.isFetching && chart === chartTypes.line) {
 			data.datasets.push({
 				label: state.meters.byMeterID[meterID].name,
