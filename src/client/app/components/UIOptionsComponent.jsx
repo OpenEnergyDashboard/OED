@@ -109,7 +109,9 @@ export default class UIOptionsComponent extends React.Component {
 					<label><input type="checkbox" onChange={this.handleChangeBarStacking} />Bar stacking</label>
 				</div>
 				}
+				{this.props.chartToRender !== chartTypes.compare &&
 				<ExportContainer />
+                }
 			</div>
 		);
 	}
