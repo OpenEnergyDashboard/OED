@@ -74,11 +74,6 @@ function mapStateToProps(state) {
 			callbacks: {
 				label: tooltipItems => `${data.datasets[tooltipItems.datasetIndex].label}: ${tooltipItems.yLabel} kWh`
 			}
-		},
-		plugins: {
-			datalabels: {
-				display: false
-			}
 		}
 	};
 

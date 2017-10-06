@@ -109,7 +109,8 @@ function mapStateToProps(state) {
 				color: 'black',
 				font: {
 					weight: 'bold'
-				}
+				},
+				display: true
 			}
 		}
 	};

@@ -8,6 +8,9 @@ import LineChartContainer from '../containers/LineChartContainer';
 import BarChartContainer from '../containers/BarChartContainer';
 import CompareChartContainer from '../containers/CompareChartContainer'
 import { chartTypes } from '../reducers/graph';
+import { defaults } from 'react-chartjs-2';
+
+defaults.global.plugins.datalabels.display = false;
 
 /**
  * React component that controls the dashboard
