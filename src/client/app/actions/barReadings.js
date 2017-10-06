@@ -78,7 +78,6 @@ export function fetchNeededBarReadings(timeInterval) {
 
 export function fetchNeededCompareReadings(timeInterval) {
     return (dispatch, getState) => {
-    	console.log('Called fetchNeededCompareReadings');
         const state = getState();
         const meterIDsToFetchForBar = state.graph.selectedMeters.filter(id => shouldFetchBarReadings(state, id, timeInterval, state.graph.compareDuration));
         if (meterIDsToFetchForBar.length > 0) {

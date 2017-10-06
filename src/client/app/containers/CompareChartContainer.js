@@ -9,7 +9,6 @@ import { Bar } from 'react-chartjs-2';
 import moment from 'moment';
 import { connect } from 'react-redux';
 import datalabels from 'chartjs-plugin-datalabels';
-import GraphColors from '../utils/GraphColors';
 
 
 /**
@@ -19,34 +18,37 @@ function mapStateToProps(state) {
 	const timeInterval = state.graph.compareTimeInterval;
 	const barDuration = state.graph.compareDuration;
 	const data = { datasets: [] };
-	const labelsSet = new Set();
-	let cw = 0;
-	let lw = 0;
-	let clw = 0;
+	const labels = [];
+	// Power used so far this week
+	let currentWeek = 0;
+	// Last week total usage
+	let lastWeek = 0;
+	// Power used up to this point last week
+	let currentLastWeek = 0;
 	const soFar = moment().diff(moment().startOf('week'), 'days');
 	for (const meterID of state.graph.selectedMeters) {
 		const readingsData = state.readings.bar.byMeterID[meterID][timeInterval][barDuration];
 		if (readingsData !== undefined && !readingsData.isFetching) {
-			// Calculate cw
+			// Calculate currentWeek
 			for (let i = 1; i <= soFar; i++) {
-				cw += readingsData.readings[readingsData.readings.length - i][1];
+				currentWeek += readingsData.readings[readingsData.readings.length - i][1];
 			}
-			// Calculate lw
+			// Calculate lastWeek
 			for (let i = 0; i < 7; i++) {
-				lw += readingsData.readings[readingsData.readings.length - (8 + i) - soFar][1];
+				lastWeek += readingsData.readings[readingsData.readings.length - (8 + i) - soFar][1];
 			}
 
-			// Calculate clw
+			// Calculate currentLastWeek
 			for (let i = 1; i <= soFar; i++) {
-				clw += readingsData.readings[readingsData.readings.length - i - 7][1];
+				currentLastWeek += readingsData.readings[readingsData.readings.length - i - 7][1];
 			}
-			labelsSet.add('Last week');
-			labelsSet.add('This week');
+			labels.push('Last week');
+			labels.push('This week');
 			const color1 = 'rgba(173, 216, 230, 1)';
 			const color2 = 'rgba(218, 165, 32, 1)';
 			const color3 = 'rgba(173, 216, 230, 0.5)';
 			data.datasets.push({
-				data: [lw, Math.round((cw / clw) * lw)],
+				data: [lastWeek, Math.round((currentWeek / currentLastWeek) * lastWeek)],
 				backgroundColor: [color1, color3],
 				hoverBackgroundColor: [color1, color3],
 				datalabels: {
@@ -55,7 +57,7 @@ function mapStateToProps(state) {
 				}
 			},
 				{
-					data: [clw, cw],
+					data: [currentLastWeek, currentWeek],
 					backgroundColor: color2,
 					hoverBackgroundColor: color2,
 					datalabels: {
@@ -67,8 +69,7 @@ function mapStateToProps(state) {
 			data.datasets.sort((a, b) => a.data[0] - b.data[0]);
 		}
 	}
-    //
-	data.labels = Array.from(labelsSet);
+	data.labels = labels;
 
 	const options = {
 		animation: {
