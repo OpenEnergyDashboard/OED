@@ -285,9 +285,11 @@ function submitGroupEdits(group) {
 		return axios.put('api/groups/edit', group)
 			.then(() => {
 				dispatch(markGroupsOutdated());
-				dispatch(markOneGroupOutdated(group.id));
-				dispatch(markGroupInEditingClean());
-				dispatch(changeDisplayMode('view'));
+				dispatch(dispatch2 => {
+					dispatch2(markOneGroupOutdated(group.id));
+					dispatch2(markGroupInEditingClean());
+					dispatch2(changeDisplayMode('view'));
+				});
 			})
 			.catch(error => {
 				dispatch(markGroupInEditingNotSubmitted());
@@ -338,8 +340,10 @@ export function deleteGroup() {
 		return axios.delete('api/groups/delete', params)
 			.then(() => {
 				dispatch(markGroupsOutdated());
-				dispatch(markGroupInEditingClean());
-				dispatch(changeDisplayMode('view'));
+				dispatch(dispatch2 => {
+					dispatch2(markGroupInEditingClean());
+					dispatch2(changeDisplayMode('view'));
+				});
 			})
 			.catch(console.error);
 	};
