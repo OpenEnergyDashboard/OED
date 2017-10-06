@@ -46,7 +46,7 @@ function mapStateToProps(state) {
 			labels.push('This week');
 			const color1 = 'rgba(173, 216, 230, 1)';
 			const color2 = 'rgba(218, 165, 32, 1)';
-			const color3 = 'rgba(173, 216, 230, 0.5)';
+			const color3 = 'rgba(173, 216, 230, 0.45)';
 			data.datasets.push({
 				data: [lastWeek, Math.round((currentWeek / currentLastWeek) * lastWeek)],
 				backgroundColor: [color1, color3],
@@ -110,8 +110,9 @@ function mapStateToProps(state) {
 				font: {
 					weight: 'bold'
 				},
-				display: true
-			}
+				display: true,
+				formatter: value => `${value} kWh`
+			},
 		}
 	};
 
