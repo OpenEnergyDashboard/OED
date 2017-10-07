@@ -36,9 +36,10 @@ router.post('/:meter_id', upload.single('csvFile'), async (req, res) => {
 			return reading;
 			// TODO Fix the third paramter, Simon will know.
 		}, (readings, tx) => {
-			return Reading.insertAll(readings, tx);
+			return Reading.insertAll(readings, tx).then(() => {console.log("Completed")});
 		});
 		transaction.then(() => {
+			console.log()
 			res.status(200);
 		});
 	} catch (err) {
