@@ -114,15 +114,18 @@ export default class UIOptionsComponent extends React.Component {
 						<div style={radioButtonInlinePadding} />
 						<label><input type="radio" name="chartTypes" value={chartTypes.bar} onChange={this.handleChangeChartType} checked={this.props.chartToRender === chartTypes.bar} />Bar</label>
 					</div>
-					<div className="checkbox">
-						<label><input type="checkbox" onChange={this.handleChangeBarStacking} />Bar stacking</label>
-					</div>
-					<p style={labelStyle}>Bar chart interval (days):</p>
-					<Slider min={1} max={365} value={this.state.barDuration} onChange={this.handleBarDurationChange} onChangeComplete={this.handleBarDurationChangeComplete} />
+					{this.props.chartToRender === chartTypes.bar &&
 					<div>
-						<ExportContainer />
+						<div className="checkbox">
+							<label><input type="checkbox" onChange={this.handleChangeBarStacking} />Bar stacking</label>
+						</div>
+						<p style={labelStyle}>Bar chart interval (days):</p>
+						<Slider min={1} max={365} value={this.state.barDuration} onChange={this.handleBarDurationChange} onChangeComplete={this.handleBarDurationChangeComplete} />
 					</div>
+					}
+					<ExportContainer />
 				</div>
+				}
 			</div>
 		);
 	}
