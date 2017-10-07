@@ -3,9 +3,11 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
 
 const express = require('express');
-const Group = require('../models/Group');
-
 const _ = require('lodash');
+const validate = require('jsonschema').validate;
+
+const Group = require('../models/Group');
+const authenticator = require('./authenticator');
 
 const router = express.Router();
 
@@ -70,56 +72,144 @@ router.get('/deep/meters/:group_id', async (req, res) => {
 	}
 });
 
-router.post('/create', async (req, res) => {
-	try {
-		const newGroup = new Group(undefined, req.body.name);
-		await newGroup.insert();
-		await Promise.all(req.body.childGroups.map(gid => newGroup.adoptGroup(gid)));
-		await Promise.all(req.body.childMeters.map(mid => newGroup.adoptMeter(mid)));
+router.use(authenticator);
 
-		res.sendStatus(200);
-	} catch (err) {
-		console.error(`Error while inserting new group ${err}`); // eslint-disable-line no-console
-		res.sendStatus(500);
+router.post('/create', async (req, res) => {
+	const validGroup = {
+		type: 'object',
+		maxProperties: 4,
+		required: ['token', 'name', 'childGroups', 'childMeters'],
+		properties: {
+			token: { type: 'string' },
+			name: {
+				type: 'string',
+				minLength: 1,
+			},
+			childGroups: {
+				type: 'array',
+				uniqueItems: true,
+				items: {
+					type: 'integer'
+				},
+			},
+			childMeters: {
+				type: 'array',
+				uniqueItems: true,
+				items: {
+					type: 'integer'
+				},
+			}
+		}
+	};
+
+	if (!validate(req.body, validGroup).valid) {
+		res.sendStatus(400);
+	} else {
+		try {
+			const newGroup = new Group(undefined, req.body.name);
+			await newGroup.insert();
+			await Promise.all(req.body.childGroups.map(gid => newGroup.adoptGroup(gid)));
+			await Promise.all(req.body.childMeters.map(mid => newGroup.adoptMeter(mid)));
+
+			res.sendStatus(200);
+		} catch (err) {
+			console.error(`Error while inserting new group ${err}`); // eslint-disable-line no-console
+			res.sendStatus(500);
+		}
 	}
 });
 
 router.put('/edit', async (req, res) => {
-	try {
-		const currentGroup = Group.getByID(req.body.id);
-		if (req.body.name !== currentGroup.name) {
-			await currentGroup.rename(req.body.name);
+	const validGroup = {
+		type: 'object',
+		maxProperties: 5,
+		required: ['token', 'id', 'name', 'childGroups', 'childMeters'],
+		properties: {
+			token: { type: 'string' },
+			id: { type: 'integer' },
+			name: {
+				type: 'string',
+				minLength: 1,
+			},
+			childGroups: {
+				type: 'array',
+				uniqueItems: true,
+				items: {
+					type: 'integer'
+				},
+			},
+			childMeters: {
+				type: 'array',
+				uniqueItems: true,
+				items: {
+					type: 'integer'
+				},
+			}
 		}
+	};
 
-		const currentChildGroups = Group.getImmediateGroupsByGroupID(currentGroup.id);
+	if (!validate(req.body, validGroup).valid) {
+		res.sendStatus(400);
+	} else {
+		try {
+			const currentGroup = await Group.getByID(req.body.id);
+			if (req.body.name !== currentGroup.name) {
+				await currentGroup.rename(req.body.name);
+			}
 
-		const adoptedGroups = _.difference(req.body.childGroups, currentChildGroups);
-		if (adoptedGroups.length === 0) {
-			await Promise.all(adoptedGroups.map(gid => currentGroup.adoptGroup(gid)));
+			const currentChildGroups = await Group.getImmediateGroupsByGroupID(currentGroup.id);
+
+			const adoptedGroups = _.difference(req.body.childGroups, currentChildGroups);
+			if (adoptedGroups.length === 0) {
+				await Promise.all(adoptedGroups.map(gid => currentGroup.adoptGroup(gid)));
+			}
+
+			const disownedGroups = _.difference(currentChildGroups, req.body.childGroups);
+			if (disownedGroups.length === 0) {
+				await Promise.all(disownedGroups.map(gid => currentGroup.disownGroup(gid)));
+			}
+
+			// Compute meters differences and adopt/disown to make changes
+			const currentChildMeters = await Group.getImmediateMetersByGroupID(currentGroup.id);
+
+			const adoptedMeters = _.difference(req.body.childMeters, currentChildMeters);
+			if (adoptedMeters.length === 0) {
+				await Promise.all(adoptedMeters.map(mid => currentGroup.adoptMeter(mid)));
+			}
+
+			const disownedMeters = _.difference(currentChildMeters, req.body.childMeters);
+			if (disownedMeters.length === 0) {
+				await Promise.all(disownedMeters.map(mid => currentGroup.disownMeter(mid)));
+			}
+
+			res.sendStatus(200);
+		} catch (err) {
+			console.error(`Error while editing existing group: ${err}`); // eslint-disable-line no-console
+			res.sendStatus(500);
 		}
+	}
+});
 
-		const disownedGroups = _.difference(currentChildGroups, req.body.childGroups);
-		if (disownedGroups.length === 0) {
-			await Promise.all(disownedGroups.map(gid => currentGroup.disownGroup(gid)));
+router.delete('/delete', async (req, res) => {
+	const validParams = {
+		type: 'object',
+		maxProperties: 2,
+		required: ['token', 'id'],
+		properties: {
+			token: { type: 'string' },
+			id: { type: 'integer' }
 		}
-
-		// Compute meters differences and adopt/disown to make changes
-		const currentChildMeters = Group.getImmediateMetersByGroupID(currentGroup.id);
-
-		const adoptedMeters = _.difference(req.body.childMeters, currentChildMeters);
-		if (adoptedMeters.length === 0) {
-			await Promise.all(adoptedMeters.map(mid => currentGroup.adoptMeter(mid)));
+	};
+	if (!validate(req.body, validParams).valid) {
+		res.sendStatus(400);
+	} else {
+		try {
+			await Group.delete(req.body.id);
+			res.sendStatus(200);
+		} catch (err) {
+			console.error(`Error while deleting group ${err}`); // eslint-disable-line no-console
+			res.sendStatus(500);
 		}
-
-		const disownedMeters = _.difference(currentChildMeters, req.body.childMeters);
-		if (disownedMeters.length === 0) {
-			await Promise.All(disownedMeters.map(mid => currentGroup.disownMeter(mid)));
-		}
-
-		res.sendStatus(200);
-	} catch (err) {
-		console.error(`Error while editing existing group: ${err}`); // eslint-disable-line no-console
-		res.sendStatus(500);
 	}
 });
 

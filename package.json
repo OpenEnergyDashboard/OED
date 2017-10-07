@@ -33,6 +33,7 @@
     "es6-promisify": "^5.0.0",
     "express": "~4.13.4",
     "fs": "0.0.1-security",
+    "jsonschema": "^1.2.0",
     "jsonwebtoken": "^7.2.1",
     "lodash": "^4.17.4",
     "lodash-webpack-plugin": "^0.11.0",

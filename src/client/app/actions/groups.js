@@ -136,8 +136,10 @@ export const MARK_GROUP_IN_EDITING_SUBMITTED = 'MARK_GROUP_IN_EDITING_SUBMITTED'
 export const MARK_GROUP_IN_EDITING_NOT_SUBMITTED = 'MARK_GROUP_IN_EDITING_NOT_SUBMITTED';
 
 export const MARK_GROUP_IN_EDITING_CLEAN = 'MARK_GROUP_IN_EDITING_CLEAN';
+export const MARK_GROUP_IN_EDITING_DIRTY = 'MARK_GROUP_IN_EDITING_DIRTY';
 
 export const MARK_GROUPS_BY_ID_OUTDATED = 'MARK_GROUPS_BY_ID_OUTDATED';
+
 export const MARK_ONE_GROUP_OUTDATED = 'MARK_ONE_GROUP_OUTDATED';
 
 /**
@@ -225,6 +227,10 @@ export function markGroupInEditingClean() {
 	return { type: MARK_GROUP_IN_EDITING_CLEAN };
 }
 
+function markGroupInEditingDirty() {
+	return { type: MARK_GROUP_IN_EDITING_DIRTY };
+}
+
 /*
  * Mark all the data in `byGroupID` as outdated.
  * This data is out of date when the name of a group may have changed, or when a group ahs been created.
@@ -279,9 +285,11 @@ function submitGroupEdits(group) {
 		return axios.put('api/groups/edit', group)
 			.then(() => {
 				dispatch(markGroupsOutdated());
-				dispatch(markOneGroupOutdated(group.id));
-				dispatch(markGroupInEditingClean());
-				dispatch(changeDisplayMode('view'));
+				dispatch(dispatch2 => {
+					dispatch2(markOneGroupOutdated(group.id));
+					dispatch2(markGroupInEditingClean());
+					dispatch2(changeDisplayMode('view'));
+				});
 			})
 			.catch(error => {
 				dispatch(markGroupInEditingNotSubmitted());
@@ -302,6 +310,7 @@ export function submitGroupInEditingIfNeeded() {
 		if (shouldSubmitGroupInEditing(getState())) {
 			const rawGroup = getState().groups.groupInEditing;
 			const group = {
+				token: localStorage.getItem('token'),
 				name: rawGroup.name,
 				childGroups: rawGroup.childGroups,
 				childMeters: rawGroup.childMeters,
@@ -317,5 +326,25 @@ export function submitGroupInEditingIfNeeded() {
 			}
 		}
 		return Promise.resolve();
+	};
+}
+
+
+export function deleteGroup() {
+	return (dispatch, getState) => {
+		dispatch(markGroupInEditingDirty());
+		const params = {
+			id: getState().groups.groupInEditing.id,
+			token: localStorage.getItem('token')
+		};
+		return axios.delete('api/groups/delete', params)
+			.then(() => {
+				dispatch(markGroupsOutdated());
+				dispatch(dispatch2 => {
+					dispatch2(markGroupInEditingClean());
+					dispatch2(changeDisplayMode('view'));
+				});
+			})
+			.catch(console.error);
 	};
 }
