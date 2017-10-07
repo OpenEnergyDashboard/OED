@@ -11,29 +11,36 @@ const router = express.Router();
 // The upload here ensures that the file is saved to server RAM rather than disk
 const upload = multer({ storage: multer.memoryStorage() });
 router.post('/:meter_id', upload.single('csvFile'), async (req, res) => {
-	try{
+	const id = parseInt(req.params.meter_id);
+	console.log(`ID: ${id}`);
+	console.log(`Retrieved meter id: ${id}`);
+	try {
 		const data = await readCSVFromString(req.file.buffer.toString('utf8'));
 		const myReadableStreamBuffer = new streamBuffers.ReadableStreamBuffer({
 			frequency: 10,
 			chunkSize: 2048
 		});
 		myReadableStreamBuffer.put(req.file.buffer);
+		myReadableStreamBuffer.stop();
 		// TODO ensure that we are getting Readings appropriately.
-		streamToDB(myReadableStreamBuffer, row => {
-			//change the type of file being read. So, my guess is I need to change the content here.
-			//MAMAC Sample log file.
-			const id =  parseInt(req.params.meter_id);
-			const readRate = row[0];
-			const endTimestamp = moment(row[1], 'HH:mm:ss MM/DD/YYYY');
-			const startTimestamp = moment(row[1], 'HH:mm:ss MM/DD/YYYY').subtract(60,'minutes');
-			// console.log(`readRate: ${readRate}`);
-			return new Reading(id, readRate, startTimestamp, endTimestamp);
-			// TODO Fix the third paramter, Simon will know.
-		}, (readings, tx) => Reading.insertAll(readings, tx).then(() => console.log('Inserted!')).catch(e => {
-			console.error(`Error inserting readings ${readings}`)
-		}));
+		const transaction = streamToDB(myReadableStreamBuffer, row => {
+			// change the type of file being read. So, my guess is I need to change the content here.
+			// MAMAC Sample log file.
 
-		res.status(200);
+			const readRate = parseInt(row[0]);
+			const endTimestamp = moment(row[1], 'HH:mm:ss MM/DD/YYYY');
+			const startTimestamp = moment(row[1], 'HH:mm:ss MM/DD/YYYY').subtract(60, 'minutes');
+			// console.log(`readRate: ${readRate}`)
+			const reading = new Reading(id, readRate, startTimestamp, endTimestamp);
+			// console.log(`Inserting a reading: ${reading.toString()}`);
+			return reading;
+			// TODO Fix the third paramter, Simon will know.
+		}, (readings, tx) => {
+			return Reading.insertAll(readings, tx);
+		});
+		transaction.then(() => {
+			res.status(200);
+		});
 	} catch (err) {
 		res.status(400).send({ text: 'Invalid file.' });
 		console.log('it broke, fix it.');

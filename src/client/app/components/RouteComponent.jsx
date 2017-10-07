@@ -9,7 +9,7 @@ import _ from 'lodash';
 import NotificationSystem from 'react-notification-system';
 import HomeComponent from './HomeComponent';
 import LoginContainer from '../containers/LoginContainer';
-import AdminComponent from './AdminComponent';
+import AdminContainer from '../containers/AdminContainer';
 import NotFoundComponent from './NotFoundComponent';
 
 export default class RouteComponent extends React.Component {
@@ -69,7 +69,7 @@ export default class RouteComponent extends React.Component {
 				<Router history={browserHistory}>
 					<Route path="/" component={HomeComponent} />
 					<Route path="/login" component={LoginContainer} />
-					<Route path="/admin" component={AdminComponent} onEnter={this.requireAuth} />
+					<Route path="/admin" component={AdminContainer} onEnter={this.requireAuth} />
 					<Route path="*" component={NotFoundComponent} />
 				</Router>
 			</div>
