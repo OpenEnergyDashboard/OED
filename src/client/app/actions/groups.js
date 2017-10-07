@@ -270,8 +270,10 @@ function submitNewGroup(group) {
 		return axios.post('api/groups/create', group)
 			.then(() => {
 				dispatch(markGroupsOutdated());
-				dispatch(markGroupInEditingClean());
-				dispatch(changeDisplayMode('view'));
+				dispatch(dispatch2 => {
+					dispatch2(markGroupInEditingClean());
+					dispatch2(changeDisplayMode('view'));
+				});
 			})
 			.catch(error => {
 				dispatch(markGroupInEditingNotSubmitted());
@@ -279,14 +281,15 @@ function submitNewGroup(group) {
 			});
 	};
 }
+
 function submitGroupEdits(group) {
 	return dispatch => {
 		dispatch(markGroupInEditingSubmitted());
 		return axios.put('api/groups/edit', group)
 			.then(() => {
 				dispatch(markGroupsOutdated());
+				dispatch(markOneGroupOutdated(group.id));
 				dispatch(dispatch2 => {
-					dispatch2(markOneGroupOutdated(group.id));
 					dispatch2(markGroupInEditingClean());
 					dispatch2(changeDisplayMode('view'));
 				});
@@ -329,7 +332,10 @@ export function submitGroupInEditingIfNeeded() {
 	};
 }
 
-
+/**
+ * Deletes the group in editing
+ * @returns {function(*, *)}
+ */
 export function deleteGroup() {
 	return (dispatch, getState) => {
 		dispatch(markGroupInEditingDirty());
@@ -337,9 +343,10 @@ export function deleteGroup() {
 			id: getState().groups.groupInEditing.id,
 			token: localStorage.getItem('token')
 		};
-		return axios.delete('api/groups/delete', params)
+		return axios.post('api/groups/delete', params)
 			.then(() => {
 				dispatch(markGroupsOutdated());
+				dispatch(changeDisplayedGroups([]));
 				dispatch(dispatch2 => {
 					dispatch2(markGroupInEditingClean());
 					dispatch2(changeDisplayMode('view'));

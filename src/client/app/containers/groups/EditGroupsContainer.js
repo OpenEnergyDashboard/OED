@@ -6,7 +6,7 @@
 import _ from 'lodash';
 import { connect } from 'react-redux';
 import EditGroupsComponent from '../../components/groups/EditGroupsComponent';
-import { submitGroupInEditingIfNeeded, editGroupName, changeDisplayMode, changeChildMeters, changeChildGroups } from '../../actions/groups';
+import { submitGroupInEditingIfNeeded, editGroupName, changeDisplayMode, changeChildMeters, changeChildGroups, deleteGroup } from '../../actions/groups';
 
 /**
  * @param {State} state
@@ -40,6 +40,7 @@ function mapStateToProps(state) {
 function mapDispatchToProps(dispatch) {
 	return {
 		submitGroupInEditingIfNeeded: () => dispatch(submitGroupInEditingIfNeeded()),
+		deleteGroup: () => dispatch(deleteGroup()),
 		editGroupName: name => dispatch(editGroupName(name)),
 		changeDisplayMode: newMode => dispatch(changeDisplayMode(newMode)),
 		changeChildMeters: meterIDs => dispatch(changeChildMeters(meterIDs)),

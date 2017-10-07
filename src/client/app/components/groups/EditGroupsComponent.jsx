@@ -80,11 +80,10 @@ export default class EditGroupsComponent extends React.Component {
 
 	handleEditGroup() {
 		this.props.submitGroupInEditingIfNeeded();
-		this.props.changeDisplayMode('view');
 	}
 
 	handleDeleteGroup() {
-		// TODO call delete group action
+		this.props.deleteGroup();
 	}
 
 	handleReturnToView() {
