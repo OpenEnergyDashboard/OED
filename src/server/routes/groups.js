@@ -160,12 +160,12 @@ router.put('/edit', async (req, res) => {
 			const currentChildGroups = await Group.getImmediateGroupsByGroupID(currentGroup.id);
 
 			const adoptedGroups = _.difference(req.body.childGroups, currentChildGroups);
-			if (adoptedGroups.length === 0) {
+			if (adoptedGroups.length !== 0) {
 				await Promise.all(adoptedGroups.map(gid => currentGroup.adoptGroup(gid)));
 			}
 
 			const disownedGroups = _.difference(currentChildGroups, req.body.childGroups);
-			if (disownedGroups.length === 0) {
+			if (disownedGroups.length !== 0) {
 				await Promise.all(disownedGroups.map(gid => currentGroup.disownGroup(gid)));
 			}
 
@@ -173,12 +173,12 @@ router.put('/edit', async (req, res) => {
 			const currentChildMeters = await Group.getImmediateMetersByGroupID(currentGroup.id);
 
 			const adoptedMeters = _.difference(req.body.childMeters, currentChildMeters);
-			if (adoptedMeters.length === 0) {
+			if (adoptedMeters.length !== 0) {
 				await Promise.all(adoptedMeters.map(mid => currentGroup.adoptMeter(mid)));
 			}
 
 			const disownedMeters = _.difference(currentChildMeters, req.body.childMeters);
-			if (disownedMeters.length === 0) {
+			if (disownedMeters.length !== 0) {
 				await Promise.all(disownedMeters.map(mid => currentGroup.disownMeter(mid)));
 			}
 
@@ -190,7 +190,7 @@ router.put('/edit', async (req, res) => {
 	}
 });
 
-router.delete('/delete', async (req, res) => {
+router.post('/delete', async (req, res) => {
 	const validParams = {
 		type: 'object',
 		maxProperties: 2,

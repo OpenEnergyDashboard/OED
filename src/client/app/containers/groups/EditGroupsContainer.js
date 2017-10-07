@@ -6,7 +6,7 @@
 import _ from 'lodash';
 import { connect } from 'react-redux';
 import EditGroupsComponent from '../../components/groups/EditGroupsComponent';
-import { submitGroupInEditingIfNeeded, editGroupName, changeDisplayMode, changeChildMeters, changeChildGroups } from '../../actions/groups';
+import { submitGroupInEditingIfNeeded, editGroupName, changeDisplayMode, changeChildMeters, changeChildGroups, deleteGroup } from '../../actions/groups';
 
 /**
  * @param {State} state
@@ -14,7 +14,8 @@ import { submitGroupInEditingIfNeeded, editGroupName, changeDisplayMode, changeC
  */
 function mapStateToProps(state) {
 	const allMeters = _.sortBy(_.values(state.meters.byMeterID).map(meter => ({ id: meter.id, name: meter.name.trim() })), 'name');
-	const allGroups = _.sortBy(_.values(state.groups.byGroupID).map(group => ({ id: group.id, name: group.name.trim() })), 'name');
+	let allGroups = _.sortBy(_.values(state.groups.byGroupID).map(group => ({ id: group.id, name: group.name.trim() })), 'name');
+	allGroups = allGroups.filter(group => group.id !== state.groups.groupInEditing.id);
 
 	const allMetersExceptChildMeters = allMeters.filter(meter => !_.includes(state.groups.groupInEditing.childMeters, meter.id));
 	const allGroupsExceptChildGroups = allGroups.filter(group => !_.includes(state.groups.groupInEditing.childGroups, group.id));
@@ -40,6 +41,7 @@ function mapStateToProps(state) {
 function mapDispatchToProps(dispatch) {
 	return {
 		submitGroupInEditingIfNeeded: () => dispatch(submitGroupInEditingIfNeeded()),
+		deleteGroup: () => dispatch(deleteGroup()),
 		editGroupName: name => dispatch(editGroupName(name)),
 		changeDisplayMode: newMode => dispatch(changeDisplayMode(newMode)),
 		changeChildMeters: meterIDs => dispatch(changeChildMeters(meterIDs)),
