@@ -7,6 +7,7 @@ import { Link } from 'react-router';
 import { Button } from 'react-bootstrap';
 import LogoComponent from './LogoComponent';
 import UIModalComponent from './UIModalComponent';
+import VERSION from '../../../common/version';
 
 /**
  * React component that controls the header strip at the top of all pages
@@ -30,6 +31,10 @@ export default function HeaderComponent(props) {
 		// Displays the admin button link only if the user is logged in (auth token exists)
 		display: localStorage.getItem('token') ? 'inline' : 'none'
 	};
+	const versionLabelStyle = {
+		fontWeight: 'bold',
+		margin: '10px'
+	};
 	return (
 		<div className="container-fluid">
 			<div className="col-xs-4">
@@ -44,6 +49,7 @@ export default function HeaderComponent(props) {
 				</div>
 				<Link style={loginLinkStyle} to="/login"><Button bsStyle="default">Log In</Button></Link>
 				<Link style={adminLinkStyle} to="/admin"><Button bsStyle="default">Admin panel</Button></Link>
+				<span style={versionLabelStyle}>{`${VERSION}`}</span>
 			</div>
 		</div>
 	);

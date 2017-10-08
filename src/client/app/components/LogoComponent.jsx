@@ -3,6 +3,7 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
 
 import React from 'react';
+import VERSION from '../../../common/version';
 
 /**
  * React component that creates an logo image from a file path
@@ -18,6 +19,6 @@ export default function LogoComponent(props) {
 		position: 'absolute'
 	};
 	return (
-		<img src={props.url} alt="Logo" style={imgStyle} />
+		<img src={props.url} alt="Logo" title={`Open Energy Dashboard ${VERSION}`} style={imgStyle} />
 	);
 }
