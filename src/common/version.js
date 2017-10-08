@@ -6,10 +6,17 @@
  * Creates a new VERSION object, which contains a major, minor, and patch release level.
  * OED is compliant with Semver.
  */
+
+const pkgJson = require('../../package.json');
+
 function OEDVersion() {
-	this.major = 0;
-	this.minor = 1;
-	this.patch = 0;
+	const versionParts = pkgJson.version.split('.');
+	if (versionParts.length !== 3) {
+		console.error('package.json version string is not in semver x.y.z format!'); // eslint-disable-line no-console
+	}
+	this.major = versionParts[0];
+	this.minor = versionParts[1];
+	this.patch = versionParts[2];
 }
 
 /**
