@@ -3,10 +3,14 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
 
 import React from 'react';
+import { defaults } from 'react-chartjs-2';
 import UIOptionsContainer from '../containers/UIOptionsContainer';
 import LineChartContainer from '../containers/LineChartContainer';
 import BarChartContainer from '../containers/BarChartContainer';
+import CompareChartContainer from '../containers/CompareChartContainer'
 import { chartTypes } from '../reducers/graph';
+
+defaults.global.plugins.datalabels.display = false;
 
 /**
  * React component that controls the dashboard
@@ -15,7 +19,17 @@ export default function DashboardComponent(props) {
 	const divPadding = {
 		paddingTop: '35px'
 	};
-	const ChartToRender = (props.chartToRender === chartTypes.line) ? LineChartContainer : BarChartContainer;
+	let ChartToRender = '';
+	if (props.chartToRender === chartTypes.line) {
+		 ChartToRender = LineChartContainer;
+	}
+	else if (props.chartToRender === chartTypes.compare) {
+		ChartToRender = CompareChartContainer;
+	}
+	else {
+		 ChartToRender = BarChartContainer;
+	}
+
 	return (
 		<div className="container-fluid">
 			<div>

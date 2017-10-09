@@ -49,6 +49,17 @@ function fetchBarReadings(meterIDs, timeInterval) {
 	};
 }
 
+function fetchCompareReadings(meterIDs, timeInterval) {
+    return (dispatch, getState) => {
+        const barDuration = getState().graph.compareDuration;
+        dispatch(requestBarReadings(meterIDs, timeInterval, barDuration));
+        const stringifiedMeterIDs = meterIDs.join(',');
+        return axios.get(`/api/readings/bar/${stringifiedMeterIDs}`, {
+            params: { timeInterval: timeInterval.toString(), barDuration: barDuration.toISOString() }
+        }).then(response => dispatch(receiveBarReadings(meterIDs, timeInterval, barDuration, response.data)));
+    };
+}
+
 /**
  * Fetches readings for the bar chart of all selected meterIDs if they are not already fetched or being fetched
  * @param {TimeInterval} timeInterval The time interval to fetch readings for on the bar chart
@@ -63,4 +74,15 @@ export function fetchNeededBarReadings(timeInterval) {
 		}
 		return Promise.resolve();
 	};
+}
+
+export function fetchNeededCompareReadings(timeInterval) {
+    return (dispatch, getState) => {
+        const state = getState();
+        const meterIDsToFetchForBar = state.graph.selectedMeters.filter(id => shouldFetchBarReadings(state, id, timeInterval, state.graph.compareDuration));
+        if (meterIDsToFetchForBar.length > 0) {
+            return dispatch(fetchCompareReadings(meterIDsToFetchForBar, timeInterval));
+        }
+        return Promise.resolve();
+    };
 }
