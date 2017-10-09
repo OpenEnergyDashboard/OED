@@ -29,18 +29,28 @@ function mapStateToProps(state) {
 	for (const meterID of state.graph.selectedMeters) {
 		const readingsData = state.readings.bar.byMeterID[meterID][timeInterval][barDuration];
 		if (readingsData !== undefined && !readingsData.isFetching) {
-			// Calculate currentWeek
-			for (let i = 1; i <= soFar; i++) {
-				currentWeek += readingsData.readings[readingsData.readings.length - i][1];
-			}
-			// Calculate lastWeek
-			for (let i = 0; i < 7; i++) {
-				lastWeek += readingsData.readings[readingsData.readings.length - (8 + i) - soFar][1];
-			}
+			// Sunday needs special logic
+			if (soFar !== 0) {
+                // Calculate currentWeek
+				for (let i = 1; i <= soFar; i++) {
+					currentWeek += readingsData.readings[readingsData.readings.length - i][1];
+				}
+                // Calculate lastWeek
+				for (let i = 0; i < 7; i++) {
+					lastWeek += readingsData.readings[readingsData.readings.length - (8 + i) - soFar][1];
+				}
 
-			// Calculate currentLastWeek
-			for (let i = 1; i <= soFar; i++) {
-				currentLastWeek += readingsData.readings[readingsData.readings.length - i - 7][1];
+                // Calculate currentLastWeek
+				for (let i = 1; i <= soFar; i++) {
+					currentLastWeek += readingsData.readings[readingsData.readings.length - i - 7][1];
+				}
+			}			else {
+				currentWeek = readingsData.readings[readingsData.readings.length - 1][1];
+				// Data is acquired in days so when less than a day has passed we need to estimate
+				currentLastWeek = Math.round((readingsData.readings[readingsData.readings.length - 8][1] / 24) * moment().hour());
+				for (let i = 0; i < 7; i++) {
+					lastWeek += readingsData.readings[readingsData.readings.length - 7][1];
+				}
 			}
 			labels.push('Last week');
 			labels.push('This week');
