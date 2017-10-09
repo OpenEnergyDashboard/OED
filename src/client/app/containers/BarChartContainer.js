@@ -48,7 +48,7 @@ function mapStateToProps(state) {
 			});
 			// Add only the unique time intervals to the label set
 			for (const element of _.flatten(readingsData.readings.map(arr => arr[0]))) {
-				labelsSet.add(`${moment(element).format('MMM DD, YYYY, hh:mm a')} - ${moment(element).add(barDuration).format('MMM DD, YYYY, hh:mm a')}`);
+				labelsSet.add(`${moment(element).format('MMM DD, YYYY')} - ${moment(element).add(barDuration).format('MMM DD, YYYY')}`);
 			}
 		}
 	}
