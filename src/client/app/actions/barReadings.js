@@ -75,7 +75,7 @@ export function fetchNeededBarReadings(timeInterval) {
 		if (meterIDsToFetchForBar.length > 0) {
 			return dispatch(fetchBarReadings(meterIDsToFetchForBar, timeInterval, DATA_TYPE_METER));
 		}
-		const groupIDsToFetchForBar = state.graph.selectedMeters.filter(id => shouldFetchBarReadings(state, id, timeInterval, state.graph.barDuration, DATA_TYPE_GROUP));
+		const groupIDsToFetchForBar = state.graph.selectedGroups.filter(id => shouldFetchBarReadings(state, id, timeInterval, state.graph.barDuration, DATA_TYPE_GROUP));
 		if (groupIDsToFetchForBar.length > 0) {
 			return dispatch(fetchBarReadings(groupIDsToFetchForBar, timeInterval, DATA_TYPE_GROUP));
 		}
