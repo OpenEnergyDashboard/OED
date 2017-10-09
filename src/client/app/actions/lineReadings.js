@@ -12,7 +12,7 @@ export const RECEIVE_LINE_READINGS = 'RECEIVE_LINE_READINGS';
 
 /**
  * @param {State} state
- * @param {number} meterID
+ * @param {number} dsID
  * @param {TimeInterval} timeInterval
  */
 function shouldFetchLineReadings(state, meterID, timeInterval) {
