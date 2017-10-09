@@ -61,7 +61,7 @@ export function changeSelectedMeters(meterIDs) {
 export function changeSelectedGroups(groupIDs) {
 	return (dispatch, getState) => {
 		dispatch(updateSelectedGroups(groupIDs));
-		// Nesting dispatches to preserve that updateSelectedMeters() is called before fetching readings
+		// Nesting dispatches to preserve that updateSelectedGroups() is called before fetching readings
 		dispatch(dispatch2 => {
 			dispatch2(fetchNeededLineReadings(getState().graph.timeInterval));
 			dispatch2(fetchNeededBarReadings(getState().graph.timeInterval));
