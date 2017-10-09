@@ -1,13 +1,11 @@
 /*
  * This Source Code Form is subject to the terms of the Mozilla Public
  * License, v. 2.0. If a copy of the MPL was not distributed with this
- * file, You can obtain one at http://mozilla.org/MPL/2.0/.
- */
+ * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
 
 import { Line } from 'react-chartjs-2';
 import moment from 'moment';
 import { connect } from 'react-redux';
-import 'chartjs-plugin-zoom';
 import GraphColors from '../utils/GraphColors';
 
 /**
@@ -76,14 +74,6 @@ function mapStateToProps(state) {
 				title: tooltipItems => `${moment(tooltipItems[0].xLabel).format('dddd, MMM DD, YYYY hh:mm a')}`,
 				label: tooltipItems => `${data.datasets[tooltipItems.datasetIndex].label}: ${tooltipItems.yLabel} kWh`
 			}
-		},
-		pan: {
-			enabled: true,
-			mode: 'x'
-		},
-		zoom: {
-			enabled: true,
-			mode: 'x',
 		}
 	};
 

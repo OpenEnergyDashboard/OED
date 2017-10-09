@@ -246,6 +246,16 @@ export default function groups(state = defaultState, action) {
 			};
 		}
 
+		case groupsActions.MARK_GROUP_IN_EDITING_DIRTY: {
+			return {
+				...state,
+				groupInEditing: {
+					...state.groupInEditing,
+					dirty: true
+				}
+			};
+		}
+
 		case groupsActions.MARK_GROUPS_BY_ID_OUTDATED: {
 			return {
 				...state,
@@ -265,7 +275,6 @@ export default function groups(state = defaultState, action) {
 				}
 			};
 		}
-
 
 		default:
 			return state;

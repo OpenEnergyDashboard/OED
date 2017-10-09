@@ -6,7 +6,9 @@ if [ "$1" == "" ]; then
 fi
 
 # Install NPM dependencies
-npm install
+echo "NPM install..."
+npm install --loglevel=warn --progress=false
+echo "NPM install finished."
 
 create_error=0 # Boolean
 

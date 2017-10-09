@@ -26,68 +26,68 @@ mocha.describe('Compressed Readings', () => {
 	const timestamp4 = timestamp3.clone().add(1, 'hour');
 	const timestamp5 = timestamp4.clone().add(1, 'hour');
 
-	mocha.beforeEach(() => db.task(function* setupBeforeEach(t) {
-		yield new Meter(undefined, 'Meter', null, false, Meter.type.MAMAC).insert(t);
-		meter = yield Meter.getByName('Meter', t);
-	}));
+	mocha.beforeEach(async () => {
+		await new Meter(undefined, 'Meter', null, false, Meter.type.MAMAC).insert();
+		meter = await Meter.getByName('Meter');
+	});
 
-	mocha.it('compresses readings', () => db.task(function* runTest(t) {
+	mocha.it('compresses readings', async () => {
 		const reading1 = new Reading(meter.id, 100, timestamp1, timestamp2);
 		const reading2 = new Reading(meter.id, 200, timestamp2, timestamp3);
 		const reading3 = new Reading(meter.id, 300, timestamp3, timestamp4);
-		yield Reading.insertAll([reading1, reading2, reading3], t);
+		await Reading.insertAll([reading1, reading2, reading3]);
 
 		// Compress the three points to two points.
-		const compressedReadings = yield Reading.getCompressedReadings([meter.id], timestamp1, timestamp4, 2, t);
+		const compressedReadings = await Reading.getCompressedReadings([meter.id], timestamp1, timestamp4, 2);
 		expect(compressedReadings[meter.id]).to.have.lengthOf(2);
 		const expectedFirstCompressedRate = ((reading1.reading) + (reading2.reading * 0.5)) / 1.5;
 		expect(compressedReadings[meter.id][0].reading_rate).to.be.closeTo(expectedFirstCompressedRate, 0.0001);
 		const expectedSecondCompressedRate = ((reading2.reading * 0.5) + (reading3.reading)) / 1.5;
 		expect(compressedReadings[meter.id][1].reading_rate).to.be.closeTo(expectedSecondCompressedRate, 0.0001);
-	}));
+	});
 
-	mocha.it('compresses readings with a gap', () => db.task(function* runTest(t) {
+	mocha.it('compresses readings with a gap', async () => {
 		const reading1 = new Reading(meter.id, 100, timestamp1, timestamp2);
 		const reading2 = new Reading(meter.id, 200, timestamp2, timestamp3);
 		const reading3 = new Reading(meter.id, 300, timestamp4, timestamp5);
-		yield Reading.insertAll([reading1, reading2, reading3], t);
+		await Reading.insertAll([reading1, reading2, reading3]);
 
 		// Compress the three points to two points.
-		const compressedReadings = yield Reading.getCompressedReadings([meter.id], timestamp1, timestamp5, 2, t);
+		const compressedReadings = await Reading.getCompressedReadings([meter.id], timestamp1, timestamp5, 2);
 		chai.expect(compressedReadings[meter.id]).to.have.lengthOf(2);
 		const expectedFirstCompressedRate = ((reading1.reading) + (reading2.reading)) / 2;
 		chai.expect(compressedReadings[meter.id][0].reading_rate).to.be.closeTo(expectedFirstCompressedRate, 0.0001);
 		const expectedSecondCompressedRate = reading3.reading;
 		chai.expect(compressedReadings[meter.id][1].reading_rate).to.be.closeTo(expectedSecondCompressedRate, 0.0001);
-	}));
+	});
 
-	mocha.it('compresses readings that overlap an end point', () => db.task(function* runTest(t) {
+	mocha.it('compresses readings that overlap an end point', async () => {
 		const reading1 = new Reading(meter.id, 100, timestamp1, timestamp2);
 		const reading2 = new Reading(meter.id, 200, timestamp2, timestamp3);
-		yield Reading.insertAll([reading1, reading2], t);
+		await Reading.insertAll([reading1, reading2]);
 		const startTimestamp = timestamp1.clone().add(30, 'minutes');
 		const endTimestamp = timestamp3;
 
-		const compressedReadings = yield Reading.getCompressedReadings([meter.id], startTimestamp, endTimestamp, 1, t);
+		const compressedReadings = await Reading.getCompressedReadings([meter.id], startTimestamp, endTimestamp, 1);
 		// The compression rate should weight the first reading half as much as the second one because its intersect time is half as long.
 		const expectedFirstCompressedRate = ((0.5 * reading1.reading) + reading2.reading) / 1.5;
 		expect(compressedReadings[meter.id][0].reading_rate).to.be.closeTo(expectedFirstCompressedRate, 0.0001);
-	}));
+	});
 
-	mocha.it('compresses readings for multiple meters at once', () => db.task(function* runTest(t) {
-		yield new Meter(undefined, 'Meter2', null, false, Meter.type.MAMAC).insert(t);
-		yield new Meter(undefined, 'Meter3', null, false, Meter.type.MAMAC).insert(t);
-		const meter2 = yield Meter.getByName('Meter2', t);
-		const meter3 = yield Meter.getByName('Meter3', t);
+	mocha.it('compresses readings for multiple meters at once', async () => {
+		await new Meter(undefined, 'Meter2', null, false, Meter.type.MAMAC).insert();
+		await new Meter(undefined, 'Meter3', null, false, Meter.type.MAMAC).insert();
+		const meter2 = await Meter.getByName('Meter2');
+		const meter3 = await Meter.getByName('Meter3');
 		const readingMeter1 = new Reading(meter.id, 100, timestamp1, timestamp2);
 		const readingMeter2 = new Reading(meter2.id, 200, timestamp1, timestamp2);
 		const readingMeter3 = new Reading(meter3.id, 300, timestamp1, timestamp2);
-		yield Reading.insertAll([readingMeter1, readingMeter2, readingMeter3], t);
-		const compressedReadings = yield Reading.getCompressedReadings([meter.id, meter2.id], null, null, 1, t);
+		await Reading.insertAll([readingMeter1, readingMeter2, readingMeter3]);
+		const compressedReadings = await Reading.getCompressedReadings([meter.id, meter2.id], null, null, 1);
 		expect(Object.keys(compressedReadings)).to.have.lengthOf(2);
 		expect(compressedReadings[meter.id]).to.have.lengthOf(1);
 		expect(compressedReadings[meter2.id]).to.have.lengthOf(1);
 		expect(compressedReadings[meter.id][0].reading_rate).to.be.closeTo(readingMeter1.reading, 0.0001);
 		expect(compressedReadings[meter2.id][0].reading_rate).to.be.closeTo(readingMeter2.reading, 0.0001);
-	}));
+	});
 });

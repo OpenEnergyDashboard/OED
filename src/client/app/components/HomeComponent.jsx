@@ -3,7 +3,7 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
 
 import React from 'react';
-import HeaderComponent from './HeaderComponent';
+import HeaderContainer from '../containers/HeaderContainer';
 import DashboardContainer from '../containers/DashboardContainer';
 
 
@@ -14,7 +14,7 @@ import DashboardContainer from '../containers/DashboardContainer';
 export default function HomeComponent() {
 	return (
 		<div>
-			<HeaderComponent renderLoginButton renderGroupsButton />
+			<HeaderContainer renderOptionsButton renderLoginButton renderGroupsButton />
 			<DashboardContainer />
 		</div>
 	);

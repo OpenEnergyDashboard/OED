@@ -38,10 +38,6 @@ class Reading {
 		return db.none(sqlFile('reading/create_function_get_compressed_readings.sql'));
 	}
 
-	static createCompressedGroupsReadingsFunction() {
-		return db.none(sqlFile('reading/create_function_get_compressed_groups_readings.sql'));
-	}
-
 	/**
 	 * Returns a promise to create the barchart readings function.
 	 * @return {Promise.<>}
@@ -152,32 +148,6 @@ class Reading {
 			);
 		}
 		return compressedReadingsByMeterID;
-	}
-
-	/**
-	 * Gets a number of compressed readings that approximate the given time range for the given groups.
-	 *
-	 * Compressed readings are in kilowatts.
-	 * @param groupIDs an array of ids for groups whose points are being compressed
-	 * @param {Moment?} fromTimestamp An optional start point for the time range.
-	 * @param {Moment?} toTimestamp An optional end point for the time range
-	 * @param numPoints The number of points to compress to. Defaults to 500
-	 * @param conn the connection to use. Defaults to the default database connection.
-	 * @return {Promise<object<int, array<{reading_rate: number, start_timestamp: Moment, end_timestamp: Moment}>>>}
-	 */
-	static async getCompressedGroupReadings(groupIDs, fromTimestamp = null, toTimestamp = null, numPoints = 500, conn = db) {
-		const allCompressedReadings = await conn.func('compressed_group_readings', [groupIDs, fromTimestamp || '-infinity', toTimestamp || 'infinity', numPoints]);
-		// Separate the result rows by meter_id and return a nested object.
-		const compressedReadingsByGroupID = {};
-		for (const row of allCompressedReadings) {
-			if (compressedReadingsByGroupID[row.group_id] === undefined) {
-				compressedReadingsByGroupID[row.group_id] = [];
-			}
-			compressedReadingsByGroupID[row.group_id].push(
-				{ reading_rate: row.reading_rate, start_timestamp: row.start_timestamp, end_timestamp: row.end_timestamp }
-			);
-		}
-		return compressedReadingsByGroupID;
 	}
 
 	/**

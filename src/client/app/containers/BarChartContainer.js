@@ -1,14 +1,12 @@
 /*
  * This Source Code Form is subject to the terms of the Mozilla Public
  * License, v. 2.0. If a copy of the MPL was not distributed with this
- * file, You can obtain one at http://mozilla.org/MPL/2.0/.
- */
+ * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
 
 import _ from 'lodash';
 import { Bar } from 'react-chartjs-2';
 import moment from 'moment';
 import { connect } from 'react-redux';
-import 'chartjs-plugin-zoom';
 import GraphColors from '../utils/GraphColors';
 
 /**
@@ -33,7 +31,7 @@ function mapStateToProps(state) {
 			});
 			// Add only the unique time intervals to the label set
 			for (const element of _.flatten(readingsData.readings.map(arr => arr[0]))) {
-				labelsSet.add(`${moment(element).format('MMM DD, YYYY, hh:mm a')} - ${moment(element).add(barDuration).format('MMM DD, YYYY, hh:mm a')}`);
+				labelsSet.add(`${moment(element).format('MMM DD, YYYY')} - ${moment(element).add(barDuration).format('MMM DD, YYYY')}`);
 			}
 		}
 	}
@@ -56,7 +54,7 @@ function mapStateToProps(state) {
 	}
 
     // Converts the label set into an array for Chart.js and sorts the labels based on the first date of the time interval
-	data.labels = Array.from(labelsSet).sort((x, y) => moment(x.split(' - ')[0], 'MMM DD, YYYY, hh:mm a').format('x') - moment(y.split(' - ')[0], 'MMM DD, YYYY, hh:mm a').format('x'));
+	data.labels = Array.from(labelsSet).sort((x, y) => moment(x.split(' - ')[0], 'MMM DD, YYYY').format('x') - moment(y.split(' - ')[0], 'MMM DD, YYYY').format('x'));
 
 	const options = {
 		animation: {

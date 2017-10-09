@@ -8,6 +8,7 @@ module.exports = {
 	},
 	"rules": {
 		"no-console": "off",
-		"max-len": ["warn", {"code": 200, "tabWidth": 4, "ignoreStrings": true}]
+		"max-len": ["warn", {"code": 200, "tabWidth": 4, "ignoreStrings": true}],
+		"react/jsx-indent-props": [1 , 'tab']
 	}
 };

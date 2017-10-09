@@ -67,8 +67,6 @@ mocha.describe('Groups', () => {
 			await parent.adoptMeter(meter.id);
 			const metersOfParent = await (Group.getImmediateMetersByGroupID(parent.id));
 			expect(metersOfParent).to.deep.equal([meter.id]);
-			const deepMetersOfParent = await Group.getDeepMetersByGroupID(parent.id);
-			expect(deepMetersOfParent).to.deep.equal([meter.id]);
 		});
 
 		mocha.it('can be given a deep child group', async () => {
