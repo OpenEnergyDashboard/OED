@@ -206,6 +206,32 @@ class Reading {
 		return barchartReadingsByMeterID;
 	}
 
+	/**
+	 * Gets barchart readings for every group across the given time interval for a duration.
+	 *
+	 * Compressed readings are in kilowatts.
+	 * @param groupIDs an array of ids for groups whose points are being compressed
+	 * @param duration A moment time duration over which to sum the readings
+	 * @param fromTimestamp An optional start point for the beginning of the entire time range.
+	 * @param toTimestamp An optional end point for the end of the entire time range.
+	 * @param conn the connection to use. Defaults to the default database connection.
+	 * @return {Promise<object<int, array<{reading_sum: number, start_timestamp: Date, end_timestamp: Date}>>>}
+	 */
+	static async getGroupBarchartReadings(groupIDs, duration, fromTimestamp = null, toTimestamp = null, conn = db) {
+		const allBarchartReadings = await conn.func('barchart_readings', [groupIDs, duration, fromTimestamp || '-infinity', toTimestamp || 'infinity']);
+		// Separate the result rows by meter_id and return a nested object.
+		const barchartReadingsByGroupID = {};
+		for (const row of allBarchartReadings) {
+			if (barchartReadingsByGroupID[row.group_id] === undefined) {
+				barchartReadingsByGroupID[row.group_id] = [];
+			}
+			barchartReadingsByGroupID[row.group_id].push(
+				{ reading_sum: row.reading_sum, start_timestamp: row.start_timestamp, end_timestamp: row.end_timestamp }
+			);
+		}
+		return barchartReadingsByGroupID;
+	}
+
 
 	toString() {
 		return `Reading [id: ${this.id}, reading: ${this.reading}, timestamp: ${this.timestamp}]`;
