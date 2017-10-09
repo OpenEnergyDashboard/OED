@@ -1,0 +1,12 @@
+.rangeslider__tooltip::after {
+	border-top: 8px solid transparent !important;
+	border-bottom: 8px solid transparent !important;
+	border-right: 8px solid rgba(0, 0, 0, 0.8) !important;
+	left: -15px !important;
+	top: 12px !important;
+}
+
+.rangeslider-horizontal .rangeslider__tooltip {
+	top: -5px !important;
+	left: 40px !important;
+}
