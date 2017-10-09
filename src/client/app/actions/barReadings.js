@@ -12,9 +12,10 @@ export const RECEIVE_BAR_READINGS = 'RECEIVE_BAR_READINGS';
 
 /**
  * @param {State} state
- * @param {number} meterID
+ * @param {number} dsID
  * @param {TimeInterval} timeInterval
  * @param {Moment.Duration} barDuration
+ * @param {String} dstype either DATA_TYPE_METER, DATA_TYPE_GROUP
  */
 function shouldFetchBarReadings(state, dsID, timeInterval, barDuration, dstype) {
 	let readingsForID;

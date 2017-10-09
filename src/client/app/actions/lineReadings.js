@@ -12,7 +12,7 @@ export const RECEIVE_LINE_READINGS = 'RECEIVE_LINE_READINGS';
 
 /**
  * @param {State} state
- * @param {number} meterID
+ * @param {number} dsID
  * @param {TimeInterval} timeInterval
  * @param {String} type either DATA_TYPE_METER, DATA_TYPE_GROUP
  */
