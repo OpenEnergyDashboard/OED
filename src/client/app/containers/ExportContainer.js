@@ -21,7 +21,7 @@ function mapStateToProps(state) {
 		if (chart === chartTypes.line) {
 			readingsData = state.readings.line.byGroupID[groupID][timeInterval];
 		} else if (chart === chartTypes.bar) {
-			console.error('UNIMPLEMENTED: Export for group bar charts.');
+			readingsData = state.readings.bar.byGroupID[groupID][timeInterval][barDuration];
 		}
 
 		if (readingsData !== undefined && !readingsData.isFetching && chart === chartTypes.line) {
@@ -33,7 +33,13 @@ function mapStateToProps(state) {
 				exportVals: state.readings.line.byGroupID[groupID][timeInterval].readings.map(arr => ({ x: arr[0], y: arr[1] }))
 			});
 		} else if (readingsData !== undefined && !readingsData.isFetching && chart === chartTypes.bar) {
-			console.error('UNIMPLEMENTED: Export for group bar charts.');
+			data.datasets.push({
+				label: state.groups.byGroupID[groupID].name,
+				id: state.groups.byGroupID[groupID].id,
+				timestamp: state.readings.bar.byGroupID[groupID][timeInterval][barDuration].start_timestamp,
+				currentChart: chart,
+				exportVals: state.readings.bar.byGroupID[groupID][timeInterval][barDuration].readings.map(arr => ({ x: arr[0], y: arr[1] }))
+			});
 		}
 	}
 
