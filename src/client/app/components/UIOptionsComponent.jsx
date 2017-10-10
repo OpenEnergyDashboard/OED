@@ -108,34 +108,32 @@ export default class UIOptionsComponent extends React.Component {
 				value: group.id
 			}
 		));
-
-
 		return (
-			<div className="col-xs-2" style={divPadding}>
-				<div className="col-xs-11">
-					<p style={labelStyle}>Groups:</p>
-					<div style={divBottomPadding}>
-						<MultiSelectComponent options={groupSelectOptions} placeholder="Select Groups" onValuesChange={s => this.handleDatasourceSelect(s, DATA_TYPE_GROUP)} />
-					</div>
-					<p style={labelStyle}>Meters:</p>
-					<div style={divBottomPadding}>
-						<MultiSelectComponent options={meterSelectOptions} placeholder="Select Meters" onValuesChange={s => this.handleDatasourceSelect(s, DATA_TYPE_METER)} />
-					</div>
-					<p style={labelStyle}>Graph Type:</p>
-					<div className="radio">
-						<label><input type="radio" name="chartTypes" value={chartTypes.line} onChange={this.handleChangeChartType} checked={this.props.chartToRender === chartTypes.line} />Line</label>
-						<div style={radioButtonInlinePadding} />
-						<label><input type="radio" name="chartTypes" value={chartTypes.bar} onChange={this.handleChangeChartType} checked={this.props.chartToRender === chartTypes.bar} />Bar</label>
-					</div>
+			<div style={divPadding}>
+				<p style={labelStyle}>Groups:</p>
+				<div style={divBottomPadding}>
+					<MultiSelectComponent options={groupSelectOptions} placeholder="Select Groups" onValuesChange={s => this.handleDatasourceSelect(s, DATA_TYPE_GROUP)} />
+				</div>
+				<p style={labelStyle}>Meters:</p>
+				<div style={divBottomPadding}>
+					<MultiSelectComponent options={meterSelectOptions} placeholder="Select Meters" onValuesChange={s => this.handleDatasourceSelect(s, DATA_TYPE_METER)} />
+				</div>
+				<p style={labelStyle}>Graph Type:</p>
+				<div className="radio">
+					<label><input type="radio" name="chartTypes" value={chartTypes.line} onChange={this.handleChangeChartType} checked={this.props.chartToRender === chartTypes.line} />Line</label>
+					<div style={radioButtonInlinePadding} />
+					<label><input type="radio" name="chartTypes" value={chartTypes.bar} onChange={this.handleChangeChartType} checked={this.props.chartToRender === chartTypes.bar} />Bar</label>
+				</div>
+				{this.props.chartToRender === chartTypes.bar &&
+				<div>
 					<div className="checkbox">
 						<label><input type="checkbox" onChange={this.handleChangeBarStacking} />Bar stacking</label>
 					</div>
 					<p style={labelStyle}>Bar chart interval (days):</p>
 					<Slider min={1} max={365} value={this.state.barDuration} onChange={this.handleBarDurationChange} onChangeComplete={this.handleBarDurationChangeComplete} />
-					<div>
-						<ExportContainer />
-					</div>
 				</div>
+				}
+				<ExportContainer />
 			</div>
 		);
 	}

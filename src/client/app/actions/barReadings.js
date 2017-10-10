@@ -12,9 +12,10 @@ export const RECEIVE_BAR_READINGS = 'RECEIVE_BAR_READINGS';
 
 /**
  * @param {State} state
- * @param {number} meterID
+ * @param {number} dsID
  * @param {TimeInterval} timeInterval
  * @param {Moment.Duration} barDuration
+ * @param {String} dstype either DATA_TYPE_METER, DATA_TYPE_GROUP
  */
 function shouldFetchBarReadings(state, dsID, timeInterval, barDuration, dstype) {
 	let readingsForID;
@@ -55,6 +56,9 @@ function fetchBarReadings(dsIDs, timeInterval, dstype) {
 			endpoint = '/api/readings/bar/meters';
 		} else if (dstype === DATA_TYPE_GROUP) {
 			endpoint = '/api/readings/bar/groups';
+		} else {
+			console.error('Unknown datatype requested in fetchBarReadings: ', dstype);
+			endpoint = '/api/nonexistant';
 		}
 
 		return axios.get(`${endpoint}/${stringifiedIDs}`, {
@@ -75,7 +79,7 @@ export function fetchNeededBarReadings(timeInterval) {
 		if (meterIDsToFetchForBar.length > 0) {
 			return dispatch(fetchBarReadings(meterIDsToFetchForBar, timeInterval, DATA_TYPE_METER));
 		}
-		const groupIDsToFetchForBar = state.graph.selectedMeters.filter(id => shouldFetchBarReadings(state, id, timeInterval, state.graph.barDuration, DATA_TYPE_GROUP));
+		const groupIDsToFetchForBar = state.graph.selectedGroups.filter(id => shouldFetchBarReadings(state, id, timeInterval, state.graph.barDuration, DATA_TYPE_GROUP));
 		if (groupIDsToFetchForBar.length > 0) {
 			return dispatch(fetchBarReadings(groupIDsToFetchForBar, timeInterval, DATA_TYPE_GROUP));
 		}

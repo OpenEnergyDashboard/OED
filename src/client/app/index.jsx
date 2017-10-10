@@ -7,7 +7,7 @@ import thunkMiddleware from 'redux-thunk';
 import { render } from 'react-dom';
 import { createStore, applyMiddleware, compose } from 'redux';
 import { Provider } from 'react-redux';
-import RouteComponent from './components/RouteComponent';
+import RouteContainer from './containers/RouteContainer';
 import reducers from './reducers';
 
 // This sets up the redux-devtools extension (if it's installed in the browser).
@@ -23,7 +23,7 @@ const store = createStore(reducers, composeEnhancers(applyMiddleware(thunkMiddle
 // Provides the Redux store to all child components
 render(
 	<Provider store={store}>
-		<RouteComponent />
+		<RouteContainer />
 	</Provider>,
 	document.getElementById('root')
 );

@@ -7,7 +7,6 @@
 import { Line } from 'react-chartjs-2';
 import moment from 'moment';
 import { connect } from 'react-redux';
-import 'chartjs-plugin-zoom';
 import GraphColors from '../utils/GraphColors';
 
 /**
@@ -76,14 +75,6 @@ function mapStateToProps(state) {
 				title: tooltipItems => `${moment(tooltipItems[0].xLabel).format('dddd, MMM DD, YYYY hh:mm a')}`,
 				label: tooltipItems => `${data.datasets[tooltipItems.datasetIndex].label}: ${tooltipItems.yLabel} kWh`
 			}
-		},
-		pan: {
-			enabled: true,
-			mode: 'x'
-		},
-		zoom: {
-			enabled: true,
-			mode: 'x',
 		}
 	};
 

@@ -12,7 +12,7 @@ export const RECEIVE_LINE_READINGS = 'RECEIVE_LINE_READINGS';
 
 /**
  * @param {State} state
- * @param {number} meterID
+ * @param {number} dsID
  * @param {TimeInterval} timeInterval
  * @param {String} type either DATA_TYPE_METER, DATA_TYPE_GROUP
  */
@@ -43,20 +43,23 @@ function receiveLineReadings(dsIDs, timeInterval, readings, dstype) {
 	return { type: RECEIVE_LINE_READINGS, dsIDs, timeInterval, readings, dstype };
 }
 
-function fetchLineReadings(dsIDs, timeInterval, type) {
+function fetchLineReadings(dsIDs, timeInterval, dstype) {
 	return dispatch => {
-		dispatch(requestLineReadings(dsIDs, timeInterval, type));
+		dispatch(requestLineReadings(dsIDs, timeInterval, dstype));
 		// The api expects the meter ids to be a comma-separated list.
 		const stringifiedIDs = dsIDs.join(',');
 		let endpoint;
-		if (type === DATA_TYPE_GROUP) {
+		if (dstype === DATA_TYPE_GROUP) {
 			endpoint = '/api/readings/line/groups';
-		} else if (type === DATA_TYPE_METER) {
+		} else if (dstype === DATA_TYPE_METER) {
 			endpoint = '/api/readings/line/meters';
+		} else {
+			console.error('Unknown datatype requested in fetchLineReadings: ', dstype);
+			endpoint = '/api/nonexistant';
 		}
 		return axios.get(`${endpoint}/${stringifiedIDs}`, {
 			params: { timeInterval: timeInterval.toString() }
-		}).then(response => dispatch(receiveLineReadings(dsIDs, timeInterval, response.data, type)));
+		}).then(response => dispatch(receiveLineReadings(dsIDs, timeInterval, response.data, dstype)));
 	};
 }
 
