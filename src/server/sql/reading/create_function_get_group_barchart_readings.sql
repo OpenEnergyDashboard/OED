@@ -14,12 +14,12 @@ CREATE OR REPLACE FUNCTION barchart_group_readings(
 
 		RETURN QUERY
 		SELECT
-			gdm.group_id AS group_id,
-			SUM(compressed.reading_sum) AS reading_sum,
+			gdm.group_id AS group_ID,
+			SUM(compressed.reading_sum)::INTEGER AS reading_sum,
 			compressed.start_timestamp AS start_timestamp,
 			compressed.end_timestamp AS end_timestamp
 		FROM barchart_readings(meter_ids, duration, from_timestamp, to_timestamp) compressed
 			INNER JOIN groups_deep_meters gdm ON gdm.meter_id = compressed.meter_id
 		GROUP by gdm.group_id, compressed.start_timestamp, compressed.end_timestamp;
 	END;
-$$
+$$ LANGUAGE plpgsql;
