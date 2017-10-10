@@ -4,6 +4,7 @@
 
 import { connect } from 'react-redux';
 import AdminComponent from '../components/AdminComponent';
+import { showNotification } from '../actions/notifications';
 
 /**
  * @param {State} state
@@ -14,4 +15,10 @@ function mapStateToProps(state) {
 	};
 }
 
-export default connect(mapStateToProps)(AdminComponent);
+function mapDispatchToProps(dispatch) {
+	return {
+		showNotification: notification => dispatch(showNotification(notification))
+	};
+}
+
+export default connect(mapStateToProps, mapDispatchToProps)(AdminComponent);

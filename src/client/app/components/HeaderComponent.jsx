@@ -28,7 +28,7 @@ export default function HeaderComponent(props) {
 	};
 	const adminLinkStyle = {
 		// Displays the admin button link only if the user is logged in (auth token exists)
-		display: localStorage.getItem('token') ? 'inline' : 'none'
+		display: localStorage.getItem('token') && (props.renderAdminButton !== false) ? 'inline' : 'none'
 	};
 	return (
 		<div className="container-fluid">

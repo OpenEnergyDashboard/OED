@@ -39,7 +39,6 @@ router.post('/:meter_id', upload.single('csvFile'), async (req, res) => {
 			return Reading.insertAll(readings, tx).then(() => {console.log("Completed")});
 		});
 		transaction.then(() => {
-			console.log()
 			res.status(200);
 		});
 	} catch (err) {

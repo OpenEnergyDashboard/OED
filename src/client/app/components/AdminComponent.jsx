@@ -6,6 +6,7 @@ import React from 'react';
 import Dropzone from 'react-dropzone';
 import axios from 'axios';
 import MeterDropDownContainer from '../containers/MeterDropdownContainer';
+import HeaderContainer from '../containers/HeaderContainer';
 
 
 export default class AdminComponent extends React.Component {
@@ -17,21 +18,31 @@ export default class AdminComponent extends React.Component {
 
 	handleOnDrop(files) {
 		const file = files[0];
-		console.log(file);
 		const data = new FormData();
 		data.append('csvFile', file);
 		axios.post(`/api/fileProcessing/${this.props.meterID}`, data)
-			.then(response => {
-				console.log(response);
+			.then(() => {
+				this.props.showNotification({
+					message: 'Successfully uploaded meter data',
+					level: 'success',
+					position: 'tr',
+					autoDismiss: 3
+				});
 			})
-			.catch(console.log);
+			.catch(() => {
+				this.props.showNotification({
+					message: 'Error uploading meter data',
+					level: 'error',
+					position: 'tr',
+					autoDismiss: 3
+				});
+			});
 	}
 
 	render() {
 		return (
 			<div>
-				<p>Admin panel</p>
-				<button>AddMeter</button>
+				<HeaderContainer renderLoginButton={false} renderOptionsButton={false} renderAdminButton={false} />
 				<Dropzone onDrop={this.handleOnDrop}>
 					<div> Add in a CSV file here:</div>
 				</Dropzone>

@@ -5,9 +5,9 @@
  */
 
 import { connect } from 'react-redux';
-import RouteComponent from '../components/RouteComponent';
+import InitializationComponent from '../components/InitializationComponent';
 import { clearNotifications } from '../actions/notifications';
-
+import { fetchMetersDetailsIfNeeded } from '../actions/meters';
 
 function mapStateToProps(state) {
 	return {
@@ -17,8 +17,9 @@ function mapStateToProps(state) {
 
 function mapDispatchToProps(dispatch) {
 	return {
-		clearNotifications: () => dispatch(clearNotifications())
+		clearNotifications: () => dispatch(clearNotifications()),
+		fetchMetersDetailsIfNeeded: () => dispatch(fetchMetersDetailsIfNeeded()),
 	};
 }
 
-export default connect(mapStateToProps, mapDispatchToProps)(RouteComponent);
+export default connect(mapStateToProps, mapDispatchToProps)(InitializationComponent);

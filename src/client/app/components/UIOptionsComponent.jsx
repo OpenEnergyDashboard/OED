@@ -27,14 +27,6 @@ export default class UIOptionsComponent extends React.Component {
 		};
 	}
 
-	/**
-	 * Called when this component mounts
-	 * Dispatches a Redux action to fetch meter information
-	 */
-	componentWillMount() {
-		this.props.fetchMetersDetailsIfNeeded();
-	}
-
 	handleMeterSelect(e) {
 		e.preventDefault();
 		const options = e.target.options;
