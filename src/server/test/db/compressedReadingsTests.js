@@ -90,4 +90,10 @@ mocha.describe('Compressed Readings', () => {
 		expect(compressedReadings[meter.id][0].reading_rate).to.be.closeTo(readingMeter1.reading, 0.0001);
 		expect(compressedReadings[meter2.id][0].reading_rate).to.be.closeTo(readingMeter2.reading, 0.0001);
 	});
+
+	mocha.it('returns no readings when none exist', async () => {
+		const result = await Reading.getCompressedReadings([meter.id]);
+
+		expect(result).to.deep.equal({ [meter.id]: [] });
+	});
 });

@@ -1,8 +1,8 @@
 /* This Source Code Form is subject to the terms of the Mozilla Public
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
-
 const database = require('./database');
+const { mapToObject } = require('../util');
 
 const db = database.db;
 const sqlFile = database.sqlFile;
@@ -146,11 +146,8 @@ class Reading {
 	static async getCompressedReadings(meterIDs, fromTimestamp = null, toTimestamp = null, numPoints = 500, conn = db) {
 		const allCompressedReadings = await conn.func('compressed_readings', [meterIDs, fromTimestamp || '-infinity', toTimestamp || 'infinity', numPoints]);
 		// Separate the result rows by meter_id and return a nested object.
-		const compressedReadingsByMeterID = {};
+		const compressedReadingsByMeterID = mapToObject(meterIDs, () => []); // Returns { 1: [], 2: [], ... }
 		for (const row of allCompressedReadings) {
-			if (compressedReadingsByMeterID[row.meter_id] === undefined) {
-				compressedReadingsByMeterID[row.meter_id] = [];
-			}
 			compressedReadingsByMeterID[row.meter_id].push(
 				{ reading_rate: row.reading_rate, start_timestamp: row.start_timestamp, end_timestamp: row.end_timestamp }
 			);
@@ -172,11 +169,8 @@ class Reading {
 	static async getCompressedGroupReadings(groupIDs, fromTimestamp = null, toTimestamp = null, numPoints = 500, conn = db) {
 		const allCompressedReadings = await conn.func('compressed_group_readings', [groupIDs, fromTimestamp || '-infinity', toTimestamp || 'infinity', numPoints]);
 		// Separate the result rows by meter_id and return a nested object.
-		const compressedReadingsByGroupID = {};
+		const compressedReadingsByGroupID = mapToObject(groupIDs, () => []); // Returns { 1: [], 2: [], ... }
 		for (const row of allCompressedReadings) {
-			if (compressedReadingsByGroupID[row.group_id] === undefined) {
-				compressedReadingsByGroupID[row.group_id] = [];
-			}
 			compressedReadingsByGroupID[row.group_id].push(
 				{ reading_rate: row.reading_rate, start_timestamp: row.start_timestamp, end_timestamp: row.end_timestamp }
 			);
@@ -198,11 +192,8 @@ class Reading {
 	static async getBarchartReadings(meterIDs, duration, fromTimestamp = null, toTimestamp = null, conn = db) {
 		const allBarchartReadings = await conn.func('barchart_readings', [meterIDs, duration, fromTimestamp || '-infinity', toTimestamp || 'infinity']);
 		// Separate the result rows by meter_id and return a nested object.
-		const barchartReadingsByMeterID = {};
+		const barchartReadingsByMeterID = mapToObject(meterIDs, () => []);
 		for (const row of allBarchartReadings) {
-			if (barchartReadingsByMeterID[row.meter_id] === undefined) {
-				barchartReadingsByMeterID[row.meter_id] = [];
-			}
 			barchartReadingsByMeterID[row.meter_id].push(
 				{ reading_sum: row.reading_sum, start_timestamp: row.start_timestamp, end_timestamp: row.end_timestamp }
 			);
@@ -224,9 +215,8 @@ class Reading {
 	static async getGroupBarchartReadings(groupIDs, duration, fromTimestamp = null, toTimestamp = null, conn = db) {
 		const allBarchartReadings = await conn.func('barchart_group_readings', [groupIDs, duration, fromTimestamp || '-infinity', toTimestamp || 'infinity']);
 		// Separate the result rows by meter_id and return a nested object.
-		const barchartReadingsByGroupID = {};
+		const barchartReadingsByGroupID = mapToObject(groupIDs, () => []);
 		for (const row of allBarchartReadings) {
-			console.log(JSON.stringify(row));
 			if (barchartReadingsByGroupID[row.group_id] === undefined) {
 				barchartReadingsByGroupID[row.group_id] = [];
 			}
@@ -234,7 +224,6 @@ class Reading {
 				{ reading_sum: row.reading_sum, start_timestamp: row.start_timestamp, end_timestamp: row.end_timestamp }
 			);
 		}
-		console.log(JSON.stringify(barchartReadingsByGroupID));
 		return barchartReadingsByGroupID;
 	}
 
