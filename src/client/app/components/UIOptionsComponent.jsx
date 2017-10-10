@@ -78,38 +78,52 @@ export default class UIOptionsComponent extends React.Component {
 		const labelStyle = {
 			textDecoration: 'underline'
 		};
-		const divPadding = {
-			paddingTop: '35px'
-		};
 		return (
-			<div className="col-xs-2" style={divPadding}>
-				<div className="col-xs-11">
-					<div>
-						<div className="form-group">
-							<p style={labelStyle}>Select meters:</p>
-							<select multiple className="form-control" id="meterList" size="8" onChange={this.handleMeterSelect}>
-								{this.props.meters.map(meter =>
-									<option key={meter.id} value={meter.id}>{meter.name}</option>
-								)}
-							</select>
-						</div>
-					</div>
-					<p style={labelStyle}>Graph Type:</p>
-					<div className="radio">
-						<label><input type="radio" name="chartTypes" value={chartTypes.line} onChange={this.handleChangeChartType} checked={this.props.chartToRender === chartTypes.line} />Line</label>
-					</div>
-					<div className="radio">
-						<label><input type="radio" name="chartTypes" value={chartTypes.bar} onChange={this.handleChangeChartType} checked={this.props.chartToRender === chartTypes.bar} />Bar</label>
-					</div>
-					<div className="checkbox">
-						<label><input type="checkbox" onChange={this.handleChangeBarStacking} />Bar stacking</label>
-					</div>
+			<div>
+				{this.props.chartToRender === chartTypes.compare || chartTypes.line &&
+				<div className="form-group">
+					<p style={labelStyle}>Select meters:</p>
+					<select multiple className="form-control" id="meterList" size="8" onChange={this.handleMeterSelect}>
+						{this.props.meters.map(meter =>
+							<option key={meter.id} value={meter.id}>{meter.name}</option>
+                        )}
+					</select>
+				</div>
+                }
+				{this.props.chartToRender === chartTypes.compare &&
+				<div className="form-group">
+					<p style={labelStyle}>Select meters:</p>
+					<select className="form-control" id="meterList" size="8" onChange={this.handleMeterSelect}>
+						{this.props.meters.map(meter =>
+							<option key={meter.id} value={meter.id}>{meter.name}</option>
+                        )}
+					</select>
+				</div>
+                }
+				<p style={labelStyle}>Graph Type:</p>
+				<div className="radio">
+					<label><input type="radio" name="chartTypes" value={chartTypes.line} onChange={this.handleChangeChartType} checked={this.props.chartToRender === chartTypes.line} />Line</label>
+				</div>
+				<div className="radio">
+					<label><input type="radio" name="chartTypes" value={chartTypes.bar} onChange={this.handleChangeChartType} checked={this.props.chartToRender === chartTypes.bar} />Bar</label>
+				</div>
+				<div className="radio">
+					<label><input type="radio" name="chartTypes" value={chartTypes.compare} onChange={this.handleChangeChartType} checked={this.props.chartToRender === chartTypes.compare} />Compare</label>
+				</div>
+				{this.props.chartToRender === chartTypes.bar &&
+				<div>
 					<p style={labelStyle}>Bar chart interval (days):</p>
 					<Slider min={1} max={365} value={this.state.barDuration} onChange={this.handleBarDurationChange} onChangeComplete={this.handleBarDurationChangeComplete} />
-					<div>
-						<ExportContainer />
-					</div>
 				</div>
+				}
+				{this.props.chartToRender === chartTypes.bar &&
+				<div className="checkbox">
+					<label><input type="checkbox" onChange={this.handleChangeBarStacking} />Bar stacking</label>
+				</div>
+				}
+				{this.props.chartToRender === chartTypes.compare || chartTypes.line &&
+				<ExportContainer />
+                }
 			</div>
 		);
 	}

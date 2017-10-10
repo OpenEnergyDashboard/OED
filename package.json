@@ -10,7 +10,8 @@
     "test": "./node_modules/.bin/mocha \"src/server/test/**/*.js\"",
     "createdb": "node ./src/scripts/createDB.js",
     "addMamacMeters": "node ./src/scripts/addMamacMeters.js",
-    "updateMamacMeters": "node ./src/scripts/updateMamacMeters.js"
+    "updateMamacMeters": "node ./src/scripts/updateMamacMeters.js",
+    "createUser": "node ./src/scripts/createUser.js"
   },
   "dependencies": {
     "axios": "^0.15.3",
@@ -23,7 +24,7 @@
     "bcryptjs": "^2.4.3",
     "body-parser": "~1.15.1",
     "chart.js": "^2.5.0",
-    "chartjs-plugin-zoom": "^0.4.5",
+    "chartjs-plugin-datalabels": "^0.1.0",
     "cookie-parser": "~1.4.3",
     "cross-env": "^5.0.5",
     "csv": "^1.1.0",
@@ -44,6 +45,7 @@
     "react-bootstrap": "^0.31.0",
     "react-chartjs-2": "^2.0.5",
     "react-dom": "^15.4.2",
+    "react-notification-system": "^0.2.15",
     "react-rangeslider": "^2.0.1",
     "react-redux": "^5.0.2",
     "react-router": "^3.0.2",

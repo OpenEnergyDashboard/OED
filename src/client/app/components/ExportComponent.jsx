@@ -22,7 +22,7 @@ const ExportComponent = props => {
 	};
 	return (
 		<div>
-			<Button bsStyle="default" onClick={exportReading}>Export!</Button>
+			<Button bsStyle="default" onClick={exportReading}>Export graph data</Button>
 		</div>
 	);
 };

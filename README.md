@@ -12,6 +12,10 @@ Node.js - Javascript runtime environment ([nodejs.org](https://nodejs.org/en/))
 
 ### Developer installation: ###
 
+You can either use Docker Compose to install Node and PostgreSQL in containers, or install Node and PostgreSQL on your system.
+
+#### Without Docker ####
+
 1. Install Node, npm, and git.
 1. Clone this repository.
 1. Run ```npm install``` in the project root directory.
@@ -32,8 +36,28 @@ TOKEN_SECRET=?             // Token for authentication. Generate something secur
 8. Run ```npm run createdb``` to create the database schema.
 1. Run `npm run addMamacMeters` to load mamac meters from an `.csv` file.
 1. Run `npm run updateMamacMeters` to fetch new data for mamac meters in the database.
+1. Run `npm run createUser` and follow the directions to create a new admin user.
 1. Run ```npm run build``` to create the Webpack bundle for production, otherwise run ```npm run dev``` for development.
 1. Run ```npm start```
+
+#### With Docker ####
+
+1. Install [Docker](https://docs.docker.com/engine/installation/) and [docker-compose](https://docs.docker.com/compose/install/).
+1. Clone this repository.
+1. Set up Node environment and the database by running ```docker-compose run --rm web src/scripts/init.sh <excel file>``` in the main directory. 
+1. Start the app in development mode with ```docker-compose run --rm --service-ports web src/scripts/devstart.sh```.
+
+
+To clarify: ```docker-compose run --rm web``` means run the following command, in the ```web``` container (the one containing the OED NodeJS app). 
+With the init script, you can either provide an Excel file with the IPs of some Mamac meters, in which case the database will be populated, or enter NONE, which will skip populating it.
+
+For production, run the app with ```docker-compose up -d```. This starts the app as a daemon. Stop the app with ```docker-compose stop```. 
+
+You can get rid of the containers with ```docker-compose down```. Until you do that, you can skip step 3 on subsequent runs.
+
+Configuration is in ```docker-config.yml```. See especially the ```environment:``` section for the ```web``` service.
+By default, the app will run on the port 3000 with secret key ?, which should definitely be changed.
+
 
 ### Authors ###
 
