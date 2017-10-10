@@ -14,16 +14,24 @@ export const RECEIVE_LINE_READINGS = 'RECEIVE_LINE_READINGS';
  * @param {State} state
  * @param {number} dsID
  * @param {TimeInterval} timeInterval
+ * @param {String} type either DATA_TYPE_METER, DATA_TYPE_GROUP
  */
-function shouldFetchLineReadings(state, meterID, timeInterval) {
-	const readingsForMeterID = state.readings.line.byMeterID[meterID];
-	if (readingsForMeterID === undefined) {
+function shouldFetchLineReadings(state, dsID, timeInterval, type) {
+	let dsArray;
+	if (type === DATA_TYPE_GROUP) {
+		dsArray = state.readings.line.byGroupID;
+	} else if (type === DATA_TYPE_METER) {
+		dsArray = state.readings.line.byMeterID;
+	}
+
+	const readingsForID = dsArray[dsID];
+	if (readingsForID === undefined) {
 		return true;
 	}
-	if (readingsForMeterID[timeInterval] === undefined) {
+	if (readingsForID[timeInterval] === undefined) {
 		return true;
 	}
-	const readingsForTimeInterval = state.readings.line.byMeterID[meterID][timeInterval];
+	const readingsForTimeInterval = dsArray[dsID][timeInterval];
 	return readingsForTimeInterval === undefined && !readingsForTimeInterval.isFetching;
 }
 

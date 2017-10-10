@@ -3,11 +3,10 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
 
 import React from 'react';
-import HeaderComponent from '../HeaderComponent';
 import GroupViewContainer from '../../containers/groups/GroupViewContainer';
 import GroupSidebarContainer from '../../containers/groups/GroupSidebarContainer';
+import HeaderComponent from '../HeaderComponent';
 import CreateGroupContainer from '../../containers/groups/CreateGroupContainer';
-import EditGroupsContainer from '../../containers/groups/EditGroupsContainer';
 
 export default class GroupComponent extends React.Component {
 	componentWillMount() {
@@ -19,6 +18,7 @@ export default class GroupComponent extends React.Component {
 	render() {
 		let GroupDisplay = null;
 		if (this.props.displayMode === 'create') {
+
 			GroupDisplay = (
 				<div>
 					<CreateGroupContainer />
@@ -27,7 +27,7 @@ export default class GroupComponent extends React.Component {
 		} else if (this.props.displayMode === 'edit') {
 			GroupDisplay = (
 				<div>
-					<EditGroupsContainer />
+					TODO
 				</div>
 			);
 		} else { // view groups

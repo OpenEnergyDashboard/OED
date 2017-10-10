@@ -53,9 +53,9 @@ function fetchBarReadings(dsIDs, timeInterval, dstype) {
 
 		let endpoint;
 		if (dstype === DATA_TYPE_METER) {
-			endpoint = '/api/readings/bar';
+			endpoint = '/api/readings/bar/meters';
 		} else if (dstype === DATA_TYPE_GROUP) {
-			endpoint = '/api/readings/bar';
+			endpoint = '/api/readings/bar/groups';
 		} else {
 			console.error('Unknown datatype requested in fetchBarReadings: ', dstype);
 			endpoint = '/api/nonexistant';

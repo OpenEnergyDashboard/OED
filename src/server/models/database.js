@@ -61,6 +61,7 @@ async function createSchema() {
 	await Reading.createCompressedReadingsFunction();
 	await Reading.createCompressedGroupsReadingsFunction();
 	await Reading.createBarchartReadingsFunction();
+	await Reading.createCompressedGroupsBarchartReadingsFunction();
 	await User.createTable();
 	await Group.createTables();
 	await db.none(sqlFile('reading/create_function_get_compressed_readings.sql'));

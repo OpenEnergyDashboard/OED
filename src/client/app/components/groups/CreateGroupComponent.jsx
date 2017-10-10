@@ -4,7 +4,8 @@
 
 import React from 'react';
 import { FormControl, Button } from 'react-bootstrap';
-import DatasourceBoxContainer from '../../containers/groups/DatasourceBoxContainer';
+import MeterBoxContainer from '../../containers/groups/MeterBoxContainer';
+import GroupBoxContainer from '../../containers/groups/GroupBoxContainer';
 
 export default class CreateGroupComponent extends React.Component {
 	constructor(props) {
@@ -46,12 +47,8 @@ export default class CreateGroupComponent extends React.Component {
 				<p style={underlineStyle}>Name:</p>
 				<FormControl type="text" placeholder="Name" onChange={this.handleNameChange} />
 				<br />
-				<p style={underlineStyle}>Select meters:</p>
-				<DatasourceBoxContainer type="meter" selection="all" />
-				<br />
-				<p style={underlineStyle}>Select groups:</p>
-				<DatasourceBoxContainer type="group" selection="all" />
-				<br />
+				<MeterBoxContainer />
+				<GroupBoxContainer />
 				<Button type="submit" onClick={this.handleCreateGroup}>Create group</Button>
 				<Button className="pull-right" type="submit" onClick={this.handleReturnToView}>Return to groups overview</Button>
 			</div>

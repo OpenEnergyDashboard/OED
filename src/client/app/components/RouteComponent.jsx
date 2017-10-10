@@ -12,6 +12,7 @@ import LoginContainer from '../containers/LoginContainer';
 import AdminComponent from './AdminComponent';
 import NotFoundComponent from './NotFoundComponent';
 import GroupContainer from '../containers/groups/GroupMainContainer';
+import EditGroupComponent from './groups/EditGroupComponent';
 
 export default class RouteComponent extends React.Component {
 	constructor(props) {
@@ -72,6 +73,7 @@ export default class RouteComponent extends React.Component {
 					<Route path="/login" component={LoginContainer} />
 					<Route path="/admin" component={AdminComponent} onEnter={this.requireAuth} />
 					<Route path="/groups" component={GroupContainer} onEnter={this.requireAuth} />
+					<Route path="/editGroup" component={EditGroupComponent} />
 					<Route path="*" component={NotFoundComponent} />
 				</Router>
 			</div>
