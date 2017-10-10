@@ -5,7 +5,6 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/.
  */
 
-import _ from 'lodash';
 import * as readingsActions from '../actions/lineReadings';
 import { DATA_TYPE_METER, DATA_TYPE_GROUP } from '../utils/Datasources';
 
@@ -78,16 +77,12 @@ export default function readings(state = defaultState, action) {
 			if (action.dstype === DATA_TYPE_METER) {
 				for (const meterID of action.dsIDs) {
 					const readingsForMeter = action.readings[meterID];
-					// Sort by timestamp
-					const sortedReadingsForMeter = _.sortBy(readingsForMeter, reading => reading[0]);
-					newState.byMeterID[meterID][timeInterval] = { isFetching: false, readings: sortedReadingsForMeter };
+					newState.byMeterID[meterID][timeInterval] = { isFetching: false, readings: readingsForMeter };
 				}
 			} else if (action.dstype === DATA_TYPE_GROUP) {
 				for (const groupID of action.dsIDs) {
 					const readingsForGroup = action.readings[groupID];
-					// Sort by timestamp
-					const sortedReadingsForGroup = _.sortBy(readingsForGroup, reading => reading[0]);
-					newState.byGroupID[groupID][timeInterval] = { isFetching: false, readings: sortedReadingsForGroup };
+					newState.byGroupID[groupID][timeInterval] = { isFetching: false, readings: readingsForGroup };
 				}
 			}
 

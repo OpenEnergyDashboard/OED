@@ -24,7 +24,8 @@ CREATE OR REPLACE FUNCTION compressed_group_readings(
 				compressed.end_timestamp AS end_timestamp
 			FROM compressed_readings(meter_ids, from_timestamp, to_timestamp, num_points) compressed
 			INNER JOIN groups_deep_meters gdm ON gdm.meter_id = compressed.meter_id
-			GROUP by gdm.group_id, compressed.start_timestamp, compressed.end_timestamp;
+			GROUP by gdm.group_id, compressed.start_timestamp, compressed.end_timestamp
+			ORDER BY gdm.group_id, compressed.start_timestamp;
 	END;
 $$ LANGUAGE plpgsql;
 
