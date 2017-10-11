@@ -10,13 +10,16 @@ const readCSV = require('../server/services/readCSV');
 const promisify = require('es6-promisify');
 const parseString = require('xml2js').parseString;
 const Meter = require('../server/models/Meter');
+const _ = require('lodash');
 const stopDB = require('../server/models/database').stopDB;
 
 const parseXMLPromisified = promisify(parseString);
 
 async function parseCSV(filename) {
 	const rawIPs = await readCSV(filename);
-	return rawIPs.slice(1).map(ip => ({ ip: ip[0] }));
+	const ipv4Pattern = /^(([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])\.){3}([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])$/;
+	// Filter to only lines that are valid ipv4 addresses, then map to objects
+	return _.filter(rawIPs, ip => (ipv4Pattern.test(ip[0]))).map(ip => ({ ip: ip[0] }));
 }
 
 /**
