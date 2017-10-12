@@ -19,6 +19,8 @@ function mapStateToProps(state) {
 	return {
 		meters: sortedMeters,
 		groups: sortedGroups,
+		selectedGroups: state.graph.selectedGroups,
+		selectedMeters: state.graph.selectedMeters,
 		chartToRender: state.graph.chartToRender
 	};
 }
