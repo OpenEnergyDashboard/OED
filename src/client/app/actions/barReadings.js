@@ -58,7 +58,7 @@ function fetchBarReadings(dsIDs, timeInterval, dstype) {
 			endpoint = '/api/readings/bar/groups';
 		} else {
 			console.error('Unknown datatype requested in fetchBarReadings: ', dstype);
-			endpoint = '/api/nonexistant';
+            return Promise.resolve();
 		}
 
 		return axios.get(`${endpoint}/${stringifiedIDs}`, {
