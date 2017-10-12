@@ -2,11 +2,9 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
 
-// This component is for viewing a single group via child box components + some buttons
 import React from 'react';
 import { Button } from 'react-bootstrap';
-import MeterBoxContainer from '../../containers/groups/MeterBoxContainer';
-import GroupBoxContainer from '../../containers/groups/GroupBoxContainer';
+import DatasourceBoxContainer from '../../containers/groups/DatasourceBoxContainer';
 
 export default class GroupViewComponent extends React.Component {
 	constructor(props) {
@@ -19,27 +17,34 @@ export default class GroupViewComponent extends React.Component {
 	}
 
 	handleEditGroup() {
-		// TODO edit group with id this.props.id
+		this.props.changeDisplayMode('edit');
+		this.props.beginEditingIfPossible(this.props.id);
 	}
 
 	render() {
 		const nameStyle = {
 			textAlign: 'center'
 		};
+		const buttonPadding = {
+			marginTop: '10px'
+		};
+		const underlineStyle = {
+			textDecoration: 'underline'
+		};
 		return (
 			<div>
 				<h2 style={nameStyle}>{this.props.name}</h2>
 				<div className="row">
 					<div className="col-xs-6">
-						<h4>Child meters:</h4>
-						<MeterBoxContainer parentID={this.props.id} />
+						<p style={underlineStyle}>Child meters:</p>
+						<DatasourceBoxContainer type="meter" selection="children" parentID={this.props.id} />
 					</div>
 					<div className="col-xs-6">
-						<h4>Child groups:</h4>
-						<GroupBoxContainer parentID={this.props.id} />
+						<p style={underlineStyle}>Child groups:</p>
+						<DatasourceBoxContainer type="group" selection="children" parentID={this.props.id} />
 					</div>
 				</div>
-				<Button bsStyle="default" onClick={this.handleEditGroup}>Edit group</Button>
+				<Button style={buttonPadding} bsStyle="default" onClick={this.handleEditGroup}>Edit group</Button>
 			</div>
 		);
 	}

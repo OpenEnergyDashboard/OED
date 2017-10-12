@@ -6,6 +6,7 @@ import React from 'react';
 import Slider from 'react-rangeslider';
 import moment from 'moment';
 import 'react-rangeslider/lib/index.css';
+import '../styles/react-rangeslider-fix.css';
 import MultiSelectComponent from './MultiSelectComponent';
 import { chartTypes } from '../reducers/graph';
 import ExportContainer from '../containers/ExportContainer';
