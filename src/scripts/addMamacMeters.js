@@ -21,8 +21,7 @@ async function parseCSV(filename) {
 	// the headers should be in the first line
 	const headers = meterInfo[0];
 	const meterDataRows = meterInfo.slice(1);
-	const formattedData = meterDataRows.map(row => _.zipObject(headers, row));
-	console.log(formattedData);
+	return meterDataRows.map(row => _.zipObject(headers, row));
 }
 
 /**
