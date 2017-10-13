@@ -22,7 +22,7 @@ const defaultState = {
 	groupInEditing: {
 		dirty: false
 	},
-	displayMode: 'view'
+	displayMode: groupsActions.DISPLAY_MODE.VIEW
 };
 
 /**
@@ -135,7 +135,7 @@ export default function groups(state = defaultState, action) {
 
 		// The following are reducers related to creating and editing groups
 		case groupsActions.CHANGE_GROUPS_UI_DISPLAY_MODE: {
-			const validModes = ['view', 'edit', 'create'];
+			const validModes = _.values(groupsActions.DISPLAY_MODE);
 			if (_.includes(validModes, action.newMode)) {
 				return {
 					...state,
