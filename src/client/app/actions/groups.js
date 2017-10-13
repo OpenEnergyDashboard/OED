@@ -321,7 +321,7 @@ export function submitGroupInEditingIfNeeded() {
 			};
 			if (creatingNewGroup(getState())) {
 				return dispatch(submitNewGroup(group));
-			} else { // eslint-disable-line no-else-return
+			} else {
 				const groupWithID = {
 					...group,
 					id: rawGroup.id
