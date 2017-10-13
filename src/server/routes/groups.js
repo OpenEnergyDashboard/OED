@@ -7,6 +7,7 @@ const _ = require('lodash');
 const validate = require('jsonschema').validate;
 
 const Group = require('../models/Group');
+const db = require('../models/database').db;
 const authenticator = require('./authenticator');
 
 const router = express.Router();
@@ -153,35 +154,30 @@ router.put('/edit', async (req, res) => {
 	} else {
 		try {
 			const currentGroup = await Group.getByID(req.body.id);
-			if (req.body.name !== currentGroup.name) {
-				await currentGroup.rename(req.body.name);
-			}
-
 			const currentChildGroups = await Group.getImmediateGroupsByGroupID(currentGroup.id);
-
-			const adoptedGroups = _.difference(req.body.childGroups, currentChildGroups);
-			if (adoptedGroups.length !== 0) {
-				await Promise.all(adoptedGroups.map(gid => currentGroup.adoptGroup(gid)));
-			}
-
-			const disownedGroups = _.difference(currentChildGroups, req.body.childGroups);
-			if (disownedGroups.length !== 0) {
-				await Promise.all(disownedGroups.map(gid => currentGroup.disownGroup(gid)));
-			}
-
-			// Compute meters differences and adopt/disown to make changes
 			const currentChildMeters = await Group.getImmediateMetersByGroupID(currentGroup.id);
 
-			const adoptedMeters = _.difference(req.body.childMeters, currentChildMeters);
-			if (adoptedMeters.length !== 0) {
-				await Promise.all(adoptedMeters.map(mid => currentGroup.adoptMeter(mid)));
-			}
+			await db.tx(t => {
+				let nameChangeQuery = [];
+				if (req.body.name !== currentGroup.name) {
+					nameChangeQuery = currentGroup.rename(req.body.name, t);
+				}
 
-			const disownedMeters = _.difference(currentChildMeters, req.body.childMeters);
-			if (disownedMeters.length !== 0) {
-				await Promise.all(disownedMeters.map(mid => currentGroup.disownMeter(mid)));
-			}
+				const adoptedGroups = _.difference(req.body.childGroups, currentChildGroups);
+				const adoptGroupsQueries = adoptedGroups.map(gid => currentGroup.adoptGroup(gid));
 
+				const disownedGroups = _.difference(currentChildGroups, req.body.childGroups);
+				const disownGroupsQueries = disownedGroups.map(gid => currentGroup.disownGroup(gid));
+
+				// Compute meters differences and adopt/disown to make changes
+				const adoptedMeters = _.difference(req.body.childMeters, currentChildMeters);
+				const adoptMetersQueries = adoptedMeters.map(mid => currentGroup.adoptMeter(mid));
+
+				const disownedMeters = _.difference(currentChildMeters, req.body.childMeters);
+				const disownMetersQueries = disownedMeters.map(mid => currentGroup.disownMeter(mid));
+
+				return t.batch(_.flatten([nameChangeQuery, adoptGroupsQueries, disownGroupsQueries, adoptMetersQueries, disownMetersQueries]));
+			});
 			res.sendStatus(200);
 		} catch (err) {
 			console.error(`Error while editing existing group: ${err}`); // eslint-disable-line no-console
