@@ -17,7 +17,7 @@ const router = express.Router();
  * @param item group or meter
  * @returns {{id, name}}
  */
-function formatToIDandNameOnly(item) {
+function formatToOnlyNameAndID(item) {
 	return { id: item.id, name: item.name };
 }
 
@@ -28,7 +28,7 @@ function formatToIDandNameOnly(item) {
 router.get('/', async (req, res) => {
 	try {
 		const rows = await Group.getAll();
-		res.json(rows.map(formatToIDandNameOnly));
+		res.json(rows.map(formatToOnlyNameAndID));
 	} catch (err) {
 		console.error(`Error while preforming GET all groups query: ${err}`); // eslint-disable-line no-console
 	}
