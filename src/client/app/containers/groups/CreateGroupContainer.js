@@ -6,7 +6,7 @@
 import _ from 'lodash';
 import { connect } from 'react-redux';
 import CreateGroupComponent from '../../components/groups/CreateGroupComponent';
-import { createNewBlankGroup, editGroupName, changeDisplayMode, submitGroupInEditingIfNeeded } from '../../actions/groups';
+import { createNewBlankGroup, editGroupName, changeDisplayMode, DISPLAY_MODE, submitGroupInEditingIfNeeded } from '../../actions/groups';
 
 function mapStateToProps(state) {
 	const sortedMeters = _.sortBy(_.values(state.meters.byMeterID).map(meter => ({ id: meter.id, name: meter.name.trim() })), 'name');
@@ -22,7 +22,7 @@ function mapDispatchToProps(dispatch) {
 		createNewBlankGroup: () => dispatch(createNewBlankGroup()),
 		submitGroupInEditingIfNeeded: () => dispatch(submitGroupInEditingIfNeeded()),
 		editGroupName: name => dispatch(editGroupName(name)),
-		changeDisplayMode: newMode => dispatch(changeDisplayMode(newMode))
+		changeDisplayModeToView: () => dispatch(changeDisplayMode(DISPLAY_MODE.VIEW))
 	};
 }
 

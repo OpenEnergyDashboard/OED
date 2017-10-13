@@ -30,7 +30,7 @@ export default class GroupSidebarComponent extends React.Component {
 	}
 
 	handleCreateGroup() {
-		this.props.changeDisplayMode('create');
+		this.props.changeDisplayModeToCreate();
 	}
 
 	render() {

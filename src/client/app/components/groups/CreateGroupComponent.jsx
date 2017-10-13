@@ -27,7 +27,7 @@ export default class CreateGroupComponent extends React.Component {
 	}
 
 	handleReturnToView() {
-		this.props.changeDisplayMode('view');
+		this.props.changeDisplayModeToView();
 	}
 
 	render() {

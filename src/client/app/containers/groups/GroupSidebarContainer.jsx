@@ -6,7 +6,7 @@
 import _ from 'lodash';
 import { connect } from 'react-redux';
 import { fetchMetersDetailsIfNeeded } from '../../actions/meters';
-import { fetchGroupsDetailsIfNeeded, changeDisplayedGroups, changeDisplayMode } from '../../actions/groups';
+import { fetchGroupsDetailsIfNeeded, changeDisplayedGroups, changeDisplayMode, DISPLAY_MODE } from '../../actions/groups';
 import GroupSidebarComponent from '../../components/groups/GroupSidebarComponent';
 
 function mapStateToProps(state) {
@@ -23,7 +23,7 @@ function mapDispatchToProps(dispatch) {
 		selectGroups: newSelectedGroupIDs => dispatch(changeDisplayedGroups(newSelectedGroupIDs)),
 		fetchGroupsDetailsIfNeeded: () => dispatch(fetchGroupsDetailsIfNeeded()),
 		fetchMetersDetailsIfNeeded: () => dispatch(fetchMetersDetailsIfNeeded()),
-		changeDisplayMode: newMode => dispatch(changeDisplayMode(newMode))
+		changeDisplayModeToCreate: () => dispatch(changeDisplayMode(DISPLAY_MODE.CREATE))
 	};
 }
 

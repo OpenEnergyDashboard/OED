@@ -87,7 +87,7 @@ export default class EditGroupsComponent extends React.Component {
 	}
 
 	handleReturnToView() {
-		this.props.changeDisplayMode('view');
+		this.props.changeDisplayModeToView();
 	}
 
 	render() {

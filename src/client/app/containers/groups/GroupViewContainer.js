@@ -5,7 +5,7 @@
 
 import { connect } from 'react-redux';
 import GroupViewComponent from '../../components/groups/GroupViewComponent';
-import { fetchGroupChildrenIfNeeded, changeDisplayMode, beginEditingIfPossible } from '../../actions/groups';
+import { fetchGroupChildrenIfNeeded, changeDisplayMode, beginEditingIfPossible, DISPLAY_MODE } from '../../actions/groups';
 
 
 /**
@@ -24,7 +24,7 @@ function mapStateToProps(state, ownProps) {
 function mapDispatchToProps(dispatch) {
 	return {
 		fetchGroupChildren: id => dispatch(fetchGroupChildrenIfNeeded(id)),
-		changeDisplayMode: newMode => dispatch(changeDisplayMode(newMode)),
+		changeDisplayModeToEdit: () => dispatch(changeDisplayMode(DISPLAY_MODE.EDIT)),
 		beginEditingIfPossible: id => dispatch(beginEditingIfPossible(id))
 	};
 }
