@@ -16,10 +16,13 @@ const stopDB = require('../server/models/database').stopDB;
 const parseXMLPromisified = promisify(parseString);
 
 async function parseCSV(filename) {
-	const rawIPs = await readCSV(filename);
-	const ipv4Pattern = /^(([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])\.){3}([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])$/;
-	// Filter to only lines that are valid ipv4 addresses, then map to objects
-	return _.filter(rawIPs, ip => (ipv4Pattern.test(ip[0]))).map(ip => ({ ip: ip[0] }));
+	// returns a list of lists representing the lines of the file
+	const meterInfo = await readCSV(filename);
+	// the headers should be in the first line
+	const headers = meterInfo[0];
+	const meterDataRows = meterInfo.slice(1);
+	const formattedData = meterDataRows.map(row => _.zipObject(headers, row));
+	console.log(formattedData);
 }
 
 /**
