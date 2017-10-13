@@ -107,11 +107,13 @@ router.post('/create', async (req, res) => {
 		res.sendStatus(400);
 	} else {
 		try {
-			const newGroup = new Group(undefined, req.body.name);
-			await newGroup.insert();
-			await Promise.all(req.body.childGroups.map(gid => newGroup.adoptGroup(gid)));
-			await Promise.all(req.body.childMeters.map(mid => newGroup.adoptMeter(mid)));
-
+			await db.tx(t => {
+				const newGroup = new Group(undefined, req.body.name);
+				const insertionQuery = newGroup.insert(t);
+				const adoptGroupsQuery = req.body.childGroups.map(gid => newGroup.adoptGroup(gid));
+				const adoptMetersQuery = req.body.childMeters.map(mid => newGroup.adoptMeter(mid));
+				t.batch(_.flatten([insertionQuery, adoptGroupsQuery, adoptMetersQuery]));
+			});
 			res.sendStatus(200);
 		} catch (err) {
 			console.error(`Error while inserting new group ${err}`); // eslint-disable-line no-console
