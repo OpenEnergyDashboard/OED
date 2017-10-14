@@ -2,24 +2,27 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
 
+
 // Script to add meters from a .xlsx file
 const reqPromise = require('request-promise-native');
-const XLSX = require('xlsx');
 const path = require('path');
+const readCSV = require('../server/services/readCSV');
 const promisify = require('es6-promisify');
 const parseString = require('xml2js').parseString;
 const Meter = require('../server/models/Meter');
+const _ = require('lodash');
 const stopDB = require('../server/models/database').stopDB;
 
 const parseXMLPromisified = promisify(parseString);
 
-function parseXLSX(filename) {
-	const workbook = XLSX.readFile(filename);
-	// This isn't a property so we don't want dot-notation
-	const worksheet = workbook.Sheets['Sheet1']; // eslint-disable-line dot-notation
-	return XLSX.utils.sheet_to_json(worksheet);
+async function parseCSV(filename) {
+	// returns a list of lists representing the lines of the file
+	const meterInfo = await readCSV(filename);
+	// the headers should be in the first line
+	const headers = meterInfo[0];
+	const meterDataRows = meterInfo.slice(1);
+	return meterDataRows.map(row => _.zipObject(headers, row));
 }
-
 
 /**
  * Creates a promise to create a Mamac meter based on a URL to grab XML from and an IP address for the meter.
@@ -58,7 +61,7 @@ async function insertMeters(ips) {
 
 async function insertMetersWrapper(filename) {
 	try {
-		const ips = parseXLSX(filename);
+		const ips = await parseCSV(filename);
 		await insertMeters(ips);
 		console.log('Done inserting meters');
 	} catch (err) {
@@ -72,7 +75,7 @@ async function insertMetersWrapper(filename) {
 // The first two elements are 'node' and the name of the file. We only want arguments passed to it.
 const args = process.argv.slice(2);
 if (args.length !== 1) {
-	console.error(`Expected one argument (path to meters xlsx file), but got ${args.length} instead`);
+	console.error(`Expected one argument (path to csv file of meter ips), but got ${args.length} instead`);
 } else {
 	const absolutePath = path.resolve(args[0]);
 	console.log(`Importing meters from ${absolutePath}`);
