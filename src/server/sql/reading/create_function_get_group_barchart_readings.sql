@@ -9,7 +9,7 @@ CREATE OR REPLACE FUNCTION barchart_group_readings(
 	BEGIN
 		SELECT array_agg(meter_id)
 		INTO meter_ids
-		FROM groups_immediate_meters gdm
+		FROM groups_deep_meters gdm
 			INNER JOIN unnest(group_ids) gids(id) ON gids.id = gdm.group_id;
 
 		RETURN QUERY

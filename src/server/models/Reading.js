@@ -171,11 +171,6 @@ class Reading {
 		// Separate the result rows by meter_id and return a nested object.
 		const compressedReadingsByGroupID = mapToObject(groupIDs, () => []); // Returns { 1: [], 2: [], ... }
 		for (const row of allCompressedReadings) {
-			// HACK. Something in the SQL is causing these to be weird for some rows.
-			// This solves the problem but is not elegant.
-			if (compressedReadingsByGroupID[row.group_id] === undefined) {
-				compressedReadingsByGroupID[row.group_id] = [];
-			}
 			compressedReadingsByGroupID[row.group_id].push(
 				{ reading_rate: row.reading_rate, start_timestamp: row.start_timestamp, end_timestamp: row.end_timestamp }
 			);
