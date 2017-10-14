@@ -130,17 +130,17 @@ mocha.describe('Compressed Readings', () => {
 			const groupA = await Group.getByName('A');
 			const actualReadings = await Reading.getCompressedGroupReadings([groupA.id], null, null, 1);
 			expect(actualReadings[groupA.id]).to.have.lengthOf(1);
-			expect(actualReadings[groupA.id][0].startTimestamp).to.equal(startTimestamp);
-			expect(actualReadings[groupA.id][0].endTimestamp).to.equal(endTimestamp);
-			expect(actualReadings[groupA.id][0].reading).to.equal(readingValue);
+			expect(actualReadings[groupA.id][0].start_timestamp.isSame(startTimestamp)).to.equal(true);
+			expect(actualReadings[groupA.id][0].end_timestamp.isSame(endTimestamp)).to.equal(true);
+			expect(actualReadings[groupA.id][0].reading_rate).to.equal(readingValue);
 		});
 		mocha.it('can get readings from a group containing groups containing meters', async () => {
 			const groupC = await Group.getByName('C');
 			const actualReadings = await Reading.getCompressedGroupReadings([groupC.id], null, null, 1);
 			expect(actualReadings[groupC.id]).to.have.lengthOf(1);
-			expect(actualReadings[groupC.id][0].startTimestamp).to.equal(startTimestamp);
-			expect(actualReadings[groupC.id][0].endTimestamp).to.equal(endTimestamp);
-			expect(actualReadings[groupC.id][0].reading).to.equal(readingValue * 2);
+			expect(actualReadings[groupC.id][0].start_timestamp.isSame(startTimestamp)).to.equal(true);
+			expect(actualReadings[groupC.id][0].end_timestamp.isSame(endTimestamp)).to.equal(true);
+			expect(actualReadings[groupC.id][0].reading_rate).to.equal(readingValue * 2);
 		});
 	});
 });

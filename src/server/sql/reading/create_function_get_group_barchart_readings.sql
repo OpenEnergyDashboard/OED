@@ -20,6 +20,9 @@ CREATE OR REPLACE FUNCTION barchart_group_readings(
 			compressed.end_timestamp AS end_timestamp
 		FROM barchart_readings(meter_ids, duration, from_timestamp, to_timestamp) compressed
 			INNER JOIN groups_deep_meters gdm ON gdm.meter_id = compressed.meter_id
+			-- The previous line would include groups that are parents of the groups we want,
+			-- so we remove those groups that are not requested here
+			INNER JOIN unnest(group_ids) gids(group_id) ON gdm.group_id = gids.group_id
 		GROUP by gdm.group_id, compressed.start_timestamp, compressed.end_timestamp;
 	END;
 $$ LANGUAGE plpgsql;
