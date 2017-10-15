@@ -12,7 +12,8 @@ MPL_REGEX=".*This Source Code Form is subject to the terms of the Mozilla Public
 
 # This find commands lists all our source code files, excluding bad directories
 # It prunes gitignore and gitattributes, and everything in the public dir, .git, node_modules, and postgres-data
-FILES=$(find . -type f \( -iname '*.jsx' -o -iname '*.js' -o -iname '*.sh' -o -iname '*.sql' -o -iname "*.y*ml" -o -iname "Dockerfile" \) -print \
+FILES=$(find . -type f \( -iname '*.jsx' -o -iname '*.js' -o -iname '*.sh' -o -iname '*.sql' -o -iname "*.y*ml" \
+	-o -iname "Dockerfile" -o -iname "*.html" -o -iname "*.css" \) -print \
 	\( -iname "*.gitignore" -o -iname "*.gitattributes" \) -prune \
 	-o \( -path '*node_modules*' -o -path '*postgres-data*' -o -path '*.git*' -o -path "*client/public*" \) -prune);
 
