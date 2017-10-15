@@ -29,7 +29,7 @@ function formatBarReadings(rows) {
  * @param {Date} [startDate]
  * @param {Date} [endDate]
  */
-router.get('/line/:meter_ids', async (req, res) => {
+router.get('/line/meters/:meter_ids', async (req, res) => {
 	// We can't do .map(parseInt) here because map would give parseInt a radix value of the current array position.
 	const meterIDs = req.params.meter_ids.split(',').map(s => parseInt(s));
 	const timeInterval = TimeInterval.fromString(req.query.timeInterval);
@@ -42,13 +42,33 @@ router.get('/line/:meter_ids', async (req, res) => {
 	}
 });
 
+
+/**
+ * GET group readings by meter id for line chart
+ * @param {array.<int>} meter_ids
+ * @param {TimeInterval} [timeInterval]
+ */
+router.get('/line/groups/:group_ids', async (req, res) => {
+	// We can't do .map(parseInt) here because map would give parseInt a radix value of the current array position.
+	const groupIDs = req.params.group_ids.split(',').map(s => parseInt(s));
+	const timeInterval = TimeInterval.fromString(req.query.timeInterval);
+	try {
+		const rawCompressedReadings = await Reading.getCompressedGroupReadings(groupIDs, timeInterval.startTimestamp, timeInterval.endTimestamp, 100);
+		const formattedCompressedReadings = _.mapValues(rawCompressedReadings, formatLineReadings);
+		res.json(formattedCompressedReadings);
+	} catch (err) {
+		console.error(`Error while performing GET readings for line with groups ${groupIDs} with time interval ${timeInterval}: ${err}`);
+	}
+});
+
+
 /**
  * GET meter readings by meter id for bar chart
  * @param {array.<int>} meter_ids
  * @param {Date} [startDate]
  * @param {Date} [endDate]
  */
-router.get('/bar/:meter_ids', async (req, res) => {
+router.get('/bar/meters/:meter_ids', async (req, res) => {
 	// We can't do .map(parseInt) here because map would give parseInt a radix value of the current array position.
 	const meterIDs = req.params.meter_ids.split(',').map(s => parseInt(s));
 	const timeInterval = TimeInterval.fromString(req.query.timeInterval);
@@ -61,5 +81,28 @@ router.get('/bar/:meter_ids', async (req, res) => {
 		console.error(`Error while performing GET readings for bar with meters ${meterIDs} with time interval ${timeInterval}: ${err}`);
 	}
 });
+
+
+/**
+ * GET meter readings by meter id for bar chart
+ * @param {array.<int>} meter_ids
+ * @param {Date} [startDate]
+ * @param {Date} [endDate]
+ */
+router.get('/bar/groups/:group_ids', async (req, res) => {
+	// We can't do .map(parseInt) here because map would give parseInt a radix value of the current array position.
+	const groupIDs = req.params.group_ids.split(',').map(s => parseInt(s));
+	const timeInterval = TimeInterval.fromString(req.query.timeInterval);
+	const barDuration = moment.duration(req.query.barDuration);
+	try {
+		const barchartReadings = await Reading.getGroupBarchartReadings(
+			groupIDs, barDuration, timeInterval.startTimestamp, timeInterval.endTimestamp);
+		const formattedBarchartReadings = _.mapValues(barchartReadings, formatBarReadings);
+		res.json(formattedBarchartReadings);
+	} catch (err) {
+		console.error(`Error while performing GET readings for bar with groups ${groupIDs} with time interval ${timeInterval}: ${err}`);
+	}
+});
+
 
 module.exports = router;

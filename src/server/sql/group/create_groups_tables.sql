@@ -108,11 +108,16 @@ CREATE VIEW groups_deep_meters AS
   */
 
 	WITH all_deep_meters(group_id, meter_id) AS (
-			SELECT DISTINCT -- Distinct because two children might include the same meter, and we only want it once.
-				gdc.parent_id AS group_id,
-				gim.meter_id
-			FROM groups_deep_children gdc
-				INNER JOIN groups_immediate_meters gim ON gdc.parent_id = gim.group_id OR gdc.child_id = gim.group_id
+		SELECT DISTINCT -- Distinct because two children might include the same meter, and we only want it once.
+			gdc.parent_id AS group_id,
+			gim.meter_id AS meter_id
+		FROM groups_immediate_meters gim
+			INNER JOIN groups_deep_children gdc ON gdc.child_id = gim.group_id
+		UNION
+		SELECT
+			gim.group_id AS group_id,
+			gim.meter_id AS meter_id
+		from groups_immediate_meters gim
 	)
 	SELECT
 		adm.group_id AS group_id,

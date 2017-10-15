@@ -11,6 +11,7 @@ const expect = chai.expect;
 
 const recreateDB = require('./common').recreateDB;
 const db = require('../../models/database').db;
+const Group = require('../../models/Group');
 const Meter = require('../../models/Meter');
 const Reading = require('../../models/Reading');
 
@@ -89,5 +90,57 @@ mocha.describe('Compressed Readings', () => {
 		expect(compressedReadings[meter2.id]).to.have.lengthOf(1);
 		expect(compressedReadings[meter.id][0].reading_rate).to.be.closeTo(readingMeter1.reading, 0.0001);
 		expect(compressedReadings[meter2.id][0].reading_rate).to.be.closeTo(readingMeter2.reading, 0.0001);
+	});
+
+	mocha.it('returns no readings when none exist', async () => {
+		const result = await Reading.getCompressedReadings([meter.id]);
+
+		expect(result).to.deep.equal({ [meter.id]: [] });
+	});
+
+	mocha.describe('With groups, meters, and readings set up', async () => {
+		let meter2;
+		const startTimestamp = moment('2017-01-01');
+		const endTimestamp = moment('2017-01-01').add(1, 'hour');
+		const readingValue = 10;
+		mocha.beforeEach(async () => {
+			// Groups A and B will each contain a meter
+			const groupA = new Group(undefined, 'A');
+			const groupB = new Group(undefined, 'B');
+			// Group C will contain A and B
+			const groupC = new Group(undefined, 'C');
+			await Promise.all([groupA, groupB, groupC].map(group => group.insert()));
+
+			// Create and get a handle to a new meter
+			await new Meter(undefined, 'Meter2', null, false, Meter.type.MAMAC).insert();
+			meter2 = await Meter.getByName('Meter2');
+
+			// Place meters & groups in hierarchy
+			await groupA.adoptMeter(meter.id);
+			await groupB.adoptMeter(meter2.id);
+			await groupC.adoptGroup(groupA.id);
+			await groupC.adoptGroup(groupB.id);
+
+			// Add some readings to the meters
+			const reading1 = new Reading(meter.id, readingValue, startTimestamp, endTimestamp);
+			const reading2 = new Reading(meter2.id, readingValue, startTimestamp, endTimestamp);
+			await Reading.insertAll([reading1, reading2]);
+		});
+		mocha.it('can get readings from a group containing meters', async () => {
+			const groupA = await Group.getByName('A');
+			const actualReadings = await Reading.getCompressedGroupReadings([groupA.id], null, null, 1);
+			expect(actualReadings[groupA.id]).to.have.lengthOf(1);
+			expect(actualReadings[groupA.id][0].start_timestamp.isSame(startTimestamp)).to.equal(true);
+			expect(actualReadings[groupA.id][0].end_timestamp.isSame(endTimestamp)).to.equal(true);
+			expect(actualReadings[groupA.id][0].reading_rate).to.equal(readingValue);
+		});
+		mocha.it('can get readings from a group containing groups containing meters', async () => {
+			const groupC = await Group.getByName('C');
+			const actualReadings = await Reading.getCompressedGroupReadings([groupC.id], null, null, 1);
+			expect(actualReadings[groupC.id]).to.have.lengthOf(1);
+			expect(actualReadings[groupC.id][0].start_timestamp.isSame(startTimestamp)).to.equal(true);
+			expect(actualReadings[groupC.id][0].end_timestamp.isSame(endTimestamp)).to.equal(true);
+			expect(actualReadings[groupC.id][0].reading_rate).to.equal(readingValue * 2);
+		});
 	});
 });
