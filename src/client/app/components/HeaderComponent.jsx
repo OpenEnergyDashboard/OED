@@ -7,7 +7,6 @@ import { Link } from 'react-router';
 import { Button } from 'react-bootstrap';
 import LogoComponent from './LogoComponent';
 import UIModalComponent from './UIModalComponent';
-import VERSION from '../../../common/version';
 
 /**
  * React component that controls the header strip at the top of all pages

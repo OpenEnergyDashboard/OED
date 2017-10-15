@@ -13,7 +13,7 @@ const readings = require('./routes/readings');
 const meters = require('./routes/meters');
 const login = require('./routes/login');
 const verification = require('./routes/verification');
-const VERSION = require('../common/version');
+const version = require('./routes/version');
 
 const app = express();
 
@@ -29,13 +29,7 @@ app.use('/api/meters', meters);
 app.use('/api/readings', readings);
 app.use('/api/login', login);
 app.use('/api/verification', verification);
-
-/**
- * Returns the version of the application to the client.
- */
-app.get('/api/version', (req, res) => {
-	res.json(VERSION);
-});
+app.use('/api/version', version);
 
 app.get('*', (req, res) => {
 	res.sendFile(path.resolve(__dirname, '..', 'client', 'index.html'));
