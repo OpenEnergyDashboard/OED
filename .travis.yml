@@ -1,3 +1,9 @@
+# *
+# * This Source Code Form is subject to the terms of the Mozilla Public
+# * License, v. 2.0. If a copy of the MPL was not distributed with this
+# * file, You can obtain one at http://mozilla.org/MPL/2.0/.
+# *
+
 dist: trusty
 sudo: required
 
@@ -28,6 +34,8 @@ before_script:
   - docker-compose run --rm web src/scripts/init.sh NONE
 
 script:
+    # Check for MPL headers
+  - ./src/scripts/checkheader.sh
     # Test non-Docker
   - npm run test
     # Test in Docker
