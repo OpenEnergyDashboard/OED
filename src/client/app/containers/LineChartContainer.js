@@ -7,7 +7,7 @@
 import { Line } from 'react-chartjs-2';
 import moment from 'moment';
 import { connect } from 'react-redux';
-import GraphColors from '../utils/GraphColors';
+import getGraphColor from '../utils/getGraphColor';
 
 /**
  * @param {State} state
@@ -15,16 +15,16 @@ import GraphColors from '../utils/GraphColors';
 function mapStateToProps(state) {
 	const timeInterval = state.graph.timeInterval;
 	const data = { datasets: [] };
-	const graphColors = new GraphColors();
 
 	for (const meterID of state.graph.selectedMeters) {
 		const readingsData = state.readings.line.byMeterID[meterID][timeInterval];
 		if (readingsData !== undefined && !readingsData.isFetching) {
+			const label = state.meters.byMeterID[meterID].name;
 			data.datasets.push({
-				label: state.meters.byMeterID[meterID].name,
+				label,
 				data: readingsData.readings.map(arr => ({ x: arr[0], y: arr[1].toFixed(2) })),
 				fill: false,
-				borderColor: graphColors.getColor()
+				borderColor: getGraphColor(label)
 			});
 		}
 	}
