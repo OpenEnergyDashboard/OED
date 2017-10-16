@@ -8,7 +8,7 @@ import _ from 'lodash';
 import { Bar } from 'react-chartjs-2';
 import moment from 'moment';
 import { connect } from 'react-redux';
-import GraphColors from '../utils/GraphColors';
+import getGraphColor from '../utils/getGraphColor';
 
 /**
  * @param {State} state
@@ -17,15 +17,15 @@ function mapStateToProps(state) {
 	const timeInterval = state.graph.timeInterval;
 	const barDuration = state.graph.barDuration;
 	const data = { datasets: [] };
-	const graphColors = new GraphColors();
 
 	const labelsSet = new Set();
 	for (const meterID of state.graph.selectedMeters) {
 		const readingsData = state.readings.bar.byMeterID[meterID][timeInterval][barDuration];
 		if (readingsData !== undefined && !readingsData.isFetching) {
-			const color = graphColors.getColor();
+			const label = state.meters.byMeterID[meterID].name
+			const color = getGraphColor(label);
 			data.datasets.push({
-				label: state.meters.byMeterID[meterID].name,
+				label,
 				data: readingsData.readings.map(arr => arr[1]),
 				backgroundColor: color,
 				hoverBackgroundColor: color
