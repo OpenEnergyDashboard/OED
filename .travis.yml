@@ -34,8 +34,6 @@ before_script:
   - docker-compose run --rm web src/scripts/init.sh NONE
 
 script:
-    # Check for MPL headers
-  - ./src/scripts/checkheader.sh
     # Test non-Docker
   - npm run test
     # Test in Docker
