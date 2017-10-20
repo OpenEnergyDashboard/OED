@@ -1,5 +1,5 @@
 # Open Energy Dashboard #
-[![Build Status](https://travis-ci.org/beloitcollegecomputerscience/OED.svg?branch=master)](https://travis-ci.org/beloitcollegecomputerscience/OED)
+[![Build Status](https://travis-ci.org/OpenEnergyDashboard/OED.svg?branch=master)](https://travis-ci.org/OpenEnergyDashboard/OED)
 
 The Open Energy Dashboard is a user-friendly way to display energy information from smart energy meters, designed and built by faculty and students at Beloit College. It is designed for institutions of higher education, and is optimized for non-technical users with a simple interface that provides access to your institution's energy data through the powerful Chart.js data graphing system. To learn more, see [our website](https://openenergydashboard.github.io/).
 
@@ -65,13 +65,13 @@ By default, the app will run on the port 3000 with secret key ?, which should de
 
 This application was created by a team of Beloit College CS students led by Prof. Steven Huss-Lederman
 
-For a list of contributors, [click here](https://github.com/beloitcollegecomputerscience/ED-JS/graphs/contributors)
+For a list of contributors, [click here](https://github.com/OpenEnergyDashboard/OED/graphs/contributors)
 
 ### Licensing ###
 
 This project is licensed under the MPL version 2.0.
 
-See the full licensing agreement [here](https://github.com/beloitcollegecomputerscience/ED-JS/blob/master/License.txt)
+See the full licensing agreement [here](License.txt)
 
 ### Contributions ###
 
