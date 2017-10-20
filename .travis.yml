@@ -34,7 +34,9 @@ before_script:
   - docker-compose run --rm web src/scripts/init.sh NONE
 
 script:
-    # Test non-Docker
+    # Validate legal requirements on source files
+  - npm run header-check
+    # Test with native Node install
   - npm run test
     # Test in Docker
   - docker-compose run --service-ports --rm web npm run test
