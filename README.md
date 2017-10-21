@@ -5,14 +5,14 @@ The Open Energy Dashboard is a user-friendly way to display energy information f
 
 The Open Energy Dashboard is available under the Mozilla Public Licence, and contributions, in the form of bug reports, feature requests, and code contributions, are welcome.
 
-### Built With: ###
+### Built With ###
 Chart.js - Javascript library used to generate data charts ([chartjs.org](http://www.chartjs.org))
 
 PostgreSQL - Database management system ([postgresql.org](https://www.postgresql.org))
 
 Node.js - Javascript runtime environment ([nodejs.org](https://nodejs.org/en/))
 
-### Developer installation: ###
+### Developer Installation ###
 
 You can either use Docker Compose to install Node and PostgreSQL in containers, or install Node and PostgreSQL on your system.
 
