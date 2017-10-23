@@ -23,7 +23,8 @@ async function updateAllMeters() {
 			metersToUpdate
 				.map(readMamacData)
 				.map(p => p.catch(err => {
-					console.error(err);
+					console.error(`ERROR ON REQUEST TO ${err.options.uri}`); // eslint-disable-line no-console
+					console.error(err.message); // eslint-disable-line no-console
 					return null;
 				}))
 		), elem => elem !== null);
