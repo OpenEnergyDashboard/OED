@@ -8,12 +8,12 @@ import GroupViewContainer from '../../containers/groups/GroupViewContainer';
 import GroupSidebarContainer from '../../containers/groups/GroupSidebarContainer';
 import CreateGroupContainer from '../../containers/groups/CreateGroupContainer';
 import EditGroupsContainer from '../../containers/groups/EditGroupsContainer';
+import { DISPLAY_MODE } from '../../actions/groups';
 
-export default class GroupComponent extends React.Component {
+export default class GroupMainComponent extends React.Component {
 	componentWillMount() {
 		this.props.fetchGroupsDetailsIfNeeded();
 		this.props.fetchMetersDetailsIfNeeded();
-		this.props.selectGroups(this.props.selectedGroups);
 	}
 
 	render() {
@@ -21,13 +21,13 @@ export default class GroupComponent extends React.Component {
 			paddingTop: '50px'
 		};
 		let GroupDisplay = null;
-		if (this.props.displayMode === 'create') {
+		if (this.props.displayMode === DISPLAY_MODE.CREATE) {
 			GroupDisplay = (
 				<div>
 					<CreateGroupContainer />
 				</div>
 			);
-		} else if (this.props.displayMode === 'edit') {
+		} else if (this.props.displayMode === DISPLAY_MODE.EDIT) {
 			GroupDisplay = (
 				<div>
 					<EditGroupsContainer />

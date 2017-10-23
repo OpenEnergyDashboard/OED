@@ -94,6 +94,13 @@ export default class EditGroupsComponent extends React.Component {
 		const divStyle = {
 			paddingTop: '35px'
 		};
+		const metersDivStyle = {
+			marginTop: '10px',
+			marginBottom: '20px'
+		};
+		const groupsDivStyle = {
+			marginBottom: '10px'
+		};
 		const leftRightButtonsDivStyle = {
 			marginTop: '25px'
 		};
@@ -113,8 +120,7 @@ export default class EditGroupsComponent extends React.Component {
 				<h3 style={centerTextStyle}>Edit Group</h3>
 				<p style={boldStyle}>Name:</p>
 				<FormControl type="text" placeholder="Name" value={this.state.name} onChange={this.handleNameChange} />
-				<br />
-				<div className="row">
+				<div className="row" style={metersDivStyle}>
 					<div className="col-xs-5">
 						<p style={boldStyle}>Child meters:</p>
 						<DatasourceBoxContainer
@@ -144,9 +150,7 @@ export default class EditGroupsComponent extends React.Component {
 						/>
 					</div>
 				</div>
-				<br />
-				<br />
-				<div className="row">
+				<div className="row" style={groupsDivStyle}>
 					<div className="col-xs-5">
 						<p style={boldStyle}>Child groups:</p>
 						<DatasourceBoxContainer
@@ -176,7 +180,6 @@ export default class EditGroupsComponent extends React.Component {
 						/>
 					</div>
 				</div>
-				<br />
 				<Button type="submit" onClick={this.handleReturnToView}>Cancel</Button>
 				<Button type="submit" onClick={this.handleEditGroup}>Submit changes</Button>
 				<Button className="pull-right" type="submit" onClick={this.handleDeleteGroup}>Delete group</Button>

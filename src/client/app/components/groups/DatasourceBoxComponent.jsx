@@ -39,7 +39,6 @@ export default class DatasourceBoxComponent extends React.Component {
 			));
 		}
 
-
 		return (
 			<MultiSelectComponent
 				options={options}
