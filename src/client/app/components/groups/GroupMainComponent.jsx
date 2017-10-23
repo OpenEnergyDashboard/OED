@@ -21,31 +21,41 @@ export default class GroupMainComponent extends React.Component {
 			paddingTop: '50px'
 		};
 		let GroupDisplay = null;
-		if (this.props.displayMode === DISPLAY_MODE.CREATE) {
-			GroupDisplay = (
-				<div>
-					<CreateGroupContainer />
-				</div>
-			);
-		} else if (this.props.displayMode === DISPLAY_MODE.EDIT) {
-			GroupDisplay = (
-				<div>
-					<EditGroupsContainer />
-				</div>
-			);
-		} else { // view groups
-			GroupDisplay = (
-				<div>
-					<div className="col-xs-2" style={divPaddingStyle}>
-						<GroupSidebarContainer />
+		switch (this.props.displayMode) {
+			case DISPLAY_MODE.CREATE: {
+				GroupDisplay = (
+					<div>
+						<CreateGroupContainer />
 					</div>
-					<div className="col-xs-4">
-						{this.props.selectedGroups.map(groupID =>
-							<GroupViewContainer key={groupID} id={groupID} />
-						)}
+				);
+				break;
+			}
+			case DISPLAY_MODE.EDIT: {
+				GroupDisplay = (
+					<div>
+						<EditGroupsContainer />
 					</div>
-				</div>
-			);
+				);
+				break;
+			}
+			case DISPLAY_MODE.VIEW: {
+				GroupDisplay = (
+					<div>
+						<div className="col-xs-2" style={divPaddingStyle}>
+							<GroupSidebarContainer />
+						</div>
+						<div className="col-xs-4">
+							{this.props.selectedGroups.map(groupID =>
+								<GroupViewContainer key={groupID} id={groupID} />
+							)}
+						</div>
+					</div>
+				);
+				break;
+			}
+			default: {
+				console.error('Encountered invalid display mode');
+			}
 		}
 
 		return (
