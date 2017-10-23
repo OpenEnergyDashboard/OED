@@ -95,14 +95,15 @@ export default class EditGroupsComponent extends React.Component {
 			paddingTop: '35px'
 		};
 		const leftRightButtonsDivStyle = {
-			marginTop: '34px'
+			marginTop: '25px'
 		};
 		const leftRightButtonStyle = {
 			width: '50%',
 			margin: '0 auto'
 		};
-		const underlineStyle = {
-			textDecoration: 'underline'
+		const boldStyle = {
+			fontWeight: 'bold',
+			margin: 0
 		};
 		const centerTextStyle = {
 			textAlign: 'center'
@@ -110,12 +111,12 @@ export default class EditGroupsComponent extends React.Component {
 		return (
 			<div style={divStyle} className="col-xs-6">
 				<h3 style={centerTextStyle}>Edit Group</h3>
-				<p style={underlineStyle}>Name:</p>
+				<p style={boldStyle}>Name:</p>
 				<FormControl type="text" placeholder="Name" value={this.state.name} onChange={this.handleNameChange} />
 				<br />
 				<div className="row">
 					<div className="col-xs-5">
-						<p style={underlineStyle}>Child meters:</p>
+						<p style={boldStyle}>Child meters:</p>
 						<DatasourceBoxContainer
 							type="meter"
 							selection="custom"
@@ -133,7 +134,7 @@ export default class EditGroupsComponent extends React.Component {
 						</Button>
 					</div>
 					<div className="col-xs-5">
-						<p style={underlineStyle}>Unused meters:</p>
+						<p style={boldStyle}>Unused meters:</p>
 						<DatasourceBoxContainer
 							type="meter"
 							selection="custom"
@@ -147,7 +148,7 @@ export default class EditGroupsComponent extends React.Component {
 				<br />
 				<div className="row">
 					<div className="col-xs-5">
-						<p style={underlineStyle}>Child groups:</p>
+						<p style={boldStyle}>Child groups:</p>
 						<DatasourceBoxContainer
 							type="group"
 							selection="custom"
@@ -165,7 +166,7 @@ export default class EditGroupsComponent extends React.Component {
 						</Button>
 					</div>
 					<div className="col-xs-5">
-						<p style={underlineStyle}>Unused groups:</p>
+						<p style={boldStyle}>Unused groups:</p>
 						<DatasourceBoxContainer
 							type="group"
 							selection="custom"
@@ -176,9 +177,9 @@ export default class EditGroupsComponent extends React.Component {
 					</div>
 				</div>
 				<br />
+				<Button type="submit" onClick={this.handleReturnToView}>Cancel</Button>
 				<Button type="submit" onClick={this.handleEditGroup}>Submit changes</Button>
-				<Button type="submit" onClick={this.handleDeleteGroup}>Delete group</Button>
-				<Button className="pull-right" type="submit" onClick={this.handleReturnToView}>Return to groups overview</Button>
+				<Button className="pull-right" type="submit" onClick={this.handleDeleteGroup}>Delete group</Button>
 			</div>
 		);
 	}

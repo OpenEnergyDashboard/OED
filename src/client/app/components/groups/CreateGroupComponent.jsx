@@ -34,8 +34,12 @@ export default class CreateGroupComponent extends React.Component {
 		const divStyle = {
 			paddingTop: '35px'
 		};
-		const underlineStyle = {
-			textDecoration: 'underline'
+		const divBottomStyle = {
+			marginBottom: '20px'
+		};
+		const textStyle = {
+			fontWeight: 'bold',
+			margin: 0
 		};
 		const centerTextStyle = {
 			textAlign: 'center'
@@ -43,17 +47,20 @@ export default class CreateGroupComponent extends React.Component {
 		return (
 			<div style={divStyle} className="col-xs-6">
 				<h3 style={centerTextStyle}>Create a New Group</h3>
-				<p style={underlineStyle}>Name:</p>
-				<FormControl type="text" placeholder="Name" onChange={this.handleNameChange} />
-				<br />
-				<p style={underlineStyle}>Select meters:</p>
-				<DatasourceBoxContainer type="meter" selection="all" />
-				<br />
-				<p style={underlineStyle}>Select groups:</p>
-				<DatasourceBoxContainer type="group" selection="all" />
-				<br />
-				<Button type="submit" onClick={this.handleCreateGroup}>Create group</Button>
-				<Button className="pull-right" type="submit" onClick={this.handleReturnToView}>Return to groups overview</Button>
+				<div style={divBottomStyle}>
+					<p style={textStyle}>Name:</p>
+					<FormControl type="text" placeholder="Name" onChange={this.handleNameChange} />
+				</div>
+				<div style={divBottomStyle}>
+					<p style={textStyle}>Select Meters:</p>
+					<DatasourceBoxContainer type="meter" selection="all" />
+				</div>
+				<div style={divBottomStyle}>
+					<p style={textStyle}>Select Groups:</p>
+					<DatasourceBoxContainer type="group" selection="all" />
+				</div>
+				<Button type="submit" onClick={this.handleReturnToView}>Cancel</Button>
+				<Button type="submit" className="pull-right" onClick={this.handleCreateGroup}>Create group</Button>
 			</div>
 		);
 	}

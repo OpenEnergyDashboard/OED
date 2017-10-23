@@ -17,6 +17,9 @@ export default class GroupComponent extends React.Component {
 	}
 
 	render() {
+		const divPaddingStyle = {
+			paddingTop: '50px'
+		};
 		let GroupDisplay = null;
 		if (this.props.displayMode === 'create') {
 			GroupDisplay = (
@@ -33,7 +36,7 @@ export default class GroupComponent extends React.Component {
 		} else { // view groups
 			GroupDisplay = (
 				<div>
-					<div className="col-xs-2">
+					<div className="col-xs-2" style={divPaddingStyle}>
 						<GroupSidebarContainer />
 					</div>
 					<div className="col-xs-4">

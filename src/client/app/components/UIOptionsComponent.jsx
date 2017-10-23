@@ -79,10 +79,11 @@ export default class UIOptionsComponent extends React.Component {
 	 */
 	render() {
 		const labelStyle = {
-			textDecoration: 'underline'
+			fontWeight: 'bold',
+			margin: 0
 		};
 		const divPadding = {
-			paddingTop: '35px'
+			paddingTop: '15px'
 		};
 		const divBottomPadding = {
 			paddingBottom: '15px'
