@@ -8,41 +8,54 @@ import GroupViewContainer from '../../containers/groups/GroupViewContainer';
 import GroupSidebarContainer from '../../containers/groups/GroupSidebarContainer';
 import CreateGroupContainer from '../../containers/groups/CreateGroupContainer';
 import EditGroupsContainer from '../../containers/groups/EditGroupsContainer';
+import { DISPLAY_MODE } from '../../actions/groups';
 
-export default class GroupComponent extends React.Component {
+export default class GroupMainComponent extends React.Component {
 	componentWillMount() {
 		this.props.fetchGroupsDetailsIfNeeded();
 		this.props.fetchMetersDetailsIfNeeded();
-		this.props.selectGroups(this.props.selectedGroups);
 	}
 
 	render() {
+		const divPaddingStyle = {
+			paddingTop: '50px'
+		};
 		let GroupDisplay = null;
-		if (this.props.displayMode === 'create') {
-			GroupDisplay = (
-				<div>
-					<CreateGroupContainer />
-				</div>
-			);
-		} else if (this.props.displayMode === 'edit') {
-			GroupDisplay = (
-				<div>
-					<EditGroupsContainer />
-				</div>
-			);
-		} else { // view groups
-			GroupDisplay = (
-				<div>
-					<div className="col-xs-2">
-						<GroupSidebarContainer />
+		switch (this.props.displayMode) {
+			case DISPLAY_MODE.CREATE: {
+				GroupDisplay = (
+					<div>
+						<CreateGroupContainer />
 					</div>
-					<div className="col-xs-4">
-						{this.props.selectedGroups.map(groupID =>
-							<GroupViewContainer key={groupID} id={groupID} />
-						)}
+				);
+				break;
+			}
+			case DISPLAY_MODE.EDIT: {
+				GroupDisplay = (
+					<div>
+						<EditGroupsContainer />
 					</div>
-				</div>
-			);
+				);
+				break;
+			}
+			case DISPLAY_MODE.VIEW: {
+				GroupDisplay = (
+					<div>
+						<div className="col-xs-2" style={divPaddingStyle}>
+							<GroupSidebarContainer />
+						</div>
+						<div className="col-xs-4">
+							{this.props.selectedGroups.map(groupID =>
+								<GroupViewContainer key={groupID} id={groupID} />
+							)}
+						</div>
+					</div>
+				);
+				break;
+			}
+			default: {
+				console.error('Encountered invalid display mode');
+			}
 		}
 
 		return (

@@ -35,13 +35,10 @@ export default class GroupSidebarComponent extends React.Component {
 
 	render() {
 		const labelStyle = {
-			textDecoration: 'underline'
-		};
-		const divPadding = {
-			paddingTop: '35px'
+			fontWeight: 'bold'
 		};
 		return (
-			<div className="form-group" style={divPadding}>
+			<div className="form-group">
 				<p style={labelStyle}>View groups:</p>
 				<select multiple className="form-control" id="groupList" size="8" onChange={this.handleGroupSelect}>
 					{this.props.groups.map(group =>

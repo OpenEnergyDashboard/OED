@@ -28,19 +28,20 @@ export default class GroupViewComponent extends React.Component {
 		const buttonPadding = {
 			marginTop: '10px'
 		};
-		const underlineStyle = {
-			textDecoration: 'underline'
+		const boldStyle = {
+			fontWeight: 'bold',
+			margin: 0
 		};
 		return (
 			<div>
 				<h2 style={nameStyle}>{this.props.name}</h2>
 				<div className="row">
 					<div className="col-xs-6">
-						<p style={underlineStyle}>Child meters:</p>
+						<p style={boldStyle}>Child Meters:</p>
 						<DatasourceBoxContainer type="meter" selection="children" parentID={this.props.id} />
 					</div>
 					<div className="col-xs-6">
-						<p style={underlineStyle}>Child groups:</p>
+						<p style={boldStyle}>Child Groups:</p>
 						<DatasourceBoxContainer type="group" selection="children" parentID={this.props.id} />
 					</div>
 				</div>
