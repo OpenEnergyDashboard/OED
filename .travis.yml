@@ -35,7 +35,7 @@ before_script:
 
 script:
     # Validate legal requirements on source files
-  - npm run header-check
+  - npm run checkHeader
     # Test with native Node install
   - npm run test
     # Test in Docker

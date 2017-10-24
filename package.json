@@ -7,7 +7,7 @@
     "start": "node ./src/bin/www",
     "dev": "webpack -d --watch --color --progress",
     "build": "cross-env NODE_ENV=production webpack -p",
-    "header-check": "./src/scripts/checkheader.sh",
+    "checkHeader": "./src/scripts/checkHeader.sh",
     "lint": "./node_modules/.bin/eslint src/client/app/**/*.js src/client/app/**/*.jsx src/server/**/*.js src/server/**/*.jsx src/scripts/**/*.js",
     "test": "./node_modules/.bin/mocha \"src/server/test/**/*.js\"",
     "createdb": "node ./src/scripts/createDB.js",
