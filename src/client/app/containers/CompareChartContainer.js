@@ -26,6 +26,22 @@ function mapStateToProps(state) {
 	// Power used up to this point last week
 	let currentLastWeek = 0;
 	const soFar = moment().diff(moment().startOf('week'), 'days');
+	const delta = function (change) {
+		if (isNaN(change)) {
+			return '';
+		}
+		if (change < 0) {
+			return `You have used ${parseInt(change.toFixed(2).replace('.', ''), 10)}% less energy this week.`;
+		}
+		return `You have used ${parseInt(change.toFixed(2).replace('.', ''), 10)}% more energy this week.`;
+	};
+
+	const colorize = function (change) {
+		if (change < 0) {
+			return 'green';
+		}
+		return 'red';
+	};
 	for (const meterID of state.graph.selectedMeters) {
 		const readingsData = state.readings.bar.byMeterID[meterID][timeInterval][barDuration];
 		if (readingsData !== undefined && !readingsData.isFetching) {
@@ -114,6 +130,11 @@ function mapStateToProps(state) {
 		 tooltips: {
 			enabled: false
 		 	},
+		title: {
+			display: true,
+			text: delta((-1 + (((currentWeek / currentLastWeek) * lastWeek) / lastWeek))),
+			fontColor: colorize((-1 + (((currentWeek / currentLastWeek) * lastWeek) / lastWeek)))
+		},
 		plugins: {
 			datalabels: {
 				color: 'black',
