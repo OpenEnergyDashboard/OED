@@ -63,7 +63,6 @@ export default class LoginComponent extends React.Component {
 				console.error(err);
 			}
 			this.inputEmail.focus();
-
 		});
 		this.setState({ email: '', password: '' });
 	}

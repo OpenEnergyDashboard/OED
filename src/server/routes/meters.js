@@ -24,7 +24,7 @@ router.get('/', async (req, res) => {
 		const rows = await Meter.getAll();
 		res.json(rows.map(formatMeterForResponse));
 	} catch (err) {
-		console.error(`Error while performing GET all meters query: ${err}`);
+		console.error(`Error while performing GET all meters query: ${err}`); // eslint-disable-line no-console
 	}
 });
 
@@ -37,7 +37,7 @@ router.get('/:meter_id', async (req, res) => {
 		const meter = await Meter.getByID(req.params.meter_id);
 		res.json(formatMeterForResponse(meter));
 	} catch (err) {
-		console.error(`Error while performing GET specific meter by id query: ${err}`);
+		console.error(`Error while performing GET specific meter by id query: ${err}`); // eslint-disable-line no-console
 	}
 });
 

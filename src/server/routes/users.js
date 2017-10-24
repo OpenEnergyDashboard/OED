@@ -15,7 +15,7 @@ router.get('/', async (req, res) => {
 		const rows = await User.getAll();
 		res.json(rows);
 	} catch (err) {
-		console.error(`Error while performing GET all users query: ${err}`);
+		console.error(`Error while performing GET all users query: ${err}`); // eslint-disable-line no-console
 	}
 });
 
@@ -28,7 +28,7 @@ router.get('/:user_id', async (req, res) => {
 		const rows = await User.getByID(req.params.user_id);
 		res.json(rows);
 	} catch (err) {
-		console.error(`Error while performing GET specific user by id query: ${err}`);
+		console.error(`Error while performing GET specific user by id query: ${err}`); // eslint-disable-line no-console
 	}
 });
 

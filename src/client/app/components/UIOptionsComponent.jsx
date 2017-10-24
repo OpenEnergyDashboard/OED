@@ -114,11 +114,21 @@ export default class UIOptionsComponent extends React.Component {
 			<div style={divPadding}>
 				<p style={labelStyle}>Groups:</p>
 				<div style={divBottomPadding}>
-					<MultiSelectComponent options={groupSelectOptions} selectedOptions={this.props.selectedGroups} placeholder="Select Groups" onValuesChange={s => this.handleDatasourceSelect(s, DATA_TYPE_GROUP)} />
+					<MultiSelectComponent
+						options={groupSelectOptions}
+						selectedOptions={this.props.selectedGroups}
+						placeholder="Select Groups"
+						onValuesChange={s => this.handleDatasourceSelect(s, DATA_TYPE_GROUP)}
+					/>
 				</div>
 				<p style={labelStyle}>Meters:</p>
 				<div style={divBottomPadding}>
-					<MultiSelectComponent options={meterSelectOptions} selectedOptions={this.props.selectedMeters} placeholder="Select Meters" onValuesChange={s => this.handleDatasourceSelect(s, DATA_TYPE_METER)} />
+					<MultiSelectComponent
+						options={meterSelectOptions}
+						selectedOptions={this.props.selectedMeters}
+						placeholder="Select Meters"
+						onValuesChange={s => this.handleDatasourceSelect(s, DATA_TYPE_METER)}
+					/>
 				</div>
 				<p style={labelStyle}>Graph Type:</p>
 				<div className="radio">

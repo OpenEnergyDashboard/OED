@@ -55,7 +55,7 @@ function fetchLineReadings(dsIDs, timeInterval, dstype) {
 			endpoint = '/api/readings/line/meters';
 		} else {
 			console.error('Unknown datatype requested in fetchLineReadings: ', dstype);
-            return Promise.resolve();
+			return Promise.resolve();
 		}
 		return axios.get(`${endpoint}/${stringifiedIDs}`, {
 			params: { timeInterval: timeInterval.toString() }
