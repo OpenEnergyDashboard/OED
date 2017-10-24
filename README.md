@@ -34,6 +34,7 @@ DB_PASSWORD=?              // The password for your postgres user
 DB_HOST=?                  // The host for your postgres db, likely localhost
 DB_PORT=?                  // The port for your postgres db, likely 5432
 TOKEN_SECRET=?             // Token for authentication. Generate something secure and random
+LOG_FILE=?                 // Path to the log file, defaults to ./log.txt
 ```
 8. Run ```npm run createdb``` to create the database schema.
 1. Run `npm run addMamacMeters` to load mamac meters from an `.csv` file.

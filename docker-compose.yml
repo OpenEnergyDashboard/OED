@@ -7,19 +7,20 @@ services:
         environment:
             - PGDATA=/var/lib/postgresql/data/pgdata
               # Custom PGDATA per recommendations from official Docker page
-        volumes: 
+        volumes:
             - ./postgres-data:/var/lib/postgresql/data/pgdata
     web:
         # Configuration variables for the app.
         environment:
-            - SERVER_PORT=3000
-            - DB_USER=opened
-            - DB_DATABASE=oed
-            - DB_TEST_DATABASE=oed_testing
-            - DB_PASSWORD=opened
-            - DB_HOST=database # Docker will set this hostname
-            - DB_PORT=5432
-            - TOKEN_SECRET=?
+            - OED_SERVER_PORT=3000
+            - OED_DB_USER=opened
+            - OED_DB_DATABASE=oed
+            - OED_DB_TEST_DATABASE=oed_testing
+            - OED_DB_PASSWORD=opened
+            - OED_DB_HOST=database # Docker will set this hostname
+            - OED_DB_PORT=5432
+            - OED_TOKEN_SECRET=?
+            - OED_LOG_FILE=log.txt
         # Set the correct build environment.
         build: ./
         # Link to the database so the app can persist data
