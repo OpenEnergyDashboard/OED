@@ -6,6 +6,7 @@ const _ = require('lodash');
 const Meter = require('../models/Meter');
 const Reading = require('../models/Reading');
 const readMamacData = require('./readMamacData');
+const log = require('../log');
 
 /**
  * Pulls new data for all the meters in the database.
@@ -13,7 +14,7 @@ const readMamacData = require('./readMamacData');
  */
 async function updateAllMeters() {
 	const time = new Date();
-	console.log(`Getting meter data ${time.toISOString()}`); // eslint-disable-line no-console
+	log(`Getting meter data ${time.toISOString()}`);
 	try {
 		const allMeters = await Meter.getAll();
 		const metersToUpdate = allMeters.filter(m => m.enabled && m.type === Meter.type.MAMAC);
@@ -23,8 +24,7 @@ async function updateAllMeters() {
 			metersToUpdate
 				.map(readMamacData)
 				.map(p => p.catch(err => {
-					console.error(`ERROR ON REQUEST TO ${err.options.uri}`); // eslint-disable-line no-console
-					console.error(err.message); // eslint-disable-line no-console
+					log(`ERROR ON REQUEST TO ${err.options.uri}, ${err.message}`, 'error');
 					return null;
 				}))
 		), elem => elem !== null);
@@ -32,9 +32,9 @@ async function updateAllMeters() {
 		// Flatten the batches (an array of arrays) into a single array.
 		const allReadingsToInsert = [].concat(...readingInsertBatches);
 		await Reading.insertOrUpdateAll(allReadingsToInsert);
-		console.log('Update finished'); // eslint-disable-line no-console
+		log('Update finished');
 	} catch (err) {
-		console.error(err); // eslint-disable-line no-console
+		log(`Error updating all meters: ${err}`, 'error');
 	}
 }
 

@@ -4,6 +4,7 @@
 
 const express = require('express');
 const User = require('../models/User');
+const log = require('../log');
 
 const router = express.Router();
 
@@ -15,7 +16,7 @@ router.get('/', async (req, res) => {
 		const rows = await User.getAll();
 		res.json(rows);
 	} catch (err) {
-		console.error(`Error while performing GET all users query: ${err}`);
+		log(`Error while performing GET all users query: ${err}`, 'error');
 	}
 });
 
@@ -28,7 +29,7 @@ router.get('/:user_id', async (req, res) => {
 		const rows = await User.getByID(req.params.user_id);
 		res.json(rows);
 	} catch (err) {
-		console.error(`Error while performing GET specific user by id query: ${err}`);
+		log(`Error while performing GET specific user by id query: ${err}`, 'error');
 	}
 });
 

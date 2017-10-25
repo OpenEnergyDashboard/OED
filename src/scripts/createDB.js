@@ -3,13 +3,14 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
 
 const { createSchema, pgp } = require('../server/models/database');
+const log = require('../server/log');
 
 (async function createSchemaWrapper() {
 	try {
 		await createSchema();
-		console.log('Schema created');
+		log('Schema created');
 	} catch (err) {
-		console.error(`Error creating schema: ${err}`);
+		log(`Error creating schema: ${err}`, 'error');
 	} finally {
 		pgp.end();
 	}

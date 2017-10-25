@@ -35,7 +35,10 @@ const config = {
 	devtool: 'source-map',
 	plugins: [
 		new LodashModuleReplacementPlugin()
-	]
+	],
+	node: {
+		fs: 'empty'
+	}
 };
 
 if (process.env.NODE_ENV === 'production') {

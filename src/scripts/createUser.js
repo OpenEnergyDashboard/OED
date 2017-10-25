@@ -7,6 +7,7 @@
 const readline = require('readline');
 const bcrypt = require('bcryptjs');
 const User = require('../server/models/User');
+const log = require('../server/log');
 
 const rl = readline.createInterface({
 	input: process.stdin,
@@ -32,7 +33,7 @@ function askPassword(email) {
 }
 
 function terminateReadline(message) {
-	if (message) console.log(message);
+	if (message) log(message);
 	rl.close();
 	process.exit(0);
 }

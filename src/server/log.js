@@ -6,7 +6,7 @@ const logFile = require('./config').logFile;
  * @param {String} level Level of message: 'standard' or 'error'
  * @param {Boolean} logToFile Log to a file in addition to std out/error
  */
-module.exports = (message, level = 'standard', logToFile = false) => {
+module.exports = (message, level = 'standard', logToFile = true) => {
 	const messageToLog = `[${level}@${new Date(Date.now()).toISOString()}] ${message}\n`;
 	if (level === 'error') {
 		console.error(messageToLog); // eslint-disable-line no-console
