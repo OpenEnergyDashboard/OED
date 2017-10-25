@@ -20,24 +20,18 @@ function parseTimestamp(raw) {
  * @param meter
  * @returns {Promise.<array.<Reading>>}
  */
-function readMamacData(meter) {
+async function readMamacData(meter) {
 	// First get a promise that's just the meter itself (or an error if it doesn't have an IP address)
-	return Promise.resolve(meter)
-		.then(m => {
-			if (!m.ipAddress) throw new Error(`${m} doesn't have an IP address to read data from`);
-			return m;
-		}).then(m => Promise.all([
-			Promise.resolve(m),
-			reqPromise(`http://${m.ipAddress}/int2.csv`).then(parseCsv)
-		])).then(([m, rawReadings]) => {
-			if (!m.id) throw new Error(`${m} doesn't have an id to associate readings with`);
-			return rawReadings.map(raw => new Reading(
-				m.id,
+	if (!meter.ipAddress) throw new Error(`${meter} doesn't have an IP address to read data from`);
+	if (!meter.id) throw new Error(`${meter} doesn't have an id to associate readings with`);
+	const rawReadings = await reqPromise(`http://${meter.ipAddress}/int2.csv`);
+	const parsedReadings = await parseCsv(rawReadings);
+	return parsedReadings.map(raw => new Reading(
+				meter.id,
 				parseInt(raw[0]),
 				parseTimestamp(raw[1]).subtract(1, 'hours').toDate(),
 				parseTimestamp(raw[1]).toDate())
 			);
-		});
 }
 
 module.exports = readMamacData;

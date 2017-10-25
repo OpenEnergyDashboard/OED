@@ -2,6 +2,7 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
 
+const _ = require('lodash');
 const Meter = require('../models/Meter');
 const Reading = require('../models/Reading');
 const readMamacData = require('./readMamacData');
@@ -14,9 +15,20 @@ async function updateAllMeters() {
 	const time = new Date();
 	console.log(`Getting meter data ${time.toISOString()}`); // eslint-disable-line no-console
 	try {
-		const meters = await Meter.getAll();
-		// Do all the network requests in parallel.
-		const readingInsertBatches = await Promise.all(meters.filter(m => m.enabled && m.type === Meter.type.MAMAC).map(readMamacData));
+		const allMeters = await Meter.getAll();
+		const metersToUpdate = allMeters.filter(m => m.enabled && m.type === Meter.type.MAMAC);
+
+		// Do all the network requests in parallel, then throw out any requests that fail after logging the errors.
+		const readingInsertBatches = _.filter(await Promise.all(
+			metersToUpdate
+				.map(readMamacData)
+				.map(p => p.catch(err => {
+					console.error(`ERROR ON REQUEST TO ${err.options.uri}`); // eslint-disable-line no-console
+					console.error(err.message); // eslint-disable-line no-console
+					return null;
+				}))
+		), elem => elem !== null);
+
 		// Flatten the batches (an array of arrays) into a single array.
 		const allReadingsToInsert = [].concat(...readingInsertBatches);
 		await Reading.insertOrUpdateAll(allReadingsToInsert);
