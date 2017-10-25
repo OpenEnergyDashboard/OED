@@ -13,8 +13,8 @@ export const RECEIVE_GROUPS_DETAILS = 'RECEIVE_GROUPS_DETAILS';
 export const REQUEST_GROUP_CHILDREN = 'REQUEST_GROUP_CHILDREN';
 export const RECEIVE_GROUP_CHILDREN = 'RECEIVE_GROUP_CHILDREN';
 
-export const CHANGE_SELECTED_GROUPS_PER_GROUP = 'CHANGE_SELECTED_GROUPS_PER_GROUP';
-export const CHANGE_SELECTED_METERS_PER_GROUP = 'CHANGE_SELECTED_METERS_PER_GROUP';
+export const CHANGE_SELECTED_CHILD_GROUPS_PER_GROUP = 'CHANGE_SELECTED_CHILD_GROUPS_PER_GROUP';
+export const CHANGE_SELECTED_CHILD_METERS_PER_GROUP = 'CHANGE_SELECTED_CHILD_METERS_PER_GROUP';
 export const CHANGE_DISPLAYED_GROUPS = 'CHANGE_DISPLAYED_GROUPS';
 
 // Viewing and fetching functions
@@ -103,8 +103,8 @@ export function changeDisplayedGroups(groupIDs) {
  * @param groupIDs The IDs of the new set of selected subgroups
  * @return {{type: string, groupIDs: *}}
  */
-export function changeSelectedGroupsOfGroup(parentID, groupIDs) {
-	return { type: CHANGE_SELECTED_GROUPS_PER_GROUP, parentID, groupIDs };
+export function changeSelectedChildGroupsOfGroup(parentID, groupIDs) {
+	return { type: CHANGE_SELECTED_CHILD_GROUPS_PER_GROUP, parentID, groupIDs };
 }
 
 /**
@@ -114,8 +114,8 @@ export function changeSelectedGroupsOfGroup(parentID, groupIDs) {
  * @param meterIDs The IDs of the new set of selected child meters
  * @return {{type: string, parentID: *, meterIDs: *}}
  */
-export function changeSelectedMetersOfGroup(parentID, meterIDs) {
-	return { type: CHANGE_SELECTED_METERS_PER_GROUP, parentID, meterIDs };
+export function changeSelectedChildMetersOfGroup(parentID, meterIDs) {
+	return { type: CHANGE_SELECTED_CHILD_METERS_PER_GROUP, parentID, meterIDs };
 }
 
 

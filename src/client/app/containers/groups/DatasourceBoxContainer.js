@@ -6,7 +6,7 @@
 import _ from 'lodash';
 import { connect } from 'react-redux';
 import DatasourceBoxComponent from '../../components/groups/DatasourceBoxComponent';
-import { changeSelectedMetersOfGroup, changeSelectedGroupsOfGroup, changeChildMeters, changeChildGroups } from '../../actions/groups';
+import { changeSelectedChildMetersOfGroup, changeSelectedChildGroupsOfGroup, changeChildMeters, changeChildGroups } from '../../actions/groups';
 
 // ownProps.selection may be 'children', 'all', or 'custom'
 // if ownProps.selection is 'children', ownProps must have a 'parentID' property
@@ -77,11 +77,11 @@ function mapDispatchToProps(dispatch, ownProps) {
 	} else if (ownProps.selection === 'children') {
 		if (ownProps.type === 'meter') {
 			return {
-				selectDatasource: meterIDs => dispatch(changeSelectedMetersOfGroup(ownProps.parentID, meterIDs))
+				selectDatasource: meterIDs => dispatch(changeSelectedChildMetersOfGroup(ownProps.parentID, meterIDs))
 			};
 		}
 		return {
-			selectDatasource: groupIDs => dispatch(changeSelectedGroupsOfGroup(ownProps.parentID, groupIDs))
+			selectDatasource: groupIDs => dispatch(changeSelectedChildGroupsOfGroup(ownProps.parentID, groupIDs))
 		};
 	}
 	return {

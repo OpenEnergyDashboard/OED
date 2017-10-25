@@ -107,7 +107,7 @@ export default function groups(state = defaultState, action) {
 			};
 		}
 
-		case groupsActions.CHANGE_SELECTED_GROUPS_PER_GROUP: {
+		case groupsActions.CHANGE_SELECTED_CHILD_GROUPS_PER_GROUP: {
 			return {
 				...state,
 				byGroupID: {
@@ -120,7 +120,7 @@ export default function groups(state = defaultState, action) {
 			};
 		}
 
-		case groupsActions.CHANGE_SELECTED_METERS_PER_GROUP: {
+		case groupsActions.CHANGE_SELECTED_CHILD_METERS_PER_GROUP: {
 			return {
 				...state,
 				byGroupID: {
