@@ -34,11 +34,12 @@ function mapStateToProps(state) {
 	for (const groupID of state.graph.selectedGroups) {
 		const readingsData = state.readings.line.byGroupID[groupID][timeInterval];
 		if (readingsData !== undefined && !readingsData.isFetching) {
+			const label = state.groups.byGroupID[groupID].name;
 			data.datasets.push({
-				label: state.groups.byGroupID[groupID].name,
+				label,
 				data: readingsData.readings.map(arr => ({ x: arr[0], y: arr[1].toFixed(2) })),
 				fill: false,
-				borderColor: graphColors.getColor()
+				borderColor: getGraphColor(label)
 			});
 		}
 	}

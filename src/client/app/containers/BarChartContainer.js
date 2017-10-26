@@ -22,7 +22,7 @@ function mapStateToProps(state) {
 	for (const meterID of state.graph.selectedMeters) {
 		const readingsData = state.readings.bar.byMeterID[meterID][timeInterval][barDuration];
 		if (readingsData !== undefined && !readingsData.isFetching) {
-			const label = state.meters.byMeterID[meterID].name
+			const label = state.meters.byMeterID[meterID].name;
 			const color = getGraphColor(label);
 			data.datasets.push({
 				label,
@@ -40,9 +40,10 @@ function mapStateToProps(state) {
 	for (const groupID of state.graph.selectedGroups) {
 		const readingsData = state.readings.bar.byGroupID[groupID][timeInterval][barDuration];
 		if (readingsData !== undefined && !readingsData.isFetching) {
-			const color = graphColors.getColor();
+			const label = state.groups.byGroupID[groupID].name;
+			const color = getGraphColor(label);
 			data.datasets.push({
-				label: state.groups.byGroupID[groupID].name,
+				label,
 				data: readingsData.readings.map(arr => arr[1]),
 				backgroundColor: color,
 				hoverBackgroundColor: color
