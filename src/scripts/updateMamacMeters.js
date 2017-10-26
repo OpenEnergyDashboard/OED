@@ -6,14 +6,14 @@
 
 const updateMeters = require('../server/services/updateMeters');
 const stopDB = require('../server/models/database').stopDB;
+const log = require('../server/log');
 
 async function updateMamacMeters() {
-	console.log('Fetching new Mamac meter data');
+	log('Fetching new Mamac meter data');
 	try {
 		await updateMeters();
-	} catch (e) {
-		console.error('Error fetching Mamac meter data:');
-		console.error(e);
+	} catch (err) {
+		log(`Error fetching Mamac meter data: ${err}`, 'error');
 	} finally {
 		stopDB();
 	}

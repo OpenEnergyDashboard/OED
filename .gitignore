@@ -26,3 +26,6 @@ private
 
 # Database
 postgres-data
+
+# Text files
+*.txt

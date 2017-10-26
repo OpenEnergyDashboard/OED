@@ -7,12 +7,13 @@
  * OED is compliant with Semver.
  */
 
+const log = require('../server/log');
 const pkgJson = require('../../package.json');
 
 function OEDVersion() {
 	const versionParts = pkgJson.version.split('.');
 	if (versionParts.length !== 3) {
-		console.error('package.json version string is not in semver x.y.z format!'); // eslint-disable-line no-console
+		log('package.json version string is not in semver x.y.z format', 'error');
 	}
 	this.major = versionParts[0];
 	this.minor = versionParts[1];

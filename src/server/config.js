@@ -20,14 +20,15 @@ const config = {};
 
 // Database configuration is taken from environment variables (which are loaded by dotenv from the .env file)
 config.database = {
-	user: process.env.DB_USER,
-	database: process.env.DB_DATABASE,
-	password: process.env.DB_PASSWORD,
-	host: process.env.DB_HOST,
-	port: process.env.DB_PORT
+	user: process.env.OED_DB_USER,
+	database: process.env.OED_DB_DATABASE,
+	password: process.env.OED_DB_PASSWORD,
+	host: process.env.OED_DB_HOST,
+	port: process.env.OED_DB_PORT
 };
 
-config.secretToken = process.env.TOKEN_SECRET;
-config.serverPort = process.env.SERVER_PORT;
+config.secretToken = process.env.OED_TOKEN_SECRET;
+config.serverPort = process.env.OED_SERVER_PORT;
+config.logFile = process.env.OED_LOG_FILE || 'log2.txt';
 
 module.exports = config;

@@ -1,16 +1,16 @@
 # Open Energy Dashboard #
 [![Build Status](https://travis-ci.org/OpenEnergyDashboard/OED.svg?branch=master)](https://travis-ci.org/OpenEnergyDashboard/OED)
 
-The Open Energy Dashboard is a user-friendly way to display energy information from smart energy meters, designed and built by faculty and students at Beloit College. It is designed for institutions of higher education, and is optimized for non-technical users with a simple interface that provides access to your institution's energy data through the powerful Chart.js data graphing system. To learn more, see [our website](https://openenergydashboard.github.io/).
+Open Energy Dashboard is a user-friendly way to display energy information from smart energy meters, designed and built by faculty and students at Beloit College. It is designed for institutions of higher education, and is optimized for non-technical users with a simple interface that provides access to your institution's energy data through the powerful Chart.js data graphing system. To learn more, see [our website](https://openenergydashboard.github.io/).
 
-The Open Energy Dashboard is available under the Mozilla Public Licence, and contributions, in the form of bug reports, feature requests, and code contributions, are welcome.
+Open Energy Dashboard is available under the Mozilla Public Licence v2, and contributions, in the form of bug reports, feature requests, and code contributions, are welcome.
 
 ### Built With ###
-Chart.js - Javascript library used to generate data charts ([chartjs.org](http://www.chartjs.org))
+Chart.js - JavaScript library used to generate data charts ([chartjs.org](http://www.chartjs.org))
 
 PostgreSQL - Database management system ([postgresql.org](https://www.postgresql.org))
 
-Node.js - Javascript runtime environment ([nodejs.org](https://nodejs.org/en/))
+Node.js - JavaScript runtime environment ([nodejs.org](https://nodejs.org/en/))
 
 ### Developer Installation ###
 
@@ -26,14 +26,15 @@ You can either use Docker Compose to install Node and PostgreSQL in containers, 
 1. Still in psql, run ```CREATE DATABASE oed_testing;``` to create a database for automated tests.
 1. Create a .env file in the root directory of the project with the following, replacing (?) with the desired information: <br>
 ```
-SERVER_PORT=?              // The port that the server should run on. 3000 is a good default choice
-DB_USER=?                  // The user that should be used to connect to postgres
-DB_DATABASE=?              // The database you just created, so likely oed
-DB_TEST_DATABASE=?         // The test database you just created, so likely oed_testing
-DB_PASSWORD=?              // The password for your postgres user
-DB_HOST=?                  // The host for your postgres db, likely localhost
-DB_PORT=?                  // The port for your postgres db, likely 5432
-TOKEN_SECRET=?             // Token for authentication. Generate something secure and random
+OED_SERVER_PORT=?              // The port that the server should run on. 3000 is a good default choice
+OED_DB_USER=?                  // The user that should be used to connect to postgres
+OED_DB_DATABASE=?              // The database you just created, so likely oed
+OED_DB_TEST_DATABASE=?         // The test database you just created, so likely oed_testing
+OED_DB_PASSWORD=?              // The password for your postgres user
+OED_DB_HOST=?                  // The host for your postgres db, likely localhost
+OED_DB_PORT=?                  // The port for your postgres db, likely 5432
+OED_TOKEN_SECRET=?             // Token for authentication. Generate something secure and random
+OED_LOG_FILE=?                 // Path to the log file, defaults to ./log.txt
 ```
 8. Run ```npm run createdb``` to create the database schema.
 1. Run `npm run addMamacMeters` to load mamac meters from an `.csv` file.
