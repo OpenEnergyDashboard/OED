@@ -1,3 +1,9 @@
+# *
+# * This Source Code Form is subject to the terms of the Mozilla Public
+# * License, v. 2.0. If a copy of the MPL was not distributed with this
+# * file, You can obtain one at http://mozilla.org/MPL/2.0/.
+# *
+
 # Dockerfile for NodeJS application portion
 # It must be in the root directory so that the build context includes the
 # package.json and source code.

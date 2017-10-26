@@ -10,7 +10,8 @@ import * as graphActions from '../actions/graph';
 
 export const chartTypes = {
 	line: 'line',
-	bar: 'bar'
+	bar: 'bar',
+	compare: 'compare'
 };
 
 /**
@@ -21,6 +22,8 @@ const defaultState = {
 	selectedGroups: [],
 	timeInterval: TimeInterval.unbounded(),
 	barDuration: moment.duration(1, 'month'),
+	compareTimeInterval: moment().diff(moment().startOf('week'), 'days'),
+	compareDuration: moment.duration(1, 'days'),
 	chartToRender: chartTypes.line,
 	barStacking: false
 };
@@ -53,6 +56,13 @@ export default function graph(state = defaultState, action) {
 				timeInterval: action.timeInterval
 			};
 		case graphActions.CHANGE_CHART_TO_RENDER:
+			if (action.chartType === 'compare') {
+				return {
+					...state,
+					selectedMeters: [],
+					chartToRender: action.chartType
+				};
+			}
 			return {
 				...state,
 				chartToRender: action.chartType

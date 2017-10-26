@@ -7,6 +7,7 @@ const _ = require('lodash');
 const moment = require('moment');
 const Reading = require('../models/Reading');
 const TimeInterval = require('../../common/TimeInterval');
+const log = require('../log');
 
 const router = express.Router();
 
@@ -38,9 +39,7 @@ router.get('/line/meters/:meter_ids', async (req, res) => {
 		const formattedCompressedReadings = _.mapValues(rawCompressedReadings, formatLineReadings);
 		res.json(formattedCompressedReadings);
 	} catch (err) {
-		console.error( // eslint-disable-line no-console
-			`Error while performing GET readings for line with meters ${meterIDs} with time interval ${timeInterval}: ${err}`
-		);
+		log(`Error while performing GET readings for line with meters ${meterIDs} with time interval ${timeInterval}: ${err}`, 'error');
 	}
 });
 
@@ -59,9 +58,7 @@ router.get('/line/groups/:group_ids', async (req, res) => {
 		const formattedCompressedReadings = _.mapValues(rawCompressedReadings, formatLineReadings);
 		res.json(formattedCompressedReadings);
 	} catch (err) {
-		console.error( // eslint-disable-line no-console
-			`Error while performing GET readings for line with groups ${groupIDs} with time interval ${timeInterval}: ${err}`
-		);
+		log(`Error while performing GET readings for line with groups ${groupIDs} with time interval ${timeInterval}: ${err}`, 'error');
 	}
 });
 
@@ -82,9 +79,7 @@ router.get('/bar/meters/:meter_ids', async (req, res) => {
 		const formattedBarchartReadings = _.mapValues(barchartReadings, formatBarReadings);
 		res.json(formattedBarchartReadings);
 	} catch (err) {
-		console.error( // eslint-disable-line no-console
-			`Error while performing GET readings for bar with meters ${meterIDs} with time interval ${timeInterval}: ${err}`
-		);
+		log(`Error while performing GET readings for bar with meters ${meterIDs} with time interval ${timeInterval}: ${err}`, 'error');
 	}
 });
 
@@ -106,9 +101,7 @@ router.get('/bar/groups/:group_ids', async (req, res) => {
 		const formattedBarchartReadings = _.mapValues(barchartReadings, formatBarReadings);
 		res.json(formattedBarchartReadings);
 	} catch (err) {
-		console.error( // eslint-disable-line no-console
-			`Error while performing GET readings for bar with groups ${groupIDs} with time interval ${timeInterval}: ${err}`
-		);
+		log(`Error while performing GET readings for bar with groups ${groupIDs} with time interval ${timeInterval}: ${err}`, 'error');
 	}
 });
 

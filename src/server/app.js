@@ -14,6 +14,7 @@ const meters = require('./routes/meters');
 const login = require('./routes/login');
 const verification = require('./routes/verification');
 const groups = require('./routes/groups');
+const version = require('./routes/version');
 
 const app = express();
 
@@ -30,6 +31,7 @@ app.use('/api/readings', readings);
 app.use('/api/login', login);
 app.use('/api/groups', groups);
 app.use('/api/verification', verification);
+app.use('/api/version', version);
 
 app.get('*', (req, res) => {
 	res.sendFile(path.resolve(__dirname, '..', 'client', 'index.html'));
