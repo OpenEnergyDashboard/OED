@@ -15,9 +15,14 @@ import { fetchGroupChildrenIfNeeded, changeDisplayMode, beginEditingIfPossible, 
  * @return {{name: name of this group}, {id: id of this group}}
  */
 function mapStateToProps(state, ownProps) {
+	const id = ownProps.id;
+	const childMeters = state.groups.byGroupID[id].childMeters.map(meterID => state.meters.byMeterID[meterID].name.trim()).sort();
+	const childGroups = state.groups.byGroupID[id].childGroups.map(groupID => state.groups.byGroupID[groupID].name.trim()).sort();
 	return {
-		id: ownProps.id,
-		name: state.groups.byGroupID[ownProps.id].name,
+		id,
+		name: state.groups.byGroupID[id].name,
+		childMeters,
+		childGroups
 	};
 }
 

@@ -4,7 +4,7 @@
 
 import React from 'react';
 import { Button } from 'react-bootstrap';
-import DatasourceBoxContainer from '../../containers/groups/DatasourceBoxContainer';
+import DisplayComponent from '../DisplayComponent';
 
 export default class GroupViewComponent extends React.Component {
 	constructor(props) {
@@ -38,11 +38,11 @@ export default class GroupViewComponent extends React.Component {
 				<div className="row">
 					<div className="col-xs-6">
 						<p style={boldStyle}>Child Meters:</p>
-						<DatasourceBoxContainer type="meter" selection="children" parentID={this.props.id} />
+						<DisplayComponent items={this.props.childMeters} />
 					</div>
 					<div className="col-xs-6">
 						<p style={boldStyle}>Child Groups:</p>
-						<DatasourceBoxContainer type="group" selection="children" parentID={this.props.id} />
+						<DisplayComponent items={this.props.childGroups} />
 					</div>
 				</div>
 				<Button style={buttonPadding} bsStyle="default" onClick={this.handleEditGroup}>Edit group</Button>
