@@ -5,65 +5,116 @@
  */
 
 import axios from 'axios';
-import { DATA_TYPE_METER, DATA_TYPE_GROUP } from '../utils/Datasources';
 
-export const REQUEST_BAR_READINGS = 'REQUEST_BAR_READINGS';
-export const RECEIVE_BAR_READINGS = 'RECEIVE_BAR_READINGS';
+export const REQUEST_GROUP_BAR_READINGS = 'REQUEST_GROUP_BAR_READINGS';
+export const RECEIVE_GROUP_BAR_READINGS = 'RECEIVE_GROUP_BAR_READINGS';
+
+export const REQUEST_METER_BAR_READINGS = 'REQUEST_METER_BAR_READINGS';
+export const RECEIVE_METER_BAR_READINGS = 'RECEIVE_METER_BAR_READINGS';
 
 /**
- * @param {State} state
- * @param {number} dsID
- * @param {TimeInterval} timeInterval
- * @param {Moment.Duration} barDuration
- * @param {String} dstype either DATA_TYPE_METER, DATA_TYPE_GROUP
+ * @param {State} state the Redux state
+ * @param {number} meterID the ID of the meter to check
+ * @param {TimeInterval} timeInterval the interval over which to check
+ * @param {Moment.Duration} barDuration the duration of each bar for which to check
+ * @returns {boolean} True if the readings for the given meter, time, and duration are missing; false otherwise.
  */
-function shouldFetchBarReadings(state, dsID, timeInterval, barDuration, dstype) {
-	let readingsForID;
-	if (dstype === DATA_TYPE_METER) {
-		readingsForID = state.readings.bar.byMeterID[dsID];
-	} else if (dstype === DATA_TYPE_GROUP) {
-		readingsForID = state.readings.bar.byGroupID[dsID];
-	}
+function shouldFetchMeterBarReadings(state, meterID, timeInterval, barDuration) {
+	const readingsForID = state.readings.bar.byMeterID[meterID];
 	if (readingsForID === undefined) {
 		return true;
 	}
-	if (readingsForID[timeInterval] === undefined) {
+
+	const readingsForTimeInterval = readingsForID[timeInterval];
+	if (readingsForTimeInterval === undefined) {
 		return true;
 	}
-	if (readingsForID[timeInterval][barDuration] === undefined) {
+
+	const readingsForBarDuration = readingsForTimeInterval[barDuration];
+	if (readingsForBarDuration === undefined) {
 		return true;
 	}
-	const readingsForTimeIntervalAndDuration = readingsForID[timeInterval][barDuration];
-	return readingsForTimeIntervalAndDuration === undefined && !readingsForTimeIntervalAndDuration.isFetching;
+
+	return !readingsForBarDuration.isFetching;
 }
 
-function requestBarReadings(dsIDs, timeInterval, barDuration, dstype) {
-	return { type: REQUEST_BAR_READINGS, dsIDs, timeInterval, barDuration, dstype };
+/**
+ * @param {State} state the Redux state
+ * @param {number} groupID the ID of the group to check
+ * @param {TimeInterval} timeInterval the interval over which to check
+ * @param {Moment.Duration} barDuration the duration of each bar for which to check
+ * @returns {boolean} True if the readings for the given group, time, and duration are missing; false otherwise.
+ */
+function shouldFetchGroupBarReadings(state, groupID, timeInterval, barDuration) {
+	const readingsForID = state.readings.bar.byMeterID[groupID];
+	if (readingsForID === undefined) {
+		return true;
+	}
+
+	const readingsForTimeInterval = readingsForID[timeInterval];
+	if (readingsForTimeInterval === undefined) {
+		return true;
+	}
+
+	const readingsForBarDuration = readingsForTimeInterval[barDuration];
+	if (readingsForBarDuration === undefined) {
+		return true;
+	}
+
+	return !readingsForBarDuration.isFetching;
 }
 
-function receiveBarReadings(dsIDs, timeInterval, barDuration, readings, dstype) {
-	return { type: RECEIVE_BAR_READINGS, dsIDs, timeInterval, barDuration, readings, dstype };
+function requestMeterBarReadings(meterIDs, timeInterval, barDuration) {
+	return { type: REQUEST_METER_BAR_READINGS, meterIDs, timeInterval, barDuration };
 }
 
-function fetchBarReadings(dsIDs, timeInterval, dstype) {
+function receiveMeterBarReadings(meterIDs, timeInterval, barDuration, readings) {
+	return { type: RECEIVE_METER_BAR_READINGS, meterIDs, timeInterval, barDuration, readings };
+}
+
+function requestGroupBarReadings(groupIDs, timeInterval, barDuration) {
+	return { type: REQUEST_GROUP_BAR_READINGS, groupIDs, timeInterval, barDuration };
+}
+
+function receiveGroupBarReadings(groupIDs, timeInterval, barDuration, readings) {
+	return { type: RECEIVE_GROUP_BAR_READINGS, groupIDs, timeInterval, barDuration, readings };
+}
+
+/**
+ * Fetch the data for the given meters over the given interval. Fully manages the Redux lifecycle.
+ * Reads bar duration from the state.
+ * @param {[number]} meterIDs The IDs of the meters whose data should be fetched
+ * @param {TimeInterval} timeInterval The time interval over which data should be fetched
+ */
+function fetchMeterBarReadings(meterIDs, timeInterval) {
 	return (dispatch, getState) => {
 		const barDuration = getState().graph.barDuration;
-		dispatch(requestBarReadings(dsIDs, timeInterval, barDuration, dstype));
-		const stringifiedIDs = dsIDs.join(',');
+		dispatch(requestMeterBarReadings(meterIDs, timeInterval, barDuration));
+		// API expectes a comma-seperated string of IDs
+		const stringifiedIDs = meterIDs.join(',');
 
-		let endpoint;
-		if (dstype === DATA_TYPE_METER) {
-			endpoint = '/api/readings/bar/meters';
-		} else if (dstype === DATA_TYPE_GROUP) {
-			endpoint = '/api/readings/bar/groups';
-		} else {
-			console.error('Unknown datatype requested in fetchBarReadings: ', dstype);
-			return Promise.resolve();
-		}
-
-		return axios.get(`${endpoint}/${stringifiedIDs}`, {
+		return axios.get(`/api/readings/bar/meters/${stringifiedIDs}`, {
 			params: { timeInterval: timeInterval.toString(), barDuration: barDuration.toISOString() }
-		}).then(response => dispatch(receiveBarReadings(dsIDs, timeInterval, barDuration, response.data, dstype)));
+		}).then(response => dispatch(receiveMeterBarReadings(meterIDs, timeInterval, barDuration, response.data)));
+	};
+}
+
+/**
+ * Fetch the data for the given groups over the given interval. Fully manages the Redux lifecycle.
+ * Reads bar duration from the state.
+ * @param {[number]} groupIDs The IDs of the groups whose data should be fetched
+ * @param {TimeInterval} timeInterval The time interval over which data should be fetched
+ */
+function fetchGroupBarReadings(groupIDs, timeInterval) {
+	return (dispatch, getState) => {
+		const barDuration = getState().graph.barDuration;
+		dispatch(requestGroupBarReadings(groupIDs, timeInterval, barDuration));
+		// API expectes a comma-seperated string of IDs
+		const stringifiedIDs = groupIDs.join(',');
+
+		return axios.get(`/api/readings/bar/groups/${stringifiedIDs}`, {
+			params: { timeInterval: timeInterval.toString(), barDuration: barDuration.toISOString() }
+		}).then(response => dispatch(receiveGroupBarReadings(groupIDs, timeInterval, barDuration, response.data)));
 	};
 }
 
@@ -86,13 +137,23 @@ function fetchCompareReadings(meterIDs, timeInterval) {
 export function fetchNeededBarReadings(timeInterval) {
 	return (dispatch, getState) => {
 		const state = getState();
-		const meterIDsToFetchForBar = state.graph.selectedMeters.filter(id => shouldFetchBarReadings(state, id, timeInterval, state.graph.barDuration, DATA_TYPE_METER));
+
+		// Determine which meters are missing data for this time interval
+		const meterIDsToFetchForBar = state.graph.selectedMeters.filter(
+			id => shouldFetchMeterBarReadings(state, id, timeInterval, state.graph.barDuration)
+		);
+		// Fetch data for any missing meters
 		if (meterIDsToFetchForBar.length > 0) {
-			return dispatch(fetchBarReadings(meterIDsToFetchForBar, timeInterval, DATA_TYPE_METER));
+			return dispatch(fetchMeterBarReadings(meterIDsToFetchForBar, timeInterval));
 		}
-		const groupIDsToFetchForBar = state.graph.selectedGroups.filter(id => shouldFetchBarReadings(state, id, timeInterval, state.graph.barDuration, DATA_TYPE_GROUP));
+
+		// Determine which groups are missing data for this time interval
+		const groupIDsToFetchForBar = state.graph.selectedGroups.filter(
+			id => shouldFetchGroupBarReadings(state, id, timeInterval, state.graph.barDuration)
+		);
+		// Fetch data for any missing groups
 		if (groupIDsToFetchForBar.length > 0) {
-			return dispatch(fetchBarReadings(groupIDsToFetchForBar, timeInterval, DATA_TYPE_GROUP));
+			return dispatch(fetchGroupBarReadings(groupIDsToFetchForBar, timeInterval));
 		}
 		return Promise.resolve();
 	};
