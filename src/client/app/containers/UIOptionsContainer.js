@@ -8,7 +8,6 @@ import UIOptionsComponent from '../components/UIOptionsComponent';
 import { changeSelectedMeters, changeSelectedGroups, changeBarDuration, changeChartToRender, changeBarStacking } from '../actions/graph';
 import { fetchMetersDetailsIfNeeded } from '../actions/meters';
 import { fetchGroupsDetailsIfNeeded } from '../actions/groups';
-import { DATA_TYPE_GROUP, DATA_TYPE_METER } from '../utils/Datasources';
 
 /**
  * @param {State} state
@@ -23,14 +22,12 @@ function mapStateToProps(state) {
 		selectedGroups: state.graph.selectedGroups.map(groupID => (
 			{
 				label: state.groups.byGroupID[groupID].name,
-				type: DATA_TYPE_GROUP,
 				value: groupID
 			}
 		)),
 		selectedMeters: state.graph.selectedMeters.map(meterID => (
 			{
 				label: state.meters.byMeterID[meterID].name,
-				type: DATA_TYPE_METER,
 				value: meterID
 			}
 		)),
