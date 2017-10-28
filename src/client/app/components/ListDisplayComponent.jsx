@@ -6,11 +6,29 @@
 import React from 'react';
 
 export default function ListDisplayComponent(props) {
+	const heightPx = (props.height || 8) * 18;
+	const listWrapperStyle = {
+		border: '1px solid #cccccc',
+		borderRadius: '2px',
+		minHeight: `${heightPx}px`,
+		maxHeight: `${heightPx}px`,
+		overflowY: 'scroll'
+	};
+
+	const listStyle = {
+		listStyleType: 'none',
+		paddingTop: '6px',
+		paddingBottom: '6px',
+		paddingLeft: '12px',
+		paddingRight: '12px',
+	};
 	return (
-		<select className="form-control" id="meterList" size={props.height || 8}>
-			{props.items.map((item, index) =>
-				<option key={index} disabled>{ item.toString() }</option>
-			)}
-		</select>
+		<div className="list-wrapper" style={listWrapperStyle} >
+			<ul id="meterList" style={listStyle} >
+				{props.items.map((item, index) =>
+					<li key={index} disabled>{ item.toString() }</li>
+				)}
+			</ul>
+		</div>
 	);
 }
