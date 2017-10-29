@@ -119,14 +119,14 @@ function fetchGroupBarReadings(groupIDs, timeInterval) {
 }
 
 function fetchCompareReadings(meterIDs, timeInterval) {
-    return (dispatch, getState) => {
-        const barDuration = getState().graph.compareDuration;
-        dispatch(requestBarReadings(meterIDs, timeInterval, barDuration));
-        const stringifiedMeterIDs = meterIDs.join(',');
-        return axios.get(`/api/readings/bar/${stringifiedMeterIDs}`, {
-            params: { timeInterval: timeInterval.toString(), barDuration: barDuration.toISOString() }
-        }).then(response => dispatch(receiveBarReadings(meterIDs, timeInterval, barDuration, response.data)));
-    };
+	return (dispatch, getState) => {
+		const barDuration = getState().graph.compareDuration;
+		dispatch(requestMeterBarReadings(meterIDs, timeInterval, barDuration));
+		const stringifiedMeterIDs = meterIDs.join(',');
+		return axios.get(`/api/readings/bar/meters/${stringifiedMeterIDs}`, {
+			params: { timeInterval: timeInterval.toString(), barDuration: barDuration.toISOString() }
+		}).then(response => dispatch(receiveMeterBarReadings(meterIDs, timeInterval, barDuration, response.data)));
+	};
 }
 
 /**
@@ -160,12 +160,12 @@ export function fetchNeededBarReadings(timeInterval) {
 }
 
 export function fetchNeededCompareReadings(timeInterval) {
-    return (dispatch, getState) => {
-        const state = getState();
-        const meterIDsToFetchForBar = state.graph.selectedMeters.filter(id => shouldFetchBarReadings(state, id, timeInterval, state.graph.compareDuration));
-        if (meterIDsToFetchForBar.length > 0) {
-            return dispatch(fetchCompareReadings(meterIDsToFetchForBar, timeInterval));
-        }
-        return Promise.resolve();
-    };
+	return (dispatch, getState) => {
+		const state = getState();
+		const meterIDsToFetchForBar = state.graph.selectedMeters.filter(id => shouldFetchMeterBarReadings(state, id, timeInterval, state.graph.compareDuration));
+		if (meterIDsToFetchForBar.length > 0) {
+			return dispatch(fetchCompareReadings(meterIDsToFetchForBar, timeInterval));
+		}
+		return Promise.resolve();
+	};
 }

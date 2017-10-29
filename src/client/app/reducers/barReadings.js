@@ -26,7 +26,6 @@ const defaultState = {
  * @return {State~Readings}
  */
 export default function readings(state = defaultState, action) {
-	console.log(action);
 	switch (action.type) {
 		case readingsActions.REQUEST_METER_BAR_READINGS: {
 			const timeInterval = action.timeInterval;

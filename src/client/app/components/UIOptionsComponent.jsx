@@ -43,7 +43,7 @@ export default class UIOptionsComponent extends React.Component {
 	 * @param {Object[]} selection An array of {label: string, value: {type: string, id: int}} representing the current selection
 	 */
 	handleMeterSelect(selection) {
-		this.props.selectMeters(selection);
+		this.props.selectMeters(selection.map(s => s.value));
 	}
 
 	/**
@@ -51,7 +51,7 @@ export default class UIOptionsComponent extends React.Component {
 	 * @param {Object[]} selection An array of {label: string, value: {type: string, id: int}} representing the current selection
 	 */
 	handleGroupSelect(selection) {
-		this.props.selectGroups(selection);
+		this.props.selectGroups(selection.map(s => s.value));
 	}
 
 	/**
