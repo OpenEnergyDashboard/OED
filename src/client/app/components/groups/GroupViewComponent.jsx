@@ -4,7 +4,7 @@
 
 import React from 'react';
 import { Button } from 'react-bootstrap';
-import DisplayComponent from '../DisplayComponent';
+import ListDisplayComponent from '../ListDisplayComponent';
 
 export default class GroupViewComponent extends React.Component {
 	constructor(props) {
@@ -38,11 +38,11 @@ export default class GroupViewComponent extends React.Component {
 				<div className="row">
 					<div className="col-xs-6">
 						<p style={boldStyle}>Child Meters:</p>
-						<DisplayComponent items={this.props.childMeters} />
+						<ListDisplayComponent items={this.props.childMeters} />
 					</div>
 					<div className="col-xs-6">
 						<p style={boldStyle}>Child Groups:</p>
-						<DisplayComponent items={this.props.childGroups} />
+						<ListDisplayComponent items={this.props.childGroups} />
 					</div>
 				</div>
 				<Button style={buttonPadding} bsStyle="default" onClick={this.handleEditGroup}>Edit group</Button>
