@@ -24,7 +24,11 @@ async function updateAllMeters() {
 			metersToUpdate
 				.map(readMamacData)
 				.map(p => p.catch(err => {
-					log(`ERROR ON REQUEST TO ${err.options.uri}, ${err.message}`, 'error');
+					let uri = '[NO URI AVAILABLE]';
+					if (err.options !== undefined && err.options.uri !== undefined) {
+						uri = err.options.uri;
+					}
+					log(`ERROR ON REQUEST TO ${uri}, ${err.message}`, 'error');
 					return null;
 				}))
 		), elem => elem !== null);
