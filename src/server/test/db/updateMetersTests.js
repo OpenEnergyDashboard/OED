@@ -17,33 +17,33 @@ const mocha = require('mocha');
 const sinon = require('sinon');
 
 
-async function testUpdateAllMeters() {
-	await recreateDB();
+mocha.describe('Meter Update', () => {
+	mocha.beforeEach(recreateDB);
+	mocha.it('can persist over a failed request', async () => {
+		const goodMeter = new Meter(undefined, 'GOOD', 1, true, Meter.type.MAMAC);
+		await goodMeter.insert();
 
-	const goodMeter = new Meter(undefined, 'GOOD', 1, true, Meter.type.MAMAC);
-	await goodMeter.insert();
+		const badMeter = new Meter(undefined, 'BAD', 2, true, Meter.type.MAMAC);
+		await badMeter.insert();
 
-	const badMeter = new Meter(undefined, 'BAD', 2, true, Meter.type.MAMAC);
-	await badMeter.insert();
+		const metersToUpdate = [goodMeter, badMeter];
 
-	const metersToUpdate = [goodMeter, badMeter];
+		const dataReader = sinon.stub();
+		dataReader.withArgs(goodMeter).resolves(new Reading(
+			goodMeter.id,
+			0,
+			moment('1970-01-01 00:00:00'),
+			moment('1970-01-01 01:00:00')
+		));
+		dataReader.withArgs(badMeter).rejects(new Error('Bland error message'));
+		dataReader.throws();
 
-	const dataReader = sinon.stub();
-	dataReader.withArgs(goodMeter).resolves(new Reading(
-		goodMeter.id,
-		0,
-		moment('1970-01-01 00:00:00'),
-		moment('1970-01-01 01:00:00')
-	));
-	dataReader.withArgs(badMeter).rejects(new Error('Bland error message'));
-	dataReader.throws();
+		await updateAllMeters(dataReader, metersToUpdate);
+		const goodReadings = await Reading.getAllByMeterID(goodMeter.id);
+		const badReadings = await Reading.getAllByMeterID(badMeter.id);
 
-	await updateAllMeters(dataReader, metersToUpdate);
-	const goodReadings = await Reading.getAllByMeterID(goodMeter.id);
-	const badReadings = await Reading.getAllByMeterID(badMeter.id);
+		expect(goodReadings.length).to.equal(1);
+		expect(badReadings.length).to.equal(0);
+	});
+});
 
-	expect(goodReadings.length).to.equal(1);
-	expect(badReadings.length).to.equal(0);
-}
-
-testUpdateAllMeters();
