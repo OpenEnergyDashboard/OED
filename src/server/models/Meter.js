@@ -86,7 +86,8 @@ class Meter {
 		if (meter.id !== undefined) {
 			throw new Error('Attempt to insert a meter that already has an ID');
 		}
-		await conn.none(sqlFile('meter/insert_new_meter.sql'), meter);
+		const resp = await conn.one(sqlFile('meter/insert_new_meter.sql'), meter);
+		this.id = resp.id;
 	}
 
 	/**
