@@ -1,4 +1,4 @@
-{ 
+{
   "name": "Open-Energy-Dashboard",
   "version": "0.0.0",
   "private": true,
@@ -70,6 +70,7 @@
     "mocha": "~3.5.3",
     "mock-require": "~2.0.2",
     "redux-devtools": "~3.4.0",
+	"sinon": "~4.0.2",
     "style-loader": "~0.19.0"
   }
 }
