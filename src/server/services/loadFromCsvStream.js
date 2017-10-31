@@ -15,7 +15,7 @@ const csv = require('csv');
  *     &#9;stream,
  *     &#9;row => new Reading(...),
  *     &#9;(readings, tx) => Reading.insertAll(readings, tx)
- * ).then(() => console.log('Inserted!'));
+ * ).then(() => log('Inserted!'));
  * @param stream the raw stream to load from
  * @param {function(Array.<*>, ...*): M} mapRowToModel A function that maps a CSV row (an array) to a model object
  * @param {function(Array.<M>, ITask): Promise<>} bulkInsertModels A function that bulk inserts an array of models using the supplied transaction

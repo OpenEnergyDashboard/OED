@@ -1,11 +1,13 @@
-{
+{ 
   "name": "Open-Energy-Dashboard",
   "version": "0.0.0",
   "private": true,
+  "license": "MPL-2.0",
   "scripts": {
     "start": "node ./src/bin/www",
     "dev": "webpack -d --watch --color --progress",
     "build": "cross-env NODE_ENV=production webpack -p",
+    "checkHeader": "./src/scripts/checkHeader.sh",
     "lint": "./node_modules/.bin/eslint src/client/app/**/*.js src/client/app/**/*.jsx src/server/**/*.js src/server/**/*.jsx src/scripts/**/*.js",
     "test": "./node_modules/.bin/mocha \"src/server/test/**/*.js\"",
     "createdb": "node ./src/scripts/createDB.js",
@@ -28,7 +30,6 @@
     "cookie-parser": "~1.4.3",
     "cross-env": "~5.0.5",
     "csv": "~1.1.1",
-    "debug": "~2.2.0",
     "dotenv": "~2.0.0",
     "es6-promisify": "~5.0.0",
     "express": "~4.13.4",
