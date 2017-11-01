@@ -9,6 +9,7 @@ import meters from './meters';
 import lineReadings from './lineReadings';
 import barReadings from './barReadings';
 import graph from './graph';
+import admin from './admin';
 import notifications from './notifications';
 
 /**
@@ -25,4 +26,4 @@ import notifications from './notifications';
  * @param action
  * @return {State}
  */
-export default combineReducers({ meters, readings: combineReducers({ line: lineReadings, bar: barReadings }), graph, notifications });
+export default combineReducers({ meters, readings: combineReducers({ line: lineReadings, bar: barReadings }), graph, notifications, admin });

@@ -5,29 +5,16 @@
 import React from 'react';
 import { Router, Route, browserHistory } from 'react-router';
 import axios from 'axios';
-import _ from 'lodash';
-import NotificationSystem from 'react-notification-system';
 import HomeComponent from './HomeComponent';
 import LoginContainer from '../containers/LoginContainer';
-import AdminComponent from './AdminComponent';
+import AdminContainer from '../containers/AdminContainer';
+import InitializationContainer from '../containers/InitializationContainer';
 import NotFoundComponent from './NotFoundComponent';
 
 export default class RouteComponent extends React.Component {
 	constructor(props) {
 		super(props);
 		this.requireAuth = this.requireAuth.bind(this);
-	}
-
-	shouldComponentUpdate() {
-		// To ignore warning: [react-router] You cannot change 'Router routes'; it will be ignored
-		return false;
-	}
-
-	componentWillReceiveProps(nextProps) {
-		if (!_.isEmpty(nextProps.notification)) {
-			this.notificationSystem.addNotification(nextProps.notification);
-			this.props.clearNotifications();
-		}
 	}
 
 	/**
@@ -66,11 +53,11 @@ export default class RouteComponent extends React.Component {
 	render() {
 		return (
 			<div>
-				<NotificationSystem ref={c => { this.notificationSystem = c; }} />
+				<InitializationContainer />
 				<Router history={browserHistory}>
 					<Route path="/" component={HomeComponent} />
 					<Route path="/login" component={LoginContainer} />
-					<Route path="/admin" component={AdminComponent} onEnter={this.requireAuth} />
+					<Route path="/admin" component={AdminContainer} onEnter={this.requireAuth} />
 					<Route path="*" component={NotFoundComponent} />
 				</Router>
 			</div>
