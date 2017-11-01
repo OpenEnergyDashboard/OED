@@ -8,13 +8,11 @@ import axios from 'axios';
 import MeterDropDownContainer from '../containers/MeterDropdownContainer';
 import HeaderContainer from '../containers/HeaderContainer';
 
-
 export default class AdminComponent extends React.Component {
 	constructor(props) {
 		super(props);
 		this.handleOnDrop = this.handleOnDrop.bind(this);
 	}
-
 
 	handleOnDrop(files) {
 		const file = files[0];

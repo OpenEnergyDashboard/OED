@@ -1,3 +1,7 @@
+/* This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this
+ * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
+
 const express = require('express');
 const Reading = require('../models/Reading');
 const moment = require('moment');
@@ -12,8 +16,6 @@ const router = express.Router();
 const upload = multer({ storage: multer.memoryStorage() });
 router.post('/:meter_id', upload.single('csvFile'), async (req, res) => {
 	const id = parseInt(req.params.meter_id);
-	console.log(`ID: ${id}`);
-	console.log(`Retrieved meter id: ${id}`);
 	try {
 		const data = await readCSVFromString(req.file.buffer.toString('utf8'));
 		const myReadableStreamBuffer = new streamBuffers.ReadableStreamBuffer({
@@ -23,12 +25,9 @@ router.post('/:meter_id', upload.single('csvFile'), async (req, res) => {
 		myReadableStreamBuffer.put(req.file.buffer);
 		myReadableStreamBuffer.stop();
 		const transaction = streamToDB(myReadableStreamBuffer, row => {
-			//	const readRate = parseInt(row[0]);
-			//	const endTimestamp = moment(row[1], 'HH:mm:ss MM/DD/YYYY');
 			const readRate = parseInt(row[0]);
 			const endTimestamp = moment(row[1], 'MM/DD/YYYY HH:mm');
 			const startTimestamp = moment(row[1], 'MM/DD/YYYY HH:mm').subtract(60, 'minutes');
-			console.log(startTimestamp);
 			const reading = new Reading(id, readRate, startTimestamp, endTimestamp);
 			return reading;
 		}, (readings, tx) => {
@@ -37,8 +36,6 @@ router.post('/:meter_id', upload.single('csvFile'), async (req, res) => {
 			});
 		});
 		try { await transaction;
-
-			console.log("DONE");
 			res.status(200).json({success: true});
 		}
 		catch(e) {
@@ -46,11 +43,11 @@ router.post('/:meter_id', upload.single('csvFile'), async (req, res) => {
 			res.status(403).json({ success: false, message: 'Failed to upload data.' });
 		}
 	} catch (err) {
-		console.log("undone2");
 		res.status(400).send({
 			success: false,
 			message: 'Incorrect file type.'
 		});
 	}
 });
+
 module.exports = router;
