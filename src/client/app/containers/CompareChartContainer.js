@@ -14,7 +14,7 @@ import datalabels from 'chartjs-plugin-datalabels';
 /**
  * @param {State} state
  */
-function mapStateToProps(state) {
+function mapStateToProps(state, ownProps) {
 	const timeInterval = state.graph.compareTimeInterval;
 	const barDuration = state.graph.compareDuration;
 	const data = { datasets: [] };
@@ -27,12 +27,12 @@ function mapStateToProps(state) {
 	let currentLastWeek = 0;
 	const soFar = moment().diff(moment().startOf('week'), 'days');
 	const delta = change => {
-		if (isNaN(change)) return ''; if (change < 0) return `${state.meters.byMeterID[state.graph.selectedMeters].name} has used ${parseInt(change.toFixed(2).replace('.', '').slice(1), 10)}% less energy this week.`;
-		return `${state.meters.byMeterID[state.graph.selectedMeters].name} has used ${parseInt(change.toFixed(2).replace('.', ''), 10)}% more energy this week.`;
+		if (isNaN(change)) return ''; if (change < 0) return `${state.meters.byMeterID[ownProps.id].name} has used ${parseInt(change.toFixed(2).replace('.', '').slice(1), 10)}% less energy this week.`;
+		return `${state.meters.byMeterID[ownProps.id].name} has used ${parseInt(change.toFixed(2).replace('.', ''), 10)}% more energy this week.`;
 	};
 	const colorize = change => { if (change < 0) return 'green'; return 'red'; };
-	for (const meterID of state.graph.selectedMeters) {
-		const readingsData = state.readings.bar.byMeterID[meterID][timeInterval][barDuration];
+	//for (const meterID of state.graph.selectedMeters) {
+		const readingsData = state.readings.bar.byMeterID[ownProps.id][timeInterval][barDuration];
 		if (readingsData !== undefined && !readingsData.isFetching) {
 			// Sunday needs special logic
 			if (soFar !== 0) {
@@ -83,7 +83,6 @@ function mapStateToProps(state) {
 			// sorts the data so that one doesn't cover up the other
 			data.datasets.sort((a, b) => a.data[0] - b.data[0]);
 		}
-	}
 	data.labels = labels;
 
 	const options = {
@@ -135,6 +134,7 @@ function mapStateToProps(state) {
 			},
 		}
 	};
+
 
 	return {
 		data,

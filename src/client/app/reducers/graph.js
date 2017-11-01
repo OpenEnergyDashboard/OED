@@ -50,13 +50,6 @@ export default function graph(state = defaultState, action) {
 				timeInterval: action.timeInterval
 			};
 		case graphActions.CHANGE_CHART_TO_RENDER:
-			if (action.chartType === 'compare') {
-				return {
-					...state,
-					selectedMeters: [],
-					chartToRender: action.chartType
-				};
-			}
 			return {
 				...state,
 				chartToRender: action.chartType
