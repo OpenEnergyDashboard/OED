@@ -9,12 +9,12 @@ chai.use(chaiAsPromised);
 const expect = chai.expect;
 
 const recreateDB = require('./common').recreateDB;
-const db = require('../../models/database').db;
 const Meter = require('../../models/Meter');
 
 const mocha = require('mocha');
 
 function expectMetersToBeEquivalent(expected, actual) {
+	expect(actual).to.have.property('id', expected.id);
 	expect(actual).to.have.property('name', expected.name);
 	expect(actual).to.have.property('enabled', expected.enabled);
 	expect(actual).to.have.property('type', expected.type);
@@ -27,8 +27,7 @@ mocha.describe('Meters', () => {
 		await meterPreInsert.insert();
 		const meterPostInsertByName = await Meter.getByName(meterPreInsert.name);
 		expectMetersToBeEquivalent(meterPreInsert, meterPostInsertByName);
-		// Need to get ID this way because preInsert doesn't have one
-		const meterPostInsertByID = await Meter.getByID(meterPostInsertByName.id);
+		const meterPostInsertByID = await Meter.getByID(meterPreInsert.id);
 		expectMetersToBeEquivalent(meterPreInsert, meterPostInsertByID);
 	});
 
