@@ -22,30 +22,35 @@ router.post('/:meter_id', upload.single('csvFile'), async (req, res) => {
 		});
 		myReadableStreamBuffer.put(req.file.buffer);
 		myReadableStreamBuffer.stop();
-		// TODO ensure that we are getting Readings appropriately.
 		const transaction = streamToDB(myReadableStreamBuffer, row => {
-			// change the type of file being read. So, my guess is I need to change the content here.
-			// MAMAC Sample log file.
-
+			//	const readRate = parseInt(row[0]);
+			//	const endTimestamp = moment(row[1], 'HH:mm:ss MM/DD/YYYY');
 			const readRate = parseInt(row[0]);
-			const endTimestamp = moment(row[1], 'HH:mm:ss MM/DD/YYYY');
-			const startTimestamp = moment(row[1], 'HH:mm:ss MM/DD/YYYY').subtract(60, 'minutes');
-			// console.log(`readRate: ${readRate}`)
+			const endTimestamp = moment(row[1], 'MM/DD/YYYY HH:mm');
+			const startTimestamp = moment(row[1], 'MM/DD/YYYY HH:mm').subtract(60, 'minutes');
+			console.log(startTimestamp);
 			const reading = new Reading(id, readRate, startTimestamp, endTimestamp);
-			// console.log(`Inserting a reading: ${reading.toString()}`);
 			return reading;
-			// TODO Fix the third paramter, Simon will know.
 		}, (readings, tx) => {
-			return Reading.insertAll(readings, tx).then(() => {console.log("Completed")});
+			return Reading.insertOrUpdateAll(readings, tx).then(() => {
+				console.log("Completed")
+			});
 		});
-		transaction.then(() => {
-			res.status(200);
-		});
+		try { await transaction;
+
+			console.log("DONE");
+			res.status(200).json({success: true});
+		}
+		catch(e) {
+			console.log(e);
+			res.status(403).json({ success: false, message: 'Failed to upload data.' });
+		}
 	} catch (err) {
-		res.status(400).send({ text: 'Invalid file.' });
-		console.log('it broke, fix it.');
-		console.log(err);
+		console.log("undone2");
+		res.status(400).send({
+			success: false,
+			message: 'Incorrect file type.'
+		});
 	}
 });
-
 module.exports = router;
