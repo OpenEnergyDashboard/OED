@@ -68,7 +68,9 @@ function fetchCompareReadings(meterIDs, timeInterval) {
 export function fetchNeededBarReadings(timeInterval) {
 	return (dispatch, getState) => {
 		const state = getState();
-		const meterIDsToFetchForBar = state.graph.selectedMeters.filter(id => shouldFetchBarReadings(state, id, timeInterval, state.graph.barDuration));
+		const meterIDsToFetchForBar = state.graph.selectedMeters.filter(
+			id => shouldFetchBarReadings(state, id, timeInterval, state.graph.barDuration)
+		);
 		if (meterIDsToFetchForBar.length > 0) {
 			return dispatch(fetchBarReadings(meterIDsToFetchForBar, timeInterval));
 		}
@@ -79,7 +81,9 @@ export function fetchNeededBarReadings(timeInterval) {
 export function fetchNeededCompareReadings(timeInterval) {
     return (dispatch, getState) => {
         const state = getState();
-        const meterIDsToFetchForBar = state.graph.selectedMeters.filter(id => shouldFetchBarReadings(state, id, timeInterval, state.graph.compareDuration));
+        const meterIDsToFetchForBar = state.graph.selectedMeters.filter(
+			id => shouldFetchBarReadings(state, id, timeInterval, state.graph.compareDuration)
+		);
         if (meterIDsToFetchForBar.length > 0) {
             return dispatch(fetchCompareReadings(meterIDsToFetchForBar, timeInterval));
         }

@@ -5,13 +5,13 @@
  */
 
 import { connect } from 'react-redux';
-import RouteComponent from '../components/RouteComponent';
 import { clearNotifications } from '../actions/notifications';
+import RouteComponent from '../components/RouteComponent';
 
 
 function mapStateToProps(state) {
 	return {
-		notification: state.notifications.notification,
+		notification: state.notifications.notification
 	};
 }
 

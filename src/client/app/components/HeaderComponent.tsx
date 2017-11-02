@@ -3,8 +3,8 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
 
 import * as React from 'react';
-import { Link } from 'react-router';
 import { Button } from 'react-bootstrap';
+import { Link } from 'react-router';
 import LogoComponent from './LogoComponent';
 import UIModalComponent from './UIModalComponent';
 

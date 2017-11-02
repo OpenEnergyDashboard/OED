@@ -4,9 +4,9 @@
 
 import * as _ from 'lodash';
 import { connect } from 'react-redux';
-import UIOptionsComponent from '../components/UIOptionsComponent';
-import { changeSelectedMeters, changeBarDuration, changeChartToRender, changeBarStacking } from '../actions/graph';
+import { changeBarDuration, changeBarStacking, changeChartToRender, changeSelectedMeters } from '../actions/graph';
 import { fetchMetersDetailsIfNeeded } from '../actions/meters';
+import UIOptionsComponent from '../components/UIOptionsComponent';
 
 /**
  * @param {State} state

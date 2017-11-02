@@ -3,8 +3,8 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
 
 import { connect } from 'react-redux';
-import LoginComponent from '../components/LoginComponent';
 import { showNotification } from '../actions/notifications';
+import LoginComponent from '../components/LoginComponent';
 
 function mapDispatchToProps(dispatch) {
 	return {

@@ -9,6 +9,7 @@
     "build": "cross-env NODE_ENV=production webpack -p",
     "checkHeader": "./src/scripts/checkHeader.sh",
     "lint": "./node_modules/.bin/eslint src/client/app/**/*.js src/client/app/**/*.jsx src/server/**/*.js src/server/**/*.jsx src/scripts/**/*.js",
+    "tslint": "./node_modules/.bin/tslint -c tslint.json src/**/*.{ts,tsx}",
     "test": "./node_modules/.bin/mocha \"src/server/test/**/*.js\"",
     "createdb": "node ./src/scripts/createDB.js",
     "addMamacMeters": "node ./src/scripts/addMamacMeters.js",
@@ -72,9 +73,11 @@
     "mocha": "~3.5.3",
     "mock-require": "~2.0.2",
     "redux-devtools": "~3.4.0",
+    "sinon": "~4.0.2",
     "source-map-loader": "~0.2.3",
     "style-loader": "~0.19.0",
-    "typescript": "~2.6.1",
-    "sinon": "~4.0.2"
+    "tslint": "~5.8.0",
+    "tslint-react": "~3.2.0",
+    "typescript": "~2.6.1"
   }
 }

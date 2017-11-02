@@ -3,16 +3,14 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
 
 import * as React from 'react';
-import { Modal, Button } from 'react-bootstrap';
+import { Button, Modal } from 'react-bootstrap';
 import UIOptionsContainer from '../containers/UIOptionsContainer';
 
-interface UIModalProps {}
-
 interface UIModalState {
-	showModal: boolean,
+	showModal: boolean;
 }
 
-export default class UIModalComponent extends React.Component<UIModalProps, UIModalState> {
+export default class UIModalComponent extends React.Component<{}, UIModalState> {
 
 	constructor(props) {
 		super(props);
@@ -21,15 +19,15 @@ export default class UIModalComponent extends React.Component<UIModalProps, UIMo
 		this.state = { showModal: false };
 	}
 
-	openModal() {
+	public openModal() {
 		this.setState({ showModal: true });
 	}
 
-	closeModal() {
+	public closeModal() {
 		this.setState({ showModal: false });
 	}
 
-	render() {
+	public render() {
 		const inlineStyle = {
 			display: 'inline'
 		};

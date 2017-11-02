@@ -11,8 +11,8 @@ import * as graphActions from '../actions/graph';
 export enum chartTypes {
 	line = 'line',
 	bar = 'bar',
-	compare = 'compare',
-};
+	compare = 'compare'
+}
 
 /**
  * @type {State~Graph}

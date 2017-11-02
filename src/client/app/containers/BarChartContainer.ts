@@ -5,8 +5,8 @@
  */
 
 import * as _ from 'lodash';
-import { Bar } from 'react-chartjs-2';
 import * as moment from 'moment';
+import { Bar } from 'react-chartjs-2';
 import { connect } from 'react-redux';
 import getGraphColor from '../utils/getGraphColor';
 
@@ -22,7 +22,7 @@ function mapStateToProps(state) {
 	for (const meterID of state.graph.selectedMeters) {
 		const readingsData = state.readings.bar.byMeterID[meterID][timeInterval][barDuration];
 		if (readingsData !== undefined && !readingsData.isFetching) {
-			const label = state.meters.byMeterID[meterID].name
+			const label = state.meters.byMeterID[meterID].name;
 			const color = getGraphColor(label);
 			data.datasets.push({
 				label,
@@ -40,7 +40,7 @@ function mapStateToProps(state) {
 	data.labels = Array.from(labelsSet).sort((x, y) => {
 		const t1 = moment(x.split(' - ')[0], 'MMM DD, YYYY').format('x');
 		const t2 = moment(y.split(' - ')[0], 'MMM DD, YYYY').format('x');
-		return +(t1) - +(t2);}); 
+		return +(t1) - +(t2); });
 
 	const options = {
 		animation: {

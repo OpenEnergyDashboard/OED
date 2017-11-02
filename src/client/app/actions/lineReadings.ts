@@ -53,7 +53,9 @@ function fetchLineReadings(meterIDs, timeInterval) {
 export function fetchNeededLineReadings(timeInterval) {
 	return (dispatch, getState) => {
 		const state = getState();
-		const meterIDsToFetchForLine = state.graph.selectedMeters.filter(id => shouldFetchLineReadings(state, id, timeInterval));
+		const meterIDsToFetchForLine = state.graph.selectedMeters.filter(
+			id => shouldFetchLineReadings(state, id, timeInterval)
+		);
 		if (meterIDsToFetchForLine.length > 0) {
 			return dispatch(fetchLineReadings(meterIDsToFetchForLine, timeInterval));
 		}

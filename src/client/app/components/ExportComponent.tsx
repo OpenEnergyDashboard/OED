@@ -2,12 +2,12 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
 
+import * as moment from 'moment';
 import * as React from 'react';
 import { Button } from 'react-bootstrap';
-import * as moment from 'moment';
 import graphExport from '../services/exportData';
 
-export default function ExportComponent (props) {
+export default function ExportComponent(props) {
 	/**
 	 * Called when Export button is clicked.
 	 * Passes an object containing the selected meter data to a function for export.
@@ -25,4 +25,4 @@ export default function ExportComponent (props) {
 			<Button bsStyle="default" onClick={exportReading}>Export graph data</Button>
 		</div>
 	);
-};
+}

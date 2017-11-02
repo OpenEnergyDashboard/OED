@@ -5,10 +5,10 @@
  */
 
 import { combineReducers } from 'redux';
-import meters from './meters';
-import lineReadings from './lineReadings';
 import barReadings from './barReadings';
 import graph from './graph';
+import lineReadings from './lineReadings';
+import meters from './meters';
 import notifications from './notifications';
 
 /**

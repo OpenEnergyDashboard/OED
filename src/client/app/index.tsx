@@ -3,16 +3,17 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
 
 import * as React from 'react';
-import thunkMiddleware from 'redux-thunk';
 import { render } from 'react-dom';
-import { createStore, applyMiddleware, compose, GenericStoreEnhancer } from 'redux';
 import { Provider } from 'react-redux';
+import { applyMiddleware, compose, createStore, GenericStoreEnhancer } from 'redux';
+import thunkMiddleware from 'redux-thunk';
 import RouteContainer from './containers/RouteContainer';
 import reducers from './reducers';
 
 // This sets up the redux-devtools extension (if it's installed in the browser).
 // https://github.com/zalmoxisus/redux-devtools-extension
 /* eslint-disable no-underscore-dangle */
+// tslint:disable-next-line no-string-literal
 const composeEnhancers = window["__REDUX_DEVTOOLS_EXTENSION_COMPOSE__"] || compose;
 /* eslint-enable */
 

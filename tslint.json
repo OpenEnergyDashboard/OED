@@ -1,0 +1,23 @@
+{
+    "defaultSeverity": "error",
+    "extends": [
+        "tslint:recommended",
+        "tslint-react"
+    ],
+    "jsRules": {},
+    "rules": {
+        "indent": "tabs",
+        "max-line-length": [true, 150],
+        "quotemark": ["single", "avoid-escape", "avoid-template"],
+        "trailing-comma": [true, {"multiline": "never", "singleline": "never"}],
+        "no-consecutive-blank-lines": [false],
+        "arrow-parens": [true, "ban-single-arg-parens"],
+        "interface-name": false,
+        "object-literal-sort-keys": false,
+        "radix": false,
+        "jsx-wrap-multiline": false,
+        "jsx-boolean-value": [true, "never"],
+        "jsx-no-multiline-js": false
+    },
+    "rulesDirectory": []
+}

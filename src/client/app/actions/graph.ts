@@ -4,9 +4,9 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/.
  */
 
-import { fetchNeededLineReadings } from './lineReadings';
-import { fetchNeededBarReadings, fetchNeededCompareReadings } from './barReadings';
 import * as TimeInterval from '../../../common/TimeInterval';
+import { fetchNeededBarReadings, fetchNeededCompareReadings } from './barReadings';
+import { fetchNeededLineReadings } from './lineReadings';
 
 export const UPDATE_SELECTED_METERS = 'UPDATE_SELECTED_METERS';
 export const UPDATE_BAR_DURATION = 'UPDATE_BAR_DURATION';

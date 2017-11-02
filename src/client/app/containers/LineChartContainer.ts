@@ -4,8 +4,8 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/.
  */
 
-import { Line } from 'react-chartjs-2';
 import * as moment from 'moment';
+import { Line } from 'react-chartjs-2';
 import { connect } from 'react-redux';
 import getGraphColor from '../utils/getGraphColor';
 

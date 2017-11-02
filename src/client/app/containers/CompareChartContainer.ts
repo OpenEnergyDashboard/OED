@@ -4,11 +4,11 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/.
  */
 
-import * as _ from 'lodash';
-import { Bar } from 'react-chartjs-2';
-import * as moment from 'moment';
-import { connect } from 'react-redux';
 import datalabels from 'chartjs-plugin-datalabels';
+import * as _ from 'lodash';
+import * as moment from 'moment';
+import { Bar } from 'react-chartjs-2';
+import { connect } from 'react-redux';
 
 
 /**
@@ -27,10 +27,17 @@ function mapStateToProps(state) {
 	let currentLastWeek = 0;
 	const soFar = moment().diff(moment().startOf('week'), 'days');
 	const delta = change => {
-		if (isNaN(change)) return ''; if (change < 0) return `${state.meters.byMeterID[state.graph.selectedMeters].name} has used ${parseInt(change.toFixed(2).replace('.', '').slice(1), 10)}% less energy this week.`;
-		return `${state.meters.byMeterID[state.graph.selectedMeters].name} has used ${parseInt(change.toFixed(2).replace('.', ''), 10)}% more energy this week.`;
+		if (isNaN(change)) {
+			return '';
+		}
+
+		const name = state.meters.byMeterID[state.graph.selectedMeters].name;
+		if (change < 0) {
+			return `${name} has used ${parseInt(change.toFixed(2).replace('.', '').slice(1), 10)}% less energy this week.`;
+		}
+		return `${name} has used ${parseInt(change.toFixed(2).replace('.', ''), 10)}% more energy this week.`;
 	};
-	const colorize = change => { if (change < 0) return 'green'; return 'red'; };
+	const colorize = change => { if (change < 0) { return 'green'; } return 'red'; };
 	for (const meterID of state.graph.selectedMeters) {
 		const readingsData = state.readings.bar.byMeterID[meterID][timeInterval][barDuration];
 		if (readingsData !== undefined && !readingsData.isFetching) {
@@ -68,7 +75,7 @@ function mapStateToProps(state) {
 				hoverBackgroundColor: [color1, color3],
 				datalabels: {
 					anchor: 'end',
-					align: 'start',
+					align: 'start'
 				}
 			},
 				{
@@ -77,7 +84,7 @@ function mapStateToProps(state) {
 					hoverBackgroundColor: color2,
 					datalabels: {
 						anchor: 'end',
-						align: 'start',
+						align: 'start'
 					}
 				});
 			// sorts the data so that one doesn't cover up the other
@@ -132,7 +139,7 @@ function mapStateToProps(state) {
 				},
 				display: true,
 				formatter: value => `${value} kWh`
-			},
+			}
 		}
 	};
 
