@@ -8,7 +8,7 @@ import HeaderComponent from '../components/HeaderComponent';
 function mapStateToProps(state, ownProps) {
 	return {
 		renderLoginButton: ownProps.renderLoginButton,
-		renderOptionsButton: ownProps.renderOptionsButton,
+		renderOptionsButton: ownProps.renderOptionsButton
 	};
 }
 

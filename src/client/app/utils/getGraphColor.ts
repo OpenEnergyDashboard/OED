@@ -24,7 +24,9 @@ export default function getGraphColor(label) {
 	let hash = 0;
 	if (label.length !== 0) {
 		for (let i = 0; i < label.length; i++) {
+			// tslint:disable-next-line no-bitwise
 			hash = label.charCodeAt(i) + ((hash << 5) - hash); // eslint-disable-line no-bitwise
+			// tslint:disable-next-line no-bitwise
 			hash &= hash; // eslint-disable-line no-bitwise
 		}
 		hash = Math.abs(hash);

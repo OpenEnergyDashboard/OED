@@ -2,11 +2,11 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
 
-import _ from 'lodash';
+import * as _ from 'lodash';
 import { connect } from 'react-redux';
-import UIOptionsComponent from '../components/UIOptionsComponent';
-import { changeSelectedMeters, changeBarDuration, changeChartToRender, changeBarStacking } from '../actions/graph';
+import { changeBarDuration, changeBarStacking, changeChartToRender, changeSelectedMeters } from '../actions/graph';
 import { fetchMetersDetailsIfNeeded } from '../actions/meters';
+import UIOptionsComponent from '../components/UIOptionsComponent';
 
 /**
  * @param {State} state

@@ -7,7 +7,7 @@ import DashboardComponent from '../components/DashboardComponent';
 
 function mapStateToProps(state) {
 	return {
-		chartToRender: state.graph.chartToRender,
+		chartToRender: state.graph.chartToRender
 	};
 }
 

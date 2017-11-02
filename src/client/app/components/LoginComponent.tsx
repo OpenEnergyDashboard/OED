@@ -2,12 +2,26 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
 
-import React from 'react';
 import axios from 'axios';
+import * as React from 'react';
 import { browserHistory } from 'react-router';
 import HeaderComponent from '../components/HeaderComponent';
 
-export default class LoginComponent extends React.Component {
+interface NotificationSpec {
+	message: string; level: string; position: string; autoDismiss: number;
+}
+
+interface LoginState {
+	email: string;
+	password: string;
+}
+
+interface LoginProps {
+	showNotification: (NotificationSpec) => null;
+}
+
+export default class LoginComponent extends React.Component<LoginProps, LoginState> {
+	public inputEmail: HTMLInputElement;
 	/**
 	 * Initializes the component's state to include email (email users use to login) and password (corresponding to their email)
 	 * Binds the functions to 'this' LoginComponent
@@ -24,7 +38,7 @@ export default class LoginComponent extends React.Component {
 	 * Sets the email state whenever the user changes the email input field
 	 * @param e The event fired
 	 */
-	handleEmailChange(e) {
+	public handleEmailChange(e) {
 		this.setState({ email: e.target.value });
 	}
 
@@ -32,7 +46,7 @@ export default class LoginComponent extends React.Component {
 	 * Sets the password state whenever the user changes the password input field
 	 * @param e The event fired
 	 */
-	handlePasswordChange(e) {
+	public handlePasswordChange(e) {
 		this.setState({ password: e.target.value });
 	}
 
@@ -41,7 +55,7 @@ export default class LoginComponent extends React.Component {
 	 * If the request is successful, the JWT auth token is stored in local storage and the app routes to the admin page
 	 * @param e The event fired
 	 */
-	handleSubmit(e) {
+	public handleSubmit(e) {
 		e.preventDefault();
 		axios.post('/api/login/', {
 			email: this.state.email,
@@ -62,7 +76,8 @@ export default class LoginComponent extends React.Component {
 			} else {
 				// If there was a problem other than a lack of authorization, the user can't fix it.
 				// Log it to the console for developer use.
-				console.error(err); // eslint-disable-line no-console
+				// tslint:disable-next-line no-console
+				console.error(err);
 			}
 			this.inputEmail.focus();
 
@@ -73,7 +88,7 @@ export default class LoginComponent extends React.Component {
 	/**
 	 * @return JSX to create the login panel
 	 */
-	render() {
+	public render() {
 		const formStyle = {
 			maxWidth: '500px',
 			margin: 'auto',
@@ -88,7 +103,14 @@ export default class LoginComponent extends React.Component {
 				<form style={formStyle} onSubmit={this.handleSubmit}>
 					<div className="input-group">
 						<span className="input-group-addon"><i className="glyphicon glyphicon-user" /></span>
-						<input type="text" className="form-control" placeholder="Email" ref={c => { this.inputEmail = c; }} value={this.state.email} onChange={this.handleEmailChange} />
+						<input
+							type="text"
+							className="form-control"
+							placeholder="Email"
+							ref={c => { this.inputEmail = c; }}
+							value={this.state.email}
+							onChange={this.handleEmailChange}
+						/>
 					</div>
 					<div className="input-group">
 						<span className="input-group-addon"><i className="glyphicon glyphicon-lock" /></span>

@@ -4,8 +4,9 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/.
  */
 
-import { fetchNeededLineReadings } from './lineReadings';
+import TimeInterval from '../../../common/TimeInterval';
 import { fetchNeededBarReadings, fetchNeededCompareReadings } from './barReadings';
+import { fetchNeededLineReadings } from './lineReadings';
 
 export const UPDATE_SELECTED_METERS = 'UPDATE_SELECTED_METERS';
 export const UPDATE_BAR_DURATION = 'UPDATE_BAR_DURATION';
@@ -71,7 +72,7 @@ function shouldChangeGraphZoom(state, timeInterval) {
 
 export function changeGraphZoomIfNeeded(timeInterval) {
 	return (dispatch, getState) => {
-		if (shouldChangeGraphZoom(getState())) {
+		if (shouldChangeGraphZoom(getState(), TimeInterval.unbounded())) {
 			dispatch(changeGraphZoom(timeInterval));
 			dispatch(fetchNeededReadingsForGraph(timeInterval));
 		}

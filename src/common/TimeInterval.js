@@ -4,6 +4,10 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/.
  */
 
+/* eslint-disable spaced-comment */
+///<reference path="./TimeInterval.d.ts" />
+/* eslint-enable spaced-comment */
+
 const moment = require('moment');
 
 class TimeInterval {

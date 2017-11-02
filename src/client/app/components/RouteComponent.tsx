@@ -2,28 +2,34 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
 
-import React from 'react';
-import { Router, Route, browserHistory } from 'react-router';
 import axios from 'axios';
-import _ from 'lodash';
-import NotificationSystem from 'react-notification-system';
-import HomeComponent from './HomeComponent';
+import * as _ from 'lodash';
+import * as React from 'react';
+import * as NotificationSystem from 'react-notification-system';
+import { browserHistory, Route, Router } from 'react-router';
 import LoginContainer from '../containers/LoginContainer';
 import AdminComponent from './AdminComponent';
+import HomeComponent from './HomeComponent';
 import NotFoundComponent from './NotFoundComponent';
 
-export default class RouteComponent extends React.Component {
+interface RouteProps {
+	clearNotifications: () => null;
+}
+
+export default class RouteComponent extends React.Component<RouteProps, {}> {
+	public notificationSystem: NotificationSystem.System;
+
 	constructor(props) {
 		super(props);
 		this.requireAuth = this.requireAuth.bind(this);
 	}
 
-	shouldComponentUpdate() {
+	public shouldComponentUpdate() {
 		// To ignore warning: [react-router] You cannot change 'Router routes'; it will be ignored
 		return false;
 	}
 
-	componentWillReceiveProps(nextProps) {
+	public componentWillReceiveProps(nextProps) {
 		if (!_.isEmpty(nextProps.notification)) {
 			this.notificationSystem.addNotification(nextProps.notification);
 			this.props.clearNotifications();
@@ -35,7 +41,7 @@ export default class RouteComponent extends React.Component {
 	 * @param nextState The next state of the router
 	 * @param replace Function that allows a route redirect
 	 */
-	requireAuth(nextState, replace) {
+	public requireAuth(nextState, replace) {
 		function redirectRoute() {
 			replace({
 				pathname: '/login',
@@ -52,7 +58,7 @@ export default class RouteComponent extends React.Component {
 		axios.post('/api/verification/', { token }, { validateStatus: status => (status >= 200 && status < 300) || (status === 401 || status === 403) })
 			.then(res => {
 				// Route to login page if the auth token is not valid
-				if (!res.data.success) browserHistory.push('/login');
+				if (!res.data.success) { browserHistory.push('/login'); }
 			})
 			// In the case of a server error, the user can't fix the issue. Log it for developers.
 			.catch(console.error); // eslint-disable-line no-console
@@ -63,7 +69,7 @@ export default class RouteComponent extends React.Component {
 	 * Note that '/admin' requires authentication
 	 * @returns JSX to create the RouteComponent
 	 */
-	render() {
+	public render() {
 		return (
 			<div>
 				<NotificationSystem ref={c => { this.notificationSystem = c; }} />

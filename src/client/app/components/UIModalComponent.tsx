@@ -2,11 +2,15 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
 
-import React from 'react';
-import { Modal, Button } from 'react-bootstrap';
+import * as React from 'react';
+import { Button, Modal } from 'react-bootstrap';
 import UIOptionsContainer from '../containers/UIOptionsContainer';
 
-export default class UIModalComponent extends React.Component {
+interface UIModalState {
+	showModal: boolean;
+}
+
+export default class UIModalComponent extends React.Component<{}, UIModalState> {
 
 	constructor(props) {
 		super(props);
@@ -15,15 +19,15 @@ export default class UIModalComponent extends React.Component {
 		this.state = { showModal: false };
 	}
 
-	openModal() {
+	public openModal() {
 		this.setState({ showModal: true });
 	}
 
-	closeModal() {
+	public closeModal() {
 		this.setState({ showModal: false });
 	}
 
-	render() {
+	public render() {
 		const inlineStyle = {
 			display: 'inline'
 		};

@@ -9,6 +9,7 @@
     "build": "cross-env NODE_ENV=production webpack -p",
     "checkHeader": "./src/scripts/checkHeader.sh",
     "lint": "./node_modules/.bin/eslint src/client/app/**/*.js src/client/app/**/*.jsx src/server/**/*.js src/server/**/*.jsx src/scripts/**/*.js",
+    "tslint": "./node_modules/.bin/tslint -c tslint.json src/**/*.{ts,tsx}",
     "test": "./node_modules/.bin/mocha \"src/server/test/**/*.js\"",
     "createdb": "node ./src/scripts/createDB.js",
     "addMamacMeters": "node ./src/scripts/addMamacMeters.js",
@@ -16,13 +17,11 @@
     "createUser": "node ./src/scripts/createUser.js"
   },
   "dependencies": {
+    "@types/lodash": "~4.14.80",
+    "@types/moment": "~2.13.0",
+    "@types/react-dom": "~16.0.2",
+    "@types/react-notification-system": "~0.2.35",
     "axios": "~0.16.2",
-    "babel-loader": "~7.1.2",
-    "babel-plugin-lodash": "~3.2.11",
-    "babel-plugin-transform-object-rest-spread": "~6.26.0",
-    "babel-polyfill": "~6.26.0",
-    "babel-preset-env": "~1.6.0",
-    "babel-preset-react": "~6.24.1",
     "bcryptjs": "~2.4.3",
     "body-parser": "~1.15.1",
     "chart.js": "~2.7.0",
@@ -41,10 +40,10 @@
     "nodemailer": "~2.6.4",
     "pg-promise": "~5.9.7",
     "prop-types": "~15.5.10",
-    "react": "~15.6.1",
+    "react": "~15.6.2",
     "react-bootstrap": "~0.31.3",
     "react-chartjs-2": "~2.6.2",
-    "react-dom": "~15.6.1",
+    "react-dom": "~15.6.2",
     "react-notification-system": "~0.2.15",
     "react-rangeslider": "~2.2.0",
     "react-redux": "~5.0.6",
@@ -58,6 +57,10 @@
     "xml2js": "~0.4.19"
   },
   "devDependencies": {
+    "@types/core-js": "~0.9.43",
+    "@types/react": "~16.0.19",
+    "@types/react-chartjs-2": "~2.0.2",
+    "awesome-typescript-loader": "~3.3.0",
     "babel-core": "~6.26.0",
     "chai": "~3.5.0",
     "chai-as-promised": "~6.0.0",
@@ -71,6 +74,10 @@
     "mock-require": "~2.0.2",
     "redux-devtools": "~3.4.0",
     "sinon": "~4.0.2",
-    "style-loader": "~0.19.0"
+    "source-map-loader": "~0.2.3",
+    "style-loader": "~0.19.0",
+    "tslint": "~5.8.0",
+    "tslint-react": "~3.2.0",
+    "typescript": "~2.6.1"
   }
 }

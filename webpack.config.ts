@@ -11,28 +11,30 @@ const APP_DIR = path.resolve(__dirname, 'src/client/app');
 const COMMON_DIR = path.resolve(__dirname, 'src/common');
 
 const config = {
-	entry: ['babel-polyfill', `${APP_DIR}/index.jsx`],
-	output: {
-		path: BUILD_DIR,
-		filename: 'bundle.js'
-	},
-	resolve: {
-		extensions: ['.js', '.jsx']
-	},
-	module: {
-		rules: [
-			{
-				test: /\.jsx?/,
-				include: [APP_DIR, COMMON_DIR],
-				loader: 'babel-loader'
-			},
-			{
-				test: /\.css$/,
-				loader: 'style-loader!css-loader'
-			}
-		]
-	},
-	devtool: 'source-map',
+    entry: APP_DIR + "/index.tsx",
+    output: {
+        filename: "bundle.js",
+        path: BUILD_DIR + "/dist"
+    },
+
+    // Enable sourcemaps for debugging webpack's output.
+    devtool: "source-map",
+
+    resolve: {
+        // Add '.ts' and '.tsx' as resolvable extensions.
+        extensions: [".ts", ".tsx", ".js", ".json"]
+    },
+
+    module: {
+        rules: [
+            // All files with a '.ts' or '.tsx' extension will be handled by 'awesome-typescript-loader'.
+			{ test: /\.tsx?$/, loader: "awesome-typescript-loader" },
+			// CSS stylesheet loader.
+			{ test: /\.css$/, loader: 'style-loader!css-loader' },
+            // All output '.js' files will have any sourcemaps re-processed by 'source-map-loader'.
+            { enforce: "pre", test: /\.js$/, loader: "source-map-loader" }
+        ]
+    },
 	plugins: [
 		new LodashModuleReplacementPlugin()
 	],
