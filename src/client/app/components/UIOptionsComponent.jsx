@@ -80,7 +80,6 @@ export default class UIOptionsComponent extends React.Component {
 		};
 		return (
 			<div>
-				{this.props.chartToRender === chartTypes.compare || chartTypes.line &&
 				<div className="form-group">
 					<p style={labelStyle}>Select meters:</p>
 					<select multiple className="form-control" id="meterList" size="8" onChange={this.handleMeterSelect}>
@@ -89,17 +88,6 @@ export default class UIOptionsComponent extends React.Component {
                         )}
 					</select>
 				</div>
-                }
-				{this.props.chartToRender === chartTypes.compare &&
-				<div className="form-group">
-					<p style={labelStyle}>Select meters:</p>
-					<select className="form-control" id="meterList" size="8" onChange={this.handleMeterSelect}>
-						{this.props.meters.map(meter =>
-							<option key={meter.id} value={meter.id}>{meter.name}</option>
-                        )}
-					</select>
-				</div>
-                }
 				<p style={labelStyle}>Graph Type:</p>
 				<div className="radio">
 					<label><input type="radio" name="chartTypes" value={chartTypes.line} onChange={this.handleChangeChartType} checked={this.props.chartToRender === chartTypes.line} />Line</label>
