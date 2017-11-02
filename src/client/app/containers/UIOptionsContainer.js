@@ -5,10 +5,8 @@
 import _ from 'lodash';
 import { connect } from 'react-redux';
 import UIOptionsComponent from '../components/UIOptionsComponent';
-import { changeSelectedMeters, changeSelectedGroups, changeBarDuration, changeChartToRender, changeBarStacking } from '../actions/graph';
+import { changeSelectedMeters, changeBarDuration, changeBarStacking } from '../actions/graph';
 import { fetchMetersDetailsIfNeeded } from '../actions/meters';
-import { fetchGroupsDetailsIfNeeded } from '../actions/groups';
-import { DATA_TYPE_GROUP, DATA_TYPE_METER } from '../utils/Datasources';
 
 /**
  * @param {State} state
@@ -16,21 +14,11 @@ import { DATA_TYPE_GROUP, DATA_TYPE_METER } from '../utils/Datasources';
  */
 function mapStateToProps(state) {
 	const sortedMeters = _.sortBy(_.values(state.meters.byMeterID).map(meter => ({ id: meter.id, name: meter.name.trim() })), 'name');
-	const sortedGroups = _.sortBy(_.values(state.groups.byGroupID).map(group => ({ id: group.id, name: group.name.trim() })), 'name');
 	return {
 		meters: sortedMeters,
-		groups: sortedGroups,
-		selectedGroups: state.graph.selectedGroups.map(groupID => (
-			{
-				label: state.groups.byGroupID[groupID].name,
-				type: DATA_TYPE_GROUP,
-				value: groupID
-			}
-		)),
 		selectedMeters: state.graph.selectedMeters.map(meterID => (
 			{
 				label: state.meters.byMeterID[meterID].name,
-				type: DATA_TYPE_METER,
 				value: meterID
 			}
 		)),
@@ -40,12 +28,9 @@ function mapStateToProps(state) {
 
 function mapDispatchToProps(dispatch) {
 	return {
-		selectMeters: newSelectedMeterIDs => dispatch(changeSelectedMeters(newSelectedMeterIDs)),
-		selectGroups: newSelectedGroupIDs => dispatch(changeSelectedGroups(newSelectedGroupIDs)),
-		changeDuration: barDuration => dispatch(changeBarDuration(barDuration)),
 		fetchMetersDetailsIfNeeded: () => dispatch(fetchMetersDetailsIfNeeded()),
-		fetchGroupsDetailsIfNeeded: () => dispatch(fetchGroupsDetailsIfNeeded()),
-		changeChartType: chartType => dispatch(changeChartToRender(chartType)),
+		selectMeters: newSelectedMeterIDs => dispatch(changeSelectedMeters(newSelectedMeterIDs)),
+		changeDuration: barDuration => dispatch(changeBarDuration(barDuration)),
 		changeBarStacking: () => dispatch(changeBarStacking())
 	};
 }

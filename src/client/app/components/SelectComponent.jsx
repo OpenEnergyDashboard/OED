@@ -8,54 +8,55 @@ import Select from 'react-select';
 import 'react-select/dist/react-select.css';
 import '../styles/react-select-css.css';
 
-export default class MultiSelectComponent extends React.Component {
+export default class SelectComponent extends React.Component {
 	constructor(props) {
 		super(props);
 		this.onValuesChangeInternal = this.onValuesChangeInternal.bind(this);
-		// selectedOptions holds a list of the options that have been selected
-		this.state = {
-			selectedOptions: this.props.selectedOptions ? this.props.selectedOptions : []
-		};
+		// selectedOption holds a list of the options that have been selected
+		if (props.selectedOption) {
+			this.state = { selectedOption: props.selectedOption };
+		} else {
+			this.state = { selectedOption: {} };
+		}
 	}
 
 	componentWillReceiveProps(nextProps) {
-		if (nextProps.selectedOptions) {
-			this.setState({ selectedOptions: nextProps.selectedOptions });
+		if (nextProps.selectedOption) {
+			this.setState({ selectedOption: nextProps.selectedOption });
 		}
 	}
 
 	onValuesChangeInternal(items) {
-		// Defer to the underlying MultiSelect when it has a state change
+		// Defer to the underlying Select when it has a state change
 		// Note that the MSC state selectedOptions is in fact the canonical source of truth
-		this.setState({ selectedOptions: items });
+		this.setState({ selectedOption: items });
 		this.props.onValuesChange(items);
 	}
 
 	render() {
 		return (
 			<Select
-				multi
 				options={this.props.options}
-				value={this.state.selectedOptions}
+				value={this.state.selectedOption}
 				placeholder={this.props.placeholder}
 				style={this.props.style}
 				onChange={this.onValuesChangeInternal}
 				clearable={false}
-				closeOnSelect={false}
+				closeOnSelect
 			/>
 		);
 	}
 }
 
-MultiSelectComponent.propTypes = {
+SelectComponent.propTypes = {
 	placeholder: PropTypes.string,
 	options: PropTypes.arrayOf(PropTypes.shape({
 		label: PropTypes.string.isRequired,
 		value: PropTypes.number,
 	})),
-	selectedOptions: PropTypes.arrayOf(PropTypes.shape({
+	selectedOption: PropTypes.shape({
 		label: PropTypes.string.isRequired,
 		value: PropTypes.number,
-	})),
+	}),
 	onValuesChange: PropTypes.func.isRequired,
 };

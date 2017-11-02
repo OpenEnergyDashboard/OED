@@ -26,11 +26,18 @@ function mapStateToProps(state) {
 	// Power used up to this point last week
 	let currentLastWeek = 0;
 	const soFar = moment().diff(moment().startOf('week'), 'days');
+
+	// Compose the text to display to the user.
 	const delta = change => {
 		if (isNaN(change)) return ''; if (change < 0) return `${state.meters.byMeterID[state.graph.selectedMeters].name} has used ${parseInt(change.toFixed(2).replace('.', '').slice(1), 10)}% less energy this week.`;
 		return `${state.meters.byMeterID[state.graph.selectedMeters].name} has used ${parseInt(change.toFixed(2).replace('.', ''), 10)}% more energy this week.`;
 	};
-	const colorize = change => { if (change < 0) return 'green'; return 'red'; };
+	// Colorize the text based on the delta.
+	const colorize = change => {
+		if (change < 0) return 'green';
+		return 'red';
+	};
+
 	for (const meterID of state.graph.selectedMeters) {
 		const readingsData = state.readings.bar.byMeterID[meterID][timeInterval][barDuration];
 		if (readingsData !== undefined && !readingsData.isFetching) {

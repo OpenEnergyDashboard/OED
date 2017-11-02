@@ -6,7 +6,6 @@
  */
 
 import * as readingsActions from '../actions/barReadings';
-import { DATA_TYPE_METER, DATA_TYPE_GROUP } from '../utils/Datasources';
 
 /**
  * @typedef {Object} State~BarReadings
@@ -28,71 +27,86 @@ const defaultState = {
  */
 export default function readings(state = defaultState, action) {
 	switch (action.type) {
-		case readingsActions.REQUEST_BAR_READINGS: {
+		case readingsActions.REQUEST_METER_BAR_READINGS: {
 			const timeInterval = action.timeInterval;
 			const barDuration = action.barDuration;
 			const newState = {
 				...state,
 				byMeterID: {
 					...state.byMeterID
-				},
-				byGroupID: {
-					...state.byGroupID
 				}
 			};
 
-			if (action.dstype === DATA_TYPE_METER) {
-				for (const meterID of action.dsIDs) {
-					if (newState.byMeterID[meterID] === undefined) {
-						newState.byMeterID[meterID] = {};
-					}
-					if (newState.byMeterID[meterID][timeInterval] === undefined) {
-						newState.byMeterID[meterID][timeInterval] = {};
-					} else if (newState.byMeterID[meterID][timeInterval][barDuration] === undefined) {
-						newState.byMeterID[meterID][timeInterval][barDuration] = { isFetching: true };
-					} else {
-						newState.byMeterID[meterID][timeInterval][barDuration] = { ...newState.byMeterID[meterID][timeInterval][barDuration], isFetching: true };
-					}
+			for (const meterID of action.meterIDs) {
+				if (newState.byMeterID[meterID] === undefined) {
+					newState.byMeterID[meterID] = {};
 				}
-			} else if (action.dstype === DATA_TYPE_GROUP) {
-				for (const groupID of action.dsIDs) {
-					if (newState.byGroupID[groupID] === undefined) {
-						newState.byGroupID[groupID] = {};
-					}
-					if (newState.byGroupID[groupID][timeInterval] === undefined) {
-						newState.byGroupID[groupID][timeInterval] = {};
-					} else if (newState.byGroupID[groupID][timeInterval][barDuration] === undefined) {
-						newState.byGroupID[groupID][timeInterval][barDuration] = { isFetching: true };
-					} else {
-						newState.byGroupID[groupID][timeInterval][barDuration] = { ...newState.byGroupID[groupID][timeInterval][barDuration], isFetching: true };
-					}
+				if (newState.byMeterID[meterID][timeInterval] === undefined) {
+					newState.byMeterID[meterID][timeInterval] = {};
+				} else if (newState.byMeterID[meterID][timeInterval][barDuration] === undefined) {
+					newState.byMeterID[meterID][timeInterval][barDuration] = { isFetching: true };
+				} else {
+					newState.byMeterID[meterID][timeInterval][barDuration] = { ...newState.byMeterID[meterID][timeInterval][barDuration], isFetching: true };
 				}
 			}
 
 			return newState;
 		}
-		case readingsActions.RECEIVE_BAR_READINGS: {
+		case readingsActions.REQUEST_GROUP_BAR_READINGS: {
+			const timeInterval = action.timeInterval;
+			const barDuration = action.barDuration;
+			const newState = {
+				...state,
+				byGroupID: {
+					...state.byGroupID
+				}
+			};
+
+			for (const groupID of action.groupIDs) {
+				if (newState.byGroupID[groupID] === undefined) {
+					newState.byGroupID[groupID] = {};
+				}
+				if (newState.byGroupID[groupID][timeInterval] === undefined) {
+					newState.byGroupID[groupID][timeInterval] = {};
+				} else if (newState.byGroupID[groupID][timeInterval][barDuration] === undefined) {
+					newState.byGroupID[groupID][timeInterval][barDuration] = { isFetching: true };
+				} else {
+					newState.byGroupID[groupID][timeInterval][barDuration] = { ...newState.byGroupID[groupID][timeInterval][barDuration], isFetching: true };
+				}
+			}
+
+			return newState;
+		}
+		case readingsActions.RECEIVE_METER_BAR_READINGS: {
 			const timeInterval = action.timeInterval;
 			const barDuration = action.barDuration;
 			const newState = {
 				...state,
 				byMeterID: {
 					...state.byMeterID
-				},
+				}
+			};
+
+			for (const meterID of action.meterIDs) {
+				const readingsForMeter = action.readings[meterID];
+				newState.byMeterID[meterID][timeInterval][barDuration] = { isFetching: false, readings: readingsForMeter };
+			}
+
+			return newState;
+		}
+		case readingsActions.RECEIVE_GROUP_BAR_READINGS: {
+			const timeInterval = action.timeInterval;
+			const barDuration = action.barDuration;
+			const newState = {
+				...state,
 				byGroupID: {
 					...state.byGroupID
 				}
 			};
-			if (action.dstype === DATA_TYPE_METER) {
-				for (const meterID of action.dsIDs) {
-					const readingsForMeter = action.readings[meterID];
-					newState.byMeterID[meterID][timeInterval][barDuration] = { isFetching: false, readings: readingsForMeter };
-				}
-			} else if (action.dstype === DATA_TYPE_GROUP) {
-				for (const groupID of action.dsIDs) {
-					const readingsForGroup = action.readings[groupID];
-					newState.byGroupID[groupID][timeInterval][barDuration] = { isFetching: false, readings: readingsForGroup };
-				}
+
+			for (const groupID of action.groupIDs) {
+				const readingsForGroup = action.readings[groupID];
+				newState.byGroupID[groupID][timeInterval][barDuration] = { isFetching: false, readings: readingsForGroup };
 			}
 			return newState;
 		}
