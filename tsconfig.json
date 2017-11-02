@@ -1,5 +1,6 @@
 {
     "compilerOptions": {
+        "baseUrl": "./src/client/app/",
         "outDir": "./src/client/public/",
         "sourceMap": true,
         "noImplicitAny": false,

@@ -16,15 +16,11 @@
     "createUser": "node ./src/scripts/createUser.js"
   },
   "dependencies": {
+    "@types/lodash": "~4.14.80",
     "@types/moment": "~2.13.0",
     "@types/react-dom": "~16.0.2",
+    "@types/react-notification-system": "~0.2.35",
     "axios": "~0.16.2",
-    "babel-loader": "~7.1.2",
-    "babel-plugin-lodash": "~3.2.11",
-    "babel-plugin-transform-object-rest-spread": "~6.26.0",
-    "babel-polyfill": "~6.26.0",
-    "babel-preset-env": "~1.6.0",
-    "babel-preset-react": "~6.24.1",
     "bcryptjs": "~2.4.3",
     "body-parser": "~1.15.1",
     "chart.js": "~2.7.0",
