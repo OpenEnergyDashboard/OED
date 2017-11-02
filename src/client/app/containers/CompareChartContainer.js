@@ -30,38 +30,44 @@ function mapStateToProps(state, ownProps) {
 		if (isNaN(change)) return ''; if (change < 0) return `${state.meters.byMeterID[ownProps.id].name} has used ${parseInt(change.toFixed(2).replace('.', '').slice(1), 10)}% less energy this week.`;
 		return `${state.meters.byMeterID[ownProps.id].name} has used ${parseInt(change.toFixed(2).replace('.', ''), 10)}% more energy this week.`;
 	};
-	const colorize = change => { if (change < 0) return 'green'; return 'red'; };
-		const readingsData = state.readings.bar.byMeterID[ownProps.id][timeInterval][barDuration];
-		if (readingsData !== undefined && !readingsData.isFetching) {
-			// Sunday needs special logic
-			if (soFar !== 0) {
-                // Calculate currentWeek
-				for (let i = 1; i <= soFar; i++) {
-					currentWeek += readingsData.readings[readingsData.readings.length - i][1];
-				}
-                // Calculate lastWeek
-				for (let i = 0; i < 7; i++) {
-					lastWeek += readingsData.readings[readingsData.readings.length - (8 + i) - soFar][1];
-				}
-
-                // Calculate currentLastWeek
-				for (let i = 1; i <= soFar; i++) {
-					currentLastWeek += readingsData.readings[readingsData.readings.length - i - 7][1];
-				}
-			}			else {
-				currentWeek = readingsData.readings[readingsData.readings.length - 1][1];
-				// Data is acquired in days so when less than a day has passed we need to estimate
-				currentLastWeek = Math.round((readingsData.readings[readingsData.readings.length - 8][1] / 24) * moment().hour());
-				for (let i = 0; i < 7; i++) {
-					lastWeek += readingsData.readings[readingsData.readings.length - 7][1];
-				}
+	const colorize = change => {
+		if (change < 0) {
+			return 'green';
+		}
+		return 'red';
+	};
+	const readingsData = state.readings.bar.byMeterID[ownProps.id][timeInterval][barDuration];
+	if (readingsData !== undefined && !readingsData.isFetching) {
+		// Sunday needs special logic
+		if (soFar !== 0) {
+			// Calculate currentWeek
+			for (let i = 1; i <= soFar; i++) {
+				currentWeek += readingsData.readings[readingsData.readings.length - i][1];
 			}
-			labels.push('Last week');
-			labels.push('This week');
-			const color1 = 'rgba(173, 216, 230, 1)';
-			const color2 = 'rgba(218, 165, 32, 1)';
-			const color3 = 'rgba(173, 216, 230, 0.45)';
-			data.datasets.push({
+			// Calculate lastWeek
+			for (let i = 0; i < 7; i++) {
+				lastWeek += readingsData.readings[readingsData.readings.length - (8 + i) - soFar][1];
+			}
+
+			// Calculate currentLastWeek
+			for (let i = 1; i <= soFar; i++) {
+				currentLastWeek += readingsData.readings[readingsData.readings.length - i - 7][1];
+			}
+		} else {
+			currentWeek = readingsData.readings[readingsData.readings.length - 1][1];
+			// Data is acquired in days so when less than a day has passed we need to estimate
+			currentLastWeek = Math.round((readingsData.readings[readingsData.readings.length - 8][1] / 24) * moment().hour());
+			for (let i = 0; i < 7; i++) {
+				lastWeek += readingsData.readings[readingsData.readings.length - 7][1];
+			}
+		}
+		labels.push('Last week');
+		labels.push('This week');
+		const color1 = 'rgba(173, 216, 230, 1)';
+		const color2 = 'rgba(218, 165, 32, 1)';
+		const color3 = 'rgba(173, 216, 230, 0.45)';
+		data.datasets.push(
+			{
 				data: [lastWeek, Math.round((currentWeek / currentLastWeek) * lastWeek)],
 				backgroundColor: [color1, color3],
 				hoverBackgroundColor: [color1, color3],
@@ -69,19 +75,19 @@ function mapStateToProps(state, ownProps) {
 					anchor: 'end',
 					align: 'start',
 				}
-			},
-				{
-					data: [currentLastWeek, currentWeek],
-					backgroundColor: color2,
-					hoverBackgroundColor: color2,
-					datalabels: {
-						anchor: 'end',
-						align: 'start',
-					}
-				});
-			// sorts the data so that one doesn't cover up the other
-			data.datasets.sort((a, b) => a.data[0] - b.data[0]);
-		}
+			}, {
+				data: [currentLastWeek, currentWeek],
+				backgroundColor: color2,
+				hoverBackgroundColor: color2,
+				datalabels: {
+					anchor: 'end',
+					align: 'start',
+				}
+			}
+		);
+		// sorts the data so that one doesn't cover up the other
+		data.datasets.sort((a, b) => a.data[0] - b.data[0]);
+	}
 	data.labels = labels;
 
 	const options = {
