@@ -5,80 +5,144 @@
  */
 
 import axios from 'axios';
-import { DATA_TYPE_METER, DATA_TYPE_GROUP } from '../utils/Datasources';
 
-export const REQUEST_LINE_READINGS = 'REQUEST_LINE_READINGS';
-export const RECEIVE_LINE_READINGS = 'RECEIVE_LINE_READINGS';
+export const REQUEST_GROUP_LINE_READINGS = 'REQUEST_GROUP_LINE_READINGS';
+export const RECEIVE_GROUP_LINE_READINGS = 'RECEIVE_GROUP_LINE_READINGS';
+
+export const REQUEST_METER_LINE_READINGS = 'REQUEST_METER_LINE_READINGS';
+export const RECEIVE_METER_LINE_READINGS = 'RECEIVE_METER_LINE_READINGS';
 
 /**
- * @param {State} state
- * @param {number} dsID
- * @param {TimeInterval} timeInterval
- * @param {String} type either DATA_TYPE_METER, DATA_TYPE_GROUP
+ * @param {State} state The current Redux state
+ * @param {number} groupID The ID of the group to check
+ * @param {TimeInterval} timeInterval The time interval to check
+ * @returns {bool} True if the line readings for the given group at the given time are missing, false otherwise
  */
-function shouldFetchLineReadings(state, dsID, timeInterval, type) {
-	let dsArray;
-	if (type === DATA_TYPE_GROUP) {
-		dsArray = state.readings.line.byGroupID;
-	} else if (type === DATA_TYPE_METER) {
-		dsArray = state.readings.line.byMeterID;
-	}
-
-	const readingsForID = dsArray[dsID];
+function shouldFetchGroupLineReadings(state, groupID, timeInterval) {
+	const readingsForID = state.readings.line.byGroupID[groupID];
 	if (readingsForID === undefined) {
 		return true;
 	}
+
+	const readingsForTimeInterval = readingsForID[timeInterval];
 	if (readingsForID[timeInterval] === undefined) {
 		return true;
 	}
-	const readingsForTimeInterval = dsArray[dsID][timeInterval];
-	return readingsForTimeInterval === undefined && !readingsForTimeInterval.isFetching;
+
+	return !readingsForTimeInterval.isFetching;
 }
 
-function requestLineReadings(dsIDs, timeInterval, dstype) {
-	return { type: REQUEST_LINE_READINGS, dsIDs, timeInterval, dstype };
+/**
+ * @param {State} state The current Redux state
+ * @param {number} meterID The ID of the meter to check
+ * @param {TimeInterval} timeInterval The time interval to check
+ * @returns {bool} True if the line readings for the given meter at the given time are missing, false otherwise
+ */
+function shouldFetchMeterLineReadings(state, meterID, timeInterval) {
+	const readingsForID = state.readings.line.byMeterID[meterID];
+	if (readingsForID === undefined) {
+		return true;
+	}
+
+	const readingsForTimeInterval = readingsForID[timeInterval];
+	if (readingsForID[timeInterval] === undefined) {
+		return true;
+	}
+
+	return !readingsForTimeInterval.isFetching;
 }
 
-function receiveLineReadings(dsIDs, timeInterval, readings, dstype) {
-	return { type: RECEIVE_LINE_READINGS, dsIDs, timeInterval, readings, dstype };
+/**
+ * @param {[number]} meterIDs The IDs of the meters whose data should be fetched
+ * @param {TimeInterval} timeInterval The time interval over which data should be fetched
+ */
+function requestMeterLineReadings(meterIDs, timeInterval) {
+	return { type: REQUEST_METER_LINE_READINGS, meterIDs, timeInterval };
 }
 
-function fetchLineReadings(dsIDs, timeInterval, dstype) {
+/**
+ * @param {[number]} meterIDs The IDs of the meters whose data has been fetched
+ * @param {TimeInterval} timeInterval The time interval over which data has been fetched
+ * @param {*} readings The data that has been fetched, indexed by meter ID.
+ */
+function receiveMeterLineReadings(meterIDs, timeInterval, readings) {
+	return { type: RECEIVE_METER_LINE_READINGS, meterIDs, timeInterval, readings };
+}
+
+/**
+ * @param {[number]} groupIDs The IDs of the groups whose data should be fetched
+ * @param {TimeInterval} timeInterval The time interval over which data should be fetched
+ */
+function requestGroupLineReadings(groupIDs, timeInterval) {
+	return { type: REQUEST_GROUP_LINE_READINGS, groupIDs, timeInterval };
+}
+
+/**
+ * @param {[number]} groupIDs The IDs of the groups whose data has been fetched
+ * @param {TimeInterval} timeInterval The time interval over which data has been fetched
+ * @param {*} readings The data that has been fetched, indexed by group ID.
+ */
+function receiveGroupLineReadings(groupIDs, timeInterval, readings) {
+	return { type: RECEIVE_GROUP_LINE_READINGS, groupIDs, timeInterval, readings };
+}
+
+/**
+ * Fetch the data for the given meters over the given interval. Fully manages the Redux lifecycle.
+ * @param {[number]} meterIDs The IDs of the meters whose data should be fetched
+ * @param {TimeInterval} timeInterval The time interval over which data should be fetched
+ */
+function fetchMeterLineReadings(meterIDs, timeInterval) {
 	return dispatch => {
-		dispatch(requestLineReadings(dsIDs, timeInterval, dstype));
-		// The api expects the meter ids to be a comma-separated list.
-		const stringifiedIDs = dsIDs.join(',');
-		let endpoint;
-		if (dstype === DATA_TYPE_GROUP) {
-			endpoint = '/api/readings/line/groups';
-		} else if (dstype === DATA_TYPE_METER) {
-			endpoint = '/api/readings/line/meters';
-		} else {
-			console.error('Unknown datatype requested in fetchLineReadings: ', dstype);
-			return Promise.resolve();
-		}
-		return axios.get(`${endpoint}/${stringifiedIDs}`, {
+		dispatch(requestMeterLineReadings(meterIDs, timeInterval));
+		// The api expects the meter IDs to be a comma-separated list.
+		const stringifiedIDs = meterIDs.join(',');
+		return axios.get(`/api/readings/line/meters/${stringifiedIDs}`, {
 			params: { timeInterval: timeInterval.toString() }
-		}).then(response => dispatch(receiveLineReadings(dsIDs, timeInterval, response.data, dstype)));
+		}).then(response => dispatch(receiveMeterLineReadings(meterIDs, timeInterval, response.data)));
 	};
 }
 
 /**
- * Fetches readings for the line chart of all selected meterIDs if they are not already fetched or being fetched
+ * Fetch the data for the given groups over the given interval. Fully manages the Redux lifecycle.
+ * @param {[number]} groupIDs The IDs of the groups whose data should be fetched
+ * @param {TimeInterval} timeInterval The time interval over which data should be fetched
+ */
+function fetchGroupLineReadings(groupIDs, timeInterval) {
+	return dispatch => {
+		dispatch(requestGroupLineReadings(groupIDs, timeInterval));
+		// The api expects the group IDs to be a comma-separated list.
+		const stringifiedIDs = groupIDs.join(',');
+		return axios.get(`/api/readings/line/groups/${stringifiedIDs}`, {
+			params: { timeInterval: timeInterval.toString() }
+		}).then(response => dispatch(receiveGroupLineReadings(groupIDs, timeInterval, response.data)));
+	};
+}
+
+/**
+ * Fetches readings for the line chart of all selected meters and groups, if needed.
  * @param {TimeInterval} timeInterval The time interval to fetch readings for on the line chart
- * @return {*} An action to fetch the needed readings
+ * @return {*} Promise resolution of async actions to fetch the needed readings.
  */
 export function fetchNeededLineReadings(timeInterval) {
 	return (dispatch, getState) => {
 		const state = getState();
-		const meterIDsToFetchForLine = state.graph.selectedMeters.filter(id => shouldFetchLineReadings(state, id, timeInterval, DATA_TYPE_METER));
+
+		// Determine which meters are missing data for this time interval
+		const meterIDsToFetchForLine = state.graph.selectedMeters.filter(
+			id => shouldFetchMeterLineReadings(state, id, timeInterval)
+		);
 		if (meterIDsToFetchForLine.length > 0) {
-			return dispatch(fetchLineReadings(meterIDsToFetchForLine, timeInterval, DATA_TYPE_METER));
+			return dispatch(fetchMeterLineReadings(meterIDsToFetchForLine, timeInterval));
 		}
-		const groupIDsToFetchForLine = state.graph.selectedGroups.filter(id => shouldFetchLineReadings(state, id, timeInterval, DATA_TYPE_GROUP));
+
+		// Determine which groups are missing data for this time interval
+		const groupIDsToFetchForLine = state.graph.selectedGroups.filter(
+			id => shouldFetchGroupLineReadings(state, id, timeInterval)
+		);
 		if (groupIDsToFetchForLine.length > 0) {
-			return dispatch(fetchLineReadings(groupIDsToFetchForLine, timeInterval, DATA_TYPE_GROUP));
+			return dispatch(fetchGroupLineReadings(groupIDsToFetchForLine, timeInterval));
 		}
+
 		return Promise.resolve();
 	};
 }
