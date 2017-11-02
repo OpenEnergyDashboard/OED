@@ -6,6 +6,7 @@ import React from 'react';
 import CompareChartContainer from '../containers/CompareChartContainer';
 
 export default function MultiCompareChartComponent(props) {
+	//how much space should be used in the bootstrap grid syststem
 	let size;
 	if (props.selectedMeters.length === 1) {
 		size = 12;

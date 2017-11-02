@@ -31,7 +31,6 @@ function mapStateToProps(state, ownProps) {
 		return `${state.meters.byMeterID[ownProps.id].name} has used ${parseInt(change.toFixed(2).replace('.', ''), 10)}% more energy this week.`;
 	};
 	const colorize = change => { if (change < 0) return 'green'; return 'red'; };
-	//for (const meterID of state.graph.selectedMeters) {
 		const readingsData = state.readings.bar.byMeterID[ownProps.id][timeInterval][barDuration];
 		if (readingsData !== undefined && !readingsData.isFetching) {
 			// Sunday needs special logic
