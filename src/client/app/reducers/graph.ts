@@ -4,14 +4,14 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/.
  */
 
-import moment from 'moment';
-import TimeInterval from '../../../common/TimeInterval';
+import * as moment from 'moment';
+import * as TimeInterval from '../../../common/TimeInterval';
 import * as graphActions from '../actions/graph';
 
-export const chartTypes = {
-	line: 'line',
-	bar: 'bar',
-	compare: 'compare'
+export enum chartTypes {
+	line = 'line',
+	bar = 'bar',
+	compare = 'compare',
 };
 
 /**

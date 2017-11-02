@@ -2,12 +2,26 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
 
-import React from 'react';
+import * as React from 'react';
 import axios from 'axios';
 import { browserHistory } from 'react-router';
 import HeaderComponent from '../components/HeaderComponent';
 
-export default class LoginComponent extends React.Component {
+interface NotificationSpec {
+	message: string, level: string, position: string, autoDismiss: number
+}
+
+interface LoginState {
+	email: string,
+	password: string,
+}
+
+interface LoginProps {
+	showNotification: (NotificationSpec) => null,
+}
+
+export default class LoginComponent extends React.Component<LoginProps, LoginState> {
+	inputEmail: HTMLInputElement;
 	/**
 	 * Initializes the component's state to include email (email users use to login) and password (corresponding to their email)
 	 * Binds the functions to 'this' LoginComponent

@@ -71,7 +71,7 @@ function shouldChangeGraphZoom(state, timeInterval) {
 
 export function changeGraphZoomIfNeeded(timeInterval) {
 	return (dispatch, getState) => {
-		if (shouldChangeGraphZoom(getState())) {
+		if (shouldChangeGraphZoom(getState(), "all")) {
 			dispatch(changeGraphZoom(timeInterval));
 			dispatch(fetchNeededReadingsForGraph(timeInterval));
 		}

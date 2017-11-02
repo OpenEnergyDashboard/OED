@@ -2,15 +2,28 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
 
-import React from 'react';
+import * as React from 'react';
 import Slider from 'react-rangeslider';
-import moment from 'moment';
+import * as moment from 'moment';
 import 'react-rangeslider/lib/index.css';
 import { chartTypes } from '../reducers/graph';
 import ExportContainer from '../containers/ExportContainer';
 
+interface UIOptionsProps {
+	fetchMetersDetailsIfNeeded: () => null,
+	meters: {id: number, name: string}[],
+	selectMeters: (selectedMeters: number[]) => null,
+	changeDuration: (duration: moment.Duration) => null,
+	chartToRender: chartTypes,
+	changeChartType: (chartType: chartTypes) => null,
+	changeBarStacking: () => null,
+}
 
-export default class UIOptionsComponent extends React.Component {
+interface UIOptionsState {
+	barDuration: number
+}
+
+export default class UIOptionsComponent extends React.Component<UIOptionsProps, UIOptionsState> {
 	/**
 	 * Initializes the component's state, binds all functions to 'this' UIOptionsComponent
 	 * @param props The props passed down through the UIOptionsContainer
@@ -38,7 +51,7 @@ export default class UIOptionsComponent extends React.Component {
 	handleMeterSelect(e) {
 		e.preventDefault();
 		const options = e.target.options;
-		const selectedMeters = [];
+		const selectedMeters: number[] = [];
 		// We can't map here because this is a collection of DOM elements, not an array.
 		for (let i = 0; i < options.length; i++) {
 			if (options[i].selected) {
@@ -83,7 +96,7 @@ export default class UIOptionsComponent extends React.Component {
 				{this.props.chartToRender === chartTypes.compare || chartTypes.line &&
 				<div className="form-group">
 					<p style={labelStyle}>Select meters:</p>
-					<select multiple className="form-control" id="meterList" size="8" onChange={this.handleMeterSelect}>
+					<select multiple className="form-control" id="meterList" size={8} onChange={this.handleMeterSelect}>
 						{this.props.meters.map(meter =>
 							<option key={meter.id} value={meter.id}>{meter.name}</option>
                         )}
@@ -93,7 +106,7 @@ export default class UIOptionsComponent extends React.Component {
 				{this.props.chartToRender === chartTypes.compare &&
 				<div className="form-group">
 					<p style={labelStyle}>Select meters:</p>
-					<select className="form-control" id="meterList" size="8" onChange={this.handleMeterSelect}>
+					<select className="form-control" id="meterList" size={8} onChange={this.handleMeterSelect}>
 						{this.props.meters.map(meter =>
 							<option key={meter.id} value={meter.id}>{meter.name}</option>
                         )}

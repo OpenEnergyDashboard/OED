@@ -2,15 +2,17 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
 
-import React from 'react';
-import { defaults } from 'react-chartjs-2';
+import * as React from 'react';
+import { defaults } from 'chart.js';
+import * as cpd from 'chartjs-plugin-datalabels';
 import UIOptionsContainer from '../containers/UIOptionsContainer';
 import LineChartContainer from '../containers/LineChartContainer';
 import BarChartContainer from '../containers/BarChartContainer';
 import CompareChartContainer from '../containers/CompareChartContainer'
 import { chartTypes } from '../reducers/graph';
 
-defaults.global.plugins.datalabels.display = false;
+// The plugin package doesn't have types, so we have to cheat here.
+defaults.global["plugins"].datalabels.display = false;
 
 /**
  * React component that controls the dashboard

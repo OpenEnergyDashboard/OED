@@ -6,7 +6,7 @@
 
 import _ from 'lodash';
 import { Bar } from 'react-chartjs-2';
-import moment from 'moment';
+import * as moment from 'moment';
 import { connect } from 'react-redux';
 import datalabels from 'chartjs-plugin-datalabels';
 
@@ -17,7 +17,7 @@ import datalabels from 'chartjs-plugin-datalabels';
 function mapStateToProps(state) {
 	const timeInterval = state.graph.compareTimeInterval;
 	const barDuration = state.graph.compareDuration;
-	const data = { datasets: [] };
+	const data = { datasets: [], labels: [] };
 	const labels = [];
 	// Power used so far this week
 	let currentWeek = 0;
