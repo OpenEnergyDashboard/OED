@@ -4,7 +4,7 @@
 
 import * as React from 'react';
 import { defaults } from 'chart.js';
-import * as cpd from 'chartjs-plugin-datalabels';
+import datalabels from 'chartjs-plugin-datalabels';
 import UIOptionsContainer from '../containers/UIOptionsContainer';
 import LineChartContainer from '../containers/LineChartContainer';
 import BarChartContainer from '../containers/BarChartContainer';
@@ -12,7 +12,7 @@ import CompareChartContainer from '../containers/CompareChartContainer'
 import { chartTypes } from '../reducers/graph';
 
 // The plugin package doesn't have types, so we have to cheat here.
-defaults.global["plugins"].datalabels.display = false;
+defaults.global["plugins"] = {datalabels: {display: false}};
 
 /**
  * React component that controls the dashboard

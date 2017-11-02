@@ -5,8 +5,8 @@
 import * as React from 'react';
 import { Router, Route, browserHistory } from 'react-router';
 import axios from 'axios';
-import _ from 'lodash';
-import NotificationSystem from 'react-notification-system';
+import * as _ from 'lodash';
+import * as NotificationSystem from 'react-notification-system';
 import HomeComponent from './HomeComponent';
 import LoginContainer from '../containers/LoginContainer';
 import AdminComponent from './AdminComponent';
@@ -19,7 +19,7 @@ interface RouteProps {
 interface RouteState{}
 
 export default class RouteComponent extends React.Component<RouteProps, RouteState> {
-	notificationSystem: any;
+	notificationSystem: NotificationSystem.System;
 	
 	constructor(props) {
 		super(props);
