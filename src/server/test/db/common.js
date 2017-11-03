@@ -20,7 +20,10 @@ const { db, createSchema } = require('../../models/database');
 async function recreateDB() {
 	await db.none('DROP TABLE IF EXISTS readings');
 	await db.none('DROP TABLE IF EXISTS meters');
+	await db.none('DROP TABLE IF EXISTS users');
+	await db.none('DROP TABLE IF EXISTS preferences');
 	await db.none('DROP TYPE IF EXISTS meter_type');
+	await db.none('DROP TYPE IF EXISTS graph_type');
 	await db.none('DROP FUNCTION IF EXISTS compressed_readings(INTEGER[], TIMESTAMP, TIMESTAMP, INTEGER);');
 	await db.none('DROP FUNCTION IF EXISTS barchart_readings(INTEGER[], INTERVAL, TIMESTAMP, TIMESTAMP);');
 	await createSchema();

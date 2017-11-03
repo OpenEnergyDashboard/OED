@@ -10,6 +10,7 @@ import lineReadings from './lineReadings';
 import barReadings from './barReadings';
 import graph from './graph';
 import notifications from './notifications';
+import admin from './admin';
 
 /**
  * @typedef {Object} State
@@ -18,11 +19,20 @@ import notifications from './notifications';
  * @property {State~BarReadings} barReadings
  * @property {State~Graph} graph
  * @property {State~Notifications} notifications
+ * @property {State-Admin} admin
  */
 
 /**
  * @param {State} state
- * @param action
  * @return {State}
  */
-export default combineReducers({ meters, readings: combineReducers({ line: lineReadings, bar: barReadings }), graph, notifications });
+export default combineReducers({
+	meters,
+	readings: combineReducers({
+		line: lineReadings,
+		bar: barReadings
+	}),
+	graph,
+	notifications,
+	admin
+});
