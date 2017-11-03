@@ -13,7 +13,13 @@
         "target": "es5",
 		"jsx": "react",
 		"allowJs": true,
-        "lib": ["es6", "dom", "es2015.promise"]
+        "lib": ["es6", "dom", "es2015.promise"],
+        "moduleResolution": "node",
+        "rootDir": "src",
+        "noImplicitReturns": true,
+        "noImplicitThis": true,
+        "noImplicitAny": true,
+        "strictNullChecks": true
     },
     "include": [
         "./src/client/app/*"
