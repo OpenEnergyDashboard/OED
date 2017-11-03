@@ -12,22 +12,15 @@ import LoginContainer from '../containers/LoginContainer';
 import AdminComponent from './AdminComponent';
 import NotFoundComponent from './NotFoundComponent';
 
-export default class RouteComponent extends React.Component {
+interface RouteProps {
+	clearNotifications(): void;
+}
+
+export default class RouteComponent extends React.Component<RouteProps, {}> {
+	private notificationSystem: NotificationSystem.System;
 	constructor(props) {
 		super(props);
 		this.requireAuth = this.requireAuth.bind(this);
-	}
-
-	shouldComponentUpdate() {
-		// To ignore warning: [react-router] You cannot change 'Router routes'; it will be ignored
-		return false;
-	}
-
-	componentWillReceiveProps(nextProps) {
-		if (!_.isEmpty(nextProps.notification)) {
-			this.notificationSystem.addNotification(nextProps.notification);
-			this.props.clearNotifications();
-		}
 	}
 
 	/**
@@ -35,7 +28,7 @@ export default class RouteComponent extends React.Component {
 	 * @param nextState The next state of the router
 	 * @param replace Function that allows a route redirect
 	 */
-	requireAuth(nextState, replace) {
+	public requireAuth(nextState, replace) {
 		function redirectRoute() {
 			replace({
 				pathname: '/login',
@@ -52,10 +45,23 @@ export default class RouteComponent extends React.Component {
 		axios.post('/api/verification/', { token }, { validateStatus: status => (status >= 200 && status < 300) || (status === 401 || status === 403) })
 			.then(res => {
 				// Route to login page if the auth token is not valid
-				if (!res.data.success) browserHistory.push('/login');
+				if (!res.data.success) { browserHistory.push('/login'); }
 			})
 			// In the case of a server error, the user can't fix the issue. Log it for developers.
 			.catch(console.error); // eslint-disable-line no-console
+	}
+
+
+	public componentWillReceiveProps(nextProps) {
+		if (!_.isEmpty(nextProps.notification)) {
+			this.notificationSystem.addNotification(nextProps.notification);
+			this.props.clearNotifications();
+		}
+	}
+
+	public shouldComponentUpdate() {
+		// To ignore warning: [react-router] You cannot change 'Router routes'; it will be ignored
+		return false;
 	}
 
 	/**
@@ -63,15 +69,15 @@ export default class RouteComponent extends React.Component {
 	 * Note that '/admin' requires authentication
 	 * @returns JSX to create the RouteComponent
 	 */
-	render() {
+	public render() {
 		return (
 			<div>
 				<NotificationSystem ref={c => { this.notificationSystem = c; }} />
 				<Router history={browserHistory}>
-					<Route path="/" component={HomeComponent} />
-					<Route path="/login" component={LoginContainer} />
-					<Route path="/admin" component={AdminComponent} onEnter={this.requireAuth} />
-					<Route path="*" component={NotFoundComponent} />
+					<Route path='/' component={HomeComponent} />
+					<Route path='/login' component={LoginContainer} />
+					<Route path='/admin' component={AdminComponent} onEnter={this.requireAuth} />
+					<Route path='*' component={NotFoundComponent} />
 				</Router>
 			</div>
 		);

@@ -11,7 +11,7 @@ import * as VERSION from '../../../common/version';
  * @return JSX to create logo image
  */
 export default function LogoComponent(props) {
-	const imgStyle = {
+	const imgStyle: React.CSSProperties = {
 		maxWidth: '100%',
 		height: 'auto',
 		top: '10px',
@@ -19,6 +19,6 @@ export default function LogoComponent(props) {
 		position: 'absolute'
 	};
 	return (
-		<img src={props.url} alt="Logo" title={`Open Energy Dashboard ${VERSION}`} style={imgStyle} />
+		<img src={props.url} alt='Logo' title={`Open Energy Dashboard ${VERSION}`} style={imgStyle} />
 	);
 }

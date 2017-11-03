@@ -6,7 +6,7 @@
 
 import { fetchNeededLineReadings } from './lineReadings';
 import { fetchNeededBarReadings, fetchNeededCompareReadings } from './barReadings';
-import * as TimeInterval from '../../../common/TimeInterval';
+import { TimeInterval } from '../../../common/TimeInterval';
 
 export const UPDATE_SELECTED_METERS = 'UPDATE_SELECTED_METERS';
 export const UPDATE_BAR_DURATION = 'UPDATE_BAR_DURATION';

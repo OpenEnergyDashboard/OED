@@ -7,7 +7,24 @@ import axios from 'axios';
 import { browserHistory } from 'react-router';
 import HeaderComponent from '../components/HeaderComponent';
 
-export default class LoginComponent extends React.Component {
+interface NotificationData {
+	message: string;
+	level: string;
+	position: string;
+	autoDismiss: number;
+}
+
+interface LoginProps {
+	showNotification(NotificationData): null;
+}
+
+interface LoginState {
+	email: string;
+	password: string;
+}
+
+export default class LoginComponent extends React.Component<LoginProps, LoginState> {
+	private inputEmail: HTMLInputElement;
 	/**
 	 * Initializes the component's state to include email (email users use to login) and password (corresponding to their email)
 	 * Binds the functions to 'this' LoginComponent
@@ -21,10 +38,47 @@ export default class LoginComponent extends React.Component {
 	}
 
 	/**
+	 * @return JSX to create the login panel
+	 */
+	public render() {
+		const formStyle = {
+			maxWidth: '500px',
+			margin: 'auto',
+			width: '50%'
+		};
+		const buttonStyle = {
+			marginTop: '10px'
+		};
+		return (
+			<div>
+				<HeaderComponent renderLoginButton={false} />
+				<form style={formStyle} onSubmit={this.handleSubmit}>
+					<div className='input-group'>
+						<span className='input-group-addon'><i className='glyphicon glyphicon-user' /></span>
+						<input
+							type='text'
+							className='form-control'
+							placeholder='Email'
+							ref={c => { this.inputEmail = c; }}
+							value={this.state.email}
+							onChange={this.handleEmailChange}
+						/>
+					</div>
+					<div className='input-group'>
+						<span className='input-group-addon'><i className='glyphicon glyphicon-lock' /></span>
+						<input type='password' className='form-control' placeholder='Password' value={this.state.password} onChange={this.handlePasswordChange} />
+					</div>
+					<input style={buttonStyle} className='btn btn-default' type='submit' value='Login' />
+				</form>
+			</div>
+		);
+	}
+
+	/**
 	 * Sets the email state whenever the user changes the email input field
 	 * @param e The event fired
 	 */
-	handleEmailChange(e) {
+	private handleEmailChange(e) {
 		this.setState({ email: e.target.value });
 	}
 
@@ -32,7 +86,7 @@ export default class LoginComponent extends React.Component {
 	 * Sets the password state whenever the user changes the password input field
 	 * @param e The event fired
 	 */
-	handlePasswordChange(e) {
+	private handlePasswordChange(e) {
 		this.setState({ password: e.target.value });
 	}
 
@@ -41,7 +95,7 @@ export default class LoginComponent extends React.Component {
 	 * If the request is successful, the JWT auth token is stored in local storage and the app routes to the admin page
 	 * @param e The event fired
 	 */
-	handleSubmit(e) {
+	private handleSubmit(e) {
 		e.preventDefault();
 		axios.post('/api/login/', {
 			email: this.state.email,
@@ -62,41 +116,11 @@ export default class LoginComponent extends React.Component {
 			} else {
 				// If there was a problem other than a lack of authorization, the user can't fix it.
 				// Log it to the console for developer use.
-				console.error(err); // eslint-disable-line no-console
+				console.error(err); // tslint:disable-line no-console
 			}
 			this.inputEmail.focus();
 
 		});
 		this.setState({ email: '', password: '' });
-	}
-
-	/**
-	 * @return JSX to create the login panel
-	 */
-	render() {
-		const formStyle = {
-			maxWidth: '500px',
-			margin: 'auto',
-			width: '50%'
-		};
-		const buttonStyle = {
-			marginTop: '10px'
-		};
-		return (
-			<div>
-				<HeaderComponent renderLoginButton={false} />
-				<form style={formStyle} onSubmit={this.handleSubmit}>
-					<div className="input-group">
-						<span className="input-group-addon"><i className="glyphicon glyphicon-user" /></span>
-						<input type="text" className="form-control" placeholder="Email" ref={c => { this.inputEmail = c; }} value={this.state.email} onChange={this.handleEmailChange} />
-					</div>
-					<div className="input-group">
-						<span className="input-group-addon"><i className="glyphicon glyphicon-lock" /></span>
-						<input type="password" className="form-control" placeholder="Password" value={this.state.password} onChange={this.handlePasswordChange} />
-					</div>
-					<input style={buttonStyle} className="btn btn-default" type="submit" value="Login" />
-				</form>
-			</div>
-		);
 	}
 }

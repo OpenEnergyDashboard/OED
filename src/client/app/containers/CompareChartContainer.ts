@@ -17,7 +17,7 @@ import datalabels from 'chartjs-plugin-datalabels';
 function mapStateToProps(state, ownProps) {
 	const timeInterval = state.graph.compareTimeInterval;
 	const barDuration = state.graph.compareDuration;
-	const data = { datasets: [] };
+	const data = { datasets: [], labels: [] };
 	const labels = [];
 	// Power used so far this week
 	let currentWeek = 0;
@@ -27,8 +27,20 @@ function mapStateToProps(state, ownProps) {
 	let currentLastWeek = 0;
 	const soFar = moment().diff(moment().startOf('week'), 'days');
 	const delta = change => {
-		if (isNaN(change)) return ''; if (change < 0) return `${state.meters.byMeterID[ownProps.id].name} has used ${parseInt(change.toFixed(2).replace('.', '').slice(1), 10)}% less energy this week.`;
-		return `${state.meters.byMeterID[ownProps.id].name} has used ${parseInt(change.toFixed(2).replace('.', ''), 10)}% more energy this week.`;
+		// On a NaN result, just give up.
+		if (isNaN(change)) { return ''; }
+
+		const name: string = state.meters.byMeterID[ownProps.id].name;
+		let changePercent;
+		let adverb;
+		if (change < 0) {
+			changePercent = parseInt(change.toFixed(2).replace('.', '').slice(1), 10);
+			adverb = 'less';
+		} else {
+			changePercent = parseInt(change.toFixed(2).replace('.', ''), 10);
+			adverb = 'more';
+		}
+		return `${name} has used ${changePercent}% ${adverb} energy this week.`;
 	};
 	const colorize = change => {
 		if (change < 0) {
@@ -73,7 +85,7 @@ function mapStateToProps(state, ownProps) {
 				hoverBackgroundColor: [color1, color3],
 				datalabels: {
 					anchor: 'end',
-					align: 'start',
+					align: 'start'
 				}
 			}, {
 				data: [currentLastWeek, currentWeek],
@@ -81,7 +93,7 @@ function mapStateToProps(state, ownProps) {
 				hoverBackgroundColor: color2,
 				datalabels: {
 					anchor: 'end',
-					align: 'start',
+					align: 'start'
 				}
 			}
 		);
@@ -120,9 +132,9 @@ function mapStateToProps(state, ownProps) {
 		legend: {
 			display: false
 		},
-		 tooltips: {
+		tooltips: {
 			enabled: false
-		 	},
+		},
 		title: {
 			display: true,
 			text: delta((-1 + (((currentWeek / currentLastWeek) * lastWeek) / lastWeek))),
@@ -136,7 +148,7 @@ function mapStateToProps(state, ownProps) {
 				},
 				display: true,
 				formatter: value => `${value} kWh`
-			},
+			}
 		}
 	};
 

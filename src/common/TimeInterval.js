@@ -57,4 +57,4 @@ class TimeInterval {
 	}
 }
 
-module.exports = TimeInterval;
+module.exports = { TimeInterval };

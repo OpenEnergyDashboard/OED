@@ -6,7 +6,11 @@ import * as React from 'react';
 import { Modal, Button } from 'react-bootstrap';
 import UIOptionsContainer from '../containers/UIOptionsContainer';
 
-export default class UIModalComponent extends React.Component {
+interface UIModalState {
+	showModal: boolean;
+}
+
+export default class UIModalComponent extends React.Component<{}, UIModalState> {
 
 	constructor(props) {
 		super(props);
@@ -15,21 +19,13 @@ export default class UIModalComponent extends React.Component {
 		this.state = { showModal: false };
 	}
 
-	openModal() {
-		this.setState({ showModal: true });
-	}
-
-	closeModal() {
-		this.setState({ showModal: false });
-	}
-
-	render() {
+	public render() {
 		const inlineStyle = {
 			display: 'inline'
 		};
 		return (
 			<div style={inlineStyle}>
-				<Button bsStyle="default" onClick={this.openModal}>Options</Button>
+				<Button bsStyle='default' onClick={this.openModal}>Options</Button>
 				<Modal show={this.state.showModal} onHide={this.closeModal}>
 					<Modal.Header closeButton>
 						<Modal.Title>Options</Modal.Title>
@@ -40,5 +36,13 @@ export default class UIModalComponent extends React.Component {
 				</Modal>
 			</div>
 		);
+	}
+
+	private openModal() {
+		this.setState({ showModal: true });
+	}
+
+	private closeModal() {
+		this.setState({ showModal: false });
 	}
 }

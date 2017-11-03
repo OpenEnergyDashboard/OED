@@ -9,7 +9,7 @@ import * as React from 'react';
  * @return JSX to create the 404 Not Found error page
  */
 export default function NotFoundComponent() {
-	const textStyle = {
+	const textStyle: React.CSSProperties = {
 		fontWeight: 'bold',
 		paddingLeft: '15px'
 	};
