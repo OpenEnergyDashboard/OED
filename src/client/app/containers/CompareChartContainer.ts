@@ -4,9 +4,9 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/.
  */
 
-import _ from 'lodash';
+import * as _ from 'lodash';
 import { Bar } from 'react-chartjs-2';
-import moment from 'moment';
+import * as moment from 'moment';
 import { connect } from 'react-redux';
 import datalabels from 'chartjs-plugin-datalabels';
 
