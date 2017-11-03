@@ -4,9 +4,8 @@
 
 -- create preferences table
 CREATE TABLE IF NOT EXISTS preferences (
-	user_id INT NOT NULL REFERENCES users(id),
+	id SERIAL PRIMARY KEY,
 	display_title VARCHAR(50) NOT NULL,
-	default_graph_type graph_type NOT NULL DEFAULT 'line',
-	default_bar_stacking BOOLEAN NOT NULL DEFAULT FALSE,
-	PRIMARY KEY (user_id)
+	default_graph_type graph_type NOT NULL,
+	default_bar_stacking BOOLEAN NOT NULL
 );
