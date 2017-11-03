@@ -1,0 +1,40 @@
+/*
+ * This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this
+ * file, You can obtain one at http://mozilla.org/MPL/2.0/.
+ */
+
+{
+    "defaultSeverity": "error",
+    "extends": [
+        "tslint:recommended",
+        "tslint-react"
+    ],
+    "jsRules": {
+        "indent": [true, "tabs"],
+        "max-line-length": [true, 150],
+        "quotemark": [true, "single", "avoid-escape", "avoid-template"],
+        "trailing-comma": [true, {"multiline": "never", "singleline": "never"}],
+        "no-consecutive-blank-lines": [false],
+        "arrow-parens": [true, "ban-single-arg-parens"],
+        "object-literal-sort-keys": false,
+        "radix": false,
+        "ordered-imports": false
+    },
+    "rules": {
+        "indent": [true, "tabs"],
+        "max-line-length": [true, 150],
+        "quotemark": [true, "single", "avoid-escape", "avoid-template"],
+        "trailing-comma": [true, {"multiline": "never", "singleline": "never"}],
+        "no-consecutive-blank-lines": [false],
+        "arrow-parens": [true, "ban-single-arg-parens"],
+        "interface-name": false,
+        "object-literal-sort-keys": false,
+        "radix": false,
+        "ordered-imports": false,
+        "jsx-wrap-multiline": false,
+        "jsx-boolean-value": [true, "never"],
+        "jsx-no-multiline-js": false
+    },
+    "rulesDirectory": []
+}

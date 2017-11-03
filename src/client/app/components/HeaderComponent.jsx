@@ -2,7 +2,7 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
 
-import React from 'react';
+import * as React from 'react';
 import { Link } from 'react-router';
 import { Button } from 'react-bootstrap';
 import LogoComponent from './LogoComponent';
@@ -31,19 +31,19 @@ export default function HeaderComponent(props) {
 		display: localStorage.getItem('token') ? 'inline' : 'none'
 	};
 	return (
-		<div className="container-fluid">
-			<div className="col-xs-4">
-				<Link to="/"><LogoComponent url="./app/images/logo.png" /></Link>
+		<div className='container-fluid'>
+			<div className='col-xs-4'>
+				<Link to='/'><LogoComponent url='./app/images/logo.png' /></Link>
 			</div>
-			<div className="col-xs-4 text-center">
+			<div className='col-xs-4 text-center'>
 				<h1 style={titleStyle}>Open Energy Dashboard</h1>
 			</div>
 			<div style={divRightStyle}>
-				<div className="visible-sm visible-xs">
+				<div className='visible-sm visible-xs'>
 					{(props.renderOptionsButton) ? <UIModalComponent /> : null}
 				</div>
-				<Link style={loginLinkStyle} to="/login"><Button bsStyle="default">Log In</Button></Link>
-				<Link style={adminLinkStyle} to="/admin"><Button bsStyle="default">Admin panel</Button></Link>
+				<Link style={loginLinkStyle} to='/login'><Button bsStyle='default'>Log In</Button></Link>
+				<Link style={adminLinkStyle} to='/admin'><Button bsStyle='default'>Admin panel</Button></Link>
 			</div>
 		</div>
 	);

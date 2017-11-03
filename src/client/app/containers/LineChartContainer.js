@@ -5,7 +5,7 @@
  */
 
 import { Line } from 'react-chartjs-2';
-import moment from 'moment';
+import * as moment from 'moment';
 import { connect } from 'react-redux';
 import getGraphColor from '../utils/getGraphColor';
 

@@ -2,7 +2,7 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
 
-import React from 'react';
+import * as React from 'react';
 import thunkMiddleware from 'redux-thunk';
 import { render } from 'react-dom';
 import { createStore, applyMiddleware, compose } from 'redux';
@@ -12,9 +12,9 @@ import reducers from './reducers';
 
 // This sets up the redux-devtools extension (if it's installed in the browser).
 // https://github.com/zalmoxisus/redux-devtools-extension
-/* eslint-disable no-underscore-dangle */
-const composeEnhancers = window.__REDUX_DEVTOOLS_EXTENSION_COMPOSE__ || compose;
-/* eslint-enable */
+/* tslint:disable no-string-literal */
+const composeEnhancers = window['__REDUX_DEVTOOLS_EXTENSION_COMPOSE__'] || compose;
+/* eslint:enable */
 
 // Creates and applies thunk middleware to the Redux store, which is defined from the Redux reducers
 const store = createStore(reducers, composeEnhancers(applyMiddleware(thunkMiddleware)));
