@@ -39,6 +39,14 @@ export default class AdminComponent extends React.Component {
 					defaultBarStacking: this.props.defaultBarStacking
 				}
 			})
+			.then(() => {
+				this.props.showNotification({
+					message: 'Updated preferences',
+					level: 'success',
+					position: 'tr',
+					autoDismiss: 3
+				});
+			})
 			.catch(() => {
 				this.props.showNotification({
 					message: 'Failed to submit changes',
@@ -52,14 +60,26 @@ export default class AdminComponent extends React.Component {
 
 	render() {
 		const labelStyle = {
-			fontWeight: 'bold'
+			fontWeight: 'bold',
+			margin: 0,
+		};
+		const bottomPaddingStyle = {
+			paddingBottom: '15px'
+		};
+		const titleStyle = {
+			fontWeight: 'bold',
+			margin: 0,
+			paddingBottom: '5px'
 		};
 		return (
 			<div>
 				<HeaderContainer renderLoginButton={false} renderOptionsButton={false} renderAdminButton={false} />
 				<div className="container-fluid">
-					<div className="col-xs-6">
-						<FormControl type="text" placeholder="Name" value={this.props.displayTitle} onChange={this.handleDisplayTitleChange} />
+					<div className="col-xs-3">
+						<div style={bottomPaddingStyle}>
+							<p style={titleStyle}>Default Site Title:</p>
+							<FormControl type="text" placeholder="Name" value={this.props.displayTitle} onChange={this.handleDisplayTitleChange} maxLength={50} />
+						</div>
 						<div>
 							<p style={labelStyle}>Default Graph Type:</p>
 							<div className="radio">

@@ -17,7 +17,7 @@ export const chartTypes = {
 /**
  * @type {State~Graph}
  */
-const defaultState = {
+export const defaultState = {
 	selectedMeters: [],
 	timeInterval: TimeInterval.unbounded(),
 	barDuration: moment.duration(1, 'month'),

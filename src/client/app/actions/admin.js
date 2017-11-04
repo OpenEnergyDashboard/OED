@@ -3,6 +3,7 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
 
 import axios from 'axios';
+import { changeBarStacking, changeChartToRender } from './graph';
 
 export const UPDATE_DISPLAY_TITLE = 'UPDATE_DISPLAY_TITLE';
 export const UPDATE_DEFAULT_GRAPH_TYPE = 'UPDATE_DEFAULT_GRAPH_TYPE';
@@ -36,6 +37,11 @@ function fetchPreferences() {
 		return axios.get('/api/preferences')
 			.then(response => {
 				dispatch(receivePreferences(response.data));
+				dispatch((dispatch2, getState) => {
+					const state = getState();
+					dispatch2(changeChartToRender(state.admin.defaultChartType));
+					dispatch2(changeBarStacking());
+				});
 			});
 	};
 }

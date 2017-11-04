@@ -33,6 +33,7 @@ export default class UIOptionsComponent extends React.Component {
 	 */
 	componentWillMount() {
 		this.props.fetchMetersDetailsIfNeeded();
+		this.props.fetchPreferencesIfNeeded();
 	}
 
 	handleMeterSelect(e) {
