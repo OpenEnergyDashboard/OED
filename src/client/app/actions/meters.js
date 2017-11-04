@@ -28,10 +28,10 @@ function fetchMetersData() {
 }
 
 /**
- * @param {State} state
+ * @param {State} Redux state
  */
 function shouldFetchMetersData(state) {
-	return state.meters.isFetching || state.meters.meters === undefined;
+	return !state.meters.isFetching && state.meters.meters === undefined;
 }
 
 export function fetchMetersDetailsIfNeeded() {

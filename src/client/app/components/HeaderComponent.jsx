@@ -17,6 +17,9 @@ export default function HeaderComponent(props) {
 	const titleStyle = {
 		display: 'inline-block'
 	};
+	const divStyle = {
+		paddingBottom: '45px'
+	};
 	const divRightStyle = {
 		float: 'right',
 		marginTop: '5px',
@@ -31,7 +34,7 @@ export default function HeaderComponent(props) {
 		display: localStorage.getItem('token') ? 'inline' : 'none'
 	};
 	return (
-		<div className="container-fluid">
+		<div className="container-fluid" style={divStyle}>
 			<div className="col-xs-4">
 				<Link to="/"><LogoComponent url="./app/images/logo.png" /></Link>
 			</div>

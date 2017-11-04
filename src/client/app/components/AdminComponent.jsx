@@ -3,24 +3,81 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
 
 import React from 'react';
-import { FormControl } from 'react-bootstrap';
+import axios from 'axios';
+import { FormControl, Button } from 'react-bootstrap';
+import { chartTypes } from '../reducers/graph';
 import HeaderContainer from '../containers/HeaderContainer';
 
 export default class AdminComponent extends React.Component {
 	constructor(props) {
 		super(props);
-		this.handleTitleChange = this.handleTitleChange.bind(this);
+		this.handleDisplayTitleChange = this.handleDisplayTitleChange.bind(this);
+		this.handleDefaultGraphTypeChange = this.handleDefaultGraphTypeChange.bind(this);
+		this.handleDefaultBarStackingChange = this.handleDefaultBarStackingChange.bind(this);
+		this.handleSubmitPreferences = this.handleSubmitPreferences.bind(this);
 	}
 
-	handleTitleChange(e) {
-		this.props.updateTitle(e.target.value);
+	handleDisplayTitleChange(e) {
+		this.props.updateDisplayTitle(e.target.value);
+	}
+
+	handleDefaultGraphTypeChange(e) {
+		this.props.updateDefaultGraphType(e.target.value);
+	}
+
+	handleDefaultBarStackingChange() {
+		this.props.toggleDefaultBarStacking();
+	}
+
+	handleSubmitPreferences() {
+		axios.post('/api/preferences',
+			{
+				token: localStorage.getItem('token'),
+				preferences: {
+					displayTitle: this.props.displayTitle,
+					defaultGraphType: this.props.defaultGraphType,
+					defaultBarStacking: this.props.defaultBarStacking
+				}
+			})
+			.catch(() => {
+				this.props.showNotification({
+					message: 'Failed to submit changes',
+					level: 'error',
+					position: 'tr',
+					autoDismiss: 3
+				});
+			}
+		);
 	}
 
 	render() {
+		const labelStyle = {
+			fontWeight: 'bold'
+		};
 		return (
 			<div>
 				<HeaderContainer renderLoginButton={false} renderOptionsButton={false} renderAdminButton={false} />
-				<FormControl type="text" placeholder="Name" value={this.props.title} onChange={this.handleTitleChange} />
+				<div className="container-fluid">
+					<div className="col-xs-6">
+						<FormControl type="text" placeholder="Name" value={this.props.displayTitle} onChange={this.handleDisplayTitleChange} />
+						<div>
+							<p style={labelStyle}>Default Graph Type:</p>
+							<div className="radio">
+								<label><input type="radio" name="chartTypes" value={chartTypes.line} onChange={this.handleDefaultGraphTypeChange} checked={this.props.defaultGraphType === chartTypes.line} />Line</label>
+							</div>
+							<div className="radio">
+								<label><input type="radio" name="chartTypes" value={chartTypes.bar} onChange={this.handleDefaultGraphTypeChange} checked={this.props.defaultGraphType === chartTypes.bar} />Bar</label>
+							</div>
+							<div className="radio">
+								<label><input type="radio" name="chartTypes" value={chartTypes.compare} onChange={this.handleDefaultGraphTypeChange} checked={this.props.defaultGraphType === chartTypes.compare} />Compare</label>
+							</div>
+						</div>
+						<div className="checkbox">
+							<label><input type="checkbox" onChange={this.handleDefaultBarStackingChange} checked={this.props.defaultBarStacking} />Default Bar stacking</label>
+						</div>
+						<Button type="submit" onClick={this.handleSubmitPreferences}>Submit</Button>
+					</div>
+				</div>
 			</div>
 		);
 	}

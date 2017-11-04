@@ -3,17 +3,44 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
 
 import * as adminActions from '../actions/admin';
+import { chartTypes } from './graph';
 
 const defaultState = {
-	title: 'Open Energy Dashboard'
+	displayTitle: 'Open Energy Dashboard',
+	defaultGraphType: chartTypes.line,
+	defaultBarStacking: false,
+	isFetching: false
 };
 
 export default function admin(state = defaultState, action) {
 	switch (action.type) {
-		case adminActions.UPDATE_TITLE:
+		case adminActions.UPDATE_DISPLAY_TITLE:
 			return {
 				...state,
-				title: action.title
+				displayTitle: action.displayTitle
+			};
+		case adminActions.UPDATE_DEFAULT_GRAPH_TYPE:
+			return {
+				...state,
+				defaultGraphType: action.defaultGraphType
+			};
+		case adminActions.TOGGLE_DEFAULT_BAR_STACKING:
+			return {
+				...state,
+				defaultBarStacking: !state.defaultBarStacking
+			};
+		case adminActions.REQUEST_PREFERENCES:
+			return {
+				...state,
+				isFetching: true
+			};
+		case adminActions.RECEIVE_PREFERENCES:
+			return {
+				...state,
+				isFetching: false,
+				displayTitle: action.data.displayTitle,
+				defaultGraphType: action.data.defaultGraphType,
+				defaultBarStacking: action.data.defaultBarStacking
 			};
 		default: return state;
 	}

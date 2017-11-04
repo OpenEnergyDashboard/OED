@@ -4,17 +4,23 @@
 
 import { connect } from 'react-redux';
 import AdminComponent from '../components/AdminComponent';
-import { updateTitle } from '../actions/admin';
+import { updateDisplayTitle, updateDefaultGraphType, toggleDefaultBarStacking } from '../actions/admin';
+import { showNotification } from '../actions/notifications';
 
 function mapStateToProps(state) {
 	return {
-		title: state.admin.title
+		displayTitle: state.admin.displayTitle,
+		defaultGraphType: state.admin.defaultGraphType,
+		defaultBarStacking: state.admin.defaultBarStacking
 	};
 }
 
 function mapDispatchToProps(dispatch) {
 	return {
-		updateTitle: title => dispatch(updateTitle(title))
+		updateDisplayTitle: displayTitle => dispatch(updateDisplayTitle(displayTitle)),
+		updateDefaultGraphType: defaultGraphType => dispatch(updateDefaultGraphType(defaultGraphType)),
+		toggleDefaultBarStacking: () => dispatch(toggleDefaultBarStacking()),
+		showNotification: notification => dispatch(showNotification(notification))
 	};
 }
 

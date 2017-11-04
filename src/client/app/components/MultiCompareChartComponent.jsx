@@ -6,7 +6,7 @@ import React from 'react';
 import CompareChartContainer from '../containers/CompareChartContainer';
 
 export default function MultiCompareChartComponent(props) {
-	//how much space should be used in the bootstrap grid syststem
+	// how much space should be used in the bootstrap grid syststem
 	let size;
 	if (props.selectedMeters.length === 1) {
 		size = 12;
@@ -17,9 +17,9 @@ export default function MultiCompareChartComponent(props) {
 	}
 	return (
 		<div className="row">
-			{props.selectedMeters.map(meterID =>
-				<div className={`col-xs-${size}`}>
-					<CompareChartContainer key={meterID} id={meterID} />
+			{props.selectedMeters.map((meterID, index) =>
+				<div className={`col-xs-${size}`} key={index}>
+					<CompareChartContainer id={meterID} />
 				</div>
 			)}
 		</div>

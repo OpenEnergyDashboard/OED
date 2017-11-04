@@ -2,8 +2,53 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
 
-export const UPDATE_TITLE = 'UPDATE_TITLE';
+import axios from 'axios';
 
-export function updateTitle(title) {
-	return { type: UPDATE_TITLE, title };
+export const UPDATE_DISPLAY_TITLE = 'UPDATE_DISPLAY_TITLE';
+export const UPDATE_DEFAULT_GRAPH_TYPE = 'UPDATE_DEFAULT_GRAPH_TYPE';
+export const TOGGLE_DEFAULT_BAR_STACKING = 'TOGGLE_DEFAULT_BAR_STACKING';
+export const REQUEST_PREFERENCES = 'REQUEST_PREFERENCES';
+export const RECEIVE_PREFERENCES = 'RECEIVE_PREFERENCES';
+
+export function updateDisplayTitle(displayTitle) {
+	return { type: UPDATE_DISPLAY_TITLE, displayTitle };
+}
+
+export function updateDefaultGraphType(defaultGraphType) {
+	return { type: UPDATE_DEFAULT_GRAPH_TYPE, defaultGraphType };
+}
+
+export function toggleDefaultBarStacking() {
+	return { type: TOGGLE_DEFAULT_BAR_STACKING };
+}
+
+function requestPreferences() {
+	return { type: REQUEST_PREFERENCES };
+}
+
+function receivePreferences(data) {
+	return { type: RECEIVE_PREFERENCES, data };
+}
+
+function fetchPreferences() {
+	return dispatch => {
+		dispatch(requestPreferences());
+		return axios.get('/api/preferences')
+			.then(response => {
+				dispatch(receivePreferences(response.data));
+			});
+	};
+}
+
+function shouldFetchMetersData(state) {
+	return !state.admin.isFetching;
+}
+
+export function fetchPreferencesIfNeeded() {
+	return (dispatch, getState) => {
+		if (shouldFetchMetersData(getState())) {
+			return dispatch(fetchPreferences());
+		}
+		return Promise.resolve();
+	};
 }
