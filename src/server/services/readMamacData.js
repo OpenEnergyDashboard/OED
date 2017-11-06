@@ -11,7 +11,11 @@ const Reading = require('../models/Reading');
 const parseCsv = promisify(csv.parse);
 
 function parseTimestamp(raw) {
-	return moment(raw, 'HH:mm:ss MM/DD/YY');
+	const ts = moment(raw, 'HH:mm:ss MM/DD/YY');
+	if (!ts.isValid()) {
+		throw new Error('raw timestamp does not parse to a valid moment object');
+	}
+	return ts;
 }
 
 /**
@@ -26,12 +30,19 @@ async function readMamacData(meter) {
 	if (!meter.id) throw new Error(`${meter} doesn't have an id to associate readings with`);
 	const rawReadings = await reqPromise(`http://${meter.ipAddress}/int2.csv`);
 	const parsedReadings = await parseCsv(rawReadings);
-	return parsedReadings.map(raw => new Reading(
+	return parsedReadings.map(raw => {
+		console.log(raw);
+		const reading = parseInt(raw[0]);
+		if (isNaN(reading)) {
+			throw new Error(`Meter reading parses to NaN for meter named ${meter.name} with id ${meter.id}`);
+		}
+		return new Reading(
 				meter.id,
-				parseInt(raw[0]),
+				reading,
 				parseTimestamp(raw[1]).subtract(1, 'hours').toDate(),
-				parseTimestamp(raw[1]).toDate())
-			);
+				parseTimestamp(raw[1]).toDate()
+		);
+	});
 }
 
 module.exports = readMamacData;
