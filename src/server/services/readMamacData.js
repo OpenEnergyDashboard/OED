@@ -13,7 +13,7 @@ const parseCsv = promisify(csv.parse);
 function parseTimestamp(raw) {
 	const ts = moment(raw, 'HH:mm:ss MM/DD/YY');
 	if (!ts.isValid()) {
-		throw new Error('raw timestamp does not parse to a valid moment object');
+		throw new Error(`raw timestamp ${raw} does not parse to a valid moment object`);
 	}
 	return ts;
 }
@@ -31,10 +31,9 @@ async function readMamacData(meter) {
 	const rawReadings = await reqPromise(`http://${meter.ipAddress}/int2.csv`);
 	const parsedReadings = await parseCsv(rawReadings);
 	return parsedReadings.map(raw => {
-		console.log(raw);
 		const reading = parseInt(raw[0]);
 		if (isNaN(reading)) {
-			throw new Error(`Meter reading parses to NaN for meter named ${meter.name} with id ${meter.id}`);
+			throw new Error(`Meter reading ${reading} parses to NaN for meter named ${meter.name} with id ${meter.id}`);
 		}
 		return new Reading(
 				meter.id,
