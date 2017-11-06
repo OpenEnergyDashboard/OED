@@ -60,7 +60,9 @@ export default class LoginComponent extends React.Component {
 					autoDismiss: 3
 				});
 			} else {
-				console.error(err);
+				// If there was a problem other than a lack of authorization, the user can't fix it.
+				// Log it to the console for developer use.
+				console.error(err); // eslint-disable-line no-console
 			}
 			this.inputEmail.focus();
 		});

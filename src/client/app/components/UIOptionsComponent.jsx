@@ -7,7 +7,6 @@ import Slider from 'react-rangeslider';
 import moment from 'moment';
 import 'react-rangeslider/lib/index.css';
 import '../styles/react-rangeslider-fix.css';
-import SelectComponent from './SelectComponent';
 import { chartTypes } from '../reducers/graph';
 
 import ExportContainer from '../containers/ExportContainer';
@@ -95,21 +94,13 @@ export default class UIOptionsComponent extends React.Component {
 		return (
 			<div style={divTopPadding}>
 				<ChartSelectContainer />
-				{/* Meters and groups multiselects don't work for the comparison graph. */}
-				{this.props.chartToRender !== chartTypes.compare && <ChartDataSelectContainer />}
-
-				{/* The comparison graph uses only a single meter, so that's what the user is allowed to select. */}
-				{this.props.chartToRender === chartTypes.compare && <div>
-					<p style={labelStyle}>Meter:</p>
-					<div style={divBottomPadding}>
-						<SelectComponent
-							options={meterSelectOptions}
-							selectedOption={singleSelectedMeter}
-							placeholder="Select Meter"
-							onValuesChange={s => this.handleMeterSelect([s])}
-						/>
-					</div>
-				</div>}
+				{ /* Controls specific to the bar chart. */}
+				{this.props.chartToRender === chartTypes.compare &&
+					<p style={divBottomPadding}>
+						Note: group data cannot be used with the compare function at this time.
+					</p>
+				}
+				<ChartDataSelectContainer />
 
 				{ /* Controls specific to the bar chart. */}
 				{this.props.chartToRender === chartTypes.bar &&

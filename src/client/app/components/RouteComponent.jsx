@@ -55,7 +55,8 @@ export default class RouteComponent extends React.Component {
 				// Route to login page if the auth token is not valid
 				if (!res.data.success) browserHistory.push('/login');
 			})
-			.catch(console.error);
+			// In the case of a server error, the user can't fix the issue. Log it for developers.
+			.catch(console.error); // eslint-disable-line no-console
 	}
 
 	/**

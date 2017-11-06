@@ -6,6 +6,7 @@
 
 # NPM
 node_modules
+npm*.log
 
 # Intellij (directory-based)
 .idea
