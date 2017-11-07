@@ -12,6 +12,7 @@ import LoginContainer from '../containers/LoginContainer';
 import AdminComponent from './AdminComponent';
 import NotFoundComponent from './NotFoundComponent';
 import GroupMainContainer from '../containers/groups/GroupMainContainer';
+import getToken from '../utils/getToken';
 
 export default class RouteComponent extends React.Component {
 	constructor(props) {
@@ -43,7 +44,7 @@ export default class RouteComponent extends React.Component {
 				state: { nextPathname: nextState.location.pathname }
 			});
 		}
-		const token = localStorage.getItem('token');
+		const token = getToken();
 		// Redirect route to login page if the auth token does not exist
 		if (!token) {
 			redirectRoute();

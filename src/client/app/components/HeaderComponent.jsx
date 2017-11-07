@@ -7,6 +7,7 @@ import { Link } from 'react-router';
 import { Button } from 'react-bootstrap';
 import LogoComponent from './LogoComponent';
 import UIModalComponent from './UIModalComponent';
+import getToken from '../utils/getToken';
 
 /**
  * React component that controls the header strip at the top of all pages
@@ -25,17 +26,17 @@ export default function HeaderComponent(props) {
 	};
 	const loginLinkStyle = {
 		// Displays the login button link only if the user is not logged in or is explicitly told to render
-		display: (localStorage.getItem('token') || props.renderLoginButton === false) ? 'none' : 'inline',
+		display: (getToken() || props.renderLoginButton === false) ? 'none' : 'inline',
 		paddingLeft: '5px'
 	};
 	const adminLinkStyle = {
 		// Displays the admin button link only if the user is logged in (auth token exists)
-		display: localStorage.getItem('token') ? 'inline' : 'none',
+		display: getToken() ? 'inline' : 'none',
 		paddingLeft: '5px'
 	};
 	const groupsLinkStyle = {
 		// Displays the groups button link only if the user is logged in (auth token exists) or explicitly told to render
-		display: localStorage.getItem('token') && props.renderGroupsButton ? 'inline' : 'none',
+		display: (getToken() && props.renderGroupsButton) ? 'inline' : 'none',
 		paddingLeft: '5px'
 	};
 	return (

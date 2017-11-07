@@ -5,6 +5,7 @@
  */
 
 import axios from 'axios';
+import getToken from '../utils/getToken';
 
 // View and fetching actions
 export const REQUEST_GROUPS_DETAILS = 'REQUEST_GROUPS_DETAILS';
@@ -314,7 +315,7 @@ export function submitGroupInEditingIfNeeded() {
 		if (shouldSubmitGroupInEditing(getState())) {
 			const rawGroup = getState().groups.groupInEditing;
 			const group = {
-				token: localStorage.getItem('token'),
+				token: getToken(),
 				name: rawGroup.name,
 				childGroups: rawGroup.childGroups,
 				childMeters: rawGroup.childMeters,
@@ -342,7 +343,7 @@ export function deleteGroup() {
 		dispatch(markGroupInEditingDirty());
 		const params = {
 			id: getState().groups.groupInEditing.id,
-			token: localStorage.getItem('token')
+			token: getToken()
 		};
 		return axios.post('api/groups/delete', params)
 			.then(() => {
