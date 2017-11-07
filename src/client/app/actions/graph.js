@@ -15,7 +15,7 @@ export const CHANGE_BAR_STACKING = 'CHANGE_BAR_STACKING';
 export const CHANGE_GRAPH_ZOOM = 'CHANGE_GRAPH_ZOOM';
 
 /**
- * @param {string} chartType is either chartTypes.line or chartTypes.bar
+ * @param {string} chartType is one of chartTypes
  * @returns {*} An action needed to change the chart type
  */
 export function changeChartToRender(chartType) {

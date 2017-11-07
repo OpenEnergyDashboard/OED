@@ -3,28 +3,31 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
 
 const _ = require('lodash');
-const Meter = require('../models/Meter');
 const Reading = require('../models/Reading');
-const readMamacData = require('./readMamacData');
+
 const log = require('../log');
 
 /**
- * Pulls new data for all the meters in the database.
- * This assumes that every meter is a MAMAC meter with a valid IP address.
+ * Uses the provided dataReader function to poll the provided meters for new readings,
+ * and inserts any new readings into the database.
+ * @param dataReader {function} A function to fetch readings from each meter
+ * @param metersToUpdate [Meter] An array of meters to be updated
+ * @return {Promise.<void>}
  */
-async function updateAllMeters() {
+async function updateAllMeters(dataReader, metersToUpdate) {
 	const time = new Date();
 	log(`Getting meter data ${time.toISOString()}`);
 	try {
-		const allMeters = await Meter.getAll();
-		const metersToUpdate = allMeters.filter(m => m.enabled && m.type === Meter.type.MAMAC);
-
 		// Do all the network requests in parallel, then throw out any requests that fail after logging the errors.
 		const readingInsertBatches = _.filter(await Promise.all(
 			metersToUpdate
-				.map(readMamacData)
+				.map(dataReader)
 				.map(p => p.catch(err => {
-					log(`ERROR ON REQUEST TO ${err.options.uri}, ${err.message}`, 'error');
+					let uri = '[NO URI AVAILABLE]';
+					if (err.options !== undefined && err.options.uri !== undefined) {
+						uri = err.options.uri;
+					}
+					log(`ERROR ON REQUEST TO ${uri}, ${err.message}`, 'error');
 					return null;
 				}))
 		), elem => elem !== null);

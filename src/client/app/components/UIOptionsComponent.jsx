@@ -7,9 +7,11 @@ import Slider from 'react-rangeslider';
 import moment from 'moment';
 import 'react-rangeslider/lib/index.css';
 import '../styles/react-rangeslider-fix.css';
-import MultiSelectComponent from './MultiSelectComponent';
 import { chartTypes } from '../reducers/graph';
+
 import ExportContainer from '../containers/ExportContainer';
+import ChartSelectContainer from '../containers/ChartSelectContainer';
+import ChartDataSelectContainer from '../containers/ChartDataSelectContainer';
 
 export default class UIOptionsComponent extends React.Component {
 	/**
@@ -19,10 +21,8 @@ export default class UIOptionsComponent extends React.Component {
 	constructor(props) {
 		super(props);
 		this.handleMeterSelect = this.handleMeterSelect.bind(this);
-		this.handleGroupSelect = this.handleGroupSelect.bind(this);
 		this.handleBarDurationChange = this.handleBarDurationChange.bind(this);
 		this.handleBarDurationChangeComplete = this.handleBarDurationChangeComplete.bind(this);
-		this.handleChangeChartType = this.handleChangeChartType.bind(this);
 		this.handleChangeBarStacking = this.handleChangeBarStacking.bind(this);
 		this.state = {
 			barDuration: 30 // barDuration in days
@@ -35,7 +35,13 @@ export default class UIOptionsComponent extends React.Component {
 	 */
 	componentWillMount() {
 		this.props.fetchMetersDetailsIfNeeded();
-		this.props.fetchGroupsDetailsIfNeeded();
+	}
+
+	/**
+	 * Stores temporary barDuration until slider is released, used to update the UI of the slider
+	 */
+	handleBarDurationChange(value) {
+		this.setState({ barDuration: value });
 	}
 
 	/**
@@ -47,30 +53,11 @@ export default class UIOptionsComponent extends React.Component {
 	}
 
 	/**
-	 * Handles a change in group selection
-	 * @param {Object[]} selection An array of {label: string, value: {type: string, id: int}} representing the current selection
-	 */
-	handleGroupSelect(selection) {
-		this.props.selectGroups(selection.map(s => s.value));
-	}
-
-	/**
-	 * Stores temporary barDuration until slider is released, used to update the UI of the slider
-	 */
-	handleBarDurationChange(value) {
-		this.setState({ barDuration: value });
-	}
-
-	/**
 	 * Called when the user releases the slider, dispatch action on temporary state variable
 	 */
 	handleBarDurationChangeComplete(e) {
 		e.preventDefault();
 		this.props.changeDuration(moment.duration(this.state.barDuration, 'days'));
-	}
-
-	handleChangeChartType(e) {
-		this.props.changeChartType(e.target.value);
 	}
 
 	handleChangeBarStacking() {
@@ -85,66 +72,41 @@ export default class UIOptionsComponent extends React.Component {
 			fontWeight: 'bold',
 			margin: 0
 		};
-		const divPadding = {
+
+		const divTopPadding = {
 			paddingTop: '15px'
 		};
+
 		const divBottomPadding = {
 			paddingBottom: '15px'
 		};
-		const radioButtonInlinePadding = {
-			display: 'inline-block',
-			width: '10px',
-		};
 
-		const meterSelectOptions = this.props.meters.map(meter => (
-			{
-				label: meter.name,
-				value: meter.id
-			}
-		));
-
-		const groupSelectOptions = this.props.groups.map(group => (
-			{
-				label: group.name,
-				value: group.id
-			}
-		));
 		return (
-			<div style={divPadding}>
-				<p style={labelStyle}>Groups:</p>
-				<div style={divBottomPadding}>
-					<MultiSelectComponent
-						options={groupSelectOptions}
-						selectedOptions={this.props.selectedGroups}
-						placeholder="Select Groups"
-						onValuesChange={s => this.handleGroupSelect(s)}
-					/>
-				</div>
-				<p style={labelStyle}>Meters:</p>
-				<div style={divBottomPadding}>
-					<MultiSelectComponent
-						options={meterSelectOptions}
-						selectedOptions={this.props.selectedMeters}
-						placeholder="Select Meters"
-						onValuesChange={s => this.handleMeterSelect(s)}
-					/>
-				</div>
-				<p style={labelStyle}>Graph Type:</p>
-				<div className="radio">
-					<label><input type="radio" name="chartTypes" value={chartTypes.line} onChange={this.handleChangeChartType} checked={this.props.chartToRender === chartTypes.line} />Line</label>
-					<div style={radioButtonInlinePadding} />
-					<label><input type="radio" name="chartTypes" value={chartTypes.bar} onChange={this.handleChangeChartType} checked={this.props.chartToRender === chartTypes.bar} />Bar</label>
-				</div>
-				{this.props.chartToRender === chartTypes.bar &&
-				<div>
-					<div className="checkbox">
-						<label><input type="checkbox" onChange={this.handleChangeBarStacking} />Bar stacking</label>
-					</div>
-					<p style={labelStyle}>Bar chart interval (days):</p>
-					<Slider min={1} max={365} value={this.state.barDuration} onChange={this.handleBarDurationChange} onChangeComplete={this.handleBarDurationChangeComplete} />
-				</div>
+			<div style={divTopPadding}>
+				<ChartSelectContainer />
+				{ /* Controls specific to the bar chart. */}
+				{this.props.chartToRender === chartTypes.compare &&
+					<p style={divBottomPadding}>
+						Note: group data cannot be used with the compare function at this time.
+					</p>
 				}
-				<ExportContainer />
+				<ChartDataSelectContainer />
+
+				{ /* Controls specific to the bar chart. */}
+				{this.props.chartToRender === chartTypes.bar &&
+					<div>
+						<div className="checkbox">
+							<label><input type="checkbox" onChange={this.handleChangeBarStacking} />Bar stacking</label>
+						</div>
+						<p style={labelStyle}>Bar chart interval (days):</p>
+						<Slider min={1} max={365} value={this.state.barDuration} onChange={this.handleBarDurationChange} onChangeComplete={this.handleBarDurationChangeComplete} />
+					</div>
+				}
+
+				{ /* We can't export compare data */ }
+				{this.props.chartToRender !== chartTypes.compare &&
+					<ExportContainer />
+				}
 			</div>
 		);
 	}
