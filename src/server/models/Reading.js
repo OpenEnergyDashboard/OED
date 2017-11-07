@@ -64,7 +64,7 @@ class Reading {
 	}
 
 	static refreshCompressedReadings(conn = db) {
-		return conn.none(sqlFile('reading/refresh_materialized_views.sql'));
+		return conn.none(sqlFile('reading/refresh_reading_views.sql'));
 	}
 
 	static mapRow(row) {

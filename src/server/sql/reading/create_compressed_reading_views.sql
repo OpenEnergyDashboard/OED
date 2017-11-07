@@ -52,6 +52,10 @@ CREATE OR REPLACE FUNCTION reading_rates_compressed_to_interval(interval_precisi
 
 
 CREATE MATERIALIZED VIEW
+minutely_readings
+	AS SELECT * FROM reading_rates_compressed_to_interval('minute');
+
+CREATE MATERIALIZED VIEW
 hourly_readings
 	AS SELECT * FROM reading_rates_compressed_to_interval('hour');
 
