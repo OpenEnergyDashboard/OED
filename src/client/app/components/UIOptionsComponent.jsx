@@ -81,16 +81,6 @@ export default class UIOptionsComponent extends React.Component {
 			paddingBottom: '15px'
 		};
 
-		const meterSelectOptions = this.props.meters.map(meter => (
-			{
-				label: meter.name,
-				value: meter.id
-			}
-		));
-
-		let singleSelectedMeter;
-		if (this.props.selectedMeters[0]) { singleSelectedMeter = this.props.selectedMeters[0]; }
-
 		return (
 			<div style={divTopPadding}>
 				<ChartSelectContainer />
@@ -112,7 +102,11 @@ export default class UIOptionsComponent extends React.Component {
 						<Slider min={1} max={365} value={this.state.barDuration} onChange={this.handleBarDurationChange} onChangeComplete={this.handleBarDurationChangeComplete} />
 					</div>
 				}
-				<ExportContainer />
+
+				{ /* We can't export compare data */ }
+				{this.props.chartToRender !== chartTypes.compare &&
+					<ExportContainer />
+				}
 			</div>
 		);
 	}

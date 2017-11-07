@@ -18,6 +18,6 @@ export default function LogoComponent(props) {
 		position: 'absolute'
 	};
 	return (
-		<img src={props.url} alt="Logo" title={`Open Energy Dashboard`} style={imgStyle} />
+		<img src={props.url} alt="Logo" title="Open Energy Dashboard" style={imgStyle} />
 	);
 }

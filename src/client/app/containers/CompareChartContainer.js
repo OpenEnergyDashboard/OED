@@ -4,11 +4,10 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/.
  */
 
-import _ from 'lodash';
 import { Bar } from 'react-chartjs-2';
 import moment from 'moment';
 import { connect } from 'react-redux';
-import datalabels from 'chartjs-plugin-datalabels';
+import datalabels from 'chartjs-plugin-datalabels'; // eslint-disable-line no-unused-vars
 
 
 /**
@@ -29,8 +28,8 @@ function mapStateToProps(state, ownProps) {
 
 	// Compose the text to display to the user.
 	const delta = change => {
-		if (isNaN(change)) return ''; if (change < 0) return `${state.meters.byMeterID[ownProps.id].name} has used ${parseInt(change.toFixed(2).replace('.', '').slice(1), 10)}% less energy this week.`;
-		return `${state.meters.byMeterID[ownProps.id].name} has used ${parseInt(change.toFixed(2).replace('.', ''), 10)}% more energy this week.`;
+		if (isNaN(change)) return ''; if (change < 0) return `${state.meters.byMeterID[ownProps.id].name} has used ${parseInt(change.toFixed(2).replace('.', '').slice(1))}% less energy this week.`;
+		return `${state.meters.byMeterID[ownProps.id].name} has used ${parseInt(change.toFixed(2).replace('.', ''))}% more energy this week.`;
 	};
 	const colorize = change => {
 		if (change < 0) {
@@ -122,9 +121,9 @@ function mapStateToProps(state, ownProps) {
 		legend: {
 			display: false
 		},
-		 tooltips: {
+		tooltips: {
 			enabled: false
-		 	},
+		},
 		title: {
 			display: true,
 			text: delta((-1 + (((currentWeek / currentLastWeek) * lastWeek) / lastWeek))),
