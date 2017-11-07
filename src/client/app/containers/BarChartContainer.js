@@ -20,42 +20,48 @@ function mapStateToProps(state) {
 
 	const labelsSet = new Set();
 	for (const meterID of state.graph.selectedMeters) {
-		const readingsData = state.readings.bar.byMeterID[meterID][timeInterval][barDuration];
-		if (readingsData !== undefined && !readingsData.isFetching) {
-			const label = state.meters.byMeterID[meterID].name;
-			const color = getGraphColor(label);
-			data.datasets.push({
-				label,
-				data: readingsData.readings.map(arr => arr[1]),
-				backgroundColor: color,
-				hoverBackgroundColor: color
-			});
-			// Add only the unique time intervals to the label set
-			for (const element of _.flatten(readingsData.readings.map(arr => arr[0]))) {
-				labelsSet.add(`${moment(element).format('MMM DD, YYYY')} - ${moment(element).add(barDuration).format('MMM DD, YYYY')}`);
+		const byMeterID = state.readings.bar.byMeterID[meterID];
+		if (byMeterID !== undefined) {
+			const readingsData = byMeterID[timeInterval][barDuration];
+			if (readingsData !== undefined && !readingsData.isFetching) {
+				const label = state.meters.byMeterID[meterID].name;
+				const color = getGraphColor(label);
+				data.datasets.push({
+					label,
+					data: readingsData.readings.map(arr => arr[1]),
+					backgroundColor: color,
+					hoverBackgroundColor: color
+				});
+				// Add only the unique time intervals to the label set
+				for (const element of _.flatten(readingsData.readings.map(arr => arr[0]))) {
+					labelsSet.add(`${moment(element).format('MMM DD, YYYY')} - ${moment(element).add(barDuration).format('MMM DD, YYYY')}`);
+				}
 			}
 		}
 	}
 
 	for (const groupID of state.graph.selectedGroups) {
-		const readingsData = state.readings.bar.byGroupID[groupID][timeInterval][barDuration];
-		if (readingsData !== undefined && !readingsData.isFetching) {
-			const label = state.groups.byGroupID[groupID].name;
-			const color = getGraphColor(label);
-			data.datasets.push({
-				label,
-				data: readingsData.readings.map(arr => arr[1]),
-				backgroundColor: color,
-				hoverBackgroundColor: color
-			});
-			// Add only the unique time intervals to the label set
-			for (const element of _.flatten(readingsData.readings.map(arr => arr[0]))) {
-				labelsSet.add(`${moment(element).format('MMM DD, YYYY')} - ${moment(element).add(barDuration).format('MMM DD, YYYY')}`);
+		const byGroupID = state.readings.bar.byGroupID[groupID];
+		if (byGroupID !== undefined) {
+			const readingsData = byGroupID[timeInterval][barDuration];
+			if (readingsData !== undefined && !readingsData.isFetching) {
+				const label = state.groups.byGroupID[groupID].name;
+				const color = getGraphColor(label);
+				data.datasets.push({
+					label,
+					data: readingsData.readings.map(arr => arr[1]),
+					backgroundColor: color,
+					hoverBackgroundColor: color
+				});
+				// Add only the unique time intervals to the label set
+				for (const element of _.flatten(readingsData.readings.map(arr => arr[0]))) {
+					labelsSet.add(`${moment(element).format('MMM DD, YYYY')} - ${moment(element).add(barDuration).format('MMM DD, YYYY')}`);
+				}
 			}
 		}
 	}
 
-    // Converts the label set into an array for Chart.js and sorts the labels based on the first date of the time interval
+	// Converts the label set into an array for Chart.js and sorts the labels based on the first date of the time interval
 	data.labels = Array.from(labelsSet).sort((x, y) => moment(x.split(' - ')[0], 'MMM DD, YYYY').format('x') - moment(y.split(' - ')[0], 'MMM DD, YYYY').format('x'));
 
 	const options = {
