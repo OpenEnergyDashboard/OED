@@ -2,11 +2,11 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
 
-import React from 'react';
+import * as React from 'react';
 import CompareChartContainer from '../containers/CompareChartContainer';
 
 export default function MultiCompareChartComponent(props) {
-	//how much space should be used in the bootstrap grid syststem
+	// how much space should be used in the bootstrap grid syststem
 	let size;
 	if (props.selectedMeters.length === 1) {
 		size = 12;
@@ -18,7 +18,7 @@ export default function MultiCompareChartComponent(props) {
 	return (
 		<div className="row">
 			{props.selectedMeters.map(meterID =>
-				<div className={`col-xs-${size}`}>
+				<div key={meterID} className={`col-xs-${size}`}>
 					<CompareChartContainer key={meterID} id={meterID} />
 				</div>
 			)}

@@ -2,11 +2,11 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
 
-import React from 'react';
+import * as React from 'react';
 import { Router, Route, browserHistory } from 'react-router';
 import axios from 'axios';
-import _ from 'lodash';
-import NotificationSystem from 'react-notification-system';
+import * as _ from 'lodash';
+import * as NotificationSystem from 'react-notification-system';
 import HomeComponent from './HomeComponent';
 import LoginContainer from '../containers/LoginContainer';
 import AdminComponent from './AdminComponent';

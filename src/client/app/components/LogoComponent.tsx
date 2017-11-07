@@ -2,8 +2,8 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
 
-import React from 'react';
-import VERSION from '../../../common/version';
+import * as React from 'react';
+import * as VERSION from '../../../common/version';
 
 /**
  * React component that creates an logo image from a file path

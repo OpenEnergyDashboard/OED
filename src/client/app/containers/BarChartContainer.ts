@@ -4,9 +4,9 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/.
  */
 
-import _ from 'lodash';
+import * as _ from 'lodash';
 import { Bar } from 'react-chartjs-2';
-import moment from 'moment';
+import * as moment from 'moment';
 import { connect } from 'react-redux';
 import getGraphColor from '../utils/getGraphColor';
 
@@ -16,13 +16,13 @@ import getGraphColor from '../utils/getGraphColor';
 function mapStateToProps(state) {
 	const timeInterval = state.graph.timeInterval;
 	const barDuration = state.graph.barDuration;
-	const data = { datasets: [] };
+	const data = { datasets: [], labels: [] };
 
 	const labelsSet = new Set();
 	for (const meterID of state.graph.selectedMeters) {
 		const readingsData = state.readings.bar.byMeterID[meterID][timeInterval][barDuration];
 		if (readingsData !== undefined && !readingsData.isFetching) {
-			const label = state.meters.byMeterID[meterID].name
+			const label = state.meters.byMeterID[meterID].name;
 			const color = getGraphColor(label);
 			data.datasets.push({
 				label,
@@ -36,8 +36,13 @@ function mapStateToProps(state) {
 			}
 		}
 	}
-    // Converts the label set into an array for Chart.js and sorts the labels based on the first date of the time interval
-	data.labels = Array.from(labelsSet).sort((x, y) => moment(x.split(' - ')[0], 'MMM DD, YYYY').format('x') - moment(y.split(' - ')[0], 'MMM DD, YYYY').format('x'));
+	// Converts the label set into an array for Chart.js and sorts the labels based on the first date of the time interval.
+	data.labels = Array.from(labelsSet).sort((x, y) => {
+		const t1 = moment(x.split(' - ')[0], 'MMM DD, YYYY').format('x');
+		const t2 = moment(y.split(' - ')[0], 'MMM DD, YYYY').format('x');
+		// Type coercion to satisfy the type checker.
+		return +(t1) - +(t2);
+	});
 
 	const options = {
 		animation: {

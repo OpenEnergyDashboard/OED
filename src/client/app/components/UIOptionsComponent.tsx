@@ -2,13 +2,12 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
 
-import React from 'react';
+import * as React from 'react';
 import Slider from 'react-rangeslider';
-import moment from 'moment';
+import * as moment from 'moment';
 import 'react-rangeslider/lib/index.css';
 import { chartTypes } from '../reducers/graph';
 import ExportContainer from '../containers/ExportContainer';
-
 
 export default class UIOptionsComponent extends React.Component {
 	/**
