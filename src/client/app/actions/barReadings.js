@@ -137,6 +137,7 @@ function fetchCompareReadings(meterIDs, timeInterval) {
 export function fetchNeededBarReadings(timeInterval) {
 	return (dispatch, getState) => {
 		const state = getState();
+		const futures = [];
 
 		// Determine which meters are missing data for this time interval
 		const meterIDsToFetchForBar = state.graph.selectedMeters.filter(
@@ -144,7 +145,7 @@ export function fetchNeededBarReadings(timeInterval) {
 		);
 		// Fetch data for any missing meters
 		if (meterIDsToFetchForBar.length > 0) {
-			return dispatch(fetchMeterBarReadings(meterIDsToFetchForBar, timeInterval));
+			futures.push(dispatch(fetchMeterBarReadings(meterIDsToFetchForBar, timeInterval)));
 		}
 
 		// Determine which groups are missing data for this time interval
@@ -153,9 +154,9 @@ export function fetchNeededBarReadings(timeInterval) {
 		);
 		// Fetch data for any missing groups
 		if (groupIDsToFetchForBar.length > 0) {
-			return dispatch(fetchGroupBarReadings(groupIDsToFetchForBar, timeInterval));
+			futures.push(dispatch(fetchGroupBarReadings(groupIDsToFetchForBar, timeInterval)));
 		}
-		return Promise.resolve();
+		return Promise.all(futures);
 	};
 }
 
