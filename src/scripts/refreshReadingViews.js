@@ -1,0 +1,18 @@
+/*
+ * This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this
+ * file, You can obtain one at http://mozilla.org/MPL/2.0/.
+ */
+
+const log = require('../server/log');
+const Reading = require('../server/models/Reading');
+const stopDB = require('../server/models/database').stopDB;
+
+async function refreshReadingViews() {
+	log('Refreshing reading views');
+	await Reading.refreshCompressedReadings();
+	log('Views refreshed');
+	stopDB();
+}
+
+refreshReadingViews();

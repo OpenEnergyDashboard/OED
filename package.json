@@ -16,7 +16,8 @@
     "addMamacMeters": "node ./src/server/services/addMamacMeters.js",
     "updateMamacMeters": "node ./src/server/services/updateMamacMeters.js",
     "createUser": "node ./src/server/services/user/createUser.js",
-    "editUser": "node ./src/server/services/user/editUser.js"
+    "editUser": "node ./src/server/services/user/editUser.js",
+	"refreshReadingViews": "node ./src/scripts/refreshReadingViews.js"
   },
   "dependencies": {
     "axios": "~0.16.2",
