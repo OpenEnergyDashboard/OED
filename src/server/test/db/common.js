@@ -18,19 +18,9 @@ config.database = {
 const { db, createSchema } = require('../../models/database');
 
 async function recreateDB() {
-	await db.none('DROP VIEW IF EXISTS groups_deep_meters');
-	await db.none('DROP VIEW IF EXISTS groups_deep_children');
-	await db.none('DROP VIEW IF EXISTS meters_deep_children');
-	await db.none('DROP TABLE IF EXISTS meters_immediate_children');
-	await db.none('DROP TABLE IF EXISTS groups_immediate_children');
-	await db.none('DROP TABLE IF EXISTS groups_immediate_meters');
-	await db.none('DROP TABLE IF EXISTS groups');
-	await db.none('DROP TABLE IF EXISTS users');
-	await db.none('DROP TABLE IF EXISTS readings');
-	await db.none('DROP TABLE IF EXISTS meters');
-	await db.none('DROP TYPE IF EXISTS meter_type');
-	await db.none('DROP FUNCTION IF EXISTS compressed_readings(INTEGER[], TIMESTAMP, TIMESTAMP, INTEGER);');
-	await db.none('DROP FUNCTION IF EXISTS barchart_readings(INTEGER[], INTERVAL, TIMESTAMP, TIMESTAMP);');
+	// This should drop all database objects, as long as they were all created by the current database user
+	// They should be, since they were all created during a previous test.
+	await db.none('DROP OWNED BY current_user;');
 	await createSchema();
 }
 
