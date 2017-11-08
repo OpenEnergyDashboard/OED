@@ -6,23 +6,23 @@
 
 import axios from 'axios';
 
-export const REQUEST_METERS_DATA = 'REQUEST_METERS_DATA';
-export const RECEIVE_METERS_DATA = 'RECEIVE_METERS_DATA';
+export const REQUEST_METERS_DETAILS = 'REQUEST_METERS_DETAILS';
+export const RECEIVE_METERS_DETAILS = 'RECEIVE_METERS_DETAILS';
 
-export function requestMetersData() {
-	return { type: REQUEST_METERS_DATA };
+export function requestMetersDetails() {
+	return { type: REQUEST_METERS_DETAILS };
 }
 
-export function receiveMetersData(data) {
-	return { type: RECEIVE_METERS_DATA, data };
+export function receiveMetersDetails(data) {
+	return { type: RECEIVE_METERS_DETAILS, data };
 }
 
-function fetchMetersData() {
+function fetchMetersDetails() {
 	return dispatch => {
-		dispatch(requestMetersData());
+		dispatch(requestMetersDetails());
 		return axios.get('/api/meters')
 			.then(response => {
-				dispatch(receiveMetersData(response.data));
+				dispatch(receiveMetersDetails(response.data));
 			});
 	};
 }
@@ -30,14 +30,14 @@ function fetchMetersData() {
 /**
  * @param {State} state
  */
-function shouldFetchMetersData(state) {
-	return state.meters.isFetching || state.meters.meters === undefined;
+function shouldFetchMetersDetails(state) {
+	return !state.meters.isFetching && state.meters.meters === undefined;
 }
 
 export function fetchMetersDetailsIfNeeded() {
 	return (dispatch, getState) => {
-		if (shouldFetchMetersData(getState())) {
-			return dispatch(fetchMetersData());
+		if (shouldFetchMetersDetails(getState())) {
+			return dispatch(fetchMetersDetails());
 		}
 		return Promise.resolve();
 	};

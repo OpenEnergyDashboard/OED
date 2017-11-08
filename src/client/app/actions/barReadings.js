@@ -6,58 +6,127 @@
 
 import axios from 'axios';
 
-export const REQUEST_BAR_READINGS = 'REQUEST_BAR_READINGS';
-export const RECEIVE_BAR_READINGS = 'RECEIVE_BAR_READINGS';
+export const REQUEST_GROUP_BAR_READINGS = 'REQUEST_GROUP_BAR_READINGS';
+export const RECEIVE_GROUP_BAR_READINGS = 'RECEIVE_GROUP_BAR_READINGS';
+
+export const REQUEST_METER_BAR_READINGS = 'REQUEST_METER_BAR_READINGS';
+export const RECEIVE_METER_BAR_READINGS = 'RECEIVE_METER_BAR_READINGS';
 
 /**
- * @param {State} state
- * @param {number} meterID
- * @param {TimeInterval} timeInterval
- * @param {Moment.Duration} barDuration
+ * @param {State} state the Redux state
+ * @param {number} meterID the ID of the meter to check
+ * @param {TimeInterval} timeInterval the interval over which to check
+ * @param {Moment.Duration} barDuration the duration of each bar for which to check
+ * @returns {boolean} True if the readings for the given meter, time, and duration are missing; false otherwise.
  */
-function shouldFetchBarReadings(state, meterID, timeInterval, barDuration) {
-	const readingsForMeterID = state.readings.bar.byMeterID[meterID];
-	if (readingsForMeterID === undefined) {
+function shouldFetchMeterBarReadings(state, meterID, timeInterval, barDuration) {
+	const readingsForID = state.readings.bar.byMeterID[meterID];
+	if (readingsForID === undefined) {
 		return true;
 	}
-	if (readingsForMeterID[timeInterval] === undefined) {
+
+	const readingsForTimeInterval = readingsForID[timeInterval];
+	if (readingsForTimeInterval === undefined) {
 		return true;
 	}
-	if (readingsForMeterID[timeInterval][barDuration] === undefined) {
+
+	const readingsForBarDuration = readingsForTimeInterval[barDuration];
+	if (readingsForBarDuration === undefined) {
 		return true;
 	}
-	const readingsForTimeIntervalAndDuration = state.readings.bar.byMeterID[meterID][timeInterval][barDuration];
-	return readingsForTimeIntervalAndDuration === undefined && !readingsForTimeIntervalAndDuration.isFetching;
+
+	return !readingsForBarDuration.isFetching;
 }
 
-function requestBarReadings(meterIDs, timeInterval, barDuration) {
-	return { type: REQUEST_BAR_READINGS, meterIDs, timeInterval, barDuration };
+/**
+ * @param {State} state the Redux state
+ * @param {number} groupID the ID of the group to check
+ * @param {TimeInterval} timeInterval the interval over which to check
+ * @param {Moment.Duration} barDuration the duration of each bar for which to check
+ * @returns {boolean} True if the readings for the given group, time, and duration are missing; false otherwise.
+ */
+function shouldFetchGroupBarReadings(state, groupID, timeInterval, barDuration) {
+	const readingsForID = state.readings.bar.byMeterID[groupID];
+	if (readingsForID === undefined) {
+		return true;
+	}
+
+	const readingsForTimeInterval = readingsForID[timeInterval];
+	if (readingsForTimeInterval === undefined) {
+		return true;
+	}
+
+	const readingsForBarDuration = readingsForTimeInterval[barDuration];
+	if (readingsForBarDuration === undefined) {
+		return true;
+	}
+
+	return !readingsForBarDuration.isFetching;
 }
 
-function receiveBarReadings(meterIDs, timeInterval, barDuration, readings) {
-	return { type: RECEIVE_BAR_READINGS, meterIDs, timeInterval, barDuration, readings };
+function requestMeterBarReadings(meterIDs, timeInterval, barDuration) {
+	return { type: REQUEST_METER_BAR_READINGS, meterIDs, timeInterval, barDuration };
 }
 
-function fetchBarReadings(meterIDs, timeInterval) {
+function receiveMeterBarReadings(meterIDs, timeInterval, barDuration, readings) {
+	return { type: RECEIVE_METER_BAR_READINGS, meterIDs, timeInterval, barDuration, readings };
+}
+
+function requestGroupBarReadings(groupIDs, timeInterval, barDuration) {
+	return { type: REQUEST_GROUP_BAR_READINGS, groupIDs, timeInterval, barDuration };
+}
+
+function receiveGroupBarReadings(groupIDs, timeInterval, barDuration, readings) {
+	return { type: RECEIVE_GROUP_BAR_READINGS, groupIDs, timeInterval, barDuration, readings };
+}
+
+/**
+ * Fetch the data for the given meters over the given interval. Fully manages the Redux lifecycle.
+ * Reads bar duration from the state.
+ * @param {[number]} meterIDs The IDs of the meters whose data should be fetched
+ * @param {TimeInterval} timeInterval The time interval over which data should be fetched
+ */
+function fetchMeterBarReadings(meterIDs, timeInterval) {
 	return (dispatch, getState) => {
 		const barDuration = getState().graph.barDuration;
-		dispatch(requestBarReadings(meterIDs, timeInterval, barDuration));
-		const stringifiedMeterIDs = meterIDs.join(',');
-		return axios.get(`/api/readings/bar/${stringifiedMeterIDs}`, {
+		dispatch(requestMeterBarReadings(meterIDs, timeInterval, barDuration));
+		// API expectes a comma-seperated string of IDs
+		const stringifiedIDs = meterIDs.join(',');
+
+		return axios.get(`/api/readings/bar/meters/${stringifiedIDs}`, {
 			params: { timeInterval: timeInterval.toString(), barDuration: barDuration.toISOString() }
-		}).then(response => dispatch(receiveBarReadings(meterIDs, timeInterval, barDuration, response.data)));
+		}).then(response => dispatch(receiveMeterBarReadings(meterIDs, timeInterval, barDuration, response.data)));
+	};
+}
+
+/**
+ * Fetch the data for the given groups over the given interval. Fully manages the Redux lifecycle.
+ * Reads bar duration from the state.
+ * @param {[number]} groupIDs The IDs of the groups whose data should be fetched
+ * @param {TimeInterval} timeInterval The time interval over which data should be fetched
+ */
+function fetchGroupBarReadings(groupIDs, timeInterval) {
+	return (dispatch, getState) => {
+		const barDuration = getState().graph.barDuration;
+		dispatch(requestGroupBarReadings(groupIDs, timeInterval, barDuration));
+		// API expectes a comma-seperated string of IDs
+		const stringifiedIDs = groupIDs.join(',');
+
+		return axios.get(`/api/readings/bar/groups/${stringifiedIDs}`, {
+			params: { timeInterval: timeInterval.toString(), barDuration: barDuration.toISOString() }
+		}).then(response => dispatch(receiveGroupBarReadings(groupIDs, timeInterval, barDuration, response.data)));
 	};
 }
 
 function fetchCompareReadings(meterIDs, timeInterval) {
-    return (dispatch, getState) => {
-        const barDuration = getState().graph.compareDuration;
-        dispatch(requestBarReadings(meterIDs, timeInterval, barDuration));
-        const stringifiedMeterIDs = meterIDs.join(',');
-        return axios.get(`/api/readings/bar/${stringifiedMeterIDs}`, {
-            params: { timeInterval: timeInterval.toString(), barDuration: barDuration.toISOString() }
-        }).then(response => dispatch(receiveBarReadings(meterIDs, timeInterval, barDuration, response.data)));
-    };
+	return (dispatch, getState) => {
+		const barDuration = getState().graph.compareDuration;
+		dispatch(requestMeterBarReadings(meterIDs, timeInterval, barDuration));
+		const stringifiedMeterIDs = meterIDs.join(',');
+		return axios.get(`/api/readings/bar/meters/${stringifiedMeterIDs}`, {
+			params: { timeInterval: timeInterval.toString(), barDuration: barDuration.toISOString() }
+		}).then(response => dispatch(receiveMeterBarReadings(meterIDs, timeInterval, barDuration, response.data)));
+	};
 }
 
 /**
@@ -68,21 +137,36 @@ function fetchCompareReadings(meterIDs, timeInterval) {
 export function fetchNeededBarReadings(timeInterval) {
 	return (dispatch, getState) => {
 		const state = getState();
-		const meterIDsToFetchForBar = state.graph.selectedMeters.filter(id => shouldFetchBarReadings(state, id, timeInterval, state.graph.barDuration));
+		const futures = [];
+
+		// Determine which meters are missing data for this time interval
+		const meterIDsToFetchForBar = state.graph.selectedMeters.filter(
+			id => shouldFetchMeterBarReadings(state, id, timeInterval, state.graph.barDuration)
+		);
+		// Fetch data for any missing meters
 		if (meterIDsToFetchForBar.length > 0) {
-			return dispatch(fetchBarReadings(meterIDsToFetchForBar, timeInterval));
+			futures.push(dispatch(fetchMeterBarReadings(meterIDsToFetchForBar, timeInterval)));
 		}
-		return Promise.resolve();
+
+		// Determine which groups are missing data for this time interval
+		const groupIDsToFetchForBar = state.graph.selectedGroups.filter(
+			id => shouldFetchGroupBarReadings(state, id, timeInterval, state.graph.barDuration)
+		);
+		// Fetch data for any missing groups
+		if (groupIDsToFetchForBar.length > 0) {
+			futures.push(dispatch(fetchGroupBarReadings(groupIDsToFetchForBar, timeInterval)));
+		}
+		return Promise.all(futures);
 	};
 }
 
 export function fetchNeededCompareReadings(timeInterval) {
-    return (dispatch, getState) => {
-        const state = getState();
-        const meterIDsToFetchForBar = state.graph.selectedMeters.filter(id => shouldFetchBarReadings(state, id, timeInterval, state.graph.compareDuration));
-        if (meterIDsToFetchForBar.length > 0) {
-            return dispatch(fetchCompareReadings(meterIDsToFetchForBar, timeInterval));
-        }
-        return Promise.resolve();
-    };
+	return (dispatch, getState) => {
+		const state = getState();
+		const meterIDsToFetchForBar = state.graph.selectedMeters.filter(id => shouldFetchMeterBarReadings(state, id, timeInterval, state.graph.compareDuration));
+		if (meterIDsToFetchForBar.length > 0) {
+			return dispatch(fetchCompareReadings(meterIDsToFetchForBar, timeInterval));
+		}
+		return Promise.resolve();
+	};
 }

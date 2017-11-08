@@ -16,16 +16,37 @@ function mapStateToProps(state) {
 	const timeInterval = state.graph.timeInterval;
 	const data = { datasets: [] };
 
+	// Add all meters data to the chart
 	for (const meterID of state.graph.selectedMeters) {
-		const readingsData = state.readings.line.byMeterID[meterID][timeInterval];
-		if (readingsData !== undefined && !readingsData.isFetching) {
-			const label = state.meters.byMeterID[meterID].name;
-			data.datasets.push({
-				label,
-				data: readingsData.readings.map(arr => ({ x: arr[0], y: arr[1].toFixed(2) })),
-				fill: false,
-				borderColor: getGraphColor(label)
-			});
+		const byMeterID = state.readings.line.byMeterID[meterID];
+		if (byMeterID !== undefined) {
+			const readingsData = byMeterID[timeInterval];
+			if (readingsData !== undefined && !readingsData.isFetching) {
+				const label = state.meters.byMeterID[meterID].name;
+				data.datasets.push({
+					label,
+					data: readingsData.readings.map(arr => ({ x: arr[0], y: arr[1].toFixed(2) })),
+					fill: false,
+					borderColor: getGraphColor(label)
+				});
+			}
+		}
+	}
+
+	// Add all groups data to the chart
+	for (const groupID of state.graph.selectedGroups) {
+		const byGroupID = state.readings.line.byGroupID[groupID];
+		if (byGroupID !== undefined) {
+			const readingsData = byGroupID[timeInterval];
+			if (readingsData !== undefined && !readingsData.isFetching) {
+				const label = state.groups.byGroupID[groupID].name;
+				data.datasets.push({
+					label,
+					data: readingsData.readings.map(arr => ({ x: arr[0], y: arr[1].toFixed(2) })),
+					fill: false,
+					borderColor: getGraphColor(label)
+				});
+			}
 		}
 	}
 

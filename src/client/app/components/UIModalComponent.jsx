@@ -25,7 +25,8 @@ export default class UIModalComponent extends React.Component {
 
 	render() {
 		const inlineStyle = {
-			display: 'inline'
+			display: 'inline',
+			paddingLeft: '5px'
 		};
 		return (
 			<div style={inlineStyle}>

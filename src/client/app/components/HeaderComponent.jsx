@@ -7,6 +7,7 @@ import { Link } from 'react-router';
 import { Button } from 'react-bootstrap';
 import LogoComponent from './LogoComponent';
 import UIModalComponent from './UIModalComponent';
+import getToken from '../utils/getToken';
 
 /**
  * React component that controls the header strip at the top of all pages
@@ -14,6 +15,7 @@ import UIModalComponent from './UIModalComponent';
  * @return JSX to create the header strip
  */
 export default function HeaderComponent(props) {
+	const title = props.title ? props.title : 'Open Energy Dashboard';
 	const titleStyle = {
 		display: 'inline-block'
 	};
@@ -23,12 +25,19 @@ export default function HeaderComponent(props) {
 		marginRight: '20px'
 	};
 	const loginLinkStyle = {
-		// Displays the login button link only if the user is not logged in or is explicitly told to display by the parent component
-		display: (localStorage.getItem('token') || props.renderLoginButton === false) ? 'none' : 'inline'
+		// Displays the login button link only if the user is not logged in or is explicitly told to render
+		display: (getToken() || props.renderLoginButton === false) ? 'none' : 'inline',
+		paddingLeft: '5px'
 	};
 	const adminLinkStyle = {
 		// Displays the admin button link only if the user is logged in (auth token exists)
-		display: localStorage.getItem('token') ? 'inline' : 'none'
+		display: getToken() ? 'inline' : 'none',
+		paddingLeft: '5px'
+	};
+	const groupsLinkStyle = {
+		// Displays the groups button link only if the user is logged in (auth token exists) or explicitly told to render
+		display: (getToken() && props.renderGroupsButton) ? 'inline' : 'none',
+		paddingLeft: '5px'
 	};
 	return (
 		<div className="container-fluid">
@@ -36,7 +45,7 @@ export default function HeaderComponent(props) {
 				<Link to="/"><LogoComponent url="./app/images/logo.png" /></Link>
 			</div>
 			<div className="col-xs-4 text-center">
-				<h1 style={titleStyle}>Open Energy Dashboard</h1>
+				<h1 style={titleStyle}>{title}</h1>
 			</div>
 			<div style={divRightStyle}>
 				<div className="visible-sm visible-xs">
@@ -44,6 +53,7 @@ export default function HeaderComponent(props) {
 				</div>
 				<Link style={loginLinkStyle} to="/login"><Button bsStyle="default">Log In</Button></Link>
 				<Link style={adminLinkStyle} to="/admin"><Button bsStyle="default">Admin panel</Button></Link>
+				<Link style={groupsLinkStyle} to="/groups"><Button bsStyle="default">Groups</Button></Link>
 			</div>
 		</div>
 	);
