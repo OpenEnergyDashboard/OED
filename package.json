@@ -1,7 +1,7 @@
 {
   "name": "Open-Energy-Dashboard",
-  "version": "0.0.0",
-  "private": true,
+  "version": "0.2.0",
+  "private": false,
   "license": "MPL-2.0",
   "scripts": {
     "start": "node ./src/bin/www",
