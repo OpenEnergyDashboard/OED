@@ -5,6 +5,7 @@
 import React from 'react';
 import { Router, Route, browserHistory } from 'react-router';
 import axios from 'axios';
+import moment from 'moment';
 import _ from 'lodash';
 import NotificationSystem from 'react-notification-system';
 import HomeComponent from './HomeComponent';
@@ -18,6 +19,7 @@ export default class RouteComponent extends React.Component {
 	constructor(props) {
 		super(props);
 		this.requireAuth = this.requireAuth.bind(this);
+		this.linkToGraph = this.linkToGraph.bind(this);
 	}
 
 	shouldComponentUpdate() {
@@ -61,8 +63,50 @@ export default class RouteComponent extends React.Component {
 	}
 
 	/**
+	 * Middleware function that allows hotlinking to a graph with options
+	 * @param nextState The next state of the router
+	 * @param replace Function that allows a route redirect
+	 */
+	linkToGraph(nextState, replace) {
+		try {
+			let pathOptions = nextState.params.splat;
+			pathOptions = pathOptions.replace('?', '');
+			const params = pathOptions.split('&');
+			for (const param of params) {
+				const option = param.split('=');
+				const key = option[0];
+				const info = option[1];
+				switch (key) {
+					case 'meterIDs':
+						this.props.changeSelectedMeters(info.split(',').map(s => parseInt(s)));
+						break;
+					case 'groupIDs':
+						this.props.changeSelectedGroups(info.split(',').map(s => parseInt(s)));
+						break;
+					case 'barDuration':
+						this.props.changeBarDuration(moment.duration(parseInt(info), 'days'));
+						break;
+					case 'barStacking':
+						if (this.props.barStacking.toString() !== info) {
+							this.props.changeBarStacking();
+						}
+						break;
+					default:
+						console.error('Unknown query parameter');
+				}
+			}
+		} catch (err) {
+			console.error('Failed to link to graph');
+		}
+		replace({
+			pathname: '/',
+			state: { nextPathname: nextState.location.pathname }
+		});
+	}
+
+	/**
 	 * React component that controls the app's routes
-	 * Note that '/admin' requires authentication
+	 * Note that '/admin' and '/groups' requires authentication
 	 * @returns JSX to create the RouteComponent
 	 */
 	render() {
@@ -74,6 +118,7 @@ export default class RouteComponent extends React.Component {
 					<Route path="/login" component={LoginContainer} />
 					<Route path="/admin" component={AdminComponent} onEnter={this.requireAuth} />
 					<Route path="/groups" component={GroupMainContainer} onEnter={this.requireAuth} />
+					<Route path="/graph/*" component={HomeComponent} onEnter={this.linkToGraph} />
 					<Route path="*" component={NotFoundComponent} />
 				</Router>
 			</div>
