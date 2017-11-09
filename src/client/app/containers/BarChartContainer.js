@@ -84,7 +84,7 @@ function mapStateToProps(state) {
 				stacked: state.graph.barStacking,
 				scaleLabel: {
 					display: true,
-					labelString: 'kWh'
+					labelString: 'kW'
 				},
 				ticks: {
 					beginAtZero: true
@@ -97,7 +97,7 @@ function mapStateToProps(state) {
 			backgroundColor: 'rgba(0,0,0,0.6)',
 			displayColors: false,
 			callbacks: {
-				label: tooltipItems => `${data.datasets[tooltipItems.datasetIndex].label}: ${tooltipItems.yLabel} kWh`
+				label: tooltipItems => `${data.datasets[tooltipItems.datasetIndex].label}: ${tooltipItems.yLabel} kW`
 			}
 		}
 	};
