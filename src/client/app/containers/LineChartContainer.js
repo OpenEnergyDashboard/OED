@@ -66,7 +66,7 @@ function mapStateToProps(state) {
 			yAxes: [{
 				scaleLabel: {
 					display: true,
-					labelString: 'kWh'
+					labelString: 'kW'
 				},
 				ticks: {
 					beginAtZero: true
@@ -80,7 +80,7 @@ function mapStateToProps(state) {
 			displayColors: false,
 			callbacks: {
 				title: tooltipItems => `${moment(tooltipItems[0].xLabel).format('dddd, MMM DD, YYYY hh:mm a')}`,
-				label: tooltipItems => `${data.datasets[tooltipItems.datasetIndex].label}: ${tooltipItems.yLabel} kWh`
+				label: tooltipItems => `${data.datasets[tooltipItems.datasetIndex].label}: ${tooltipItems.yLabel} kW`
 			}
 		}
 	};

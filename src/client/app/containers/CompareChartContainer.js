@@ -111,7 +111,7 @@ function mapStateToProps(state, ownProps) {
 				stacked: false,
 				scaleLabel: {
 					display: true,
-					labelString: 'kWh'
+					labelString: 'kW'
 				},
 				ticks: {
 					beginAtZero: true
@@ -136,7 +136,7 @@ function mapStateToProps(state, ownProps) {
 					weight: 'bold'
 				},
 				display: true,
-				formatter: value => `${value} kWh`
+				formatter: value => `${value} kW`
 			},
 		}
 	};
