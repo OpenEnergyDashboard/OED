@@ -103,7 +103,7 @@ export default class LoginComponent extends React.Component<LoginProps, LoginSta
 		})
 		.then(response => {
 			localStorage.setItem('token', response.data.token);
-			browserHistory.push('/admin');
+			browserHistory.push('/');
 		})
 		.catch(err => {
 			if (err.response.status === 401) {
@@ -119,7 +119,6 @@ export default class LoginComponent extends React.Component<LoginProps, LoginSta
 				console.error(err); // tslint:disable-line no-console
 			}
 			this.inputEmail.focus();
-
 		});
 		this.setState({ email: '', password: '' });
 	}

@@ -2,17 +2,9 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
 
-/*
-  The groups table contains a row for each group in the database.
-  Groups have child groups, which can have child groups, and so on. This forms a Directed Acyclic Graph (DAG).
-
-  A directed acyclic graph is great because by taking any group as the root node and traversing the graph, we get all of
-  that graph's children. (It's not quite a tree because there might be a diamond pattern in the child graph)
-
-  Each group also has a list of meters that it directly covers.
- */
 CREATE TABLE groups (
-  id SERIAL PRIMARY KEY NOT NULL
+	id SERIAL PRIMARY KEY NOT NULL,
+	name VARCHAR(50) UNIQUE NOT NULL CHECK (char_length(name) >= 1)
 );
 
 /*
@@ -22,35 +14,35 @@ CREATE TABLE groups (
   TODO: Ensure that no cycles are inserted into the graph. This will likely require a BEFORE INSERT trigger.
  */
 CREATE TABLE groups_immediate_children (
-  parent_id INT NOT NULL REFERENCES groups (id),
-  child_id  INT NOT NULL REFERENCES groups (id),
-  PRIMARY KEY (parent_id, child_id), -- Only one edge between a parent and a child
-  CHECK (parent_id != child_id) -- No self-references
+	parent_id INT NOT NULL REFERENCES groups (id),
+	child_id  INT NOT NULL REFERENCES groups (id),
+	PRIMARY KEY (parent_id, child_id), -- Only one edge between a parent and a child
+	CHECK (parent_id != child_id) -- No self-references
 );
 
 /*
   The groups_deep_children view provides a logical table with a row for each (parent, deep child) relationship in the tree.
  */
 CREATE VIEW groups_deep_children AS
-  /* This recursive common table expression (CTE) starts at each node in the graph and iterates.
+	/* This recursive common table expression (CTE) starts at each no-e in the graph and iterates.
       At each iteration, it adds new rows to the result set for each newly discovered deep child relationship.
   */
-  WITH RECURSIVE deep_children(parent_id, child_id) AS (
-    SELECT
-      gic.parent_id,
-      gic.child_id
-    FROM groups_immediate_children gic
-    UNION ALL -- We can use UNION ALL instead of union because the graph is acyclic and therefore we don't risk looping forever.
-    SELECT
-      gdc.parent_id,
-      gic.child_id
-    FROM deep_children gdc
-      INNER JOIN groups_immediate_children gic ON gdc.child_id = gic.parent_id
-  )
-  SELECT -- Select the results of the CTE to create the view.
-    parent_id,
-    child_id
-  FROM deep_children;
+	WITH RECURSIVE deep_children(parent_id, child_id) AS (
+		SELECT
+			gic.parent_id,
+			gic.child_id
+		FROM groups_immediate_children gic
+		UNION ALL -- We can use UNION ALL instead of union because the graph is acyclic and therefore we don't risk looping forever.
+		SELECT
+			gdc.parent_id,
+			gic.child_id
+		FROM deep_children gdc
+			INNER JOIN groups_immediate_children gic ON gdc.child_id = gic.parent_id
+	)
+	SELECT -- Select the results of the CTE to create the view.
+		parent_id,
+		child_id
+	FROM deep_children;
 
 /*
   When we aggregate the meters for a group, we need to exclude a meter if we also include a meter that covers a superset
@@ -60,10 +52,10 @@ CREATE VIEW groups_deep_children AS
   TODO: Ensure that the graph structure is actually a multitree. This will probably require a BEFORE INSERT trigger.
 */
 CREATE TABLE meters_immediate_children (
-  parent_id INT NOT NULL REFERENCES meters (id),
-  child_id  INT NOT NULL REFERENCES meters (id),
-  PRIMARY KEY (parent_id, child_id),
-  CHECK (parent_id != child_id)
+	parent_id INT NOT NULL REFERENCES meters (id),
+	child_id  INT NOT NULL REFERENCES meters (id),
+	PRIMARY KEY (parent_id, child_id),
+	CHECK (parent_id != child_id)
 );
 
 /*
@@ -71,34 +63,34 @@ CREATE TABLE meters_immediate_children (
   multitree of meter relationships.
  */
 CREATE VIEW meters_deep_children AS
-  /*
+	/*
     This is implemented the same way that decks_deep_children is implemented.
    */
-  WITH RECURSIVE deep_children(parent_id, child_id) AS (
-    SELECT
-      mic.parent_id,
-      mic.child_id
-    FROM meters_immediate_children mic
-    UNION ALL
-    SELECT
-      mdc.parent_id,
-      mic.child_id
-    FROM deep_children mdc
-      INNER JOIN meters_immediate_children mic ON mdc.child_id = mic.parent_id
-  )
-  SELECT
-    parent_id,
-    child_id
-  FROM deep_children;
+	WITH RECURSIVE deep_children(parent_id, child_id) AS (
+		SELECT
+			mic.parent_id,
+			mic.child_id
+		FROM meters_immediate_children mic
+		UNION ALL
+		SELECT
+			mdc.parent_id,
+			mic.child_id
+		FROM deep_children mdc
+			INNER JOIN meters_immediate_children mic ON mdc.child_id = mic.parent_id
+	)
+	SELECT
+		parent_id,
+		child_id
+	FROM deep_children;
 
 
 /*
   This table represents the many-to-many relationship between groups and meters.
 */
 CREATE TABLE groups_immediate_meters (
-  group_id INT NOT NULL REFERENCES groups (id),
-  meter_id INT NOT NULL REFERENCES meters (id),
-  PRIMARY KEY (group_id, meter_id)
+	group_id INT NOT NULL REFERENCES groups (id),
+	meter_id INT NOT NULL REFERENCES meters (id),
+	PRIMARY KEY (group_id, meter_id)
 );
 
 /*
@@ -111,31 +103,36 @@ CREATE TABLE groups_immediate_meters (
   The above to-do is probably going to require a significant reworking of some stuff.
  */
 CREATE VIEW groups_deep_meters AS
-  /* First we need to get all the deep child meters for each group. We just join groups_immediate_meters to
+	/* First we need to get all the deep child meters for each group. We just join groups_immediate_meters to
     groups_deep_children to grab all the meters associated with a group or one of its deep children.
   */
 
-  WITH all_deep_meters(group_id, meter_id) AS (
-      SELECT DISTINCT -- Distinct because two children might include the same meter, and we only want it once.
-        gdc.parent_id AS group_id,
-        gim.meter_id
-      FROM groups_deep_children gdc
-        INNER JOIN groups_immediate_meters gim ON gdc.parent_id = gim.group_id OR gdc.child_id = gim.group_id
-  )
-  SELECT
-    adm.group_id AS group_id,
-    adm.meter_id AS meter_id,
-    EXISTS(
-    /*
+	WITH all_deep_meters(group_id, meter_id) AS (
+		SELECT DISTINCT -- Distinct because two children might include the same meter, and we only want it once.
+			gdc.parent_id AS group_id,
+			gim.meter_id AS meter_id
+		FROM groups_immediate_meters gim
+			INNER JOIN groups_deep_children gdc ON gdc.child_id = gim.group_id
+		UNION
+		SELECT
+			gim.group_id AS group_id,
+			gim.meter_id AS meter_id
+		from groups_immediate_meters gim
+	)
+	SELECT
+		adm.group_id AS group_id,
+		adm.meter_id AS meter_id,
+		EXISTS(
+		/*
       We want to mark meter-group relationships as shadowed if there is another relationship with the same
       group that has a meter that is a deep parent of this meter.
       We do this by looking for rows in the meters_deep_children (mdc) view where mdc.child_id is the id
       of the current meter, and mdc.parent_id is the ID of some other row in all_deep_meters that has the same group ID as
       our current group and has a meter id that is a deep parent of our current meter.
     */
-        SELECT 1 -- It doesn't matter what the result set has, only that it has at least 1 row, so we can just use '1'.
-        FROM all_deep_meters adm2
-          INNER JOIN meters_deep_children mdc ON mdc.parent_id = adm2.meter_id AND mdc.child_id = adm.meter_id
-        WHERE adm2.group_id = adm.group_id
-    )            AS is_shadowed
-  FROM all_deep_meters adm;
+				SELECT 1 -- It doesn't matter what the result set has, only that it has at least 1 row, so we can just use '1'.
+				FROM all_deep_meters adm2
+					INNER JOIN meters_deep_children mdc ON mdc.parent_id = adm2.meter_id AND mdc.child_id = adm.meter_id
+				WHERE adm2.group_id = adm.group_id
+		)            AS is_shadowed
+	FROM all_deep_meters adm;

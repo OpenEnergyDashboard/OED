@@ -11,6 +11,8 @@ import HomeComponent from './HomeComponent';
 import LoginContainer from '../containers/LoginContainer';
 import AdminComponent from './AdminComponent';
 import NotFoundComponent from './NotFoundComponent';
+import GroupMainContainer from '../containers/groups/GroupMainContainer';
+import getToken from '../utils/getToken';
 
 interface RouteProps {
 	clearNotifications(): void;
@@ -35,7 +37,7 @@ export default class RouteComponent extends React.Component<RouteProps, {}> {
 				state: { nextPathname: nextState.location.pathname }
 			});
 		}
-		const token = localStorage.getItem('token');
+		const token = getToken();
 		// Redirect route to login page if the auth token does not exist
 		if (!token) {
 			redirectRoute();
@@ -74,10 +76,11 @@ export default class RouteComponent extends React.Component<RouteProps, {}> {
 			<div>
 				<NotificationSystem ref={c => { this.notificationSystem = c; }} />
 				<Router history={browserHistory}>
-					<Route path='/' component={HomeComponent} />
-					<Route path='/login' component={LoginContainer} />
-					<Route path='/admin' component={AdminComponent} onEnter={this.requireAuth} />
-					<Route path='*' component={NotFoundComponent} />
+					<Route path="/" component={HomeComponent} />
+					<Route path="/login" component={LoginContainer} />
+					<Route path="/admin" component={AdminComponent} onEnter={this.requireAuth} />
+					<Route path="/groups" component={GroupMainContainer} onEnter={this.requireAuth} />
+					<Route path="*" component={NotFoundComponent} />
 				</Router>
 			</div>
 		);

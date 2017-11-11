@@ -25,12 +25,12 @@ const defaultState = {
  */
 export default function meters(state = defaultState, action) {
 	switch (action.type) {
-		case metersActions.REQUEST_METERS_DATA:
+		case metersActions.REQUEST_METERS_DETAILS:
 			return {
 				...state,
 				isFetching: true
 			};
-		case metersActions.RECEIVE_METERS_DATA:
+		case metersActions.RECEIVE_METERS_DETAILS:
 			return {
 				...state,
 				isFetching: false,

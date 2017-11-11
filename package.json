@@ -1,7 +1,7 @@
 {
   "name": "Open-Energy-Dashboard",
-  "version": "0.0.0",
-  "private": true,
+  "version": "0.2.0",
+  "private": false,
   "license": "MPL-2.0",
   "scripts": {
     "start": "node ./src/bin/www",
@@ -27,6 +27,7 @@
     "dotenv": "~2.0.0",
     "es6-promisify": "~5.0.0",
     "express": "~4.13.4",
+    "jsonschema": "~1.2.0",
     "jsonwebtoken": "~7.2.1",
     "lodash": "~4.17.4",
     "lodash-webpack-plugin": "~0.11.4",
@@ -43,6 +44,7 @@
     "react-rangeslider": "~2.2.0",
     "react-redux": "~5.0.6",
     "react-router": "~3.0.5",
+    "react-select": "~1.0.0-rc.10",
     "redux": "~3.7.2",
     "redux-thunk": "~2.2.0",
     "request": "~2.83.0",

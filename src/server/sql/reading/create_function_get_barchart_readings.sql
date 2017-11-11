@@ -24,6 +24,13 @@ CREATE OR REPLACE FUNCTION barchart_readings(
 		FROM readings
 		INNER JOIN unnest(meter_ids) specific_meter(id) ON readings.meter_id = specific_meter.id
 		WHERE (readings.start_timestamp, readings.end_timestamp) OVERLAPS (from_timestamp, to_timestamp);
+
+		IF real_start_timestamp = '-infinity' OR real_end_timestamp = 'infinity' THEN
+			-- If the time range was not shrunk then there were no readings and we should return no rows.
+			RETURN; -- Return just returns an empty result set.
+		END IF;
+
+		-- If we didn't return then it's safe to subtract the timestamps
 		real_duration := least(duration, real_end_timestamp - real_start_timestamp);
 
 		RETURN QUERY

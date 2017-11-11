@@ -9,13 +9,14 @@ import { fetchNeededBarReadings, fetchNeededCompareReadings } from './barReading
 import { TimeInterval } from '../../../common/TimeInterval';
 
 export const UPDATE_SELECTED_METERS = 'UPDATE_SELECTED_METERS';
+export const UPDATE_SELECTED_GROUPS = 'UPDATE_SELECTED_GROUPS';
 export const UPDATE_BAR_DURATION = 'UPDATE_BAR_DURATION';
 export const CHANGE_CHART_TO_RENDER = 'CHANGE_CHART_TO_RENDER';
 export const CHANGE_BAR_STACKING = 'CHANGE_BAR_STACKING';
 export const CHANGE_GRAPH_ZOOM = 'CHANGE_GRAPH_ZOOM';
 
 /**
- * @param {string} chartType is either chartTypes.line or chartTypes.bar
+ * @param {string} chartType is one of chartTypes
  * @returns {*} An action needed to change the chart type
  */
 export function changeChartToRender(chartType) {
@@ -28,6 +29,10 @@ export function changeBarStacking() {
 
 export function updateSelectedMeters(meterIDs) {
 	return { type: UPDATE_SELECTED_METERS, meterIDs };
+}
+
+export function updateSelectedGroups(groupIDs) {
+	return { type: UPDATE_SELECTED_GROUPS, groupIDs };
 }
 
 export function updateBarDuration(barDuration) {
@@ -50,6 +55,18 @@ export function changeSelectedMeters(meterIDs) {
 			dispatch2(fetchNeededLineReadings(getState().graph.timeInterval));
 			dispatch2(fetchNeededBarReadings(getState().graph.timeInterval));
 			dispatch2(fetchNeededCompareReadings(getState().graph.compareTimeInterval));
+		});
+		return Promise.resolve();
+	};
+}
+
+export function changeSelectedGroups(groupIDs) {
+	return (dispatch, getState) => {
+		dispatch(updateSelectedGroups(groupIDs));
+		// Nesting dispatches to preserve that updateSelectedGroups() is called before fetching readings
+		dispatch(dispatch2 => {
+			dispatch2(fetchNeededLineReadings(getState().graph.timeInterval));
+			dispatch2(fetchNeededBarReadings(getState().graph.timeInterval));
 		});
 		return Promise.resolve();
 	};

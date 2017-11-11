@@ -19,6 +19,7 @@ export enum chartTypes {
  */
 const defaultState = {
 	selectedMeters: [],
+	selectedGroups: [],
 	timeInterval: TimeInterval.unbounded(),
 	barDuration: moment.duration(1, 'month'),
 	compareTimeInterval: moment().diff(moment().startOf('week'), 'days'),
@@ -38,6 +39,11 @@ export default function graph(state = defaultState, action) {
 			return {
 				...state,
 				selectedMeters: action.meterIDs
+			};
+		case graphActions.UPDATE_SELECTED_GROUPS:
+			return {
+				...state,
+				selectedGroups: action.groupIDs
 			};
 		case graphActions.UPDATE_BAR_DURATION:
 			return {

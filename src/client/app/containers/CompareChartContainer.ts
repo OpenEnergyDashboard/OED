@@ -4,11 +4,10 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/.
  */
 
-import * as _ from 'lodash';
 import { Bar } from 'react-chartjs-2';
 import * as moment from 'moment';
 import { connect } from 'react-redux';
-import datalabels from 'chartjs-plugin-datalabels';
+import datalabels from 'chartjs-plugin-datalabels'; // eslint-disable-line no-unused-vars
 
 
 /**
@@ -26,6 +25,8 @@ function mapStateToProps(state, ownProps) {
 	// Power used up to this point last week
 	let currentLastWeek = 0;
 	const soFar = moment().diff(moment().startOf('week'), 'days');
+
+	// Compose the text to display to the user.
 	const delta = change => {
 		// On a NaN result, just give up.
 		if (isNaN(change)) { return ''; }
@@ -122,7 +123,7 @@ function mapStateToProps(state, ownProps) {
 				stacked: false,
 				scaleLabel: {
 					display: true,
-					labelString: 'kWh'
+					labelString: 'kW'
 				},
 				ticks: {
 					beginAtZero: true
@@ -147,8 +148,8 @@ function mapStateToProps(state, ownProps) {
 					weight: 'bold'
 				},
 				display: true,
-				formatter: value => `${value} kWh`
-			}
+				formatter: value => `${value} kW`
+			},
 		}
 	};
 
