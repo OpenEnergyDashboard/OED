@@ -119,15 +119,6 @@ export function changeOptionsFromLink(options) {
 	if (options.changeBarStacking) {
 		dispatchSecond.push(changeBarStacking());
 	}
-	return dispatch => {
-		for (const func of dispatchFirst) {
-			dispatch(func);
-		}
-		dispatch(dispatch2 => {
-			for (const func of dispatchSecond) {
-				dispatch2(func);
-			}
-		});
-		return Promise.resolve();
-	};
+	return dispatch => Promise.all(dispatchFirst.map(dispatch))
+			.then(() => Promise.all(dispatchSecond.map(dispatch)));
 }
