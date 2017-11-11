@@ -7,13 +7,25 @@ export const DATA_TYPE_METER = 'DATA_TYPE_METER';
 // Signifies that the containing object represents a group of meters and groups
 export const DATA_TYPE_GROUP = 'DATA_TYPE_GROUP';
 
+interface GroupID {
+	type: 'DATA_TYPE_GROUP';
+	value: number;
+}
+
+interface MeterID {
+	type: 'DATA_TYPE_METER';
+	value: number;
+}
+
+type DatasourceID = GroupID | MeterID;
+
 /**
  * Put item's id field in tgt if the item specifies a meter
  * @param {int[]} tgt The array to perhaps insert an item into
  * @param {{String, int}} item The item being considered
  * @return {Array} The modified tgt array
  */
-export function metersFilterReduce(tgt, item) {
+export function metersFilterReduce(tgt: number[], item: DatasourceID) {
 	if (item.type === DATA_TYPE_METER) {
 		tgt.push(item.value);
 	}
@@ -26,7 +38,7 @@ export function metersFilterReduce(tgt, item) {
  * @param {{String, int}} item The item being considered
  * @return {Array} The modified tgt array
  */
-export function groupsFilterReduce(tgt, item) {
+export function groupsFilterReduce(tgt: number[], item: DatasourceID) {
 	if (item.type === DATA_TYPE_GROUP) {
 		tgt.push(item.value);
 	}
