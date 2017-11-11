@@ -65,43 +65,37 @@ export default class RouteComponent extends React.Component {
 	/**
 	 * Middleware function that allows hotlinking to a graph with options
 	 * @param nextState The next state of the router
-	 * @param replace Function that allows a route redirect
 	 */
-	linkToGraph(nextState, replace) {
-		try {
-			let pathOptions = nextState.params.splat;
-			pathOptions = pathOptions.replace('?', '');
-			const params = pathOptions.split('&');
-			for (const param of params) {
-				const option = param.split('=');
-				const key = option[0];
-				const info = option[1];
-				switch (key) {
-					case 'meterIDs':
-						this.props.changeSelectedMeters(info.split(',').map(s => parseInt(s)));
-						break;
-					case 'groupIDs':
-						this.props.changeSelectedGroups(info.split(',').map(s => parseInt(s)));
-						break;
-					case 'barDuration':
-						this.props.changeBarDuration(moment.duration(parseInt(info), 'days'));
-						break;
-					case 'barStacking':
-						if (this.props.barStacking.toString() !== info) {
-							this.props.changeBarStacking();
-						}
-						break;
-					default:
-						console.error('Unknown query parameter');
+	linkToGraph(nextState) {
+		const queries = nextState.location.query;
+		if (!_.isEmpty(queries)) {
+			try {
+				const options = {};
+				for (const [key, info] of Object.entries(queries)) {
+					switch (key) {
+						case 'meterIDs':
+							options.meterIDs = info.split(',').map(s => parseInt(s));
+							break;
+						case 'groupIDs':
+							options.groupIDs = info.split(',').map(s => parseInt(s));
+							break;
+						case 'barDuration':
+							options.barDuration = moment.duration(parseInt(info), 'days');
+							break;
+						case 'barStacking':
+							if (this.props.barStacking.toString() !== info) {
+								options.changeBarStacking = true;
+							}
+							break;
+						default:
+							console.error('Unknown query parameter');
+					}
 				}
+				this.props.changeOptionsFromLink(options);
+			} catch (err) {
+				console.error('Failed to link to graph');
 			}
-		} catch (err) {
-			console.error('Failed to link to graph');
 		}
-		replace({
-			pathname: '/',
-			state: { nextPathname: nextState.location.pathname }
-		});
 	}
 
 	/**
@@ -114,11 +108,10 @@ export default class RouteComponent extends React.Component {
 			<div>
 				<NotificationSystem ref={c => { this.notificationSystem = c; }} />
 				<Router history={browserHistory}>
-					<Route path="/" component={HomeComponent} />
+					<Route path="/" component={HomeComponent} onEnter={this.linkToGraph} />
 					<Route path="/login" component={LoginContainer} />
 					<Route path="/admin" component={AdminComponent} onEnter={this.requireAuth} />
 					<Route path="/groups" component={GroupMainContainer} onEnter={this.requireAuth} />
-					<Route path="/graph/*" component={HomeComponent} onEnter={this.linkToGraph} />
 					<Route path="*" component={NotFoundComponent} />
 				</Router>
 			</div>

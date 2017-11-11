@@ -7,7 +7,7 @@
 import { connect } from 'react-redux';
 import RouteComponent from '../components/RouteComponent';
 import { clearNotifications } from '../actions/notifications';
-import { changeSelectedMeters, changeSelectedGroups, changeBarDuration, changeBarStacking } from '../actions/graph';
+import { changeOptionsFromLink } from '../actions/graph';
 
 
 function mapStateToProps(state) {
@@ -20,10 +20,7 @@ function mapStateToProps(state) {
 function mapDispatchToProps(dispatch) {
 	return {
 		clearNotifications: () => dispatch(clearNotifications()),
-		changeSelectedMeters: meterIDs => dispatch(changeSelectedMeters(meterIDs)),
-		changeSelectedGroups: groupIDs => dispatch(changeSelectedGroups(groupIDs)),
-		changeBarDuration: barDuration => dispatch(changeBarDuration(barDuration)),
-		changeBarStacking: () => dispatch(changeBarStacking())
+		changeOptionsFromLink: options => dispatch(changeOptionsFromLink(options))
 	};
 }
 
