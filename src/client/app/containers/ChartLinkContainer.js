@@ -23,8 +23,4 @@ function mapStateToProps(state) {
 	};
 }
 
-
-/**
- * Connects changes to the Redux store to ChartSelectComponent via mapStateToProps
- */
 export default connect(mapStateToProps)(ChartLinkComponent);
