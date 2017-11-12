@@ -3,7 +3,7 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
 
-import _ from 'lodash';
+import * as _ from 'lodash';
 import { connect } from 'react-redux';
 import CreateGroupComponent from '../../components/groups/CreateGroupComponent';
 import { createNewBlankGroup, editGroupName, changeDisplayMode, DISPLAY_MODE, submitGroupInEditingIfNeeded } from '../../actions/groups';

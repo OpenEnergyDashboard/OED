@@ -3,7 +3,7 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
 
-import _ from 'lodash';
+import * as _ from 'lodash';
 import { connect } from 'react-redux';
 import EditGroupsComponent from '../../components/groups/EditGroupsComponent';
 import { submitGroupInEditingIfNeeded, editGroupName, changeDisplayMode, DISPLAY_MODE, changeChildMeters, changeChildGroups, deleteGroup } from '../../actions/groups';

@@ -3,8 +3,8 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
 
 // This component is the main page of the edit group page.
-import React from 'react';
-import _ from 'lodash';
+import * as React from 'react';
+import * as _ from 'lodash';
 import { FormControl, Button, Glyphicon } from 'react-bootstrap';
 import DatasourceBoxContainer from '../../containers/groups/DatasourceBoxContainer';
 
