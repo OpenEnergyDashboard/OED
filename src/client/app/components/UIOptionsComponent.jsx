@@ -12,6 +12,7 @@ import { chartTypes } from '../reducers/graph';
 import ExportContainer from '../containers/ExportContainer';
 import ChartSelectContainer from '../containers/ChartSelectContainer';
 import ChartDataSelectContainer from '../containers/ChartDataSelectContainer';
+import ChartLinkContainer from '../containers/ChartLinkContainer';
 
 export default class UIOptionsComponent extends React.Component {
 	/**
@@ -111,6 +112,9 @@ export default class UIOptionsComponent extends React.Component {
 				{this.props.chartToRender !== chartTypes.compare &&
 					<ExportContainer />
 				}
+				<div style={divTopPadding}>
+					<ChartLinkContainer />
+				</div>
 			</div>
 		);
 	}
