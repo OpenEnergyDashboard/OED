@@ -92,7 +92,7 @@ export default class RouteComponent extends React.Component {
 							}
 							break;
 						default:
-							console.error('Unknown query parameter');
+							throw new Error('Unknown query parameter');
 					}
 				}
 				this.props.changeOptionsFromLink(options);
