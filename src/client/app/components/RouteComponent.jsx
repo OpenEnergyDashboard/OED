@@ -65,8 +65,9 @@ export default class RouteComponent extends React.Component {
 	/**
 	 * Middleware function that allows hotlinking to a graph with options
 	 * @param nextState The next state of the router
+	 * @param replace Function that allows a route redirect
 	 */
-	linkToGraph(nextState) {
+	linkToGraph(nextState, replace) {
 		const queries = nextState.location.query;
 		if (!_.isEmpty(queries)) {
 			try {
@@ -78,6 +79,9 @@ export default class RouteComponent extends React.Component {
 							break;
 						case 'groupIDs':
 							options.groupIDs = info.split(',').map(s => parseInt(s));
+							break;
+						case 'chartType':
+							options.chartType = info;
 							break;
 						case 'barDuration':
 							options.barDuration = moment.duration(parseInt(info), 'days');
@@ -96,6 +100,9 @@ export default class RouteComponent extends React.Component {
 				console.error('Failed to link to graph');
 			}
 		}
+		replace({
+			pathname: '/'
+		});
 	}
 
 	/**
@@ -108,10 +115,11 @@ export default class RouteComponent extends React.Component {
 			<div>
 				<NotificationSystem ref={c => { this.notificationSystem = c; }} />
 				<Router history={browserHistory}>
-					<Route path="/" component={HomeComponent} onEnter={this.linkToGraph} />
+					<Route path="/" component={HomeComponent} />
 					<Route path="/login" component={LoginContainer} />
 					<Route path="/admin" component={AdminComponent} onEnter={this.requireAuth} />
 					<Route path="/groups" component={GroupMainContainer} onEnter={this.requireAuth} />
+					<Route path="/graph" component={HomeComponent} onEnter={this.linkToGraph} />
 					<Route path="*" component={NotFoundComponent} />
 				</Router>
 			</div>

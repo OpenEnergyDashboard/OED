@@ -99,7 +99,7 @@ export function changeGraphZoomIfNeeded(timeInterval) {
 
 /**
  * Update graph options from a link
- * @param options - Object of possible values to dispatch with keys: meterIDs, groupIDs, barDuration, toggleBarStacking
+ * @param options - Object of possible values to dispatch with keys: meterIDs, groupIDs, chartType, barDuration, toggleBarStacking
  * @returns {function(*)}
  */
 export function changeOptionsFromLink(options) {
@@ -112,6 +112,9 @@ export function changeOptionsFromLink(options) {
 	if (options.groupIDs) {
 		dispatchFirst.push(fetchGroupsDetailsIfNeeded());
 		dispatchSecond.push(changeSelectedGroups(options.groupIDs));
+	}
+	if (options.chartType) {
+		dispatchSecond.push(changeChartToRender(options.chartType));
 	}
 	if (options.barDuration) {
 		dispatchSecond.push(changeBarDuration(options.barDuration));
