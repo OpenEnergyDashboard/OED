@@ -5,10 +5,17 @@
  */
 
 import { Bar } from 'react-chartjs-2';
+import { ChartData, ChartDataSets } from 'chart.js';
 import * as moment from 'moment';
 import { connect } from 'react-redux';
 import datalabels from 'chartjs-plugin-datalabels'; // eslint-disable-line no-unused-vars
 
+interface ChartDataSetsWithDatalabels extends ChartDataSets {
+	datalabels: {
+		anchor: string;
+		align: string;
+	};
+}
 
 /**
  * @param {State} state
@@ -16,8 +23,8 @@ import datalabels from 'chartjs-plugin-datalabels'; // eslint-disable-line no-un
 function mapStateToProps(state, ownProps) {
 	const timeInterval = state.graph.compareTimeInterval;
 	const barDuration = state.graph.compareDuration;
-	const data = { datasets: [], labels: [] };
-	const labels = [];
+	const datasets: ChartDataSetsWithDatalabels[] = [];
+	const labels: string[] = [];
 	// Power used so far this week
 	let currentWeek = 0;
 	// Last week total usage
@@ -79,7 +86,7 @@ function mapStateToProps(state, ownProps) {
 		const color1 = 'rgba(173, 216, 230, 1)';
 		const color2 = 'rgba(218, 165, 32, 1)';
 		const color3 = 'rgba(173, 216, 230, 0.45)';
-		data.datasets.push(
+		datasets.push(
 			{
 				data: [lastWeek, Math.round((currentWeek / currentLastWeek) * lastWeek)],
 				backgroundColor: [color1, color3],
@@ -99,9 +106,16 @@ function mapStateToProps(state, ownProps) {
 			}
 		);
 		// sorts the data so that one doesn't cover up the other
-		data.datasets.sort((a, b) => a.data[0] - b.data[0]);
+		datasets.sort((a, b) => {
+			if (a.data !== undefined && b.data !== undefined) {
+				return +(a.data[0]) - +(b.data[0]);
+			} else {
+				return 0;
+			}
+		});
 	}
-	data.labels = labels;
+
+	const data: ChartData = {datasets, labels};
 
 	const options = {
 		animation: {
@@ -149,7 +163,7 @@ function mapStateToProps(state, ownProps) {
 				},
 				display: true,
 				formatter: value => `${value} kW`
-			},
+			}
 		}
 	};
 

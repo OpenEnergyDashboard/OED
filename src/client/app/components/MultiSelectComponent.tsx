@@ -6,9 +6,22 @@ import * as PropTypes from 'prop-types';
 import * as React from 'react';
 import Select from 'react-select';
 import 'react-select/dist/react-select.css';
+import { SelectOption } from '../utils/types';
 import '../styles/react-select-css.css';
 
-export default class MultiSelectComponent extends React.Component {
+interface MultiSelectProps {
+	placeholder: string;
+	options: SelectOption[];
+	selectedOptions: SelectOption[] | null;
+	style?: React.CSSProperties;
+	onValuesChange(values: SelectOption[]): void;
+}
+
+interface MultiSelectState {
+	selectedOptions: SelectOption[];
+}
+
+export default class MultiSelectComponent extends React.Component<MultiSelectProps, MultiSelectState> {
 	constructor(props) {
 		super(props);
 		this.onValuesChangeInternal = this.onValuesChangeInternal.bind(this);
@@ -18,20 +31,13 @@ export default class MultiSelectComponent extends React.Component {
 		};
 	}
 
-	componentWillReceiveProps(nextProps) {
+	public componentWillReceiveProps(nextProps) {
 		if (nextProps.selectedOptions) {
 			this.setState({ selectedOptions: nextProps.selectedOptions });
 		}
 	}
 
-	onValuesChangeInternal(items) {
-		// Defer to the underlying MultiSelect when it has a state change
-		// Note that the MSC state selectedOptions is in fact the canonical source of truth
-		this.setState({ selectedOptions: items });
-		this.props.onValuesChange(items);
-	}
-
-	render() {
+	public render() {
 		return (
 			<Select
 				multi
@@ -45,17 +51,11 @@ export default class MultiSelectComponent extends React.Component {
 			/>
 		);
 	}
-}
 
-MultiSelectComponent.propTypes = {
-	placeholder: PropTypes.string,
-	options: PropTypes.arrayOf(PropTypes.shape({
-		label: PropTypes.string.isRequired,
-		value: PropTypes.number,
-	})),
-	selectedOptions: PropTypes.arrayOf(PropTypes.shape({
-		label: PropTypes.string.isRequired,
-		value: PropTypes.number,
-	})),
-	onValuesChange: PropTypes.func.isRequired,
-};
+	private onValuesChangeInternal(items) {
+		// Defer to the underlying MultiSelect when it has a state change
+		// Note that the MSC state selectedOptions is in fact the canonical source of truth
+		this.setState({ selectedOptions: items });
+		this.props.onValuesChange(items);
+	}
+}

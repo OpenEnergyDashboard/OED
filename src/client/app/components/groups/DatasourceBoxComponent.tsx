@@ -4,16 +4,25 @@
 
 import * as React from 'react';
 import MultiSelectComponent from '../MultiSelectComponent';
-import { DATA_TYPE_METER, DATA_TYPE_GROUP, metersFilterReduce, groupsFilterReduce } from '../../utils/Datasources';
+import { DataType, metersFilterReduce, groupsFilterReduce } from '../../utils/Datasources';
+import { NamedIDItem, SelectOption, DataTyped } from '../../utils/types';
 
-export default class DatasourceBoxComponent extends React.Component {
+interface DatasourceBoxProps {
+	// TODO: This should be an enum
+	type: string;
+	datasource: NamedIDItem[];
+	selectedOptions: NamedIDItem[];
+	selectDatasource(ids: number[]): void;
+}
+
+export default class DatasourceBoxComponent extends React.Component<DatasourceBoxProps, {}> {
 	constructor(props) {
 		super(props);
 		this.handleDatasourceSelect = this.handleDatasourceSelect.bind(this);
 	}
 
 	handleDatasourceSelect(selection) {
-		if (this.props.type === 'meters') {
+		if (this.props.type === 'meters' || this.props.type === 'meter') {
 			this.props.selectDatasource(selection.reduce(metersFilterReduce, []));
 		} else {
 			this.props.selectDatasource(selection.reduce(groupsFilterReduce, []));
@@ -21,22 +30,29 @@ export default class DatasourceBoxComponent extends React.Component {
 	}
 
 	render() {
-		const options = this.props.datasource.map(element => (
+		let type: DataType = DataType.Group;
+		if (this.props.type === 'meters' || this.props.type === 'meter') {
+			type = DataType.Meter;
+		}
+
+		const options: Array<SelectOption & DataTyped> = this.props.datasource.map(element => (
 			{
 				label: element.name,
-				type: this.props.type === 'meters' ? DATA_TYPE_METER : DATA_TYPE_GROUP,
-				value: element.id,
+				type,
+				value: element.id
 			}
 		));
-		let selectedOptions = null;
+		let selectedOptions: Array<SelectOption & DataTyped> | null;
 		if (this.props.selectedOptions) {
 			selectedOptions = this.props.selectedOptions.map(element => (
 				{
 					label: element.name,
-					type: this.props.type === 'meters' ? DATA_TYPE_METER : DATA_TYPE_GROUP,
-					value: element.id,
+					type,
+					value: element.id
 				}
 			));
+		} else {
+			selectedOptions = null;
 		}
 
 		return (

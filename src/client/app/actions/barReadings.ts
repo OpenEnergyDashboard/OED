@@ -5,12 +5,54 @@
  */
 
 import axios from 'axios';
+import * as moment from 'moment';
+import { TimeInterval } from '../../../common/TimeInterval';
 
 export const REQUEST_GROUP_BAR_READINGS = 'REQUEST_GROUP_BAR_READINGS';
 export const RECEIVE_GROUP_BAR_READINGS = 'RECEIVE_GROUP_BAR_READINGS';
 
 export const REQUEST_METER_BAR_READINGS = 'REQUEST_METER_BAR_READINGS';
 export const RECEIVE_METER_BAR_READINGS = 'RECEIVE_METER_BAR_READINGS';
+
+interface BarReadings {
+	[id: number]: Array<[number, number]>;
+}
+
+export interface RequestMeterBarReadingsAction {
+	type: 'REQUEST_METER_BAR_READINGS';
+	meterIDs: number[];
+	timeInterval: TimeInterval;
+	barDuration: moment.Duration;
+}
+
+export interface RequestGroupBarReadingsAction {
+	type: 'REQUEST_GROUP_BAR_READINGS';
+	groupIDs: number[];
+	timeInterval: TimeInterval;
+	barDuration: moment.Duration;
+}
+
+export interface ReceiveMeterBarReadingsAction {
+	type: 'RECEIVE_METER_BAR_READINGS';
+	meterIDs: number[];
+	timeInterval: TimeInterval;
+	barDuration: moment.Duration;
+	readings: BarReadings;
+}
+
+export interface ReceiveGroupBarReadingsAction {
+	type: 'RECEIVE_GROUP_BAR_READINGS';
+	groupIDs: number[];
+	timeInterval: TimeInterval;
+	barDuration: moment.Duration;
+	readings: BarReadings;
+}
+
+export type BarReadingsAction =
+	ReceiveGroupBarReadingsAction |
+	ReceiveGroupBarReadingsAction |
+	RequestMeterBarReadingsAction |
+	RequestGroupBarReadingsAction;
 
 /**
  * @param {State} state the Redux state
@@ -19,18 +61,18 @@ export const RECEIVE_METER_BAR_READINGS = 'RECEIVE_METER_BAR_READINGS';
  * @param {Moment.Duration} barDuration the duration of each bar for which to check
  * @returns {boolean} True if the readings for the given meter, time, and duration are missing; false otherwise.
  */
-function shouldFetchMeterBarReadings(state, meterID, timeInterval, barDuration) {
+function shouldFetchMeterBarReadings(state, meterID: number, timeInterval: TimeInterval, barDuration: moment.Duration): boolean {
 	const readingsForID = state.readings.bar.byMeterID[meterID];
 	if (readingsForID === undefined) {
 		return true;
 	}
 
-	const readingsForTimeInterval = readingsForID[timeInterval];
+	const readingsForTimeInterval = readingsForID[timeInterval.toString()];
 	if (readingsForTimeInterval === undefined) {
 		return true;
 	}
 
-	const readingsForBarDuration = readingsForTimeInterval[barDuration];
+	const readingsForBarDuration = readingsForTimeInterval[barDuration.toISOString()];
 	if (readingsForBarDuration === undefined) {
 		return true;
 	}
@@ -45,18 +87,18 @@ function shouldFetchMeterBarReadings(state, meterID, timeInterval, barDuration) 
  * @param {Moment.Duration} barDuration the duration of each bar for which to check
  * @returns {boolean} True if the readings for the given group, time, and duration are missing; false otherwise.
  */
-function shouldFetchGroupBarReadings(state, groupID, timeInterval, barDuration) {
+function shouldFetchGroupBarReadings(state, groupID: number, timeInterval: TimeInterval, barDuration: moment.Duration): boolean {
 	const readingsForID = state.readings.bar.byMeterID[groupID];
 	if (readingsForID === undefined) {
 		return true;
 	}
 
-	const readingsForTimeInterval = readingsForID[timeInterval];
+	const readingsForTimeInterval = readingsForID[timeInterval.toString()];
 	if (readingsForTimeInterval === undefined) {
 		return true;
 	}
 
-	const readingsForBarDuration = readingsForTimeInterval[barDuration];
+	const readingsForBarDuration = readingsForTimeInterval[barDuration.toISOString()];
 	if (readingsForBarDuration === undefined) {
 		return true;
 	}
@@ -64,19 +106,21 @@ function shouldFetchGroupBarReadings(state, groupID, timeInterval, barDuration) 
 	return !readingsForBarDuration.isFetching;
 }
 
-function requestMeterBarReadings(meterIDs, timeInterval, barDuration) {
+function requestMeterBarReadings(meterIDs: number[], timeInterval: TimeInterval, barDuration: moment.Duration): RequestMeterBarReadingsAction {
 	return { type: REQUEST_METER_BAR_READINGS, meterIDs, timeInterval, barDuration };
 }
 
-function receiveMeterBarReadings(meterIDs, timeInterval, barDuration, readings) {
+function receiveMeterBarReadings(meterIDs: number[], timeInterval: TimeInterval, barDuration: moment.Duration, readings):
+	ReceiveMeterBarReadingsAction {
 	return { type: RECEIVE_METER_BAR_READINGS, meterIDs, timeInterval, barDuration, readings };
 }
 
-function requestGroupBarReadings(groupIDs, timeInterval, barDuration) {
+function requestGroupBarReadings(groupIDs: number[], timeInterval: TimeInterval, barDuration: moment.Duration): RequestGroupBarReadingsAction {
 	return { type: REQUEST_GROUP_BAR_READINGS, groupIDs, timeInterval, barDuration };
 }
 
-function receiveGroupBarReadings(groupIDs, timeInterval, barDuration, readings) {
+function receiveGroupBarReadings(groupIDs: number[], timeInterval: TimeInterval, barDuration: moment.Duration, readings):
+	ReceiveGroupBarReadingsAction {
 	return { type: RECEIVE_GROUP_BAR_READINGS, groupIDs, timeInterval, barDuration, readings };
 }
 
@@ -86,7 +130,7 @@ function receiveGroupBarReadings(groupIDs, timeInterval, barDuration, readings) 
  * @param {[number]} meterIDs The IDs of the meters whose data should be fetched
  * @param {TimeInterval} timeInterval The time interval over which data should be fetched
  */
-function fetchMeterBarReadings(meterIDs, timeInterval) {
+function fetchMeterBarReadings(meterIDs: number[], timeInterval: TimeInterval) {
 	return (dispatch, getState) => {
 		const barDuration = getState().graph.barDuration;
 		dispatch(requestMeterBarReadings(meterIDs, timeInterval, barDuration));
@@ -137,7 +181,7 @@ function fetchCompareReadings(meterIDs, timeInterval) {
 export function fetchNeededBarReadings(timeInterval) {
 	return (dispatch, getState) => {
 		const state = getState();
-		const futures = [];
+		const promises: Array<Promise<any>> = [];
 
 		// Determine which meters are missing data for this time interval
 		const meterIDsToFetchForBar = state.graph.selectedMeters.filter(
@@ -145,7 +189,7 @@ export function fetchNeededBarReadings(timeInterval) {
 		);
 		// Fetch data for any missing meters
 		if (meterIDsToFetchForBar.length > 0) {
-			futures.push(dispatch(fetchMeterBarReadings(meterIDsToFetchForBar, timeInterval)));
+			promises.push(dispatch(fetchMeterBarReadings(meterIDsToFetchForBar, timeInterval)));
 		}
 
 		// Determine which groups are missing data for this time interval
@@ -154,16 +198,18 @@ export function fetchNeededBarReadings(timeInterval) {
 		);
 		// Fetch data for any missing groups
 		if (groupIDsToFetchForBar.length > 0) {
-			futures.push(dispatch(fetchGroupBarReadings(groupIDsToFetchForBar, timeInterval)));
+			promises.push(dispatch(fetchGroupBarReadings(groupIDsToFetchForBar, timeInterval)));
 		}
-		return Promise.all(futures);
+		return Promise.all(promises);
 	};
 }
 
 export function fetchNeededCompareReadings(timeInterval) {
 	return (dispatch, getState) => {
 		const state = getState();
-		const meterIDsToFetchForBar = state.graph.selectedMeters.filter(id => shouldFetchMeterBarReadings(state, id, timeInterval, state.graph.compareDuration));
+		const meterIDsToFetchForBar = state.graph.selectedMeters.filter(
+			id => shouldFetchMeterBarReadings(state, id, timeInterval, state.graph.compareDuration)
+		);
 		if (meterIDsToFetchForBar.length > 0) {
 			return dispatch(fetchCompareReadings(meterIDsToFetchForBar, timeInterval));
 		}

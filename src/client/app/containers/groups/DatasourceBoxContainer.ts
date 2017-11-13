@@ -7,12 +7,13 @@ import * as _ from 'lodash';
 import { connect } from 'react-redux';
 import DatasourceBoxComponent from '../../components/groups/DatasourceBoxComponent';
 import { changeSelectedChildMetersOfGroup, changeSelectedChildGroupsOfGroup, changeChildMeters, changeChildGroups } from '../../actions/groups';
+import { NamedIDItem } from '../../utils/types';
 
 // ownProps.selection may be 'children', 'all', or 'custom'
 // if ownProps.selection is 'children', ownProps must have a 'parentID' property
 // if ownProps.selection is 'custom', ownProps must have both a 'datasource' and 'selectDatasource' prop (and optional selectedOptions prop)
 function mapStateToProps(state, ownProps) {
-	let datasource = null;
+	let datasource: NamedIDItem[] = [];
 	if (ownProps.selection === 'all') {
 		if (ownProps.type === 'meter') {
 			datasource = Object.keys(state.meters.byMeterID).map(meterID => {

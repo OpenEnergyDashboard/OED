@@ -6,6 +6,7 @@
 
 import * as _ from 'lodash';
 import { Bar } from 'react-chartjs-2';
+import { ChartData, ChartDataSets } from 'chart.js';
 import * as moment from 'moment';
 import { connect } from 'react-redux';
 import getGraphColor from '../utils/getGraphColor';
@@ -16,7 +17,7 @@ import getGraphColor from '../utils/getGraphColor';
 function mapStateToProps(state) {
 	const timeInterval = state.graph.timeInterval;
 	const barDuration = state.graph.barDuration;
-	const data = { datasets: [], labels: [] };
+	const datasets: ChartDataSets[] = [];
 
 	const labelsSet = new Set();
 	for (const meterID of state.graph.selectedMeters) {
@@ -26,7 +27,7 @@ function mapStateToProps(state) {
 			if (readingsData !== undefined && !readingsData.isFetching) {
 				const label = state.meters.byMeterID[meterID].name;
 				const color = getGraphColor(label);
-				data.datasets.push({
+				datasets.push({
 					label,
 					data: readingsData.readings.map(arr => arr[1]),
 					backgroundColor: color,
@@ -47,7 +48,7 @@ function mapStateToProps(state) {
 			if (readingsData !== undefined && !readingsData.isFetching) {
 				const label = state.groups.byGroupID[groupID].name;
 				const color = getGraphColor(label);
-				data.datasets.push({
+				datasets.push({
 					label,
 					data: readingsData.readings.map(arr => arr[1]),
 					backgroundColor: color,
@@ -62,7 +63,11 @@ function mapStateToProps(state) {
 	}
 
 	// Converts the label set into an array for Chart.js and sorts the labels based on the first date of the time interval
-	data.labels = Array.from(labelsSet).sort((x, y) => moment(x.split(' - ')[0], 'MMM DD, YYYY').format('x') - moment(y.split(' - ')[0], 'MMM DD, YYYY').format('x'));
+	const labels = Array.from(labelsSet).sort((x, y) => {
+		const t1 = moment(x.split(' - ')[0], 'MMM DD, YYYY').format('x');
+		const t2 = moment(y.split(' - ')[0], 'MMM DD, YYYY').format('x');
+		return +(t1) - +(t2);
+	});
 
 	const options = {
 		animation: {
@@ -97,10 +102,12 @@ function mapStateToProps(state) {
 			backgroundColor: 'rgba(0,0,0,0.6)',
 			displayColors: false,
 			callbacks: {
-				label: tooltipItems => `${data.datasets[tooltipItems.datasetIndex].label}: ${tooltipItems.yLabel} kW`
+				label: tooltipItems => `${datasets[tooltipItems.datasetIndex].label}: ${tooltipItems.yLabel} kW`
 			}
 		}
 	};
+
+	const data: ChartData = { datasets, labels };
 
 	return {
 		data,

@@ -7,8 +7,36 @@ import * as React from 'react';
 import * as _ from 'lodash';
 import { FormControl, Button, Glyphicon } from 'react-bootstrap';
 import DatasourceBoxContainer from '../../containers/groups/DatasourceBoxContainer';
+import { NamedIDItem } from '../../utils/types';
 
-export default class EditGroupsComponent extends React.Component {
+interface EditGroupsProps {
+	name: string;
+	childMeters: NamedIDItem[];
+	childGroups: NamedIDItem[];
+	allMetersExceptChildMeters: NamedIDItem[];
+	allGroupsExceptChildGroups: NamedIDItem[];
+	submitGroupInEditingIfNeeded(): void;
+	deleteGroup(): void;
+	handleReturnToView(): void;
+	changeDisplayModeToView(): void;
+	editGroupName(name: string): void;
+	changeChildMeters(selected: number[]): void;
+	changeChildGroups(selected: number[]): void;
+}
+
+interface EditGroupsState {
+	name: string;
+	selectedMeters: number[];
+	defaultSelectedMeters: number[];
+	unusedMeters: number[];
+	defaultUnusedMeters: number[];
+	selectedGroups: number[];
+	defaultSelectedGroups: number[];
+	unusedGroups: number[];
+	defaultUnusedGroups: number[];
+}
+
+export default class EditGroupsComponent extends React.Component<EditGroupsProps, EditGroupsState> {
 	constructor(props) {
 		super(props);
 		this.state = {
@@ -91,98 +119,98 @@ export default class EditGroupsComponent extends React.Component {
 	}
 
 	render() {
-		const divStyle = {
+		const divStyle: React.CSSProperties = {
 			paddingTop: '35px'
 		};
-		const metersDivStyle = {
+		const metersDivStyle: React.CSSProperties = {
 			marginTop: '10px',
 			marginBottom: '20px'
 		};
-		const groupsDivStyle = {
+		const groupsDivStyle: React.CSSProperties = {
 			marginBottom: '10px'
 		};
-		const leftRightButtonsDivStyle = {
+		const leftRightButtonsDivStyle: React.CSSProperties = {
 			marginTop: '25px'
 		};
-		const leftRightButtonStyle = {
+		const leftRightButtonStyle: React.CSSProperties = {
 			width: '50%',
 			margin: '0 auto'
 		};
-		const boldStyle = {
+		const boldStyle: React.CSSProperties = {
 			fontWeight: 'bold',
 			margin: 0
 		};
-		const centerTextStyle = {
+		const centerTextStyle: React.CSSProperties = {
 			textAlign: 'center'
 		};
 		return (
-			<div style={divStyle} className="col-xs-6">
+			<div style={divStyle} className='col-xs-6'>
 				<h3 style={centerTextStyle}>Edit Group</h3>
 				<p style={boldStyle}>Name:</p>
-				<FormControl type="text" placeholder="Name" value={this.state.name} onChange={this.handleNameChange} />
-				<div className="row" style={metersDivStyle}>
-					<div className="col-xs-5">
+				<FormControl type='text' placeholder='Name' value={this.state.name} onChange={this.handleNameChange} />
+				<div className='row' style={metersDivStyle}>
+					<div className='col-xs-5'>
 						<p style={boldStyle}>Child meters:</p>
 						<DatasourceBoxContainer
-							type="meter"
-							selection="custom"
+							type='meter'
+							selection='custom'
 							datasource={this.props.childMeters}
 							selectedOptions={this.state.defaultSelectedMeters}
 							selectDatasource={this.handleUpdatedSelectedMeters}
 						/>
 					</div>
-					<div className="col-xs-2" style={leftRightButtonsDivStyle}>
+					<div className='col-xs-2' style={leftRightButtonsDivStyle}>
 						<Button onClick={this.handleMoveUnusedMetersToChildMeters} style={leftRightButtonStyle}>
-							<Glyphicon glyph="chevron-left" />
+							<Glyphicon glyph='chevron-left' />
 						</Button>
 						<Button onClick={this.handleMoveChildMetersToUnusedMeters} style={leftRightButtonStyle}>
-							<Glyphicon glyph="chevron-right" />
+							<Glyphicon glyph='chevron-right' />
 						</Button>
 					</div>
-					<div className="col-xs-5">
+					<div className='col-xs-5'>
 						<p style={boldStyle}>Unused meters:</p>
 						<DatasourceBoxContainer
-							type="meter"
-							selection="custom"
+							type='meter'
+							selection='custom'
 							datasource={this.props.allMetersExceptChildMeters}
 							selectedOptions={this.state.defaultUnusedMeters}
 							selectDatasource={this.handleUpdateUnusedMeters}
 						/>
 					</div>
 				</div>
-				<div className="row" style={groupsDivStyle}>
-					<div className="col-xs-5">
+				<div className='row' style={groupsDivStyle}>
+					<div className='col-xs-5'>
 						<p style={boldStyle}>Child groups:</p>
 						<DatasourceBoxContainer
-							type="group"
-							selection="custom"
+							type='group'
+							selection='custom'
 							datasource={this.props.childGroups}
 							selectedOptions={this.state.defaultSelectedGroups}
 							selectDatasource={this.handleUpdateSelectedGroups}
 						/>
 					</div>
-					<div className="col-xs-2" style={leftRightButtonsDivStyle}>
+					<div className='col-xs-2' style={leftRightButtonsDivStyle}>
 						<Button onClick={this.handleMoveUnusedGroupsToChildGroups} style={leftRightButtonStyle}>
-							<Glyphicon glyph="chevron-left" />
+							<Glyphicon glyph='chevron-left' />
 						</Button>
 						<Button onClick={this.handleMoveChildGroupsToUnusedGroups} style={leftRightButtonStyle}>
-							<Glyphicon glyph="chevron-right" />
+							<Glyphicon glyph='chevron-right' />
 						</Button>
 					</div>
-					<div className="col-xs-5">
+					<div className='col-xs-5'>
 						<p style={boldStyle}>Unused groups:</p>
 						<DatasourceBoxContainer
-							type="group"
-							selection="custom"
+							type='group'
+							selection='custom'
 							datasource={this.props.allGroupsExceptChildGroups}
 							selectedOptions={this.state.defaultUnusedGroups}
 							selectDatasource={this.handleUpdateUnusedGroups}
 						/>
 					</div>
 				</div>
-				<Button type="submit" onClick={this.handleReturnToView}>Cancel</Button>
-				<Button type="submit" onClick={this.handleEditGroup}>Submit changes</Button>
-				<Button className="pull-right" type="submit" onClick={this.handleDeleteGroup}>Delete group</Button>
+				<Button type='submit' onClick={this.handleReturnToView}>Cancel</Button>
+				<Button type='submit' onClick={this.handleEditGroup}>Submit changes</Button>
+				<Button className='pull-right' type='submit' onClick={this.handleDeleteGroup}>Delete group</Button>
 			</div>
 		);
 	}

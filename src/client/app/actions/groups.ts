@@ -142,7 +142,7 @@ export const MARK_GROUP_IN_EDITING_DIRTY = 'MARK_GROUP_IN_EDITING_DIRTY';
 export const MARK_GROUPS_BY_ID_OUTDATED = 'MARK_GROUPS_BY_ID_OUTDATED';
 
 export const MARK_ONE_GROUP_OUTDATED = 'MARK_ONE_GROUP_OUTDATED';
-export const DISPLAY_MODE = { VIEW: 'view', EDIT: 'edit', CREATE: 'create' };
+export enum DISPLAY_MODE { VIEW = 'view', EDIT = 'edit', CREATE = 'create' }
 
 /**
  * Change the display mode of the groups page

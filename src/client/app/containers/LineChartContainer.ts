@@ -5,6 +5,7 @@
  */
 
 import { Line } from 'react-chartjs-2';
+import { ChartData, ChartDataSets } from 'chart.js';
 import * as moment from 'moment';
 import { connect } from 'react-redux';
 import getGraphColor from '../utils/getGraphColor';
@@ -14,7 +15,7 @@ import getGraphColor from '../utils/getGraphColor';
  */
 function mapStateToProps(state) {
 	const timeInterval = state.graph.timeInterval;
-	const data = { datasets: [] };
+	const datasets: ChartDataSets[] = [];
 
 	// Add all meters data to the chart
 	for (const meterID of state.graph.selectedMeters) {
@@ -23,7 +24,7 @@ function mapStateToProps(state) {
 			const readingsData = byMeterID[timeInterval];
 			if (readingsData !== undefined && !readingsData.isFetching) {
 				const label = state.meters.byMeterID[meterID].name;
-				data.datasets.push({
+				datasets.push({
 					label,
 					data: readingsData.readings.map(arr => ({ x: arr[0], y: arr[1].toFixed(2) })),
 					fill: false,
@@ -40,7 +41,7 @@ function mapStateToProps(state) {
 			const readingsData = byGroupID[timeInterval];
 			if (readingsData !== undefined && !readingsData.isFetching) {
 				const label = state.groups.byGroupID[groupID].name;
-				data.datasets.push({
+				datasets.push({
 					label,
 					data: readingsData.readings.map(arr => ({ x: arr[0], y: arr[1].toFixed(2) })),
 					fill: false,
@@ -80,10 +81,12 @@ function mapStateToProps(state) {
 			displayColors: false,
 			callbacks: {
 				title: tooltipItems => `${moment(tooltipItems[0].xLabel).format('dddd, MMM DD, YYYY hh:mm a')}`,
-				label: tooltipItems => `${data.datasets[tooltipItems.datasetIndex].label}: ${tooltipItems.yLabel} kW`
+				label: tooltipItems => `${datasets[tooltipItems.datasetIndex].label}: ${tooltipItems.yLabel} kW`
 			}
 		}
 	};
+
+	const data: ChartData = { datasets };
 
 	return {
 		data,

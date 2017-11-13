@@ -12,7 +12,7 @@ export default function ListDisplayComponent(props) {
 
 	// The list wrapper is of a fixed height, with  grey border and a slight curve
 	// It imposes a scrollbar when there is too much content to display
-	const listWrapperStyle = {
+	const listWrapperStyle: React.CSSProperties = {
 		border: '1px solid #cccccc',
 		borderRadius: '2px',
 		minHeight: `${heightPx}px`,
@@ -21,7 +21,7 @@ export default function ListDisplayComponent(props) {
 	};
 
 	// The list itself has no bullets and pads items as if they were in a <select>
-	const listStyle = {
+	const listStyle: React.CSSProperties = {
 		listStyleType: 'none',
 		paddingTop: '6px',
 		paddingBottom: '6px',
@@ -30,9 +30,9 @@ export default function ListDisplayComponent(props) {
 	};
 
 	return (
-		<div className="list-wrapper" style={listWrapperStyle} >
-			<ul id="meterList" style={listStyle} >
-				{ props.items.map(item => <li>{ item.toString() }</li>) }
+		<div className='list-wrapper' style={listWrapperStyle} >
+			<ul id='meterList' style={listStyle} >
+				{props.items.map(item => <li key={item.toString()}>{item.toString()}</li>)}
 			</ul>
 		</div>
 	);

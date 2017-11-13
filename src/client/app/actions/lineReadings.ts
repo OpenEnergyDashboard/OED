@@ -126,14 +126,14 @@ function fetchGroupLineReadings(groupIDs, timeInterval) {
 export function fetchNeededLineReadings(timeInterval) {
 	return (dispatch, getState) => {
 		const state = getState();
-		const futures = [];
+		const promises: Array<Promise<any>> = [];
 
 		// Determine which meters are missing data for this time interval
 		const meterIDsToFetchForLine = state.graph.selectedMeters.filter(
 			id => shouldFetchMeterLineReadings(state, id, timeInterval)
 		);
 		if (meterIDsToFetchForLine.length > 0) {
-			futures.push(dispatch(fetchMeterLineReadings(meterIDsToFetchForLine, timeInterval)));
+			promises.push(dispatch(fetchMeterLineReadings(meterIDsToFetchForLine, timeInterval)));
 		}
 
 		// Determine which groups are missing data for this time interval
@@ -141,9 +141,9 @@ export function fetchNeededLineReadings(timeInterval) {
 			id => shouldFetchGroupLineReadings(state, id, timeInterval)
 		);
 		if (groupIDsToFetchForLine.length > 0) {
-			futures.push(dispatch(fetchGroupLineReadings(groupIDsToFetchForLine, timeInterval)));
+			promises.push(dispatch(fetchGroupLineReadings(groupIDsToFetchForLine, timeInterval)));
 		}
 
-		return Promise.all(futures);
+		return Promise.all(promises);
 	};
 }

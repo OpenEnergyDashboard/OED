@@ -4,11 +4,24 @@
 
 import * as React from 'react';
 import MultiSelectComponent from './MultiSelectComponent';
+import { SelectOption } from '../utils/types';
+import { fetchGroupsDetailsIfNeeded } from 'actions/groups';
+
+interface ChartDataSelectProps {
+	meters: SelectOption[];
+	groups: SelectOption[];
+	selectedMeters: SelectOption[];
+	selectedGroups: SelectOption[];
+	fetchMetersDetailsIfNeeded(): void;
+	fetchGroupsDetailsIfNeeded(): void;
+	selectMeters(meterIDs: number[]): void;
+	selectGroups(groupIDs: number[]): void;
+}
 
 /**
  * A component which allows the user to select which data should be displayed on the chart.
  */
-export default class ChartDataSelectComponent extends React.Component {
+export default class ChartDataSelectComponent extends React.Component<ChartDataSelectProps, {}> {
 	constructor(props) {
 		super(props);
 		this.handleMeterSelect = this.handleMeterSelect.bind(this);
@@ -16,36 +29,20 @@ export default class ChartDataSelectComponent extends React.Component {
 	}
 
 	/**
- 	 * Called when this component mounts
- 	 * Dispatches a Redux action to fetch meter information
- 	 */
-	componentWillMount() {
+	 * Called when the component mounts.
+	 * Fetch all meter and group info, for display.
+	 */
+	public componentWillMount() {
 		this.props.fetchMetersDetailsIfNeeded();
 		this.props.fetchGroupsDetailsIfNeeded();
 	}
 
-	/**
-	 * Handles a change in meter selection
-	 * @param {Object[]} selection An array of {label: string, value: {type: string, id: int}} representing the current selection
-	 */
-	handleMeterSelect(selection) {
-		this.props.selectMeters(selection.map(s => s.value));
-	}
-
-	/**
-	 * Handles a change in group selection
-	 * @param {Object[]} selection An array of {label: string, value: {type: string, id: int}} representing the current selection
-	 */
-	handleGroupSelect(selection) {
-		this.props.selectGroups(selection.map(s => s.value));
-	}
-
-	render() {
-		const divBottomPadding = {
+	public render() {
+		const divBottomPadding: React.CSSProperties = {
 			paddingBottom: '15px'
 		};
 
-		const labelStyle = {
+		const labelStyle: React.CSSProperties = {
 			fontWeight: 'bold',
 			margin: 0
 		};
@@ -57,7 +54,7 @@ export default class ChartDataSelectComponent extends React.Component {
 					<MultiSelectComponent
 						options={this.props.groups}
 						selectedOptions={this.props.selectedGroups}
-						placeholder="Select Groups"
+						placeholder='Select Groups'
 						onValuesChange={s => this.handleGroupSelect(s)}
 					/>
 				</div>
@@ -66,11 +63,27 @@ export default class ChartDataSelectComponent extends React.Component {
 					<MultiSelectComponent
 						options={this.props.meters}
 						selectedOptions={this.props.selectedMeters}
-						placeholder="Select Meters"
+						placeholder='Select Meters'
 						onValuesChange={s => this.handleMeterSelect(s)}
 					/>
 				</div>
 			</div>
 		);
+	}
+
+	/**
+	 * Handles a change in meter selection
+	 * @param {Object[]} selection An array of items representing the current selection
+	 */
+	private handleMeterSelect(selection: SelectOption[]) {
+		this.props.selectMeters(selection.map(s => s.value));
+	}
+
+	/**
+	 * Handles a change in group selection
+	 * @param {Object[]} selection An array of items representing the current selection
+	 */
+	private handleGroupSelect(selection: SelectOption[]) {
+		this.props.selectGroups(selection.map(s => s.value));
 	}
 }

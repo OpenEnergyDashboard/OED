@@ -6,16 +6,10 @@ import * as React from 'react';
 import axios from 'axios';
 import { browserHistory } from 'react-router';
 import HeaderComponent from '../components/HeaderComponent';
-
-interface NotificationData {
-	message: string;
-	level: string;
-	position: string;
-	autoDismiss: number;
-}
+import { Notification } from '../actions/notifications';
 
 interface LoginProps {
-	showNotification(NotificationData): null;
+	showNotification(notification: Notification): void;
 }
 
 interface LoginState {
@@ -29,7 +23,7 @@ export default class LoginComponent extends React.Component<LoginProps, LoginSta
 	 * Initializes the component's state to include email (email users use to login) and password (corresponding to their email)
 	 * Binds the functions to 'this' LoginComponent
 	 */
-	constructor(props) {
+	constructor(props: LoginProps) {
 		super(props);
 		this.state = { email: '', password: '' };
 		this.handleEmailChange = this.handleEmailChange.bind(this);
@@ -59,7 +53,7 @@ export default class LoginComponent extends React.Component<LoginProps, LoginSta
 							type='text'
 							className='form-control'
 							placeholder='Email'
-							ref={c => { this.inputEmail = c; }}
+							ref={c => { if (c !== null) { this.inputEmail = c; } }}
 							value={this.state.email}
 							onChange={this.handleEmailChange}
 						/>
@@ -78,7 +72,7 @@ export default class LoginComponent extends React.Component<LoginProps, LoginSta
 	 * Sets the email state whenever the user changes the email input field
 	 * @param e The event fired
 	 */
-	private handleEmailChange(e) {
+	private handleEmailChange(e: React.ChangeEvent<HTMLInputElement>) {
 		this.setState({ email: e.target.value });
 	}
 
@@ -86,7 +80,7 @@ export default class LoginComponent extends React.Component<LoginProps, LoginSta
 	 * Sets the password state whenever the user changes the password input field
 	 * @param e The event fired
 	 */
-	private handlePasswordChange(e) {
+	private handlePasswordChange(e: React.ChangeEvent<HTMLInputElement>) {
 		this.setState({ password: e.target.value });
 	}
 
@@ -95,7 +89,7 @@ export default class LoginComponent extends React.Component<LoginProps, LoginSta
 	 * If the request is successful, the JWT auth token is stored in local storage and the app routes to the admin page
 	 * @param e The event fired
 	 */
-	private handleSubmit(e) {
+	private handleSubmit(e: React.FormEvent<HTMLFormElement>) {
 		e.preventDefault();
 		axios.post('/api/login/', {
 			email: this.state.email,

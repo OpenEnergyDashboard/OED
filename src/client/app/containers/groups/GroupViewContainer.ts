@@ -16,13 +16,13 @@ import { fetchGroupChildrenIfNeeded, changeDisplayMode, beginEditingIfPossible, 
  */
 function mapStateToProps(state, ownProps) {
 	const id = ownProps.id;
-	const childMeters = state.groups.byGroupID[id].childMeters.map(meterID => state.meters.byMeterID[meterID].name.trim()).sort();
-	const childGroups = state.groups.byGroupID[id].childGroups.map(groupID => state.groups.byGroupID[groupID].name.trim()).sort();
+	const childMeterNames = state.groups.byGroupID[id].childMeters.map(meterID => state.meters.byMeterID[meterID].name.trim()).sort();
+	const childGroupNames = state.groups.byGroupID[id].childGroups.map(groupID => state.groups.byGroupID[groupID].name.trim()).sort();
 	return {
 		id,
 		name: state.groups.byGroupID[id].name,
-		childMeters,
-		childGroups
+		childMeterNames,
+		childGroupNames
 	};
 }
 

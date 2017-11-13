@@ -29,7 +29,7 @@ function convertToCSV(items) {
  * @param inputCSV A String containing the formatted CSV data.
  * @param fileName A string representing the name of the file.
  */
-function downloadCSV(inputCSV, fileName) {
+function downloadCSV(inputCSV: string, fileName: string) {
 	const element = document.createElement('a');
 	element.setAttribute('href', `data:text/csv;charset=utf-8,${encodeURIComponent(inputCSV)}`);
 	element.setAttribute('download', fileName);
@@ -47,7 +47,7 @@ function downloadCSV(inputCSV, fileName) {
  * @param dataSets An Object. The compressed data from each meter currently selected in the graph.
  * @param name the name of the file.
  */
-export default function graphExport(dataSets, name) {
+export default function graphExport(dataSets, name: string) {
 	const dataToExport = convertToCSV(dataSets);
 	downloadCSV(dataToExport, name);
 }

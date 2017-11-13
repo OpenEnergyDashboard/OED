@@ -8,9 +8,9 @@ import * as moment from 'moment';
 
 export class TimeInterval {
 	static unbounded(): TimeInterval;
-	static fromString(stringified): TimeInterval;
+	static fromString(stringified: string): TimeInterval;
 	constructor(startTimestamp: moment.Moment, endTimestamp: moment.Moment);
 	toString(): string;
-	equals(other: TimeInterval);
+	equals(other: TimeInterval): boolean;
 	valueOf(): string;
 }

@@ -27,7 +27,7 @@ function mapDispatchToProps(dispatch) {
 	return {
 		selectGroups: newSelectedGroupIDs => dispatch(changeDisplayedGroups(newSelectedGroupIDs)),
 		fetchGroupsDetailsIfNeeded: () => dispatch(fetchGroupsDetailsIfNeeded()),
-		fetchMetersDetailsIfNeeded: () => dispatch(fetchMetersDetailsIfNeeded()),
+		fetchMetersDetailsIfNeeded: () => dispatch(fetchMetersDetailsIfNeeded())
 	};
 }
 

@@ -6,7 +6,14 @@
 import * as _ from 'lodash';
 import { connect } from 'react-redux';
 import EditGroupsComponent from '../../components/groups/EditGroupsComponent';
-import { submitGroupInEditingIfNeeded, editGroupName, changeDisplayMode, DISPLAY_MODE, changeChildMeters, changeChildGroups, deleteGroup } from '../../actions/groups';
+import {
+	submitGroupInEditingIfNeeded,
+	editGroupName,
+	changeDisplayMode,
+	DISPLAY_MODE,
+	changeChildMeters,
+	changeChildGroups,
+	deleteGroup } from '../../actions/groups';
 
 /**
  * @param {State} state

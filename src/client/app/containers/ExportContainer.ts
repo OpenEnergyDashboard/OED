@@ -3,15 +3,25 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
 
 import { connect } from 'react-redux';
+import * as moment from 'moment';
 import ExportComponent from '../components/ExportComponent';
 import { chartTypes } from '../reducers/graph';
+
+interface ExportDataSet {
+	label: string;
+	id: number;
+	timestamp: moment.Moment;
+	currentChart: chartTypes;
+	exportVals: Array<{x: number, y: number}>;
+}
+
 /**
  * @param {State} state
  * @return {{meterInfo: *, selectedMeters: Array}}
  */
 function mapStateToProps(state) {
 	const timeInterval = state.graph.timeInterval;
-	const data = { datasets: [] };
+	const datasets: ExportDataSet[] = [];
 	const chart = state.graph.chartToRender;
 	const barDuration = state.graph.barDuration;
 
@@ -21,7 +31,7 @@ function mapStateToProps(state) {
 			if (byGroupID !== undefined) {
 				const readingsData = byGroupID[timeInterval];
 				if (readingsData !== undefined && !readingsData.isFetching) {
-					data.datasets.push({
+					datasets.push({
 						label: state.groups.byGroupID[groupID].name,
 						id: state.groups.byGroupID[groupID].id,
 						timestamp: readingsData.start_timestamp,
@@ -36,7 +46,7 @@ function mapStateToProps(state) {
 			if (byMeterID !== undefined) {
 				const readingsData = byMeterID[timeInterval];
 				if (readingsData !== undefined && !readingsData.isFetching) {
-					data.datasets.push({
+					datasets.push({
 						label: state.meters.byMeterID[meterID].name,
 						id: state.meters.byMeterID[meterID].id,
 						timestamp: readingsData.start_timestamp,
@@ -54,7 +64,7 @@ function mapStateToProps(state) {
 				if (byTimeInterval !== undefined) {
 					const readingsData = byTimeInterval[barDuration];
 					if (readingsData !== undefined && !readingsData.isFetching) {
-						data.datasets.push({
+						datasets.push({
 							label: state.groups.byGroupID[groupID].name,
 							id: state.groups.byGroupID[groupID].id,
 							timestamp: readingsData.start_timestamp,
@@ -72,7 +82,7 @@ function mapStateToProps(state) {
 				if (byTimeInterval !== undefined) {
 					const readingsData = byTimeInterval[barDuration];
 					if (readingsData !== undefined && !readingsData.isFetching) {
-						data.datasets.push({
+						datasets.push({
 							label: state.meters.byMeterID[meterID].name,
 							id: state.meters.byMeterID[meterID].id,
 							timestamp: readingsData.start_timestamp,
@@ -87,7 +97,7 @@ function mapStateToProps(state) {
 
 	return {
 		selectedMeters: state.graph.selectedMeters,
-		exportVals: data
+		exportVals: { datasets }
 	};
 }
 

@@ -10,17 +10,24 @@ import CreateGroupContainer from '../../containers/groups/CreateGroupContainer';
 import EditGroupsContainer from '../../containers/groups/EditGroupsContainer';
 import { DISPLAY_MODE } from '../../actions/groups';
 
-export default class GroupMainComponent extends React.Component {
-	componentWillMount() {
+interface GroupMainProps {
+	displayMode: DISPLAY_MODE;
+	selectedGroups: number[];
+	fetchGroupsDetailsIfNeeded(): void;
+	fetchMetersDetailsIfNeeded(): void;
+}
+
+export default class GroupMainComponent extends React.Component<GroupMainProps, {}> {
+	public componentWillMount() {
 		this.props.fetchGroupsDetailsIfNeeded();
 		this.props.fetchMetersDetailsIfNeeded();
 	}
 
-	render() {
+	public render() {
 		const divPaddingStyle = {
 			paddingTop: '50px'
 		};
-		let GroupDisplay = null;
+		let GroupDisplay: JSX.Element | undefined;
 		switch (this.props.displayMode) {
 			case DISPLAY_MODE.CREATE: {
 				GroupDisplay = (
@@ -41,10 +48,10 @@ export default class GroupMainComponent extends React.Component {
 			case DISPLAY_MODE.VIEW: {
 				GroupDisplay = (
 					<div>
-						<div className="col-xs-2" style={divPaddingStyle}>
+						<div className='col-xs-2' style={divPaddingStyle}>
 							<GroupSidebarContainer />
 						</div>
-						<div className="col-xs-4">
+						<div className='col-xs-4'>
 							{this.props.selectedGroups.map(groupID =>
 								<GroupViewContainer key={groupID} id={groupID} />
 							)}
@@ -60,10 +67,10 @@ export default class GroupMainComponent extends React.Component {
 
 		return (
 			<div>
-				<HeaderComponent title="Groups" />
-				<div className="container-fluid">
-					<div className="col-xs-11">
-						{ GroupDisplay }
+				<HeaderComponent title='Groups' />
+				<div className='container-fluid'>
+					<div className='col-xs-11'>
+						{GroupDisplay}
 					</div>
 				</div>
 			</div>

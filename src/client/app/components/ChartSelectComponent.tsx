@@ -6,25 +6,26 @@ import * as React from 'react';
 import { ToggleButtonGroup, ToggleButton } from 'react-bootstrap';
 import { chartTypes } from '../reducers/graph';
 
+interface ChartSelectProps {
+	selectedChart: chartTypes;
+	changeChartType(chartType: chartTypes): void;
+}
+
 /**
  * A component that allows users to select which chart should be displayed.
  */
-export default class ChartSelectComponent extends React.Component {
+export default class ChartSelectComponent extends React.Component<ChartSelectProps, {}> {
 	constructor(props) {
 		super(props);
 		this.handleChangeChartType = this.handleChangeChartType.bind(this);
 	}
 
-	handleChangeChartType(value) {
-		this.props.changeChartType(value);
-	}
-
-	render() {
-		const divBottomPadding = {
+	public render() {
+		const divBottomPadding: React.CSSProperties = {
 			paddingBottom: '15px'
 		};
 
-		const labelStyle = {
+		const labelStyle: React.CSSProperties = {
 			fontWeight: 'bold',
 			margin: 0
 		};
@@ -33,8 +34,8 @@ export default class ChartSelectComponent extends React.Component {
 			<div style={divBottomPadding}>
 				<p style={labelStyle}>Graph Type:</p>
 				<ToggleButtonGroup
-					type="radio"
-					name="chartTypes"
+					type='radio'
+					name='chartTypes'
 					value={this.props.selectedChart}
 					onChange={this.handleChangeChartType}
 				>
@@ -44,5 +45,9 @@ export default class ChartSelectComponent extends React.Component {
 				</ToggleButtonGroup>
 			</div>
 		);
+	}
+
+	private handleChangeChartType(value) {
+		this.props.changeChartType(value);
 	}
 }

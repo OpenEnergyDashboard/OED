@@ -6,62 +6,71 @@ import * as React from 'react';
 import { FormControl, Button } from 'react-bootstrap';
 import DatasourceBoxContainer from '../../containers/groups/DatasourceBoxContainer';
 
-export default class CreateGroupComponent extends React.Component {
-	constructor(props) {
+interface CreateGroupProps {
+	createNewBlankGroup(): void;
+	editGroupName(name: string): void;
+	submitGroupInEditingIfNeeded(): void;
+	changeDisplayModeToView(): void;
+}
+
+export default class CreateGroupComponent extends React.Component<CreateGroupProps, {}> {
+	constructor(props: CreateGroupProps) {
 		super(props);
 		this.handleNameChange = this.handleNameChange.bind(this);
 		this.handleCreateGroup = this.handleCreateGroup.bind(this);
 		this.handleReturnToView = this.handleReturnToView.bind(this);
 	}
 
-	componentWillMount() {
+	public componentWillMount() {
 		this.props.createNewBlankGroup();
 	}
 
-	handleNameChange(e) {
-		this.props.editGroupName(e.target.value);
-	}
-
-	handleCreateGroup() {
-		this.props.submitGroupInEditingIfNeeded();
-	}
-
-	handleReturnToView() {
-		this.props.changeDisplayModeToView();
-	}
-
-	render() {
-		const divStyle = {
+	public render() {
+		const divStyle: React.CSSProperties = {
 			paddingTop: '35px'
 		};
-		const divBottomStyle = {
+		const divBottomStyle: React.CSSProperties = {
 			marginBottom: '20px'
 		};
-		const textStyle = {
+		const textStyle: React.CSSProperties = {
 			fontWeight: 'bold',
 			margin: 0
 		};
-		const centerTextStyle = {
+		const centerTextStyle: React.CSSProperties = {
 			textAlign: 'center'
 		};
 		return (
-			<div style={divStyle} className="col-xs-6">
+			<div style={divStyle} className='col-xs-6'>
 				<h3 style={centerTextStyle}>Create a New Group</h3>
 				<div style={divBottomStyle}>
 					<p style={textStyle}>Name:</p>
-					<FormControl type="text" placeholder="Name" onChange={this.handleNameChange} />
+					<FormControl type='text' placeholder='Name' onChange={this.handleNameChange} />
 				</div>
 				<div style={divBottomStyle}>
 					<p style={textStyle}>Select Meters:</p>
-					<DatasourceBoxContainer type="meter" selection="all" />
+					<DatasourceBoxContainer type='meter' selection='all' />
 				</div>
 				<div style={divBottomStyle}>
 					<p style={textStyle}>Select Groups:</p>
-					<DatasourceBoxContainer type="group" selection="all" />
+					<DatasourceBoxContainer type='group' selection='all' />
 				</div>
-				<Button type="submit" onClick={this.handleReturnToView}>Cancel</Button>
-				<Button type="submit" className="pull-right" onClick={this.handleCreateGroup}>Create group</Button>
+				<Button type='submit' onClick={this.handleReturnToView}>Cancel</Button>
+				<Button type='submit' className='pull-right' onClick={this.handleCreateGroup}>Create group</Button>
 			</div>
 		);
+	}
+
+	private handleNameChange(e: React.ChangeEvent<FormControl>) {
+		// TODO: Don't know how to get rid of this?
+		// For now, disabled the lint disallowing access by string, so we can fake it up.
+		this.props.editGroupName(e.target['value']); // tslint:disable-line no-string-literal
+	}
+
+	private handleCreateGroup() {
+		this.props.submitGroupInEditingIfNeeded();
+	}
+
+	private handleReturnToView() {
+		this.props.changeDisplayModeToView();
 	}
 }
