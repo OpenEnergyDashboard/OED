@@ -84,12 +84,6 @@ export default class UIOptionsComponent extends React.Component {
 		return (
 			<div style={divTopPadding}>
 				<ChartSelectContainer />
-				{ /* Controls specific to the bar chart. */}
-				{this.props.chartToRender === chartTypes.compare &&
-					<p style={divBottomPadding}>
-						Note: group data cannot be used with the compare function at this time.
-					</p>
-				}
 				<ChartDataSelectContainer />
 
 				{ /* Controls specific to the bar chart. */}
