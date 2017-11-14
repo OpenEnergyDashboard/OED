@@ -27,17 +27,35 @@ function mapStateToProps(state, ownProps) {
 	const soFar = moment().diff(moment().startOf('week'), 'days');
 
 	// Compose the text to display to the user.
-	const delta = change => {
-		if (isNaN(change)) return ''; if (change < 0) return `${state.meters.byMeterID[ownProps.id].name} has used ${parseInt(change.toFixed(2).replace('.', '').slice(1))}% less energy this week.`;
-		return `${state.meters.byMeterID[ownProps.id].name} has used ${parseInt(change.toFixed(2).replace('.', ''))}% more energy this week.`;
-	};
+	let delta;
+	if (ownProps.isGroup) {
+		delta = change => {
+			if (isNaN(change)) return '';
+			if (change < 0) return `${state.groups.byGroupID[ownProps.id].name} has used ${parseInt(change.toFixed(2).replace('.', '').slice(1))}% less energy this week.`;
+			return `${state.groups.byGroupID[ownProps.id].name} has used ${parseInt(change.toFixed(2).replace('.', ''))}% more energy this week.`;
+		};
+	}	else {
+		delta = change => {
+			if (isNaN(change)) return '';
+			if (change < 0) return `${state.meters.byMeterID[ownProps.id].name} has used ${parseInt(change.toFixed(2).replace('.', '').slice(1))}% less energy this week.`;
+			return `${state.meters.byMeterID[ownProps.id].name} has used ${parseInt(change.toFixed(2).replace('.', ''))}% more energy this week.`;
+		};
+	}
+
+
 	const colorize = change => {
 		if (change < 0) {
 			return 'green';
 		}
 		return 'red';
 	};
-	const readingsData = state.readings.bar.byMeterID[ownProps.id][timeInterval][barDuration];
+
+	let readingsData;
+	if (ownProps.isGroup) {
+		readingsData = state.readings.bar.byGroupID[ownProps.id][timeInterval][barDuration];
+	}	else {
+		readingsData = state.readings.bar.byMeterID[ownProps.id][timeInterval][barDuration];
+	}
 	if (readingsData !== undefined && !readingsData.isFetching) {
 		// Sunday needs special logic
 		if (soFar !== 0) {

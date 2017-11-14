@@ -120,14 +120,28 @@ function fetchGroupBarReadings(groupIDs, timeInterval) {
 
 function fetchCompareReadings(meterIDs, timeInterval) {
 	return (dispatch, getState) => {
-		const barDuration = getState().graph.compareDuration;
-		dispatch(requestMeterBarReadings(meterIDs, timeInterval, barDuration));
+		const compareDuration = getState().graph.compareDuration;
+		dispatch(requestMeterBarReadings(meterIDs, timeInterval, compareDuration));
 		const stringifiedMeterIDs = meterIDs.join(',');
 		return axios.get(`/api/readings/bar/meters/${stringifiedMeterIDs}`, {
-			params: { timeInterval: timeInterval.toString(), barDuration: barDuration.toISOString() }
-		}).then(response => dispatch(receiveMeterBarReadings(meterIDs, timeInterval, barDuration, response.data)));
+			params: { timeInterval: timeInterval.toString(), barDuration: compareDuration.toISOString() }
+		}).then(response => dispatch(receiveMeterBarReadings(meterIDs, timeInterval, compareDuration, response.data)));
 	};
 }
+
+function fetchGroupCompareReadings(groupIDs, timeInterval) {
+	return (dispatch, getState) => {
+		const compareDuration = getState().graph.compareDuration;
+		dispatch(requestGroupBarReadings(groupIDs, timeInterval, compareDuration));
+		// API expectes a comma-seperated string of IDs
+		const stringifiedIDs = groupIDs.join(',');
+
+		return axios.get(`/api/readings/bar/groups/${stringifiedIDs}`, {
+			params: { timeInterval: timeInterval.toString(), barDuration: compareDuration.toISOString() }
+		}).then(response => dispatch(receiveGroupBarReadings(groupIDs, timeInterval, compareDuration, response.data)));
+	};
+}
+
 
 /**
  * Fetches readings for the bar chart of all selected meterIDs if they are not already fetched or being fetched
@@ -163,10 +177,25 @@ export function fetchNeededBarReadings(timeInterval) {
 export function fetchNeededCompareReadings(timeInterval) {
 	return (dispatch, getState) => {
 		const state = getState();
-		const meterIDsToFetchForBar = state.graph.selectedMeters.filter(id => shouldFetchMeterBarReadings(state, id, timeInterval, state.graph.compareDuration));
-		if (meterIDsToFetchForBar.length > 0) {
-			return dispatch(fetchCompareReadings(meterIDsToFetchForBar, timeInterval));
+		const futures = [];
+
+		// Determine which meters are missing data for this time interval
+		const meterIDsToFetchForCompare = state.graph.selectedMeters.filter(
+			id => shouldFetchMeterBarReadings(state, id, timeInterval, state.graph.compareDuration)
+		);
+		// Fetch data for any missing meters
+		if (meterIDsToFetchForCompare.length > 0) {
+			futures.push(dispatch(fetchCompareReadings(meterIDsToFetchForCompare, timeInterval)));
 		}
-		return Promise.resolve();
+
+		// Determine which groups are missing data for this time interval
+		const groupIDsToFetchForCompare = state.graph.selectedGroups.filter(
+			id => shouldFetchGroupBarReadings(state, id, timeInterval, state.graph.compareDuration)
+		);
+		// Fetch data for any missing groups
+		if (groupIDsToFetchForCompare.length > 0) {
+			futures.push(dispatch(fetchGroupCompareReadings(groupIDsToFetchForCompare, timeInterval)));
+		}
+		return Promise.all(futures);
 	};
 }

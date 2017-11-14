@@ -8,9 +8,9 @@ import CompareChartContainer from '../containers/CompareChartContainer';
 export default function MultiCompareChartComponent(props) {
 	// Compute how much space should be used in the bootstrap grid system
 	let size;
-	if (props.selectedMeters.length === 1) {
+	if (props.selectedMeters.length + props.selectedGroups.length === 1) {
 		size = 12;
-	} else if (props.selectedMeters.length === 2) {
+	} else if (props.selectedMeters.length + props.selectedGroups.length === 2) {
 		size = 6;
 	} else {
 		size = 4;
@@ -22,22 +22,26 @@ export default function MultiCompareChartComponent(props) {
 	};
 
 	// Display a message if no meters are selected
-	if (props.selectedMeters.length === 0) {
+	if (props.selectedMeters.length + props.selectedGroups.length === 0) {
 		return (
 			<div className="row">
 				<div className="col-xs-12" style={centeredStyle}>
-					Select one or more meters to compare usage over time.
+					Select one or more items to compare usage over time.
 				</div>
 			</div>
 		);
 	}
 
-
 	return (
 		<div className="row">
 			{props.selectedMeters.map(meterID =>
 				<div className={`col-xs-${size}`} key={meterID}>
-					<CompareChartContainer key={meterID} id={meterID} />
+					<CompareChartContainer key={meterID} id={meterID} isGroup={false} />
+				</div>
+			)}
+			{props.selectedGroups.map(groupID =>
+				<div className={`col-xs-${size}`} key={groupID}>
+					<CompareChartContainer key={groupID} id={groupID} isGroup />
 				</div>
 			)}
 		</div>
