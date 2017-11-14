@@ -7,7 +7,8 @@ import MultiCompareChartComponent from '../components/MultiCompareChartComponent
 
 function mapStateToProps(state) {
 	return {
-		selectedMeters: state.graph.selectedMeters
+		selectedMeters: state.graph.selectedMeters,
+		selectedGroups: state.graph.selectedGroups
 	};
 }
 

@@ -66,6 +66,7 @@ export function changeSelectedGroups(groupIDs) {
 		dispatch(dispatch2 => {
 			dispatch2(fetchNeededLineReadings(getState().graph.timeInterval));
 			dispatch2(fetchNeededBarReadings(getState().graph.timeInterval));
+			dispatch2(fetchNeededCompareReadings(getState().graph.compareTimeInterval));
 		});
 		return Promise.resolve();
 	};
