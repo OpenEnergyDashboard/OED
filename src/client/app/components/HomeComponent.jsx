@@ -5,17 +5,22 @@
 import React from 'react';
 import HeaderContainer from '../containers/HeaderContainer';
 import DashboardContainer from '../containers/DashboardContainer';
-
+import FooterComponent from '../components/FooterComponent';
 
 /**
  * Top-level React component that controls the home page
  * @return JSX to create the home page
  */
 export default function HomeComponent() {
+	const bodyStyle = {
+		marginBottom: '0.7em',
+		minHeight: '100%'
+	};
 	return (
 		<div>
 			<HeaderContainer renderOptionsButton renderLoginButton renderGroupsButton />
-			<DashboardContainer />
+			<DashboardContainer style={bodyStyle}/>
+			<FooterComponent />
 		</div>
 	);
 }
