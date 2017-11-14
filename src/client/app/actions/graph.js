@@ -6,6 +6,8 @@
 
 import { fetchNeededLineReadings } from './lineReadings';
 import { fetchNeededBarReadings, fetchNeededCompareReadings } from './barReadings';
+import { fetchMetersDetailsIfNeeded } from './meters';
+import { fetchGroupsDetailsIfNeeded } from './groups';
 
 export const UPDATE_SELECTED_METERS = 'UPDATE_SELECTED_METERS';
 export const UPDATE_SELECTED_GROUPS = 'UPDATE_SELECTED_GROUPS';
@@ -26,15 +28,15 @@ export function changeBarStacking() {
 	return { type: CHANGE_BAR_STACKING };
 }
 
-export function updateSelectedMeters(meterIDs) {
+function updateSelectedMeters(meterIDs) {
 	return { type: UPDATE_SELECTED_METERS, meterIDs };
 }
 
-export function updateSelectedGroups(groupIDs) {
+function updateSelectedGroups(groupIDs) {
 	return { type: UPDATE_SELECTED_GROUPS, groupIDs };
 }
 
-export function updateBarDuration(barDuration) {
+function updateBarDuration(barDuration) {
 	return { type: UPDATE_BAR_DURATION, barDuration };
 }
 
@@ -94,4 +96,33 @@ export function changeGraphZoomIfNeeded(timeInterval) {
 			dispatch(fetchNeededReadingsForGraph(timeInterval));
 		}
 	};
+}
+
+/**
+ * Update graph options from a link
+ * @param options - Object of possible values to dispatch with keys: meterIDs, groupIDs, chartType, barDuration, toggleBarStacking
+ * @returns {function(*)}
+ */
+export function changeOptionsFromLink(options) {
+	const dispatchFirst = [];
+	const dispatchSecond = [];
+	if (options.meterIDs) {
+		dispatchFirst.push(fetchMetersDetailsIfNeeded());
+		dispatchSecond.push(changeSelectedMeters(options.meterIDs));
+	}
+	if (options.groupIDs) {
+		dispatchFirst.push(fetchGroupsDetailsIfNeeded());
+		dispatchSecond.push(changeSelectedGroups(options.groupIDs));
+	}
+	if (options.chartType) {
+		dispatchSecond.push(changeChartToRender(options.chartType));
+	}
+	if (options.barDuration) {
+		dispatchSecond.push(changeBarDuration(options.barDuration));
+	}
+	if (options.changeBarStacking) {
+		dispatchSecond.push(changeBarStacking());
+	}
+	return dispatch => Promise.all(dispatchFirst.map(dispatch))
+			.then(() => Promise.all(dispatchSecond.map(dispatch)));
 }

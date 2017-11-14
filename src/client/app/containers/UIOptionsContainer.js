@@ -22,7 +22,9 @@ function mapStateToProps(state) {
 				value: meterID
 			}
 		)),
-		chartToRender: state.graph.chartToRender
+		chartToRender: state.graph.chartToRender,
+		barDuration: state.graph.barDuration,
+		barStacking: state.graph.barStacking
 	};
 }
 
