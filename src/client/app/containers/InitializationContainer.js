@@ -8,10 +8,13 @@ import { connect } from 'react-redux';
 import InitializationComponent from '../components/InitializationComponent';
 import { clearNotifications } from '../actions/notifications';
 import { fetchMetersDetailsIfNeeded } from '../actions/meters';
+import { changeOptionsFromLink } from '../actions/graph';
+
 
 function mapStateToProps(state) {
 	return {
 		notification: state.notifications.notification,
+		barStacking: state.graph.barStacking
 	};
 }
 
@@ -19,6 +22,7 @@ function mapDispatchToProps(dispatch) {
 	return {
 		clearNotifications: () => dispatch(clearNotifications()),
 		fetchMetersDetailsIfNeeded: () => dispatch(fetchMetersDetailsIfNeeded()),
+		changeOptionsFromLink: options => dispatch(changeOptionsFromLink(options))
 	};
 }
 

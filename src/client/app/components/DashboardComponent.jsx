@@ -7,7 +7,7 @@ import { defaults } from 'react-chartjs-2';
 import UIOptionsContainer from '../containers/UIOptionsContainer';
 import LineChartContainer from '../containers/LineChartContainer';
 import BarChartContainer from '../containers/BarChartContainer';
-import CompareChartContainer from '../containers/CompareChartContainer'
+import MultiCompareChartContainer from '../containers/MultiCompareChartContainer';
 import { chartTypes } from '../reducers/graph';
 
 defaults.global.plugins.datalabels.display = false;
@@ -21,13 +21,11 @@ export default function DashboardComponent(props) {
 	};
 	let ChartToRender = '';
 	if (props.chartToRender === chartTypes.line) {
-		 ChartToRender = LineChartContainer;
-	}
-	else if (props.chartToRender === chartTypes.compare) {
-		ChartToRender = CompareChartContainer;
-	}
-	else {
-		 ChartToRender = BarChartContainer;
+		ChartToRender = LineChartContainer;
+	} else if (props.chartToRender === chartTypes.compare) {
+		ChartToRender = MultiCompareChartContainer;
+	} else {
+		ChartToRender = BarChartContainer;
 	}
 
 	return (

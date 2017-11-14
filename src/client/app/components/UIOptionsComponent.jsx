@@ -6,9 +6,13 @@ import React from 'react';
 import Slider from 'react-rangeslider';
 import moment from 'moment';
 import 'react-rangeslider/lib/index.css';
+import '../styles/react-rangeslider-fix.css';
 import { chartTypes } from '../reducers/graph';
-import ExportContainer from '../containers/ExportContainer';
 
+import ExportContainer from '../containers/ExportContainer';
+import ChartSelectContainer from '../containers/ChartSelectContainer';
+import ChartDataSelectContainer from '../containers/ChartDataSelectContainer';
+import ChartLinkContainer from '../containers/ChartLinkContainer';
 
 export default class UIOptionsComponent extends React.Component {
 	/**
@@ -20,24 +24,14 @@ export default class UIOptionsComponent extends React.Component {
 		this.handleMeterSelect = this.handleMeterSelect.bind(this);
 		this.handleBarDurationChange = this.handleBarDurationChange.bind(this);
 		this.handleBarDurationChangeComplete = this.handleBarDurationChangeComplete.bind(this);
-		this.handleChangeChartType = this.handleChangeChartType.bind(this);
 		this.handleChangeBarStacking = this.handleChangeBarStacking.bind(this);
 		this.state = {
-			barDuration: 30 // barDuration in days
+			barDuration: this.props.barDuration.asDays()
 		};
 	}
 
-	handleMeterSelect(e) {
-		e.preventDefault();
-		const options = e.target.options;
-		const selectedMeters = [];
-		// We can't map here because this is a collection of DOM elements, not an array.
-		for (let i = 0; i < options.length; i++) {
-			if (options[i].selected) {
-				selectedMeters.push(parseInt(options[i].value));
-			}
-		}
-		this.props.selectMeters(selectedMeters);
+	componentWillReceiveProps(nextProps) {
+		this.setState({ barDuration: nextProps.barDuration.asDays() });
 	}
 
 	/**
@@ -48,15 +42,19 @@ export default class UIOptionsComponent extends React.Component {
 	}
 
 	/**
+	 * Handles a change in meter selection
+	 * @param {Object[]} selection An array of {label: string, value: {type: string, id: int}} representing the current selection
+	 */
+	handleMeterSelect(selection) {
+		this.props.selectMeters(selection.map(s => s.value));
+	}
+
+	/**
 	 * Called when the user releases the slider, dispatch action on temporary state variable
 	 */
 	handleBarDurationChangeComplete(e) {
 		e.preventDefault();
 		this.props.changeDuration(moment.duration(this.state.barDuration, 'days'));
-	}
-
-	handleChangeChartType(e) {
-		this.props.changeChartType(e.target.value);
 	}
 
 	handleChangeBarStacking() {
@@ -68,54 +66,37 @@ export default class UIOptionsComponent extends React.Component {
 	 */
 	render() {
 		const labelStyle = {
-			textDecoration: 'underline'
+			fontWeight: 'bold',
+			margin: 0
 		};
+
+		const divTopPadding = {
+			paddingTop: '15px'
+		};
+
 		return (
-			<div>
-				{this.props.chartToRender === chartTypes.compare || chartTypes.line &&
-				<div className="form-group">
-					<p style={labelStyle}>Select meters:</p>
-					<select multiple className="form-control" id="meterList" size="8" onChange={this.handleMeterSelect}>
-						{this.props.meters.map(meter =>
-							<option key={meter.id} value={meter.id}>{meter.name}</option>
-                        )}
-					</select>
-				</div>
-                }
-				{this.props.chartToRender === chartTypes.compare &&
-				<div className="form-group">
-					<p style={labelStyle}>Select meters:</p>
-					<select className="form-control" id="meterList" size="8" onChange={this.handleMeterSelect}>
-						{this.props.meters.map(meter =>
-							<option key={meter.id} value={meter.id}>{meter.name}</option>
-                        )}
-					</select>
-				</div>
-                }
-				<p style={labelStyle}>Graph Type:</p>
-				<div className="radio">
-					<label><input type="radio" name="chartTypes" value={chartTypes.line} onChange={this.handleChangeChartType} checked={this.props.chartToRender === chartTypes.line} />Line</label>
-				</div>
-				<div className="radio">
-					<label><input type="radio" name="chartTypes" value={chartTypes.bar} onChange={this.handleChangeChartType} checked={this.props.chartToRender === chartTypes.bar} />Bar</label>
-				</div>
-				<div className="radio">
-					<label><input type="radio" name="chartTypes" value={chartTypes.compare} onChange={this.handleChangeChartType} checked={this.props.chartToRender === chartTypes.compare} />Compare</label>
-				</div>
+			<div style={divTopPadding}>
+				<ChartSelectContainer />
+				<ChartDataSelectContainer />
+
+				{ /* Controls specific to the bar chart. */}
 				{this.props.chartToRender === chartTypes.bar &&
-				<div>
-					<p style={labelStyle}>Bar chart interval (days):</p>
-					<Slider min={1} max={365} value={this.state.barDuration} onChange={this.handleBarDurationChange} onChangeComplete={this.handleBarDurationChangeComplete} />
-				</div>
+					<div>
+						<div className="checkbox">
+							<label><input type="checkbox" onChange={this.handleChangeBarStacking} checked={this.props.barStacking} />Bar stacking</label>
+						</div>
+						<p style={labelStyle}>Bar chart interval (days):</p>
+						<Slider min={1} max={365} value={this.state.barDuration} onChange={this.handleBarDurationChange} onChangeComplete={this.handleBarDurationChangeComplete} />
+					</div>
 				}
-				{this.props.chartToRender === chartTypes.bar &&
-				<div className="checkbox">
-					<label><input type="checkbox" onChange={this.handleChangeBarStacking} />Bar stacking</label>
-				</div>
+
+				{ /* We can't export compare data */ }
+				{this.props.chartToRender !== chartTypes.compare &&
+					<ExportContainer />
 				}
-				{this.props.chartToRender === chartTypes.compare || chartTypes.line &&
-				<ExportContainer />
-                }
+				<div style={divTopPadding}>
+					<ChartLinkContainer />
+				</div>
 			</div>
 		);
 	}

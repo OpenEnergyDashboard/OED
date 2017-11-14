@@ -14,6 +14,7 @@ const readings = require('./routes/readings');
 const meters = require('./routes/meters');
 const login = require('./routes/login');
 const verification = require('./routes/verification');
+const groups = require('./routes/groups');
 const version = require('./routes/version');
 
 const app = express();
@@ -29,6 +30,7 @@ app.use('/api/users', users);
 app.use('/api/meters', meters);
 app.use('/api/readings', readings);
 app.use('/api/login', login);
+app.use('/api/groups', groups);
 app.use('/api/verification', verification);
 app.use('/api/fileProcessing', fileProcessing);
 //    /api/fp/6

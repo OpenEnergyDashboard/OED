@@ -136,4 +136,9 @@ mocha.describe('Barchart Readings', () => {
 		expect(barchartReadings[meter2.id][0].reading_sum).to.equal(readingMeter2.reading);
 		expect(barchartReadings[meter3.id][0].reading_sum).to.equal(readingMeter3.reading);
 	});
+
+	mocha.it('returns correct results when no readings exist', async () => {
+		const result = await Reading.getBarchartReadings([meter.id], moment.duration(1, 'day'));
+		expect(result).to.deep.equal({ [meter.id]: [] });
+	});
 });

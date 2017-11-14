@@ -1,8 +1,8 @@
 /* This Source Code Form is subject to the terms of the Mozilla Public
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
-
 const database = require('./database');
+const { mapToObject } = require('../util');
 
 const db = database.db;
 const sqlFile = database.sqlFile;
@@ -36,6 +36,14 @@ class Reading {
 	 */
 	static createCompressedReadingsFunction() {
 		return db.none(sqlFile('reading/create_function_get_compressed_readings.sql'));
+	}
+
+	static createCompressedGroupsReadingsFunction() {
+		return db.none(sqlFile('reading/create_function_get_compressed_groups_readings.sql'));
+	}
+
+	static createCompressedGroupsBarchartReadingsFunction() {
+		return db.none(sqlFile('reading/create_function_get_group_barchart_readings.sql'));
 	}
 
 	/**
@@ -138,16 +146,36 @@ class Reading {
 	static async getCompressedReadings(meterIDs, fromTimestamp = null, toTimestamp = null, numPoints = 500, conn = db) {
 		const allCompressedReadings = await conn.func('compressed_readings', [meterIDs, fromTimestamp || '-infinity', toTimestamp || 'infinity', numPoints]);
 		// Separate the result rows by meter_id and return a nested object.
-		const compressedReadingsByMeterID = {};
+		const compressedReadingsByMeterID = mapToObject(meterIDs, () => []); // Returns { 1: [], 2: [], ... }
 		for (const row of allCompressedReadings) {
-			if (compressedReadingsByMeterID[row.meter_id] === undefined) {
-				compressedReadingsByMeterID[row.meter_id] = [];
-			}
 			compressedReadingsByMeterID[row.meter_id].push(
 				{ reading_rate: row.reading_rate, start_timestamp: row.start_timestamp, end_timestamp: row.end_timestamp }
 			);
 		}
 		return compressedReadingsByMeterID;
+	}
+
+	/**
+	 * Gets a number of compressed readings that approximate the given time range for the given groups.
+	 *
+	 * Compressed readings are in kilowatts.
+	 * @param groupIDs an array of ids for groups whose points are being compressed
+	 * @param {Moment?} fromTimestamp An optional start point for the time range.
+	 * @param {Moment?} toTimestamp An optional end point for the time range
+	 * @param numPoints The number of points to compress to. Defaults to 500
+	 * @param conn the connection to use. Defaults to the default database connection.
+	 * @return {Promise<object<int, array<{reading_rate: number, start_timestamp: Moment, end_timestamp: Moment}>>>}
+	 */
+	static async getCompressedGroupReadings(groupIDs, fromTimestamp = null, toTimestamp = null, numPoints = 500, conn = db) {
+		const allCompressedReadings = await conn.func('compressed_group_readings', [groupIDs, fromTimestamp || '-infinity', toTimestamp || 'infinity', numPoints]);
+		// Separate the result rows by meter_id and return a nested object.
+		const compressedReadingsByGroupID = mapToObject(groupIDs, () => []); // Returns { 1: [], 2: [], ... }
+		for (const row of allCompressedReadings) {
+			compressedReadingsByGroupID[row.group_id].push(
+				{ reading_rate: row.reading_rate, start_timestamp: row.start_timestamp, end_timestamp: row.end_timestamp }
+			);
+		}
+		return compressedReadingsByGroupID;
 	}
 
 	/**
@@ -164,16 +192,39 @@ class Reading {
 	static async getBarchartReadings(meterIDs, duration, fromTimestamp = null, toTimestamp = null, conn = db) {
 		const allBarchartReadings = await conn.func('barchart_readings', [meterIDs, duration, fromTimestamp || '-infinity', toTimestamp || 'infinity']);
 		// Separate the result rows by meter_id and return a nested object.
-		const barchartReadingsByMeterID = {};
+		const barchartReadingsByMeterID = mapToObject(meterIDs, () => []);
 		for (const row of allBarchartReadings) {
-			if (barchartReadingsByMeterID[row.meter_id] === undefined) {
-				barchartReadingsByMeterID[row.meter_id] = [];
-			}
 			barchartReadingsByMeterID[row.meter_id].push(
 				{ reading_sum: row.reading_sum, start_timestamp: row.start_timestamp, end_timestamp: row.end_timestamp }
 			);
 		}
 		return barchartReadingsByMeterID;
+	}
+
+	/**
+	 * Gets barchart readings for every group across the given time interval for a duration.
+	 *
+	 * Compressed readings are in kilowatts.
+	 * @param groupIDs an array of ids for groups whose points are being compressed
+	 * @param duration A moment time duration over which to sum the readings
+	 * @param fromTimestamp An optional start point for the beginning of the entire time range.
+	 * @param toTimestamp An optional end point for the end of the entire time range.
+	 * @param conn the connection to use. Defaults to the default database connection.
+	 * @return {Promise<object<int, array<{reading_sum: number, start_timestamp: Date, end_timestamp: Date}>>>}
+	 */
+	static async getGroupBarchartReadings(groupIDs, duration, fromTimestamp = null, toTimestamp = null, conn = db) {
+		const allBarchartReadings = await conn.func('barchart_group_readings', [groupIDs, duration, fromTimestamp || '-infinity', toTimestamp || 'infinity']);
+		// Separate the result rows by meter_id and return a nested object.
+		const barchartReadingsByGroupID = mapToObject(groupIDs, () => []);
+		for (const row of allBarchartReadings) {
+			if (barchartReadingsByGroupID[row.group_id] === undefined) {
+				barchartReadingsByGroupID[row.group_id] = [];
+			}
+			barchartReadingsByGroupID[row.group_id].push(
+				{ reading_sum: row.reading_sum, start_timestamp: row.start_timestamp, end_timestamp: row.end_timestamp }
+			);
+		}
+		return barchartReadingsByGroupID;
 	}
 
 

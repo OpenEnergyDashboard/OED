@@ -19,6 +19,7 @@ export const chartTypes = {
  */
 const defaultState = {
 	selectedMeters: [],
+	selectedGroups: [],
 	timeInterval: TimeInterval.unbounded(),
 	barDuration: moment.duration(1, 'month'),
 	compareTimeInterval: moment().diff(moment().startOf('week'), 'days'),
@@ -39,6 +40,11 @@ export default function graph(state = defaultState, action) {
 				...state,
 				selectedMeters: action.meterIDs
 			};
+		case graphActions.UPDATE_SELECTED_GROUPS:
+			return {
+				...state,
+				selectedGroups: action.groupIDs
+			};
 		case graphActions.UPDATE_BAR_DURATION:
 			return {
 				...state,
@@ -50,13 +56,6 @@ export default function graph(state = defaultState, action) {
 				timeInterval: action.timeInterval
 			};
 		case graphActions.CHANGE_CHART_TO_RENDER:
-			if (action.chartType === 'compare') {
-				return {
-					...state,
-					selectedMeters: [],
-					chartToRender: action.chartType
-				};
-			}
 			return {
 				...state,
 				chartToRender: action.chartType
