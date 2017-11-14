@@ -10,10 +10,8 @@ export default function MultiCompareChartComponent(props) {
 	let size;
 	if (props.selectedMeters.length + props.selectedGroups.length === 1) {
 		size = 12;
-	} else if (props.selectedMeters.length + props.selectedGroups.length === 2) {
-		size = 6;
 	} else {
-		size = 4;
+		size = 6;
 	}
 
 	const centeredStyle = {
