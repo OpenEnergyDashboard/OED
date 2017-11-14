@@ -12,6 +12,7 @@ import datalabels from 'chartjs-plugin-datalabels'; // eslint-disable-line no-un
 
 /**
  * @param {State} state
+ * @param ownProps
  */
 function mapStateToProps(state, ownProps) {
 	const timeInterval = state.graph.compareTimeInterval;
