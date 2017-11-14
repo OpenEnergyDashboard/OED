@@ -12,6 +12,13 @@ import graph from './graph';
 import groups from './groups';
 import notifications from './notifications';
 
+import { BarReadingsState } from './barReadings';
+import { LineReadingsState } from './lineReadings';
+import { GraphState } from './graph';
+import { GroupsState } from './groups';
+import { MetersState } from './meters';
+import { NotificationsState } from './notifications';
+
 /**
  * @typedef {Object} State
  * @property {State~Meters} meters
@@ -21,6 +28,17 @@ import notifications from './notifications';
  * @property {State~Groups} groups
  * @property {State~Notifications} notifications
  */
+
+export interface State {
+	meters: MetersState;
+	readings: {
+		line: LineReadingsState;
+		bar: BarReadingsState;
+	};
+	graph: GraphState;
+	groups: GroupsState;
+	notifications: NotificationsState;
+}
 
 /**
  * @param {State} state

@@ -15,7 +15,30 @@ import * as readingsActions from '../actions/lineReadings';
 /**
  * @type {State~Readings}
  */
-const defaultState = {
+export interface LineReadingsState {
+	byMeterID: {
+		[meterID: number]: {
+			[timeInterval: string]: {
+				isFetching: boolean;
+				readings?: {
+					[point: number]: Array<[number, number]>;
+				};
+			}
+		}
+	};
+	byGroupID: {
+		[groupID: number]: {
+			[timeInterval: string]: {
+				isFetching: boolean;
+				readings?: {
+					[point: number]: Array<[number, number]>;
+				};
+			}
+		}
+	};
+}
+
+const defaultState: LineReadingsState = {
 	byMeterID: {},
 	byGroupID: {}
 };
@@ -72,7 +95,7 @@ export default function readings(state = defaultState, action) {
 			const newState = {
 				...state,
 				byMeterID: {
-					...state.byMeterID,
+					...state.byMeterID
 				}
 			};
 

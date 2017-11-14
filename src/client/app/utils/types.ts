@@ -20,3 +20,13 @@ export interface NamedIDItem {
 	id: number;
 	name: string;
 }
+
+export interface LineReadings {
+	[id: number]: {
+		[point: number]: Array<[number, number]>;
+	};
+}
+
+export interface BarReadings {
+	[id: number]: Array<[number, number]>;
+}

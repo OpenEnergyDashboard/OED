@@ -12,8 +12,17 @@ import * as metersActions from '../actions/meters';
  * @property {boolean} isFetching
  * @property {Object<number, Object>} byMeterID
  */
+export interface MetersState {
+	isFetching: boolean;
+	byMeterID: {
+		[meterID: number]: {
+			id: number;
+			name: string;
+		};
+	};
+}
 
-const defaultState = {
+const defaultState: MetersState = {
 	isFetching: false,
 	byMeterID: {}
 };

@@ -6,16 +6,40 @@
  */
 
 import * as readingsActions from '../actions/barReadings';
+import { BarReadingsAction } from '../actions/barReadings';
 
 /**
  * @typedef {Object} State~BarReadings
  * @property {Object<number, Object>} byMeterID
  */
 
+export interface BarReadingsState {
+	byMeterID: {
+		[meterID: number]: {
+			[timeInterval: string]: {
+				[barDuration: string]: {
+					isFetching: boolean;
+					readings?: Array<[number, number]>;
+				}
+			}
+		}
+	};
+	byGroupID: {
+		[groupID: number]: {
+			[timeInterval: string]: {
+				[barDuration: string]: {
+					isFetching: boolean;
+					readings?: Array<[number, number]>;
+				}
+			}
+		}
+	};
+}
+
 /**
  * @type {State~BarReadings}
  */
-const defaultState = {
+const defaultState: BarReadingsState = {
 	byMeterID: {},
 	byGroupID: {}
 };
@@ -25,11 +49,11 @@ const defaultState = {
  * @param action
  * @return {State~Readings}
  */
-export default function readings(state = defaultState, action) {
+export default function readings(state = defaultState, action: BarReadingsAction) {
 	switch (action.type) {
 		case readingsActions.REQUEST_METER_BAR_READINGS: {
-			const timeInterval = action.timeInterval;
-			const barDuration = action.barDuration;
+			const timeInterval = action.timeInterval.toString();
+			const barDuration = action.barDuration.toISOString();
 			const newState = {
 				...state,
 				byMeterID: {
@@ -53,8 +77,8 @@ export default function readings(state = defaultState, action) {
 			return newState;
 		}
 		case readingsActions.REQUEST_GROUP_BAR_READINGS: {
-			const timeInterval = action.timeInterval;
-			const barDuration = action.barDuration;
+			const timeInterval = action.timeInterval.toString();
+			const barDuration = action.barDuration.toISOString();
 			const newState = {
 				...state,
 				byGroupID: {
@@ -78,8 +102,8 @@ export default function readings(state = defaultState, action) {
 			return newState;
 		}
 		case readingsActions.RECEIVE_METER_BAR_READINGS: {
-			const timeInterval = action.timeInterval;
-			const barDuration = action.barDuration;
+			const timeInterval = action.timeInterval.toString();
+			const barDuration = action.barDuration.toISOString();
 			const newState = {
 				...state,
 				byMeterID: {
@@ -95,8 +119,8 @@ export default function readings(state = defaultState, action) {
 			return newState;
 		}
 		case readingsActions.RECEIVE_GROUP_BAR_READINGS: {
-			const timeInterval = action.timeInterval;
-			const barDuration = action.barDuration;
+			const timeInterval = action.timeInterval.toString();
+			const barDuration = action.barDuration.toISOString();
 			const newState = {
 				...state,
 				byGroupID: {

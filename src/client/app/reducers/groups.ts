@@ -7,6 +7,22 @@
 import * as _ from 'lodash';
 import * as groupsActions from '../actions/groups';
 
+export interface GroupDefinition {
+	id: number;
+	name: string;
+	isFetching: boolean;
+	outdated: boolean;
+	childGroups: number[];
+	childMeters: number[];
+	selectedGroups: number[];
+	selectedMeters: number[];
+}
+
+export interface StatefulEditable {
+	dirty: boolean;
+	submitted?: boolean;
+}
+
 /**
  * @typedef {Object} State~Groups
  * @property {boolean} isFetching
@@ -14,7 +30,18 @@ import * as groupsActions from '../actions/groups';
  * @property {Object<number, Object>} byGroupID
  * @property {Object} groupInEditing
  */
-const defaultState = {
+export interface GroupsState {
+	isFetching: boolean;
+	outdated: boolean;
+	byGroupID: {
+		[groupID: number]: GroupDefinition;
+	};
+	selectedGroups: number[];
+	groupInEditing: GroupDefinition & StatefulEditable | StatefulEditable;
+	displayMode: groupsActions.DISPLAY_MODE;
+}
+
+const defaultState: GroupsState = {
 	isFetching: false,
 	outdated: true,
 	byGroupID: {},
@@ -54,7 +81,7 @@ export default function groups(state = defaultState, action) {
 				childGroups: [],
 				childMeters: [],
 				selectedGroups: [],
-				selectedMeters: [],
+				selectedMeters: []
 			}));
 			// newGroups is an array: this converts it into a nested object where the key to each group is its ID.
 			// Without this, byGroupID will not be keyed by group ID.
@@ -64,7 +91,7 @@ export default function groups(state = defaultState, action) {
 				...state,
 				isFetching: false,
 				outdated: false,
-				byGroupID: newGroupsByID,
+				byGroupID: newGroupsByID
 			};
 		}
 
@@ -76,7 +103,7 @@ export default function groups(state = defaultState, action) {
 					...state.byGroupID,
 					[action.groupID]: {
 						...state.byGroupID[action.groupID],
-						isFetching: true,
+						isFetching: true
 					}
 				}
 
@@ -94,7 +121,7 @@ export default function groups(state = defaultState, action) {
 						isFetching: false,
 						outdated: false,
 						childGroups: action.data.groups,
-						childMeters: action.data.meters,
+						childMeters: action.data.meters
 					}
 				}
 			};
@@ -103,7 +130,7 @@ export default function groups(state = defaultState, action) {
 		case groupsActions.CHANGE_DISPLAYED_GROUPS: {
 			return {
 				...state,
-				selectedGroups: action.groupIDs,
+				selectedGroups: action.groupIDs
 			};
 		}
 
@@ -114,7 +141,7 @@ export default function groups(state = defaultState, action) {
 					...state.byGroupID,
 					[action.parentID]: {
 						...state.byGroupID[action.parentID],
-						selectedGroups: action.groupIDs,
+						selectedGroups: action.groupIDs
 					}
 				}
 			};
@@ -127,7 +154,7 @@ export default function groups(state = defaultState, action) {
 					...state.byGroupID,
 					[action.parentID]: {
 						...state.byGroupID[action.parentID],
-						selectedMeters: action.meterIDs,
+						selectedMeters: action.meterIDs
 					}
 				}
 			};

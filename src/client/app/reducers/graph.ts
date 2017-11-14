@@ -17,7 +17,18 @@ export enum chartTypes {
 /**
  * @type {State~Graph}
  */
-const defaultState = {
+export interface GraphState {
+	selectedMeters: number[];
+	selectedGroups: number[];
+	timeInterval: TimeInterval;
+	barDuration: moment.Duration;
+	compareTimeInterval: number;
+	compareDuration: moment.Duration;
+	chartToRender: chartTypes;
+	barStacking: boolean;
+}
+
+const defaultState: GraphState = {
 	selectedMeters: [],
 	selectedGroups: [],
 	timeInterval: TimeInterval.unbounded(),
@@ -33,7 +44,7 @@ const defaultState = {
  * @param action
  * @return {State~Graph}
  */
-export default function graph(state = defaultState, action) {
+export default function graph(state = defaultState, action: graphActions.GraphAction) {
 	switch (action.type) {
 		case graphActions.UPDATE_SELECTED_METERS:
 			return {

@@ -7,16 +7,14 @@
 import axios from 'axios';
 import * as moment from 'moment';
 import { TimeInterval } from '../../../common/TimeInterval';
+import { State } from '../reducers/index';
+import { BarReadings } from '../utils/types';
 
 export const REQUEST_GROUP_BAR_READINGS = 'REQUEST_GROUP_BAR_READINGS';
 export const RECEIVE_GROUP_BAR_READINGS = 'RECEIVE_GROUP_BAR_READINGS';
 
 export const REQUEST_METER_BAR_READINGS = 'REQUEST_METER_BAR_READINGS';
 export const RECEIVE_METER_BAR_READINGS = 'RECEIVE_METER_BAR_READINGS';
-
-interface BarReadings {
-	[id: number]: Array<[number, number]>;
-}
 
 export interface RequestMeterBarReadingsAction {
 	type: 'REQUEST_METER_BAR_READINGS';
@@ -49,7 +47,7 @@ export interface ReceiveGroupBarReadingsAction {
 }
 
 export type BarReadingsAction =
-	ReceiveGroupBarReadingsAction |
+	ReceiveMeterBarReadingsAction |
 	ReceiveGroupBarReadingsAction |
 	RequestMeterBarReadingsAction |
 	RequestGroupBarReadingsAction;
@@ -61,7 +59,7 @@ export type BarReadingsAction =
  * @param {Moment.Duration} barDuration the duration of each bar for which to check
  * @returns {boolean} True if the readings for the given meter, time, and duration are missing; false otherwise.
  */
-function shouldFetchMeterBarReadings(state, meterID: number, timeInterval: TimeInterval, barDuration: moment.Duration): boolean {
+function shouldFetchMeterBarReadings(state: State, meterID: number, timeInterval: TimeInterval, barDuration: moment.Duration): boolean {
 	const readingsForID = state.readings.bar.byMeterID[meterID];
 	if (readingsForID === undefined) {
 		return true;
@@ -87,7 +85,7 @@ function shouldFetchMeterBarReadings(state, meterID: number, timeInterval: TimeI
  * @param {Moment.Duration} barDuration the duration of each bar for which to check
  * @returns {boolean} True if the readings for the given group, time, and duration are missing; false otherwise.
  */
-function shouldFetchGroupBarReadings(state, groupID: number, timeInterval: TimeInterval, barDuration: moment.Duration): boolean {
+function shouldFetchGroupBarReadings(state: State, groupID: number, timeInterval: TimeInterval, barDuration: moment.Duration): boolean {
 	const readingsForID = state.readings.bar.byMeterID[groupID];
 	if (readingsForID === undefined) {
 		return true;

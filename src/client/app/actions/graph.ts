@@ -43,7 +43,17 @@ export interface ChangeBarStackingAction {
 
 export interface ChangeGraphZoomAction {
 	type: 'CHANGE_GRAPH_ZOOM';
+	timeInterval: TimeInterval;
 }
+
+export type GraphAction =
+	| ChangeGraphZoomAction
+	| ChangeBarStackingAction
+	| ChangeChartToRenderAction
+	| UpdateBarDurationAction
+	| UpdateSelectedGroupsAction
+	| UpdateSelectedMetersAction;
+
 
 /**
  * @param {string} chartType is one of chartTypes
@@ -67,6 +77,10 @@ export function updateSelectedGroups(groupIDs: number[]): UpdateSelectedGroupsAc
 
 export function updateBarDuration(barDuration: number): UpdateBarDurationAction {
 	return { type: UPDATE_BAR_DURATION, barDuration };
+}
+
+function changeGraphZoom(timeInterval: TimeInterval): ChangeGraphZoomAction {
+	return { type: CHANGE_GRAPH_ZOOM, timeInterval };
 }
 
 export function changeBarDuration(barDuration: number) {
@@ -107,10 +121,6 @@ function fetchNeededReadingsForGraph(timeInterval: TimeInterval) {
 		dispatch(fetchNeededLineReadings(timeInterval));
 		dispatch(fetchNeededBarReadings(timeInterval));
 	};
-}
-
-function changeGraphZoom(timeInterval: TimeInterval) {
-	return { type: CHANGE_GRAPH_ZOOM, timeInterval };
 }
 
 function shouldChangeGraphZoom(state, timeInterval: TimeInterval) {

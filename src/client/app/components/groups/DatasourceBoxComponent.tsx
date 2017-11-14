@@ -22,7 +22,7 @@ export default class DatasourceBoxComponent extends React.Component<DatasourceBo
 	}
 
 	handleDatasourceSelect(selection) {
-		if (this.props.type === 'meters' || this.props.type === 'meter') {
+		if (this.props.type === 'meters') {
 			this.props.selectDatasource(selection.reduce(metersFilterReduce, []));
 		} else {
 			this.props.selectDatasource(selection.reduce(groupsFilterReduce, []));
@@ -31,7 +31,7 @@ export default class DatasourceBoxComponent extends React.Component<DatasourceBo
 
 	render() {
 		let type: DataType = DataType.Group;
-		if (this.props.type === 'meters' || this.props.type === 'meter') {
+		if (this.props.type === 'meters') {
 			type = DataType.Meter;
 		}
 

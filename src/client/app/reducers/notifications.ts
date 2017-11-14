@@ -6,11 +6,15 @@
 
 import * as topLevelActions from '../actions/notifications';
 
+export interface NotificationsState {
+	notification: topLevelActions.Notification;
+}
+
 const defaultState = {
 	notification: {}
 };
 
-export default function topLevel(state = defaultState, action) {
+export default function topLevel(state = defaultState, action: topLevelActions.NotificationAction) {
 	switch (action.type) {
 		case topLevelActions.SHOW_NOTIFICATION:
 			return {
