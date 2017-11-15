@@ -6,17 +6,20 @@ import React from 'react';
 import CompareChartContainer from '../containers/CompareChartContainer';
 
 export default function MultiCompareChartComponent(props) {
-	// Compute how much space should be used in the bootstrap grid system
-	let size;
-	if (props.selectedMeters.length + props.selectedGroups.length === 1) {
-		size = 12;
-	} else {
-		size = 6;
-	}
-
 	const centeredStyle = {
 		marginTop: '20%',
 		textAlign: 'center'
+	};
+
+	const flexContainerStyle = {
+		display: 'flex',
+		flexFlow: 'row wrap',
+		flexShrink: '3'
+	};
+
+	const flexChildStyle = {
+		width: '30%',
+		flexGrow: '1'
 	};
 
 	// Display a message if no meters are selected
@@ -31,14 +34,14 @@ export default function MultiCompareChartComponent(props) {
 	}
 
 	return (
-		<div className="row">
+		<div style={flexContainerStyle}>
 			{props.selectedMeters.map(meterID =>
-				<div className={`col-xs-${size}`} key={meterID}>
+				<div style={flexChildStyle} key={meterID}>
 					<CompareChartContainer key={meterID} id={meterID} isGroup={false} />
 				</div>
 			)}
 			{props.selectedGroups.map(groupID =>
-				<div className={`col-xs-${size}`} key={groupID}>
+				<div style={flexChildStyle} key={groupID}>
 					<CompareChartContainer key={groupID} id={groupID} isGroup />
 				</div>
 			)}
