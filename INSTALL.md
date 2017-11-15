@@ -28,10 +28,11 @@ Killing the running process (ctrl+C) will stop the app. You can get rid of the c
 
 Stop the app with ```docker-compose stop```. You can get rid of the containers with ```docker-compose down```.
 
-### Data Storage ###
+### Administration ###
 
 PostgreSQL stores its data in `postgres-data`. This and `node_modules` will be owned by root, becuase the user in the Docker continer is root; to uninstall the app, you need to delete them from inside the container (or as root on your own machine): ```docker-compose run --rm web rm -r postgres-data node_modules```.
 
+You can access the PostgreSQL database through the `dbadmin` service, which is container linked to the `database` service. It has `psql` installed, so you can simply: `docker-compose run --rm dbadmin psql -h database -d oed -U opened --password` and get a PostgreSQL prompt.
 
 ## Without Docker ##
 
