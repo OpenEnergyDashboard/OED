@@ -7,7 +7,19 @@
 
 if [ "$1" == "" ]; then 
     echo "You must provide a filename to get meters from, or the word NONE."
+    echo "You may also specify a flag --build to build the Webpack-ed application for production."
     exit 1
+fi
+
+
+BUILD=no
+if [ "$2" != "--build" ] && [ "$2" != "" ]; then
+    echo "Unknown flag $2. The only valid flag is --build."
+    exit 1
+fi
+
+if [ "$2" == "--build" ]; then
+    BUILD=yes
 fi
 
 # Install NPM dependencies
@@ -48,4 +60,9 @@ if [ $1 != "NONE"  ]; then
     npm run addMamacMeters $1 2> /dev/null
     echo "Trying to update meters."
     npm run updateMamacMeters 2> /dev/null
+fi
+
+# Build webpack if needed
+if [ $BUILD == "yes" ]; then
+    npm run build
 fi
