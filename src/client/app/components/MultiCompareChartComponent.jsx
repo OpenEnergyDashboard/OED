@@ -6,6 +6,11 @@ import React from 'react';
 import CompareChartContainer from '../containers/CompareChartContainer';
 
 export default function MultiCompareChartComponent(props) {
+	let size = 0;
+	if (props.selectedMeters.length + props.selectedGroups.length < 3) {
+		size = 1;
+	}
+
 	const centeredStyle = {
 		marginTop: '20%',
 		textAlign: 'center'
@@ -14,12 +19,11 @@ export default function MultiCompareChartComponent(props) {
 	const flexContainerStyle = {
 		display: 'flex',
 		flexFlow: 'row wrap',
-		flexShrink: '3'
 	};
 
 	const flexChildStyle = {
 		width: '30%',
-		flexGrow: '1'
+		flexGrow: size
 	};
 
 	// Display a message if no meters are selected
