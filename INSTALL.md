@@ -8,6 +8,7 @@ You can either use Docker Compose to install Node and PostgreSQL in containers, 
 
 1. Install [Docker](https://docs.docker.com/engine/installation/) and [docker-compose](https://docs.docker.com/compose/install/).
 1. Clone this repository.
+1. Create a CSV file with your meter IP addresses and copy it into the directory where the project resides.
 1. Set up Node environment and the database by running ```docker-compose run --rm web src/scripts/init.sh <csv file>``` in the main directory. 
 1. Start the app in development mode with ```docker-compose run --rm --service-ports web src/scripts/devstart.sh```.
 1. Wait for the Webpack build to finish and then access the app at [localhost:3000](http://localhost:3000).
@@ -20,6 +21,7 @@ Killing the running process (ctrl+C) will stop the app. You can get rid of the c
 
 1. Install [Docker](https://docs.docker.com/engine/installation/) and [docker-compose](https://docs.docker.com/compose/install/).
 1. Clone this repository.
+1. Create a CSV file with your meter IP addresses and copy it into the directory where the project resides.
 1. Set up the environment with `docker-compose run --rm web src/scripts/init.sh <csv file> --build` in the main directory.
 1. Edit ```docker-compose.yml``` to change
 	1. the secret key (in `services -> web -> environment -> OED_TOKEN_SECRET`) to a random value. Keep it secret.
