@@ -15,6 +15,10 @@ services:
               # Custom PGDATA per recommendations from official Docker page
         volumes:
             - ./postgres-data:/var/lib/postgresql/data/pgdata
+    dbadmin:
+        build: ./database/
+        links:
+            - database
     web:
         # Configuration variables for the app.
         environment:
