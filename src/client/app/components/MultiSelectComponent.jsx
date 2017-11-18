@@ -32,9 +32,11 @@ export default class MultiSelectComponent extends React.Component {
 	}
 
 	render() {
+		let multi = true;
+		if (!this.props.multi) multi = false;
 		return (
 			<Select
-				multi
+				multi={multi}
 				options={this.props.options}
 				value={this.state.selectedOptions}
 				placeholder={this.props.placeholder}
@@ -58,4 +60,5 @@ MultiSelectComponent.propTypes = {
 		value: PropTypes.number,
 	})),
 	onValuesChange: PropTypes.func.isRequired,
+	multi: PropTypes.bool
 };

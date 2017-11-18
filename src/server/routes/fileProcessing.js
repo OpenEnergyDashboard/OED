@@ -6,14 +6,16 @@ const express = require('express');
 const Reading = require('../models/Reading');
 const moment = require('moment');
 const streamBuffers = require('stream-buffers');
-const readCSVFromString = require('../services/readCSV').readCSVFromString;
 const multer = require('multer');
 const streamToDB = require('../services/loadFromCsvStream');
-
+const authenticator = require('./authenticator');
 const router = express.Router();
+const validate = require('jsonschema').validate;
 
 // The upload here ensures that the file is saved to server RAM rather than disk
 const upload = multer({ storage: multer.memoryStorage() });
+
+router.use(authenticator);
 router.post('/:meter_id', upload.single('csvFile'), async (req, res) => {
 	const id = parseInt(req.params.meter_id);
 	try {
@@ -22,6 +24,7 @@ router.post('/:meter_id', upload.single('csvFile'), async (req, res) => {
 			chunkSize: 2048
 		});
 		myReadableStreamBuffer.put(req.file.buffer);
+		//stop() indicates we are done putting the data in our readable stream.
 		myReadableStreamBuffer.stop();
 		const transaction = streamToDB(myReadableStreamBuffer, row => {
 			const readRate = parseInt(row[0]);
@@ -31,7 +34,6 @@ router.post('/:meter_id', upload.single('csvFile'), async (req, res) => {
 			return reading;
 		}, (readings, tx) => {
 			return Reading.insertOrUpdateAll(readings, tx).then(() => {
-				console.log("Completed")
 			});
 		});
 		try { await transaction;
@@ -43,7 +45,6 @@ router.post('/:meter_id', upload.single('csvFile'), async (req, res) => {
 		}
 	} catch (err) {
 		console.log(err);
-		console.log("undone");
 		res.status(400).send({
 			success: false,
 			message: 'Incorrect file type.'

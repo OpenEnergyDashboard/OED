@@ -5,16 +5,16 @@
 import React from 'react';
 import Dropzone from 'react-dropzone';
 import axios from 'axios';
-import MeterDropDownContainer from '../containers/MeterDropdownContainer';
+import MultiSelectComponent from './MultiSelectComponent';
 import HeaderContainer from '../containers/HeaderContainer';
 
 export default class AdminComponent extends React.Component {
 	constructor(props) {
 		super(props);
-		this.handleOnDrop = this.handleOnDrop.bind(this);
+		this.handleFileToImport = this.handleFileToImport.bind(this);
 	}
 
-	handleOnDrop(files) {
+	handleFileToImport(files) {
 		const file = files[0];
 		const data = new FormData();
 		data.append('csvFile', file);
@@ -38,13 +38,20 @@ export default class AdminComponent extends React.Component {
 	}
 
 	render() {
+		console.log(this.props.meters);
+		console.log(this.props.selectedImportMeterID);
 		return (
 			<div>
 				<HeaderContainer renderLoginButton={false} renderOptionsButton={false} renderAdminButton={false} />
-				<Dropzone onDrop={this.handleOnDrop}>
+				<Dropzone onDrop={this.handleFileToImport}>
 					<div> Add in a CSV file here:</div>
 				</Dropzone>
-				<MeterDropDownContainer />
+				<MultiSelectComponent
+					options={this.props.meters}
+					selectedOptions={this.props.selectedImportMeterID}
+					placeholder="Select meter to import data"
+					onValuesChange={s => this.props.updateSelectedImportMeter(s)}
+				/>
 			</div>
 		);
 	}

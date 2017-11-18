@@ -8,9 +8,9 @@ const defaultState = {
 	selectedMeter: null
 };
 
-export default function meterDropDown(state = defaultState, action) {
+export default function admin(state = defaultState, action) {
 	switch (action.type) {
-		case adminActions.UPDATE_SELECTED_METER:
+		case adminActions.UPDATE_IMPORT_METER:
 			return {
 				...state,
 				selectedMeter: action.meterID

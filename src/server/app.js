@@ -33,7 +33,6 @@ app.use('/api/login', login);
 app.use('/api/groups', groups);
 app.use('/api/verification', verification);
 app.use('/api/fileProcessing', fileProcessing);
-//    /api/fp/6
 app.use('/api/version', version);
 
 app.get('*', (req, res) => {
