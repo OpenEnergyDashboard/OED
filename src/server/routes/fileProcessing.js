@@ -17,7 +17,6 @@ const upload = multer({ storage: multer.memoryStorage() });
 router.post('/:meter_id', upload.single('csvFile'), async (req, res) => {
 	const id = parseInt(req.params.meter_id);
 	try {
-		const data = await readCSVFromString(req.file.buffer.toString('utf8'));
 		const myReadableStreamBuffer = new streamBuffers.ReadableStreamBuffer({
 			frequency: 10,
 			chunkSize: 2048
@@ -43,6 +42,8 @@ router.post('/:meter_id', upload.single('csvFile'), async (req, res) => {
 			res.status(403).json({ success: false, message: 'Failed to upload data.' });
 		}
 	} catch (err) {
+		console.log(err);
+		console.log("undone");
 		res.status(400).send({
 			success: false,
 			message: 'Incorrect file type.'
