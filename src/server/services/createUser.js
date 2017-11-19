@@ -6,8 +6,8 @@
 
 const readline = require('readline');
 const bcrypt = require('bcryptjs');
-const User = require('../server/models/User');
-const log = require('../server/log');
+const User = require('../models/User');
+const log = require('../log');
 
 const rl = readline.createInterface({
 	input: process.stdin,

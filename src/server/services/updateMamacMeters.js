@@ -4,11 +4,11 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/.
  */
 
-const Meter = require('../server/models/Meter');
-const readMamacData = require('../server/services/readMamacData');
-const updateMeters = require('../server/services/updateMeters');
-const stopDB = require('../server/models/database').stopDB;
-const log = require('../server/log');
+const Meter = require('../models/Meter');
+const readMamacData = require('./readMamacData');
+const updateMeters = require('./updateMeters');
+const stopDB = require('../models/database').stopDB;
+const log = require('../log');
 
 async function updateMamacMeters() {
 	log('Fetching new Mamac meter data');

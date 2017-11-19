@@ -2,7 +2,7 @@
 
 You can either use Docker Compose to install Node and PostgreSQL in containers, or install Node and PostgreSQL on your system.
 
-## With Docker ##
+## With Docker - For Development and Production ##
 
 ### Development ###
 
@@ -26,9 +26,10 @@ Killing the running process (ctrl+C) will stop the app. You can get rid of the c
 1. Edit ```docker-compose.yml``` to change
 	1. the secret key (in `services -> web -> environment -> OED_TOKEN_SECRET`) to a random value. Keep it secret.
 	1. the port (in `services -> web -> ports`) to a mapping from host to container; e.g., to host on your computer's port 80, set it to `80:3000`.
-1. Bring the app online with ```docker-compose up -d```.
-
-Stop the app with ```docker-compose stop```. You can get rid of the containers with ```docker-compose down```.
+1. Copy src/scripts/updateOED.bash to /etc/cron.hourly/updateOED.bash and make the necessary modifications to the script. See the script for more detail.
+1. Copy src/scripts/oed.service to /etc/systemd/system/oed.service and make the necessary modifications to the script. See the script for more detail.
+1. Run ```systemctl enable oed.service``` to make the service start on server boot.
+1. Bring the app online with ```systemctl start oed.service```. Stop the app with ```systemctl stop oed.service```.
 
 ### Administration ###
 
@@ -36,7 +37,7 @@ PostgreSQL stores its data in `postgres-data`. This and `node_modules` will be o
 
 You can access the PostgreSQL database through the `dbadmin` service, which is container linked to the `database` service. It has `psql` installed, so you can simply: `docker-compose run --rm dbadmin psql -h database -d oed -U opened --password` and get a PostgreSQL prompt.
 
-## Without Docker ##
+## Without Docker - For Development ##
 
 1. Install Node, npm, and git.
 1. Clone this repository.
