@@ -23,6 +23,7 @@ function mapStateToProps(state) {
 		const byMeterID = state.readings.bar.byMeterID[meterID];
 		if (byMeterID !== undefined) {
 			const readingsData = byMeterID[timeInterval][barDuration];
+			const lineReadings = state.readings.line.byMeterID[meterID][timeInterval];
 			if (readingsData !== undefined && !readingsData.isFetching) {
 				const label = state.meters.byMeterID[meterID].name;
 				const color = getGraphColor(label);
@@ -33,8 +34,14 @@ function mapStateToProps(state) {
 					hoverBackgroundColor: color
 				});
 				// Add only the unique time intervals to the label set
+				let last = 0;
+				for (const element of _.flatten(lineReadings.readings.map(arr => arr[0]))) {
+					last = Math.max(last, element);
+				}
 				for (const element of _.flatten(readingsData.readings.map(arr => arr[0]))) {
-					labelsSet.add(`${moment(element).format('MMM DD, YYYY')} - ${moment(element).add(barDuration).format('MMM DD, YYYY')}`);
+					const difference = moment(last).subtract(element);
+					const nextInterval = Math.min(barDuration, difference);
+					labelsSet.add(`${moment(element).format('MMM DD, YYYY')} - ${moment(element).add(nextInterval).format('MMM DD, YYYY')}`);
 				}
 			}
 		}
@@ -44,6 +51,7 @@ function mapStateToProps(state) {
 		const byGroupID = state.readings.bar.byGroupID[groupID];
 		if (byGroupID !== undefined) {
 			const readingsData = byGroupID[timeInterval][barDuration];
+			const lineReadings = state.readings.line.byMeterID[groupID][timeInterval];
 			if (readingsData !== undefined && !readingsData.isFetching) {
 				const label = state.groups.byGroupID[groupID].name;
 				const color = getGraphColor(label);
@@ -54,8 +62,14 @@ function mapStateToProps(state) {
 					hoverBackgroundColor: color
 				});
 				// Add only the unique time intervals to the label set
+				let last = 0;
+				for (const element of _.flatten(lineReadings.readings.map(arr => arr[0]))) {
+					last = Math.max(last, element);
+				}
 				for (const element of _.flatten(readingsData.readings.map(arr => arr[0]))) {
-					labelsSet.add(`${moment(element).format('MMM DD, YYYY')} - ${moment(element).add(barDuration).format('MMM DD, YYYY')}`);
+					const difference = moment(last).subtract(element);
+					const nextInterval = Math.min(barDuration, difference);
+					labelsSet.add(`${moment(element).format('MMM DD, YYYY')} - ${moment(element).add(nextInterval).format('MMM DD, YYYY')}`);
 				}
 			}
 		}
