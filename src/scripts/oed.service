@@ -14,7 +14,7 @@ Requires=docker.service
 After=docker.service
 
 [Service]
-ExecStart=/usr/bin/docker-compose up -d
+ExecStart=/usr/bin/docker-compose up
 ExecStop=/usr/bin/docker-compose down
 WorkingDirectory=/example/path/to/project/OED
 Restart=always
