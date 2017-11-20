@@ -1,0 +1,28 @@
+# *
+# * This Source Code Form is subject to the terms of the Mozilla Public
+# * License, v. 2.0. If a copy of the MPL was not distributed with this
+# * file, You can obtain one at http://mozilla.org/MPL/2.0/.
+# *
+
+# To use:
+# Modify the WorkingDirectory variable
+# Modify the user variable
+
+[Unit]
+Description=OED
+Requires=docker.service
+After=docker.service
+
+[Service]
+ExecStart=/usr/bin/docker-compose up
+ExecStop=/usr/bin/docker-compose down
+WorkingDirectory=/example/path/to/project/OED
+Restart=always
+RestartSec=10
+StandardOutput=syslog
+StandardError=syslog
+SyslogIdentifier=OED
+User=example_user
+
+[Install]
+WantedBy=multi-user.target
