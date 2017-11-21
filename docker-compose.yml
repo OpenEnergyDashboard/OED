@@ -11,14 +11,11 @@ services:
     database:
         build: ./database/
         environment:
+            # Custom PGDATA per recommendations from official Docker page
             - PGDATA=/var/lib/postgresql/data/pgdata
-              # Custom PGDATA per recommendations from official Docker page
         volumes:
             - ./postgres-data:/var/lib/postgresql/data/pgdata
-    dbadmin:
-        build: ./database/
-        links:
-            - database
+    # Web service runs Node
     web:
         # Configuration variables for the app.
         environment:
