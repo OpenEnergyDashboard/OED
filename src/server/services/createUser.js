@@ -39,15 +39,25 @@ function terminateReadline(message) {
 }
 
 (async () => {
-	let emailResult;
-	try {
-		emailResult = await askEmail();
-	} catch (err) {
-		terminateReadline('Invalid email, no user created');
+	let email;
+	let password;
+
+	// If there aren't enough args, go interactive.
+	let cmd_args = process.argv;
+	if (cmd_args.length !== 4) {
+		let emailResult;
+		try {
+			emailResult = await askEmail();
+		} catch (err) {
+			terminateReadline('Invalid email, no user created');
+		}
+		const output = await askPassword(emailResult);
+		email = output[0];
+		password = output[1];
+	} else {
+		email = cmd_args[2];
+		password = cmd_args[3];
 	}
-	const output = await askPassword(emailResult);
-	const email = output[0];
-	const password = output[1];
 
 	if (password.length < 8) {
 		terminateReadline('Password must be at least eight characters, no user created');

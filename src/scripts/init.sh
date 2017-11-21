@@ -5,27 +5,41 @@
 # * file, You can obtain one at http://mozilla.org/MPL/2.0/.
 # *
 
-if [ "$1" == "" ]; then 
-    echo "You must provide a filename to get meters from, or the word NONE."
-    echo "You may also specify a flag --build to build the Webpack-ed application for production."
-    exit 1
-fi
-
+USAGE="Usage: init.sh <filename | NONE> [--default-user] [--build] [--no-npm-instal]; -u or --default-user creates the default test user; -b builds webpack; -n skips npm install"
 
 BUILD=no
-if [ "$2" != "--build" ] && [ "$2" != "" ]; then
-    echo "Unknown flag $2. The only valid flag is --build."
+DEFAULT_USER=no
+NPM_BUILD=yes
+
+if [ "$1" == "" ]; then 
+    echo $USAGE
     exit 1
 fi
 
-if [ "$2" == "--build" ]; then
-    BUILD=yes
+if [ ! -e "$1" ] && [ "$1" != "NONE" ]; then
+    echo "File $1 not found."
+    exit 1
 fi
 
+while [ "$2" != "" ]; do
+    case "$2" in
+        -b) BUILD=yes;;
+        --build) BUILD=yes;;
+        -u) DEFAULT_USER=yes;;
+        --default-user) DEFAULT_USER=yes;;
+        -n) NPM_BUILD=no;;
+        --no-npm-install) NPM_BUILD=no;;
+        *) echo "Invalid option $2" >&2; echo $USAGE; exit 1;;
+    esac
+    shift
+done
+
 # Install NPM dependencies
-echo "NPM install..."
-npm install --loglevel=warn --progress=false
-echo "NPM install finished."
+if [ "$NPM_BUILD" == "yes" ]; then
+    echo "NPM install..."
+    npm install --loglevel=warn --progress=false
+    echo "NPM install finished."
+fi
 
 create_error=0 # Boolean
 
@@ -63,11 +77,15 @@ if [ $1 != "NONE"  ]; then
 fi
 
 # Create a user
-echo "Preparing to create user. You will be asked to enter a user-name and password."
-echo "The username must be a valid email and the password must be at least 8 characters."
-npm run createUser
+set -e
+if [ $DEFAULT_USER == "yes" ]; then
+    npm run createUser -- test@test.test testtest
+    echo "Created a user 'test@test.test' with password 'testtest'."
+else
+    npm run createUser
+fi
 
 # Build webpack if needed
-if [ $BUILD == "yes" ]; then
+if [ "$BUILD" == "yes" ]; then
     npm run build
 fi
