@@ -12,6 +12,7 @@ import { chartTypes } from '../reducers/graph';
 import ExportContainer from '../containers/ExportContainer';
 import ChartSelectContainer from '../containers/ChartSelectContainer';
 import ChartDataSelectContainer from '../containers/ChartDataSelectContainer';
+import ChartLinkContainer from '../containers/ChartLinkContainer';
 
 export default class UIOptionsComponent extends React.Component {
 	/**
@@ -25,8 +26,12 @@ export default class UIOptionsComponent extends React.Component {
 		this.handleBarDurationChangeComplete = this.handleBarDurationChangeComplete.bind(this);
 		this.handleChangeBarStacking = this.handleChangeBarStacking.bind(this);
 		this.state = {
-			barDuration: 30 // barDuration in days
+			barDuration: this.props.barDuration.asDays()
 		};
+	}
+
+	componentWillReceiveProps(nextProps) {
+		this.setState({ barDuration: nextProps.barDuration.asDays() });
 	}
 
 	/**
@@ -77,26 +82,16 @@ export default class UIOptionsComponent extends React.Component {
 			paddingTop: '15px'
 		};
 
-		const divBottomPadding = {
-			paddingBottom: '15px'
-		};
-
 		return (
 			<div style={divTopPadding}>
 				<ChartSelectContainer />
-				{ /* Controls specific to the bar chart. */}
-				{this.props.chartToRender === chartTypes.compare &&
-					<p style={divBottomPadding}>
-						Note: group data cannot be used with the compare function at this time.
-					</p>
-				}
 				<ChartDataSelectContainer />
 
 				{ /* Controls specific to the bar chart. */}
 				{this.props.chartToRender === chartTypes.bar &&
 					<div>
 						<div className="checkbox">
-							<label><input type="checkbox" onChange={this.handleChangeBarStacking} />Bar stacking</label>
+							<label><input type="checkbox" onChange={this.handleChangeBarStacking} checked={this.props.barStacking} />Bar stacking</label>
 						</div>
 						<p style={labelStyle}>Bar chart interval (days):</p>
 						<Slider min={1} max={365} value={this.state.barDuration} onChange={this.handleBarDurationChange} onChangeComplete={this.handleBarDurationChangeComplete} />
@@ -107,6 +102,9 @@ export default class UIOptionsComponent extends React.Component {
 				{this.props.chartToRender !== chartTypes.compare &&
 					<ExportContainer />
 				}
+				<div style={divTopPadding}>
+					<ChartLinkContainer />
+				</div>
 			</div>
 		);
 	}
