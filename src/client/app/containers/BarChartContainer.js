@@ -40,7 +40,12 @@ function mapStateToProps(state) {
 				}
 				for (const element of _.flatten(readingsData.readings.map(arr => arr[0]))) {
 					const difference = moment(last).subtract(element);
-					const nextInterval = Math.min(barDuration, difference);
+					let nextInterval = 0;
+					if (difference > 0) {
+						nextInterval = Math.min(barDuration, difference);
+					} else {
+						nextInterval = barDuration;
+					}
 					labelsSet.add(`${moment(element).format('MMM DD, YYYY')} - ${moment(element).add(nextInterval).format('MMM DD, YYYY')}`);
 				}
 			}
@@ -68,7 +73,12 @@ function mapStateToProps(state) {
 				}
 				for (const element of _.flatten(readingsData.readings.map(arr => arr[0]))) {
 					const difference = moment(last).subtract(element);
-					const nextInterval = Math.min(barDuration, difference);
+					let nextInterval = 0;
+					if (difference > 0) {
+						nextInterval = Math.min(barDuration, difference);
+					} else {
+						nextInterval = barDuration;
+					}
 					labelsSet.add(`${moment(element).format('MMM DD, YYYY')} - ${moment(element).add(nextInterval).format('MMM DD, YYYY')}`);
 				}
 			}
