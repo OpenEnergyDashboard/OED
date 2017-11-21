@@ -13,7 +13,7 @@ import { showNotification } from '../actions/notifications';
 function mapStateToProps(state) {
 	return {
 		meters: _.sortBy(_.values(state.meters.byMeterID).map(meter => ({ value: meter.id, label: meter.name.trim() })), 'name'),
-		selectedImportMeterID: state.admin.selectedMeter,
+		selectedImportMeter: state.admin.selectedMeter,
 	};
 }
 

@@ -16,7 +16,8 @@ const validate = require('jsonschema').validate;
 const upload = multer({ storage: multer.memoryStorage() });
 
 router.use(authenticator);
-router.post('/:meter_id', upload.single('csvFile'), async (req, res) => {
+router.post('/:meter_id', upload.array('csvFile', 'token'), async (req,res) => {
+//router.post('/:meter_id', upload.single('csvFile'), async (req, res) => {
 	const id = parseInt(req.params.meter_id);
 	try {
 		const myReadableStreamBuffer = new streamBuffers.ReadableStreamBuffer({
