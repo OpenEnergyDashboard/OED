@@ -63,7 +63,7 @@ PostgreSQL stores its data in `postgres-data`. This and `node_modules` will be o
 You can access the PostgreSQL database through the `database` service. Given that the app is running, you can:
 
 * Get a Postgres shell with `docker-compose exec database psql -U oed`
-* Take a database dump with `docker-compose exec database pg_dump -U oed > dump_$(date +%d-%m-%Y"_"%H_%M_%S.sql)`
+* Take a database dump with `docker-compose exec database pg_dump -U oed > dump_$(date +%Y-%m-%d"_"%H_%M_%S.sql)`
 * Restore a database dump with by first copying the dump into the container with `docker cp /path/to/dump.sql container_name:/dump.sql` and then restoring it into the database with `docker-compose exec database psql -U oed -F /dump.sql`.
 
 ### Upgrading the App ###
