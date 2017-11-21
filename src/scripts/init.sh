@@ -62,6 +62,11 @@ if [ $1 != "NONE"  ]; then
     npm run updateMamacMeters 2> /dev/null
 fi
 
+# Create a user
+echo "Preparing to create user. You will be asked to enter a user-name and password."
+echo "The username must be a valid email and the password must be at least 8 characters."
+npm run createUser
+
 # Build webpack if needed
 if [ $BUILD == "yes" ]; then
     npm run build
