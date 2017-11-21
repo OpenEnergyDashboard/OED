@@ -43,8 +43,8 @@ function terminateReadline(message) {
 	let password;
 
 	// If there aren't enough args, go interactive.
-	let cmd_args = process.argv;
-	if (cmd_args.length !== 4) {
+	const cmdArgs = process.argv;
+	if (cmdArgs.length !== 4) {
 		let emailResult;
 		try {
 			emailResult = await askEmail();
@@ -55,8 +55,8 @@ function terminateReadline(message) {
 		email = output[0];
 		password = output[1];
 	} else {
-		email = cmd_args[2];
-		password = cmd_args[3];
+		email = cmdArgs[2];
+		password = cmdArgs[3];
 	}
 
 	if (password.length < 8) {
