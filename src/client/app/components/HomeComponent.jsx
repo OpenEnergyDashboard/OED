@@ -12,14 +12,11 @@ import FooterComponent from '../components/FooterComponent';
  * @return JSX to create the home page
  */
 export default function HomeComponent() {
-	const bodyStyle = {
-		marginBottom: '0.7em',
-		minHeight: '100%'
-	};
+
 	return (
 		<div>
 			<HeaderContainer renderOptionsButton renderLoginButton renderGroupsButton />
-			<DashboardContainer style={bodyStyle}/>
+			<DashboardContainer/>
 			<FooterComponent />
 		</div>
 	);

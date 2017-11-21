@@ -13,20 +13,16 @@ import React from 'react';
 export default function FooterComponent() {
 	const footerStyle = {
 		position: 'absolute',
-		bottom: '1em',
-		width: '100%',
-		height: '1em'
+	 	bottom: '0',
+	 	width: '100%'
 	};
-	const containerStyle = {
-		//paddingTop: '2em'
-	};
+
 
 	return (
 		<footer className="footer" style={footerStyle}>
-			<div className="container" style={containerStyle}>
-				<a href="mailto:oed@beloit.edu">Contact Us</a>
-				<a href="https://github.com/beloitcollegecomputerscience/OED">Website</a>
-			</div>
+			<a href="mailto:oed@beloit.edu">Contact Us</a>
+			<a href="https://github.com/beloitcollegecomputerscience/OED">Website</a>
 		</footer>
+
 	);
 }
