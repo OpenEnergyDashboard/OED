@@ -17,9 +17,9 @@ const ExportComponent = props => {
 
 		// Determine and format the first time in the dataset
 		let startTime = moment(compressedData[0].exportVals[0].x);
-		for (const i in compressedData) {
-			if (i.isInteger()) {
-				const startTimeOfDataset = moment(compressedData[i].exportVals[0].x);
+		for (const reading of compressedData) {
+			if (reading !== undefined) {
+				const startTimeOfDataset = moment(reading.exportVals[0].x);
 				if (startTime.isAfter(startTimeOfDataset)) {
 					startTime = startTimeOfDataset;
 				}
@@ -29,9 +29,9 @@ const ExportComponent = props => {
 
 		// Determine and format the last time in the dataset
 		let endTime = moment(compressedData[0].exportVals[compressedData[0].exportVals.length - 1].x);
-		for (const i in compressedData) {
-			if (i.isInteger()) {
-				const endTimeOfDataset = moment(compressedData[i].exportVals[compressedData[0].exportVals.length - 1].x);
+		for (const reading of compressedData) {
+			if (reading !== undefined) {
+				const endTimeOfDataset = moment(reading.exportVals[reading.exportVals.length - 1].x);
 				if (endTimeOfDataset.isAfter(endTime)) {
 					endTime = endTimeOfDataset;
 				}
