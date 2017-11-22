@@ -5,11 +5,12 @@
 # * file, You can obtain one at http://mozilla.org/MPL/2.0/.
 # *
 
-USAGE="Usage: init.sh <filename | NONE> [--default-user] [--build] [--no-npm-instal]; -u or --default-user creates the default test user; -b builds webpack; -n skips npm install"
+USAGE="Usage: init.sh <filename | NONE> [--default-user | --no-user] [--build] [--no-npm-instal]; -u or --default-user creates the default test user, while --no-user creates no new user; -b builds webpack; -n skips npm install"
 
 BUILD=no
 DEFAULT_USER=no
-NPM_BUILD=yes
+SKIP_USER=no
+NPM_INSTALL=yes
 
 if [ "$1" == "" ]; then 
     echo $USAGE
@@ -27,15 +28,21 @@ while [ "$2" != "" ]; do
         --build) BUILD=yes;;
         -u) DEFAULT_USER=yes;;
         --default-user) DEFAULT_USER=yes;;
-        -n) NPM_BUILD=no;;
-        --no-npm-install) NPM_BUILD=no;;
+        --no-user) SKIP_USER=yes;;
+        -n) NPM_INSTALL=no;;
+        --no-npm-install) NPM_INSTALL=no;;
         *) echo "Invalid option $2" >&2; echo $USAGE; exit 1;;
     esac
     shift
 done
 
+if [ "$SKIP_USER" == yes ] && [ "$DEFAULT_USER" == yes ]; then
+    echo "--no-user and --default-user are mutually exclusive."
+    exit 1
+fi
+
 # Install NPM dependencies
-if [ "$NPM_BUILD" == "yes" ]; then
+if [ "$NPM_INSTALL" == "yes" ]; then
     echo "NPM install..."
     npm install --loglevel=warn --progress=false
     echo "NPM install finished."
@@ -78,10 +85,10 @@ fi
 
 # Create a user
 set -e
-if [ $DEFAULT_USER == "yes" ]; then
+if [ "$DEFAULT_USER" == "yes" ]; then
     npm run createUser -- test@test.test testtest
     echo "Created a user 'test@test.test' with password 'testtest'."
-else
+elif [ "$SKIP_USER" != "yes" ]; then 
     npm run createUser
 fi
 
