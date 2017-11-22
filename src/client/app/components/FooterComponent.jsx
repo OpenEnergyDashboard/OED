@@ -16,15 +16,18 @@ export default function FooterComponent() {
 		bottom: '1em',
 		paddingTop: '1em',
 		paddingLeft: '.5em',
+		paddingRight: '.5em',
 		borderTop: '1px #e1e4e8 solid',
 		color: '#999',
+		textAlign: 'center',
+		width: '98%'
 	};
 
 
 	return (
-		<div className="fluid-container">
+		<div className="container-fluid">
 			<footer className="footer" style={footerStyle}>
-				<span>Open Energy Dashboard is an open source project coordinated by Beloit College. <a href="mailto:oed@beloit.edu">Contact Us</a> or
+				<span>Open Energy Dashboard is an open source project coordinated by Beloit College. <a target="_blank" rel="noopener" href="mailto:oed@beloit.edu">Contact us</a> or
 					visit our <a href="https://github.com/beloitcollegecomputerscience/OED">website</a> for more information.</span>
 			</footer>
 		</div>
