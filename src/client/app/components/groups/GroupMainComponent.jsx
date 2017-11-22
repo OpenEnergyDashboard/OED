@@ -4,6 +4,7 @@
 
 import React from 'react';
 import HeaderComponent from '../HeaderComponent';
+import FooterComponent from '../FooterComponent';
 import GroupViewContainer from '../../containers/groups/GroupViewContainer';
 import GroupSidebarContainer from '../../containers/groups/GroupSidebarContainer';
 import CreateGroupContainer from '../../containers/groups/CreateGroupContainer';
@@ -66,6 +67,7 @@ export default class GroupMainComponent extends React.Component {
 						{ GroupDisplay }
 					</div>
 				</div>
+				<FooterComponent/>
 			</div>
 		);
 	}

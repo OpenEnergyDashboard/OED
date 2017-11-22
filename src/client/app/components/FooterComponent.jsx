@@ -13,16 +13,19 @@ import React from 'react';
 export default function FooterComponent() {
 	const footerStyle = {
 		position: 'absolute',
-	 	bottom: '0',
-	 	width: '100%'
+	 	bottom: '1em',
+		paddingTop: '1em',
+		paddingLeft: '.5em',
+		borderTop: '1px #e1e4e8 solid',
+		color: '#999',
 	};
 
 
 	return (
-		<footer className="footer" style={footerStyle}>
-			<a href="mailto:oed@beloit.edu">Contact Us</a>
-			<a href="https://github.com/beloitcollegecomputerscience/OED">Website</a>
-		</footer>
-
+		<div className="fluid-container">
+			<footer className="footer" style={footerStyle}>
+				<span>Open Energy Dashboard is an open source project coordinated by Beloit College. <a href="mailto:oed@beloit.edu">Contact Us</a> or visit our <a href="https://github.com/beloitcollegecomputerscience/OED">website</a> for more information.</span>
+			</footer>
+		</div>
 	);
 }
