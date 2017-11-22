@@ -12,11 +12,10 @@ import FooterComponent from '../components/FooterComponent';
  * @return JSX to create the home page
  */
 export default function HomeComponent() {
-
 	return (
 		<div>
 			<HeaderContainer renderOptionsButton renderLoginButton renderGroupsButton />
-			<DashboardContainer/>
+			<DashboardContainer />
 			<FooterComponent />
 		</div>
 	);
