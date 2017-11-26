@@ -16,31 +16,40 @@ export default class AdminComponent extends React.Component {
 	}
 
 	handleFileToImport(files) {
-		const data = new FormData();
-		data.append('csvFile', files[0]);
-		data.append('token', getToken());
-		axios.post(`/api/fileProcessing/${this.props.selectedImportMeter.value}`, data)
-		.then(() => {
+		if (!this.props.selectedImportMeter) {
 			this.props.showNotification({
-				message: 'Successfully uploaded meter data',
-				level: 'success',
-				position: 'tr',
-				autoDismiss: 3
-			});
-		}).catch(() => {
-			this.props.showNotification({
-				message: 'Error uploading meter data',
+				message: 'Please select a meter',
 				level: 'error',
 				position: 'tr',
 				autoDismiss: 3
 			});
-		});
+		} else {
+			const data = new FormData();
+			data.append('csvFile', files[0]);
+			//	data.append('token', getToken());
+			axios.post(`/api/fileProcessing/${this.props.selectedImportMeter.value}`, data)
+				.then(() => {
+					this.props.showNotification({
+						message: 'Successfully uploaded meter data',
+						level: 'success',
+						position: 'tr',
+						autoDismiss: 3
+					});
+				}).catch(() => {
+				this.props.showNotification({
+					message: 'Error uploading meter data',
+					level: 'error',
+					position: 'tr',
+					autoDismiss: 3
+				});
+			});
+		}
 	}
 
 	render() {
-		let selectedImportMeter = {};
+		let selectedImportMeter = [];
 		if (this.props.selectedImportMeter) {
-			selectedImportMeter = this.props.selectedImportMeter;
+			selectedImportMeter.push(this.props.selectedImportMeter);
 		}
 		return (
 			<div>

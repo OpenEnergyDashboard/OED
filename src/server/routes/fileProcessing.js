@@ -15,9 +15,7 @@ const validate = require('jsonschema').validate;
 // The upload here ensures that the file is saved to server RAM rather than disk
 const upload = multer({ storage: multer.memoryStorage() });
 
-router.use(authenticator);
-router.post('/:meter_id', upload.array('csvFile', 'token'), async (req,res) => {
-//router.post('/:meter_id', upload.single('csvFile'), async (req, res) => {
+router.post('/:meter_id', upload.single('csvFile'), async (req, res) => {
 	const id = parseInt(req.params.meter_id);
 	try {
 		const myReadableStreamBuffer = new streamBuffers.ReadableStreamBuffer({
@@ -37,15 +35,16 @@ router.post('/:meter_id', upload.array('csvFile', 'token'), async (req,res) => {
 			return Reading.insertOrUpdateAll(readings, tx).then(() => {
 			});
 		});
-		try { await transaction;
+		try {
+			await transaction;
 			res.status(200).json({success: true});
-		}
-		catch(e) {
-			console.log(e);
+		} catch (err) {
+			console.log('Failed to upload');
+			console.log(err);
 			res.status(403).json({ success: false, message: 'Failed to upload data.' });
 		}
 	} catch (err) {
-		console.log(err);
+		console.log('Incorrect file type');
 		res.status(400).send({
 			success: false,
 			message: 'Incorrect file type.'
