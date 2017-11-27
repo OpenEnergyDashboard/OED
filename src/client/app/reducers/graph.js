@@ -17,7 +17,7 @@ export const chartTypes = {
 /**
  * @type {State~Graph}
  */
-export const defaultState = {
+const defaultState = {
 	selectedMeters: [],
 	selectedGroups: [],
 	timeInterval: TimeInterval.unbounded(),

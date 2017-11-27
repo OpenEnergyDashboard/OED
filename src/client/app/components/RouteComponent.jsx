@@ -7,7 +7,7 @@ import { Router, Route, browserHistory } from 'react-router';
 import axios from 'axios';
 import moment from 'moment';
 import _ from 'lodash';
-import NotificationSystem from 'react-notification-system';
+import InitializationContainer from '../containers/InitializationContainer';
 import HomeComponent from './HomeComponent';
 import LoginContainer from '../containers/LoginContainer';
 import AdminContainer from '../containers/AdminContainer';
@@ -20,18 +20,6 @@ export default class RouteComponent extends React.Component {
 		super(props);
 		this.requireAuth = this.requireAuth.bind(this);
 		this.linkToGraph = this.linkToGraph.bind(this);
-	}
-
-	shouldComponentUpdate() {
-		// To ignore warning: [react-router] You cannot change 'Router routes'; it will be ignored
-		return false;
-	}
-
-	componentWillReceiveProps(nextProps) {
-		if (!_.isEmpty(nextProps.notification)) {
-			this.notificationSystem.addNotification(nextProps.notification);
-			this.props.clearNotifications();
-		}
 	}
 
 	/**
@@ -118,7 +106,7 @@ export default class RouteComponent extends React.Component {
 	render() {
 		return (
 			<div>
-				<NotificationSystem ref={c => { this.notificationSystem = c; }} />
+				<InitializationContainer />
 				<Router history={browserHistory}>
 					<Route path="/" component={HomeComponent} />
 					<Route path="/login" component={LoginContainer} />
