@@ -83,13 +83,40 @@ export default class AdminComponent extends React.Component {
 						<div>
 							<p style={labelStyle}>Default Graph Type:</p>
 							<div className="radio">
-								<label><input type="radio" name="chartTypes" value={chartTypes.line} onChange={this.handleDefaultGraphTypeChange} checked={this.props.defaultGraphType === chartTypes.line} />Line</label>
+								<label>
+									<input
+										type="radio"
+										name="chartTypes"
+										value={chartTypes.line}
+										onChange={this.handleDefaultGraphTypeChange}
+										checked={this.props.defaultGraphType === chartTypes.line}
+									/>
+									Line
+								</label>
 							</div>
 							<div className="radio">
-								<label><input type="radio" name="chartTypes" value={chartTypes.bar} onChange={this.handleDefaultGraphTypeChange} checked={this.props.defaultGraphType === chartTypes.bar} />Bar</label>
+								<label>
+									<input
+										type="radio"
+										name="chartTypes"
+										value={chartTypes.bar}
+										onChange={this.handleDefaultGraphTypeChange}
+										checked={this.props.defaultGraphType === chartTypes.bar}
+									/>
+									Bar
+								</label>
 							</div>
 							<div className="radio">
-								<label><input type="radio" name="chartTypes" value={chartTypes.compare} onChange={this.handleDefaultGraphTypeChange} checked={this.props.defaultGraphType === chartTypes.compare} />Compare</label>
+								<label>
+									<input
+										type="radio"
+										name="chartTypes"
+										value={chartTypes.compare}
+										onChange={this.handleDefaultGraphTypeChange}
+										checked={this.props.defaultGraphType === chartTypes.compare}
+									/>
+									Compare
+								</label>
 							</div>
 						</div>
 						<div className="checkbox">
