@@ -11,7 +11,7 @@ MPL_REGEX=".*?This\W+Source\W+Code\W+Form\W+is\W+subject\W+to\W+the\W+terms\W+of
 # Get a list of files tracked by Git
 FILES=$(git ls-files)
 # Filter out text files
-FILES=$(echo "$FILES" | grep -v "README\.md")
+FILES=$(echo "$FILES" | grep -v ".*\.md")
 FILES=$(echo "$FILES" | grep -v "\.editorconfig")
 FILES=$(echo "$FILES" | grep -v "\.gitattributes")
 FILES=$(echo "$FILES" | grep -v "package\.json")

@@ -31,6 +31,12 @@ CREATE OR REPLACE FUNCTION compressed_readings(
 		WHERE readings.meter_id = ANY(meter_ids)
 					AND readings.end_timestamp >= from_timestamp AND readings.start_timestamp <= to_timestamp;
 
+		IF real_start_timestamp = '-infinity' OR real_end_timestamp = 'infinity' THEN
+			-- If the time range was not shrunk then there were no readings and we should return no rows.
+			RETURN; -- Return just returns an empty result set.
+		END IF;
+
+		-- If we didn't return then it's safe to subtract the timestamps
 		point_width := (real_end_timestamp - real_start_timestamp) / num_points;
 
 		RETURN QUERY

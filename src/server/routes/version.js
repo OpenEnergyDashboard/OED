@@ -3,7 +3,7 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
 
 const express = require('express');
-const VERSION = require('../../common/version');
+const VERSION = require('../version');
 
 const router = express.Router();
 /**

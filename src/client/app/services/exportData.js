@@ -19,7 +19,7 @@ function convertToCSV(items) {
 		data.forEach(reading => {
 			const info = reading.y;
 			const startTimeStamp = moment(reading.x).format('dddd MMM DD YYYY hh:mm a');
-			csvOutput += `${label},${info} kwh, ${startTimeStamp}\n`; // this assumes that meter readings are in kwh
+			csvOutput += `${label},${info} kW, ${startTimeStamp}\n`; // this assumes that meter readings are in kW
 		});
 	});
 	return csvOutput;

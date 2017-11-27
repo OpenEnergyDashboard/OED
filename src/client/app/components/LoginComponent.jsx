@@ -49,7 +49,7 @@ export default class LoginComponent extends React.Component {
 		})
 		.then(response => {
 			localStorage.setItem('token', response.data.token);
-			browserHistory.push('/admin');
+			browserHistory.push('/');
 		})
 		.catch(err => {
 			if (err.response.status === 401) {
@@ -65,7 +65,6 @@ export default class LoginComponent extends React.Component {
 				console.error(err); // eslint-disable-line no-console
 			}
 			this.inputEmail.focus();
-
 		});
 		this.setState({ email: '', password: '' });
 	}

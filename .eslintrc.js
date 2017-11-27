@@ -23,6 +23,7 @@ module.exports = {
 		"no-useless-constructor": ["warn"],
 		"no-param-reassign": 0,
 		"no-plusplus": ["warn", { "allowForLoopAfterthoughts": true }],
+		"no-else-return": 0,
 
 		// AirBnB disallows these syntax forms and also ForInStatement and ForOfStatement.
 		// We want to use both of those. They play nicely with await and are more readable than .forEach.

@@ -16,7 +16,8 @@ import * as readingsActions from '../actions/lineReadings';
  * @type {State~Readings}
  */
 const defaultState = {
-	byMeterID: {}
+	byMeterID: {},
+	byGroupID: {}
 };
 
 /**
@@ -26,7 +27,7 @@ const defaultState = {
  */
 export default function readings(state = defaultState, action) {
 	switch (action.type) {
-		case readingsActions.REQUEST_LINE_READINGS: {
+		case readingsActions.REQUEST_METER_LINE_READINGS: {
 			const timeInterval = action.timeInterval;
 			const newState = {
 				...state,
@@ -34,6 +35,7 @@ export default function readings(state = defaultState, action) {
 					...state.byMeterID
 				}
 			};
+
 			for (const meterID of action.meterIDs) {
 				if (newState.byMeterID[meterID] === undefined) {
 					newState.byMeterID[meterID] = {};
@@ -45,18 +47,55 @@ export default function readings(state = defaultState, action) {
 			}
 			return newState;
 		}
-		case readingsActions.RECEIVE_LINE_READINGS: {
+		case readingsActions.REQUEST_GROUP_LINE_READINGS: {
+			const timeInterval = action.timeInterval;
+			const newState = {
+				...state,
+				byGroupID: {
+					...state.byGroupID
+				}
+			};
+
+			for (const groupID of action.groupIDs) {
+				if (newState.byGroupID[groupID] === undefined) {
+					newState.byGroupID[groupID] = {};
+				} else if (newState.byGroupID[groupID][timeInterval] === undefined) {
+					newState.byGroupID[groupID][timeInterval] = { isFetching: true };
+				} else {
+					newState.byGroupID[groupID][timeInterval] = { ...newState.byGroupID[groupID][timeInterval], isFetching: true };
+				}
+			}
+			return newState;
+		}
+		case readingsActions.RECEIVE_METER_LINE_READINGS: {
 			const timeInterval = action.timeInterval;
 			const newState = {
 				...state,
 				byMeterID: {
-					...state.byMeterID
+					...state.byMeterID,
 				}
 			};
+
 			for (const meterID of action.meterIDs) {
 				const readingsForMeter = action.readings[meterID];
 				newState.byMeterID[meterID][timeInterval] = { isFetching: false, readings: readingsForMeter };
 			}
+			return newState;
+		}
+		case readingsActions.RECEIVE_GROUP_LINE_READINGS: {
+			const timeInterval = action.timeInterval;
+			const newState = {
+				...state,
+				byGroupID: {
+					...state.byGroupID
+				}
+			};
+
+			for (const groupID of action.groupIDs) {
+				const readingsForGroup = action.readings[groupID];
+				newState.byGroupID[groupID][timeInterval] = { isFetching: false, readings: readingsForGroup };
+			}
+
 			return newState;
 		}
 		default:

@@ -2,17 +2,17 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
 
-/**
- * Creates a new VERSION object, which contains a major, minor, and patch release level.
- * OED is compliant with Semver.
- */
-
 const pkgJson = require('../../package.json');
+const log = require('./log');
 
+/**
+ * Creates a new OEDVersion object, which contains a major, minor, and patch release level.
+ * OED is compliant with Semver. The version data is fetched from the package.json.
+ */
 function OEDVersion() {
 	const versionParts = pkgJson.version.split('.');
 	if (versionParts.length !== 3) {
-		console.log('package.json version string is not in semver x.y.z format', 'error');
+		log(`package.json version string "${pkgJson.version}" is not in semver x.y.z format`, 'error', true);
 	}
 	this.major = versionParts[0];
 	this.minor = versionParts[1];
