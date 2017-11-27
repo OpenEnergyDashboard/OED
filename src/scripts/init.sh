@@ -90,6 +90,8 @@ if [ "$DEFAULT_USER" == "yes" ]; then
     echo "Created a user 'test@test.test' with password 'testtest'."
 elif [ "$SKIP_USER" != "yes" ]; then 
     npm run createUser
+else
+    echo "WARNING: No user was created during init.sh run. You may wish to set up a user with the createUser npm script."
 fi
 
 # Build webpack if needed

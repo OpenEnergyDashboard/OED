@@ -14,13 +14,19 @@ const rl = readline.createInterface({
 	output: process.stdout
 });
 
+// Verifies that an email is valid
+function checkEmail(email) {
+	// See https://stackoverflow.com/a/46181/5116950
+	// eslint-disable-next-line
+	const regexEmail = /^(([^<>()\[\]\\.,;:\s@"]+(\.[^<>()\[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
+	return regexEmail.test(email);
+}
+
+// Asks the user for an e-mail.
 function askEmail() {
 	return new Promise((resolve, reject) => {
 		rl.question('Email: ', email => {
-			// See https://stackoverflow.com/a/46181/5116950
-			// eslint-disable-next-line
-			const regexEmail = /^(([^<>()\[\]\\.,;:\s@"]+(\.[^<>()\[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
-			if (regexEmail.test(email))	resolve(email);
+			if (checkEmail(email)) resolve(email);
 			else reject(email);
 		});
 	});
@@ -57,6 +63,10 @@ function terminateReadline(message) {
 	} else {
 		email = cmdArgs[2];
 		password = cmdArgs[3];
+
+		if (!checkEmail(email)) {
+			terminateReadline('Invalid email, no user created');
+		}
 	}
 
 	if (password.length < 8) {
