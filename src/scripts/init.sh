@@ -5,27 +5,48 @@
 # * file, You can obtain one at http://mozilla.org/MPL/2.0/.
 # *
 
-if [ "$1" == "" ]; then 
-    echo "You must provide a filename to get meters from, or the word NONE."
-    echo "You may also specify a flag --build to build the Webpack-ed application for production."
-    exit 1
-fi
-
+USAGE="Usage: init.sh <filename | NONE> [--default-user | --no-user] [--build] [--no-npm-instal]; -u or --default-user creates the default test user, while --no-user creates no new user; -b builds webpack; -n skips npm install"
 
 BUILD=no
-if [ "$2" != "--build" ] && [ "$2" != "" ]; then
-    echo "Unknown flag $2. The only valid flag is --build."
+DEFAULT_USER=no
+SKIP_USER=no
+NPM_INSTALL=yes
+
+if [ "$1" == "" ]; then 
+    echo $USAGE
     exit 1
 fi
 
-if [ "$2" == "--build" ]; then
-    BUILD=yes
+if [ ! -e "$1" ] && [ "$1" != "NONE" ]; then
+    echo "File $1 not found."
+    exit 1
+fi
+
+while [ "$2" != "" ]; do
+    case "$2" in
+        -b) BUILD=yes;;
+        --build) BUILD=yes;;
+        -u) DEFAULT_USER=yes;;
+        --default-user) DEFAULT_USER=yes;;
+        --no-user) SKIP_USER=yes;;
+        -n) NPM_INSTALL=no;;
+        --no-npm-install) NPM_INSTALL=no;;
+        *) echo "Invalid option $2" >&2; echo $USAGE; exit 1;;
+    esac
+    shift
+done
+
+if [ "$SKIP_USER" == yes ] && [ "$DEFAULT_USER" == yes ]; then
+    echo "--no-user and --default-user are mutually exclusive."
+    exit 1
 fi
 
 # Install NPM dependencies
-echo "NPM install..."
-npm install --loglevel=warn --progress=false
-echo "NPM install finished."
+if [ "$NPM_INSTALL" == "yes" ]; then
+    echo "NPM install..."
+    npm install --loglevel=warn --progress=false
+    echo "NPM install finished."
+fi
 
 create_error=0 # Boolean
 
@@ -62,7 +83,18 @@ if [ $1 != "NONE"  ]; then
     npm run updateMamacMeters 2> /dev/null
 fi
 
+# Create a user
+set -e
+if [ "$DEFAULT_USER" == "yes" ]; then
+    npm run createUser -- test@test.test testtest
+    echo "Created a user 'test@test.test' with password 'testtest'."
+elif [ "$SKIP_USER" != "yes" ]; then 
+    npm run createUser
+else
+    echo "WARNING: No user was created during init.sh run. You may wish to set up a user with the createUser npm script."
+fi
+
 # Build webpack if needed
-if [ $BUILD == "yes" ]; then
+if [ "$BUILD" == "yes" ]; then
     npm run build
 fi
