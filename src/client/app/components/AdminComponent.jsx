@@ -12,7 +12,7 @@ export default class AdminComponent extends React.Component {
 	constructor(props) {
 		super(props);
 		this.handleDisplayTitleChange = this.handleDisplayTitleChange.bind(this);
-		this.handleDefaultGraphTypeChange = this.handleDefaultGraphTypeChange.bind(this);
+		this.handleDefaultChartToRenderChange = this.handleDefaultChartToRenderChange.bind(this);
 		this.handleDefaultBarStackingChange = this.handleDefaultBarStackingChange.bind(this);
 		this.handleSubmitPreferences = this.handleSubmitPreferences.bind(this);
 	}
@@ -21,7 +21,7 @@ export default class AdminComponent extends React.Component {
 		this.props.updateDisplayTitle(e.target.value);
 	}
 
-	handleDefaultGraphTypeChange(e) {
+	handleDefaultChartToRenderChange(e) {
 		this.props.updateDefaultGraphType(e.target.value);
 	}
 
@@ -35,7 +35,7 @@ export default class AdminComponent extends React.Component {
 				token: localStorage.getItem('token'),
 				preferences: {
 					displayTitle: this.props.displayTitle,
-					defaultGraphType: this.props.defaultGraphType,
+					defaultChartToRender: this.props.defaultChartToRender,
 					defaultBarStacking: this.props.defaultBarStacking
 				}
 			})
@@ -88,8 +88,8 @@ export default class AdminComponent extends React.Component {
 										type="radio"
 										name="chartTypes"
 										value={chartTypes.line}
-										onChange={this.handleDefaultGraphTypeChange}
-										checked={this.props.defaultGraphType === chartTypes.line}
+										onChange={this.handleDefaultChartToRenderChange}
+										checked={this.props.defaultChartToRender === chartTypes.line}
 									/>
 									Line
 								</label>
@@ -100,8 +100,8 @@ export default class AdminComponent extends React.Component {
 										type="radio"
 										name="chartTypes"
 										value={chartTypes.bar}
-										onChange={this.handleDefaultGraphTypeChange}
-										checked={this.props.defaultGraphType === chartTypes.bar}
+										onChange={this.handleDefaultChartToRenderChange}
+										checked={this.props.defaultChartToRender === chartTypes.bar}
 									/>
 									Bar
 								</label>
@@ -112,8 +112,8 @@ export default class AdminComponent extends React.Component {
 										type="radio"
 										name="chartTypes"
 										value={chartTypes.compare}
-										onChange={this.handleDefaultGraphTypeChange}
-										checked={this.props.defaultGraphType === chartTypes.compare}
+										onChange={this.handleDefaultChartToRenderChange}
+										checked={this.props.defaultChartToRender === chartTypes.compare}
 									/>
 									Compare
 								</label>

@@ -4,13 +4,13 @@
 
 import { connect } from 'react-redux';
 import AdminComponent from '../components/AdminComponent';
-import { updateDisplayTitle, updateDefaultGraphType, toggleDefaultBarStacking } from '../actions/admin';
+import { updateDisplayTitle, updateDefaultChartToRender, toggleDefaultBarStacking } from '../actions/admin';
 import { showNotification } from '../actions/notifications';
 
 function mapStateToProps(state) {
 	return {
 		displayTitle: state.admin.displayTitle,
-		defaultGraphType: state.admin.defaultGraphType,
+		defaultChartToRender: state.admin.defaultChartToRender,
 		defaultBarStacking: state.admin.defaultBarStacking
 	};
 }
@@ -18,7 +18,7 @@ function mapStateToProps(state) {
 function mapDispatchToProps(dispatch) {
 	return {
 		updateDisplayTitle: displayTitle => dispatch(updateDisplayTitle(displayTitle)),
-		updateDefaultGraphType: defaultGraphType => dispatch(updateDefaultGraphType(defaultGraphType)),
+		updateDefaultGraphType: defaultChartToRender => dispatch(updateDefaultChartToRender(defaultChartToRender)),
 		toggleDefaultBarStacking: () => dispatch(toggleDefaultBarStacking()),
 		showNotification: notification => dispatch(showNotification(notification))
 	};

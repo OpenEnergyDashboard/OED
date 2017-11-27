@@ -6,7 +6,7 @@ import axios from 'axios';
 import { changeBarStacking, changeChartToRender } from './graph';
 
 export const UPDATE_DISPLAY_TITLE = 'UPDATE_DISPLAY_TITLE';
-export const UPDATE_DEFAULT_GRAPH_TYPE = 'UPDATE_DEFAULT_GRAPH_TYPE';
+export const UPDATE_DEFAULT_CHART_TO_RENDER = 'UPDATE_DEFAULT_CHART_TO_RENDER';
 export const TOGGLE_DEFAULT_BAR_STACKING = 'TOGGLE_DEFAULT_BAR_STACKING';
 export const REQUEST_PREFERENCES = 'REQUEST_PREFERENCES';
 export const RECEIVE_PREFERENCES = 'RECEIVE_PREFERENCES';
@@ -15,8 +15,8 @@ export function updateDisplayTitle(displayTitle) {
 	return { type: UPDATE_DISPLAY_TITLE, displayTitle };
 }
 
-export function updateDefaultGraphType(defaultGraphType) {
-	return { type: UPDATE_DEFAULT_GRAPH_TYPE, defaultGraphType };
+export function updateDefaultChartToRender(defaultChartToRender) {
+	return { type: UPDATE_DEFAULT_CHART_TO_RENDER, defaultChartToRender };
 }
 
 export function toggleDefaultBarStacking() {
@@ -39,7 +39,7 @@ function fetchPreferences() {
 				dispatch(receivePreferences(response.data));
 				dispatch((dispatch2, getState) => {
 					const state = getState();
-					dispatch2(changeChartToRender(state.admin.defaultChartType));
+					dispatch2(changeChartToRender(state.admin.defaultChartToRender));
 					dispatch2(changeBarStacking());
 				});
 			});

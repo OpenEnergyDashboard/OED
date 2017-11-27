@@ -5,5 +5,5 @@
 UPDATE preferences
 SET
 	display_title = ${displayTitle},
-	default_graph_type = ${defaultGraphType},
+	default_chart_to_render = ${defaultChartToRender},
 	default_bar_stacking = ${defaultBarStacking};

@@ -7,7 +7,7 @@ import { chartTypes } from './graph';
 
 const defaultState = {
 	displayTitle: 'Open Energy Dashboard',
-	defaultGraphType: chartTypes.line,
+	defaultChartToRender: chartTypes.line,
 	defaultBarStacking: false,
 	isFetching: false
 };
@@ -19,10 +19,10 @@ export default function admin(state = defaultState, action) {
 				...state,
 				displayTitle: action.displayTitle
 			};
-		case adminActions.UPDATE_DEFAULT_GRAPH_TYPE:
+		case adminActions.UPDATE_DEFAULT_CHART_TO_RENDER:
 			return {
 				...state,
-				defaultGraphType: action.defaultGraphType
+				defaultChartToRender: action.defaultChartToRender
 			};
 		case adminActions.TOGGLE_DEFAULT_BAR_STACKING:
 			return {
@@ -39,9 +39,10 @@ export default function admin(state = defaultState, action) {
 				...state,
 				isFetching: false,
 				displayTitle: action.data.displayTitle,
-				defaultGraphType: action.data.defaultGraphType,
+				defaultChartToRender: action.data.defaultChartToRender,
 				defaultBarStacking: action.data.defaultBarStacking
 			};
-		default: return state;
+		default:
+			return state;
 	}
 }

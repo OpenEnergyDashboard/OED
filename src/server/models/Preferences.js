@@ -11,12 +11,12 @@ const sqlFile = database.sqlFile;
 class Preferences {
 	/**
 	 * @param {String} displayTitle - Header title to display
-	 * @param {String} defaultGraphType - Graph to display as default
+	 * @param {String} defaultChartToRender - Chart to display as default
 	 * @param {Boolean} defaultBarStacking - Option to set default toggle of bar stacking
 	 */
-	constructor(displayTitle, defaultGraphType, defaultBarStacking) {
+	constructor(displayTitle, defaultChartToRender, defaultBarStacking) {
 		this.displayTitle = displayTitle;
-		this.defaultGraphType = defaultGraphType;
+		this.defaultChartToRender = defaultChartToRender;
 		this.defaultBarStacking = defaultBarStacking;
 	}
 
@@ -39,7 +39,7 @@ class Preferences {
 	}
 
 	static mapRow(row) {
-		return new Preferences(row.display_title, row.default_graph_type, row.default_bar_stacking);
+		return new Preferences(row.display_title, row.default_chart_to_render, row.default_bar_stacking);
 	}
 
 	static async get() {
@@ -53,7 +53,7 @@ class Preferences {
 		await db.none(sqlFile('preferences/update_preferences.sql'),
 			{
 				displayTitle: preferences.displayTitle,
-				defaultGraphType: preferences.defaultGraphType,
+				defaultChartToRender: preferences.defaultChartToRender,
 				defaultBarStacking: preferences.defaultBarStacking
 			});
 	}

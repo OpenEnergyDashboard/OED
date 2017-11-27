@@ -6,6 +6,6 @@
 CREATE TABLE IF NOT EXISTS preferences (
 	id SERIAL PRIMARY KEY,
 	display_title VARCHAR(50) NOT NULL,
-	default_graph_type graph_type NOT NULL,
+	default_chart_to_render graph_type NOT NULL,
 	default_bar_stacking BOOLEAN NOT NULL
 );
