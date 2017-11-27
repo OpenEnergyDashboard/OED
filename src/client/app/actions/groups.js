@@ -6,6 +6,7 @@
 
 import axios from 'axios';
 import getToken from '../utils/getToken';
+import { showNotification } from './notifications';
 
 // View and fetching actions
 export const REQUEST_GROUPS_DETAILS = 'REQUEST_GROUPS_DETAILS';
@@ -277,9 +278,14 @@ function submitNewGroup(group) {
 					dispatch2(changeDisplayMode(DISPLAY_MODE.VIEW));
 				});
 			})
-			.catch(error => {
+			.catch(() => {
 				dispatch(markGroupInEditingNotSubmitted());
-				console.error(error);
+				dispatch(showNotification({
+					message: 'Failed to create a new group',
+					level: 'error',
+					position: 'tr',
+					autoDismiss: 3
+				}));
 			});
 	};
 }
@@ -296,9 +302,14 @@ function submitGroupEdits(group) {
 					dispatch2(changeDisplayMode(DISPLAY_MODE.VIEW));
 				});
 			})
-			.catch(error => {
+			.catch(() => {
 				dispatch(markGroupInEditingNotSubmitted());
-				console.error(error);
+				dispatch(showNotification({
+					message: 'Failed to edit group',
+					level: 'error',
+					position: 'tr',
+					autoDismiss: 3
+				}));
 			});
 	};
 }
@@ -354,6 +365,11 @@ export function deleteGroup() {
 					dispatch2(changeDisplayMode('view'));
 				});
 			})
-			.catch(console.error);
+			.catch(dispatch(showNotification({
+				message: 'Failed to delete group',
+				level: 'error',
+				position: 'tr',
+				autoDismiss: 3
+			})));
 	};
 }

@@ -78,13 +78,12 @@ export default class UIOptionsComponent extends React.Component {
 			fontWeight: 'bold',
 			margin: 0
 		};
-
 		const divTopPadding = {
 			paddingTop: '15px'
 		};
 
 		return (
-			<div style={divTopPadding}>
+			<div>
 				<ChartSelectContainer />
 				<ChartDataSelectContainer />
 

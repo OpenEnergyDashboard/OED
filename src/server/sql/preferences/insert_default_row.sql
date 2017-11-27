@@ -3,5 +3,4 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
 
 INSERT INTO preferences (display_title, default_chart_to_render, default_bar_stacking)
-VALUES ('Open Energy Dashboard', 'line', FALSE);
-
+VALUES ('', 'line', FALSE);

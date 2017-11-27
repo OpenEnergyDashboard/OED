@@ -15,12 +15,11 @@ import getToken from '../utils/getToken';
  * @return JSX to create the header strip
  */
 export default function HeaderComponent(props) {
-	const title = props.title ? props.title : 'Open Energy Dashboard';
 	const titleStyle = {
 		display: 'inline-block'
 	};
 	const divStyle = {
-		paddingBottom: '45px'
+		paddingBottom: '5px'
 	};
 	const divRightStyle = {
 		float: 'right',
@@ -48,7 +47,7 @@ export default function HeaderComponent(props) {
 				<Link to="/"><LogoComponent url="./app/images/logo.png" /></Link>
 			</div>
 			<div className="col-xs-4 text-center">
-				<h1 style={titleStyle}>{title}</h1>
+				<h1 style={titleStyle}>{props.title}</h1>
 			</div>
 			<div style={divRightStyle}>
 				<div className="visible-sm visible-xs">

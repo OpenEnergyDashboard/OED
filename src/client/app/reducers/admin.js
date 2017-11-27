@@ -6,7 +6,7 @@ import * as adminActions from '../actions/admin';
 import { chartTypes } from './graph';
 
 const defaultState = {
-	displayTitle: 'Open Energy Dashboard',
+	displayTitle: '',
 	defaultChartToRender: chartTypes.line,
 	defaultBarStacking: false,
 	isFetching: false

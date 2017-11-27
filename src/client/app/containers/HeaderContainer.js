@@ -7,6 +7,7 @@ import HeaderComponent from '../components/HeaderComponent';
 
 function mapStateToProps(state, ownProps) {
 	return {
+		title: state.admin.displayTitle,
 		renderLoginButton: ownProps.renderLoginButton,
 		renderOptionsButton: ownProps.renderOptionsButton,
 	};

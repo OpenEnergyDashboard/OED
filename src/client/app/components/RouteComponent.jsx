@@ -97,7 +97,12 @@ export default class RouteComponent extends React.Component {
 				}
 				this.props.changeOptionsFromLink(options);
 			} catch (err) {
-				console.error('Failed to link to graph');
+				this.props.showNotification({
+					message: 'Failed to link to graph',
+					level: 'error',
+					position: 'tr',
+					autoDismiss: 3
+				});
 			}
 		}
 		replace({
