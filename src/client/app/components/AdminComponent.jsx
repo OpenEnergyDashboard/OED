@@ -73,7 +73,7 @@ export default class AdminComponent extends React.Component {
 		};
 		return (
 			<div>
-				<HeaderContainer renderLoginButton={false} renderOptionsButton={false} renderAdminButton={false} />
+				<HeaderContainer />
 				<div className="container-fluid">
 					<div className="col-xs-3">
 						<div style={bottomPaddingStyle}>

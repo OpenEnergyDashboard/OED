@@ -3,7 +3,7 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
 
 import React from 'react';
-import HeaderComponent from '../HeaderComponent';
+import HeaderContainer from '../../containers/HeaderContainer';
 import GroupViewContainer from '../../containers/groups/GroupViewContainer';
 import GroupSidebarContainer from '../../containers/groups/GroupSidebarContainer';
 import CreateGroupContainer from '../../containers/groups/CreateGroupContainer';
@@ -57,7 +57,7 @@ export default class GroupMainComponent extends React.Component {
 
 		return (
 			<div>
-				<HeaderComponent title="Groups" />
+				<HeaderContainer />
 				<div className="container-fluid">
 					<div className="col-xs-11">
 						{ GroupDisplay }

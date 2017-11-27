@@ -14,7 +14,7 @@ import DashboardContainer from '../containers/DashboardContainer';
 export default function HomeComponent() {
 	return (
 		<div>
-			<HeaderContainer renderOptionsButton renderLoginButton renderGroupsButton />
+			<HeaderContainer />
 			<DashboardContainer />
 		</div>
 	);

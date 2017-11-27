@@ -15,6 +15,36 @@ import getToken from '../utils/getToken';
  * @return JSX to create the header strip
  */
 export default function HeaderComponent(props) {
+	const urlArr = window.location.href.split('/');
+	const page = urlArr[urlArr.length - 1];
+	let renderOptionsButton = false;
+	let renderLoginButton = false;
+	let renderAdminButton = false;
+	let renderGroupsButton = false;
+
+	switch (page) {
+		case '': // home page
+			renderOptionsButton = true;
+			if (getToken()) {
+				renderAdminButton = true;
+				renderGroupsButton = true;
+			} else {
+				renderLoginButton = true;
+			}
+			break;
+		case 'groups':
+			renderAdminButton = true;
+			break;
+		case 'admin':
+			renderGroupsButton = true;
+			break;
+		case 'login':
+			break;
+		default: // Unknown page, routes to 404, show nothing
+			break;
+
+	}
+
 	const titleStyle = {
 		display: 'inline-block'
 	};
@@ -24,23 +54,21 @@ export default function HeaderComponent(props) {
 	const divRightStyle = {
 		float: 'right',
 		marginTop: '5px',
-		marginRight: '20px'
+		display: 'flex'
 	};
 	const loginLinkStyle = {
-		// Displays the login button link only if the user is not logged in or is explicitly told to render
-		display: (getToken() || props.renderLoginButton === false) ? 'none' : 'inline',
+		display: renderLoginButton ? 'inline' : 'none',
 		paddingLeft: '5px'
 	};
 	const adminLinkStyle = {
-		// Displays the admin button link only if the user is logged in (auth token exists)
-		display: getToken() ? 'inline' : 'none',
+		display: renderAdminButton ? 'inline' : 'none',
 		paddingLeft: '5px'
 	};
 	const groupsLinkStyle = {
-		// Displays the groups button link only if the user is logged in (auth token exists) or explicitly told to render
-		display: (getToken() && props.renderGroupsButton) ? 'inline' : 'none',
+		display: renderGroupsButton ? 'inline' : 'none',
 		paddingLeft: '5px'
 	};
+
 	return (
 		<div className="container-fluid" style={divStyle}>
 			<div className="col-xs-4">
@@ -51,7 +79,7 @@ export default function HeaderComponent(props) {
 			</div>
 			<div style={divRightStyle}>
 				<div className="visible-sm visible-xs">
-					{(props.renderOptionsButton) ? <UIModalComponent /> : null}
+					{(renderOptionsButton) ? <UIModalComponent /> : null}
 				</div>
 				<Link style={loginLinkStyle} to="/login"><Button bsStyle="default">Log In</Button></Link>
 				<Link style={adminLinkStyle} to="/admin"><Button bsStyle="default">Admin panel</Button></Link>
