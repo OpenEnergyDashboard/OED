@@ -112,7 +112,7 @@ router.post('/create', async (req, res) => {
 				const insertionQuery = newGroup.insert(t);
 				const adoptGroupsQuery = req.body.childGroups.map(gid => newGroup.adoptGroup(gid));
 				const adoptMetersQuery = req.body.childMeters.map(mid => newGroup.adoptMeter(mid));
-				t.batch(_.flatten([insertionQuery, adoptGroupsQuery, adoptMetersQuery]));
+				return t.batch(_.flatten([insertionQuery, adoptGroupsQuery, adoptMetersQuery]));
 			});
 			res.sendStatus(200);
 		} catch (err) {
