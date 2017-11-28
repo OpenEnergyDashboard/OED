@@ -24,8 +24,9 @@ export default class AdminComponent extends React.Component {
 				autoDismiss: 3
 			});
 		} else {
+			const file = files[0];
 			const data = new FormData();
-			data.append('csvFile', files[0]);
+			data.append('csvFile', file);
 			//	data.append('token', getToken());
 			axios.post(`/api/fileProcessing/${this.props.selectedImportMeter.value}`, data)
 				.then(() => {
@@ -35,22 +36,19 @@ export default class AdminComponent extends React.Component {
 						position: 'tr',
 						autoDismiss: 3
 					});
-				}).catch(() => {
-				this.props.showNotification({
-					message: 'Error uploading meter data',
-					level: 'error',
-					position: 'tr',
-					autoDismiss: 3
+				})
+				.catch(() => {
+					this.props.showNotification({
+						message: 'Error uploading meter data',
+						level: 'error',
+						position: 'tr',
+						autoDismiss: 3
+					});
 				});
-			});
-		}
+			}
 	}
 
 	render() {
-		let selectedImportMeter = [];
-		if (this.props.selectedImportMeter) {
-			selectedImportMeter.push(this.props.selectedImportMeter);
-		}
 		return (
 			<div>
 				<HeaderContainer renderLoginButton={false} renderOptionsButton={false} renderAdminButton={false} />
@@ -61,7 +59,7 @@ export default class AdminComponent extends React.Component {
 						</Dropzone>
 						<MultiSelectComponent
 							options={this.props.meters}
-							selectedOptions={selectedImportMeter}
+							selectedOptions={this.props.selectedImportMeter}
 							placeholder="Select meter to import data"
 							onValuesChange={s => this.props.updateSelectedImportMeter(s)}
 						/>

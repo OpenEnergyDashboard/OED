@@ -14,7 +14,7 @@ export default class MultiSelectComponent extends React.Component {
 		this.onValuesChangeInternal = this.onValuesChangeInternal.bind(this);
 		// selectedOptions holds a list of the options that have been selected
 		this.state = {
-			selectedOptions: this.props.selectedOptions ? this.props.selectedOptions : []
+			selectedOptions: this.props.selectedOptions ? this.props.selectedOptions : null
 		};
 	}
 

@@ -17,30 +17,33 @@ const upload = multer({ storage: multer.memoryStorage() });
 
 router.post('/:meter_id', upload.single('csvFile'), async (req, res) => {
 	const id = parseInt(req.params.meter_id);
+	console.log("1");
 	try {
 		const myReadableStreamBuffer = new streamBuffers.ReadableStreamBuffer({
 			frequency: 10,
 			chunkSize: 2048
 		});
+		console.log("2");
 		myReadableStreamBuffer.put(req.file.buffer);
 		//stop() indicates we are done putting the data in our readable stream.
+		console.log("3");
 		myReadableStreamBuffer.stop();
-		const transaction = streamToDB(myReadableStreamBuffer, row => {
-			const readRate = parseInt(row[0]);
-			const endTimestamp = moment(row[1], 'MM/DD/YYYY HH:mm');
-			const startTimestamp = moment(row[1], 'MM/DD/YYYY HH:mm').subtract(60, 'minutes');
-			const reading = new Reading(id, readRate, startTimestamp, endTimestamp);
-			return reading;
-		}, (readings, tx) => {
-			return Reading.insertOrUpdateAll(readings, tx).then(() => {
-			});
-		});
 		try {
-			await transaction;
+			console.log("4");
+			await streamToDB(myReadableStreamBuffer, row => {
+				const readRate = parseInt(row[0]);
+				const endTimestamp = moment(row[1], 'MM/DD/YYYY HH:mm');
+				const startTimestamp = moment(row[1], 'MM/DD/YYYY HH:mm').subtract(60, 'minutes');
+				const reading = new Reading(id, readRate, startTimestamp, endTimestamp);
+				return reading;
+			}, (readings, tx) => {
+				return Reading.insertOrUpdateAll(readings, tx);
+			});
+			console.log("DONE");
 			res.status(200).json({success: true});
-		} catch (err) {
+		} catch (e) {
+			console.log(e);
 			console.log('Failed to upload');
-			console.log(err);
 			res.status(403).json({ success: false, message: 'Failed to upload data.' });
 		}
 	} catch (err) {

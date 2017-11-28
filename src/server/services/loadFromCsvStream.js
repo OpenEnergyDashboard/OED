@@ -23,7 +23,9 @@ const csv = require('csv');
  * @template M
  */
 function loadFromCsvStream(stream, mapRowToModel, bulkInsertModels) {
-	return db.tx(t => new Promise(resolve => {
+	return db.tx(t => new Promise((resolve, reject) => {
+		let rejected = false;
+		let error = null;
 		const MIN_INSERT_BUFFER_SIZE = 1000;
 		let modelsToInsert = [];
 		const pendingInserts = [];
@@ -41,21 +43,36 @@ function loadFromCsvStream(stream, mapRowToModel, bulkInsertModels) {
 			let row;
 				// We can only get the next row once so we check that it isn't null at the same time that we assign it
 			while ((row = parser.read()) !== null) { // eslint-disable-line no-cond-assign
-				modelsToInsert.push(mapRowToModel(row));
+				if (!rejected) {
+					modelsToInsert.push(mapRowToModel(row));
+				}
 			}
-			if (modelsToInsert.length >= MIN_INSERT_BUFFER_SIZE) {
-				insertQueuedModels();
+			if (!rejected) {
+				if (modelsToInsert.length >= MIN_INSERT_BUFFER_SIZE) {
+					insertQueuedModels();
+				}
 			}
+		});
+
+		parser.on('error', err => {
+			rejected = true;
+			error = err;
+			console.log("in error");
 		});
 		// Defines what happens when the parser's input stream is finished (and thus the promise needs to be resolved)
 		parser.on('finish', () => {
-			// Insert any models left in the buffer
-			if (modelsToInsert.length > 0) {
-				insertQueuedModels();
+			if (!rejected) {
+				// Insert any models left in the buffer
+				if (modelsToInsert.length > 0) {
+					insertQueuedModels();
+				}
+				// Resolve the promise, telling pg-promise to run the batch query and complete (or rollback) the
+				// transaction.
+				resolve(t.batch(pendingInserts));
+			} else {
+				console.log("In finish; error happened");
+				reject(error);
 			}
-			// Resolve the promise, telling pg-promise to run the batch query and complete (or rollback) the
-			// transaction.
-			resolve(t.batch(pendingInserts));
 		});
 		stream.pipe(parser);
 	}));
