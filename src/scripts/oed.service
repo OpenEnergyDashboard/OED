@@ -1,10 +1,5 @@
-# *
-# * This Source Code Form is subject to the terms of the Mozilla Public
-# * License, v. 2.0. If a copy of the MPL was not distributed with this
-# * file, You can obtain one at http://mozilla.org/MPL/2.0/.
-# *
-
 # To use:
+# This should be copied to /etc/systemd/system/ and the copy renamed so that its function will be clear to admins.
 # Modify the WorkingDirectory variable
 # Modify the user variable
 

@@ -51,7 +51,8 @@ OED_LOG_FILE=?                 // Path to the log file, defaults to ./log.txt
 1. Edit ```docker-compose.yml``` to change
 	1. the secret key (in `services -> web -> environment -> OED_TOKEN_SECRET`) to a random value. Keep it secret.
 	1. the port (in `services -> web -> ports`) to a mapping from host to container; e.g., to host on your computer's port 80, set it to `80:3000`.
-1. Copy src/scripts/updateOED.bash to /etc/cron.hourly/updateOED.bash and make the necessary modifications to the script. See the script for more detail.
+1. Copy src/scripts/OEDCron.bash to /etc/cron.hourly/OEDCron.bash and make the necessary modifications to the script. See the script for more detail.
+1. Run ```chmod +x OEDCron.bash``` to make the script executable.
 1. Copy src/scripts/oed.service to /etc/systemd/system/oed.service and make the necessary modifications to the script. See the script for more detail.
 1. Run ```systemctl enable oed.service``` to make the service start on server boot.
 1. Bring the app online with ```systemctl start oed.service```. Stop the app with ```systemctl stop oed.service```.
