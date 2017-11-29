@@ -12,7 +12,7 @@ DEFAULT_USER=no
 SKIP_USER=no
 NPM_INSTALL=yes
 
-if [ "$1" == "" ]; then 
+if [ "$1" == "" ]; then
     echo $USAGE
     exit 1
 fi
@@ -50,7 +50,7 @@ fi
 
 create_error=0 # Boolean
 
-tries=0 
+tries=0
 max_tries=10
 
 # Try to create the schema until it succeeds
@@ -59,13 +59,13 @@ while [ $create_error == 0 ]; do
     sleep 1
     echo "Attempting to create database."
     # Redirect stderr to a file
-    npm run createdb |& tee /tmp/oed.error > /dev/null 
+    npm run createdb |& tee /tmp/oed.error > /dev/null
     # search the file for the kind of error we can recover from
-    grep -q 'Error: connect ECONNREFUSED' /tmp/oed.error 
+    grep -q 'Error: connect ECONNREFUSED' /tmp/oed.error
     create_error=$?
 
     # Check loop runtime
-    ((tries=tries+1))    
+    ((tries=tries+1))
     if [ $tries -ge $max_tries ]; then
         echo "FAILED! Too many tries. Is your database at $DB_HOST:$DB_PORT down?"
         exit 1
@@ -86,9 +86,9 @@ fi
 # Create a user
 set -e
 if [ "$DEFAULT_USER" == "yes" ]; then
-    npm run createUser -- test@test.test testtest
-    echo "Created a user 'test@test.test' with password 'testtest'."
-elif [ "$SKIP_USER" != "yes" ]; then 
+    npm run createUser -- test@example.com password
+    echo "Created a user 'test@example.com' with password 'password'."
+elif [ "$SKIP_USER" != "yes" ]; then
     npm run createUser
 else
     echo "WARNING: No user was created during init.sh run. You may wish to set up a user with the createUser npm script."
