@@ -28,7 +28,7 @@ export default function FooterComponent() {
 		<div className="container-fluid">
 			<footer className="footer" style={footerStyle}>
 				<span>Open Energy Dashboard is an open source project coordinated by Beloit College. <a href="mailto:oed@beloit.edu">Contact us</a> or
-					visit our <a href="https://openenergydashboard.github.io/">website</a> for more information.</span>
+					visit our <a target="_blank" rel="noopener noreferrer" href="https://openenergydashboard.github.io/">website</a> for more information.</span>
 			</footer>
 		</div>
 	);
