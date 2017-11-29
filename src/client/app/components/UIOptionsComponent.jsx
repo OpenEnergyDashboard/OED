@@ -5,10 +5,10 @@
 import React from 'react';
 import Slider from 'react-rangeslider';
 import moment from 'moment';
+import { ToggleButtonGroup, ToggleButton } from 'react-bootstrap';
 import 'react-rangeslider/lib/index.css';
 import '../styles/react-rangeslider-fix.css';
 import { chartTypes } from '../reducers/graph';
-
 import ExportContainer from '../containers/ExportContainer';
 import ChartSelectContainer from '../containers/ChartSelectContainer';
 import ChartDataSelectContainer from '../containers/ChartDataSelectContainer';
@@ -25,6 +25,7 @@ export default class UIOptionsComponent extends React.Component {
 		this.handleBarDurationChange = this.handleBarDurationChange.bind(this);
 		this.handleBarDurationChangeComplete = this.handleBarDurationChangeComplete.bind(this);
 		this.handleChangeBarStacking = this.handleChangeBarStacking.bind(this);
+		this.handleSpanButton = this.handleSpanButton.bind(this);
 		this.state = {
 			barDuration: this.props.barDuration.asDays()
 		};
@@ -65,10 +66,15 @@ export default class UIOptionsComponent extends React.Component {
 		this.props.changeDuration(moment.duration(this.state.barDuration, 'days'));
 	}
 
+
 	handleChangeBarStacking() {
 		this.props.changeBarStacking();
 	}
 
+	handleSpanButton(value) {
+		this.props.changeDuration(moment.duration(value, 'days'));
+		console.log(document.getElementsByName('timeSpans')[3].checked);
+	}
 	/**
 	 * @returns JSX to create the UI options side-panel (includes dynamic rendering of meter information for selection)
 	 */
@@ -82,6 +88,13 @@ export default class UIOptionsComponent extends React.Component {
 			paddingTop: '15px'
 		};
 
+		let showSlider = false;
+		if (document.getElementsByName('timeSpans')[0] !== undefined && document.getElementsByName('timeSpans')[0].checked === false
+		&& document.getElementsByName('timeSpans')[1] !== undefined && document.getElementsByName('timeSpans')[1].checked === false
+		&& document.getElementsByName('timeSpans')[2] !== undefined && document.getElementsByName('timeSpans')[2].checked === false) {
+			showSlider = true;
+		}
+
 		return (
 			<div style={divTopPadding}>
 				<ChartSelectContainer />
@@ -94,9 +107,28 @@ export default class UIOptionsComponent extends React.Component {
 							<label><input type="checkbox" onChange={this.handleChangeBarStacking} checked={this.props.barStacking} />Bar stacking</label>
 						</div>
 						<p style={labelStyle}>Bar chart interval (days):</p>
-						<Slider min={1} max={365} value={this.state.barDuration} onChange={this.handleBarDurationChange} onChangeComplete={this.handleBarDurationChangeComplete} />
+						<ToggleButtonGroup
+							type="radio"
+							name="timeSpans"
+							value={this.state.barDuration}
+							onChange={this.handleSpanButton}
+						>
+							<ToggleButton value={1}>Day</ToggleButton>
+							<ToggleButton value={7}>Week</ToggleButton>
+							<ToggleButton value={28}>Month</ToggleButton>
+							<ToggleButton value={0}>Custom</ToggleButton>
+
+						</ToggleButtonGroup>
+						{showSlider &&
+						<Slider
+							min={1} max={365} value={this.state.barDuration} onChange={this.handleBarDurationChange}
+							onChangeComplete={this.handleBarDurationChangeComplete}
+						/>
+						}
 					</div>
+
 				}
+
 
 				{ /* We can't export compare data */ }
 				{this.props.chartToRender !== chartTypes.compare &&
