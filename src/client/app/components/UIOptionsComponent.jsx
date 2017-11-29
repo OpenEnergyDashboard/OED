@@ -132,7 +132,9 @@ export default class UIOptionsComponent extends React.Component {
 
 				{ /* We can't export compare data */ }
 				{this.props.chartToRender !== chartTypes.compare &&
-					<ExportContainer />
+					<div style={divTopPadding}>
+						<ExportContainer />
+					</div>
 				}
 				<div style={divTopPadding}>
 					<ChartLinkContainer />
