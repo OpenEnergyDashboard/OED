@@ -24,7 +24,7 @@ FILES=$(echo "$FILES" | grep -v "src\/client\/favicon\.ico")
 FILES=$(echo "$FILES" | grep -v "src\/server\/test\/db\/data\/.*")
 # Filter out outside scripts
 FILES=$(echo "$FILES" | grep -v "src\/scripts\/oed\.service")
-FILES=$(echo "$FILES" | grep -v "src\/scripts\/OEDCron\.bash")
+FILES=$(echo "$FILES" | grep -v "src\/scripts\/updateMamacMetersOEDCron\.bash")
 
 # Counts the files listed in FILES
 NFILES=$(echo $FILES | wc -w)
