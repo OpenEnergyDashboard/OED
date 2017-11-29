@@ -5,7 +5,7 @@
 import React from 'react';
 import Slider from 'react-rangeslider';
 import moment from 'moment';
-import { ToggleButtonGroup, ToggleButton } from 'react-bootstrap';
+import { Button, ToggleButtonGroup, ToggleButton } from 'react-bootstrap';
 import 'react-rangeslider/lib/index.css';
 import '../styles/react-rangeslider-fix.css';
 import { chartTypes } from '../reducers/graph';
@@ -26,8 +26,10 @@ export default class UIOptionsComponent extends React.Component {
 		this.handleBarDurationChangeComplete = this.handleBarDurationChangeComplete.bind(this);
 		this.handleChangeBarStacking = this.handleChangeBarStacking.bind(this);
 		this.handleSpanButton = this.handleSpanButton.bind(this);
+		this.toggleSlider = this.toggleSlider.bind(this);
 		this.state = {
-			barDuration: this.props.barDuration.asDays()
+			barDuration: this.props.barDuration.asDays(),
+			showsSlider: false
 		};
 	}
 
@@ -73,8 +75,12 @@ export default class UIOptionsComponent extends React.Component {
 
 	handleSpanButton(value) {
 		this.props.changeDuration(moment.duration(value, 'days'));
-		console.log(document.getElementsByName('timeSpans')[3].checked);
 	}
+
+	toggleSlider() {
+		this.setState({ showSlider: !this.state.showSlider });
+	}
+
 	/**
 	 * @returns JSX to create the UI options side-panel (includes dynamic rendering of meter information for selection)
 	 */
@@ -88,12 +94,10 @@ export default class UIOptionsComponent extends React.Component {
 			paddingTop: '15px'
 		};
 
-		let showSlider = false;
-		if (document.getElementsByName('timeSpans')[0] !== undefined && document.getElementsByName('timeSpans')[0].checked === false
-		&& document.getElementsByName('timeSpans')[1] !== undefined && document.getElementsByName('timeSpans')[1].checked === false
-		&& document.getElementsByName('timeSpans')[2] !== undefined && document.getElementsByName('timeSpans')[2].checked === false) {
-			showSlider = true;
-		}
+		const zIndexFix = {
+			zIndex: '0'
+		};
+
 
 		return (
 			<div style={divTopPadding}>
@@ -112,14 +116,15 @@ export default class UIOptionsComponent extends React.Component {
 							name="timeSpans"
 							value={this.state.barDuration}
 							onChange={this.handleSpanButton}
+							style={zIndexFix}
 						>
 							<ToggleButton value={1}>Day</ToggleButton>
 							<ToggleButton value={7}>Week</ToggleButton>
 							<ToggleButton value={28}>Month</ToggleButton>
-							<ToggleButton value={0}>Custom</ToggleButton>
-
 						</ToggleButtonGroup>
-						{showSlider &&
+						<Button name="customToggle" onClick={this.toggleSlider}>Toggle Custom Slider</Button>
+
+						{this.state.showSlider &&
 						<Slider
 							min={1} max={365} value={this.state.barDuration} onChange={this.handleBarDurationChange}
 							onChangeComplete={this.handleBarDurationChangeComplete}
