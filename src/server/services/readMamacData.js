@@ -11,6 +11,10 @@ const Reading = require('../models/Reading');
 const parseCsv = promisify(csv.parse);
 
 function parseTimestamp(raw) {
+	const timestampRegExp = /^\d{2}:\d{2}:\d{2} \d{1,2}\/\d{1,2}\/\d{1,2}/;
+	if (!timestampRegExp.test(raw)) {
+		throw new Error(`Raw timestamp ${raw} does not pass regex validation`);
+	}
 	const ts = moment(raw, 'HH:mm:ss MM/DD/YY');
 	if (!ts.isValid()) {
 		throw new Error(`raw timestamp ${raw} does not parse to a valid moment object`);
@@ -31,7 +35,7 @@ async function readMamacData(meter) {
 	const rawReadings = await reqPromise(`http://${meter.ipAddress}/int2.csv`);
 	const parsedReadings = await parseCsv(rawReadings);
 	return parsedReadings.map(raw => {
-		const reading = parseInt(raw[0]);
+		const reading = Number(raw[0]); // Thank you, JavaScript.
 		if (isNaN(reading)) {
 			throw new Error(`Meter reading ${reading} parses to NaN for meter named ${meter.name} with id ${meter.id}`);
 		}
