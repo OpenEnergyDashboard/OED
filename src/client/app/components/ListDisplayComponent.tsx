@@ -5,7 +5,12 @@
 
 import * as React from 'react';
 
-export default function ListDisplayComponent(props) {
+interface ListDisplayProps {
+	height?: number;
+	items: any[];
+}
+
+export default function ListDisplayComponent(props: ListDisplayProps) {
 	const defaultHeightItems = 8;
 	const itemHeightPx = 18;
 	const heightPx = (props.height || defaultHeightItems) * itemHeightPx;
@@ -26,13 +31,13 @@ export default function ListDisplayComponent(props) {
 		paddingTop: '6px',
 		paddingBottom: '6px',
 		paddingLeft: '12px',
-		paddingRight: '12px',
+		paddingRight: '12px'
 	};
 
 	return (
 		<div className='list-wrapper' style={listWrapperStyle} >
 			<ul id='meterList' style={listStyle} >
-				{props.items.map(item => <li key={item.toString()}>{item.toString()}</li>)}
+				{props.items.map((item: any) => <li key={item.toString()}>{item.toString()}</li>)}
 			</ul>
 		</div>
 	);

@@ -9,15 +9,10 @@ import { createStore, applyMiddleware, compose } from 'redux';
 import { Provider } from 'react-redux';
 import RouteContainer from './containers/RouteContainer';
 import reducers from './reducers';
-
-// This sets up the redux-devtools extension (if it's installed in the browser).
-// https://github.com/zalmoxisus/redux-devtools-extension
-/* tslint:disable no-string-literal */
-const composeEnhancers = window['__REDUX_DEVTOOLS_EXTENSION_COMPOSE__'] || compose;
-/* eslint:enable */
+import { composeWithDevTools } from 'redux-devtools-extension';
 
 // Creates and applies thunk middleware to the Redux store, which is defined from the Redux reducers
-const store = createStore(reducers, composeEnhancers(applyMiddleware(thunkMiddleware)));
+const store = createStore(reducers, composeWithDevTools(applyMiddleware(thunkMiddleware)));
 
 // Renders the entire application, starting with RouteComponent, into the root div
 // Provides the Redux store to all child components

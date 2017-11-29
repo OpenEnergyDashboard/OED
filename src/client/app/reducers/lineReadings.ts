@@ -21,7 +21,7 @@ export interface LineReadingsState {
 			[timeInterval: string]: {
 				isFetching: boolean;
 				readings?: {
-					[point: number]: Array<[number, number]>;
+					[point: number]: [number, number];
 				};
 			}
 		}
@@ -31,7 +31,7 @@ export interface LineReadingsState {
 			[timeInterval: string]: {
 				isFetching: boolean;
 				readings?: {
-					[point: number]: Array<[number, number]>;
+					[point: number]: [number, number];
 				};
 			}
 		}
@@ -48,10 +48,10 @@ const defaultState: LineReadingsState = {
  * @param action
  * @return {State~Readings}
  */
-export default function readings(state = defaultState, action) {
+export default function readings(state = defaultState, action: readingsActions.LineReadingsAction) {
 	switch (action.type) {
 		case readingsActions.REQUEST_METER_LINE_READINGS: {
-			const timeInterval = action.timeInterval;
+			const timeInterval = action.timeInterval.toString();
 			const newState = {
 				...state,
 				byMeterID: {
@@ -71,7 +71,7 @@ export default function readings(state = defaultState, action) {
 			return newState;
 		}
 		case readingsActions.REQUEST_GROUP_LINE_READINGS: {
-			const timeInterval = action.timeInterval;
+			const timeInterval = action.timeInterval.toString();
 			const newState = {
 				...state,
 				byGroupID: {
@@ -91,7 +91,7 @@ export default function readings(state = defaultState, action) {
 			return newState;
 		}
 		case readingsActions.RECEIVE_METER_LINE_READINGS: {
-			const timeInterval = action.timeInterval;
+			const timeInterval = action.timeInterval.toString();
 			const newState = {
 				...state,
 				byMeterID: {
@@ -106,7 +106,7 @@ export default function readings(state = defaultState, action) {
 			return newState;
 		}
 		case readingsActions.RECEIVE_GROUP_LINE_READINGS: {
-			const timeInterval = action.timeInterval;
+			const timeInterval = action.timeInterval.toString();
 			const newState = {
 				...state,
 				byGroupID: {

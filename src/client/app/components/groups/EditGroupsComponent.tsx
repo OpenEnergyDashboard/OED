@@ -3,11 +3,12 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
 
 // This component is the main page of the edit group page.
+// TYPESCRIPT TODO: I have insufficient domain knowledge to edit this.
 import * as React from 'react';
 import * as _ from 'lodash';
 import { FormControl, Button, Glyphicon } from 'react-bootstrap';
 import DatasourceBoxContainer from '../../containers/groups/DatasourceBoxContainer';
-import { NamedIDItem } from '../../utils/types';
+import { NamedIDItem } from '../../types/items';
 
 interface EditGroupsProps {
 	name: string;
@@ -37,7 +38,7 @@ interface EditGroupsState {
 }
 
 export default class EditGroupsComponent extends React.Component<EditGroupsProps, EditGroupsState> {
-	constructor(props) {
+	constructor(props: EditGroupsProps) {
 		super(props);
 		this.state = {
 			name: this.props.name,

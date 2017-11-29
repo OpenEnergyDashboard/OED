@@ -9,13 +9,7 @@ import { fetchNeededLineReadings } from './lineReadings';
 import { fetchNeededBarReadings, fetchNeededCompareReadings } from './barReadings';
 import { TimeInterval } from '../../../common/TimeInterval';
 import { chartTypes } from '../reducers/graph';
-
-export const UPDATE_SELECTED_METERS = 'UPDATE_SELECTED_METERS';
-export const UPDATE_SELECTED_GROUPS = 'UPDATE_SELECTED_GROUPS';
-export const UPDATE_BAR_DURATION = 'UPDATE_BAR_DURATION';
-export const CHANGE_CHART_TO_RENDER = 'CHANGE_CHART_TO_RENDER';
-export const CHANGE_BAR_STACKING = 'CHANGE_BAR_STACKING';
-export const CHANGE_GRAPH_ZOOM = 'CHANGE_GRAPH_ZOOM';
+import { State, Dispatch, GetState, Thunk, TerminalThunk, ActionType } from '../types/redux';
 
 export interface UpdateSelectedMetersAction {
 	type: 'UPDATE_SELECTED_METERS';
@@ -60,30 +54,30 @@ export type GraphAction =
  * @returns {*} An action needed to change the chart type
  */
 export function changeChartToRender(chartType: chartTypes): ChangeChartToRenderAction {
-	return { type: CHANGE_CHART_TO_RENDER, chartType };
+	return { type: ActionType.ChangeChartToRender, chartType };
 }
 
 export function changeBarStacking(): ChangeBarStackingAction {
-	return { type: CHANGE_BAR_STACKING };
+	return { type: ActionType.ChangeBarStacking };
 }
 
 export function updateSelectedMeters(meterIDs: number[]): UpdateSelectedMetersAction {
-	return { type: UPDATE_SELECTED_METERS, meterIDs };
+	return { type: ActionType.UpdateSelectedMeters, meterIDs };
 }
 
 export function updateSelectedGroups(groupIDs: number[]): UpdateSelectedGroupsAction {
-	return { type: UPDATE_SELECTED_GROUPS, groupIDs };
+	return { type: ActionType.UpdateSelectedGroups, groupIDs };
 }
 
 export function updateBarDuration(barDuration: number): UpdateBarDurationAction {
-	return { type: UPDATE_BAR_DURATION, barDuration };
+	return { type: ActionType.UpdateBarDuration, barDuration };
 }
 
 function changeGraphZoom(timeInterval: TimeInterval): ChangeGraphZoomAction {
-	return { type: CHANGE_GRAPH_ZOOM, timeInterval };
+	return { type: ActionType.ChangeGraphZoom, timeInterval };
 }
 
-export function changeBarDuration(barDuration: number) {
+export function changeBarDuration(barDuration: number): Thunk {
 	return (dispatch, getState) => {
 		dispatch(updateBarDuration(barDuration));
 		dispatch(fetchNeededBarReadings(getState().graph.timeInterval));
@@ -91,20 +85,21 @@ export function changeBarDuration(barDuration: number) {
 	};
 }
 
-export function changeSelectedMeters(meterIDs: number[]) {
+export function changeSelectedMeters(meterIDs: number[]): Thunk {
 	return (dispatch, getState) => {
 		dispatch(updateSelectedMeters(meterIDs));
 		// Nesting dispatches to preserve that updateSelectedMeters() is called before fetching readings
 		dispatch(dispatch2 => {
 			dispatch2(fetchNeededLineReadings(getState().graph.timeInterval));
 			dispatch2(fetchNeededBarReadings(getState().graph.timeInterval));
+			// TODO TYPESCRIPT: This is a conflict that isn't resolvable as is. state.graph.compareTimeInterval really should be a TimeInterval.
 			dispatch2(fetchNeededCompareReadings(getState().graph.compareTimeInterval));
 		});
 		return Promise.resolve();
 	};
 }
 
-export function changeSelectedGroups(groupIDs: number[]) {
+export function changeSelectedGroups(groupIDs: number[]): Thunk {
 	return (dispatch, getState) => {
 		dispatch(updateSelectedGroups(groupIDs));
 		// Nesting dispatches to preserve that updateSelectedGroups() is called before fetching readings
@@ -116,18 +111,18 @@ export function changeSelectedGroups(groupIDs: number[]) {
 	};
 }
 
-function fetchNeededReadingsForGraph(timeInterval: TimeInterval) {
+function fetchNeededReadingsForGraph(timeInterval: TimeInterval): TerminalThunk {
 	return dispatch => {
 		dispatch(fetchNeededLineReadings(timeInterval));
 		dispatch(fetchNeededBarReadings(timeInterval));
 	};
 }
 
-function shouldChangeGraphZoom(state, timeInterval: TimeInterval) {
+function shouldChangeGraphZoom(state: State, timeInterval: TimeInterval): boolean {
 	return !state.graph.timeInterval.equals(timeInterval);
 }
 
-export function changeGraphZoomIfNeeded(timeInterval: TimeInterval) {
+export function changeGraphZoomIfNeeded(timeInterval: TimeInterval): TerminalThunk {
 	return (dispatch, getState) => {
 		if (shouldChangeGraphZoom(getState(), TimeInterval.unbounded())) {
 			dispatch(changeGraphZoom(timeInterval));

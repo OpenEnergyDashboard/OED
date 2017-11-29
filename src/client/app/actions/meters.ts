@@ -4,21 +4,32 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/.
  */
 
+import * as _ from 'lodash';
 import axios from 'axios';
+import { ActionType, Dispatch, State, GetState, Thunk } from '../types/redux';
+import { NamedIDItem } from '../types/items';
 
-export const REQUEST_METERS_DETAILS = 'REQUEST_METERS_DETAILS';
-export const RECEIVE_METERS_DETAILS = 'RECEIVE_METERS_DETAILS';
-
-export function requestMetersDetails() {
-	return { type: REQUEST_METERS_DETAILS };
+export interface RequestMetersDetailsAction {
+	type: ActionType.RequestMetersDetails;
 }
 
-export function receiveMetersDetails(data) {
-	return { type: RECEIVE_METERS_DETAILS, data };
+export interface ReceiveMetersDetailsAction {
+	type: ActionType.ReceiveMetersDetails;
+	data: NamedIDItem[];
 }
 
-function fetchMetersDetails() {
-	return dispatch => {
+export type MetersAction = RequestMetersDetailsAction | ReceiveMetersDetailsAction;
+
+export function requestMetersDetails(): RequestMetersDetailsAction {
+	return { type: ActionType.RequestMetersDetails };
+}
+
+export function receiveMetersDetails(data: NamedIDItem[]): ReceiveMetersDetailsAction {
+	return { type: ActionType.ReceiveMetersDetails, data };
+}
+
+function fetchMetersDetails(): Thunk {
+	return (dispatch: Dispatch) => {
 		dispatch(requestMetersDetails());
 		return axios.get('/api/meters')
 			.then(response => {
@@ -30,12 +41,12 @@ function fetchMetersDetails() {
 /**
  * @param {State} state
  */
-function shouldFetchMetersDetails(state) {
-	return !state.meters.isFetching && state.meters.meters === undefined;
+function shouldFetchMetersDetails(state: State): boolean {
+	return !state.meters.isFetching && _.size(state.meters.byMeterID) === 0;
 }
 
-export function fetchMetersDetailsIfNeeded() {
-	return (dispatch, getState) => {
+export function fetchMetersDetailsIfNeeded(): Thunk {
+	return (dispatch: Dispatch, getState: GetState) => {
 		if (shouldFetchMetersDetails(getState())) {
 			return dispatch(fetchMetersDetails());
 		}

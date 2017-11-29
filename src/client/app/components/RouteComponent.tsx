@@ -3,7 +3,7 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
 
 import * as React from 'react';
-import { Router, Route, browserHistory } from 'react-router';
+import { Router, Route, browserHistory, RedirectFunction, RouterState } from 'react-router';
 import axios from 'axios';
 import * as _ from 'lodash';
 import * as NotificationSystem from 'react-notification-system';
@@ -13,14 +13,16 @@ import AdminComponent from './AdminComponent';
 import NotFoundComponent from './NotFoundComponent';
 import GroupMainContainer from '../containers/groups/GroupMainContainer';
 import getToken from '../utils/getToken';
+import { ClearNotificationAction } from '../actions/notifications';
 
 interface RouteProps {
-	clearNotifications(): void;
+	notification: NotificationSystem.Notification;
+	clearNotifications(): ClearNotificationAction;
 }
 
 export default class RouteComponent extends React.Component<RouteProps, {}> {
 	private notificationSystem: NotificationSystem.System;
-	constructor(props) {
+	constructor(props: RouteProps) {
 		super(props);
 		this.requireAuth = this.requireAuth.bind(this);
 	}
@@ -30,7 +32,7 @@ export default class RouteComponent extends React.Component<RouteProps, {}> {
 	 * @param nextState The next state of the router
 	 * @param replace Function that allows a route redirect
 	 */
-	public requireAuth(nextState, replace) {
+	public requireAuth(nextState: RouterState, replace: RedirectFunction) {
 		function redirectRoute() {
 			replace({
 				pathname: '/login',
@@ -54,7 +56,7 @@ export default class RouteComponent extends React.Component<RouteProps, {}> {
 	}
 
 
-	public componentWillReceiveProps(nextProps) {
+	public componentWillReceiveProps(nextProps: RouteProps) {
 		if (!_.isEmpty(nextProps.notification)) {
 			this.notificationSystem.addNotification(nextProps.notification);
 			this.props.clearNotifications();
@@ -74,13 +76,13 @@ export default class RouteComponent extends React.Component<RouteProps, {}> {
 	public render() {
 		return (
 			<div>
-				<NotificationSystem ref={c => { this.notificationSystem = c; }} />
+				<NotificationSystem ref={(c: NotificationSystem.System) => { this.notificationSystem = c; }} />
 				<Router history={browserHistory}>
-					<Route path="/" component={HomeComponent} />
-					<Route path="/login" component={LoginContainer} />
-					<Route path="/admin" component={AdminComponent} onEnter={this.requireAuth} />
-					<Route path="/groups" component={GroupMainContainer} onEnter={this.requireAuth} />
-					<Route path="*" component={NotFoundComponent} />
+					<Route path='/' component={HomeComponent} />
+					<Route path='/login' component={LoginContainer} />
+					<Route path='/admin' component={AdminComponent} onEnter={this.requireAuth} />
+					<Route path='/groups' component={GroupMainContainer} onEnter={this.requireAuth} />
+					<Route path='*' component={NotFoundComponent} />
 				</Router>
 			</div>
 		);

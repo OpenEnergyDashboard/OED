@@ -5,17 +5,18 @@
 import * as React from 'react';
 import { ToggleButtonGroup, ToggleButton } from 'react-bootstrap';
 import { chartTypes } from '../reducers/graph';
+import { ChangeChartToRenderAction } from '../actions/graph';
 
 interface ChartSelectProps {
 	selectedChart: chartTypes;
-	changeChartType(chartType: chartTypes): void;
+	changeChartType(chartType: chartTypes): ChangeChartToRenderAction;
 }
 
 /**
  * A component that allows users to select which chart should be displayed.
  */
 export default class ChartSelectComponent extends React.Component<ChartSelectProps, {}> {
-	constructor(props) {
+	constructor(props: ChartSelectProps) {
 		super(props);
 		this.handleChangeChartType = this.handleChangeChartType.bind(this);
 	}
@@ -33,6 +34,7 @@ export default class ChartSelectComponent extends React.Component<ChartSelectPro
 		return (
 			<div style={divBottomPadding}>
 				<p style={labelStyle}>Graph Type:</p>
+				{/* TODO TYPESCRIPT: This error seems due to a bug in the typings. Issue:  */}
 				<ToggleButtonGroup
 					type='radio'
 					name='chartTypes'
@@ -47,7 +49,7 @@ export default class ChartSelectComponent extends React.Component<ChartSelectPro
 		);
 	}
 
-	private handleChangeChartType(value) {
+	private handleChangeChartType(value: chartTypes) {
 		this.props.changeChartType(value);
 	}
 }

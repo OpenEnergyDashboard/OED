@@ -4,11 +4,19 @@
 
 import { connect } from 'react-redux';
 import HeaderComponent from '../components/HeaderComponent';
+import { State } from '../types/redux';
 
-function mapStateToProps(state, ownProps) {
+interface HeaderContainerProps {
+	renderLoginButton: boolean;
+	renderOptionsButton: boolean;
+	renderGroupsButton: boolean;
+}
+
+function mapStateToProps(state: State, ownProps: HeaderContainerProps) {
 	return {
 		renderLoginButton: ownProps.renderLoginButton,
 		renderOptionsButton: ownProps.renderOptionsButton,
+		renderGroupsButton: ownProps.renderGroupsButton
 	};
 }
 

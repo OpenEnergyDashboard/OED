@@ -3,6 +3,7 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
 
 import * as React from 'react';
+// TODO TYPESCRIPT: Need definitions for this?
 import Slider from 'react-rangeslider';
 import * as moment from 'moment';
 import 'react-rangeslider/lib/index.css';
@@ -11,20 +12,16 @@ import { chartTypes } from '../reducers/graph';
 import ExportContainer from '../containers/ExportContainer';
 import ChartSelectContainer from '../containers/ChartSelectContainer';
 import ChartDataSelectContainer from '../containers/ChartDataSelectContainer';
+import { ChangeBarStackingAction } from '../actions/graph';
 
-
-interface UIOptionsProps {
+export interface UIOptionsProps {
 	chartToRender: chartTypes;
-	meters: [{ id: number, name: string }];
-	fetchMetersDetailsIfNeeded(): void;
-	selectMeters(meterIDs: number[]): void;
-	changeDuration(duration: moment.Duration): void;
-	changeChartType(chartType: chartTypes): void;
-	changeBarStacking(): void;
+	changeDuration(duration: number): Promise<any>;
+	changeBarStacking(): ChangeBarStackingAction;
 }
 
 interface UIOptionsState {
-	barDuration: number;
+	barDuration: moment.Duration;
 }
 
 export default class UIOptionsComponent extends React.Component<UIOptionsProps, UIOptionsState> {
@@ -34,21 +31,12 @@ export default class UIOptionsComponent extends React.Component<UIOptionsProps, 
 	 */
 	constructor(props: UIOptionsProps) {
 		super(props);
-		this.handleMeterSelect = this.handleMeterSelect.bind(this);
 		this.handleBarDurationChange = this.handleBarDurationChange.bind(this);
 		this.handleBarDurationChangeComplete = this.handleBarDurationChangeComplete.bind(this);
 		this.handleChangeBarStacking = this.handleChangeBarStacking.bind(this);
 		this.state = {
 			barDuration: 30 // barDuration in days
 		};
-	}
-
-	/**
-	 * Called when this component mounts
-	 * Dispatches a Redux action to fetch meter information
-	 */
-	public componentWillMount() {
-		this.props.fetchMetersDetailsIfNeeded();
 	}
 
 	/**
@@ -109,14 +97,6 @@ export default class UIOptionsComponent extends React.Component<UIOptionsProps, 
 	 */
 	private handleBarDurationChange(value: number) {
 		this.setState({ barDuration: value });
-	}
-
-	/**
-	 * Handles a change in meter selection
-	 * @param {Object[]} selection An array of {label: string, value: int} representing the current selection
-	 */
-	private handleMeterSelect(selection: Array<{label: string; value: number; }>) {
-		this.props.selectMeters(selection.map(s => s.value));
 	}
 
 	/**

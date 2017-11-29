@@ -5,19 +5,20 @@
 import * as React from 'react';
 import { Button } from 'react-bootstrap';
 import ListDisplayComponent from '../ListDisplayComponent';
+import { ChangeDisplayModeAction } from '../../actions/groups';
 
 interface GroupViewProps {
 	name: string;
 	id: number;
 	childMeterNames: string[];
 	childGroupNames: string[];
-	fetchGroupChildren(id: number): void;
+	fetchGroupChildren(id: number): Promise<any>;
 	beginEditingIfPossible(id: number): void;
-	changeDisplayModeToEdit(): void;
+	changeDisplayModeToEdit(): ChangeDisplayModeAction;
 }
 
 export default class GroupViewComponent extends React.Component<GroupViewProps, {}> {
-	constructor(props) {
+	constructor(props: GroupViewProps) {
 		super(props);
 		this.handleEditGroup = this.handleEditGroup.bind(this);
 	}

@@ -5,12 +5,18 @@
 import * as React from 'react';
 import { FormControl, Button } from 'react-bootstrap';
 import DatasourceBoxContainer from '../../containers/groups/DatasourceBoxContainer';
+import { SelectionType } from '../../containers/groups/DatasourceBoxContainer';
+import { NamedIDItem } from '../../types/items';
+import { CreateNewBlankGroupAction, EditGroupNameAction, ChangeDisplayModeAction } from '../../actions/groups';
+
 
 interface CreateGroupProps {
-	createNewBlankGroup(): void;
-	editGroupName(name: string): void;
-	submitGroupInEditingIfNeeded(): void;
-	changeDisplayModeToView(): void;
+	meters: NamedIDItem[];
+	groups: NamedIDItem[];
+	createNewBlankGroup(): CreateNewBlankGroupAction;
+	editGroupName(name: string): EditGroupNameAction;
+	submitGroupInEditingIfNeeded(): Promise<any>;
+	changeDisplayModeToView(): ChangeDisplayModeAction;
 }
 
 export default class CreateGroupComponent extends React.Component<CreateGroupProps, {}> {
@@ -48,11 +54,11 @@ export default class CreateGroupComponent extends React.Component<CreateGroupPro
 				</div>
 				<div style={divBottomStyle}>
 					<p style={textStyle}>Select Meters:</p>
-					<DatasourceBoxContainer type='meter' selection='all' />
+					<DatasourceBoxContainer type='meter' selection={SelectionType.All} />
 				</div>
 				<div style={divBottomStyle}>
 					<p style={textStyle}>Select Groups:</p>
-					<DatasourceBoxContainer type='group' selection='all' />
+					<DatasourceBoxContainer type='group' selection={SelectionType.All} />
 				</div>
 				<Button type='submit' onClick={this.handleReturnToView}>Cancel</Button>
 				<Button type='submit' className='pull-right' onClick={this.handleCreateGroup}>Create group</Button>
@@ -61,9 +67,9 @@ export default class CreateGroupComponent extends React.Component<CreateGroupPro
 	}
 
 	private handleNameChange(e: React.ChangeEvent<FormControl>) {
-		// TODO: Don't know how to get rid of this?
+		// TYPESCRIPT TODO: Don't know how to get rid of this?
 		// For now, disabled the lint disallowing access by string, so we can fake it up.
-		this.props.editGroupName(e.target['value']); // tslint:disable-line no-string-literal
+		this.props.editGroupName(e.currentTarget.value); // tslint:disable-line no-string-literal
 	}
 
 	private handleCreateGroup() {

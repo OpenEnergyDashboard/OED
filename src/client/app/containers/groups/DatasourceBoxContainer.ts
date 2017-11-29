@@ -7,16 +7,34 @@ import * as _ from 'lodash';
 import { connect } from 'react-redux';
 import DatasourceBoxComponent from '../../components/groups/DatasourceBoxComponent';
 import { changeSelectedChildMetersOfGroup, changeSelectedChildGroupsOfGroup, changeChildMeters, changeChildGroups } from '../../actions/groups';
-import { NamedIDItem } from '../../utils/types';
+import { NamedIDItem } from '../../types/items';
+import { Dispatch, State } from '../../types/redux';
+
+export enum SelectionType {
+	Children = 'children',
+	All = 'all',
+	Custom = 'custom'
+}
+
+interface DatasourceBoxContainerProps {
+	selection?: SelectionType;
+	type?: string;
+	parentID?: number;
+	datasource?: NamedIDItem[];
+	selectedOptions?: NamedIDItem[];
+	selectDatasource?: (meterIDs: number[]) => void;
+}
 
 // ownProps.selection may be 'children', 'all', or 'custom'
 // if ownProps.selection is 'children', ownProps must have a 'parentID' property
 // if ownProps.selection is 'custom', ownProps must have both a 'datasource' and 'selectDatasource' prop (and optional selectedOptions prop)
-function mapStateToProps(state, ownProps) {
+function mapStateToProps(state: State, ownProps: DatasourceBoxContainerProps) {
 	let datasource: NamedIDItem[] = [];
-	if (ownProps.selection === 'all') {
+	if (ownProps.selection === SelectionType.All) {
 		if (ownProps.type === 'meter') {
-			datasource = Object.keys(state.meters.byMeterID).map(meterID => {
+			datasource = Object.keys(state.meters.byMeterID)
+				.map((meterIDString: string) => parseInt(meterIDString))
+				.map(meterID => {
 				const meter = state.meters.byMeterID[meterID];
 				return {
 					id: meter.id,
@@ -24,7 +42,9 @@ function mapStateToProps(state, ownProps) {
 				};
 			});
 		} else {
-			datasource = Object.keys(state.groups.byGroupID).map(groupID => {
+			datasource = Object.keys(state.groups.byGroupID)
+				.map((groupIDString: string) => parseInt(groupIDString))
+				.map(groupID => {
 				const group = state.groups.byGroupID[groupID];
 				return {
 					id: group.id,
@@ -39,7 +59,7 @@ function mapStateToProps(state, ownProps) {
 					const meter = state.meters.byMeterID[meterID];
 					return {
 						id: meter.id,
-						name: meter.name,
+						name: meter.name
 					};
 				});
 			} else {
@@ -47,14 +67,14 @@ function mapStateToProps(state, ownProps) {
 					const group = state.groups.byGroupID[groupID];
 					return {
 						id: group.id,
-						name: group.name,
+						name: group.name
 					};
 				});
 			}
 		} else {
 			console.error('DatasourceBoxContainer must be supplied a parentID prop if type === children');
 		}
-	} else { // custom selection handled by parent
+	} else if (ownProps.datasource !== undefined) { // custom selection handled by parent
 		datasource = ownProps.datasource;
 	}
 
@@ -65,29 +85,40 @@ function mapStateToProps(state, ownProps) {
 	};
 }
 
-function mapDispatchToProps(dispatch, ownProps) {
+function mapDispatchToProps(dispatch: Dispatch, ownProps: DatasourceBoxContainerProps) {
 	if (ownProps.selection === 'all') {
 		if (ownProps.type === 'meter') {
 			return {
-				selectDatasource: meterIDs => dispatch(changeChildMeters(meterIDs)),
+				selectDatasource: (meterIDs: number[]) => dispatch(changeChildMeters(meterIDs)),
 			};
 		}
 		return {
-			selectDatasource: groupIDs => dispatch(changeChildGroups(groupIDs))
+			selectDatasource: (groupIDs: number[]) => dispatch(changeChildGroups(groupIDs))
 		};
 	} else if (ownProps.selection === 'children') {
-		if (ownProps.type === 'meter') {
+		const parentID = ownProps.parentID;
+		if (parentID !== undefined) {
+			if (ownProps.type === 'meter') {
+				return {
+					selectDatasource: (meterIDs: number[]) => dispatch(changeSelectedChildMetersOfGroup(parentID, meterIDs))
+				};
+			}
 			return {
-				selectDatasource: meterIDs => dispatch(changeSelectedChildMetersOfGroup(ownProps.parentID, meterIDs))
+				selectDatasource: (groupIDs: number[]) => dispatch(changeSelectedChildGroupsOfGroup(parentID, groupIDs))
 			};
+		} else {
+			throw new Error('Unacceptable condition: DatasourceBoxContainer given children selection without parent ID');
 		}
-		return {
-			selectDatasource: groupIDs => dispatch(changeSelectedChildGroupsOfGroup(ownProps.parentID, groupIDs))
-		};
+	} else {
+		const selectDatasource = ownProps.selectDatasource;
+		if (selectDatasource !== undefined) {
+			return {
+				selectDatasource: (meterIDs: number[]) => selectDatasource(meterIDs)
+			};
+		} else {
+			throw new Error('Unacceptable condition: DatasourceBoxContainer for "custom" requires a selectDatasource function, but it was undefined.');
+		}
 	}
-	return {
-		selectDatasource: meterIDs => ownProps.selectDatasource(meterIDs)
-	};
 }
 
 export default connect(mapStateToProps, mapDispatchToProps)(DatasourceBoxComponent);

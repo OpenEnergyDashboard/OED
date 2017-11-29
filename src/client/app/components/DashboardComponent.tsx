@@ -11,19 +11,22 @@ import MultiCompareChartContainer from '../containers/MultiCompareChartContainer
 import { chartTypes } from '../reducers/graph';
 
 /* tslint:disable no-string-literal */
-// We're really just setting defaults.global.plugins.datalabels.display to false
-// However, the datalabels plugin doesn't have types. So we have to cheat.
-defaults.global['plugins'] = {datalabels: {display: false}};
+// TODO TYPESCRIPT: There is an open issue for this: https://github.com/DefinitelyTyped/DefinitelyTyped/pull/21842
+defaults.global.plugins = {datalabels: {display: false}};
 /* tslint:enable */
+
+interface DashboardProps {
+	chartToRender: chartTypes;
+}
 
 /**
  * React component that controls the dashboard
  */
-export default function DashboardComponent(props) {
+export default function DashboardComponent(props: DashboardProps) {
 	const divPadding = {
 		paddingTop: '35px'
 	};
-	let ChartToRender = '';
+	let ChartToRender: typeof LineChartContainer | typeof MultiCompareChartContainer | typeof BarChartContainer;
 	if (props.chartToRender === chartTypes.line) {
 		ChartToRender = LineChartContainer;
 	} else if (props.chartToRender === chartTypes.compare) {

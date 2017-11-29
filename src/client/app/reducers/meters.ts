@@ -5,7 +5,8 @@
  */
 
 import * as _ from 'lodash';
-import * as metersActions from '../actions/meters';
+import { MetersAction } from '../actions/meters';
+import { ActionType } from '../types/redux';
 
 /**
  * @typedef {Object} State~Meters
@@ -32,14 +33,14 @@ const defaultState: MetersState = {
  * @param action
  * @return {State~Meters}
  */
-export default function meters(state = defaultState, action) {
+export default function meters(state = defaultState, action: MetersAction) {
 	switch (action.type) {
-		case metersActions.REQUEST_METERS_DETAILS:
+		case ActionType.RequestMetersDetails:
 			return {
 				...state,
 				isFetching: true
 			};
-		case metersActions.RECEIVE_METERS_DETAILS:
+		case ActionType.ReceiveMetersDetails:
 			return {
 				...state,
 				isFetching: false,

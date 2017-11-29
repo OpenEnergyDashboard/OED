@@ -5,7 +5,8 @@
 
 import { connect } from 'react-redux';
 import GroupViewComponent from '../../components/groups/GroupViewComponent';
-import { fetchGroupChildrenIfNeeded, changeDisplayMode, beginEditingIfPossible, DISPLAY_MODE } from '../../actions/groups';
+import { fetchGroupChildrenIfNeeded, changeDisplayMode, beginEditingIfPossible, DisplayMode } from '../../actions/groups';
+import { Dispatch, State } from '../../types/redux';
 
 
 /**
@@ -14,7 +15,7 @@ import { fetchGroupChildrenIfNeeded, changeDisplayMode, beginEditingIfPossible, 
  * @param ownProps: ID and Name, passed to this container by GroupMainComponent
  * @return {{name: name of this group}, {id: id of this group}}
  */
-function mapStateToProps(state, ownProps) {
+function mapStateToProps(state: State, ownProps: {id: number}) {
 	const id = ownProps.id;
 	const childMeterNames = state.groups.byGroupID[id].childMeters.map(meterID => state.meters.byMeterID[meterID].name.trim()).sort();
 	const childGroupNames = state.groups.byGroupID[id].childGroups.map(groupID => state.groups.byGroupID[groupID].name.trim()).sort();
@@ -26,11 +27,11 @@ function mapStateToProps(state, ownProps) {
 	};
 }
 
-function mapDispatchToProps(dispatch) {
+function mapDispatchToProps(dispatch: Dispatch) {
 	return {
-		fetchGroupChildren: id => dispatch(fetchGroupChildrenIfNeeded(id)),
-		changeDisplayModeToEdit: () => dispatch(changeDisplayMode(DISPLAY_MODE.EDIT)),
-		beginEditingIfPossible: id => dispatch(beginEditingIfPossible(id))
+		fetchGroupChildren: (id: number) => dispatch(fetchGroupChildrenIfNeeded(id)),
+		changeDisplayModeToEdit: () => dispatch(changeDisplayMode(DisplayMode.Edit)),
+		beginEditingIfPossible: (id: number) => dispatch(beginEditingIfPossible(id))
 	};
 }
 

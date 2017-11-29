@@ -5,16 +5,17 @@
  */
 
 import * as _ from 'lodash';
-import { Bar } from 'react-chartjs-2';
-import { ChartData, ChartDataSets } from 'chart.js';
+import { Bar, ChartComponentProps } from 'react-chartjs-2';
+import { ChartData, ChartDataSets, ChartTooltipItem } from 'chart.js';
 import * as moment from 'moment';
 import { connect } from 'react-redux';
 import getGraphColor from '../utils/getGraphColor';
+import { State } from '../types/redux';
 
 /**
  * @param {State} state
  */
-function mapStateToProps(state) {
+function mapStateToProps(state: State) {
 	const timeInterval = state.graph.timeInterval;
 	const barDuration = state.graph.barDuration;
 	const datasets: ChartDataSets[] = [];
@@ -23,8 +24,8 @@ function mapStateToProps(state) {
 	for (const meterID of state.graph.selectedMeters) {
 		const byMeterID = state.readings.bar.byMeterID[meterID];
 		if (byMeterID !== undefined) {
-			const readingsData = byMeterID[timeInterval][barDuration];
-			if (readingsData !== undefined && !readingsData.isFetching) {
+			const readingsData = byMeterID[timeInterval.toString()][barDuration.toISOString()];
+			if (readingsData !== undefined && readingsData.readings !== undefined && !readingsData.isFetching) {
 				const label = state.meters.byMeterID[meterID].name;
 				const color = getGraphColor(label);
 				datasets.push({
@@ -44,8 +45,8 @@ function mapStateToProps(state) {
 	for (const groupID of state.graph.selectedGroups) {
 		const byGroupID = state.readings.bar.byGroupID[groupID];
 		if (byGroupID !== undefined) {
-			const readingsData = byGroupID[timeInterval][barDuration];
-			if (readingsData !== undefined && !readingsData.isFetching) {
+			const readingsData = byGroupID[timeInterval.toString()][barDuration.toISOString()];
+			if (readingsData !== undefined && readingsData.readings !== undefined && !readingsData.isFetching) {
 				const label = state.groups.byGroupID[groupID].name;
 				const color = getGraphColor(label);
 				datasets.push({
@@ -92,7 +93,7 @@ function mapStateToProps(state) {
 					labelString: 'kW'
 				},
 				ticks: {
-					beginAtZero: true
+					min: 0
 				}
 			}]
 		},
@@ -102,18 +103,26 @@ function mapStateToProps(state) {
 			backgroundColor: 'rgba(0,0,0,0.6)',
 			displayColors: false,
 			callbacks: {
-				label: tooltipItems => `${datasets[tooltipItems.datasetIndex].label}: ${tooltipItems.yLabel} kW`
+				label: (tooltipItems: ChartTooltipItem) => {
+					if (tooltipItems.datasetIndex !== undefined) {
+						return `${datasets[tooltipItems.datasetIndex].label}: ${tooltipItems.yLabel} kW`;
+					} else {
+						throw new Error('tooltipItems.datasetIndex was undefined in line chart tooltip label callback');
+					}
+				}
 			}
 		}
 	};
 
 	const data: ChartData = { datasets, labels };
 
-	return {
+	const props: ChartComponentProps =  {
 		data,
 		options,
 		redraw: true
 	};
+
+	return props;
 }
 
 export default connect(mapStateToProps)(Bar);

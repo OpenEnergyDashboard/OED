@@ -2,27 +2,26 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
 
-import * as PropTypes from 'prop-types';
 import * as React from 'react';
 import Select from 'react-select';
 import 'react-select/dist/react-select.css';
-import { SelectOption } from '../utils/types';
+import { SelectOption } from '../types/items';
 import '../styles/react-select-css.css';
 
-interface MultiSelectProps {
+interface MultiSelectProps<I> {
 	placeholder: string;
-	options: SelectOption[];
-	selectedOptions: SelectOption[] | null;
+	options: Array<SelectOption & I>;
+	selectedOptions: Array<SelectOption & I> | null;
 	style?: React.CSSProperties;
-	onValuesChange(values: SelectOption[]): void;
+	onValuesChange(values: Array<SelectOption & I>): void;
 }
 
 interface MultiSelectState {
 	selectedOptions: SelectOption[];
 }
 
-export default class MultiSelectComponent extends React.Component<MultiSelectProps, MultiSelectState> {
-	constructor(props) {
+export default class MultiSelectComponent<I> extends React.Component<MultiSelectProps<I>, MultiSelectState> {
+	constructor(props: MultiSelectProps<I>) {
 		super(props);
 		this.onValuesChangeInternal = this.onValuesChangeInternal.bind(this);
 		// selectedOptions holds a list of the options that have been selected
@@ -31,7 +30,7 @@ export default class MultiSelectComponent extends React.Component<MultiSelectPro
 		};
 	}
 
-	public componentWillReceiveProps(nextProps) {
+	public componentWillReceiveProps(nextProps: MultiSelectProps<I>) {
 		if (nextProps.selectedOptions) {
 			this.setState({ selectedOptions: nextProps.selectedOptions });
 		}
@@ -52,7 +51,7 @@ export default class MultiSelectComponent extends React.Component<MultiSelectPro
 		);
 	}
 
-	private onValuesChangeInternal(items) {
+	private onValuesChangeInternal(items: Array<SelectOption & I>) {
 		// Defer to the underlying MultiSelect when it has a state change
 		// Note that the MSC state selectedOptions is in fact the canonical source of truth
 		this.setState({ selectedOptions: items });

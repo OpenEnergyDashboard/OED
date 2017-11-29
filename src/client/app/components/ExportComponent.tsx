@@ -6,18 +6,23 @@ import * as React from 'react';
 import { Button } from 'react-bootstrap';
 import * as moment from 'moment';
 import graphExport from '../services/exportData';
+import { ExportDataSet } from '../types/readings';
 
-const ExportComponent = props => {
+interface ExportProps {
+	selectedMeters: number[];
+	exportVals: { datasets: ExportDataSet[] };
+}
+
+export default function ExportComponent(props: ExportProps) {
 	/**
 	 * Called when Export button is clicked.
 	 * Passes an object containing the selected meter data to a function for export.
 	 */
 	const exportReading = () => {
 		const compressedData = props.exportVals.datasets;
-		let time = compressedData[0].exportVals[0].x;
 		const chart = compressedData[0].currentChart;
-		time = moment(time).format('ddddMMMDDYYYY');
-		const name = `oedExport${time}${chart}.csv`;
+		const startTime = moment(compressedData[0].exportVals[0].x).format('ddddMMMDDYYYY');
+		const name = `oedExport${startTime}${chart}.csv`;
 		graphExport(compressedData,	name);
 	};
 	return (
@@ -25,5 +30,4 @@ const ExportComponent = props => {
 			<Button bsStyle='default' onClick={exportReading}>Export graph data</Button>
 		</div>
 	);
-};
-export default ExportComponent;
+}

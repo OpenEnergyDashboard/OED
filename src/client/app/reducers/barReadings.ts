@@ -7,6 +7,7 @@
 
 import * as readingsActions from '../actions/barReadings';
 import { BarReadingsAction } from '../actions/barReadings';
+import { ActionType } from '../types/redux';
 
 /**
  * @typedef {Object} State~BarReadings
@@ -51,7 +52,7 @@ const defaultState: BarReadingsState = {
  */
 export default function readings(state = defaultState, action: BarReadingsAction) {
 	switch (action.type) {
-		case readingsActions.REQUEST_METER_BAR_READINGS: {
+		case ActionType.RequestMeterBarReadings: {
 			const timeInterval = action.timeInterval.toString();
 			const barDuration = action.barDuration.toISOString();
 			const newState = {
@@ -76,7 +77,7 @@ export default function readings(state = defaultState, action: BarReadingsAction
 
 			return newState;
 		}
-		case readingsActions.REQUEST_GROUP_BAR_READINGS: {
+		case ActionType.RequestGroupBarReadings: {
 			const timeInterval = action.timeInterval.toString();
 			const barDuration = action.barDuration.toISOString();
 			const newState = {
@@ -101,7 +102,7 @@ export default function readings(state = defaultState, action: BarReadingsAction
 
 			return newState;
 		}
-		case readingsActions.RECEIVE_METER_BAR_READINGS: {
+		case ActionType.ReceiveMeterBarReadings: {
 			const timeInterval = action.timeInterval.toString();
 			const barDuration = action.barDuration.toISOString();
 			const newState = {
@@ -118,7 +119,7 @@ export default function readings(state = defaultState, action: BarReadingsAction
 
 			return newState;
 		}
-		case readingsActions.RECEIVE_GROUP_BAR_READINGS: {
+		case ActionType.ReceiveGroupBarReadings: {
 			const timeInterval = action.timeInterval.toString();
 			const barDuration = action.barDuration.toISOString();
 			const newState = {

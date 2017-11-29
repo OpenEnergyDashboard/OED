@@ -7,31 +7,25 @@
 import axios from 'axios';
 import * as moment from 'moment';
 import { TimeInterval } from '../../../common/TimeInterval';
-import { State } from '../reducers/index';
-import { BarReadings } from '../utils/types';
-
-export const REQUEST_GROUP_BAR_READINGS = 'REQUEST_GROUP_BAR_READINGS';
-export const RECEIVE_GROUP_BAR_READINGS = 'RECEIVE_GROUP_BAR_READINGS';
-
-export const REQUEST_METER_BAR_READINGS = 'REQUEST_METER_BAR_READINGS';
-export const RECEIVE_METER_BAR_READINGS = 'RECEIVE_METER_BAR_READINGS';
+import { State, Dispatch, GetState, Thunk, ActionType } from '../types/redux';
+import { BarReadings } from '../types/readings';
 
 export interface RequestMeterBarReadingsAction {
-	type: 'REQUEST_METER_BAR_READINGS';
+	type: ActionType.RequestMeterBarReadings;
 	meterIDs: number[];
 	timeInterval: TimeInterval;
 	barDuration: moment.Duration;
 }
 
 export interface RequestGroupBarReadingsAction {
-	type: 'REQUEST_GROUP_BAR_READINGS';
+	type: ActionType.RequestGroupBarReadings;
 	groupIDs: number[];
 	timeInterval: TimeInterval;
 	barDuration: moment.Duration;
 }
 
 export interface ReceiveMeterBarReadingsAction {
-	type: 'RECEIVE_METER_BAR_READINGS';
+	type: ActionType.ReceiveMeterBarReadings;
 	meterIDs: number[];
 	timeInterval: TimeInterval;
 	barDuration: moment.Duration;
@@ -39,7 +33,7 @@ export interface ReceiveMeterBarReadingsAction {
 }
 
 export interface ReceiveGroupBarReadingsAction {
-	type: 'RECEIVE_GROUP_BAR_READINGS';
+	type: ActionType.ReceiveGroupBarReadings;
 	groupIDs: number[];
 	timeInterval: TimeInterval;
 	barDuration: moment.Duration;
@@ -105,21 +99,21 @@ function shouldFetchGroupBarReadings(state: State, groupID: number, timeInterval
 }
 
 function requestMeterBarReadings(meterIDs: number[], timeInterval: TimeInterval, barDuration: moment.Duration): RequestMeterBarReadingsAction {
-	return { type: REQUEST_METER_BAR_READINGS, meterIDs, timeInterval, barDuration };
+	return { type: ActionType.RequestMeterBarReadings, meterIDs, timeInterval, barDuration };
 }
 
-function receiveMeterBarReadings(meterIDs: number[], timeInterval: TimeInterval, barDuration: moment.Duration, readings):
+function receiveMeterBarReadings(meterIDs: number[], timeInterval: TimeInterval, barDuration: moment.Duration, readings: BarReadings):
 	ReceiveMeterBarReadingsAction {
-	return { type: RECEIVE_METER_BAR_READINGS, meterIDs, timeInterval, barDuration, readings };
+	return { type: ActionType.ReceiveMeterBarReadings, meterIDs, timeInterval, barDuration, readings };
 }
 
 function requestGroupBarReadings(groupIDs: number[], timeInterval: TimeInterval, barDuration: moment.Duration): RequestGroupBarReadingsAction {
-	return { type: REQUEST_GROUP_BAR_READINGS, groupIDs, timeInterval, barDuration };
+	return { type: ActionType.RequestGroupBarReadings, groupIDs, timeInterval, barDuration };
 }
 
-function receiveGroupBarReadings(groupIDs: number[], timeInterval: TimeInterval, barDuration: moment.Duration, readings):
+function receiveGroupBarReadings(groupIDs: number[], timeInterval: TimeInterval, barDuration: moment.Duration, readings: BarReadings):
 	ReceiveGroupBarReadingsAction {
-	return { type: RECEIVE_GROUP_BAR_READINGS, groupIDs, timeInterval, barDuration, readings };
+	return { type: ActionType.ReceiveGroupBarReadings, groupIDs, timeInterval, barDuration, readings };
 }
 
 /**
@@ -128,8 +122,8 @@ function receiveGroupBarReadings(groupIDs: number[], timeInterval: TimeInterval,
  * @param {[number]} meterIDs The IDs of the meters whose data should be fetched
  * @param {TimeInterval} timeInterval The time interval over which data should be fetched
  */
-function fetchMeterBarReadings(meterIDs: number[], timeInterval: TimeInterval) {
-	return (dispatch, getState) => {
+function fetchMeterBarReadings(meterIDs: number[], timeInterval: TimeInterval): Thunk {
+	return (dispatch: Dispatch, getState: GetState) => {
 		const barDuration = getState().graph.barDuration;
 		dispatch(requestMeterBarReadings(meterIDs, timeInterval, barDuration));
 		// API expectes a comma-seperated string of IDs
@@ -147,8 +141,8 @@ function fetchMeterBarReadings(meterIDs: number[], timeInterval: TimeInterval) {
  * @param {[number]} groupIDs The IDs of the groups whose data should be fetched
  * @param {TimeInterval} timeInterval The time interval over which data should be fetched
  */
-function fetchGroupBarReadings(groupIDs, timeInterval) {
-	return (dispatch, getState) => {
+function fetchGroupBarReadings(groupIDs: number[], timeInterval: TimeInterval): Thunk {
+	return (dispatch: Dispatch, getState: GetState) => {
 		const barDuration = getState().graph.barDuration;
 		dispatch(requestGroupBarReadings(groupIDs, timeInterval, barDuration));
 		// API expectes a comma-seperated string of IDs
@@ -160,8 +154,8 @@ function fetchGroupBarReadings(groupIDs, timeInterval) {
 	};
 }
 
-function fetchCompareReadings(meterIDs, timeInterval) {
-	return (dispatch, getState) => {
+function fetchCompareReadings(meterIDs: number[], timeInterval: TimeInterval): Thunk {
+	return (dispatch: Dispatch, getState: GetState) => {
 		const barDuration = getState().graph.compareDuration;
 		dispatch(requestMeterBarReadings(meterIDs, timeInterval, barDuration));
 		const stringifiedMeterIDs = meterIDs.join(',');
@@ -176,8 +170,8 @@ function fetchCompareReadings(meterIDs, timeInterval) {
  * @param {TimeInterval} timeInterval The time interval to fetch readings for on the bar chart
  * @return {*} An action to fetch the needed readings
  */
-export function fetchNeededBarReadings(timeInterval) {
-	return (dispatch, getState) => {
+export function fetchNeededBarReadings(timeInterval: TimeInterval): Thunk {
+	return (dispatch: Dispatch, getState: GetState) => {
 		const state = getState();
 		const promises: Array<Promise<any>> = [];
 
@@ -202,7 +196,7 @@ export function fetchNeededBarReadings(timeInterval) {
 	};
 }
 
-export function fetchNeededCompareReadings(timeInterval) {
+export function fetchNeededCompareReadings(timeInterval: TimeInterval): Thunk {
 	return (dispatch, getState) => {
 		const state = getState();
 		const meterIDsToFetchForBar = state.graph.selectedMeters.filter(

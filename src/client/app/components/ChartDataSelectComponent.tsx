@@ -4,7 +4,7 @@
 
 import * as React from 'react';
 import MultiSelectComponent from './MultiSelectComponent';
-import { SelectOption } from '../utils/types';
+import { SelectOption } from '../types/items';
 import { fetchGroupsDetailsIfNeeded } from 'actions/groups';
 
 interface ChartDataSelectProps {
@@ -12,17 +12,17 @@ interface ChartDataSelectProps {
 	groups: SelectOption[];
 	selectedMeters: SelectOption[];
 	selectedGroups: SelectOption[];
-	fetchMetersDetailsIfNeeded(): void;
-	fetchGroupsDetailsIfNeeded(): void;
-	selectMeters(meterIDs: number[]): void;
-	selectGroups(groupIDs: number[]): void;
+	fetchMetersDetailsIfNeeded(): Promise<any>;
+	fetchGroupsDetailsIfNeeded(): Promise<any>;
+	selectMeters(meterIDs: number[]): Promise<any>;
+	selectGroups(groupIDs: number[]): Promise<any>;
 }
 
 /**
  * A component which allows the user to select which data should be displayed on the chart.
  */
 export default class ChartDataSelectComponent extends React.Component<ChartDataSelectProps, {}> {
-	constructor(props) {
+	constructor(props: ChartDataSelectProps) {
 		super(props);
 		this.handleMeterSelect = this.handleMeterSelect.bind(this);
 		this.handleGroupSelect = this.handleGroupSelect.bind(this);

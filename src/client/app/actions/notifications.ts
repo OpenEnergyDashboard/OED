@@ -4,23 +4,16 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/.
  */
 
-export const SHOW_NOTIFICATION = 'SHOW_NOTIFICATION';
-export const CLEAR_NOTIFICATIONS = 'CLEAR_NOTIFICATIONS';
-
-export interface Notification {
-	message: string;
-	level: string;
-	position: string;
-	autoDismiss: number;
-}
+import { ActionType } from '../types/redux';
+import { Notification } from 'react-notification-system';
 
 export interface ShowNotificationAction {
-	type: 'SHOW_NOTIFICATION';
+	type: ActionType.ShowNotification;
 	notification: Notification;
 }
 
 export interface ClearNotificationAction {
-	type: 'CLEAR_NOTIFICATIONS';
+	type: ActionType.ClearNotifications;
 }
 
 export type NotificationAction = ShowNotificationAction | ClearNotificationAction;
@@ -29,10 +22,10 @@ export type NotificationAction = ShowNotificationAction | ClearNotificationActio
  * @param notification object containing { message, level, position, autoDismiss }
  * @returns {{type: string, notification: *}}
  */
-export function showNotification(notification: Notification) {
-	return { type: SHOW_NOTIFICATION, notification };
+export function showNotification(notification: Notification): ShowNotificationAction {
+	return { type: ActionType.ShowNotification, notification };
 }
 
-export function clearNotifications() {
-	return { type: CLEAR_NOTIFICATIONS };
+export function clearNotifications(): ClearNotificationAction {
+	return { type: ActionType.ClearNotifications };
 }

@@ -3,7 +3,7 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
 
 import * as moment from 'moment';
-
+import { ExportDataSet } from '../types/readings';
 
 /**
  * Function to converts the compressed meter data into a CSV formatted string.
@@ -11,7 +11,7 @@ import * as moment from 'moment';
  * @returns output A string containing the CSV formatted compressed meter data.
  */
 
-function convertToCSV(items) {
+function convertToCSV(items: ExportDataSet[]) {
 	let csvOutput = 'Label,Readings,Start Timestamp\n';
 	items.forEach(set => {
 		const data = set.exportVals;
@@ -47,7 +47,7 @@ function downloadCSV(inputCSV: string, fileName: string) {
  * @param dataSets An Object. The compressed data from each meter currently selected in the graph.
  * @param name the name of the file.
  */
-export default function graphExport(dataSets, name: string) {
+export default function graphExport(dataSets: ExportDataSet[], name: string) {
 	const dataToExport = convertToCSV(dataSets);
 	downloadCSV(dataToExport, name);
 }

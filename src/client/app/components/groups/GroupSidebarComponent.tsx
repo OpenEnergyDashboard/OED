@@ -13,7 +13,7 @@ interface GroupSidebarProps {
 }
 
 export default class GroupSidebarComponent extends React.Component<GroupSidebarProps, {}> {
-	constructor(props) {
+	constructor(props: GroupSidebarProps) {
 		super(props);
 		this.handleGroupSelect = this.handleGroupSelect.bind(this);
 		this.handleCreateGroup = this.handleCreateGroup.bind(this);

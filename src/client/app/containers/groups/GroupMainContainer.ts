@@ -8,9 +8,10 @@ import { connect } from 'react-redux';
 import { fetchMetersDetailsIfNeeded } from '../../actions/meters';
 import { fetchGroupsDetailsIfNeeded, changeDisplayedGroups } from '../../actions/groups';
 import GroupMainComponent from '../../components/groups/GroupMainComponent';
+import { Dispatch, State } from '../../types/redux';
 
 
-function mapStateToProps(state) {
+function mapStateToProps(state: State) {
 	const sortedGroups = _.sortBy(_.values(state.groups.byGroupID).map(group => ({ id: group.id, name: group.name.trim() })), 'name');
 	const sortedMeters = _.sortBy(_.values(state.meters.byMeterID).map(meter => ({ id: meter.id, name: meter.name.trim() })), 'name');
 	const selectGroups = state.groups.selectedGroups;
@@ -23,9 +24,9 @@ function mapStateToProps(state) {
 }
 
 
-function mapDispatchToProps(dispatch) {
+function mapDispatchToProps(dispatch: Dispatch) {
 	return {
-		selectGroups: newSelectedGroupIDs => dispatch(changeDisplayedGroups(newSelectedGroupIDs)),
+		selectGroups: (newSelectedGroupIDs: number[]) => dispatch(changeDisplayedGroups(newSelectedGroupIDs)),
 		fetchGroupsDetailsIfNeeded: () => dispatch(fetchGroupsDetailsIfNeeded()),
 		fetchMetersDetailsIfNeeded: () => dispatch(fetchMetersDetailsIfNeeded())
 	};

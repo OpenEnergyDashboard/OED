@@ -8,13 +8,17 @@ import GroupViewContainer from '../../containers/groups/GroupViewContainer';
 import GroupSidebarContainer from '../../containers/groups/GroupSidebarContainer';
 import CreateGroupContainer from '../../containers/groups/CreateGroupContainer';
 import EditGroupsContainer from '../../containers/groups/EditGroupsContainer';
-import { DISPLAY_MODE } from '../../actions/groups';
+import { DisplayMode, ChangeDisplayedGroupsAction } from '../../actions/groups';
+import { NamedIDItem } from '../../types/items';
 
 interface GroupMainProps {
-	displayMode: DISPLAY_MODE;
+	groups: NamedIDItem[];
+	meters: NamedIDItem[];
+	displayMode: DisplayMode;
 	selectedGroups: number[];
-	fetchGroupsDetailsIfNeeded(): void;
-	fetchMetersDetailsIfNeeded(): void;
+	selectGroups(newSelectedGroupIDs: number[]): ChangeDisplayedGroupsAction;
+	fetchGroupsDetailsIfNeeded(): Promise<any>;
+	fetchMetersDetailsIfNeeded(): Promise<any>;
 }
 
 export default class GroupMainComponent extends React.Component<GroupMainProps, {}> {
@@ -29,7 +33,7 @@ export default class GroupMainComponent extends React.Component<GroupMainProps, 
 		};
 		let GroupDisplay: JSX.Element | undefined;
 		switch (this.props.displayMode) {
-			case DISPLAY_MODE.CREATE: {
+			case DisplayMode.Create: {
 				GroupDisplay = (
 					<div>
 						<CreateGroupContainer />
@@ -37,7 +41,7 @@ export default class GroupMainComponent extends React.Component<GroupMainProps, 
 				);
 				break;
 			}
-			case DISPLAY_MODE.EDIT: {
+			case DisplayMode.Edit: {
 				GroupDisplay = (
 					<div>
 						<EditGroupsContainer />
@@ -45,7 +49,7 @@ export default class GroupMainComponent extends React.Component<GroupMainProps, 
 				);
 				break;
 			}
-			case DISPLAY_MODE.VIEW: {
+			case DisplayMode.View: {
 				GroupDisplay = (
 					<div>
 						<div className='col-xs-2' style={divPaddingStyle}>

@@ -7,6 +7,7 @@
 import * as moment from 'moment';
 import { TimeInterval } from '../../../common/TimeInterval';
 import * as graphActions from '../actions/graph';
+import { ActionType } from '../types/redux';
 
 export enum chartTypes {
 	line = 'line',
@@ -22,6 +23,8 @@ export interface GraphState {
 	selectedGroups: number[];
 	timeInterval: TimeInterval;
 	barDuration: moment.Duration;
+	// TODO: Should this be a time interval, potentially?
+	// It causes an (I think justified) type error.
 	compareTimeInterval: number;
 	compareDuration: moment.Duration;
 	chartToRender: chartTypes;
@@ -46,32 +49,32 @@ const defaultState: GraphState = {
  */
 export default function graph(state = defaultState, action: graphActions.GraphAction) {
 	switch (action.type) {
-		case graphActions.UPDATE_SELECTED_METERS:
+		case ActionType.UpdateSelectedMeters:
 			return {
 				...state,
 				selectedMeters: action.meterIDs
 			};
-		case graphActions.UPDATE_SELECTED_GROUPS:
+		case ActionType.UpdateSelectedGroups:
 			return {
 				...state,
 				selectedGroups: action.groupIDs
 			};
-		case graphActions.UPDATE_BAR_DURATION:
+		case ActionType.UpdateBarDuration:
 			return {
 				...state,
 				barDuration: action.barDuration
 			};
-		case graphActions.CHANGE_GRAPH_ZOOM:
+		case ActionType.ChangeGraphZoom:
 			return {
 				...state,
 				timeInterval: action.timeInterval
 			};
-		case graphActions.CHANGE_CHART_TO_RENDER:
+		case ActionType.ChangeChartToRender:
 			return {
 				...state,
 				chartToRender: action.chartType
 			};
-		case graphActions.CHANGE_BAR_STACKING:
+		case ActionType.ChangeBarStacking:
 			return {
 				...state,
 				barStacking: !state.barStacking

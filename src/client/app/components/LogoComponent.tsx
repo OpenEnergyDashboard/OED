@@ -4,12 +4,16 @@
 
 import * as React from 'react';
 
+interface LogoProps {
+	url: string;
+}
+
 /**
  * React component that creates an logo image from a file path
  * @param props The props from the parent component which includes a path url
  * @return JSX to create logo image
  */
-export default function LogoComponent(props) {
+export default function LogoComponent(props: LogoProps) {
 	const imgStyle: React.CSSProperties = {
 		maxWidth: '100%',
 		height: 'auto',
@@ -18,6 +22,6 @@ export default function LogoComponent(props) {
 		position: 'absolute'
 	};
 	return (
-		<img src={props.url} alt="Logo" title="Open Energy Dashboard" style={imgStyle} />
+		<img src={props.url} alt='Logo' title='Open Energy Dashboard' style={imgStyle} />
 	);
 }

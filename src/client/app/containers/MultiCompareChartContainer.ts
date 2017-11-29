@@ -4,8 +4,9 @@
 
 import { connect } from 'react-redux';
 import MultiCompareChartComponent from '../components/MultiCompareChartComponent';
+import { State } from '../types/redux';
 
-function mapStateToProps(state) {
+function mapStateToProps(state: State) {
 	return {
 		selectedMeters: state.graph.selectedMeters
 	};

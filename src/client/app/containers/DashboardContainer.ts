@@ -4,8 +4,9 @@
 
 import { connect } from 'react-redux';
 import DashboardComponent from '../components/DashboardComponent';
+import { State } from '../types/redux';
 
-function mapStateToProps(state) {
+function mapStateToProps(state: State) {
 	return {
 		chartToRender: state.graph.chartToRender,
 	};

@@ -3,12 +3,14 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
 
 import { connect } from 'react-redux';
+import { Notification } from 'react-notification-system';
 import LoginComponent from '../components/LoginComponent';
 import { showNotification } from '../actions/notifications';
+import { Dispatch } from '../types/redux';
 
-function mapDispatchToProps(dispatch) {
+function mapDispatchToProps(dispatch: Dispatch) {
 	return {
-		showNotification: notification => dispatch(showNotification(notification))
+		showNotification: (notification: Notification) => dispatch(showNotification(notification))
 	};
 }
 

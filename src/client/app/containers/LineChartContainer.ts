@@ -4,16 +4,18 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/.
  */
 
-import { Line } from 'react-chartjs-2';
-import { ChartData, ChartDataSets } from 'chart.js';
+import * as _ from 'lodash';
+import { Line, ChartComponentProps } from 'react-chartjs-2';
+import { ChartData, ChartDataSets, ChartPoint, ChartTooltipItem } from 'chart.js';
 import * as moment from 'moment';
 import { connect } from 'react-redux';
 import getGraphColor from '../utils/getGraphColor';
+import { State } from '../types/redux';
 
 /**
  * @param {State} state
  */
-function mapStateToProps(state) {
+function mapStateToProps(state: State) {
 	const timeInterval = state.graph.timeInterval;
 	const datasets: ChartDataSets[] = [];
 
@@ -21,12 +23,20 @@ function mapStateToProps(state) {
 	for (const meterID of state.graph.selectedMeters) {
 		const byMeterID = state.readings.line.byMeterID[meterID];
 		if (byMeterID !== undefined) {
-			const readingsData = byMeterID[timeInterval];
+			const readingsData = byMeterID[timeInterval.toString()];
 			if (readingsData !== undefined && !readingsData.isFetching) {
 				const label = state.meters.byMeterID[meterID].name;
+				if (readingsData.readings === undefined) {
+					throw new Error('Unacceptable condition: readingsData.readings is undefined.');
+				}
+
+				const dataPoints: ChartPoint[] = _.values(readingsData.readings).map(
+					(v: [number, number]) => ({ x: v[0], y: parseInt(v[1].toFixed(2)) })
+				);
+
 				datasets.push({
 					label,
-					data: readingsData.readings.map(arr => ({ x: arr[0], y: arr[1].toFixed(2) })),
+					data: dataPoints,
 					fill: false,
 					borderColor: getGraphColor(label)
 				});
@@ -38,12 +48,20 @@ function mapStateToProps(state) {
 	for (const groupID of state.graph.selectedGroups) {
 		const byGroupID = state.readings.line.byGroupID[groupID];
 		if (byGroupID !== undefined) {
-			const readingsData = byGroupID[timeInterval];
+			const readingsData = byGroupID[timeInterval.toString()];
 			if (readingsData !== undefined && !readingsData.isFetching) {
 				const label = state.groups.byGroupID[groupID].name;
+				if (readingsData.readings === undefined) {
+					throw new Error('Unacceptable condition: readingsData.readings is undefined.');
+				}
+
+				const dataPoints: ChartPoint[] = _.values(readingsData.readings).map(
+					(v: [number, number]) => ({ x: v[0], y: parseInt(v[1].toFixed(2)) })
+				);
+
 				datasets.push({
 					label,
-					data: readingsData.readings.map(arr => ({ x: arr[0], y: arr[1].toFixed(2) })),
+					data: dataPoints,
 					fill: false,
 					borderColor: getGraphColor(label)
 				});
@@ -70,7 +88,7 @@ function mapStateToProps(state) {
 					labelString: 'kW'
 				},
 				ticks: {
-					beginAtZero: true
+					min: 0
 				}
 			}]
 		},
@@ -80,19 +98,27 @@ function mapStateToProps(state) {
 			backgroundColor: 'rgba(0,0,0,0.6)',
 			displayColors: false,
 			callbacks: {
-				title: tooltipItems => `${moment(tooltipItems[0].xLabel).format('dddd, MMM DD, YYYY hh:mm a')}`,
-				label: tooltipItems => `${datasets[tooltipItems.datasetIndex].label}: ${tooltipItems.yLabel} kW`
+				title: (tooltipItems: ChartTooltipItem[]) => `${moment(tooltipItems[0].xLabel).format('dddd, MMM DD, YYYY hh:mm a')}`,
+				label: (tooltipItems: ChartTooltipItem) => {
+					if (tooltipItems.datasetIndex !== undefined) {
+						return `${datasets[tooltipItems.datasetIndex].label}: ${tooltipItems.yLabel} kW`;
+					} else {
+						throw new Error('tooltipItems.datasetIndex was undefined in line chart tooltip label callback');
+					}
+				}
 			}
 		}
 	};
 
 	const data: ChartData = { datasets };
 
-	return {
+	const props: ChartComponentProps = {
 		data,
 		options,
 		redraw: true
 	};
+
+	return props;
 }
 
 export default connect(mapStateToProps)(Line);

@@ -6,17 +6,26 @@
 
 import * as _ from 'lodash';
 import * as groupsActions from '../actions/groups';
+import { ActionType } from '../types/redux';
 
-export interface GroupDefinition {
-	id: number;
-	name: string;
+export interface GroupMetadata {
 	isFetching: boolean;
 	outdated: boolean;
-	childGroups: number[];
-	childMeters: number[];
 	selectedGroups: number[];
 	selectedMeters: number[];
 }
+
+export interface GroupData {
+	name: string;
+	childMeters: number[];
+	childGroups: number[];
+}
+
+export interface GroupID {
+	id: number;
+}
+
+export type GroupDefinition = GroupData & GroupMetadata & GroupID;
 
 export interface StatefulEditable {
 	dirty: boolean;
@@ -38,7 +47,7 @@ export interface GroupsState {
 	};
 	selectedGroups: number[];
 	groupInEditing: GroupDefinition & StatefulEditable | StatefulEditable;
-	displayMode: groupsActions.DISPLAY_MODE;
+	displayMode: groupsActions.DisplayMode;
 }
 
 const defaultState: GroupsState = {
@@ -49,7 +58,7 @@ const defaultState: GroupsState = {
 	groupInEditing: {
 		dirty: false
 	},
-	displayMode: groupsActions.DISPLAY_MODE.VIEW
+	displayMode: groupsActions.DisplayMode.View
 };
 
 /**
@@ -57,15 +66,15 @@ const defaultState: GroupsState = {
  * @param action
  * @return {State~Groups}
  */
-export default function groups(state = defaultState, action) {
+export default function groups(state = defaultState, action: groupsActions.GroupsAction) {
 	switch (action.type) {
 		// The following are reducers related to viewing and fetching groups data
-		case groupsActions.REQUEST_GROUPS_DETAILS:
+		case ActionType.RequestGroupsDetails:
 			return {
 				...state,
 				isFetching: true
 			};
-		case groupsActions.RECEIVE_GROUPS_DETAILS: {
+		case ActionType.ReceiveGroupsDetails: {
 			/*
 			 add new fields to each group object:
 			 isFetching flag for each group
@@ -95,7 +104,7 @@ export default function groups(state = defaultState, action) {
 			};
 		}
 
-		case groupsActions.REQUEST_GROUP_CHILDREN: {
+		case ActionType.RequestGroupChildren: {
 			// Make no changes except setting isFetching = true for the group whose children we are fetching.
 			return {
 				...state,
@@ -110,7 +119,7 @@ export default function groups(state = defaultState, action) {
 			};
 		}
 
-		case groupsActions.RECEIVE_GROUP_CHILDREN: {
+		case ActionType.ReceiveGroupChildren: {
 			// Set isFetching = false for the group, and set the group's children to the arrays in the response.
 			return {
 				...state,
@@ -127,14 +136,14 @@ export default function groups(state = defaultState, action) {
 			};
 		}
 
-		case groupsActions.CHANGE_DISPLAYED_GROUPS: {
+		case ActionType.ChangeDisplayedGroups: {
 			return {
 				...state,
 				selectedGroups: action.groupIDs
 			};
 		}
 
-		case groupsActions.CHANGE_SELECTED_CHILD_GROUPS_PER_GROUP: {
+		case ActionType.ChangeSelectedChildGroupsPerGroup: {
 			return {
 				...state,
 				byGroupID: {
@@ -147,7 +156,7 @@ export default function groups(state = defaultState, action) {
 			};
 		}
 
-		case groupsActions.CHANGE_SELECTED_CHILD_METERS_PER_GROUP: {
+		case ActionType.ChangeSelectedChildMetersPerGroup: {
 			return {
 				...state,
 				byGroupID: {
@@ -161,8 +170,8 @@ export default function groups(state = defaultState, action) {
 		}
 
 		// The following are reducers related to creating and editing groups
-		case groupsActions.CHANGE_GROUPS_UI_DISPLAY_MODE: {
-			const validModes = _.values(groupsActions.DISPLAY_MODE);
+		case ActionType.ChangeGroupsUIDisplayMode: {
+			const validModes = _.values(groupsActions.DisplayMode);
 			if (_.includes(validModes, action.newMode)) {
 				return {
 					...state,
@@ -172,7 +181,7 @@ export default function groups(state = defaultState, action) {
 			return state;
 		}
 
-		case groupsActions.CREATE_NEW_BLANK_GROUP: {
+		case ActionType.CreateNewBlankGroup: {
 			if (!state.groupInEditing.dirty) {
 				return {
 					...state,
@@ -191,7 +200,7 @@ export default function groups(state = defaultState, action) {
 			return state;
 		}
 
-		case groupsActions.BEGIN_EDITING_GROUP: {
+		case ActionType.BeginEditingGroup: {
 			if (!state.groupInEditing.dirty) {
 				const currentGroup = state.byGroupID[action.groupID];
 				const toEdit = {
@@ -210,7 +219,7 @@ export default function groups(state = defaultState, action) {
 			return state;
 		}
 
-		case groupsActions.EDIT_GROUP_NAME: {
+		case ActionType.EditGroupName: {
 			return {
 				...state,
 				groupInEditing: {
@@ -221,7 +230,7 @@ export default function groups(state = defaultState, action) {
 			};
 		}
 
-		case groupsActions.CHANGE_CHILD_GROUPS: {
+		case ActionType.ChangeChildGroups: {
 			return {
 				...state,
 				groupInEditing: {
@@ -232,7 +241,7 @@ export default function groups(state = defaultState, action) {
 			};
 		}
 
-		case groupsActions.CHANGE_CHILD_METERS: {
+		case ActionType.ChangeChildMeters: {
 			return {
 				...state,
 				groupInEditing: {
@@ -243,7 +252,7 @@ export default function groups(state = defaultState, action) {
 			};
 		}
 
-		case groupsActions.MARK_GROUP_IN_EDITING_SUBMITTED: {
+		case ActionType.MarkGroupInEditingSubmitted: {
 			return {
 				...state,
 				groupInEditing: {
@@ -253,7 +262,7 @@ export default function groups(state = defaultState, action) {
 			};
 		}
 
-		case groupsActions.MARK_GROUP_IN_EDITING_NOT_SUBMITTED: {
+		case ActionType.MarkGroupInEditingNotSubmitted: {
 			return {
 				...state,
 				groupInEditing: {
@@ -263,7 +272,7 @@ export default function groups(state = defaultState, action) {
 			};
 		}
 
-		case groupsActions.MARK_GROUP_IN_EDITING_CLEAN: {
+		case ActionType.MarkGroupInEditingClean: {
 			return {
 				...state,
 				groupInEditing: {
@@ -273,7 +282,7 @@ export default function groups(state = defaultState, action) {
 			};
 		}
 
-		case groupsActions.MARK_GROUP_IN_EDITING_DIRTY: {
+		case ActionType.MarkGroupInEditingDirty: {
 			return {
 				...state,
 				groupInEditing: {
@@ -283,14 +292,14 @@ export default function groups(state = defaultState, action) {
 			};
 		}
 
-		case groupsActions.MARK_GROUPS_BY_ID_OUTDATED: {
+		case ActionType.MarkGroupsByIDOutdated: {
 			return {
 				...state,
 				outdated: true
 			};
 		}
 
-		case groupsActions.MARK_ONE_GROUP_OUTDATED: {
+		case ActionType.MarkOneGroupOutdated: {
 			return {
 				...state,
 				byGroupID: {

@@ -6,29 +6,89 @@
 
 import axios from 'axios';
 import getToken from '../utils/getToken';
+import { State, Dispatch, GetState, Thunk, TerminalThunk, ActionType } from '../types/redux';
+import { NamedIDItem } from '../types/items';
+import { StatefulEditable, GroupDefinition, GroupData, GroupID } from '../reducers/groups';
 
-// View and fetching actions
-export const REQUEST_GROUPS_DETAILS = 'REQUEST_GROUPS_DETAILS';
-export const RECEIVE_GROUPS_DETAILS = 'RECEIVE_GROUPS_DETAILS';
+export type GroupsAction =
+	| RequestGroupsDetailsAction
+	| ReceiveGroupsDetailsAction
+	| RequestGroupChildrenAction
+	| ReceiveGroupChildrenAction
+	| ChangeDisplayedGroupsAction
+	| ChangeSelectedChildGroupsPerGroupAction
+	| ChangeSelectedChildMetersPerGroupAction
+	| ChangeDisplayModeAction
+	| CreateNewBlankGroupAction
+	| BeginEditingGroupAction
+	| EditGroupNameAction
+	| ChangeChildGroupsAction
+	| ChangeChildMetersAction
+	| MarkGroupInEditingSubmittedAction
+	| MarkGroupInEditingNotSubmittedAction
+	| MarkGroupInEditingCleanAction
+	| MarkGroupInEditingDirtyAction
+	| MarkGroupsOutdatedAction
+	| MarkOneGroupOutdatedAction;
 
-export const REQUEST_GROUP_CHILDREN = 'REQUEST_GROUP_CHILDREN';
-export const RECEIVE_GROUP_CHILDREN = 'RECEIVE_GROUP_CHILDREN';
-
-export const CHANGE_SELECTED_CHILD_GROUPS_PER_GROUP = 'CHANGE_SELECTED_CHILD_GROUPS_PER_GROUP';
-export const CHANGE_SELECTED_CHILD_METERS_PER_GROUP = 'CHANGE_SELECTED_CHILD_METERS_PER_GROUP';
-export const CHANGE_DISPLAYED_GROUPS = 'CHANGE_DISPLAYED_GROUPS';
-
-// Viewing and fetching functions
-
-function requestGroupsDetails() {
-	return { type: REQUEST_GROUPS_DETAILS };
+export interface RequestGroupsDetailsAction {
+	type: ActionType.RequestGroupsDetails;
 }
 
-function receiveGroupsDetails(data) {
-	return { type: RECEIVE_GROUPS_DETAILS, data };
+export interface ReceiveGroupsDetailsAction {
+	type: ActionType.ReceiveGroupsDetails;
+	data: NamedIDItem[];
 }
 
-function fetchGroupsDetails() {
+export interface RequestGroupChildrenAction {
+	type: ActionType.RequestGroupChildren;
+	groupID: number;
+}
+
+export interface ReceiveGroupChildrenAction {
+	type: ActionType.ReceiveGroupChildren;
+	groupID: number;
+	data: {meters: number[], groups: number[]};
+}
+
+export interface ChangeDisplayedGroupsAction {
+	type: ActionType.ChangeDisplayedGroups;
+	groupIDs: number[];
+}
+
+export interface ChangeSelectedChildGroupsPerGroupAction {
+	type: ActionType.ChangeSelectedChildGroupsPerGroup;
+	parentID: number;
+	groupIDs: number[];
+}
+
+export interface ChangeSelectedChildMetersPerGroupAction {
+	type: ActionType.ChangeSelectedChildMetersPerGroup;
+	parentID: number;
+	meterIDs: number[];
+}
+
+function requestGroupsDetails(): RequestGroupsDetailsAction {
+	return { type: ActionType.RequestGroupsDetails };
+}
+
+function receiveGroupsDetails(data: NamedIDItem[]): ReceiveGroupsDetailsAction {
+	return { type: ActionType.ReceiveGroupsDetails, data };
+}
+
+function requestGroupChildren(groupID: number): RequestGroupChildrenAction {
+	return { type: ActionType.RequestGroupChildren, groupID };
+}
+
+function receiveGroupChildren(groupID: number, data: {meters: number[], groups: number[]}): ReceiveGroupChildrenAction {
+	return { type: ActionType.ReceiveGroupChildren, groupID, data };
+}
+
+export function changeDisplayedGroups(groupIDs: number[]): ChangeDisplayedGroupsAction {
+	return { type: ActionType.ChangeDisplayedGroups, groupIDs };
+}
+
+function fetchGroupsDetails(): Thunk {
 	return dispatch => {
 		dispatch(requestGroupsDetails());
 		// Returns the names and IDs of all groups in the groups table.
@@ -42,14 +102,14 @@ function fetchGroupsDetails() {
 /**
  * @param {State} state
  */
-function shouldFetchGroupsDetails(state) {
+function shouldFetchGroupsDetails(state: State): boolean {
 	return !state.groups.isFetching && state.groups.outdated;
 }
 
 /**
  * @returns {function(*, *)}
  */
-export function fetchGroupsDetailsIfNeeded() {
+export function fetchGroupsDetailsIfNeeded(): Thunk {
 	return (dispatch, getState) => {
 		if (shouldFetchGroupsDetails(getState())) {
 			return dispatch(fetchGroupsDetails());
@@ -58,22 +118,14 @@ export function fetchGroupsDetailsIfNeeded() {
 	};
 }
 
-function requestGroupChildren(groupID) {
-	return { type: REQUEST_GROUP_CHILDREN, groupID };
-}
-
-function receiveGroupChildren(groupID, data) {
-	return { type: RECEIVE_GROUP_CHILDREN, groupID, data };
-}
-
-function shouldFetchGroupChildren(state, groupID) {
+function shouldFetchGroupChildren(state: State, groupID: number) {
 	const group = state.groups.byGroupID[groupID];
 	// Check that the group is outdated AND that it is not being fetched.
 	return group.outdated && !group.isFetching;
 }
 
-function fetchGroupChildren(groupID) {
-	return dispatch => {
+function fetchGroupChildren(groupID: number) {
+	return (dispatch: Dispatch) => {
 		dispatch(requestGroupChildren(groupID));
 		return axios.get(`api/groups/children/${groupID}`)
 			.then(response => dispatch(receiveGroupChildren(groupID, response.data)));
@@ -84,17 +136,13 @@ function fetchGroupChildren(groupID) {
  * @param groupID
  * @returns {function(*, *)}
  */
-export function fetchGroupChildrenIfNeeded(groupID) {
-	return (dispatch, getState) => {
+export function fetchGroupChildrenIfNeeded(groupID: number) {
+	return (dispatch: Dispatch, getState: GetState) => {
 		if (shouldFetchGroupChildren(getState(), groupID)) {
 			return dispatch(fetchGroupChildren(groupID));
 		}
 		return Promise.resolve();
 	};
-}
-
-export function changeDisplayedGroups(groupIDs) {
-	return { type: CHANGE_DISPLAYED_GROUPS, groupIDs };
 }
 
 /**
@@ -104,8 +152,8 @@ export function changeDisplayedGroups(groupIDs) {
  * @param groupIDs The IDs of the new set of selected subgroups
  * @return {{type: string, groupIDs: *}}
  */
-export function changeSelectedChildGroupsOfGroup(parentID, groupIDs) {
-	return { type: CHANGE_SELECTED_CHILD_GROUPS_PER_GROUP, parentID, groupIDs };
+export function changeSelectedChildGroupsOfGroup(parentID: number, groupIDs: number[]): ChangeSelectedChildGroupsPerGroupAction {
+	return { type: ActionType.ChangeSelectedChildGroupsPerGroup, parentID, groupIDs };
 }
 
 /**
@@ -115,59 +163,95 @@ export function changeSelectedChildGroupsOfGroup(parentID, groupIDs) {
  * @param meterIDs The IDs of the new set of selected child meters
  * @return {{type: string, parentID: *, meterIDs: *}}
  */
-export function changeSelectedChildMetersOfGroup(parentID, meterIDs) {
-	return { type: CHANGE_SELECTED_CHILD_METERS_PER_GROUP, parentID, meterIDs };
+export function changeSelectedChildMetersOfGroup(parentID: number, meterIDs: number[]): ChangeSelectedChildMetersPerGroupAction {
+	return { type: ActionType.ChangeSelectedChildMetersPerGroup, parentID, meterIDs };
 }
 
 
 /*
- * The following are the action definitions and functions related to creation and editing of groups.
- * The functions are listed generally in the same order as the related action definitions.
+ * The following are functions related to creation and editing of groups.
  */
-export const CHANGE_GROUPS_UI_DISPLAY_MODE = 'CHANGE_GROUPS_UI_DISPLAY_MODE';
 
-export const CREATE_NEW_BLANK_GROUP = 'CREATE_NEW_BLANK_GROUP';
-export const BEGIN_EDITING_GROUP = 'BEGIN_EDITING_GROUP';
+export enum DisplayMode { View = 'view', Edit = 'edit', Create = 'create' }
 
-export const EDIT_GROUP_NAME = 'EDIT_GROUP_NAME';
-export const CHANGE_CHILD_GROUPS = 'CHANGE_CHILD_GROUPS';
-export const CHANGE_CHILD_METERS = 'CHANGE_CHILD_METERS';
+export interface ChangeDisplayModeAction {
+	type: ActionType.ChangeGroupsUIDisplayMode;
+	newMode: DisplayMode;
+}
 
-export const MARK_GROUP_IN_EDITING_SUBMITTED = 'MARK_GROUP_IN_EDITING_SUBMITTED';
-export const MARK_GROUP_IN_EDITING_NOT_SUBMITTED = 'MARK_GROUP_IN_EDITING_NOT_SUBMITTED';
+export interface CreateNewBlankGroupAction {
+	type: ActionType.CreateNewBlankGroup;
+}
 
-export const MARK_GROUP_IN_EDITING_CLEAN = 'MARK_GROUP_IN_EDITING_CLEAN';
-export const MARK_GROUP_IN_EDITING_DIRTY = 'MARK_GROUP_IN_EDITING_DIRTY';
+export interface BeginEditingGroupAction {
+	type: ActionType.BeginEditingGroup;
+	groupID: number;
+}
 
-export const MARK_GROUPS_BY_ID_OUTDATED = 'MARK_GROUPS_BY_ID_OUTDATED';
+export interface EditGroupNameAction {
+	type: ActionType.EditGroupName;
+	newName: string;
+}
 
-export const MARK_ONE_GROUP_OUTDATED = 'MARK_ONE_GROUP_OUTDATED';
-export enum DISPLAY_MODE { VIEW = 'view', EDIT = 'edit', CREATE = 'create' }
+export interface ChangeChildGroupsAction {
+	type: ActionType.ChangeChildGroups;
+	groupIDs: number[];
+}
+
+export interface ChangeChildMetersAction {
+	type: ActionType.ChangeChildMeters;
+	meterIDs: number[];
+}
+
+export interface MarkGroupInEditingSubmittedAction {
+	type: ActionType.MarkGroupInEditingSubmitted;
+}
+
+export interface MarkGroupInEditingNotSubmittedAction {
+	type: ActionType.MarkGroupInEditingNotSubmitted;
+}
+
+export interface MarkGroupInEditingCleanAction {
+	type: ActionType.MarkGroupInEditingClean;
+}
+
+export interface MarkGroupInEditingDirtyAction {
+	type: ActionType.MarkGroupInEditingDirty;
+}
+
+export interface MarkGroupsOutdatedAction {
+	type: ActionType.MarkGroupsByIDOutdated;
+}
+
+export interface MarkOneGroupOutdatedAction {
+	type: ActionType.MarkOneGroupOutdated;
+	groupID: number;
+}
 
 /**
  * Change the display mode of the groups page
  * @param newMode Either 'view', 'edit', or 'create'
  * @return {{type: string, newMode: String}}
  */
-export function changeDisplayMode(newMode) {
-	return { type: CHANGE_GROUPS_UI_DISPLAY_MODE, newMode };
+export function changeDisplayMode(newMode: DisplayMode): ChangeDisplayModeAction {
+	return { type: ActionType.ChangeGroupsUIDisplayMode, newMode };
 }
 
 /**
  * Set state.groups.groupInEditing to a blank group
  * @return {{type: string}}
  */
-export function createNewBlankGroup() {
-	return { type: CREATE_NEW_BLANK_GROUP };
+export function createNewBlankGroup(): CreateNewBlankGroupAction {
+	return { type: ActionType.CreateNewBlankGroup };
 }
 
 // Fire the action to actually overwrite `groupInEditing`
-function beginEditingGroup(groupID) {
-	return { type: BEGIN_EDITING_GROUP, groupID };
+function beginEditingGroup(groupID: number): BeginEditingGroupAction {
+	return { type: ActionType.BeginEditingGroup, groupID };
 }
 
 // Check if `groupInEditing` is clean (can it be overwritten).
-function canBeginEditing(state) {
+function canBeginEditing(state: State): boolean {
 	return !state.groups.groupInEditing.dirty;
 }
 
@@ -176,7 +260,7 @@ function canBeginEditing(state) {
  * @param groupID The ID of the group to be edited
  * @return {function(*, *)}
  */
-export function beginEditingIfPossible(groupID) {
+export function beginEditingIfPossible(groupID: number): TerminalThunk {
 	return (dispatch, getState) => {
 		if (canBeginEditing(getState())) {
 			dispatch(fetchGroupChildrenIfNeeded(groupID));
@@ -190,8 +274,8 @@ export function beginEditingIfPossible(groupID) {
  * @param newName The new name
  * @return {{type: string, newName: String}}
  */
-export function editGroupName(newName) {
-	return { type: EDIT_GROUP_NAME, newName };
+export function editGroupName(newName: string): EditGroupNameAction {
+	return { type: ActionType.EditGroupName, newName };
 }
 
 /**
@@ -199,24 +283,24 @@ export function editGroupName(newName) {
  * @param groupIDs IDs of the new child groups
  * @return {{type: string, groupIDs: [Int]}}
  */
-export function changeChildGroups(groupIDs) {
-	return { type: CHANGE_CHILD_GROUPS, groupIDs };
+export function changeChildGroups(groupIDs: number[]): ChangeChildGroupsAction {
+	return { type: ActionType.ChangeChildGroups, groupIDs };
 }
 /**
  * Change the child meters of the group in editing
  * @param meterIDs IDs of the new set of child meters
  * @return {{type: string, meterIDs: [Int]}}
  */
-export function changeChildMeters(meterIDs) {
-	return { type: CHANGE_CHILD_METERS, meterIDs };
+export function changeChildMeters(meterIDs: number[]): ChangeChildMetersAction {
+	return { type: ActionType.ChangeChildMeters, meterIDs };
 }
 
 // Record whether or not a request to submit edits to the database has been sent
-function markGroupInEditingSubmitted() {
-	return { type: MARK_GROUP_IN_EDITING_SUBMITTED };
+function markGroupInEditingSubmitted(): MarkGroupInEditingSubmittedAction {
+	return { type: ActionType.MarkGroupInEditingSubmitted };
 }
-function markGroupInEditingNotSubmitted() {
-	return { type: MARK_GROUP_IN_EDITING_NOT_SUBMITTED };
+function markGroupInEditingNotSubmitted(): MarkGroupInEditingNotSubmittedAction {
+	return { type: ActionType.MarkGroupInEditingNotSubmitted };
 }
 
 /**
@@ -225,12 +309,12 @@ function markGroupInEditingNotSubmitted() {
  * It is not clean until a request to store the changes has received a successful response.
  * @return {{type: string}}
  */
-export function markGroupInEditingClean() {
-	return { type: MARK_GROUP_IN_EDITING_CLEAN };
+export function markGroupInEditingClean(): MarkGroupInEditingCleanAction {
+	return { type: ActionType.MarkGroupInEditingClean };
 }
 
-function markGroupInEditingDirty() {
-	return { type: MARK_GROUP_IN_EDITING_DIRTY };
+function markGroupInEditingDirty(): MarkGroupInEditingDirtyAction {
+	return { type: ActionType.MarkGroupInEditingDirty };
 }
 
 /*
@@ -238,8 +322,8 @@ function markGroupInEditingDirty() {
  * This data is out of date when the name of a group may have changed, or when a group ahs been created.
  * groupDetails will be re-fetched at the next opportunity.
  */
-function markGroupsOutdated() {
-	return { type: MARK_GROUPS_BY_ID_OUTDATED };
+function markGroupsOutdated(): MarkGroupsOutdatedAction {
+	return { type: ActionType.MarkGroupsByIDOutdated };
 }
 /*
  * Mark a single group as outdated.
@@ -247,18 +331,19 @@ function markGroupsOutdated() {
  * This is not essential at the moment, but will become essential when we try to limit the number of times we fetch all
  * groups.
  */
-function markOneGroupOutdated(groupID) {
-	return { type: MARK_ONE_GROUP_OUTDATED, groupID };
+function markOneGroupOutdated(groupID: number): MarkOneGroupOutdatedAction {
+	return { type: ActionType.MarkOneGroupOutdated, groupID };
 }
 
-function shouldSubmitGroupInEditing(state) {
+function shouldSubmitGroupInEditing(state: State): boolean {
 	// Should submit if there are uncommitted changes and they have not already been submitted
 	return state.groups.groupInEditing.dirty && !(state.groups.groupInEditing.submitted);
 }
 
-function creatingNewGroup(state) {
+function creatingNewGroup(state: State): boolean {
 	// If the group in editing lacks an ID, we are creating a new group
-	return (state.groups.groupInEditing.id === undefined);
+	const id = state.groups.groupInEditing as GroupDefinition;
+	return (id === undefined);
 }
 
 /*
@@ -266,7 +351,7 @@ function creatingNewGroup(state) {
  * `submitGroupInEditingIfNeeded` to handle sending the API request
  * and processing the response.
  */
-function submitNewGroup(group) {
+function submitNewGroup(group: GroupData): Thunk {
 	return dispatch => {
 		dispatch(markGroupInEditingSubmitted());
 		return axios.post('api/groups/create', group)
@@ -274,17 +359,18 @@ function submitNewGroup(group) {
 				dispatch(markGroupsOutdated());
 				dispatch(dispatch2 => {
 					dispatch2(markGroupInEditingClean());
-					dispatch2(changeDisplayMode(DISPLAY_MODE.VIEW));
+					dispatch2(changeDisplayMode(DisplayMode.View));
 				});
 			})
 			.catch(error => {
 				dispatch(markGroupInEditingNotSubmitted());
+				// tslint:disable-next-line no-console
 				console.error(error);
 			});
 	};
 }
 
-function submitGroupEdits(group) {
+function submitGroupEdits(group: GroupData & GroupID): Thunk {
 	return dispatch => {
 		dispatch(markGroupInEditingSubmitted());
 		return axios.put('api/groups/edit', group)
@@ -293,11 +379,12 @@ function submitGroupEdits(group) {
 				dispatch(markOneGroupOutdated(group.id));
 				dispatch(dispatch2 => {
 					dispatch2(markGroupInEditingClean());
-					dispatch2(changeDisplayMode(DISPLAY_MODE.VIEW));
+					dispatch2(changeDisplayMode(DisplayMode.View));
 				});
 			})
 			.catch(error => {
 				dispatch(markGroupInEditingNotSubmitted());
+				// tslint:disable-next-line no-console
 				console.error(error);
 			});
 	};
@@ -311,14 +398,17 @@ function submitGroupEdits(group) {
  * @return {function(*, *)}
  */
 export function submitGroupInEditingIfNeeded() {
-	return (dispatch, getState) => {
+	return (dispatch: Dispatch, getState: GetState) => {
 		if (shouldSubmitGroupInEditing(getState())) {
-			const rawGroup = getState().groups.groupInEditing;
+			const rawGroup = getState().groups.groupInEditing as GroupDefinition;
+			if (rawGroup === undefined) {
+				throw new Error('Unacceptable condition: state.groups.groupInEditing has no data.');
+			}
 			const group = {
 				token: getToken(),
 				name: rawGroup.name,
 				childGroups: rawGroup.childGroups,
-				childMeters: rawGroup.childMeters,
+				childMeters: rawGroup.childMeters
 			};
 			if (creatingNewGroup(getState())) {
 				return dispatch(submitNewGroup(group));
@@ -338,11 +428,15 @@ export function submitGroupInEditingIfNeeded() {
  * Deletes the group in editing
  * @returns {function(*, *)}
  */
-export function deleteGroup() {
+export function deleteGroup(): TerminalThunk {
 	return (dispatch, getState) => {
 		dispatch(markGroupInEditingDirty());
+		const groupInEditing = getState().groups.groupInEditing as GroupDefinition;
+		if (groupInEditing === undefined) {
+			throw new Error('Unacceptable condition: state.groups.groupInEditing has no data.');
+		}
 		const params = {
-			id: getState().groups.groupInEditing.id,
+			groupInEditing,
 			token: getToken()
 		};
 		return axios.post('api/groups/delete', params)
@@ -351,7 +445,7 @@ export function deleteGroup() {
 				dispatch(changeDisplayedGroups([]));
 				dispatch(dispatch2 => {
 					dispatch2(markGroupInEditingClean());
-					dispatch2(changeDisplayMode('view'));
+					dispatch2(changeDisplayMode(DisplayMode.View));
 				});
 			})
 			.catch(console.error);

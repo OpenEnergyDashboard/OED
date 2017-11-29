@@ -10,28 +10,35 @@ import {
 	submitGroupInEditingIfNeeded,
 	editGroupName,
 	changeDisplayMode,
-	DISPLAY_MODE,
+	DisplayMode,
 	changeChildMeters,
 	changeChildGroups,
 	deleteGroup } from '../../actions/groups';
+import { StatefulEditable, GroupDefinition } from '../../reducers/groups';
+import { State, Dispatch } from '../../types/redux';
 
 /**
  * @param {State} state
  * @return {{meters: *, groups: *}}
  */
-function mapStateToProps(state) {
+function mapStateToProps(state: State) {
 	const allMeters = _.sortBy(_.values(state.meters.byMeterID).map(meter => ({ id: meter.id, name: meter.name.trim() })), 'name');
 	let allGroups = _.sortBy(_.values(state.groups.byGroupID).map(group => ({ id: group.id, name: group.name.trim() })), 'name');
-	allGroups = allGroups.filter(group => group.id !== state.groups.groupInEditing.id);
 
-	const allMetersExceptChildMeters = allMeters.filter(meter => !_.includes(state.groups.groupInEditing.childMeters, meter.id));
-	const allGroupsExceptChildGroups = allGroups.filter(group => !_.includes(state.groups.groupInEditing.childGroups, group.id));
+	const groupInEditing = state.groups.groupInEditing as GroupDefinition;
+	if (groupInEditing === undefined) {
+		throw new Error('Unacceptable condition: state.groups.groupInEditing has no data.');
+	}
+	allGroups = allGroups.filter(group => group.id !== groupInEditing.id);
 
-	const childMeters = _.sortBy(state.groups.groupInEditing.childMeters.map(meterID => ({
+	const allMetersExceptChildMeters = allMeters.filter(meter => !_.includes(groupInEditing.childMeters, meter.id));
+	const allGroupsExceptChildGroups = allGroups.filter(group => !_.includes(groupInEditing.childGroups, group.id));
+
+	const childMeters = _.sortBy(groupInEditing.childMeters.map((meterID: number) => ({
 		name: state.meters.byMeterID[meterID].name.trim(),
 		id: meterID
 	})), 'name');
-	const childGroups = _.sortBy(state.groups.groupInEditing.childGroups.map(groupID => ({
+	const childGroups = _.sortBy(groupInEditing.childGroups.map((groupID: number) => ({
 		name: state.groups.byGroupID[groupID].name.trim(),
 		id: groupID
 	})), 'name');
@@ -41,18 +48,18 @@ function mapStateToProps(state) {
 		allGroupsExceptChildGroups,
 		childMeters,
 		childGroups,
-		name: state.groups.groupInEditing.name
+		name: groupInEditing.name
 	};
 }
 
-function mapDispatchToProps(dispatch) {
+function mapDispatchToProps(dispatch: Dispatch) {
 	return {
 		submitGroupInEditingIfNeeded: () => dispatch(submitGroupInEditingIfNeeded()),
 		deleteGroup: () => dispatch(deleteGroup()),
-		editGroupName: name => dispatch(editGroupName(name)),
-		changeDisplayModeToView: () => dispatch(changeDisplayMode(DISPLAY_MODE.VIEW)),
-		changeChildMeters: meterIDs => dispatch(changeChildMeters(meterIDs)),
-		changeChildGroups: groupIDs => dispatch(changeChildGroups(groupIDs))
+		editGroupName: (name: string) => dispatch(editGroupName(name)),
+		changeDisplayModeToView: () => dispatch(changeDisplayMode(DisplayMode.View)),
+		changeChildMeters: (meterIDs: number[]) => dispatch(changeChildMeters(meterIDs)),
+		changeChildGroups: (groupIDs: number[]) => dispatch(changeChildGroups(groupIDs))
 	};
 }
 

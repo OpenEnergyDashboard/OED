@@ -6,10 +6,11 @@
 import * as _ from 'lodash';
 import { connect } from 'react-redux';
 import { fetchMetersDetailsIfNeeded } from '../../actions/meters';
-import { fetchGroupsDetailsIfNeeded, changeDisplayedGroups, changeDisplayMode, DISPLAY_MODE } from '../../actions/groups';
+import { fetchGroupsDetailsIfNeeded, changeDisplayedGroups, changeDisplayMode, DisplayMode } from '../../actions/groups';
 import GroupSidebarComponent from '../../components/groups/GroupSidebarComponent';
+import { State, Dispatch } from '../../types/redux';
 
-function mapStateToProps(state) {
+function mapStateToProps(state: State) {
 	const sortedGroups = _.sortBy(_.values(state.groups.byGroupID).map(group => ({ id: group.id, name: group.name.trim() })), 'name');
 	return {
 		groups: sortedGroups,
@@ -18,12 +19,12 @@ function mapStateToProps(state) {
 }
 
 
-function mapDispatchToProps(dispatch) {
+function mapDispatchToProps(dispatch: Dispatch) {
 	return {
-		selectGroups: newSelectedGroupIDs => dispatch(changeDisplayedGroups(newSelectedGroupIDs)),
+		selectGroups: (newSelectedGroupIDs: number[]) => dispatch(changeDisplayedGroups(newSelectedGroupIDs)),
 		fetchGroupsDetailsIfNeeded: () => dispatch(fetchGroupsDetailsIfNeeded()),
 		fetchMetersDetailsIfNeeded: () => dispatch(fetchMetersDetailsIfNeeded()),
-		changeDisplayModeToCreate: () => dispatch(changeDisplayMode(DISPLAY_MODE.CREATE))
+		changeDisplayModeToCreate: () => dispatch(changeDisplayMode(DisplayMode.Create))
 	};
 }
 

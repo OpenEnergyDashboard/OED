@@ -2,27 +2,12 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
 
-export enum DataType {
-	Meter = 'DATA_TYPE_METER',
-	Group = 'DATA_TYPE_GROUP'
-}
+import { DataType, DatasourceID } from '../types/Datasources';
 
 // Signifies that the containing object represents a meter
 export const DATA_TYPE_METER = DataType.Meter;
 // Signifies that the containing object represents a group of meters and groups
 export const DATA_TYPE_GROUP = DataType.Group;
-
-interface GroupID {
-	type: 'DATA_TYPE_GROUP';
-	value: number;
-}
-
-interface MeterID {
-	type: 'DATA_TYPE_METER';
-	value: number;
-}
-
-type DatasourceID = GroupID | MeterID;
 
 /**
  * Put item's id field in tgt if the item specifies a meter

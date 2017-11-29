@@ -7,7 +7,8 @@
 import axios from 'axios';
 import * as moment from 'moment';
 import { TimeInterval } from '../../../common/TimeInterval';
-import { LineReadings } from '../utils/types';
+import { LineReadings } from '../types/readings';
+import { Thunk, Dispatch, State } from '../types/redux';
 
 export const REQUEST_GROUP_LINE_READINGS = 'REQUEST_GROUP_LINE_READINGS';
 export const RECEIVE_GROUP_LINE_READINGS = 'RECEIVE_GROUP_LINE_READINGS';
@@ -53,7 +54,7 @@ export type LineReadingsAction =
  * @param {TimeInterval} timeInterval The time interval to check
  * @returns {bool} True if the line readings for the given group at the given time are missing, false otherwise
  */
-function shouldFetchGroupLineReadings(state, groupID: number, timeInterval: TimeInterval): boolean {
+function shouldFetchGroupLineReadings(state: State, groupID: number, timeInterval: TimeInterval): boolean {
 	const timeIntervalIndex = timeInterval.toString();
 	const readingsForID = state.readings.line.byGroupID[groupID];
 	if (readingsForID === undefined) {
@@ -74,7 +75,7 @@ function shouldFetchGroupLineReadings(state, groupID: number, timeInterval: Time
  * @param {TimeInterval} timeInterval The time interval to check
  * @returns {bool} True if the line readings for the given meter at the given time are missing, false otherwise
  */
-function shouldFetchMeterLineReadings(state, meterID: number, timeInterval: TimeInterval): boolean {
+function shouldFetchMeterLineReadings(state: State, meterID: number, timeInterval: TimeInterval): boolean {
 	const timeIntervalIndex = timeInterval.toString();
 	const readingsForID = state.readings.line.byMeterID[meterID];
 	if (readingsForID === undefined) {
@@ -102,7 +103,7 @@ function requestMeterLineReadings(meterIDs: number[], timeInterval: TimeInterval
  * @param {TimeInterval} timeInterval The time interval over which data has been fetched
  * @param {*} readings The data that has been fetched, indexed by meter ID.
  */
-function receiveMeterLineReadings(meterIDs: number[], timeInterval: TimeInterval, readings): ReceiveMeterLineReadingsAction {
+function receiveMeterLineReadings(meterIDs: number[], timeInterval: TimeInterval, readings: LineReadings): ReceiveMeterLineReadingsAction {
 	return { type: RECEIVE_METER_LINE_READINGS, meterIDs, timeInterval, readings };
 }
 
@@ -119,7 +120,7 @@ function requestGroupLineReadings(groupIDs: number[], timeInterval: TimeInterval
  * @param {TimeInterval} timeInterval The time interval over which data has been fetched
  * @param {*} readings The data that has been fetched, indexed by group ID.
  */
-function receiveGroupLineReadings(groupIDs: number[], timeInterval: TimeInterval, readings): ReceiveGroupLineReadingsAction {
+function receiveGroupLineReadings(groupIDs: number[], timeInterval: TimeInterval, readings: LineReadings): ReceiveGroupLineReadingsAction {
 	return { type: RECEIVE_GROUP_LINE_READINGS, groupIDs, timeInterval, readings };
 }
 
@@ -128,7 +129,7 @@ function receiveGroupLineReadings(groupIDs: number[], timeInterval: TimeInterval
  * @param {[number]} meterIDs The IDs of the meters whose data should be fetched
  * @param {TimeInterval} timeInterval The time interval over which data should be fetched
  */
-function fetchMeterLineReadings(meterIDs: number[], timeInterval: TimeInterval) {
+function fetchMeterLineReadings(meterIDs: number[], timeInterval: TimeInterval): Thunk {
 	return dispatch => {
 		dispatch(requestMeterLineReadings(meterIDs, timeInterval));
 		// The api expects the meter IDs to be a comma-separated list.
@@ -144,7 +145,7 @@ function fetchMeterLineReadings(meterIDs: number[], timeInterval: TimeInterval) 
  * @param {[number]} groupIDs The IDs of the groups whose data should be fetched
  * @param {TimeInterval} timeInterval The time interval over which data should be fetched
  */
-function fetchGroupLineReadings(groupIDs: number[], timeInterval: TimeInterval) {
+function fetchGroupLineReadings(groupIDs: number[], timeInterval: TimeInterval): Thunk {
 	return dispatch => {
 		dispatch(requestGroupLineReadings(groupIDs, timeInterval));
 		// The api expects the group IDs to be a comma-separated list.
@@ -160,7 +161,7 @@ function fetchGroupLineReadings(groupIDs: number[], timeInterval: TimeInterval) 
  * @param {TimeInterval} timeInterval The time interval to fetch readings for on the line chart
  * @return {*} Promise resolution of async actions to fetch the needed readings.
  */
-export function fetchNeededLineReadings(timeInterval: TimeInterval) {
+export function fetchNeededLineReadings(timeInterval: TimeInterval): Thunk {
 	return (dispatch, getState) => {
 		const state = getState();
 		const promises: Array<Promise<any>> = [];

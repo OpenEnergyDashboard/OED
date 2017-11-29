@@ -5,11 +5,12 @@
 import * as React from 'react';
 import axios from 'axios';
 import { browserHistory } from 'react-router';
+import { Notification } from 'react-notification-system';
 import HeaderComponent from '../components/HeaderComponent';
-import { Notification } from '../actions/notifications';
+import { ShowNotificationAction } from '../actions/notifications';
 
 interface LoginProps {
-	showNotification(notification: Notification): void;
+	showNotification(notification: Notification): ShowNotificationAction;
 }
 
 interface LoginState {

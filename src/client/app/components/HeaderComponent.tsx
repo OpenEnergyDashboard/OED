@@ -9,12 +9,19 @@ import LogoComponent from './LogoComponent';
 import UIModalComponent from './UIModalComponent';
 import getToken from '../utils/getToken';
 
+interface HeaderProps {
+	renderLoginButton?: boolean;
+	renderGroupsButton?: boolean;
+	renderOptionsButton?: boolean;
+	title?: string;
+}
+
 /**
  * React component that controls the header strip at the top of all pages
  * @param props The props passed down by the parent component
  * @return JSX to create the header strip
  */
-export default function HeaderComponent(props) {
+export default function HeaderComponent(props: HeaderProps) {
 	const title = props.title ? props.title : 'Open Energy Dashboard';
 	const titleStyle = {
 		display: 'inline-block'
@@ -44,16 +51,16 @@ export default function HeaderComponent(props) {
 			<div className='col-xs-4'>
 				<Link to='/'><LogoComponent url='./app/images/logo.png' /></Link>
 			</div>
-			<div className="col-xs-4 text-center">
+			<div className='col-xs-4 text-center'>
 				<h1 style={titleStyle}>{title}</h1>
 			</div>
 			<div style={divRightStyle}>
 				<div className='visible-sm visible-xs'>
 					{(props.renderOptionsButton) ? <UIModalComponent /> : null}
 				</div>
-				<Link style={loginLinkStyle} to="/login"><Button bsStyle="default">Log In</Button></Link>
-				<Link style={adminLinkStyle} to="/admin"><Button bsStyle="default">Admin panel</Button></Link>
-				<Link style={groupsLinkStyle} to="/groups"><Button bsStyle="default">Groups</Button></Link>
+				<Link style={loginLinkStyle} to='/login'><Button bsStyle='default'>Log In</Button></Link>
+				<Link style={adminLinkStyle} to='/admin'><Button bsStyle='default'>Admin panel</Button></Link>
+				<Link style={groupsLinkStyle} to='/groups'><Button bsStyle='default'>Groups</Button></Link>
 			</div>
 		</div>
 	);

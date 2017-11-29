@@ -7,15 +7,16 @@
 import { connect } from 'react-redux';
 import RouteComponent from '../components/RouteComponent';
 import { clearNotifications } from '../actions/notifications';
+import { Dispatch, State } from '../types/redux';
 
 
-function mapStateToProps(state) {
+function mapStateToProps(state: State) {
 	return {
-		notification: state.notifications.notification,
+		notification: state.notifications.notification
 	};
 }
 
-function mapDispatchToProps(dispatch) {
+function mapDispatchToProps(dispatch: Dispatch) {
 	return {
 		clearNotifications: () => dispatch(clearNotifications())
 	};

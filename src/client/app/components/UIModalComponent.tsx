@@ -12,7 +12,7 @@ interface UIModalState {
 
 export default class UIModalComponent extends React.Component<{}, UIModalState> {
 
-	constructor(props) {
+	constructor(props: {}) {
 		super(props);
 		this.openModal = this.openModal.bind(this);
 		this.closeModal = this.closeModal.bind(this);

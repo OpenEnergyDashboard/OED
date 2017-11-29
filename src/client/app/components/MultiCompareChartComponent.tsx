@@ -5,9 +5,13 @@
 import * as React from 'react';
 import CompareChartContainer from '../containers/CompareChartContainer';
 
-export default function MultiCompareChartComponent(props) {
+interface MultiCompareChartProps {
+	selectedMeters: number[];
+}
+
+export default function MultiCompareChartComponent(props: MultiCompareChartProps) {
 	// Compute how much space should be used in the bootstrap grid system
-	let size;
+	let size: number;
 	if (props.selectedMeters.length === 1) {
 		size = 12;
 	} else if (props.selectedMeters.length === 2) {
@@ -24,8 +28,8 @@ export default function MultiCompareChartComponent(props) {
 	// Display a message if no meters are selected
 	if (props.selectedMeters.length === 0) {
 		return (
-			<div className="row">
-				<div className="col-xs-12" style={centeredStyle}>
+			<div className='row'>
+				<div className='col-xs-12' style={centeredStyle}>
 					Select one or more meters to compare usage over time.
 				</div>
 			</div>
@@ -34,7 +38,7 @@ export default function MultiCompareChartComponent(props) {
 
 
 	return (
-		<div className="row">
+		<div className='row'>
 			{props.selectedMeters.map(meterID =>
 				<div className={`col-xs-${size}`} key={meterID}>
 					<CompareChartContainer key={meterID} id={meterID} />

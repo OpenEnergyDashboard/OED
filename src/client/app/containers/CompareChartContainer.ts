@@ -4,11 +4,13 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/.
  */
 
-import { Bar } from 'react-chartjs-2';
+import { Bar, ChartComponentProps } from 'react-chartjs-2';
 import { ChartData, ChartDataSets } from 'chart.js';
 import * as moment from 'moment';
 import { connect } from 'react-redux';
-import datalabels from 'chartjs-plugin-datalabels'; // eslint-disable-line no-unused-vars
+// This is better than using an import, since we don't actually use anything from the plugin in the code.
+/// <reference path="chartjs-plugin-datalabels" />
+import { State } from '../types/redux';
 
 interface ChartDataSetsWithDatalabels extends ChartDataSets {
 	datalabels: {
@@ -17,10 +19,14 @@ interface ChartDataSetsWithDatalabels extends ChartDataSets {
 	};
 }
 
+interface CompareChartContainerProps {
+	id: number;
+}
+
 /**
  * @param {State} state
  */
-function mapStateToProps(state, ownProps) {
+function mapStateToProps(state: State, ownProps: CompareChartContainerProps) {
 	const timeInterval = state.graph.compareTimeInterval;
 	const barDuration = state.graph.compareDuration;
 	const datasets: ChartDataSetsWithDatalabels[] = [];
@@ -34,7 +40,7 @@ function mapStateToProps(state, ownProps) {
 	const soFar = moment().diff(moment().startOf('week'), 'days');
 
 	// Compose the text to display to the user.
-	const delta = change => {
+	const delta = (change: number) => {
 		// On a NaN result, just give up.
 		if (isNaN(change)) { return ''; }
 
@@ -50,14 +56,14 @@ function mapStateToProps(state, ownProps) {
 		}
 		return `${name} has used ${changePercent}% ${adverb} energy this week.`;
 	};
-	const colorize = change => {
+	const colorize = (change: number) => {
 		if (change < 0) {
 			return 'green';
 		}
 		return 'red';
 	};
-	const readingsData = state.readings.bar.byMeterID[ownProps.id][timeInterval][barDuration];
-	if (readingsData !== undefined && !readingsData.isFetching) {
+	const readingsData = state.readings.bar.byMeterID[ownProps.id][timeInterval][barDuration.toISOString()];
+	if (readingsData !== undefined && readingsData.readings !== undefined && !readingsData.isFetching) {
 		// Sunday needs special logic
 		if (soFar !== 0) {
 			// Calculate currentWeek
@@ -140,7 +146,7 @@ function mapStateToProps(state, ownProps) {
 					labelString: 'kW'
 				},
 				ticks: {
-					beginAtZero: true
+					min: 0
 				}
 			}]
 		},
@@ -162,17 +168,19 @@ function mapStateToProps(state, ownProps) {
 					weight: 'bold'
 				},
 				display: true,
-				formatter: value => `${value} kW`
+				formatter: (value: number) => `${value} kW`
 			}
 		}
 	};
 
 
-	return {
+	const props: ChartComponentProps = {
 		data,
 		options,
 		redraw: true
 	};
+
+	return props;
 }
 
 export default connect(mapStateToProps)(Bar);
