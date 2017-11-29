@@ -35,7 +35,7 @@ async function readMamacData(meter) {
 	const rawReadings = await reqPromise(`http://${meter.ipAddress}/int2.csv`);
 	const parsedReadings = await parseCsv(rawReadings);
 	return parsedReadings.map(raw => {
-		const reading = Number(raw[0]); // Thank you, JavaScript.
+		const reading = Number(raw[0]);
 		if (isNaN(reading)) {
 			throw new Error(`Meter reading ${reading} parses to NaN for meter named ${meter.name} with id ${meter.id}`);
 		}
