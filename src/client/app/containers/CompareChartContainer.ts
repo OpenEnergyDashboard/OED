@@ -21,10 +21,12 @@ interface ChartDataSetsWithDatalabels extends ChartDataSets {
 
 interface CompareChartContainerProps {
 	id: number;
+	isGroup: boolean;
 }
 
 /**
  * @param {State} state
+ * @param ownProps
  */
 function mapStateToProps(state: State, ownProps: CompareChartContainerProps) {
 	const timeInterval = state.graph.compareTimeInterval;
@@ -40,29 +42,57 @@ function mapStateToProps(state: State, ownProps: CompareChartContainerProps) {
 	const soFar = moment().diff(moment().startOf('week'), 'days');
 
 	// Compose the text to display to the user.
-	const delta = (change: number) => {
-		// On a NaN result, just give up.
-		if (isNaN(change)) { return ''; }
+	let delta;
+	if (ownProps.isGroup) {
+		delta = (change: number) => {
+			// On a NaN result, just give up.
+			if (isNaN(change)) { return ''; }
 
-		const name: string = state.meters.byMeterID[ownProps.id].name;
-		let changePercent;
-		let adverb;
-		if (change < 0) {
-			changePercent = parseInt(change.toFixed(2).replace('.', '').slice(1), 10);
-			adverb = 'less';
-		} else {
-			changePercent = parseInt(change.toFixed(2).replace('.', ''), 10);
-			adverb = 'more';
-		}
-		return `${name} has used ${changePercent}% ${adverb} energy this week.`;
-	};
+			const name: string = state.groups.byGroupID[ownProps.id].name;
+			let changePercent;
+			let adverb;
+			if (change < 0) {
+				changePercent = parseInt(change.toFixed(2).replace('.', '').slice(1), 10);
+				adverb = 'less';
+			} else {
+				changePercent = parseInt(change.toFixed(2).replace('.', ''), 10);
+				adverb = 'more';
+			}
+			return `${name} has used ${changePercent}% ${adverb} energy this week.`;
+		};
+	}	else {
+		delta = (change: number) => {
+			// On a NaN result, just give up.
+			if (isNaN(change)) { return ''; }
+
+			const name: string = state.meters.byMeterID[ownProps.id].name;
+			let changePercent;
+			let adverb;
+			if (change < 0) {
+				changePercent = parseInt(change.toFixed(2).replace('.', '').slice(1), 10);
+				adverb = 'less';
+			} else {
+				changePercent = parseInt(change.toFixed(2).replace('.', ''), 10);
+				adverb = 'more';
+			}
+			return `${name} has used ${changePercent}% ${adverb} energy this week.`;
+		};
+	}
+
+
 	const colorize = (change: number) => {
 		if (change < 0) {
 			return 'green';
 		}
 		return 'red';
 	};
-	const readingsData = state.readings.bar.byMeterID[ownProps.id][timeInterval][barDuration.toISOString()];
+
+	let readingsData;
+	if (ownProps.isGroup) {
+		readingsData = state.readings.bar.byGroupID[ownProps.id][timeInterval][barDuration.toISOString()];
+	}	else {
+		readingsData = state.readings.bar.byMeterID[ownProps.id][timeInterval][barDuration.toISOString()];
+	}
 	if (readingsData !== undefined && readingsData.readings !== undefined && !readingsData.isFetching) {
 		// Sunday needs special logic
 		if (soFar !== 0) {

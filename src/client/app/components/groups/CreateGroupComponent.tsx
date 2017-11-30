@@ -67,9 +67,8 @@ export default class CreateGroupComponent extends React.Component<CreateGroupPro
 	}
 
 	private handleNameChange(e: React.ChangeEvent<FormControl>) {
-		// TYPESCRIPT TODO: Don't know how to get rid of this?
-		// For now, disabled the lint disallowing access by string, so we can fake it up.
-		this.props.editGroupName(e.currentTarget.value); // tslint:disable-line no-string-literal
+		// TODO TYPESCRIPT: https://stackoverflow.com/questions/47582626/typesafe-onchange-for-react-js-formcontrol-events
+		this.props.editGroupName(e.target.value);
 	}
 
 	private handleCreateGroup() {

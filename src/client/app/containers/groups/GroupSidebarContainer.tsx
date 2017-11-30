@@ -13,8 +13,7 @@ import { State, Dispatch } from '../../types/redux';
 function mapStateToProps(state: State) {
 	const sortedGroups = _.sortBy(_.values(state.groups.byGroupID).map(group => ({ id: group.id, name: group.name.trim() })), 'name');
 	return {
-		groups: sortedGroups,
-		selectedGroups: state.groups.selectedGroups
+		groups: sortedGroups
 	};
 }
 
@@ -23,7 +22,6 @@ function mapDispatchToProps(dispatch: Dispatch) {
 	return {
 		selectGroups: (newSelectedGroupIDs: number[]) => dispatch(changeDisplayedGroups(newSelectedGroupIDs)),
 		fetchGroupsDetailsIfNeeded: () => dispatch(fetchGroupsDetailsIfNeeded()),
-		fetchMetersDetailsIfNeeded: () => dispatch(fetchMetersDetailsIfNeeded()),
 		changeDisplayModeToCreate: () => dispatch(changeDisplayMode(DisplayMode.Create))
 	};
 }

@@ -11,7 +11,7 @@ import MultiCompareChartContainer from '../containers/MultiCompareChartContainer
 import { chartTypes } from '../reducers/graph';
 
 /* tslint:disable no-string-literal */
-// TODO TYPESCRIPT: There is an open issue for this: https://github.com/DefinitelyTyped/DefinitelyTyped/pull/21842
+// TODO TYPESCRIPT: There is an open PR for this: https://github.com/DefinitelyTyped/DefinitelyTyped/pull/21842
 defaults.global.plugins = {datalabels: {display: false}};
 /* tslint:enable */
 

@@ -30,8 +30,8 @@ before_script:
     # Database for non-Docker execution
   - psql -c 'CREATE DATABASE travis_ci_test' -U postgres
   - psql -c "CREATE USER test WITH PASSWORD 'test';" -U postgres
-    # Database for Docker execution
-  - docker-compose run --rm web src/scripts/init.sh NONE
+    # Database for Docker execution. No meters, with a default user.
+  - docker-compose run --rm web src/scripts/init.sh NONE --default-user
 
 script:
     # Validate legal requirements on source files

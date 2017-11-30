@@ -34,7 +34,7 @@ export default class ChartSelectComponent extends React.Component<ChartSelectPro
 		return (
 			<div style={divBottomPadding}>
 				<p style={labelStyle}>Graph Type:</p>
-				{/* TODO TYPESCRIPT: This error seems due to a bug in the typings. Issue:  */}
+				{/* TODO TYPESCRIPT: This error seems due to a bug in the typings. Issue: https://github.com/DefinitelyTyped/DefinitelyTyped/issues/21840 */}
 				<ToggleButtonGroup
 					type='radio'
 					name='chartTypes'

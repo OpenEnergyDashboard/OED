@@ -9,6 +9,9 @@ import * as _ from 'lodash';
 import { FormControl, Button, Glyphicon } from 'react-bootstrap';
 import DatasourceBoxContainer from '../../containers/groups/DatasourceBoxContainer';
 import { NamedIDItem } from '../../types/items';
+import { SelectionType } from '../../containers/groups/DatasourceBoxContainer';
+import { TerminalThunk } from '../../types/redux';
+import { EditGroupNameAction, ChangeDisplayModeAction, ChangeChildMetersAction, ChangeChildGroupsAction } from '../../actions/groups';
 
 interface EditGroupsProps {
 	name: string;
@@ -16,25 +19,24 @@ interface EditGroupsProps {
 	childGroups: NamedIDItem[];
 	allMetersExceptChildMeters: NamedIDItem[];
 	allGroupsExceptChildGroups: NamedIDItem[];
-	submitGroupInEditingIfNeeded(): void;
-	deleteGroup(): void;
-	handleReturnToView(): void;
-	changeDisplayModeToView(): void;
-	editGroupName(name: string): void;
-	changeChildMeters(selected: number[]): void;
-	changeChildGroups(selected: number[]): void;
+	submitGroupInEditingIfNeeded(): Promise<any>;
+	deleteGroup(): TerminalThunk;
+	changeDisplayModeToView(): ChangeDisplayModeAction;
+	editGroupName(name: string): EditGroupNameAction;
+	changeChildMeters(selected: number[]): ChangeChildMetersAction;
+	changeChildGroups(selected: number[]): ChangeChildGroupsAction;
 }
 
 interface EditGroupsState {
 	name: string;
 	selectedMeters: number[];
-	defaultSelectedMeters: number[];
+	defaultSelectedMeters: NamedIDItem[];
 	unusedMeters: number[];
-	defaultUnusedMeters: number[];
+	defaultUnusedMeters: NamedIDItem[];
 	selectedGroups: number[];
-	defaultSelectedGroups: number[];
+	defaultSelectedGroups: NamedIDItem[];
 	unusedGroups: number[];
-	defaultUnusedGroups: number[];
+	defaultUnusedGroups: NamedIDItem[];
 }
 
 export default class EditGroupsComponent extends React.Component<EditGroupsProps, EditGroupsState> {
@@ -62,64 +64,9 @@ export default class EditGroupsComponent extends React.Component<EditGroupsProps
 		this.handleMoveUnusedGroupsToChildGroups = this.handleMoveUnusedGroupsToChildGroups.bind(this);
 		this.handleEditGroup = this.handleEditGroup.bind(this);
 		this.handleDeleteGroup = this.handleDeleteGroup.bind(this);
-		this.handleReturnToView = this.handleReturnToView.bind(this);
 	}
 
-	handleNameChange(e) {
-		const name = e.target.value;
-		this.setState({ name });
-		this.props.editGroupName(name);
-	}
-
-	handleUpdatedSelectedMeters(selectedMeters) {
-		this.setState({ selectedMeters });
-	}
-
-	handleUpdateUnusedMeters(unusedMeters) {
-		this.setState({ unusedMeters });
-	}
-
-	handleUpdateSelectedGroups(selectedGroups) {
-		this.setState({ selectedGroups });
-	}
-
-	handleUpdateUnusedGroups(unusedGroups) {
-		this.setState({ unusedGroups });
-	}
-
-	handleMoveChildMetersToUnusedMeters() {
-		this.props.changeChildMeters(_.difference(this.props.childMeters.map(meter => meter.id), this.state.selectedMeters));
-		this.setState({ selectedMeters: [], defaultSelectedMeters: [] });
-	}
-
-	handleMoveUnusedMetersToChildMeters() {
-		this.props.changeChildMeters(_.union(this.props.childMeters.map(meter => meter.id), this.state.unusedMeters));
-		this.setState({ unusedMeters: [], defaultUnusedMeters: [] });
-	}
-
-	handleMoveChildGroupsToUnusedGroups() {
-		this.props.changeChildGroups(_.difference(this.props.childGroups.map(group => group.id), this.state.selectedGroups));
-		this.setState({ selectedGroups: [], defaultSelectedGroups: [] });
-	}
-
-	handleMoveUnusedGroupsToChildGroups() {
-		this.props.changeChildGroups(_.union(this.props.childGroups.map(group => group.id), this.state.unusedGroups));
-		this.setState({ unusedGroups: [], defaultUnusedGroups: [] });
-	}
-
-	handleEditGroup() {
-		this.props.submitGroupInEditingIfNeeded();
-	}
-
-	handleDeleteGroup() {
-		this.props.deleteGroup();
-	}
-
-	handleReturnToView() {
-		this.props.changeDisplayModeToView();
-	}
-
-	render() {
+	public render() {
 		const divStyle: React.CSSProperties = {
 			paddingTop: '35px'
 		};
@@ -154,7 +101,7 @@ export default class EditGroupsComponent extends React.Component<EditGroupsProps
 						<p style={boldStyle}>Child meters:</p>
 						<DatasourceBoxContainer
 							type='meter'
-							selection='custom'
+							selection={SelectionType.Custom}
 							datasource={this.props.childMeters}
 							selectedOptions={this.state.defaultSelectedMeters}
 							selectDatasource={this.handleUpdatedSelectedMeters}
@@ -172,7 +119,7 @@ export default class EditGroupsComponent extends React.Component<EditGroupsProps
 						<p style={boldStyle}>Unused meters:</p>
 						<DatasourceBoxContainer
 							type='meter'
-							selection='custom'
+							selection={SelectionType.Custom}
 							datasource={this.props.allMetersExceptChildMeters}
 							selectedOptions={this.state.defaultUnusedMeters}
 							selectDatasource={this.handleUpdateUnusedMeters}
@@ -184,7 +131,7 @@ export default class EditGroupsComponent extends React.Component<EditGroupsProps
 						<p style={boldStyle}>Child groups:</p>
 						<DatasourceBoxContainer
 							type='group'
-							selection='custom'
+							selection={SelectionType.Custom}
 							datasource={this.props.childGroups}
 							selectedOptions={this.state.defaultSelectedGroups}
 							selectDatasource={this.handleUpdateSelectedGroups}
@@ -202,7 +149,7 @@ export default class EditGroupsComponent extends React.Component<EditGroupsProps
 						<p style={boldStyle}>Unused groups:</p>
 						<DatasourceBoxContainer
 							type='group'
-							selection='custom'
+							selection={SelectionType.Custom}
 							datasource={this.props.allGroupsExceptChildGroups}
 							selectedOptions={this.state.defaultUnusedGroups}
 							selectDatasource={this.handleUpdateUnusedGroups}
@@ -214,5 +161,60 @@ export default class EditGroupsComponent extends React.Component<EditGroupsProps
 				<Button className='pull-right' type='submit' onClick={this.handleDeleteGroup}>Delete group</Button>
 			</div>
 		);
+	}
+
+	private handleNameChange(e: React.FormEvent<FormControl>) {
+		// TODO TYPESCRIPT: Open SO question: https://stackoverflow.com/questions/47582626/typesafe-onchange-for-react-js-formcontrol-events
+		const name = e.target.value;
+		this.setState({ name });
+		this.props.editGroupName(name);
+	}
+
+	private handleUpdatedSelectedMeters(selectedMeters: number[]) {
+		this.setState({ selectedMeters });
+	}
+
+	private handleUpdateUnusedMeters(unusedMeters: number[]) {
+		this.setState({ unusedMeters });
+	}
+
+	private handleUpdateSelectedGroups(selectedGroups: number[]) {
+		this.setState({ selectedGroups });
+	}
+
+	private handleUpdateUnusedGroups(unusedGroups: number[]) {
+		this.setState({ unusedGroups });
+	}
+
+	private handleMoveChildMetersToUnusedMeters() {
+		this.props.changeChildMeters(_.difference(this.props.childMeters.map(meter => meter.id), this.state.selectedMeters));
+		this.setState({ selectedMeters: [], defaultSelectedMeters: [] });
+	}
+
+	private handleMoveUnusedMetersToChildMeters() {
+		this.props.changeChildMeters(_.union(this.props.childMeters.map(meter => meter.id), this.state.unusedMeters));
+		this.setState({ unusedMeters: [], defaultUnusedMeters: [] });
+	}
+
+	private handleMoveChildGroupsToUnusedGroups() {
+		this.props.changeChildGroups(_.difference(this.props.childGroups.map(group => group.id), this.state.selectedGroups));
+		this.setState({ selectedGroups: [], defaultSelectedGroups: [] });
+	}
+
+	private handleMoveUnusedGroupsToChildGroups() {
+		this.props.changeChildGroups(_.union(this.props.childGroups.map(group => group.id), this.state.unusedGroups));
+		this.setState({ unusedGroups: [], defaultUnusedGroups: [] });
+	}
+
+	private handleEditGroup() {
+		this.props.submitGroupInEditingIfNeeded();
+	}
+
+	private handleDeleteGroup() {
+		this.props.deleteGroup();
+	}
+
+	private handleReturnToView() {
+		this.props.changeDisplayModeToView();
 	}
 }

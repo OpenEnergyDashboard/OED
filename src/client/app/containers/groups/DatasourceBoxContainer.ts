@@ -72,7 +72,7 @@ function mapStateToProps(state: State, ownProps: DatasourceBoxContainerProps) {
 				});
 			}
 		} else {
-			console.error('DatasourceBoxContainer must be supplied a parentID prop if type === children');
+			throw new Error('DatasourceBoxContainer must be supplied a parentID prop if type === children');
 		}
 	} else if (ownProps.datasource !== undefined) { // custom selection handled by parent
 		datasource = ownProps.datasource;
@@ -89,7 +89,7 @@ function mapDispatchToProps(dispatch: Dispatch, ownProps: DatasourceBoxContainer
 	if (ownProps.selection === 'all') {
 		if (ownProps.type === 'meter') {
 			return {
-				selectDatasource: (meterIDs: number[]) => dispatch(changeChildMeters(meterIDs)),
+				selectDatasource: (meterIDs: number[]) => dispatch(changeChildMeters(meterIDs))
 			};
 		}
 		return {

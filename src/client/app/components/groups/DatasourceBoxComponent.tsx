@@ -26,15 +26,7 @@ export default class DatasourceBoxComponent extends React.Component<DatasourceBo
 		this.handleDatasourceSelect = this.handleDatasourceSelect.bind(this);
 	}
 
-	handleDatasourceSelect(selection: DatasourceID[]) {
-		if (this.props.type === 'meter') {
-			this.props.selectDatasource(selection.reduce(metersFilterReduce, []));
-		} else {
-			this.props.selectDatasource(selection.reduce(groupsFilterReduce, []));
-		}
-	}
-
-	render() {
+	public render() {
 		let type: DataType = DataType.Group;
 		if (this.props.type === 'meter') {
 			type = DataType.Meter;
@@ -68,5 +60,13 @@ export default class DatasourceBoxComponent extends React.Component<DatasourceBo
 				onValuesChange={this.handleDatasourceSelect}
 			/>
 		);
+	}
+
+	private handleDatasourceSelect(selection: DatasourceID[]) {
+		if (this.props.type === 'meter') {
+			this.props.selectDatasource(selection.reduce(metersFilterReduce, []));
+		} else {
+			this.props.selectDatasource(selection.reduce(groupsFilterReduce, []));
+		}
 	}
 }

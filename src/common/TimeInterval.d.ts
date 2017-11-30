@@ -7,10 +7,10 @@
 import * as moment from 'moment';
 
 export class TimeInterval {
-	static unbounded(): TimeInterval;
-	static fromString(stringified: string): TimeInterval;
-	constructor(startTimestamp: moment.Moment, endTimestamp: moment.Moment);
-	toString(): string;
-	equals(other: TimeInterval): boolean;
-	valueOf(): string;
+	public static unbounded(): TimeInterval;
+	public static fromString(stringified: string): TimeInterval;
+	public constructor(startTimestamp: moment.Moment, endTimestamp: moment.Moment);
+	public toString(): string;
+	public equals(other: TimeInterval): boolean;
+	public valueOf(): string;
 }

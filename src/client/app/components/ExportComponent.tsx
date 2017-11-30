@@ -20,9 +20,33 @@ export default function ExportComponent(props: ExportProps) {
 	 */
 	const exportReading = () => {
 		const compressedData = props.exportVals.datasets;
-		const chart = compressedData[0].currentChart;
-		const startTime = moment(compressedData[0].exportVals[0].x).format('ddddMMMDDYYYY');
-		const name = `oedExport${startTime}${chart}.csv`;
+
+		// Determine and format the first time in the dataset
+		let startTime = moment(compressedData[0].exportVals[0].x);
+		for (const reading of compressedData) {
+			if (reading !== undefined) {
+				const startTimeOfDataset = moment(reading.exportVals[0].x);
+				if (startTime.isAfter(startTimeOfDataset)) {
+					startTime = startTimeOfDataset;
+				}
+			}
+		}
+		const startTimeString = startTime.format('YYYY-MMM-DD-dddd');
+
+		// Determine and format the last time in the dataset
+		let endTime = moment(compressedData[0].exportVals[compressedData[0].exportVals.length - 1].x);
+		for (const reading of compressedData) {
+			if (reading !== undefined) {
+				const endTimeOfDataset = moment(reading.exportVals[reading.exportVals.length - 1].x);
+				if (endTimeOfDataset.isAfter(endTime)) {
+					endTime = endTimeOfDataset;
+				}
+			}
+		}
+		const endTimeString = endTime.format('YYYY-MMM-DD-dddd');
+
+		const chartName = compressedData[0].currentChart;
+		const name = `oedExport_${chartName}_${startTimeString}_to_${endTimeString}.csv`;
 		graphExport(compressedData,	name);
 	};
 	return (

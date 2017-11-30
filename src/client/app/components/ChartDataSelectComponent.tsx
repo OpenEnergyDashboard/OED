@@ -47,6 +47,8 @@ export default class ChartDataSelectComponent extends React.Component<ChartDataS
 			margin: 0
 		};
 
+		const handleGroupSelect = (s: SelectOption[]) => this.handleGroupSelect(s);
+
 		return (
 			<div>
 				<p style={labelStyle}>Groups:</p>
@@ -55,7 +57,7 @@ export default class ChartDataSelectComponent extends React.Component<ChartDataS
 						options={this.props.groups}
 						selectedOptions={this.props.selectedGroups}
 						placeholder='Select Groups'
-						onValuesChange={s => this.handleGroupSelect(s)}
+						onValuesChange={handleGroupSelect}
 					/>
 				</div>
 				<p style={labelStyle}>Meters:</p>
@@ -64,7 +66,7 @@ export default class ChartDataSelectComponent extends React.Component<ChartDataS
 						options={this.props.meters}
 						selectedOptions={this.props.selectedMeters}
 						placeholder='Select Meters'
-						onValuesChange={s => this.handleMeterSelect(s)}
+						onValuesChange={this.handleMeterSelect}
 					/>
 				</div>
 			</div>

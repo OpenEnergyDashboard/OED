@@ -4,6 +4,7 @@
 
 import * as React from 'react';
 import HeaderComponent from '../HeaderComponent';
+import FooterComponent from '../FooterComponent';
 import GroupViewContainer from '../../containers/groups/GroupViewContainer';
 import GroupSidebarContainer from '../../containers/groups/GroupSidebarContainer';
 import CreateGroupContainer from '../../containers/groups/CreateGroupContainer';
@@ -65,7 +66,7 @@ export default class GroupMainComponent extends React.Component<GroupMainProps, 
 				break;
 			}
 			default: {
-				console.error('Encountered invalid display mode');
+				console.error('Encountered invalid display mode'); // tslint:disable-line no-console
 			}
 		}
 
@@ -77,6 +78,7 @@ export default class GroupMainComponent extends React.Component<GroupMainProps, 
 						{GroupDisplay}
 					</div>
 				</div>
+				<FooterComponent/>
 			</div>
 		);
 	}

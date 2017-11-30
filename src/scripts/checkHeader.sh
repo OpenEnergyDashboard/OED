@@ -11,7 +11,7 @@ MPL_REGEX=".*?This\W+Source\W+Code\W+Form\W+is\W+subject\W+to\W+the\W+terms\W+of
 # Get a list of files tracked by Git
 FILES=$(git ls-files)
 # Filter out text files
-FILES=$(echo "$FILES" | grep -v "README\.md")
+FILES=$(echo "$FILES" | grep -v ".*\.md")
 FILES=$(echo "$FILES" | grep -v "\.editorconfig")
 FILES=$(echo "$FILES" | grep -v "\.gitattributes")
 FILES=$(echo "$FILES" | grep -v "package\.json")
@@ -22,24 +22,27 @@ FILES=$(echo "$FILES" | grep -v "src\/client\/app\/images\/.*")
 FILES=$(echo "$FILES" | grep -v "src\/client\/favicon\.ico")
 # Filter out test data
 FILES=$(echo "$FILES" | grep -v "src\/server\/test\/db\/data\/.*")
+# Filter out outside scripts
+FILES=$(echo "$FILES" | grep -v "src\/scripts\/oed\.service")
+FILES=$(echo "$FILES" | grep -v "src\/scripts\/updateMamacMetersOEDCron\.bash")
 
 # Counts the files listed in FILES
 NFILES=$(echo $FILES | wc -w)
 echo "[MPL2] Checking $NFILES files for a Mozilla Public License 2.0 header."
 
-# This searches for the above regex. 
+# This searches for the above regex.
 # P enables Perl and z enables multi-line support
 # s turns off warnings, lv lists files that don't match
 MISSING_HEADER=$(grep -Pz -slv "$MPL_REGEX" $FILES)
 NMISSING=$(echo $MISSING_HEADER | wc -w)
 
-# Check if there's 
+# Check if there's
 if [ ! -z "$MISSING_HEADER" ]; then
 	echo "[MPL2] The following $NMISSING files are missing headers:"
 	echo "$MISSING_HEADER"
 	echo ""
 	exit 1
-else 
+else
 	echo "[MPL2] Every source file has a Mozilla Public License 2.0 header."
 	echo ""
 	exit 0

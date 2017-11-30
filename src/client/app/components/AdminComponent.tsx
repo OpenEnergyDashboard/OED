@@ -3,6 +3,7 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
 
 import * as React from 'react';
+import FooterComponent from '../components/FooterComponent';
 
 /**
  * React component that controls the Admin panel
@@ -12,6 +13,7 @@ export default function AdminComponent() {
 	return (
 		<div>
 			<p>Admin panel</p>
+			<FooterComponent/>
 		</div>
 	);
 }

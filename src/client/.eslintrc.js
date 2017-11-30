@@ -7,7 +7,7 @@ module.exports = {
 		"browser": true
 	},
 	"rules": {
-		"no-console": "off",
+		"no-console": 1,
 		"max-len": ["warn", {"code": 200, "tabWidth": 4, "ignoreStrings": true}],
 		"react/jsx-indent-props": [1 , 'tab']
 	}

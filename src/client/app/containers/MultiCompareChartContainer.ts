@@ -8,7 +8,8 @@ import { State } from '../types/redux';
 
 function mapStateToProps(state: State) {
 	return {
-		selectedMeters: state.graph.selectedMeters
+		selectedMeters: state.graph.selectedMeters,
+		selectedGroups: state.graph.selectedGroups
 	};
 }
 

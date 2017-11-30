@@ -5,6 +5,8 @@
  */
 
 import * as moment from 'moment';
+import { fetchMetersDetailsIfNeeded } from './meters';
+import { fetchGroupsDetailsIfNeeded } from './groups';
 import { fetchNeededLineReadings } from './lineReadings';
 import { fetchNeededBarReadings, fetchNeededCompareReadings } from './barReadings';
 import { TimeInterval } from '../../../common/TimeInterval';
@@ -129,4 +131,41 @@ export function changeGraphZoomIfNeeded(timeInterval: TimeInterval): TerminalThu
 			dispatch(fetchNeededReadingsForGraph(timeInterval));
 		}
 	};
+}
+
+export interface LinkOptions {
+	meterIDs?: number[];
+	groupIDs?: number[];
+	chartType?: chartTypes;
+	barDuration?: number;
+	toggleBarStacking?: boolean;
+}
+
+/**
+ * Update graph options from a link
+ * @param options - Object of possible values to dispatch with keys: meterIDs, groupIDs, chartType, barDuration, toggleBarStacking
+ * @returns {function(*)}
+ */
+export function changeOptionsFromLink(options: LinkOptions) {
+	const dispatchFirst: Thunk[] = [];
+	const dispatchSecond: Array<Thunk | ChangeChartToRenderAction | ChangeBarStackingAction> = [];
+	if (options.meterIDs) {
+		dispatchFirst.push(fetchMetersDetailsIfNeeded());
+		dispatchSecond.push(changeSelectedMeters(options.meterIDs));
+	}
+	if (options.groupIDs) {
+		dispatchFirst.push(fetchGroupsDetailsIfNeeded());
+		dispatchSecond.push(changeSelectedGroups(options.groupIDs));
+	}
+	if (options.chartType) {
+		dispatchSecond.push(changeChartToRender(options.chartType));
+	}
+	if (options.barDuration) {
+		dispatchSecond.push(changeBarDuration(options.barDuration));
+	}
+	if (options.toggleBarStacking) {
+		dispatchSecond.push(changeBarStacking());
+	}
+	return (dispatch: Dispatch) => Promise.all(dispatchFirst.map(dispatch))
+			.then(() => Promise.all(dispatchSecond.map(dispatch)));
 }

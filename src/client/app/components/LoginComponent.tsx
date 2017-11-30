@@ -8,6 +8,8 @@ import { browserHistory } from 'react-router';
 import { Notification } from 'react-notification-system';
 import HeaderComponent from '../components/HeaderComponent';
 import { ShowNotificationAction } from '../actions/notifications';
+import FooterComponent from '../components/FooterComponent';
+
 
 interface LoginProps {
 	showNotification(notification: Notification): ShowNotificationAction;
@@ -19,7 +21,7 @@ interface LoginState {
 }
 
 export default class LoginComponent extends React.Component<LoginProps, LoginState> {
-	private inputEmail: HTMLInputElement;
+	private inputEmail: HTMLInputElement | null;
 	/**
 	 * Initializes the component's state to include email (email users use to login) and password (corresponding to their email)
 	 * Binds the functions to 'this' LoginComponent
@@ -54,7 +56,7 @@ export default class LoginComponent extends React.Component<LoginProps, LoginSta
 							type='text'
 							className='form-control'
 							placeholder='Email'
-							ref={c => { if (c !== null) { this.inputEmail = c; } }}
+							ref={c => { this.inputEmail = c; }}
 							value={this.state.email}
 							onChange={this.handleEmailChange}
 						/>
@@ -65,6 +67,7 @@ export default class LoginComponent extends React.Component<LoginProps, LoginSta
 					</div>
 					<input style={buttonStyle} className='btn btn-default' type='submit' value='Login' />
 				</form>
+				<FooterComponent/>
 			</div>
 		);
 	}
@@ -113,7 +116,10 @@ export default class LoginComponent extends React.Component<LoginProps, LoginSta
 				// Log it to the console for developer use.
 				console.error(err); // tslint:disable-line no-console
 			}
-			this.inputEmail.focus();
+
+			if (this.inputEmail !== null) {
+				this.inputEmail.focus();
+			}
 		});
 		this.setState({ email: '', password: '' });
 	}

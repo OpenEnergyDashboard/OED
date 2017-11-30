@@ -8,7 +8,7 @@ import { State } from '../types/redux';
 
 function mapStateToProps(state: State) {
 	return {
-		chartToRender: state.graph.chartToRender,
+		chartToRender: state.graph.chartToRender
 	};
 }
 

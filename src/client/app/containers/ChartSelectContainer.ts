@@ -20,7 +20,7 @@ function mapStateToProps(state: State) {
 
 function mapDispatchToProps(dispatch: Dispatch) {
 	return {
-		changeChartType: (chartType: chartTypes) => dispatch(changeChartToRender(chartType)),
+		changeChartType: (chartType: chartTypes) => dispatch(changeChartToRender(chartType))
 	};
 }
 

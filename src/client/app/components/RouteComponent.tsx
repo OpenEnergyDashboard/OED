@@ -7,6 +7,7 @@ import { Router, Route, browserHistory, RedirectFunction, RouterState } from 're
 import axios from 'axios';
 import * as _ from 'lodash';
 import * as NotificationSystem from 'react-notification-system';
+import * as moment from 'moment';
 import HomeComponent from './HomeComponent';
 import LoginContainer from '../containers/LoginContainer';
 import AdminComponent from './AdminComponent';
@@ -14,10 +15,15 @@ import NotFoundComponent from './NotFoundComponent';
 import GroupMainContainer from '../containers/groups/GroupMainContainer';
 import getToken from '../utils/getToken';
 import { ClearNotificationAction } from '../actions/notifications';
+import { ReplaceFunction } from 'lodash';
+import { LinkOptions } from 'actions/graph';
+import { chartTypes } from '../reducers/graph';
 
 interface RouteProps {
 	notification: NotificationSystem.Notification;
+	barStacking: boolean;
 	clearNotifications(): ClearNotificationAction;
+	changeOptionsFromLink(options: LinkOptions): Promise<any>;
 }
 
 export default class RouteComponent extends React.Component<RouteProps, {}> {
@@ -25,6 +31,7 @@ export default class RouteComponent extends React.Component<RouteProps, {}> {
 	constructor(props: RouteProps) {
 		super(props);
 		this.requireAuth = this.requireAuth.bind(this);
+		this.linkToGraph = this.linkToGraph.bind(this);
 	}
 
 	/**
@@ -69,8 +76,51 @@ export default class RouteComponent extends React.Component<RouteProps, {}> {
 	}
 
 	/**
+	 * Middleware function that allows hotlinking to a graph with options
+	 * @param nextState The next state of the router
+	 * @param replace Function that allows a route redirect
+	 */
+	public linkToGraph(nextState: RouterState, replace: ReplaceFunction) {
+		const queries = nextState.location.query;
+		if (!_.isEmpty(queries)) {
+			try {
+				const options: LinkOptions = {};
+				for (const [key, infoObj] of _.entries(queries)) {
+					const info = infoObj.toString();
+					switch (key) {
+						case 'meterIDs':
+							options.meterIDs = info.split(',').map(s => parseInt(s));
+							break;
+						case 'groupIDs':
+							options.groupIDs = info.split(',').map(s => parseInt(s));
+							break;
+						case 'chartType':
+							options.chartType = info as chartTypes;
+							break;
+						case 'barDuration':
+							// TODO TYPESCRIPT: Again the irresolvable conflict: is barDuration a number or a duration?
+							options.barDuration = moment.duration(parseInt(info), 'days');
+							break;
+						case 'barStacking':
+							if (this.props.barStacking.toString() !== info) {
+								options.toggleBarStacking = true;
+							}
+							break;
+						default:
+							throw new Error('Unknown query parameter');
+					}
+				}
+				this.props.changeOptionsFromLink(options);
+			} catch (err) {
+				console.error('Failed to link to graph'); // tslint:disable-line no-console
+			}
+		}
+		replace('/');
+	}
+
+	/**
 	 * React component that controls the app's routes
-	 * Note that '/admin' requires authentication
+	 * Note that '/admin' and '/groups' requires authentication
 	 * @returns JSX to create the RouteComponent
 	 */
 	public render() {
@@ -82,6 +132,7 @@ export default class RouteComponent extends React.Component<RouteProps, {}> {
 					<Route path='/login' component={LoginContainer} />
 					<Route path='/admin' component={AdminComponent} onEnter={this.requireAuth} />
 					<Route path='/groups' component={GroupMainContainer} onEnter={this.requireAuth} />
+					<Route path='/graph' component={HomeComponent} onEnter={this.linkToGraph} />
 					<Route path='*' component={NotFoundComponent} />
 				</Router>
 			</div>

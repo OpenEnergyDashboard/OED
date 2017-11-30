@@ -17,12 +17,15 @@ import { UIOptionsProps } from '../components/UIOptionsComponent';
  */
 function mapStateToProps(state: State) {
 	return {
-		chartToRender: state.graph.chartToRender
+		chartToRender: state.graph.chartToRender,
+		barStacking: state.graph.barStacking,
+		barDuration: state.graph.barDuration
 	};
 }
 
 function mapDispatchToProps(dispatch: Dispatch) {
 	return {
+		// TODO TYPESCRIPT: This is an irresolvable conflict. Is barDuration a moment or a number??
 		changeDuration: (barDuration: moment.Duration) => dispatch(changeBarDuration(barDuration)),
 		changeBarStacking: () => dispatch(changeBarStacking())
 	};

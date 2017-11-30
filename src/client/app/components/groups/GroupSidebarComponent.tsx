@@ -4,12 +4,13 @@
 
 import * as React from 'react';
 import { Button } from 'react-bootstrap';
+import { ChangeDisplayedGroupsAction, ChangeDisplayModeAction } from '../../actions/groups';
 
 interface GroupSidebarProps {
 	groups: Array<{id: number, name: string}>;
-	changeDisplayModeToCreate(): void;
-	fetchGroupsDetailsIfNeeded(): void;
-	selectGroups(groups: number[]): void;
+	changeDisplayModeToCreate(): ChangeDisplayModeAction;
+	fetchGroupsDetailsIfNeeded(): Promise<any>;
+	selectGroups(groups: number[]): ChangeDisplayedGroupsAction;
 }
 
 export default class GroupSidebarComponent extends React.Component<GroupSidebarProps, {}> {
