@@ -63,8 +63,14 @@ class Reading {
 		return conn.none(sqlFile('reading/create_compressed_reading_views.sql'));
 	}
 
+	/**
+	 * Refreshes the daily readings view.
+	 * Should be called at least once a day, preferably in the middle of the night.
+	 * @param conn The connection to use
+	 * @return {Promise<void>}
+	 */
 	static refreshCompressedReadings(conn = db) {
-		return conn.none(sqlFile('reading/refresh_reading_views.sql'));
+		return conn.func('refresh_daily_readings', []);
 	}
 
 	static mapRow(row) {
