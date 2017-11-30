@@ -136,7 +136,7 @@ CREATE FUNCTION refresh_daily_readings()
 	AS $$
 		-- TODO: Investigate the performance impacts of CONCURRENTLY and dropping / recreating the index
 		REFRESH MATERIALIZED VIEW daily_readings;
-	$$;
+	$$ LANGUAGE 'plpgsql';
 
 
 /*
@@ -167,13 +167,13 @@ BEGIN
 	requested_interval := end_timestamp - start_timestamp;
 	requested_range := tsrange(start_timestamp, end_timestamp, '[]');
 
-	IF extract(DAYS, requested_interval) >= minimum_num_pts THEN
+	IF extract(DAY FROM requested_interval) >= minimum_num_pts THEN
 		RETURN QUERY
 			SELECT *
 			FROM daily_readings
 			INNER JOIN unnest(meter_ids) meters(id) ON daily_readings.meter_id = meters.id
 			WHERE requested_range @> time_interval;
-	ELSIF extract(HOURS, requested_interval) >= minimum_num_pts THEN
+	ELSIF extract(HOURS FROM requested_interval) >= minimum_num_pts THEN
 		RETURN QUERY
 		SELECT *
 		FROM hourly_readings
@@ -187,4 +187,4 @@ BEGIN
 		WHERE requested_range @> time_interval;
 	END IF;
 END
-$$ LANGUAGE 'pl/pgsql';
+$$ LANGUAGE 'plpgsql';
