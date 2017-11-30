@@ -3,7 +3,7 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
 
 import * as React from 'react';
-import { FormControl, Button } from 'react-bootstrap';
+import { FormControl, FormControlProps, Button } from 'react-bootstrap';
 import DatasourceBoxContainer from '../../containers/groups/DatasourceBoxContainer';
 import { SelectionType } from '../../containers/groups/DatasourceBoxContainer';
 import { NamedIDItem } from '../../types/items';
@@ -66,9 +66,13 @@ export default class CreateGroupComponent extends React.Component<CreateGroupPro
 		);
 	}
 
-	private handleNameChange(e: React.ChangeEvent<FormControl>) {
-		// TODO TYPESCRIPT: https://stackoverflow.com/questions/47582626/typesafe-onchange-for-react-js-formcontrol-events
-		this.props.editGroupName(e.target.value);
+	private handleNameChange(e: React.ChangeEvent<FormControlProps>) {
+		const value = e.target.value;
+		if (value) {
+			this.props.editGroupName(value as string);
+		} else {
+			this.props.editGroupName('');
+		}
 	}
 
 	private handleCreateGroup() {

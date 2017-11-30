@@ -6,7 +6,7 @@
 // TYPESCRIPT TODO: I have insufficient domain knowledge to edit this.
 import * as React from 'react';
 import * as _ from 'lodash';
-import { FormControl, Button, Glyphicon } from 'react-bootstrap';
+import { FormControl, FormControlProps, Button, Glyphicon } from 'react-bootstrap';
 import DatasourceBoxContainer from '../../containers/groups/DatasourceBoxContainer';
 import { NamedIDItem } from '../../types/items';
 import { SelectionType } from '../../containers/groups/DatasourceBoxContainer';
@@ -163,11 +163,12 @@ export default class EditGroupsComponent extends React.Component<EditGroupsProps
 		);
 	}
 
-	private handleNameChange(e: React.FormEvent<FormControl>) {
-		// TODO TYPESCRIPT: Open SO question: https://stackoverflow.com/questions/47582626/typesafe-onchange-for-react-js-formcontrol-events
-		const name = e.target.value;
-		this.setState({ name });
-		this.props.editGroupName(name);
+	private handleNameChange(e: React.FormEvent<FormControlProps>) {
+		const name = e.currentTarget.value;
+		if (name) {
+			this.setState({ name: name as string });
+			this.props.editGroupName(name as string);
+		}
 	}
 
 	private handleUpdatedSelectedMeters(selectedMeters: number[]) {
