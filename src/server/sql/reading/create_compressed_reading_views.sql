@@ -128,6 +128,7 @@ daily_readings
 		 -- The order by ensures that the materialized view will be clustered in this way.
 			ORDER BY gen.interval_start, r.meter_id;
 
+CREATE EXTENSION IF NOT EXISTS btree_gist;
 -- We need a gist index to support the @> operation.
 CREATE INDEX idx_daily_readings ON daily_readings USING GIST(time_interval, meter_id);
 
