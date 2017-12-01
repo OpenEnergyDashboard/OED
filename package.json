@@ -10,6 +10,7 @@
     "checkHeader": "./src/scripts/checkHeader.sh",
     "checkTypescript": "./src/scripts/checkTypescript.sh",
     "lint": "./node_modules/.bin/tslint -c tslint.json src/{server,bin,scripts,common}/**/*.{ts,tsx,js,jsx} src/client/app/**/*.{ts,tsx,js,jsx}",
+    "typeCheck": "./node_modules/.bin/tsc -p . --noEmit",
     "test": "./node_modules/.bin/mocha \"src/server/test/**/*.js\"",
     "createdb": "node ./src/server/services/createDB.js",
     "addMamacMeters": "node ./src/server/services/addMamacMeters.js",

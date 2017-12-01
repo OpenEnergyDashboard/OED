@@ -67,6 +67,28 @@ You can access the PostgreSQL database through the `database` service. Given tha
 * Take a database dump with `docker-compose exec database pg_dump -U oed > dump_$(date +%Y-%m-%d"_"%H_%M_%S.sql)`
 * Restore a database dump with by first copying the dump into the container with `docker cp /path/to/dump.sql container_name:/dump.sql` and then restoring it into the database with `docker-compose exec database psql -U oed -f /dump.sql`.
 
+### NPM Scripts ###
+
+These can be run by executing `npm run <script>` in the `web` Docker-Compose service.
+
+App actions:
+* `start` starts the NodeJS webserver
+* `dev` starts Webpack in development mode, dynamically rebuilding the packed file.
+* `build` builds the app for production
+
+Validation and CI actions:
+* `checkHeader` ensures that there are no source files without MPL headers
+* `checkTypescript` ensures that there are no JavaScript source files in the TypeScript portion of the project
+* `lint` runs TSLint against the project to ensure style conformity
+* `typeCheck` runs the TypeScript compiler without emitting code (i.e. just checks for type errors)
+* `test` runs the automated test suite on the server.
+
+Administration:
+* `createdb` creates the database schema
+* `addMamacMeters` adds meters from a CSV file with the heading `ip`
+* `updateMamacMeters` fetches new data from known meters
+* `createUser` creates a new user, either with `... createUser <username> <password>` or interactively.
+
 ### Upgrading the App ###
 
 To upgrade the app:
