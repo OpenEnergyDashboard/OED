@@ -59,7 +59,7 @@ class Meter {
 	/**
 	 * Returns a promise to retrieve the meter with the given id from the database.
 	 * @param id the id of the meter to retrieve
- 	 * @param conn the connection to use. Defaults to the default database connection.
+	 * @param conn the connection to use. Defaults to the default database connection.
 	 * @returns {Promise.<Meter>}
 	 */
 	static async getByID(id, conn = db) {
