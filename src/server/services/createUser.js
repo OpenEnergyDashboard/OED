@@ -17,7 +17,7 @@ const rl = readline.createInterface({
 // Verifies that an email is valid
 function checkEmail(email) {
 	// See https://stackoverflow.com/a/46181/5116950
-	// eslint-disable-next-line max-len, no-useless-escape
+	// tslint:disable-next-line max-line-length no-useless-escape
 	const regexEmail = /^(([^<>()\[\]\\.,;:\s@"]+(\.[^<>()\[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
 	return regexEmail.test(email);
 }
@@ -26,8 +26,11 @@ function checkEmail(email) {
 function askEmail() {
 	return new Promise((resolve, reject) => {
 		rl.question('Email: ', email => {
-			if (checkEmail(email)) resolve(email);
-			else reject(email);
+			if (checkEmail(email)) {
+				resolve(email);
+			} else {
+				reject(email);
+			}
 		});
 	});
 }
@@ -39,7 +42,9 @@ function askPassword(email) {
 }
 
 function terminateReadline(message) {
-	if (message) log(message);
+	if (message) {
+			log(message);
+	}
 	rl.close();
 	process.exit(0);
 }

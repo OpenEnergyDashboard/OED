@@ -12,7 +12,7 @@ try {
 	fs.accessSync(envPath);
 	dotenv.config({ path: envPath });
 } catch (err) {
-	console.log("Couldn't load a .env file");
+	console.log("Couldn't load a .env file"); // tslint:disable-line no-console
 }
 
 

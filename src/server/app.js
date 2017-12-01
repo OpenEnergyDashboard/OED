@@ -46,8 +46,11 @@ app.use((req, res, next) => {
 
 app.use((err, req, res) => {
 	res.status(err.status || 500);
-	if (err.status === 404) res.send(`<h1>${err.status} Not found</h1>`);
-	else res.send(`<h1>${err.status} Server Error</h1>`);
+	if (err.status === 404) {
+		res.send(`<h1>${err.status} Not found</h1>`);
+	} else {
+		res.send(`<h1>${err.status} Server Error</h1>`);
+	}
 });
 
 module.exports = app;

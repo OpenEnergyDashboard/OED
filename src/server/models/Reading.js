@@ -144,7 +144,8 @@ class Reading {
 	 * @return {Promise<object<int, array<{reading_rate: number, start_timestamp: Date, end_timestamp: Date}>>>}
 	 */
 	static async getCompressedReadings(meterIDs, fromTimestamp = null, toTimestamp = null, numPoints = 500, conn = db) {
-		const allCompressedReadings = await conn.func('compressed_readings', [meterIDs, fromTimestamp || '-infinity', toTimestamp || 'infinity', numPoints]);
+		const allCompressedReadings = await conn.func('compressed_readings',
+			[meterIDs, fromTimestamp || '-infinity', toTimestamp || 'infinity', numPoints]);
 		// Separate the result rows by meter_id and return a nested object.
 		const compressedReadingsByMeterID = mapToObject(meterIDs, () => []); // Returns { 1: [], 2: [], ... }
 		for (const row of allCompressedReadings) {
@@ -167,7 +168,8 @@ class Reading {
 	 * @return {Promise<object<int, array<{reading_rate: number, start_timestamp: Moment, end_timestamp: Moment}>>>}
 	 */
 	static async getCompressedGroupReadings(groupIDs, fromTimestamp = null, toTimestamp = null, numPoints = 500, conn = db) {
-		const allCompressedReadings = await conn.func('compressed_group_readings', [groupIDs, fromTimestamp || '-infinity', toTimestamp || 'infinity', numPoints]);
+		const allCompressedReadings = await conn.func('compressed_group_readings',
+			[groupIDs, fromTimestamp || '-infinity', toTimestamp || 'infinity', numPoints]);
 		// Separate the result rows by meter_id and return a nested object.
 		const compressedReadingsByGroupID = mapToObject(groupIDs, () => []); // Returns { 1: [], 2: [], ... }
 		for (const row of allCompressedReadings) {
@@ -213,7 +215,8 @@ class Reading {
 	 * @return {Promise<object<int, array<{reading_sum: number, start_timestamp: Date, end_timestamp: Date}>>>}
 	 */
 	static async getGroupBarchartReadings(groupIDs, duration, fromTimestamp = null, toTimestamp = null, conn = db) {
-		const allBarchartReadings = await conn.func('barchart_group_readings', [groupIDs, duration, fromTimestamp || '-infinity', toTimestamp || 'infinity']);
+		const allBarchartReadings = await conn.func('barchart_group_readings',
+			[groupIDs, duration, fromTimestamp || '-infinity', toTimestamp || 'infinity']);
 		// Separate the result rows by meter_id and return a nested object.
 		const barchartReadingsByGroupID = mapToObject(groupIDs, () => []);
 		for (const row of allBarchartReadings) {

@@ -40,7 +40,7 @@ function loadFromCsvStream(stream, mapRowToModel, bulkInsertModels) {
 		parser.on('readable', () => {
 			let row;
 				// We can only get the next row once so we check that it isn't null at the same time that we assign it
-			while ((row = parser.read()) !== null) { // eslint-disable-line no-cond-assign
+			while ((row = parser.read()) !== null) { // tslint:disable-line no-conditional-assignment
 				modelsToInsert.push(mapRowToModel(row));
 			}
 			if (modelsToInsert.length >= MIN_INSERT_BUFFER_SIZE) {
