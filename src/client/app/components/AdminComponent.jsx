@@ -49,12 +49,14 @@ export default class AdminComponent extends React.Component {
 	}
 
 	render() {
+		// onDrop = {this.handleFileToImport}
 		return (
 			<div>
 				<HeaderContainer renderLoginButton={false} renderOptionsButton={false} renderAdminButton={false} />
 				<div className="container-fluid">
 					<div className="col-xs-4">
-						<Dropzone onDrop={this.handleFileToImport}>
+						<Dropzone accept = "text/csv,"
+								  onDrop = {this.handleFileToImport}>
 							<div> Add in a CSV file here:</div>
 						</Dropzone>
 						<MultiSelectComponent

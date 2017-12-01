@@ -24,6 +24,7 @@ router.post('/:meter_id', upload.single('csvFile'), async (req, res) => {
 			chunkSize: 2048
 		});
 		console.log("2");
+
 		myReadableStreamBuffer.put(req.file.buffer);
 		//stop() indicates we are done putting the data in our readable stream.
 		console.log("3");

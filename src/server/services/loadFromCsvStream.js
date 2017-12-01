@@ -61,21 +61,26 @@ function loadFromCsvStream(stream, mapRowToModel, bulkInsertModels) {
 		});
 		// Defines what happens when the parser's input stream is finished (and thus the promise needs to be resolved)
 		parser.on('finish', () => {
-			if (!rejected) {
+			// if (!rejected) {
 				// Insert any models left in the buffer
 				if (modelsToInsert.length > 0) {
 					insertQueuedModels();
 				}
 				// Resolve the promise, telling pg-promise to run the batch query and complete (or rollback) the
 				// transaction.
-				resolve(t.batch(pendingInserts));
-			} else {
-				console.log("In finish; error happened");
-				reject(error);
-			}
+				resolve(t.batch(pendingInserts).then(arg => {
+					if (error) {
+						return Promise.reject(error);
+					} else {
+						return Promise.resolve(arg)
+					}
+				}));
+			// } else {
+			// 	console.log("In finish; error happened");
+			// 	reject(error);
+			// }
 		});
 		stream.pipe(parser);
 	}));
 }
-
 module.exports = loadFromCsvStream;
