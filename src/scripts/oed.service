@@ -1,0 +1,23 @@
+# To use:
+# This should be copied to /etc/systemd/system/ and the copy renamed so that its function will be clear to admins.
+# Modify the WorkingDirectory variable
+# Modify the user variable
+
+[Unit]
+Description=OED
+Requires=docker.service
+After=docker.service
+
+[Service]
+ExecStart=/usr/bin/docker-compose up
+ExecStop=/usr/bin/docker-compose down
+WorkingDirectory=/example/path/to/project/OED
+Restart=always
+RestartSec=10
+StandardOutput=syslog
+StandardError=syslog
+SyslogIdentifier=OED
+User=example_user
+
+[Install]
+WantedBy=multi-user.target

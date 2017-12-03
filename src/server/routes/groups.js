@@ -9,6 +9,7 @@ const validate = require('jsonschema').validate;
 const Group = require('../models/Group');
 const db = require('../models/database').db;
 const authenticator = require('./authenticator');
+const log = require('../log');
 
 const router = express.Router();
 
@@ -31,7 +32,7 @@ router.get('/', async (req, res) => {
 		const rows = await Group.getAll();
 		res.json(rows.map(formatToOnlyNameAndID));
 	} catch (err) {
-		console.error(`Error while preforming GET all groups query: ${err}`); // eslint-disable-line no-console
+		log(`Error while preforming GET all groups query: ${err}`, 'error');
 	}
 });
 
@@ -51,7 +52,7 @@ router.get('/children/:group_id', async (req, res) => {
 		]);
 		res.json({ meters, groups });
 	} catch (err) {
-		console.error(`Error while preforming GET on all immediate children (meters and groups) of specific group: ${err}`); // eslint-disable-line no-console, max-len
+		log(`Error while preforming GET on all immediate children (meters and groups) of specific group: ${err}`, 'error');
 	}
 });
 
@@ -60,7 +61,7 @@ router.get('/deep/groups/:group_id', async (req, res) => {
 		const [deepGroups] = await Group.getDeepGroupsByGroupID(req.params.group_id);
 		res.json({ deepGroups });
 	} catch (err) {
-		console.error(`Error while preforming GET on all deep child groups of specific group: ${err}`); // eslint-disable-line no-console
+		log(`Error while preforming GET on all deep child groups of specific group: ${err}`, 'error');
 	}
 });
 
@@ -69,7 +70,7 @@ router.get('/deep/meters/:group_id', async (req, res) => {
 		const [deepMeters] = await Group.getDeepMetersByGroupID(req.params.group_id);
 		res.json({ deepMeters });
 	} catch (err) {
-		console.error(`Error while preforming GET on all deep child meters of specific group: ${err}`); // eslint-disable-line no-console
+		log(`Error while preforming GET on all deep child meters of specific group: ${err}`, 'error');
 	}
 });
 
@@ -107,16 +108,16 @@ router.post('/create', async (req, res) => {
 		res.sendStatus(400);
 	} else {
 		try {
-			await db.tx(t => {
+			await db.tx(async t => {
 				const newGroup = new Group(undefined, req.body.name);
-				const insertionQuery = newGroup.insert(t);
-				const adoptGroupsQuery = req.body.childGroups.map(gid => newGroup.adoptGroup(gid));
-				const adoptMetersQuery = req.body.childMeters.map(mid => newGroup.adoptMeter(mid));
-				return t.batch(_.flatten([insertionQuery, adoptGroupsQuery, adoptMetersQuery]));
+				await newGroup.insert(t);
+				const adoptGroupsQuery = req.body.childGroups.map(gid => newGroup.adoptGroup(gid, t));
+				const adoptMetersQuery = req.body.childMeters.map(mid => newGroup.adoptMeter(mid, t));
+				return t.batch(_.flatten([adoptGroupsQuery, adoptMetersQuery]));
 			});
 			res.sendStatus(200);
 		} catch (err) {
-			console.error(`Error while inserting new group ${err}`); // eslint-disable-line no-console
+			log(`Error while inserting new group ${err}`, 'error');
 			res.sendStatus(500);
 		}
 	}
@@ -182,7 +183,7 @@ router.put('/edit', async (req, res) => {
 			});
 			res.sendStatus(200);
 		} catch (err) {
-			console.error(`Error while editing existing group: ${err}`); // eslint-disable-line no-console
+			log(`Error while editing existing group: ${err}`, 'error');
 			res.sendStatus(500);
 		}
 	}
@@ -205,7 +206,7 @@ router.post('/delete', async (req, res) => {
 			await Group.delete(req.body.id);
 			res.sendStatus(200);
 		} catch (err) {
-			console.error(`Error while deleting group ${err}`); // eslint-disable-line no-console
+			log(`Error while deleting group ${err}`, 'error');
 			res.sendStatus(500);
 		}
 	}
