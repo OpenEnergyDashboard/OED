@@ -6,8 +6,8 @@ import React from 'react';
 import Dropzone from 'react-dropzone';
 import axios from 'axios';
 import MultiSelectComponent from './MultiSelectComponent';
-import getToken from '../utils/getToken';
 import HeaderContainer from '../containers/HeaderContainer';
+import getToken from "../utils/getToken";
 
 export default class AdminComponent extends React.Component {
 	constructor(props) {
@@ -16,6 +16,7 @@ export default class AdminComponent extends React.Component {
 	}
 
 	handleFileToImport(files) {
+		//token passed as a header
 		if (!this.props.selectedImportMeter) {
 			this.props.showNotification({
 				message: 'Please select a meter',
@@ -27,8 +28,16 @@ export default class AdminComponent extends React.Component {
 			const file = files[0];
 			const data = new FormData();
 			data.append('csvFile', file);
-			//	data.append('token', getToken());
-			axios.post(`/api/fileProcessing/${this.props.selectedImportMeter.value}`, data)
+			// data.append('token', getToken());
+			axios({
+				method: 'post',
+				url: `/api/fileProcessing/${this.props.selectedImportMeter.value}`,
+				data,
+				params: {
+					token: getToken()
+				}
+			})
+			// axios.post(`/api/fileProcessing/${this.props.selectedImportMeter.value}`, data)
 				.then(() => {
 					this.props.showNotification({
 						message: 'Successfully uploaded meter data',
@@ -45,17 +54,16 @@ export default class AdminComponent extends React.Component {
 						autoDismiss: 3
 					});
 				});
-			}
+		}
 	}
 
 	render() {
-		// onDrop = {this.handleFileToImport}
 		return (
 			<div>
 				<HeaderContainer renderLoginButton={false} renderOptionsButton={false} renderAdminButton={false} />
 				<div className="container-fluid">
 					<div className="col-xs-4">
-						<Dropzone accept = "text/csv,"
+						<Dropzone accept = "text/csv, application/vnd.ms-excel,"
 								  onDrop = {this.handleFileToImport}>
 							<div> Add in a CSV file here:</div>
 						</Dropzone>

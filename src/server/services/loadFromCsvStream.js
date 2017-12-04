@@ -41,7 +41,7 @@ function loadFromCsvStream(stream, mapRowToModel, bulkInsertModels) {
 		// Defines how the parser behaves when it has new data (models to be inserted)
 		parser.on('readable', () => {
 			let row;
-				// We can only get the next row once so we check that it isn't null at the same time that we assign it
+			// We can only get the next row once so we check that it isn't null at the same time that we assign it
 			while ((row = parser.read()) !== null) { // eslint-disable-line no-cond-assign
 				if (!rejected) {
 					modelsToInsert.push(mapRowToModel(row));
@@ -61,20 +61,21 @@ function loadFromCsvStream(stream, mapRowToModel, bulkInsertModels) {
 		});
 		// Defines what happens when the parser's input stream is finished (and thus the promise needs to be resolved)
 		parser.on('finish', () => {
+			console.log("Finished wow");
 			// if (!rejected) {
-				// Insert any models left in the buffer
-				if (modelsToInsert.length > 0) {
-					insertQueuedModels();
+			// Insert any models left in the buffer
+			if (modelsToInsert.length > 0) {
+				insertQueuedModels();
+			}
+			// Resolve the promise, telling pg-promise to run the batch query and complete (or rollback) the
+			// transaction.
+			resolve(t.batch(pendingInserts).then(arg => {
+				if (error) {
+					return Promise.reject(error);
+				} else {
+					return Promise.resolve(arg)
 				}
-				// Resolve the promise, telling pg-promise to run the batch query and complete (or rollback) the
-				// transaction.
-				resolve(t.batch(pendingInserts).then(arg => {
-					if (error) {
-						return Promise.reject(error);
-					} else {
-						return Promise.resolve(arg)
-					}
-				}));
+			}));
 			// } else {
 			// 	console.log("In finish; error happened");
 			// 	reject(error);
