@@ -342,7 +342,7 @@ function shouldSubmitGroupInEditing(state: State): boolean {
 
 function creatingNewGroup(state: State): boolean {
 	// If the group in editing lacks an ID, we are creating a new group
-	const id = state.groups.groupInEditing as GroupDefinition;
+	const id = (state.groups.groupInEditing as GroupDefinition).id;
 	return (id === undefined);
 }
 
@@ -436,7 +436,7 @@ export function deleteGroup(): TerminalThunk {
 			throw new Error('Unacceptable condition: state.groups.groupInEditing has no data.');
 		}
 		const params = {
-			groupInEditing,
+			id: groupInEditing.id,
 			token: getToken()
 		};
 		return axios.post('api/groups/delete', params)
