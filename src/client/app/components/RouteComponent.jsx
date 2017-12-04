@@ -7,9 +7,6 @@ import { Router, Route, browserHistory } from 'react-router';
 import axios from 'axios';
 import moment from 'moment';
 import _ from 'lodash';
-import { IntlProvider, addLocaleData } from 'react-intl';
-import en from 'react-intl/locale-data/en';
-import fr from 'react-intl/locale-data/fr';
 import NotificationSystem from 'react-notification-system';
 import HomeComponent from './HomeComponent';
 import LoginContainer from '../containers/LoginContainer';
@@ -17,36 +14,12 @@ import AdminComponent from './AdminComponent';
 import NotFoundComponent from './NotFoundComponent';
 import GroupMainContainer from '../containers/groups/GroupMainContainer';
 import getToken from '../utils/getToken';
-import localeData from './../../app/data.json';
 
 export default class RouteComponent extends React.Component {
 	constructor(props) {
 		super(props);
 		this.requireAuth = this.requireAuth.bind(this);
 		this.linkToGraph = this.linkToGraph.bind(this);
-		this.localeLanguage = this.localeLanguage.bind(this);
-		this.loadMessages = this.loadMessages.bind(this);
-		addLocaleData([...en, ...fr]);
-	}
-
-	localeLanguage() {
-		// Find the user's locale language
-		const language = (navigator.languages && navigator.languages[0]) ||
-			navigator.language ||
-			navigator.userLanguage;
-		alert(language);
-		return language;
-	}
-
-	loadMessages() {
-		const language = this.localeLanguage();
-		// Try full locale, try locale without region code, fallback to 'en'
-		// Split locales with a region code
-		const languageWithoutRegionCode = language.toLowerCase().split(/[_-]+/)[0];
-
-		// Try full locale, try locale without region code, fallback to 'en'
-		const messages = localeData[languageWithoutRegionCode] || localeData[language] || localeData.en;
-		return messages;
 	}
 
 	shouldComponentUpdate() {
@@ -141,16 +114,14 @@ export default class RouteComponent extends React.Component {
 		return (
 			<div>
 				<NotificationSystem ref={c => { this.notificationSystem = c; }} />
-				<IntlProvider locale={this.localeLanguage()} messages={this.loadMessages()}>
-					<Router history={browserHistory}>
-						<Route path="/" component={HomeComponent} />
-						<Route path="/login" component={LoginContainer} />
-						<Route path="/admin" component={AdminComponent} onEnter={this.requireAuth} />
-						<Route path="/groups" component={GroupMainContainer} onEnter={this.requireAuth} />
-						<Route path="/graph" component={HomeComponent} onEnter={this.linkToGraph} />
-						<Route path="*" component={NotFoundComponent} />
-					</Router>
-				</IntlProvider>
+				<Router history={browserHistory}>
+					<Route path="/" component={HomeComponent} />
+					<Route path="/login" component={LoginContainer} />
+					<Route path="/admin" component={AdminComponent} onEnter={this.requireAuth} />
+					<Route path="/groups" component={GroupMainContainer} onEnter={this.requireAuth} />
+					<Route path="/graph" component={HomeComponent} onEnter={this.linkToGraph} />
+					<Route path="*" component={NotFoundComponent} />
+				</Router>
 			</div>
 		);
 	}

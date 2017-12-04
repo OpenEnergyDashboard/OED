@@ -4,13 +4,5 @@
 
 {
   "presets": ["env", "react"],
-  "plugins": [
-	"transform-object-rest-spread",
-	[
-	  "react-intl", {
-	  "messagesDir": "./build/messages",
-	  "enforceDescriptions": false
-	}
-	]
-  ]
+  "plugins": ["transform-object-rest-spread"]
 }

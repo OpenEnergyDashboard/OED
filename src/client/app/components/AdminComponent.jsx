@@ -3,7 +3,6 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
 
 import React from 'react';
-import { FormattedMessage } from 'react-intl';
 
 /**
  * React component that controls the Admin panel
@@ -12,13 +11,7 @@ import { FormattedMessage } from 'react-intl';
 export default function AdminComponent() {
 	return (
 		<div>
-			<FormattedMessage
-				id="admin.panel"
-				defaultMessage="{txt}"
-				values={{
-					txt: <p>Admin panel</p>
-				}}
-			/>
+			<p>Admin panel</p>
 		</div>
 	);
 }
