@@ -7,6 +7,7 @@ import axios from 'axios';
 import { FormControl, Button } from 'react-bootstrap';
 import { chartTypes } from '../reducers/graph';
 import HeaderContainer from '../containers/HeaderContainer';
+import FooterComponent from '../components/FooterComponent';
 
 export default class AdminComponent extends React.Component {
 	constructor(props) {
@@ -125,6 +126,7 @@ export default class AdminComponent extends React.Component {
 						<Button type="submit" onClick={this.handleSubmitPreferences}>Submit</Button>
 					</div>
 				</div>
+				<FooterComponent />
 			</div>
 		);
 	}

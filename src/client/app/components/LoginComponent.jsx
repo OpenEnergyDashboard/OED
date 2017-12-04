@@ -6,6 +6,8 @@ import React from 'react';
 import axios from 'axios';
 import { browserHistory } from 'react-router';
 import HeaderContainer from '../containers/HeaderContainer';
+import FooterComponent from '../components/FooterComponent';
+
 
 export default class LoginComponent extends React.Component {
 	/**
@@ -95,6 +97,7 @@ export default class LoginComponent extends React.Component {
 					</div>
 					<input style={buttonStyle} className="btn btn-default" type="submit" value="Login" />
 				</form>
+				<FooterComponent />
 			</div>
 		);
 	}
