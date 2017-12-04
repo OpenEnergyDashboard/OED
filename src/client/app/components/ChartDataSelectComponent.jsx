@@ -3,6 +3,7 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
 
 import React from 'react';
+import { FormattedMessage } from 'react-intl';
 import MultiSelectComponent from './MultiSelectComponent';
 
 /**
@@ -52,7 +53,10 @@ export default class ChartDataSelectComponent extends React.Component {
 
 		return (
 			<div>
-				<p style={labelStyle}>Groups:</p>
+				<FormattedMessage
+					id="groups"
+					defaultMessage="Groups:"
+				/>
 				<div style={divBottomPadding}>
 					<MultiSelectComponent
 						options={this.props.groups}
