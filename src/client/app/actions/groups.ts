@@ -8,7 +8,7 @@ import axios from 'axios';
 import getToken from '../utils/getToken';
 import { State, Dispatch, GetState, Thunk, TerminalThunk, ActionType } from '../types/redux';
 import { NamedIDItem } from '../types/items';
-import { StatefulEditable, GroupDefinition, GroupData, GroupID } from '../reducers/groups';
+import { GroupDefinition, GroupData, GroupID } from '../reducers/groups';
 
 export type GroupsAction =
 	| RequestGroupsDetailsAction

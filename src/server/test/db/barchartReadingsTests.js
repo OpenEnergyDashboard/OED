@@ -131,7 +131,8 @@ mocha.describe('Barchart Readings', () => {
 			[meter.id, meter2.id, meter3.id],
 			moment.duration(1, 'hour'),
 			startTimestamp,
-			endTimestamp);
+			endTimestamp
+		);
 		expect(Object.keys(barchartReadings)).to.have.lengthOf(3);
 		expect(barchartReadings[meter.id]).to.have.lengthOf(1);
 		expect(barchartReadings[meter2.id]).to.have.lengthOf(1);

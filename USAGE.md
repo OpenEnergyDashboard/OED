@@ -57,7 +57,11 @@ OED_LOG_FILE=?                 // Path to the log file, defaults to ./log.txt
 1. Run ```systemctl enable oed.service``` to make the service start on server boot.
 1. Bring the app online with ```systemctl start oed.service```. Stop the app with ```systemctl stop oed.service```.
 
-### Administration ###
+
+
+# Administration #
+
+## Data Storage ##
 
 PostgreSQL stores its data in `postgres-data`. This and `node_modules` will be owned by root, becuase the user in the Docker continer is root; to uninstall the app, you need to delete them from inside the container (or as root on your own machine): ```docker-compose run --rm web rm -r postgres-data node_modules```.
 
@@ -69,25 +73,25 @@ You can access the PostgreSQL database through the `database` service. Given tha
 
 ### NPM Scripts ###
 
-These can be run by executing `npm run <script>` in the `web` Docker-Compose service.
+These can be run by executing `npm run <script>` in the `web` Docker-Compose service (e.g. `docker-compose run --rm web npm run <script> [args]`).
 
 App actions:
-* `start` starts the NodeJS webserver
-* `dev` starts Webpack in development mode, dynamically rebuilding the packed file.
-* `build` builds the app for production
+* `start` starts the NodeJS webserver.
+* `dev` starts Webpack in development mode, dynamically rebuilding the client-side application (and re-typechecking) when files change.
+* `build` builds the client-side application for production a single time, and performs typechecking.
 
 Validation and CI actions:
-* `checkHeader` ensures that there are no source files without MPL headers
-* `checkTypescript` ensures that there are no JavaScript source files in the TypeScript portion of the project
-* `lint` runs TSLint against the project to ensure style conformity
-* `typeCheck` runs the TypeScript compiler without emitting code (i.e. just checks for type errors)
+* `checkHeader` ensures that there are no source files without MPL headers.
+* `checkTypescript` ensures that there are no JavaScript source files in the TypeScript portion of the project.
+* `lint` runs TSLint against the project to ensure style conformity.
+* `typeCheck` runs the TypeScript compiler without emitting code (i.e. just checks for type errors).
 * `test` runs the automated test suite on the server.
 
 Administration:
-* `createdb` creates the database schema
-* `addMamacMeters` adds meters from a CSV file with the heading `ip`
-* `updateMamacMeters` fetches new data from known meters
-* `createUser` creates a new user, either with `... createUser <username> <password>` or interactively.
+* `createdb` creates the database schema in an uninitialized database. It will not update the schema.
+* `addMamacMeters` adds meters from a CSV file (see above).
+* `updateMamacMeters` fetches new data from previously imported Mamac meters.
+* `createUser` creates a new user. If given no arguments, it is interactive; you can also pass the username and password as command line arguments.
 
 ### Upgrading the App ###
 

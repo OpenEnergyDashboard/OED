@@ -32,13 +32,6 @@ export interface StatefulEditable {
 	submitted?: boolean;
 }
 
-/**
- * @typedef {Object} State~Groups
- * @property {boolean} isFetching
- * @property {boolean} outdated
- * @property {Object<number, Object>} byGroupID
- * @property {Object} groupInEditing
- */
 export interface GroupsState {
 	isFetching: boolean;
 	outdated: boolean;

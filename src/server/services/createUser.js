@@ -43,7 +43,7 @@ function askPassword(email) {
 
 function terminateReadline(message) {
 	if (message) {
-			log(message);
+		log(message);
 	}
 	rl.close();
 	process.exit(0);

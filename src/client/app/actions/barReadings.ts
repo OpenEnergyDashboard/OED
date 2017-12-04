@@ -126,7 +126,7 @@ function fetchMeterBarReadings(meterIDs: number[], timeInterval: TimeInterval): 
 	return (dispatch: Dispatch, getState: GetState) => {
 		const barDuration = getState().graph.barDuration;
 		dispatch(requestMeterBarReadings(meterIDs, timeInterval, barDuration));
-		// API expectes a comma-seperated string of IDs
+		// API expects a comma-separated string of IDs
 		const stringifiedIDs = meterIDs.join(',');
 
 		return axios.get(`/api/readings/bar/meters/${stringifiedIDs}`, {
@@ -154,7 +154,7 @@ function fetchGroupBarReadings(groupIDs: number[], timeInterval: TimeInterval): 
 	};
 }
 
-function fetchCompareReadings(meterIDs: number[], timeInterval: TimeInterval): Thunk {
+function fetchMeterCompareReadings(meterIDs: number[], timeInterval: TimeInterval): Thunk {
 	return (dispatch: Dispatch, getState: GetState) => {
 		const compareDuration = getState().graph.compareDuration;
 		dispatch(requestMeterBarReadings(meterIDs, timeInterval, compareDuration));
@@ -221,7 +221,7 @@ export function fetchNeededCompareReadings(timeInterval: TimeInterval): Thunk {
 		);
 		// Fetch data for any missing meters
 		if (meterIDsToFetchForCompare.length > 0) {
-			promises.push(dispatch(fetchCompareReadings(meterIDsToFetchForCompare, timeInterval)));
+			promises.push(dispatch(fetchMeterCompareReadings(meterIDsToFetchForCompare, timeInterval)));
 		}
 
 		// Determine which groups are missing data for this time interval

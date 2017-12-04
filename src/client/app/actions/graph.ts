@@ -11,34 +11,34 @@ import { fetchNeededLineReadings } from './lineReadings';
 import { fetchNeededBarReadings, fetchNeededCompareReadings } from './barReadings';
 import { TimeInterval } from '../../../common/TimeInterval';
 import { chartTypes } from '../reducers/graph';
-import { State, Dispatch, GetState, Thunk, TerminalThunk, ActionType } from '../types/redux';
+import { State, Dispatch, Thunk, TerminalThunk, ActionType } from '../types/redux';
 
 export interface UpdateSelectedMetersAction {
-	type: 'UPDATE_SELECTED_METERS';
+	type: ActionType.UpdateSelectedMeters;
 	meterIDs: number[];
 }
 
 export interface UpdateSelectedGroupsAction {
-	type: 'UPDATE_SELECTED_GROUPS';
+	type: ActionType.UpdateSelectedGroups;
 	groupIDs: number[];
 }
 
 export interface UpdateBarDurationAction {
-	type: 'UPDATE_BAR_DURATION';
-	barDuration: number;
+	type: ActionType.UpdateBarDuration;
+	barDuration: moment.Duration;
 }
 
 export interface ChangeChartToRenderAction {
-	type: 'CHANGE_CHART_TO_RENDER';
+	type: ActionType.ChangeChartToRender;
 	chartType: chartTypes;
 }
 
 export interface ChangeBarStackingAction {
-	type: 'CHANGE_BAR_STACKING';
+	type: ActionType.ChangeBarStacking;
 }
 
 export interface ChangeGraphZoomAction {
-	type: 'CHANGE_GRAPH_ZOOM';
+	type: ActionType.ChangeGraphZoom;
 	timeInterval: TimeInterval;
 }
 
@@ -71,7 +71,7 @@ export function updateSelectedGroups(groupIDs: number[]): UpdateSelectedGroupsAc
 	return { type: ActionType.UpdateSelectedGroups, groupIDs };
 }
 
-export function updateBarDuration(barDuration: number): UpdateBarDurationAction {
+export function updateBarDuration(barDuration: moment.Duration): UpdateBarDurationAction {
 	return { type: ActionType.UpdateBarDuration, barDuration };
 }
 
@@ -79,7 +79,7 @@ function changeGraphZoom(timeInterval: TimeInterval): ChangeGraphZoomAction {
 	return { type: ActionType.ChangeGraphZoom, timeInterval };
 }
 
-export function changeBarDuration(barDuration: number): Thunk {
+export function changeBarDuration(barDuration: moment.Duration): Thunk {
 	return (dispatch, getState) => {
 		dispatch(updateBarDuration(barDuration));
 		dispatch(fetchNeededBarReadings(getState().graph.timeInterval));
@@ -94,7 +94,6 @@ export function changeSelectedMeters(meterIDs: number[]): Thunk {
 		dispatch(dispatch2 => {
 			dispatch2(fetchNeededLineReadings(getState().graph.timeInterval));
 			dispatch2(fetchNeededBarReadings(getState().graph.timeInterval));
-			// TODO TYPESCRIPT: This is a conflict that isn't resolvable as is. state.graph.compareTimeInterval really should be a TimeInterval.
 			dispatch2(fetchNeededCompareReadings(getState().graph.compareTimeInterval));
 		});
 		return Promise.resolve();
@@ -108,6 +107,8 @@ export function changeSelectedGroups(groupIDs: number[]): Thunk {
 		dispatch(dispatch2 => {
 			dispatch2(fetchNeededLineReadings(getState().graph.timeInterval));
 			dispatch2(fetchNeededBarReadings(getState().graph.timeInterval));
+			// TODO TYPESCRIPT??
+			dispatch2(fetchNeededCompareReadings(getState().graph.compareTimeInterval));
 		});
 		return Promise.resolve();
 	};
@@ -137,7 +138,7 @@ export interface LinkOptions {
 	meterIDs?: number[];
 	groupIDs?: number[];
 	chartType?: chartTypes;
-	barDuration?: number;
+	barDuration?: moment.Duration;
 	toggleBarStacking?: boolean;
 }
 
@@ -167,5 +168,5 @@ export function changeOptionsFromLink(options: LinkOptions) {
 		dispatchSecond.push(changeBarStacking());
 	}
 	return (dispatch: Dispatch) => Promise.all(dispatchFirst.map(dispatch))
-			.then(() => Promise.all(dispatchSecond.map(dispatch)));
+		.then(() => Promise.all(dispatchSecond.map(dispatch)));
 }

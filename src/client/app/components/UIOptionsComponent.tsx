@@ -24,7 +24,7 @@ export interface UIOptionsProps {
 }
 
 interface UIOptionsState {
-	barDuration: number;
+	barDurationDays: number;
 }
 
 export default class UIOptionsComponent extends React.Component<UIOptionsProps, UIOptionsState> {
@@ -38,12 +38,12 @@ export default class UIOptionsComponent extends React.Component<UIOptionsProps, 
 		this.handleBarDurationChangeComplete = this.handleBarDurationChangeComplete.bind(this);
 		this.handleChangeBarStacking = this.handleChangeBarStacking.bind(this);
 		this.state = {
-			barDuration: this.props.barDuration.asDays()
+			barDurationDays: this.props.barDuration.asDays()
 		};
 	}
 
 	public componentWillReceiveProps(nextProps: UIOptionsProps) {
-		this.setState({ barDuration: nextProps.barDuration.asDays() });
+		this.setState({ barDurationDays: nextProps.barDuration.asDays() });
 	}
 
 	/**
@@ -74,7 +74,7 @@ export default class UIOptionsComponent extends React.Component<UIOptionsProps, 
 						<Slider
 							min={1}
 							max={365}
-							value={this.state.barDuration}
+							value={this.state.barDurationDays}
 							onChange={this.handleBarDurationChange}
 							onChangeComplete={this.handleBarDurationChangeComplete}
 						/>
@@ -96,15 +96,14 @@ export default class UIOptionsComponent extends React.Component<UIOptionsProps, 
 	 * Stores temporary barDuration until slider is released, used to update the UI of the slider
 	 */
 	private handleBarDurationChange(value: number) {
-		this.setState({ barDuration: value });
+		this.setState({ barDurationDays: value});
 	}
 
 	/**
 	 * Called when the user releases the slider, dispatch action on temporary state variable
 	 */
 	private handleBarDurationChangeComplete(e: React.ChangeEvent<null>) {
-		e.preventDefault();
-		this.props.changeDuration(moment.duration(this.state.barDuration, 'days'));
+		this.props.changeDuration(moment.duration({days: this.state.barDurationDays}));
 	}
 
 	private handleChangeBarStacking() {

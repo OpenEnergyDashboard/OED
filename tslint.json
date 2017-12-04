@@ -10,30 +10,53 @@
         "tslint:recommended",
         "tslint-react"
     ],
+    // Rules for JavaScript code.
     "jsRules": {
+        // We have to indent with tabs
         "indent": [true, "tabs"],
+        // No lines longer than 150 are allowed
         "max-line-length": [true, 150],
+        // In general, strings should be clean and single-quoted, with no templates where they aren't needed
         "quotemark": [true, "single", "avoid-escape", "avoid-template"],
+        // No trailing commas allowed anywhere
         "trailing-comma": [true, {"multiline": "never", "singleline": "never"}],
+        // Sometimes we want to seperate sections with multiple blank lines
         "no-consecutive-blank-lines": [false],
+        // Arrow function style: arg => value or (arg1, arg2) => value
         "arrow-parens": [true, "ban-single-arg-parens"],
+        // No need to put keys in alphabetical order
         "object-literal-sort-keys": false,
+        // It's useless to specify radices in most cases
         "radix": false,
+        // The order of imports is annoying and not useful
         "ordered-imports": false
     },
     "rules": {
+        // We have to indent with tabs
         "indent": [true, "tabs"],
+        // No lines longer than 150 are allowed
         "max-line-length": [true, 150],
+        // In general, strings should be clean and single-quoted, with no templates where they aren't needed
         "quotemark": [true, "single", "avoid-escape", "avoid-template"],
+        // No trailing commas allowed anywhere
         "trailing-comma": [true, {"multiline": "never", "singleline": "never"}],
+        // Sometimes we want to seperate sections with multiple blank lines
         "no-consecutive-blank-lines": [false],
+        // Arrow function style: arg => value or (arg1, arg2) => value
         "arrow-parens": [true, "ban-single-arg-parens"],
-        "interface-name": false,
+        // No need to put keys in alphabetical order
         "object-literal-sort-keys": false,
+        // It's useless to specify radices in most cases
         "radix": false,
+        // The order of imports is annoying and not useful
         "ordered-imports": false,
+        // Interfaces don't need to start with the letter I.
+        "interface-name": false,
+        // This rule is buggy.
         "jsx-wrap-multiline": false,
+        // We shouldn't need to be explicit about the value of a true boolean option
         "jsx-boolean-value": [true, "never"],
+        // Long JavaScript (and TypeScript) code should be allowed in JSX/TSX XML
         "jsx-no-multiline-js": false
     },
     "rulesDirectory": []

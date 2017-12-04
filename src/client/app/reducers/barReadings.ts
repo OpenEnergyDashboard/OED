@@ -63,12 +63,16 @@ export default function readings(state = defaultState, action: BarReadingsAction
 			};
 
 			for (const meterID of action.meterIDs) {
+				// Create group entry and time interval entry if needed
 				if (newState.byMeterID[meterID] === undefined) {
 					newState.byMeterID[meterID] = {};
 				}
 				if (newState.byMeterID[meterID][timeInterval] === undefined) {
 					newState.byMeterID[meterID][timeInterval] = {};
-				} else if (newState.byMeterID[meterID][timeInterval][barDuration] === undefined) {
+				}
+
+				// Retain existing data if there is any
+				if (newState.byMeterID[meterID][timeInterval][barDuration] === undefined) {
 					newState.byMeterID[meterID][timeInterval][barDuration] = { isFetching: true };
 				} else {
 					newState.byMeterID[meterID][timeInterval][barDuration] = { ...newState.byMeterID[meterID][timeInterval][barDuration], isFetching: true };
@@ -88,12 +92,16 @@ export default function readings(state = defaultState, action: BarReadingsAction
 			};
 
 			for (const groupID of action.groupIDs) {
+				// Create group entry and time interval entry if needed
 				if (newState.byGroupID[groupID] === undefined) {
 					newState.byGroupID[groupID] = {};
 				}
 				if (newState.byGroupID[groupID][timeInterval] === undefined) {
 					newState.byGroupID[groupID][timeInterval] = {};
-				} else if (newState.byGroupID[groupID][timeInterval][barDuration] === undefined) {
+				}
+
+				// Retain existing data if there is any
+				if (newState.byGroupID[groupID][timeInterval][barDuration] === undefined) {
 					newState.byGroupID[groupID][timeInterval][barDuration] = { isFetching: true };
 				} else {
 					newState.byGroupID[groupID][timeInterval][barDuration] = { ...newState.byGroupID[groupID][timeInterval][barDuration], isFetching: true };
@@ -116,7 +124,6 @@ export default function readings(state = defaultState, action: BarReadingsAction
 				const readingsForMeter = action.readings[meterID];
 				newState.byMeterID[meterID][timeInterval][barDuration] = { isFetching: false, readings: readingsForMeter };
 			}
-
 			return newState;
 		}
 		case ActionType.ReceiveGroupBarReadings: {

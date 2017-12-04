@@ -98,8 +98,7 @@ export default class RouteComponent extends React.Component<RouteProps, {}> {
 							options.chartType = info as chartTypes;
 							break;
 						case 'barDuration':
-							// TODO TYPESCRIPT: Again the irresolvable conflict: is barDuration a number or a duration?
-							options.barDuration = moment.duration(parseInt(info), 'days');
+							const maybeDuration = moment.duration(parseInt(info));
 							break;
 						case 'barStacking':
 							if (this.props.barStacking.toString() !== info) {

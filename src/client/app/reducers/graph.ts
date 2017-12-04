@@ -23,9 +23,7 @@ export interface GraphState {
 	selectedGroups: number[];
 	timeInterval: TimeInterval;
 	barDuration: moment.Duration;
-	// TODO: Should this be a time interval, potentially?
-	// It causes an (I think justified) type error.
-	compareTimeInterval: number;
+	compareTimeInterval: TimeInterval;
 	compareDuration: moment.Duration;
 	chartToRender: chartTypes;
 	barStacking: boolean;
@@ -36,7 +34,7 @@ const defaultState: GraphState = {
 	selectedGroups: [],
 	timeInterval: TimeInterval.unbounded(),
 	barDuration: moment.duration(1, 'month'),
-	compareTimeInterval: moment().diff(moment().startOf('week'), 'days'),
+	compareTimeInterval: new TimeInterval(moment().startOf('week'), moment()),
 	compareDuration: moment.duration(1, 'days'),
 	chartToRender: chartTypes.line,
 	barStacking: false

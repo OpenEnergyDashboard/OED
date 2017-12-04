@@ -6,6 +6,7 @@
  */
 
 import * as readingsActions from '../actions/lineReadings';
+import { ActionType } from '../types/redux';
 
 /**
  * @typedef {Object} State~BarReadings
@@ -50,7 +51,7 @@ const defaultState: LineReadingsState = {
  */
 export default function readings(state = defaultState, action: readingsActions.LineReadingsAction) {
 	switch (action.type) {
-		case readingsActions.REQUEST_METER_LINE_READINGS: {
+		case ActionType.RequestMeterLineReadings: {
 			const timeInterval = action.timeInterval.toString();
 			const newState = {
 				...state,
@@ -60,9 +61,13 @@ export default function readings(state = defaultState, action: readingsActions.L
 			};
 
 			for (const meterID of action.meterIDs) {
+				// Create meter wrapper if needed
 				if (newState.byMeterID[meterID] === undefined) {
 					newState.byMeterID[meterID] = {};
-				} else if (newState.byMeterID[meterID][timeInterval] === undefined) {
+				}
+
+				// Preserve existing data
+				if (newState.byMeterID[meterID][timeInterval] === undefined) {
 					newState.byMeterID[meterID][timeInterval] = { isFetching: true };
 				} else {
 					newState.byMeterID[meterID][timeInterval] = { ...newState.byMeterID[meterID][timeInterval], isFetching: true };
@@ -70,7 +75,7 @@ export default function readings(state = defaultState, action: readingsActions.L
 			}
 			return newState;
 		}
-		case readingsActions.REQUEST_GROUP_LINE_READINGS: {
+		case ActionType.RequestGroupLineReadings: {
 			const timeInterval = action.timeInterval.toString();
 			const newState = {
 				...state,
@@ -80,9 +85,13 @@ export default function readings(state = defaultState, action: readingsActions.L
 			};
 
 			for (const groupID of action.groupIDs) {
+				// Create group wrapper
 				if (newState.byGroupID[groupID] === undefined) {
 					newState.byGroupID[groupID] = {};
-				} else if (newState.byGroupID[groupID][timeInterval] === undefined) {
+				}
+
+				// Preserve existing data
+				if (newState.byGroupID[groupID][timeInterval] === undefined) {
 					newState.byGroupID[groupID][timeInterval] = { isFetching: true };
 				} else {
 					newState.byGroupID[groupID][timeInterval] = { ...newState.byGroupID[groupID][timeInterval], isFetching: true };
@@ -90,7 +99,7 @@ export default function readings(state = defaultState, action: readingsActions.L
 			}
 			return newState;
 		}
-		case readingsActions.RECEIVE_METER_LINE_READINGS: {
+		case ActionType.ReceiveMeterLineReadings: {
 			const timeInterval = action.timeInterval.toString();
 			const newState = {
 				...state,
@@ -105,7 +114,7 @@ export default function readings(state = defaultState, action: readingsActions.L
 			}
 			return newState;
 		}
-		case readingsActions.RECEIVE_GROUP_LINE_READINGS: {
+		case ActionType.ReceiveGroupLineReadings: {
 			const timeInterval = action.timeInterval.toString();
 			const newState = {
 				...state,
