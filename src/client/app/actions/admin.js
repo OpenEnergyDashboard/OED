@@ -38,8 +38,7 @@ function fetchPreferences() {
 			.then(response => {
 				dispatch(receivePreferences(response.data));
 				dispatch((dispatch2, getState) => {
-					const state = getState();
-					dispatch2(changeChartToRender(state.admin.defaultChartToRender));
+					dispatch2(changeChartToRender(getState().admin.defaultChartToRender));
 					dispatch2(changeBarStacking());
 				});
 			});

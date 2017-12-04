@@ -9,11 +9,12 @@ import moment from 'moment';
 import _ from 'lodash';
 import InitializationContainer from '../containers/InitializationContainer';
 import HomeComponent from './HomeComponent';
-import LoginContainer from '../containers/LoginContainer';
+import LoginComponent from '../components/LoginComponent';
 import AdminContainer from '../containers/AdminContainer';
 import NotFoundComponent from './NotFoundComponent';
 import GroupMainContainer from '../containers/groups/GroupMainContainer';
 import getToken from '../utils/getToken';
+import { showErrorNotification } from '../utils/notifications';
 
 export default class RouteComponent extends React.Component {
 	constructor(props) {
@@ -85,12 +86,7 @@ export default class RouteComponent extends React.Component {
 				}
 				this.props.changeOptionsFromLink(options);
 			} catch (err) {
-				this.props.showNotification({
-					message: 'Failed to link to graph',
-					level: 'error',
-					position: 'tr',
-					autoDismiss: 3
-				});
+				showErrorNotification('Failed to link to graph');
 			}
 		}
 		replace({
@@ -109,7 +105,7 @@ export default class RouteComponent extends React.Component {
 				<InitializationContainer />
 				<Router history={browserHistory}>
 					<Route path="/" component={HomeComponent} />
-					<Route path="/login" component={LoginContainer} />
+					<Route path="/login" component={LoginComponent} />
 					<Route path="/admin" component={AdminContainer} onEnter={this.requireAuth} />
 					<Route path="/groups" component={GroupMainContainer} onEnter={this.requireAuth} />
 					<Route path="/graph" component={HomeComponent} onEnter={this.linkToGraph} />

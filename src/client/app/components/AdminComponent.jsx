@@ -8,6 +8,7 @@ import { FormControl, Button } from 'react-bootstrap';
 import { chartTypes } from '../reducers/graph';
 import HeaderContainer from '../containers/HeaderContainer';
 import FooterComponent from '../components/FooterComponent';
+import { showSuccessNotification, showErrorNotification } from '../utils/notifications';
 
 export default class AdminComponent extends React.Component {
 	constructor(props) {
@@ -41,20 +42,10 @@ export default class AdminComponent extends React.Component {
 				}
 			})
 			.then(() => {
-				this.props.showNotification({
-					message: 'Updated preferences',
-					level: 'success',
-					position: 'tr',
-					autoDismiss: 3
-				});
+				showSuccessNotification('Updated preferences');
 			})
 			.catch(() => {
-				this.props.showNotification({
-					message: 'Failed to submit changes',
-					level: 'error',
-					position: 'tr',
-					autoDismiss: 3
-				});
+				showErrorNotification('Failed to submit changes');
 			}
 		);
 	}

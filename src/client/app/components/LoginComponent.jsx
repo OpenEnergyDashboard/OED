@@ -7,6 +7,7 @@ import axios from 'axios';
 import { browserHistory } from 'react-router';
 import HeaderContainer from '../containers/HeaderContainer';
 import FooterComponent from '../components/FooterComponent';
+import { showErrorNotification } from '../utils/notifications';
 
 
 export default class LoginComponent extends React.Component {
@@ -55,12 +56,7 @@ export default class LoginComponent extends React.Component {
 		})
 		.catch(err => {
 			if (err.response.status === 401) {
-				this.props.showNotification({
-					message: 'Invalid email/password combination',
-					level: 'error',
-					position: 'tr',
-					autoDismiss: 3
-				});
+				showErrorNotification('Invalid email/password combination');
 			} else {
 				// If there was a problem other than a lack of authorization, the user can't fix it.
 				// Log it to the console for developer use.
