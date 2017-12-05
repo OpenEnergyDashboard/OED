@@ -77,6 +77,10 @@ export default class UIOptionsComponent extends React.Component {
 		this.props.changeDuration(moment.duration(value, 'days'));
 	}
 
+	handleCompareSpanButton(value) {
+		this.props.chang
+	}
+
 	toggleSlider() {
 		this.setState({ showSlider: !this.state.showSlider });
 	}
@@ -132,6 +136,21 @@ export default class UIOptionsComponent extends React.Component {
 						}
 					</div>
 
+				}
+				{this.props.chartToRender === chartTypes.compare &&
+				<div>
+					<ToggleButtonGroup
+						type="radio"
+						name="timeSpansCompare"
+						value={this.state.compareDuration}
+						onChange={this.handleCompareSpanButton}
+						style={zIndexFix}
+					>
+						<ToggleButton value={1}>Day</ToggleButton>
+						<ToggleButton value={7}>Week</ToggleButton>
+						<ToggleButton value={28}>Month</ToggleButton>
+					</ToggleButtonGroup>
+				</div>
 				}
 
 
