@@ -5,7 +5,7 @@
 import React from 'react';
 import Slider from 'react-rangeslider';
 import moment from 'moment';
-import { Button, ToggleButtonGroup, ToggleButton } from 'react-bootstrap';
+import { Button, ToggleButtonGroup, ToggleButton, ButtonGroup } from 'react-bootstrap';
 import 'react-rangeslider/lib/index.css';
 import '../styles/react-rangeslider-fix.css';
 import { chartTypes } from '../reducers/graph';
@@ -13,6 +13,7 @@ import ExportContainer from '../containers/ExportContainer';
 import ChartSelectContainer from '../containers/ChartSelectContainer';
 import ChartDataSelectContainer from '../containers/ChartDataSelectContainer';
 import ChartLinkContainer from '../containers/ChartLinkContainer';
+import TimeInterval from '../../../common/TimeInterval';
 
 export default class UIOptionsComponent extends React.Component {
 	/**
@@ -26,6 +27,7 @@ export default class UIOptionsComponent extends React.Component {
 		this.handleBarDurationChangeComplete = this.handleBarDurationChangeComplete.bind(this);
 		this.handleChangeBarStacking = this.handleChangeBarStacking.bind(this);
 		this.handleSpanButton = this.handleSpanButton.bind(this);
+		this.handleCompareSpanButton = this.handleCompareSpanButton.bind(this);
 		this.toggleSlider = this.toggleSlider.bind(this);
 		this.state = {
 			barDuration: this.props.barDuration.asDays(),
@@ -78,7 +80,8 @@ export default class UIOptionsComponent extends React.Component {
 	}
 
 	handleCompareSpanButton(value) {
-		this.props.chang
+		console.log(value);
+		this.props.changeCompareInterval(value);
 	}
 
 	toggleSlider() {
@@ -139,17 +142,16 @@ export default class UIOptionsComponent extends React.Component {
 				}
 				{this.props.chartToRender === chartTypes.compare &&
 				<div>
-					<ToggleButtonGroup
-						type="radio"
+					<ButtonGroup
 						name="timeSpansCompare"
-						value={this.state.compareDuration}
+						value={this.state.compareInterval}
 						onChange={this.handleCompareSpanButton}
 						style={zIndexFix}
 					>
-						<ToggleButton value={1}>Day</ToggleButton>
-						<ToggleButton value={7}>Week</ToggleButton>
-						<ToggleButton value={28}>Month</ToggleButton>
-					</ToggleButtonGroup>
+						<Button>Day</Button>
+						<Button>Week</Button>
+						<Button>Month</Button>
+					</ButtonGroup>
 				</div>
 				}
 

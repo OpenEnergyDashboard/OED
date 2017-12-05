@@ -5,7 +5,10 @@
 import _ from 'lodash';
 import { connect } from 'react-redux';
 import UIOptionsComponent from '../components/UIOptionsComponent';
-import { changeSelectedMeters, changeBarDuration, changeBarStacking } from '../actions/graph';
+import {
+	changeSelectedMeters, changeBarDuration, changeBarStacking, changeCompareDuration,
+	changeCompareTimeInterval
+} from '../actions/graph';
 import { fetchMetersDetailsIfNeeded } from '../actions/meters';
 
 /**
@@ -26,7 +29,7 @@ function mapStateToProps(state) {
 		barDuration: state.graph.barDuration,
 		barStacking: state.graph.barStacking,
 		compareInterval: state.graph.compareTimeInterval,
-		compareDuration:	state.graph.compareDuration
+		compareDuration: state.graph.compareDuration
 	};
 }
 
@@ -35,6 +38,7 @@ function mapDispatchToProps(dispatch) {
 		fetchMetersDetailsIfNeeded: () => dispatch(fetchMetersDetailsIfNeeded()),
 		selectMeters: newSelectedMeterIDs => dispatch(changeSelectedMeters(newSelectedMeterIDs)),
 		changeDuration: barDuration => dispatch(changeBarDuration(barDuration)),
+		changeCompareInterval: compareInterval => dispatch(changeCompareTimeInterval(compareInterval)),
 		changeBarStacking: () => dispatch(changeBarStacking())
 	};
 }

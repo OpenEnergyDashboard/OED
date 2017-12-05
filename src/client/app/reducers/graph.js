@@ -50,10 +50,11 @@ export default function graph(state = defaultState, action) {
 				...state,
 				barDuration: action.barDuration
 			};
-		case graphActions.UPDATE_COMPARE_DURATION:
+		case graphActions.UPDATE_COMPARE_INTERVAL:
 			return {
 				...state,
-				compareDuration: action.compareDuration
+				compareTimeInterval: action.compareTimeInterval
+				// TODO update duration accordingly
 			};
 		case graphActions.CHANGE_GRAPH_ZOOM:
 			return {
