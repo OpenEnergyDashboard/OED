@@ -5,7 +5,7 @@
 import React from 'react';
 import Slider from 'react-rangeslider';
 import moment from 'moment';
-import { Button, ToggleButtonGroup, ToggleButton, ButtonGroup } from 'react-bootstrap';
+import { Button, ToggleButtonGroup, ToggleButton } from 'react-bootstrap';
 import 'react-rangeslider/lib/index.css';
 import '../styles/react-rangeslider-fix.css';
 import { chartTypes } from '../reducers/graph';
@@ -80,8 +80,19 @@ export default class UIOptionsComponent extends React.Component {
 	}
 
 	handleCompareSpanButton(value) {
-		console.log(value);
-		this.props.changeCompareInterval(value);
+		let compareTimeInterval;
+		switch (value) {
+			case 'day':
+				compareTimeInterval = new TimeInterval(moment().subtract('2 days'), moment()).toString();
+				break;
+			case 'month':
+				compareTimeInterval = new TimeInterval(moment().startOf('week').subtract('42 days'), moment()).toString();
+				break;
+			default: // handles week
+				compareTimeInterval = new TimeInterval(moment().startOf('week').subtract(7, 'days'), moment()).toString();
+				break;
+		}
+		this.props.changeCompareInterval(compareTimeInterval);
 	}
 
 	toggleSlider() {
@@ -142,16 +153,16 @@ export default class UIOptionsComponent extends React.Component {
 				}
 				{this.props.chartToRender === chartTypes.compare &&
 				<div>
-					<ButtonGroup
+					<ToggleButtonGroup
 						name="timeSpansCompare"
 						value={this.state.compareInterval}
 						onChange={this.handleCompareSpanButton}
 						style={zIndexFix}
 					>
-						<Button>Day</Button>
-						<Button>Week</Button>
-						<Button>Month</Button>
-					</ButtonGroup>
+						<ToggleButton value="day">Day</ToggleButton>
+						<ToggleButton value="week">Week</ToggleButton>
+						<ToggleButton value="month">Month</ToggleButton>
+					</ToggleButtonGroup>
 				</div>
 				}
 

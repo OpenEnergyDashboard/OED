@@ -35,7 +35,7 @@ function mapStateToProps(state, ownProps) {
 			if (change < 0) return `${state.groups.byGroupID[ownProps.id].name} has used ${parseInt(change.toFixed(2).replace('.', '').slice(1))}% less energy this week.`;
 			return `${state.groups.byGroupID[ownProps.id].name} has used ${parseInt(change.toFixed(2).replace('.', ''))}% more energy this week.`;
 		};
-	}	else {
+	} else {
 		delta = change => {
 			if (isNaN(change)) return '';
 			if (change < 0) return `${state.meters.byMeterID[ownProps.id].name} has used ${parseInt(change.toFixed(2).replace('.', '').slice(1))}% less energy this week.`;
