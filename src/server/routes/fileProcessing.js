@@ -10,11 +10,6 @@ const multer = require('multer');
 const streamToDB = require('../services/loadFromCsvStream');
 const authenticator = require('./authenticator');
 const router = express.Router();
-//read file in a different way.
-//fix id issue
-//fix token issue
-//make sure tests work
-
 
 // The upload here ensures that the file is saved to server RAM rather than disk
 const upload = multer({ storage: multer.memoryStorage() });

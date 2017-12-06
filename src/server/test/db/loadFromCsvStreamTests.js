@@ -10,6 +10,8 @@ const moment = require('moment');
 const path = require('path');
 const Reading = require('../../models/Reading');
 const streamBuffers = require('stream-buffers');
+const fs = require('fs');
+const promisify = require('es6-promisify');
 
 chai.use(chaiAsPromised);
 const expect = chai.expect;
@@ -21,7 +23,7 @@ const readCsv = require('../../services/readCSV');
 
 const mocha = require('mocha');
 
-mocha.describe('Read mamc log from a file', () => {
+mocha.describe('Read mamc log from a file: ', () => {
 	mocha.beforeEach(recreateDB);
 	let meter;
 	mocha.beforeEach(async () => {
@@ -31,13 +33,13 @@ mocha.describe('Read mamc log from a file', () => {
 
 	mocha.it('loads the correct number of rows from a file', async () => {
 		const testFilePath = path.join(__dirname, 'data', 'mamac-log.csv');
-		const buffer = await readCsv(testFilePath);
+		const readFile = promisify(fs.readFile);
+		const buffer = await readFile(testFilePath);
 		const myReadableStreamBuffer = new streamBuffers.ReadableStreamBuffer({
 			frequency: 10,
 			chunkSize: 2048
 		});
 		//open file.
-		console.log(buffer);
 		myReadableStreamBuffer.put(buffer);
 		myReadableStreamBuffer.stop();
 		await loadFromCsvStream(myReadableStreamBuffer, row => {
@@ -54,8 +56,9 @@ mocha.describe('Read mamc log from a file', () => {
 	});
 
 	mocha.it('errors correctly on an invalid file', async () => {
-		const testFilePath = path.join(__dirname, 'data', 'mamac-logInvalid.csv');
-		const buffer = await readCsv(testFilePath);
+		const testFilePath = path.join(__dirname, 'data', 'mamac-invalid.csv');
+		const readFile = promisify(fs.readFile);
+		const buffer = await readFile(testFilePath);
 		const myReadableStreamBuffer = new streamBuffers.ReadableStreamBuffer({
 			frequency: 10,
 			chunkSize: 2048
@@ -74,10 +77,11 @@ mocha.describe('Read mamc log from a file', () => {
 		).to.eventually.be.rejected;
 
 	});
-	mocha.it('rolls back correctly when it rejects', async () => {
-		const testFilePath = path.join(__dirname, 'data', 'mamac-logInvalid.csv');
-		const buffer = await readCsv(testFilePath);
 
+	mocha.it('rolls back correctly when it rejects', async () => {
+		const testFilePath = path.join(__dirname, 'data', 'mamac-invalid.csv');
+		const readFile = promisify(fs.readFile);
+		const buffer = await readFile(testFilePath);
 		const myReadableStreamBuffer = new streamBuffers.ReadableStreamBuffer({
 			frequency: 10,
 			chunkSize: 2048
