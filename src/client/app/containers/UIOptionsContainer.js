@@ -29,7 +29,6 @@ function mapStateToProps(state) {
 		barDuration: state.graph.barDuration,
 		barStacking: state.graph.barStacking,
 		compareInterval: state.graph.compareTimeInterval,
-		compareDuration: state.graph.compareDuration
 	};
 }
 

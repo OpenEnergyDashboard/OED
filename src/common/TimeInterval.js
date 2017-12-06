@@ -6,7 +6,6 @@
 
 const moment = require('moment');
 
-
 class TimeInterval {
 	constructor(startTimestamp, endTimestamp) {
 		this.startTimestamp = startTimestamp && moment.utc(startTimestamp);
