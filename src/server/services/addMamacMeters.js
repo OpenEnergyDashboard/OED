@@ -6,13 +6,13 @@
 // Script to add meters from a .xlsx file
 const reqPromise = require('request-promise-native');
 const path = require('path');
-const readCSV = require('../server/services/readCSV');
+const readCSV = require('./readCSV');
 const promisify = require('es6-promisify');
 const parseString = require('xml2js').parseString;
-const Meter = require('../server/models/Meter');
+const Meter = require('../models/Meter');
 const _ = require('lodash');
-const stopDB = require('../server/models/database').stopDB;
-const log = require('../server/log');
+const stopDB = require('../models/database').stopDB;
+const log = require('../log');
 
 const parseXMLPromisified = promisify(parseString);
 
