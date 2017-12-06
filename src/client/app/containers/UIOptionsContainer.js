@@ -6,7 +6,7 @@ import _ from 'lodash';
 import { connect } from 'react-redux';
 import UIOptionsComponent from '../components/UIOptionsComponent';
 import {
-	changeSelectedMeters, changeBarDuration, changeBarStacking, changeCompareDuration,
+	changeSelectedMeters, changeBarDuration, changeBarStacking,
 	changeCompareTimeInterval
 } from '../actions/graph';
 import { fetchMetersDetailsIfNeeded } from '../actions/meters';

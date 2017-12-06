@@ -60,7 +60,6 @@ function mapStateToProps(state, ownProps) {
 		readingsData = state.readings.bar.byMeterID[ownProps.id][timeInterval][barDuration];
 	}
 	if (readingsData !== undefined && !readingsData.isFetching) {
-
 		// Can't get time span in days so instead calculate what mode is being compared here
 		if (readingsData.readings.length < 7) {
 			soFar = 1;
