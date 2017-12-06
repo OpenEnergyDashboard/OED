@@ -16,6 +16,7 @@ export const CHANGE_CHART_TO_RENDER = 'CHANGE_CHART_TO_RENDER';
 export const CHANGE_BAR_STACKING = 'CHANGE_BAR_STACKING';
 export const CHANGE_GRAPH_ZOOM = 'CHANGE_GRAPH_ZOOM';
 export const UPDATE_COMPARE_INTERVAL = 'UPDATE_COMPARE_INTERVAL';
+export const UPDATE_COMPARE_DURATION = 'UPDATE_COMPARE_DURATION';
 
 
 /**
@@ -54,9 +55,14 @@ function updateCompareTimeInterval(compareTimeInterval) {
 	return { type: UPDATE_COMPARE_INTERVAL, compareTimeInterval };
 }
 
-export function changeCompareTimeInterval(compareTimeInterval) {
+function updateCompareDuration(compareDuration) {
+	return { type: UPDATE_COMPARE_DURATION, compareDuration };
+}
+
+export function changeCompareTimeInterval(compareTimeInterval, compareDuration) {
 	return (dispatch, getState) => {
 		dispatch(updateCompareTimeInterval(compareTimeInterval));
+		dispatch(updateCompareDuration(compareDuration));
 		dispatch(fetchNeededCompareReadings(getState().graph.compareTimeInterval));
 		return Promise.resolve();
 	};

@@ -37,7 +37,7 @@ function mapDispatchToProps(dispatch) {
 		fetchMetersDetailsIfNeeded: () => dispatch(fetchMetersDetailsIfNeeded()),
 		selectMeters: newSelectedMeterIDs => dispatch(changeSelectedMeters(newSelectedMeterIDs)),
 		changeDuration: barDuration => dispatch(changeBarDuration(barDuration)),
-		changeCompareInterval: compareInterval => dispatch(changeCompareTimeInterval(compareInterval)),
+		changeCompareInterval: (compareInterval, compareDuration) => dispatch(changeCompareTimeInterval(compareInterval, compareDuration)),
 		changeBarStacking: () => dispatch(changeBarStacking())
 	};
 }

@@ -55,6 +55,11 @@ export default function graph(state = defaultState, action) {
 				...state,
 				compareTimeInterval: action.compareTimeInterval
 			};
+		case graphActions.UPDATE_COMPARE_DURATION:
+			return {
+				...state,
+				compareDuration: action.compareDuration
+			};
 		case graphActions.CHANGE_GRAPH_ZOOM:
 			return {
 				...state,

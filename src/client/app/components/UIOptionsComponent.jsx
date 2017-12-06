@@ -81,18 +81,22 @@ export default class UIOptionsComponent extends React.Component {
 
 	handleCompareSpanButton(value) {
 		let compareTimeInterval;
+		let compareDuration;
 		switch (value) {
 			case 'day':
 				compareTimeInterval = new TimeInterval(moment().subtract(2, 'days'), moment()).toString();
+				compareDuration = moment.duration(1, 'hours');
 				break;
 			case 'month':
 				compareTimeInterval = new TimeInterval(moment().startOf('week').subtract(49, 'days'), moment()).toString();
+				compareDuration = moment.duration(1, 'days');
 				break;
 			default: // handles week
 				compareTimeInterval = new TimeInterval(moment().startOf('week').subtract(7, 'days'), moment()).toString();
+				compareDuration = moment.duration(1, 'days');
 				break;
 		}
-		this.props.changeCompareInterval(compareTimeInterval);
+		this.props.changeCompareInterval(compareTimeInterval, compareDuration);
 	}
 
 	toggleSlider() {

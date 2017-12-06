@@ -60,12 +60,11 @@ function mapStateToProps(state, ownProps) {
 		readingsData = state.readings.bar.byMeterID[ownProps.id][timeInterval][barDuration];
 	}
 	if (readingsData !== undefined && !readingsData.isFetching) {
-		// Can't get time span in days so instead calculate what mode is being compared here
 		if (readingsData.readings.length < 7) {
-			soFar = 1;
+			soFar = moment().hour();
 		} else if (readingsData.readings.length < 14) {
 			soFar = moment().diff(moment().startOf('week'), 'days');
-		}		else {
+		} else {
 			soFar = moment().diff(moment().startOf('week').subtract(21, 'days'), 'days');
 		}
 
@@ -77,8 +76,8 @@ function mapStateToProps(state, ownProps) {
 		for (let i = 0; i < readingsData.readings.length - soFar; i++) {
 			prev += readingsData.readings[i][1];
 		}
-		// Calculate currentPrev. Have to special case this due to lack of hour data. Also handles Sunday.
-		if (readingsData.readings.length < 7 || soFar === 0) {
+		// Calculate currentPrev. Have to special case Sunday. Fixing this is a good first issue since we now have hour data.
+		if (soFar === 0) {
 			currentPrev = Math.round((readingsData.readings[0][1] / 24) * moment().hour());
 		} else {
 			for (let i = 0; i < soFar; i++) {
