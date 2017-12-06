@@ -10,8 +10,8 @@ import _ from 'lodash';
 import NotificationSystem from 'react-notification-system';
 import HomeComponent from './HomeComponent';
 import LoginContainer from '../containers/LoginContainer';
-import AdminComponent from './AdminComponent';
-import NotFoundComponent from './NotFoundComponent';
+import AdminContainer from '../containers/AdminContainer';
+import InitializationContainer from '../containers/InitializationContainer';
 import GroupMainContainer from '../containers/groups/GroupMainContainer';
 import getToken from '../utils/getToken';
 
@@ -113,14 +113,13 @@ export default class RouteComponent extends React.Component {
 	render() {
 		return (
 			<div>
-				<NotificationSystem ref={c => { this.notificationSystem = c; }} />
+				<InitializationContainer />
 				<Router history={browserHistory}>
-					<Route path="/" component={HomeComponent} />
 					<Route path="/login" component={LoginContainer} />
 					<Route path="/admin" component={AdminComponent} onEnter={this.requireAuth} />
 					<Route path="/groups" component={GroupMainContainer} onEnter={this.requireAuth} />
 					<Route path="/graph" component={HomeComponent} onEnter={this.linkToGraph} />
-					<Route path="*" component={NotFoundComponent} />
+					<Route path="*" component={HomeComponent} />
 				</Router>
 			</div>
 		);
