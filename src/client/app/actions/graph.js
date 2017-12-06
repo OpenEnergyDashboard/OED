@@ -57,7 +57,7 @@ function updateCompareTimeInterval(compareTimeInterval) {
 export function changeCompareTimeInterval(compareTimeInterval) {
 	return (dispatch, getState) => {
 		dispatch(updateCompareTimeInterval(compareTimeInterval));
-		dispatch(fetchNeededBarReadings(getState().graph.compareTimeInterval));
+		dispatch(fetchNeededCompareReadings(getState().graph.compareTimeInterval));
 		return Promise.resolve();
 	};
 }

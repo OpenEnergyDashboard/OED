@@ -83,10 +83,10 @@ export default class UIOptionsComponent extends React.Component {
 		let compareTimeInterval;
 		switch (value) {
 			case 'day':
-				compareTimeInterval = new TimeInterval(moment().subtract('2 days'), moment()).toString();
+				compareTimeInterval = new TimeInterval(moment().subtract(2, 'days'), moment()).toString();
 				break;
 			case 'month':
-				compareTimeInterval = new TimeInterval(moment().startOf('week').subtract('42 days'), moment()).toString();
+				compareTimeInterval = new TimeInterval(moment().startOf('week').subtract(49, 'days'), moment()).toString();
 				break;
 			default: // handles week
 				compareTimeInterval = new TimeInterval(moment().startOf('week').subtract(7, 'days'), moment()).toString();

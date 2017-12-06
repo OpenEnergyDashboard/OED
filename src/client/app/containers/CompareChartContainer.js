@@ -25,7 +25,9 @@ function mapStateToProps(state, ownProps) {
 	let prev = 0;
 	// Power used up to this point last week
 	let currentPrev = 0;
-	const soFar = moment().diff(moment().startOf('week'), 'days');
+	// How long it's been since start of measure period
+	let soFar;
+
 
 	// Compose the text to display to the user.
 	let delta;
@@ -58,29 +60,18 @@ function mapStateToProps(state, ownProps) {
 		readingsData = state.readings.bar.byMeterID[ownProps.id][timeInterval][barDuration];
 	}
 	if (readingsData !== undefined && !readingsData.isFetching) {
-		// 	// Sunday needs special logic
-		// 	if (soFar !== 0) {
-		// 		// Calculate current
-		// 		for (let i = 1; i <= soFar; i++) {
-		// 			current += readingsData.readings[readingsData.readings.length - i][1];
-		// 		}
-		// 		// Calculate lastWeek
-		// 		for (let i = 0; i < 7; i++) {
-		// 			lastWeek += readingsData.readings[readingsData.readings.length - (8 + i) - soFar][1];
-		// 		}
-		//
-		// 		// Calculate currentLastWeek
-		// 		for (let i = 1; i <= soFar; i++) {
-		// 			currentLastWeek += readingsData.readings[readingsData.readings.length - i - 7][1];
-		// 		}
-		// 	} else {
-		// 		current = readingsData.readings[readingsData.readings.length - 1][1];
-		// 		// Data is acquired in days so when less than a day has passed we need to estimate
-		// 		currentLastWeek = Math.round((readingsData.readings[readingsData.readings.length - 8][1] / 24) * moment().hour());
-		// 		for (let i = 0; i < 7; i++) {
-		// 			lastWeek += readingsData.readings[readingsData.readings.length - 7][1];
-		// 		}
-		// Calculate current
+		console.log(readingsData.readings.length);
+
+		// Can't get time span in days so instead calculate what mode is being compared here
+		if (readingsData.readings.length < 7) {
+			soFar = 1;
+		} else if (readingsData.readings.length < 14) {
+			soFar = moment().diff(moment().startOf('week'), 'days');
+		}		else {
+			soFar = moment().diff(moment().startOf('week').subtract(21, 'days'), 'days');
+		}
+
+		// Calculates current
 		for (let i = readingsData.readings.length - soFar; i < readingsData.readings.length; i++) {
 			current += readingsData.readings[i][1];
 		}
@@ -88,9 +79,13 @@ function mapStateToProps(state, ownProps) {
 		for (let i = 0; i < readingsData.readings.length - soFar; i++) {
 			prev += readingsData.readings[i][1];
 		}
-		// Calculate currentPrev
-		for (let i = 0; i < soFar; i++) {
-			currentPrev += readingsData.readings[i][1];
+		// Calculate currentPrev. Have to special case this due to lack of hour data. Also handles Sunday.
+		if (readingsData.readings.length < 7 || soFar === 0) {
+			currentPrev = Math.round((readingsData.readings[0][1] / 24) * moment().hour());
+		} else {
+			for (let i = 0; i < soFar; i++) {
+				currentPrev += readingsData.readings[i][1];
+			}
 		}
 	}
 
