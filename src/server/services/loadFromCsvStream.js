@@ -19,11 +19,10 @@ const csv = require('csv');
  * @param stream the raw stream to load from
  * @param {function(Array.<*>, ...*): M} mapRowToModel A function that maps a CSV row (an array) to a model object
  * @param {function(Array.<M>, ITask): Promise<>} bulkInsertModels A function that bulk inserts an array of models using the supplied transaction
- * @return {function(fs.ReadStream, ...*): Promise.<>} A promise to execute the load operation
  * @template M
  */
 function loadFromCsvStream(stream, mapRowToModel, bulkInsertModels) {
-	return db.tx(t => new Promise((resolve, reject) => {
+	return db.tx(t => new Promise((resolve) => {
 		let rejected = false;
 		let error = null;
 		const MIN_INSERT_BUFFER_SIZE = 1000;

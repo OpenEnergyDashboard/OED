@@ -19,7 +19,6 @@ const recreateDB = require('./common').recreateDB;
 const db = require('../../models/database').db;
 const Meter = require('../../models/Meter');
 const loadFromCsvStream = require('../../services/loadFromCsvStream');
-const readCsv = require('../../services/readCSV');
 
 const mocha = require('mocha');
 
