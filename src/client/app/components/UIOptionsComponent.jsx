@@ -128,7 +128,7 @@ export default class UIOptionsComponent extends React.Component {
 						<div className="checkbox">
 							<label><input type="checkbox" onChange={this.handleChangeBarStacking} checked={this.props.barStacking} />Bar stacking</label>
 						</div>
-						<p style={labelStyle}>Bar chart interval (days):</p>
+						<p style={labelStyle}>Bar chart interval:</p>
 						<ToggleButtonGroup
 							type="radio"
 							name="timeSpans"
@@ -140,7 +140,7 @@ export default class UIOptionsComponent extends React.Component {
 							<ToggleButton value={7}>Week</ToggleButton>
 							<ToggleButton value={28}>Month</ToggleButton>
 						</ToggleButtonGroup>
-						<Button name="customToggle" onClick={this.toggleSlider}>Toggle Custom Slider</Button>
+						<Button name="customToggle" onClick={this.toggleSlider}>Toggle Custom Slider (days)</Button>
 
 						{this.state.showSlider &&
 						<Slider

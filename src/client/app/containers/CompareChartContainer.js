@@ -34,14 +34,14 @@ function mapStateToProps(state, ownProps) {
 	if (ownProps.isGroup) {
 		delta = change => {
 			if (isNaN(change)) return '';
-			if (change < 0) return `${state.groups.byGroupID[ownProps.id].name} has used ${parseInt(change.toFixed(2).replace('.', '').slice(1))}% less energy this week.`;
-			return `${state.groups.byGroupID[ownProps.id].name} has used ${parseInt(change.toFixed(2).replace('.', ''))}% more energy this week.`;
+			if (change < 0) return `${state.groups.byGroupID[ownProps.id].name} has used ${parseInt(change.toFixed(2).replace('.', '').slice(1))}% less energy this time interval.`;
+			return `${state.groups.byGroupID[ownProps.id].name} has used ${parseInt(change.toFixed(2).replace('.', ''))}% more energy this time interval.`;
 		};
 	} else {
 		delta = change => {
 			if (isNaN(change)) return '';
-			if (change < 0) return `${state.meters.byMeterID[ownProps.id].name} has used ${parseInt(change.toFixed(2).replace('.', '').slice(1))}% less energy this week.`;
-			return `${state.meters.byMeterID[ownProps.id].name} has used ${parseInt(change.toFixed(2).replace('.', ''))}% more energy this week.`;
+			if (change < 0) return `${state.meters.byMeterID[ownProps.id].name} has used ${parseInt(change.toFixed(2).replace('.', '').slice(1))}% less energy this time interval.`;
+			return `${state.meters.byMeterID[ownProps.id].name} has used ${parseInt(change.toFixed(2).replace('.', ''))}% more energy this time interval.`;
 		};
 	}
 
@@ -88,8 +88,8 @@ function mapStateToProps(state, ownProps) {
 	}
 
 
-	labels.push('Last week');
-	labels.push('This week');
+	labels.push('Last time interval');
+	labels.push('This time interval');
 	const color1 = 'rgba(173, 216, 230, 1)';
 	const color2 = 'rgba(218, 165, 32, 1)';
 	const color3 = 'rgba(173, 216, 230, 0.45)';
