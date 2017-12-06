@@ -33,21 +33,12 @@ app.use('/api/groups', groups);
 app.use('/api/verification', verification);
 app.use('/api/version', version);
 
-app.get('*', (req, res) => {
+app.get('\\/|login|admin|groups|graph', (req, res) => {
 	res.sendFile(path.resolve(__dirname, '..', 'client', 'index.html'));
 });
 
-// catch 404 and forward to error handler
-app.use((req, res, next) => {
-	const err = new Error('Not Found');
-	err.status = 404;
-	next(err);
-});
-
-app.use((err, req, res) => {
-	res.status(err.status || 500);
-	if (err.status === 404) res.send(`<h1>${err.status} Not found</h1>`);
-	else res.send(`<h1>${err.status} Server Error</h1>`);
+app.use((req, res) => {
+	res.status(404).send('<h1>404 Not Found<h1/>');
 });
 
 module.exports = app;
