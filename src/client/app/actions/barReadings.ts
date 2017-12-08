@@ -7,44 +7,10 @@
 import axios from 'axios';
 import * as moment from 'moment';
 import { TimeInterval } from '../../../common/TimeInterval';
-import { State, Dispatch, GetState, Thunk, ActionType } from '../types/redux';
+import { Dispatch, GetState, Thunk, ActionType } from '../types/redux/actions';
+import { State } from '../types/redux/state';
 import { BarReadings } from '../types/readings';
-
-export interface RequestMeterBarReadingsAction {
-	type: ActionType.RequestMeterBarReadings;
-	meterIDs: number[];
-	timeInterval: TimeInterval;
-	barDuration: moment.Duration;
-}
-
-export interface RequestGroupBarReadingsAction {
-	type: ActionType.RequestGroupBarReadings;
-	groupIDs: number[];
-	timeInterval: TimeInterval;
-	barDuration: moment.Duration;
-}
-
-export interface ReceiveMeterBarReadingsAction {
-	type: ActionType.ReceiveMeterBarReadings;
-	meterIDs: number[];
-	timeInterval: TimeInterval;
-	barDuration: moment.Duration;
-	readings: BarReadings;
-}
-
-export interface ReceiveGroupBarReadingsAction {
-	type: ActionType.ReceiveGroupBarReadings;
-	groupIDs: number[];
-	timeInterval: TimeInterval;
-	barDuration: moment.Duration;
-	readings: BarReadings;
-}
-
-export type BarReadingsAction =
-	ReceiveMeterBarReadingsAction |
-	ReceiveGroupBarReadingsAction |
-	RequestMeterBarReadingsAction |
-	RequestGroupBarReadingsAction;
+import * as t from '../types/redux/barReadings';
 
 /**
  * @param {State} state the Redux state
@@ -98,21 +64,21 @@ function shouldFetchGroupBarReadings(state: State, groupID: number, timeInterval
 	return !readingsForBarDuration.isFetching;
 }
 
-function requestMeterBarReadings(meterIDs: number[], timeInterval: TimeInterval, barDuration: moment.Duration): RequestMeterBarReadingsAction {
+function requestMeterBarReadings(meterIDs: number[], timeInterval: TimeInterval, barDuration: moment.Duration): t.RequestMeterBarReadingsAction {
 	return { type: ActionType.RequestMeterBarReadings, meterIDs, timeInterval, barDuration };
 }
 
 function receiveMeterBarReadings(meterIDs: number[], timeInterval: TimeInterval, barDuration: moment.Duration, readings: BarReadings):
-	ReceiveMeterBarReadingsAction {
+	t.ReceiveMeterBarReadingsAction {
 	return { type: ActionType.ReceiveMeterBarReadings, meterIDs, timeInterval, barDuration, readings };
 }
 
-function requestGroupBarReadings(groupIDs: number[], timeInterval: TimeInterval, barDuration: moment.Duration): RequestGroupBarReadingsAction {
+function requestGroupBarReadings(groupIDs: number[], timeInterval: TimeInterval, barDuration: moment.Duration): t.RequestGroupBarReadingsAction {
 	return { type: ActionType.RequestGroupBarReadings, groupIDs, timeInterval, barDuration };
 }
 
 function receiveGroupBarReadings(groupIDs: number[], timeInterval: TimeInterval, barDuration: moment.Duration, readings: BarReadings):
-	ReceiveGroupBarReadingsAction {
+	t.ReceiveGroupBarReadingsAction {
 	return { type: ActionType.ReceiveGroupBarReadings, groupIDs, timeInterval, barDuration, readings };
 }
 

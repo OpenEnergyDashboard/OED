@@ -5,34 +5,14 @@
  */
 
 import * as _ from 'lodash';
-import { MetersAction } from '../actions/meters';
-import { ActionType } from '../types/redux';
-
-/**
- * @typedef {Object} State~Meters
- * @property {boolean} isFetching
- * @property {Object<number, Object>} byMeterID
- */
-export interface MetersState {
-	isFetching: boolean;
-	byMeterID: {
-		[meterID: number]: {
-			id: number;
-			name: string;
-		};
-	};
-}
+import { MetersAction, MetersState } from '../types/redux/meters';
+import { ActionType } from '../types/redux/actions';
 
 const defaultState: MetersState = {
 	isFetching: false,
 	byMeterID: {}
 };
 
-/**
- * @param {State~Meters} state
- * @param action
- * @return {State~Meters}
- */
 export default function meters(state = defaultState, action: MetersAction) {
 	switch (action.type) {
 		case ActionType.RequestMetersDetails:

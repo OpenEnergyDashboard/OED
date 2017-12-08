@@ -7,7 +7,7 @@ import axios from 'axios';
 import { browserHistory } from 'react-router';
 import { Notification } from 'react-notification-system';
 import HeaderComponent from '../components/HeaderComponent';
-import { ShowNotificationAction } from '../actions/notifications';
+import { ShowNotificationAction } from '../types/redux/notifications';
 import FooterComponent from '../components/FooterComponent';
 
 

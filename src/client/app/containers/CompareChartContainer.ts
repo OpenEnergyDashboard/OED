@@ -10,7 +10,7 @@ import * as moment from 'moment';
 import { connect } from 'react-redux';
 // This is better than using an import, since we don't actually use anything from the plugin in the code.
 /// <reference path="chartjs-plugin-datalabels" />
-import { State } from '../types/redux';
+import { State } from '../types/redux/state';
 
 interface ChartDataSetsWithDatalabels extends ChartDataSets {
 	datalabels: {

@@ -12,9 +12,4 @@ import graph from './graph';
 import groups from './groups';
 import notifications from './notifications';
 
-/**
- * @param {State} state
- * @param action
- * @return {State}
- */
 export default combineReducers({ meters, readings: combineReducers({ line: lineReadings, bar: barReadings }), graph, groups, notifications });

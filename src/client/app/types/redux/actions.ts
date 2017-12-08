@@ -4,24 +4,7 @@
 
 import { Dispatch } from 'redux';
 import { ThunkAction } from 'redux-thunk';
-
-import { BarReadingsState } from '../reducers/barReadings';
-import { LineReadingsState } from '../reducers/lineReadings';
-import { GraphState } from '../reducers/graph';
-import { GroupsState } from '../reducers/groups';
-import { MetersState } from '../reducers/meters';
-import { NotificationsState } from '../reducers/notifications';
-
-export interface State {
-	meters: MetersState;
-	readings: {
-		line: LineReadingsState;
-		bar: BarReadingsState;
-	};
-	graph: GraphState;
-	groups: GroupsState;
-	notifications: NotificationsState;
-}
+import { State } from './state';
 
 export enum ActionType {
 	RequestMetersDetails = 'REQUEST_METERS_DETAILS',
@@ -79,11 +62,6 @@ export type Dispatch = Dispatch<State>;
  */
 export type GetState = () => State;
 
-/**
- * The type of terminating actions used in the project.
- * No return, no extra argument, uses the global state.
- */
-export type TerminalThunk = ThunkAction<void, State, void>;
 /**
  * The type of promissory actions used in the project.
  * Returns a promise, no extra argument, uses the global state.

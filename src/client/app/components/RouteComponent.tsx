@@ -14,10 +14,10 @@ import AdminComponent from './AdminComponent';
 import NotFoundComponent from './NotFoundComponent';
 import GroupMainContainer from '../containers/groups/GroupMainContainer';
 import getToken from '../utils/getToken';
-import { ClearNotificationAction } from '../actions/notifications';
+import { ClearNotificationAction } from '../types/redux/notifications';
 import { ReplaceFunction } from 'lodash';
 import { LinkOptions } from 'actions/graph';
-import { chartTypes } from '../reducers/graph';
+import { ChartTypes } from '../types/redux/graph';
 
 interface RouteProps {
 	notification: NotificationSystem.Notification;
@@ -95,7 +95,8 @@ export default class RouteComponent extends React.Component<RouteProps, {}> {
 							options.groupIDs = info.split(',').map(s => parseInt(s));
 							break;
 						case 'chartType':
-							options.chartType = info as chartTypes;
+							options.chartType = info as ChartTypes;
+							options.chartType = info as ChartTypes;
 							break;
 						case 'barDuration':
 							const maybeDuration = moment.duration(parseInt(info));

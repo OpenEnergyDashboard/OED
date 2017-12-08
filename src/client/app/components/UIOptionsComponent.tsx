@@ -8,15 +8,15 @@ import Slider from 'react-rangeslider';
 import * as moment from 'moment';
 import 'react-rangeslider/lib/index.css';
 import '../styles/react-rangeslider-fix.css';
-import { chartTypes } from '../reducers/graph';
 import ExportContainer from '../containers/ExportContainer';
 import ChartSelectContainer from '../containers/ChartSelectContainer';
 import ChartDataSelectContainer from '../containers/ChartDataSelectContainer';
-import { ChangeBarStackingAction } from '../actions/graph';
+import { ChangeBarStackingAction } from '../types/redux/graph';
 import ChartLinkContainer from '../containers/ChartLinkContainer';
+import { ChartTypes } from '../types/redux/graph';
 
 export interface UIOptionsProps {
-	chartToRender: chartTypes;
+	chartToRender: ChartTypes;
 	barStacking: boolean;
 	barDuration: moment.Duration;
 	changeDuration(duration: moment.Duration): Promise<any>;
@@ -65,7 +65,7 @@ export default class UIOptionsComponent extends React.Component<UIOptionsProps, 
 				<ChartDataSelectContainer />
 
 				{/* Controls specific to the bar chart. */}
-				{this.props.chartToRender === chartTypes.bar &&
+				{this.props.chartToRender === ChartTypes.bar &&
 					<div>
 						<div className='checkbox'>
 							<label><input type='checkbox' onChange={this.handleChangeBarStacking} checked={this.props.barStacking} />Bar stacking</label>
@@ -82,7 +82,7 @@ export default class UIOptionsComponent extends React.Component<UIOptionsProps, 
 				}
 
 				{/* We can't export compare data */}
-				{this.props.chartToRender !== chartTypes.compare &&
+				{this.props.chartToRender !== ChartTypes.compare &&
 					<ExportContainer />
 				}
 				<div style={divTopPadding}>
@@ -103,7 +103,7 @@ export default class UIOptionsComponent extends React.Component<UIOptionsProps, 
 	 * Called when the user releases the slider, dispatch action on temporary state variable
 	 */
 	private handleBarDurationChangeComplete(e: React.ChangeEvent<null>) {
-		this.props.changeDuration(moment.duration({days: this.state.barDurationDays}));
+		this.props.changeDuration(moment.duration( {days: this.state.barDurationDays}));
 	}
 
 	private handleChangeBarStacking() {

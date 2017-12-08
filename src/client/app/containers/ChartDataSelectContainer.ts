@@ -8,7 +8,8 @@ import ChartDataSelectComponent from '../components/ChartDataSelectComponent';
 import { changeSelectedMeters, changeSelectedGroups } from '../actions/graph';
 import { fetchMetersDetailsIfNeeded } from '../actions/meters';
 import { fetchGroupsDetailsIfNeeded } from '../actions/groups';
-import { Dispatch, State } from '../types/redux';
+import { State } from '../types/redux/state';
+import { Dispatch } from '../types/redux/actions';
 
 
 /**

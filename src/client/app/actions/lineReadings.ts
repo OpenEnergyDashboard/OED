@@ -8,39 +8,9 @@ import axios from 'axios';
 import * as moment from 'moment';
 import { TimeInterval } from '../../../common/TimeInterval';
 import { LineReadings } from '../types/readings';
-import { ActionType, Thunk, Dispatch, State } from '../types/redux';
-
-export interface RequestMeterLineReadingsAction {
-	type: ActionType.RequestMeterLineReadings;
-	meterIDs: number[];
-	timeInterval: TimeInterval;
-}
-
-export interface RequestGroupLineReadingsAction {
-	type: ActionType.RequestGroupLineReadings;
-	groupIDs: number[];
-	timeInterval: TimeInterval;
-}
-
-export interface ReceiveMeterLineReadingsAction {
-	type: ActionType.ReceiveMeterLineReadings;
-	meterIDs: number[];
-	timeInterval: TimeInterval;
-	readings: LineReadings;
-}
-
-export interface ReceiveGroupLineReadingsAction {
-	type: ActionType.ReceiveGroupLineReadings;
-	groupIDs: number[];
-	timeInterval: TimeInterval;
-	readings: LineReadings;
-}
-
-export type LineReadingsAction =
-	ReceiveMeterLineReadingsAction |
-	ReceiveGroupLineReadingsAction |
-	RequestMeterLineReadingsAction |
-	RequestGroupLineReadingsAction;
+import { ActionType, Thunk, Dispatch } from '../types/redux/actions';
+import { State } from '../types/redux/state';
+import * as t from '../types/redux/lineReadings';
 
 /**
  * @param {State} state The current Redux state
@@ -88,7 +58,7 @@ function shouldFetchMeterLineReadings(state: State, meterID: number, timeInterva
  * @param {[number]} meterIDs The IDs of the meters whose data should be fetched
  * @param {TimeInterval} timeInterval The time interval over which data should be fetched
  */
-function requestMeterLineReadings(meterIDs: number[], timeInterval: TimeInterval): RequestMeterLineReadingsAction {
+function requestMeterLineReadings(meterIDs: number[], timeInterval: TimeInterval): t.RequestMeterLineReadingsAction {
 	return { type: ActionType.RequestMeterLineReadings, meterIDs, timeInterval };
 }
 
@@ -97,7 +67,7 @@ function requestMeterLineReadings(meterIDs: number[], timeInterval: TimeInterval
  * @param {TimeInterval} timeInterval The time interval over which data has been fetched
  * @param {*} readings The data that has been fetched, indexed by meter ID.
  */
-function receiveMeterLineReadings(meterIDs: number[], timeInterval: TimeInterval, readings: LineReadings): ReceiveMeterLineReadingsAction {
+function receiveMeterLineReadings(meterIDs: number[], timeInterval: TimeInterval, readings: LineReadings): t.ReceiveMeterLineReadingsAction {
 	return { type: ActionType.ReceiveMeterLineReadings, meterIDs, timeInterval, readings };
 }
 
@@ -105,7 +75,7 @@ function receiveMeterLineReadings(meterIDs: number[], timeInterval: TimeInterval
  * @param {[number]} groupIDs The IDs of the groups whose data should be fetched
  * @param {TimeInterval} timeInterval The time interval over which data should be fetched
  */
-function requestGroupLineReadings(groupIDs: number[], timeInterval: TimeInterval): RequestGroupLineReadingsAction {
+function requestGroupLineReadings(groupIDs: number[], timeInterval: TimeInterval): t.RequestGroupLineReadingsAction {
 	return { type: ActionType.RequestGroupLineReadings, groupIDs, timeInterval };
 }
 
@@ -114,7 +84,7 @@ function requestGroupLineReadings(groupIDs: number[], timeInterval: TimeInterval
  * @param {TimeInterval} timeInterval The time interval over which data has been fetched
  * @param {*} readings The data that has been fetched, indexed by group ID.
  */
-function receiveGroupLineReadings(groupIDs: number[], timeInterval: TimeInterval, readings: LineReadings): ReceiveGroupLineReadingsAction {
+function receiveGroupLineReadings(groupIDs: number[], timeInterval: TimeInterval, readings: LineReadings): t.ReceiveGroupLineReadingsAction {
 	return { type: ActionType.ReceiveGroupLineReadings, groupIDs, timeInterval, readings };
 }
 

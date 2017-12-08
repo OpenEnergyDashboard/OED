@@ -4,7 +4,7 @@
 
 import { connect } from 'react-redux';
 import ChartLinkComponent from '../components/ChartLinkComponent';
-import { State } from '../types/redux';
+import { State } from '../types/redux/state';
 
 function mapStateToProps(state: State) {
 	let linkText = `${window.location.href}graph?`;

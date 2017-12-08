@@ -6,7 +6,7 @@ import { connect } from 'react-redux';
 import { Notification } from 'react-notification-system';
 import LoginComponent from '../components/LoginComponent';
 import { showNotification } from '../actions/notifications';
-import { Dispatch } from '../types/redux';
+import { Dispatch } from '../types/redux/actions';
 
 function mapDispatchToProps(dispatch: Dispatch) {
 	return {

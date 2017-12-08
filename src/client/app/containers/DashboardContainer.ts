@@ -4,7 +4,7 @@
 
 import { connect } from 'react-redux';
 import DashboardComponent from '../components/DashboardComponent';
-import { State } from '../types/redux';
+import { State } from '../types/redux/state';
 
 function mapStateToProps(state: State) {
 	return {

@@ -6,50 +6,14 @@
  */
 
 import * as readingsActions from '../actions/barReadings';
-import { BarReadingsAction } from '../actions/barReadings';
-import { ActionType } from '../types/redux';
+import { BarReadingsAction, BarReadingsState } from '../types/redux/barReadings';
+import { ActionType } from '../types/redux/actions';
 
-/**
- * @typedef {Object} State~BarReadings
- * @property {Object<number, Object>} byMeterID
- */
-
-export interface BarReadingsState {
-	byMeterID: {
-		[meterID: number]: {
-			[timeInterval: string]: {
-				[barDuration: string]: {
-					isFetching: boolean;
-					readings?: Array<[number, number]>;
-				}
-			}
-		}
-	};
-	byGroupID: {
-		[groupID: number]: {
-			[timeInterval: string]: {
-				[barDuration: string]: {
-					isFetching: boolean;
-					readings?: Array<[number, number]>;
-				}
-			}
-		}
-	};
-}
-
-/**
- * @type {State~BarReadings}
- */
 const defaultState: BarReadingsState = {
 	byMeterID: {},
 	byGroupID: {}
 };
 
-/**
- * @param {State~Readings} state
- * @param action
- * @return {State~Readings}
- */
 export default function readings(state = defaultState, action: BarReadingsAction) {
 	switch (action.type) {
 		case ActionType.RequestMeterBarReadings: {

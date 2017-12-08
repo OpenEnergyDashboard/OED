@@ -6,28 +6,8 @@
 
 import * as moment from 'moment';
 import { TimeInterval } from '../../../common/TimeInterval';
-import * as graphActions from '../actions/graph';
-import { ActionType } from '../types/redux';
-
-export enum chartTypes {
-	line = 'line',
-	bar = 'bar',
-	compare = 'compare'
-}
-
-/**
- * @type {State~Graph}
- */
-export interface GraphState {
-	selectedMeters: number[];
-	selectedGroups: number[];
-	timeInterval: TimeInterval;
-	barDuration: moment.Duration;
-	compareTimeInterval: TimeInterval;
-	compareDuration: moment.Duration;
-	chartToRender: chartTypes;
-	barStacking: boolean;
-}
+import { GraphAction, GraphState, ChartTypes } from '../types/redux/graph';
+import { ActionType } from '../types/redux/actions';
 
 const defaultState: GraphState = {
 	selectedMeters: [],
@@ -36,7 +16,7 @@ const defaultState: GraphState = {
 	barDuration: moment.duration(1, 'month'),
 	compareTimeInterval: new TimeInterval(moment().startOf('week'), moment()),
 	compareDuration: moment.duration(1, 'days'),
-	chartToRender: chartTypes.line,
+	chartToRender: ChartTypes.line,
 	barStacking: false
 };
 
@@ -45,7 +25,7 @@ const defaultState: GraphState = {
  * @param action
  * @return {State~Graph}
  */
-export default function graph(state = defaultState, action: graphActions.GraphAction) {
+export default function graph(state = defaultState, action: GraphAction) {
 	switch (action.type) {
 		case ActionType.UpdateSelectedMeters:
 			return {

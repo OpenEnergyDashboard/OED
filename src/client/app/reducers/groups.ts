@@ -5,43 +5,8 @@
  */
 
 import * as _ from 'lodash';
-import * as groupsActions from '../actions/groups';
-import { ActionType } from '../types/redux';
-
-export interface GroupMetadata {
-	isFetching: boolean;
-	outdated: boolean;
-	selectedGroups: number[];
-	selectedMeters: number[];
-}
-
-export interface GroupData {
-	name: string;
-	childMeters: number[];
-	childGroups: number[];
-}
-
-export interface GroupID {
-	id: number;
-}
-
-export type GroupDefinition = GroupData & GroupMetadata & GroupID;
-
-export interface StatefulEditable {
-	dirty: boolean;
-	submitted?: boolean;
-}
-
-export interface GroupsState {
-	isFetching: boolean;
-	outdated: boolean;
-	byGroupID: {
-		[groupID: number]: GroupDefinition;
-	};
-	selectedGroups: number[];
-	groupInEditing: GroupDefinition & StatefulEditable | StatefulEditable;
-	displayMode: groupsActions.DisplayMode;
-}
+import { GroupsAction, GroupsState, DisplayMode } from '../types/redux/groups';
+import { ActionType } from '../types/redux/actions';
 
 const defaultState: GroupsState = {
 	isFetching: false,
@@ -51,7 +16,7 @@ const defaultState: GroupsState = {
 	groupInEditing: {
 		dirty: false
 	},
-	displayMode: groupsActions.DisplayMode.View
+	displayMode: DisplayMode.View
 };
 
 /**
@@ -59,7 +24,7 @@ const defaultState: GroupsState = {
  * @param action
  * @return {State~Groups}
  */
-export default function groups(state = defaultState, action: groupsActions.GroupsAction) {
+export default function groups(state = defaultState, action: GroupsAction) {
 	switch (action.type) {
 		// The following are reducers related to viewing and fetching groups data
 		case ActionType.RequestGroupsDetails:
@@ -164,7 +129,7 @@ export default function groups(state = defaultState, action: groupsActions.Group
 
 		// The following are reducers related to creating and editing groups
 		case ActionType.ChangeGroupsUIDisplayMode: {
-			const validModes = _.values(groupsActions.DisplayMode);
+			const validModes = _.values(DisplayMode);
 			if (_.includes(validModes, action.newMode)) {
 				return {
 					...state,

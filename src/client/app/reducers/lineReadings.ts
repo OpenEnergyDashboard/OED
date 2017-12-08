@@ -5,51 +5,15 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/.
  */
 
-import * as readingsActions from '../actions/lineReadings';
-import { ActionType } from '../types/redux';
-
-/**
- * @typedef {Object} State~BarReadings
- * @property {Object<number, Object>} byMeterID
- */
-
-/**
- * @type {State~Readings}
- */
-export interface LineReadingsState {
-	byMeterID: {
-		[meterID: number]: {
-			[timeInterval: string]: {
-				isFetching: boolean;
-				readings?: {
-					[point: number]: [number, number];
-				};
-			}
-		}
-	};
-	byGroupID: {
-		[groupID: number]: {
-			[timeInterval: string]: {
-				isFetching: boolean;
-				readings?: {
-					[point: number]: [number, number];
-				};
-			}
-		}
-	};
-}
+import { LineReadingsAction, LineReadingsState } from '../types/redux/lineReadings';
+import { ActionType } from '../types/redux/actions';
 
 const defaultState: LineReadingsState = {
 	byMeterID: {},
 	byGroupID: {}
 };
 
-/**
- * @param {State~Readings} state
- * @param action
- * @return {State~Readings}
- */
-export default function readings(state = defaultState, action: readingsActions.LineReadingsAction) {
+export default function readings(state = defaultState, action: LineReadingsAction) {
 	switch (action.type) {
 		case ActionType.RequestMeterLineReadings: {
 			const timeInterval = action.timeInterval.toString();

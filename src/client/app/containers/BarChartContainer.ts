@@ -10,7 +10,7 @@ import { ChartData, ChartDataSets, ChartTooltipItem } from 'chart.js';
 import * as moment from 'moment';
 import { connect } from 'react-redux';
 import getGraphColor from '../utils/getGraphColor';
-import { State } from '../types/redux';
+import { State } from '../types/redux/state';
 
 /**
  * @param {State} state

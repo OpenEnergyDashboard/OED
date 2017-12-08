@@ -8,7 +8,8 @@ import { connect } from 'react-redux';
 import { fetchMetersDetailsIfNeeded } from '../../actions/meters';
 import { fetchGroupsDetailsIfNeeded, changeDisplayedGroups } from '../../actions/groups';
 import GroupMainComponent from '../../components/groups/GroupMainComponent';
-import { Dispatch, State } from '../../types/redux';
+import { Dispatch } from '../../types/redux/actions';
+import { State } from '../../types/redux/state';
 
 
 function mapStateToProps(state: State) {

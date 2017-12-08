@@ -5,18 +5,14 @@
  */
 
 import { Notification } from 'react-notification-system';
-import * as topLevelActions from '../actions/notifications';
-import { ActionType } from '../types/redux';
+import { NotificationAction, NotificationsState } from '../types/redux/notifications';
+import { ActionType } from '../types/redux/actions';
 
-export interface NotificationsState {
-	notification: Notification;
-}
-
-const defaultState = {
+const defaultState: NotificationsState = {
 	notification: {}
 };
 
-export default function topLevel(state = defaultState, action: topLevelActions.NotificationAction) {
+export default function topLevel(state = defaultState, action: NotificationAction) {
 	switch (action.type) {
 		case ActionType.ShowNotification:
 			return {

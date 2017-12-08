@@ -4,7 +4,7 @@
 
 import { connect } from 'react-redux';
 import HeaderComponent from '../components/HeaderComponent';
-import { State } from '../types/redux';
+import { State } from '../types/redux/state';
 
 interface HeaderContainerProps {
 	renderLoginButton: boolean;

@@ -9,7 +9,7 @@ import GroupViewContainer from '../../containers/groups/GroupViewContainer';
 import GroupSidebarContainer from '../../containers/groups/GroupSidebarContainer';
 import CreateGroupContainer from '../../containers/groups/CreateGroupContainer';
 import EditGroupsContainer from '../../containers/groups/EditGroupsContainer';
-import { DisplayMode, ChangeDisplayedGroupsAction } from '../../actions/groups';
+import { DisplayMode, ChangeDisplayedGroupsAction } from '../../types/redux/groups';
 import { NamedIDItem } from '../../types/items';
 
 interface GroupMainProps {

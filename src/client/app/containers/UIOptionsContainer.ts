@@ -8,7 +8,8 @@ import { connect } from 'react-redux';
 import UIOptionsComponent from '../components/UIOptionsComponent';
 import { changeSelectedMeters, changeBarDuration, changeBarStacking } from '../actions/graph';
 import { fetchMetersDetailsIfNeeded } from '../actions/meters';
-import { State, Dispatch } from '../types/redux';
+import { Dispatch } from '../types/redux/actions';
+import { State } from '../types/redux/state';
 import { UIOptionsProps } from '../components/UIOptionsComponent';
 
 /**

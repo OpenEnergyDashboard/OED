@@ -4,7 +4,7 @@
 
 import * as React from 'react';
 import { Button } from 'react-bootstrap';
-import { ChangeDisplayedGroupsAction, ChangeDisplayModeAction } from '../../actions/groups';
+import { ChangeDisplayedGroupsAction, ChangeDisplayModeAction } from '../../types/redux/groups';
 
 interface GroupSidebarProps {
 	groups: Array<{id: number, name: string}>;

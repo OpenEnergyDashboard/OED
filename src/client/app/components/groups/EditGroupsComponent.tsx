@@ -10,8 +10,7 @@ import { FormControl, FormControlProps, Button, Glyphicon } from 'react-bootstra
 import DatasourceBoxContainer from '../../containers/groups/DatasourceBoxContainer';
 import { NamedIDItem } from '../../types/items';
 import { SelectionType } from '../../containers/groups/DatasourceBoxContainer';
-import { TerminalThunk } from '../../types/redux';
-import { EditGroupNameAction, ChangeDisplayModeAction, ChangeChildMetersAction, ChangeChildGroupsAction } from '../../actions/groups';
+import { EditGroupNameAction, ChangeDisplayModeAction, ChangeChildMetersAction, ChangeChildGroupsAction } from '../../types/redux/groups';
 
 interface EditGroupsProps {
 	name: string;
@@ -20,7 +19,7 @@ interface EditGroupsProps {
 	allMetersExceptChildMeters: NamedIDItem[];
 	allGroupsExceptChildGroups: NamedIDItem[];
 	submitGroupInEditingIfNeeded(): Promise<any>;
-	deleteGroup(): TerminalThunk;
+	deleteGroup(): Promise<any>;
 	changeDisplayModeToView(): ChangeDisplayModeAction;
 	editGroupName(name: string): EditGroupNameAction;
 	changeChildMeters(selected: number[]): ChangeChildMetersAction;

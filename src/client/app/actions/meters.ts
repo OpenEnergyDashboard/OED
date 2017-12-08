@@ -6,25 +6,17 @@
 
 import * as _ from 'lodash';
 import axios from 'axios';
-import { ActionType, Dispatch, State, GetState, Thunk } from '../types/redux';
+import { ActionType, Dispatch, GetState, Thunk } from '../types/redux/actions';
+import { State } from '../types/redux/state';
+import * as t from '../types/redux/meters';
 import { NamedIDItem } from '../types/items';
 
-export interface RequestMetersDetailsAction {
-	type: ActionType.RequestMetersDetails;
-}
 
-export interface ReceiveMetersDetailsAction {
-	type: ActionType.ReceiveMetersDetails;
-	data: NamedIDItem[];
-}
-
-export type MetersAction = RequestMetersDetailsAction | ReceiveMetersDetailsAction;
-
-export function requestMetersDetails(): RequestMetersDetailsAction {
+export function requestMetersDetails(): t.RequestMetersDetailsAction {
 	return { type: ActionType.RequestMetersDetails };
 }
 
-export function receiveMetersDetails(data: NamedIDItem[]): ReceiveMetersDetailsAction {
+export function receiveMetersDetails(data: NamedIDItem[]): t.ReceiveMetersDetailsAction {
 	return { type: ActionType.ReceiveMetersDetails, data };
 }
 

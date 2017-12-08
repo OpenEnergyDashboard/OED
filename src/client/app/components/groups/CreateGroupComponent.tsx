@@ -7,7 +7,7 @@ import { FormControl, FormControlProps, Button } from 'react-bootstrap';
 import DatasourceBoxContainer from '../../containers/groups/DatasourceBoxContainer';
 import { SelectionType } from '../../containers/groups/DatasourceBoxContainer';
 import { NamedIDItem } from '../../types/items';
-import { CreateNewBlankGroupAction, EditGroupNameAction, ChangeDisplayModeAction } from '../../actions/groups';
+import { CreateNewBlankGroupAction, EditGroupNameAction, ChangeDisplayModeAction } from '../../types/redux/groups';
 
 
 interface CreateGroupProps {

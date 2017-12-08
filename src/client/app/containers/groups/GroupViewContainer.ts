@@ -5,8 +5,10 @@
 
 import { connect } from 'react-redux';
 import GroupViewComponent from '../../components/groups/GroupViewComponent';
-import { fetchGroupChildrenIfNeeded, changeDisplayMode, beginEditingIfPossible, DisplayMode } from '../../actions/groups';
-import { Dispatch, State } from '../../types/redux';
+import { fetchGroupChildrenIfNeeded, changeDisplayMode, beginEditingIfPossible } from '../../actions/groups';
+import { DisplayMode } from '../../types/redux/groups';
+import { Dispatch } from '../../types/redux/actions';
+import { State } from '../../types/redux/state';
 
 
 /**
@@ -17,8 +19,8 @@ import { Dispatch, State } from '../../types/redux';
  */
 function mapStateToProps(state: State, ownProps: {id: number}) {
 	const id = ownProps.id;
-	const childMeterNames = state.groups.byGroupID[id].childMeters.map(meterID => state.meters.byMeterID[meterID].name.trim()).sort();
-	const childGroupNames = state.groups.byGroupID[id].childGroups.map(groupID => state.groups.byGroupID[groupID].name.trim()).sort();
+	const childMeterNames = state.groups.byGroupID[id].childMeters.map((meterID: number) => state.meters.byMeterID[meterID].name.trim()).sort();
+	const childGroupNames = state.groups.byGroupID[id].childGroups.map((groupID: number) => state.groups.byGroupID[groupID].name.trim()).sort();
 	return {
 		id,
 		name: state.groups.byGroupID[id].name,
