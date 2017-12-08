@@ -31,7 +31,7 @@ export default function HeaderComponent(props) {
 	};
 	const adminLinkStyle = {
 		// Displays the admin button link only if the user is logged in (auth token exists)
-		display: getToken() ? 'inline' : 'none',
+		display: getToken() && (props.renderAdminButton !== false) ? 'inline' : 'none',
 		paddingLeft: '5px'
 	};
 	const groupsLinkStyle = {

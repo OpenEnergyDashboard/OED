@@ -9,6 +9,7 @@ function mapStateToProps(state, ownProps) {
 	return {
 		renderLoginButton: ownProps.renderLoginButton,
 		renderOptionsButton: ownProps.renderOptionsButton,
+		renderAdminButton: ownProps.renderAdminButton
 	};
 }
 
