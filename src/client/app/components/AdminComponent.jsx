@@ -66,7 +66,7 @@ export default class AdminComponent extends React.Component {
 						<Dropzone accept="text/csv, application/vnd.ms-excel," onDrop={this.handleFileToImport}>
 							<div> Add in a CSV file here:</div>
 						</Dropzone>
-						<MultiSelectComponent options={this.props.meters} selectedOptions={this.props.selectedImportMeter} placeholder="Select meter to import data"/>
+						<MultiSelectComponent options={this.props.meters} selectedOptions={this.props.selectedImportMeter} placeholder="Select meter to import data" onValuesChange={s => this.props.updateSelectedImportMeter(s)}/>
 					</div>
 				</div>
 			</div>
