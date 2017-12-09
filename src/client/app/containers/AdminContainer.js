@@ -3,6 +3,7 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
 
 import { connect } from 'react-redux';
+import _ from 'lodash';
 import AdminComponent from '../components/AdminComponent';
 import { updateSelectedMeter } from '../actions/admin';
 import { showNotification } from '../actions/notifications';

@@ -6,7 +6,6 @@
 
 const chai = require('chai');
 const chaiAsPromised = require('chai-as-promised');
-const moment = require('moment');
 const path = require('path');
 
 chai.use(chaiAsPromised);
@@ -22,10 +21,8 @@ const mocha = require('mocha');
 
 mocha.describe('Insert Metasys readings from a file', () => {
 	mocha.beforeEach(recreateDB);
-	let meter;
 	mocha.beforeEach(async () => {
 		await new Meter(undefined, 'metasys-valid', null, false, Meter.type.METASYS).insert();
-		meter = await Meter.getByName('metasys-valid');
 	});
 
 	mocha.it('loads the correct number of rows from a file', async () => {

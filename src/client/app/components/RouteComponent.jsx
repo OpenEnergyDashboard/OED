@@ -7,7 +7,6 @@ import { Router, Route, browserHistory } from 'react-router';
 import axios from 'axios';
 import moment from 'moment';
 import _ from 'lodash';
-import NotificationSystem from 'react-notification-system';
 import HomeComponent from './HomeComponent';
 import LoginContainer from '../containers/LoginContainer';
 import AdminContainer from '../containers/AdminContainer';
@@ -97,7 +96,7 @@ export default class RouteComponent extends React.Component {
 				}
 				this.props.changeOptionsFromLink(options);
 			} catch (err) {
-				console.error('Failed to link to graph');
+				console.error('Failed to link to graph'); // eslint-disable-line no-console
 			}
 		}
 		replace({
@@ -116,7 +115,7 @@ export default class RouteComponent extends React.Component {
 				<InitializationContainer />
 				<Router history={browserHistory}>
 					<Route path="/login" component={LoginContainer} />
-					<Route path="/admin" component={AdminComponent} onEnter={this.requireAuth} />
+					<Route path="/admin" component={AdminContainer} onEnter={this.requireAuth} />
 					<Route path="/groups" component={GroupMainContainer} onEnter={this.requireAuth} />
 					<Route path="/graph" component={HomeComponent} onEnter={this.linkToGraph} />
 					<Route path="*" component={HomeComponent} />
