@@ -67,7 +67,7 @@ export default class GroupMainComponent extends React.Component {
 						{ GroupDisplay }
 					</div>
 				</div>
-				<FooterComponent/>
+				<FooterComponent />
 			</div>
 		);
 	}

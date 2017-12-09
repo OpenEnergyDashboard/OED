@@ -38,7 +38,7 @@ mocha.describe('Read mamc log from a file: ', () => {
 			frequency: 10,
 			chunkSize: 2048
 		});
-		//open file.
+		// open file.
 		myReadableStreamBuffer.put(buffer);
 		myReadableStreamBuffer.stop();
 		await loadFromCsvStream(myReadableStreamBuffer, row => {
@@ -46,9 +46,7 @@ mocha.describe('Read mamc log from a file: ', () => {
 			const endTimestamp = moment(row[1], 'MM/DD/YYYY HH:mm');
 			const startTimestamp = moment(row[1], 'MM/DD/YYYY HH:mm').subtract(60, 'minutes');
 			return new Reading(meter.id, readRate, startTimestamp, endTimestamp);
-		}, (readings, tx) => {
-			return Reading.insertOrUpdateAll(readings, tx);
-		});
+		}, (readings, tx) => Reading.insertOrUpdateAll(readings, tx));
 		const { count } = await db.one('SELECT COUNT(*) as count FROM readings');
 		console.log(count);
 		expect(parseInt(count)).to.equal(20);
@@ -70,11 +68,8 @@ mocha.describe('Read mamc log from a file: ', () => {
 				const endTimestamp = moment(row[1], 'MM/DD/YYYY HH:mm');
 				const startTimestamp = moment(row[1], 'MM/DD/YYYY HH:mm').subtract(60, 'minutes');
 				return new Reading(meter.id, readRate, startTimestamp, endTimestamp);
-			}, (readings, tx) => {
-				return Reading.insertOrUpdateAll(readings, tx);
-			})
+			}, (readings, tx) => Reading.insertOrUpdateAll(readings, tx))
 		).to.eventually.be.rejected;
-
 	});
 
 	mocha.it('rolls back correctly when it rejects', async () => {
@@ -93,11 +88,9 @@ mocha.describe('Read mamc log from a file: ', () => {
 				const endTimestamp = moment(row[1], 'MM/DD/YYYY HH:mm');
 				const startTimestamp = moment(row[1], 'MM/DD/YYYY HH:mm').subtract(60, 'minutes');
 				return new Reading(meter.id, readRate, startTimestamp, endTimestamp);
-			}, (readings, tx) => {
-				return Reading.insertOrUpdateAll(readings, tx);
-			});
+			}, (readings, tx) => Reading.insertOrUpdateAll(readings, tx));
 		} catch (e) {
-			const {count} = await db.one('SELECT COUNT(*) as count FROM readings');
+			const { count } = await db.one('SELECT COUNT(*) as count FROM readings');
 			expect(parseInt(count)).to.equal(0);
 		}
 	});

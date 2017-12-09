@@ -15,7 +15,7 @@ function mapStateToProps(state) {
 		meters: _.sortBy(_.values(state.meters.byMeterID).map(meter => ({ id: meter.id, name: meter.name.trim() })), 'name')
 	};
 }
-function mapDispatchToProps(dispatch){
+function mapDispatchToProps(dispatch) {
 	return {
 		updateSelectedMeter: meterID => dispatch(updateSelectedMeter(meterID))
 	};

@@ -97,7 +97,7 @@ export default class LoginComponent extends React.Component {
 					</div>
 					<input style={buttonStyle} className="btn btn-default" type="submit" value="Login" />
 				</form>
-				<FooterComponent/>
+				<FooterComponent />
 			</div>
 		);
 	}

@@ -37,7 +37,7 @@ mocha.describe('Insert Metasys readings from a file', () => {
 		try {
 			await readMetasysData(testFilePath, 30, 1, false);
 		} catch (e) {
-			const {count} = await db.one('SELECT COUNT(*) as count FROM readings');
+			const { count } = await db.one('SELECT COUNT(*) as count FROM readings');
 			expect(parseInt(count)).to.equal(0);
 		}
 	});

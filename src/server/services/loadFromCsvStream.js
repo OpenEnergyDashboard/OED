@@ -22,9 +22,9 @@ const csv = require('csv');
  * @template M
  */
 function loadFromCsvStream(stream, mapRowToModel, bulkInsertModels) {
-	return db.tx(t => new Promise((resolve) => {
+	return db.tx(t => new Promise(resolve => {
 		let rejected = false;
-		let error = null;
+		const error = null;
 		const MIN_INSERT_BUFFER_SIZE = 1000;
 		let modelsToInsert = [];
 		const pendingInserts = [];
@@ -53,21 +53,18 @@ function loadFromCsvStream(stream, mapRowToModel, bulkInsertModels) {
 			}
 		});
 		parser.on('error', err => {
-			console.log("in error");
+			console.log('in error');
 			if (!rejected) {
-				console.log("Called error first time");
-				resolve(t.batch(pendingInserts).then(() => {
-					return Promise.reject(err);
-				}))
+				console.log('Called error first time');
+				resolve(t.batch(pendingInserts).then(() => Promise.reject(err)));
 			} else {
-				console.log("Called error more than once");
+				console.log('Called error more than once');
 			}
 			rejected = true;
-
 		});
 		// Defines what happens when the parser's input stream is finished (and thus the promise needs to be resolved)
 		parser.on('finish', () => {
-			console.log("Finished wow");
+			console.log('Finished wow');
 			// if (!rejected) {
 			// Insert any models left in the buffer
 			if (modelsToInsert.length > 0) {
@@ -81,7 +78,7 @@ function loadFromCsvStream(stream, mapRowToModel, bulkInsertModels) {
 					console.log('hello dear 2');
 					return Promise.reject(error);
 				} else {
-					return Promise.resolve(arg)
+					return Promise.resolve(arg);
 				}
 			}));
 		});

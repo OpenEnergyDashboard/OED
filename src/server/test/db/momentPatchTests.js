@@ -21,13 +21,13 @@ mocha.describe('MomentJS patching', () => {
 
 	mocha.it('patches moment durations', async () => {
 		const result = await db.one('SELECT pg_typeof(${interval})', { interval: moment.duration(1, 'days') });
-		const type = result['pg_typeof'];
+		const type = result.pg_typeof;
 		expect(type).to.equal('interval');
 	});
 
 	mocha.it('patches arrays of moment durations', async () => {
 		const result = await db.one('SELECT pg_typeof(${intervalArr})', { intervalArr: [moment.duration(1, 'days'), moment.duration(2, 'days')] });
-		const type = result['pg_typeof'];
+		const type = result.pg_typeof;
 		expect(type).to.equal('interval[]');
 	});
 
