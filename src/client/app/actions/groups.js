@@ -5,7 +5,7 @@
  */
 
 import axios from 'axios';
-import getToken from '../utils/getToken';
+import { getToken } from '../utils/token';
 import { showErrorNotification } from '../utils/notifications';
 
 // View and fetching actions

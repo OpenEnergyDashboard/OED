@@ -7,7 +7,7 @@ import { Link } from 'react-router';
 import { Button } from 'react-bootstrap';
 import LogoComponent from './LogoComponent';
 import UIModalComponent from './UIModalComponent';
-import getToken from '../utils/getToken';
+import { hasToken } from '../utils/token';
 
 /**
  * React component that controls the header strip at the top of all pages
@@ -32,12 +32,12 @@ export default class HeaderComponent extends React.Component {
 		let renderLoginButton = false;
 		let renderAdminButton = false;
 		let renderGroupsButton = false;
-		const renderLogoutButton = !!getToken();
+		const renderLogoutButton = hasToken();
 
 		switch (page) {
 			case '': // home page
 				renderOptionsButton = true;
-				if (getToken()) {
+				if (renderLogoutButton) {
 					renderAdminButton = true;
 					renderGroupsButton = true;
 				} else {

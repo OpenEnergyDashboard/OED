@@ -38,8 +38,11 @@ function fetchPreferences() {
 			.then(response => {
 				dispatch(receivePreferences(response.data));
 				dispatch((dispatch2, getState) => {
-					dispatch2(changeChartToRender(getState().admin.defaultChartToRender));
-					dispatch2(changeBarStacking());
+					const state = getState();
+					dispatch2(changeChartToRender(state.admin.defaultChartToRender));
+					if (response.data.defaultBarStacking !== state.graph.barStacking) {
+						dispatch2(changeBarStacking());
+					}
 				});
 			});
 	};

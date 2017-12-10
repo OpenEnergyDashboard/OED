@@ -13,7 +13,7 @@ import LoginComponent from '../components/LoginComponent';
 import AdminContainer from '../containers/AdminContainer';
 import NotFoundComponent from './NotFoundComponent';
 import GroupMainContainer from '../containers/groups/GroupMainContainer';
-import getToken from '../utils/getToken';
+import { getToken, hasToken } from '../utils/token';
 import { showErrorNotification } from '../utils/notifications';
 
 export default class RouteComponent extends React.Component {
@@ -35,14 +35,13 @@ export default class RouteComponent extends React.Component {
 				state: { nextPathname: nextState.location.pathname }
 			});
 		}
-		const token = getToken();
 		// Redirect route to login page if the auth token does not exist
-		if (!token) {
+		if (!hasToken()) {
 			redirectRoute();
 			return;
 		}
 		// Verify that the auth token is valid
-		axios.post('/api/verification/', { token }, { validateStatus: status => (status >= 200 && status < 300) || (status === 401 || status === 403) })
+		axios.post('/api/verification/', { token: getToken() }, { validateStatus: status => (status >= 200 && status < 300) || (status === 401 || status === 403) })
 			.then(res => {
 				// Route to login page if the auth token is not valid
 				if (!res.data.success) browserHistory.push('/login');
