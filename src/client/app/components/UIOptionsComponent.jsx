@@ -36,14 +36,6 @@ export default class UIOptionsComponent extends React.Component {
 	}
 
 	/**
-	 * Called when this component mounts
-	 * Dispatches a Redux action to fetch meter information
-	 */
-	componentWillMount() {
-		this.props.fetchMetersDetailsIfNeeded();
-	}
-
-	/**
 	 * Stores temporary barDuration until slider is released, used to update the UI of the slider
 	 */
 	handleBarDurationChange(value) {
@@ -78,13 +70,12 @@ export default class UIOptionsComponent extends React.Component {
 			fontWeight: 'bold',
 			margin: 0
 		};
-
 		const divTopPadding = {
 			paddingTop: '15px'
 		};
 
 		return (
-			<div style={divTopPadding}>
+			<div>
 				<ChartSelectContainer />
 				<ChartDataSelectContainer />
 

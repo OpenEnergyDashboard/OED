@@ -13,9 +13,7 @@ export default function LogoComponent(props) {
 	const imgStyle = {
 		maxWidth: '100%',
 		height: 'auto',
-		top: '10px',
-		// left: '30px',
-		position: 'absolute'
+		paddingTop: '10px',
 	};
 	return (
 		<img src={props.url} alt="Logo" title="Open Energy Dashboard" style={imgStyle} />

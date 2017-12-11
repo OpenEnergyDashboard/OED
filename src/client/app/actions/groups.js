@@ -5,7 +5,8 @@
  */
 
 import axios from 'axios';
-import getToken from '../utils/getToken';
+import { getToken } from '../utils/token';
+import { showErrorNotification } from '../utils/notifications';
 
 // View and fetching actions
 export const REQUEST_GROUPS_DETAILS = 'REQUEST_GROUPS_DETAILS';
@@ -277,9 +278,9 @@ function submitNewGroup(group) {
 					dispatch2(changeDisplayMode(DISPLAY_MODE.VIEW));
 				});
 			})
-			.catch(error => {
+			.catch(() => {
 				dispatch(markGroupInEditingNotSubmitted());
-				console.error(error);
+				showErrorNotification('Failed to create a new group');
 			});
 	};
 }
@@ -296,9 +297,9 @@ function submitGroupEdits(group) {
 					dispatch2(changeDisplayMode(DISPLAY_MODE.VIEW));
 				});
 			})
-			.catch(error => {
+			.catch(() => {
 				dispatch(markGroupInEditingNotSubmitted());
-				console.error(error);
+				showErrorNotification('Failed to edit group');
 			});
 	};
 }
@@ -354,6 +355,8 @@ export function deleteGroup() {
 					dispatch2(changeDisplayMode('view'));
 				});
 			})
-			.catch(console.error);
+			.catch(() => {
+				showErrorNotification('Failed to delete group');
+			});
 	};
 }

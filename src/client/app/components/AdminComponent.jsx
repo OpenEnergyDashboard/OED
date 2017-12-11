@@ -3,21 +3,105 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
 
 import React from 'react';
-import { FormattedMessage } from 'react-intl';
+import { FormControl, Button } from 'react-bootstrap';
+import { chartTypes } from '../reducers/graph';
+import HeaderContainer from '../containers/HeaderContainer';
 import FooterComponent from '../components/FooterComponent';
 
-/**
- * React component that controls the Admin panel
- * @returns JSX to create the AdminComponent
- */
-export default function AdminComponent() {
-	return (
-		<div>
-			<p><FormattedMessage
-				id="admin.panel"
-				defaultMessage="Admin panel"
-			/></p>
-			<FooterComponent/>
-		</div>
-	);
+export default class AdminComponent extends React.Component {
+	constructor(props) {
+		super(props);
+		this.handleDisplayTitleChange = this.handleDisplayTitleChange.bind(this);
+		this.handleDefaultChartToRenderChange = this.handleDefaultChartToRenderChange.bind(this);
+		this.handleDefaultBarStackingChange = this.handleDefaultBarStackingChange.bind(this);
+		this.handleSubmitPreferences = this.handleSubmitPreferences.bind(this);
+	}
+
+	handleDisplayTitleChange(e) {
+		this.props.updateDisplayTitle(e.target.value);
+	}
+
+	handleDefaultChartToRenderChange(e) {
+		this.props.updateDefaultGraphType(e.target.value);
+	}
+
+	handleDefaultBarStackingChange() {
+		this.props.toggleDefaultBarStacking();
+	}
+
+	handleSubmitPreferences() {
+		this.props.submitPreferences();
+	}
+
+	render() {
+		const labelStyle = {
+			fontWeight: 'bold',
+			margin: 0,
+		};
+		const bottomPaddingStyle = {
+			paddingBottom: '15px'
+		};
+		const titleStyle = {
+			fontWeight: 'bold',
+			margin: 0,
+			paddingBottom: '5px'
+		};
+		return (
+			<div>
+				<HeaderContainer />
+				<div className="container-fluid">
+					<div className="col-xs-3">
+						<div style={bottomPaddingStyle}>
+							<p style={titleStyle}>Default Site Title:</p>
+							<FormControl type="text" placeholder="Name" value={this.props.displayTitle} onChange={this.handleDisplayTitleChange} maxLength={50} />
+						</div>
+						<div>
+							<p style={labelStyle}>Default Graph Type:</p>
+							<div className="radio">
+								<label>
+									<input
+										type="radio"
+										name="chartTypes"
+										value={chartTypes.line}
+										onChange={this.handleDefaultChartToRenderChange}
+										checked={this.props.defaultChartToRender === chartTypes.line}
+									/>
+									Line
+								</label>
+							</div>
+							<div className="radio">
+								<label>
+									<input
+										type="radio"
+										name="chartTypes"
+										value={chartTypes.bar}
+										onChange={this.handleDefaultChartToRenderChange}
+										checked={this.props.defaultChartToRender === chartTypes.bar}
+									/>
+									Bar
+								</label>
+							</div>
+							<div className="radio">
+								<label>
+									<input
+										type="radio"
+										name="chartTypes"
+										value={chartTypes.compare}
+										onChange={this.handleDefaultChartToRenderChange}
+										checked={this.props.defaultChartToRender === chartTypes.compare}
+									/>
+									Compare
+								</label>
+							</div>
+						</div>
+						<div className="checkbox">
+							<label><input type="checkbox" onChange={this.handleDefaultBarStackingChange} checked={this.props.defaultBarStacking} />Default Bar stacking</label>
+						</div>
+						<Button type="submit" onClick={this.handleSubmitPreferences} disabled={this.props.disableSubmitPreferences}>Submit</Button>
+					</div>
+				</div>
+				<FooterComponent />
+			</div>
+		);
+	}
 }

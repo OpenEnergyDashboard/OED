@@ -5,10 +5,9 @@
 import { connect } from 'react-redux';
 import HeaderComponent from '../components/HeaderComponent';
 
-function mapStateToProps(state, ownProps) {
+function mapStateToProps(state) {
 	return {
-		renderLoginButton: ownProps.renderLoginButton,
-		renderOptionsButton: ownProps.renderOptionsButton,
+		title: state.admin.displayTitle
 	};
 }
 
