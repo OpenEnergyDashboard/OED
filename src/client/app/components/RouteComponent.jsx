@@ -11,7 +11,6 @@ import InitializationContainer from '../containers/InitializationContainer';
 import HomeComponent from './HomeComponent';
 import LoginComponent from '../components/LoginComponent';
 import AdminContainer from '../containers/AdminContainer';
-import NotFoundComponent from './NotFoundComponent';
 import GroupMainContainer from '../containers/groups/GroupMainContainer';
 import { getToken, hasToken } from '../utils/token';
 import { showErrorNotification } from '../utils/notifications';
@@ -103,12 +102,11 @@ export default class RouteComponent extends React.Component {
 			<div>
 				<InitializationContainer />
 				<Router history={browserHistory}>
-					<Route path="/" component={HomeComponent} />
 					<Route path="/login" component={LoginComponent} />
 					<Route path="/admin" component={AdminContainer} onEnter={this.requireAuth} />
 					<Route path="/groups" component={GroupMainContainer} onEnter={this.requireAuth} />
 					<Route path="/graph" component={HomeComponent} onEnter={this.linkToGraph} />
-					<Route path="*" component={NotFoundComponent} />
+					<Route path="*" component={HomeComponent} />
 				</Router>
 			</div>
 		);
