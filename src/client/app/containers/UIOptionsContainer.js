@@ -5,8 +5,7 @@
 import _ from 'lodash';
 import { connect } from 'react-redux';
 import UIOptionsComponent from '../components/UIOptionsComponent';
-import { changeSelectedMeters, changeBarDuration, changeBarStacking } from '../actions/graph';
-import { fetchMetersDetailsIfNeeded } from '../actions/meters';
+import { changeSelectedMeters, changeBarDuration, changeBarStacking, changeChartToRender } from '../actions/graph';
 
 /**
  * @param {State} state
@@ -30,9 +29,9 @@ function mapStateToProps(state) {
 
 function mapDispatchToProps(dispatch) {
 	return {
-		fetchMetersDetailsIfNeeded: () => dispatch(fetchMetersDetailsIfNeeded()),
 		selectMeters: newSelectedMeterIDs => dispatch(changeSelectedMeters(newSelectedMeterIDs)),
 		changeDuration: barDuration => dispatch(changeBarDuration(barDuration)),
+		changeChartType: chartType => dispatch(changeChartToRender(chartType)),
 		changeBarStacking: () => dispatch(changeBarStacking())
 	};
 }

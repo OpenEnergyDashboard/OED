@@ -35,7 +35,8 @@ export default class GroupSidebarComponent extends React.Component {
 
 	render() {
 		const labelStyle = {
-			fontWeight: 'bold'
+			fontWeight: 'bold',
+			margin: '0px'
 		};
 		return (
 			<div className="form-group">

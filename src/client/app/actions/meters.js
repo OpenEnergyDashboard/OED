@@ -28,7 +28,7 @@ function fetchMetersDetails() {
 }
 
 /**
- * @param {State} state
+ * @param {State} Redux state
  */
 function shouldFetchMetersDetails(state) {
 	return !state.meters.isFetching && state.meters.meters === undefined;
