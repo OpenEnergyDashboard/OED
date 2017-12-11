@@ -3,12 +3,10 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
 
 import React from 'react';
-import axios from 'axios';
 import { FormControl, Button } from 'react-bootstrap';
 import { chartTypes } from '../reducers/graph';
 import HeaderContainer from '../containers/HeaderContainer';
 import FooterComponent from '../components/FooterComponent';
-import { showSuccessNotification, showErrorNotification } from '../utils/notifications';
 
 export default class AdminComponent extends React.Component {
 	constructor(props) {
@@ -32,22 +30,7 @@ export default class AdminComponent extends React.Component {
 	}
 
 	handleSubmitPreferences() {
-		axios.post('/api/preferences',
-			{
-				token: localStorage.getItem('token'),
-				preferences: {
-					displayTitle: this.props.displayTitle,
-					defaultChartToRender: this.props.defaultChartToRender,
-					defaultBarStacking: this.props.defaultBarStacking
-				}
-			})
-			.then(() => {
-				showSuccessNotification('Updated preferences');
-			})
-			.catch(() => {
-				showErrorNotification('Failed to submit changes');
-			}
-		);
+		this.props.submitPreferences();
 	}
 
 	render() {

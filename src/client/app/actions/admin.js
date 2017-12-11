@@ -4,12 +4,15 @@
 
 import axios from 'axios';
 import { changeBarStacking, changeChartToRender } from './graph';
+import { showErrorNotification, showSuccessNotification } from '../utils/notifications';
+import { getToken } from '../utils/token';
 
 export const UPDATE_DISPLAY_TITLE = 'UPDATE_DISPLAY_TITLE';
 export const UPDATE_DEFAULT_CHART_TO_RENDER = 'UPDATE_DEFAULT_CHART_TO_RENDER';
 export const TOGGLE_DEFAULT_BAR_STACKING = 'TOGGLE_DEFAULT_BAR_STACKING';
 export const REQUEST_PREFERENCES = 'REQUEST_PREFERENCES';
 export const RECEIVE_PREFERENCES = 'RECEIVE_PREFERENCES';
+export const TOGGLE_IS_SUBMITTING_PREFERENCES = 'TOGGLE_IS_SUBMITTING_PREFERENCES';
 
 export function updateDisplayTitle(displayTitle) {
 	return { type: UPDATE_DISPLAY_TITLE, displayTitle };
@@ -31,6 +34,10 @@ function receivePreferences(data) {
 	return { type: RECEIVE_PREFERENCES, data };
 }
 
+function toggleIsSubmittingPreferences() {
+	return { type: TOGGLE_IS_SUBMITTING_PREFERENCES };
+}
+
 function fetchPreferences() {
 	return dispatch => {
 		dispatch(requestPreferences());
@@ -48,14 +55,52 @@ function fetchPreferences() {
 	};
 }
 
-function shouldFetchMetersData(state) {
+function submitPreferences() {
+	return (dispatch, getState) => {
+		const state = getState();
+		dispatch(toggleIsSubmittingPreferences());
+		return axios.post('/api/preferences',
+			{
+				token: getToken(),
+				preferences: {
+					displayTitle: state.admin.displayTitle,
+					defaultChartToRender: state.admin.defaultChartToRender,
+					defaultBarStacking: state.admin.defaultBarStacking
+				}
+			})
+			.then(() => {
+				showSuccessNotification('Updated preferences');
+				dispatch(toggleIsSubmittingPreferences());
+			})
+			.catch(() => {
+				showErrorNotification('Failed to submit changes');
+				dispatch(toggleIsSubmittingPreferences());
+			}
+		);
+	};
+}
+
+function shouldFetchPreferenceData(state) {
 	return !state.admin.isFetching;
+}
+
+function shouldSubmitPreferenceData(state) {
+	return !state.admin.isSubmitting;
 }
 
 export function fetchPreferencesIfNeeded() {
 	return (dispatch, getState) => {
-		if (shouldFetchMetersData(getState())) {
+		if (shouldFetchPreferenceData(getState())) {
 			return dispatch(fetchPreferences());
+		}
+		return Promise.resolve();
+	};
+}
+
+export function submitPreferencesIfNeeded() {
+	return (dispatch, getState) => {
+		if (shouldSubmitPreferenceData(getState())) {
+			return dispatch(submitPreferences());
 		}
 		return Promise.resolve();
 	};

@@ -9,7 +9,8 @@ const defaultState = {
 	displayTitle: '',
 	defaultChartToRender: chartTypes.line,
 	defaultBarStacking: false,
-	isFetching: false
+	isFetching: false,
+	isSubmitting: false
 };
 
 export default function admin(state = defaultState, action) {
@@ -41,6 +42,11 @@ export default function admin(state = defaultState, action) {
 				displayTitle: action.data.displayTitle,
 				defaultChartToRender: action.data.defaultChartToRender,
 				defaultBarStacking: action.data.defaultBarStacking
+			};
+		case adminActions.TOGGLE_IS_SUBMITTING_PREFERENCES:
+			return {
+				...state,
+				isSubmitting: !state.isSubmitting
 			};
 		default:
 			return state;
