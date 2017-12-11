@@ -98,12 +98,7 @@ function mapStateToProps(state) {
 			backgroundColor: 'rgba(0,0,0,0.6)',
 			displayColors: false,
 			callbacks: {
-				label: tooltipItems => `${<FormattedDate
-					value={new Date(data.datasets[tooltipItems.datasetIndex].label)}
-					year="numeric"
-					month="long"
-					day="2-digit"
-				/>}: ${tooltipItems.yLabel} kW`
+				label: tooltipItems => `${data.datasets[tooltipItems.datasetIndex].label}: ${tooltipItems.yLabel} kW`
 			}
 		}
 	};
