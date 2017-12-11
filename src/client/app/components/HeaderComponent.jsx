@@ -3,6 +3,7 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
 
 import React from 'react';
+import { FormattedMessage } from 'react-intl';
 import { Link } from 'react-router';
 import { Button } from 'react-bootstrap';
 import LogoComponent from './LogoComponent';
@@ -51,9 +52,18 @@ export default function HeaderComponent(props) {
 				<div className="visible-sm visible-xs">
 					{(props.renderOptionsButton) ? <UIModalComponent /> : null}
 				</div>
-				<Link style={loginLinkStyle} to="/login"><Button bsStyle="default">Log In</Button></Link>
-				<Link style={adminLinkStyle} to="/admin"><Button bsStyle="default">Admin panel</Button></Link>
-				<Link style={groupsLinkStyle} to="/groups"><Button bsStyle="default">Groups</Button></Link>
+				<Link style={loginLinkStyle} to="/login"><Button bsStyle="default"><FormattedMessage
+					id="login"
+					defaultMessage="Log in"
+				/></Button></Link>
+				<Link style={adminLinkStyle} to="/admin"><Button bsStyle="default"><FormattedMessage
+					id="admin.panel"
+					defaultMessage="Admin panel"
+				/></Button></Link>
+				<Link style={groupsLinkStyle} to="/groups"><Button bsStyle="default"><FormattedMessage
+					id="groups"
+					defaultMessage="Groups"
+				/></Button></Link>
 			</div>
 		</div>
 	);

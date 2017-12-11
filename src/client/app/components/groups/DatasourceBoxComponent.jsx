@@ -3,10 +3,11 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
 
 import React from 'react';
+import { defineMessages, injectIntl, intlShape } from 'react-intl';
 import MultiSelectComponent from '../MultiSelectComponent';
 import { DATA_TYPE_METER, DATA_TYPE_GROUP, metersFilterReduce, groupsFilterReduce } from '../../utils/Datasources';
 
-export default class DatasourceBoxComponent extends React.Component {
+class DatasourceBoxComponent extends React.Component {
 	constructor(props) {
 		super(props);
 		this.handleDatasourceSelect = this.handleDatasourceSelect.bind(this);
@@ -38,14 +39,36 @@ export default class DatasourceBoxComponent extends React.Component {
 				}
 			));
 		}
+		let messages;
+		if (this.props.type === 'meter') {
+			messages = defineMessages({
+				select: {
+					id: 'select.meters',
+					defaultMessage: 'Select Meters'
+				}
+			});
+		} else {
+			messages = defineMessages({
+				select: {
+					id: 'select.groups',
+					defaultMessage: 'Select Groups'
+				}
+			});
+		}
+		const { formatMessage } = this.props.intl;
 
 		return (
 			<MultiSelectComponent
 				options={options}
 				selectedOptions={selectedOptions}
-				placeholder={`Select ${this.props.type}s`}
+				placeholder={formatMessage(messages.select)}
 				onValuesChange={this.handleDatasourceSelect}
 			/>
 		);
 	}
 }
+DatasourceBoxComponent.propTypes = {
+	intl: intlShape.isRequired
+};
+
+export default injectIntl(DatasourceBoxComponent);

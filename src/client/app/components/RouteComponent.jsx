@@ -8,7 +8,7 @@ import axios from 'axios';
 import moment from 'moment';
 import _ from 'lodash';
 import en from 'react-intl/locale-data/en';
-import es from 'react-intl/locale-data/es';
+import fr from 'react-intl/locale-data/fr';
 import { addLocaleData, IntlProvider } from 'react-intl';
 import NotificationSystem from 'react-notification-system';
 import HomeComponent from './HomeComponent';
@@ -117,13 +117,13 @@ export default class RouteComponent extends React.Component {
 	 * @returns JSX to create the RouteComponent
 	 */
 	render() {
-		addLocaleData([...en, ...es]);
-		const messages = localeData.es;
-		const language = 'es';
+		addLocaleData([...en, ...fr]);
+		const lang = 'fr';
+		const messages = localeData.fr;
 		return (
 			<div>
 				<NotificationSystem ref={c => { this.notificationSystem = c; }} />
-				<IntlProvider locale={language} messages={messages}>
+				<IntlProvider locale={lang} messages={messages}>
 					<Router history={browserHistory}>
 						<Route path="/" component={HomeComponent} />
 						<Route path="/login" component={LoginContainer} />

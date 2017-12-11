@@ -3,6 +3,7 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
 
 import React from 'react';
+import { FormattedMessage } from 'react-intl';
 
 /**
  * React component that displays a 404 Not Found error page
@@ -14,6 +15,9 @@ export default function NotFoundComponent() {
 		paddingLeft: '15px'
 	};
 	return (
-		<h1 style={textStyle}>404 Not Found</h1>
+		<h1 style={textStyle}><FormattedMessage
+			id="404"
+			defaultMessage="404 Not Found"
+		/></h1>
 	);
 }

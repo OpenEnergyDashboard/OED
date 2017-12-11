@@ -3,6 +3,7 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
 
 import React from 'react';
+import { FormattedMessage } from 'react-intl';
 import FooterComponent from '../components/FooterComponent';
 
 /**
@@ -12,7 +13,10 @@ import FooterComponent from '../components/FooterComponent';
 export default function AdminComponent() {
 	return (
 		<div>
-			<p>Admin panel</p>
+			<p><FormattedMessage
+				id="admin.panel"
+				defaultMessage="Admin panel"
+			/></p>
 			<FooterComponent/>
 		</div>
 	);

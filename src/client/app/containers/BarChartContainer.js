@@ -4,7 +4,9 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/.
  */
 
+import React from 'react';
 import _ from 'lodash';
+import { FormattedDate } from 'react-intl';
 import { Bar } from 'react-chartjs-2';
 import moment from 'moment';
 import { connect } from 'react-redux';
@@ -63,7 +65,6 @@ function mapStateToProps(state) {
 
 	// Converts the label set into an array for Chart.js and sorts the labels based on the first date of the time interval
 	data.labels = Array.from(labelsSet).sort((x, y) => moment(x.split(' - ')[0], 'MMM DD, YYYY').format('x') - moment(y.split(' - ')[0], 'MMM DD, YYYY').format('x'));
-
 	const options = {
 		animation: {
 			duration: 0
@@ -97,7 +98,12 @@ function mapStateToProps(state) {
 			backgroundColor: 'rgba(0,0,0,0.6)',
 			displayColors: false,
 			callbacks: {
-				label: tooltipItems => `${data.datasets[tooltipItems.datasetIndex].label}: ${tooltipItems.yLabel} kW`
+				label: tooltipItems => `${<FormattedDate
+					value={new Date(data.datasets[tooltipItems.datasetIndex].label)}
+					year="numeric"
+					month="long"
+					day="2-digit"
+				/>}: ${tooltipItems.yLabel} kW`
 			}
 		}
 	};

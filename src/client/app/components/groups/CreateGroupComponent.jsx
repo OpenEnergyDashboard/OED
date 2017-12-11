@@ -3,10 +3,11 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
 
 import React from 'react';
+import { defineMessages, injectIntl, intlShape, FormattedMessage } from 'react-intl';
 import { FormControl, Button } from 'react-bootstrap';
 import DatasourceBoxContainer from '../../containers/groups/DatasourceBoxContainer';
 
-export default class CreateGroupComponent extends React.Component {
+class CreateGroupComponent extends React.Component {
 	constructor(props) {
 		super(props);
 		this.handleNameChange = this.handleNameChange.bind(this);
@@ -44,24 +45,54 @@ export default class CreateGroupComponent extends React.Component {
 		const centerTextStyle = {
 			textAlign: 'center'
 		};
+		const messages = defineMessages({
+			name: {
+				id: 'name',
+				defaultMessage: 'Name'
+			}
+		});
+		const { formatMessage } = this.props.intl;
 		return (
 			<div style={divStyle} className="col-xs-6">
-				<h3 style={centerTextStyle}>Create a New Group</h3>
+				<h3 style={centerTextStyle}><FormattedMessage
+					id="create.new.group"
+					defaultMessage="Create a New Group"
+				/></h3>
 				<div style={divBottomStyle}>
-					<p style={textStyle}>Name:</p>
-					<FormControl type="text" placeholder="Name" onChange={this.handleNameChange} />
+					<p style={textStyle}><FormattedMessage
+						id="name:"
+						defaultMessage="Name:"
+					/></p>
+					<FormControl type="text" placeholder={formatMessage(messages.name)} onChange={this.handleNameChange} />
 				</div>
 				<div style={divBottomStyle}>
-					<p style={textStyle}>Select Meters:</p>
+					<p style={textStyle}><FormattedMessage
+						id="meters.select"
+						defaultMessage="Select Meters:"
+					/></p>
 					<DatasourceBoxContainer type="meter" selection="all" />
 				</div>
 				<div style={divBottomStyle}>
-					<p style={textStyle}>Select Groups:</p>
+					<p style={textStyle}><FormattedMessage
+						id="groups.select"
+						defaultMessage="Select Groups:"
+					/></p>
 					<DatasourceBoxContainer type="group" selection="all" />
 				</div>
-				<Button type="submit" onClick={this.handleReturnToView}>Cancel</Button>
-				<Button type="submit" className="pull-right" onClick={this.handleCreateGroup}>Create group</Button>
+				<Button type="submit" onClick={this.handleReturnToView}><FormattedMessage
+					id="cancel"
+					defaultMessage="Cancel"
+				/></Button>
+				<Button type="submit" className="pull-right" onClick={this.handleCreateGroup}><FormattedMessage
+					id="create.group"
+					defaultMessage="Create Group"
+				/></Button>
 			</div>
 		);
 	}
 }
+CreateGroupComponent.propTypes = {
+	intl: intlShape.isRequired
+};
+
+export default injectIntl(CreateGroupComponent);

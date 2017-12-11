@@ -3,13 +3,13 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
 
 import React from 'react';
-import { FormattedMessage } from 'react-intl';
+import { defineMessages, injectIntl, intlShape, FormattedMessage } from 'react-intl';
 import MultiSelectComponent from './MultiSelectComponent';
 
 /**
  * A component which allows the user to select which data should be displayed on the chart.
  */
-export default class ChartDataSelectComponent extends React.Component {
+class ChartDataSelectComponent extends React.Component {
 	constructor(props) {
 		super(props);
 		this.handleMeterSelect = this.handleMeterSelect.bind(this);
@@ -51,10 +51,22 @@ export default class ChartDataSelectComponent extends React.Component {
 			margin: 0
 		};
 
+		const messages = defineMessages({
+			selectGroup: {
+				id: 'select.groups',
+				defaultMessage: 'Select Groups'
+			},
+			selectMeter: {
+				id: 'select.meters',
+				defaultMessage: 'Select Meters'
+			}
+		});
+		const { formatMessage } = this.props.intl;
+
 		return (
 			<div>
 				<p style={labelStyle}><FormattedMessage
-					id="selectGroup"
+					id="group"
 					defaultMessage="Groups:"
 				/>
 				</p>
@@ -62,16 +74,19 @@ export default class ChartDataSelectComponent extends React.Component {
 					<MultiSelectComponent
 						options={this.props.groups}
 						selectedOptions={this.props.selectedGroups}
-						placeholder="Select Groups"
+						placeholder={formatMessage(messages.selectGroup)}
 						onValuesChange={s => this.handleGroupSelect(s)}
 					/>
 				</div>
-				<p style={labelStyle}>Meters:</p>
+				<p style={labelStyle}><FormattedMessage
+					id="meters"
+					defaultMessage="Meters:"
+				/></p>
 				<div style={divBottomPadding}>
 					<MultiSelectComponent
 						options={this.props.meters}
 						selectedOptions={this.props.selectedMeters}
-						placeholder="Select Meters"
+						placeholder={formatMessage(messages.selectMeter)}
 						onValuesChange={s => this.handleMeterSelect(s)}
 					/>
 				</div>
@@ -79,3 +94,9 @@ export default class ChartDataSelectComponent extends React.Component {
 		);
 	}
 }
+
+ChartDataSelectComponent.propTypes = {
+	intl: intlShape.isRequired
+};
+
+export default injectIntl(ChartDataSelectComponent);

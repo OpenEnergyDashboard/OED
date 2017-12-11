@@ -3,6 +3,7 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
 
 import React from 'react';
+import { FormattedMessage } from 'react-intl';
 import { Button } from 'react-bootstrap';
 
 export default class GroupSidebarComponent extends React.Component {
@@ -39,14 +40,20 @@ export default class GroupSidebarComponent extends React.Component {
 		};
 		return (
 			<div className="form-group">
-				<p style={labelStyle}>View groups:</p>
+				<p style={labelStyle}><FormattedMessage
+					id="view.groups"
+					defaultMessage="View groups:"
+				/></p>
 				<select multiple className="form-control" id="groupList" size="8" onChange={this.handleGroupSelect}>
 					{this.props.groups.map(group =>
 						<option key={group.id} value={group.id}>{group.name}</option>
 					)}
 				</select>
 				<br />
-				<Button bsStyle="default" onClick={this.handleCreateGroup}>Create new group</Button>
+				<Button bsStyle="default" onClick={this.handleCreateGroup}><FormattedMessage
+					id="create.new.group"
+					defaultMessage="Create new group"
+				/></Button>
 			</div>
 		);
 	}

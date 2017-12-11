@@ -3,6 +3,7 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
 
 import React from 'react';
+import { FormattedMessage } from 'react-intl';
 import { Button } from 'react-bootstrap';
 import ListDisplayComponent from '../ListDisplayComponent';
 
@@ -37,15 +38,24 @@ export default class GroupViewComponent extends React.Component {
 				<h2 style={nameStyle}>{this.props.name}</h2>
 				<div className="row">
 					<div className="col-xs-6">
-						<p style={boldStyle}>Child Meters:</p>
+						<p style={boldStyle}><FormattedMessage
+							id="child.meters"
+							defaultMessage="Child Meters:"
+						/></p>
 						<ListDisplayComponent items={this.props.childMeters} />
 					</div>
 					<div className="col-xs-6">
-						<p style={boldStyle}>Child Groups:</p>
+						<p style={boldStyle}><FormattedMessage
+							id="child.groups"
+							defaultMessage="Child Groups:"
+						/></p>
 						<ListDisplayComponent items={this.props.childGroups} />
 					</div>
 				</div>
-				<Button style={buttonPadding} bsStyle="default" onClick={this.handleEditGroup}>Edit group</Button>
+				<Button style={buttonPadding} bsStyle="default" onClick={this.handleEditGroup}><FormattedMessage
+					id="edit.group"
+					defaultMessage="Edit group"
+				/></Button>
 			</div>
 		);
 	}

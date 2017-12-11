@@ -28,7 +28,6 @@ export default function ListDisplayComponent(props) {
 		paddingLeft: '12px',
 		paddingRight: '12px',
 	};
-
 	return (
 		<div className="list-wrapper" style={listWrapperStyle} >
 			<ul id="meterList" style={listStyle} >
