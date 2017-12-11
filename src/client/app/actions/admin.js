@@ -12,7 +12,8 @@ export const UPDATE_DEFAULT_CHART_TO_RENDER = 'UPDATE_DEFAULT_CHART_TO_RENDER';
 export const TOGGLE_DEFAULT_BAR_STACKING = 'TOGGLE_DEFAULT_BAR_STACKING';
 export const REQUEST_PREFERENCES = 'REQUEST_PREFERENCES';
 export const RECEIVE_PREFERENCES = 'RECEIVE_PREFERENCES';
-export const TOGGLE_IS_SUBMITTING_PREFERENCES = 'TOGGLE_IS_SUBMITTING_PREFERENCES';
+export const MARK_PREFERENCES_NOT_SUBMITTED = 'MARK_PREFERENCES_NOT_SUBMITTED';
+export const MARK_PREFERENCES_SUBMITTED = 'MARK_PREFERENCES_SUBMITTED';
 
 export function updateDisplayTitle(displayTitle) {
 	return { type: UPDATE_DISPLAY_TITLE, displayTitle };
@@ -34,8 +35,12 @@ function receivePreferences(data) {
 	return { type: RECEIVE_PREFERENCES, data };
 }
 
-function toggleIsSubmittingPreferences() {
-	return { type: TOGGLE_IS_SUBMITTING_PREFERENCES };
+function markPreferencesSubmitted() {
+	return { type: MARK_PREFERENCES_SUBMITTED };
+}
+
+function markPreferencesNotSubmitted() {
+	return { type: MARK_PREFERENCES_NOT_SUBMITTED };
 }
 
 function fetchPreferences() {
@@ -58,7 +63,7 @@ function fetchPreferences() {
 function submitPreferences() {
 	return (dispatch, getState) => {
 		const state = getState();
-		dispatch(toggleIsSubmittingPreferences());
+		dispatch(markPreferencesSubmitted());
 		return axios.post('/api/preferences',
 			{
 				token: getToken(),
@@ -70,11 +75,10 @@ function submitPreferences() {
 			})
 			.then(() => {
 				showSuccessNotification('Updated preferences');
-				dispatch(toggleIsSubmittingPreferences());
 			})
 			.catch(() => {
+				dispatch(markPreferencesNotSubmitted());
 				showErrorNotification('Failed to submit changes');
-				dispatch(toggleIsSubmittingPreferences());
 			}
 		);
 	};
@@ -85,7 +89,7 @@ function shouldFetchPreferenceData(state) {
 }
 
 function shouldSubmitPreferenceData(state) {
-	return !state.admin.isSubmitting;
+	return !state.admin.submitted;
 }
 
 export function fetchPreferencesIfNeeded() {

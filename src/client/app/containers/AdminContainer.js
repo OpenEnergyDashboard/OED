@@ -10,7 +10,8 @@ function mapStateToProps(state) {
 	return {
 		displayTitle: state.admin.displayTitle,
 		defaultChartToRender: state.admin.defaultChartToRender,
-		defaultBarStacking: state.admin.defaultBarStacking
+		defaultBarStacking: state.admin.defaultBarStacking,
+		disableSubmitPreferences: state.admin.submitted
 	};
 }
 

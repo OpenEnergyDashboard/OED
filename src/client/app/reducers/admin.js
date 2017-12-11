@@ -10,7 +10,7 @@ const defaultState = {
 	defaultChartToRender: chartTypes.line,
 	defaultBarStacking: false,
 	isFetching: false,
-	isSubmitting: false
+	submitted: true
 };
 
 export default function admin(state = defaultState, action) {
@@ -18,17 +18,20 @@ export default function admin(state = defaultState, action) {
 		case adminActions.UPDATE_DISPLAY_TITLE:
 			return {
 				...state,
-				displayTitle: action.displayTitle
+				displayTitle: action.displayTitle,
+				submitted: false
 			};
 		case adminActions.UPDATE_DEFAULT_CHART_TO_RENDER:
 			return {
 				...state,
-				defaultChartToRender: action.defaultChartToRender
+				defaultChartToRender: action.defaultChartToRender,
+				submitted: false,
 			};
 		case adminActions.TOGGLE_DEFAULT_BAR_STACKING:
 			return {
 				...state,
-				defaultBarStacking: !state.defaultBarStacking
+				defaultBarStacking: !state.defaultBarStacking,
+				submitted: false
 			};
 		case adminActions.REQUEST_PREFERENCES:
 			return {
@@ -43,10 +46,15 @@ export default function admin(state = defaultState, action) {
 				defaultChartToRender: action.data.defaultChartToRender,
 				defaultBarStacking: action.data.defaultBarStacking
 			};
-		case adminActions.TOGGLE_IS_SUBMITTING_PREFERENCES:
+		case adminActions.MARK_PREFERENCES_SUBMITTED:
 			return {
 				...state,
-				isSubmitting: !state.isSubmitting
+				submitted: true
+			};
+		case adminActions.MARK_PREFERENCES_NOT_SUBMITTED:
+			return {
+				...state,
+				submitted: false
 			};
 		default:
 			return state;

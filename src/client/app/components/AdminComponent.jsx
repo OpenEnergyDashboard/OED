@@ -97,7 +97,7 @@ export default class AdminComponent extends React.Component {
 						<div className="checkbox">
 							<label><input type="checkbox" onChange={this.handleDefaultBarStackingChange} checked={this.props.defaultBarStacking} />Default Bar stacking</label>
 						</div>
-						<Button type="submit" onClick={this.handleSubmitPreferences}>Submit</Button>
+						<Button type="submit" onClick={this.handleSubmitPreferences} disabled={this.props.disableSubmitPreferences}>Submit</Button>
 					</div>
 				</div>
 				<FooterComponent />
