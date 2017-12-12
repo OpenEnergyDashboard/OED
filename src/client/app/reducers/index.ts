@@ -11,10 +11,17 @@ import barReadings from './barReadings';
 import graph from './graph';
 import groups from './groups';
 import notifications from './notifications';
+import admin from './admin';
 
-/**
- * @param {State} state
- * @param action
- * @return {State}
- */
-export default combineReducers({ meters, readings: combineReducers({ line: lineReadings, bar: barReadings }), graph, groups, notifications });
+
+export default combineReducers({
+	meters,
+	readings: combineReducers({
+		line: lineReadings,
+		bar: barReadings
+	}),
+	graph,
+	groups,
+	notifications,
+	admin
+});

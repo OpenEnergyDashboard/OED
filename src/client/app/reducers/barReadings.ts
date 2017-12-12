@@ -5,7 +5,6 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/.
  */
 
-import * as readingsActions from '../actions/barReadings';
 import { BarReadingsAction } from '../actions/barReadings';
 import { ActionType } from '../types/redux';
 
@@ -45,11 +44,6 @@ const defaultState: BarReadingsState = {
 	byGroupID: {}
 };
 
-/**
- * @param {State~Readings} state
- * @param action
- * @return {State~Readings}
- */
 export default function readings(state = defaultState, action: BarReadingsAction) {
 	switch (action.type) {
 		case ActionType.RequestMeterBarReadings: {

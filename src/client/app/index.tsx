@@ -5,7 +5,7 @@
 import * as React from 'react';
 import thunkMiddleware from 'redux-thunk';
 import { render } from 'react-dom';
-import { createStore, applyMiddleware, compose } from 'redux';
+import { createStore, applyMiddleware } from 'redux';
 import { Provider } from 'react-redux';
 import RouteContainer from './containers/RouteContainer';
 import reducers from './reducers';
@@ -22,3 +22,5 @@ render(
 	</Provider>,
 	document.getElementById('root')
 );
+
+export default store;

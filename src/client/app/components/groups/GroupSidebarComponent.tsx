@@ -20,10 +20,6 @@ export default class GroupSidebarComponent extends React.Component<GroupSidebarP
 		this.handleCreateGroup = this.handleCreateGroup.bind(this);
 	}
 
-	public componentWillMount() {
-		this.props.fetchGroupsDetailsIfNeeded();
-	}
-
 	public render() {
 		const labelStyle: React.CSSProperties = {
 			fontWeight: 'bold'

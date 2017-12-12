@@ -5,9 +5,10 @@
  */
 
 import axios from 'axios';
-import getToken from '../utils/getToken';
+import { getToken } from '../utils/token';
 import { State, Dispatch, GetState, Thunk, TerminalThunk, ActionType } from '../types/redux';
 import { NamedIDItem } from '../types/items';
+import { showErrorNotification } from '../utils/notifications';
 import { StatefulEditable, GroupDefinition, GroupData, GroupID } from '../reducers/groups';
 
 export type GroupsAction =
@@ -364,8 +365,7 @@ function submitNewGroup(group: GroupData): Thunk {
 			})
 			.catch(error => {
 				dispatch(markGroupInEditingNotSubmitted());
-				// tslint:disable-next-line no-console
-				console.error(error);
+				showErrorNotification('Failed to create group');
 			});
 	};
 }
@@ -384,8 +384,7 @@ function submitGroupEdits(group: GroupData & GroupID): Thunk {
 			})
 			.catch(error => {
 				dispatch(markGroupInEditingNotSubmitted());
-				// tslint:disable-next-line no-console
-				console.error(error);
+				showErrorNotification('Failed to edit group');
 			});
 	};
 }
@@ -448,6 +447,8 @@ export function deleteGroup(): TerminalThunk {
 					dispatch2(changeDisplayMode(DisplayMode.View));
 				});
 			})
-			.catch(console.error);
+			.catch(() => {
+				showErrorNotification('Failed to delete group');
+			});
 	};
 }

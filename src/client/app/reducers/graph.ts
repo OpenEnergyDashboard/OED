@@ -15,9 +15,6 @@ export enum chartTypes {
 	compare = 'compare'
 }
 
-/**
- * @type {State~Graph}
- */
 export interface GraphState {
 	selectedMeters: number[];
 	selectedGroups: number[];
@@ -42,11 +39,6 @@ const defaultState: GraphState = {
 	barStacking: false
 };
 
-/**
- * @param {State~Graph} state
- * @param action
- * @return {State~Graph}
- */
 export default function graph(state = defaultState, action: graphActions.GraphAction) {
 	switch (action.type) {
 		case ActionType.UpdateSelectedMeters:

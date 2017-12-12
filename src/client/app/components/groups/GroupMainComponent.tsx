@@ -3,7 +3,7 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
 
 import * as React from 'react';
-import HeaderComponent from '../HeaderComponent';
+import HeaderContainer from '../../containers/HeaderContainer';
 import FooterComponent from '../FooterComponent';
 import GroupViewContainer from '../../containers/groups/GroupViewContainer';
 import GroupSidebarContainer from '../../containers/groups/GroupSidebarContainer';
@@ -29,9 +29,14 @@ export default class GroupMainComponent extends React.Component<GroupMainProps, 
 	}
 
 	public render() {
-		const divPaddingStyle = {
-			paddingTop: '50px'
+		const flexContainerStyle = {
+			display: 'flex',
+			flexFlow: 'row wrap'
 		};
+		const flexChildStyle = {
+			marginRight: '10px'
+		};
+
 		let GroupDisplay: JSX.Element | undefined;
 		switch (this.props.displayMode) {
 			case DisplayMode.Create: {
@@ -53,12 +58,14 @@ export default class GroupMainComponent extends React.Component<GroupMainProps, 
 			case DisplayMode.View: {
 				GroupDisplay = (
 					<div>
-						<div className='col-xs-2' style={divPaddingStyle}>
+						<div className='col-xs-2'>
 							<GroupSidebarContainer />
 						</div>
-						<div className='col-xs-4'>
+						<div className='col-xs-10' style={flexContainerStyle}>
 							{this.props.selectedGroups.map(groupID =>
-								<GroupViewContainer key={groupID} id={groupID} />
+								<div className='col-xs-4' style={flexChildStyle} key={groupID}>
+									<GroupViewContainer key={groupID} id={groupID} />
+								</div>
 							)}
 						</div>
 					</div>
@@ -72,13 +79,13 @@ export default class GroupMainComponent extends React.Component<GroupMainProps, 
 
 		return (
 			<div>
-				<HeaderComponent title='Groups' />
+				<HeaderContainer />
 				<div className='container-fluid'>
 					<div className='col-xs-11'>
 						{GroupDisplay}
 					</div>
 				</div>
-				<FooterComponent/>
+				<FooterComponent />
 			</div>
 		);
 	}

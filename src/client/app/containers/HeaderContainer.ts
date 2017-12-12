@@ -14,9 +14,7 @@ interface HeaderContainerProps {
 
 function mapStateToProps(state: State, ownProps: HeaderContainerProps) {
 	return {
-		renderLoginButton: ownProps.renderLoginButton,
-		renderOptionsButton: ownProps.renderOptionsButton,
-		renderGroupsButton: ownProps.renderGroupsButton
+		title: state.admin.displayTitle
 	};
 }
 

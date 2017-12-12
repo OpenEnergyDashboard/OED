@@ -21,6 +21,7 @@ export interface State {
 	graph: GraphState;
 	groups: GroupsState;
 	notifications: NotificationsState;
+	admin: AdminState;
 }
 
 export enum ActionType {

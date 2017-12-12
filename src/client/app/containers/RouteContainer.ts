@@ -6,21 +6,18 @@
 
 import { connect } from 'react-redux';
 import RouteComponent from '../components/RouteComponent';
-import { clearNotifications } from '../actions/notifications';
 import { Dispatch, State } from '../types/redux';
 import { changeOptionsFromLink, LinkOptions } from '../actions/graph';
 
 
 function mapStateToProps(state: State) {
 	return {
-		notification: state.notifications.notification,
 		barStacking: state.graph.barStacking
 	};
 }
 
 function mapDispatchToProps(dispatch: Dispatch) {
 	return {
-		clearNotifications: () => dispatch(clearNotifications()),
 		changeOptionsFromLink: (options: LinkOptions) => dispatch(changeOptionsFromLink(options))
 	};
 }

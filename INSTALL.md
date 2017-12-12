@@ -11,7 +11,7 @@ You can either use Docker Compose to install Node and PostgreSQL in containers, 
 1. Start the app in development mode with ```docker-compose run --rm --service-ports web src/scripts/devstart.sh```.
 1. Wait for the Webpack build to finish and then access the app at [localhost:3000](http://localhost:3000).
 
-The app will re-build any time a file is changed. You can log into the app with `test@test.test`, password `testtest` (the result of the `--default-user` flag to the init script).
+The app will re-build any time a file is changed. You can log into the app with `test@example.com`, password `password` (the result of the `--default-user` flag to the init script).
 
 Killing the running process (ctrl+C) will stop the app. You can get rid of the containers with ```docker-compose down```.
 
