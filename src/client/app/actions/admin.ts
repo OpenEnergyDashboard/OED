@@ -8,8 +8,9 @@ import { showErrorNotification, showSuccessNotification } from '../utils/notific
 import { getToken } from '../utils/token';
 import { ChartTypes } from '../types/redux/graph';
 import { PreferenceRequestItem } from '../types/items';
-import { ActionType, Dispatch, GetState, State, Thunk } from '../types/redux';
 import * as t from '../types/redux/admin';
+import { ActionType, Dispatch, GetState, Thunk } from '../types/redux/actions';
+import { State } from '../types/redux/state';
 
 export function updateDisplayTitle(displayTitle: string): t.UpdateDisplayTitleAction {
 	return { type: ActionType.UpdateDisplayTitle, displayTitle };
