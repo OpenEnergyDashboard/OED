@@ -47,7 +47,9 @@ export default class RouteComponent extends React.Component<RouteProps, {}> {
 			return;
 		}
 		// Verify that the auth token is valid
-		axios.post('/api/verification/', { token: getToken() }, { validateStatus: status => (status >= 200 && status < 300) || (status === 401 || status === 403) })
+		axios.post('/api/verification/',
+			{ token: getToken() },
+			{ validateStatus: status => (status >= 200 && status < 300) || (status === 401 || status === 403) })
 			.then(res => {
 				// Route to login page if the auth token is not valid
 				if (!res.data.success) { browserHistory.push('/login'); }

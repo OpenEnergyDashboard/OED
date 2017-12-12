@@ -7,9 +7,22 @@ import { FormControl, Button } from 'react-bootstrap';
 import { chartTypes } from '../reducers/graph';
 import HeaderContainer from '../containers/HeaderContainer';
 import FooterComponent from '../components/FooterComponent';
+import {ToggleDefaultBarStackingAction, UpdateDefaultChartToRenderAction, UpdateDisplayTitleAction} from '../actions/admin';
 
-export default class AdminComponent extends React.Component {
-	constructor(props) {
+interface AdminProps {
+	displayTitle: string;
+	defaultChartToRender: chartTypes;
+	defaultBarStacking: boolean;
+	disableSubmitPreferences: boolean;
+	updateDisplayTitle(title: string): UpdateDisplayTitleAction;
+	updateDefaultChartType(defaultChartToRender: chartTypes): UpdateDefaultChartToRenderAction;
+	toggleDefaultBarStacking(): ToggleDefaultBarStackingAction;
+	submitPreferences(): Promise<void>;
+}
+
+
+export default class AdminComponent extends React.Component<AdminProps, {}> {
+	constructor(props: AdminProps) {
 		super(props);
 		this.handleDisplayTitleChange = this.handleDisplayTitleChange.bind(this);
 		this.handleDefaultChartToRenderChange = this.handleDefaultChartToRenderChange.bind(this);
@@ -17,31 +30,15 @@ export default class AdminComponent extends React.Component {
 		this.handleSubmitPreferences = this.handleSubmitPreferences.bind(this);
 	}
 
-	handleDisplayTitleChange(e) {
-		this.props.updateDisplayTitle(e.target.value);
-	}
-
-	handleDefaultChartToRenderChange(e) {
-		this.props.updateDefaultGraphType(e.target.value);
-	}
-
-	handleDefaultBarStackingChange() {
-		this.props.toggleDefaultBarStacking();
-	}
-
-	handleSubmitPreferences() {
-		this.props.submitPreferences();
-	}
-
-	render() {
-		const labelStyle = {
+	public render() {
+		const labelStyle: React.CSSProperties = {
 			fontWeight: 'bold',
-			margin: 0,
+			margin: 0
 		};
-		const bottomPaddingStyle = {
+		const bottomPaddingStyle: React.CSSProperties = {
 			paddingBottom: '15px'
 		};
-		const titleStyle = {
+		const titleStyle: React.CSSProperties = {
 			fontWeight: 'bold',
 			margin: 0,
 			paddingBottom: '5px'
@@ -49,19 +46,19 @@ export default class AdminComponent extends React.Component {
 		return (
 			<div>
 				<HeaderContainer />
-				<div className="container-fluid">
-					<div className="col-xs-3">
+				<div className='container-fluid'>
+					<div className='col-xs-3'>
 						<div style={bottomPaddingStyle}>
 							<p style={titleStyle}>Default Site Title:</p>
-							<FormControl type="text" placeholder="Name" value={this.props.displayTitle} onChange={this.handleDisplayTitleChange} maxLength={50} />
+							<FormControl type='text' placeholder='Name' value={this.props.displayTitle} onChange={this.handleDisplayTitleChange} maxLength={50} />
 						</div>
 						<div>
-							<p style={labelStyle}>Default Graph Type:</p>
-							<div className="radio">
+							<p style={labelStyle}>Default Chart Type:</p>
+							<div className='radio'>
 								<label>
 									<input
-										type="radio"
-										name="chartTypes"
+										type='radio'
+										name='chartTypes'
 										value={chartTypes.line}
 										onChange={this.handleDefaultChartToRenderChange}
 										checked={this.props.defaultChartToRender === chartTypes.line}
@@ -69,11 +66,11 @@ export default class AdminComponent extends React.Component {
 									Line
 								</label>
 							</div>
-							<div className="radio">
+							<div className='radio'>
 								<label>
 									<input
-										type="radio"
-										name="chartTypes"
+										type='radio'
+										name='chartTypes'
 										value={chartTypes.bar}
 										onChange={this.handleDefaultChartToRenderChange}
 										checked={this.props.defaultChartToRender === chartTypes.bar}
@@ -81,11 +78,11 @@ export default class AdminComponent extends React.Component {
 									Bar
 								</label>
 							</div>
-							<div className="radio">
+							<div className='radio'>
 								<label>
 									<input
-										type="radio"
-										name="chartTypes"
+										type='radio'
+										name='chartTypes'
 										value={chartTypes.compare}
 										onChange={this.handleDefaultChartToRenderChange}
 										checked={this.props.defaultChartToRender === chartTypes.compare}
@@ -94,14 +91,38 @@ export default class AdminComponent extends React.Component {
 								</label>
 							</div>
 						</div>
-						<div className="checkbox">
-							<label><input type="checkbox" onChange={this.handleDefaultBarStackingChange} checked={this.props.defaultBarStacking} />Default Bar stacking</label>
+						<div className='checkbox'>
+							<label>
+								<input
+									type='checkbox'
+									onChange={this.handleDefaultBarStackingChange}
+									checked={this.props.defaultBarStacking}
+								/>
+								Default Bar stacking
+							</label>
 						</div>
-						<Button type="submit" onClick={this.handleSubmitPreferences} disabled={this.props.disableSubmitPreferences}>Submit</Button>
+						<Button type='submit' onClick={this.handleSubmitPreferences} disabled={this.props.disableSubmitPreferences}>Submit</Button>
 					</div>
 				</div>
 				<FooterComponent />
 			</div>
 		);
+	}
+
+
+	private handleDisplayTitleChange(e) {
+		this.props.updateDisplayTitle(e.target.value);
+	}
+
+	private handleDefaultChartToRenderChange(e) {
+		this.props.updateDefaultChartType(e.target.value);
+	}
+
+	private handleDefaultBarStackingChange() {
+		this.props.toggleDefaultBarStacking();
+	}
+
+	private handleSubmitPreferences() {
+		this.props.submitPreferences();
 	}
 }

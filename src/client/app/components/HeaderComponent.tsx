@@ -7,13 +7,10 @@ import { Link } from 'react-router';
 import { Button } from 'react-bootstrap';
 import LogoComponent from './LogoComponent';
 import UIModalComponent from './UIModalComponent';
-import { hasToken } from '../utils/token';
+import { deleteToken, hasToken} from '../utils/token';
 
 interface HeaderProps {
-	renderLoginButton?: boolean;
-	renderGroupsButton?: boolean;
-	renderOptionsButton?: boolean;
-	title?: string;
+	title: string;
 }
 
 /**
@@ -21,18 +18,13 @@ interface HeaderProps {
  * @param props The props passed down by the parent component
  * @return JSX to create the header strip
  */
-export default class HeaderComponent extends React.Component {
-	constructor(props) {
+export default class HeaderComponent extends React.Component<HeaderProps, {}> {
+	constructor(props: HeaderProps) {
 		super(props);
 		this.handleLogOut = this.handleLogOut.bind(this);
 	}
 
-	handleLogOut() {
-		localStorage.removeItem('token');
-		this.forceUpdate();
-	}
-
-	render() {
+	public render() {
 		const urlArr = window.location.href.split('/');
 		const page = urlArr[urlArr.length - 1];
 		let renderOptionsButton = false;
@@ -93,23 +85,28 @@ export default class HeaderComponent extends React.Component {
 		};
 
 		return (
-			<div className="container-fluid" style={divStyle}>
-				<div className="col-xs-4">
-					<Link to="/"><LogoComponent url="./app/images/logo.png" /></Link>
+			<div className='container-fluid' style={divStyle}>
+				<div className='col-xs-4'>
+					<Link to='/'><LogoComponent url='./app/images/logo.png' /></Link>
 				</div>
-				<div className="col-xs-4 text-center">
+				<div className='col-xs-4 text-center'>
 					<h1 style={titleStyle}>{this.props.title}</h1>
 				</div>
 				<div style={divRightStyle}>
-					<div className="visible-sm visible-xs">
+					<div className='visible-sm visible-xs'>
 						{(renderOptionsButton) ? <UIModalComponent /> : null}
 					</div>
-					<Link style={loginLinkStyle} to="/login"><Button bsStyle="default">Log In</Button></Link>
-					<Link style={adminLinkStyle} to="/admin"><Button bsStyle="default">Admin panel</Button></Link>
-					<Link style={groupsLinkStyle} to="/groups"><Button bsStyle="default">Groups</Button></Link>
-					<Link style={logoutButtonStyle} to="/"><Button bsStyle="default" onClick={this.handleLogOut}>Log Out</Button></Link>
+					<Link style={loginLinkStyle} to='/login'><Button bsStyle='default'>Log In</Button></Link>
+					<Link style={adminLinkStyle} to='/admin'><Button bsStyle='default'>Admin panel</Button></Link>
+					<Link style={groupsLinkStyle} to='/groups'><Button bsStyle='default'>Groups</Button></Link>
+					<Link style={logoutButtonStyle} to='/'><Button bsStyle='default' onClick={this.handleLogOut}>Log Out</Button></Link>
 				</div>
 			</div>
 		);
+	}
+
+	private handleLogOut() {
+		deleteToken();
+		this.forceUpdate();
 	}
 }

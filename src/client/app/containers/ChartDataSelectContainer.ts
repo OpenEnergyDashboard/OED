@@ -11,9 +11,6 @@ import { fetchGroupsDetailsIfNeeded } from '../actions/groups';
 import { Dispatch, State } from '../types/redux';
 
 
-/**
- * @param {State} state
- */
 function mapStateToProps(state: State) {
 	// Map information about meters and groups into a format the component can display.
 	const sortedMeters = _.sortBy(_.values(state.meters.byMeterID).map(meter => ({ value: meter.id, label: meter.name.trim() })), 'name');
@@ -49,7 +46,4 @@ function mapDispatchToProps(dispatch: Dispatch) {
 	};
 }
 
-/**
- * Connects changes to the Redux store to ChartSelectComponent via mapStateToProps
- */
 export default connect(mapStateToProps, mapDispatchToProps)(ChartDataSelectComponent);

@@ -6,13 +6,7 @@ import { connect } from 'react-redux';
 import HeaderComponent from '../components/HeaderComponent';
 import { State } from '../types/redux';
 
-interface HeaderContainerProps {
-	renderLoginButton: boolean;
-	renderOptionsButton: boolean;
-	renderGroupsButton: boolean;
-}
-
-function mapStateToProps(state: State, ownProps: HeaderContainerProps) {
+function mapStateToProps(state: State) {
 	return {
 		title: state.admin.displayTitle
 	};

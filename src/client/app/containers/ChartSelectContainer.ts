@@ -9,9 +9,6 @@ import { chartTypes } from 'reducers/graph';
 import { State, Dispatch } from '../types/redux';
 
 
-/**
- * @param {State} state
- */
 function mapStateToProps(state: State) {
 	return {
 		selectedChart: state.graph.chartToRender
@@ -24,7 +21,4 @@ function mapDispatchToProps(dispatch: Dispatch) {
 	};
 }
 
-/**
- * Connects changes to the Redux store to ChartSelectComponent via mapStateToProps
- */
 export default connect(mapStateToProps, mapDispatchToProps)(ChartSelectComponent);

@@ -18,3 +18,7 @@ export function hasToken(): boolean {
 	}
 	return true;
 }
+
+export function deleteToken(): void {
+	localStorage.removeItem('token');
+}

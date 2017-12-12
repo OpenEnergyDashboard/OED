@@ -17,10 +17,7 @@ interface LoginState {
 
 export default class LoginComponent extends React.Component<{}, LoginState> {
 	private inputEmail: HTMLInputElement | null;
-	/**
-	 * Initializes the component's state to include email (email users use to login) and password (corresponding to their email)
-	 * Binds the functions to 'this' LoginComponent
-	 */
+
 	constructor(props: {}) {
 		super(props);
 		this.state = { email: '', password: '' };
