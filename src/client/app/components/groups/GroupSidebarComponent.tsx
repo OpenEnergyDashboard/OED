@@ -9,7 +9,6 @@ import { ChangeDisplayedGroupsAction, ChangeDisplayModeAction } from '../../acti
 interface GroupSidebarProps {
 	groups: Array<{id: number, name: string}>;
 	changeDisplayModeToCreate(): ChangeDisplayModeAction;
-	fetchGroupsDetailsIfNeeded(): Promise<any>;
 	selectGroups(groups: number[]): ChangeDisplayedGroupsAction;
 }
 

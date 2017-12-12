@@ -50,7 +50,13 @@ export default class AdminComponent extends React.Component<AdminProps, {}> {
 					<div className='col-xs-3'>
 						<div style={bottomPaddingStyle}>
 							<p style={titleStyle}>Default Site Title:</p>
-							<FormControl type='text' placeholder='Name' value={this.props.displayTitle} onChange={this.handleDisplayTitleChange} maxLength={50} />
+							<FormControl
+								type='text'
+								placeholder='Name'
+								value={this.props.displayTitle}
+								onChange={this.handleDisplayTitleChange}
+								maxLength={50}
+							/>
 						</div>
 						<div>
 							<p style={labelStyle}>Default Chart Type:</p>
@@ -110,12 +116,12 @@ export default class AdminComponent extends React.Component<AdminProps, {}> {
 	}
 
 
-	private handleDisplayTitleChange(e) {
+	private handleDisplayTitleChange(e: React.ChangeEvent<HTMLInputElement>) {
 		this.props.updateDisplayTitle(e.target.value);
 	}
 
-	private handleDefaultChartToRenderChange(e) {
-		this.props.updateDefaultChartType(e.target.value);
+	private handleDefaultChartToRenderChange(e: React.ChangeEvent<HTMLInputElement>) {
+		this.props.updateDefaultChartType(e.target.value as chartTypes);
 	}
 
 	private handleDefaultBarStackingChange() {

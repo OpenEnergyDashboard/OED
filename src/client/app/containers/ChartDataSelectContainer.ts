@@ -6,8 +6,6 @@ import * as _ from 'lodash';
 import { connect } from 'react-redux';
 import ChartDataSelectComponent from '../components/ChartDataSelectComponent';
 import { changeSelectedMeters, changeSelectedGroups } from '../actions/graph';
-import { fetchMetersDetailsIfNeeded } from '../actions/meters';
-import { fetchGroupsDetailsIfNeeded } from '../actions/groups';
 import { Dispatch, State } from '../types/redux';
 
 
@@ -41,8 +39,6 @@ function mapDispatchToProps(dispatch: Dispatch) {
 	return {
 		selectMeters: (newSelectedMeterIDs: number[]) => dispatch(changeSelectedMeters(newSelectedMeterIDs)),
 		selectGroups: (newSelectedGroupIDs: number[]) => dispatch(changeSelectedGroups(newSelectedGroupIDs)),
-		fetchMetersDetailsIfNeeded: () => dispatch(fetchMetersDetailsIfNeeded()),
-		fetchGroupsDetailsIfNeeded: () => dispatch(fetchGroupsDetailsIfNeeded())
 	};
 }
 

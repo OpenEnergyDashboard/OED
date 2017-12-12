@@ -4,11 +4,23 @@
 
 import * as React from 'react';
 import * as _ from 'lodash';
-import NotificationSystem from 'react-notification-system';
+import * as NotificationSystem from 'react-notification-system';
+import { ClearNotificationAction } from '../actions/notifications';
 
-export default class InitializationComponent extends React.Component {
+interface InitializationProps {
+	notification: Notification;
+	clearNotifications(): ClearNotificationAction;
+	fetchMeterDetailsIfNeeded(): Promise<any>;
+	fetchGroupDetailsIfNeeded(): Promise<any>;
+	fetchPreferencesIfNeeded(): Promise<any>;
+}
+
+export default class InitializationComponent extends React.Component<InitializationProps, {}> {
+	private notificationSystem: NotificationSystem.System;
+
 	public componentWillMount() {
-		this.props.fetchMetersDetailsIfNeeded();
+		this.props.fetchMeterDetailsIfNeeded();
+		this.props.fetchGroupDetailsIfNeeded();
 		this.props.fetchPreferencesIfNeeded();
 	}
 

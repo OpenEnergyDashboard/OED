@@ -100,16 +100,10 @@ function fetchGroupsDetails(): Thunk {
 	};
 }
 
-/**
- * @param {State} state
- */
 function shouldFetchGroupsDetails(state: State): boolean {
 	return !state.groups.isFetching && state.groups.outdated;
 }
 
-/**
- * @returns {function(*, *)}
- */
 export function fetchGroupsDetailsIfNeeded(): Thunk {
 	return (dispatch, getState) => {
 		if (shouldFetchGroupsDetails(getState())) {
@@ -132,11 +126,7 @@ function fetchGroupChildren(groupID: number) {
 			.then(response => dispatch(receiveGroupChildren(groupID, response.data)));
 	};
 }
-/**
- *
- * @param groupID
- * @returns {function(*, *)}
- */
+
 export function fetchGroupChildrenIfNeeded(groupID: number) {
 	return (dispatch: Dispatch, getState: GetState) => {
 		if (shouldFetchGroupChildren(getState(), groupID)) {

@@ -6,20 +6,23 @@ import { connect } from 'react-redux';
 import InitializationComponent from '../components/InitializationComponent';
 import { clearNotifications } from '../actions/notifications';
 import { fetchMetersDetailsIfNeeded } from '../actions/meters';
+import { fetchGroupsDetailsIfNeeded } from '../actions/groups';
 import { changeOptionsFromLink } from '../actions/graph';
 import { fetchPreferencesIfNeeded } from '../actions/admin';
+import {Dispatch, State} from '../types/redux';
 
 
-function mapStateToProps(state) {
+function mapStateToProps(state: State) {
 	return {
 		notification: state.notifications.notification
 	};
 }
 
-function mapDispatchToProps(dispatch) {
+function mapDispatchToProps(dispatch: Dispatch) {
 	return {
 		clearNotifications: () => dispatch(clearNotifications()),
 		fetchMetersDetailsIfNeeded: () => dispatch(fetchMetersDetailsIfNeeded()),
+		fetchGroupDetailsIfNeeded: () => dispatch(fetchGroupsDetailsIfNeeded()),
 		fetchPreferencesIfNeeded: () => dispatch(fetchPreferencesIfNeeded()),
 		changeOptionsFromLink: options => dispatch(changeOptionsFromLink(options))
 	};
