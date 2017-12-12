@@ -4,7 +4,6 @@
 
 import { connect } from 'react-redux';
 import MultiCompareChartComponent from '../components/MultiCompareChartComponent';
-import { Dispatch } from '../types/redux/actions';
 import { State } from '../types/redux/state';
 
 function mapStateToProps(state: State) {

@@ -1,8 +1,6 @@
-/*
- * This Source Code Form is subject to the terms of the Mozilla Public
+/* This Source Code Form is subject to the terms of the Mozilla Public
  * License, v. 2.0. If a copy of the MPL was not distributed with this
- * file, You can obtain one at http://mozilla.org/MPL/2.0/.
- */
+ * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
 
 import * as _ from 'lodash';
 import { GroupsAction, GroupsState, DisplayMode } from '../types/redux/groups';
@@ -19,11 +17,7 @@ const defaultState: GroupsState = {
 	displayMode: DisplayMode.View
 };
 
-/**
- * @param {State~Groups} state
- * @param action
- * @return {State~Groups}
- */
+
 export default function groups(state = defaultState, action: GroupsAction) {
 	switch (action.type) {
 		// The following are reducers related to viewing and fetching groups data

@@ -2,7 +2,7 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
 
-import { ChartTypes } from '../types/redux/graph';
+import { ChartTypes } from './redux/graph';
 
 /**
  * The type of line readings in actions.

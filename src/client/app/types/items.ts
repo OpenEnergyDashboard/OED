@@ -2,7 +2,7 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
 
-import { chartTypes } from '../reducers/graph';
+import { ChartTypes } from '../types/redux/graph';
 
 /**
  * The type of options displayed in Select components.
@@ -25,7 +25,7 @@ export interface NamedIDItem {
  */
 export interface PreferenceRequestItem {
 	displayTitle: string;
-	defaultChartToRender: chartTypes;
+	defaultChartToRender: ChartTypes;
 	defaultBarStacking: boolean;
 }
 

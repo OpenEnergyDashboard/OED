@@ -1,23 +1,14 @@
-/*
- * This Source Code Form is subject to the terms of the Mozilla Public
+/* This Source Code Form is subject to the terms of the Mozilla Public
  * License, v. 2.0. If a copy of the MPL was not distributed with this
- * file, You can obtain one at http://mozilla.org/MPL/2.0/.
- */
+ * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
 
 import axios from 'axios';
-import * as moment from 'moment';
 import { TimeInterval } from '../../../common/TimeInterval';
 import { LineReadings } from '../types/readings';
-import { ActionType, Thunk, Dispatch } from '../types/redux/actions';
+import {ActionType, Thunk, Dispatch, GetState} from '../types/redux/actions';
 import { State } from '../types/redux/state';
 import * as t from '../types/redux/lineReadings';
 
-/**
- * @param {State} state The current Redux state
- * @param {number} groupID The ID of the group to check
- * @param {TimeInterval} timeInterval The time interval to check
- * @returns {bool} True if the line readings for the given group at the given time are missing, false otherwise
- */
 function shouldFetchGroupLineReadings(state: State, groupID: number, timeInterval: TimeInterval): boolean {
 	const timeIntervalIndex = timeInterval.toString();
 	const readingsForID = state.readings.line.byGroupID[groupID];
@@ -33,12 +24,6 @@ function shouldFetchGroupLineReadings(state: State, groupID: number, timeInterva
 	return !readingsForTimeInterval.isFetching;
 }
 
-/**
- * @param {State} state The current Redux state
- * @param {number} meterID The ID of the meter to check
- * @param {TimeInterval} timeInterval The time interval to check
- * @returns {bool} True if the line readings for the given meter at the given time are missing, false otherwise
- */
 function shouldFetchMeterLineReadings(state: State, meterID: number, timeInterval: TimeInterval): boolean {
 	const timeIntervalIndex = timeInterval.toString();
 	const readingsForID = state.readings.line.byMeterID[meterID];
@@ -54,44 +39,25 @@ function shouldFetchMeterLineReadings(state: State, meterID: number, timeInterva
 	return !readingsForTimeInterval.isFetching;
 }
 
-/**
- * @param {[number]} meterIDs The IDs of the meters whose data should be fetched
- * @param {TimeInterval} timeInterval The time interval over which data should be fetched
- */
 function requestMeterLineReadings(meterIDs: number[], timeInterval: TimeInterval): t.RequestMeterLineReadingsAction {
 	return { type: ActionType.RequestMeterLineReadings, meterIDs, timeInterval };
 }
 
-/**
- * @param {[number]} meterIDs The IDs of the meters whose data has been fetched
- * @param {TimeInterval} timeInterval The time interval over which data has been fetched
- * @param {*} readings The data that has been fetched, indexed by meter ID.
- */
 function receiveMeterLineReadings(meterIDs: number[], timeInterval: TimeInterval, readings: LineReadings): t.ReceiveMeterLineReadingsAction {
 	return { type: ActionType.ReceiveMeterLineReadings, meterIDs, timeInterval, readings };
 }
 
-/**
- * @param {[number]} groupIDs The IDs of the groups whose data should be fetched
- * @param {TimeInterval} timeInterval The time interval over which data should be fetched
- */
 function requestGroupLineReadings(groupIDs: number[], timeInterval: TimeInterval): t.RequestGroupLineReadingsAction {
 	return { type: ActionType.RequestGroupLineReadings, groupIDs, timeInterval };
 }
 
-/**
- * @param {[number]} groupIDs The IDs of the groups whose data has been fetched
- * @param {TimeInterval} timeInterval The time interval over which data has been fetched
- * @param {*} readings The data that has been fetched, indexed by group ID.
- */
+
 function receiveGroupLineReadings(groupIDs: number[], timeInterval: TimeInterval, readings: LineReadings): t.ReceiveGroupLineReadingsAction {
 	return { type: ActionType.ReceiveGroupLineReadings, groupIDs, timeInterval, readings };
 }
 
 /**
  * Fetch the data for the given meters over the given interval. Fully manages the Redux lifecycle.
- * @param {[number]} meterIDs The IDs of the meters whose data should be fetched
- * @param {TimeInterval} timeInterval The time interval over which data should be fetched
  */
 function fetchMeterLineReadings(meterIDs: number[], timeInterval: TimeInterval): Thunk {
 	return dispatch => {
@@ -106,11 +72,9 @@ function fetchMeterLineReadings(meterIDs: number[], timeInterval: TimeInterval):
 
 /**
  * Fetch the data for the given groups over the given interval. Fully manages the Redux lifecycle.
- * @param {[number]} groupIDs The IDs of the groups whose data should be fetched
- * @param {TimeInterval} timeInterval The time interval over which data should be fetched
  */
 function fetchGroupLineReadings(groupIDs: number[], timeInterval: TimeInterval): Thunk {
-	return dispatch => {
+	return (dispatch: Dispatch) => {
 		dispatch(requestGroupLineReadings(groupIDs, timeInterval));
 		// The api expects the group IDs to be a comma-separated list.
 		const stringifiedIDs = groupIDs.join(',');
@@ -122,11 +86,9 @@ function fetchGroupLineReadings(groupIDs: number[], timeInterval: TimeInterval):
 
 /**
  * Fetches readings for the line chart of all selected meters and groups, if needed.
- * @param {TimeInterval} timeInterval The time interval to fetch readings for on the line chart
- * @return {*} Promise resolution of async actions to fetch the needed readings.
  */
 export function fetchNeededLineReadings(timeInterval: TimeInterval): Thunk {
-	return (dispatch, getState) => {
+	return (dispatch: Dispatch, getState: GetState) => {
 		const state = getState();
 		const promises: Array<Promise<any>> = [];
 

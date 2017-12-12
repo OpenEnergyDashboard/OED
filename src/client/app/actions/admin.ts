@@ -6,75 +6,36 @@ import axios from 'axios';
 import { changeBarStacking, changeChartToRender } from './graph';
 import { showErrorNotification, showSuccessNotification } from '../utils/notifications';
 import { getToken } from '../utils/token';
-import { chartTypes } from '../reducers/graph';
+import { ChartTypes } from '../types/redux/graph';
 import { PreferenceRequestItem } from '../types/items';
 import { ActionType, Dispatch, GetState, State, Thunk } from '../types/redux';
+import * as t from '../types/redux/admin';
 
-export type AdminAction =
-	| UpdateDisplayTitleAction
-	| UpdateDefaultChartToRenderAction
-	| ToggleDefaultBarStackingAction
-	| RequestPreferencesAction
-	| ReceivePreferencesAction
-	| MarkPreferencesNotSubmittedAction
-	| MarkPreferencesSubmittedAction;
-
-export interface UpdateDisplayTitleAction {
-	type: ActionType.UpdateDisplayTitle;
-	displayTitle: string;
-}
-
-export interface UpdateDefaultChartToRenderAction {
-	type: ActionType.UpdateDefaultChartToRender;
-	defaultChartToRender: chartTypes;
-}
-
-export interface ToggleDefaultBarStackingAction {
-	type: ActionType.ToggleDefaultBarStacking;
-}
-
-export interface RequestPreferencesAction {
-	type: ActionType.RequestPreferences;
-}
-
-export interface ReceivePreferencesAction {
-	type: ActionType.ReceivePreferences;
-	data: PreferenceRequestItem;
-}
-
-export interface MarkPreferencesNotSubmittedAction {
-	type: ActionType.MarkPreferencesNotSubmitted;
-}
-
-export interface MarkPreferencesSubmittedAction {
-	type: ActionType.MarkPreferencesSubmitted;
-}
-
-export function updateDisplayTitle(displayTitle: string): UpdateDisplayTitleAction {
+export function updateDisplayTitle(displayTitle: string): t.UpdateDisplayTitleAction {
 	return { type: ActionType.UpdateDisplayTitle, displayTitle };
 }
 
-export function updateDefaultChartToRender(defaultChartToRender: chartTypes): UpdateDefaultChartToRenderAction {
+export function updateDefaultChartToRender(defaultChartToRender: ChartTypes): t.UpdateDefaultChartToRenderAction {
 	return { type: ActionType.UpdateDefaultChartToRender, defaultChartToRender };
 }
 
-export function toggleDefaultBarStacking(): ToggleDefaultBarStackingAction {
+export function toggleDefaultBarStacking(): t.ToggleDefaultBarStackingAction {
 	return { type: ActionType.ToggleDefaultBarStacking };
 }
 
-function requestPreferences(): RequestPreferencesAction {
+function requestPreferences(): t.RequestPreferencesAction {
 	return { type: ActionType.RequestPreferences };
 }
 
-function receivePreferences(data: PreferenceRequestItem): ReceivePreferencesAction {
+function receivePreferences(data: PreferenceRequestItem): t.ReceivePreferencesAction {
 	return { type: ActionType.ReceivePreferences, data };
 }
 
-function markPreferencesNotSubmitted(): MarkPreferencesNotSubmittedAction {
+function markPreferencesNotSubmitted(): t.MarkPreferencesNotSubmittedAction {
 	return { type: ActionType.MarkPreferencesNotSubmitted };
 }
 
-function markPreferencesSubmitted(): MarkPreferencesSubmittedAction {
+function markPreferencesSubmitted(): t.MarkPreferencesSubmittedAction {
 	return { type: ActionType.MarkPreferencesSubmitted };
 }
 

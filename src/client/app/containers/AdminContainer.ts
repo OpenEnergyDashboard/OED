@@ -6,7 +6,7 @@ import { connect } from 'react-redux';
 import AdminComponent from '../components/AdminComponent';
 import { updateDisplayTitle, updateDefaultChartToRender, toggleDefaultBarStacking, submitPreferencesIfNeeded } from '../actions/admin';
 import { Dispatch, State } from '../types/redux';
-import { chartTypes } from '../reducers/graph';
+import { ChartTypes } from '../types/redux/graph';
 
 function mapStateToProps(state: State) {
 	return {
@@ -20,7 +20,7 @@ function mapStateToProps(state: State) {
 function mapDispatchToProps(dispatch: Dispatch) {
 	return {
 		updateDisplayTitle: (displayTitle: string) => dispatch(updateDisplayTitle(displayTitle)),
-		updateDefaultChartType: (defaultChartToRender: chartTypes) => dispatch(updateDefaultChartToRender(defaultChartToRender)),
+		updateDefaultChartType: (defaultChartToRender: ChartTypes) => dispatch(updateDefaultChartToRender(defaultChartToRender)),
 		toggleDefaultBarStacking: () => dispatch(toggleDefaultBarStacking()),
 		submitPreferences: () => dispatch(submitPreferencesIfNeeded())
 	};

@@ -6,8 +6,6 @@ import * as _ from 'lodash';
 import { connect } from 'react-redux';
 import ChartDataSelectComponent from '../components/ChartDataSelectComponent';
 import { changeSelectedMeters, changeSelectedGroups } from '../actions/graph';
-import { fetchMetersDetailsIfNeeded } from '../actions/meters';
-import { fetchGroupsDetailsIfNeeded } from '../actions/groups';
 import { State } from '../types/redux/state';
 import { Dispatch } from '../types/redux/actions';
 

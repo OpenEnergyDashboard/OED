@@ -2,27 +2,19 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
 
-import * as adminActions from '../actions/admin';
-import { chartTypes } from './graph';
-import { ActionType } from '../types/redux';
-
-export interface AdminState {
-	displayTitle: string;
-	defaultChartToRender: chartTypes;
-	defaultBarStacking: boolean;
-	isFetching: boolean;
-	submitted: boolean;
-}
+import { ChartTypes } from '../types/redux/graph';
+import { ActionType } from '../types/redux/actions';
+import { AdminState, AdminAction } from '../types/redux/admin';
 
 const defaultState: AdminState = {
 	displayTitle: '',
-	defaultChartToRender: chartTypes.line,
+	defaultChartToRender: ChartTypes.line,
 	defaultBarStacking: false,
 	isFetching: false,
 	submitted: true
 };
 
-export default function admin(state = defaultState, action: adminActions.AdminAction) {
+export default function admin(state = defaultState, action: AdminAction) {
 	switch (action.type) {
 		case ActionType.UpdateDisplayTitle:
 			return {

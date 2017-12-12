@@ -7,9 +7,9 @@ import InitializationComponent from '../components/InitializationComponent';
 import { clearNotifications } from '../actions/notifications';
 import { fetchMetersDetailsIfNeeded } from '../actions/meters';
 import { fetchGroupsDetailsIfNeeded } from '../actions/groups';
-import { changeOptionsFromLink } from '../actions/graph';
+import { changeOptionsFromLink, LinkOptions } from '../actions/graph';
 import { fetchPreferencesIfNeeded } from '../actions/admin';
-import {Dispatch, State} from '../types/redux';
+import { Dispatch, State } from '../types/redux';
 
 
 function mapStateToProps(state: State) {
@@ -24,7 +24,7 @@ function mapDispatchToProps(dispatch: Dispatch) {
 		fetchMetersDetailsIfNeeded: () => dispatch(fetchMetersDetailsIfNeeded()),
 		fetchGroupDetailsIfNeeded: () => dispatch(fetchGroupsDetailsIfNeeded()),
 		fetchPreferencesIfNeeded: () => dispatch(fetchPreferencesIfNeeded()),
-		changeOptionsFromLink: options => dispatch(changeOptionsFromLink(options))
+		changeOptionsFromLink: (options: LinkOptions) => dispatch(changeOptionsFromLink(options))
 	};
 }
 

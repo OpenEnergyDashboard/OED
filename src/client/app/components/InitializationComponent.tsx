@@ -5,7 +5,8 @@
 import * as React from 'react';
 import * as _ from 'lodash';
 import * as NotificationSystem from 'react-notification-system';
-import { ClearNotificationAction } from '../actions/notifications';
+import { ClearNotificationAction } from '../types/redux/notifications';
+import { LinkOptions} from '../actions/graph';
 
 interface InitializationProps {
 	notification: Notification;
@@ -13,6 +14,7 @@ interface InitializationProps {
 	fetchMeterDetailsIfNeeded(): Promise<any>;
 	fetchGroupDetailsIfNeeded(): Promise<any>;
 	fetchPreferencesIfNeeded(): Promise<any>;
+	changeOptionsFromLink(options: LinkOptions): Promise<any>;
 }
 
 export default class InitializationComponent extends React.Component<InitializationProps, {}> {
@@ -24,7 +26,7 @@ export default class InitializationComponent extends React.Component<Initializat
 		this.props.fetchPreferencesIfNeeded();
 	}
 
-	public componentWillReceiveProps(nextProps) {
+	public componentWillReceiveProps(nextProps: InitializationProps) {
 		if (!_.isEmpty(nextProps.notification)) {
 			this.notificationSystem.addNotification(nextProps.notification);
 			this.props.clearNotifications();
@@ -39,7 +41,7 @@ export default class InitializationComponent extends React.Component<Initializat
 	public render() {
 		return (
 			<div>
-				<NotificationSystem ref={c => { this.notificationSystem = c; }} />
+				<NotificationSystem ref={(c: NotificationSystem.System) => { this.notificationSystem = c; }} />
 			</div>
 		);
 	}

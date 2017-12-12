@@ -17,7 +17,7 @@ export default function LogoComponent(props: LogoProps) {
 	const imgStyle: React.CSSProperties = {
 		maxWidth: '100%',
 		height: 'auto',
-		paddingTop: '10px',
+		paddingTop: '10px'
 	};
 	return (
 		<img src={props.url} alt='Logo' title='Open Energy Dashboard' style={imgStyle} />

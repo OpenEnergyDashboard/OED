@@ -9,10 +9,7 @@ import { changeBarDuration, changeBarStacking } from '../actions/graph';
 import { Dispatch } from '../types/redux/actions';
 import { State } from '../types/redux/state';
 
-/**
- * @param {State} state
- * @return {{meterInfo: *, selectedMeters: Array}}
- */
+
 function mapStateToProps(state: State) {
 	return {
 		chartToRender: state.graph.chartToRender,
@@ -28,7 +25,5 @@ function mapDispatchToProps(dispatch: Dispatch) {
 	};
 }
 
-/**
- * Connects changes to the Redux store to UIOptionsComponent via mapStateToProps
- */
+
 export default connect(mapStateToProps, mapDispatchToProps)(UIOptionsComponent);

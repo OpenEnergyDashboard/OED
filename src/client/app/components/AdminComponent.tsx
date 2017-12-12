@@ -4,18 +4,18 @@
 
 import * as React from 'react';
 import { FormControl, Button } from 'react-bootstrap';
-import { chartTypes } from '../reducers/graph';
+import { ChartTypes } from '../types/redux/graph';
 import HeaderContainer from '../containers/HeaderContainer';
 import FooterComponent from '../components/FooterComponent';
-import {ToggleDefaultBarStackingAction, UpdateDefaultChartToRenderAction, UpdateDisplayTitleAction} from '../actions/admin';
+import { ToggleDefaultBarStackingAction, UpdateDefaultChartToRenderAction, UpdateDisplayTitleAction } from '../types/redux/admin';
 
 interface AdminProps {
 	displayTitle: string;
-	defaultChartToRender: chartTypes;
+	defaultChartToRender: ChartTypes;
 	defaultBarStacking: boolean;
 	disableSubmitPreferences: boolean;
 	updateDisplayTitle(title: string): UpdateDisplayTitleAction;
-	updateDefaultChartType(defaultChartToRender: chartTypes): UpdateDefaultChartToRenderAction;
+	updateDefaultChartType(defaultChartToRender: ChartTypes): UpdateDefaultChartToRenderAction;
 	toggleDefaultBarStacking(): ToggleDefaultBarStackingAction;
 	submitPreferences(): Promise<void>;
 }
@@ -50,6 +50,7 @@ export default class AdminComponent extends React.Component<AdminProps, {}> {
 					<div className='col-xs-3'>
 						<div style={bottomPaddingStyle}>
 							<p style={titleStyle}>Default Site Title:</p>
+							{/*TODO TYPESCRIPT: This might be a bug in the typings.*/}
 							<FormControl
 								type='text'
 								placeholder='Name'
@@ -65,9 +66,9 @@ export default class AdminComponent extends React.Component<AdminProps, {}> {
 									<input
 										type='radio'
 										name='chartTypes'
-										value={chartTypes.line}
+										value={ChartTypes.line}
 										onChange={this.handleDefaultChartToRenderChange}
-										checked={this.props.defaultChartToRender === chartTypes.line}
+										checked={this.props.defaultChartToRender === ChartTypes.line}
 									/>
 									Line
 								</label>
@@ -77,9 +78,9 @@ export default class AdminComponent extends React.Component<AdminProps, {}> {
 									<input
 										type='radio'
 										name='chartTypes'
-										value={chartTypes.bar}
+										value={ChartTypes.bar}
 										onChange={this.handleDefaultChartToRenderChange}
-										checked={this.props.defaultChartToRender === chartTypes.bar}
+										checked={this.props.defaultChartToRender === ChartTypes.bar}
 									/>
 									Bar
 								</label>
@@ -89,9 +90,9 @@ export default class AdminComponent extends React.Component<AdminProps, {}> {
 									<input
 										type='radio'
 										name='chartTypes'
-										value={chartTypes.compare}
+										value={ChartTypes.compare}
 										onChange={this.handleDefaultChartToRenderChange}
-										checked={this.props.defaultChartToRender === chartTypes.compare}
+										checked={this.props.defaultChartToRender === ChartTypes.compare}
 									/>
 									Compare
 								</label>
@@ -121,7 +122,7 @@ export default class AdminComponent extends React.Component<AdminProps, {}> {
 	}
 
 	private handleDefaultChartToRenderChange(e: React.ChangeEvent<HTMLInputElement>) {
-		this.props.updateDefaultChartType(e.target.value as chartTypes);
+		this.props.updateDefaultChartType(e.target.value as ChartTypes);
 	}
 
 	private handleDefaultBarStackingChange() {

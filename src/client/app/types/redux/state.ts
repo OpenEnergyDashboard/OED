@@ -8,6 +8,7 @@ import { GraphState } from './graph';
 import { GroupsState } from './groups';
 import { MetersState } from './meters';
 import { NotificationsState } from './notifications';
+import { AdminState } from './admin';
 
 export interface State {
 	meters: MetersState;
@@ -18,4 +19,5 @@ export interface State {
 	graph: GraphState;
 	groups: GroupsState;
 	notifications: NotificationsState;
+	admin: AdminState;
 }

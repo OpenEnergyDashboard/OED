@@ -12,10 +12,7 @@ import { Dispatch, Thunk, ActionType } from '../types/redux/actions';
 import { State } from '../types/redux/state';
 import * as t from '../types/redux/graph';
 
-/**
- * @param {string} chartType is one of chartTypes
- * @returns {*} An action needed to change the chart type
- */
+
 export function changeChartToRender(chartType: t.ChartTypes): t.ChangeChartToRenderAction {
 	return { type: ActionType.ChangeChartToRender, chartType };
 }
