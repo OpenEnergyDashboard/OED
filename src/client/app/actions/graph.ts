@@ -2,81 +2,45 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
 
+import * as moment from 'moment';
 import { fetchMetersDetailsIfNeeded } from './meters';
 import { fetchGroupsDetailsIfNeeded } from './groups';
 import { fetchNeededLineReadings } from './lineReadings';
 import { fetchNeededBarReadings, fetchNeededCompareReadings } from './barReadings';
 import { TimeInterval } from '../../../common/TimeInterval';
-import { chartTypes } from '../reducers/graph';
-import { State, Dispatch, Thunk, TerminalThunk, ActionType } from '../types/redux';
-
-export interface UpdateSelectedMetersAction {
-	type: ActionType.UpdateSelectedMeters;
-	meterIDs: number[];
-}
-
-export interface UpdateSelectedGroupsAction {
-	type: ActionType.UpdateSelectedGroups;
-	groupIDs: number[];
-}
-
-export interface UpdateBarDurationAction {
-	type: ActionType.UpdateBarDuration;
-	barDuration: number;
-}
-
-export interface ChangeChartToRenderAction {
-	type: ActionType.ChangeChartToRender;
-	chartType: chartTypes;
-}
-
-export interface ChangeBarStackingAction {
-	type: ActionType.ChangeBarStacking;
-}
-
-export interface ChangeGraphZoomAction {
-	type: ActionType.ChangeGraphZoom;
-	timeInterval: TimeInterval;
-}
-
-export type GraphAction =
-	| ChangeGraphZoomAction
-	| ChangeBarStackingAction
-	| ChangeChartToRenderAction
-	| UpdateBarDurationAction
-	| UpdateSelectedGroupsAction
-	| UpdateSelectedMetersAction;
-
+import { Dispatch, Thunk, ActionType } from '../types/redux/actions';
+import { State } from '../types/redux/state';
+import * as t from '../types/redux/graph';
 
 /**
  * @param {string} chartType is one of chartTypes
  * @returns {*} An action needed to change the chart type
  */
-export function changeChartToRender(chartType: chartTypes): ChangeChartToRenderAction {
+export function changeChartToRender(chartType: t.ChartTypes): t.ChangeChartToRenderAction {
 	return { type: ActionType.ChangeChartToRender, chartType };
 }
 
-export function changeBarStacking(): ChangeBarStackingAction {
+export function changeBarStacking(): t.ChangeBarStackingAction {
 	return { type: ActionType.ChangeBarStacking };
 }
 
-export function updateSelectedMeters(meterIDs: number[]): UpdateSelectedMetersAction {
+export function updateSelectedMeters(meterIDs: number[]): t.UpdateSelectedMetersAction {
 	return { type: ActionType.UpdateSelectedMeters, meterIDs };
 }
 
-export function updateSelectedGroups(groupIDs: number[]): UpdateSelectedGroupsAction {
+export function updateSelectedGroups(groupIDs: number[]): t.UpdateSelectedGroupsAction {
 	return { type: ActionType.UpdateSelectedGroups, groupIDs };
 }
 
-export function updateBarDuration(barDuration: number): UpdateBarDurationAction {
+export function updateBarDuration(barDuration: moment.Duration): t.UpdateBarDurationAction {
 	return { type: ActionType.UpdateBarDuration, barDuration };
 }
 
-function changeGraphZoom(timeInterval: TimeInterval): ChangeGraphZoomAction {
+function changeGraphZoom(timeInterval: TimeInterval): t.ChangeGraphZoomAction {
 	return { type: ActionType.ChangeGraphZoom, timeInterval };
 }
 
-export function changeBarDuration(barDuration: number): Thunk {
+export function changeBarDuration(barDuration: moment.Duration): Thunk {
 	return (dispatch, getState) => {
 		dispatch(updateBarDuration(barDuration));
 		dispatch(fetchNeededBarReadings(getState().graph.timeInterval));
@@ -91,7 +55,6 @@ export function changeSelectedMeters(meterIDs: number[]): Thunk {
 		dispatch(dispatch2 => {
 			dispatch2(fetchNeededLineReadings(getState().graph.timeInterval));
 			dispatch2(fetchNeededBarReadings(getState().graph.timeInterval));
-			// TODO TYPESCRIPT: This is a conflict that isn't resolvable as is. state.graph.compareTimeInterval really should be a TimeInterval.
 			dispatch2(fetchNeededCompareReadings(getState().graph.compareTimeInterval));
 		});
 		return Promise.resolve();
@@ -105,15 +68,18 @@ export function changeSelectedGroups(groupIDs: number[]): Thunk {
 		dispatch(dispatch2 => {
 			dispatch2(fetchNeededLineReadings(getState().graph.timeInterval));
 			dispatch2(fetchNeededBarReadings(getState().graph.timeInterval));
+			// TODO TYPESCRIPT??
+			dispatch2(fetchNeededCompareReadings(getState().graph.compareTimeInterval));
 		});
 		return Promise.resolve();
 	};
 }
 
-function fetchNeededReadingsForGraph(timeInterval: TimeInterval): TerminalThunk {
+function fetchNeededReadingsForGraph(timeInterval: TimeInterval): Thunk {
 	return dispatch => {
 		dispatch(fetchNeededLineReadings(timeInterval));
 		dispatch(fetchNeededBarReadings(timeInterval));
+		return Promise.resolve();
 	};
 }
 
@@ -121,20 +87,21 @@ function shouldChangeGraphZoom(state: State, timeInterval: TimeInterval): boolea
 	return !state.graph.timeInterval.equals(timeInterval);
 }
 
-export function changeGraphZoomIfNeeded(timeInterval: TimeInterval): TerminalThunk {
+export function changeGraphZoomIfNeeded(timeInterval: TimeInterval): Thunk {
 	return (dispatch, getState) => {
 		if (shouldChangeGraphZoom(getState(), TimeInterval.unbounded())) {
 			dispatch(changeGraphZoom(timeInterval));
 			dispatch(fetchNeededReadingsForGraph(timeInterval));
 		}
+		return Promise.resolve();
 	};
 }
 
 export interface LinkOptions {
 	meterIDs?: number[];
 	groupIDs?: number[];
-	chartType?: chartTypes;
-	barDuration?: number;
+	chartType?: t.ChartTypes;
+	barDuration?: moment.Duration;
 	toggleBarStacking?: boolean;
 }
 
@@ -145,7 +112,7 @@ export interface LinkOptions {
  */
 export function changeOptionsFromLink(options: LinkOptions) {
 	const dispatchFirst: Thunk[] = [];
-	const dispatchSecond: Array<Thunk | ChangeChartToRenderAction | ChangeBarStackingAction> = [];
+	const dispatchSecond: Array<Thunk | t.ChangeChartToRenderAction | t.ChangeBarStackingAction> = [];
 	if (options.meterIDs) {
 		dispatchFirst.push(fetchMetersDetailsIfNeeded());
 		dispatchSecond.push(changeSelectedMeters(options.meterIDs));
@@ -164,5 +131,5 @@ export function changeOptionsFromLink(options: LinkOptions) {
 		dispatchSecond.push(changeBarStacking());
 	}
 	return (dispatch: Dispatch) => Promise.all(dispatchFirst.map(dispatch))
-			.then(() => Promise.all(dispatchSecond.map(dispatch)));
+		.then(() => Promise.all(dispatchSecond.map(dispatch)));
 }

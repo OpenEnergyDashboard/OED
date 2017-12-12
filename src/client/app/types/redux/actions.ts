@@ -4,26 +4,7 @@
 
 import { Dispatch } from 'redux';
 import { ThunkAction } from 'redux-thunk';
-
-import { BarReadingsState } from '../reducers/barReadings';
-import { LineReadingsState } from '../reducers/lineReadings';
-import { GraphState } from '../reducers/graph';
-import { GroupsState } from '../reducers/groups';
-import { MetersState } from '../reducers/meters';
-import { NotificationsState } from '../reducers/notifications';
-import { AdminState } from '../reducers/admin';
-
-export interface State {
-	meters: MetersState;
-	readings: {
-		line: LineReadingsState;
-		bar: BarReadingsState;
-	};
-	graph: GraphState;
-	groups: GroupsState;
-	notifications: NotificationsState;
-	admin: AdminState;
-}
+import { State } from './state';
 
 export enum ActionType {
 	RequestMetersDetails = 'REQUEST_METERS_DETAILS',
@@ -36,6 +17,11 @@ export enum ActionType {
 	ReceiveGroupBarReadings = 'RECEIVE_GROUP_BAR_READINGS',
 	RequestMeterBarReadings = 'REQUEST_METER_BAR_READINGS',
 	ReceiveMeterBarReadings = 'RECEIVE_METER_BAR_READINGS',
+
+	RequestGroupLineReadings = 'REQUEST_GROUP_LINE_READINGS',
+	ReceiveGroupLineReadings = 'RECEIVE_GROUP_LINE_READINGS',
+	RequestMeterLineReadings = 'REQUEST_METER_LINE_READINGS',
+	ReceiveMeterLineReadings = 'RECEIVE_METER_LINE_READINGS',
 
 	UpdateSelectedMeters = 'UPDATE_SELECTED_METERS',
 	UpdateSelectedGroups = 'UPDATE_SELECTED_GROUPS',
@@ -84,11 +70,6 @@ export type Dispatch = Dispatch<State>;
  */
 export type GetState = () => State;
 
-/**
- * The type of terminating actions used in the project.
- * No return, no extra argument, uses the global state.
- */
-export type TerminalThunk = ThunkAction<void, State, void>;
 /**
  * The type of promissory actions used in the project.
  * Returns a promise, no extra argument, uses the global state.

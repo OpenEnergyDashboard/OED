@@ -10,7 +10,7 @@ import * as moment from 'moment';
 import { connect } from 'react-redux';
 // This is better than using an import, since we don't actually use anything from the plugin in the code.
 /// <reference path="chartjs-plugin-datalabels" />
-import { State } from '../types/redux';
+import { State } from '../types/redux/state';
 
 interface ChartDataSetsWithDatalabels extends ChartDataSets {
 	datalabels: {
@@ -29,8 +29,8 @@ interface CompareChartContainerProps {
  * @param ownProps
  */
 function mapStateToProps(state: State, ownProps: CompareChartContainerProps) {
-	const timeInterval = state.graph.compareTimeInterval;
-	const barDuration = state.graph.compareDuration;
+	const timeInterval = state.graph.compareTimeInterval.toString();
+	const compareDuration = state.graph.compareDuration.toISOString();
 	const datasets: ChartDataSetsWithDatalabels[] = [];
 	const labels: string[] = [];
 	// Power used so far this week
@@ -87,12 +87,15 @@ function mapStateToProps(state: State, ownProps: CompareChartContainerProps) {
 		return 'red';
 	};
 
-	let readingsData;
+	let readingsData: {isFetching: boolean, readings?: Array<[number, number]>} | undefined ;
 	if (ownProps.isGroup) {
-		readingsData = state.readings.bar.byGroupID[ownProps.id][timeInterval][barDuration.toISOString()];
-	}	else {
-		readingsData = state.readings.bar.byMeterID[ownProps.id][timeInterval][barDuration.toISOString()];
+		const readingsDataByTimeInterval = state.readings.bar.byGroupID[ownProps.id][timeInterval];
+		readingsData = readingsDataByTimeInterval[compareDuration];
+	} else {
+		const readingsDataByTimeInterval = state.readings.bar.byGroupID[ownProps.id][timeInterval];
+		readingsData = readingsDataByTimeInterval[compareDuration];
 	}
+
 	if (readingsData !== undefined && readingsData.readings !== undefined && !readingsData.isFetching) {
 		// Sunday needs special logic
 		if (soFar !== 0) {

@@ -6,9 +6,9 @@ import { connect } from 'react-redux';
 import * as moment from 'moment';
 import * as _ from 'lodash';
 import ExportComponent from '../components/ExportComponent';
-import { chartTypes } from '../reducers/graph';
+import { ChartTypes } from '../types/redux/graph';
 import { ExportDataSet } from '../types/readings';
-import { State } from '../types/redux';
+import { State } from '../types/redux/state';
 
 /**
  * @param {State} state
@@ -20,7 +20,7 @@ function mapStateToProps(state: State) {
 	const chart = state.graph.chartToRender;
 	const barDuration = state.graph.barDuration;
 
-	if (chart === chartTypes.line) {
+	if (chart === ChartTypes.line) {
 		for (const groupID of state.graph.selectedGroups) {
 			const byGroupID = state.readings.line.byGroupID[groupID];
 			if (byGroupID !== undefined) {
@@ -65,7 +65,7 @@ function mapStateToProps(state: State) {
 				}
 			}
 		}
-	} else if (chart === chartTypes.bar) {
+	} else if (chart === ChartTypes.bar) {
 		for (const groupID of state.graph.selectedGroups) {
 			const byGroupID = state.readings.bar.byGroupID[groupID];
 			if (byGroupID !== undefined) {

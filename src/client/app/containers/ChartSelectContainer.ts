@@ -5,8 +5,9 @@
 import { connect } from 'react-redux';
 import ChartSelectComponent from '../components/ChartSelectComponent';
 import { changeChartToRender } from '../actions/graph';
-import { chartTypes } from 'reducers/graph';
-import { State, Dispatch } from '../types/redux';
+import { ChartTypes } from '../types/redux/graph';
+import { Dispatch } from '../types/redux/actions';
+import { State } from '../types/redux/state';
 
 
 function mapStateToProps(state: State) {
@@ -17,7 +18,7 @@ function mapStateToProps(state: State) {
 
 function mapDispatchToProps(dispatch: Dispatch) {
 	return {
-		changeChartType: (chartType: chartTypes) => dispatch(changeChartToRender(chartType))
+		changeChartType: (chartType: ChartTypes) => dispatch(changeChartToRender(chartType))
 	};
 }
 

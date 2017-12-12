@@ -6,7 +6,8 @@ import * as _ from 'lodash';
 import { connect } from 'react-redux';
 import { changeDisplayedGroups, changeDisplayMode, DisplayMode } from '../../actions/groups';
 import GroupSidebarComponent from '../../components/groups/GroupSidebarComponent';
-import { State, Dispatch } from '../../types/redux';
+import { Dispatch } from '../../types/redux/actions';
+import { State } from '../../types/redux/state';
 
 function mapStateToProps(state: State) {
 	const sortedGroups = _.sortBy(_.values(state.groups.byGroupID).map(group => ({ id: group.id, name: group.name.trim() })), 'name');

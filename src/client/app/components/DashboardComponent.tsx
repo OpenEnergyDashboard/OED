@@ -8,7 +8,7 @@ import UIOptionsContainer from '../containers/UIOptionsContainer';
 import LineChartContainer from '../containers/LineChartContainer';
 import BarChartContainer from '../containers/BarChartContainer';
 import MultiCompareChartContainer from '../containers/MultiCompareChartContainer';
-import { chartTypes } from '../reducers/graph';
+import { ChartTypes } from '../types/redux/graph';
 
 /* tslint:disable no-string-literal */
 // TODO TYPESCRIPT: There is an open PR for this: https://github.com/DefinitelyTyped/DefinitelyTyped/pull/21842
@@ -16,7 +16,7 @@ defaults.global.plugins = {datalabels: {display: false}};
 /* tslint:enable */
 
 interface DashboardProps {
-	chartToRender: chartTypes;
+	chartToRender: ChartTypes;
 }
 
 /**
@@ -24,9 +24,9 @@ interface DashboardProps {
  */
 export default function DashboardComponent(props: DashboardProps) {
 	let ChartToRender: typeof LineChartContainer | typeof MultiCompareChartContainer | typeof BarChartContainer;
-	if (props.chartToRender === chartTypes.line) {
+	if (props.chartToRender === ChartTypes.line) {
 		ChartToRender = LineChartContainer;
-	} else if (props.chartToRender === chartTypes.compare) {
+	} else if (props.chartToRender === ChartTypes.compare) {
 		ChartToRender = MultiCompareChartContainer;
 	} else {
 		ChartToRender = BarChartContainer;

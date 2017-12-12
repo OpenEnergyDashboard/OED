@@ -5,7 +5,7 @@
 import * as React from 'react';
 import { Button } from 'react-bootstrap';
 import ListDisplayComponent from '../ListDisplayComponent';
-import { ChangeDisplayModeAction } from '../../actions/groups';
+import { ChangeDisplayModeAction } from '../../types/redux/groups';
 
 interface GroupViewProps {
 	name: string;
@@ -13,7 +13,7 @@ interface GroupViewProps {
 	childMeterNames: string[];
 	childGroupNames: string[];
 	fetchGroupChildren(id: number): Promise<any>;
-	beginEditingIfPossible(id: number): void;
+	beginEditingIfPossible(id: number): Promise<any>;
 	changeDisplayModeToEdit(): ChangeDisplayModeAction;
 }
 

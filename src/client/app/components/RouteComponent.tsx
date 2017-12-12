@@ -13,9 +13,9 @@ import LoginComponent from '../components/LoginComponent';
 import AdminContainer from '../containers/AdminContainer';
 import GroupMainContainer from '../containers/groups/GroupMainContainer';
 import { LinkOptions } from 'actions/graph';
-import { chartTypes } from '../reducers/graph';
 import { getToken, hasToken } from '../utils/token';
 import { showErrorNotification } from '../utils/notifications';
+import { ChartTypes } from '../types/redux/graph';
 
 interface RouteProps {
 	barStacking: boolean;
@@ -78,11 +78,11 @@ export default class RouteComponent extends React.Component<RouteProps, {}> {
 							options.groupIDs = info.split(',').map(s => parseInt(s));
 							break;
 						case 'chartType':
-							options.chartType = info as chartTypes;
+							options.chartType = info as ChartTypes;
+							options.chartType = info as ChartTypes;
 							break;
 						case 'barDuration':
-							// TODO TYPESCRIPT: Again the irresolvable conflict: is barDuration a number or a duration?
-							options.barDuration = moment.duration(parseInt(info), 'days');
+							const maybeDuration = moment.duration(parseInt(info));
 							break;
 						case 'barStacking':
 							if (this.props.barStacking.toString() !== info) {

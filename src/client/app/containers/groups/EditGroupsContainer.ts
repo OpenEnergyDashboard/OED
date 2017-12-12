@@ -10,12 +10,12 @@ import {
 	submitGroupInEditingIfNeeded,
 	editGroupName,
 	changeDisplayMode,
-	DisplayMode,
 	changeChildMeters,
 	changeChildGroups,
 	deleteGroup } from '../../actions/groups';
-import { StatefulEditable, GroupDefinition } from '../../reducers/groups';
-import { State, Dispatch } from '../../types/redux';
+import { GroupDefinition, DisplayMode } from '../../types/redux/groups';
+import { Dispatch } from '../../types/redux/actions';
+import { State } from '../../types/redux/state';
 
 /**
  * @param {State} state

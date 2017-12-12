@@ -8,45 +8,9 @@ import axios from 'axios';
 import * as moment from 'moment';
 import { TimeInterval } from '../../../common/TimeInterval';
 import { LineReadings } from '../types/readings';
-import { Thunk, Dispatch, State } from '../types/redux';
-
-export const REQUEST_GROUP_LINE_READINGS = 'REQUEST_GROUP_LINE_READINGS';
-export const RECEIVE_GROUP_LINE_READINGS = 'RECEIVE_GROUP_LINE_READINGS';
-
-export const REQUEST_METER_LINE_READINGS = 'REQUEST_METER_LINE_READINGS';
-export const RECEIVE_METER_LINE_READINGS = 'RECEIVE_METER_LINE_READINGS';
-
-export interface RequestMeterLineReadingsAction {
-	type: 'REQUEST_METER_LINE_READINGS';
-	meterIDs: number[];
-	timeInterval: TimeInterval;
-}
-
-export interface RequestGroupLineReadingsAction {
-	type: 'REQUEST_GROUP_LINE_READINGS';
-	groupIDs: number[];
-	timeInterval: TimeInterval;
-}
-
-export interface ReceiveMeterLineReadingsAction {
-	type: 'RECEIVE_METER_LINE_READINGS';
-	meterIDs: number[];
-	timeInterval: TimeInterval;
-	readings: LineReadings;
-}
-
-export interface ReceiveGroupLineReadingsAction {
-	type: 'RECEIVE_GROUP_LINE_READINGS';
-	groupIDs: number[];
-	timeInterval: TimeInterval;
-	readings: LineReadings;
-}
-
-export type LineReadingsAction =
-	ReceiveMeterLineReadingsAction |
-	ReceiveGroupLineReadingsAction |
-	RequestMeterLineReadingsAction |
-	RequestGroupLineReadingsAction;
+import { ActionType, Thunk, Dispatch } from '../types/redux/actions';
+import { State } from '../types/redux/state';
+import * as t from '../types/redux/lineReadings';
 
 /**
  * @param {State} state The current Redux state
@@ -94,8 +58,8 @@ function shouldFetchMeterLineReadings(state: State, meterID: number, timeInterva
  * @param {[number]} meterIDs The IDs of the meters whose data should be fetched
  * @param {TimeInterval} timeInterval The time interval over which data should be fetched
  */
-function requestMeterLineReadings(meterIDs: number[], timeInterval: TimeInterval): RequestMeterLineReadingsAction {
-	return { type: REQUEST_METER_LINE_READINGS, meterIDs, timeInterval };
+function requestMeterLineReadings(meterIDs: number[], timeInterval: TimeInterval): t.RequestMeterLineReadingsAction {
+	return { type: ActionType.RequestMeterLineReadings, meterIDs, timeInterval };
 }
 
 /**
@@ -103,16 +67,16 @@ function requestMeterLineReadings(meterIDs: number[], timeInterval: TimeInterval
  * @param {TimeInterval} timeInterval The time interval over which data has been fetched
  * @param {*} readings The data that has been fetched, indexed by meter ID.
  */
-function receiveMeterLineReadings(meterIDs: number[], timeInterval: TimeInterval, readings: LineReadings): ReceiveMeterLineReadingsAction {
-	return { type: RECEIVE_METER_LINE_READINGS, meterIDs, timeInterval, readings };
+function receiveMeterLineReadings(meterIDs: number[], timeInterval: TimeInterval, readings: LineReadings): t.ReceiveMeterLineReadingsAction {
+	return { type: ActionType.ReceiveMeterLineReadings, meterIDs, timeInterval, readings };
 }
 
 /**
  * @param {[number]} groupIDs The IDs of the groups whose data should be fetched
  * @param {TimeInterval} timeInterval The time interval over which data should be fetched
  */
-function requestGroupLineReadings(groupIDs: number[], timeInterval: TimeInterval): RequestGroupLineReadingsAction {
-	return { type: REQUEST_GROUP_LINE_READINGS, groupIDs, timeInterval };
+function requestGroupLineReadings(groupIDs: number[], timeInterval: TimeInterval): t.RequestGroupLineReadingsAction {
+	return { type: ActionType.RequestGroupLineReadings, groupIDs, timeInterval };
 }
 
 /**
@@ -120,8 +84,8 @@ function requestGroupLineReadings(groupIDs: number[], timeInterval: TimeInterval
  * @param {TimeInterval} timeInterval The time interval over which data has been fetched
  * @param {*} readings The data that has been fetched, indexed by group ID.
  */
-function receiveGroupLineReadings(groupIDs: number[], timeInterval: TimeInterval, readings: LineReadings): ReceiveGroupLineReadingsAction {
-	return { type: RECEIVE_GROUP_LINE_READINGS, groupIDs, timeInterval, readings };
+function receiveGroupLineReadings(groupIDs: number[], timeInterval: TimeInterval, readings: LineReadings): t.ReceiveGroupLineReadingsAction {
+	return { type: ActionType.ReceiveGroupLineReadings, groupIDs, timeInterval, readings };
 }
 
 /**

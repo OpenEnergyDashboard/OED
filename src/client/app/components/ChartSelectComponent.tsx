@@ -4,12 +4,12 @@
 
 import * as React from 'react';
 import { ToggleButtonGroup, ToggleButton } from 'react-bootstrap';
-import { chartTypes } from '../reducers/graph';
-import { ChangeChartToRenderAction } from '../actions/graph';
+import { ChartTypes } from '../types/redux/graph';
+import { ChangeChartToRenderAction } from '../types/redux/graph';
 
 interface ChartSelectProps {
-	selectedChart: chartTypes;
-	changeChartType(chartType: chartTypes): ChangeChartToRenderAction;
+	selectedChart: ChartTypes;
+	changeChartType(chartType: ChartTypes): ChangeChartToRenderAction;
 }
 
 /**
@@ -41,15 +41,15 @@ export default class ChartSelectComponent extends React.Component<ChartSelectPro
 					value={this.props.selectedChart}
 					onChange={this.handleChangeChartType}
 				>
-					<ToggleButton value={chartTypes.line}>Line</ToggleButton>
-					<ToggleButton value={chartTypes.bar}>Bar</ToggleButton>
-					<ToggleButton value={chartTypes.compare}>Compare</ToggleButton>
+					<ToggleButton value={ChartTypes.line}>Line</ToggleButton>
+					<ToggleButton value={ChartTypes.bar}>Bar</ToggleButton>
+					<ToggleButton value={ChartTypes.compare}>Compare</ToggleButton>
 				</ToggleButtonGroup>
 			</div>
 		);
 	}
 
-	private handleChangeChartType(value: chartTypes) {
+	private handleChangeChartType(value: ChartTypes) {
 		this.props.changeChartType(value);
 	}
 }

@@ -5,40 +5,9 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/.
  */
 
-import { BarReadingsAction } from '../actions/barReadings';
-import { ActionType } from '../types/redux';
+import { BarReadingsAction, BarReadingsState } from '../types/redux/barReadings';
+import { ActionType } from '../types/redux/actions';
 
-/**
- * @typedef {Object} State~BarReadings
- * @property {Object<number, Object>} byMeterID
- */
-
-export interface BarReadingsState {
-	byMeterID: {
-		[meterID: number]: {
-			[timeInterval: string]: {
-				[barDuration: string]: {
-					isFetching: boolean;
-					readings?: Array<[number, number]>;
-				}
-			}
-		}
-	};
-	byGroupID: {
-		[groupID: number]: {
-			[timeInterval: string]: {
-				[barDuration: string]: {
-					isFetching: boolean;
-					readings?: Array<[number, number]>;
-				}
-			}
-		}
-	};
-}
-
-/**
- * @type {State~BarReadings}
- */
 const defaultState: BarReadingsState = {
 	byMeterID: {},
 	byGroupID: {}
@@ -57,12 +26,16 @@ export default function readings(state = defaultState, action: BarReadingsAction
 			};
 
 			for (const meterID of action.meterIDs) {
+				// Create group entry and time interval entry if needed
 				if (newState.byMeterID[meterID] === undefined) {
 					newState.byMeterID[meterID] = {};
 				}
 				if (newState.byMeterID[meterID][timeInterval] === undefined) {
 					newState.byMeterID[meterID][timeInterval] = {};
-				} else if (newState.byMeterID[meterID][timeInterval][barDuration] === undefined) {
+				}
+
+				// Retain existing data if there is any
+				if (newState.byMeterID[meterID][timeInterval][barDuration] === undefined) {
 					newState.byMeterID[meterID][timeInterval][barDuration] = { isFetching: true };
 				} else {
 					newState.byMeterID[meterID][timeInterval][barDuration] = { ...newState.byMeterID[meterID][timeInterval][barDuration], isFetching: true };
@@ -82,12 +55,16 @@ export default function readings(state = defaultState, action: BarReadingsAction
 			};
 
 			for (const groupID of action.groupIDs) {
+				// Create group entry and time interval entry if needed
 				if (newState.byGroupID[groupID] === undefined) {
 					newState.byGroupID[groupID] = {};
 				}
 				if (newState.byGroupID[groupID][timeInterval] === undefined) {
 					newState.byGroupID[groupID][timeInterval] = {};
-				} else if (newState.byGroupID[groupID][timeInterval][barDuration] === undefined) {
+				}
+
+				// Retain existing data if there is any
+				if (newState.byGroupID[groupID][timeInterval][barDuration] === undefined) {
 					newState.byGroupID[groupID][timeInterval][barDuration] = { isFetching: true };
 				} else {
 					newState.byGroupID[groupID][timeInterval][barDuration] = { ...newState.byGroupID[groupID][timeInterval][barDuration], isFetching: true };
@@ -110,7 +87,6 @@ export default function readings(state = defaultState, action: BarReadingsAction
 				const readingsForMeter = action.readings[meterID];
 				newState.byMeterID[meterID][timeInterval][barDuration] = { isFetching: false, readings: readingsForMeter };
 			}
-
 			return newState;
 		}
 		case ActionType.ReceiveGroupBarReadings: {

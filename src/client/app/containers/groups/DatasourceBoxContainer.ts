@@ -8,7 +8,8 @@ import { connect } from 'react-redux';
 import DatasourceBoxComponent from '../../components/groups/DatasourceBoxComponent';
 import { changeSelectedChildMetersOfGroup, changeSelectedChildGroupsOfGroup, changeChildMeters, changeChildGroups } from '../../actions/groups';
 import { NamedIDItem } from '../../types/items';
-import { Dispatch, State } from '../../types/redux';
+import { Dispatch } from '../../types/redux/actions';
+import { State } from '../../types/redux/state';
 
 export enum SelectionType {
 	Children = 'children',

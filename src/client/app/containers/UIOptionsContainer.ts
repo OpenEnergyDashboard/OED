@@ -6,7 +6,8 @@ import * as moment from 'moment';
 import { connect } from 'react-redux';
 import UIOptionsComponent from '../components/UIOptionsComponent';
 import { changeBarDuration, changeBarStacking } from '../actions/graph';
-import { State, Dispatch } from '../types/redux';
+import { Dispatch } from '../types/redux/actions';
+import { State } from '../types/redux/state';
 
 /**
  * @param {State} state
@@ -22,7 +23,6 @@ function mapStateToProps(state: State) {
 
 function mapDispatchToProps(dispatch: Dispatch) {
 	return {
-		// TODO TYPESCRIPT: This is an irresolvable conflict. Is barDuration a moment or a number??
 		changeDuration: (barDuration: moment.Duration) => dispatch(changeBarDuration(barDuration)),
 		changeBarStacking: () => dispatch(changeBarStacking())
 	};

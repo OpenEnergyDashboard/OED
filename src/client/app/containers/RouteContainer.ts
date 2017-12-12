@@ -6,7 +6,8 @@
 
 import { connect } from 'react-redux';
 import RouteComponent from '../components/RouteComponent';
-import { Dispatch, State } from '../types/redux';
+import { Dispatch } from '../types/redux/actions';
+import { State } from '../types/redux/state';
 import { changeOptionsFromLink, LinkOptions } from '../actions/graph';
 
 
