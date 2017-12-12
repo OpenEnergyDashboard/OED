@@ -4,9 +4,10 @@
 
 import * as adminActions from '../actions/admin';
 import { chartTypes } from './graph';
+import { ActionType } from '../types/redux';
 
 export interface AdminState {
-	displayTitle: string,
+	displayTitle: string;
 	defaultChartToRender: chartTypes;
 	defaultBarStacking: boolean;
 	isFetching: boolean;
@@ -23,30 +24,30 @@ const defaultState: AdminState = {
 
 export default function admin(state = defaultState, action: adminActions.AdminAction) {
 	switch (action.type) {
-		case adminActions.UPDATE_DISPLAY_TITLE:
+		case ActionType.UpdateDisplayTitle:
 			return {
 				...state,
 				displayTitle: action.displayTitle,
 				submitted: false
 			};
-		case adminActions.UPDATE_DEFAULT_CHART_TO_RENDER:
+		case ActionType.UpdateDefaultChartToRender:
 			return {
 				...state,
 				defaultChartToRender: action.defaultChartToRender,
-				submitted: false,
+				submitted: false
 			};
-		case adminActions.TOGGLE_DEFAULT_BAR_STACKING:
+		case ActionType.ToggleDefaultBarStacking:
 			return {
 				...state,
 				defaultBarStacking: !state.defaultBarStacking,
 				submitted: false
 			};
-		case adminActions.REQUEST_PREFERENCES:
+		case ActionType.RequestPreferences:
 			return {
 				...state,
 				isFetching: true
 			};
-		case adminActions.RECEIVE_PREFERENCES:
+		case ActionType.ReceivePreferences:
 			return {
 				...state,
 				isFetching: false,
@@ -54,15 +55,15 @@ export default function admin(state = defaultState, action: adminActions.AdminAc
 				defaultChartToRender: action.data.defaultChartToRender,
 				defaultBarStacking: action.data.defaultBarStacking
 			};
-		case adminActions.MARK_PREFERENCES_SUBMITTED:
-			return {
-				...state,
-				submitted: true
-			};
-		case adminActions.MARK_PREFERENCES_NOT_SUBMITTED:
+		case ActionType.MarkPreferencesNotSubmitted:
 			return {
 				...state,
 				submitted: false
+			};
+		case ActionType.MarkPreferencesSubmitted:
+			return {
+				...state,
+				submitted: true
 			};
 		default:
 			return state;

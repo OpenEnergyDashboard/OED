@@ -11,31 +11,31 @@ import { chartTypes } from '../reducers/graph';
 import { State, Dispatch, Thunk, TerminalThunk, ActionType } from '../types/redux';
 
 export interface UpdateSelectedMetersAction {
-	type: 'UPDATE_SELECTED_METERS';
+	type: ActionType.UpdateSelectedMeters;
 	meterIDs: number[];
 }
 
 export interface UpdateSelectedGroupsAction {
-	type: 'UPDATE_SELECTED_GROUPS';
+	type: ActionType.UpdateSelectedGroups;
 	groupIDs: number[];
 }
 
 export interface UpdateBarDurationAction {
-	type: 'UPDATE_BAR_DURATION';
+	type: ActionType.UpdateBarDuration;
 	barDuration: number;
 }
 
 export interface ChangeChartToRenderAction {
-	type: 'CHANGE_CHART_TO_RENDER';
+	type: ActionType.ChangeChartToRender;
 	chartType: chartTypes;
 }
 
 export interface ChangeBarStackingAction {
-	type: 'CHANGE_BAR_STACKING';
+	type: ActionType.ChangeBarStacking;
 }
 
 export interface ChangeGraphZoomAction {
-	type: 'CHANGE_GRAPH_ZOOM';
+	type: ActionType.ChangeGraphZoom;
 	timeInterval: TimeInterval;
 }
 

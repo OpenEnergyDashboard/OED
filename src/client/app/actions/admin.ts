@@ -7,67 +7,77 @@ import { changeBarStacking, changeChartToRender } from './graph';
 import { showErrorNotification, showSuccessNotification } from '../utils/notifications';
 import { getToken } from '../utils/token';
 import { chartTypes } from '../reducers/graph';
-import { NamedIDItem } from '../types/items';
-import { Dispatch, GetState, Thunk } from '../types/redux';
+import { PreferenceRequestItem } from '../types/items';
+import { ActionType, Dispatch, GetState, State, Thunk } from '../types/redux';
+
+export type AdminAction =
+	| UpdateDisplayTitleAction
+	| UpdateDefaultChartToRenderAction
+	| ToggleDefaultBarStackingAction
+	| RequestPreferencesAction
+	| ReceivePreferencesAction
+	| MarkPreferencesNotSubmittedAction
+	| MarkPreferencesSubmittedAction;
 
 export interface UpdateDisplayTitleAction {
-	type: 'UPDATE_DISPLAY_TITLE';
+	type: ActionType.UpdateDisplayTitle;
 	displayTitle: string;
 }
 
 export interface UpdateDefaultChartToRenderAction {
-	type: 'UPDATE_DEFAULT_CHART_TO_RENDER';
+	type: ActionType.UpdateDefaultChartToRender;
 	defaultChartToRender: chartTypes;
 }
 
 export interface ToggleDefaultBarStackingAction {
-	type: 'TOGGLE_DEFAULT_BAR_STACKING';
+	type: ActionType.ToggleDefaultBarStacking;
 }
 
 export interface RequestPreferencesAction {
-	type: 'REQUEST_PREFERENCES';
+	type: ActionType.RequestPreferences;
 }
 
 export interface ReceivePreferencesAction {
-	type: 'RECEIVE_PREFERENCES';
-	data: NamedIDItem[]; // TODO is this right?
+	type: ActionType.ReceivePreferences;
+	data: PreferenceRequestItem;
 }
 
 export interface MarkPreferencesNotSubmittedAction {
-	type: 'MARK_PREFERENCES_NOT_SUBMITTED';
+	type: ActionType.MarkPreferencesNotSubmitted;
 }
 
 export interface MarkPreferencesSubmittedAction {
-	type: 'MARK_PREFERENCES_SUBMITTED';
+	type: ActionType.MarkPreferencesSubmitted;
 }
 
 export function updateDisplayTitle(displayTitle: string): UpdateDisplayTitleAction {
-	return { type: UPDATE_DISPLAY_TITLE, displayTitle };
+	return { type: ActionType.UpdateDisplayTitle, displayTitle };
 }
 
 export function updateDefaultChartToRender(defaultChartToRender: chartTypes): UpdateDefaultChartToRenderAction {
-	return { type: UPDATE_DEFAULT_CHART_TO_RENDER, defaultChartToRender };
+	return { type: ActionType.UpdateDefaultChartToRender, defaultChartToRender };
 }
 
 export function toggleDefaultBarStacking(): ToggleDefaultBarStackingAction {
-	return { type: TOGGLE_DEFAULT_BAR_STACKING };
+	return { type: ActionType.ToggleDefaultBarStacking };
 }
 
 function requestPreferences(): RequestPreferencesAction {
-	return { type: REQUEST_PREFERENCES };
+	return { type: ActionType.RequestPreferences };
 }
 
-function receivePreferences(data: NamedIDItem[]): ReceivePreferencesAction {
-	return { type: RECEIVE_PREFERENCES, data };
+function receivePreferences(data: PreferenceRequestItem): ReceivePreferencesAction {
+	return { type: ActionType.ReceivePreferences, data };
 }
 
-function markPreferencesSubmitted(): MarkPreferencesNotSubmittedAction {
-	return { type: MARK_PREFERENCES_SUBMITTED };
+function markPreferencesNotSubmitted(): MarkPreferencesNotSubmittedAction {
+	return { type: ActionType.MarkPreferencesNotSubmitted };
 }
 
-function markPreferencesNotSubmitted(): MarkPreferencesSubmittedAction {
-	return { type: MARK_PREFERENCES_NOT_SUBMITTED };
+function markPreferencesSubmitted(): MarkPreferencesSubmittedAction {
+	return { type: ActionType.MarkPreferencesSubmitted };
 }
+
 
 function fetchPreferences(): Thunk {
 	return (dispatch: Dispatch) => {
@@ -110,11 +120,11 @@ function submitPreferences() {
 	};
 }
 
-function shouldFetchPreferenceData(state): boolean {
+function shouldFetchPreferenceData(state: State): boolean {
 	return !state.admin.isFetching;
 }
 
-function shouldSubmitPreferenceData(state): boolean {
+function shouldSubmitPreferenceData(state: State): boolean {
 	return !state.admin.submitted;
 }
 
@@ -128,7 +138,7 @@ export function fetchPreferencesIfNeeded(): Thunk {
 }
 
 export function submitPreferencesIfNeeded(): Thunk {
-	return (dispatch: Dispatch, getState: GetSTate) => {
+	return (dispatch: Dispatch, getState: GetState) => {
 		if (shouldSubmitPreferenceData(getState())) {
 			return dispatch(submitPreferences());
 		}

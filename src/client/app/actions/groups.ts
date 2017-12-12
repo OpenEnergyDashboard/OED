@@ -9,7 +9,7 @@ import { getToken } from '../utils/token';
 import { State, Dispatch, GetState, Thunk, TerminalThunk, ActionType } from '../types/redux';
 import { NamedIDItem } from '../types/items';
 import { showErrorNotification } from '../utils/notifications';
-import { StatefulEditable, GroupDefinition, GroupData, GroupID } from '../reducers/groups';
+import { GroupDefinition, GroupData, GroupID } from '../reducers/groups';
 
 export type GroupsAction =
 	| RequestGroupsDetailsAction
