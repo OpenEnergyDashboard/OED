@@ -21,8 +21,8 @@ const defaultState = {
 	selectedMeters: [],
 	selectedGroups: [],
 	timeInterval: TimeInterval.unbounded(),
-	barDuration: moment.duration(1, 'month'),
-	compareTimeInterval: moment().diff(moment().startOf('week'), 'days'),
+	barDuration: moment.duration(28, 'days'),
+	compareTimeInterval: new TimeInterval(moment().startOf('week').subtract(7, 'days'), moment()).toString(),
 	compareDuration: moment.duration(1, 'days'),
 	chartToRender: chartTypes.line,
 	barStacking: false
@@ -49,6 +49,16 @@ export default function graph(state = defaultState, action) {
 			return {
 				...state,
 				barDuration: action.barDuration
+			};
+		case graphActions.UPDATE_COMPARE_INTERVAL:
+			return {
+				...state,
+				compareTimeInterval: action.compareTimeInterval
+			};
+		case graphActions.UPDATE_COMPARE_DURATION:
+			return {
+				...state,
+				compareDuration: action.compareDuration
 			};
 		case graphActions.CHANGE_GRAPH_ZOOM:
 			return {
