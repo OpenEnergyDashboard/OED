@@ -32,7 +32,7 @@ export default function ListDisplayComponent(props) {
 	return (
 		<div className="list-wrapper" style={listWrapperStyle} >
 			<ul id="meterList" style={listStyle} >
-				{ props.items.map(item => <li>{ item.toString() }</li>) }
+				{ props.items.map((item, i) => <li key={i}>{ item.toString() }</li>) }
 			</ul>
 		</div>
 	);

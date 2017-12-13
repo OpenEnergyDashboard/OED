@@ -29,6 +29,6 @@ config.database = {
 
 config.secretToken = process.env.OED_TOKEN_SECRET;
 config.serverPort = process.env.OED_SERVER_PORT;
-config.logFile = process.env.OED_LOG_FILE || 'log2.txt';
+config.logFile = process.env.OED_LOG_FILE || 'log.txt';
 
 module.exports = config;
