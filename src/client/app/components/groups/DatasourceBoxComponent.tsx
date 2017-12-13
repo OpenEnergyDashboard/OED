@@ -6,7 +6,7 @@ import * as React from 'react';
 import MultiSelectComponent from '../MultiSelectComponent';
 import { metersFilterReduce, groupsFilterReduce } from '../../utils/Datasources';
 import { NamedIDItem, SelectOption } from '../../types/items';
-import { DataType, DataTyped, DatasourceID } from '../../types/Datasources';
+import { DataType, DatasourceID } from '../../types/Datasources';
 
 interface DatasourceBoxProps {
 	// TODO: This should be an enum

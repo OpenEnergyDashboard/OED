@@ -23,9 +23,6 @@ interface DashboardProps {
  * React component that controls the dashboard
  */
 export default function DashboardComponent(props: DashboardProps) {
-	const divPadding = {
-		paddingTop: '35px'
-	};
 	let ChartToRender: typeof LineChartContainer | typeof MultiCompareChartContainer | typeof BarChartContainer;
 	if (props.chartToRender === ChartTypes.line) {
 		ChartToRender = LineChartContainer;
@@ -38,7 +35,7 @@ export default function DashboardComponent(props: DashboardProps) {
 	return (
 		<div className='container-fluid'>
 			<div>
-				<div className='col-xs-2 hidden-sm hidden-xs' style={divPadding}>
+				<div className='col-xs-2 hidden-sm hidden-xs'>
 					<UIOptionsContainer />
 				</div>
 				<div className='col-xs-10'>

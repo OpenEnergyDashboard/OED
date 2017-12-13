@@ -5,28 +5,20 @@
 import * as React from 'react';
 import axios from 'axios';
 import { browserHistory } from 'react-router';
-import { Notification } from 'react-notification-system';
-import HeaderComponent from '../components/HeaderComponent';
-import { ShowNotificationAction } from '../types/redux/notifications';
+import HeaderContainer from '../containers/HeaderContainer';
 import FooterComponent from '../components/FooterComponent';
+import { showErrorNotification } from '../utils/notifications';
 
-
-interface LoginProps {
-	showNotification(notification: Notification): ShowNotificationAction;
-}
 
 interface LoginState {
 	email: string;
 	password: string;
 }
 
-export default class LoginComponent extends React.Component<LoginProps, LoginState> {
+export default class LoginComponent extends React.Component<{}, LoginState> {
 	private inputEmail: HTMLInputElement | null;
-	/**
-	 * Initializes the component's state to include email (email users use to login) and password (corresponding to their email)
-	 * Binds the functions to 'this' LoginComponent
-	 */
-	constructor(props: LoginProps) {
+
+	constructor(props: {}) {
 		super(props);
 		this.state = { email: '', password: '' };
 		this.handleEmailChange = this.handleEmailChange.bind(this);
@@ -34,9 +26,6 @@ export default class LoginComponent extends React.Component<LoginProps, LoginSta
 		this.handleSubmit = this.handleSubmit.bind(this);
 	}
 
-	/**
-	 * @return JSX to create the login panel
-	 */
 	public render() {
 		const formStyle = {
 			maxWidth: '500px',
@@ -48,7 +37,7 @@ export default class LoginComponent extends React.Component<LoginProps, LoginSta
 		};
 		return (
 			<div>
-				<HeaderComponent renderLoginButton={false} />
+				<HeaderContainer />
 				<form style={formStyle} onSubmit={this.handleSubmit}>
 					<div className='input-group'>
 						<span className='input-group-addon'><i className='glyphicon glyphicon-user' /></span>
@@ -67,7 +56,7 @@ export default class LoginComponent extends React.Component<LoginProps, LoginSta
 					</div>
 					<input style={buttonStyle} className='btn btn-default' type='submit' value='Login' />
 				</form>
-				<FooterComponent/>
+				<FooterComponent />
 			</div>
 		);
 	}
@@ -105,12 +94,7 @@ export default class LoginComponent extends React.Component<LoginProps, LoginSta
 		})
 		.catch(err => {
 			if (err.response.status === 401) {
-				this.props.showNotification({
-					message: 'Invalid email/password combination',
-					level: 'error',
-					position: 'tr',
-					autoDismiss: 3
-				});
+				showErrorNotification('Invalid email/password combination');
 			} else {
 				// If there was a problem other than a lack of authorization, the user can't fix it.
 				// Log it to the console for developer use.

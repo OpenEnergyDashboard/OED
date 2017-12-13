@@ -1,8 +1,6 @@
-/*
- * This Source Code Form is subject to the terms of the Mozilla Public
+/* This Source Code Form is subject to the terms of the Mozilla Public
  * License, v. 2.0. If a copy of the MPL was not distributed with this
- * file, You can obtain one at http://mozilla.org/MPL/2.0/.
- */
+ * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
 
 import * as moment from 'moment';
 import { TimeInterval } from '../../../common/TimeInterval';
@@ -20,11 +18,6 @@ const defaultState: GraphState = {
 	barStacking: false
 };
 
-/**
- * @param {State~Graph} state
- * @param action
- * @return {State~Graph}
- */
 export default function graph(state = defaultState, action: GraphAction) {
 	switch (action.type) {
 		case ActionType.UpdateSelectedMeters:

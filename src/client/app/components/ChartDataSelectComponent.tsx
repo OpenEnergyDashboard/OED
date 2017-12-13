@@ -5,15 +5,12 @@
 import * as React from 'react';
 import MultiSelectComponent from './MultiSelectComponent';
 import { SelectOption } from '../types/items';
-import { fetchGroupsDetailsIfNeeded } from 'actions/groups';
 
 interface ChartDataSelectProps {
 	meters: SelectOption[];
 	groups: SelectOption[];
 	selectedMeters: SelectOption[];
 	selectedGroups: SelectOption[];
-	fetchMetersDetailsIfNeeded(): Promise<any>;
-	fetchGroupsDetailsIfNeeded(): Promise<any>;
 	selectMeters(meterIDs: number[]): Promise<any>;
 	selectGroups(groupIDs: number[]): Promise<any>;
 }
@@ -26,15 +23,6 @@ export default class ChartDataSelectComponent extends React.Component<ChartDataS
 		super(props);
 		this.handleMeterSelect = this.handleMeterSelect.bind(this);
 		this.handleGroupSelect = this.handleGroupSelect.bind(this);
-	}
-
-	/**
-	 * Called when the component mounts.
-	 * Fetch all meter and group info, for display.
-	 */
-	public componentWillMount() {
-		this.props.fetchMetersDetailsIfNeeded();
-		this.props.fetchGroupsDetailsIfNeeded();
 	}
 
 	public render() {

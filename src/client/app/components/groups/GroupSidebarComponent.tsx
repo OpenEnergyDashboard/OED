@@ -9,8 +9,8 @@ import { ChangeDisplayedGroupsAction, ChangeDisplayModeAction } from '../../type
 interface GroupSidebarProps {
 	groups: Array<{id: number, name: string}>;
 	changeDisplayModeToCreate(): ChangeDisplayModeAction;
-	fetchGroupsDetailsIfNeeded(): Promise<any>;
 	selectGroups(groups: number[]): ChangeDisplayedGroupsAction;
+	fetchGroupsDetailsIfNeeded(): Promise<void>;
 }
 
 export default class GroupSidebarComponent extends React.Component<GroupSidebarProps, {}> {

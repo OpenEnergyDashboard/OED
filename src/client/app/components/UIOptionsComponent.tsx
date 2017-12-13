@@ -60,7 +60,7 @@ export default class UIOptionsComponent extends React.Component<UIOptionsProps, 
 		};
 
 		return (
-			<div style={divTopPadding}>
+			<div>
 				<ChartSelectContainer />
 				<ChartDataSelectContainer />
 
@@ -106,6 +106,9 @@ export default class UIOptionsComponent extends React.Component<UIOptionsProps, 
 		this.props.changeDuration(moment.duration( {days: this.state.barDurationDays}));
 	}
 
+	/**
+	 * Toggles the bar stacking option
+	 */
 	private handleChangeBarStacking() {
 		this.props.changeBarStacking();
 	}

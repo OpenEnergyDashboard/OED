@@ -2,7 +2,5 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
 
-
-export default function getToken(): string | null {
-	return localStorage.getItem('token');
-}
+SELECT display_title, default_chart_to_render, default_bar_stacking
+FROM preferences;

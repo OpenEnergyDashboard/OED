@@ -6,15 +6,10 @@ import * as _ from 'lodash';
 import { connect } from 'react-redux';
 import ChartDataSelectComponent from '../components/ChartDataSelectComponent';
 import { changeSelectedMeters, changeSelectedGroups } from '../actions/graph';
-import { fetchMetersDetailsIfNeeded } from '../actions/meters';
-import { fetchGroupsDetailsIfNeeded } from '../actions/groups';
 import { State } from '../types/redux/state';
 import { Dispatch } from '../types/redux/actions';
 
 
-/**
- * @param {State} state
- */
 function mapStateToProps(state: State) {
 	// Map information about meters and groups into a format the component can display.
 	const sortedMeters = _.sortBy(_.values(state.meters.byMeterID).map(meter => ({ value: meter.id, label: meter.name.trim() })), 'name');
@@ -44,13 +39,8 @@ function mapStateToProps(state: State) {
 function mapDispatchToProps(dispatch: Dispatch) {
 	return {
 		selectMeters: (newSelectedMeterIDs: number[]) => dispatch(changeSelectedMeters(newSelectedMeterIDs)),
-		selectGroups: (newSelectedGroupIDs: number[]) => dispatch(changeSelectedGroups(newSelectedGroupIDs)),
-		fetchMetersDetailsIfNeeded: () => dispatch(fetchMetersDetailsIfNeeded()),
-		fetchGroupsDetailsIfNeeded: () => dispatch(fetchGroupsDetailsIfNeeded())
+		selectGroups: (newSelectedGroupIDs: number[]) => dispatch(changeSelectedGroups(newSelectedGroupIDs))
 	};
 }
 
-/**
- * Connects changes to the Redux store to ChartSelectComponent via mapStateToProps
- */
 export default connect(mapStateToProps, mapDispatchToProps)(ChartDataSelectComponent);

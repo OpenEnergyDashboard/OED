@@ -3,7 +3,6 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
 
 import { connect } from 'react-redux';
-import * as moment from 'moment';
 import * as _ from 'lodash';
 import ExportComponent from '../components/ExportComponent';
 import { ChartTypes } from '../types/redux/graph';

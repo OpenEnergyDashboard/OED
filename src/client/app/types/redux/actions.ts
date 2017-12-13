@@ -49,7 +49,15 @@ export enum ActionType {
 	MarkGroupInEditingClean = 'MARK_GROUP_IN_EDITING_CLEAN',
 	MarkGroupInEditingDirty = 'MARK_GROUP_IN_EDITING_DIRTY',
 	MarkGroupsByIDOutdated = 'MARK_GROUPS_BY_ID_OUTDATED',
-	MarkOneGroupOutdated = 'MARK_ONE_GROUP_OUTDATED'
+	MarkOneGroupOutdated = 'MARK_ONE_GROUP_OUTDATED',
+
+	UpdateDisplayTitle = 'UPDATE_DISPLAY_TITLE',
+	UpdateDefaultChartToRender = 'UPDATE_DEFAULT_CHART_TO_RENDER',
+	ToggleDefaultBarStacking = 'TOGGLE_DEFAULT_BAR_STACKING',
+	RequestPreferences = 'REQUEST_PREFERENCES',
+	ReceivePreferences = 'RECEIVE_PREFERENCES',
+	MarkPreferencesNotSubmitted = 'MARK_PREFERENCES_NOT_SUBMITTED',
+	MarkPreferencesSubmitted = 'MARK_PREFERENCES_SUBMITTED'
 }
 
 /**

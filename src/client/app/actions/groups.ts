@@ -1,14 +1,13 @@
-/*
- * This Source Code Form is subject to the terms of the Mozilla Public
+/* This Source Code Form is subject to the terms of the Mozilla Public
  * License, v. 2.0. If a copy of the MPL was not distributed with this
- * file, You can obtain one at http://mozilla.org/MPL/2.0/.
- */
+ * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
 
 import axios from 'axios';
-import getToken from '../utils/getToken';
+import { getToken } from '../utils/token';
 import { Dispatch, GetState, Thunk, ActionType } from '../types/redux/actions';
 import { State } from '../types/redux/state';
 import { NamedIDItem } from '../types/items';
+import { showErrorNotification } from '../utils/notifications';
 import * as t from '../types/redux/groups';
 
 function requestGroupsDetails(): t.RequestGroupsDetailsAction {
@@ -42,16 +41,10 @@ function fetchGroupsDetails(): Thunk {
 	};
 }
 
-/**
- * @param {State} state
- */
 function shouldFetchGroupsDetails(state: State): boolean {
 	return !state.groups.isFetching && state.groups.outdated;
 }
 
-/**
- * @returns {function(*, *)}
- */
 export function fetchGroupsDetailsIfNeeded(): Thunk {
 	return (dispatch, getState) => {
 		if (shouldFetchGroupsDetails(getState())) {
@@ -74,11 +67,7 @@ function fetchGroupChildren(groupID: number) {
 			.then(response => dispatch(receiveGroupChildren(groupID, response.data)));
 	};
 }
-/**
- *
- * @param groupID
- * @returns {function(*, *)}
- */
+
 export function fetchGroupChildrenIfNeeded(groupID: number) {
 	return (dispatch: Dispatch, getState: GetState) => {
 		if (shouldFetchGroupChildren(getState(), groupID)) {
@@ -247,8 +236,7 @@ function submitNewGroup(group: t.GroupData): Thunk {
 			})
 			.catch(error => {
 				dispatch(markGroupInEditingNotSubmitted());
-				// tslint:disable-next-line no-console
-				console.error(error);
+				showErrorNotification('Failed to create group');
 			});
 	};
 }
@@ -267,8 +255,7 @@ function submitGroupEdits(group: t.GroupData & t.GroupID): Thunk {
 			})
 			.catch(error => {
 				dispatch(markGroupInEditingNotSubmitted());
-				// tslint:disable-next-line no-console
-				console.error(error);
+				showErrorNotification('Failed to edit group');
 			});
 	};
 }
@@ -331,6 +318,8 @@ export function deleteGroup(): Thunk {
 					dispatch2(changeDisplayMode(t.DisplayMode.View));
 				});
 			})
-			.catch(console.error);
+			.catch(() => {
+				showErrorNotification('Failed to delete group');
+			});
 	};
 }
