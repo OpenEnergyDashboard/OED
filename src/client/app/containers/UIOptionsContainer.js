@@ -5,7 +5,12 @@
 import _ from 'lodash';
 import { connect } from 'react-redux';
 import UIOptionsComponent from '../components/UIOptionsComponent';
-import { changeSelectedMeters, changeBarDuration, changeBarStacking, changeChartToRender } from '../actions/graph';
+import {
+	changeSelectedMeters,
+	changeBarDuration,
+	changeBarStacking,
+	changeChartToRender,
+	changeCompareTimeInterval} from '../actions/graph';
 
 /**
  * @param {State} state
