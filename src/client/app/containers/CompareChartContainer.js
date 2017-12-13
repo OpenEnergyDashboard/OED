@@ -7,16 +7,14 @@
 import { Bar } from 'react-chartjs-2';
 import moment from 'moment';
 import { connect } from 'react-redux';
-import datalabels from 'chartjs-plugin-datalabels'; // eslint-disable-line no-unused-vars
+import datalabels from 'chartjs-plugin-datalabels';
+import TimeInterval from "../../../common/TimeInterval";
 
 
-/**
- * @param {State} state
- * @param ownProps
- */
 function mapStateToProps(state, ownProps) {
 	const timeInterval = state.graph.compareTimeInterval;
 	const barDuration = state.graph.compareDuration;
+	const timeIntervalDurationInDays = TimeInterval.fromString(timeInterval).duration('days');
 	const data = { datasets: [] };
 	const labels = [];
 	// Power used so far this week
@@ -28,20 +26,33 @@ function mapStateToProps(state, ownProps) {
 	// How long it's been since start of measure period
 	let soFar;
 
+	let prevLabel;
+	let currLabel;
+	if (timeIntervalDurationInDays < 7) {
+		prevLabel = 'Yesterday';
+		currLabel = 'Today';
+	} else if (timeIntervalDurationInDays >= 7 && timeIntervalDurationInDays < 14) {
+		prevLabel = 'Last week';
+		currLabel = 'This week';
+	} else {
+		prevLabel = 'Last month';
+		currLabel = 'This month';
+	}
+	const currLabelLowercase = currLabel.toLowerCase();
 
 	// Compose the text to display to the user.
 	let delta;
 	if (ownProps.isGroup) {
 		delta = change => {
 			if (isNaN(change)) return '';
-			if (change < 0) return `${state.groups.byGroupID[ownProps.id].name} has used ${parseInt(change.toFixed(2).replace('.', '').slice(1))}% less energy this time interval.`;
-			return `${state.groups.byGroupID[ownProps.id].name} has used ${parseInt(change.toFixed(2).replace('.', ''))}% more energy this time interval.`;
+			if (change < 0) return `${state.groups.byGroupID[ownProps.id].name} has used ${parseInt(change.toFixed(2).replace('.', '').slice(1))}% less energy ${currLabelLowercase}`;
+			return `${state.groups.byGroupID[ownProps.id].name} has used ${parseInt(change.toFixed(2).replace('.', ''))}% more energy ${currLabelLowercase}`;
 		};
 	} else {
 		delta = change => {
 			if (isNaN(change)) return '';
-			if (change < 0) return `${state.meters.byMeterID[ownProps.id].name} has used ${parseInt(change.toFixed(2).replace('.', '').slice(1))}% less energy this time interval.`;
-			return `${state.meters.byMeterID[ownProps.id].name} has used ${parseInt(change.toFixed(2).replace('.', ''))}% more energy this time interval.`;
+			if (change < 0) return `${state.meters.byMeterID[ownProps.id].name} has used ${parseInt(change.toFixed(2).replace('.', '').slice(1))}% less energy ${currLabelLowercase}`;
+			return `${state.meters.byMeterID[ownProps.id].name} has used ${parseInt(change.toFixed(2).replace('.', ''))}% more energy ${currLabelLowercase}`;
 		};
 	}
 
@@ -65,18 +76,20 @@ function mapStateToProps(state, ownProps) {
 		} else if (readingsData.readings.length < 14) {
 			soFar = moment().diff(moment().startOf('week'), 'days');
 		} else {
+			// 21 to differentiate from week case, week case never larger than 14
 			soFar = moment().diff(moment().startOf('week').subtract(21, 'days'), 'days');
 		}
 
-		// Calculates current
+		// Calculates current interval
 		for (let i = readingsData.readings.length - soFar; i < readingsData.readings.length; i++) {
 			current += readingsData.readings[i][1];
 		}
-		// Calculate prev
+		// Calculate prev interval
 		for (let i = 0; i < readingsData.readings.length - soFar; i++) {
 			prev += readingsData.readings[i][1];
 		}
-		// Calculate currentPrev. Have to special case Sunday. Fixing this is a good first issue since we now have hour data.
+		// Calculates current for previous time interval
+		// Have to special case Sunday for week and month
 		if (soFar === 0) {
 			currentPrev = Math.round((readingsData.readings[0][1] / 24) * moment().hour());
 		} else {
@@ -86,9 +99,8 @@ function mapStateToProps(state, ownProps) {
 		}
 	}
 
-
-	labels.push('Last time interval');
-	labels.push('This time interval');
+	labels.push(prevLabel);
+	labels.push(currLabel);
 	const color1 = 'rgba(173, 216, 230, 1)';
 	const color2 = 'rgba(218, 165, 32, 1)';
 	const color3 = 'rgba(173, 216, 230, 0.45)';
@@ -113,8 +125,9 @@ function mapStateToProps(state, ownProps) {
 		);
 		// sorts the data so that one doesn't cover up the other
 	data.datasets.sort((a, b) => a.data[0] - b.data[0]);
-
 	data.labels = labels;
+
+	const change = (-1 + (((current / currentPrev) * prev) / prev));
 
 	const options = {
 		animation: {
@@ -151,8 +164,8 @@ function mapStateToProps(state, ownProps) {
 		},
 		title: {
 			display: true,
-			text: delta((-1 + (((current / currentPrev) * prev) / prev))),
-			fontColor: colorize((-1 + (((current / currentPrev) * prev) / prev)))
+			text: delta(change),
+			fontColor: colorize(change)
 		},
 		plugins: {
 			datalabels: {

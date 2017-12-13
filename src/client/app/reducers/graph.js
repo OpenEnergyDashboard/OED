@@ -21,7 +21,7 @@ const defaultState = {
 	selectedMeters: [],
 	selectedGroups: [],
 	timeInterval: TimeInterval.unbounded(),
-	barDuration: moment.duration(1, 'month'),
+	barDuration: moment.duration(28, 'days'),
 	compareTimeInterval: new TimeInterval(moment().startOf('week').subtract(7, 'days'), moment()).toString(),
 	compareDuration: moment.duration(1, 'days'),
 	chartToRender: chartTypes.line,
