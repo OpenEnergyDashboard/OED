@@ -50,7 +50,7 @@ export default class AdminComponent extends React.Component<AdminProps, {}> {
 					<div className='col-xs-3'>
 						<div style={bottomPaddingStyle}>
 							<p style={titleStyle}>Default Site Title:</p>
-							{/*TODO TYPESCRIPT: This might be a bug in the typings.*/}
+							{/*TODO TYPESCRIPT: This is a bug in the typings. Issue: https://github.com/DefinitelyTyped/DefinitelyTyped/issues/21840*/}
 							<FormControl
 								type='text'
 								placeholder='Name'
