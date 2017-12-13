@@ -174,9 +174,9 @@ export default class UIOptionsComponent extends React.Component {
 						onChange={this.handleCompareSpanButton}
 						style={zIndexFix}
 					>
-						<ToggleButton value='day'>Day</ToggleButton>
-						<ToggleButton value='week'>Week</ToggleButton>
-						<ToggleButton value='month'>Month</ToggleButton>
+						<ToggleButton value="day">Day</ToggleButton>
+						<ToggleButton value="week">Week</ToggleButton>
+						<ToggleButton value="month">Month</ToggleButton>
 					</ToggleButtonGroup>
 				</div>
 				}

@@ -7,8 +7,8 @@
 import { Bar } from 'react-chartjs-2';
 import moment from 'moment';
 import { connect } from 'react-redux';
-import datalabels from 'chartjs-plugin-datalabels';
-import TimeInterval from "../../../common/TimeInterval";
+import datalabels from 'chartjs-plugin-datalabels'; // eslint-disable-line no-unused-vars
+import TimeInterval from '../../../common/TimeInterval';
 
 
 function mapStateToProps(state, ownProps) {
