@@ -5,7 +5,8 @@
 import { connect } from 'react-redux';
 import AdminComponent from '../components/AdminComponent';
 import { updateDisplayTitle, updateDefaultChartToRender, toggleDefaultBarStacking, submitPreferencesIfNeeded } from '../actions/admin';
-import { Dispatch, State } from '../types/redux';
+import { Dispatch } from '../types/redux/actions';
+import { State } from '../types/redux/state';
 import { ChartTypes } from '../types/redux/graph';
 
 function mapStateToProps(state: State) {

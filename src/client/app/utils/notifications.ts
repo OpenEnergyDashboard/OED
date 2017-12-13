@@ -5,7 +5,9 @@
 import store from '../index';
 import { showNotification as showNotificationAction } from '../actions/notifications';
 
-export function showSuccessNotification(message: string, position = 'tr', autoDismiss = 3) {
+export type NotificationPosition = 'tr' | 'tl' | 'tc' | 'br' | 'bl' | 'bc';
+
+export function showSuccessNotification(message: string, position: NotificationPosition = 'tr', autoDismiss = 3) {
 	store.dispatch(showNotificationAction({
 		message,
 		level: 'success',
@@ -14,7 +16,7 @@ export function showSuccessNotification(message: string, position = 'tr', autoDi
 	}));
 }
 
-export function showErrorNotification(message, position = 'tr', autoDismiss = 3) {
+export function showErrorNotification(message: string, position: NotificationPosition = 'tr', autoDismiss = 3) {
 	store.dispatch(showNotificationAction({
 		message,
 		level: 'error',
