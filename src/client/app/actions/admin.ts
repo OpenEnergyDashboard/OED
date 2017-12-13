@@ -61,7 +61,6 @@ function fetchPreferences(): Thunk {
 function submitPreferences() {
 	return (dispatch: Dispatch, getState: GetState) => {
 		const state = getState();
-		dispatch(markPreferencesSubmitted());
 		return axios.post('/api/preferences',
 			{
 				token: getToken(),
@@ -72,6 +71,7 @@ function submitPreferences() {
 				}
 			})
 			.then(() => {
+				dispatch(markPreferencesSubmitted());
 				showSuccessNotification('Updated preferences');
 			})
 			.catch(() => {
