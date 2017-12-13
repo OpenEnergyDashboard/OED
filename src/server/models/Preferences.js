@@ -13,11 +13,13 @@ class Preferences {
 	 * @param {String} displayTitle - Header title to display
 	 * @param {String} defaultChartToRender - Chart to display as default
 	 * @param {Boolean} defaultBarStacking - Option to set default toggle of bar stacking
+	 * @param {String} defaultLanguage - Option to set the default language
 	 */
-	constructor(displayTitle, defaultChartToRender, defaultBarStacking) {
+	constructor(displayTitle, defaultChartToRender, defaultBarStacking, defaultLanguage) {
 		this.displayTitle = displayTitle;
 		this.defaultChartToRender = defaultChartToRender;
 		this.defaultBarStacking = defaultBarStacking;
+		this.defaultLanguage = defaultLanguage;
 	}
 
 	/**
@@ -39,7 +41,7 @@ class Preferences {
 	}
 
 	static mapRow(row) {
-		return new Preferences(row.display_title, row.default_chart_to_render, row.default_bar_stacking);
+		return new Preferences(row.display_title, row.default_chart_to_render, row.default_bar_stacking, row.default_language);
 	}
 
 	static async get() {
@@ -49,12 +51,15 @@ class Preferences {
 
 	static async update(newPreferences) {
 		const preferences = await Preferences.get();
+		console.log(preferences);
 		_.merge(preferences, newPreferences);
+		console.log(preferences);
 		await db.none(sqlFile('preferences/update_preferences.sql'),
 			{
 				displayTitle: preferences.displayTitle,
 				defaultChartToRender: preferences.defaultChartToRender,
-				defaultBarStacking: preferences.defaultBarStacking
+				defaultBarStacking: preferences.defaultBarStacking,
+				defaultLanguage: preferences.defaultLanguage
 			});
 	}
 }

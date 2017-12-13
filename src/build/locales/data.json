@@ -14,7 +14,7 @@
 	"visit": " ou visitez notre ",
 	"website": "site web",
 	"info": " pour plus d'informations.",
-	"login": "S'identifier",
+	"login": "Se Connecter",
 	"groups": "Groupes",
 	"empty.compare": "Selectionnez un ou plusieurs articles pour comparer l'utilisation au fil du temps.",
 	"404": "404 Introuvable",
@@ -37,6 +37,12 @@
 	"edit.group": "Modifier le Groupe",
 	"child.meters": "Mètres Enfants:",
 	"child.groups": "Groupes Enfants:",
-	"view.groups": "Visionner les groupes:"
+	"view.groups": "Visionner les groupes:",
+	"site.title": "Titre du Site par Défaut",
+	"default.graph.type": "Type du Diagramme par Défaut",
+	"default.bar.stacking": "Empillage de Bandes par Défaut",
+	"submit": "Soumettre",
+	"logout": "Se Déconnecter",
+	"language": "Langue"
   }
 }

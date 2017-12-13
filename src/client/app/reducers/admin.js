@@ -5,10 +5,16 @@
 import * as adminActions from '../actions/admin';
 import { chartTypes } from './graph';
 
+export const languageTypes = {
+	en: 'en',
+	fr: 'fr'
+};
+
 const defaultState = {
 	displayTitle: '',
 	defaultChartToRender: chartTypes.line,
 	defaultBarStacking: false,
+	defaultLanguage: languageTypes.en,
 	isFetching: false,
 	submitted: true
 };
@@ -33,6 +39,12 @@ export default function admin(state = defaultState, action) {
 				defaultBarStacking: !state.defaultBarStacking,
 				submitted: false
 			};
+		case adminActions.UPDATE_DEFAULT_LANGUAGE:
+			return {
+				...state,
+				defaultLanguage: action.defaultLanguage,
+				submitted: false
+			};
 		case adminActions.REQUEST_PREFERENCES:
 			return {
 				...state,
@@ -44,7 +56,8 @@ export default function admin(state = defaultState, action) {
 				isFetching: false,
 				displayTitle: action.data.displayTitle,
 				defaultChartToRender: action.data.defaultChartToRender,
-				defaultBarStacking: action.data.defaultBarStacking
+				defaultBarStacking: action.data.defaultBarStacking,
+				defaultLanguage: action.data.defaultLanguage
 			};
 		case adminActions.MARK_PREFERENCES_SUBMITTED:
 			return {

@@ -4,14 +4,15 @@
 
 import { connect } from 'react-redux';
 import AdminComponent from '../components/AdminComponent';
-import { updateDisplayTitle, updateDefaultChartToRender, toggleDefaultBarStacking, submitPreferencesIfNeeded } from '../actions/admin';
+import { updateDisplayTitle, updateDefaultChartToRender, toggleDefaultBarStacking, submitPreferencesIfNeeded, updateDefaultLanguage} from '../actions/admin';
 
 function mapStateToProps(state) {
 	return {
 		displayTitle: state.admin.displayTitle,
 		defaultChartToRender: state.admin.defaultChartToRender,
 		defaultBarStacking: state.admin.defaultBarStacking,
-		disableSubmitPreferences: state.admin.submitted
+		disableSubmitPreferences: state.admin.submitted,
+		defaultLanguage: state.admin.defaultLanguage
 	};
 }
 
@@ -20,7 +21,8 @@ function mapDispatchToProps(dispatch) {
 		updateDisplayTitle: displayTitle => dispatch(updateDisplayTitle(displayTitle)),
 		updateDefaultGraphType: defaultChartToRender => dispatch(updateDefaultChartToRender(defaultChartToRender)),
 		toggleDefaultBarStacking: () => dispatch(toggleDefaultBarStacking()),
-		submitPreferences: () => dispatch(submitPreferencesIfNeeded())
+		submitPreferences: () => dispatch(submitPreferencesIfNeeded()),
+		updateDefaultLanguage: language => dispatch(updateDefaultLanguage(language))
 	};
 }
 

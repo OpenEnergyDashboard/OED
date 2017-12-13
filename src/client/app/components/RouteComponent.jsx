@@ -104,8 +104,13 @@ export default class RouteComponent extends React.Component {
 	 */
 	render() {
 		addLocaleData([...en, ...fr]);
-		const lang = 'fr';
-		const messages = localeData.fr;
+		const lang = this.props.defaultLanguage;
+		let messages;
+		if (lang === 'fr') {
+			messages = localeData.fr;
+		} else {
+			messages = localeData.en;
+		}
 		return (
 			<div>
 				<InitializationContainer />

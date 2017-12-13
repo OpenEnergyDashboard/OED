@@ -32,4 +32,4 @@ postgres-data
 *.txt
 
 # Exclude Translations
-./build
+build
