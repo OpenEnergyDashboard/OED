@@ -11,7 +11,8 @@ import { changeOptionsFromLink } from '../actions/graph';
 
 function mapStateToProps(state) {
 	return {
-		barStacking: state.graph.barStacking
+		barStacking: state.graph.barStacking,
+		defaultLanguage: state.admin.defaultLanguage
 	};
 }
 

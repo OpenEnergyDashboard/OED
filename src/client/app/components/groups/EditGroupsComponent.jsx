@@ -4,11 +4,12 @@
 
 // This component is the main page of the edit group page.
 import React from 'react';
+import { defineMessages, injectIntl, intlShape, FormattedMessage } from 'react-intl';
 import _ from 'lodash';
 import { FormControl, Button, Glyphicon } from 'react-bootstrap';
 import DatasourceBoxContainer from '../../containers/groups/DatasourceBoxContainer';
 
-export default class EditGroupsComponent extends React.Component {
+class EditGroupsComponent extends React.Component {
 	constructor(props) {
 		super(props);
 		this.state = {
@@ -115,14 +116,30 @@ export default class EditGroupsComponent extends React.Component {
 		const centerTextStyle = {
 			textAlign: 'center'
 		};
+		const messages = defineMessages({
+			name: {
+				id: 'name',
+				defaultMessage: 'Name'
+			}
+		});
+		const { formatMessage } = this.props.intl;
 		return (
 			<div style={divStyle} className="col-xs-6">
-				<h3 style={centerTextStyle}>Edit Group</h3>
-				<p style={boldStyle}>Name:</p>
-				<FormControl type="text" placeholder="Name" value={this.state.name} onChange={this.handleNameChange} />
+				<h3 style={centerTextStyle}><FormattedMessage
+					id="edit.group"
+					defaultMessage="Edit Group"
+				/></h3>
+				<p style={boldStyle}><FormattedMessage
+					id="name:"
+					defaultMessage="Name:"
+				/></p>
+				<FormControl type="text" placeholder={formatMessage(messages.name)} value={this.state.name} onChange={this.handleNameChange} />
 				<div className="row" style={metersDivStyle}>
 					<div className="col-xs-5">
-						<p style={boldStyle}>Child meters:</p>
+						<p style={boldStyle}><FormattedMessage
+							id="child.meters"
+							defaultMessage="Child Meters:"
+						/></p>
 						<DatasourceBoxContainer
 							type="meter"
 							selection="custom"
@@ -140,7 +157,10 @@ export default class EditGroupsComponent extends React.Component {
 						</Button>
 					</div>
 					<div className="col-xs-5">
-						<p style={boldStyle}>Unused meters:</p>
+						<p style={boldStyle}><FormattedMessage
+							id="unused.meters"
+							defaultMessage="Unused Meters:"
+						/></p>
 						<DatasourceBoxContainer
 							type="meter"
 							selection="custom"
@@ -152,7 +172,10 @@ export default class EditGroupsComponent extends React.Component {
 				</div>
 				<div className="row" style={groupsDivStyle}>
 					<div className="col-xs-5">
-						<p style={boldStyle}>Child groups:</p>
+						<p style={boldStyle}><FormattedMessage
+							id="child.groups"
+							defaultMessage="Child Groups:"
+						/></p>
 						<DatasourceBoxContainer
 							type="group"
 							selection="custom"
@@ -170,7 +193,10 @@ export default class EditGroupsComponent extends React.Component {
 						</Button>
 					</div>
 					<div className="col-xs-5">
-						<p style={boldStyle}>Unused groups:</p>
+						<p style={boldStyle}><FormattedMessage
+							id="unused.groups"
+							defaultMessage="Unused Groups:"
+						/></p>
 						<DatasourceBoxContainer
 							type="group"
 							selection="custom"
@@ -180,10 +206,24 @@ export default class EditGroupsComponent extends React.Component {
 						/>
 					</div>
 				</div>
-				<Button type="submit" onClick={this.handleReturnToView}>Cancel</Button>
-				<Button type="submit" onClick={this.handleEditGroup}>Submit changes</Button>
-				<Button className="pull-right" type="submit" onClick={this.handleDeleteGroup}>Delete group</Button>
+				<Button type="submit" onClick={this.handleReturnToView}><FormattedMessage
+					id="cancel"
+					defaultMessage="Cancel"
+				/></Button>
+				<Button type="submit" onClick={this.handleEditGroup}><FormattedMessage
+					id="submit.changes"
+					defaultMessage="Submit changes"
+				/></Button>
+				<Button className="pull-right" type="submit" onClick={this.handleDeleteGroup}><FormattedMessage
+					id="delete.group"
+					defaultMessage="Delete group"
+				/></Button>
 			</div>
 		);
 	}
 }
+EditGroupsComponent.propTypes = {
+	intl: intlShape.isRequired
+};
+
+export default injectIntl(EditGroupsComponent);

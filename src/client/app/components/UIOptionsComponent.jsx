@@ -3,6 +3,7 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
 
 import React from 'react';
+import { FormattedMessage } from 'react-intl';
 import Slider from 'react-rangeslider';
 import moment from 'moment';
 import 'react-rangeslider/lib/index.css';
@@ -82,9 +83,15 @@ export default class UIOptionsComponent extends React.Component {
 				{this.props.chartToRender === chartTypes.bar &&
 					<div>
 						<div className="checkbox">
-							<label><input type="checkbox" onChange={this.handleChangeBarStacking} checked={this.props.barStacking} />Bar stacking</label>
+							<label><input type="checkbox" onChange={this.handleChangeBarStacking} checked={this.props.barStacking} /><FormattedMessage
+								id="bar.stacking"
+								defaultMessage="Bar stacking"
+							/></label>
 						</div>
-						<p style={labelStyle}>Bar chart interval (days):</p>
+						<p style={labelStyle}><FormattedMessage
+							id="bar.interval"
+							defaultMessage="Bar chart interval (days):"
+						/></p>
 						<Slider min={1} max={365} value={this.state.barDuration} onChange={this.handleBarDurationChange} onChangeComplete={this.handleBarDurationChangeComplete} />
 					</div>
 				}

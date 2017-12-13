@@ -14,6 +14,7 @@ export const REQUEST_PREFERENCES = 'REQUEST_PREFERENCES';
 export const RECEIVE_PREFERENCES = 'RECEIVE_PREFERENCES';
 export const MARK_PREFERENCES_NOT_SUBMITTED = 'MARK_PREFERENCES_NOT_SUBMITTED';
 export const MARK_PREFERENCES_SUBMITTED = 'MARK_PREFERENCES_SUBMITTED';
+export const UPDATE_DEFAULT_LANGUAGE = 'UPDATE_DEFAULT_LANGUAGE';
 
 export function updateDisplayTitle(displayTitle) {
 	return { type: UPDATE_DISPLAY_TITLE, displayTitle };
@@ -25,6 +26,10 @@ export function updateDefaultChartToRender(defaultChartToRender) {
 
 export function toggleDefaultBarStacking() {
 	return { type: TOGGLE_DEFAULT_BAR_STACKING };
+}
+
+export function updateDefaultLanguage(defaultLanguage) {
+	return { type: UPDATE_DEFAULT_LANGUAGE, defaultLanguage };
 }
 
 function requestPreferences() {
@@ -70,7 +75,8 @@ function submitPreferences() {
 				preferences: {
 					displayTitle: state.admin.displayTitle,
 					defaultChartToRender: state.admin.defaultChartToRender,
-					defaultBarStacking: state.admin.defaultBarStacking
+					defaultBarStacking: state.admin.defaultBarStacking,
+					defaultLanguage: state.admin.defaultLanguage
 				}
 			})
 			.then(() => {

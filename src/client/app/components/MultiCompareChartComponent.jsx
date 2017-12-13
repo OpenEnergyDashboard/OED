@@ -3,6 +3,7 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
 
 import React from 'react';
+import { FormattedMessage } from 'react-intl';
 import CompareChartContainer from '../containers/CompareChartContainer';
 
 export default function MultiCompareChartComponent(props) {
@@ -31,7 +32,10 @@ export default function MultiCompareChartComponent(props) {
 		return (
 			<div className="row">
 				<div className="col-xs-12" style={centeredStyle}>
-					Select one or more items to compare usage over time.
+					<FormattedMessage
+						id="empty.compare"
+						defaultMessage="Select one or more items to compare usage over time."
+					/>
 				</div>
 			</div>
 		);

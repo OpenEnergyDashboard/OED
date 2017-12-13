@@ -91,7 +91,7 @@ export default class LoginComponent extends React.Component {
 						<span className="input-group-addon"><i className="glyphicon glyphicon-lock" /></span>
 						<input type="password" className="form-control" placeholder="Password" value={this.state.password} onChange={this.handlePasswordChange} />
 					</div>
-					<input style={buttonStyle} className="btn btn-default" type="submit" value="Login" />
+					<input style={buttonStyle} className="btn btn-default" type="submit" value="Log in"/>
 				</form>
 				<FooterComponent />
 			</div>

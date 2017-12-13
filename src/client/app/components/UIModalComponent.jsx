@@ -3,6 +3,7 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
 
 import React from 'react';
+import { FormattedMessage } from 'react-intl';
 import { Modal, Button } from 'react-bootstrap';
 import UIOptionsContainer from '../containers/UIOptionsContainer';
 
@@ -30,10 +31,16 @@ export default class UIModalComponent extends React.Component {
 		};
 		return (
 			<div style={inlineStyle}>
-				<Button bsStyle="default" onClick={this.openModal}>Options</Button>
+				<Button bsStyle="default" onClick={this.openModal}><FormattedMessage
+					id="options"
+					defaultMessage="Options"
+				/></Button>
 				<Modal show={this.state.showModal} onHide={this.closeModal}>
 					<Modal.Header closeButton>
-						<Modal.Title>Options</Modal.Title>
+						<Modal.Title><FormattedMessage
+							id="options"
+							defaultMessage="Options"
+						/></Modal.Title>
 					</Modal.Header>
 					<Modal.Body>
 						<UIOptionsContainer />
