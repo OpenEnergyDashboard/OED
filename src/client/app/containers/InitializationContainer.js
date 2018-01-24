@@ -13,7 +13,6 @@ import { changeOptionsFromLink } from '../actions/graph';
 
 function mapStateToProps(state) {
 	return {
-		notification: state.notifications.notification,
 		barStacking: state.graph.barStacking
 	};
 }

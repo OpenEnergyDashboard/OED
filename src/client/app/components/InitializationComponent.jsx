@@ -9,6 +9,7 @@ import NotificationSystem from 'react-notification-system';
 export default class InitializationComponent extends React.Component {
 	componentWillMount() {
 		this.props.fetchMetersDetailsIfNeeded();
+		this.props.fetchPreferencesIfNeeded();
 	}
 
 	componentWillReceiveProps(nextProps) {
@@ -18,7 +19,7 @@ export default class InitializationComponent extends React.Component {
 		}
 	}
 
-	static shouldComponentUpdate() {
+	shouldComponentUpdate() {
 		// To ignore warning: [react-router] You cannot change 'Router routes'; it will be ignored
 		return false;
 	}
