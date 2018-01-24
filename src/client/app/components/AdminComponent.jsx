@@ -10,8 +10,8 @@ import { chartTypes } from '../reducers/graph';
 import HeaderContainer from '../containers/HeaderContainer';
 import FooterComponent from '../components/FooterComponent';
 import MultiSelectComponent from './MultiSelectComponent';
-import HeaderContainer from '../containers/HeaderContainer';
-import getToken from '../utils/getToken';
+import { getToken } from '../utils/token';
+import { showSuccessNotification, showErrorNotification } from '../utils/notifications';
 
 export default class AdminComponent extends React.Component {
 	constructor(props) {
@@ -42,12 +42,7 @@ export default class AdminComponent extends React.Component {
 	handleFileToImport(files) {
 		// token passed as a header
 		if (!this.props.selectedImportMeter) {
-			this.props.showNotification({
-				message: 'Please select a meter',
-				level: 'error',
-				position: 'tr',
-				autoDismiss: 3
-			});
+			showErrorNotification('Please select a meter');
 		} else {
 			const file = files[0];
 			const data = new FormData();
@@ -59,22 +54,13 @@ export default class AdminComponent extends React.Component {
 				params: {
 					token: getToken()
 				}
-			}).then(() => {
-					this.props.showNotification({
-						message: 'Successfully uploaded meter data',
-						level: 'success',
-						position: 'tr',
-						autoDismiss: 3
-					});
-				})
-				.catch(() => {
-					this.props.showNotification({
-						message: 'Error uploading meter data',
-						level: 'error',
-						position: 'tr',
-						autoDismiss: 3
-					});
-				});
+			})
+			.then(() => {
+				showSuccessNotification('Successfully uploaded meter data');
+			})
+			.catch(() => {
+				showErrorNotification('Error uploading meter data');
+			});
 		}
 	}
 
@@ -91,68 +77,95 @@ export default class AdminComponent extends React.Component {
 			margin: 0,
 			paddingBottom: '5px'
 		};
+		const marginBottomStyle = {
+			marginBottom: '15px'
+		};
 		return (
 			<div>
 				<HeaderContainer />
 				<div className="container-fluid">
-					<div className="row">
-						<div className="col-xs-4">
-							<Dropzone accept="text/csv, application/vnd.ms-excel," onDrop={this.handleFileToImport}>
-								<div> Add in a CSV file here:</div>
-							</Dropzone>
-							<MultiSelectComponent options={this.props.meters} selectedOptions={this.props.selectedImportMeter} placeholder="Select meter to import data" onValuesChange={s => this.props.updateSelectedImportMeter(s)} />
+					<div className="row" style={marginBottomStyle}>
+						<div className="col-xs-3">
+							<div style={bottomPaddingStyle}>
+								<p style={titleStyle}>Default Site Title:</p>
+								<FormControl
+									type="text"
+									placeholder="Name"
+									value={this.props.displayTitle}
+									onChange={this.handleDisplayTitleChange}
+									maxLength={50}
+								/>
+							</div>
+							<div>
+								<p style={labelStyle}>Default Graph Type:</p>
+								<div className="radio">
+									<label>
+										<input
+											type="radio"
+											name="chartTypes"
+											value={chartTypes.line}
+											onChange={this.handleDefaultChartToRenderChange}
+											checked={this.props.defaultChartToRender === chartTypes.line}
+										/>
+                                        Line
+                                    </label>
+								</div>
+								<div className="radio">
+									<label>
+										<input
+											type="radio"
+											name="chartTypes"
+											value={chartTypes.bar}
+											onChange={this.handleDefaultChartToRenderChange}
+											checked={this.props.defaultChartToRender === chartTypes.bar}
+										/>
+                                        Bar
+                                    </label>
+								</div>
+								<div className="radio">
+									<label>
+										<input
+											type="radio"
+											name="chartTypes"
+											value={chartTypes.compare}
+											onChange={this.handleDefaultChartToRenderChange}
+											checked={this.props.defaultChartToRender === chartTypes.compare}
+										/>
+                                        Compare
+                                    </label>
+								</div>
+							</div>
+							<div className="checkbox">
+								<label>
+									<input
+										type="checkbox"
+										onChange={this.handleDefaultBarStackingChange}
+										checked={this.props.defaultBarStacking}
+									/>
+									Default Bar stacking
+								</label>
+							</div>
+							<Button
+								type="submit"
+								onClick={this.handleSubmitPreferences}
+								disabled={this.props.disableSubmitPreferences}
+							>
+								Submit
+							</Button>
 						</div>
 					</div>
 					<div className="row">
-                        <div className="col-xs-3">
-                            <div style={bottomPaddingStyle}>
-                                <p style={titleStyle}>Default Site Title:</p>
-                                <FormControl type="text" placeholder="Name" value={this.props.displayTitle} onChange={this.handleDisplayTitleChange} maxLength={50} />
-                            </div>
-                            <div>
-                                <p style={labelStyle}>Default Graph Type:</p>
-                                <div className="radio">
-                                    <label>
-                                        <input
-                                            type="radio"
-                                            name="chartTypes"
-                                            value={chartTypes.line}
-                                            onChange={this.handleDefaultChartToRenderChange}
-                                            checked={this.props.defaultChartToRender === chartTypes.line}
-                                        />
-                                        Line
-                                    </label>
-                                </div>
-                                <div className="radio">
-                                    <label>
-                                        <input
-                                            type="radio"
-                                            name="chartTypes"
-                                            value={chartTypes.bar}
-                                            onChange={this.handleDefaultChartToRenderChange}
-                                            checked={this.props.defaultChartToRender === chartTypes.bar}
-                                        />
-                                        Bar
-                                    </label>
-                                </div>
-                                <div className="radio">
-                                    <label>
-                                        <input
-                                            type="radio"
-                                            name="chartTypes"
-                                            value={chartTypes.compare}
-                                            onChange={this.handleDefaultChartToRenderChange}
-                                            checked={this.props.defaultChartToRender === chartTypes.compare}
-                                        />
-                                        Compare
-                                    </label>
-                                </div>
-                            </div>
-                            <div className="checkbox">
-                                <label><input type="checkbox" onChange={this.handleDefaultBarStackingChange} checked={this.props.defaultBarStacking} />Default Bar stacking</label>
-                            </div>
-                            <Button type="submit" onClick={this.handleSubmitPreferences} disabled={this.props.disableSubmitPreferences}>Submit</Button>
-                        </div>
+						<div className="col-xs-2">
+							<Dropzone accept="text/csv, application/vnd.ms-excel," onDrop={this.handleFileToImport}>
+								<div> Add in a CSV file here:</div>
+							</Dropzone>
+							<MultiSelectComponent
+								options={this.props.meters}
+								selectedOptions={this.props.selectedImportMeter}
+								placeholder="Select meter to import data"
+								onValuesChange={s => this.props.updateSelectedImportMeter(s)}
+							/>
+						</div>
 					</div>
 				</div>
 				<FooterComponent />

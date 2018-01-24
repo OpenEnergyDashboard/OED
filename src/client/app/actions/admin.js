@@ -109,6 +109,7 @@ export function submitPreferencesIfNeeded() {
 		}
 		return Promise.resolve();
 	};
+}
 
 export function updateSelectedMeter(meterID) {
 	return { type: UPDATE_IMPORT_METER, meterID };

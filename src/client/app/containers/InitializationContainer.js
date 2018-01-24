@@ -9,11 +9,12 @@ import InitializationComponent from '../components/InitializationComponent';
 import { clearNotifications } from '../actions/notifications';
 import { fetchMetersDetailsIfNeeded } from '../actions/meters';
 import { changeOptionsFromLink } from '../actions/graph';
+import { fetchPreferencesIfNeeded } from '../actions/admin';
 
 
 function mapStateToProps(state) {
 	return {
-		barStacking: state.graph.barStacking
+		notification: state.notifications.notification
 	};
 }
 
@@ -21,6 +22,7 @@ function mapDispatchToProps(dispatch) {
 	return {
 		clearNotifications: () => dispatch(clearNotifications()),
 		fetchMetersDetailsIfNeeded: () => dispatch(fetchMetersDetailsIfNeeded()),
+		fetchPreferencesIfNeeded: () => dispatch(fetchPreferencesIfNeeded()),
 		changeOptionsFromLink: options => dispatch(changeOptionsFromLink(options))
 	};
 }

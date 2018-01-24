@@ -6,7 +6,6 @@ import { connect } from 'react-redux';
 import _ from 'lodash';
 import AdminComponent from '../components/AdminComponent';
 import { updateDisplayTitle, updateDefaultChartToRender, toggleDefaultBarStacking, submitPreferencesIfNeeded, updateSelectedMeter } from '../actions/admin';
-import { showNotification } from '../actions/notifications';
 
 function mapStateToProps(state) {
 	return {
@@ -21,7 +20,6 @@ function mapStateToProps(state) {
 
 function mapDispatchToProps(dispatch) {
 	return {
-		showNotification: notification => dispatch(showNotification(notification)),
 		updateSelectedImportMeter: meterID => dispatch(updateSelectedMeter(meterID)),
 		updateDisplayTitle: displayTitle => dispatch(updateDisplayTitle(displayTitle)),
 		updateDefaultGraphType: defaultChartToRender => dispatch(updateDefaultChartToRender(defaultChartToRender)),
