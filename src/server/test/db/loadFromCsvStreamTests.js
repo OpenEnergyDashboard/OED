@@ -48,7 +48,6 @@ mocha.describe('Read mamc log from a file: ', () => {
 			return new Reading(meter.id, readRate, startTimestamp, endTimestamp);
 		}, (readings, tx) => Reading.insertOrUpdateAll(readings, tx));
 		const { count } = await db.one('SELECT COUNT(*) as count FROM readings');
-		console.log(count);
 		expect(parseInt(count)).to.equal(20);
 	});
 
