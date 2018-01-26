@@ -35,12 +35,9 @@ router.post('/:meter_id', upload.single('csvFile'), async (req, res) => {
 			}, (readings, tx) => Reading.insertOrUpdateAll(readings, tx));
 			res.status(200).json({ success: true });
 		} catch (e) {
-			console.log(e);
-			console.log('Failed to upload');
 			res.status(403).json({ success: false, message: 'Failed to upload data.' });
 		}
 	} catch (err) {
-		console.log('Incorrect file type');
 		res.status(400).send({
 			success: false,
 			message: 'Incorrect file type.'

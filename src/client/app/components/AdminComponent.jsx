@@ -164,6 +164,7 @@ export default class AdminComponent extends React.Component {
 								selectedOptions={this.props.selectedImportMeter}
 								placeholder="Select meter to import data"
 								onValuesChange={s => this.props.updateSelectedImportMeter(s)}
+								singleSelect
 							/>
 						</div>
 					</div>

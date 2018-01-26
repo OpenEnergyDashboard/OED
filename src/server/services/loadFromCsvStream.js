@@ -53,29 +53,21 @@ function loadFromCsvStream(stream, mapRowToModel, bulkInsertModels) {
 			}
 		});
 		parser.on('error', err => {
-			console.log('in error');
 			if (!rejected) {
-				console.log('Called error first time');
 				resolve(t.batch(pendingInserts).then(() => Promise.reject(err)));
-			} else {
-				console.log('Called error more than once');
 			}
 			rejected = true;
 		});
 		// Defines what happens when the parser's input stream is finished (and thus the promise needs to be resolved)
 		parser.on('finish', () => {
-			console.log('Finished wow');
-			// if (!rejected) {
 			// Insert any models left in the buffer
 			if (modelsToInsert.length > 0) {
 				insertQueuedModels();
 			}
-			console.log('hello dear');
 			// Resolve the promise, telling pg-promise to run the batch query and complete (or rollback) the
 			// transaction.
 			resolve(t.batch(pendingInserts).then(arg => {
 				if (rejected) {
-					console.log('hello dear 2');
 					return Promise.reject(error);
 				} else {
 					return Promise.resolve(arg);
