@@ -41,13 +41,25 @@ export interface ChangeGraphZoomAction {
 	timeInterval: TimeInterval;
 }
 
+export interface UpdateCompareIntervalAction {
+	type: ActionType.UpdateCompareInterval;
+	compareTimeInterval: TimeInterval;
+}
+
+export interface UpdateCompareDurationAction {
+	type: ActionType.UpdateCompareDuration;
+	compareDuration: moment.Duration;
+}
+
 export type GraphAction =
 	| ChangeGraphZoomAction
 	| ChangeBarStackingAction
 	| ChangeChartToRenderAction
 	| UpdateBarDurationAction
 	| UpdateSelectedGroupsAction
-	| UpdateSelectedMetersAction;
+	| UpdateSelectedMetersAction
+	| UpdateCompareIntervalAction
+	| UpdateCompareDurationAction;
 
 export interface GraphState {
 	selectedMeters: number[];

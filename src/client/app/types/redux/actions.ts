@@ -29,6 +29,8 @@ export enum ActionType {
 	ChangeChartToRender = 'CHANGE_CHART_TO_RENDER',
 	ChangeBarStacking = 'CHANGE_BAR_STACKING',
 	ChangeGraphZoom = 'CHANGE_GRAPH_ZOOM',
+	UpdateCompareInterval = 'UPDATE_COMPARE_INTERVAL',
+	UpdateCompareDuration = 'UPDATE_COMPARE_DURATION',
 
 	RequestGroupsDetails = 'REQUEST_GROUPS_DETAILS',
 	ReceiveGroupsDetails = 'RECEIVE_GROUPS_DETAILS',
