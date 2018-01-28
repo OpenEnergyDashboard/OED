@@ -30,3 +30,4 @@ postgres-data
 
 # Text files
 *.txt
+!License.txt
