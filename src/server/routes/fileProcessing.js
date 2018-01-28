@@ -17,8 +17,8 @@ const upload = multer({ storage: multer.memoryStorage() });
 
 router.use(authenticator);
 router.post('/:meter_id', upload.single('csvFile'), async (req, res) => {
-	const id = parseInt(req.params.meter_id);
 	try {
+		const id = parseInt(req.params.meter_id);
 		const myReadableStreamBuffer = new streamBuffers.ReadableStreamBuffer({
 			frequency: 10,
 			chunkSize: 2048
@@ -28,7 +28,7 @@ router.post('/:meter_id', upload.single('csvFile'), async (req, res) => {
 		myReadableStreamBuffer.stop();
 		try {
 			await streamToDB(myReadableStreamBuffer, row => {
-				const readRate = parseInt(row[0]);
+				const readRate = Number(row[0]);
 				const endTimestamp = moment(row[1], 'MM/DD/YYYY HH:mm');
 				const startTimestamp = moment(row[1], 'MM/DD/YYYY HH:mm').subtract(60, 'minutes');
 				return new Reading(id, readRate, startTimestamp, endTimestamp);
