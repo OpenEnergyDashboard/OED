@@ -6,6 +6,7 @@ import * as adminActions from '../actions/admin';
 import { chartTypes } from './graph';
 
 const defaultState = {
+	selectedMeter: null,
 	displayTitle: '',
 	defaultChartToRender: chartTypes.line,
 	defaultBarStacking: false,
@@ -15,6 +16,11 @@ const defaultState = {
 
 export default function admin(state = defaultState, action) {
 	switch (action.type) {
+		case adminActions.UPDATE_IMPORT_METER:
+			return {
+				...state,
+				selectedMeter: action.meterID
+			};
 		case adminActions.UPDATE_DISPLAY_TITLE:
 			return {
 				...state,

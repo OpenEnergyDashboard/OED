@@ -7,6 +7,7 @@ import { changeBarStacking, changeChartToRender } from './graph';
 import { showErrorNotification, showSuccessNotification } from '../utils/notifications';
 import { getToken } from '../utils/token';
 
+export const UPDATE_IMPORT_METER = 'UPDATE_IMPORT_METER';
 export const UPDATE_DISPLAY_TITLE = 'UPDATE_DISPLAY_TITLE';
 export const UPDATE_DEFAULT_CHART_TO_RENDER = 'UPDATE_DEFAULT_CHART_TO_RENDER';
 export const TOGGLE_DEFAULT_BAR_STACKING = 'TOGGLE_DEFAULT_BAR_STACKING';
@@ -108,4 +109,8 @@ export function submitPreferencesIfNeeded() {
 		}
 		return Promise.resolve();
 	};
+}
+
+export function updateSelectedMeter(meterID) {
+	return { type: UPDATE_IMPORT_METER, meterID };
 }
