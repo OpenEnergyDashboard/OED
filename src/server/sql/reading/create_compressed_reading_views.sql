@@ -133,13 +133,6 @@ CREATE EXTENSION IF NOT EXISTS btree_gist;
 CREATE INDEX idx_daily_readings ON daily_readings USING GIST(time_interval, meter_id);
 
 
-CREATE FUNCTION refresh_daily_readings()
-	AS $$
-		-- TODO: Investigate the performance impacts of CONCURRENTLY and dropping / recreating the index
-		REFRESH MATERIALIZED VIEW daily_readings;
-	$$ LANGUAGE 'plpgsql';
-
-
 /*
 The following function determines the correct duration view to query from, and returns compressed data from it.
  */

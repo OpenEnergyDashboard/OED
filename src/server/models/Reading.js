@@ -70,7 +70,8 @@ class Reading {
 	 * @return {Promise<void>}
 	 */
 	static refreshCompressedReadings(conn = db) {
-		return conn.func('refresh_daily_readings', []);
+		// This can't be a function because you can't call REFRESH inside a function
+		return conn.none('REFRESH MATERIALIZED VIEW daily_readings');
 	}
 
 	static mapRow(row) {
