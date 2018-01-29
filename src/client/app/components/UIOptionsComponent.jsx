@@ -27,7 +27,7 @@ export default class UIOptionsComponent extends React.Component {
 		this.handleBarDurationChangeComplete = this.handleBarDurationChangeComplete.bind(this);
 		this.handleChangeBarStacking = this.handleChangeBarStacking.bind(this);
 		this.handleBarButton = this.handleBarButton.bind(this);
-		this.handleCompareSpanButton = this.handleCompareSpanButton.bind(this);
+		this.handleCompareButton = this.handleCompareButton.bind(this);
 		this.toggleSlider = this.toggleSlider.bind(this);
 		this.state = {
 			barDuration: this.props.barDuration.asDays(),
@@ -71,7 +71,7 @@ export default class UIOptionsComponent extends React.Component {
 		this.props.changeDuration(moment.duration(value, 'days'));
 	}
 
-	handleCompareSpanButton(value) {
+	handleCompareButton(value) {
 		let compareTimeInterval;
 		let compareDuration;
 		switch (value) {
@@ -177,14 +177,26 @@ export default class UIOptionsComponent extends React.Component {
 				{this.props.chartToRender === chartTypes.compare &&
 				<div>
 					<ButtonGroup
-						name="timeSpansCompare"
-						value={compareVal}
-						onChange={this.handleCompareSpanButton}
 						style={zIndexFix}
 					>
-						<Button outline value="day">Day</Button>
-						<Button outline value="week">Week</Button>
-						<Button outline value="month">Month</Button>
+						<Button
+							outline={compareVal !== 'day'}
+							onClick={() => this.handleCompareButton('day')}
+						>
+							Day
+						</Button>
+						<Button
+							outline={compareVal !== 'week'}
+							onClick={() => this.handleCompareButton('week')}
+						>
+							Week
+						</Button>
+						<Button
+							outline={compareVal !== 'month'}
+							onClick={() => this.handleCompareButton('month')}
+						>
+							Month
+						</Button>
 					</ButtonGroup>
 				</div>
 				}
