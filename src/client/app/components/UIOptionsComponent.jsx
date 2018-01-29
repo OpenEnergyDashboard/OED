@@ -26,7 +26,7 @@ export default class UIOptionsComponent extends React.Component {
 		this.handleBarDurationChange = this.handleBarDurationChange.bind(this);
 		this.handleBarDurationChangeComplete = this.handleBarDurationChangeComplete.bind(this);
 		this.handleChangeBarStacking = this.handleChangeBarStacking.bind(this);
-		this.handleSpanButton = this.handleSpanButton.bind(this);
+		this.handleBarButton = this.handleBarButton.bind(this);
 		this.handleCompareSpanButton = this.handleCompareSpanButton.bind(this);
 		this.toggleSlider = this.toggleSlider.bind(this);
 		this.state = {
@@ -67,7 +67,7 @@ export default class UIOptionsComponent extends React.Component {
 		this.props.changeBarStacking();
 	}
 
-	handleSpanButton(value) {
+	handleBarButton(value) {
 		this.props.changeDuration(moment.duration(value, 'days'));
 	}
 
@@ -136,17 +136,34 @@ export default class UIOptionsComponent extends React.Component {
 						<p style={labelStyle}>Bar chart interval:</p>
 						<ButtonGroup
 							type="radio"
-							name="timeSpans"
 							value={this.state.barDuration}
-							onChange={this.handleSpanButton}
 							style={zIndexFix}
 						>
-							<Button outline value={1}>Day</Button>
-							<Button outline value={7}>Week</Button>
-							<Button outline value={28}>Month</Button>
+							<Button
+								outline={this.state.barDuration !== 1}
+								onClick={() => this.handleBarButton(1)}
+							>
+								Day
+							</Button>
+							<Button
+								outline={this.state.barDuration !== 7}
+								onClick={() => this.handleBarButton(7)}
+							>
+								Week
+							</Button>
+							<Button
+								outline={this.state.barDuration !== 28}
+								onClick={() => this.handleBarButton(28)}
+							>
+								Month
+							</Button>
 						</ButtonGroup>
-						<Button outline name="customToggle" onClick={this.toggleSlider}>Toggle Custom Slider (days)</Button>
-
+						<Button
+							outline={!this.state.showSlider}
+							onClick={this.toggleSlider}
+						>
+							Toggle Custom Slider (days)
+						</Button>
 						{this.state.showSlider &&
 						<Slider
 							min={1} max={365} value={this.state.barDuration} onChange={this.handleBarDurationChange}

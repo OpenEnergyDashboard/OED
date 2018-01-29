@@ -30,7 +30,12 @@ export default class ChartLinkComponent extends React.Component {
 		};
 		return (
 			<div>
-				<Button outline onClick={this.toggleLink}>Toggle chart link</Button>
+				<Button
+					outline={!this.state.showLink}
+					onClick={this.toggleLink}
+				>
+					Toggle chart link
+				</Button>
 				{this.state.showLink &&
 					<div style={wellStyle}>
 						{this.props.linkText}

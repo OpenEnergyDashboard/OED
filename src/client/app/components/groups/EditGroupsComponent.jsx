@@ -180,9 +180,15 @@ export default class EditGroupsComponent extends React.Component {
 							/>
 						</div>
 					</div>
-					<Button outline type="submit" onClick={this.handleReturnToView}>Cancel</Button>
-					<Button outline type="submit" onClick={this.handleEditGroup}>Submit changes</Button>
-					<Button outline className="justify-content-end" type="submit" onClick={this.handleDeleteGroup}>Delete group</Button>
+					<div className="row">
+						<div className="col-6">
+							<Button outline onClick={this.handleReturnToView}>Cancel</Button>
+							<Button outline onClick={this.handleEditGroup}>Submit changes</Button>
+						</div>
+						<div className="col-6 d-flex justify-content-end">
+							<Button outline className="justify-content-end" onClick={this.handleDeleteGroup}>Delete group</Button>
+						</div>
+					</div>
 				</div>
 			</div>
 		);

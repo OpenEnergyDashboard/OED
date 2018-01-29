@@ -34,13 +34,26 @@ export default class ChartSelectComponent extends React.Component {
 				<p style={labelStyle}>Graph Type:</p>
 				<ButtonGroup
 					type="radio"
-					name="chartTypes"
-					value={this.props.selectedChart}
 					onChange={this.handleChangeChartType}
 				>
-					<Button outline value={chartTypes.line}>Line</Button>
-					<Button outline value={chartTypes.bar}>Bar</Button>
-					<Button outline value={chartTypes.compare}>Compare</Button>
+					<Button
+						outline={this.props.selectedChart !== chartTypes.line}
+						onClick={() => this.handleChangeChartType(chartTypes.line)}
+					>
+						Line
+					</Button>
+					<Button
+						outline={this.props.selectedChart !== chartTypes.bar}
+						onClick={() => this.handleChangeChartType(chartTypes.bar)}
+					>
+						Bar
+					</Button>
+					<Button
+						outline={this.props.selectedChart !== chartTypes.compare}
+						onClick={() => this.handleChangeChartType(chartTypes.compare)}
+					>
+						Compare
+					</Button>
 				</ButtonGroup>
 			</div>
 		);
