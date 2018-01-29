@@ -4,7 +4,7 @@
 
 const express = require('express');
 const Preferences = require('../models/Preferences');
-const log = require('../log');
+const { log } = require('../log');
 const authentication = require('./authenticator');
 
 const router = express.Router();
@@ -17,7 +17,7 @@ router.get('/', async (req, res) => {
 		const rows = await Preferences.get();
 		res.json(rows);
 	} catch (err) {
-		log(`Error while performing GET all preferences query: ${err}`, 'error');
+		log.error(`Error while performing GET all preferences query: ${err}`, err);
 	}
 });
 
@@ -32,7 +32,7 @@ router.post('/', async (req, res) => {
 		const rows = await Preferences.update(req.body.preferences);
 		res.json(rows);
 	} catch (err) {
-		log(`Error while performing POST update preferences: ${err}`, 'error');
+		log.error(`Error while performing POST update preferences: ${err}`, err);
 	}
 });
 
