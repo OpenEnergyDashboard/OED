@@ -9,6 +9,7 @@ import { createStore, applyMiddleware, compose } from 'redux';
 import { Provider } from 'react-redux';
 import RouteComponent from './components/RouteComponent';
 import reducers from './reducers';
+import 'bootstrap/dist/css/bootstrap.css';
 
 // This sets up the redux-devtools extension (if it's installed in the browser).
 // https://github.com/zalmoxisus/redux-devtools-extension

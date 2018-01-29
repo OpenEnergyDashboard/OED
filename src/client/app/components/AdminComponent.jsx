@@ -3,7 +3,7 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
 
 import React from 'react';
-import { FormControl, Button } from 'react-bootstrap';
+import { Input, Button } from 'reactstrap';
 import Dropzone from 'react-dropzone';
 import axios from 'axios';
 import { chartTypes } from '../reducers/graph';
@@ -91,7 +91,7 @@ export default class AdminComponent extends React.Component {
 						<div className="col-3">
 							<div style={bottomPaddingStyle}>
 								<p style={titleStyle}>Default Site Title:</p>
-								<FormControl
+								<Input
 									type="text"
 									placeholder="Name"
 									value={this.props.displayTitle}

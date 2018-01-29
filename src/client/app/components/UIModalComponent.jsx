@@ -3,24 +3,19 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
 
 import React from 'react';
-import { Modal, Button } from 'react-bootstrap';
+import { Modal, ModalHeader, ModalBody, Button } from 'reactstrap';
 import UIOptionsContainer from '../containers/UIOptionsContainer';
 
 export default class UIModalComponent extends React.Component {
 
 	constructor(props) {
 		super(props);
-		this.openModal = this.openModal.bind(this);
-		this.closeModal = this.closeModal.bind(this);
+		this.toggle = this.toggle.bind(this);
 		this.state = { showModal: false };
 	}
 
-	openModal() {
-		this.setState({ showModal: true });
-	}
-
-	closeModal() {
-		this.setState({ showModal: false });
+	toggle() {
+		this.setState({ showModal: !this.state.showModal });
 	}
 
 	render() {
@@ -30,14 +25,12 @@ export default class UIModalComponent extends React.Component {
 		};
 		return (
 			<div style={inlineStyle}>
-				<Button bsStyle="default" onClick={this.openModal}>Options</Button>
-				<Modal show={this.state.showModal} onHide={this.closeModal}>
-					<Modal.Header closeButton>
-						<Modal.Title>Options</Modal.Title>
-					</Modal.Header>
-					<Modal.Body>
+				<Button outline onClick={this.toggle}>Options</Button>
+				<Modal isOpen={this.state.showModal} toggle={this.toggle}>
+					<ModalHeader>Options</ModalHeader>
+					<ModalBody>
 						<UIOptionsContainer />
-					</Modal.Body>
+					</ModalBody>
 				</Modal>
 			</div>
 		);

@@ -4,7 +4,7 @@
 
 import React from 'react';
 import { Link } from 'react-router';
-import { Button } from 'react-bootstrap';
+import { Button } from 'reactstrap';
 import LogoComponent from './LogoComponent';
 import UIModalComponent from './UIModalComponent';
 import { hasToken } from '../utils/token';
@@ -98,10 +98,10 @@ export default class HeaderComponent extends React.Component {
 						<div className="d-lg-none">
 							{(renderOptionsButton) ? <UIModalComponent /> : null}
 						</div>
-						<Link style={loginLinkStyle} to="/login"><Button bsStyle="default">Log In</Button></Link>
-						<Link style={adminLinkStyle} to="/admin"><Button bsStyle="default">Admin panel</Button></Link>
-						<Link style={groupsLinkStyle} to="/groups"><Button bsStyle="default">Groups</Button></Link>
-						<Link style={logoutButtonStyle} to="/"><Button bsStyle="default" onClick={this.handleLogOut}>Log Out</Button></Link>
+						<Link style={loginLinkStyle} to="/login"><Button outline>Log In</Button></Link>
+						<Link style={adminLinkStyle} to="/admin"><Button outline>Admin panel</Button></Link>
+						<Link style={groupsLinkStyle} to="/groups"><Button outline>Groups</Button></Link>
+						<Link style={logoutButtonStyle} to="/"><Button outline onClick={this.handleLogOut}>Log Out</Button></Link>
 					</div>
 				</div>
 			</div>

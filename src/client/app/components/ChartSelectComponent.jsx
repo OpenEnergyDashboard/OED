@@ -3,7 +3,7 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
 
 import React from 'react';
-import { ToggleButtonGroup, ToggleButton } from 'react-bootstrap';
+import { ButtonGroup, Button } from 'reactstrap';
 import { chartTypes } from '../reducers/graph';
 
 /**
@@ -32,16 +32,16 @@ export default class ChartSelectComponent extends React.Component {
 		return (
 			<div style={divBottomPadding}>
 				<p style={labelStyle}>Graph Type:</p>
-				<ToggleButtonGroup
+				<ButtonGroup
 					type="radio"
 					name="chartTypes"
 					value={this.props.selectedChart}
 					onChange={this.handleChangeChartType}
 				>
-					<ToggleButton value={chartTypes.line}>Line</ToggleButton>
-					<ToggleButton value={chartTypes.bar}>Bar</ToggleButton>
-					<ToggleButton value={chartTypes.compare}>Compare</ToggleButton>
-				</ToggleButtonGroup>
+					<Button outline value={chartTypes.line}>Line</Button>
+					<Button outline value={chartTypes.bar}>Bar</Button>
+					<Button outline value={chartTypes.compare}>Compare</Button>
+				</ButtonGroup>
 			</div>
 		);
 	}

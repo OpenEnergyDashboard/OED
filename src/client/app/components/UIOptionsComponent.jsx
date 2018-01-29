@@ -5,7 +5,7 @@
 import React from 'react';
 import Slider from 'react-rangeslider';
 import moment from 'moment';
-import { Button, ToggleButtonGroup, ToggleButton } from 'react-bootstrap';
+import { Button, ButtonGroup } from 'reactstrap';
 import 'react-rangeslider/lib/index.css';
 import '../styles/react-rangeslider-fix.css';
 import { chartTypes } from '../reducers/graph';
@@ -134,18 +134,18 @@ export default class UIOptionsComponent extends React.Component {
 							<label><input type="checkbox" onChange={this.handleChangeBarStacking} checked={this.props.barStacking} />Bar stacking</label>
 						</div>
 						<p style={labelStyle}>Bar chart interval:</p>
-						<ToggleButtonGroup
+						<ButtonGroup
 							type="radio"
 							name="timeSpans"
 							value={this.state.barDuration}
 							onChange={this.handleSpanButton}
 							style={zIndexFix}
 						>
-							<ToggleButton value={1}>Day</ToggleButton>
-							<ToggleButton value={7}>Week</ToggleButton>
-							<ToggleButton value={28}>Month</ToggleButton>
-						</ToggleButtonGroup>
-						<Button name="customToggle" onClick={this.toggleSlider}>Toggle Custom Slider (days)</Button>
+							<Button outline value={1}>Day</Button>
+							<Button outline value={7}>Week</Button>
+							<Button outline value={28}>Month</Button>
+						</ButtonGroup>
+						<Button outline name="customToggle" onClick={this.toggleSlider}>Toggle Custom Slider (days)</Button>
 
 						{this.state.showSlider &&
 						<Slider
@@ -159,16 +159,16 @@ export default class UIOptionsComponent extends React.Component {
 				{ /* Controls specific to the compare chart */}
 				{this.props.chartToRender === chartTypes.compare &&
 				<div>
-					<ToggleButtonGroup
+					<ButtonGroup
 						name="timeSpansCompare"
 						value={compareVal}
 						onChange={this.handleCompareSpanButton}
 						style={zIndexFix}
 					>
-						<ToggleButton value="day">Day</ToggleButton>
-						<ToggleButton value="week">Week</ToggleButton>
-						<ToggleButton value="month">Month</ToggleButton>
-					</ToggleButtonGroup>
+						<Button outline value="day">Day</Button>
+						<Button outline value="week">Week</Button>
+						<Button outline value="month">Month</Button>
+					</ButtonGroup>
 				</div>
 				}
 

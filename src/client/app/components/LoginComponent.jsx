@@ -5,6 +5,7 @@
 import React from 'react';
 import axios from 'axios';
 import { browserHistory } from 'react-router';
+import { Input, Button, InputGroup } from 'reactstrap';
 import HeaderContainer from '../containers/HeaderContainer';
 import FooterComponent from '../components/FooterComponent';
 import { showErrorNotification } from '../utils/notifications';
@@ -82,17 +83,26 @@ export default class LoginComponent extends React.Component {
 		return (
 			<div>
 				<HeaderContainer />
-				<form style={formStyle} onSubmit={this.handleSubmit}>
-					<div className="input-group">
-						<span className="input-group-addon"><i className="glyphicon glyphicon-user" /></span>
-						<input type="text" className="form-control" placeholder="Email" ref={c => { this.inputEmail = c; }} value={this.state.email} onChange={this.handleEmailChange} />
-					</div>
-					<div className="input-group">
-						<span className="input-group-addon"><i className="glyphicon glyphicon-lock" /></span>
-						<input type="password" className="form-control" placeholder="Password" value={this.state.password} onChange={this.handlePasswordChange} />
-					</div>
-					<input style={buttonStyle} className="btn btn-default" type="submit" value="Login" />
-				</form>
+				<div style={formStyle}>
+					<InputGroup>
+						<Input
+							type="text"
+							className="form-control"
+							placeholder="Email" ref={c => { this.inputEmail = c; }}
+							value={this.state.email}
+							onChange={this.handleEmailChange}
+						/>
+					</InputGroup>
+					<InputGroup>
+						<Input
+							type="password"
+							placeholder="Password"
+							value={this.state.password}
+							onChange={this.handlePasswordChange}
+						/>
+					</InputGroup>
+					<Button outline style={buttonStyle} type="submit" onClick={this.handleSubmit}>Submit</Button>
+				</div>
 				<FooterComponent />
 			</div>
 		);

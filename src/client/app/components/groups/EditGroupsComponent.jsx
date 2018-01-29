@@ -2,10 +2,9 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
 
-// This component is the main page of the edit group page.
 import React from 'react';
 import _ from 'lodash';
-import { FormControl, Button, Glyphicon } from 'react-bootstrap';
+import { Input, Button } from 'reactstrap';
 import DatasourceBoxContainer from '../../containers/groups/DatasourceBoxContainer';
 
 export default class EditGroupsComponent extends React.Component {
@@ -120,7 +119,7 @@ export default class EditGroupsComponent extends React.Component {
 				<div style={divStyle} className="col-6">
 					<h3 style={centerTextStyle}>Edit Group</h3>
 					<p style={boldStyle}>Name:</p>
-					<FormControl type="text" placeholder="Name" value={this.state.name} onChange={this.handleNameChange} />
+					<Input type="text" placeholder="Name" value={this.state.name} onChange={this.handleNameChange} />
 					<div className="row" style={metersDivStyle}>
 						<div className="col-5">
 							<p style={boldStyle}>Child meters:</p>
@@ -133,11 +132,11 @@ export default class EditGroupsComponent extends React.Component {
 							/>
 						</div>
 						<div className="col-2" style={leftRightButtonsDivStyle}>
-							<Button onClick={this.handleMoveUnusedMetersToChildMeters} style={leftRightButtonStyle}>
-								<Glyphicon glyph="chevron-left" />
+							<Button outline onClick={this.handleMoveUnusedMetersToChildMeters} style={leftRightButtonStyle}>
+								<i className="fa fa-chevron-left" />
 							</Button>
-							<Button onClick={this.handleMoveChildMetersToUnusedMeters} style={leftRightButtonStyle}>
-								<Glyphicon glyph="chevron-right" />
+							<Button outline onClick={this.handleMoveChildMetersToUnusedMeters} style={leftRightButtonStyle}>
+								<i className="fa fa-chevron-right" />
 							</Button>
 						</div>
 						<div className="col-5">
@@ -163,11 +162,11 @@ export default class EditGroupsComponent extends React.Component {
 							/>
 						</div>
 						<div className="col-2" style={leftRightButtonsDivStyle}>
-							<Button onClick={this.handleMoveUnusedGroupsToChildGroups} style={leftRightButtonStyle}>
-								<Glyphicon glyph="chevron-left" />
+							<Button outline onClick={this.handleMoveUnusedGroupsToChildGroups} style={leftRightButtonStyle}>
+								<i className="fa fa-chevron-left" />
 							</Button>
-							<Button onClick={this.handleMoveChildGroupsToUnusedGroups} style={leftRightButtonStyle}>
-								<Glyphicon glyph="chevron-right" />
+							<Button outline onClick={this.handleMoveChildGroupsToUnusedGroups} style={leftRightButtonStyle}>
+								<i className="fa fa-chevron-right" />
 							</Button>
 						</div>
 						<div className="col-5">
@@ -181,9 +180,9 @@ export default class EditGroupsComponent extends React.Component {
 							/>
 						</div>
 					</div>
-					<Button type="submit" onClick={this.handleReturnToView}>Cancel</Button>
-					<Button type="submit" onClick={this.handleEditGroup}>Submit changes</Button>
-					<Button className="justify-content-end" type="submit" onClick={this.handleDeleteGroup}>Delete group</Button>
+					<Button outline type="submit" onClick={this.handleReturnToView}>Cancel</Button>
+					<Button outline type="submit" onClick={this.handleEditGroup}>Submit changes</Button>
+					<Button outline className="justify-content-end" type="submit" onClick={this.handleDeleteGroup}>Delete group</Button>
 				</div>
 			</div>
 		);

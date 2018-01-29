@@ -3,7 +3,7 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
 
 import React from 'react';
-import { Button } from 'react-bootstrap';
+import { Button } from 'reactstrap';
 import ListDisplayComponent from '../ListDisplayComponent';
 
 export default class GroupViewComponent extends React.Component {
@@ -45,7 +45,7 @@ export default class GroupViewComponent extends React.Component {
 						<ListDisplayComponent items={this.props.childGroups} />
 					</div>
 				</div>
-				<Button style={buttonPadding} bsStyle="default" onClick={this.handleEditGroup}>Edit group</Button>
+				<Button style={buttonPadding} outline onClick={this.handleEditGroup}>Edit group</Button>
 			</div>
 		);
 	}
