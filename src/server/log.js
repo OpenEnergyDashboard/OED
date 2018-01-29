@@ -73,13 +73,11 @@ class Logger {
 			}
 		}
 		if (this.logToFile) {
-			if (this.logToFile) {
-				fs.appendFile(logFile, messageToLog, err => {
-					if (err) {
-						console.error(`Failed to write to log file: ${err}`); // eslint-disable-line no-console
-					}
-				});
-			}
+			fs.appendFile(logFile, messageToLog, err => {
+				if (err) {
+					console.error(`Failed to write to log file: ${err}`); // eslint-disable-line no-console
+				}
+			});
 		}
 	}
 
