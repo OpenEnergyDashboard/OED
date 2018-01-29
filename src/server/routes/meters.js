@@ -4,7 +4,7 @@
 
 const express = require('express');
 const Meter = require('../models/Meter');
-const log = require('../log');
+const { log } = require('../log');
 
 const router = express.Router();
 
@@ -25,7 +25,7 @@ router.get('/', async (req, res) => {
 		const rows = await Meter.getAll();
 		res.json(rows.map(formatMeterForResponse));
 	} catch (err) {
-		log(`Error while performing GET all meters query: ${err}`, 'error');
+		log.error(`Error while performing GET all meters query: ${err}`, err);
 	}
 });
 
@@ -38,7 +38,7 @@ router.get('/:meter_id', async (req, res) => {
 		const meter = await Meter.getByID(req.params.meter_id);
 		res.json(formatMeterForResponse(meter));
 	} catch (err) {
-		log(`Error while performing GET specific meter by id query: ${err}`, 'error');
+		log.error(`Error while performing GET specific meter by id query: ${err}`, err);
 	}
 });
 

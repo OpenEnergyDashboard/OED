@@ -5,7 +5,7 @@
 const _ = require('lodash');
 const Reading = require('../models/Reading');
 
-const log = require('../log');
+const { log } = require('../log');
 
 /**
  * Uses the provided dataReader function to poll the provided meters for new readings,
@@ -16,7 +16,7 @@ const log = require('../log');
  */
 async function updateAllMeters(dataReader, metersToUpdate) {
 	const time = new Date();
-	log(`Getting meter data ${time.toISOString()}`);
+	log.info(`Getting meter data ${time.toISOString()}`);
 	try {
 		// Do all the network requests in parallel, then throw out any requests that fail after logging the errors.
 		const readingInsertBatches = _.filter(await Promise.all(
@@ -27,7 +27,7 @@ async function updateAllMeters(dataReader, metersToUpdate) {
 					if (err.options !== undefined && err.options.uri !== undefined) {
 						uri = err.options.uri;
 					}
-					log(`ERROR ON REQUEST TO ${uri}, ${err.message}`, 'error');
+					log.error(`ERROR ON REQUEST TO ${uri}, ${err.message}`, err);
 					return null;
 				}))
 		), elem => elem !== null);
@@ -35,9 +35,9 @@ async function updateAllMeters(dataReader, metersToUpdate) {
 		// Flatten the batches (an array of arrays) into a single array.
 		const allReadingsToInsert = [].concat(...readingInsertBatches);
 		await Reading.insertOrUpdateAll(allReadingsToInsert);
-		log('Update finished');
+		log.info('Update finished');
 	} catch (err) {
-		log(`Error updating all meters: ${err}`, 'error');
+		log.error(`Error updating all meters: ${err}`, err);
 	}
 }
 

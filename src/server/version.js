@@ -3,7 +3,7 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
 
 const pkgJson = require('../../package.json');
-const log = require('./log');
+const { log } = require('./log');
 
 /**
  * Creates a new OEDVersion object, which contains a major, minor, and patch release level.
@@ -12,7 +12,7 @@ const log = require('./log');
 function OEDVersion() {
 	const versionParts = pkgJson.version.split('.');
 	if (versionParts.length !== 3) {
-		log(`package.json version string "${pkgJson.version}" is not in semver x.y.z format`, 'error', true);
+		log.error(`package.json version string "${pkgJson.version}" is not in semver x.y.z format`);
 	}
 	this.major = versionParts[0];
 	this.minor = versionParts[1];
