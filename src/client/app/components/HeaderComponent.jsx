@@ -58,13 +58,13 @@ export default class HeaderComponent extends React.Component {
 		}
 
 		const titleStyle = {
+			marginTop: '5px',
 			display: 'inline-block'
 		};
 		const divStyle = {
 			paddingBottom: '5px'
 		};
 		const divRightStyle = {
-			float: 'right',
 			marginTop: '5px',
 			display: 'flex'
 		};
@@ -87,20 +87,22 @@ export default class HeaderComponent extends React.Component {
 
 		return (
 			<div className="container-fluid" style={divStyle}>
-				<div className="col-xs-4">
-					<Link to="/"><LogoComponent url="./app/images/logo.png" /></Link>
-				</div>
-				<div className="col-xs-4 text-center">
-					<h1 style={titleStyle}>{this.props.title}</h1>
-				</div>
-				<div style={divRightStyle}>
-					<div className="visible-sm visible-xs">
-						{(renderOptionsButton) ? <UIModalComponent /> : null}
+				<div className="row">
+					<div className="col-4">
+						<Link to="/"><LogoComponent url="./app/images/logo.png" /></Link>
 					</div>
-					<Link style={loginLinkStyle} to="/login"><Button bsStyle="default">Log In</Button></Link>
-					<Link style={adminLinkStyle} to="/admin"><Button bsStyle="default">Admin panel</Button></Link>
-					<Link style={groupsLinkStyle} to="/groups"><Button bsStyle="default">Groups</Button></Link>
-					<Link style={logoutButtonStyle} to="/"><Button bsStyle="default" onClick={this.handleLogOut}>Log Out</Button></Link>
+					<div className="col-4 text-center">
+						<h1 style={titleStyle}>{this.props.title}</h1>
+					</div>
+					<div className="col-4 justify-content-end" style={divRightStyle}>
+						<div className="d-lg-none">
+							{(renderOptionsButton) ? <UIModalComponent /> : null}
+						</div>
+						<Link style={loginLinkStyle} to="/login"><Button bsStyle="default">Log In</Button></Link>
+						<Link style={adminLinkStyle} to="/admin"><Button bsStyle="default">Admin panel</Button></Link>
+						<Link style={groupsLinkStyle} to="/groups"><Button bsStyle="default">Groups</Button></Link>
+						<Link style={logoutButtonStyle} to="/"><Button bsStyle="default" onClick={this.handleLogOut}>Log Out</Button></Link>
+					</div>
 				</div>
 			</div>
 		);

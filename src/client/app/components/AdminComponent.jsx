@@ -78,14 +78,17 @@ export default class AdminComponent extends React.Component {
 			paddingBottom: '5px'
 		};
 		const marginBottomStyle = {
-			marginBottom: '15px'
+			marginBottom: '35px'
+		};
+		const smallMarginBottomStyle = {
+			marginBottom: '5px'
 		};
 		return (
 			<div>
 				<HeaderContainer />
 				<div className="container-fluid">
 					<div className="row" style={marginBottomStyle}>
-						<div className="col-xs-3">
+						<div className="col-3">
 							<div style={bottomPaddingStyle}>
 								<p style={titleStyle}>Default Site Title:</p>
 								<FormControl
@@ -155,17 +158,22 @@ export default class AdminComponent extends React.Component {
 						</div>
 					</div>
 					<div className="row">
-						<div className="col-xs-2">
-							<Dropzone accept="text/csv, application/vnd.ms-excel," onDrop={this.handleFileToImport}>
-								<div> Add in a CSV file here:</div>
-							</Dropzone>
+						<div className="col-2">
+							<p style={titleStyle}>Import meter readings:</p>
 							<MultiSelectComponent
+								style={smallMarginBottomStyle}
 								options={this.props.meters}
 								selectedOptions={this.props.selectedImportMeter}
 								placeholder="Select meter to import data"
 								onValuesChange={s => this.props.updateSelectedImportMeter(s)}
 								singleSelect
 							/>
+							{ this.props.selectedImportMeter &&
+								<Dropzone accept="text/csv, application/vnd.ms-excel," onDrop={this.handleFileToImport}>
+									<div>Upload a CSV file:</div>
+								</Dropzone>
+							}
+
 						</div>
 					</div>
 				</div>
