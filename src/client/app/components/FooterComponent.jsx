@@ -7,20 +7,18 @@ import React from 'react';
 
 /**
  * React component that controls the footer strip at the bottom of all pages
- * @param props The props passed down by the parent component
  * @return JSX to create the footer
  */
 export default function FooterComponent() {
 	const footerStyle = {
-		position: 'absolute',
+		position: 'fixed',
 		bottom: '1em',
 		paddingTop: '1em',
 		paddingLeft: '.5em',
 		paddingRight: '.5em',
 		borderTop: '1px #e1e4e8 solid',
-		color: '#999',
 		textAlign: 'center',
-		width: '98%'
+		width: '100%'
 	};
 
 

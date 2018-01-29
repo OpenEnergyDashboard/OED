@@ -45,7 +45,7 @@ export default class CreateGroupComponent extends React.Component {
 			textAlign: 'center'
 		};
 		return (
-			<div style={divStyle} className="col-xs-6">
+			<div style={divStyle} className="col-6">
 				<h3 style={centerTextStyle}>Create a New Group</h3>
 				<div style={divBottomStyle}>
 					<p style={textStyle}>Name:</p>

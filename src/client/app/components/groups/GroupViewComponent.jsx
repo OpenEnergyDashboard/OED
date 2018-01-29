@@ -36,11 +36,11 @@ export default class GroupViewComponent extends React.Component {
 			<div>
 				<h2 style={nameStyle}>{this.props.name}</h2>
 				<div className="row">
-					<div className="col-xs-6">
+					<div className="col-6">
 						<p style={boldStyle}>Child Meters:</p>
 						<ListDisplayComponent items={this.props.childMeters} />
 					</div>
-					<div className="col-xs-6">
+					<div className="col-6">
 						<p style={boldStyle}>Child Groups:</p>
 						<ListDisplayComponent items={this.props.childGroups} />
 					</div>

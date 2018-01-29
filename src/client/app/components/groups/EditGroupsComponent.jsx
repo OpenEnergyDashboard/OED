@@ -116,73 +116,75 @@ export default class EditGroupsComponent extends React.Component {
 			textAlign: 'center'
 		};
 		return (
-			<div style={divStyle} className="col-xs-6">
-				<h3 style={centerTextStyle}>Edit Group</h3>
-				<p style={boldStyle}>Name:</p>
-				<FormControl type="text" placeholder="Name" value={this.state.name} onChange={this.handleNameChange} />
-				<div className="row" style={metersDivStyle}>
-					<div className="col-xs-5">
-						<p style={boldStyle}>Child meters:</p>
-						<DatasourceBoxContainer
-							type="meter"
-							selection="custom"
-							datasource={this.props.childMeters}
-							selectedOptions={this.state.defaultSelectedMeters}
-							selectDatasource={this.handleUpdatedSelectedMeters}
-						/>
+			<div className="row">
+				<div style={divStyle} className="col-6">
+					<h3 style={centerTextStyle}>Edit Group</h3>
+					<p style={boldStyle}>Name:</p>
+					<FormControl type="text" placeholder="Name" value={this.state.name} onChange={this.handleNameChange} />
+					<div className="row" style={metersDivStyle}>
+						<div className="col-5">
+							<p style={boldStyle}>Child meters:</p>
+							<DatasourceBoxContainer
+								type="meter"
+								selection="custom"
+								datasource={this.props.childMeters}
+								selectedOptions={this.state.defaultSelectedMeters}
+								selectDatasource={this.handleUpdatedSelectedMeters}
+							/>
+						</div>
+						<div className="col-2" style={leftRightButtonsDivStyle}>
+							<Button onClick={this.handleMoveUnusedMetersToChildMeters} style={leftRightButtonStyle}>
+								<Glyphicon glyph="chevron-left" />
+							</Button>
+							<Button onClick={this.handleMoveChildMetersToUnusedMeters} style={leftRightButtonStyle}>
+								<Glyphicon glyph="chevron-right" />
+							</Button>
+						</div>
+						<div className="col-5">
+							<p style={boldStyle}>Unused meters:</p>
+							<DatasourceBoxContainer
+								type="meter"
+								selection="custom"
+								datasource={this.props.allMetersExceptChildMeters}
+								selectedOptions={this.state.defaultUnusedMeters}
+								selectDatasource={this.handleUpdateUnusedMeters}
+							/>
+						</div>
 					</div>
-					<div className="col-xs-2" style={leftRightButtonsDivStyle}>
-						<Button onClick={this.handleMoveUnusedMetersToChildMeters} style={leftRightButtonStyle}>
-							<Glyphicon glyph="chevron-left" />
-						</Button>
-						<Button onClick={this.handleMoveChildMetersToUnusedMeters} style={leftRightButtonStyle}>
-							<Glyphicon glyph="chevron-right" />
-						</Button>
+					<div className="row" style={groupsDivStyle}>
+						<div className="col-5">
+							<p style={boldStyle}>Child groups:</p>
+							<DatasourceBoxContainer
+								type="group"
+								selection="custom"
+								datasource={this.props.childGroups}
+								selectedOptions={this.state.defaultSelectedGroups}
+								selectDatasource={this.handleUpdateSelectedGroups}
+							/>
+						</div>
+						<div className="col-2" style={leftRightButtonsDivStyle}>
+							<Button onClick={this.handleMoveUnusedGroupsToChildGroups} style={leftRightButtonStyle}>
+								<Glyphicon glyph="chevron-left" />
+							</Button>
+							<Button onClick={this.handleMoveChildGroupsToUnusedGroups} style={leftRightButtonStyle}>
+								<Glyphicon glyph="chevron-right" />
+							</Button>
+						</div>
+						<div className="col-5">
+							<p style={boldStyle}>Unused groups:</p>
+							<DatasourceBoxContainer
+								type="group"
+								selection="custom"
+								datasource={this.props.allGroupsExceptChildGroups}
+								selectedOptions={this.state.defaultUnusedGroups}
+								selectDatasource={this.handleUpdateUnusedGroups}
+							/>
+						</div>
 					</div>
-					<div className="col-xs-5">
-						<p style={boldStyle}>Unused meters:</p>
-						<DatasourceBoxContainer
-							type="meter"
-							selection="custom"
-							datasource={this.props.allMetersExceptChildMeters}
-							selectedOptions={this.state.defaultUnusedMeters}
-							selectDatasource={this.handleUpdateUnusedMeters}
-						/>
-					</div>
+					<Button type="submit" onClick={this.handleReturnToView}>Cancel</Button>
+					<Button type="submit" onClick={this.handleEditGroup}>Submit changes</Button>
+					<Button className="justify-content-end" type="submit" onClick={this.handleDeleteGroup}>Delete group</Button>
 				</div>
-				<div className="row" style={groupsDivStyle}>
-					<div className="col-xs-5">
-						<p style={boldStyle}>Child groups:</p>
-						<DatasourceBoxContainer
-							type="group"
-							selection="custom"
-							datasource={this.props.childGroups}
-							selectedOptions={this.state.defaultSelectedGroups}
-							selectDatasource={this.handleUpdateSelectedGroups}
-						/>
-					</div>
-					<div className="col-xs-2" style={leftRightButtonsDivStyle}>
-						<Button onClick={this.handleMoveUnusedGroupsToChildGroups} style={leftRightButtonStyle}>
-							<Glyphicon glyph="chevron-left" />
-						</Button>
-						<Button onClick={this.handleMoveChildGroupsToUnusedGroups} style={leftRightButtonStyle}>
-							<Glyphicon glyph="chevron-right" />
-						</Button>
-					</div>
-					<div className="col-xs-5">
-						<p style={boldStyle}>Unused groups:</p>
-						<DatasourceBoxContainer
-							type="group"
-							selection="custom"
-							datasource={this.props.allGroupsExceptChildGroups}
-							selectedOptions={this.state.defaultUnusedGroups}
-							selectDatasource={this.handleUpdateUnusedGroups}
-						/>
-					</div>
-				</div>
-				<Button type="submit" onClick={this.handleReturnToView}>Cancel</Button>
-				<Button type="submit" onClick={this.handleEditGroup}>Submit changes</Button>
-				<Button className="pull-right" type="submit" onClick={this.handleDeleteGroup}>Delete group</Button>
 			</div>
 		);
 	}
