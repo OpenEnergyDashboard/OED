@@ -3,6 +3,7 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
 
 const config = require('../../config');
+const { log, LogLevel } = require('../../log');
 
 // This swaps us to the test database for running test.
 // TODO: Fix up configuration between different environments. Maybe use the config npm package.
@@ -14,6 +15,10 @@ config.database = {
 	host: process.env.OED_DB_TEST_HOST || process.env.OED_DB_HOST,
 	port: process.env.OED_DB_TEST_PORT || process.env.OED_DB_PORT
 };
+
+// Disable logging during tests.
+// TODO: Move logging disabling to a better place.
+log.level = LogLevel.SILENT;
 
 const { db, createSchema } = require('../../models/database');
 
