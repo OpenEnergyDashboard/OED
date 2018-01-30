@@ -28,7 +28,7 @@ export default class MenuModalComponent extends React.Component {
 			<div style={inlineStyle}>
 				<Button outline onClick={this.toggle}>Menu</Button>
 				<Modal isOpen={this.state.showModal} toggle={this.toggle}>
-					<ModalHeader>Options</ModalHeader>
+					<ModalHeader toggle={this.toggle}>Options</ModalHeader>
 					<ModalBody>
 						<HeaderButtonsComponent renderOptionsButton={false} />
 						{ this.props.showUIOptions &&
