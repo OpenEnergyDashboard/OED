@@ -5,8 +5,9 @@
 import React from 'react';
 import { Modal, ModalHeader, ModalBody, Button } from 'reactstrap';
 import UIOptionsContainer from '../containers/UIOptionsContainer';
+import HeaderButtonsComponent from './HeaderButtonsComponent';
 
-export default class UIModalComponent extends React.Component {
+export default class MenuModalComponent extends React.Component {
 
 	constructor(props) {
 		super(props);
@@ -25,11 +26,14 @@ export default class UIModalComponent extends React.Component {
 		};
 		return (
 			<div style={inlineStyle}>
-				<Button outline onClick={this.toggle}>Options</Button>
+				<Button outline onClick={this.toggle}>Menu</Button>
 				<Modal isOpen={this.state.showModal} toggle={this.toggle}>
 					<ModalHeader>Options</ModalHeader>
 					<ModalBody>
-						<UIOptionsContainer />
+						<HeaderButtonsComponent renderOptionsButton={false} />
+						{ this.props.showUIOptions &&
+							<UIOptionsContainer />
+						}
 					</ModalBody>
 				</Modal>
 			</div>

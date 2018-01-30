@@ -5,7 +5,7 @@
 import React from 'react';
 import axios from 'axios';
 import { browserHistory } from 'react-router';
-import { Input, Button, InputGroup } from 'reactstrap';
+import { Input, Button, InputGroup, Form } from 'reactstrap';
 import HeaderContainer from '../containers/HeaderContainer';
 import FooterComponent from '../components/FooterComponent';
 import { showErrorNotification } from '../utils/notifications';
@@ -83,12 +83,12 @@ export default class LoginComponent extends React.Component {
 		return (
 			<div>
 				<HeaderContainer />
-				<div style={formStyle}>
+				<Form style={formStyle}>
 					<InputGroup>
 						<Input
 							type="text"
-							className="form-control"
-							placeholder="Email" ref={c => { this.inputEmail = c; }}
+							placeholder="Email"
+							innerRef={c => { this.inputEmail = c; }}
 							value={this.state.email}
 							onChange={this.handleEmailChange}
 						/>
@@ -102,7 +102,7 @@ export default class LoginComponent extends React.Component {
 						/>
 					</InputGroup>
 					<Button outline style={buttonStyle} type="submit" onClick={this.handleSubmit}>Submit</Button>
-				</div>
+				</Form>
 				<FooterComponent />
 			</div>
 		);
