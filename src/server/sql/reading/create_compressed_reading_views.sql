@@ -43,24 +43,24 @@ minutely_readings
 						 (r.reading / (extract(EPOCH FROM (r.end_timestamp - r.start_timestamp)) / 3600)) -- Reading rate in kw
 						 *
 						 extract(EPOCH FROM -- The number of seconds that the reading shares with the interval
-										 least(r.end_timestamp, gen.interval_start + '1 hour'::INTERVAL)
+										 least(r.end_timestamp, gen.interval_start + '1 minute'::INTERVAL)
 										 -
 										 greatest(r.start_timestamp, gen.interval_start)
 						 )
 				 ) / sum(
 						 extract(EPOCH FROM -- The number of seconds that the reading shares with the interval
-										 least(r.end_timestamp, gen.interval_start + '1 hour'::INTERVAL)
+										 least(r.end_timestamp, gen.interval_start + '1 minute'::INTERVAL)
 										 -
 										 greatest(r.start_timestamp, gen.interval_start)
 						 )
 				 )) AS reading_rate,
-				tsrange(gen.interval_start, gen.interval_start + '1 hour'::INTERVAL, '()') AS time_interval
+				tsrange(gen.interval_start, gen.interval_start + '1 minute'::INTERVAL, '()') AS time_interval
 			FROM readings r
 				CROSS JOIN LATERAL generate_series(
-						date_trunc('hour', r.start_timestamp),
+						date_trunc('minute', r.start_timestamp),
 						-- Subtract 1 interval width because generate_series is end-inclusive
-						date_trunc_up('hour', r.end_timestamp) - '1 hour'::INTERVAL,
-						'1 hour'::INTERVAL
+						date_trunc_up('minute', r.end_timestamp) - '1 minute'::INTERVAL,
+						'1 minute'::INTERVAL
 				) gen(interval_start)
 			GROUP BY r.meter_id, gen.interval_start;
 
@@ -136,8 +136,8 @@ CREATE INDEX idx_daily_readings ON daily_readings USING GIST(time_interval, mete
 /*
 The following function determines the correct duration view to query from, and returns compressed data from it.
  */
-CREATE FUNCTION compressed_readings_2(meter_ids INTEGER[], start_timestamp TIMESTAMP, end_timestamp TIMESTAMP)
-	RETURNS TABLE(meter_id INTEGER, reading_rate REAL, time_interval TSRANGE)
+CREATE FUNCTION compressed_readings_2(meter_ids INTEGER[], start_stamp TIMESTAMP, end_stamp TIMESTAMP)
+	RETURNS TABLE(meter_id INTEGER, reading_rate FLOAT, start_timestamp TIMESTAMP, end_timestamp TIMESTAMP)
 AS $$
 DECLARE
 	requested_interval INTERVAL;
@@ -158,27 +158,63 @@ BEGIN
 	*/
 
 	-- TODO: Shrink this to actual timestamps that exist.
-	requested_interval := end_timestamp - start_timestamp;
-	requested_range := tsrange(start_timestamp, end_timestamp, '[]');
+	requested_interval := end_stamp - start_stamp;
+	requested_range := tsrange(start_stamp, end_stamp, '[]');
 
 	IF extract(DAY FROM requested_interval) >= minimum_num_pts THEN
 		RETURN QUERY
-			SELECT *
-			FROM daily_readings
+			SELECT
+				daily.meter_id AS meter_id,
+				daily.reading_rate,
+				lower(daily.time_interval) AS start_timestamp,
+				upper(daily.time_interval) AS end_timestamp
+			FROM daily_readings daily
 			INNER JOIN unnest(meter_ids) meters(id) ON daily_readings.meter_id = meters.id
 			WHERE requested_range @> time_interval;
 	ELSIF extract(HOURS FROM requested_interval) >= minimum_num_pts THEN
 		RETURN QUERY
-		SELECT *
-		FROM hourly_readings
+			SELECT hourly.meter_id AS meter_id,
+				hourly.reading_rate,
+				lower(hourly.time_interval) AS start_timestamp,
+				upper(hourly.time_interval) AS end_timestamp
+			FROM hourly_readings hourly
 			INNER JOIN unnest(meter_ids) meters(id) ON hourly_readings.meter_id = meters.id
 		WHERE requested_range @> time_interval;
 	ELSE
 		RETURN QUERY
-		SELECT *
+		SELECT
+			minutely_readings.meter_id as meter_id,
+			minutely_readings.reading_rate as reading_rate,
+			lower(minutely_readings.time_interval) AS start_timestamp,
+			upper(minutely_readings.time_interval) AS end_timestamp
 		FROM minutely_readings
 			INNER JOIN unnest(meter_ids) meters(id) ON minutely_readings.meter_id = meters.id
-		WHERE requested_range @> time_interval;
+		WHERE requested_range @> minutely_readings.time_interval;
 	END IF;
 END
+$$ LANGUAGE 'plpgsql';
+
+
+CREATE FUNCTION compressed_group_readings_2(group_ids INTEGER[], start_stamp TIMESTAMP, end_stamp TIMESTAMP)
+	RETURNS TABLE(group_id INTEGER, reading_rate FLOAT, start_timestamp TIMESTAMP, end_timestamp TIMESTAMP)
+AS $$
+	DECLARE
+		meter_ids INTEGER[];
+	BEGIN
+		-- First get all the meter ids that will be included in one or more groups being queried
+		SELECT array_agg(gdm.meter_id) INTO meter_ids
+		FROM groups_deep_meters gdm
+		INNER JOIN unnest(group_ids) gids(id) ON gdm.group_id = gids.id;
+
+		RETURN QUERY
+			SELECT
+				gdm.group_id AS group_id,
+				SUM(compressed.reading_rate) AS reading_rate,
+				compressed.start_timestamp,
+				compressed.end_timestamp
+			FROM compressed_readings_2(meter_ids, start_stamp, end_stamp) compressed
+			INNER JOIN groups_deep_meters gdm ON compressed.meter_id = gdm.meter_id
+			INNER JOIN unnest(group_ids) gids(id) on gdm.group_id = gids.id
+			GROUP BY gdm.group_id, compressed.start_timestamp, compressed.end_timestamp;
+	END;
 $$ LANGUAGE 'plpgsql';

@@ -250,6 +250,54 @@ class Reading {
 		return barchartReadingsByGroupID;
 	}
 
+	/**
+	 * Gets compressed readings for the given time range
+	 * @param meterIDs
+	 * @param fromTimestamp
+	 * @param toTimestamp
+	 * @param conn the connection to use. Defaults to the default database connection.
+	 * @return {Promise<object<int, array<{reading_rate: number, start_timestamp: }>>>}
+	 */
+	static async getNewCompressedReadings(meterIDs, fromTimestamp, toTimestamp, conn = db) {
+		/**
+		 * @type {array<{meter_id: int, reading_rate: Number, start_timestamp: Moment, end_timestamp: Moment}>}
+		 */
+		const allCompressedReadings = await conn.func('compressed_readings_2', [meterIDs, fromTimestamp, toTimestamp]);
+
+		const compressedReadingsByMeterID = mapToObject(meterIDs, () => []);
+		for (const row of allCompressedReadings) {
+			compressedReadingsByMeterID[row.meter_id].push(
+				{reading_rate: row.reading_rate, start_timestamp: row.start_timestamp, end_timestamp: row.end_timestamp}
+			)
+		}
+		return compressedReadingsByMeterID;
+	}
+
+
+	/**
+	 * Gets compressed readings for the given time range
+	 * @param groupIDs
+	 * @param fromTimestamp
+	 * @param toTimestamp
+	 * @param conn the connection to use. Defaults to the default database connection.
+	 * @return {Promise<object<int, array<{reading_rate: number, start_timestamp: }>>>}
+	 */
+	static async getNewCompressedGroupReadings(groupIDs, fromTimestamp, toTimestamp, conn = db) {
+		/**
+		 * @type {array<{group_id: int, reading_rate: Number, start_timestamp: Moment, end_timestamp: Moment}>}
+		 */
+		const allCompressedGroupReadings = await conn.func('compressed_group_readings_2', [groupIDs, fromTimestamp, toTimestamp]);
+
+		const compressedReadingsByGroupID = mapToObject(groupIDs, () => []);
+		for (const row of allCompressedGroupReadings) {
+			compressedReadingsByGroupID[row.group_id].push(
+				{reading_rate: row.reading_rate, start_timestamp: row.start_timestamp, end_timestamp: row.end_timestamp}
+			)
+		}
+		return compressedReadingsByGroupID;
+	}
+
+
 
 	toString() {
 		return `Reading [id: ${this.meterID}, reading: ${this.reading}, startTimestamp: ${this.startTimestamp}, endTimestamp: ${this.endTimestamp}]`;

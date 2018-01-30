@@ -41,3 +41,5 @@ function compressedReadingViewSQL(intervalPrecision) {
 	GROUP BY r.meter_id, gen.interval_start;
 	`
 }
+
+console.log(compressedReadingViewSQL('minute'));
