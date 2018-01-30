@@ -171,5 +171,30 @@ mocha.describe('Compressed Readings 2', () => {
 
 			expect(readingsForGroup.length).to.equal(1 * 60); // Minute compression, 1 hour duration
 		});
+
+		mocha.it('Compresses when two groups have different meters', async () => {
+			const startOfDay = moment('2018-01-01');
+
+			// Each meter gets a reading. Meter1 is at 100 kw, Meter2 is at 200.
+			await Reading.insertAll([
+				new Reading(meter1.id, 100, startOfDay, startOfDay.clone().add(1, 'hour')),
+				new Reading(meter2.id, 200, startOfDay, startOfDay.clone().add(1, 'hour'))
+			]);
+
+			// Associate both meters with a single group
+			await group1.adoptMeter(meter1.id);
+			await group2.adoptMeter(meter2.id);
+
+			const groupReadings = await Reading.getNewCompressedGroupReadings(
+				[group1.id, group2.id], startOfDay, startOfDay.clone().add(1, 'hour')
+			);
+
+			expect(Object.keys(groupReadings).length).to.equal(2);
+			const readingsForG1 = groupReadings[group1.id];
+			const readingsForG2 = groupReadings[group2.id];
+
+			expect(readingsForG1.length).to.equal(1 * 60); // Minute compression, 1 hour duration
+			expect(readingsForG2.length).to.equal(1 * 60); // Minute compression, 1 hour duration
+		});
 	});
 });
