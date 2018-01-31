@@ -8,7 +8,7 @@
     "dev": "webpack -d --watch --color --progress",
     "build": "cross-env NODE_ENV=production webpack -p",
     "checkHeader": "./src/scripts/checkHeader.sh",
-    "lint": "./node_modules/.bin/eslint src/client/app/**/*.js src/client/app/**/*.jsx src/server/**/*.js src/server/**/*.jsx src/server/*.js",
+    "lint": "./node_modules/.bin/eslint src/client/app/**/*.js src/client/app/**/*.jsx src/server/**/*.js src/server/*.js",
     "test": "./node_modules/.bin/mocha \"src/server/test/**/*.js\"",
     "createdb": "node ./src/server/services/createDB.js",
     "addMamacMeters": "node ./src/server/services/addMamacMeters.js",
