@@ -17,7 +17,7 @@ interface MultiSelectProps<I> {
 }
 
 interface MultiSelectState {
-	selectedOptions: SelectOption[];
+	selectedOptions?: SelectOption[];
 }
 
 export default class MultiSelectComponent<I> extends React.Component<MultiSelectProps<I>, MultiSelectState> {
@@ -26,7 +26,7 @@ export default class MultiSelectComponent<I> extends React.Component<MultiSelect
 		this.onValuesChangeInternal = this.onValuesChangeInternal.bind(this);
 		// selectedOptions holds a list of the options that have been selected
 		this.state = {
-			selectedOptions: this.props.selectedOptions ? this.props.selectedOptions : []
+			selectedOptions: this.props.selectedOptions ? this.props.selectedOptions : undefined
 		};
 	}
 

@@ -3,8 +3,15 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
 
 import { connect } from 'react-redux';
+import * as _ from 'lodash';
 import AdminComponent from '../components/AdminComponent';
-import { updateDisplayTitle, updateDefaultChartToRender, toggleDefaultBarStacking, submitPreferencesIfNeeded } from '../actions/admin';
+import {
+	updateDisplayTitle,
+	updateDefaultChartToRender,
+	toggleDefaultBarStacking,
+	submitPreferencesIfNeeded,
+	updateSelectedMeter } from '../actions/admin';
+
 import { Dispatch } from '../types/redux/actions';
 import { State } from '../types/redux/state';
 import { ChartTypes } from '../types/redux/graph';
@@ -14,12 +21,15 @@ function mapStateToProps(state: State) {
 		displayTitle: state.admin.displayTitle,
 		defaultChartToRender: state.admin.defaultChartToRender,
 		defaultBarStacking: state.admin.defaultBarStacking,
-		disableSubmitPreferences: state.admin.submitted
+		disableSubmitPreferences: state.admin.submitted,
+		meters: _.sortBy(_.values(state.meters.byMeterID).map(meter => ({ value: meter.id, label: meter.name.trim() })), 'name'),
+		selectedImportMeter: state.admin.selectedMeter
 	};
 }
 
 function mapDispatchToProps(dispatch: Dispatch) {
 	return {
+		updateSelectedImportMeter: (meterID: number) => dispatch(updateSelectedMeter(meterID)),
 		updateDisplayTitle: (displayTitle: string) => dispatch(updateDisplayTitle(displayTitle)),
 		updateDefaultChartType: (defaultChartToRender: ChartTypes) => dispatch(updateDefaultChartToRender(defaultChartToRender)),
 		toggleDefaultBarStacking: () => dispatch(toggleDefaultBarStacking()),

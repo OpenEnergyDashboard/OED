@@ -3,17 +3,28 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
 
 import * as React from 'react';
+import axios from 'axios';
 import { FormControl, Button } from 'react-bootstrap';
 import { ChartTypes } from '../types/redux/graph';
 import HeaderContainer from '../containers/HeaderContainer';
 import FooterComponent from '../components/FooterComponent';
-import { ToggleDefaultBarStackingAction, UpdateDefaultChartToRenderAction, UpdateDisplayTitleAction } from '../types/redux/admin';
+import { getToken } from '../utils/token';
+import { showSuccessNotification, showErrorNotification } from '../utils/notifications';
+import {
+	ToggleDefaultBarStackingAction,
+	UpdateDefaultChartToRenderAction,
+	UpdateDisplayTitleAction,
+	UpdateImportMeterAction } from '../types/redux/admin';
+import { SelectOption } from '../types/items';
 
 interface AdminProps {
 	displayTitle: string;
 	defaultChartToRender: ChartTypes;
 	defaultBarStacking: boolean;
 	disableSubmitPreferences: boolean;
+	selectedImportMeter: SelectOption;
+	meters: SelectOption[];
+	updateSelectedImportMeter(meterID: number): UpdateImportMeterAction;
 	updateDisplayTitle(title: string): UpdateDisplayTitleAction;
 	updateDefaultChartType(defaultChartToRender: ChartTypes): UpdateDefaultChartToRenderAction;
 	toggleDefaultBarStacking(): ToggleDefaultBarStackingAction;
@@ -28,6 +39,7 @@ export default class AdminComponent extends React.Component<AdminProps, {}> {
 		this.handleDefaultChartToRenderChange = this.handleDefaultChartToRenderChange.bind(this);
 		this.handleDefaultBarStackingChange = this.handleDefaultBarStackingChange.bind(this);
 		this.handleSubmitPreferences = this.handleSubmitPreferences.bind(this);
+		this.handleFileToImport = this.handleFileToImport.bind(this);
 	}
 
 	public render() {
@@ -117,12 +129,12 @@ export default class AdminComponent extends React.Component<AdminProps, {}> {
 	}
 
 
-	private handleDisplayTitleChange(e: React.ChangeEvent<HTMLInputElement>) {
-		this.props.updateDisplayTitle(e.target.value);
+	private handleDisplayTitleChange(e: React.FormEvent<FormControl>) {
+		this.props.updateDisplayTitle((e.target as HTMLInputElement).value);
 	}
 
-	private handleDefaultChartToRenderChange(e: React.ChangeEvent<HTMLInputElement>) {
-		this.props.updateDefaultChartType(e.target.value as ChartTypes);
+	private handleDefaultChartToRenderChange(e: React.FormEvent<HTMLInputElement>) {
+		this.props.updateDefaultChartType((e.target as HTMLInputElement).value as ChartTypes);
 	}
 
 	private handleDefaultBarStackingChange() {
@@ -131,5 +143,30 @@ export default class AdminComponent extends React.Component<AdminProps, {}> {
 
 	private handleSubmitPreferences() {
 		this.props.submitPreferences();
+	}
+
+	private handleFileToImport(files: string[]) {
+		// token passed as a header
+		if (!this.props.selectedImportMeter) {
+			showErrorNotification('Please select a meter');
+		} else {
+			const file = files[0];
+			const data = new FormData();
+			data.append('csvFile', file);
+			axios({
+				method: 'post',
+				url: `/api/fileProcessing/${this.props.selectedImportMeter.value}`,
+				data,
+				params: {
+					token: getToken()
+				}
+			})
+			.then(() => {
+				showSuccessNotification('Successfully uploaded meter data');
+			})
+			.catch(() => {
+				showErrorNotification('Error uploading meter data');
+			});
+		}
 	}
 }

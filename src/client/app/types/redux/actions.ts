@@ -53,6 +53,7 @@ export enum ActionType {
 	MarkGroupsByIDOutdated = 'MARK_GROUPS_BY_ID_OUTDATED',
 	MarkOneGroupOutdated = 'MARK_ONE_GROUP_OUTDATED',
 
+	UpdateImportMeter = 'UPDATE_IMPORT_METER',
 	UpdateDisplayTitle = 'UPDATE_DISPLAY_TITLE',
 	UpdateDefaultChartToRender = 'UPDATE_DEFAULT_CHART_TO_RENDER',
 	ToggleDefaultBarStacking = 'TOGGLE_DEFAULT_BAR_STACKING',

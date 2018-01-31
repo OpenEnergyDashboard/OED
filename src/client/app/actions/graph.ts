@@ -11,7 +11,7 @@ import { TimeInterval } from '../../../common/TimeInterval';
 import { Dispatch, Thunk, ActionType } from '../types/redux/actions';
 import { State } from '../types/redux/state';
 import * as t from '../types/redux/graph';
-
+import { Duration } from 'moment';
 
 export function changeChartToRender(chartType: t.ChartTypes): t.ChangeChartToRenderAction {
 	return { type: ActionType.ChangeChartToRender, chartType };
@@ -41,6 +41,23 @@ export function changeBarDuration(barDuration: moment.Duration): Thunk {
 	return (dispatch, getState) => {
 		dispatch(updateBarDuration(barDuration));
 		dispatch(fetchNeededBarReadings(getState().graph.timeInterval));
+		return Promise.resolve();
+	};
+}
+
+function updateCompareTimeInterval(compareTimeInterval: TimeInterval): t.UpdateCompareIntervalAction {
+	return { type: ActionType.UpdateCompareInterval, compareTimeInterval };
+}
+
+function updateCompareDuration(compareDuration: Duration): t.UpdateCompareDurationAction {
+	return { type: ActionType.UpdateCompareDuration, compareDuration };
+}
+
+export function changeCompareTimeInterval(compareTimeInterval: TimeInterval, compareDuration: Duration): Thunk {
+	return (dispatch, getState) => {
+		dispatch(updateCompareTimeInterval(compareTimeInterval));
+		dispatch(updateCompareDuration(compareDuration));
+		dispatch(fetchNeededCompareReadings(getState().graph.compareTimeInterval));
 		return Promise.resolve();
 	};
 }

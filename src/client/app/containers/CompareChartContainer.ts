@@ -6,6 +6,7 @@ import { Bar, ChartComponentProps } from 'react-chartjs-2';
 import { ChartData, ChartDataSets } from 'chart.js';
 import * as moment from 'moment';
 import { connect } from 'react-redux';
+import { TimeInterval } from '../../../common/TimeInterval';
 // This is better than using an import, since we don't actually use anything from the plugin in the code.
 /// <reference path="chartjs-plugin-datalabels" />
 import { State } from '../types/redux/state';
@@ -22,64 +23,58 @@ interface CompareChartContainerProps {
 	isGroup: boolean;
 }
 
-/**
- * @param {State} state
- * @param ownProps
- */
 function mapStateToProps(state: State, ownProps: CompareChartContainerProps) {
 	const timeInterval = state.graph.compareTimeInterval.toString();
-	const compareDuration = state.graph.compareDuration.toISOString();
+	const barDuration = state.graph.compareDuration.toISOString();
+	const timeIntervalDurationInDays = TimeInterval.fromString(timeInterval).duration('days');
 	const datasets: ChartDataSetsWithDatalabels[] = [];
 	const labels: string[] = [];
 	// Power used so far this week
-	let currentWeek = 0;
+	let current = 0;
 	// Last week total usage
-	let lastWeek = 0;
+	let prev = 0;
 	// Power used up to this point last week
-	let currentLastWeek = 0;
-	const soFar = moment().diff(moment().startOf('week'), 'days');
+	let currentPrev = 0;
+	// How long it's been since start of measure period
+	let soFar;
+
+	let prevLabel;
+	let currLabel;
+	if (timeIntervalDurationInDays < 7) {
+		prevLabel = 'Yesterday';
+		currLabel = 'Today';
+	} else if (timeIntervalDurationInDays >= 7 && timeIntervalDurationInDays < 14) {
+		prevLabel = 'Last week';
+		currLabel = 'This week';
+	} else {
+		prevLabel = 'Last month';
+		currLabel = 'This month';
+	}
+	const currLabelLowercase = currLabel.toLowerCase();
 
 	// Compose the text to display to the user.
 	let delta;
 	if (ownProps.isGroup) {
-		delta = (change: number) => {
-			// On a NaN result, just give up.
-			if (isNaN(change)) { return ''; }
-
-			const name: string = state.groups.byGroupID[ownProps.id].name;
-			let changePercent;
-			let adverb;
+		delta = (changeForText: number) => {
+			if (isNaN(changeForText)) { return '' };
 			if (change < 0) {
-				changePercent = parseInt(change.toFixed(2).replace('.', '').slice(1), 10);
-				adverb = 'less';
-			} else {
-				changePercent = parseInt(change.toFixed(2).replace('.', ''), 10);
-				adverb = 'more';
+				return `${state.groups.byGroupID[ownProps.id].name} has used ${parseInt(change.toFixed(2).replace('.', '').slice(1))}% less energy ${currLabelLowercase}`;
 			}
-			return `${name} has used ${changePercent}% ${adverb} energy this week.`;
+			return `${state.groups.byGroupID[ownProps.id].name} has used ${parseInt(change.toFixed(2).replace('.', ''))}% more energy ${currLabelLowercase}`;
 		};
-	}	else {
-		delta = (change: number) => {
-			// On a NaN result, just give up.
-			if (isNaN(change)) { return ''; }
-
-			const name: string = state.meters.byMeterID[ownProps.id].name;
-			let changePercent;
-			let adverb;
+	} else {
+		delta = (changeForText: number) => {
+			if (isNaN(changeForText)) { return ''; }
 			if (change < 0) {
-				changePercent = parseInt(change.toFixed(2).replace('.', '').slice(1), 10);
-				adverb = 'less';
-			} else {
-				changePercent = parseInt(change.toFixed(2).replace('.', ''), 10);
-				adverb = 'more';
+				return `${state.meters.byMeterID[ownProps.id].name} has used ${parseInt(change.toFixed(2).replace('.', '').slice(1))}% less energy ${currLabelLowercase}`;
 			}
-			return `${name} has used ${changePercent}% ${adverb} energy this week.`;
+			return `${state.meters.byMeterID[ownProps.id].name} has used ${parseInt(change.toFixed(2).replace('.', ''))}% more energy ${currLabelLowercase}`;
 		};
 	}
 
 
-	const colorize = (change: number) => {
-		if (change < 0) {
+	const colorize = (changeForColorization: number) => {
+		if (changeForColorization < 0) {
 			return 'green';
 		}
 		return 'red';
@@ -88,72 +83,76 @@ function mapStateToProps(state: State, ownProps: CompareChartContainerProps) {
 	let readingsData: {isFetching: boolean, readings?: Array<[number, number]>} | undefined ;
 	if (ownProps.isGroup) {
 		const readingsDataByTimeInterval = state.readings.bar.byGroupID[ownProps.id][timeInterval];
-		readingsData = readingsDataByTimeInterval[compareDuration];
+		readingsData = readingsDataByTimeInterval[timeIntervalDurationInDays];
 	} else {
 		const readingsDataByTimeInterval = state.readings.bar.byGroupID[ownProps.id][timeInterval];
-		readingsData = readingsDataByTimeInterval[compareDuration];
+		readingsData = readingsDataByTimeInterval[timeIntervalDurationInDays];
 	}
-
-	if (readingsData !== undefined && readingsData.readings !== undefined && !readingsData.isFetching) {
-		// Sunday needs special logic
-		if (soFar !== 0) {
-			// Calculate currentWeek
-			for (let i = 1; i <= soFar; i++) {
-				currentWeek += readingsData.readings[readingsData.readings.length - i][1];
-			}
-			// Calculate lastWeek
-			for (let i = 0; i < 7; i++) {
-				lastWeek += readingsData.readings[readingsData.readings.length - (8 + i) - soFar][1];
-			}
-
-			// Calculate currentLastWeek
-			for (let i = 1; i <= soFar; i++) {
-				currentLastWeek += readingsData.readings[readingsData.readings.length - i - 7][1];
-			}
+	if (readingsData !== undefined && !readingsData.isFetching && readingsData.readings !== undefined) {
+		if (readingsData.readings.length < 7) {
+			soFar = moment().hour();
+		} else if (readingsData.readings.length < 14) {
+			soFar = moment().diff(moment().startOf('week'), 'days');
 		} else {
-			currentWeek = readingsData.readings[readingsData.readings.length - 1][1];
-			// Data is acquired in days so when less than a day has passed we need to estimate
-			currentLastWeek = Math.round((readingsData.readings[readingsData.readings.length - 8][1] / 24) * moment().hour());
-			for (let i = 0; i < 7; i++) {
-				lastWeek += readingsData.readings[readingsData.readings.length - 7][1];
+			// 21 to differentiate from week case, week case never larger than 14
+			soFar = moment().diff(moment().startOf('week').subtract(21, 'days'), 'days');
+		}
+
+		// Calculates current interval
+		for (let i = readingsData.readings.length - soFar; i < readingsData.readings.length; i++) {
+			current += readingsData.readings[i][1];
+		}
+		// Calculate prev interval
+		for (let i = 0; i < readingsData.readings.length - soFar; i++) {
+			prev += readingsData.readings[i][1];
+		}
+		// Calculates current for previous time interval
+		// Have to special case Sunday for week and month
+		if (soFar === 0) {
+			currentPrev = Math.round((readingsData.readings[0][1] / 24) * moment().hour());
+		} else {
+			for (let i = 0; i < soFar; i++) {
+				currentPrev += readingsData.readings[i][1];
 			}
 		}
-		labels.push('Last week');
-		labels.push('This week');
-		const color1 = 'rgba(173, 216, 230, 1)';
-		const color2 = 'rgba(218, 165, 32, 1)';
-		const color3 = 'rgba(173, 216, 230, 0.45)';
-		datasets.push(
-			{
-				data: [lastWeek, Math.round((currentWeek / currentLastWeek) * lastWeek)],
-				backgroundColor: [color1, color3],
-				hoverBackgroundColor: [color1, color3],
-				datalabels: {
-					anchor: 'end',
-					align: 'start'
-				}
-			}, {
-				data: [currentLastWeek, currentWeek],
-				backgroundColor: color2,
-				hoverBackgroundColor: color2,
-				datalabels: {
-					anchor: 'end',
-					align: 'start'
-				}
-			}
-		);
-		// sorts the data so that one doesn't cover up the other
-		datasets.sort((a, b) => {
-			if (a.data !== undefined && b.data !== undefined) {
-				return +(a.data[0]) - +(b.data[0]);
-			} else {
-				return 0;
-			}
-		});
 	}
 
-	const data: ChartData = {datasets, labels};
+	labels.push(prevLabel);
+	labels.push(currLabel);
+	const color1 = 'rgba(173, 216, 230, 1)';
+	const color2 = 'rgba(218, 165, 32, 1)';
+	const color3 = 'rgba(173, 216, 230, 0.45)';
+	datasets.push(
+		{
+			data: [prev, Math.round((current / currentPrev) * prev)],
+			backgroundColor: [color1, color3],
+			hoverBackgroundColor: [color1, color3],
+			datalabels: {
+				anchor: 'end',
+				align: 'start'
+			}
+		}, {
+			data: [currentPrev, current],
+			backgroundColor: color2,
+			hoverBackgroundColor: color2,
+			datalabels: {
+				anchor: 'end',
+				align: 'start'
+			}
+		}
+	);
+	// sorts the data so that one doesn't cover up the other
+	datasets.sort((a, b) => {
+		if (a.data !== undefined && b.data !== undefined) {
+			return +(a.data[0]) - +(b.data[0]);
+		} else {
+			return 0;
+		}
+	});
 
+
+	const data: ChartData = {datasets, labels};
+	const change = (-1 + (((current / currentPrev) * prev) / prev));
 	const options = {
 		animation: {
 			duration: 0
@@ -189,8 +188,8 @@ function mapStateToProps(state: State, ownProps: CompareChartContainerProps) {
 		},
 		title: {
 			display: true,
-			text: delta((-1 + (((currentWeek / currentLastWeek) * lastWeek) / lastWeek))),
-			fontColor: colorize((-1 + (((currentWeek / currentLastWeek) * lastWeek) / lastWeek)))
+			text: delta(change),
+			fontColor: colorize(change)
 		},
 		plugins: {
 			datalabels: {
@@ -213,5 +212,6 @@ function mapStateToProps(state: State, ownProps: CompareChartContainerProps) {
 
 	return props;
 }
+
 
 export default connect(mapStateToProps)(Bar);

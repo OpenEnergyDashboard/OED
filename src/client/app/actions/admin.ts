@@ -12,6 +12,10 @@ import * as t from '../types/redux/admin';
 import { ActionType, Dispatch, GetState, Thunk } from '../types/redux/actions';
 import { State } from '../types/redux/state';
 
+export function updateSelectedMeter(meterID: number): t.UpdateImportMeterAction {
+	return { type: ActionType.UpdateImportMeter, meterID };
+}
+
 export function updateDisplayTitle(displayTitle: string): t.UpdateDisplayTitleAction {
 	return { type: ActionType.UpdateDisplayTitle, displayTitle };
 }

@@ -14,4 +14,5 @@ export class TimeInterval {
 	public toString(): string;
 	public equals(other: TimeInterval): boolean;
 	public valueOf(): string;
+	public duration(specifier: string): number;
 }

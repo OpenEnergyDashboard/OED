@@ -18,8 +18,8 @@ import { showErrorNotification } from '../utils/notifications';
 import { ChartTypes } from '../types/redux/graph';
 
 interface RouteProps {
-	barStacking: boolean;
-	changeOptionsFromLink(options: LinkOptions): Promise<any>;
+	barStacking: boolean ;
+	changeOptionsFromLink(options: LinkOptions): Promise<any[]>;
 }
 
 export default class RouteComponent extends React.Component<RouteProps, {}> {

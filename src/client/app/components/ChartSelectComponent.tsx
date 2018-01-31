@@ -49,7 +49,7 @@ export default class ChartSelectComponent extends React.Component<ChartSelectPro
 		);
 	}
 
-	private handleChangeChartType(value: ChartTypes) {
-		this.props.changeChartType(value);
+	private handleChangeChartType(value: string) {
+		this.props.changeChartType(value as ChartTypes);
 	}
 }

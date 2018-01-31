@@ -2,11 +2,12 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
 
-import {PreferenceRequestItem} from '../items';
+import { PreferenceRequestItem, SelectOption } from '../items';
 import { ChartTypes } from './graph';
 import { ActionType } from './actions';
 
 export type AdminAction =
+	| UpdateImportMeterAction
 	| UpdateDisplayTitleAction
 	| UpdateDefaultChartToRenderAction
 	| ToggleDefaultBarStackingAction
@@ -14,6 +15,11 @@ export type AdminAction =
 	| ReceivePreferencesAction
 	| MarkPreferencesNotSubmittedAction
 	| MarkPreferencesSubmittedAction;
+
+export interface UpdateImportMeterAction {
+	type: ActionType.UpdateImportMeter;
+	meterID: number;
+}
 
 export interface UpdateDisplayTitleAction {
 	type: ActionType.UpdateDisplayTitle;
@@ -47,6 +53,7 @@ export interface MarkPreferencesSubmittedAction {
 }
 
 export interface AdminState {
+	selectedMeter: SelectOption | null;
 	displayTitle: string;
 	defaultChartToRender: ChartTypes;
 	defaultBarStacking: boolean;

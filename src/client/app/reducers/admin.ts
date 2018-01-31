@@ -7,6 +7,7 @@ import { ActionType } from '../types/redux/actions';
 import { AdminState, AdminAction } from '../types/redux/admin';
 
 const defaultState: AdminState = {
+	selectedMeter: null,
 	displayTitle: '',
 	defaultChartToRender: ChartTypes.line,
 	defaultBarStacking: false,
@@ -16,6 +17,11 @@ const defaultState: AdminState = {
 
 export default function admin(state = defaultState, action: AdminAction) {
 	switch (action.type) {
+		case ActionType.UpdateImportMeter:
+			return {
+				...state,
+				selectedMeter: action.meterID
+			};
 		case ActionType.UpdateDisplayTitle:
 			return {
 				...state,

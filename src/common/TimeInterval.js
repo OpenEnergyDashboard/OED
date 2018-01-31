@@ -26,6 +26,18 @@ class TimeInterval {
 	}
 
 	/**
+	 * Returns the duration of the time interval
+	 * @param specifier - Optional parameter, defaults to milliseconds
+	 * @returns {number}
+	 */
+	duration(specifier) {
+		if (specifier) {
+			return this.endTimestamp.diff(this.startTimestamp, specifier);
+		}
+		return this.endTimestamp.diff(this.startTimestamp);
+	}
+
+	/**
 	 * Returns TimeInterval.toString() so that using a time interval as an object key will
 	 * have reasonable behaviour.
 	 * @return {*}

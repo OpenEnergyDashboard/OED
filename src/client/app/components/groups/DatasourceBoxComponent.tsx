@@ -17,6 +17,7 @@ interface DatasourceBoxProps {
 }
 
 // This is just an alias, so it's ok to have it in this file.
+// Aliasing this specialization is required because the meaning of < and > conflict in TypeScript and JSX.
 // tslint:disable max-classes-per-file
 class MultiSelectDatasourceComponent extends MultiSelectComponent<DatasourceID> {}
 

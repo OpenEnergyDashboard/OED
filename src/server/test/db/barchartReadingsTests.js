@@ -10,7 +10,6 @@ chai.use(chaiAsPromised);
 const expect = chai.expect;
 
 const recreateDB = require('./common').recreateDB;
-const db = require('../../models/database').db;
 const Meter = require('../../models/Meter');
 const Reading = require('../../models/Reading');
 

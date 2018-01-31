@@ -40,6 +40,16 @@ export default function graph(state = defaultState, action: GraphAction) {
 				...state,
 				timeInterval: action.timeInterval
 			};
+		case ActionType.UpdateCompareDuration:
+			return {
+				...state,
+				compareDuration: action.compareDuration
+			};
+		case ActionType.UpdateCompareInterval:
+			return {
+				...state,
+				compareTimeInterval: action.compareTimeInterval
+			};
 		case ActionType.ChangeChartToRender:
 			return {
 				...state,
