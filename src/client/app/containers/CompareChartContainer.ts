@@ -56,9 +56,10 @@ function mapStateToProps(state: State, ownProps: CompareChartContainerProps) {
 	let delta;
 	if (ownProps.isGroup) {
 		delta = (changeForText: number) => {
-			if (isNaN(changeForText)) { return '' };
+			if (isNaN(changeForText)) { return ''; }
 			if (change < 0) {
-				return `${state.groups.byGroupID[ownProps.id].name} has used ${parseInt(change.toFixed(2).replace('.', '').slice(1))}% less energy ${currLabelLowercase}`;
+				const name = state.groups.byGroupID[ownProps.id].name;
+				return `${name} has used ${parseInt(change.toFixed(2).replace('.', '').slice(1))}% less energy ${currLabelLowercase}`;
 			}
 			return `${state.groups.byGroupID[ownProps.id].name} has used ${parseInt(change.toFixed(2).replace('.', ''))}% more energy ${currLabelLowercase}`;
 		};
@@ -66,7 +67,8 @@ function mapStateToProps(state: State, ownProps: CompareChartContainerProps) {
 		delta = (changeForText: number) => {
 			if (isNaN(changeForText)) { return ''; }
 			if (change < 0) {
-				return `${state.meters.byMeterID[ownProps.id].name} has used ${parseInt(change.toFixed(2).replace('.', '').slice(1))}% less energy ${currLabelLowercase}`;
+				const name = state.meters.byMeterID[ownProps.id].name;
+				return `${name} has used ${parseInt(change.toFixed(2).replace('.', '').slice(1))}% less energy ${currLabelLowercase}`;
 			}
 			return `${state.meters.byMeterID[ownProps.id].name} has used ${parseInt(change.toFixed(2).replace('.', ''))}% more energy ${currLabelLowercase}`;
 		};

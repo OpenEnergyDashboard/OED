@@ -124,7 +124,7 @@ function fetchMeterCompareReadings(meterIDs: number[], timeInterval: TimeInterva
 		dispatch(requestMeterBarReadings(meterIDs, timeInterval, compareDuration));
 		const stringifiedMeterIDs = meterIDs.join(',');
 		return axios.get(`/api/readings/bar/meters/${stringifiedMeterIDs}`, {
-			params: { timeInterval: timeInterval, barDuration: compareDuration.toISOString() }
+			params: { timeInterval, barDuration: compareDuration.toISOString() }
 		}).then(response => dispatch(receiveMeterBarReadings(meterIDs, timeInterval, compareDuration, response.data)));
 	};
 }
@@ -137,7 +137,7 @@ function fetchGroupCompareReadings(groupIDs: number[], timeInterval: TimeInterva
 		const stringifiedIDs = groupIDs.join(',');
 
 		return axios.get(`/api/readings/bar/groups/${stringifiedIDs}`, {
-			params: { timeInterval: timeInterval, barDuration: compareDuration.toISOString() }
+			params: { timeInterval, barDuration: compareDuration.toISOString() }
 		}).then(response => dispatch(receiveGroupBarReadings(groupIDs, timeInterval, compareDuration, response.data)));
 	};
 }
