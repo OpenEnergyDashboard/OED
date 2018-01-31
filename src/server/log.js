@@ -29,11 +29,11 @@ LogLevel.SILENT = new LogLevel('SILENT', Number.NEGATIVE_INFINITY);
 
 class Logger {
 
-	constructor(logFile) {
+	constructor(logFilePath) {
 		this.level = LogLevel.INFO;
 		this.logToFile = true;
 		this.logToConsole = true;
-		this.logFile = logFile;
+		this.logFile = logFilePath;
 	}
 
 	/**
@@ -54,7 +54,7 @@ class Logger {
 		// Add a stacktrace to the message if one was provided
 		if (error !== null) {
 			if (error.stack) {
-				messageToLog += 'Stacktrace: \n' + error.stack + '\n'
+				messageToLog += `Stacktrace: \n${error.stack}\n`;
 			} else {
 				// It's possible someone passed in an error that isn't actually an Error object
 				// because javascript lets you throw anything. In that case, the error won't have
@@ -62,13 +62,15 @@ class Logger {
 
 				// So we just try to convert whatever we got to a string and include it. It's better
 				// than nothing.
-				messageToLog += 'An error was included, but it was not an Error object:\n' + error
+				messageToLog += `An error was included, but it was not an Error object:\n${error}`;
 			}
 		}
 		if (this.logToConsole) {
 			if (level.priority >= LogLevel.WARN.priority) {
+				// eslint-disable-next-line no-console
 				console.error(messageToLog);
 			} else {
+				// eslint-disable-next-line no-console
 				console.log(messageToLog);
 			}
 		}
@@ -87,7 +89,7 @@ class Logger {
 	 * @param {Error?} error An optional error object to include information about
 	 */
 	debug(message, error = null) {
-		this.log(LogLevel.DEBUG, message)
+		this.log(LogLevel.DEBUG, message, error);
 	}
 
 	/**
@@ -96,7 +98,7 @@ class Logger {
 	 * @param {Error?} error An optional error object to include information about
 	 */
 	info(message, error = null) {
-		this.log(LogLevel.INFO, message, error)
+		this.log(LogLevel.INFO, message, error);
 	}
 
 	/**
@@ -105,7 +107,7 @@ class Logger {
 	 * @param {Error?} error An optional error object to include information about
 	 */
 	warn(message, error = null) {
-		this.log(LogLevel.WARN, message, error)
+		this.log(LogLevel.WARN, message, error);
 	}
 
 	/**
@@ -114,7 +116,7 @@ class Logger {
 	 * @param {Error?} error An optional error object to include information about
 	 */
 	error(message, error) {
-		this.log(LogLevel.ERROR, message, error)
+		this.log(LogLevel.ERROR, message, error);
 	}
 
 }
