@@ -24,7 +24,8 @@ router.post('/', async (req, res) => {
 		properties: {
 			email: {
 				type: 'string',
-				minLength: 3
+				minLength: 3,
+				maxLength: 254
 			},
 			password: {
 				type: 'string',
