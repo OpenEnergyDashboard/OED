@@ -31,15 +31,15 @@ router.use(authentication);
 router.post('/', async (req, res) => {
 	const validParams = {
 		type: 'object',
-		maxProperties: 4,
-		required: ['token', 'displayTitle', 'defaultChartToRender', 'defaultBarTracking'],
+		maxProperties: 2,
+		required: ['token', 'preferences'],
 		properties: {
 			token: {
 				type: 'string',
 			},
 			preferences: {
 				displayTitle: {
-					type: 'string'
+					type: 'string',
 				},
 				defaultChartToRender: {
 					type: 'string'
