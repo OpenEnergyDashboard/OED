@@ -5,7 +5,7 @@
 import React from 'react';
 import Slider from 'react-rangeslider';
 import moment from 'moment';
-import { Button, ToggleButtonGroup, ToggleButton } from 'react-bootstrap';
+import { Button, ButtonGroup } from 'reactstrap';
 import 'react-rangeslider/lib/index.css';
 import '../styles/react-rangeslider-fix.css';
 import { chartTypes } from '../reducers/graph';
@@ -26,8 +26,8 @@ export default class UIOptionsComponent extends React.Component {
 		this.handleBarDurationChange = this.handleBarDurationChange.bind(this);
 		this.handleBarDurationChangeComplete = this.handleBarDurationChangeComplete.bind(this);
 		this.handleChangeBarStacking = this.handleChangeBarStacking.bind(this);
-		this.handleSpanButton = this.handleSpanButton.bind(this);
-		this.handleCompareSpanButton = this.handleCompareSpanButton.bind(this);
+		this.handleBarButton = this.handleBarButton.bind(this);
+		this.handleCompareButton = this.handleCompareButton.bind(this);
 		this.toggleSlider = this.toggleSlider.bind(this);
 		this.state = {
 			barDuration: this.props.barDuration.asDays(),
@@ -67,11 +67,11 @@ export default class UIOptionsComponent extends React.Component {
 		this.props.changeBarStacking();
 	}
 
-	handleSpanButton(value) {
+	handleBarButton(value) {
 		this.props.changeDuration(moment.duration(value, 'days'));
 	}
 
-	handleCompareSpanButton(value) {
+	handleCompareButton(value) {
 		let compareTimeInterval;
 		let compareDuration;
 		switch (value) {
@@ -134,19 +134,36 @@ export default class UIOptionsComponent extends React.Component {
 							<label><input type="checkbox" onChange={this.handleChangeBarStacking} checked={this.props.barStacking} />Bar stacking</label>
 						</div>
 						<p style={labelStyle}>Bar chart interval:</p>
-						<ToggleButtonGroup
+						<ButtonGroup
 							type="radio"
-							name="timeSpans"
 							value={this.state.barDuration}
-							onChange={this.handleSpanButton}
 							style={zIndexFix}
 						>
-							<ToggleButton value={1}>Day</ToggleButton>
-							<ToggleButton value={7}>Week</ToggleButton>
-							<ToggleButton value={28}>Month</ToggleButton>
-						</ToggleButtonGroup>
-						<Button name="customToggle" onClick={this.toggleSlider}>Toggle Custom Slider (days)</Button>
-
+							<Button
+								outline={this.state.barDuration !== 1}
+								onClick={() => this.handleBarButton(1)}
+							>
+								Day
+							</Button>
+							<Button
+								outline={this.state.barDuration !== 7}
+								onClick={() => this.handleBarButton(7)}
+							>
+								Week
+							</Button>
+							<Button
+								outline={this.state.barDuration !== 28}
+								onClick={() => this.handleBarButton(28)}
+							>
+								Month
+							</Button>
+						</ButtonGroup>
+						<Button
+							outline={!this.state.showSlider}
+							onClick={this.toggleSlider}
+						>
+							Toggle Custom Slider (days)
+						</Button>
 						{this.state.showSlider &&
 						<Slider
 							min={1} max={365} value={this.state.barDuration} onChange={this.handleBarDurationChange}
@@ -159,16 +176,28 @@ export default class UIOptionsComponent extends React.Component {
 				{ /* Controls specific to the compare chart */}
 				{this.props.chartToRender === chartTypes.compare &&
 				<div>
-					<ToggleButtonGroup
-						name="timeSpansCompare"
-						value={compareVal}
-						onChange={this.handleCompareSpanButton}
+					<ButtonGroup
 						style={zIndexFix}
 					>
-						<ToggleButton value="day">Day</ToggleButton>
-						<ToggleButton value="week">Week</ToggleButton>
-						<ToggleButton value="month">Month</ToggleButton>
-					</ToggleButtonGroup>
+						<Button
+							outline={compareVal !== 'day'}
+							onClick={() => this.handleCompareButton('day')}
+						>
+							Day
+						</Button>
+						<Button
+							outline={compareVal !== 'week'}
+							onClick={() => this.handleCompareButton('week')}
+						>
+							Week
+						</Button>
+						<Button
+							outline={compareVal !== 'month'}
+							onClick={() => this.handleCompareButton('month')}
+						>
+							Month
+						</Button>
+					</ButtonGroup>
 				</div>
 				}
 

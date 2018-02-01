@@ -3,7 +3,7 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
 
 import React from 'react';
-import { Button } from 'react-bootstrap';
+import { Button } from 'reactstrap';
 
 export default class GroupSidebarComponent extends React.Component {
 	constructor(props) {
@@ -47,7 +47,7 @@ export default class GroupSidebarComponent extends React.Component {
 					)}
 				</select>
 				<br />
-				<Button bsStyle="default" onClick={this.handleCreateGroup}>Create new group</Button>
+				<Button outline onClick={this.handleCreateGroup}>Create new group</Button>
 			</div>
 		);
 	}
