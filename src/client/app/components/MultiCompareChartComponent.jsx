@@ -12,8 +12,7 @@ export default function MultiCompareChartComponent(props) {
 	}
 
 	const centeredStyle = {
-		marginTop: '20%',
-		textAlign: 'center'
+		marginTop: '20%'
 	};
 
 	const flexContainerStyle = {
@@ -29,10 +28,8 @@ export default function MultiCompareChartComponent(props) {
 	// Display a message if no meters are selected
 	if (props.selectedMeters.length + props.selectedGroups.length === 0) {
 		return (
-			<div className="row">
-				<div className="col-xs-12" style={centeredStyle}>
-					Select one or more items to compare usage over time.
-				</div>
+			<div className="text-center" style={centeredStyle}>
+				Select one or more items to compare usage over time.
 			</div>
 		);
 	}
