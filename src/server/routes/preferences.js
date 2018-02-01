@@ -37,14 +37,16 @@ router.post('/', async (req, res) => {
 			token: {
 				type: 'string',
 			},
-			displayTitle: {
-				type: 'string'
-			},
-			defaultChartToRender: {
-				type: 'string'
-			},
-			defaultBarTracking: {
-				type: 'boolean'
+			preferences: {
+				displayTitle: {
+					type: 'string'
+				},
+				defaultChartToRender: {
+					type: 'string'
+				},
+				defaultBarTracking: {
+					type: 'boolean'
+				}
 			}
 		}
 	};
