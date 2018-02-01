@@ -47,12 +47,12 @@ export default class GroupMainComponent extends React.Component {
 			case DISPLAY_MODE.VIEW: {
 				GroupDisplay = (
 					<div className="row">
-						<div className="col-2">
+						<div className="col-12 col-lg-2">
 							<GroupSidebarContainer />
 						</div>
-						<div className="col-10" style={flexContainerStyle}>
+						<div className="col-12 col-lg-10" style={flexContainerStyle}>
 							{this.props.selectedGroups.map(groupID =>
-								<div className="col-4" style={flexChildStyle} key={groupID}>
+								<div className="col-12 col-lg-4" style={flexChildStyle} key={groupID}>
 									<GroupViewContainer key={groupID} id={groupID} />
 								</div>
 							)}
