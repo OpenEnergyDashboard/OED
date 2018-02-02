@@ -101,9 +101,9 @@ function mapStateToProps(state, ownProps) {
 
 	labels.push(prevLabel);
 	labels.push(currLabel);
-	const blueSolidColor = 'rgba(173, 216, 230, 1)';
-	const yellowColor = 'rgba(218, 165, 32, 1)';
-	const blueTransparentColor = 'rgba(173, 216, 230, 0.45)';
+	const readingsAfterCurrentTimeColor = 'rgba(173, 216, 230, 1)';
+	const readingsBeforeCurrentTimeColor = 'rgba(218, 165, 32, 1)';
+	const projectedDataColor = 'rgba(173, 216, 230, 0.45)';
 	data.datasets.push(
 		{
 			data: [prev, Math.round((current / currentPrev) * prev)],
@@ -123,10 +123,10 @@ function mapStateToProps(state, ownProps) {
 	data.datasets.sort((a, b) => a.data[0] - b.data[0]);
 
 	// apply info to datasets after sort
-	data.datasets[0].backgroundColor = [yellowColor, yellowColor];
-	data.datasets[0].hoverBackgroundColor = [yellowColor, yellowColor];
-	data.datasets[1].backgroundColor = [blueSolidColor, blueTransparentColor];
-	data.datasets[1].hoverBackgroundColor = [blueSolidColor, blueTransparentColor];
+	data.datasets[0].backgroundColor = [readingsBeforeCurrentTimeColor, readingsBeforeCurrentTimeColor];
+	data.datasets[0].hoverBackgroundColor = [readingsBeforeCurrentTimeColor, readingsBeforeCurrentTimeColor];
+	data.datasets[1].backgroundColor = [readingsAfterCurrentTimeColor, projectedDataColor];
+	data.datasets[1].hoverBackgroundColor = [readingsAfterCurrentTimeColor, projectedDataColor];
 	data.labels = labels;
 
 	const change = (-1 + (((current / currentPrev) * prev) / prev));
