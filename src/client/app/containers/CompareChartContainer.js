@@ -101,9 +101,9 @@ function mapStateToProps(state, ownProps) {
 
 	labels.push(prevLabel);
 	labels.push(currLabel);
-	const color1 = 'rgba(173, 216, 230, 1)';
-	const color2 = 'rgba(218, 165, 32, 1)';
-	const color3 = 'rgba(173, 216, 230, 0.45)';
+	const blueSolidColor = 'rgba(173, 216, 230, 1)';
+	const yellowColor = 'rgba(218, 165, 32, 1)';
+	const blueTransparentColor = 'rgba(173, 216, 230, 0.45)';
 	data.datasets.push(
 		{
 			data: [prev, Math.round((current / currentPrev) * prev)],
@@ -123,10 +123,10 @@ function mapStateToProps(state, ownProps) {
 	data.datasets.sort((a, b) => a.data[0] - b.data[0]);
 
 	// apply info to datasets after sort
-	data.datasets[0].backgroundColor = [color2, color2];
-	data.datasets[0].hoverBackgroundColor = [color2, color2];
-	data.datasets[1].backgroundColor = [color1, color3];
-	data.datasets[1].hoverBackgroundColor = [color1, color3];
+	data.datasets[0].backgroundColor = [yellowColor, yellowColor];
+	data.datasets[0].hoverBackgroundColor = [yellowColor, yellowColor];
+	data.datasets[1].backgroundColor = [blueSolidColor, blueTransparentColor];
+	data.datasets[1].hoverBackgroundColor = [blueSolidColor, blueTransparentColor];
 	data.labels = labels;
 
 	const change = (-1 + (((current / currentPrev) * prev) / prev));
