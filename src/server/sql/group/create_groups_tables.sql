@@ -136,3 +136,26 @@ CREATE VIEW groups_deep_meters AS
 				WHERE adm2.group_id = adm.group_id
 		)            AS is_shadowed
 	FROM all_deep_meters adm;
+
+CREATE FUNCTION check_cyclic_groups()
+	RETURNS TRIGGER AS
+	$$
+		DECLARE
+			num_rows INTEGER;
+		BEGIN
+			SELECT COUNT(*) INTO num_rows
+			FROM groups_deep_children WHERE child_id = NEW.parent_id AND parent_id = NEW.child_id;
+
+			IF num_rows > 0 THEN
+				RAISE EXCEPTION 'Cyclic group detected';
+			END IF;
+			RETURN NEW;
+		END;
+	$$
+	LANGUAGE 'plpgsql';
+
+CREATE TRIGGER check_cyclic_groups_trigger
+	BEFORE INSERT OR UPDATE
+	ON groups_immediate_children
+	FOR EACH ROW
+	EXECUTE PROCEDURE check_cyclic_groups();
