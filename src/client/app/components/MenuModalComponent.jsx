@@ -24,13 +24,23 @@ export default class MenuModalComponent extends React.Component {
 			display: 'inline',
 			paddingLeft: '5px'
 		};
+		const marginBottomStyle = {
+			marginBottom: '15px'
+		};
+		const labelStyle = {
+			fontWeight: 'bold',
+			margin: 0
+		};
 		return (
 			<div style={inlineStyle}>
 				<Button outline onClick={this.toggle}>Menu</Button>
 				<Modal isOpen={this.state.showModal} toggle={this.toggle}>
 					<ModalHeader toggle={this.toggle}>Options</ModalHeader>
 					<ModalBody>
-						<HeaderButtonsComponent renderOptionsButton={false} />
+						<div style={marginBottomStyle}>
+							<p style={labelStyle}>Navigation:</p>
+							<HeaderButtonsComponent renderOptionsButton={false} />
+						</div>
 						{ this.props.showUIOptions &&
 							<UIOptionsContainer />
 						}

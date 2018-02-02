@@ -58,8 +58,7 @@ export default class HeaderButtonsComponent extends React.Component {
 			paddingLeft: '5px'
 		};
 		const adminLinkStyle = {
-			display: renderAdminButton ? 'inline' : 'none',
-			paddingLeft: '5px'
+			display: renderAdminButton ? 'inline' : 'none'
 		};
 		const groupsLinkStyle = {
 			display: renderGroupsButton ? 'inline' : 'none',
