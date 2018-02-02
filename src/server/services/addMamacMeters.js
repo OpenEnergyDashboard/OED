@@ -12,7 +12,7 @@ const parseString = require('xml2js').parseString;
 const Meter = require('../models/Meter');
 const _ = require('lodash');
 const stopDB = require('../models/database').stopDB;
-const log = require('../log');
+const { log } = require('../log');
 
 const parseXMLPromisified = promisify(parseString);
 
@@ -59,14 +59,13 @@ async function insertMeters(ips) {
 	return await Promise.all(meters.map(m => m.insert()));
 }
 
-
 async function insertMetersWrapper(filename) {
 	try {
 		const ips = await parseCSV(filename);
 		await insertMeters(ips);
-		log('Done inserting meters');
+		log.info('Done inserting meters');
 	} catch (err) {
-		log(`Error inserting meters: ${err}`, 'error');
+		log.error(`Error inserting meters: ${err}`, err);
 	} finally {
 		stopDB();
 	}
@@ -75,10 +74,10 @@ async function insertMetersWrapper(filename) {
 // The first two elements are 'node' and the name of the file. We only want arguments passed to it.
 const args = process.argv.slice(2);
 if (args.length !== 1) {
-	log(`Expected one argument (path to csv file of meter ips), but got ${args.length} instead`, 'error');
+	log.error(`Expected one argument (path to csv file of meter ips), but got ${args.length} instead`, 'error');
 } else {
 	const absolutePath = path.resolve(args[0]);
-	log(`Importing meters from ${absolutePath}`);
+	log.info(`Importing meters from ${absolutePath}`);
 	insertMetersWrapper(absolutePath);
 }
 

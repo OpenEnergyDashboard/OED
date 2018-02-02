@@ -14,7 +14,7 @@ import FooterComponent from '../components/FooterComponent';
 export default function HomeComponent() {
 	return (
 		<div>
-			<HeaderContainer renderOptionsButton renderLoginButton renderGroupsButton />
+			<HeaderContainer />
 			<DashboardContainer />
 			<FooterComponent />
 		</div>

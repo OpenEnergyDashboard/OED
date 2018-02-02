@@ -3,7 +3,7 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
 
 import React from 'react';
-import HeaderComponent from '../HeaderComponent';
+import HeaderContainer from '../../containers/HeaderContainer';
 import FooterComponent from '../FooterComponent';
 import GroupViewContainer from '../../containers/groups/GroupViewContainer';
 import GroupSidebarContainer from '../../containers/groups/GroupSidebarContainer';
@@ -18,9 +18,14 @@ export default class GroupMainComponent extends React.Component {
 	}
 
 	render() {
-		const divPaddingStyle = {
-			paddingTop: '50px'
+		const flexContainerStyle = {
+			display: 'flex',
+			flexFlow: 'row wrap',
 		};
+		const flexChildStyle = {
+			marginRight: '10px'
+		};
+
 		let GroupDisplay = null;
 		switch (this.props.displayMode) {
 			case DISPLAY_MODE.CREATE: {
@@ -41,13 +46,15 @@ export default class GroupMainComponent extends React.Component {
 			}
 			case DISPLAY_MODE.VIEW: {
 				GroupDisplay = (
-					<div>
-						<div className="col-xs-2" style={divPaddingStyle}>
+					<div className="row">
+						<div className="col-12 col-lg-2">
 							<GroupSidebarContainer />
 						</div>
-						<div className="col-xs-4">
+						<div className="col-12 col-lg-10" style={flexContainerStyle}>
 							{this.props.selectedGroups.map(groupID =>
-								<GroupViewContainer key={groupID} id={groupID} />
+								<div className="col-12 col-lg-4" style={flexChildStyle} key={groupID}>
+									<GroupViewContainer key={groupID} id={groupID} />
+								</div>
 							)}
 						</div>
 					</div>
@@ -55,19 +62,17 @@ export default class GroupMainComponent extends React.Component {
 				break;
 			}
 			default: {
-				console.error('Encountered invalid display mode');
+				console.error('Encountered invalid display mode'); // eslint-disable no-console
 			}
 		}
 
 		return (
 			<div>
-				<HeaderComponent title="Groups" />
+				<HeaderContainer />
 				<div className="container-fluid">
-					<div className="col-xs-11">
-						{ GroupDisplay }
-					</div>
+					{ GroupDisplay }
 				</div>
-				<FooterComponent/>
+				<FooterComponent />
 			</div>
 		);
 	}

@@ -15,6 +15,9 @@ export const UPDATE_BAR_DURATION = 'UPDATE_BAR_DURATION';
 export const CHANGE_CHART_TO_RENDER = 'CHANGE_CHART_TO_RENDER';
 export const CHANGE_BAR_STACKING = 'CHANGE_BAR_STACKING';
 export const CHANGE_GRAPH_ZOOM = 'CHANGE_GRAPH_ZOOM';
+export const UPDATE_COMPARE_INTERVAL = 'UPDATE_COMPARE_INTERVAL';
+export const UPDATE_COMPARE_DURATION = 'UPDATE_COMPARE_DURATION';
+
 
 /**
  * @param {string} chartType is one of chartTypes
@@ -44,6 +47,23 @@ export function changeBarDuration(barDuration) {
 	return (dispatch, getState) => {
 		dispatch(updateBarDuration(barDuration));
 		dispatch(fetchNeededBarReadings(getState().graph.timeInterval));
+		return Promise.resolve();
+	};
+}
+
+function updateCompareTimeInterval(compareTimeInterval) {
+	return { type: UPDATE_COMPARE_INTERVAL, compareTimeInterval };
+}
+
+function updateCompareDuration(compareDuration) {
+	return { type: UPDATE_COMPARE_DURATION, compareDuration };
+}
+
+export function changeCompareTimeInterval(compareTimeInterval, compareDuration) {
+	return (dispatch, getState) => {
+		dispatch(updateCompareTimeInterval(compareTimeInterval));
+		dispatch(updateCompareDuration(compareDuration));
+		dispatch(fetchNeededCompareReadings(getState().graph.compareTimeInterval));
 		return Promise.resolve();
 	};
 }

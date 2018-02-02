@@ -9,8 +9,10 @@ const logger = require('morgan');
 const cookieParser = require('cookie-parser');
 const bodyParser = require('body-parser');
 const users = require('./routes/users');
+const fileProcessing = require('./routes/fileProcessing');
 const readings = require('./routes/readings');
 const meters = require('./routes/meters');
+const preferences = require('./routes/preferences');
 const login = require('./routes/login');
 const verification = require('./routes/verification');
 const groups = require('./routes/groups');
@@ -28,9 +30,11 @@ app.use(express.static(path.join(__dirname, '..', 'client')));
 app.use('/api/users', users);
 app.use('/api/meters', meters);
 app.use('/api/readings', readings);
+app.use('/api/preferences', preferences);
 app.use('/api/login', login);
 app.use('/api/groups', groups);
 app.use('/api/verification', verification);
+app.use('/api/fileProcessing', fileProcessing);
 app.use('/api/version', version);
 
 app.get('\\/|login|admin|groups|graph', (req, res) => {

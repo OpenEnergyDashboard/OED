@@ -3,7 +3,7 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
 
 import React from 'react';
-import { Button } from 'react-bootstrap';
+import { Button } from 'reactstrap';
 
 export default class ChartLinkComponent extends React.Component {
 	constructor(props) {
@@ -30,7 +30,12 @@ export default class ChartLinkComponent extends React.Component {
 		};
 		return (
 			<div>
-				<Button onClick={this.toggleLink}>Toggle chart link</Button>
+				<Button
+					outline={!this.state.showLink}
+					onClick={this.toggleLink}
+				>
+					Toggle chart link
+				</Button>
 				{this.state.showLink &&
 					<div style={wellStyle}>
 						{this.props.linkText}

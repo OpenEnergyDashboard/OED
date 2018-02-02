@@ -16,9 +16,6 @@ defaults.global.plugins.datalabels.display = false;
  * React component that controls the dashboard
  */
 export default function DashboardComponent(props) {
-	const divPadding = {
-		paddingTop: '35px'
-	};
 	let ChartToRender = '';
 	if (props.chartToRender === chartTypes.line) {
 		ChartToRender = LineChartContainer;
@@ -30,11 +27,11 @@ export default function DashboardComponent(props) {
 
 	return (
 		<div className="container-fluid">
-			<div>
-				<div className="col-xs-2 hidden-sm hidden-xs" style={divPadding}>
+			<div className="row">
+				<div className="col-2 d-none d-lg-block">
 					<UIOptionsContainer />
 				</div>
-				<div className="col-xs-10">
+				<div className="col-12 col-lg-10">
 					<ChartToRender />
 				</div>
 			</div>

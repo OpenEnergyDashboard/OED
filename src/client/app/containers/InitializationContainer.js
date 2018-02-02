@@ -5,23 +5,26 @@
  */
 
 import { connect } from 'react-redux';
-import RouteComponent from '../components/RouteComponent';
+import InitializationComponent from '../components/InitializationComponent';
 import { clearNotifications } from '../actions/notifications';
+import { fetchMetersDetailsIfNeeded } from '../actions/meters';
 import { changeOptionsFromLink } from '../actions/graph';
+import { fetchPreferencesIfNeeded } from '../actions/admin';
 
 
 function mapStateToProps(state) {
 	return {
-		notification: state.notifications.notification,
-		barStacking: state.graph.barStacking
+		notification: state.notifications.notification
 	};
 }
 
 function mapDispatchToProps(dispatch) {
 	return {
 		clearNotifications: () => dispatch(clearNotifications()),
+		fetchMetersDetailsIfNeeded: () => dispatch(fetchMetersDetailsIfNeeded()),
+		fetchPreferencesIfNeeded: () => dispatch(fetchPreferencesIfNeeded()),
 		changeOptionsFromLink: options => dispatch(changeOptionsFromLink(options))
 	};
 }
 
-export default connect(mapStateToProps, mapDispatchToProps)(RouteComponent);
+export default connect(mapStateToProps, mapDispatchToProps)(InitializationComponent);
