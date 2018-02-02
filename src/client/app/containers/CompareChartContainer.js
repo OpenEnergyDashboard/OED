@@ -107,24 +107,26 @@ function mapStateToProps(state, ownProps) {
 	data.datasets.push(
 		{
 			data: [prev, Math.round((current / currentPrev) * prev)],
-			backgroundColor: [color1, color3],
-			hoverBackgroundColor: [color1, color3],
 			datalabels: {
 				anchor: 'end',
 				align: 'start',
 			}
 		}, {
 			data: [currentPrev, current],
-			backgroundColor: color2,
-			hoverBackgroundColor: color2,
 			datalabels: {
 				anchor: 'end',
 				align: 'start',
 			}
 		}
-		);
-		// sorts the data so that one doesn't cover up the other
+	);
+	// sorts the data so that one doesn't cover up the other
 	data.datasets.sort((a, b) => a.data[0] - b.data[0]);
+
+	// apply info to datasets after sort
+	data.datasets[0].backgroundColor = [color2, color2];
+	data.datasets[0].hoverBackgroundColor = [color2, color2];
+	data.datasets[1].backgroundColor = [color1, color3];
+	data.datasets[1].hoverBackgroundColor = [color1, color3];
 	data.labels = labels;
 
 	const change = (-1 + (((current / currentPrev) * prev) / prev));
