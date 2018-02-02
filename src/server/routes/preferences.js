@@ -58,6 +58,7 @@ router.post('/', async (req, res) => {
 			res.json(rows);
 		} catch (err) {
 			log.error(`Error while performing POST update preferences: ${err}`, err);
+			res.sendStatus(500);
 		}
 	}
 });

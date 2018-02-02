@@ -12,7 +12,8 @@ try {
 	fs.accessSync(envPath);
 	dotenv.config({ path: envPath });
 } catch (err) {
-	console.log("Couldn't load a .env file");
+	// TODO: Check if valid env variables are actually loaded despite the lack of a file, only log if they are not
+	// console.log("Couldn't load a .env file");
 }
 
 
