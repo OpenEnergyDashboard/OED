@@ -6,4 +6,10 @@
 	max-height: 200px;
 	min-width: 100%;
 	overflow-y: scroll;
+
 }
+
+.Select-placeholder {
+	overflow: hidden;
+}
+
