@@ -42,7 +42,17 @@ router.get('/line/meters/:meter_ids', async (req, res) => {
 			}
 		}
 	};
-	if (!validate(validParams, req.params).valid) {
+	const validQueries = {
+		type: 'object',
+		maxProperties: 1,
+		required: ['timeInterval'],
+		properties: {
+			timeInterval: {
+				type: 'string'
+			}
+		}
+	};
+	if (!validate(validParams, req.params).valid || !validate(validQueries, req.query).valid) {
 		res.sendStatus(400);
 	} else {
 		// We can't do .map(parseInt) here because map would give parseInt a radix value of the current array position.
@@ -76,7 +86,17 @@ router.get('/line/groups/:group_ids', async (req, res) => {
 			}
 		}
 	};
-	if (!validate(validParams, req.params).valid) {
+	const validQueries = {
+		type: 'object',
+		maxProperties: 1,
+		required: ['timeInterval'],
+		properties: {
+			timeInterval: {
+				type: 'string'
+			}
+		}
+	};
+	if (!validate(validParams, req.params).valid || !validate(validQueries, req.query).valid) {
 		res.sendStatus(400);
 	} else {
 		// We can't do .map(parseInt) here because map would give parseInt a radix value of the current array position.
@@ -111,7 +131,20 @@ router.get('/bar/meters/:meter_ids', async (req, res) => {
 			}
 		}
 	};
-	if (!validate(validParams, req.params).valid) {
+	const validQueries = {
+		type: 'object',
+		maxProperties: 2,
+		required: ['timeInterval', 'barDuration'],
+		properties: {
+			timeInterval: {
+				type: 'string'
+			},
+			barDuration: {
+				type: 'string'
+			}
+		}
+	};
+	if (!validate(validParams, req.params).valid || !validate(validQueries, req.query).valid) {
 		res.sendStatus(400);
 	} else {
 		// We can't do .map(parseInt) here because map would give parseInt a radix value of the current array position.
@@ -147,7 +180,20 @@ router.get('/bar/groups/:group_ids', async (req, res) => {
 			}
 		}
 	};
-	if (!validate(validParams, req.params).valid) {
+	const validQueries = {
+		type: 'object',
+		maxProperties: 2,
+		required: ['timeInterval', 'barDuration'],
+		properties: {
+			timeInterval: {
+				type: 'string'
+			},
+			barDuration: {
+				type: 'string'
+			}
+		}
+	};
+	if (!validate(validParams, req.params).valid || !validate(validQueries, req.query).valid) {
 		res.sendStatus(400);
 	} else {
 		// We can't do .map(parseInt) here because map would give parseInt a radix value of the current array position.
