@@ -14,7 +14,7 @@ const validate = require('jsonschema').validate;
 const router = express.Router();
 
 // The upload here ensures that the file is saved to server RAM rather than disk
-const upload = multer({storage: multer.memoryStorage()});
+const upload = multer({ storage: multer.memoryStorage() });
 
 router.use(authenticator);
 router.post('/:meter_id', upload.single('csvFile'), async (req, res) => {
@@ -47,9 +47,9 @@ router.post('/:meter_id', upload.single('csvFile'), async (req, res) => {
 					const startTimestamp = moment(row[1], 'MM/DD/YYYY HH:mm').subtract(60, 'minutes');
 					return new Reading(id, readRate, startTimestamp, endTimestamp);
 				}, (readings, tx) => Reading.insertOrUpdateAll(readings, tx));
-				res.status(200).json({success: true});
+				res.status(200).json({ success: true });
 			} catch (e) {
-				res.status(403).json({success: false, message: 'Failed to upload data.'});
+				res.status(403).json({ success: false, message: 'Failed to upload data.' });
 			}
 		} catch (err) {
 			res.status(400).send({
