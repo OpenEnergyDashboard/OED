@@ -17,7 +17,7 @@ export default function MultiCompareChartComponent(props) {
 	};
 
 	// Display a message if no meters are selected
-	if (props.selectedMeters.length + props.selectedGroups.length === 0) {
+	if (numSelectedItems === 0) {
 		return (
 			<div className="text-center" style={centeredStyle}>
 				Select one or more items to compare usage over time.
