@@ -57,11 +57,25 @@ router.get('/children/:group_id', async (req, res) => {
 });
 
 router.get('/deep/groups/:group_id', async (req, res) => {
-	try {
-		const [deepGroups] = await Group.getDeepGroupsByGroupID(req.params.group_id);
-		res.json({ deepGroups });
-	} catch (err) {
-		log.error(`Error while preforming GET on all deep child groups of specific group: ${err}`, err);
+	const validParams = {
+		type: 'object',
+		maxProperties: 1,
+		required: ['group_id'],
+		properties: {
+			group_id: {
+				type: 'number'
+			}
+		}
+	};
+	if (!validate(validParams, req.params).valid) {
+		res.sendStatus(400);
+	} else {
+		try {
+			const [deepGroups] = await Group.getDeepGroupsByGroupID(req.params.group_id);
+			res.json({ deepGroups });
+		} catch (err) {
+			log.error(`Error while preforming GET on all deep child groups of specific group: ${err}`, err);
+		}
 	}
 });
 
