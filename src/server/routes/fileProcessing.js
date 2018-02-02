@@ -14,7 +14,7 @@ const validate = require('jsonschema').validate;
 const router = express.Router();
 
 // The upload here ensures that the file is saved to server RAM rather than disk
-const upload = multer({ storage: multer.memoryStorage() });
+const upload = multer({storage: multer.memoryStorage()});
 
 router.use(authenticator);
 router.post('/:meter_id', upload.single('csvFile'), async (req, res) => {
@@ -28,7 +28,7 @@ router.post('/:meter_id', upload.single('csvFile'), async (req, res) => {
 			}
 		}
 	};
-	if (!validate(validParams, req.params).valid) {
+	if (!validate(validParams, req.params).valid || !req.file.buffer) {
 		res.sendStatus(400);
 	} else {
 		try {
@@ -37,23 +37,19 @@ router.post('/:meter_id', upload.single('csvFile'), async (req, res) => {
 				frequency: 10,
 				chunkSize: 2048
 			});
-			if (req.file.buffer) {
-				myReadableStreamBuffer.put(req.file.buffer);
-				// stop() indicates we are done putting the data in our readable stream.
-				myReadableStreamBuffer.stop();
-				try {
-					await streamToDB(myReadableStreamBuffer, row => {
-						const readRate = Number(row[0]);
-						const endTimestamp = moment(row[1], 'MM/DD/YYYY HH:mm');
-						const startTimestamp = moment(row[1], 'MM/DD/YYYY HH:mm').subtract(60, 'minutes');
-						return new Reading(id, readRate, startTimestamp, endTimestamp);
-					}, (readings, tx) => Reading.insertOrUpdateAll(readings, tx));
-					res.status(200).json({ success: true });
-				} catch (e) {
-					res.status(403).json({ success: false, message: 'Failed to upload data.' });
-				}
-			} else {
-				res.sendStatus(400);
+			myReadableStreamBuffer.put(req.file.buffer);
+			// stop() indicates we are done putting the data in our readable stream.
+			myReadableStreamBuffer.stop();
+			try {
+				await streamToDB(myReadableStreamBuffer, row => {
+					const readRate = Number(row[0]);
+					const endTimestamp = moment(row[1], 'MM/DD/YYYY HH:mm');
+					const startTimestamp = moment(row[1], 'MM/DD/YYYY HH:mm').subtract(60, 'minutes');
+					return new Reading(id, readRate, startTimestamp, endTimestamp);
+				}, (readings, tx) => Reading.insertOrUpdateAll(readings, tx));
+				res.status(200).json({success: true});
+			} catch (e) {
+				res.status(403).json({success: false, message: 'Failed to upload data.'});
 			}
 		} catch (err) {
 			res.status(400).send({
