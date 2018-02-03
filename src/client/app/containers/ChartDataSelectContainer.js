@@ -21,13 +21,13 @@ function mapStateToProps(state) {
 	// Map information about the currently selected meters into a format the component can display.
 	const selectedGroups = state.graph.selectedGroups.map(groupID => (
 		{
-			label: state.groups.byGroupID[groupID].name,
+			label: state.groups.byGroupID[groupID] ? state.groups.byGroupID[groupID].name : '',
 			value: groupID
 		}
 	));
 	const selectedMeters = state.graph.selectedMeters.map(meterID => (
 		{
-			label: state.meters.byMeterID[meterID].name,
+			label: state.meters.byMeterID[meterID] ? state.meters.byMeterID[meterID].name : '',
 			value: meterID
 		}
 	));

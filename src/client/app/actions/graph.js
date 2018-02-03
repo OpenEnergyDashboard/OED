@@ -17,7 +17,12 @@ export const CHANGE_BAR_STACKING = 'CHANGE_BAR_STACKING';
 export const CHANGE_GRAPH_ZOOM = 'CHANGE_GRAPH_ZOOM';
 export const UPDATE_COMPARE_INTERVAL = 'UPDATE_COMPARE_INTERVAL';
 export const UPDATE_COMPARE_DURATION = 'UPDATE_COMPARE_DURATION';
+export const TOGGLE_HOTLINKED = 'TOGGLE_HOTLINKED';
 
+
+function toggleHotlinked() {
+	return { type: 'TOGGLE_HOTLINKED' };
+}
 
 /**
  * @param {string} chartType is one of chartTypes
@@ -124,7 +129,7 @@ export function changeGraphZoomIfNeeded(timeInterval) {
  * @returns {function(*)}
  */
 export function changeOptionsFromLink(options) {
-	const dispatchFirst = [];
+	const dispatchFirst = [toggleHotlinked()];
 	const dispatchSecond = [];
 	if (options.meterIDs) {
 		dispatchFirst.push(fetchMetersDetailsIfNeeded());

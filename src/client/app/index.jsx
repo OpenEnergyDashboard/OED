@@ -8,7 +8,7 @@ import { render } from 'react-dom';
 import { createStore, applyMiddleware, compose } from 'redux';
 import { Provider } from 'react-redux';
 import 'bootstrap/dist/css/bootstrap.css';
-import RouteComponent from './components/RouteComponent';
+import RouteContainer from './containers/RouteContainer';
 import reducers from './reducers';
 import './styles/index.css';
 
@@ -25,7 +25,7 @@ const store = createStore(reducers, composeEnhancers(applyMiddleware(thunkMiddle
 // Provides the Redux store to all child components
 render(
 	<Provider store={store}>
-		<RouteComponent />
+		<RouteContainer />
 	</Provider>,
 	document.getElementById('root')
 );

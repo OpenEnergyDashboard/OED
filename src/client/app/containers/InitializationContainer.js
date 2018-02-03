@@ -8,9 +8,6 @@ import { connect } from 'react-redux';
 import InitializationComponent from '../components/InitializationComponent';
 import { clearNotifications } from '../actions/notifications';
 import { fetchMetersDetailsIfNeeded } from '../actions/meters';
-import { changeOptionsFromLink } from '../actions/graph';
-import { fetchPreferencesIfNeeded } from '../actions/admin';
-
 
 function mapStateToProps(state) {
 	return {
@@ -21,9 +18,7 @@ function mapStateToProps(state) {
 function mapDispatchToProps(dispatch) {
 	return {
 		clearNotifications: () => dispatch(clearNotifications()),
-		fetchMetersDetailsIfNeeded: () => dispatch(fetchMetersDetailsIfNeeded()),
-		fetchPreferencesIfNeeded: () => dispatch(fetchPreferencesIfNeeded()),
-		changeOptionsFromLink: options => dispatch(changeOptionsFromLink(options))
+		fetchMetersDetailsIfNeeded: () => dispatch(fetchMetersDetailsIfNeeded())
 	};
 }
 

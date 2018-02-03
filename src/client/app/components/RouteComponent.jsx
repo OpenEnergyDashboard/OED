@@ -22,6 +22,11 @@ export default class RouteComponent extends React.Component {
 		this.linkToGraph = this.linkToGraph.bind(this);
 	}
 
+	shouldComponentUpdate() {
+		// To ignore warning: [react-router] You cannot change 'Router routes'; it will be ignored
+		return false;
+	}
+
 	/**
 	 * Middleware function that requires proper authentication for a page route
 	 * @param nextState The next state of the router
@@ -82,7 +87,9 @@ export default class RouteComponent extends React.Component {
 							throw new Error('Unknown query parameter');
 					}
 				}
-				this.props.changeOptionsFromLink(options);
+				if (Object.keys(options).length > 0) {
+					this.props.changeOptionsFromLink(options);
+				}
 			} catch (err) {
 				showErrorNotification('Failed to link to graph');
 			}

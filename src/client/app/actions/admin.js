@@ -86,7 +86,7 @@ function submitPreferences() {
 }
 
 function shouldFetchPreferenceData(state) {
-	return !state.admin.isFetching;
+	return !state.admin.isFetching && !state.graph.hotlinked;
 }
 
 function shouldSubmitPreferenceData(state) {

@@ -25,7 +25,8 @@ const defaultState = {
 	compareTimeInterval: new TimeInterval(moment().startOf('week').subtract(7, 'days'), moment()).toString(),
 	compareDuration: moment.duration(1, 'days'),
 	chartToRender: chartTypes.line,
-	barStacking: false
+	barStacking: false,
+	hotlinked: false
 };
 
 /**
@@ -35,6 +36,11 @@ const defaultState = {
  */
 export default function graph(state = defaultState, action) {
 	switch (action.type) {
+		case graphActions.TOGGLE_HOTLINKED:
+			return {
+				...state,
+				hotlinked: !state.hotlinked
+			};
 		case graphActions.UPDATE_SELECTED_METERS:
 			return {
 				...state,
