@@ -73,7 +73,7 @@ function mapStateToProps(state, ownProps) {
 	if (readingsData !== undefined && !readingsData.isFetching) {
 		if (readingsData.readings.length < 7) {
 			soFar = moment().hour();
-		} else if (readingsData.readings.length < 14) {
+		} else if (readingsData.readings.length <= 14) {
 			soFar = moment().diff(moment().startOf('week'), 'days');
 		} else {
 			// 21 to differentiate from week case, week case never larger than 14

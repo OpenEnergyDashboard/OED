@@ -3,19 +3,20 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
 
 import { connect } from 'react-redux';
-import DashboardComponent from '../components/DashboardComponent';
-import { fetchPreferencesIfNeeded } from '../actions/admin';
+import RouteComponent from '../components/RouteComponent';
+import { changeOptionsFromLink } from '../actions/graph';
 
 function mapStateToProps(state) {
 	return {
-		chartToRender: state.graph.chartToRender,
+		barStacking: state.graph.barStacking
 	};
 }
+
 
 function mapDispatchToProps(dispatch) {
 	return {
-		fetchPreferencesIfNeeded: () => dispatch(fetchPreferencesIfNeeded())
+		changeOptionsFromLink: options => dispatch(changeOptionsFromLink(options))
 	};
 }
 
-export default connect(mapStateToProps, mapDispatchToProps)(DashboardComponent);
+export default connect(mapStateToProps, mapDispatchToProps)(RouteComponent);

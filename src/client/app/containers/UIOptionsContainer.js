@@ -22,7 +22,7 @@ function mapStateToProps(state) {
 		meters: sortedMeters,
 		selectedMeters: state.graph.selectedMeters.map(meterID => (
 			{
-				label: state.meters.byMeterID[meterID].name,
+				label: state.meters.byMeterID[meterID] ? state.meters.byMeterID[meterID].name : '',
 				value: meterID
 			}
 		)),

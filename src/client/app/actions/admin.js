@@ -45,18 +45,20 @@ function markPreferencesNotSubmitted() {
 }
 
 function fetchPreferences() {
-	return dispatch => {
+	return (dispatch, getState) => {
 		dispatch(requestPreferences());
 		return axios.get('/api/preferences')
 			.then(response => {
 				dispatch(receivePreferences(response.data));
-				dispatch((dispatch2, getState) => {
-					const state = getState();
-					dispatch2(changeChartToRender(state.admin.defaultChartToRender));
-					if (response.data.defaultBarStacking !== state.graph.barStacking) {
-						dispatch2(changeBarStacking());
-					}
-				});
+				if (!getState().graph.hotlinked) {
+					dispatch((dispatch2, getState2) => {
+						const state = getState2();
+						dispatch2(changeChartToRender(state.admin.defaultChartToRender));
+						if (response.data.defaultBarStacking !== state.graph.barStacking) {
+							dispatch2(changeBarStacking());
+						}
+					});
+				}
 			});
 	};
 }
