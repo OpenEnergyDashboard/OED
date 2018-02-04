@@ -218,3 +218,65 @@ AS $$
 			GROUP BY gdm.group_id, compressed.start_timestamp, compressed.end_timestamp;
 	END;
 $$ LANGUAGE 'plpgsql';
+
+
+CREATE FUNCTION compressed_barchart_readings_2(
+	meter_ids INTEGER[],
+	bar_width_days INTEGER,
+	start_stamp TIMESTAMP,
+	end_stamp TIMESTAMP
+)
+	RETURNS TABLE(meter_id INTEGER, reading FLOAT, start_timestamp TIMESTAMP, end_timestamp TIMESTAMP)
+AS $$
+DECLARE
+	bar_width INTERVAL;
+	real_start_stamp TIMESTAMP;
+	real_end_stamp TIMESTAMP;
+BEGIN
+	bar_width := INTERVAL '1 day' * bar_width_days;
+	real_start_stamp := date_trunc_up('day', start_stamp);
+	real_end_stamp := date_trunc('day', end_stamp);
+	RETURN QUERY
+		SELECT dr.meter_id AS meter_id,
+			SUM(dr.reading_rate * 86400) AS reading, -- 86400 seconds in a day
+			bars.interval_start AS start_timestamp,
+			bars.interval_start + bar_width AS end_timestamp
+	FROM daily_readings dr
+	INNER JOIN generate_series(real_start_stamp, real_end_stamp, bar_width) bars(interval_start)
+			ON tsrange(bars.interval_start, bars.interval_start + bar_width, '[]') @> dr.time_interval
+	INNER JOIN unnest(meter_ids) meters(id) ON dr.meter_id = meters.id
+	GROUP BY dr.meter_id, bars.interval_start;
+
+END;
+$$ LANGUAGE 'plpgsql';
+
+
+CREATE FUNCTION compressed_barchart_group_readings_2(
+	group_ids INTEGER[],
+	bar_width_days INTEGER,
+	start_stamp TIMESTAMP,
+	end_stamp TIMESTAMP
+)
+	RETURNS TABLE(group_id INTEGER, reading FLOAT, start_timestamp TIMESTAMP, end_timestamp TIMESTAMP)
+AS $$
+DECLARE
+	bar_width INTERVAL;
+	real_start_stamp TIMESTAMP;
+	real_end_stamp TIMESTAMP;
+BEGIN
+	bar_width := INTERVAL '1 day' * bar_width_days;
+	real_start_stamp := date_trunc_up('day', start_stamp);
+	real_end_stamp := date_trunc('day', end_stamp);
+	RETURN QUERY
+	SELECT dr.meter_id AS meter_id,
+				 SUM(dr.reading_rate * 86400) AS reading, -- 86400 seconds in a day
+				 bars.interval_start AS start_timestamp,
+				 bars.interval_start + bar_width AS end_timestamp
+	FROM daily_readings dr
+		INNER JOIN generate_series(real_start_stamp, real_end_stamp, bar_width) bars(interval_start)
+			ON tsrange(bars.interval_start, bars.interval_start + bar_width, '[]') @> dr.time_interval
+		INNER JOIN groups_deep_meters gdm ON dr.meter_id = gdm.meter_id
+		INNER JOIN unnest(group_ids) groups(id) ON gdm.group_id = groups.id
+	GROUP BY dr.meter_id, bars.interval_start;
+END;
+$$ LANGUAGE 'plpgsql';

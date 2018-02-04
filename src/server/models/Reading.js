@@ -267,8 +267,8 @@ class Reading {
 		const compressedReadingsByMeterID = mapToObject(meterIDs, () => []);
 		for (const row of allCompressedReadings) {
 			compressedReadingsByMeterID[row.meter_id].push(
-				{reading_rate: row.reading_rate, start_timestamp: row.start_timestamp, end_timestamp: row.end_timestamp}
-			)
+				{ reading_rate: row.reading_rate, start_timestamp: row.start_timestamp, end_timestamp: row.end_timestamp }
+			);
 		}
 		return compressedReadingsByMeterID;
 	}
@@ -280,7 +280,7 @@ class Reading {
 	 * @param fromTimestamp
 	 * @param toTimestamp
 	 * @param conn the connection to use. Defaults to the default database connection.
-	 * @return {Promise<object<int, array<{reading_rate: number, start_timestamp: }>>>}
+	 * @return {Promise<object<int, array<{reading_rate: number, start_timestamp: Moment, end_timestamp: Moment}>>>}
 	 */
 	static async getNewCompressedGroupReadings(groupIDs, fromTimestamp, toTimestamp, conn = db) {
 		/**
@@ -291,12 +291,51 @@ class Reading {
 		const compressedReadingsByGroupID = mapToObject(groupIDs, () => []);
 		for (const row of allCompressedGroupReadings) {
 			compressedReadingsByGroupID[row.group_id].push(
-				{reading_rate: row.reading_rate, start_timestamp: row.start_timestamp, end_timestamp: row.end_timestamp}
-			)
+				{ reading_rate: row.reading_rate, start_timestamp: row.start_timestamp, end_timestamp: row.end_timestamp }
+			);
 		}
 		return compressedReadingsByGroupID;
 	}
 
+	/**
+	 * Gets barchart readings for the given time range for the given meters
+	 * @param meterIDs The meters to get barchart readings for
+	 * @param fromTimestamp The start of the barchart interval
+	 * @param toTimestamp the end of the barchart interval
+	 * @param barWidthDays the width of each bar in days
+	 * @param conn the connection to use. Defaults to the default database connection
+	 * @return {Promise<object<int, array<{reading: number, start_timestamp: Moment, end_timestamp: Moment}>>>}
+	 */
+	static async getNewCompressedBarchartReadings(meterIDs, fromTimestamp, toTimestamp, barWidthDays, conn = db) {
+		const allBarReadings = await conn.func('compressed_barchart_readings_2', [meterIDs, barWidthDays, fromTimestamp, toTimestamp]);
+		const barReadingsByMeterID = mapToObject(meterIDs, () => []);
+		for (const row of allBarReadings) {
+			barReadingsByMeterID[row.meter_id].push(
+				{ reading: row.reading, start_timestamp: row.start_timestamp, end_timestamp: row.end_timestamp }
+			);
+		}
+		return barReadingsByMeterID;
+	}
+
+	/**
+	 * Gets barchart readings for the given time range for the given groups
+	 * @param groupIDs The groups to get barchart readings for
+	 * @param fromTimestamp The start of the barchart interval
+	 * @param toTimestamp the end of the barchart interval
+	 * @param barWidthDays the width of each bar in days
+	 * @param conn the connection to use. Defaults to the default database connection
+	 * @return {Promise<object<int, array<{reading: number, start_timestamp: Moment, end_timestamp: Moment}>>>}
+	 */
+	static async getNewCompressedBarchartGroupReadings(groupIDs, fromTimestamp, toTimestamp, barWidthDays, conn = db) {
+		const allBarReadings = await conn.func('compressed_barchart_group_readings_2', [groupIDs, barWidthDays, fromTimestamp, toTimestamp]);
+		const barReadingsByGroupID = mapToObject(groupIDs, () => []);
+		for (const row of allBarReadings) {
+			barReadingsByGroupID[row.group_id].push(
+				{ reading: row.reading, start_timestamp: row.start_timestamp, end_timestamp: row.end_timestamp }
+			);
+		}
+		return barReadingsByGroupID;
+	}
 
 
 	toString() {
