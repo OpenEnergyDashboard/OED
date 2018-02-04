@@ -4,6 +4,7 @@
 
 const jwt = require('jsonwebtoken');
 const secretToken = require('../config').secretToken;
+const validate = require('jsonschema').validate;
 
 /**
  * Middleware function to force a route to require authentication
@@ -11,7 +12,12 @@ const secretToken = require('../config').secretToken;
  */
 module.exports = (req, res, next) => {
 	const token = req.headers.token || req.body.token || req.query.token;
-	if (token) {
+	const validParams = {
+		type: 'string',
+	};
+	if (!validate(token, validParams).valid) {
+		res.sendStatus(400);
+	} else if (token) {
 		jwt.verify(token, secretToken, (err, decoded) => {
 			if (err) {
 				res.status(401).json({ success: false, message: 'Failed to authenticate token.' });

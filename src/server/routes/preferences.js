@@ -6,6 +6,7 @@ const express = require('express');
 const Preferences = require('../models/Preferences');
 const { log } = require('../log');
 const authentication = require('./authenticator');
+const validate = require('jsonschema').validate;
 
 const router = express.Router();
 
@@ -28,11 +29,37 @@ router.use(authentication);
  * @param user_id
  */
 router.post('/', async (req, res) => {
-	try {
-		const rows = await Preferences.update(req.body.preferences);
-		res.json(rows);
-	} catch (err) {
-		log.error(`Error while performing POST update preferences: ${err}`, err);
+	const validParams = {
+		type: 'object',
+		maxProperties: 2,
+		required: ['token', 'preferences'],
+		properties: {
+			token: {
+				type: 'string',
+			},
+			preferences: {
+				displayTitle: {
+					type: 'string',
+				},
+				defaultChartToRender: {
+					type: 'string'
+				},
+				defaultBarTracking: {
+					type: 'boolean'
+				}
+			}
+		}
+	};
+	if (!validate(req.body, validParams).valid) {
+		res.sendStatus(400);
+	} else {
+		try {
+			const rows = await Preferences.update(req.body.preferences);
+			res.json(rows);
+		} catch (err) {
+			log.error(`Error while performing POST update preferences: ${err}`, err);
+			res.sendStatus(500);
+		}
 	}
 });
 

@@ -5,6 +5,7 @@
 const express = require('express');
 const jwt = require('jsonwebtoken');
 const secretToken = require('../config').secretToken;
+const validate = require('jsonschema').validate;
 
 const router = express.Router();
 
@@ -13,19 +14,26 @@ const router = express.Router();
  * @param token
  */
 router.post('/', (req, res) => {
-	const token = req.body.token;
-	if (token) {
+	const validParams = {
+		type: 'object',
+		maxProperties: 1,
+		required: ['token'],
+		properties: {
+			token: {
+				type: 'string'
+			}
+		}
+	};
+	if (!validate(req.body, validParams).valid) {
+		res.sendStatus(400);
+	} else {
+		const token = req.body.token;
 		jwt.verify(token, secretToken, err => {
 			if (err) {
 				res.status(401).json({ success: false, message: 'Failed to authenticate token.' });
 			} else {
 				res.status(200).json({ success: true });
 			}
-		});
-	} else {
-		res.status(403).send({
-			success: false,
-			message: 'No token provided.'
 		});
 	}
 });
