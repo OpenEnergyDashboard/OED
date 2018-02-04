@@ -15,7 +15,7 @@ module.exports = (req, res, next) => {
 	const validParams = {
 		type: 'string',
 	};
-	if (!validate(validParams, token).valid) {
+	if (!validate(token, validParams).valid) {
 		res.sendStatus(400);
 	} else if (token) {
 		jwt.verify(token, secretToken, (err, decoded) => {

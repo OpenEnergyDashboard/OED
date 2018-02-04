@@ -67,7 +67,7 @@ router.get('/deep/groups/:group_id', async (req, res) => {
 			}
 		}
 	};
-	if (!validate(validParams, req.params).valid) {
+	if (!validate(req.params, validParams).valid) {
 		res.sendStatus(400);
 	} else {
 		try {
@@ -91,7 +91,7 @@ router.get('/deep/meters/:group_id', async (req, res) => {
 			}
 		}
 	};
-	if (!validate(validParams, req.params).valid) {
+	if (!validate(req.params, validParams).valid) {
 		res.sendStatus(400);
 	} else {
 		try {

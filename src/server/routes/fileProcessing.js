@@ -28,7 +28,7 @@ router.post('/:meter_id', upload.single('csvFile'), async (req, res) => {
 			}
 		}
 	};
-	if (!validate(validParams, req.params).valid || !req.file.buffer) {
+	if (!validate(req.params, validParams).valid || !req.file.buffer) {
 		res.sendStatus(400);
 	} else {
 		try {
