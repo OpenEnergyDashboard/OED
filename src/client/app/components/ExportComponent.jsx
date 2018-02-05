@@ -5,7 +5,7 @@
 import React from 'react';
 import { Button } from 'reactstrap';
 import moment from 'moment';
-import graphExport from '../services/exportData';
+import graphExport from '../utils/exportData';
 
 const ExportComponent = props => {
 	/**
