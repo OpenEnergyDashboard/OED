@@ -38,6 +38,15 @@ function askPassword(email) {
 	});
 }
 
+function overwritePassword() {
+	return new Promise((resolve, reject) => {
+		rl.question('User already exists. Overwrite password? [y/n] ', answer => {
+			if (answer.toLowerCase() === 'y') resolve(answer);
+			else reject(answer);
+		});
+	});
+}
+
 function terminateReadline(message) {
 	if (message) log.info(message);
 	rl.close();
@@ -73,11 +82,18 @@ function terminateReadline(message) {
 		terminateReadline('Password must be at least eight characters, no user created');
 	}
 
-	const admin = new User(undefined, email, bcrypt.hashSync(password, 10));
+	const passwordHash = bcrypt.hashSync(password, 10);
+	const admin = new User(undefined, email, passwordHash);
 	try {
 		await admin.insert();
 		terminateReadline('User created');
 	} catch (err) {
-		terminateReadline('User already exists, no additional user created');
+		try {
+			await overwritePassword();
+			await User.updateUserPassword(email, passwordHash);
+			terminateReadline('User\'s password updated');
+		} catch (err2) {
+			terminateReadline('No additional user created');
+		}
 	}
 })();
