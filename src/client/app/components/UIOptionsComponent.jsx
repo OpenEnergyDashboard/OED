@@ -155,14 +155,14 @@ export default class UIOptionsComponent extends React.Component {
 								outline={this.state.barDuration !== 28}
 								onClick={() => this.handleBarButton(28)}
 							>
-								Month
+								4 Weeks
 							</Button>
 						</ButtonGroup>
 						<Button
 							outline={!this.state.showSlider}
 							onClick={this.toggleSlider}
 						>
-							Toggle Custom Slider (days)
+							Toggle custom slider (days)
 						</Button>
 						{this.state.showSlider &&
 						<Slider
@@ -195,7 +195,7 @@ export default class UIOptionsComponent extends React.Component {
 							outline={compareVal !== 'month'}
 							onClick={() => this.handleCompareButton('month')}
 						>
-							Month
+							4 Weeks
 						</Button>
 					</ButtonGroup>
 				</div>
