@@ -173,7 +173,14 @@ export default class AdminComponent extends React.Component {
 									<div>Upload a CSV file:</div>
 								</Dropzone>
 							}
-
+						</div>
+						<div>
+							<div className="col-2">
+								<p style={titleStyle}> Add new meters: </p>
+								<Dropzone accept="text/csv, application/vnd.ms-excel," onDrop={this.handleMeterToImport}>
+									<div>Upload a CSV file 2:</div>
+								</Dropzone>
+							</div>
 						</div>
 					</div>
 				</div>
