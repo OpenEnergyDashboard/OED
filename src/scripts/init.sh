@@ -88,10 +88,10 @@ fi
 # Create a user
 set -e
 if [ "$DEFAULT_USER" == "yes" ]; then
-    npm run usermod -- test@example.com password
+    npm run createUser -- test@example.com password
     echo "Created a user 'test@example.com' with password 'password'."
 elif [ "$SKIP_USER" != "yes" ]; then
-    npm run usermod
+    npm run createUser
 else
     echo "WARNING: No user was created during init.sh run. You may wish to set up a user with the usermod npm script."
 fi

@@ -13,7 +13,8 @@
     "createdb": "node ./src/server/services/createDB.js",
     "addMamacMeters": "node ./src/server/services/addMamacMeters.js",
     "updateMamacMeters": "node ./src/server/services/updateMamacMeters.js",
-    "usermod": "node ./src/server/services/usermod.js"
+    "createUser": "node ./src/server/services/user/createUser.js",
+    "editUser": "node ./src/server/services/user/editUser.js"
   },
   "dependencies": {
     "axios": "~0.16.2",
