@@ -93,7 +93,7 @@ if [ "$DEFAULT_USER" == "yes" ]; then
 elif [ "$SKIP_USER" != "yes" ]; then
     npm run createUser
 else
-    echo "WARNING: No user was created during init.sh run. You may wish to set up a user with the usermod npm script."
+    echo "WARNING: No user was created during init.sh run. You may wish to set up a user with the createUser npm script."
 fi
 
 # Build webpack if needed
