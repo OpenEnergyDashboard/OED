@@ -216,6 +216,7 @@ router.put('/edit', async (req, res) => {
 			if (err.message && err.message === 'Cyclic group detected') {
 				res.status(400).send({ message: err.message });
 			} else {
+				log.error(`Error while editing existing group ${err}`, err);
 				res.sendStatus(500);
 			}
 		}
