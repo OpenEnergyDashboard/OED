@@ -21,6 +21,7 @@ export default class AdminComponent extends React.Component {
 		this.handleDefaultBarStackingChange = this.handleDefaultBarStackingChange.bind(this);
 		this.handleSubmitPreferences = this.handleSubmitPreferences.bind(this);
 		this.handleFileToImport = this.handleFileToImport.bind(this);
+		this.handleMeterToImport = this.handleMeterToImport.bind(this);
 	}
 
 	handleDisplayTitleChange(e) {
@@ -37,6 +38,27 @@ export default class AdminComponent extends React.Component {
 
 	handleSubmitPreferences() {
 		this.props.submitPreferences();
+	}
+
+	handleMeterToImport(files) {
+		const file = files[0];
+		const data = new FormData();
+		console.log(data);
+		data.append('csvFile', file);
+		// axios({
+		// 	method: 'post',
+		// 	url: `/api/meters/`,
+		// 	data,
+		// 	params: {
+		// 		token: getToken()
+		// 	}
+		// })
+		// 	.then(() => {
+		// 		showSuccessNotification('Successfully uploaded new meters');
+		// 	})
+		// 	.catch(() => {
+		// 		showErrorNotification('Error uploading new meters');
+		// 	});
 	}
 
 	handleFileToImport(files) {
@@ -168,19 +190,17 @@ export default class AdminComponent extends React.Component {
 								onValuesChange={s => this.props.updateSelectedImportMeter(s)}
 								singleSelect
 							/>
-							{ this.props.selectedImportMeter &&
+							{this.props.selectedImportMeter &&
 								<Dropzone accept="text/csv, application/vnd.ms-excel," onDrop={this.handleFileToImport}>
 									<div>Upload energy data (CSV):</div>
 								</Dropzone>
 							}
 						</div>
-						<div>
-							<div className="col-2">
-								<p style={titleStyle}>Add new meters:</p>
-								<Dropzone accept="text/csv, application/vnd.ms-excel," onDrop={this.handleMeterToImport}>
-									<div>Upload meters list (CSV):</div>
-								</Dropzone>
-							</div>
+						<div className="col-2">
+							<p style={titleStyle}> Add new meters: </p>
+							<Dropzone accept="text/csv, application/vnd.ms-excel," onDrop={this.handleMeterToImport}>
+								<div>Upload meters list (CSV):</div>
+							</Dropzone>
 						</div>
 					</div>
 				</div>
