@@ -9,6 +9,7 @@ import NotificationSystem from 'react-notification-system';
 export default class InitializationComponent extends React.Component {
 	componentWillMount() {
 		this.props.fetchMetersDetailsIfNeeded();
+		this.props.fetchPreferencesIfNeeded();
 	}
 
 	componentWillReceiveProps(nextProps) {
