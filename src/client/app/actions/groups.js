@@ -297,9 +297,13 @@ function submitGroupEdits(group) {
 					dispatch2(changeDisplayMode(DISPLAY_MODE.VIEW));
 				});
 			})
-			.catch(() => {
+			.catch(e => {
 				dispatch(markGroupInEditingNotSubmitted());
-				showErrorNotification('Failed to edit group');
+				if (e.response.data.message && e.response.data.message === 'Cyclic group detected') {
+					showErrorNotification('You cannot create a cyclic group');
+				} else {
+					showErrorNotification('Failed to edit group');
+				}
 			});
 	};
 }
