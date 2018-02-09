@@ -24,7 +24,7 @@ router.post('/:meter_id', upload.single('csvFile'), async (req, res) => {
 		required: ['meter_id'],
 		properties: {
 			meter_id: {
-				type: 'number'
+				type: 'string'
 			}
 		}
 	};
