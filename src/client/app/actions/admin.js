@@ -50,14 +50,12 @@ function fetchPreferences() {
 		return axios.get('/api/preferences')
 			.then(response => {
 				dispatch(receivePreferences(response.data));
-				if (!getState().graph.hotlinked) {
-					dispatch((dispatch2, getState2) => {
-						const state = getState2();
-						dispatch2(changeChartToRender(state.admin.defaultChartToRender));
-						if (response.data.defaultBarStacking !== state.graph.barStacking) {
-							dispatch2(changeBarStacking());
-						}
-					});
+				const state = getState();
+				if (!state.graph.hotlinked) {
+					dispatch(changeChartToRender(state.admin.defaultChartToRender));
+					if (response.data.defaultBarStacking !== state.graph.barStacking) {
+						dispatch(changeBarStacking());
+					}
 				}
 			});
 	};

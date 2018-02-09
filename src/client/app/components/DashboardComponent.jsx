@@ -15,32 +15,26 @@ defaults.global.plugins.datalabels.display = false;
 /**
  * React component that controls the dashboard
  */
-export default class DashboardComponent extends React.Component {
-	componentWillMount() {
-		this.props.fetchPreferencesIfNeeded();
+export default function DashboardComponent(props) {
+	let ChartToRender = '';
+	if (props.chartToRender === chartTypes.line) {
+		ChartToRender = LineChartContainer;
+	} else if (props.chartToRender === chartTypes.compare) {
+		ChartToRender = MultiCompareChartContainer;
+	} else {
+		ChartToRender = BarChartContainer;
 	}
 
-	render() {
-		let ChartToRender = '';
-		if (this.props.chartToRender === chartTypes.line) {
-			ChartToRender = LineChartContainer;
-		} else if (this.props.chartToRender === chartTypes.compare) {
-			ChartToRender = MultiCompareChartContainer;
-		} else {
-			ChartToRender = BarChartContainer;
-		}
-
-		return (
-			<div className="container-fluid">
-				<div className="row">
-					<div className="col-2 d-none d-lg-block">
-						<UIOptionsContainer />
-					</div>
-					<div className="col-12 col-lg-10">
-						<ChartToRender />
-					</div>
+	return (
+		<div className="container-fluid">
+			<div className="row">
+				<div className="col-2 d-none d-lg-block">
+					<UIOptionsContainer />
+				</div>
+				<div className="col-12 col-lg-10">
+					<ChartToRender />
 				</div>
 			</div>
-		);
-	}
+		</div>
+	);
 }
