@@ -19,6 +19,7 @@ export default class AdminComponent extends React.Component {
 		this.handleDisplayTitleChange = this.handleDisplayTitleChange.bind(this);
 		this.handleDefaultChartToRenderChange = this.handleDefaultChartToRenderChange.bind(this);
 		this.handleDefaultBarStackingChange = this.handleDefaultBarStackingChange.bind(this);
+		this.handleDefaultHideOptionsChange = this.handleDefaultHideOptionsChange.bind(this);
 		this.handleSubmitPreferences = this.handleSubmitPreferences.bind(this);
 		this.handleFileToImport = this.handleFileToImport.bind(this);
 	}
@@ -33,6 +34,10 @@ export default class AdminComponent extends React.Component {
 
 	handleDefaultBarStackingChange() {
 		this.props.toggleDefaultBarStacking();
+	}
+
+	handleDefaultHideOptionsChange() {
+		this.props.toggleDefaultHideOptions();
 	}
 
 	handleSubmitPreferences() {
@@ -145,7 +150,17 @@ export default class AdminComponent extends React.Component {
 										onChange={this.handleDefaultBarStackingChange}
 										checked={this.props.defaultBarStacking}
 									/>
-									Default Bar stacking
+									Default bar stacking
+								</label>
+							</div>
+							<div className="checkbox">
+								<label>
+									<input
+										type="checkbox"
+										onChange={this.handleDefaultHideOptionsChange}
+										checked={this.props.defaultHideOptions}
+									/>
+									Default hide options panel
 								</label>
 							</div>
 							<Button

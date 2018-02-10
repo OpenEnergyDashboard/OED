@@ -7,7 +7,8 @@ import HeaderComponent from '../components/HeaderComponent';
 
 function mapStateToProps(state) {
 	return {
-		title: state.admin.displayTitle
+		title: state.admin.displayTitle,
+		hideOptions: state.admin.defaultHideOptions
 	};
 }
 

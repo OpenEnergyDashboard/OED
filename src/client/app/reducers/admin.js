@@ -10,6 +10,7 @@ const defaultState = {
 	displayTitle: '',
 	defaultChartToRender: chartTypes.line,
 	defaultBarStacking: false,
+	defaultHideOptions: false,
 	isFetching: false,
 	submitted: true
 };
@@ -39,6 +40,12 @@ export default function admin(state = defaultState, action) {
 				defaultBarStacking: !state.defaultBarStacking,
 				submitted: false
 			};
+		case adminActions.TOGGLE_DEFAULT_HIDE_OPTIONS:
+			return {
+				...state,
+				defaultHideOptions: !state.defaultHideOptions,
+				submitted: false
+			};
 		case adminActions.REQUEST_PREFERENCES:
 			return {
 				...state,
@@ -50,7 +57,8 @@ export default function admin(state = defaultState, action) {
 				isFetching: false,
 				displayTitle: action.data.displayTitle,
 				defaultChartToRender: action.data.defaultChartToRender,
-				defaultBarStacking: action.data.defaultBarStacking
+				defaultBarStacking: action.data.defaultBarStacking,
+				defaultHideOptions: action.data.defaultHideOptions
 			};
 		case adminActions.MARK_PREFERENCES_SUBMITTED:
 			return {

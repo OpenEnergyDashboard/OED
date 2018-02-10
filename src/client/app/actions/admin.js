@@ -11,6 +11,7 @@ export const UPDATE_IMPORT_METER = 'UPDATE_IMPORT_METER';
 export const UPDATE_DISPLAY_TITLE = 'UPDATE_DISPLAY_TITLE';
 export const UPDATE_DEFAULT_CHART_TO_RENDER = 'UPDATE_DEFAULT_CHART_TO_RENDER';
 export const TOGGLE_DEFAULT_BAR_STACKING = 'TOGGLE_DEFAULT_BAR_STACKING';
+export const TOGGLE_DEFAULT_HIDE_OPTIONS = 'TOGGLE_DEFAULT_HIDE_OPTIONS';
 export const REQUEST_PREFERENCES = 'REQUEST_PREFERENCES';
 export const RECEIVE_PREFERENCES = 'RECEIVE_PREFERENCES';
 export const MARK_PREFERENCES_NOT_SUBMITTED = 'MARK_PREFERENCES_NOT_SUBMITTED';
@@ -26,6 +27,10 @@ export function updateDefaultChartToRender(defaultChartToRender) {
 
 export function toggleDefaultBarStacking() {
 	return { type: TOGGLE_DEFAULT_BAR_STACKING };
+}
+
+export function toggleDefaultHideOptions() {
+	return { type: TOGGLE_DEFAULT_HIDE_OPTIONS };
 }
 
 function requestPreferences() {
@@ -71,7 +76,8 @@ function submitPreferences() {
 				preferences: {
 					displayTitle: state.admin.displayTitle,
 					defaultChartToRender: state.admin.defaultChartToRender,
-					defaultBarStacking: state.admin.defaultBarStacking
+					defaultBarStacking: state.admin.defaultBarStacking,
+					defaultHideOptions: state.admin.defaultHideOptions
 				}
 			})
 			.then(() => {

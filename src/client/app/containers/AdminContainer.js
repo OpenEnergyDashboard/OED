@@ -5,13 +5,21 @@
 import { connect } from 'react-redux';
 import _ from 'lodash';
 import AdminComponent from '../components/AdminComponent';
-import { updateDisplayTitle, updateDefaultChartToRender, toggleDefaultBarStacking, submitPreferencesIfNeeded, updateSelectedMeter } from '../actions/admin';
+import {
+	updateDisplayTitle,
+	updateDefaultChartToRender,
+	toggleDefaultBarStacking,
+	toggleDefaultHideOptions,
+	submitPreferencesIfNeeded,
+	updateSelectedMeter,
+} from '../actions/admin';
 
 function mapStateToProps(state) {
 	return {
 		displayTitle: state.admin.displayTitle,
 		defaultChartToRender: state.admin.defaultChartToRender,
 		defaultBarStacking: state.admin.defaultBarStacking,
+		defaultHideOptions: state.admin.defaultHideOptions,
 		disableSubmitPreferences: state.admin.submitted,
 		meters: _.sortBy(_.values(state.meters.byMeterID).map(meter => ({ value: meter.id, label: meter.name.trim() })), 'name'),
 		selectedImportMeter: state.admin.selectedMeter
@@ -24,6 +32,7 @@ function mapDispatchToProps(dispatch) {
 		updateDisplayTitle: displayTitle => dispatch(updateDisplayTitle(displayTitle)),
 		updateDefaultGraphType: defaultChartToRender => dispatch(updateDefaultChartToRender(defaultChartToRender)),
 		toggleDefaultBarStacking: () => dispatch(toggleDefaultBarStacking()),
+		toggleDefaultHideOptions: () => dispatch(toggleDefaultHideOptions()),
 		submitPreferences: () => dispatch(submitPreferencesIfNeeded())
 	};
 }

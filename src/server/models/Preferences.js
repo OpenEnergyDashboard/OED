@@ -13,11 +13,13 @@ class Preferences {
 	 * @param {String} displayTitle - Header title to display
 	 * @param {String} defaultChartToRender - Chart to display as default
 	 * @param {Boolean} defaultBarStacking - Option to set default toggle of bar stacking
+	 * @param {Boolean} defaultHideOptions - Option to hide options panel by default
 	 */
-	constructor(displayTitle, defaultChartToRender, defaultBarStacking) {
+	constructor(displayTitle, defaultChartToRender, defaultBarStacking, defaultHideOptions) {
 		this.displayTitle = displayTitle;
 		this.defaultChartToRender = defaultChartToRender;
 		this.defaultBarStacking = defaultBarStacking;
+		this.defaultHideOptions = defaultHideOptions;
 	}
 
 	/**
@@ -39,7 +41,7 @@ class Preferences {
 	}
 
 	static mapRow(row) {
-		return new Preferences(row.display_title, row.default_chart_to_render, row.default_bar_stacking);
+		return new Preferences(row.display_title, row.default_chart_to_render, row.default_bar_stacking, row.default_hide_options);
 	}
 
 	static async get() {
@@ -54,7 +56,8 @@ class Preferences {
 			{
 				displayTitle: preferences.displayTitle,
 				defaultChartToRender: preferences.defaultChartToRender,
-				defaultBarStacking: preferences.defaultBarStacking
+				defaultBarStacking: preferences.defaultBarStacking,
+				defaultHideOptions: preferences.defaultHideOptions
 			});
 	}
 }

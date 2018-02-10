@@ -8,6 +8,7 @@ import DashboardComponent from '../components/DashboardComponent';
 function mapStateToProps(state) {
 	return {
 		chartToRender: state.graph.chartToRender,
+		hideOptions: state.admin.defaultHideOptions
 	};
 }
 
