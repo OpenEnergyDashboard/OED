@@ -10,7 +10,7 @@
 
 const app = require('../server/app');
 const http = require('http');
-const log = require('../server/log');
+const { log } = require('../server/log');
 
 const serverPort = require('../server/config').serverPort;
 
@@ -66,11 +66,11 @@ function onError(error) {
     // handle specific listen errors with friendly messages
 	switch (error.code) {
 	case 'EACCES':
-		log(`${bind} requires elevated privileges`, 'error', true);
+		log.error(`${bind} requires elevated privileges`);
 		process.exit(1);
 		break;
 	case 'EADDRINUSE':
-		log(`${bind} is already in use`, 'error', true);
+		log.error(`${bind} is already in use`);
 		process.exit(1);
 		break;
 	default:
@@ -87,7 +87,7 @@ function onListening() {
 	const bind = typeof addr === 'string'
         ? `pipe ${addr}`
         : `port ${addr.port}`;
-	log(`Listening on ${bind}`);
+	log.info(`Listening on ${bind}`);
 }
 
 

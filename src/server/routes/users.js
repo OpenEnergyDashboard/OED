@@ -4,7 +4,8 @@
 
 const express = require('express');
 const User = require('../models/User');
-const log = require('../log');
+const { log } = require('../log');
+const validate = require('jsonschema').validate;
 
 const router = express.Router();
 
@@ -16,7 +17,7 @@ router.get('/', async (req, res) => {
 		const rows = await User.getAll();
 		res.json(rows);
 	} catch (err) {
-		log(`Error while performing GET all users query: ${err}`, 'error');
+		log.error(`Error while performing GET all users query: ${err}`, err);
 	}
 });
 
@@ -25,11 +26,26 @@ router.get('/', async (req, res) => {
  * @param user_id
  */
 router.get('/:user_id', async (req, res) => {
-	try {
-		const rows = await User.getByID(req.params.user_id);
-		res.json(rows);
-	} catch (err) {
-		log(`Error while performing GET specific user by id query: ${err}`, 'error');
+	const validParams = {
+		type: 'object',
+		maxProperties: 1,
+		required: ['user_id'],
+		properties: {
+			group_id: {
+				type: 'id'
+			}
+		}
+	};
+	if (!validate(req.params, validParams).valid) {
+		res.sendStatus(400);
+	} else {
+		try {
+			const rows = await User.getByID(req.params.user_id);
+			res.json(rows);
+		} catch (err) {
+			log.error(`Error while performing GET specific user by id query: ${err}`, err);
+			res.sendStatus(500);
+		}
 	}
 });
 

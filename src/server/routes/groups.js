@@ -9,7 +9,7 @@ const validate = require('jsonschema').validate;
 const Group = require('../models/Group');
 const db = require('../models/database').db;
 const authenticator = require('./authenticator');
-const log = require('../log');
+const { log } = require('../log');
 
 const router = express.Router();
 
@@ -32,7 +32,7 @@ router.get('/', async (req, res) => {
 		const rows = await Group.getAll();
 		res.json(rows.map(formatToOnlyNameAndID));
 	} catch (err) {
-		log(`Error while preforming GET all groups query: ${err}`, 'error');
+		log.error(`Error while preforming GET all groups query: ${err}`, err);
 	}
 });
 
@@ -52,25 +52,55 @@ router.get('/children/:group_id', async (req, res) => {
 		]);
 		res.json({ meters, groups });
 	} catch (err) {
-		log(`Error while preforming GET on all immediate children (meters and groups) of specific group: ${err}`, 'error');
+		log.error(`Error while preforming GET on all immediate children (meters and groups) of specific group: ${err}`, err);
 	}
 });
 
 router.get('/deep/groups/:group_id', async (req, res) => {
-	try {
-		const [deepGroups] = await Group.getDeepGroupsByGroupID(req.params.group_id);
-		res.json({ deepGroups });
-	} catch (err) {
-		log(`Error while preforming GET on all deep child groups of specific group: ${err}`, 'error');
+	const validParams = {
+		type: 'object',
+		maxProperties: 1,
+		required: ['group_id'],
+		properties: {
+			group_id: {
+				type: 'number'
+			}
+		}
+	};
+	if (!validate(req.params, validParams).valid) {
+		res.sendStatus(400);
+	} else {
+		try {
+			const [deepGroups] = await Group.getDeepGroupsByGroupID(req.params.group_id);
+			res.json({ deepGroups });
+		} catch (err) {
+			log.error(`Error while preforming GET on all deep child groups of specific group: ${err}`, err);
+			res.sendStatus(500);
+		}
 	}
 });
 
 router.get('/deep/meters/:group_id', async (req, res) => {
-	try {
-		const [deepMeters] = await Group.getDeepMetersByGroupID(req.params.group_id);
-		res.json({ deepMeters });
-	} catch (err) {
-		log(`Error while preforming GET on all deep child meters of specific group: ${err}`, 'error');
+	const validParams = {
+		type: 'object',
+		maxProperties: 1,
+		required: ['group_id'],
+		properties: {
+			meter_id: {
+				type: 'number'
+			}
+		}
+	};
+	if (!validate(req.params, validParams).valid) {
+		res.sendStatus(400);
+	} else {
+		try {
+			const [deepMeters] = await Group.getDeepMetersByGroupID(req.params.group_id);
+			res.json({ deepMeters });
+		} catch (err) {
+			log.error(`Error while preforming GET on all deep child meters of specific group: ${err}`, err);
+			res.sendStatus(500);
+		}
 	}
 });
 
@@ -117,7 +147,7 @@ router.post('/create', async (req, res) => {
 			});
 			res.sendStatus(200);
 		} catch (err) {
-			log(`Error while inserting new group ${err}`, 'error');
+			log.error(`Error while inserting new group ${err}`, err);
 			res.sendStatus(500);
 		}
 	}
@@ -183,8 +213,12 @@ router.put('/edit', async (req, res) => {
 			});
 			res.sendStatus(200);
 		} catch (err) {
-			log(`Error while editing existing group: ${err}`, 'error');
-			res.sendStatus(500);
+			if (err.message && err.message === 'Cyclic group detected') {
+				res.status(400).send({ message: err.message });
+			} else {
+				log.error(`Error while editing existing group ${err}`, err);
+				res.sendStatus(500);
+			}
 		}
 	}
 });
@@ -206,7 +240,7 @@ router.post('/delete', async (req, res) => {
 			await Group.delete(req.body.id);
 			res.sendStatus(200);
 		} catch (err) {
-			log(`Error while deleting group ${err}`, 'error');
+			log.error(`Error while deleting group ${err}`, err);
 			res.sendStatus(500);
 		}
 	}

@@ -7,12 +7,13 @@ import { Router, Route, browserHistory } from 'react-router';
 import axios from 'axios';
 import moment from 'moment';
 import _ from 'lodash';
-import NotificationSystem from 'react-notification-system';
+import InitializationContainer from '../containers/InitializationContainer';
 import HomeComponent from './HomeComponent';
-import LoginContainer from '../containers/LoginContainer';
-import AdminComponent from './AdminComponent';
+import LoginComponent from '../components/LoginComponent';
+import AdminContainer from '../containers/AdminContainer';
 import GroupMainContainer from '../containers/groups/GroupMainContainer';
-import getToken from '../utils/getToken';
+import { getToken, hasToken } from '../utils/token';
+import { showErrorNotification } from '../utils/notifications';
 
 export default class RouteComponent extends React.Component {
 	constructor(props) {
@@ -24,13 +25,6 @@ export default class RouteComponent extends React.Component {
 	shouldComponentUpdate() {
 		// To ignore warning: [react-router] You cannot change 'Router routes'; it will be ignored
 		return false;
-	}
-
-	componentWillReceiveProps(nextProps) {
-		if (!_.isEmpty(nextProps.notification)) {
-			this.notificationSystem.addNotification(nextProps.notification);
-			this.props.clearNotifications();
-		}
 	}
 
 	/**
@@ -45,14 +39,13 @@ export default class RouteComponent extends React.Component {
 				state: { nextPathname: nextState.location.pathname }
 			});
 		}
-		const token = getToken();
 		// Redirect route to login page if the auth token does not exist
-		if (!token) {
+		if (!hasToken()) {
 			redirectRoute();
 			return;
 		}
 		// Verify that the auth token is valid
-		axios.post('/api/verification/', { token }, { validateStatus: status => (status >= 200 && status < 300) || (status === 401 || status === 403) })
+		axios.post('/api/verification/', { token: getToken() }, { validateStatus: status => (status >= 200 && status < 300) || (status === 401 || status === 403) })
 			.then(res => {
 				// Route to login page if the auth token is not valid
 				if (!res.data.success) browserHistory.push('/login');
@@ -94,9 +87,11 @@ export default class RouteComponent extends React.Component {
 							throw new Error('Unknown query parameter');
 					}
 				}
-				this.props.changeOptionsFromLink(options);
+				if (Object.keys(options).length > 0) {
+					this.props.changeOptionsFromLink(options);
+				}
 			} catch (err) {
-				console.error('Failed to link to graph');
+				showErrorNotification('Failed to link to graph');
 			}
 		}
 		replace({
@@ -112,10 +107,10 @@ export default class RouteComponent extends React.Component {
 	render() {
 		return (
 			<div>
-				<NotificationSystem ref={c => { this.notificationSystem = c; }} />
+				<InitializationContainer />
 				<Router history={browserHistory}>
-					<Route path="/login" component={LoginContainer} />
-					<Route path="/admin" component={AdminComponent} onEnter={this.requireAuth} />
+					<Route path="/login" component={LoginComponent} />
+					<Route path="/admin" component={AdminContainer} onEnter={this.requireAuth} />
 					<Route path="/groups" component={GroupMainContainer} onEnter={this.requireAuth} />
 					<Route path="/graph" component={HomeComponent} onEnter={this.linkToGraph} />
 					<Route path="*" component={HomeComponent} />

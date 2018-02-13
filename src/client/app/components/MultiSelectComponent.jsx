@@ -14,7 +14,7 @@ export default class MultiSelectComponent extends React.Component {
 		this.onValuesChangeInternal = this.onValuesChangeInternal.bind(this);
 		// selectedOptions holds a list of the options that have been selected
 		this.state = {
-			selectedOptions: this.props.selectedOptions ? this.props.selectedOptions : []
+			selectedOptions: this.props.selectedOptions ? this.props.selectedOptions : null
 		};
 	}
 
@@ -34,7 +34,7 @@ export default class MultiSelectComponent extends React.Component {
 	render() {
 		return (
 			<Select
-				multi
+				multi={!this.props.singleSelect}
 				options={this.props.options}
 				value={this.state.selectedOptions}
 				placeholder={this.props.placeholder}
@@ -53,9 +53,16 @@ MultiSelectComponent.propTypes = {
 		label: PropTypes.string.isRequired,
 		value: PropTypes.number,
 	})),
-	selectedOptions: PropTypes.arrayOf(PropTypes.shape({
-		label: PropTypes.string.isRequired,
-		value: PropTypes.number,
-	})),
+	selectedOptions: PropTypes.oneOfType([
+		PropTypes.arrayOf(PropTypes.shape({
+			label: PropTypes.string.isRequired,
+			value: PropTypes.number,
+		})),
+		PropTypes.shape({
+			label: PropTypes.string.isRequired,
+			value: PropTypes.number,
+		})
+	]),
 	onValuesChange: PropTypes.func.isRequired,
+	singleSelect: PropTypes.bool
 };

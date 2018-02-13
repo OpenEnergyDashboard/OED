@@ -3,9 +3,9 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
 
 import React from 'react';
-import { Button } from 'react-bootstrap';
+import { Button } from 'reactstrap';
 import moment from 'moment';
-import graphExport from '../services/exportData';
+import graphExport from '../utils/exportData';
 
 const ExportComponent = props => {
 	/**
@@ -45,7 +45,7 @@ const ExportComponent = props => {
 	};
 	return (
 		<div>
-			<Button bsStyle="default" onClick={exportReading}>Export graph data</Button>
+			<Button outline onClick={exportReading}>Export graph data</Button>
 		</div>
 	);
 };

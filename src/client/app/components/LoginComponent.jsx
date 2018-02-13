@@ -5,8 +5,10 @@
 import React from 'react';
 import axios from 'axios';
 import { browserHistory } from 'react-router';
-import HeaderComponent from '../components/HeaderComponent';
+import { Input, Button, InputGroup, Form } from 'reactstrap';
+import HeaderContainer from '../containers/HeaderContainer';
 import FooterComponent from '../components/FooterComponent';
+import { showErrorNotification } from '../utils/notifications';
 
 
 export default class LoginComponent extends React.Component {
@@ -55,12 +57,7 @@ export default class LoginComponent extends React.Component {
 		})
 		.catch(err => {
 			if (err.response.status === 401) {
-				this.props.showNotification({
-					message: 'Invalid email/password combination',
-					level: 'error',
-					position: 'tr',
-					autoDismiss: 3
-				});
+				showErrorNotification('Invalid email/password combination');
 			} else {
 				// If there was a problem other than a lack of authorization, the user can't fix it.
 				// Log it to the console for developer use.
@@ -85,19 +82,28 @@ export default class LoginComponent extends React.Component {
 		};
 		return (
 			<div>
-				<HeaderComponent renderLoginButton={false} />
-				<form style={formStyle} onSubmit={this.handleSubmit}>
-					<div className="input-group">
-						<span className="input-group-addon"><i className="glyphicon glyphicon-user" /></span>
-						<input type="text" className="form-control" placeholder="Email" ref={c => { this.inputEmail = c; }} value={this.state.email} onChange={this.handleEmailChange} />
-					</div>
-					<div className="input-group">
-						<span className="input-group-addon"><i className="glyphicon glyphicon-lock" /></span>
-						<input type="password" className="form-control" placeholder="Password" value={this.state.password} onChange={this.handlePasswordChange} />
-					</div>
-					<input style={buttonStyle} className="btn btn-default" type="submit" value="Login" />
-				</form>
-				<FooterComponent/>
+				<HeaderContainer />
+				<Form style={formStyle}>
+					<InputGroup>
+						<Input
+							type="text"
+							placeholder="Email"
+							innerRef={c => { this.inputEmail = c; }}
+							value={this.state.email}
+							onChange={this.handleEmailChange}
+						/>
+					</InputGroup>
+					<InputGroup>
+						<Input
+							type="password"
+							placeholder="Password"
+							value={this.state.password}
+							onChange={this.handlePasswordChange}
+						/>
+					</InputGroup>
+					<Button outline style={buttonStyle} type="submit" onClick={this.handleSubmit}>Submit</Button>
+				</Form>
+				<FooterComponent />
 			</div>
 		);
 	}
