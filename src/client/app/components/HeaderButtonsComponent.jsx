@@ -27,12 +27,14 @@ export default class HeaderButtonsComponent extends React.Component {
 		const page = urlArr[urlArr.length - 1];
 		let showUIOptions = false;
 		let renderLoginButton = false;
+		let renderHomeButton = true;
 		let renderAdminButton = false;
 		let renderGroupsButton = false;
 		const renderLogoutButton = hasToken();
 
 		switch (page) {
 			case '': // home page
+				renderHomeButton = false;
 				showUIOptions = true;
 				if (renderLogoutButton) {
 					renderAdminButton = true;
@@ -55,6 +57,10 @@ export default class HeaderButtonsComponent extends React.Component {
 		}
 		const loginLinkStyle = {
 			display: renderLoginButton ? 'inline' : 'none',
+			paddingLeft: '5px'
+		};
+		const homeLinkStyle = {
+			display: renderHomeButton ? 'inline' : 'none',
 			paddingLeft: '5px'
 		};
 		const adminLinkStyle = {
@@ -81,6 +87,7 @@ export default class HeaderButtonsComponent extends React.Component {
 				</div>
 				<div className={this.props.renderOptionsButton ? 'd-none d-lg-block' : ''}>
 					<Link style={loginLinkStyle} to="/login"><Button outline>Log In</Button></Link>
+					<Link style={homeLinkStyle} to="/"><Button outline>Home</Button></Link>
 					<Link style={adminLinkStyle} to="/admin"><Button outline>Admin panel</Button></Link>
 					<Link style={groupsLinkStyle} to="/groups"><Button outline>Groups</Button></Link>
 					<Link style={logoutButtonStyle} to="/"><Button outline onClick={this.handleLogOut}>Log Out</Button></Link>
