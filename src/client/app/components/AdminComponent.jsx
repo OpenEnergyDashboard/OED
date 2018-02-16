@@ -45,20 +45,20 @@ export default class AdminComponent extends React.Component {
 		const data = new FormData();
 		console.log(data);
 		data.append('csvFile', file);
-		// axios({
-		// 	method: 'post',
-		// 	url: `/api/meters/`,
-		// 	data,
-		// 	params: {
-		// 		token: getToken()
-		// 	}
-		// })
-		// 	.then(() => {
-		// 		showSuccessNotification('Successfully uploaded new meters');
-		// 	})
-		// 	.catch(() => {
-		// 		showErrorNotification('Error uploading new meters');
-		// 	});
+		axios({
+			method: 'post',
+			url: '/api/fileProcessing/meters',
+			data,
+			params: {
+				token: getToken()
+			}
+		})
+			.then(() => {
+				showSuccessNotification('Successfully uploaded new meters');
+			})
+			.catch(() => {
+				showErrorNotification('Error uploading new meters');
+			});
 	}
 
 	handleFileToImport(files) {
@@ -69,9 +69,10 @@ export default class AdminComponent extends React.Component {
 			const file = files[0];
 			const data = new FormData();
 			data.append('csvFile', file);
+			console.log(data);
 			axios({
 				method: 'post',
-				url: `/api/fileProcessing/${this.props.selectedImportMeter.value}`,
+				url: `/api/fileProcessing/readings/${this.props.selectedImportMeter.value}`,
 				data,
 				params: {
 					token: getToken()

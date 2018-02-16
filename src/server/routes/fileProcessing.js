@@ -10,6 +10,7 @@ const multer = require('multer');
 const streamToDB = require('../services/loadFromCsvStream');
 const authenticator = require('./authenticator');
 const validate = require('jsonschema').validate;
+const MeterReading = require('../services/addMamacMeters');
 
 const router = express.Router();
 
@@ -17,7 +18,7 @@ const router = express.Router();
 const upload = multer({ storage: multer.memoryStorage() });
 
 router.use(authenticator);
-router.post('/:meter_id', upload.single('csvFile'), async (req, res) => {
+router.post('/readings/:meter_id', upload.single('csvFile'), async (req, res) => {
 	const validParams = {
 		type: 'object',
 		maxProperties: 1,
@@ -58,6 +59,15 @@ router.post('/:meter_id', upload.single('csvFile'), async (req, res) => {
 			});
 		}
 	}
+});
+
+router.post('/meters', upload.single('csvFile'), async (req, res) => {
+	const meterData = req.file.buffer.toString();
+	for (const row of meterData) {
+		console.log(row);
+	}
+	console.log(meterData);
+	res.sendStatus(200);
 });
 
 module.exports = router;
