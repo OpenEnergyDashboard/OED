@@ -14,6 +14,7 @@ import ChartSelectContainer from '../containers/ChartSelectContainer';
 import ChartDataSelectContainer from '../containers/ChartDataSelectContainer';
 import ChartLinkContainer from '../containers/ChartLinkContainer';
 import TimeInterval from '../../../common/TimeInterval';
+import TooltipComponent from './TooltipComponent';
 
 export default class UIOptionsComponent extends React.Component {
 	/**
@@ -131,7 +132,9 @@ export default class UIOptionsComponent extends React.Component {
 				{this.props.chartToRender === chartTypes.bar &&
 					<div>
 						<div className="checkbox">
-							<label><input type="checkbox" onChange={this.handleChangeBarStacking} checked={this.props.barStacking} />Bar stacking</label>
+							<label><input type="checkbox" onChange={this.handleChangeBarStacking} checked={this.props.barStacking} />
+								<TooltipComponent tip="Stack bars on top of each other" text="Bar stacking" />
+							</label>
 						</div>
 						<p style={labelStyle}>Bar chart interval:</p>
 						<ButtonGroup
