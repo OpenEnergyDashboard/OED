@@ -6,16 +6,9 @@ import React from 'react';
 
 /**
  * React component that creates an logo image from a file path
- * @param props The props from the parent component which includes a path url
- * @return JSX to create logo image
  */
 export default function LogoComponent(props) {
-	const imgStyle = {
-		maxWidth: '100%',
-		height: 'auto',
-		paddingTop: '10px',
-	};
 	return (
-		<img src={props.url} alt="Logo" title="Open Energy Dashboard" style={imgStyle} />
+		<img height={props.height} src={props.url} alt="Logo" title="Open Energy Dashboard" />
 	);
 }
