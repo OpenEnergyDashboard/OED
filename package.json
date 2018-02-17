@@ -26,7 +26,7 @@
     "bcryptjs": "~2.4.3",
     "body-parser": "~1.15.1",
     "bootstrap": "~4.0.0",
-    "chart.js": "~2.7.0",
+    "chart.js": "~2.7.1",
     "chartjs-plugin-datalabels": "~0.1.0",
     "cookie-parser": "~1.4.3",
     "cross-env": "~5.0.5",

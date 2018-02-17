@@ -159,10 +159,29 @@ function mapStateToProps(state, ownProps) {
 			}]
 		},
 		legend: {
-			display: false
+			display: false,
 		},
 		tooltips: {
-			enabled: false
+			mode: 'nearest',
+			intersect: false,
+			backgroundColor: 'rgba(0,0,0,0.6)',
+			displayColors: false,
+			callbacks: {
+				label: (tooltipItems, data) => { // eslint-disable-line no-shadow
+					const usage = tooltipItems.yLabel;
+					switch (usage) {
+						case data.datasets[0].data[0]:
+							return `${usage} kW used this time ${tooltipItems.xLabel.toLowerCase()}`;
+						case data.datasets[0].data[1]:
+							return `${usage} kW used so far ${tooltipItems.xLabel.toLowerCase()}`;
+						case data.datasets[1].data[0]:
+							return `${usage} kW total ${tooltipItems.xLabel.toLowerCase()}`;
+						default:
+							return `${usage} kW projected to be used ${tooltipItems.xLabel.toLowerCase()}`;
+					}
+				},
+				title: () => ''
+			}
 		},
 		title: {
 			display: true,
