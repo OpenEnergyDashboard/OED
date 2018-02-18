@@ -5,6 +5,7 @@
 import * as React from 'react';
 import axios from 'axios';
 import { browserHistory } from 'react-router';
+import { Input, Button, InputGroup, Form } from 'reactstrap';
 import HeaderContainer from '../containers/HeaderContainer';
 import FooterComponent from '../components/FooterComponent';
 import { showErrorNotification } from '../utils/notifications';
@@ -18,6 +19,10 @@ interface LoginState {
 export default class LoginComponent extends React.Component<{}, LoginState> {
 	private inputEmail: HTMLInputElement | null;
 
+	/**
+	 * Initializes the component's state to include email (email users use to login) and password (corresponding to their email)
+	 * Binds the functions to 'this' LoginComponent
+	 */
 	constructor(props: {}) {
 		super(props);
 		this.state = { email: '', password: '' };
@@ -26,6 +31,9 @@ export default class LoginComponent extends React.Component<{}, LoginState> {
 		this.handleSubmit = this.handleSubmit.bind(this);
 	}
 
+	/**
+	 * @return JSX to create the login panel
+	 */
 	public render() {
 		const formStyle = {
 			maxWidth: '500px',
@@ -38,24 +46,26 @@ export default class LoginComponent extends React.Component<{}, LoginState> {
 		return (
 			<div>
 				<HeaderContainer />
-				<form style={formStyle} onSubmit={this.handleSubmit}>
-					<div className='input-group'>
-						<span className='input-group-addon'><i className='glyphicon glyphicon-user' /></span>
-						<input
+				<Form style={formStyle}>
+					<InputGroup>
+						<Input
 							type='text'
-							className='form-control'
 							placeholder='Email'
-							ref={c => { this.inputEmail = c; }}
+							innerRef={c => { this.inputEmail = c; }}
 							value={this.state.email}
 							onChange={this.handleEmailChange}
 						/>
-					</div>
-					<div className='input-group'>
-						<span className='input-group-addon'><i className='glyphicon glyphicon-lock' /></span>
-						<input type='password' className='form-control' placeholder='Password' value={this.state.password} onChange={this.handlePasswordChange} />
-					</div>
-					<input style={buttonStyle} className='btn btn-default' type='submit' value='Login' />
-				</form>
+					</InputGroup>
+					<InputGroup>
+						<Input
+							type="password"
+							placeholder="Password"
+							value={this.state.password}
+							onChange={this.handlePasswordChange}
+						/>
+					</InputGroup>
+					<Button outline style={buttonStyle} type='submit' onClick={this.handleSubmit}>Submit</Button>
+				</Form>
 				<FooterComponent />
 			</div>
 		);

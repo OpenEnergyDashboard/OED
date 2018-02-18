@@ -1,6 +1,8 @@
-/* This Source Code Form is subject to the terms of the Mozilla Public
+/*
+ * This Source Code Form is subject to the terms of the Mozilla Public
  * License, v. 2.0. If a copy of the MPL was not distributed with this
- * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
+ * file, You can obtain one at http://mozilla.org/MPL/2.0/.
+ */
 
 import { Bar, ChartComponentProps } from 'react-chartjs-2';
 import { ChartData, ChartDataSets } from 'chart.js';
@@ -121,22 +123,18 @@ function mapStateToProps(state: State, ownProps: CompareChartContainerProps) {
 
 	labels.push(prevLabel);
 	labels.push(currLabel);
-	const color1 = 'rgba(173, 216, 230, 1)';
-	const color2 = 'rgba(218, 165, 32, 1)';
-	const color3 = 'rgba(173, 216, 230, 0.45)';
+	const readingsAfterCurrentTimeColor = 'rgba(173, 216, 230, 1)';
+	const readingsBeforeCurrentTimeColor = 'rgba(218, 165, 32, 1)';
+	const projectedDataColor = 'rgba(173, 216, 230, 0.45)';
 	datasets.push(
 		{
 			data: [prev, Math.round((current / currentPrev) * prev)],
-			backgroundColor: [color1, color3],
-			hoverBackgroundColor: [color1, color3],
 			datalabels: {
 				anchor: 'end',
 				align: 'start'
 			}
 		}, {
 			data: [currentPrev, current],
-			backgroundColor: color2,
-			hoverBackgroundColor: color2,
 			datalabels: {
 				anchor: 'end',
 				align: 'start'
@@ -153,9 +151,16 @@ function mapStateToProps(state: State, ownProps: CompareChartContainerProps) {
 	});
 
 
+	// apply info to datasets after sort
+	datasets[0].backgroundColor = [readingsBeforeCurrentTimeColor, readingsBeforeCurrentTimeColor];
+	datasets[0].hoverBackgroundColor = [readingsBeforeCurrentTimeColor, readingsBeforeCurrentTimeColor];
+	datasets[1].backgroundColor = [readingsAfterCurrentTimeColor, projectedDataColor];
+	datasets[1].hoverBackgroundColor = [readingsAfterCurrentTimeColor, projectedDataColor];
+
+
 	const data: ChartData = {datasets, labels};
 	const change = (-1 + (((current / currentPrev) * prev) / prev));
-	const options = {
+	const options: ChartOptions = {
 		animation: {
 			duration: 0
 		},
@@ -178,7 +183,7 @@ function mapStateToProps(state: State, ownProps: CompareChartContainerProps) {
 					labelString: 'kW'
 				},
 				ticks: {
-					min: 0
+					beginAtZero: true
 				}
 			}]
 		},

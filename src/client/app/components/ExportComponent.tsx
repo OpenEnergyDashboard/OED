@@ -3,7 +3,7 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
 
 import * as React from 'react';
-import { Button } from 'react-bootstrap';
+import { Button } from 'reactstrap';
 import * as moment from 'moment';
 import graphExport from '../services/exportData';
 import { ExportDataSet } from '../types/readings';
@@ -51,7 +51,7 @@ export default function ExportComponent(props: ExportProps) {
 	};
 	return (
 		<div>
-			<Button bsStyle='default' onClick={exportReading}>Export graph data</Button>
+			<Button outline onClick={exportReading}>Export graph data</Button>
 		</div>
 	);
 }

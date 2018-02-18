@@ -3,7 +3,7 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
 
 import * as React from 'react';
-import { Button } from 'react-bootstrap';
+import { Button } from 'reactstrap';
 import { ChangeDisplayedGroupsAction, ChangeDisplayModeAction } from '../../types/redux/groups';
 
 interface GroupSidebarProps {
@@ -26,7 +26,8 @@ export default class GroupSidebarComponent extends React.Component<GroupSidebarP
 
 	public render() {
 		const labelStyle: React.CSSProperties = {
-			fontWeight: 'bold'
+			fontWeight: 'bold',
+			margin: '0px'
 		};
 		return (
 			<div className='form-group'>
@@ -37,7 +38,7 @@ export default class GroupSidebarComponent extends React.Component<GroupSidebarP
 					)}
 				</select>
 				<br />
-				<Button bsStyle='default' onClick={this.handleCreateGroup}>Create new group</Button>
+				<Button outline onClick={this.handleCreateGroup}>Create new group</Button>
 			</div>
 		);
 	}

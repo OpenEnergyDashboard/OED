@@ -6,7 +6,7 @@
 // TYPESCRIPT TODO: I have insufficient domain knowledge to edit this.
 import * as React from 'react';
 import * as _ from 'lodash';
-import { FormControl, FormControlProps, Button, Glyphicon } from 'react-bootstrap';
+import { Input, Button } from 'reactstrap';
 import DatasourceBoxContainer from '../../containers/groups/DatasourceBoxContainer';
 import { NamedIDItem } from '../../types/items';
 import { SelectionType } from '../../containers/groups/DatasourceBoxContainer';
@@ -63,7 +63,10 @@ export default class EditGroupsComponent extends React.Component<EditGroupsProps
 		this.handleMoveUnusedGroupsToChildGroups = this.handleMoveUnusedGroupsToChildGroups.bind(this);
 		this.handleEditGroup = this.handleEditGroup.bind(this);
 		this.handleDeleteGroup = this.handleDeleteGroup.bind(this);
+		this.handleReturnToView = this.handleReturnToView.bind(this);
 	}
+
+
 
 	public render() {
 		const divStyle: React.CSSProperties = {
@@ -91,78 +94,91 @@ export default class EditGroupsComponent extends React.Component<EditGroupsProps
 			textAlign: 'center'
 		};
 		return (
-			<div style={divStyle} className='col-xs-6'>
-				<h3 style={centerTextStyle}>Edit Group</h3>
-				<p style={boldStyle}>Name:</p>
-				<FormControl type='text' placeholder='Name' value={this.state.name} onChange={this.handleNameChange} />
-				<div className='row' style={metersDivStyle}>
-					<div className='col-xs-5'>
-						<p style={boldStyle}>Child meters:</p>
-						<DatasourceBoxContainer
-							type='meter'
-							selection={SelectionType.Custom}
-							datasource={this.props.childMeters}
-							selectedOptions={this.state.defaultSelectedMeters}
-							selectDatasource={this.handleUpdatedSelectedMeters}
-						/>
+			<div className='row'>
+				<div style={divStyle} className='col-6'>
+					<h3 style={centerTextStyle}>Edit Group</h3>
+					<p style={boldStyle}>Name:</p>
+					{/* There is a type error on the next line because reactstrap's InputProps doesn't have a
+						placeholder field, even though it accepts one. */}
+					<Input type='text' placeholder='Name' value={this.state.name} onChange={this.handleNameChange} />
+					<div className='row' style={metersDivStyle}>
+						<div className='col-5'>
+							<p style={boldStyle}>Child meters:</p>
+							<DatasourceBoxContainer
+								type='meter'
+								selection={SelectionType.Custom}
+								datasource={this.props.childMeters}
+								selectedOptions={this.state.defaultSelectedMeters}
+								selectDatasource={this.handleUpdatedSelectedMeters}
+							/>
+						</div>
+						<div className='col-2' style={leftRightButtonsDivStyle}>
+							<Button outline onClick={this.handleMoveUnusedMetersToChildMeters} style={leftRightButtonStyle}>
+								<i className='fa fa-chevron-left' />
+							</Button>
+							<Button outline onClick={this.handleMoveChildMetersToUnusedMeters} style={leftRightButtonStyle}>
+								<i className='fa fa-chevron-right' />
+							</Button>
+						</div>
+						<div className='col-5'>
+							<p style={boldStyle}>Unused meters:</p>
+							<DatasourceBoxContainer
+								type='meter'
+								selection={SelectionType.Custom}
+								datasource={this.props.allMetersExceptChildMeters}
+								selectedOptions={this.state.defaultUnusedMeters}
+								selectDatasource={this.handleUpdateUnusedMeters}
+							/>
+						</div>
 					</div>
-					<div className='col-xs-2' style={leftRightButtonsDivStyle}>
-						<Button onClick={this.handleMoveUnusedMetersToChildMeters} style={leftRightButtonStyle}>
-							<Glyphicon glyph='chevron-left' />
-						</Button>
-						<Button onClick={this.handleMoveChildMetersToUnusedMeters} style={leftRightButtonStyle}>
-							<Glyphicon glyph='chevron-right' />
-						</Button>
-					</div>
-					<div className='col-xs-5'>
-						<p style={boldStyle}>Unused meters:</p>
-						<DatasourceBoxContainer
-							type='meter'
-							selection={SelectionType.Custom}
-							datasource={this.props.allMetersExceptChildMeters}
-							selectedOptions={this.state.defaultUnusedMeters}
-							selectDatasource={this.handleUpdateUnusedMeters}
-						/>
-					</div>
-				</div>
-				<div className='row' style={groupsDivStyle}>
-					<div className='col-xs-5'>
-						<p style={boldStyle}>Child groups:</p>
-						<DatasourceBoxContainer
-							type='group'
-							selection={SelectionType.Custom}
-							datasource={this.props.childGroups}
-							selectedOptions={this.state.defaultSelectedGroups}
-							selectDatasource={this.handleUpdateSelectedGroups}
-						/>
-					</div>
-					<div className='col-xs-2' style={leftRightButtonsDivStyle}>
-						<Button onClick={this.handleMoveUnusedGroupsToChildGroups} style={leftRightButtonStyle}>
-							<Glyphicon glyph='chevron-left' />
-						</Button>
-						<Button onClick={this.handleMoveChildGroupsToUnusedGroups} style={leftRightButtonStyle}>
-							<Glyphicon glyph='chevron-right' />
-						</Button>
-					</div>
-					<div className='col-xs-5'>
-						<p style={boldStyle}>Unused groups:</p>
-						<DatasourceBoxContainer
-							type='group'
-							selection={SelectionType.Custom}
-							datasource={this.props.allGroupsExceptChildGroups}
-							selectedOptions={this.state.defaultUnusedGroups}
-							selectDatasource={this.handleUpdateUnusedGroups}
-						/>
+					<div className='row' style={groupsDivStyle}>
+						<div className='col-5'>
+							<p style={boldStyle}>Child groups:</p>
+							<DatasourceBoxContainer
+								type='group'
+								selection={SelectionType.Custom}
+								datasource={this.props.childGroups}
+								selectedOptions={this.state.defaultSelectedGroups}
+								selectDatasource={this.handleUpdateSelectedGroups}
+							/>
+						</div>
+						<div className='col-2' style={leftRightButtonsDivStyle}>
+							<Button outline onClick={this.handleMoveUnusedGroupsToChildGroups} style={leftRightButtonStyle}>
+								<i className='fa fa-chevron-left' />
+							</Button>
+							<Button outline onClick={this.handleMoveChildGroupsToUnusedGroups} style={leftRightButtonStyle}>
+								<i className='fa fa-chevron-right' />
+							</Button>
+						</div>
+						<div className='col-5'>
+							<p style={boldStyle}>Unused groups:</p>
+							<DatasourceBoxContainer
+								type='group'
+								selection={SelectionType.Custom}
+								datasource={this.props.allGroupsExceptChildGroups}
+								selectedOptions={this.state.defaultUnusedGroups}
+								selectDatasource={this.handleUpdateUnusedGroups}
+							/>
+						</div>
 					</div>
 				</div>
 				<Button type='submit' onClick={this.handleReturnToView}>Cancel</Button>
 				<Button type='submit' onClick={this.handleEditGroup}>Submit changes</Button>
 				<Button className='pull-right' type='submit' onClick={this.handleDeleteGroup}>Delete group</Button>
+					<div className='row'>
+						<div className='col-6'>
+							<Button outline onClick={this.handleReturnToView}>Cancel</Button>
+							<Button outline onClick={this.handleEditGroup}>Submit changes</Button>
+						</div>
+						<div className='col-6 d-flex justify-content-end'>
+							<Button outline className='justify-content-end' onClick={this.handleDeleteGroup}>Delete group</Button>
+						</div>
+					</div>
 			</div>
 		);
 	}
 
-	private handleNameChange(e: React.FormEvent<FormControlProps>) {
+	private handleNameChange(e: React.ChangeEvent<HTMLInputElement>) {
 		const name = e.currentTarget.value;
 		if (name) {
 			this.setState({ name: name as string });

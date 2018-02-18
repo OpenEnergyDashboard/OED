@@ -3,7 +3,7 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
 
 import * as React from 'react';
-import { FormControl, FormControlProps, Button } from 'react-bootstrap';
+import { Input, Button } from 'reactstrap';
 import DatasourceBoxContainer from '../../containers/groups/DatasourceBoxContainer';
 import { SelectionType } from '../../containers/groups/DatasourceBoxContainer';
 import { NamedIDItem } from '../../types/items';
@@ -46,11 +46,11 @@ export default class CreateGroupComponent extends React.Component<CreateGroupPro
 			textAlign: 'center'
 		};
 		return (
-			<div style={divStyle} className='col-xs-6'>
+			<div style={divStyle} className='col-6'>
 				<h3 style={centerTextStyle}>Create a New Group</h3>
 				<div style={divBottomStyle}>
 					<p style={textStyle}>Name:</p>
-					<FormControl type='text' placeholder='Name' onChange={this.handleNameChange} />
+					<Input type='text' placeholder='Name' onChange={this.handleNameChange} />
 				</div>
 				<div style={divBottomStyle}>
 					<p style={textStyle}>Select Meters:</p>
@@ -60,13 +60,19 @@ export default class CreateGroupComponent extends React.Component<CreateGroupPro
 					<p style={textStyle}>Select Groups:</p>
 					<DatasourceBoxContainer type='group' selection={SelectionType.All} />
 				</div>
-				<Button type='submit' onClick={this.handleReturnToView}>Cancel</Button>
-				<Button type='submit' className='pull-right' onClick={this.handleCreateGroup}>Create group</Button>
+				<div className='row'>
+					<div className='col-6'>
+						<Button outline type='submit' onClick={this.handleReturnToView}>Cancel</Button>
+					</div>
+					<div className='col-6 d-flex justify-content-end'>
+						<Button outline type='submit' onClick={this.handleCreateGroup}>Create group</Button>
+					</div>
+				</div>
 			</div>
 		);
 	}
 
-	private handleNameChange(e: React.ChangeEvent<FormControlProps>) {
+	private handleNameChange(e: React.ChangeEvent<HTMLInputElement>) {
 		const value = e.target.value;
 		if (value) {
 			this.props.editGroupName(value as string);

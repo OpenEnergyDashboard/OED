@@ -4,7 +4,8 @@
 
 import * as React from 'react';
 import axios from 'axios';
-import { FormControl, Button } from 'react-bootstrap';
+import { Input, Button } from 'reactstrap';
+import Dropzone from 'react-dropzone';
 import { ChartTypes } from '../types/redux/graph';
 import HeaderContainer from '../containers/HeaderContainer';
 import FooterComponent from '../components/FooterComponent';
@@ -16,6 +17,7 @@ import {
 	UpdateDisplayTitleAction,
 	UpdateImportMeterAction } from '../types/redux/admin';
 import { SelectOption } from '../types/items';
+import SingleSelectComponent from './SingleSelectComponent';
 
 interface AdminProps {
 	displayTitle: string;
@@ -55,72 +57,104 @@ export default class AdminComponent extends React.Component<AdminProps, {}> {
 			margin: 0,
 			paddingBottom: '5px'
 		};
+		const marginBottomStyle: React.CSSProperties = {
+			marginBottom: '35px'
+		};
+		const smallMarginBottomStyle: React.CSSProperties = {
+			marginBottom: '5px'
+		};
 		return (
 			<div>
 				<HeaderContainer />
 				<div className='container-fluid'>
-					<div className='col-xs-3'>
-						<div style={bottomPaddingStyle}>
-							<p style={titleStyle}>Default Site Title:</p>
-							{/*TODO TYPESCRIPT: This is a bug in the typings. Issue: https://github.com/DefinitelyTyped/DefinitelyTyped/issues/21840*/}
-							<FormControl
-								type='text'
-								placeholder='Name'
-								value={this.props.displayTitle}
-								onChange={this.handleDisplayTitleChange}
-								maxLength={50}
-							/>
-						</div>
-						<div>
-							<p style={labelStyle}>Default Chart Type:</p>
-							<div className='radio'>
-								<label>
-									<input
-										type='radio'
-										name='chartTypes'
-										value={ChartTypes.line}
-										onChange={this.handleDefaultChartToRenderChange}
-										checked={this.props.defaultChartToRender === ChartTypes.line}
-									/>
-									Line
-								</label>
-							</div>
-							<div className='radio'>
-								<label>
-									<input
-										type='radio'
-										name='chartTypes'
-										value={ChartTypes.bar}
-										onChange={this.handleDefaultChartToRenderChange}
-										checked={this.props.defaultChartToRender === ChartTypes.bar}
-									/>
-									Bar
-								</label>
-							</div>
-							<div className='radio'>
-								<label>
-									<input
-										type='radio'
-										name='chartTypes'
-										value={ChartTypes.compare}
-										onChange={this.handleDefaultChartToRenderChange}
-										checked={this.props.defaultChartToRender === ChartTypes.compare}
-									/>
-									Compare
-								</label>
-							</div>
-						</div>
-						<div className='checkbox'>
-							<label>
-								<input
-									type='checkbox'
-									onChange={this.handleDefaultBarStackingChange}
-									checked={this.props.defaultBarStacking}
+					<div className='row' style={marginBottomStyle}>
+						<div className='col-3'>
+							<div style={bottomPaddingStyle}>
+								<p style={titleStyle}>Default Site Title:</p>
+								<Input
+									type='text'
+									placeholder='Name'
+									value={this.props.displayTitle}
+									onChange={this.handleDisplayTitleChange}
+									maxLength={50}
 								/>
-								Default Bar stacking
-							</label>
+							</div>
+							<div>
+								<p style={labelStyle}>Default Graph Type:</p>
+								<div className='radio'>
+									<label>
+										<input
+											type='radio'
+											name='chartTypes'
+											value={ChartTypes.line}
+											onChange={this.handleDefaultChartToRenderChange}
+											checked={this.props.defaultChartToRender === ChartTypes.line}
+										/>
+										Line
+									</label>
+								</div>
+								<div className='radio'>
+									<label>
+										<input
+											type='radio'
+											name='chartTypes'
+											value={ChartTypes.bar}
+											onChange={this.handleDefaultChartToRenderChange}
+											checked={this.props.defaultChartToRender === ChartTypes.bar}
+										/>
+										Bar
+									</label>
+								</div>
+								<div className='radio'>
+									<label>
+										<input
+											type='radio'
+											name='chartTypes'
+											value={ChartTypes.compare}
+											onChange={this.handleDefaultChartToRenderChange}
+											checked={this.props.defaultChartToRender === ChartTypes.compare}
+										/>
+										Compare
+									</label>
+								</div>
+							</div>
+							<div className='checkbox'>
+								<label>
+									<input
+										type='checkbox'
+										onChange={this.handleDefaultBarStackingChange}
+										checked={this.props.defaultBarStacking}
+									/>
+									Default Bar stacking
+								</label>
+							</div>
+							<Button
+								type='submit'
+								onClick={this.handleSubmitPreferences}
+								disabled={this.props.disableSubmitPreferences}
+							>
+								Submit
+							</Button>
 						</div>
-						<Button type='submit' onClick={this.handleSubmitPreferences} disabled={this.props.disableSubmitPreferences}>Submit</Button>
+					</div>
+					<div className='row'>
+						<div className='col-2'>
+							<p style={titleStyle}>Import meter readings:</p>
+							{/* TODO TYPESCRIPT: singleSelect isn't a valid option, but it existed here before. */}
+							<SingleSelectComponent
+								style={smallMarginBottomStyle}
+								options={this.props.meters}
+								selectedOption={this.props.selectedImportMeter}
+								placeholder='Select meter to import data'
+								onValueChange={s => this.props.updateSelectedImportMeter(s)}
+							/>
+							{/* TODO TYPESCRIPT: the dropzone expects onDrop to take an array of ImageFile, which doesn't make sense.*/}
+							{ this.props.selectedImportMeter &&
+							<Dropzone accept='text/csv, application/vnd.ms-excel,' onDrop={this.handleFileToImport}>
+								<div>Upload a CSV file:</div>
+							</Dropzone>
+							}
+						</div>
 					</div>
 				</div>
 				<FooterComponent />
@@ -129,7 +163,7 @@ export default class AdminComponent extends React.Component<AdminProps, {}> {
 	}
 
 
-	private handleDisplayTitleChange(e: React.FormEvent<FormControl>) {
+	private handleDisplayTitleChange(e: { target: HTMLInputElement; }) {
 		this.props.updateDisplayTitle((e.target as HTMLInputElement).value);
 	}
 

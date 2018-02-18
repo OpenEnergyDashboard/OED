@@ -3,9 +3,12 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
 
 import * as React from 'react';
-import { ToggleButtonGroup, ToggleButton } from 'react-bootstrap';
+
 import { ChartTypes } from '../types/redux/graph';
 import { ChangeChartToRenderAction } from '../types/redux/graph';
+import Button from 'reactstrap/lib/Button';
+import ButtonGroup from 'reactstrap/lib/ButtonGroup';
+import {FormEvent} from "react";
 
 interface ChartSelectProps {
 	selectedChart: ChartTypes;
@@ -34,22 +37,31 @@ export default class ChartSelectComponent extends React.Component<ChartSelectPro
 		return (
 			<div style={divBottomPadding}>
 				<p style={labelStyle}>Graph Type:</p>
-				{/* TODO TYPESCRIPT: This error seems due to a bug in the typings. Issue: https://github.com/DefinitelyTyped/DefinitelyTyped/issues/21840 */}
-				<ToggleButtonGroup
-					type='radio'
-					name='chartTypes'
-					value={this.props.selectedChart}
-					onChange={this.handleChangeChartType}
-				>
-					<ToggleButton value={ChartTypes.line}>Line</ToggleButton>
-					<ToggleButton value={ChartTypes.bar}>Bar</ToggleButton>
-					<ToggleButton value={ChartTypes.compare}>Compare</ToggleButton>
-				</ToggleButtonGroup>
+				<ButtonGroup>
+					<Button
+						outline={this.props.selectedChart !== ChartTypes.line}
+						onClick={() => this.handleChangeChartType(ChartTypes.line)}
+					>
+						Line
+					</Button>
+					<Button
+						outline={this.props.selectedChart !== ChartTypes.bar}
+						onClick={() => this.handleChangeChartType(ChartTypes.bar)}
+					>
+						Bar
+					</Button>
+					<Button
+						outline={this.props.selectedChart !== ChartTypes.compare}
+						onClick={() => this.handleChangeChartType(ChartTypes.compare)}
+					>
+						Compare
+					</Button>
+				</ButtonGroup>
 			</div>
 		);
 	}
 
-	private handleChangeChartType(value: string) {
-		this.props.changeChartType(value as ChartTypes);
+	private handleChangeChartType(value: ChartTypes) {
+		this.props.changeChartType(value);
 	}
 }

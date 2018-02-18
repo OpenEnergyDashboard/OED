@@ -5,8 +5,10 @@
 import * as React from 'react';
 // TODO TYPESCRIPT: Need definitions for this?
 import Slider from 'react-rangeslider';
+
 import * as moment from 'moment';
-import { Button, ToggleButtonGroup, ToggleButton } from 'react-bootstrap';
+import { Button, ButtonGroup } from 'reactstrap';
+
 import 'react-rangeslider/lib/index.css';
 import '../styles/react-rangeslider-fix.css';
 import { TimeInterval } from '../../../common/TimeInterval';
@@ -42,8 +44,8 @@ export default class UIOptionsComponent extends React.Component<UIOptionsProps, 
 		this.handleBarDurationChange = this.handleBarDurationChange.bind(this);
 		this.handleBarDurationChangeComplete = this.handleBarDurationChangeComplete.bind(this);
 		this.handleChangeBarStacking = this.handleChangeBarStacking.bind(this);
-		this.handleSpanButton = this.handleSpanButton.bind(this);
-		this.handleCompareSpanButton = this.handleCompareSpanButton.bind(this);
+		this.handleBarButton = this.handleBarButton.bind(this);
+		this.handleCompareButton = this.handleCompareButton.bind(this);
 		this.toggleSlider = this.toggleSlider.bind(this);
 		this.state = {
 			barDurationDays: this.props.barDuration.asDays(),
@@ -51,8 +53,9 @@ export default class UIOptionsComponent extends React.Component<UIOptionsProps, 
 		};
 	}
 
+
 	public componentWillReceiveProps(nextProps: UIOptionsProps) {
-		this.setState({ barDurationDays: nextProps.barDuration.asDays() });
+		this.setState({barDurationDays: nextProps.barDuration.asDays()});
 	}
 
 	/**
@@ -94,19 +97,35 @@ export default class UIOptionsComponent extends React.Component<UIOptionsProps, 
 							<label><input type='checkbox' onChange={this.handleChangeBarStacking} checked={this.props.barStacking} />Bar stacking</label>
 						</div>
 						<p style={labelStyle}>Bar chart interval:</p>
-						<ToggleButtonGroup
-							type='radio'
-							name='timeSpans'
+						<ButtonGroup
 							value={this.state.barDurationDays}
-							onChange={this.handleSpanButton}
 							style={zIndexFix}
 						>
-							<ToggleButton value={1}>Day</ToggleButton>
-							<ToggleButton value={7}>Week</ToggleButton>
-							<ToggleButton value={28}>Month</ToggleButton>
-						</ToggleButtonGroup>
-						<Button name='customToggle' onClick={this.toggleSlider}>Toggle Custom Slider (days)</Button>
-
+							<Button
+								outline={this.state.barDurationDays !== 1}
+								onClick={() => this.handleBarButton(1)}
+							>
+								Day
+							</Button>
+							<Button
+								outline={this.state.barDurationDays !== 7}
+								onClick={() => this.handleBarButton(7)}
+							>
+								Week
+							</Button>
+							<Button
+								outline={this.state.barDurationDays !== 28}
+								onClick={() => this.handleBarButton(28)}
+							>
+								Month
+							</Button>
+						</ButtonGroup>
+						<Button
+							outline={!this.state.showSlider}
+							onClick={this.toggleSlider}
+						>
+							Toggle Custom Slider (days)
+						</Button>
 						{this.state.showSlider &&
 						<Slider
 							min={1}
@@ -122,17 +141,28 @@ export default class UIOptionsComponent extends React.Component<UIOptionsProps, 
 				{/* Controls specific to the compare chart */}
 				{this.props.chartToRender === ChartTypes.compare &&
 				<div>
-					<ToggleButtonGroup
-						name='timeSpansCompare'
-						value={compareVal}
-						onChange={this.handleCompareSpanButton}
+					<ButtonGroup
 						style={zIndexFix}
-						type='radio'
 					>
-						<ToggleButton value='day'>Day</ToggleButton>
-						<ToggleButton value='week'>Week</ToggleButton>
-						<ToggleButton value='month'>Month</ToggleButton>
-					</ToggleButtonGroup>
+						<Button
+							outline={compareVal !== 'day'}
+							onClick={() => this.handleCompareButton('day')}
+						>
+							Day
+						</Button>
+						<Button
+							outline={compareVal !== 'week'}
+							onClick={() => this.handleCompareButton('week')}
+						>
+							Week
+						</Button>
+						<Button
+							outline={compareVal !== 'month'}
+							onClick={() => this.handleCompareButton('month')}
+						>
+							Month
+						</Button>
+					</ButtonGroup>
 				</div>
 				}
 
@@ -151,18 +181,33 @@ export default class UIOptionsComponent extends React.Component<UIOptionsProps, 
 	}
 
 	/**
+	 * Handles a change in meter selection
+	 * @param {Object[]} selection An array of {label: string, value: {type: string, id: int}} representing the current selection
+	 */
+	// private handleMeterSelect(selection: Array<{label: string, value: {type: string, id: number}}>) {
+	// 	this.props.selectMeters(selection.map(s => s.value));
+	// }
+
+	/**
+	 * Called when the user releases the slider, dispatch action on temporary state variable
+	 */
+	// TODO TYPESCRIPT: react-rangeslider doesn't have types. We should investigate what type this actually is
+	private handleBarDurationChangeComplete(e: any) {
+		e.preventDefault();
+		this.props.changeDuration(moment.duration(this.state.barDurationDays, 'days'));
+	}
+
+	private handleBarButton(value: number) {
+		this.props.changeDuration(moment.duration(value, 'days'));
+	}
+
+	/**
 	 * Stores temporary barDuration until slider is released, used to update the UI of the slider
 	 */
 	private handleBarDurationChange(value: number) {
 		this.setState({ barDurationDays: value});
 	}
 
-	/**
-	 * Called when the user releases the slider, dispatch action on temporary state variable
-	 */
-	private handleBarDurationChangeComplete(e: React.ChangeEvent<null>) {
-		this.props.changeDuration(moment.duration( {days: this.state.barDurationDays}));
-	}
 
 	/**
 	 * Toggles the bar stacking option
@@ -177,27 +222,25 @@ export default class UIOptionsComponent extends React.Component<UIOptionsProps, 
 		this.props.changeDuration(moment.duration(value, 'days'));
 	}
 
-	// TODO TYPESCRIPT this is an issue with typings for React.FormEvent<> and ChangeEvent<>
-	// The type of value is actually string
-	private handleCompareSpanButton(value: any) {
-		let compareTimeInterval;
+	private handleCompareButton(value: string) {
+		let compareTimeInterval: TimeInterval;
 		let compareDuration;
 		switch (value) {
 			case 'day':
-				compareTimeInterval = new TimeInterval(moment().subtract(2, 'days'), moment()).toString();
+				compareTimeInterval = new TimeInterval(moment().subtract(2, 'days'), moment());
 				// fetch hours for accuracy when time interval is small
 				compareDuration = moment.duration(1, 'hours');
 				break;
 			case 'month':
-				compareTimeInterval = new TimeInterval(moment().startOf('week').subtract(49, 'days'), moment()).toString();
+				compareTimeInterval = new TimeInterval(moment().startOf('week').subtract(49, 'days'), moment());
 				compareDuration = moment.duration(1, 'days');
 				break;
 			default: // handles week
-				compareTimeInterval = new TimeInterval(moment().startOf('week').subtract(7, 'days'), moment()).toString();
+				compareTimeInterval = new TimeInterval(moment().startOf('week').subtract(7, 'days'), moment());
 				compareDuration = moment.duration(1, 'days');
 				break;
 		}
-		this.props.changeCompareInterval(TimeInterval.fromString(compareTimeInterval), compareDuration);
+		this.props.changeCompareInterval(compareTimeInterval, compareDuration);
 	}
 
 	private toggleSlider() {

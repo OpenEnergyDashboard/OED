@@ -34,11 +34,11 @@ export default function DashboardComponent(props: DashboardProps) {
 
 	return (
 		<div className='container-fluid'>
-			<div>
-				<div className='col-xs-2 hidden-sm hidden-xs'>
+			<div className='row'>
+				<div className='col-2 d-none d-lg-block'>
 					<UIOptionsContainer />
 				</div>
-				<div className='col-xs-10'>
+				<div className='col-12 col-lg-10'>
 					<ChartToRender />
 				</div>
 			</div>

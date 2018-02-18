@@ -3,7 +3,7 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
 
 import * as React from 'react';
-import { Button } from 'react-bootstrap';
+import { Button } from 'reactstrap';
 import ListDisplayComponent from '../ListDisplayComponent';
 import { ChangeDisplayModeAction } from '../../types/redux/groups';
 
@@ -42,16 +42,16 @@ export default class GroupViewComponent extends React.Component<GroupViewProps, 
 			<div>
 				<h2 style={nameStyle}>{this.props.name}</h2>
 				<div className='row'>
-					<div className='col-xs-6'>
+					<div className='col-6'>
 						<p style={boldStyle}>Child Meters:</p>
 						<ListDisplayComponent items={this.props.childMeterNames} />
 					</div>
-					<div className='col-xs-6'>
+					<div className='col-6'>
 						<p style={boldStyle}>Child Groups:</p>
 						<ListDisplayComponent items={this.props.childGroupNames} />
 					</div>
 				</div>
-				<Button style={buttonPadding} bsStyle='default' onClick={this.handleEditGroup}>Edit group</Button>
+				<Button style={buttonPadding} outline onClick={this.handleEditGroup}>Edit group</Button>
 			</div>
 		);
 	}

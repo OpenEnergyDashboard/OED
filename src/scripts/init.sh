@@ -22,6 +22,8 @@ if [ ! -e "$1" ] && [ "$1" != "NONE" ]; then
     exit 1
 fi
 
+IPS_FILE=$1
+
 while [ "$2" != "" ]; do
     case "$2" in
         -b) BUILD=yes;;
@@ -77,8 +79,8 @@ echo "Schema created or already exists."
 # Pull the meters into the DB and get data
 if [ $1 != "NONE"  ]; then
     set -e
-    echo "Trying to add meters."
-    npm run addMamacMeters $1 2> /dev/null
+    echo "Trying to add meters from '$IPS_FILE'."
+    npm run addMamacMeters $IPS_FILE 2> /dev/null
     echo "Trying to update meters."
     npm run updateMamacMeters 2> /dev/null
 fi

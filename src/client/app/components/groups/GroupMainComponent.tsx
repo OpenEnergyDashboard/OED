@@ -57,13 +57,13 @@ export default class GroupMainComponent extends React.Component<GroupMainProps, 
 			}
 			case DisplayMode.View: {
 				GroupDisplay = (
-					<div>
-						<div className='col-xs-2'>
+					<div className="row">
+						<div className='col-12 col-lg-2'>
 							<GroupSidebarContainer />
 						</div>
-						<div className='col-xs-10' style={flexContainerStyle}>
+						<div className='col-12 col-lg-10' style={flexContainerStyle}>
 							{this.props.selectedGroups.map(groupID =>
-								<div className='col-xs-4' style={flexChildStyle} key={groupID}>
+								<div className='col-12 col-lg-4' style={flexChildStyle} key={groupID}>
 									<GroupViewContainer key={groupID} id={groupID} />
 								</div>
 							)}
@@ -81,9 +81,7 @@ export default class GroupMainComponent extends React.Component<GroupMainProps, 
 			<div>
 				<HeaderContainer />
 				<div className='container-fluid'>
-					<div className='col-xs-11'>
-						{GroupDisplay}
-					</div>
+					{GroupDisplay}
 				</div>
 				<FooterComponent />
 			</div>

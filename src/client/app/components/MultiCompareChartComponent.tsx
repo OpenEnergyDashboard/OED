@@ -12,46 +12,35 @@ interface MultiCompareChartProps {
 
 export default function MultiCompareChartComponent(props: MultiCompareChartProps) {
 	// Compute how much space should be used in the bootstrap grid system
-	let size = 0;
-	if (props.selectedMeters.length + props.selectedGroups.length < 3) {
-		size = 1;
+	let size = 3;
+	const numSelectedItems = props.selectedMeters.length + props.selectedGroups.length;
+	if (numSelectedItems < 3) {
+		size = numSelectedItems;
 	}
 
 	const centeredStyle = {
-		marginTop: '20%',
-		textAlign: 'center'
-	};
-
-	const flexContainerStyle = {
-		display: 'flex',
-		flexFlow: 'row wrap'
-	};
-
-	const flexChildStyle = {
-		width: '30%',
-		flexGrow: size
+		marginTop: '20%'
 	};
 
 	// Display a message if no meters are selected
-	if (props.selectedMeters.length + props.selectedGroups.length === 0) {
+	if (numSelectedItems === 0) {
 		return (
-			<div className='row'>
-				<div className='col-xs-12' style={centeredStyle}>
-					Select one or more items to compare usage over time.
-				</div>
+			<div className='text-center' style={centeredStyle}>
+				Select one or more items to compare usage over time.
 			</div>
 		);
 	}
+	const childClassName = `col-12 col-lg-${12 / size}`;
 
 	return (
-		<div style={flexContainerStyle}>
+		<div className='row'>
 			{props.selectedMeters.map(meterID =>
-				<div style={flexChildStyle} key={meterID}>
+				<div className={childClassName} key={meterID}>
 					<CompareChartContainer key={meterID} id={meterID} isGroup={false} />
 				</div>
 			)}
 			{props.selectedGroups.map(groupID =>
-				<div style={flexChildStyle} key={groupID}>
+				<div className={childClassName} key={groupID}>
 					<CompareChartContainer key={groupID} id={groupID} isGroup />
 				</div>
 			)}

@@ -5,10 +5,12 @@
 import * as React from 'react';
 import thunkMiddleware from 'redux-thunk';
 import { render } from 'react-dom';
-import { createStore, applyMiddleware } from 'redux';
+import { createStore, applyMiddleware, compose } from 'redux';
 import { Provider } from 'react-redux';
+import 'bootstrap/dist/css/bootstrap.css';
 import RouteContainer from './containers/RouteContainer';
 import reducers from './reducers';
+import './styles/index.css';
 import { composeWithDevTools } from 'redux-devtools-extension';
 
 // Creates and applies thunk middleware to the Redux store, which is defined from the Redux reducers
