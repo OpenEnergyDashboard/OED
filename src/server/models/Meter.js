@@ -90,6 +90,13 @@ class Meter {
 		this.id = resp.id;
 	}
 
+	static insertAll(meters, conn = db) {
+		return conn.tx(t => t.sequence(function seq(i) {
+			const seqT = this;
+			return meters[i] && meters[i].insert(conn = seqT);
+		}));
+	}
+
 	/**
 	 * Returns a promise to get all of the readings for this meter from the database.
 	 * @param conn the connection to use. Defaults to the default database connection.
