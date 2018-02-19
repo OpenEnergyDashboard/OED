@@ -6,6 +6,7 @@ import * as React from 'react';
 import axios from 'axios';
 import { Input, Button } from 'reactstrap';
 import Dropzone from 'react-dropzone';
+import { ImageFile } from 'react-dropzone';
 import { ChartTypes } from '../types/redux/graph';
 import HeaderContainer from '../containers/HeaderContainer';
 import FooterComponent from '../components/FooterComponent';
@@ -32,7 +33,6 @@ interface AdminProps {
 	toggleDefaultBarStacking(): ToggleDefaultBarStackingAction;
 	submitPreferences(): Promise<void>;
 }
-
 
 export default class AdminComponent extends React.Component<AdminProps, {}> {
 	constructor(props: AdminProps) {
@@ -140,13 +140,12 @@ export default class AdminComponent extends React.Component<AdminProps, {}> {
 					<div className='row'>
 						<div className='col-2'>
 							<p style={titleStyle}>Import meter readings:</p>
-							{/* TODO TYPESCRIPT: singleSelect isn't a valid option, but it existed here before. */}
 							<SingleSelectComponent
 								style={smallMarginBottomStyle}
 								options={this.props.meters}
 								selectedOption={this.props.selectedImportMeter}
 								placeholder='Select meter to import data'
-								onValueChange={s => this.props.updateSelectedImportMeter(s)}
+								onValueChange={s => this.props.updateSelectedImportMeter(s.value)}
 							/>
 							{/* TODO TYPESCRIPT: the dropzone expects onDrop to take an array of ImageFile, which doesn't make sense.*/}
 							{ this.props.selectedImportMeter &&
@@ -179,7 +178,7 @@ export default class AdminComponent extends React.Component<AdminProps, {}> {
 		this.props.submitPreferences();
 	}
 
-	private handleFileToImport(files: string[]) {
+	private handleFileToImport(files: ImageFile[]) {
 		// token passed as a header
 		if (!this.props.selectedImportMeter) {
 			showErrorNotification('Please select a meter');

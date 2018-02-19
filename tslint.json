@@ -57,7 +57,9 @@
         // We shouldn't need to be explicit about the value of a true boolean option
         "jsx-boolean-value": [true, "never"],
         // Long JavaScript (and TypeScript) code should be allowed in JSX/TSX XML
-        "jsx-no-multiline-js": false
+        "jsx-no-multiline-js": false,
+        // We don't have issue with performance here
+        "jsx-no-lambda": false,
     },
     "rulesDirectory": []
 }

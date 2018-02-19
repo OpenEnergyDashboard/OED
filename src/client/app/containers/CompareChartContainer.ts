@@ -4,8 +4,8 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/.
  */
 
-import { Bar, ChartComponentProps } from 'react-chartjs-2';
-import { ChartData, ChartDataSets } from 'chart.js';
+import { Bar, LinearComponentProps } from 'react-chartjs-2';
+import { ChartData, ChartDataSets, LinearTickOptions } from 'chart.js';
 import * as moment from 'moment';
 import { connect } from 'react-redux';
 import { TimeInterval } from '../../../common/TimeInterval';
@@ -160,7 +160,10 @@ function mapStateToProps(state: State, ownProps: CompareChartContainerProps) {
 
 	const data: ChartData = {datasets, labels};
 	const change = (-1 + (((current / currentPrev) * prev) / prev));
-	const options: ChartOptions = {
+	const ticks: LinearTickOptions = {
+		beginAtZero: true
+	};
+	const options = {
 		animation: {
 			duration: 0
 		},
@@ -182,9 +185,7 @@ function mapStateToProps(state: State, ownProps: CompareChartContainerProps) {
 					display: true,
 					labelString: 'kW'
 				},
-				ticks: {
-					beginAtZero: true
-				}
+				ticks
 			}]
 		},
 		legend: {
@@ -211,7 +212,7 @@ function mapStateToProps(state: State, ownProps: CompareChartContainerProps) {
 	};
 
 
-	const props: ChartComponentProps = {
+	const props: LinearComponentProps = {
 		data,
 		options,
 		redraw: true

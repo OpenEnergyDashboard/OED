@@ -10,29 +10,28 @@ import 'react-select/dist/react-select.css';
 import { SelectOption } from '../types/items';
 import '../styles/react-select-css.css';
 
-interface SingleSelectProps<I> {
+interface SingleSelectProps {
 	placeholder: string;
-	options: Array<SelectOption & I>;
-	selectedOption?: SelectOption & I | null;
+	options: SelectOption[];
+	selectedOption?: SelectOption | null;
 	style?: React.CSSProperties;
-	onValueChange(value: SelectOption & I): void;
+	onValueChange(value: SelectOption): void;
 }
 
-interface MultiSelectState {
+interface SingleSelectState {
 	selectedOption?: SelectOption;
 }
 
-export default class MultiSelectComponent<I> extends React.Component<SingleSelectProps<I>, MultiSelectState> {
-	constructor(props: SingleSelectProps<I>) {
+export default class SingleSelectComponent extends React.Component<SingleSelectProps, SingleSelectState> {
+	constructor(props: SingleSelectProps) {
 		super(props);
 		this.onValuesChangeInternal = this.onValuesChangeInternal.bind(this);
-		// selectedOptions holds a list of the options that have been selected
 		this.state = {
 			selectedOption: this.props.selectedOption ? this.props.selectedOption : undefined
 		};
 	}
 
-	public componentWillReceiveProps(nextProps: SingleSelectProps<I>) {
+	public componentWillReceiveProps(nextProps: SingleSelectProps) {
 		if (nextProps.selectedOption) {
 			this.setState({ selectedOption: nextProps.selectedOption });
 		}
@@ -52,7 +51,7 @@ export default class MultiSelectComponent<I> extends React.Component<SingleSelec
 		);
 	}
 
-	private onValuesChangeInternal(item: SelectOption & I) {
+	private onValuesChangeInternal(item: SelectOption) {
 		// Defer to the underlying MultiSelect when it has a state change
 		// Note that the MSC state selectedOptions is in fact the canonical source of truth
 		this.setState({ selectedOption: item });

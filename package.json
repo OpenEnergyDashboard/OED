@@ -7,7 +7,7 @@
     "start": "node ./src/bin/www",
     "dev": "webpack -d --watch --color --progress",
     "build": "cross-env NODE_ENV=production webpack -p",
-	"buildDev": "webpack -p",
+    "buildDev": "webpack -p",
     "checkHeader": "./src/scripts/checkHeader.sh",
     "checkTypescript": "./src/scripts/checkTypescript.sh",
     "lint": "./node_modules/.bin/tslint -c tslint.json src/{server,bin,scripts,common}/**/*.{ts,tsx,js,jsx} src/client/app/**/*.{ts,tsx,js,jsx}",

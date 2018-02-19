@@ -98,7 +98,6 @@ export default class UIOptionsComponent extends React.Component<UIOptionsProps, 
 						</div>
 						<p style={labelStyle}>Bar chart interval:</p>
 						<ButtonGroup
-							value={this.state.barDurationDays}
 							style={zIndexFix}
 						>
 							<Button
