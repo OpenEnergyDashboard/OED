@@ -123,7 +123,7 @@ export default class RouteComponent extends React.Component<RouteProps, {}> {
 		);
 	}
 
-	private shouldComponentUpdate() {
+	public shouldComponentUpdate() {
 		// To ignore warning: [react-router] You cannot change 'Router routes'; it will be ignored
 		return false;
 	}
