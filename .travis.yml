@@ -36,7 +36,9 @@ before_script:
 script:
     # Validate legal requirements on source files
   - npm run checkHeader
-    # Check for eslint failures
+    # Validate that all areas which are intended to be typed, are typed
+  - npm run checkTypescript
+    # Check for tslint failures
   - npm run lint
     # Test with native Node install
   - npm run test
