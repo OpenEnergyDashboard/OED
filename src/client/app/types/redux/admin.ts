@@ -53,7 +53,7 @@ export interface MarkPreferencesSubmittedAction {
 }
 
 export interface AdminState {
-	selectedMeter: SelectOption | null;
+	selectedMeter: number | null;
 	displayTitle: string;
 	defaultChartToRender: ChartTypes;
 	defaultBarStacking: boolean;

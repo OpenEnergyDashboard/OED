@@ -57,7 +57,7 @@ export default class GroupMainComponent extends React.Component<GroupMainProps, 
 			}
 			case DisplayMode.View: {
 				GroupDisplay = (
-					<div className="row">
+					<div className='row'>
 						<div className='col-12 col-lg-2'>
 							<GroupSidebarContainer />
 						</div>

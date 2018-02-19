@@ -20,7 +20,7 @@ const store = createStore(reducers, composeWithDevTools(applyMiddleware(thunkMid
 // Provides the Redux store to all child components
 render(
 	<Provider store={store}>
-		<RouteContainer/>
+		<RouteContainer />
 	</Provider>,
 	document.getElementById('root')
 );

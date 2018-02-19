@@ -5,6 +5,7 @@
 const express = require('express');
 const Meter = require('../models/Meter');
 const { log } = require('../log');
+const validate = require('jsonschema').validate;
 
 const router = express.Router();
 
@@ -34,11 +35,26 @@ router.get('/', async (req, res) => {
  * @param {int} meter_id
  */
 router.get('/:meter_id', async (req, res) => {
-	try {
-		const meter = await Meter.getByID(req.params.meter_id);
-		res.json(formatMeterForResponse(meter));
-	} catch (err) {
-		log.error(`Error while performing GET specific meter by id query: ${err}`, err);
+	const validParams = {
+		type: 'object',
+		maxProperties: 1,
+		required: ['meter_id'],
+		properties: {
+			group_id: {
+				type: 'number'
+			}
+		}
+	};
+	if (!validate(req.params, validParams).valid) {
+		res.sendStatus(400);
+	} else {
+		try {
+			const meter = await Meter.getByID(req.params.meter_id);
+			res.json(formatMeterForResponse(meter));
+		} catch (err) {
+			log.error(`Error while performing GET specific meter by id query: ${err}`, err);
+			res.sendStatus(500);
+		}
 	}
 });
 

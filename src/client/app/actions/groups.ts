@@ -253,9 +253,13 @@ function submitGroupEdits(group: t.GroupData & t.GroupID): Thunk {
 					dispatch2(changeDisplayMode(t.DisplayMode.View));
 				});
 			})
-			.catch(error => {
+			.catch(e => {
 				dispatch(markGroupInEditingNotSubmitted());
-				showErrorNotification('Failed to edit group');
+				if (e.response.data.message && e.response.data.message === 'Cyclic group detected') {
+					showErrorNotification('You cannot create a cyclic group');
+				} else {
+					showErrorNotification('Failed to edit group');
+				}
 			});
 	};
 }

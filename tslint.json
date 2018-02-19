@@ -59,7 +59,7 @@
         // Long JavaScript (and TypeScript) code should be allowed in JSX/TSX XML
         "jsx-no-multiline-js": false,
         // We don't have issue with performance here
-        "jsx-no-lambda": false,
+        "jsx-no-lambda": false
     },
     "rulesDirectory": []
 }

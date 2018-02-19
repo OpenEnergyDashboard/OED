@@ -58,8 +58,8 @@ export default class LoginComponent extends React.Component<{}, LoginState> {
 					</InputGroup>
 					<InputGroup>
 						<Input
-							type="password"
-							placeholder="Password"
+							type='password'
+							placeholder='Password'
 							value={this.state.password}
 							onChange={this.handlePasswordChange}
 						/>

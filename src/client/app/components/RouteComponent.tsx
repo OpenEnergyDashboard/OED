@@ -93,7 +93,9 @@ export default class RouteComponent extends React.Component<RouteProps, {}> {
 							throw new Error('Unknown query parameter');
 					}
 				}
-				this.props.changeOptionsFromLink(options);
+				if (Object.keys(options).length > 0) {
+					this.props.changeOptionsFromLink(options);
+				}
 			} catch (err) {
 				showErrorNotification('Failed to link to graph');
 			}
@@ -119,5 +121,10 @@ export default class RouteComponent extends React.Component<RouteProps, {}> {
 				</Router>
 			</div>
 		);
+	}
+
+	private shouldComponentUpdate() {
+		// To ignore warning: [react-router] You cannot change 'Router routes'; it will be ignored
+		return false;
 	}
 }

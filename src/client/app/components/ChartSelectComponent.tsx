@@ -8,7 +8,7 @@ import { ChartTypes } from '../types/redux/graph';
 import { ChangeChartToRenderAction } from '../types/redux/graph';
 import Button from 'reactstrap/lib/Button';
 import ButtonGroup from 'reactstrap/lib/ButtonGroup';
-import {FormEvent} from "react";
+import { FormEvent } from 'react';
 
 interface ChartSelectProps {
 	selectedChart: ChartTypes;

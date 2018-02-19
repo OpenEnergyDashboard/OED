@@ -98,8 +98,6 @@ export default class EditGroupsComponent extends React.Component<EditGroupsProps
 				<div style={divStyle} className='col-6'>
 					<h3 style={centerTextStyle}>Edit Group</h3>
 					<p style={boldStyle}>Name:</p>
-					{/* There is a type error on the next line because reactstrap's InputProps doesn't have a
-						placeholder field, even though it accepts one. */}
 					<Input type='text' placeholder='Name' value={this.state.name} onChange={this.handleNameChange} />
 					<div className='row' style={metersDivStyle}>
 						<div className='col-5'>
@@ -161,10 +159,6 @@ export default class EditGroupsComponent extends React.Component<EditGroupsProps
 							/>
 						</div>
 					</div>
-				</div>
-				<Button type='submit' onClick={this.handleReturnToView}>Cancel</Button>
-				<Button type='submit' onClick={this.handleEditGroup}>Submit changes</Button>
-				<Button className='pull-right' type='submit' onClick={this.handleDeleteGroup}>Delete group</Button>
 					<div className='row'>
 						<div className='col-6'>
 							<Button outline onClick={this.handleReturnToView}>Cancel</Button>
@@ -174,6 +168,7 @@ export default class EditGroupsComponent extends React.Component<EditGroupsProps
 							<Button outline className='justify-content-end' onClick={this.handleDeleteGroup}>Delete group</Button>
 						</div>
 					</div>
+				</div>
 			</div>
 		);
 	}
