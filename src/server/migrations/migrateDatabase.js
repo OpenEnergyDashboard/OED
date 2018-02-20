@@ -1,5 +1,11 @@
 const migrationList = require('./registerMigration');
 
+/**
+ * If current version or version user wants to migrate is not in the migrationList, throw an Error
+ * @param curr current version of the database
+ * @param to version want to migrate to
+ * @param adjListArray adjacency list of version graph
+ */
 function checkIfFromAndToExist(curr, to, adjListArray) {
 	if (!(curr in adjListArray)) {
 		throw new Error('Did not find current version in migration list');
