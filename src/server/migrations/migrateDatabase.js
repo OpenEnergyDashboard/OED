@@ -1,11 +1,19 @@
 const migrationList = require('./registerMigration');
 
-// breath first search to find path to migrate databse
-function findPathToMigrate(from, to, adjListArray) {
+function checkIfFromAndToExist(curr, to, adjListArray) {
+	if (!(curr in adjListArray)) {
+		throw new Error('Did not find current version in migration list');
+	}
+	if (!(to in adjListArray)) {
+		throw new Error('Did not find to version in migration list');
+	}
+}
+
+function findPathToMigrate(curr, to, adjListArray) {
 	const queue = [];
 	const path = [];
 	const visited = [];
-
+	checkIfFromAndToExist(curr, to, adjListArray);
 	for (const vertex in adjListArray) {
 		if (Object.prototype.hasOwnProperty.call(adjListArray, vertex)) {
 			visited[vertex] = false;
@@ -13,8 +21,8 @@ function findPathToMigrate(from, to, adjListArray) {
 		}
 	}
 
-	queue.push(from);
-	visited[from] = true;
+	queue.push(curr);
+	visited[curr] = true;
 
 	while (queue.length > 0) {
 		const currentVertexID = queue.shift();
@@ -32,22 +40,16 @@ function findPathToMigrate(from, to, adjListArray) {
 	return path;
 }
 
-function printPathToMigrate(s, f, path) {
-	if (s === f) {
-		console.log(`${f} `);
+function printPathToMigrate(curr, to, path) {
+	if (curr === to) {
+		console.log(`${to} `);
+	} else if (path[to] === -1) {
+		throw new Error('No path found');
 	} else {
-		if (path[f] === -1) {
-			console.log('No path');
-		} else {
-			printPathToMigrate(s, path[f], path);
-			console.log(`${f} `);
-		}
+		printPathToMigrate(curr, path[to], path);
+		console.log(`${to} `);
 	}
 }
 
-const path = findPathToMigrate(0.1, 0.3, migrationList);
-console.log(path);
-printPathToMigrate(0.1, 0.3, path);
-
-// console.log(findPathToMigrate(0.1, 0.2, migrationList));
-// printPathToMigrate(0.1, 0.2, migrationList);
+const path = findPathToMigrate('0.1.0', '0.5.0', migrationList);
+printPathToMigrate('0.1.0', '0.5.0', path);
