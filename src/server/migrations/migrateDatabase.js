@@ -22,6 +22,7 @@ function checkIfFromAndToExist(curr, to, adjListArray) {
 /**
  * Do a breath first search traversal to find the shortest path
  * from the current version to the version user want to migrate
+ * It also works for down migration.
  * @param curr current version of the database
  * @param to version want to migrate to
  * @param adjListArray adjacency list of version graph
@@ -30,7 +31,7 @@ function checkIfFromAndToExist(curr, to, adjListArray) {
 function findPathToMigrate(curr, to, adjListArray) {
 	const queue = [];
 	const path = [];
-	const visited = [];
+	const visited = []; // When there is a cycle, make sure it is not infinite.
 
 	checkIfFromAndToExist(curr, to, adjListArray);
 
@@ -77,5 +78,5 @@ function printPathToMigrate(curr, to, path) {
 	}
 }
 
-const path = findPathToMigrate('0.1.0', '0.5.0', migrationList);
-printPathToMigrate('0.1.0', '0.5.0', path);
+const path = findPathToMigrate('0.3.0', '0.1.0', migrationList);
+printPathToMigrate('0.3.0', '0.1.0', path);
