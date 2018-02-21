@@ -4,14 +4,13 @@
 
 const express = require('express');
 const Reading = require('../models/Reading');
+const Meter = require('../models/Meter');
 const moment = require('moment');
 const streamBuffers = require('stream-buffers');
 const multer = require('multer');
 const streamToDB = require('../services/loadFromCsvStream');
 const authenticator = require('./authenticator');
 const validate = require('jsonschema').validate;
-const readCsv = require('../services/readCSV');
-
 const router = express.Router();
 
 // The upload here ensures that the file is saved to server RAM rather than disk
@@ -62,12 +61,29 @@ router.post('/readings/:meter_id', upload.single('csvFile'), async (req, res) =>
 });
 
 router.post('/meters', upload.single('csvFile'), async (req, res) => {
-	const meterData = req.file.buffer.toString();
-	console.log(meterData.trim());
-	for (const row of meterData) {
-	//	console.log(row);
+	try {
+		const myReadableStreamBuffer = new streamBuffers.ReadableStreamBuffer({
+			frequency: 10,
+			chunkSize: 2048
+		});
+		myReadableStreamBuffer.put(req.file.buffer);
+		// stop() indicates we are done putting the data in our readable stream.
+		myReadableStreamBuffer.stop();
+		try {
+			await streamToDB(myReadableStreamBuffer, row => {
+				const ipAddress = Number(row[0]);
+				return new Meter(undefined, ipAddress, ipAddress, true, Meter.type.MAMAC);
+			}, (meters, tx) => Meter.insertAll(meters, tx));
+			res.status(200).json({ success: true });
+		} catch (e) {
+			res.status(403).json({ success: false, message: 'Failed to upload meter.' });
+		}
+	} catch (err) {
+		res.status(400).send({
+			success: false,
+			message: 'Incorrect file type.'
+		});
 	}
-	res.sendStatus(200);
 });
 
 module.exports = router;
