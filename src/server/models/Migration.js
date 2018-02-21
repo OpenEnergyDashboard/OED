@@ -8,18 +8,32 @@ const db = database.db;
 const sqlFile = database.sqlFile;
 
 class Migration {
-
-	constructor(id, from, to, updateTime) {
+	/**
+	 * @param id should be undefined when creating a new migration
+	 * @param fromVersion current version
+	 * @param toVersion version want to update to
+	 * @param updateTime time when migrate database
+	 */
+	constructor(id, fromVersion, toVersion, updateTime) {
 		this.id = id;
-		this.from = from;
-		this.to = to;
+		this.fromVersion = fromVersion;
+		this.toVersion = toVersion;
 		this.updateTime = updateTime;
 	}
 
+	/**
+	 * Returns a promise to create the migration table.
+	 * @return {Promise.<>}
+	 */
 	static createTables() {
 		return db.none(sqlFile('group/create_migration_tables.sql'));
 	}
 
+	/**
+	 * Returns a promise to insert this migration into the database
+	 * @param conn the connection to use. Defaults to the default database connection.
+	 * @returns {Promise.<>}
+	 */
 	async insert(conn = db) {
 		const migration = this;
 		if (migration.id !== undefined) {
