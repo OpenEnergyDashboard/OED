@@ -23,9 +23,9 @@ function checkIfFromAndToExist(curr, to, adjListArray) {
  * Do a breath first search traversal to find the shortest path
  * from the current version to the version user want to migrate
  * @param curr current version of the database
- * @param to to version want to migrate to
+ * @param to version want to migrate to
  * @param adjListArray adjacency list of version graph
- * @returns {Array} return an array that store the path to the version that we want to migrate to
+ * @returns {Array} return an array of indexes to the version that we want to migrate to
  */
 function findPathToMigrate(curr, to, adjListArray) {
 	const queue = [];
@@ -60,6 +60,12 @@ function findPathToMigrate(curr, to, adjListArray) {
 	return path;
 }
 
+/**
+ * Based on the path array, recursively find the correct path to the version wanted to update
+ * @param curr current version of the database
+ * @param to version want to migrate to
+ * @param path array that store the indexes to the version that we want to migrate to
+ */
 function printPathToMigrate(curr, to, path) {
 	if (curr === to) {
 		console.log(`${to} `);
