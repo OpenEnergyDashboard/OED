@@ -9,10 +9,11 @@ const sqlFile = database.sqlFile;
 
 class Migration {
 
-	constructor(id, from, to) {
+	constructor(id, from, to, updateTime) {
 		this.id = id;
-		this.from = from
+		this.from = from;
 		this.to = to;
+		this.updateTime = updateTime;
 	}
 
 	static createTables() {
@@ -20,12 +21,11 @@ class Migration {
 	}
 
 	async insert(conn = db) {
-		const group = this;
-		if (group.id !== undefined) {
-			throw new Error('Attempt to insert a group that already has an ID');
+		const migration = this;
+		if (migration.id !== undefined) {
+			throw new Error('Attempt to insert a migration that already has an ID');
 		}
-		const resp = await conn.one(sqlFile('group/insert_new_group.sql'), group);
-		// resp = { id: 42 }, hence this line
+		const resp = await conn.one(sqlFile('group/insert_new_migration.sql'), migration);
 		this.id = resp.id;
 	}
 }
