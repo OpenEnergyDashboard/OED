@@ -35,7 +35,7 @@ function findPathToMigrate(curr, to, adjListArray) {
 
 	checkIfFromAndToExist(curr, to, adjListArray);
 
-	for (const vertex in adjListArray) {
+	for (const vertex of adjListArray) {
 		if (Object.prototype.hasOwnProperty.call(adjListArray, vertex)) {
 			visited[vertex] = false;
 			path[vertex] = -1;

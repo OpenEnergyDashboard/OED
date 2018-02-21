@@ -12,4 +12,18 @@ const migrationList = {
 	'0.4.0': []
 };
 
+const migrations = [
+	require('./0.1.0-0.2.0/migrate')
+];
+
+const m = migrations[0];
+
+const db = require('../models/database').db;
+
+db.tx(async t => {
+	for (const m of migrations) {
+		await m.up(t);
+	}
+});
+
 module.exports = migrationList;

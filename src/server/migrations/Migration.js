@@ -1,9 +1,9 @@
 class Migration {
 	/** the version that this migration should be applied to */
-	static fromVersion() {}
+	fromVersion() {}
 
 	/** the version that this migration takes the database to */
-	static toVersion() {}
+	toVersion() {}
 
 	/** migrates the database from fromVersion() to toVersion() */
 	up(db) {}
