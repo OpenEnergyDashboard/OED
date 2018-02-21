@@ -1,3 +1,7 @@
+/* This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this
+ * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
+
 const migrationList = require('./registerMigration');
 
 /**
@@ -27,7 +31,9 @@ function findPathToMigrate(curr, to, adjListArray) {
 	const queue = [];
 	const path = [];
 	const visited = [];
+
 	checkIfFromAndToExist(curr, to, adjListArray);
+
 	for (const vertex in adjListArray) {
 		if (Object.prototype.hasOwnProperty.call(adjListArray, vertex)) {
 			visited[vertex] = false;
