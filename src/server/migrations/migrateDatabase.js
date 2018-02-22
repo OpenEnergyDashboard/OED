@@ -6,6 +6,9 @@ const migrationList = require('./registerMigration');
 
 const db = require('../models/database').db;
 
+// contains a string of file pair
+const pathFile = [];
+
 /**
  * If current version or version user wants to migrate is not in the migrationList, throw an Error
  * @param curr current version of the database
@@ -69,24 +72,28 @@ function findPathToMigrate(curr, to, adjListArray) {
  * @param to version want to migrate to
  * @param path array that store the indexes to the version that we want to migrate to
  */
-function printPathToMigrate(curr, to, path) {
+function getStringPairToMigrate(curr, to, path) {
 	if (curr === to) {
-		console.log(`${to} `);
+		pathFile.push();
 	} else if (path[to] === -1) {
 		throw new Error('No path found');
 	} else {
-		printPathToMigrate(curr, path[to], path);
-		console.log(`${to} `);
+		getStringPairToMigrate(curr, path[to], path);
+		const s = `./${path[to]}-${to}/migrate`;
+		pathFile.push(s);
 	}
 }
 
-// const m = migrations[0];
-//
-// db.tx(async t => {
-// 	for (const m of migrations) {
-// 		await m.up(t);
-// 	}
-// });
+function migrateUsingFile(pathFileName) {
+	const migrationFile = {};
+	db.tx(async t => {
+		for (let i = 0; i < pathFileName.length; i++) {
+			migrationFile[i] = require(pathFileName[i]);
+			migrationFile[i].up(t);
+		}
+	});
+}
 
-const path = findPathToMigrate('0.3.0', '0.1.0', migrationList);
-printPathToMigrate('0.3.0', '0.1.0', path);
+const path = findPathToMigrate('0.1.0', '0.3.0', migrationList);
+getStringPairToMigrate('0.1.0', '0.3.0', path);
+migrateUsingFile(pathFile);
