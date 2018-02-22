@@ -4,6 +4,8 @@
 
 const migrationList = require('./registerMigration');
 
+const db = require('../models/database').db;
+
 /**
  * If current version or version user wants to migrate is not in the migrationList, throw an Error
  * @param curr current version of the database
@@ -35,7 +37,7 @@ function findPathToMigrate(curr, to, adjListArray) {
 
 	checkIfFromAndToExist(curr, to, adjListArray);
 
-	for (const vertex of adjListArray) {
+	for (const vertex in adjListArray) {
 		if (Object.prototype.hasOwnProperty.call(adjListArray, vertex)) {
 			visited[vertex] = false;
 			path[vertex] = -1;
@@ -77,6 +79,14 @@ function printPathToMigrate(curr, to, path) {
 		console.log(`${to} `);
 	}
 }
+
+// const m = migrations[0];
+//
+// db.tx(async t => {
+// 	for (const m of migrations) {
+// 		await m.up(t);
+// 	}
+// });
 
 const path = findPathToMigrate('0.3.0', '0.1.0', migrationList);
 printPathToMigrate('0.3.0', '0.1.0', path);
