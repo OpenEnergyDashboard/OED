@@ -2,15 +2,41 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
 
-const migrationList = require('./registerMigration').migrationList;
+const migrations = require('./registerMigration');
 
 const db = require('../models/database').db;
 const Migration = require('../models/Migration');
 const {log} = require('../log');
 
+// file needed to run database transaction
+const requiredFile = [];
 
-// contains a string of file pair
-const pathFile = [];
+/**
+ * create an adjacency list of the migrations
+ * @returns {{}} object in adjacency list style
+ */
+function createMigrationList() {
+	const migrationList = {};
+
+	const vertex = [];
+
+	for (const m of migrations) {
+		vertex.push(m.fromVersion);
+		vertex.push(m.toVersion);
+	}
+
+	const uniqueKey = [...new Set(vertex)];
+
+	uniqueKey.forEach(key => {
+		migrationList[key] = [];
+	});
+
+	for (const m of migrations) {
+		migrationList[m.fromVersion].push(m);
+	}
+
+	return migrationList;
+}
 
 /**
  * If current version or version user wants to migrate is not in the migrationList, throw an Error
@@ -59,10 +85,10 @@ function findPathToMigrate(curr, to, adjListArray) {
 		const edges = currentVertex.length;
 		for (let i = 0; i < edges; i++) {
 			const target = currentVertex[i];
-			if (!visited[target]) {
-				visited[target] = true;
-				path[target] = currentVertexID;
-				queue.push(target);
+			if (!visited[target.toVersion]) {
+				visited[target.toVersion] = true;
+				path[target.toVersion] = currentVertexID;
+				queue.push(target.toVersion);
 			}
 		}
 	}
@@ -70,50 +96,62 @@ function findPathToMigrate(curr, to, adjListArray) {
 }
 
 /**
- * Based on the path array, recursively find the correct path to the version wanted to update
- * and add it to the pathFile string
+ * Based on the path array, recursively find the correct file to the version wanted to update
+ * and add it to the requiredFile array
  * @param curr current version of the database
  * @param to version want to migrate to
  * @param path array that store the indexes to the version that we want to migrate to
  */
-function getStringPairToMigrate(curr, to, path) {
+function getRequiredFileToMigrate(curr, to, path) {
 	if (curr === to) {
-		pathFile.push();
+		requiredFile.push();
 	} else if (path[to] === -1) {
 		throw new Error('No path found');
 	} else {
-		getStringPairToMigrate(curr, path[to], path);
-		const s = `./${path[to]}-${to}/migrate`;
-		pathFile.push(s);
+		getRequiredFileToMigrate(curr, path[to], path);
+		requiredFile.push({
+			fromVersion: path[to],
+			toVersion: to
+		});
 	}
 }
 
-function migrateUsingFile(pathFileName) {
-	const migrationFile = {};
+/**
+ * Open a database transaction and migrate the database by calling up() method.
+ * Insert row into migration folder
+ * @param neededFile
+ * @param list
+ */
+function migrateDatabaseTransaction(neededFile, list) {
 	db.tx(async t => {
-		for (let i = 0; i < pathFileName.length; i++) {
-			migrationFile[i] = require(pathFileName[i]);
-			migrationFile[i].up(t);
-		}
+		neededFile.forEach(file => {
+			for (const items in list) {
+				if (file.fromVersion === items) {
+					list[items].forEach(item => {
+						if (item.toVersion === file.toVersion) {
+							item.up(t);
+						}
+					});
+				}
+			}
+		});
 	}).then(data => {
 		// success, COMMIT was executed
-		const migration = new Migration(undefined, migrationFile[i].fromVersion);
-		migration.insert();
 	}).catch(error => {
 		// failure, ROLLBACK was executed
 	});
 }
 
 // const path = findPathToMigrate(Migration.getCurrentVersion(), '0.3.0', migrationList);
-// getStringPairToMigrate(Migration.getCurrentVersion(), '0.3.0', path);
-const path = findPathToMigrate('0.1.0', '0.3.0', migrationList);
-getStringPairToMigrate('0.1.0', '0.3.0', path);
-console.log(pathFile);
-migrateUsingFile(pathFile);
+// getRequiredFileToMigrate(Migration.getCurrentVersion(), '0.3.0', path);
+const list = createMigrationList();
+const path = findPathToMigrate('0.1.0', '0.3.0', list);
+getRequiredFileToMigrate('0.1.0', '0.3.0', path);
+migrateDatabaseTransaction(requiredFile, list);
 
 module.exports = {
 	checkIfFromAndToExist,
 	findPathToMigrate,
-	getStringPairToMigrate,
-	migrateUsingFile
+	getStringPairToMigrate: getRequiredFileToMigrate,
+	migrateUsingFile: migrateDatabaseTransaction
 };
