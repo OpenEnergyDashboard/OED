@@ -104,6 +104,6 @@ function migrateUsingFile(pathFileName) {
 	});
 }
 
-const path = findPathToMigrate('0.1.0', '0.3.0', migrationList);
-getStringPairToMigrate('0.1.0', '0.3.0', path);
+const path = findPathToMigrate(Migration.getCurrentVersion(), '0.3.0', migrationList);
+getStringPairToMigrate(Migration.getCurrentVersion(), '0.3.0', path);
 migrateUsingFile(pathFile);
