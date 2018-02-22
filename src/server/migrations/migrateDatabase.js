@@ -2,7 +2,7 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
 
-const migrationList = require('./registerMigration');
+const migrationList = require('./registerMigration').migrationList;
 
 const db = require('../models/database').db;
 const Migration = require('../models/Migration');
@@ -97,13 +97,23 @@ function migrateUsingFile(pathFileName) {
 		}
 	}).then(data => {
 		// success, COMMIT was executed
-		const migration = new Migration(undefined, migrationFile[i].fromVersion, Date.now());
+		const migration = new Migration(undefined, migrationFile[i].fromVersion);
 		migration.insert();
 	}).catch(error => {
 		// failure, ROLLBACK was executed
 	});
 }
 
-const path = findPathToMigrate(Migration.getCurrentVersion(), '0.3.0', migrationList);
-getStringPairToMigrate(Migration.getCurrentVersion(), '0.3.0', path);
+// const path = findPathToMigrate(Migration.getCurrentVersion(), '0.3.0', migrationList);
+// getStringPairToMigrate(Migration.getCurrentVersion(), '0.3.0', path);
+const path = findPathToMigrate('0.1.0', '0.3.0', migrationList);
+getStringPairToMigrate('0.1.0', '0.3.0', path);
+console.log(pathFile);
 migrateUsingFile(pathFile);
+
+module.exports = {
+	checkIfFromAndToExist,
+	findPathToMigrate,
+	getStringPairToMigrate,
+	migrateUsingFile
+};
