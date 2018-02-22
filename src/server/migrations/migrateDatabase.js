@@ -6,6 +6,7 @@ const migrations = require('./registerMigration');
 
 const db = require('../models/database').db;
 const Migration = require('../models/Migration');
+
 const {log} = require('../log');
 
 // file needed to run database transaction
@@ -119,17 +120,23 @@ function getRequiredFileToMigrate(curr, to, path) {
 /**
  * Open a database transaction and migrate the database by calling up() method.
  * Insert row into migration folder
- * @param neededFile
- * @param list
+ * @param neededFile name of file needed to migrate
+ * @param list is the migration list
  */
 function migrateDatabaseTransaction(neededFile, list) {
 	db.tx(async t => {
 		neededFile.forEach(file => {
 			for (const items in list) {
 				if (file.fromVersion === items) {
-					list[items].forEach(item => {
+					list[items].forEach(async item => {
 						if (item.toVersion === file.toVersion) {
 							item.up(t);
+							const migration = new Migration(undefined, file.fromVersion, file.toVersion);
+							try {
+								await migration.insert(t);
+							} catch (err) {
+
+							}
 						}
 					});
 				}
