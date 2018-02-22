@@ -5,6 +5,9 @@
 const migrationList = require('./registerMigration');
 
 const db = require('../models/database').db;
+const Migration = require('../models/Migration');
+const {log} = require('../log');
+
 
 // contains a string of file pair
 const pathFile = [];
@@ -68,6 +71,7 @@ function findPathToMigrate(curr, to, adjListArray) {
 
 /**
  * Based on the path array, recursively find the correct path to the version wanted to update
+ * and add it to the pathFile string
  * @param curr current version of the database
  * @param to version want to migrate to
  * @param path array that store the indexes to the version that we want to migrate to
@@ -91,6 +95,12 @@ function migrateUsingFile(pathFileName) {
 			migrationFile[i] = require(pathFileName[i]);
 			migrationFile[i].up(t);
 		}
+	}).then(data => {
+		// success, COMMIT was executed
+		const migration = new Migration(undefined, migrationFile[i].fromVersion, Date.now());
+		migration.insert();
+	}).catch(error => {
+		// failure, ROLLBACK was executed
 	});
 }
 

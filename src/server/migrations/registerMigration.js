@@ -3,7 +3,7 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
 
 /**
- * register migration here
+ * register migration here. It allows for down migration however NOT RECOMMENDED
  */
 const migrations = [
 	require('./0.1.0-0.2.0/migrate'),
