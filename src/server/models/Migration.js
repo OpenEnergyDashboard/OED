@@ -42,5 +42,14 @@ class Migration {
 		const resp = await conn.one(sqlFile('group/insert_new_migration.sql'), migration);
 		this.id = resp.id;
 	}
+
+	/**
+	 * Returns a promise to retrieve the current version of the database.
+	 * @returns {Promise.<Migration>}
+	 */
+	static async getCurrentVersion() {
+		const row = await db.one(sqlFile('user/get_user_by_id.sql'));
+		return row.toVersion;
+	}
 }
 module.exports = Migration;
