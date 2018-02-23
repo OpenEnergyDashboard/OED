@@ -48,8 +48,8 @@ class Migration {
 	 * @returns {Promise.<Migration>}
 	 */
 	static async getCurrentVersion() {
-		const row = await db.one(sqlFile('user/get_user_by_id.sql'));
-		return row.toVersion;
+		const row = await db.one(sqlFile('user/get_current_version.sql'));
+		return row;
 	}
 }
 module.exports = Migration;
