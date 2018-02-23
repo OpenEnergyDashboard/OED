@@ -26,7 +26,7 @@ class Migration {
 	 * @return {Promise.<>}
 	 */
 	static createTables() {
-		return db.none(sqlFile('group/create_migration_tables.sql'));
+		return db.none(sqlFile('migration/create_migration_table.sql'));
 	}
 
 	/**
@@ -39,7 +39,7 @@ class Migration {
 		if (migration.id !== undefined) {
 			throw new Error('Attempt to insert a migration that already has an ID');
 		}
-		const resp = await conn.one(sqlFile('group/insert_new_migration.sql'), migration);
+		const resp = await conn.one(sqlFile('migration/insert_new_migration.sql'), migration);
 		this.id = resp.id;
 	}
 
@@ -48,7 +48,7 @@ class Migration {
 	 * @returns {Promise.<Migration>}
 	 */
 	static async getCurrentVersion() {
-		const row = await db.one(sqlFile('user/get_current_version.sql'));
+		const row = await db.one(sqlFile('migration/get_current_version.sql'));
 		return row;
 	}
 }

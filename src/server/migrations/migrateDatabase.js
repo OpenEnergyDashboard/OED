@@ -149,16 +149,14 @@ function migrateDatabaseTransaction(neededFile, list) {
 	});
 }
 
-// const path = findPathToMigrate(Migration.getCurrentVersion(), '0.3.0', migrationList);
-// getRequiredFileToMigrate(Migration.getCurrentVersion(), '0.3.0', path);
-const list = createMigrationList();
-const path = findPathToMigrate('0.1.0', '0.3.0', list);
-getRequiredFileToMigrate('0.1.0', '0.3.0', path);
-migrateDatabaseTransaction(requiredFile, list);
+function migrateAll(toVersion) {
+	const currentVersion = Migration.getCurrentVersion();
+	const list = createMigrationList();
+	const path = findPathToMigrate(currentVersion, '0.3.0', list);
+	getRequiredFileToMigrate(currentVersion, '0.3.0', path);
+	migrateDatabaseTransaction(requiredFile, list);
+}
 
 module.exports = {
-	checkIfFromAndToExist,
-	findPathToMigrate,
-	getStringPairToMigrate: getRequiredFileToMigrate,
-	migrateUsingFile: migrateDatabaseTransaction
+	migrateAll
 };
