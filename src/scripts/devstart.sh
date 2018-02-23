@@ -10,5 +10,5 @@
 # but there's no reason not to use it in non-container ones.
 # It starts the autorebuild in the background and then 
 # runs the server.
-npm run dev &
-npm start
+yarn dev &
+yarn start

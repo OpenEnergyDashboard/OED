@@ -16,7 +16,7 @@ FILES=$(echo "$FILES" | grep -v "\.editorconfig")
 FILES=$(echo "$FILES" | grep -v "\.gitattributes")
 FILES=$(echo "$FILES" | grep -v "package\.json")
 # Filter out generated files
-FILES=$(echo "$FILES" | grep -v "package-lock\.json")
+FILES=$(echo "$FILES" | grep -v "yarn\.lock")
 # Filter out images
 FILES=$(echo "$FILES" | grep -v "src\/client\/app\/images\/.*")
 FILES=$(echo "$FILES" | grep -v "src\/client\/favicon\.ico")

@@ -4,9 +4,9 @@
 # * file, You can obtain one at http://mozilla.org/MPL/2.0/.
 # *
 
-# NPM
+# Yarn and node modules
 node_modules
-npm*.log
+yarn-error.log
 
 # Intellij (directory-based)
 .idea
