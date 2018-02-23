@@ -3,14 +3,9 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
 
 import * as React from 'react';
-// TODO TYPESCRIPT: Need definitions for this?
-import Slider from 'react-rangeslider';
-
+import sliderWithoutTooltips, { createSliderWithTooltip } from 'rc-slider';
 import * as moment from 'moment';
 import { Button, ButtonGroup } from 'reactstrap';
-
-import 'react-rangeslider/lib/index.css';
-import '../styles/react-rangeslider-fix.css';
 import { TimeInterval } from '../../../common/TimeInterval';
 import ExportContainer from '../containers/ExportContainer';
 import ChartSelectContainer from '../containers/ChartSelectContainer';
@@ -18,6 +13,9 @@ import ChartDataSelectContainer from '../containers/ChartDataSelectContainer';
 import { ChangeBarStackingAction } from '../types/redux/graph';
 import ChartLinkContainer from '../containers/ChartLinkContainer';
 import { ChartTypes } from '../types/redux/graph';
+import 'rc-slider/assets/index.css';
+
+const Slider = createSliderWithTooltip(sliderWithoutTooltips);
 
 export interface UIOptionsProps {
 	chartToRender: ChartTypes;
@@ -44,6 +42,7 @@ export default class UIOptionsComponent extends React.Component<UIOptionsProps, 
 		this.handleBarDurationChange = this.handleBarDurationChange.bind(this);
 		this.handleBarDurationChangeComplete = this.handleBarDurationChangeComplete.bind(this);
 		this.handleChangeBarStacking = this.handleChangeBarStacking.bind(this);
+		this.formatSliderTip = this.formatSliderTip.bind(this);
 		this.handleBarButton = this.handleBarButton.bind(this);
 		this.handleCompareButton = this.handleCompareButton.bind(this);
 		this.toggleSlider = this.toggleSlider.bind(this);
@@ -123,16 +122,28 @@ export default class UIOptionsComponent extends React.Component<UIOptionsProps, 
 							outline={!this.state.showSlider}
 							onClick={this.toggleSlider}
 						>
-							Toggle custom slider (days)
+							Toggle custom slider
 						</Button>
 						{this.state.showSlider &&
-						<Slider
-							min={1}
-							max={365}
-							value={this.state.barDurationDays}
-							onChange={this.handleBarDurationChange}
-							onChangeComplete={this.handleBarDurationChangeComplete}
-						/>
+							<div style={divTopPadding}>
+								<Slider
+									min={1}
+									max={365}
+									value={this.state.barDurationDays}
+									onChange={this.handleBarDurationChange}
+									onAfterChange={this.handleBarDurationChangeComplete}
+									tipFormatter={this.formatSliderTip}
+									trackStyle={{ backgroundColor: 'gray', height: 10 }}
+									handleStyle={[{
+										height: 28,
+										width: 28,
+										marginLeft: -14,
+										marginTop: -9,
+										backgroundColor: 'white'
+									}]}
+									railStyle={{ backgroundColor: 'gray', height: 10 }}
+								/>
+							</div>
 						}
 					</div>
 
@@ -190,9 +201,7 @@ export default class UIOptionsComponent extends React.Component<UIOptionsProps, 
 	/**
 	 * Called when the user releases the slider, dispatch action on temporary state variable
 	 */
-	// TODO TYPESCRIPT: react-rangeslider doesn't have types. We should investigate what type this actually is
 	private handleBarDurationChangeComplete(e: any) {
-		e.preventDefault();
 		this.props.changeDuration(moment.duration(this.state.barDurationDays, 'days'));
 	}
 
@@ -206,7 +215,6 @@ export default class UIOptionsComponent extends React.Component<UIOptionsProps, 
 	private handleBarDurationChange(value: number) {
 		this.setState({ barDurationDays: value});
 	}
-
 
 	/**
 	 * Toggles the bar stacking option
@@ -244,5 +252,12 @@ export default class UIOptionsComponent extends React.Component<UIOptionsProps, 
 
 	private toggleSlider() {
 		this.setState({ showSlider: !this.state.showSlider });
+	}
+
+	private formatSliderTip(value: number) {
+		if (value <= 1) {
+			return `${value} day`;
+		}
+		return `${value} days`;
 	}
 }
