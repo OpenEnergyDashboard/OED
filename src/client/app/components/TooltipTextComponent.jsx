@@ -5,7 +5,10 @@
 import React from 'react';
 import ReactTooltip from 'react-tooltip';
 
-export default function TooltipComponent(props) {
+/**
+ * Component that renders text that shows a tooltip on hover
+ */
+export default function TooltipTextComponent(props) {
 	const divStyle = {
 		display: 'inline-block'
 	};
