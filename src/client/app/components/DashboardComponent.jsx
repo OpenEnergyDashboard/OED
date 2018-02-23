@@ -8,6 +8,7 @@ import UIOptionsContainer from '../containers/UIOptionsContainer';
 import LineChartContainer from '../containers/LineChartContainer';
 import BarChartContainer from '../containers/BarChartContainer';
 import MultiCompareChartContainer from '../containers/MultiCompareChartContainer';
+import SpinnerComponent from './SpinnerComponent';
 import { chartTypes } from '../reducers/graph';
 
 defaults.global.plugins.datalabels.display = false;
@@ -16,12 +17,22 @@ defaults.global.plugins.datalabels.display = false;
  * React component that controls the dashboard
  */
 export default function DashboardComponent(props) {
-	let ChartToRender = '';
+	let ChartToRender;
+	let showSpinner = false;
 	if (props.chartToRender === chartTypes.line) {
+		if (props.lineLoading) {
+			showSpinner = true;
+		}
 		ChartToRender = LineChartContainer;
 	} else if (props.chartToRender === chartTypes.compare) {
+		if (props.compareLoading) {
+			showSpinner = true;
+		}
 		ChartToRender = MultiCompareChartContainer;
 	} else {
+		if (props.barLoading) {
+			showSpinner = true;
+		}
 		ChartToRender = BarChartContainer;
 	}
 
@@ -31,8 +42,12 @@ export default function DashboardComponent(props) {
 				<div className="col-2 d-none d-lg-block">
 					<UIOptionsContainer />
 				</div>
-				<div className="col-12 col-lg-10">
-					<ChartToRender />
+				<div className="col-12 col-lg-10 align-self-center text-center">
+					{ showSpinner ? (
+						<SpinnerComponent loading width="50px" height="50px" />
+					) : (
+						<ChartToRender />
+					)}
 				</div>
 			</div>
 		</div>

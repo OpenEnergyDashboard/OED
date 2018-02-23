@@ -17,7 +17,10 @@ import * as readingsActions from '../actions/lineReadings';
  */
 const defaultState = {
 	byMeterID: {},
-	byGroupID: {}
+	byGroupID: {},
+	isFetching: false,
+	metersFetching: false,
+	groupsFetching: false
 };
 
 /**
@@ -33,7 +36,9 @@ export default function readings(state = defaultState, action) {
 				...state,
 				byMeterID: {
 					...state.byMeterID
-				}
+				},
+				metersFetching: true,
+				isFetching: true
 			};
 
 			for (const meterID of action.meterIDs) {
@@ -53,7 +58,9 @@ export default function readings(state = defaultState, action) {
 				...state,
 				byGroupID: {
 					...state.byGroupID
-				}
+				},
+				groupsFetching: true,
+				isFetching: true
 			};
 
 			for (const groupID of action.groupIDs) {
@@ -73,13 +80,18 @@ export default function readings(state = defaultState, action) {
 				...state,
 				byMeterID: {
 					...state.byMeterID,
-				}
+				},
+				metersFetching: false
 			};
 
 			for (const meterID of action.meterIDs) {
 				const readingsForMeter = action.readings[meterID];
 				newState.byMeterID[meterID][timeInterval] = { isFetching: false, readings: readingsForMeter };
 			}
+			if (!state.groupsFetching) {
+				newState.isFetching = false;
+			}
+
 			return newState;
 		}
 		case readingsActions.RECEIVE_GROUP_LINE_READINGS: {
@@ -88,12 +100,16 @@ export default function readings(state = defaultState, action) {
 				...state,
 				byGroupID: {
 					...state.byGroupID
-				}
+				},
+				groupsFetching: false
 			};
 
 			for (const groupID of action.groupIDs) {
 				const readingsForGroup = action.readings[groupID];
 				newState.byGroupID[groupID][timeInterval] = { isFetching: false, readings: readingsForGroup };
+			}
+			if (!state.metersFetching) {
+				newState.isFetching = false;
 			}
 
 			return newState;

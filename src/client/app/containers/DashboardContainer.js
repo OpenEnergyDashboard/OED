@@ -8,6 +8,9 @@ import DashboardComponent from '../components/DashboardComponent';
 function mapStateToProps(state) {
 	return {
 		chartToRender: state.graph.chartToRender,
+		lineLoading: state.readings.line.isFetching,
+		barLoading: state.readings.bar.isFetching,
+		compareLoading: state.readings.bar.isFetching
 	};
 }
 

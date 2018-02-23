@@ -5,6 +5,9 @@
 import React from 'react';
 import '../styles/spinner.css';
 
+/**
+ * Spinner/loading React component
+ */
 function SpinnerComponent(props) {
 	const spinnerStyle = {
 		width: props.width ? props.width : '15px',
