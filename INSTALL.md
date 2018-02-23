@@ -16,9 +16,9 @@ The app will re-build any time a file is changed. You can log into the app with 
 Killing the running process (ctrl+C) will stop the app. You can get rid of the containers with ```docker-compose down```.
 
 ### Without Docker ###
-1. Install Node, npm, and git.
+1. Install Node, yarn, and git.
 1. Clone this repository.
-1. Run ```npm install``` in the project root directory.
+1. Run ```yarn``` in the project root directory.
 1. Install PostgreSQL, start the PostgreSQL server, and connect to it via psql.
 1. In psql, run ```CREATE DATABASE oed;``` to create the database.
 1. Still in psql, run ```CREATE DATABASE oed_testing;``` to create a database for automated tests.
@@ -34,12 +34,12 @@ OED_DB_PORT=?                  // The port for your postgres db, likely 5432
 OED_TOKEN_SECRET=?             // Token for authentication. Generate something secure and random
 OED_LOG_FILE=?                 // Path to the log file, defaults to ./log.txt
 ```
-8. Run ```npm run createdb``` to create the database schema.
-1. Run `npm run addMamacMeters` to load mamac meters from an `.csv` file.
-1. Run `npm run updateMamacMeters` to fetch new data for mamac meters in the database.
-1. Run `npm run createUser` and follow the directions to create a new admin user.
-1. Run ```npm run build``` to create the Webpack bundle for production, otherwise run ```npm run dev``` for development.
-1. Run ```npm start```
+8. Run ```yarn createdb``` to create the database schema.
+1. Run `yarn addMamacMeters` to load mamac meters from an `.csv` file.
+1. Run `yarn updateMamacMeters` to fetch new data for mamac meters in the database.
+1. Run `yarn createUser` and follow the directions to create a new admin user.
+1. Run ```yarn build``` to create the Webpack bundle for production, otherwise run ```yarn dev``` for development.
+1. Run ```yarn start```
 
 
 ## Production ##

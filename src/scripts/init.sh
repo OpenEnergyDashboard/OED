@@ -5,12 +5,12 @@
 # * file, You can obtain one at http://mozilla.org/MPL/2.0/.
 # *
 
-USAGE="Usage: init.sh <filename | NONE> [--default-user | --no-user] [--build] [--no-npm-instal]; -u or --default-user creates the default test user, while --no-user creates no new user; -b builds webpack; -n skips npm install"
+USAGE="Usage: init.sh <filename | NONE> [--default-user | --no-user] [--build] [--no-yarn-instal]; -u or --default-user creates the default test user, while --no-user creates no new user; -b builds webpack; -n skips yarn install"
 
 BUILD=no
 DEFAULT_USER=no
 SKIP_USER=no
-NPM_INSTALL=yes
+YARN_INSTALL=yes
 
 if [ "$1" == "" ]; then
     echo $USAGE
@@ -31,8 +31,8 @@ while [ "$2" != "" ]; do
         -u) DEFAULT_USER=yes;;
         --default-user) DEFAULT_USER=yes;;
         --no-user) SKIP_USER=yes;;
-        -n) NPM_INSTALL=no;;
-        --no-npm-install) NPM_INSTALL=no;;
+        -n) YARN_INSTALL=no;;
+        --no-yarn-install) YARN_INSTALL=no;;
         *) echo "Invalid option $2" >&2; echo $USAGE; exit 1;;
     esac
     shift
@@ -43,11 +43,11 @@ if [ "$SKIP_USER" == yes ] && [ "$DEFAULT_USER" == yes ]; then
     exit 1
 fi
 
-# Install NPM dependencies
-if [ "$NPM_INSTALL" == "yes" ]; then
-    echo "NPM install..."
-    npm install --loglevel=warn --progress=false
-    echo "NPM install finished."
+# Install npm dependencies via Yarn
+if [ "$YARN_INSTALL" == "yes" ]; then
+    echo "Yarn install..."
+    yarn
+    echo "Yarn install finished."
 fi
 
 create_error=0 # Boolean
@@ -61,7 +61,7 @@ while [ $create_error == 0 ]; do
     sleep 1
     echo "Attempting to create database."
     # Redirect stderr to a file
-    npm run createdb |& tee /tmp/oed.error > /dev/null
+    yarn createdb |& tee /tmp/oed.error > /dev/null
     # search the file for the kind of error we can recover from
     grep -q 'Error: connect ECONNREFUSED' /tmp/oed.error
     create_error=$?
@@ -80,23 +80,23 @@ echo "Schema created or already exists."
 if [ $1 != "NONE"  ]; then
     set -e
     echo "Trying to add meters from '$IPS_FILE'."
-    npm run addMamacMeters $IPS_FILE 2> /dev/null
+    yarn addMamacMeters $IPS_FILE 2> /dev/null
     echo "Trying to update meters."
-    npm run updateMamacMeters 2> /dev/null
+    yarn updateMamacMeters 2> /dev/null
 fi
 
 # Create a user
 set -e
 if [ "$DEFAULT_USER" == "yes" ]; then
-    npm run createUser -- test@example.com password
+    yarn createUser -- test@example.com password
     echo "Created a user 'test@example.com' with password 'password'."
 elif [ "$SKIP_USER" != "yes" ]; then
-    npm run createUser
+    yarn createUser
 else
-    echo "WARNING: No user was created during init.sh run. You may wish to set up a user with the createUser npm script."
+    echo "WARNING: No user was created during init.sh run. You may wish to set up a user with the createUser yarn script."
 fi
 
 # Build webpack if needed
 if [ "$BUILD" == "yes" ]; then
-    npm run build
+    yarn build
 fi

@@ -35,10 +35,10 @@ before_script:
 
 script:
     # Validate legal requirements on source files
-  - npm run checkHeader
+  - yarn run checkHeader
     # Check for eslint failures
-  - npm run lint
+  - yarn run lint
     # Test with native Node install
-  - npm run test
+  - yarn run test
     # Test in Docker
-  - docker-compose run --service-ports --rm web npm run test
+  - docker-compose run --service-ports --rm web yarn test

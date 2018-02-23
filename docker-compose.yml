@@ -46,4 +46,4 @@ services:
         depends_on:
             - database
         # Lets docker-compose up work right
-        command: ["npm", "start"]
+        command: ["yarn", "start"]

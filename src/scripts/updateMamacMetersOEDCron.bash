@@ -3,4 +3,4 @@
 cd '/example/path/to/project/OED'
 
 # The following line should NOT need to be edited except by devs.
-docker-compose run --rm web npm run --silent updateMamacMeters &>> /dev/null &
+docker-compose run --rm web yarn --silent updateMamacMeters &>> /dev/null &
