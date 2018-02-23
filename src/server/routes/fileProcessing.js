@@ -61,29 +61,7 @@ router.post('/readings/:meter_id', upload.single('csvFile'), async (req, res) =>
 });
 
 router.post('/meters', upload.single('csvFile'), async (req, res) => {
-	try {
-		const myReadableStreamBuffer = new streamBuffers.ReadableStreamBuffer({
-			frequency: 10,
-			chunkSize: 2048
-		});
-		myReadableStreamBuffer.put(req.file.buffer);
-		// stop() indicates we are done putting the data in our readable stream.
-		myReadableStreamBuffer.stop();
-		try {
-			await streamToDB(myReadableStreamBuffer, row => {
-				const ipAddress = Number(row[0]);
-				return new Meter(undefined, ipAddress, ipAddress, true, Meter.type.MAMAC);
-			}, (meters, tx) => Meter.insertAll(meters, tx));
-			res.status(200).json({ success: true });
-		} catch (e) {
-			res.status(403).json({ success: false, message: 'Failed to upload meter.' });
-		}
-	} catch (err) {
-		res.status(400).send({
-			success: false,
-			message: 'Incorrect file type.'
-		});
-	}
+	console.log(req.params.list.data);
 });
 
 module.exports = router;

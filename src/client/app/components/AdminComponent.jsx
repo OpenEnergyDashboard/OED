@@ -42,22 +42,37 @@ export default class AdminComponent extends React.Component {
 
 	handleMeterToImport(files) {
 		const file = files[0];
-		const data = new FormData();
-		console.log(data);
-		data.append('csvFile', file);
+		const reader = new FileReader();
+		let listValue = [];
+		reader.onload = () => {
+			const fileAsBinaryString = reader.result;
+			listValue = fileAsBinaryString.split(/\r?\n/);
+			for (const items of listValue) {
+				if(items.length === 0){
+					listValue.splice(listValue.indexOf(items), 1);
+				}
+			}
+		};
+		reader.onabort = () => console.log('file reading was aborted');
+		reader.onerror = () => console.log('file reading has failed')
+		reader.readAsBinaryString(file);
+		const jsonObject = {
+			data: listValue
+		};
 		axios({
+			/*TODO: connect with API */
 			method: 'post',
-			url: '/api/fileProcessing/meters',
-			data,
+			url: `/api/fileProcessing/meters`,
 			params: {
-				token: getToken()
+				token: getToken(),
+				list: jsonObject
 			}
 		})
 			.then(() => {
-				showSuccessNotification('Successfully uploaded new meters');
+				showSuccessNotification('Successfully uploaded meter data');
 			})
 			.catch(() => {
-				showErrorNotification('Error uploading new meters');
+				showErrorNotification('Error uploading meter data');
 			});
 	}
 
