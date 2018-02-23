@@ -7,5 +7,5 @@ CREATE TABLE IF NOT EXISTS migrations (
 	id SERIAL PRIMARY KEY,
 	from_version VARCHAR(20) NOT NULL,
 	to_version VARCHAR(20) NOT NULL,
-	update_timestamp TIMESTAMP NOT NULL
+	update_timestamp TIMESTAMP DEFAULT NOW() NOT NULL
 );

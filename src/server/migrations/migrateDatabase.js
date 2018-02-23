@@ -13,7 +13,7 @@ const {log} = require('../log');
 const requiredFile = [];
 
 /**
- * create an adjacency list of the migrations
+ * create an adjacency list (OBJECT) of the migrations
  * @returns {{}} object in adjacency list style
  */
 function createMigrationList() {
@@ -130,7 +130,7 @@ function migrateDatabaseTransaction(neededFile, list) {
 				if (file.fromVersion === items) {
 					list[items].forEach(async item => {
 						if (item.toVersion === file.toVersion) {
-							item.up(t);
+							await item.up(t);
 							const migration = new Migration(undefined, file.fromVersion, file.toVersion);
 							try {
 								await migration.insert(t);

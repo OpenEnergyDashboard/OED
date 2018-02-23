@@ -3,7 +3,4 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
 
 -- get the current as max of to_version column
-SELECT to_version
-FROM migrations
-WHERE to_version = (SELECT max(to_version) FROM migrations)
-LIMIT 1
+SELECT to_version FROM migrations
