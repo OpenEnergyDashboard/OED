@@ -6,7 +6,7 @@ import React from 'react';
 import ReactTooltip from 'react-tooltip';
 
 /**
- * Component that renders a help icon that shows a tooltip when on hover
+ * Component that renders a help icon that shows a tooltip on hover
  */
 export default function TooltipHelpComponent(props) {
 	const divStyle = {
