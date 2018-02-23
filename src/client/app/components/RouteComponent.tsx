@@ -79,10 +79,9 @@ export default class RouteComponent extends React.Component<RouteProps, {}> {
 							break;
 						case 'chartType':
 							options.chartType = info as ChartTypes;
-							options.chartType = info as ChartTypes;
 							break;
 						case 'barDuration':
-							const maybeDuration = moment.duration(parseInt(info));
+							options.barDuration = moment.duration(parseInt(info));
 							break;
 						case 'barStacking':
 							if (this.props.barStacking.toString() !== info) {

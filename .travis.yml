@@ -38,6 +38,8 @@ script:
   - npm run checkHeader
     # Validate that all areas which are intended to be typed, are typed
   - npm run checkTypescript
+    # Validate that the client's type system is internally consistent
+  - npm run typeCheck
     # Check for tslint failures
   - npm run lint
     # Test with native Node install

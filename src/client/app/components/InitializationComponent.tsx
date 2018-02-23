@@ -33,11 +33,6 @@ export default class InitializationComponent extends React.Component<Initializat
 		}
 	}
 
-	public shouldComponentUpdate() {
-		// To ignore warning: [react-router] You cannot change 'Router routes'; it will be ignored
-		return false;
-	}
-
 	public render() {
 		return (
 			<div>
