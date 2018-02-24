@@ -4,6 +4,7 @@
 
 const chai = require('chai');
 const chaiAsPromised = require('chai-as-promised');
+
 chai.use(chaiAsPromised);
 const expect = chai.expect;
 const mocha = require('mocha');
@@ -28,32 +29,23 @@ for (let i = 0; i < versionLists.length; i++) {
 		toVersion,
 		up: async dbt => {
 			// migration here
-			console.log('called');
 			isCalled[i] = true;
 		}
 	};
 	migrationList.push(item);
 }
 
-(async () => {
-	await migrateAll('0.3.0', migrationList);
-	console.log(isCalled);
-})(); // call the async fn here
 
 mocha.describe('Migrate the database from current to new version', () => {
 	mocha.beforeEach(recreateDB);
-	mocha.beforeEach(async () => {
-		await new Migration(undefined, '0.0.0', '0.1.0').insert();
-	});
+	// mocha.beforeEach(async () => {
+	// 	await new Migration(undefined, '0.0.0', '0.1.0').insert();
+	// });
 
 	mocha.it('should show correct correct up method for each migration in list and insert new row into database', async () => {
-		migrateAll('0.3.0', migrationList);
+		await migrateAll('0.3.0', migrationList);
 		const afterCalled = [true, true, false, false];
-		expect(isCalled).to.equal(afterCalled);
-		// const testFilePath = path.join(__dirname, 'data', 'metasys-duplicate.csv');
-		// await readMetasysData(testFilePath, 60, 2, false);
-		// const {count} = await db.one('SELECT COUNT(*) as count FROM readings');
-		// expect(parseInt(count)).to.equal(37);
+		expect(isCalled).to.deep.equal(afterCalled);
 	});
 
 	// mocha.it('should fail because there is no path', async () => {
@@ -62,5 +54,4 @@ mocha.describe('Migrate the database from current to new version', () => {
 	// 	// const {reading} = await db.one('SELECT reading FROM readings LIMIT 1');
 	// 	// expect(parseInt(reading)).to.equal(280);
 	// });
-
 });

@@ -124,7 +124,7 @@ function getRequiredFileToMigrate(curr, to, path) {
  * @param list is the migration list
  */
 async function migrateDatabaseTransaction(neededFile, list) {
-	db.tx(async t => {
+	await db.tx(async t => {
 		neededFile.forEach(file => {
 			for (const items in list) {
 				if (file.fromVersion === items) {
@@ -159,7 +159,7 @@ async function migrateAll(toVersion, migrationItems) {
 	const list = createMigrationList(migrationItems);
 	const path = findPathToMigrate('0.1.0', toVersion, list);
 	getRequiredFileToMigrate('0.1.0', toVersion, path);
-	migrateDatabaseTransaction(requiredFile, list);
+	await migrateDatabaseTransaction(requiredFile, list);
 }
 
 // migrateAll('0.3.0', migrations);
