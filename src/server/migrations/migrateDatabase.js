@@ -123,7 +123,7 @@ function getRequiredFileToMigrate(curr, to, path) {
  * @param neededFile name of file needed to migrate
  * @param list is the migration list
  */
-function migrateDatabaseTransaction(neededFile, list) {
+async function migrateDatabaseTransaction(neededFile, list) {
 	db.tx(async t => {
 		neededFile.forEach(file => {
 			for (const items in list) {
