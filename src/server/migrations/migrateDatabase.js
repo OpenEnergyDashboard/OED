@@ -7,7 +7,7 @@ const migrations = require('./registerMigration');
 const db = require('../models/database').db;
 const Migration = require('../models/Migration');
 
-const {log} = require('../log');
+const { log } = require('../log');
 
 // file needed to run database transaction
 const requiredFile = [];
@@ -16,12 +16,12 @@ const requiredFile = [];
  * create an adjacency list (OBJECT) of the migrations
  * @returns {{}} object in adjacency list style
  */
-function createMigrationList() {
+function createMigrationList(migrationItems) {
 	const migrationList = {};
 
 	const vertex = [];
 
-	for (const m of migrations) {
+	for (const m of migrationItems) {
 		vertex.push(m.fromVersion);
 		vertex.push(m.toVersion);
 	}
@@ -32,7 +32,7 @@ function createMigrationList() {
 		migrationList[key] = [];
 	});
 
-	for (const m of migrations) {
+	for (const m of migrationItems) {
 		migrationList[m.fromVersion].push(m);
 	}
 
@@ -149,13 +149,20 @@ function migrateDatabaseTransaction(neededFile, list) {
 	});
 }
 
-function migrateAll(toVersion) {
-	const currentVersion = Migration.getCurrentVersion();
-	const list = createMigrationList();
-	const path = findPathToMigrate(currentVersion, '0.3.0', list);
-	getRequiredFileToMigrate(currentVersion, '0.3.0', path);
+/**
+ * Migrate the database from current version to next version
+ * @param toVersion is the version wanting to migrate to
+ * @param migrationItems is the list of migration that users register
+ */
+async function migrateAll(toVersion, migrationItems) {
+	// const currentVersion = Migration.getCurrentVersion();
+	const list = createMigrationList(migrationItems);
+	const path = findPathToMigrate('0.1.0', toVersion, list);
+	getRequiredFileToMigrate('0.1.0', toVersion, path);
 	migrateDatabaseTransaction(requiredFile, list);
 }
+
+// migrateAll('0.3.0', migrations);
 
 module.exports = {
 	migrateAll

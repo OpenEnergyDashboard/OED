@@ -3,6 +3,7 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
 
 const database = require('./database');
+const { findMaxSemanticVersion } = require('../util');
 
 const db = database.db;
 const sqlFile = database.sqlFile;
@@ -49,7 +50,8 @@ class Migration {
 	 */
 	static async getCurrentVersion() {
 		const row = await db.one(sqlFile('migration/get_current_version.sql'));
-		return row;
+		const currentVersion = findMaxSemanticVersion(row);
+		return currentVersion;
 	}
 }
 module.exports = Migration;

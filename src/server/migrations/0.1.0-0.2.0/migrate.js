@@ -3,6 +3,6 @@ module.exports = {
 	toVersion: '0.2.0',
 	up: () => {
 		// migration here
-		console.log('called 1');
+		// console.log('called 1');
 	}
 };
