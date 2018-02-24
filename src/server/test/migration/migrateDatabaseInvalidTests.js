@@ -53,7 +53,7 @@ mocha.describe('Migration Invalid', () => {
 		const list = migrationList.filter(e => e.fromVersion !== '0.3.0');
 		expect(async () => {
 			await migrateAll('0.5.0', list)
-				.to.throw(new Error('Should not downgrade, please check .js'));
+				.to.throw(new Error('No path found'));
 		});
 	});
 

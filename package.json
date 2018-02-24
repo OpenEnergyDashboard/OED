@@ -11,7 +11,8 @@
     "lint": "./node_modules/.bin/eslint src/client/app/**/*.js src/client/app/**/*.jsx src/server/**/*.js src/server/*.js src/bin/*",
     "test": "./node_modules/.bin/mocha \"src/server/test/**/*.js\"",
     "createdb": "node ./src/server/services/createDB.js",
-    "addMamacMeters": "node ./src/server/services/addMamacMeters.js",
+	"migratedb": "node ./src/server/services/migrateDB.js",
+	"addMamacMeters": "node ./src/server/services/addMamacMeters.js",
     "updateMamacMeters": "node ./src/server/services/updateMamacMeters.js",
     "createUser": "node ./src/server/services/createUser.js"
   },
