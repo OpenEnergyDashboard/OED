@@ -52,8 +52,8 @@ class Migration {
 	 * @returns {Promise.<Migration>}
 	 */
 	static async getCurrentVersion() {
-		const migrations = await Migration.getAll().toVersion;
-		return findMaxSemanticVersion(migrations);
+		const migrations = (await Migration.getAll());
+		return findMaxSemanticVersion(migrations.map(m => m.toVersion));
 	}
 
 	/**
@@ -61,8 +61,8 @@ class Migration {
 	 * @returns {Promise.<array.<User>>}
 	 */
 	static async getAll() {
-		const rows = await db.any(sqlFile('migration/get_current_version.sql'));
-		return rows.map(row => new Migration(row.id, row.fromVersion, row.toVersion, row.updateTime));
+		const rows = await db.any(sqlFile('migration/get_all_migrations.sql'));
+		return rows.map(row => new Migration(row.id, row.from_version, row.to_version, row.update_time));
 	}
 }
 module.exports = Migration;

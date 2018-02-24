@@ -2,14 +2,9 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
 
-const migrations = require('./registerMigration');
-
 const db = require('../models/database').db;
 const Migration = require('../models/Migration');
-const User = require('../models/Meter');
 const { compare } = require('../util');
-
-const {log} = require('../log');
 
 // file needed to run database transaction
 const requiredFile = [];
@@ -77,11 +72,9 @@ function findPathToMigrate(curr, to, adjListArray) {
 
 	checkIfFromAndToExist(curr, to, adjListArray);
 
-	for (const vertex in adjListArray) {
-		if (Object.prototype.hasOwnProperty.call(adjListArray, vertex)) {
-			visited[vertex] = false;
-			path[vertex] = -1;
-		}
+	for (const vertex of Object.keys(adjListArray)) {
+		visited[vertex] = false;
+		path[vertex] = -1;
 	}
 
 	queue.push(curr);
@@ -133,7 +126,7 @@ function getRequiredFileToMigrate(curr, to, path) {
 async function migrateDatabaseTransaction(neededFile, list) {
 	await db.tx(async t => {
 		neededFile.forEach(file => {
-			for (const items in list) {
+			for (const items of Object.keys(list)) {
 				if (file.fromVersion === items) {
 					list[items].forEach(async item => {
 						if (item.toVersion === file.toVersion) {

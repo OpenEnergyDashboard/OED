@@ -46,7 +46,7 @@ mocha.describe('Migration Valid', () => {
 		await migrateAll('0.3.0', migrationList);
 		const afterCalled = [true, true, false, false];
 		expect(isCalled).to.deep.equal(afterCalled);
-		// expect('0.3.0').to.equal(Migration.getCurrentVersion());
+		expect('0.3.0').to.equal(await Migration.getCurrentVersion());
 	});
 
 	mocha.it('should find the shortest path to upgrade', async () => {
@@ -56,7 +56,7 @@ mocha.describe('Migration Valid', () => {
 			migrationList[2] = '0.1.0-0.4.0';
 			const afterCalled = [false, false, true, false];
 			expect(isCalled).to.deep.equal(afterCalled);
-			// expect('0.3.0').to.equal(Migration.getCurrentVersion());
+			expect('0.4.0').to.equal(Migration.getCurrentVersion());
 		})();
 	});
 });

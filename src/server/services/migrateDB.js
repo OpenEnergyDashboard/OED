@@ -47,13 +47,11 @@ function terminateReadline(message) {
 	// If there aren't enough args, go interactive.
 	const cmdArgs = process.argv;
 	if (cmdArgs.length !== 4) {
-		let toVersionResult;
 		try {
-			toVersionResult = await askToVersion();
+			toVersion = await askToVersion();
 		} catch (err) {
 			terminateReadline('Invalid toVersion, no migration succeeded');
 		}
-		toVersion = await askToVersion();
 	} else {
 		toVersion = cmdArgs[2];
 
@@ -63,7 +61,7 @@ function terminateReadline(message) {
 	}
 
 	try {
-		await migrateAll(toVersion, migrationList);
+		await migrateAll(toVersion, `${'migrationList'}`);
 		terminateReadline('Migration successful');
 	} catch (err) {
 		log.error(`Error while migrating database: ${err}`, err);
