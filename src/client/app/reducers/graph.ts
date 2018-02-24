@@ -12,8 +12,8 @@ const defaultState: GraphState = {
 	selectedGroups: [],
 	timeInterval: TimeInterval.unbounded(),
 	barDuration: moment.duration(1, 'month'),
-	compareTimeInterval: new TimeInterval(moment().startOf('week'), moment()),
-	compareDuration: moment.duration(1, 'days'),
+	compareTimeInterval: new TimeInterval(moment().subtract(2, 'days'), moment()),
+	compareDuration: moment.duration(1, 'hours'),
 	chartToRender: ChartTypes.line,
 	barStacking: false
 };

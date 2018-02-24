@@ -87,10 +87,10 @@ function mapStateToProps(state: State, ownProps: CompareChartContainerProps) {
 	let readingsData: {isFetching: boolean, readings?: Array<[number, number]>} | undefined ;
 	if (ownProps.isGroup) {
 		const readingsDataByTimeInterval = state.readings.bar.byGroupID[ownProps.id][timeInterval];
-		readingsData = readingsDataByTimeInterval[timeIntervalDurationInDays];
+		readingsData = readingsDataByTimeInterval[barDuration];
 	} else {
-		const readingsDataByTimeInterval = state.readings.bar.byGroupID[ownProps.id][timeInterval];
-		readingsData = readingsDataByTimeInterval[timeIntervalDurationInDays];
+		const readingsDataByTimeInterval = state.readings.bar.byMeterID[ownProps.id][timeInterval];
+		readingsData = readingsDataByTimeInterval[barDuration];
 	}
 	if (readingsData !== undefined && !readingsData.isFetching && readingsData.readings !== undefined) {
 		if (readingsData.readings.length < 7) {
@@ -103,6 +103,10 @@ function mapStateToProps(state: State, ownProps: CompareChartContainerProps) {
 		}
 
 		// Calculates current interval
+		if (readingsData.readings.length < soFar) {
+			throw new Error(`Insufficient readings data to process comparison for id ${ownProps.id}, ti ${timeInterval}, dur ${barDuration}.
+				readingsData has ${readingsData.readings.length} but we'd like to look at the last ${soFar} elements.`);
+		}
 		for (let i = readingsData.readings.length - soFar; i < readingsData.readings.length; i++) {
 			current += readingsData.readings[i][1];
 		}
