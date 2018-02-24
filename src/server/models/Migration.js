@@ -30,6 +30,9 @@ class Migration {
 		return db.none(sqlFile('migration/create_migration_table.sql'));
 	}
 
+	static mapRow(row) {
+		return new Migration(row.id, row.fromVersion, row.toVersion, row.updateTime);
+	}
 	/**
 	 * Returns a promise to insert this migration into the database
 	 * @param conn the connection to use. Defaults to the default database connection.
@@ -49,9 +52,17 @@ class Migration {
 	 * @returns {Promise.<Migration>}
 	 */
 	static async getCurrentVersion() {
-		const row = await db.one(sqlFile('migration/get_current_version.sql'));
-		const currentVersion = findMaxSemanticVersion(row);
-		return currentVersion;
+		const migrations = await Migration.getAll().toVersion;
+		return findMaxSemanticVersion(migrations);
+	}
+
+	/**
+	 * Returns a promise to get all of the user from the database
+	 * @returns {Promise.<array.<User>>}
+	 */
+	static async getAll() {
+		const rows = await db.any(sqlFile('migration/get_current_version.sql'));
+		return rows.map(row => new Migration(row.id, row.fromVersion, row.toVersion, row.updateTime));
 	}
 }
 module.exports = Migration;

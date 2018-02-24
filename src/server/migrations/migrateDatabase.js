@@ -6,8 +6,10 @@ const migrations = require('./registerMigration');
 
 const db = require('../models/database').db;
 const Migration = require('../models/Migration');
+const User = require('../models/Meter');
+const { compare } = require('../util');
 
-const { log } = require('../log');
+const {log} = require('../log');
 
 // file needed to run database transaction
 const requiredFile = [];
@@ -22,8 +24,13 @@ function createMigrationList(migrationItems) {
 	const vertex = [];
 
 	for (const m of migrationItems) {
-		vertex.push(m.fromVersion);
-		vertex.push(m.toVersion);
+		// disallow down migration
+		if (compare(m.fromVersion, m.toVersion) === 1) {
+			throw new Error('Should not downgrade, please check registerMigration.js');
+		} else {
+			vertex.push(m.fromVersion);
+			vertex.push(m.toVersion);
+		}
 	}
 
 	const uniqueKey = [...new Set(vertex)];
@@ -47,10 +54,10 @@ function createMigrationList(migrationItems) {
  */
 function checkIfFromAndToExist(curr, to, adjListArray) {
 	if (!(curr in adjListArray)) {
-		throw new Error('Did not find current version in migration list');
+		throw new Error('Did not find version in migration list');
 	}
 	if (!(to in adjListArray)) {
-		throw new Error('Did not find to version in migration list');
+		throw new Error('Did not find version in migration list');
 	}
 }
 
@@ -156,13 +163,16 @@ async function migrateDatabaseTransaction(neededFile, list) {
  */
 async function migrateAll(toVersion, migrationItems) {
 	// const currentVersion = Migration.getCurrentVersion();
-	const list = createMigrationList(migrationItems);
-	const path = findPathToMigrate('0.1.0', toVersion, list);
-	getRequiredFileToMigrate('0.1.0', toVersion, path);
-	await migrateDatabaseTransaction(requiredFile, list);
+	const currentVersion = '0.1.0';
+	if (currentVersion === toVersion) {
+		throw Error('You have the highest version');
+	} else {
+		const list = createMigrationList(migrationItems);
+		const path = findPathToMigrate(currentVersion, toVersion, list);
+		getRequiredFileToMigrate(currentVersion, toVersion, path);
+		await migrateDatabaseTransaction(requiredFile, list);
+	}
 }
-
-// migrateAll('0.3.0', migrations);
 
 module.exports = {
 	migrateAll

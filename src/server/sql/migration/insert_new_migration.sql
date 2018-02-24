@@ -3,4 +3,5 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
 
 INSERT INTO migrations (from_version, to_version, update_timestamp)
-VALUES (${from_version}, ${to_version}, NOW());
+VALUES (${fromVersion}, ${toVersion}, NOW())
+RETURNING id;

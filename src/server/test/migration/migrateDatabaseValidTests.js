@@ -16,9 +16,9 @@ const Migration = require('../../models/Migration');
 const { migrateAll } = require('../../migrations/migrateDatabase');
 
 
-const versionLists = ['0.1.0-0.2.0', '0.2.0-0.3.0', '0.3.0-0.1.0', '0.1.0-0.4.0'];
+const versionLists = ['0.1.0-0.2.0', '0.2.0-0.3.0', '0.1.0-0.4.0', '0.2.0-0.5.0'];
 const migrationList = [];
-const isCalled = [false, false, false, false];
+let isCalled = [false, false, false, false];
 
 // This mocks registerMigration.js
 for (let i = 0; i < versionLists.length; i++) {
@@ -36,22 +36,27 @@ for (let i = 0; i < versionLists.length; i++) {
 }
 
 
-mocha.describe('Migrate the database from current to new version', () => {
+mocha.describe('Migration Valid', () => {
 	mocha.beforeEach(recreateDB);
-	// mocha.beforeEach(async () => {
-	// 	await new Migration(undefined, '0.0.0', '0.1.0').insert();
-	// });
+	mocha.beforeEach(async () => {
+		await new Migration(undefined, '0.0.0', '0.1.0').insert(db);
+	});
 
-	mocha.it('should show correct correct up method for each migration in list and insert new row into database', async () => {
+	mocha.it('should call correct up method for and insert new row into database', async () => {
 		await migrateAll('0.3.0', migrationList);
 		const afterCalled = [true, true, false, false];
 		expect(isCalled).to.deep.equal(afterCalled);
+		// expect('0.3.0').to.equal(Migration.getCurrentVersion());
 	});
 
-	// mocha.it('should fail because there is no path', async () => {
-	// 	// const testFilePath = path.join(__dirname, 'data', 'metasys-duplicate.csv');
-	// 	// await readMetasysData(testFilePath, 60, 2, true);
-	// 	// const {reading} = await db.one('SELECT reading FROM readings LIMIT 1');
-	// 	// expect(parseInt(reading)).to.equal(280);
-	// });
+	mocha.it('should find the shortest path to upgrade', async () => {
+		(async () => {
+			isCalled = [false, false, false, false];
+			await migrateAll('0.3.0', migrationList);
+			migrationList[2] = '0.1.0-0.4.0';
+			const afterCalled = [false, false, true, false];
+			expect(isCalled).to.deep.equal(afterCalled);
+			// expect('0.3.0').to.equal(Migration.getCurrentVersion());
+		})();
+	});
 });
