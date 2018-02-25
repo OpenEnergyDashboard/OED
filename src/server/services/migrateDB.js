@@ -5,32 +5,36 @@
  */
 
 const readline = require('readline');
-const Migration = require('../models/Migration');
 const { log } = require('../log');
-const { compare } = require('../util');
-const { migrateAll } = require('../migrations/migrateDatabase');
-const migrationList = require('../migrations/registerMigration').migrations;
+const { findMaxSemanticVersion } = require('../util');
+const { migrateAll, getUniqueKeyOfMigrationList } = require('../migrations/migrateDatabase');
+const migrationList = require('../migrations/registerMigration');
 
 const rl = readline.createInterface({
 	input: process.stdin,
 	output: process.stdout
 });
 
-// Verifies that an toVersion is good
-function checkVersion(toVersion) {
-	const currentVersion = Migration.getCurrentVersion();
-	return compare(currentVersion, toVersion) === -1;
+function findMaxSematicVersion(list) {
+	return findMaxSemanticVersion(getUniqueKeyOfMigrationList(list));
 }
 
-// Asks the user for an e-mail.
-function askToVersion() {
+function askUpdateToMax() {
 	return new Promise((resolve, reject) => {
-		rl.question('To Version: ', toVersion => {
-			if (checkVersion(toVersion)) {
-				resolve(toVersion);
+		rl.question('Do you want to update to the max version? [yes/no]: ', answer => {
+			if (answer === 'yes' || answer === 'no') {
+				resolve(answer);
 			} else {
-				reject(toVersion);
+				reject(answer);
 			}
+		});
+	});
+}
+
+function askToVersion() {
+	return new Promise(resolve => {
+		rl.question('To Version: ', toVersion => {
+			resolve(toVersion);
 		});
 	});
 }
@@ -43,25 +47,20 @@ function terminateReadline(message) {
 
 (async () => {
 	let toVersion;
-
-	// If there aren't enough args, go interactive.
-	const cmdArgs = process.argv;
-	if (cmdArgs.length !== 4) {
-		try {
-			toVersion = await askToVersion();
-		} catch (err) {
-			terminateReadline('Invalid toVersion, no migration succeeded');
-		}
-	} else {
-		toVersion = cmdArgs[2];
-
-		if (!checkVersion(toVersion)) {
-			terminateReadline('Invalid toVersion, no migration succeeded');
-		}
-	}
-
 	try {
-		await migrateAll(toVersion, `${'migrationList'}`);
+		const updateMax = await askUpdateToMax();
+		if (updateMax === 'yes') {
+			toVersion = await findMaxSematicVersion(migrationList);
+		} else if (updateMax === 'no') {
+			toVersion = await askToVersion();
+		}
+	} catch (err) {
+		console.log(err);
+		terminateReadline('Invalid arguments, please enter [yes/no]');
+	}
+	try {
+		console.log(toVersion);
+		await migrateAll(toVersion, migrationList);
 		terminateReadline('Migration successful');
 	} catch (err) {
 		log.error(`Error while migrating database: ${err}`, err);

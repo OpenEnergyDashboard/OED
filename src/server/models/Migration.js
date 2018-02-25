@@ -30,9 +30,6 @@ class Migration {
 		return db.none(sqlFile('migration/create_migration_table.sql'));
 	}
 
-	static mapRow(row) {
-		return new Migration(row.id, row.fromVersion, row.toVersion, row.updateTime);
-	}
 	/**
 	 * Returns a promise to insert this migration into the database
 	 * @param conn the connection to use. Defaults to the default database connection.
@@ -52,7 +49,7 @@ class Migration {
 	 * @returns {Promise.<Migration>}
 	 */
 	static async getCurrentVersion() {
-		const migrations = (await Migration.getAll());
+		const migrations = await Migration.getAll();
 		return findMaxSemanticVersion(migrations.map(m => m.toVersion));
 	}
 

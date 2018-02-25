@@ -16,7 +16,12 @@ function mapToObject(array, valueMapper) {
 	return _.zipObject(array, array.map(valueMapper));
 }
 
-function compare(a, b) {
+/**
+ * @param a the first version
+ * @param b the second version
+ * @returns {number} 0 if equal; 1 is a > b; -1 if a < b
+ */
+function compareSemanticVersion(a, b) {
 	if (a === b) {
 		return 0;
 	}
@@ -52,11 +57,16 @@ function compare(a, b) {
 	return 0;
 }
 
+/**
+ * Find max version
+ * @param list of versions
+ * @returns {*} the max version
+ */
 function findMaxSemanticVersion(list) {
 	let max = list[0];
 
 	list.forEach(item => {
-		if (compare(item, max) === 1) {
+		if (compareSemanticVersion(item, max) === 1) {
 			max = item;
 		}
 	});
@@ -66,6 +76,6 @@ function findMaxSemanticVersion(list) {
 
 module.exports = {
 	mapToObject,
-	compare,
+	compare: compareSemanticVersion,
 	findMaxSemanticVersion
 };

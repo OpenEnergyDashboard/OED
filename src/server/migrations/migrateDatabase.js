@@ -9,13 +9,7 @@ const { compare } = require('../util');
 // file needed to run database transaction
 const requiredFile = [];
 
-/**
- * create an adjacency list (OBJECT) of the migrations
- * @returns {{}} object in adjacency list style
- */
-function createMigrationList(migrationItems) {
-	const migrationList = {};
-
+function getUniqueKeyOfMigrationList(migrationItems) {
 	const vertex = [];
 
 	for (const m of migrationItems) {
@@ -28,7 +22,17 @@ function createMigrationList(migrationItems) {
 		}
 	}
 
-	const uniqueKey = [...new Set(vertex)];
+	return [...new Set(vertex)];
+}
+
+/**
+ * create an adjacency list (OBJECT) of the migrations
+ * @returns {{}} object in adjacency list style
+ */
+function createMigrationList(migrationItems) {
+	const migrationList = {};
+
+	const uniqueKey = getUniqueKeyOfMigrationList(migrationItems);
 
 	uniqueKey.forEach(key => {
 		migrationList[key] = [];
@@ -155,8 +159,7 @@ async function migrateDatabaseTransaction(neededFile, list) {
  * @param migrationItems is the list of migration that users register
  */
 async function migrateAll(toVersion, migrationItems) {
-	// const currentVersion = Migration.getCurrentVersion();
-	const currentVersion = '0.1.0';
+	const currentVersion = await Migration.getCurrentVersion();
 	if (currentVersion === toVersion) {
 		throw Error('You have the highest version');
 	} else {
@@ -168,5 +171,6 @@ async function migrateAll(toVersion, migrationItems) {
 }
 
 module.exports = {
+	getUniqueKeyOfMigrationList,
 	migrateAll
 };
