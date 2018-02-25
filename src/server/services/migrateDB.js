@@ -15,7 +15,7 @@ const rl = readline.createInterface({
 	output: process.stdout
 });
 
-function findMaxSematicVersion(list) {
+function findMaxVersion(list) {
 	return findMaxSemanticVersion(getUniqueKeyOfMigrationList(list));
 }
 
@@ -50,16 +50,14 @@ function terminateReadline(message) {
 	try {
 		const updateMax = await askUpdateToMax();
 		if (updateMax === 'yes') {
-			toVersion = await findMaxSematicVersion(migrationList);
+			toVersion = await findMaxVersion(migrationList);
 		} else if (updateMax === 'no') {
 			toVersion = await askToVersion();
 		}
 	} catch (err) {
-		console.log(err);
 		terminateReadline('Invalid arguments, please enter [yes/no]');
 	}
 	try {
-		console.log(toVersion);
 		await migrateAll(toVersion, migrationList);
 		terminateReadline('Migration successful');
 	} catch (err) {

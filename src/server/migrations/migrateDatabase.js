@@ -9,6 +9,11 @@ const { compare } = require('../util');
 // file needed to run database transaction
 const requiredFile = [];
 
+/**
+ * Create an array of unique versions;
+ * @param migrationItems extracted from registerMigration.js
+ * @returns {*[]} array of unique versions
+ */
 function getUniqueKeyOfMigrationList(migrationItems) {
 	const vertex = [];
 
@@ -27,7 +32,8 @@ function getUniqueKeyOfMigrationList(migrationItems) {
 
 /**
  * create an adjacency list (OBJECT) of the migrations
- * @returns {{}} object in adjacency list style
+ * @param migrationItems extracted from registerMigration.js
+ * @returns {{}}
  */
 function createMigrationList(migrationItems) {
 	const migrationList = {};

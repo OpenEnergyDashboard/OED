@@ -54,7 +54,7 @@ class Migration {
 	}
 
 	/**
-	 * Returns a promise to get all of the user from the database
+	 * Returns a promise to get all of the migration from the database
 	 * @returns {Promise.<array.<User>>}
 	 */
 	static async getAll() {
