@@ -4,7 +4,7 @@
 
 const db = require('../models/database').db;
 const Migration = require('../models/Migration');
-const { compare } = require('../util');
+const { compareSemanticVersion } = require('../util');
 const { log } = require('../log');
 
 // file needed to run database transaction
@@ -32,7 +32,7 @@ function getUniqueKeyOfMigrationList(migrationItems) {
 
 	for (const m of migrationItems) {
 		// disallow down migration
-		if (compare(m.fromVersion, m.toVersion) === 1) {
+		if (compareSemanticVersion(m.fromVersion, m.toVersion) === 1) {
 			throw new Error('Should not downgrade, please check registerMigration.js');
 		} else {
 			vertex.push(m.fromVersion);

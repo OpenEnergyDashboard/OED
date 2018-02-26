@@ -76,6 +76,6 @@ function findMaxSemanticVersion(list) {
 
 module.exports = {
 	mapToObject,
-	compare: compareSemanticVersion,
+	compareSemanticVersion,
 	findMaxSemanticVersion
 };

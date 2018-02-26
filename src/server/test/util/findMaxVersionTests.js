@@ -9,13 +9,13 @@ const chai = require('chai');
 const expect = chai.expect;
 const mocha = require('mocha');
 
-const { findMaxSemanticVersion, compare } = require('../../util');
+const { findMaxSemanticVersion, compareSemanticVersion } = require('../../util');
 
 mocha.describe('compareTwoSemanticVersion', () => {
 	mocha.it('should compare two version to determine which one is greater', () => {
 		const a = '0.2.2';
 		const b = '0.2.11';
-		expect(compare(a, b)).to.equal(-1);
+		expect(compareSemanticVersion(a, b)).to.equal(-1);
 	});
 });
 
