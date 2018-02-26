@@ -153,9 +153,9 @@ async function migrateDatabaseTransaction(neededFile, list) {
 				if (file.fromVersion === items) {
 					list[items].forEach(async item => {
 						if (item.toVersion === file.toVersion) {
-							await item.up(t);
-							const migration = new Migration(undefined, file.fromVersion, file.toVersion);
 							try {
+								await item.up(t);
+								const migration = new Migration(undefined, file.fromVersion, file.toVersion);
 								await migration.insert(t);
 							} catch (err) {
 								log.error(`Error while migrating database: ${err}`, err);
