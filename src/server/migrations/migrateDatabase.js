@@ -10,6 +10,18 @@ const { compare } = require('../util');
 const requiredFile = [];
 
 /**
+ * @param migrationItems extracted from registerMigration.js
+ * @returns {Array} of migration pair
+ */
+function printMigrationList(migrationItems) {
+	const list = [];
+	for (const item of migrationItems) {
+		list.push(`${item.fromVersion} -> ${item.toVersion}`);
+	}
+	return list;
+}
+
+/**
  * Create an array of unique versions;
  * @param migrationItems extracted from registerMigration.js
  * @returns {*[]} array of unique versions
@@ -177,6 +189,7 @@ async function migrateAll(toVersion, migrationItems) {
 }
 
 module.exports = {
+	printMigrationList,
 	getUniqueKeyOfMigrationList,
 	migrateAll
 };

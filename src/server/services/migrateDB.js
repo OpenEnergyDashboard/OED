@@ -7,7 +7,7 @@
 const readline = require('readline');
 const { log } = require('../log');
 const { findMaxSemanticVersion } = require('../util');
-const { migrateAll, getUniqueKeyOfMigrationList } = require('../migrations/migrateDatabase');
+const { printMigrationList, migrateAll, getUniqueKeyOfMigrationList } = require('../migrations/migrateDatabase');
 const migrationList = require('../migrations/registerMigration');
 
 const rl = readline.createInterface({
@@ -62,6 +62,7 @@ function terminateReadline(message) {
 		terminateReadline('Migration successful');
 	} catch (err) {
 		log.error(`Error while migrating database: ${err}`, err);
+		console.log('Possible migrations: \n', printMigrationList(migrationList));
 		terminateReadline('Migration failed');
 	}
 })();
