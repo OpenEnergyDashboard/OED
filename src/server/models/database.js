@@ -55,7 +55,7 @@ async function createSchema() {
 	const User = require('./User');
 	const Group = require('./Group');
 	const Preferences = require('./Preferences');
-	const Migration = require ('./Migration');
+	const Migration = require('./Migration');
 	/* eslint-enable global-require */
 	await Meter.createMeterTypesEnum();
 	await Meter.createTable();

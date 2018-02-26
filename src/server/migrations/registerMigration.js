@@ -6,10 +6,12 @@
  * register migration here. It allows for down migration however NOT RECOMMENDED
  */
 const migrations = [
+	/* eslint-disable global-require */
 	require('./0.1.0-0.2.0/migrate'),
 	require('./0.1.0-0.3.0/migrate'),
 	require('./0.2.0-0.3.0/migrate'),
 	require('./0.5.0-0.6.0/migrate')
+	/* eslint-disable global-require */
 ];
 
 module.exports = migrations;

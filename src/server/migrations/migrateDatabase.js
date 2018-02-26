@@ -5,6 +5,7 @@
 const db = require('../models/database').db;
 const Migration = require('../models/Migration');
 const { compare } = require('../util');
+const { log } = require('../log');
 
 // file needed to run database transaction
 const requiredFile = [];
@@ -157,17 +158,13 @@ async function migrateDatabaseTransaction(neededFile, list) {
 							try {
 								await migration.insert(t);
 							} catch (err) {
-
+								log.error(`Error while migrating database: ${err}`, err);
 							}
 						}
 					});
 				}
 			}
 		});
-	}).then(data => {
-		// success, COMMIT was executed
-	}).catch(error => {
-		// failure, ROLLBACK was executed
 	});
 }
 
