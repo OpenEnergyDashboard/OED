@@ -68,7 +68,7 @@ async function createSchema() {
 	await Preferences.createGraphTypesEnum();
 	await Preferences.createTable();
 	await Group.createTables();
-	await Migration.createTables();
+	await Migration.createTable();
 	await db.none(sqlFile('reading/create_function_get_compressed_readings.sql'));
 }
 

@@ -2,5 +2,5 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
 
--- get the current as max of to_version column
+-- get all migrations
 SELECT * FROM migrations;

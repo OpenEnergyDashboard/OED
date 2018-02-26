@@ -26,7 +26,7 @@ class Migration {
 	 * Returns a promise to create the migration table.
 	 * @return {Promise.<>}
 	 */
-	static createTables() {
+	static createTable() {
 		return db.none(sqlFile('migration/create_migration_table.sql'));
 	}
 
