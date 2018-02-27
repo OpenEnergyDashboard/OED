@@ -3,11 +3,11 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
 
 /**
- * register migration here. It allows for down migration however NOT RECOMMENDED
+ * Register migration here
  */
 const migrations = [
 	/* eslint-disable global-require */
-	require('./0.2.0-0.3.0/migrate'),
+	require('./0.2.0-0.3.0'),
 	/* eslint-disable global-require */
 ];
 

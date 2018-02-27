@@ -29,11 +29,10 @@ function printMigrationList(migrationItems) {
  */
 function getUniqueKeyOfMigrationList(migrationItems) {
 	const vertex = [];
-
 	for (const m of migrationItems) {
 		// disallow down migration
 		if (compareSemanticVersion(m.fromVersion, m.toVersion) === 1) {
-			throw new Error('Should not downgrade, please check registerMigration.js');
+			throw new Error(`Migration fromVersion ${m.fromVersion} is more recent than toVersion ${m.toVersion}`);
 		} else {
 			vertex.push(m.fromVersion);
 			vertex.push(m.toVersion);
@@ -126,13 +125,13 @@ function findPathToMigrate(curr, to, adjListArray) {
  * @param to version want to migrate to
  * @param path array that store the indexes to the version that we want to migrate to
  */
-function getRequiredFileToMigrate(curr, to, path) {
+function getRequiredFilesToMigrate(curr, to, path) {
 	if (curr === to) {
 		requiredFile.push();
 	} else if (path[to] === -1) {
 		throw new Error('No path found');
 	} else {
-		getRequiredFileToMigrate(curr, path[to], path);
+		getRequiredFilesToMigrate(curr, path[to], path);
 		requiredFile.push({
 			fromVersion: path[to],
 			toVersion: to
@@ -143,29 +142,30 @@ function getRequiredFileToMigrate(curr, to, path) {
 /**
  * Open a database transaction and migrate the database by calling up() method.
  * Insert row into migration folder
- * @param neededFile name of file needed to migrate
- * @param list is the migration list
+ * @param neededFiles name of files needed to migrate
+ * @param allMigrationFiles is all of possible migration files
  */
-async function migrateDatabaseTransaction(neededFile, list) {
-	await db.tx(async t => {
-		neededFile.forEach(file => {
-			for (const items of Object.keys(list)) {
-				if (file.fromVersion === items) {
-					list[items].forEach(async item => {
-						if (item.toVersion === file.toVersion) {
-							try {
-								await item.up(t);
-								const migration = new Migration(undefined, file.fromVersion, file.toVersion);
-								await migration.insert(t);
-							} catch (err) {
-								log.error(`Error while migrating database: ${err}`, err);
-							}
+async function migrateDatabaseTransaction(neededFiles, allMigrationFiles) {
+	try {
+		await db.tx(async t => {
+			neededFiles.forEach(neededFile => {
+				allMigrationFiles.forEach(async migrationFile => {
+					if (neededFile.fromVersion === migrationFile.fromVersion && neededFile.toVersion === migrationFile.toVersion) {
+						try {
+							await migrationFile.up(t);
+							const migration = new Migration(undefined, migrationFile.fromVersion, migrationFile.toVersion);
+							await migration.insert(t);
+						} catch (err) {
+							// TODO:What if we don't have migration in the table;
+							log.error(`Error while migrating database: ${err}`, err);
 						}
-					});
-				}
-			}
+					}
+				});
+			});
 		});
-	});
+	} catch (err) {
+		log.error(`Error while migrating database: ${err}`, err);
+	}
 }
 
 /**
@@ -176,12 +176,12 @@ async function migrateDatabaseTransaction(neededFile, list) {
 async function migrateAll(toVersion, migrationItems) {
 	const currentVersion = await Migration.getCurrentVersion();
 	if (currentVersion === toVersion) {
-		throw Error('You have the highest version');
+		throw new Error('You have the highest version');
 	} else {
 		const list = createMigrationList(migrationItems);
 		const path = findPathToMigrate(currentVersion, toVersion, list);
-		getRequiredFileToMigrate(currentVersion, toVersion, path);
-		await migrateDatabaseTransaction(requiredFile, list);
+		getRequiredFilesToMigrate(currentVersion, toVersion, path);
+		await migrateDatabaseTransaction(requiredFile, migrationItems);
 	}
 }
 
