@@ -4,11 +4,11 @@
 
 const express = require('express');
 const Reading = require('../models/Reading');
-const Meter = require('../models/Meter');
 const moment = require('moment');
 const streamBuffers = require('stream-buffers');
 const multer = require('multer');
 const streamToDB = require('../services/loadFromCsvStream');
+const { insertMeters } = require('../services/readMamacMeters');
 const authenticator = require('./authenticator');
 const validate = require('jsonschema').validate;
 const router = express.Router();
@@ -60,8 +60,13 @@ router.post('/readings/:meter_id', upload.single('csvFile'), async (req, res) =>
 	}
 });
 
-router.post('/meters', upload.single('csvFile'), async (req, res) => {
-	console.log(req.params.list.data);
+router.post('/meters', async (req, res) => {
+	try {
+		insertMeters(req.body);
+		res.status(200).json({ success: true });
+	} catch (err) {
+		res.status(403).json({ success: false, message: 'Failed to upload meter.' });
+	}
 });
 
 module.exports = router;

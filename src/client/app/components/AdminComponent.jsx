@@ -42,38 +42,37 @@ export default class AdminComponent extends React.Component {
 
 	handleMeterToImport(files) {
 		const file = files[0];
+		let jsonObject = [];
 		const reader = new FileReader();
 		let listValue = [];
 		reader.onload = () => {
 			const fileAsBinaryString = reader.result;
 			listValue = fileAsBinaryString.split(/\r?\n/);
 			for (const items of listValue) {
-				if(items.length === 0){
+				if (items.length === 0) {
 					listValue.splice(listValue.indexOf(items), 1);
 				}
 			}
+			console.log(listValue);
+			jsonObject = listValue;
+			axios({
+				method: 'post',
+				url: `/api/fileProcessing/meters`,
+				data: jsonObject,
+				params: {
+					token: getToken(),
+				}
+			})
+				.then(() => {
+					showSuccessNotification('Successfully uploaded meters');
+				})
+				.catch(() => {
+					showErrorNotification('Error uploading meters');
+				});
 		};
 		reader.onabort = () => console.log('file reading was aborted');
 		reader.onerror = () => console.log('file reading has failed')
 		reader.readAsBinaryString(file);
-		const jsonObject = {
-			data: listValue
-		};
-		axios({
-			/*TODO: connect with API */
-			method: 'post',
-			url: `/api/fileProcessing/meters`,
-			params: {
-				token: getToken(),
-				list: jsonObject
-			}
-		})
-			.then(() => {
-				showSuccessNotification('Successfully uploaded meter data');
-			})
-			.catch(() => {
-				showErrorNotification('Error uploading meter data');
-			});
 	}
 
 	handleFileToImport(files) {
