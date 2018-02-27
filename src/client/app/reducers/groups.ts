@@ -127,7 +127,8 @@ export default function groups(state = defaultState, action: GroupsAction) {
 			if (_.includes(validModes, action.newMode)) {
 				return {
 					...state,
-					displayMode: action.newMode
+					displayMode: action.newMode,
+					selectedGroups: [] // zero out selected groups when we switch screens
 				};
 			}
 			return state;
