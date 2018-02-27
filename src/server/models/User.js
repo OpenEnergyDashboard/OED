@@ -58,6 +58,14 @@ class User {
 	}
 
 	/**
+	 * Returns a promise to update a user's password
+	 * @returns {Promise.<array.<User>>}
+	 */
+	static async updateUserPassword(email, passwordHash) {
+		return db.none(sqlFile('user/update_user_password.sql'), { email: email, password_hash: passwordHash });
+	}
+
+	/**
 	 * Returns a promise to insert this user into the database
 	 * @returns {Promise.<>}
 	 */
