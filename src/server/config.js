@@ -46,4 +46,7 @@ config.secretToken = process.env.OED_TOKEN_SECRET;
 config.serverPort = process.env.OED_SERVER_PORT;
 config.logFile = process.env.OED_LOG_FILE || 'log.txt';
 
+config.obvius = {
+	password: process.env.OED_OBVIUS_PASSWORD || 'password'
+};
 module.exports = config;

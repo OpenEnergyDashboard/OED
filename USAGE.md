@@ -71,7 +71,7 @@ network, so you can access the OED server. E.g.:
 `docker-compose run --rm --service-ports web src/scripts/devstart.sh`
 
 ### Without Docker ###
-If you are not using Docker, you need to install the dependencies yourself. Specifically, 
+If you are not using Docker, you need to install the dependencies yourself. Specifically,
 install Node.js version 8.11 or higher; NPM, the Node package manager; and PostgreSQL
 version 9.6 or higher.
 
@@ -79,7 +79,7 @@ Once PostgreSQL is installed, you will need to run the ```init.sql``` file from 
 `database` directory with `psql -U postgres -f database/init.sql`. This adds the user
 OED with password `opened` and creates the databases `oed` and `oed_testing`.
 
-Docker also manages configuration. If you are not using Docker, you will need to create a 
+Docker also manages configuration. If you are not using Docker, you will need to create a
 .env file (a file whose name is `.env` and nothing else) in the root directory of the project
 with the following contents, with any changes needed for your system.
 

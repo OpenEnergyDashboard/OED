@@ -18,6 +18,7 @@ const verification = require('./routes/verification');
 const groups = require('./routes/groups');
 const version = require('./routes/version');
 const baseline = require('./routes/baseline');
+const obvius = require('./routes/obvius');
 
 const app = express();
 
@@ -38,6 +39,7 @@ app.use('/api/verification', verification);
 app.use('/api/fileProcessing', fileProcessing);
 app.use('/api/version', version);
 app.use('/api/baselines', baseline);
+app.use('/api/obvius', obvius);
 
 app.get('\\/|login|admin|groups|createGroup|editGroup|graph', (req, res) => {
 	res.sendFile(path.resolve(__dirname, '..', 'client', 'index.html'));

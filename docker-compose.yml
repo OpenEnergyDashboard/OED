@@ -38,6 +38,7 @@ services:
             - OED_MAIL_FROM=mydomain@example.com
             - OED_MAIL_TO=mydomain@example.com # Set the destination address here
             - OED_MAIL_ORG=My Organization Name
+            - OED_OBVIUS_PASSWORD=password
         # Set the correct build environment.
         build: ./
         # Link to the database so the app can persist data
