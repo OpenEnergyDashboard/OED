@@ -2,7 +2,7 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
 
-import axios from 'axios';
+import api from '../utils/Api';
 import { TimeInterval } from '../../../common/TimeInterval';
 import { LineReadings } from '../types/readings';
 import {ActionType, Thunk, Dispatch, GetState} from '../types/redux/actions';
@@ -60,13 +60,10 @@ function receiveGroupLineReadings(groupIDs: number[], timeInterval: TimeInterval
  * Fetch the data for the given meters over the given interval. Fully manages the Redux lifecycle.
  */
 function fetchMeterLineReadings(meterIDs: number[], timeInterval: TimeInterval): Thunk {
-	return dispatch => {
+	return async dispatch => {
 		dispatch(requestMeterLineReadings(meterIDs, timeInterval));
-		// The api expects the meter IDs to be a comma-separated list.
-		const stringifiedIDs = meterIDs.join(',');
-		return axios.get(`/api/readings/line/meters/${stringifiedIDs}`, {
-			params: { timeInterval: timeInterval.toString() }
-		}).then(response => dispatch(receiveMeterLineReadings(meterIDs, timeInterval, response.data)));
+		const meterLineReadings = await api.meterLineReadings(meterIDs, timeInterval);
+		dispatch(receiveMeterLineReadings(meterIDs, timeInterval, meterLineReadings));
 	};
 }
 
@@ -74,13 +71,10 @@ function fetchMeterLineReadings(meterIDs: number[], timeInterval: TimeInterval):
  * Fetch the data for the given groups over the given interval. Fully manages the Redux lifecycle.
  */
 function fetchGroupLineReadings(groupIDs: number[], timeInterval: TimeInterval): Thunk {
-	return (dispatch: Dispatch) => {
+	return async (dispatch: Dispatch) => {
 		dispatch(requestGroupLineReadings(groupIDs, timeInterval));
-		// The api expects the group IDs to be a comma-separated list.
-		const stringifiedIDs = groupIDs.join(',');
-		return axios.get(`/api/readings/line/groups/${stringifiedIDs}`, {
-			params: { timeInterval: timeInterval.toString() }
-		}).then(response => dispatch(receiveGroupLineReadings(groupIDs, timeInterval, response.data)));
+		const groupLineReadings = await api.groupLineReadings(groupIDs, timeInterval);
+		dispatch(receiveGroupLineReadings(groupIDs, timeInterval, groupLineReadings));
 	};
 }
 
