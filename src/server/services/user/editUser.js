@@ -22,6 +22,12 @@ const { askEmail, askPassword, terminateReadline } = require('./utils');
 	}
 
 	try {
+		await User.getByEmail(email);
+	} catch (err) {
+		terminateReadline('No user with that email exists');
+	}
+
+	try {
 		const passwordHash = bcrypt.hashSync(password, 10);
 		await User.updateUserPassword(email, passwordHash);
 		terminateReadline('User\'s password updated');
