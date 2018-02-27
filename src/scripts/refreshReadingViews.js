@@ -4,14 +4,13 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/.
  */
 
-const log = require('../server/log');
 const Reading = require('../server/models/Reading');
 const stopDB = require('../server/models/database').stopDB;
 
 async function refreshReadingViews() {
-	log('Refreshing reading views');
+	console.log('Refreshing reading views');
 	await Reading.refreshCompressedReadings();
-	log('Views refreshed');
+	console.log('Views refreshed');
 	stopDB();
 }
 
