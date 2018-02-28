@@ -5,8 +5,9 @@
  */
 
 import axios, {AxiosResponse} from 'axios';
-import {LineReadings} from '../types/readings';
+import {BarReadings, LineReadings} from '../types/readings';
 import { TimeInterval } from '../../../common/TimeInterval';
+import * as moment from 'moment';
 
 /**
  * Provides access to the backend.
@@ -26,6 +27,22 @@ class Api {
 		return await this.doGetRequest<LineReadings>(
 			`/api/readings/line/groups/${stringifiedIDs}`,
 			{ timeInterval: timeInterval.toString() }
+		);
+	}
+
+	public async meterBarReadings(meterIDs: number[], timeInterval: TimeInterval, barDuration: moment.Duration): Promise<BarReadings> {
+		const stringifiedIDs = meterIDs.join(',');
+		return await this.doGetRequest<BarReadings>(
+			`/api/readings/bar/meters/${stringifiedIDs}`,
+			{ timeInterval: timeInterval.toString(), barDuration: barDuration.toISOString() }
+		);
+	}
+
+	public async groupBarReadings(groupIDs: number[], timeInterval: TimeInterval, barDuration: moment.Duration): Promise<BarReadings> {
+		const stringifiedIDs = groupIDs.join(',');
+		return await this.doGetRequest<BarReadings>(
+			`/api/readings/bar/groups/${stringifiedIDs}`,
+			{ timeInterval: timeInterval.toString(), barDuration: barDuration.toISOString() }
 		);
 	}
 
