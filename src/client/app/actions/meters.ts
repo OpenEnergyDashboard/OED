@@ -3,11 +3,11 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
 
 import * as _ from 'lodash';
-import axios from 'axios';
 import { ActionType, Dispatch, GetState, Thunk } from '../types/redux/actions';
 import { State } from '../types/redux/state';
 import * as t from '../types/redux/meters';
 import { NamedIDItem } from '../types/items';
+import api from '../utils/Api';
 
 
 export function requestMetersDetails(): t.RequestMetersDetailsAction {
@@ -19,12 +19,10 @@ export function receiveMetersDetails(data: NamedIDItem[]): t.ReceiveMetersDetail
 }
 
 function fetchMetersDetails(): Thunk {
-	return (dispatch: Dispatch) => {
+	return async (dispatch: Dispatch) => {
 		dispatch(requestMetersDetails());
-		return axios.get('/api/meters')
-			.then(response => {
-				dispatch(receiveMetersDetails(response.data));
-			});
+		const metersDetails = await api.metersDetails();
+		dispatch(receiveMetersDetails(metersDetails));
 	};
 }
 

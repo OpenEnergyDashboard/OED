@@ -8,11 +8,16 @@ import axios, {AxiosResponse} from 'axios';
 import {BarReadings, LineReadings} from '../types/readings';
 import { TimeInterval } from '../../../common/TimeInterval';
 import * as moment from 'moment';
+import {NamedIDItem} from '../types/items';
 
 /**
  * Provides access to the backend.
  */
 class Api {
+
+	public async metersDetails(): Promise<NamedIDItem[]> {
+		return (await this.doGetRequest<NamedIDItem[]>('/api/meters'));
+	}
 
 	public async meterLineReadings(meterIDs: number[], timeInterval: TimeInterval): Promise<LineReadings> {
 		const stringifiedIDs = meterIDs.join(',');
