@@ -46,18 +46,20 @@ function markPreferencesSubmitted(): t.MarkPreferencesSubmittedAction {
 
 
 function fetchPreferences(): Thunk {
-	return (dispatch: Dispatch) => {
+	return (dispatch: Dispatch, getState: GetState) => {
 		dispatch(requestPreferences());
 		return axios.get('/api/preferences')
 			.then(response => {
 				dispatch(receivePreferences(response.data));
-				dispatch((dispatch2: Dispatch, getState: GetState) => {
-					const state = getState();
-					dispatch2(changeChartToRender(state.admin.defaultChartToRender));
-					if (response.data.defaultBarStacking !== state.graph.barStacking) {
-						dispatch2(changeBarStacking());
-					}
-				});
+				if (!getState().graph.hotlinked) {
+					dispatch((dispatch2: Dispatch, getState2: GetState) => {
+						const state = getState();
+						dispatch2(changeChartToRender(state.admin.defaultChartToRender));
+						if (response.data.defaultBarStacking !== state.graph.barStacking) {
+							dispatch2(changeBarStacking());
+						}
+					});
+				}
 			});
 	};
 }

@@ -31,6 +31,7 @@ export enum ActionType {
 	ChangeGraphZoom = 'CHANGE_GRAPH_ZOOM',
 	UpdateCompareInterval = 'UPDATE_COMPARE_INTERVAL',
 	UpdateCompareDuration = 'UPDATE_COMPARE_DURATION',
+	SetHotlinked = 'SET_HOTLINKED',
 
 	RequestGroupsDetails = 'REQUEST_GROUPS_DETAILS',
 	ReceiveGroupsDetails = 'RECEIVE_GROUPS_DETAILS',
