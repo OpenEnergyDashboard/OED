@@ -1,6 +1,6 @@
 /* This Source Code Form is subject to the terms of the Mozilla Public
- * License, v. 2.0. If a copy of the MPL was not distributed with this
- * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
+* License, v. 2.0. If a copy of the MPL was not distributed with this
+* file, You can obtain one at http://mozilla.org/MPL/2.0/. */
 
 import React from 'react';
 import Dropzone from 'react-dropzone';
@@ -32,12 +32,12 @@ export default class addReadings extends React.Component {
 					token: getToken()
 				}
 			})
-				.then(() => {
-					showSuccessNotification('Successfully uploaded meter data');
-				})
-				.catch(() => {
-					showErrorNotification('Error uploading meter data');
-				});
+			.then(() => {
+				showSuccessNotification('Successfully uploaded meter data');
+			})
+			.catch(() => {
+				showErrorNotification('Error uploading meter data');
+			});
 		}
 	}
 
@@ -50,6 +50,7 @@ export default class addReadings extends React.Component {
 		const smallMarginBottomStyle = {
 			marginBottom: '5px'
 		};
+
 		return (
 			<div>
 				<p style={titleStyle}>Import readings for a selected meter:</p>
