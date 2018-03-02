@@ -115,21 +115,21 @@ router.post('/create', async (req, res) => {
 			token: { type: 'string' },
 			name: {
 				type: 'string',
-				minLength: 1,
+				minLength: 1
 			},
 			childGroups: {
 				type: 'array',
 				uniqueItems: true,
 				items: {
 					type: 'integer'
-				},
+				}
 			},
 			childMeters: {
 				type: 'array',
 				uniqueItems: true,
 				items: {
 					type: 'integer'
-				},
+				}
 			}
 		}
 	};
@@ -163,21 +163,21 @@ router.put('/edit', async (req, res) => {
 			id: { type: 'integer' },
 			name: {
 				type: 'string',
-				minLength: 1,
+				minLength: 1
 			},
 			childGroups: {
 				type: 'array',
 				uniqueItems: true,
 				items: {
 					type: 'integer'
-				},
+				}
 			},
 			childMeters: {
 				type: 'array',
 				uniqueItems: true,
 				items: {
 					type: 'integer'
-				},
+				}
 			}
 		}
 	};

@@ -126,7 +126,12 @@ mocha.describe('Barchart Readings', () => {
 
 		const startTimestamp = timestamp1.clone();
 		const endTimestamp = startTimestamp.clone().add(2, 'hours');
-		const barchartReadings = await Reading.getBarchartReadings([meter.id, meter2.id, meter3.id], moment.duration(1, 'hour'), startTimestamp, endTimestamp);
+		const barchartReadings = await Reading.getBarchartReadings(
+			[meter.id, meter2.id, meter3.id],
+			moment.duration(1, 'hour'),
+			startTimestamp,
+			endTimestamp
+		);
 		expect(Object.keys(barchartReadings)).to.have.lengthOf(3);
 		expect(barchartReadings[meter.id]).to.have.lengthOf(1);
 		expect(barchartReadings[meter2.id]).to.have.lengthOf(1);

@@ -6,7 +6,7 @@ const express = require('express');
 const _ = require('lodash');
 const moment = require('moment');
 const Reading = require('../models/Reading');
-const TimeInterval = require('../../common/TimeInterval');
+const TimeInterval = require('../../common/TimeInterval').TimeInterval;
 const { log } = require('../log');
 const validate = require('jsonschema').validate;
 
