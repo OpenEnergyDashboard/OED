@@ -1,6 +1,6 @@
 {
   "name": "Open-Energy-Dashboard",
-  "version": "0.2.0",
+  "version": "0.3.0",
   "private": false,
   "license": "MPL-2.0",
   "scripts": {
@@ -8,12 +8,13 @@
     "dev": "webpack -d --watch --color --progress",
     "build": "cross-env NODE_ENV=production webpack -p",
     "checkHeader": "./src/scripts/checkHeader.sh",
-    "lint": "./node_modules/.bin/eslint src/client/app/**/*.js src/client/app/**/*.jsx src/server/**/*.js src/server/*.js",
+    "lint": "./node_modules/.bin/eslint src/client/app/**/*.js src/client/app/**/*.jsx src/server/**/*.js src/server/*.js src/bin/*",
     "test": "./node_modules/.bin/mocha \"src/server/test/**/*.js\"",
     "createdb": "node ./src/server/services/createDB.js",
     "addMamacMeters": "node ./src/server/services/addMamacMeters.js",
     "updateMamacMeters": "node ./src/server/services/updateMamacMeters.js",
-    "createUser": "node ./src/server/services/createUser.js"
+    "createUser": "node ./src/server/services/user/createUser.js",
+    "editUser": "node ./src/server/services/user/editUser.js"
   },
   "dependencies": {
     "axios": "~0.16.2",

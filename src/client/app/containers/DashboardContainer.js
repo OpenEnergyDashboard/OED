@@ -4,7 +4,6 @@
 
 import { connect } from 'react-redux';
 import DashboardComponent from '../components/DashboardComponent';
-import { fetchPreferencesIfNeeded } from '../actions/admin';
 
 function mapStateToProps(state) {
 	return {
@@ -12,10 +11,4 @@ function mapStateToProps(state) {
 	};
 }
 
-function mapDispatchToProps(dispatch) {
-	return {
-		fetchPreferencesIfNeeded: () => dispatch(fetchPreferencesIfNeeded())
-	};
-}
-
-export default connect(mapStateToProps, mapDispatchToProps)(DashboardComponent);
+export default connect(mapStateToProps)(DashboardComponent);

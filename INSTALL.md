@@ -6,12 +6,14 @@ You can either use Docker Compose to install Node and PostgreSQL in containers, 
 ### With Docker ###
 1. Install [Docker](https://docs.docker.com/engine/installation/) and [docker-compose](https://docs.docker.com/compose/install/).
 1. Clone this repository.
-1. Create a CSV file with a single column called "ip" with your meter IP addresses and copy it into the directory where the project resides.
+1. Create a CSV file with a single column called "ip" with your meter IP addresses and copy it into the directory in which the project resides.
 1. Set up Node environment and the database by running ```docker-compose run --rm web src/scripts/init.sh <csv file> --default-user``` in the main directory. 
 1. Start the app in development mode with ```docker-compose run --rm --service-ports web src/scripts/devstart.sh```.
 1. Wait for the Webpack build to finish and then access the app at [localhost:3000](http://localhost:3000).
 
-The app will re-build any time a file is changed. You can log into the app with `test@example.com`, password `password` (the result of the `--default-user` flag to the init script).
+The app will be automatically rebuilt whenever a file is changed.
+
+You can log into the app with `test@example.com`, password `password` (the result of the `--default-user` flag to the init script).
 
 Killing the running process (ctrl+C) will stop the app. You can get rid of the containers with ```docker-compose down```.
 
@@ -51,9 +53,9 @@ OED_LOG_FILE=?                 // Path to the log file, defaults to ./log.txt
 1. Edit ```docker-compose.yml``` to change
 	1. the secret key (in `services -> web -> environment -> OED_TOKEN_SECRET`) to a random value. Keep it secret.
 	1. the port (in `services -> web -> ports`) to a mapping from host to container; e.g., to host on your computer's port 80, set it to `80:3000`.
-1. Copy src/scripts/updateMamacMetersOEDCron.bash to /etc/cron.hourly/updateMamacMetersOEDCron.bash and make the necessary modifications to the script. See the script for more detail.
+1. Copy ```src/scripts/updateMamacMetersOEDCron.bash``` to ```/etc/cron.hourly/updateMamacMetersOEDCron.bash``` and make the necessary modifications to the script. See the script for more detail.
 1. Run ```chmod +x updateMamacMetersOEDCron.bash``` to make the script executable.
-1. Copy src/scripts/oed.service to /etc/systemd/system/oed.service and make the necessary modifications to the script. See the script for more detail.
+1. Copy ```src/scripts/oed.service``` to ```/etc/systemd/system/oed.service``` and make the necessary modifications to the script. See the script for more detail.
 1. Run ```systemctl enable oed.service``` to make the service start on server boot.
 1. Bring the app online with ```systemctl start oed.service```. Stop the app with ```systemctl stop oed.service```.
 
@@ -65,7 +67,8 @@ You can access the PostgreSQL database through the `database` service. Given tha
 
 * Get a Postgres shell with `docker-compose exec database psql -U oed`
 * Take a database dump with `docker-compose exec database pg_dump -U oed > dump_$(date +%Y-%m-%d"_"%H_%M_%S.sql)`
-* Restore a database dump with by first copying the dump into the container with `docker cp /path/to/dump.sql container_name:/dump.sql` and then restoring it into the database with `docker-compose exec database psql -U oed -f /dump.sql`.
+* Restore a database dump by first copying the dump into the container with `docker cp /path/to/dump.sql container_name:/dump.sql` and then restoring it into the database with `docker-compose exec database psql -U oed -f /dump.sql`.
+* Change an admin's password with `docker-compose run --rm web npm run editUser` and follow the directions.
 
 ### Upgrading the App ###
 
