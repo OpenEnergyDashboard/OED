@@ -8,7 +8,7 @@ import axios, {AxiosResponse} from 'axios';
 import {BarReadings, LineReadings} from '../types/readings';
 import { TimeInterval } from '../../../common/TimeInterval';
 import * as moment from 'moment';
-import {NamedIDItem} from '../types/items';
+import {NamedIDItem, PreferenceRequestItem} from '../types/items';
 import {getToken, hasToken} from './token';
 import {GroupData, GroupID} from '../types/redux/groups';
 
@@ -71,6 +71,14 @@ class Api {
 
 	public async deleteGroup(groupID: number) {
 		return await this.doAuthPostRequest('api/groups/delete', {id: groupID});
+	}
+
+	public async getPreferences(): Promise<PreferenceRequestItem> {
+		return await this.doGetRequest<PreferenceRequestItem>('/api/preferences');
+	}
+
+	public async submitPreferences(preferences: PreferenceRequestItem): Promise<void> {
+		await this.doAuthPostRequest('/api/preferences', { preferences });
 	}
 
 	private async doGetRequest<R>(
