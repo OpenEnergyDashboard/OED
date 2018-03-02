@@ -69,7 +69,7 @@ while [ $create_error == 0 ]; do
     # Check loop runtime
     ((tries=tries+1))
     if [ $tries -ge $max_tries ]; then
-        echo "FAILED! Too many tries. Is your database at $DB_HOST:$DB_PORT down?"
+        echo "FAILED! Too many tries. Is your database at $OED_DB_HOST:$OED_DB_PORT down?"
         exit 1
     fi
 done
