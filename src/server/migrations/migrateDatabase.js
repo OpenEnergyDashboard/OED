@@ -157,7 +157,7 @@ async function migrateDatabaseTransaction(neededFiles, allMigrationFiles) {
 							await migration.insert(t);
 						} catch (err) {
 							// TODO:What if we don't have migration in the table;
-							log.error(`Error while migrating database: ${err}`, err);
+							log.error('Error while migrating database', err);
 						}
 					}
 				});
