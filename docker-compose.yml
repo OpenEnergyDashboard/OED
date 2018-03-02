@@ -33,8 +33,8 @@ services:
         # Link to the database so the app can persist data
         links:
             - database
-        # Load the source code into the container
-        # Using a volume allows autorebuild to work
+        # Load the source code into the container.
+        # Using a volume allows autorebuild to work.
         volumes:
             - ./:/usr/src/app
         # Map the default port.

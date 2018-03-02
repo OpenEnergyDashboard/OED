@@ -16,6 +16,9 @@ class TimeInterval {
 	toString() {
 		if (this.isBounded) {
 			// Using '_' as a separator character since it doesn't appear in ISO dates
+			if (this.startTimestamp === undefined || this.endTimestamp === undefined) {
+				throw Error('startTimestamp or endTimestamp was undefined in a bounded TimeInterval');
+			}
 			return `${this.startTimestamp.format()}_${this.endTimestamp.format()}`;
 		}
 		return 'all';
@@ -69,4 +72,4 @@ class TimeInterval {
 	}
 }
 
-module.exports = TimeInterval;
+module.exports = { TimeInterval };
