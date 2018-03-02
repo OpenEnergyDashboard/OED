@@ -10,7 +10,7 @@ import _ from 'lodash';
 import InitializationContainer from '../containers/InitializationContainer';
 import HomeComponent from './HomeComponent';
 import LoginComponent from '../components/LoginComponent';
-import AdminContainer from '../containers/AdminContainer';
+import AdminComponent from '../components/AdminComponent';
 import GroupMainContainer from '../containers/groups/GroupMainContainer';
 import { getToken, hasToken } from '../utils/token';
 import { showErrorNotification } from '../utils/notifications';
@@ -110,7 +110,7 @@ export default class RouteComponent extends React.Component {
 				<InitializationContainer />
 				<Router history={browserHistory}>
 					<Route path="/login" component={LoginComponent} />
-					<Route path="/admin" component={AdminContainer} onEnter={this.requireAuth} />
+					<Route path="/admin" component={AdminComponent} onEnter={this.requireAuth} />
 					<Route path="/groups" component={GroupMainContainer} onEnter={this.requireAuth} />
 					<Route path="/graph" component={HomeComponent} onEnter={this.linkToGraph} />
 					<Route path="*" component={HomeComponent} />

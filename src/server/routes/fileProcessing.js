@@ -11,6 +11,8 @@ const streamToDB = require('../services/loadFromCsvStream');
 const { insertMeters } = require('../services/readMamacMeters');
 const authenticator = require('./authenticator');
 const validate = require('jsonschema').validate;
+const { log } = require('../log');
+
 const router = express.Router();
 
 // The upload here ensures that the file is saved to server RAM rather than disk
@@ -62,9 +64,10 @@ router.post('/readings/:meter_id', upload.single('csvFile'), async (req, res) =>
 
 router.post('/meters', async (req, res) => {
 	try {
-		insertMeters(req.body);
+		await insertMeters(req.body.map(ip => ({ ip })));
 		res.status(200).json({ success: true });
 	} catch (err) {
+		log.error('Error uploading meters', err);
 		res.status(403).json({ success: false, message: 'Failed to upload meter.' });
 	}
 });
