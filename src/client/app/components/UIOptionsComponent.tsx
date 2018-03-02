@@ -81,7 +81,7 @@ export default class UIOptionsComponent extends React.Component<UIOptionsProps, 
 		} else if (compareTimeIntervalDurationInDays >= 7 && compareTimeIntervalDurationInDays < 14) {
 			compareVal = 'week';
 		} else {
-			compareVal = 'month';
+			compareVal = 'four weeks';
 		}
 
 		return (
@@ -167,8 +167,8 @@ export default class UIOptionsComponent extends React.Component<UIOptionsProps, 
 							Week
 						</Button>
 						<Button
-							outline={compareVal !== 'month'}
-							onClick={() => this.handleCompareButton('month')}
+							outline={compareVal !== 'four weeks'}
+							onClick={() => this.handleCompareButton('four weeks')}
 						>
 							4 Weeks
 						</Button>
@@ -238,7 +238,7 @@ export default class UIOptionsComponent extends React.Component<UIOptionsProps, 
 				// fetch hours for accuracy when time interval is small
 				compareDuration = moment.duration(1, 'hours');
 				break;
-			case 'month':
+			case 'four weeks':
 				compareTimeInterval = new TimeInterval(moment().startOf('week').subtract(49, 'days'), moment());
 				compareDuration = moment.duration(1, 'days');
 				break;
