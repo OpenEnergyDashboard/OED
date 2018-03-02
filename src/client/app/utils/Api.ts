@@ -10,7 +10,7 @@ import { TimeInterval } from '../../../common/TimeInterval';
 import * as moment from 'moment';
 import {NamedIDItem} from '../types/items';
 import {getToken, hasToken} from './token';
-import {GroupData, GroupID} from "../types/redux/groups";
+import {GroupData, GroupID} from '../types/redux/groups';
 
 /**
  * Provides access to the backend.
