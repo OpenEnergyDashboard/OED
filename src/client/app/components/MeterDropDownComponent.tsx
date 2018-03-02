@@ -2,7 +2,7 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
 
-import React from 'react';
+import * as React from 'react';
 import { UpdateImportMeterAction } from '../types/redux/admin';
 import { NamedIDItem } from '../types/items';
 
@@ -12,7 +12,7 @@ export interface MeterDropDownProps {
 }
 
 export default class MeterDropDownComponent extends React.Component<MeterDropDownProps, {}> {
-	constructor(props) {
+	constructor(props: MeterDropDownProps) {
 		super(props);
 		this.handleMeterSelect = this.handleMeterSelect.bind(this);
 	}
@@ -27,7 +27,7 @@ export default class MeterDropDownComponent extends React.Component<MeterDropDow
 		);
 	}
 
-	private handleMeterSelect(e) {
-		this.props.updateSelectedMeter(e.target.value);
+	private handleMeterSelect(e: React.ChangeEvent<HTMLSelectElement>) {
+		this.props.updateSelectedMeter(parseInt(e.target.value));
 	}
 }
