@@ -2,13 +2,12 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
 
-import axios from 'axios';
-import { getToken } from '../utils/token';
 import { Dispatch, GetState, Thunk, ActionType } from '../types/redux/actions';
 import { State } from '../types/redux/state';
 import { NamedIDItem } from '../types/items';
 import { showErrorNotification } from '../utils/notifications';
 import * as t from '../types/redux/groups';
+import api from '../utils/Api';
 
 function requestGroupsDetails(): t.RequestGroupsDetailsAction {
 	return { type: ActionType.RequestGroupsDetails };
@@ -31,13 +30,11 @@ export function changeDisplayedGroups(groupIDs: number[]): t.ChangeDisplayedGrou
 }
 
 function fetchGroupsDetails(): Thunk {
-	return dispatch => {
+	return async dispatch => {
 		dispatch(requestGroupsDetails());
 		// Returns the names and IDs of all groups in the groups table.
-		return axios.get('/api/groups/')
-			.then(response => {
-				dispatch(receiveGroupsDetails(response.data));
-			});
+		const groupsDetails = await api.groupsDetails();
+		return dispatch(receiveGroupsDetails(groupsDetails));
 	};
 }
 
@@ -61,10 +58,10 @@ function shouldFetchGroupChildren(state: State, groupID: number) {
 }
 
 function fetchGroupChildren(groupID: number) {
-	return (dispatch: Dispatch) => {
+	return async (dispatch: Dispatch) => {
 		dispatch(requestGroupChildren(groupID));
-		return axios.get(`api/groups/children/${groupID}`)
-			.then(response => dispatch(receiveGroupChildren(groupID, response.data)));
+		const childGroupIDs = await api.groupChildren(groupID);
+		dispatch(receiveGroupChildren(groupID, childGroupIDs));
 	};
 }
 
@@ -224,43 +221,41 @@ function creatingNewGroup(state: State): boolean {
  * and processing the response.
  */
 function submitNewGroup(group: t.GroupData): Thunk {
-	return dispatch => {
+	return async dispatch => {
 		dispatch(markGroupInEditingSubmitted());
-		return axios.post('api/groups/create', group)
-			.then(() => {
-				dispatch(markGroupsOutdated());
-				dispatch(dispatch2 => {
-					dispatch2(markGroupInEditingClean());
-					dispatch2(changeDisplayMode(t.DisplayMode.View));
-				});
-			})
-			.catch(error => {
-				dispatch(markGroupInEditingNotSubmitted());
-				showErrorNotification('Failed to create group');
+		try {
+			await api.createGroup(group);
+			dispatch(markGroupsOutdated());
+			dispatch(dispatch2 => {
+				dispatch2(markGroupInEditingClean());
+				dispatch2(changeDisplayMode(t.DisplayMode.View));
 			});
+		} catch (e) {
+			dispatch(markGroupInEditingNotSubmitted());
+			showErrorNotification('Failed to create group');
+		}
 	};
 }
 
 function submitGroupEdits(group: t.GroupData & t.GroupID): Thunk {
-	return dispatch => {
+	return async dispatch => {
 		dispatch(markGroupInEditingSubmitted());
-		return axios.put('api/groups/edit', group)
-			.then(() => {
-				dispatch(markGroupsOutdated());
-				dispatch(markOneGroupOutdated(group.id));
-				dispatch(dispatch2 => {
-					dispatch2(markGroupInEditingClean());
-					dispatch2(changeDisplayMode(t.DisplayMode.View));
-				});
-			})
-			.catch(e => {
-				dispatch(markGroupInEditingNotSubmitted());
-				if (e.response.data.message && e.response.data.message === 'Cyclic group detected') {
-					showErrorNotification('You cannot create a cyclic group');
-				} else {
-					showErrorNotification('Failed to edit group');
-				}
+		try {
+			await api.editGroup(group);
+			dispatch(markGroupsOutdated());
+			dispatch(markOneGroupOutdated(group.id));
+			dispatch(dispatch2 => {
+				dispatch2(markGroupInEditingClean());
+				dispatch2(changeDisplayMode(t.DisplayMode.View));
 			});
+		} catch (e) {
+			dispatch(markGroupInEditingNotSubmitted());
+			if (e.response.data.message && e.response.data.message === 'Cyclic group detected') {
+				showErrorNotification('You cannot create a cyclic group');
+			} else {
+				showErrorNotification('Failed to edit group');
+			}
+		}
 	};
 }
 
@@ -279,7 +274,6 @@ export function submitGroupInEditingIfNeeded() {
 				throw new Error('Unacceptable condition: state.groups.groupInEditing has no data.');
 			}
 			const group = {
-				token: getToken(),
 				name: rawGroup.name,
 				childGroups: rawGroup.childGroups,
 				childMeters: rawGroup.childMeters
@@ -303,27 +297,22 @@ export function submitGroupInEditingIfNeeded() {
  * @returns {function(*, *)}
  */
 export function deleteGroup(): Thunk {
-	return (dispatch, getState) => {
+	return async (dispatch, getState) => {
 		dispatch(markGroupInEditingDirty());
 		const groupInEditing = getState().groups.groupInEditing as t.GroupDefinition;
 		if (groupInEditing === undefined) {
 			throw new Error('Unacceptable condition: state.groups.groupInEditing has no data.');
 		}
-		const params = {
-			id: groupInEditing.id,
-			token: getToken()
-		};
-		return axios.post('api/groups/delete', params)
-			.then(() => {
-				dispatch(markGroupsOutdated());
-				dispatch(changeDisplayedGroups([]));
-				dispatch(dispatch2 => {
-					dispatch2(markGroupInEditingClean());
-					dispatch2(changeDisplayMode(t.DisplayMode.View));
-				});
-			})
-			.catch(() => {
-				showErrorNotification('Failed to delete group');
+		try {
+			await api.deleteGroup(groupInEditing.id);
+			dispatch(markGroupsOutdated());
+			dispatch(changeDisplayedGroups([]));
+			dispatch(dispatch2 => {
+				dispatch2(markGroupInEditingClean());
+				dispatch2(changeDisplayMode(t.DisplayMode.View));
 			});
+		} catch (e) {
+			showErrorNotification('Failed to delete group');
+		}
 	};
 }

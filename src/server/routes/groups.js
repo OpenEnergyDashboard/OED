@@ -110,9 +110,8 @@ router.post('/create', async (req, res) => {
 	const validGroup = {
 		type: 'object',
 		maxProperties: 4,
-		required: ['token', 'name', 'childGroups', 'childMeters'],
+		required: ['name', 'childGroups', 'childMeters'],
 		properties: {
-			token: { type: 'string' },
 			name: {
 				type: 'string',
 				minLength: 1
@@ -157,9 +156,8 @@ router.put('/edit', async (req, res) => {
 	const validGroup = {
 		type: 'object',
 		maxProperties: 5,
-		required: ['token', 'id', 'name', 'childGroups', 'childMeters'],
+		required: ['id', 'name', 'childGroups', 'childMeters'],
 		properties: {
-			token: { type: 'string' },
 			id: { type: 'integer' },
 			name: {
 				type: 'string',
@@ -227,9 +225,8 @@ router.post('/delete', async (req, res) => {
 	const validParams = {
 		type: 'object',
 		maxProperties: 2,
-		required: ['token', 'id'],
+		required: ['id'],
 		properties: {
-			token: { type: 'string' },
 			id: { type: 'integer' }
 		}
 	};
