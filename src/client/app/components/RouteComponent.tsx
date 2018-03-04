@@ -15,7 +15,7 @@ import { LinkOptions } from 'actions/graph';
 import { getToken, hasToken } from '../utils/token';
 import { showErrorNotification } from '../utils/notifications';
 import { ChartTypes } from '../types/redux/graph';
-import api from '../utils/Api';
+import {verificationApi} from '../utils/api';
 
 interface RouteProps {
 	barStacking: boolean ;
@@ -50,7 +50,7 @@ export default class RouteComponent extends React.Component<RouteProps, {}> {
 		// Needs to be async because of the network request
 		(async () => {
 			try {
-				if (!(await api.checkTokenValid())) {
+				if (!(await verificationApi.checkTokenValid())) {
 					// Route to login page if the auth token is not valid
 					browserHistory.push('/login');
 				}

@@ -8,7 +8,7 @@ import { Input, Button, InputGroup, Form } from 'reactstrap';
 import HeaderContainer from '../containers/HeaderContainer';
 import FooterComponent from '../components/FooterComponent';
 import { showErrorNotification } from '../utils/notifications';
-import api from '../utils/Api';
+import {verificationApi} from '../utils/api';
 
 
 interface LoginState {
@@ -96,7 +96,7 @@ export default class LoginComponent extends React.Component<{}, LoginState> {
 		e.preventDefault();
 		(async () => {
 			try {
-				const token = await api.login(this.state.email, this.state.password);
+				const token = await verificationApi.login(this.state.email, this.state.password);
 				localStorage.setItem('token', token);
 				browserHistory.push('/');
 			} catch (err) {

@@ -7,7 +7,7 @@ import { ActionType, Dispatch, GetState, Thunk } from '../types/redux/actions';
 import { State } from '../types/redux/state';
 import * as t from '../types/redux/meters';
 import { NamedIDItem } from '../types/items';
-import api from '../utils/Api';
+import {metersApi} from '../utils/api';
 
 
 export function requestMetersDetails(): t.RequestMetersDetailsAction {
@@ -21,7 +21,7 @@ export function receiveMetersDetails(data: NamedIDItem[]): t.ReceiveMetersDetail
 function fetchMetersDetails(): Thunk {
 	return async (dispatch: Dispatch) => {
 		dispatch(requestMetersDetails());
-		const metersDetails = await api.metersDetails();
+		const metersDetails = await metersApi.details();
 		dispatch(receiveMetersDetails(metersDetails));
 	};
 }

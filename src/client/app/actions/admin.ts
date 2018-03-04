@@ -9,7 +9,8 @@ import { PreferenceRequestItem } from '../types/items';
 import * as t from '../types/redux/admin';
 import { ActionType, Dispatch, GetState, Thunk } from '../types/redux/actions';
 import { State } from '../types/redux/state';
-import api from '../utils/Api';
+import {preferencesApi} from '../utils/api';
+
 
 export function updateSelectedMeter(meterID: number): t.UpdateImportMeterAction {
 	return { type: ActionType.UpdateImportMeter, meterID };
@@ -47,7 +48,7 @@ function markPreferencesSubmitted(): t.MarkPreferencesSubmittedAction {
 function fetchPreferences(): Thunk {
 	return async (dispatch: Dispatch, getState: GetState) => {
 		dispatch(requestPreferences());
-		const preferences = await api.getPreferences();
+		const preferences = await preferencesApi.getPreferences();
 		dispatch(receivePreferences(preferences));
 		if (!getState().graph.hotlinked) {
 			dispatch((dispatch2: Dispatch, getState2: GetState) => {
@@ -65,7 +66,7 @@ function submitPreferences() {
 	return async (dispatch: Dispatch, getState: GetState) => {
 		const state = getState();
 		try {
-			await api.submitPreferences({
+			await preferencesApi.submitPreferences({
 				displayTitle: state.admin.displayTitle,
 				defaultChartToRender: state.admin.defaultChartToRender,
 				defaultBarStacking: state.admin.defaultBarStacking

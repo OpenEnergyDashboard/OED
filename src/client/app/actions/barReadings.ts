@@ -8,7 +8,7 @@ import { Dispatch, GetState, Thunk, ActionType } from '../types/redux/actions';
 import { State } from '../types/redux/state';
 import { BarReadings } from '../types/readings';
 import * as t from '../types/redux/barReadings';
-import api from '../utils/Api';
+import {groupsApi, metersApi} from '../utils/api';
 
 /**
  * @param {State} state the Redux state
@@ -90,7 +90,7 @@ function fetchMeterBarReadings(meterIDs: number[], timeInterval: TimeInterval): 
 	return async (dispatch: Dispatch, getState: GetState) => {
 		const barDuration = getState().graph.barDuration;
 		dispatch(requestMeterBarReadings(meterIDs, timeInterval, barDuration));
-		const readings = await api.meterBarReadings(meterIDs, timeInterval, barDuration);
+		const readings = await metersApi.barReadings(meterIDs, timeInterval, barDuration);
 		dispatch(receiveMeterBarReadings(meterIDs, timeInterval, barDuration, readings));
 	};
 }
@@ -107,7 +107,7 @@ function fetchGroupBarReadings(groupIDs: number[], timeInterval: TimeInterval): 
 		dispatch(requestGroupBarReadings(groupIDs, timeInterval, barDuration));
 		// API expectes a comma-seperated string of IDs
 		const stringifiedIDs = groupIDs.join(',');
-		const readings = await api.groupBarReadings(groupIDs, timeInterval, barDuration);
+		const readings = await groupsApi.barReadings(groupIDs, timeInterval, barDuration);
 		dispatch(receiveGroupBarReadings(groupIDs, timeInterval, barDuration, readings));
 	};
 }
@@ -116,7 +116,7 @@ function fetchMeterCompareReadings(meterIDs: number[], timeInterval: TimeInterva
 	return async (dispatch: Dispatch, getState: GetState) => {
 		const compareDuration = getState().graph.compareDuration;
 		dispatch(requestMeterBarReadings(meterIDs, timeInterval, compareDuration));
-		const readings = await api.meterBarReadings(meterIDs, timeInterval, compareDuration);
+		const readings = await metersApi.barReadings(meterIDs, timeInterval, compareDuration);
 		dispatch(receiveMeterBarReadings(meterIDs, timeInterval, compareDuration, readings));
 	};
 }
@@ -125,7 +125,7 @@ function fetchGroupCompareReadings(groupIDs: number[], timeInterval: TimeInterva
 	return async (dispatch: Dispatch, getState: GetState) => {
 		const compareDuration = getState().graph.compareDuration;
 		dispatch(requestGroupBarReadings(groupIDs, timeInterval, compareDuration));
-		const readings = await api.groupBarReadings(groupIDs, timeInterval, compareDuration);
+		const readings = await groupsApi.barReadings(groupIDs, timeInterval, compareDuration);
 		dispatch(receiveGroupBarReadings(groupIDs, timeInterval, compareDuration, readings));
 	};
 }

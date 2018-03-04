@@ -7,7 +7,7 @@ import { State } from '../types/redux/state';
 import { NamedIDItem } from '../types/items';
 import { showErrorNotification } from '../utils/notifications';
 import * as t from '../types/redux/groups';
-import api from '../utils/Api';
+import {groupsApi} from '../utils/api';
 
 function requestGroupsDetails(): t.RequestGroupsDetailsAction {
 	return { type: ActionType.RequestGroupsDetails };
@@ -33,7 +33,7 @@ function fetchGroupsDetails(): Thunk {
 	return async dispatch => {
 		dispatch(requestGroupsDetails());
 		// Returns the names and IDs of all groups in the groups table.
-		const groupsDetails = await api.groupsDetails();
+		const groupsDetails = await groupsApi.details();
 		return dispatch(receiveGroupsDetails(groupsDetails));
 	};
 }
@@ -60,7 +60,7 @@ function shouldFetchGroupChildren(state: State, groupID: number) {
 function fetchGroupChildren(groupID: number) {
 	return async (dispatch: Dispatch) => {
 		dispatch(requestGroupChildren(groupID));
-		const childGroupIDs = await api.groupChildren(groupID);
+		const childGroupIDs = await groupsApi.children(groupID);
 		dispatch(receiveGroupChildren(groupID, childGroupIDs));
 	};
 }
@@ -224,7 +224,7 @@ function submitNewGroup(group: t.GroupData): Thunk {
 	return async dispatch => {
 		dispatch(markGroupInEditingSubmitted());
 		try {
-			await api.createGroup(group);
+			await groupsApi.create(group);
 			dispatch(markGroupsOutdated());
 			dispatch(dispatch2 => {
 				dispatch2(markGroupInEditingClean());
@@ -241,7 +241,7 @@ function submitGroupEdits(group: t.GroupData & t.GroupID): Thunk {
 	return async dispatch => {
 		dispatch(markGroupInEditingSubmitted());
 		try {
-			await api.editGroup(group);
+			await groupsApi.edit(group);
 			dispatch(markGroupsOutdated());
 			dispatch(markOneGroupOutdated(group.id));
 			dispatch(dispatch2 => {
@@ -304,7 +304,7 @@ export function deleteGroup(): Thunk {
 			throw new Error('Unacceptable condition: state.groups.groupInEditing has no data.');
 		}
 		try {
-			await api.deleteGroup(groupInEditing.id);
+			await groupsApi.delete(groupInEditing.id);
 			dispatch(markGroupsOutdated());
 			dispatch(changeDisplayedGroups([]));
 			dispatch(dispatch2 => {

@@ -2,12 +2,12 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
 
-import api from '../utils/Api';
 import { TimeInterval } from '../../../common/TimeInterval';
 import { LineReadings } from '../types/readings';
 import {ActionType, Thunk, Dispatch, GetState} from '../types/redux/actions';
 import { State } from '../types/redux/state';
 import * as t from '../types/redux/lineReadings';
+import {groupsApi, metersApi} from '../utils/api';
 
 function shouldFetchGroupLineReadings(state: State, groupID: number, timeInterval: TimeInterval): boolean {
 	const timeIntervalIndex = timeInterval.toString();
@@ -62,7 +62,7 @@ function receiveGroupLineReadings(groupIDs: number[], timeInterval: TimeInterval
 function fetchMeterLineReadings(meterIDs: number[], timeInterval: TimeInterval): Thunk {
 	return async dispatch => {
 		dispatch(requestMeterLineReadings(meterIDs, timeInterval));
-		const meterLineReadings = await api.meterLineReadings(meterIDs, timeInterval);
+		const meterLineReadings = await metersApi.lineReadings(meterIDs, timeInterval);
 		dispatch(receiveMeterLineReadings(meterIDs, timeInterval, meterLineReadings));
 	};
 }
@@ -73,7 +73,7 @@ function fetchMeterLineReadings(meterIDs: number[], timeInterval: TimeInterval):
 function fetchGroupLineReadings(groupIDs: number[], timeInterval: TimeInterval): Thunk {
 	return async (dispatch: Dispatch) => {
 		dispatch(requestGroupLineReadings(groupIDs, timeInterval));
-		const groupLineReadings = await api.groupLineReadings(groupIDs, timeInterval);
+		const groupLineReadings = await groupsApi.lineReadings(groupIDs, timeInterval);
 		dispatch(receiveGroupLineReadings(groupIDs, timeInterval, groupLineReadings));
 	};
 }

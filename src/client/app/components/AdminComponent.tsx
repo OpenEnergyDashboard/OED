@@ -3,14 +3,12 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
 
 import * as React from 'react';
-import axios from 'axios';
 import { Input, Button } from 'reactstrap';
 import Dropzone from 'react-dropzone';
 import { ImageFile } from 'react-dropzone';
 import { ChartTypes } from '../types/redux/graph';
 import HeaderContainer from '../containers/HeaderContainer';
 import FooterComponent from '../components/FooterComponent';
-import { getToken } from '../utils/token';
 import { showSuccessNotification, showErrorNotification } from '../utils/notifications';
 import {
 	ToggleDefaultBarStackingAction,
@@ -19,7 +17,7 @@ import {
 	UpdateImportMeterAction } from '../types/redux/admin';
 import { SelectOption } from '../types/items';
 import SingleSelectComponent from './SingleSelectComponent';
-import api from '../utils/Api';
+import { metersApi } from '../utils/api';
 
 interface AdminProps {
 	displayTitle: string;
@@ -185,7 +183,7 @@ export default class AdminComponent extends React.Component<AdminProps, {}> {
 			showErrorNotification('Please select a meter');
 		} else {
 			const file = files[0];
-			api.submitNewMeterReadings(this.props.selectedImportMeter.value, file)
+			metersApi.submitNewReadings(this.props.selectedImportMeter.value, file)
 			.then(() => {
 				showSuccessNotification('Successfully uploaded meter data');
 			})
