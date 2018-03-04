@@ -5,7 +5,7 @@
  */
 
 import ApiBackend from './ApiBackend';
-import {getToken} from '../token';
+import { getToken } from '../token';
 
 class VerificationApi {
 	private readonly backend: ApiBackend;

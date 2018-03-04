@@ -6,10 +6,10 @@
 
 import ApiBackend from './ApiBackend';
 import * as moment from 'moment';
-import {BarReadings, LineReadings} from '../../types/readings';
-import {NamedIDItem} from '../../types/items';
-import {TimeInterval} from '../../../../common/TimeInterval';
-import {GroupData, GroupID} from '../../types/redux/groups';
+import { BarReadings, LineReadings } from '../../types/readings';
+import { NamedIDItem } from '../../types/items';
+import { TimeInterval } from '../../../../common/TimeInterval';
+import { GroupData, GroupID } from '../../types/redux/groups';
 
 class GroupsApi {
 	private readonly backend: ApiBackend;

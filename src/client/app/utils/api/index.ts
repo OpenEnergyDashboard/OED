@@ -18,4 +18,4 @@ const metersApi = new MetersApi(apiBackend);
 const preferencesApi = new PreferencesApi(apiBackend);
 const verificationApi = new VerificationApi(apiBackend);
 
-export {groupsApi, metersApi, preferencesApi, verificationApi};
+export { groupsApi, metersApi, preferencesApi, verificationApi };

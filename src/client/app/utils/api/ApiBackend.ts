@@ -4,13 +4,13 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/.
  */
 
-import axios, {AxiosRequestConfig, AxiosResponse} from 'axios';
-import {getToken, hasToken} from '../token';
+import axios, { AxiosRequestConfig, AxiosResponse } from 'axios';
+import { getToken, hasToken } from '../token';
 
 /**
  * Handles the actual sending and receiving of network requests.
  *
- * Should probably only be used by other api classes.
+ * Should only be used by other api classes.
  */
 class ApiBackend {
 	public async doGetRequest<R>(

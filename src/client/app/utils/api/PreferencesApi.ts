@@ -5,7 +5,7 @@
  */
 
 import ApiBackend from './ApiBackend';
-import {PreferenceRequestItem} from '../../types/items';
+import { PreferenceRequestItem } from '../../types/items';
 
 class PreferencesApi {
 	private readonly backend: ApiBackend;

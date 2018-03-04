@@ -5,9 +5,9 @@
  */
 
 import ApiBackend from './ApiBackend';
-import {NamedIDItem} from '../../types/items';
-import {BarReadings, LineReadings} from '../../types/readings';
-import {TimeInterval} from '../../../../common/TimeInterval';
+import { NamedIDItem } from '../../types/items';
+import { BarReadings, LineReadings } from '../../types/readings';
+import { TimeInterval } from '../../../../common/TimeInterval';
 import * as moment from 'moment';
 
 class MetersApi {
