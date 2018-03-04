@@ -31,8 +31,12 @@ function parseTimestamp(raw) {
  */
 async function readMamacData(meter) {
 	// First get a promise that's just the meter itself (or an error if it doesn't have an IP address)
-	if (!meter.ipAddress) throw new Error(`${meter} doesn't have an IP address to read data from`);
-	if (!meter.id) throw new Error(`${meter} doesn't have an id to associate readings with`);
+	if (!meter.ipAddress) {
+		throw new Error(`${meter} doesn't have an IP address to read data from`);
+	}
+	if (!meter.id) {
+		throw new Error(`${meter} doesn't have an id to associate readings with`);
+	}
 	const rawReadings = await reqPromise(`http://${meter.ipAddress}/int2.csv`);
 	const parsedReadings = await parseCsv(rawReadings);
 	return parsedReadings.map(raw => {

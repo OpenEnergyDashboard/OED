@@ -68,8 +68,8 @@ async function readMetasysData(filePath, readingInterval, readingRepetition, cum
 				meterReading = meterReading1;
 			}
 			// push into reading Array
-			const reading = new Reading(meter.id, meterReading, startTimestamp.toDate(), endTimestamp.toDate());
-			readingArray.push(reading);
+			const newReading = new Reading(meter.id, meterReading, startTimestamp.toDate(), endTimestamp.toDate());
+			readingArray.push(newReading);
 		}
 		index += 1;
 	}

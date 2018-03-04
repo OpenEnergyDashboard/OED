@@ -1,0 +1,37 @@
+/*
+ * This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this
+ * file, You can obtain one at http://mozilla.org/MPL/2.0/.
+ */
+ 
+{
+    "compilerOptions": {
+        "baseUrl": "./src/client/app/",
+        "outDir": "./src/client/public/",
+        "sourceMap": true,
+        "module": "commonjs",
+        "target": "es5",
+		"jsx": "react",
+		"allowJs": true,
+        "lib": ["es6", "dom", "es2015.promise"],
+        "moduleResolution": "node",
+        "rootDir": "src",
+        "noImplicitReturns": true,
+        "noImplicitThis": true,
+        "noImplicitAny": true,
+        "strictNullChecks": true,
+        "typeRoots": [
+            "./node_modules/@types",
+            "./src/client/app/types"
+        ]
+    },
+    "include": [
+        "./src/client/app/**/*"
+    ],
+    "exclude": [
+        "node_modules"
+    ],
+    "awesomeTypescriptLoaderOptions": {
+        "useBabel": true
+    }
+}

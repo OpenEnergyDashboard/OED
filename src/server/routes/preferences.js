@@ -35,11 +35,11 @@ router.post('/', async (req, res) => {
 		required: ['token', 'preferences'],
 		properties: {
 			token: {
-				type: 'string',
+				type: 'string'
 			},
 			preferences: {
 				displayTitle: {
-					type: 'string',
+					type: 'string'
 				},
 				defaultChartToRender: {
 					type: 'string'
