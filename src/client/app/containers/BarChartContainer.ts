@@ -107,6 +107,11 @@ function mapStateToProps(state: State) {
 					}
 				}
 			}
+		},
+		plugins: {
+			datalabels: {
+				display: false
+			}
 		}
 	};
 

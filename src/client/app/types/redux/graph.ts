@@ -51,6 +51,11 @@ export interface UpdateCompareDurationAction {
 	compareDuration: moment.Duration;
 }
 
+export interface SetHotlinked {
+	type: ActionType.SetHotlinked;
+	hotlinked: boolean;
+}
+
 export type GraphAction =
 	| ChangeGraphZoomAction
 	| ChangeBarStackingAction
@@ -59,7 +64,8 @@ export type GraphAction =
 	| UpdateSelectedGroupsAction
 	| UpdateSelectedMetersAction
 	| UpdateCompareIntervalAction
-	| UpdateCompareDurationAction;
+	| UpdateCompareDurationAction
+	| SetHotlinked;
 
 export interface GraphState {
 	selectedMeters: number[];
@@ -70,4 +76,5 @@ export interface GraphState {
 	compareDuration: moment.Duration;
 	chartToRender: ChartTypes;
 	barStacking: boolean;
+	hotlinked: boolean;
 }

@@ -9,9 +9,12 @@ import { ChartData, ChartDataSets, LinearTickOptions } from 'chart.js';
 import * as moment from 'moment';
 import { connect } from 'react-redux';
 import { TimeInterval } from '../../../common/TimeInterval';
-// This is better than using an import, since we don't actually use anything from the plugin in the code.
-/// <reference path="chartjs-plugin-datalabels" />
 import { State } from '../types/redux/state';
+import * as datalabels from 'chartjs-plugin-datalabels';
+
+if (datalabels === null || datalabels === undefined) {
+	throw new Error('Datalabels plugin was tree-shaken out.');
+}
 
 interface ChartDataSetsWithDatalabels extends ChartDataSets {
 	datalabels: {

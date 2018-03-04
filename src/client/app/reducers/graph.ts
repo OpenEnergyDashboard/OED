@@ -15,7 +15,8 @@ const defaultState: GraphState = {
 	compareTimeInterval: new TimeInterval(moment().startOf('week').subtract(7, 'days'), moment()),
 	compareDuration: moment.duration(1, 'days'),
 	chartToRender: ChartTypes.line,
-	barStacking: false
+	barStacking: false,
+	hotlinked: false
 };
 
 export default function graph(state = defaultState, action: GraphAction) {
@@ -59,6 +60,11 @@ export default function graph(state = defaultState, action: GraphAction) {
 			return {
 				...state,
 				barStacking: !state.barStacking
+			};
+		case ActionType.SetHotlinked:
+			return {
+				...state,
+				hotlinked: action.hotlinked
 			};
 		default:
 			return state;

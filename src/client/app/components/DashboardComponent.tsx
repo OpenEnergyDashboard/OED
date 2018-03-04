@@ -10,7 +10,7 @@ import BarChartContainer from '../containers/BarChartContainer';
 import MultiCompareChartContainer from '../containers/MultiCompareChartContainer';
 import { ChartTypes } from '../types/redux/graph';
 
-defaults.global.plugins = {datalabels: {display: false}};
+defaults.plugins = {datalabels: {display: false}};
 
 interface DashboardProps {
 	chartToRender: ChartTypes;

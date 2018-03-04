@@ -33,6 +33,17 @@ export function updateBarDuration(barDuration: moment.Duration): t.UpdateBarDura
 	return { type: ActionType.UpdateBarDuration, barDuration };
 }
 
+export function setHotlinked(hotlinked: boolean): t.SetHotlinked {
+	return { type: ActionType.SetHotlinked, hotlinked };
+}
+
+export function setHotlinkedAsync(hotlinked: boolean): Thunk {
+	return (dispatch: Dispatch) => {
+		dispatch(setHotlinked(hotlinked));
+		return Promise.resolve();
+	};
+}
+
 function changeGraphZoom(timeInterval: TimeInterval): t.ChangeGraphZoomAction {
 	return { type: ActionType.ChangeGraphZoom, timeInterval };
 }
@@ -125,7 +136,7 @@ export interface LinkOptions {
  * @returns {function(*)}
  */
 export function changeOptionsFromLink(options: LinkOptions) {
-	const dispatchFirst: Thunk[] = [];
+	const dispatchFirst: Thunk[] = [setHotlinkedAsync(true)];
 	const dispatchSecond: Array<Thunk | t.ChangeChartToRenderAction | t.ChangeBarStackingAction> = [];
 	if (options.meterIDs) {
 		dispatchFirst.push(fetchMetersDetailsIfNeeded());

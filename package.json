@@ -15,14 +15,15 @@
     "createdb": "node ./src/server/services/createDB.js",
     "addMamacMeters": "node ./src/server/services/addMamacMeters.js",
     "updateMamacMeters": "node ./src/server/services/updateMamacMeters.js",
-    "createUser": "node ./src/server/services/createUser.js"
+    "createUser": "node ./src/server/services/user/createUser.js",
+    "editUser": "node ./src/server/services/user/editUser.js"
   },
   "dependencies": {
     "axios": "~0.16.2",
     "bcryptjs": "~2.4.3",
     "body-parser": "~1.15.1",
     "bootstrap": "~4.0.0",
-    "chart.js": "~2.7.0",
+    "chart.js": "~2.7.1",
     "chartjs-plugin-datalabels": "~0.1.0",
     "cookie-parser": "~1.4.3",
     "cross-env": "~5.0.5",
@@ -62,7 +63,7 @@
   },
   "devDependencies": {
     "@types/axios": "~0.14.0",
-    "@types/chartjs": "0.0.31",
+    "@types/chart.js": "2.7.9",
     "@types/core-js": "~0.9.43",
     "@types/lodash": "~4.14.80",
     "@types/moment": "~2.13.0",

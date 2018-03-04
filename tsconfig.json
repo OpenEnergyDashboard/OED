@@ -19,10 +19,17 @@
         "noImplicitReturns": true,
         "noImplicitThis": true,
         "noImplicitAny": true,
-        "strictNullChecks": true
+        "strictNullChecks": true,
+        "typeRoots": [
+            "./node_modules/@types",
+            "./src/client/app/types"
+        ]
     },
     "include": [
-        "./src/client/app/*"
+        "./src/client/app/**/*"
+    ],
+    "exclude": [
+        "node_modules"
     ],
     "awesomeTypescriptLoaderOptions": {
         "useBabel": true
