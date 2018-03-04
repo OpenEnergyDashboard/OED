@@ -9,6 +9,7 @@ import { Input, Button, InputGroup, Form } from 'reactstrap';
 import HeaderContainer from '../containers/HeaderContainer';
 import FooterComponent from '../components/FooterComponent';
 import { showErrorNotification } from '../utils/notifications';
+import api from '../utils/Api';
 
 
 interface LoginState {
@@ -94,27 +95,24 @@ export default class LoginComponent extends React.Component<{}, LoginState> {
 	 */
 	private handleSubmit(e: React.FormEvent<HTMLFormElement>) {
 		e.preventDefault();
-		axios.post('/api/login/', {
-			email: this.state.email,
-			password: this.state.password
-		})
-		.then(response => {
-			localStorage.setItem('token', response.data.token);
-			browserHistory.push('/');
-		})
-		.catch(err => {
-			if (err.response.status === 401) {
-				showErrorNotification('Invalid email/password combination');
-			} else {
-				// If there was a problem other than a lack of authorization, the user can't fix it.
-				// Log it to the console for developer use.
-				console.error(err); // tslint:disable-line no-console
+		(async () => {
+			try {
+				const token = await api.login(this.state.email, this.state.password);
+				localStorage.setItem('token', token);
+				browserHistory.push('/');
+			} catch (err) {
+				if (err.response.status === 401) {
+					showErrorNotification('Invalid email/password combination');
+				} else {
+					// If there was a problem other than a lack of authorization, the user can't fix it.
+					// Log it to the console for developer use.
+					console.error(err); // tslint:disable-line no-console
+				}
+				if (this.inputEmail !== null) {
+					this.inputEmail.focus();
+				}
 			}
-
-			if (this.inputEmail !== null) {
-				this.inputEmail.focus();
-			}
-		});
+		})();
 		this.setState({ email: '', password: '' });
 	}
 }

@@ -90,6 +90,11 @@ class Api {
 		return response.data.success === true;
 	}
 
+	public async login(email: string, password: string): Promise<string> {
+		const response = await this.doPostRequest<{token: string}>('/api/login/', {email, password});
+		return response.token;
+	}
+
 	private async doGetRequest<R>(
 		url: string,
 		params: { [key: string]: string } = {},
