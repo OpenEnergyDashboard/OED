@@ -11,7 +11,6 @@ import { TimeInterval } from '../../../common/TimeInterval';
 import { Dispatch, Thunk, ActionType } from '../types/redux/actions';
 import { State } from '../types/redux/state';
 import * as t from '../types/redux/graph';
-import { Duration } from 'moment';
 
 export function changeChartToRender(chartType: t.ChartTypes): t.ChangeChartToRenderAction {
 	return { type: ActionType.ChangeChartToRender, chartType };
@@ -56,19 +55,14 @@ export function changeBarDuration(barDuration: moment.Duration): Thunk {
 	};
 }
 
-function updateCompareTimeInterval(compareTimeInterval: TimeInterval): t.UpdateCompareIntervalAction {
-	return { type: ActionType.UpdateCompareInterval, compareTimeInterval };
+function updateComparePeriod(comparePeriod: string): t.UpdateComparePeriodAction {
+	return { type: ActionType.UpdateComparePeriod, comparePeriod };
 }
 
-function updateCompareDuration(compareDuration: Duration): t.UpdateCompareDurationAction {
-	return { type: ActionType.UpdateCompareDuration, compareDuration };
-}
-
-export function changeCompareTimeInterval(compareTimeInterval: TimeInterval, compareDuration: Duration): Thunk {
-	return (dispatch, getState) => {
-		dispatch(updateCompareTimeInterval(compareTimeInterval));
-		dispatch(updateCompareDuration(compareDuration));
-		dispatch(fetchNeededCompareReadings(getState().graph.compareTimeInterval));
+export function changeComparePeriod(comparePeriod: string): Thunk {
+	return (dispatch: Dispatch) => {
+		dispatch(updateComparePeriod(comparePeriod));
+		dispatch(fetchNeededCompareReadings(comparePeriod));
 		return Promise.resolve();
 	};
 }
@@ -80,7 +74,7 @@ export function changeSelectedMeters(meterIDs: number[]): Thunk {
 		dispatch(dispatch2 => {
 			dispatch2(fetchNeededLineReadings(getState().graph.timeInterval));
 			dispatch2(fetchNeededBarReadings(getState().graph.timeInterval));
-			dispatch2(fetchNeededCompareReadings(getState().graph.compareTimeInterval));
+			dispatch2(fetchNeededCompareReadings(getState().graph.comparePeriod));
 		});
 		return Promise.resolve();
 	};
@@ -93,8 +87,7 @@ export function changeSelectedGroups(groupIDs: number[]): Thunk {
 		dispatch(dispatch2 => {
 			dispatch2(fetchNeededLineReadings(getState().graph.timeInterval));
 			dispatch2(fetchNeededBarReadings(getState().graph.timeInterval));
-			// TODO TYPESCRIPT??
-			dispatch2(fetchNeededCompareReadings(getState().graph.compareTimeInterval));
+			dispatch2(fetchNeededCompareReadings(getState().graph.comparePeriod));
 		});
 		return Promise.resolve();
 	};
@@ -128,6 +121,7 @@ export interface LinkOptions {
 	chartType?: t.ChartTypes;
 	barDuration?: moment.Duration;
 	toggleBarStacking?: boolean;
+	comparePeriod?: string;
 }
 
 /**
@@ -154,6 +148,9 @@ export function changeOptionsFromLink(options: LinkOptions) {
 	}
 	if (options.toggleBarStacking) {
 		dispatchSecond.push(changeBarStacking());
+	}
+	if (options.comparePeriod) {
+		dispatchSecond.push(changeComparePeriod(options.comparePeriod));
 	}
 	return (dispatch: Dispatch) => Promise.all(dispatchFirst.map(dispatch))
 		.then(() => Promise.all(dispatchSecond.map(dispatch)));

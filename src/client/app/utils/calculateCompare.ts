@@ -3,30 +3,30 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at http://mozilla.org/MPL/2.0/.
  */
-import TimeInterval from "../../../common/TimeInterval";
-import moment from "moment/moment";
+import { TimeInterval } from '../../../common/TimeInterval';
+import * as moment from 'moment';
 
-export function calculateCompareTimeInterval(value) {
+export function calculateCompareTimeInterval(comparePeriod: string): TimeInterval {
 	let compareTimeInterval;
-	switch (value) {
+	switch (comparePeriod) {
 		case 'day':
-			compareTimeInterval = new TimeInterval(moment().subtract(2, 'days'), moment()).toString();
+			compareTimeInterval = new TimeInterval(moment().subtract(2, 'days'), moment());
 			break;
 		case 'week':
-			compareTimeInterval = new TimeInterval(moment().startOf('week').subtract(7, 'days'), moment()).toString();
+			compareTimeInterval = new TimeInterval(moment().startOf('week').subtract(7, 'days'), moment());
 			break;
 		case 'month':
-			compareTimeInterval = new TimeInterval(moment().startOf('week').subtract(49, 'days'), moment()).toString();
+			compareTimeInterval = new TimeInterval(moment().startOf('week').subtract(49, 'days'), moment());
 			break;
 		default:
-			throw new Error(`Unknown period value: ${value}`);
+			throw new Error(`Unknown period value: ${comparePeriod}`);
 	}
 	return compareTimeInterval;
 }
 
-export function calculateCompareDuration(value) {
+export function calculateCompareDuration(comparePeriod: string): moment.Duration {
 	let compareDuration;
-	switch (value) {
+	switch (comparePeriod) {
 		case 'day':
 			// fetch hours for accuracy when time interval is small
 			compareDuration = moment.duration(1, 'hours');
@@ -38,7 +38,7 @@ export function calculateCompareDuration(value) {
 			compareDuration = moment.duration(1, 'days');
 			break;
 		default:
-			throw new Error(`Unknown period value: ${value}`);
+			throw new Error(`Unknown period value: ${comparePeriod}`);
 	}
 	return compareDuration;
 }

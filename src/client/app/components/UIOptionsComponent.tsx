@@ -21,10 +21,10 @@ export interface UIOptionsProps {
 	chartToRender: ChartTypes;
 	barStacking: boolean;
 	barDuration: moment.Duration;
-	compareTimeInterval: string;
+	comparePeriod: string;
 	changeDuration(duration: moment.Duration): Promise<any>;
 	changeBarStacking(): ChangeBarStackingAction;
-	changeCompareInterval(interval: TimeInterval, duration: moment.Duration): Promise<any>;
+	changeComparePeriod(comparePeriod: string): Promise<any>;
 }
 
 interface UIOptionsState {
@@ -74,15 +74,6 @@ export default class UIOptionsComponent extends React.Component<UIOptionsProps, 
 			zIndex: 0
 		};
 
-		const compareTimeIntervalDurationInDays = TimeInterval.fromString(this.props.compareTimeInterval).duration('days');
-		let compareVal;
-		if (compareTimeIntervalDurationInDays < 7) {
-			compareVal = 'day';
-		} else if (compareTimeIntervalDurationInDays >= 7 && compareTimeIntervalDurationInDays < 14) {
-			compareVal = 'week';
-		} else {
-			compareVal = 'month';
-		}
 
 		return (
 			<div>
@@ -155,19 +146,19 @@ export default class UIOptionsComponent extends React.Component<UIOptionsProps, 
 						style={zIndexFix}
 					>
 						<Button
-							outline={compareVal !== 'day'}
+							outline={this.props.comparePeriod !== 'day'}
 							onClick={() => this.handleCompareButton('day')}
 						>
 							Day
 						</Button>
 						<Button
-							outline={compareVal !== 'week'}
+							outline={this.props.comparePeriod !== 'week'}
 							onClick={() => this.handleCompareButton('week')}
 						>
 							Week
 						</Button>
 						<Button
-							outline={compareVal !== 'month'}
+							outline={this.props.comparePeriod !== 'month'}
 							onClick={() => this.handleCompareButton('month')}
 						>
 							4 Weeks
@@ -229,25 +220,8 @@ export default class UIOptionsComponent extends React.Component<UIOptionsProps, 
 		this.props.changeDuration(moment.duration(value, 'days'));
 	}
 
-	private handleCompareButton(value: string) {
-		let compareTimeInterval: TimeInterval;
-		let compareDuration;
-		switch (value) {
-			case 'day':
-				compareTimeInterval = new TimeInterval(moment().subtract(2, 'days'), moment());
-				// fetch hours for accuracy when time interval is small
-				compareDuration = moment.duration(1, 'hours');
-				break;
-			case 'month':
-				compareTimeInterval = new TimeInterval(moment().startOf('week').subtract(49, 'days'), moment());
-				compareDuration = moment.duration(1, 'days');
-				break;
-			default: // handles week
-				compareTimeInterval = new TimeInterval(moment().startOf('week').subtract(7, 'days'), moment());
-				compareDuration = moment.duration(1, 'days');
-				break;
-		}
-		this.props.changeCompareInterval(compareTimeInterval, compareDuration);
+	private handleCompareButton(comparePeriod: string) {
+		this.props.changeComparePeriod(comparePeriod);
 	}
 
 	private toggleSlider() {

@@ -12,8 +12,7 @@ const defaultState: GraphState = {
 	selectedGroups: [],
 	timeInterval: TimeInterval.unbounded(),
 	barDuration: moment.duration(1, 'month'),
-	compareTimeInterval: new TimeInterval(moment().startOf('week').subtract(7, 'days'), moment()),
-	compareDuration: moment.duration(1, 'days'),
+	comparePeriod: 'week',
 	chartToRender: ChartTypes.line,
 	barStacking: false,
 	hotlinked: false
@@ -41,15 +40,10 @@ export default function graph(state = defaultState, action: GraphAction) {
 				...state,
 				timeInterval: action.timeInterval
 			};
-		case ActionType.UpdateCompareDuration:
+		case ActionType.ChangeComparePeriod:
 			return {
 				...state,
-				compareDuration: action.compareDuration
-			};
-		case ActionType.UpdateCompareInterval:
-			return {
-				...state,
-				compareTimeInterval: action.compareTimeInterval
+				comparePeriod: action.comparePeriod
 			};
 		case ActionType.ChangeChartToRender:
 			return {

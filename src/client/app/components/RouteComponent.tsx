@@ -88,6 +88,9 @@ export default class RouteComponent extends React.Component<RouteProps, {}> {
 								options.toggleBarStacking = true;
 							}
 							break;
+						case 'comparePeriod':
+							options.comparePeriod = info;
+							break;
 						default:
 							throw new Error('Unknown query parameter');
 					}

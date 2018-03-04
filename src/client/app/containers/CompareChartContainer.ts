@@ -8,9 +8,9 @@ import { Bar, LinearComponentProps } from 'react-chartjs-2';
 import { ChartData, ChartDataSets, LinearTickOptions } from 'chart.js';
 import * as moment from 'moment';
 import { connect } from 'react-redux';
-import { TimeInterval } from '../../../common/TimeInterval';
 import { State } from '../types/redux/state';
 import * as datalabels from 'chartjs-plugin-datalabels';
+import {calculateCompareDuration, calculateCompareTimeInterval} from '../utils/calculateCompare';
 
 if (datalabels === null || datalabels === undefined) {
 	throw new Error('Datalabels plugin was tree-shaken out.');
@@ -29,9 +29,9 @@ interface CompareChartContainerProps {
 }
 
 function mapStateToProps(state: State, ownProps: CompareChartContainerProps) {
-	const timeInterval = state.graph.compareTimeInterval.toString();
-	const barDuration = state.graph.compareDuration.toISOString();
-	const timeIntervalDurationInDays = TimeInterval.fromString(timeInterval).duration('days');
+	const comparePeriod = state.graph.comparePeriod;
+	const timeInterval = calculateCompareTimeInterval(comparePeriod);
+	const barDuration = calculateCompareDuration(comparePeriod);
 	const datasets: ChartDataSetsWithDatalabels[] = [];
 	const labels: string[] = [];
 	// Power used so far this week
@@ -45,15 +45,22 @@ function mapStateToProps(state: State, ownProps: CompareChartContainerProps) {
 
 	let prevLabel;
 	let currLabel;
-	if (timeIntervalDurationInDays < 7) {
-		prevLabel = 'Yesterday';
-		currLabel = 'Today';
-	} else if (timeIntervalDurationInDays >= 7 && timeIntervalDurationInDays < 14) {
-		prevLabel = 'Last week';
-		currLabel = 'This week';
-	} else {
-		prevLabel = 'Last month';
-		currLabel = 'This month';
+
+	switch (state.graph.comparePeriod) {
+		case 'day':
+			prevLabel = 'Yesterday';
+			currLabel = 'Today';
+			break;
+		case 'week':
+			prevLabel = 'Last week';
+			currLabel = 'This week';
+			break;
+		case 'month':
+			prevLabel = 'Last month';
+			currLabel = 'This month';
+			break;
+		default:
+			throw new Error(`Unknown period value: ${state.graph.comparePeriod}`);
 	}
 	const currLabelLowercase = currLabel.toLowerCase();
 
@@ -89,11 +96,11 @@ function mapStateToProps(state: State, ownProps: CompareChartContainerProps) {
 
 	let readingsData: {isFetching: boolean, readings?: Array<[number, number]>} | undefined ;
 	if (ownProps.isGroup) {
-		const readingsDataByTimeInterval = state.readings.bar.byGroupID[ownProps.id][timeInterval];
-		readingsData = readingsDataByTimeInterval[barDuration];
+		const readingsDataByTimeInterval = state.readings.bar.byGroupID[ownProps.id][timeInterval.toString()];
+		readingsData = readingsDataByTimeInterval[barDuration.toISOString()];
 	} else {
-		const readingsDataByTimeInterval = state.readings.bar.byMeterID[ownProps.id][timeInterval];
-		readingsData = readingsDataByTimeInterval[barDuration];
+		const readingsDataByTimeInterval = state.readings.bar.byMeterID[ownProps.id][timeInterval.toString()];
+		readingsData = readingsDataByTimeInterval[barDuration.toISOString()];
 	}
 	if (readingsData !== undefined && !readingsData.isFetching && readingsData.readings !== undefined) {
 		if (readingsData.readings.length < 7) {

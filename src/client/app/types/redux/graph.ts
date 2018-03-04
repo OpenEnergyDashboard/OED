@@ -41,14 +41,14 @@ export interface ChangeGraphZoomAction {
 	timeInterval: TimeInterval;
 }
 
-export interface UpdateCompareIntervalAction {
-	type: ActionType.UpdateCompareInterval;
-	compareTimeInterval: TimeInterval;
+export interface UpdateComparePeriodAction {
+	type: ActionType.UpdateComparePeriod;
+	comparePeriod: string;
 }
 
-export interface UpdateCompareDurationAction {
-	type: ActionType.UpdateCompareDuration;
-	compareDuration: moment.Duration;
+export interface ChangeComparePeriodAction {
+	type: ActionType.ChangeComparePeriod;
+	comparePeriod: string;
 }
 
 export interface SetHotlinked {
@@ -63,8 +63,8 @@ export type GraphAction =
 	| UpdateBarDurationAction
 	| UpdateSelectedGroupsAction
 	| UpdateSelectedMetersAction
-	| UpdateCompareIntervalAction
-	| UpdateCompareDurationAction
+	| UpdateComparePeriodAction
+	| ChangeComparePeriodAction
 	| SetHotlinked;
 
 export interface GraphState {
@@ -72,8 +72,7 @@ export interface GraphState {
 	selectedGroups: number[];
 	timeInterval: TimeInterval;
 	barDuration: moment.Duration;
-	compareTimeInterval: TimeInterval;
-	compareDuration: moment.Duration;
+	comparePeriod: string;
 	chartToRender: ChartTypes;
 	barStacking: boolean;
 	hotlinked: boolean;
