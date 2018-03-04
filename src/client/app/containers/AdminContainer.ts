@@ -9,6 +9,7 @@ import {
 	updateDisplayTitle,
 	updateDefaultChartToRender,
 	toggleDefaultBarStacking,
+	toggleDefaultHideOptions,
 	submitPreferencesIfNeeded,
 	updateSelectedMeter } from '../actions/admin';
 
@@ -27,6 +28,7 @@ function mapStateToProps(state: State) {
 		displayTitle: state.admin.displayTitle,
 		defaultChartToRender: state.admin.defaultChartToRender,
 		defaultBarStacking: state.admin.defaultBarStacking,
+		defaultHideOptions: state.admin.defaultHideOptions,
 		disableSubmitPreferences: state.admin.submitted,
 		meters: _.sortBy(_.values(state.meters.byMeterID).map(meter => ({ value: meter.id, label: meter.name.trim() })), 'name'),
 		selectedImportMeter: selectedMeter
@@ -39,6 +41,7 @@ function mapDispatchToProps(dispatch: Dispatch) {
 		updateDisplayTitle: (displayTitle: string) => dispatch(updateDisplayTitle(displayTitle)),
 		updateDefaultChartType: (defaultChartToRender: ChartTypes) => dispatch(updateDefaultChartToRender(defaultChartToRender)),
 		toggleDefaultBarStacking: () => dispatch(toggleDefaultBarStacking()),
+		toggleDefaultHideOptions: () => dispatch(toggleDefaultHideOptions()),
 		submitPreferences: () => dispatch(submitPreferencesIfNeeded())
 	};
 }

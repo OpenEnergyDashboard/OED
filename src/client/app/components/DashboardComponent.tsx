@@ -14,6 +14,7 @@ defaults.plugins = {datalabels: {display: false}};
 
 interface DashboardProps {
 	chartToRender: ChartTypes;
+	hideOptions: boolean;
 }
 
 /**
@@ -29,13 +30,16 @@ export default function DashboardComponent(props: DashboardProps) {
 		ChartToRender = BarChartContainer;
 	}
 
+	const optionsClassName = !props.hideOptions ? 'col-2 d-none d-lg-block' : 'd-none';
+	const chartClassName = !props.hideOptions ? 'col-12 col-lg-10' : 'col-12';
+
 	return (
 		<div className='container-fluid'>
 			<div className='row'>
-				<div className='col-2 d-none d-lg-block'>
+				<div className={optionsClassName}>
 					<UIOptionsContainer />
 				</div>
-				<div className='col-12 col-lg-10'>
+				<div className={chartClassName}>
 					<ChartToRender />
 				</div>
 			</div>

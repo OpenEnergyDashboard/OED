@@ -46,6 +46,9 @@ router.post('/', async (req, res) => {
 				},
 				defaultBarTracking: {
 					type: 'boolean'
+				},
+				defaultHideOptions: {
+					type: 'boolean'
 				}
 			}
 		}

@@ -28,6 +28,10 @@ export function toggleDefaultBarStacking(): t.ToggleDefaultBarStackingAction {
 	return { type: ActionType.ToggleDefaultBarStacking };
 }
 
+export function toggleDefaultHideOptions(): t.ToggleDefaultHideOptionsAction {
+	return { type: ActionType.ToggleDefaultHideOptions };
+}
+
 function requestPreferences(): t.RequestPreferencesAction {
 	return { type: ActionType.RequestPreferences };
 }
@@ -73,7 +77,8 @@ function submitPreferences() {
 				preferences: {
 					displayTitle: state.admin.displayTitle,
 					defaultChartToRender: state.admin.defaultChartToRender,
-					defaultBarStacking: state.admin.defaultBarStacking
+					defaultBarStacking: state.admin.defaultBarStacking,
+					defaultHideOptions: state.admin.defaultHideOptions
 				}
 			})
 			.then(() => {

@@ -2,5 +2,10 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
 
-SELECT display_title, default_chart_to_render, default_bar_stacking, default_hide_options
-FROM preferences;
+/**
+ * Returns the current page route
+ */
+export default function getPage(): string {
+	const urlArr = window.location.href.split('/');
+	return urlArr[urlArr.length - 1];
+}

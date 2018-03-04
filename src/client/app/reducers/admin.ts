@@ -11,6 +11,7 @@ const defaultState: AdminState = {
 	displayTitle: '',
 	defaultChartToRender: ChartTypes.line,
 	defaultBarStacking: false,
+	defaultHideOptions: false,
 	isFetching: false,
 	submitted: true
 };
@@ -40,6 +41,12 @@ export default function admin(state = defaultState, action: AdminAction) {
 				defaultBarStacking: !state.defaultBarStacking,
 				submitted: false
 			};
+		case ActionType.ToggleDefaultHideOptions:
+			return {
+				...state,
+				defaultHideOptions: !state.defaultHideOptions,
+				submitted: false
+			};
 		case ActionType.RequestPreferences:
 			return {
 				...state,
@@ -51,7 +58,8 @@ export default function admin(state = defaultState, action: AdminAction) {
 				isFetching: false,
 				displayTitle: action.data.displayTitle,
 				defaultChartToRender: action.data.defaultChartToRender,
-				defaultBarStacking: action.data.defaultBarStacking
+				defaultBarStacking: action.data.defaultBarStacking,
+				defaultHideOptions: action.data.defaultHideOptions
 			};
 		case ActionType.MarkPreferencesNotSubmitted:
 			return {

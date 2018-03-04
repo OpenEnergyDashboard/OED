@@ -11,6 +11,7 @@ export type AdminAction =
 	| UpdateDisplayTitleAction
 	| UpdateDefaultChartToRenderAction
 	| ToggleDefaultBarStackingAction
+	| ToggleDefaultHideOptionsAction
 	| RequestPreferencesAction
 	| ReceivePreferencesAction
 	| MarkPreferencesNotSubmittedAction
@@ -35,6 +36,10 @@ export interface ToggleDefaultBarStackingAction {
 	type: ActionType.ToggleDefaultBarStacking;
 }
 
+export interface ToggleDefaultHideOptionsAction {
+	type: ActionType.ToggleDefaultHideOptions;
+}
+
 export interface RequestPreferencesAction {
 	type: ActionType.RequestPreferences;
 }
@@ -57,6 +62,7 @@ export interface AdminState {
 	displayTitle: string;
 	defaultChartToRender: ChartTypes;
 	defaultBarStacking: boolean;
+	defaultHideOptions: boolean;
 	isFetching: boolean;
 	submitted: boolean;
 }

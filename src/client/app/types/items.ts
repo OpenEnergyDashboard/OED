@@ -27,6 +27,7 @@ export interface PreferenceRequestItem {
 	displayTitle: string;
 	defaultChartToRender: ChartTypes;
 	defaultBarStacking: boolean;
+	defaultHideOptions: boolean;
 }
 
 /**

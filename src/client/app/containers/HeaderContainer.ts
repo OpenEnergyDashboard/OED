@@ -8,7 +8,8 @@ import { State } from '../types/redux/state';
 
 function mapStateToProps(state: State) {
 	return {
-		title: state.admin.displayTitle
+		title: state.admin.displayTitle,
+		hideOptions: state.admin.defaultHideOptions
 	};
 }
 

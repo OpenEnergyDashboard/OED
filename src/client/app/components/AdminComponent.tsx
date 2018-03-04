@@ -14,6 +14,7 @@ import { getToken } from '../utils/token';
 import { showSuccessNotification, showErrorNotification } from '../utils/notifications';
 import {
 	ToggleDefaultBarStackingAction,
+	ToggleDefaultHideOptionsAction,
 	UpdateDefaultChartToRenderAction,
 	UpdateDisplayTitleAction,
 	UpdateImportMeterAction } from '../types/redux/admin';
@@ -24,6 +25,7 @@ interface AdminProps {
 	displayTitle: string;
 	defaultChartToRender: ChartTypes;
 	defaultBarStacking: boolean;
+	defaultHideOptions: boolean;
 	disableSubmitPreferences: boolean;
 	selectedImportMeter: SelectOption;
 	meters: SelectOption[];
@@ -31,6 +33,7 @@ interface AdminProps {
 	updateDisplayTitle(title: string): UpdateDisplayTitleAction;
 	updateDefaultChartType(defaultChartToRender: ChartTypes): UpdateDefaultChartToRenderAction;
 	toggleDefaultBarStacking(): ToggleDefaultBarStackingAction;
+	toggleDefaultHideOptions(): ToggleDefaultHideOptionsAction;
 	submitPreferences(): Promise<void>;
 }
 
@@ -40,6 +43,7 @@ export default class AdminComponent extends React.Component<AdminProps, {}> {
 		this.handleDisplayTitleChange = this.handleDisplayTitleChange.bind(this);
 		this.handleDefaultChartToRenderChange = this.handleDefaultChartToRenderChange.bind(this);
 		this.handleDefaultBarStackingChange = this.handleDefaultBarStackingChange.bind(this);
+		this.handleDefaultHideOptionsChange = this.handleDefaultHideOptionsChange.bind(this);
 		this.handleSubmitPreferences = this.handleSubmitPreferences.bind(this);
 		this.handleFileToImport = this.handleFileToImport.bind(this);
 	}
@@ -125,7 +129,17 @@ export default class AdminComponent extends React.Component<AdminProps, {}> {
 										onChange={this.handleDefaultBarStackingChange}
 										checked={this.props.defaultBarStacking}
 									/>
-									Default Bar stacking
+									Default bar stacking
+								</label>
+							</div>
+							<div className='checkbox'>
+								<label>
+									<input
+										type='checkbox'
+										onChange={this.handleDefaultHideOptionsChange}
+										checked={this.props.defaultHideOptions}
+									/>
+									Default hide options panel
 								</label>
 							</div>
 							<Button
@@ -172,6 +186,10 @@ export default class AdminComponent extends React.Component<AdminProps, {}> {
 
 	private handleDefaultBarStackingChange() {
 		this.props.toggleDefaultBarStacking();
+	}
+
+	private handleDefaultHideOptionsChange() {
+		this.props.toggleDefaultHideOptions();
 	}
 
 	private handleSubmitPreferences() {

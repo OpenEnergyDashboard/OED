@@ -7,6 +7,7 @@ import { Link } from 'react-router';
 import { Button } from 'reactstrap';
 import MenuModalComponent from './MenuModalComponent';
 import { hasToken } from '../utils/token';
+import getPage from '../utils/getPage';
 
 interface HeaderButtonsProps {
 	renderOptionsButton: boolean;
@@ -22,8 +23,6 @@ export default class HeaderButtonsComponent extends React.Component<HeaderButton
 	}
 
 	public render() {
-		const urlArr = window.location.href.split('/');
-		const page = urlArr[urlArr.length - 1];
 		let showUIOptions = false;
 		let renderLoginButton = false;
 		let renderHomeButton = true;
@@ -31,7 +30,7 @@ export default class HeaderButtonsComponent extends React.Component<HeaderButton
 		let renderGroupsButton = false;
 		const renderLogoutButton = hasToken();
 
-		switch (page) {
+		switch (getPage()) {
 			case '': // home page
 				renderHomeButton = false;
 				showUIOptions = true;
@@ -99,6 +98,4 @@ export default class HeaderButtonsComponent extends React.Component<HeaderButton
 		localStorage.removeItem('token');
 		this.forceUpdate();
 	}
-
-
 }

@@ -8,8 +8,11 @@ import LogoComponent from './LogoComponent';
 
 interface HeaderProps {
 	title: string;
+	hideOptions: boolean;
 }
 import HeaderButtonsComponent from './HeaderButtonsComponent';
+import MenuModalComponent from './MenuModalComponent';
+import getPage from '../utils/getPage';
 
 /**
  * React component that controls the header strip at the top of all pages
@@ -37,7 +40,13 @@ export default function HeaderComponent(props: HeaderProps) {
 					<h1 style={titleStyle}>{props.title}</h1>
 				</div>
 				<div className='col-4 justify-content-end' style={divRightStyle}>
-					<HeaderButtonsComponent renderOptionsButton />
+					{ props.hideOptions ?
+						<MenuModalComponent
+							showUIOptions={getPage() === ''}
+							renderOptionsButton={false}
+						/>
+					: <HeaderButtonsComponent renderOptionsButton />
+					}
 				</div>
 			</div>
 		</div>
