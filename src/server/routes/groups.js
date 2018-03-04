@@ -109,7 +109,7 @@ router.use(authenticator);
 router.post('/create', async (req, res) => {
 	const validGroup = {
 		type: 'object',
-		maxProperties: 4,
+		maxProperties: 3,
 		required: ['name', 'childGroups', 'childMeters'],
 		properties: {
 			name: {
