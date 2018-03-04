@@ -9,7 +9,7 @@ import { PreferenceRequestItem } from '../types/items';
 import * as t from '../types/redux/admin';
 import { ActionType, Dispatch, GetState, Thunk } from '../types/redux/actions';
 import { State } from '../types/redux/state';
-import {preferencesApi} from '../utils/api';
+import { preferencesApi } from '../utils/api';
 
 
 export function updateSelectedMeter(meterID: number): t.UpdateImportMeterAction {

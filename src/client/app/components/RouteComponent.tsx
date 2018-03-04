@@ -15,7 +15,7 @@ import { LinkOptions } from 'actions/graph';
 import { getToken, hasToken } from '../utils/token';
 import { showErrorNotification } from '../utils/notifications';
 import { ChartTypes } from '../types/redux/graph';
-import {verificationApi} from '../utils/api';
+import { verificationApi } from '../utils/api';
 
 interface RouteProps {
 	barStacking: boolean ;

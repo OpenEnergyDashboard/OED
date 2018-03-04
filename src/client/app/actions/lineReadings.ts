@@ -7,7 +7,7 @@ import { LineReadings } from '../types/readings';
 import {ActionType, Thunk, Dispatch, GetState} from '../types/redux/actions';
 import { State } from '../types/redux/state';
 import * as t from '../types/redux/lineReadings';
-import {groupsApi, metersApi} from '../utils/api';
+import { groupsApi, metersApi } from '../utils/api';
 
 function shouldFetchGroupLineReadings(state: State, groupID: number, timeInterval: TimeInterval): boolean {
 	const timeIntervalIndex = timeInterval.toString();

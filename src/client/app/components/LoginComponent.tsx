@@ -8,7 +8,7 @@ import { Input, Button, InputGroup, Form } from 'reactstrap';
 import HeaderContainer from '../containers/HeaderContainer';
 import FooterComponent from '../components/FooterComponent';
 import { showErrorNotification } from '../utils/notifications';
-import {verificationApi} from '../utils/api';
+import { verificationApi } from '../utils/api';
 
 
 interface LoginState {

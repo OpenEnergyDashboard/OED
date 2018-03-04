@@ -7,7 +7,7 @@ import { State } from '../types/redux/state';
 import { NamedIDItem } from '../types/items';
 import { showErrorNotification } from '../utils/notifications';
 import * as t from '../types/redux/groups';
-import {groupsApi} from '../utils/api';
+import { groupsApi } from '../utils/api';
 
 function requestGroupsDetails(): t.RequestGroupsDetailsAction {
 	return { type: ActionType.RequestGroupsDetails };

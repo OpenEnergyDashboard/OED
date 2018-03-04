@@ -7,7 +7,7 @@ import { ActionType, Dispatch, GetState, Thunk } from '../types/redux/actions';
 import { State } from '../types/redux/state';
 import * as t from '../types/redux/meters';
 import { NamedIDItem } from '../types/items';
-import {metersApi} from '../utils/api';
+import { metersApi } from '../utils/api';
 
 
 export function requestMetersDetails(): t.RequestMetersDetailsAction {
