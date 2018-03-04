@@ -100,12 +100,13 @@ export default class LoginComponent extends React.Component<{}, LoginState> {
 				localStorage.setItem('token', token);
 				browserHistory.push('/');
 			} catch (err) {
-				if (err.response.status === 401) {
+				if (err.response && err.response.status === 401) {
 					showErrorNotification('Invalid email/password combination');
 				} else {
 					// If there was a problem other than a lack of authorization, the user can't fix it.
-					// Log it to the console for developer use.
-					console.error(err); // tslint:disable-line no-console
+					// This is an irrecoverable state, so just throw an error and let the user know something went wrong
+					showErrorNotification('Error logging in');
+					throw err;
 				}
 				if (this.inputEmail !== null) {
 					this.inputEmail.focus();

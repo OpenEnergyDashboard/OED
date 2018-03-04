@@ -49,14 +49,9 @@ export default class RouteComponent extends React.Component<RouteProps, {}> {
 		// Verify that the auth token is valid.
 		// Needs to be async because of the network request
 		(async () => {
-			try {
-				if (!(await verificationApi.checkTokenValid())) {
-					// Route to login page if the auth token is not valid
-					browserHistory.push('/login');
-				}
-			} catch (e) {
-				// In the case of a server error, the user can't fix the issue. Log it for developers.
-				console.error(e); // tslint:disable-line no-console
+			if (!(await verificationApi.checkTokenValid())) {
+				// Route to login page if the auth token is not valid
+				browserHistory.push('/login');
 			}
 		})();
 	}
