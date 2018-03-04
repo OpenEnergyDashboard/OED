@@ -81,6 +81,15 @@ class Api {
 		await this.doAuthPostRequest('/api/preferences', { preferences });
 	}
 
+	public async checkTokenValid(): Promise<boolean> {
+		// This will not throw an error if the status code is 401 unauthorized or 403 forbidden
+		const response: AxiosResponse = await axios.post('/api/verification/',
+			{ token: getToken() },
+			{ validateStatus: status => (status >= 200 && status < 300) || (status === 401 || status === 403) });
+		// The server returns { success: true } if and only if the token is valid.
+		return response.data.success === true;
+	}
+
 	private async doGetRequest<R>(
 		url: string,
 		params: { [key: string]: string } = {},
