@@ -95,6 +95,12 @@ class Api {
 		return response.token;
 	}
 
+	public async submitNewMeterReadings(meterID: number, readingsFile: File): Promise<void> {
+		const formData = new FormData();
+		formData.append('csvFile', readingsFile);
+		return await this.doAuthPostRequest<void>(`/api/fileProcessing/${meterID}`, formData);
+	}
+
 	private async doGetRequest<R>(
 		url: string,
 		params: { [key: string]: string } = {},

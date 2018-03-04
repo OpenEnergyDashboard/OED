@@ -19,6 +19,7 @@ import {
 	UpdateImportMeterAction } from '../types/redux/admin';
 import { SelectOption } from '../types/items';
 import SingleSelectComponent from './SingleSelectComponent';
+import api from '../utils/Api';
 
 interface AdminProps {
 	displayTitle: string;
@@ -184,16 +185,7 @@ export default class AdminComponent extends React.Component<AdminProps, {}> {
 			showErrorNotification('Please select a meter');
 		} else {
 			const file = files[0];
-			const data = new FormData();
-			data.append('csvFile', file);
-			axios({
-				method: 'post',
-				url: `/api/fileProcessing/${this.props.selectedImportMeter.value}`,
-				data,
-				params: {
-					token: getToken()
-				}
-			})
+			api.submitNewMeterReadings(this.props.selectedImportMeter.value, file)
 			.then(() => {
 				showSuccessNotification('Successfully uploaded meter data');
 			})
