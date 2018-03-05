@@ -59,7 +59,7 @@ function updateComparePeriod(comparePeriod: string): t.UpdateComparePeriodAction
 	return { type: ActionType.UpdateComparePeriod, comparePeriod };
 }
 
-export function changeComparePeriod(comparePeriod: string): Thunk {
+export function changeCompareGraph(comparePeriod: string): Thunk {
 	return (dispatch: Dispatch) => {
 		dispatch(updateComparePeriod(comparePeriod));
 		dispatch(fetchNeededCompareReadings(comparePeriod));
@@ -150,7 +150,7 @@ export function changeOptionsFromLink(options: LinkOptions) {
 		dispatchSecond.push(changeBarStacking());
 	}
 	if (options.comparePeriod) {
-		dispatchSecond.push(changeComparePeriod(options.comparePeriod));
+		dispatchSecond.push(changeCompareGraph(options.comparePeriod));
 	}
 	return (dispatch: Dispatch) => Promise.all(dispatchFirst.map(dispatch))
 		.then(() => Promise.all(dispatchSecond.map(dispatch)));

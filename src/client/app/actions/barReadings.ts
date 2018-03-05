@@ -120,7 +120,7 @@ function fetchGroupBarReadings(groupIDs: number[], timeInterval: TimeInterval): 
 }
 
 function fetchMeterCompareReadings(meterIDs: number[], comparePeriod: string): Thunk {
-	return (dispatch: Dispatch, getState: GetState) => {
+	return (dispatch: Dispatch) => {
 		const compareDuration = calculateCompareDuration(comparePeriod);
 		const timeInterval = calculateCompareTimeInterval(comparePeriod);
 		dispatch(requestMeterBarReadings(meterIDs, timeInterval, compareDuration));

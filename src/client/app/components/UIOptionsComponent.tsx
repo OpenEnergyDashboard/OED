@@ -24,7 +24,7 @@ export interface UIOptionsProps {
 	comparePeriod: string;
 	changeDuration(duration: moment.Duration): Promise<any>;
 	changeBarStacking(): ChangeBarStackingAction;
-	changeComparePeriod(comparePeriod: string): Promise<any>;
+	changeCompareGraph(comparePeriod: string): Promise<any>;
 }
 
 interface UIOptionsState {
@@ -221,7 +221,7 @@ export default class UIOptionsComponent extends React.Component<UIOptionsProps, 
 	}
 
 	private handleCompareButton(comparePeriod: string) {
-		this.props.changeComparePeriod(comparePeriod);
+		this.props.changeCompareGraph(comparePeriod);
 	}
 
 	private toggleSlider() {

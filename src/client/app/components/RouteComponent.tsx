@@ -89,7 +89,7 @@ export default class RouteComponent extends React.Component<RouteProps, {}> {
 							}
 							break;
 						case 'comparePeriod':
-							options.comparePeriod = info;
+							options.comparePeriod = info.toString();
 							break;
 						default:
 							throw new Error('Unknown query parameter');
