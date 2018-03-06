@@ -10,7 +10,7 @@ import * as moment from 'moment';
 import { connect } from 'react-redux';
 import { State } from '../types/redux/state';
 import * as datalabels from 'chartjs-plugin-datalabels';
-import {calculateCompareDuration, calculateCompareTimeInterval} from '../utils/calculateCompare';
+import {calculateCompareDuration, calculateCompareTimeInterval, getComparePeriodLabels, getCompareChangeSummary} from '../utils/calculateCompare';
 
 if (datalabels === null || datalabels === undefined) {
 	throw new Error('Datalabels plugin was tree-shaken out.');
@@ -32,60 +32,27 @@ function mapStateToProps(state: State, ownProps: CompareChartContainerProps) {
 	const comparePeriod = state.graph.comparePeriod;
 	const timeInterval = calculateCompareTimeInterval(comparePeriod);
 	const barDuration = calculateCompareDuration(comparePeriod);
+
+	// The name of the entity for which compare data is being computed.
+	let name;
+	if (ownProps.isGroup) {
+		name = state.groups.byGroupID[ownProps.id].name;
+	} else {
+		name = state.meters.byMeterID[ownProps.id].name;
+	}
+
 	const datasets: ChartDataSetsWithDatalabels[] = [];
 	const labels: string[] = [];
 	// Power used so far this week
-	let current = 0;
+	let currentPeriodUsage = 0;
 	// Last week total usage
-	let prev = 0;
+	let lastPeriodTotalUsage = 0;
 	// Power used up to this point last week
-	let currentPrev = 0;
+	let usedToThisPointLastTimePeriod = 0;
 	// How long it's been since start of measure period
-	let soFar;
+	let timeSincePeriodStart;
 
-	let prevLabel;
-	let currLabel;
-
-	switch (state.graph.comparePeriod) {
-		case 'day':
-			prevLabel = 'Yesterday';
-			currLabel = 'Today';
-			break;
-		case 'week':
-			prevLabel = 'Last week';
-			currLabel = 'This week';
-			break;
-		case 'month':
-			prevLabel = 'Last month';
-			currLabel = 'This month';
-			break;
-		default:
-			throw new Error(`Unknown period value: ${state.graph.comparePeriod}`);
-	}
-	const currLabelLowercase = currLabel.toLowerCase();
-
-	// Compose the text to display to the user.
-	let delta;
-	if (ownProps.isGroup) {
-		delta = (changeForText: number) => {
-			if (isNaN(changeForText)) { return ''; }
-			if (change < 0) {
-				const name = state.groups.byGroupID[ownProps.id].name;
-				return `${name} has used ${parseInt(change.toFixed(2).replace('.', '').slice(1))}% less energy ${currLabelLowercase}`;
-			}
-			return `${state.groups.byGroupID[ownProps.id].name} has used ${parseInt(change.toFixed(2).replace('.', ''))}% more energy ${currLabelLowercase}`;
-		};
-	} else {
-		delta = (changeForText: number) => {
-			if (isNaN(changeForText)) { return ''; }
-			if (change < 0) {
-				const name = state.meters.byMeterID[ownProps.id].name;
-				return `${name} has used ${parseInt(change.toFixed(2).replace('.', '').slice(1))}% less energy ${currLabelLowercase}`;
-			}
-			return `${state.meters.byMeterID[ownProps.id].name} has used ${parseInt(change.toFixed(2).replace('.', ''))}% more energy ${currLabelLowercase}`;
-		};
-	}
-
+	const periodLabels = getComparePeriodLabels(comparePeriod);
 
 	const colorize = (changeForColorization: number) => {
 		if (changeForColorization < 0) {
@@ -104,51 +71,57 @@ function mapStateToProps(state: State, ownProps: CompareChartContainerProps) {
 	}
 	if (readingsData !== undefined && !readingsData.isFetching && readingsData.readings !== undefined) {
 		if (readingsData.readings.length < 7) {
-			soFar = moment().hour();
+			timeSincePeriodStart = moment().hour();
 		} else if (readingsData.readings.length <= 14) {
-			soFar = moment().diff(moment().startOf('week'), 'days');
+			timeSincePeriodStart = moment().diff(moment().startOf('week'), 'days');
 		} else {
 			// 21 to differentiate from week case, week case never larger than 14
-			soFar = moment().diff(moment().startOf('week').subtract(21, 'days'), 'days');
+			timeSincePeriodStart = moment().diff(moment().startOf('week').subtract(21, 'days'), 'days');
 		}
 
 		// Calculates current interval
-		if (readingsData.readings.length < soFar) {
+		if (readingsData.readings.length < timeSincePeriodStart) {
 			throw new Error(`Insufficient readings data to process comparison for id ${ownProps.id}, ti ${timeInterval}, dur ${barDuration}.
-				readingsData has ${readingsData.readings.length} but we'd like to look at the last ${soFar} elements.`);
+				readingsData has ${readingsData.readings.length} but we'd like to look at the last ${timeSincePeriodStart} elements.`);
 		}
-		for (let i = readingsData.readings.length - soFar; i < readingsData.readings.length; i++) {
-			current += readingsData.readings[i][1];
+		for (let i = readingsData.readings.length - timeSincePeriodStart; i < readingsData.readings.length; i++) {
+			currentPeriodUsage += readingsData.readings[i][1];
 		}
 		// Calculate prev interval
-		for (let i = 0; i < readingsData.readings.length - soFar; i++) {
-			prev += readingsData.readings[i][1];
+		for (let i = 0; i < readingsData.readings.length - timeSincePeriodStart; i++) {
+			lastPeriodTotalUsage += readingsData.readings[i][1];
 		}
 		// Calculates current for previous time interval
 		// Have to special case Sunday for week and month
-		if (soFar === 0) {
-			currentPrev = Math.round((readingsData.readings[0][1] / 24) * moment().hour());
+		if (timeSincePeriodStart === 0) {
+			usedToThisPointLastTimePeriod = Math.round((readingsData.readings[0][1] / 24) * moment().hour());
 		} else {
-			for (let i = 0; i < soFar; i++) {
-				currentPrev += readingsData.readings[i][1];
+			for (let i = 0; i < timeSincePeriodStart; i++) {
+				usedToThisPointLastTimePeriod += readingsData.readings[i][1];
 			}
 		}
 	}
 
-	labels.push(prevLabel);
-	labels.push(currLabel);
+	// Compute the change between periods.
+	const change = (-1 + (((currentPeriodUsage / usedToThisPointLastTimePeriod) * lastPeriodTotalUsage) / lastPeriodTotalUsage));
+
+	// Compose the text to display to the user.
+	const changeSummary = getCompareChangeSummary(change, name, periodLabels);
+
+	labels.push(periodLabels.prev);
+	labels.push(periodLabels.current);
 	const readingsAfterCurrentTimeColor = 'rgba(173, 216, 230, 1)';
 	const readingsBeforeCurrentTimeColor = 'rgba(218, 165, 32, 1)';
 	const projectedDataColor = 'rgba(173, 216, 230, 0.45)';
 	datasets.push(
 		{
-			data: [prev, Math.round((current / currentPrev) * prev)],
+			data: [lastPeriodTotalUsage, Math.round((currentPeriodUsage / usedToThisPointLastTimePeriod) * lastPeriodTotalUsage)],
 			datalabels: {
 				anchor: 'end',
 				align: 'start'
 			}
 		}, {
-			data: [currentPrev, current],
+			data: [usedToThisPointLastTimePeriod, currentPeriodUsage],
 			datalabels: {
 				anchor: 'end',
 				align: 'start'
@@ -173,7 +146,6 @@ function mapStateToProps(state: State, ownProps: CompareChartContainerProps) {
 
 
 	const data: ChartData = {datasets, labels};
-	const change = (-1 + (((current / currentPrev) * prev) / prev));
 	const ticks: LinearTickOptions = {
 		beginAtZero: true
 	};
@@ -210,7 +182,7 @@ function mapStateToProps(state: State, ownProps: CompareChartContainerProps) {
 		},
 		title: {
 			display: true,
-			text: delta(change),
+			text: changeSummary,
 			fontColor: colorize(change)
 		},
 		plugins: {
