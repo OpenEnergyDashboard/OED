@@ -40,7 +40,9 @@ function askToVersion() {
 }
 
 function terminateReadline(message) {
-	if (message) log.info(message);
+	if (message) {
+		log.info(message);
+	}
 	rl.close();
 	process.exit(0);
 }
@@ -62,7 +64,7 @@ function terminateReadline(message) {
 		terminateReadline('Migration successful');
 	} catch (err) {
 		log.error(`Error while migrating database: ${err}`, err);
-		console.log('Possible migrations: \n', printMigrationList(migrationList));
+		log.info('Possible migrations: \n', printMigrationList(migrationList));
 		terminateReadline('Migration failed');
 	}
 })();
