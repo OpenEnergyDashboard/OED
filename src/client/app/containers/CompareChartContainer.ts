@@ -52,8 +52,8 @@ function mapStateToProps(state: State, ownProps: CompareChartContainerProps) {
 		prevLabel = 'Last week';
 		currLabel = 'This week';
 	} else {
-		prevLabel = 'Last month';
-		currLabel = 'This month';
+		prevLabel = 'Last four weeks';
+		currLabel = 'This four weeks';
 	}
 	const currLabelLowercase = currLabel.toLowerCase();
 
@@ -118,7 +118,7 @@ function mapStateToProps(state: State, ownProps: CompareChartContainerProps) {
 			prev += readingsData.readings[i][1];
 		}
 		// Calculates current for previous time interval
-		// Have to special case Sunday for week and month
+		// Have to special case Sunday for week and four weeks
 		if (soFar === 0) {
 			currentPrev = Math.round((readingsData.readings[0][1] / 24) * moment().hour());
 		} else {
