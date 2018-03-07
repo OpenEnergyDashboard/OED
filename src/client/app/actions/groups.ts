@@ -239,7 +239,7 @@ function submitNewGroup(group: t.GroupData): Thunk {
 				if (error.response !== undefined && error.response.status === 409) {
 					showErrorNotification(`Name '${group.name}' was already taken.`);
 				} else {
-					showErrorNotification('Unable to create group.')
+					showErrorNotification('Unable to create group.');
 				}
 			});
 	};
