@@ -40,7 +40,7 @@ export default function graph(state = defaultState, action: GraphAction) {
 				...state,
 				timeInterval: action.timeInterval
 			};
-		case ActionType.ChangeComparePeriod:
+		case ActionType.UpdateComparePeriod:
 			return {
 				...state,
 				comparePeriod: action.comparePeriod

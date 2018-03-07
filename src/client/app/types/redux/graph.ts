@@ -46,11 +46,6 @@ export interface UpdateComparePeriodAction {
 	comparePeriod: string;
 }
 
-export interface ChangeComparePeriodAction {
-	type: ActionType.ChangeComparePeriod;
-	comparePeriod: string;
-}
-
 export interface SetHotlinked {
 	type: ActionType.SetHotlinked;
 	hotlinked: boolean;
@@ -64,7 +59,6 @@ export type GraphAction =
 	| UpdateSelectedGroupsAction
 	| UpdateSelectedMetersAction
 	| UpdateComparePeriodAction
-	| ChangeComparePeriodAction
 	| SetHotlinked;
 
 export interface GraphState {
