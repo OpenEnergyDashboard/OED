@@ -26,6 +26,11 @@ const config = {
         extensions: [".ts", ".tsx", ".js", ".json"]
     },
 
+    // Ignore warnings about bundle size
+    performance: {
+        hints: false
+    },
+
     module: {
         rules: [
             // All TypeScript ('.ts' or '.tsx') will be handled by 'awesome-typescript-loader'.
