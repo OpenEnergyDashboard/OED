@@ -148,7 +148,11 @@ router.post('/create', async (req, res) => {
 			res.sendStatus(200);
 		} catch (err) {
 			log.error(`Error while inserting new group ${err}`, err);
-			res.sendStatus(500);
+			if (err.toString() === 'error: duplicate key value violates unique constraint "groups_name_key"') {
+				res.sendStatus(409); //409 conflict
+			} else {
+				res.sendStatus(500);
+			}
 		}
 	}
 });

@@ -236,7 +236,11 @@ function submitNewGroup(group: t.GroupData): Thunk {
 			})
 			.catch(error => {
 				dispatch(markGroupInEditingNotSubmitted());
-				showErrorNotification('Failed to create group');
+				if (error.response !== undefined && error.response.status === 409) {
+					showErrorNotification(`Name '${group.name}' was already taken.`);
+				} else {
+					showErrorNotification('Unable to create group.')
+				}
 			});
 	};
 }
