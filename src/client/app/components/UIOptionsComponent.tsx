@@ -147,21 +147,21 @@ export default class UIOptionsComponent extends React.Component<UIOptionsProps, 
 					>
 						<Button
 							outline={this.props.comparePeriod !== 'day'}
-                            active={this.props.comparePeriod === 'day'}
+							active={this.props.comparePeriod === 'day'}
 							onClick={() => this.handleCompareButton('day')}
 						>
 							Day
 						</Button>
 						<Button
 							outline={this.props.comparePeriod !== 'week'}
-                            active={this.props.comparePeriod === 'week'}
+							active={this.props.comparePeriod === 'week'}
 							onClick={() => this.handleCompareButton('week')}
 						>
 							Week
 						</Button>
 						<Button
 							outline={this.props.comparePeriod !== 'month'}
-                            active={this.props.comparePeriod === 'month'}
+							active={this.props.comparePeriod === 'month'}
 							onClick={() => this.handleCompareButton('month')}
 						>
 							4 Weeks

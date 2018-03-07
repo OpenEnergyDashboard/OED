@@ -63,18 +63,18 @@ function mapStateToProps(state: State, ownProps: CompareChartContainerProps) {
 
 	let readingsData: {isFetching: boolean, readings?: Array<[number, number]>} | undefined ;
 	if (ownProps.isGroup) {
-        const readingsDataByID = state.readings.bar.byGroupID[ownProps.id];
+		const readingsDataByID = state.readings.bar.byGroupID[ownProps.id];
 		const readingsDataByTimeInterval = readingsDataByID[timeInterval.toString()];
 		readingsData = readingsDataByTimeInterval[barDuration.toISOString()];
 	} else {
-        const readingsDataByID = state.readings.bar.byMeterID[ownProps.id];
+		const readingsDataByID = state.readings.bar.byMeterID[ownProps.id];
 		const readingsDataByTimeInterval = readingsDataByID[timeInterval.toString()];
 		readingsData = readingsDataByTimeInterval[barDuration.toISOString()];
 	}
 	if (readingsData !== undefined && !readingsData.isFetching && readingsData.readings !== undefined) {
-		if (state.graph.comparePeriod === "day") {
+		if (state.graph.comparePeriod === 'day') {
 			timeSincePeriodStart = moment().hour();
-        } else if (state.graph.comparePeriod === "week") {
+		} else if (state.graph.comparePeriod === 'week') {
 			timeSincePeriodStart = moment().diff(moment().startOf('week'), 'days');
 		} else {
 			// 21 to differentiate from week case, week case never larger than 14

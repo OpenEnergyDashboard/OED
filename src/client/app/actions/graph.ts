@@ -61,10 +61,10 @@ function updateComparePeriod(comparePeriod: string): t.UpdateComparePeriodAction
 
 export function changeCompareGraph(comparePeriod: string): Thunk {
 	return (dispatch: Dispatch) => {
-        return Promise.all([
-            dispatch(updateComparePeriod(comparePeriod)),
-            dispatch(fetchNeededCompareReadings(comparePeriod))
-        ]);
+		return Promise.all([
+			dispatch(updateComparePeriod(comparePeriod)),
+			dispatch(fetchNeededCompareReadings(comparePeriod))
+		]);
 	};
 }
 
