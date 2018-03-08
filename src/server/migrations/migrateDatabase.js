@@ -156,7 +156,6 @@ async function migrateDatabaseTransaction(neededFiles, allMigrationFiles) {
 							const migration = new Migration(undefined, migrationFile.fromVersion, migrationFile.toVersion);
 							await migration.insert(t);
 						} catch (err) {
-							// TODO:What if we don't have migration in the table;
 							log.error('Error while migrating database', err);
 						}
 					}
@@ -164,7 +163,7 @@ async function migrateDatabaseTransaction(neededFiles, allMigrationFiles) {
 			});
 		});
 	} catch (err) {
-		log.error(`Error while migrating database: ${err}`, err);
+		log.error('Error while migrating database', err);
 	}
 }
 
@@ -175,8 +174,6 @@ async function migrateDatabaseTransaction(neededFiles, allMigrationFiles) {
  */
 async function migrateAll(toVersion, migrationItems) {
 	const currentVersion = await Migration.getCurrentVersion();
-	console.log(currentVersion);
-	console.log(toVersion);
 	if (currentVersion === toVersion) {
 		throw new Error('You have the highest version');
 	} else {

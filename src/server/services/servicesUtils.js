@@ -9,20 +9,11 @@ const rl = readline.createInterface({
 	output: process.stdout
 });
 
-// function ask(question, condition = true) {
-// 	return new Promise((resolve, reject) => {
-// 		rl.question(question, response  => {
-// 			if (condition(response)) {
-// 				console.log('something');
-// 				resolve(response);
-// 			} else {
-// 				reject(response);
-// 			}
-// 		});
-// 	});
-// }
-
-
+/**
+ * Ask a question and then returns a promise of the response.
+ * @param question is the string of the question you want to ask
+ * @returns {Promise<any>} of the reponse
+ */
 function ask(question) {
 	return new Promise(resolve => {
 		rl.question(question, response => resolve(response));

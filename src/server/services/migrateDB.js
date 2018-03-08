@@ -21,18 +21,18 @@ function findMaxVersion(list) {
 		if (updateMax.toLowerCase() === 'yes' || updateMax.toLowerCase() === 'y') {
 			toVersion = await findMaxVersion(migrationList);
 		} else if (updateMax.toLowerCase() === 'no' || updateMax.toLowerCase() === 'n') {
-			toVersion = await ask('To Version');
+			toVersion = await ask('To Version: ');
 		} else {
 			terminateReadline('Invalid arguments, please enter [yes/no]');
 		}
 	} catch (err) {
-		terminateReadline(err);
+		// terminateReadline(err);
 	}
 	try {
 		await migrateAll(toVersion, migrationList);
 		terminateReadline('Migration successful');
 	} catch (err) {
-		log.error(`Error while migrating database: ${err}`, err);
+		log.error('Error while migrating database: ', err);
 		log.info('Possible migrations: \n', printMigrationList(migrationList));
 		terminateReadline('Migration failed');
 	}
