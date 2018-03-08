@@ -38,12 +38,6 @@ function askPassword(email) {
 	});
 }
 
-function ask(question) {
-	return new Promise(resolve => {
-		rl.question(question, response => resolve(response));
-	});
-}
-
 function terminateReadline(message) {
 	if (message) { log.info(message); }
 	rl.close();

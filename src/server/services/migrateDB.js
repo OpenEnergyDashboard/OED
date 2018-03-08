@@ -4,57 +4,24 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/.
  */
 
-const readline = require('readline');
 const { log } = require('../log');
+const { ask, terminateReadline } = require('./servicesUtils');
 const { findMaxSemanticVersion } = require('../util');
 const { printMigrationList, migrateAll, getUniqueKeyOfMigrationList } = require('../migrations/migrateDatabase');
 const migrationList = require('../migrations/registerMigration');
-
-const rl = readline.createInterface({
-	input: process.stdin,
-	output: process.stdout
-});
 
 function findMaxVersion(list) {
 	return findMaxSemanticVersion(getUniqueKeyOfMigrationList(list));
 }
 
-function askUpdateToMax() {
-	return new Promise((resolve, reject) => {
-		rl.question('Do you want to update to the max version? [yes/no]: ', answer => {
-			if (answer === 'yes' || answer === 'no') {
-				resolve(answer);
-			} else {
-				reject(answer);
-			}
-		});
-	});
-}
-
-function askToVersion() {
-	return new Promise(resolve => {
-		rl.question('To Version: ', toVersion => {
-			resolve(toVersion);
-		});
-	});
-}
-
-function terminateReadline(message) {
-	if (message) {
-		log.info(message);
-	}
-	rl.close();
-	process.exit(0);
-}
-
 (async () => {
 	let toVersion;
 	try {
-		const updateMax = await askUpdateToMax();
-		if (updateMax === 'yes') {
+		const updateMax = await ask('Do you want to update to the max version? [yes/no]: ');
+		if (updateMax.toLowerCase() === 'yes' || updateMax.toLowerCase() === 'y') {
 			toVersion = await findMaxVersion(migrationList);
-		} else if (updateMax === 'no') {
-			toVersion = await askToVersion();
+		} else if (updateMax.toLowerCase() === 'no' || updateMax.toLowerCase() === 'n') {
+			toVersion = await ask('To Version');
 		}
 	} catch (err) {
 		terminateReadline('Invalid arguments, please enter [yes/no]');
