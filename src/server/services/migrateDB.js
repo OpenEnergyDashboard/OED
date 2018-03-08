@@ -26,7 +26,7 @@ function findMaxVersion(list) {
 			terminateReadline('Invalid arguments, please enter [yes/no]');
 		}
 	} catch (err) {
-		// terminateReadline(err);
+		terminateReadline('Could not find the max version from the registered migration list');
 	}
 	try {
 		await migrateAll(toVersion, migrationList);

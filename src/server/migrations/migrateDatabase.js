@@ -71,10 +71,10 @@ function createMigrationList(migrationItems) {
  */
 function checkIfFromAndToExist(curr, to, adjListArray) {
 	if (!(curr in adjListArray)) {
-		throw new Error(`Could not find version ${curr} in migration list`);
+		throw new Error(`Could not find version ${curr} from the registered migration list`);
 	}
 	if (!(to in adjListArray)) {
-		throw new Error(`Could not find version ${to} in migration list`);
+		throw new Error(`Could not find version ${to} from the registered migration list`);
 	}
 }
 
