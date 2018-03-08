@@ -71,10 +71,10 @@ function createMigrationList(migrationItems) {
  */
 function checkIfFromAndToExist(curr, to, adjListArray) {
 	if (!(curr in adjListArray)) {
-		throw new Error('Did not find version in migration list');
+		throw new Error(`Could not find version ${curr} in migration list`);
 	}
 	if (!(to in adjListArray)) {
-		throw new Error('Did not find version in migration list');
+		throw new Error(`Could not find version ${to} in migration list`);
 	}
 }
 
@@ -175,6 +175,8 @@ async function migrateDatabaseTransaction(neededFiles, allMigrationFiles) {
  */
 async function migrateAll(toVersion, migrationItems) {
 	const currentVersion = await Migration.getCurrentVersion();
+	console.log(currentVersion);
+	console.log(toVersion);
 	if (currentVersion === toVersion) {
 		throw new Error('You have the highest version');
 	} else {

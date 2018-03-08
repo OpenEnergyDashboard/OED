@@ -22,9 +22,11 @@ function findMaxVersion(list) {
 			toVersion = await findMaxVersion(migrationList);
 		} else if (updateMax.toLowerCase() === 'no' || updateMax.toLowerCase() === 'n') {
 			toVersion = await ask('To Version');
+		} else {
+			terminateReadline('Invalid arguments, please enter [yes/no]');
 		}
 	} catch (err) {
-		terminateReadline('Invalid arguments, please enter [yes/no]');
+		terminateReadline(err);
 	}
 	try {
 		await migrateAll(toVersion, migrationList);

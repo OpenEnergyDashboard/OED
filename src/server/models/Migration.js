@@ -59,7 +59,11 @@ class Migration {
 	 */
 	static async getAll() {
 		const rows = await db.any(sqlFile('migration/get_all_migrations.sql'));
-		return rows.map(row => new Migration(row.id, row.from_version, row.to_version, row.update_time));
+		if (rows.length > 0) {
+			return rows.map(row => new Migration(row.id, row.from_version, row.to_version, row.update_time));
+		} else {
+			throw new Error('There is no item in migration table or table does not exists');
+		}
 	}
 }
 module.exports = Migration;
