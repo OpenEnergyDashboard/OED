@@ -72,12 +72,31 @@ function handleStatus(req, res) {
 }
 
 /**
- * Handle an Obvius upload request.
- * Unfortunately the Obvious API does not specify a HTTP verb.
+ * A middleware to lowercase all params.
  */
-router.all('/', async (req, res) => {
+function lowercaseParams(req, res, next) {
+	for (const key of Object.entries(req.query)) {
+		req.query[key[0].toLowerCase()] = key[1];
+	}
+	for (const key of Object.entries(req.params)) {
+		req.params[key[0].toLowerCase()] = key[1];
+	}
+	if (req.body) {
+		for (const key of Object.entries(req.body)) {
+			req.body[key[0].toLowerCase()] = key[1];
+		}
+	}
+	next();
+}
+router.use(lowercaseParams);
+
+/**
+ * A middleware to add our params mixin
+ */
+router.use((req, res, next) => {
 	// Mixin for getting parameters from any possible method.
 	req.param = (param, defaultValue) => {
+		param = param.toLowerCase();
 		// If the param exists as a route param, use it.
 		if (typeof req.params[param] !== 'undefined') {
 			return req.params[param];
@@ -94,20 +113,30 @@ router.all('/', async (req, res) => {
 		return defaultValue;
 	};
 
+	next();
+});
+
+/**
+ * Handle an Obvius upload request.
+ * Unfortunately the Obvious API does not specify a HTTP verb.
+ */
+router.all('/', async (req, res) => {
 	// Log the IP of the requester
 	const ip = req.headers['x-forwarded-for'] || req.connection.remoteAddress;
 	log.info(`Received Obvious protocol request from ${ip}`);
 
+	log.info(`Received body: ${JSON.stringify(req.body)}`);
+
 	// Attempt to verify the password
-	if (!req.param('PASSWORD')) {
-		failure(req, res, 'PASSWORD parameter is required.');
+	if (!req.param('password')) {
+		failure(req, res, 'password parameter is required.');
 		return;
-	} else if (req.param('PASSWORD') !== config.obvius.password) {
-		failure(req, res, 'PASSWORD was not correct.');
+	} else if (req.param('password') !== config.obvius.password) {
+		failure(req, res, 'password was not correct.');
 		return;
 	}
 
-	const mode = req.param('MODE', false);
+	const mode = req.param('mode', false);
 	if (mode === false) {
 		failure(req, res, 'Request must include mode parameter.');
 		return;
@@ -143,7 +172,7 @@ router.all('/', async (req, res) => {
 		return;
 	}
 
-	failure(req, res, `Unknown MODE '${mode}'`);
+	failure(req, res, `Unknown mode '${mode}'`);
 });
 
 module.exports = router;
