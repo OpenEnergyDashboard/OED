@@ -2,7 +2,7 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
 
-import React from 'react';
+import * as React from 'react';
 import HeaderContainer from '../containers/HeaderContainer';
 import FooterComponent from '../components/FooterComponent';
 import AddMetersComponent from './admin/AddMetersComponent';
@@ -18,12 +18,12 @@ export default function AdminComponent() {
 	return (
 		<div>
 			<HeaderContainer />
-			<div className="container-fluid">
-				<div className="row">
-					<div className="col-12 col-lg-6">
+			<div className='container-fluid'>
+				<div className='row'>
+					<div className='col-12 col-lg-6'>
 						<PreferencesContainer />
 					</div>
-					<div className="col-12 col-lg-6">
+					<div className='col-12 col-lg-6'>
 						<AddReadingsContainer />
 						<AddMetersComponent />
 					</div>

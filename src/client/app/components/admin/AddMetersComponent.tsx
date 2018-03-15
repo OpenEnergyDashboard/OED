@@ -3,19 +3,19 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
 
-import React from 'react';
+import * as React from 'react';
 import Dropzone from 'react-dropzone';
 import axios from 'axios';
 import { getToken } from '../../utils/token';
 import { showSuccessNotification, showErrorNotification } from '../../utils/notifications';
 
-export default class addMeters extends React.Component {
-	constructor(props) {
+export default class AddMetersComponent extends React.Component<{}, {}> {
+	constructor(props: {}) {
 		super(props);
 		this.handleMeterToImport = this.handleMeterToImport.bind(this);
 	}
 
-	handleMeterToImport(files) {
+	public handleMeterToImport(files: File[]) {
 		const file = files[0];
 		let jsonObject = [];
 		const reader = new FileReader();
@@ -34,7 +34,7 @@ export default class addMeters extends React.Component {
 				url: '/api/fileProcessing/meters',
 				data: jsonObject,
 				params: {
-					token: getToken(),
+					token: getToken()
 				}
 			})
 			.then(() => {
@@ -49,8 +49,8 @@ export default class addMeters extends React.Component {
 		reader.readAsBinaryString(file);
 	}
 
-	render() {
-		const titleStyle = {
+	public render() {
+		const titleStyle: React.CSSProperties = {
 			fontWeight: 'bold',
 			margin: 0,
 			paddingBottom: '5px'
@@ -59,7 +59,7 @@ export default class addMeters extends React.Component {
 		return (
 			<div>
 				<p style={titleStyle}> Add new meters: </p>
-				<Dropzone accept="text/csv, application/vnd.ms-excel," onDrop={this.handleMeterToImport}>
+				<Dropzone accept='text/csv, application/vnd.ms-excel,' onDrop={this.handleMeterToImport}>
 					<div>Upload meters list (CSV):</div>
 				</Dropzone>
 			</div>
