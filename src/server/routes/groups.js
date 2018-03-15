@@ -155,7 +155,7 @@ router.post('/create', async (req, res) => {
 router.put('/edit', async (req, res) => {
 	const validGroup = {
 		type: 'object',
-		maxProperties: 5,
+		maxProperties: 4,
 		required: ['id', 'name', 'childGroups', 'childMeters'],
 		properties: {
 			id: { type: 'integer' },
@@ -224,7 +224,7 @@ router.put('/edit', async (req, res) => {
 router.post('/delete', async (req, res) => {
 	const validParams = {
 		type: 'object',
-		maxProperties: 2,
+		maxProperties: 1,
 		required: ['id'],
 		properties: {
 			id: { type: 'integer' }
