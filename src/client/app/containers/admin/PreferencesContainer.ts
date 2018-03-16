@@ -5,20 +5,23 @@
 import { connect } from 'react-redux';
 import PreferencesComponent from '../../components/admin/PreferencesComponent';
 import { updateDisplayTitle, updateDefaultChartToRender, toggleDefaultBarStacking, submitPreferencesIfNeeded} from '../../actions/admin';
+import {State} from '../../types/redux/state';
+import {Dispatch} from '../../types/redux/actions';
+import {ChartTypes} from '../../types/redux/graph';
 
-function mapStateToProps(state) {
+function mapStateToProps(state: State) {
 	return {
 		displayTitle: state.admin.displayTitle,
 		defaultChartToRender: state.admin.defaultChartToRender,
 		defaultBarStacking: state.admin.defaultBarStacking,
-		disableSubmitPreferences: state.admin.submitted,
+		disableSubmitPreferences: state.admin.submitted
 	};
 }
 
-function mapDispatchToProps(dispatch) {
+function mapDispatchToProps(dispatch: Dispatch) {
 	return {
-		updateDisplayTitle: displayTitle => dispatch(updateDisplayTitle(displayTitle)),
-		updateDefaultGraphType: defaultChartToRender => dispatch(updateDefaultChartToRender(defaultChartToRender)),
+		updateDisplayTitle: (displayTitle: string) => dispatch(updateDisplayTitle(displayTitle)),
+		updateDefaultChartType: (defaultChartToRender: ChartTypes) => dispatch(updateDefaultChartToRender(defaultChartToRender)),
 		toggleDefaultBarStacking: () => dispatch(toggleDefaultBarStacking()),
 		submitPreferences: () => dispatch(submitPreferencesIfNeeded())
 	};

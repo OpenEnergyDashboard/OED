@@ -5,7 +5,6 @@
 import * as React from 'react';
 import Dropzone from 'react-dropzone';
 import axios from 'axios';
-import MultiSelectComponent from '../MultiSelectComponent';
 import { getToken } from '../../utils/token';
 import { showSuccessNotification, showErrorNotification } from '../../utils/notifications';
 import {SelectOption} from '../../types/items';

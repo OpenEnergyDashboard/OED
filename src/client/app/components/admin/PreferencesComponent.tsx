@@ -4,10 +4,24 @@
 
 import * as React from 'react';
 import { Input, Button } from 'reactstrap';
-import { chartTypes } from '../../reducers/graph';
+import { ChartTypes } from '../../types/redux/graph';
+import {
+	ToggleDefaultBarStackingAction,
+	UpdateDefaultChartToRenderAction,
+	UpdateDisplayTitleAction} from '../../types/redux/admin';
 
-export default class preferences extends React.Component {
-	constructor(props) {
+interface PreferencesProps {
+	displayTitle: string;
+	defaultChartToRender: ChartTypes;
+	defaultBarStacking: boolean;
+	disableSubmitPreferences: boolean;
+	updateDisplayTitle(title: string): UpdateDisplayTitleAction;
+	updateDefaultChartType(defaultChartToRender: ChartTypes): UpdateDefaultChartToRenderAction;
+	toggleDefaultBarStacking(): ToggleDefaultBarStackingAction;
+	submitPreferences(): Promise<void>;
+}
+export default class PreferencesComponent extends React.Component<PreferencesProps, {}> {
+	constructor(props: PreferencesProps) {
 		super(props);
 		this.handleDisplayTitleChange = this.handleDisplayTitleChange.bind(this);
 		this.handleDefaultChartToRenderChange = this.handleDefaultChartToRenderChange.bind(this);
@@ -15,31 +29,15 @@ export default class preferences extends React.Component {
 		this.handleSubmitPreferences = this.handleSubmitPreferences.bind(this);
 	}
 
-	handleDisplayTitleChange(e) {
-		this.props.updateDisplayTitle(e.target.value);
-	}
-
-	handleDefaultChartToRenderChange(e) {
-		this.props.updateDefaultGraphType(e.target.value);
-	}
-
-	handleDefaultBarStackingChange() {
-		this.props.toggleDefaultBarStacking();
-	}
-
-	handleSubmitPreferences() {
-		this.props.submitPreferences();
-	}
-
-	render() {
-		const labelStyle = {
+	public render() {
+		const labelStyle: React.CSSProperties = {
 			fontWeight: 'bold',
-			margin: 0,
+			margin: 0
 		};
-		const bottomPaddingStyle = {
+		const bottomPaddingStyle: React.CSSProperties = {
 			paddingBottom: '15px'
 		};
-		const titleStyle = {
+		const titleStyle: React.CSSProperties = {
 			fontWeight: 'bold',
 			margin: 0,
 			paddingBottom: '5px'
@@ -49,8 +47,8 @@ export default class preferences extends React.Component {
 				<div style={bottomPaddingStyle}>
 					<p style={titleStyle}>Default Site Title:</p>
 					<Input
-						type="text"
-						placeholder="Name"
+						type='text'
+						placeholder='Name'
 						value={this.props.displayTitle}
 						onChange={this.handleDisplayTitleChange}
 						maxLength={50}
@@ -58,47 +56,47 @@ export default class preferences extends React.Component {
 				</div>
 				<div>
 					<p style={labelStyle}>Default Graph Type:</p>
-					<div className="radio">
+					<div className='radio'>
 						<label>
 							<input
-								type="radio"
-								name="chartTypes"
-								value={chartTypes.line}
+								type='radio'
+								name='chartTypes'
+								value={ChartTypes.line}
 								onChange={this.handleDefaultChartToRenderChange}
-								checked={this.props.defaultChartToRender === chartTypes.line}
+								checked={this.props.defaultChartToRender === ChartTypes.line}
 							/>
 							Line
 						</label>
 					</div>
-					<div className="radio">
+					<div className='radio'>
 						<label>
 							<input
-								type="radio"
-								name="chartTypes"
-								value={chartTypes.bar}
+								type='radio'
+								name='chartTypes'
+								value={ChartTypes.bar}
 								onChange={this.handleDefaultChartToRenderChange}
-								checked={this.props.defaultChartToRender === chartTypes.bar}
+								checked={this.props.defaultChartToRender === ChartTypes.bar}
 							/>
 							Bar
 						</label>
 					</div>
-					<div className="radio">
+					<div className='radio'>
 						<label>
 							<input
-								type="radio"
-								name="chartTypes"
-								value={chartTypes.compare}
+								type='radio'
+								name='chartTypes'
+								value={ChartTypes.compare}
 								onChange={this.handleDefaultChartToRenderChange}
-								checked={this.props.defaultChartToRender === chartTypes.compare}
+								checked={this.props.defaultChartToRender === ChartTypes.compare}
 							/>
 							Compare
 						</label>
 					</div>
 				</div>
-				<div className="checkbox">
+				<div className='checkbox'>
 					<label>
 						<input
-							type="checkbox"
+							type='checkbox'
 							onChange={this.handleDefaultBarStackingChange}
 							checked={this.props.defaultBarStacking}
 						/>
@@ -106,7 +104,7 @@ export default class preferences extends React.Component {
 					</label>
 				</div>
 				<Button
-					type="submit"
+					type='submit'
 					onClick={this.handleSubmitPreferences}
 					disabled={this.props.disableSubmitPreferences}
 				>
@@ -114,5 +112,21 @@ export default class preferences extends React.Component {
 				</Button>
 			</div>
 		);
+	}
+
+	private handleDisplayTitleChange(e: { target: HTMLInputElement; }) {
+		this.props.updateDisplayTitle(e.target.value);
+	}
+
+	private handleDefaultChartToRenderChange(e: React.FormEvent<HTMLInputElement>) {
+		this.props.updateDefaultChartType((e.target as HTMLInputElement).value as ChartTypes);
+	}
+
+	private handleDefaultBarStackingChange() {
+		this.props.toggleDefaultBarStacking();
+	}
+
+	private handleSubmitPreferences() {
+		this.props.submitPreferences();
 	}
 }
