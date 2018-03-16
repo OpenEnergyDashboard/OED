@@ -31,8 +31,6 @@ export default class AddReadingComponent extends React.Component<AddReadingProps
 			const file = files[0];
 			const data = new FormData();
 			data.append('csvFile', file);
-			// console.log(data);
-			// TODO: Look into selectedImportMeter.value?
 			axios({
 				method: 'post',
 				url: `/api/fileProcessing/readings/${this.props.selectedImportMeter.value}`,

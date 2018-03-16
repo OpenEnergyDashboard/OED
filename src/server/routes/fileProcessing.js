@@ -53,10 +53,8 @@ router.post('/readings/:meter_id', upload.single('csvFile'), async (req, res) =>
 				res.status(200).json({ success: true });
 			} catch (e) {
 				res.status(403).json({ success: false, message: 'Failed to upload data.' });
-				console.log('sandeep');
 			}
 		} catch (err) {
-			console.log('sandeepAcharya');
 			res.status(400).send({
 				success: false,
 				message: 'Incorrect file type.'
@@ -70,7 +68,6 @@ router.post('/meters', async (req, res) => {
 		await insertMeters(req.body.map(ip => ({ ip })));
 		res.status(200).json({ success: true });
 	} catch (err) {
-		console.log('got here!');
 		log.error('Error uploading meters', err);
 		res.status(403).json({ success: false, message: 'Failed to upload meter.' });
 	}
