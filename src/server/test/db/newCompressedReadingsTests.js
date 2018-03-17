@@ -199,6 +199,7 @@ mocha.describe('Compressed Readings 2', () => {
 
 	mocha.describe('Compressed meter barchart readings', () => {
 		let meter;
+		let meter2;
 		const timestamp1 = moment('2017-01-01');
 		const timestamp2 = timestamp1.clone().add(1, 'day');
 		const timestamp3 = timestamp2.clone().add(1, 'day');
@@ -208,6 +209,8 @@ mocha.describe('Compressed Readings 2', () => {
 		mocha.beforeEach(async () => {
 			await new Meter(undefined, 'Meter', null, false, Meter.type.MAMAC).insert();
 			meter = await Meter.getByName('Meter');
+			await new Meter(undefined, 'Meter2', null, false, Meter.type.MAMAC).insert();
+			meter2 = await Meter.getByName('Meter2');
 		});
 
 		mocha.it('Retrieves the correct interval for a single meter and day width', async () => {
@@ -231,6 +234,27 @@ mocha.describe('Compressed Readings 2', () => {
 				{reading: 200, start_timestamp: timestamp2.valueOf(), end_timestamp: timestamp3.valueOf()},
 				{reading: 300, start_timestamp: timestamp3.valueOf(), end_timestamp: timestamp4.valueOf()},
 				{reading: 400, start_timestamp: timestamp4.valueOf(), end_timestamp: timestamp5.valueOf()}
+			])
+		});
+
+		mocha.it('Retrieves the correct interval for a single meter and multiple days width', async () => {
+			await Reading.insertAll([
+				new Reading(meter.id, 100, timestamp1, timestamp2),
+				new Reading(meter.id, 200, timestamp2, timestamp3),
+				new Reading(meter.id, 300, timestamp3, timestamp4),
+				new Reading(meter.id, 400, timestamp4, timestamp5)
+			]);
+			await Reading.refreshCompressedReadings();
+
+			const barReadings = await Reading.getNewCompressedBarchartReadings([meter.id], timestamp1, timestamp5, 2);
+			expect(barReadings).to.have.keys([meter.id.toString()]);
+			const readingsForMeter = barReadings[meter.id];
+			const readingsForMeterComparable = readingsForMeter.map(
+				({reading, start_timestamp, end_timestamp}) => ({ reading, start_timestamp: start_timestamp.valueOf(), end_timestamp: end_timestamp.valueOf()})
+			);
+			expect(readingsForMeterComparable).to.deep.equal([
+				{reading: 300, start_timestamp: timestamp1.valueOf(), end_timestamp: timestamp3.valueOf()},
+				{reading: 700, start_timestamp: timestamp3.valueOf(), end_timestamp: timestamp5.valueOf()}
 			])
 		});
 
