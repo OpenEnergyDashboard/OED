@@ -238,7 +238,9 @@ BEGIN
 	real_end_stamp := date_trunc('day', end_stamp);
 	RETURN QUERY
 		SELECT dr.meter_id AS meter_id,
-			SUM(dr.reading_rate * 86400) AS reading, -- 86400 seconds in a day
+			--  dr.reading_rate is the weighted average reading rate over the day, in kW. To convert it to kW * h,
+			-- we do reading_rate (kw) * time (1 day) * (24 hr / 1 day) to get kW H.
+			SUM(dr.reading_rate * 24) AS reading,
 			bars.interval_start AS start_timestamp,
 			bars.interval_start + bar_width AS end_timestamp
 	FROM daily_readings dr
@@ -269,7 +271,7 @@ BEGIN
 	real_end_stamp := date_trunc('day', end_stamp);
 	RETURN QUERY
 	SELECT dr.meter_id AS meter_id,
-				 SUM(dr.reading_rate * 86400) AS reading, -- 86400 seconds in a day
+				 SUM(dr.reading_rate * 24) AS reading, -- 24 hours in a day
 				 bars.interval_start AS start_timestamp,
 				 bars.interval_start + bar_width AS end_timestamp
 	FROM daily_readings dr
