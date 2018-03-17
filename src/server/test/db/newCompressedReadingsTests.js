@@ -258,5 +258,26 @@ mocha.describe('Compressed Readings 2', () => {
 			])
 		});
 
+		mocha.it('Retrieves the correct barchart readings for multiple meters', async () => {
+			await Reading.insertAll([
+				new Reading(meter.id, 100, timestamp1, timestamp2),
+				new Reading(meter2.id, 1, timestamp1, timestamp2),
+			]);
+			await Reading.refreshCompressedReadings();
+			const barReadings = await Reading.getNewCompressedBarchartReadings([meter.id, meter2.id], timestamp1, timestamp2, 1);
+			expect(barReadings).to.have.keys([meter.id.toString(), meter2.id.toString()]);
+			const readingsForMeterComparable = barReadings[meter.id].map(
+				({reading, start_timestamp, end_timestamp}) => ({ reading, start_timestamp: start_timestamp.valueOf(), end_timestamp: end_timestamp.valueOf()})
+			);
+			const readingsForMeter2Comparable = barReadings[meter2.id].map(
+				({reading, start_timestamp, end_timestamp}) => ({ reading, start_timestamp: start_timestamp.valueOf(), end_timestamp: end_timestamp.valueOf()})
+			);
+			expect(readingsForMeterComparable).to.deep.equal([
+				{reading: 100, start_timestamp: timestamp1.valueOf(), end_timestamp: timestamp2.valueOf()}
+			]);
+			expect(readingsForMeter2Comparable).to.deep.equal([
+				{reading: 1, start_timestamp: timestamp1.valueOf(), end_timestamp: timestamp2.valueOf()}
+			]);
+		});
 	});
 });
