@@ -39,21 +39,28 @@ async function getMeterInfo(url, ip) {
 
 /**
  *
- * @param ips The IPs of the meters
+ * @param rows The rows of the meters
  * @returns {Array.<Promise.<Meter>>}
  */
-function allMeters(ips) {
-	return ips.map(ip => getMeterInfo(`http://${ip.ip}/sm101.xml`, ip.ip));
+function infoForAllMeters(rows) {
+	// IP address regex: https://stackoverflow.com/a/25969006
+	const regexIPAddress = /^((25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.){3}(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)$/;
+	for (const row of rows) {
+		if (!regexIPAddress.test(row.ip)) {
+			throw new Error('Invalid IP address');
+		}
+	}
+	return rows.map(row => getMeterInfo(`http://${row.ip}/sm101.xml`, row.ip));
 }
 
 /**
  * promises to insert the meters into the database
- * @param ips IPs of the meters
+ * @param rows rows of the meters
  * @returns {Promise.<>}
  */
-async function insertMeters(ips) {
-	const meters = await Promise.all(allMeters(ips));
-	return await Promise.all(meters.map(m => m.insert()));
+async function insertMeters(rows) {
+	const meters = await Promise.all(infoForAllMeters(rows));
+	await Promise.all(meters.map(m => m.insert()));
 }
 
 async function insertMetersWrapper(filename) {

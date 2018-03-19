@@ -68,8 +68,9 @@ router.post('/meters', async (req, res) => {
 		await insertMeters(req.body.map(ip => ({ ip })));
 		res.status(200).json({ success: true });
 	} catch (err) {
-		log.error('Error with meters', err);
-		res.status(403).json({ success: false, message: 'Failed to upload meter.' });
+		// TODO remove log
+		log.error('Error uploading meters', err);
+		res.status(403).json({ success: false, message: 'Failed to upload meters.' });
 	}
 });
 

@@ -41,8 +41,8 @@ export default class AddMetersComponent extends React.Component<AddMetersProps, 
 				}
 			})
 			.then(() => {
-				showSuccessNotification('Successfully uploaded meters');
-				this.props.fetchMeterDetailsIfNeeded(true);
+				showSuccessNotification('Successfully uploaded meters'); // this.props.fetchMeterDetailsIfNeeded(true);
+
 			})
 			.catch(() => {
 				showErrorNotification('Error uploading meters');
