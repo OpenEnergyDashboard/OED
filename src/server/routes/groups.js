@@ -86,7 +86,7 @@ router.get('/deep/meters/:group_id', async (req, res) => {
 		maxProperties: 1,
 		required: ['group_id'],
 		properties: {
-			meter_id: {
+			group_id: {
 				type: 'number'
 			}
 		}
@@ -109,10 +109,9 @@ router.use(authenticator);
 router.post('/create', async (req, res) => {
 	const validGroup = {
 		type: 'object',
-		maxProperties: 4,
-		required: ['token', 'name', 'childGroups', 'childMeters'],
+		maxProperties: 3,
+		required: ['name', 'childGroups', 'childMeters'],
 		properties: {
-			token: { type: 'string' },
 			name: {
 				type: 'string',
 				minLength: 1
@@ -156,10 +155,9 @@ router.post('/create', async (req, res) => {
 router.put('/edit', async (req, res) => {
 	const validGroup = {
 		type: 'object',
-		maxProperties: 5,
-		required: ['token', 'id', 'name', 'childGroups', 'childMeters'],
+		maxProperties: 4,
+		required: ['id', 'name', 'childGroups', 'childMeters'],
 		properties: {
-			token: { type: 'string' },
 			id: { type: 'integer' },
 			name: {
 				type: 'string',
@@ -226,10 +224,9 @@ router.put('/edit', async (req, res) => {
 router.post('/delete', async (req, res) => {
 	const validParams = {
 		type: 'object',
-		maxProperties: 2,
-		required: ['token', 'id'],
+		maxProperties: 1,
+		required: ['id'],
 		properties: {
-			token: { type: 'string' },
 			id: { type: 'integer' }
 		}
 	};

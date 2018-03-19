@@ -3,14 +3,12 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
 
 import * as React from 'react';
-import axios from 'axios';
 import { Input, Button } from 'reactstrap';
 import Dropzone from 'react-dropzone';
 import { ImageFile } from 'react-dropzone';
 import { ChartTypes } from '../types/redux/graph';
 import HeaderContainer from '../containers/HeaderContainer';
 import FooterComponent from '../components/FooterComponent';
-import { getToken } from '../utils/token';
 import { showSuccessNotification, showErrorNotification } from '../utils/notifications';
 import {
 	ToggleDefaultBarStackingAction,
@@ -19,6 +17,7 @@ import {
 	UpdateImportMeterAction } from '../types/redux/admin';
 import { SelectOption } from '../types/items';
 import SingleSelectComponent from './SingleSelectComponent';
+import { metersApi } from '../utils/api';
 
 interface AdminProps {
 	displayTitle: string;
@@ -184,16 +183,7 @@ export default class AdminComponent extends React.Component<AdminProps, {}> {
 			showErrorNotification('Please select a meter');
 		} else {
 			const file = files[0];
-			const data = new FormData();
-			data.append('csvFile', file);
-			axios({
-				method: 'post',
-				url: `/api/fileProcessing/${this.props.selectedImportMeter.value}`,
-				data,
-				params: {
-					token: getToken()
-				}
-			})
+			metersApi.submitNewReadings(this.props.selectedImportMeter.value, file)
 			.then(() => {
 				showSuccessNotification('Successfully uploaded meter data');
 			})
