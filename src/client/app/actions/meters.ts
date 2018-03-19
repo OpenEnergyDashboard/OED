@@ -35,9 +35,9 @@ function shouldFetchMetersDetails(state: State): boolean {
 	return !state.meters.isFetching && _.size(state.meters.byMeterID) === 0;
 }
 
-export function fetchMetersDetailsIfNeeded(): Thunk {
+export function fetchMetersDetailsIfNeeded(alwaysFetch?: boolean): Thunk {
 	return (dispatch: Dispatch, getState: GetState) => {
-		if (shouldFetchMetersDetails(getState())) {
+		if (alwaysFetch || shouldFetchMetersDetails(getState())) {
 			return dispatch(fetchMetersDetails());
 		}
 		return Promise.resolve();

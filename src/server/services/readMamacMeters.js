@@ -53,7 +53,6 @@ function allMeters(ips) {
  */
 async function insertMeters(ips) {
 	const meters = await Promise.all(allMeters(ips));
-	console.log("it got here");
 	return await Promise.all(meters.map(m => m.insert()));
 }
 

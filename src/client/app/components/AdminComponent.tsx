@@ -5,7 +5,7 @@
 import * as React from 'react';
 import HeaderContainer from '../containers/HeaderContainer';
 import FooterComponent from '../components/FooterComponent';
-import AddMetersComponent from './admin/AddMetersComponent';
+import AddMeterContainer from '../containers/admin/AddMetersContainer';
 import AddReadingsContainer from '../containers/admin/AddReadingsContainer';
 import PreferencesContainer from '../containers/admin/PreferencesContainer';
 
@@ -25,7 +25,7 @@ export default function AdminComponent() {
 					</div>
 					<div className='col-12 col-lg-6'>
 						<AddReadingsContainer />
-						<AddMetersComponent />
+						<AddMeterContainer />
 					</div>
 				</div>
 			</div>

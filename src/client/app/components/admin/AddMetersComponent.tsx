@@ -9,8 +9,11 @@ import axios from 'axios';
 import { getToken } from '../../utils/token';
 import { showSuccessNotification, showErrorNotification } from '../../utils/notifications';
 
-export default class AddMetersComponent extends React.Component<{}, {}> {
-	constructor(props: {}) {
+interface AddMetersProps {
+	fetchMeterDetailsIfNeeded(alwaysFetch?: boolean): Promise<any>;
+}
+export default class AddMetersComponent extends React.Component<AddMetersProps, {}> {
+	constructor(props: AddMetersProps) {
 		super(props);
 		this.handleMeterToImport = this.handleMeterToImport.bind(this);
 	}
@@ -39,6 +42,7 @@ export default class AddMetersComponent extends React.Component<{}, {}> {
 			})
 			.then(() => {
 				showSuccessNotification('Successfully uploaded meters');
+				this.props.fetchMeterDetailsIfNeeded(true);
 			})
 			.catch(() => {
 				showErrorNotification('Error uploading meters');
