@@ -6,7 +6,6 @@ import * as React from 'react';
 import sliderWithoutTooltips, { createSliderWithTooltip } from 'rc-slider';
 import * as moment from 'moment';
 import { Button, ButtonGroup } from 'reactstrap';
-import { TimeInterval } from '../../../common/TimeInterval';
 import ExportContainer from '../containers/ExportContainer';
 import ChartSelectContainer from '../containers/ChartSelectContainer';
 import ChartDataSelectContainer from '../containers/ChartDataSelectContainer';
@@ -14,6 +13,7 @@ import { ChangeBarStackingAction } from '../types/redux/graph';
 import ChartLinkContainer from '../containers/ChartLinkContainer';
 import { ChartTypes } from '../types/redux/graph';
 import 'rc-slider/assets/index.css';
+import { ComparePeriod } from '../utils/calculateCompare';
 
 const Slider = createSliderWithTooltip(sliderWithoutTooltips);
 
@@ -21,10 +21,10 @@ export interface UIOptionsProps {
 	chartToRender: ChartTypes;
 	barStacking: boolean;
 	barDuration: moment.Duration;
-	comparePeriod: string;
+	comparePeriod: ComparePeriod;
 	changeDuration(duration: moment.Duration): Promise<any>;
 	changeBarStacking(): ChangeBarStackingAction;
-	changeCompareGraph(comparePeriod: string): Promise<any>;
+	changeCompareGraph(comparePeriod: ComparePeriod): Promise<any>;
 }
 
 interface UIOptionsState {
@@ -33,10 +33,6 @@ interface UIOptionsState {
 }
 
 export default class UIOptionsComponent extends React.Component<UIOptionsProps, UIOptionsState> {
-	/**
-	 * Initializes the component's state, binds all functions to 'this' UIOptionsComponent
-	 * @param props The props passed down through the UIOptionsContainer
-	 */
 	constructor(props: UIOptionsProps) {
 		super(props);
 		this.handleBarDurationChange = this.handleBarDurationChange.bind(this);
@@ -146,23 +142,23 @@ export default class UIOptionsComponent extends React.Component<UIOptionsProps, 
 						style={zIndexFix}
 					>
 						<Button
-							outline={this.props.comparePeriod !== 'day'}
-							active={this.props.comparePeriod === 'day'}
-							onClick={() => this.handleCompareButton('day')}
+							outline={this.props.comparePeriod !== ComparePeriod.Day}
+							active={this.props.comparePeriod === ComparePeriod.Day}
+							onClick={() => this.handleCompareButton(ComparePeriod.Day)}
 						>
 							Day
 						</Button>
 						<Button
-							outline={this.props.comparePeriod !== 'week'}
-							active={this.props.comparePeriod === 'week'}
-							onClick={() => this.handleCompareButton('week')}
+							outline={this.props.comparePeriod !== ComparePeriod.Week}
+							active={this.props.comparePeriod === ComparePeriod.Week}
+							onClick={() => this.handleCompareButton(ComparePeriod.Week)}
 						>
 							Week
 						</Button>
 						<Button
-							outline={this.props.comparePeriod !== 'month'}
-							active={this.props.comparePeriod === 'month'}
-							onClick={() => this.handleCompareButton('month')}
+							outline={this.props.comparePeriod !== ComparePeriod.FourWeeks}
+							active={this.props.comparePeriod === ComparePeriod.FourWeeks}
+							onClick={() => this.handleCompareButton(ComparePeriod.FourWeeks)}
 						>
 							4 Weeks
 						</Button>
@@ -223,7 +219,7 @@ export default class UIOptionsComponent extends React.Component<UIOptionsProps, 
 		this.props.changeDuration(moment.duration(value, 'days'));
 	}
 
-	private handleCompareButton(comparePeriod: string) {
+	private handleCompareButton(comparePeriod: ComparePeriod) {
 		this.props.changeCompareGraph(comparePeriod);
 	}
 

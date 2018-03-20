@@ -9,7 +9,7 @@ import { Dispatch, GetState, Thunk, ActionType } from '../types/redux/actions';
 import { State } from '../types/redux/state';
 import { BarReadings } from '../types/readings';
 import * as t from '../types/redux/barReadings';
-import {calculateCompareDuration, calculateCompareTimeInterval} from '../utils/calculateCompare';
+import { ComparePeriod, calculateCompareDuration, calculateCompareTimeInterval } from '../utils/calculateCompare';
 
 /**
  * @param {State} state the Redux state
@@ -119,7 +119,7 @@ function fetchGroupBarReadings(groupIDs: number[], timeInterval: TimeInterval): 
 	};
 }
 
-function fetchMeterCompareReadings(meterIDs: number[], comparePeriod: string): Thunk {
+function fetchMeterCompareReadings(meterIDs: number[], comparePeriod: ComparePeriod): Thunk {
 	return (dispatch: Dispatch) => {
 		const compareDuration = calculateCompareDuration(comparePeriod);
 		const timeInterval = calculateCompareTimeInterval(comparePeriod);
@@ -131,7 +131,7 @@ function fetchMeterCompareReadings(meterIDs: number[], comparePeriod: string): T
 	};
 }
 
-function fetchGroupCompareReadings(groupIDs: number[], comparePeriod: string) {
+function fetchGroupCompareReadings(groupIDs: number[], comparePeriod: ComparePeriod) {
 	return (dispatch: Dispatch) => {
 		const compareDuration = calculateCompareDuration(comparePeriod);
 		const timeInterval = calculateCompareTimeInterval(comparePeriod);
@@ -177,7 +177,7 @@ export function fetchNeededBarReadings(timeInterval: TimeInterval): Thunk {
 	};
 }
 
-export function fetchNeededCompareReadings(comparePeriod: string): Thunk {
+export function fetchNeededCompareReadings(comparePeriod: ComparePeriod): Thunk {
 	return (dispatch, getState) => {
 		const state = getState();
 		const promises: Array<Promise<any>> = [];

@@ -1,24 +1,39 @@
-/*
- * This Source Code Form is subject to the terms of the Mozilla Public
+/* This Source Code Form is subject to the terms of the Mozilla Public
  * License, v. 2.0. If a copy of the MPL was not distributed with this
- * file, You can obtain one at http://mozilla.org/MPL/2.0/.
- */
+ * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
+
 import { TimeInterval } from '../../../common/TimeInterval';
 import * as moment from 'moment';
-import { State } from '../types/redux/state';
 
-// TODO make a comparePeriod enum
+export enum ComparePeriod {
+	Day = 'Day',
+	Week = 'Week',
+	FourWeeks = 'FourWeeks'
+}
 
-export function calculateCompareTimeInterval(comparePeriod: string): TimeInterval {
+export function validateComparePeriod(comparePeriod: string): ComparePeriod {
+	switch (comparePeriod) {
+		case 'Day':
+			return ComparePeriod.Day;
+		case 'Week':
+			return ComparePeriod.Week;
+		case 'FourWeeks':
+			return ComparePeriod.FourWeeks;
+		default:
+			throw new Error(`Unknown period value: ${comparePeriod}`);
+	}
+}
+
+export function calculateCompareTimeInterval(comparePeriod: ComparePeriod): TimeInterval {
 	let compareTimeInterval;
 	switch (comparePeriod) {
-		case 'day':
+		case ComparePeriod.Day:
 			compareTimeInterval = new TimeInterval(moment().subtract(2, 'days'), moment());
 			break;
-		case 'week':
+		case ComparePeriod.Week:
 			compareTimeInterval = new TimeInterval(moment().startOf('week').subtract(7, 'days'), moment());
 			break;
-		case 'month':
+		case ComparePeriod.FourWeeks:
 			compareTimeInterval = new TimeInterval(moment().startOf('week').subtract(49, 'days'), moment());
 			break;
 		default:
@@ -27,17 +42,17 @@ export function calculateCompareTimeInterval(comparePeriod: string): TimeInterva
 	return compareTimeInterval;
 }
 
-export function calculateCompareDuration(comparePeriod: string): moment.Duration {
+export function calculateCompareDuration(comparePeriod: ComparePeriod): moment.Duration {
 	let compareDuration;
 	switch (comparePeriod) {
-		case 'day':
+		case ComparePeriod.Day:
 			// fetch hours for accuracy when time interval is small
 			compareDuration = moment.duration(1, 'hours');
 			break;
-		case 'week':
+		case ComparePeriod.Week:
 			compareDuration = moment.duration(1, 'days');
 			break;
-		case 'month':
+		case ComparePeriod.FourWeeks:
 			compareDuration = moment.duration(1, 'days');
 			break;
 		default:
@@ -55,14 +70,14 @@ export interface ComparePeriodLabels {
  * Determines the human-readable names of a comparison period.
  * @param comparePeriod the machine-readable name of the period
  */
-export function getComparePeriodLabels(comparePeriod: string): ComparePeriodLabels {
+export function getComparePeriodLabels(comparePeriod: ComparePeriod): ComparePeriodLabels {
 	switch (comparePeriod) {
-		case 'day':
-			return {prev: 'Yesterday', current: 'Today'};
-		case 'week':
-			return {prev: 'Last week', current: 'This week'};
-		case 'month':
-			return {prev: 'Last four weeks', current: 'This four weeks'};
+		case ComparePeriod.Day:
+			return { prev: 'Yesterday', current: 'Today' };
+		case ComparePeriod.Week:
+			return { prev: 'Last Week', current: 'This Week' };
+		case ComparePeriod.FourWeeks:
+			return { prev: 'Last four weeks', current: 'This four weeks' };
 		default:
 			throw new Error(`Unknown period value: ${comparePeriod}`);
 	}

@@ -11,6 +11,7 @@ import { TimeInterval } from '../../../common/TimeInterval';
 import { Dispatch, Thunk, ActionType } from '../types/redux/actions';
 import { State } from '../types/redux/state';
 import * as t from '../types/redux/graph';
+import { ComparePeriod } from '../utils/calculateCompare';
 
 export function changeChartToRender(chartType: t.ChartTypes): t.ChangeChartToRenderAction {
 	return { type: ActionType.ChangeChartToRender, chartType };
@@ -55,11 +56,11 @@ export function changeBarDuration(barDuration: moment.Duration): Thunk {
 	};
 }
 
-function updateComparePeriod(comparePeriod: string): t.UpdateComparePeriodAction {
+function updateComparePeriod(comparePeriod: ComparePeriod): t.UpdateComparePeriodAction {
 	return { type: ActionType.UpdateComparePeriod, comparePeriod };
 }
 
-export function changeCompareGraph(comparePeriod: string): Thunk {
+export function changeCompareGraph(comparePeriod: ComparePeriod): Thunk {
 	return (dispatch: Dispatch) => {
 		return Promise.all([
 			dispatch(updateComparePeriod(comparePeriod)),
@@ -122,7 +123,7 @@ export interface LinkOptions {
 	chartType?: t.ChartTypes;
 	barDuration?: moment.Duration;
 	toggleBarStacking?: boolean;
-	comparePeriod?: string;
+	comparePeriod?: ComparePeriod;
 }
 
 /**

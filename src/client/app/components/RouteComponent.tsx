@@ -16,6 +16,7 @@ import { LinkOptions } from 'actions/graph';
 import { getToken, hasToken } from '../utils/token';
 import { showErrorNotification } from '../utils/notifications';
 import { ChartTypes } from '../types/redux/graph';
+import {ComparePeriod, validateComparePeriod} from '../utils/calculateCompare';
 
 interface RouteProps {
 	barStacking: boolean ;
@@ -89,7 +90,7 @@ export default class RouteComponent extends React.Component<RouteProps, {}> {
 							}
 							break;
 						case 'comparePeriod':
-							options.comparePeriod = info.toString();
+							options.comparePeriod = validateComparePeriod(info.toString());
 							break;
 						default:
 							throw new Error('Unknown query parameter');

@@ -6,13 +6,14 @@ import * as moment from 'moment';
 import { TimeInterval } from '../../../common/TimeInterval';
 import { GraphAction, GraphState, ChartTypes } from '../types/redux/graph';
 import { ActionType } from '../types/redux/actions';
+import { ComparePeriod } from '../utils/calculateCompare';
 
 const defaultState: GraphState = {
 	selectedMeters: [],
 	selectedGroups: [],
 	timeInterval: TimeInterval.unbounded(),
-	barDuration: moment.duration(1, 'month'),
-	comparePeriod: 'week',
+	barDuration: moment.duration(4, 'weeks'),
+	comparePeriod: ComparePeriod.Week,
 	chartToRender: ChartTypes.line,
 	barStacking: false,
 	hotlinked: false

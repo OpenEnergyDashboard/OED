@@ -10,7 +10,13 @@ import * as moment from 'moment';
 import { connect } from 'react-redux';
 import { State } from '../types/redux/state';
 import * as datalabels from 'chartjs-plugin-datalabels';
-import {calculateCompareDuration, calculateCompareTimeInterval, getComparePeriodLabels, getCompareChangeSummary} from '../utils/calculateCompare';
+import {
+	ComparePeriod,
+	calculateCompareDuration,
+	calculateCompareTimeInterval,
+	getComparePeriodLabels,
+	getCompareChangeSummary
+} from '../utils/calculateCompare';
 
 if (datalabels === null || datalabels === undefined) {
 	throw new Error('Datalabels plugin was tree-shaken out.');
@@ -43,11 +49,11 @@ function mapStateToProps(state: State, ownProps: CompareChartContainerProps) {
 
 	const datasets: ChartDataSetsWithDatalabels[] = [];
 	const labels: string[] = [];
-	// Power used so far this week
+	// Power used so far this Week
 	let currentPeriodUsage = 0;
-	// Last week total usage
+	// Last Week total usage
 	let lastPeriodTotalUsage = 0;
-	// Power used up to this point last week
+	// Power used up to this point last Week
 	let usedToThisPointLastTimePeriod = 0;
 	// How long it's been since start of measure period
 	let timeSincePeriodStart;
@@ -61,7 +67,7 @@ function mapStateToProps(state: State, ownProps: CompareChartContainerProps) {
 		return 'red';
 	};
 
-	let readingsData: {isFetching: boolean, readings?: Array<[number, number]>} | undefined ;
+	let readingsData: { isFetching: boolean, readings?: Array<[number, number]> } | undefined ;
 	if (ownProps.isGroup) {
 		const readingsDataByID = state.readings.bar.byGroupID[ownProps.id];
 		const readingsDataByTimeInterval = readingsDataByID[timeInterval.toString()];
@@ -72,12 +78,12 @@ function mapStateToProps(state: State, ownProps: CompareChartContainerProps) {
 		readingsData = readingsDataByTimeInterval[barDuration.toISOString()];
 	}
 	if (readingsData !== undefined && !readingsData.isFetching && readingsData.readings !== undefined) {
-		if (state.graph.comparePeriod === 'day') {
+		if (state.graph.comparePeriod === ComparePeriod.Day) {
 			timeSincePeriodStart = moment().hour();
-		} else if (state.graph.comparePeriod === 'week') {
+		} else if (state.graph.comparePeriod === ComparePeriod.Week) {
 			timeSincePeriodStart = moment().diff(moment().startOf('week'), 'days');
 		} else {
-			// 21 to differentiate from week case, week case never larger than 14
+			// 21 to differentiate from Week case, Week case never larger than 14
 			timeSincePeriodStart = moment().diff(moment().startOf('week').subtract(21, 'days'), 'days');
 		}
 
@@ -94,7 +100,7 @@ function mapStateToProps(state: State, ownProps: CompareChartContainerProps) {
 			lastPeriodTotalUsage += readingsData.readings[i][1];
 		}
 		// Calculates current for previous time interval
-		// Have to special case Sunday for week and month
+		// Have to special case Sunday for Week and FourWeeks
 		if (timeSincePeriodStart === 0) {
 			usedToThisPointLastTimePeriod = Math.round((readingsData.readings[0][1] / 24) * moment().hour());
 		} else {
