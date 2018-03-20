@@ -36,7 +36,8 @@ interface CompareChartContainerProps {
 
 function mapStateToProps(state: State, ownProps: CompareChartContainerProps) {
 	const comparePeriod = state.graph.comparePeriod;
-	const timeInterval = calculateCompareTimeInterval(comparePeriod);
+	const timeInterval = state.graph.compareTimeInterval;
+	console.log(timeInterval);
 	const barDuration = calculateCompareDuration(comparePeriod);
 
 	// The name of the entity for which compare data is being computed.

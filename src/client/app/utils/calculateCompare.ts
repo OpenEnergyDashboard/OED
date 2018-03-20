@@ -24,17 +24,17 @@ export function validateComparePeriod(comparePeriod: string): ComparePeriod {
 	}
 }
 
-export function calculateCompareTimeInterval(comparePeriod: ComparePeriod): TimeInterval {
+export function calculateCompareTimeInterval(comparePeriod: ComparePeriod, currentTime: moment.Moment): TimeInterval {
 	let compareTimeInterval;
 	switch (comparePeriod) {
 		case ComparePeriod.Day:
-			compareTimeInterval = new TimeInterval(moment().subtract(2, 'days'), moment());
+			compareTimeInterval = new TimeInterval(moment().subtract(2, 'days'), currentTime);
 			break;
 		case ComparePeriod.Week:
-			compareTimeInterval = new TimeInterval(moment().startOf('week').subtract(7, 'days'), moment());
+			compareTimeInterval = new TimeInterval(moment().startOf('week').subtract(7, 'days'), currentTime);
 			break;
 		case ComparePeriod.FourWeeks:
-			compareTimeInterval = new TimeInterval(moment().startOf('week').subtract(49, 'days'), moment());
+			compareTimeInterval = new TimeInterval(moment().startOf('week').subtract(49, 'days'), currentTime);
 			break;
 		default:
 			throw new Error(`Unknown period value: ${comparePeriod}`);

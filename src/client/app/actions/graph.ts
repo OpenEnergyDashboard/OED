@@ -57,7 +57,11 @@ export function changeBarDuration(barDuration: moment.Duration): Thunk {
 }
 
 function updateComparePeriod(comparePeriod: ComparePeriod): t.UpdateComparePeriodAction {
-	return { type: ActionType.UpdateComparePeriod, comparePeriod };
+	return {
+		type: ActionType.UpdateComparePeriod,
+		comparePeriod,
+		currentTime: moment()
+	};
 }
 
 export function changeCompareGraph(comparePeriod: ComparePeriod): Thunk {

@@ -44,7 +44,8 @@ export interface ChangeGraphZoomAction {
 
 export interface UpdateComparePeriodAction {
 	type: ActionType.UpdateComparePeriod;
-	comparePeriod: string;
+	comparePeriod: ComparePeriod;
+	currentTime: moment.Moment;
 }
 
 export interface SetHotlinked {
@@ -68,6 +69,7 @@ export interface GraphState {
 	timeInterval: TimeInterval;
 	barDuration: moment.Duration;
 	comparePeriod: ComparePeriod;
+	compareTimeInterval: TimeInterval;
 	chartToRender: ChartTypes;
 	barStacking: boolean;
 	hotlinked: boolean;
