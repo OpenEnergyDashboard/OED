@@ -147,7 +147,7 @@ router.post('/create', async (req, res) => {
 			res.sendStatus(200);
 		} catch (err) {
 			if (err.toString() === 'error: duplicate key value violates unique constraint "groups_name_key"') {
-				res.status(400).json({error: `Group "${req.body.name}" is already in use.`}); 
+				res.status(400).json({error: `Group "${req.body.name}" is already in use.`});
 			} else {
 				log.error(`Error while inserting new group ${err}`, err);
 				res.sendStatus(500);
