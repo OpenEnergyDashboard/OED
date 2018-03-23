@@ -16,7 +16,7 @@ const Migration = require('../../models/Migration');
 const { migrateAll } = require('../../migrations/migrateDatabase');
 
 
-const versionLists = ['0.1.0-0.2.0', '0.2.0-0.3.0', '0.1.0-0.4.0', '0.2.0-0.5.0'];
+const versionLists = ['0.100.0-0.200.0', '0.200.0-0.300.0', '0.100.0-0.400.0', '0.200.0-0.500.0'];
 const migrationList = [];
 let isCalled = [false, false, false, false];
 
@@ -39,24 +39,24 @@ for (let i = 0; i < versionLists.length; i++) {
 mocha.describe('Migration Valid', () => {
 	mocha.beforeEach(recreateDB);
 	mocha.beforeEach(async () => {
-		await new Migration(undefined, '0.0.0', '0.1.0').insert(db);
+		await new Migration(undefined, '0.0.0', '0.100.0').insert(db);
 	});
 
 	mocha.it('should call correct up method for and insert new row into database', async () => {
-		await migrateAll('0.3.0', migrationList);
+		await migrateAll('0.300.0', migrationList);
 		const afterCalled = [true, true, false, false];
 		expect(isCalled).to.deep.equal(afterCalled);
-		expect('0.3.0').to.equal(await Migration.getCurrentVersion());
+		expect('0.300.0').to.equal(await Migration.getCurrentVersion());
 	});
 
 	mocha.it('should find the shortest path to upgrade', async () => {
 		(async () => {
 			isCalled = [false, false, false, false];
-			await migrateAll('0.3.0', migrationList);
-			migrationList[2] = '0.1.0-0.4.0';
+			await migrateAll('0.300.0', migrationList);
+			migrationList[2] = '0.100.0-0.400.0';
 			const afterCalled = [false, false, true, false];
 			expect(isCalled).to.deep.equal(afterCalled);
-			expect('0.4.0').to.equal(Migration.getCurrentVersion());
+			expect('0.400.0').to.equal(Migration.getCurrentVersion());
 		})();
 	});
 });

@@ -35,7 +35,7 @@ class Migration {
 	static async insertDefaultMigration() {
 		const version = `${VERSION.major}.${VERSION.minor}.${VERSION.patch}`;
 		await db.tx(async t => {
-			const migration = new Migration(undefined, '0.0.0', version);
+			const migration = new Migration(undefined, undefined, version);
 			migration.insert(t);
 		});
 	}

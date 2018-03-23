@@ -16,7 +16,7 @@ const Migration = require('../../models/Migration');
 const { migrateAll } = require('../../migrations/migrateDatabase');
 
 
-const versionLists = ['0.1.0-0.2.0', '0.2.0-0.3.0', '0.3.0-0.1.0', '0.1.0-0.4.0', '0.2.1-0.5.0'];
+const versionLists = ['0.100.0-0.200.0', '0.200.0-0.300.0', '0.300.0-0.100.0', '0.100.0-0.400.0', '0.200.1-0.500.0'];
 const migrationList = [];
 const called = [false, false, false, false, false];
 
@@ -39,12 +39,12 @@ for (let i = 0; i < versionLists.length; i++) {
 mocha.describe('Migration Invalid', () => {
 	mocha.beforeEach(recreateDB);
 	mocha.beforeEach(async () => {
-		await new Migration(undefined, '0.0.0', '0.1.0').insert(db);
+		await new Migration(undefined, '0.0.0', '0.100.0').insert(db);
 	});
 
 	mocha.it('should fail because of down migration', async () => {
 		expect(async () => {
-			await migrateAll('0.5.0', migrationList)
+			await migrateAll('0.500.0', migrationList)
 				.to.throw(new Error('Should not downgrade, please check .js'));
 		});
 	});
@@ -52,23 +52,23 @@ mocha.describe('Migration Invalid', () => {
 	mocha.it('should fail because there is no path', async () => {
 		const list = migrationList.filter(e => e.fromVersion !== '0.3.0');
 		expect(async () => {
-			await migrateAll('0.5.0', list)
+			await migrateAll('0.500.0', list)
 				.to.throw(new Error('No path found'));
 		});
 	});
 
 	mocha.it('should fail because there is no version in the list', async () => {
-		const list = migrationList.filter(e => e.fromVersion !== '0.3.0');
+		const list = migrationList.filter(e => e.fromVersion !== '0.300.0');
 		expect(async () => {
-			await migrateAll('0.6.0', list)
+			await migrateAll('0.600.0', list)
 				.to.throw(new Error('Did not find version in migration list'));
 		});
 	});
 
 	mocha.it('should fail because the current version is the highest Version', async () => {
-		const list = migrationList.filter(e => e.fromVersion !== '0.3.0');
+		const list = migrationList.filter(e => e.fromVersion !== '0.300.0');
 		expect(async () => {
-			await migrateAll('0.1.0', list)
+			await migrateAll('0.100.0', list)
 				.to.throw(new Error('You have the highest version'));
 		});
 	});
