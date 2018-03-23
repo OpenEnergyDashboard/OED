@@ -38,7 +38,7 @@ router.get('/line/meters/:meter_ids', async (req, res) => {
 		required: ['meter_ids'],
 		properties: {
 			meter_ids: {
-				type: 'number'
+				type: 'string'
 			}
 		}
 	};
@@ -82,7 +82,7 @@ router.get('/line/groups/:group_ids', async (req, res) => {
 		required: ['group_ids'],
 		properties: {
 			group_ids: {
-				type: 'number'
+				type: 'string'
 			}
 		}
 	};
@@ -127,7 +127,7 @@ router.get('/bar/meters/:meter_ids', async (req, res) => {
 		required: ['meter_ids'],
 		properties: {
 			meter_ids: {
-				type: 'number'
+				type: 'string'
 			}
 		}
 	};
@@ -176,7 +176,7 @@ router.get('/bar/groups/:group_ids', async (req, res) => {
 		required: ['group_ids'],
 		properties: {
 			group_ids: {
-				type: 'number'
+				type: 'string'
 			}
 		}
 	};

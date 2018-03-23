@@ -41,7 +41,7 @@ router.get('/:meter_id', async (req, res) => {
 		required: ['meter_id'],
 		properties: {
 			meter_id: {
-				type: 'number'
+				type: 'string'
 			}
 		}
 	};

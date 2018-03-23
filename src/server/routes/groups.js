@@ -63,7 +63,7 @@ router.get('/deep/groups/:group_id', async (req, res) => {
 		required: ['group_id'],
 		properties: {
 			group_id: {
-				type: 'number'
+				type: 'string'
 			}
 		}
 	};
@@ -87,7 +87,7 @@ router.get('/deep/meters/:group_id', async (req, res) => {
 		required: ['group_id'],
 		properties: {
 			group_id: {
-				type: 'number'
+				type: 'string'
 			}
 		}
 	};
