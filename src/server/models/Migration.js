@@ -4,6 +4,7 @@
 
 const database = require('./database');
 const { findMaxSemanticVersion } = require('../util');
+const { VERSION } = require('../version');
 
 const db = database.db;
 const sqlFile = database.sqlFile;
@@ -26,8 +27,14 @@ class Migration {
 	 * Returns a promise to create the migration table.
 	 * @return {Promise.<>}
 	 */
-	static createTable() {
-		return db.none(sqlFile('migration/create_migration_table.sql'));
+	static async createTable() {
+		await db.none(sqlFile('migration/create_migration_table.sql'));
+		await Migration.insertDefaultMigration();
+	}
+
+	static async insertDefaultMigration() {
+		const migration = new Migration(undefined, '0.0.0', VERSION);
+		await migration.insert(db);
 	}
 
 	/**
