@@ -189,6 +189,24 @@ mocha.describe('Compressed Readings 2', () => {
 			const rowWidth = moment.duration(aRow.end_timestamp.diff(aRow.start_timestamp));
 			expect(rowWidth.asDays()).to.equal(1);
 		});
+
+		mocha.it('Correctly shrinks infinite intervals', async () => {
+			// TODO: Test infinite range with bounded timestamp to ensure proper shrink
+			const yearStart = moment('2018-01-01');
+			const yearEnd = yearStart.clone().add(1, 'year');
+
+			await Reading.insertAll([
+				new Reading(meter.id, 100, yearStart, yearEnd)
+			]);
+
+			await Reading.refreshCompressedReadings();
+			const allReadings = await Reading.getNewCompressedReadings([meter.id], null, null);
+			const meterReadings = allReadings[meter.id];
+			expect(meterReadings.length).to.equal(365); // 365 days in a year
+			const aRow = meterReadings[0];
+			const rowWidth = moment.duration(aRow.end_timestamp.diff(aRow.start_timestamp));
+			expect(rowWidth.asDays()).to.equal(1);
+		});
 	});
 
 	mocha.describe('Compressed group readings', () => {

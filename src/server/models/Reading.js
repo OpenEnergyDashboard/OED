@@ -258,11 +258,11 @@ class Reading {
 	 * @param conn the connection to use. Defaults to the default database connection.
 	 * @return {Promise<object<int, array<{reading_rate: number, start_timestamp: }>>>}
 	 */
-	static async getNewCompressedReadings(meterIDs, fromTimestamp, toTimestamp, conn = db) {
+	static async getNewCompressedReadings(meterIDs, fromTimestamp = null, toTimestamp = null, conn = db) {
 		/**
 		 * @type {array<{meter_id: int, reading_rate: Number, start_timestamp: Moment, end_timestamp: Moment}>}
 		 */
-		const allCompressedReadings = await conn.func('compressed_readings_2', [meterIDs, fromTimestamp, toTimestamp]);
+		const allCompressedReadings = await conn.func('compressed_readings_2', [meterIDs, fromTimestamp || '-infinity', toTimestamp || 'infinity']);
 
 		const compressedReadingsByMeterID = mapToObject(meterIDs, () => []);
 		for (const row of allCompressedReadings) {
