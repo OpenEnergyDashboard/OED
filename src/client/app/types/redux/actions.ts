@@ -58,6 +58,7 @@ export enum ActionType {
 	UpdateDisplayTitle = 'UPDATE_DISPLAY_TITLE',
 	UpdateDefaultChartToRender = 'UPDATE_DEFAULT_CHART_TO_RENDER',
 	ToggleDefaultBarStacking = 'TOGGLE_DEFAULT_BAR_STACKING',
+	UpdateDefaultLanguage= 'UPDATE_DEFAULT_LANGUAGE',
 	RequestPreferences = 'REQUEST_PREFERENCES',
 	ReceivePreferences = 'RECEIVE_PREFERENCES',
 	MarkPreferencesNotSubmitted = 'MARK_PREFERENCES_NOT_SUBMITTED',

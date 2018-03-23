@@ -10,6 +10,7 @@ import * as t from '../types/redux/admin';
 import { ActionType, Dispatch, GetState, Thunk } from '../types/redux/actions';
 import { State } from '../types/redux/state';
 import { preferencesApi } from '../utils/api';
+import { LanguageTypes } from '../types/i18n';
 
 
 export function updateSelectedMeter(meterID: number): t.UpdateImportMeterAction {
@@ -28,6 +29,10 @@ export function toggleDefaultBarStacking(): t.ToggleDefaultBarStackingAction {
 	return { type: ActionType.ToggleDefaultBarStacking };
 }
 
+export function updateDefaultLanguage(defaultLanguage: LanguageTypes): t.UpdateDefaultLanguageAction {
+	return { type: ActionType.UpdateDefaultLanguage, defaultLanguage };
+}
+
 function requestPreferences(): t.RequestPreferencesAction {
 	return { type: ActionType.RequestPreferences };
 }
@@ -43,7 +48,6 @@ function markPreferencesNotSubmitted(): t.MarkPreferencesNotSubmittedAction {
 function markPreferencesSubmitted(): t.MarkPreferencesSubmittedAction {
 	return { type: ActionType.MarkPreferencesSubmitted };
 }
-
 
 function fetchPreferences(): Thunk {
 	return async (dispatch: Dispatch, getState: GetState) => {
@@ -69,7 +73,8 @@ function submitPreferences() {
 			await preferencesApi.submitPreferences({
 				displayTitle: state.admin.displayTitle,
 				defaultChartToRender: state.admin.defaultChartToRender,
-				defaultBarStacking: state.admin.defaultBarStacking
+				defaultBarStacking: state.admin.defaultBarStacking,
+				defaultLanguage: state.admin.defaultLanguage
 			});
 			dispatch(markPreferencesSubmitted());
 			showSuccessNotification('Updated preferences');

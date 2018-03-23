@@ -19,10 +19,12 @@ import { LinkOptions } from 'actions/graph';
 import { getToken, hasToken } from '../utils/token';
 import { showErrorNotification } from '../utils/notifications';
 import { ChartTypes } from '../types/redux/graph';
+import { LanguageTypes } from '../types/i18n';
 import { verificationApi } from '../utils/api';
 
 interface RouteProps {
-	barStacking: boolean ;
+	barStacking: boolean;
+	defaultLanguage: LanguageTypes;
 	changeOptionsFromLink(options: LinkOptions): Promise<any[]>;
 }
 
@@ -111,12 +113,17 @@ export default class RouteComponent extends React.Component<RouteProps, {}> {
 	 */
 	public render() {
 		addLocaleData([...en, ...fr]);
-		const lang = 'fr';
-		const messages = (localeData as any).fr;
+		const lang = this.props.defaultLanguage;
+		let messages;
+		if (lang === 'fr') {
+			messages = (localeData as any).fr;
+		} else {
+			messages = (localeData as any).en;
+		}
 		return (
 			<div>
 				<InitializationContainer />
-				<IntlProvider locale={lang} messages={messages}>
+				<IntlProvider locale={lang} messages={messages} key={lang}>
 					<Router history={browserHistory}>
 						<Route path='/login' component={LoginComponent} />
 						<Route path='/admin' component={AdminContainer} onEnter={this.requireAuth} />
@@ -127,10 +134,5 @@ export default class RouteComponent extends React.Component<RouteProps, {}> {
 				</IntlProvider>
 			</div>
 		);
-	}
-
-	public shouldComponentUpdate() {
-		// To ignore warning: [react-router] You cannot change 'Router routes'; it will be ignored
-		return false;
 	}
 }

@@ -4,12 +4,14 @@
 
 import { PreferenceRequestItem, SelectOption } from '../items';
 import { ChartTypes } from './graph';
+import { LanguageTypes } from '../i18n';
 import { ActionType } from './actions';
 
 export type AdminAction =
 	| UpdateImportMeterAction
 	| UpdateDisplayTitleAction
 	| UpdateDefaultChartToRenderAction
+	| UpdateDefaultLanguageAction
 	| ToggleDefaultBarStackingAction
 	| RequestPreferencesAction
 	| ReceivePreferencesAction
@@ -35,6 +37,11 @@ export interface ToggleDefaultBarStackingAction {
 	type: ActionType.ToggleDefaultBarStacking;
 }
 
+export interface UpdateDefaultLanguageAction {
+	type: ActionType.UpdateDefaultLanguage;
+	defaultLanguage: LanguageTypes;
+}
+
 export interface RequestPreferencesAction {
 	type: ActionType.RequestPreferences;
 }
@@ -57,6 +64,7 @@ export interface AdminState {
 	displayTitle: string;
 	defaultChartToRender: ChartTypes;
 	defaultBarStacking: boolean;
+	defaultLanguage: LanguageTypes;
 	isFetching: boolean;
 	submitted: boolean;
 }

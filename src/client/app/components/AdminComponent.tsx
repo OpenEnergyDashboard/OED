@@ -14,21 +14,25 @@ import {
 	ToggleDefaultBarStackingAction,
 	UpdateDefaultChartToRenderAction,
 	UpdateDisplayTitleAction,
+	UpdateDefaultLanguageAction,
 	UpdateImportMeterAction } from '../types/redux/admin';
 import { SelectOption } from '../types/items';
 import SingleSelectComponent from './SingleSelectComponent';
 import { metersApi } from '../utils/api';
+import { LanguageTypes } from '../types/i18n';
 
 interface AdminProps {
 	displayTitle: string;
 	defaultChartToRender: ChartTypes;
 	defaultBarStacking: boolean;
+	defaultLanguage: LanguageTypes;
 	disableSubmitPreferences: boolean;
 	selectedImportMeter: SelectOption;
 	meters: SelectOption[];
 	updateSelectedImportMeter(meterID: number): UpdateImportMeterAction;
 	updateDisplayTitle(title: string): UpdateDisplayTitleAction;
 	updateDefaultChartType(defaultChartToRender: ChartTypes): UpdateDefaultChartToRenderAction;
+	updateDefaultLanguage(defaultLanguage: LanguageTypes): UpdateDefaultLanguageAction;
 	toggleDefaultBarStacking(): ToggleDefaultBarStackingAction;
 	submitPreferences(): Promise<void>;
 }
@@ -39,6 +43,7 @@ export default class AdminComponent extends React.Component<AdminProps, {}> {
 		this.handleDisplayTitleChange = this.handleDisplayTitleChange.bind(this);
 		this.handleDefaultChartToRenderChange = this.handleDefaultChartToRenderChange.bind(this);
 		this.handleDefaultBarStackingChange = this.handleDefaultBarStackingChange.bind(this);
+		this.handleDefaultLanguageChange = this.handleDefaultLanguageChange.bind(this);
 		this.handleSubmitPreferences = this.handleSubmitPreferences.bind(this);
 		this.handleFileToImport = this.handleFileToImport.bind(this);
 	}
@@ -127,6 +132,33 @@ export default class AdminComponent extends React.Component<AdminProps, {}> {
 									Default Bar stacking
 								</label>
 							</div>
+							<div>
+								<p style={labelStyle}>Default Language:</p>
+								<div className='radio'>
+									<label>
+										<input
+											type='radio'
+											name='languageTypes'
+											value={LanguageTypes.en}
+											onChange={this.handleDefaultLanguageChange}
+											checked={this.props.defaultLanguage === LanguageTypes.en}
+										/>
+										English
+									</label>
+								</div>
+								<div className='radio'>
+									<label>
+										<input
+											type='radio'
+											name='languageTypes'
+											value={LanguageTypes.fr}
+											onChange={this.handleDefaultLanguageChange}
+											checked={this.props.defaultLanguage === LanguageTypes.fr}
+										/>
+										French
+									</label>
+								</div>
+							</div>
 							<Button
 								type='submit'
 								onClick={this.handleSubmitPreferences}
@@ -160,13 +192,16 @@ export default class AdminComponent extends React.Component<AdminProps, {}> {
 		);
 	}
 
-
 	private handleDisplayTitleChange(e: { target: HTMLInputElement; }) {
 		this.props.updateDisplayTitle((e.target as HTMLInputElement).value);
 	}
 
 	private handleDefaultChartToRenderChange(e: React.FormEvent<HTMLInputElement>) {
 		this.props.updateDefaultChartType((e.target as HTMLInputElement).value as ChartTypes);
+	}
+
+	private handleDefaultLanguageChange(e: React.FormEvent<HTMLInputElement>) {
+		this.props.updateDefaultLanguage((e.target as HTMLInputElement).value as LanguageTypes);
 	}
 
 	private handleDefaultBarStackingChange() {
