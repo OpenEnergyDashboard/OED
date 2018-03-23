@@ -23,7 +23,6 @@ export default class AddReadingComponent extends React.Component<AddReadingProps
 	}
 
 	public handleFileToImport(files: File[]) {
-		// token passed as a header
 		if (!this.props.selectedImportMeter) {
 			showErrorNotification('Please select a meter');
 		} else {

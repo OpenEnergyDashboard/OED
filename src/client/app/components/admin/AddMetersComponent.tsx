@@ -25,20 +25,25 @@ export default class AddMetersComponent extends React.Component<AddMetersProps, 
 		reader.onload = () => {
 			const fileAsBinaryString = reader.result;
 			listValue = fileAsBinaryString.split(/\r?\n/);
-			for (const items of listValue) {
-				if (items.length === 0) {
-					listValue.splice(listValue.indexOf(items), 1);
+			if (listValue[0] !==  'ip') {
+				showErrorNotification('Incorrect file format');
+			} else {
+				listValue.splice(listValue.indexOf('ip'), 1);
+				for (const items of listValue) {
+					if (items.length === 0) {
+						listValue.splice(listValue.indexOf(items), 1);
+					}
 				}
+				meters = listValue;
+				fileProcessingApi.submitNewMeters(meters)
+					.then(() => {
+						showSuccessNotification('Successfully uploaded meters');
+						this.props.fetchMeterDetailsIfNeeded(true);
+					})
+					.catch(() => {
+						showErrorNotification('Error uploading meters');
+					});
 			}
-			meters = listValue;
-			fileProcessingApi.submitNewMeters(meters)
-			.then(() => {
-				showSuccessNotification('Successfully uploaded meters');
-				this.props.fetchMeterDetailsIfNeeded(true);
-			})
-			.catch(() => {
-				showErrorNotification('Error uploading meters');
-			});
 		};
 		reader.onabort = () => showErrorNotification('File reading was aborted');
 		reader.onerror = () => showErrorNotification('File reading has failed');
