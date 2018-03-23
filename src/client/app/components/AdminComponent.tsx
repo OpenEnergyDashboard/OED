@@ -20,6 +20,7 @@ import { SelectOption } from '../types/items';
 import SingleSelectComponent from './SingleSelectComponent';
 import { metersApi } from '../utils/api';
 import { LanguageTypes } from '../types/i18n';
+import { defineMessages, FormattedMessage, injectIntl, InjectedIntlProps, InjectedIntl } from 'react-intl';
 
 interface AdminProps {
 	displayTitle: string;
@@ -29,6 +30,7 @@ interface AdminProps {
 	disableSubmitPreferences: boolean;
 	selectedImportMeter: SelectOption;
 	meters: SelectOption[];
+	intl: InjectedIntl;
 	updateSelectedImportMeter(meterID: number): UpdateImportMeterAction;
 	updateDisplayTitle(title: string): UpdateDisplayTitleAction;
 	updateDefaultChartType(defaultChartToRender: ChartTypes): UpdateDefaultChartToRenderAction;
@@ -37,7 +39,7 @@ interface AdminProps {
 	submitPreferences(): Promise<void>;
 }
 
-export default class AdminComponent extends React.Component<AdminProps, {}> {
+class AdminComponent extends React.Component<AdminProps & InjectedIntlProps, {}> {
 	constructor(props: AdminProps) {
 		super(props);
 		this.handleDisplayTitleChange = this.handleDisplayTitleChange.bind(this);
@@ -67,6 +69,11 @@ export default class AdminComponent extends React.Component<AdminProps, {}> {
 		const smallMarginBottomStyle: React.CSSProperties = {
 			marginBottom: '5px'
 		};
+		const messages = defineMessages({
+			name: {	id: 'name' },
+			selectMeter: { id: 'select.meter' }
+		});
+		const { formatMessage } = this.props.intl;
 		return (
 			<div>
 				<HeaderContainer />
@@ -74,17 +81,21 @@ export default class AdminComponent extends React.Component<AdminProps, {}> {
 					<div className='row' style={marginBottomStyle}>
 						<div className='col-3'>
 							<div style={bottomPaddingStyle}>
-								<p style={titleStyle}>Default Site Title:</p>
+								<p style={titleStyle}>
+									<FormattedMessage id='default.site.title' />:
+								</p>
 								<Input
 									type='text'
-									placeholder='Name'
+									placeholder={formatMessage(messages.name)}
 									value={this.props.displayTitle}
 									onChange={this.handleDisplayTitleChange}
 									maxLength={50}
 								/>
 							</div>
 							<div>
-								<p style={labelStyle}>Default Graph Type:</p>
+								<p style={labelStyle}>
+									<FormattedMessage id='default.graph.type' />:
+								</p>
 								<div className='radio'>
 									<label>
 										<input
@@ -94,7 +105,7 @@ export default class AdminComponent extends React.Component<AdminProps, {}> {
 											onChange={this.handleDefaultChartToRenderChange}
 											checked={this.props.defaultChartToRender === ChartTypes.line}
 										/>
-										Line
+										<FormattedMessage id='line' />
 									</label>
 								</div>
 								<div className='radio'>
@@ -106,7 +117,7 @@ export default class AdminComponent extends React.Component<AdminProps, {}> {
 											onChange={this.handleDefaultChartToRenderChange}
 											checked={this.props.defaultChartToRender === ChartTypes.bar}
 										/>
-										Bar
+										<FormattedMessage id='bar' />
 									</label>
 								</div>
 								<div className='radio'>
@@ -118,22 +129,27 @@ export default class AdminComponent extends React.Component<AdminProps, {}> {
 											onChange={this.handleDefaultChartToRenderChange}
 											checked={this.props.defaultChartToRender === ChartTypes.compare}
 										/>
-										Compare
+										<FormattedMessage id='compare' />
 									</label>
 								</div>
 							</div>
 							<div className='checkbox'>
+								<p style={labelStyle}>
+									<FormattedMessage id='default.bar.stacking' />:
+								</p>
 								<label>
 									<input
 										type='checkbox'
 										onChange={this.handleDefaultBarStackingChange}
 										checked={this.props.defaultBarStacking}
 									/>
-									Default Bar stacking
+									<FormattedMessage id='bar.stacking' />
 								</label>
 							</div>
 							<div>
-								<p style={labelStyle}>Default Language:</p>
+								<p style={labelStyle}>
+									<FormattedMessage id='default.language' />:
+								</p>
 								<div className='radio'>
 									<label>
 										<input
@@ -155,7 +171,7 @@ export default class AdminComponent extends React.Component<AdminProps, {}> {
 											onChange={this.handleDefaultLanguageChange}
 											checked={this.props.defaultLanguage === LanguageTypes.fr}
 										/>
-										French
+										Français
 									</label>
 								</div>
 							</div>
@@ -164,24 +180,28 @@ export default class AdminComponent extends React.Component<AdminProps, {}> {
 								onClick={this.handleSubmitPreferences}
 								disabled={this.props.disableSubmitPreferences}
 							>
-								Submit
+								<FormattedMessage id='submit' />
 							</Button>
 						</div>
 					</div>
 					<div className='row'>
 						<div className='col-2'>
-							<p style={titleStyle}>Import meter readings:</p>
+							<p style={titleStyle}>
+								<FormattedMessage id='import.meter.readings' />:
+							</p>
 							<SingleSelectComponent
 								style={smallMarginBottomStyle}
 								options={this.props.meters}
 								selectedOption={this.props.selectedImportMeter}
-								placeholder='Select meter to import data'
+								placeholder={formatMessage(messages.selectMeter)}
 								onValueChange={s => this.props.updateSelectedImportMeter(s.value)}
 							/>
 							{/* TODO TYPESCRIPT: the dropzone expects onDrop to take an array of ImageFile, which doesn't make sense.*/}
 							{ this.props.selectedImportMeter &&
 							<Dropzone accept='text/csv, application/vnd.ms-excel,' onDrop={this.handleFileToImport}>
-								<div>Upload a CSV file:</div>
+								<div>
+									<FormattedMessage id='upload.csv' />
+								</div>
 							</Dropzone>
 							}
 						</div>
@@ -228,3 +248,5 @@ export default class AdminComponent extends React.Component<AdminProps, {}> {
 		}
 	}
 }
+
+export default injectIntl(AdminComponent);
