@@ -4,7 +4,7 @@
 
 const database = require('./database');
 const { findMaxSemanticVersion } = require('../util');
-const { VERSION } = require('../version');
+const VERSION = require('../version');
 
 const db = database.db;
 const sqlFile = database.sqlFile;
@@ -33,8 +33,11 @@ class Migration {
 	}
 
 	static async insertDefaultMigration() {
-		const migration = new Migration(undefined, '0.0.0', VERSION);
-		await migration.insert(db);
+		const version = `${VERSION.major}.${VERSION.minor}.${VERSION.patch}`;
+		await db.tx(async t => {
+			const migration = new Migration(undefined, '0.0.0', version);
+			migration.insert(t);
+		});
 	}
 
 	/**
