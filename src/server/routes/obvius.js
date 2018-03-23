@@ -2,10 +2,17 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
 
+/*
+ * This file implements the /api/obvius route. This route accepts data from Obvius meters, handling parameters
+ * passed in form/multipart, GET parameters, or POST body parameters.
+ */
+
 const express = require('express');
 const config = require('../config');
+const multer = require('multer');
 const { log } = require('../log');
 
+const upload = multer({ storage: multer.memoryStorage() });
 const router = express.Router();
 
 const MODE_STATUS = 'STATUS';
@@ -28,7 +35,7 @@ function failure(req, res, reason = '') {
 	log.error(`Obvius protocol request from ${ip} failed due to ${reason}`);
 
 	res.status(406) // 406 Not Acceptable error, as required by Obvius
-		.send(`<pre> ${reason} </pre>`);
+		.send(`<pre>\n${reason}\n</pre>\n`);
 }
 
 /**
@@ -41,7 +48,7 @@ function failure(req, res, reason = '') {
  */
 function success(req, res, comment = '') {
 	res.status(200) // 200 OK
-		.send(`<pre>\nSUCCESS\n ${comment} "</pre>`);
+		.send(`<pre>\nSUCCESS\n${comment}</pre>\n`);
 }
 /**
  * Logs a STATUS request for later examination.
@@ -72,7 +79,7 @@ function handleStatus(req, res) {
 }
 
 /**
- * A middleware to lowercase all params.
+ * A middleware to lowercase all params, including those passed by form/multipart
  */
 function lowercaseParams(req, res, next) {
 	for (const key of Object.entries(req.query)) {
@@ -88,10 +95,14 @@ function lowercaseParams(req, res, next) {
 	}
 	next();
 }
-router.use(lowercaseParams);
+// Here, the use of upload.array() allows the lowercaseParams middleware to integrate form/multipart data
+// into the generic parameter pipeline along with POST and GET params.
+router.use(upload.array(), lowercaseParams);
 
 /**
- * A middleware to add our params mixin
+ * A middleware to add our params mixin.
+ * This mixin adds a function, req.param, which when combined with the above code allows
+ * all types of parameters (GET query parameters)
  */
 router.use((req, res, next) => {
 	// Mixin for getting parameters from any possible method.
@@ -124,8 +135,6 @@ router.all('/', async (req, res) => {
 	// Log the IP of the requester
 	const ip = req.headers['x-forwarded-for'] || req.connection.remoteAddress;
 	log.info(`Received Obvious protocol request from ${ip}`);
-
-	log.info(`Received body: ${JSON.stringify(req.body)}`);
 
 	// Attempt to verify the password
 	if (!req.param('password')) {
