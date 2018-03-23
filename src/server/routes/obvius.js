@@ -5,6 +5,11 @@
 /*
  * This file implements the /api/obvius route. This route accepts data from Obvius meters, handling parameters
  * passed in form/multipart, GET parameters, or POST body parameters.
+ *
+ * STATUS mode requests are logged.
+ *
+ * CONFIGFILEMANIFEST requests are responded to with a dummy manifest which specifies
+ * 					  a lack of config files to respond with.
  */
 
 const express = require('express');
@@ -21,6 +26,8 @@ const MODE_CONFIG_MANIFEST = 'CONFIGFILEMANIFEST';
 const MODE_CONFIG_UPLOAD = 'CONFIGFILEUPLOAD';
 const MODE_CONFIG_DOWNLOAD = 'CONFIGFILEDOWNLOAD';
 const MODE_TEST = 'MODE_TEST';
+
+const LOGFILE_FILENAME = 'LOGFILE';
 
 /**
  * Inform the client of a failure (406 Not Acceptable), and log it.
@@ -97,7 +104,7 @@ function lowercaseParams(req, res, next) {
 }
 // Here, the use of upload.array() allows the lowercaseParams middleware to integrate form/multipart data
 // into the generic parameter pipeline along with POST and GET params.
-router.use(upload.array(), lowercaseParams);
+router.use(upload.single(LOGFILE_FILENAME), lowercaseParams);
 
 /**
  * A middleware to add our params mixin.
@@ -157,6 +164,7 @@ router.all('/', async (req, res) => {
 	}
 
 	if (mode === MODE_LOGFILE_UPLOAD) {
+		log.info(`Received file: ${req.file}`);
 		failure(req, res, 'Logfile Upload Not Implemented');
 		return;
 	}
@@ -167,7 +175,11 @@ router.all('/', async (req, res) => {
 	}
 
 	if (mode === MODE_CONFIG_MANIFEST) {
-		failure(req, res, 'Config Manifest Not Implemented');
+		// Returns a dummy config manifest.
+		// The blank/empty timestamp will always indicate an out-of-date manifest.
+		// The checksum is a dummy.
+		const response = 'CONFIGFILE,loggerconfig.ini,42a48182862fa5044d1ac7b294bc6f97,0000-00-00 00:00:00\n';
+		success(req, res, response);
 		return;
 	}
 
