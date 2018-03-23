@@ -125,6 +125,69 @@ mocha.describe('Compressed Readings 2', () => {
 				expect(duration.asMilliseconds()).to.equal(moment.duration(1, 'minute').asMilliseconds());
 				expect(reading.reading_rate).to.be.closeTo(100 / 24, 0.00001)
 			}
+
+			expect(readingsForMeter.length).to.equal(24 * 60); // minutes in a day
+		});
+
+		mocha.it('Retrieves the correct number of readings when asked for a short interval', async () => {
+			const dayStart = moment('2018-01-01');
+			const dayEnd = dayStart.clone().add(1, 'day');
+
+			await Reading.insertAll([
+				new Reading(meter.id, 100, dayStart, dayEnd)
+			]);
+
+			await Reading.refreshCompressedReadings();
+
+			const meterReadings = await Reading.getNewCompressedReadings([meter.id], dayStart, dayStart.clone().add(1, 'minute'));
+
+			expect(meterReadings[meter.id].length).to.equal(1);
+		});
+		mocha.it('Retrieves the correct number of readings when asked for a long interval', async () => {
+			const dayStart = moment('2018-01-01');
+			const dayEnd = dayStart.clone().add(1, 'day');
+
+			await Reading.insertAll([
+				new Reading(meter.id, 100, dayStart, dayEnd)
+			]);
+
+			await Reading.refreshCompressedReadings();
+
+			const meterReadings = await Reading.getNewCompressedReadings([meter.id], dayStart, dayStart.clone().add(1, 'hours'));
+			expect(meterReadings[meter.id].length).to.equal(60);
+		});
+
+		mocha.it('Retrieves the correct type of readings when asked for an hour-resolution interval', async () => {
+			const yearStart = moment('2018-01-01');
+			const yearEnd = yearStart.clone().add(1, 'year');
+
+			await Reading.insertAll([
+				new Reading(meter.id, 100, yearStart, yearEnd)
+			]);
+
+			await Reading.refreshCompressedReadings();
+			const allReadings = await Reading.getNewCompressedReadings([meter.id], yearStart, yearStart.clone().add(60, 'hours'));
+			const meterReadings = allReadings[meter.id];
+			expect(meterReadings.length).to.equal(60);
+			const aRow = meterReadings[0];
+			const rowWidth = moment.duration(aRow.end_timestamp.diff(aRow.start_timestamp));
+			expect(rowWidth.asHours()).to.equal(1);
+		});
+		mocha.it('Retrieves the correct type of readings when asked for a day-resolution interval', async () => {
+			const yearStart = moment('2018-01-01');
+			const yearEnd = yearStart.clone().add(1, 'year');
+
+			await Reading.insertAll([
+				new Reading(meter.id, 100, yearStart, yearEnd)
+			]);
+
+			await Reading.refreshCompressedReadings();
+			const allReadings = await Reading.getNewCompressedReadings([meter.id], yearStart, yearStart.clone().add(60, 'days'));
+			const meterReadings = allReadings[meter.id];
+			expect(meterReadings.length).to.equal(60);
+			const aRow = meterReadings[0];
+			const rowWidth = moment.duration(aRow.end_timestamp.diff(aRow.start_timestamp));
+			expect(rowWidth.asDays()).to.equal(1);
 		});
 	});
 

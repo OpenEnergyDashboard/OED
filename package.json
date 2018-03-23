@@ -98,7 +98,7 @@
     "mocha": "~3.5.3",
     "mock-require": "~2.0.2",
     "redux-devtools": "~3.4.0",
-    "sinon": "~4.0.2",
+    "sinon": "~4.4.6",
     "source-map-loader": "~0.2.3",
     "style-loader": "~0.19.0",
     "tslint": "~5.8.0",

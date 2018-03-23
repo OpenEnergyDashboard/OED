@@ -169,16 +169,17 @@ BEGIN
 				lower(daily.time_interval) AS start_timestamp,
 				upper(daily.time_interval) AS end_timestamp
 			FROM daily_readings daily
-			INNER JOIN unnest(meter_ids) meters(id) ON daily_readings.meter_id = meters.id
+			INNER JOIN unnest(meter_ids) meters(id) ON daily.meter_id = meters.id
 			WHERE requested_range @> time_interval;
-	ELSIF extract(HOURS FROM requested_interval) >= minimum_num_pts THEN
+	-- There's no quick way to get the number of hours in an interval. extract(HOURS FROM '1 day, 3 hours') gives 3.
+	ELSIF extract(EPOCH FROM requested_interval)/3600 >= minimum_num_pts THEN
 		RETURN QUERY
 			SELECT hourly.meter_id AS meter_id,
 				hourly.reading_rate,
 				lower(hourly.time_interval) AS start_timestamp,
 				upper(hourly.time_interval) AS end_timestamp
 			FROM hourly_readings hourly
-			INNER JOIN unnest(meter_ids) meters(id) ON hourly_readings.meter_id = meters.id
+			INNER JOIN unnest(meter_ids) meters(id) ON hourly.meter_id = meters.id
 		WHERE requested_range @> time_interval;
 	ELSE
 		RETURN QUERY
