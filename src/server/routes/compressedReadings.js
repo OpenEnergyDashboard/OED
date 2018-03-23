@@ -12,7 +12,7 @@ const Reading = require('../models/Reading');
 const { TimeInterval } = require('../../common/TimeInterval');
 
 
-function validateLineReadingsParams(params) {
+function validateMeterLineReadingsParams(params) {
 	const validParams = {
 		type: 'object',
 		maxProperties: 1,
@@ -56,10 +56,31 @@ async function compressedLineReadings(meterIDs, timeInterval) {
 	return _.mapValues(rawReadings, readingsForMeter => readingsForMeter.map(formatCompressedReadingRow));
 }
 
+function validateGroupLineReadingsParams(params) {
+	const validParams = {
+		type: 'object',
+		maxProperties: 1,
+		required: ['group_ids'],
+		properties: {
+			meter_ids: {
+				type: 'string',
+				pattern: '^\\d+(?:,\\d+)*$' // Matches 1 or 1,2 or 1,2,34 (for example)
+			}
+		}
+	};
+	const paramsValidationResult = validate(params, validParams);
+	return paramsValidationResult.valid;
+}
+
+async function compressedGroupLineReadings(groupIDs, timeInterval) {
+	const rawReadings = await Reading.getNewCompressedGroupReadings(groupIDs, timeInterval.startTimestamp, timeInterval.endTimestamp);
+	return _.mapValues(rawReadings, readingsForGroup => readingsForGroup.map(formatCompressedReadingRow));
+}
+
 function createRouter() {
 	const router = express.Router();
 	router.get('/line/meters/:meter_ids', async (req, res) => {
-		if (!(validateLineReadingsParams(req.params) && validateLineReadingsQueryParams(req.query))) {
+		if (!(validateMeterLineReadingsParams(req.params) && validateLineReadingsQueryParams(req.query))) {
 			res.sendStatus(400);
 		} else {
 			const meterIDs = req.params.meter_ids.split(',').map(idStr => Number(idStr));
@@ -68,12 +89,23 @@ function createRouter() {
 			res.json(forJson);
 		}
 	});
+
+	router.get('/line/groups/:group_ids', async (req, res) => {
+		if (!(validateGroupLineReadingsParams(req.params) && validateLineReadingsQueryParams(req.query))) {
+			res.sendStatus(400);
+		} else {
+			const groupIDs = req.params.group_ids.split(',').map(idStr => Number(idStr));
+			const timeInterval = TimeInterval.fromString(req.query.timeInterval);
+			const forJson = await compressedGroupLineReadings(groupIDs, timeInterval);
+			res.json(forJson);
+		}
+	});
 	return router;
 }
 
 module.exports = {
 	compressedLineReadings,
-	validateLineReadingsParams,
+	validateLineReadingsParams: validateMeterLineReadingsParams,
 	validateLineReadingsQueryParams,
 	createRouter
 };
