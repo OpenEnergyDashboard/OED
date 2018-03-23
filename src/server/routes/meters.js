@@ -40,8 +40,8 @@ router.get('/:meter_id', async (req, res) => {
 		maxProperties: 1,
 		required: ['meter_id'],
 		properties: {
-			group_id: {
-				type: 'number'
+			meter_id: {
+				type: 'string'
 			}
 		}
 	};
