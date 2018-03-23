@@ -4,6 +4,10 @@
 
 import * as React from 'react';
 import { Router, Route, browserHistory, RedirectFunction, RouterState } from 'react-router';
+import { addLocaleData, IntlProvider } from 'react-intl';
+import * as en from 'react-intl/locale-data/en';
+import * as fr from 'react-intl/locale-data/fr';
+import * as localeData from '../translations/locales/data.json';
 import * as _ from 'lodash';
 import * as moment from 'moment';
 import InitializationContainer from '../containers/InitializationContainer';
@@ -106,16 +110,21 @@ export default class RouteComponent extends React.Component<RouteProps, {}> {
 	 * @returns JSX to create the RouteComponent
 	 */
 	public render() {
+		addLocaleData([...en, ...fr]);
+		const lang = 'fr';
+		const messages = (localeData as any).fr;
 		return (
 			<div>
 				<InitializationContainer />
-				<Router history={browserHistory}>
-					<Route path='/login' component={LoginComponent} />
-					<Route path='/admin' component={AdminContainer} onEnter={this.requireAuth} />
-					<Route path='/groups' component={GroupMainContainer} onEnter={this.requireAuth} />
-					<Route path='/graph' component={HomeComponent} onEnter={this.linkToGraph} />
-					<Route path='*' component={HomeComponent} />
-				</Router>
+				<IntlProvider locale={lang} messages={messages}>
+					<Router history={browserHistory}>
+						<Route path='/login' component={LoginComponent} />
+						<Route path='/admin' component={AdminContainer} onEnter={this.requireAuth} />
+						<Route path='/groups' component={GroupMainContainer} onEnter={this.requireAuth} />
+						<Route path='/graph' component={HomeComponent} onEnter={this.linkToGraph} />
+						<Route path='*' component={HomeComponent} />
+					</Router>
+				</IntlProvider>
 			</div>
 		);
 	}

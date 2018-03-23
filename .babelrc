@@ -3,5 +3,13 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
 {
 	"presets": ["env", "react"],
-	"plugins": ["transform-object-rest-spread"]
+	"plugins": [
+		"transform-object-rest-spread", 
+		[
+			"react-intl", {
+				"messagesDir": "./src/client/app/translations/messages",
+				"enforceDescriptions": false
+			}
+		]
+	]
 }
