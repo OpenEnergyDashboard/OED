@@ -4,7 +4,7 @@
 
 import { connect } from 'react-redux';
 import * as _ from 'lodash';
-import AdminComponent from '../components/AdminComponent';
+import AdminComponent from '../components/admin/AdminComponent';
 import {
 	updateDisplayTitle,
 	updateDefaultChartToRender,

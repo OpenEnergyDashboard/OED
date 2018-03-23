@@ -9,7 +9,7 @@ import * as moment from 'moment';
 import InitializationContainer from '../containers/InitializationContainer';
 import HomeComponent from './HomeComponent';
 import LoginComponent from '../components/LoginComponent';
-import AdminComponent from '../components/AdminComponent';
+import AdminComponent from './admin/AdminComponent';
 import GroupMainContainer from '../containers/groups/GroupMainContainer';
 import { LinkOptions } from 'actions/graph';
 import { getToken, hasToken } from '../utils/token';
