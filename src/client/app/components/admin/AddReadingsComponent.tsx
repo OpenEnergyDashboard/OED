@@ -4,12 +4,11 @@
 
 import * as React from 'react';
 import Dropzone from 'react-dropzone';
-import axios from 'axios';
-import { getToken } from '../../utils/token';
 import { showSuccessNotification, showErrorNotification } from '../../utils/notifications';
 import {SelectOption} from '../../types/items';
 import SingleSelectComponent from '../SingleSelectComponent';
 import {UpdateImportMeterAction} from '../../types/redux/admin';
+import { fileProcessingApi } from '../../utils/api';
 
 interface AddReadingProps {
 	selectedImportMeter: SelectOption | null;
@@ -29,22 +28,13 @@ export default class AddReadingComponent extends React.Component<AddReadingProps
 			showErrorNotification('Please select a meter');
 		} else {
 			const file = files[0];
-			const data = new FormData();
-			data.append('csvFile', file);
-			axios({
-				method: 'post',
-				url: `/api/fileProcessing/readings/${this.props.selectedImportMeter.value}`,
-				data,
-				params: {
-					token: getToken()
-				}
-			})
-			.then(() => {
-				showSuccessNotification('Successfully uploaded meter data');
-			})
-			.catch(() => {
-				showErrorNotification('Error uploading meter data');
-			});
+			fileProcessingApi.submitNewReadings(this.props.selectedImportMeter.value, file)
+				.then(() => {
+					showSuccessNotification('Successfully uploaded meter data');
+				})
+				.catch(() => {
+					showErrorNotification('Error uploading meter data');
+				});
 		}
 	}
 

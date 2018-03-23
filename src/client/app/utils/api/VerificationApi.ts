@@ -7,7 +7,7 @@
 import ApiBackend from './ApiBackend';
 import { getToken } from '../token';
 
-class VerificationApi {
+export default class VerificationApi {
 	private readonly backend: ApiBackend;
 
 	constructor(backend: ApiBackend) {
@@ -30,5 +30,3 @@ class VerificationApi {
 		return response.token;
 	}
 }
-
-export default VerificationApi;

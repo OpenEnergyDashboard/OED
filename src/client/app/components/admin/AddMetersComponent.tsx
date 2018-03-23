@@ -5,8 +5,7 @@
 
 import * as React from 'react';
 import Dropzone from 'react-dropzone';
-import axios from 'axios';
-import { getToken } from '../../utils/token';
+import { fileProcessingApi } from '../../utils/api';
 import { showSuccessNotification, showErrorNotification } from '../../utils/notifications';
 
 interface AddMetersProps {
@@ -20,7 +19,7 @@ export default class AddMetersComponent extends React.Component<AddMetersProps, 
 
 	public handleMeterToImport(files: File[]) {
 		const file = files[0];
-		let jsonObject = [];
+		let meters = [];
 		const reader = new FileReader();
 		let listValue = [];
 		reader.onload = () => {
@@ -31,18 +30,11 @@ export default class AddMetersComponent extends React.Component<AddMetersProps, 
 					listValue.splice(listValue.indexOf(items), 1);
 				}
 			}
-			jsonObject = listValue;
-			axios({
-				method: 'post',
-				url: '/api/fileProcessing/meters',
-				data: jsonObject,
-				params: {
-					token: getToken()
-				}
-			})
+			meters = listValue;
+			fileProcessingApi.submitNewMeters(meters)
 			.then(() => {
-				showSuccessNotification('Successfully uploaded meters'); // this.props.fetchMeterDetailsIfNeeded(true);
-
+				showSuccessNotification('Successfully uploaded meters');
+				this.props.fetchMeterDetailsIfNeeded(true);
 			})
 			.catch(() => {
 				showErrorNotification('Error uploading meters');

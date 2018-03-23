@@ -5,7 +5,7 @@
 import { connect } from 'react-redux';
 import AddMetersComponent from '../../components/admin/AddMetersComponent';
 import { fetchMetersDetailsIfNeeded } from '../../actions/meters';
-import {Dispatch} from '../../types/redux/actions';
+import { Dispatch } from '../../types/redux/actions';
 
 function mapDispatchToProps(dispatch: Dispatch) {
 	return {
@@ -13,4 +13,4 @@ function mapDispatchToProps(dispatch: Dispatch) {
 	};
 }
 
-export default connect(mapDispatchToProps)(AddMetersComponent);
+export default connect(null, mapDispatchToProps)(AddMetersComponent);

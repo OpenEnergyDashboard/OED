@@ -6,9 +6,9 @@ import { connect } from 'react-redux';
 import * as _ from 'lodash';
 import AddReadingsComponent from '../../components/admin/AddReadingsComponent';
 import { updateSelectedMeter } from '../../actions/admin';
-import {State} from '../../types/redux/state';
-import {Dispatch} from '../../types/redux/actions';
-import {NamedIDItem, SelectOption} from '../../types/items';
+import { State } from '../../types/redux/state';
+import { Dispatch } from '../../types/redux/actions';
+import { NamedIDItem, SelectOption } from '../../types/items';
 
 function mapStateToProps(state: State) {
 	let selectedImportMeter;

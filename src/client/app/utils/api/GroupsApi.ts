@@ -11,7 +11,7 @@ import { NamedIDItem } from '../../types/items';
 import { TimeInterval } from '../../../../common/TimeInterval';
 import { GroupData, GroupID } from '../../types/redux/groups';
 
-class GroupsApi {
+export default class GroupsApi {
 	private readonly backend: ApiBackend;
 
 	constructor(backend: ApiBackend) {
@@ -56,5 +56,3 @@ class GroupsApi {
 		return await this.backend.doPostRequest('api/groups/delete', {id: groupID});
 	}
 }
-
-export default GroupsApi;

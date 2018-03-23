@@ -7,7 +7,7 @@
 import ApiBackend from './ApiBackend';
 import { PreferenceRequestItem } from '../../types/items';
 
-class PreferencesApi {
+export default class PreferencesApi {
 	private readonly backend: ApiBackend;
 
 	constructor(backend: ApiBackend) {
@@ -22,5 +22,3 @@ class PreferencesApi {
 		await this.backend.doPostRequest('/api/preferences', { preferences });
 	}
 }
-
-export default PreferencesApi;

@@ -64,13 +64,29 @@ router.post('/readings/:meter_id', upload.single('csvFile'), async (req, res) =>
 });
 
 router.post('/meters', async (req, res) => {
-	try {
-		await insertMeters(req.body.map(ip => ({ ip })));
-		res.status(200).json({ success: true });
-	} catch (err) {
-		// TODO remove log
-		log.error('Error uploading meters', err);
-		res.status(403).json({ success: false, message: 'Failed to upload meters.' });
+	const validBody = {
+		type: 'object',
+		maxProperties: 1,
+		required: ['meters'],
+		properties: {
+			meters: {
+				type: 'array',
+				uniqueItems: false,
+				items: {
+					type: 'string'
+				}
+			}
+		}
+	};
+	if (!validate(req.body, validBody).valid) {
+		res.sendStatus(400);
+	} else {
+		try {
+			await insertMeters(req.body.meters.map(ip => ({ip})));
+			res.status(200).json({success: true});
+		} catch (err) {
+			res.status(403).json({success: false, message: 'Failed to upload meters.'});
+		}
 	}
 });
 

@@ -43,13 +43,6 @@ async function getMeterInfo(url, ip) {
  * @returns {Array.<Promise.<Meter>>}
  */
 function infoForAllMeters(rows) {
-	// IP address regex: https://stackoverflow.com/a/25969006
-	const regexIPAddress = /^((25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.){3}(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)$/;
-	for (const row of rows) {
-		if (!regexIPAddress.test(row.ip)) {
-			throw new Error('Invalid IP address');
-		}
-	}
 	return rows.map(row => getMeterInfo(`http://${row.ip}/sm101.xml`, row.ip));
 }
 
