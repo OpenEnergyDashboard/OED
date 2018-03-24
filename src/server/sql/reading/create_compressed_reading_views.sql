@@ -243,12 +243,14 @@ CREATE FUNCTION compressed_barchart_readings_2(
 AS $$
 DECLARE
 	bar_width INTERVAL;
+	real_tsrange TSRANGE;
 	real_start_stamp TIMESTAMP;
 	real_end_stamp TIMESTAMP;
 BEGIN
 	bar_width := INTERVAL '1 day' * bar_width_days;
-	real_start_stamp := date_trunc_up('day', start_stamp);
-	real_end_stamp := date_trunc('day', end_stamp);
+	real_tsrange := shrink_tsrange_to_real_readings(tsrange(date_trunc_up('day', start_stamp), date_trunc('day', end_stamp)));
+	real_start_stamp := date_trunc_up('day', lower(real_tsrange));
+	real_end_stamp := date_trunc('day', upper(real_tsrange));
 	RETURN QUERY
 		SELECT dr.meter_id AS meter_id,
 			--  dr.reading_rate is the weighted average reading rate over the day, in kW. To convert it to kW * h,
