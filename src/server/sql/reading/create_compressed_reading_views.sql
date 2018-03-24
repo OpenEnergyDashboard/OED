@@ -278,14 +278,16 @@ CREATE FUNCTION compressed_barchart_group_readings_2(
 AS $$
 DECLARE
 	bar_width INTERVAL;
+	real_tsrange TSRANGE;
 	real_start_stamp TIMESTAMP;
 	real_end_stamp TIMESTAMP;
 BEGIN
 	bar_width := INTERVAL '1 day' * bar_width_days;
-	real_start_stamp := date_trunc_up('day', start_stamp);
-	real_end_stamp := date_trunc('day', end_stamp);
+	real_tsrange := shrink_tsrange_to_real_readings(tsrange(date_trunc_up('day', start_stamp), date_trunc('day', end_stamp)));
+	real_start_stamp := date_trunc_up('day', lower(real_tsrange));
+	real_end_stamp := date_trunc('day', upper(real_tsrange));
 	RETURN QUERY
-	SELECT dr.meter_id AS meter_id,
+	SELECT gdm.group_id AS group_id,
 				 SUM(dr.reading_rate * 24) AS reading, -- 24 hours in a day
 				 bars.interval_start AS start_timestamp,
 				 bars.interval_start + bar_width AS end_timestamp
@@ -294,6 +296,6 @@ BEGIN
 			ON tsrange(bars.interval_start, bars.interval_start + bar_width, '[]') @> dr.time_interval
 		INNER JOIN groups_deep_meters gdm ON dr.meter_id = gdm.meter_id
 		INNER JOIN unnest(group_ids) groups(id) ON gdm.group_id = groups.id
-	GROUP BY dr.meter_id, bars.interval_start;
+	GROUP BY gdm.group_id, bars.interval_start;
 END;
 $$ LANGUAGE 'plpgsql';

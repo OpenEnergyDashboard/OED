@@ -77,7 +77,7 @@ async function compressedGroupLineReadings(groupIDs, timeInterval) {
 	return _.mapValues(rawReadings, readingsForGroup => readingsForGroup.map(formatCompressedReadingRow));
 }
 
-function validateBarReadingsParams(params) {
+function validateMeterBarReadingsParams(params) {
 	const validParams = {
 		type: 'object',
 		maxProperties: 1,
@@ -125,6 +125,27 @@ async function compressedMeterBarReadings(meterIDs, barWidthDays, timeInterval) 
 	return _.mapValues(rawReadings, readingsForMeter => readingsForMeter.map(formatCompressedBarReadingRow));
 }
 
+function validateGroupBarReadingsParams(params) {
+	const validParams = {
+		type: 'object',
+		maxProperties: 1,
+		required: ['group_ids'],
+		properties: {
+			meter_ids: {
+				type: 'string',
+				pattern: '^\\d+(?:,\\d+)*$' // Matches 1 or 1,2 or 1,2,34 (for example)
+			}
+		}
+	};
+	const paramsValidationResult = validate(params, validParams);
+	return paramsValidationResult.valid;
+}
+
+async function compressedGroupBarReadings(groupIDs, barWidthDays, timeInterval) {
+	const rawReadings = await Reading.getNewCompressedBarchartGroupReadings(groupIDs, timeInterval.startTimestamp, timeInterval.endTimestamp, barWidthDays);
+	return _.mapValues(rawReadings, readingsForMeter => readingsForMeter.map(formatCompressedBarReadingRow));
+}
+
 function createRouter() {
 	const router = express.Router();
 	router.get('/line/meters/:meter_ids', async (req, res) => {
@@ -150,7 +171,7 @@ function createRouter() {
 	});
 
 	router.get('/bar/meters/:meter_ids', async (req, res) => {
-		if (!(validateBarReadingsParams(req.params) && validateBarReadingsQueryParams(req.query))) {
+		if (!(validateMeterBarReadingsParams(req.params) && validateBarReadingsQueryParams(req.query))) {
 			res.sendStatus(400);
 		} else {
 			const meterIDs = req.params.meter_ids.split(',').map(idStr => Number(idStr));
@@ -160,6 +181,19 @@ function createRouter() {
 			res.json(forJson);
 		}
 	});
+
+	router.get('/bar/groups/:group_ids', async (req, res) => {
+		if (!(validateGroupBarReadingsParams(req.params) && validateBarReadingsQueryParams(req.query))) {
+			res.sendStatus(400);
+		} else {
+			const groupIDs = req.params.group_ids.split(',').map(idStr => Number(idStr));
+			const timeInterval = TimeInterval.fromString(req.query.timeInterval);
+			const barWidthDays = Number(req.query.barWidthDays);
+			const forJson = await compressedGroupBarReadings(groupIDs, barWidthDays, timeInterval);
+			res.json(forJson);
+		}
+	});
+
 	return router;
 }
 
