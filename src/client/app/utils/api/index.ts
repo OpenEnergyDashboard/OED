@@ -9,6 +9,8 @@ import GroupsApi from './GroupsApi';
 import MetersApi from './MetersApi';
 import PreferencesApi from './PreferencesApi';
 import VerificationApi from './VerificationApi';
+import CompressedReadingsApi from './CompressedReadingsApi';
+import {TimeInterval} from '../../../../common/TimeInterval';
 
 const apiBackend = new ApiBackend();
 
@@ -17,5 +19,6 @@ const groupsApi = new GroupsApi(apiBackend);
 const metersApi = new MetersApi(apiBackend);
 const preferencesApi = new PreferencesApi(apiBackend);
 const verificationApi = new VerificationApi(apiBackend);
+const compressedReadingsApi = new CompressedReadingsApi(apiBackend);
 
-export { groupsApi, metersApi, preferencesApi, verificationApi };
+export { groupsApi, metersApi, preferencesApi, verificationApi, compressedReadingsApi };
