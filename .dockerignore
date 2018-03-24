@@ -1,0 +1,5 @@
+.idea
+.editorconfig
+.env
+.git
+postgres-data
