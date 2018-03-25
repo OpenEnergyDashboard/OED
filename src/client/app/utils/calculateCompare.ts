@@ -13,7 +13,7 @@ export enum ComparePeriod {
 
 export enum SortingOrder {
 	Alphabetical = 'Alphabetical',
-	Adcending = 'Ascending',
+	Ascending = 'Ascending',
 	Descending = 'Descending'
 }
 
