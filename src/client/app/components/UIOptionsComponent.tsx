@@ -174,9 +174,24 @@ export default class UIOptionsComponent extends React.Component<UIOptionsProps, 
 							Sorting
 						</DropdownToggle>
 						<DropdownMenu>
-							<DropdownItem>Alphabetical</DropdownItem>
-							<DropdownItem>Ascending</DropdownItem>
-							<DropdownItem>Descending</DropdownItem>
+							<DropdownItem
+								active={this.props.sortingOrder === SortingOrder.Alphabetical}
+								onClick={() => this.handleSortingButton(SortingOrder.Alphabetical)}
+							>
+								Alphabetical
+							</DropdownItem>
+							<DropdownItem
+								active={this.props.sortingOrder === SortingOrder.Adcending}
+								onClick={() => this.handleSortingButton(SortingOrder.Adcending)}
+							>
+								Ascending
+							</DropdownItem>
+							<DropdownItem
+								active={this.props.sortingOrder === SortingOrder.Descending}
+								onClick={() => this.handleSortingButton(SortingOrder.Descending)}
+							>
+								Descending
+							</DropdownItem>
 						</DropdownMenu>
 					</Dropdown>
 				</div>

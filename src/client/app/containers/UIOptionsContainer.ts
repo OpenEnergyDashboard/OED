@@ -5,10 +5,10 @@
 import * as moment from 'moment';
 import { connect } from 'react-redux';
 import UIOptionsComponent from '../components/UIOptionsComponent';
-import { changeBarDuration, changeBarStacking, changeCompareGraph } from '../actions/graph';
+import { changeBarDuration, changeBarStacking, changeCompareGraph, changeSortingOrder } from '../actions/graph';
 import { Dispatch } from '../types/redux/actions';
 import { State } from '../types/redux/state';
-import { ComparePeriod} from '../utils/calculateCompare';
+import {ComparePeriod, SortingOrder} from '../utils/calculateCompare';
 
 
 function mapStateToProps(state: State) {
@@ -25,7 +25,8 @@ function mapDispatchToProps(dispatch: Dispatch) {
 	return {
 		changeDuration: (barDuration: moment.Duration) => dispatch(changeBarDuration(barDuration)),
 		changeBarStacking: () => dispatch(changeBarStacking()),
-		changeCompareGraph: (comparePeriod: ComparePeriod) => dispatch(changeCompareGraph(comparePeriod))
+		changeCompareGraph: (comparePeriod: ComparePeriod) => dispatch(changeCompareGraph(comparePeriod)),
+		changeSortingOrder: (sortingOrder: SortingOrder) => dispatch(changeSortingOrder(sortingOrder))
 	};
 }
 

@@ -64,6 +64,11 @@ export default function graph(state = defaultState, action: GraphAction) {
 				...state,
 				hotlinked: action.hotlinked
 			};
+		case ActionType.ChangeSortingOrder:
+			return {
+				...state,
+				sortingOrder: action.sortingOrder
+			};
 		default:
 			return state;
 	}

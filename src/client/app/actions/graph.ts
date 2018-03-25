@@ -11,7 +11,8 @@ import { TimeInterval } from '../../../common/TimeInterval';
 import { Dispatch, Thunk, ActionType } from '../types/redux/actions';
 import { State } from '../types/redux/state';
 import * as t from '../types/redux/graph';
-import { ComparePeriod } from '../utils/calculateCompare';
+import {ComparePeriod, SortingOrder} from '../utils/calculateCompare';
+import {ChangeSortingOrderAction} from "../types/redux/graph";
 
 export function changeChartToRender(chartType: t.ChartTypes): t.ChangeChartToRenderAction {
 	return { type: ActionType.ChangeChartToRender, chartType };
@@ -71,6 +72,10 @@ export function changeCompareGraph(comparePeriod: ComparePeriod): Thunk {
 			dispatch(fetchNeededCompareReadings(comparePeriod))
 		]);
 	};
+}
+
+export function changeSortingOrder(sortingOrder: SortingOrder): t.ChangeSortingOrderAction {
+	return { type: ActionType.ChangeSortingOrder, sortingOrder };
 }
 
 export function changeSelectedMeters(meterIDs: number[]): Thunk {
