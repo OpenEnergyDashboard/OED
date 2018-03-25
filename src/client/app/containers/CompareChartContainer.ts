@@ -13,7 +13,6 @@ import * as datalabels from 'chartjs-plugin-datalabels';
 import {
 	ComparePeriod,
 	calculateCompareDuration,
-	calculateCompareTimeInterval,
 	getComparePeriodLabels,
 	getCompareChangeSummary
 } from '../utils/calculateCompare';
@@ -37,7 +36,6 @@ interface CompareChartContainerProps {
 function mapStateToProps(state: State, ownProps: CompareChartContainerProps) {
 	const comparePeriod = state.graph.comparePeriod;
 	const timeInterval = state.graph.compareTimeInterval;
-	console.log(timeInterval);
 	const barDuration = calculateCompareDuration(comparePeriod);
 
 	// The name of the entity for which compare data is being computed.

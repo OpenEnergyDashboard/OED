@@ -13,7 +13,7 @@ import { ChangeBarStackingAction } from '../types/redux/graph';
 import ChartLinkContainer from '../containers/ChartLinkContainer';
 import { ChartTypes } from '../types/redux/graph';
 import 'rc-slider/assets/index.css';
-import { ComparePeriod } from '../utils/calculateCompare';
+import { ComparePeriod, SortingOrder } from '../utils/calculateCompare';
 
 const Slider = createSliderWithTooltip(sliderWithoutTooltips);
 
@@ -22,6 +22,7 @@ export interface UIOptionsProps {
 	barStacking: boolean;
 	barDuration: moment.Duration;
 	comparePeriod: ComparePeriod;
+	sortingOrder: SortingOrder;
 	changeDuration(duration: moment.Duration): Promise<any>;
 	changeBarStacking(): ChangeBarStackingAction;
 	changeCompareGraph(comparePeriod: ComparePeriod): Promise<any>;

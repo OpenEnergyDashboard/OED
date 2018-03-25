@@ -11,6 +11,12 @@ export enum ComparePeriod {
 	FourWeeks = 'FourWeeks'
 }
 
+export enum SortingOrder {
+	Alphabetical = 'Alphabetical',
+	Adcending = 'Ascending',
+	Descending = 'Descending'
+}
+
 export function validateComparePeriod(comparePeriod: string): ComparePeriod {
 	switch (comparePeriod) {
 		case 'Day':

@@ -5,7 +5,7 @@
 import * as moment from 'moment';
 import { TimeInterval } from '../../../../common/TimeInterval';
 import { ActionType } from './actions';
-import { ComparePeriod } from '../../utils/calculateCompare';
+import { ComparePeriod, SortingOrder } from '../../utils/calculateCompare';
 
 export enum ChartTypes {
 	line = 'line',
@@ -70,6 +70,7 @@ export interface GraphState {
 	barDuration: moment.Duration;
 	comparePeriod: ComparePeriod;
 	compareTimeInterval: TimeInterval;
+	sortingOrder: SortingOrder;
 	chartToRender: ChartTypes;
 	barStacking: boolean;
 	hotlinked: boolean;
