@@ -9,7 +9,7 @@ import { Button, ButtonGroup, Dropdown, DropdownToggle, DropdownMenu, DropdownIt
 import ExportContainer from '../containers/ExportContainer';
 import ChartSelectContainer from '../containers/ChartSelectContainer';
 import ChartDataSelectContainer from '../containers/ChartDataSelectContainer';
-import { ChangeBarStackingAction } from '../types/redux/graph';
+import { ChangeBarStackingAction, ChangeSortingOrderAction } from '../types/redux/graph';
 import ChartLinkContainer from '../containers/ChartLinkContainer';
 import { ChartTypes } from '../types/redux/graph';
 import 'rc-slider/assets/index.css';
@@ -26,6 +26,7 @@ export interface UIOptionsProps {
 	changeDuration(duration: moment.Duration): Promise<any>;
 	changeBarStacking(): ChangeBarStackingAction;
 	changeCompareGraph(comparePeriod: ComparePeriod): Promise<any>;
+	changeSortingOrder(sortingOrder: SortingOrder): ChangeSortingOrderAction;
 }
 
 interface UIOptionsState {
@@ -43,6 +44,7 @@ export default class UIOptionsComponent extends React.Component<UIOptionsProps, 
 		this.formatSliderTip = this.formatSliderTip.bind(this);
 		this.handleBarButton = this.handleBarButton.bind(this);
 		this.handleCompareButton = this.handleCompareButton.bind(this);
+		this.handleSortingButton = this.handleSortingButton.bind(this);
 		this.toggleSlider = this.toggleSlider.bind(this);
 		this.toggleDropdown = this.toggleDropdown.bind(this);
 		this.state = {
@@ -235,6 +237,10 @@ export default class UIOptionsComponent extends React.Component<UIOptionsProps, 
 
 	private handleCompareButton(comparePeriod: ComparePeriod) {
 		this.props.changeCompareGraph(comparePeriod);
+	}
+
+	private handleSortingButton(sortingOrder: SortingOrder) {
+		this.props.changeSortingOrder(sortingOrder);
 	}
 
 	private toggleSlider() {

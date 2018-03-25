@@ -48,6 +48,11 @@ export interface UpdateComparePeriodAction {
 	currentTime: moment.Moment;
 }
 
+export interface ChangeSortingOrderAction {
+	type: ActionType.ChangeSortingOrder;
+	sortingOrder: SortingOrder;
+}
+
 export interface SetHotlinked {
 	type: ActionType.SetHotlinked;
 	hotlinked: boolean;
@@ -61,7 +66,8 @@ export type GraphAction =
 	| UpdateSelectedGroupsAction
 	| UpdateSelectedMetersAction
 	| UpdateComparePeriodAction
-	| SetHotlinked;
+	| SetHotlinked
+	| ChangeSortingOrderAction;
 
 export interface GraphState {
 	selectedMeters: number[];

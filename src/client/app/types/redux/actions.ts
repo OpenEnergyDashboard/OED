@@ -30,6 +30,7 @@ export enum ActionType {
 	ChangeBarStacking = 'CHANGE_BAR_STACKING',
 	ChangeGraphZoom = 'CHANGE_GRAPH_ZOOM',
 	UpdateComparePeriod = 'UPDATE_COMPARE_PERIOD',
+	ChangeSortingOrder = 'CHANGE_SORTING_ORDER',
 	SetHotlinked = 'SET_HOTLINKED',
 
 	RequestGroupsDetails = 'REQUEST_GROUPS_DETAILS',
