@@ -5,7 +5,7 @@
 import * as React from 'react';
 import sliderWithoutTooltips, { createSliderWithTooltip } from 'rc-slider';
 import * as moment from 'moment';
-import { Button, ButtonGroup } from 'reactstrap';
+import { Button, ButtonGroup, Dropdown, DropdownToggle, DropdownMenu, DropdownItem } from 'reactstrap';
 import ExportContainer from '../containers/ExportContainer';
 import ChartSelectContainer from '../containers/ChartSelectContainer';
 import ChartDataSelectContainer from '../containers/ChartDataSelectContainer';
@@ -31,6 +31,7 @@ export interface UIOptionsProps {
 interface UIOptionsState {
 	barDurationDays: number;
 	showSlider: boolean;
+	dropdownOpen: boolean;
 }
 
 export default class UIOptionsComponent extends React.Component<UIOptionsProps, UIOptionsState> {
@@ -43,9 +44,11 @@ export default class UIOptionsComponent extends React.Component<UIOptionsProps, 
 		this.handleBarButton = this.handleBarButton.bind(this);
 		this.handleCompareButton = this.handleCompareButton.bind(this);
 		this.toggleSlider = this.toggleSlider.bind(this);
+		this.toggleDropdown = this.toggleDropdown.bind(this);
 		this.state = {
 			barDurationDays: this.props.barDuration.asDays(),
-			showSlider: false
+			showSlider: false,
+			dropdownOpen: false
 		};
 	}
 
@@ -164,6 +167,16 @@ export default class UIOptionsComponent extends React.Component<UIOptionsProps, 
 							4 Weeks
 						</Button>
 					</ButtonGroup>
+					<Dropdown isOpen={this.state.dropdownOpen} toggle={this.toggleDropdown}>
+						<DropdownToggle caret>
+							Sorting
+						</DropdownToggle>
+						<DropdownMenu>
+							<DropdownItem>Alphabetical</DropdownItem>
+							<DropdownItem>Ascending</DropdownItem>
+							<DropdownItem>Descending</DropdownItem>
+						</DropdownMenu>
+					</Dropdown>
 				</div>
 				}
 
@@ -233,5 +246,9 @@ export default class UIOptionsComponent extends React.Component<UIOptionsProps, 
 			return `${value} day`;
 		}
 		return `${value} days`;
+	}
+
+	private toggleDropdown() {
+		this.setState({ dropdownOpen: !this.state.dropdownOpen });
 	}
 }
