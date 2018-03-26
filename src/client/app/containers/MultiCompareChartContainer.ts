@@ -27,7 +27,6 @@ interface ReadingsData {
 function mapStateToProps(state: State) {
 	const meters: Entity[] = getDataForIDs(state.graph.selectedMeters, false, state);
 	const groups: Entity[] = getDataForIDs(state.graph.selectedGroups, true, state);
-	// TODO: Sort meters and groups
 	const sortingOrder = state.graph.sortingOrder;
 	return {
 		selectedMeters: sortIDs(meters, sortingOrder),
@@ -141,7 +140,7 @@ function calculateUsageToThisPointLastTimePeroid(readingsData: ReadingsData, tim
 	return usedToThisPointLastTimePeriod;
 }
 
-function isReadingsDataValid(readingsData: ReadingsData): boolean {
+function isReadingsDataValid(readingsData: ReadingsData | undefined): boolean {
 	return readingsData !== undefined && !readingsData.isFetching && readingsData.readings !== undefined;
 }
 
@@ -154,9 +153,9 @@ function calculateChange(currentPeriodUsage: number, usedToThisPointLastTimePeri
 function sortIDs(ids: Entity[], sortingOrder: SortingOrder): Entity[] {
 	switch (sortingOrder) {
 		case SortingOrder.Alphabetical:
-			ids.sort(function(a, b) {
-				const nameA = a.name.toLowerCase();
-				const nameB = b.name.toLowerCase();
+			ids.sort((a, b) => {
+				const nameA = a.name.toLowerCase().trim();
+				const nameB = b.name.toLowerCase().trim();
 				if (nameA < nameB) {
 					return -1;
 				}
@@ -167,7 +166,7 @@ function sortIDs(ids: Entity[], sortingOrder: SortingOrder): Entity[] {
 			})
 			break;
 		case SortingOrder.Ascending:
-			ids.sort(function (a, b) {
+			ids.sort((a, b) => {
 				if (a.change < b.change) {
 					return -1;
 				}
@@ -178,7 +177,7 @@ function sortIDs(ids: Entity[], sortingOrder: SortingOrder): Entity[] {
 			})
 			break;
 		case SortingOrder.Descending:
-			ids.sort(function (a, b) {
+			ids.sort((a, b) =>  {
 				if (a.change > b.change) {
 					return -1;
 				}
