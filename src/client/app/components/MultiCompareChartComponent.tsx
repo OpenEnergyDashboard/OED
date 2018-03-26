@@ -4,6 +4,7 @@
 
 import * as React from 'react';
 import CompareChartContainer from '../containers/CompareChartContainer';
+import { FormattedMessage } from 'react-intl';
 
 interface MultiCompareChartProps {
 	selectedMeters: number[];
@@ -26,7 +27,7 @@ export default function MultiCompareChartComponent(props: MultiCompareChartProps
 	if (numSelectedItems === 0) {
 		return (
 			<div className='text-center' style={centeredStyle}>
-				Select one or more items to compare usage over time.
+				<FormattedMessage id='empty.compare' />
 			</div>
 		);
 	}

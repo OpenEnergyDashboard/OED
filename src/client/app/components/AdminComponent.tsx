@@ -234,17 +234,23 @@ class AdminComponent extends React.Component<AdminPropsWithIntl, {}> {
 	}
 
 	private handleFileToImport(files: ImageFile[]) {
-		// token passed as a header
+		const messages = defineMessages({
+			pleaseSelectMeter: { id: 'please.select.meter' },
+			success: { id: 'successful.upload.readings' },
+			error: { id: 'error.upload.readings' }
+		});
+		const { formatMessage } = this.props.intl;
+
 		if (!this.props.selectedImportMeter) {
-			showErrorNotification('Please select a meter');
+			showErrorNotification(formatMessage(messages.pleaseSelectMeter));
 		} else {
 			const file = files[0];
 			metersApi.submitNewReadings(this.props.selectedImportMeter.value, file)
 			.then(() => {
-				showSuccessNotification('Successfully uploaded meter data');
+				showSuccessNotification(formatMessage(messages.success));
 			})
 			.catch(() => {
-				showErrorNotification('Error uploading meter data');
+				showErrorNotification(formatMessage(messages.error));
 			});
 		}
 	}
