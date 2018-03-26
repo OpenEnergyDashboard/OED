@@ -36,7 +36,7 @@ function mapStateToProps(state: State) {
 
 function getDataForIDs(ids: number[], isGroup: boolean, state: State): Entity[] {
 	const timeInterval = state.graph.compareTimeInterval;
-	const comparePeriod = state.graph.comparePeriod
+	const comparePeriod = state.graph.comparePeriod;
 	const barDuration = calculateCompareDuration(comparePeriod);
 	const entities: Entity[] = [];
 	for (const id of ids) {
