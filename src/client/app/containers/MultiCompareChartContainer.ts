@@ -5,7 +5,7 @@
 import { connect } from 'react-redux';
 import MultiCompareChartComponent from '../components/MultiCompareChartComponent';
 import { State } from '../types/redux/state';
-import {calculateCompareDuration, ComparePeriod} from '../utils/calculateCompare';
+import {calculateCompareDuration, ComparePeriod, SortingOrder} from '../utils/calculateCompare';
 import { TimeInterval } from '../../../common/TimeInterval';
 import * as moment from 'moment';
 
@@ -28,9 +28,10 @@ function mapStateToProps(state: State) {
 	const meters: Entity[] = getDataForIDs(state.graph.selectedMeters, false, state);
 	const groups: Entity[] = getDataForIDs(state.graph.selectedGroups, true, state);
 	// TODO: Sort meters and groups
+	const sortingOrder = state.graph.sortingOrder;
 	return {
-		selectedMeters: meters,
-		selectedGroups: groups
+		selectedMeters: sortIDs(meters, sortingOrder),
+		selectedGroups: sortIDs(groups, sortingOrder)
 	};
 }
 
@@ -148,6 +149,49 @@ function calculateChange(currentPeriodUsage: number, usedToThisPointLastTimePeri
 	// Compute the change between periods.
 	const change = (-1 + (((currentPeriodUsage / usedToThisPointLastTimePeriod) * lastPeriodTotalUsage) / lastPeriodTotalUsage));
 	return change;
+}
+
+function sortIDs(ids: Entity[], sortingOrder: SortingOrder): Entity[] {
+	switch (sortingOrder) {
+		case SortingOrder.Alphabetical:
+			ids.sort(function(a, b) {
+				const nameA = a.name.toLowerCase();
+				const nameB = b.name.toLowerCase();
+				if (nameA < nameB) {
+					return -1;
+				}
+				if (nameA > nameB) {
+					return 1;
+				}
+				return 0;
+			})
+			break;
+		case SortingOrder.Ascending:
+			ids.sort(function (a, b) {
+				if (a.change < b.change) {
+					return -1;
+				}
+				if (a.change > b.change) {
+					return 1;
+				}
+				return 0;
+			})
+			break;
+		case SortingOrder.Descending:
+			ids.sort(function (a, b) {
+				if (a.change > b.change) {
+					return -1;
+				}
+				if (a.change < b.change) {
+					return 1;
+				}
+				return 0;
+			})
+			break;
+		default:
+			throw new Error(`Unknown sorting order: ${sortingOrder}`);
+	}
+	return ids;
 }
 
 export default connect(mapStateToProps)(MultiCompareChartComponent);
