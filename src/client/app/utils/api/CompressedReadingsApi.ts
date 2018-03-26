@@ -4,9 +4,10 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/.
  */
 
+import * as _ from 'lodash';
 import ApiBackend from './ApiBackend';
 import {TimeInterval} from '../../../../common/TimeInterval';
-import {CompressedBarReadings, CompressedLineReadings} from '../../types/compressed-readings';
+import {CompressedBarReadings, CompressedLineReading, CompressedLineReadings} from '../../types/compressed-readings';
 
 export default class CompressedReadingsApi {
 	private readonly backend: ApiBackend;
@@ -17,18 +18,26 @@ export default class CompressedReadingsApi {
 
 	public async meterLineReadings(meterIDs: number[], timeInterval: TimeInterval): Promise<CompressedLineReadings> {
 		const stringifiedIDs = meterIDs.join(',');
-		return await this.backend.doGetRequest<CompressedLineReadings>(
+		const readings = await this.backend.doGetRequest<CompressedLineReadings>(
 			`/api/compressedReadings/line/meters/${stringifiedIDs}`,
 			{ timeInterval: timeInterval.toString() }
 		);
+		// Ensure everything is sorted
+		_.values(readings)
+			.forEach( (value: CompressedLineReading[]) => value.sort((a, b) => a.startTimestamp - b.startTimestamp));
+		return readings;
 	}
 
 	public async groupLineReadings(groupIDs: number[], timeInterval: TimeInterval): Promise<CompressedLineReadings> {
 		const stringifiedIDs = groupIDs.join(',');
-		return await this.backend.doGetRequest<CompressedLineReadings>(
+		const readings = await this.backend.doGetRequest<CompressedLineReadings>(
 			`/api/compressedReadings/line/groups/${stringifiedIDs}`,
 			{ timeInterval: timeInterval.toString() }
 		);
+		// Ensure everything is sorted
+		_.values(readings)
+			.forEach( (value: CompressedLineReading[]) => value.sort((a, b) => a.startTimestamp - b.startTimestamp));
+		return readings;
 	}
 
 	public async meterBarReadings(meterIDs: number[], timeInterval: TimeInterval, barWidthDays: number): Promise<CompressedBarReadings> {

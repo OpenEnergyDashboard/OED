@@ -10,7 +10,6 @@ import MetersApi from './MetersApi';
 import PreferencesApi from './PreferencesApi';
 import VerificationApi from './VerificationApi';
 import CompressedReadingsApi from './CompressedReadingsApi';
-import {TimeInterval} from '../../../../common/TimeInterval';
 
 const apiBackend = new ApiBackend();
 

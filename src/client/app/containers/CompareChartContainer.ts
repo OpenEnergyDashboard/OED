@@ -11,6 +11,7 @@ import { connect } from 'react-redux';
 import { TimeInterval } from '../../../common/TimeInterval';
 import { State } from '../types/redux/state';
 import * as datalabels from 'chartjs-plugin-datalabels';
+import {CompressedBarReading} from '../types/compressed-readings';
 
 if (datalabels === null || datalabels === undefined) {
 	throw new Error('Datalabels plugin was tree-shaken out.');
@@ -88,13 +89,22 @@ function mapStateToProps(state: State, ownProps: CompareChartContainerProps) {
 	};
 
 	let readingsData: {isFetching: boolean, readings?: Array<[number, number]>} | undefined ;
+	let readingsDataByTimeInterval;
 	if (ownProps.isGroup) {
-		const readingsDataByTimeInterval = state.readings.bar.byGroupID[ownProps.id][timeInterval];
-		readingsData = readingsDataByTimeInterval[barDuration];
+		readingsDataByTimeInterval = state.readings.bar.byGroupID[ownProps.id][timeInterval];
 	} else {
-		const readingsDataByTimeInterval = state.readings.bar.byMeterID[ownProps.id][timeInterval];
-		readingsData = readingsDataByTimeInterval[barDuration];
+		readingsDataByTimeInterval = state.readings.bar.byMeterID[ownProps.id][timeInterval];
 	}
+	const readingsDataNewForm = readingsDataByTimeInterval[barDuration];
+	let newReadingLines: Array<[number, number]> | undefined;
+	if (readingsDataNewForm.readings) {
+		newReadingLines = readingsDataNewForm.readings.map(r => [r.startTimestamp.valueOf(), r.reading]) as Array<[number, number]>;
+	}
+	readingsData = {
+		isFetching: readingsDataNewForm.isFetching,
+		readings: newReadingLines
+	};
+
 	if (readingsData !== undefined && !readingsData.isFetching && readingsData.readings !== undefined) {
 		if (readingsData.readings.length < 7) {
 			soFar = moment().hour();

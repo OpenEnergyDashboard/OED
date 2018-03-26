@@ -8,7 +8,8 @@ import { Dispatch, GetState, Thunk, ActionType } from '../types/redux/actions';
 import { State } from '../types/redux/state';
 import { BarReadings } from '../types/readings';
 import * as t from '../types/redux/barReadings';
-import { groupsApi, metersApi } from '../utils/api';
+import {compressedReadingsApi, groupsApi, metersApi} from '../utils/api';
+import {CompressedBarReadings} from '../types/compressed-readings';
 
 /**
  * @param {State} state the Redux state
@@ -66,7 +67,7 @@ function requestMeterBarReadings(meterIDs: number[], timeInterval: TimeInterval,
 	return { type: ActionType.RequestMeterBarReadings, meterIDs, timeInterval, barDuration };
 }
 
-function receiveMeterBarReadings(meterIDs: number[], timeInterval: TimeInterval, barDuration: moment.Duration, readings: BarReadings):
+function receiveMeterBarReadings(meterIDs: number[], timeInterval: TimeInterval, barDuration: moment.Duration, readings: CompressedBarReadings):
 	t.ReceiveMeterBarReadingsAction {
 	return { type: ActionType.ReceiveMeterBarReadings, meterIDs, timeInterval, barDuration, readings };
 }
@@ -75,7 +76,7 @@ function requestGroupBarReadings(groupIDs: number[], timeInterval: TimeInterval,
 	return { type: ActionType.RequestGroupBarReadings, groupIDs, timeInterval, barDuration };
 }
 
-function receiveGroupBarReadings(groupIDs: number[], timeInterval: TimeInterval, barDuration: moment.Duration, readings: BarReadings):
+function receiveGroupBarReadings(groupIDs: number[], timeInterval: TimeInterval, barDuration: moment.Duration, readings: CompressedBarReadings):
 	t.ReceiveGroupBarReadingsAction {
 	return { type: ActionType.ReceiveGroupBarReadings, groupIDs, timeInterval, barDuration, readings };
 }
@@ -90,7 +91,7 @@ function fetchMeterBarReadings(meterIDs: number[], timeInterval: TimeInterval): 
 	return async (dispatch: Dispatch, getState: GetState) => {
 		const barDuration = getState().graph.barDuration;
 		dispatch(requestMeterBarReadings(meterIDs, timeInterval, barDuration));
-		const readings = await metersApi.barReadings(meterIDs, timeInterval, barDuration);
+		const readings = await compressedReadingsApi.meterBarReadings(meterIDs, timeInterval, Math.round(barDuration.asDays()));
 		dispatch(receiveMeterBarReadings(meterIDs, timeInterval, barDuration, readings));
 	};
 }
@@ -107,7 +108,7 @@ function fetchGroupBarReadings(groupIDs: number[], timeInterval: TimeInterval): 
 		dispatch(requestGroupBarReadings(groupIDs, timeInterval, barDuration));
 		// API expectes a comma-seperated string of IDs
 		const stringifiedIDs = groupIDs.join(',');
-		const readings = await groupsApi.barReadings(groupIDs, timeInterval, barDuration);
+		const readings = await compressedReadingsApi.groupBarReadings(groupIDs, timeInterval, Math.round(barDuration.asDays()));
 		dispatch(receiveGroupBarReadings(groupIDs, timeInterval, barDuration, readings));
 	};
 }
@@ -116,7 +117,7 @@ function fetchMeterCompareReadings(meterIDs: number[], timeInterval: TimeInterva
 	return async (dispatch: Dispatch, getState: GetState) => {
 		const compareDuration = getState().graph.compareDuration;
 		dispatch(requestMeterBarReadings(meterIDs, timeInterval, compareDuration));
-		const readings = await metersApi.barReadings(meterIDs, timeInterval, compareDuration);
+		const readings = await compressedReadingsApi.meterBarReadings(meterIDs, timeInterval, Math.round(compareDuration.asDays()));
 		dispatch(receiveMeterBarReadings(meterIDs, timeInterval, compareDuration, readings));
 	};
 }
@@ -125,7 +126,7 @@ function fetchGroupCompareReadings(groupIDs: number[], timeInterval: TimeInterva
 	return async (dispatch: Dispatch, getState: GetState) => {
 		const compareDuration = getState().graph.compareDuration;
 		dispatch(requestGroupBarReadings(groupIDs, timeInterval, compareDuration));
-		const readings = await groupsApi.barReadings(groupIDs, timeInterval, compareDuration);
+		const readings = await compressedReadingsApi.groupBarReadings(groupIDs, timeInterval, Math.round(compareDuration.asDays()));
 		dispatch(receiveGroupBarReadings(groupIDs, timeInterval, compareDuration, readings));
 	};
 }

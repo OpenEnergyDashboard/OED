@@ -5,6 +5,7 @@
 import { TimeInterval } from '../../../../common/TimeInterval';
 import { LineReadings } from '../readings';
 import { ActionType } from './actions';
+import {CompressedLineReading, CompressedLineReadings} from '../compressed-readings';
 
 export interface RequestMeterLineReadingsAction {
 	type: ActionType.RequestMeterLineReadings;
@@ -22,14 +23,14 @@ export interface ReceiveMeterLineReadingsAction {
 	type: ActionType.ReceiveMeterLineReadings;
 	meterIDs: number[];
 	timeInterval: TimeInterval;
-	readings: LineReadings;
+	readings: CompressedLineReadings;
 }
 
 export interface ReceiveGroupLineReadingsAction {
 	type: ActionType.ReceiveGroupLineReadings;
 	groupIDs: number[];
 	timeInterval: TimeInterval;
-	readings: LineReadings;
+	readings: CompressedLineReadings;
 }
 
 export type LineReadingsAction =
@@ -43,9 +44,7 @@ export interface LineReadingsState {
 		[meterID: number]: {
 			[timeInterval: string]: {
 				isFetching: boolean;
-				readings?: {
-					[point: number]: [number, number];
-				};
+				readings?: CompressedLineReading[];
 			}
 		}
 	};
@@ -53,9 +52,7 @@ export interface LineReadingsState {
 		[groupID: number]: {
 			[timeInterval: string]: {
 				isFetching: boolean;
-				readings?: {
-					[point: number]: [number, number];
-				};
+				readings?: CompressedLineReading[];
 			}
 		}
 	};
