@@ -60,7 +60,7 @@ class UIOptionsComponent extends React.Component<UIOptionsPropsWithIntl, UIOptio
 		const labelStyle: React.CSSProperties = {
 			fontWeight: 'bold',
 			margin: 0
-		}
+		};
 		const divTopPadding: React.CSSProperties = {
 			paddingTop: '15px'
 		};
