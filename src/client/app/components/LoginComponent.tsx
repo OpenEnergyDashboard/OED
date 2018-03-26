@@ -9,21 +9,17 @@ import HeaderContainer from '../containers/HeaderContainer';
 import FooterComponent from '../components/FooterComponent';
 import { showErrorNotification } from '../utils/notifications';
 import { verificationApi } from '../utils/api';
-
+import { InjectedIntlProps, injectIntl, defineMessages, FormattedMessage } from 'react-intl';
 
 interface LoginState {
 	email: string;
 	password: string;
 }
 
-export default class LoginComponent extends React.Component<{}, LoginState> {
+class LoginComponent extends React.Component<InjectedIntlProps, LoginState> {
 	private inputEmail: HTMLInputElement | null;
 
-	/**
-	 * Initializes the component's state to include email (email users use to login) and password (corresponding to their email)
-	 * Binds the functions to 'this' LoginComponent
-	 */
-	constructor(props: {}) {
+	constructor(props: InjectedIntlProps) {
 		super(props);
 		this.state = { email: '', password: '' };
 		this.handleEmailChange = this.handleEmailChange.bind(this);
@@ -43,6 +39,13 @@ export default class LoginComponent extends React.Component<{}, LoginState> {
 		const buttonStyle = {
 			marginTop: '10px'
 		};
+
+		const messages = defineMessages({
+			email: { id: 'email' },
+			password: { id: 'password' }
+		});
+		const { formatMessage } = this.props.intl;
+
 		return (
 			<div>
 				<HeaderContainer />
@@ -50,7 +53,7 @@ export default class LoginComponent extends React.Component<{}, LoginState> {
 					<InputGroup>
 						<Input
 							type='text'
-							placeholder='Email'
+							placeholder={formatMessage(messages.email)}
 							innerRef={c => { this.inputEmail = c; }}
 							value={this.state.email}
 							onChange={this.handleEmailChange}
@@ -59,12 +62,14 @@ export default class LoginComponent extends React.Component<{}, LoginState> {
 					<InputGroup>
 						<Input
 							type='password'
-							placeholder='Password'
+							placeholder={formatMessage(messages.password)}
 							value={this.state.password}
 							onChange={this.handlePasswordChange}
 						/>
 					</InputGroup>
-					<Button outline style={buttonStyle} type='submit' onClick={this.handleSubmit}>Submit</Button>
+					<Button outline style={buttonStyle} type='submit' onClick={this.handleSubmit}>
+						<FormattedMessage id='submit' />
+					</Button>
 				</Form>
 				<FooterComponent />
 			</div>
@@ -116,3 +121,5 @@ export default class LoginComponent extends React.Component<{}, LoginState> {
 		this.setState({ email: '', password: '' });
 	}
 }
+
+export default injectIntl<{}>(LoginComponent);

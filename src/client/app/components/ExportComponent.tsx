@@ -7,6 +7,7 @@ import { Button } from 'reactstrap';
 import * as moment from 'moment';
 import graphExport from '../utils/exportData';
 import { ExportDataSet } from '../types/readings';
+import { FormattedMessage } from 'react-intl';
 
 interface ExportProps {
 	selectedMeters: number[];
@@ -51,7 +52,9 @@ export default function ExportComponent(props: ExportProps) {
 	};
 	return (
 		<div>
-			<Button outline onClick={exportReading}>Export graph data</Button>
+			<Button outline onClick={exportReading}>
+				<FormattedMessage id='export.graph.data' />
+			</Button>
 		</div>
 	);
 }

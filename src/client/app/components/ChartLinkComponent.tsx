@@ -36,10 +36,7 @@ export default class ChartLinkComponent extends React.Component<ChartLinkProps, 
 		return (
 			<div>
 				<Button	outline	onClick={this.toggleLink}>
-					<FormattedMessage
-						id='toggle.link'
-						defaultMessage='Toggle chart link'
-					/>
+					<FormattedMessage id='toggle.link' />
 				</Button>
 				{this.state.showLink &&
 					<div style={wellStyle}>

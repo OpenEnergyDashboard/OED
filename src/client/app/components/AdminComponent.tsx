@@ -20,7 +20,7 @@ import { SelectOption } from '../types/items';
 import SingleSelectComponent from './SingleSelectComponent';
 import { metersApi } from '../utils/api';
 import { LanguageTypes } from '../types/i18n';
-import { defineMessages, FormattedMessage, injectIntl, InjectedIntlProps, InjectedIntl } from 'react-intl';
+import { defineMessages, FormattedMessage, injectIntl, InjectedIntlProps } from 'react-intl';
 
 interface AdminProps {
 	displayTitle: string;
@@ -30,7 +30,6 @@ interface AdminProps {
 	disableSubmitPreferences: boolean;
 	selectedImportMeter: SelectOption;
 	meters: SelectOption[];
-	intl: InjectedIntl;
 	updateSelectedImportMeter(meterID: number): UpdateImportMeterAction;
 	updateDisplayTitle(title: string): UpdateDisplayTitleAction;
 	updateDefaultChartType(defaultChartToRender: ChartTypes): UpdateDefaultChartToRenderAction;
@@ -39,8 +38,10 @@ interface AdminProps {
 	submitPreferences(): Promise<void>;
 }
 
-class AdminComponent extends React.Component<AdminProps & InjectedIntlProps, {}> {
-	constructor(props: AdminProps) {
+type AdminPropsWithIntl = AdminProps & InjectedIntlProps;
+
+class AdminComponent extends React.Component<AdminPropsWithIntl, {}> {
+	constructor(props: AdminPropsWithIntl) {
 		super(props);
 		this.handleDisplayTitleChange = this.handleDisplayTitleChange.bind(this);
 		this.handleDefaultChartToRenderChange = this.handleDefaultChartToRenderChange.bind(this);
@@ -249,4 +250,4 @@ class AdminComponent extends React.Component<AdminProps & InjectedIntlProps, {}>
 	}
 }
 
-export default injectIntl(AdminComponent);
+export default injectIntl<AdminProps>(AdminComponent);
