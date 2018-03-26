@@ -88,7 +88,9 @@ class UIOptionsComponent extends React.Component<UIOptionsPropsWithIntl, UIOptio
 				{this.props.chartToRender === ChartTypes.bar &&
 					<div>
 						<div className='checkbox'>
-							<label><input type='checkbox' onChange={this.handleChangeBarStacking} checked={this.props.barStacking} />Bar stacking</label>
+							<label><input type='checkbox' onChange={this.handleChangeBarStacking} checked={this.props.barStacking} />
+								<FormattedMessage id='bar.stacking' />
+							</label>
 						</div>
 						<p style={labelStyle}>
 							<FormattedMessage id='bar.interval' />:
@@ -100,26 +102,26 @@ class UIOptionsComponent extends React.Component<UIOptionsPropsWithIntl, UIOptio
 								outline={this.state.barDurationDays !== 1}
 								onClick={() => this.handleBarButton(1)}
 							>
-								<FormattedMessage id='day' />:
+								<FormattedMessage id='day' />
 							</Button>
 							<Button
 								outline={this.state.barDurationDays !== 7}
 								onClick={() => this.handleBarButton(7)}
 							>
-								<FormattedMessage id='week' />:
+								<FormattedMessage id='week' />
 							</Button>
 							<Button
 								outline={this.state.barDurationDays !== 28}
 								onClick={() => this.handleBarButton(28)}
 							>
-								<FormattedMessage id='4.weeks' />:
+								<FormattedMessage id='4.weeks' />
 							</Button>
 						</ButtonGroup>
 						<Button
 							outline={!this.state.showSlider}
 							onClick={this.toggleSlider}
 						>
-							<FormattedMessage id='toggle.custom.slider' />:
+							<FormattedMessage id='toggle.custom.slider' />
 						</Button>
 						{this.state.showSlider &&
 							<div style={divTopPadding}>
@@ -155,19 +157,19 @@ class UIOptionsComponent extends React.Component<UIOptionsPropsWithIntl, UIOptio
 							outline={compareVal !== 'day'}
 							onClick={() => this.handleCompareButton('day')}
 						>
-							<FormattedMessage id='day' />:
+							<FormattedMessage id='day' />
 						</Button>
 						<Button
 							outline={compareVal !== 'week'}
 							onClick={() => this.handleCompareButton('week')}
 						>
-							<FormattedMessage id='week' />:
+							<FormattedMessage id='week' />
 						</Button>
 						<Button
 							outline={compareVal !== 'month'}
 							onClick={() => this.handleCompareButton('month')}
 						>
-							<FormattedMessage id='4.weeks' />:
+							<FormattedMessage id='4.weeks' />
 						</Button>
 					</ButtonGroup>
 				</div>
