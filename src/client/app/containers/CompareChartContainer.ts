@@ -8,7 +8,6 @@ import { Bar, LinearComponentProps } from 'react-chartjs-2';
 import { ChartData, ChartDataSets, LinearTickOptions } from 'chart.js';
 import { connect } from 'react-redux';
 import { State } from '../types/redux/state';
-import * as datalabels from 'chartjs-plugin-datalabels';
 import {getComparePeriodLabels, getCompareChangeSummary} from '../utils/calculateCompare';
 import { Entity } from '../containers/MultiCompareChartContainer';
 

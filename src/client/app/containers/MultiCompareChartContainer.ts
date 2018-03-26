@@ -99,6 +99,7 @@ function getTimeSincePeriodStart(comparePeriod: ComparePeriod): number {
 			break;
 		case ComparePeriod.Week:
 			timeSincePeriodStart = moment().diff(moment().startOf('week'), 'days');
+			break;
 		case ComparePeriod.FourWeeks:
 			// 21 to differentiate from Week case, Week case never larger than 14
 			timeSincePeriodStart = moment().diff(moment().startOf('week').subtract(21, 'days'), 'days');
