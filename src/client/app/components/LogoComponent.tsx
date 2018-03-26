@@ -7,14 +7,13 @@ import { injectIntl, InjectedIntlProps, defineMessages } from 'react-intl';
 
 interface LogoProps {
 	url: string;
+	height: number;
 }
 
 type LogoPropsWithIntl = LogoProps & InjectedIntlProps;
 
 /**
  * React component that creates an logo image from a file path
- * @param props The props from the parent component which includes a path url
- * @return JSX to create logo image
  */
 function LogoComponent(props: LogoPropsWithIntl) {
 	const imgStyle: React.CSSProperties = {
@@ -28,7 +27,7 @@ function LogoComponent(props: LogoPropsWithIntl) {
 	});
 	const { formatMessage } = props.intl;
 	return (
-		<img src={props.url} alt={formatMessage(messages.logo)} title={formatMessage(messages.oed)} style={imgStyle} />
+		<img height={props.height} src={props.url} alt={formatMessage(messages.logo)} title={formatMessage(messages.oed)} style={imgStyle} />
 	);
 }
 

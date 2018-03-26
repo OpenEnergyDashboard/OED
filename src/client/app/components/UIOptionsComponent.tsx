@@ -7,6 +7,7 @@ import sliderWithoutTooltips, { createSliderWithTooltip } from 'rc-slider';
 import * as moment from 'moment';
 import { Button, ButtonGroup } from 'reactstrap';
 import { TimeInterval } from '../../../common/TimeInterval';
+import TooltipHelpComponent from './TooltipHelpComponent';
 import ExportContainer from '../containers/ExportContainer';
 import ChartSelectContainer from '../containers/ChartSelectContainer';
 import ChartDataSelectContainer from '../containers/ChartDataSelectContainer';
@@ -59,12 +60,10 @@ class UIOptionsComponent extends React.Component<UIOptionsPropsWithIntl, UIOptio
 		const labelStyle: React.CSSProperties = {
 			fontWeight: 'bold',
 			margin: 0
-		};
-
+		}
 		const divTopPadding: React.CSSProperties = {
 			paddingTop: '15px'
 		};
-
 		const zIndexFix: React.CSSProperties = {
 			zIndex: 0
 		};
@@ -79,6 +78,8 @@ class UIOptionsComponent extends React.Component<UIOptionsPropsWithIntl, UIOptio
 			compareVal = 'month';
 		}
 
+		const messages = defineMessages({ barStackingTip: {	id: 'bar.stacking.tip' }});
+
 		return (
 			<div>
 				<ChartSelectContainer />
@@ -89,7 +90,7 @@ class UIOptionsComponent extends React.Component<UIOptionsPropsWithIntl, UIOptio
 					<div>
 						<div className='checkbox'>
 							<label><input type='checkbox' onChange={this.handleChangeBarStacking} checked={this.props.barStacking} />
-								<FormattedMessage id='bar.stacking' />
+								<FormattedMessage id='bar.stacking' /><TooltipHelpComponent tip={this.props.intl.formatMessage(messages.barStackingTip)} />
 							</label>
 						</div>
 						<p style={labelStyle}>
