@@ -9,7 +9,7 @@ import { Dispatch } from '../../types/redux/actions';
 
 function mapDispatchToProps(dispatch: Dispatch) {
 	return {
-		fetchMeterDetailsIfNeeded: (alwaysFetch?: boolean) => dispatch(fetchMetersDetailsIfNeeded(alwaysFetch))
+		fetchMeterDetailsIfNeeded: () => dispatch(fetchMetersDetailsIfNeeded(true))
 	};
 }
 

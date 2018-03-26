@@ -19,7 +19,7 @@ export default class FileProcessingApi {
 		return await this.backend.doPostRequest<void>(`/api/fileProcessing/readings/${meterID}`, formData);
 	}
 
-	public async submitNewMeters(meters: [string]): Promise<void> {
+	public async submitNewMeters(meters: string[]): Promise<void> {
 		return await this.backend.doPostRequest<void>('/api/fileProcessing/meters', { meters });
 	}
 }

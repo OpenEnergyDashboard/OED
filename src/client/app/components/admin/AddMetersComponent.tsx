@@ -21,23 +21,27 @@ export default class AddMetersComponent extends React.Component<AddMetersProps, 
 		const file = files[0];
 		let meters = [];
 		const reader = new FileReader();
-		let listValue = [];
+		let dataLines = [];
+		const listOfIps: string[] = [];
+
 		reader.onload = () => {
 			const fileAsBinaryString = reader.result;
-			listValue = fileAsBinaryString.split(/\r?\n/);
-			if (listValue[0] !==  'ip') {
+			dataLines = fileAsBinaryString.split(/\r?\n/);
+			dataLines[0] = dataLines[0].replace(/\"/g, '');
+			if (dataLines[0] !==  'ip') {
 				showErrorNotification('Incorrect file format');
 			} else {
-				listValue.splice(listValue.indexOf('ip'), 1);
-				for (const items of listValue) {
-					if (items.length === 0) {
-						listValue.splice(listValue.indexOf(items), 1);
+				for (const items of dataLines) {
+					const ips = items.replace(/\"/g, '');
+					if (items.length !== 0 && items !== 'ip') {
+						listOfIps.push(ips);
 					}
 				}
-				meters = listValue;
+				meters = listOfIps;
 				fileProcessingApi.submitNewMeters(meters)
 					.then(() => {
 						showSuccessNotification('Successfully uploaded meters');
+						this.props.fetchMeterDetailsIfNeeded(true);
 						this.props.fetchMeterDetailsIfNeeded(true);
 					})
 					.catch(() => {
