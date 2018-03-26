@@ -34,7 +34,7 @@ class Meter {
 
 	/**
 	 * Returns a promise to create the meter_type type.
-	 * This needs to be run before Meter.createTable().
+	 * This needs to be run before Entity.createTable().
 	 * @return {Promise<void>}
 	 */
 	static createMeterTypesEnum() {

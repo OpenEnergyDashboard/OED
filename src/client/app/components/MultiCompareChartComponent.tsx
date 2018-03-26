@@ -4,10 +4,11 @@
 
 import * as React from 'react';
 import CompareChartContainer from '../containers/CompareChartContainer';
+import { Entity } from '../containers/MultiCompareChartContainer';
 
 interface MultiCompareChartProps {
-	selectedMeters: number[];
-	selectedGroups: number[];
+	selectedMeters: Entity[];
+	selectedGroups: Entity[];
 }
 
 export default function MultiCompareChartComponent(props: MultiCompareChartProps) {
@@ -34,14 +35,20 @@ export default function MultiCompareChartComponent(props: MultiCompareChartProps
 
 	return (
 		<div className='row'>
-			{props.selectedMeters.map(meterID =>
-				<div className={childClassName} key={meterID}>
-					<CompareChartContainer key={meterID} id={meterID} isGroup={false} />
+			{props.selectedMeters.map(meter =>
+				<div className={childClassName} key={meter.id}>
+					<CompareChartContainer
+						key={meter.id}
+						entity={meter}
+					/>
 				</div>
 			)}
-			{props.selectedGroups.map(groupID =>
-				<div className={childClassName} key={groupID}>
-					<CompareChartContainer key={groupID} id={groupID} isGroup />
+			{props.selectedGroups.map(group =>
+				<div className={childClassName} key={group.id}>
+					<CompareChartContainer
+						key={group.id}
+						entity={group}
+					/>
 				</div>
 			)}
 		</div>

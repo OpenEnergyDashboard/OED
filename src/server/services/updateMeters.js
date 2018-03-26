@@ -11,7 +11,7 @@ const { log } = require('../log');
  * Uses the provided dataReader function to poll the provided meters for new readings,
  * and inserts any new readings into the database.
  * @param dataReader {function} A function to fetch readings from each meter
- * @param metersToUpdate [Meter] An array of meters to be updated
+ * @param metersToUpdate [Entity] An array of meters to be updated
  * @return {Promise.<void>}
  */
 async function updateAllMeters(dataReader, metersToUpdate) {

@@ -15,7 +15,7 @@ const defaultState: GraphState = {
 	barDuration: moment.duration(4, 'weeks'),
 	comparePeriod: ComparePeriod.Week,
 	compareTimeInterval: calculateCompareTimeInterval(ComparePeriod.Week, moment()),
-	sortingOrder: SortingOrder.Descending,
+	sortingOrder: SortingOrder.Ascending,
 	chartToRender: ChartTypes.line,
 	barStacking: false,
 	hotlinked: false

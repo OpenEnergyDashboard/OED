@@ -5,7 +5,7 @@
 SELECT
   meter_id, reading, start_timestamp, end_timestamp
 FROM readings
-WHERE meter_id = ${meterID}
+WHERE meter_id = ${id}
   AND start_timestamp >= COALESCE(${startDate}, '-infinity'::TIMESTAMP)
 	AND end_timestamp <= COALESCE(${endDate}, 'infinity'::TIMESTAMP)
 ORDER BY start_timestamp ASC;
