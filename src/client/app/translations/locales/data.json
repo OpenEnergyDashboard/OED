@@ -1,6 +1,7 @@
 {
 	"en": {
 		"404": "404 Not Found",
+		"4.weeks": "4 Weeks",
 		"admin.panel": "Admin Panel",
 		"bar": "Bar",
 		"bar.interval": "Bar Interval",
@@ -12,6 +13,8 @@
 		"contact.us": "Contact us ",
 		"create.group": "Create a Group",
 		"create.new.group": "Create a New Group",
+		"day": "Day",
+		"days": "Days",
 		"default.bar.stacking": "Default Bar Stacking",
 		"default.graph.type": "Default Graph Type",
 		"default.language": "Default Language",
@@ -50,16 +53,19 @@
 		"submit.changes": "Submit changes",
 		"submit": "Submit",
 		"successful.upload.readings": "Succesfully uploaded meter readings",
+		"toggle.custom.slider": "Toggle custom slider",
 		"toggle.link": "Toggle chart link",
 		"unused.groups": "Unused Groups",
 		"unused.meters": "Unused Meters",
 		"upload.csv": "Upload a CSV file",
 		"view.groups": "View Groups",
 		"visit": "visit",
-		"website": "site web"
+		"website": "site web",
+		"week": "Week"
 	},
 	"fr": {
 		"404": "404 Introuvable",
+		"4.weeks": "4 semaines",
 		"admin.panel": "Panneau d'administration",
 		"bar": "Bande",
 		"bar.interval": "Intervalle du diagramme à bandes",
@@ -71,6 +77,8 @@
 		"contact.us": "Contactez nous ",
 		"create.group": "Créer un Groupe",
 		"create.new.group": "Créer un Nouveau Groupe",
+		"day": "Journée",
+		"days": "Journées",
 		"default.bar.stacking": "Empillage de Bandes par Défaut",
 		"default.graph.type": "Type du Diagramme par Défaut",
 		"default.language": "Langue par Défaut",
@@ -109,12 +117,14 @@
 		"submit.changes": "Soumettre les changements",
 		"submit": "Soumettre",
 		"successful.upload.readings": "Lecture réussie des relevés de mètres",
+		"toggle.custom.slider": "Basculer le curseur personnalisé",
 		"toggle.link": "Bascule du lien du diagramme",
 		"unused.groups": "Groupes non utilisés",
 		"unused.meters": "Mètres non utilisés",
 		"upload.csv": "Télécharger un fichier CSV",
 		"view.groups": "Visionner les groupes",
 		"visit": "ou visitez notre",
-		"website": "site web"
+		"website": "site web",
+		"week": "Semaine"
 	}
 }

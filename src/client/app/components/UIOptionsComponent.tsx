@@ -14,6 +14,7 @@ import { ChangeBarStackingAction } from '../types/redux/graph';
 import ChartLinkContainer from '../containers/ChartLinkContainer';
 import { ChartTypes } from '../types/redux/graph';
 import 'rc-slider/assets/index.css';
+import { InjectedIntlProps, FormattedMessage, injectIntl, defineMessages } from 'react-intl';
 
 const Slider = createSliderWithTooltip(sliderWithoutTooltips);
 
@@ -27,17 +28,15 @@ export interface UIOptionsProps {
 	changeCompareInterval(interval: TimeInterval, duration: moment.Duration): Promise<any>;
 }
 
+type UIOptionsPropsWithIntl = UIOptionsProps & InjectedIntlProps;
+
 interface UIOptionsState {
 	barDurationDays: number;
 	showSlider: boolean;
 }
 
-export default class UIOptionsComponent extends React.Component<UIOptionsProps, UIOptionsState> {
-	/**
-	 * Initializes the component's state, binds all functions to 'this' UIOptionsComponent
-	 * @param props The props passed down through the UIOptionsContainer
-	 */
-	constructor(props: UIOptionsProps) {
+class UIOptionsComponent extends React.Component<UIOptionsPropsWithIntl, UIOptionsState> {
+	constructor(props: UIOptionsPropsWithIntl) {
 		super(props);
 		this.handleBarDurationChange = this.handleBarDurationChange.bind(this);
 		this.handleBarDurationChangeComplete = this.handleBarDurationChangeComplete.bind(this);
@@ -52,14 +51,10 @@ export default class UIOptionsComponent extends React.Component<UIOptionsProps, 
 		};
 	}
 
-
 	public componentWillReceiveProps(nextProps: UIOptionsProps) {
 		this.setState({barDurationDays: nextProps.barDuration.asDays()});
 	}
 
-	/**
-	 * @returns JSX to create the UI options side-panel (includes dynamic rendering of meter information for selection)
-	 */
 	public render() {
 		const labelStyle: React.CSSProperties = {
 			fontWeight: 'bold',
@@ -95,7 +90,9 @@ export default class UIOptionsComponent extends React.Component<UIOptionsProps, 
 						<div className='checkbox'>
 							<label><input type='checkbox' onChange={this.handleChangeBarStacking} checked={this.props.barStacking} />Bar stacking</label>
 						</div>
-						<p style={labelStyle}>Bar chart interval:</p>
+						<p style={labelStyle}>
+							<FormattedMessage id='bar.interval' />:
+						</p>
 						<ButtonGroup
 							style={zIndexFix}
 						>
@@ -103,26 +100,26 @@ export default class UIOptionsComponent extends React.Component<UIOptionsProps, 
 								outline={this.state.barDurationDays !== 1}
 								onClick={() => this.handleBarButton(1)}
 							>
-								Day
+								<FormattedMessage id='day' />:
 							</Button>
 							<Button
 								outline={this.state.barDurationDays !== 7}
 								onClick={() => this.handleBarButton(7)}
 							>
-								Week
+								<FormattedMessage id='week' />:
 							</Button>
 							<Button
 								outline={this.state.barDurationDays !== 28}
 								onClick={() => this.handleBarButton(28)}
 							>
-								4 Weeks
+								<FormattedMessage id='4.weeks' />:
 							</Button>
 						</ButtonGroup>
 						<Button
 							outline={!this.state.showSlider}
 							onClick={this.toggleSlider}
 						>
-							Toggle custom slider
+							<FormattedMessage id='toggle.custom.slider' />:
 						</Button>
 						{this.state.showSlider &&
 							<div style={divTopPadding}>
@@ -158,19 +155,19 @@ export default class UIOptionsComponent extends React.Component<UIOptionsProps, 
 							outline={compareVal !== 'day'}
 							onClick={() => this.handleCompareButton('day')}
 						>
-							Day
+							<FormattedMessage id='day' />:
 						</Button>
 						<Button
 							outline={compareVal !== 'week'}
 							onClick={() => this.handleCompareButton('week')}
 						>
-							Week
+							<FormattedMessage id='week' />:
 						</Button>
 						<Button
 							outline={compareVal !== 'month'}
 							onClick={() => this.handleCompareButton('month')}
 						>
-							4 Weeks
+							<FormattedMessage id='4.weeks' />:
 						</Button>
 					</ButtonGroup>
 				</div>
@@ -255,9 +252,16 @@ export default class UIOptionsComponent extends React.Component<UIOptionsProps, 
 	}
 
 	private formatSliderTip(value: number) {
+		const messages = defineMessages({
+			day: {	id: 'day' },
+			days: { id: 'days' }
+		});
+		const { formatMessage } = this.props.intl;
 		if (value <= 1) {
-			return `${value} day`;
+			return `${value} ${formatMessage(messages.day)}`;
 		}
-		return `${value} days`;
+		return `${value} ${formatMessage(messages.days)}`;
 	}
 }
+
+export default injectIntl<UIOptionsProps>(UIOptionsComponent);

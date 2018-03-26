@@ -100,6 +100,4 @@ export default class HeaderButtonsComponent extends React.Component<HeaderButton
 		localStorage.removeItem('token');
 		this.forceUpdate();
 	}
-
-
 }
