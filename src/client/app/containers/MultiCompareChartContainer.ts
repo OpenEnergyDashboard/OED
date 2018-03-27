@@ -164,7 +164,7 @@ function sortIDs(ids: Entity[], sortingOrder: SortingOrder): Entity[] {
 					return 1;
 				}
 				return 0;
-			})
+			});
 			break;
 		case SortingOrder.Ascending:
 			ids.sort((a, b) => {
@@ -175,7 +175,7 @@ function sortIDs(ids: Entity[], sortingOrder: SortingOrder): Entity[] {
 					return 1;
 				}
 				return 0;
-			})
+			});
 			break;
 		case SortingOrder.Descending:
 			ids.sort((a, b) =>  {
@@ -186,7 +186,7 @@ function sortIDs(ids: Entity[], sortingOrder: SortingOrder): Entity[] {
 					return 1;
 				}
 				return 0;
-			})
+			});
 			break;
 		default:
 			throw new Error(`Unknown sorting order: ${sortingOrder}`);

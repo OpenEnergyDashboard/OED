@@ -12,7 +12,6 @@ import { Dispatch, Thunk, ActionType } from '../types/redux/actions';
 import { State } from '../types/redux/state';
 import * as t from '../types/redux/graph';
 import {ComparePeriod, SortingOrder} from '../utils/calculateCompare';
-import {ChangeSortingOrderAction} from "../types/redux/graph";
 
 export function changeChartToRender(chartType: t.ChartTypes): t.ChangeChartToRenderAction {
 	return { type: ActionType.ChangeChartToRender, chartType };
