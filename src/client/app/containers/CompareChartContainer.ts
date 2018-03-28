@@ -9,7 +9,12 @@ import { ChartData, ChartDataSets, LinearTickOptions } from 'chart.js';
 import { connect } from 'react-redux';
 import { State } from '../types/redux/state';
 import {getComparePeriodLabels, getCompareChangeSummary} from '../utils/calculateCompare';
-import { Entity } from '../containers/MultiCompareChartContainer';
+import { Entity } from './MultiCompareChartContainer';
+import * as datalabels from 'chartjs-plugin-datalabels';
+
+if (datalabels === null || datalabels === undefined) {
+	throw new Error('Datalabels plugin was tree-shaken out.');
+}
 
 interface ChartDataSetsWithDatalabels extends ChartDataSets {
 	datalabels: {
