@@ -15,7 +15,9 @@
 const express = require('express');
 const config = require('../config');
 const multer = require('multer');
+const zlib = require('zlib');
 const { log } = require('../log');
+const streamBuffers = require('stream-buffers');
 
 const upload = multer({ storage: multer.memoryStorage() });
 const router = express.Router();
@@ -165,6 +167,14 @@ router.all('/', async (req, res) => {
 
 	if (mode === MODE_LOGFILE_UPLOAD) {
 		log.info(`Received file: ${req.file}`);
+		zlib.gunzip(req.file.buffer, (err, buffer) => {
+			if (!err) {
+				log.info(buffer.toString('utf-8'));
+			} else {
+				log.error(err);
+			}
+		});
+
 		failure(req, res, 'Logfile Upload Not Implemented');
 		return;
 	}
