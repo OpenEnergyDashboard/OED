@@ -11,7 +11,6 @@ const streamToDB = require('../services/loadFromCsvStream');
 const { insertMeters } = require('../services/readMamacMeters');
 const authenticator = require('./authenticator');
 const validate = require('jsonschema').validate;
-const { log } = require('../log');
 
 const router = express.Router();
 

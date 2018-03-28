@@ -19,7 +19,6 @@ export default class AddMetersComponent extends React.Component<AddMetersProps, 
 
 	public handleMeterToImport(files: File[]) {
 		const file = files[0];
-		let meters = [];
 		const reader = new FileReader();
 		let dataLines = [];
 		const listOfIps: string[] = [];
@@ -37,11 +36,9 @@ export default class AddMetersComponent extends React.Component<AddMetersProps, 
 						listOfIps.push(ips);
 					}
 				}
-				meters = listOfIps;
-				fileProcessingApi.submitNewMeters(meters)
+				fileProcessingApi.submitNewMeters(listOfIps)
 					.then(() => {
 						showSuccessNotification('Successfully uploaded meters');
-						this.props.fetchMeterDetailsIfNeeded(true);
 						this.props.fetchMeterDetailsIfNeeded(true);
 					})
 					.catch(() => {
@@ -65,7 +62,7 @@ export default class AddMetersComponent extends React.Component<AddMetersProps, 
 			<div>
 				<p style={titleStyle}> Add new meters: </p>
 				<Dropzone accept='text/csv, application/vnd.ms-excel,' onDrop={this.handleMeterToImport}>
-					<div>Upload meters list (CSV):</div>
+					<div>Upload meters data (CSV):</div>
 				</Dropzone>
 			</div>
 		);
