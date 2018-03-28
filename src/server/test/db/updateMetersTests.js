@@ -17,7 +17,7 @@ const mocha = require('mocha');
 const sinon = require('sinon');
 
 
-mocha.describe('Entity Update', () => {
+mocha.describe('Meter Update', () => {
 	mocha.beforeEach(recreateDB);
 	mocha.it('can persist over a failed request', async () => {
 		const goodMeter = new Meter(undefined, 'GOOD', 1, true, Meter.type.MAMAC);

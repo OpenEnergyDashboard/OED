@@ -5,5 +5,5 @@
 SELECT
   meter_id, reading, start_timestamp, end_timestamp
 FROM readings
-WHERE meter_id = ${id}
+WHERE meter_id = ${meterID}
 ORDER BY start_timestamp ASC;
