@@ -2,13 +2,13 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
 
-import axios from 'axios';
 import * as moment from 'moment';
 import { TimeInterval } from '../../../common/TimeInterval';
 import { Dispatch, GetState, Thunk, ActionType } from '../types/redux/actions';
 import { State } from '../types/redux/state';
 import { BarReadings } from '../types/readings';
 import * as t from '../types/redux/barReadings';
+import { groupsApi, metersApi } from '../utils/api';
 import { ComparePeriod, calculateCompareDuration, calculateCompareTimeInterval } from '../utils/calculateCompare';
 
 /**
@@ -88,15 +88,11 @@ function receiveGroupBarReadings(groupIDs: number[], timeInterval: TimeInterval,
  * @param {TimeInterval} timeInterval The time interval over which data should be fetched
  */
 function fetchMeterBarReadings(meterIDs: number[], timeInterval: TimeInterval): Thunk {
-	return (dispatch: Dispatch, getState: GetState) => {
+	return async (dispatch: Dispatch, getState: GetState) => {
 		const barDuration = getState().graph.barDuration;
 		dispatch(requestMeterBarReadings(meterIDs, timeInterval, barDuration));
-		// API expects a comma-separated string of IDs
-		const stringifiedIDs = meterIDs.join(',');
-
-		return axios.get(`/api/readings/bar/meters/${stringifiedIDs}`, {
-			params: { timeInterval: timeInterval.toString(), barDuration: barDuration.toISOString() }
-		}).then(response => dispatch(receiveMeterBarReadings(meterIDs, timeInterval, barDuration, response.data)));
+		const readings = await metersApi.barReadings(meterIDs, timeInterval, barDuration);
+		dispatch(receiveMeterBarReadings(meterIDs, timeInterval, barDuration, readings));
 	};
 }
 
@@ -107,41 +103,33 @@ function fetchMeterBarReadings(meterIDs: number[], timeInterval: TimeInterval): 
  * @param {TimeInterval} timeInterval The time interval over which data should be fetched
  */
 function fetchGroupBarReadings(groupIDs: number[], timeInterval: TimeInterval): Thunk {
-	return (dispatch: Dispatch, getState: GetState) => {
+	return async (dispatch: Dispatch, getState: GetState) => {
 		const barDuration = getState().graph.barDuration;
 		dispatch(requestGroupBarReadings(groupIDs, timeInterval, barDuration));
 		// API expectes a comma-seperated string of IDs
 		const stringifiedIDs = groupIDs.join(',');
-
-		return axios.get(`/api/readings/bar/groups/${stringifiedIDs}`, {
-			params: { timeInterval: timeInterval.toString(), barDuration: barDuration.toISOString() }
-		}).then(response => dispatch(receiveGroupBarReadings(groupIDs, timeInterval, barDuration, response.data)));
+		const readings = await groupsApi.barReadings(groupIDs, timeInterval, barDuration);
+		dispatch(receiveGroupBarReadings(groupIDs, timeInterval, barDuration, readings));
 	};
 }
 
 function fetchMeterCompareReadings(meterIDs: number[], comparePeriod: ComparePeriod): Thunk {
-	return (dispatch: Dispatch, getState: GetState) => {
+	return async (dispatch: Dispatch, getState: GetState) => {
 		const compareDuration = calculateCompareDuration(comparePeriod);
 		const timeInterval = getState().graph.compareTimeInterval;
 		dispatch(requestMeterBarReadings(meterIDs, timeInterval, compareDuration));
-		const stringifiedMeterIDs = meterIDs.join(',');
-		return axios.get(`/api/readings/bar/meters/${stringifiedMeterIDs}`, {
-			params: { timeInterval: timeInterval.toString(), barDuration: compareDuration.toISOString() }
-		}).then(response => dispatch(receiveMeterBarReadings(meterIDs, timeInterval, compareDuration, response.data)));
+		const readings = await metersApi.barReadings(meterIDs, timeInterval, compareDuration);
+		dispatch(receiveMeterBarReadings(meterIDs, timeInterval, compareDuration, readings));
 	};
 }
 
 function fetchGroupCompareReadings(groupIDs: number[], comparePeriod: ComparePeriod) {
-	return (dispatch: Dispatch, getState: GetState) => {
+	return async (dispatch: Dispatch, getState: GetState) => {
 		const compareDuration = calculateCompareDuration(comparePeriod);
 		const timeInterval = getState().graph.compareTimeInterval;
 		dispatch(requestGroupBarReadings(groupIDs, timeInterval, compareDuration));
-		// API expects a comma-separated string of IDs
-		const stringifiedIDs = groupIDs.join(',');
-
-		return axios.get(`/api/readings/bar/groups/${stringifiedIDs}`, {
-			params: { timeInterval: timeInterval.toString(), barDuration: compareDuration.toISOString() }
-		}).then(response => dispatch(receiveGroupBarReadings(groupIDs, timeInterval, compareDuration, response.data)));
+		const readings = await groupsApi.barReadings(groupIDs, timeInterval, compareDuration);
+		dispatch(receiveGroupBarReadings(groupIDs, timeInterval, compareDuration, readings));
 	};
 }
 

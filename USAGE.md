@@ -95,6 +95,7 @@ Administration:
 * `addMamacMeters` adds meters from a CSV file (see above).
 * `updateMamacMeters` fetches new data from previously imported Mamac meters.
 * `createUser` creates a new user. If given no arguments, it is interactive; you can also pass the username and password as command line arguments.
+* `editUser` edits the password of an existing user.
 
 ### Upgrading the App ###
 

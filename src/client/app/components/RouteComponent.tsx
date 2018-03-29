@@ -4,7 +4,6 @@
 
 import * as React from 'react';
 import { Router, Route, browserHistory, RedirectFunction, RouterState } from 'react-router';
-import axios from 'axios';
 import * as _ from 'lodash';
 import * as moment from 'moment';
 import InitializationContainer from '../containers/InitializationContainer';
@@ -16,6 +15,7 @@ import { LinkOptions } from 'actions/graph';
 import { getToken, hasToken } from '../utils/token';
 import { showErrorNotification } from '../utils/notifications';
 import { ChartTypes } from '../types/redux/graph';
+import { verificationApi } from '../utils/api';
 import {ComparePeriod, validateComparePeriod} from '../utils/calculateCompare';
 
 interface RouteProps {
@@ -47,16 +47,14 @@ export default class RouteComponent extends React.Component<RouteProps, {}> {
 			redirectRoute();
 			return;
 		}
-		// Verify that the auth token is valid
-		axios.post('/api/verification/',
-			{ token: getToken() },
-			{ validateStatus: status => (status >= 200 && status < 300) || (status === 401 || status === 403) })
-			.then(res => {
+		// Verify that the auth token is valid.
+		// Needs to be async because of the network request
+		(async () => {
+			if (!(await verificationApi.checkTokenValid())) {
 				// Route to login page if the auth token is not valid
-				if (!res.data.success) { browserHistory.push('/login'); }
-			})
-			// In the case of a server error, the user can't fix the issue. Log it for developers.
-			.catch(console.error); // eslint-disable-line no-console
+				browserHistory.push('/login');
+			}
+		})();
 	}
 
 	/**
