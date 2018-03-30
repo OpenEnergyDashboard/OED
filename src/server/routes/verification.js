@@ -20,7 +20,8 @@ router.post('/', (req, res) => {
 		required: ['token'],
 		properties: {
 			token: {
-				type: 'string'
+				type: 'string',
+				pattern: '^\\d+$'
 			}
 		}
 	};

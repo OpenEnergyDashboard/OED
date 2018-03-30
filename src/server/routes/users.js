@@ -32,7 +32,8 @@ router.get('/:user_id', async (req, res) => {
 		required: ['user_id'],
 		properties: {
 			user_id: {
-				type: 'string'
+				type: 'string',
+				pattern: '^\\d+$'
 			}
 		}
 	};
