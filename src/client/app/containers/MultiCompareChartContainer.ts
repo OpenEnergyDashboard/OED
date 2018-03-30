@@ -9,7 +9,7 @@ import {calculateCompareDuration, ComparePeriod, SortingOrder} from '../utils/ca
 import { TimeInterval } from '../../../common/TimeInterval';
 import * as moment from 'moment';
 
-export interface Entity {
+export interface CompareEntity {
 	id: number;
 	isGroup: boolean;
 	name: string;
@@ -25,20 +25,20 @@ interface ReadingsData {
 }
 
 function mapStateToProps(state: State) {
-	const meters: Entity[] = getDataForIDs(state.graph.selectedMeters, false, state);
-	const groups: Entity[] = getDataForIDs(state.graph.selectedGroups, true, state);
-	const compareEntities: Entity[] = meters.concat(groups);
+	const meters: CompareEntity[] = getDataForIDs(state.graph.selectedMeters, false, state);
+	const groups: CompareEntity[] = getDataForIDs(state.graph.selectedGroups, true, state);
+	const compareEntities: CompareEntity[] = meters.concat(groups);
 	const sortingOrder = state.graph.compareSortingOrder;
 	return {
 		selectedCompareEntities: sortIDs(compareEntities, sortingOrder)
 	};
 }
 
-function getDataForIDs(ids: number[], isGroup: boolean, state: State): Entity[] {
+function getDataForIDs(ids: number[], isGroup: boolean, state: State): CompareEntity[] {
 	const timeInterval = state.graph.compareTimeInterval;
 	const comparePeriod = state.graph.comparePeriod;
 	const barDuration = calculateCompareDuration(comparePeriod);
-	const entities: Entity[] = [];
+	const entities: CompareEntity[] = [];
 	for (const id of ids) {
 		let name: string;
 		let readingsData: ReadingsData | undefined;
@@ -59,7 +59,7 @@ function getDataForIDs(ids: number[], isGroup: boolean, state: State): Entity[] 
 			const lastPeriodTotalUsage = calculateLastPeriodUsage(readingsData, timeSincePeriodStart) || 0;
 			const usedToThisPointLastTimePeriod = calculateUsageToThisPointLastTimePeroid(readingsData, timeSincePeriodStart) || 0;
 			const change = calculateChange(currentPeriodUsage, usedToThisPointLastTimePeriod, lastPeriodTotalUsage);
-			const entity: Entity = {id, isGroup, name, change, lastPeriodTotalUsage, currentPeriodUsage, usedToThisPointLastTimePeriod};
+			const entity: CompareEntity = {id, isGroup, name, change, lastPeriodTotalUsage, currentPeriodUsage, usedToThisPointLastTimePeriod};
 			entities.push(entity);
 		}
 	}
@@ -147,7 +147,7 @@ function calculateChange(currentPeriodUsage: number, usedToThisPointLastTimePeri
 	return change;
 }
 
-function sortIDs(ids: Entity[], sortingOrder: SortingOrder): Entity[] {
+function sortIDs(ids: CompareEntity[], sortingOrder: SortingOrder): CompareEntity[] {
 	switch (sortingOrder) {
 		case SortingOrder.Alphabetical:
 			ids.sort((a, b) => {

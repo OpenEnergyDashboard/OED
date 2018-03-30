@@ -4,16 +4,15 @@
 
 import * as React from 'react';
 import CompareChartContainer from '../containers/CompareChartContainer';
-import { Entity } from '../containers/MultiCompareChartContainer';
+import { CompareEntity } from '../containers/MultiCompareChartContainer';
 
 interface MultiCompareChartProps {
-	selectedCompareEntities: Entity[];
+	selectedCompareEntities: CompareEntity[];
 }
 
 export default function MultiCompareChartComponent(props: MultiCompareChartProps) {
 	// Compute how much space should be used in the bootstrap grid system
 	let size = 3;
-	// const numSelectedItems = props.selectedMeters.length + props.selectedGroups.length;
 	const numSelectedItems = props.selectedCompareEntities.length;
 	if (numSelectedItems < 3) {
 		size = numSelectedItems;

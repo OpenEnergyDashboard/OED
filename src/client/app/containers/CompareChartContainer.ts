@@ -9,7 +9,7 @@ import { ChartData, ChartDataSets, LinearTickOptions, ChartTooltipItem } from 'c
 import { connect } from 'react-redux';
 import { State } from '../types/redux/state';
 import {getComparePeriodLabels, getCompareChangeSummary} from '../utils/calculateCompare';
-import { Entity } from './MultiCompareChartContainer';
+import { CompareEntity } from './MultiCompareChartContainer';
 import * as datalabels from 'chartjs-plugin-datalabels';
 
 if (datalabels === null || datalabels === undefined) {
@@ -24,7 +24,7 @@ interface ChartDataSetsWithDatalabels extends ChartDataSets {
 }
 
 interface CompareChartContainerProps {
-	entity: Entity;
+	entity: CompareEntity;
 }
 
 function mapStateToProps(state: State, ownProps: CompareChartContainerProps) {
