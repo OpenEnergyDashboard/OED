@@ -51,13 +51,13 @@ function getDataForIDs(ids: number[], isGroup: boolean, state: State): CompareEn
 		}
 		if (isReadingsDataValid(readingsData)) {
 			const timeSincePeriodStart = getTimeSincePeriodStart(comparePeriod);
-			if (readingsData.readings!.length < timeSincePeriodStart) {
+			if (readingsData!.readings!.length < timeSincePeriodStart) {
 				throw new Error(`Insufficient readings data to process comparison for id ${id}, ti ${timeInterval}, dur ${barDuration}.
-				readingsData has ${readingsData.readings!.length} but we'd like to look at the last ${timeSincePeriodStart} elements.`);
+				readingsData has ${readingsData!.readings!.length} but we'd like to look at the last ${timeSincePeriodStart} elements.`);
 			}
-			const currentPeriodUsage = calculateCurrentPeriodUsage(readingsData, timeSincePeriodStart) || 0;
-			const lastPeriodTotalUsage = calculateLastPeriodUsage(readingsData, timeSincePeriodStart) || 0;
-			const usedToThisPointLastTimePeriod = calculateUsageToThisPointLastTimePeroid(readingsData, timeSincePeriodStart) || 0;
+			const currentPeriodUsage = calculateCurrentPeriodUsage(readingsData!, timeSincePeriodStart) || 0;
+			const lastPeriodTotalUsage = calculateLastPeriodUsage(readingsData!, timeSincePeriodStart) || 0;
+			const usedToThisPointLastTimePeriod = calculateUsageToThisPointLastTimePeroid(readingsData!, timeSincePeriodStart) || 0;
 			const change = calculateChange(currentPeriodUsage, usedToThisPointLastTimePeriod, lastPeriodTotalUsage);
 			const entity: CompareEntity = {id, isGroup, name, change, lastPeriodTotalUsage, currentPeriodUsage, usedToThisPointLastTimePeriod};
 			entities.push(entity);
@@ -67,14 +67,20 @@ function getDataForIDs(ids: number[], isGroup: boolean, state: State): CompareEn
 }
 
 function getGroupName(state: State, groupID: number): string {
+	if (state.groups.byGroupID[groupID] === undefined) {
+		return '';
+	}
 	return state.groups.byGroupID[groupID].name;
 }
 
 function getMeterName(state: State, meterID: number): string {
+	if (state.meters.byMeterID[meterID] === undefined) {
+		return '';
+	}
 	return state.meters.byMeterID[meterID].name;
 }
 
-function getGroupReadingsData(state: State, groupID: number, timeInterval: TimeInterval, barDuration: moment.Duration) {
+function getGroupReadingsData(state: State, groupID: number, timeInterval: TimeInterval, barDuration: moment.Duration): ReadingsData | undefined {
 	let readingsData: ReadingsData | undefined ;
 	const readingsDataByID = state.readings.bar.byGroupID[groupID];
 	const readingsDataByTimeInterval = readingsDataByID[timeInterval.toString()];
@@ -82,7 +88,7 @@ function getGroupReadingsData(state: State, groupID: number, timeInterval: TimeI
 	return readingsData;
 }
 
-function getMeterReadingsData(state: State, meterID: number, timeInterval: TimeInterval, barDuration: moment.Duration) {
+function getMeterReadingsData(state: State, meterID: number, timeInterval: TimeInterval, barDuration: moment.Duration): ReadingsData | undefined {
 	let readingsData: ReadingsData | undefined ;
 	const readingsDataByID = state.readings.bar.byMeterID[meterID];
 	const readingsDataByTimeInterval = readingsDataByID[timeInterval.toString()];
