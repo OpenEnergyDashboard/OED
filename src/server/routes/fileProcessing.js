@@ -51,7 +51,7 @@ router.post('/readings/:meter_id', upload.single('csvFile'), async (req, res) =>
 				}, (readings, tx) => Reading.insertOrUpdateAll(readings, tx));
 				res.status(200).json({ success: true });
 			} catch (e) {
-				res.status(403).json({ success: false, message: 'Failed to upload data.' });
+				res.status(403).json({ success: false });
 			}
 		} catch (err) {
 			res.status(400).send({
@@ -84,7 +84,7 @@ router.post('/meters', async (req, res) => {
 			await insertMeters(req.body.meters.map(ip => ({ip})));
 			res.status(200).json({success: true});
 		} catch (err) {
-			res.status(403).json({success: false, message: 'Failed to upload meters.'});
+			res.status(403).json({success: false});
 		}
 	}
 });

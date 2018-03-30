@@ -6,6 +6,7 @@
 import * as React from 'react';
 import Dropzone from 'react-dropzone';
 import { fileProcessingApi } from '../../utils/api';
+import TooltipHelpComponent from '../TooltipHelpComponent';
 import { showSuccessNotification, showErrorNotification } from '../../utils/notifications';
 
 interface AddMetersProps {
@@ -55,12 +56,16 @@ export default class AddMetersComponent extends React.Component<AddMetersProps, 
 		const titleStyle: React.CSSProperties = {
 			fontWeight: 'bold',
 			margin: 0,
-			paddingBottom: '5px'
+			paddingBottom: '5px',
+			display: 'inline'
 		};
 
 		return (
 			<div>
 				<p style={titleStyle}> Add new meters: </p>
+				<TooltipHelpComponent
+					tip="The file format is a CSV file with 'ip' as the first line followed by a list of meter IPs each separated by a new line"
+				/>
 				<Dropzone accept='text/csv, application/vnd.ms-excel,' onDrop={this.handleMeterToImport}>
 					<div>Upload meters data (CSV):</div>
 				</Dropzone>
