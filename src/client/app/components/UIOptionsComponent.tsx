@@ -33,7 +33,7 @@ export interface UIOptionsProps {
 interface UIOptionsState {
 	barDurationDays: number;
 	showSlider: boolean;
-	dropdownOpen: boolean;
+	compareSortingDropdownOpen: boolean;
 }
 
 export default class UIOptionsComponent extends React.Component<UIOptionsProps, UIOptionsState> {
@@ -51,7 +51,7 @@ export default class UIOptionsComponent extends React.Component<UIOptionsProps, 
 		this.state = {
 			barDurationDays: this.props.barDuration.asDays(),
 			showSlider: false,
-			dropdownOpen: false
+			compareSortingDropdownOpen: false
 		};
 	}
 
@@ -172,7 +172,7 @@ export default class UIOptionsComponent extends React.Component<UIOptionsProps, 
 							4 Weeks
 						</Button>
 					</ButtonGroup>
-					<Dropdown isOpen={this.state.dropdownOpen} toggle={this.toggleDropdown}>
+					<Dropdown isOpen={this.state.compareSortingDropdownOpen} toggle={this.toggleDropdown}>
 						<DropdownToggle caret>
 							Sort
 						</DropdownToggle>
@@ -273,6 +273,6 @@ export default class UIOptionsComponent extends React.Component<UIOptionsProps, 
 	}
 
 	private toggleDropdown() {
-		this.setState({ dropdownOpen: !this.state.dropdownOpen });
+		this.setState({ compareSortingDropdownOpen: !this.state.compareSortingDropdownOpen });
 	}
 }
