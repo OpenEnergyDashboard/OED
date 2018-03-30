@@ -7,8 +7,6 @@ const Migration = require('../models/Migration');
 const { compareSemanticVersion } = require('../util');
 const { log } = require('../log');
 
-// file needed to run database transaction
-const requiredFile = [];
 
 /**
  * @param migrationItems extracted from registerMigration.js
@@ -115,24 +113,30 @@ function findPathToMigrate(curr, to, adjListArray) {
 }
 
 /**
- * Based on the path array, recursively find the correct file to the version wanted to update
- * and add it to the requiredFile array
+ * Based on the path array, find the correct file to the version wanted to update
  * @param curr current version of the database
  * @param to version want to migrate to
- * @param path array that store the indexes to the version that we want to migrate to
+ * @param path to version want to migrate to
+ * @returns {Array} of files needed to update database
  */
 function getRequiredFilesToMigrate(curr, to, path) {
+	// file needed to run database transaction
+	const requiredFile = [];
 	if (curr === to) {
-		requiredFile.push();
-	} else if (path[to] === -1) {
+		return requiredFile;
+	}
+	if (path[to] === -1) {
 		throw new Error('No path found');
-	} else {
-		getRequiredFilesToMigrate(curr, path[to], path);
-		requiredFile.push({
+	}
+
+	while (curr !== to) {
+		requiredFile.unshift({
 			fromVersion: path[to],
 			toVersion: to
 		});
+		to = path[to];
 	}
+	return requiredFile;
 }
 
 /**
@@ -172,7 +176,7 @@ async function migrateAll(toVersion, migrationItems) {
 	const currentVersion = await Migration.getCurrentVersion();
 	const list = createMigrationList(migrationItems);
 	const path = findPathToMigrate(currentVersion, toVersion, list);
-	getRequiredFilesToMigrate(currentVersion, toVersion, path);
+	const requiredFile = getRequiredFilesToMigrate(currentVersion, toVersion, path);
 	await migrateDatabaseTransaction(requiredFile, migrationItems);
 }
 
