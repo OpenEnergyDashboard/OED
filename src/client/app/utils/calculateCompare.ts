@@ -96,9 +96,9 @@ export function getComparePeriodLabels(comparePeriod: ComparePeriod): ComparePer
  * @param name the name of the entity being measured
  * @param labels the names of the periods in question
  */
-export function getCompareChangeSummary(change: number, name: string, labels: ComparePeriodLabels) {
-	const percent = parseInt(change.toFixed(2).replace('.', '').slice(1));
+export function getCompareChangeSummary(change: number, name: string, labels: ComparePeriodLabels): string {
 	if (isNaN(change)) { return ''; }
+	const percent = parseInt(change.toFixed(2).replace('.', '').slice(1));
 	if (change < 0) {
 		return `${name} has used ${percent}% less energy ${labels.current.toLocaleLowerCase()}`;
 	} else {
