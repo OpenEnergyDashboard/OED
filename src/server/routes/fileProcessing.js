@@ -8,6 +8,7 @@ const moment = require('moment');
 const streamBuffers = require('stream-buffers');
 const multer = require('multer');
 const streamToDB = require('../services/loadFromCsvStream');
+const { insertMeters } = require('../services/readMamacMeters');
 const authenticator = require('./authenticator');
 const validate = require('jsonschema').validate;
 
@@ -17,7 +18,7 @@ const router = express.Router();
 const upload = multer({ storage: multer.memoryStorage() });
 
 router.use(authenticator);
-router.post('/:meter_id', upload.single('csvFile'), async (req, res) => {
+router.post('/readings/:meter_id', upload.single('csvFile'), async (req, res) => {
 	const validParams = {
 		type: 'object',
 		maxProperties: 1,
@@ -29,7 +30,7 @@ router.post('/:meter_id', upload.single('csvFile'), async (req, res) => {
 			}
 		}
 	};
-	if (!validate(req.params, validParams).valid || !req.file.buffer) {
+	if (!validate(req.params, validParams).valid) {
 		res.sendStatus(400);
 	} else {
 		try {
@@ -50,13 +51,40 @@ router.post('/:meter_id', upload.single('csvFile'), async (req, res) => {
 				}, (readings, tx) => Reading.insertOrUpdateAll(readings, tx));
 				res.status(200).json({ success: true });
 			} catch (e) {
-				res.status(403).json({ success: false, message: 'Failed to upload data.' });
+				res.status(403).json({ success: false });
 			}
 		} catch (err) {
 			res.status(400).send({
 				success: false,
 				message: 'Incorrect file type.'
 			});
+		}
+	}
+});
+
+router.post('/meters', async (req, res) => {
+	const validBody = {
+		type: 'object',
+		maxProperties: 1,
+		required: ['meters'],
+		properties: {
+			meters: {
+				type: 'array',
+				uniqueItems: false,
+				items: {
+					type: 'string'
+				}
+			}
+		}
+	};
+	if (!validate(req.body, validBody).valid) {
+		res.sendStatus(400);
+	} else {
+		try {
+			await insertMeters(req.body.meters.map(ip => ({ip})));
+			res.status(200).json({success: true});
+		} catch (err) {
+			res.status(403).json({success: false});
 		}
 	}
 });
