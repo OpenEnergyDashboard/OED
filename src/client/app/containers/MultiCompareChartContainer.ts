@@ -50,7 +50,6 @@ function getDataForIDs(ids: number[], isGroup: boolean, state: State): Entity[] 
 			readingsData = getMeterReadingsData(state, id, timeInterval, barDuration);
 		}
 		if (isReadingsDataValid(readingsData)) {
-			// How long it's been since start of measure period
 			const timeSincePeriodStart = getTimeSincePeriodStart(comparePeriod);
 			if (readingsData.readings!.length < timeSincePeriodStart) {
 				throw new Error(`Insufficient readings data to process comparison for id ${id}, ti ${timeInterval}, dur ${barDuration}.
@@ -111,7 +110,6 @@ function getTimeSincePeriodStart(comparePeriod: ComparePeriod): number {
 }
 
 function calculateCurrentPeriodUsage(readingsData: ReadingsData, timeSincePeriodStart: number): number {
-	// Power used so far this Week
 	let currentPeriodUsage = 0;
 	for (let i = readingsData.readings!.length - timeSincePeriodStart; i < readingsData.readings!.length; i++) {
 		currentPeriodUsage += readingsData.readings![i][1];
@@ -128,7 +126,6 @@ function calculateLastPeriodUsage(readingsData: ReadingsData, timeSincePeriodSta
 }
 
 function calculateUsageToThisPointLastTimePeroid(readingsData: ReadingsData, timeSincePeriodStart: number): number {
-	// Calculates current for previous time interval
 	// Have to special case Sunday for Week and FourWeeks
 	let usedToThisPointLastTimePeriod = 0;
 	if (timeSincePeriodStart === 0) {
@@ -146,7 +143,6 @@ function isReadingsDataValid(readingsData: ReadingsData | undefined): boolean {
 }
 
 function calculateChange(currentPeriodUsage: number, usedToThisPointLastTimePeriod: number, lastPeriodTotalUsage: number): number {
-	// Compute the change between periods.
 	const change = (-1 + (((currentPeriodUsage / usedToThisPointLastTimePeriod) * lastPeriodTotalUsage) / lastPeriodTotalUsage));
 	return change;
 }
