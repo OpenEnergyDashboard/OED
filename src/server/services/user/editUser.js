@@ -4,7 +4,7 @@
 
 const bcrypt = require('bcryptjs');
 const User = require('../../models/User');
-const { ask, terminateReadline } = require('../servicesUtils');
+const { ask, terminateReadline } = require('../utils');
 
 (async () => {
 	let email;

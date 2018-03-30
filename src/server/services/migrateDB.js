@@ -6,7 +6,7 @@
 
 const { log } = require('../log');
 const Migration = require('../models/Migration');
-const { ask, terminateReadline } = require('./servicesUtils');
+const { ask, terminateReadline } = require('./utils');
 const { findMaxSemanticVersion } = require('../util');
 const { showPossibleMigrations, migrateAll, getUniqueVersions } = require('../migrations/migrateDatabase');
 const migrationList = require('../migrations/registerMigration');
