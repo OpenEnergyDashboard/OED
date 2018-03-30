@@ -7,7 +7,7 @@
 const { log } = require('../log');
 const { ask, terminateReadline } = require('./servicesUtils');
 const { findMaxSemanticVersion } = require('../util');
-const { printMigrationList, migrateAll, getUniqueKeyOfMigrationList } = require('../migrations/migrateDatabase');
+const { showPossibleMigrations, migrateAll, getUniqueKeyOfMigrationList } = require('../migrations/migrateDatabase');
 const migrationList = require('../migrations/registerMigration');
 
 function findMaxVersion(list) {
@@ -33,7 +33,7 @@ function findMaxVersion(list) {
 		terminateReadline('Migration successful');
 	} catch (err) {
 		log.error('Error while migrating database: ', err);
-		log.info('Possible migrations: \n', printMigrationList(migrationList));
+		log.info('Possible migrations: \n', showPossibleMigrations(migrationList));
 		terminateReadline('Migration failed');
 	}
 })();

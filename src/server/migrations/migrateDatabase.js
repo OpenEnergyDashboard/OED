@@ -14,12 +14,9 @@ const requiredFile = [];
  * @param migrationItems extracted from registerMigration.js
  * @returns {Array} of migration pair
  */
-function printMigrationList(migrationItems) {
-	const list = [];
-	for (const item of migrationItems) {
-		list.push(`${item.fromVersion} -> ${item.toVersion}`);
-	}
-	return list;
+function showPossibleMigrations(migrationItems) {
+	console.log('called');
+	return migrationItems.map(item => `${item.fromVersion} -> ${item.toVersion}`);
 }
 
 /**
@@ -185,7 +182,7 @@ async function migrateAll(toVersion, migrationItems) {
 }
 
 module.exports = {
-	printMigrationList,
+	showPossibleMigrations,
 	getUniqueKeyOfMigrationList,
 	migrateAll
 };
