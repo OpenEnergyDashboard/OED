@@ -73,8 +73,8 @@ export function changeCompareGraph(comparePeriod: ComparePeriod): Thunk {
 	};
 }
 
-export function changeSortingOrder(sortingOrder: SortingOrder): t.ChangeSortingOrderAction {
-	return { type: ActionType.ChangeSortingOrder, sortingOrder };
+export function changeCompareSortingOrder(compareSortingOrder: SortingOrder): t.ChangeCompareSortingOrderAction {
+	return { type: ActionType.ChangeCompareSortingOrder, compareSortingOrder };
 }
 
 export function changeSelectedMeters(meterIDs: number[]): Thunk {

@@ -15,7 +15,7 @@ const defaultState: GraphState = {
 	barDuration: moment.duration(4, 'weeks'),
 	comparePeriod: ComparePeriod.Week,
 	compareTimeInterval: calculateCompareTimeInterval(ComparePeriod.Week, moment()),
-	sortingOrder: SortingOrder.Ascending,
+	compareSortingOrder: SortingOrder.Ascending,
 	chartToRender: ChartTypes.line,
 	barStacking: false,
 	hotlinked: false
@@ -64,10 +64,10 @@ export default function graph(state = defaultState, action: GraphAction) {
 				...state,
 				hotlinked: action.hotlinked
 			};
-		case ActionType.ChangeSortingOrder:
+		case ActionType.ChangeCompareSortingOrder:
 			return {
 				...state,
-				sortingOrder: action.sortingOrder
+				compareSortingOrder: action.compareSortingOrder
 			};
 		default:
 			return state;

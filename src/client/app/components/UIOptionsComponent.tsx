@@ -10,7 +10,7 @@ import TooltipHelpComponent from './TooltipHelpComponent';
 import ExportContainer from '../containers/ExportContainer';
 import ChartSelectContainer from '../containers/ChartSelectContainer';
 import ChartDataSelectContainer from '../containers/ChartDataSelectContainer';
-import { ChangeBarStackingAction, ChangeSortingOrderAction } from '../types/redux/graph';
+import { ChangeBarStackingAction, ChangeCompareSortingOrderAction } from '../types/redux/graph';
 import ChartLinkContainer from '../containers/ChartLinkContainer';
 import { ChartTypes } from '../types/redux/graph';
 import { ComparePeriod, SortingOrder } from '../utils/calculateCompare';
@@ -23,11 +23,11 @@ export interface UIOptionsProps {
 	barStacking: boolean;
 	barDuration: moment.Duration;
 	comparePeriod: ComparePeriod;
-	sortingOrder: SortingOrder;
+	compareSortingOrder: SortingOrder;
 	changeDuration(duration: moment.Duration): Promise<any>;
 	changeBarStacking(): ChangeBarStackingAction;
 	changeCompareGraph(comparePeriod: ComparePeriod): Promise<any>;
-	changeSortingOrder(sortingOrder: SortingOrder): ChangeSortingOrderAction;
+	changeCompareSortingOrder(compareSortingOrder: SortingOrder): ChangeCompareSortingOrderAction;
 }
 
 interface UIOptionsState {
@@ -178,19 +178,19 @@ export default class UIOptionsComponent extends React.Component<UIOptionsProps, 
 						</DropdownToggle>
 						<DropdownMenu>
 							<DropdownItem
-								active={this.props.sortingOrder === SortingOrder.Alphabetical}
+								active={this.props.compareSortingOrder === SortingOrder.Alphabetical}
 								onClick={() => this.handleSortingButton(SortingOrder.Alphabetical)}
 							>
 								Alphabetically
 							</DropdownItem>
 							<DropdownItem
-								active={this.props.sortingOrder === SortingOrder.Ascending}
+								active={this.props.compareSortingOrder === SortingOrder.Ascending}
 								onClick={() => this.handleSortingButton(SortingOrder.Ascending)}
 							>
 								Ascending
 							</DropdownItem>
 							<DropdownItem
-								active={this.props.sortingOrder === SortingOrder.Descending}
+								active={this.props.compareSortingOrder === SortingOrder.Descending}
 								onClick={() => this.handleSortingButton(SortingOrder.Descending)}
 							>
 								Descending
@@ -258,7 +258,7 @@ export default class UIOptionsComponent extends React.Component<UIOptionsProps, 
 	}
 
 	private handleSortingButton(sortingOrder: SortingOrder) {
-		this.props.changeSortingOrder(sortingOrder);
+		this.props.changeCompareSortingOrder(sortingOrder);
 	}
 
 	private toggleSlider() {

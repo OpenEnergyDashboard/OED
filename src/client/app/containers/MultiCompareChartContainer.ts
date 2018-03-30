@@ -28,7 +28,7 @@ function mapStateToProps(state: State) {
 	const meters: Entity[] = getDataForIDs(state.graph.selectedMeters, false, state);
 	const groups: Entity[] = getDataForIDs(state.graph.selectedGroups, true, state);
 	const compareEntities: Entity[] = meters.concat(groups);
-	const sortingOrder = state.graph.sortingOrder;
+	const sortingOrder = state.graph.compareSortingOrder;
 	return {
 		selectedCompareEntities: sortIDs(compareEntities, sortingOrder)
 	};
