@@ -12,7 +12,7 @@ import { getToken, hasToken } from '../token';
  *
  * Should only be used by other api classes.
  */
-class ApiBackend {
+export default class ApiBackend {
 	public async doGetRequest<R>(
 		url: string,
 		params: { [key: string]: string } = {},
@@ -66,5 +66,3 @@ class ApiBackend {
 
 	}
 }
-
-export default ApiBackend;

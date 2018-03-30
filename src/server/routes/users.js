@@ -31,7 +31,7 @@ router.get('/:user_id', async (req, res) => {
 		maxProperties: 1,
 		required: ['user_id'],
 		properties: {
-			user_id: {
+			group_id: {
 				type: 'id'
 			}
 		}
