@@ -13,7 +13,8 @@ const validate = require('jsonschema').validate;
 module.exports = (req, res, next) => {
 	const token = req.headers.token || req.body.token || req.query.token;
 	const validParams = {
-		type: 'string'
+		type: 'string',
+		pattern: '^\\d+$'
 	};
 	if (!validate(token, validParams).valid) {
 		res.sendStatus(400);
