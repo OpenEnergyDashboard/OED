@@ -156,7 +156,7 @@ async function migrateDatabaseTransaction(neededFiles, allMigrationFiles) {
 							const migration = new Migration(undefined, migrationFile.fromVersion, migrationFile.toVersion);
 							await migration.insert(t);
 						} catch (err) {
-							throw new Error('Error while migrating database');
+							throw new Error('Migration Transaction Failed');
 						}
 					}
 				});
