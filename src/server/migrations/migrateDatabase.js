@@ -15,16 +15,15 @@ const requiredFile = [];
  * @returns {Array} of migration pair
  */
 function showPossibleMigrations(migrationItems) {
-	console.log('called');
-	return migrationItems.map(item => `${item.fromVersion} -> ${item.toVersion}`);
+	return migrationItems.map(item => `\n${item.fromVersion} -> ${item.toVersion}`);
 }
 
 /**
- * Create an array of unique versions;
+ * Create an array of unique versions. For example: [0.1.0, 0.2.0, 0.2.0, 0.3.0] -> [0.1.0, 0.2.0, 0.3.0]
  * @param migrationItems extracted from registerMigration.js
  * @returns {*[]} array of unique versions
  */
-function getUniqueKeyOfMigrationList(migrationItems) {
+function getUniqueVersions(migrationItems) {
 	const vertex = [];
 	for (const m of migrationItems) {
 		// disallow down migration
@@ -47,7 +46,7 @@ function getUniqueKeyOfMigrationList(migrationItems) {
 function createMigrationList(migrationItems) {
 	const migrationList = {};
 
-	const uniqueKey = getUniqueKeyOfMigrationList(migrationItems);
+	const uniqueKey = getUniqueVersions(migrationItems);
 
 	uniqueKey.forEach(key => {
 		migrationList[key] = [];
@@ -171,18 +170,14 @@ async function migrateDatabaseTransaction(neededFiles, allMigrationFiles) {
  */
 async function migrateAll(toVersion, migrationItems) {
 	const currentVersion = await Migration.getCurrentVersion();
-	if (currentVersion === toVersion) {
-		throw new Error('You have the highest version');
-	} else {
-		const list = createMigrationList(migrationItems);
-		const path = findPathToMigrate(currentVersion, toVersion, list);
-		getRequiredFilesToMigrate(currentVersion, toVersion, path);
-		await migrateDatabaseTransaction(requiredFile, migrationItems);
-	}
+	const list = createMigrationList(migrationItems);
+	const path = findPathToMigrate(currentVersion, toVersion, list);
+	getRequiredFilesToMigrate(currentVersion, toVersion, path);
+	await migrateDatabaseTransaction(requiredFile, migrationItems);
 }
 
 module.exports = {
 	showPossibleMigrations,
-	getUniqueKeyOfMigrationList,
+	getUniqueVersions,
 	migrateAll
 };

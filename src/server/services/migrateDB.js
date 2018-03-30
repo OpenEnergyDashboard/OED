@@ -5,13 +5,14 @@
  */
 
 const { log } = require('../log');
+const Migration = require('../models/Migration');
 const { ask, terminateReadline } = require('./servicesUtils');
 const { findMaxSemanticVersion } = require('../util');
-const { showPossibleMigrations, migrateAll, getUniqueKeyOfMigrationList } = require('../migrations/migrateDatabase');
+const { showPossibleMigrations, migrateAll, getUniqueVersions } = require('../migrations/migrateDatabase');
 const migrationList = require('../migrations/registerMigration');
 
 function findMaxVersion(list) {
-	return findMaxSemanticVersion(getUniqueKeyOfMigrationList(list));
+	return findMaxSemanticVersion(getUniqueVersions(list));
 }
 
 (async () => {
@@ -29,11 +30,16 @@ function findMaxVersion(list) {
 		terminateReadline('Could not find the max version from the registered migration list');
 	}
 	try {
-		await migrateAll(toVersion, migrationList);
-		terminateReadline('Migration successful');
+		const currentVersion = await Migration.getCurrentVersion();
+		if (currentVersion === toVersion) {
+			terminateReadline(`Cannot migrate. You already have the highest version ${currentVersion}`);
+		} else {
+			await migrateAll(toVersion, migrationList);
+			terminateReadline('Migration successful');
+		}
 	} catch (err) {
 		log.error('Error while migrating database: ', err);
-		log.info('Possible migrations: \n', showPossibleMigrations(migrationList));
+		log.info(`Possible migrations: \n ${showPossibleMigrations(migrationList)}`);
 		terminateReadline('Migration failed');
 	}
 })();
