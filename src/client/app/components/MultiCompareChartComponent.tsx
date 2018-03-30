@@ -7,14 +7,14 @@ import CompareChartContainer from '../containers/CompareChartContainer';
 import { Entity } from '../containers/MultiCompareChartContainer';
 
 interface MultiCompareChartProps {
-	selectedMeters: Entity[];
-	selectedGroups: Entity[];
+	selectedCompareEntities: Entity[];
 }
 
 export default function MultiCompareChartComponent(props: MultiCompareChartProps) {
 	// Compute how much space should be used in the bootstrap grid system
 	let size = 3;
-	const numSelectedItems = props.selectedMeters.length + props.selectedGroups.length;
+	// const numSelectedItems = props.selectedMeters.length + props.selectedGroups.length;
+	const numSelectedItems = props.selectedCompareEntities.length;
 	if (numSelectedItems < 3) {
 		size = numSelectedItems;
 	}
@@ -35,19 +35,11 @@ export default function MultiCompareChartComponent(props: MultiCompareChartProps
 
 	return (
 		<div className='row'>
-			{props.selectedMeters.map(meter =>
-				<div className={childClassName} key={meter.id}>
+			{props.selectedCompareEntities.map(compareEntity =>
+				<div className={childClassName} key={compareEntity.id + compareEntity.name}>
 					<CompareChartContainer
-						key={meter.id}
-						entity={meter}
-					/>
-				</div>
-			)}
-			{props.selectedGroups.map(group =>
-				<div className={childClassName} key={group.id}>
-					<CompareChartContainer
-						key={group.id}
-						entity={group}
+						key={compareEntity.id + compareEntity.name}
+						entity={compareEntity}
 					/>
 				</div>
 			)}
