@@ -5,7 +5,7 @@
  */
 
 import { Bar, LinearComponentProps } from 'react-chartjs-2';
-import { ChartData, ChartDataSets, LinearTickOptions } from 'chart.js';
+import { ChartData, ChartDataSets, LinearTickOptions, ChartTooltipItem } from 'chart.js';
 import * as moment from 'moment';
 import { connect } from 'react-redux';
 import { TimeInterval } from '../../../common/TimeInterval';
@@ -199,7 +199,30 @@ function mapStateToProps(state: State, ownProps: CompareChartContainerProps) {
 			display: false
 		},
 		tooltips: {
-			enabled: false
+			mode: 'nearest',
+			intersect: false,
+			backgroundColor: 'rgba(0,0,0,0.6)',
+			displayColors: false,
+			callbacks: {
+				label: (tooltipItem: ChartTooltipItem, data: ChartData) => { // tslint:disable-line no-shadowed-variable
+					const usage = tooltipItem.yLabel;
+					const usedThisTime = data.datasets![0].data![0];
+					const usedSoFar = data.datasets![0].data![1];
+					const totalUsed = data.datasets![1].data![0];
+					const labelText = tooltipItem.xLabel!.toLowerCase();
+					switch (usage) {
+						case usedThisTime:
+							return `${usage} kW used this time ${labelText}`;
+						case usedSoFar:
+							return `${usage} kW used so far ${labelText}`;
+						case totalUsed:
+							return `${usage} kW total ${labelText}`;
+						default:
+							return `${usage} kW projected to be used ${labelText}`;
+					}
+				},
+				title: () => ''
+			}
 		},
 		title: {
 			display: true,
