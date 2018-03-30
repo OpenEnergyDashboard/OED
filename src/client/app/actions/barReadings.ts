@@ -106,8 +106,6 @@ function fetchGroupBarReadings(groupIDs: number[], timeInterval: TimeInterval): 
 	return async (dispatch: Dispatch, getState: GetState) => {
 		const barDuration = getState().graph.barDuration;
 		dispatch(requestGroupBarReadings(groupIDs, timeInterval, barDuration));
-		// API expectes a comma-seperated string of IDs
-		const stringifiedIDs = groupIDs.join(',');
 		const readings = await groupsApi.barReadings(groupIDs, timeInterval, barDuration);
 		dispatch(receiveGroupBarReadings(groupIDs, timeInterval, barDuration, readings));
 	};
