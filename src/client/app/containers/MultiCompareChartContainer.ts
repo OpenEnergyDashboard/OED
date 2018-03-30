@@ -143,8 +143,7 @@ function isReadingsDataValid(readingsData: ReadingsData | undefined): boolean {
 }
 
 function calculateChange(currentPeriodUsage: number, usedToThisPointLastTimePeriod: number, lastPeriodTotalUsage: number): number {
-	const change = (-1 + (((currentPeriodUsage / usedToThisPointLastTimePeriod) * lastPeriodTotalUsage) / lastPeriodTotalUsage));
-	return change;
+	return (-1 + (((currentPeriodUsage / usedToThisPointLastTimePeriod) * lastPeriodTotalUsage) / lastPeriodTotalUsage));
 }
 
 function sortIDs(ids: CompareEntity[], sortingOrder: SortingOrder): CompareEntity[] {
