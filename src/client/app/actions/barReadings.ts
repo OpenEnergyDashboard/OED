@@ -9,7 +9,7 @@ import { State } from '../types/redux/state';
 import { BarReadings } from '../types/readings';
 import * as t from '../types/redux/barReadings';
 import { groupsApi, metersApi } from '../utils/api';
-import { ComparePeriod, calculateCompareDuration, calculateCompareTimeInterval } from '../utils/calculateCompare';
+import { ComparePeriod, calculateCompareDuration } from '../utils/calculateCompare';
 
 /**
  * @param {State} state the Redux state

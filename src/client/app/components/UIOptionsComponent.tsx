@@ -6,7 +6,6 @@ import * as React from 'react';
 import sliderWithoutTooltips, { createSliderWithTooltip } from 'rc-slider';
 import * as moment from 'moment';
 import { Button, ButtonGroup, Dropdown, DropdownToggle, DropdownMenu, DropdownItem } from 'reactstrap';
-import { TimeInterval } from '../../../common/TimeInterval';
 import TooltipHelpComponent from './TooltipHelpComponent';
 import ExportContainer from '../containers/ExportContainer';
 import ChartSelectContainer from '../containers/ChartSelectContainer';
@@ -14,8 +13,8 @@ import ChartDataSelectContainer from '../containers/ChartDataSelectContainer';
 import { ChangeBarStackingAction, ChangeSortingOrderAction } from '../types/redux/graph';
 import ChartLinkContainer from '../containers/ChartLinkContainer';
 import { ChartTypes } from '../types/redux/graph';
-import 'rc-slider/assets/index.css';
 import { ComparePeriod, SortingOrder } from '../utils/calculateCompare';
+import 'rc-slider/assets/index.css';
 
 const Slider = createSliderWithTooltip(sliderWithoutTooltips);
 
