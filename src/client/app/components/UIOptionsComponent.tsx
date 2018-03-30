@@ -7,6 +7,7 @@ import sliderWithoutTooltips, { createSliderWithTooltip } from 'rc-slider';
 import * as moment from 'moment';
 import { Button, ButtonGroup } from 'reactstrap';
 import { TimeInterval } from '../../../common/TimeInterval';
+import TooltipHelpComponent from './TooltipHelpComponent';
 import ExportContainer from '../containers/ExportContainer';
 import ChartSelectContainer from '../containers/ChartSelectContainer';
 import ChartDataSelectContainer from '../containers/ChartDataSelectContainer';
@@ -93,7 +94,9 @@ export default class UIOptionsComponent extends React.Component<UIOptionsProps, 
 				{this.props.chartToRender === ChartTypes.bar &&
 					<div>
 						<div className='checkbox'>
-							<label><input type='checkbox' onChange={this.handleChangeBarStacking} checked={this.props.barStacking} />Bar stacking</label>
+							<label><input type='checkbox' onChange={this.handleChangeBarStacking} checked={this.props.barStacking} />
+								Bar stacking <TooltipHelpComponent tip='Stack bars on top of each other' />
+							</label>
 						</div>
 						<p style={labelStyle}>Bar chart interval:</p>
 						<ButtonGroup

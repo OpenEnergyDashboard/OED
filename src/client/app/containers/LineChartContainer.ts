@@ -52,7 +52,7 @@ function mapStateToProps(state: State) {
 				}
 
 				const dataPoints: ChartPoint[] = _.values(readingsData.readings).map(
-					(v: [number, number]) => ({ x: v[0], y: parseInt(v[1].toFixed(2)) })
+					(v: [number, number]) => ({ x: v[0], y: v[1] })
 				);
 
 				datasets.push({
