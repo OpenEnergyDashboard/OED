@@ -63,7 +63,7 @@ function createMigrationList(migrationItems) {
  * @param to version want to migrate to
  * @param adjListArray adjacency list of version graph
  */
-function checkIfFromAndToExist(curr, to, adjListArray) {
+function ensureIfFromAndToExist(curr, to, adjListArray) {
 	if (!(curr in adjListArray)) {
 		throw new Error(`Could not find version ${curr} from the registered migration list`);
 	}
@@ -86,7 +86,7 @@ function findPathToMigrate(curr, to, adjListArray) {
 	const path = [];
 	const visited = []; // When there is a cycle, make sure it is not infinite.
 
-	checkIfFromAndToExist(curr, to, adjListArray);
+	ensureIfFromAndToExist(curr, to, adjListArray);
 
 	for (const vertex of Object.keys(adjListArray)) {
 		visited[vertex] = false;
@@ -156,7 +156,7 @@ async function migrateDatabaseTransaction(neededFiles, allMigrationFiles) {
 							const migration = new Migration(undefined, migrationFile.fromVersion, migrationFile.toVersion);
 							await migration.insert(t);
 						} catch (err) {
-							log.error('Error while migrating database', err);
+							throw new Error('Error while migrating database');
 						}
 					}
 				});
