@@ -13,7 +13,7 @@ import * as moment from 'moment';
 import InitializationContainer from '../containers/InitializationContainer';
 import HomeComponent from './HomeComponent';
 import LoginComponent from '../components/LoginComponent';
-import AdminContainer from '../containers/AdminContainer';
+import AdminComponent from './admin/AdminComponent';
 import GroupMainContainer from '../containers/groups/GroupMainContainer';
 import { LinkOptions } from 'actions/graph';
 import { getToken, hasToken } from '../utils/token';
@@ -126,7 +126,7 @@ export default class RouteComponent extends React.Component<RouteProps, {}> {
 				<IntlProvider locale={lang} messages={messages} key={lang}>
 					<Router history={browserHistory}>
 						<Route path='/login' component={LoginComponent} />
-						<Route path='/admin' component={AdminContainer} onEnter={this.requireAuth} />
+						<Route path='/admin' component={AdminComponent} onEnter={this.requireAuth} />
 						<Route path='/groups' component={GroupMainContainer} onEnter={this.requireAuth} />
 						<Route path='/graph' component={HomeComponent} onEnter={this.linkToGraph} />
 						<Route path='*' component={HomeComponent} />

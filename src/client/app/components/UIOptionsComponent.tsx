@@ -191,14 +191,6 @@ class UIOptionsComponent extends React.Component<UIOptionsPropsWithIntl, UIOptio
 	}
 
 	/**
-	 * Handles a change in meter selection
-	 * @param {Object[]} selection An array of {label: string, value: {type: string, id: int}} representing the current selection
-	 */
-	// private handleMeterSelect(selection: Array<{label: string, value: {type: string, id: number}}>) {
-	// 	this.props.selectMeters(selection.map(s => s.value));
-	// }
-
-	/**
 	 * Called when the user releases the slider, dispatch action on temporary state variable
 	 */
 	private handleBarDurationChangeComplete(e: any) {
