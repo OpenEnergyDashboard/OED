@@ -81,18 +81,26 @@ function getMeterName(state: State, meterID: number): string {
 }
 
 function getGroupReadingsData(state: State, groupID: number, timeInterval: TimeInterval, barDuration: moment.Duration): ReadingsData | undefined {
-	let readingsData: ReadingsData | undefined ;
+	let readingsData: ReadingsData | undefined;
 	const readingsDataByID = state.readings.bar.byGroupID[groupID];
-	const readingsDataByTimeInterval = readingsDataByID[timeInterval.toString()];
-	readingsData = readingsDataByTimeInterval[barDuration.toISOString()];
+	if (readingsDataByID !== undefined) {
+		const readingsDataByTimeInterval = readingsDataByID[timeInterval.toString()];
+		if (readingsDataByTimeInterval !== undefined) {
+			readingsData = readingsDataByTimeInterval[barDuration.toISOString()];
+		}
+	}
 	return readingsData;
 }
 
 function getMeterReadingsData(state: State, meterID: number, timeInterval: TimeInterval, barDuration: moment.Duration): ReadingsData | undefined {
-	let readingsData: ReadingsData | undefined ;
+	let readingsData: ReadingsData | undefined;
 	const readingsDataByID = state.readings.bar.byMeterID[meterID];
-	const readingsDataByTimeInterval = readingsDataByID[timeInterval.toString()];
-	readingsData = readingsDataByTimeInterval[barDuration.toISOString()];
+	if (readingsDataByID !== undefined) {
+		const readingsDataByTimeInterval = readingsDataByID[timeInterval.toString()];
+		if (readingsDataByTimeInterval !== undefined) {
+			readingsData = readingsDataByTimeInterval[barDuration.toISOString()];
+		}
+	}
 	return readingsData;
 }
 
