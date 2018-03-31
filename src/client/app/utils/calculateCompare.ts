@@ -30,6 +30,19 @@ export function validateComparePeriod(comparePeriod: string): ComparePeriod {
 	}
 }
 
+export function validateSortingOrder(sortingOrder: string): SortingOrder {
+	switch (sortingOrder) {
+		case 'Alphabetical':
+			return SortingOrder.Alphabetical;
+		case 'Ascending':
+			return SortingOrder.Ascending;
+		case 'Descending':
+			return SortingOrder.Descending;
+		default:
+			throw new Error(`Unknown sorting order: ${sortingOrder}`);
+	}
+}
+
 export function calculateCompareTimeInterval(comparePeriod: ComparePeriod, currentTime: moment.Moment): TimeInterval {
 	let compareTimeInterval;
 	switch (comparePeriod) {

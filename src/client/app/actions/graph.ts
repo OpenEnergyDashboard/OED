@@ -11,7 +11,7 @@ import { TimeInterval } from '../../../common/TimeInterval';
 import { Dispatch, Thunk, ActionType } from '../types/redux/actions';
 import { State } from '../types/redux/state';
 import * as t from '../types/redux/graph';
-import {ComparePeriod, SortingOrder} from '../utils/calculateCompare';
+import { ComparePeriod, SortingOrder } from '../utils/calculateCompare';
 
 export function changeChartToRender(chartType: t.ChartTypes): t.ChangeChartToRenderAction {
 	return { type: ActionType.ChangeChartToRender, chartType };
@@ -132,6 +132,7 @@ export interface LinkOptions {
 	barDuration?: moment.Duration;
 	toggleBarStacking?: boolean;
 	comparePeriod?: ComparePeriod;
+	compareSortingOrder?: SortingOrder;
 }
 
 /**
@@ -141,7 +142,7 @@ export interface LinkOptions {
  */
 export function changeOptionsFromLink(options: LinkOptions) {
 	const dispatchFirst: Thunk[] = [setHotlinkedAsync(true)];
-	const dispatchSecond: Array<Thunk | t.ChangeChartToRenderAction | t.ChangeBarStackingAction> = [];
+	const dispatchSecond: Array<Thunk | t.ChangeChartToRenderAction | t.ChangeBarStackingAction | t.ChangeCompareSortingOrderAction> = [];
 	if (options.meterIDs) {
 		dispatchFirst.push(fetchMetersDetailsIfNeeded());
 		dispatchSecond.push(changeSelectedMeters(options.meterIDs));
@@ -161,6 +162,9 @@ export function changeOptionsFromLink(options: LinkOptions) {
 	}
 	if (options.comparePeriod) {
 		dispatchSecond.push(changeCompareGraph(options.comparePeriod));
+	}
+	if (options.compareSortingOrder) {
+		dispatchSecond.push(changeCompareSortingOrder(options.compareSortingOrder));
 	}
 	return (dispatch: Dispatch) => Promise.all(dispatchFirst.map(dispatch))
 		.then(() => Promise.all(dispatchSecond.map(dispatch)));

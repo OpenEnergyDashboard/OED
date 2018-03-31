@@ -22,6 +22,7 @@ function mapStateToProps(state: State) {
 			break;
 		case 'compare':
 			linkText += `&comparePeriod=${state.graph.comparePeriod}`;
+			linkText += `&compareSortingOrder=${state.graph.compareSortingOrder}`;
 			break;
 		default:
 			break;
