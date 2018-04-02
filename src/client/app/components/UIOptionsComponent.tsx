@@ -173,26 +173,26 @@ class UIOptionsComponent extends React.Component<UIOptionsPropsWithIntl, UIOptio
 					</ButtonGroup>
 					<Dropdown isOpen={this.state.compareSortingDropdownOpen} toggle={this.toggleDropdown}>
 						<DropdownToggle caret>
-							Sort
+							<FormattedMessage id='sort' />
 						</DropdownToggle>
 						<DropdownMenu>
 							<DropdownItem
 								active={this.props.compareSortingOrder === SortingOrder.Alphabetical}
 								onClick={() => this.handleSortingButton(SortingOrder.Alphabetical)}
 							>
-								Alphabetically
+								<FormattedMessage id='alphabetically' />
 							</DropdownItem>
 							<DropdownItem
 								active={this.props.compareSortingOrder === SortingOrder.Ascending}
 								onClick={() => this.handleSortingButton(SortingOrder.Ascending)}
 							>
-								Ascending
+								<FormattedMessage id='ascending' />
 							</DropdownItem>
 							<DropdownItem
 								active={this.props.compareSortingOrder === SortingOrder.Descending}
 								onClick={() => this.handleSortingButton(SortingOrder.Descending)}
 							>
-								Descending
+								<FormattedMessage id='descending' />
 							</DropdownItem>
 						</DropdownMenu>
 					</Dropdown>
