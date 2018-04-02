@@ -7,15 +7,15 @@ You can either use Docker Compose to install Node and PostgreSQL in containers, 
 1. Install [Docker](https://docs.docker.com/engine/installation/) and [docker-compose](https://docs.docker.com/compose/install/).
 1. Clone this repository.
 1. Create a CSV file with a single column called "ip" with your meter IP addresses and copy it into the directory in which the project resides.
-1. Set up Node environment and the database by running ```docker-compose run --rm web src/scripts/init.sh <csv file> --default-user``` in the main directory. 
+1. Set up Node environment and the database by running ```docker-compose run --rm web src/scripts/install.sh``` in the main directory.
 1. Start the app in development mode with ```docker-compose run --rm --service-ports web src/scripts/devstart.sh```.
 1. Wait for the Webpack build to finish and then access the app at [localhost:3000](http://localhost:3000).
 
-The app will be automatically rebuilt whenever a file is changed.
+You can log into the app with email: `test@example.com`, password: `password`.
 
-You can log into the app with `test@example.com`, password `password` (the result of the `--default-user` flag to the init script).
+To import meters, upload the CSV file on the admin page. To fetch the latest meter readings, run ```docker-compose run --rm web npm run updateMamacMeters```.
 
-Killing the running process (ctrl+C) will stop the app. You can get rid of the containers with ```docker-compose down```.
+Killing the running process (ctrl+C) will stop the app. You can get rid of the Docker containers with ```docker-compose down```.
 
 ### Without Docker ###
 1. Install Node, npm, and git.
@@ -40,8 +40,8 @@ OED_LOG_FILE=?                 // Path to the log file, defaults to ./log.txt
 1. Run `npm run addMamacMeters` to load mamac meters from an `.csv` file.
 1. Run `npm run updateMamacMeters` to fetch new data for mamac meters in the database.
 1. Run `npm run createUser` and follow the directions to create a new admin user.
-1. Run ```npm run build``` to create the Webpack bundle for production, otherwise run ```npm run dev``` for development.
-1. Run ```npm start```
+1. Run ```npm run webpack:dev``` to create the Webpack bundle.
+1. Run ```npm start```.
 
 
 ## Production ##
@@ -49,7 +49,7 @@ OED_LOG_FILE=?                 // Path to the log file, defaults to ./log.txt
 1. Install [Docker](https://docs.docker.com/engine/installation/) and [docker-compose](https://docs.docker.com/compose/install/).
 1. Clone this repository.
 1. Create a CSV file with a single column called "ip" with your meter IP addresses and copy it into the directory where the project resides.
-1. Set up the environment with `docker-compose run --rm web src/scripts/init.sh <csv file> --build` in the main directory.
+1. Set up the environment with `docker-compose run --rm web src/scripts/install.sh --production` in the main directory.
 1. Edit ```docker-compose.yml``` to change
 	1. the secret key (in `services -> web -> environment -> OED_TOKEN_SECRET`) to a random value. Keep it secret.
 	1. the port (in `services -> web -> ports`) to a mapping from host to container; e.g., to host on your computer's port 80, set it to `80:3000`.
@@ -58,6 +58,7 @@ OED_LOG_FILE=?                 // Path to the log file, defaults to ./log.txt
 1. Copy ```src/scripts/oed.service``` to ```/etc/systemd/system/oed.service``` and make the necessary modifications to the script. See the script for more detail.
 1. Run ```systemctl enable oed.service``` to make the service start on server boot.
 1. Bring the app online with ```systemctl start oed.service```. Stop the app with ```systemctl stop oed.service```.
+1. To import meters, visit the admin page and upload the CSV file.
 
 
 
@@ -80,8 +81,9 @@ These can be run by executing `npm run <script>` in the `web` Docker-Compose ser
 
 App actions:
 * `start` starts the NodeJS webserver.
-* `dev` starts Webpack in development mode, dynamically rebuilding the client-side application (and re-typechecking) when files change.
-* `build` builds the client-side application for production a single time, and performs typechecking.
+* `webpack:dev` runs Webpack in development mode and dynamically rebuilding the client-side application when files change.
+* `webpack:build` runs Webpack once in production mode.
+* `webpack` run Webpack once in development mode.
 
 Validation and CI actions:
 * `checkHeader` ensures that there are no source files without MPL headers.
