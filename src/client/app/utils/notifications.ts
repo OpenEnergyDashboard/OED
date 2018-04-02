@@ -4,21 +4,22 @@
 
 import store from '../index';
 import { showNotification as showNotificationAction } from '../actions/notifications';
+import translate from './translate';
 
 export type NotificationPosition = 'tr' | 'tl' | 'tc' | 'br' | 'bl' | 'bc';
 
-export function showSuccessNotification(message: string, position: NotificationPosition = 'tr', autoDismiss = 3) {
+export function showSuccessNotification(messageID: string, position: NotificationPosition = 'tr', autoDismiss = 3) {
 	store.dispatch(showNotificationAction({
-		message,
+		message: translate(messageID),
 		level: 'success',
 		position,
 		autoDismiss
 	}));
 }
 
-export function showErrorNotification(message: string, position: NotificationPosition = 'tr', autoDismiss = 3) {
+export function showErrorNotification(messageID: string, position: NotificationPosition = 'tr', autoDismiss = 3) {
 	store.dispatch(showNotificationAction({
-		message,
+		message: translate(messageID),
 		level: 'error',
 		position,
 		autoDismiss

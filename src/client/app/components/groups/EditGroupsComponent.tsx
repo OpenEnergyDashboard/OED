@@ -2,8 +2,6 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
 
-// This component is the main page of the edit group page.
-// TYPESCRIPT TODO: I have insufficient domain knowledge to edit this.
 import * as React from 'react';
 import * as _ from 'lodash';
 import { Input, Button } from 'reactstrap';

@@ -27,15 +27,15 @@ class AddReadingComponent extends React.Component<AddReadingsPropsWithIntl, {}> 
 
 	public handleFileToImport(files: File[]) {
 		if (!this.props.selectedImportMeter) {
-			showErrorNotification('Please select a meter');
+			showErrorNotification('please.select.meter');
 		} else {
 			const file = files[0];
 			fileProcessingApi.submitNewReadings(this.props.selectedImportMeter.value, file)
 				.then(() => {
-					showSuccessNotification('Successfully uploaded meter data');
+					showSuccessNotification('successfully.upload.readings');
 				})
 				.catch(() => {
-					showErrorNotification('Error uploading meter data');
+					showErrorNotification('failed.to.upload.readings');
 				});
 		}
 	}

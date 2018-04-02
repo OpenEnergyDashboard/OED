@@ -232,7 +232,7 @@ function submitNewGroup(group: t.GroupData): Thunk {
 			});
 		} catch (e) {
 			dispatch(markGroupInEditingNotSubmitted());
-			showErrorNotification('Failed to create group');
+			showErrorNotification('failed.to.create.group');
 		}
 	};
 }
@@ -251,9 +251,9 @@ function submitGroupEdits(group: t.GroupData & t.GroupID): Thunk {
 		} catch (e) {
 			dispatch(markGroupInEditingNotSubmitted());
 			if (e.response.data.message && e.response.data.message === 'Cyclic group detected') {
-				showErrorNotification('You cannot create a cyclic group');
+				showErrorNotification('you.cannot.create.a.cyclic.group');
 			} else {
-				showErrorNotification('Failed to edit group');
+				showErrorNotification('failed.to.edit.group');
 			}
 		}
 	};
@@ -312,7 +312,7 @@ export function deleteGroup(): Thunk {
 				dispatch2(changeDisplayMode(t.DisplayMode.View));
 			});
 		} catch (e) {
-			showErrorNotification('Failed to delete group');
+			showErrorNotification('failed.to.delete.group');
 		}
 	};
 }

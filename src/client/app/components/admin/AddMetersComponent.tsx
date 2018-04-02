@@ -1,4 +1,3 @@
-
 /* This Source Code Form is subject to the terms of the Mozilla Public
 * License, v. 2.0. If a copy of the MPL was not distributed with this
 * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
@@ -33,7 +32,7 @@ class AddMetersComponent extends React.Component<AddMetersPropsWithIntl, {}> {
 			dataLines = fileAsBinaryString.split(/\r?\n/);
 			dataLines[0] = dataLines[0].replace(/\"/g, '');
 			if (dataLines[0] !==  'ip') {
-				showErrorNotification('Incorrect file format');
+				showErrorNotification('incorrect.file.format');
 			} else {
 				for (const items of dataLines) {
 					const ips = items.replace(/\"/g, '');
@@ -43,16 +42,16 @@ class AddMetersComponent extends React.Component<AddMetersPropsWithIntl, {}> {
 				}
 				fileProcessingApi.submitNewMeters(listOfIps)
 					.then(() => {
-						showSuccessNotification('Successfully uploaded meters');
+						showSuccessNotification('successfully.uploaded.meters');
 						this.props.fetchMeterDetailsIfNeeded(true);
 					})
 					.catch(() => {
-						showErrorNotification('Error uploading meters');
+						showErrorNotification('failed.to.upload.meters');
 					});
 			}
 		};
-		reader.onabort = () => showErrorNotification('File reading was aborted');
-		reader.onerror = () => showErrorNotification('File reading has failed');
+		reader.onabort = () => showErrorNotification('file.reading.aborted');
+		reader.onerror = () => showErrorNotification('failed.to.read.file');
 		reader.readAsBinaryString(file);
 	}
 

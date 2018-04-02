@@ -77,10 +77,10 @@ function submitPreferences() {
 				defaultLanguage: state.admin.defaultLanguage
 			});
 			dispatch(markPreferencesSubmitted());
-			showSuccessNotification('Updated preferences');
+			showSuccessNotification('updated.preferences');
 		} catch (e) {
 			dispatch(markPreferencesNotSubmitted());
-			showErrorNotification('Failed to submit changes');
+			showErrorNotification('failed.to.submit.changes');
 		}
 	};
 }

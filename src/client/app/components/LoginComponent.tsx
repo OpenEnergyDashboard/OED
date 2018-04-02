@@ -99,11 +99,6 @@ class LoginComponent extends React.Component<InjectedIntlProps, LoginState> {
 	 */
 	private handleSubmit(e: React.FormEvent<HTMLFormElement>) {
 		e.preventDefault();
-		const messages = defineMessages({
-			invalid: { id: 'invalid.email.password' },
-			error: { id: 'error.logging.in' }
-		});
-		const { formatMessage } = this.props.intl;
 		(async () => {
 			try {
 				const token = await verificationApi.login(this.state.email, this.state.password);
@@ -111,11 +106,11 @@ class LoginComponent extends React.Component<InjectedIntlProps, LoginState> {
 				browserHistory.push('/');
 			} catch (err) {
 				if (err.response && err.response.status === 401) {
-					showErrorNotification(formatMessage(messages.invalid));
+					showErrorNotification('invalid.email.password');
 				} else {
 					// If there was a problem other than a lack of authorization, the user can't fix it.
 					// This is an irrecoverable state, so just throw an error and let the user know something went wrong
-					showErrorNotification(formatMessage(messages.error));
+					showErrorNotification('failed.logging.in');
 					throw err;
 				}
 				if (this.inputEmail !== null) {
