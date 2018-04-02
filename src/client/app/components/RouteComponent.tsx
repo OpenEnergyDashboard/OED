@@ -21,6 +21,7 @@ import { showErrorNotification } from '../utils/notifications';
 import { ChartTypes } from '../types/redux/graph';
 import { LanguageTypes } from '../types/i18n';
 import { verificationApi } from '../utils/api';
+import { validateComparePeriod, validateSortingOrder } from '../utils/calculateCompare';
 
 interface RouteProps {
 	barStacking: boolean;
@@ -73,7 +74,7 @@ export default class RouteComponent extends React.Component<RouteProps, {}> {
 			try {
 				const options: LinkOptions = {};
 				for (const [key, infoObj] of _.entries(queries)) {
-					const info = infoObj.toString();
+					const info: string = infoObj.toString();
 					switch (key) {
 						case 'meterIDs':
 							options.meterIDs = info.split(',').map(s => parseInt(s));
@@ -91,6 +92,12 @@ export default class RouteComponent extends React.Component<RouteProps, {}> {
 							if (this.props.barStacking.toString() !== info) {
 								options.toggleBarStacking = true;
 							}
+							break;
+						case 'comparePeriod':
+							options.comparePeriod = validateComparePeriod(info);
+							break;
+						case 'compareSortingOrder':
+							options.compareSortingOrder = validateSortingOrder(info);
 							break;
 						default:
 							throw new Error('Unknown query parameter');

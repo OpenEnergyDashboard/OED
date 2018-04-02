@@ -5,6 +5,7 @@
 import * as moment from 'moment';
 import { TimeInterval } from '../../../../common/TimeInterval';
 import { ActionType } from './actions';
+import { ComparePeriod, SortingOrder } from '../../utils/calculateCompare';
 
 export enum ChartTypes {
 	line = 'line',
@@ -41,14 +42,15 @@ export interface ChangeGraphZoomAction {
 	timeInterval: TimeInterval;
 }
 
-export interface UpdateCompareIntervalAction {
-	type: ActionType.UpdateCompareInterval;
-	compareTimeInterval: TimeInterval;
+export interface UpdateComparePeriodAction {
+	type: ActionType.UpdateComparePeriod;
+	comparePeriod: ComparePeriod;
+	currentTime: moment.Moment;
 }
 
-export interface UpdateCompareDurationAction {
-	type: ActionType.UpdateCompareDuration;
-	compareDuration: moment.Duration;
+export interface ChangeCompareSortingOrderAction {
+	type: ActionType.ChangeCompareSortingOrder;
+	compareSortingOrder: SortingOrder;
 }
 
 export interface SetHotlinked {
@@ -63,17 +65,18 @@ export type GraphAction =
 	| UpdateBarDurationAction
 	| UpdateSelectedGroupsAction
 	| UpdateSelectedMetersAction
-	| UpdateCompareIntervalAction
-	| UpdateCompareDurationAction
-	| SetHotlinked;
+	| UpdateComparePeriodAction
+	| SetHotlinked
+	| ChangeCompareSortingOrderAction;
 
 export interface GraphState {
 	selectedMeters: number[];
 	selectedGroups: number[];
 	timeInterval: TimeInterval;
 	barDuration: moment.Duration;
+	comparePeriod: ComparePeriod;
 	compareTimeInterval: TimeInterval;
-	compareDuration: moment.Duration;
+	compareSortingOrder: SortingOrder;
 	chartToRender: ChartTypes;
 	barStacking: boolean;
 	hotlinked: boolean;
