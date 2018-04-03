@@ -148,8 +148,8 @@ function getRequiredFilesToMigrate(curr, to, path) {
 async function migrateDatabaseTransaction(neededFiles, allMigrationFiles) {
 	try {
 		await db.tx(async t => {
-			neededFiles.forEach(neededFile => {
-				allMigrationFiles.forEach(async migrationFile => {
+			for (const neededFile of neededFiles) {
+				for (const migrationFile of allMigrationFiles) {
 					if (neededFile.fromVersion === migrationFile.fromVersion && neededFile.toVersion === migrationFile.toVersion) {
 						try {
 							await migrationFile.up(t);
@@ -159,9 +159,9 @@ async function migrateDatabaseTransaction(neededFiles, allMigrationFiles) {
 							throw new Error('Migration Transaction Failed');
 						}
 					}
-				});
-			});
-		});
+				}
+			}
+		})
 	} catch (err) {
 		log.error('Error while migrating database', err);
 	}
