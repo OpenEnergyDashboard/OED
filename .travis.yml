@@ -31,7 +31,7 @@ before_script:
   - psql -c 'CREATE DATABASE travis_ci_test' -U postgres
   - psql -c "CREATE USER test WITH PASSWORD 'test';" -U postgres
     # Database for Docker execution. No meters, with a default user.
-  - docker-compose run --rm web src/scripts/installOED.sh --production
+  - docker-compose run --rm web src/scripts/installOED.sh
 
 script:
     # Validate legal requirements on source files
