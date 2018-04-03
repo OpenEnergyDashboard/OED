@@ -161,7 +161,7 @@ async function migrateDatabaseTransaction(neededFiles, allMigrationFiles) {
 					}
 				}
 			}
-		})
+		});
 	} catch (err) {
 		log.error('Error while migrating database', err);
 	}
