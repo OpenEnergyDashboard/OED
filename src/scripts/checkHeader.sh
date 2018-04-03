@@ -26,7 +26,7 @@ FILES=$(echo "$FILES" | grep -v "src\/server\/test\/db\/data\/.*")
 FILES=$(echo "$FILES" | grep -v "src\/scripts\/oed\.service")
 FILES=$(echo "$FILES" | grep -v "src\/scripts\/updateMamacMetersOEDCron\.bash")
 # Filter out JSON translation data
-FILES=$(echo "$FILES" | grep -v "src\/client\/app\/translations\/locales\/data.json")
+FILES=$(echo "$FILES" | grep -v "src\/client\/app\/translations\/data.json")
 
 # Counts the files listed in FILES
 NFILES=$(echo $FILES | wc -w)
