@@ -4,12 +4,13 @@
 
 import * as React from 'react';
 import { browserHistory } from 'react-router';
+import { InjectedIntlProps, injectIntl, defineMessages, FormattedMessage } from 'react-intl';
 import { Input, Button, InputGroup, Form } from 'reactstrap';
 import HeaderContainer from '../containers/HeaderContainer';
 import FooterComponent from '../components/FooterComponent';
 import { showErrorNotification } from '../utils/notifications';
 import { verificationApi } from '../utils/api';
-import { InjectedIntlProps, injectIntl, defineMessages, FormattedMessage } from 'react-intl';
+import translate from '../utils/translate';
 
 interface LoginState {
 	email: string;
@@ -106,11 +107,11 @@ class LoginComponent extends React.Component<InjectedIntlProps, LoginState> {
 				browserHistory.push('/');
 			} catch (err) {
 				if (err.response && err.response.status === 401) {
-					showErrorNotification('invalid.email.password');
+					showErrorNotification(translate('invalid.email.password'));
 				} else {
 					// If there was a problem other than a lack of authorization, the user can't fix it.
 					// This is an irrecoverable state, so just throw an error and let the user know something went wrong
-					showErrorNotification('failed.logging.in');
+					showErrorNotification(translate('failed.logging.in'));
 					throw err;
 				}
 				if (this.inputEmail !== null) {

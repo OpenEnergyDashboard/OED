@@ -7,7 +7,7 @@ import { Router, Route, browserHistory, RedirectFunction, RouterState } from 're
 import { addLocaleData, IntlProvider } from 'react-intl';
 import * as en from 'react-intl/locale-data/en';
 import * as fr from 'react-intl/locale-data/fr';
-import * as localeData from '../translations/locales/data.json';
+import * as localeData from '../translations/data.json';
 import * as _ from 'lodash';
 import * as moment from 'moment';
 import InitializationContainer from '../containers/InitializationContainer';
@@ -21,6 +21,7 @@ import { showErrorNotification } from '../utils/notifications';
 import { ChartTypes } from '../types/redux/graph';
 import { LanguageTypes } from '../types/i18n';
 import { verificationApi } from '../utils/api';
+import translate from '../utils/translate';
 import { validateComparePeriod, validateSortingOrder } from '../utils/calculateCompare';
 
 interface RouteProps {
@@ -107,7 +108,7 @@ export default class RouteComponent extends React.Component<RouteProps, {}> {
 					this.props.changeOptionsFromLink(options);
 				}
 			} catch (err) {
-				showErrorNotification('failed.to.link.graph');
+				showErrorNotification(translate('failed.to.link.graph'));
 			}
 		}
 		replace('/');

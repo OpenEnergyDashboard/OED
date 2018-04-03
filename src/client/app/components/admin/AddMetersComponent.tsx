@@ -4,10 +4,11 @@
 
 import * as React from 'react';
 import Dropzone from 'react-dropzone';
+import { defineMessages, FormattedMessage, injectIntl, InjectedIntlProps } from 'react-intl';
 import { fileProcessingApi } from '../../utils/api';
 import TooltipHelpComponent from '../TooltipHelpComponent';
 import { showSuccessNotification, showErrorNotification } from '../../utils/notifications';
-import { defineMessages, FormattedMessage, injectIntl, InjectedIntlProps } from 'react-intl';
+import translate from '../../utils/translate';
 
 interface AddMetersProps {
 	fetchMeterDetailsIfNeeded(alwaysFetch?: boolean): Promise<any>;
@@ -32,7 +33,7 @@ class AddMetersComponent extends React.Component<AddMetersPropsWithIntl, {}> {
 			dataLines = fileAsBinaryString.split(/\r?\n/);
 			dataLines[0] = dataLines[0].replace(/\"/g, '');
 			if (dataLines[0] !==  'ip') {
-				showErrorNotification('incorrect.file.format');
+				showErrorNotification(translate('incorrect.file.format'));
 			} else {
 				for (const items of dataLines) {
 					const ips = items.replace(/\"/g, '');
@@ -42,16 +43,16 @@ class AddMetersComponent extends React.Component<AddMetersPropsWithIntl, {}> {
 				}
 				fileProcessingApi.submitNewMeters(listOfIps)
 					.then(() => {
-						showSuccessNotification('successfully.uploaded.meters');
+						showSuccessNotification(translate('successfully.uploaded.meters'));
 						this.props.fetchMeterDetailsIfNeeded(true);
 					})
 					.catch(() => {
-						showErrorNotification('failed.to.upload.meters');
+						showErrorNotification(translate('failed.to.upload.meters'));
 					});
 			}
 		};
-		reader.onabort = () => showErrorNotification('file.reading.aborted');
-		reader.onerror = () => showErrorNotification('failed.to.read.file');
+		reader.onabort = () => showErrorNotification(translate('file.reading.aborted'));
+		reader.onerror = () => showErrorNotification(translate('failed.to.read.file'));
 		reader.readAsBinaryString(file);
 	}
 

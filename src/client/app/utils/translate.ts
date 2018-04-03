@@ -6,10 +6,14 @@ import store from '../index';
 import { addLocaleData, IntlProvider, defineMessages } from 'react-intl';
 import * as en from 'react-intl/locale-data/en';
 import * as fr from 'react-intl/locale-data/fr';
-import * as localeData from '../translations/locales/data.json';
+import * as localeData from '../translations/data.json';
 
-export default function translate(messageID: string): string {
-	addLocaleData([...en, ...fr]);
+addLocaleData([...en, ...fr]);
+
+const enum AsTranslated {}
+export type TranslatedString = string & AsTranslated;
+
+export default function translate(messageID: string): TranslatedString {
 	const state: any = store.getState();
 	const lang = state.admin.defaultLanguage;
 
@@ -20,5 +24,5 @@ export default function translate(messageID: string): string {
 		messages = (localeData as any).en;
 	}
 	const { intl } = new IntlProvider({ locale: lang, messages }, {}).getChildContext();
-	return intl.formatMessage(defineMessages({ [messageID]: { id: messageID }})[messageID]);
+	return intl.formatMessage(defineMessages({ [messageID]: { id: messageID }})[messageID]) as TranslatedString;
 }

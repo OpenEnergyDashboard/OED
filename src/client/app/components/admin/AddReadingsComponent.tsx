@@ -4,12 +4,13 @@
 
 import * as React from 'react';
 import Dropzone from 'react-dropzone';
+import { defineMessages, FormattedMessage, injectIntl, InjectedIntlProps } from 'react-intl';
 import { showSuccessNotification, showErrorNotification } from '../../utils/notifications';
 import { SelectOption } from '../../types/items';
 import SingleSelectComponent from '../SingleSelectComponent';
 import { UpdateImportMeterAction } from '../../types/redux/admin';
 import { fileProcessingApi } from '../../utils/api';
-import { defineMessages, FormattedMessage, injectIntl, InjectedIntlProps } from 'react-intl';
+import translate from '../../utils/translate';
 
 interface AddReadingProps {
 	selectedImportMeter: SelectOption | null;
@@ -27,15 +28,15 @@ class AddReadingComponent extends React.Component<AddReadingsPropsWithIntl, {}> 
 
 	public handleFileToImport(files: File[]) {
 		if (!this.props.selectedImportMeter) {
-			showErrorNotification('please.select.meter');
+			showErrorNotification(translate('please.select.meter'));
 		} else {
 			const file = files[0];
 			fileProcessingApi.submitNewReadings(this.props.selectedImportMeter.value, file)
 				.then(() => {
-					showSuccessNotification('successfully.upload.readings');
+					showSuccessNotification(translate('successfully.upload.readings'));
 				})
 				.catch(() => {
-					showErrorNotification('failed.to.upload.readings');
+					showErrorNotification(translate('failed.to.upload.readings'));
 				});
 		}
 	}

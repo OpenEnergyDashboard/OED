@@ -8,6 +8,7 @@ import { NamedIDItem } from '../types/items';
 import { showErrorNotification } from '../utils/notifications';
 import * as t from '../types/redux/groups';
 import { groupsApi } from '../utils/api';
+import translate from '../utils/translate';
 
 function requestGroupsDetails(): t.RequestGroupsDetailsAction {
 	return { type: ActionType.RequestGroupsDetails };
@@ -232,7 +233,7 @@ function submitNewGroup(group: t.GroupData): Thunk {
 			});
 		} catch (e) {
 			dispatch(markGroupInEditingNotSubmitted());
-			showErrorNotification('failed.to.create.group');
+			showErrorNotification(translate('failed.to.create.group'));
 		}
 	};
 }
@@ -251,9 +252,9 @@ function submitGroupEdits(group: t.GroupData & t.GroupID): Thunk {
 		} catch (e) {
 			dispatch(markGroupInEditingNotSubmitted());
 			if (e.response.data.message && e.response.data.message === 'Cyclic group detected') {
-				showErrorNotification('you.cannot.create.a.cyclic.group');
+				showErrorNotification(translate('you.cannot.create.a.cyclic.group'));
 			} else {
-				showErrorNotification('failed.to.edit.group');
+				showErrorNotification(translate('failed.to.edit.group'));
 			}
 		}
 	};
@@ -312,7 +313,7 @@ export function deleteGroup(): Thunk {
 				dispatch2(changeDisplayMode(t.DisplayMode.View));
 			});
 		} catch (e) {
-			showErrorNotification('failed.to.delete.group');
+			showErrorNotification(translate('failed.to.delete.group'));
 		}
 	};
 }

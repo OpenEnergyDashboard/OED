@@ -10,6 +10,7 @@ import * as t from '../types/redux/admin';
 import { ActionType, Dispatch, GetState, Thunk } from '../types/redux/actions';
 import { State } from '../types/redux/state';
 import { preferencesApi } from '../utils/api';
+import translate from '../utils/translate';
 import { LanguageTypes } from '../types/i18n';
 
 
@@ -77,10 +78,10 @@ function submitPreferences() {
 				defaultLanguage: state.admin.defaultLanguage
 			});
 			dispatch(markPreferencesSubmitted());
-			showSuccessNotification('updated.preferences');
+			showSuccessNotification(translate('updated.preferences'));
 		} catch (e) {
 			dispatch(markPreferencesNotSubmitted());
-			showErrorNotification('failed.to.submit.changes');
+			showErrorNotification(translate('failed.to.submit.changes'));
 		}
 	};
 }

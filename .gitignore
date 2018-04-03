@@ -31,6 +31,3 @@ postgres-data
 # Text files
 *.txt
 !License.txt
-
-# Generated translations
-/src/client/app/translations/messages
