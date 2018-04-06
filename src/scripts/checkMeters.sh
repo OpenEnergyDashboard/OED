@@ -13,11 +13,11 @@ read line
 while read line
 do
 	echo "$line:"
-	curl -s -m 1 "http://$line" > /dev/null
+	curl -s -m 5 "http://$line" > /dev/null
 	success=$?
 	if [ "$success" == "0" ]; then
-		echo "	GOOD"
+		echo "	Request succeeds."
 	else
-		echo "	NO GOOD $success"
+		echo "	Request fails with code $success."
 	fi
 done
