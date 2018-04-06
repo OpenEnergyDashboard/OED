@@ -17,18 +17,32 @@ function findMaxVersion(list) {
 
 (async () => {
 	let toVersion;
-	try {
-		const updateMax = await ask('Do you want to update to the max version? [yes/no]: ');
-		if (updateMax.toLowerCase() === 'yes' || updateMax.toLowerCase() === 'y') {
-			toVersion = await findMaxVersion(migrationList);
-		} else if (updateMax.toLowerCase() === 'no' || updateMax.toLowerCase() === 'n') {
-			toVersion = await ask('To Version: ');
-		} else {
-			terminateReadline('Invalid arguments, please enter [yes/no]');
+
+	// If there aren't enough args, go interactive.
+	const cmdArgs = process.argv;
+	if (cmdArgs.length !== 3) {
+		try {
+			const updateMax = await ask('Do you want to update to the max version? [yes/no]: ');
+			if (updateMax.toLowerCase() === 'yes' || updateMax.toLowerCase() === 'y') {
+				toVersion = await findMaxVersion(migrationList);
+			} else if (updateMax.toLowerCase() === 'no' || updateMax.toLowerCase() === 'n') {
+				toVersion = await ask('To Version: ');
+			} else {
+				terminateReadline('Invalid arguments, please enter [yes/no]');
+			}
+		} catch (err) {
+			terminateReadline('Could not find the max version from the registered migration list');
 		}
-	} catch (err) {
-		terminateReadline('Could not find the max version from the registered migration list');
+	} else {
+		const response = cmdArgs[2];
+
+		if (response.toLowerCase() === 'highest') {
+			toVersion = await findMaxVersion(migrationList);
+		} else {
+			toVersion = response;
+		}
 	}
+
 	try {
 		const currentVersion = await Migration.getCurrentVersion();
 		if (currentVersion === toVersion) {
