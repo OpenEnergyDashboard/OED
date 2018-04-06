@@ -5,7 +5,7 @@ Open Energy Dashboard is a user-friendly way to display energy information from 
 
 Open Energy Dashboard is available under the Mozilla Public Licence v2, and contributions, in the form of bug reports, feature requests, and code contributions, are welcome.
 
-### Installation ###
+### Installation and Usage ###
 
 See [USAGE.md](USAGE.md).
 
