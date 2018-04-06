@@ -5,8 +5,9 @@
   "license": "MPL-2.0",
   "scripts": {
     "start": "node ./src/bin/www",
-    "dev": "webpack -d --watch --color --progress",
-    "build": "cross-env NODE_ENV=production webpack -p",
+    "webpack:dev": "webpack -d --watch --color --progress",
+    "webpack:build": "cross-env NODE_ENV=production webpack -p",
+    "webpack": "webpack -d --color --progress",
     "checkHeader": "./src/scripts/checkHeader.sh",
     "checkTypescript": "./src/scripts/checkTypescript.sh",
     "lint": "./node_modules/.bin/tslint -c tslint.json src/{server,bin,scripts,common}/**/*.{ts,tsx,js,jsx} src/client/app/**/*.{ts,tsx,js,jsx}",
