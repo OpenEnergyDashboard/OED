@@ -14,6 +14,7 @@
     "typeCheck": "./node_modules/.bin/tsc -p . --noEmit",
     "test": "./node_modules/.bin/mocha \"src/server/test/**/*.js\"",
     "createdb": "node ./src/server/services/createDB.js",
+    "migratedb": "node ./src/server/services/migrateDB.js",
     "addMamacMeters": "node ./src/server/services/addMamacMeters.js",
     "updateMamacMeters": "node ./src/server/services/updateMamacMeters.js",
     "createUser": "node ./src/server/services/user/createUser.js",

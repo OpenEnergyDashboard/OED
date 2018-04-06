@@ -4,7 +4,8 @@
 
 const bcrypt = require('bcryptjs');
 const User = require('../../models/User');
-const { askEmail, askPassword, terminateReadline, validateEmail } = require('./utils');
+const { validateEmail } = require('./utils');
+const { ask, terminateReadline } = require('../utils');
 
 (async () => {
 	let email;
@@ -13,15 +14,12 @@ const { askEmail, askPassword, terminateReadline, validateEmail } = require('./u
 	// If there aren't enough args, go interactive.
 	const cmdArgs = process.argv;
 	if (cmdArgs.length !== 4) {
-		let emailResult;
-		try {
-			emailResult = await askEmail('Email of user to create');
-		} catch (err) {
+		email = await ask('Email of user to create: ');
+		if (!validateEmail(email)) {
 			terminateReadline('Invalid email, no user created');
+		} else {
+			password = await ask('Password: ');
 		}
-		const output = await askPassword(emailResult);
-		email = output[0];
-		password = output[1];
 	} else {
 		email = cmdArgs[2];
 		password = cmdArgs[3];

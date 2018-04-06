@@ -4,18 +4,17 @@
 
 const bcrypt = require('bcryptjs');
 const User = require('../../models/User');
-const { askEmail, askPassword, terminateReadline } = require('./utils');
+const { ask, terminateReadline } = require('../utils');
 
 (async () => {
-	let emailResult;
+	let email;
+	let password;
 	try {
-		emailResult = await askEmail('Email of user to modify');
+		email = await ask('Email of user to modify: ');
 	} catch (err) {
 		terminateReadline('Invalid email, no user modified');
 	}
-	const output = await askPassword(emailResult);
-	const email = output[0];
-	const password = output[1];
+	password = await ask('Password: ');
 
 	if (password.length < 8) {
 		terminateReadline('Password must be at least eight characters, user\'s password not modified');
