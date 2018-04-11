@@ -30,7 +30,7 @@ export default function MultiCompareChartComponent(props: MultiCompareChartProps
 				{props.errorEntities.map( name =>
 					<div className='col-12 clearfix' key={name}>
 						<UncontrolledAlert color='danger' className='float-right text-right'>
-							Insufficient data to show the graph of {name}.
+							Insufficient readings data to process comparison for {name}.
 						</UncontrolledAlert>
 					</div>
 				)}

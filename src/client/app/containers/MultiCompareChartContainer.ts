@@ -57,8 +57,6 @@ function getDataForIDs(ids: number[], isGroup: boolean, state: State): CompareEn
 			const timeSincePeriodStart = getTimeSincePeriodStart(comparePeriod);
 			if (readingsData!.readings!.length < timeSincePeriodStart) {
 				errorEntities.push(name);
-				console.log(`Insufficient readings data to process comparison for id ${id}, ti ${timeInterval}, dur ${barDuration}.
-					readingsData has ${readingsData!.readings!.length} but we'd like to look at the last ${timeSincePeriodStart} elements.`);
 				continue;
 			}
 			const currentPeriodUsage = calculateCurrentPeriodUsage(readingsData!, timeSincePeriodStart) || 0;
