@@ -48,7 +48,10 @@ function logMailer(level, message) {
 	transporter.sendMail(mailOptions, (err, info) => {
 		if (err) {
 			// tslint:disable-next-line no-console
-			console.log(`\t[EMAIL NOT SENT]: ${err.message}`);
+			console.error(`\t[EMAIL NOT SENT]: ${err.message}`);
+		} else {
+			// tslint:disable-next-line no-console
+			console.log(`\t[EMAIL SENT]: ${info.response}`)
 		}
 	});
 }
