@@ -93,6 +93,7 @@ async function createSchema() {
 	const LogEmail = require('./LogEmail');
 	const Baseline = require('./Baseline');
 
+	const Logfile = require('./obvius/Logfile');
 	/* eslint-enable global-require */
 	await Meter.createMeterTypesEnum();
 	await Meter.createTable();
@@ -109,6 +110,8 @@ async function createSchema() {
 	await getDB().none(sqlFile('reading/create_function_get_compressed_readings.sql'));
 	await Baseline.createTable();
 	await getDB().none(sqlFile('baseline/create_function_get_average_reading.sql'));
+	await db.none(sqlFile('reading/create_function_get_compressed_readings.sql'));
+	await Logfile.createTable();
 }
 
 // Create a new database connection.
