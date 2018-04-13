@@ -10,13 +10,15 @@ import InitializationContainer from '../containers/InitializationContainer';
 import HomeComponent from './HomeComponent';
 import LoginComponent from '../components/LoginComponent';
 import AdminComponent from './admin/AdminComponent';
-import GroupMainContainer from '../containers/groups/GroupMainContainer';
 import { LinkOptions } from 'actions/graph';
 import { hasToken } from '../utils/token';
 import { showErrorNotification } from '../utils/notifications';
 import { ChartTypes } from '../types/redux/graph';
 import { verificationApi } from '../utils/api';
 import { validateComparePeriod, validateSortingOrder } from '../utils/calculateCompare';
+import EditGroupsContainer from '../containers/groups/EditGroupsContainer';
+import CreateGroupContainer from '../containers/groups/CreateGroupContainer';
+import GroupViewContainer from '../containers/groups/GroupViewContainer';
 
 interface RouteProps {
 	barStacking: boolean ;
@@ -119,8 +121,10 @@ export default class RouteComponent extends React.Component<RouteProps, {}> {
 				<Router history={browserHistory}>
 					<Route path='/login' component={LoginComponent} />
 					<Route path='/admin' component={AdminComponent} onEnter={this.requireAuth} />
-					<Route path='/groups' component={GroupMainContainer} onEnter={this.requireAuth} />
+					<Route path='/groups' component={GroupViewContainer} />
 					<Route path='/graph' component={HomeComponent} onEnter={this.linkToGraph} />
+					<Route path='/createGroup' component={EditGroupsContainer} onEnter={this.requireAuth} />
+					<Route path='/editGroup' component={CreateGroupContainer} onEnter={this.requireAuth} />
 					<Route path='*' component={HomeComponent} />
 				</Router>
 			</div>
