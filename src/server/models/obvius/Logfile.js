@@ -9,16 +9,18 @@ const sqlFile = database.sqlFile;
 
 class Logfile {
 	/**
-	 * 
+	 *
 	 * @param {number} id This Logfile's ID. Undefined if this file is being created.
+	 * @param {string} ipAddress The IP Address from which this logfile was uploaded.
 	 * @param {string} filename The filename of this logfile.
 	 * @param {moment} created The time at which this logfile was created.
 	 * @param {string} hash The MD5 sum of the contents of this file.
 	 * @param {string} contents The contents of this file, as received from AquiSuite.
 	 * @param {boolean} processed Whether or not this logfile has been processed.
 	 */
-	constructor(id, filename, created, hash, contents, processed) {
+	constructor(id, ipAddress, filename, created, hash, contents, processed) {
 		this.id = id;
+		this.ipAddress = ipAddress;
 		this.filename = filename;
 		this.created = created;
 		this.hash = hash;
@@ -35,12 +37,12 @@ class Logfile {
 	}
 
 	static mapRow(row) {
-		return new Logfile(row.id, row.filename, row.created, row.hash, row.contents, row.processed);
+		return new Logfile(row.id, row.ip_address, row.filename, row.created, row.hash, row.contents, row.processed);
 	}
 
 	/**
 	 * Returns a promise to get a specific logfile by ID
-	 * @param {number} id 
+	 * @param {number} id
 	 * @param conn The connection to use. Defaults to the default DB connection.
 	 */
 	static async getByID(id, conn = db) {
@@ -50,7 +52,7 @@ class Logfile {
 
 	/**
 	 * Returns a promise to get all the logfiles stored.
-	 * @param conn The connection to use. Defaults to the default DB connection. 
+	 * @param conn The connection to use. Defaults to the default DB connection.
 	 */
 	static async getAll(conn = db) {
 		const rows = await conn.any(sqlFile("obvius/get_all_logs.sql"));

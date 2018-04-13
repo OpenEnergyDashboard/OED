@@ -12,12 +12,13 @@ const md5 = require('md5');
 const moment = require('moment');
 
 const recreateDB = require('./common').recreateDB;
-const Logfile = require("../../models/obvius/Logfile");
+const Logfile = require('../../models/obvius/Logfile');
 
 const mocha = require('mocha');
 
 function expectLogfilesToBeEquivalent(expected, actual) {
 	expect(actual).to.have.property('id', expected.id);
+	expect(actual).to.have.property('ipAddress', expected.ipAddress);
 	expect(actual).to.have.property('filename', expected.filename);
 	expect(actual).to.have.property('created');
 	expect(actual.created.toISOString()).to.equal(expected.created.toISOString());
@@ -29,12 +30,13 @@ function expectLogfilesToBeEquivalent(expected, actual) {
 mocha.describe('Logfiles', () => {
 	mocha.beforeEach(recreateDB);
 	mocha.it('can be saved and retrieved', async () => {
-		const contents = "Some test contents for the log file.";
+		const contents = 'Some test contents for the log file.';
 		const chash = md5(contents);
-		const filename = "log.whatever.whenever";
-		const logfilePreInsert = new Logfile(undefined, filename, moment(), chash, contents, false);
+		const filename = 'log.whatever.whenever';
+		const ipAddress = '0.0.0.0';
+		const logfilePreInsert = new Logfile(undefined, ipAddress, filename, moment(), chash, contents, false);
 		await logfilePreInsert.insert();
-		const logfilePostInsertByID = await Logfile.getByID(logfilePreInsert.id);
+		const logfilePostInsertByID = await Logfile.getByID(1);
 		expectLogfilesToBeEquivalent(logfilePreInsert, logfilePostInsertByID);
 	});
 });

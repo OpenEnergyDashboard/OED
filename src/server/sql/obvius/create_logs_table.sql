@@ -4,6 +4,7 @@
 
  CREATE TABLE IF NOT EXISTS obvius_logs (
 	 id SERIAL PRIMARY KEY,
+	 ip_address VARCHAR(20) NOT NULL,
 	 filename TEXT NOT NULL,
 	 created TIMESTAMP NOT NULL,
 	 hash CHARACTER(32) NOT NULL,
