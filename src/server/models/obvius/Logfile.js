@@ -51,6 +51,17 @@ class Logfile {
 	}
 
 	/**
+	 * Returns a promise to get all the logfiles associated with the given IP,
+	 * ordered by the date of creation, ascending.
+	 * @param {string} ip 
+	 * @param conn The connection to use. Defaults to the default DB connection.
+	 */
+	static async getByIP(ip, conn = db) {
+		const rows = await conn.any(sqlFile('obvius/get_logs_by_ip.sql'), {ipAddress: ip});
+		return rows.map(Logfile.mapRow);
+	}
+
+	/**
 	 * Returns a promise to get all the logfiles stored.
 	 * @param conn The connection to use. Defaults to the default DB connection.
 	 */

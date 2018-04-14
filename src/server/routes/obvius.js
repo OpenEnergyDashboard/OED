@@ -17,6 +17,8 @@ const config = require('../config');
 const multer = require('multer');
 const zlib = require('zlib');
 const { log } = require('../log');
+const Logfile = require('../models/obvius/Logfile');
+const listLogfiles = require('../services/listLogfiles');
 const streamBuffers = require('stream-buffers');
 
 const upload = multer({ storage: multer.memoryStorage() });
@@ -185,12 +187,7 @@ router.all('/', async (req, res) => {
 	}
 
 	if (mode === MODE_CONFIG_MANIFEST) {
-		// Returns a dummy config manifest.
-		// The blank/empty timestamp will always indicate an out-of-date manifest.
-		// The checksum is a dummy.
-		const response = 'CONFIGFILE,loggerconfig.ini,42a48182862fa5044d1ac7b294bc6f97,0000-00-00 00:00:00\n';
-		success(req, res, response);
-		return;
+		success(await listLogfiles());
 	}
 
 	if (mode === MODE_CONFIG_UPLOAD) {

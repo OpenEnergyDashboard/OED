@@ -3,4 +3,6 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
 
 SELECT id, ip_address, filename, created, hash, contents, processed 
-	FROM obvius_logs;
+	FROM obvius_logs 
+	WHERE ip_address=${ipAddress} 
+	ORDER BY created ASC;

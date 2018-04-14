@@ -13,6 +13,7 @@ const moment = require('moment');
 
 const recreateDB = require('./common').recreateDB;
 const Logfile = require('../../models/obvius/Logfile');
+const listLogfiles = require('../../services/obvius/listLogfiles');
 
 const mocha = require('mocha');
 
@@ -39,4 +40,35 @@ mocha.describe('Logfiles', () => {
 		const logfilePostInsertByID = await Logfile.getByID(1);
 		expectLogfilesToBeEquivalent(logfilePreInsert, logfilePostInsertByID);
 	});
+	mocha.it('can be retrieved by IP address', async () => {
+		const logfile1 = new Logfile(undefined, "0.0.0.0", "logfile1", moment().subtract(1, 'd'), md5("contents"), "contents", true);
+		const logfile2 = new Logfile(undefined, "0.0.0.0", "logfile2", moment(), md5("contents"), "contents", true);
+		const logfile3 = new Logfile(undefined, "0.0.0.1", "logfile3", moment(), md5("contents"), "contents", true);
+		await logfile1.insert();
+		await logfile2.insert();
+		await logfile3.insert();
+
+		// Test correct length.
+		const logfilesForAllZeroes = await Logfile.getByIP('0.0.0.0');
+		expect(logfilesForAllZeroes).to.have.length(2);
+		const logfilesForOneOne = await Logfile.getByIP('0.0.0.1');
+		expect(logfilesForOneOne).to.have.length(1);
+
+		// Test correct ordering.
+		expectLogfilesToBeEquivalent(logfilesForAllZeroes[0], logfile1);
+		expectLogfilesToBeEquivalent(logfilesForAllZeroes[1], logfile2);
+	});
+	mocha.it('can generate an Obvius config manifest', async () => {
+		const logfile1 = new Logfile(undefined, "0.0.0.0", "logfile1", moment(), md5("contents1"), "contents1", true);
+		const logfile2 = new Logfile(undefined, "0.0.0.0", "logfile2", moment(), md5("contents2"), "contents2", true);
+		const logfile3 = new Logfile(undefined, "0.0.0.0", "logfile3", moment(), md5("contents3"), "contents3", true);
+
+		await logfile1.insert();
+		await logfile2.insert();
+		await logfile3.insert();
+
+		const expectation = 'CONFIGFILE,logfile1,4891e2a24026da4dea5b4119e1dc1863\nCONFIGFILE,logfile2,b2d0efbdc48f4b7bf42f8ab76d71f84e\nCONFIGFILE,logfile3,2635f317ed53a4fc4014650181fa7ccd\n';
+
+		expect(await listLogfiles()).to.equal(expectation);
+	})
 });
