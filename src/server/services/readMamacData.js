@@ -42,13 +42,25 @@ async function readMamacData(meter) {
 	return parsedReadings.map(raw => {
 		const reading = Math.round(Number(raw[0]));
 		if (isNaN(reading)) {
-			throw new Error(`Meter reading ${reading} parses to NaN for meter named ${meter.name} with id ${meter.id}`);
+			const e = Error(`Meter reading ${reading} parses to NaN for meter named ${meter.name} with id ${meter.id}`);
+			e.options = {ipAddress: meter.ipAddress};
+			throw e;
+		}
+		let startTs;
+		let endTs;
+		try {
+			startTs = parseTimestamp(raw[1]).subtract(1, 'hours').toDate();
+			endTs = parseTimestamp(raw[1]).toDate();
+		} catch (re) {
+			const e = Error(re.message);
+			e.options = {ipAddress: meter.ipAddress};
+			throw e;
 		}
 		return new Reading(
 				meter.id,
 				reading,
-				parseTimestamp(raw[1]).subtract(1, 'hours').toDate(),
-				parseTimestamp(raw[1]).toDate()
+				startTs,
+				endTs
 		);
 	});
 }
