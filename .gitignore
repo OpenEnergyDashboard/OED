@@ -7,6 +7,7 @@
 # NPM
 node_modules
 npm*.log
+v8-compile-cache*
 
 # Intellij (directory-based)
 .idea

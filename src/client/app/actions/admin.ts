@@ -2,15 +2,15 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
 
-import axios from 'axios';
 import { changeBarStacking, changeChartToRender } from './graph';
 import { showErrorNotification, showSuccessNotification } from '../utils/notifications';
-import { getToken } from '../utils/token';
 import { ChartTypes } from '../types/redux/graph';
 import { PreferenceRequestItem } from '../types/items';
 import * as t from '../types/redux/admin';
 import { ActionType, Dispatch, GetState, Thunk } from '../types/redux/actions';
 import { State } from '../types/redux/state';
+import { preferencesApi } from '../utils/api';
+
 
 export function updateSelectedMeter(meterID: number): t.UpdateImportMeterAction {
 	return { type: ActionType.UpdateImportMeter, meterID };
@@ -46,45 +46,37 @@ function markPreferencesSubmitted(): t.MarkPreferencesSubmittedAction {
 
 
 function fetchPreferences(): Thunk {
-	return (dispatch: Dispatch, getState: GetState) => {
+	return async (dispatch: Dispatch, getState: GetState) => {
 		dispatch(requestPreferences());
-		return axios.get('/api/preferences')
-			.then(response => {
-				dispatch(receivePreferences(response.data));
-				if (!getState().graph.hotlinked) {
-					dispatch((dispatch2: Dispatch, getState2: GetState) => {
-						const state = getState();
-						dispatch2(changeChartToRender(state.admin.defaultChartToRender));
-						if (response.data.defaultBarStacking !== state.graph.barStacking) {
-							dispatch2(changeBarStacking());
-						}
-					});
+		const preferences = await preferencesApi.getPreferences();
+		dispatch(receivePreferences(preferences));
+		if (!getState().graph.hotlinked) {
+			dispatch((dispatch2: Dispatch, getState2: GetState) => {
+				const state = getState();
+				dispatch2(changeChartToRender(state.admin.defaultChartToRender));
+				if (preferences.defaultBarStacking !== state.graph.barStacking) {
+					dispatch2(changeBarStacking());
 				}
 			});
+		}
 	};
 }
 
 function submitPreferences() {
-	return (dispatch: Dispatch, getState: GetState) => {
+	return async (dispatch: Dispatch, getState: GetState) => {
 		const state = getState();
-		return axios.post('/api/preferences',
-			{
-				token: getToken(),
-				preferences: {
-					displayTitle: state.admin.displayTitle,
-					defaultChartToRender: state.admin.defaultChartToRender,
-					defaultBarStacking: state.admin.defaultBarStacking
-				}
-			})
-			.then(() => {
-				dispatch(markPreferencesSubmitted());
-				showSuccessNotification('Updated preferences');
-			})
-			.catch(() => {
-				dispatch(markPreferencesNotSubmitted());
-				showErrorNotification('Failed to submit changes');
-			}
-		);
+		try {
+			await preferencesApi.submitPreferences({
+				displayTitle: state.admin.displayTitle,
+				defaultChartToRender: state.admin.defaultChartToRender,
+				defaultBarStacking: state.admin.defaultBarStacking
+			});
+			dispatch(markPreferencesSubmitted());
+			showSuccessNotification('Updated preferences');
+		} catch (e) {
+			dispatch(markPreferencesNotSubmitted());
+			showErrorNotification('Failed to submit changes');
+		}
 	};
 }
 

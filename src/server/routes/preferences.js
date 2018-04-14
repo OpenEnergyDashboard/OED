@@ -31,12 +31,9 @@ router.use(authentication);
 router.post('/', async (req, res) => {
 	const validParams = {
 		type: 'object',
-		maxProperties: 2,
-		required: ['token', 'preferences'],
+		maxProperties: 1,
+		required: ['preferences'],
 		properties: {
-			token: {
-				type: 'string'
-			},
 			preferences: {
 				displayTitle: {
 					type: 'string'

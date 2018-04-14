@@ -4,18 +4,19 @@
 
 import * as React from 'react';
 import { Router, Route, browserHistory, RedirectFunction, RouterState } from 'react-router';
-import axios from 'axios';
 import * as _ from 'lodash';
 import * as moment from 'moment';
 import InitializationContainer from '../containers/InitializationContainer';
 import HomeComponent from './HomeComponent';
 import LoginComponent from '../components/LoginComponent';
-import AdminContainer from '../containers/AdminContainer';
+import AdminComponent from './admin/AdminComponent';
 import GroupMainContainer from '../containers/groups/GroupMainContainer';
 import { LinkOptions } from 'actions/graph';
-import { getToken, hasToken } from '../utils/token';
+import { hasToken } from '../utils/token';
 import { showErrorNotification } from '../utils/notifications';
 import { ChartTypes } from '../types/redux/graph';
+import { verificationApi } from '../utils/api';
+import { validateComparePeriod, validateSortingOrder } from '../utils/calculateCompare';
 
 interface RouteProps {
 	barStacking: boolean ;
@@ -46,16 +47,14 @@ export default class RouteComponent extends React.Component<RouteProps, {}> {
 			redirectRoute();
 			return;
 		}
-		// Verify that the auth token is valid
-		axios.post('/api/verification/',
-			{ token: getToken() },
-			{ validateStatus: status => (status >= 200 && status < 300) || (status === 401 || status === 403) })
-			.then(res => {
+		// Verify that the auth token is valid.
+		// Needs to be async because of the network request
+		(async () => {
+			if (!(await verificationApi.checkTokenValid())) {
 				// Route to login page if the auth token is not valid
-				if (!res.data.success) { browserHistory.push('/login'); }
-			})
-			// In the case of a server error, the user can't fix the issue. Log it for developers.
-			.catch(console.error); // eslint-disable-line no-console
+				browserHistory.push('/login');
+			}
+		})();
 	}
 
 	/**
@@ -69,7 +68,7 @@ export default class RouteComponent extends React.Component<RouteProps, {}> {
 			try {
 				const options: LinkOptions = {};
 				for (const [key, infoObj] of _.entries(queries)) {
-					const info = infoObj.toString();
+					const info: string = infoObj.toString();
 					switch (key) {
 						case 'meterIDs':
 							options.meterIDs = info.split(',').map(s => parseInt(s));
@@ -87,6 +86,12 @@ export default class RouteComponent extends React.Component<RouteProps, {}> {
 							if (this.props.barStacking.toString() !== info) {
 								options.toggleBarStacking = true;
 							}
+							break;
+						case 'comparePeriod':
+							options.comparePeriod = validateComparePeriod(info);
+							break;
+						case 'compareSortingOrder':
+							options.compareSortingOrder = validateSortingOrder(info);
 							break;
 						default:
 							throw new Error('Unknown query parameter');
@@ -113,7 +118,7 @@ export default class RouteComponent extends React.Component<RouteProps, {}> {
 				<InitializationContainer />
 				<Router history={browserHistory}>
 					<Route path='/login' component={LoginComponent} />
-					<Route path='/admin' component={AdminContainer} onEnter={this.requireAuth} />
+					<Route path='/admin' component={AdminComponent} onEnter={this.requireAuth} />
 					<Route path='/groups' component={GroupMainContainer} onEnter={this.requireAuth} />
 					<Route path='/graph' component={HomeComponent} onEnter={this.linkToGraph} />
 					<Route path='*' component={HomeComponent} />

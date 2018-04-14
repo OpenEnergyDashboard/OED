@@ -3,11 +3,11 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
 
 import * as _ from 'lodash';
-import axios from 'axios';
 import { ActionType, Dispatch, GetState, Thunk } from '../types/redux/actions';
 import { State } from '../types/redux/state';
 import * as t from '../types/redux/meters';
 import { NamedIDItem } from '../types/items';
+import { metersApi } from '../utils/api';
 
 
 export function requestMetersDetails(): t.RequestMetersDetailsAction {
@@ -19,12 +19,10 @@ export function receiveMetersDetails(data: NamedIDItem[]): t.ReceiveMetersDetail
 }
 
 function fetchMetersDetails(): Thunk {
-	return (dispatch: Dispatch) => {
+	return async (dispatch: Dispatch) => {
 		dispatch(requestMetersDetails());
-		return axios.get('/api/meters')
-			.then(response => {
-				dispatch(receiveMetersDetails(response.data));
-			});
+		const metersDetails = await metersApi.details();
+		dispatch(receiveMetersDetails(metersDetails));
 	};
 }
 
@@ -35,9 +33,9 @@ function shouldFetchMetersDetails(state: State): boolean {
 	return !state.meters.isFetching && _.size(state.meters.byMeterID) === 0;
 }
 
-export function fetchMetersDetailsIfNeeded(): Thunk {
+export function fetchMetersDetailsIfNeeded(alwaysFetch?: boolean): Thunk {
 	return (dispatch: Dispatch, getState: GetState) => {
-		if (shouldFetchMetersDetails(getState())) {
+		if (alwaysFetch || shouldFetchMetersDetails(getState())) {
 			return dispatch(fetchMetersDetails());
 		}
 		return Promise.resolve();
