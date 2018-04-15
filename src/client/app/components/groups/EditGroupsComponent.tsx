@@ -11,6 +11,9 @@ import DatasourceBoxContainer from '../../containers/groups/DatasourceBoxContain
 import { NamedIDItem } from '../../types/items';
 import { SelectionType } from '../../containers/groups/DatasourceBoxContainer';
 import { EditGroupNameAction, ChangeDisplayModeAction, ChangeChildMetersAction, ChangeChildGroupsAction } from '../../types/redux/groups';
+import HeaderComponent from "../HeaderComponent";
+import FooterComponent from "../FooterComponent";
+import HeaderContainer from "../../containers/HeaderContainer";
 
 interface EditGroupsProps {
 	name: string;
@@ -94,81 +97,87 @@ export default class EditGroupsComponent extends React.Component<EditGroupsProps
 			textAlign: 'center'
 		};
 		return (
-			<div className='row'>
-				<div style={divStyle} className='col-6'>
-					<h3 style={centerTextStyle}>Edit Group</h3>
-					<p style={boldStyle}>Name:</p>
-					<Input type='text' placeholder='Name' value={this.state.name} onChange={this.handleNameChange} />
-					<div className='row' style={metersDivStyle}>
-						<div className='col-5'>
-							<p style={boldStyle}>Child meters:</p>
-							<DatasourceBoxContainer
-								type='meter'
-								selection={SelectionType.Custom}
-								datasource={this.props.childMeters}
-								selectedOptions={this.state.defaultSelectedMeters}
-								selectDatasource={this.handleUpdatedSelectedMeters}
-							/>
-						</div>
-						<div className='col-2' style={leftRightButtonsDivStyle}>
-							<Button outline onClick={this.handleMoveUnusedMetersToChildMeters} style={leftRightButtonStyle}>
-								<i className='fa fa-chevron-left' />
-							</Button>
-							<Button outline onClick={this.handleMoveChildMetersToUnusedMeters} style={leftRightButtonStyle}>
-								<i className='fa fa-chevron-right' />
-							</Button>
-						</div>
-						<div className='col-5'>
-							<p style={boldStyle}>Unused meters:</p>
-							<DatasourceBoxContainer
-								type='meter'
-								selection={SelectionType.Custom}
-								datasource={this.props.allMetersExceptChildMeters}
-								selectedOptions={this.state.defaultUnusedMeters}
-								selectDatasource={this.handleUpdateUnusedMeters}
-							/>
-						</div>
-					</div>
-					<div className='row' style={groupsDivStyle}>
-						<div className='col-5'>
-							<p style={boldStyle}>Child groups:</p>
-							<DatasourceBoxContainer
-								type='group'
-								selection={SelectionType.Custom}
-								datasource={this.props.childGroups}
-								selectedOptions={this.state.defaultSelectedGroups}
-								selectDatasource={this.handleUpdateSelectedGroups}
-							/>
-						</div>
-						<div className='col-2' style={leftRightButtonsDivStyle}>
-							<Button outline onClick={this.handleMoveUnusedGroupsToChildGroups} style={leftRightButtonStyle}>
-								<i className='fa fa-chevron-left' />
-							</Button>
-							<Button outline onClick={this.handleMoveChildGroupsToUnusedGroups} style={leftRightButtonStyle}>
-								<i className='fa fa-chevron-right' />
-							</Button>
-						</div>
-						<div className='col-5'>
-							<p style={boldStyle}>Unused groups:</p>
-							<DatasourceBoxContainer
-								type='group'
-								selection={SelectionType.Custom}
-								datasource={this.props.allGroupsExceptChildGroups}
-								selectedOptions={this.state.defaultUnusedGroups}
-								selectDatasource={this.handleUpdateUnusedGroups}
-							/>
-						</div>
-					</div>
+			<div>
+				<HeaderContainer />
+				<div className='container-fluid'>
 					<div className='row'>
-						<div className='col-6'>
-							<Button outline onClick={this.handleReturnToView}>Cancel</Button>
-							<Button outline onClick={this.handleEditGroup}>Submit changes</Button>
-						</div>
-						<div className='col-6 d-flex justify-content-end'>
-							<Button outline className='justify-content-end' onClick={this.handleDeleteGroup}>Delete group</Button>
+						<div style={divStyle} className='col-6'>
+							<h3 style={centerTextStyle}>Edit Group</h3>
+							<p style={boldStyle}>Name:</p>
+							<Input type='text' placeholder='Name' value={this.state.name} onChange={this.handleNameChange} />
+							<div className='row' style={metersDivStyle}>
+								<div className='col-5'>
+									<p style={boldStyle}>Child meters:</p>
+									<DatasourceBoxContainer
+										type='meter'
+										selection={SelectionType.Custom}
+										datasource={this.props.childMeters}
+										selectedOptions={this.state.defaultSelectedMeters}
+										selectDatasource={this.handleUpdatedSelectedMeters}
+									/>
+								</div>
+								<div className='col-2' style={leftRightButtonsDivStyle}>
+									<Button outline onClick={this.handleMoveUnusedMetersToChildMeters} style={leftRightButtonStyle}>
+										<i className='fa fa-chevron-left' />
+									</Button>
+									<Button outline onClick={this.handleMoveChildMetersToUnusedMeters} style={leftRightButtonStyle}>
+										<i className='fa fa-chevron-right' />
+									</Button>
+								</div>
+								<div className='col-5'>
+									<p style={boldStyle}>Unused meters:</p>
+									<DatasourceBoxContainer
+										type='meter'
+										selection={SelectionType.Custom}
+										datasource={this.props.allMetersExceptChildMeters}
+										selectedOptions={this.state.defaultUnusedMeters}
+										selectDatasource={this.handleUpdateUnusedMeters}
+									/>
+								</div>
+							</div>
+							<div className='row' style={groupsDivStyle}>
+								<div className='col-5'>
+									<p style={boldStyle}>Child groups:</p>
+									<DatasourceBoxContainer
+										type='group'
+										selection={SelectionType.Custom}
+										datasource={this.props.childGroups}
+										selectedOptions={this.state.defaultSelectedGroups}
+										selectDatasource={this.handleUpdateSelectedGroups}
+									/>
+								</div>
+								<div className='col-2' style={leftRightButtonsDivStyle}>
+									<Button outline onClick={this.handleMoveUnusedGroupsToChildGroups} style={leftRightButtonStyle}>
+										<i className='fa fa-chevron-left' />
+									</Button>
+									<Button outline onClick={this.handleMoveChildGroupsToUnusedGroups} style={leftRightButtonStyle}>
+										<i className='fa fa-chevron-right' />
+									</Button>
+								</div>
+								<div className='col-5'>
+									<p style={boldStyle}>Unused groups:</p>
+									<DatasourceBoxContainer
+										type='group'
+										selection={SelectionType.Custom}
+										datasource={this.props.allGroupsExceptChildGroups}
+										selectedOptions={this.state.defaultUnusedGroups}
+										selectDatasource={this.handleUpdateUnusedGroups}
+									/>
+								</div>
+							</div>
+							<div className='row'>
+								<div className='col-6'>
+									<Button outline onClick={this.handleReturnToView}>Cancel</Button>
+									<Button outline onClick={this.handleEditGroup}>Submit changes</Button>
+								</div>
+								<div className='col-6 d-flex justify-content-end'>
+									<Button outline className='justify-content-end' onClick={this.handleDeleteGroup}>Delete group</Button>
+								</div>
+							</div>
 						</div>
 					</div>
 				</div>
+				<FooterComponent />
 			</div>
 		);
 	}

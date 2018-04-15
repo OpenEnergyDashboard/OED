@@ -29,45 +29,12 @@ export default class GroupMainComponent extends React.Component<GroupMainProps, 
 	}
 
 	public render() {
-		const flexContainerStyle = {
-			display: 'flex',
-			flexFlow: 'row wrap'
-		};
-		const flexChildStyle = {
-			marginRight: '10px'
-		};
-
 		let GroupDisplay: JSX.Element | undefined;
 		switch (this.props.displayMode) {
 			case DisplayMode.Create: {
 				GroupDisplay = (
 					<div>
 						<CreateGroupContainer />
-					</div>
-				);
-				break;
-			}
-			case DisplayMode.Edit: {
-				GroupDisplay = (
-					<div>
-						<EditGroupsContainer />
-					</div>
-				);
-				break;
-			}
-			case DisplayMode.View: {
-				GroupDisplay = (
-					<div className='row'>
-						<div className='col-12 col-lg-2'>
-							<GroupSidebarContainer />
-						</div>
-						<div className='col-12 col-lg-10' style={flexContainerStyle}>
-							{this.props.selectedGroups.map(groupID =>
-								<div className='col-12 col-lg-4' style={flexChildStyle} key={groupID}>
-									<GroupViewContainer key={groupID} id={groupID} />
-								</div>
-							)}
-						</div>
 					</div>
 				);
 				break;

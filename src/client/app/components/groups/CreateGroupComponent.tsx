@@ -8,6 +8,8 @@ import DatasourceBoxContainer from '../../containers/groups/DatasourceBoxContain
 import { SelectionType } from '../../containers/groups/DatasourceBoxContainer';
 import { NamedIDItem } from '../../types/items';
 import { CreateNewBlankGroupAction, EditGroupNameAction, ChangeDisplayModeAction } from '../../types/redux/groups';
+import HeaderContainer from "../../containers/HeaderContainer";
+import FooterComponent from "../FooterComponent";
 
 
 interface CreateGroupProps {
@@ -46,28 +48,34 @@ export default class CreateGroupComponent extends React.Component<CreateGroupPro
 			textAlign: 'center'
 		};
 		return (
-			<div style={divStyle} className='col-6'>
-				<h3 style={centerTextStyle}>Create a New Group</h3>
-				<div style={divBottomStyle}>
-					<p style={textStyle}>Name:</p>
-					<Input type='text' placeholder='Name' onChange={this.handleNameChange} />
-				</div>
-				<div style={divBottomStyle}>
-					<p style={textStyle}>Select Meters:</p>
-					<DatasourceBoxContainer type='meter' selection={SelectionType.All} />
-				</div>
-				<div style={divBottomStyle}>
-					<p style={textStyle}>Select Groups:</p>
-					<DatasourceBoxContainer type='group' selection={SelectionType.All} />
-				</div>
-				<div className='row'>
-					<div className='col-6'>
-						<Button outline type='submit' onClick={this.handleReturnToView}>Cancel</Button>
+			<div>
+				<HeaderContainer />
+				<div className='container-fluid'>
+					<div style={divStyle} className='col-6'>
+						<h3 style={centerTextStyle}>Create a New Group</h3>
+						<div style={divBottomStyle}>
+							<p style={textStyle}>Name:</p>
+							<Input type='text' placeholder='Name' onChange={this.handleNameChange} />
+						</div>
+						<div style={divBottomStyle}>
+							<p style={textStyle}>Select Meters:</p>
+							<DatasourceBoxContainer type='meter' selection={SelectionType.All} />
+						</div>
+						<div style={divBottomStyle}>
+							<p style={textStyle}>Select Groups:</p>
+							<DatasourceBoxContainer type='group' selection={SelectionType.All} />
+						</div>
+						<div className='row'>
+							<div className='col-6'>
+								<Button outline type='submit' onClick={this.handleReturnToView}>Cancel</Button>
+							</div>
+							<div className='col-6 d-flex justify-content-end'>
+								<Button outline type='submit' onClick={this.handleCreateGroup}>Create group</Button>
+							</div>
+						</div>
 					</div>
-					<div className='col-6 d-flex justify-content-end'>
-						<Button outline type='submit' onClick={this.handleCreateGroup}>Create group</Button>
-					</div>
 				</div>
+				<FooterComponent />
 			</div>
 		);
 	}

@@ -14,11 +14,9 @@ import { State } from '../../types/redux/state';
 function mapStateToProps(state: State) {
 	const sortedGroups = _.sortBy(_.values(state.groups.byGroupID).map(group => ({ id: group.id, name: group.name.trim() })), 'name');
 	const sortedMeters = _.sortBy(_.values(state.meters.byMeterID).map(meter => ({ id: meter.id, name: meter.name.trim() })), 'name');
-	const selectGroups = state.groups.selectedGroups;
 	return {
 		groups: sortedGroups,
 		meters: sortedMeters,
-		selectedGroups: selectGroups,
 		displayMode: state.groups.displayMode
 	};
 }

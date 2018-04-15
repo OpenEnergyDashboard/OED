@@ -18,7 +18,7 @@ import { verificationApi } from '../utils/api';
 import { validateComparePeriod, validateSortingOrder } from '../utils/calculateCompare';
 import EditGroupsContainer from '../containers/groups/EditGroupsContainer';
 import CreateGroupContainer from '../containers/groups/CreateGroupContainer';
-import GroupViewContainer from '../containers/groups/GroupViewContainer';
+import GroupsDetailContainer from '../containers/groups/GroupsDetailContainer';
 
 interface RouteProps {
 	barStacking: boolean ;
@@ -121,7 +121,7 @@ export default class RouteComponent extends React.Component<RouteProps, {}> {
 				<Router history={browserHistory}>
 					<Route path='/login' component={LoginComponent} />
 					<Route path='/admin' component={AdminComponent} onEnter={this.requireAuth} />
-					<Route path='/groups' component={GroupViewContainer} />
+					<Route path='/groups' component={GroupsDetailContainer} />
 					<Route path='/graph' component={HomeComponent} onEnter={this.linkToGraph} />
 					<Route path='/createGroup' component={EditGroupsContainer} onEnter={this.requireAuth} />
 					<Route path='/editGroup' component={CreateGroupContainer} onEnter={this.requireAuth} />
