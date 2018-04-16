@@ -3,12 +3,14 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
 
 import * as React from 'react';
+import { UncontrolledAlert } from 'reactstrap';
 import { FormattedMessage } from 'react-intl';
 import CompareChartContainer from '../containers/CompareChartContainer';
 import { CompareEntity } from '../containers/MultiCompareChartContainer';
 
 interface MultiCompareChartProps {
 	selectedCompareEntities: CompareEntity[];
+	errorEntities: string[];
 }
 
 export default function MultiCompareChartComponent(props: MultiCompareChartProps) {
@@ -18,31 +20,37 @@ export default function MultiCompareChartComponent(props: MultiCompareChartProps
 	if (numSelectedItems < 3) {
 		size = numSelectedItems;
 	}
-
+	const childClassName = `col-12 col-lg-${12 / size}`;
 	const centeredStyle = {
 		marginTop: '20%'
 	};
 
-	// Display a message if no meters are selected
-	if (numSelectedItems === 0) {
-		return (
-			<div className='text-center' style={centeredStyle}>
-				<FormattedMessage id='empty.compare' />
-			</div>
-		);
-	}
-	const childClassName = `col-12 col-lg-${12 / size}`;
-
 	return (
-		<div className='row'>
-			{props.selectedCompareEntities.map(compareEntity =>
-				<div className={childClassName} key={compareEntity.id + compareEntity.name}>
-					<CompareChartContainer
-						key={compareEntity.id + compareEntity.name}
-						entity={compareEntity}
-					/>
+		<div>
+			<div className='row'>
+				{props.errorEntities.map( name =>
+					<div className='col-12 clearfix' key={name}>
+						<UncontrolledAlert color='danger' className='float-right text-right'>
+							<FormattedMessage id='insufficient.readings' /> {name}
+						</UncontrolledAlert>
+					</div>
+				)}
+			</div>
+			<div className='row'>
+				{props.selectedCompareEntities.map(compareEntity =>
+					<div className={childClassName} key={compareEntity.id + compareEntity.name}>
+						<CompareChartContainer
+							key={compareEntity.id + compareEntity.name}
+							entity={compareEntity}
+						/>
+					</div>
+				)}
+			</div>
+			{props.selectedCompareEntities.length === 0 &&
+				<div className='text-center' style={centeredStyle}>
+					<FormattedMessage id='empty.compare' />
 				</div>
-			)}
+			}
 		</div>
 	);
 }

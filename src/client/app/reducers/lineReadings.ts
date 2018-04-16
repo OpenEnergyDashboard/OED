@@ -7,7 +7,10 @@ import { ActionType } from '../types/redux/actions';
 
 const defaultState: LineReadingsState = {
 	byMeterID: {},
-	byGroupID: {}
+	byGroupID: {},
+	isFetching: false,
+	metersFetching: false,
+	groupsFetching: false
 };
 
 export default function readings(state = defaultState, action: LineReadingsAction) {
@@ -18,7 +21,9 @@ export default function readings(state = defaultState, action: LineReadingsActio
 				...state,
 				byMeterID: {
 					...state.byMeterID
-				}
+				},
+				metersFetching: true,
+				isFetching: true
 			};
 
 			for (const meterID of action.meterIDs) {
@@ -42,7 +47,9 @@ export default function readings(state = defaultState, action: LineReadingsActio
 				...state,
 				byGroupID: {
 					...state.byGroupID
-				}
+				},
+				groupsFetching: true,
+				isFetching: true
 			};
 
 			for (const groupID of action.groupIDs) {
@@ -73,6 +80,10 @@ export default function readings(state = defaultState, action: LineReadingsActio
 				const readingsForMeter = action.readings[meterID];
 				newState.byMeterID[meterID][timeInterval] = { isFetching: false, readings: readingsForMeter };
 			}
+			if (!state.groupsFetching) {
+				newState.isFetching = false;
+			}
+
 			return newState;
 		}
 		case ActionType.ReceiveGroupLineReadings: {
@@ -81,12 +92,16 @@ export default function readings(state = defaultState, action: LineReadingsActio
 				...state,
 				byGroupID: {
 					...state.byGroupID
-				}
+				},
+				groupsFetching: false
 			};
 
 			for (const groupID of action.groupIDs) {
 				const readingsForGroup = action.readings[groupID];
 				newState.byGroupID[groupID][timeInterval] = { isFetching: false, readings: readingsForGroup };
+			}
+			if (!state.metersFetching) {
+				newState.isFetching = false;
 			}
 
 			return newState;
