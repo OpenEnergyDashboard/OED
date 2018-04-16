@@ -31,7 +31,6 @@ function mapStateToProps(state: State, ownProps: {id: number}) {
 function mapDispatchToProps(dispatch: Dispatch) {
 	return {
 		fetchGroupChildren: (id: number) => dispatch(fetchGroupChildrenIfNeeded(id)),
-		changeDisplayModeToEdit: () => dispatch(changeDisplayMode(DisplayMode.Edit)),
 		beginEditingIfPossible: (id: number) => dispatch(beginEditingIfPossible(id))
 	};
 }

@@ -21,7 +21,7 @@ function mapStateToProps(state: State) {
 function mapDispatchToProps(dispatch: Dispatch) {
 	return {
 		selectGroups: (newSelectedGroupIDs: number[]) => dispatch(changeDisplayedGroups(newSelectedGroupIDs)),
-		changeDisplayModeToCreate: () => dispatch(changeDisplayMode(DisplayMode.Create)),
+		// changeDisplayModeToCreate: () => dispatch(changeDisplayMode(DisplayMode.Create)),
 		fetchGroupsDetailsIfNeeded: () => dispatch(fetchGroupsDetailsIfNeeded())
 	};
 }

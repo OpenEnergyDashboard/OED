@@ -60,7 +60,6 @@ function mapDispatchToProps(dispatch: Dispatch) {
 		submitGroupInEditingIfNeeded: () => dispatch(submitGroupInEditingIfNeeded()),
 		deleteGroup: () => dispatch(deleteGroup()),
 		editGroupName: (name: string) => dispatch(editGroupName(name)),
-		changeDisplayModeToView: () => dispatch(changeDisplayMode(DisplayMode.View)),
 		changeChildMeters: (meterIDs: number[]) => dispatch(changeChildMeters(meterIDs)),
 		changeChildGroups: (groupIDs: number[]) => dispatch(changeChildGroups(groupIDs))
 	};

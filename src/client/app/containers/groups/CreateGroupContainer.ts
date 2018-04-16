@@ -33,7 +33,6 @@ function mapDispatchToProps(dispatch: Dispatch) {
 		createNewBlankGroup: () => dispatch(createNewBlankGroup()),
 		submitGroupInEditingIfNeeded: () => dispatch(submitGroupInEditingIfNeeded()),
 		editGroupName: (name: string) => dispatch(editGroupName(name)),
-		changeDisplayModeToView: () => dispatch(changeDisplayMode(DisplayMode.View))
 	};
 }
 

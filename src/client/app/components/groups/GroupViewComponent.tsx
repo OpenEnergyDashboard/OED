@@ -15,7 +15,6 @@ interface GroupViewProps {
 	childGroupNames: string[];
 	fetchGroupChildren(id: number): Promise<any>;
 	beginEditingIfPossible(id: number): Promise<any>;
-	changeDisplayModeToEdit(): ChangeDisplayModeAction;
 }
 
 export default class GroupViewComponent extends React.Component<GroupViewProps, {}> {

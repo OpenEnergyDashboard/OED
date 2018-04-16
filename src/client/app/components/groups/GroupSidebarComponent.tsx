@@ -9,7 +9,6 @@ import {  browserHistory } from 'react-router';
 
 interface GroupSidebarProps {
 	groups: Array<{id: number, name: string}>;
-	changeDisplayModeToCreate(): ChangeDisplayModeAction;
 	selectGroups(groups: number[]): ChangeDisplayedGroupsAction;
 	fetchGroupsDetailsIfNeeded(): Promise<void>;
 }

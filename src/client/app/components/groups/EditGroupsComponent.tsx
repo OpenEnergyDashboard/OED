@@ -23,7 +23,6 @@ interface EditGroupsProps {
 	allGroupsExceptChildGroups: NamedIDItem[];
 	submitGroupInEditingIfNeeded(): Promise<any>;
 	deleteGroup(): Promise<any>;
-	changeDisplayModeToView(): ChangeDisplayModeAction;
 	editGroupName(name: string): EditGroupNameAction;
 	changeChildMeters(selected: number[]): ChangeChildMetersAction;
 	changeChildGroups(selected: number[]): ChangeChildGroupsAction;

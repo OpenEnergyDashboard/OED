@@ -19,7 +19,6 @@ interface CreateGroupProps {
 	createNewBlankGroup(): CreateNewBlankGroupAction;
 	editGroupName(name: string): EditGroupNameAction;
 	submitGroupInEditingIfNeeded(): Promise<any>;
-	changeDisplayModeToView(): ChangeDisplayModeAction;
 	fetchGroupsDetailsIfNeeded(): Promise<any>;
 	fetchMetersDetailsIfNeeded(): Promise<any>;
 }
