@@ -21,15 +21,15 @@ async function updateAllMeters(dataReader, metersToUpdate) {
 		// Do all the network requests in parallel, then throw out any requests that fail after logging the errors.
 		const readingInsertBatches = _.filter(await Promise.all(
 			metersToUpdate
-				.map(dataReader)
-				.map(p => p.catch(err => {
-					let uri = '[NO URI AVAILABLE]';
-					if (err.options !== undefined && err.options.uri !== undefined) {
-						uri = err.options.uri;
-					}
-					log.error(`ERROR ON REQUEST TO ${uri}, ${err.message}`, err);
-					return null;
-				}))
+			.map(dataReader)
+			.map(p => p.catch(err => {
+				let ipAddress = '[NO IP ADDRESS AVAILABLE]';
+				if (err.options !== undefined && err.options.ipAddress !== undefined) {
+					ipAddress = err.options.ipAddress;
+				}
+				log.error(`ERROR ON REQUEST TO METER ${ipAddress}, ${err.message}`, err);
+				return null;
+			}))
 		), elem => elem !== null);
 
 		// Flatten the batches (an array of arrays) into a single array.
