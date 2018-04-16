@@ -123,8 +123,8 @@ export default class RouteComponent extends React.Component<RouteProps, {}> {
 					<Route path='/admin' component={AdminComponent} onEnter={this.requireAuth} />
 					<Route path='/groups' component={GroupsDetailContainer} />
 					<Route path='/graph' component={HomeComponent} onEnter={this.linkToGraph} />
-					<Route path='/createGroup' component={EditGroupsContainer} onEnter={this.requireAuth} />
-					<Route path='/editGroup' component={CreateGroupContainer} onEnter={this.requireAuth} />
+					<Route path='/createGroup' component={CreateGroupContainer} onEnter={this.requireAuth} />
+					<Route path='/editGroup' component={EditGroupsContainer} onEnter={this.requireAuth} />
 					<Route path='*' component={HomeComponent} />
 				</Router>
 			</div>

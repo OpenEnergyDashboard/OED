@@ -6,6 +6,7 @@ import * as React from 'react';
 import { Button } from 'reactstrap';
 import ListDisplayComponent from '../ListDisplayComponent';
 import { ChangeDisplayModeAction } from '../../types/redux/groups';
+import {  browserHistory } from 'react-router';
 
 interface GroupViewProps {
 	name: string;
@@ -57,7 +58,7 @@ export default class GroupViewComponent extends React.Component<GroupViewProps, 
 	}
 
 	private handleEditGroup() {
-		this.props.changeDisplayModeToEdit();
+		browserHistory.push('/editGroup');
 		this.props.beginEditingIfPossible(this.props.id);
 	}
 }
