@@ -5,6 +5,7 @@
 import * as React from 'react';
 import { Button } from 'reactstrap';
 import { ChangeDisplayedGroupsAction, ChangeDisplayModeAction } from '../../types/redux/groups';
+import {  browserHistory } from 'react-router';
 
 interface GroupSidebarProps {
 	groups: Array<{id: number, name: string}>;
@@ -57,6 +58,6 @@ export default class GroupSidebarComponent extends React.Component<GroupSidebarP
 	}
 
 	private handleCreateGroup() {
-		this.props.changeDisplayModeToCreate();
+		browserHistory.push('/createGroup');
 	}
 }

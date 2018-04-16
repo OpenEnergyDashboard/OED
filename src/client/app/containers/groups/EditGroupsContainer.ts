@@ -11,10 +11,12 @@ import {
 	changeDisplayMode,
 	changeChildMeters,
 	changeChildGroups,
-	deleteGroup } from '../../actions/groups';
+	deleteGroup, fetchGroupsDetailsIfNeeded
+} from '../../actions/groups';
 import { GroupDefinition, DisplayMode } from '../../types/redux/groups';
 import { Dispatch } from '../../types/redux/actions';
 import { State } from '../../types/redux/state';
+import {fetchMetersDetailsIfNeeded} from '../../actions/meters';
 
 /**
  * @param {State} state
@@ -53,6 +55,8 @@ function mapStateToProps(state: State) {
 
 function mapDispatchToProps(dispatch: Dispatch) {
 	return {
+		fetchGroupsDetailsIfNeeded: () => dispatch(fetchGroupsDetailsIfNeeded()),
+		fetchMetersDetailsIfNeeded: () => dispatch(fetchMetersDetailsIfNeeded()),
 		submitGroupInEditingIfNeeded: () => dispatch(submitGroupInEditingIfNeeded()),
 		deleteGroup: () => dispatch(deleteGroup()),
 		editGroupName: (name: string) => dispatch(editGroupName(name)),

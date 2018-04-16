@@ -11,9 +11,9 @@ import DatasourceBoxContainer from '../../containers/groups/DatasourceBoxContain
 import { NamedIDItem } from '../../types/items';
 import { SelectionType } from '../../containers/groups/DatasourceBoxContainer';
 import { EditGroupNameAction, ChangeDisplayModeAction, ChangeChildMetersAction, ChangeChildGroupsAction } from '../../types/redux/groups';
-import HeaderComponent from "../HeaderComponent";
-import FooterComponent from "../FooterComponent";
-import HeaderContainer from "../../containers/HeaderContainer";
+import FooterComponent from '../FooterComponent';
+import HeaderContainer from '../../containers/HeaderContainer';
+import {  browserHistory } from 'react-router';
 
 interface EditGroupsProps {
 	name: string;
@@ -27,6 +27,8 @@ interface EditGroupsProps {
 	editGroupName(name: string): EditGroupNameAction;
 	changeChildMeters(selected: number[]): ChangeChildMetersAction;
 	changeChildGroups(selected: number[]): ChangeChildGroupsAction;
+	fetchGroupsDetailsIfNeeded(): Promise<any>;
+	fetchMetersDetailsIfNeeded(): Promise<any>;
 }
 
 interface EditGroupsState {
@@ -68,9 +70,10 @@ export default class EditGroupsComponent extends React.Component<EditGroupsProps
 		this.handleDeleteGroup = this.handleDeleteGroup.bind(this);
 		this.handleReturnToView = this.handleReturnToView.bind(this);
 	}
-
-
-
+	public componentWillMount() {
+		this.props.fetchGroupsDetailsIfNeeded();
+		this.props.fetchMetersDetailsIfNeeded();
+	}
 	public render() {
 		const divStyle: React.CSSProperties = {
 			paddingTop: '35px'
@@ -235,6 +238,6 @@ export default class EditGroupsComponent extends React.Component<EditGroupsProps
 	}
 
 	private handleReturnToView() {
-		this.props.changeDisplayModeToView();
+		browserHistory.push('/groups');
 	}
 }

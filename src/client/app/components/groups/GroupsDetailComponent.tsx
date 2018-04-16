@@ -14,12 +14,14 @@ import GroupViewContainer from '../../containers/groups/GroupViewContainer';
 
 interface GroupsDetailProps {
 	selectedGroups: number[];
+	fetchGroupsDetailsIfNeeded(): Promise<any>;
+	fetchMetersDetailsIfNeeded(): Promise<any>;
 }
 export default class GroupsDetailComponent extends React.Component<GroupsDetailProps, {}> {
-	constructor(props: GroupsDetailProps) {
-		super(props);
+	public componentWillMount() {
+		this.props.fetchGroupsDetailsIfNeeded();
+		this.props.fetchMetersDetailsIfNeeded();
 	}
-
 	public render() {
 		const flexContainerStyle = {
 			display: 'flex',

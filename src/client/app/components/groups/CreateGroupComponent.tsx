@@ -8,8 +8,9 @@ import DatasourceBoxContainer from '../../containers/groups/DatasourceBoxContain
 import { SelectionType } from '../../containers/groups/DatasourceBoxContainer';
 import { NamedIDItem } from '../../types/items';
 import { CreateNewBlankGroupAction, EditGroupNameAction, ChangeDisplayModeAction } from '../../types/redux/groups';
-import HeaderContainer from "../../containers/HeaderContainer";
-import FooterComponent from "../FooterComponent";
+import HeaderContainer from '../../containers/HeaderContainer';
+import FooterComponent from '../FooterComponent';
+import {  browserHistory } from 'react-router';
 
 
 interface CreateGroupProps {
@@ -19,6 +20,8 @@ interface CreateGroupProps {
 	editGroupName(name: string): EditGroupNameAction;
 	submitGroupInEditingIfNeeded(): Promise<any>;
 	changeDisplayModeToView(): ChangeDisplayModeAction;
+	fetchGroupsDetailsIfNeeded(): Promise<any>;
+	fetchMetersDetailsIfNeeded(): Promise<any>;
 }
 
 export default class CreateGroupComponent extends React.Component<CreateGroupProps, {}> {
@@ -31,6 +34,8 @@ export default class CreateGroupComponent extends React.Component<CreateGroupPro
 
 	public componentWillMount() {
 		this.props.createNewBlankGroup();
+		this.props.fetchGroupsDetailsIfNeeded();
+		this.props.fetchMetersDetailsIfNeeded();
 	}
 
 	public render() {
@@ -94,6 +99,6 @@ export default class CreateGroupComponent extends React.Component<CreateGroupPro
 	}
 
 	private handleReturnToView() {
-		this.props.changeDisplayModeToView();
+		browserHistory.push('/groups');
 	}
 }
