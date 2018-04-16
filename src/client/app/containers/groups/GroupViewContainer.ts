@@ -4,18 +4,10 @@
 
 import { connect } from 'react-redux';
 import GroupViewComponent from '../../components/groups/GroupViewComponent';
-import { fetchGroupChildrenIfNeeded, changeDisplayMode, beginEditingIfPossible } from '../../actions/groups';
-import { DisplayMode } from '../../types/redux/groups';
+import { fetchGroupChildrenIfNeeded, beginEditingIfPossible } from '../../actions/groups';
 import { Dispatch } from '../../types/redux/actions';
 import { State } from '../../types/redux/state';
 
-
-/**
- * Pass the ID and Name of the group on to the component.
- * @param {State} state
- * @param ownProps: ID and Name, passed to this container by GroupMainComponent
- * @return {{name: name of this group}, {id: id of this group}}
- */
 function mapStateToProps(state: State, ownProps: {id: number}) {
 	const id = ownProps.id;
 	const childMeterNames = state.groups.byGroupID[id].childMeters.map((meterID: number) => state.meters.byMeterID[meterID].name.trim()).sort();

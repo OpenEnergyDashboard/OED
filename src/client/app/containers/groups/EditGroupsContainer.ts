@@ -8,20 +8,14 @@ import EditGroupsComponent from '../../components/groups/EditGroupsComponent';
 import {
 	submitGroupInEditingIfNeeded,
 	editGroupName,
-	changeDisplayMode,
 	changeChildMeters,
 	changeChildGroups,
-	deleteGroup, fetchGroupsDetailsIfNeeded
+	deleteGroup
 } from '../../actions/groups';
-import { GroupDefinition, DisplayMode } from '../../types/redux/groups';
+import { GroupDefinition } from '../../types/redux/groups';
 import { Dispatch } from '../../types/redux/actions';
 import { State } from '../../types/redux/state';
-import {fetchMetersDetailsIfNeeded} from '../../actions/meters';
 
-/**
- * @param {State} state
- * @return {{meters: *, groups: *}}
- */
 function mapStateToProps(state: State) {
 	const allMeters = _.sortBy(_.values(state.meters.byMeterID).map(meter => ({ id: meter.id, name: meter.name.trim() })), 'name');
 	let allGroups = _.sortBy(_.values(state.groups.byGroupID).map(group => ({ id: group.id, name: group.name.trim() })), 'name');
@@ -55,8 +49,6 @@ function mapStateToProps(state: State) {
 
 function mapDispatchToProps(dispatch: Dispatch) {
 	return {
-		fetchGroupsDetailsIfNeeded: () => dispatch(fetchGroupsDetailsIfNeeded()),
-		fetchMetersDetailsIfNeeded: () => dispatch(fetchMetersDetailsIfNeeded()),
 		submitGroupInEditingIfNeeded: () => dispatch(submitGroupInEditingIfNeeded()),
 		deleteGroup: () => dispatch(deleteGroup()),
 		editGroupName: (name: string) => dispatch(editGroupName(name)),

@@ -8,6 +8,7 @@ import { NamedIDItem } from '../types/items';
 import { showErrorNotification } from '../utils/notifications';
 import * as t from '../types/redux/groups';
 import { groupsApi } from '../utils/api';
+import { browserHistory } from 'react-router';
 
 function requestGroupsDetails(): t.RequestGroupsDetailsAction {
 	return { type: ActionType.RequestGroupsDetails };
@@ -228,7 +229,7 @@ function submitNewGroup(group: t.GroupData): Thunk {
 			dispatch(markGroupsOutdated());
 			dispatch(dispatch2 => {
 				dispatch2(markGroupInEditingClean());
-				dispatch2(changeDisplayMode(t.DisplayMode.View));
+				browserHistory.push('/groups');
 			});
 		} catch (e) {
 			dispatch(markGroupInEditingNotSubmitted());
@@ -246,7 +247,7 @@ function submitGroupEdits(group: t.GroupData & t.GroupID): Thunk {
 			dispatch(markOneGroupOutdated(group.id));
 			dispatch(dispatch2 => {
 				dispatch2(markGroupInEditingClean());
-				dispatch2(changeDisplayMode(t.DisplayMode.View));
+				browserHistory.push('/groups');
 			});
 		} catch (e) {
 			dispatch(markGroupInEditingNotSubmitted());
@@ -292,10 +293,6 @@ export function submitGroupInEditingIfNeeded() {
 	};
 }
 
-/**
- * Deletes the group in editing
- * @returns {function(*, *)}
- */
 export function deleteGroup(): Thunk {
 	return async (dispatch, getState) => {
 		dispatch(markGroupInEditingDirty());
@@ -309,7 +306,7 @@ export function deleteGroup(): Thunk {
 			dispatch(changeDisplayedGroups([]));
 			dispatch(dispatch2 => {
 				dispatch2(markGroupInEditingClean());
-				dispatch2(changeDisplayMode(t.DisplayMode.View));
+				browserHistory.push('/groups');
 			});
 		} catch (e) {
 			showErrorNotification('Failed to delete group');

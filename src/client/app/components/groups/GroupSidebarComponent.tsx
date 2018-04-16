@@ -10,7 +10,6 @@ import {  browserHistory } from 'react-router';
 interface GroupSidebarProps {
 	groups: Array<{id: number, name: string}>;
 	selectGroups(groups: number[]): ChangeDisplayedGroupsAction;
-	fetchGroupsDetailsIfNeeded(): Promise<void>;
 }
 
 export default class GroupSidebarComponent extends React.Component<GroupSidebarProps, {}> {
@@ -18,10 +17,6 @@ export default class GroupSidebarComponent extends React.Component<GroupSidebarP
 		super(props);
 		this.handleGroupSelect = this.handleGroupSelect.bind(this);
 		this.handleCreateGroup = this.handleCreateGroup.bind(this);
-	}
-
-	public componentWillMount() {
-		this.props.fetchGroupsDetailsIfNeeded();
 	}
 
 	public render() {

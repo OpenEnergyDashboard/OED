@@ -5,15 +5,10 @@
 import * as _ from 'lodash';
 import { connect } from 'react-redux';
 import CreateGroupComponent from '../../components/groups/CreateGroupComponent';
-import {
-	createNewBlankGroup, editGroupName, changeDisplayMode, submitGroupInEditingIfNeeded,
-	fetchGroupsDetailsIfNeeded
-} from '../../actions/groups';
+import { createNewBlankGroup, editGroupName, submitGroupInEditingIfNeeded } from '../../actions/groups';
 import { Dispatch } from '../../types/redux/actions';
 import { State } from '../../types/redux/state';
 import { NamedIDItem } from '../../types/items';
-import { DisplayMode } from '../../types/redux/groups';
-import {fetchMetersDetailsIfNeeded} from '../../actions/meters';
 
 function mapStateToProps(state: State) {
 	const sortedMeters: NamedIDItem[] = _.sortBy(_.values(state.meters.byMeterID).map(
@@ -28,8 +23,6 @@ function mapStateToProps(state: State) {
 
 function mapDispatchToProps(dispatch: Dispatch) {
 	return {
-		fetchGroupsDetailsIfNeeded: () => dispatch(fetchGroupsDetailsIfNeeded()),
-		fetchMetersDetailsIfNeeded: () => dispatch(fetchMetersDetailsIfNeeded()),
 		createNewBlankGroup: () => dispatch(createNewBlankGroup()),
 		submitGroupInEditingIfNeeded: () => dispatch(submitGroupInEditingIfNeeded()),
 		editGroupName: (name: string) => dispatch(editGroupName(name)),

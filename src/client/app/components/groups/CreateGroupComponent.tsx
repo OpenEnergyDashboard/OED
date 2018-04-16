@@ -7,7 +7,7 @@ import { Input, Button } from 'reactstrap';
 import DatasourceBoxContainer from '../../containers/groups/DatasourceBoxContainer';
 import { SelectionType } from '../../containers/groups/DatasourceBoxContainer';
 import { NamedIDItem } from '../../types/items';
-import { CreateNewBlankGroupAction, EditGroupNameAction, ChangeDisplayModeAction } from '../../types/redux/groups';
+import { CreateNewBlankGroupAction, EditGroupNameAction } from '../../types/redux/groups';
 import HeaderContainer from '../../containers/HeaderContainer';
 import FooterComponent from '../FooterComponent';
 import {  browserHistory } from 'react-router';
@@ -19,8 +19,6 @@ interface CreateGroupProps {
 	createNewBlankGroup(): CreateNewBlankGroupAction;
 	editGroupName(name: string): EditGroupNameAction;
 	submitGroupInEditingIfNeeded(): Promise<any>;
-	fetchGroupsDetailsIfNeeded(): Promise<any>;
-	fetchMetersDetailsIfNeeded(): Promise<any>;
 }
 
 export default class CreateGroupComponent extends React.Component<CreateGroupProps, {}> {
@@ -33,8 +31,6 @@ export default class CreateGroupComponent extends React.Component<CreateGroupPro
 
 	public componentWillMount() {
 		this.props.createNewBlankGroup();
-		this.props.fetchGroupsDetailsIfNeeded();
-		this.props.fetchMetersDetailsIfNeeded();
 	}
 
 	public render() {

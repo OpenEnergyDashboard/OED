@@ -3,14 +3,13 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
 
 // This component is the main page of the edit group page.
-// TYPESCRIPT TODO: I have insufficient domain knowledge to edit this.
 import * as React from 'react';
 import * as _ from 'lodash';
 import { Input, Button } from 'reactstrap';
 import DatasourceBoxContainer from '../../containers/groups/DatasourceBoxContainer';
 import { NamedIDItem } from '../../types/items';
 import { SelectionType } from '../../containers/groups/DatasourceBoxContainer';
-import { EditGroupNameAction, ChangeDisplayModeAction, ChangeChildMetersAction, ChangeChildGroupsAction } from '../../types/redux/groups';
+import { EditGroupNameAction, ChangeChildMetersAction, ChangeChildGroupsAction } from '../../types/redux/groups';
 import FooterComponent from '../FooterComponent';
 import HeaderContainer from '../../containers/HeaderContainer';
 import {  browserHistory } from 'react-router';
@@ -26,8 +25,6 @@ interface EditGroupsProps {
 	editGroupName(name: string): EditGroupNameAction;
 	changeChildMeters(selected: number[]): ChangeChildMetersAction;
 	changeChildGroups(selected: number[]): ChangeChildGroupsAction;
-	fetchGroupsDetailsIfNeeded(): Promise<any>;
-	fetchMetersDetailsIfNeeded(): Promise<any>;
 }
 
 interface EditGroupsState {
@@ -69,10 +66,7 @@ export default class EditGroupsComponent extends React.Component<EditGroupsProps
 		this.handleDeleteGroup = this.handleDeleteGroup.bind(this);
 		this.handleReturnToView = this.handleReturnToView.bind(this);
 	}
-	public componentWillMount() {
-		this.props.fetchGroupsDetailsIfNeeded();
-		this.props.fetchMetersDetailsIfNeeded();
-	}
+
 	public render() {
 		const divStyle: React.CSSProperties = {
 			paddingTop: '35px'

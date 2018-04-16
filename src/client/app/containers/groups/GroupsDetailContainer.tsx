@@ -5,8 +5,8 @@
 import { connect } from 'react-redux';
 import GroupsDetailComponent from '../../components/groups/GroupsDetailComponent';
 import { State } from '../../types/redux/state';
-import {changeDisplayedGroups, fetchGroupsDetailsIfNeeded} from '../../actions/groups';
-import {fetchMetersDetailsIfNeeded} from '../../actions/meters';
+import { fetchGroupsDetailsIfNeeded } from '../../actions/groups';
+import { fetchMetersDetailsIfNeeded } from '../../actions/meters';
 import {Dispatch} from '../../types/redux/actions';
 
 
