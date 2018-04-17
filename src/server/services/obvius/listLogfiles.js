@@ -10,7 +10,7 @@ async function listLogfiles() {
 	let response = '';
 	for (f of allLogfiles) {
 		if (f.processed) {
-			response += `CONFIGFILE,${f.filename},${f.hash}\n`;
+			response += `CONFIGFILE,${f.makeFilename()},${f.hash}\n`;
 		}
 	}
 	return response;

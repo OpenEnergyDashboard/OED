@@ -19,8 +19,8 @@ const mocha = require('mocha');
 
 function expectLogfilesToBeEquivalent(expected, actual) {
 	expect(actual).to.have.property('id', expected.id);
-	expect(actual).to.have.property('ipAddress', expected.ipAddress);
-	expect(actual).to.have.property('filename', expected.filename);
+	expect(actual).to.have.property('serialId', expected.serialId);
+	expect(actual).to.have.property('modbusId', expected.modbusId);
 	expect(actual).to.have.property('created');
 	expect(actual.created.toISOString()).to.equal(expected.created.toISOString());
 	expect(actual).to.have.property('hash', expected.hash);
@@ -33,25 +33,23 @@ mocha.describe('Logfiles', () => {
 	mocha.it('can be saved and retrieved', async () => {
 		const contents = 'Some test contents for the log file.';
 		const chash = md5(contents);
-		const filename = 'log.whatever.whenever';
-		const ipAddress = '0.0.0.0';
-		const logfilePreInsert = new Logfile(undefined, ipAddress, filename, moment(), chash, contents, false);
+		const logfilePreInsert = new Logfile(undefined, '0', 'md1', moment(), chash, contents, false);
 		await logfilePreInsert.insert();
 		const logfilePostInsertByID = await Logfile.getByID(1);
 		expectLogfilesToBeEquivalent(logfilePreInsert, logfilePostInsertByID);
 	});
-	mocha.it('can be retrieved by IP address', async () => {
-		const logfile1 = new Logfile(undefined, "0.0.0.0", "logfile1", moment().subtract(1, 'd'), md5("contents"), "contents", true);
-		const logfile2 = new Logfile(undefined, "0.0.0.0", "logfile2", moment(), md5("contents"), "contents", true);
-		const logfile3 = new Logfile(undefined, "0.0.0.1", "logfile3", moment(), md5("contents"), "contents", true);
+	mocha.it('can be retrieved by serial ID', async () => {
+		const logfile1 = new Logfile(undefined, "0", "md1", moment().subtract(1, 'd'), md5("contents"), "contents", true);
+		const logfile2 = new Logfile(undefined, "0", "md1", moment(), md5("contents"), "contents", true);
+		const logfile3 = new Logfile(undefined, "1", "md2", moment(), md5("contents"), "contents", true);
 		await logfile1.insert();
 		await logfile2.insert();
 		await logfile3.insert();
 
 		// Test correct length.
-		const logfilesForAllZeroes = await Logfile.getByIP('0.0.0.0');
+		const logfilesForAllZeroes = await Logfile.getBySerial('0');
 		expect(logfilesForAllZeroes).to.have.length(2);
-		const logfilesForOneOne = await Logfile.getByIP('0.0.0.1');
+		const logfilesForOneOne = await Logfile.getBySerial('1');
 		expect(logfilesForOneOne).to.have.length(1);
 
 		// Test correct ordering.
@@ -59,15 +57,15 @@ mocha.describe('Logfiles', () => {
 		expectLogfilesToBeEquivalent(logfilesForAllZeroes[1], logfile2);
 	});
 	mocha.it('can generate an Obvius config manifest', async () => {
-		const logfile1 = new Logfile(undefined, "0.0.0.0", "logfile1", moment(), md5("contents1"), "contents1", true);
-		const logfile2 = new Logfile(undefined, "0.0.0.0", "logfile2", moment(), md5("contents2"), "contents2", true);
-		const logfile3 = new Logfile(undefined, "0.0.0.0", "logfile3", moment(), md5("contents3"), "contents3", true);
+		const logfile1 = new Logfile(undefined, "0", "md1", moment(), md5("contents1"), "contents1", true);
+		const logfile2 = new Logfile(undefined, "0", "md1", moment(), md5("contents2"), "contents2", true);
+		const logfile3 = new Logfile(undefined, "0", "md1", moment(), md5("contents3"), "contents3", true);
 
 		await logfile1.insert();
 		await logfile2.insert();
 		await logfile3.insert();
 
-		const expectation = 'CONFIGFILE,logfile1,4891e2a24026da4dea5b4119e1dc1863\nCONFIGFILE,logfile2,b2d0efbdc48f4b7bf42f8ab76d71f84e\nCONFIGFILE,logfile3,2635f317ed53a4fc4014650181fa7ccd\n';
+		const expectation = 'CONFIGFILE,0-md1.cf,4891e2a24026da4dea5b4119e1dc1863\nCONFIGFILE,0-md1.cf,b2d0efbdc48f4b7bf42f8ab76d71f84e\nCONFIGFILE,0-md1.cf,2635f317ed53a4fc4014650181fa7ccd\n';
 
 		expect(await listLogfiles()).to.equal(expectation);
 	})

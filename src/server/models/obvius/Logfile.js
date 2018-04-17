@@ -11,17 +11,17 @@ class Logfile {
 	/**
 	 *
 	 * @param {number} id This Logfile's ID. Undefined if this file is being created.
-	 * @param {string} ipAddress The IP Address from which this logfile was uploaded.
-	 * @param {string} filename The filename of this logfile.
-	 * @param {moment} created The time at which this logfile was created.
+	 * @param {string} serialId The serial number of the Obvius device reporting this file
+	 * @param {string} modbusId The modbus ID of the device being reported
+	 * @param {Moment} created The time at which this logfile was created.
 	 * @param {string} hash The MD5 sum of the contents of this file.
 	 * @param {string} contents The contents of this file, as received from AquiSuite.
 	 * @param {boolean} processed Whether or not this logfile has been processed.
 	 */
-	constructor(id, ipAddress, filename, created, hash, contents, processed) {
+	constructor(id, serialId, modbusId, created, hash, contents, processed) {
 		this.id = id;
-		this.ipAddress = ipAddress;
-		this.filename = filename;
+		this.serialId = serialId;
+		this.modbusId = modbusId;
 		this.created = created;
 		this.hash = hash;
 		this.contents = contents;
@@ -37,7 +37,7 @@ class Logfile {
 	}
 
 	static mapRow(row) {
-		return new Logfile(row.id, row.ip_address, row.filename, row.created, row.hash, row.contents, row.processed);
+		return new Logfile(row.id, row.serial_id, row.modbus_id, row.created, row.hash, row.contents, row.processed);
 	}
 
 	/**
@@ -51,13 +51,13 @@ class Logfile {
 	}
 
 	/**
-	 * Returns a promise to get all the logfiles associated with the given IP,
+	 * Returns a promise to get all the logfiles associated with the serial number,
 	 * ordered by the date of creation, ascending.
-	 * @param {string} ip 
+	 * @param {string} id the serial number to look up
 	 * @param conn The connection to use. Defaults to the default DB connection.
 	 */
-	static async getByIP(ip, conn = db) {
-		const rows = await conn.any(sqlFile('obvius/get_logs_by_ip.sql'), {ipAddress: ip});
+	static async getBySerial(id, conn = db) {
+		const rows = await conn.any(sqlFile('obvius/get_logs_by_sn.sql'), {serialId: id});
 		return rows.map(Logfile.mapRow);
 	}
 
@@ -77,6 +77,14 @@ class Logfile {
 		}
 		const resp = await conn.one(sqlFile('obvius/insert_new_log.sql'), logfile);
 		this.id = resp.id;
+	}
+
+	/**
+	 * Computes and returns a sensible filename for this logfile
+	 * @returns {string}
+	 */
+	makeFilename() {
+		return `${this.serialId}-${this.modbusId}.cf`
 	}
 }
 
