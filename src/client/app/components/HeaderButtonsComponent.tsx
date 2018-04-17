@@ -7,6 +7,7 @@ import { Link } from 'react-router';
 import { Button } from 'reactstrap';
 import MenuModalComponent from './MenuModalComponent';
 import { hasToken } from '../utils/token';
+import { FormattedMessage } from 'react-intl';
 
 interface HeaderButtonsProps {
 	renderOptionsButton: boolean;
@@ -85,11 +86,11 @@ export default class HeaderButtonsComponent extends React.Component<HeaderButton
 					}
 				</div>
 				<div className={this.props.renderOptionsButton ? 'd-none d-lg-block' : ''}>
-					<Link style={loginLinkStyle} to='/login'><Button outline>Log In</Button></Link>
-					<Link style={homeLinkStyle} to='/'><Button outline>Home</Button></Link>
-					<Link style={adminLinkStyle} to='/admin'><Button outline>Admin panel</Button></Link>
-					<Link style={groupsLinkStyle} to='/groups'><Button outline>Groups</Button></Link>
-					<Link style={logoutButtonStyle} to='/'><Button outline onClick={this.handleLogOut}>Log Out</Button></Link>
+					<Link style={loginLinkStyle} to='/login'><Button outline><FormattedMessage id='log.in'/></Button></Link>
+					<Link style={homeLinkStyle} to='/'><Button outline><FormattedMessage id='home'/></Button></Link>
+					<Link style={adminLinkStyle} to='/admin'><Button outline><FormattedMessage id='admin.panel'/></Button></Link>
+					<Link style={groupsLinkStyle} to='/groups'><Button outline><FormattedMessage id='groups' /></Button></Link>
+					<Link style={logoutButtonStyle} to='/'><Button outline onClick={this.handleLogOut}><FormattedMessage id='log.out'/></Button></Link>
 				</div>
 			</div>
 		);
@@ -99,6 +100,4 @@ export default class HeaderButtonsComponent extends React.Component<HeaderButton
 		localStorage.removeItem('token');
 		this.forceUpdate();
 	}
-
-
 }
