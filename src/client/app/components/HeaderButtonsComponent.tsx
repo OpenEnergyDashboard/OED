@@ -28,7 +28,7 @@ export default class HeaderButtonsComponent extends React.Component<HeaderButton
 		let renderLoginButton = false;
 		let renderHomeButton = true;
 		let renderAdminButton = false;
-		let renderGroupsButton = false;
+		let renderGroupsButton = true;
 		const renderLogoutButton = hasToken();
 
 		switch (page) {
@@ -37,16 +37,13 @@ export default class HeaderButtonsComponent extends React.Component<HeaderButton
 				showUIOptions = true;
 				if (renderLogoutButton) {
 					renderAdminButton = true;
-					renderGroupsButton = true;
 				} else {
 					renderLoginButton = true;
 				}
 				break;
 			case 'groups':
 				renderAdminButton = true;
-				break;
-			case 'admin':
-				renderGroupsButton = true;
+				renderGroupsButton = false;
 				break;
 			case 'login':
 				break;

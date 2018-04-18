@@ -5,8 +5,8 @@
 import * as React from 'react';
 import { Button } from 'reactstrap';
 import ListDisplayComponent from '../ListDisplayComponent';
-import { ChangeDisplayModeAction } from '../../types/redux/groups';
-import {  browserHistory } from 'react-router';
+import { Link } from 'react-router';
+import { hasToken } from '../../utils/token';
 
 interface GroupViewProps {
 	name: string;
@@ -28,6 +28,7 @@ export default class GroupViewComponent extends React.Component<GroupViewProps, 
 	}
 
 	public render() {
+		const renderEditGroupButton = hasToken();
 		const nameStyle: React.CSSProperties = {
 			textAlign: 'center'
 		};
@@ -37,6 +38,10 @@ export default class GroupViewComponent extends React.Component<GroupViewProps, 
 		const boldStyle: React.CSSProperties = {
 			fontWeight: 'bold',
 			margin: 0
+		};
+		const editGroupStyle: React.CSSProperties = {
+			display: renderEditGroupButton ? 'inline' : 'none',
+			paddingLeft: '5px'
 		};
 		return (
 			<div>
@@ -51,13 +56,14 @@ export default class GroupViewComponent extends React.Component<GroupViewProps, 
 						<ListDisplayComponent items={this.props.childGroupNames} />
 					</div>
 				</div>
-				<Button style={buttonPadding} outline onClick={this.handleEditGroup}>Edit group</Button>
+				<Link style={editGroupStyle} to='/editGroup'>
+					<Button style={buttonPadding} outline onClick={this.handleEditGroup}>Edit group</Button>
+				</Link>
 			</div>
 		);
 	}
 
 	private handleEditGroup() {
-		browserHistory.push('/editGroup');
 		this.props.beginEditingIfPossible(this.props.id);
 	}
 }
