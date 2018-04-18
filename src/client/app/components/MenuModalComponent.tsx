@@ -9,7 +9,7 @@ import HeaderButtonsComponent from './HeaderButtonsComponent';
 import { FormattedMessage } from 'react-intl';
 
 interface MenuModalProps {
-	showUIOptions: boolean;
+	showOptions: boolean;
 	renderOptionsButton: boolean;
 }
 interface MenuModalState {
@@ -54,8 +54,8 @@ export default class MenuModalComponent extends React.Component<MenuModalProps, 
 							</p>
 							<HeaderButtonsComponent renderOptionsButton={false} />
 						</div>
-						{ this.props.showUIOptions &&
-						<UIOptionsContainer />
+						{ this.props.showOptions &&
+							<UIOptionsContainer />
 						}
 					</ModalBody>
 				</Modal>

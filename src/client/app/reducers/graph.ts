@@ -6,7 +6,7 @@ import * as moment from 'moment';
 import { TimeInterval } from '../../../common/TimeInterval';
 import { GraphAction, GraphState, ChartTypes } from '../types/redux/graph';
 import { ActionType } from '../types/redux/actions';
-import {calculateCompareTimeInterval, ComparePeriod, SortingOrder} from '../utils/calculateCompare';
+import { calculateCompareTimeInterval, ComparePeriod, SortingOrder } from '../utils/calculateCompare';
 
 const defaultState: GraphState = {
 	selectedMeters: [],
@@ -19,7 +19,7 @@ const defaultState: GraphState = {
 	chartToRender: ChartTypes.line,
 	barStacking: false,
 	hotlinked: false,
-	uiOptionsVisibility: true
+	optionsVisibility: true
 };
 
 export default function graph(state = defaultState, action: GraphAction) {
@@ -70,10 +70,10 @@ export default function graph(state = defaultState, action: GraphAction) {
 				...state,
 				compareSortingOrder: action.compareSortingOrder
 			};
-		case ActionType.SetUIOptionsVisibility:
+		case ActionType.SetOptionsVisibility:
 			return {
 				...state,
-				uiOptionsVisibility: action.visibility
+				optionsVisibility: action.visibility
 			};
 		default:
 			return state;

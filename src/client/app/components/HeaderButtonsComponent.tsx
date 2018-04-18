@@ -5,9 +5,10 @@
 import * as React from 'react';
 import { Link } from 'react-router';
 import { Button } from 'reactstrap';
+import { FormattedMessage } from 'react-intl';
 import MenuModalComponent from './MenuModalComponent';
 import { hasToken } from '../utils/token';
-import { FormattedMessage } from 'react-intl';
+import getPage from '../utils/getPage';
 
 interface HeaderButtonsProps {
 	renderOptionsButton: boolean;
@@ -23,19 +24,17 @@ export default class HeaderButtonsComponent extends React.Component<HeaderButton
 	}
 
 	public render() {
-		const urlArr = window.location.href.split('/');
-		const page = urlArr[urlArr.length - 1];
-		let showUIOptions = false;
+		let showOptions = false;
 		let renderLoginButton = false;
 		let renderHomeButton = true;
 		let renderAdminButton = false;
 		let renderGroupsButton = false;
 		const renderLogoutButton = hasToken();
 
-		switch (page) {
+		switch (getPage()) {
 			case '': // home page
 				renderHomeButton = false;
-				showUIOptions = true;
+				showOptions = true;
 				if (renderLogoutButton) {
 					renderAdminButton = true;
 					renderGroupsButton = true;
@@ -80,7 +79,7 @@ export default class HeaderButtonsComponent extends React.Component<HeaderButton
 				<div className='d-lg-none'>
 					{(this.props.renderOptionsButton) ?
 						<MenuModalComponent
-							showUIOptions={showUIOptions}
+							showOptions={showOptions}
 							renderOptionsButton={false}
 						/> : null
 					}
