@@ -18,7 +18,8 @@ const defaultState: GraphState = {
 	compareSortingOrder: SortingOrder.Descending,
 	chartToRender: ChartTypes.line,
 	barStacking: false,
-	hotlinked: false
+	hotlinked: false,
+	uiOptionsVisibility: true
 };
 
 export default function graph(state = defaultState, action: GraphAction) {
@@ -68,6 +69,11 @@ export default function graph(state = defaultState, action: GraphAction) {
 			return {
 				...state,
 				compareSortingOrder: action.compareSortingOrder
+			};
+		case ActionType.SetUIOptionsVisibility:
+			return {
+				...state,
+				uiOptionsVisibility: action.visibility
 			};
 		default:
 			return state;

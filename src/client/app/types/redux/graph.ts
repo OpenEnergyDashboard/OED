@@ -58,6 +58,11 @@ export interface SetHotlinked {
 	hotlinked: boolean;
 }
 
+export interface SetUIOptionsVisibility {
+	type: ActionType.SetUIOptionsVisibility;
+	visibility: boolean;
+}
+
 export type GraphAction =
 	| ChangeGraphZoomAction
 	| ChangeBarStackingAction
@@ -67,7 +72,8 @@ export type GraphAction =
 	| UpdateSelectedMetersAction
 	| UpdateComparePeriodAction
 	| SetHotlinked
-	| ChangeCompareSortingOrderAction;
+	| ChangeCompareSortingOrderAction
+	| SetUIOptionsVisibility;
 
 export interface GraphState {
 	selectedMeters: number[];
@@ -80,4 +86,5 @@ export interface GraphState {
 	chartToRender: ChartTypes;
 	barStacking: boolean;
 	hotlinked: boolean;
+	uiOptionsVisibility: boolean;
 }

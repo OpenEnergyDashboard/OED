@@ -12,6 +12,7 @@ import { Dispatch, Thunk, ActionType } from '../types/redux/actions';
 import { State } from '../types/redux/state';
 import * as t from '../types/redux/graph';
 import { ComparePeriod, SortingOrder } from '../utils/calculateCompare';
+import {SetUIOptionsVisibility} from "../types/redux/graph";
 
 export function changeChartToRender(chartType: t.ChartTypes): t.ChangeChartToRenderAction {
 	return { type: ActionType.ChangeChartToRender, chartType };
@@ -42,6 +43,10 @@ export function setHotlinkedAsync(hotlinked: boolean): Thunk {
 		dispatch(setHotlinked(hotlinked));
 		return Promise.resolve();
 	};
+}
+
+export function setUIOptionsVisibility(visibility: boolean): t.SetUIOptionsVisibility {
+	return { type: ActionType.SetUIOptionsVisibility, visibility };
 }
 
 function changeGraphZoom(timeInterval: TimeInterval): t.ChangeGraphZoomAction {

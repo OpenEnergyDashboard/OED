@@ -29,6 +29,7 @@ export enum ActionType {
 	ChangeChartToRender = 'CHANGE_CHART_TO_RENDER',
 	ChangeBarStacking = 'CHANGE_BAR_STACKING',
 	ChangeGraphZoom = 'CHANGE_GRAPH_ZOOM',
+	SetUIOptionsVisibility = 'SetUIOptionsVisibility',
 	UpdateComparePeriod = 'UPDATE_COMPARE_PERIOD',
 	ChangeCompareSortingOrder = 'CHANGE_COMPARE_SORTING_ORDER',
 	SetHotlinked = 'SET_HOTLINKED',

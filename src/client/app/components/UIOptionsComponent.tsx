@@ -11,7 +11,7 @@ import TooltipHelpComponent from './TooltipHelpComponent';
 import ExportContainer from '../containers/ExportContainer';
 import ChartSelectContainer from '../containers/ChartSelectContainer';
 import ChartDataSelectContainer from '../containers/ChartDataSelectContainer';
-import { ChangeBarStackingAction, ChangeCompareSortingOrderAction } from '../types/redux/graph';
+import { ChangeBarStackingAction, ChangeCompareSortingOrderAction, SetUIOptionsVisibility } from '../types/redux/graph';
 import ChartLinkContainer from '../containers/ChartLinkContainer';
 import { ChartTypes } from '../types/redux/graph';
 import { ComparePeriod, SortingOrder } from '../utils/calculateCompare';
@@ -27,6 +27,7 @@ export interface UIOptionsProps {
 	compareSortingOrder: SortingOrder;
 	changeDuration(duration: moment.Duration): Promise<any>;
 	changeBarStacking(): ChangeBarStackingAction;
+	setUIOptionsVisibility(visibility: boolean): SetUIOptionsVisibility;
 	changeCompareGraph(comparePeriod: ComparePeriod): Promise<any>;
 	changeCompareSortingOrder(compareSortingOrder: SortingOrder): ChangeCompareSortingOrderAction;
 }
@@ -49,6 +50,7 @@ class UIOptionsComponent extends React.Component<UIOptionsPropsWithIntl, UIOptio
 		this.handleBarButton = this.handleBarButton.bind(this);
 		this.handleCompareButton = this.handleCompareButton.bind(this);
 		this.handleSortingButton = this.handleSortingButton.bind(this);
+		this.setUIOptionsVisibility = this.setUIOptionsVisibility.bind(this);
 		this.toggleSlider = this.toggleSlider.bind(this);
 		this.toggleDropdown = this.toggleDropdown.bind(this);
 		this.state = {
@@ -209,6 +211,14 @@ class UIOptionsComponent extends React.Component<UIOptionsPropsWithIntl, UIOptio
 				<div style={divTopPadding}>
 					<ChartLinkContainer />
 				</div>
+				<div style={divTopPadding}>
+					<Button
+						onClick={() => this.setUIOptionsVisibility(false)}
+						outline
+					>
+						<FormattedMessage id='collapse.chart.options' />
+					</Button>
+				</div>
 			</div>
 		);
 	}
@@ -247,6 +257,10 @@ class UIOptionsComponent extends React.Component<UIOptionsPropsWithIntl, UIOptio
 
 	private handleSortingButton(sortingOrder: SortingOrder) {
 		this.props.changeCompareSortingOrder(sortingOrder);
+	}
+
+	private setUIOptionsVisibility(visibility: boolean) {
+		this.props.setUIOptionsVisibility(visibility);
 	}
 
 	private toggleSlider() {
