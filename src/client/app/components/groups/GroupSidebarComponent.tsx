@@ -32,7 +32,9 @@ export default class GroupSidebarComponent extends React.Component<GroupSidebarP
 		};
 		return (
 			<div className='form-group'>
-				<p style={labelStyle}>View groups:</p>
+				<p style={labelStyle}>
+					<FormattedMessage id='view.groups' />:
+				</p>
 				<select multiple className='form-control' id='groupList' size={8} onChange={this.handleGroupSelect}>
 					{this.props.groups.map(group =>
 						<option key={group.id} value={group.id}>{group.name}</option>
