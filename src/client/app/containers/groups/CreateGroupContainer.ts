@@ -25,7 +25,7 @@ function mapDispatchToProps(dispatch: Dispatch) {
 	return {
 		createNewBlankGroup: () => dispatch(createNewBlankGroup()),
 		submitGroupInEditingIfNeeded: () => dispatch(submitGroupInEditingIfNeeded()),
-		editGroupName: (name: string) => dispatch(editGroupName(name)),
+		editGroupName: (name: string) => dispatch(editGroupName(name))
 	};
 }
 
