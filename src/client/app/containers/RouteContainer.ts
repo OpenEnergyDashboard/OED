@@ -7,13 +7,10 @@ import RouteComponent from '../components/RouteComponent';
 import { Dispatch } from '../types/redux/actions';
 import { State } from '../types/redux/state';
 import { changeOptionsFromLink, LinkOptions } from '../actions/graph';
-import {GroupDefinition} from '../types/redux/groups';
 
 
 function mapStateToProps(state: State) {
-	const groupInEditing = state.groups.groupInEditing as GroupDefinition;
 	return {
-		groupInEditing,
 		barStacking: state.graph.barStacking
 	};
 }

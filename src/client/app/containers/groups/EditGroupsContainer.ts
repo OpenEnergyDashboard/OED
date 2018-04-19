@@ -15,14 +15,19 @@ import {
 import { GroupDefinition } from '../../types/redux/groups';
 import { Dispatch } from '../../types/redux/actions';
 import { State } from '../../types/redux/state';
+import {  browserHistory } from 'react-router';
 
 function mapStateToProps(state: State) {
 	const allMeters = _.sortBy(_.values(state.meters.byMeterID).map(meter => ({ id: meter.id, name: meter.name.trim() })), 'name');
 	let allGroups = _.sortBy(_.values(state.groups.byGroupID).map(group => ({ id: group.id, name: group.name.trim() })), 'name');
 
 	const groupInEditing = state.groups.groupInEditing as GroupDefinition;
-	if (groupInEditing === undefined) {
-		throw new Error('Unacceptable condition: state.groups.groupInEditing has no data.');
+	if (groupInEditing === undefined || _.isEmpty(_.difference(Object.keys(groupInEditing), ['dirty']))) {
+		if (groupInEditing === undefined) {
+			throw new Error('Unacceptable condition: state.groups.groupInEditing has no data.');
+		}
+		browserHistory.push('/groups');
+		return;
 	}
 	allGroups = allGroups.filter(group => group.id !== groupInEditing.id);
 

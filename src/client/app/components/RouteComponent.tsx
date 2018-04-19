@@ -19,11 +19,9 @@ import { validateComparePeriod, validateSortingOrder } from '../utils/calculateC
 import EditGroupsContainer from '../containers/groups/EditGroupsContainer';
 import CreateGroupContainer from '../containers/groups/CreateGroupContainer';
 import GroupsDetailContainer from '../containers/groups/GroupsDetailContainer';
-import {GroupDefinition} from '../types/redux/groups';
 
 interface RouteProps {
 	barStacking: boolean ;
-	groupInEditing: GroupDefinition;
 	changeOptionsFromLink(options: LinkOptions): Promise<any[]>;
 }
 
@@ -31,7 +29,6 @@ export default class RouteComponent extends React.Component<RouteProps, {}> {
 	constructor(props: RouteProps) {
 		super(props);
 		this.requireAuth = this.requireAuth.bind(this);
-		this.directToEditGroup = this.directToEditGroup.bind(this);
 		this.linkToGraph = this.linkToGraph.bind(this);
 	}
 
@@ -62,14 +59,6 @@ export default class RouteComponent extends React.Component<RouteProps, {}> {
 		})();
 	}
 
-
-	public directToEditGroup(nextState: RouterState, replace: RedirectFunction) {
-		if (this.props.groupInEditing === undefined || _.isEmpty(_.difference(Object.keys(this.props.groupInEditing), ['dirty']))) {
-			browserHistory.push('/groups');
-		} else {
-			this.requireAuth(nextState, replace);
-		}
-	}
 	/**
 	 * Middleware function that allows hotlinking to a graph with options
 	 * @param nextState The next state of the router
