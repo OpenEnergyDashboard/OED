@@ -50,4 +50,3 @@ export default class GroupsDetailComponent extends React.Component<GroupsDetailP
 		);
 	}
 }
-

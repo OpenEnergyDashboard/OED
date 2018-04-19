@@ -3,9 +3,10 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
 
 import * as React from 'react';
+import { UncontrolledAlert } from 'reactstrap';
+import { FormattedMessage } from 'react-intl';
 import CompareChartContainer from '../containers/CompareChartContainer';
 import { CompareEntity } from '../containers/MultiCompareChartContainer';
-import { UncontrolledAlert } from 'reactstrap';
 
 interface MultiCompareChartProps {
 	selectedCompareEntities: CompareEntity[];
@@ -30,7 +31,7 @@ export default function MultiCompareChartComponent(props: MultiCompareChartProps
 				{props.errorEntities.map( name =>
 					<div className='col-12 clearfix' key={name}>
 						<UncontrolledAlert color='danger' className='float-right text-right'>
-							Insufficient readings data to process comparison for {name}.
+							<FormattedMessage id='insufficient.readings' /> {name}
 						</UncontrolledAlert>
 					</div>
 				)}
@@ -47,7 +48,7 @@ export default function MultiCompareChartComponent(props: MultiCompareChartProps
 			</div>
 			{props.selectedCompareEntities.length === 0 &&
 				<div className='text-center' style={centeredStyle}>
-					Select one or more items to compare usage over time.
+					<FormattedMessage id='empty.compare' />
 				</div>
 			}
 		</div>

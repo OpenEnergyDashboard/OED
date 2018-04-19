@@ -5,6 +5,7 @@
 import * as React from 'react';
 import { Modal, Button } from 'react-bootstrap';
 import UIOptionsContainer from '../containers/UIOptionsContainer';
+import { FormattedMessage } from 'react-intl';
 
 interface UIModalState {
 	showModal: boolean;
@@ -26,10 +27,14 @@ export default class UIModalComponent extends React.Component<{}, UIModalState> 
 		};
 		return (
 			<div style={inlineStyle}>
-				<Button bsStyle='default' onClick={this.openModal}>Options</Button>
+				<Button bsStyle='default' onClick={this.openModal}>
+					<FormattedMessage id='options' />
+				</Button>
 				<Modal show={this.state.showModal} onHide={this.closeModal}>
 					<Modal.Header closeButton>
-						<Modal.Title>Options</Modal.Title>
+						<Modal.Title>
+							<FormattedMessage id='options' />
+						</Modal.Title>
 					</Modal.Header>
 					<Modal.Body>
 						<UIOptionsContainer />

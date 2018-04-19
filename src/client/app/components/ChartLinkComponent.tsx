@@ -3,6 +3,7 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
 
 import * as React from 'react';
+import { FormattedMessage } from 'react-intl';
 import { Button } from 'reactstrap';
 
 interface ChartLinkProps {
@@ -34,11 +35,8 @@ export default class ChartLinkComponent extends React.Component<ChartLinkProps, 
 		};
 		return (
 			<div>
-				<Button
-					outline={!this.state.showLink}
-					onClick={this.toggleLink}
-				>
-					Toggle chart link
+				<Button	outline	onClick={this.toggleLink}>
+					<FormattedMessage id='toggle.link' />
 				</Button>
 				{this.state.showLink &&
 					<div style={wellStyle}>

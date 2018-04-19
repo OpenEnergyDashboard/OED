@@ -4,6 +4,7 @@
 
 import { TimeInterval } from '../../../common/TimeInterval';
 import * as moment from 'moment';
+import translate from '../utils/translate';
 
 export enum ComparePeriod {
 	Day = 'Day',
@@ -92,11 +93,11 @@ export interface ComparePeriodLabels {
 export function getComparePeriodLabels(comparePeriod: ComparePeriod): ComparePeriodLabels {
 	switch (comparePeriod) {
 		case ComparePeriod.Day:
-			return { prev: 'Yesterday', current: 'Today' };
+			return { prev: translate('yesterday'), current: translate('today') };
 		case ComparePeriod.Week:
-			return { prev: 'Last Week', current: 'This Week' };
+			return { prev: translate('last.week'), current: translate('this.week') };
 		case ComparePeriod.FourWeeks:
-			return { prev: 'Last four weeks', current: 'This four weeks' };
+			return { prev: translate('last.four.weeks'), current: translate('this.four.weeks') };
 		default:
 			throw new Error(`Unknown period value: ${comparePeriod}`);
 	}
@@ -113,8 +114,8 @@ export function getCompareChangeSummary(change: number, name: string, labels: Co
 	if (isNaN(change)) { return ''; }
 	const percent = parseInt(change.toFixed(2).replace('.', '').slice(1));
 	if (change < 0) {
-		return `${name} has used ${percent}% less energy ${labels.current.toLocaleLowerCase()}`;
+		return `${name} ${translate('has.used')} ${percent}% ${translate('less.energy')} ${labels.current.toLocaleLowerCase()}`;
 	} else {
-		return `${name} has used ${percent}% more energy ${labels.current.toLocaleLowerCase()}`;
+		return `${name} ${translate('has.used')} ${percent}% ${translate('more.energy')} ${labels.current.toLocaleLowerCase()}`;
 	}
 }

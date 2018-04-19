@@ -4,6 +4,7 @@
 
 import * as React from 'react';
 import { Button } from 'reactstrap';
+import { FormattedMessage } from 'react-intl';
 import { ChangeDisplayedGroupsAction } from '../../types/redux/groups';
 import { Link } from 'react-router';
 import {hasToken} from '../../utils/token';
@@ -38,7 +39,11 @@ export default class GroupSidebarComponent extends React.Component<GroupSidebarP
 					)}
 				</select>
 				<br />
-				<Link style={createGroupStyle} to='/createGroup'><Button outline>Create new group</Button></Link>
+				<Link style={createGroupStyle} to='/createGroup'>
+					<Button outline>
+						<FormattedMessage id='create.group' />
+					</Button>
+				</Link>
 			</div>
 		);
 	}

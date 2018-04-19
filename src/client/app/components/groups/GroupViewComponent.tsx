@@ -7,6 +7,7 @@ import { Button } from 'reactstrap';
 import ListDisplayComponent from '../ListDisplayComponent';
 import { Link } from 'react-router';
 import { hasToken } from '../../utils/token';
+import { FormattedMessage } from 'react-intl';
 
 interface GroupViewProps {
 	name: string;
@@ -48,16 +49,22 @@ export default class GroupViewComponent extends React.Component<GroupViewProps, 
 				<h2 style={nameStyle}>{this.props.name}</h2>
 				<div className='row'>
 					<div className='col-6'>
-						<p style={boldStyle}>Child Meters:</p>
+						<p style={boldStyle}>
+							<FormattedMessage id='child.meters' />:
+						</p>
 						<ListDisplayComponent items={this.props.childMeterNames} />
 					</div>
 					<div className='col-6'>
-						<p style={boldStyle}>Child Groups:</p>
+						<p style={boldStyle}>
+							<FormattedMessage id='child.groups' />:
+						</p>
 						<ListDisplayComponent items={this.props.childGroupNames} />
 					</div>
 				</div>
 				<Link style={editGroupStyle} to='/editGroup'>
-					<Button style={buttonPadding} outline onClick={this.handleEditGroup}>Edit group</Button>
+					<Button style={buttonPadding} outline onClick={this.handleEditGroup}>
+						<FormattedMessage id='edit.a.group' />
+					</Button>
 				</Link>
 			</div>
 		);
