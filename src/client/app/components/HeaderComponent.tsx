@@ -50,11 +50,10 @@ export default function HeaderComponent(props: HeaderProps) {
 				</div>
 				<div className='col-4 justify-content-end' style={divRightStyle}>
 					{ props.optionsVisibility ?
-						<HeaderButtonsComponent renderOptionsButton />
-						:
-						<MenuModalComponent
+						<HeaderButtonsComponent showCollapsedMenuButton />
+						: <MenuModalComponent
 							showOptions={getPage() === ''}
-							renderOptionsButton={false}
+							showCollapsedMenuButton={false}
 						/>
 					}
 				</div>

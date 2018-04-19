@@ -11,7 +11,7 @@ import { hasToken } from '../utils/token';
 import getPage from '../utils/getPage';
 
 interface HeaderButtonsProps {
-	renderOptionsButton: boolean;
+	showCollapsedMenuButton: boolean;
 }
 
 /**
@@ -77,14 +77,14 @@ export default class HeaderButtonsComponent extends React.Component<HeaderButton
 		return (
 			<div>
 				<div className='d-lg-none'>
-					{(this.props.renderOptionsButton) ?
+					{(this.props.showCollapsedMenuButton) ?
 						<MenuModalComponent
 							showOptions={showOptions}
-							renderOptionsButton={false}
+							showCollapsedMenuButton={false}
 						/> : null
 					}
 				</div>
-				<div className={this.props.renderOptionsButton ? 'd-none d-lg-block' : ''}>
+				<div className={this.props.showCollapsedMenuButton ? 'd-none d-lg-block' : ''}>
 					<Link style={loginLinkStyle} to='/login'><Button outline><FormattedMessage id='log.in'/></Button></Link>
 					<Link style={homeLinkStyle} to='/'><Button outline><FormattedMessage id='home'/></Button></Link>
 					<Link style={adminLinkStyle} to='/admin'><Button outline><FormattedMessage id='admin.panel'/></Button></Link>
