@@ -212,7 +212,7 @@ class UIOptionsComponent extends React.Component<UIOptionsPropsWithIntl, UIOptio
 				<div style={divTopPadding}>
 					<ChartLinkContainer />
 				</div>
-				<div style={divTopPadding}>
+				<div style={divTopPadding} className='d-none d-lg-block'>
 					<Button
 						onClick={this.handleSetOptionsVisibility}
 						outline
