@@ -15,10 +15,12 @@
 const express = require('express');
 const config = require('../config');
 const multer = require('multer');
+const moment = require('moment');
+const md5 = require('md5');
 const zlib = require('zlib');
 const { log } = require('../log');
 const Logfile = require('../models/obvius/Logfile');
-const listLogfiles = require('../services/listLogfiles');
+const listLogfiles = require('../services/obvius/listLogfiles');
 const streamBuffers = require('stream-buffers');
 
 const upload = multer({ storage: multer.memoryStorage() });
@@ -32,6 +34,7 @@ const MODE_CONFIG_DOWNLOAD = 'CONFIGFILEDOWNLOAD';
 const MODE_TEST = 'MODE_TEST';
 
 const LOGFILE_FILENAME = 'LOGFILE';
+const CONFIG_FILENAME = 'CONFIGFILE';
 
 /**
  * Inform the client of a failure (406 Not Acceptable), and log it.
@@ -108,7 +111,7 @@ function lowercaseParams(req, res, next) {
 }
 // Here, the use of upload.array() allows the lowercaseParams middleware to integrate form/multipart data
 // into the generic parameter pipeline along with POST and GET params.
-router.use(upload.single(LOGFILE_FILENAME), lowercaseParams);
+router.use(upload.any(), lowercaseParams);
 
 /**
  * A middleware to add our params mixin.
@@ -168,14 +171,16 @@ router.all('/', async (req, res) => {
 	}
 
 	if (mode === MODE_LOGFILE_UPLOAD) {
-		log.info(`Received file: ${req.file}`);
-		zlib.gunzip(req.file.buffer, (err, buffer) => {
-			if (!err) {
-				log.info(buffer.toString('utf-8'));
-			} else {
-				log.error(err);
-			}
-		});
+		for (const fx of req.files) {
+			log.info(`Received ${fx.fieldname}: ${fx.originalname}`);
+			zlib.gunzip(fx.buffer, (err, buffer) => {
+				if (!err) {
+					log.info(buffer.toString('utf-8'));
+				} else {
+					log.error(err);
+				}
+			});
+		}
 
 		failure(req, res, 'Logfile Upload Not Implemented');
 		return;
@@ -187,11 +192,35 @@ router.all('/', async (req, res) => {
 	}
 
 	if (mode === MODE_CONFIG_MANIFEST) {
-		success(await listLogfiles());
+		success(req, res, await listLogfiles());
+		return;
 	}
 
 	if (mode === MODE_CONFIG_UPLOAD) {
-		failure(req, res, 'Config Upload Not Implemented');
+		// Check required parameters
+		if (!req.param('serialnumber', false)) {
+			failure(req, res, 'Config Upload Requires Serial Number');
+			return;
+		}
+		if (!req.param('modbusdevice', false)) {
+			failure(req, res, 'Config Upload Requires Modbus Device ID');
+			return;
+		}
+		for (const fx of req.files) {
+			log.info(`Received ${fx.fieldname}: ${fx.originalname}`);
+			const zipped_rsb = new streamBuffers.ReadableStreamBuffer();
+			const unzipped_wsb = new streamBuffers.WritableStreamBuffer();
+			zipped_rsb.put(fx.buffer);
+			zipped_rsb.stop();
+
+			const g = zlib.createGunzip();
+			zipped_rsb.pipe(g).pipe(unzipped_wsb);
+			const data = unzipped_wsb.getContentsAsString();
+
+			const lf = new Logfile(undefined, req.param('serialnumber'), req.param('modbusdevice'), moment(), md5(data), data, true);
+			await lf.insert();
+			success(req, res, `Acquired config log with (pseudo)filename ${lf.makeFilename()}.`);
+		}
 		return;
 	}
 

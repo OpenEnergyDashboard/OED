@@ -84,7 +84,7 @@ class Logfile {
 	 * @returns {string}
 	 */
 	makeFilename() {
-		return `${this.serialId}-${this.modbusId}.cf`
+		return `${this.serialId}-mb-${this.modbusId}.ini`
 	}
 }
 
