@@ -6,11 +6,12 @@
 
 import { Bar, LinearComponentProps } from 'react-chartjs-2';
 import { ChartData, ChartDataSets, LinearTickOptions, ChartTooltipItem } from 'chart.js';
+import * as datalabels from 'chartjs-plugin-datalabels';
 import { connect } from 'react-redux';
 import { State } from '../types/redux/state';
-import {getComparePeriodLabels, getCompareChangeSummary} from '../utils/calculateCompare';
+import { getComparePeriodLabels, getCompareChangeSummary } from '../utils/calculateCompare';
 import { CompareEntity } from './MultiCompareChartContainer';
-import * as datalabels from 'chartjs-plugin-datalabels';
+import translate from '../utils/translate';
 
 if (datalabels === null || datalabels === undefined) {
 	throw new Error('Datalabels plugin was tree-shaken out.');
@@ -127,13 +128,13 @@ function mapStateToProps(state: State, ownProps: CompareChartContainerProps) {
 					const labelText = tooltipItem.xLabel!.toLowerCase();
 					switch (usage) {
 						case usedThisTime:
-							return `${usage} kW used this time ${labelText}`;
+							return `${usage} kW ${translate('used.this.time')} ${labelText}`;
 						case usedSoFar:
-							return `${usage} kW used so far ${labelText}`;
+							return `${usage} kW ${translate('used.so.far')} ${labelText}`;
 						case totalUsed:
-							return `${usage} kW total ${labelText}`;
+							return `${usage} kW ${translate('total')} ${labelText}`;
 						default:
-							return `${usage} kW projected to be used ${labelText}`;
+							return `${usage} kW ${translate('projected.to.be.used')} ${labelText}`;
 					}
 				},
 				title: () => ''

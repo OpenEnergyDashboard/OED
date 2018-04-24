@@ -6,6 +6,7 @@ import * as React from 'react';
 import { Modal, ModalHeader, ModalBody, Button } from 'reactstrap';
 import UIOptionsContainer from '../containers/UIOptionsContainer';
 import HeaderButtonsComponent from './HeaderButtonsComponent';
+import { FormattedMessage } from 'react-intl';
 
 interface MenuModalProps {
 	showUIOptions: boolean;
@@ -39,12 +40,18 @@ export default class MenuModalComponent extends React.Component<MenuModalProps, 
 		};
 		return (
 			<div style={inlineStyle}>
-				<Button outline onClick={this.toggle}>Menu</Button>
+				<Button outline onClick={this.toggle}>
+					<FormattedMessage id='menu'/>
+				</Button>
 				<Modal isOpen={this.state.showModal} toggle={this.toggle}>
-					<ModalHeader toggle={this.toggle}>Options</ModalHeader>
+					<ModalHeader toggle={this.toggle}>
+						<FormattedMessage id='options' />
+					</ModalHeader>
 					<ModalBody>
 						<div style={marginBottomStyle}>
-							<p style={labelStyle}>Navigation:</p>
+							<p style={labelStyle}>
+								<FormattedMessage id='navigation' />:
+							</p>
 							<HeaderButtonsComponent renderOptionsButton={false} />
 						</div>
 						{ this.props.showUIOptions &&
