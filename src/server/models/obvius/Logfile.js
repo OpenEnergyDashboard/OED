@@ -36,6 +36,14 @@ class Logfile {
 		return db.none(sqlFile('obvius/create_logs_table.sql'));
 	}
 
+	/**
+	 * Returns a promise to remove all entries in the table.
+	 * @return {Promise.<>}
+	 */
+	static purgeAll() {
+		return db.none(sqlFile('obvius/purge_logs.sql'));
+	}
+
 	static mapRow(row) {
 		return new Logfile(row.id, row.serial_id, row.modbus_id, row.created, row.hash, row.contents, row.processed);
 	}

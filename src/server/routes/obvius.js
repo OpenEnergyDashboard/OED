@@ -208,14 +208,8 @@ router.all('/', async (req, res) => {
 		}
 		for (const fx of req.files) {
 			log.info(`Received ${fx.fieldname}: ${fx.originalname}`);
-			const zipped_rsb = new streamBuffers.ReadableStreamBuffer();
-			const unzipped_wsb = new streamBuffers.WritableStreamBuffer();
-			zipped_rsb.put(fx.buffer);
-			zipped_rsb.stop();
 
-			const g = zlib.createGunzip();
-			zipped_rsb.pipe(g).pipe(unzipped_wsb);
-			const data = unzipped_wsb.getContentsAsString();
+			const data = zlib.gunzipSync(fx.buffer).toString('utf-8');
 
 			const lf = new Logfile(undefined, req.param('serialnumber'), req.param('modbusdevice'), moment(), md5(data), data, true);
 			await lf.insert();
