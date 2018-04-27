@@ -14,9 +14,19 @@ function mapStateToProps(state: State) {
 	if (state.graph.selectedGroups.length > 0) {
 		linkText += `groupIDs=${state.graph.selectedGroups.toString()}&`;
 	}
-	linkText += `chartType=${state.graph.chartToRender}&`;
-	linkText += `barDuration=${state.graph.barDuration.asDays()}&`;
-	linkText += `barStacking=${state.graph.barStacking}`;
+	linkText += `chartType=${state.graph.chartToRender}`;
+	switch (state.graph.chartToRender) {
+		case 'bar':
+			linkText += `&barDuration=${state.graph.barDuration.asDays()}`;
+			linkText += `&barStacking=${state.graph.barStacking}`;
+			break;
+		case 'compare':
+			linkText += `&comparePeriod=${state.graph.comparePeriod}`;
+			linkText += `&compareSortingOrder=${state.graph.compareSortingOrder}`;
+			break;
+		default:
+			break;
+	}
 
 	return {
 		linkText

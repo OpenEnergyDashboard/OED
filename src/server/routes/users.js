@@ -31,8 +31,9 @@ router.get('/:user_id', async (req, res) => {
 		maxProperties: 1,
 		required: ['user_id'],
 		properties: {
-			group_id: {
-				type: 'id'
+			user_id: {
+				type: 'string',
+				pattern: '^\\d+$'
 			}
 		}
 	};

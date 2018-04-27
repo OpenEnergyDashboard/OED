@@ -7,6 +7,7 @@
 import ApiBackend from './ApiBackend';
 import GroupsApi from './GroupsApi';
 import MetersApi from './MetersApi';
+import FileProcessingApi from './FileProcessingApi';
 import PreferencesApi from './PreferencesApi';
 import VerificationApi from './VerificationApi';
 import CompressedReadingsApi from './CompressedReadingsApi';
@@ -16,8 +17,9 @@ const apiBackend = new ApiBackend();
 // All specific backends share the same ApiBackend
 const groupsApi = new GroupsApi(apiBackend);
 const metersApi = new MetersApi(apiBackend);
+const fileProcessingApi = new FileProcessingApi(apiBackend);
 const preferencesApi = new PreferencesApi(apiBackend);
 const verificationApi = new VerificationApi(apiBackend);
 const compressedReadingsApi = new CompressedReadingsApi(apiBackend);
 
-export { groupsApi, metersApi, preferencesApi, verificationApi, compressedReadingsApi };
+export { groupsApi, metersApi, fileProcessingApi, preferencesApi, verificationApi, compressedReadingsApi };

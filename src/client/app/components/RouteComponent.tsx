@@ -9,13 +9,14 @@ import * as moment from 'moment';
 import InitializationContainer from '../containers/InitializationContainer';
 import HomeComponent from './HomeComponent';
 import LoginComponent from '../components/LoginComponent';
-import AdminContainer from '../containers/AdminContainer';
+import AdminComponent from './admin/AdminComponent';
 import GroupMainContainer from '../containers/groups/GroupMainContainer';
 import { LinkOptions } from 'actions/graph';
-import { getToken, hasToken } from '../utils/token';
+import { hasToken } from '../utils/token';
 import { showErrorNotification } from '../utils/notifications';
 import { ChartTypes } from '../types/redux/graph';
 import { verificationApi } from '../utils/api';
+import { validateComparePeriod, validateSortingOrder } from '../utils/calculateCompare';
 
 interface RouteProps {
 	barStacking: boolean ;
@@ -67,7 +68,7 @@ export default class RouteComponent extends React.Component<RouteProps, {}> {
 			try {
 				const options: LinkOptions = {};
 				for (const [key, infoObj] of _.entries(queries)) {
-					const info = infoObj.toString();
+					const info: string = infoObj.toString();
 					switch (key) {
 						case 'meterIDs':
 							options.meterIDs = info.split(',').map(s => parseInt(s));
@@ -85,6 +86,12 @@ export default class RouteComponent extends React.Component<RouteProps, {}> {
 							if (this.props.barStacking.toString() !== info) {
 								options.toggleBarStacking = true;
 							}
+							break;
+						case 'comparePeriod':
+							options.comparePeriod = validateComparePeriod(info);
+							break;
+						case 'compareSortingOrder':
+							options.compareSortingOrder = validateSortingOrder(info);
 							break;
 						default:
 							throw new Error('Unknown query parameter');
@@ -111,7 +118,7 @@ export default class RouteComponent extends React.Component<RouteProps, {}> {
 				<InitializationContainer />
 				<Router history={browserHistory}>
 					<Route path='/login' component={LoginComponent} />
-					<Route path='/admin' component={AdminContainer} onEnter={this.requireAuth} />
+					<Route path='/admin' component={AdminComponent} onEnter={this.requireAuth} />
 					<Route path='/groups' component={GroupMainContainer} onEnter={this.requireAuth} />
 					<Route path='/graph' component={HomeComponent} onEnter={this.linkToGraph} />
 					<Route path='*' component={HomeComponent} />

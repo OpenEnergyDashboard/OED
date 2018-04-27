@@ -56,4 +56,7 @@ export interface LineReadingsState {
 			}
 		}
 	};
+	isFetching: boolean;
+	metersFetching: boolean;
+	groupsFetching: boolean;
 }
