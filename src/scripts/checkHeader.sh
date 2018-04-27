@@ -18,6 +18,7 @@ FILES=$(echo "$FILES" | grep -v "package\.json")
 # Filter out generated files
 FILES=$(echo "$FILES" | grep -v "package-lock\.json")
 # Filter out images
+FILES=$(echo "$FILES" | grep -v "doc\/images/.*")
 FILES=$(echo "$FILES" | grep -v "src\/client\/app\/images\/.*")
 FILES=$(echo "$FILES" | grep -v "src\/client\/favicon\.ico")
 # Filter out test data

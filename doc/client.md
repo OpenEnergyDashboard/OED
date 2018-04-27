@@ -4,11 +4,11 @@ All client-side code is stored in `src/client`. It follows a standard React/Redu
 
 ## Public, index.html, and Webpack
 
-The index.html is the entry point of the client-side code.
+The `index.html` file is the entry point of the client-side code.
 It is served by Express as defined in `src/server/app.js`.
 When Webpack is run, it transpiles TypeScript (with some ES6+ syntax) into JavaScript ES5 code and bundles the entire application together.
 This bundle is built in `src/client/public/bundle.js` (not tracked in Git).
-The index.html loads the bundle as its only script.
+The `index.html` file loads the bundle as its only script.
 The React application is mounted in the root HTML div.
 The entry point for React is in `src/client/app/index.tsx`.
 
