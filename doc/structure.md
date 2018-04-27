@@ -15,7 +15,6 @@ In the root directory, we have several metadata files. These are further organiz
 ### For Humans
 
 * **README.md** is an overview of the project, displayed on the GitHub front page for the project.
-* **USAGE.md** describes how to install, configure, and use the project from a sysadmin's point of view.
 * **License.txt** describes the legal aspect of the project. OED is licensed under the [Mozilla Public Licese version 2.0](https://www.mozilla.org/en-US/MPL/2.0/).
 * The **doc/** directory holds documentation intended for developers.
 
@@ -44,7 +43,7 @@ In the root directory, we have several metadata files. These are further organiz
 
 ## Frontend Code
 
-All frontend code is stored in `src/client`. It follows a standard React/Redux structure.
+See [client.md](client.md).
 
 ## Backend Code
 

@@ -7,7 +7,7 @@ Open Energy Dashboard is available under the Mozilla Public Licence v2, and cont
 
 ### Installation and Usage ###
 
-See [USAGE.md](USAGE.md).
+See [usage.md](doc/usage.md).
 
 ### Built With ###
 Chart.js - JavaScript library used to generate data charts ([chartjs.org](http://www.chartjs.org))
