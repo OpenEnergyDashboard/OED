@@ -7,16 +7,16 @@ const database = require('../database');
 const db = database.db;
 const sqlFile = database.sqlFile;
 
-class Logfile {
+class Configfile {
 	/**
 	 *
-	 * @param {number} id This Logfile's ID. Undefined if this file is being created.
+	 * @param {number} id This Configfile's ID. Undefined if this file is being created.
 	 * @param {string} serialId The serial number of the Obvius device reporting this file
 	 * @param {string} modbusId The modbus ID of the device being reported
-	 * @param {Moment} created The time at which this logfile was created.
+	 * @param {Moment} created The time at which this Configfile was created.
 	 * @param {string} hash The MD5 sum of the contents of this file.
 	 * @param {string} contents The contents of this file, as received from AquiSuite.
-	 * @param {boolean} processed Whether or not this logfile has been processed.
+	 * @param {boolean} processed Whether or not this Configfile has been processed.
 	 */
 	constructor(id, serialId, modbusId, created, hash, contents, processed) {
 		this.id = id;
@@ -29,11 +29,11 @@ class Logfile {
 	}
 
 	/**
-	 * Returns a promise to create the logfile table.
+	 * Returns a promise to create the Configfile table.
 	 * @return {Promise.<>}
 	 */
 	static createTable() {
-		return db.none(sqlFile('obvius/create_logs_table.sql'));
+		return db.none(sqlFile('obvius/create_config_table.sql'));
 	}
 
 	/**
@@ -41,54 +41,54 @@ class Logfile {
 	 * @return {Promise.<>}
 	 */
 	static purgeAll() {
-		return db.none(sqlFile('obvius/purge_logs.sql'));
+		return db.none(sqlFile('obvius/purge_configs.sql'));
 	}
 
 	static mapRow(row) {
-		return new Logfile(row.id, row.serial_id, row.modbus_id, row.created, row.hash, row.contents, row.processed);
+		return new Configfile(row.id, row.serial_id, row.modbus_id, row.created, row.hash, row.contents, row.processed);
 	}
 
 	/**
-	 * Returns a promise to get a specific logfile by ID
+	 * Returns a promise to get a specific Configfile by ID
 	 * @param {number} id
 	 * @param conn The connection to use. Defaults to the default DB connection.
 	 */
 	static async getByID(id, conn = db) {
-		const row = await conn.one(sqlFile('obvius/get_logs_by_id.sql'), {id: id});
-		return Logfile.mapRow(row);
+		const row = await conn.one(sqlFile('obvius/get_configs_by_id.sql'), {id: id});
+		return Configfile.mapRow(row);
 	}
 
 	/**
-	 * Returns a promise to get all the logfiles associated with the serial number,
+	 * Returns a promise to get all the Configfile associated with the serial number,
 	 * ordered by the date of creation, ascending.
 	 * @param {string} id the serial number to look up
 	 * @param conn The connection to use. Defaults to the default DB connection.
 	 */
 	static async getBySerial(id, conn = db) {
-		const rows = await conn.any(sqlFile('obvius/get_logs_by_sn.sql'), {serialId: id});
-		return rows.map(Logfile.mapRow);
+		const rows = await conn.any(sqlFile('obvius/get_configs_by_sn.sql'), {serialId: id});
+		return rows.map(Configfile.mapRow);
 	}
 
 	/**
-	 * Returns a promise to get all the logfiles stored.
+	 * Returns a promise to get all the Configfiles stored.
 	 * @param conn The connection to use. Defaults to the default DB connection.
 	 */
 	static async getAll(conn = db) {
-		const rows = await conn.any(sqlFile("obvius/get_all_logs.sql"));
-		return rows.map(Logfile.mapRow);
+		const rows = await conn.any(sqlFile("obvius/get_all_configs.sql"));
+		return rows.map(Configfile.mapRow);
 	}
 
 	async insert(conn = db) {
-		const logfile = this;
+		const configfile = this;
 		if (this.id !== undefined) {
-			throw new Error('Attempt to insert a Logfile with an existing ID.');
+			throw new Error('Attempt to insert a Configfile with an existing ID.');
 		}
-		const resp = await conn.one(sqlFile('obvius/insert_new_log.sql'), logfile);
+		const resp = await conn.one(sqlFile('obvius/insert_new_config.sql'), configfile);
 		this.id = resp.id;
 	}
 
 	/**
-	 * Computes and returns a sensible filename for this logfile
+	 * Computes and returns a sensible filename for this Configfile
 	 * @returns {string}
 	 */
 	makeFilename() {
@@ -96,4 +96,4 @@ class Logfile {
 	}
 }
 
-module.exports = Logfile;
+module.exports = Configfile;

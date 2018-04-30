@@ -2,15 +2,15 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
 
-const Logfile = require('../../models/obvius/Logfile');
+const Configfile = require('../../models/obvius/Configfile');
 const stopDB = require('../../models/database').stopDB;
 const { log } = require('../../log');
 
-async function showLogfiles() {
+async function showConfigfiles() {
 	try {
-		const allLogfiles = await Logfile.getAll();
+		const allConfigfiles = await Configfile.getAll();
 		let response = '';
-		for (f of allLogfiles) {
+		for (f of allConfigfiles) {
 			console.log(`Config log for ID ${f.id} (${f.serialId}:${f.modbusId}).`)
 			console.log(f.contents)
 			console.log('-------------------------\n\n')
@@ -22,4 +22,4 @@ async function showLogfiles() {
 	}
 }
 
-showLogfiles();
+showConfigfiles();

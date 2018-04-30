@@ -89,6 +89,7 @@ async function createSchema() {
 	const User = require('./User');
 	const Group = require('./Group');
 	const Preferences = require('./Preferences');
+	const Configfile = require('./obvius/Configfile');
 	const Migration = require('./Migration');
 	const LogEmail = require('./LogEmail');
 	const Baseline = require('./Baseline');
@@ -111,7 +112,7 @@ async function createSchema() {
 	await Baseline.createTable();
 	await getDB().none(sqlFile('baseline/create_function_get_average_reading.sql'));
 	await db.none(sqlFile('reading/create_function_get_compressed_readings.sql'));
-	await Logfile.createTable();
+	await Configfile.createTable();
 }
 
 // Create a new database connection.

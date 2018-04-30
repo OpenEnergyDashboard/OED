@@ -22,8 +22,8 @@
     "updateMamacMeters": "node ./src/server/services/updateMamacMeters.js",
     "createUser": "node ./src/server/services/user/createUser.js",
     "editUser": "node ./src/server/services/user/editUser.js",
-    "obvius:showLogfiles": "node ./src/server/services/obvius/showLogfiles.js",
-    "obvius:purgeLogfiles": "node ./src/server/services/obvius/purgeLogfiles.js",
+    "obvius:showConfigfiles": "node ./src/server/services/obvius/showLogfiles.js",
+    "obvius:purgeConfigfiles": "node ./src/server/services/obvius/purgeLogfiles.js",
     "sendLogEmail": "node ./src/server/services/sendLogEmail.js"
   },
   "nodemonConfig": {

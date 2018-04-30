@@ -19,8 +19,8 @@ const moment = require('moment');
 const md5 = require('md5');
 const zlib = require('zlib');
 const { log } = require('../log');
-const Logfile = require('../models/obvius/Logfile');
-const listLogfiles = require('../services/obvius/listLogfiles');
+const Configfile = require('../models/obvius/Configfile');
+const listConfigfiles = require('../services/obvius/listConfigfiles');
 const streamBuffers = require('stream-buffers');
 
 const upload = multer({ storage: multer.memoryStorage() });
@@ -192,7 +192,7 @@ router.all('/', async (req, res) => {
 	}
 
 	if (mode === MODE_CONFIG_MANIFEST) {
-		success(req, res, await listLogfiles());
+		success(req, res, await listConfigfiles());
 		return;
 	}
 
@@ -211,8 +211,8 @@ router.all('/', async (req, res) => {
 
 			const data = zlib.gunzipSync(fx.buffer).toString('utf-8');
 
-			const lf = new Logfile(undefined, req.param('serialnumber'), req.param('modbusdevice'), moment(), md5(data), data, true);
-			await lf.insert();
+			const cf = new Configfile(undefined, req.param('serialnumber'), req.param('modbusdevice'), moment(), md5(data), data, true);
+			await cf.insert();
 			success(req, res, `Acquired config log with (pseudo)filename ${lf.makeFilename()}.`);
 		}
 		return;

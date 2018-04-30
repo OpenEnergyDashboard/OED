@@ -12,12 +12,12 @@ const md5 = require('md5');
 const moment = require('moment');
 
 const recreateDB = require('./common').recreateDB;
-const Logfile = require('../../models/obvius/Logfile');
-const listLogfiles = require('../../services/obvius/listLogfiles');
+const Configfile = require('../../models/obvius/Configfile');
+const listConfigfiles = require('../../services/obvius/listConfigfiles');
 
 const mocha = require('mocha');
 
-function expectLogfilesToBeEquivalent(expected, actual) {
+function expectConfigfilesToBeEquivalent(expected, actual) {
 	expect(actual).to.have.property('id', expected.id);
 	expect(actual).to.have.property('serialId', expected.serialId);
 	expect(actual).to.have.property('modbusId', expected.modbusId);
@@ -28,45 +28,45 @@ function expectLogfilesToBeEquivalent(expected, actual) {
 	expect(actual).to.have.property('processed', expected.processed);
 }
 
-mocha.describe('Logfiles', () => {
+mocha.describe('Configfiles', () => {
 	mocha.beforeEach(recreateDB);
 	mocha.it('can be saved and retrieved', async () => {
 		const contents = 'Some test contents for the log file.';
 		const chash = md5(contents);
-		const logfilePreInsert = new Logfile(undefined, '0', 'md1', moment(), chash, contents, false);
-		await logfilePreInsert.insert();
-		const logfilePostInsertByID = await Logfile.getByID(1);
-		expectLogfilesToBeEquivalent(logfilePreInsert, logfilePostInsertByID);
+		const configfilePreInsert = new Configfile(undefined, '0', 'md1', moment(), chash, contents, false);
+		await configfilePreInsert.insert();
+		const configfilePostInsertByID = await Configfile.getByID(1);
+		expectConfigfilesToBeEquivalent(configfilePreInsert, configfilePostInsertByID);
 	});
 	mocha.it('can be retrieved by serial ID', async () => {
-		const logfile1 = new Logfile(undefined, "0", "md1", moment().subtract(1, 'd'), md5("contents"), "contents", true);
-		const logfile2 = new Logfile(undefined, "0", "md1", moment(), md5("contents"), "contents", true);
-		const logfile3 = new Logfile(undefined, "1", "md2", moment(), md5("contents"), "contents", true);
-		await logfile1.insert();
-		await logfile2.insert();
-		await logfile3.insert();
+		const configfile1 = new Configfile(undefined, "0", "md1", moment().subtract(1, 'd'), md5("contents"), "contents", true);
+		const configfile2 = new Configfile(undefined, "0", "md1", moment(), md5("contents"), "contents", true);
+		const configfile3 = new Configfile(undefined, "1", "md2", moment(), md5("contents"), "contents", true);
+		await configfile1.insert();
+		await configfile2.insert();
+		await configfile3.insert();
 
 		// Test correct length.
-		const logfilesForAllZeroes = await Logfile.getBySerial('0');
-		expect(logfilesForAllZeroes).to.have.length(2);
-		const logfilesForOneOne = await Logfile.getBySerial('1');
-		expect(logfilesForOneOne).to.have.length(1);
+		const configfilesForAllZeroes = await Configfile.getBySerial('0');
+		expect(configfilesForAllZeroes).to.have.length(2);
+		const configfilesForOneOne = await Configfile.getBySerial('1');
+		expect(configfilesForOneOne).to.have.length(1);
 
 		// Test correct ordering.
-		expectLogfilesToBeEquivalent(logfilesForAllZeroes[0], logfile1);
-		expectLogfilesToBeEquivalent(logfilesForAllZeroes[1], logfile2);
+		expectConfigfilesToBeEquivalent(configfilesForAllZeroes[0], configfile1);
+		expectConfigfilesToBeEquivalent(configfilesForAllZeroes[1], configfile2);
 	});
 	mocha.it('can generate an Obvius config manifest', async () => {
-		const logfile1 = new Logfile(undefined, "0", "md1", moment(), md5("contents1"), "contents1", true);
-		const logfile2 = new Logfile(undefined, "0", "md1", moment(), md5("contents2"), "contents2", true);
-		const logfile3 = new Logfile(undefined, "0", "md1", moment(), md5("contents3"), "contents3", true);
+		const configfile1 = new Configfile(undefined, "0", "md1", moment('1970-01-01'), md5("contents1"), "contents1", true);
+		const configfile2 = new Configfile(undefined, "0", "md1", moment('1970-01-02'), md5("contents2"), "contents2", true);
+		const configfile3 = new Configfile(undefined, "0", "md1", moment('1970-01-03'), md5("contents3"), "contents3", true);
 
-		await logfile1.insert();
-		await logfile2.insert();
-		await logfile3.insert();
+		await configfile1.insert();
+		await configfile2.insert();
+		await configfile3.insert();
 
-		const expectation = 'CONFIGFILE,0-md1.cf,4891e2a24026da4dea5b4119e1dc1863\nCONFIGFILE,0-md1.cf,b2d0efbdc48f4b7bf42f8ab76d71f84e\nCONFIGFILE,0-md1.cf,2635f317ed53a4fc4014650181fa7ccd\n';
+		const expectation = 'CONFIGFILE,0-mb-md1.ini,4891e2a24026da4dea5b4119e1dc1863,1970-01-01 12:00:00\nCONFIGFILE,0-mb-md1.ini,b2d0efbdc48f4b7bf42f8ab76d71f84e,1970-01-02 12:00:00\nCONFIGFILE,0-mb-md1.ini,2635f317ed53a4fc4014650181fa7ccd,1970-01-03 12:00:00\n';
 
-		expect(await listLogfiles()).to.equal(expectation);
+		expect(await listConfigfiles()).to.equal(expectation);
 	})
 });
