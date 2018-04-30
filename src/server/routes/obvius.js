@@ -209,11 +209,16 @@ router.all('/', async (req, res) => {
 		for (const fx of req.files) {
 			log.info(`Received ${fx.fieldname}: ${fx.originalname}`);
 
-			const data = zlib.gunzipSync(fx.buffer).toString('utf-8');
+			let data;
+			try {
+				data = zlib.gunzipSync(fx.buffer).toString('utf-8');
+			} catch (error) {
+				data = fx.buffer.toString('utf-8');
+			} 
 
 			const cf = new Configfile(undefined, req.param('serialnumber'), req.param('modbusdevice'), moment(), md5(data), data, true);
 			await cf.insert();
-			success(req, res, `Acquired config log with (pseudo)filename ${lf.makeFilename()}.`);
+			success(req, res, `Acquired config log with (pseudo)filename ${cf.makeFilename()}.`);
 		}
 		return;
 	}
