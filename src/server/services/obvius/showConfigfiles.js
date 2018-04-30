@@ -11,9 +11,11 @@ async function showConfigfiles() {
 		const allConfigfiles = await Configfile.getAll();
 		let response = '';
 		for (f of allConfigfiles) {
-			console.log(`Config log for ID ${f.id} (${f.serialId}:${f.modbusId}).`)
-			console.log(f.contents)
-			console.log('-------------------------\n\n')
+			// tslint:disable no-console
+			console.log(`Config log for ID ${f.id} (${f.serialId}:${f.modbusId}).`);
+			console.log(f.contents);
+			console.log('-------------------------\n\n');
+			// tslint:enable
 		}
 	} catch (err) {
 		log.error(`Error listing Obvius config logs: ${err}`, err);

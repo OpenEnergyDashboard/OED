@@ -74,7 +74,7 @@ class Configfile {
 	 * @param conn The connection to use. Defaults to the default DB connection.
 	 */
 	static async getAll(conn = db) {
-		const rows = await conn.any(sqlFile("obvius/get_all_configs.sql"));
+		const rows = await conn.any(sqlFile('obvius/get_all_configs.sql'));
 		return rows.map(Configfile.mapRow);
 	}
 
@@ -92,7 +92,7 @@ class Configfile {
 	 * @returns {string}
 	 */
 	makeFilename() {
-		return `${this.serialId}-mb-${this.modbusId}.ini`
+		return `${this.serialId}-mb-${this.modbusId}.ini`;
 	}
 }
 

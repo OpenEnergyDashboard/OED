@@ -39,9 +39,9 @@ mocha.describe('Configfiles', () => {
 		expectConfigfilesToBeEquivalent(configfilePreInsert, configfilePostInsertByID);
 	});
 	mocha.it('can be retrieved by serial ID', async () => {
-		const configfile1 = new Configfile(undefined, "0", "md1", moment().subtract(1, 'd'), md5("contents"), "contents", true);
-		const configfile2 = new Configfile(undefined, "0", "md1", moment(), md5("contents"), "contents", true);
-		const configfile3 = new Configfile(undefined, "1", "md2", moment(), md5("contents"), "contents", true);
+		const configfile1 = new Configfile(undefined, '0', 'md1', moment().subtract(1, 'd'), md5('contents'), 'contents', true);
+		const configfile2 = new Configfile(undefined, '0', 'md1', moment(), md5('contents'), 'contents', true);
+		const configfile3 = new Configfile(undefined, '1', 'md2', moment(), md5('contents'), 'contents', true);
 		await configfile1.insert();
 		await configfile2.insert();
 		await configfile3.insert();
@@ -57,16 +57,17 @@ mocha.describe('Configfiles', () => {
 		expectConfigfilesToBeEquivalent(configfilesForAllZeroes[1], configfile2);
 	});
 	mocha.it('can generate an Obvius config manifest', async () => {
-		const configfile1 = new Configfile(undefined, "0", "md1", moment('1970-01-01'), md5("contents1"), "contents1", true);
-		const configfile2 = new Configfile(undefined, "0", "md1", moment('1970-01-02'), md5("contents2"), "contents2", true);
-		const configfile3 = new Configfile(undefined, "0", "md1", moment('1970-01-03'), md5("contents3"), "contents3", true);
+		const configfile1 = new Configfile(undefined, '0', 'md1', moment('1970-01-01'), md5('contents1'), 'contents1', true);
+		const configfile2 = new Configfile(undefined, '0', 'md1', moment('1970-01-02'), md5('contents2'), 'contents2', true);
+		const configfile3 = new Configfile(undefined, '0', 'md1', moment('1970-01-03'), md5('contents3'), 'contents3', true);
 
 		await configfile1.insert();
 		await configfile2.insert();
 		await configfile3.insert();
 
+		//tslint:disable-next-line max-line-length
 		const expectation = 'CONFIGFILE,0-mb-md1.ini,4891e2a24026da4dea5b4119e1dc1863,1970-01-01 12:00:00\nCONFIGFILE,0-mb-md1.ini,b2d0efbdc48f4b7bf42f8ab76d71f84e,1970-01-02 12:00:00\nCONFIGFILE,0-mb-md1.ini,2635f317ed53a4fc4014650181fa7ccd,1970-01-03 12:00:00\n';
 
 		expect(await listConfigfiles()).to.equal(expectation);
-	})
+	});
 });

@@ -28,6 +28,9 @@ FILES=$(echo "$FILES" | grep -v "src\/scripts\/updateMamacMetersOEDCron\.bash")
 FILES=$(echo "$FILES" | grep -v "src\/scripts\/sendLogEmailCron\.bash")
 # Filter out JSON translation data
 FILES=$(echo "$FILES" | grep -v "src\/client\/app\/translations\/data.json")
+# Filter out test data for Obvius
+FILES=$(echo "$FILES" | grep -v "src\/server\/test\/db\/web\/obvius\/.*\.ini")
+FILES=$(echo "$FILES" | grep -v "src\/server\/test\/db\/web\/obvius\/.*\.gz")
 
 # Counts the files listed in FILES
 NFILES=$(echo $FILES | wc -w)
