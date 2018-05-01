@@ -2,40 +2,38 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
 
- const csv = require('csv');
- const promisify = require('es6-promisify');
- const parseCsv = promisify(csv.parse);
+const moment = require('moment');
+const Meter = require('../../models/Meter');
+const Reading = require('../../models/Reading');
+const demuxCsvWithSingleColumnTimestamps = require('./csvDemux');
 
-/**
- * Demultiplexes a CSV file with a single column of timestamps and multiple columns
- * of data, into multiple arrays of [timestamp, datapoint] tuples.
- * @param {string} input 
- * @param {number} timesColumn 
- */
-async function demuxCsvWithSingleColumnTimestamps(input, timesColumn=0) {
-	data = await parseCsv(input);
+async function loadLogfileToReadings(serialNumber, ipAddress, logfile) {
+	// Get demultiplexed, parsed data from the CSV.
+	const data = demuxCsvWithSingleColumnTimestamps(logfile);
 
-	// Create output array with the appropriate number of columns
-	// and filled with empty arrays.
-	const output = [...Array(data[0].length - 1)].map(x=>[]);
+	for (let i = 0; i < data.length; i++) {
+		let meter;
+		try {
+			meter = await Meter.getByName(`${serialNumber}.${i}`);
+		} catch (v) {
+			meter = new Meter(undefined, `${serialNumber}.${i}`, ipAddress, true, Meter.type.OBVIUS, `OBVIUS ${serialNumber} COLUMN ${i}`);
+			await meter.insert();
+		}
 
-	for (let r = 0; r < data.length; r++) {
-		const row = data[r];
-		const time = row[timesColumn];
-		for (let col = 0; col < row.length; col++) {
-			// Set the adjusted column number (skipping the times column)
-			let adjCol;
-			if (col < timesColumn) {
-				adjCol = col;
-			} else if (col == timesColumn) {
+		for (const rawReading of data[i]) {
+			// If the reading is invalid, throw it out.
+			if (rawReading[1] === null) {
 				continue
-			} else {
-				adjCol = col - 1;
 			}
-			output[adjCol][r] = [time, Number.parseFloat(row[col])];
+
+			// Otherwise assume it is kWh and proceed
+			const startTimestamp = moment(rawReading[0], 'YYYY-MM-DD HH:mm:ss');
+			const endTimestamp = startTimestamp.clone();
+			endTimestamp.add(moment.duration(1, 'hours'));
+			const reading = new Reading(meter.id, rawReading[1], startTimestamp, endTimestamp);
+			await reading.insert();
 		}
 	}
-	return output
 }
 
-module.exports = {demuxCsvWithSingleColumnTimestamps};
+module.exports = loadLogfileToReadings;

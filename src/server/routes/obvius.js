@@ -22,6 +22,7 @@ const { log } = require('../log');
 const Configfile = require('../models/obvius/Configfile');
 const listConfigfiles = require('../services/obvius/listConfigfiles');
 const streamBuffers = require('stream-buffers');
+const loadLogfileToReadings = require('../services/obvius/loadLogfileToReadings');
 
 const upload = multer({ storage: multer.memoryStorage() });
 const router = express.Router();
@@ -171,18 +172,25 @@ router.all('/', async (req, res) => {
 	}
 
 	if (mode === MODE_LOGFILE_UPLOAD) {
+		if (!req.param('serialnumber', false)) {
+			failure(req, res, 'Logfile Upload Requires Serial Number');
+			return;
+		}
 		for (const fx of req.files) {
 			log.info(`Received ${fx.fieldname}: ${fx.originalname}`);
-			zlib.gunzip(fx.buffer, (err, buffer) => {
-				if (!err) {
-					log.info(buffer.toString('utf-8'));
-				} else {
-					log.error(err);
-				}
-			});
+			// Logfiles are always gzipped.
+			let data;
+			try {
+				data = zlib.gunzipSync(fx.buffer);
+			} catch (err) {
+				log.error(err);
+				failure(req, res, `Unable to gunzip incoming buffer: ${err}`);
+				return
+			}
+				loadLogfileToReadings(req.param('serialnumber'), ip, data);
 		}
 
-		failure(req, res, 'Logfile Upload Not Implemented');
+		success(req, res, 'Logfile Upload IS PROVISIONAL');
 		return;
 	}
 
