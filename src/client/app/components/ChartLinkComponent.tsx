@@ -24,7 +24,7 @@ export default class ChartLinkComponent extends React.Component<ChartLinkProps, 
 	}
 
 	public render() {
-		const wellStyle = {
+		const wellStyle: React.CSSProperties = {
 			wordWrap: 'break-word',
 			padding: '9px',
 			minHeight: '20px',
