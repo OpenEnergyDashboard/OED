@@ -11,7 +11,7 @@ import TooltipHelpComponent from './TooltipHelpComponent';
 import ExportContainer from '../containers/ExportContainer';
 import ChartSelectContainer from '../containers/ChartSelectContainer';
 import ChartDataSelectContainer from '../containers/ChartDataSelectContainer';
-import { ChangeBarStackingAction, ChangeCompareSortingOrderAction } from '../types/redux/graph';
+import { ChangeBarStackingAction, ChangeCompareSortingOrderAction, SetOptionsVisibility } from '../types/redux/graph';
 import ChartLinkContainer from '../containers/ChartLinkContainer';
 import { ChartTypes } from '../types/redux/graph';
 import { ComparePeriod, SortingOrder } from '../utils/calculateCompare';
@@ -25,8 +25,10 @@ export interface UIOptionsProps {
 	barDuration: moment.Duration;
 	comparePeriod: ComparePeriod;
 	compareSortingOrder: SortingOrder;
+	optionsVisibility: boolean;
 	changeDuration(duration: moment.Duration): Promise<any>;
 	changeBarStacking(): ChangeBarStackingAction;
+	setOptionsVisibility(visibility: boolean): SetOptionsVisibility;
 	changeCompareGraph(comparePeriod: ComparePeriod): Promise<any>;
 	changeCompareSortingOrder(compareSortingOrder: SortingOrder): ChangeCompareSortingOrderAction;
 }
@@ -49,6 +51,7 @@ class UIOptionsComponent extends React.Component<UIOptionsPropsWithIntl, UIOptio
 		this.handleBarButton = this.handleBarButton.bind(this);
 		this.handleCompareButton = this.handleCompareButton.bind(this);
 		this.handleSortingButton = this.handleSortingButton.bind(this);
+		this.handleSetOptionsVisibility = this.handleSetOptionsVisibility.bind(this);
 		this.toggleSlider = this.toggleSlider.bind(this);
 		this.toggleDropdown = this.toggleDropdown.bind(this);
 		this.state = {
@@ -209,6 +212,18 @@ class UIOptionsComponent extends React.Component<UIOptionsPropsWithIntl, UIOptio
 				<div style={divTopPadding}>
 					<ChartLinkContainer />
 				</div>
+				<div style={divTopPadding} className='d-none d-lg-block'>
+					<Button
+						onClick={this.handleSetOptionsVisibility}
+						outline
+					>
+						{ this.props.optionsVisibility ?
+							<FormattedMessage id='hide.options' />
+							:
+							<FormattedMessage id='show.options' />
+						}
+					</Button>
+				</div>
 			</div>
 		);
 	}
@@ -228,9 +243,6 @@ class UIOptionsComponent extends React.Component<UIOptionsPropsWithIntl, UIOptio
 		this.setState({ barDurationDays: value});
 	}
 
-	/**
-	 * Toggles the bar stacking option
-	 */
 	private handleChangeBarStacking() {
 		this.props.changeBarStacking();
 	}
@@ -247,6 +259,10 @@ class UIOptionsComponent extends React.Component<UIOptionsPropsWithIntl, UIOptio
 
 	private handleSortingButton(sortingOrder: SortingOrder) {
 		this.props.changeCompareSortingOrder(sortingOrder);
+	}
+
+	private handleSetOptionsVisibility() {
+		this.props.setOptionsVisibility(!this.props.optionsVisibility);
 	}
 
 	private toggleSlider() {

@@ -5,11 +5,14 @@
 import * as React from 'react';
 import { Link } from 'react-router';
 import LogoComponent from './LogoComponent';
+import HeaderButtonsComponent from './HeaderButtonsComponent';
+import MenuModalComponent from './MenuModalComponent';
+import getPage from '../utils/getPage';
 
 interface HeaderProps {
 	title: string;
+	optionsVisibility: boolean;
 }
-import HeaderButtonsComponent from './HeaderButtonsComponent';
 
 /**
  * React component that controls the header strip at the top of all pages
@@ -46,7 +49,13 @@ export default function HeaderComponent(props: HeaderProps) {
 					<h6 style={smallTitleStyle}>{props.title}</h6>
 				</div>
 				<div className='col-4 justify-content-end' style={divRightStyle}>
-					<HeaderButtonsComponent renderOptionsButton />
+					{ props.optionsVisibility ?
+						<HeaderButtonsComponent showCollapsedMenuButton />
+						: <MenuModalComponent
+							showOptions={getPage() === ''}
+							showCollapsedMenuButton={false}
+						/>
+					}
 				</div>
 			</div>
 		</div>

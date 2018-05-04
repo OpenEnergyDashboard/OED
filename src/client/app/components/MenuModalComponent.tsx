@@ -9,9 +9,10 @@ import HeaderButtonsComponent from './HeaderButtonsComponent';
 import { FormattedMessage } from 'react-intl';
 
 interface MenuModalProps {
-	showUIOptions: boolean;
-	renderOptionsButton: boolean;
+	showOptions: boolean;
+	showCollapsedMenuButton: boolean;
 }
+
 interface MenuModalState {
 	showModal: boolean;
 }
@@ -52,10 +53,10 @@ export default class MenuModalComponent extends React.Component<MenuModalProps, 
 							<p style={labelStyle}>
 								<FormattedMessage id='navigation' />:
 							</p>
-							<HeaderButtonsComponent renderOptionsButton={false} />
+							<HeaderButtonsComponent showCollapsedMenuButton={false} />
 						</div>
-						{ this.props.showUIOptions &&
-						<UIOptionsContainer />
+						{ this.props.showOptions &&
+							<UIOptionsContainer />
 						}
 					</ModalBody>
 				</Modal>
