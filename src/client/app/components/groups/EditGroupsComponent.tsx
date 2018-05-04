@@ -2,8 +2,6 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
 
-// This component is the main page of the edit group page.
-// TYPESCRIPT TODO: I have insufficient domain knowledge to edit this.
 import * as React from 'react';
 import * as _ from 'lodash';
 import { Input, Button } from 'reactstrap';
@@ -11,6 +9,7 @@ import DatasourceBoxContainer from '../../containers/groups/DatasourceBoxContain
 import { NamedIDItem } from '../../types/items';
 import { SelectionType } from '../../containers/groups/DatasourceBoxContainer';
 import { EditGroupNameAction, ChangeDisplayModeAction, ChangeChildMetersAction, ChangeChildGroupsAction } from '../../types/redux/groups';
+import { FormattedMessage, InjectedIntlProps, injectIntl, defineMessages } from 'react-intl';
 
 interface EditGroupsProps {
 	name: string;
@@ -26,6 +25,8 @@ interface EditGroupsProps {
 	changeChildGroups(selected: number[]): ChangeChildGroupsAction;
 }
 
+type EditGroupsPropsWithIntl = EditGroupsProps & InjectedIntlProps;
+
 interface EditGroupsState {
 	name: string;
 	selectedMeters: number[];
@@ -38,8 +39,8 @@ interface EditGroupsState {
 	defaultUnusedGroups: NamedIDItem[];
 }
 
-export default class EditGroupsComponent extends React.Component<EditGroupsProps, EditGroupsState> {
-	constructor(props: EditGroupsProps) {
+class EditGroupsComponent extends React.Component<EditGroupsPropsWithIntl, EditGroupsState> {
+	constructor(props: EditGroupsPropsWithIntl) {
 		super(props);
 		this.state = {
 			name: this.props.name,
@@ -66,8 +67,6 @@ export default class EditGroupsComponent extends React.Component<EditGroupsProps
 		this.handleReturnToView = this.handleReturnToView.bind(this);
 	}
 
-
-
 	public render() {
 		const divStyle: React.CSSProperties = {
 			paddingTop: '35px'
@@ -93,15 +92,22 @@ export default class EditGroupsComponent extends React.Component<EditGroupsProps
 		const centerTextStyle: React.CSSProperties = {
 			textAlign: 'center'
 		};
+		const messages = defineMessages({ name: { id: 'name' }});
 		return (
 			<div className='row'>
 				<div style={divStyle} className='col-6'>
-					<h3 style={centerTextStyle}>Edit Group</h3>
-					<p style={boldStyle}>Name:</p>
-					<Input type='text' placeholder='Name' value={this.state.name} onChange={this.handleNameChange} />
+					<h3 style={centerTextStyle}>
+						<FormattedMessage id='edit.group' />
+					</h3>
+					<p style={boldStyle}>
+						<FormattedMessage id='name' />:
+					</p>
+					<Input type='text' placeholder={this.props.intl.formatMessage(messages.name)} value={this.state.name} onChange={this.handleNameChange} />
 					<div className='row' style={metersDivStyle}>
 						<div className='col-5'>
-							<p style={boldStyle}>Child meters:</p>
+							<p style={boldStyle}>
+								<FormattedMessage id='child.meters' />:
+							</p>
 							<DatasourceBoxContainer
 								type='meter'
 								selection={SelectionType.Custom}
@@ -119,7 +125,9 @@ export default class EditGroupsComponent extends React.Component<EditGroupsProps
 							</Button>
 						</div>
 						<div className='col-5'>
-							<p style={boldStyle}>Unused meters:</p>
+							<p style={boldStyle}>
+								<FormattedMessage id='unused.meters' />:
+							</p>
 							<DatasourceBoxContainer
 								type='meter'
 								selection={SelectionType.Custom}
@@ -131,7 +139,9 @@ export default class EditGroupsComponent extends React.Component<EditGroupsProps
 					</div>
 					<div className='row' style={groupsDivStyle}>
 						<div className='col-5'>
-							<p style={boldStyle}>Child groups:</p>
+							<p style={boldStyle}>
+								<FormattedMessage id='child.groups' />:
+							</p>
 							<DatasourceBoxContainer
 								type='group'
 								selection={SelectionType.Custom}
@@ -149,7 +159,9 @@ export default class EditGroupsComponent extends React.Component<EditGroupsProps
 							</Button>
 						</div>
 						<div className='col-5'>
-							<p style={boldStyle}>Unused groups:</p>
+							<p style={boldStyle}>
+								<FormattedMessage id='unused.groups' />:
+							</p>
 							<DatasourceBoxContainer
 								type='group'
 								selection={SelectionType.Custom}
@@ -161,11 +173,17 @@ export default class EditGroupsComponent extends React.Component<EditGroupsProps
 					</div>
 					<div className='row'>
 						<div className='col-6'>
-							<Button outline onClick={this.handleReturnToView}>Cancel</Button>
-							<Button outline onClick={this.handleEditGroup}>Submit changes</Button>
+							<Button outline onClick={this.handleReturnToView}>
+								<FormattedMessage id='cancel' />
+							</Button>
+							<Button outline onClick={this.handleEditGroup}>
+								<FormattedMessage id='submit.changes' />
+							</Button>
 						</div>
 						<div className='col-6 d-flex justify-content-end'>
-							<Button outline className='justify-content-end' onClick={this.handleDeleteGroup}>Delete group</Button>
+							<Button outline className='justify-content-end' onClick={this.handleDeleteGroup}>
+								<FormattedMessage id='delete.group' />
+							</Button>
 						</div>
 					</div>
 				</div>
@@ -229,3 +247,5 @@ export default class EditGroupsComponent extends React.Component<EditGroupsProps
 		this.props.changeDisplayModeToView();
 	}
 }
+
+export default injectIntl<EditGroupsProps>(EditGroupsComponent);

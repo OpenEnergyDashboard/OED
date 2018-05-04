@@ -5,6 +5,7 @@
 import * as React from 'react';
 import { Button } from 'reactstrap';
 import { ChangeDisplayedGroupsAction, ChangeDisplayModeAction } from '../../types/redux/groups';
+import { FormattedMessage } from 'react-intl';
 
 interface GroupSidebarProps {
 	groups: Array<{id: number, name: string}>;
@@ -38,7 +39,9 @@ export default class GroupSidebarComponent extends React.Component<GroupSidebarP
 					)}
 				</select>
 				<br />
-				<Button outline onClick={this.handleCreateGroup}>Create new group</Button>
+				<Button outline onClick={this.handleCreateGroup}>
+					<FormattedMessage id='create.group' />
+				</Button>
 			</div>
 		);
 	}

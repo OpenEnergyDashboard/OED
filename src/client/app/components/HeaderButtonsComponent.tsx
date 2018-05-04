@@ -5,11 +5,13 @@
 import * as React from 'react';
 import { Link } from 'react-router';
 import { Button } from 'reactstrap';
+import { FormattedMessage } from 'react-intl';
 import MenuModalComponent from './MenuModalComponent';
 import { hasToken } from '../utils/token';
+import getPage from '../utils/getPage';
 
 interface HeaderButtonsProps {
-	renderOptionsButton: boolean;
+	showCollapsedMenuButton: boolean;
 }
 
 /**
@@ -22,19 +24,17 @@ export default class HeaderButtonsComponent extends React.Component<HeaderButton
 	}
 
 	public render() {
-		const urlArr = window.location.href.split('/');
-		const page = urlArr[urlArr.length - 1];
-		let showUIOptions = false;
+		let showOptions = false;
 		let renderLoginButton = false;
 		let renderHomeButton = true;
 		let renderAdminButton = false;
 		let renderGroupsButton = false;
 		const renderLogoutButton = hasToken();
 
-		switch (page) {
+		switch (getPage()) {
 			case '': // home page
 				renderHomeButton = false;
-				showUIOptions = true;
+				showOptions = true;
 				if (renderLogoutButton) {
 					renderAdminButton = true;
 					renderGroupsButton = true;
@@ -77,19 +77,19 @@ export default class HeaderButtonsComponent extends React.Component<HeaderButton
 		return (
 			<div>
 				<div className='d-lg-none'>
-					{(this.props.renderOptionsButton) ?
+					{(this.props.showCollapsedMenuButton) ?
 						<MenuModalComponent
-							showUIOptions={showUIOptions}
-							renderOptionsButton={false}
+							showOptions={showOptions}
+							showCollapsedMenuButton={false}
 						/> : null
 					}
 				</div>
-				<div className={this.props.renderOptionsButton ? 'd-none d-lg-block' : ''}>
-					<Link style={loginLinkStyle} to='/login'><Button outline>Log In</Button></Link>
-					<Link style={homeLinkStyle} to='/'><Button outline>Home</Button></Link>
-					<Link style={adminLinkStyle} to='/admin'><Button outline>Admin panel</Button></Link>
-					<Link style={groupsLinkStyle} to='/groups'><Button outline>Groups</Button></Link>
-					<Link style={logoutButtonStyle} to='/'><Button outline onClick={this.handleLogOut}>Log Out</Button></Link>
+				<div className={this.props.showCollapsedMenuButton ? 'd-none d-lg-block' : ''}>
+					<Link style={loginLinkStyle} to='/login'><Button outline><FormattedMessage id='log.in'/></Button></Link>
+					<Link style={homeLinkStyle} to='/'><Button outline><FormattedMessage id='home'/></Button></Link>
+					<Link style={adminLinkStyle} to='/admin'><Button outline><FormattedMessage id='admin.panel'/></Button></Link>
+					<Link style={groupsLinkStyle} to='/groups'><Button outline><FormattedMessage id='groups' /></Button></Link>
+					<Link style={logoutButtonStyle} to='/'><Button outline onClick={this.handleLogOut}><FormattedMessage id='log.out'/></Button></Link>
 				</div>
 			</div>
 		);
@@ -99,6 +99,4 @@ export default class HeaderButtonsComponent extends React.Component<HeaderButton
 		localStorage.removeItem('token');
 		this.forceUpdate();
 	}
-
-
 }

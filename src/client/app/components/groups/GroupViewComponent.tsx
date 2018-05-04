@@ -6,6 +6,7 @@ import * as React from 'react';
 import { Button } from 'reactstrap';
 import ListDisplayComponent from '../ListDisplayComponent';
 import { ChangeDisplayModeAction } from '../../types/redux/groups';
+import { FormattedMessage } from 'react-intl';
 
 interface GroupViewProps {
 	name: string;
@@ -43,15 +44,21 @@ export default class GroupViewComponent extends React.Component<GroupViewProps, 
 				<h2 style={nameStyle}>{this.props.name}</h2>
 				<div className='row'>
 					<div className='col-6'>
-						<p style={boldStyle}>Child Meters:</p>
+						<p style={boldStyle}>
+							<FormattedMessage id='child.meters' />:
+						</p>
 						<ListDisplayComponent items={this.props.childMeterNames} />
 					</div>
 					<div className='col-6'>
-						<p style={boldStyle}>Child Groups:</p>
+						<p style={boldStyle}>
+							<FormattedMessage id='child.groups' />:
+						</p>
 						<ListDisplayComponent items={this.props.childGroupNames} />
 					</div>
 				</div>
-				<Button style={buttonPadding} outline onClick={this.handleEditGroup}>Edit group</Button>
+				<Button style={buttonPadding} outline onClick={this.handleEditGroup}>
+					<FormattedMessage id='edit.a.group' />
+				</Button>
 			</div>
 		);
 	}

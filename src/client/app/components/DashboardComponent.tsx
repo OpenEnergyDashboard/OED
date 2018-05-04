@@ -8,12 +8,21 @@ import UIOptionsContainer from '../containers/UIOptionsContainer';
 import LineChartContainer from '../containers/LineChartContainer';
 import BarChartContainer from '../containers/BarChartContainer';
 import MultiCompareChartContainer from '../containers/MultiCompareChartContainer';
+import SpinnerComponent from './SpinnerComponent';
 import { ChartTypes } from '../types/redux/graph';
 
-defaults.plugins = {datalabels: {display: false}};
+defaults.plugins = {
+	datalabels: {
+		display: false
+	}
+};
 
 interface DashboardProps {
 	chartToRender: ChartTypes;
+	optionsVisibility: boolean;
+	lineLoading: false;
+	barLoading: false;
+	compareLoading: false;
 }
 
 /**
@@ -21,22 +30,39 @@ interface DashboardProps {
  */
 export default function DashboardComponent(props: DashboardProps) {
 	let ChartToRender: typeof LineChartContainer | typeof MultiCompareChartContainer | typeof BarChartContainer;
+	let showSpinner = false;
 	if (props.chartToRender === ChartTypes.line) {
+		if (props.lineLoading) {
+			showSpinner = true;
+		}
 		ChartToRender = LineChartContainer;
-	} else if (props.chartToRender === ChartTypes.compare) {
-		ChartToRender = MultiCompareChartContainer;
-	} else {
+	} else if (props.chartToRender === ChartTypes.bar) {
+		if (props.barLoading) {
+			showSpinner = true;
+		}
 		ChartToRender = BarChartContainer;
+	} else {
+		if (props.compareLoading) {
+			showSpinner = true;
+		}
+		ChartToRender = MultiCompareChartContainer;
 	}
+
+	const optionsClassName = props.optionsVisibility ? 'col-2 d-none d-lg-block' : 'd-none';
+	const chartClassName = props.optionsVisibility ? 'col-12 col-lg-10' : 'col-12';
 
 	return (
 		<div className='container-fluid'>
 			<div className='row'>
-				<div className='col-2 d-none d-lg-block'>
+				<div className={optionsClassName}>
 					<UIOptionsContainer />
 				</div>
-				<div className='col-12 col-lg-10'>
-					<ChartToRender />
+				<div className={`${chartClassName} align-self-center text-center`}>
+					{ showSpinner ? (
+						<SpinnerComponent loading width={50} height={50} />
+					) : (
+						<ChartToRender />
+					)}
 				</div>
 			</div>
 		</div>

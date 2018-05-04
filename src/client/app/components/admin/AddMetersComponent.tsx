@@ -1,19 +1,23 @@
-
 /* This Source Code Form is subject to the terms of the Mozilla Public
 * License, v. 2.0. If a copy of the MPL was not distributed with this
 * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
 
 import * as React from 'react';
 import Dropzone from 'react-dropzone';
+import { defineMessages, FormattedMessage, injectIntl, InjectedIntlProps } from 'react-intl';
 import { fileProcessingApi } from '../../utils/api';
 import TooltipHelpComponent from '../TooltipHelpComponent';
 import { showSuccessNotification, showErrorNotification } from '../../utils/notifications';
+import translate from '../../utils/translate';
 
 interface AddMetersProps {
 	fetchMeterDetailsIfNeeded(alwaysFetch?: boolean): Promise<any>;
 }
-export default class AddMetersComponent extends React.Component<AddMetersProps, {}> {
-	constructor(props: AddMetersProps) {
+
+type AddMetersPropsWithIntl = AddMetersProps & InjectedIntlProps;
+
+class AddMetersComponent extends React.Component<AddMetersPropsWithIntl, {}> {
+	constructor(props: AddMetersPropsWithIntl) {
 		super(props);
 		this.handleMeterToImport = this.handleMeterToImport.bind(this);
 	}
@@ -29,7 +33,7 @@ export default class AddMetersComponent extends React.Component<AddMetersProps, 
 			dataLines = fileAsBinaryString.split(/\r?\n/);
 			dataLines[0] = dataLines[0].replace(/\"/g, '');
 			if (dataLines[0] !==  'ip') {
-				showErrorNotification('Incorrect file format');
+				showErrorNotification(translate('incorrect.file.format'));
 			} else {
 				for (const items of dataLines) {
 					const ips = items.replace(/\"/g, '');
@@ -39,16 +43,16 @@ export default class AddMetersComponent extends React.Component<AddMetersProps, 
 				}
 				fileProcessingApi.submitNewMeters(listOfIps)
 					.then(() => {
-						showSuccessNotification('Successfully uploaded meters');
+						showSuccessNotification(translate('successfully.uploaded.meters'));
 						this.props.fetchMeterDetailsIfNeeded(true);
 					})
 					.catch(() => {
-						showErrorNotification('Error uploading meters');
+						showErrorNotification(translate('failed.to.upload.meters'));
 					});
 			}
 		};
-		reader.onabort = () => showErrorNotification('File reading was aborted');
-		reader.onerror = () => showErrorNotification('File reading has failed');
+		reader.onabort = () => showErrorNotification(translate('file.reading.aborted'));
+		reader.onerror = () => showErrorNotification(translate('failed.to.read.file'));
 		reader.readAsBinaryString(file);
 	}
 
@@ -59,17 +63,25 @@ export default class AddMetersComponent extends React.Component<AddMetersProps, 
 			paddingBottom: '5px',
 			display: 'inline'
 		};
+		const messages = defineMessages({ tipFormat: { id: 'tip.meters.csv.format' }});
+		const { formatMessage } = this.props.intl;
 
 		return (
 			<div>
-				<p style={titleStyle}> Add new meters: </p>
+				<p style={titleStyle}>
+					<FormattedMessage id='add.new.meters' />
+				</p>
 				<TooltipHelpComponent
-					tip="The file format is a CSV file with 'ip' as the first line followed by a list of meter IPs each separated by a new line"
+					tip={formatMessage(messages.tipFormat)}
 				/>
 				<Dropzone accept='text/csv, application/vnd.ms-excel,' onDrop={this.handleMeterToImport}>
-					<div>Upload meters data (CSV):</div>
+					<div>
+						<FormattedMessage id='upload.meters.csv' />
+					</div>
 				</Dropzone>
 			</div>
 		);
 	}
 }
+
+export default injectIntl<AddMetersProps>(AddMetersComponent);

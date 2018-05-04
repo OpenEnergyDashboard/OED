@@ -8,7 +8,11 @@ import { State } from '../types/redux/state';
 
 function mapStateToProps(state: State) {
 	return {
-		chartToRender: state.graph.chartToRender
+		chartToRender: state.graph.chartToRender,
+		lineLoading: state.readings.line.isFetching,
+		barLoading: state.readings.bar.isFetching,
+		compareLoading: state.readings.bar.isFetching,
+		optionsVisibility: state.graph.optionsVisibility
 	};
 }
 

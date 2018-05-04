@@ -5,6 +5,7 @@
 import * as React from 'react';
 import MultiSelectComponent from './MultiSelectComponent';
 import { SelectOption } from '../types/items';
+import { defineMessages, FormattedMessage, injectIntl, InjectedIntlProps } from 'react-intl';
 
 interface ChartDataSelectProps {
 	meters: SelectOption[];
@@ -15,11 +16,13 @@ interface ChartDataSelectProps {
 	selectGroups(groupIDs: number[]): Promise<any>;
 }
 
+type ChartDataSelectPropsWithIntl = ChartDataSelectProps & InjectedIntlProps;
+
 /**
  * A component which allows the user to select which data should be displayed on the chart.
  */
-export default class ChartDataSelectComponent extends React.Component<ChartDataSelectProps, {}> {
-	constructor(props: ChartDataSelectProps) {
+class ChartDataSelectComponent extends React.Component<ChartDataSelectPropsWithIntl, {}> {
+	constructor(props: ChartDataSelectPropsWithIntl) {
 		super(props);
 		this.handleMeterSelect = this.handleMeterSelect.bind(this);
 		this.handleGroupSelect = this.handleGroupSelect.bind(this);
@@ -29,31 +32,39 @@ export default class ChartDataSelectComponent extends React.Component<ChartDataS
 		const divBottomPadding: React.CSSProperties = {
 			paddingBottom: '15px'
 		};
-
 		const labelStyle: React.CSSProperties = {
 			fontWeight: 'bold',
 			margin: 0
 		};
+		const messages = defineMessages({
+			selectGroups: {	id: 'select.groups' },
+			selectMeters: { id: 'select.meters' }
+		});
+		const { formatMessage } = this.props.intl;
 
 		const handleGroupSelect = (s: SelectOption[]) => this.handleGroupSelect(s);
 
 		return (
 			<div>
-				<p style={labelStyle}>Groups:</p>
+				<p style={labelStyle}>
+					<FormattedMessage id='groups' />:
+				</p>
 				<div style={divBottomPadding}>
 					<MultiSelectComponent
 						options={this.props.groups}
 						selectedOptions={this.props.selectedGroups}
-						placeholder='Select Groups'
+						placeholder={formatMessage(messages.selectGroups)}
 						onValuesChange={handleGroupSelect}
 					/>
 				</div>
-				<p style={labelStyle}>Meters:</p>
+				<p style={labelStyle}>
+					<FormattedMessage id='meters' />:
+				</p>
 				<div style={divBottomPadding}>
 					<MultiSelectComponent
 						options={this.props.meters}
 						selectedOptions={this.props.selectedMeters}
-						placeholder='Select Meters'
+						placeholder={formatMessage(messages.selectMeters)}
 						onValuesChange={this.handleMeterSelect}
 					/>
 				</div>
@@ -77,3 +88,5 @@ export default class ChartDataSelectComponent extends React.Component<ChartDataS
 		this.props.selectGroups(selection.map(s => s.value));
 	}
 }
+
+export default injectIntl<ChartDataSelectProps>(ChartDataSelectComponent);

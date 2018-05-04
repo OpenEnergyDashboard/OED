@@ -44,6 +44,10 @@ export function setHotlinkedAsync(hotlinked: boolean): Thunk {
 	};
 }
 
+export function setOptionsVisibility(visibility: boolean): t.SetOptionsVisibility {
+	return { type: ActionType.SetOptionsVisibility, visibility };
+}
+
 function changeGraphZoom(timeInterval: TimeInterval): t.ChangeGraphZoomAction {
 	return { type: ActionType.ChangeGraphZoom, timeInterval };
 }

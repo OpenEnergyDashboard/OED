@@ -3,6 +3,7 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
 
 import { ChartTypes } from '../types/redux/graph';
+import { LanguageTypes } from '../types/i18n';
 
 /**
  * The type of options displayed in Select components.
@@ -27,6 +28,7 @@ export interface PreferenceRequestItem {
 	displayTitle: string;
 	defaultChartToRender: ChartTypes;
 	defaultBarStacking: boolean;
+	defaultLanguage: LanguageTypes;
 }
 
 /**

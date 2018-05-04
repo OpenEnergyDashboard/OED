@@ -6,4 +6,5 @@ UPDATE preferences
 SET
 	display_title = ${displayTitle},
 	default_chart_to_render = ${defaultChartToRender},
-	default_bar_stacking = ${defaultBarStacking};
+	default_bar_stacking = ${defaultBarStacking},
+	default_language = ${defaultLanguage};

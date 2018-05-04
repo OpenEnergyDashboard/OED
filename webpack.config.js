@@ -9,7 +9,6 @@ const path = require('path');
 
 const BUILD_DIR = path.resolve(__dirname, 'src/client/public');
 const APP_DIR = path.resolve(__dirname, 'src/client/app');
-const COMMON_DIR = path.resolve(__dirname, 'src/common');
 
 const config = {
     entry: APP_DIR + "/index.tsx",
@@ -24,6 +23,11 @@ const config = {
     resolve: {
         // Add '.ts' and '.tsx' as resolvable extensions.
         extensions: [".ts", ".tsx", ".js", ".json"]
+    },
+
+    // Ignore warnings about bundle size
+    performance: {
+        hints: false
     },
 
     module: {

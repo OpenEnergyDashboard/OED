@@ -73,7 +73,7 @@ export default class GroupMainComponent extends React.Component<GroupMainProps, 
 				break;
 			}
 			default: {
-				console.error('Encountered invalid display mode'); // tslint:disable-line no-console
+				throw new Error('Encountered invalid display mode');
 			}
 		}
 
