@@ -5,7 +5,8 @@
 import * as React from 'react';
 import { Button } from 'reactstrap';
 import ListDisplayComponent from '../ListDisplayComponent';
-import { ChangeDisplayModeAction } from '../../types/redux/groups';
+import { Link } from 'react-router';
+import { hasToken } from '../../utils/token';
 import { FormattedMessage } from 'react-intl';
 
 interface GroupViewProps {
@@ -15,7 +16,6 @@ interface GroupViewProps {
 	childGroupNames: string[];
 	fetchGroupChildren(id: number): Promise<any>;
 	beginEditingIfPossible(id: number): Promise<any>;
-	changeDisplayModeToEdit(): ChangeDisplayModeAction;
 }
 
 export default class GroupViewComponent extends React.Component<GroupViewProps, {}> {
@@ -29,6 +29,7 @@ export default class GroupViewComponent extends React.Component<GroupViewProps, 
 	}
 
 	public render() {
+		const renderEditGroupButton = hasToken();
 		const nameStyle: React.CSSProperties = {
 			textAlign: 'center'
 		};
@@ -38,6 +39,10 @@ export default class GroupViewComponent extends React.Component<GroupViewProps, 
 		const boldStyle: React.CSSProperties = {
 			fontWeight: 'bold',
 			margin: 0
+		};
+		const editGroupStyle: React.CSSProperties = {
+			display: renderEditGroupButton ? 'inline' : 'none',
+			paddingLeft: '5px'
 		};
 		return (
 			<div>
@@ -56,15 +61,16 @@ export default class GroupViewComponent extends React.Component<GroupViewProps, 
 						<ListDisplayComponent items={this.props.childGroupNames} />
 					</div>
 				</div>
-				<Button style={buttonPadding} outline onClick={this.handleEditGroup}>
-					<FormattedMessage id='edit.a.group' />
-				</Button>
+				<Link style={editGroupStyle} to='/editGroup'>
+					<Button style={buttonPadding} outline onClick={this.handleEditGroup}>
+						<FormattedMessage id='edit.a.group' />
+					</Button>
+				</Link>
 			</div>
 		);
 	}
 
 	private handleEditGroup() {
-		this.props.changeDisplayModeToEdit();
 		this.props.beginEditingIfPossible(this.props.id);
 	}
 }

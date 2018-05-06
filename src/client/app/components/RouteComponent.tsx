@@ -14,7 +14,6 @@ import InitializationContainer from '../containers/InitializationContainer';
 import HomeComponent from './HomeComponent';
 import LoginComponent from '../components/LoginComponent';
 import AdminComponent from './admin/AdminComponent';
-import GroupMainContainer from '../containers/groups/GroupMainContainer';
 import { LinkOptions } from 'actions/graph';
 import { hasToken } from '../utils/token';
 import { showErrorNotification } from '../utils/notifications';
@@ -23,6 +22,9 @@ import { LanguageTypes } from '../types/i18n';
 import { verificationApi } from '../utils/api';
 import translate from '../utils/translate';
 import { validateComparePeriod, validateSortingOrder } from '../utils/calculateCompare';
+import EditGroupsContainer from '../containers/groups/EditGroupsContainer';
+import CreateGroupContainer from '../containers/groups/CreateGroupContainer';
+import GroupsDetailContainer from '../containers/groups/GroupsDetailContainer';
 
 interface RouteProps {
 	barStacking: boolean;
@@ -69,7 +71,7 @@ export default class RouteComponent extends React.Component<RouteProps, {}> {
 	 * @param nextState The next state of the router
 	 * @param replace Function that allows a route redirect
 	 */
-	public linkToGraph(nextState: RouterState, replace: _.ReplaceFunction) {
+	public linkToGraph(nextState: RouterState, replace: RedirectFunction) {
 		const queries = nextState.location.query;
 		if (!_.isEmpty(queries)) {
 			try {
@@ -116,7 +118,7 @@ export default class RouteComponent extends React.Component<RouteProps, {}> {
 
 	/**
 	 * React component that controls the app's routes
-	 * Note that '/admin' and '/groups' requires authentication
+	 * Note that '/admin', '/editGroup', and '/createGroup' requires authentication
 	 * @returns JSX to create the RouteComponent
 	 */
 	public render() {
@@ -135,8 +137,10 @@ export default class RouteComponent extends React.Component<RouteProps, {}> {
 					<Router history={browserHistory}>
 						<Route path='/login' component={LoginComponent} />
 						<Route path='/admin' component={AdminComponent} onEnter={this.requireAuth} />
-						<Route path='/groups' component={GroupMainContainer} onEnter={this.requireAuth} />
+						<Route path='/groups' component={GroupsDetailContainer} />
 						<Route path='/graph' component={HomeComponent} onEnter={this.linkToGraph} />
+						<Route path='/createGroup' component={CreateGroupContainer} onEnter={this.requireAuth} />
+						<Route path='/editGroup' component={EditGroupsContainer} onEnter={this.requireAuth} />
 						<Route path='*' component={HomeComponent} />
 					</Router>
 				</IntlProvider>

@@ -7,7 +7,10 @@ import { Input, Button } from 'reactstrap';
 import DatasourceBoxContainer from '../../containers/groups/DatasourceBoxContainer';
 import { SelectionType } from '../../containers/groups/DatasourceBoxContainer';
 import { NamedIDItem } from '../../types/items';
-import { CreateNewBlankGroupAction, EditGroupNameAction, ChangeDisplayModeAction } from '../../types/redux/groups';
+import { CreateNewBlankGroupAction, EditGroupNameAction } from '../../types/redux/groups';
+import HeaderContainer from '../../containers/HeaderContainer';
+import FooterComponent from '../FooterComponent';
+import {  browserHistory } from 'react-router';
 import { FormattedMessage, InjectedIntlProps, injectIntl, defineMessages } from 'react-intl';
 
 
@@ -17,7 +20,6 @@ interface CreateGroupProps {
 	createNewBlankGroup(): CreateNewBlankGroupAction;
 	editGroupName(name: string): EditGroupNameAction;
 	submitGroupInEditingIfNeeded(): Promise<any>;
-	changeDisplayModeToView(): ChangeDisplayModeAction;
 }
 
 type CreateGroupPropsWithIntl = CreateGroupProps & InjectedIntlProps;
@@ -50,40 +52,46 @@ class CreateGroupComponent extends React.Component<CreateGroupPropsWithIntl, {}>
 		};
 		const messages = defineMessages({ name: { id: 'name' }});
 		return (
-			<div style={divStyle} className='col-6'>
-				<h3 style={centerTextStyle}>
-					<FormattedMessage id='create.group' />
-				</h3>
-				<div style={divBottomStyle}>
-					<p style={textStyle}>
-						<FormattedMessage id='name' />:
-					</p>
-					<Input type='text' placeholder={this.props.intl.formatMessage(messages.name)} onChange={this.handleNameChange} />
-				</div>
-				<div style={divBottomStyle}>
-					<p style={textStyle}>
-						<FormattedMessage id='select.meters' />:
-					</p>
-					<DatasourceBoxContainer type='meter' selection={SelectionType.All} />
-				</div>
-				<div style={divBottomStyle}>
-					<p style={textStyle}>
-						<FormattedMessage id='select.groups' />:
-					</p>
-					<DatasourceBoxContainer type='group' selection={SelectionType.All} />
-				</div>
-				<div className='row'>
-					<div className='col-6'>
-						<Button outline type='submit' onClick={this.handleReturnToView}>
-							<FormattedMessage id='cancel' />
-						</Button>
-					</div>
-					<div className='col-6 d-flex justify-content-end'>
-						<Button outline type='submit' onClick={this.handleCreateGroup}>
+			<div>
+				<HeaderContainer />
+				<div className='container-fluid'>
+					<div style={divStyle} className='col-6'>
+						<h3 style={centerTextStyle}>
 							<FormattedMessage id='create.group' />
-						</Button>
+						</h3>
+						<div style={divBottomStyle}>
+							<p style={textStyle}>
+								<FormattedMessage id='name' />:
+							</p>
+							<Input type='text' placeholder={this.props.intl.formatMessage(messages.name)} onChange={this.handleNameChange} />
+						</div>
+						<div style={divBottomStyle}>
+							<p style={textStyle}>
+								<FormattedMessage id='select.meters' />:
+							</p>
+							<DatasourceBoxContainer type='meter' selection={SelectionType.All} />
+						</div>
+						<div style={divBottomStyle}>
+							<p style={textStyle}>
+								<FormattedMessage id='select.groups' />:
+							</p>
+							<DatasourceBoxContainer type='group' selection={SelectionType.All} />
+						</div>
+						<div className='row'>
+							<div className='col-6'>
+								<Button outline type='submit' onClick={this.handleReturnToView}>
+									<FormattedMessage id='cancel' />
+								</Button>
+							</div>
+							<div className='col-6 d-flex justify-content-end'>
+								<Button outline type='submit' onClick={this.handleCreateGroup}>
+									<FormattedMessage id='create.group' />
+								</Button>
+							</div>
+						</div>
 					</div>
 				</div>
+				<FooterComponent />
 			</div>
 		);
 	}
@@ -102,7 +110,7 @@ class CreateGroupComponent extends React.Component<CreateGroupPropsWithIntl, {}>
 	}
 
 	private handleReturnToView() {
-		this.props.changeDisplayModeToView();
+		browserHistory.push('/groups');
 	}
 }
 
