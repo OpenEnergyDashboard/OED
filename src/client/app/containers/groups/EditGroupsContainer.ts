@@ -22,6 +22,7 @@ function mapStateToProps(state: State) {
 	let allGroups = _.sortBy(_.values(state.groups.byGroupID).map(group => ({ id: group.id, name: group.name.trim() })), 'name');
 
 	const groupInEditing = state.groups.groupInEditing as GroupDefinition;
+	// If there is no group to edit, then redirect to the view groups page
 	if (groupInEditing === undefined || _.isEmpty(_.difference(Object.keys(groupInEditing), ['dirty']))) {
 		if (groupInEditing === undefined) {
 			throw new Error('Unacceptable condition: state.groups.groupInEditing has no data.');
