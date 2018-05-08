@@ -41,8 +41,11 @@ router.post('/', async (req, res) => {
 				defaultChartToRender: {
 					type: 'string'
 				},
-				defaultBarTracking: {
+				defaultBarStacking: {
 					type: 'boolean'
+				},
+				defaultLanguage: {
+					type: 'string'
 				}
 			}
 		}

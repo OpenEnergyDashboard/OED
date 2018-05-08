@@ -4,22 +4,31 @@
 
 import * as React from 'react';
 import { Router, Route, browserHistory, RedirectFunction, RouterState } from 'react-router';
+import { addLocaleData, IntlProvider } from 'react-intl';
+import * as en from 'react-intl/locale-data/en';
+import * as fr from 'react-intl/locale-data/fr';
+import * as localeData from '../translations/data.json';
 import * as _ from 'lodash';
 import * as moment from 'moment';
 import InitializationContainer from '../containers/InitializationContainer';
 import HomeComponent from './HomeComponent';
 import LoginComponent from '../components/LoginComponent';
 import AdminComponent from './admin/AdminComponent';
-import GroupMainContainer from '../containers/groups/GroupMainContainer';
 import { LinkOptions } from 'actions/graph';
 import { hasToken } from '../utils/token';
 import { showErrorNotification } from '../utils/notifications';
 import { ChartTypes } from '../types/redux/graph';
+import { LanguageTypes } from '../types/i18n';
 import { verificationApi } from '../utils/api';
+import translate from '../utils/translate';
 import { validateComparePeriod, validateSortingOrder } from '../utils/calculateCompare';
+import EditGroupsContainer from '../containers/groups/EditGroupsContainer';
+import CreateGroupContainer from '../containers/groups/CreateGroupContainer';
+import GroupsDetailContainer from '../containers/groups/GroupsDetailContainer';
 
 interface RouteProps {
-	barStacking: boolean ;
+	barStacking: boolean;
+	defaultLanguage: LanguageTypes;
 	changeOptionsFromLink(options: LinkOptions): Promise<any[]>;
 }
 
@@ -62,7 +71,7 @@ export default class RouteComponent extends React.Component<RouteProps, {}> {
 	 * @param nextState The next state of the router
 	 * @param replace Function that allows a route redirect
 	 */
-	public linkToGraph(nextState: RouterState, replace: _.ReplaceFunction) {
+	public linkToGraph(nextState: RouterState, replace: RedirectFunction) {
 		const queries = nextState.location.query;
 		if (!_.isEmpty(queries)) {
 			try {
@@ -101,7 +110,7 @@ export default class RouteComponent extends React.Component<RouteProps, {}> {
 					this.props.changeOptionsFromLink(options);
 				}
 			} catch (err) {
-				showErrorNotification('Failed to link to graph');
+				showErrorNotification(translate('failed.to.link.graph'));
 			}
 		}
 		replace('/');
@@ -109,26 +118,33 @@ export default class RouteComponent extends React.Component<RouteProps, {}> {
 
 	/**
 	 * React component that controls the app's routes
-	 * Note that '/admin' and '/groups' requires authentication
+	 * Note that '/admin', '/editGroup', and '/createGroup' requires authentication
 	 * @returns JSX to create the RouteComponent
 	 */
 	public render() {
+		addLocaleData([...en, ...fr]);
+		const lang = this.props.defaultLanguage;
+		let messages;
+		if (lang === 'fr') {
+			messages = (localeData as any).fr;
+		} else {
+			messages = (localeData as any).en;
+		}
 		return (
 			<div>
 				<InitializationContainer />
-				<Router history={browserHistory}>
-					<Route path='/login' component={LoginComponent} />
-					<Route path='/admin' component={AdminComponent} onEnter={this.requireAuth} />
-					<Route path='/groups' component={GroupMainContainer} onEnter={this.requireAuth} />
-					<Route path='/graph' component={HomeComponent} onEnter={this.linkToGraph} />
-					<Route path='*' component={HomeComponent} />
-				</Router>
+				<IntlProvider locale={lang} messages={messages} key={lang}>
+					<Router history={browserHistory}>
+						<Route path='/login' component={LoginComponent} />
+						<Route path='/admin' component={AdminComponent} onEnter={this.requireAuth} />
+						<Route path='/groups' component={GroupsDetailContainer} />
+						<Route path='/graph' component={HomeComponent} onEnter={this.linkToGraph} />
+						<Route path='/createGroup' component={CreateGroupContainer} onEnter={this.requireAuth} />
+						<Route path='/editGroup' component={EditGroupsContainer} onEnter={this.requireAuth} />
+						<Route path='*' component={HomeComponent} />
+					</Router>
+				</IntlProvider>
 			</div>
 		);
-	}
-
-	public shouldComponentUpdate() {
-		// To ignore warning: [react-router] You cannot change 'Router routes'; it will be ignored
-		return false;
 	}
 }

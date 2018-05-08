@@ -7,6 +7,7 @@ import MultiSelectComponent from '../MultiSelectComponent';
 import { metersFilterReduce, groupsFilterReduce } from '../../utils/Datasources';
 import { NamedIDItem, SelectOption } from '../../types/items';
 import { DataType, DatasourceID } from '../../types/Datasources';
+import { InjectedIntlProps, injectIntl, defineMessages } from 'react-intl';
 
 interface DatasourceBoxProps {
 	// TODO: This should be an enum
@@ -16,13 +17,15 @@ interface DatasourceBoxProps {
 	selectDatasource(ids: number[]): void;
 }
 
+type DatasourceBoxPropsWithIntl = DatasourceBoxProps & InjectedIntlProps;
+
 // This is just an alias, so it's ok to have it in this file.
 // Aliasing this specialization is required because the meaning of < and > conflict in TypeScript and JSX.
 // tslint:disable max-classes-per-file
 class MultiSelectDatasourceComponent extends MultiSelectComponent<DatasourceID> {}
 
-export default class DatasourceBoxComponent extends React.Component<DatasourceBoxProps, {}> {
-	constructor(props: DatasourceBoxProps) {
+class DatasourceBoxComponent extends React.Component<DatasourceBoxPropsWithIntl, {}> {
+	constructor(props: DatasourceBoxPropsWithIntl) {
 		super(props);
 		this.handleDatasourceSelect = this.handleDatasourceSelect.bind(this);
 	}
@@ -52,12 +55,17 @@ export default class DatasourceBoxComponent extends React.Component<DatasourceBo
 		} else {
 			selectedOptions = null;
 		}
+		const messages = defineMessages({
+			selectMeters: { id: 'select.meters' },
+			selectGroups: { id: 'select.groups' }
+		});
+		const { formatMessage } = this.props.intl;
 
 		return (
 			<MultiSelectDatasourceComponent
 				options={options}
 				selectedOptions={selectedOptions}
-				placeholder={`Select ${this.props.type}s`}
+				placeholder={this.props.type === 'meter' ? formatMessage(messages.selectMeters) : formatMessage(messages.selectGroups)}
 				onValuesChange={this.handleDatasourceSelect}
 			/>
 		);
@@ -71,3 +79,5 @@ export default class DatasourceBoxComponent extends React.Component<DatasourceBo
 		}
 	}
 }
+
+export default injectIntl<DatasourceBoxProps>(DatasourceBoxComponent);

@@ -39,7 +39,7 @@ app.use('/api/fileProcessing', fileProcessing);
 app.use('/api/version', version);
 app.use('/api/compressedReadings', createRouterForNewCompressedReadings());
 
-app.get('\\/|login|admin|groups|graph', (req, res) => {
+app.get('\\/|login|admin|groups|createGroup|editGroup|graph', (req, res) => {
 	res.sendFile(path.resolve(__dirname, '..', 'client', 'index.html'));
 });
 

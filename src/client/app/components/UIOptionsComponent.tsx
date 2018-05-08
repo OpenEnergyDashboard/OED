@@ -3,6 +3,7 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
 
 import * as React from 'react';
+import { InjectedIntlProps, FormattedMessage, injectIntl, defineMessages } from 'react-intl';
 import sliderWithoutTooltips, { createSliderWithTooltip } from 'rc-slider';
 import * as moment from 'moment';
 import { Button, ButtonGroup, Dropdown, DropdownToggle, DropdownMenu, DropdownItem } from 'reactstrap';
@@ -10,7 +11,7 @@ import TooltipHelpComponent from './TooltipHelpComponent';
 import ExportContainer from '../containers/ExportContainer';
 import ChartSelectContainer from '../containers/ChartSelectContainer';
 import ChartDataSelectContainer from '../containers/ChartDataSelectContainer';
-import { ChangeBarStackingAction, ChangeCompareSortingOrderAction } from '../types/redux/graph';
+import { ChangeBarStackingAction, ChangeCompareSortingOrderAction, SetOptionsVisibility } from '../types/redux/graph';
 import ChartLinkContainer from '../containers/ChartLinkContainer';
 import { ChartTypes } from '../types/redux/graph';
 import { ComparePeriod, SortingOrder } from '../utils/calculateCompare';
@@ -24,11 +25,15 @@ export interface UIOptionsProps {
 	barDuration: moment.Duration;
 	comparePeriod: ComparePeriod;
 	compareSortingOrder: SortingOrder;
+	optionsVisibility: boolean;
 	changeDuration(duration: moment.Duration): Promise<any>;
 	changeBarStacking(): ChangeBarStackingAction;
+	setOptionsVisibility(visibility: boolean): SetOptionsVisibility;
 	changeCompareGraph(comparePeriod: ComparePeriod): Promise<any>;
 	changeCompareSortingOrder(compareSortingOrder: SortingOrder): ChangeCompareSortingOrderAction;
 }
+
+type UIOptionsPropsWithIntl = UIOptionsProps & InjectedIntlProps;
 
 interface UIOptionsState {
 	barDurationDays: number;
@@ -36,8 +41,8 @@ interface UIOptionsState {
 	compareSortingDropdownOpen: boolean;
 }
 
-export default class UIOptionsComponent extends React.Component<UIOptionsProps, UIOptionsState> {
-	constructor(props: UIOptionsProps) {
+class UIOptionsComponent extends React.Component<UIOptionsPropsWithIntl, UIOptionsState> {
+	constructor(props: UIOptionsPropsWithIntl) {
 		super(props);
 		this.handleBarDurationChange = this.handleBarDurationChange.bind(this);
 		this.handleBarDurationChangeComplete = this.handleBarDurationChangeComplete.bind(this);
@@ -46,6 +51,7 @@ export default class UIOptionsComponent extends React.Component<UIOptionsProps, 
 		this.handleBarButton = this.handleBarButton.bind(this);
 		this.handleCompareButton = this.handleCompareButton.bind(this);
 		this.handleSortingButton = this.handleSortingButton.bind(this);
+		this.handleSetOptionsVisibility = this.handleSetOptionsVisibility.bind(this);
 		this.toggleSlider = this.toggleSlider.bind(this);
 		this.toggleDropdown = this.toggleDropdown.bind(this);
 		this.state = {
@@ -55,28 +61,22 @@ export default class UIOptionsComponent extends React.Component<UIOptionsProps, 
 		};
 	}
 
-
 	public componentWillReceiveProps(nextProps: UIOptionsProps) {
 		this.setState({barDurationDays: nextProps.barDuration.asDays()});
 	}
 
-	/**
-	 * @returns JSX to create the UI options side-panel (includes dynamic rendering of meter information for selection)
-	 */
 	public render() {
 		const labelStyle: React.CSSProperties = {
 			fontWeight: 'bold',
 			margin: 0
 		};
-
 		const divTopPadding: React.CSSProperties = {
 			paddingTop: '15px'
 		};
-
 		const zIndexFix: React.CSSProperties = {
 			zIndex: 0
 		};
-
+		const messages = defineMessages({ barStackingTip: {	id: 'bar.stacking.tip' }});
 
 		return (
 			<div>
@@ -88,10 +88,12 @@ export default class UIOptionsComponent extends React.Component<UIOptionsProps, 
 					<div>
 						<div className='checkbox'>
 							<label><input type='checkbox' onChange={this.handleChangeBarStacking} checked={this.props.barStacking} />
-								Bar stacking <TooltipHelpComponent tip='Stack bars on top of each other' />
+								<FormattedMessage id='bar.stacking' /><TooltipHelpComponent tip={this.props.intl.formatMessage(messages.barStackingTip)} />
 							</label>
 						</div>
-						<p style={labelStyle}>Bar chart interval:</p>
+						<p style={labelStyle}>
+							<FormattedMessage id='bar.interval' />:
+						</p>
 						<ButtonGroup
 							style={zIndexFix}
 						>
@@ -99,26 +101,26 @@ export default class UIOptionsComponent extends React.Component<UIOptionsProps, 
 								outline={this.state.barDurationDays !== 1}
 								onClick={() => this.handleBarButton(1)}
 							>
-								Day
+								<FormattedMessage id='day' />
 							</Button>
 							<Button
 								outline={this.state.barDurationDays !== 7}
 								onClick={() => this.handleBarButton(7)}
 							>
-								Week
+								<FormattedMessage id='week' />
 							</Button>
 							<Button
 								outline={this.state.barDurationDays !== 28}
 								onClick={() => this.handleBarButton(28)}
 							>
-								4 Weeks
+								<FormattedMessage id='4.weeks' />
 							</Button>
 						</ButtonGroup>
 						<Button
 							outline={!this.state.showSlider}
 							onClick={this.toggleSlider}
 						>
-							Toggle custom slider
+							<FormattedMessage id='toggle.custom.slider' />
 						</Button>
 						{this.state.showSlider &&
 							<div style={divTopPadding}>
@@ -155,45 +157,45 @@ export default class UIOptionsComponent extends React.Component<UIOptionsProps, 
 							active={this.props.comparePeriod === ComparePeriod.Day}
 							onClick={() => this.handleCompareButton(ComparePeriod.Day)}
 						>
-							Day
+							<FormattedMessage id='day' />
 						</Button>
 						<Button
 							outline={this.props.comparePeriod !== ComparePeriod.Week}
 							active={this.props.comparePeriod === ComparePeriod.Week}
 							onClick={() => this.handleCompareButton(ComparePeriod.Week)}
 						>
-							Week
+							<FormattedMessage id='week' />
 						</Button>
 						<Button
 							outline={this.props.comparePeriod !== ComparePeriod.FourWeeks}
 							active={this.props.comparePeriod === ComparePeriod.FourWeeks}
 							onClick={() => this.handleCompareButton(ComparePeriod.FourWeeks)}
 						>
-							4 Weeks
+							<FormattedMessage id='4.weeks' />
 						</Button>
 					</ButtonGroup>
 					<Dropdown isOpen={this.state.compareSortingDropdownOpen} toggle={this.toggleDropdown}>
 						<DropdownToggle caret>
-							Sort
+							<FormattedMessage id='sort' />
 						</DropdownToggle>
 						<DropdownMenu>
 							<DropdownItem
 								active={this.props.compareSortingOrder === SortingOrder.Alphabetical}
 								onClick={() => this.handleSortingButton(SortingOrder.Alphabetical)}
 							>
-								Alphabetically
+								<FormattedMessage id='alphabetically' />
 							</DropdownItem>
 							<DropdownItem
 								active={this.props.compareSortingOrder === SortingOrder.Ascending}
 								onClick={() => this.handleSortingButton(SortingOrder.Ascending)}
 							>
-								Ascending
+								<FormattedMessage id='ascending' />
 							</DropdownItem>
 							<DropdownItem
 								active={this.props.compareSortingOrder === SortingOrder.Descending}
 								onClick={() => this.handleSortingButton(SortingOrder.Descending)}
 							>
-								Descending
+								<FormattedMessage id='descending' />
 							</DropdownItem>
 						</DropdownMenu>
 					</Dropdown>
@@ -210,21 +212,22 @@ export default class UIOptionsComponent extends React.Component<UIOptionsProps, 
 				<div style={divTopPadding}>
 					<ChartLinkContainer />
 				</div>
+				<div style={divTopPadding} className='d-none d-lg-block'>
+					<Button
+						onClick={this.handleSetOptionsVisibility}
+						outline
+					>
+						{ this.props.optionsVisibility ?
+							<FormattedMessage id='hide.options' />
+							:
+							<FormattedMessage id='show.options' />
+						}
+					</Button>
+				</div>
 			</div>
 		);
 	}
 
-	/**
-	 * Handles a change in meter selection
-	 * @param {Object[]} selection An array of {label: string, value: {type: string, id: int}} representing the current selection
-	 */
-	// private handleMeterSelect(selection: Array<{label: string, value: {type: string, id: number}}>) {
-	// 	this.props.selectMeters(selection.map(s => s.value));
-	// }
-
-	/**
-	 * Called when the user releases the slider, dispatch action on temporary state variable
-	 */
 	private handleBarDurationChangeComplete(e: any) {
 		this.props.changeDuration(moment.duration(this.state.barDurationDays, 'days'));
 	}
@@ -240,14 +243,11 @@ export default class UIOptionsComponent extends React.Component<UIOptionsProps, 
 		this.setState({ barDurationDays: value});
 	}
 
-	/**
-	 * Toggles the bar stacking option
-	 */
 	private handleChangeBarStacking() {
 		this.props.changeBarStacking();
 	}
 
-	// TODO TYPESCRIPT this is an issue with typings for React.FormEvent<> and ChangeEvent<>
+	// This is an issue with typings for React.FormEvent<> and ChangeEvent<>
 	// The type of value is actually number
 	private handleSpanButton(value: any) {
 		this.props.changeDuration(moment.duration(value, 'days'));
@@ -261,18 +261,29 @@ export default class UIOptionsComponent extends React.Component<UIOptionsProps, 
 		this.props.changeCompareSortingOrder(sortingOrder);
 	}
 
+	private handleSetOptionsVisibility() {
+		this.props.setOptionsVisibility(!this.props.optionsVisibility);
+	}
+
 	private toggleSlider() {
 		this.setState({ showSlider: !this.state.showSlider });
 	}
 
 	private formatSliderTip(value: number) {
+		const messages = defineMessages({
+			day: {	id: 'day' },
+			days: { id: 'days' }
+		});
+		const { formatMessage } = this.props.intl;
 		if (value <= 1) {
-			return `${value} day`;
+			return `${value} ${formatMessage(messages.day)}`;
 		}
-		return `${value} days`;
+		return `${value} ${formatMessage(messages.days)}`;
 	}
 
 	private toggleDropdown() {
 		this.setState({ compareSortingDropdownOpen: !this.state.compareSortingDropdownOpen });
 	}
 }
+
+export default injectIntl<UIOptionsProps>(UIOptionsComponent);

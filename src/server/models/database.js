@@ -65,7 +65,6 @@ async function createSchema() {
 	await Reading.createBarchartReadingsFunction();
 	await Reading.createCompressedGroupsBarchartReadingsFunction();
 	await User.createTable();
-	await Preferences.createGraphTypesEnum();
 	await Preferences.createTable();
 	await Group.createTables();
 	await Migration.createTable();

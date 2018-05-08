@@ -25,6 +25,8 @@ interface ReadingsData {
 	readings?: Array<[number, number]>;
 }
 
+let errorEntities: string[] = [];
+
 function mapCompressedReadingsToReadingsData(
 	compressed: { isFetching: boolean, readings?: CompressedBarReading[] | undefined }
 	): ReadingsData | undefined {
@@ -36,12 +38,14 @@ function mapCompressedReadingsToReadingsData(
 }
 
 function mapStateToProps(state: State) {
+	errorEntities = [];
 	const meters: CompareEntity[] = getDataForIDs(state.graph.selectedMeters, false, state);
 	const groups: CompareEntity[] = getDataForIDs(state.graph.selectedGroups, true, state);
 	const compareEntities: CompareEntity[] = meters.concat(groups);
 	const sortingOrder = state.graph.compareSortingOrder;
 	return {
-		selectedCompareEntities: sortIDs(compareEntities, sortingOrder)
+		selectedCompareEntities: sortIDs(compareEntities, sortingOrder),
+		errorEntities: errorEntities as string[]
 	};
 }
 
@@ -63,8 +67,8 @@ function getDataForIDs(ids: number[], isGroup: boolean, state: State): CompareEn
 		if (isReadingsDataValid(readingsData)) {
 			const timeSincePeriodStart = getTimeSincePeriodStart(comparePeriod);
 			if (readingsData!.readings!.length < timeSincePeriodStart) {
-				throw new Error(`Insufficient readings data to process comparison for id ${id}, ti ${timeInterval}, dur ${barDuration}.
-				readingsData has ${readingsData!.readings!.length} but we'd like to look at the last ${timeSincePeriodStart} elements.`);
+				errorEntities.push(name);
+				continue;
 			}
 			const currentPeriodUsage = calculateCurrentPeriodUsage(readingsData!, timeSincePeriodStart) || 0;
 			const lastPeriodTotalUsage = calculateLastPeriodUsage(readingsData!, timeSincePeriodStart) || 0;

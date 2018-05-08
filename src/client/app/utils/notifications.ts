@@ -4,10 +4,11 @@
 
 import store from '../index';
 import { showNotification as showNotificationAction } from '../actions/notifications';
+import { TranslatedString } from './translate';
 
 export type NotificationPosition = 'tr' | 'tl' | 'tc' | 'br' | 'bl' | 'bc';
 
-export function showSuccessNotification(message: string, position: NotificationPosition = 'tr', autoDismiss = 3) {
+export function showSuccessNotification(message: TranslatedString, position: NotificationPosition = 'tr', autoDismiss = 3) {
 	store.dispatch(showNotificationAction({
 		message,
 		level: 'success',
@@ -16,7 +17,7 @@ export function showSuccessNotification(message: string, position: NotificationP
 	}));
 }
 
-export function showErrorNotification(message: string, position: NotificationPosition = 'tr', autoDismiss = 3) {
+export function showErrorNotification(message: TranslatedString, position: NotificationPosition = 'tr', autoDismiss = 3) {
 	store.dispatch(showNotificationAction({
 		message,
 		level: 'error',

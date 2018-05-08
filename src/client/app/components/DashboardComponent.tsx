@@ -19,6 +19,7 @@ defaults.plugins = {
 
 interface DashboardProps {
 	chartToRender: ChartTypes;
+	optionsVisibility: boolean;
 	lineLoading: false;
 	barLoading: false;
 	compareLoading: false;
@@ -47,13 +48,16 @@ export default function DashboardComponent(props: DashboardProps) {
 		ChartToRender = MultiCompareChartContainer;
 	}
 
+	const optionsClassName = props.optionsVisibility ? 'col-2 d-none d-lg-block' : 'd-none';
+	const chartClassName = props.optionsVisibility ? 'col-12 col-lg-10' : 'col-12';
+
 	return (
 		<div className='container-fluid'>
 			<div className='row'>
-				<div className='col-2 d-none d-lg-block'>
+				<div className={optionsClassName}>
 					<UIOptionsContainer />
 				</div>
-				<div className='col-12 col-lg-10 align-self-center text-center'>
+				<div className={`${chartClassName} align-self-center text-center`}>
 					{ showSpinner ? (
 						<SpinnerComponent loading width={50} height={50} />
 					) : (

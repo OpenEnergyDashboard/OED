@@ -9,6 +9,7 @@ import { ChangeChartToRenderAction } from '../types/redux/graph';
 import Button from 'reactstrap/lib/Button';
 import ButtonGroup from 'reactstrap/lib/ButtonGroup';
 import { FormEvent } from 'react';
+import { FormattedMessage } from 'react-intl';
 
 interface ChartSelectProps {
 	selectedChart: ChartTypes;
@@ -36,25 +37,27 @@ export default class ChartSelectComponent extends React.Component<ChartSelectPro
 
 		return (
 			<div style={divBottomPadding}>
-				<p style={labelStyle}>Graph Type:</p>
+				<p style={labelStyle}>
+					<FormattedMessage id='graph.type' />:
+				</p>
 				<ButtonGroup>
 					<Button
 						outline={this.props.selectedChart !== ChartTypes.line}
 						onClick={() => this.handleChangeChartType(ChartTypes.line)}
 					>
-						Line
+						<FormattedMessage id='line' />
 					</Button>
 					<Button
 						outline={this.props.selectedChart !== ChartTypes.bar}
 						onClick={() => this.handleChangeChartType(ChartTypes.bar)}
 					>
-						Bar
+						<FormattedMessage id='bar' />
 					</Button>
 					<Button
 						outline={this.props.selectedChart !== ChartTypes.compare}
 						onClick={() => this.handleChangeChartType(ChartTypes.compare)}
 					>
-						Compare
+						<FormattedMessage id='compare' />
 					</Button>
 				</ButtonGroup>
 			</div>
