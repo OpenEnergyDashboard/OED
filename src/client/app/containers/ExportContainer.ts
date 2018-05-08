@@ -8,6 +8,16 @@ import ExportComponent from '../components/ExportComponent';
 import { ChartTypes } from '../types/redux/graph';
 import { ExportDataSet } from '../types/readings';
 import { State } from '../types/redux/state';
+import {CompressedBarReading, CompressedBarReadings, CompressedLineReading} from '../types/compressed-readings';
+
+
+function transformLineReadingToLegacy(reading: CompressedLineReading): [number, number] {
+	return [reading.startTimestamp, reading.reading];
+}
+
+function transformBarReadingToLegacy(reading: CompressedBarReading): [number, number] {
+	return [reading.startTimestamp, reading.reading];
+}
 
 /**
  * @param {State} state
@@ -30,8 +40,9 @@ function mapStateToProps(state: State) {
 						throw new Error('Unacceptable condition: readingsData.readings is undefined.');
 					}
 
-					const dataPoints: Array<{x: number, y: number}> = _.values(readingsData.readings).map(
-						(v: [number, number]) => ({ x: v[0], y: v[1]})
+					const dataPoints: Array<{x: number, y: number}> = _.values(readingsData.readings)
+						.map(transformLineReadingToLegacy)
+						.map((v: [number, number]) => ({ x: v[0], y: v[1]})
 					);
 					datasets.push({
 						label,
@@ -52,7 +63,9 @@ function mapStateToProps(state: State) {
 						throw new Error('Unacceptable condition: readingsData.readings is undefined.');
 					}
 
-					const dataPoints: Array<{x: number, y: number}> = _.values(readingsData.readings).map(
+					const dataPoints: Array<{x: number, y: number}> = _.values(readingsData.readings)
+						.map(transformLineReadingToLegacy)
+						.map(
 						(v: [number, number]) => ({ x: v[0], y: v[1]})
 					);
 					datasets.push({
@@ -77,8 +90,9 @@ function mapStateToProps(state: State) {
 							throw new Error('Unacceptable condition: readingsData.readings is undefined.');
 						}
 
-						const dataPoints: Array<{x: number, y: number}> = _.values(readingsData.readings).map(
-							(v: [number, number]) => ({ x: v[0], y: v[1]})
+						const dataPoints: Array<{x: number, y: number}> = _.values(readingsData.readings)
+							.map(transformBarReadingToLegacy)
+							.map((v: [number, number]) => ({ x: v[0], y: v[1]})
 						);
 						datasets.push({
 							label,
@@ -102,8 +116,9 @@ function mapStateToProps(state: State) {
 							throw new Error('Unacceptable condition: readingsData.readings is undefined.');
 						}
 
-						const dataPoints: Array<{x: number, y: number}> = _.values(readingsData.readings).map(
-							(v: [number, number]) => ({ x: v[0], y: v[1]})
+						const dataPoints: Array<{x: number, y: number}> = _.values(readingsData.readings)
+							.map(transformBarReadingToLegacy)
+							.map((v: [number, number]) => ({ x: v[0], y: v[1]})
 						);
 						datasets.push({
 							label,
