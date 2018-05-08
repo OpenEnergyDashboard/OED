@@ -8,7 +8,7 @@ const chai = require('chai');
 
 const expect = chai.expect;
 const mocha = require('mocha');
-const sinon = require("sinon");
+const sinon = require('sinon');
 
 const moment = require('moment');
 
@@ -26,7 +26,7 @@ function mockResponse() {
 	return {
 		sendStatus: sinon.spy(),
 		json: sinon.spy()
-	}
+	};
 }
 
 mocha.describe('Compressed readings routes', () => {

@@ -5,7 +5,9 @@
  */
 
 /**
-This code generates select statements for the compressed readings views.
+ * This code generates select statements for the compressed readings views.
+ * @param intervalPrecision
+ * @return {string}
  */
 function compressedReadingViewSQL(intervalPrecision) {
 	const quotedPrecision = `'${intervalPrecision}'`;
@@ -39,7 +41,8 @@ function compressedReadingViewSQL(intervalPrecision) {
 				${intervalWidth}
 		) gen(interval_start)
 	GROUP BY r.meter_id, gen.interval_start;
-	`
+	`;
 }
 
+/* tslint:disable no-console */
 console.log(compressedReadingViewSQL('minute'));

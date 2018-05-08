@@ -57,7 +57,8 @@ mocha.describe('Compressed Readings 2', () => {
 				new Reading(meter.id, 400, timestamp4, timestamp5)
 			]);
 			await Reading.refreshCompressedReadings();
-			const { meter_id, reading_rate } = await db.one('SELECT * FROM daily_readings WHERE time_interval && tsrange(${start_timestamp}, ${end_timestamp});',
+			const { meter_id, reading_rate } = await db.one(
+				'SELECT * FROM daily_readings WHERE time_interval && tsrange(${start_timestamp}, ${end_timestamp});',
 				{ start_timestamp: timestamp1, end_timestamp: timestamp2 });
 			expect(meter_id).to.equal(meter.id);
 			expect(reading_rate).to.equal((100 + 200 + 300 + 400) / 4);
@@ -66,7 +67,7 @@ mocha.describe('Compressed Readings 2', () => {
 		mocha.it('Compresses when raw data overlaps compressed ranges badly', async () => {
 			const startOfDay = moment('2018-01-01');
 			const halfHourBefore = startOfDay.clone().subtract(30, 'minutes');
-			const halfHourAfter = startOfDay.clone().add(30, "minutes");
+			const halfHourAfter = startOfDay.clone().add(30, 'minutes');
 			await Reading.insertAll([
 				new Reading(meter.id, 100, halfHourBefore, halfHourAfter)
 			]);
@@ -123,7 +124,7 @@ mocha.describe('Compressed Readings 2', () => {
 			for (reading of readingsForMeter) {
 				const duration = moment.duration(reading.end_timestamp.diff(reading.start_timestamp));
 				expect(duration.asMilliseconds()).to.equal(moment.duration(1, 'minute').asMilliseconds());
-				expect(reading.reading_rate).to.be.closeTo(100 / 24, 0.00001)
+				expect(reading.reading_rate).to.be.closeTo(100 / 24, 0.00001);
 			}
 
 			expect(readingsForMeter.length).to.equal(24 * 60); // minutes in a day
@@ -315,7 +316,7 @@ mocha.describe('Compressed Readings 2', () => {
 				{reading: 200, start_timestamp: timestamp2.valueOf(), end_timestamp: timestamp3.valueOf()},
 				{reading: 300, start_timestamp: timestamp3.valueOf(), end_timestamp: timestamp4.valueOf()},
 				{reading: 400, start_timestamp: timestamp4.valueOf(), end_timestamp: timestamp5.valueOf()}
-			])
+			]);
 		});
 
 		mocha.it('Retrieves the correct interval for a single meter and multiple days width', async () => {
@@ -336,13 +337,13 @@ mocha.describe('Compressed Readings 2', () => {
 			expect(readingsForMeterComparable).to.deep.equal([
 				{reading: 300, start_timestamp: timestamp1.valueOf(), end_timestamp: timestamp3.valueOf()},
 				{reading: 700, start_timestamp: timestamp3.valueOf(), end_timestamp: timestamp5.valueOf()}
-			])
+			]);
 		});
 
 		mocha.it('Retrieves the correct barchart readings for multiple meters', async () => {
 			await Reading.insertAll([
 				new Reading(meter.id, 100, timestamp1, timestamp2),
-				new Reading(meter2.id, 1, timestamp1, timestamp2),
+				new Reading(meter2.id, 1, timestamp1, timestamp2)
 			]);
 			await Reading.refreshCompressedReadings();
 			const barReadings = await Reading.getNewCompressedBarchartReadings([meter.id, meter2.id], timestamp1, timestamp2, 1);

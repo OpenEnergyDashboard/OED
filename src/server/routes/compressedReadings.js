@@ -48,7 +48,7 @@ function formatCompressedReadingRow(readingRow) {
 		reading: readingRow.reading_rate,
 		startTimestamp: readingRow.start_timestamp.valueOf(),
 		endTimestamp: readingRow.end_timestamp.valueOf()
-	}
+	};
 }
 
 async function compressedLineReadings(meterIDs, timeInterval) {
@@ -117,7 +117,7 @@ function formatCompressedBarReadingRow(readingRow) {
 		reading: readingRow.reading,
 		startTimestamp: readingRow.start_timestamp.valueOf(),
 		endTimestamp: readingRow.end_timestamp.valueOf()
-	}
+	};
 }
 
 async function compressedMeterBarReadings(meterIDs, barWidthDays, timeInterval) {
@@ -142,7 +142,8 @@ function validateGroupBarReadingsParams(params) {
 }
 
 async function compressedGroupBarReadings(groupIDs, barWidthDays, timeInterval) {
-	const rawReadings = await Reading.getNewCompressedBarchartGroupReadings(groupIDs, timeInterval.startTimestamp, timeInterval.endTimestamp, barWidthDays);
+	const rawReadings = await Reading.getNewCompressedBarchartGroupReadings(
+		groupIDs, timeInterval.startTimestamp, timeInterval.endTimestamp, barWidthDays);
 	return _.mapValues(rawReadings, readingsForMeter => readingsForMeter.map(formatCompressedBarReadingRow));
 }
 

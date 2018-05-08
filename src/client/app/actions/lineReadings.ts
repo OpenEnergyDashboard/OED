@@ -54,7 +54,8 @@ function requestGroupLineReadings(groupIDs: number[], timeInterval: TimeInterval
 }
 
 
-function receiveGroupLineReadings(groupIDs: number[], timeInterval: TimeInterval, readings: CompressedLineReadings): t.ReceiveGroupLineReadingsAction {
+function receiveGroupLineReadings(
+	groupIDs: number[], timeInterval: TimeInterval, readings: CompressedLineReadings): t.ReceiveGroupLineReadingsAction {
 	return { type: ActionType.ReceiveGroupLineReadings, groupIDs, timeInterval, readings };
 }
 
