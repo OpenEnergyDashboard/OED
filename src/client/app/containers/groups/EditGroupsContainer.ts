@@ -8,25 +8,27 @@ import EditGroupsComponent from '../../components/groups/EditGroupsComponent';
 import {
 	submitGroupInEditingIfNeeded,
 	editGroupName,
-	changeDisplayMode,
 	changeChildMeters,
 	changeChildGroups,
-	deleteGroup } from '../../actions/groups';
-import { GroupDefinition, DisplayMode } from '../../types/redux/groups';
+	deleteGroup
+} from '../../actions/groups';
+import { GroupDefinition } from '../../types/redux/groups';
 import { Dispatch } from '../../types/redux/actions';
 import { State } from '../../types/redux/state';
+import {  browserHistory } from 'react-router';
 
-/**
- * @param {State} state
- * @return {{meters: *, groups: *}}
- */
 function mapStateToProps(state: State) {
 	const allMeters = _.sortBy(_.values(state.meters.byMeterID).map(meter => ({ id: meter.id, name: meter.name.trim() })), 'name');
 	let allGroups = _.sortBy(_.values(state.groups.byGroupID).map(group => ({ id: group.id, name: group.name.trim() })), 'name');
 
 	const groupInEditing = state.groups.groupInEditing as GroupDefinition;
-	if (groupInEditing === undefined) {
-		throw new Error('Unacceptable condition: state.groups.groupInEditing has no data.');
+	// If there is no group to edit, then redirect to the view groups page
+	if (groupInEditing === undefined || _.isEmpty(_.difference(Object.keys(groupInEditing), ['dirty']))) {
+		if (groupInEditing === undefined) {
+			throw new Error('Unacceptable condition: state.groups.groupInEditing has no data.');
+		}
+		browserHistory.push('/groups');
+		return;
 	}
 	allGroups = allGroups.filter(group => group.id !== groupInEditing.id);
 
@@ -56,7 +58,6 @@ function mapDispatchToProps(dispatch: Dispatch) {
 		submitGroupInEditingIfNeeded: () => dispatch(submitGroupInEditingIfNeeded()),
 		deleteGroup: () => dispatch(deleteGroup()),
 		editGroupName: (name: string) => dispatch(editGroupName(name)),
-		changeDisplayModeToView: () => dispatch(changeDisplayMode(DisplayMode.View)),
 		changeChildMeters: (meterIDs: number[]) => dispatch(changeChildMeters(meterIDs)),
 		changeChildGroups: (groupIDs: number[]) => dispatch(changeChildGroups(groupIDs))
 	};

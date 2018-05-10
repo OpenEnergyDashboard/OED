@@ -28,7 +28,7 @@ export default class HeaderButtonsComponent extends React.Component<HeaderButton
 		let renderLoginButton = false;
 		let renderHomeButton = true;
 		let renderAdminButton = false;
-		let renderGroupsButton = false;
+		let renderGroupsButton = true;
 		const renderLogoutButton = hasToken();
 
 		switch (getPage()) {
@@ -37,16 +37,13 @@ export default class HeaderButtonsComponent extends React.Component<HeaderButton
 				showOptions = true;
 				if (renderLogoutButton) {
 					renderAdminButton = true;
-					renderGroupsButton = true;
 				} else {
 					renderLoginButton = true;
 				}
 				break;
 			case 'groups':
 				renderAdminButton = true;
-				break;
-			case 'admin':
-				renderGroupsButton = true;
+				renderGroupsButton = false;
 				break;
 			case 'login':
 				break;
@@ -85,10 +82,10 @@ export default class HeaderButtonsComponent extends React.Component<HeaderButton
 					}
 				</div>
 				<div className={this.props.showCollapsedMenuButton ? 'd-none d-lg-block' : ''}>
-					<Link style={loginLinkStyle} to='/login'><Button outline><FormattedMessage id='log.in'/></Button></Link>
-					<Link style={homeLinkStyle} to='/'><Button outline><FormattedMessage id='home'/></Button></Link>
 					<Link style={adminLinkStyle} to='/admin'><Button outline><FormattedMessage id='admin.panel'/></Button></Link>
 					<Link style={groupsLinkStyle} to='/groups'><Button outline><FormattedMessage id='groups' /></Button></Link>
+					<Link style={loginLinkStyle} to='/login'><Button outline><FormattedMessage id='log.in'/></Button></Link>
+					<Link style={homeLinkStyle} to='/'><Button outline><FormattedMessage id='home'/></Button></Link>
 					<Link style={logoutButtonStyle} to='/'><Button outline onClick={this.handleLogOut}><FormattedMessage id='log.out'/></Button></Link>
 				</div>
 			</div>

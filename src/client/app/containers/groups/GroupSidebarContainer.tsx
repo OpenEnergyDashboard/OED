@@ -4,8 +4,7 @@
 
 import * as _ from 'lodash';
 import { connect } from 'react-redux';
-import {changeDisplayedGroups, changeDisplayMode, fetchGroupsDetailsIfNeeded} from '../../actions/groups';
-import { DisplayMode } from '../../types/redux/groups';
+import { changeDisplayedGroups } from '../../actions/groups';
 import GroupSidebarComponent from '../../components/groups/GroupSidebarComponent';
 import { Dispatch } from '../../types/redux/actions';
 import { State } from '../../types/redux/state';
@@ -20,9 +19,7 @@ function mapStateToProps(state: State) {
 
 function mapDispatchToProps(dispatch: Dispatch) {
 	return {
-		selectGroups: (newSelectedGroupIDs: number[]) => dispatch(changeDisplayedGroups(newSelectedGroupIDs)),
-		changeDisplayModeToCreate: () => dispatch(changeDisplayMode(DisplayMode.Create)),
-		fetchGroupsDetailsIfNeeded: () => dispatch(fetchGroupsDetailsIfNeeded())
+		selectGroups: (newSelectedGroupIDs: number[]) => dispatch(changeDisplayedGroups(newSelectedGroupIDs))
 	};
 }
 
