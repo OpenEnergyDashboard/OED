@@ -28,11 +28,11 @@ services:
             - OED_DB_PORT=5432
             - OED_TOKEN_SECRET=?
             - OED_LOG_FILE=log.txt
-            - OED_MAIL_METHOD=none
-            - OED_MAIL_IDENT=user@domain.tld
-            - OED_MAIL_CREDENTIAL=credential
-            - OED_MAIL_FROM=user@domain.tld
-            - OED_MAIL_TO=admin@domain.tld
+            - OED_MAIL_METHOD=gmail
+            - OED_MAIL_IDENT=openenergydashboard@gmail.com
+            - OED_MAIL_CREDENTIAL=beloit2020
+            - OED_MAIL_FROM=openenergydashboard@gmail.com
+            - OED_MAIL_TO=buip@beloit.edu
             - OED_MAIL_ORG=Development
         # Set the correct build environment.
         build: ./
