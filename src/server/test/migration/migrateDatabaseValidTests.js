@@ -50,12 +50,10 @@ mocha.describe('Migration Valid', () => {
 	});
 
 	mocha.it('should find the shortest path to upgrade', async () => {
-		return (async () => {
-			isCalled = [false, false, false, false, false];
-			await migrateAll('0.400.0', migrationList);
-			const afterCalled = [false, false, false, true, false];
-			expect(isCalled).to.deep.equal(afterCalled);
-			expect('0.400.0').to.equal(await Migration.getCurrentVersion());
-		})();
+		isCalled = [false, false, false, false, false];
+		await migrateAll('0.400.0', migrationList);
+		const afterCalled = [false, false, false, true, false];
+		expect(isCalled).to.deep.equal(afterCalled);
+		expect('0.400.0').to.equal(await Migration.getCurrentVersion());
 	});
 });
