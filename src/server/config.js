@@ -30,7 +30,7 @@ config.database = {
 
 // Mail configuration
 let method = process.env.OED_MAIL_METHOD;
-if (method !== null & method !== undefined) {
+if (method !== null && method !== undefined) {
 	method = method.toLocaleLowerCase();
 }
 config.mailer = {
