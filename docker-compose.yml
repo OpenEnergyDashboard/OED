@@ -30,9 +30,9 @@ services:
             - OED_LOG_FILE=log.txt
             - OED_MAIL_METHOD=gmail
             - OED_MAIL_IDENT=openenergydashboard@gmail.com
-            - OED_MAIL_CREDENTIAL=beloit2020
+            - OED_MAIL_CREDENTIAL=credential #Set the email password here
             - OED_MAIL_FROM=openenergydashboard@gmail.com
-            - OED_MAIL_TO=buip@beloit.edu
+            - OED_MAIL_TO=to@email.com #Set the destination address here
             - OED_MAIL_ORG=Development
         # Set the correct build environment.
         build: ./
