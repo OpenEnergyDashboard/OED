@@ -4,7 +4,7 @@
 
 const fs = require('fs');
 const logFile = require('./config').logFile;
-const logMailer = require('./logMailer');
+const addToEmailStack = require('./logMailer');
 
 /**
  * Represents the importance of a message to be logged
@@ -96,7 +96,7 @@ class Logger {
 					messageToMail += `An error was included, but it was not an Error object:\n${error}`;
 				}
 			}
-			logMailer(level.name, messageToMail);
+			addToEmailStack(messageToMail);
 		}
 	}
 

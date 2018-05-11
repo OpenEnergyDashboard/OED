@@ -5,19 +5,46 @@
 const nodemailer = require('nodemailer');
 const mg = require('nodemailer-mailgun-transport');
 const config = require('./config');
+const schedule = require('node-schedule');
 const { log } = require('./log');
+
+let errorMessageStack = [];
+
+/**
+ * Add message to message stack.
+ * @param {String} message
+ */
+function addToEmailStack(message) {
+	errorMessageStack.push(message);
+}
+
+/**
+ * Schedule email to be sent every one hour
+ */
+schedule.scheduleJob('0 * * * *', function() {
+	logMailer();
+});
 
 /**
  * Send an e-mail representing an error message.
- * @param {string} level The level, as a string
- * @param {string} message The string to e-mail
  */
-function logMailer(level, message) {
+function logMailer() {
+
+	// When there is no error, don't send email
+	if (errorMessageStack.length === 0) {
+		return;
+	}
+
+	// Split array then combined into a string message
+	let message = "";
+	for (let i = 0; i < errorMessageStack.length; i++) {
+		message += errorMessageStack[i] + "\n" + "\n" + "\n";
+	}
 
 	let mailOptions = {
 		from: config.mailer.from,
 		to: config.mailer.to,
-		subject: `[OED ${config.mailer.org}] Open Energy Dashboard ${level}`,
+		subject: `[OED ${config.mailer.org}] Open Energy Dashboard ERROR`,
 		text: message
 	};
 
@@ -41,7 +68,7 @@ function logMailer(level, message) {
 		});
 	} else {
 		// tslint:disable-next-line no-console
-		log.error(`Unable to send e-mail due to unknown mailer method ${config.mailer.method}`, true);
+		console.error(`Unable to send e-mail due to unknown mailer method ${config.mailer.method}`, true);
 		return;
 	}
 
@@ -52,8 +79,10 @@ function logMailer(level, message) {
 		} else {
 			// tslint:disable-next-line no-console
 			console.log(`\t[EMAIL SENT]: ${info.response}`);
+			// Clear the error message stack when email is sent
+			errorMessageStack = [];
 		}
 	});
 }
 
-module.exports = logMailer;
+module.exports = addToEmailStack;
