@@ -26,24 +26,24 @@ Killing the running process (ctrl+C) will stop the app. You can get rid of the D
 1. Still in psql, run ```CREATE DATABASE oed_testing;``` to create a database for automated tests.
 1. Create a .env file in the root directory of the project with the following, replacing (?) with the desired information: <br>
 ```
-OED_SERVER_PORT=?              // The port that the server should run on. 3000 is a good default choice
-OED_TOKEN_SECRET=?             // Token for authentication. Generate something secure and random
+OED_SERVER_PORT=?              # The port that the server should run on. 3000 is a good default choice
+OED_TOKEN_SECRET=?             # Token for authentication. Generate something secure and random
 
-OED_DB_USER=?                  // The user that should be used to connect to postgres
-OED_DB_DATABASE=?              // The database you just created, so likely oed
-OED_DB_TEST_DATABASE=?         // The test database you just created, so likely oed_testing
-OED_DB_PASSWORD=?              // The password for your postgres user
-OED_DB_HOST=?                  // The host for your postgres db, likely localhost
-OED_DB_PORT=?                  // The port for your postgres db, likely 5432
+OED_DB_USER=?                  # The user that should be used to connect to postgres
+OED_DB_DATABASE=?              # The database you just created, so likely oed
+OED_DB_TEST_DATABASE=?         # The test database you just created, so likely oed_testing
+OED_DB_PASSWORD=?              # The password for your postgres user
+OED_DB_HOST=?                  # The host for your postgres db, likely localhost
+OED_DB_PORT=?                  # The port for your postgres db, likely 5432
 
-OED_LOG_FILE=?                 // Path to the log file, defaults to ./log.txt
+OED_LOG_FILE=?                 # Path to the log file, defaults to ./log.txt
 
-OED_MAIL_METHOD=none		   // Method of sending mail. Supports "gmail", "mailgun", "none". Case insensitive.
-OED_MAIL_IDENT=user@gmail.com  // Identifier; username for gmail, domain for mailgun.
-OED_MAIL_CREDENTIAL=?		   // Credential; password for gmail, API key for mailgun.
-OED_MAIL_FROM=user@gmail.com   // From address for email
-OED_MAIL_TO=admin@example.com  // Who gets the e-mail
-OED_MAIL_ORG=Development	   // Organization Name
+OED_MAIL_METHOD=none		   # Method of sending mail. Supports "gmail", "mailgun", "none". Case insensitive.
+OED_MAIL_IDENT=user@example.com  # Identifier; username for gmail, domain for mailgun.
+OED_MAIL_CREDENTIAL=?		   # Credential; password for gmail, API key for mailgun.
+OED_MAIL_FROM=user@example.com   # From address for email
+OED_MAIL_TO=admin@example.com  # Who gets the e-mail
+OED_MAIL_ORG=Development	   # Organization Name
 ```
 8. Run ```npm run createdb``` to create the database schema.
 1. Run `npm run addMamacMeters` to load mamac meters from an `.csv` file.

@@ -14,7 +14,7 @@ const log = require('./log').log;
  */
 function logMailer(level, message) {
 
-	var mailOptions = {
+	let mailOptions = {
 		from: config.mailer.from,
 		to: config.mailer.to,
 		subject: `[OED ${config.mailer.org}] Open Energy Dashboard ${level}`,
