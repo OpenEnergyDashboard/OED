@@ -5,7 +5,7 @@
 const nodemailer = require('nodemailer');
 const mg = require('nodemailer-mailgun-transport');
 const config = require('./config');
-const log = require('./log').log;
+const { log } = require('./log');
 
 /**
  * Send an e-mail representing an error message.
@@ -41,7 +41,7 @@ function logMailer(level, message) {
 		});
 	} else {
 		// tslint:disable-next-line no-console
-		console.error(`Unable to send e-mail due to unknown mailer method ${config.mailer.method}`, skipMail = true);
+		log.error(`Unable to send e-mail due to unknown mailer method ${config.mailer.method}`, true);
 		return;
 	}
 
