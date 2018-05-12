@@ -5,7 +5,6 @@
 const nodemailer = require('nodemailer');
 const mg = require('nodemailer-mailgun-transport');
 const config = require('./config');
-const schedule = require('node-schedule');
 const { log } = require('./log');
 
 let errorMessageStack = [];
@@ -17,13 +16,6 @@ let errorMessageStack = [];
 function addToEmailStack(message) {
 	errorMessageStack.push(message);
 }
-
-/**
- * Schedule email to be sent once a day
- */
-schedule.scheduleJob('0 20 * * *', function() {
-	logMailer();
-});
 
 /**
  * Send an e-mail representing an error message.
