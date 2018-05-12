@@ -19,9 +19,9 @@ function addToEmailStack(message) {
 }
 
 /**
- * Schedule email to be sent every one hour
+ * Schedule email to be sent once a day
  */
-schedule.scheduleJob('0 * * * *', function() {
+schedule.scheduleJob('0 20 * * *', function() {
 	logMailer();
 });
 
