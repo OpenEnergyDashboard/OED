@@ -28,9 +28,9 @@ function logMailer() {
 	}
 
 	// Split array then combined into a string message
-	let message = "";
+	let message = '';
 	for (let i = 0; i < errorMessageStack.length; i++) {
-		message += errorMessageStack[i] + "\n" + "\n" + "\n";
+		message += errorMessageStack[i] + '\n' + '\n' + '\n';
 	}
 
 	let mailOptions = {
