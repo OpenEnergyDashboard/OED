@@ -24,7 +24,7 @@ FILES=$(echo "$FILES" | grep -v "src\/client\/favicon\.ico")
 FILES=$(echo "$FILES" | grep -v "src\/server\/test\/db\/data\/.*")
 # Filter out outside scripts
 FILES=$(echo "$FILES" | grep -v "src\/scripts\/oed\.service")
-FILES=$(echo "$FILES" | grep -v "src\/scripts\/updateMamacMetersOEDCron\.bash"
+FILES=$(echo "$FILES" | grep -v "src\/scripts\/updateMamacMetersOEDCron\.bash")
 FILES=$(echo "$FILES" | grep -v "src\/scripts\/sendLogEmailCron\.bash")
 # Filter out JSON translation data
 FILES=$(echo "$FILES" | grep -v "src\/client\/app\/translations\/data.json")
