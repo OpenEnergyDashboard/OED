@@ -4,7 +4,7 @@
 
 const fs = require('fs');
 const logFile = require('./config').logFile;
-const addToEmailStack = require('./logMailer');
+const { addToEmailStack } = require('./logMailer');
 
 /**
  * Represents the importance of a message to be logged
