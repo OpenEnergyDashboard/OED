@@ -20,7 +20,7 @@ function addToEmailStack(message) {
 /**
  * Send an e-mail representing an error message.
  */
-function logMailer() {
+async function logMailer() {
 
 	// When there is no error, don't send email
 	if (errorMessageStack.length === 0) {
@@ -66,15 +66,16 @@ function logMailer() {
 
 	transporter.sendMail(mailOptions, (err, info) => {
 		if (err) {
-			// tslint:disable-next-line no-console
-			console.error(`\t[EMAIL NOT SENT]: ${err.message}`);
+			log.err(`\t[EMAIL NOT SENT]: ${err.message}`, err, true);
 		} else {
-			// tslint:disable-next-line no-console
-			console.log(`\t[EMAIL SENT]: ${info.response}`);
+			log.info(`\t[EMAIL SENT]: ${info.response}`);
 			// Clear the error message stack when email is sent
 			errorMessageStack = [];
 		}
 	});
 }
 
-module.exports = addToEmailStack;
+module.exports = {
+	addToEmailStack,
+	logMailer
+};
