@@ -88,14 +88,6 @@ class Logger {
 		if (level.priority <= this.emailLevel.priority) {
 			let messageToMail = `At ${new Date(Date.now()).toISOString()}, an ${level.name} event occurred.\n`;
 			messageToMail += `${message}\n`;
-			// Add a stacktrace to the message if one was provided
-			if (error !== null) {
-				if (error.stack) {
-					messageToMail += `Stacktrace: \n${error.stack}\n`;
-				} else {
-					messageToMail += `An error was included, but it was not an Error object:\n${error}`;
-				}
-			}
 			addToEmailStack(messageToMail);
 		}
 	}
