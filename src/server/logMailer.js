@@ -58,6 +58,7 @@ function createEmailBody() {
 		} else {
 			message += `<p>${errorMessageStack[i]}</p>`;
 		}
+		message += '<hr>';
 	}
 	return message;
 }

@@ -38,12 +38,12 @@ OED_DB_PORT=?                  # The port for your postgres db, likely 5432
 
 OED_LOG_FILE=?                 # Path to the log file, defaults to ./log.txt
 
-OED_MAIL_METHOD=none		   # Method of sending mail. Supports "gmail", "mailgun", "none". Case insensitive.
-OED_MAIL_IDENT=user@example.com  # Identifier; username for gmail, domain for mailgun.
+OED_MAIL_METHOD=?		   	   # Method of sending mail. Supports "gmail", "mailgun", "none". Case insensitive.
+OED_MAIL_IDENT=?               # Identifier; username for gmail, domain for mailgun. Ex: user@example.com
 OED_MAIL_CREDENTIAL=?		   # Credential; password for gmail, API key for mailgun.
-OED_MAIL_FROM=user@example.com   # From address for email
-OED_MAIL_TO=admin@example.com  # Who gets the e-mail
-OED_MAIL_ORG=Development	   # Organization Name
+OED_MAIL_FROM=?                # From address for email
+OED_MAIL_TO=?                  # Who gets the e-mail. Ex: admin@example.com
+OED_MAIL_ORG=?	               # Organization Name
 ```
 8. Run ```npm run createdb``` to create the database schema.
 1. Run `npm run addMamacMeters` to load mamac meters from an `.csv` file.
@@ -63,6 +63,7 @@ OED_MAIL_ORG=Development	   # Organization Name
 	1. the secret key (in `services -> web -> environment -> OED_TOKEN_SECRET`) to a random value. Keep it secret.
 	1. the port (in `services -> web -> ports`) to a mapping from host to container; e.g., to host on your computer's port 80, set it to `80:3000`.
 1. Copy ```src/scripts/updateMamacMetersOEDCron.bash``` to ```/etc/cron.hourly/updateMamacMetersOEDCron.bash``` and make the necessary modifications to the script. See the script for more detail.
+1. Copy ```src/scripts/sendLogEmailCron.bash``` to ```/etc/cron.daily/sendLogEmailCron.bash``` and make the necessary modifications to the script. See the script for more detail.
 1. Run ```chmod +x updateMamacMetersOEDCron.bash``` to make the script executable.
 1. Copy ```src/scripts/oed.service``` to ```/etc/systemd/system/oed.service``` and make the necessary modifications to the script. See the script for more detail.
 1. Run ```systemctl enable oed.service``` to make the service start on server boot.
