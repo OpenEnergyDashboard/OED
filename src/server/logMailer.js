@@ -38,9 +38,9 @@ function checkIfMessageContainsSpecialError() {
 function createEmailSubject(isImportant) {
 	let subject;
 	if (isImportant) {
-		subject = `[IMPORTANT] [OED ${config.mailer.org}] Open Energy Dashboard ERROR`
+		subject = `[IMPORTANT] [OED ${config.mailer.org}] Open Energy Dashboard ERROR`;
 	} else {
-		subject = `[OED ${config.mailer.org}] Open Energy Dashboard ERROR`
+		subject = `[OED ${config.mailer.org}] Open Energy Dashboard ERROR`;
 	}
 	return subject;
 }
@@ -86,6 +86,7 @@ async function logMailer() {
 	};
 
 	let transporter;
+	// Create transporter based on the service, log error if there is something wrong with the email or credential
 	if (config.mailer.method === 'none') {
 		return;
 	} else if (config.mailer.method === 'mailgun') {
@@ -105,7 +106,7 @@ async function logMailer() {
 		});
 	} else {
 		// tslint:disable-next-line no-console
-		console.error(`Unable to send e-mail due to unknown mailer method ${config.mailer.method}`, true);
+		log.error(`Unable to send e-mail due to unknown mailer method ${config.mailer.method}`, null, true);
 		return;
 	}
 
