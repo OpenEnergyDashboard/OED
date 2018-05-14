@@ -18,6 +18,51 @@ function addToEmailStack(message) {
 }
 
 /**
+ * @returns {boolean} if there is a special error in the message stack
+ */
+function checkIfMessageContainsSpecialError() {
+	let isImportant = false;
+	for (let i = 0; i < errorMessageStack.length; i++) {
+		if (errorMessageStack[i].includes('does not parse to a valid moment object')) {
+			isImportant = true;
+			break;
+		}
+	}
+	return isImportant;
+}
+
+/**
+ * @param isImportant if there is a special error in the message stack
+ * @returns {String} the subject of the email
+ */
+function createEmailSubject(isImportant) {
+	let subject;
+	if (isImportant) {
+		subject = `[IMPORTANT] [OED ${config.mailer.org}] Open Energy Dashboard ERROR`
+	} else {
+		subject = `[OED ${config.mailer.org}] Open Energy Dashboard ERROR`
+	}
+	return subject;
+}
+
+/**
+ * Create the body of the email. Color message red it if it is a special error
+ * @returns {string} the content of the email
+ */
+function createEmailBody() {
+	// Split array then combined into a string message
+	let message = '';
+	for (let i = 0; i < errorMessageStack.length; i++) {
+		if (errorMessageStack[i].includes('does not parse to a valid moment object')) {
+			message += `<p style='color:red;'>${errorMessageStack[i]}</p>`;
+		} else {
+			message += `<p>${errorMessageStack[i]}</p>`;
+		}
+	}
+	return message;
+}
+
+/**
  * Send an e-mail representing an error message.
  */
 async function logMailer() {
@@ -27,17 +72,17 @@ async function logMailer() {
 		return;
 	}
 
-	// Split array then combined into a string message
-	let message = '';
-	for (let i = 0; i < errorMessageStack.length; i++) {
-		message += errorMessageStack[i] + '\n' + '\n' + '\n';
-	}
+	const isImportant = checkIfMessageContainsSpecialError();
+
+	const emailSubject = createEmailSubject(isImportant);
+
+	const emailBody = createEmailBody();
 
 	let mailOptions = {
 		from: config.mailer.from,
 		to: config.mailer.to,
-		subject: `[OED ${config.mailer.org}] Open Energy Dashboard ERROR`,
-		text: message
+		subject: emailSubject,
+		text: emailBody
 	};
 
 	let transporter;
