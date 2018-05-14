@@ -106,7 +106,6 @@ async function logMailer() {
 			}
 		});
 	} else {
-		// tslint:disable-next-line no-console
 		log.error(`Unable to send e-mail due to unknown mailer method ${config.mailer.method}`, null, true);
 		return;
 	}
