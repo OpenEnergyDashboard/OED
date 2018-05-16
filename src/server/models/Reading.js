@@ -1,11 +1,14 @@
 /* This Source Code Form is subject to the terms of the Mozilla Public
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
+
 const database = require('./database');
 const { mapToObject } = require('../util');
 
 const db = database.db;
 const sqlFile = database.sqlFile;
+
+const moment = require('moment');
 
 class Reading {
 	/**
@@ -61,6 +64,14 @@ class Reading {
 	 */
 	static createCompressedReadingsMaterializedViews(conn = db) {
 		return conn.none(sqlFile('reading/create_compressed_reading_views.sql'));
+	}
+
+	/**
+	 * Returns a promise to create the compare function
+	 */
+
+	static createCompareFunction(conn = db) {
+		return conn.none(sqlFile('reading/calculate_compare.sql'));
 	}
 
 	/**
@@ -337,6 +348,29 @@ class Reading {
 		return barReadingsByGroupID;
 	}
 
+	/**
+	 *
+	 * @param meterIDs
+	 * @param {Moment} currStartTimestamp
+	 * @param {Moment} currEndTimestamp
+	 * @param {Duration} compareDuration
+	 * @param conn the connection to use. Defaults to the default database connection
+	 * @return {Promise<void>}
+	 */
+	static async getCompareReadings(meterIDs, currStartTimestamp, currEndTimestamp, compareDuration, conn = db) {
+		const allCompareReadings = await conn.func(
+			'compare_readings',
+			[meterIDs, currStartTimestamp, currEndTimestamp, compareDuration.toISOString()]);
+		const compareReadingsByMeterID = mapToObject(meterIDs, () => []);
+		for (const row of allCompareReadings) {
+			compareReadingsByMeterID[row.meter_id] = {
+				currentUse: row.current_use,
+				prevUseTotal: row.prev_use_total,
+				prevUseForCurrent: row.prev_use_for_current
+			};
+		}
+		return compareReadingsByMeterID;
+	}
 
 	toString() {
 		return `Reading [id: ${this.meterID}, reading: ${this.reading}, startTimestamp: ${this.startTimestamp}, endTimestamp: ${this.endTimestamp}]`;

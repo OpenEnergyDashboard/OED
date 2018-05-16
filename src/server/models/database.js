@@ -70,6 +70,7 @@ async function createSchema() {
 	await Migration.createTable();
 	await db.none(sqlFile('reading/create_function_get_compressed_readings.sql'));
 	await Reading.createCompressedReadingsMaterializedViews();
+	await Reading.createCompareFunction();
 }
 
 /**
