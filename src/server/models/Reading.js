@@ -361,7 +361,7 @@ class Reading {
 		const allCompareReadings = await conn.func(
 			'compare_readings',
 			[meterIDs, currStartTimestamp, currEndTimestamp, compareDuration.toISOString()]);
-		const compareReadingsByMeterID = mapToObject(meterIDs, () => []);
+		const compareReadingsByMeterID = {};
 		for (const row of allCompareReadings) {
 			compareReadingsByMeterID[row.meter_id] = {
 				currentUse: row.current_use,
@@ -370,6 +370,21 @@ class Reading {
 			};
 		}
 		return compareReadingsByMeterID;
+	}
+
+	static async getGroupCompareReadings(groupIDs, currStartTimestamp, currEndTimestamp, compareDuration, conn = db) {
+		const allCompareReadings = await conn.func(
+			'group_compare_readings',
+			[groupIDs, currStartTimestamp, currEndTimestamp, compareDuration.toISOString()]);
+		const compareReadingsByGroupID = {};
+		for (const row of allCompareReadings) {
+			compareReadingsByGroupID[row.group_id] = {
+				currentUse: row.current_use,
+				prevUseTotal: row.prev_use_total,
+				prevUseForCurrent: row.prev_use_for_current
+			};
+		}
+		return compareReadingsByGroupID;
 	}
 
 	toString() {

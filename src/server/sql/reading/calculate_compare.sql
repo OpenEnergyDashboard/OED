@@ -74,3 +74,33 @@ BEGIN
 		LEFT JOIN current_period ON m.id = current_period.meter_id;
 END;
 $$ LANGUAGE 'plpgsql';
+
+
+CREATE FUNCTION group_compare_readings(
+	group_ids INTEGER[],
+	current_period_start TIMESTAMP,
+	current_period_end TIMESTAMP,
+	period_duration INTERVAL
+)
+	RETURNS TABLE(group_id INTEGER, current_use REAL, prev_use_total REAL, prev_use_for_current REAL)
+AS $$
+DECLARE
+	meter_ids INTEGER[];
+BEGIN
+	SELECT array_agg(DISTINCT meter_id) INTO meter_ids
+	FROM unnest(group_ids) gids(id)
+	INNER JOIN groups_deep_meters gdm ON gdm.group_id = gids.id;
+
+	RETURN QUERY
+	SELECT
+		gids.id AS group_id,
+		SUM(cr.current_use) AS current_use,
+		SUM(cr.prev_use_total) AS prev_use_total,
+		SUM(cr.prev_use_for_current) AS prev_use_for_current
+	FROM unnest(group_ids) gids(id)
+	INNER JOIN groups_deep_meters gdm ON gdm.group_id = gids.id
+	INNER JOIN compare_readings(meter_ids, current_period_start, current_period_end, period_duration) cr
+			ON cr.meter_id = gdm.meter_id
+	GROUP by gids.id;
+END;
+$$ LANGUAGE 'plpgsql'
