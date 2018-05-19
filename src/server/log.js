@@ -4,6 +4,7 @@
 
 const fs = require('fs');
 const logFile = require('./config').logFile;
+const { addToEmailStack } = require('./logMailer');
 
 /**
  * Represents the importance of a message to be logged
@@ -31,6 +32,7 @@ class Logger {
 
 	constructor(logFilePath) {
 		this.level = LogLevel.INFO;
+		this.emailLevel = LogLevel.ERROR;
 		this.logToFile = true;
 		this.logToConsole = true;
 		this.logFile = logFilePath;
@@ -43,43 +45,50 @@ class Logger {
 	 * @param {LogLevel} level the level to log at
 	 * @param {String} message the message to log
 	 * @param {Error?} error An optional error object to provide a stacktrace
+	 * @param {boolean?} skipMail Don't e-mail this message even if we would normally emit an e-mail for this level.
 	 */
-	log(level, message, error = null) {
+	log(level, message, error = null, skipMail = false) {
 		// Only log if given a high enough priority level.
-		if (level.priority > this.level.priority) {
-			return;
-		}
-		let messageToLog = `[${level.name}@${new Date(Date.now()).toISOString()}] ${message}\n`;
+		if (level.priority <= this.level.priority && !skipMail) {
+			let messageToLog = `[${level.name}@${new Date(Date.now()).toISOString()}] ${message}\n`;
 
-		// Add a stacktrace to the message if one was provided
-		if (error !== null) {
-			if (error.stack) {
-				messageToLog += `Stacktrace: \n${error.stack}\n`;
-			} else {
-				// It's possible someone passed in an error that isn't actually an Error object
-				// because javascript lets you throw anything. In that case, the error won't have
-				// a stack.
+			// Add a stacktrace to the message if one was provided
+			if (error !== null) {
+				if (error.stack) {
+					messageToLog += `Stacktrace: \n${error.stack}\n`;
+				} else {
+					// It's possible someone passed in an error that isn't actually an Error object
+					// because javascript lets you throw anything. In that case, the error won't have
+					// a stack.
 
-				// So we just try to convert whatever we got to a string and include it. It's better
-				// than nothing.
-				messageToLog += `An error was included, but it was not an Error object:\n${error}`;
-			}
-		}
-		if (this.logToConsole) {
-			if (level.priority >= LogLevel.WARN.priority) {
-				// tslint:disable-next-line no-console
-				console.error(messageToLog);
-			} else {
-				// tslint:disable-next-line no-console
-				console.log(messageToLog);
-			}
-		}
-		if (this.logToFile) {
-			fs.appendFile(logFile, messageToLog, err => {
-				if (err) {
-					console.error(`Failed to write to log file: ${err}`); // tslint:disable-line no-console
+					// So we just try to convert whatever we got to a string and include it. It's better
+					// than nothing.
+					messageToLog += `An error was included, but it was not an Error object:\n${error}`;
 				}
-			});
+			}
+			if (this.logToConsole) {
+				if (level.priority >= LogLevel.WARN.priority) {
+					// tslint:disable-next-line no-console
+					console.error(messageToLog);
+				} else {
+					// tslint:disable-next-line no-console
+					console.log(messageToLog);
+				}
+			}
+			if (this.logToFile) {
+				fs.appendFile(logFile, messageToLog, err => {
+					if (err) {
+						console.error(`Failed to write to log file: ${err}`); // tslint:disable-line no-console
+					}
+				});
+			}
+		}
+
+		// Only send an e-mail if given a high enough priority level.
+		if (level.priority <= this.emailLevel.priority) {
+			let messageToMail = `At ${new Date(Date.now()).toISOString()}, an ${level.name} event occurred.\n`;
+			messageToMail += `${message}\n`;
+			addToEmailStack(messageToMail);
 		}
 	}
 
@@ -87,36 +96,40 @@ class Logger {
 	 * Log the given message at the DEBUG level
 	 * @param {String} message the message to log
 	 * @param {Error?} error An optional error object to include information about
+	 * @param {boolean?} skipMail Don't e-mail this message even if we would normally emit an e-mail for this level.
 	 */
-	debug(message, error = null) {
-		this.log(LogLevel.DEBUG, message, error);
+	debug(message, error = null, skipMail = false) {
+		this.log(LogLevel.DEBUG, message, error, skipMail);
 	}
 
 	/**
 	 * Log the given message at the INFO level
 	 * @param {String} message the message to log
 	 * @param {Error?} error An optional error object to include information about
+	 * @param {boolean?} skipMail Don't e-mail this message even if we would normally emit an e-mail for this level.
 	 */
-	info(message, error = null) {
-		this.log(LogLevel.INFO, message, error);
+	info(message, error = null, skipMail = false) {
+		this.log(LogLevel.INFO, message, error, skipMail);
 	}
 
 	/**
 	 * Log the given message at the WARN level
 	 * @param {String} message the message to log
 	 * @param {Error?} error An optional error object to include information about
+	 * @param {boolean?} skipMail Don't e-mail this message even if we would normally emit an e-mail for this level.
 	 */
-	warn(message, error = null) {
-		this.log(LogLevel.WARN, message, error);
+	warn(message, error = null, skipMail = false) {
+		this.log(LogLevel.WARN, message, error, skipMail);
 	}
 
 	/**
 	 * Log the given message at the ERROR level
 	 * @param {String} message the message to log
 	 * @param {Error?} error An optional error object to include information about
+	 * @param {boolean?} skipMail Don't e-mail this message even if we would normally emit an e-mail for this level.
 	 */
-	error(message, error) {
-		this.log(LogLevel.ERROR, message, error);
+	error(message, error = null, skipMail = false) {
+		this.log(LogLevel.ERROR, message, error, skipMail);
 	}
 
 }

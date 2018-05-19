@@ -28,6 +28,12 @@ services:
             - OED_DB_PORT=5432
             - OED_TOKEN_SECRET=?
             - OED_LOG_FILE=log.txt
+            - OED_MAIL_METHOD=none # Method of sending mail. Supports "gmail", "mailgun", "none". Case insensitive.
+            - OED_MAIL_IDENT=mydomain@example.com
+            - OED_MAIL_CREDENTIAL=credential # Set the email password here
+            - OED_MAIL_FROM=mydomain@example.com
+            - OED_MAIL_TO=mydomain@example.com # Set the destination address here
+            - OED_MAIL_ORG=My Organization Name
         # Set the correct build environment.
         build: ./
         # Link to the database so the app can persist data
