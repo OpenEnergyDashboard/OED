@@ -14,7 +14,6 @@ function parseTimestamp(raw) {
 	raw = raw.trim();
 	const timestampRegExp = /^\d{2}:\d{2}:\d{2} \d{1,2}\/\d{1,2}\/\d{1,2}$/;
 	if (!timestampRegExp.test(raw)) {
-		//TODO: Hightlight this error
 		throw new Error(`Raw timestamp ${raw} does not pass regex validation`);
 	}
 	const ts = moment(raw, 'HH:mm:ss MM/DD/YY');
