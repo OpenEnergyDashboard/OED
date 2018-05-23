@@ -83,7 +83,7 @@ async function logMailer() {
 		from: config.mailer.from,
 		to: config.mailer.to,
 		subject: emailSubject,
-		text: emailBody
+		html: emailBody
 	};
 
 	let transporter;
@@ -112,11 +112,11 @@ async function logMailer() {
 
 	transporter.sendMail(mailOptions, (err, info) => {
 		if (err) {
-			log.err(`\t[EMAIL NOT SENT]: ${err.message}`, err, true);
+			log.error(`\t[EMAIL NOT SENT]: ${err.message}`, err, true);
 		} else {
+			errorMessageStack = [];
 			log.info(`\t[EMAIL SENT]: ${info.response}`);
 			// Clear the error message stack when email is sent
-			errorMessageStack = [];
 		}
 	});
 }
