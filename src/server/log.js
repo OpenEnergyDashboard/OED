@@ -93,7 +93,7 @@ class Logger {
 				try {
 					await logEmail.insert();
 				} catch (err) {
-					log.error(`Error while inserting log mail ${err}`); // tslint:disable-line no-console
+					console.error(`Error while inserting log mail ${err}`); // tslint:disable-line no-console
 				}
 			})();
 		}
