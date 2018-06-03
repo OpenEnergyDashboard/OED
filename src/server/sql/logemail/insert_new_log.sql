@@ -2,6 +2,6 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
 
-INSERT INTO migrations (from_version, to_version, update_timestamp)
-VALUES (${fromVersion}, ${toVersion}, NOW())
+INSERT INTO logemail (error_message)
+VALUES (${errorMessage})
 RETURNING id;

@@ -17,6 +17,10 @@ function addToEmailStack(message) {
 	errorMessageStack.push(message);
 }
 
+function getEmailStack() {
+	return errorMessageStack;
+}
+
 /**
  * @returns {boolean} if there is a special error in the message stack
  */
@@ -67,6 +71,8 @@ function createEmailBody() {
  * Send an e-mail representing an error message.
  */
 async function logMailer() {
+
+	console.log('Size is', getEmailStack().length);
 
 	// When there is no error, don't send email
 	if (errorMessageStack.length === 0) {
