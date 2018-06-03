@@ -3,15 +3,18 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
 
 const database = require('../../models/database');
-
+const { log } = require('../../log');
 const sqlFile = database.sqlFile;
 
 module.exports = {
 	fromVersion: '0.3.0',
 	toVersion: '0.4.0',
 	up: async db => {
-		// migration here
-		await db.none(sqlFile('preferences/create_language_types_enum.sql'));
-		await db.none(sqlFile('preferences/add_language_column.sql'));
+		try {
+			// await db.none(sqlFile('../migrations/0.3.0-0.4.0/sql/preferences/create_language_types_enum.sql'));
+			await db.none(sqlFile('../migrations/0.3.0-0.4.0/sql/preferences/add_lansguage_column.sql'));
+		} catch (err) {
+			throw new Error('Cannot migrate');
+		}
 	}
 };
