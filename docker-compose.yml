@@ -28,8 +28,7 @@ services:
             - OED_DB_PORT=5432
             - OED_TOKEN_SECRET=?
             - OED_LOG_FILE=log.txt
-            - OED_MAIL_METHOD=gmail # Method of sending mail. Supports "gmail", "mailgun", "none". Case insensitive.
-			- OED_MAIL_METHOD=none # Method of sending mail. Supports "gmail", "mailgun", "none". Case insensitive.
+            - OED_MAIL_METHOD=none # Method of sending mail. Supports "gmail", "mailgun", "none". Case insensitive.
             - OED_MAIL_IDENT=mydomain@example.com
             - OED_MAIL_CREDENTIAL=credential # Set the email password here
             - OED_MAIL_FROM=mydomain@example.com
