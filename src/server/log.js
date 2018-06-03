@@ -89,7 +89,7 @@ class Logger {
 			let messageToMail = `At ${new Date(Date.now()).toISOString()}, an ${level.name} event occurred.\n`;
 			messageToMail += `${message}\n`;
 			const logEmail = new LogEmail(undefined, messageToMail);
-			( async() => {
+			(async () => {
 				try {
 					await logEmail.insert();
 				} catch (err) {
