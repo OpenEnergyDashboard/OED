@@ -47,7 +47,7 @@ class Logger {
 	 * @param {Error?} error An optional error object to provide a stacktrace
 	 * @param {boolean?} skipMail Don't e-mail this message even if we would normally emit an e-mail for this level.
 	 */
-	 log(level, message, error = null, skipMail = false) {
+	log(level, message, error = null, skipMail = false) {
 		// Only log if given a high enough priority level.
 		if (level.priority <= this.level.priority && !skipMail) {
 			let messageToLog = `[${level.name}@${new Date(Date.now()).toISOString()}] ${message}\n`;
@@ -89,7 +89,7 @@ class Logger {
 			let messageToMail = `At ${new Date(Date.now()).toISOString()}, an ${level.name} event occurred.\n`;
 			messageToMail += `${message}\n`;
 			const logEmail = new LogEmail(undefined, messageToMail);
-			(async() => {
+			( async() => {
 				try {
 					await logEmail.insert();
 				} catch (err) {
