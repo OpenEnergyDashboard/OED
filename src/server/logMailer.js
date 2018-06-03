@@ -6,25 +6,13 @@ const nodemailer = require('nodemailer');
 const mg = require('nodemailer-mailgun-transport');
 const config = require('./config');
 const { log } = require('./log');
+const LogEmail = require('./models/LogEmail');
 
-let errorMessageStack = [];
-
-/**
- * Add message to message stack.
- * @param {String} message
- */
-function addToEmailStack(message) {
-	errorMessageStack.push(message);
-}
-
-function getEmailStack() {
-	return errorMessageStack;
-}
 
 /**
  * @returns {boolean} if there is a special error in the message stack
  */
-function checkIfMessageContainsSpecialError() {
+function checkIfMessageContainsSpecialError(errorMessageStack) {
 	let isImportant = false;
 	for (let i = 0; i < errorMessageStack.length; i++) {
 		if (errorMessageStack[i].includes('does not parse to a valid moment object')) {
@@ -53,7 +41,7 @@ function createEmailSubject(isImportant) {
  * Create the body of the email. Color message red it if it is a special error
  * @returns {string} the content of the email
  */
-function createEmailBody() {
+function createEmailBody(errorMessageStack) {
 	// Split array then combined into a string message
 	let message = '';
 	for (let i = 0; i < errorMessageStack.length; i++) {
@@ -72,18 +60,19 @@ function createEmailBody() {
  */
 async function logMailer() {
 
-	console.log('Size is', getEmailStack().length);
+	let allEmails = await LogEmail.getAll();
+	allEmails = allEmails.map(e => e.errorMessage);
 
 	// When there is no error, don't send email
-	if (errorMessageStack.length === 0) {
+	if (allEmails.length === 0) {
 		return;
 	}
 
-	const isImportant = checkIfMessageContainsSpecialError();
+	const isImportant = checkIfMessageContainsSpecialError(allEmails);
 
 	const emailSubject = createEmailSubject(isImportant);
 
-	const emailBody = createEmailBody();
+	const emailBody = createEmailBody(allEmails);
 
 	let mailOptions = {
 		from: config.mailer.from,
@@ -116,18 +105,17 @@ async function logMailer() {
 		return;
 	}
 
-	transporter.sendMail(mailOptions, (err, info) => {
+	transporter.sendMail(mailOptions, async (err, inform) => {
 		if (err) {
 			log.error(`\t[EMAIL NOT SENT]: ${err.message}`, err, true);
 		} else {
-			errorMessageStack = [];
-			log.info(`\t[EMAIL SENT]: ${info.response}`);
+			await LogEmail.delete();
+			log.info(`\t[EMAIL SENT]: ${inform.response}`);
 			// Clear the error message stack when email is sent
 		}
 	});
 }
 
 module.exports = {
-	addToEmailStack,
 	logMailer
 };

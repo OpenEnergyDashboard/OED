@@ -4,7 +4,7 @@
 
 const fs = require('fs');
 const logFile = require('./config').logFile;
-const { addToEmailStack } = require('./logMailer');
+const LogEmail = require('./models/LogEmail');
 
 /**
  * Represents the importance of a message to be logged
@@ -47,7 +47,7 @@ class Logger {
 	 * @param {Error?} error An optional error object to provide a stacktrace
 	 * @param {boolean?} skipMail Don't e-mail this message even if we would normally emit an e-mail for this level.
 	 */
-	log(level, message, error = null, skipMail = false) {
+	 log(level, message, error = null, skipMail = false) {
 		// Only log if given a high enough priority level.
 		if (level.priority <= this.level.priority && !skipMail) {
 			let messageToLog = `[${level.name}@${new Date(Date.now()).toISOString()}] ${message}\n`;
@@ -88,7 +88,14 @@ class Logger {
 		if (level.priority <= this.emailLevel.priority) {
 			let messageToMail = `At ${new Date(Date.now()).toISOString()}, an ${level.name} event occurred.\n`;
 			messageToMail += `${message}\n`;
-			addToEmailStack(messageToMail);
+			const logEmail = new LogEmail(undefined, messageToMail);
+			(async() => {
+				try {
+					await logEmail.insert();
+				} catch (err) {
+					log.error(`Error while inserting log mail ${err}`); // tslint:disable-line no-console
+				}
+			})();
 		}
 	}
 

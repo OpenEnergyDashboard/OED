@@ -28,10 +28,9 @@ class LogEmail {
 
 	/**
 	 * Returns a promise to insert this log email into the database
-	 * @param conn the connection to use. Defaults to the default database connection.
 	 * @returns {Promise.<>}
 	 */
-	async insert(conn = db) {
+	async insert() {
 		const logEmail = this;
 		if (logEmail.id !== undefined) {
 			throw new Error('Attempt to insert a log email that already has an ID');
@@ -42,11 +41,10 @@ class LogEmail {
 
 	/**
 	 * Returns a promise to delete all logs email
-	 * @param conn The connection to be used. Defaults to (*GASP!*) the default database connection
 	 * @return {Promise.<void>}
 	 */
-	static async delete(conn = db) {
-		await conn.none(sqlFile('group/delete_all_logs.sql'));
+	static async delete() {
+		await db.none(sqlFile('logemail/delete_all_logs.sql'));
 	}
 
 
