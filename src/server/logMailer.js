@@ -61,12 +61,13 @@ function createEmailBody(errorMessageStack) {
 async function logMailer() {
 
 	let allEmails = await LogEmail.getAll();
-	allEmails = allEmails.map(e => e.errorMessage);
 
 	// When there is no error, don't send email
-	if (allEmails.length === 0) {
+	if (!allEmails) {
 		return;
 	}
+
+	allEmails = allEmails.map(e => e.errorMessage);
 
 	const isImportant = checkIfMessageContainsSpecialError(allEmails);
 

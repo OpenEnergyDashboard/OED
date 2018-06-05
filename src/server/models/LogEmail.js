@@ -56,8 +56,6 @@ class LogEmail {
 		const rows = await db.any(sqlFile('logemail/get_all_logs.sql'));
 		if (rows.length > 0) {
 			return rows.map(row => new LogEmail(row.id, row.error_message));
-		} else {
-			throw new Error('There is no item in log email table or table does not exists');
 		}
 	}
 }
