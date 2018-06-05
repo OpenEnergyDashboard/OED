@@ -44,8 +44,10 @@ function createEmailSubject(isImportant) {
 function createEmailBody(errorMessageStack) {
 	// Split array then combined into a string message
 	let message = '';
+	const specialError1 = 'does not parse to a valid moment object';
+	const specialError2 = 'Raw timestamp';
 	for (let i = 0; i < errorMessageStack.length; i++) {
-		if (errorMessageStack[i].includes('does not parse to a valid moment object')) {
+		if (errorMessageStack[i].includes(specialError1) || errorMessageStack[i].includes(specialError2)) {
 			message += `<p style='color:red;'>${errorMessageStack[i]}</p>`;
 		} else {
 			message += `<p>${errorMessageStack[i]}</p>`;
@@ -110,9 +112,9 @@ async function logMailer() {
 		if (err) {
 			log.error(`\t[EMAIL NOT SENT]: ${err.message}`, err, true);
 		} else {
+			// Clear the database when email is sent
 			await LogEmail.delete();
 			log.info(`\t[EMAIL SENT]: ${inform.response}`);
-			// Clear the error message stack when email is sent
 		}
 	});
 }
