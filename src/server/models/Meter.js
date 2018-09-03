@@ -52,6 +52,16 @@ class Meter {
 		return Meter.mapRow(row);
 	}
 
+	/**
+	 * Check if a meter with the same name is already in the database.
+	 * @param conn the connection to use. Defaults to the default database connection.
+	 * @returns {boolean}
+	 */
+	async existsByName(conn = db) {
+		const row = await conn.oneOrNone(sqlFile('meter/get_meter_by_name.sql'), { name: this.name });
+		return row !== null;
+	}
+
 	static mapRow(row) {
 		return new Meter(row.id, row.name, row.ipaddress, row.enabled, row.meter_type);
 	}
