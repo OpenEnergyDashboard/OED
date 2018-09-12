@@ -28,7 +28,7 @@ interface CompareChartContainerProps {
 	entity: CompareEntity;
 }
 
-function mapStateToProps(state: State, ownProps: CompareChartContainerProps) {
+function mapStateToProps(state: State, ownProps: CompareChartContainerProps): LinearComponentProps {
 	const comparePeriod = state.graph.comparePeriod;
 	const datasets: ChartDataSetsWithDatalabels[] = [];
 	const labels: string[] = [];
