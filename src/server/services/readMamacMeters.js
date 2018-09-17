@@ -50,7 +50,7 @@ async function getMeterInfo(url, ip) {
 		.then(raw => parseXMLPromisified(raw))
 		.then(xml => {
 			const name = xml.Maverick.NodeID[0];
-			return new Meter(undefined, name, ip, true, Meter.type.MAMAC);
+			return new Meter(undefined, name, ip, true, true, Meter.type.MAMAC);
 		});
 }
 
@@ -71,12 +71,12 @@ function infoForAllMeters(rows) {
 async function insertMeters(rows) {
 	const errors = [];
 	await Promise.all(infoForAllMeters(rows).map(
-			promise => promise
+			async promise => promise
 			.then(async meter => {
 				if (await meter.existsByName()) {
 					log.info(`Skipping existing meter ${meter.name}`);
 				} else {
-					meter.insert();
+					await meter.insert();
 				}
 			})
 			.catch(error => errors.push(error))

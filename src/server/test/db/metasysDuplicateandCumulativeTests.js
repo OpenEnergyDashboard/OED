@@ -20,7 +20,7 @@ const mocha = require('mocha');
 mocha.describe('Insert Metasys readings from a file', () => {
 	mocha.beforeEach(recreateDB);
 	mocha.beforeEach(async () => {
-		await new Meter(undefined, 'metasys-duplicate', null, false, Meter.type.METASYS).insert();
+		await new Meter(undefined, 'metasys-duplicate', null, false, true, Meter.type.METASYS).insert();
 	//	meter = await Meter.getByName('metasys-duplicate');
 	});
 

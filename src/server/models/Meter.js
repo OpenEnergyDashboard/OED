@@ -14,13 +14,15 @@ class Meter {
 	 * @param name This meter's name
 	 * @param ipAddress This meter's IP Address
 	 * @param enabled This meter is being actively read from
+	 * @param displayable This meters is available to users for charting
 	 * @param type What kind of meter this is
 	 */
-	constructor(id, name, ipAddress, enabled, type) {
+	constructor(id, name, ipAddress, enabled, displayable, type) {
 		this.id = id;
 		this.name = name;
 		this.ipAddress = ipAddress;
 		this.enabled = enabled;
+		this.displayable = displayable;
 		this.type = type;
 	}
 
@@ -63,7 +65,7 @@ class Meter {
 	}
 
 	static mapRow(row) {
-		return new Meter(row.id, row.name, row.ipaddress, row.enabled, row.meter_type);
+		return new Meter(row.id, row.name, row.ipaddress, row.enabled, row.displayable, row.meter_type);
 	}
 
 	/**
@@ -84,6 +86,26 @@ class Meter {
 	 */
 	static async getAll(conn = getDB) {
 		const rows = await conn().any(sqlFile('meter/get_all_meters.sql'));
+		return rows.map(Meter.mapRow);
+	}
+
+	/**
+	 * Returns a promise to get all of the displayable meters from the database
+	 * @param conn the connection to use. Defaults to the default database connection.
+	 * @returns {Promise.<array.<Meter>>}
+	 */
+	static async getDisplayable(conn = getDB) {
+		const rows = await conn().any(sqlFile('meter/get_displayable_meters.sql'));
+		return rows.map(Meter.mapRow);
+	}
+
+	/**
+	 * Returns a promise to get all of the updatable meters from the database
+	 * @param conn the connection to use. Defaults to the default database connection.
+	 * @returns {Promise.<array.<Meter>>}
+	 */
+	static async getEnabled(conn = getDB) {
+		const rows = await conn().any(sqlFile('meter/get_enabled_meters.sql'));
 		return rows.map(Meter.mapRow);
 	}
 

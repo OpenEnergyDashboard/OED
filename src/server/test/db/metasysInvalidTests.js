@@ -21,7 +21,7 @@ const mocha = require('mocha');
 mocha.describe('Insert Metasys readings from a file', () => {
 	mocha.beforeEach(recreateDB);
 	mocha.beforeEach(async () => {
-		await new Meter(undefined, 'metasys-invalid', null, false, Meter.type.METASYS).insert();
+		await new Meter(undefined, 'metasys-invalid', null, false, true, Meter.type.METASYS).insert();
 	});
 
 	mocha.it('errors correctly on an invalid file', () => {

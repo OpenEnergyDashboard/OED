@@ -23,7 +23,7 @@ mocha.describe('Insert Mamac readings from a file', () => {
 	mocha.beforeEach(recreateDB);
 	let meter;
 	mocha.beforeEach(async () => {
-		await new Meter(undefined, 'Meter', null, false, Meter.type.MAMAC).insert();
+		await new Meter(undefined, 'Meter', null, false, true, Meter.type.MAMAC).insert();
 		meter = await Meter.getByName('Meter');
 	});
 

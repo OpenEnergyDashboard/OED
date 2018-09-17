@@ -20,10 +20,10 @@ const sinon = require('sinon');
 mocha.describe('Meter Update', () => {
 	mocha.beforeEach(recreateDB);
 	mocha.it('can persist over a failed request', async () => {
-		const goodMeter = new Meter(undefined, 'GOOD', 1, true, Meter.type.MAMAC);
+		const goodMeter = new Meter(undefined, 'GOOD', 1, true, true, Meter.type.MAMAC);
 		await goodMeter.insert();
 
-		const badMeter = new Meter(undefined, 'BAD', 2, true, Meter.type.MAMAC);
+		const badMeter = new Meter(undefined, 'BAD', 2, true, true, Meter.type.MAMAC);
 		await badMeter.insert();
 
 		const metersToUpdate = [goodMeter, badMeter];
