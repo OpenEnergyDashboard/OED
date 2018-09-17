@@ -16,16 +16,23 @@ config.database = {
 	port: process.env.OED_DB_TEST_PORT || process.env.OED_DB_PORT
 };
 
+const { getDB, currentDB, createSchema } = require('../../models/database');
+
 // Disable logging during tests.
 // TODO: Move logging disabling to a better place.
 log.level = LogLevel.SILENT;
 
-const { db, createSchema } = require('../../models/database');
-
 async function recreateDB() {
+	// Just transfer connection if needed.
+	getDB();
+	if (currentDB() === process.env.OED_DB_DATABASE) {
+		// tslint:disable-next-line no-console
+		console.error(`Refusing to destroy production database ${currentDB()} for tests; should be using ${config.database.database}.`)
+		process.exit(255);
+	}
 	// This should drop all database objects, as long as they were all created by the current database user
 	// They should be, since they were all created during a previous test.
-	await db.none('DROP OWNED BY current_user;');
+	await getDB().none('DROP OWNED BY current_user;');
 	await createSchema();
 }
 

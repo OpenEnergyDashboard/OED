@@ -10,7 +10,7 @@ const expect = chai.expect;
 const mocha = require('mocha');
 
 const recreateDB = require('../db/common').recreateDB;
-const db = require('../../models/database').db;
+const getDB = require('../../models/database').getDB;
 
 const Migration = require('../../models/Migration');
 const { migrateAll } = require('../../migrations/migrateDatabase');
@@ -39,7 +39,11 @@ for (let i = 0; i < versionLists.length; i++) {
 mocha.describe('Migration Valid', () => {
 	mocha.beforeEach(recreateDB);
 	mocha.beforeEach(async () => {
-		await new Migration(undefined, '0.0.0', '0.100.0').insert(db);
+		// Normally, recreateDB _does_ populate the migration table;
+		// that's the whole point. But, these tests require that the
+		// table is in a specific state, so I'll delete the records here.
+		getDB().none("TRUNCATE TABLE migrations");
+		await new Migration(undefined, '0.0.0', '0.100.0').insert();
 	});
 
 	mocha.it('should call correct up method for and insert new row into database', async () => {
