@@ -27,7 +27,7 @@ async function recreateDB() {
 	getDB();
 	if (currentDB() === process.env.OED_DB_DATABASE) {
 		// tslint:disable-next-line no-console
-		console.error(`Refusing to destroy production database ${currentDB()} for tests; should be using ${config.database.database}.`)
+		console.error(`Refusing to destroy production database ${currentDB()} for tests; should be using ${config.database.database}.`);
 		process.exit(255);
 	}
 	// This should drop all database objects, as long as they were all created by the current database user
