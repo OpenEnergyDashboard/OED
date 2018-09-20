@@ -4,7 +4,7 @@
 
 const database = require('./database');
 
-const db = database.db;
+const getDB = database.getDB;
 const sqlFile = database.sqlFile;
 
 class LogEmail {
@@ -22,7 +22,7 @@ class LogEmail {
 	 * @return {Promise.<>}
 	 */
 	static async createTable() {
-		await db.none(sqlFile('logemail/create_log_table.sql'));
+		await getDB().none(sqlFile('logemail/create_log_table.sql'));
 	}
 
 
@@ -35,7 +35,7 @@ class LogEmail {
 		if (logEmail.id !== undefined) {
 			throw new Error('Attempt to insert a log email that already has an ID');
 		}
-		const resp = await db.one(sqlFile('logemail/insert_new_log.sql'), logEmail);
+		const resp = await getDB().one(sqlFile('logemail/insert_new_log.sql'), logEmail);
 		this.id = resp.id;
 	}
 
@@ -44,7 +44,7 @@ class LogEmail {
 	 * @return {Promise.<void>}
 	 */
 	static async delete() {
-		await db.none(sqlFile('logemail/delete_all_logs.sql'));
+		await getDB().none(sqlFile('logemail/delete_all_logs.sql'));
 	}
 
 
@@ -53,7 +53,7 @@ class LogEmail {
 	 * @returns {Promise.<array.<LogEmail>>}
 	 */
 	static async getAll() {
-		const rows = await db.any(sqlFile('logemail/get_all_logs.sql'));
+		const rows = await getDB().any(sqlFile('logemail/get_all_logs.sql'));
 		if (rows.length > 0) {
 			return rows.map(row => new LogEmail(row.id, row.error_message));
 		}

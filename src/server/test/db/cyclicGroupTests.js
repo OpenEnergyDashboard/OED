@@ -14,7 +14,7 @@ const recreateDB = require('./common').recreateDB;
 const Group = require('../../models/Group');
 const mocha = require('mocha');
 
-const db = require('../../models/database').db;
+const getDB = require('../../models/database').getDB;
 
 
 mocha.describe('Group Cycles', async () => {
@@ -45,6 +45,6 @@ mocha.describe('Group Cycles', async () => {
 	mocha.it('Cannot run update queries that create cycles', async () => {
 		await group1.adoptGroup(group2.id);
 		await group2.adoptGroup(group3.id);
-		await expect(db.none(`UPDATE groups_immediate_children set child_id = ${group1.id} WHERE parent_id = ${group2.id}`)).to.eventually.be.rejected;
+		await expect(getDB().none(`UPDATE groups_immediate_children set child_id = ${group1.id} WHERE parent_id = ${group2.id}`)).to.eventually.be.rejected;
 	});
 });
