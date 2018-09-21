@@ -30,6 +30,7 @@ before_script:
     # Database for non-Docker execution
   - psql -c 'CREATE DATABASE travis_ci_test' -U postgres
   - psql -c "CREATE USER test WITH PASSWORD 'test';" -U postgres
+  - psql -c 'CREATE EXTENSION IF NOT EXISTS btree_gist;' -U postgres -d travis_ci_test
     # Database for Docker execution. No meters, with a default user.
   - docker-compose run --rm web src/scripts/installOED.sh
 
