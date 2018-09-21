@@ -12,7 +12,7 @@ chai.use(chaiAsPromised);
 const expect = chai.expect;
 
 const recreateDB = require('./common').recreateDB;
-const db = require('../../models/database').db;
+const getDB = require('../../models/database').getDB;
 
 const mocha = require('mocha');
 
@@ -20,26 +20,26 @@ mocha.describe('MomentJS patching', () => {
 	mocha.beforeEach(recreateDB);
 
 	mocha.it('patches moment durations', async () => {
-		const result = await db.one('SELECT pg_typeof(${interval})', { interval: moment.duration(1, 'days') });
+		const result = await getDB().one('SELECT pg_typeof(${interval})', { interval: moment.duration(1, 'days') });
 		const type = result.pg_typeof;
 		expect(type).to.equal('interval');
 	});
 
 	mocha.it('patches arrays of moment durations', async () => {
-		const result = await db.one('SELECT pg_typeof(${intervalArr})', { intervalArr: [moment.duration(1, 'days'), moment.duration(2, 'days')] });
+		const result = await getDB().one('SELECT pg_typeof(${intervalArr})', { intervalArr: [moment.duration(1, 'days'), moment.duration(2, 'days')] });
 		const type = result.pg_typeof;
 		expect(type).to.equal('interval[]');
 	});
 
 	mocha.it('patches returned durations to moment duration types', async () => {
 		const duration = moment.duration(1, 'days');
-		const { returned } = await db.one('SELECT ${duration} AS returned', { duration });
+		const { returned } = await getDB().one('SELECT ${duration} AS returned', { duration });
 		expect(moment.isDuration(returned)).to.equal(true);
 	});
 
 	mocha.it('patches durations to the correct value', async () => {
 		const duration = moment.duration(1, 'days');
-		const { returned } = await db.one('SELECT ${duration} as returned', { duration });
+		const { returned } = await getDB().one('SELECT ${duration} as returned', { duration });
 		expect(duration.toISOString()).to.equal(returned.toISOString());
 	});
 });

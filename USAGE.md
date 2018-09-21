@@ -26,15 +26,24 @@ Killing the running process (ctrl+C) will stop the app. You can get rid of the D
 1. Still in psql, run ```CREATE DATABASE oed_testing;``` to create a database for automated tests.
 1. Create a .env file in the root directory of the project with the following, replacing (?) with the desired information: <br>
 ```
-OED_SERVER_PORT=?              // The port that the server should run on. 3000 is a good default choice
-OED_DB_USER=?                  // The user that should be used to connect to postgres
-OED_DB_DATABASE=?              // The database you just created, so likely oed
-OED_DB_TEST_DATABASE=?         // The test database you just created, so likely oed_testing
-OED_DB_PASSWORD=?              // The password for your postgres user
-OED_DB_HOST=?                  // The host for your postgres db, likely localhost
-OED_DB_PORT=?                  // The port for your postgres db, likely 5432
-OED_TOKEN_SECRET=?             // Token for authentication. Generate something secure and random
-OED_LOG_FILE=?                 // Path to the log file, defaults to ./log.txt
+OED_SERVER_PORT=?              # The port that the server should run on. 3000 is a good default choice
+OED_TOKEN_SECRET=?             # Token for authentication. Generate something secure and random
+
+OED_DB_USER=?                  # The user that should be used to connect to postgres
+OED_DB_DATABASE=?              # The database you just created, so likely oed
+OED_DB_TEST_DATABASE=?         # The test database you just created, so likely oed_testing
+OED_DB_PASSWORD=?              # The password for your postgres user
+OED_DB_HOST=?                  # The host for your postgres db, likely localhost
+OED_DB_PORT=?                  # The port for your postgres db, likely 5432
+
+OED_LOG_FILE=?                 # Path to the log file, defaults to ./log.txt
+
+OED_MAIL_METHOD=?		   	   # Method of sending mail. Supports "gmail", "mailgun", "none". Case insensitive.
+OED_MAIL_IDENT=?               # Identifier; username for gmail, domain for mailgun. Ex: user@example.com
+OED_MAIL_CREDENTIAL=?		   # Credential; password for gmail, API key for mailgun.
+OED_MAIL_FROM=?                # From address for email
+OED_MAIL_TO=?                  # Who gets the e-mail. Ex: admin@example.com
+OED_MAIL_ORG=?	               # Organization Name
 ```
 8. Run ```npm run createdb``` to create the database schema.
 1. Run `npm run addMamacMeters` to load mamac meters from an `.csv` file.
@@ -54,6 +63,7 @@ OED_LOG_FILE=?                 // Path to the log file, defaults to ./log.txt
 	1. the secret key (in `services -> web -> environment -> OED_TOKEN_SECRET`) to a random value. Keep it secret.
 	1. the port (in `services -> web -> ports`) to a mapping from host to container; e.g., to host on your computer's port 80, set it to `80:3000`.
 1. Copy ```src/scripts/updateMamacMetersOEDCron.bash``` to ```/etc/cron.hourly/updateMamacMetersOEDCron.bash``` and make the necessary modifications to the script. See the script for more detail.
+1. Copy ```src/scripts/sendLogEmailCron.bash``` to ```/etc/cron.daily/sendLogEmailCron.bash``` and make the necessary modifications to the script. See the script for more detail.
 1. Run ```chmod +x updateMamacMetersOEDCron.bash``` to make the script executable.
 1. Copy ```src/scripts/oed.service``` to ```/etc/systemd/system/oed.service``` and make the necessary modifications to the script. See the script for more detail.
 1. Run ```systemctl enable oed.service``` to make the service start on server boot.

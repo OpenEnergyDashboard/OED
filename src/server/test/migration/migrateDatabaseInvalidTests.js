@@ -10,7 +10,7 @@ const expect = chai.expect;
 const mocha = require('mocha');
 
 const recreateDB = require('../db/common').recreateDB;
-const db = require('../../models/database').db;
+const getDB = require('../../models/database').getDB;
 
 const Migration = require('../../models/Migration');
 const { migrateAll } = require('../../migrations/migrateDatabase');
@@ -39,7 +39,7 @@ for (let i = 0; i < versionLists.length; i++) {
 mocha.describe('Migration Invalid', () => {
 	mocha.beforeEach(recreateDB);
 	mocha.beforeEach(async () => {
-		await new Migration(undefined, '0.0.0', '0.100.0').insert(db);
+		await new Migration(undefined, '0.0.0', '0.100.0');
 	});
 
 	mocha.it('should fail because of down migration', async () => {

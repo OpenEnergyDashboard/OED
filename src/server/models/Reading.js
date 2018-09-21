@@ -5,7 +5,7 @@
 const database = require('./database');
 const { mapToObject } = require('../util');
 
-const db = database.db;
+const getDB = database.getDB;
 const sqlFile = database.sqlFile;
 
 const moment = require('moment');
@@ -30,7 +30,7 @@ class Reading {
 	 * @return {Promise.<>}
 	 */
 	static createTable() {
-		return db.none(sqlFile('reading/create_readings_table.sql'));
+		return getDB().none(sqlFile('reading/create_readings_table.sql'));
 	}
 
 	/**
@@ -38,15 +38,15 @@ class Reading {
 	 * @return {Promise.<>}
 	 */
 	static createCompressedReadingsFunction() {
-		return db.none(sqlFile('reading/create_function_get_compressed_readings.sql'));
+		return getDB().none(sqlFile('reading/create_function_get_compressed_readings.sql'));
 	}
 
 	static createCompressedGroupsReadingsFunction() {
-		return db.none(sqlFile('reading/create_function_get_compressed_groups_readings.sql'));
+		return getDB().none(sqlFile('reading/create_function_get_compressed_groups_readings.sql'));
 	}
 
 	static createCompressedGroupsBarchartReadingsFunction() {
-		return db.none(sqlFile('reading/create_function_get_group_barchart_readings.sql'));
+		return getDB().none(sqlFile('reading/create_function_get_group_barchart_readings.sql'));
 	}
 
 	/**
@@ -54,7 +54,7 @@ class Reading {
 	 * @return {Promise.<>}
 	 */
 	static createBarchartReadingsFunction() {
-		return db.none(sqlFile('reading/create_function_get_barchart_readings.sql'));
+		return getDB().none(sqlFile('reading/create_function_get_barchart_readings.sql'));
 	}
 
 	/**
@@ -95,10 +95,10 @@ class Reading {
 	 * @param conn the connection to use. Defaults to the default database connection.
 	 * @returns {Promise.<>}
 	 */
-	static insertAll(readings, conn = db) {
-		return conn.tx(t => t.sequence(function seq(i) {
+	static insertAll(readings, conn = getDB) {
+		return conn().tx(t => t.sequence(function seq(i) {
 			const seqT = this;
-			return readings[i] && readings[i].insert(conn = seqT);
+			return readings[i] && readings[i].insert(conn = () => seqT);
 		}));
 	}
 
@@ -108,10 +108,10 @@ class Reading {
 	 * @param conn the connection to use. Defaults to the default database connection.
 	 * @returns {Promise.<>}
 	 */
-	static insertOrUpdateAll(readings, conn = db) {
-		return conn.tx(t => t.sequence(function seq(i) {
+	static insertOrUpdateAll(readings, conn = getDB) {
+		return conn().tx(t => t.sequence(function seq(i) {
 			const seqT = this;
-			return readings[i] && readings[i].insertOrUpdate(conn = seqT);
+			return readings[i] && readings[i].insertOrUpdate(conn = () => seqT);
 		}));
 	}
 
@@ -121,8 +121,8 @@ class Reading {
 	 * @param conn the connection to use. Defaults to the default database connection.
 	 * @returns {Promise.<array.<Reading>>}
 	 */
-	static async getAllByMeterID(meterID, conn = db) {
-		const rows = await conn.any(sqlFile('reading/get_all_readings_by_meter_id.sql'), { meterID: meterID });
+	static async getAllByMeterID(meterID, conn = getDB) {
+		const rows = await conn().any(sqlFile('reading/get_all_readings_by_meter_id.sql'), { meterID: meterID });
 		return rows.map(Reading.mapRow);
 	}
 
@@ -136,8 +136,8 @@ class Reading {
 	 * @param conn the connection to use. Defaults to the default database connection.
 	 * @returns {Promise.<array.<Reading>>}
 	 */
-	static async getReadingsByMeterIDAndDateRange(meterID, startDate, endDate, conn = db) {
-		const rows = await conn.any(sqlFile('reading/get_readings_by_meter_id_and_date_range.sql'), {
+	static async getReadingsByMeterIDAndDateRange(meterID, startDate, endDate, conn = getDB) {
+		const rows = await conn().any(sqlFile('reading/get_readings_by_meter_id_and_date_range.sql'), {
 			meterID: meterID,
 			startDate: startDate,
 			endDate: endDate
@@ -150,8 +150,8 @@ class Reading {
 	 * @param conn the connection to use. Defaults to the default database connection.
 	 * @returns {Promise.<>}
 	 */
-	insert(conn = db) {
-		return conn.none(sqlFile('reading/insert_new_reading.sql'), this);
+	insert(conn = getDB) {
+		return conn().none(sqlFile('reading/insert_new_reading.sql'), this);
 	}
 
 	/**
@@ -159,8 +159,8 @@ class Reading {
 	 * @param conn the connection to use. Defaults to the default database connection.
 	 * @returns {Promise.<>}
 	 */
-	insertOrUpdate(conn = db) {
-		return conn.none(sqlFile('reading/insert_or_update_reading.sql'), this);
+	insertOrUpdate(conn = getDB) {
+		return conn().none(sqlFile('reading/insert_or_update_reading.sql'), this);
 	}
 
 	/**
@@ -174,8 +174,8 @@ class Reading {
 	 * @param conn the connection to use. Defaults to the default database connection.
 	 * @return {Promise<object<int, array<{reading_rate: number, start_timestamp: Date, end_timestamp: Date}>>>}
 	 */
-	static async getCompressedReadings(meterIDs, fromTimestamp = null, toTimestamp = null, numPoints = 500, conn = db) {
-		const allCompressedReadings = await conn.func('compressed_readings',
+	static async getCompressedReadings(meterIDs, fromTimestamp = null, toTimestamp = null, numPoints = 500, conn = getDB) {
+		const allCompressedReadings = await conn().func('compressed_readings',
 			[meterIDs, fromTimestamp || '-infinity', toTimestamp || 'infinity', numPoints]);
 		// Separate the result rows by meter_id and return a nested object.
 		const compressedReadingsByMeterID = mapToObject(meterIDs, () => []); // Returns { 1: [], 2: [], ... }
@@ -198,8 +198,8 @@ class Reading {
 	 * @param conn the connection to use. Defaults to the default database connection.
 	 * @return {Promise<object<int, array<{reading_rate: number, start_timestamp: Moment, end_timestamp: Moment}>>>}
 	 */
-	static async getCompressedGroupReadings(groupIDs, fromTimestamp = null, toTimestamp = null, numPoints = 500, conn = db) {
-		const allCompressedReadings = await conn.func('compressed_group_readings',
+	static async getCompressedGroupReadings(groupIDs, fromTimestamp = null, toTimestamp = null, numPoints = 500, conn = getDB) {
+		const allCompressedReadings = await conn().func('compressed_group_readings',
 			[groupIDs, fromTimestamp || '-infinity', toTimestamp || 'infinity', numPoints]);
 		// Separate the result rows by meter_id and return a nested object.
 		const compressedReadingsByGroupID = mapToObject(groupIDs, () => []); // Returns { 1: [], 2: [], ... }
@@ -222,8 +222,8 @@ class Reading {
 	 * @param conn the connection to use. Defaults to the default database connection.
 	 * @return {Promise<object<int, array<{reading_sum: number, start_timestamp: Date, end_timestamp: Date}>>>}
 	 */
-	static async getBarchartReadings(meterIDs, duration, fromTimestamp = null, toTimestamp = null, conn = db) {
-		const allBarchartReadings = await conn.func('barchart_readings', [meterIDs, duration, fromTimestamp || '-infinity', toTimestamp || 'infinity']);
+	static async getBarchartReadings(meterIDs, duration, fromTimestamp = null, toTimestamp = null, conn = getDB) {
+		const allBarchartReadings = await conn().func('barchart_readings', [meterIDs, duration, fromTimestamp || '-infinity', toTimestamp || 'infinity']);
 		// Separate the result rows by meter_id and return a nested object.
 		const barchartReadingsByMeterID = mapToObject(meterIDs, () => []);
 		for (const row of allBarchartReadings) {
@@ -245,8 +245,8 @@ class Reading {
 	 * @param conn the connection to use. Defaults to the default database connection.
 	 * @return {Promise<object<int, array<{reading_sum: number, start_timestamp: Date, end_timestamp: Date}>>>}
 	 */
-	static async getGroupBarchartReadings(groupIDs, duration, fromTimestamp = null, toTimestamp = null, conn = db) {
-		const allBarchartReadings = await conn.func('barchart_group_readings',
+	static async getGroupBarchartReadings(groupIDs, duration, fromTimestamp = null, toTimestamp = null, conn = getDB) {
+		const allBarchartReadings = await conn().func('barchart_group_readings',
 			[groupIDs, duration, fromTimestamp || '-infinity', toTimestamp || 'infinity']);
 		// Separate the result rows by meter_id and return a nested object.
 		const barchartReadingsByGroupID = mapToObject(groupIDs, () => []);

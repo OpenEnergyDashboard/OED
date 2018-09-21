@@ -11,19 +11,53 @@ const pgp = require('pg-promise')({
 		}
 	}
 });
+
 const path = require('path');
 const config = require('../config');
 const patchMomentType = require('./patch-moment-type');
 
 patchMomentType(pgp);
+
 /**
  * The connection to the database
  * @type {pgPromise.IDatabase}
  */
-const db = pgp(config.database);
+let db;
+let currentDB = null;
+
+/**
+ * Get a new connection to the database.
+ * @return {pgPromise.IDatabase}
+ */
+function getDB() {
+	// Only create a new connection if we've changed databases or have no
+	// current connection.
+	if (currentDB === null || currentDB !== config.database.database) {
+		stopDB();
+		currentDB = null;
+		db = pgp(config.database);
+		currentDB = config.database.database;
+	}
+	return db;
+}
+
+/**
+ * Get the name of the database current being worked on.
+ * @return {string}
+ */
+function getCurrentDB() {
+	return currentDB;
+}
+
+/**
+ * Closes the connection pool and stops pg-promise
+ * Only call this to avoid the 30 second script timeout before pg-promise closes connections.
+ */
+function stopDB() {
+	pgp.end();
+}
 
 const sqlFilesDir = path.join(__dirname, '..', 'sql');
-
 const loadedSqlFiles = {};
 
 /**
@@ -56,6 +90,7 @@ async function createSchema() {
 	const Group = require('./Group');
 	const Preferences = require('./Preferences');
 	const Migration = require('./Migration');
+	const LogEmail = require('./LogEmail');
 	/* eslint-enable global-require */
 	await Meter.createMeterTypesEnum();
 	await Meter.createTable();
@@ -68,21 +103,18 @@ async function createSchema() {
 	await Preferences.createTable();
 	await Group.createTables();
 	await Migration.createTable();
-	await db.none(sqlFile('reading/create_function_get_compressed_readings.sql'));
+	await LogEmail.createTable();
+	await getDB().none(sqlFile('reading/create_function_get_compressed_readings.sql'));
 	await Reading.createCompressedReadingsMaterializedViews();
 	await Reading.createCompareFunction();
 }
 
-/**
- * Closes the connection pool and stops pg-promise
- * Only call this to avoid the 30 second script timeout before pg-promise closes connections.
- */
-function stopDB() {
-	pgp.end();
-}
+// Create a new database connection.
+// db = getDB();
 
 module.exports = {
-	db,
+	getDB,
+	currentDB: getCurrentDB,
 	sqlFile,
 	createSchema,
 	pgp,

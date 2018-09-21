@@ -23,6 +23,21 @@ async function parseCSV(filename) {
 }
 
 /**
+ * Creates a promise that resolves to the raw content of the URL and rejects on
+ * error or timeout.
+ * @param {string} url The URL of the resource to GET
+ * @param {number} timeout The time to allow, in milliseconds
+ * @returns {Promise.<string>}
+ */
+async function reqWithTimeout(url, timeout) {
+	return Promise.race([
+		reqPromise(url),
+		new Promise((resolve, reject) =>
+			setTimeout(() => reject(new Error(`Failed to GET ${url} within ${timeout} ms`)), timeout))
+	]);
+}
+
+/**
  * Creates a promise to create a Mamac meter based on a URL to grab XML from and an IP address for the meter.
  *
  * The URL should be formed from the IP address.
@@ -31,10 +46,12 @@ async function parseCSV(filename) {
  * @returns {Promise.<Meter>}
  */
 async function getMeterInfo(url, ip) {
-	const raw = await reqPromise(url);
-	const xml = await parseXMLPromisified(raw);
-	const name = xml.Maverick.NodeID[0];
-	return new Meter(undefined, name, ip, true, Meter.type.MAMAC);
+	return reqWithTimeout(url, 5000)
+		.then(raw => parseXMLPromisified(raw))
+		.then(xml => {
+			const name = xml.Maverick.NodeID[0];
+			return new Meter(undefined, name, ip, true, Meter.type.MAMAC);
+		});
 }
 
 /**
@@ -52,20 +69,33 @@ function infoForAllMeters(rows) {
  * @returns {Promise.<>}
  */
 async function insertMeters(rows) {
-	const meters = await Promise.all(infoForAllMeters(rows));
-	await Promise.all(meters.map(m => m.insert()));
+	const errors = [];
+	await Promise.all(infoForAllMeters(rows).map(
+			promise => promise
+			.then(async meter => {
+				if (await meter.existsByName()) {
+					log.info(`Skipping existing meter ${meter.name}`);
+				} else {
+					meter.insert();
+				}
+			})
+			.catch(error => errors.push(error))
+		)
+	);
+	return errors;
 }
 
 async function insertMetersWrapper(filename) {
-	try {
-		const ips = await parseCSV(filename);
-		await insertMeters(ips);
-		log.info('Done inserting meters');
-	} catch (err) {
+	const errors = await parseCSV(filename)
+		.then(ips => insertMeters(ips))
+		.catch(err => log.error(`Error inserting meters: ${err}`, err))
+		.then(stopDB());
+
+	for (const err of errors) {
 		log.error(`Error inserting meters: ${err}`, err);
-	} finally {
-		stopDB();
 	}
+
+	log.info('Done inserting meters');
 }
 
 module.exports = {
