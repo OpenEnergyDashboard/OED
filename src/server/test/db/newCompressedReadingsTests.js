@@ -12,7 +12,7 @@ chai.use(chaiAsPromised);
 const expect = chai.expect;
 
 const recreateDB = require('./common').recreateDB;
-const db = require('../../models/database').db;
+const getDB = require('../../models/database').getDB;
 const Meter = require('../../models/Meter');
 const Reading = require('../../models/Reading');
 const Group = require('../../models/Group');
@@ -43,7 +43,7 @@ mocha.describe('Compressed Readings 2', () => {
 				new Reading(meter.id, 400, timestamp4, timestamp5)
 			]);
 			await Reading.refreshCompressedReadings();
-			const { meter_id, reading_rate } = await db.one('SELECT * FROM hourly_readings WHERE lower(time_interval)=${start_timestamp};',
+			const { meter_id, reading_rate } = await getDB().one('SELECT * FROM hourly_readings WHERE lower(time_interval)=${start_timestamp};',
 				{ start_timestamp: timestamp1 });
 			expect(meter_id).to.equal(meter.id);
 			expect(reading_rate).to.equal(100);
@@ -57,7 +57,7 @@ mocha.describe('Compressed Readings 2', () => {
 				new Reading(meter.id, 400, timestamp4, timestamp5)
 			]);
 			await Reading.refreshCompressedReadings();
-			const { meter_id, reading_rate } = await db.one(
+			const { meter_id, reading_rate } = await getDB().one(
 				'SELECT * FROM daily_readings WHERE time_interval && tsrange(${start_timestamp}, ${end_timestamp});',
 				{ start_timestamp: timestamp1, end_timestamp: timestamp2 });
 			expect(meter_id).to.equal(meter.id);
@@ -73,7 +73,7 @@ mocha.describe('Compressed Readings 2', () => {
 			]);
 
 			await Reading.refreshCompressedReadings();
-			const rows = await db.many('SELECT * FROM daily_readings;');
+			const rows = await getDB().many('SELECT * FROM daily_readings;');
 			expect(rows).to.have.length(2);
 			expect(rows[0].meter_id).to.equal(meter.id);
 			expect(rows[1].meter_id).to.equal(meter.id);
@@ -99,7 +99,7 @@ mocha.describe('Compressed Readings 2', () => {
 
 			await Reading.refreshCompressedReadings();
 
-			const { meter_id, reading_rate } = await db.one('SELECT * FROM daily_readings WHERE lower(time_interval) = ${start_timestamp};',
+			const { meter_id, reading_rate } = await getDB().one('SELECT * FROM daily_readings WHERE lower(time_interval) = ${start_timestamp};',
 				{ start_timestamp: day1Start });
 
 			expect(meter_id).to.equal(meter.id);

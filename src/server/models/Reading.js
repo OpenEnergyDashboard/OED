@@ -62,16 +62,16 @@ class Reading {
 	 * readings by various time intervals.
 	 * @return {Promise<void>}
 	 */
-	static createCompressedReadingsMaterializedViews(conn = db) {
-		return conn.none(sqlFile('reading/create_compressed_reading_views.sql'));
+	static createCompressedReadingsMaterializedViews(conn = getDB) {
+		return conn().none(sqlFile('reading/create_compressed_reading_views.sql'));
 	}
 
 	/**
 	 * Returns a promise to create the compare function
 	 */
 
-	static createCompareFunction(conn = db) {
-		return conn.none(sqlFile('reading/calculate_compare.sql'));
+	static createCompareFunction(conn = getDB) {
+		return conn().none(sqlFile('reading/calculate_compare.sql'));
 	}
 
 	/**
@@ -80,9 +80,9 @@ class Reading {
 	 * @param conn The connection to use
 	 * @return {Promise<void>}
 	 */
-	static refreshCompressedReadings(conn = db) {
+	static refreshCompressedReadings(conn = getDB) {
 		// This can't be a function because you can't call REFRESH inside a function
-		return conn.none('REFRESH MATERIALIZED VIEW daily_readings');
+		return conn().none('REFRESH MATERIALIZED VIEW daily_readings');
 	}
 
 	static mapRow(row) {
@@ -269,11 +269,11 @@ class Reading {
 	 * @param conn the connection to use. Defaults to the default database connection.
 	 * @return {Promise<object<int, array<{reading_rate: number, start_timestamp: }>>>}
 	 */
-	static async getNewCompressedReadings(meterIDs, fromTimestamp = null, toTimestamp = null, conn = db) {
+	static async getNewCompressedReadings(meterIDs, fromTimestamp = null, toTimestamp = null, conn = getDB) {
 		/**
 		 * @type {array<{meter_id: int, reading_rate: Number, start_timestamp: Moment, end_timestamp: Moment}>}
 		 */
-		const allCompressedReadings = await conn.func('compressed_readings_2', [meterIDs, fromTimestamp || '-infinity', toTimestamp || 'infinity']);
+		const allCompressedReadings = await conn().func('compressed_readings_2', [meterIDs, fromTimestamp || '-infinity', toTimestamp || 'infinity']);
 
 		const compressedReadingsByMeterID = mapToObject(meterIDs, () => []);
 		for (const row of allCompressedReadings) {
@@ -293,11 +293,11 @@ class Reading {
 	 * @param conn the connection to use. Defaults to the default database connection.
 	 * @return {Promise<object<int, array<{reading_rate: number, start_timestamp: Moment, end_timestamp: Moment}>>>}
 	 */
-	static async getNewCompressedGroupReadings(groupIDs, fromTimestamp, toTimestamp, conn = db) {
+	static async getNewCompressedGroupReadings(groupIDs, fromTimestamp, toTimestamp, conn = getDB) {
 		/**
 		 * @type {array<{group_id: int, reading_rate: Number, start_timestamp: Moment, end_timestamp: Moment}>}
 		 */
-		const allCompressedGroupReadings = await conn.func('compressed_group_readings_2', [groupIDs, fromTimestamp, toTimestamp]);
+		const allCompressedGroupReadings = await conn().func('compressed_group_readings_2', [groupIDs, fromTimestamp, toTimestamp]);
 
 		const compressedReadingsByGroupID = mapToObject(groupIDs, () => []);
 		for (const row of allCompressedGroupReadings) {
@@ -317,8 +317,8 @@ class Reading {
 	 * @param conn the connection to use. Defaults to the default database connection
 	 * @return {Promise<object<int, array<{reading: number, start_timestamp: Moment, end_timestamp: Moment}>>>}
 	 */
-	static async getNewCompressedBarchartReadings(meterIDs, fromTimestamp, toTimestamp, barWidthDays, conn = db) {
-		const allBarReadings = await conn.func('compressed_barchart_readings_2', [meterIDs, barWidthDays, fromTimestamp, toTimestamp]);
+	static async getNewCompressedBarchartReadings(meterIDs, fromTimestamp, toTimestamp, barWidthDays, conn = getDB) {
+		const allBarReadings = await conn().func('compressed_barchart_readings_2', [meterIDs, barWidthDays, fromTimestamp, toTimestamp]);
 		const barReadingsByMeterID = mapToObject(meterIDs, () => []);
 		for (const row of allBarReadings) {
 			barReadingsByMeterID[row.meter_id].push(
@@ -337,8 +337,8 @@ class Reading {
 	 * @param conn the connection to use. Defaults to the default database connection
 	 * @return {Promise<object<int, array<{reading: number, start_timestamp: Moment, end_timestamp: Moment}>>>}
 	 */
-	static async getNewCompressedBarchartGroupReadings(groupIDs, fromTimestamp, toTimestamp, barWidthDays, conn = db) {
-		const allBarReadings = await conn.func('compressed_barchart_group_readings_2', [groupIDs, barWidthDays, fromTimestamp, toTimestamp]);
+	static async getNewCompressedBarchartGroupReadings(groupIDs, fromTimestamp, toTimestamp, barWidthDays, conn = getDB) {
+		const allBarReadings = await conn().func('compressed_barchart_group_readings_2', [groupIDs, barWidthDays, fromTimestamp, toTimestamp]);
 		const barReadingsByGroupID = mapToObject(groupIDs, () => []);
 		for (const row of allBarReadings) {
 			barReadingsByGroupID[row.group_id].push(
@@ -357,8 +357,8 @@ class Reading {
 	 * @param conn the connection to use. Defaults to the default database connection
 	 * @return {Promise<void>}
 	 */
-	static async getCompareReadings(meterIDs, currStartTimestamp, currEndTimestamp, compareDuration, conn = db) {
-		const allCompareReadings = await conn.func(
+	static async getCompareReadings(meterIDs, currStartTimestamp, currEndTimestamp, compareDuration, conn = getDB) {
+		const allCompareReadings = await conn().func(
 			'compare_readings',
 			[meterIDs, currStartTimestamp, currEndTimestamp, compareDuration.toISOString()]);
 		const compareReadingsByMeterID = {};
@@ -372,8 +372,8 @@ class Reading {
 		return compareReadingsByMeterID;
 	}
 
-	static async getGroupCompareReadings(groupIDs, currStartTimestamp, currEndTimestamp, compareDuration, conn = db) {
-		const allCompareReadings = await conn.func(
+	static async getGroupCompareReadings(groupIDs, currStartTimestamp, currEndTimestamp, compareDuration, conn = getDB) {
+		const allCompareReadings = await conn().func(
 			'group_compare_readings',
 			[groupIDs, currStartTimestamp, currEndTimestamp, compareDuration.toISOString()]);
 		const compareReadingsByGroupID = {};
