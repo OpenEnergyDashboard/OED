@@ -13,8 +13,8 @@ const { log } = require('../log');
 async function updateMamacMeters() {
 	log.info('Fetching new Mamac meter data');
 	try {
-		const allMeters = await Meter.getAll();
-		const metersToUpdate = allMeters.filter(m => m.enabled && m.type === Meter.type.MAMAC);
+		const allMeters = await Meter.getEnabled();
+		const metersToUpdate = allMeters.filter(m => m.type === Meter.type.MAMAC);
 		await updateMeters(readMamacData, metersToUpdate);
 	} catch (err) {
 		log.error(`Error fetching Mamac meter data: ${err}`, err);
