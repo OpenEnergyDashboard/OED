@@ -204,7 +204,7 @@ BEGIN
 			INNER JOIN unnest(meter_ids) meters(id) ON minutely_readings.meter_id = meters.id
 		WHERE requested_range @> minutely_readings.time_interval;
 	END IF;
-END
+END;
 $$ LANGUAGE 'plpgsql';
 
 
