@@ -6,6 +6,7 @@
   "repository": "https://github.com/OpenEnergyDashboard/OED",
   "scripts": {
     "start": "node ./src/bin/www",
+    "start:dev": "./node_modules/.bin/nodemon ./src/bin/www",
     "webpack:dev": "webpack -d --watch --color --progress",
     "webpack:build": "cross-env NODE_ENV=production webpack -p",
     "webpack": "webpack -d --color --progress",
@@ -21,6 +22,16 @@
     "createUser": "node ./src/server/services/user/createUser.js",
     "editUser": "node ./src/server/services/user/editUser.js",
     "sendLogEmail": "node ./src/server/services/sendLogEmail.js"
+  },
+  "nodemonConfig": {
+    "watch": [
+      "src/server/",
+      "src/bin/",
+      "src/common"
+    ],
+    "ignore": [
+      "src/client/"
+    ]
   },
   "dependencies": {
     "axios": "~0.16.2",
@@ -104,6 +115,7 @@
     "css-loader": "~0.28.7",
     "mocha": "~3.5.3",
     "mock-require": "~2.0.2",
+    "nodemon": "~1.18.4",
     "redux-devtools": "~3.4.0",
     "sinon": "~4.0.2",
     "source-map-loader": "~0.2.3",

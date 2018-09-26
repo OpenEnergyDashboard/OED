@@ -150,6 +150,7 @@ For non-Docker installs, simply issue `npm run [SCRIPT]`.
 
 App actions:
 * `start` starts the NodeJS webserver.
+* `start:dev` starts the NodeJS webserver with Nodemon, so it restarts automatically.
 * `webpack:dev` runs Webpack in development mode and dynamically rebuilding the client-side application when files change.
 * `webpack:build` runs Webpack once in production mode.
 * `webpack` runs Webpack once in development mode.
