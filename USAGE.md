@@ -91,6 +91,7 @@ These can be run by executing `npm run <script>` in the `web` Docker-Compose ser
 
 App actions:
 * `start` starts the NodeJS webserver.
+* `start:dev` starts the NodeJS webserver with Nodemon, so it restarts automatically.
 * `webpack:dev` runs Webpack in development mode and dynamically rebuilding the client-side application when files change.
 * `webpack:build` runs Webpack once in production mode.
 * `webpack` runs Webpack once in development mode.
@@ -113,8 +114,8 @@ Administration:
 
 To upgrade the app:
 1. Stop the app (`systemctl stop oed.service`)
-1. Store your local config changes with `git stash` 
-1. Update with `git pull`. 
+1. Store your local config changes with `git stash`
+1. Update with `git pull`.
 1. Replace your local changes with `git stash pop`
 1. Re-build the app (`docker-compose run --rm web ./src/scripts/updateOED.sh`)
 1. Restart the app (`systemctl start oed.service`)
