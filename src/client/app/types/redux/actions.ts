@@ -9,6 +9,7 @@ import { State } from './state';
 export enum ActionType {
 	RequestMetersDetails = 'REQUEST_METERS_DETAILS',
 	ReceiveMetersDetails = 'RECEIVE_METERS_DETAILS',
+	ChangeDisplayedMeters = 'CHANGE_DISPLAYED_METERS',
 
 	ShowNotification = 'SHOW_NOTIFICATION',
 	ClearNotifications = 'CLEAR_NOTIFICATIONS',

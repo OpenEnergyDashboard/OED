@@ -24,33 +24,14 @@ export default class HeaderButtonsComponent extends React.Component<HeaderButton
 	}
 
 	public render() {
-		let showOptions = false;
-		let renderLoginButton = false;
-		let renderHomeButton = true;
-		let renderAdminButton = false;
-		let renderGroupsButton = true;
+		const showOptions = false;
+		const renderLoginButton = !hasToken();
+		const renderHomeButton = getPage() !== '';
+		const renderAdminButton = hasToken() && getPage() !== 'admin';
+		const renderGroupsButton = hasToken() && getPage() !== 'groups';
+		const renderMetersButton = getPage() !== 'meters';
 		const renderLogoutButton = hasToken();
 
-		switch (getPage()) {
-			case '': // home page
-				renderHomeButton = false;
-				showOptions = true;
-				if (renderLogoutButton) {
-					renderAdminButton = true;
-				} else {
-					renderLoginButton = true;
-				}
-				break;
-			case 'groups':
-				renderAdminButton = true;
-				renderGroupsButton = false;
-				break;
-			case 'login':
-				break;
-			default: // Unknown page, routes to 404, show nothing
-				break;
-
-		}
 		const loginLinkStyle: React.CSSProperties = {
 			display: renderLoginButton ? 'inline' : 'none',
 			paddingLeft: '5px'
@@ -64,6 +45,10 @@ export default class HeaderButtonsComponent extends React.Component<HeaderButton
 		};
 		const groupsLinkStyle: React.CSSProperties = {
 			display: renderGroupsButton ? 'inline' : 'none',
+			paddingLeft: '5px'
+		};
+		const metersLinkStyle: React.CSSProperties = {
+			display: renderMetersButton ? 'inline' : 'none',
 			paddingLeft: '5px'
 		};
 		const logoutButtonStyle: React.CSSProperties = {
@@ -84,8 +69,9 @@ export default class HeaderButtonsComponent extends React.Component<HeaderButton
 				<div className={this.props.showCollapsedMenuButton ? 'd-none d-lg-block' : ''}>
 					<Link style={adminLinkStyle} to='/admin'><Button outline><FormattedMessage id='admin.panel'/></Button></Link>
 					<Link style={groupsLinkStyle} to='/groups'><Button outline><FormattedMessage id='groups' /></Button></Link>
-					<Link style={loginLinkStyle} to='/login'><Button outline><FormattedMessage id='log.in'/></Button></Link>
+					<Link style={metersLinkStyle} to='/meters'><Button outline><FormattedMessage id='meters' /></Button></Link>
 					<Link style={homeLinkStyle} to='/'><Button outline><FormattedMessage id='home'/></Button></Link>
+					<Link style={loginLinkStyle} to='/login'><Button outline><FormattedMessage id='log.in'/></Button></Link>
 					<Link style={logoutButtonStyle} to='/'><Button outline onClick={this.handleLogOut}><FormattedMessage id='log.out'/></Button></Link>
 				</div>
 			</div>

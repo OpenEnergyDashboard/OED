@@ -63,7 +63,7 @@ optionalAuthMiddleware = (req, res, next) => {
 	} else {
 		next();
 	}
-}
+};
 
 module.exports = {
 	authMiddleware,

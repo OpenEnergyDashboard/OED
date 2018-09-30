@@ -8,7 +8,8 @@ import { ActionType } from '../types/redux/actions';
 
 const defaultState: MetersState = {
 	isFetching: false,
-	byMeterID: {}
+	byMeterID: {},
+	selectedMeters: []
 };
 
 export default function meters(state = defaultState, action: MetersAction) {
@@ -23,6 +24,11 @@ export default function meters(state = defaultState, action: MetersAction) {
 				...state,
 				isFetching: false,
 				byMeterID: _.keyBy(action.data, meter => meter.id)
+			};
+		case ActionType.ChangeDisplayedMeters:
+			return {
+				...state,
+				selectedMeters: action.selectedMeters
 			};
 		default:
 			return state;

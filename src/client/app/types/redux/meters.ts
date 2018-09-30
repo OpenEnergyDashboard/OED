@@ -14,14 +14,29 @@ export interface ReceiveMetersDetailsAction {
 	data: NamedIDItem[];
 }
 
-export type MetersAction = RequestMetersDetailsAction | ReceiveMetersDetailsAction;
+export interface ChangeDisplayedMetersAction {
+	type: ActionType.ChangeDisplayedMeters;
+	selectedMeters: number[];
+}
+
+export type MetersAction =
+		| RequestMetersDetailsAction
+		| ReceiveMetersDetailsAction
+		| ChangeDisplayedMetersAction;
+
+export interface MeterMetadata {
+	id: number;
+	name: string;
+	enabled: boolean;
+	displayable: boolean;
+	meterType?: string;
+	ipAddress?: string;
+}
 
 export interface MetersState {
 	isFetching: boolean;
 	byMeterID: {
-		[meterID: number]: {
-			id: number;
-			name: string;
-		};
+		[meterID: number]: MeterMetadata;
 	};
+	selectedMeters: number[];
 }

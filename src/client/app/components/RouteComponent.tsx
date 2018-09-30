@@ -25,6 +25,7 @@ import { validateComparePeriod, validateSortingOrder } from '../utils/calculateC
 import EditGroupsContainer from '../containers/groups/EditGroupsContainer';
 import CreateGroupContainer from '../containers/groups/CreateGroupContainer';
 import GroupsDetailContainer from '../containers/groups/GroupsDetailContainer';
+import MetersDetailContainer from '../containers/meters/MetersDetailContainer';
 
 interface RouteProps {
 	barStacking: boolean;
@@ -138,6 +139,7 @@ export default class RouteComponent extends React.Component<RouteProps, {}> {
 						<Route path='/login' component={LoginComponent} />
 						<Route path='/admin' component={AdminComponent} onEnter={this.requireAuth} />
 						<Route path='/groups' component={GroupsDetailContainer} />
+						<Route path='/meters' component={MetersDetailContainer} />
 						<Route path='/graph' component={HomeComponent} onEnter={this.linkToGraph} />
 						<Route path='/createGroup' component={CreateGroupContainer} onEnter={this.requireAuth} />
 						<Route path='/editGroup' component={EditGroupsContainer} onEnter={this.requireAuth} />

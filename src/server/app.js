@@ -37,9 +37,11 @@ app.use('/api/verification', verification);
 app.use('/api/fileProcessing', fileProcessing);
 app.use('/api/version', version);
 
-app.get('\\/|login|admin|groups|createGroup|editGroup|graph', (req, res) => {
-	res.sendFile(path.resolve(__dirname, '..', 'client', 'index.html'));
-});
+app.get('\\/|login|admin|groups|createGroup|editGroup|graph|meters|editMeter',
+	(req, res) => {
+		res.sendFile(path.resolve(__dirname, '..', 'client', 'index.html'));
+	}
+);
 
 app.use((req, res) => {
 	res.status(404).send('<h1>404 Not Found<h1/>');

@@ -18,6 +18,10 @@ export function receiveMetersDetails(data: NamedIDItem[]): t.ReceiveMetersDetail
 	return { type: ActionType.ReceiveMetersDetails, data };
 }
 
+export function changeDisplayedMeters(meters: number[]): t.ChangeDisplayedMetersAction {
+	return { type: ActionType.ChangeDisplayedMeters, selectedMeters: meters};
+}
+
 function fetchMetersDetails(): Thunk {
 	return async (dispatch: Dispatch) => {
 		dispatch(requestMetersDetails());
