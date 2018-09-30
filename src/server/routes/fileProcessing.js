@@ -9,7 +9,7 @@ const streamBuffers = require('stream-buffers');
 const multer = require('multer');
 const streamToDB = require('../services/loadFromCsvStream');
 const { insertMeters } = require('../services/readMamacMeters');
-const authenticator = require('./authenticator');
+const authenticator = require('./authenticator').authMiddleware;
 const validate = require('jsonschema').validate;
 
 const router = express.Router();

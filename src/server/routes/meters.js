@@ -6,8 +6,10 @@ const express = require('express');
 const Meter = require('../models/Meter');
 const { log } = require('../log');
 const validate = require('jsonschema').validate;
+const authenticator = require('./authenticator').optionalAuthMiddleware;
 
 const router = express.Router();
+router.use(authenticator);
 
 /**
  * Defines the format in which we want to send meters and controls what information we send to the client.
@@ -19,11 +21,18 @@ function formatMeterForResponse(meter) {
 }
 
 /**
- * GET information on all meters
+ * GET information on displayable meters (or all meters, if logged in)
  */
 router.get('/', async (req, res) => {
+	let query;
+	if (req.hasValidAuthToken) {
+		query = Meter.getAll;
+	} else {
+		query = Meter.getDisplayable;
+	}
+
 	try {
-		const rows = await Meter.getAll();
+		const rows = await query();
 		res.json(rows.map(formatMeterForResponse));
 	} catch (err) {
 		log.error(`Error while performing GET all meters query: ${err}`, err);
@@ -32,6 +41,7 @@ router.get('/', async (req, res) => {
 
 /**
  * GET information for a specific meter by id
+ * Prohibits access to meters that are not displayable if not logged in
  * @param {int} meter_id
  */
 router.get('/:meter_id', async (req, res) => {
@@ -51,7 +61,13 @@ router.get('/:meter_id', async (req, res) => {
 	} else {
 		try {
 			const meter = await Meter.getByID(req.params.meter_id);
-			res.json(formatMeterForResponse(meter));
+			if (meter.displayable || req.hasValidAuthToken) {
+				// If the meter is displayable, fine. If the meter is
+				// not displayable but the user is logged in, also fine.
+				res.json(formatMeterForResponse(meter));
+			} else {
+				res.sendStatus(400);
+			}
 		} catch (err) {
 			log.error(`Error while performing GET specific meter by id query: ${err}`, err);
 			res.sendStatus(500);
