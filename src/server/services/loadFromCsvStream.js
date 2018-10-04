@@ -4,7 +4,7 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/.
  */
 
-const db = require('../models/database').db;
+const getDB = require('../models/database').getDB;
 const csv = require('csv');
 
 /**
@@ -22,7 +22,7 @@ const csv = require('csv');
  * @template M
  */
 function loadFromCsvStream(stream, mapRowToModel, bulkInsertModels) {
-	return db.tx(t => new Promise(resolve => {
+	return getDB().tx(t => new Promise(resolve => {
 		let rejected = false;
 		const error = null;
 		const MIN_INSERT_BUFFER_SIZE = 1000;
@@ -32,7 +32,7 @@ function loadFromCsvStream(stream, mapRowToModel, bulkInsertModels) {
 		const parser = csv.parse();
 
 		function insertQueuedModels() {
-			const insert = bulkInsertModels(modelsToInsert, t);
+			const insert = bulkInsertModels(modelsToInsert, () => t);
 			pendingInserts.push(insert);
 			modelsToInsert = [];
 		}

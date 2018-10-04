@@ -12,7 +12,7 @@ chai.use(chaiAsPromised);
 const expect = chai.expect;
 
 const recreateDB = require('./common').recreateDB;
-const db = require('../../models/database').db;
+const getDB = require('../../models/database').getDB;
 const Meter = require('../../models/Meter');
 const readMetasysData = require('../../services/readMetasysData');
 
@@ -34,7 +34,7 @@ mocha.describe('Insert Metasys readings from a file', () => {
 		try {
 			await readMetasysData(testFilePath, 30, 1, false);
 		} catch (e) {
-			const { count } = await db.one('SELECT COUNT(*) as count FROM readings');
+			const { count } = await getDB().one('SELECT COUNT(*) as count FROM readings');
 			expect(parseInt(count)).to.equal(0);
 		}
 	});

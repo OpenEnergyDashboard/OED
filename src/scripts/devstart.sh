@@ -11,4 +11,4 @@
 # It starts the autorebuild in the background and then
 # runs the server.
 npm run webpack:dev &
-npm start
+npm run start:dev
