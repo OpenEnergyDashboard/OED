@@ -57,6 +57,8 @@ async function createSchema() {
 	const Preferences = require('./Preferences');
 	const Migration = require('./Migration');
 	const LogEmail = require('./LogEmail');
+	const Baseline = require('./Baseline');
+
 	/* eslint-enable global-require */
 	await Meter.createMeterTypesEnum();
 	await Meter.createTable();
@@ -70,7 +72,9 @@ async function createSchema() {
 	await Group.createTables();
 	await Migration.createTable();
 	await LogEmail.createTable();
+	await Baseline.createTable();
 	await db.none(sqlFile('reading/create_function_get_compressed_readings.sql'));
+	await db.none(sqlFile('baseline/create_function_get_average_reading.sql'));
 }
 
 /**
