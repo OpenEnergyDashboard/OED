@@ -36,7 +36,7 @@
     "dotenv": "~2.0.0",
     "es6-promisify": "~5.0.0",
     "express": "~4.16.3",
-    "jquery": "~1.9.1",
+    "jquery": "~3.3.1",
     "jsonschema": "~1.2.0",
     "jsonwebtoken": "~8.3.0",
     "lodash": "~4.17.4",
