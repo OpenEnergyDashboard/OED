@@ -6,6 +6,7 @@ const LodashModuleReplacementPlugin = require('lodash-webpack-plugin');
 const UglifyJsPlugin = require('uglifyjs-webpack-plugin');
 const webpack = require('webpack');
 const path = require('path');
+const { CheckerPlugin } = require('awesome-typescript-loader');
 
 const BUILD_DIR = path.resolve(__dirname, 'src/client/public');
 const APP_DIR = path.resolve(__dirname, 'src/client/app');
@@ -45,6 +46,7 @@ const config = {
     },
 	plugins: [
         new LodashModuleReplacementPlugin(),
+		new CheckerPlugin(),
 	],
 	node: {
 		fs: 'empty'
