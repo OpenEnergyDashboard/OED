@@ -79,7 +79,7 @@
     "@types/moment": "~2.13.0",
     "@types/rc-slider": "~8.2.3",
     "@types/react": "~16.3.11",
-    "@types/react-bootstrap": "~0.31.9",
+    "@types/react-bootstrap": "~0.32.14",
     "@types/react-chartjs-2": "~2.0.2",
     "@types/react-dom": "~16.0.5",
     "@types/react-dropzone": "~4.2.0",
