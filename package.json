@@ -101,6 +101,7 @@
     "babel-preset-react": "~6.24.1",
     "chai": "~3.5.0",
     "chai-as-promised": "~6.0.0",
+    "cryptiles": "~4.1.2",
     "css-loader": "~0.28.7",
     "mocha": "~5.2.0",
     "mock-require": "~2.0.2",
