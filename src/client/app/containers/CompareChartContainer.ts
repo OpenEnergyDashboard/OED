@@ -167,5 +167,6 @@ function mapStateToProps(state: State, ownProps: CompareChartContainerProps): Li
 	return props;
 }
 
-
-export default connect(mapStateToProps)(Bar);
+// Escape from TypeScript here. TypeScript doesn't like the fact that Bar is non typed.
+let b: any = Bar;
+export default connect(mapStateToProps)(b);
