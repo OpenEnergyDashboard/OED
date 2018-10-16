@@ -14,11 +14,11 @@ function parseTimestamp(raw, line) {
 	raw = raw.trim();
 	const timestampRegExp = /^\d{2}:\d{2}:\d{2} \d{1,2}\/\d{1,2}\/\d{1,2}$/;
 	if (!timestampRegExp.test(raw)) {
-		throw new Error(`CSV line ` + line + `: Raw timestamp ${raw} does not pass regex validation`);
+		throw new Error('CSV line ' + line + `: Raw timestamp ${raw} does not pass regex validation`);
 	}
 	const ts = moment(raw, 'HH:mm:ss MM/DD/YY');
 	if (!ts.isValid()) {
-		throw new Error(`CSV line ` + line + `: Raw timestamp ${raw} does not parse to a valid moment object`);
+		throw new Error('CSV line ' + line + `: Raw timestamp ${raw} does not parse to a valid moment object`);
 	}
 	return ts;
 }
@@ -43,7 +43,7 @@ async function readMamacData(meter) {
 		let line = index + 1;
 		const reading = Math.round(Number(raw[0]));
 		if (isNaN(reading)) {
-			const e = Error(`CSV line ` + line + `: Meter reading ${reading} parses to NaN for meter named ${meter.name} with id ${meter.id}`);
+			const e = Error('CSV line ' + line + `: Meter reading ${reading} parses to NaN for meter named ${meter.name} with id ${meter.id}`);
 			e.options = {ipAddress: meter.ipAddress};
 			throw e;
 		}

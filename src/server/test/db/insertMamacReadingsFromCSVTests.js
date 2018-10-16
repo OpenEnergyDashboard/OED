@@ -43,7 +43,7 @@ mocha.describe('Insert Mamac readings from a file', () => {
 			await loadMamacReadingsFromCsvFile(testFilePath, meter, readingDuration);
 			expect.fail('should have thrown an exception');
 		} catch (e) {
-			// We want this to error		
+			// We want this to error
 		}
 	});
 	mocha.it('rolls back correctly when it rejects', async () => {
