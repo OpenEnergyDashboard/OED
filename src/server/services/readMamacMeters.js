@@ -76,7 +76,7 @@ async function insertMeters(rows) {
 			(promise, index) => promise
 			.then(async meter => {
 				if (await meter.existsByName()) {
-					log.info('CSV line ' + (index + 2)+ `: Skipping existing meter ${meter.name}`);
+					log.info('CSV line ' + (index + 2) + `: Skipping existing meter ${meter.name}`);
 				} else {
 					meter.insert();
 				}
