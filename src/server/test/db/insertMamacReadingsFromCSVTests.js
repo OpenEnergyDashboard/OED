@@ -45,7 +45,7 @@ mocha.describe('Insert Mamac readings from a file', () => {
 			expect.fail('should have thrown an exception');
 		} catch (e) {
 			// We want this to error
-			var errLine = e.getErrors()[0]["index"] + 1;
+			let errLine = e.getErrors()[0]["index"] + 1;
 			console.log(colors.red(">>>>Error on line: " + errLine));			
 		}
 	});
