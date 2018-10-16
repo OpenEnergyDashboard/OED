@@ -34,7 +34,7 @@ async function reqWithTimeout(url, timeout, csvLine) {
 	return Promise.race([
 		reqPromise(url),
 		new Promise((resolve, reject) =>
-			setTimeout(() => reject(new Error(`CSV line ${line}: Failed to GET ${url} within ${timeout} ms`)), timeout))
+			setTimeout(() => reject(new Error(`CSV line ${csvLine}: Failed to GET ${url} within ${timeout} ms`)), timeout))
 	]);
 }
 
@@ -76,7 +76,7 @@ async function insertMeters(rows) {
 			(promise, index) => promise
 			.then(async meter => {
 				if (await meter.existsByName()) {
-					log.info(`CSV line ${line}: Skipping existing meter ${meter.name}`);
+					log.info(`CSV line ${index + 2}: Skipping existing meter ${meter.name}`);
 				} else {
 					meter.insert();
 				}
