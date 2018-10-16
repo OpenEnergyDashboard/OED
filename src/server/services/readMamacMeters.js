@@ -70,11 +70,11 @@ function infoForAllMeters(rows) {
  * @param rows rows of the meters
  * @returns {Promise.<>}
  */
-async function insertMeters(rows) {	
+async function insertMeters(rows) {
 	const errors = [];
 	await Promise.all(infoForAllMeters(rows).map(
 			(promise, index) => promise
-			.then(async meter => {				
+			.then(async meter => {
 				if (await meter.existsByName()) {
 					log.info(`CSV line ` + (index + 2)+ `: Skipping existing meter ${meter.name}`);
 				} else {

@@ -10,7 +10,7 @@ const Reading = require('../models/Reading');
 
 const parseCsv = promisify(csv.parse);
 
-function parseTimestamp(raw, line) {	
+function parseTimestamp(raw, line) {
 	raw = raw.trim();
 	const timestampRegExp = /^\d{2}:\d{2}:\d{2} \d{1,2}\/\d{1,2}\/\d{1,2}$/;
 	if (!timestampRegExp.test(raw)) {
@@ -38,7 +38,7 @@ async function readMamacData(meter) {
 		throw new Error(`${meter} doesn't have an id to associate readings with`);
 	}
 	const rawReadings = await reqPromise(`http://${meter.ipAddress}/int2.csv`);
-	const parsedReadings = await parseCsv(rawReadings);	
+	const parsedReadings = await parseCsv(rawReadings);
 	return parsedReadings.map( (raw, index) => {
 		let line = index + 1;
 		const reading = Math.round(Number(raw[0]));
