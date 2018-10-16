@@ -18,7 +18,6 @@ const Meter = require('../../models/Meter');
 const loadMamacReadingsFromCsvFile = require('../../services/loadMamacReadingsFromCsvFile');
 
 const mocha = require('mocha');
-const colors = require('colors');
 
 mocha.describe('Insert Mamac readings from a file', () => {
 	mocha.beforeEach(recreateDB);
@@ -44,9 +43,7 @@ mocha.describe('Insert Mamac readings from a file', () => {
 			await loadMamacReadingsFromCsvFile(testFilePath, meter, readingDuration);
 			expect.fail('should have thrown an exception');
 		} catch (e) {
-			// We want this to error
-			let errLine = e.getErrors()[0]["index"] + 1;
-			console.log(colors.red(">>>>Error on line: " + errLine));			
+			// We want this to error		
 		}
 	});
 	mocha.it('rolls back correctly when it rejects', async () => {
