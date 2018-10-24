@@ -15,5 +15,7 @@ module.exports = {
 		await db.none(sqlFile('../migrations/0.3.0-0.4.0/sql/baseline/create_baseline_table.sql'));
 		await db.none(sqlFile('../migrations/0.3.0-0.4.0/sql/baseline/create_function_get_average_reading.sql'));
 		await db.none(sqlFile('../migrations/0.3.0-0.4.0/sql/readings/set_reading_type_to_real.sql'));
+		await db.none(sqlFile('../migrations/0.3.0-0.4.0/sql/obvius/create_config_table.sql'));
 	}
-};
+}
+

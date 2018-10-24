@@ -94,7 +94,6 @@ async function createSchema() {
 	const LogEmail = require('./LogEmail');
 	const Baseline = require('./Baseline');
 
-	const Logfile = require('./obvius/Logfile');
 	/* eslint-enable global-require */
 	await Meter.createMeterTypesEnum();
 	await Meter.createTable();

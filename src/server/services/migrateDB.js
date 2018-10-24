@@ -48,11 +48,11 @@ function findMaxVersion(list) {
 		if (currentVersion === toVersion) {
 			terminateReadline(`Cannot migrate. You already have the highest version ${currentVersion}`);
 		} else {
-			const result = await migrateAll(toVersion, migrationList);
-			if (result !== undefined) {
+			try {
+				await migrateAll(toVersion, migrationList);
 				terminateReadline('Migration successful');
-			} else {
-				terminateReadline('Migration failed');
+			} catch (err) {
+				terminateReadline(`Migration failed: ${err}`);
 			}
 		}
 	} catch (err) {
