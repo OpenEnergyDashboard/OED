@@ -3,7 +3,7 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/.
  */
 const database = require('./database');
-const TimeInterval = require('../../common/TimeInterval');
+const { TimeInterval } = require('../../common/TimeInterval');
 const getDB = database.getDB;
 const sqlFile = database.sqlFile;
 class Baseline {
