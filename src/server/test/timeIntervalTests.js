@@ -12,11 +12,11 @@ const { TimeInterval } = require('../../common/TimeInterval');
 
 
 mocha.describe('Time Intervals', () => {
-	mocha.it('can be created', async () =>{
+	mocha.it('can be created', async () => {
 		const start = moment('1970-01-01 00:01:00');
 		const end = moment('2069-12-31 00:01:00');
 		const ti = new TimeInterval(start, end);
-		expect(ti.toString()).to.equal('1970-01-01T06:01:00Z_2069-12-31T06:01:00Z')
+		expect(ti.toString()).to.equal('1970-01-01T06:01:00Z_2069-12-31T06:01:00Z');
 	});
 
 });
