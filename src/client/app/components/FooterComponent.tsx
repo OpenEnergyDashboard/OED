@@ -3,6 +3,7 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
 
 import * as React from 'react';
+import { FormattedMessage } from 'react-intl';
 
 /**
  * React component that controls the footer strip at the bottom of all pages
@@ -27,8 +28,17 @@ export default function FooterComponent() {
 		<div>
 			<div style={phantomStyle} />
 			<footer className='footer' style={footerStyle}>
-				<span>Open Energy Dashboard is an open source project coordinated by Beloit College. <a href='mailto:oed@beloit.edu'>Contact us</a> or
-					visit our <a target='_blank' rel='noopener noreferrer' href='https://openenergydashboard.github.io/'>website</a> for more information.</span>
+				<span>
+					<FormattedMessage id='oed.description' />
+					<a href='mailto:oed@beloit.edu'>
+						<FormattedMessage id='contact.us' />
+					</a>
+					<FormattedMessage id='visit'/>
+					<a target='_blank' rel='noopener noreferrer' href='https://openenergydashboard.github.io/'>
+						<FormattedMessage id='website' />
+					</a>
+					<FormattedMessage id='info' />
+				</span>
 			</footer>
 		</div>
 	);

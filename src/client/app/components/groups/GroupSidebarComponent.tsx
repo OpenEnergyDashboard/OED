@@ -4,41 +4,48 @@
 
 import * as React from 'react';
 import { Button } from 'reactstrap';
-import { ChangeDisplayedGroupsAction, ChangeDisplayModeAction } from '../../types/redux/groups';
+import { FormattedMessage } from 'react-intl';
+import { ChangeDisplayedGroupsAction } from '../../types/redux/groups';
+import { Link } from 'react-router';
+import {hasToken} from '../../utils/token';
 
 interface GroupSidebarProps {
 	groups: Array<{id: number, name: string}>;
-	changeDisplayModeToCreate(): ChangeDisplayModeAction;
 	selectGroups(groups: number[]): ChangeDisplayedGroupsAction;
-	fetchGroupsDetailsIfNeeded(): Promise<void>;
 }
 
 export default class GroupSidebarComponent extends React.Component<GroupSidebarProps, {}> {
 	constructor(props: GroupSidebarProps) {
 		super(props);
 		this.handleGroupSelect = this.handleGroupSelect.bind(this);
-		this.handleCreateGroup = this.handleCreateGroup.bind(this);
-	}
-
-	public componentWillMount() {
-		this.props.fetchGroupsDetailsIfNeeded();
 	}
 
 	public render() {
+		const renderCreateNewGroupButton = hasToken();
 		const labelStyle: React.CSSProperties = {
 			fontWeight: 'bold',
 			margin: '0px'
 		};
+		const createGroupStyle: React.CSSProperties = {
+			display: renderCreateNewGroupButton ? 'inline' : 'none',
+			paddingLeft: '5px'
+		};
 		return (
 			<div className='form-group'>
-				<p style={labelStyle}>View groups:</p>
+				<p style={labelStyle}>
+					<FormattedMessage id='view.groups' />:
+				</p>
 				<select multiple className='form-control' id='groupList' size={8} onChange={this.handleGroupSelect}>
 					{this.props.groups.map(group =>
 						<option key={group.id} value={group.id}>{group.name}</option>
 					)}
 				</select>
 				<br />
-				<Button outline onClick={this.handleCreateGroup}>Create new group</Button>
+				<Link style={createGroupStyle} to='/createGroup'>
+					<Button outline>
+						<FormattedMessage id='create.group' />
+					</Button>
+				</Link>
 			</div>
 		);
 	}
@@ -54,9 +61,5 @@ export default class GroupSidebarComponent extends React.Component<GroupSidebarP
 			}
 		}
 		this.props.selectGroups(selectedGroups);
-	}
-
-	private handleCreateGroup() {
-		this.props.changeDisplayModeToCreate();
 	}
 }

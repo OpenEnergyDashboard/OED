@@ -6,17 +6,20 @@ import * as moment from 'moment';
 import { TimeInterval } from '../../../common/TimeInterval';
 import { GraphAction, GraphState, ChartTypes } from '../types/redux/graph';
 import { ActionType } from '../types/redux/actions';
+import { calculateCompareTimeInterval, ComparePeriod, SortingOrder } from '../utils/calculateCompare';
 
 const defaultState: GraphState = {
 	selectedMeters: [],
 	selectedGroups: [],
 	timeInterval: TimeInterval.unbounded(),
-	barDuration: moment.duration(1, 'month'),
-	compareTimeInterval: new TimeInterval(moment().startOf('week').subtract(7, 'days'), moment()),
-	compareDuration: moment.duration(1, 'days'),
+	barDuration: moment.duration(4, 'weeks'),
+	comparePeriod: ComparePeriod.Week,
+	compareTimeInterval: calculateCompareTimeInterval(ComparePeriod.Week, moment()),
+	compareSortingOrder: SortingOrder.Descending,
 	chartToRender: ChartTypes.line,
 	barStacking: false,
-	hotlinked: false
+	hotlinked: false,
+	optionsVisibility: true
 };
 
 export default function graph(state = defaultState, action: GraphAction) {
@@ -41,15 +44,11 @@ export default function graph(state = defaultState, action: GraphAction) {
 				...state,
 				timeInterval: action.timeInterval
 			};
-		case ActionType.UpdateCompareDuration:
+		case ActionType.UpdateComparePeriod:
 			return {
 				...state,
-				compareDuration: action.compareDuration
-			};
-		case ActionType.UpdateCompareInterval:
-			return {
-				...state,
-				compareTimeInterval: action.compareTimeInterval
+				comparePeriod: action.comparePeriod,
+				compareTimeInterval: calculateCompareTimeInterval(action.comparePeriod, action.currentTime)
 			};
 		case ActionType.ChangeChartToRender:
 			return {
@@ -65,6 +64,16 @@ export default function graph(state = defaultState, action: GraphAction) {
 			return {
 				...state,
 				hotlinked: action.hotlinked
+			};
+		case ActionType.ChangeCompareSortingOrder:
+			return {
+				...state,
+				compareSortingOrder: action.compareSortingOrder
+			};
+		case ActionType.SetOptionsVisibility:
+			return {
+				...state,
+				optionsVisibility: action.visibility
 			};
 		default:
 			return state;

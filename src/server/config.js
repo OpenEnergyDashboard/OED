@@ -28,6 +28,20 @@ config.database = {
 	port: process.env.OED_DB_PORT
 };
 
+// Mail configuration
+let method = process.env.OED_MAIL_METHOD;
+if (method !== null && method !== undefined) {
+	method = method.toLocaleLowerCase();
+}
+config.mailer = {
+	method: method,
+	ident: process.env.OED_MAIL_IDENT,
+	credential: process.env.OED_MAIL_CREDENTIAL,
+	from: process.env.OED_MAIL_FROM,
+	to: process.env.OED_MAIL_TO,
+	org: process.env.OED_MAIL_ORG
+};
+
 config.secretToken = process.env.OED_TOKEN_SECRET;
 config.serverPort = process.env.OED_SERVER_PORT;
 config.logFile = process.env.OED_LOG_FILE || 'log.txt';

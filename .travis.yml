@@ -18,7 +18,7 @@ addons:
   postgresql: "9.6"
 
 env:
-    - OED_DB_USER=test OED_DB_PASSWORD=test OED_DB_DATABASE=travis_ci_test OED_DB_TEST_DATABASE=travis_ci_test OED_DB_HOST=localhost OED_DB_PORT=5432 OED_TOKEN_SECRET=travis OED_SERVER_PORT=3000 DOCKER_COMPOSE_VERSION=1.16.1
+    - OED_DB_USER=test OED_DB_PASSWORD=test OED_DB_DATABASE=travis_ci_dummy OED_DB_TEST_DATABASE=travis_ci_test OED_DB_HOST=localhost OED_DB_PORT=5432 OED_TOKEN_SECRET=travis OED_SERVER_PORT=3000 DOCKER_COMPOSE_VERSION=1.16.1
 
 before_install:
     - sudo rm /usr/local/bin/docker-compose
@@ -31,7 +31,7 @@ before_script:
   - psql -c 'CREATE DATABASE travis_ci_test' -U postgres
   - psql -c "CREATE USER test WITH PASSWORD 'test';" -U postgres
     # Database for Docker execution. No meters, with a default user.
-  - docker-compose run --rm web src/scripts/init.sh NONE --default-user
+  - docker-compose run --rm web src/scripts/installOED.sh
 
 script:
     # Validate legal requirements on source files

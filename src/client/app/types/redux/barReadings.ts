@@ -64,4 +64,7 @@ export interface BarReadingsState {
 			}
 		}
 	};
+	isFetching: boolean;
+	metersFetching: boolean;
+	groupsFetching: boolean;
 }

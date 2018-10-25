@@ -3,44 +3,38 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
 
 import { connect } from 'react-redux';
-import * as _ from 'lodash';
-import AdminComponent from '../components/AdminComponent';
+import PreferencesComponent from '../../components/admin/PreferencesComponent';
 import {
 	updateDisplayTitle,
 	updateDefaultChartToRender,
 	toggleDefaultBarStacking,
-	submitPreferencesIfNeeded,
-	updateSelectedMeter } from '../actions/admin';
-
-import { Dispatch } from '../types/redux/actions';
-import { State } from '../types/redux/state';
-import { ChartTypes } from '../types/redux/graph';
+	updateDefaultLanguage,
+	submitPreferencesIfNeeded
+} from '../../actions/admin';
+import { State } from '../../types/redux/state';
+import { Dispatch } from '../../types/redux/actions';
+import { ChartTypes } from '../../types/redux/graph';
+import { LanguageTypes } from '../../types/i18n';
 
 function mapStateToProps(state: State) {
-	let selectedMeter;
-	if (state.admin.selectedMeter === null) {
-		selectedMeter = null;
-	} else {
-		selectedMeter = { value: state.admin.selectedMeter, label: state.meters.byMeterID[state.admin.selectedMeter].name };
-	}
 	return {
 		displayTitle: state.admin.displayTitle,
 		defaultChartToRender: state.admin.defaultChartToRender,
 		defaultBarStacking: state.admin.defaultBarStacking,
-		disableSubmitPreferences: state.admin.submitted,
-		meters: _.sortBy(_.values(state.meters.byMeterID).map(meter => ({ value: meter.id, label: meter.name.trim() })), 'name'),
-		selectedImportMeter: selectedMeter
+		defaultLanguage: state.admin.defaultLanguage,
+		disableSubmitPreferences: state.admin.submitted
 	};
 }
 
 function mapDispatchToProps(dispatch: Dispatch) {
 	return {
-		updateSelectedImportMeter: (meterID: number) => dispatch(updateSelectedMeter(meterID)),
 		updateDisplayTitle: (displayTitle: string) => dispatch(updateDisplayTitle(displayTitle)),
 		updateDefaultChartType: (defaultChartToRender: ChartTypes) => dispatch(updateDefaultChartToRender(defaultChartToRender)),
 		toggleDefaultBarStacking: () => dispatch(toggleDefaultBarStacking()),
+		updateDefaultLanguage: (defaultLanguage: LanguageTypes) => dispatch(updateDefaultLanguage(defaultLanguage)),
 		submitPreferences: () => dispatch(submitPreferencesIfNeeded())
 	};
 }
 
-export default connect(mapStateToProps, mapDispatchToProps)(AdminComponent);
+export default connect(mapStateToProps, mapDispatchToProps)(PreferencesComponent);
+

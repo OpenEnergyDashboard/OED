@@ -8,6 +8,8 @@ import { NamedIDItem } from '../types/items';
 import { showErrorNotification } from '../utils/notifications';
 import * as t from '../types/redux/groups';
 import { groupsApi } from '../utils/api';
+import { browserHistory } from 'react-router';
+import translate from '../utils/translate';
 
 function requestGroupsDetails(): t.RequestGroupsDetailsAction {
 	return { type: ActionType.RequestGroupsDetails };
@@ -228,14 +230,14 @@ function submitNewGroup(group: t.GroupData): Thunk {
 			dispatch(markGroupsOutdated());
 			dispatch(dispatch2 => {
 				dispatch2(markGroupInEditingClean());
-				dispatch2(changeDisplayMode(t.DisplayMode.View));
+				browserHistory.push('/groups');
 			});
 		} catch (e) {
 			dispatch(markGroupInEditingNotSubmitted());
 			if (e.response !== undefined && e.response.status === 400) {
 				showErrorNotification(e.response.data.error);
 			} else {
-				showErrorNotification('Unable to create group.');
+				showErrorNotification(translate('failed.to.create.group'));
 			}
 		}
 	};
@@ -250,14 +252,14 @@ function submitGroupEdits(group: t.GroupData & t.GroupID): Thunk {
 			dispatch(markOneGroupOutdated(group.id));
 			dispatch(dispatch2 => {
 				dispatch2(markGroupInEditingClean());
-				dispatch2(changeDisplayMode(t.DisplayMode.View));
+				browserHistory.push('/groups');
 			});
 		} catch (e) {
 			dispatch(markGroupInEditingNotSubmitted());
 			if (e.response.data.message && e.response.data.message === 'Cyclic group detected') {
-				showErrorNotification('You cannot create a cyclic group');
+				showErrorNotification(translate('you.cannot.create.a.cyclic.group'));
 			} else {
-				showErrorNotification('Failed to edit group');
+				showErrorNotification(translate('failed.to.edit.group'));
 			}
 		}
 	};
@@ -296,10 +298,6 @@ export function submitGroupInEditingIfNeeded() {
 	};
 }
 
-/**
- * Deletes the group in editing
- * @returns {function(*, *)}
- */
 export function deleteGroup(): Thunk {
 	return async (dispatch, getState) => {
 		dispatch(markGroupInEditingDirty());
@@ -313,10 +311,10 @@ export function deleteGroup(): Thunk {
 			dispatch(changeDisplayedGroups([]));
 			dispatch(dispatch2 => {
 				dispatch2(markGroupInEditingClean());
-				dispatch2(changeDisplayMode(t.DisplayMode.View));
+				browserHistory.push('/groups');
 			});
 		} catch (e) {
-			showErrorNotification('Failed to delete group');
+			showErrorNotification(translate('failed.to.delete.group'));
 		}
 	};
 }

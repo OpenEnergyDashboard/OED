@@ -1,0 +1,29 @@
+/* This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this
+ * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
+
+.spinner {
+	display: inline-block;
+	border-radius: 100%;
+	animation-fill-mode: both;
+	animation-name: spin-animation;
+}
+
+.spinner-item-1 {
+	animation: spin-animation 0.7s 0s infinite linear;
+}
+
+.spinner-item-2 {
+	animation: spin-animation 0.7s 0.35s infinite linear;
+}
+
+@keyframes spin-animation {
+	50% {
+		transform: scale(0.75);
+		opacity: 0.2
+	} 
+	100% {
+		transform: scale(1);
+		opacity: 1
+	}
+}

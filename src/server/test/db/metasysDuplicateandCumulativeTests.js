@@ -11,7 +11,7 @@ chai.use(chaiAsPromised);
 const expect = chai.expect;
 
 const recreateDB = require('./common').recreateDB;
-const db = require('../../models/database').db;
+const getDB = require('../../models/database').getDB;
 const Meter = require('../../models/Meter');
 const readMetasysData = require('../../services/readMetasysData');
 
@@ -27,14 +27,14 @@ mocha.describe('Insert Metasys readings from a file', () => {
 	mocha.it('handles duplicate readings', async () => {
 		const testFilePath = path.join(__dirname, 'data', 'metasys-duplicate.csv');
 		await readMetasysData(testFilePath, 60, 2, false);
-		const { count } = await db.one('SELECT COUNT(*) as count FROM readings');
+		const { count } = await getDB().one('SELECT COUNT(*) as count FROM readings');
 		expect(parseInt(count)).to.equal(37);
 	});
 
 	mocha.it('handles cumulative readings', async () => {
 		const testFilePath = path.join(__dirname, 'data', 'metasys-duplicate.csv');
 		await readMetasysData(testFilePath, 60, 2, true);
-		const { reading } = await db.one('SELECT reading FROM readings LIMIT 1');
+		const { reading } = await getDB().one('SELECT reading FROM readings LIMIT 1');
 		expect(parseInt(reading)).to.equal(280);
 	});
 });

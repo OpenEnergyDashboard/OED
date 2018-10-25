@@ -10,7 +10,7 @@ import { BarReadings, LineReadings } from '../../types/readings';
 import { TimeInterval } from '../../../../common/TimeInterval';
 import * as moment from 'moment';
 
-class MetersApi {
+export default class MetersApi {
 	private readonly backend: ApiBackend;
 
 	constructor(backend: ApiBackend) {
@@ -36,12 +36,4 @@ class MetersApi {
 			{ timeInterval: timeInterval.toString(), barDuration: barDuration.toISOString() }
 		);
 	}
-
-	public async submitNewReadings(meterID: number, readingsFile: File): Promise<void> {
-		const formData = new FormData();
-		formData.append('csvFile', readingsFile);
-		return await this.backend.doPostRequest<void>(`/api/fileProcessing/${meterID}`, formData);
-	}
 }
-
-export default MetersApi;
