@@ -43,6 +43,10 @@ export default class MeterViewComponent extends React.Component<MeterViewProps, 
 			return { color: 'red' };
 	}
 
+	private styleToggleBtn(): React.CSSProperties {
+		return { float: "right" };
+	}
+
 	private formatMeterType() {
 		if (this.props.meterType) {
 			return this.props.meterType;
@@ -64,31 +68,74 @@ export default class MeterViewComponent extends React.Component<MeterViewProps, 
 			);
 		}
 	}
+
 	private formatDisplayable() {
+		let styleFn;
+		let messageId;
+		let buttonMessageId;
 
 		if (this.props.displayable) {
-			return ( <span style={this.styleEnabled()}>
-				<FormattedMessage id='meter.is.displayable' />
-				</span>
-			);
+			styleFn = this.styleEnabled;
+			messageId = 'meter.is.displayable';
+			buttonMessageId = 'hide';
 		} else {
-			return ( <span style={this.styleDisabled()}>
-				<FormattedMessage id='meter.is.not.displayable' />
-			</span> );
+			styleFn = this.styleDisabled;
+			messageId = 'meter.is.not.displayable';
+			buttonMessageId = 'show';
+		};
+
+		let toggleButton;
+		if (hasToken()) {
+			toggleButton = <Button style={this.styleToggleBtn()} color="primary">
+				<FormattedMessage id={buttonMessageId} />
+				</Button>;
+		} else {
+			toggleButton = <div> </div>;
 		}
+
+		return (
+			<span>
+			<span style={styleFn()}>
+				<FormattedMessage id={messageId} />
+			</span>
+			{toggleButton}
+			</span>
+		);
 	}
 
 	private formatEnabled() {
-		if (this.props.enabled) {
-			return ( <span style={this.styleEnabled()}>
-				<FormattedMessage id='meter.is.enabled' />
-				</span>
-			);
+		let styleFn;
+		let messageId;
+		let buttonMessageId;
+
+		if (this.props.displayable) {
+			styleFn = this.styleEnabled;
+			messageId = 'meter.is.enabled';
+			buttonMessageId = 'disable';
 		} else {
-			return ( <span style={this.styleDisabled()}>
-				<FormattedMessage id='meter.is.not.enabled' />
-			</span> );
+			styleFn = this.styleDisabled;
+			messageId = 'meter.is.not.enabled';
+			buttonMessageId = 'enable';
+		};
+
+		let toggleButton;
+		if (hasToken()) {
+			toggleButton = <Button style={this.styleToggleBtn()}color="primary">
+				<FormattedMessage id={buttonMessageId} />
+				</Button>;
+		} else {
+			toggleButton = <div> </div>;
 		}
+
+		return (
+			<span>
+				<span style={styleFn()}>
+					<FormattedMessage id={messageId} />
+				</span>
+				{ toggleButton }
+			</span>
+		);
+
 	}
 }
 
