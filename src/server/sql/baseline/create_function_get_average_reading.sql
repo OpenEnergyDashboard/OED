@@ -48,7 +48,7 @@ BEGIN
 				extract(EPOCH FROM least(r.end_timestamp, compressed.start + point_width) - greatest(r.start_timestamp, compressed.start)) AS duration
 			FROM readings r
 				INNER JOIN generate_series(real_start_timestamp, real_end_timestamp - point_width, point_width) compressed(start) ON
-																																																														r.start_timestamp <= compressed.start + point_width AND r.end_timestamp >= compressed.start
+					r.start_timestamp <= compressed.start + point_width AND r.end_timestamp >= compressed.start
 			WHERE r.meter_id = ANY(meter_ids)
 	)
 	SELECT
