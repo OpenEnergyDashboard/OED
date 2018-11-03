@@ -10,6 +10,7 @@ CREATE TABLE baseline (
 	apply_range tsrange NOT NULL,
 	calc_range tsrange NOT NULL,
 	baseline_value DOUBLE PRECISION NOT NULL,
+	note TEXT,
 	PRIMARY KEY (meter_id, apply_range),
 	EXCLUDE USING GIST (
 		meter_id WITH =,

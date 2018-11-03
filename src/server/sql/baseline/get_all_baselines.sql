@@ -8,5 +8,6 @@ SELECT
 	upper(apply_range) as apply_end,
 	lower(calc_range) as calc_start,
 	upper(calc_range) as calc_end,
-	baseline_value
+	baseline_value,
+	note
 from baseline;

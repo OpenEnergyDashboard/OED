@@ -21,7 +21,8 @@ router.post('/new', async (req, res) => {
 			req.body.applyStart,
 			req.body.applyEnd,
 			req.body.calcStart,
-			req.body.calcEnd
+			req.body.calcEnd,
+			req.body.note
 		);
 		await baseline.insert();
 		res.sendStatus(200);
