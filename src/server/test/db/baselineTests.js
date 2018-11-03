@@ -34,7 +34,7 @@ mocha.describe('Baselines', () => {
 			applyEnd,
 			calcStart,
 			calcEnd,
-			"a note"
+			'a note'
 		);
 		await baseline.insert();
 		const retrievedBaselines = await Baseline.getAllForMeterID(meter.id);
