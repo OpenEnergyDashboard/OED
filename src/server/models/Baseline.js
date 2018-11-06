@@ -7,7 +7,7 @@ const { TimeInterval } = require('../../common/TimeInterval');
 const getDB = database.getDB;
 const sqlFile = database.sqlFile;
 class Baseline {
-	constructor(meterID, applyStart, applyEnd, calcStart, calcEnd, baselineValue = null, note) {
+	constructor(meterID, applyStart, applyEnd, calcStart, calcEnd, note = null, baselineValue = null) {
 		this.meterID = meterID;
 		this.applyRange = new TimeInterval(applyStart, applyEnd);
 		this.calcRange = new TimeInterval(calcStart, calcEnd);
@@ -19,7 +19,7 @@ class Baseline {
 	}
 	static mapRow(row) {
 		return new Baseline(row.meter_id, row.apply_start, row.apply_end, row.calc_start, row.calc_end,
-			row.baseline_value, row.note);
+			row.note, row.baseline_value);
 	}
 	async insert(conn = getDB) {
 		const resp = await conn().one(sqlFile('baseline/new_baseline.sql'), {
