@@ -7,6 +7,6 @@ VALUES (${meter_id},
 				tsrange(${apply_start}, ${apply_end}, '[]'),
 				tsrange(${calc_start}, ${calc_end}, '[]'),
 				(SELECT reading_rate FROM get_average_reading(ARRAY [${meter_id}], ${calc_start}, ${calc_end})),
-				note
+				${note}
 				)
 RETURNING baseline_value;
