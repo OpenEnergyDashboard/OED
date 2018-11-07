@@ -234,7 +234,11 @@ function submitNewGroup(group: t.GroupData): Thunk {
 			});
 		} catch (e) {
 			dispatch(markGroupInEditingNotSubmitted());
-			showErrorNotification(translate('failed.to.create.group'));
+			if (e.response !== undefined && e.response.status === 400) {
+				showErrorNotification(e.response.data.error);
+			} else {
+				showErrorNotification(translate('failed.to.create.group'));
+			}
 		}
 	};
 }
