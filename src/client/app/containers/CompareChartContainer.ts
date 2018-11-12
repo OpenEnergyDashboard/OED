@@ -5,11 +5,16 @@
 */
 
 import * as datalabels from 'chartjs-plugin-datalabels';
-import Plot, {PlotParams} from 'react-plotly.js';
 import { connect } from 'react-redux';
 import { State } from '../types/redux/state';
 import { getComparePeriodLabels } from '../utils/calculateCompare';
 import { CompareEntity } from './MultiCompareChartContainer';
+import * as Plotly from 'plotly.js';
+import { PlotParams } from 'react-plotly.js';
+import { Data, Layout } from 'plotly.js';
+
+var createPlotlyComponent = require( 'react-plotly.js/factory');
+const Plot = createPlotlyComponent(Plotly);
 
 if (datalabels === null || datalabels === undefined) {
 	throw new Error('Datalabels plugin was tree-shaken out.');
@@ -48,5 +53,5 @@ function mapStateToProps(state: State, ownProps: CompareChartContainerProps): Pl
 }
 
 // Escape from TypeScript here. TypeScript doesn't like the fact that Bar is non typed.
-const plotConstructor: any = Plot;
-export default connect(mapStateToProps)(plotConstructor);
+//const plotConstructor: any = Plot;
+export default connect(mapStateToProps)(Plot);
