@@ -13,6 +13,7 @@ interface MetersDetailProps {
 	meters: number[];
 	unsavedChanges: boolean;
 	fetchMetersDetailsIfNeeded(): Promise<any>;
+	submitEditedMeters(): Promise<any>;
 }
 
 export default class MetersDetailComponent extends React.Component<MetersDetailProps, {}> {
@@ -42,7 +43,7 @@ export default class MetersDetailComponent extends React.Component<MetersDetailP
 		const buttonContainerStyle: React.CSSProperties = {
 			width: '10%',
 			marginLeft: '40%',
-			marginRight: '40%',
+			marginRight: '40%'
 		};
 
 		return (
@@ -70,8 +71,13 @@ export default class MetersDetailComponent extends React.Component<MetersDetailP
 					</tbody>
 					</Table>
 					</div>
-					<Button style={buttonContainerStyle}>
-						<FormattedMessage id='save.meter.edits' disabled={this.props.unsavedChanges} />
+					<Button
+						color='success'
+						style={buttonContainerStyle}
+						disabled={!this.props.unsavedChanges}
+						onClick={this.props.submitEditedMeters}
+					>
+						<FormattedMessage id='save.meter.edits' />
 					</Button>
 				</div>
 				<FooterComponent />

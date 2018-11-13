@@ -5,7 +5,7 @@
 import { connect } from 'react-redux';
 import MetersDetailComponent from '../../components/meters/MetersDetailComponent';
 import { State } from '../../types/redux/state';
-import { fetchMetersDetailsIfNeeded } from '../../actions/meters';
+import { fetchMetersDetailsIfNeeded, submitEditedMeters } from '../../actions/meters';
 import {Dispatch} from '../../types/redux/actions';
 
 
@@ -13,13 +13,15 @@ function mapStateToProps(state: State) {
 	return {
 		meters: Object.keys(state.meters.byMeterID)
 			.map(key => parseInt(key))
-			.filter(key => !isNaN(key))
+			.filter(key => !isNaN(key)),
+		unsavedChanges: Object.keys(state.meters.editedMeters).length > 0
 	};
 }
 
 function mapDispatchToProps(dispatch: Dispatch) {
 	return {
-		fetchMetersDetailsIfNeeded: () => dispatch(fetchMetersDetailsIfNeeded())
+		fetchMetersDetailsIfNeeded: () => dispatch(fetchMetersDetailsIfNeeded()),
+		submitEditedMeters: () => dispatch(submitEditedMeters())
 	};
 }
 

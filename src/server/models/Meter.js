@@ -124,6 +124,19 @@ class Meter {
 	}
 
 	/**
+	 * Returns a promise to update an existing meter in the database
+	 * @param conn the connection to use. Defaults to the default database connection.
+	 * @returns {Promise.<>}
+	 */
+	async update(conn = getDB) {
+		const meter = this;
+		if (meter.id === undefined) {
+			throw new Error('Attempt to update a meter with no ID');
+		}
+		await conn().none(sqlFile('meter/update_meter.sql'), meter);
+	}
+
+	/**
 	 * Returns a promise to get all of the readings for this meter from the database.
 	 * @param conn the connection to use. Defaults to the default database connection.
 	 * @returns {Promise.<Array.<Reading>>}

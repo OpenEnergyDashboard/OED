@@ -6,10 +6,11 @@ const express = require('express');
 const Meter = require('../models/Meter');
 const { log } = require('../log');
 const validate = require('jsonschema').validate;
-const authenticator = require('./authenticator').optionalAuthMiddleware;
+const optionalAuthenticator = require('./authenticator').optionalAuthMiddleware;
+const requiredAuthenticator = require('./authenticator').authMiddleware;
 
 const router = express.Router();
-router.use(authenticator);
+router.use(optionalAuthenticator);
 
 /**
  * Defines the format in which we want to send meters and controls what information we send to the client, if logged in or not.
@@ -87,6 +88,40 @@ router.get('/:meter_id', async (req, res) => {
 			log.error(`Error while performing GET specific meter by id query: ${err}`, err);
 			res.sendStatus(500);
 		}
+	}
+});
+
+router.use(requiredAuthenticator);
+
+router.post('/edit', async (req, res) => {
+	const validParams = {
+		type: 'object',
+		maxProperties: 3,
+		required: ['id', 'enabled', 'displayable'],
+		properties: {
+			id: { type: 'integer' },
+			enabled: { type: 'bool' },
+			displayable: { type: 'bool' }
+		}
+	};
+
+	const validatorResult = validate(req.body, validParams);
+	if (!validatorResult.valid) {
+		log.warn('Got request to edit meters with invalid meter data.');
+		res.status(400)
+			.json({ message: 'Invalid meter data supplied.', err: validatorResult.errors });
+	} else {
+		try {
+			const meter = await Meter.getByID(req.body.id);
+			meter.enabled = req.body.enabled;
+			meter.displayable = req.body.displayable;
+			await meter.update();
+		} catch (err) {
+			log.error('Failed to edit meter', err);
+			res.status(500).json({ message: 'Unable to edit meters.', err });
+		}
+
+		res.status(200).json({ message: `Successfully edited meter ${req.body.id}` });
 	}
 });
 

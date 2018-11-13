@@ -15,8 +15,9 @@ authMiddleware = (req, res, next) => {
 	const validParams = {
 		type: 'string'
 	};
+
 	if (!validate(token, validParams).valid) {
-		res.sendStatus(400);
+		res.status(403).json({ success: false, message: 'No token provided or JSON was invalid.' });
 	} else if (token) {
 		jwt.verify(token, secretToken, (err, decoded) => {
 			if (err) {
@@ -26,10 +27,7 @@ authMiddleware = (req, res, next) => {
 			next();
 		});
 	} else {
-		res.status(403).send({
-			success: false,
-			message: 'No token provided.'
-		});
+		res.status(403).send({ success: false, message: 'No token provided.' });
 	}
 };
 

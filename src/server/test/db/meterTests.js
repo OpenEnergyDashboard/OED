@@ -31,6 +31,19 @@ mocha.describe('Meters', () => {
 		expectMetersToBeEquivalent(meterPreInsert, meterPostInsertByID);
 	});
 
+	mocha.it('can be saved, edited, and retrieved', async () => {
+		const meterPreInsert = new Meter(undefined, 'Meter', null, false, true, Meter.type.MAMAC);
+		await meterPreInsert.insert();
+		const meterPostInsertByID = await Meter.getByID(meterPreInsert.id);
+		expectMetersToBeEquivalent(meterPreInsert, meterPostInsertByID);
+
+		meterPreInsert.name = 'Something Else';
+		meterPreInsert.enabled = true;
+		await meterPreInsert.update();
+		const meterPostUpdate = await Meter.getByID(meterPreInsert.id);
+		expectMetersToBeEquivalent(meterPreInsert, meterPostUpdate);
+	});
+
 	mocha.it('can get only enabled meters', async () => {
 		const enabledMeter = new Meter(undefined, 'EnabledMeter', null, true, true, Meter.type.MAMAC);
 		const disabledMeter = new Meter(undefined, 'DisabledMeter', null, false, true, Meter.type.MAMAC);

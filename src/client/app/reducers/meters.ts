@@ -9,10 +9,14 @@ import { ActionType } from '../types/redux/actions';
 const defaultState: MetersState = {
 	isFetching: false,
 	byMeterID: {},
-	selectedMeters: []
+	selectedMeters: [],
+	editedMeters: {},
+	submitting: []
 };
 
 export default function meters(state = defaultState, action: MetersAction) {
+	let submitting;
+	let editedMeters;
 	switch (action.type) {
 		case ActionType.RequestMetersDetails:
 			return {
@@ -29,6 +33,35 @@ export default function meters(state = defaultState, action: MetersAction) {
 			return {
 				...state,
 				selectedMeters: action.selectedMeters
+			};
+		case ActionType.EditMeterDetails:
+			editedMeters = state.editedMeters;
+			editedMeters[action.meter.id] = action.meter;
+			return {
+				...state,
+				editedMeters
+			};
+		case ActionType.SubmitEditedMeter:
+			submitting = state.submitting;
+			submitting.push(action.meter);
+			return {
+				...state,
+				submitting
+			};
+		case ActionType.ConfirmEditedMeter:
+			submitting = state.submitting;
+			submitting.splice(submitting.indexOf(action.meter));
+
+			const byMeterID = state.byMeterID;
+			editedMeters = state.editedMeters;
+			byMeterID[action.meter] = editedMeters[action.meter];
+
+			delete editedMeters[action.meter];
+			return {
+				...state,
+				submitting,
+				editedMeters,
+				byMeterID
 			};
 		default:
 			return state;

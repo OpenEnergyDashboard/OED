@@ -6,13 +6,25 @@ import { connect } from 'react-redux';
 import MeterViewComponent from '../../components/meters/MeterViewComponent';
 import { Dispatch } from '../../types/redux/actions';
 import { State } from '../../types/redux/state';
+import { editMeterDetails } from '../../actions/meters';
+import { MeterMetadata } from '../../types/redux/meters';
 
 function mapStateToProps(state: State, ownProps: {id: number}) {
-	return state.meters.byMeterID[ownProps.id];
+	let meter = JSON.parse(JSON.stringify(state.meters.byMeterID[ownProps.id]));
+	if (state.meters.editedMeters[ownProps.id]) {
+		meter = JSON.parse(JSON.stringify(state.meters.editedMeters[ownProps.id]));
+	}
+	return {
+		meter,
+		isEdited: state.meters.editedMeters[ownProps.id] !== undefined,
+		isSubmitting: state.meters.submitting.indexOf(ownProps.id) !== -1
+	};
 }
 
 function mapDispatchToProps(dispatch: Dispatch) {
-	return {};
+	return {
+		editMeterDetails: (meter: MeterMetadata) => dispatch(editMeterDetails(meter))
+	};
 }
 
 export default connect(mapStateToProps, mapDispatchToProps)(MeterViewComponent);

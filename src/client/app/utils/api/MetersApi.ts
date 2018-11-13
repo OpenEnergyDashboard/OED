@@ -8,6 +8,7 @@ import ApiBackend from './ApiBackend';
 import { NamedIDItem } from '../../types/items';
 import { BarReadings, LineReadings } from '../../types/readings';
 import { TimeInterval } from '../../../../common/TimeInterval';
+import { MeterMetadata, MeterEditData } from '../../types/redux/meters';
 import * as moment from 'moment';
 
 export default class MetersApi {
@@ -35,5 +36,13 @@ export default class MetersApi {
 			`/api/readings/bar/meters/${stringifiedIDs}`,
 			{ timeInterval: timeInterval.toString(), barDuration: barDuration.toISOString() }
 		);
+	}
+
+
+	public async edit(meter: MeterMetadata): Promise<{}> {
+		return await this.backend.doPostRequest<MeterEditData>(
+				'/api/meters/edit',
+				{ id: meter.id, enabled: meter.enabled, displayable: meter.displayable }
+			);
 	}
 }

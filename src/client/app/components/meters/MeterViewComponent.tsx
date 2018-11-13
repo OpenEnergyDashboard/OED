@@ -8,13 +8,24 @@ import ListDisplayComponent from '../ListDisplayComponent';
 import { Link } from 'react-router';
 import { hasToken } from '../../utils/token';
 import { FormattedMessage } from 'react-intl';
-import { MeterMetadata } from '../../types/redux/meters';
+import { MeterMetadata, EditMeterDetailsAction } from '../../types/redux/meters';
 
-type MeterViewProps = MeterMetadata;
+interface MeterViewProps {
+	// The ID of the meter to be displayed
+	id: number;
+	// The meter metadata being displayed by this row
+	meter: MeterMetadata;
+	isEdited: boolean;
+	isSubmitting: boolean;
+	// The function used to dispatch the action to edit meter details
+	editMeterDetails(meter: MeterMetadata): EditMeterDetailsAction;
+}
 
 export default class MeterViewComponent extends React.Component<MeterViewProps, {}> {
 	constructor(props: MeterViewProps) {
 		super(props);
+		this.toggleMeterDisplayable = this.toggleMeterDisplayable.bind(this);
+		this.toggleMeterEnabled = this.toggleMeterEnabled.bind(this);
 	}
 
 	public render() {
@@ -25,14 +36,26 @@ export default class MeterViewComponent extends React.Component<MeterViewProps, 
 		};
 		return (
 			<tr>
-				<td> {this.props.id} </td>
-				<td> {this.props.name} </td>
+				<td> {this.props.meter.id} {this.formatStatus()} </td>
+				<td> {this.props.meter.name} </td>
 				<td> {this.formatMeterType()} </td>
 				<td> {this.formatMeterAddress()} </td>
 				<td> {this.formatEnabled()} </td>
 				<td> {this.formatDisplayable()} </td>
 			</tr>
 		);
+	}
+
+	private formatStatus(): string {
+		if (this.props.isSubmitting) {
+			return '(submitting)';
+		}
+
+		if (this.props.isEdited) {
+			return '(edited)';
+		}
+
+		return '';
 	}
 
 	private styleEnabled(): React.CSSProperties {
@@ -44,12 +67,24 @@ export default class MeterViewComponent extends React.Component<MeterViewProps, 
 	}
 
 	private styleToggleBtn(): React.CSSProperties {
-		return { float: "right" };
+		return { float: 'right' };
+	}
+
+	private toggleMeterDisplayable() {
+		const editedMeter = this.props.meter;
+		editedMeter.displayable = !editedMeter.displayable;
+		this.props.editMeterDetails(editedMeter);
+	}
+
+	private toggleMeterEnabled() {
+		const editedMeter = this.props.meter;
+		editedMeter.enabled = !editedMeter.enabled;
+		this.props.editMeterDetails(editedMeter);
 	}
 
 	private formatMeterType() {
-		if (this.props.meterType) {
-			return this.props.meterType;
+		if (this.props.meter.meterType) {
+			return this.props.meter.meterType;
 		} else {
 			return ( <span style={this.styleDisabled()}>
 				<FormattedMessage id='admin.only' />
@@ -59,8 +94,8 @@ export default class MeterViewComponent extends React.Component<MeterViewProps, 
 	}
 
 	private formatMeterAddress() {
-		if (this.props.ipAddress) {
-			return this.props.ipAddress;
+		if (this.props.meter.ipAddress) {
+			return this.props.meter.ipAddress;
 		} else {
 			return ( <span style={this.styleDisabled()}>
 				<FormattedMessage id='admin.only' />
@@ -74,7 +109,7 @@ export default class MeterViewComponent extends React.Component<MeterViewProps, 
 		let messageId;
 		let buttonMessageId;
 
-		if (this.props.displayable) {
+		if (this.props.meter.displayable) {
 			styleFn = this.styleEnabled;
 			messageId = 'meter.is.displayable';
 			buttonMessageId = 'hide';
@@ -82,15 +117,15 @@ export default class MeterViewComponent extends React.Component<MeterViewProps, 
 			styleFn = this.styleDisabled;
 			messageId = 'meter.is.not.displayable';
 			buttonMessageId = 'show';
-		};
+		}
 
 		let toggleButton;
 		if (hasToken()) {
-			toggleButton = <Button style={this.styleToggleBtn()} color="primary">
+			toggleButton = <Button style={this.styleToggleBtn()} color='primary' onClick={this.toggleMeterDisplayable}>
 				<FormattedMessage id={buttonMessageId} />
 				</Button>;
 		} else {
-			toggleButton = <div> </div>;
+			toggleButton = <div />;
 		}
 
 		return (
@@ -108,7 +143,7 @@ export default class MeterViewComponent extends React.Component<MeterViewProps, 
 		let messageId;
 		let buttonMessageId;
 
-		if (this.props.displayable) {
+		if (this.props.meter.enabled) {
 			styleFn = this.styleEnabled;
 			messageId = 'meter.is.enabled';
 			buttonMessageId = 'disable';
@@ -116,15 +151,15 @@ export default class MeterViewComponent extends React.Component<MeterViewProps, 
 			styleFn = this.styleDisabled;
 			messageId = 'meter.is.not.enabled';
 			buttonMessageId = 'enable';
-		};
+		}
 
 		let toggleButton;
 		if (hasToken()) {
-			toggleButton = <Button style={this.styleToggleBtn()}color="primary">
+			toggleButton = <Button style={this.styleToggleBtn()} color='primary' onClick={this.toggleMeterEnabled}>
 				<FormattedMessage id={buttonMessageId} />
 				</Button>;
 		} else {
-			toggleButton = <div> </div>;
+			toggleButton = <div />;
 		}
 
 		return (
@@ -132,7 +167,7 @@ export default class MeterViewComponent extends React.Component<MeterViewProps, 
 				<span style={styleFn()}>
 					<FormattedMessage id={messageId} />
 				</span>
-				{ toggleButton }
+				{toggleButton}
 			</span>
 		);
 
