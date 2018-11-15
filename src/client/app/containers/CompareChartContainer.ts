@@ -7,7 +7,7 @@
 import * as datalabels from 'chartjs-plugin-datalabels';
 import { connect } from 'react-redux';
 import { State } from '../types/redux/state';
-import { getComparePeriodLabels, getCompareChangeSummary, getCompareBarTitles } from '../utils/calculateCompare';
+import { getCompareChangeSummary, getCompareBarTitles, getComparePeriodLabelsForXAxis } from '../utils/calculateCompare';
 import { CompareEntity } from './MultiCompareChartContainer';
 import * as Plotly from 'plotly.js';
 import { PlotParams } from 'react-plotly.js';
@@ -24,7 +24,7 @@ interface CompareChartContainerProps {
 
 function mapStateToProps(state: State, ownProps: CompareChartContainerProps): PlotParams {
 	const comparePeriod = state.graph.comparePeriod;
-	const periodLabels = getComparePeriodLabels(comparePeriod);
+	const periodLabels = getComparePeriodLabelsForXAxis(comparePeriod);
 	const barTitles = getCompareBarTitles(comparePeriod);
 	const entity = ownProps.entity;
 	const currentUsageColor = 'rgba(218, 165, 32, 1)';

@@ -101,7 +101,20 @@ export function getComparePeriodLabels(comparePeriod: ComparePeriod): ComparePer
 		default:
 			throw new Error(`Unknown period value: ${comparePeriod}`);
 	}
+}
 
+export function getComparePeriodLabelsForXAxis(comparePeriod: ComparePeriod): ComparePeriodLabels {
+	if (comparePeriod === ComparePeriod.Day || comparePeriod === ComparePeriod.Week) {
+		return getComparePeriodLabels(comparePeriod);
+	}
+	const startOfThisFourWeeks = moment().startOf('week').subtract(21, 'days');
+	const endOfThisFourWeeks = moment().endOf('week');
+	const startOfLastFourWeeks = moment().startOf('week').subtract(49, 'days');
+	const endOfLastFourWeeks = moment().endOf('week').subtract(28, 'days');
+	return {
+		prev: startOfLastFourWeeks.format('MM/DD') + '-' + endOfLastFourWeeks.format('MM/DD'),
+		current: startOfThisFourWeeks.format('MM/DD') + '-' + endOfThisFourWeeks.format('MM/DD')
+	};
 }
 
 /**
