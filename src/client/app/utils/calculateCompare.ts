@@ -143,10 +143,10 @@ export function getCompareBarTitles(comparePeriod: ComparePeriod): CompareBarTit
 			end = m.endOf('week').format('dddd'); // Saturday
 			break;
 		case ComparePeriod.FourWeeks:
-			// TODO: Change those labels
-			start = 'start';
-			current = 'current';
-			end = 'end';
+			// TODO: Change those label
+			start = '0 days';
+			current = (21 + moment().weekday().valueOf()) + ' days';
+			end = '28 days';
 			break;
 		default:
 			throw new Error(`Unknown period value: ${comparePeriod}`);
