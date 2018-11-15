@@ -4,7 +4,7 @@
 
 import { TimeInterval } from '../../../common/TimeInterval';
 import * as moment from 'moment';
-import translate from '../utils/translate';
+import translate, { getDefaultLanguage } from '../utils/translate';
 
 export enum ComparePeriod {
 	Day = 'Day',
@@ -118,4 +118,41 @@ export function getCompareChangeSummary(change: number, name: string, labels: Co
 	} else {
 		return `${name} ${translate('has.used')} ${percent}% ${translate('more.energy')} ${labels.current.toLocaleLowerCase()}`;
 	}
+}
+
+export interface CompareBarTitles {
+	barForCurrentUsage: string;
+	barForTotalUsage: string;
+}
+
+export function getCompareBarTitles(comparePeriod: ComparePeriod): CompareBarTitles {
+	const lang = getDefaultLanguage();
+	const m = moment().locale(lang);
+	let start;
+	let current;
+	let end;
+	switch (comparePeriod) {
+		case ComparePeriod.Day:
+			start = m.startOf('day').format('hh A'); // 12 AM
+			current = moment().format('hh A');
+			end = m.endOf('day').format('hh A'); // 11 PM
+			break;
+		case ComparePeriod.Week:
+			start = m.startOf('week').format('dddd'); // Sunday
+			current = moment().locale(lang).format('dddd');
+			end = m.endOf('week').format('dddd'); // Saturday
+			break;
+		case ComparePeriod.FourWeeks:
+			// TODO: Change those labels
+			start = 'start';
+			current = 'current';
+			end = 'end';
+			break;
+		default:
+			throw new Error(`Unknown period value: ${comparePeriod}`);
+	}
+	return {
+		barForCurrentUsage: start + '-' + current,
+		barForTotalUsage: start + '-' + end
+	};
 }

@@ -7,7 +7,7 @@
 import * as datalabels from 'chartjs-plugin-datalabels';
 import { connect } from 'react-redux';
 import { State } from '../types/redux/state';
-import { getComparePeriodLabels, getCompareChangeSummary } from '../utils/calculateCompare';
+import { getComparePeriodLabels, getCompareChangeSummary, getCompareBarTitles } from '../utils/calculateCompare';
 import { CompareEntity } from './MultiCompareChartContainer';
 import * as Plotly from 'plotly.js';
 import { PlotParams } from 'react-plotly.js';
@@ -25,24 +25,38 @@ interface CompareChartContainerProps {
 function mapStateToProps(state: State, ownProps: CompareChartContainerProps): PlotParams {
 	const comparePeriod = state.graph.comparePeriod;
 	const periodLabels = getComparePeriodLabels(comparePeriod);
+	const barTitles = getCompareBarTitles(comparePeriod);
 	const entity = ownProps.entity;
+	const currentUsageColor = 'rgba(218, 165, 32, 1)';
+	const totalUsageColor = 'rgba(173, 216, 230, 1)';
 
-	const readingsBeforeCurrentTime: Plotly.Data = {
+	const readingsForCurrentUsage: Plotly.Data = {
 		x: [periodLabels.prev, periodLabels.current],
 		y: [entity.usedToThisPointLastTimePeriod, entity.currentPeriodUsage],
-		name: 'Before current time',
-		type: 'bar'
+		text: 'kW',
+		name: barTitles.barForCurrentUsage,
+		type: 'bar',
+		marker: {
+			color: currentUsageColor
+		}
 	};
-	const readingsAfterCurrentTime: Plotly.Data = {
+	const readingsForTotalUsage: Plotly.Data = {
 		x: [periodLabels.prev, periodLabels.current],
 		y: [entity.lastPeriodTotalUsage, Math.round((entity.currentPeriodUsage / entity.usedToThisPointLastTimePeriod) * entity.lastPeriodTotalUsage)],
-		name: 'After current time',
-		type: 'bar'
+		text: 'kW',
+		name: barTitles.barForTotalUsage,
+		type: 'bar',
+		marker: {
+			color: totalUsageColor
+		}
 	};
-	const chartData: Plotly.Data [] = [readingsBeforeCurrentTime, readingsAfterCurrentTime];
+	const chartData: Plotly.Data [] = [readingsForCurrentUsage, readingsForTotalUsage];
 	const chartLayout: Partial<Plotly.Layout> = {
-		barmode: 'group',
-		title: getCompareChangeSummary(entity.change, entity.name, periodLabels)
+		title: getCompareChangeSummary(entity.change, entity.name, periodLabels),
+		titlefont: {
+			color: colorlizeCompareGraphTitle(entity.change)
+		},
+		barmode: 'stack'
 	};
 	const props: PlotParams = {
 		data: chartData,

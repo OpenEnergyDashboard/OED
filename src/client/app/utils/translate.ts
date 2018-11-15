@@ -13,9 +13,13 @@ addLocaleData([...en, ...fr]);
 const enum AsTranslated {}
 export type TranslatedString = string & AsTranslated;
 
-export default function translate(messageID: string): TranslatedString {
+export function getDefaultLanguage(): string {
 	const state: any = store.getState();
-	const lang = state.admin.defaultLanguage;
+	return state.admin.defaultLanguage;
+}
+
+export default function translate(messageID: string): TranslatedString {
+	const lang = getDefaultLanguage();
 
 	let messages;
 	if (lang === 'fr') {
