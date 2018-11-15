@@ -7,13 +7,11 @@
 import * as datalabels from 'chartjs-plugin-datalabels';
 import { connect } from 'react-redux';
 import { State } from '../types/redux/state';
-import { getComparePeriodLabels } from '../utils/calculateCompare';
+import { getComparePeriodLabels, getCompareChangeSummary } from '../utils/calculateCompare';
 import { CompareEntity } from './MultiCompareChartContainer';
 import * as Plotly from 'plotly.js';
 import { PlotParams } from 'react-plotly.js';
-import { Data, Layout } from 'plotly.js';
-
-var createPlotlyComponent = require( 'react-plotly.js/factory');
+const createPlotlyComponent = require( 'react-plotly.js/factory');
 const Plot = createPlotlyComponent(Plotly);
 
 if (datalabels === null || datalabels === undefined) {
@@ -27,31 +25,38 @@ interface CompareChartContainerProps {
 function mapStateToProps(state: State, ownProps: CompareChartContainerProps): PlotParams {
 	const comparePeriod = state.graph.comparePeriod;
 	const periodLabels = getComparePeriodLabels(comparePeriod);
-	const soFar: Plotly.Data = {
+	const entity = ownProps.entity;
+
+	const readingsBeforeCurrentTime: Plotly.Data = {
 		x: [periodLabels.prev, periodLabels.current],
-		y: [10, 20],
-		name: 'soFar',
+		y: [entity.usedToThisPointLastTimePeriod, entity.currentPeriodUsage],
+		name: 'Before current time',
 		type: 'bar'
 	};
-	const whole: Plotly.Data = {
+	const readingsAfterCurrentTime: Plotly.Data = {
 		x: [periodLabels.prev, periodLabels.current],
-		y: [30 - 10, 45 - 20],
-		name: 'whole',
+		y: [entity.lastPeriodTotalUsage, Math.round((entity.currentPeriodUsage / entity.usedToThisPointLastTimePeriod) * entity.lastPeriodTotalUsage)],
+		name: 'After current time',
 		type: 'bar'
 	};
-	const chartData: Plotly.Data [] = [soFar, whole];
+	const chartData: Plotly.Data [] = [readingsBeforeCurrentTime, readingsAfterCurrentTime];
 	const chartLayout: Partial<Plotly.Layout> = {
 		barmode: 'group',
-		title: 'compare'
+		title: getCompareChangeSummary(entity.change, entity.name, periodLabels)
 	};
 	const props: PlotParams = {
-		data : chartData,
-		layout : chartLayout
+		data: chartData,
+		layout: chartLayout
 	};
 
 	return props;
 }
 
-// Escape from TypeScript here. TypeScript doesn't like the fact that Bar is non typed.
-//const plotConstructor: any = Plot;
+function colorlizeCompareGraphTitle(changeForColorization: number): string {
+	if (changeForColorization < 0) {
+		return 'green';
+	}
+	return 'red';
+}
+
 export default connect(mapStateToProps)(Plot);
