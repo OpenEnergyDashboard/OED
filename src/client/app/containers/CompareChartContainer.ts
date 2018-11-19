@@ -29,7 +29,7 @@ interface CompareChartContainerProps {
 	entity: CompareEntity;
 }
 
-function mapStateToProps(state: State, ownProps: CompareChartContainerProps) {
+function mapStateToProps(state: State, ownProps: CompareChartContainerProps): LinearComponentProps {
 	const comparePeriod = state.graph.comparePeriod;
 	const datasets: ChartDataSetsWithDatalabels[] = [];
 	const labels: string[] = [];
@@ -168,5 +168,6 @@ function mapStateToProps(state: State, ownProps: CompareChartContainerProps) {
 	return props;
 }
 
-
-export default connect(mapStateToProps)(Bar);
+// Escape from TypeScript here. TypeScript doesn't like the fact that Bar is non typed.
+const barConstructor: any = Bar;
+export default connect(mapStateToProps)(barConstructor);
