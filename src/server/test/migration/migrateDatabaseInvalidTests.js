@@ -10,7 +10,6 @@ const expect = chai.expect;
 const mocha = require('mocha');
 
 const recreateDB = require('../db/common').recreateDB;
-const getDB = require('../../models/database').getDB;
 
 const Migration = require('../../models/Migration');
 const { migrateAll } = require('../../migrations/migrateDatabase');

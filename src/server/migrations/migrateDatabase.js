@@ -32,7 +32,6 @@ function getUniqueVersions(migrationItems) {
 			vertex.push(m.toVersion);
 		}
 	}
-
 	return [...new Set(vertex)];
 }
 
@@ -43,17 +42,13 @@ function getUniqueVersions(migrationItems) {
  */
 function createMigrationList(migrationItems) {
 	const migrationList = {};
-
 	const uniqueKey = getUniqueVersions(migrationItems);
-
 	uniqueKey.forEach(key => {
 		migrationList[key] = [];
 	});
-
 	for (const m of migrationItems) {
 		migrationList[m.fromVersion].push(m);
 	}
-
 	return migrationList;
 }
 
@@ -85,17 +80,13 @@ function findPathToMigrate(curr, to, adjListArray) {
 	const queue = [];
 	const path = [];
 	const visited = []; // When there is a cycle, make sure it is not infinite.
-
 	ensureIfFromAndToExist(curr, to, adjListArray);
-
 	for (const vertex of Object.keys(adjListArray)) {
 		visited[vertex] = false;
 		path[vertex] = -1;
 	}
-
 	queue.push(curr);
 	visited[curr] = true;
-
 	while (queue.length > 0) {
 		const currentVertexID = queue.shift();
 		const currentVertex = adjListArray[currentVertexID];

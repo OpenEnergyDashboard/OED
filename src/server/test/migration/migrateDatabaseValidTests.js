@@ -42,7 +42,7 @@ mocha.describe('Migration Valid', () => {
 		// Normally, recreateDB _does_ populate the migration table;
 		// that's the whole point. But, these tests require that the
 		// table is in a specific state, so I'll delete the records here.
-		getDB().none('TRUNCATE TABLE migrations');
+		await getDB().none('TRUNCATE TABLE migrations');
 		await new Migration(undefined, '0.0.0', '0.100.0').insert();
 	});
 
