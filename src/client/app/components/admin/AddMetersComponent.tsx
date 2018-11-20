@@ -30,6 +30,12 @@ class AddMetersComponent extends React.Component<AddMetersPropsWithIntl, {}> {
 
 		reader.onload = () => {
 			const fileAsBinaryString = reader.result;
+			if (fileAsBinaryString === null || fileAsBinaryString === undefined) {
+				throw new Error('fileAsBinaryString was null or undefined in meter import onload function');
+			}
+			if (typeof(fileAsBinaryString) !== 'string') {
+				throw new Error('fileAsBinaryString was not a string in meter import onload function');
+			}
 			dataLines = fileAsBinaryString.split(/\r?\n/);
 			dataLines[0] = dataLines[0].replace(/\"/g, '');
 			if (dataLines[0] !==  'ip') {

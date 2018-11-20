@@ -13,6 +13,7 @@ export class TimeInterval {
 	public constructor(startTimestamp: moment.Moment, endTimestamp: moment.Moment);
 	public toString(): string;
 	public equals(other: TimeInterval): boolean;
+	public contains(other: TimeInterval): boolean;
 	public valueOf(): string;
 	public duration(specifier: string): number;
 }
