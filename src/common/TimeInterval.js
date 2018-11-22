@@ -41,6 +41,29 @@ class TimeInterval {
 	}
 
 	/**
+	 * Test if this time interval is contains another.
+	 * Intervals are considered to contain equal intervals.
+	 * @param other
+	 * @return {boolean}
+	 */
+	contains(other) {
+		if (!(other instanceof TimeInterval)) {
+			throw new Error('TimeInterval objects can only be compared to other TimeInterval objects');
+		}
+		/* The logic here is:
+		 *
+		 * THIS starts at -∞ OR not after OTHER
+		 * AND
+		 * THIS ends at +∞ OR not before OTHER
+		 */
+		return (
+			((this.startTimestamp === null) || (this.startTimestamp <= other.startTimestamp))
+			&&
+			((this.endTimestamp === null) || (this.endTimestamp >= other.endTimestamp))
+		);
+	}
+
+	/**
 	 * Returns TimeInterval.toString() so that using a time interval as an object key will
 	 * have reasonable behaviour.
 	 * @return {*}

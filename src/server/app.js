@@ -19,6 +19,7 @@ const verification = require('./routes/verification');
 const groups = require('./routes/groups');
 const version = require('./routes/version');
 const config = require('./config');
+const baseline = require('./routes/baseline');
 
 const app = express();
 
@@ -38,6 +39,7 @@ app.use('/api/verification', verification);
 app.use('/api/fileProcessing', fileProcessing);
 app.use('/api/version', version);
 app.use(express.static(path.join(__dirname, '..', 'client', 'public')));
+app.use('/api/baselines', baseline);
 
 const router = express.Router();
 
