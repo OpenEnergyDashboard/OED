@@ -9,7 +9,7 @@ services:
     # Database service. It's PostgreSQL, see the
     # Dockerfile in ./database
     database:
-        build: ./database/
+        build: ./containers/database/
         environment:
             # Custom PGDATA per recommendations from official Docker page
             - PGDATA=/var/lib/postgresql/data/pgdata
@@ -32,8 +32,10 @@ services:
             - OED_MAIL_IDENT=mydomain@example.com
             - OED_MAIL_CREDENTIAL=credential # Set the email password here
             - OED_MAIL_FROM=mydomain@example.com
-            - OED_MAIL_TO=mydomain@example.com # Set the destination address here
-            - OED_MAIL_ORG=My Organization Name
+            - OED_MAIL_TO=mydomain@example.com  # Set the destination address here
+            - OED_MAIL_ORG=My Organization Name # Org name for mail formatting
+            # If in a subdirectory, set it here
+            # - OED_SUBDIR=/subdir/
         # Set the correct build environment.
         build: ./
         # Link to the database so the app can persist data
@@ -53,3 +55,16 @@ services:
             - database
         # Lets docker-compose up work right
         command: ["npm", "start"]
+        # Reverse proxy, for testing
+    proxy:
+        build: ./containers/proxy
+        # Link to the web container so it can proxy connections
+        links:
+            - web
+        # Map the web port
+        ports:
+            - "3001:3001"
+        # Don't bring this up without the web service
+        depends_on:
+            - web
+

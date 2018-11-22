@@ -97,6 +97,8 @@ OED_MAIL_CREDENTIAL=?		   # Credential; password for gmail, API key for mailgun.
 OED_MAIL_FROM=?                # From address for email
 OED_MAIL_TO=?                  # Who gets the e-mail. Ex: admin@example.com
 OED_MAIL_ORG=?	               # Organization Name
+OED_SUBDIR=					   # Domain subdirectory for e.g. reverse proxy
+							   # For instance, /test/ places OED at servername.net/test/
 ```
 8. Run ```npm run createdb``` to create the database schema.
 1. Run `npm run addMamacMeters` to load mamac meters from an `.csv` file.
