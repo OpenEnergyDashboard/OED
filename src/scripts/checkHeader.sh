@@ -26,6 +26,7 @@ FILES=$(echo "$FILES" | grep -v "src\/server\/test\/db\/data\/.*")
 FILES=$(echo "$FILES" | grep -v "src\/scripts\/oed\.service")
 FILES=$(echo "$FILES" | grep -v "src\/scripts\/updateMamacMetersOEDCron\.bash")
 FILES=$(echo "$FILES" | grep -v "src\/scripts\/sendLogEmailCron\.bash")
+FILES=$(echo "$FILES" | grep -v "src\/scripts\/refreshReadingViews\.bash")
 # Filter out JSON translation data
 FILES=$(echo "$FILES" | grep -v "src\/client\/app\/translations\/data.json")
 
