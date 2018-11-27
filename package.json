@@ -23,7 +23,7 @@
     "createUser": "node ./src/server/services/user/createUser.js",
     "editUser": "node ./src/server/services/user/editUser.js",
     "sendLogEmail": "node ./src/server/services/sendLogEmail.js",
-    "refreshReadingViews": "node ./src/scripts/refreshReadingViews.js"
+    "refreshReadingViews": "node ./src/server/services/refreshReadingViews.js"
   },
   "nodemonConfig": {
     "watch": [
