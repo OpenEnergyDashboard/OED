@@ -7,7 +7,6 @@ const _ = require('lodash');
 const validate = require('jsonschema').validate;
 
 const Group = require('../models/Group');
-const getDB = require('../models/database').getDB;
 const authenticator = require('./authenticator');
 const { log } = require('../log');
 
@@ -143,13 +142,6 @@ router.post('/create', async (req, res) => {
 			await newGroup.insert();
 			await req.body.childGroups.map(gid => newGroup.adoptGroup(gid));
 			await req.body.childMeters.map(mid => newGroup.adoptMeter(mid));
-			/*await getDB().tx(async t => {
-				const newGroup = new Group(undefined, req.body.name);
-				await newGroup.insert(() => t);
-				const adoptGroupsQuery = req.body.childGroups.map(gid => newGroup.adoptGroup(gid, t));
-				const adoptMetersQuery = req.body.childMeters.map(mid => newGroup.adoptMeter(mid, t));
-				return t.batch(_.flatten([adoptGroupsQuery, adoptMetersQuery]));
-			});*/
 			res.sendStatus(200);
 		} catch (err) {
 			if (err.toString() === 'error: duplicate key value violates unique constraint "groups_name_key"') {
@@ -214,28 +206,6 @@ router.put('/edit', async (req, res) => {
 
 			const disownedMeters = _.difference(currentChildMeters, req.body.childMeters);
 			await disownedMeters.map(mid => currentGroup.disownMeter(mid));
-
-			/*await getDB().tx(t => {
-				let nameChangeQuery = [];
-				if (req.body.name !== currentGroup.name) {
-					nameChangeQuery = currentGroup.rename(req.body.name, t);
-				}
-
-				const adoptedGroups = _.difference(req.body.childGroups, currentChildGroups);
-				const adoptGroupsQueries = adoptedGroups.map(gid => currentGroup.adoptGroup(gid));
-
-				const disownedGroups = _.difference(currentChildGroups, req.body.childGroups);
-				const disownGroupsQueries = disownedGroups.map(gid => currentGroup.disownGroup(gid));
-
-				// Compute meters differences and adopt/disown to make changes
-				const adoptedMeters = _.difference(req.body.childMeters, currentChildMeters);
-				const adoptMetersQueries = adoptedMeters.map(mid => currentGroup.adoptMeter(mid));
-
-				const disownedMeters = _.difference(currentChildMeters, req.body.childMeters);
-				const disownMetersQueries = disownedMeters.map(mid => currentGroup.disownMeter(mid));
-
-				return t.batch(_.flatten([nameChangeQuery, adoptGroupsQueries, disownGroupsQueries, adoptMetersQueries, disownMetersQueries]));
-			});*/
 			res.sendStatus(200);
 		} catch (err) {
 			if (err.message && err.message === 'Cyclic group detected') {
