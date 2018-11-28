@@ -9,10 +9,7 @@ import { connect } from 'react-redux';
 import { State } from '../types/redux/state';
 import { getCompareChangeSummary, getCompareBarTitles, getComparePeriodLabelsForXAxis } from '../utils/calculateCompare';
 import { CompareEntity } from './MultiCompareChartContainer';
-import * as Plotly from 'plotly.js';
-import { PlotParams } from 'react-plotly.js';
-const createPlotlyComponent = require( 'react-plotly.js/factory');
-const Plot = createPlotlyComponent(Plotly);
+import PlotlyChart, { IPlotlyChartProps } from 'react-plotlyjs-ts';
 
 if (datalabels === null || datalabels === undefined) {
 	throw new Error('Datalabels plugin was tree-shaken out.');
@@ -22,7 +19,7 @@ interface CompareChartContainerProps {
 	entity: CompareEntity;
 }
 
-function mapStateToProps(state: State, ownProps: CompareChartContainerProps): PlotParams {
+function mapStateToProps(state: State, ownProps: CompareChartContainerProps) {
 	const comparePeriod = state.graph.comparePeriod;
 	const periodLabels = getComparePeriodLabelsForXAxis(comparePeriod);
 	const barTitles = getCompareBarTitles(comparePeriod);
@@ -30,7 +27,7 @@ function mapStateToProps(state: State, ownProps: CompareChartContainerProps): Pl
 	const currentUsageColor = 'rgba(218, 165, 32, 1)';
 	const totalUsageColor = 'rgba(173, 216, 230, 1)';
 
-	const readingsForCurrentUsage: Plotly.Data = {
+	const readingsForCurrentUsage: any = {
 		x: [periodLabels.prev, periodLabels.current],
 		y: [entity.usedToThisPointLastTimePeriod, entity.currentPeriodUsage],
 		text: 'kW',
@@ -40,7 +37,7 @@ function mapStateToProps(state: State, ownProps: CompareChartContainerProps): Pl
 			color: currentUsageColor
 		}
 	};
-	const readingsForTotalUsage: Plotly.Data = {
+	const readingsForTotalUsage: any = {
 		x: [periodLabels.prev, periodLabels.current],
 		y: [entity.lastPeriodTotalUsage, Math.round((entity.currentPeriodUsage / entity.usedToThisPointLastTimePeriod) * entity.lastPeriodTotalUsage)],
 		text: 'kW',
@@ -50,17 +47,17 @@ function mapStateToProps(state: State, ownProps: CompareChartContainerProps): Pl
 			color: totalUsageColor
 		}
 	};
-	const chartData: Plotly.Data [] = [readingsForCurrentUsage, readingsForTotalUsage];
-	const chartLayout: Partial<Plotly.Layout> = {
+	const data: any[] = [readingsForCurrentUsage, readingsForTotalUsage];
+	const layout: any = {
 		title: getCompareChangeSummary(entity.change, entity.name, periodLabels),
 		titlefont: {
 			color: colorlizeCompareGraphTitle(entity.change)
 		},
 		barmode: 'stack'
 	};
-	const props: PlotParams = {
-		data: chartData,
-		layout: chartLayout
+	const props: IPlotlyChartProps = {
+		data,
+		layout
 	};
 
 	return props;
@@ -73,4 +70,5 @@ function colorlizeCompareGraphTitle(changeForColorization: number): string {
 	return 'red';
 }
 
-export default connect(mapStateToProps)(Plot);
+const plotly: any = PlotlyChart;
+export default connect(mapStateToProps)(plotly);
