@@ -156,10 +156,11 @@ App actions:
 * `webpack` runs Webpack once in development mode.
 
 Validation and CI actions:
-* `checkHeader` ensures that there are no source files without MPL headers.
-* `checkTypescript` ensures that there are no JavaScript source files in the TypeScript portion of the project.
-* `lint` runs TSLint against the project to ensure style conformity.
-* `typeCheck` runs the TypeScript compiler without emitting code (i.e. just checks for type errors).
+* `check` runs all the below non-test checks (that is, all static checks)
+* `check:header` ensures that there are no source files without MPL headers.
+* `check:typescript` ensures that there are no JavaScript source files in the TypeScript portion of the project.
+* `check:lint` runs TSLint against the project to ensure style conformity.
+* `check:types` runs the TypeScript compiler without emitting code (i.e. just checks for type errors).
 * `test` runs the automated test suite on the server.
 
 Administration:
