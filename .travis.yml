@@ -36,13 +36,13 @@ before_script:
 
 script:
     # Validate legal requirements on source files
-  - npm run checkHeader
+  - npm run check:header
     # Validate that all areas which are intended to be typed, are typed
-  - npm run checkTypescript
+  - npm run check:typescript
     # Validate that the client's type system is internally consistent
-  - npm run typeCheck
+  - npm run check:types
     # Check for tslint failures
-  - npm run lint
+  - npm run check:lint
     # Test with native Node install
   - npm run test
     # Test in Docker
