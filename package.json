@@ -116,7 +116,7 @@
     "css-loader": "~0.28.7",
     "mocha": "~5.2.0",
     "mock-require": "~2.0.2",
-    "nodemon": "~1.18.4",
+    "nodemon": "~1.18.7",
     "redux-devtools": "~3.4.0",
     "sinon": "~4.0.2",
     "source-map-loader": "~0.2.3",
