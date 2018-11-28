@@ -1,6 +1,6 @@
-# This should be copied to /etc/ and the copy renamed so that its function will be clear to admins.
-# This should be executed daily after fetching midnight readings, since it aggregates data at day level and above.
-# You can set execution time for cron jobs in the /etc/crontab file.
+# This aggregates the readings data at day level and above.
+# This should be copied to /etc/ or /etc/cron.daily/ and the copy renamed so that its function will be clear to admins.
+# This should be executed daily after fetching midnight readings, such as 12:30 am.
 
 # The absolute path the project root directory (OED)
 cd '/example/path/to/project/OED'

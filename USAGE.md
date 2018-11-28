@@ -61,6 +61,7 @@ network, so you can access the OED server. E.g.:
 1. Set up Node environment and the database by running ```docker-compose run --rm web src/scripts/installOED.sh``` in the main directory.
 1. Add meters from the ips.csv file with ```docker-compose run --rm web npm run addMamacMeters ips.csv```.
 1. Update the meters you added with ```docker-compse run --rm web npm run updateMamacMeters```.
+1. Aggregate the readings data in the database with ```docker-compose run --rm web npm run refreshReadingViews```.
 1. Start the app in development mode with ```docker-compose run --rm --service-ports web src/scripts/devstart.sh```.
 1. Wait for the Webpack build to finish and then access the app at [localhost:3000](http://localhost:3000).
 
@@ -101,6 +102,7 @@ OED_MAIL_ORG=?	               # Organization Name
 8. Run ```npm run createdb``` to create the database schema.
 1. Run `npm run addMamacMeters` to load mamac meters from an `.csv` file.
 1. Run `npm run updateMamacMeters` to fetch new data for mamac meters in the database.
+1. Run `npm run refreshReadingViews` to aggregate readings data in the database.
 1. Run `npm run createUser` and follow the directions to create a new admin user.
 1. Run ```npm run webpack:dev``` to create the Webpack bundle.
 1. Run ```npm start``` to start the server.
@@ -118,8 +120,10 @@ OED_MAIL_ORG=?	               # Organization Name
 	TODO: Document convention for naming files
 1. Copy ```src/scripts/updateMamacMetersOEDCron.bash``` to ```/etc/cron.hourly/updateMamacMetersOEDCron.bash``` and make the necessary modifications to the script. See the script for more detail.
 1. Copy ```src/scripts/sendLogEmailCron.bash``` to ```/etc/cron.daily/sendLogEmailCron.bash``` and make the necessary modifications to the script. See the script for more detail.
+1. Copy ```src/scripts/refreshReadingViewsCron.bash``` to ```/etc/cron.daily/refreshReadingViewsCron.bash``` and make the necessary modifications to the script. See the script for more detail.
 1. Run ```chmod +x updateMamacMetersOEDCron.bash``` to make the script executable.
 1. Run ```chmod +x sendLogEmailCron.bash``` to make the script executable.
+1. Run ```chmod +x refreshReadingViewsCron.bash``` to make the script executable.
 1. Copy ```src/scripts/oed.service``` to ```/etc/systemd/system/oed.service``` and make the necessary modifications to the script. See the script for more detail.
 1. Update your meters to get data for the first time. Refer to the Administration section below.
 1. Run ```systemctl enable oed.service``` to make the service start on server boot.
@@ -166,6 +170,7 @@ Administration:
 * `createdb` creates the database schema in an uninitialized database. It will not update the schema.
 * `addMamacMeters` adds meters from a CSV file (see above).
 * `updateMamacMeters` fetches new data from previously imported Mamac meters.
+* `refreshReadingViews` aggregates readings data in the database.
 * `createUser` creates a new user. If given no arguments, it is interactive; you can also pass the username and password as command line arguments.
 * `editUser` edits the password of an existing user.
 
