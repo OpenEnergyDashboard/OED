@@ -41,6 +41,7 @@ export default class MetersDetailComponent extends React.Component<MetersDetailP
 		};
 
 		const buttonContainerStyle: React.CSSProperties = {
+			minWidth: '150px',
 			width: '10%',
 			marginLeft: '40%',
 			marginRight: '40%'
