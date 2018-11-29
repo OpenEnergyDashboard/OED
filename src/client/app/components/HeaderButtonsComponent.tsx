@@ -28,7 +28,7 @@ export default class HeaderButtonsComponent extends React.Component<HeaderButton
 		const renderLoginButton = !hasToken();
 		const renderHomeButton = getPage() !== '';
 		const renderAdminButton = hasToken() && getPage() !== 'admin';
-		const renderGroupsButton = hasToken() && getPage() !== 'groups';
+		const renderGroupsButton = getPage() !== 'groups';
 		const renderMetersButton = getPage() !== 'meters';
 		const renderLogoutButton = hasToken();
 
