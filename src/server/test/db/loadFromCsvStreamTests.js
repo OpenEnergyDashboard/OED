@@ -49,7 +49,7 @@ mocha.describe('Read mamc log from a file: ', () => {
 				const startTimestamp = moment(row[1], 'MM/DD/YYYY HH:mm').subtract(60, 'minutes');
 				return new Reading(meter.id, readRate, startTimestamp, endTimestamp);
 			},
-			(readings, tx) => Reading.insertOrUpdateAll(readings, tx));
+			(readings, tx) => Reading.insertOrIgnoreAll(readings, tx));
 		const { count } = await getDB().one('SELECT COUNT(*) as count FROM readings');
 		expect(parseInt(count)).to.equal(20);
 	});
@@ -70,7 +70,7 @@ mocha.describe('Read mamc log from a file: ', () => {
 				const endTimestamp = moment(row[1], 'MM/DD/YYYY HH:mm');
 				const startTimestamp = moment(row[1], 'MM/DD/YYYY HH:mm').subtract(60, 'minutes');
 				return new Reading(meter.id, readRate, startTimestamp, endTimestamp);
-			}, (readings, tx) => Reading.insertOrUpdateAll(readings, tx))
+			}, (readings, tx) => Reading.insertOrIgnoreAll(readings, tx))
 		).to.eventually.be.rejected;
 	});
 
@@ -90,7 +90,7 @@ mocha.describe('Read mamc log from a file: ', () => {
 				const endTimestamp = moment(row[1], 'MM/DD/YYYY HH:mm');
 				const startTimestamp = moment(row[1], 'MM/DD/YYYY HH:mm').subtract(60, 'minutes');
 				return new Reading(meter.id, readRate, startTimestamp, endTimestamp);
-			}, (readings, tx) => Reading.insertOrUpdateAll(readings, tx));
+			}, (readings, tx) => Reading.insertOrIgnoreAll(readings, tx));
 		} catch (e) {
 			const { count } = await getDB().one('SELECT COUNT(*) as count FROM readings');
 			expect(parseInt(count)).to.equal(0);

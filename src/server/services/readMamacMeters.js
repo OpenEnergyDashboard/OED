@@ -27,13 +27,14 @@ async function parseCSV(filename) {
  * error or timeout.
  * @param {string} url The URL of the resource to GET
  * @param {number} timeout The time to allow, in milliseconds
+ * @param csvLine The current CVS line
  * @returns {Promise.<string>}
  */
-async function reqWithTimeout(url, timeout) {
+async function reqWithTimeout(url, timeout, csvLine) {
 	return Promise.race([
 		reqPromise(url),
 		new Promise((resolve, reject) =>
-			setTimeout(() => reject(new Error(`Failed to GET ${url} within ${timeout} ms`)), timeout))
+			setTimeout(() => reject(new Error(`CSV line ${csvLine}: Failed to GET ${url} within ${timeout} ms`)), timeout))
 	]);
 }
 
@@ -43,10 +44,11 @@ async function reqWithTimeout(url, timeout) {
  * The URL should be formed from the IP address.
  * @param url The url to retrieve meter info from.
  * @param ip The ip of the meter being created
+ * @param csvLine The current CSV line
  * @returns {Promise.<Meter>}
  */
-async function getMeterInfo(url, ip) {
-	return reqWithTimeout(url, 5000)
+async function getMeterInfo(url, ip, csvLine) {
+	return reqWithTimeout(url, 5000, csvLine)
 		.then(raw => parseXMLPromisified(raw))
 		.then(xml => {
 			const name = xml.Maverick.NodeID[0];
@@ -60,7 +62,7 @@ async function getMeterInfo(url, ip) {
  * @returns {Array.<Promise.<Meter>>}
  */
 function infoForAllMeters(rows) {
-	return rows.map(row => getMeterInfo(`http://${row.ip}/sm101.xml`, row.ip));
+	return rows.map((row, index) => getMeterInfo(`http://${row.ip}/sm101.xml`, row.ip, index + 2));
 }
 
 /**
@@ -71,10 +73,10 @@ function infoForAllMeters(rows) {
 async function insertMeters(rows) {
 	const errors = [];
 	await Promise.all(infoForAllMeters(rows).map(
-			async promise => promise
+			(promise, index) => promise
 			.then(async meter => {
 				if (await meter.existsByName()) {
-					log.info(`Skipping existing meter ${meter.name}`);
+					log.info(`CSV line ${index + 2}: Skipping existing meter ${meter.name}`);
 				} else {
 					await meter.insert();
 				}

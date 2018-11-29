@@ -60,4 +60,18 @@ mocha.describe('Readings', () => {
 		const retrievedReadings = await Reading.getAllByMeterID(meter.id);
 		expect(retrievedReadings).to.have.length(2);
 	});
+	mocha.it('can keep any data already in the DB', async () => {
+		const startTimestamp = moment('2018-01-01');
+		const endTimestamp = moment(startTimestamp).add(1, 'hour');
+		const reading = new Reading(meter.id, 1, startTimestamp, endTimestamp);
+		await reading.insert();
+		const newReading = new Reading(meter.id, 2, startTimestamp, endTimestamp);
+		await Reading.insertOrIgnoreAll([newReading]);
+		const retrievedReadings = await Reading.getAllByMeterID(meter.id);
+		expect(retrievedReadings).to.have.length(1);
+		const retrievedReading = retrievedReadings[0];
+		expect(retrievedReading.startTimestamp.isSame(startTimestamp)).to.equal(true);
+		expect(retrievedReading.endTimestamp.isSame(endTimestamp)).to.equal(true);
+		expect(retrievedReading.reading).to.equal(1);
+	});
 });
