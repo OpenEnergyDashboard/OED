@@ -38,8 +38,8 @@ export default class MeterViewComponent extends React.Component<MeterViewProps, 
 			<tr>
 				<td> {this.props.meter.id} {this.formatStatus()} </td>
 				<td> {this.props.meter.name} </td>
-				{ hasToken() && <td> {this.props.meter.meterType} </td> }
-				{ hasToken() && <td> {this.props.meter.ipAddress} </td> }
+				{hasToken() && <td> {this.props.meter.meterType} </td>}
+				{hasToken() && <td> {this.props.meter.ipAddress} </td>}
 				<td> {this.formatEnabled()} </td>
 				<td> {this.formatDisplayable()} </td>
 			</tr>
