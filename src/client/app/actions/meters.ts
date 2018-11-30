@@ -37,7 +37,7 @@ export function confirmMeterEdits(meter: number): t.ConfirmEditedMeterAction {
 	return { type: ActionType.ConfirmEditedMeter, meter};
 }
 
-function fetchMetersDetails(): Thunk {
+export function fetchMetersDetails(): Thunk {
 	return async (dispatch: Dispatch) => {
 		dispatch(requestMetersDetails());
 		const metersDetails = await metersApi.details();

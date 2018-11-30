@@ -5,7 +5,7 @@
 import { connect } from 'react-redux';
 import MetersDetailComponent from '../../components/meters/MetersDetailComponent';
 import { State } from '../../types/redux/state';
-import { fetchMetersDetailsIfNeeded, submitEditedMeters } from '../../actions/meters';
+import { fetchMetersDetails, submitEditedMeters } from '../../actions/meters';
 import {Dispatch} from '../../types/redux/actions';
 
 
@@ -20,7 +20,7 @@ function mapStateToProps(state: State) {
 
 function mapDispatchToProps(dispatch: Dispatch) {
 	return {
-		fetchMetersDetailsIfNeeded: () => dispatch(fetchMetersDetailsIfNeeded()),
+		fetchMetersDetails: () => dispatch(fetchMetersDetails()),
 		submitEditedMeters: () => dispatch(submitEditedMeters())
 	};
 }

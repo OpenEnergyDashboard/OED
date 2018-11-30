@@ -38,8 +38,8 @@ export default class MeterViewComponent extends React.Component<MeterViewProps, 
 			<tr>
 				<td> {this.props.meter.id} {this.formatStatus()} </td>
 				<td> {this.props.meter.name} </td>
-				<td> {this.formatMeterType()} </td>
-				<td> {this.formatMeterAddress()} </td>
+				{ hasToken() && <td> {this.props.meter.meterType} </td> }
+				{ hasToken() && <td> {this.props.meter.ipAddress} </td> }
 				<td> {this.formatEnabled()} </td>
 				<td> {this.formatDisplayable()} </td>
 			</tr>
@@ -80,28 +80,6 @@ export default class MeterViewComponent extends React.Component<MeterViewProps, 
 		const editedMeter = this.props.meter;
 		editedMeter.enabled = !editedMeter.enabled;
 		this.props.editMeterDetails(editedMeter);
-	}
-
-	private formatMeterType() {
-		if (this.props.meter.meterType) {
-			return this.props.meter.meterType;
-		} else {
-			return ( <span style={this.styleDisabled()}>
-				<FormattedMessage id='admin.only' />
-				</span>
-			);
-		}
-	}
-
-	private formatMeterAddress() {
-		if (this.props.meter.ipAddress) {
-			return this.props.meter.ipAddress;
-		} else {
-			return ( <span style={this.styleDisabled()}>
-				<FormattedMessage id='admin.only' />
-				</span>
-			);
-		}
 	}
 
 	private formatDisplayable() {

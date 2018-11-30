@@ -5,6 +5,7 @@
 import * as React from 'react';
 import { Table, Button } from 'reactstrap';
 import { FormattedMessage } from 'react-intl';
+import { hasToken } from '../../utils/token';
 import MeterViewContainer from '../../containers/meters/MeterViewContainer';
 import HeaderContainer from '../../containers/HeaderContainer';
 import FooterComponent from '../FooterComponent';
@@ -12,13 +13,13 @@ import FooterComponent from '../FooterComponent';
 interface MetersDetailProps {
 	meters: number[];
 	unsavedChanges: boolean;
-	fetchMetersDetailsIfNeeded(): Promise<any>;
+	fetchMetersDetails(): Promise<any>;
 	submitEditedMeters(): Promise<any>;
 }
 
 export default class MetersDetailComponent extends React.Component<MetersDetailProps, {}> {
 	public componentWillMount() {
-		this.props.fetchMetersDetailsIfNeeded();
+		this.props.fetchMetersDetails();
 	}
 
 	public render() {
@@ -60,8 +61,8 @@ export default class MetersDetailComponent extends React.Component<MetersDetailP
 						<tr>
 						<th> <FormattedMessage id='meter.id' /> </th>
 						<th> <FormattedMessage id='meter.name' /> </th>
-						<th> <FormattedMessage id='meter.type' /> </th>
-						<th> <FormattedMessage id='meter.ip'/> </th>
+						{ hasToken() && <th> <FormattedMessage id='meter.type' /> </th> }
+						{ hasToken() && <th> <FormattedMessage id='meter.ip'/> </th> }
 						<th> <FormattedMessage id='meter.enabled' /> </th>
 						<th> <FormattedMessage id='meter.displayable' /> </th>
 						</tr>
@@ -72,14 +73,14 @@ export default class MetersDetailComponent extends React.Component<MetersDetailP
 					</tbody>
 					</Table>
 					</div>
-					<Button
+					{ hasToken() && <Button
 						color='success'
 						style={buttonContainerStyle}
 						disabled={!this.props.unsavedChanges}
 						onClick={this.props.submitEditedMeters}
 					>
 						<FormattedMessage id='save.meter.edits' />
-					</Button>
+					</Button> }
 				</div>
 				<FooterComponent />
 			</div>
