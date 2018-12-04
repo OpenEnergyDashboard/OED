@@ -50,7 +50,7 @@ In other words:
 Adding the `--service-ports` flag prevents Docker from segregating the container in the
 network, so you can access the OED server. E.g.:
 
-`docker-compose run --rm web src/scripts/devstart.sh`
+`docker-compose run --rm --service-ports web src/scripts/devstart.sh`
 
 ## Development ##
 
@@ -75,36 +75,62 @@ Killing the running process (ctrl+C) will stop the app. You can get rid of the D
 1. Install Node.js. Node.js is the runtime used to execute our serverside JavaScript application.
 1. Install NPM, the Node Package Manager. NPM is used to manage our JavaScript dependencies.
 1. Clone this repository.
+1. Create a CSV file with a single column called "ip" with your meter IP addresses and copy it into the directory in which the project resides.
 1. Run ```npm install``` in the project root directory.
-1. Install PostgreSQL, start the PostgreSQL server, and connect to it via psql.
-1. In psql, run ```CREATE DATABASE oed;``` to create the database.
-1. Still in psql, run ```CREATE DATABASE oed_testing;``` to create a database for automated tests.
-1. Create a .env file in the root directory of the project with the following, replacing (?) with the desired information: <br>
+1. Install PostgreSQL, start the PostgreSQL server, and connect to it via psql. (On Windows you must add the `psql` command to your PATH environment variable.)
+1. Run the ```init.sql``` file from the `database` directory with `psql -U postgres -f database/init.sql`. This adds the user OED with password `opened` and creates
+the databases `oed` and `oed_testing`.
+1. Create a .env file (a file whose name is `.env` and nothing else) in the root directory of the project with the following, with any changes needed for your system.
+See below for more on what each variable does.
 
 ```
-OED_SERVER_PORT=?              # The port that the server should run on. 3000 is a good default choice
-OED_TOKEN_SECRET=?             # Token for authentication. Generate something secure and random
-OED_DB_USER=?                  # The user that should be used to connect to postgres
-OED_DB_DATABASE=?              # The database you just created, so likely oed
-OED_DB_TEST_DATABASE=?         # The test database you just created, so likely oed_testing
-OED_DB_PASSWORD=?              # The password for your postgres user
-OED_DB_HOST=?                  # The host for your postgres db, likely localhost
-OED_DB_PORT=?                  # The port for your postgres db, likely 5432
-OED_LOG_FILE=?                 # Path to the log file, defaults to ./log.txt
-OED_MAIL_METHOD=?		   	   # Method of sending mail. Supports "gmail", "mailgun", "none". Case insensitive.
-OED_MAIL_IDENT=?               # Identifier; username for gmail, domain for mailgun. Ex: user@example.com
-OED_MAIL_CREDENTIAL=?		   # Credential; password for gmail, API key for mailgun.
-OED_MAIL_FROM=?                # From address for email
-OED_MAIL_TO=?                  # Who gets the e-mail. Ex: admin@example.com
-OED_MAIL_ORG=?	               # Organization Name
+OED_SERVER_PORT=3000
+OED_TOKEN_SECRET=asdf
+OED_DB_USER=oed
+OED_DB_DATABASE=oed
+OED_DB_TEST_DATABASE=oed_testing
+OED_DB_PASSWORD=opened
+OED_DB_HOST=localhost
+OED_DB_PORT=5432
+OED_LOG_FILE=log.txt
+OED_MAIL_METHOD=none
+OED_MAIL_IDENT=
+OED_MAIL_CREDENTIAL=
+OED_MAIL_FROM=
+OED_MAIL_TO=
+OED_MAIL_ORG=
 ```
+
 8. Run ```npm run createdb``` to create the database schema.
-1. Run `npm run addMamacMeters` to load mamac meters from an `.csv` file.
-1. Run `npm run updateMamacMeters` to fetch new data for mamac meters in the database.
+1. Run `npm run addMamacMeters` to load mamac meters from the `.csv` file.
+1. Run `npm run updateMamacMeters` to fetch new readings data for MAMAC meters in the database.
 1. Run `npm run createUser` and follow the directions to create a new admin user.
 1. Run ```npm run webpack:dev``` to create the Webpack bundle.
-1. Run ```npm start``` to start the server.
+1. In a new terminal, run ```npm start``` to start the server.
 
+### Environment Variables ###
+The OED server is configured via environment variables, as follows.
+
+- OED_SERVER_PORT: The port that the server should run on. 3000 is a good default choice
+- OED_TOKEN_SECRET: Token for authentication. Generate something secure and random
+- OED_DB_USER: The user that should be used to connect to postgres
+- OED_DB_DATABASE: The database you just created, so likely oed
+- OED_DB_TEST_DATABASE: The test database you just created, so likely oed_testing
+- OED_DB_PASSWORD: The password for your postgres user
+- OED_DB_HOST: The host for your postgres db, likely localhost
+- OED_DB_PORT: The port for your postgres db, likely 5432
+- OED_LOG_FILE: Path to the log file, defaults to ./log.txt
+- OED_MAIL_METHOD: Method of sending mail. Supports "gmail", "mailgun", "none". Case insensitive.
+- OED_MAIL_IDENT: Username for gmail, domain for mailgun. Ex: user@example.com
+- OED_MAIL_CREDENTIAL: Password for gmail, or API key for mailgun.
+- OED_MAIL_FROM: From address for email. If using GMail, make sure this is set
+- OED_MAIL_TO: Who gets error e-mail. Ex: admin@example.com
+- OED_MAIL_ORG: Organization name, used in e-mail subject line
+
+### Setting the Path on Windows ###
+
+Open your settings, search for Advanced System Settings, click Environment Variables near
+the bottom left of the tab, and add `C:\Program Files\PostgreSQL\11\bin".
 
 ## Production ##
 ### Installation ###
