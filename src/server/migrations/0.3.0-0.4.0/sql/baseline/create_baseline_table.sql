@@ -5,7 +5,7 @@
 -- Allows us to use gist in this database
 CREATE EXTENSION IF NOT EXISTS btree_gist;
 -- create baseline table
-CREATE TABLE IF NOT EXISTS basline (
+CREATE TABLE IF NOT EXISTS baseline (
 	meter_id INT NOT NULL REFERENCES meters (id),
 	apply_range tsrange NOT NULL,
 	calc_range tsrange NOT NULL,
