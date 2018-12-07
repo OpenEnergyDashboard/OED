@@ -73,7 +73,8 @@ export default function readings(state = defaultState, action: LineReadingsActio
 				...state,
 				byMeterID: {
 					...state.byMeterID
-				}
+				},
+				metersFetching: false
 			};
 
 			for (const meterID of action.meterIDs) {

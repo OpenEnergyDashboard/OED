@@ -116,6 +116,19 @@ class Reading {
 	}
 
 	/**
+	 * Returns a promise to insert or ignore all of the given readings into the database (as a transaction)
+	 * @param {array<Reading>} readings the readings to insert or update
+	 * @param conn the connection to use. Defaults to the default database connection.
+	 * @returns {Promise<any>}
+	 */
+	static insertOrIgnoreAll(readings, conn = getDB) {
+		return conn().tx(t => t.sequence(function seq(i) {
+			const seqT = this;
+			return readings[i] && readings[i].insertOrIgnore(conn = () => seqT);
+		}));
+	}
+
+	/**
 	 * Returns a promise to get all of the readings for this meter from the database.
 	 * @param meterID The id of the meter to find readings for
 	 * @param conn the connection to use. Defaults to the default database connection.
@@ -161,6 +174,15 @@ class Reading {
 	 */
 	insertOrUpdate(conn = getDB) {
 		return conn().none(sqlFile('reading/insert_or_update_reading.sql'), this);
+	}
+
+	/**
+	 * Returns a promise to insert this reading into the database, or ignore it if it already exists.
+	 * @param conn the connection to use. Defaults to the default database connection.
+	 * @returns {Promise.<>}
+	 */
+	insertOrIgnore(conn = getDB) {
+		return conn().none(sqlFile('reading/insert_or_ignore_reading.sql'), this);
 	}
 
 	/**
