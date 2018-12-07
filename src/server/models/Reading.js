@@ -8,8 +8,6 @@ const { mapToObject } = require('../util');
 const getDB = database.getDB;
 const sqlFile = database.sqlFile;
 
-const moment = require('moment');
-
 class Reading {
 	/**
 	 * Creates a new reading
@@ -71,7 +69,7 @@ class Reading {
 	 */
 
 	static createCompareFunction(conn = getDB) {
-		return conn().none(sqlFile('reading/calculate_compare.sql'));
+		return conn().none(sqlFile('reading/create_function_calculate_compare.sql'));
 	}
 
 	/**
@@ -375,35 +373,42 @@ class Reading {
 	 * @param meterIDs
 	 * @param {Moment} currStartTimestamp
 	 * @param {Moment} currEndTimestamp
-	 * @param {Duration} compareDuration
+	 * @param {Duration} compareShift
 	 * @param conn the connection to use. Defaults to the default database connection
 	 * @return {Promise<void>}
 	 */
-	static async getCompareReadings(meterIDs, currStartTimestamp, currEndTimestamp, compareDuration, conn = getDB) {
+	static async getCompareReadings(meterIDs, currStartTimestamp, currEndTimestamp, compareShift, conn = getDB) {
 		const allCompareReadings = await conn().func(
 			'compare_readings',
-			[meterIDs, currStartTimestamp, currEndTimestamp, compareDuration.toISOString()]);
+			[meterIDs, currStartTimestamp, currEndTimestamp, compareShift.toISOString()]);
 		const compareReadingsByMeterID = {};
 		for (const row of allCompareReadings) {
 			compareReadingsByMeterID[row.meter_id] = {
 				currentUse: row.current_use,
-				prevUseTotal: row.prev_use_total,
-				prevUseForCurrent: row.prev_use_for_current
+				prevUse: row.prev_use
 			};
 		}
 		return compareReadingsByMeterID;
 	}
 
-	static async getGroupCompareReadings(groupIDs, currStartTimestamp, currEndTimestamp, compareDuration, conn = getDB) {
+	/**
+	 *
+	 * @param groupIDs
+	 * @param {Moment} currStartTimestamp
+	 * @param {Moment} currEndTimestamp
+	 * @param {Duration} compareShift
+	 * @param conn the connection to use. Defaults to the default database connection
+	 * @return {Promise<void>}
+	 */
+	static async getGroupCompareReadings(groupIDs, currStartTimestamp, currEndTimestamp, compareShift, conn = getDB) {
 		const allCompareReadings = await conn().func(
 			'group_compare_readings',
-			[groupIDs, currStartTimestamp, currEndTimestamp, compareDuration.toISOString()]);
+			[groupIDs, currStartTimestamp, currEndTimestamp, compareShift.toISOString()]);
 		const compareReadingsByGroupID = {};
 		for (const row of allCompareReadings) {
 			compareReadingsByGroupID[row.group_id] = {
 				currentUse: row.current_use,
-				prevUseTotal: row.prev_use_total,
-				prevUseForCurrent: row.prev_use_for_current
+				prevUse: row.prev_use
 			};
 		}
 		return compareReadingsByGroupID;
