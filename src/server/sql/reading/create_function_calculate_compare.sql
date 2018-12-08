@@ -18,7 +18,7 @@ CREATE OR REPLACE FUNCTION compare_readings (
 	current_period_end TIMESTAMP,
 	shift INTERVAL
 )
-	RETURNS TABLE(meter_id INTEGER, current_use REAL, prev_use_for_current REAL)
+	RETURNS TABLE(meter_id INTEGER, current_use REAL, prev_use REAL)
 AS $$
 DECLARE
 	prev_period_start TIMESTAMP;
@@ -66,7 +66,7 @@ CREATE OR REPLACE FUNCTION group_compare_readings (
 	current_period_end TIMESTAMP,
 	shift INTERVAL
 )
-	RETURNS TABLE(group_id INTEGER, current_use REAL, prev_use_for_current REAL)
+	RETURNS TABLE(group_id INTEGER, current_use REAL, prev_use REAL)
 AS $$
 DECLARE
 	meter_ids INTEGER[];
@@ -79,7 +79,7 @@ BEGIN
 	SELECT
 		gids.id AS group_id,
 		SUM(cr.current_use) AS current_use,
-		SUM(cr.prev_use_for_current) AS prev_use
+		SUM(cr.prev_use) AS prev_use
 	FROM unnest(group_ids) gids(id)
 	INNER JOIN groups_deep_meters gdm ON gdm.group_id = gids.id
 	INNER JOIN compare_readings(meter_ids, current_period_start, current_period_end, shift) cr

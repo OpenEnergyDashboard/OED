@@ -27,7 +27,7 @@ mocha.describe('Compare calculation', () => {
 	const prevEnd = prevStart.clone().add(1, 'day'); // 2018-01-02
 	const currStart = prevStart.clone().add(5, 'day'); // 2018-01-06
 	const currEnd = currStart.clone().add(1, 'day'); // 2018-01-07
-	const shift = moment.duration(5, 'days')
+	const shift = moment.duration(5, 'days');
 	mocha.beforeEach(async () => {
 		await new Meter(undefined, 'Meter', null, false, Meter.type.MAMAC).insert();
 		meter = await Meter.getByName('Meter');
