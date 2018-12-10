@@ -404,8 +404,6 @@ class Reading {
 		const allCompareReadings = await conn().func(
 			'group_compare_readings',
 			[groupIDs, currStartTimestamp, currEndTimestamp, compareShift.toISOString()]);
-		console.log('getCompareReadings');
-		console.log(allCompareReadings);
 		const compareReadingsByGroupID = {};
 		for (const row of allCompareReadings) {
 			compareReadingsByGroupID[row.group_id] = {
