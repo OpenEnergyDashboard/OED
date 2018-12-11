@@ -10,10 +10,10 @@
     "webpack:dev": "webpack -d --watch --color --progress",
     "webpack:build": "cross-env NODE_ENV=production webpack -p",
     "webpack": "webpack -d --color --progress",
-	"check": "./src/scripts/devcheck.sh",
+    "check": "./src/scripts/devcheck.sh",
     "check:header": "./src/scripts/checkHeader.sh",
     "check:typescript": "./src/scripts/checkTypescript.sh",
-	"check:types": "./node_modules/.bin/tsc -p . --noEmit",
+    "check:types": "./node_modules/.bin/tsc -p . --noEmit",
     "check:lint": "./node_modules/.bin/tslint -c tslint.json src/{server,bin,scripts,common}/**/*.{ts,tsx,js,jsx} src/client/app/**/*.{ts,tsx,js,jsx}",
     "test": "./node_modules/.bin/mocha \"src/server/test/**/*.js\"",
     "createdb": "node ./src/server/services/createDB.js",
@@ -22,7 +22,8 @@
     "updateMamacMeters": "node ./src/server/services/updateMamacMeters.js",
     "createUser": "node ./src/server/services/user/createUser.js",
     "editUser": "node ./src/server/services/user/editUser.js",
-    "sendLogEmail": "node ./src/server/services/sendLogEmail.js"
+    "sendLogEmail": "node ./src/server/services/sendLogEmail.js",
+	"refreshReadingViews": "node ./src/server/services/refreshReadingViews.js"
   },
   "nodemonConfig": {
     "watch": [
