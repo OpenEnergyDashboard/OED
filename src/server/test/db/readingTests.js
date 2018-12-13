@@ -35,6 +35,18 @@ mocha.describe('Readings', () => {
 		expect(readingPostInsert.endTimestamp.isSame(endTimestamp)).to.equal(true);
 		expect(readingPostInsert).to.have.property('reading', readingPreInsert.reading);
 	});
+	mocha.it('can be saved and retrieved with floating point values', async () => {
+		const startTimestamp = moment('2017-01-01');
+		const endTimestamp = moment('2017-01-01').add(1, 'hour');
+		const readingPreInsert = new Reading(meter.id, 3.5, startTimestamp, endTimestamp);
+		await readingPreInsert.insert();
+		const retrievedReadings = await Reading.getAllByMeterID(meter.id);
+		expect(retrievedReadings).to.have.lengthOf(1);
+		const readingPostInsert = retrievedReadings[0];
+		expect(readingPostInsert.startTimestamp.isSame(startTimestamp)).to.equal(true);
+		expect(readingPostInsert.endTimestamp.isSame(endTimestamp)).to.equal(true);
+		expect(readingPostInsert).to.have.property('reading', readingPreInsert.reading);
+	});
 	mocha.it('can be saved in bulk', async () => {
 		const startTimestamp1 = moment('2017-01-01');
 		const endTimestamp1 = moment(startTimestamp1).add(1, 'hour');
