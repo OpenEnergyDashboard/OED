@@ -27,7 +27,7 @@ export interface CompareReading {
 }
 
 export interface CompareReadings {
-	[id: number]: CompareReading[];
+	[id: number]: CompareReading;
 }
 
 export interface ExportDataSet {

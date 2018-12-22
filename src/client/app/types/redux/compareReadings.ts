@@ -39,26 +39,25 @@ export type CompareReadingAction =
 	RequestMeterCompareReadingAction |
 	RequestGroupCompareReadingAction;
 
+export interface CompareReadingsData {
+	isFetching: boolean;
+	curr_use?: number;
+	prev_use?: number;
+	// prev_total?: number;
+}
+
 export interface CompareReadingsState {
 	byMeterID: {
 		[meterID: number]: {
 			[timeInterval: string]: {
-				[compareShift: string]: {
-					isFetching: boolean;
-					curr_use?: number;
-					prev_use?: number;
-				}
+				[compareShift: string]: CompareReadingsData;
 			}
 		}
 	};
 	byGroupID: {
 		[groupID: number]: {
 			[timeInterval: string]: {
-				[compareShift: string]: {
-					isFetching: boolean;
-					curr_use?: number;
-					prev_use?: number;
-				}
+				[compareShift: string]: CompareReadingsData;
 			}
 		}
 	};
