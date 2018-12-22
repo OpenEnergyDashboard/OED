@@ -73,11 +73,11 @@ class TimeInterval {
 	}
 
 	getStartTimestamp() {
-		return this.startTimestamp
+		return this.startTimestamp;
 	}
 
 	getEndTimestamp() {
-		return this.endTimestamp
+		return this.endTimestamp;
 	}
 
 	/**
