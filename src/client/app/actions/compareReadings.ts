@@ -9,11 +9,13 @@ import { State } from '../types/redux/state';
 import { CompareReadings } from '../types/readings';
 import * as t from '../types/redux/compareReadings';
 import { metersApi, groupsApi } from '../utils/api';
+import { ComparePeriod, calculateCompareShift, calculateCompareTimeInterval } from '../utils/calculateCompare';
 
 /**
  * @param {State} state the Redux state
  * @param {number} meterID the ID of the meter to check
  * @param {TimeInterval} timeInterval the interval over which to check
+ * @param {compareShift} compareShift The time shift between curr and prev
  * @returns {boolean} True if the readings for the given meter, and time are missing; false otherwise.
  */
 function shouldFetchMeterCompareReadings(state: State, meterID: number, timeInterval: TimeInterval, compareShift: moment.Duration): boolean {
@@ -36,6 +38,7 @@ function shouldFetchMeterCompareReadings(state: State, meterID: number, timeInte
  * @param {State} state the Redux state
  * @param {number} groupID the ID of the group to check
  * @param {TimeInterval} timeInterval the interval over which to check
+ * @param {compareShift} compareShift The time shift between curr and prev
  * @returns {boolean} True if the readings for the given group, and time are missing; false otherwise.
  */
 function shouldFetchGroupCompareReadings(state: State, groupID: number, timeInterval: TimeInterval, compareShift: moment.Duration): boolean {
@@ -78,6 +81,7 @@ function receiveGroupCompareReadings(groupIDs: number[], timeInterval: TimeInter
  * Fetch the data for the given meters over the given interval. Fully manages the Redux lifecycle.
  * @param {[number]} meterIDs The IDs of the meters whose data should be fetched
  * @param {TimeInterval} timeInterval The time interval over which data should be fetched
+ * @param {compareShift} compareShift The time shift between curr and prev
  */
 function fetchMeterCompareReadings(meterIDs: number[], timeInterval: TimeInterval, compareShift: moment.Duration): Thunk {
 	return async (dispatch: Dispatch) => {
@@ -91,6 +95,7 @@ function fetchMeterCompareReadings(meterIDs: number[], timeInterval: TimeInterva
  * Fetch the data for the given groups over the given interval. Fully manages the Redux lifecycle.
  * @param {[number]} groupIDs The IDs of the groups whose data should be fetched
  * @param {TimeInterval} timeInterval The time interval over which data should be fetched
+ * @param {compareShift} compareShift The time shift between curr and prev
  */
 function fetchGroupCompareReadings(groupIDs: number[], timeInterval: TimeInterval, compareShift: moment.Duration): Thunk {
 	return async (dispatch: Dispatch) => {
@@ -103,11 +108,13 @@ function fetchGroupCompareReadings(groupIDs: number[], timeInterval: TimeInterva
 
 /**
  * Fetches readings for the compare chart of all selected meterIDs if they are not already fetched or being fetched
- * @param {TimeInterval} timeInterval The time interval to fetch readings for on the compare chart
+ * @param {ComparePeriod} comparePeriod The period to fetch readings for on the compare chart
  * @return {*} An action to fetch the needed readings
  */
-export function fetchNeededCompareReadings(timeInterval: TimeInterval, compareShift: moment.Duration): Thunk {
+export function fetchNeededCompareReadings(comparePeriod: ComparePeriod): Thunk {
 	return (dispatch, getState) => {
+		const compareShift = calculateCompareShift(comparePeriod);
+		const timeInterval = calculateCompareTimeInterval(comparePeriod, moment());
 		const state = getState();
 		const promises: Array<Promise<any>> = [];
 

@@ -69,11 +69,11 @@ function updateComparePeriod(comparePeriod: ComparePeriod): t.UpdateComparePerio
 	};
 }
 
-export function changeCompareGraph(timeInterval: TimeInterval, compareShift: moment.Duration): Thunk {
+export function changeCompareGraph(comparePeriod: ComparePeriod): Thunk {
 	return (dispatch: Dispatch) => {
 		return Promise.all([
 			dispatch(updateComparePeriod(comparePeriod)),
-			dispatch(fetchNeededCompareReadings(timeInterval, compareShift))
+			dispatch(fetchNeededCompareReadings(comparePeriod))
 		]);
 	};
 }
@@ -89,7 +89,7 @@ export function changeSelectedMeters(meterIDs: number[]): Thunk {
 		dispatch(dispatch2 => {
 			dispatch2(fetchNeededLineReadings(getState().graph.timeInterval));
 			dispatch2(fetchNeededBarReadings(getState().graph.timeInterval));
-			dispatch2(fetchNeededCompareReadings(getState().graph.timeInterval, getState.graph));
+			dispatch2(fetchNeededCompareReadings(getState().graph.comparePeriod));
 		});
 		return Promise.resolve();
 	};
