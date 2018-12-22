@@ -68,8 +68,8 @@ class Reading {
 	 * Returns a promise to create the compare function
 	 */
 
-	static createCompareFunction(conn = getDB) {
-		return conn().none(sqlFile('reading/create_function_calculate_compare.sql'));
+	static createCompareReadingsFunction(conn = getDB) {
+		return conn().none(sqlFile('reading/create_function_get_compare_readings.sql'));
 	}
 
 	/**

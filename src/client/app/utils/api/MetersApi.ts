@@ -6,7 +6,7 @@
 
 import ApiBackend from './ApiBackend';
 import { NamedIDItem } from '../../types/items';
-import { BarReadings, LineReadings } from '../../types/readings';
+import { BarReadings, CompareReadings, LineReadings } from '../../types/readings';
 import { TimeInterval } from '../../../../common/TimeInterval';
 import * as moment from 'moment';
 
@@ -34,6 +34,21 @@ export default class MetersApi {
 		return await this.backend.doGetRequest<BarReadings>(
 			`/api/readings/bar/meters/${stringifiedIDs}`,
 			{ timeInterval: timeInterval.toString(), barDuration: barDuration.toISOString() }
+		);
+	}
+
+	public async compareReadings(meterIDs: number[], timeInterval: TimeInterval, shift: moment.Duration):
+		Promise<CompareReadings> {
+		const stringifiedIDs = meterIDs.join(',');
+		const currStart: moment.Moment = timeInterval.getStartTimestamp();
+		const currEnd: moment.Moment = timeInterval.getEndTimestamp();
+		return await this.backend.doGetRequest<CompareReadings>(
+			`/api/compareReadings/meters/${stringifiedIDs}`,
+			{
+				current_period_start: currStart.toString(),
+				current_period_end: currEnd.toString(),
+				shift: shift.toISOString()
+			}
 		);
 	}
 }

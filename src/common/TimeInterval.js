@@ -72,6 +72,14 @@ class TimeInterval {
 		return this.toString();
 	}
 
+	getStartTimestamp() {
+		return this.startTimestamp
+	}
+
+	getEndTimestamp() {
+		return this.endTimestamp
+	}
+
 	/**
 	 * Creates a new unbounded time interval
 	 * @return {TimeInterval}

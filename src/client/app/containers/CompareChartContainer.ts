@@ -12,7 +12,6 @@ import { State } from '../types/redux/state';
 import { getComparePeriodLabels, getCompareChangeSummary } from '../utils/calculateCompare';
 import { CompareEntity } from './MultiCompareChartContainer';
 import translate from '../utils/translate';
-import {CompressedBarReading} from '../types/compressed-readings';
 
 if (datalabels === null || datalabels === undefined) {
 	throw new Error('Datalabels plugin was tree-shaken out.');
@@ -51,15 +50,20 @@ function mapStateToProps(state: State, ownProps: CompareChartContainerProps): Li
 	const readingsAfterCurrentTimeColor = 'rgba(173, 216, 230, 1)';
 	const readingsBeforeCurrentTimeColor = 'rgba(218, 165, 32, 1)';
 	const projectedDataColor = 'rgba(173, 216, 230, 0.45)';
+	if (entity.prevTotalUsage !== undefined) {
+		datasets.push(
+			{
+				data: [entity.prevTotalUsage],
+				datalabels: {
+					anchor: 'end',
+					align: 'start'
+				}
+			}
+		);
+	}
 	datasets.push(
 		{
-			data: [entity.lastPeriodTotalUsage, Math.round((entity.currentPeriodUsage / entity.usedToThisPointLastTimePeriod) * entity.lastPeriodTotalUsage)],
-			datalabels: {
-				anchor: 'end',
-				align: 'start'
-			}
-		}, {
-			data: [entity.usedToThisPointLastTimePeriod, entity.currentPeriodUsage],
+			data: [entity.prevUsage, entity.currUsage],
 			datalabels: {
 				anchor: 'end',
 				align: 'start'

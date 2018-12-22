@@ -108,7 +108,7 @@ async function createSchema() {
 	await LogEmail.createTable();
 	await getDB().none(sqlFile('reading/create_function_get_compressed_readings.sql'));
 	await Reading.createCompressedReadingsMaterializedViews();
-	await Reading.createCompareFunction();
+	await Reading.createCompareReadingsFunction();
 	await Baseline.createTable();
 	await getDB().none(sqlFile('baseline/create_function_get_average_reading.sql'));
 }

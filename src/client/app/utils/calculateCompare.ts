@@ -81,6 +81,25 @@ export function calculateCompareDuration(comparePeriod: ComparePeriod): moment.D
 	return compareDuration;
 }
 
+export function calculateCompareShift(comparePeriod: ComparePeriod): moment.Duration {
+	let compareShift;
+	switch (comparePeriod) {
+		case ComparePeriod.Day:
+			// fetch hours for accuracy when time interval is small
+			compareShift = moment.duration(1, 'days');
+			break;
+		case ComparePeriod.Week:
+			compareShift = moment.duration(7, 'days');
+			break;
+		case ComparePeriod.FourWeeks:
+			compareShift = moment.duration(28, 'days');
+			break;
+		default:
+			throw new Error(`Unknown period value: ${comparePeriod}`);
+	}
+	return compareShift;
+}
+
 export interface ComparePeriodLabels {
 	current: string;
 	prev: string;

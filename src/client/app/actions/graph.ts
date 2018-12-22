@@ -6,7 +6,8 @@ import * as moment from 'moment';
 import { fetchMetersDetailsIfNeeded } from './meters';
 import { fetchGroupsDetailsIfNeeded } from './groups';
 import { fetchNeededLineReadings } from './lineReadings';
-import { fetchNeededBarReadings, fetchNeededCompareReadings } from './barReadings';
+import { fetchNeededBarReadings } from './barReadings';
+import { fetchNeededCompareReadings } from './compareReadings';
 import { TimeInterval } from '../../../common/TimeInterval';
 import { Dispatch, Thunk, ActionType } from '../types/redux/actions';
 import { State } from '../types/redux/state';
@@ -68,11 +69,11 @@ function updateComparePeriod(comparePeriod: ComparePeriod): t.UpdateComparePerio
 	};
 }
 
-export function changeCompareGraph(comparePeriod: ComparePeriod): Thunk {
+export function changeCompareGraph(timeInterval: TimeInterval, compareShift: moment.Duration): Thunk {
 	return (dispatch: Dispatch) => {
 		return Promise.all([
 			dispatch(updateComparePeriod(comparePeriod)),
-			dispatch(fetchNeededCompareReadings(comparePeriod))
+			dispatch(fetchNeededCompareReadings(timeInterval, compareShift))
 		]);
 	};
 }
@@ -88,7 +89,7 @@ export function changeSelectedMeters(meterIDs: number[]): Thunk {
 		dispatch(dispatch2 => {
 			dispatch2(fetchNeededLineReadings(getState().graph.timeInterval));
 			dispatch2(fetchNeededBarReadings(getState().graph.timeInterval));
-			dispatch2(fetchNeededCompareReadings(getState().graph.comparePeriod));
+			dispatch2(fetchNeededCompareReadings(getState().graph.timeInterval, getState.graph));
 		});
 		return Promise.resolve();
 	};

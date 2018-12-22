@@ -6,6 +6,7 @@ import { combineReducers } from 'redux';
 import meters from './meters';
 import lineReadings from './lineReadings';
 import barReadings from './barReadings';
+import compareReadings from './compareReadings';
 import graph from './graph';
 import groups from './groups';
 import notifications from './notifications';
@@ -16,7 +17,8 @@ export default combineReducers({
 	meters,
 	readings: combineReducers({
 		line: lineReadings,
-		bar: barReadings
+		bar: barReadings,
+		compare: compareReadings
 	}),
 	graph,
 	groups,
