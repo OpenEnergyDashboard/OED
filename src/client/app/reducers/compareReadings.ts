@@ -75,7 +75,11 @@ export default function readings(state = defaultState, action: CompareReadingAct
 			};
 			for (const meterID of action.meterIDs) {
 				const readingForMeter = action.readings[meterID];
-				newState.byMeterID[meterID][timeInterval][compareShift] = { isFetching: false, reading: readingForMeter };
+				newState.byMeterID[meterID][timeInterval][compareShift] = {
+					isFetching: false,
+					curr_use: readingForMeter.curr_use,
+					prev_use: readingForMeter.prev_use
+				};
 			}
 			if (!state.groupsFetching) {
 				newState.isFetching = false;
@@ -92,7 +96,11 @@ export default function readings(state = defaultState, action: CompareReadingAct
 			};
 			for (const groupID of action.groupIDs) {
 				const readingForGroup = action.readings[groupID];
-				newState.byGroupID[groupID][timeInterval][compareShift] = { isFetching: false, reading: readingForGroup };
+				newState.byGroupID[groupID][timeInterval][compareShift] = {
+					isFetching: false,
+					curr_use: readingForGroup.curr_use,
+					prev_use: readingForGroup.prev_use
+				};
 			}
 			if (!state.metersFetching) {
 				newState.isFetching = false;
