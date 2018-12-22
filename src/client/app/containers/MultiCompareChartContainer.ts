@@ -5,10 +5,10 @@
 import { connect } from 'react-redux';
 import MultiCompareChartComponent from '../components/MultiCompareChartComponent';
 import { State } from '../types/redux/state';
-import {calculateCompareDuration, calculateCompareShift, ComparePeriod, SortingOrder} from '../utils/calculateCompare';
+import { calculateCompareShift, ComparePeriod, SortingOrder} from '../utils/calculateCompare';
+import { CompareReadingsData } from '../types/redux/compareReadings';
 import { TimeInterval } from '../../../common/TimeInterval';
 import * as moment from 'moment';
-import {CompressedBarReading} from '../types/compressed-readings';
 
 export interface CompareEntity {
 	id: number;
@@ -18,12 +18,6 @@ export interface CompareEntity {
 	currUsage: number;
 	prevUsage: number;
 	prevTotalUsage?: number;
-}
-
-interface CompareReadingsData {
-	isFetching: boolean;
-	curr_use?: number;
-	prev_use?: number;
 }
 
 let errorEntities: string[] = [];
@@ -56,16 +50,10 @@ function getDataForIDs(ids: number[], isGroup: boolean, state: State): CompareEn
 			readingsData = getMeterReadingsData(state, id, timeInterval, compareShift);
 		}
 		if (isReadingsDataValid(readingsData)) {
-			const timeSincePeriodStart = getTimeSincePeriodStart(comparePeriod);
-			if (readingsData!.readings!.length < timeSincePeriodStart) {
-				errorEntities.push(name);
-				continue;
-			}
-			const currentPeriodUsage = readingsData.curr_use;
-			const lastPeriodTotalUsage = calculateLastPeriodUsage(readingsData!, timeSincePeriodStart) || 0;
-			const usedToThisPointLastTimePeriod = calculateUsageToThisPointLastTimePeroid(readingsData!, timeSincePeriodStart) || 0;
-			const change = calculateChange(currentPeriodUsage, usedToThisPointLastTimePeriod, lastPeriodTotalUsage);
-			const entity: CompareEntity = {id, isGroup, name, change, lastPeriodTotalUsage, currentPeriodUsage, usedToThisPointLastTimePeriod};
+			const currUsage = readingsData!.curr_use!;
+			const prevUsage = readingsData!.prev_use!;
+			const change = calculateChange(currUsage, prevUsage);
+			const entity: CompareEntity = {id, isGroup, name, change, currUsage, prevUsage};
 			entities.push(entity);
 		}
 	}
@@ -86,9 +74,10 @@ function getMeterName(state: State, meterID: number): string {
 	return state.meters.byMeterID[meterID].name;
 }
 
-function getGroupReadingsData(state: State, groupID: number, timeInterval: TimeInterval, compareShift: moment.Duration): CompareReadingsData | undefined {
+function getGroupReadingsData(state: State, groupID: number, timeInterval: TimeInterval, compareShift: moment.Duration):
+	CompareReadingsData | undefined {
 	let readingsData: CompareReadingsData | undefined;
-	const readingsDataByID = state.readings.bar.byGroupID[groupID];
+	const readingsDataByID = state.readings.compare.byGroupID[groupID];
 	if (readingsDataByID !== undefined) {
 		const readingsDataByTimeInterval = readingsDataByID[timeInterval.toString()];
 		if (readingsDataByTimeInterval !== undefined) {
@@ -101,9 +90,10 @@ function getGroupReadingsData(state: State, groupID: number, timeInterval: TimeI
 	return readingsData;
 }
 
-function getMeterReadingsData(state: State, meterID: number, timeInterval: TimeInterval, compareShift: moment.Duration): CompareReadingsData | undefined {
+function getMeterReadingsData(state: State, meterID: number, timeInterval: TimeInterval, compareShift: moment.Duration):
+	CompareReadingsData | undefined {
 	let readingsData: CompareReadingsData | undefined;
-	const readingsDataByID = state.readings.bar.byMeterID[meterID];
+	const readingsDataByID = state.readings.compare.byMeterID[meterID];
 	if (readingsDataByID !== undefined) {
 		const readingsDataByTimeInterval = readingsDataByID[timeInterval.toString()];
 		if (readingsDataByTimeInterval !== undefined) {
@@ -114,33 +104,14 @@ function getMeterReadingsData(state: State, meterID: number, timeInterval: TimeI
 		}
 	}
 	return readingsData;
-}
-
-function getTimeSincePeriodStart(comparePeriod: ComparePeriod): number {
-	let timeSincePeriodStart;
-	switch (comparePeriod) {
-		case ComparePeriod.Day:
-			timeSincePeriodStart = moment().hour();
-			break;
-		case ComparePeriod.Week:
-			timeSincePeriodStart = moment().diff(moment().startOf('week'), 'days');
-			break;
-		case ComparePeriod.FourWeeks:
-			// 21 to differentiate from Week case, Week case never larger than 14
-			timeSincePeriodStart = moment().diff(moment().startOf('week').subtract(21, 'days'), 'days');
-			break;
-		default:
-			throw new Error(`Unknown period value: ${comparePeriod}`);
-	}
-	return timeSincePeriodStart;
 }
 
 function isReadingsDataValid(readingsData: CompareReadingsData | undefined): boolean {
 	return readingsData !== undefined && !readingsData.isFetching && readingsData.curr_use !== undefined && readingsData.prev_use !== undefined;
 }
 
-function calculateChange(currentPeriodUsage: number, usedToThisPointLastTimePeriod: number, lastPeriodTotalUsage: number): number {
-	return (-1 + (((currentPeriodUsage / usedToThisPointLastTimePeriod) * lastPeriodTotalUsage) / lastPeriodTotalUsage));
+function calculateChange(currentPeriodUsage: number, usedToThisPointLastTimePeriod: number): number {
+	return -1 + (currentPeriodUsage / usedToThisPointLastTimePeriod);
 }
 
 function sortIDs(ids: CompareEntity[], sortingOrder: SortingOrder): CompareEntity[] {
