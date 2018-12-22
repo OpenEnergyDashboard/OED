@@ -14,8 +14,6 @@ const defaultState: CompareReadingsState = {
 };
 
 export default function readings(state = defaultState, action: CompareReadingAction) {
-	const timeInterval = action.timeInterval.toString();
-	const compareShift = action.compareShift.toISOString();
 	switch (action.type) {
 		case ActionType.RequestMeterCompareReading: {
 			const newState = {
@@ -26,6 +24,8 @@ export default function readings(state = defaultState, action: CompareReadingAct
 				metersFetching: true,
 				isFetching: true
 			};
+			const timeInterval = action.timeInterval.toString();
+			const compareShift = action.compareShift.toISOString();
 			for (const meterID of action.meterIDs) {
 				// Create group entry and time interval entry if needed
 				if (newState.byMeterID[meterID] === undefined) {
@@ -52,6 +52,8 @@ export default function readings(state = defaultState, action: CompareReadingAct
 				groupsFetching: true,
 				isFetching: true
 			};
+			const timeInterval = action.timeInterval.toString();
+			const compareShift = action.compareShift.toISOString();
 			for (const groupID of action.groupIDs) {
 				// Create group entry and time interval entry if needed
 				if (newState.byGroupID[groupID] === undefined) {
@@ -77,6 +79,8 @@ export default function readings(state = defaultState, action: CompareReadingAct
 				},
 				metersFetching: false
 			};
+			const timeInterval = action.timeInterval.toString();
+			const compareShift = action.compareShift.toISOString();
 			for (const meterID of action.meterIDs) {
 				const readingForMeter = action.readings[meterID];
 				newState.byMeterID[meterID][timeInterval][compareShift] = {
@@ -98,6 +102,8 @@ export default function readings(state = defaultState, action: CompareReadingAct
 				},
 				groupsFetching: false
 			};
+			const timeInterval = action.timeInterval.toString();
+			const compareShift = action.compareShift.toISOString();
 			for (const groupID of action.groupIDs) {
 				const readingForGroup = action.readings[groupID];
 				newState.byGroupID[groupID][timeInterval][compareShift] = {
