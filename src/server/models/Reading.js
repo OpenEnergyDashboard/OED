@@ -381,7 +381,6 @@ class Reading {
 		const allCompareReadings = await conn().func(
 			'compare_readings',
 			[meterIDs, currStartTimestamp, currEndTimestamp, compareShift.toISOString()]);
-		console.log(allCompareReadings);
 		const compareReadingsByMeterID = {};
 		for (const row of allCompareReadings) {
 			compareReadingsByMeterID[row.meter_id] = {
