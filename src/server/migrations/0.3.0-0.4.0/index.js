@@ -15,6 +15,7 @@ module.exports = {
 			await db.none(sqlFile('../migrations/0.3.0-0.4.0/sql/logemail/create_log_table.sql'));
 			await db.none(sqlFile('../migrations/0.3.0-0.4.0/sql/baseline/create_baseline_table.sql'));
 			await db.none(sqlFile('../migrations/0.3.0-0.4.0/sql/baseline/create_function_get_average_reading.sql'));
+			await db.none(sqlFile('../migrations/0.3.0-0.4.0/sql/compareReadings/create_function_get_compare_readings.sql'));
 		} catch (err) {
 			throw new Error('Error while migrating each sql file');
 		}
