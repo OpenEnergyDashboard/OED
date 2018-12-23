@@ -45,8 +45,8 @@ export default class MetersApi {
 		return await this.backend.doGetRequest<CompareReadings>(
 			`/api/compareReadings/meters/${stringifiedIDs}`,
 			{
-				current_period_start: currStart.toString(),
-				current_period_end: currEnd.toString(),
+				curr_start: currStart.toISOString(),
+				curr_end: currEnd.toISOString(),
 				shift: shift.toISOString()
 			}
 		);

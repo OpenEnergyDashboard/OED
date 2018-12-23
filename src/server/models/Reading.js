@@ -381,11 +381,12 @@ class Reading {
 		const allCompareReadings = await conn().func(
 			'compare_readings',
 			[meterIDs, currStartTimestamp, currEndTimestamp, compareShift.toISOString()]);
+		console.log(allCompareReadings);
 		const compareReadingsByMeterID = {};
 		for (const row of allCompareReadings) {
 			compareReadingsByMeterID[row.meter_id] = {
-				currentUse: row.current_use,
-				prevUse: row.prev_use
+				curr_use: row.current_use,
+				prev_use: row.prev_use
 			};
 		}
 		return compareReadingsByMeterID;
@@ -407,8 +408,8 @@ class Reading {
 		const compareReadingsByGroupID = {};
 		for (const row of allCompareReadings) {
 			compareReadingsByGroupID[row.group_id] = {
-				currentUse: row.current_use,
-				prevUse: row.prev_use
+				curr_use: row.current_use,
+				prev_use: row.prev_use
 			};
 		}
 		return compareReadingsByGroupID;

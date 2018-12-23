@@ -19,7 +19,7 @@ const Group = require('../../models/Group');
 
 const mocha = require('mocha');
 
-mocha.describe('Compare calculation', () => {
+mocha.describe('Comparison chart Readings', () => {
 	mocha.beforeEach(recreateDB);
 
 	let meter;
@@ -38,7 +38,7 @@ mocha.describe('Compare calculation', () => {
 	});
 	mocha.it('Works for meters', async () => {
 		const result = await Reading.getCompareReadings([meter.id], currStart, currEnd, shift);
-		expect(result).to.deep.equal({[meter.id]: {currentUse: 10, prevUse: 1}});
+		expect(result).to.deep.equal({[meter.id]: {curr_use: 10, prev_use: 1}});
 	});
 
 	mocha.it('Works for groups', async () => {
@@ -46,6 +46,6 @@ mocha.describe('Compare calculation', () => {
 		const group = await Group.getByName('Group');
 		await group.adoptMeter(meter.id);
 		const result = await Reading.getGroupCompareReadings([group.id], currStart, currEnd, shift);
-		expect(result).to.deep.equal({[group.id]: {currentUse: 10, prevUse: 1}});
+		expect(result).to.deep.equal({[group.id]: {curr_use: 10, prev_use: 1}});
 	});
 });
