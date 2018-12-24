@@ -384,7 +384,7 @@ class Reading {
 		const compareReadingsByMeterID = {};
 		for (const row of allCompareReadings) {
 			compareReadingsByMeterID[row.meter_id] = {
-				curr_use: row.current_use,
+				curr_use: row.curr_use,
 				prev_use: row.prev_use
 			};
 		}
@@ -407,7 +407,7 @@ class Reading {
 		const compareReadingsByGroupID = {};
 		for (const row of allCompareReadings) {
 			compareReadingsByGroupID[row.group_id] = {
-				curr_use: row.current_use,
+				curr_use: row.curr_use,
 				prev_use: row.prev_use
 			};
 		}
