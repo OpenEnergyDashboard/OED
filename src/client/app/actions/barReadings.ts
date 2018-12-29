@@ -7,7 +7,6 @@ import { TimeInterval } from '../../../common/TimeInterval';
 import { Dispatch, GetState, Thunk, ActionType } from '../types/redux/actions';
 import { State } from '../types/redux/state';
 import * as t from '../types/redux/barReadings';
-import { ComparePeriod, calculateCompareDuration } from '../utils/calculateCompare';
 import { compressedReadingsApi } from '../utils/api';
 import { CompressedBarReadings } from '../types/compressed-readings';
 
@@ -110,27 +109,6 @@ function fetchGroupBarReadings(groupIDs: number[], timeInterval: TimeInterval): 
 		dispatch(receiveGroupBarReadings(groupIDs, timeInterval, barDuration, readings));
 	};
 }
-
-function fetchMeterCompareReadings(meterIDs: number[], comparePeriod: ComparePeriod): Thunk {
-	return async (dispatch: Dispatch, getState: GetState) => {
-		const compareDuration = calculateCompareDuration(comparePeriod);
-		const timeInterval = getState().graph.compareTimeInterval;
-		dispatch(requestMeterBarReadings(meterIDs, timeInterval, compareDuration));
-		const readings = await compressedReadingsApi.meterBarReadings(meterIDs, timeInterval, Math.round(compareDuration.asDays()));
-		dispatch(receiveMeterBarReadings(meterIDs, timeInterval, compareDuration, readings));
-	};
-}
-
-function fetchGroupCompareReadings(groupIDs: number[], comparePeriod: ComparePeriod) {
-	return async (dispatch: Dispatch, getState: GetState) => {
-		const compareDuration = calculateCompareDuration(comparePeriod);
-		const timeInterval = getState().graph.compareTimeInterval;
-		dispatch(requestGroupBarReadings(groupIDs, timeInterval, compareDuration));
-		const readings = await compressedReadingsApi.groupBarReadings(groupIDs, timeInterval, Math.round(compareDuration.asDays()));
-		dispatch(receiveGroupBarReadings(groupIDs, timeInterval, compareDuration, readings));
-	};
-}
-
 
 /**
  * Fetches readings for the bar chart of all selected meterIDs if they are not already fetched or being fetched

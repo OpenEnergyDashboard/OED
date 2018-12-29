@@ -5,7 +5,7 @@
 import { connect } from 'react-redux';
 import MultiCompareChartComponent from '../components/MultiCompareChartComponent';
 import { State } from '../types/redux/state';
-import { calculateCompareShift, ComparePeriod, SortingOrder} from '../utils/calculateCompare';
+import { calculateCompareShift, SortingOrder} from '../utils/calculateCompare';
 import { CompareReadingsData } from '../types/redux/compareReadings';
 import { TimeInterval } from '../../../common/TimeInterval';
 import * as moment from 'moment';
