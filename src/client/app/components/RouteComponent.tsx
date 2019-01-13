@@ -102,6 +102,9 @@ export default class RouteComponent extends React.Component<RouteProps, {}> {
 						case 'compareSortingOrder':
 							options.compareSortingOrder = validateSortingOrder(info);
 							break;
+						case 'optionsVisibility':
+							options.optionsVisibility = (info === 'true');
+							break;
 						default:
 							throw new Error('Unknown query parameter');
 					}

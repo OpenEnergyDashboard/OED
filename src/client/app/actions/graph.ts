@@ -137,6 +137,7 @@ export interface LinkOptions {
 	toggleBarStacking?: boolean;
 	comparePeriod?: ComparePeriod;
 	compareSortingOrder?: SortingOrder;
+	optionsVisibility?: boolean;
 }
 
 /**
@@ -146,7 +147,8 @@ export interface LinkOptions {
  */
 export function changeOptionsFromLink(options: LinkOptions) {
 	const dispatchFirst: Thunk[] = [setHotlinkedAsync(true)];
-	const dispatchSecond: Array<Thunk | t.ChangeChartToRenderAction | t.ChangeBarStackingAction | t.ChangeCompareSortingOrderAction> = [];
+	const dispatchSecond: Array<Thunk | t.ChangeChartToRenderAction | t.ChangeBarStackingAction
+		| t.ChangeCompareSortingOrderAction | t.SetOptionsVisibility> = [];
 	if (options.meterIDs) {
 		dispatchFirst.push(fetchMetersDetailsIfNeeded());
 		dispatchSecond.push(changeSelectedMeters(options.meterIDs));
@@ -169,6 +171,9 @@ export function changeOptionsFromLink(options: LinkOptions) {
 	}
 	if (options.compareSortingOrder) {
 		dispatchSecond.push(changeCompareSortingOrder(options.compareSortingOrder));
+	}
+	if (options.optionsVisibility != null) {
+		dispatchSecond.push(setOptionsVisibility(options.optionsVisibility));
 	}
 	return (dispatch: Dispatch) => Promise.all(dispatchFirst.map(dispatch))
 		.then(() => Promise.all(dispatchSecond.map(dispatch)));
