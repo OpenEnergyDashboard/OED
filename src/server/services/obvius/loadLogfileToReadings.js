@@ -5,6 +5,7 @@
 const moment = require('moment');
 const Meter = require('../../models/Meter');
 const Reading = require('../../models/Reading');
+const { log } = require('../../log');
 const demuxCsvWithSingleColumnTimestamps = require('./csvDemux');
 
 async function loadLogfileToReadings(serialNumber, ipAddress, logfile) {
@@ -31,7 +32,11 @@ async function loadLogfileToReadings(serialNumber, ipAddress, logfile) {
 			const endTimestamp = startTimestamp.clone();
 			endTimestamp.add(moment.duration(1, 'hours'));
 			const reading = new Reading(meter.id, rawReading[1], startTimestamp, endTimestamp);
-			await reading.insert();
+			try {
+				await reading.insert();
+			} catch (err) {
+				log.error("Could not insert readings from Obvius logfile.", err);
+			}
 		}
 	}
 }
