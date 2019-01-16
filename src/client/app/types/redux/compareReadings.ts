@@ -47,7 +47,6 @@ export interface CompareReadingsData {
 	isFetching: boolean;
 	curr_use?: number;
 	prev_use?: number;
-	// prev_total?: number;
 }
 
 export interface CompareReadingsState {

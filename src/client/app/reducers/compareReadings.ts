@@ -9,8 +9,8 @@ const defaultState: CompareReadingsState = {
 	byMeterID: {},
 	byGroupID: {},
 	isFetching: false,
-		metersFetching: false,
-		groupsFetching: false
+	metersFetching: false,
+	groupsFetching: false
 };
 
 export default function readings(state = defaultState, action: CompareReadingAction) {

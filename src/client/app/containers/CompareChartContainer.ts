@@ -47,19 +47,7 @@ function mapStateToProps(state: State, ownProps: CompareChartContainerProps): Li
 
 	labels.push(periodLabels.prev);
 	labels.push(periodLabels.current);
-	const readingsAfterCurrentTimeColor = 'rgba(173, 216, 230, 1)';
-	const readingsBeforeCurrentTimeColor = 'rgba(218, 165, 32, 1)';
-	if (entity.prevTotalUsage !== undefined) {
-		datasets.push(
-			{
-				data: [entity.prevTotalUsage],
-				datalabels: {
-					anchor: 'end',
-					align: 'start'
-				}
-			}
-		);
-	}
+	const barColor = 'rgba(218, 165, 32, 1)';
 	datasets.push(
 		{
 			data: [entity.prevUsage, entity.currUsage],
@@ -69,21 +57,8 @@ function mapStateToProps(state: State, ownProps: CompareChartContainerProps): Li
 			}
 		}
 	);
-	// sorts the data so that one doesn't cover up the other
-	datasets.sort((a, b) => {
-		if (a.data !== undefined && b.data !== undefined) {
-			return +(a.data[0]) - +(b.data[0]);
-		} else {
-			return 0;
-		}
-	});
-	// apply info to datasets after sort
-	datasets[0].backgroundColor = [readingsBeforeCurrentTimeColor, readingsBeforeCurrentTimeColor];
-	datasets[0].hoverBackgroundColor = [readingsBeforeCurrentTimeColor, readingsBeforeCurrentTimeColor];
-	if (entity.prevTotalUsage !== undefined) {
-		datasets[1].backgroundColor = [readingsAfterCurrentTimeColor];
-		datasets[1].hoverBackgroundColor = [readingsAfterCurrentTimeColor];
-	}
+	datasets[0].backgroundColor = barColor;
+	datasets[0].hoverBackgroundColor = barColor;
 
 	const data: ChartData = {datasets, labels};
 	const ticks: LinearTickOptions = {
@@ -128,6 +103,7 @@ function mapStateToProps(state: State, ownProps: CompareChartContainerProps): Li
 					const usedThisTime = data.datasets![0].data![0];
 					const usedSoFar = data.datasets![0].data![1];
 					const labelText = tooltipItem.xLabel!.toLowerCase();
+					// TODO: Modify below
 					switch (usage) {
 						case usedThisTime:
 							return `${usage} kW ${translate('used.this.time')} ${labelText}`;

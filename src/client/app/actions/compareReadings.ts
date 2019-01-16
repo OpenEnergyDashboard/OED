@@ -83,11 +83,13 @@ function receiveGroupCompareReadings(groupIDs: number[], timeInterval: TimeInter
  * @param {TimeInterval} timeInterval The time interval over which data should be fetched
  * @param {compareShift} compareShift The time shift between curr and prev
  */
-function fetchMeterCompareReadings(meterIDs: number[], timeInterval: TimeInterval, compareShift: moment.Duration): Thunk {
+function fetchMeterCompareReadings(meterIDs: number[], comparePeriod: ComparePeriod): Thunk {
+	const compareShift = calculateCompareShift(comparePeriod);
+	const currTimeInterval = calculateCompareTimeInterval(comparePeriod, moment());
 	return async (dispatch: Dispatch) => {
-		dispatch(requestMeterCompareReadings(meterIDs, timeInterval, compareShift));
-		const readings = await metersApi.compareReadings(meterIDs, timeInterval, compareShift);
-		dispatch(receiveMeterCompareReadings(meterIDs, timeInterval, compareShift, readings));
+		dispatch(requestMeterCompareReadings(meterIDs, currTimeInterval, compareShift));
+		const readings: CompareReadings = await metersApi.compareReadings(meterIDs, currTimeInterval, compareShift);
+		dispatch(receiveMeterCompareReadings(meterIDs, currTimeInterval, compareShift, readings));
 	};
 }
 
@@ -97,11 +99,13 @@ function fetchMeterCompareReadings(meterIDs: number[], timeInterval: TimeInterva
  * @param {TimeInterval} timeInterval The time interval over which data should be fetched
  * @param {compareShift} compareShift The time shift between curr and prev
  */
-function fetchGroupCompareReadings(groupIDs: number[], timeInterval: TimeInterval, compareShift: moment.Duration): Thunk {
+function fetchGroupCompareReadings(groupIDs: number[], comparePeriod: ComparePeriod): Thunk {
+	const compareShift = calculateCompareShift(comparePeriod);
+	const currTimeInterval = calculateCompareTimeInterval(comparePeriod, moment());
 	return async (dispatch: Dispatch) => {
-		dispatch(requestGroupCompareReadings(groupIDs, timeInterval, compareShift));
-		const readings = await groupsApi.compareReadings(groupIDs, timeInterval, compareShift);
-		dispatch(receiveGroupCompareReadings(groupIDs, timeInterval, compareShift, readings));
+		dispatch(requestGroupCompareReadings(groupIDs, currTimeInterval, compareShift));
+		const readings = await groupsApi.compareReadings(groupIDs, currTimeInterval, compareShift);
+		dispatch(receiveGroupCompareReadings(groupIDs, currTimeInterval, compareShift, readings));
 	};
 }
 
@@ -124,7 +128,7 @@ export function fetchNeededCompareReadings(comparePeriod: ComparePeriod): Thunk 
 		);
 		// Fetch data for any missing meters
 		if (meterIDsToFetchForCompare.length > 0) {
-			promises.push(dispatch(fetchMeterCompareReadings(meterIDsToFetchForCompare, timeInterval, compareShift)));
+			promises.push(dispatch(fetchMeterCompareReadings(meterIDsToFetchForCompare, comparePeriod)));
 		}
 
 		// Determine which groups are missing data for this time interval
@@ -133,7 +137,7 @@ export function fetchNeededCompareReadings(comparePeriod: ComparePeriod): Thunk 
 		);
 		// Fetch data for any missing groups
 		if (groupIDsToFetchForCompare.length > 0) {
-			promises.push(dispatch(fetchGroupCompareReadings(groupIDsToFetchForCompare, timeInterval, compareShift)));
+			promises.push(dispatch(fetchGroupCompareReadings(groupIDsToFetchForCompare, comparePeriod)));
 		}
 		return Promise.all(promises);
 	};
