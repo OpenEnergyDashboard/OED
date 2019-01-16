@@ -2,6 +2,7 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
 
+const mocha = require('mocha');
 const config = require('../../config');
 const { log, LogLevel } = require('../../log');
 
@@ -16,11 +17,7 @@ config.database = {
 	port: process.env.OED_DB_TEST_PORT || process.env.OED_DB_PORT
 };
 
-const { getDB, currentDB, createSchema } = require('../../models/database');
-
-// Disable logging during tests.
-// TODO: Move logging disabling to a better place.
-log.level = LogLevel.SILENT;
+const { getDB, currentDB, stopDB, createSchema } = require('../../models/database');
 
 async function recreateDB() {
 	// Just transfer connection if needed.
@@ -37,3 +34,13 @@ async function recreateDB() {
 }
 
 module.exports.recreateDB = recreateDB;
+
+// Disable logging during tests.
+// TODO: Move logging disabling to a better place.
+log.level = LogLevel.SILENT;
+
+// Global "root suite" function to drop all database connections after testing.
+mocha.after(async () => {
+	stopDB();
+});
+
