@@ -103,10 +103,10 @@ mocha.describe('loadLogfileToReadings', async () => {
 	mocha.it('adds the right number and type of meters', async () => {
 		csvDataAdd2Meters = '1970-01-01 00:00:00,10,10\n1970-01-02 00:00:00,20,20';
 		await loadLogfileToReadings('000', '0.0.0.0', csvDataAdd2Meters);
-		
+
 		let m = await Meter.getAll();
 		expect(m).to.have.lengthOf(2);
-		
+
 		let m1 = await Meter.getByName('000.0');
 		let m2 = await Meter.getByName('000.1');
 		expect(m1).to.have.property('type', Meter.type.OBVIUS);
@@ -115,9 +115,18 @@ mocha.describe('loadLogfileToReadings', async () => {
 	mocha.it('adds readings that overlap', async () => {
 		csvDataAdd2Meters = '1970-01-01 00:00:00,10\n1970-01-01 00:30:00,20';
 		await loadLogfileToReadings('000', '0.0.0.0', csvDataAdd2Meters);
-		
+
 		let m1 = await Meter.getByName('000.0');
 		let readings = await m1.readings();
 		expect(readings).to.have.lengthOf(2);
+	});
+    mocha.it('does not modify accepted data', async() => {
+		csvDataAddDuplicate = '1970-01-01 00:00:00,10\n1970-01-01 00:00:00,20';
+		await loadLogfileToReadings('000', '0.0.0.0', csvDataAddDuplicate);
+
+		let m1 = await Meter.getByName('000.0');
+		let readings = await m1.readings();
+		expect(readings).to.have.lengthOf(1);
+		expect(readings[0]).to.have.property('reading', 10);
 	});
 });
