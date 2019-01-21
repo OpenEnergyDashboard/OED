@@ -103,14 +103,13 @@ function mapStateToProps(state: State, ownProps: CompareChartContainerProps): Li
 					const usedThisTime = data.datasets![0].data![0];
 					const usedSoFar = data.datasets![0].data![1];
 					const labelText = tooltipItem.xLabel!.toLowerCase();
-					// TODO: Modify below
 					switch (usage) {
 						case usedThisTime:
 							return `${usage} kW ${translate('used.this.time')} ${labelText}`;
 						case usedSoFar:
 							return `${usage} kW ${translate('used.so.far')} ${labelText}`;
 						default:
-							return `${usage} kW ${translate('total')} ${labelText}`;
+							return ``;
 					}
 				},
 				title: () => ''
