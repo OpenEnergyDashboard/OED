@@ -109,7 +109,7 @@ function mapStateToProps(state: State, ownProps: CompareChartContainerProps): Li
 						case usedSoFar:
 							return `${usage} kW ${translate('used.so.far')} ${labelText}`;
 						default:
-							return ``;
+							return '';
 					}
 				},
 				title: () => ''
