@@ -35,7 +35,6 @@ router.get('/', async (req, res) => {
  * @param {int} meter_id
  */
 router.get('/:meter_id', async (req, res) => {
-	// Defines the format of a valid request.
 	// The request must include exactly one parameter
 	// called meter_id containing only digits.
 	const validParams = {
@@ -50,8 +49,6 @@ router.get('/:meter_id', async (req, res) => {
 			}
 		}
 	};
-	// Checks that the request we got was valid according to the validParams
-	// definition.
 	if (!validate(req.params, validParams).valid) {
 		res.sendStatus(400);
 	} else {
