@@ -45,6 +45,7 @@ router.get('/:meter_id', async (req, res) => {
 		properties: {
 			meter_id: {
 				type: 'string',
+				// TODO: Is this pattern correct?
 				pattern: '^\\d+$'
 			}
 		}
