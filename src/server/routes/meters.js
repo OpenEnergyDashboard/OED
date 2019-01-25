@@ -19,7 +19,7 @@ function formatMeterForResponse(meter) {
 }
 
 /**
- * GET information on all meters
+ * GET information on all meters in JSON format
  */
 router.get('/', async (req, res) => {
 	try {
