@@ -25,7 +25,7 @@ CREATE OR REPLACE FUNCTION barchart_readings(
 		real_duration INTERVAL;
 
 	BEGIN
-		-- Select the time of the earliest reading in the readings table and the latest and put them into the real_timestamps.
+		-- Select the time of the earliest and latest readings that overlap the time interval from the selected meters.
 		SELECT
 			greatest(MIN(readings.start_timestamp), from_timestamp), least(MAX(readings.end_timestamp), to_timestamp)
 		INTO real_start_timestamp, real_end_timestamp
@@ -40,27 +40,43 @@ CREATE OR REPLACE FUNCTION barchart_readings(
 			RETURN; -- Return just returns an empty result set.
 		END IF;
 
-		-- If we didn't return then it's safe to subtract the timestamps
+		-- If we didn't return then it's safe to subtract the timestamps.
+		-- Get the actual amount of time to look over.
 		real_duration := least(duration, real_end_timestamp - real_start_timestamp);
 
+		-- meter_id,
 		RETURN QUERY
 		SELECT
 			r.meter_id,
+			-- Convert the weighted average of the meter's readings from agg.start -> agg.start + real_duration to an integer.
 			CAST(
-					ROUND(SUM(
-							 r.reading / (extract(EPOCH FROM (r.end_timestamp - r.start_timestamp)))
-							 * EXTRACT(epoch FROM (least(r.end_timestamp, (agg.start + real_duration)) - greatest(r.start_timestamp, agg.start)))
+					ROUND(
+						-- Do a weighted average of the all readings in the duration agg.start -> agg.start + real_duration.
+							SUM(
+							-- Divide the value of the reading by the number of seconds the reading covered.
+							 r.reading / (EXTRACT(EPOCH FROM (r.end_timestamp - r.start_timestamp)))
+							-- Get amount of time this reading over laps the current time segment.
+							 * EXTRACT(EPOCH FROM (least(r.end_timestamp, (agg.start + real_duration)) - greatest(r.start_timestamp, agg.start)))
 					)) AS INTEGER
 			),
+			-- Hold the start and end times of the reading duration segment.
 			agg.start,
 			agg.start + real_duration
 		FROM readings r
+		-- Use all readings from meters that an id in the meter_ids array.
 		INNER JOIN unnest(meter_ids) specific_meter(id) ON r.meter_id = specific_meter.id
+			-- Create an array to iterate over. agg (which is short for aggregation) will hold the start of the interval to
+			-- aggregate over.
 			INNER JOIN generate_series(real_start_timestamp, real_end_timestamp, real_duration) agg(start)
 				ON
+					-- Select a reading only if it is overlapping the current aggregation interval.
 					(r.start_timestamp, r.end_timestamp) OVERLAPS (agg.start, agg.start + real_duration)
-					AND -- generate_series is an end-inclusive range, so we make it an open interval with the second OVERLAPS statement
+					AND -- generate_series is an end-inclusive range (meaning at some point agg.start = real_end_timestamp),
+					--  so we make it an open interval with the second OVERLAPS statement since,
+					-- (real_end, real_end + duration) does not overlap (real_start, real_end).
 					(agg.start, agg.start + duration) OVERLAPS (real_start_timestamp, real_end_timestamp)
+		-- Group the query so that all readings from a single meter are nearby and then by all aggregations that are over
+		-- the same interval.
 		GROUP BY(r.meter_id, agg.start)
 		ORDER BY r.meter_id, agg.start;
 	END;
