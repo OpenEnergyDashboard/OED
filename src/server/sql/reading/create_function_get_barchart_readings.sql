@@ -8,14 +8,12 @@
 	short time intervals cover the total time interval that is to be shown.
  */
 CREATE OR REPLACE FUNCTION barchart_readings(
-		-- Declaring parameters for the function.
-
     meter_ids INTEGER[],
-    -- Total duration to measure meters over.
+    -- Interval that is aggregated over.
     duration INTERVAL,
     from_timestamp TIMESTAMP = '-infinity',
     to_timestamp TIMESTAMP = 'infinity')
-	-- Return a table containing the id, sum of readings, and interval as columns.
+	-- Return a table containing the id, sum of readings, and interval that has been aggregated as columns.
 	RETURNS TABLE(meter_ID INTEGER, reading_sum INTEGER, start_timestamp TIMESTAMP, end_timestamp TIMESTAMP) AS $$
 
 	-- Create some variables to hold the actual time range and duration.
@@ -25,7 +23,11 @@ CREATE OR REPLACE FUNCTION barchart_readings(
 		real_duration INTERVAL;
 
 	BEGIN
-		-- Select the time of the earliest and latest readings that overlap the time interval from the selected meters.
+		/*
+			Select either the time of the earliest reading in the time range or if there are readings earlier than the
+			beginning of our time range, choose the beginning of the time range.
+			The same is done for the end timestamp.
+		 */
 		SELECT
 			greatest(MIN(readings.start_timestamp), from_timestamp), least(MAX(readings.end_timestamp), to_timestamp)
 		INTO real_start_timestamp, real_end_timestamp
