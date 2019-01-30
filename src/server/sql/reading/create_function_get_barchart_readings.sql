@@ -4,15 +4,20 @@
 
 
 /**
-	This function sums the readings for an array of meters over a given duration that is repeated over a given time interval,
-	and	returns a query
+	This function sums the readings over some short duration for some set of readings. This is then repeated until the
+	short time intervals cover the total time that is to be shown.
  */
 CREATE OR REPLACE FUNCTION barchart_readings(
-	meter_ids INTEGER[],
-	duration INTERVAL,
-	from_timestamp TIMESTAMP = '-infinity',
-	to_timestamp TIMESTAMP = 'infinity')
+		-- Declaring parameters for the function.
+
+    meter_ids INTEGER[],
+    -- Total duration to measure meters over.
+    duration INTERVAL,
+    from_timestamp TIMESTAMP = '-infinity',
+    to_timestamp TIMESTAMP = 'infinity')
+	-- Return a table containing the id, sum of readings, and interval as columns.
 	RETURNS TABLE(meter_ID INTEGER, reading_sum INTEGER, start_timestamp TIMESTAMP, end_timestamp TIMESTAMP) AS $$
+
 	DECLARE
 		real_start_timestamp TIMESTAMP;
 		real_end_timestamp TIMESTAMP;
