@@ -38,10 +38,18 @@ class Reading {
 		return getDB().none(sqlFile('reading/create_function_get_compressed_readings.sql'));
 	}
 
+	/**
+	 * Returns a promise to create the compressed groups readings function.
+	 * @returns {Promise.<>}
+	 */
 	static createCompressedGroupsReadingsFunction() {
 		return getDB().none(sqlFile('reading/create_function_get_compressed_groups_readings.sql'));
 	}
 
+	/**
+	 * Returns a promise to create the group barchart readings function.
+	 * @returns {Promise.<>}
+	 */
 	static createCompressedGroupsBarchartReadingsFunction() {
 		return getDB().none(sqlFile('reading/create_function_get_group_barchart_readings.sql'));
 	}
@@ -54,6 +62,11 @@ class Reading {
 		return getDB().none(sqlFile('reading/create_function_get_barchart_readings.sql'));
 	}
 
+	/**
+	 * Change a row from the readings table into a Reading object.
+	 * @param row The row from the table to be changed.
+	 * @returns {Reading}
+	 */
 	static mapRow(row) {
 		return new Reading(row.meter_id, row.reading, row.start_timestamp, row.end_timestamp);
 	}
@@ -65,6 +78,7 @@ class Reading {
 	 * @returns {Promise.<>}
 	 */
 	static insertAll(readings, conn = getDB) {
+		// TODO: What does tx and sequence do?
 		return conn().tx(t => t.sequence(function seq(i) {
 			const seqT = this;
 			return readings[i] && readings[i].insert(conn = () => seqT);
@@ -148,6 +162,8 @@ class Reading {
 			[meterIDs, fromTimestamp || '-infinity', toTimestamp || 'infinity', numPoints]);
 		// Separate the result rows by meter_id and return a nested object.
 		const compressedReadingsByMeterID = mapToObject(meterIDs, () => []); // Returns { 1: [], 2: [], ... }
+		// For each row in the allCompressedReadings table, append the compressed reading value to the array for
+		// the meter that corresponds to that reading.
 		for (const row of allCompressedReadings) {
 			compressedReadingsByMeterID[row.meter_id].push(
 				{ reading_rate: row.reading_rate, start_timestamp: row.start_timestamp, end_timestamp: row.end_timestamp }
@@ -220,6 +236,8 @@ class Reading {
 		// Separate the result rows by meter_id and return a nested object.
 		const barchartReadingsByGroupID = mapToObject(groupIDs, () => []);
 		for (const row of allBarchartReadings) {
+			// If there was an unexpected group id in the barchart readings by group, just create a place to hold
+			// that value in the object to be returned.
 			if (barchartReadingsByGroupID[row.group_id] === undefined) {
 				barchartReadingsByGroupID[row.group_id] = [];
 			}
