@@ -31,7 +31,9 @@ CREATE OR REPLACE FUNCTION barchart_readings(
 			greatest(MIN(readings.start_timestamp), from_timestamp), least(MAX(readings.end_timestamp), to_timestamp)
 		INTO real_start_timestamp, real_end_timestamp
 		FROM readings
+		-- Create a temporary variable that has an attribute 'id' to match with the corresponding row in readings.
 		INNER JOIN unnest(meter_ids) specific_meter(id) ON readings.meter_id = specific_meter.id
+		-- Only select readings that overlap the interval we are looking for.
 		WHERE (readings.start_timestamp, readings.end_timestamp) OVERLAPS (from_timestamp, to_timestamp);
 
 		IF real_start_timestamp = '-infinity' OR real_end_timestamp = 'infinity' THEN
