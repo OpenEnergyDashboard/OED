@@ -5,7 +5,7 @@
 
 /**
 	This function sums the readings over some short duration for some set of readings. This is then repeated until the
-	short time intervals cover the total time that is to be shown.
+	short time intervals cover the total time interval that is to be shown.
  */
 CREATE OR REPLACE FUNCTION barchart_readings(
 		-- Declaring parameters for the function.
@@ -18,11 +18,12 @@ CREATE OR REPLACE FUNCTION barchart_readings(
 	-- Return a table containing the id, sum of readings, and interval as columns.
 	RETURNS TABLE(meter_ID INTEGER, reading_sum INTEGER, start_timestamp TIMESTAMP, end_timestamp TIMESTAMP) AS $$
 
-	--Declare is creating some variables being that will later be used related to the created table above.
+	-- Create some variables to hold the actual time range and duration.
 	DECLARE
 		real_start_timestamp TIMESTAMP;
 		real_end_timestamp TIMESTAMP;
 		real_duration INTERVAL;
+
 	BEGIN
 		-- Select the time of the earliest reading in the readings table and the latest and put them into the real_timestamps.
 		-- TODO: Should this be changed into finding the earliest and latest for just the meters that are being looked at?
