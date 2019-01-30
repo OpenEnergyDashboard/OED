@@ -26,7 +26,6 @@ CREATE OR REPLACE FUNCTION barchart_readings(
 
 	BEGIN
 		-- Select the time of the earliest reading in the readings table and the latest and put them into the real_timestamps.
-		-- TODO: Should this be changed into finding the earliest and latest for just the meters that are being looked at?
 		SELECT
 			greatest(MIN(readings.start_timestamp), from_timestamp), least(MAX(readings.end_timestamp), to_timestamp)
 		INTO real_start_timestamp, real_end_timestamp
