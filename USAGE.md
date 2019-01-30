@@ -17,7 +17,7 @@ you are setting up OED in order to gather data from power meters and display it,
 This guide requires that you enter some commands into an operating system shell, or
 terminal.
 
-- On Windows, this is the "Command Line" (`cmd.exe`).
+- On Windows, this is the "Command Line" (`cmd.exe`).  
 - On MacOS, you can use Terminal.app (the default), iTerm2, or any other terminal program.
 - On Linux, your distribution will provide a terminal; it can generally be opened with
 Ctrl+Shift+T or by searching for "Terminal" in your application menu.
@@ -30,7 +30,8 @@ FreeBSD, OpenBSD, and Plan9.
 Docker is not supported on Windows. Windows is incapable of supporting LXE containers,
 the technology on which Docker is based, and Microsoft
 [artifically limits](https://docs.microsoft.com/en-us/virtualization/hyper-v-on-windows/about/)
-the use of Docker for Windows, a virtualized technology.
+the use of Docker for Windows, a virtualized technology.  Make sure to use "Linux containers" 
+and linux line endings.
 
 Docker is supported on MacOS via the [Docker for Mac](https://docs.docker.com/docker-for-mac/)
 software, a virtualized technology. You may experience issues with the `devstart` script
