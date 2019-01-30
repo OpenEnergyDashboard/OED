@@ -18,6 +18,7 @@ CREATE OR REPLACE FUNCTION barchart_readings(
 	-- Return a table containing the id, sum of readings, and interval as columns.
 	RETURNS TABLE(meter_ID INTEGER, reading_sum INTEGER, start_timestamp TIMESTAMP, end_timestamp TIMESTAMP) AS $$
 
+	--Declare is creating some variables being that will later be used related to the created table above.
 	DECLARE
 		real_start_timestamp TIMESTAMP;
 		real_end_timestamp TIMESTAMP;
