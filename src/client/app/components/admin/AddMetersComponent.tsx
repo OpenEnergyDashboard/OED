@@ -21,7 +21,11 @@ class AddMetersComponent extends React.Component<AddMetersPropsWithIntl, {}> {
 		super(props);
 		this.handleMeterToImport = this.handleMeterToImport.bind(this);
 	}
-
+	
+	/*
+	 * Takes an array of type "File" as "files" and does something to handle it.
+	 * TODO: What are these files used for in relation to meter components?
+	*/
 	public handleMeterToImport(files: File[]) {
 		const file = files[0];
 		const reader = new FileReader();
@@ -61,7 +65,11 @@ class AddMetersComponent extends React.Component<AddMetersPropsWithIntl, {}> {
 		reader.onerror = () => showErrorNotification(translate('failed.to.read.file'));
 		reader.readAsBinaryString(file);
 	}
-
+	
+	/*
+	 * @returns HTML code to render components for the meters.
+	 * TODO: confirm this.
+	*/
 	public render() {
 		const titleStyle: React.CSSProperties = {
 			fontWeight: 'bold',
@@ -71,7 +79,8 @@ class AddMetersComponent extends React.Component<AddMetersPropsWithIntl, {}> {
 		};
 		const messages = defineMessages({ tipFormat: { id: 'tip.meters.csv.format' }});
 		const { formatMessage } = this.props.intl;
-
+		
+		// HTML code to render visuals:
 		return (
 			<div>
 				<p style={titleStyle}>
