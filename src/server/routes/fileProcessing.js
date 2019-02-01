@@ -48,7 +48,7 @@ router.post('/readings/:meter_id', upload.single('csvFile'), async (req, res) =>
 					const endTimestamp = moment(row[1], 'MM/DD/YYYY HH:mm');
 					const startTimestamp = moment(row[1], 'MM/DD/YYYY HH:mm').subtract(60, 'minutes');
 					return new Reading(id, readRate, startTimestamp, endTimestamp);
-				}, (readings, tx) => Reading.insertOrUpdateAll(readings, tx));
+				}, (readings, tx) => Reading.insertOrIgnoreAll(readings, tx));
 				res.status(200).json({ success: true });
 			} catch (e) {
 				res.status(403).json({ success: false });

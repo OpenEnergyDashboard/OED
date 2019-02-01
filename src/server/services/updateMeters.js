@@ -34,7 +34,7 @@ async function updateAllMeters(dataReader, metersToUpdate) {
 
 		// Flatten the batches (an array of arrays) into a single array.
 		const allReadingsToInsert = [].concat(...readingInsertBatches);
-		await Reading.insertOrUpdateAll(allReadingsToInsert);
+		await Reading.insertOrIgnoreAll(allReadingsToInsert);
 		log.info('Update finished');
 	} catch (err) {
 		log.error(`Error updating all meters: ${err}`, err);
