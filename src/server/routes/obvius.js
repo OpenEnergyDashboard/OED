@@ -25,19 +25,10 @@ const listConfigfiles = require('../services/obvius/listConfigfiles');
 const streamBuffers = require('stream-buffers');
 const loadLogfileToReadings = require('../services/obvius/loadLogfileToReadings');
 const middleware = require('../middleware');
+const obvius = require('../util').obvius;
 
 const upload = multer({ storage: multer.memoryStorage() });
 const router = express.Router();
-
-const MODE_STATUS = 'STATUS';
-const MODE_LOGFILE_UPLOAD = 'LOGFILEUPLOAD';
-const MODE_CONFIG_MANIFEST = 'CONFIGFILEMANIFEST';
-const MODE_CONFIG_UPLOAD = 'CONFIGFILEUPLOAD';
-const MODE_CONFIG_DOWNLOAD = 'CONFIGFILEDOWNLOAD';
-const MODE_TEST = 'MODE_TEST';
-
-const LOGFILE_FILENAME = 'LOGFILE';
-const CONFIG_FILENAME = 'CONFIGFILE';
 
 // Here, the use of upload.array() allows the lowercaseParams middleware to
 // integrate form/multipart data into the generic parameter pipeline along with
@@ -126,12 +117,12 @@ router.all('/', async (req, res) => {
 		return;
 	}
 
-	if (mode === MODE_STATUS) {
+	if (mode === obvius.mode.status) {
 		handleStatus(req, res);
 		return;
 	}
 
-	if (mode === MODE_LOGFILE_UPLOAD) {
+	if (mode === obvius.mode.logfile_upload) {
 		if (!req.param('serialnumber', false)) {
 			failure(req, res, 'Logfile Upload Requires Serial Number');
 			return;
@@ -154,17 +145,17 @@ router.all('/', async (req, res) => {
 		return;
 	}
 
-	if (mode === MODE_CONFIG_DOWNLOAD) {
+	if (mode === obvius.mode.config_file_download) {
 		failure(req, res, 'Config Download Not Implemented');
 		return;
 	}
 
-	if (mode === MODE_CONFIG_MANIFEST) {
+	if (mode === obvius.mode.config_file.manifest) {
 		success(req, res, await listConfigfiles());
 		return;
 	}
 
-	if (mode === MODE_CONFIG_UPLOAD) {
+	if (mode === obvius.mode.config_file_upload) {
 		// Check required parameters
 		if (!req.param('serialnumber', false)) {
 			failure(req, res, 'Config Upload Requires Serial Number');
@@ -191,7 +182,7 @@ router.all('/', async (req, res) => {
 		return;
 	}
 
-	if (mode === MODE_TEST) {
+	if (mode === obvius.mode.test) {
 		failure(req, res, 'Test Not Implemented');
 		return;
 	}
