@@ -34,7 +34,7 @@ const router = express.Router();
 // integrate form/multipart data into the generic parameter pipeline along with
 // POST and GET params.
 router.use(upload.any(), middleware.lowercaseAllParamNames);
-router.use(middleware.paramsLookupMixin)
+router.use(middleware.paramsLookupMixin);
 
 /**
  * Inform the client of a failure (406 Not Acceptable), and log it.
@@ -136,9 +136,9 @@ router.all('/', async (req, res) => {
 			} catch (err) {
 				log.error(err);
 				failure(req, res, `Unable to gunzip incoming buffer: ${err}`);
-				return
+				return;
 			}
-				loadLogfileToReadings(req.param('serialnumber'), ip, data);
+			loadLogfileToReadings(req.param('serialnumber'), ip, data);
 		}
 
 		success(req, res, 'Logfile Upload IS PROVISIONAL');

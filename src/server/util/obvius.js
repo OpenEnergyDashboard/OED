@@ -11,15 +11,15 @@ const mode = {
 	config_file_upload: 'CONFIGFILEUPLOAD',
 	config_file_download: 'CONFIGFILEDOWNLOAD',
 	test: 'MODE_TEST'
-}
+};
 
 const filename = {
 	logfile: 'LOGFILE',
 	configfile: 'CONFIGFILE'
-}
+};
 
 module.exports = {
 	mode,
 	filename
-}
+};
 

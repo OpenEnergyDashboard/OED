@@ -13,5 +13,5 @@ const { lowercaseAllParamNames, paramsLookupMixin } = require('./paramsProcessin
 module.exports = {
 	lowercaseAllParamNames,
 	paramsLookupMixin
-}
+};
 

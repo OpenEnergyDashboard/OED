@@ -12,10 +12,10 @@ const _ = require('lodash');
  * elements
  * @return {Object} An object with key-value pairs item, valueMapper(item) for each item
  * in the array
-*/
+ */
 function mapToObject(array, valueMapper) {
 	return _.zipObject(array, array.map(valueMapper));
 }
 
-module.exports = { mapToObject }
+module.exports = { mapToObject };
 

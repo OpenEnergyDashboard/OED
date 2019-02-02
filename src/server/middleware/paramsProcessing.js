@@ -57,5 +57,5 @@ function paramsLookupMixin(req, res, next) {
 module.exports = {
 	lowercaseAllParamNames,
 	paramsLookupMixin
-}
+};
 
