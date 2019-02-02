@@ -33,7 +33,7 @@ async function loadLogfileToReadings(serialNumber, ipAddress, logfile) {
 			endTimestamp.add(moment.duration(1, 'hours'));
 			const reading = new Reading(meter.id, rawReading[1], startTimestamp, endTimestamp);
 			try {
-				await reading.insert();
+				await reading.insertOrIgnore();
 			} catch (err) {
 				log.error("Could not insert readings from Obvius logfile.", err);
 			}
