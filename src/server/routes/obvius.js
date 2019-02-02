@@ -3,8 +3,9 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
 
 /*
- * This file implements the /api/obvius route. This route accepts data from Obvius meters, handling parameters
- * passed in form/multipart, GET parameters, or POST body parameters.
+ * This file implements the /api/obvius route. This route accepts data from
+ * Obvius meters, handling parameters passed in form/multipart, GET parameters,
+ * or POST body parameters.
  *
  * STATUS mode requests are logged.
  *
@@ -23,6 +24,7 @@ const Configfile = require('../models/obvius/Configfile');
 const listConfigfiles = require('../services/obvius/listConfigfiles');
 const streamBuffers = require('stream-buffers');
 const loadLogfileToReadings = require('../services/obvius/loadLogfileToReadings');
+const middleware = require('../middleware');
 
 const upload = multer({ storage: multer.memoryStorage() });
 const router = express.Router();
@@ -36,6 +38,12 @@ const MODE_TEST = 'MODE_TEST';
 
 const LOGFILE_FILENAME = 'LOGFILE';
 const CONFIG_FILENAME = 'CONFIGFILE';
+
+// Here, the use of upload.array() allows the lowercaseParams middleware to
+// integrate form/multipart data into the generic parameter pipeline along with
+// POST and GET params.
+router.use(upload.any(), middleware.lowercaseAllParamNames);
+router.use(middleware.paramsLookupMixin)
 
 /**
  * Inform the client of a failure (406 Not Acceptable), and log it.
@@ -65,6 +73,7 @@ function success(req, res, comment = '') {
 	res.status(200) // 200 OK
 		.send(`<pre>\nSUCCESS\n${comment}</pre>\n`);
 }
+
 /**
  * Logs a STATUS request for later examination.
  * @param {express.Request} req the request to process (must have the req.param mixin)
@@ -92,55 +101,6 @@ function handleStatus(req, res) {
 
 	success(req, res);
 }
-
-/**
- * A middleware to lowercase all params, including those passed by form/multipart
- */
-function lowercaseParams(req, res, next) {
-	for (const key of Object.entries(req.query)) {
-		req.query[key[0].toLowerCase()] = key[1];
-	}
-	for (const key of Object.entries(req.params)) {
-		req.params[key[0].toLowerCase()] = key[1];
-	}
-	if (req.body) {
-		for (const key of Object.entries(req.body)) {
-			req.body[key[0].toLowerCase()] = key[1];
-		}
-	}
-	next();
-}
-// Here, the use of upload.array() allows the lowercaseParams middleware to integrate form/multipart data
-// into the generic parameter pipeline along with POST and GET params.
-router.use(upload.any(), lowercaseParams);
-
-/**
- * A middleware to add our params mixin.
- * This mixin adds a function, req.param, which when combined with the above code allows
- * all types of parameters (GET query parameters)
- */
-router.use((req, res, next) => {
-	// Mixin for getting parameters from any possible method.
-	req.param = (param, defaultValue) => {
-		param = param.toLowerCase();
-		// If the param exists as a route param, use it.
-		if (typeof req.params[param] !== 'undefined') {
-			return req.params[param];
-		}
-		// If the param exists as a body param, use it.
-		if (req.body && typeof req.body[param] !== 'undefined') {
-			return req.body[param];
-		}
-		// Return the query param, if it exists.
-		if (typeof req.query[param] !== 'undefined') {
-			return req.query[param];
-		}
-		// Return the default value if all else fails.
-		return defaultValue;
-	};
-
-	next();
-});
 
 /**
  * Handle an Obvius upload request.
@@ -222,7 +182,7 @@ router.all('/', async (req, res) => {
 				data = zlib.gunzipSync(fx.buffer).toString('utf-8');
 			} catch (error) {
 				data = fx.buffer.toString('utf-8');
-			} 
+			}
 
 			const cf = new Configfile(undefined, req.param('serialnumber'), req.param('modbusdevice'), moment(), md5(data), data, true);
 			await cf.insert();
