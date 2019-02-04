@@ -2,7 +2,7 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
 
-const db = require('../models/database').db;
+const getDB = require('../models/database').getDB;
 const Migration = require('../models/Migration');
 const { compareSemanticVersion } = require('../util');
 const { log } = require('../log');
@@ -147,24 +147,22 @@ function getRequiredFilesToMigrate(curr, to, path) {
  */
 async function migrateDatabaseTransaction(neededFiles, allMigrationFiles) {
 	try {
-		await db.tx(async t => {
+		await getDB().tx(async t => {
 			for (const neededFile of neededFiles) {
 				for (const migrationFile of allMigrationFiles) {
 					if (neededFile.fromVersion === migrationFile.fromVersion && neededFile.toVersion === migrationFile.toVersion) {
-						try {
-							await migrationFile.up(t);
-							const migration = new Migration(undefined, migrationFile.fromVersion, migrationFile.toVersion);
-							await migration.insert(t);
-						} catch (err) {
-							throw new Error('Migration Transaction Failed');
-						}
+						await migrationFile.up(t);
+						const migration = new Migration(undefined, migrationFile.fromVersion, migrationFile.toVersion);
+						await migration.insert(() => t);
 					}
 				}
 			}
 		});
 	} catch (err) {
 		log.error('Error while migrating database', err);
+		return undefined;
 	}
+	return true;
 }
 
 /**
@@ -177,7 +175,7 @@ async function migrateAll(toVersion, migrationItems) {
 	const list = createMigrationList(migrationItems);
 	const path = findPathToMigrate(currentVersion, toVersion, list);
 	const requiredFile = getRequiredFilesToMigrate(currentVersion, toVersion, path);
-	await migrateDatabaseTransaction(requiredFile, migrationItems);
+	return await migrateDatabaseTransaction(requiredFile, migrationItems);
 }
 
 module.exports = {

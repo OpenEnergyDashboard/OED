@@ -4,7 +4,7 @@
 
 const database = require('./database');
 
-const db = database.db;
+const getDB = database.getDB;
 const sqlFile = database.sqlFile;
 
 class User {
@@ -24,7 +24,7 @@ class User {
 	 * @returns {Promise.<>}
 	 */
 	static createTable() {
-		return db.none(sqlFile('user/create_users_table.sql'));
+		return getDB().none(sqlFile('user/create_users_table.sql'));
 	}
 
 	/**
@@ -33,7 +33,7 @@ class User {
 	 * @returns {Promise.<User>}
 	 */
 	static async getByID(id) {
-		const row = await db.one(sqlFile('user/get_user_by_id.sql'), { id: id });
+		const row = await getDB().one(sqlFile('user/get_user_by_id.sql'), { id: id });
 		return new User(row.id, row.email);
 	}
 
@@ -44,7 +44,7 @@ class User {
 	 * @returns {Promise.<User>}
 	 */
 	static async getByEmail(email) {
-		const row = await db.one(sqlFile('user/get_user_by_email.sql'), { email: email });
+		const row = await getDB().one(sqlFile('user/get_user_by_email.sql'), { email: email });
 		return new User(row.id, row.email, row.password_hash);
 	}
 
@@ -53,7 +53,7 @@ class User {
 	 * @returns {Promise.<array.<User>>}
 	 */
 	static async getAll() {
-		const rows = await db.any(sqlFile('user/get_all_users.sql'));
+		const rows = await getDB().any(sqlFile('user/get_all_users.sql'));
 		return rows.map(row => new User(row.id, row.email));
 	}
 
@@ -62,7 +62,7 @@ class User {
 	 * @returns {Promise.<array.<User>>}
 	 */
 	static async updateUserPassword(email, passwordHash) {
-		return db.none(sqlFile('user/update_user_password.sql'), { email: email, password_hash: passwordHash });
+		return getDB().none(sqlFile('user/update_user_password.sql'), { email: email, password_hash: passwordHash });
 	}
 
 	/**
@@ -74,7 +74,7 @@ class User {
 		if (user.id !== undefined) {
 			throw new Error('Attempted to insert a user that already has an ID');
 		}
-		return await db.none(sqlFile('user/insert_new_user.sql'), user);
+		return await getDB().none(sqlFile('user/insert_new_user.sql'), user);
 	}
 }
 
