@@ -35,6 +35,18 @@ mocha.describe('Readings', () => {
 		expect(readingPostInsert.endTimestamp.isSame(endTimestamp)).to.equal(true);
 		expect(readingPostInsert).to.have.property('reading', readingPreInsert.reading);
 	});
+	mocha.it('can be saved and retrieved with floating point values', async () => {
+		const startTimestamp = moment('2017-01-01');
+		const endTimestamp = moment('2017-01-01').add(1, 'hour');
+		const readingPreInsert = new Reading(meter.id, 3.5, startTimestamp, endTimestamp);
+		await readingPreInsert.insert();
+		const retrievedReadings = await Reading.getAllByMeterID(meter.id);
+		expect(retrievedReadings).to.have.lengthOf(1);
+		const readingPostInsert = retrievedReadings[0];
+		expect(readingPostInsert.startTimestamp.isSame(startTimestamp)).to.equal(true);
+		expect(readingPostInsert.endTimestamp.isSame(endTimestamp)).to.equal(true);
+		expect(readingPostInsert).to.have.property('reading', readingPreInsert.reading);
+	});
 	mocha.it('can be saved in bulk', async () => {
 		const startTimestamp1 = moment('2017-01-01');
 		const endTimestamp1 = moment(startTimestamp1).add(1, 'hour');
@@ -59,5 +71,19 @@ mocha.describe('Readings', () => {
 		await Reading.insertOrUpdateAll([reading1Updated, reading2]);
 		const retrievedReadings = await Reading.getAllByMeterID(meter.id);
 		expect(retrievedReadings).to.have.length(2);
+	});
+	mocha.it('can keep any data already in the DB', async () => {
+		const startTimestamp = moment('2018-01-01');
+		const endTimestamp = moment(startTimestamp).add(1, 'hour');
+		const reading = new Reading(meter.id, 1, startTimestamp, endTimestamp);
+		await reading.insert();
+		const newReading = new Reading(meter.id, 2, startTimestamp, endTimestamp);
+		await Reading.insertOrIgnoreAll([newReading]);
+		const retrievedReadings = await Reading.getAllByMeterID(meter.id);
+		expect(retrievedReadings).to.have.length(1);
+		const retrievedReading = retrievedReadings[0];
+		expect(retrievedReading.startTimestamp.isSame(startTimestamp)).to.equal(true);
+		expect(retrievedReading.endTimestamp.isSame(endTimestamp)).to.equal(true);
+		expect(retrievedReading.reading).to.equal(1);
 	});
 });

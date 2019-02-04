@@ -3,4 +3,4 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
 
 ALTER TABLE preferences
-	ADD COLUMN default_language language_type NOT NULL DEFAULT 'en';
+	ADD COLUMN IF NOT EXISTS default_language language_type NOT NULL DEFAULT 'en';
