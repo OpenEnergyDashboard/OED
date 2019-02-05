@@ -4,7 +4,6 @@
  */
 const database = require('./database');
 const { TimeInterval } = require('../../common/TimeInterval');
-const getDB = database.getDB;
 const sqlFile = database.sqlFile;
 class Baseline {
 	constructor(meterID, applyStart, applyEnd, calcStart, calcEnd, note = null, baselineValue = null) {
@@ -14,14 +13,14 @@ class Baseline {
 		this.baselineValue = baselineValue;
 		this.note = note;
 	}
-	static createTable() {
-		return getDB().none(sqlFile('baseline/create_baseline_table.sql'));
+	static createTable(conn) {
+		return conn.none(sqlFile('baseline/create_baseline_table.sql'));
 	}
 	static mapRow(row) {
 		return new Baseline(row.meter_id, row.apply_start, row.apply_end, row.calc_start, row.calc_end,
 			row.note, row.baseline_value);
 	}
-	async insert(conn = getDB) {
+	async insert(conn) {
 		const resp = await conn().one(sqlFile('baseline/new_baseline.sql'), {
 			meter_id: this.meterID,
 			apply_start: this.applyRange.startTimestamp,
@@ -32,12 +31,12 @@ class Baseline {
 		});
 		this.baselineValue = resp.baseline_value;
 	}
-	static async getAllForMeterID(meterID, conn = getDB) {
-		const rows = await conn().any(sqlFile('baseline/get_baselines_by_meter_id.sql'), { meter_id: meterID });
+	static async getAllForMeterID(meterID, conn) {
+		const rows = await conn.any(sqlFile('baseline/get_baselines_by_meter_id.sql'), { meter_id: meterID });
 		return rows.map(row => Baseline.mapRow(row));
 	}
-	static async getAllBaselines(conn = getDB) {
-		const rows = await conn().any(sqlFile('baseline/get_all_baselines.sql'));
+	static async getAllBaselines(conn) {
+		const rows = await conn.any(sqlFile('baseline/get_all_baselines.sql'));
 		return rows.map(row => Baseline.mapRow(row));
 	}
 }

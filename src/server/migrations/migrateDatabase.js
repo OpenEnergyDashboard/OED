@@ -153,7 +153,7 @@ async function migrateDatabaseTransaction(neededFiles, allMigrationFiles) {
 					if (neededFile.fromVersion === migrationFile.fromVersion && neededFile.toVersion === migrationFile.toVersion) {
 						await migrationFile.up(t);
 						const migration = new Migration(undefined, migrationFile.fromVersion, migrationFile.toVersion);
-						await migration.insert(() => t);
+						await migration.insert(t);
 					}
 				}
 			}
@@ -167,11 +167,12 @@ async function migrateDatabaseTransaction(neededFiles, allMigrationFiles) {
 
 /**
  * Migrate the database from current version to next version
+ * @param conn is the connection to use.
  * @param toVersion is the version wanting to migrate to
  * @param migrationItems is the list of migration that users register
  */
-async function migrateAll(toVersion, migrationItems) {
-	const currentVersion = await Migration.getCurrentVersion();
+async function migrateAll(conn, toVersion, migrationItems) {
+	const currentVersion = await Migration.getCurrentVersion(conn);
 	const list = createMigrationList(migrationItems);
 	const path = findPathToMigrate(currentVersion, toVersion, list);
 	const requiredFile = getRequiredFilesToMigrate(currentVersion, toVersion, path);

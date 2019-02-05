@@ -9,12 +9,12 @@ chai.use(chaiAsPromised);
 const expect = chai.expect;
 const mocha = require('mocha');
 
-const recreateDB = require('../db/common').recreateDB;
-const getDB = require('../../models/database').getDB;
+const testDB = require('../db/common').testDB;
 
 const Migration = require('../../models/Migration');
 const { migrateAll } = require('../../migrations/migrateDatabase');
 
+const config = require('../../config');
 
 const versionLists = ['0.100.0-0.200.0', '0.200.0-0.300.0', '0.300.0-0.400.0', '0.100.0-0.400.0', '0.200.0-0.500.0'];
 const migrationList = [];
@@ -37,27 +37,26 @@ for (let i = 0; i < versionLists.length; i++) {
 
 
 mocha.describe('Migration Valid', () => {
-	mocha.beforeEach(recreateDB);
 	mocha.beforeEach(async () => {
 		// Normally, recreateDB _does_ populate the migration table;
 		// that's the whole point. But, these tests require that the
 		// table is in a specific state, so I'll delete the records here.
-		getDB().none('TRUNCATE TABLE migrations');
-		await new Migration(undefined, '0.0.0', '0.100.0').insert();
+		testDB.none('TRUNCATE TABLE migrations');
+		await new Migration(undefined, '0.0.0', '0.100.0').insert(testDB);
 	});
 
 	mocha.it('should call correct up method for and insert new row into database', async () => {
-		await migrateAll('0.300.0', migrationList);
+		await migrateAll(testDB, '0.300.0', migrationList);
 		const afterCalled = [true, true, false, false, false];
 		expect(isCalled).to.deep.equal(afterCalled);
-		expect('0.300.0').to.equal(await Migration.getCurrentVersion());
+		expect('0.300.0').to.equal(await Migration.getCurrentVersion(testDB));
 	});
 
 	mocha.it('should find the shortest path to upgrade', async () => {
 		isCalled = [false, false, false, false, false];
-		await migrateAll('0.400.0', migrationList);
+		await migrateAll(testDB, '0.400.0', migrationList);
 		const afterCalled = [false, false, false, true, false];
 		expect(isCalled).to.deep.equal(afterCalled);
-		expect('0.400.0').to.equal(await Migration.getCurrentVersion());
+		expect('0.400.0').to.equal(await Migration.getCurrentVersion(testDB));
 	});
 });
