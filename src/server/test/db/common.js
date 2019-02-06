@@ -6,9 +6,19 @@ const mocha = require('mocha');
 const { log, LogLevel } = require('../../log');
 const { getDB, createSchema, stopDB } = require('../../models/database');
 
-let testDB;
+// Global database connection object, whose members are accessible to DB-touching tests.
+// For instance, call:
+// conn = testDB.getConnection();
+// doSomething(conn)
+let testDB = {
+	_connection: null,
+	config: null,
+	getConnection: function () {
+		return this._connection;
+	}
+};
 
-async function connectTestDB() {
+function connectTestDB() {
 	const testDBConfig = {
 		user: process.env.OED_DB_TEST_USER || process.env.OED_DB_USER,
 		database: process.env.OED_DB_TEST_DATABASE,
@@ -18,7 +28,8 @@ async function connectTestDB() {
 	};
 
 	stopDB();
-	testDB = getDB(testDBConfig);
+	testDB._connection = getDB(testDBConfig);
+	testDB.config = testDBConfig;
 }
 
 // Disable logging during tests.
@@ -26,10 +37,11 @@ async function connectTestDB() {
 log.level = LogLevel.SILENT;
 
 async function recreateDB() {
+	conn = testDB.getConnection();
 	// This should drop all database objects, as long as they were all created by the current database user
 	// They should be, since they were all created during a previous test.
-	await testDB.none('DROP OWNED BY current_user;');
-	await createSchema(testDB);
+	await conn.none('DROP OWNED BY current_user;');
+	await createSchema(conn);
 }
 
 mocha.before(() => {
@@ -44,5 +56,8 @@ mocha.after(() => {
 	stopDB();
 });
 
-module.exports.recreateDB = recreateDB;
-module.exports.testDB = testDB;
+module.exports = {
+	recreateDB,
+	testDB
+};
+
