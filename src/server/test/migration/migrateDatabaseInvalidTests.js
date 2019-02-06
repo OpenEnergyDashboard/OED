@@ -9,8 +9,7 @@ chai.use(chaiAsPromised);
 const expect = chai.expect;
 const mocha = require('mocha');
 
-const recreateDB = require('../db/common').recreateDB;
-const getDB = require('../../models/database').getDB;
+const testDB = require('../db/common').testDB;
 
 const Migration = require('../../models/Migration');
 const { migrateAll } = require('../../migrations/migrateDatabase');
@@ -37,39 +36,30 @@ for (let i = 0; i < versionLists.length; i++) {
 
 
 mocha.describe('Migration Invalid', () => {
-	mocha.beforeEach(recreateDB);
 	mocha.beforeEach(async () => {
 		await new Migration(undefined, '0.0.0', '0.100.0');
 	});
 
 	mocha.it('should fail because of down migration', async () => {
-		expect(async () => {
-			await migrateAll('0.500.0', migrationList)
-				.to.throw(new Error('Should not downgrade, please check .js'));
-		});
+		await expect(migrateAll('0.500.0', migrationList))
+				.to.be.rejectedWith(new Error('Should not downgrade, please check .js'));
 	});
 
 	mocha.it('should fail because there is no path', async () => {
 		const list = migrationList.filter(e => e.fromVersion !== '0.3.0');
-		expect(async () => {
-			await migrateAll('0.500.0', list)
-				.to.throw(new Error('No path found'));
-		});
+		await expect(migrateAll('0.500.0', list))
+			.to.be.rejectedWith(new Error('No path found'));
 	});
 
 	mocha.it('should fail because there is no version in the list', async () => {
 		const list = migrationList.filter(e => e.fromVersion !== '0.300.0');
-		expect(async () => {
-			await migrateAll('0.600.0', list)
-				.to.throw(new Error('Did not find version in migration list'));
-		});
+		await expect(migrateAll('0.600.0', list))
+				.to.be.rejectedWith(new Error('Did not find version in migration list'));
 	});
 
 	mocha.it('should fail because the current version is the highest Version', async () => {
 		const list = migrationList.filter(e => e.fromVersion !== '0.300.0');
-		expect(async () => {
-			await migrateAll('0.100.0', list)
-				.to.throw(new Error('You have the highest version'));
-		});
+		await expect(migrateAll('0.100.0', list))
+				.to.be.rejectedWith(new Error('You have the highest version'));
 	});
 });
