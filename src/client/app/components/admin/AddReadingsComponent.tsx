@@ -46,8 +46,9 @@ class AddReadingComponent extends React.Component<AddReadingsPropsWithIntl, {}> 
 	}
 	
 	/*
-	 * Modifies CSS properties and returns HTML code for screen display.
-	 */
+	 * @returns HTML code to render components for the reading components.
+	 * TODO: confirm this.
+	*/
 	public render() {
 		const titleStyle: React.CSSProperties = {
 			fontWeight: 'bold',
