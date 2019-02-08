@@ -41,6 +41,7 @@ interface UIOptionsState {
 	compareSortingDropdownOpen: boolean;
 }
 
+/* TODO: Find what exactly use of UIOptionsComponent is and how it works */
 class UIOptionsComponent extends React.Component<UIOptionsPropsWithIntl, UIOptionsState> {
 	constructor(props: UIOptionsPropsWithIntl) {
 		super(props);
@@ -64,7 +65,10 @@ class UIOptionsComponent extends React.Component<UIOptionsPropsWithIntl, UIOptio
 	public componentWillReceiveProps(nextProps: UIOptionsProps) {
 		this.setState({barDurationDays: nextProps.barDuration.asDays()});
 	}
-
+	
+	/*
+	 * Updates the components on the page from this code and returns HTML for the page.
+	*/
 	public render() {
 		const labelStyle: React.CSSProperties = {
 			fontWeight: 'bold',
