@@ -38,7 +38,10 @@ class PreferencesComponent extends React.Component<PreferencesPropsWithIntl, {}>
 		this.handleDefaultLanguageChange = this.handleDefaultLanguageChange.bind(this);
 		this.handleSubmitPreferences = this.handleSubmitPreferences.bind(this);
 	}
-
+	
+	/*
+	 * Renders the page using previous components and returning HTML code with updated information.
+	*/
 	public render() {
 		const labelStyle: React.CSSProperties = {
 			fontWeight: 'bold',
@@ -161,11 +164,13 @@ class PreferencesComponent extends React.Component<PreferencesPropsWithIntl, {}>
 			</div>
 		);
 	}
-
+	
+	/* Updates title desplay */
 	private handleDisplayTitleChange(e: { target: HTMLInputElement; }) {
 		this.props.updateDisplayTitle(e.target.value);
 	}
-
+	
+	
 	private handleDefaultChartToRenderChange(e: React.FormEvent<HTMLInputElement>) {
 		this.props.updateDefaultChartType((e.target as HTMLInputElement).value as ChartTypes);
 	}
