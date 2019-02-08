@@ -40,7 +40,8 @@ class PreferencesComponent extends React.Component<PreferencesPropsWithIntl, {}>
 	}
 	
 	/*
-	 * Renders the page using previous components and returning HTML code with updated information.
+	 * @returns HTML code to render components for *things*.
+	 * TODO: confirm this. Also, figure out what exactly what this modifies.
 	*/
 	public render() {
 		const labelStyle: React.CSSProperties = {
