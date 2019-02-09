@@ -1,4 +1,4 @@
-[ ] barchartReadingsTests.js
+[x] barchartReadingsTests.js
 [ ] baselineTests.js
 [x] common.js
 [ ] compressedReadingsTests.js

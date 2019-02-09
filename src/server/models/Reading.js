@@ -66,7 +66,7 @@ class Reading {
 	static insertAll(readings, conn) {
 		return conn.tx(t => t.sequence(function seq(i) {
 			const seqT = this;
-			return readings[i] && readings[i].insert(conn = () => seqT);
+			return readings[i] && readings[i].insert(seqT);
 		}));
 	}
 
@@ -79,7 +79,7 @@ class Reading {
 	static insertOrUpdateAll(readings, conn) {
 		return conn.tx(t => t.sequence(function seq(i) {
 			const seqT = this;
-			return readings[i] && readings[i].insertOrUpdate(conn = () => seqT);
+			return readings[i] && readings[i].insertOrUpdate(seqT);
 		}));
 	}
 
@@ -92,7 +92,7 @@ class Reading {
 	static insertOrIgnoreAll(readings, conn) {
 		return conn.tx(t => t.sequence(function seq(i) {
 			const seqT = this;
-			return readings[i] && readings[i].insertOrIgnore(conn = () => seqT);
+			return readings[i] && readings[i].insertOrIgnore(seqT);
 		}));
 	}
 
