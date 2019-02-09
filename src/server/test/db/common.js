@@ -18,7 +18,7 @@ const { getDB, createSchema, stopDB } = require('../../models/database');
 let testDB = {
 	_connection: null,
 	config: null,
-	getConnection: function () {
+	getConnection: function() {
 		return this._connection;
 	}
 };
@@ -53,7 +53,7 @@ mocha.before(() => {
 	connectTestDB();
 });
 
-mocha.beforeEach(async () =>{
+mocha.beforeEach(async () => {
 	await recreateDB();
 });
 

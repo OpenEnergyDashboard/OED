@@ -38,7 +38,7 @@ class Preferences {
 	}
 
 	/**
-	 * 
+	 *
 	 * @param conn is the connection to use.
 	 */
 	static async get(conn) {
