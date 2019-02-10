@@ -1,5 +1,5 @@
 [x] barchartReadingsTests.js
-[ ] baselineTests.js
+[x] baselineTests.js
 [x] common.js
 [ ] compressedReadingsTests.js
 [ ] cyclicGroupTests.js

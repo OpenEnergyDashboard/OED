@@ -21,7 +21,7 @@ class Baseline {
 			row.note, row.baseline_value);
 	}
 	async insert(conn) {
-		const resp = await conn().one(sqlFile('baseline/new_baseline.sql'), {
+		const resp = await conn.one(sqlFile('baseline/new_baseline.sql'), {
 			meter_id: this.meterID,
 			apply_start: this.applyRange.startTimestamp,
 			apply_end: this.applyRange.endTimestamp,
