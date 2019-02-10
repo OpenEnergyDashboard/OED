@@ -15,7 +15,7 @@ mocha.describe('Baselines', () => {
 	mocha.beforeEach(recreateDB);
 	mocha.it('can be saved and retrieved', async () => {
 		// Need a meter in the database
-		const meter = new Meter(undefined, 'Larry', null, false, Meter.type.MAMAC);
+		const meter = new Meter(undefined, 'Larry', null, false, true, Meter.type.MAMAC);
 		await meter.insert();
 		const reading = new Reading(
 			meter.id,
