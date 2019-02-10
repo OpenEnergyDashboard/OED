@@ -69,7 +69,7 @@ export default function readings(state = defaultState, action: LineReadingsActio
 		}
 		case ActionType.ReceiveMeterLineReadings: {
 			const timeInterval = action.timeInterval.toString();
-			const newState = {
+			const newState: LineReadingsState = {
 				...state,
 				byMeterID: {
 					...state.byMeterID
@@ -89,7 +89,7 @@ export default function readings(state = defaultState, action: LineReadingsActio
 		}
 		case ActionType.ReceiveGroupLineReadings: {
 			const timeInterval = action.timeInterval.toString();
-			const newState = {
+			const newState: LineReadingsState = {
 				...state,
 				byGroupID: {
 					...state.byGroupID

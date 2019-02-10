@@ -16,13 +16,15 @@
     "check:types": "./node_modules/.bin/tsc -p . --noEmit",
     "check:lint": "./node_modules/.bin/tslint -c tslint.json src/{server,bin,scripts,common}/**/*.{ts,tsx,js,jsx} src/client/app/**/*.{ts,tsx,js,jsx}",
     "test": "./node_modules/.bin/mocha \"src/server/test/**/*.js\"",
+	"testPartial": "./node_modules/.bin/mocha",
     "createdb": "node ./src/server/services/createDB.js",
     "migratedb": "node ./src/server/services/migrateDB.js",
     "addMamacMeters": "node ./src/server/services/addMamacMeters.js",
     "updateMamacMeters": "node ./src/server/services/updateMamacMeters.js",
     "createUser": "node ./src/server/services/user/createUser.js",
     "editUser": "node ./src/server/services/user/editUser.js",
-    "sendLogEmail": "node ./src/server/services/sendLogEmail.js"
+    "sendLogEmail": "node ./src/server/services/sendLogEmail.js",
+    "refreshReadingViews": "node ./src/scripts/refreshReadingViews.js"
   },
   "nodemonConfig": {
     "watch": [
@@ -120,7 +122,7 @@
     "mock-require": "~2.0.2",
     "nodemon": "~1.18.7",
     "redux-devtools": "~3.4.0",
-    "sinon": "~4.0.2",
+    "sinon": "~4.4.6",
     "source-map-loader": "~0.2.3",
     "style-loader": "~0.19.0",
     "tslint": "~5.8.0",

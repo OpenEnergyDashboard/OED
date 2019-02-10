@@ -12,6 +12,7 @@ import { State } from '../types/redux/state';
 import { getComparePeriodLabels, getCompareChangeSummary } from '../utils/calculateCompare';
 import { CompareEntity } from './MultiCompareChartContainer';
 import translate from '../utils/translate';
+import {CompressedBarReading} from '../types/compressed-readings';
 
 if (datalabels === null || datalabels === undefined) {
 	throw new Error('Datalabels plugin was tree-shaken out.');

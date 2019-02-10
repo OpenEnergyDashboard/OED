@@ -17,7 +17,8 @@ const login = require('./routes/login');
 const verification = require('./routes/verification');
 const groups = require('./routes/groups');
 const version = require('./routes/version');
-const baseline = require('./routes/baseline');
+const createRouterForNewCompressedReadings = require('./routes/compressedReadings').createRouter;
+const createRouterForCompareReadings = require('./routes/compareReadings').createRouter;
 
 const app = express();
 
@@ -37,7 +38,8 @@ app.use('/api/groups', groups);
 app.use('/api/verification', verification);
 app.use('/api/fileProcessing', fileProcessing);
 app.use('/api/version', version);
-app.use('/api/baselines', baseline);
+app.use('/api/compressedReadings', createRouterForNewCompressedReadings());
+app.use('/api/compareReadings', createRouterForCompareReadings());
 
 app.get('\\/|login|admin|groups|createGroup|editGroup|graph', (req, res) => {
 	res.sendFile(path.resolve(__dirname, '..', 'client', 'index.html'));

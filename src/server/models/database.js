@@ -107,8 +107,8 @@ async function createSchema() {
 	await Migration.createTable();
 	await LogEmail.createTable();
 	await getDB().none(sqlFile('reading/create_function_get_compressed_readings.sql'));
-	await Baseline.createTable();
-	await getDB().none(sqlFile('baseline/create_function_get_average_reading.sql'));
+	await Reading.createCompressedReadingsMaterializedViews();
+	await Reading.createCompareFunction();
 }
 
 // Create a new database connection.

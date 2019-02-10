@@ -8,6 +8,7 @@ import { State } from '../types/redux/state';
 import {calculateCompareDuration, ComparePeriod, SortingOrder} from '../utils/calculateCompare';
 import { TimeInterval } from '../../../common/TimeInterval';
 import * as moment from 'moment';
+import {CompressedBarReading} from '../types/compressed-readings';
 
 export interface CompareEntity {
 	id: number;
@@ -25,6 +26,16 @@ interface ReadingsData {
 }
 
 let errorEntities: string[] = [];
+
+function mapCompressedReadingsToReadingsData(
+	compressed: { isFetching: boolean, readings?: CompressedBarReading[] | undefined }
+	): ReadingsData | undefined {
+	if (compressed.readings === undefined) {
+		return undefined;
+	}
+	const readings = compressed.readings.map(barReading => [barReading.startTimestamp, barReading.reading] as [number, number]);
+	return { isFetching: compressed.isFetching, readings };
+}
 
 function mapStateToProps(state: State) {
 	errorEntities = [];
@@ -90,7 +101,7 @@ function getGroupReadingsData(state: State, groupID: number, timeInterval: TimeI
 	if (readingsDataByID !== undefined) {
 		const readingsDataByTimeInterval = readingsDataByID[timeInterval.toString()];
 		if (readingsDataByTimeInterval !== undefined) {
-			readingsData = readingsDataByTimeInterval[barDuration.toISOString()];
+			readingsData = mapCompressedReadingsToReadingsData(readingsDataByTimeInterval[barDuration.toISOString()]);
 		}
 	}
 	return readingsData;
@@ -102,7 +113,7 @@ function getMeterReadingsData(state: State, meterID: number, timeInterval: TimeI
 	if (readingsDataByID !== undefined) {
 		const readingsDataByTimeInterval = readingsDataByID[timeInterval.toString()];
 		if (readingsDataByTimeInterval !== undefined) {
-			readingsData = readingsDataByTimeInterval[barDuration.toISOString()];
+			readingsData = mapCompressedReadingsToReadingsData(readingsDataByTimeInterval[barDuration.toISOString()]);
 		}
 	}
 	return readingsData;
