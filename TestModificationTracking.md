@@ -1,7 +1,7 @@
 [x] barchartReadingsTests.js
 [x] baselineTests.js
 [x] common.js
-[ ] compressedReadingsTests.js
+[x] compressedReadingsTests.js
 [ ] cyclicGroupTests.js
 [x] groupTests.js
 [ ] insertMamacReadingsFromCSVTests.js
