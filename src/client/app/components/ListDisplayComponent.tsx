@@ -9,6 +9,10 @@ interface ListDisplayProps {
 	items: any[];
 }
 
+/**
+* @returns HTML code to render components for List Display.
+* TODO: confirm this.
+*/
 export default function ListDisplayComponent(props: ListDisplayProps) {
 	const defaultHeightItems = 8;
 	const itemHeightPx = 18;
