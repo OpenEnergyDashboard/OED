@@ -12,47 +12,52 @@ const path = require('path');
 chai.use(chaiAsPromised);
 const expect = chai.expect;
 
-const recreateDB = require('./common').recreateDB;
-const getDB = require('../../models/database').getDB;
+const testDB = require('./common').testDB;
 const Meter = require('../../models/Meter');
 const loadMamacReadingsFromCsvFile = require('../../services/loadMamacReadingsFromCsvFile');
 
 const mocha = require('mocha');
 
 mocha.describe('Insert Mamac readings from a file', () => {
-	mocha.beforeEach(recreateDB);
 	let meter;
 	mocha.beforeEach(async () => {
-		await new Meter(undefined, 'Meter', null, false, Meter.type.MAMAC).insert();
-		meter = await Meter.getByName('Meter');
+		conn = testDB.getConnection();
+		await new Meter(undefined, 'Meter', null, false, Meter.type.MAMAC).insert(conn);
+		meter = await Meter.getByName('Meter', conn);
 	});
 
 	mocha.it('loads the correct number of rows from a file', async () => {
+		conn = testDB.getConnection();
 		const testFilePath = path.join(__dirname, 'data', 'test-readings.csv');
 		const readingDuration = moment.duration(1, 'hours');
-		await loadMamacReadingsFromCsvFile(testFilePath, meter, readingDuration);
-		const { count } = await getDB().one('SELECT COUNT(*) as count FROM readings');
+		await loadMamacReadingsFromCsvFile(testFilePath, meter, readingDuration, conn);
+		// TODO: Should really have a method on the model to do this.
+		const { count } = await conn.one('SELECT COUNT(*) as count FROM readings');
 		expect(parseInt(count)).to.equal(20);
 	});
 
 	mocha.it('errors correctly on an invalid file', async () => {
+		conn = testDB.getConnection();
 		const testFilePath = path.join(__dirname, 'data', 'test-readings-invalid.csv');
 		const readingDuration = moment.duration(1, 'hours');
 
 		try {
-			await loadMamacReadingsFromCsvFile(testFilePath, meter, readingDuration);
+			await loadMamacReadingsFromCsvFile(testFilePath, meter, readingDuration, conn);
 			expect.fail('should have thrown an exception');
 		} catch (e) {
 			// We want this to error
+			// TODO: I think Mocha actually has a way to do this with expect()
 		}
 	});
 	mocha.it('rolls back correctly when it rejects', async () => {
+		conn = testDB.getConnection();
 		const testFilePath = path.join(__dirname, 'data', 'test-readings-invalid.csv');
 		const readingDuration = moment.duration(1, 'hours');
 		try {
-			await loadMamacReadingsFromCsvFile(testFilePath, meter, readingDuration);
+			await loadMamacReadingsFromCsvFile(testFilePath, meter, readingDuration, conn);
 		} catch (e) {
-			const { count } = await getDB().one('SELECT COUNT(*) as count FROM readings');
+			// TODO: Should really have a method on the model to do this.
+			const { count } = await conn.one('SELECT COUNT(*) as count FROM readings');
 			expect(parseInt(count)).to.equal(0);
 		}
 	});

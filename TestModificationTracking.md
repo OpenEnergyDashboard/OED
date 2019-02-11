@@ -4,7 +4,7 @@
 [x] compressedReadingsTests.js
 [x] cyclicGroupTests.js
 [x] groupTests.js
-[ ] insertMamacReadingsFromCSVTests.js
+[x] insertMamacReadingsFromCSVTests.js
 [ ] loadFromCsvStreamTests.js
 [ ] logEmailTest.js
 [ ] metasysDuplicateandCumulativeTests.js
