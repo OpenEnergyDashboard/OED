@@ -8,29 +8,31 @@ const chai = require('chai');
 const chaiAsPromised = require('chai-as-promised');
 const moment = require('moment');
 const path = require('path');
-const Reading = require('../../models/Reading');
 const streamBuffers = require('stream-buffers');
 const fs = require('fs');
 const promisify = require('es6-promisify');
 
 chai.use(chaiAsPromised);
 const expect = chai.expect;
-const recreateDB = require('./common').recreateDB;
-const getDB = require('../../models/database').getDB;
+const testDB = require('./common').testDB;
+const Reading = require('../../models/Reading');
 const Meter = require('../../models/Meter');
 const loadFromCsvStream = require('../../services/loadFromCsvStream');
 
 const mocha = require('mocha');
 
-mocha.describe('Read mamc log from a file: ', () => {
-	mocha.beforeEach(recreateDB);
+mocha.describe('Read Mamac log from a file: ', () => {
 	let meter;
 	mocha.beforeEach(async () => {
-		await new Meter(undefined, 'Meter', null, false, Meter.type.MAMAC).insert();
-		meter = await Meter.getByName('Meter');
+		// TODO: This should be refactored into a method as it appears in at least
+		// four test suites verbiatim
+		const conn = testDB.getConnection();
+		await new Meter(undefined, 'Meter', null, false, Meter.type.MAMAC).insert(conn);
+		meter = await Meter.getByName('Meter', conn);
 	});
 
 	mocha.it('loads the correct number of rows from a file', async () => {
+		const conn = testDB.getConnection();
 		const testFilePath = path.join(__dirname, 'data', 'mamac-log.csv');
 		const readFile = promisify(fs.readFile);
 		const buffer = await readFile(testFilePath);
@@ -49,12 +51,15 @@ mocha.describe('Read mamc log from a file: ', () => {
 				const startTimestamp = moment(row[1], 'MM/DD/YYYY HH:mm').subtract(60, 'minutes');
 				return new Reading(meter.id, readRate, startTimestamp, endTimestamp);
 			},
-			(readings, tx) => Reading.insertOrIgnoreAll(readings, tx));
-		const { count } = await getDB().one('SELECT COUNT(*) as count FROM readings');
+			(readings, tx) => Reading.insertOrIgnoreAll(readings, tx),
+			conn
+		);
+		const count = await Reading.count(conn);
 		expect(parseInt(count)).to.equal(20);
 	});
 
 	mocha.it('errors correctly on an invalid file', async () => {
+		const conn = testDB.getConnection();
 		const testFilePath = path.join(__dirname, 'data', 'mamac-invalid.csv');
 		const readFile = promisify(fs.readFile);
 		const buffer = await readFile(testFilePath);
@@ -70,8 +75,9 @@ mocha.describe('Read mamc log from a file: ', () => {
 				const endTimestamp = moment(row[1], 'MM/DD/YYYY HH:mm');
 				const startTimestamp = moment(row[1], 'MM/DD/YYYY HH:mm').subtract(60, 'minutes');
 				return new Reading(meter.id, readRate, startTimestamp, endTimestamp);
-			}, (readings, tx) => Reading.insertOrIgnoreAll(readings, tx))
-		).to.eventually.be.rejected;
+			}, (readings, tx) => Reading.insertOrIgnoreAll(readings, tx),
+			conn
+			)).to.eventually.be.rejected;
 	});
 
 	mocha.it('rolls back correctly when it rejects', async () => {
@@ -90,9 +96,11 @@ mocha.describe('Read mamc log from a file: ', () => {
 				const endTimestamp = moment(row[1], 'MM/DD/YYYY HH:mm');
 				const startTimestamp = moment(row[1], 'MM/DD/YYYY HH:mm').subtract(60, 'minutes');
 				return new Reading(meter.id, readRate, startTimestamp, endTimestamp);
-			}, (readings, tx) => Reading.insertOrIgnoreAll(readings, tx));
+			}, (readings, tx) => Reading.insertOrIgnoreAll(readings, tx),
+			conn
+			);
 		} catch (e) {
-			const { count } = await getDB().one('SELECT COUNT(*) as count FROM readings');
+			const count = await Reading.count(conn);
 			expect(parseInt(count)).to.equal(0);
 		}
 	});
