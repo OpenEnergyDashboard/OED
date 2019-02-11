@@ -24,7 +24,11 @@ export default class ChartSelectComponent extends React.Component<ChartSelectPro
 		super(props);
 		this.handleChangeChartType = this.handleChangeChartType.bind(this);
 	}
-
+	
+	/*
+	 * @returns HTML code to render components for ChartSelectComponents.
+	 * TODO: confirm this.
+	 */
 	public render() {
 		const divBottomPadding: React.CSSProperties = {
 			paddingBottom: '15px'
