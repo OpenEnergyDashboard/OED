@@ -7,6 +7,8 @@ import { FormattedMessage } from 'react-intl';
 
 /**
  * React component that controls the footer strip at the bottom of all pages
+ * @returns HTML code to render footer components.
+ * TODO: confirm this.
  */
 export default function FooterComponent() {
 	const footerStyle: React.CSSProperties = {
