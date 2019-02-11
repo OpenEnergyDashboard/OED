@@ -58,6 +58,15 @@ class Reading {
 	}
 
 	/**
+	 * Returns the number of readings which exist in the database, total.
+	 * @param conn the connection to use
+	 */
+	static async count(conn) {
+		const { count } = await conn.one('SELECT COUNT(*) as count FROM readings');
+		return count;
+	}
+
+	/**
 	 * Returns a promise to insert all of the given readings into the database (as a transaction)
 	 * @param {array<Reading>} readings the readings to insert
 	 * @param conn is the connection to use.

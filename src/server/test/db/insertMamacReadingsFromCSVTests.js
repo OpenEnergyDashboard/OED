@@ -13,6 +13,7 @@ chai.use(chaiAsPromised);
 const expect = chai.expect;
 
 const testDB = require('./common').testDB;
+const Reading = require('../../models/Reading');
 const Meter = require('../../models/Meter');
 const loadMamacReadingsFromCsvFile = require('../../services/loadMamacReadingsFromCsvFile');
 
@@ -31,8 +32,7 @@ mocha.describe('Insert Mamac readings from a file', () => {
 		const testFilePath = path.join(__dirname, 'data', 'test-readings.csv');
 		const readingDuration = moment.duration(1, 'hours');
 		await loadMamacReadingsFromCsvFile(testFilePath, meter, readingDuration, conn);
-		// TODO: Should really have a method on the model to do this.
-		const { count } = await conn.one('SELECT COUNT(*) as count FROM readings');
+		const count = await Reading.count(conn);
 		expect(parseInt(count)).to.equal(20);
 	});
 
@@ -56,8 +56,7 @@ mocha.describe('Insert Mamac readings from a file', () => {
 		try {
 			await loadMamacReadingsFromCsvFile(testFilePath, meter, readingDuration, conn);
 		} catch (e) {
-			// TODO: Should really have a method on the model to do this.
-			const { count } = await conn.one('SELECT COUNT(*) as count FROM readings');
+			const count = await Reading.count(conn);
 			expect(parseInt(count)).to.equal(0);
 		}
 	});
