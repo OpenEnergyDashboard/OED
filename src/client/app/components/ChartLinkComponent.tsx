@@ -22,7 +22,11 @@ export default class ChartLinkComponent extends React.Component<ChartLinkProps, 
 			showLink: false
 		};
 	}
-
+	
+	/*
+	 * @returns HTML code to render components for ChartLinkComponents.
+	 * TODO: confirm this.
+	 */
 	public render() {
 		const wellStyle: React.CSSProperties = {
 			wordWrap: 'break-word',
