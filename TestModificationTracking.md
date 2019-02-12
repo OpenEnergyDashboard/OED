@@ -7,9 +7,9 @@
 [x] insertMamacReadingsFromCSVTests.js
 [x] loadFromCsvStreamTests.js
 [x] logEmailTest.js
-[ ] metasysDuplicateandCumulativeTests.js
-[ ] metasysInvalidTests.js
-[ ] metasysValidTests.js
+[x] metasysDuplicateandCumulativeTests.js
+[x] metasysInvalidTests.js
+[x] metasysValidTests.js
 [ ] meterTests.js
 [ ] momentPatchTests.js
 [ ] readingTests.js
