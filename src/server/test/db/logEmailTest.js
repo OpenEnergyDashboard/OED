@@ -8,28 +8,29 @@ const chaiAsPromised = require('chai-as-promised');
 chai.use(chaiAsPromised);
 const expect = chai.expect;
 
-const recreateDB = require('./common').recreateDB;
+const testDB = require('./common').testDB;
 const LogEmail = require('../../models/LogEmail');
 
 const mocha = require('mocha');
 
 
 mocha.describe('Log Email', () => {
-	mocha.beforeEach(recreateDB);
 	mocha.beforeEach(async () => {
-		await new LogEmail(undefined, 'Test error message').insert();
+		await new LogEmail(undefined, 'Test error message').insert(conn);
 	});
 
 	mocha.it('Get error message from database', async () => {
-		let allEmails = await LogEmail.getAll();
+		conn = testDB.getConnection()
+		let allEmails = await LogEmail.getAll(conn);
 		allEmails = allEmails.map(e => e.errorMessage);
 		expect(allEmails[0]).to.equal('Test error message');
 	});
 
 	mocha.it('Delete all log email after sent, should fail because there are no items in table', async () => {
-		await LogEmail.delete();
+		conn = testDB.getConnection()
+		await LogEmail.delete(conn);
 		expect(async () => {
-			await LogEmail.getAll().to.throw(new Error('No path found'));
+			await LogEmail.getAll(conn).to.throw(new Error('No path found'));
 		});
 	});
 });

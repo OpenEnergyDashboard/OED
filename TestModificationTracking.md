@@ -6,7 +6,7 @@
 [x] groupTests.js
 [x] insertMamacReadingsFromCSVTests.js
 [x] loadFromCsvStreamTests.js
-[ ] logEmailTest.js
+[x] logEmailTest.js
 [ ] metasysDuplicateandCumulativeTests.js
 [ ] metasysInvalidTests.js
 [ ] metasysValidTests.js
