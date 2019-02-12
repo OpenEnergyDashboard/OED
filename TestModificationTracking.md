@@ -11,6 +11,6 @@
 [x] metasysInvalidTests.js
 [x] metasysValidTests.js
 [x] meterTests.js
-[ ] momentPatchTests.js
+[x] momentPatchTests.js
 [ ] readingTests.js
 [x] updateMetersTests.js
