@@ -40,6 +40,7 @@ function connectTestDB() {
 // Disable logging during tests.
 // TODO: Move logging disabling to a better place.
 log.level = LogLevel.SILENT;
+log.emailLevel = LogLevel.SILENT;
 
 async function recreateDB() {
 	conn = testDB.getConnection();
