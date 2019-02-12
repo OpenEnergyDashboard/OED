@@ -12,9 +12,10 @@ const { log } = require('../log');
  * and inserts any new readings into the database.
  * @param dataReader {function} A function to fetch readings from each meter
  * @param metersToUpdate [Meter] An array of meters to be updated
+ * @param conn the database connection to use
  * @return {Promise.<void>}
  */
-async function updateAllMeters(dataReader, metersToUpdate) {
+async function updateAllMeters(dataReader, metersToUpdate, conn) {
 	const time = new Date();
 	log.info(`Getting meter data ${time.toISOString()}`);
 	try {
@@ -34,7 +35,7 @@ async function updateAllMeters(dataReader, metersToUpdate) {
 
 		// Flatten the batches (an array of arrays) into a single array.
 		const allReadingsToInsert = [].concat(...readingInsertBatches);
-		await Reading.insertOrIgnoreAll(allReadingsToInsert);
+		await Reading.insertOrIgnoreAll(allReadingsToInsert, conn);
 		log.info('Update finished');
 	} catch (err) {
 		log.error(`Error updating all meters: ${err}`, err);

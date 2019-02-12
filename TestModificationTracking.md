@@ -10,7 +10,7 @@
 [x] metasysDuplicateandCumulativeTests.js
 [x] metasysInvalidTests.js
 [x] metasysValidTests.js
-[ ] meterTests.js
+[x] meterTests.js
 [ ] momentPatchTests.js
 [ ] readingTests.js
-[ ] updateMetersTests.js
+[x] updateMetersTests.js

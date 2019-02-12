@@ -9,7 +9,7 @@ const moment = require('moment');
 chai.use(chaiAsPromised);
 const expect = chai.expect;
 
-const recreateDB = require('./common').recreateDB;
+const testDB = require('./common').testDB;
 const Meter = require('../../models/Meter');
 const Reading = require('../../models/Reading');
 const updateAllMeters = require('../../services/updateMeters');
@@ -18,13 +18,13 @@ const sinon = require('sinon');
 
 
 mocha.describe('Meter Update', () => {
-	mocha.beforeEach(recreateDB);
 	mocha.it('can persist over a failed request', async () => {
+		const conn = testDB.getConnection();
 		const goodMeter = new Meter(undefined, 'GOOD', 1, true, Meter.type.MAMAC);
-		await goodMeter.insert();
+		await goodMeter.insert(conn);
 
 		const badMeter = new Meter(undefined, 'BAD', 2, true, Meter.type.MAMAC);
-		await badMeter.insert();
+		await badMeter.insert(conn);
 
 		const metersToUpdate = [goodMeter, badMeter];
 
@@ -38,9 +38,9 @@ mocha.describe('Meter Update', () => {
 		dataReader.withArgs(badMeter).rejects(new Error('Bland error message'));
 		dataReader.throws();
 
-		await updateAllMeters(dataReader, metersToUpdate);
-		const goodReadings = await Reading.getAllByMeterID(goodMeter.id);
-		const badReadings = await Reading.getAllByMeterID(badMeter.id);
+		await updateAllMeters(dataReader, metersToUpdate, conn);
+		const goodReadings = await Reading.getAllByMeterID(goodMeter.id, conn);
+		const badReadings = await Reading.getAllByMeterID(badMeter.id, conn);
 
 		expect(goodReadings.length).to.equal(1);
 		expect(badReadings.length).to.equal(0);

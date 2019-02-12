@@ -8,7 +8,7 @@ const chaiAsPromised = require('chai-as-promised');
 chai.use(chaiAsPromised);
 const expect = chai.expect;
 
-const recreateDB = require('./common').recreateDB;
+const testDB = require('./common').testDB;
 const Meter = require('../../models/Meter');
 
 const mocha = require('mocha');
@@ -21,16 +21,13 @@ function expectMetersToBeEquivalent(expected, actual) {
 }
 
 mocha.describe('Meters', () => {
-	mocha.beforeEach(recreateDB);
 	mocha.it('can be saved and retrieved', async () => {
+		const conn = testDB.getConnection();
 		const meterPreInsert = new Meter(undefined, 'Meter', null, false, Meter.type.MAMAC);
-		await meterPreInsert.insert();
-		const meterPostInsertByName = await Meter.getByName(meterPreInsert.name);
+		await meterPreInsert.insert(conn);
+		const meterPostInsertByName = await Meter.getByName(meterPreInsert.name, conn);
 		expectMetersToBeEquivalent(meterPreInsert, meterPostInsertByName);
-		const meterPostInsertByID = await Meter.getByID(meterPreInsert.id);
+		const meterPostInsertByID = await Meter.getByID(meterPreInsert.id, conn);
 		expectMetersToBeEquivalent(meterPreInsert, meterPostInsertByID);
 	});
-
-	mocha.it('can use the default connection in methods', () => new Meter(undefined, 'Meter', null, false, Meter.type.MAMAC).insert()
-		.catch(() => chai.fail()));
 });
