@@ -30,7 +30,7 @@ mocha.describe('Metasys readings', () => {
 			const testFilePath = path.join(__dirname, 'data', 'metasys-duplicate.csv');
 			await readMetasysData(testFilePath, 60, 2, false, conn);
 			const count = await Reading.count(conn);
-			expect(parseInt(count)).to.equal(37);
+			expect(count).to.equal(37);
 		});
 
 		mocha.it('handles cumulative readings', async () => {
@@ -60,7 +60,7 @@ mocha.describe('Metasys readings', () => {
 				await readMetasysData(testFilePath, 30, 1, false, conn);
 			} catch (e) {
 				const count = await Reading.count(conn);
-				expect(parseInt(count)).to.equal(0);
+				expect(count).to.equal(0);
 			}
 		});
 	});
@@ -76,7 +76,7 @@ mocha.describe('Metasys readings', () => {
 			const testFilePath = path.join(__dirname, 'data', 'metasys-valid.csv');
 			await readMetasysData(testFilePath, 30, 1, true, conn);
 			const count = await Reading.count(conn);
-			expect(parseInt(count)).to.equal(125);
+			expect(count).to.equal(125);
 		});
 	});
 });

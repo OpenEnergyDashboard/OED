@@ -60,10 +60,11 @@ class Reading {
 	/**
 	 * Returns the number of readings which exist in the database, total.
 	 * @param conn the connection to use
+	 * @returns {number} the number of readings in the entire readings table
 	 */
 	static async count(conn) {
 		const { count } = await conn.one('SELECT COUNT(*) as count FROM readings');
-		return count;
+		return parseInt(count);
 	}
 
 	/**

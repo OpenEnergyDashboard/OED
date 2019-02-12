@@ -55,7 +55,7 @@ mocha.describe('Read Mamac log from a file: ', () => {
 			conn
 		);
 		const count = await Reading.count(conn);
-		expect(parseInt(count)).to.equal(20);
+		expect(count).to.equal(20);
 	});
 
 	mocha.it('errors correctly on an invalid file', async () => {
@@ -101,7 +101,7 @@ mocha.describe('Read Mamac log from a file: ', () => {
 			);
 		} catch (e) {
 			const count = await Reading.count(conn);
-			expect(parseInt(count)).to.equal(0);
+			expect(count).to.equal(0);
 		}
 	});
 });

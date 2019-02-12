@@ -33,7 +33,7 @@ mocha.describe('Insert Mamac readings from a file', () => {
 		const readingDuration = moment.duration(1, 'hours');
 		await loadMamacReadingsFromCsvFile(testFilePath, meter, readingDuration, conn);
 		const count = await Reading.count(conn);
-		expect(parseInt(count)).to.equal(20);
+		expect(count).to.equal(20);
 	});
 
 	mocha.it('errors correctly on an invalid file', async () => {
@@ -57,7 +57,7 @@ mocha.describe('Insert Mamac readings from a file', () => {
 			await loadMamacReadingsFromCsvFile(testFilePath, meter, readingDuration, conn);
 		} catch (e) {
 			const count = await Reading.count(conn);
-			expect(parseInt(count)).to.equal(0);
+			expect(count).to.equal(0);
 		}
 	});
 });
