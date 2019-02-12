@@ -12,5 +12,5 @@
 [x] metasysValidTests.js
 [x] meterTests.js
 [x] momentPatchTests.js
-[ ] readingTests.js
+[x] readingTests.js
 [x] updateMetersTests.js
