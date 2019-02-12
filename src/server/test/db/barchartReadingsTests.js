@@ -152,7 +152,7 @@ mocha.describe('Barchart Readings', () => {
 
 	mocha.it('returns correct results when no readings exist', async () => {
 		conn = testDB.getConnection();
-		const result = await Reading.getBarchartReadings([meter.id], moment.duration(1, 'day'), conn);
+		const result = await Reading.getBarchartReadings([meter.id], moment.duration(1, 'day'), null, null, conn);
 		expect(result).to.deep.equal({ [meter.id]: [] });
 	});
 });
