@@ -38,25 +38,29 @@ for (let i = 0; i < versionLists.length; i++) {
 
 mocha.describe('Migration Valid', () => {
 	mocha.beforeEach(async () => {
+		const conn = testDB.getConnection();
 		// Normally, recreateDB _does_ populate the migration table;
 		// that's the whole point. But, these tests require that the
 		// table is in a specific state, so I'll delete the records here.
-		testDB.none('TRUNCATE TABLE migrations');
-		await new Migration(undefined, '0.0.0', '0.100.0').insert(testDB);
+		conn.none('TRUNCATE TABLE migrations');
 	});
 
 	mocha.it('should call correct up method for and insert new row into database', async () => {
-		await migrateAll(testDB, '0.300.0', migrationList);
+		const conn = testDB.getConnection();
+		await new Migration(undefined, '0.0.0', '0.100.0').insert(conn);
+		await migrateAll('0.300.0', migrationList, conn);
 		const afterCalled = [true, true, false, false, false];
 		expect(isCalled).to.deep.equal(afterCalled);
-		expect('0.300.0').to.equal(await Migration.getCurrentVersion(testDB));
+		expect('0.300.0').to.equal(await Migration.getCurrentVersion(conn));
 	});
 
 	mocha.it('should find the shortest path to upgrade', async () => {
+		const conn = testDB.getConnection();
+		await new Migration(undefined, '0.0.0', '0.100.0').insert(conn);
 		isCalled = [false, false, false, false, false];
-		await migrateAll(testDB, '0.400.0', migrationList);
+		await migrateAll('0.400.0', migrationList, conn);
 		const afterCalled = [false, false, false, true, false];
 		expect(isCalled).to.deep.equal(afterCalled);
-		expect('0.400.0').to.equal(await Migration.getCurrentVersion(testDB));
+		expect('0.400.0').to.equal(await Migration.getCurrentVersion(conn));
 	});
 });

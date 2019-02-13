@@ -2,7 +2,6 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
 
-const getDB = require('../models/database').getDB;
 const Migration = require('../models/Migration');
 const { compareSemanticVersion } = require('../util');
 const { log } = require('../log');
@@ -144,10 +143,11 @@ function getRequiredFilesToMigrate(curr, to, path) {
  * Insert row into migration folder
  * @param neededFiles name of files needed to migrate
  * @param allMigrationFiles is all of possible migration files
+ * @param conn the database connection to use
  */
-async function migrateDatabaseTransaction(neededFiles, allMigrationFiles) {
+async function migrateDatabaseTransaction(neededFiles, allMigrationFiles, conn) {
 	try {
-		await getDB().tx(async t => {
+		await conn.tx(async t => {
 			for (const neededFile of neededFiles) {
 				for (const migrationFile of allMigrationFiles) {
 					if (neededFile.fromVersion === migrationFile.fromVersion && neededFile.toVersion === migrationFile.toVersion) {
@@ -167,16 +167,19 @@ async function migrateDatabaseTransaction(neededFiles, allMigrationFiles) {
 
 /**
  * Migrate the database from current version to next version
- * @param conn is the connection to use.
  * @param toVersion is the version wanting to migrate to
  * @param migrationItems is the list of migration that users register
+ * @param conn is the connection to use.
  */
-async function migrateAll(conn, toVersion, migrationItems) {
+async function migrateAll(toVersion, migrationItems, conn) {
 	const currentVersion = await Migration.getCurrentVersion(conn);
+	if (compareSemanticVersion(currentVersion, toVersion) === 0) {
+		throw new Error('You have the highest version');
+	}
 	const list = createMigrationList(migrationItems);
 	const path = findPathToMigrate(currentVersion, toVersion, list);
 	const requiredFile = getRequiredFilesToMigrate(currentVersion, toVersion, path);
-	return await migrateDatabaseTransaction(requiredFile, migrationItems);
+	return await migrateDatabaseTransaction(requiredFile, migrationItems, conn);
 }
 
 module.exports = {
