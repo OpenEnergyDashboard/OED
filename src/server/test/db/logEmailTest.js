@@ -20,14 +20,14 @@ mocha.describe('Log Email', () => {
 	});
 
 	mocha.it('Get error message from database', async () => {
-		conn = testDB.getConnection()
+		conn = testDB.getConnection();
 		let allEmails = await LogEmail.getAll(conn);
 		allEmails = allEmails.map(e => e.errorMessage);
 		expect(allEmails[0]).to.equal('Test error message');
 	});
 
 	mocha.it('Delete all log email after sent, should fail because there are no items in table', async () => {
-		conn = testDB.getConnection()
+		conn = testDB.getConnection();
 		await LogEmail.delete(conn);
 		expect(async () => {
 			await LogEmail.getAll(conn).to.throw(new Error('No path found'));

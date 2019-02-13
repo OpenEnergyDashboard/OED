@@ -70,7 +70,7 @@ mocha.describe('Metasys readings', () => {
 			conn = testDB.getConnection();
 			await new Meter(undefined, 'metasys-valid', null, false, Meter.type.METASYS).insert(conn);
 		});
-	
+
 		mocha.it('loads the correct number of rows from a file', async () => {
 			conn = testDB.getConnection();
 			const testFilePath = path.join(__dirname, 'data', 'metasys-valid.csv');
