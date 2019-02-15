@@ -2,6 +2,14 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
 
+/**
+ * This class is for testing meter readings.  This is done by recreating a DB and then waiting for a meter reading.
+ * The following mocha.its are where expected results are checked.
+ */
+
+/**
+ * Initial imports.
+ */
 const chai = require('chai');
 const chaiAsPromised = require('chai-as-promised');
 const moment = require('moment');
@@ -15,6 +23,9 @@ const Reading = require('../../models/Reading');
 
 const mocha = require('mocha');
 
+/**
+ * Here is where the DB is recreated and meter readings are being retrieved.
+ */
 mocha.describe('Readings', () => {
 	mocha.beforeEach(recreateDB);
 	let meter;
@@ -23,6 +34,10 @@ mocha.describe('Readings', () => {
 		meter = await Meter.getByName('Meter');
 	});
 
+	/**
+	 * Timestamps are made to get readings and then are stored in readingPostInsert.  Then there is an "expect" to check
+	 * if the readingPostInsert has the property of a reading.
+	 */
 	mocha.it('can be saved and retrieved', async () => {
 		const startTimestamp = moment('2017-01-01');
 		const endTimestamp = moment('2017-01-01').add(1, 'hour');
@@ -35,6 +50,9 @@ mocha.describe('Readings', () => {
 		expect(readingPostInsert.endTimestamp.isSame(endTimestamp)).to.equal(true);
 		expect(readingPostInsert).to.have.property('reading', readingPreInsert.reading);
 	});
+	/**
+	 * Like the test above, timestamps are made and then checked if the expected amount of readings are present.
+	 */
 	mocha.it('can be saved in bulk', async () => {
 		const startTimestamp1 = moment('2017-01-01');
 		const endTimestamp1 = moment(startTimestamp1).add(1, 'hour');
@@ -46,6 +64,9 @@ mocha.describe('Readings', () => {
 		const retrievedReadings = await Reading.getAllByMeterID(meter.id);
 		expect(retrievedReadings).to.have.length(2);
 	});
+	/**
+	 * This is the same as the mocha.it above, but tests if insertOrUpdateAll returns the expected results.
+	 */
 	mocha.it('can be saved/updated in bulk', async () => {
 		const startTimestamp1 = moment('2017-01-01');
 		const endTimestamp1 = moment(startTimestamp1).add(1, 'hour');
