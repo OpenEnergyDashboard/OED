@@ -8,6 +8,9 @@ const favicon = require('serve-favicon');
 const logger = require('morgan');
 const cookieParser = require('cookie-parser');
 const bodyParser = require('body-parser');
+
+const { log, LogLevel } = require('./log');
+
 const users = require('./routes/users');
 const fileProcessing = require('./routes/fileProcessing');
 const readings = require('./routes/readings');
@@ -22,7 +25,13 @@ const baseline = require('./routes/baseline');
 const app = express();
 
 app.use(favicon(path.join(__dirname, '..', 'client', 'favicon.ico')));
-app.use(logger('dev'));
+
+// If other logging is turned off, there's no reason to log HTTP requests either.
+// TODO: Potentially modify the Morgan logger to use the log API, thus unifying all our logging.
+if (log.level !== LogLevel.SILENT) {
+	app.use(logger('dev'));
+}
+
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: false }));
 app.use(cookieParser());

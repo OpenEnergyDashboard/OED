@@ -4,7 +4,16 @@
 
 const config = require('../../config');
 const { log, LogLevel } = require('../../log');
+const chai = require('chai');
+const chaiAsPromised = require('chai-as-promised');
+const chaiHttp = require('chai-http');
 const mocha = require('mocha');
+
+// Configure Chai to use the required plugins
+chai.use(chaiAsPromised);
+chai.use(chaiHttp);
+
+const expect = chai.expect;
 
 // This swaps us to the test database for running test.
 // TODO: Fix up configuration between different environments. Maybe use the config npm package.
@@ -40,3 +49,9 @@ async function recreateDB() {
 
 mocha.beforeEach(recreateDB);
 
+module.exports = {
+	chai,
+	mocha,
+	expect,
+	app
+};
