@@ -3,22 +3,15 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
 
 import * as _ from 'lodash';
-import { Line, ChartComponentProps } from 'react-chartjs-2';
-import { ChartData, ChartDataSets, ChartPoint, ChartTooltipItem } from 'chart.js';
 import * as moment from 'moment';
 import { connect } from 'react-redux';
 import getGraphColor from '../utils/getGraphColor';
 import { State } from '../types/redux/state';
-import {CompressedLineReading} from '../types/compressed-readings';
+import PlotlyChart, { IPlotlyChartProps } from 'react-plotlyjs-ts';
 
-
-function compressedReadingToChartPoint(compressedReading: CompressedLineReading): ChartPoint {
-	return { x: compressedReading.startTimestamp, y: compressedReading.reading };
-}
-
-function mapStateToProps(state: State) {
+function mapStateToProps(state: State){
 	const timeInterval = state.graph.timeInterval;
-	const datasets: ChartDataSets[] = [];
+	const datasets: any[] = [];
 
 	// Add all meters data to the chart
 	for (const meterID of state.graph.selectedMeters) {
@@ -31,13 +24,38 @@ function mapStateToProps(state: State) {
 					throw new Error('Unacceptable condition: readingsData.readings is undefined.');
 				}
 
-				const dataPoints: ChartPoint[] = _.values(readingsData.readings).map(compressedReadingToChartPoint);
+				const xData: string[] = [];
+				const yData: number[] = [];
+				const hoverText: string[] = [];
+				const readings = _.values(readingsData.readings);
+				readings.forEach(reading => {
+					const readingTime = moment(reading.startTimestamp);
+					xData.push(readingTime.format('YYYY-MM-DD HH:mm:ss'));
+					yData.push(reading.reading);
+					hoverText.push(`<b> ${readingTime.format('dddd, MMM DD, YYYY hh:mm a')} </b> <br> ${label}: ${reading.startTimestamp} kW`);
+				});
+
+				// Save plot timestamp range
+				let minTimestamp: string = "";
+				let maxTimestamp: string = "";
+				if (readings.length > 0){
+					minTimestamp = readings[0]["startTimestamp"].toString();
+					maxTimestamp = readings[readings.length-1]["startTimestamp"].toString();
+				}
+				let root: any = document.getElementById('root');
+				root.setAttribute("min-timestamp", minTimestamp);
+				root.setAttribute("max-timestamp", maxTimestamp);
 
 				datasets.push({
-					label,
-					data: dataPoints,
-					fill: false,
-					borderColor: getGraphColor(label)
+					name: label,
+					x: xData,
+					y: yData,
+					text: hoverText,
+					hoverinfo: 'text',
+					type: 'scatter',
+					mode: 'lines',
+					line: {shape: 'spline'},
+					marker: {color: getGraphColor(label)}
 				});
 			}
 		}
@@ -54,73 +72,58 @@ function mapStateToProps(state: State) {
 					throw new Error('Unacceptable condition: readingsData.readings is undefined.');
 				}
 
-				const dataPoints: ChartPoint[] = _.values(readingsData.readings).map(compressedReadingToChartPoint);
+				const xData: string[] = [];
+				const yData: number[] = [];
+				const hoverText: string[] = [];
+				_.values(readingsData.readings).forEach(reading => {
+					const readingTime = moment(reading.startTimestamp);
+					xData.push(readingTime.format('YYYY-MM-DD HH:mm:ss'));
+					yData.push(reading.reading);
+					hoverText.push(`<b> ${readingTime.format('dddd, MMM DD, YYYY hh:mm a')} </b> <br> ${label}: ${reading.startTimestamp} kW`);
+				});
 
 				datasets.push({
-					label,
-					data: dataPoints,
-					fill: false,
-					borderColor: getGraphColor(label)
+					name: label,
+					x: xData,
+					y: yData,
+					text: hoverText,
+					hoverinfo: 'text',
+					type: 'scatter',
+					mode: 'lines',
+					line: {shape: 'spline'},
+					marker: {color: getGraphColor(label)}
 				});
 			}
 		}
 	}
-
-	const options = {
-		animation: {
-			duration: 0
+	const layout: any = {
+		autozise: true,
+		title: 'First Test',
+		showlegend: true,
+		legend: {
+			x: 0,
+			y: 1.1,
+			orientation: 'h',
 		},
-		elements: {
-			point: {
-				radius: 0
-			}
+		yaxis: {
+			title: 'kW',
+			showgrid: true,
+			gridcolor: '#ddd'
 		},
-		scales: {
-			xAxes: [{
-				type: 'time'
-			}],
-			yAxes: [{
-				scaleLabel: {
-					display: true,
-					labelString: 'kW'
-				},
-				ticks: {
-					min: 0
-				}
-			}]
-		},
-		tooltips: {
-			mode: 'nearest',
-			intersect: false,
-			backgroundColor: 'rgba(0,0,0,0.6)',
-			displayColors: false,
-			callbacks: {
-				title: (tooltipItems: ChartTooltipItem[]) => `${moment(tooltipItems[0].xLabel).format('dddd, MMM DD, YYYY hh:mm a')}`,
-				label: (tooltipItems: ChartTooltipItem) => {
-					if (tooltipItems.datasetIndex !== undefined) {
-						return `${datasets[tooltipItems.datasetIndex].label}: ${tooltipItems.yLabel} kW`;
-					} else {
-						throw new Error('tooltipItems.datasetIndex was undefined in line chart tooltip label callback');
-					}
-				}
-			}
-		},
-		plugins: {
-			datalabels: {
-				display: false
-			}
+		xaxis: {
+			rangeslider: {thickness: 0.1},
+			showgrid: true,
+			gridcolor: '#ddd'
 		}
 	};
 
-	const data: ChartData = { datasets };
 
-	const props: ChartComponentProps = {
-		data,
-		options,
-		redraw: true
+	const props: IPlotlyChartProps = {
+		data: datasets,
+		layout
 	};
 
 	return props;
 }
 
-export default connect(mapStateToProps)(Line);
+export default connect(mapStateToProps)(PlotlyChart);
