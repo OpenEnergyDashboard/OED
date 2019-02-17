@@ -112,7 +112,7 @@ function mapStateToProps(state: State){
 	const layout: any = {
 		autozise: true,
 		// width: 700,
-    	// height: 700,
+		// height: 700,
 		// title: 'First Test',
 		showlegend: true,
 		legend: {
