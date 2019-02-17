@@ -13,7 +13,7 @@ function mapStateToProps(state: State){
 	const timeInterval = state.graph.timeInterval;
 	const datasets: any[] = [];
 
-	// Add all meters data to the chart
+	// Add all valid data from existing meters to the line plot
 	for (const meterID of state.graph.selectedMeters) {
 		const byMeterID = state.readings.line.byMeterID[meterID];
 		if (byMeterID !== undefined) {
@@ -24,6 +24,7 @@ function mapStateToProps(state: State){
 					throw new Error('Unacceptable condition: readingsData.readings is undefined.');
 				}
 
+				// Create two arrays for the x and y values. Fill the array with the data from the compressed readings
 				const xData: string[] = [];
 				const yData: number[] = [];
 				const hoverText: string[] = [];
@@ -32,10 +33,10 @@ function mapStateToProps(state: State){
 					const readingTime = moment(reading.startTimestamp);
 					xData.push(readingTime.format('YYYY-MM-DD HH:mm:ss'));
 					yData.push(reading.reading);
-					hoverText.push(`<b> ${readingTime.format('dddd, MMM DD, YYYY hh:mm a')} </b> <br> ${label}: ${reading.startTimestamp} kW`);
+					hoverText.push(`<b> ${readingTime.format('dddd, MMM DD, YYYY hh:mm a')} </b> <br> ${label}: ${reading.reading} kW`);
 				});
 
-				// Save plot timestamp range
+				// Save the timestamp range of the plot
 				let minTimestamp: string = "";
 				let maxTimestamp: string = "";
 				if (readings.length > 0){
@@ -46,6 +47,7 @@ function mapStateToProps(state: State){
 				root.setAttribute("min-timestamp", minTimestamp);
 				root.setAttribute("max-timestamp", maxTimestamp);
 
+				// This variable contains all the elements (x and y values, line type, etc.) assigned to the data parameter of the Plotly object
 				datasets.push({
 					name: label,
 					x: xData,
@@ -54,14 +56,18 @@ function mapStateToProps(state: State){
 					hoverinfo: 'text',
 					type: 'scatter',
 					mode: 'lines',
-					line: {shape: 'spline'},
+					line: {
+						shape: 'spline',
+						width: 3
+						// smoothing: 1.3
+					},
 					marker: {color: getGraphColor(label)}
 				});
 			}
 		}
 	}
 
-	// Add all groups data to the chart
+	// Add all valid data from existing groups to the line plot
 	for (const groupID of state.graph.selectedGroups) {
 		const byGroupID = state.readings.line.byGroupID[groupID];
 		if (byGroupID !== undefined) {
@@ -72,6 +78,7 @@ function mapStateToProps(state: State){
 					throw new Error('Unacceptable condition: readingsData.readings is undefined.');
 				}
 
+				// Create two arrays for the x and y values. Fill the array with the data from the compressed readings
 				const xData: string[] = [];
 				const yData: number[] = [];
 				const hoverText: string[] = [];
@@ -79,9 +86,10 @@ function mapStateToProps(state: State){
 					const readingTime = moment(reading.startTimestamp);
 					xData.push(readingTime.format('YYYY-MM-DD HH:mm:ss'));
 					yData.push(reading.reading);
-					hoverText.push(`<b> ${readingTime.format('dddd, MMM DD, YYYY hh:mm a')} </b> <br> ${label}: ${reading.startTimestamp} kW`);
+					hoverText.push(`<b> ${readingTime.format('dddd, MMM DD, YYYY hh:mm a')} </b> <br> ${label}: ${reading.reading} kW`);
 				});
 
+				// This variable contains all the elements (x and y values, line type, etc.) assigned to the data parameter of the Plotly object
 				datasets.push({
 					name: label,
 					x: xData,
@@ -90,15 +98,22 @@ function mapStateToProps(state: State){
 					hoverinfo: 'text',
 					type: 'scatter',
 					mode: 'lines',
-					line: {shape: 'spline'},
+					line: {
+						shape: 'spline',
+						width: 3
+					},
 					marker: {color: getGraphColor(label)}
 				});
 			}
 		}
 	}
+
+	// Customize the layout of the plot
 	const layout: any = {
 		autozise: true,
-		title: 'First Test',
+		// width: 700,
+    	// height: 700,
+		// title: 'First Test',
 		showlegend: true,
 		legend: {
 			x: 0,
@@ -114,13 +129,21 @@ function mapStateToProps(state: State){
 			rangeslider: {thickness: 0.1},
 			showgrid: true,
 			gridcolor: '#ddd'
+		},
+		margin: {
+			t: 10,
+			b: 10
 		}
 	};
 
-
+	// Assign all the paramaters required to create the Plotly object (data, layout, config) to the variable props, returned by mapStateToProps
+	// The Plotly toolbar is displayed if displayModeBar is set to true
 	const props: IPlotlyChartProps = {
 		data: datasets,
-		layout
+		layout,
+		config: {
+			displayModeBar: false
+		}
 	};
 
 	return props;

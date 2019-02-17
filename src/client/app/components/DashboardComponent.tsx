@@ -11,11 +11,22 @@ import MultiCompareChartContainer from '../containers/MultiCompareChartContainer
 import SpinnerComponent from './SpinnerComponent';
 import { ChartTypes } from '../types/redux/graph';
 
+import * as moment from 'moment';
+import { TimeInterval } from '../../../common/TimeInterval';
+
+import Button from 'reactstrap/lib/Button';
+import { FormEvent } from 'react';
+import { FormattedMessage } from 'react-intl';
+import { Dispatch, Thunk, ActionType } from '../types/redux/actions';
+
+import * as Plotly from 'plotly.js';
+
 defaults.plugins = {
 	datalabels: {
 		display: false
 	}
 };
+
 
 interface DashboardProps {
 	chartToRender: ChartTypes;
@@ -23,48 +34,107 @@ interface DashboardProps {
 	lineLoading: false;
 	barLoading: false;
 	compareLoading: false;
+	selectedTimeInterval: TimeInterval;
+	changeTimeInterval(timeInterval: TimeInterval): Promise<any>;
 }
+
 
 /**
  * React component that controls the dashboard
  */
-export default function DashboardComponent(props: DashboardProps) {
-	let ChartToRender: typeof LineChartContainer | typeof MultiCompareChartContainer | typeof BarChartContainer;
-	let showSpinner = false;
-	if (props.chartToRender === ChartTypes.line) {
-		if (props.lineLoading) {
-			showSpinner = true;
-		}
-		ChartToRender = LineChartContainer;
-	} else if (props.chartToRender === ChartTypes.bar) {
-		if (props.barLoading) {
-			showSpinner = true;
-		}
-		ChartToRender = BarChartContainer;
-	} else {
-		if (props.compareLoading) {
-			showSpinner = true;
-		}
-		ChartToRender = MultiCompareChartContainer;
+export default class DashboardComponent extends React.Component<DashboardProps, {}> {
+	constructor(props: DashboardProps) {
+		super(props);
+		this.handleTimeIntervalChange = this.handleTimeIntervalChange.bind(this);
 	}
 
-	const optionsClassName = props.optionsVisibility ? 'col-2 d-none d-lg-block' : 'd-none';
-	const chartClassName = props.optionsVisibility ? 'col-12 col-lg-10' : 'col-12';
+	public render(){
+		let ChartToRender: typeof LineChartContainer | typeof MultiCompareChartContainer | typeof BarChartContainer;
+		let showSpinner = false;
+		if (this.props.chartToRender === ChartTypes.line) {
+			if (this.props.lineLoading) {
+				showSpinner = true;
+			}
+			ChartToRender = LineChartContainer;
+		} else if (this.props.chartToRender === ChartTypes.bar) {
+			if (this.props.barLoading) {
+				showSpinner = true;
+			}
+			ChartToRender = BarChartContainer;
+		} else {
+			if (this.props.compareLoading) {
+				showSpinner = true;
+			}
+			ChartToRender = MultiCompareChartContainer;
+		}
 
-	return (
-		<div className='container-fluid'>
-			<div className='row'>
-				<div className={optionsClassName}>
-					<UIOptionsContainer />
-				</div>
-				<div className={`${chartClassName} align-self-center text-center`}>
-					{ showSpinner ? (
-						<SpinnerComponent loading width={50} height={50} />
-					) : (
-						<ChartToRender />
-					)}
+		const optionsClassName = this.props.optionsVisibility ? 'col-2 d-none d-lg-block' : 'd-none';
+		const chartClassName = this.props.optionsVisibility ? 'col-12 col-lg-10' : 'col-12';
+
+		const buttonMargin: React.CSSProperties = {
+			marginRight: '10px'
+		};
+
+		return (
+			<div className='container-fluid'>
+				<div className='row'>
+					<div className={optionsClassName}>
+						<UIOptionsContainer />
+					</div>
+					<div className={`${chartClassName} align-self-center text-center`}>
+						{ showSpinner ? (
+							<SpinnerComponent loading width={50} height={50} />
+						) : (
+							<ChartToRender />
+						)}
+						<Button
+							style={buttonMargin}
+							onClick={() => this.handleTimeIntervalChange("range")}
+						>
+							Redraw
+						</Button>
+						<Button
+							style={buttonMargin}
+							onClick={() => this.handleTimeIntervalChange("all")}
+						>
+							Restore
+						</Button>
+					</div>
 				</div>
 			</div>
-		</div>
-	);
+		);		
+	}
+
+	private handleTimeIntervalChange(mode: string) {
+		if (mode == "all"){
+			this.props.changeTimeInterval(TimeInterval.unbounded());			
+		}else{
+			let sliderContainer: any = document.querySelector(".rangeslider-bg");
+			let sliderBox: any = document.querySelector(".rangeslider-slidebox");
+			let root: any = document.getElementById("root");	
+
+			if (sliderContainer && sliderBox && root){
+				// Attributes of the slider: full width and the min & max values of the box
+				let fullWidth: number = parseInt(sliderContainer.getAttribute("width"));
+				let sliderMinX: number = parseInt(sliderBox.getAttribute("x"));
+				let sliderMaxX: number = sliderMinX + parseInt(sliderBox.getAttribute("width"));
+				if (sliderMaxX - sliderMinX == fullWidth) return;
+
+				// From the Plotly line graph, get current min and max times in seconds
+				let minTimeStamp: number = parseInt(root.getAttribute("min-timestamp"));
+				let maxTimeStamp: number = parseInt(root.getAttribute("max-timestamp"));
+
+				// Seconds displayed on graph
+				let deltaSeconds: number = maxTimeStamp - minTimeStamp;
+				let secondsPerPixel: number = deltaSeconds / fullWidth;
+
+				// Get the new min and max times, in seconds, from the slider box
+				let newMinXTimestamp = Math.floor(minTimeStamp + (secondsPerPixel * sliderMinX));
+				let newMaxXTimestamp = Math.floor(minTimeStamp + (secondsPerPixel * sliderMaxX));
+
+				let timeInterval = new TimeInterval(moment(newMinXTimestamp), moment(newMaxXTimestamp));
+				this.props.changeTimeInterval(timeInterval);
+			}			
+		}
+	}
 }
