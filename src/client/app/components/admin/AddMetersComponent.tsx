@@ -67,7 +67,7 @@ class AddMetersComponent extends React.Component<AddMetersPropsWithIntl, {}> {
 	}
 	
 	/*
-	 * @returns HTML code to render components for the meters.
+	 * @returns JSX code to render components for the meters.
 	 * TODO: confirm this.
 	*/
 	public render() {
@@ -80,7 +80,7 @@ class AddMetersComponent extends React.Component<AddMetersPropsWithIntl, {}> {
 		const messages = defineMessages({ tipFormat: { id: 'tip.meters.csv.format' }});
 		const { formatMessage } = this.props.intl;
 		
-		// HTML code to render visuals:
+		// JSX code to render visuals:
 		return (
 			<div>
 				<p style={titleStyle}>
