@@ -24,7 +24,7 @@ export default class HeaderButtonsComponent extends React.Component<HeaderButton
 	}
 	
 	/*
-	 * @returns HTML code to render components for header button.
+	 * @returns JSX code to render components for header button.
 	 * TODO: confirm this.
 	 */
 	public render() {
