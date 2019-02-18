@@ -16,7 +16,7 @@ interface HeaderProps {
 
 /**
  * React component that controls the header strip at the top of all pages
- * @returns HTML code to render components for header.
+ * @returns JSX code to render components for header.
  * TODO: confirm this.
  */
 export default function HeaderComponent(props: HeaderProps) {
