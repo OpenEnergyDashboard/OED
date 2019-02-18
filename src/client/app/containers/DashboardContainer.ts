@@ -6,6 +6,11 @@ import { connect } from 'react-redux';
 import DashboardComponent from '../components/DashboardComponent';
 import { State } from '../types/redux/state';
 
+/* Passes the current redux state of the dashboard, and turns it into props for the React
+*  component, which is what will be visible on the page. Makes it possible to access
+*  your reducer state objects from within your React components.
+*
+*  Returns the all of the elements in the dashboard. */
 function mapStateToProps(state: State) {
 	return {
 		chartToRender: state.graph.chartToRender,
@@ -16,4 +21,5 @@ function mapStateToProps(state: State) {
 	};
 }
 
+// function that connects the React container to the Redux store of states
 export default connect(mapStateToProps)(DashboardComponent);

@@ -6,6 +6,12 @@ import { connect } from 'react-redux';
 import ChartLinkComponent from '../components/ChartLinkComponent';
 import { State } from '../types/redux/state';
 
+
+/* Passes the current redux state of the chart link text, and turns it into props for the React
+*  component, which is what will be visible on the page. Makes it possible to access
+*  your reducer state objects from within your React components.
+*
+*  Returns the updated link text */
 function mapStateToProps(state: State) {
 	let linkText = `${window.location.href}graph?`;
 	if (state.graph.selectedMeters.length > 0) {
@@ -27,10 +33,10 @@ function mapStateToProps(state: State) {
 		default:
 			break;
 	}
-
 	return {
 		linkText
 	};
 }
 
+// function that connects the React container to the Redux store of states
 export default connect(mapStateToProps)(ChartLinkComponent);

@@ -11,18 +11,11 @@ import getGraphColor from '../utils/getGraphColor';
 import { State } from '../types/redux/state';
 
 
-/* This takes the current state of the map and turns it into a provider, I think. A provider
-*   will alert our Redux app when there has been a change in state, and this will re-render our React
-* app (from internet). 
+/* Passes the current redux state of the barchart, and turns it into props for the React
+*  component, which is what will be visible on the page. Makes it possible to access
+*  your reducer state objects from within your React components.
 *
-*  This takes a state. Gets the time interval and bar duration of that state. 
-*  Connects React and Redux. Simplifies component state as a subset of the application
-*  state, so it can better comply with redux pattern. I don't super know what that means
-*  but I've done a lot of googling and it makes the most sense so far.
-*
-*  Practically, it keeps performance high.
-*/
-
+*  Returns the props object. */
 function mapStateToProps(state: State) {
 	const timeInterval = state.graph.timeInterval;
 	const barDuration = state.graph.barDuration;
@@ -32,10 +25,7 @@ function mapStateToProps(state: State) {
 	for (const meterID of state.graph.selectedMeters) {
 		const byMeterID = state.readings.bar.byMeterID[meterID];
 		if (byMeterID !== undefined) {
-			// gets data at current time interval/barDuration
 			const readingsData = byMeterID[timeInterval.toString()][barDuration.toISOString()];
-			// If it's undefined and isFetching, we can get the label, color and then push the datasets
-			// to the chart? This makes no sense to me.
 			if (readingsData !== undefined && readingsData.readings !== undefined && !readingsData.isFetching) {
 				const label = state.meters.byMeterID[meterID].name;
 				const color = getGraphColor(label);
@@ -53,7 +43,7 @@ function mapStateToProps(state: State) {
 		}
 	}
 
-	// Find data for the groups that the user has selected, and then do the same as above
+
 	for (const groupID of state.graph.selectedGroups) {
 		const byGroupID = state.readings.bar.byGroupID[groupID];
 		if (byGroupID !== undefined) {
@@ -144,4 +134,5 @@ function mapStateToProps(state: State) {
 	return props;
 }
 
+// function that connects the React container to the Redux store of states
 export default connect(mapStateToProps)(Bar);

@@ -28,6 +28,11 @@ interface CompareChartContainerProps {
 	entity: CompareEntity;
 }
 
+/* Passes the current redux state of the of the chart container and it's props, and turns it into props for the React
+*  component, which is what will be visible on the page. Makes it possible to access
+*  your reducer state objects from within your React components.
+*
+*  Returns the props object. */
 function mapStateToProps(state: State, ownProps: CompareChartContainerProps): LinearComponentProps {
 	const comparePeriod = state.graph.comparePeriod;
 	const datasets: ChartDataSetsWithDatalabels[] = [];
@@ -169,4 +174,6 @@ function mapStateToProps(state: State, ownProps: CompareChartContainerProps): Li
 
 // Escape from TypeScript here. TypeScript doesn't like the fact that Bar is non typed.
 const barConstructor: any = Bar;
+
+// function that connects the React container to the Redux store of states
 export default connect(mapStateToProps)(barConstructor);
