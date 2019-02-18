@@ -46,7 +46,7 @@ class AddReadingComponent extends React.Component<AddReadingsPropsWithIntl, {}> 
 	}
 	
 	/*
-	 * @returns HTML code to render components for the reading components.
+	 * @returns JSX code to render components for the reading components.
 	 * TODO: confirm this.
 	*/
 	public render() {
@@ -60,7 +60,7 @@ class AddReadingComponent extends React.Component<AddReadingsPropsWithIntl, {}> 
 		};
 		const messages = defineMessages({ selectMeter: { id: 'select.meter' }});
 		const { formatMessage } = this.props.intl;
-		// HTML code to be returned
+		// JSX code to be returned
 		return (
 			<div>
 				<p style={titleStyle}>
