@@ -26,7 +26,7 @@ export default class ChartSelectComponent extends React.Component<ChartSelectPro
 	}
 	
 	/*
-	 * @returns HTML code to render components for ChartSelectComponents.
+	 * @returns JSX code to render components for ChartSelectComponents.
 	 * TODO: confirm this.
 	 */
 	public render() {
