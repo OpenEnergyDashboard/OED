@@ -27,7 +27,7 @@ interface DashboardProps {
 
 /**
  * React component that controls the dashboard
- * @returns HTML code to render DashboardComponents.
+ * @returns JSX code to render DashboardComponents.
  * TODO: confirm this.
  */
 export default function DashboardComponent(props: DashboardProps) {
