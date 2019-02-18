@@ -40,7 +40,7 @@ class PreferencesComponent extends React.Component<PreferencesPropsWithIntl, {}>
 	}
 	
 	/*
-	 * @returns HTML code to render components for *things*.
+	 * @returns JSX code to render components for *things*.
 	 * TODO: confirm this. Also, figure out what exactly what this modifies.
 	*/
 	public render() {
@@ -58,6 +58,7 @@ class PreferencesComponent extends React.Component<PreferencesPropsWithIntl, {}>
 		};
 		const messages = defineMessages({ name: {	id: 'name' }});
 		const { formatMessage } = this.props.intl;
+		// JSX code to return
 		return (
 			<div>
 				<div style={bottomPaddingStyle}>
