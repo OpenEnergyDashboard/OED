@@ -14,6 +14,9 @@ interface ExportProps {
 	exportVals: { datasets: ExportDataSet[] };
 }
 
+/**
+ * @returns JSX code for components.
+ */
 export default function ExportComponent(props: ExportProps) {
 	/**
 	 * Called when Export button is clicked.
@@ -51,7 +54,7 @@ export default function ExportComponent(props: ExportProps) {
 		graphExport(compressedData,	name);
 	};
 	/*
-	 * TODO: I am noticing that some files have specific "render" methods for the HTML code, 
+	 * TODO: I am noticing that some files have specific "render" methods for the JSX code, 
 	 * while others just return it. Is there a reason for this inconsistency I am missing?
 	 */
 	return (
