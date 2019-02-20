@@ -8,6 +8,8 @@ const chai = require('chai');
 const chaiAsPromised = require('chai-as-promised');
 const chaiHttp = require('chai-http');
 const mocha = require('mocha');
+const bcrypt = require('bcryptjs');
+const User = require('../../models/User');
 
 // Configure Chai to use the required plugins
 chai.use(chaiAsPromised);
@@ -33,6 +35,9 @@ const app = require('../../app');
 // TODO: Move logging disabling to a better place.
 log.level = LogLevel.SILENT;
 
+// The user for use by tests.
+const test_user = new User(undefined, "test@example.invalid", bcrypt.hashSync("password", 10));
+
 async function recreateDB() {
 	// Just transfer connection if needed.
 	getDB();
@@ -45,6 +50,9 @@ async function recreateDB() {
 	// They should be, since they were all created during a previous test.
 	await getDB().none('DROP OWNED BY current_user;');
 	await createSchema();
+
+	// Authenticated routes require a user. Let's create one.
+	await test_user.insert();
 }
 
 mocha.beforeEach(recreateDB);
