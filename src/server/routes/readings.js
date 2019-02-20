@@ -52,7 +52,7 @@ router.get('/line/meters/:meter_ids', async (req, res) => {
 			}
 		}
 	};
-	if (!validate(req.params, validParams).valid || !validate(validQueries, req.query).valid) {
+	if (!validate(req.params, validParams).valid || !validate(req.query, validQueries).valid) {
 		res.sendStatus(400);
 	} else {
 		// We can't do .map(parseInt) here because map would give parseInt a radix value of the current array position.
@@ -96,7 +96,7 @@ router.get('/line/groups/:group_ids', async (req, res) => {
 			}
 		}
 	};
-	if (!validate(req.params, validParams).valid || !validate(validQueries, req.query).valid) {
+	if (!validate(req.params, validParams).valid || !validate(req.query, validQueries).valid) {
 		res.sendStatus(400);
 	} else {
 		// We can't do .map(parseInt) here because map would give parseInt a radix value of the current array position.
@@ -144,7 +144,7 @@ router.get('/bar/meters/:meter_ids', async (req, res) => {
 			}
 		}
 	};
-	if (!validate(req.params, validParams).valid || !validate(validQueries, req.query).valid) {
+	if (!validate(req.params, validParams).valid || !validate(req.query, validQueries).valid) {
 		res.sendStatus(400);
 	} else {
 		// We can't do .map(parseInt) here because map would give parseInt a radix value of the current array position.
@@ -193,7 +193,8 @@ router.get('/bar/groups/:group_ids', async (req, res) => {
 			}
 		}
 	};
-	if (!validate(req.params, validParams).valid || !validate(validQueries, req.query).valid) {
+
+	if (!validate(req.params, validParams).valid || !validate(req.query, validQueries).valid) {
 		res.sendStatus(400);
 	} else {
 		// We can't do .map(parseInt) here because map would give parseInt a radix value of the current array position.
