@@ -29,7 +29,7 @@ export default class ChartLinkComponent extends React.Component<ChartLinkProps, 
 		};
 	}
 	
-	/*
+	/**
 	 * @returns JSX code to render components for ChartLinkComponents.
 	 * TODO: confirm this.
 	 */
