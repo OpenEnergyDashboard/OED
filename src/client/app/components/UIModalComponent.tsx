@@ -19,7 +19,10 @@ export default class UIModalComponent extends React.Component<{}, UIModalState> 
 		this.closeModal = this.closeModal.bind(this);
 		this.state = { showModal: false };
 	}
-
+	
+	/*
+	 * @returns JSX code to render modal components.
+	 */
 	public render() {
 		const inlineStyle = {
 			display: 'inline',
