@@ -28,7 +28,7 @@ export default class ChartSelectComponent extends React.Component<ChartSelectPro
 		this.handleChangeChartType = this.handleChangeChartType.bind(this);
 	}
 	
-	/*
+	/**
 	 * @returns JSX code to render components for ChartSelectComponents.
 	 * TODO: confirm this.
 	 */
