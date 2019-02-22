@@ -36,7 +36,8 @@ const app = require('../../app');
 log.level = LogLevel.SILENT;
 
 // The user for use by tests.
-const test_user = new User(undefined, "test@example.invalid", bcrypt.hashSync("password", 10));
+const test_user = new User(undefined, 'test@example.invalid', bcrypt.hashSync('password', 10));
+test_user.password = 'password';
 
 async function recreateDB() {
 	// Just transfer connection if needed.
@@ -61,5 +62,6 @@ module.exports = {
 	chai,
 	mocha,
 	expect,
-	app
+	app,
+	test_user
 };
