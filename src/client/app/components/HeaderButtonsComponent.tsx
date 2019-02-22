@@ -23,7 +23,7 @@ export default class HeaderButtonsComponent extends React.Component<HeaderButton
 		this.handleLogOut = this.handleLogOut.bind(this);
 	}
 	
-	/*
+	/**
 	 * @returns JSX code to render components for header button.
 	 * TODO: confirm this.
 	 */
