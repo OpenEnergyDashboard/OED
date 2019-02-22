@@ -28,7 +28,8 @@ class ChartDataSelectComponent extends React.Component<ChartDataSelectPropsWithI
 		this.handleGroupSelect = this.handleGroupSelect.bind(this);
 	}
 	
-	/* @returns JSX code to render components for Select Components.
+	/**
+	 * @returns JSX code to render components for Select Components.
 	 * TODO: confirm this. Also find out what "ChartDataSelectComponent" means.
 	*/
 	public render() {
