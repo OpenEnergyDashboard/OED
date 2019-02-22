@@ -22,7 +22,7 @@ class AddMetersComponent extends React.Component<AddMetersPropsWithIntl, {}> {
 		this.handleMeterToImport = this.handleMeterToImport.bind(this);
 	}
 	
-	/*
+	/**
 	 * Takes an array of type "File" as "files" and does something to handle it.
 	 * TODO: What are these files used for in relation to meter components?
 	*/
