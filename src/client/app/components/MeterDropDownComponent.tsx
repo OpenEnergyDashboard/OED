@@ -16,7 +16,10 @@ export default class MeterDropDownComponent extends React.Component<MeterDropDow
 		super(props);
 		this.handleMeterSelect = this.handleMeterSelect.bind(this);
 	}
-
+	
+	/*
+	 * @returns JSX code to render the meter drop down components.
+	 */
 	public render() {
 		return (
 			<select onChange={this.handleMeterSelect}>
