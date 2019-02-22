@@ -11,6 +11,9 @@ import ButtonGroup from 'reactstrap/lib/ButtonGroup';
 import { FormEvent } from 'react';
 import { FormattedMessage } from 'react-intl';
 
+/*
+ * Calls method to change the type of chart when a chart is selected.
+ */
 interface ChartSelectProps {
 	selectedChart: ChartTypes;
 	changeChartType(chartType: ChartTypes): ChangeChartToRenderAction;
