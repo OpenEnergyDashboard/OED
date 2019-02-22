@@ -26,7 +26,7 @@ class AddReadingComponent extends React.Component<AddReadingsPropsWithIntl, {}> 
 		this.handleFileToImport = this.handleFileToImport.bind(this);
 	}
 	
-	/*
+	/**
 	 * Handles an array of "File" types
 	 * TODO: specify more details
 	 */
@@ -45,7 +45,7 @@ class AddReadingComponent extends React.Component<AddReadingsPropsWithIntl, {}> 
 		}
 	}
 	
-	/*
+	/**
 	 * @returns JSX code to render components for the reading components.
 	 * TODO: confirm this.
 	*/
