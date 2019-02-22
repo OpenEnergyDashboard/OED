@@ -23,7 +23,7 @@ mocha.describe('readings API', () => {
 					.query({timeInterval: ETERNITY.toString()});
 				expect(res).to.have.status(200);
 				expect(res).to.be.json;
-				expect(res.body).to.have.property("1");
+				expect(res.body).to.have.property('1');
 				expect(res.body['1']).to.have.length(0);
 			});
 		});
@@ -37,7 +37,7 @@ mocha.describe('readings API', () => {
 					.query({timeInterval: ETERNITY.toString()});
 				expect(res).to.have.status(200);
 				expect(res).to.be.json;
-				expect(res.body).to.have.property("1");
+				expect(res.body).to.have.property('1');
 				expect(res.body['1']).to.have.length(0);
 			});
 		});
@@ -63,7 +63,7 @@ mocha.describe('readings API', () => {
 					.query({barDuration: DAY.toISOString(), timeInterval: ETERNITY.toString()});
 				expect(res).to.have.status(200);
 				expect(res).to.be.json;
-				expect(res.body).to.have.property("1");
+				expect(res.body).to.have.property('1');
 				expect(res.body['1']).to.have.length(0);
 			});
 		});
@@ -87,7 +87,7 @@ mocha.describe('readings API', () => {
 					.query({barDuration: DAY.toISOString(), timeInterval: ETERNITY.toString()});
 				expect(res).to.have.status(200);
 				expect(res).to.be.json;
-				expect(res.body).to.have.property("1");
+				expect(res.body).to.have.property('1');
 				expect(res.body['1']).to.have.length(0);
 			});
 		});

@@ -36,8 +36,8 @@ const app = require('../../app');
 log.level = LogLevel.SILENT;
 
 // The user for use by tests.
-const test_user = new User(undefined, 'test@example.invalid', bcrypt.hashSync('password', 10));
-test_user.password = 'password';
+const testUser = new User(undefined, 'test@example.invalid', bcrypt.hashSync('password', 10));
+testUser.password = 'password';
 
 async function recreateDB() {
 	// Just transfer connection if needed.
@@ -53,7 +53,7 @@ async function recreateDB() {
 	await createSchema();
 
 	// Authenticated routes require a user. Let's create one.
-	await test_user.insert();
+	await testUser.insert();
 }
 
 mocha.beforeEach(recreateDB);
@@ -63,5 +63,5 @@ module.exports = {
 	mocha,
 	expect,
 	app,
-	test_user
+	testUser
 };

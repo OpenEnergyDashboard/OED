@@ -4,27 +4,27 @@
 
 /* This file tests the login form API. */
 
-const { chai, mocha, expect, app, test_user } = require('./common');
+const { chai, mocha, expect, app, testUser } = require('./common');
 
 const VERSION = require('../../version');
 
 mocha.describe('login API', () => {
 	mocha.it('returns JWT for a successful login attempt', async () => {
 		const res = await chai.request(app).post('/api/login')
-			.send({ email: test_user.email, password: test_user.password });
+			.send({ email: testUser.email, password: testUser.password });
 		expect(res).to.have.status(200);
 		expect(res).to.be.json;
 		expect(res.body).to.have.property('token');
 	});
 	mocha.it('returns 401 for a wrong password', async () => {
 		const res = await chai.request(app).post('/api/login')
-			.send({ email: test_user.email, password: test_user.password + 'wrong' });
+			.send({ email: testUser.email, password: testUser.password + 'wrong' });
 		expect(res).to.have.status(401);
 		expect(res.body).not.to.have.property('token');
 	});
 	mocha.it('returns 401 for a wrong user', async () => {
 		const res = await chai.request(app).post('/api/login')
-			.send({ email: test_user.email + 'nope', password: test_user.password });
+			.send({ email: testUser.email + 'nope', password: testUser.password });
 		expect(res).to.have.status(401);
 		expect(res.body).not.to.have.property('token');
 	});
