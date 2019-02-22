@@ -39,7 +39,7 @@ class PreferencesComponent extends React.Component<PreferencesPropsWithIntl, {}>
 		this.handleSubmitPreferences = this.handleSubmitPreferences.bind(this);
 	}
 	
-	/*
+	/**
 	 * @returns JSX code to render components for *things*.
 	 * TODO: confirm this. Also, figure out what exactly what this modifies.
 	*/
