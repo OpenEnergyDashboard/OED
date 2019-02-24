@@ -9,6 +9,11 @@ import GroupSidebarComponent from '../../components/groups/GroupSidebarComponent
 import { Dispatch } from '../../types/redux/actions';
 import { State } from '../../types/redux/state';
 
+/**
+ * Coordinates links from a given state to props on the site.
+ * @returns a sorted group of values from state
+ * TODO: Confirm this
+ */
 function mapStateToProps(state: State) {
 	const sortedGroups = _.sortBy(_.values(state.groups.byGroupID).map(group => ({ id: group.id, name: group.name.trim() })), 'name');
 	return {
@@ -16,7 +21,11 @@ function mapStateToProps(state: State) {
 	};
 }
 
-
+/**
+ * Assigns uses to props. 
+ * @returns a selected group
+ * TODO: Confirm this
+ */
 function mapDispatchToProps(dispatch: Dispatch) {
 	return {
 		selectGroups: (newSelectedGroupIDs: number[]) => dispatch(changeDisplayedGroups(newSelectedGroupIDs))
