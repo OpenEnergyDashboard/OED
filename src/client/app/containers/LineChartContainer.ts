@@ -30,10 +30,10 @@ function mapStateToProps(state: State){
 				const hoverText: string[] = [];
 				const readings = _.values(readingsData.readings);
 				readings.forEach(reading => {
-					const readingTime = moment(reading.startTimestamp);
-					xData.push(readingTime.format('YYYY-MM-DD HH:mm:ss'));
+					const timeReading = moment(reading.startTimestamp);
+					xData.push(timeReading.format('YYYY-MM-DD HH:mm:ss'));
 					yData.push(reading.reading);
-					hoverText.push(`<b> ${readingTime.format('dddd, MMM DD, YYYY hh:mm a')} </b> <br> ${label}: ${reading.reading} kW`);
+					hoverText.push(`<b> ${timeReading.format('dddd, MMM DD, YYYY hh:mm a')} </b> <br> ${label}: ${reading.reading} kW`);
 				});
 
 				// Save the timestamp range of the plot
@@ -83,10 +83,10 @@ function mapStateToProps(state: State){
 				const yData: number[] = [];
 				const hoverText: string[] = [];
 				_.values(readingsData.readings).forEach(reading => {
-					const readingTime = moment(reading.startTimestamp);
-					xData.push(readingTime.format('YYYY-MM-DD HH:mm:ss'));
+					const timeReading = moment(reading.startTimestamp);
+					xData.push(timeReading.format('YYYY-MM-DD HH:mm:ss'));
 					yData.push(reading.reading);
-					hoverText.push(`<b> ${readingTime.format('dddd, MMM DD, YYYY hh:mm a')} </b> <br> ${label}: ${reading.reading} kW`);
+					hoverText.push(`<b> ${timeReading.format('dddd, MMM DD, YYYY hh:mm a')} </b> <br> ${label}: ${reading.reading} kW`);
 				});
 
 				// This variable contains all the elements (x and y values, line type, etc.) assigned to the data parameter of the Plotly object
@@ -142,7 +142,7 @@ function mapStateToProps(state: State){
 		data: datasets,
 		layout,
 		config: {
-			displayModeBar: false
+			displayModeBar: true
 		}
 	};
 

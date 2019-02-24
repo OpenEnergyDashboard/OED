@@ -88,12 +88,12 @@ export default class DashboardComponent extends React.Component<DashboardProps, 
 							<ChartToRender />
 						)}
 						{ (this.props.chartToRender === ChartTypes.line) ? (
-							[<Button
+							[<Button key={1}
 								style={buttonMargin}
 								onClick={() => this.handleTimeIntervalChange("range")}
 							> Redraw
 							</Button>,
-							<Button
+							<Button key={2}
 								style={buttonMargin}
 								onClick={() => this.handleTimeIntervalChange("all")}
 							> Restore
