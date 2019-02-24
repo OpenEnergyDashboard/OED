@@ -25,8 +25,6 @@ function mapStateToProps(state: State) {
 				const yData: number[] = [];
 				const hoverText: string[] = [];
 				const readings = _.orderBy(readingsData.readings, ['startTimestamp'], ['asc']);
-				console.log(readings);
-				console.log(readingsData.readings);
 				readings.forEach(barReading => {
 					const timeReading: string = `${moment(barReading.startTimestamp).format('MMM DD, YYYY')} - ${moment(barReading.endTimestamp).format('MMM DD, YYYY')}`;
 					xData.push(timeReading);
@@ -57,8 +55,6 @@ function mapStateToProps(state: State) {
 				const yData: number[] = [];
 				const hoverText: string[] = [];
 				const readings = _.orderBy(readingsData.readings, ['startTimestamp'], ['asc']);
-				console.log(readings);
-				console.log(readingsData.readings);
 				readings.forEach(barReading => {
 					const timeReading: string = `${moment(barReading.startTimestamp).format('MMM DD, YYYY')} - ${moment(barReading.endTimestamp).format('MMM DD, YYYY')}`;
 					xData.push(timeReading);
