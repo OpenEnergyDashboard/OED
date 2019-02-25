@@ -4,7 +4,7 @@
 
 /**
  * This class is for testing meter readings.  This is done by recreating a DB and then waiting for a meter reading.
- * The following mocha.its are where expected results are checked.
+ * mocha.its are where expected results are checked.
  */
 
 /**

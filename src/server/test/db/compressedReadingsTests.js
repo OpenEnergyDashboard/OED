@@ -2,6 +2,13 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
 
+/**
+ * This class tests compressing the meter readings.
+ */
+
+/**
+ * Initial imports.
+ */
 const chai = require('chai');
 const chaiAsPromised = require('chai-as-promised');
 const moment = require('moment');
@@ -16,9 +23,18 @@ const Reading = require('../../models/Reading');
 
 const mocha = require('mocha');
 
+/**
+ * Tests for compressed meter readings.
+ */
 mocha.describe('Compressed Readings', () => {
+	/**
+	 * Here is where the DB is recreated.
+	 */
 	mocha.beforeEach(recreateDB);
 
+	/**
+	 * Timestamps are created for meter readings.
+	 */
 	let meter;
 	const timestamp1 = moment('2017-01-01');
 	const timestamp2 = timestamp1.clone().add(1, 'hour');
@@ -26,11 +42,17 @@ mocha.describe('Compressed Readings', () => {
 	const timestamp4 = timestamp3.clone().add(1, 'hour');
 	const timestamp5 = timestamp4.clone().add(1, 'hour');
 
+	/**
+	 * Get meters.
+	 */
 	mocha.beforeEach(async () => {
 		await new Meter(undefined, 'Meter', null, false, Meter.type.MAMAC).insert();
 		meter = await Meter.getByName('Meter');
 	});
 
+	/**
+	 * Get meter readings and compress them.
+	 */
 	mocha.it('compresses readings', async () => {
 		const reading1 = new Reading(meter.id, 100, timestamp1, timestamp2);
 		const reading2 = new Reading(meter.id, 200, timestamp2, timestamp3);
@@ -46,6 +68,9 @@ mocha.describe('Compressed Readings', () => {
 		expect(compressedReadings[meter.id][1].reading_rate).to.be.closeTo(expectedSecondCompressedRate, 0.0001);
 	});
 
+	/**
+	 * Get meter readings with a gab of time between a reading and compress those readings.
+	 */
 	mocha.it('compresses readings with a gap', async () => {
 		const reading1 = new Reading(meter.id, 100, timestamp1, timestamp2);
 		const reading2 = new Reading(meter.id, 200, timestamp2, timestamp3);
@@ -61,6 +86,9 @@ mocha.describe('Compressed Readings', () => {
 		chai.expect(compressedReadings[meter.id][1].reading_rate).to.be.closeTo(expectedSecondCompressedRate, 0.0001);
 	});
 
+	/**
+	 * Get meter readings where timestamps overlap and then compress those readings.
+	 */
 	mocha.it('compresses readings that overlap an end point', async () => {
 		const reading1 = new Reading(meter.id, 100, timestamp1, timestamp2);
 		const reading2 = new Reading(meter.id, 200, timestamp2, timestamp3);
@@ -74,6 +102,9 @@ mocha.describe('Compressed Readings', () => {
 		expect(compressedReadings[meter.id][0].reading_rate).to.be.closeTo(expectedFirstCompressedRate, 0.0001);
 	});
 
+	/**
+	 * Get multiple meter readings simultaneously and compress them.
+	 */
 	mocha.it('compresses readings for multiple meters at once', async () => {
 		await new Meter(undefined, 'Meter2', null, false, Meter.type.MAMAC).insert();
 		await new Meter(undefined, 'Meter3', null, false, Meter.type.MAMAC).insert();
@@ -91,17 +122,26 @@ mocha.describe('Compressed Readings', () => {
 		expect(compressedReadings[meter2.id][0].reading_rate).to.be.closeTo(readingMeter2.reading, 0.0001);
 	});
 
+	/**
+	 * Gets meter readings and if none exist, then returns an empty reading.
+	 */
 	mocha.it('returns no readings when none exist', async () => {
 		const result = await Reading.getCompressedReadings([meter.id]);
 
 		expect(result).to.deep.equal({ [meter.id]: [] });
 	});
 
+	/**
+	 * Tests for groups and meters.
+	 */
 	mocha.describe('With groups, meters, and readings set up', async () => {
 		let meter2;
 		const startTimestamp = moment('2017-01-01');
 		const endTimestamp = moment('2017-01-01').add(1, 'hour');
 		const readingValue = 10;
+		/**
+		 * Create groups A, B and C and add meters to groups.
+		 */
 		mocha.beforeEach(async () => {
 			// Groups A and B will each contain a meter
 			const groupA = new Group(undefined, 'A');
@@ -125,6 +165,9 @@ mocha.describe('Compressed Readings', () => {
 			const reading2 = new Reading(meter2.id, readingValue, startTimestamp, endTimestamp);
 			await Reading.insertAll([reading1, reading2]);
 		});
+		/**
+		 * Get a group and check actual compressed meter readings with actual meter readings.
+		 */
 		mocha.it('can get readings from a group containing meters', async () => {
 			const groupA = await Group.getByName('A');
 			const actualReadings = await Reading.getCompressedGroupReadings([groupA.id], null, null, 1);
@@ -133,6 +176,9 @@ mocha.describe('Compressed Readings', () => {
 			expect(actualReadings[groupA.id][0].end_timestamp.isSame(endTimestamp)).to.equal(true);
 			expect(actualReadings[groupA.id][0].reading_rate).to.equal(readingValue);
 		});
+		/**
+		 * Get another group and check actual compressed meter readings with actual meter readings.
+		 */
 		mocha.it('can get readings from a group containing groups containing meters', async () => {
 			const groupC = await Group.getByName('C');
 			const actualReadings = await Reading.getCompressedGroupReadings([groupC.id], null, null, 1);
