@@ -4,7 +4,7 @@
 
 /* This file tests the groups API. */
 
-const { chai, mocha, expect, app } = require('./common');
+const { chai, mocha, expect, app, testUser } = require('./common');
 const Group = require('../../models/Group');
 const Meter = require('../../models/Meter')
 
@@ -63,6 +63,35 @@ mocha.describe('groups API', () => {
 			expect(res).to.be.json;
 			expect(res.body).to.have.a.property('deepGroups');
 			expect(res.body.deepGroups).to.include.members([groupB.id, groupC.id]);
+		});
+	});
+
+	mocha.describe('modification API', () => {
+		let token;
+		mocha.before(async () => {
+			let res = await chai.request(app).post('/api/login')
+				.send({ email: testUser.email, password: testUser.password });
+			token = res.body.token;
+		});
+		mocha.describe('create endpoint', () => {
+			mocha.it('rejects all requests without a token with 403', async () => {
+				const res = await chai.request(app).post('/api/groups/create').type('json').send({});
+				expect(res).to.have.status(403);
+			});
+			mocha.it('rejects all requests with an invalid token with 401', async () => {
+				const res = await chai.request(app).post('/api/groups/create').type('json').send({ token: token + 'nope' });
+				expect(res).to.have.status(401);
+			});
+		});
+		mocha.describe('edit endpoint', () => {
+			mocha.it('rejects all requests without a token with 403', async () => {
+				const res = await chai.request(app).post('/api/groups/edit').type('json').send({});
+				expect(res).to.have.status(403);
+			});
+			mocha.it('rejects all requests with an invalid token with 401', async () => {
+				const res = await chai.request(app).post('/api/groups/edit').type('json').send({ token: token + 'nope' });
+				expect(res).to.have.status(401);
+			});
 		});
 	});
 });
