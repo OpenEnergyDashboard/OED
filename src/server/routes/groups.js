@@ -72,7 +72,7 @@ router.get('/deep/groups/:group_id', async (req, res) => {
 		res.sendStatus(400);
 	} else {
 		try {
-			const [deepGroups] = await Group.getDeepGroupsByGroupID(req.params.group_id);
+			const deepGroups = await Group.getDeepGroupsByGroupID(req.params.group_id);
 			res.json({ deepGroups });
 		} catch (err) {
 			log.error(`Error while preforming GET on all deep child groups of specific group: ${err}`, err);
@@ -97,7 +97,7 @@ router.get('/deep/meters/:group_id', async (req, res) => {
 		res.sendStatus(400);
 	} else {
 		try {
-			const [deepMeters] = await Group.getDeepMetersByGroupID(req.params.group_id);
+			const deepMeters = await Group.getDeepMetersByGroupID(req.params.group_id);
 			res.json({ deepMeters });
 		} catch (err) {
 			log.error(`Error while preforming GET on all deep child meters of specific group: ${err}`, err);
