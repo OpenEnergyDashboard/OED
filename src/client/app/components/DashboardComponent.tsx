@@ -27,6 +27,8 @@ interface DashboardProps {
 
 /**
  * React component that controls the dashboard
+ * @returns JSX code to render DashboardComponents.
+ * TODO: confirm this.
  */
 export default function DashboardComponent(props: DashboardProps) {
 	let ChartToRender: typeof LineChartContainer | typeof MultiCompareChartContainer | typeof BarChartContainer;

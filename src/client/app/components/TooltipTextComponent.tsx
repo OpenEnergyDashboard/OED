@@ -12,6 +12,7 @@ interface TooltipTextProps {
 
 /**
  * Component that renders text that shows a tooltip on hover
+ * @returns JSX code to render tooltip.
  */
 export default function TooltipTextComponent(props: TooltipTextProps) {
 	const divStyle = {

@@ -11,6 +11,9 @@ import ButtonGroup from 'reactstrap/lib/ButtonGroup';
 import { FormEvent } from 'react';
 import { FormattedMessage } from 'react-intl';
 
+/*
+ * Calls method to change the type of chart when a chart is selected.
+ */
 interface ChartSelectProps {
 	selectedChart: ChartTypes;
 	changeChartType(chartType: ChartTypes): ChangeChartToRenderAction;
@@ -24,7 +27,11 @@ export default class ChartSelectComponent extends React.Component<ChartSelectPro
 		super(props);
 		this.handleChangeChartType = this.handleChangeChartType.bind(this);
 	}
-
+	
+	/**
+	 * @returns JSX code to render components for ChartSelectComponents.
+	 * TODO: confirm this.
+	 */
 	public render() {
 		const divBottomPadding: React.CSSProperties = {
 			paddingBottom: '15px'

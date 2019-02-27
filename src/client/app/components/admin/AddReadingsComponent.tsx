@@ -25,7 +25,11 @@ class AddReadingComponent extends React.Component<AddReadingsPropsWithIntl, {}> 
 		super(props);
 		this.handleFileToImport = this.handleFileToImport.bind(this);
 	}
-
+	
+	/**
+	 * Handles an array of "File" types
+	 * TODO: specify more details
+	 */
 	public handleFileToImport(files: File[]) {
 		if (!this.props.selectedImportMeter) {
 			showErrorNotification(translate('please.select.meter'));
@@ -40,7 +44,11 @@ class AddReadingComponent extends React.Component<AddReadingsPropsWithIntl, {}> 
 				});
 		}
 	}
-
+	
+	/**
+	 * @returns JSX code to render components for the reading components.
+	 * TODO: confirm this.
+	*/
 	public render() {
 		const titleStyle: React.CSSProperties = {
 			fontWeight: 'bold',
@@ -52,7 +60,7 @@ class AddReadingComponent extends React.Component<AddReadingsPropsWithIntl, {}> 
 		};
 		const messages = defineMessages({ selectMeter: { id: 'select.meter' }});
 		const { formatMessage } = this.props.intl;
-
+		// JSX code to be returned
 		return (
 			<div>
 				<p style={titleStyle}>

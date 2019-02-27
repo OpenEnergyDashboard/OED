@@ -6,10 +6,17 @@ import * as React from 'react';
 import { FormattedMessage } from 'react-intl';
 import { Button } from 'reactstrap';
 
+/*
+ * Establishes text for chart links.
+ */
 interface ChartLinkProps {
 	linkText: string;
 }
 
+/**
+ * The type used to represent the state of a ChartLinkComponent.
+ * showLink: whether the link is visible or not.
+ */
 interface ChartLinkState {
 	showLink: boolean;
 }
@@ -22,7 +29,7 @@ export default class ChartLinkComponent extends React.Component<ChartLinkProps, 
 			showLink: false
 		};
 	}
-
+	
 	public render() {
 		const wellStyle: React.CSSProperties = {
 			wordWrap: 'break-word',
@@ -46,7 +53,11 @@ export default class ChartLinkComponent extends React.Component<ChartLinkProps, 
 			</div>
 		);
 	}
-
+	
+	/*
+	 * Inverts whether link is displayed (is visible).
+	 * TODO: confirm this
+	 */
 	private toggleLink() {
 		this.setState({ showLink: !this.state.showLink });
 	}

@@ -7,6 +7,9 @@ import { Modal, Button } from 'react-bootstrap';
 import UIOptionsContainer from '../containers/UIOptionsContainer';
 import { FormattedMessage } from 'react-intl';
 
+/*
+ * Is modal visible?
+ */
 interface UIModalState {
 	showModal: boolean;
 }
@@ -19,7 +22,10 @@ export default class UIModalComponent extends React.Component<{}, UIModalState> 
 		this.closeModal = this.closeModal.bind(this);
 		this.state = { showModal: false };
 	}
-
+	
+	/**
+	 * @returns JSX code to render modal components.
+	 */
 	public render() {
 		const inlineStyle = {
 			display: 'inline',
@@ -43,11 +49,13 @@ export default class UIModalComponent extends React.Component<{}, UIModalState> 
 			</div>
 		);
 	}
-
+	
+	/* Makes modal component visible */
 	private openModal() {
 		this.setState({ showModal: true });
 	}
-
+	
+	/* Makes modal component invisible */
 	private closeModal() {
 		this.setState({ showModal: false });
 	}

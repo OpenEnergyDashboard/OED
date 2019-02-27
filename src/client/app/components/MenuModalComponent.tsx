@@ -26,7 +26,11 @@ export default class MenuModalComponent extends React.Component<MenuModalProps, 
 		this.toggle = this.toggle.bind(this);
 		this.state = { showModal: false };
 	}
-
+	
+	/**
+	 * Creates certain stylings for menu.
+	 * @returns JSX code to render menu components.
+	 */
 	public render(): React.ReactNode {
 		const inlineStyle: React.CSSProperties = {
 			display: 'inline',

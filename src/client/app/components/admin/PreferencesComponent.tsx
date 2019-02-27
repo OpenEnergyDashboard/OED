@@ -38,7 +38,11 @@ class PreferencesComponent extends React.Component<PreferencesPropsWithIntl, {}>
 		this.handleDefaultLanguageChange = this.handleDefaultLanguageChange.bind(this);
 		this.handleSubmitPreferences = this.handleSubmitPreferences.bind(this);
 	}
-
+	
+	/**
+	 * @returns JSX code to render components for *things*.
+	 * TODO: confirm this. Also, figure out what exactly what this modifies.
+	*/
 	public render() {
 		const labelStyle: React.CSSProperties = {
 			fontWeight: 'bold',
@@ -54,6 +58,7 @@ class PreferencesComponent extends React.Component<PreferencesPropsWithIntl, {}>
 		};
 		const messages = defineMessages({ name: {	id: 'name' }});
 		const { formatMessage } = this.props.intl;
+		// JSX code to return
 		return (
 			<div>
 				<div style={bottomPaddingStyle}>
@@ -161,11 +166,13 @@ class PreferencesComponent extends React.Component<PreferencesPropsWithIntl, {}>
 			</div>
 		);
 	}
-
+	
+	/* Updates title desplay */
 	private handleDisplayTitleChange(e: { target: HTMLInputElement; }) {
 		this.props.updateDisplayTitle(e.target.value);
 	}
-
+	
+	
 	private handleDefaultChartToRenderChange(e: React.FormEvent<HTMLInputElement>) {
 		this.props.updateDefaultChartType((e.target as HTMLInputElement).value as ChartTypes);
 	}

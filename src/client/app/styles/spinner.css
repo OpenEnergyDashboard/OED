@@ -2,6 +2,7 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
 
+/* Creates general spinner visuals, used and modified by spinner-item-1 and spinner-item-2 */
 .spinner {
 	display: inline-block;
 	border-radius: 100%;
@@ -17,6 +18,7 @@
 	animation: spin-animation 0.7s 0.35s infinite linear;
 }
 
+/* Handles spin animation on specified object */
 @keyframes spin-animation {
 	50% {
 		transform: scale(0.75);

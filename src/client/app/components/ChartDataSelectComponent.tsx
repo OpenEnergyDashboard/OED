@@ -27,7 +27,11 @@ class ChartDataSelectComponent extends React.Component<ChartDataSelectPropsWithI
 		this.handleMeterSelect = this.handleMeterSelect.bind(this);
 		this.handleGroupSelect = this.handleGroupSelect.bind(this);
 	}
-
+	
+	/**
+	 * @returns JSX code to render components for Select Components.
+	 * TODO: confirm this. Also find out what "ChartDataSelectComponent" means.
+	*/
 	public render() {
 		const divBottomPadding: React.CSSProperties = {
 			paddingBottom: '15px'

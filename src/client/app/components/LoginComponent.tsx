@@ -12,6 +12,9 @@ import { showErrorNotification } from '../utils/notifications';
 import { verificationApi } from '../utils/api';
 import translate from '../utils/translate';
 
+/**
+ * Creates components used by the LoginState
+ */
 interface LoginState {
 	email: string;
 	password: string;
@@ -46,8 +49,8 @@ class LoginComponent extends React.Component<InjectedIntlProps, LoginState> {
 			password: { id: 'password' }
 		});
 		const { formatMessage } = this.props.intl;
-
-		return (
+		
+		return (  /* HTML code for login screen layout */
 			<div>
 				<HeaderContainer />
 				<Form style={formStyle}>
