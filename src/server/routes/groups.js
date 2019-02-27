@@ -142,8 +142,8 @@ router.post('/create', async (req, res) => {
 			await getDB().tx(async t => {
 				const newGroup = new Group(undefined, req.body.name);
 				await newGroup.insert(() => t);
-				const adoptGroupsQuery = req.body.childGroups.map(gid => newGroup.adoptGroup(gid, t));
-				const adoptMetersQuery = req.body.childMeters.map(mid => newGroup.adoptMeter(mid, t));
+				const adoptGroupsQuery = req.body.childGroups.map(gid => newGroup.adoptGroup(gid, () => t));
+				const adoptMetersQuery = req.body.childMeters.map(mid => newGroup.adoptMeter(mid, () => t));
 				return t.batch(_.flatten([adoptGroupsQuery, adoptMetersQuery]));
 			});
 			res.sendStatus(200);
