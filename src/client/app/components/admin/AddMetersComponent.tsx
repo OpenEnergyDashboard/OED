@@ -23,8 +23,8 @@ class AddMetersComponent extends React.Component<AddMetersPropsWithIntl, {}> {
 	}
 	
 	/**
-	 * Takes an array of type "File" as "files" and does something to handle it.
-	 * TODO: What are these files used for in relation to meter components?
+	 * Takes an array of type "File" as "files", checks that the files are valid and in proper format,
+	 * modifies strings to be read, gets the IPs of listed meters and submits them as new meters.
 	*/
 	public handleMeterToImport(files: File[]) {
 		const file = files[0];
@@ -34,14 +34,20 @@ class AddMetersComponent extends React.Component<AddMetersPropsWithIntl, {}> {
 
 		reader.onload = () => {
 			const fileAsBinaryString = reader.result;
+			
+			// Checks whether it actually contains the string
 			if (fileAsBinaryString === null || fileAsBinaryString === undefined) {
 				throw new Error('fileAsBinaryString was null or undefined in meter import onload function');
 			}
 			if (typeof(fileAsBinaryString) !== 'string') {
 				throw new Error('fileAsBinaryString was not a string in meter import onload function');
 			}
+			
+			// Splits the string on line endings
 			dataLines = fileAsBinaryString.split(/\r?\n/);
 			dataLines[0] = dataLines[0].replace(/\"/g, '');
+			
+			// Grabs the IPs of all the meters in the file
 			if (dataLines[0] !==  'ip') {
 				showErrorNotification(translate('incorrect.file.format'));
 			} else {
@@ -51,6 +57,8 @@ class AddMetersComponent extends React.Component<AddMetersPropsWithIntl, {}> {
 						listOfIps.push(ips);
 					}
 				}
+				
+				// submit IP as new meter
 				fileProcessingApi.submitNewMeters(listOfIps)
 					.then(() => {
 						showSuccessNotification(translate('successfully.uploaded.meters'));
@@ -66,10 +74,6 @@ class AddMetersComponent extends React.Component<AddMetersPropsWithIntl, {}> {
 		reader.readAsBinaryString(file);
 	}
 	
-	/*
-	 * @returns JSX code to render components for the meters.
-	 * TODO: confirm this.
-	*/
 	public render() {
 		const titleStyle: React.CSSProperties = {
 			fontWeight: 'bold',
