@@ -13,8 +13,9 @@ interface ChartLinkProps {
 	linkText: string;
 }
 
-/*
- * Is the link visible?
+/**
+ * The type used to represent the state of a ChartLinkComponent.
+ * showLink: whether the link is visible or not.
  */
 interface ChartLinkState {
 	showLink: boolean;
@@ -29,10 +30,6 @@ export default class ChartLinkComponent extends React.Component<ChartLinkProps, 
 		};
 	}
 	
-	/**
-	 * @returns JSX code to render components for ChartLinkComponents.
-	 * TODO: confirm this.
-	 */
 	public render() {
 		const wellStyle: React.CSSProperties = {
 			wordWrap: 'break-word',
