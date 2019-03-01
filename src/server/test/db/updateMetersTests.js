@@ -2,7 +2,7 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
 
- /**
+ /*
   * Initial imports.
   */
 const chai = require('chai');
@@ -19,17 +19,17 @@ const updateAllMeters = require('../../services/updateMeters');
 const mocha = require('mocha');
 const sinon = require('sinon');
 
-/**
+/*
  * Tests for updating meters.
  */
 mocha.describe('Meter Update', () => {
 
-	/**
+	/*
 	 * Recreates the database before each test.
 	 */
 	mocha.beforeEach(recreateDB);
 
-	/**
+	/*
 	 * Tests that the updateMeters service correctly handles errors.
 	 */
 	mocha.it('can persist over a failed request', async () => {
