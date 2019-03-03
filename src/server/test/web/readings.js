@@ -5,7 +5,7 @@
 /* This file tests the readings retrieval API. */
 
 const moment = require('moment');
-const { chai, mocha, expect, app } = require('./common');
+const { chai, mocha, expect, app } = require('../common');
 const { TimeInterval } = require('../../../common/TimeInterval');
 
 const ETERNITY = TimeInterval.unbounded();

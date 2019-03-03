@@ -5,7 +5,6 @@
 const database = require('./database');
 const Reading = require('./Reading');
 
-const getDB = database.getDB;
 const sqlFile = database.sqlFile;
 
 class Meter {
@@ -28,8 +27,8 @@ class Meter {
 	 * Returns a promise to create the meters table.
 	 * @return {Promise.<>}
 	 */
-	static createTable() {
-		return getDB().none(sqlFile('meter/create_meters_table.sql'));
+	static createTable(conn) {
+		return conn.none(sqlFile('meter/create_meters_table.sql'));
 	}
 
 	/**
@@ -37,28 +36,28 @@ class Meter {
 	 * This needs to be run before Meter.createTable().
 	 * @return {Promise<void>}
 	 */
-	static createMeterTypesEnum() {
-		return getDB().none(sqlFile('meter/create_meter_types_enum.sql'));
+	static createMeterTypesEnum(conn) {
+		return conn.none(sqlFile('meter/create_meter_types_enum.sql'));
 	}
 
 	/**
 	 * Returns a promise to retrieve the meter with the given name from the database.
 	 * @param name the meter's name
-	 * @param conn the connection to use. Defaults to the default database connection.
+	 * @param conn the connection to be used.
 	 * @returns {Promise.<Meter>}
 	 */
-	static async getByName(name, conn = getDB) {
-		const row = await conn().one(sqlFile('meter/get_meter_by_name.sql'), { name: name });
+	static async getByName(name, conn ) {
+		const row = await conn.one(sqlFile('meter/get_meter_by_name.sql'), { name: name });
 		return Meter.mapRow(row);
 	}
 
 	/**
 	 * Check if a meter with the same name is already in the database.
-	 * @param conn the connection to use. Defaults to the default database connection.
+	 * @param conn the connection to be used.
 	 * @returns {boolean}
 	 */
-	async existsByName(conn = getDB) {
-		const row = await conn().oneOrNone(sqlFile('meter/get_meter_by_name.sql'), { name: this.name });
+	async existsByName(conn) {
+		const row = await conn.oneOrNone(sqlFile('meter/get_meter_by_name.sql'), { name: this.name });
 		return row !== null;
 	}
 
@@ -69,44 +68,44 @@ class Meter {
 	/**
 	 * Returns a promise to retrieve the meter with the given id from the database.
 	 * @param id the id of the meter to retrieve
-	 * @param conn the connection to use. Defaults to the default database connection.
+	 * @param conn the connection to be used.
 	 * @returns {Promise.<Meter>}
 	 */
-	static async getByID(id, conn = getDB) {
-		const row = await conn().one(sqlFile('meter/get_meter_by_id.sql'), { id: id });
+	static async getByID(id, conn) {
+		const row = await conn.one(sqlFile('meter/get_meter_by_id.sql'), { id: id });
 		return Meter.mapRow(row);
 	}
 
 	/**
 	 * Returns a promise to get all of the meters from the database
-	 * @param conn the connection to use. Defaults to the default database connection.
+	 * @param conn the connection to be used.
 	 * @returns {Promise.<array.<Meter>>}
 	 */
-	static async getAll(conn = getDB) {
-		const rows = await conn().any(sqlFile('meter/get_all_meters.sql'));
+	static async getAll(conn) {
+		const rows = await conn.any(sqlFile('meter/get_all_meters.sql'));
 		return rows.map(Meter.mapRow);
 	}
 
 	/**
 	 * Returns a promise to insert this meter into the database
-	 * @param conn the connection to use. Defaults to the default database connection.
+	 * @param conn the connection to be used.
 	 * @returns {Promise.<>}
 	 */
-	async insert(conn = getDB) {
+	async insert(conn) {
 		const meter = this;
 		if (meter.id !== undefined) {
 			throw new Error('Attempt to insert a meter that already has an ID');
 		}
-		const resp = await conn().one(sqlFile('meter/insert_new_meter.sql'), meter);
+		const resp = await conn.one(sqlFile('meter/insert_new_meter.sql'), meter);
 		this.id = resp.id;
 	}
 
 	/**
 	 * Returns a promise to get all of the readings for this meter from the database.
-	 * @param conn the connection to use. Defaults to the default database connection.
+	 * @param conn the connection to be used.
 	 * @returns {Promise.<Array.<Reading>>}
 	 */
-	readings(conn = getDB) {
+	readings(conn) {
 		return Reading.getAllByMeterID(this.id, conn);
 	}
 }

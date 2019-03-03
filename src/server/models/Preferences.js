@@ -5,7 +5,6 @@
 const _ = require('lodash');
 const database = require('./database');
 
-const getDB = database.getDB;
 const sqlFile = database.sqlFile;
 
 class Preferences {
@@ -24,28 +23,33 @@ class Preferences {
 
 	/**
 	 * Returns a promise to create the preferences table and associated enums
+	 * @param conn is the connection to use.
 	 * @returns {Promise.<>}
 	 */
-	static async createTable() {
-		await getDB().none(sqlFile('preferences/create_graph_types_enum.sql'));
-		await getDB().none(sqlFile('preferences/create_language_types_enum.sql'));
-		await getDB().none(sqlFile('preferences/create_preferences_table.sql'));
-		await getDB().none(sqlFile('preferences/insert_default_row.sql'));
+	static async createTable(conn) {
+		await conn.none(sqlFile('preferences/create_graph_types_enum.sql'));
+		await conn.none(sqlFile('preferences/create_language_types_enum.sql'));
+		await conn.none(sqlFile('preferences/create_preferences_table.sql'));
+		await conn.none(sqlFile('preferences/insert_default_row.sql'));
 	}
 
 	static mapRow(row) {
 		return new Preferences(row.display_title, row.default_chart_to_render, row.default_bar_stacking, row.default_language);
 	}
 
-	static async get() {
-		const row = await getDB().one(sqlFile('preferences/get_preferences.sql'));
+	/**
+	 *
+	 * @param conn is the connection to use.
+	 */
+	static async get(conn) {
+		const row = await conn.one(sqlFile('preferences/get_preferences.sql'));
 		return Preferences.mapRow(row);
 	}
 
-	static async update(newPreferences) {
+	static async update(conn, newPreferences) {
 		const preferences = await Preferences.get();
 		_.merge(preferences, newPreferences);
-		await getDB().none(sqlFile('preferences/update_preferences.sql'),
+		await conn.none(sqlFile('preferences/update_preferences.sql'),
 			{
 				displayTitle: preferences.displayTitle,
 				defaultChartToRender: preferences.defaultChartToRender,

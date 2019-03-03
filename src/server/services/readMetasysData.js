@@ -16,8 +16,9 @@ const path = require('path');
  * @param readingInterval  value of the reading interval. For example 60 minutes, 30 minutes.
  * @param readingRepetition value is 1 if reading is not duplicated. 2 if repeated twice and so on.
  * @param  cumulativeIndicator false if readings are not cumulative and vice-versa.
+ * @param conn the database connection to use
  */
-async function readMetasysData(filePath, readingInterval, readingRepetition, cumulativeIndicator) {
+async function readMetasysData(filePath, readingInterval, readingRepetition, cumulativeIndicator, conn) {
 	// arrays to store readings and rows
 	const readingArray = [];
 	const rowArray = [];
@@ -28,7 +29,7 @@ async function readMetasysData(filePath, readingInterval, readingRepetition, cum
 	const rows = await readCsv(filePath);
 
 	// meterInformation
-	const meter = await Meter.getByName(fileName.replace('.csv', ''));
+	const meter = await Meter.getByName(fileName.replace('.csv', ''), conn);
 
 	// Initialize timestamps and other variables
 	let startTimestamp = moment(0);
@@ -76,7 +77,7 @@ async function readMetasysData(filePath, readingInterval, readingRepetition, cum
 
 	// Deal with the last reading
 	// Timestamp for last reading
-	const lastRow = await rowArray.pop();
+	const lastRow = await rowArray.pop(conn);
 	endTimestamp = moment(lastRow[0], 'MM/DD/YY HH:mm');
 	startTimestamp = moment(endTimestamp).subtract(readingInterval, 'minutes');
 	// meterReadingForLastReading
@@ -85,7 +86,7 @@ async function readMetasysData(filePath, readingInterval, readingRepetition, cum
 	// pushing last reading into array
 	const reading = new Reading(meter.id, meterReadingEnd, startTimestamp.toDate(), endTimestamp.toDate());
 	readingArray.push(reading);
-	return await Reading.insertAll(readingArray);
+	return await Reading.insertAll(readingArray, conn);
 }
 module.exports = readMetasysData;
 

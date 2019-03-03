@@ -4,13 +4,14 @@
 
 /* This file tests the groups API. */
 
-const { chai, mocha, expect, app, testUser } = require('./common');
+const { chai, mocha, expect, app, testUser, testDB } = require('../common');
 const Group = require('../../models/Group');
 const Meter = require('../../models/Meter')
 
 mocha.describe('groups API', () => {
 	let groupA, groupB, groupC, meterA, meterB, meterC;
 	mocha.beforeEach(async () => {
+		const conn = testDB.getConnection();
 		/*
 			* Groups and meters are created in the following hierarchy.
 			* group A
@@ -23,15 +24,15 @@ mocha.describe('groups API', () => {
 		groupA = new Group(undefined, 'A');
 		groupB = new Group(undefined, 'B');
 		groupC = new Group(undefined, 'C');
-		await Promise.all([groupA, groupB, groupC].map(group => group.insert()));
+		await Promise.all([groupA, groupB, groupC].map(group => group.insert(conn)));
 		meterA = new Meter(undefined, 'A', null, false, Meter.type.MAMAC);
 		meterB = new Meter(undefined, 'B', null, false, Meter.type.MAMAC);
 		meterC = new Meter(undefined, 'C', null, false, Meter.type.METASYS);
-		await Promise.all([meterA, meterB, meterC].map(meter => meter.insert()));
+		await Promise.all([meterA, meterB, meterC].map(meter => meter.insert(conn)));
 
-		await Promise.all([groupA.adoptMeter(meterA.id), groupA.adoptGroup(groupB.id),
-			groupB.adoptGroup(groupC.id), groupB.adoptMeter(meterB.id),
-			groupC.adoptMeter(meterC.id)]);
+		await Promise.all([groupA.adoptMeter(meterA.id, conn), groupA.adoptGroup(groupB.id, conn),
+			groupB.adoptGroup(groupC.id, conn), groupB.adoptMeter(meterB.id, conn),
+			groupC.adoptMeter(meterC.id, conn)]);
 	});
 	mocha.describe('retrieval', () => {
 		mocha.it('returns the list of existing groups', async () => {

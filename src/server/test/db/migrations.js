@@ -2,28 +2,18 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
 
-const chai = require('chai');
-const chaiAsPromised = require('chai-as-promised');
-
-chai.use(chaiAsPromised);
-const expect = chai.expect;
-const mocha = require('mocha');
-
-const recreateDB = require('../db/common').recreateDB;
-const getDB = require('../../models/database').getDB;
+const { mocha, expect, testDB } = require('../common');
 
 const Migration = require('../../models/Migration');
 const { migrateAll } = require('../../migrations/migrateDatabase');
 
-
-
-
 async function clearMigrationsTable() {
-		// Normally, recreateDB _does_ populate the migration table;
-		// that's the whole point. But, these tests require that the
-		// table is in a specific state, so the records are deleted here.
-		await getDB().none('TRUNCATE TABLE migrations');
-		await new Migration(undefined, '0.0.0', '0.100.0').insert();
+	const conn = testDB.getConnection();
+	// Normally, recreateDB _does_ populate the migration table;
+	// that's the whole point. But, these tests require that the
+	// table is in a specific state, so the records are deleted here.
+	await conn.none('TRUNCATE TABLE migrations');
+	await new Migration(undefined, '0.0.0', '0.100.0').insert();
 }
 
 mocha.describe('Migrations', () => {

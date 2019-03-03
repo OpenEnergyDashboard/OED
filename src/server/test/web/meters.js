@@ -5,7 +5,7 @@
 /* This file tests the API for retrieving meters, by artificially
  * inserting meters prior to executing the test code. */
 
-const { chai, mocha, expect, app } = require('./common');
+const { chai, mocha, expect, app, testDB } = require('../common');
 const Meter = require('../../models/Meter');
 
 mocha.describe('meters API', () => {
@@ -17,9 +17,10 @@ mocha.describe('meters API', () => {
 	});
 
 	mocha.it('returns all existing meters', async () => {
-		await new Meter(undefined, 'Meter 1', '1.1.1.1', true, Meter.type.MAMAC).insert();
-		await new Meter(undefined, 'Meter 2', '1.1.1.1', true, Meter.type.MAMAC).insert();
-		await new Meter(undefined, 'Meter 3', '1.1.1.1', true, Meter.type.MAMAC).insert();
+		const conn = testDB.getConnection();
+		await new Meter(undefined, 'Meter 1', '1.1.1.1', true, Meter.type.MAMAC).insert(conn);
+		await new Meter(undefined, 'Meter 2', '1.1.1.1', true, Meter.type.MAMAC).insert(conn);
+		await new Meter(undefined, 'Meter 3', '1.1.1.1', true, Meter.type.MAMAC).insert(conn);
 
 		const res = await chai.request(app).get('/api/meters');
 		expect(res).to.have.status(200);
@@ -37,9 +38,10 @@ mocha.describe('meters API', () => {
 	});
 
 	mocha.it('returns details on a single meter by ID', async () => {
-		await new Meter(undefined, 'Meter 1', '1.1.1.1', true, Meter.type.MAMAC).insert();
+		const conn = testDB.getConnection();
+		await new Meter(undefined, 'Meter 1', '1.1.1.1', true, Meter.type.MAMAC).insert(conn);
 		const meter2 = new Meter(undefined, 'Meter 2', '1.1.1.1', true, Meter.type.MAMAC);
-		await meter2.insert();
+		await meter2.insert(conn);
 
 		const res = await chai.request(app).get(`/api/meters/${meter2.id}`);
 		expect(res).to.have.status(200);
@@ -49,8 +51,9 @@ mocha.describe('meters API', () => {
 	});
 
 	mocha.it('responds appropriately when the meter in question does not exist', async () => {
+		const conn = testDB.getConnection();
 		const meter = new Meter(undefined, 'Meter', '1.1.1.1', true, Meter.type.MAMAC);
-		await meter.insert();
+		await meter.insert(conn);
 
 		const res = await chai.request(app).get(`/api/meters/${meter.id + 1}`);
 		expect(res).to.have.status(500);

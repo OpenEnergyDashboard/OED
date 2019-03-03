@@ -4,7 +4,7 @@
 
 /* This file tests the login form API. */
 
-const { chai, mocha, expect, app, testUser } = require('./common');
+const { chai, mocha, expect, app, testUser } = require('../common');
 
 const VERSION = require('../../version');
 
