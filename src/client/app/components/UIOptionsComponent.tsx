@@ -66,9 +66,6 @@ class UIOptionsComponent extends React.Component<UIOptionsPropsWithIntl, UIOptio
 		this.setState({barDurationDays: nextProps.barDuration.asDays()});
 	}
 	
-	/*
-	 * Updates the components on the page from this code and returns HTML for the page.
-	*/
 	public render() {
 		const labelStyle: React.CSSProperties = {
 			fontWeight: 'bold',
