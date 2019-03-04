@@ -53,10 +53,7 @@ export default function ExportComponent(props: ExportProps) {
 		const name = `oedExport_${chartName}_${startTimeString}_to_${endTimeString}.csv`;
 		graphExport(compressedData,	name);
 	};
-	/*
-	 * TODO: I am noticing that some files have specific "render" methods for the JSX code, 
-	 * while others just return it. Is there a reason for this inconsistency I am missing?
-	 */
+	
 	return (
 		<div>
 			<Button outline onClick={exportReading}>
