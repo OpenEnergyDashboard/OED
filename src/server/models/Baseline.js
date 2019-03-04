@@ -14,13 +14,30 @@ class Baseline {
 		this.baselineValue = baselineValue;
 		this.note = note;
 	}
+
+	/**
+	 * Returns a promise to create the baseline table.
+	 * @returns {Promise.<>}
+	 */
 	static createTable() {
 		return getDB().none(sqlFile('baseline/create_baseline_table.sql'));
 	}
+
+	/**
+	 * Creates a new baseline from the data in a row.
+	 * @param row the row from which the baseline is to be created
+	 * @returns {Baseline}
+	 */
 	static mapRow(row) {
 		return new Baseline(row.meter_id, row.apply_start, row.apply_end, row.calc_start, row.calc_end,
 			row.note, row.baseline_value);
 	}
+
+	/**
+	 * Returns a promise to insert this baseline into the database.
+	 * @param conn the connection to use, defaults to default database connection
+	 * @returns {Promise.<>}
+	 */
 	async insert(conn = getDB) {
 		const resp = await conn().one(sqlFile('baseline/new_baseline.sql'), {
 			meter_id: this.meterID,
@@ -32,10 +49,23 @@ class Baseline {
 		});
 		this.baselineValue = resp.baseline_value;
 	}
+
+	/**
+	 * Returns a promise to get all of the baselines from the given meter.
+	 * @param meterID the id of the meter from which baselines will be gotten
+	 * @param conn the connection to use, defaults to the default database connection
+	 * @returns {Promise.<array.<Baseline>>}
+	 */
 	static async getAllForMeterID(meterID, conn = getDB) {
 		const rows = await conn().any(sqlFile('baseline/get_baselines_by_meter_id.sql'), { meter_id: meterID });
 		return rows.map(row => Baseline.mapRow(row));
 	}
+
+	/**
+	 * Returns a promise to get all of the baselines from the database.
+	 * @param conn the connection to use, defaults to the default database connection
+	 * @returns {Promise.<array.<Baseline>>}
+	 */
 	static async getAllBaselines(conn = getDB) {
 		const rows = await conn().any(sqlFile('baseline/get_all_baselines.sql'));
 		return rows.map(row => Baseline.mapRow(row));

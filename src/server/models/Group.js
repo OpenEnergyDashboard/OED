@@ -21,7 +21,7 @@ class Group {
 
 	/**
 	 * Returns a promise to create all the groups tables.
-	 * @returns {Promise<>}
+	 * @returns {Promise.<>}
 	 */
 	static createTables() {
 		return getDB().none(sqlFile('group/create_groups_tables.sql'));
