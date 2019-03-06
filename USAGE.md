@@ -1,15 +1,30 @@
+# Quick Start With Docker #
+If using Docker, you first need to install [Docker](https://docs.docker.com/engine/installation/)
+and [docker-compose](https://docs.docker.com/compose/install/).
+
+On Ubuntu, you can do this via:
+
+```bash
+sudo apt install docker.io docker-compose
+```
+
+You can then install and start OED with:
+
+```bash
+docker-compose up
+```
+
+Go to `localhost:3000` in your web browser and enjoy!
+
+You probably want to read the rest of this document to learn about the technologies we
+use and how to add meters and read data from them.
+
 # Requirements #
 
-The Open Energy Dashboard uses PostgreSQL version 9.6 or higher for data storage, and
-runs on Node.js version 8.11 or higher. These are the version shipped in the Ubuntu
+The Open Energy Dashboard uses **PostgreSQL** version 9.6 or higher for data storage, and
+runs on **Node.js** version 8.11 or higher. These are the version shipped in the Ubuntu
 repositories, meaning that Windows users can easily use the Windows Subsystem for Linux
 in order to work on the project.
-
-If you want to install OED so you can contribute code, see the "Development" section. If
-you are setting up OED in order to gather data from power meters and display it, see the
-"Production" section.
-
-## Dockerization ##
 
 OED can also be installed using the Docker containerization tool. This allows it to be
 segregated from the rest of the system, and makes updates easier to perform, since the
@@ -19,6 +34,9 @@ The is the only supported method for production deployments.
 
 Under Docker, OED is installed and administered using the `docker-compose` command. You
 will need Docker version 18.06 CE or higher and `docker-compose` version 1.21 or higher.
+If you want to install OED so you can contribute code, see the "Development" section. If
+you are setting up OED in order to gather data from power meters and display it, see the
+"Production" section.
 
 ## Notes ##
 
@@ -32,19 +50,23 @@ terminal.
 - On Linux, your distribution will provide a terminal; it can generally be opened with
 Ctrl+Shift+T or by searching for "Terminal" in your application menu.
 
-### On Docker and Non-Free Operating Systems ###
+### On OED and Non-UNIX Operating Systems ###
 
-Docker is well-supported on most free/libre operating systems, including GNU/Linux,
-FreeBSD, OpenBSD, and Plan9.
+Windows is not a supported platform. You can probably run OED there, but you will
+experience problems.
 
-Docker is not supported on Windows. Windows is incapable of supporting LXE containers,
-the technology on which Docker is based, and Microsoft
-[artifically limits](https://docs.microsoft.com/en-us/virtualization/hyper-v-on-windows/about/)
-the use of Docker for Windows, a virtualized technology.
+Docker is a Linux technology. It is based on Linux kernel features including namespaces
+and cgroups. On Mac OS, you can use [Docker for Mac](https://docs.docker.com/docker-for-mac/)
+to run OED in Docker. Microsoft [artifically limits](https://docs.microsoft.com/en-us/virtualization/hyper-v-on-windows/about/)
+the use of Docker for Windows, so you may experience problems.
 
-Docker is supported on MacOS via the [Docker for Mac](https://docs.docker.com/docker-for-mac/)
-software, a virtualized technology. You may experience issues with the `devstart` script
-which uses features that have problems on Docker for Mac to watch files for edits.
+Open Energy Dashboard universally uses UNIX filenames, which are seperated with forward
+slashes. Linux uses UNIX filenames. Mac OS uses UNIX filenames. BSD uses UNIX filenames.
+Solaris uses UNIX filenames. SmartOS uses UNIX filenames.
+
+For reasons known only to Bill Gates and God, Windows uses backwards slashes instead.
+This means all of our convenience scripts are broken on Windows. Sorry. Use a real
+computer or figure out how to run the project without them.
 
 # Installation #
 
@@ -54,21 +76,21 @@ and for production usage.
 ## Development ##
 
 ### With Docker ###
-If using Docker, you first need to install [Docker](https://docs.docker.com/engine/installation/) and [docker-compose](https://docs.docker.com/compose/install/).
 
 When using OED via Docker, most commands should be issued in the form:
 
-`docker-compose run --rm web [COMMAND]`
+`docker-compose exec web [COMMAND]`
 
 In other words:
-- `docker-compose run` - Execute a command in a Docker container managed by Docker-Compose
-- `--rm` - Remove the container after executing the command
+- `docker-compose exec` - Execute a command in a Docker container managed by Docker-Compose
 - `web` - Run the command in the `web` container (the container with Node and NPM)
 
-Adding the `--service-ports` flag prevents Docker from segregating the container in the
-network, so you can access the OED server. E.g.:
+This only works if the system is running (started via `docker-compose up`). If, for some
+reason, you have to execute a command without starting the system, use	`docker-compose
+run --rm web [COMMAND]`, which will start a new `web` container and then remove it
+once finished.
 
-`docker-compose run --rm --service-ports web src/scripts/devstart.sh`
+Follow the instructions in the Docker Quickstart section at the top of the document.
 
 ### Without Docker ###
 If you are not using Docker, you need to install the dependencies yourself. Specifically,
@@ -86,6 +108,7 @@ with the following contents, with any changes needed for your system.
 See below for more on what each variable does.
 
 ```
+OED_PRODUCTION=no
 OED_SERVER_PORT=3000
 OED_TOKEN_SECRET=asdf
 OED_DB_USER=oed
@@ -105,10 +128,7 @@ OED_MAIL_ORG=
 
 ### Installation Steps ###
 
-Clone this repository into a new directory with `git clone <URL>`.
-
-Set up Node environment and the database by running `docker-compose run --rm web src/scripts/installOED.sh` in the main directory.
-Start the app in development mode with ```docker-compose run --rm --service-ports web src/scripts/devstart.sh```.
+Set up Node environment and the database by running `src/scripts/installOED.sh` in the main directory.
 Wait for the Webpack build to finish and then access the app at [localhost:3000](http://localhost:3000).
 
 You can log into the app with email: `test@example.com`, password: `password`.
@@ -125,12 +145,15 @@ ip
 127.0.0.2
 ```
 
-Add meters from the ips.csv file with `docker-compose run --rm web npm run addMamacMeters ips.csv`, then fetch data
-from the meters you just added with `docker-compose run --rm web npm run updateMamacMeters`.
+Add meters from the ips.csv file with
+`docker-compose exec web npm run addMamacMeters ips.csv`,
+then fetch data from the meters you just added with
+`docker-compose exec web npm run updateMamacMeters`.
 
 ### Environment Variables ###
 The OED server is configured via environment variables, as follows.
 
+- OED_PRODUCTION: 'yes' if running "for realsies" on a server, 'no' otherwise.
 - OED_SERVER_PORT: The port that the server should run on. 3000 is a good default choice
 - OED_TOKEN_SECRET: Token for authentication. Generate something secure and random
 - OED_DB_USER: The user that should be used to connect to postgres
@@ -147,19 +170,13 @@ The OED server is configured via environment variables, as follows.
 - OED_MAIL_TO: Who gets error e-mail. Ex: admin@example.com
 - OED_MAIL_ORG: Organization name, used in e-mail subject line
 
-### Setting the Path on Windows ###
-On Windows, you may need to add the `psql` binary to your path.
-
-Open your settings, search for Advanced System Settings, click Environment Variables near
-the bottom left of the tab, and add `C:\Program Files\PostgreSQL\11\bin".
-
 ## Production ##
 ### Installation ###
 1. Install [Docker](https://docs.docker.com/engine/installation/) and [docker-compose](https://docs.docker.com/compose/install/).
 1. Clone this repository. `git clone https://github.com/OpenEnergyDashboard/OED.git [directory]`
 1. Create a CSV file with a single column called "ip" with your meter IP addresses and copy it into the directory where the project resides. These are the IPs of Mamac meters from which this OED instance will pull data. If the site has no Mamac meters, you may skip this step.
-1. Set up the environment with `docker-compose run --rm web src/scripts/installOED.sh --production` in the main directory. `--rm` here tells `docker-compose` not to keep the Docker containers it creates after the command finishes.
 1. Edit ```docker-compose.yml``` to change
+	1. OED_PRODUCTION to `yes`.
 	1. the secret key (in `services -> web -> environment -> OED_TOKEN_SECRET`) to a random value. Keep it secret.
 	1. the port (in `services -> web -> ports`) to a mapping from host to container; e.g., to host on your computer's port 80, set it to `80:3000`.
 
@@ -179,9 +196,13 @@ the bottom left of the tab, and add `C:\Program Files\PostgreSQL\11\bin".
 
 ## Data Storage ##
 
-PostgreSQL stores its data in `postgres-data`. This and `node_modules` will be owned by root, becuase the user in the Docker continer is root; to uninstall the app, you need to delete them from inside the container (or as root on your own machine): ```docker-compose run --rm web rm -r postgres-data node_modules```.
+PostgreSQL stores its data in `postgres-data`. This and `node_modules` will be owned by
+root, becuase the user in the Docker continer is root; to uninstall the app, you need to
+delete them from inside the container (or as root on your own machine):
+```docker-compose run --rm web rm -r postgres-data node_modules```.
 
-You can access the PostgreSQL database through the `database` service. Given that the app is running, you can:
+You can access the PostgreSQL database through the `database` service. Given that the app
+is running, you can:
 
 * Get a Postgres shell with `docker-compose exec database psql -U oed`
 * Take a database dump with `docker-compose exec database pg_dump -U oed > dump_$(date +%Y-%m-%d"_"%H_%M_%S.sql)`
@@ -227,3 +248,4 @@ To upgrade the app:
 1. Replace your local changes with `git stash pop`
 1. Re-build the app (`docker-compose run --rm web ./src/scripts/updateOED.sh`)
 1. Restart the app (`systemctl start oed.service`)
+
