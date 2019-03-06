@@ -19,6 +19,7 @@ services:
     web:
         # Configuration variables for the app.
         environment:
+            - OED_PRODUCTION=no
             - OED_SERVER_PORT=3000
             - OED_DB_USER=oed
             - OED_DB_DATABASE=oed
@@ -37,7 +38,9 @@ services:
             # If in a subdirectory, set it here
             # - OED_SUBDIR=/subdir/
         # Set the correct build environment.
-        build: ./
+        build:
+            context: ./
+            dockerfile: ./containers/web/Dockerfile
         # Link to the database so the app can persist data
         links:
             - database
@@ -54,7 +57,7 @@ services:
         depends_on:
             - database
         # Lets docker-compose up work right
-        command: ["npm", "start"]
+        command: ["bash", "./src/scripts/installOED.sh"]
         # Reverse proxy, for testing
     proxy:
         build: ./containers/proxy
