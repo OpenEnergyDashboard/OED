@@ -59,15 +59,3 @@ services:
         # Lets docker-compose up work right
         command: ["bash", "./src/scripts/installOED.sh"]
         # Reverse proxy, for testing
-    proxy:
-        build: ./containers/proxy
-        # Link to the web container so it can proxy connections
-        links:
-            - web
-        # Map the web port
-        ports:
-            - "3001:3001"
-        # Don't bring this up without the web service
-        depends_on:
-            - web
-
