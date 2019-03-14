@@ -53,20 +53,15 @@ Ctrl+Shift+T or by searching for "Terminal" in your application menu.
 ### On OED and Non-UNIX Operating Systems ###
 
 Windows is not a supported platform. You can probably run OED there, but you will
-experience problems.
+experience problems for the following reasons.
 
-Docker is a Linux technology. It is based on Linux kernel features including namespaces
+First, Docker is a Linux technology. It is based on Linux kernel features including namespaces
 and cgroups. On Mac OS, you can use [Docker for Mac](https://docs.docker.com/docker-for-mac/)
-to run OED in Docker. Microsoft [artifically limits](https://docs.microsoft.com/en-us/virtualization/hyper-v-on-windows/about/)
-the use of Docker for Windows, so you may experience problems.
+to run OED in Docker. Microsoft limits the use of Docker for Windows to the Professional
+and Enterprise editions. so you may experience problems.
 
-Open Energy Dashboard universally uses UNIX filenames, which are seperated with forward
-slashes. Linux uses UNIX filenames. Mac OS uses UNIX filenames. BSD uses UNIX filenames.
-Solaris uses UNIX filenames. SmartOS uses UNIX filenames.
-
-For reasons known only to Bill Gates and God, Windows uses backwards slashes instead.
-This means all of our convenience scripts are broken on Windows. Sorry. Use a real
-computer or figure out how to run the project without them.
+Second, Open Energy Dashboard universally uses UNIX filenames, which are seperated with forward
+slashes. This means all of our convenience scripts are broken on Windows.
 
 # Installation #
 
