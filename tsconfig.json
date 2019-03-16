@@ -3,11 +3,11 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at http://mozilla.org/MPL/2.0/.
  */
- 
+
 {
     "compilerOptions": {
         "baseUrl": "./src/client/app/",
-        "outDir": "./src/client/public/",
+        "outDir": "./src/client/public/app/",
         "sourceMap": true,
         "module": "commonjs",
         "target": "es5",
