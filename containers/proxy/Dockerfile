@@ -1,16 +1,9 @@
-#!/usr/bin/env bash
 # *
 # * This Source Code Form is subject to the terms of the Mozilla Public
 # * License, v. 2.0. If a copy of the MPL was not distributed with this
 # * file, You can obtain one at http://mozilla.org/MPL/2.0/.
 # *
 
-set -e
-
-npm run check:header &
-npm run check:typescript &
-npm run check:types &
-npm run check:lint &
-
-wait
+FROM nginx:alpine
+COPY proxy.conf /etc/nginx/conf.d/proxy.conf
 
