@@ -6,10 +6,15 @@
 
 const { chai, mocha, expect, app, testUser, testDB } = require('../common');
 const Group = require('../../models/Group');
-const Meter = require('../../models/Meter')
+const Meter = require('../../models/Meter');
 
 mocha.describe('groups API', () => {
-	let groupA, groupB, groupC, meterA, meterB, meterC;
+	let groupA;
+	let groupB;
+	let groupC;
+	let meterA;
+	let meterB;
+	let meterC;
 	mocha.beforeEach(async () => {
 		const conn = testDB.getConnection();
 		/*
@@ -43,7 +48,7 @@ mocha.describe('groups API', () => {
 			expect(res.body).to.deep.include.members([groupA, groupB, groupC]);
 		});
 		mocha.it('returns the immediate children of a group', async () => {
-			const res = await chai.request(app).get(`/api/groups/children/${groupA.id}`)
+			const res = await chai.request(app).get(`/api/groups/children/${groupA.id}`);
 			expect(res).to.have.status(200);
 			expect(res).to.be.json;
 			expect(res.body).to.have.property('meters');
@@ -114,18 +119,18 @@ mocha.describe('groups API', () => {
 				const res = await chai.request(app).put('/api/groups/edit').set('token', token + 'nope').type('json').send({});
 				expect(res).to.have.status(401);
 			});
-			mocha.it('allows adding a new child meter to a group', async() => {
+			mocha.it('allows adding a new child meter to a group', async () => {
 				const meterD = new Meter(undefined, 'D', null, false, Meter.type.MAMAC);
 				await meterD.insert();
 				let res = await chai.request(app).put('/api/groups/edit').set('token', token).type('json').send({
 					id: groupC.id,
 					name: groupC.name,
 					childGroups: [],
-					childMeters: [meterC.id, meterD.id],
+					childMeters: [meterC.id, meterD.id]
 				});
 				expect(res).to.have.status(200);
 
-				res = await chai.request(app).get(`/api/groups/children/${groupC.id}`)
+				res = await chai.request(app).get(`/api/groups/children/${groupC.id}`);
 				expect(res).to.have.status(200);
 				expect(res).to.be.json;
 				expect(res.body).to.have.property('meters');
@@ -133,18 +138,18 @@ mocha.describe('groups API', () => {
 				expect(res.body.meters).to.have.a.lengthOf(2).and.include.members([meterC.id, meterD.id]);
 				expect(res.body.groups).to.have.a.lengthOf(0);
 			});
-			mocha.it('allows adding a new child group to a group', async() => {
+			mocha.it('allows adding a new child group to a group', async () => {
 				const groupD = new Group(undefined, 'D');
 				await groupD.insert();
 				let res = await chai.request(app).put('/api/groups/edit').set('token', token).type('json').send({
 					id: groupC.id,
 					name: groupC.name,
 					childGroups: [groupD.id],
-					childMeters: [meterC.id],
+					childMeters: [meterC.id]
 				});
 				expect(res).to.have.status(200);
 
-				res = await chai.request(app).get(`/api/groups/children/${groupC.id}`)
+				res = await chai.request(app).get(`/api/groups/children/${groupC.id}`);
 				expect(res).to.have.status(200);
 				expect(res).to.be.json;
 				expect(res.body).to.have.property('meters');

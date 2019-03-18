@@ -152,8 +152,8 @@ const defaultLogger = new Logger(logFile);
  * Wherever logging is available, the process should log unhandled rejections.
  */
 process.on('unhandledRejection', (reason, p) => {
-	p.catch((e) => {
-	    defaultLogger.error(`Unhandled Promise Rejection: ${reason}`, e);
+	p.catch(e => {
+		defaultLogger.error(`Unhandled Promise Rejection: ${reason}`, e);
 	});
 });
 
