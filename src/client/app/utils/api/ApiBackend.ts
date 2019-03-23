@@ -6,7 +6,7 @@
 
 import axios, { AxiosRequestConfig, AxiosResponse } from 'axios';
 import { getToken, hasToken } from '../token';
-
+const baseHref = (document.getElementsByTagName('base')[0] || {}).href;
 /**
  * Handles the actual sending and receiving of network requests.
  *
@@ -54,12 +54,14 @@ export default class ApiBackend {
 			return {
 				params,
 				headers: {token: getToken(), ...headers},
+				baseURL: baseHref,
 				...extraConfig
 			};
 		} else {
 			return {
 				params,
 				headers,
+				baseURL: baseHref,
 				...extraConfig
 			};
 		}
