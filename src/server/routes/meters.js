@@ -6,6 +6,7 @@ const express = require('express');
 const Meter = require('../models/Meter');
 const { log } = require('../log');
 const validate = require('jsonschema').validate;
+const { getConnection } = require('../db');
 
 const router = express.Router();
 
@@ -22,8 +23,9 @@ function formatMeterForResponse(meter) {
  * GET information on all meters
  */
 router.get('/', async (req, res) => {
+	const conn = getConnection();
 	try {
-		const rows = await Meter.getAll();
+		const rows = await Meter.getAll(conn);
 		res.json(rows.map(formatMeterForResponse));
 	} catch (err) {
 		log.error(`Error while performing GET all meters query: ${err}`, err);
@@ -49,8 +51,9 @@ router.get('/:meter_id', async (req, res) => {
 	if (!validate(req.params, validParams).valid) {
 		res.sendStatus(400);
 	} else {
+		const conn = getConnection();
 		try {
-			const meter = await Meter.getByID(req.params.meter_id);
+			const meter = await Meter.getByID(req.params.meter_id, conn);
 			res.json(formatMeterForResponse(meter));
 		} catch (err) {
 			log.error(`Error while performing GET specific meter by id query: ${err}`, err);
@@ -60,3 +63,4 @@ router.get('/:meter_id', async (req, res) => {
 });
 
 module.exports = router;
+

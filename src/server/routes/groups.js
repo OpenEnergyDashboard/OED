@@ -6,8 +6,8 @@ const express = require('express');
 const _ = require('lodash');
 const validate = require('jsonschema').validate;
 
+const { getConnection } = require('../db');
 const Group = require('../models/Group');
-const getDB = require('../models/database').getDB;
 const authenticator = require('./authenticator');
 const { log } = require('../log');
 
@@ -23,13 +23,13 @@ function formatToOnlyNameAndID(item) {
 	return { id: item.id, name: item.name };
 }
 
-
 /**
  * GET IDs and names of all groups
  */
 router.get('/', async (req, res) => {
+	const conn = getConnection();
 	try {
-		const rows = await Group.getAll();
+		const rows = await Group.getAll(conn);
 		res.json(rows.map(formatToOnlyNameAndID));
 	} catch (err) {
 		log.error(`Error while preforming GET all groups query: ${err}`, err);
@@ -45,10 +45,11 @@ router.get('/', async (req, res) => {
  * @return {[int], [int]}  child meter IDs and child group IDs
  */
 router.get('/children/:group_id', async (req, res) => {
+	const conn = getConnection();
 	try {
 		const [meters, groups] = await Promise.all([
-			Group.getImmediateMetersByGroupID(req.params.group_id),
-			Group.getImmediateGroupsByGroupID(req.params.group_id)
+			Group.getImmediateMetersByGroupID(req.params.group_id, conn),
+			Group.getImmediateGroupsByGroupID(req.params.group_id, conn)
 		]);
 		res.json({ meters, groups });
 	} catch (err) {
@@ -71,8 +72,9 @@ router.get('/deep/groups/:group_id', async (req, res) => {
 	if (!validate(req.params, validParams).valid) {
 		res.sendStatus(400);
 	} else {
+		const conn = getConnection();
 		try {
-			const deepGroups = await Group.getDeepGroupsByGroupID(req.params.group_id);
+			const deepGroups = await Group.getDeepGroupsByGroupID(req.params.group_id, conn);
 			res.json({ deepGroups });
 		} catch (err) {
 			log.error(`Error while preforming GET on all deep child groups of specific group: ${err}`, err);
@@ -96,8 +98,9 @@ router.get('/deep/meters/:group_id', async (req, res) => {
 	if (!validate(req.params, validParams).valid) {
 		res.sendStatus(400);
 	} else {
+		const conn = getConnection();
 		try {
-			const deepMeters = await Group.getDeepMetersByGroupID(req.params.group_id);
+			const deepMeters = await Group.getDeepMetersByGroupID(req.params.group_id, conn);
 			res.json({ deepMeters });
 		} catch (err) {
 			log.error(`Error while preforming GET on all deep child meters of specific group: ${err}`, err);
@@ -138,12 +141,13 @@ router.post('/create', async (req, res) => {
 	if (!validate(req.body, validGroup).valid) {
 		res.sendStatus(400);
 	} else {
+		const conn = getConnection();
 		try {
-			await getDB().tx(async t => {
+			await conn.tx(async t => {
 				const newGroup = new Group(undefined, req.body.name);
-				await newGroup.insert(() => t);
-				const adoptGroupsQuery = req.body.childGroups.map(gid => newGroup.adoptGroup(gid, () => t));
-				const adoptMetersQuery = req.body.childMeters.map(mid => newGroup.adoptMeter(mid, () => t));
+				await newGroup.insert(t);
+				const adoptGroupsQuery = req.body.childGroups.map(gid => newGroup.adoptGroup(gid, t));
+				const adoptMetersQuery = req.body.childMeters.map(mid => newGroup.adoptMeter(mid, t));
 				return t.batch(_.flatten([adoptGroupsQuery, adoptMetersQuery]));
 			});
 			res.sendStatus(200);
@@ -190,28 +194,29 @@ router.put('/edit', async (req, res) => {
 		res.sendStatus(400);
 	} else {
 		try {
-			const currentGroup = await Group.getByID(req.body.id);
-			const currentChildGroups = await Group.getImmediateGroupsByGroupID(currentGroup.id);
-			const currentChildMeters = await Group.getImmediateMetersByGroupID(currentGroup.id);
+			const conn = getConnection();
+			const currentGroup = await Group.getByID(req.body.id, conn);
+			const currentChildGroups = await Group.getImmediateGroupsByGroupID(currentGroup.id, conn);
+			const currentChildMeters = await Group.getImmediateMetersByGroupID(currentGroup.id, conn);
 
-			await getDB().tx(t => {
+			await conn.tx(t => {
 				let nameChangeQuery = [];
 				if (req.body.name !== currentGroup.name) {
 					nameChangeQuery = currentGroup.rename(req.body.name, t);
 				}
 
 				const adoptedGroups = _.difference(req.body.childGroups, currentChildGroups);
-				const adoptGroupsQueries = adoptedGroups.map(gid => currentGroup.adoptGroup(gid));
+				const adoptGroupsQueries = adoptedGroups.map(gid => currentGroup.adoptGroup(gid, t));
 
 				const disownedGroups = _.difference(currentChildGroups, req.body.childGroups);
-				const disownGroupsQueries = disownedGroups.map(gid => currentGroup.disownGroup(gid));
+				const disownGroupsQueries = disownedGroups.map(gid => currentGroup.disownGroup(gid, t));
 
 				// Compute meters differences and adopt/disown to make changes
 				const adoptedMeters = _.difference(req.body.childMeters, currentChildMeters);
-				const adoptMetersQueries = adoptedMeters.map(mid => currentGroup.adoptMeter(mid));
+				const adoptMetersQueries = adoptedMeters.map(mid => currentGroup.adoptMeter(mid, t));
 
 				const disownedMeters = _.difference(currentChildMeters, req.body.childMeters);
-				const disownMetersQueries = disownedMeters.map(mid => currentGroup.disownMeter(mid));
+				const disownMetersQueries = disownedMeters.map(mid => currentGroup.disownMeter(mid, t));
 
 				return t.batch(_.flatten([nameChangeQuery, adoptGroupsQueries, disownGroupsQueries, adoptMetersQueries, disownMetersQueries]));
 			});
@@ -239,8 +244,9 @@ router.post('/delete', async (req, res) => {
 	if (!validate(req.body, validParams).valid) {
 		res.sendStatus(400);
 	} else {
+		const conn = getConnection();
 		try {
-			await Group.delete(req.body.id);
+			await Group.delete(req.body.id, conn);
 			res.sendStatus(200);
 		} catch (err) {
 			log.error(`Error while deleting group ${err}`, err);
@@ -250,3 +256,4 @@ router.post('/delete', async (req, res) => {
 });
 
 module.exports = router;
+

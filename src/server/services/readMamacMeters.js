@@ -61,24 +61,25 @@ async function getMeterInfo(url, ip, csvLine) {
  * @param rows The rows of the meters
  * @returns {Array.<Promise.<Meter>>}
  */
-function infoForAllMeters(rows) {
+function infoForAllMeters(rows, conn) {
 	return rows.map((row, index) => getMeterInfo(`http://${row.ip}/sm101.xml`, row.ip, index + 2));
 }
 
 /**
  * promises to insert the meters into the database
  * @param rows rows of the meters
+ * @param conn the database connection to use
  * @returns {Promise.<>}
  */
-async function insertMeters(rows) {
+async function insertMeters(rows, conn) {
 	const errors = [];
 	await Promise.all(infoForAllMeters(rows).map(
 			(promise, index) => promise
 			.then(async meter => {
-				if (await meter.existsByName()) {
+				if (await meter.existsByName(conn)) {
 					log.info(`CSV line ${index + 2}: Skipping existing meter ${meter.name}`);
 				} else {
-					meter.insert();
+					meter.insert(conn);
 				}
 			})
 			.catch(error => errors.push(error))
@@ -87,9 +88,9 @@ async function insertMeters(rows) {
 	return errors;
 }
 
-async function insertMetersWrapper(filename) {
+async function insertMetersWrapper(filename, conn) {
 	const errors = await parseCSV(filename)
-		.then(ips => insertMeters(ips))
+		.then(ips => insertMeters(ips, conn))
 		.catch(err => log.error(`Error inserting meters: ${err}`, err))
 		.then(stopDB());
 

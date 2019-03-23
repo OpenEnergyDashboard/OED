@@ -17,6 +17,7 @@ const expect = chai.expect;
 const { log, LogLevel } = require('../log');
 const User = require('../models/User');
 const { getDB, currentDB, createSchema, stopDB } = require('../models/database');
+const { swapConnection, dropConnection } = require('../db');
 const app = require('../app');
 
 // Configure Chai to use the required plugins
@@ -47,6 +48,7 @@ function connectTestDB() {
 	stopDB();
 	testDB._connection = getDB(testDBConfig);
 	testDB.config = testDBConfig;
+	swapConnection(testDB.config, testDB._connection);
 }
 
 // Disable logging during tests.
@@ -54,12 +56,17 @@ function connectTestDB() {
 log.level = LogLevel.SILENT;
 log.emailLevel = LogLevel.SILENT;
 
+// The user for use by tests.
+const testUser = new User(undefined, 'test@example.invalid', bcrypt.hashSync('password', 10));
+testUser.password = 'password';
+
 async function recreateDB() {
 	conn = testDB.getConnection();
 	// This should drop all database objects, as long as they were all created by the current database user
 	// They should be, since they were all created during a previous test.
 	await conn.none('DROP OWNED BY current_user;');
 	await createSchema(conn);
+	await testUser.insert(conn);
 }
 
 mocha.before(() => {
@@ -71,12 +78,8 @@ mocha.beforeEach(async () => {
 });
 
 mocha.after(() => {
-	stopDB();
+	dropConnection();
 });
-
-// The user for use by tests.
-const testUser = new User(undefined, 'test@example.invalid', bcrypt.hashSync('password', 10));
-testUser.password = 'password';
 
 module.exports = {
 	chai,

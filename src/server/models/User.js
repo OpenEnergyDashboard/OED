@@ -4,7 +4,6 @@
 
 const database = require('./database');
 
-const getDB = database.getDB;
 const sqlFile = database.sqlFile;
 
 class User {
@@ -34,7 +33,7 @@ class User {
 	 * @param id
 	 * @returns {Promise.<User>}
 	 */
-	static async getByID(conn, id) {
+	static async getByID(id, conn) {
 		const row = await conn.one(sqlFile('user/get_user_by_id.sql'), { id: id });
 		return new User(row.id, row.email);
 	}
@@ -42,11 +41,11 @@ class User {
 	/**
 	 * Returns a promise to retrieve the user with the given email from the database.
 	 * This exposes the user's password_hash and should only be used for authentication purposes.
-	 * @param conn is the connection to use.
-	 * @param email
+	 * @param email the email to look up
+	 * @param conn the connection to use.
 	 * @returns {Promise.<User>}
 	 */
-	static async getByEmail(conn, email) {
+	static async getByEmail(email, conn) {
 		const row = await conn.one(sqlFile('user/get_user_by_email.sql'), { email: email });
 		return new User(row.id, row.email, row.password_hash);
 	}

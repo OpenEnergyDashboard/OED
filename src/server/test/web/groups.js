@@ -120,8 +120,9 @@ mocha.describe('groups API', () => {
 				expect(res).to.have.status(401);
 			});
 			mocha.it('allows adding a new child meter to a group', async () => {
+				const conn = testDB.getConnection();
 				const meterD = new Meter(undefined, 'D', null, false, Meter.type.MAMAC);
-				await meterD.insert();
+				await meterD.insert(conn);
 				let res = await chai.request(app).put('/api/groups/edit').set('token', token).type('json').send({
 					id: groupC.id,
 					name: groupC.name,
@@ -139,8 +140,9 @@ mocha.describe('groups API', () => {
 				expect(res.body.groups).to.have.a.lengthOf(0);
 			});
 			mocha.it('allows adding a new child group to a group', async () => {
+				const conn = testDB.getConnection();
 				const groupD = new Group(undefined, 'D');
-				await groupD.insert();
+				await groupD.insert(conn);
 				let res = await chai.request(app).put('/api/groups/edit').set('token', token).type('json').send({
 					id: groupC.id,
 					name: groupC.name,

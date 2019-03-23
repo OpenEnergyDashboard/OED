@@ -8,6 +8,8 @@ const jwt = require('jsonwebtoken');
 const User = require('../models/User');
 const secretToken = require('../config').secretToken;
 const validate = require('jsonschema').validate;
+const { log } = require('../log');
+const { getConnection } = require('../db');
 
 const router = express.Router();
 
@@ -37,8 +39,9 @@ router.post('/', async (req, res) => {
 	if (!validate(req.body, validParams).valid) {
 		res.sendStatus(400);
 	} else {
+		const conn = getConnection();
 		try {
-			const user = await User.getByEmail(req.body.email);
+			const user = await User.getByEmail(req.body.email, conn);
 			const isValid = await bcrypt.compare(req.body.password, user.passwordHash);
 			if (isValid) {
 				const token = jwt.sign({ data: user.id }, secretToken, { expiresIn: 86400 });
@@ -50,6 +53,7 @@ router.post('/', async (req, res) => {
 			if (err.message === 'Unauthorized password' || err.message === 'No data returned from the query.') {
 				res.status(401).send({ text: 'Not authorized' });
 			} else {
+				log.error(`Unable to check user password for ${req.body.email}`, err);
 				res.status(500).send({ text: 'Internal Server Error' });
 			}
 		}
