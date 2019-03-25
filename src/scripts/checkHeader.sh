@@ -14,6 +14,7 @@ FILES=$(git ls-files)
 FILES=$(echo "$FILES" | grep -v ".*\.md")
 FILES=$(echo "$FILES" | grep -v "\.editorconfig")
 FILES=$(echo "$FILES" | grep -v "\.gitattributes")
+FILES=$(echo "$FILES" | grep -v ".vscode")
 FILES=$(echo "$FILES" | grep -v "package\.json")
 # Filter out generated files
 FILES=$(echo "$FILES" | grep -v "package-lock\.json")
