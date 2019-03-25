@@ -6,7 +6,7 @@
   "repository": "https://github.com/OpenEnergyDashboard/OED",
   "scripts": {
     "start": "node ./src/bin/www",
-    "start:dev": "./node_modules/.bin/nodemon ./src/bin/www",
+    "start:dev": "./node_modules/.bin/nodemon --inspect=0.0.0.0 ./src/bin/www",
     "webpack:dev": "webpack -d --watch --color --progress",
     "webpack:build": "cross-env NODE_ENV=production webpack -p",
     "webpack": "webpack -d --color --progress",
