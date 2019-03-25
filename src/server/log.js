@@ -7,6 +7,7 @@
 const fs = require('fs');
 const logFile = require('./config').logFile;
 const LogEmail = require('./models/LogEmail');
+const { getConnection } = require('./db');
 
 /**
  * Represents the importance of a message to be logged
@@ -52,6 +53,8 @@ class Logger {
 	log(level, message, error = null, skipMail = false) {
 		let messageToLog = `[${level.name}@${new Date(Date.now()).toISOString()}] ${message}\n`;
 
+		const conn = getConnection();
+
 		// Add a stacktrace to the message if one was provided.
 		if (error !== null) {
 			if (error.stack) {
@@ -89,16 +92,16 @@ class Logger {
 			}
 		}
 
-		// Only send an e-mail if given a high enough priority level.
-		if (level.priority <= this.emailLevel.priority) {
+		// Only send an e-mail if given a high enough priority level and the database is connected
+		if (level.priority <= this.emailLevel.priority && conn !== null) {
 			let messageToMail = `At ${new Date(Date.now()).toISOString()}, an ${level.name} event occurred.\n`;
 			messageToMail += `${message}\n`;
 			const logEmail = new LogEmail(undefined, messageToMail);
 			(async () => {
 				try {
-					await logEmail.insert();
+					await logEmail.insert(conn);
 				} catch (err) {
-					console.error(`Error while inserting log mail ${err}`); // tslint:disable-line no-console
+					console.error(`Error while inserting log mail ${err} (${err.stack})`); // tslint:disable-line no-console
 				}
 			})();
 		}

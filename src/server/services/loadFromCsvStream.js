@@ -4,7 +4,6 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/.
  */
 
-const getDB = require('../models/database').getDB;
 const csv = require('csv');
 
 /**
@@ -79,3 +78,4 @@ function loadFromCsvStream(stream, mapRowToModel, bulkInsertModels, conn) {
 	}));
 }
 module.exports = loadFromCsvStream;
+

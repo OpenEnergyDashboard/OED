@@ -73,7 +73,7 @@ function infoForAllMeters(rows, conn) {
  */
 async function insertMeters(rows, conn) {
 	const errors = [];
-	await Promise.all(infoForAllMeters(rows).map(
+	await Promise.all(infoForAllMeters(rows, conn).map(
 			(promise, index) => promise
 			.then(async meter => {
 				if (await meter.existsByName(conn)) {
@@ -91,17 +91,11 @@ async function insertMeters(rows, conn) {
 async function insertMetersWrapper(filename, conn) {
 	const errors = await parseCSV(filename)
 		.then(ips => insertMeters(ips, conn))
-		.catch(err => log.error(`Error inserting meters: ${err}`, err))
-		.then(stopDB());
-
-	for (const err of errors) {
-		log.error(`Error inserting meters: ${err}`, err);
-	}
-
-	log.info('Done inserting meters');
+		.catch(err => log.error(`Error inserting meters: ${err}`, err));
 }
 
 module.exports = {
 	insertMetersWrapper,
 	insertMeters
 };
+

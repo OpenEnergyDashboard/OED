@@ -10,6 +10,7 @@ const { ask, terminateReadline } = require('./utils');
 const { findMaxSemanticVersion } = require('../util');
 const { showPossibleMigrations, migrateAll, getUniqueVersions } = require('../migrations/migrateDatabase');
 const migrationList = require('../migrations/registerMigration');
+const { getConnection, dropConnection } = require('../db');
 
 function findMaxVersion(list) {
 	return findMaxSemanticVersion(getUniqueVersions(list));
@@ -43,12 +44,13 @@ function findMaxVersion(list) {
 		}
 	}
 
+	const conn = getConnection();
 	try {
-		const currentVersion = await Migration.getCurrentVersion();
+		const currentVersion = await Migration.getCurrentVersion(conn);
 		if (currentVersion === toVersion) {
 			terminateReadline(`Cannot migrate. You already have the highest version ${currentVersion}`);
 		} else {
-			const result = await migrateAll(toVersion, migrationList);
+			const result = await migrateAll(toVersion, migrationList, conn);
 			if (result !== undefined) {
 				terminateReadline('Migration successful');
 			} else {
@@ -61,3 +63,4 @@ function findMaxVersion(list) {
 		terminateReadline('Migration failed');
 	}
 })();
+

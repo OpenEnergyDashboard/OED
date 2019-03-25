@@ -5,6 +5,8 @@
 const bcrypt = require('bcryptjs');
 const User = require('../../models/User');
 const { ask, terminateReadline } = require('../utils');
+const { getConnection, dropConnection } = require('../../db');
+
 
 (async () => {
 	let email;
@@ -20,9 +22,11 @@ const { ask, terminateReadline } = require('../utils');
 		terminateReadline('Password must be at least eight characters, user\'s password not modified');
 	}
 
+	const conn = getConnection();
 	try {
-		await User.getByEmail(email);
+		await User.getByEmail(email, conn);
 	} catch (err) {
+		dropConnection();
 		terminateReadline('No user with that email exists');
 	}
 
@@ -32,5 +36,7 @@ const { ask, terminateReadline } = require('../utils');
 		terminateReadline('User\'s password updated');
 	} catch (err) {
 		terminateReadline('Failed to update user\'s password');
+	} finally {
+		dropConnection();
 	}
 })();
