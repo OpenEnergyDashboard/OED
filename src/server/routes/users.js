@@ -44,7 +44,7 @@ router.get('/:user_id', async (req, res) => {
 	} else {
 		const conn = getConnection();
 		try {
-			const rows = await User.getByID(req.params.user_id);
+			const rows = await User.getByID(req.params.user_id, conn);
 			res.json(rows);
 		} catch (err) {
 			log.error(`Error while performing GET specific user by id query: ${err}`, err);

@@ -38,7 +38,7 @@ class Preferences {
 	}
 
 	/**
-	 *
+	 * Get the preferences from the database.
 	 * @param conn is the connection to use.
 	 */
 	static async get(conn) {
@@ -46,7 +46,11 @@ class Preferences {
 		return Preferences.mapRow(row);
 	}
 
-	static async update(conn, newPreferences) {
+	/**
+	 * Update the preferences in the database.
+	 * @param conn the database connection to use.
+	 */
+	static async update(newPreferences, conn) {
 		const preferences = await Preferences.get();
 		_.merge(preferences, newPreferences);
 		await conn.none(sqlFile('preferences/update_preferences.sql'),

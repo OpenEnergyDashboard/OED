@@ -41,6 +41,7 @@ mocha.describe('Compressed Readings', () => {
 	});
 
 	mocha.it('compresses readings with a gap', async () => {
+		conn = testDB.getConnection();
 		const reading1 = new Reading(meter.id, 100, timestamp1, timestamp2);
 		const reading2 = new Reading(meter.id, 200, timestamp2, timestamp3);
 		const reading3 = new Reading(meter.id, 300, timestamp4, timestamp5);
@@ -56,6 +57,7 @@ mocha.describe('Compressed Readings', () => {
 	});
 
 	mocha.it('compresses readings that overlap an end point', async () => {
+		conn = testDB.getConnection();
 		const reading1 = new Reading(meter.id, 100, timestamp1, timestamp2);
 		const reading2 = new Reading(meter.id, 200, timestamp2, timestamp3);
 		await Reading.insertAll([reading1, reading2], conn);
@@ -69,6 +71,7 @@ mocha.describe('Compressed Readings', () => {
 	});
 
 	mocha.it('compresses readings for multiple meters at once', async () => {
+		conn = testDB.getConnection();
 		await new Meter(undefined, 'Meter2', null, false, Meter.type.MAMAC).insert(conn);
 		await new Meter(undefined, 'Meter3', null, false, Meter.type.MAMAC).insert(conn);
 		const meter2 = await Meter.getByName('Meter2', conn);
@@ -86,6 +89,7 @@ mocha.describe('Compressed Readings', () => {
 	});
 
 	mocha.it('returns no readings when none exist', async () => {
+		conn = testDB.getConnection();
 		const result = await Reading.getCompressedReadings([meter.id], null, null, 1, conn);
 
 		expect(result).to.deep.equal({ [meter.id]: [] });
@@ -97,6 +101,7 @@ mocha.describe('Compressed Readings', () => {
 		const endTimestamp = moment('2017-01-01').add(1, 'hour');
 		const readingValue = 10;
 		mocha.beforeEach(async () => {
+			conn = testDB.getConnection();
 			// Groups A and B will each contain a meter
 			const groupA = new Group(undefined, 'A');
 			const groupB = new Group(undefined, 'B');
@@ -113,13 +118,12 @@ mocha.describe('Compressed Readings', () => {
 			await groupB.adoptMeter(meter2.id, conn);
 			await groupC.adoptGroup(groupA.id, conn);
 			await groupC.adoptGroup(groupB.id, conn);
-
-			// Add some readings to the meters
 			const reading1 = new Reading(meter.id, readingValue, startTimestamp, endTimestamp);
 			const reading2 = new Reading(meter2.id, readingValue, startTimestamp, endTimestamp);
 			await Reading.insertAll([reading1, reading2], conn);
 		});
 		mocha.it('can get readings from a group containing meters', async () => {
+			conn = testDB.getConnection();
 			const groupA = await Group.getByName('A', conn);
 			const actualReadings = await Reading.getCompressedGroupReadings([groupA.id], null, null, 1, conn);
 			expect(actualReadings[groupA.id]).to.have.lengthOf(1);
@@ -128,6 +132,7 @@ mocha.describe('Compressed Readings', () => {
 			expect(actualReadings[groupA.id][0].reading_rate).to.equal(readingValue);
 		});
 		mocha.it('can get readings from a group containing groups containing meters', async () => {
+			conn = testDB.getConnection();
 			const groupC = await Group.getByName('C', conn);
 			const actualReadings = await Reading.getCompressedGroupReadings([groupC.id], null, null, 1, conn);
 			expect(actualReadings[groupC.id]).to.have.lengthOf(1);

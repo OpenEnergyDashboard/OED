@@ -25,6 +25,7 @@ class Meter {
 
 	/**
 	 * Returns a promise to create the meters table.
+	 * @param conn the connection to use
 	 * @return {Promise.<>}
 	 */
 	static createTable(conn) {
@@ -34,6 +35,7 @@ class Meter {
 	/**
 	 * Returns a promise to create the meter_type type.
 	 * This needs to be run before Meter.createTable().
+	 * @param conn the connection to use
 	 * @return {Promise<void>}
 	 */
 	static createMeterTypesEnum(conn) {

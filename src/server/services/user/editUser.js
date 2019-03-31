@@ -32,7 +32,7 @@ const { getConnection, dropConnection } = require('../../db');
 
 	try {
 		const passwordHash = bcrypt.hashSync(password, 10);
-		await User.updateUserPassword(email, passwordHash);
+		await User.updateUserPassword(email, passwordHash, conn);
 		terminateReadline('User\'s password updated');
 	} catch (err) {
 		terminateReadline('Failed to update user\'s password');

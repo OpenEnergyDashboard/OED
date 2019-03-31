@@ -23,6 +23,7 @@ class Reading {
 
 	/**
 	 * Returns a promise to create the readings table.
+	 * @param conn the database connection to use
 	 * @return {Promise.<>}
 	 */
 	static createTable(conn) {
@@ -31,16 +32,27 @@ class Reading {
 
 	/**
 	 * Returns a promise to create the compressed readings function.
+	 * @param conn the database connection to use
 	 * @return {Promise.<>}
 	 */
 	static createCompressedReadingsFunction(conn) {
 		return conn.none(sqlFile('reading/create_function_get_compressed_readings.sql'));
 	}
 
+	/**
+	 * Returns a promise to create the compressed groups readings function.
+	 * @param conn the database connection to use
+	 * @return {Promise.<>}
+	 */
 	static createCompressedGroupsReadingsFunction(conn) {
 		return conn.none(sqlFile('reading/create_function_get_compressed_groups_readings.sql'));
 	}
 
+	/**
+	 * Returns a promise to create the compressed groups barchart readings function.
+	 * @param conn the database connection to use
+	 * @return {Promise.<>}
+	 */
 	static createCompressedGroupsBarchartReadingsFunction(conn) {
 		return conn.none(sqlFile('reading/create_function_get_group_barchart_readings.sql'));
 	}

@@ -62,10 +62,12 @@ class User {
 
 	/**
 	 * Returns a promise to update a user's password
+	 * @param email the email of the user whose password is to be updated
+	 * @param passwordHash the new password's hash
 	 * @param conn is the connection to use.
 	 * @returns {Promise.<array.<User>>}
 	 */
-	static async updateUserPassword(conn, email, passwordHash) {
+	static async updateUserPassword(email, passwordHash, conn) {
 		return conn.none(sqlFile('user/update_user_password.sql'), { email: email, password_hash: passwordHash });
 	}
 

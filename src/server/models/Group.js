@@ -20,6 +20,7 @@ class Group {
 
 	/**
 	 * Returns a promise to create all the groups tables.
+	 * @param conn the database connection to use
 	 * @returns {Promise<>}
 	 */
 	static createTables(conn) {
