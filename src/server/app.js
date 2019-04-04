@@ -9,6 +9,7 @@ const favicon = require('serve-favicon');
 const logger = require('morgan');
 const cookieParser = require('cookie-parser');
 const bodyParser = require('body-parser');
+const config = require('./config');
 
 const { log, LogLevel } = require('./log');
 
@@ -21,7 +22,8 @@ const login = require('./routes/login');
 const verification = require('./routes/verification');
 const groups = require('./routes/groups');
 const version = require('./routes/version');
-const config = require('./config');
+const createRouterForNewCompressedReadings = require('./routes/compressedReadings').createRouter;
+const createRouterForCompareReadings = require('./routes/compareReadings').createRouter;
 const baseline = require('./routes/baseline');
 
 const app = express();
@@ -46,8 +48,10 @@ app.use('/api/groups', groups);
 app.use('/api/verification', verification);
 app.use('/api/fileProcessing', fileProcessing);
 app.use('/api/version', version);
-app.use(express.static(path.join(__dirname, '..', 'client', 'public')));
+app.use('/api/compressedReadings', createRouterForNewCompressedReadings());
+app.use('/api/compareReadings', createRouterForCompareReadings());
 app.use('/api/baselines', baseline);
+app.use(express.static(path.join(__dirname, '..', 'client', 'public')));
 
 const router = express.Router();
 

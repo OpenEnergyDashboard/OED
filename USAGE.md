@@ -92,10 +92,6 @@ If you are not using Docker, you need to install the dependencies yourself. Spec
 install Node.js version 8.11 or higher; NPM, the Node package manager; and PostgreSQL
 version 9.6 or higher.
 
-Once PostgreSQL is installed, you will need to run the ```init.sql``` file from the
-`database` directory with `psql -U postgres -f database/init.sql`. This adds the user
-OED with password `opened` and creates the databases `oed` and `oed_testing`.
-
 Docker also manages configuration. If you are not using Docker, you will need to create a
 .env file (a file whose name is `.env` and nothing else) in the root directory of the project
 with the following contents, with any changes needed for your system.
@@ -144,6 +140,8 @@ Add meters from the ips.csv file with
 `docker-compose exec web npm run addMamacMeters ips.csv`,
 then fetch data from the meters you just added with
 `docker-compose exec web npm run updateMamacMeters`.
+Finally, update aggregate readings with
+`docker-compose exec web npm run refreshReadingViews`.
 
 ### Environment Variables ###
 The OED server is configured via environment variables, as follows.
@@ -177,8 +175,10 @@ The OED server is configured via environment variables, as follows.
 
 1. Copy ```src/scripts/updateMamacMetersOEDCron.bash``` to ```/etc/cron.hourly/updateMamacMetersOEDCron.bash``` and make the necessary modifications to the script. See the script for more detail.
 1. Copy ```src/scripts/sendLogEmailCron.bash``` to ```/etc/cron.daily/sendLogEmailCron.bash``` and make the necessary modifications to the script. See the script for more detail.
+1. Copy ```src/scripts/refreshReadingViewsCron.bash``` to ```/etc/cron.daily/refreshReadingViewsCron.bash``` and make the necessary modifications to the script. See the script for more detail.
 1. Run ```chmod +x updateMamacMetersOEDCron.bash``` to make the script executable.
 1. Run ```chmod +x sendLogEmailCron.bash``` to make the script executable.
+1. Run ```chmod +x refreshReadingViewsCron.bash``` to make the script executable.
 1. Copy ```src/scripts/oed.service``` to ```/etc/systemd/system/oed.service``` and make the necessary modifications to the script. See the script for more detail.
 1. Update your meters to get data for the first time. Refer to the Administration section below.
 1. Run ```systemctl enable oed.service``` to make the service start on server boot.
@@ -231,6 +231,7 @@ Administration:
 * `createdb` creates the database schema in an uninitialized database. It will not update the schema.
 * `addMamacMeters` adds meters from a CSV file (see above).
 * `updateMamacMeters` fetches new data from previously imported Mamac meters.
+* `refreshReadingViews` aggregates readings data in the database.
 * `createUser` creates a new user. If given no arguments, it is interactive; you can also pass the username and password as command line arguments.
 * `editUser` edits the password of an existing user.
 

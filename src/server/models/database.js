@@ -92,12 +92,11 @@ async function createSchema(conn) {
 	await Migration.createTable(conn);
 	await LogEmail.createTable(conn);
 	await conn.none(sqlFile('reading/create_function_get_compressed_readings.sql'));
+	await Reading.createCompressedReadingsMaterializedViews(conn);
+	await Reading.createCompareFunction(conn);
 	await Baseline.createTable(conn);
 	await conn.none(sqlFile('baseline/create_function_get_average_reading.sql'));
 }
-
-// Create a new database connection.
-// db = getDB();
 
 module.exports = {
 	getDB,
