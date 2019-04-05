@@ -66,7 +66,7 @@ router.get('/line/meters/:meter_ids', async (req, res) => {
 		const meterIDs = req.params.meter_ids.split(',').map(s => parseInt(s));
 		const timeInterval = TimeInterval.fromString(req.query.timeInterval);
 		try {
-			// rawCompressedReadings and formattedCompressedReadings get meters readings and then is formatted into
+			// rawCompressedReadings and formattedCompressedReadings get meters readings and then are formatted into
 			// json.
 			const rawCompressedReadings = await Reading.getCompressedReadings(meterIDs, timeInterval.startTimestamp,
 				timeInterval.endTimestamp, 100);

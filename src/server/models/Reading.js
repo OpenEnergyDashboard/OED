@@ -78,7 +78,6 @@ class Reading {
 	 * @returns {Promise.<>}
 	 */
 	static insertAll(readings, conn = getDB) {
-		// TODO: What does tx and sequence do?
 		return conn().tx(t => t.sequence(function seq(i) {
 			const seqT = this;
 			return readings[i] && readings[i].insert(conn = () => seqT);
@@ -88,7 +87,7 @@ class Reading {
 	/**
 	 * Returns a promise to insert or update all of the given readings into the database (as a transaction)
 	 * @param {array<Reading>} readings the readings to insert or update
-	 * @param conn the connection to use. Defaults to the default database connection.
+	 * @param conn the connection to use. Defaults to the def		ault database connection.
 	 * @returns {Promise.<>}
 	 */
 	static insertOrUpdateAll(readings, conn = getDB) {

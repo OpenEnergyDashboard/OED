@@ -13,7 +13,7 @@ CREATE OR REPLACE FUNCTION compressed_readings(
     to_timestamp TIMESTAMP = 'infinity',
 		-- Number of points to make out of the compression.
     num_points INT = 500)
-	-- Return a table with the id, TODO: reading rate?, and the short interval within the total time for this compression.
+	-- Return a table with the id.
 	RETURNS TABLE(meter_ID INTEGER, reading_rate FLOAT, start_timestamp TIMESTAMP, end_timestamp TIMESTAMP) AS $$
 
 	-- Create some variables to hold how wide each point will be in time and when the readings actually start and end.

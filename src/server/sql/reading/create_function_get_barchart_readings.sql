@@ -53,11 +53,11 @@ CREATE OR REPLACE FUNCTION barchart_readings(
 			-- Convert the weighted average of the meter's readings from agg.start -> agg.start + real_duration to an integer.
 			CAST(
 					ROUND(
-						-- Do a weighted average of the all readings in the duration agg.start -> agg.start + real_duration.
+						-- Do a weighted average of all the readings in the duration agg.start -> agg.start + real_duration.
 							SUM(
 							-- Divide the value of the reading by the number of seconds the reading covered.
 							 r.reading / (EXTRACT(EPOCH FROM (r.end_timestamp - r.start_timestamp)))
-							-- Get amount of time this reading over laps the current time segment.
+							-- Get amount of time this reading overlaps the current time segment.
 							 * EXTRACT(EPOCH FROM (least(r.end_timestamp, (agg.start + real_duration)) - greatest(r.start_timestamp, agg.start)))
 					)) AS INTEGER
 			),
@@ -65,7 +65,7 @@ CREATE OR REPLACE FUNCTION barchart_readings(
 			agg.start,
 			agg.start + real_duration
 		FROM readings r
-		-- Use all readings from meters that an id in the meter_ids array.
+		-- Use all readings from meters that have an id in the meter_ids array.
 		INNER JOIN unnest(meter_ids) specific_meter(id) ON r.meter_id = specific_meter.id
 			-- Create an array to iterate over. agg (which is short for aggregation) will hold the start of the interval to
 			-- aggregate over.
@@ -74,7 +74,7 @@ CREATE OR REPLACE FUNCTION barchart_readings(
 					-- Select a reading only if it is overlapping the current aggregation interval.
 					(r.start_timestamp, r.end_timestamp) OVERLAPS (agg.start, agg.start + real_duration)
 					AND -- generate_series is an end-inclusive range (meaning at some point agg.start = real_end_timestamp),
-					--  so we make it an open interval with the second OVERLAPS statement since,
+					--  so we make it an open interval with the second OVERLAPS statement since
 					-- (real_end, real_end + duration) does not overlap (real_start, real_end).
 					(agg.start, agg.start + duration) OVERLAPS (real_start_timestamp, real_end_timestamp)
 		-- Group the query so that all readings from a single meter are nearby and then by all aggregations that are over

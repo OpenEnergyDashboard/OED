@@ -7,7 +7,6 @@
 /**
 	This function gets a group of barchart readings and returns a table of those group readings.
 */
-
 CREATE OR REPLACE FUNCTION barchart_group_readings(
 	group_ids INTEGER[],
 	duration INTERVAL,

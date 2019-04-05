@@ -29,7 +29,7 @@ CREATE OR REPLACE FUNCTION compressed_group_readings(
 
 		RETURN QUERY
 			-- Find group_ids, the sum of compressed_reading_rates, compressed_start and compressed_end timestamps from
-			-- the output of the lcompressed_readings function and perform a join.
+			-- the output of the compressed_readings function and perform a join.
 			SELECT
 				gdm.group_id AS group_id,
 				SUM(compressed.reading_rate) AS reading_rate,
