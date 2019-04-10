@@ -14,7 +14,7 @@
     "check:header": "./src/scripts/checkHeader.sh",
     "check:typescript": "./src/scripts/checkTypescript.sh",
     "check:types": "./node_modules/.bin/tsc -p . --noEmit",
-    "check:lint": "./node_modules/.bin/tslint -c tslint.json src/{server,bin,scripts,common}/**/*.{ts,tsx,js,jsx} src/client/app/**/*.{ts,tsx,js,jsx}",
+    "check:lint": "./node_modules/.bin/tslint src/{server,bin,scripts,common}/**/*.{ts,tsx,js,jsx} src/client/app/**/*.{ts,tsx,js,jsx}",
     "test": "./node_modules/.bin/mocha \"src/server/test/**/*.js\"",
     "createdb": "node ./src/server/services/createDB.js",
     "migratedb": "node ./src/server/services/migrateDB.js",
