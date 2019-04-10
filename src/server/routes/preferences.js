@@ -5,7 +5,7 @@
 const express = require('express');
 const Preferences = require('../models/Preferences');
 const { log } = require('../log');
-const authentication = require('./authenticator');
+const authentication = require('./authenticator').authMiddleware;
 const validate = require('jsonschema').validate;
 const { getConnection } = require('../db');
 

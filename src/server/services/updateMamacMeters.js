@@ -14,8 +14,8 @@ async function updateMamacMeters() {
 	const conn = getConnection();
 	log.info('Fetching new Mamac meter data');
 	try {
-		const allMeters = await Meter.getAll(conn);
-		const metersToUpdate = allMeters.filter(m => m.enabled && m.type === Meter.type.MAMAC);
+		const allMeters = await Meter.getEnabled(conn);
+		const metersToUpdate = allMeters.filter(m => m.type === Meter.type.MAMAC);
 		await updateMeters(readMamacData, metersToUpdate, conn);
 	} catch (err) {
 		log.error(`Error fetching Mamac meter data: ${err}`, err);

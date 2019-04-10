@@ -13,7 +13,7 @@ mocha.describe('Metasys readings', () => {
 	mocha.describe('with metasys-duplicate meter', () => {
 		mocha.beforeEach(async () => {
 			conn = testDB.getConnection();
-			await new Meter(undefined, 'metasys-duplicate', null, false, Meter.type.METASYS).insert(conn);
+			await new Meter(undefined, 'metasys-duplicate', null, false, true, Meter.type.METASYS).insert(conn);
 		//	meter = await Meter.getByName('metasys-duplicate');
 		});
 
@@ -36,7 +36,7 @@ mocha.describe('Metasys readings', () => {
 	mocha.describe('with metasys-invalid meter', () => {
 		mocha.beforeEach(async () => {
 			conn = testDB.getConnection();
-			await new Meter(undefined, 'metasys-invalid', null, false, Meter.type.METASYS).insert(conn);
+			await new Meter(undefined, 'metasys-invalid', null, false, true, Meter.type.METASYS).insert(conn);
 		});
 
 		mocha.it('errors correctly on an invalid file', () => {
@@ -60,7 +60,7 @@ mocha.describe('Metasys readings', () => {
 	mocha.describe('with metasys-valid meter', () => {
 		mocha.beforeEach(async () => {
 			conn = testDB.getConnection();
-			await new Meter(undefined, 'metasys-valid', null, false, Meter.type.METASYS).insert(conn);
+			await new Meter(undefined, 'metasys-valid', null, false, true, Meter.type.METASYS).insert(conn);
 		});
 
 		mocha.it('loads the correct number of rows from a file', async () => {

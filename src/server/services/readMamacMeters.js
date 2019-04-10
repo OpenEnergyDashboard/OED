@@ -52,7 +52,7 @@ async function getMeterInfo(url, ip, csvLine) {
 		.then(raw => parseXMLPromisified(raw))
 		.then(xml => {
 			const name = xml.Maverick.NodeID[0];
-			return new Meter(undefined, name, ip, true, Meter.type.MAMAC);
+			return new Meter(undefined, name, ip, true, true, Meter.type.MAMAC);
 		});
 }
 
@@ -79,7 +79,7 @@ async function insertMeters(rows, conn) {
 				if (await meter.existsByName(conn)) {
 					log.info(`CSV line ${index + 2}: Skipping existing meter ${meter.name}`);
 				} else {
-					meter.insert(conn);
+					await meter.insert(conn);
 				}
 			})
 			.catch(error => errors.push(error))
@@ -98,4 +98,3 @@ module.exports = {
 	insertMetersWrapper,
 	insertMeters
 };
-

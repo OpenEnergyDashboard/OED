@@ -8,7 +8,7 @@ const validate = require('jsonschema').validate;
 
 const { getConnection } = require('../db');
 const Group = require('../models/Group');
-const authenticator = require('./authenticator');
+const authenticator = require('./authenticator').authMiddleware;
 const { log } = require('../log');
 
 const router = express.Router();

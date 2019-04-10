@@ -5,7 +5,7 @@
 /* This file tests the API for retrieving meters, by artificially
  * inserting meters prior to executing the test code. */
 
-const { chai, mocha, expect, app, testDB } = require('../common');
+const { chai, mocha, expect, app, testDB, testUser } = require('../common');
 const Meter = require('../../models/Meter');
 
 mocha.describe('meters API', () => {
@@ -16,11 +16,12 @@ mocha.describe('meters API', () => {
 		expect(res.body).to.have.lengthOf(0);
 	});
 
-	mocha.it('returns all existing meters', async () => {
+	mocha.it('returns all visible meters', async () => {
 		const conn = testDB.getConnection();
-		await new Meter(undefined, 'Meter 1', '1.1.1.1', true, Meter.type.MAMAC).insert(conn);
-		await new Meter(undefined, 'Meter 2', '1.1.1.1', true, Meter.type.MAMAC).insert(conn);
-		await new Meter(undefined, 'Meter 3', '1.1.1.1', true, Meter.type.MAMAC).insert(conn);
+		await new Meter(undefined, 'Meter 1', '1.1.1.1', true, true, Meter.type.MAMAC).insert(conn);
+		await new Meter(undefined, 'Meter 2', '1.1.1.1', true, true, Meter.type.MAMAC).insert(conn);
+		await new Meter(undefined, 'Meter 3', '1.1.1.1', true, true, Meter.type.MAMAC).insert(conn);
+		await new Meter(undefined, 'Not Visible', '1.1.1.1', true, false, Meter.type.MAMAC).insert(conn);
 
 		const res = await chai.request(app).get('/api/meters');
 		expect(res).to.have.status(200);
@@ -36,11 +37,40 @@ mocha.describe('meters API', () => {
 			expect(meter).not.to.have.property('type');
 		}
 	});
+	mocha.describe('with authentication', () => {
+		let token;
+		mocha.before(async () => {
+			let res = await chai.request(app).post('/api/login')
+				.send({ email: testUser.email, password: testUser.password });
+			token = res.body.token;
+		});
+		mocha.it('returns all meters', async () => {
+			const conn = testDB.getConnection();
+			await new Meter(undefined, 'Meter 1', '1.1.1.1', true, true, Meter.type.MAMAC).insert(conn);
+			await new Meter(undefined, 'Meter 2', '1.1.1.1', true, true, Meter.type.MAMAC).insert(conn);
+			await new Meter(undefined, 'Meter 3', '1.1.1.1', true, true, Meter.type.MAMAC).insert(conn);
+			await new Meter(undefined, 'Not Visible', '1.1.1.1', true, false, Meter.type.MAMAC).insert(conn);
+
+			const res = await chai.request(app).get('/api/meters').set('token', token);
+			expect(res).to.have.status(200);
+			expect(res).to.be.json;
+			expect(res.body).to.have.lengthOf(4);
+
+			for (let i = 0; i++; i < 4) {
+				const meter = res.body[i];
+				expect(meter).to.have.property('id');
+				expect(meter).to.have.property('name', `Meter ${i + 1}`);
+				expect(meter).not.to.have.property('ipAddress');
+				expect(meter).not.to.have.property('enabled');
+				expect(meter).not.to.have.property('type');
+			}
+		});
+	});
 
 	mocha.it('returns details on a single meter by ID', async () => {
 		const conn = testDB.getConnection();
-		await new Meter(undefined, 'Meter 1', '1.1.1.1', true, Meter.type.MAMAC).insert(conn);
-		const meter2 = new Meter(undefined, 'Meter 2', '1.1.1.1', true, Meter.type.MAMAC);
+		await new Meter(undefined, 'Meter 1', '1.1.1.1', true, true, Meter.type.MAMAC).insert(conn);
+		const meter2 = new Meter(undefined, 'Meter 2', '1.1.1.1', true, true, Meter.type.MAMAC);
 		await meter2.insert(conn);
 
 		const res = await chai.request(app).get(`/api/meters/${meter2.id}`);
@@ -52,7 +82,7 @@ mocha.describe('meters API', () => {
 
 	mocha.it('responds appropriately when the meter in question does not exist', async () => {
 		const conn = testDB.getConnection();
-		const meter = new Meter(undefined, 'Meter', '1.1.1.1', true, Meter.type.MAMAC);
+		const meter = new Meter(undefined, 'Meter', '1.1.1.1', true, true, Meter.type.MAMAC);
 		await meter.insert(conn);
 
 		const res = await chai.request(app).get(`/api/meters/${meter.id + 1}`);
