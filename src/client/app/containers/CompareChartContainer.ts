@@ -12,7 +12,6 @@ import { State } from '../types/redux/state';
 import { getComparePeriodLabels, getCompareChangeSummary } from '../utils/calculateCompare';
 import { CompareEntity } from './MultiCompareChartContainer';
 import translate from '../utils/translate';
-import {CompressedBarReading} from '../types/compressed-readings';
 
 if (datalabels === null || datalabels === undefined) {
 	throw new Error('Datalabels plugin was tree-shaken out.');
@@ -48,40 +47,18 @@ function mapStateToProps(state: State, ownProps: CompareChartContainerProps): Li
 
 	labels.push(periodLabels.prev);
 	labels.push(periodLabels.current);
-	const readingsAfterCurrentTimeColor = 'rgba(173, 216, 230, 1)';
-	const readingsBeforeCurrentTimeColor = 'rgba(218, 165, 32, 1)';
-	const projectedDataColor = 'rgba(173, 216, 230, 0.45)';
+	const barColor = 'rgba(218, 165, 32, 1)';
 	datasets.push(
 		{
-			data: [entity.lastPeriodTotalUsage, Math.round((entity.currentPeriodUsage / entity.usedToThisPointLastTimePeriod) * entity.lastPeriodTotalUsage)],
-			datalabels: {
-				anchor: 'end',
-				align: 'start'
-			}
-		}, {
-			data: [entity.usedToThisPointLastTimePeriod, entity.currentPeriodUsage],
+			data: [entity.prevUsage, entity.currUsage],
 			datalabels: {
 				anchor: 'end',
 				align: 'start'
 			}
 		}
 	);
-	// sorts the data so that one doesn't cover up the other
-	datasets.sort((a, b) => {
-		if (a.data !== undefined && b.data !== undefined) {
-			return +(a.data[0]) - +(b.data[0]);
-		} else {
-			return 0;
-		}
-	});
-
-
-	// apply info to datasets after sort
-	datasets[0].backgroundColor = [readingsBeforeCurrentTimeColor, readingsBeforeCurrentTimeColor];
-	datasets[0].hoverBackgroundColor = [readingsBeforeCurrentTimeColor, readingsBeforeCurrentTimeColor];
-	datasets[1].backgroundColor = [readingsAfterCurrentTimeColor, projectedDataColor];
-	datasets[1].hoverBackgroundColor = [readingsAfterCurrentTimeColor, projectedDataColor];
-
+	datasets[0].backgroundColor = barColor;
+	datasets[0].hoverBackgroundColor = barColor;
 
 	const data: ChartData = {datasets, labels};
 	const ticks: LinearTickOptions = {
@@ -125,17 +102,14 @@ function mapStateToProps(state: State, ownProps: CompareChartContainerProps): Li
 					const usage = tooltipItem.yLabel;
 					const usedThisTime = data.datasets![0].data![0];
 					const usedSoFar = data.datasets![0].data![1];
-					const totalUsed = data.datasets![1].data![0];
 					const labelText = tooltipItem.xLabel!.toLowerCase();
 					switch (usage) {
 						case usedThisTime:
 							return `${usage} kW ${translate('used.this.time')} ${labelText}`;
 						case usedSoFar:
 							return `${usage} kW ${translate('used.so.far')} ${labelText}`;
-						case totalUsed:
-							return `${usage} kW ${translate('total')} ${labelText}`;
 						default:
-							return `${usage} kW ${translate('projected.to.be.used')} ${labelText}`;
+							return '';
 					}
 				},
 				title: () => ''

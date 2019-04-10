@@ -30,7 +30,7 @@ const app = express();
 
 // If other logging is turned off, there's no reason to log HTTP requests either.
 // TODO: Potentially modify the Morgan logger to use the log API, thus unifying all our logging.
-if (log.level != LogLevel.SILENT) {
+if (log.level !== LogLevel.SILENT) {
 	app.use(logger('dev'));
 }
 

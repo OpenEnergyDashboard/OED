@@ -27,6 +27,11 @@ export enum ActionType {
 	RequestMeterLineReadings = 'REQUEST_METER_LINE_READINGS',
 	ReceiveMeterLineReadings = 'RECEIVE_METER_LINE_READINGS',
 
+	RequestGroupCompareReading = 'REQUEST_GROUP_COMPARE_READINGS',
+	ReceiveGroupCompareReading = 'RECEIVE_GROUP_COMPARE_READINGS',
+	RequestMeterCompareReading = 'REQUEST_METER_COMPARE_READINGS',
+	ReceiveMeterCompareReading = 'RECEIVE_METER_COMPARE_READINGS',
+
 	UpdateSelectedMeters = 'UPDATE_SELECTED_METERS',
 	UpdateSelectedGroups = 'UPDATE_SELECTED_GROUPS',
 	UpdateBarDuration = 'UPDATE_BAR_DURATION',

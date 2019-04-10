@@ -6,7 +6,7 @@
 
 import ApiBackend from './ApiBackend';
 import { NamedIDItem } from '../../types/items';
-import { BarReadings, LineReadings } from '../../types/readings';
+import { BarReadings, CompareReadings, LineReadings } from '../../types/readings';
 import { TimeInterval } from '../../../../common/TimeInterval';
 import { MeterMetadata, MeterEditData } from '../../types/redux/meters';
 import * as moment from 'moment';
@@ -38,11 +38,25 @@ export default class MetersApi {
 		);
 	}
 
-
 	public async edit(meter: MeterMetadata): Promise<{}> {
 		return await this.backend.doPostRequest<MeterEditData>(
 				'/api/meters/edit',
 				{ id: meter.id, enabled: meter.enabled, displayable: meter.displayable }
-			);
+		);
+	}
+
+	public async compareReadings(meterIDs: number[], timeInterval: TimeInterval, shift: moment.Duration):
+		Promise<CompareReadings> {
+		const stringifiedIDs = meterIDs.join(',');
+		const currStart: moment.Moment = timeInterval.getStartTimestamp();
+		const currEnd: moment.Moment = timeInterval.getEndTimestamp();
+		return await this.backend.doGetRequest<CompareReadings>(
+			`/api/compareReadings/meters/${stringifiedIDs}`,
+			{
+				curr_start: currStart.toISOString(),
+				curr_end: currEnd.toISOString(),
+				shift: shift.toISOString()
+			}
+		);
 	}
 }

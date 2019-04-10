@@ -15,6 +15,11 @@ const bcrypt = require('bcryptjs');
 const expect = chai.expect;
 
 const { log, LogLevel } = require('../log');
+// Disable logging during tests.
+// TODO: Move logging disabling to a better place.
+log.level = LogLevel.SILENT;
+log.emailLevel = LogLevel.SILENT;
+
 const User = require('../models/User');
 const { getDB, currentDB, createSchema, stopDB } = require('../models/database');
 const { swapConnection, dropConnection } = require('../db');
@@ -50,11 +55,6 @@ function connectTestDB() {
 	testDB.config = testDBConfig;
 	swapConnection(testDB.config, testDB._connection);
 }
-
-// Disable logging during tests.
-// TODO: Move logging disabling to a better place.
-log.level = LogLevel.SILENT;
-log.emailLevel = LogLevel.SILENT;
 
 // The user for use by tests.
 const testUser = new User(undefined, 'test@example.invalid', bcrypt.hashSync('password', 10));
