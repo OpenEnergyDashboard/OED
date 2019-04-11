@@ -3,4 +3,4 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
 
 ALTER TABLE meters
-    ADD COLUMN displayable boolean NOT NULL default true;
+    ADD COLUMN IF NOT EXISTS displayable boolean NOT NULL default true;

@@ -16,6 +16,8 @@ module.exports = {
 		await db.none(sqlFile('../migrations/0.3.0-0.4.0/sql/baseline/create_baseline_table.sql'));
 		await db.none(sqlFile('../migrations/0.3.0-0.4.0/sql/baseline/create_function_get_average_reading.sql'));
 		await db.none(sqlFile('../migrations/0.3.0-0.4.0/sql/readings/set_reading_type_to_real.sql'));
+		await db.none(sqlFile('../migrations/0.3.0-0.4.0/sql/fast-pt-compression/create_compressed_reading_views.sql'));
+		await db.none(sqlFile('../migrations/0.3.0-0.4.0/sql/fast-pt-compression/create_function_get_compare_readings.sql'));
 		await db.none(sqlFile('../migrations/0.3.0-0.4.0/sql/compareReadings/create_function_get_compare_readings.sql'));
 	}
 };

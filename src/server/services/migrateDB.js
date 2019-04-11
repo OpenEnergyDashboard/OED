@@ -46,6 +46,7 @@ function findMaxVersion(list) {
 
 	const conn = getConnection();
 	try {
+		await Migration.createTable(conn);
 		const currentVersion = await Migration.getCurrentVersion(conn);
 		if (currentVersion === toVersion) {
 			terminateReadline(`Cannot migrate. You already have the highest version ${currentVersion}`);
