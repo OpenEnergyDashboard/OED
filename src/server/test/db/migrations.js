@@ -78,7 +78,6 @@ mocha.describe('Migrations', () => {
 		mocha.beforeEach(async () => {
 			const conn = testDB.getConnection();
 			await clearMigrationsTable(conn);
-			//await new Migration(undefined, '0.0.0', '0.100.0');
 		});
 
 		mocha.it('should fail because of down migration', async () => {

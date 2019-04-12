@@ -32,15 +32,9 @@ mocha.describe('Insert Mamac readings from a file', () => {
 		conn = testDB.getConnection();
 		const testFilePath = path.join(__dirname, 'data', 'test-readings-invalid.csv');
 		const readingDuration = moment.duration(1, 'hours');
-
-		try {
-			await loadMamacReadingsFromCsvFile(testFilePath, meter, readingDuration, conn);
-			expect.fail('should have thrown an exception');
-		} catch (e) {
-			// We want this to error
-			// TODO: I think Mocha actually has a way to do this with expect()
-		}
+		return expect(loadMamacReadingsFromCsvFile(testFilePath, meter, readingDuration, conn)).to.eventually.be.rejected;
 	});
+
 	mocha.it('rolls back correctly when it rejects', async () => {
 		conn = testDB.getConnection();
 		const testFilePath = path.join(__dirname, 'data', 'test-readings-invalid.csv');

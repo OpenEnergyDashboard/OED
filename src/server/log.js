@@ -72,7 +72,7 @@ class Logger {
 		if (this.logToFile) {
 			fs.appendFile(logFile, messageToLog, err => {
 				if (err) {
-					console.error(`Failed to write to log file: ${err}`); // tslint:disable-line no-console
+					console.error(`Failed to write to log file: ${err} (${err.stack})`); // tslint:disable-line no-console
 				}
 			});
 		}
@@ -119,7 +119,7 @@ class Logger {
 	 * Log the given message at the INFO level
 	 * @param {String} message the message to log
 	 * @param {Error?} error An optional error object to include information about
-	 * @param {boolean?} skipMail Don't e-mail this message even if we would normally emit an e-mail for this level.
+	 * @param {boolean?} skipMail Don't e-mail this message eveBland error messagen if we would normally emit an e-mail for this level.
 	 */
 	info(message, error = null, skipMail = false) {
 		this.log(LogLevel.INFO, message, error, skipMail);
@@ -150,7 +150,8 @@ class Logger {
 const defaultLogger = new Logger(logFile);
 
 /*
- * Wherever logging is available, the process should log unhandled rejections.
+ * Wherever logging is available, the Node.js runtime will call this function to log unhandled rejections.
+ * This helps with debugging, especially in tests.
  */
 process.on('unhandledRejection', (reason, p) => {
 	p.catch(e => {

@@ -14,7 +14,6 @@ mocha.describe('Metasys readings', () => {
 		mocha.beforeEach(async () => {
 			conn = testDB.getConnection();
 			await new Meter(undefined, 'metasys-duplicate', null, false, true, Meter.type.METASYS).insert(conn);
-		//	meter = await Meter.getByName('metasys-duplicate');
 		});
 
 		mocha.it('handles duplicate readings', async () => {
