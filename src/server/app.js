@@ -57,7 +57,8 @@ const router = express.Router();
 
 router.get(/^(\/)(login|admin|groups|createGroup|editGroup|graph|meters|editMeter)?$/, (req, res) => {
 	fs.readFile(path.resolve(__dirname, '..', 'client', 'index.html'), (err, html) => {
-		let htmlPlusData = html.toString().replace('SUBDIR', config.subdir);
+		const subdir = config.subdir || "/";
+		let htmlPlusData = html.toString().replace('SUBDIR', subdir);
 		res.send(htmlPlusData);
 	});
 });
