@@ -119,7 +119,7 @@ class Logger {
 	 * Log the given message at the INFO level
 	 * @param {String} message the message to log
 	 * @param {Error?} error An optional error object to include information about
-	 * @param {boolean?} skipMail Don't e-mail this message eveBland error messagen if we would normally emit an e-mail for this level.
+	 * @param {boolean?} skipMail Don't e-mail this message even if we would normally emit an e-mail for this level.
 	 */
 	info(message, error = null, skipMail = false) {
 		this.log(LogLevel.INFO, message, error, skipMail);
