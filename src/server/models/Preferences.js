@@ -51,7 +51,7 @@ class Preferences {
 	 * @param conn the database connection to use.
 	 */
 	static async update(newPreferences, conn) {
-		const preferences = await Preferences.get();
+		const preferences = await Preferences.get(conn);
 		_.merge(preferences, newPreferences);
 		await conn.none(sqlFile('preferences/update_preferences.sql'),
 			{
