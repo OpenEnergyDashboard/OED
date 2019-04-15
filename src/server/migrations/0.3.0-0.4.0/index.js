@@ -5,6 +5,7 @@
 const database = require('../../models/database');
 const sqlFile = database.sqlFile;
 
+// Export as an object with to and from versions and a function to try to run all listed sql files.
 module.exports = {
 	fromVersion: '0.3.0',
 	toVersion: '0.4.0',

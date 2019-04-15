@@ -62,6 +62,11 @@ class Meter {
 		return row !== null;
 	}
 
+	/**
+	 * Creates a new meter from the data in a row.
+	 * @param row the row from which the meter is to be created
+	 * @returns {Meter}
+	 */
 	static mapRow(row) {
 		return new Meter(row.id, row.name, row.ipaddress, row.enabled, row.meter_type);
 	}
@@ -111,6 +116,7 @@ class Meter {
 	}
 }
 
+// Enum of meter types
 Meter.type = {
 	MAMAC: 'mamac',
 	METASYS: 'metasys'

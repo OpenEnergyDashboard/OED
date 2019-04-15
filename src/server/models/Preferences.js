@@ -33,15 +33,29 @@ class Preferences {
 		await getDB().none(sqlFile('preferences/insert_default_row.sql'));
 	}
 
+	/**
+	 * Creates a new set of preferences from the data in a row.
+	 * @param row the row from which the preferences object is to be created
+	 * @returns {Preferences}
+	 */
 	static mapRow(row) {
 		return new Preferences(row.display_title, row.default_chart_to_render, row.default_bar_stacking, row.default_language);
 	}
 
+	/**
+	 * Returns a promise to retrieve the current preferences.
+	 * @returns {Promise.<Preferences>}
+	 */
 	static async get() {
 		const row = await getDB().one(sqlFile('preferences/get_preferences.sql'));
 		return Preferences.mapRow(row);
 	}
 
+	/**
+	 * Returns a promise to update the current preferences.
+	 * @param newPreferences object to merge into the current preferences
+	 * @returns {Promise.<void>}
+	 */
 	static async update(newPreferences) {
 		const preferences = await Preferences.get();
 		_.merge(preferences, newPreferences);
