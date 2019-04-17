@@ -15,7 +15,7 @@ import {
 import { GroupDefinition } from '../../types/redux/groups';
 import { Dispatch } from '../../types/redux/actions';
 import { State } from '../../types/redux/state';
-import {  browserHistory } from 'react-router';
+import {  browserHistory } from '../../utils/history';
 
 function mapStateToProps(state: State) {
 	const allMeters = _.sortBy(_.values(state.meters.byMeterID).map(meter => ({ id: meter.id, name: meter.name.trim() })), 'name');

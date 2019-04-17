@@ -8,7 +8,7 @@ import { NamedIDItem } from '../types/items';
 import { showErrorNotification } from '../utils/notifications';
 import * as t from '../types/redux/groups';
 import { groupsApi } from '../utils/api';
-import { browserHistory } from 'react-router';
+import { browserHistory } from '../utils/history';
 import translate from '../utils/translate';
 
 function requestGroupsDetails(): t.RequestGroupsDetailsAction {
