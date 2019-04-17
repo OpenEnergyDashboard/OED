@@ -50,6 +50,7 @@
     "es6-promisify": "~5.0.0",
     "event-stream": "~3.3.5",
     "express": "~4.16.4",
+    "history": "~2.1.2",
     "jquery": "~3.3.1",
     "jsonschema": "~1.2.0",
     "jsonwebtoken": "~8.3.0",

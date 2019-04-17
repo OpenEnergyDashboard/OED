@@ -3,7 +3,8 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
 
 import * as React from 'react';
-import { Router, Route, browserHistory, RedirectFunction, RouterState } from 'react-router';
+import { createHistory } from 'history';
+import { Router, Route, useRouterHistory, RedirectFunction, RouterState } from 'react-router';
 import { addLocaleData, IntlProvider } from 'react-intl';
 import * as en from 'react-intl/locale-data/en';
 import * as fr from 'react-intl/locale-data/fr';
@@ -26,6 +27,12 @@ import EditGroupsContainer from '../containers/groups/EditGroupsContainer';
 import CreateGroupContainer from '../containers/groups/CreateGroupContainer';
 import GroupsDetailContainer from '../containers/groups/GroupsDetailContainer';
 import MetersDetailContainer from '../containers/meters/MetersDetailContainer';
+
+const baseHref = (document.getElementsByTagName('base')[0] || {}).href;
+
+const browserHistory = useRouterHistory(createHistory)({
+	basename: baseHref
+});
 
 interface RouteProps {
 	barStacking: boolean;
