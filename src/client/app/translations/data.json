@@ -58,6 +58,7 @@
 	"info": "for more information.",
 	"insufficient.readings": "Insufficient readings data to process comparison for ",
 	"invalid.email.password": "Invalid email/password combination",
+	"invalid.token.login.or.logout": "Token has expired. Either log in again, or log out.",
 	"last.four.weeks": "Last four weeks",
 	"last.week": "Last week",
 	"less.energy": "less energy",

@@ -29,3 +29,17 @@ mocha.describe('login API', () => {
 		expect(res.body).not.to.have.property('token');
 	});
 });
+
+mocha.describe('verification API', () => {
+	mocha.it('returns 200 when passed a valid token', async () => {
+		const res = await chai.request(app).post('/api/login')
+			.send({ email: testUser.email, password: testUser.password });
+		expect(res).to.have.status(200);
+		expect(res).to.be.json;
+		token = res.body.token;
+
+		const res2 = await chai.request(app).post('/api/verification')
+			.send({token: token});
+		expect(res2).to.have.status(200);
+	});
+});
