@@ -5,24 +5,42 @@
 # * file, You can obtain one at http://mozilla.org/MPL/2.0/.
 # *
 
-USAGE="Usage: install.sh [--production]"
+USAGE="Usage: $0 [--production] [--nostart]"
 
 production=no
+dostart=yes
 
-if [ "$1" == "--production" ]; then
-	production=yes
-    echo "OED production install"
-elif [ "$1" != "" ]; then
-	echo $USAGE
-	exit 1
-else
-	echo "OED development install"
+# Run through all flags and match
+while test $# -gt 0; do
+	case "$1" in
+		--production)
+			shift
+			production=yes
+			;;
+		--nostart)
+			shift
+			dostart=no
+			;;
+		*)
+			echo $USAGE
+			exit 1
+	esac
+done
+
+# Load .env if it exists
+
+if [ -f ".env" ]; then
+	source .env
 fi
 
 # Install NPM dependencies
-echo "NPM install..."
-npm install --loglevel=warn --progress=false
-echo "NPM install finished."
+if [ -d "node_modules" ]; then
+	echo "node_modules/ exists, skipping NPM install."
+else
+	echo "NPM install..."
+	npm install --loglevel=warn --progress=false
+	echo "NPM install finished."
+fi
 
 create_error=0 # Boolean
 
@@ -52,17 +70,29 @@ echo "Schema created or already exists."
 
 # Create a user
 set -e
-if [ "$production" == "yes" ]; then
-	npm run createUser
-else
+if [ "$production" == "no" ] && [ ! "$OED_PRODUCTION" == "yes" ]; then
     npm run createUser -- test@example.com password
+	echo "Created development user 'test@example.com' with password 'password'"
 fi
 
 # Build webpack if needed
-if [ "$production" == "yes" ]; then
+if [ "$production" == "yes" ] || [ "$OED_PRODUCTION" == "yes" ]; then
     npm run webpack:build
-else
+elif [ "$dostart" == "no" ]; then
 	npm run webpack
 fi
 
 echo "OED install finished"
+
+# Start OED
+if [ "$dostart" == "yes" ]; then
+	if [ "$production" == "yes" ] || [ "$OED_PRODUCTION" == "yes" ]; then
+		echo "Starting OED in production mode"
+		npm run start
+	else
+		echo "Starting OED in development mode"
+		./src/scripts/devstart.sh
+	fi
+else
+	echo "Not starting OED due to --nostart"
+fi

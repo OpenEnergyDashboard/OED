@@ -98,7 +98,7 @@ class LoginComponent extends React.Component<InjectedIntlProps, LoginState> {
 	 * If the request is successful, the JWT auth token is stored in local storage and the app routes to the admin page
 	 * @param e The event fired
 	 */
-	private handleSubmit(e: React.FormEvent<HTMLFormElement>) {
+	private handleSubmit(e: React.MouseEvent<HTMLButtonElement>) {
 		e.preventDefault();
 		(async () => {
 			try {
