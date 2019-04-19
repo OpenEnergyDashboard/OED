@@ -5,8 +5,6 @@
 # *
 
 # Dockerfile for NodeJS application portion
-# It must be in the root directory so that the build context includes the
-# package.json and source code.
 FROM node:latest
 
 # Create the directory for the app

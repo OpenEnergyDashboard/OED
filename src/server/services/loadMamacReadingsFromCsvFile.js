@@ -16,9 +16,10 @@ const loadFromCsvStream = require('./loadFromCsvStream');
  * @param {string} filePath the path to the csv file
  * @param {Meter} meter the meter to associate the readings with
  * @param {moment.Duration} readingDuration The duration of the readings in this csv file.
+ * @param conn the database connection to use
  * @return {Promise.<>}
  */
-function loadMamacReadingsFromCsvFile(filePath, meter, readingDuration) {
+function loadMamacReadingsFromCsvFile(filePath, meter, readingDuration, conn) {
 	const stream = fs.createReadStream(filePath);
 	return loadFromCsvStream(stream,
 		row => {
@@ -28,7 +29,8 @@ function loadMamacReadingsFromCsvFile(filePath, meter, readingDuration) {
 			const startTimestamp = moment(endTimestamp).subtract(readingDuration);
 			return new Reading(meter.id, readRate, startTimestamp, endTimestamp);
 		},
-		Reading.insertAll
+		Reading.insertAll,
+		conn
 	);
 }
 

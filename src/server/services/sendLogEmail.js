@@ -4,11 +4,16 @@
 
 const { logMailer } = require('../logMailer');
 const { log } = require('../log');
+const { getConnection, dropConnection } = require('../db');
 
 (async function sendLoggingEmail() {
+	let conn = getConnection();
 	try {
-		await logMailer();
+		await logMailer(conn);
 	} catch (err) {
 		log.error(`Error while sending email: ${err}`, err, true);
+	} finally {
+		dropConnection();
 	}
 }());
+
