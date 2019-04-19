@@ -3,7 +3,7 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
 
 import * as React from 'react';
-import { browserHistory } from 'react-router';
+import {  browserHistory } from '../utils/history';
 import { InjectedIntlProps, injectIntl, defineMessages, FormattedMessage } from 'react-intl';
 import { Input, Button, InputGroup, Form } from 'reactstrap';
 import HeaderContainer from '../containers/HeaderContainer';

@@ -12,7 +12,7 @@ import { SelectionType } from '../../containers/groups/DatasourceBoxContainer';
 import { EditGroupNameAction, ChangeChildMetersAction, ChangeChildGroupsAction } from '../../types/redux/groups';
 import FooterComponent from '../FooterComponent';
 import HeaderContainer from '../../containers/HeaderContainer';
-import {  browserHistory } from 'react-router';
+import {  browserHistory } from '../../utils/history';
 import { FormattedMessage, InjectedIntlProps, injectIntl, defineMessages } from 'react-intl';
 
 interface EditGroupsProps {

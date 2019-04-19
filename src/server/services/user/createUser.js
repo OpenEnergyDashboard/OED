@@ -6,6 +6,7 @@ const bcrypt = require('bcryptjs');
 const User = require('../../models/User');
 const { validateEmail } = require('./utils');
 const { ask, terminateReadline } = require('../utils');
+const { getConnection, dropConnection } = require('../../db');
 
 (async () => {
 	let email;
@@ -35,10 +36,13 @@ const { ask, terminateReadline } = require('../utils');
 
 	const passwordHash = bcrypt.hashSync(password, 10);
 	const admin = new User(undefined, email, passwordHash);
+	const conn = getConnection();
 	try {
-		await admin.insert();
+		await admin.insert(conn);
 		terminateReadline('User created');
 	} catch (err) {
 		terminateReadline('User already exists, no additional user created');
+	} finally {
+		dropConnection();
 	}
 })();

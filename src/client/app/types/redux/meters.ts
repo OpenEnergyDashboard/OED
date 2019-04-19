@@ -14,14 +14,59 @@ export interface ReceiveMetersDetailsAction {
 	data: NamedIDItem[];
 }
 
-export type MetersAction = RequestMetersDetailsAction | ReceiveMetersDetailsAction;
+export interface ChangeDisplayedMetersAction {
+	type: ActionType.ChangeDisplayedMeters;
+	selectedMeters: number[];
+}
+
+export interface EditMeterDetailsAction {
+	type: ActionType.EditMeterDetails;
+	meter: MeterMetadata;
+}
+
+export interface SubmitEditedMeterAction {
+	type: ActionType.SubmitEditedMeter;
+	meter: number;
+}
+
+export interface ConfirmEditedMeterAction {
+	type: ActionType.ConfirmEditedMeter;
+	meter: number;
+}
+
+export type MetersAction =
+		| RequestMetersDetailsAction
+		| ReceiveMetersDetailsAction
+		| ChangeDisplayedMetersAction
+		| EditMeterDetailsAction
+		| SubmitEditedMeterAction
+		| ConfirmEditedMeterAction;
+
+export interface MeterMetadata {
+	id: number;
+	name: string;
+	enabled: boolean;
+	displayable: boolean;
+	meterType?: string;
+	ipAddress?: string;
+}
+
+export interface MeterMetadataByID {
+	[meterID: number]: MeterMetadata;
+}
+
+export interface MeterEditData {
+	id: number;
+	enabled: boolean;
+	displayable: boolean;
+}
 
 export interface MetersState {
 	isFetching: boolean;
-	byMeterID: {
-		[meterID: number]: {
-			id: number;
-			name: string;
-		};
-	};
+	byMeterID: MeterMetadataByID;
+	selectedMeters: number[];
+	// Holds all meters that have been edited locally
+	editedMeters: MeterMetadataByID;
+	// Meters the app is currently attempting to upload meter changes
+	submitting: number[];
 }

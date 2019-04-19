@@ -9,6 +9,10 @@ const favicon = require('serve-favicon');
 const logger = require('morgan');
 const cookieParser = require('cookie-parser');
 const bodyParser = require('body-parser');
+const config = require('./config');
+
+const { log, LogLevel } = require('./log');
+
 const users = require('./routes/users');
 const fileProcessing = require('./routes/fileProcessing');
 const readings = require('./routes/readings');
@@ -18,13 +22,19 @@ const login = require('./routes/login');
 const verification = require('./routes/verification');
 const groups = require('./routes/groups');
 const version = require('./routes/version');
-const config = require('./config');
+const createRouterForNewCompressedReadings = require('./routes/compressedReadings').createRouter;
+const createRouterForCompareReadings = require('./routes/compareReadings').createRouter;
 const baseline = require('./routes/baseline');
 
 const app = express();
 
+// If other logging is turned off, there's no reason to log HTTP requests either.
+// TODO: Potentially modify the Morgan logger to use the log API, thus unifying all our logging.
+if (log.level !== LogLevel.SILENT) {
+	app.use(logger('dev'));
+}
+
 app.use(favicon(path.join(__dirname, '..', 'client', 'public', 'favicon.ico')));
-app.use(logger('dev'));
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: false }));
 app.use(cookieParser());
@@ -38,17 +48,21 @@ app.use('/api/groups', groups);
 app.use('/api/verification', verification);
 app.use('/api/fileProcessing', fileProcessing);
 app.use('/api/version', version);
-app.use(express.static(path.join(__dirname, '..', 'client', 'public')));
+app.use('/api/compressedReadings', createRouterForNewCompressedReadings());
+app.use('/api/compareReadings', createRouterForCompareReadings());
 app.use('/api/baselines', baseline);
+app.use(express.static(path.join(__dirname, '..', 'client', 'public')));
 
 const router = express.Router();
 
-router.get(/^(\/)(login|admin|groups|createGroup|editGroup|graph)?$/, (req, res) => {
+router.get(/^(\/)(login|admin|groups|createGroup|editGroup|graph|meters|editMeter)?$/, (req, res) => {
 	fs.readFile(path.resolve(__dirname, '..', 'client', 'index.html'), (err, html) => {
-		let htmlPlusData = html.toString().replace('SUBDIR', config.subdir);
+		const subdir = config.subdir || '/';
+		let htmlPlusData = html.toString().replace('SUBDIR', subdir);
 		res.send(htmlPlusData);
 	});
 });
+
 
 app.use(router);
 
