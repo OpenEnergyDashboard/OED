@@ -14,18 +14,19 @@ FILES=$(git ls-files)
 FILES=$(echo "$FILES" | grep -v ".*\.md")
 FILES=$(echo "$FILES" | grep -v "\.editorconfig")
 FILES=$(echo "$FILES" | grep -v "\.gitattributes")
+FILES=$(echo "$FILES" | grep -v ".vscode")
 FILES=$(echo "$FILES" | grep -v "package\.json")
 # Filter out generated files
 FILES=$(echo "$FILES" | grep -v "package-lock\.json")
 # Filter out images
-FILES=$(echo "$FILES" | grep -v "src\/client\/app\/images\/.*")
-FILES=$(echo "$FILES" | grep -v "src\/client\/favicon\.ico")
+FILES=$(echo "$FILES" | grep -v "src\/client\/public\/.*")
 # Filter out test data
 FILES=$(echo "$FILES" | grep -v "src\/server\/test\/db\/data\/.*")
 # Filter out outside scripts
 FILES=$(echo "$FILES" | grep -v "src\/scripts\/oed\.service")
 FILES=$(echo "$FILES" | grep -v "src\/scripts\/updateMamacMetersOEDCron\.bash")
 FILES=$(echo "$FILES" | grep -v "src\/scripts\/sendLogEmailCron\.bash")
+FILES=$(echo "$FILES" | grep -v "src\/scripts\/refreshReadingViewsCron\.bash")
 # Filter out JSON translation data
 FILES=$(echo "$FILES" | grep -v "src\/client\/app\/translations\/data.json")
 

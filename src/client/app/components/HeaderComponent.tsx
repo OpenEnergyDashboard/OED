@@ -37,10 +37,10 @@ export default function HeaderComponent(props: HeaderProps) {
 		<div className='container-fluid' style={divStyle}>
 			<div className='row'>
 				<div className='d-none d-lg-block col-4'>
-					<Link to='/'><LogoComponent height={80} url='./app/images/logo.png' /></Link>
+					<Link to='/'><LogoComponent height={80} url='./logo.png' /></Link>
 				</div>
 				<div className='d-lg-none col-4'>
-					<Link to='/'><LogoComponent height={50} url='./app/images/logo.png' /></Link>
+					<Link to='/'><LogoComponent height={50} url='./logo.png' /></Link>
 				</div>
 				<div className='d-none d-lg-block col-4 text-center'>
 					<h1 style={largeTitleStyle}>{props.title}</h1>
