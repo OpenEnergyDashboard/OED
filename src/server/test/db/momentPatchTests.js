@@ -4,42 +4,35 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/.
  */
 
-const chai = require('chai');
-const chaiAsPromised = require('chai-as-promised');
+const { mocha, expect, testDB } = require('../common');
 const moment = require('moment');
 
-chai.use(chaiAsPromised);
-const expect = chai.expect;
-
-const recreateDB = require('./common').recreateDB;
-const getDB = require('../../models/database').getDB;
-
-const mocha = require('mocha');
-
 mocha.describe('MomentJS patching', () => {
-	mocha.beforeEach(recreateDB);
-
 	mocha.it('patches moment durations', async () => {
-		const result = await getDB().one('SELECT pg_typeof(${interval})', { interval: moment.duration(1, 'days') });
+		const conn = testDB.getConnection();
+		const result = await conn.one('SELECT pg_typeof(${interval})', { interval: moment.duration(1, 'days') });
 		const type = result.pg_typeof;
 		expect(type).to.equal('interval');
 	});
 
 	mocha.it('patches arrays of moment durations', async () => {
-		const result = await getDB().one('SELECT pg_typeof(${intervalArr})', { intervalArr: [moment.duration(1, 'days'), moment.duration(2, 'days')] });
+		const conn = testDB.getConnection();
+		const result = await conn.one('SELECT pg_typeof(${intervalArr})', { intervalArr: [moment.duration(1, 'days'), moment.duration(2, 'days')] });
 		const type = result.pg_typeof;
 		expect(type).to.equal('interval[]');
 	});
 
 	mocha.it('patches returned durations to moment duration types', async () => {
+		const conn = testDB.getConnection();
 		const duration = moment.duration(1, 'days');
-		const { returned } = await getDB().one('SELECT ${duration} AS returned', { duration });
+		const { returned } = await conn.one('SELECT ${duration} AS returned', { duration });
 		expect(moment.isDuration(returned)).to.equal(true);
 	});
 
 	mocha.it('patches durations to the correct value', async () => {
+		const conn = testDB.getConnection();
 		const duration = moment.duration(1, 'days');
-		const { returned } = await getDB().one('SELECT ${duration} as returned', { duration });
+		const { returned } = await conn.one('SELECT ${duration} as returned', { duration });
 		expect(duration.toISOString()).to.equal(returned.toISOString());
 	});
 });

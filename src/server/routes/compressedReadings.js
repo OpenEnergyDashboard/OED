@@ -8,6 +8,7 @@ const express = require('express');
 const validate = require('jsonschema').validate;
 const _ = require('lodash');
 
+const { getConnection } = require('../db');
 const Reading = require('../models/Reading');
 const { TimeInterval } = require('../../common/TimeInterval');
 
@@ -52,7 +53,8 @@ function formatCompressedReadingRow(readingRow) {
 }
 
 async function compressedLineReadings(meterIDs, timeInterval) {
-	const rawReadings = await Reading.getNewCompressedReadings(meterIDs, timeInterval.startTimestamp, timeInterval.endTimestamp);
+	const conn = getConnection();
+	const rawReadings = await Reading.getNewCompressedReadings(meterIDs, timeInterval.startTimestamp, timeInterval.endTimestamp, conn);
 	return _.mapValues(rawReadings, readingsForMeter => readingsForMeter.map(formatCompressedReadingRow));
 }
 
@@ -73,7 +75,8 @@ function validateGroupLineReadingsParams(params) {
 }
 
 async function compressedGroupLineReadings(groupIDs, timeInterval) {
-	const rawReadings = await Reading.getNewCompressedGroupReadings(groupIDs, timeInterval.startTimestamp, timeInterval.endTimestamp);
+	const conn = getConnection();
+	const rawReadings = await Reading.getNewCompressedGroupReadings(groupIDs, timeInterval.startTimestamp, timeInterval.endTimestamp, conn);
 	return _.mapValues(rawReadings, readingsForGroup => readingsForGroup.map(formatCompressedReadingRow));
 }
 
@@ -121,7 +124,9 @@ function formatCompressedBarReadingRow(readingRow) {
 }
 
 async function compressedMeterBarReadings(meterIDs, barWidthDays, timeInterval) {
-	const rawReadings = await Reading.getNewCompressedBarchartReadings(meterIDs, timeInterval.startTimestamp, timeInterval.endTimestamp, barWidthDays);
+	const conn = getConnection();
+	const rawReadings = await Reading.getNewCompressedBarchartReadings(
+		meterIDs, timeInterval.startTimestamp, timeInterval.endTimestamp, barWidthDays, conn);
 	return _.mapValues(rawReadings, readingsForMeter => readingsForMeter.map(formatCompressedBarReadingRow));
 }
 
@@ -142,8 +147,9 @@ function validateGroupBarReadingsParams(params) {
 }
 
 async function compressedGroupBarReadings(groupIDs, barWidthDays, timeInterval) {
+	const conn = getConnection();
 	const rawReadings = await Reading.getNewCompressedBarchartGroupReadings(
-		groupIDs, timeInterval.startTimestamp, timeInterval.endTimestamp, barWidthDays);
+		groupIDs, timeInterval.startTimestamp, timeInterval.endTimestamp, barWidthDays, conn);
 	return _.mapValues(rawReadings, readingsForMeter => readingsForMeter.map(formatCompressedBarReadingRow));
 }
 
@@ -153,9 +159,10 @@ function createRouter() {
 		if (!(validateMeterLineReadingsParams(req.params) && validateLineReadingsQueryParams(req.query))) {
 			res.sendStatus(400);
 		} else {
+			const conn = getConnection();
 			const meterIDs = req.params.meter_ids.split(',').map(idStr => Number(idStr));
 			const timeInterval = TimeInterval.fromString(req.query.timeInterval);
-			const forJson = await compressedLineReadings(meterIDs, timeInterval);
+			const forJson = await compressedLineReadings(meterIDs, timeInterval, conn);
 			res.json(forJson);
 		}
 	});
@@ -164,9 +171,10 @@ function createRouter() {
 		if (!(validateGroupLineReadingsParams(req.params) && validateLineReadingsQueryParams(req.query))) {
 			res.sendStatus(400);
 		} else {
+			const conn = getConnection();
 			const groupIDs = req.params.group_ids.split(',').map(idStr => Number(idStr));
 			const timeInterval = TimeInterval.fromString(req.query.timeInterval);
-			const forJson = await compressedGroupLineReadings(groupIDs, timeInterval);
+			const forJson = await compressedGroupLineReadings(groupIDs, timeInterval, conn);
 			res.json(forJson);
 		}
 	});
@@ -175,10 +183,11 @@ function createRouter() {
 		if (!(validateMeterBarReadingsParams(req.params) && validateBarReadingsQueryParams(req.query))) {
 			res.sendStatus(400);
 		} else {
+			const conn = getConnection();
 			const meterIDs = req.params.meter_ids.split(',').map(idStr => Number(idStr));
 			const timeInterval = TimeInterval.fromString(req.query.timeInterval);
 			const barWidthDays = Number(req.query.barWidthDays);
-			const forJson = await compressedMeterBarReadings(meterIDs, barWidthDays, timeInterval);
+			const forJson = await compressedMeterBarReadings(meterIDs, barWidthDays, timeInterval, conn);
 			res.json(forJson);
 		}
 	});
@@ -187,10 +196,11 @@ function createRouter() {
 		if (!(validateGroupBarReadingsParams(req.params) && validateBarReadingsQueryParams(req.query))) {
 			res.sendStatus(400);
 		} else {
+			const conn = getConnection();
 			const groupIDs = req.params.group_ids.split(',').map(idStr => Number(idStr));
 			const timeInterval = TimeInterval.fromString(req.query.timeInterval);
 			const barWidthDays = Number(req.query.barWidthDays);
-			const forJson = await compressedGroupBarReadings(groupIDs, barWidthDays, timeInterval);
+			const forJson = await compressedGroupBarReadings(groupIDs, barWidthDays, timeInterval, conn);
 			res.json(forJson);
 		}
 	});

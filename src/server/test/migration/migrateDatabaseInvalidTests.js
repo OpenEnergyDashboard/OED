@@ -2,15 +2,7 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
 
-const chai = require('chai');
-const chaiAsPromised = require('chai-as-promised');
-
-chai.use(chaiAsPromised);
-const expect = chai.expect;
-const mocha = require('mocha');
-
-const recreateDB = require('../db/common').recreateDB;
-const getDB = require('../../models/database').getDB;
+const { mocha, expect, testDB } = require('../common');
 
 const Migration = require('../../models/Migration');
 const { migrateAll } = require('../../migrations/migrateDatabase');
@@ -35,41 +27,34 @@ for (let i = 0; i < versionLists.length; i++) {
 	migrationList.push(item);
 }
 
-
 mocha.describe('Migration Invalid', () => {
-	mocha.beforeEach(recreateDB);
 	mocha.beforeEach(async () => {
-		await new Migration(undefined, '0.0.0', '0.100.0');
+		const conn = testDB.getConnection();
+		await new Migration(undefined, '0.0.0', '0.100.0').insert(conn);
 	});
 
 	mocha.it('should fail because of down migration', async () => {
-		expect(async () => {
-			await migrateAll('0.500.0', migrationList)
-				.to.throw(new Error('Should not downgrade, please check .js'));
-		});
+		const conn = testDB.getConnection();
+		await expect(migrateAll('0.500.0', migrationList, conn))
+			.to.be.rejectedWith('Migration fromVersion 0.300.0 is more recent than toVersion 0.100.0');
 	});
 
 	mocha.it('should fail because there is no path', async () => {
-		const list = migrationList.filter(e => e.fromVersion !== '0.3.0');
-		expect(async () => {
-			await migrateAll('0.500.0', list)
-				.to.throw(new Error('No path found'));
-		});
+		const conn = testDB.getConnection();
+		const list = migrationList.filter(e => e.fromVersion !== '0.300.0');
+		await expect(migrateAll('0.500.0', list, conn))
+			.to.be.rejectedWith('No path found');
 	});
 
 	mocha.it('should fail because there is no version in the list', async () => {
 		const list = migrationList.filter(e => e.fromVersion !== '0.300.0');
-		expect(async () => {
-			await migrateAll('0.600.0', list)
-				.to.throw(new Error('Did not find version in migration list'));
-		});
+		await expect(migrateAll('0.600.0', list, conn))
+				.to.be.rejectedWith('Could not find version 0.600.0 from the registered migration list');
 	});
 
 	mocha.it('should fail because the current version is the highest Version', async () => {
 		const list = migrationList.filter(e => e.fromVersion !== '0.300.0');
-		expect(async () => {
-			await migrateAll('0.100.0', list)
-				.to.throw(new Error('You have the highest version'));
-		});
+		await expect(migrateAll('0.100.0', list, conn))
+				.to.be.rejectedWith('You have the highest version');
 	});
 });

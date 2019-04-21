@@ -8,7 +8,6 @@ const config = require('./config');
 const { log } = require('./log');
 const LogEmail = require('./models/LogEmail');
 
-
 /**
  * @returns {boolean} if there is a special error in the message stack
  */
@@ -59,10 +58,10 @@ function createEmailBody(errorMessageStack) {
 
 /**
  * Send an e-mail representing an error message.
+ * @param conn the database connection to use
  */
-async function logMailer() {
-
-	let allEmails = await LogEmail.getAll();
+async function logMailer(conn) {
+	let allEmails = await LogEmail.getAll(conn);
 
 	// When there is no error, don't send email
 	if (!allEmails) {
@@ -113,7 +112,7 @@ async function logMailer() {
 			log.error(`\t[EMAIL NOT SENT]: ${err.message}`, err, true);
 		} else {
 			// Clear the database when email is sent
-			await LogEmail.delete();
+			await LogEmail.delete(conn);
 			log.info(`\t[EMAIL SENT]: ${inform.response}`);
 		}
 	});

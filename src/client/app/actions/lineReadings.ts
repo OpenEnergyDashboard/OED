@@ -3,12 +3,11 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
 
 import { TimeInterval } from '../../../common/TimeInterval';
-import { LineReadings } from '../types/readings';
-import {ActionType, Thunk, Dispatch, GetState} from '../types/redux/actions';
+import { ActionType, Thunk, Dispatch, GetState } from '../types/redux/actions';
 import { State } from '../types/redux/state';
 import * as t from '../types/redux/lineReadings';
-import {compressedReadingsApi, groupsApi, metersApi} from '../utils/api';
-import {CompressedLineReadings} from '../types/compressed-readings';
+import { compressedReadingsApi } from '../utils/api';
+import { CompressedLineReadings } from '../types/compressed-readings';
 
 function shouldFetchGroupLineReadings(state: State, groupID: number, timeInterval: TimeInterval): boolean {
 	const timeIntervalIndex = timeInterval.toString();

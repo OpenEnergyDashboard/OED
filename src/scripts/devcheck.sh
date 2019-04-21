@@ -7,8 +7,10 @@
 
 set -e
 
-npm run check:header
-npm run check:typescript
-npm run check:types
-npm run check:lint
+npm run check:header &
+npm run check:typescript &
+npm run check:types &
+npm run check:lint &
+
+wait
 

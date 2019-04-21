@@ -4,14 +4,15 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/.
  */
 
-const Reading = require('../server/models/Reading');
-const stopDB = require('../server/models/database').stopDB;
+const { getConnection, dropConnection } = require('../db');
+const Reading = require('../models/Reading');
 /* tslint:disable no-console */
 async function refreshReadingViews() {
+	const conn = getConnection();
 	console.log('Refreshing reading views');
-	await Reading.refreshCompressedReadings();
+	await Reading.refreshCompressedReadings(conn);
 	console.log('Views refreshed');
-	stopDB();
+	dropConnection();
 }
 
 refreshReadingViews();

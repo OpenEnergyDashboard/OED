@@ -7,6 +7,7 @@
 const express = require('express');
 const validate = require('jsonschema').validate;
 const moment = require('moment');
+const { getConnection } = require('../db');
 
 const Reading = require('../models/Reading');
 
@@ -46,15 +47,15 @@ function validateQueryParams(queryParams) {
 	const validParams = {
 		type: 'object',
 		maxProperties: 3,
-		required: ['curr_start', 'curr_end', 'duration'],
+		required: ['curr_start', 'curr_end', 'shift'],
 		properties: {
 			curr_start: {
 				type: 'string' // iso 8601
 			},
-			'curr_end': {
+			curr_end: {
 				type: 'string' // iso 8601
 			},
-			'duration': {
+			shift: {
 				type: 'string' // iso 8601 duration
 			}
 		}
@@ -63,12 +64,14 @@ function validateQueryParams(queryParams) {
 	return paramsValidationResult.valid;
 }
 
-async function meterCompareReadings(meterIDs, currStart, currEnd, duration) {
-	return await Reading.getCompareReadings(meterIDs, currStart, currEnd, duration);
+async function meterCompareReadings(meterIDs, currStart, currEnd, shift) {
+	const conn = getConnection();
+	return await Reading.getCompareReadings(meterIDs, currStart, currEnd, shift, conn);
 }
 
-async function groupCompareReadings(groupIDs, currStart, currEnd, duration) {
-	return await Reading.getGroupCompareReadings(groupIDs, currStart, currEnd, duration);
+async function groupCompareReadings(groupIDs, currStart, currEnd, shift) {
+	const conn = getConnection();
+	return await Reading.getGroupCompareReadings(groupIDs, currStart, currEnd, shift, conn);
 }
 
 function createRouter() {
@@ -79,11 +82,12 @@ function createRouter() {
 			res.sendStatus(400);
 			return;
 		}
+		const conn = getConnection();
 		const meterIDs = req.params.meter_ids.split(',').map(id => parseInt(id));
 		const currStart = moment(req.query.curr_start);
 		const currEnd = moment(req.query.curr_end);
-		const duration = moment.duration(req.query.duration);
-		res.json(await meterCompareReadings(meterIDs, currStart, currEnd, duration));
+		const shift = moment.duration(req.query.shift);
+		res.json(await meterCompareReadings(meterIDs, currStart, currEnd, shift, conn));
 	});
 
 	router.get('/groups/:group_ids', async (req, res) => {
@@ -91,11 +95,12 @@ function createRouter() {
 			res.sendStatus(400);
 			return;
 		}
+		const conn = getConnection();
 		const groupIDs = req.params.group_ids.split(',').map(id => parseInt(id));
 		const currStart = moment(req.query.curr_start);
 		const currEnd = moment(req.query.curr_end);
-		const duration = moment.duration(req.query.duration);
-		res.json(await groupCompareReadings(groupIDs, currStart, currEnd, duration));
+		const shift = moment.duration(req.query.shift);
+		res.json(await groupCompareReadings(groupIDs, currStart, currEnd, shift, conn));
 	});
 
 	return router;

@@ -17,7 +17,7 @@ interface CompareChartContainerProps {
 }
 
 function mapStateToProps(state: State, ownProps: CompareChartContainerProps): IPlotlyChartProps {
-	const comparePeriod = state.graph.comparePeriod;	
+	const comparePeriod = state.graph.comparePeriod;
 	const datasets: any[] = [];
 
 	const periodLabels = getComparePeriodLabels(comparePeriod);
@@ -43,9 +43,9 @@ function mapStateToProps(state: State, ownProps: CompareChartContainerProps): IP
 	const currentPeriodToThisPoint = Math.round(entity.currentPeriodUsage);
 
 	datasets.push(
-		{			
+		{
 			x: [periodLabels.prev, periodLabels.current],
-			y: [previousPeriodTotal, currentPeriodProjectedTotal],			
+			y: [previousPeriodTotal, currentPeriodProjectedTotal],
 			hovertext: [
 				`<b>${previousPeriodTotal} KW</b> ${translate('total')}<br>${periodLabels.prev.toLowerCase()}`,
 				`<b>${currentPeriodProjectedTotal} KW</b> ${translate('projected.to.be.used')}<br>${periodLabels.current.toLowerCase()}`
@@ -55,23 +55,23 @@ function mapStateToProps(state: State, ownProps: CompareChartContainerProps): IP
 			marker: {color: readingsAfterCurrentTimeColor},
 			text: [ `<b>${previousPeriodTotal} kW</b>`, `<b>${currentPeriodProjectedTotal} kW</b>`],
 			textposition: 'auto',
-			textfont: {    
+			textfont: {
 			  color: 'rgba(0,0,0,1)'
 			}
 		},
-		{			
+		{
 			x: [periodLabels.prev, periodLabels.current],
-			y: [previousPeriodToThisPoint, currentPeriodToThisPoint],			
+			y: [previousPeriodToThisPoint, currentPeriodToThisPoint],
 			hovertext: [
 				`<b>${previousPeriodToThisPoint} kW</b> ${translate('used.this.time')}<br>${periodLabels.prev.toLowerCase()}`,
 				`<b>${currentPeriodToThisPoint} KW</b> ${translate('used.so.far')}<br>${periodLabels.current.toLowerCase()}`
 			],
 			hoverinfo: 'text',
 			type: 'bar',
-			marker: {color: readingsBeforeCurrentTimeColor},			
+			marker: {color: readingsBeforeCurrentTimeColor},
 			text: [ `<b>${previousPeriodToThisPoint} kW</b>`, `<b>${currentPeriodToThisPoint} kW</b>`],
 			textposition: 'auto',
-			textfont: {    
+			textfont: {
 			  color: 'rgba(0,0,0,1)'
 			}
 		},
@@ -101,16 +101,16 @@ function mapStateToProps(state: State, ownProps: CompareChartContainerProps): IP
 		},
 		hovermode:'closest',
 		barmode: 'overlay',
-		autozise: true,		
+		autozise: true,
 		showlegend: false,
 		legend: {
 		},
 		yaxis: {
 			title: 'kW',
 			showgrid: true,
-			gridcolor: '#ddd',			
+			gridcolor: '#ddd',
 		},
-		xaxis: {					
+		xaxis: {
 			showgrid: false,
 			gridcolor: '#ddd'
 		},

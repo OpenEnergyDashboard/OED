@@ -6,6 +6,7 @@ const express = require('express');
 const User = require('../models/User');
 const { log } = require('../log');
 const validate = require('jsonschema').validate;
+const { getConnection } = require('../db');
 
 const router = express.Router();
 
@@ -13,8 +14,9 @@ const router = express.Router();
  * Route for getting all users
  */
 router.get('/', async (req, res) => {
+	const conn = getConnection();
 	try {
-		const rows = await User.getAll();
+		const rows = await User.getAll(conn);
 		res.json(rows);
 	} catch (err) {
 		log.error(`Error while performing GET all users query: ${err}`, err);
@@ -40,8 +42,9 @@ router.get('/:user_id', async (req, res) => {
 	if (!validate(req.params, validParams).valid) {
 		res.sendStatus(400);
 	} else {
+		const conn = getConnection();
 		try {
-			const rows = await User.getByID(req.params.user_id);
+			const rows = await User.getByID(req.params.user_id, conn);
 			res.json(rows);
 		} catch (err) {
 			log.error(`Error while performing GET specific user by id query: ${err}`, err);
@@ -51,3 +54,4 @@ router.get('/:user_id', async (req, res) => {
 });
 
 module.exports = router;
+
