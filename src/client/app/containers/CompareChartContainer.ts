@@ -37,10 +37,16 @@ function mapStateToProps(state: State, ownProps: CompareChartContainerProps): IP
 	const readingsBeforeCurrentTimeColor = 'rgba(218, 165, 32, 1)';
 	const projectedDataColor = 'rgba(173, 216, 230, 0.45)';
 
+	// const previousPeriodTotal = 0;
+	// const currentPeriodProjectedTotal = 0;
+	// const previousPeriodToThisPoint = 0;
+	// const currentPeriodToThisPoint = 0;
+
 	const previousPeriodTotal = Math.round(entity.lastPeriodTotalUsage);
 	const currentPeriodProjectedTotal = Math.round((entity.currentPeriodUsage / entity.usedToThisPointLastTimePeriod) * entity.lastPeriodTotalUsage);
 	const previousPeriodToThisPoint = Math.round(entity.usedToThisPointLastTimePeriod);
 	const currentPeriodToThisPoint = Math.round(entity.currentPeriodUsage);
+
 
 	datasets.push(
 		{
@@ -135,4 +141,5 @@ function mapStateToProps(state: State, ownProps: CompareChartContainerProps): IP
 	return props;
 }
 
-export default connect(mapStateToProps)(PlotlyChart);
+const plotlyConstructor: any = PlotlyChart;
+export default connect(mapStateToProps)(plotlyConstructor);
