@@ -45,5 +45,6 @@ config.mailer = {
 config.secretToken = process.env.OED_TOKEN_SECRET;
 config.serverPort = process.env.OED_SERVER_PORT;
 config.logFile = process.env.OED_LOG_FILE || 'log.txt';
+config.subdir = process.env.OED_SUBDIR || '';
 
 module.exports = config;
