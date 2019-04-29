@@ -33,71 +33,30 @@ function mapStateToProps(state: State, ownProps: CompareChartContainerProps): IP
 	const entity = ownProps.entity;
 	const changeSummary = getCompareChangeSummary(entity.change, entity.name, periodLabels);
 
-	const readingsAfterCurrentTimeColor = 'rgba(173, 216, 230, 1)';
-	const readingsBeforeCurrentTimeColor = 'rgba(218, 165, 32, 1)';
-	const projectedDataColor = 'rgba(173, 216, 230, 0.45)';
+	const barColor = 'rgba(218, 165, 32, 1)';
 
-	// const previousPeriodTotal = 0;
-	// const currentPeriodProjectedTotal = 0;
-	// const previousPeriodToThisPoint = 0;
-	// const currentPeriodToThisPoint = 0;
-
-	const previousPeriodTotal = Math.round(entity.lastPeriodTotalUsage);
-	const currentPeriodProjectedTotal = Math.round((entity.currentPeriodUsage / entity.usedToThisPointLastTimePeriod) * entity.lastPeriodTotalUsage);
-	const previousPeriodToThisPoint = Math.round(entity.usedToThisPointLastTimePeriod);
-	const currentPeriodToThisPoint = Math.round(entity.currentPeriodUsage);
+	const previousPeriod = entity.prevUsage;
+	const currentPeriod = entity.currUsage;
 
 
 	datasets.push(
 		{
 			x: [periodLabels.prev, periodLabels.current],
-			y: [previousPeriodTotal, currentPeriodProjectedTotal],
+			y: [previousPeriod, currentPeriod],
 			hovertext: [
-				`<b>${previousPeriodTotal} KW</b> ${translate('total')}<br>${periodLabels.prev.toLowerCase()}`,
-				`<b>${currentPeriodProjectedTotal} KW</b> ${translate('projected.to.be.used')}<br>${periodLabels.current.toLowerCase()}`
+				`<b>${previousPeriod} KW</b> ${translate('total')}<br>${periodLabels.prev.toLowerCase()}`,
+				`<b>${currentPeriod} KW</b> ${translate('projected.to.be.used')}<br>${periodLabels.current.toLowerCase()}`
 			],
 			hoverinfo: 'text',
 			type: 'bar',
-			marker: {color: readingsAfterCurrentTimeColor},
-			text: [ `<b>${previousPeriodTotal} kW</b>`, `<b>${currentPeriodProjectedTotal} kW</b>`],
+			marker: {color: barColor},
+			text: [ `<b>${previousPeriod} kW</b>`, `<b>${currentPeriod} kW</b>`],
 			textposition: 'auto',
 			textfont: {
 			  color: 'rgba(0,0,0,1)'
 			}
-		},
-		{
-			x: [periodLabels.prev, periodLabels.current],
-			y: [previousPeriodToThisPoint, currentPeriodToThisPoint],
-			hovertext: [
-				`<b>${previousPeriodToThisPoint} kW</b> ${translate('used.this.time')}<br>${periodLabels.prev.toLowerCase()}`,
-				`<b>${currentPeriodToThisPoint} KW</b> ${translate('used.so.far')}<br>${periodLabels.current.toLowerCase()}`
-			],
-			hoverinfo: 'text',
-			type: 'bar',
-			marker: {color: readingsBeforeCurrentTimeColor},
-			text: [ `<b>${previousPeriodToThisPoint} kW</b>`, `<b>${currentPeriodToThisPoint} kW</b>`],
-			textposition: 'auto',
-			textfont: {
-			  color: 'rgba(0,0,0,1)'
-			}
-		},
+		}
 	)
-
-	// // sorts the data so that one doesn't cover up the other
-	// datasets.sort((a, b) => {
-	// 	if (a.data !== undefined && b.data !== undefined) {
-	// 		return +(a.data[0]) - +(b.data[0]);
-	// 	} else {
-	// 		return 0;
-	// 	}
-	// });
-
-
-	// // apply info to datasets after sort
-	// datasets[0].backgroundColor = [readingsBeforeCurrentTimeColor, readingsBeforeCurrentTimeColor];
-	// datasets[0].hoverBackgroundColor = [readingsBeforeCurrentTimeColor, readingsBeforeCurrentTimeColor];
-	// datasets[1].backgroundColor = [readingsAfterCurrentTimeColor, projectedDataColor];
-	// datasets[1].hoverBackgroundColor = [readingsAfterCurrentTimeColor, projectedDataColor];
 
 	const layout: any = {
 		title: `<b>${changeSummary}</b>`,
@@ -106,7 +65,6 @@ function mapStateToProps(state: State, ownProps: CompareChartContainerProps): IP
 			color: colorize(entity.change)
 		},
 		hovermode:'closest',
-		barmode: 'overlay',
 		autozise: true,
 		showlegend: false,
 		legend: {

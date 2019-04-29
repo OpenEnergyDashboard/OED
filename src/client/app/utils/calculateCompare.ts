@@ -134,7 +134,7 @@ export function getComparePeriodLabels(comparePeriod: ComparePeriod): ComparePer
  */
 export function getCompareChangeSummary(change: number, name: string, labels: ComparePeriodLabels): string {
 	if (isNaN(change)) { return ''; }
-	const percent = parseInt(change.toFixed(2).replace('.', '').slice(1));
+	const percent = parseInt(change.toFixed(2).replace('.', ''));
 	if (change < 0) {
 		return `${name} ${translate('has.used')} ${percent}% ${translate('less.energy')} ${labels.current.toLocaleLowerCase()}`;
 	} else {
