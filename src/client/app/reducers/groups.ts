@@ -128,6 +128,9 @@ export default function groups(state = defaultState, action: GroupsAction) {
 				return {
 					...state,
 					displayMode: action.newMode,
+					groupInEditing: {
+						dirty: false
+					},
 					selectedGroups: [] // zero out selected groups when we switch screens
 				};
 			}
