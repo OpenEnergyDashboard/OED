@@ -16,45 +16,43 @@ const expect = chai.expect;
 const recreateDB = require('./common').recreateDB;
 const Group = require('../../models/Group');
 const mocha = require('mocha');
-
 const getDB = require('../../models/database').getDB;
-
+const { mocha, expect, testDB } = require('../common');
+const Group = require('../../models/Group');
 /*
  * Tests to ensure group cycles are forbidden.
  */
 mocha.describe('Group Cycles', async () => {
-
-	/*
-	 * Recreates the database and creates, inserts, and retrieves 3 new groups before each test.
-	 */
-	mocha.beforeEach(recreateDB);
 	let group1;
 	let group2;
 	let group3;
 	mocha.beforeEach(async () => {
-		await new Group(undefined, 'group1').insert();
-		await new Group(undefined, 'group2').insert();
-		await new Group(undefined, 'group3').insert();
-		group1 = await Group.getByName('group1');
-		group2 = await Group.getByName('group2');
-		group3 = await Group.getByName('group3');
+		conn = testDB.getConnection();
+		await new Group(undefined, 'group1').insert(conn);
+		await new Group(undefined, 'group2').insert(conn);
+		await new Group(undefined, 'group3').insert(conn);
+		group1 = await Group.getByName('group1', conn);
+		group2 = await Group.getByName('group2', conn);
+		group3 = await Group.getByName('group3', conn);
 	});
 
 	/*
 	 * Tests that the child group of a group cannot also be set as its parent.
 	 */
 	mocha.it('Cannot save immediate cycles', async () => {
-		await group1.adoptGroup(group2.id);
-		await expect(group2.adoptGroup(group1.id), 'cyclic group insert was not rejected').to.eventually.be.rejected;
+		conn = testDB.getConnection();
+		await group1.adoptGroup(group2.id, conn);
+		await expect(group2.adoptGroup(group1.id, conn), 'cyclic group insert was not rejected').to.eventually.be.rejected;
 	});
 
 	/*
 	 * Tests that the grandchild group of a group cannot also be set as its parent.
 	 */
 	mocha.it('Cannot save deeply nested cycles', async () => {
-		await group1.adoptGroup(group2.id);
-		await group2.adoptGroup(group3.id);
-		await expect(group3.adoptGroup(group1.id), 'cyclic group insert was not rejected').to.eventually.be.rejected;
+		conn = testDB.getConnection();
+		await group1.adoptGroup(group2.id, conn);
+		await group2.adoptGroup(group3.id, conn);
+		await expect(group3.adoptGroup(group1.id, conn), 'cyclic group insert was not rejected').to.eventually.be.rejected;
 	});
 	
 	/*
@@ -62,8 +60,9 @@ mocha.describe('Group Cycles', async () => {
 	 * parent of the parent group.
 	 */
 	mocha.it('Cannot run update queries that create cycles', async () => {
-		await group1.adoptGroup(group2.id);
-		await group2.adoptGroup(group3.id);
-		await expect(getDB().none(`UPDATE groups_immediate_children set child_id = ${group1.id} WHERE parent_id = ${group2.id}`)).to.eventually.be.rejected;
+		conn = testDB.getConnection();
+		await group1.adoptGroup(group2.id, conn);
+		await group2.adoptGroup(group3.id, conn);
+		await expect(conn.none(`UPDATE groups_immediate_children set child_id = ${group1.id} WHERE parent_id = ${group2.id}`)).to.eventually.be.rejected;
 	});
 });

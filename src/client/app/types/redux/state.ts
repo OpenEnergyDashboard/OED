@@ -9,12 +9,14 @@ import { GroupsState } from './groups';
 import { MetersState } from './meters';
 import { NotificationsState } from './notifications';
 import { AdminState } from './admin';
+import { CompareReadingsState } from './compareReadings';
 
 export interface State {
 	meters: MetersState;
 	readings: {
 		line: LineReadingsState;
 		bar: BarReadingsState;
+		compare: CompareReadingsState;
 	};
 	graph: GraphState;
 	groups: GroupsState;

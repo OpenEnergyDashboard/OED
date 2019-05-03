@@ -7,16 +7,12 @@
   */
 const chai = require('chai');
 const chaiAsPromised = require('chai-as-promised');
+const { mocha, expect, testDB } = require('../common');
 const moment = require('moment');
 
-chai.use(chaiAsPromised);
-const expect = chai.expect;
-
-const recreateDB = require('./common').recreateDB;
 const Meter = require('../../models/Meter');
 const Reading = require('../../models/Reading');
 const updateAllMeters = require('../../services/updateMeters');
-const mocha = require('mocha');
 const sinon = require('sinon');
 
 /*
@@ -32,13 +28,14 @@ mocha.describe('Meter Update', () => {
 	/*
 	 * Tests that the updateMeters service correctly handles errors.
 	 */
-	mocha.it('can persist over a failed request', async () => {
 		// Create two meters and add them to the database
-		const goodMeter = new Meter(undefined, 'GOOD', 1, true, Meter.type.MAMAC);
-		await goodMeter.insert();
+	mocha.it('can persist over a failed request', async () => {
+		const conn = testDB.getConnection();
+		const goodMeter = new Meter(undefined, 'GOOD', 1, true, true, Meter.type.MAMAC);
+		await goodMeter.insert(conn);
 
-		const badMeter = new Meter(undefined, 'BAD', 2, true, Meter.type.MAMAC);
-		await badMeter.insert();
+		const badMeter = new Meter(undefined, 'BAD', 2, true, true, Meter.type.MAMAC);
+		await badMeter.insert(conn);
 
 		const metersToUpdate = [goodMeter, badMeter];
 		
@@ -53,10 +50,10 @@ mocha.describe('Meter Update', () => {
 		dataReader.withArgs(badMeter).rejects(new Error('Bland error message'));
 		dataReader.throws();
 
-		// Update the two meters with the stub and obtain all new readings.
-		await updateAllMeters(dataReader, metersToUpdate);
-		const goodReadings = await Reading.getAllByMeterID(goodMeter.id);
-		const badReadings = await Reading.getAllByMeterID(badMeter.id);
+  // Update the two meters with the stub and obtain all new readings.
+		await updateAllMeters(dataReader, metersToUpdate, conn);
+		const goodReadings = await Reading.getAllByMeterID(goodMeter.id, conn);
+		const badReadings = await Reading.getAllByMeterID(badMeter.id, conn);
 
 		// Check that the good meter has one reading and the bad meter has none.
 		expect(goodReadings.length).to.equal(1);

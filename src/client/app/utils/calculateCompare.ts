@@ -48,13 +48,16 @@ export function calculateCompareTimeInterval(comparePeriod: ComparePeriod, curre
 	let compareTimeInterval;
 	switch (comparePeriod) {
 		case ComparePeriod.Day:
-			compareTimeInterval = new TimeInterval(moment().subtract(2, 'days'), currentTime);
+			// TimeInterval for today 12 am to current time
+			compareTimeInterval = new TimeInterval(moment().startOf('day'), currentTime);
 			break;
 		case ComparePeriod.Week:
-			compareTimeInterval = new TimeInterval(moment().startOf('week').subtract(7, 'days'), currentTime);
+			// TimeInterval for this week, from last Sunday 12 am to current time
+			compareTimeInterval = new TimeInterval(moment().startOf('week'), currentTime);
 			break;
 		case ComparePeriod.FourWeeks:
-			compareTimeInterval = new TimeInterval(moment().startOf('week').subtract(49, 'days'), currentTime);
+			// TimeInterval for this 4 weeks period
+			compareTimeInterval = new TimeInterval(moment().startOf('week').subtract(3, 'weeks'), currentTime);
 			break;
 		default:
 			throw new Error(`Unknown period value: ${comparePeriod}`);
@@ -79,6 +82,25 @@ export function calculateCompareDuration(comparePeriod: ComparePeriod): moment.D
 			throw new Error(`Unknown period value: ${comparePeriod}`);
 	}
 	return compareDuration;
+}
+
+export function calculateCompareShift(comparePeriod: ComparePeriod): moment.Duration {
+	let compareShift;
+	switch (comparePeriod) {
+		case ComparePeriod.Day:
+			// fetch hours for accuracy when time interval is small
+			compareShift = moment.duration(1, 'days');
+			break;
+		case ComparePeriod.Week:
+			compareShift = moment.duration(7, 'days');
+			break;
+		case ComparePeriod.FourWeeks:
+			compareShift = moment.duration(28, 'days');
+			break;
+		default:
+			throw new Error(`Unknown period value: ${comparePeriod}`);
+	}
+	return compareShift;
 }
 
 export interface ComparePeriodLabels {

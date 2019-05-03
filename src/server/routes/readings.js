@@ -9,6 +9,7 @@ const Reading = require('../models/Reading');
 const TimeInterval = require('../../common/TimeInterval').TimeInterval;
 const { log } = require('../log');
 const validate = require('jsonschema').validate;
+const { getConnection } = require('../db');
 
 const router = express.Router();
 
@@ -58,9 +59,10 @@ router.get('/line/meters/:meter_ids', async (req, res) => {
 	};
 
 	// If the parameters or dates are invalid then an exception will be thrown, statusCode 400.
-	if (!validate(req.params, validParams).valid || !validate(validQueries, req.query).valid) {
+	if (!validate(req.params, validParams).valid || !validate(req.query, validQueries).valid) {
 		res.sendStatus(400);
 	} else {
+		const conn = getConnection();
 		// We can't do .map(parseInt) here because map would give parseInt a radix value of the current array position.
 		// Instead, we use a lambda function "s => parseInt(s)" so that .map(parseInt) can be recreated without problems.
 		const meterIDs = req.params.meter_ids.split(',').map(s => parseInt(s));
@@ -68,8 +70,8 @@ router.get('/line/meters/:meter_ids', async (req, res) => {
 		try {
 			// rawCompressedReadings and formattedCompressedReadings get meters readings and then are formatted into
 			// json.
-			const rawCompressedReadings = await Reading.getCompressedReadings(meterIDs, timeInterval.startTimestamp,
-				timeInterval.endTimestamp, 100);
+			const rawCompressedReadings = await Reading.getCompressedReadings(meterIDs, timeInterval.startTimestamp, 
+                                                                        timeInterval.endTimestamp, 100, conn);
 			const formattedCompressedReadings = _.mapValues(rawCompressedReadings, formatLineReadings);
 			res.json(formattedCompressedReadings);
 		} catch (err) {
@@ -108,17 +110,18 @@ router.get('/line/groups/:group_ids', async (req, res) => {
 		}
 	};
 	// If the parameters or dates are invalid then an exception will be thrown, statusCode 400.
-	if (!validate(req.params, validParams).valid || !validate(validQueries, req.query).valid) {
+	if (!validate(req.params, validParams).valid || !validate(req.query, validQueries).valid) {
 		res.sendStatus(400);
 	} else {
+		const conn = getConnection();
 		// We can't do .map(parseInt) here because map would give parseInt a radix value of the current array position.
 		// Again, this is why a lambda function is used so that .map(parseInt) can be recreated without problems.
 		const groupIDs = req.params.group_ids.split(',').map(s => parseInt(s));
 		const timeInterval = TimeInterval.fromString(req.query.timeInterval);
 		try {
 			// Get meters readings and then is formatted into json.
-			const rawCompressedReadings = await Reading.getCompressedGroupReadings(groupIDs, timeInterval.startTimestamp,
-				timeInterval.endTimestamp, 100);
+			const rawCompressedReadings = await Reading.getCompressedGroupReadings(
+				groupIDs, timeInterval.startTimestamp, timeInterval.endTimestamp, 100, conn);
 			const formattedCompressedReadings = _.mapValues(rawCompressedReadings, formatLineReadings);
 			res.json(formattedCompressedReadings);
 		} catch (err) {
@@ -161,9 +164,10 @@ router.get('/bar/meters/:meter_ids', async (req, res) => {
 		}
 	};
 	// If the parameters or dates are invalid then an exception will be thrown, statusCode 400.
-	if (!validate(req.params, validParams).valid || !validate(validQueries, req.query).valid) {
+	if (!validate(req.params, validParams).valid || !validate(req.query, validQueries).valid) {
 		res.sendStatus(400);
 	} else {
+		const conn = getConnection();
 		// We can't do .map(parseInt) here because map would give parseInt a radix value of the current array position.
 		// Again, this is why a lambda function is used so that .map(parseInt) can be recreated without problems.
 		const meterIDs = req.params.meter_ids.split(',').map(s => parseInt(s));
@@ -171,8 +175,7 @@ router.get('/bar/meters/:meter_ids', async (req, res) => {
 		const barDuration = moment.duration(req.query.barDuration);
 		try {
 			// Get meters readings and then is formatted into json.
-			const barchartReadings = await Reading.getBarchartReadings(meterIDs, barDuration, timeInterval.startTimestamp,
-				timeInterval.endTimestamp);
+			const barchartReadings = await Reading.getBarchartReadings(meterIDs, barDuration, timeInterval.startTimestamp, timeInterval.endTimestamp, conn);
 			const formattedBarchartReadings = _.mapValues(barchartReadings, formatBarReadings);
 			res.json(formattedBarchartReadings);
 		} catch (err) {
@@ -215,9 +218,10 @@ router.get('/bar/groups/:group_ids', async (req, res) => {
 		}
 	};
 	// If the parameters or dates are invalid then an exception will be thrown, statusCode 400.
-	if (!validate(req.params, validParams).valid || !validate(validQueries, req.query).valid) {
+	if (!validate(req.params, validParams).valid || !validate(req.query, validQueries).valid) {
 		res.sendStatus(400);
 	} else {
+		const conn = getConnection();
 		// We can't do .map(parseInt) here because map would give parseInt a radix value of the current array position.
 		// Again, this is why a lambda function is used so that .map(parseInt) can be recreated without problems.
 		const groupIDs = req.params.group_ids.split(',').map(s => parseInt(s));
@@ -226,7 +230,7 @@ router.get('/bar/groups/:group_ids', async (req, res) => {
 		try {
 			// Get meters readings and then is formatted into json.
 			const barchartReadings = await Reading.getGroupBarchartReadings(
-				groupIDs, barDuration, timeInterval.startTimestamp, timeInterval.endTimestamp);
+				groupIDs, barDuration, timeInterval.startTimestamp, timeInterval.endTimestamp, conn);
 			const formattedBarchartReadings = _.mapValues(barchartReadings, formatBarReadings);
 			res.json(formattedBarchartReadings);
 		} catch (err) {
@@ -239,3 +243,4 @@ router.get('/bar/groups/:group_ids', async (req, res) => {
 
 
 module.exports = router;
+

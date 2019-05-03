@@ -5,6 +5,6 @@
 /*
 Inserts values into the meters tables and returns the primary key of the meters table.
 */
-INSERT INTO meters(name, ipaddress, enabled, meter_type)
-VALUES (${name}, ${ipAddress}, ${enabled}, ${type})
-RETURNING id;
+INSERT INTO meters(name, ipaddress, enabled, displayable, meter_type)
+    VALUES (${name}, ${ipAddress}, ${enabled}, ${displayable}, ${type})
+    RETURNING id;

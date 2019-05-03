@@ -5,7 +5,6 @@
 const _ = require('lodash');
 const database = require('./database');
 
-const getDB = database.getDB;
 const sqlFile = database.sqlFile;
 
 class Preferences {
@@ -24,13 +23,14 @@ class Preferences {
 
 	/**
 	 * Returns a promise to create the preferences table and associated enums
+	 * @param conn is the connection to use.
 	 * @returns {Promise.<>}
 	 */
-	static async createTable() {
-		await getDB().none(sqlFile('preferences/create_graph_types_enum.sql'));
-		await getDB().none(sqlFile('preferences/create_language_types_enum.sql'));
-		await getDB().none(sqlFile('preferences/create_preferences_table.sql'));
-		await getDB().none(sqlFile('preferences/insert_default_row.sql'));
+	static async createTable(conn) {
+		await conn.none(sqlFile('preferences/create_graph_types_enum.sql'));
+		await conn.none(sqlFile('preferences/create_language_types_enum.sql'));
+		await conn.none(sqlFile('preferences/create_preferences_table.sql'));
+		await conn.none(sqlFile('preferences/insert_default_row.sql'));
 	}
 
 	/**
@@ -43,23 +43,22 @@ class Preferences {
 	}
 
 	/**
-	 * Returns a promise to retrieve the current preferences.
-	 * @returns {Promise.<Preferences>}
+	 * Get the preferences from the database.
+	 * @param conn is the connection to use.
 	 */
-	static async get() {
-		const row = await getDB().one(sqlFile('preferences/get_preferences.sql'));
+	static async get(conn) {
+		const row = await conn.one(sqlFile('preferences/get_preferences.sql'));
 		return Preferences.mapRow(row);
 	}
 
 	/**
-	 * Returns a promise to update the current preferences.
-	 * @param newPreferences object to merge into the current preferences
-	 * @returns {Promise.<void>}
+	 * Update the preferences in the database.
+	 * @param conn the database connection to use.
 	 */
-	static async update(newPreferences) {
-		const preferences = await Preferences.get();
+	static async update(newPreferences, conn) {
+		const preferences = await Preferences.get(conn);
 		_.merge(preferences, newPreferences);
-		await getDB().none(sqlFile('preferences/update_preferences.sql'),
+		await conn.none(sqlFile('preferences/update_preferences.sql'),
 			{
 				displayTitle: preferences.displayTitle,
 				defaultChartToRender: preferences.defaultChartToRender,

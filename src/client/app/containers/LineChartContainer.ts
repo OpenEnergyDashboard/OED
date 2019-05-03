@@ -9,7 +9,12 @@ import * as moment from 'moment';
 import { connect } from 'react-redux';
 import getGraphColor from '../utils/getGraphColor';
 import { State } from '../types/redux/state';
+import {CompressedLineReading} from '../types/compressed-readings';
 
+
+function compressedReadingToChartPoint(compressedReading: CompressedLineReading): ChartPoint {
+	return { x: compressedReading.startTimestamp, y: compressedReading.reading };
+}
 
 function mapStateToProps(state: State) {
 	const timeInterval = state.graph.timeInterval;
@@ -26,9 +31,7 @@ function mapStateToProps(state: State) {
 					throw new Error('Unacceptable condition: readingsData.readings is undefined.');
 				}
 
-				const dataPoints: ChartPoint[] = _.values(readingsData.readings).map(
-					(v: [number, number]) => ({ x: v[0], y: v[1] })
-				);
+				const dataPoints: ChartPoint[] = _.values(readingsData.readings).map(compressedReadingToChartPoint);
 
 				datasets.push({
 					label,
@@ -51,9 +54,7 @@ function mapStateToProps(state: State) {
 					throw new Error('Unacceptable condition: readingsData.readings is undefined.');
 				}
 
-				const dataPoints: ChartPoint[] = _.values(readingsData.readings).map(
-					(v: [number, number]) => ({ x: v[0], y: v[1] })
-				);
+				const dataPoints: ChartPoint[] = _.values(readingsData.readings).map(compressedReadingToChartPoint);
 
 				datasets.push({
 					label,

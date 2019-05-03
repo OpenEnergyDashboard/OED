@@ -3,11 +3,12 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
 
 import * as React from 'react';
-import { Router, Route, browserHistory, RedirectFunction, RouterState } from 'react-router';
+import { Router, Route, RedirectFunction, RouterState } from 'react-router';
 import { addLocaleData, IntlProvider } from 'react-intl';
 import * as en from 'react-intl/locale-data/en';
 import * as fr from 'react-intl/locale-data/fr';
 import * as localeData from '../translations/data.json';
+import { browserHistory } from '../utils/history';
 import * as _ from 'lodash';
 import * as moment from 'moment';
 import InitializationContainer from '../containers/InitializationContainer';
@@ -25,6 +26,7 @@ import { validateComparePeriod, validateSortingOrder } from '../utils/calculateC
 import EditGroupsContainer from '../containers/groups/EditGroupsContainer';
 import CreateGroupContainer from '../containers/groups/CreateGroupContainer';
 import GroupsDetailContainer from '../containers/groups/GroupsDetailContainer';
+import MetersDetailContainer from '../containers/meters/MetersDetailContainer';
 
 interface RouteProps {
 	barStacking: boolean;
@@ -64,6 +66,32 @@ export default class RouteComponent extends React.Component<RouteProps, {}> {
 				browserHistory.push('/login');
 			}
 		})();
+	}
+
+	/**
+	 * Middleware function that checks proper authentication for a page route
+	 * @param nextState The next state of the router
+	 * @param replace Function that allows a route redirect
+	 */
+	public checkAuth(nextState: RouterState, replace: RedirectFunction) {
+		function redirectRoute() {
+			replace({
+				pathname: '/login',
+				state: { nextPathname: nextState.location.pathname }
+			});
+		}
+		// Only check the token if the auth token does not exist
+		if (hasToken()) {
+			// Verify that the auth token is valid.
+			// Needs to be async because of the network request
+			(async () => {
+				if (!(await verificationApi.checkTokenValid())) {
+					// Route to login page if the auth token is not valid
+					showErrorNotification(translate('invalid.token.login.or.logout'));
+					browserHistory.push('/login');
+				}
+			})();
+		}
 	}
 
 	/**
@@ -140,7 +168,8 @@ export default class RouteComponent extends React.Component<RouteProps, {}> {
 					<Router history={browserHistory}>
 						<Route path='/login' component={LoginComponent} />
 						<Route path='/admin' component={AdminComponent} onEnter={this.requireAuth} />
-						<Route path='/groups' component={GroupsDetailContainer} />
+						<Route path='/groups' component={GroupsDetailContainer} onEnter={this.checkAuth} />
+						<Route path='/meters' component={MetersDetailContainer} onEnter={this.checkAuth} />
 						<Route path='/graph' component={HomeComponent} onEnter={this.linkToGraph} />
 						<Route path='/createGroup' component={CreateGroupContainer} onEnter={this.requireAuth} />
 						<Route path='/editGroup' component={EditGroupsContainer} onEnter={this.requireAuth} />

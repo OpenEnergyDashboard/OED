@@ -9,6 +9,10 @@ import { State } from './state';
 export enum ActionType {
 	RequestMetersDetails = 'REQUEST_METERS_DETAILS',
 	ReceiveMetersDetails = 'RECEIVE_METERS_DETAILS',
+	ChangeDisplayedMeters = 'CHANGE_DISPLAYED_METERS',
+	EditMeterDetails = 'EDIT_METER_DETAILS',
+	SubmitEditedMeter = 'SUBMIT_EDITED_METER',
+	ConfirmEditedMeter = 'CONFIRM_EDITED_METER',
 
 	ShowNotification = 'SHOW_NOTIFICATION',
 	ClearNotifications = 'CLEAR_NOTIFICATIONS',
@@ -22,6 +26,11 @@ export enum ActionType {
 	ReceiveGroupLineReadings = 'RECEIVE_GROUP_LINE_READINGS',
 	RequestMeterLineReadings = 'REQUEST_METER_LINE_READINGS',
 	ReceiveMeterLineReadings = 'RECEIVE_METER_LINE_READINGS',
+
+	RequestGroupCompareReading = 'REQUEST_GROUP_COMPARE_READINGS',
+	ReceiveGroupCompareReading = 'RECEIVE_GROUP_COMPARE_READINGS',
+	RequestMeterCompareReading = 'REQUEST_METER_COMPARE_READINGS',
+	ReceiveMeterCompareReading = 'RECEIVE_METER_COMPARE_READINGS',
 
 	UpdateSelectedMeters = 'UPDATE_SELECTED_METERS',
 	UpdateSelectedGroups = 'UPDATE_SELECTED_GROUPS',
