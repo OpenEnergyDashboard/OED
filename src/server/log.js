@@ -5,6 +5,7 @@
 const fs = require('fs');
 const logFile = require('./config').logFile;
 const LogEmail = require('./models/LogEmail');
+const { getConnection } = require('./db');
 
 /**
  * Represents the importance of a message to be logged
@@ -48,24 +49,36 @@ class Logger {
 	 * @param {boolean?} skipMail Don't e-mail this message even if we would normally emit an e-mail for this level.
 	 */
 	log(level, message, error = null, skipMail = false) {
-		// Only log if given a high enough priority level.
-		if (level.priority <= this.level.priority && !skipMail) {
-			let messageToLog = `[${level.name}@${new Date(Date.now()).toISOString()}] ${message}\n`;
+		let messageToLog = `[${level.name}@${new Date(Date.now()).toISOString()}] ${message}\n`;
 
-			// Add a stacktrace to the message if one was provided
-			if (error !== null) {
-				if (error.stack) {
-					messageToLog += `Stacktrace: \n${error.stack}\n`;
-				} else {
-					// It's possible someone passed in an error that isn't actually an Error object
-					// because javascript lets you throw anything. In that case, the error won't have
-					// a stack.
+		const conn = getConnection();
 
-					// So we just try to convert whatever we got to a string and include it. It's better
-					// than nothing.
-					messageToLog += `An error was included, but it was not an Error object:\n${error}`;
-				}
+		// Add a stacktrace to the message if one was provided.
+		if (error !== null) {
+			if (error.stack) {
+				messageToLog += `Stacktrace: \n${error.stack}\n`;
+			} else {
+				// It's possible someone passed in an error that isn't actually an Error object
+				// because javascript lets you throw anything. In that case, the error won't have
+				// a stack.
+
+				// So we just try to convert whatever we got to a string and include it. It's better
+				// than nothing.
+				messageToLog += `An error was included, but it was not an Error object:\n${error}`;
 			}
+		}
+
+		// Always log to the logfile.
+		if (this.logToFile) {
+			fs.appendFile(logFile, messageToLog, err => {
+				if (err) {
+					console.error(`Failed to write to log file: ${err} (${err.stack})`); // tslint:disable-line no-console
+				}
+			});
+		}
+
+		// Only log elsewhere if given a high enough priority level.
+		if (level.priority <= this.level.priority && !skipMail) {
 			if (this.logToConsole) {
 				if (level.priority >= LogLevel.WARN.priority) {
 					// tslint:disable-next-line no-console
@@ -75,25 +88,18 @@ class Logger {
 					console.log(messageToLog);
 				}
 			}
-			if (this.logToFile) {
-				fs.appendFile(logFile, messageToLog, err => {
-					if (err) {
-						console.error(`Failed to write to log file: ${err}`); // tslint:disable-line no-console
-					}
-				});
-			}
 		}
 
-		// Only send an e-mail if given a high enough priority level.
-		if (level.priority <= this.emailLevel.priority) {
+		// Only send an e-mail if given a high enough priority level and the database is connected
+		if (level.priority <= this.emailLevel.priority && conn !== null) {
 			let messageToMail = `At ${new Date(Date.now()).toISOString()}, an ${level.name} event occurred.\n`;
 			messageToMail += `${message}\n`;
 			const logEmail = new LogEmail(undefined, messageToMail);
 			(async () => {
 				try {
-					await logEmail.insert();
+					await logEmail.insert(conn);
 				} catch (err) {
-					console.error(`Error while inserting log mail ${err}`); // tslint:disable-line no-console
+					console.error(`Error while inserting log mail ${err} (${err.stack})`); // tslint:disable-line no-console
 				}
 			})();
 		}
@@ -141,8 +147,17 @@ class Logger {
 
 }
 
-
 const defaultLogger = new Logger(logFile);
+
+/*
+ * Wherever logging is available, the Node.js runtime will call this function to log unhandled rejections.
+ * This helps with debugging, especially in tests.
+ */
+process.on('unhandledRejection', (reason, p) => {
+	p.catch(e => {
+		defaultLogger.error(`Unhandled Promise Rejection: ${reason}`, e);
+	});
+});
 
 defaultLogger.logToFile = true;
 defaultLogger.logToConsole = true;

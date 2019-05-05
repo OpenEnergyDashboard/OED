@@ -5,8 +5,9 @@
 const express = require('express');
 const Preferences = require('../models/Preferences');
 const { log } = require('../log');
-const authentication = require('./authenticator');
+const authentication = require('./authenticator').authMiddleware;
 const validate = require('jsonschema').validate;
+const { getConnection } = require('../db');
 
 const router = express.Router();
 
@@ -14,8 +15,9 @@ const router = express.Router();
  * Route for getting the preferences
  */
 router.get('/', async (req, res) => {
+	const conn = getConnection();
 	try {
-		const rows = await Preferences.get();
+		const rows = await Preferences.get(conn);
 		res.json(rows);
 	} catch (err) {
 		log.error(`Error while performing GET all preferences query: ${err}`, err);
@@ -53,8 +55,9 @@ router.post('/', async (req, res) => {
 	if (!validate(req.body, validParams).valid) {
 		res.sendStatus(400);
 	} else {
+		const conn = getConnection();
 		try {
-			const rows = await Preferences.update(req.body.preferences);
+			const rows = await Preferences.update(req.body.preferences, conn);
 			res.json(rows);
 		} catch (err) {
 			log.error(`Error while performing POST update preferences: ${err}`, err);
@@ -64,3 +67,4 @@ router.post('/', async (req, res) => {
 });
 
 module.exports = router;
+

@@ -6,10 +6,9 @@ import * as moment from 'moment';
 import { TimeInterval } from '../../../common/TimeInterval';
 import { Dispatch, GetState, Thunk, ActionType } from '../types/redux/actions';
 import { State } from '../types/redux/state';
-import { BarReadings } from '../types/readings';
 import * as t from '../types/redux/barReadings';
-import { groupsApi, metersApi } from '../utils/api';
-import { ComparePeriod, calculateCompareDuration } from '../utils/calculateCompare';
+import { compressedReadingsApi } from '../utils/api';
+import { CompressedBarReadings } from '../types/compressed-readings';
 
 /**
  * @param {State} state the Redux state
@@ -67,7 +66,7 @@ function requestMeterBarReadings(meterIDs: number[], timeInterval: TimeInterval,
 	return { type: ActionType.RequestMeterBarReadings, meterIDs, timeInterval, barDuration };
 }
 
-function receiveMeterBarReadings(meterIDs: number[], timeInterval: TimeInterval, barDuration: moment.Duration, readings: BarReadings):
+function receiveMeterBarReadings(meterIDs: number[], timeInterval: TimeInterval, barDuration: moment.Duration, readings: CompressedBarReadings):
 	t.ReceiveMeterBarReadingsAction {
 	return { type: ActionType.ReceiveMeterBarReadings, meterIDs, timeInterval, barDuration, readings };
 }
@@ -76,7 +75,7 @@ function requestGroupBarReadings(groupIDs: number[], timeInterval: TimeInterval,
 	return { type: ActionType.RequestGroupBarReadings, groupIDs, timeInterval, barDuration };
 }
 
-function receiveGroupBarReadings(groupIDs: number[], timeInterval: TimeInterval, barDuration: moment.Duration, readings: BarReadings):
+function receiveGroupBarReadings(groupIDs: number[], timeInterval: TimeInterval, barDuration: moment.Duration, readings: CompressedBarReadings):
 	t.ReceiveGroupBarReadingsAction {
 	return { type: ActionType.ReceiveGroupBarReadings, groupIDs, timeInterval, barDuration, readings };
 }
@@ -91,7 +90,7 @@ function fetchMeterBarReadings(meterIDs: number[], timeInterval: TimeInterval): 
 	return async (dispatch: Dispatch, getState: GetState) => {
 		const barDuration = getState().graph.barDuration;
 		dispatch(requestMeterBarReadings(meterIDs, timeInterval, barDuration));
-		const readings = await metersApi.barReadings(meterIDs, timeInterval, barDuration);
+		const readings = await compressedReadingsApi.meterBarReadings(meterIDs, timeInterval, Math.round(barDuration.asDays()));
 		dispatch(receiveMeterBarReadings(meterIDs, timeInterval, barDuration, readings));
 	};
 }
@@ -106,31 +105,10 @@ function fetchGroupBarReadings(groupIDs: number[], timeInterval: TimeInterval): 
 	return async (dispatch: Dispatch, getState: GetState) => {
 		const barDuration = getState().graph.barDuration;
 		dispatch(requestGroupBarReadings(groupIDs, timeInterval, barDuration));
-		const readings = await groupsApi.barReadings(groupIDs, timeInterval, barDuration);
+		const readings = await compressedReadingsApi.groupBarReadings(groupIDs, timeInterval, Math.round(barDuration.asDays()));
 		dispatch(receiveGroupBarReadings(groupIDs, timeInterval, barDuration, readings));
 	};
 }
-
-function fetchMeterCompareReadings(meterIDs: number[], comparePeriod: ComparePeriod): Thunk {
-	return async (dispatch: Dispatch, getState: GetState) => {
-		const compareDuration = calculateCompareDuration(comparePeriod);
-		const timeInterval = getState().graph.compareTimeInterval;
-		dispatch(requestMeterBarReadings(meterIDs, timeInterval, compareDuration));
-		const readings = await metersApi.barReadings(meterIDs, timeInterval, compareDuration);
-		dispatch(receiveMeterBarReadings(meterIDs, timeInterval, compareDuration, readings));
-	};
-}
-
-function fetchGroupCompareReadings(groupIDs: number[], comparePeriod: ComparePeriod) {
-	return async (dispatch: Dispatch, getState: GetState) => {
-		const compareDuration = calculateCompareDuration(comparePeriod);
-		const timeInterval = getState().graph.compareTimeInterval;
-		dispatch(requestGroupBarReadings(groupIDs, timeInterval, compareDuration));
-		const readings = await groupsApi.barReadings(groupIDs, timeInterval, compareDuration);
-		dispatch(receiveGroupBarReadings(groupIDs, timeInterval, compareDuration, readings));
-	};
-}
-
 
 /**
  * Fetches readings for the bar chart of all selected meterIDs if they are not already fetched or being fetched
@@ -158,34 +136,6 @@ export function fetchNeededBarReadings(timeInterval: TimeInterval): Thunk {
 		// Fetch data for any missing groups
 		if (groupIDsToFetchForBar.length > 0) {
 			promises.push(dispatch(fetchGroupBarReadings(groupIDsToFetchForBar, timeInterval)));
-		}
-		return Promise.all(promises);
-	};
-}
-
-export function fetchNeededCompareReadings(comparePeriod: ComparePeriod): Thunk {
-	return (dispatch, getState) => {
-		const state = getState();
-		const promises: Array<Promise<any>> = [];
-		const timeInterval: TimeInterval = getState().graph.compareTimeInterval;
-		const compareDuration: moment.Duration = calculateCompareDuration(comparePeriod);
-
-		// Determine which meters are missing data for this time interval
-		const meterIDsToFetchForCompare = state.graph.selectedMeters.filter(
-			id => shouldFetchMeterBarReadings(state, id, timeInterval, compareDuration)
-		);
-		// Fetch data for any missing meters
-		if (meterIDsToFetchForCompare.length > 0) {
-			promises.push(dispatch(fetchMeterCompareReadings(meterIDsToFetchForCompare, comparePeriod)));
-		}
-
-		// Determine which groups are missing data for this time interval
-		const groupIDsToFetchForCompare = state.graph.selectedGroups.filter(
-			id => shouldFetchGroupBarReadings(state, id, timeInterval, compareDuration)
-		);
-		// Fetch data for any missing groups
-		if (groupIDsToFetchForCompare.length > 0) {
-			promises.push(dispatch(fetchGroupCompareReadings(groupIDsToFetchForCompare, comparePeriod)));
 		}
 		return Promise.all(promises);
 	};

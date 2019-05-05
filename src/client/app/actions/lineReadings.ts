@@ -3,11 +3,11 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
 
 import { TimeInterval } from '../../../common/TimeInterval';
-import { LineReadings } from '../types/readings';
-import {ActionType, Thunk, Dispatch, GetState} from '../types/redux/actions';
+import { ActionType, Thunk, Dispatch, GetState } from '../types/redux/actions';
 import { State } from '../types/redux/state';
 import * as t from '../types/redux/lineReadings';
-import { groupsApi, metersApi } from '../utils/api';
+import { compressedReadingsApi } from '../utils/api';
+import { CompressedLineReadings } from '../types/compressed-readings';
 
 function shouldFetchGroupLineReadings(state: State, groupID: number, timeInterval: TimeInterval): boolean {
 	const timeIntervalIndex = timeInterval.toString();
@@ -43,7 +43,8 @@ function requestMeterLineReadings(meterIDs: number[], timeInterval: TimeInterval
 	return { type: ActionType.RequestMeterLineReadings, meterIDs, timeInterval };
 }
 
-function receiveMeterLineReadings(meterIDs: number[], timeInterval: TimeInterval, readings: LineReadings): t.ReceiveMeterLineReadingsAction {
+function receiveMeterLineReadings(
+	meterIDs: number[], timeInterval: TimeInterval, readings: CompressedLineReadings): t.ReceiveMeterLineReadingsAction {
 	return { type: ActionType.ReceiveMeterLineReadings, meterIDs, timeInterval, readings };
 }
 
@@ -52,7 +53,8 @@ function requestGroupLineReadings(groupIDs: number[], timeInterval: TimeInterval
 }
 
 
-function receiveGroupLineReadings(groupIDs: number[], timeInterval: TimeInterval, readings: LineReadings): t.ReceiveGroupLineReadingsAction {
+function receiveGroupLineReadings(
+	groupIDs: number[], timeInterval: TimeInterval, readings: CompressedLineReadings): t.ReceiveGroupLineReadingsAction {
 	return { type: ActionType.ReceiveGroupLineReadings, groupIDs, timeInterval, readings };
 }
 
@@ -62,7 +64,7 @@ function receiveGroupLineReadings(groupIDs: number[], timeInterval: TimeInterval
 function fetchMeterLineReadings(meterIDs: number[], timeInterval: TimeInterval): Thunk {
 	return async dispatch => {
 		dispatch(requestMeterLineReadings(meterIDs, timeInterval));
-		const meterLineReadings = await metersApi.lineReadings(meterIDs, timeInterval);
+		const meterLineReadings = await compressedReadingsApi.meterLineReadings(meterIDs, timeInterval);
 		dispatch(receiveMeterLineReadings(meterIDs, timeInterval, meterLineReadings));
 	};
 }
@@ -73,7 +75,7 @@ function fetchMeterLineReadings(meterIDs: number[], timeInterval: TimeInterval):
 function fetchGroupLineReadings(groupIDs: number[], timeInterval: TimeInterval): Thunk {
 	return async (dispatch: Dispatch) => {
 		dispatch(requestGroupLineReadings(groupIDs, timeInterval));
-		const groupLineReadings = await groupsApi.lineReadings(groupIDs, timeInterval);
+		const groupLineReadings = await compressedReadingsApi.groupLineReadings(groupIDs, timeInterval);
 		dispatch(receiveGroupLineReadings(groupIDs, timeInterval, groupLineReadings));
 	};
 }

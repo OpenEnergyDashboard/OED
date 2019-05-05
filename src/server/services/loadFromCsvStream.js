@@ -4,7 +4,6 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/.
  */
 
-const getDB = require('../models/database').getDB;
 const csv = require('csv');
 
 /**
@@ -19,10 +18,11 @@ const csv = require('csv');
  * @param stream the raw stream to load from
  * @param {function(Array.<*>, ...*): M} mapRowToModel A function that maps a CSV row (an array) to a model object
  * @param {function(Array.<M>, ITask): Promise<>} bulkInsertModels A function that bulk inserts an array of models using the supplied transaction
+ * @param conn the database connection to use
  * @template M
  */
-function loadFromCsvStream(stream, mapRowToModel, bulkInsertModels) {
-	return getDB().tx(t => new Promise(resolve => {
+function loadFromCsvStream(stream, mapRowToModel, bulkInsertModels, conn) {
+	return conn.tx(t => new Promise(resolve => {
 		let rejected = false;
 		const error = null;
 		const MIN_INSERT_BUFFER_SIZE = 1000;
@@ -32,7 +32,7 @@ function loadFromCsvStream(stream, mapRowToModel, bulkInsertModels) {
 		const parser = csv.parse();
 
 		function insertQueuedModels() {
-			const insert = bulkInsertModels(modelsToInsert, () => t);
+			const insert = bulkInsertModels(modelsToInsert, t);
 			pendingInserts.push(insert);
 			modelsToInsert = [];
 		}
@@ -78,3 +78,4 @@ function loadFromCsvStream(stream, mapRowToModel, bulkInsertModels) {
 	}));
 }
 module.exports = loadFromCsvStream;
+

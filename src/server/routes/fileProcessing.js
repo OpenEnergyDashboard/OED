@@ -9,8 +9,9 @@ const streamBuffers = require('stream-buffers');
 const multer = require('multer');
 const streamToDB = require('../services/loadFromCsvStream');
 const { insertMeters } = require('../services/readMamacMeters');
-const authenticator = require('./authenticator');
+const authenticator = require('./authenticator').authMiddleware;
 const validate = require('jsonschema').validate;
+const { getConnection } = require('../db');
 
 const router = express.Router();
 
@@ -33,6 +34,7 @@ router.post('/readings/:meter_id', upload.single('csvFile'), async (req, res) =>
 	if (!validate(req.params, validParams).valid) {
 		res.sendStatus(400);
 	} else {
+		const conn = getConnection();
 		try {
 			const id = parseInt(req.params.meter_id);
 			const myReadableStreamBuffer = new streamBuffers.ReadableStreamBuffer({
@@ -48,7 +50,7 @@ router.post('/readings/:meter_id', upload.single('csvFile'), async (req, res) =>
 					const endTimestamp = moment(row[1], 'MM/DD/YYYY HH:mm');
 					const startTimestamp = moment(row[1], 'MM/DD/YYYY HH:mm').subtract(60, 'minutes');
 					return new Reading(id, readRate, startTimestamp, endTimestamp);
-				}, (readings, tx) => Reading.insertOrIgnoreAll(readings, tx));
+				}, (readings, tx) => Reading.insertOrIgnoreAll(readings, tx), conn);
 				res.status(200).json({ success: true });
 			} catch (e) {
 				res.status(403).json({ success: false });
@@ -80,8 +82,9 @@ router.post('/meters', async (req, res) => {
 	if (!validate(req.body, validBody).valid) {
 		res.sendStatus(400);
 	} else {
+		const conn = getConnection();
 		try {
-			await insertMeters(req.body.meters.map(ip => ({ip})));
+			await insertMeters(req.body.meters.map(ip => ({ip})), conn);
 			res.status(200).json({success: true});
 		} catch (err) {
 			res.status(403).json({success: false});
