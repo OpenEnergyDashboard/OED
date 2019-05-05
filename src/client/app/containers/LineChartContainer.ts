@@ -11,11 +11,7 @@ import getGraphColor from '../utils/getGraphColor';
 import { State } from '../types/redux/state';
 
 
-/* Passes the current redux state of the line chart, and turns it into props for the React
-*  component, which is what will be visible on the page. Makes it possible to access
-*  your reducer state objects from within your React components.
-*
-*  Returns the props object. */
+
 function mapStateToProps(state: State) {
 	const timeInterval = state.graph.timeInterval;
 	const datasets: ChartDataSets[] = [];
