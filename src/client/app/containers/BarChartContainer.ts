@@ -31,13 +31,14 @@ function mapStateToProps(state: State) {
 				const color = getGraphColor(label);
 				datasets.push({
 					label,
-					data: readingsData.readings.map(arr => arr[1]),
+					data: readingsData.readings.map(barReading => barReading.reading),
 					backgroundColor: color,
 					hoverBackgroundColor: color
 				});
 				// Add only the unique time intervals to the label set
-				for (const element of _.flatten(readingsData.readings.map(arr => arr[0]))) {
-					labelsSet.add(`${moment(element).format('MMM DD, YYYY')} - ${moment(element).add(barDuration).format('MMM DD, YYYY')}`);
+				for (const barReading of readingsData.readings) {
+					labelsSet.add(
+						`${moment(barReading.startTimestamp).format('MMM DD, YYYY')} - ${moment(barReading.endTimestamp).format('MMM DD, YYYY')}`);
 				}
 			}
 		}
@@ -53,13 +54,14 @@ function mapStateToProps(state: State) {
 				const color = getGraphColor(label);
 				datasets.push({
 					label,
-					data: readingsData.readings.map(arr => arr[1]),
+					data: readingsData.readings.map(barReading => barReading.reading),
 					backgroundColor: color,
 					hoverBackgroundColor: color
 				});
 				// Add only the unique time intervals to the label set
-				for (const element of _.flatten(readingsData.readings.map(arr => arr[0]))) {
-					labelsSet.add(`${moment(element).format('MMM DD, YYYY')} - ${moment(element).add(barDuration).format('MMM DD, YYYY')}`);
+				for (const barReading of readingsData.readings) {
+					labelsSet.add(
+						`${moment(barReading.startTimestamp).format('MMM DD, YYYY')} - ${moment(barReading.endTimestamp).format('MMM DD, YYYY')}`);
 				}
 			}
 		}

@@ -51,8 +51,10 @@ services:
         # Map the default port.
         ports:
             - "3000:3000"
+            - "9229:9229" # Debug port
               # For production you might want something like:
               # - "80:3000"
+              # and disable the debug port
         # Don't bring this up without the DB
         depends_on:
             - database

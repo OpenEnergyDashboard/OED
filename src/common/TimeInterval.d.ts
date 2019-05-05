@@ -16,4 +16,6 @@ export class TimeInterval {
 	public contains(other: TimeInterval): boolean;
 	public valueOf(): string;
 	public duration(specifier: string): number;
+	public getStartTimestamp(): moment.Moment;
+	public getEndTimestamp(): moment.Moment;
 }

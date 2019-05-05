@@ -4,7 +4,6 @@
 
 const database = require('./database');
 
-const getDB = database.getDB;
 const sqlFile = database.sqlFile;
 
 class LogEmail {
@@ -19,41 +18,45 @@ class LogEmail {
 
 	/**
 	 * Returns a promise to create the log email table.
+	 * @param conn the connection to be used.
 	 * @return {Promise.<>}
 	 */
-	static async createTable() {
-		await getDB().none(sqlFile('logemail/create_log_table.sql'));
+	static async createTable(conn) {
+		await conn.none(sqlFile('logemail/create_log_table.sql'));
 	}
 
 
 	/**
 	 * Returns a promise to insert this log email into the database
+	 * @param conn the connection to be used.
 	 * @returns {Promise.<>}
 	 */
-	async insert() {
+	async insert(conn) {
 		const logEmail = this;
 		if (logEmail.id !== undefined) {
 			throw new Error('Attempt to insert a log email that already has an ID');
 		}
-		const resp = await getDB().one(sqlFile('logemail/insert_new_log.sql'), logEmail);
+		const resp = await conn.one(sqlFile('logemail/insert_new_log.sql'), logEmail);
 		this.id = resp.id;
 	}
 
 	/**
 	 * Returns a promise to delete all logs email
+	 * @param conn the connection to be used.
 	 * @return {Promise.<void>}
 	 */
-	static async delete() {
-		await getDB().none(sqlFile('logemail/delete_all_logs.sql'));
+	static async delete(conn) {
+		await conn.none(sqlFile('logemail/delete_all_logs.sql'));
 	}
 
 
 	/**
 	 * Returns a promise to get all of the log email from the database
+	 * @param conn the connection to be used.
 	 * @returns {Promise.<array.<LogEmail>>}
 	 */
-	static async getAll() {
-		const rows = await getDB().any(sqlFile('logemail/get_all_logs.sql'));
+	static async getAll(conn) {
+		const rows = await conn.any(sqlFile('logemail/get_all_logs.sql'));
 		if (rows.length > 0) {
 			return rows.map(row => new LogEmail(row.id, row.error_message));
 		}

@@ -13,32 +13,16 @@ const pgp = require('pg-promise')({
 });
 
 const path = require('path');
-const config = require('../config');
 const patchMomentType = require('./patch-moment-type');
 
 patchMomentType(pgp);
 
 /**
- * The connection to the database
- * @type {pgPromise.IDatabase}
- */
-let db;
-let currentDB = null;
-
-/**
- * Get a new connection to the database.
+ * Create a new connection to the database.
  * @return {pgPromise.IDatabase}
  */
-function getDB() {
-	// Only create a new connection if we've changed databases or have no
-	// current connection.
-	if (currentDB === null || currentDB !== config.database.database) {
-		stopDB();
-		currentDB = null;
-		db = pgp(config.database);
-		currentDB = config.database.database;
-	}
-	return db;
+function getDB(connectionParameters) {
+	return pgp(connectionParameters);
 }
 
 /**
@@ -79,9 +63,10 @@ function sqlFile(filePath) {
 
 /**
  * Returns a promise to create the database schema.
+ * @param conn the connection to be used.
  * @return {Promise<void>}
  */
-async function createSchema() {
+async function createSchema(conn) {
 	// We need to require these here instead of at the top to prevent circular dependency issues.
 	/* eslint-disable global-require */
 	const Meter = require('./Meter');
@@ -94,25 +79,24 @@ async function createSchema() {
 	const Baseline = require('./Baseline');
 
 	/* eslint-enable global-require */
-	await Meter.createMeterTypesEnum();
-	await Meter.createTable();
-	await Reading.createTable();
-	await Reading.createCompressedReadingsFunction();
-	await Reading.createCompressedGroupsReadingsFunction();
-	await Reading.createBarchartReadingsFunction();
-	await Reading.createCompressedGroupsBarchartReadingsFunction();
-	await User.createTable();
-	await Preferences.createTable();
-	await Group.createTables();
-	await Migration.createTable();
-	await LogEmail.createTable();
-	await getDB().none(sqlFile('reading/create_function_get_compressed_readings.sql'));
-	await Baseline.createTable();
-	await getDB().none(sqlFile('baseline/create_function_get_average_reading.sql'));
+	await Meter.createMeterTypesEnum(conn);
+	await Meter.createTable(conn);
+	await Reading.createTable(conn);
+	await Reading.createCompressedReadingsFunction(conn);
+	await Reading.createCompressedGroupsReadingsFunction(conn);
+	await Reading.createBarchartReadingsFunction(conn);
+	await Reading.createCompressedGroupsBarchartReadingsFunction(conn);
+	await User.createTable(conn);
+	await Preferences.createTable(conn);
+	await Group.createTables(conn);
+	await Migration.createTable(conn);
+	await LogEmail.createTable(conn);
+	await conn.none(sqlFile('reading/create_function_get_compressed_readings.sql'));
+	await Reading.createCompressedReadingsMaterializedViews(conn);
+	await Reading.createCompareReadingsFunction(conn);
+	await Baseline.createTable(conn);
+	await conn.none(sqlFile('baseline/create_function_get_average_reading.sql'));
 }
-
-// Create a new database connection.
-// db = getDB();
 
 module.exports = {
 	getDB,

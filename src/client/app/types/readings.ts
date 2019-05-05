@@ -3,6 +3,7 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
 
 import { ChartTypes } from './redux/graph';
+import {TimeInterval} from '../../../common/TimeInterval';
 
 /**
  * The type of line readings in actions.
@@ -18,6 +19,15 @@ export interface LineReadings {
  */
 export interface BarReadings {
 	[id: number]: Array<[number, number]>;
+}
+
+export interface CompareReading {
+	curr_use: number;
+	prev_use: number;
+}
+
+export interface CompareReadings {
+	[id: number]: CompareReading;
 }
 
 export interface ExportDataSet {

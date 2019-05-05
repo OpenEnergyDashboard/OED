@@ -10,6 +10,7 @@ import MetersApi from './MetersApi';
 import FileProcessingApi from './FileProcessingApi';
 import PreferencesApi from './PreferencesApi';
 import VerificationApi from './VerificationApi';
+import CompressedReadingsApi from './CompressedReadingsApi';
 
 const apiBackend = new ApiBackend();
 
@@ -19,5 +20,6 @@ const metersApi = new MetersApi(apiBackend);
 const fileProcessingApi = new FileProcessingApi(apiBackend);
 const preferencesApi = new PreferencesApi(apiBackend);
 const verificationApi = new VerificationApi(apiBackend);
+const compressedReadingsApi = new CompressedReadingsApi(apiBackend);
 
-export { groupsApi, metersApi, fileProcessingApi, preferencesApi, verificationApi };
+export { groupsApi, metersApi, fileProcessingApi, preferencesApi, verificationApi, compressedReadingsApi };

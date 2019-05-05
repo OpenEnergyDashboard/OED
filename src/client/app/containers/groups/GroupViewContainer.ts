@@ -4,9 +4,10 @@
 
 import { connect } from 'react-redux';
 import GroupViewComponent from '../../components/groups/GroupViewComponent';
-import { fetchGroupChildrenIfNeeded, beginEditingIfPossible } from '../../actions/groups';
+import { fetchGroupChildrenIfNeeded, beginEditingIfPossible, changeDisplayMode } from '../../actions/groups';
 import { Dispatch } from '../../types/redux/actions';
 import { State } from '../../types/redux/state';
+import { DisplayMode } from '../../types/redux/groups';
 
 function mapStateToProps(state: State, ownProps: {id: number}) {
 	const id = ownProps.id;
@@ -23,6 +24,7 @@ function mapStateToProps(state: State, ownProps: {id: number}) {
 function mapDispatchToProps(dispatch: Dispatch) {
 	return {
 		fetchGroupChildren: (id: number) => dispatch(fetchGroupChildrenIfNeeded(id)),
+		changeDisplayModeToEdit: () => dispatch(changeDisplayMode(DisplayMode.Edit)),
 		beginEditingIfPossible: (id: number) => dispatch(beginEditingIfPossible(id))
 	};
 }
