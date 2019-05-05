@@ -54,9 +54,7 @@ class PreferencesComponent extends React.Component<PreferencesPropsWithIntl, {}>
 			paddingBottom: '5px'
 		};
 
-		const paddingText: React:CSSProperties = {
-			marginLeft:'30px'
-		}
+
 		const messages = defineMessages({ name: {	id: 'name' }});
 		const { formatMessage } = this.props.intl;
 		return (
