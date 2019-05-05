@@ -75,13 +75,14 @@ class AddMetersComponent extends React.Component<AddMetersPropsWithIntl, {}> {
 		return (
 			<div>
 				<p style={titleStyle}>
+
 					<FormattedMessage id='add.new.meters' />
 				</p>
 				<TooltipHelpComponent
 					tip={formatMessage(messages.tipFormat)}
 				/>
 				<Dropzone accept='text/csv, application/vnd.ms-excel,' onDrop={this.handleMeterToImport}>
-					<div>
+					<div style={{marginLeft: '10px'}}>
 						<FormattedMessage id='upload.meters.csv' />
 					</div>
 				</Dropzone>

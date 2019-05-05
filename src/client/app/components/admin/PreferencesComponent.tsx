@@ -45,13 +45,18 @@ class PreferencesComponent extends React.Component<PreferencesPropsWithIntl, {}>
 			margin: 0
 		};
 		const bottomPaddingStyle: React.CSSProperties = {
-			paddingBottom: '15px'
+			paddingBottom: '15px',
 		};
+
 		const titleStyle: React.CSSProperties = {
 			fontWeight: 'bold',
 			margin: 0,
 			paddingBottom: '5px'
 		};
+
+		const paddingText: React:CSSProperties = {
+			marginLeft:'30px'
+		}
 		const messages = defineMessages({ name: {	id: 'name' }});
 		const { formatMessage } = this.props.intl;
 		return (
@@ -73,15 +78,16 @@ class PreferencesComponent extends React.Component<PreferencesPropsWithIntl, {}>
 						<FormattedMessage id='default.graph.type' />:
 					</p>
 					<div className='radio'>
-						<label>
+						<label >
 							<input
 								type='radio'
 								name='chartTypes'
+								style={{marginRight: '10px'}}
 								value={ChartTypes.line}
 								onChange={this.handleDefaultChartToRenderChange}
 								checked={this.props.defaultChartToRender === ChartTypes.line}
 							/>
-							<FormattedMessage id='line' />
+							<FormattedMessage id='line'/>
 						</label>
 					</div>
 					<div className='radio'>
@@ -89,6 +95,7 @@ class PreferencesComponent extends React.Component<PreferencesPropsWithIntl, {}>
 							<input
 								type='radio'
 								name='chartTypes'
+								style={{marginRight: '10px'}}
 								value={ChartTypes.bar}
 								onChange={this.handleDefaultChartToRenderChange}
 								checked={this.props.defaultChartToRender === ChartTypes.bar}
@@ -101,11 +108,12 @@ class PreferencesComponent extends React.Component<PreferencesPropsWithIntl, {}>
 							<input
 								type='radio'
 								name='chartTypes'
+								style={{marginRight: '10px'}}
 								value={ChartTypes.compare}
 								onChange={this.handleDefaultChartToRenderChange}
 								checked={this.props.defaultChartToRender === ChartTypes.compare}
 							/>
-							<FormattedMessage id='compare' />
+							<FormattedMessage id='compare'/>
 						</label>
 					</div>
 				</div>
@@ -116,6 +124,7 @@ class PreferencesComponent extends React.Component<PreferencesPropsWithIntl, {}>
 					<label>
 						<input
 							type='checkbox'
+							style={{marginRight: '10px'}}
 							onChange={this.handleDefaultBarStackingChange}
 							checked={this.props.defaultBarStacking}
 						/>
@@ -130,6 +139,7 @@ class PreferencesComponent extends React.Component<PreferencesPropsWithIntl, {}>
 						<label>
 							<input
 								type='radio'
+								style={{marginRight: '10px'}}
 								name='languageTypes'
 								value={LanguageTypes.en}
 								onChange={this.handleDefaultLanguageChange}
@@ -142,6 +152,7 @@ class PreferencesComponent extends React.Component<PreferencesPropsWithIntl, {}>
 						<label>
 							<input
 								type='radio'
+								style={{marginRight: '10px'}}
 								name='languageTypes'
 								value={LanguageTypes.fr}
 								onChange={this.handleDefaultLanguageChange}

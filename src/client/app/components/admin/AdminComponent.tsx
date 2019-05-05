@@ -18,6 +18,9 @@ export default function AdminComponent() {
 	const divMarginTop: React.CSSProperties = {
 		marginTop: '50px'
 	};
+	const divMarginLeft: React.CSSProperties = {
+		marginLeft: '25px'
+	};
 	return (
 		<div>
 			<HeaderContainer />
@@ -38,5 +41,3 @@ export default function AdminComponent() {
 		</div>
 	);
 }
-
-
