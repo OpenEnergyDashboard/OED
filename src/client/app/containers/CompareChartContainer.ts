@@ -44,8 +44,8 @@ function mapStateToProps(state: State, ownProps: CompareChartContainerProps): IP
 			x: [periodLabels.prev, periodLabels.current],
 			y: [previousPeriod, currentPeriod],
 			hovertext: [
-				`<b>${previousPeriod} KW</b> ${translate('total')}<br>${periodLabels.prev.toLowerCase()}`,
-				`<b>${currentPeriod} KW</b> ${translate('projected.to.be.used')}<br>${periodLabels.current.toLowerCase()}`
+				`<b>${previousPeriod} KW</b> ${translate('used.this.time')}<br>${periodLabels.prev.toLowerCase()}`,
+				`<b>${currentPeriod} KW</b> ${translate('used.so.far')}<br>${periodLabels.current.toLowerCase()}`
 			],
 			hoverinfo: 'text',
 			type: 'bar',
