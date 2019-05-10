@@ -7,7 +7,8 @@ import * as ReactTooltip from 'react-tooltip';
 
 interface TooltipTextProps {
 	tip: string;
-	text: string;
+	text?: string;
+	children?: React.ReactChild;
 }
 
 /**
@@ -17,10 +18,19 @@ export default function TooltipTextComponent(props: TooltipTextProps) {
 	const divStyle = {
 		display: 'inline-block'
 	};
-	return (
-		<div style={divStyle}>
-			<div data-tip={props.tip}>{props.text}</div>
-			<ReactTooltip />
-		</div>
-	);
+	if (props.text !== null && props.text !== undefined) {
+		return (
+			<div style={divStyle}>
+				<div data-tip={props.tip}>{props.text}</div>
+				<ReactTooltip />
+			</div>
+		);
+	} else {
+		return (
+			<div style={divStyle}>
+				<div data-tip={props.tip}>{props.children}</div>
+				<ReactTooltip />
+			</div>
+		)
+	}
 }
