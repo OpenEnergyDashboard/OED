@@ -10,6 +10,7 @@ import Button from 'reactstrap/lib/Button';
 import ButtonGroup from 'reactstrap/lib/ButtonGroup';
 import { FormEvent } from 'react';
 import { FormattedMessage } from 'react-intl';
+import TooltipHelpComponent from './TooltipHelpComponent';
 
 interface ChartSelectProps {
 	selectedChart: ChartTypes;
@@ -57,9 +58,11 @@ export default class ChartSelectComponent extends React.Component<ChartSelectPro
 						outline={this.props.selectedChart !== ChartTypes.compare}
 						onClick={() => this.handleChangeChartType(ChartTypes.compare)}
 					>
+						<TooltipHelpComponent tip="This serves a page where we can compare different datasets" />
 						<FormattedMessage id='compare' />
 					</Button>
 				</ButtonGroup>
+				<TooltipHelpComponent tip="The various forms of graph that the data can be visualized as" />
 			</div>
 		);
 	}
