@@ -16,6 +16,7 @@ import ChartLinkContainer from '../containers/ChartLinkContainer';
 import { ChartTypes } from '../types/redux/graph';
 import { ComparePeriod, SortingOrder } from '../utils/calculateCompare';
 import 'rc-slider/assets/index.css';
+import TooltipTextComponent from './TooltipTextComponent';
 
 const Slider = createSliderWithTooltip(sliderWithoutTooltips);
 
@@ -217,11 +218,14 @@ class UIOptionsComponent extends React.Component<UIOptionsPropsWithIntl, UIOptio
 						onClick={this.handleSetOptionsVisibility}
 						outline
 					>
+						<TooltipTextComponent tip="Make optionns disapear">
 						{ this.props.optionsVisibility ?
+							
 							<FormattedMessage id='hide.options' />
 							:
 							<FormattedMessage id='show.options' />
 						}
+						</TooltipTextComponent>
 					</Button>
 				</div>
 			</div>

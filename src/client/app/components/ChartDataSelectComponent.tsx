@@ -6,6 +6,7 @@ import * as React from 'react';
 import MultiSelectComponent from './MultiSelectComponent';
 import { SelectOption } from '../types/items';
 import { defineMessages, FormattedMessage, injectIntl, InjectedIntlProps } from 'react-intl';
+import TooltipHelpComponent from './TooltipHelpComponent';
 
 interface ChartDataSelectProps {
 	meters: SelectOption[];
@@ -31,6 +32,7 @@ class ChartDataSelectComponent extends React.Component<ChartDataSelectPropsWithI
 	public render() {
 		const divBottomPadding: React.CSSProperties = {
 			paddingBottom: '15px'
+			
 		};
 		const labelStyle: React.CSSProperties = {
 			fontWeight: 'bold',
@@ -47,17 +49,21 @@ class ChartDataSelectComponent extends React.Component<ChartDataSelectPropsWithI
 		return (
 			<div>
 				<p style={labelStyle}>
+				
 					<FormattedMessage id='groups' />:
 				</p>
 				<div style={divBottomPadding}>
+			
 					<MultiSelectComponent
 						options={this.props.groups}
 						selectedOptions={this.props.selectedGroups}
 						placeholder={formatMessage(messages.selectGroups)}
 						onValuesChange={handleGroupSelect}
 					/>
+					<TooltipHelpComponent tip="Choose which groups to dipsplay"/>
 				</div>
 				<p style={labelStyle}>
+					
 					<FormattedMessage id='meters' />:
 				</p>
 				<div style={divBottomPadding}>
@@ -67,6 +73,7 @@ class ChartDataSelectComponent extends React.Component<ChartDataSelectPropsWithI
 						placeholder={formatMessage(messages.selectMeters)}
 						onValuesChange={this.handleMeterSelect}
 					/>
+					<TooltipHelpComponent tip="Choose which meters to display"/>
 				</div>
 			</div>
 		);
@@ -87,6 +94,7 @@ class ChartDataSelectComponent extends React.Component<ChartDataSelectPropsWithI
 	private handleGroupSelect(selection: SelectOption[]) {
 		this.props.selectGroups(selection.map(s => s.value));
 	}
+	
 }
 
 export default injectIntl<ChartDataSelectProps>(ChartDataSelectComponent);

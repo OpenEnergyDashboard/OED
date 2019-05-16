@@ -4,6 +4,7 @@
 
 import * as React from 'react';
 import { FormattedMessage } from 'react-intl';
+import TooltipHelpComponent from './TooltipHelpComponent';
 
 /**
  * React component that controls the footer strip at the bottom of all pages
@@ -39,7 +40,9 @@ export default function FooterComponent() {
 					</a>
 					<FormattedMessage id='info' />
 				</span>
+				<TooltipHelpComponent tip="Follow links if you have more questions"/>
 			</footer>
+			
 		</div>
 	);
 }

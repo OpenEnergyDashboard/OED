@@ -11,6 +11,7 @@ import { hasToken } from '../utils/token';
 import getPage from '../utils/getPage';
 import TooltipHelpComponent from './TooltipHelpComponent';
 import topLevel from 'reducers/notifications';
+import TooltipTextComponent from './TooltipTextComponent';
 
 interface HeaderButtonsProps {
 	showCollapsedMenuButton: boolean;
@@ -71,8 +72,8 @@ export default class HeaderButtonsComponent extends React.Component<HeaderButton
 				<div className={this.props.showCollapsedMenuButton ? 'd-none d-lg-block' : ''}>
 					<TooltipHelpComponent tip="Navigate to different pages" />
 					<Link style={adminLinkStyle} to='/admin'><Button outline><FormattedMessage id='admin.panel'/></Button></Link>
-					<Link style={groupsLinkStyle} to='/groups'><Button outline><FormattedMessage id='groups' /></Button></Link>
-					<Link style={metersLinkStyle} to='/meters'><Button outline><FormattedMessage id='meters' /></Button></Link>
+					<Link style={groupsLinkStyle} to='/groups'><Button outline><TooltipTextComponent tip="Groups"><FormattedMessage id='groups' /></TooltipTextComponent></Button></Link>
+					<Link style={metersLinkStyle} to='/meters'><Button outline><TooltipTextComponent tip="Meters"><FormattedMessage id='meters' /></TooltipTextComponent></Button></Link>
 					<Link style={homeLinkStyle} to='/'><Button outline><FormattedMessage id='home'/></Button></Link>
 					<Link style={loginLinkStyle} to='/login'><Button outline><FormattedMessage id='log.in'/></Button></Link>
 					<Link style={logoutButtonStyle} to='/'><Button outline onClick={this.handleLogOut}><FormattedMessage id='log.out'/></Button></Link>
