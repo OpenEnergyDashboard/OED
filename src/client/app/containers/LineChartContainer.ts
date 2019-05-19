@@ -98,7 +98,7 @@ function mapStateToProps(state: State) {
 				title: (tooltipItems: ChartTooltipItem[]) => `${moment(tooltipItems[0].xLabel).format('dddd, MMM DD, YYYY hh:mm a')}`,
 				label: (tooltipItems: ChartTooltipItem) => {
 					if (tooltipItems.datasetIndex !== undefined) {
-						return `${datasets[tooltipItems.datasetIndex].label}: ${tooltipItems.yLabel} kW`;
+						return `${datasets[tooltipItems.datasetIndex].label}: ${Number(parseFloat(tooltipItems.yLabel || '0').toFixed(3))} kW`;
 					} else {
 						throw new Error('tooltipItems.datasetIndex was undefined in line chart tooltip label callback');
 					}
