@@ -106,7 +106,7 @@ export default class RouteComponent extends React.Component<RouteProps, {}> {
 				const options: LinkOptions = {};
 				for (const [key, infoObj] of _.entries(queries)) {
 					// TODO Verify that this is not null/undefined as travis warning is giving or there is a better fix than this quick one.
-					// This removes the static check issue but not a runtime complaint per 
+					// This removes the static check issue but not a runtime complaint per
 					// https://stackoverflow.com/questions/40349987/how-to-suppress-error-ts2533-object-is-possibly-null-or-undefined
 					const info: string = infoObj!.toString();
 					switch (key) {
