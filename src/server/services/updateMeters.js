@@ -4,7 +4,7 @@
 
 const _ = require('lodash');
 const Reading = require('../models/Reading');
-
+const validateData = require('../services/validateData');
 const { log } = require('../log');
 
 /**
@@ -15,6 +15,8 @@ const { log } = require('../log');
  * @param conn the database connection to use
  * @return {Promise.<void>}
  */
+const minVal = -Number.MAX_VALUE;
+const maxVal = -Number.MIN_VALUE;
 async function updateAllMeters(dataReader, metersToUpdate, conn) {
 	const time = new Date();
 	log.info(`Getting meter data ${time.toISOString()}`);
@@ -31,7 +33,7 @@ async function updateAllMeters(dataReader, metersToUpdate, conn) {
 				log.error(`ERROR ON REQUEST TO METER ${ipAddress}, ${err.message}`, err);
 				return null;
 			}))
-		), elem => elem !== null);
+		), elem => validateData(elem, minVal, maxVal));
 
 		// Flatten the batches (an array of arrays) into a single array.
 		const allReadingsToInsert = [].concat(...readingInsertBatches);
