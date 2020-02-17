@@ -4,8 +4,10 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/.
  */
 
+//This script checks whether the server is online or not using PHP
+
 <?php
-	$host = 'oed.beloit.edu:3040';
+	$host = 'YOUR SITE URL';
 	if($socket = @fsockopen($host, 80, $errno, $errstr, 30)) {
 		echo '<script type="text/javascript">
 			const { log } = require("../log");
