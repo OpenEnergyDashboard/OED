@@ -136,6 +136,7 @@ export interface LinkOptions {
 	chartType?: t.ChartTypes;
 	barDuration?: moment.Duration;
 	toggleBarStacking?: boolean;
+	
 	comparePeriod?: ComparePeriod;
 	compareSortingOrder?: SortingOrder;
 	optionsVisibility?: boolean;
