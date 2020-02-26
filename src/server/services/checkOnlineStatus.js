@@ -4,8 +4,9 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/.
  */
 
-//This script checks whether the server is online or not using Javascript.
-//This script may encounter redirecting problem due to the web policy
+// This script checks whether the server is online or not using Javascript.
+// This script may encounter redirecting problem due to the web policy
+// See below for editing for your site
 
 const { log } = require('../log');
 var script = document.createElement('script');
@@ -14,6 +15,7 @@ document.body.appendChild(script);
 
 $.ajax({
 	type: "HEAD",
+	// edit the next line for the URL you want to check
 	url: 'YOUR SITE URL',
 	success : function() {
 		log.info('The server is still alive');

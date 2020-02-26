@@ -4,9 +4,11 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/.
  */
 
-//This script checks whether the server is online or not using PHP
+// This script checks whether the server is online or not using PHP
+// See below for editing for your site
 
 <?php
+	// edit the next line for the URL you want to check
 	$host = 'YOUR SITE URL';
 	if($socket = @fsockopen($host, 80, $errno, $errstr, 30)) {
 		echo '<script type="text/javascript">
