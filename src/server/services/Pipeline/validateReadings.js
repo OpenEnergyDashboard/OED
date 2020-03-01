@@ -25,7 +25,7 @@ function validateReadings(arrayToValidate, maxVal, minVal, minDate, maxDate, int
 }
 
 function checkDate(arrayToValidate, minDate, maxDate) {
-	for (reading in arrayToValidate) {
+	for (reading of arrayToValidate) {
 		if (reading.startTimestamp.isBefore(minDate)) {
 			log.error(`ERROR WHEN CHECKING READING TIME FROM METER ${reading.meterID}: Time ${reading.startTimestamp} is earlier than lower bound ${minDate}`);
 			return false;
@@ -39,7 +39,7 @@ function checkDate(arrayToValidate, minDate, maxDate) {
 }
 
 function checkValue(arrayToValidate, minVal, maxVal) {
-	for (reading in arrayToValidate) {
+	for (reading of arrayToValidate) {
 		if (reading.reading < minVal) {
 			log.error(`ERROR WHEN CHECKING READING VALUE FROM METER ${reading.meterID}: ${reading.reading} is smaller than lower bound ${minVal}`);
 			return false;
@@ -55,8 +55,8 @@ function checkIntervals(arrayToValidate, interval) {
 	if (interval == null) {
 		return true;
 	}
-	lastTime = null
-	for (reading in arrayToValidate) {
+	lastTime = null;
+	for (reading of arrayToValidate) {
 		if (lastTime == null) {
 			lastTime = reading.startTimestamp;
 			continue;

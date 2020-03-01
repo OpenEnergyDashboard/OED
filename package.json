@@ -45,7 +45,7 @@
     "chartjs-plugin-datalabels": "~0.1.0",
     "cookie-parser": "~1.4.4",
     "cross-env": "~5.0.5",
-    "csv": "~1.1.1",
+    "csv": "~5.3.1",
     "dotenv": "~2.0.0",
     "es6-promisify": "~5.0.0",
     "event-stream": "~3.3.5",
