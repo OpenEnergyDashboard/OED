@@ -11,7 +11,7 @@ const { log } = require('../log');
  * Convert an matrix of number values to an array of Readings
  * @param {matrix of numbers} toConvert a number array in which each row represents a Reading values
  * @param {ipAddress} meter IP address of the meter which all the Reading values belong to
- * @param {number} maxVal maximum acceptable reading value 
+ * @param {number} maxVal maximum acceptable reading value
  * @param {number} minVal minimum acceptable reading value
  * @param {date} minDate earliest acceptable date
  * @param {date} maxDate latest acceptable date
@@ -19,13 +19,13 @@ const { log } = require('../log');
  */
 
 function convertToReadings(toConvert, ipAddress, maxVal, minVal, minDate, maxDate, equalInterval) {
-	readings = toConvert.map(row => new Reading(ipAddress,row[0],row[1],row[2]));
+	readings = toConvert.map(row => new Reading(ipAddress, row[0], row[1], row[2]));
 	if (!validateReading(arrayOfReadings, maxVal, minVal, minDate, maxDate, equalInterval)) {
 		log.error(`ERROR WHEN VALIDATING READINGS FROM METER ${meter.id}`);
 		return null;
 	}
 	return arrayOfReadings;
- }
+}
 
- module.exports = convertToReadings;
+module.exports = convertToReadings;
 

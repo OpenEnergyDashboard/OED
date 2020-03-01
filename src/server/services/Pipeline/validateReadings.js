@@ -9,8 +9,8 @@ const { log } = require('../log');
 
 /**
  * Validate an array of Readings value according to certain criteria
- * @param {array of Readings} arrayToValidate 
- * @param {number} maxVal maximum acceptable reading value 
+ * @param {array of Readings} arrayToValidate
+ * @param {number} maxVal maximum acceptable reading value
  * @param {number} minVal minimum acceptable reading value
  * @param {Moment} minDate earliest acceptable date
  * @param {Moment} maxDate latest acceptable date
@@ -34,7 +34,7 @@ function checkDate(arrayToValidate, minDate, maxDate) {
 			log.error(`ERROR WHEN CHECKING READING TIME FROM METER ${reading.meterID}: Time ${reading.startTimestamp} is later than upper bound ${maxDate}`);
 			return false;
 		}
-	}cocov
+	}
 	return true;
 }
 
@@ -48,18 +48,20 @@ function checkValue(arrayToValidate, minVal, maxVal) {
 			return false;
 		}
 	}
-	return true;	
+	return true;
 }
 
 function checkIntervals(arrayToValidate, interval) {
-	if (interval == null) return true;
+	if (interval == null) {
+		return true;
+	}
 	lastTime = null
 	for (reading in arrayToValidate) {
 		if (lastTime == null) {
 			lastTime = reading.startTimestamp;
 			continue;
 		}
-		if (lastTime.diff(reading.startTimestamp) != interval) {
+		if (lastTime.diff(reading.startTimestamp) !== interval) {
 			return false;
 		}
 	}
