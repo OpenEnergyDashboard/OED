@@ -20,6 +20,12 @@ function mapStateToProps(state: State) {
 			linkText += `&barDuration=${state.graph.barDuration.asDays()}`;
 			linkText += `&barStacking=${state.graph.barStacking}`;
 			break;
+		case 'line':
+			linkText += `&serverRange=${state.graph.timeInterval.toString()}`;
+			//under construction;
+			let root:any = document.getElementById('root');
+			// linkText += `&displayRange=${state.graph.timeInterval.toString().split('_')}`;		
+			break;
 		case 'compare':
 			linkText += `&comparePeriod=${state.graph.comparePeriod}`;
 			linkText += `&compareSortingOrder=${state.graph.compareSortingOrder}`;

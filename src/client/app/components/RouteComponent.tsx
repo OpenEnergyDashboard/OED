@@ -27,6 +27,7 @@ import EditGroupsContainer from '../containers/groups/EditGroupsContainer';
 import CreateGroupContainer from '../containers/groups/CreateGroupContainer';
 import GroupsDetailContainer from '../containers/groups/GroupsDetailContainer';
 import MetersDetailContainer from '../containers/meters/MetersDetailContainer';
+import { TimeInterval } from '../../../common/TimeInterval.js';
 
 interface RouteProps {
 	barStacking: boolean;
@@ -105,10 +106,7 @@ export default class RouteComponent extends React.Component<RouteProps, {}> {
 			try {
 				const options: LinkOptions = {};
 				for (const [key, infoObj] of _.entries(queries)) {
-					// TODO Verify that this is not null/undefined as travis warning is giving or there is a better fix than this quick one.
-					// This removes the static check issue but not a runtime complaint per
-					// https://stackoverflow.com/questions/40349987/how-to-suppress-error-ts2533-object-is-possibly-null-or-undefined
-					const info: string = infoObj!.toString();
+					const info: string = infoObj.toString();
 					switch (key) {
 						case 'meterIDs':
 							options.meterIDs = info.split(',').map(s => parseInt(s));
@@ -120,7 +118,7 @@ export default class RouteComponent extends React.Component<RouteProps, {}> {
 							options.chartType = info as ChartTypes;
 							break;
 						case 'barDuration':
-							options.barDuration = moment.duration(parseInt(info), 'days');
+							options.barDuration = moment.duration(parseInt(info));
 							break;
 						case 'barStacking':
 							if (this.props.barStacking.toString() !== info) {
@@ -136,6 +134,8 @@ export default class RouteComponent extends React.Component<RouteProps, {}> {
 						case 'optionsVisibility':
 							options.optionsVisibility = (info === 'true');
 							break;
+						case 'serverRange':
+							options.serverRange = TimeInterval.fromString(info);
 						default:
 							throw new Error('Unknown query parameter');
 					}

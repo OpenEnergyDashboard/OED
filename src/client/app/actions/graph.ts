@@ -122,7 +122,7 @@ function shouldChangeGraphZoom(state: State, timeInterval: TimeInterval): boolea
 
 export function changeGraphZoomIfNeeded(timeInterval: TimeInterval): Thunk {
 	return (dispatch, getState) => {
-		if (shouldChangeGraphZoom(getState(), TimeInterval.unbounded())) {
+		if (shouldChangeGraphZoom(getState(), timeInterval)) {
 			dispatch(changeGraphZoom(timeInterval));
 			dispatch(fetchNeededReadingsForGraph(timeInterval));
 		}
@@ -136,7 +136,7 @@ export interface LinkOptions {
 	chartType?: t.ChartTypes;
 	barDuration?: moment.Duration;
 	toggleBarStacking?: boolean;
-	
+	serverRange?: TimeInterval;
 	comparePeriod?: ComparePeriod;
 	compareSortingOrder?: SortingOrder;
 	optionsVisibility?: boolean;
@@ -150,7 +150,7 @@ export interface LinkOptions {
 export function changeOptionsFromLink(options: LinkOptions) {
 	const dispatchFirst: Thunk[] = [setHotlinkedAsync(true)];
 	const dispatchSecond: Array<Thunk | t.ChangeChartToRenderAction | t.ChangeBarStackingAction
-		| t.ChangeCompareSortingOrderAction | t.SetOptionsVisibility> = [];
+		| t.ChangeGraphZoomAction |t.ChangeCompareSortingOrderAction | t.SetOptionsVisibility> = [];
 	if (options.meterIDs) {
 		dispatchFirst.push(fetchMetersDetailsIfNeeded());
 		dispatchSecond.push(changeSelectedMeters(options.meterIDs));
@@ -167,6 +167,9 @@ export function changeOptionsFromLink(options: LinkOptions) {
 	}
 	if (options.toggleBarStacking) {
 		dispatchSecond.push(changeBarStacking());
+	}
+	if (options.serverRange) {
+		dispatchSecond.push(changeGraphZoomIfNeeded(options.serverRange));
 	}
 	if (options.comparePeriod) {
 		dispatchSecond.push(changeCompareGraph(options.comparePeriod));
