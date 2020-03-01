@@ -14,13 +14,13 @@ const { log } = require('../log');
  * @param {number} minVal minimum acceptable reading value
  * @param {Moment} minDate earliest acceptable date
  * @param {Moment} maxDate latest acceptable date
- * @param {boolean} equalInterval true if expecting equal intervals, otherwise false
+ * @param {boolean} interval the expected interval between reading time
  */
 
-function validateReadings(arrayToValidate, maxVal, minVal, minDate, maxDate, equalInterval) {
+function validateReadings(arrayToValidate, maxVal, minVal, minDate, maxDate, interval) {
 	validDates = checkDate(arrayToValidate, minDate, maxDate);
 	validValues = checkValue(arayToValidate, minVal, maxVal);
-	validIntervals = checkIntervals(arrayToValidate, equalInterval);
+	validIntervals = checkIntervals(arrayToValidate, interval);
 	return validDates && validValues && validIntervals;
 }
 
@@ -51,8 +51,18 @@ function checkValue(arrayToValidate, minVal, maxVal) {
 	return true;	
 }
 
-function checkIntervals(arrayToValidate, equalInterval) {
-	if (!equalInterval) return true;
-
+function checkIntervals(arrayToValidate, interval) {
+	if (interval == null) return true;
+	lastTime = null
+	for (reading in arrayToValidate) {
+		if (lastTime == null) {
+			lastTime = reading.startTimestamp;
+			continue;
+		}
+		if (lastTime.diff(reading.startTimestamp()) != interval) {
+			return false;
+		}
+	}
+	return true;
 }
 module.exports = validateReadings;
