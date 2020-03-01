@@ -59,7 +59,7 @@ function checkIntervals(arrayToValidate, interval) {
 			lastTime = reading.startTimestamp;
 			continue;
 		}
-		if (lastTime.diff(reading.startTimestamp()) != interval) {
+		if (lastTime.diff(reading.startTimestamp) != interval) {
 			return false;
 		}
 	}
