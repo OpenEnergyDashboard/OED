@@ -20,11 +20,11 @@ const { log } = require('../log');
 
 function convertToReadings(toConvert, ipAddress, maxVal, minVal, minDate, maxDate, equalInterval) {
 	readings = toConvert.map(row => new Reading(ipAddress, row[0], row[1], row[2]));
-	if (!validateReading(arrayOfReadings, maxVal, minVal, minDate, maxDate, equalInterval)) {
+	if (!validateReading(readings, maxVal, minVal, minDate, maxDate, equalInterval)) {
 		log.error(`ERROR WHEN VALIDATING READINGS FROM METER ${meter.id}`);
 		return null;
 	}
-	return arrayOfReadings;
+	return readings;
 }
 
 module.exports = convertToReadings;
