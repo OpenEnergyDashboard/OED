@@ -9,13 +9,13 @@ const { log } = require('../log');
 
 /**
  * Validate an array of Readings value according to certain criteria
- * @param {array of Readings} arrayToValidate
+ * @param {array of Readings} arrayToValidate 
  * @param {number} maxVal maximum acceptable reading value
  * @param {number} minVal minimum acceptable reading value
  * @param {Moment} minDate earliest acceptable date
  * @param {Moment} maxDate latest acceptable date
  * @param {boolean} interval the expected interval between reading time
- * @param {number} maxError the maximum number of errors to be reported
+ * @param {number} maxError the maximum number of errors to be reported, ignore the rest
  */
 
 function validateReadings(arrayToValidate, maxVal, minVal, minDate, maxDate, interval, maxError) {
@@ -25,7 +25,17 @@ function validateReadings(arrayToValidate, maxVal, minVal, minDate, maxDate, int
 	return validDates && validValues && validIntervals;
 }
 
+/**
+ * Check and report any out-of-bound date. Can be ignored by passing null minDate and maxDate
+ * @param {array of Readings} arrayToValidate 
+ * @param {Moment} minDate earliest acceptable date
+ * @param {Moment} maxDate latest acceptable date
+ * @param {number} maxError maximum number of errors to be reported, ignore the rest
+ */
 function checkDate(arrayToValidate, minDate, maxDate, maxError) {
+	if (minDate === null && maxDate === null) {
+		return true;
+	}
 	validDates = true;
 	for (reading of arrayToValidate) {
 		if (maxError < 0) {
@@ -45,6 +55,13 @@ function checkDate(arrayToValidate, minDate, maxDate, maxError) {
 	return validDates;
 }
 
+/**
+ * Check and report any out-of-bound reading value. Can be ignored by passing MIN_VALUE & MAX_VALUE
+ * @param {*} arrayToValidate 
+ * @param {*} minVal maximum acceptable reading value
+ * @param {*} maxVal minimum acceptable reading value
+ * @param {*} maxError maximum number of errors to be reported, ignore the rest
+ */
 function checkValue(arrayToValidate, minVal, maxVal, maxError) {
 	validValues = true;
 	for (reading of arrayToValidate) {
@@ -64,6 +81,12 @@ function checkValue(arrayToValidate, minVal, maxVal, maxError) {
 	return validValues;
 }
 
+/**
+ * Check and report unequal intervals. Can be ignore by passing null interval
+ * @param {*} arrayToValidate 
+ * @param {*} interval expected gap between 2 consecutive reading values
+ * @param {*} maxError maximum number of errors to be reported. Ignore the rest
+ */
 function checkIntervals(arrayToValidate, interval, maxError) {
 	if (interval == null) {
 		return true;
@@ -74,7 +97,7 @@ function checkIntervals(arrayToValidate, interval, maxError) {
 		if (maxError < 0) {
 			break;
 		}
-		if (reading == arrayToValidate[0]) {
+		if (reading === arrayToValidate[0]) {
 			continue;
 		}
 		if (lastTime.diff(reading.startTimestamp) !== interval) {
