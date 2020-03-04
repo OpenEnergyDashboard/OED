@@ -16,6 +16,7 @@ mocha.describe('Barchart Readings', () => {
 	const timestamp5 = timestamp4.clone().add(1, 'hour');
 
 	mocha.beforeEach(async () => {
+		connectTestDB(); // Debug: see if this helps
 		conn = testDB.getConnection();
 		await new Meter(undefined, 'Meter', null, false, true, Meter.type.MAMAC).insert(conn);
 		meter = await Meter.getByName('Meter', conn);
@@ -23,7 +24,6 @@ mocha.describe('Barchart Readings', () => {
 
 	mocha.it('barchart readings with no specified time interval', async () => {
 		conn = testDB.getConnection();
-		console.log(conn); // Debug: not sure this works
 		const reading1 = new Reading(meter.id, 100, timestamp1, timestamp2);
 		const reading2 = new Reading(meter.id, 200, timestamp2, timestamp3);
 		const reading3 = new Reading(meter.id, 300, timestamp3, timestamp4);
