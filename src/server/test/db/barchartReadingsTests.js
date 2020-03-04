@@ -32,6 +32,7 @@ mocha.describe('Barchart Readings', () => {
 		// TODO: This is awkward. Is there a better way to have conn as a non-optional
 		// without requiring changing EVERY call to getBarchartReadings?
 		// If not, well, we need to change every call.
+		// Silly change to see if get Travis error.
 		const barchartReadings = await Reading.getBarchartReadings([meter.id], moment.duration(2, 'h'), null, null, conn);
 		expect(barchartReadings[meter.id]).to.have.lengthOf(2);
 		const expectedFirstReading = Math.floor(reading1.reading + reading2.reading);
