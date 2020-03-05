@@ -32,3 +32,6 @@ postgres-data
 # Text files
 *.txt
 !License.txt
+
+# Mac file system files
+.DS_Store
