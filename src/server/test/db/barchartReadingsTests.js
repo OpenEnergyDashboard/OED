@@ -16,7 +16,6 @@ mocha.describe('Barchart Readings', () => {
 	const timestamp5 = timestamp4.clone().add(1, 'hour');
 
 	mocha.beforeEach(async () => {
-		connectTestDB(); // Debug: see if this helps
 		conn = testDB.getConnection();
 		await new Meter(undefined, 'Meter', null, false, true, Meter.type.MAMAC).insert(conn);
 		meter = await Meter.getByName('Meter', conn);
