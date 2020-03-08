@@ -9,7 +9,7 @@ const { log } = require('../log');
 
 /**
  * Validate an array of Readings value according to certain criteria
- * @param {array of Readings} arrayToValidate 
+ * @param {array of Readings} arrayToValidate
  * @param {number} maxVal maximum acceptable reading value
  * @param {number} minVal minimum acceptable reading value
  * @param {Moment} minDate earliest acceptable date
@@ -27,7 +27,7 @@ function validateReadings(arrayToValidate, maxVal, minVal, minDate, maxDate, int
 
 /**
  * Check and report any out-of-bound date. Can be ignored by passing null minDate and maxDate
- * @param {array of Readings} arrayToValidate 
+ * @param {array of Readings} arrayToValidate
  * @param {Moment} minDate earliest acceptable date
  * @param {Moment} maxDate latest acceptable date
  * @param {number} maxError maximum number of errors to be reported, ignore the rest
@@ -57,7 +57,7 @@ function checkDate(arrayToValidate, minDate, maxDate, maxError) {
 
 /**
  * Check and report any out-of-bound reading value. Can be ignored by passing MIN_VALUE & MAX_VALUE
- * @param {*} arrayToValidate 
+ * @param {*} arrayToValidate
  * @param {*} minVal maximum acceptable reading value
  * @param {*} maxVal minimum acceptable reading value
  * @param {*} maxError maximum number of errors to be reported, ignore the rest
@@ -83,7 +83,7 @@ function checkValue(arrayToValidate, minVal, maxVal, maxError) {
 
 /**
  * Check and report unequal intervals. Can be ignore by passing null interval
- * @param {*} arrayToValidate 
+ * @param {*} arrayToValidate
  * @param {*} interval expected gap between 2 consecutive reading values
  * @param {*} maxError maximum number of errors to be reported. Ignore the rest
  */
