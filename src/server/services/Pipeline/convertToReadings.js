@@ -9,7 +9,7 @@ const { log } = require('../log');
 
 /**
  * Convert an matrix of number values to an array of Readings
- * @param {matrix of numbers} toConvert a number array in which each row represents a Reading values
+ * @param {matrix of numbers} toConvert a number array in which each row represents a Reading values (reading, startTime, endTime)
  * @param {ipAddress} meter IP address of the meter which all the Reading values belong to
  * @param {number} maxVal maximum acceptable reading value
  * @param {number} minVal minimum acceptable reading value
