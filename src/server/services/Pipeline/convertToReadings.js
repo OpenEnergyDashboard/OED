@@ -4,7 +4,7 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/.
  */
 
-const Reading = require('./../models/Reading');
+const Reading = require('../../models/Reading');
 const { log } = require('../log');
 
 /**

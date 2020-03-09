@@ -17,7 +17,7 @@ mocha.describe('Convert array of values to array of Readings', () => {
 		for (let i = 0; i < result.length; ++i) {
 			expect(result[i].reading).to.equal(sampleArray[i][0]);
 			expect(result[i].startTimeStamp).to.equal(sammpleArray[i][1]);
-			expect(result[i].endTimeStamp.to.equal(sampleArray[i][2]));
+			expect(result[i].endTimeStamp).to.equal(sampleArray[i][2]);
 		}
 	});
 });
