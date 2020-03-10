@@ -135,6 +135,7 @@ export interface LinkOptions {
 	groupIDs?: number[];
 	chartType?: t.ChartTypes;
 	barDuration?: moment.Duration;
+	serverRange?: TimeInterval;
 	toggleBarStacking?: boolean;
 	comparePeriod?: ComparePeriod;
 	compareSortingOrder?: SortingOrder;
@@ -149,7 +150,7 @@ export interface LinkOptions {
 export function changeOptionsFromLink(options: LinkOptions) {
 	const dispatchFirst: Thunk[] = [setHotlinkedAsync(true)];
 	const dispatchSecond: Array<Thunk | t.ChangeChartToRenderAction | t.ChangeBarStackingAction
-		| t.ChangeCompareSortingOrderAction | t.SetOptionsVisibility> = [];
+		| t.ChangeCompareSortingOrderAction | t.SetOptionsVisibility | t.ChangeGraphZoomAction> = [];
 	if (options.meterIDs) {
 		dispatchFirst.push(fetchMetersDetailsIfNeeded());
 		dispatchSecond.push(changeSelectedMeters(options.meterIDs));
@@ -163,6 +164,9 @@ export function changeOptionsFromLink(options: LinkOptions) {
 	}
 	if (options.barDuration) {
 		dispatchSecond.push(changeBarDuration(options.barDuration));
+	}
+	if (options.serverRange) {
+		dispatchSecond.push(changeGraphZoomIfNeeded(options.serverRange));
 	}
 	if (options.toggleBarStacking) {
 		dispatchSecond.push(changeBarStacking());

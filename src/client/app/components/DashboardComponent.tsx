@@ -104,16 +104,16 @@ export default class DashboardComponent extends React.Component<DashboardProps, 
 					</div>
 				</div>
 			</div>
-		);		
+		);
 	}
 
 	private handleTimeIntervalChange(mode: string) {
 		if (mode == "all"){
-			this.props.changeTimeInterval(TimeInterval.unbounded());			
+			this.props.changeTimeInterval(TimeInterval.unbounded());
 		}else{
 			let sliderContainer: any = document.querySelector(".rangeslider-bg");
 			let sliderBox: any = document.querySelector(".rangeslider-slidebox");
-			let root: any = document.getElementById("root");	
+			let root: any = document.getElementById("root");
 
 			if (sliderContainer && sliderBox && root){
 				// Attributes of the slider: full width and the min & max values of the box
@@ -136,7 +136,7 @@ export default class DashboardComponent extends React.Component<DashboardProps, 
 
 				let timeInterval = new TimeInterval(moment(newMinXTimestamp), moment(newMaxXTimestamp));
 				this.props.changeTimeInterval(timeInterval);
-			}			
+			}
 		}
 	}
 }

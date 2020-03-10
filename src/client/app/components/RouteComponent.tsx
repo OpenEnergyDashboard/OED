@@ -27,6 +27,7 @@ import EditGroupsContainer from '../containers/groups/EditGroupsContainer';
 import CreateGroupContainer from '../containers/groups/CreateGroupContainer';
 import GroupsDetailContainer from '../containers/groups/GroupsDetailContainer';
 import MetersDetailContainer from '../containers/meters/MetersDetailContainer';
+import { TimeInterval } from '../../../common/TimeInterval.js';
 
 interface RouteProps {
 	barStacking: boolean;
@@ -132,6 +133,9 @@ export default class RouteComponent extends React.Component<RouteProps, {}> {
 							break;
 						case 'optionsVisibility':
 							options.optionsVisibility = (info === 'true');
+							break;
+						case 'serverRange':
+							options.serverRange = TimeInterval.fromString(info);
 							break;
 						default:
 							throw new Error('Unknown query parameter');
