@@ -97,7 +97,13 @@ export default class DashboardComponent extends React.Component<DashboardProps, 
 								style={buttonMargin}
 								onClick={() => this.handleTimeIntervalChange("all")}
 							> Restore
-							</Button>]
+							</Button>,
+							<Button key={3}
+							style={buttonMargin}
+							onClick={() => this.handleTimeIntervalChange("7dfp")}
+							> Past Week
+							</Button>
+							]
 						) : (
 							null
 						)}
@@ -110,12 +116,12 @@ export default class DashboardComponent extends React.Component<DashboardProps, 
 	private handleTimeIntervalChange(mode: string) {
 		if (mode == "all"){
 			this.props.changeTimeInterval(TimeInterval.unbounded());
-		}else{
+		}else if (mode == 'range') {
 			let sliderContainer: any = document.querySelector(".rangeslider-bg");
 			let sliderBox: any = document.querySelector(".rangeslider-slidebox");
 			let root: any = document.getElementById("root");
 
-			if (sliderContainer && sliderBox && root){
+			if (sliderContainer && sliderBox && root) {
 				// Attributes of the slider: full width and the min & max values of the box
 				let fullWidth: number = parseInt(sliderContainer.getAttribute("width"));
 				let sliderMinX: number = parseInt(sliderBox.getAttribute("x"));
@@ -137,6 +143,14 @@ export default class DashboardComponent extends React.Component<DashboardProps, 
 				let timeInterval = new TimeInterval(moment(newMinXTimestamp), moment(newMaxXTimestamp));
 				this.props.changeTimeInterval(timeInterval);
 			}
+		} else {
+			let numDays = parseInt(mode.substring(0,mode.indexOf('dfp')));
+			let current = moment();
+			let newMinXTimestamp = current.clone();
+			newMinXTimestamp.subtract(numDays,'days');
+			let timeInterval = TimeInterval.fromString(newMinXTimestamp.toISOString().substring(0, 19) + 'Z_' + current.toISOString().substring(0, 19) + 'Z');
+			console.log(timeInterval);
+			this.props.changeTimeInterval(timeInterval);
 		}
 	}
 }

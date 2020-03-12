@@ -3,31 +3,31 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
 
 import * as React from 'react';
-import { Router, Route, RedirectFunction, RouterState } from 'react-router';
-import { addLocaleData, IntlProvider } from 'react-intl';
+import {RedirectFunction, Route, Router, RouterState} from 'react-router';
+import {addLocaleData, IntlProvider} from 'react-intl';
 import * as en from 'react-intl/locale-data/en';
 import * as fr from 'react-intl/locale-data/fr';
 import * as localeData from '../translations/data.json';
-import { browserHistory } from '../utils/history';
+import {browserHistory} from '../utils/history';
 import * as _ from 'lodash';
 import * as moment from 'moment';
 import InitializationContainer from '../containers/InitializationContainer';
 import HomeComponent from './HomeComponent';
 import LoginComponent from '../components/LoginComponent';
 import AdminComponent from './admin/AdminComponent';
-import { LinkOptions } from 'actions/graph';
-import { hasToken } from '../utils/token';
-import { showErrorNotification } from '../utils/notifications';
-import { ChartTypes } from '../types/redux/graph';
-import { LanguageTypes } from '../types/i18n';
-import { verificationApi } from '../utils/api';
+import {LinkOptions} from 'actions/graph';
+import {hasToken} from '../utils/token';
+import {showErrorNotification} from '../utils/notifications';
+import {ChartTypes} from '../types/redux/graph';
+import {LanguageTypes} from '../types/i18n';
+import {verificationApi} from '../utils/api';
 import translate from '../utils/translate';
-import { validateComparePeriod, validateSortingOrder } from '../utils/calculateCompare';
+import {validateComparePeriod, validateSortingOrder} from '../utils/calculateCompare';
 import EditGroupsContainer from '../containers/groups/EditGroupsContainer';
 import CreateGroupContainer from '../containers/groups/CreateGroupContainer';
 import GroupsDetailContainer from '../containers/groups/GroupsDetailContainer';
 import MetersDetailContainer from '../containers/meters/MetersDetailContainer';
-import { TimeInterval } from '../../../common/TimeInterval.js';
+import {TimeInterval} from '../../../common/TimeInterval';
 
 interface RouteProps {
 	barStacking: boolean;
@@ -135,7 +135,14 @@ export default class RouteComponent extends React.Component<RouteProps, {}> {
 							options.optionsVisibility = (info === 'true');
 							break;
 						case 'serverRange':
-							options.serverRange = TimeInterval.fromString(info);
+							let index = info.indexOf('dfp');
+							if (index == -1) {
+								options.serverRange = TimeInterval.fromString(info);
+							} else {
+								let message = info.substring(0,index);
+								let stringField = this.getNewIntervalFromMessage(message);
+								options.serverRange = TimeInterval.fromString(stringField);
+							}
 							break;
 						default:
 							throw new Error('Unknown query parameter');
@@ -149,6 +156,19 @@ export default class RouteComponent extends React.Component<RouteProps, {}> {
 			}
 		}
 		replace('/');
+	}
+
+	/**
+	 * Generates new time interval based on current time and user selected amount to trace back;
+	 * @param message: currently able to accept how many days to go back in time;
+	 */
+	private getNewIntervalFromMessage(message:string) {
+		let numDays = parseInt(message);
+
+		let current = moment();
+		let newMinTimeStamp = current.clone();
+		newMinTimeStamp.subtract(numDays,'days');
+		return newMinTimeStamp.toISOString().substring(0, 19) + 'Z_' + current.toISOString().substring(0, 19) + 'Z';
 	}
 
 	/**

@@ -11,6 +11,7 @@ import DashboardComponent from 'components/DashboardComponent';
 
 function mapStateToProps(state: State) {
 	let linkText = `${window.location.href}graph?`;
+	let weeklyLink = ''; //reflects graph 5 days from present, with user selected meters and groups;
 	if (state.graph.selectedMeters.length > 0) {
 		linkText += `meterIDs=${state.graph.selectedMeters.toString()}&`;
 	}
@@ -24,37 +25,8 @@ function mapStateToProps(state: State) {
 			linkText += `&barStacking=${state.graph.barStacking}`;
 			break;
 		case 'line':
+			weeklyLink = linkText + `&serverRange=7dfp`; //dfp: days from present;
 			linkText += `&serverRange=${state.graph.timeInterval.toString()}`;
-			//under construction;
-			let sliderContainer: any = document.querySelector(".rangeslider-bg");
-			let sliderBox: any = document.querySelector(".rangeslider-slidebox");
-			//console.log();
-			// if (sliderContainer && sliderBox){
-			// 	console.log('passed');
-			// 	// Attributes of the slider: full width and the min & max values of the box
-			// 	let fullWidth: number = parseInt(sliderContainer.getAttribute("width"));
-			// 	let sliderMinX: number = parseInt(sliderBox.getAttribute("x"));
-			// 	let sliderMaxX: number = sliderMinX + parseInt(sliderBox.getAttribute("width"));
-			// 	if (sliderMaxX - sliderMinX == fullWidth) return;
-			//
-			// 	// From the Plotly line graph, get current min and max times in seconds
-			// 	let minTimeStamp: number = parseInt(state.graph.timeInterval.getStartTimestamp.toString());
-			// 	let maxTimeStamp: number = parseInt(state.graph.timeInterval.getEndTimestamp.toString());
-			//
-			// 	// Seconds displayed on graph
-			// 	let deltaSeconds: number = maxTimeStamp - minTimeStamp;
-			// 	let secondsPerPixel: number = deltaSeconds / fullWidth;
-			//
-			// 	// Get the new min and max times, in seconds, from the slider box
-			// 	let newMinXTimestamp = Math.floor(minTimeStamp + (secondsPerPixel * sliderMinX));
-			// 	let newMaxXTimestamp = Math.floor(minTimeStamp + (secondsPerPixel * sliderMaxX));
-			// 	let interval = new TimeInterval(moment(newMinXTimestamp), moment(newMaxXTimestamp));
-			// 	linkText += `&selectedRange=${interval.toString()}`;
-			// } else {
-			// 	console.log('did not pass or unspecified');
-			// 	linkText += `&selectedRange=null`;
-			// }
-
 			break;
 		case 'compare':
 			linkText += `&comparePeriod=${state.graph.comparePeriod}`;
@@ -65,7 +37,7 @@ function mapStateToProps(state: State) {
 	}
 
 	return {
-		linkText
+		linkText, weeklyLink,
 	};
 }
 

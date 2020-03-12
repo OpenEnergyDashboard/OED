@@ -8,18 +8,24 @@ import { Button } from 'reactstrap';
 
 interface ChartLinkProps {
 	linkText: string;
+	weeklyLink:string;
 }
 
 interface ChartLinkState {
 	showLink: boolean;
+	showOptionalLink: boolean;
+	optionalLink: string;
 }
 
 export default class ChartLinkComponent extends React.Component<ChartLinkProps, ChartLinkState> {
 	constructor(props: ChartLinkProps) {
 		super(props);
 		this.toggleLink = this.toggleLink.bind(this);
+		this.handle7DaysChange = this.handle7DaysChange.bind(this);
 		this.state = {
-			showLink: false
+			showLink: false,
+			showOptionalLink: false,
+			optionalLink: '',
 		};
 	}
 
@@ -43,9 +49,25 @@ export default class ChartLinkComponent extends React.Component<ChartLinkProps, 
 						{this.props.linkText}
 					</div>
 				}
+				<Button outline onClick ={this.handle7DaysChange}>
+					7 Days bp
+				</Button>
+				{this.state.showOptionalLink &&
+					<div style={wellStyle}>
+						{this.state.optionalLink}
+					</div>
+				}
 			</div>
 		);
 	}
+	handle7DaysChange() {
+		this.setState(
+			{
+				showOptionalLink: !this.state.showOptionalLink,
+				optionalLink: this.props.weeklyLink,
+		});
+	}
+
 
 	private toggleLink() {
 		this.setState({ showLink: !this.state.showLink });
