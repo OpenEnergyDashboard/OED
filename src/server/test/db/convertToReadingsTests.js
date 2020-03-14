@@ -3,6 +3,7 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at http://mozilla.org/MPL/2.0/.
  */
+const { mocha, expect } = require('../common');
 const convertToReadings = require('../../services/Pipeline/convertToReadings');
 const Reading = require('../../models/Reading');
 
@@ -16,7 +17,7 @@ mocha.describe('Convert array of values to array of Readings', () => {
 		let result = convertToReadings(sampleArray, undefined, Number.MAX_VALUE, Number.MIN_VALUE, minDate, maxDate);
 		for (let i = 0; i < result.length; ++i) {
 			expect(result[i].reading).to.equal(sampleArray[i][0]);
-			expect(result[i].startTimeStamp).to.equal(sammpleArray[i][1]);
+			expect(result[i].startTimeStamp).to.equal(sammpleArray[i][2]);
 			expect(result[i].endTimeStamp).to.equal(sampleArray[i][2]);
 		}
 	});

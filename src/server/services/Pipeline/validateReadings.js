@@ -5,7 +5,7 @@
  */
 
 const Reading = require('./../models/Reading');
-const { log } = require('../log');
+const { log } = require('../../log');
 
 /**
  * Validate an array of Readings value according to certain criteria
@@ -109,4 +109,5 @@ function checkIntervals(arrayToValidate, interval, maxError) {
 	}
 	return equalIntervals;
 }
+
 module.exports = validateReadings;
