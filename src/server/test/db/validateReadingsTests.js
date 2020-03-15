@@ -8,14 +8,14 @@ const { checkDate, checkValue, checkIntervals} = require('../../services/Pipelin
 const Reading = require('../../models/Reading');
 
 mocha.describe('Validate Readings', () => {
-	mocha.it('detects out-of-bound date', async() => {
+	mocha.it('detects out-of-bound date', async () => {
 		const minDate = moment('1970-01-01 00:00:00');
 		const maxDate = moment('2000-01-01 00:00:00');
 		// testing sequence: [in-bound, in-bound], [in-bound, later], [in-bound, in-bound], [earlier, in-bound]
-		let testingDates = [ [ moment('1970-01-01 00:00:00'), moment('1980-01-01 00:00:00') ],
-							 [ moment('1970-01-01 00:00:01'), moment('2000-01-01 00:00:01') ],
-							 [ moment('1999-01-01 00:00:00'), moment('2000-01-01 00:00:00') ],
-							 [ moment('1950-01-01 00:00:00'), moment('1990-01-01 00:00:00') ] ];
+		let testingDates = [[ moment('1970-01-01 00:00:00'), moment('1980-01-01 00:00:00') ],
+							[ moment('1970-01-01 00:00:01'), moment('2000-01-01 00:00:01') ],
+							[ moment('1999-01-01 00:00:00'), moment('2000-01-01 00:00:00') ],
+							[ moment('1950-01-01 00:00:00'), moment('1990-01-01 00:00:00') ]];
 		const results = testingDates.map(date => new Reading(
 			undefined,
 			0,
@@ -53,14 +53,14 @@ mocha.describe('Validate Readings', () => {
 		let testing = [ Reading(undefined, 0, moment('1970-01-01 00:00:00'), moment('1970-01-01 00:00:01')),
 						Reading(undefined, 0, moment('1970-01-01 00:01:00'), moment('1970-01-01 00:01:01')),
 						Reading(undefined, 0, moment('1970-01-01 00:04:00'), moment('1970-01-01 00:04:01'))];
-		let result = checkIntervals(testing, 60, Number.MAX_VALUE)
+		let result = checkIntervals(testing, 60, Number.MAX_VALUE);
 		expect(result.to.equal(false));
 	});
 	mocha.it('detect equal intervals', async () => {
 		let testing = [ Reading(undefined, 0, moment('1970-01-01 00:00:00'), moment('1970-01-01 00:00:01')),
 						Reading(undefined, 0, moment('1970-01-01 00:01:00'), moment('1970-01-01 00:01:01')),
 						Reading(undefined, 0, moment('1970-01-01 00:02:00'), moment('1970-01-01 00:02:01'))];
-		let result = checkIntervals(testing, 60, Number.MAX_VALUE)
+		let result = checkIntervals(testing, 60, Number.MAX_VALUE);
 		expect(result.to.equal(true));
 	});
 });
