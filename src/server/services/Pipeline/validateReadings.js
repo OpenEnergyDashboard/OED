@@ -4,21 +4,21 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/.
  */
 
-const Reading = require('./../models/Reading');
+const Reading = require('../../models/Reading');
 const { log } = require('../../log');
 
 /**
  * Validate an array of Readings value according to certain criteria
  * @param {array of Readings} arrayToValidate
- * @param {number} maxVal maximum acceptable reading value
  * @param {number} minVal minimum acceptable reading value
+ * @param {number} maxVal maximum acceptable reading value
  * @param {Moment} minDate earliest acceptable date
  * @param {Moment} maxDate latest acceptable date
- * @param {boolean} interval the expected interval between reading time
+ * @param {number} interval the expected interval between reading time in seconds
  * @param {number} maxError the maximum number of errors to be reported, ignore the rest
  */
 
-function validateReadings(arrayToValidate, maxVal, minVal, minDate, maxDate, interval, maxError) {
+function validateReadings(arrayToValidate, minVal, maxVal, minDate, maxDate, interval, maxError) {
 	validDates = checkDate(arrayToValidate, minDate, maxDate, maxError / 3);
 	validValues = checkValue(arayToValidate, minVal, maxVal, maxError / 3);
 	validIntervals = checkIntervals(arrayToValidate, interval, maxError / 3);
@@ -57,10 +57,10 @@ function checkDate(arrayToValidate, minDate, maxDate, maxError) {
 
 /**
  * Check and report any out-of-bound reading value. Can be ignored by passing MIN_VALUE & MAX_VALUE
- * @param {*} arrayToValidate
- * @param {*} minVal maximum acceptable reading value
- * @param {*} maxVal minimum acceptable reading value
- * @param {*} maxError maximum number of errors to be reported, ignore the rest
+ * @param {array of Readings} arrayToValidate
+ * @param {number} minVal maximum acceptable reading value
+ * @param {number} maxVal minimum acceptable reading value
+ * @param {number} maxError maximum number of errors to be reported, ignore the rest
  */
 function checkValue(arrayToValidate, minVal, maxVal, maxError) {
 	validValues = true;
@@ -83,9 +83,9 @@ function checkValue(arrayToValidate, minVal, maxVal, maxError) {
 
 /**
  * Check and report unequal intervals. Can be ignore by passing null interval
- * @param {*} arrayToValidate
- * @param {*} interval expected gap between 2 consecutive reading values
- * @param {*} maxError maximum number of errors to be reported. Ignore the rest
+ * @param {array of Readings} arrayToValidate
+ * @param {number} interval expected gap between 2 consecutive reading times in seconds
+ * @param {number} maxError maximum number of errors to be reported. Ignore the rest
  */
 function checkIntervals(arrayToValidate, interval, maxError) {
 	if (interval == null) {
@@ -100,7 +100,7 @@ function checkIntervals(arrayToValidate, interval, maxError) {
 		if (reading === arrayToValidate[0]) {
 			continue;
 		}
-		if (lastTime.diff(reading.startTimestamp) !== interval) {
+		if (lastTime.diff(reading.startTimestamp, 'seconds') !== interval) {
 			log.error(`UNEQUAL INTERVAL IS DETECTED FROM METER ${reading.meterID}`);
 			--maxError;
 			equalIntervals = false;
@@ -110,4 +110,9 @@ function checkIntervals(arrayToValidate, interval, maxError) {
 	return equalIntervals;
 }
 
-module.exports = validateReadings;
+module.exports = {
+	validateReadings,
+	checkDate,
+	checkValue,
+	checkIntervals
+}

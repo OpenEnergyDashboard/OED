@@ -16,12 +16,13 @@ const { log } = require('../../log');
  * @param {date} minDate earliest acceptable date
  * @param {date} maxDate latest acceptable date
  * @param {boolean} equalInterval true if expecting equal intervals, otherwise false
+ * @param {number} maxError the maximum number of errors to be reported, ignore the rest
  */
 
-function convertToReadings(toConvert, ipAddress, maxVal, minVal, minDate, maxDate, equalInterval) {
+function convertToReadings(toConvert, ipAddress, minVal, maxVal, minDate, maxDate, equalInterval, maxError) {
 	readings = toConvert.map(row => new Reading(ipAddress, row[0], row[1], row[2]));
-	if (!validateReading(readings, maxVal, minVal, minDate, maxDate, equalInterval)) {
-		log.error(`ERROR WHEN VALIDATING READINGS FROM METER ${meter.id}`);
+	if (!validateReading(readings, minVal, maxVal, minDate, maxDate, equalInterval, maxError)) {
+		log.error(`ERROR WHEN VALIDATING READINGS FROM METER ${ipAddress}`);
 		return null;
 	}
 	return readings;
