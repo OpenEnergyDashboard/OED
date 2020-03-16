@@ -16,13 +16,13 @@ const { validateReadings } = require('./validateReadings');
  * @param {number} minVal minimum acceptable reading value
  * @param {date} minDate earliest acceptable date
  * @param {date} maxDate latest acceptable date
- * @param {boolean} equalInterval true if expecting equal intervals, otherwise false
+ * @param {number} interval the expected interval between reading time in seconds
  * @param {number} maxError the maximum number of errors to be reported, ignore the rest
  */
 
-function convertToReadings(toConvert, ipAddress, minVal, maxVal, minDate, maxDate, equalInterval, maxError) {
+function convertToReadings(toConvert, ipAddress, minVal, maxVal, minDate, maxDate, interval, maxError) {
 	readings = toConvert.map(row => new Reading(ipAddress, row[0], row[1], row[2]));
-	if (!validateReadings(readings, minVal, maxVal, minDate, maxDate, equalInterval, maxError)) {
+	if (!validateReadings(readings, minVal, maxVal, minDate, maxDate, interval, maxError)) {
 		//log.warn(`ERROR WHEN VALIDATING READINGS FROM METER ${ipAddress}`);
 		return null;
 	}
