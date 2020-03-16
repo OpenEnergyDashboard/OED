@@ -22,9 +22,9 @@ const moment = require('moment');
  */
 
 function convertToReadings(toConvert, ipAddress, minVal, maxVal, minDate, maxDate, interval, maxError) {
-	readings = toConvert.map(row => new Reading(ipAddress, 
-												moment(row[0], 'HH:mm:ss MM/DD/YYYY'),
-												moment(row[1], 'HH:mm:ss MM/DD/YYYY'), 
+	readings = toConvert.map(row => new Reading(ipAddress,
+												row[0],
+												moment(row[1], 'HH:mm:ss MM/DD/YYYY'),
 												moment(row[2], 'HH:mm:ss MM/DD/YYYY')));
 	if (!validateReadings(readings, minVal, maxVal, minDate, maxDate, interval, maxError)) {
 		//log.warn(`ERROR WHEN VALIDATING READINGS FROM METER ${ipAddress}`);
