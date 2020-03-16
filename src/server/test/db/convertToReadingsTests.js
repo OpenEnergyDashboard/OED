@@ -16,12 +16,12 @@ mocha.describe('Convert data', () => {
 		let result = convertToReadings(sampleArray, undefined, -Number.MAX_VALUE, Number.MAX_VALUE, null, null, null, 0);
 		expect(result.length).to.equal(3);
 		console.log(result[0].reading);
-		console.log(result[0].startTimeStamp);
-		console.log(result[0].endTimeStamp);
+		console.log(result[0].startTimeStamp.format());
+		console.log(result[0].endTimeStamp.format());
 		for (let i = 0; i < result.length; ++i) {
 			expect(result[i].reading).to.equal(sampleArray[i][0]);
-			expect(result[i].startTimeStamp.isSame(moment(sampleArray[i][1], 'HH:mm:ss MM/DD/YYYY'))).to.equal(true);
-			expect(result[i].endTimeStamp.isSame(moment(sampleArray[i][2], 'HH:mm:ss MM/DD/YYYY'))).to.equal(true);
+			expect(result[i].startTimeStamp.format()).to.equal(sampleArray[i][1]);
+			expect(result[i].endTimeStamp.format()).to.equal(sampleArray[i][2]);
 		}
 	});
 });
