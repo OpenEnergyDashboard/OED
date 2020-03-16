@@ -16,8 +16,8 @@ mocha.describe('Convert data', () => {
 		let result = convertToReadings(sampleArray, undefined, -Number.MAX_VALUE, Number.MAX_VALUE, null, null, null, 0);
 		for (let i = 0; i < result.length; ++i) {
 			expect(result[i].reading).to.equal(sampleArray[i][0]);
-			expect(result[i].startTimeStamp).to.equal(sampleArray[i][1]);
-			expect(result[i].endTimeStamp).to.equal(sampleArray[i][2]);
+			expect(result[i].startTimeStamp.isSame(sampleArray[i][1])).to.equal(true);
+			expect(result[i].endTimeStamp.isSame(sampleArray[i][2])).to.equal(true);
 		}
 	});
 });
