@@ -6,7 +6,7 @@
 const { mocha, expect } = require('../common');
 const convertToReadings = require('../../services/Pipeline/convertToReadings');
 const Reading = require('../../models/Reading');
-const moment = require('moment')
+const moment = require('moment');
 
 mocha.describe('Convert data', () => {
 	mocha.it('array of reading & moment to array of Reading values', async () => {

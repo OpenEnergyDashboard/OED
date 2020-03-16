@@ -6,7 +6,7 @@
 const { mocha, expect } = require('../common');
 const { checkDate, checkValue, checkIntervals} = require('../../services/Pipeline/validateReadings');
 const Reading = require('../../models/Reading');
-const moment = require('moment')
+const moment = require('moment');
 
 mocha.describe('Validate Readings', () => {
 	mocha.it('detects out-of-bound date', async () => {

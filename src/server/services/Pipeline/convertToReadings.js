@@ -6,7 +6,7 @@
 
 const Reading = require('../../models/Reading');
 const { log } = require('../../log');
-const { validateReading } = require('./validateReadings')
+const { validateReadings } = require('./validateReadings');
 
 /**
  * Convert an matrix of number values to an array of Readings
@@ -22,7 +22,7 @@ const { validateReading } = require('./validateReadings')
 
 function convertToReadings(toConvert, ipAddress, minVal, maxVal, minDate, maxDate, equalInterval, maxError) {
 	readings = toConvert.map(row => new Reading(ipAddress, row[0], row[1], row[2]));
-	if (!validateReading(readings, minVal, maxVal, minDate, maxDate, equalInterval, maxError)) {
+	if (!validateReadings(readings, minVal, maxVal, minDate, maxDate, equalInterval, maxError)) {
 		log.error(`ERROR WHEN VALIDATING READINGS FROM METER ${ipAddress}`);
 		return null;
 	}
