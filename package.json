@@ -36,7 +36,7 @@
     ]
   },
   "dependencies": {
-    "axios": "~0.19.2",
+    "axios": "~0.16.2",
     "babel-plugin-react-intl": "~2.4.0",
     "bcryptjs": "~2.4.3",
     "body-parser": "~1.18.3",
@@ -45,7 +45,7 @@
     "chartjs-plugin-datalabels": "~0.1.0",
     "cookie-parser": "~1.4.4",
     "cross-env": "~5.0.5",
-    "csv": "~5.3.1",
+    "csv": "~1.1.1",
     "dotenv": "~2.0.0",
     "es6-promisify": "~5.0.0",
     "event-stream": "~3.3.5",
@@ -54,7 +54,7 @@
     "jquery": "~3.4.1",
     "jsonschema": "~1.2.4",
     "jsonwebtoken": "~8.3.0",
-    "lodash": "~4.17.15",
+    "lodash": "~4.17.11",
     "lodash-webpack-plugin": "~0.11.5",
     "moment": "~2.24.0",
     "morgan": "~1.9.0",

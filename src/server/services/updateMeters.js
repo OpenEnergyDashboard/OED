@@ -33,7 +33,7 @@ async function updateAllMeters(dataReader, metersToUpdate, conn) {
 				log.error(`ERROR ON REQUEST TO METER ${ipAddress}, ${err.message}`, err);
 				return null;
 			}))
-		), elem => validateData(elem, minVal, maxVal));
+		), elem => elem !== null);
 
 		// Flatten the batches (an array of arrays) into a single array.
 		const allReadingsToInsert = [].concat(...readingInsertBatches);
