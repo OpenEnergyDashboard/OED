@@ -19,9 +19,9 @@ const { log } = require('../../log');
  */
 
 function validateReadings(arrayToValidate, minVal, maxVal, minDate, maxDate, interval, maxError) {
-	validDates = checkDate(arrayToValidate, minDate, maxDate, maxError / 3);
-	validValues = checkValue(arrayToValidate, minVal, maxVal, maxError / 3);
-	validIntervals = checkIntervals(arrayToValidate, interval, maxError / 3);
+	validDates = checkDate(arrayToValidate, minDate, maxDate, maxError / 2);
+	validValues = checkValue(arrayToValidate, minVal, maxVal, maxError / 2);
+	validIntervals = checkIntervals(arrayToValidate, interval);
 	return validDates && validValues && validIntervals;
 }
 
@@ -87,11 +87,10 @@ function checkValue(arrayToValidate, minVal, maxVal, maxError) {
  * @param {number} interval expected gap between 2 consecutive reading times in seconds
  * @param {number} maxError maximum number of errors to be reported. Ignore the rest
  */
-function checkIntervals(arrayToValidate, interval, maxError) {
+function checkIntervals(arrayToValidate, interval) {
 	if (interval == null) {
 		return true;
 	}
-	equalIntervals = true;
 	lastTime = arrayToValidate[0].startTimestamp;
 	for (reading of arrayToValidate) {
 		if (maxError <= 0) {
@@ -100,14 +99,13 @@ function checkIntervals(arrayToValidate, interval, maxError) {
 		if (reading === arrayToValidate[0]) {
 			continue;
 		}
-		if (lastTime.diff(reading.startTimestamp, 'seconds') !== interval) {
+		if (reading.startTimestamp.diff(lastTime, 'seconds') !== interval) {
 			//log.warn(`UNEQUAL INTERVAL IS DETECTED FROM METER ${reading.meterID}`);
-			--maxError;
-			equalIntervals = false;
+			return false;
 		}
 		lastTime = reading.startTimestamp;
 	}
-	return equalIntervals;
+	return true;
 }
 
 module.exports = {
