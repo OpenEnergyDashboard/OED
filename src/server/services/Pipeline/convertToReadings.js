@@ -6,6 +6,7 @@
 
 const Reading = require('../../models/Reading');
 const { log } = require('../../log');
+const validateReading = require('./validateReadings')
 
 /**
  * Convert an matrix of number values to an array of Readings

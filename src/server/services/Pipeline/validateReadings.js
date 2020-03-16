@@ -72,7 +72,7 @@ function checkValue(arrayToValidate, minVal, maxVal, maxError) {
 			log.error(`ERROR WHEN CHECKING READING VALUE FROM METER ${reading.meterID}: ${reading.reading} is smaller than lower bound ${minVal}`);
 			--maxError;
 			validValues = false;
-		} else if (reading.reading > maxDate) {
+		} else if (reading.reading > maxVal) {
 			log.error(`ERROR WHEN CHECKING READING VALUE FROM METER ${reading.meterID}: ${reading.reading} is larger than upper bound ${maxVal}`);
 			--maxError;
 			validValues = false;

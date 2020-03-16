@@ -51,16 +51,16 @@ mocha.describe('Validate Readings', () => {
 		}
 	});
 	mocha.it('detect unequal intervals', async () => {
-		let testing = [ Reading(undefined, 0, moment('1970-01-01 00:00:00'), moment('1970-01-01 00:00:01')),
-						Reading(undefined, 0, moment('1970-01-01 00:01:00'), moment('1970-01-01 00:01:01')),
-						Reading(undefined, 0, moment('1970-01-01 00:04:00'), moment('1970-01-01 00:04:01'))];
+		let testing = [ new Reading(undefined, 0, moment('1970-01-01 00:00:00'), moment('1970-01-01 00:00:01')),
+						new Reading(undefined, 0, moment('1970-01-01 00:01:00'), moment('1970-01-01 00:01:01')),
+						new Reading(undefined, 0, moment('1970-01-01 00:04:00'), moment('1970-01-01 00:04:01'))];
 		let result = checkIntervals(testing, 60, Number.MAX_VALUE);
 		expect(result.to.equal(false));
 	});
 	mocha.it('detect equal intervals', async () => {
-		let testing = [ Reading(undefined, 0, moment('1970-01-01 00:00:00'), moment('1970-01-01 00:00:01')),
-						Reading(undefined, 0, moment('1970-01-01 00:01:00'), moment('1970-01-01 00:01:01')),
-						Reading(undefined, 0, moment('1970-01-01 00:02:00'), moment('1970-01-01 00:02:01'))];
+		let testing = [ new Reading(undefined, 0, moment('1970-01-01 00:00:00'), moment('1970-01-01 00:00:01')),
+						new Reading(undefined, 0, moment('1970-01-01 00:01:00'), moment('1970-01-01 00:01:01')),
+						new Reading(undefined, 0, moment('1970-01-01 00:02:00'), moment('1970-01-01 00:02:01'))];
 		let result = checkIntervals(testing, 60, Number.MAX_VALUE);
 		expect(result.to.equal(true));
 	});
