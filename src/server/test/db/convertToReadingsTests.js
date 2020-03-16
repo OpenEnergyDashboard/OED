@@ -14,6 +14,10 @@ mocha.describe('Convert data', () => {
 							[ 1, moment('2000-01-01 00:00:00'), moment('2000-01-01 00:00:00') ],
 							[ 2, moment('2010-01-01 00:00:00'), moment('2020-01-01 00:00:00') ]];
 		let result = convertToReadings(sampleArray, undefined, -Number.MAX_VALUE, Number.MAX_VALUE, null, null, null, 0);
+		expect(result.length).to.equal(3);
+		console.log(result[0].reading);
+		console.log(result[0].startTimeStamp);
+		console.log(result[0].endTimeStamp);
 		for (let i = 0; i < result.length; ++i) {
 			expect(result[i].reading).to.equal(sampleArray[i][0]);
 			expect(result[i].startTimeStamp.isSame(sampleArray[i][1])).to.equal(true);
