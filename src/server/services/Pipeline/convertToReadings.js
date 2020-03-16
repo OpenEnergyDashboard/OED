@@ -23,7 +23,7 @@ const { validateReadings } = require('./validateReadings');
 function convertToReadings(toConvert, ipAddress, minVal, maxVal, minDate, maxDate, equalInterval, maxError) {
 	readings = toConvert.map(row => new Reading(ipAddress, row[0], row[1], row[2]));
 	if (!validateReadings(readings, minVal, maxVal, minDate, maxDate, equalInterval, maxError)) {
-		log.error(`ERROR WHEN VALIDATING READINGS FROM METER ${ipAddress}`);
+		log.warn(`ERROR WHEN VALIDATING READINGS FROM METER ${ipAddress}`);
 		return null;
 	}
 	return readings;

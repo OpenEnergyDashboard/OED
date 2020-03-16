@@ -42,12 +42,12 @@ function checkDate(arrayToValidate, minDate, maxDate, maxError) {
 			break;
 		}
 		if (reading.startTimestamp.isBefore(minDate)) {
-			log.error(`ERROR WHEN CHECKING READING TIME FROM METER ${reading.meterID}: Time ${reading.startTimestamp} is earlier than lower bound ${minDate}`);
+			log.warn(`ERROR WHEN CHECKING READING TIME FROM METER ${reading.meterID}: Time ${reading.startTimestamp} is earlier than lower bound ${minDate}`);
 			--maxError;
 			validDate = false;
 		}
 		if (reading.endTimestamp.isAfter(maxDate)) {
-			log.error(`ERROR WHEN CHECKING READING TIME FROM METER ${reading.meterID}: Time ${reading.startTimestamp} is later than upper bound ${maxDate}`);
+			log.warn(`ERROR WHEN CHECKING READING TIME FROM METER ${reading.meterID}: Time ${reading.startTimestamp} is later than upper bound ${maxDate}`);
 			--maxError;
 			validDate = false;
 		}
@@ -69,11 +69,11 @@ function checkValue(arrayToValidate, minVal, maxVal, maxError) {
 			break;
 		}
 		if (reading.reading < minVal) {
-			log.error(`ERROR WHEN CHECKING READING VALUE FROM METER ${reading.meterID}: ${reading.reading} is smaller than lower bound ${minVal}`);
+			log.warn(`ERROR WHEN CHECKING READING VALUE FROM METER ${reading.meterID}: ${reading.reading} is smaller than lower bound ${minVal}`);
 			--maxError;
 			validValues = false;
 		} else if (reading.reading > maxVal) {
-			log.error(`ERROR WHEN CHECKING READING VALUE FROM METER ${reading.meterID}: ${reading.reading} is larger than upper bound ${maxVal}`);
+			log.warn(`ERROR WHEN CHECKING READING VALUE FROM METER ${reading.meterID}: ${reading.reading} is larger than upper bound ${maxVal}`);
 			--maxError;
 			validValues = false;
 		}
@@ -101,7 +101,7 @@ function checkIntervals(arrayToValidate, interval, maxError) {
 			continue;
 		}
 		if (lastTime.diff(reading.startTimestamp, 'seconds') !== interval) {
-			log.error(`UNEQUAL INTERVAL IS DETECTED FROM METER ${reading.meterID}`);
+			log.warn(`UNEQUAL INTERVAL IS DETECTED FROM METER ${reading.meterID}`);
 			--maxError;
 			equalIntervals = false;
 		}
