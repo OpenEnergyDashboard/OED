@@ -13,9 +13,7 @@ mocha.describe('Convert data', () => {
 		let sampleArray = [ [ 0, moment('1980-01-01 00:00:00'), moment('1990-01-01 00:00:00') ],
 							[ 1, moment('2000-01-01 00:00:00'), moment('2000-01-01 00:00:00') ],
 							[ 2, moment('2010-01-01 00:00:00'), moment('2020-01-01 00:00:00') ]];
-		let minDate = moment('1970-01-01 00:00:00');
-		let maxDate = moment('2970-01-01 00:00:00');
-		let result = convertToReadings(sampleArray, undefined, -Number.MAX_VALUE, Number.MAX_VALUE, minDate, maxDate, null, 0);
+		let result = convertToReadings(sampleArray, undefined, -Number.MAX_VALUE, Number.MAX_VALUE, null, null, null, 0);
 		for (let i = 0; i < result.length; ++i) {
 			expect(result[i].reading).to.equal(sampleArray[i][0]);
 			expect(result[i].startTimeStamp).to.equal(sampleArray[i][1]);

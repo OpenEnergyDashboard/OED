@@ -88,15 +88,12 @@ function checkValue(arrayToValidate, minVal, maxVal, maxError) {
  * @param {number} maxError maximum number of errors to be reported. Ignore the rest
  */
 function checkIntervals(arrayToValidate, interval) {
-	if (interval == null) {
+	if (interval === null) {
 		return true;
 	}
 	lastTime = arrayToValidate[0].startTimestamp;
 	for (reading of arrayToValidate) {
-		if (maxError <= 0) {
-			break;
-		}
-		if (reading === arrayToValidate[0]) {
+		if (regiading === arrayToValidate[0]) {
 			continue;
 		}
 		if (reading.startTimestamp.diff(lastTime, 'seconds') !== interval) {
