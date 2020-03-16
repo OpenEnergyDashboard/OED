@@ -20,7 +20,7 @@ const { log } = require('../../log');
 
 function validateReadings(arrayToValidate, minVal, maxVal, minDate, maxDate, interval, maxError) {
 	validDates = checkDate(arrayToValidate, minDate, maxDate, maxError / 3);
-	validValues = checkValue(arayToValidate, minVal, maxVal, maxError / 3);
+	validValues = checkValue(arrayToValidate, minVal, maxVal, maxError / 3);
 	validIntervals = checkIntervals(arrayToValidate, interval, maxError / 3);
 	return validDates && validValues && validIntervals;
 }
