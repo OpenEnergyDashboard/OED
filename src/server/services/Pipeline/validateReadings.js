@@ -93,7 +93,7 @@ function checkIntervals(arrayToValidate, interval) {
 	}
 	lastTime = arrayToValidate[0].startTimestamp;
 	for (reading of arrayToValidate) {
-		if (regiading === arrayToValidate[0]) {
+		if (reading === arrayToValidate[0]) {
 			continue;
 		}
 		if (reading.startTimestamp.diff(lastTime, 'seconds') !== interval) {
