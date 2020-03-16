@@ -10,9 +10,9 @@ const moment = require('moment');
 
 mocha.describe('Convert data', () => {
 	mocha.it('array of reading & moment to array of Reading values', async () => {
-		let sampleArray = [ [ 0, '00:00:00 01/01/1999', '00:00:03 01/01/1999' ],
-							[ 1, '00:00:01 01/01/2000', '00:00:04 01/01/2000' ],
-							[ 2, '00:00:02 01/01/2001', '00:00:05 01/01/2001' ]];
+		let sampleArray = [ [ 0, moment('00:00:00 01/01/1999', 'HH:mm:ss MM/DD/YYYY'), moment('00:00:03 01/01/1999', 'HH:mm:ss MM/DD/YYYY')],
+							[ 1, moment('00:00:00 01/02/1999', 'HH:mm:ss MM/DD/YYYY'), moment('00:00:03 01/02/1999', 'HH:mm:ss MM/DD/YYYY')],
+							[ 2, moment('00:00:00 01/03/1999', 'HH:mm:ss MM/DD/YYYY'), moment('00:00:03 01/03/1999', 'HH:mm:ss MM/DD/YYYY')]];
 		let result = convertToReadings(sampleArray, undefined, -Number.MAX_VALUE, Number.MAX_VALUE, null, null, null, 0);
 		expect(result.length).to.equal(3);
 		console.log(result[0].reading);
@@ -20,8 +20,8 @@ mocha.describe('Convert data', () => {
 		console.log(result[0].endTimeStamp.format());
 		for (let i = 0; i < result.length; ++i) {
 			expect(result[i].reading).to.equal(sampleArray[i][0]);
-			expect(result[i].startTimeStamp.format()).to.equal(sampleArray[i][1]);
-			expect(result[i].endTimeStamp.format()).to.equal(sampleArray[i][2]);
+			expect(result[i].startTimeStamp).to.equal(sampleArray[i][1]);
+			expect(result[i].endTimeStamp).to.equal(sampleArray[i][2]);
 		}
 	});
 });
