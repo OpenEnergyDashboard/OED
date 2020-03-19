@@ -5,16 +5,21 @@
 import * as React from 'react';
 import { FormattedMessage } from 'react-intl';
 import { Button } from 'reactstrap';
+import {ChartTypes} from '../types/redux/graph';
+import {getRangeSliderInterval} from './DashboardComponent';
 
 interface ChartLinkProps {
 	linkText: string;
-	weeklyLink:string;
+	weeklyLink: string;
+	chartType: ChartTypes;
 }
 
 interface ChartLinkState {
 	showLink: boolean;
+	showSliderRange: boolean;
 	showOptionalLink: boolean;
 	optionalLink: string;
+	sliderRange: string;
 }
 
 export default class ChartLinkComponent extends React.Component<ChartLinkProps, ChartLinkState> {
@@ -24,8 +29,10 @@ export default class ChartLinkComponent extends React.Component<ChartLinkProps, 
 		this.handle7DaysChange = this.handle7DaysChange.bind(this);
 		this.state = {
 			showLink: false,
+			showSliderRange: false,
 			showOptionalLink: false,
 			optionalLink: '',
+			sliderRange: '',
 		};
 	}
 
@@ -47,10 +54,11 @@ export default class ChartLinkComponent extends React.Component<ChartLinkProps, 
 				{this.state.showLink &&
 					<div style={wellStyle}>
 						{this.props.linkText}
+						{this.state.showSliderRange && this.state.sliderRange}
 					</div>
 				}
 				<Button outline onClick ={this.handle7DaysChange}>
-					7 Days bp
+					7 days => present
 				</Button>
 				{this.state.showOptionalLink &&
 					<div style={wellStyle}>
@@ -60,7 +68,7 @@ export default class ChartLinkComponent extends React.Component<ChartLinkProps, 
 			</div>
 		);
 	}
-	handle7DaysChange() {
+	private handle7DaysChange() {
 		this.setState(
 			{
 				showOptionalLink: !this.state.showOptionalLink,
@@ -70,6 +78,29 @@ export default class ChartLinkComponent extends React.Component<ChartLinkProps, 
 
 
 	private toggleLink() {
-		this.setState({ showLink: !this.state.showLink });
+		if (this.state.showLink) {
+			this.setState({
+				showLink: false,
+				showSliderRange: false,
+			})
+		} else {
+			if (this.props.chartType == 'line') {
+				let newSliderRange = this.getSliderRange();
+				this.setState({
+					showLink: !this.state.showLink,
+					showSliderRange: true,
+					sliderRange: newSliderRange,
+				});
+			} else {
+				this.setState({
+					showLink: !this.state.showLink,
+				});
+			}
+		}
+	}
+
+	private getSliderRange() {
+		let newSliderRange = `&sliderRange=${getRangeSliderInterval()}`;
+		return newSliderRange;
 	}
 }

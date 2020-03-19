@@ -130,12 +130,35 @@ export function changeGraphZoomIfNeeded(timeInterval: TimeInterval): Thunk {
 	};
 }
 
+function shouldChangeRangeSlider(range: string): boolean {
+	return range != 'all';
+}
+
+function changeRangeSlider(sliderInterval: string): t.ChangeSliderRangeAction {
+	return {type: ActionType.ChangeSliderRange, sliderInterval};
+}
+
+function resetRangeSliderStack(): t.ResetRangeSliderStackAction {
+	return {type: ActionType.ResetRangeSliderStack};
+}
+
+function changeRangeSliderIfNeeded(interval: string): Thunk {
+	return (dispatch) => {
+		if (shouldChangeRangeSlider(interval)) {
+			dispatch(changeRangeSlider(interval));
+			// dispatch(resetRangeSliderStack());
+		}
+		return Promise.resolve();
+	};
+}
+
 export interface LinkOptions {
 	meterIDs?: number[];
 	groupIDs?: number[];
 	chartType?: t.ChartTypes;
 	barDuration?: moment.Duration;
 	serverRange?: TimeInterval;
+	sliderRange?: string;
 	toggleBarStacking?: boolean;
 	comparePeriod?: ComparePeriod;
 	compareSortingOrder?: SortingOrder;
@@ -150,7 +173,7 @@ export interface LinkOptions {
 export function changeOptionsFromLink(options: LinkOptions) {
 	const dispatchFirst: Thunk[] = [setHotlinkedAsync(true)];
 	const dispatchSecond: Array<Thunk | t.ChangeChartToRenderAction | t.ChangeBarStackingAction
-		| t.ChangeCompareSortingOrderAction | t.SetOptionsVisibility | t.ChangeGraphZoomAction> = [];
+		| t.ChangeCompareSortingOrderAction | t.SetOptionsVisibility > = [];
 	if (options.meterIDs) {
 		dispatchFirst.push(fetchMetersDetailsIfNeeded());
 		dispatchSecond.push(changeSelectedMeters(options.meterIDs));
@@ -167,6 +190,9 @@ export function changeOptionsFromLink(options: LinkOptions) {
 	}
 	if (options.serverRange) {
 		dispatchSecond.push(changeGraphZoomIfNeeded(options.serverRange));
+	}
+	if (options.sliderRange) {
+		dispatchSecond.push(changeRangeSliderIfNeeded(options.sliderRange));
 	}
 	if (options.toggleBarStacking) {
 		dispatchSecond.push(changeBarStacking());

@@ -8,6 +8,7 @@ import { connect } from 'react-redux';
 import getGraphColor from '../utils/getGraphColor';
 import { State } from '../types/redux/state';
 import PlotlyChart, { IPlotlyChartProps } from 'react-plotlyjs-ts';
+import {TimeInterval} from '../../../common/TimeInterval';
 
 function mapStateToProps(state: State){
 	const timeInterval = state.graph.timeInterval;
@@ -108,6 +109,14 @@ function mapStateToProps(state: State){
 		}
 	}
 
+	let start = Date.parse(moment(timeInterval.getStartTimestamp()).toISOString());
+	let end = Date.parse(moment(timeInterval.getEndTimestamp()).toISOString());
+	if (state.graph.rangeSliderInterval.length != 0) {
+		let interval = TimeInterval.fromString(state.graph.rangeSliderInterval);
+		start = Date.parse(moment(interval.getStartTimestamp()).toISOString());
+		end = Date.parse(moment(interval.getEndTimestamp()).toISOString());
+	}
+
 	// Customize the layout of the plot
 	const layout: any = {
 		autozise: true,
@@ -125,8 +134,12 @@ function mapStateToProps(state: State){
 			showgrid: true,
 			gridcolor: '#ddd'
 		},
+
 		xaxis: {
-			rangeslider: {thickness: 0.1},
+			range: [start,end],
+			rangeslider: {
+				thickness: 0.1,
+			},
 			showgrid: true,
 			gridcolor: '#ddd'
 		},

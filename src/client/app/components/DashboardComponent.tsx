@@ -117,32 +117,8 @@ export default class DashboardComponent extends React.Component<DashboardProps, 
 		if (mode == "all"){
 			this.props.changeTimeInterval(TimeInterval.unbounded());
 		}else if (mode == 'range') {
-			let sliderContainer: any = document.querySelector(".rangeslider-bg");
-			let sliderBox: any = document.querySelector(".rangeslider-slidebox");
-			let root: any = document.getElementById("root");
-
-			if (sliderContainer && sliderBox && root) {
-				// Attributes of the slider: full width and the min & max values of the box
-				let fullWidth: number = parseInt(sliderContainer.getAttribute("width"));
-				let sliderMinX: number = parseInt(sliderBox.getAttribute("x"));
-				let sliderMaxX: number = sliderMinX + parseInt(sliderBox.getAttribute("width"));
-				if (sliderMaxX - sliderMinX == fullWidth) return;
-
-				// From the Plotly line graph, get current min and max times in seconds
-				let minTimeStamp: number = parseInt(root.getAttribute("min-timestamp"));
-				let maxTimeStamp: number = parseInt(root.getAttribute("max-timestamp"));
-
-				// Seconds displayed on graph
-				let deltaSeconds: number = maxTimeStamp - minTimeStamp;
-				let secondsPerPixel: number = deltaSeconds / fullWidth;
-
-				// Get the new min and max times, in seconds, from the slider box
-				let newMinXTimestamp = Math.floor(minTimeStamp + (secondsPerPixel * sliderMinX));
-				let newMaxXTimestamp = Math.floor(minTimeStamp + (secondsPerPixel * sliderMaxX));
-
-				let timeInterval = new TimeInterval(moment(newMinXTimestamp), moment(newMaxXTimestamp));
+				let timeInterval = TimeInterval.fromString(getRangeSliderInterval());
 				this.props.changeTimeInterval(timeInterval);
-			}
 		} else {
 			let numDays = parseInt(mode.substring(0,mode.indexOf('dfp')));
 			let current = moment();
@@ -153,4 +129,31 @@ export default class DashboardComponent extends React.Component<DashboardProps, 
 			this.props.changeTimeInterval(timeInterval);
 		}
 	}
+}
+
+export function getRangeSliderInterval(): string {
+	let sliderContainer: any = document.querySelector(".rangeslider-bg");
+	let sliderBox: any = document.querySelector(".rangeslider-slidebox");
+	let root: any = document.getElementById("root");
+
+	if (sliderContainer && sliderBox && root) {
+		// Attributes of the slider: full width and the min & max values of the box
+		let fullWidth: number = parseInt(sliderContainer.getAttribute("width"));
+		let sliderMinX: number = parseInt(sliderBox.getAttribute("x"));
+		let sliderMaxX: number = sliderMinX + parseInt(sliderBox.getAttribute("width"));
+		if (sliderMaxX - sliderMinX == fullWidth) return 'all';
+
+		// From the Plotly line graph, get current min and max times in seconds
+		let minTimeStamp: number = parseInt(root.getAttribute("min-timestamp"));
+		let maxTimeStamp: number = parseInt(root.getAttribute("max-timestamp"));
+
+		// Seconds displayed on graph
+		let deltaSeconds: number = maxTimeStamp - minTimeStamp;
+		let secondsPerPixel: number = deltaSeconds / fullWidth;
+
+		// Get the new min and max times, in seconds, from the slider box
+		let newMinXTimestamp = Math.floor(minTimeStamp + (secondsPerPixel * sliderMinX));
+		let newMaxXTimestamp = Math.floor(minTimeStamp + (secondsPerPixel * sliderMaxX));
+		return new TimeInterval(moment(newMinXTimestamp), moment(newMaxXTimestamp)).toString();
+	} else throw new Error('unable to get range slider params');
 }
