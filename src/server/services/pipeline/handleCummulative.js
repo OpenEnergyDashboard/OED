@@ -5,7 +5,7 @@
  */
 
 /**
- * Handle cummulative data, assume that last row is the first reading (skip this row). 
+ * Handle cummulative data, assume that last row is the first reading (skip this row).
  * @Example
  * 	row 0: reading #0 + #1 + #2
  *  row 1: reading #0 + #1

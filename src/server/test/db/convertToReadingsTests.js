@@ -6,20 +6,20 @@
 const { mocha, expect } = require('../common');
 const convertToReadings = require('../../services/Pipeline/convertToReadings');
 const Reading = require('../../models/Reading');
-const moment = require('moment-timezone');
+const moment = require('moment');
 
 mocha.describe('Convert data', () => {
 	mocha.it('array of reading & moment to array of Reading values', async () => {
 		let sampleArray = [ [ 0, moment('1970-01-01 00:00:00'), moment('1980-01-01 00:00:00')],
 							[ 1, moment('1970-01-01 00:00:01'), moment('2000-01-01 00:00:01')],
 							[ 2, moment('1999-01-01 00:00:00'), moment('2000-01-01 00:00:00')]];
-		const conditionSet = { 
-				"minVal": -Number.MAX_VALUE, 
-				"maxVal": Number.MAX_VALUE, 
-				"minDate": null, 
-				"maxDate": null,
-				"interval": null,
-				"maxErrors": 10};
+		const conditionSet = {
+				'minVal': -Number.MAX_VALUE, 
+				'maxVal': Number.MAX_VALUE, 
+				'minDate': null, 
+				'maxDate': null,
+				'interval': null,
+				'maxErrors': 10};
 		let i = 0;
 		convertToReadings(sampleArray, "testing", conditionSet)
 						.map(reading => {
