@@ -109,13 +109,10 @@ function mapStateToProps(state: State){
 		}
 	}
 
-	let start = Date.parse(moment(timeInterval.getStartTimestamp()).toISOString());
-	let end = Date.parse(moment(timeInterval.getEndTimestamp()).toISOString());
-	if (state.graph.rangeSliderInterval.length != 0) {
-		let interval = TimeInterval.fromString(state.graph.rangeSliderInterval);
-		start = Date.parse(moment(interval.getStartTimestamp()).toISOString());
-		end = Date.parse(moment(interval.getEndTimestamp()).toISOString());
-	}
+	//calculate slider interval if rangeSliderInterval is specified;
+	let sliderInterval = (state.graph.rangeSliderInterval.length == 0)? timeInterval : TimeInterval.fromString(state.graph.rangeSliderInterval);
+	let start = Date.parse(moment(sliderInterval.getStartTimestamp()).toISOString());
+	let end = Date.parse(moment(sliderInterval.getEndTimestamp()).toISOString());
 
 	// Customize the layout of the plot
 	const layout: any = {
@@ -136,7 +133,7 @@ function mapStateToProps(state: State){
 		},
 
 		xaxis: {
-			range: [start,end],
+			range: [start,end], //specifies the start and end points of visible part of graph(unshaded region on slider);
 			rangeslider: {
 				thickness: 0.1,
 			},

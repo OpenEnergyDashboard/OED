@@ -123,6 +123,7 @@ function shouldChangeGraphZoom(state: State, timeInterval: TimeInterval): boolea
 export function changeGraphZoomIfNeeded(timeInterval: TimeInterval): Thunk {
 	return (dispatch, getState) => {
 		if (shouldChangeGraphZoom(getState(), timeInterval)) {
+			dispatch(resetRangeSliderStack());
 			dispatch(changeGraphZoom(timeInterval));
 			dispatch(fetchNeededReadingsForGraph(timeInterval));
 		}
@@ -146,7 +147,6 @@ function changeRangeSliderIfNeeded(interval: string): Thunk {
 	return (dispatch) => {
 		if (shouldChangeRangeSlider(interval)) {
 			dispatch(changeRangeSlider(interval));
-			// dispatch(resetRangeSliderStack());
 		}
 		return Promise.resolve();
 	};
