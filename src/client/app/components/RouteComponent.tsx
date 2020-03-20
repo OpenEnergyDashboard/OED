@@ -101,7 +101,7 @@ export default class RouteComponent extends React.Component<RouteProps, {}> {
 	 * @param replace Function that allows a route redirect
 	 */
 	public linkToGraph(nextState: RouterState, replace: RedirectFunction) {
-		const queries: Array<[string, object]> = nextState.location.query;
+		const queries: any = nextState.location.query;
 		if (!_.isEmpty(queries)) {
 			try {
 				const options: LinkOptions = {};
