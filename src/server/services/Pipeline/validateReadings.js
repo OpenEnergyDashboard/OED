@@ -10,18 +10,13 @@ const { log } = require('../../log');
 /**
  * Validate an array of Readings value according to certain criteria
  * @param {array of Readings} arrayToValidate
- * @param {number} minVal minimum acceptable reading value
- * @param {number} maxVal maximum acceptable reading value
- * @param {Moment} minDate earliest acceptable date
- * @param {Moment} maxDate latest acceptable date
- * @param {number} interval the expected interval between reading time in seconds
- * @param {number} maxError the maximum number of errors to be reported, ignore the rest
+ * @param {dict} conditionSet used to validate readings (minVal, maxVal, minDate, maxDate, interval, maxError)
  */
 
-function validateReadings(arrayToValidate, minVal, maxVal, minDate, maxDate, interval, maxError) {
-	validDates = checkDate(arrayToValidate, minDate, maxDate, maxError / 2);
-	validValues = checkValue(arrayToValidate, minVal, maxVal, maxError / 2);
-	validIntervals = checkIntervals(arrayToValidate, interval);
+function validateReadings(arrayToValidate, conditionSet) {
+	validDates = checkDate(arrayToValidate, conditionSet['minDate'], conditionSet['maxDate'], conditionSet['maxError'] / 2);
+	validValues = checkValue(arrayToValidate, conditionSet['minVal'], conditionSet['maxVal'], conditionSet['maxError'] / 2);
+	validIntervals = checkIntervals(arrayToValidate, conditionSet['interval']);
 	return validDates && validValues && validIntervals;
 }
 
@@ -42,12 +37,12 @@ function checkDate(arrayToValidate, minDate, maxDate, maxError) {
 			break;
 		}
 		if (reading.startTimestamp.isBefore(minDate)) {
-			//log.warn(`ERROR WHEN CHECKING READING TIME FROM METER ${reading.meterID}: Time ${reading.startTimestamp} is earlier than lower bound ${minDate}`);
+			log.warn(`ERROR WHEN CHECKING READING TIME FROM METER ${reading.meterID}: Time ${reading.startTimestamp} is earlier than lower bound ${minDate}`);
 			--maxError;
 			validDates = false;
 		}
 		if (reading.endTimestamp.isAfter(maxDate)) {
-			//log.warn(`ERROR WHEN CHECKING READING TIME FROM METER ${reading.meterID}: Time ${reading.startTimestamp} is later than upper bound ${maxDate}`);
+			log.warn(`ERROR WHEN CHECKING READING TIME FROM METER ${reading.meterID}: Time ${reading.startTimestamp} is later than upper bound ${maxDate}`);
 			--maxError;
 			validDates = false;
 		}
@@ -69,11 +64,11 @@ function checkValue(arrayToValidate, minVal, maxVal, maxError) {
 			break;
 		}
 		if (reading.reading < minVal) {
-			//log.warn(`ERROR WHEN CHECKING READING VALUE FROM METER ${reading.meterID}: ${reading.reading} is smaller than lower bound ${minVal}`);
+			log.warn(`ERROR WHEN CHECKING READING VALUE FROM METER ${reading.meterID}: ${reading.reading} is smaller than lower bound ${minVal}`);
 			--maxError;
 			validValues = false;
 		} else if (reading.reading > maxVal) {
-			//log.warn(`ERROR WHEN CHECKING READING VALUE FROM METER ${reading.meterID}: ${reading.reading} is larger than upper bound ${maxVal}`);
+			log.warn(`ERROR WHEN CHECKING READING VALUE FROM METER ${reading.meterID}: ${reading.reading} is larger than upper bound ${maxVal}`);
 			--maxError;
 			validValues = false;
 		}
@@ -97,7 +92,7 @@ function checkIntervals(arrayToValidate, interval) {
 			continue;
 		}
 		if (reading.startTimestamp.diff(lastTime, 'seconds') !== interval) {
-			//log.warn(`UNEQUAL INTERVAL IS DETECTED FROM METER ${reading.meterID}`);
+			log.warn(`UNEQUAL INTERVAL IS DETECTED FROM METER ${reading.meterID}`);
 			return false;
 		}
 		lastTime = reading.startTimestamp;

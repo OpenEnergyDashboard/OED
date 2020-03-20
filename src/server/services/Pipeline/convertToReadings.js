@@ -11,20 +11,15 @@ const moment = require('moment');
 
 /**
  * Convert an matrix of number values to an array of Readings
- * @param {matrix of numbers} toConvert a number array in which each row represents a Reading values (reading, startTime, endTime)
- * @param {ipAddress} meter IP address of the meter which all the Reading values belong to
- * @param {number} maxVal maximum acceptable reading value
- * @param {number} minVal minimum acceptable reading value
- * @param {date} minDate earliest acceptable date
- * @param {date} maxDate latest acceptable date
- * @param {number} interval the expected interval between reading time in seconds
- * @param {number} maxError the maximum number of errors to be reported, ignore the rest
+ * @param {2d array} toConvert a number array in which each row represents a Reading values (reading, startTime, endTime)
+ * @param {int} ipAddress IP address of the meter which all the Reading values belong to
+ * @param {dict} conditionSet used to validate readings (minVal, maxVal, minDate, maxDate, interval, maxError)
  */
 
-function convertToReadings(toConvert, ipAddress, minVal, maxVal, minDate, maxDate, interval, maxError) {
+function convertToReadings(toConvert, ipAddress, conditionSet) {
 	readings = toConvert.map(row => new Reading(ipAddress, row[0], row[1], row[2]));
-	if (!validateReadings(readings, minVal, maxVal, minDate, maxDate, interval, maxError)) {
-		//log.warn(`ERROR WHEN VALIDATING READINGS FROM METER ${ipAddress}`);
+	if (!validateReadings(readings, conditionSet)) {
+		log.warn(`ERROR WHEN VALIDATING READINGS FROM METER ${ipAddress}`);
 		return null;
 	}
 	return readings;
