@@ -4,6 +4,8 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/.
  */
 
+const moment = require('moment');
+
 /**
  * Handle cummulative data, assume that last row is the first reading (skip this row).
  * @Example
@@ -22,12 +24,11 @@ function handleCummulative(rows, readingRepetition) {
 	// Initialize timestamps and other variables
 	let startTimestamp = moment(0);
 	let endTimestamp = moment(0);
-	let index = 0;
 	let meterReading = 0;
 	let meterReading1 = 0;
 	let meterReading2 = 0;
 
-	for (var index = 0; index < rows.length; ++index) {
+	for (let index = 0; index < rows.length; ++index) {
 		// To read data where same reading is repeated. Like E-mon D-mon meters
 		if (index !== 0 && Math.abs((index - readingRepetition) % readingRepetition) === 0) {
 			// set start_timestamp and end_timestamp

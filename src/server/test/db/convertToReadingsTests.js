@@ -16,7 +16,7 @@ mocha.describe('Convert data', () => {
 		const conditionSet = {
 				'minVal': -Number.MAX_VALUE,
 				'maxVal': Number.MAX_VALUE,
-				'minDate': null, 
+				'minDate': null,
 				'maxDate': null,
 				'interval': null,
 				'maxErrors': 10};

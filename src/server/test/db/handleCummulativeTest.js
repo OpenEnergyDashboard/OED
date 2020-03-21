@@ -9,17 +9,83 @@ const Reading = require('../../models/Reading');
 const moment = require('moment');
 
 mocha.describe('Handle cummulative', () => {
-	mocha.it('works with non-repeated values', async () => {
-		let sampleArray = [[0, moment('1970-01-01 00:00:00'), moment('1970-01-01 00:00:30')]]
-		const val_gap = 2;
-		const time_gap = 30;
-		for (let i = 1; i < 12; ++i) {
-			sampleArray.push([sampleArray[i - 1][0] + val_gap, 
-							sampleArray[i - 1][1].add(time_gap, 'second'),
-							sampleArray[i - 1][2].add(time_gap, 'second')]);
-		}
-		result = handleCummulative(sampleArray, 0);
-		expect(result.length).to.equal(sampleArray.length - 1);
-		result.map(row => expect(row[0]).to.equal(gap));
+	let sampleArray = [[10000, moment('1970-01-01 00:00:00'), moment('1970-01-01 00:00:30')]];
+	const valGap = 2;
+	const timeGap = 30;
+	for (let i = 1; i < 12; ++i) {
+		sampleArray.push([sampleArray[i - 1][0] - valGap * i,
+						sampleArray[i - 1][1].subtract(timeGap * i, 'second'),
+						sampleArray[i - 1][2].subtract(timeGap * i, 'second')]);
+	}
+	mocha.describe('with non-duplicated value', () => {
+		result = handleCummulative(sampleArray, 1);
+		mocha.it('returned array length', async () => {
+			expect(result.length).to.equal(sampleArray.length - 1);
+		});
+		mocha.it('reading values', async () => {
+			let i = 1;
+			result.map(row => {
+				expect(row[0]).to.equal(valGap * i);
+				++i;
+			});
+		});
+		mocha.it('startTimeStamps', async () => {
+			let i = 0;
+			result.map(row => {
+				expect(row[1].format()).to.equal(sampleArray[i][1].format());
+				++i;
+			});
+		});
+		mocha.it('endTimeStamps', async () => {
+			let i = 0;
+			result.map(row => {
+				expect(row[2].format()).to.equal(sampleArray[i][2].format());
+				++i;
+				});
+		});
+	});
+	mocha.describe('with duplicated value', () => {
+		mocha.it('returned array length', async () => {
+			for (let repetition = 2; repetition < 7; ++repetition) {
+				result = handleCummulative(sampleArray, repetition);
+				expect(result.length).to.equal(Math.floor((sampleArray.length - 1) / repetition));
+			}
+		});
+		mocha.it('reading values', async () => {
+			for (let repetition = 2; repetition < 7; ++repetition) {
+				result = handleCummulative(sampleArray, repetition);
+				let k = 0;
+				for (let i = 1; i < 12; ++i) {
+					if ((i - repetition) % repetition === 0) {
+						expect(result[k][0]).to.equal(sampleArray[i - repetition][0] - sampleArray[i][0]);
+						++k;
+					}
+				}
+			}
+		});
+		mocha.it('startTimeStamps', async () => {
+			for (let repetition = 2; repetition < 7; ++repetition) {
+				result = handleCummulative(sampleArray, repetition);
+				let k = 0;
+				for (let i = 1; i < 12; ++i) {
+					if ((i - repetition) % repetition === 0) {
+						expect(result[k][1].format()).to.equal(sampleArray[i][1].format());
+						++k;
+					}
+				}
+			}
+		});
+		mocha.it('endTimeStamps', async () => {
+			for (let repetition = 2; repetition < 7; ++repetition) {
+				result = handleCummulative(sampleArray, repetition);
+				let k = 0;
+				for (let i = 1; i < 12; ++i) {
+					if ((i - repetition) % repetition === 0) {
+						expect(result[k][2].format()).to.equal(sampleArray[i - repetition][2].format());
+						++k;
+					}
+				}
+			}
+		});
 	});
 });
