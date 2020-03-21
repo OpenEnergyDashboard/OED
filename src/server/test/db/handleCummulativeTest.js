@@ -4,7 +4,7 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/.
  */
 const { mocha, expect } = require('../common');
-const handleCummulative = require('../../services/Pipeline/handleCummulative');
+const handleCummulative = require('../../services/pipeline-in-progress/handleCummulative');
 const Reading = require('../../models/Reading');
 const moment = require('moment');
 

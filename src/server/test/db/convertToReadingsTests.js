@@ -4,7 +4,7 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/.
  */
 const { mocha, expect } = require('../common');
-const convertToReadings = require('../../services/Pipeline/convertToReadings');
+const convertToReadings = require('../../services/pipeline-in-progress/convertToReadings');
 const Reading = require('../../models/Reading');
 const moment = require('moment');
 
