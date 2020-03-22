@@ -53,7 +53,7 @@ export default function graph(state = defaultState, action: GraphAction) {
 		case ActionType.ResetRangeSliderStack:
 			return {
 				...state,
-				rangeSliderInterval: '',
+				rangeSliderInterval: ''
 			};
 		case ActionType.UpdateComparePeriod:
 			return {

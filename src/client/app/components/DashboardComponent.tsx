@@ -48,7 +48,7 @@ export default class DashboardComponent extends React.Component<DashboardProps, 
 		this.handleTimeIntervalChange = this.handleTimeIntervalChange.bind(this);
 	}
 
-	public render(){
+	public render() {
 		let ChartToRender: typeof LineChartContainer | typeof MultiCompareChartContainer | typeof BarChartContainer;
 		let showSpinner = false;
 		if (this.props.chartToRender === ChartTypes.line) {
@@ -88,19 +88,22 @@ export default class DashboardComponent extends React.Component<DashboardProps, 
 							<ChartToRender />
 						)}
 						{ (this.props.chartToRender === ChartTypes.line) ? (
-							[<Button key={1}
+							[<Button
+								key={1}
 								style={buttonMargin}
-								onClick={() => this.handleTimeIntervalChange("range")}
+								onClick={() => this.handleTimeIntervalChange('range')}
 							> Redraw
 							</Button>,
-							<Button key={2}
+							<Button
+								key={2}
 								style={buttonMargin}
-								onClick={() => this.handleTimeIntervalChange("all")}
+								onClick={() => this.handleTimeIntervalChange('all')}
 							> Restore
 							</Button>,
-							<Button key={3}
-							style={buttonMargin}
-							onClick={() => this.handleTimeIntervalChange("7dfp")}
+							<Button
+								key={3}
+								style={buttonMargin}
+								onClick={() => this.handleTimeIntervalChange('7dfp')}
 							> Past Week
 							</Button>
 							]
@@ -114,46 +117,50 @@ export default class DashboardComponent extends React.Component<DashboardProps, 
 	}
 
 	private handleTimeIntervalChange(mode: string) {
-		if (mode == "all"){
+		if (mode === 'all') {
 			this.props.changeTimeInterval(TimeInterval.unbounded());
-		}else if (mode == 'range') {
-				let timeInterval = TimeInterval.fromString(getRangeSliderInterval());
+		} else if (mode === 'range') {
+				const timeInterval = TimeInterval.fromString(getRangeSliderInterval());
 				this.props.changeTimeInterval(timeInterval);
 		} else {
-			let numDays = parseInt(mode.substring(0,mode.indexOf('dfp')));
-			let current = moment();
-			let newMinXTimestamp = current.clone();
-			newMinXTimestamp.subtract(numDays,'days');
-			let timeInterval = TimeInterval.fromString(newMinXTimestamp.toISOString().substring(0, 19) + 'Z_' + current.toISOString().substring(0, 19) + 'Z');
-			console.log(timeInterval);
+			const numDays = parseInt(mode.substring(0, mode.indexOf('dfp')));
+			const current = moment();
+			const newMinXTimestamp = current.clone();
+			newMinXTimestamp.subtract(numDays, 'days');
+			const timeInterval = TimeInterval.fromString(newMinXTimestamp.toISOString().substring(0, 19)
+				+ 'Z_' + current.toISOString().substring(0, 19) + 'Z');
 			this.props.changeTimeInterval(timeInterval);
 		}
 	}
 }
 
 export function getRangeSliderInterval(): string {
-	let sliderContainer: any = document.querySelector(".rangeslider-bg");
-	let sliderBox: any = document.querySelector(".rangeslider-slidebox");
-	let root: any = document.getElementById("root");
+	const sliderContainer: any = document.querySelector('.rangeslider-bg');
+	const sliderBox: any = document.querySelector('.rangeslider-slidebox');
+	const root: any = document.getElementById('root');
 
 	if (sliderContainer && sliderBox && root) {
 		// Attributes of the slider: full width and the min & max values of the box
-		let fullWidth: number = parseInt(sliderContainer.getAttribute("width"));
-		let sliderMinX: number = parseInt(sliderBox.getAttribute("x"));
-		let sliderMaxX: number = sliderMinX + parseInt(sliderBox.getAttribute("width"));
-		if (sliderMaxX - sliderMinX == fullWidth) return 'all';
+		const fullWidth: number = parseInt(sliderContainer.getAttribute('width'));
+		const sliderMinX: number = parseInt(sliderBox.getAttribute('x'));
+		const sliderMaxX: number = sliderMinX + parseInt(sliderBox.getAttribute('width'));
+		if (sliderMaxX - sliderMinX === fullWidth) {
+			return 'all';
+		}
 
 		// From the Plotly line graph, get current min and max times in seconds
-		let minTimeStamp: number = parseInt(root.getAttribute("min-timestamp"));
-		let maxTimeStamp: number = parseInt(root.getAttribute("max-timestamp"));
+		const minTimeStamp: number = parseInt(root.getAttribute('min-timestamp'));
+		const maxTimeStamp: number = parseInt(root.getAttribute('max-timestamp'));
 
 		// Seconds displayed on graph
-		let deltaSeconds: number = maxTimeStamp - minTimeStamp;
-		let secondsPerPixel: number = deltaSeconds / fullWidth;
+		const deltaSeconds: number = maxTimeStamp - minTimeStamp;
+		const secondsPerPixel: number = deltaSeconds / fullWidth;
 
 		// Get the new min and max times, in seconds, from the slider box
-		let newMinXTimestamp = Math.floor(minTimeStamp + (secondsPerPixel * sliderMinX));
-		let newMaxXTimestamp = Math.floor(minTimeStamp + (secondsPerPixel * sliderMaxX));
+		const newMinXTimestamp = Math.floor(minTimeStamp + (secondsPerPixel * sliderMinX));
+		const newMaxXTimestamp = Math.floor(minTimeStamp + (secondsPerPixel * sliderMaxX));
 		return new TimeInterval(moment(newMinXTimestamp), moment(newMaxXTimestamp)).toString();
-	} else throw new Error('unable to get range slider params');
+	} else {
+		throw new Error('unable to get range slider params');
+	}
 }

@@ -135,12 +135,12 @@ export default class RouteComponent extends React.Component<RouteProps, {}> {
 							options.optionsVisibility = (info === 'true');
 							break;
 						case 'serverRange':
-							let index = info.indexOf('dfp');
-							if (index == -1) {
+							const index = info.indexOf('dfp');
+							if (index === -1) {
 								options.serverRange = TimeInterval.fromString(info);
 							} else {
-								let message = info.substring(0,index);
-								let stringField = this.getNewIntervalFromMessage(message);
+								const message = info.substring(0, index);
+								const stringField = this.getNewIntervalFromMessage(message);
 								options.serverRange = TimeInterval.fromString(stringField);
 							}
 							break;
@@ -159,19 +159,6 @@ export default class RouteComponent extends React.Component<RouteProps, {}> {
 			}
 		}
 		replace('/');
-	}
-
-	/**
-	 * Generates new time interval based on current time and user selected amount to trace back;
-	 * @param message: currently able to accept how many days to go back in time;
-	 */
-	private getNewIntervalFromMessage(message:string) {
-		let numDays = parseInt(message);
-
-		let current = moment();
-		let newMinTimeStamp = current.clone();
-		newMinTimeStamp.subtract(numDays,'days');
-		return newMinTimeStamp.toISOString().substring(0, 19) + 'Z_' + current.toISOString().substring(0, 19) + 'Z';
 	}
 
 	/**
@@ -205,5 +192,18 @@ export default class RouteComponent extends React.Component<RouteProps, {}> {
 				</IntlProvider>
 			</div>
 		);
+	}
+
+	/**
+	 * Generates new time interval based on current time and user selected amount to trace back;
+	 * @param message: currently able to accept how many days to go back in time;
+	 */
+	private getNewIntervalFromMessage(message: string) {
+		const numDays = parseInt(message);
+
+		const current = moment();
+		const newMinTimeStamp = current.clone();
+		newMinTimeStamp.subtract(numDays, 'days');
+		return newMinTimeStamp.toISOString().substring(0, 19) + 'Z_' + current.toISOString().substring(0, 19) + 'Z';
 	}
 }

@@ -32,7 +32,7 @@ export default class ChartLinkComponent extends React.Component<ChartLinkProps, 
 			showSliderRange: false,
 			showOptionalLink: false,
 			optionalLink: '',
-			sliderRange: '',
+			sliderRange: ''
 		};
 	}
 
@@ -57,7 +57,7 @@ export default class ChartLinkComponent extends React.Component<ChartLinkProps, 
 						{this.state.showSliderRange && this.state.sliderRange}
 					</div>
 				}
-				<Button outline onClick ={this.handle7DaysChange}>
+				<Button outline onClick={this.handle7DaysChange}>
 					7 days => present
 				</Button>
 				{this.state.showOptionalLink &&
@@ -72,7 +72,7 @@ export default class ChartLinkComponent extends React.Component<ChartLinkProps, 
 		this.setState(
 			{
 				showOptionalLink: !this.state.showOptionalLink,
-				optionalLink: this.props.weeklyLink,
+				optionalLink: this.props.weeklyLink
 		});
 	}
 
@@ -81,26 +81,26 @@ export default class ChartLinkComponent extends React.Component<ChartLinkProps, 
 		if (this.state.showLink) {
 			this.setState({
 				showLink: false,
-				showSliderRange: false,
-			})
+				showSliderRange: false
+			});
 		} else {
-			if (this.props.chartType == 'line') {
-				let newSliderRange = this.getSliderRange();
+			if (this.props.chartType === 'line') {
+				const newSliderRange = this.getSliderRange();
 				this.setState({
 					showLink: !this.state.showLink,
 					showSliderRange: true,
-					sliderRange: newSliderRange,
+					sliderRange: newSliderRange
 				});
 			} else {
 				this.setState({
-					showLink: !this.state.showLink,
+					showLink: !this.state.showLink
 				});
 			}
 		}
 	}
 
 	private getSliderRange() {
-		let newSliderRange = `&sliderRange=${getRangeSliderInterval()}`;
+		const newSliderRange = `&sliderRange=${getRangeSliderInterval()}`;
 		return newSliderRange;
 	}
 }

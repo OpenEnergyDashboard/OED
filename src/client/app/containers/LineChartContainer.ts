@@ -10,7 +10,7 @@ import { State } from '../types/redux/state';
 import PlotlyChart, { IPlotlyChartProps } from 'react-plotlyjs-ts';
 import {TimeInterval} from '../../../common/TimeInterval';
 
-function mapStateToProps(state: State){
+function mapStateToProps(state: State) {
 	const timeInterval = state.graph.timeInterval;
 	const datasets: any[] = [];
 
@@ -38,15 +38,15 @@ function mapStateToProps(state: State){
 				});
 
 				// Save the timestamp range of the plot
-				let minTimestamp: string = "";
-				let maxTimestamp: string = "";
-				if (readings.length > 0){
-					minTimestamp = readings[0]["startTimestamp"].toString();
-					maxTimestamp = readings[readings.length-1]["startTimestamp"].toString();
+				let minTimestamp: string = '';
+				let maxTimestamp: string = '';
+				if (readings.length > 0) {
+					minTimestamp = readings[0]['startTimestamp'].toString();
+					maxTimestamp = readings[readings.length - 1]['startTimestamp'].toString();
 				}
-				let root: any = document.getElementById('root');
-				root.setAttribute("min-timestamp", minTimestamp);
-				root.setAttribute("max-timestamp", maxTimestamp);
+				const root: any = document.getElementById('root');
+				root.setAttribute('min-timestamp', minTimestamp);
+				root.setAttribute('max-timestamp', maxTimestamp);
 
 				// This variable contains all the elements (x and y values, line type, etc.) assigned to the data parameter of the Plotly object
 				datasets.push({
@@ -109,10 +109,10 @@ function mapStateToProps(state: State){
 		}
 	}
 
-	//calculate slider interval if rangeSliderInterval is specified;
-	let sliderInterval = (state.graph.rangeSliderInterval.length == 0)? timeInterval : TimeInterval.fromString(state.graph.rangeSliderInterval);
-	let start = Date.parse(moment(sliderInterval.getStartTimestamp()).toISOString());
-	let end = Date.parse(moment(sliderInterval.getEndTimestamp()).toISOString());
+	// Calculate slider interval if rangeSliderInterval is specified;
+	const sliderInterval = (state.graph.rangeSliderInterval.length === 0) ? timeInterval : TimeInterval.fromString(state.graph.rangeSliderInterval);
+	const start = Date.parse(moment(sliderInterval.getStartTimestamp()).toISOString());
+	const end = Date.parse(moment(sliderInterval.getEndTimestamp()).toISOString());
 
 	// Customize the layout of the plot
 	const layout: any = {
@@ -124,7 +124,7 @@ function mapStateToProps(state: State){
 		legend: {
 			x: 0,
 			y: 1.1,
-			orientation: 'h',
+			orientation: 'h'
 		},
 		yaxis: {
 			title: 'kW',
@@ -133,9 +133,9 @@ function mapStateToProps(state: State){
 		},
 
 		xaxis: {
-			range: [start,end], //specifies the start and end points of visible part of graph(unshaded region on slider);
+			range: [start, end], // Specifies the start and end points of visible part of graph(unshaded region on slider);
 			rangeslider: {
-				thickness: 0.1,
+				thickness: 0.1
 			},
 			showgrid: true,
 			gridcolor: '#ddd'

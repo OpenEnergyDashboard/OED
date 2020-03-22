@@ -132,7 +132,7 @@ export function changeGraphZoomIfNeeded(timeInterval: TimeInterval): Thunk {
 }
 
 function shouldChangeRangeSlider(range: string): boolean {
-	return range != 'all';
+	return range !== 'all';
 }
 
 function changeRangeSlider(sliderInterval: string): t.ChangeSliderRangeAction {
@@ -144,7 +144,7 @@ function resetRangeSliderStack(): t.ResetRangeSliderStackAction {
 }
 
 function changeRangeSliderIfNeeded(interval: string): Thunk {
-	return (dispatch) => {
+	return dispatch => {
 		if (shouldChangeRangeSlider(interval)) {
 			dispatch(changeRangeSlider(interval));
 		}

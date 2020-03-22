@@ -10,9 +10,9 @@ import moment = require('moment');
 import DashboardComponent from 'components/DashboardComponent';
 
 function mapStateToProps(state: State) {
-	let chartType = state.graph.chartToRender;
+	const chartType = state.graph.chartToRender;
 	let linkText = `${window.location.href}graph?`;
-	let weeklyLink = ''; //reflects graph 7 days from present, with user selected meters and groups;
+	let weeklyLink = ''; // reflects graph 7 days from present, with user selected meters and groups;
 	if (state.graph.selectedMeters.length > 0) {
 		linkText += `meterIDs=${state.graph.selectedMeters.toString()}&`;
 	}
@@ -26,7 +26,7 @@ function mapStateToProps(state: State) {
 			linkText += `&barStacking=${state.graph.barStacking}`;
 			break;
 		case 'line':
-			weeklyLink = linkText + `&serverRange=7dfp`; //dfp: days from present;
+			weeklyLink = linkText + '&serverRange=7dfp'; // dfp: days from present;
 			linkText += `&serverRange=${state.graph.timeInterval.toString()}`;
 			break;
 		case 'compare':
