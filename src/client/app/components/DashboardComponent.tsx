@@ -48,7 +48,7 @@ export default class DashboardComponent extends React.Component<DashboardProps, 
 		this.handleTimeIntervalChange = this.handleTimeIntervalChange.bind(this);
 	}
 
-	public render(){
+	public render() {
 		let ChartToRender: typeof LineChartContainer | typeof MultiCompareChartContainer | typeof BarChartContainer;
 		let showSpinner = false;
 		if (this.props.chartToRender === ChartTypes.line) {
@@ -109,13 +109,13 @@ export default class DashboardComponent extends React.Component<DashboardProps, 
 
 	private handleTimeIntervalChange(mode: string) {
 		if (mode == "all"){
-			this.props.changeTimeInterval(TimeInterval.unbounded());			
-		}else{
+			this.props.changeTimeInterval(TimeInterval.unbounded());
+		} else {
 			let sliderContainer: any = document.querySelector(".rangeslider-bg");
 			let sliderBox: any = document.querySelector(".rangeslider-slidebox");
 			let root: any = document.getElementById("root");	
 
-			if (sliderContainer && sliderBox && root){
+			if (sliderContainer && sliderBox && root) {
 				// Attributes of the slider: full width and the min & max values of the box
 				let fullWidth: number = parseInt(sliderContainer.getAttribute("width"));
 				let sliderMinX: number = parseInt(sliderBox.getAttribute("x"));
@@ -136,7 +136,7 @@ export default class DashboardComponent extends React.Component<DashboardProps, 
 
 				let timeInterval = new TimeInterval(moment(newMinXTimestamp), moment(newMaxXTimestamp));
 				this.props.changeTimeInterval(timeInterval);
-			}			
+			}
 		}
 	}
 }

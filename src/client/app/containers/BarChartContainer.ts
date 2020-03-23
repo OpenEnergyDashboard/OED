@@ -14,7 +14,6 @@ function mapStateToProps(state: State) {
 	const barDuration = state.graph.barDuration;
 	const datasets: any[] = [];
 
-	const labelsSet = new Set();
 	for (const meterID of state.graph.selectedMeters) {
 		const byMeterID = state.readings.bar.byMeterID[meterID];
 		if (byMeterID !== undefined) {
@@ -81,7 +80,7 @@ function mapStateToProps(state: State) {
 		barmode: 'group',
 		bargap: 0.2,
 		bargroupgap: 0.1,
-		autozise: true,
+		autosize: true,
 		showlegend: true,
 		legend: {
 			x: 0,

@@ -65,7 +65,7 @@ function mapStateToProps(state: State, ownProps: CompareChartContainerProps): IP
 			color: colorize(entity.change)
 		},
 		hovermode:'closest',
-		autozise: true,
+		autosize: true,
 		showlegend: false,
 		legend: {
 		},

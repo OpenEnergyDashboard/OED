@@ -59,7 +59,6 @@ function mapStateToProps(state: State){
 					line: {
 						shape: 'spline',
 						width: 3
-						// smoothing: 1.3
 					},
 					marker: {color: getGraphColor(label)}
 				});
@@ -110,7 +109,7 @@ function mapStateToProps(state: State){
 
 	// Customize the layout of the plot
 	const layout: any = {
-		autozise: true,
+		autosize: true,
 		showlegend: true,
 		legend: {
 			x: 0,
@@ -133,7 +132,7 @@ function mapStateToProps(state: State){
 		}
 	};
 
-	// Assign all the paramaters required to create the Plotly object (data, layout, config) to the variable props, returned by mapStateToProps
+	// Assign all the parameters required to create the Plotly object (data, layout, config) to the variable props, returned by mapStateToProps
 	// The Plotly toolbar is displayed if displayModeBar is set to true
 	const props: IPlotlyChartProps = {
 		data: datasets,
