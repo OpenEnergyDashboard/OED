@@ -111,9 +111,6 @@ function mapStateToProps(state: State){
 	// Customize the layout of the plot
 	const layout: any = {
 		autozise: true,
-		// width: 700,
-		// height: 700,
-		// title: 'First Test',
 		showlegend: true,
 		legend: {
 			x: 0,
