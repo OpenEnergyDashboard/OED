@@ -21,12 +21,12 @@ mocha.describe('Load data from array', () => {
 							[4, '20:00:00 1/24/20'],
 							[5, '21:00:00 1/24/20']];
 		const readingDuration = 30;
-		await loadArrayInput(arrayInput, 
-									meter.id, 
+		await loadArrayInput(arrayInput,
+									meter.id,
 									input => input.map(row => {
 										const reading = row[0];
 										const endTimestamp = moment(row[1], 'HH:mm:ss MM/DD/YYYY');
-										const startTimestamp = moment(endTimestamp).subtract(readingDuration, "minute");
+										const startTimestamp = moment(endTimestamp).subtract(readingDuration, 'minute');
 										return [reading, startTimestamp, endTimestamp];
 									}),
 									false,
@@ -39,7 +39,7 @@ mocha.describe('Load data from array', () => {
 				expect(reading.meterID).to.equal(meter.id);
 				expect(reading.reading).to.equal(arrayInput[i][0]);
 				expect(reading.endTimestamp.format()).to.equal(moment(arrayInput[i][1], 'HH:mm:ss MM/DD/YYYY').format());
-				expect(reading.startTimestamp.format()).to.equal((moment(arrayInput[i][1], 'HH:mm:ss MM/DD/YYYY').subtract(readingDuration, "minute")).format());
+				expect(reading.startTimestamp.format()).to.equal((moment(arrayInput[i][1], 'HH:mm:ss MM/DD/YYYY').subtract(readingDuration, 'minute')).format());
 				++i;
 		});
 	});

@@ -26,7 +26,6 @@ async function loadArrayInput(dataRows, meterID, mapRowToModel, isCummulative, c
 		readings = convertToReadings(readingsArray, meterID, conditionSet);
 		await Reading.insertOrIgnoreAll(readings, conn);
 	} catch (err) {
-		console.log("Error");
 		log.error(`Error updating meter ${ipAddress}: ${err}`, err);
 	}
 }
