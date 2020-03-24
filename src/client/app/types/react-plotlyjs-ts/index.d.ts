@@ -1,4 +1,6 @@
 /// <reference types="react" />
+// TODO <https://www.typescriptlang.org/docs/handbook/triple-slash-directives.html> gives limited 
+// circumstances where reference should be used. We need to verify this is a good use.
 import * as plotly from 'plotly.js';
 import * as React from 'react';
 export interface IPlotlyChartProps {

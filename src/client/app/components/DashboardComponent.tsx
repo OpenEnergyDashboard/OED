@@ -20,6 +20,7 @@ import { FormattedMessage } from 'react-intl';
 import { Dispatch, Thunk, ActionType } from '../types/redux/actions';
 
 import * as Plotly from 'plotly.js';
+// TODO lowercase plotly for the import in index.d.ts but uppercase here.
 
 defaults.plugins = {
 	datalabels: {
@@ -108,6 +109,9 @@ export default class DashboardComponent extends React.Component<DashboardProps, 
 	}
 
 	private handleTimeIntervalChange(mode: string) {
+// TODO Should mode be an enum since it has clearly defined values. Since the if/else uses it below 
+// it could use a boolean but that implies there will only be two possible values forever 
+// which seems likely to be the case.
 		if (mode == "all"){
 			this.props.changeTimeInterval(TimeInterval.unbounded());
 		} else {

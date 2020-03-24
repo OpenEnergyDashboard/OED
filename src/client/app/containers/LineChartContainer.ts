@@ -66,6 +66,8 @@ function mapStateToProps(state: State){
 		}
 	}
 
+// TODO The meters and groups code is very similar and maybe it should be refactored out to create a function to do 
+// both. This would mean future changes would automatically happen to both.
 	// Add all valid data from existing groups to the line plot
 	for (const groupID of state.graph.selectedGroups) {
 		const byGroupID = state.readings.line.byGroupID[groupID];
@@ -82,6 +84,8 @@ function mapStateToProps(state: State){
 				const yData: number[] = [];
 				const hoverText: string[] = [];
 				_.values(readingsData.readings).forEach(reading => {
+// TODO The meter code explicitly creates the array but this does not. This seems cleaner (a little harder to 
+// see data on debug). Whatever is chosen, it should probably be the same way.
 					const timeReading = moment(reading.startTimestamp);
 					xData.push(timeReading.format('YYYY-MM-DD HH:mm:ss'));
 					yData.push(reading.reading);
@@ -118,7 +122,6 @@ function mapStateToProps(state: State){
 		},
 		yaxis: {
 			title: 'kW',
-			showgrid: true,
 			gridcolor: '#ddd'
 		},
 		xaxis: {
