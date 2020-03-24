@@ -83,9 +83,8 @@ function mapStateToProps(state: State){
 				const xData: string[] = [];
 				const yData: number[] = [];
 				const hoverText: string[] = [];
-				_.values(readingsData.readings).forEach(reading => {
-// TODO The meter code explicitly creates the array but this does not. This seems cleaner (a little harder to 
-// see data on debug). Whatever is chosen, it should probably be the same way.
+				const readings = _.values(readingsData.readings);
+				readings.forEach(reading => {
 					const timeReading = moment(reading.startTimestamp);
 					xData.push(timeReading.format('YYYY-MM-DD HH:mm:ss'));
 					yData.push(reading.reading);
