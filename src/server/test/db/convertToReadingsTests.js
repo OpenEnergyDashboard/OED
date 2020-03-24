@@ -13,15 +13,8 @@ mocha.describe('Convert data', () => {
 		let sampleArray = [ [ 0, moment('1970-01-01 00:00:00'), moment('1980-01-01 00:00:00')],
 							[ 1, moment('1970-01-01 00:00:01'), moment('2000-01-01 00:00:01')],
 							[ 2, moment('1999-01-01 00:00:00'), moment('2000-01-01 00:00:00')]];
-		const conditionSet = {
-				'minVal': -Number.MAX_VALUE,
-				'maxVal': Number.MAX_VALUE,
-				'minDate': null,
-				'maxDate': null,
-				'interval': null,
-				'maxErrors': 10};
 		let i = 0;
-		convertToReadings(sampleArray, 'testing', conditionSet)
+		convertToReadings(sampleArray, 'testing', undefined)
 						.map(reading => {
 							expect(reading.meterID).to.equal('testing');
 							expect(reading.reading).to.equal(sampleArray[i][0]);
