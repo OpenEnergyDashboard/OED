@@ -18,8 +18,12 @@ function mapStateToProps(state: State) {
 		const byMeterID = state.readings.bar.byMeterID[meterID];
 		if (byMeterID !== undefined) {
 			const readingsData = byMeterID[timeInterval.toString()][barDuration.toISOString()];
-			if (readingsData !== undefined && readingsData.readings !== undefined && !readingsData.isFetching) {
+			if (readingsData !== undefined && !readingsData.isFetching) {
 				const label = state.meters.byMeterID[meterID].name;
+				if (readingsData.readings === undefined) {
+					throw new Error('Unacceptable condition: readingsData.readings is undefined.');
+				}
+
 				const xData: string[] = [];
 				const yData: number[] = [];
 				const hoverText: string[] = [];
