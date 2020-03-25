@@ -18,11 +18,12 @@ const convertToReading = require('./convertToReadings');
  *     &#9;(readings, tx) => Reading.insertAll(readings, tx)
  * ).then(() => log('Inserted!'));
  * @param stream the raw stream to load from
+ * @param meterID
  * @param {function(Array.<*>, ...*): M} mapRowToModel A function that maps a CSV row (an array) to a model object
+ * @param conditionSet
  * @param conn the database connection to use
- * @template M
  */
-function loadCsvStream(stream, ipAddress, mapRowToModel, conditionSet, conn) {
+function loadCsvStream(stream, meterID, mapRowToModel, conditionSet, conn) {
 	return conn.tx(t => new Promise(resolve => {
 		let rejected = false;
 		const error = null;
@@ -44,7 +45,9 @@ function loadCsvStream(stream, ipAddress, mapRowToModel, conditionSet, conn) {
 			// We can only get the next row once so we check that it isn't null at the same time that we assign it
 			while ((row = parser.read()) !== null) { // tslint:disable-line no-conditional-assignment
 				if (!rejected) {
-					modelsToInsert.push(convertToReading(mapRowToModel(row), ipAddress, conditionSet));
+					modelRow = mapRowToModel(row);
+					reading = convertToReading([modelRow], meterID, conditionSet);
+					modelsToInsert.push(reading[0]); // convertToReading return array of size 1
 				}
 			}
 			if (!rejected) {

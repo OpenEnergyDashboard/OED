@@ -19,14 +19,14 @@ const { log } = require('../../log');
 
 async function loadArrayInput(dataRows, meterID, mapRowToModel, isCummulative, conditionSet, conn) {
 	try {
-		readingsArray = mapRowToModel(dataRows);
+		readingsArray = dataRows.map(mapRowToModel);
 		if (isCummulative) {
 			readingsArray = handleCummulative(readingsArray);
 		}
 		readings = convertToReadings(readingsArray, meterID, conditionSet);
 		await Reading.insertOrIgnoreAll(readings, conn);
 	} catch (err) {
-		log.error(`Error updating meter ${ipAddress}: ${err}`, err);
+		log.error(`Error updating meter ${meterID}: ${err}`, err);
 	}
 }
 

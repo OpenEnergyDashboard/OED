@@ -8,12 +8,12 @@ const fs = require('fs');
 const readCSV = require('./readCSV');
 const loadArrayInput = require('./loadArrayInput');
 const loadCsvStream = require('./loadCsvStream');
-const { log } = require('../log');
+const { log } = require('../../log');
 
 /**
  * Read a CSV file and select needed column to return an array of reading value and reading time
  * @param {string} filePath
- * @param {string} ipAddress
+ * @param {string} meterID
  * @param {function} mapRowToModel a customized function that map needed values from each row to the Reading model
  * @param {boolean} readAsStream true if prefer to read file as CSV stream
  * @param {boolean} isCummulative true if the given data is cummulative
@@ -21,17 +21,17 @@ const { log } = require('../log');
  * @param {array} conn connection to database
  */
 
-async function loadCsvInput(filePath, ipAddress, mapRowToModel, readAsStream, isCummulative, conditionSet, conn) {
+async function loadCsvInput(filePath, meterID, mapRowToModel, readAsStream, isCummulative, conditionSet, conn) {
 	try {
 		if (readAsStream) {
 			const stream = fs.createReadStream(filePath);
-			await loadCsvStream(stream, ipAddress, mapRowToModel, isCummulative, conditionSet, conn);
+			await loadCsvStream(stream, meterID, mapRowToModel, conditionSet, conn);
 		} else {
-			const dataRows = await readCSV(filename);
-			await loadArrayInput(dataRows, ipAddress, mapRowToModel, isCummulative, conditionSet, conn);
+			const dataRows = await readCSV(filePath);
+			await loadArrayInput(dataRows, meterID, mapRowToModel, isCummulative, conditionSet, conn);
 		}
 	} catch (err) {
-		log.error(`Error updating meter ${ipAddress}: ${err}`, err);
+		log.error(`Error updating meter ${meterID}: ${err}`, err);
 	}
 }
 

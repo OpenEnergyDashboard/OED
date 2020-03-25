@@ -23,12 +23,12 @@ mocha.describe('Load data from array', () => {
 		const readingDuration = 30;
 		await loadArrayInput(arrayInput,
 									meter.id,
-									input => input.map(row => {
+									row => {
 										const reading = row[0];
 										const endTimestamp = moment(row[1], 'HH:mm:ss MM/DD/YYYY');
 										const startTimestamp = moment(endTimestamp).subtract(readingDuration, 'minute');
 										return [reading, startTimestamp, endTimestamp];
-									}),
+									},
 									false,
 									undefined,
 									conn);
