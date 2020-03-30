@@ -110,7 +110,7 @@ function mapStateToProps(state: State) {
 	}
 
 	// Calculate slider interval if rangeSliderInterval is specified;
-	const sliderInterval = (state.graph.rangeSliderInterval.length === 0) ? timeInterval : TimeInterval.fromString(state.graph.rangeSliderInterval);
+	const sliderInterval = (state.graph.rangeSliderInterval.equals(TimeInterval.unbounded())) ? timeInterval : state.graph.rangeSliderInterval;
 	const start = Date.parse(moment(sliderInterval.getStartTimestamp()).toISOString());
 	const end = Date.parse(moment(sliderInterval.getEndTimestamp()).toISOString());
 

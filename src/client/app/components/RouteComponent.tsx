@@ -145,7 +145,7 @@ export default class RouteComponent extends React.Component<RouteProps, {}> {
 							}
 							break;
 						case 'sliderRange':
-							options.sliderRange = info;
+							options.sliderRange = TimeInterval.fromString(info);
 							break;
 						default:
 							throw new Error('Unknown query parameter');

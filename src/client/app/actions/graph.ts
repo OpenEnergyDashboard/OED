@@ -131,19 +131,23 @@ export function changeGraphZoomIfNeeded(timeInterval: TimeInterval): Thunk {
 	};
 }
 
-function shouldChangeRangeSlider(range: string): boolean {
-	return range !== 'all';
+function shouldChangeRangeSlider(range: TimeInterval): boolean {
+	return range !== TimeInterval.unbounded();
 }
 
-function changeRangeSlider(sliderInterval: string): t.ChangeSliderRangeAction {
+function changeRangeSlider(sliderInterval: TimeInterval): t.ChangeSliderRangeAction {
 	return {type: ActionType.ChangeSliderRange, sliderInterval};
 }
 
+/**
+ * remove constraints for rangeslider after user clicked redraw or restore
+ * by setting sliderRange to an empty string
+ */
 function resetRangeSliderStack(): t.ResetRangeSliderStackAction {
 	return {type: ActionType.ResetRangeSliderStack};
 }
 
-function changeRangeSliderIfNeeded(interval: string): Thunk {
+function changeRangeSliderIfNeeded(interval: TimeInterval): Thunk {
 	return dispatch => {
 		if (shouldChangeRangeSlider(interval)) {
 			dispatch(changeRangeSlider(interval));
@@ -158,7 +162,7 @@ export interface LinkOptions {
 	chartType?: t.ChartTypes;
 	barDuration?: moment.Duration;
 	serverRange?: TimeInterval;
-	sliderRange?: string;
+	sliderRange?: TimeInterval;
 	toggleBarStacking?: boolean;
 	comparePeriod?: ComparePeriod;
 	compareSortingOrder?: SortingOrder;

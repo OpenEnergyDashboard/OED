@@ -12,7 +12,7 @@ const defaultState: GraphState = {
 	selectedMeters: [],
 	selectedGroups: [],
 	timeInterval: TimeInterval.unbounded(),
-	rangeSliderInterval: '',
+	rangeSliderInterval: TimeInterval.unbounded(),
 	barDuration: moment.duration(4, 'weeks'),
 	comparePeriod: ComparePeriod.Week,
 	compareTimeInterval: calculateCompareTimeInterval(ComparePeriod.Week, moment()),
@@ -53,7 +53,7 @@ export default function graph(state = defaultState, action: GraphAction) {
 		case ActionType.ResetRangeSliderStack:
 			return {
 				...state,
-				rangeSliderInterval: ''
+				rangeSliderInterval: TimeInterval.unbounded()
 			};
 		case ActionType.UpdateComparePeriod:
 			return {

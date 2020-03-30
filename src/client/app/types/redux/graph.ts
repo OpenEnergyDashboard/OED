@@ -44,7 +44,7 @@ export interface ChangeGraphZoomAction {
 
 export interface ChangeSliderRangeAction {
 	type: ActionType.ChangeSliderRange;
-	sliderInterval: string;
+	sliderInterval: TimeInterval;
 }
 
 export interface ResetRangeSliderStackAction {
@@ -90,7 +90,7 @@ export interface GraphState {
 	selectedMeters: number[];
 	selectedGroups: number[];
 	timeInterval: TimeInterval;
-	rangeSliderInterval: string;
+	rangeSliderInterval: TimeInterval;
 	barDuration: moment.Duration;
 	comparePeriod: ComparePeriod;
 	compareTimeInterval: TimeInterval;

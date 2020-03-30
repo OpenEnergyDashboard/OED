@@ -52,18 +52,20 @@ export default class ChartLinkComponent extends React.Component<ChartLinkProps, 
 					<FormattedMessage id='toggle.link' />
 				</Button>
 				{this.state.showLink &&
-					<div style={wellStyle}>
-						{this.props.linkText}
-						{this.state.showSliderRange && this.state.sliderRange}
-					</div>
-				}
-				<Button outline onClick={this.handle7DaysChange}>
-					7 days => present
-				</Button>
-				{this.state.showOptionalLink &&
-					<div style={wellStyle}>
-						{this.state.optionalLink}
-					</div>
+					<>
+						<div style={wellStyle}>
+							{this.props.linkText}
+							{this.state.showSliderRange && this.state.sliderRange}
+						</div>
+						<Button outline onClick={this.handle7DaysChange}>
+							Set to track most recent 7 days
+						</Button>
+						{this.state.showOptionalLink &&
+							<div style={wellStyle}>
+							{this.state.optionalLink}
+							</div>
+						}
+					</>
 				}
 			</div>
 		);
@@ -85,7 +87,7 @@ export default class ChartLinkComponent extends React.Component<ChartLinkProps, 
 			});
 		} else {
 			if (this.props.chartType === 'line') {
-				const newSliderRange = this.getSliderRange();
+				const newSliderRange = this.getSliderRangeString();
 				this.setState({
 					showLink: !this.state.showLink,
 					showSliderRange: true,
@@ -99,8 +101,8 @@ export default class ChartLinkComponent extends React.Component<ChartLinkProps, 
 		}
 	}
 
-	private getSliderRange() {
-		const newSliderRange = `&sliderRange=${getRangeSliderInterval()}`;
-		return newSliderRange;
+	private getSliderRangeString() {
+		const sliderRangeString = `&sliderRange=${getRangeSliderInterval()}`;
+		return sliderRangeString;
 	}
 }

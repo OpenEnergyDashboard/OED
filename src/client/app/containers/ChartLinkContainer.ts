@@ -20,14 +20,14 @@ function mapStateToProps(state: State) {
 		linkText += `groupIDs=${state.graph.selectedGroups.toString()}&`;
 	}
 	linkText += `chartType=${state.graph.chartToRender}`;
+	weeklyLink = linkText + '&serverRange=7dfp'; // dfp: days from present;
+	linkText += `&serverRange=${state.graph.timeInterval.toString()}`;
 	switch (chartType) {
 		case 'bar':
 			linkText += `&barDuration=${state.graph.barDuration.asDays()}`;
 			linkText += `&barStacking=${state.graph.barStacking}`;
 			break;
 		case 'line':
-			weeklyLink = linkText + '&serverRange=7dfp'; // dfp: days from present;
-			linkText += `&serverRange=${state.graph.timeInterval.toString()}`;
 			break;
 		case 'compare':
 			linkText += `&comparePeriod=${state.graph.comparePeriod}`;
