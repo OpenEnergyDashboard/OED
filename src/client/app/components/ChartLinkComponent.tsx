@@ -87,7 +87,7 @@ export default class ChartLinkComponent extends React.Component<ChartLinkProps, 
 			});
 		} else {
 			if (this.props.chartType === 'line') {
-				const newSliderRange = this.getSliderRangeString();
+				const newSliderRange = this.getSliderRangeString(); //get sliderRange on demand;
 				this.setState({
 					showLink: !this.state.showLink,
 					showSliderRange: true,
