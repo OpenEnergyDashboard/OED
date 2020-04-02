@@ -43,7 +43,7 @@ script:
   - npm run check:types
     # Check for tslint failures
   - npm run check:lint
-    # Test with native Node install
-  - npm run test
     # Test in Docker
   - docker-compose run --service-ports --rm web npm run test
+    # Test with native Node install
+  - npm run test
