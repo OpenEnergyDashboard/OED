@@ -19,7 +19,7 @@ const convertToReading = require('./convertToReadings');
  * ).then(() => log('Inserted!'));
  * @param stream the raw stream to load from
  * @param meterID
- * @param {function(Array.<*>, ...*): M} mapRowToModel A function that maps a CSV row (an array) to a model object
+ * @param {function(Array.<*>, ...*): M} mapRowToModel A function that maps a CSV row to a fixed [readings, (Moment) startTimeStamp, (Moment) endTimeStap] array format 
  * @param conditionSet
  * @param conn the database connection to use
  */
@@ -47,7 +47,7 @@ function loadCsvStream(stream, meterID, mapRowToModel, conditionSet, conn) {
 				if (!rejected) {
 					modelRow = mapRowToModel(row);
 					reading = convertToReading([modelRow], meterID, conditionSet);
-					modelsToInsert.push(reading[0]); // convertToReading return array of size 1
+					modelsToInsert.push(reading[0]); // convertToReading returns array of size 1
 				}
 			}
 			if (!rejected) {

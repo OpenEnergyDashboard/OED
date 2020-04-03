@@ -25,10 +25,10 @@ async function loadCsvInput(filePath, meterID, mapRowToModel, readAsStream, isCu
 	try {
 		if (readAsStream) {
 			const stream = fs.createReadStream(filePath);
-			await loadCsvStream(stream, meterID, mapRowToModel, conditionSet, conn);
+			return loadCsvStream(stream, meterID, mapRowToModel, conditionSet, conn);
 		} else {
 			const dataRows = await readCSV(filePath);
-			await loadArrayInput(dataRows, meterID, mapRowToModel, isCummulative, conditionSet, conn);
+			return loadArrayInput(dataRows, meterID, mapRowToModel, isCummulative, conditionSet, conn);
 		}
 	} catch (err) {
 		log.error(`Error updating meter ${meterID}: ${err}`, err);

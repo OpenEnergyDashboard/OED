@@ -39,7 +39,6 @@ function loadFromCsvStream(stream, mapRowToModel, bulkInsertModels, conn) {
 
 		// Defines how the parser behaves when it has new data (models to be inserted)
 		parser.on('readable', () => {
-			let row;
 			// We can only get the next row once so we check that it isn't null at the same time that we assign it
 			while ((row = parser.read()) !== null) { // tslint:disable-line no-conditional-assignment
 				if (!rejected) {
