@@ -19,7 +19,7 @@ const convertToReading = require('./convertToReadings');
  * ).then(() => log('Inserted!'));
  * @param stream the raw stream to load from
  * @param meterID
- * @param {function(Array.<*>, ...*): M} mapRowToModel A function that maps a CSV row to a fixed [readings, (Moment) startTimeStamp, (Moment) endTimeStap] array format 
+ * @param {function(Array.<*>, ...*): M} mapRowToModel maps a CSV row to a fixed [readings, (Moment) startTimeStamp, (Moment) endTimeStap] format
  * @param conditionSet
  * @param conn the database connection to use
  */

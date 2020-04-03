@@ -6,7 +6,7 @@
 
 const moment = require('moment');
 const Reading = require('../../models/Reading');
-const loadCsvInput = require('./loadCsvInput')
+const loadCsvInput = require('./loadCsvInput');
 
 /**
  * Returns a promise to insert readings from a MAMAC csv file with the given path into the database
@@ -19,8 +19,8 @@ const loadCsvInput = require('./loadCsvInput')
  * @return {Promise.<>}
  */
 function loadMamac(filePath, meter, readingDuration, conn) {
-	return loadCsvInput(filePath = filePath, 
-						meterID = meter.id, 
+	return loadCsvInput(filePath = filePath,
+						meterID = meter.id,
 						mapRowToModel = row => {
 							const readRate = row[0];
 							// Mamac timestamps look like 11:00:00 7/31/16

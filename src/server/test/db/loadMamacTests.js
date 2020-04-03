@@ -17,7 +17,7 @@ mocha.describe('Load Mamac Readings from a CSV file', () => {
 		conn = testDB.getConnection();
 		await new Meter(undefined, 'Mamac Meter', null, false, true, Meter.type.MAMAC).insert(conn);
 		meter = await Meter.getByName('Mamac Meter', conn);
-	}); 
+	});
 
 	mocha.it('loads the correct number of rows from a file', async () => {
 		conn = testDB.getConnection();
