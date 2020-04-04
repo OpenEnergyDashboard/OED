@@ -3,7 +3,6 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
 
 import * as React from 'react';
-import { defaults } from 'chart.js';
 import UIOptionsContainer from '../containers/UIOptionsContainer';
 import LineChartContainer from '../containers/LineChartContainer';
 import BarChartContainer from '../containers/BarChartContainer';
@@ -22,11 +21,6 @@ import { Dispatch, Thunk, ActionType } from '../types/redux/actions';
 import * as Plotly from 'plotly.js';
 // TODO lowercase plotly for the import in index.d.ts but uppercase here.
 
-defaults.plugins = {
-	datalabels: {
-		display: false
-	}
-};
 
 
 interface DashboardProps {
