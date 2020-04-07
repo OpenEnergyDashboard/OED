@@ -31,7 +31,8 @@ function mapStateToProps(state: State) {
 				const hoverText: string[] = [];
 				const readings = _.orderBy(readingsData.readings, ['startTimestamp'], ['asc']);
 				readings.forEach(barReading => {
-					const timeReading: string = `${moment(barReading.startTimestamp).format('MMM DD, YYYY')} - ${moment(barReading.endTimestamp).format('MMM DD, YYYY')}`;
+					const timeReading: string =
+						`${moment(barReading.startTimestamp).format('MMM DD, YYYY')} - ${moment(barReading.endTimestamp).format('MMM DD, YYYY')}`;
 					xData.push(timeReading);
 					yData.push(barReading.reading);
 					hoverText.push(`<b> ${timeReading} </b> <br> ${label}: ${barReading.reading} kW`);
@@ -67,7 +68,8 @@ function mapStateToProps(state: State) {
 				const hoverText: string[] = [];
 				const readings = _.orderBy(readingsData.readings, ['startTimestamp'], ['asc']);
 				readings.forEach(barReading => {
-					const timeReading: string = `${moment(barReading.startTimestamp).format('MMM DD, YYYY')} - ${moment(barReading.endTimestamp).format('MMM DD, YYYY')}`;
+					const timeReading: string =
+						`${moment(barReading.startTimestamp).format('MMM DD, YYYY')} - ${moment(barReading.endTimestamp).format('MMM DD, YYYY')}`;
 					xData.push(timeReading);
 					yData.push(barReading.reading);
 					hoverText.push(`<b> ${timeReading} </b> <br> ${label}: ${barReading.reading} kW`);
@@ -98,7 +100,7 @@ function mapStateToProps(state: State) {
 		legend: {
 			x: 0,
 			y: 1.1,
-			orientation: 'h',
+			orientation: 'h'
 		},
 		yaxis: {
 			title: 'kW',
