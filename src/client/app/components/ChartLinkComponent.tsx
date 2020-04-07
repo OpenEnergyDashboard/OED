@@ -26,7 +26,7 @@ export default class ChartLinkComponent extends React.Component<ChartLinkProps, 
 	constructor(props: ChartLinkProps) {
 		super(props);
 		this.toggleLink = this.toggleLink.bind(this);
-		this.handle7DaysChange = this.handle7DaysChange.bind(this);
+		// this.handle7DaysChange = this.handle7DaysChange.bind(this);
 		this.state = {
 			showLink: false,
 			showSliderRange: false,
@@ -57,26 +57,28 @@ export default class ChartLinkComponent extends React.Component<ChartLinkProps, 
 							{this.props.linkText}
 							{this.state.showSliderRange && this.state.sliderRange}
 						</div>
-						<Button outline onClick={this.handle7DaysChange}>
-							Set to track most recent 7 days
-						</Button>
-						{this.state.showOptionalLink &&
-							<div style={wellStyle}>
-							{this.state.optionalLink}
-							</div>
-						}
+						{/*removed the button to track a week's data from present after commit caa6109e7624c1ad0bee2b20aa8f9c91cf48c8e4*/}
+						{/*<Button outline onClick={this.handle7DaysChange}>*/}
+						{/*	Set to track most recent 7 days*/}
+						{/*</Button>*/}
+						{/*{this.state.showOptionalLink &&*/}
+						{/*	<div style={wellStyle}>*/}
+						{/*	{this.state.optionalLink}*/}
+						{/*	</div>*/}
+						{/*}*/}
 					</>
 				}
 			</div>
 		);
 	}
-	private handle7DaysChange() {
-		this.setState(
-			{
-				showOptionalLink: !this.state.showOptionalLink,
-				optionalLink: this.props.weeklyLink
-		});
-	}
+	// function responsible for showing url to track a week's data from present, removed after commit caa6109e7624c1ad0bee2b20aa8f9c91cf48c8e4
+	// private handle7DaysChange() {
+	// 	this.setState(
+	// 		{
+	// 			showOptionalLink: !this.state.showOptionalLink,
+	// 			optionalLink: this.props.weeklyLink
+	// 	});
+	// }
 
 
 	private toggleLink() {
