@@ -83,14 +83,16 @@ export default class DashboardComponent extends React.Component<DashboardProps, 
 							<ChartToRender />
 						)}
 						{ (this.props.chartToRender === ChartTypes.line) ? (
-							[<Button key={1}
+							[<Button
+								key={1}
 								style={buttonMargin}
-								onClick={() => this.handleTimeIntervalChange("range")}
+								onClick={() => this.handleTimeIntervalChange('range')}
 							> Redraw
 							</Button>,
-							<Button key={2}
+							<Button
+								key={2}
 								style={buttonMargin}
-								onClick={() => this.handleTimeIntervalChange("all")}
+								onClick={() => this.handleTimeIntervalChange('all')}
 							> Restore
 							</Button>]
 						) : (
@@ -99,40 +101,39 @@ export default class DashboardComponent extends React.Component<DashboardProps, 
 					</div>
 				</div>
 			</div>
-		);		
+		);
 	}
 
 	private handleTimeIntervalChange(mode: string) {
-// TODO Should mode be an enum since it has clearly defined values. Since the if/else uses it below 
-// it could use a boolean but that implies there will only be two possible values forever 
+// TODO Should mode be an enum since it has clearly defined values. Since the if/else uses it below
+// it could use a boolean but that implies there will only be two possible values forever
 // which seems likely to be the case.
-		if (mode == "all"){
+		if (mode === 'all') {
 			this.props.changeTimeInterval(TimeInterval.unbounded());
 		} else {
-			let sliderContainer: any = document.querySelector(".rangeslider-bg");
-			let sliderBox: any = document.querySelector(".rangeslider-slidebox");
-			let root: any = document.getElementById("root");	
+			const sliderContainer: any = document.querySelector('.rangeslider-bg');
+			const sliderBox: any = document.querySelector('.rangeslider-slidebox');
+			const root: any = document.getElementById('root');
 
 			if (sliderContainer && sliderBox && root) {
 				// Attributes of the slider: full width and the min & max values of the box
-				let fullWidth: number = parseInt(sliderContainer.getAttribute("width"));
-				let sliderMinX: number = parseInt(sliderBox.getAttribute("x"));
-				let sliderMaxX: number = sliderMinX + parseInt(sliderBox.getAttribute("width"));
-				if (sliderMaxX - sliderMinX == fullWidth) return;
+				const fullWidth: number = parseInt(sliderContainer.getAttribute('width"'));
+				const sliderMinX: number = parseInt(sliderBox.getAttribute('x'));
+				const sliderMaxX: number = sliderMinX + parseInt(sliderBox.getAttribute('width'));
+				if (sliderMaxX - sliderMinX === fullWidth) {return; }
 
 				// From the Plotly line graph, get current min and max times in seconds
-				let minTimeStamp: number = parseInt(root.getAttribute("min-timestamp"));
-				let maxTimeStamp: number = parseInt(root.getAttribute("max-timestamp"));
+				const minTimeStamp: number = parseInt(root.getAttribute('min-timestamp'));
+				const maxTimeStamp: number = parseInt(root.getAttribute('max-timestamp'));
 
 				// Seconds displayed on graph
-				let deltaSeconds: number = maxTimeStamp - minTimeStamp;
-				let secondsPerPixel: number = deltaSeconds / fullWidth;
+				const deltaSeconds: number = maxTimeStamp - minTimeStamp;
+				const secondsPerPixel: number = deltaSeconds / fullWidth;
 
 				// Get the new min and max times, in seconds, from the slider box
-				let newMinXTimestamp = Math.floor(minTimeStamp + (secondsPerPixel * sliderMinX));
-				let newMaxXTimestamp = Math.floor(minTimeStamp + (secondsPerPixel * sliderMaxX));
-
-				let timeInterval = new TimeInterval(moment(newMinXTimestamp), moment(newMaxXTimestamp));
+				const newMinXTimestamp = Math.floor(minTimeStamp + (secondsPerPixel * sliderMinX));
+				const newMaxXTimestamp = Math.floor(minTimeStamp + (secondsPerPixel * sliderMaxX));
+				const timeInterval = new TimeInterval(moment(newMinXTimestamp), moment(newMaxXTimestamp));
 				this.props.changeTimeInterval(timeInterval);
 			}
 		}
