@@ -9,7 +9,7 @@ import getGraphColor from '../utils/getGraphColor';
 import { State } from '../types/redux/state';
 import PlotlyChart, { IPlotlyChartProps } from 'react-plotlyjs-ts';
 
-function mapStateToProps(state: State){
+function mapStateToProps(state: State) {
 	const timeInterval = state.graph.timeInterval;
 	const datasets: any[] = [];
 
@@ -37,15 +37,15 @@ function mapStateToProps(state: State){
 				});
 
 				// Save the timestamp range of the plot
-				let minTimestamp: string = "";
-				let maxTimestamp: string = "";
-				if (readings.length > 0){
-					minTimestamp = readings[0]["startTimestamp"].toString();
-					maxTimestamp = readings[readings.length-1]["startTimestamp"].toString();
+				let minTimestamp: string = '';
+				let maxTimestamp: string = '';
+				if (readings.length > 0) {
+					minTimestamp = readings[0]['startTimestamp'].toString();
+					maxTimestamp = readings[readings.length - 1]['startTimestamp'].toString();
 				}
-				let root: any = document.getElementById('root');
-				root.setAttribute("min-timestamp", minTimestamp);
-				root.setAttribute("max-timestamp", maxTimestamp);
+				const root: any = document.getElementById('root');
+				root.setAttribute('min-timestamp', minTimestamp);
+				root.setAttribute('max-timestamp', maxTimestamp);
 
 				// This variable contains all the elements (x and y values, line type, etc.) assigned to the data parameter of the Plotly object
 				datasets.push({
@@ -66,7 +66,7 @@ function mapStateToProps(state: State){
 		}
 	}
 
-// TODO The meters and groups code is very similar and maybe it should be refactored out to create a function to do 
+// TODO The meters and groups code is very similar and maybe it should be refactored out to create a function to do
 // both. This would mean future changes would automatically happen to both.
 	// Add all valid data from existing groups to the line plot
 	for (const groupID of state.graph.selectedGroups) {
@@ -117,7 +117,7 @@ function mapStateToProps(state: State){
 		legend: {
 			x: 0,
 			y: 1.1,
-			orientation: 'h',
+			orientation: 'h'
 		},
 		yaxis: {
 			title: 'kW',
