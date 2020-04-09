@@ -117,7 +117,7 @@ export default class DashboardComponent extends React.Component<DashboardProps, 
 
 			if (sliderContainer && sliderBox && root) {
 				// Attributes of the slider: full width and the min & max values of the box
-				const fullWidth: number = parseInt(sliderContainer.getAttribute('width"'));
+				const fullWidth: number = parseInt(sliderContainer.getAttribute('width'));
 				const sliderMinX: number = parseInt(sliderBox.getAttribute('x'));
 				const sliderMaxX: number = sliderMinX + parseInt(sliderBox.getAttribute('width'));
 				if (sliderMaxX - sliderMinX === fullWidth) {return; }
