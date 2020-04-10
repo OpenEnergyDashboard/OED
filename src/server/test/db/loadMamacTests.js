@@ -9,7 +9,7 @@ const moment = require('moment');
 const path = require('path');
 const Reading = require('../../models/Reading');
 const Meter = require('../../models/Meter');
-const loadMamac = require('../../services/pipeline-in-progress/loadMamac');
+const insertMamacData = require('../../services/pipeline-in-progress/insertMamacData')
 
 mocha.describe('Load Mamac Readings from a CSV file', () => {
 	let meter;
@@ -23,7 +23,7 @@ mocha.describe('Load Mamac Readings from a CSV file', () => {
 		conn = testDB.getConnection();
 		const testFilePath = path.join(__dirname, 'data', 'test-readings.csv');
 		const readingDuration = moment.duration(1, 'hours');
-		await loadMamac(testFilePath, meter, readingDuration, conn);
+		await insertMamacData(testFilePath, meter, readingDuration, conn);
 		const count = await Reading.count(conn);
 		expect(count).to.equal(20);
 	});
@@ -32,7 +32,7 @@ mocha.describe('Load Mamac Readings from a CSV file', () => {
 		conn = testDB.getConnection();
 		const testFilePath = path.join(__dirname, 'data', 'test-readings-invalid.csv');
 		const readingDuration = moment.duration(1, 'hours');
-		return expect(loadMamac(testFilePath, meter, readingDuration, conn)).to.eventually.be.rejected;
+		return expect(insertMamacData(testFilePath, meter, readingDuration, conn)).to.eventually.be.rejected;
 	});
 
 	mocha.it('rolls back correctly when it rejects', async () => {
@@ -40,7 +40,7 @@ mocha.describe('Load Mamac Readings from a CSV file', () => {
 		const testFilePath = path.join(__dirname, 'data', 'test-readings-invalid.csv');
 		const readingDuration = moment.duration(1, 'hours');
 		try {
-			await loadMamac(testFilePath, meter, readingDuration, conn);
+			await insertMamacData(testFilePath, meter, readingDuration, conn);
 		} catch (e) {
 			const count = await Reading.count(conn);
 			expect(count).to.equal(0);

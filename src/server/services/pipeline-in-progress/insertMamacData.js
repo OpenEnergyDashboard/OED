@@ -18,7 +18,7 @@ const loadCsvInput = require('./loadCsvInput');
  * @param conn the database connection to use
  * @return {Promise.<>}
  */
-function loadMamac(filePath, meter, readingDuration, conn) {
+function insertMamacData(filePath, meter, readingDuration, conn) {
 	return loadCsvInput(filePath = filePath,
 						meterID = meter.id,
 						mapRowToModel = row => {
@@ -34,4 +34,4 @@ function loadMamac(filePath, meter, readingDuration, conn) {
 						conn = conn);
 }
 
-module.exports = loadMamac;
+module.exports = insertMamacData;
