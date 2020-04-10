@@ -6,7 +6,7 @@
 
 const Meter = require('./../../models/Meter');
 const moment = require('moment');
-const loadCsvInput = require('./loadCsvInput')
+const loadCsvInput = require('./loadCsvInput');
 const path = require('path');
 
 /**
@@ -22,7 +22,7 @@ async function insertMetasysData(filePath, readingInterval, readingRepetition, c
 	const fileName = path.basename(filePath);
 	const meter = await Meter.getByName(fileName.replace('.csv', ''), conn);
 	return loadCsvInput(filePath = filePath,
-						meterID = meter.id, 
+						meterID = meter.id,
 						mapRowToModel = row => {
 							readRate = row[3].replace(' kW', '');
 							readRate = Math.round(parseFloat(readRate));

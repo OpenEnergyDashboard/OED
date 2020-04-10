@@ -9,7 +9,7 @@ const moment = require('moment');
 const path = require('path');
 const Reading = require('../../models/Reading');
 const Meter = require('../../models/Meter');
-const insertMamacData = require('../../services/pipeline-in-progress/insertMamacData')
+const insertMamacData = require('../../services/pipeline-in-progress/insertMamacData');
 
 mocha.describe('PIPELINE: Insert Mamac Readings from a CSV file', () => {
 	let meter;
