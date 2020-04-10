@@ -8,7 +8,7 @@ const { checkDate, checkValue, checkIntervals} = require('../../services/pipelin
 const Reading = require('../../models/Reading');
 const moment = require('moment');
 
-mocha.describe('Validate Readings', () => {
+mocha.describe('PIPELINE: Validate Readings', () => {
 	mocha.it('detects out-of-bound date', async () => {
 		const minDate = moment('1970-01-01 00:00:00');
 		const maxDate = moment('2000-01-01 00:00:00');

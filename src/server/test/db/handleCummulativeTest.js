@@ -8,7 +8,7 @@ const handleCummulative = require('../../services/pipeline-in-progress/handleCum
 const Reading = require('../../models/Reading');
 const moment = require('moment');
 
-mocha.describe('Handle cummulative', () => {
+mocha.describe('PIPELINE: Handle cummulative', () => {
 	let sampleArray = [[10000, moment('1970-01-01 00:00:00'), moment('1970-01-01 00:00:30')]];
 	const valGap = 2;
 	const timeGap = 30;

@@ -8,7 +8,7 @@ const convertToReadings = require('../../services/pipeline-in-progress/convertTo
 const Reading = require('../../models/Reading');
 const moment = require('moment');
 
-mocha.describe('Convert data', () => {
+mocha.describe('PIPELINE: Convert raw data to readings', () => {
 	mocha.it('array of reading & moment to array of Reading values', async () => {
 		let sampleArray = [ [ 0, moment('1970-01-01 00:00:00'), moment('1980-01-01 00:00:00')],
 							[ 1, moment('1970-01-01 00:00:01'), moment('2000-01-01 00:00:01')],

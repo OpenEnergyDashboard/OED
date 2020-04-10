@@ -11,7 +11,7 @@ const Reading = require('../../models/Reading');
 const Meter = require('../../models/Meter');
 const insertMamacData = require('../../services/pipeline-in-progress/insertMamacData')
 
-mocha.describe('Load Mamac Readings from a CSV file', () => {
+mocha.describe('PIPELINE: Insert Mamac Readings from a CSV file', () => {
 	let meter;
 	mocha.beforeEach(async () => {
 		conn = testDB.getConnection();

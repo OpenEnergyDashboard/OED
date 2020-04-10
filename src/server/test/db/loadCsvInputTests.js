@@ -12,7 +12,7 @@ const Meter = require('../../models/Meter');
 const path = require('path');
 const loadCsvInput = require('../../services/pipeline-in-progress/loadCsvInput');
 
-mocha.describe('Load data from csv file', () => {
+mocha.describe('PIPELINE: Load data from csv file', () => {
 	const testFilePath = path.join(__dirname, 'data', 'test-readings.csv');
 	function mapRowsToModel(row) {
 		const reading = row[0];

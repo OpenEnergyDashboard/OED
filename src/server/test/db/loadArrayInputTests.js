@@ -10,7 +10,7 @@ const Reading = require('../../models/Reading');
 const Meter = require('../../models/Meter');
 const loadArrayInput = require('../../services/pipeline-in-progress/loadArrayInput');
 
-mocha.describe('Load data from array', () => {
+mocha.describe('PIPELINE: Load data from array', () => {
 	mocha.it('valid data input', async () => {
 		const conn = testDB.getConnection();
 		const meter = new Meter(undefined, 'test_insert_array', 12345, true, true, Meter.type.MAMAC);
