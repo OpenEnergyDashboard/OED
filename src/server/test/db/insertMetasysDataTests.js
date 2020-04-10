@@ -62,12 +62,12 @@ mocha.describe('PIPELINE: insert MetasysData from csv file', () => {
 			await new Meter(undefined, 'metasys-valid', null, false, true, Meter.type.METASYS).insert(conn);
 		});
 
-		mocha.it('loads the correct number of rows from a file', async () => {
+		mocha.it('loads the correct number of rows from a file (drop last row)', async () => {
 			conn = testDB.getConnection();
 			const testFilePath = path.join(__dirname, 'data', 'metasys-valid.csv');
 			await insertMetasysData(testFilePath, 30, 1, true, conn);
 			const count = await Reading.count(conn);
-			expect(count).to.equal(125);
+			expect(count).to.equal(124);
 		});
 	});
 });

@@ -7,6 +7,7 @@
 const Meter = require('./../../models/Meter');
 const moment = require('moment');
 const loadCsvInput = require('./loadCsvInput')
+const path = require('path');
 
 /**
  * Reads CSV file passed to input all the Metasys readings into database.
@@ -18,19 +19,21 @@ const loadCsvInput = require('./loadCsvInput')
  */
 
 async function insertMetasysData(filePath, readingInterval, readingRepetition, cumulativeIndicator, conn) {
+	const fileName = path.basename(filePath);
 	const meter = await Meter.getByName(fileName.replace('.csv', ''), conn);
 	return loadCsvInput(filePath = filePath,
 						meterID = meter.id, 
 						mapRowToModel = row => {
-							readRate = meterReading1.replace(' kW', '');
+							readRate = row[3].replace(' kW', '');
 							readRate = Math.round(parseFloat(readRate));
 							// Metasys timestamps look like 11:00:00 7/31/16
-							startTimestamp = moment(row[0], 'MM/DD/YY HH:mm');
 							endTimestamp = moment(row[0], 'MM/DD/YY HH:mm');
+							startTimestamp = moment(endTimestamp).subtract(readingInterval, 'minutes');
 							return [readRate, startTimestamp, endTimestamp];
 						},
 						readAsStream = false,
-						isCummulative = cummulativeIndicator,
+						isCummulative = cumulativeIndicator,
+						readingRepetition = readingRepetition,
 						conditionSet = undefined,
 						conn = conn);
 }

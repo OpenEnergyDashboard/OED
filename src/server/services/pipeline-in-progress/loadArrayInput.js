@@ -7,6 +7,7 @@
 const Reading = require('../../models/Reading');
 const convertToReadings = require('./convertToReadings');
 const { log } = require('../../log');
+const handleCummulative = require('./handleCummulative')
 
 /**
  * Select and process needed values from a matrix and return an array of reading value and reading time
@@ -17,17 +18,13 @@ const { log } = require('../../log');
  * @param {array} conditionSet used to validate readings (minVal, maxVal, minDate, maxDate, interval, maxError)
  */
 
-async function loadArrayInput(dataRows, meterID, mapRowToModel, isCummulative, conditionSet, conn) {
-	try {
-		readingsArray = dataRows.map(mapRowToModel);
-		if (isCummulative) {
-			readingsArray = handleCummulative(readingsArray);
-		}
-		readings = convertToReadings(readingsArray, meterID, conditionSet);
-		await Reading.insertOrIgnoreAll(readings, conn);
-	} catch (err) {
-		log.error(`Error updating meter ${meterID}: ${err}`, err);
+async function loadArrayInput(dataRows, meterID, mapRowToModel, isCummulative, readingRepetition, conditionSet, conn) {
+	readingsArray = dataRows.map(mapRowToModel);
+	if (isCummulative) {
+		readingsArray = handleCummulative(readingsArray, readingRepetition);
 	}
+	readings = convertToReadings(readingsArray, meterID, conditionSet);
+	return await Reading.insertOrIgnoreAll(readings, conn);
 }
 
 module.exports = loadArrayInput;

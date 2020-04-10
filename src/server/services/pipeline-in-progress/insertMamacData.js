@@ -30,6 +30,7 @@ function insertMamacData(filePath, meter, readingDuration, conn) {
 						},
 						readAsStream = true,
 						isCummulative = false,
+						readingRepetition = 1,
 						conditionSet = undefined,
 						conn = conn);
 }

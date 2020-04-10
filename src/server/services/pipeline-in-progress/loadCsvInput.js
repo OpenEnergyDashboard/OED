@@ -21,14 +21,14 @@ const { log } = require('../../log');
  * @param {array} conn connection to database
  */
 
-async function loadCsvInput(filePath, meterID, mapRowToModel, readAsStream, isCummulative, conditionSet, conn) {
+async function loadCsvInput(filePath, meterID, mapRowToModel, readAsStream, isCummulative, readingRepetition, conditionSet, conn) {
 	try {
 		if (readAsStream) {
 			const stream = fs.createReadStream(filePath);
 			return loadCsvStream(stream, meterID, mapRowToModel, conditionSet, conn);
 		} else {
 			const dataRows = await readCSV(filePath);
-			return loadArrayInput(dataRows, meterID, mapRowToModel, isCummulative, conditionSet, conn);
+			return loadArrayInput(dataRows, meterID, mapRowToModel, isCummulative, readingRepetition, conditionSet, conn);
 		}
 	} catch (err) {
 		log.error(`Error updating meter ${meterID}: ${err}`, err);

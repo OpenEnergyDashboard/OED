@@ -22,16 +22,17 @@ mocha.describe('PIPELINE: Load data from array', () => {
 							[5, '21:00:00 1/24/20']];
 		const readingDuration = 30;
 		await loadArrayInput(arrayInput,
-									meter.id,
-									row => {
-										const reading = row[0];
-										const endTimestamp = moment(row[1], 'HH:mm:ss MM/DD/YYYY');
-										const startTimestamp = moment(endTimestamp).subtract(readingDuration, 'minute');
-										return [reading, startTimestamp, endTimestamp];
-									},
-									false,
-									undefined,
-									conn);
+							meter.id,
+							row => {
+								const reading = row[0];
+								const endTimestamp = moment(row[1], 'HH:mm:ss MM/DD/YYYY');
+								const startTimestamp = moment(endTimestamp).subtract(readingDuration, 'minute');
+								return [reading, startTimestamp, endTimestamp];
+								},
+							false,
+							1,
+							undefined,
+							conn);
 		const result = await Reading.getAllByMeterID(meter.id, conn);
 		expect(result.length).to.equal(5);
 		let i = 0;
