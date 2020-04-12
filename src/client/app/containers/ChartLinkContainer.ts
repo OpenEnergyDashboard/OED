@@ -5,9 +5,6 @@
 import { connect } from 'react-redux';
 import ChartLinkComponent from '../components/ChartLinkComponent';
 import { State } from '../types/redux/state';
-import { TimeInterval } from '../../../common/TimeInterval';
-import moment = require('moment');
-import DashboardComponent from 'components/DashboardComponent';
 
 function mapStateToProps(state: State) {
 	const chartType = state.graph.chartToRender;
@@ -38,7 +35,8 @@ function mapStateToProps(state: State) {
 	}
 
 	return {
-		linkText, chartType
+		linkText,
+		chartType
 		// weeklyLink // removed after commit caa6109e7624c1ad0bee2b20aa8f9c91cf48c8e4
 	};
 }

@@ -10,29 +10,31 @@ import {getRangeSliderInterval} from './DashboardComponent';
 
 interface ChartLinkProps {
 	linkText: string;
-	weeklyLink: string;
 	chartType: ChartTypes;
 }
 
 interface ChartLinkState {
 	showLink: boolean;
 	showSliderRange: boolean;
+	sliderRange: string;
 	showOptionalLink: boolean;
 	optionalLink: string;
-	sliderRange: string;
+	optionsVisibility: boolean;
 }
 
 export default class ChartLinkComponent extends React.Component<ChartLinkProps, ChartLinkState> {
 	constructor(props: ChartLinkProps) {
 		super(props);
 		this.toggleLink = this.toggleLink.bind(this);
+		this.handleOptionsVisibility = this.handleOptionsVisibility.bind(this);
 		// this.handle7DaysChange = this.handle7DaysChange.bind(this);
 		this.state = {
 			showLink: false,
 			showSliderRange: false,
-			showOptionalLink: false,
+			sliderRange: '',
+			showOptionalLink: true,
 			optionalLink: '',
-			sliderRange: ''
+			optionsVisibility: false,
 		};
 	}
 
@@ -53,9 +55,15 @@ export default class ChartLinkComponent extends React.Component<ChartLinkProps, 
 				</Button>
 				{this.state.showLink &&
 					<>
+                        <div className='checkbox'>
+                            <label><input type='checkbox' onChange={this.handleOptionsVisibility} checked={this.state.optionsVisibility}/>
+                                <FormattedMessage id='hide.options.in.link' />
+                            </label>
+                        </div>
 						<div style={wellStyle}>
 							{this.props.linkText}
 							{this.state.showSliderRange && this.state.sliderRange}
+							{this.state.showOptionalLink && this.state.optionalLink}
 						</div>
 						{/*removed the button to track a week's data from present after commit caa6109e7624c1ad0bee2b20aa8f9c91cf48c8e4*/}
 						{/*<Button outline onClick={this.handle7DaysChange}>*/}
@@ -106,5 +114,14 @@ export default class ChartLinkComponent extends React.Component<ChartLinkProps, 
 	private getSliderRangeString() {
 		const sliderRangeString = `&sliderRange=${getRangeSliderInterval()}`;
 		return sliderRangeString;
+	}
+
+	private handleOptionsVisibility() {
+		let currState = this.state.optionsVisibility;
+		let optionsVisibilityToken = '&optionsVisibility=false';
+		this.setState({
+			optionsVisibility: !currState,
+			optionalLink: (currState)? '':optionsVisibilityToken,
+		});
 	}
 }
