@@ -33,5 +33,5 @@ postgres-data
 *.txt
 !License.txt
 
-# Mac file system files
+# For Mac developers to ignore file system info
 .DS_Store
