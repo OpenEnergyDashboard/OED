@@ -8,6 +8,7 @@ import ListDisplayComponent from '../ListDisplayComponent';
 import { Link } from 'react-router';
 import { hasToken } from '../../utils/token';
 import { FormattedMessage } from 'react-intl';
+import { ChangeDisplayModeAction } from '../../types/redux/groups';
 
 interface GroupViewProps {
 	name: string;
@@ -16,6 +17,7 @@ interface GroupViewProps {
 	childGroupNames: string[];
 	fetchGroupChildren(id: number): Promise<any>;
 	beginEditingIfPossible(id: number): Promise<any>;
+	changeDisplayModeToEdit(): ChangeDisplayModeAction;
 }
 
 export default class GroupViewComponent extends React.Component<GroupViewProps, {}> {

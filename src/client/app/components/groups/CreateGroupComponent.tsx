@@ -7,7 +7,7 @@ import { Input, Button } from 'reactstrap';
 import DatasourceBoxContainer from '../../containers/groups/DatasourceBoxContainer';
 import { SelectionType } from '../../containers/groups/DatasourceBoxContainer';
 import { NamedIDItem } from '../../types/items';
-import { CreateNewBlankGroupAction, EditGroupNameAction } from '../../types/redux/groups';
+import { CreateNewBlankGroupAction, EditGroupNameAction, ChangeDisplayModeAction } from '../../types/redux/groups';
 import HeaderContainer from '../../containers/HeaderContainer';
 import FooterComponent from '../FooterComponent';
 import { browserHistory } from '../../utils/history';
@@ -20,6 +20,7 @@ interface CreateGroupProps {
 	createNewBlankGroup(): CreateNewBlankGroupAction;
 	editGroupName(name: string): EditGroupNameAction;
 	submitGroupInEditingIfNeeded(): Promise<any>;
+	changeDisplayModeToView(): ChangeDisplayModeAction;
 }
 
 type CreateGroupPropsWithIntl = CreateGroupProps & InjectedIntlProps;
@@ -110,6 +111,7 @@ class CreateGroupComponent extends React.Component<CreateGroupPropsWithIntl, {}>
 	}
 
 	private handleReturnToView() {
+		this.props.changeDisplayModeToView();
 		browserHistory.push('/groups');
 	}
 }

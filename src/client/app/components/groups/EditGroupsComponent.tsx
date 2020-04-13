@@ -9,7 +9,7 @@ import { Input, Button } from 'reactstrap';
 import DatasourceBoxContainer from '../../containers/groups/DatasourceBoxContainer';
 import { NamedIDItem } from '../../types/items';
 import { SelectionType } from '../../containers/groups/DatasourceBoxContainer';
-import { EditGroupNameAction, ChangeChildMetersAction, ChangeChildGroupsAction } from '../../types/redux/groups';
+import { EditGroupNameAction, ChangeChildMetersAction, ChangeChildGroupsAction, ChangeDisplayModeAction } from '../../types/redux/groups';
 import FooterComponent from '../FooterComponent';
 import HeaderContainer from '../../containers/HeaderContainer';
 import {  browserHistory } from '../../utils/history';
@@ -26,6 +26,7 @@ interface EditGroupsProps {
 	editGroupName(name: string): EditGroupNameAction;
 	changeChildMeters(selected: number[]): ChangeChildMetersAction;
 	changeChildGroups(selected: number[]): ChangeChildGroupsAction;
+	changeDisplayModeToView(): ChangeDisplayModeAction;
 }
 
 type EditGroupsPropsWithIntl = EditGroupsProps & InjectedIntlProps;
@@ -254,6 +255,7 @@ class EditGroupsComponent extends React.Component<EditGroupsPropsWithIntl, EditG
 
 	private handleReturnToView() {
 		browserHistory.push('/groups');
+		this.props.changeDisplayModeToView();
 	}
 }
 

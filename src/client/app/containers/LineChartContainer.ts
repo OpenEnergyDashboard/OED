@@ -60,7 +60,6 @@ function mapStateToProps(state: State) {
 					line: {
 						shape: 'spline',
 						width: 3
-						// smoothing: 1.3
 					},
 					marker: {color: getGraphColor(label)}
 				});
@@ -68,6 +67,8 @@ function mapStateToProps(state: State) {
 		}
 	}
 
+// TODO The meters and groups code is very similar and maybe it should be refactored out to create a function to do
+// both. This would mean future changes would automatically happen to both.
 	// Add all valid data from existing groups to the line plot
 	for (const groupID of state.graph.selectedGroups) {
 		const byGroupID = state.readings.line.byGroupID[groupID];
@@ -83,7 +84,8 @@ function mapStateToProps(state: State) {
 				const xData: string[] = [];
 				const yData: number[] = [];
 				const hoverText: string[] = [];
-				_.values(readingsData.readings).forEach(reading => {
+				const readings = _.values(readingsData.readings);
+				readings.forEach(reading => {
 					const timeReading = moment(reading.startTimestamp);
 					xData.push(timeReading.format('YYYY-MM-DD HH:mm:ss'));
 					yData.push(reading.reading);
@@ -116,10 +118,7 @@ function mapStateToProps(state: State) {
 
 	// Customize the layout of the plot
 	const layout: any = {
-		autozise: true,
-		// width: 700,
-		// height: 700,
-		// title: 'First Test',
+		autosize: true,
 		showlegend: true,
 		legend: {
 			x: 0,
@@ -128,7 +127,6 @@ function mapStateToProps(state: State) {
 		},
 		yaxis: {
 			title: 'kW',
-			showgrid: true,
 			gridcolor: '#ddd'
 		},
 
@@ -146,7 +144,7 @@ function mapStateToProps(state: State) {
 		}
 	};
 
-	// Assign all the paramaters required to create the Plotly object (data, layout, config) to the variable props, returned by mapStateToProps
+	// Assign all the parameters required to create the Plotly object (data, layout, config) to the variable props, returned by mapStateToProps
 	// The Plotly toolbar is displayed if displayModeBar is set to true
 	const props: IPlotlyChartProps = {
 		data: datasets,

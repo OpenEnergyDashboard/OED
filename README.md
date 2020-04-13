@@ -1,7 +1,7 @@
 # Open Energy Dashboard #
 [![Build Status](https://travis-ci.org/OpenEnergyDashboard/OED.svg?branch=master)](https://travis-ci.org/OpenEnergyDashboard/OED)
 
-Open Energy Dashboard is a user-friendly way to display energy information from smart energy meters, designed and built by faculty and students at Beloit College. It is designed for institutions of higher education, and is optimized for non-technical users with a simple interface that provides access to your institution's energy data through the powerful Chart.js data graphing system. To learn more, see [our website](https://openenergydashboard.github.io/).
+Open Energy Dashboard is a user-friendly way to display energy information from smart energy meters, designed and built by faculty and students at Beloit College. It is designed for institutions of higher education, and is optimized for non-technical users with a simple interface that provides access to your institution's energy data through the powerful Plotly.js data graphing system. To learn more, see [our website](https://openenergydashboard.github.io/).
 
 Open Energy Dashboard is available under the Mozilla Public Licence v2, and contributions, in the form of bug reports, feature requests, and code contributions, are welcome.
 
@@ -10,7 +10,7 @@ Open Energy Dashboard is available under the Mozilla Public Licence v2, and cont
 See [USAGE.md](USAGE.md).
 
 ### Built With ###
-Chart.js - JavaScript library used to generate data charts ([chartjs.org](http://www.chartjs.org))
+Plotly.js - JavaScript library used to generate data charts ([plotly.com](https://plotly.com/javascript/))
 
 PostgreSQL - Database management system ([postgresql.org](https://www.postgresql.org))
 

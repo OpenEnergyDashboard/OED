@@ -14,24 +14,31 @@ function mapStateToProps(state: State) {
 	const barDuration = state.graph.barDuration;
 	const datasets: any[] = [];
 
-	const labelsSet = new Set();
+	// Add all valid data from existing meters to the bar chart
 	for (const meterID of state.graph.selectedMeters) {
 		const byMeterID = state.readings.bar.byMeterID[meterID];
 		if (byMeterID !== undefined) {
 			const readingsData = byMeterID[timeInterval.toString()][barDuration.toISOString()];
-			if (readingsData !== undefined && readingsData.readings !== undefined && !readingsData.isFetching) {
+			if (readingsData !== undefined && !readingsData.isFetching) {
 				const label = state.meters.byMeterID[meterID].name;
+				if (readingsData.readings === undefined) {
+					throw new Error('Unacceptable condition: readingsData.readings is undefined.');
+				}
+
+				// Create two arrays for the x and y values. Fill the array with the data.
 				const xData: string[] = [];
 				const yData: number[] = [];
 				const hoverText: string[] = [];
 				const readings = _.orderBy(readingsData.readings, ['startTimestamp'], ['asc']);
 				readings.forEach(barReading => {
-					const timeReading: string = `${moment(barReading.startTimestamp).format('MMM DD, YYYY')} - ${moment(barReading.endTimestamp).format('MMM DD, YYYY')}`;
+					const timeReading: string =
+						`${moment(barReading.startTimestamp).format('MMM DD, YYYY')} - ${moment(barReading.endTimestamp).format('MMM DD, YYYY')}`;
 					xData.push(timeReading);
 					yData.push(barReading.reading);
 					hoverText.push(`<b> ${timeReading} </b> <br> ${label}: ${barReading.reading} kW`);
 				});
 
+				// This variable contains all the elements (x and y values, bar type, etc.) assigned to the data parameter of the Plotly object
 				datasets.push({
 					name: label,
 					x: xData,
@@ -49,19 +56,26 @@ function mapStateToProps(state: State) {
 		const byGroupID = state.readings.bar.byGroupID[groupID];
 		if (byGroupID !== undefined) {
 			const readingsData = byGroupID[timeInterval.toString()][barDuration.toISOString()];
-			if (readingsData !== undefined && readingsData.readings !== undefined && !readingsData.isFetching) {
+			if (readingsData !== undefined && !readingsData.isFetching) {
 				const label = state.groups.byGroupID[groupID].name;
+				if (readingsData.readings === undefined) {
+					throw new Error('Unacceptable condition: readingsData.readings is undefined.');
+				}
+
+				// Create two arrays for the x and y values. Fill the array with the data.
 				const xData: string[] = [];
 				const yData: number[] = [];
 				const hoverText: string[] = [];
 				const readings = _.orderBy(readingsData.readings, ['startTimestamp'], ['asc']);
 				readings.forEach(barReading => {
-					const timeReading: string = `${moment(barReading.startTimestamp).format('MMM DD, YYYY')} - ${moment(barReading.endTimestamp).format('MMM DD, YYYY')}`;
+					const timeReading: string =
+						`${moment(barReading.startTimestamp).format('MMM DD, YYYY')} - ${moment(barReading.endTimestamp).format('MMM DD, YYYY')}`;
 					xData.push(timeReading);
 					yData.push(barReading.reading);
 					hoverText.push(`<b> ${timeReading} </b> <br> ${label}: ${barReading.reading} kW`);
 				});
 
+				// This variable contains all the elements (x and y values, bar chart, etc.) assigned to the data parameter of the Plotly object
 				datasets.push({
 					name: label,
 					x: xData,
@@ -81,12 +95,12 @@ function mapStateToProps(state: State) {
 		barmode: 'group',
 		bargap: 0.2,
 		bargroupgap: 0.1,
-		autozise: true,
+		autosize: true,
 		showlegend: true,
 		legend: {
 			x: 0,
 			y: 1.1,
-			orientation: 'h',
+			orientation: 'h'
 		},
 		yaxis: {
 			title: 'kW',
@@ -111,8 +125,8 @@ function mapStateToProps(state: State) {
 		}
 	};
 
-	// Assign all the paramaters required to create the Plotly object (data, layout, config) to the variable props, returned by mapStateToProps
-	// The Plotly toolbar is displayed if displayModeBar is set to true
+	// Assign all the parameters required to create the Plotly object (data, layout, config) to the variable props, returned by mapStateToProps
+	// The Plotly toolbar is displayed if displayModeBar is set to true (not for bar charts)
 	const props: IPlotlyChartProps = {
 		data: datasets,
 		layout,

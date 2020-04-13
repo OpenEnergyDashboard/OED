@@ -53,10 +53,10 @@ function mapStateToProps(state: State, ownProps: CompareChartContainerProps): IP
 			text: [ `<b>${previousPeriod} kW</b>`, `<b>${currentPeriod} kW</b>`],
 			textposition: 'auto',
 			textfont: {
-			  color: 'rgba(0,0,0,1)'
+				color: 'rgba(0,0,0,1)'
 			}
 		}
-	)
+	);
 
 	const layout: any = {
 		title: `<b>${changeSummary}</b>`,
@@ -64,15 +64,15 @@ function mapStateToProps(state: State, ownProps: CompareChartContainerProps): IP
 			size: 10,
 			color: colorize(entity.change)
 		},
-		hovermode:'closest',
-		autozise: true,
+		hovermode: 'closest',
+		autosize: true,
 		showlegend: false,
 		legend: {
 		},
 		yaxis: {
 			title: 'kW',
 			showgrid: true,
-			gridcolor: '#ddd',
+			gridcolor: '#ddd'
 		},
 		xaxis: {
 			showgrid: false,
@@ -82,7 +82,7 @@ function mapStateToProps(state: State, ownProps: CompareChartContainerProps): IP
 			t: 20,
 			b: 120,
 			l: 60,
-			r: 20,
+			r: 20
 		}
 	};
 
