@@ -3,8 +3,8 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at http://mozilla.org/MPL/2.0/.
  */
- const { log } = require('../log');
 
+const { log } = require('../log');
 
 const { getConnection, dropConnection } = require('../db');
 const Reading = require('../models/Reading');
@@ -13,10 +13,8 @@ async function refreshReadingViews() {
 	const conn = getConnection();
 
 	log.info('Refreshing Reading Views');
-//	console.log('Refreshing reading views');
 	await Reading.refreshCompressedReadings(conn);
 	log.info('Views Refreshed');
-//	console.log('Views refreshed');
 	dropConnection();
 }
 
