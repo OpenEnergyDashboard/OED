@@ -122,7 +122,7 @@ function shouldChangeGraphZoom(state: State, timeInterval: TimeInterval): boolea
 
 export function changeGraphZoomIfNeeded(timeInterval: TimeInterval): Thunk {
 	return (dispatch, getState) => {
-		if (shouldChangeGraphZoom(getState(), TimeInterval.unbounded())) {
+		if (shouldChangeGraphZoom(getState(), timeInterval)) {
 			dispatch(changeGraphZoom(timeInterval));
 			dispatch(fetchNeededReadingsForGraph(timeInterval));
 		}
