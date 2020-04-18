@@ -28,7 +28,7 @@ async function insertObviusData(serialNumber, ipAddress, logfile) {
 				continue;
 			}
 			// Otherwise assume it is kWh and proceed
-			return loadArrayInput(dataRows = data[i],
+			return loadArrayInput(dataRows = [data[i]],
 								meterID = meter.id,
 								mapRowToModel = row => {
 									const startTimestamp = moment(rawReading[0], 'YYYY-MM-DD HH:mm:ss');
