@@ -245,3 +245,6 @@ To upgrade the app:
 1. Re-build the app (`docker-compose run --rm web ./src/scripts/updateOED.sh`)
 1. Restart the app (`systemctl start oed.service`)
 
+Some old installations (from 0.3.0 or before) need to upgrade their PostgreSQL user to
+superuser.
+
