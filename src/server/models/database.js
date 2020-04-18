@@ -74,6 +74,7 @@ async function createSchema(conn) {
 	const User = require('./User');
 	const Group = require('./Group');
 	const Preferences = require('./Preferences');
+	const Configfile = require('./Configfile');
 	const Migration = require('./Migration');
 	const LogEmail = require('./LogEmail');
 	const Baseline = require('./Baseline');
@@ -96,6 +97,7 @@ async function createSchema(conn) {
 	await Reading.createCompareReadingsFunction(conn);
 	await Baseline.createTable(conn);
 	await conn.none(sqlFile('baseline/create_function_get_average_reading.sql'));
+	await Configfile.createTable(conn);
 }
 
 module.exports = {
