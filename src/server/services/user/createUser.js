@@ -40,6 +40,7 @@ const { getConnection, dropConnection } = require('../../db');
 	console.log("DEBUG: getting DB connection");
 	const conn = getConnection();
 	console.log("DEBUG: insert user into DB");
+	console.log("conn: " + conn);
 	try {
 		await admin.insert(conn);
 		terminateReadline('User created');

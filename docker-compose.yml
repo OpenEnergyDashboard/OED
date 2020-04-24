@@ -15,12 +15,12 @@ services:
             - PGDATA=/var/lib/postgresql/data/pgdata
         volumes:
             - ./postgres-data:/var/lib/postgresql/data/pgdata
-        healthcheck:
+        # healthcheck:
             # This checks if postgres is ready for work.
-            test: ["CMD-SHELL", "pg_isready -U postgres"]
-            interval: 5s
-            timeout: 5s
-            retries: 5
+            # test: ["CMD-SHELL", "pg_isready -U postgres"]
+            # interval: 5s
+            # timeout: 5s
+            # retries: 5
     # Web service runs Node
     web:
         # Configuration variables for the app.
@@ -63,9 +63,10 @@ services:
               # and disable the debug port
         # Don't bring this up without the DB
         depends_on:
-            database:
-                # We need the database and it has to be ready for work (see healthcheck above).
-                condition: service_healthy
+            - database
+                # database:
+                    # We need the database and it has to be ready for work (see healthcheck above).
+                # condition: service_healthy
             # Lets docker-compose up work right
         command: ["bash", "./src/scripts/installOED.sh"]
         # Reverse proxy, for testing
