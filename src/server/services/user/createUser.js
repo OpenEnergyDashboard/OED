@@ -11,6 +11,7 @@ const { getConnection, dropConnection } = require('../../db');
 (async () => {
 	let email;
 	let password;
+	console.log("DEBUG: starting createUser.js");
 
 	// If there aren't enough args, go interactive.
 	const cmdArgs = process.argv;
@@ -36,7 +37,9 @@ const { getConnection, dropConnection } = require('../../db');
 
 	const passwordHash = bcrypt.hashSync(password, 10);
 	const admin = new User(undefined, email, passwordHash);
+	console.log("DEBUG: getting DB connection");
 	const conn = getConnection();
+	console.log("DEBUG: insert user into DB");
 	try {
 		await admin.insert(conn);
 		terminateReadline('User created');
@@ -45,4 +48,5 @@ const { getConnection, dropConnection } = require('../../db');
 	} finally {
 		dropConnection();
 	}
+	console.log("DEBUG: finishing createUser.js");
 })();
