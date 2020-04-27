@@ -22,25 +22,18 @@ async function insertObviusData(serialNumber, ipAddress, logfile) {
 			await meter.insert();
 		}
 
-		for (const rawReading of data[i]) {
-			// If the reading is invalid, throw it out.
-			if (rawReading[1] === null) {
-				continue;
-			}
-			// Otherwise assume it is kWh and proceed
-			return loadArrayInput(dataRows = [data[i]],
-								meterID = meter.id,
-								mapRowToModel = row => {
-									const startTimestamp = moment(rawReading[0], 'YYYY-MM-DD HH:mm:ss');
-									const endTimestamp = startTimestamp.clone();
-									endTimestamp.add(moment.duration(1, 'hours'));
-									return [rawReading[1], startTimestamp, endTimestamp];
-								},
-								isCummulative = false,
-								readingRepetition = 1,
-								conditionSet = undefined,
-								conn = conn);
-		}
+		return loadArrayInput(dataRows = data[i],
+							meterID = meter.id,
+							mapRowToModel = row => {
+							const startTimestamp = moment(rawReading[0], 'YYYY-MM-DD HH:mm:ss');
+							const endTimestamp = startTimestamp.clone();
+							endTimestamp.add(moment.duration(1, 'hours'));
+							return [rawReading[1], startTimestamp, endTimestamp];
+							},
+							isCummulative = false,
+							readingRepetition = 1,
+							conditionSet = undefined,
+							conn = conn);
 	}
 }
 
