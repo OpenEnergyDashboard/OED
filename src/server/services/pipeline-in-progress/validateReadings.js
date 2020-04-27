@@ -82,20 +82,22 @@ function checkValue(arrayToValidate, minVal, maxVal, maxError) {
  * @param {number} interval expected gap between 2 consecutive reading times in seconds
  * @param {number} maxError maximum number of errors to be reported. Ignore the rest
  */
-function checkIntervals(arrayToValidate, interval) {
-	if (interval === null) {
+function checkIntervals(arrayToValidate, threshold) {
+	if (threshold === null) {
 		return true;
 	}
-	lastTime = arrayToValidate[0].startTimestamp;
+	interval = arrayToValidate[1].startTimestamp - arrayToValidate[0].endTimestamp;
+	lastTime = arrayToValidate[1].endTimestamp;
 	for (reading of arrayToValidate) {
 		if (reading === arrayToValidate[0]) {
 			continue;
 		}
-		if (reading.startTimestamp.diff(lastTime, 'seconds') !== interval) {
+		currGap = reading.startTimestamp.diff(lastTime, 'seconds');
+		if (currGap < interval - threshold || currGap > interval + threshold) {
 			log.warn(`UNEQUAL INTERVAL IS DETECTED FROM METER ${reading.meterID}`);
 			return false;
 		}
-		lastTime = reading.startTimestamp;
+		lastTime = reading.endTimestamp;
 	}
 	return true;
 }
