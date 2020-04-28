@@ -25,10 +25,10 @@ async function insertObviusData(serialNumber, ipAddress, logfile) {
 		return loadArrayInput(dataRows = data[i],
 							meterID = meter.id,
 							mapRowToModel = row => {
-							const startTimestamp = moment(rawReading[0], 'YYYY-MM-DD HH:mm:ss');
-							const endTimestamp = startTimestamp.clone();
-							endTimestamp.add(moment.duration(1, 'hours'));
-							return [rawReading[1], startTimestamp, endTimestamp];
+								const startTimestamp = moment(rawReading[0], 'YYYY-MM-DD HH:mm:ss');
+								const endTimestamp = startTimestamp.clone();
+								endTimestamp.add(moment.duration(1, 'hours'));
+								return [rawReading[1], startTimestamp, endTimestamp];
 							},
 							isCummulative = false,
 							readingRepetition = 1,
