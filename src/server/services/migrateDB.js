@@ -55,7 +55,7 @@ function findMaxVersion(list) {
 			if (result !== undefined) {
 				terminateReadline('Migration successful');
 			} else {
-				terminateReadline(`Migration failed: ${err}`);
+				terminateReadline(`Migration failed`);
 			}
 		}
 	} catch (err) {
