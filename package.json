@@ -80,7 +80,6 @@
     "request-promise-native": "~1.0.7",
     "serve-favicon": "~2.5.0",
     "stream-buffers": "~3.0.2",
-    "ts-md5": "~1.2.7",
     "uglifyjs-webpack-plugin": "~1.2.4",
     "webpack": "~4.30.0",
     "webpack-cli": "~3.1.2",
