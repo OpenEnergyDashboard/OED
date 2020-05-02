@@ -22,3 +22,4 @@ mocha.describe('mapToObject', () => {
 		expect(mapToObject([], elem => elem)).to.deep.equal({});
 	});
 });
+
