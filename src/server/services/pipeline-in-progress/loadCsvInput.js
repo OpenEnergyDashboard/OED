@@ -17,7 +17,7 @@ const { log } = require('../../log');
  * @param {function} mapRowToModel a customized function that map needed values from each row to the Reading model
  * @param {boolean} readAsStream true if prefer to read file as CSV stream
  * @param {boolean} isCummulative true if the given data is cummulative
- * @param {array} conditionSet used to validate readings (minVal, maxVal, minDate, maxDate, interval, maxError)
+ * @param {array} conditionSet used to validate readings (minVal, maxVal, minDate, maxDate, threshold, maxError)
  * @param {array} conn connection to database
  */
 
