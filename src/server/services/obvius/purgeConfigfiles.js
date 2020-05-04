@@ -3,17 +3,18 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
 
 const Configfile = require('../../models/obvius/Configfile');
-const stopDB = require('../../models/database').stopDB;
 const { log } = require('../../log');
+const { getConnection, dropConnection } = require('../../db');
 
 async function purgeConfigfiles() {
 	log.info('Purging Obvius config logs.');
+	const conn = getConnection();
 	try {
-		Configfile.purgeAll();
+		Configfile.purgeAll(conn);
 	} catch (err) {
 		log.error(`Error purging Obvius config logs: ${err}`, err);
 	} finally {
-		stopDB();
+		dropConnection();
 	}
 }
 

@@ -4,7 +4,6 @@
 
 const database = require('../database');
 
-const getDB = database.getDB;
 const sqlFile = database.sqlFile;
 
 class Configfile {
@@ -30,18 +29,20 @@ class Configfile {
 
 	/**
 	 * Returns a promise to create the Configfile table.
+	 * @param conn The connection to use.
 	 * @return {Promise.<>}
 	 */
-	static createTable(conn = getDB) {
-		return conn().none(sqlFile('obvius/create_config_table.sql'));
+	static createTable(conn) {
+		return conn.none(sqlFile('obvius/create_config_table.sql'));
 	}
 
 	/**
 	 * Returns a promise to remove all entries in the table.
+	 * @param conn The connection to use.
 	 * @return {Promise.<>}
 	 */
-	static purgeAll(conn = getDB) {
-		return conn().none(sqlFile('obvius/purge_configs.sql'));
+	static purgeAll(conn) {
+		return conn.none(sqlFile('obvius/purge_configs.sql'));
 	}
 
 	static mapRow(row) {
@@ -51,10 +52,10 @@ class Configfile {
 	/**
 	 * Returns a promise to get a specific Configfile by ID
 	 * @param {number} id
-	 * @param conn The connection to use. Defaults to the default DB connection.
+	 * @param conn The connection to use.
 	 */
-	static async getByID(id, conn = getDB) {
-		const row = await conn().one(sqlFile('obvius/get_configs_by_id.sql'), {id: id});
+	static async getByID(id, conn) {
+		const row = await conn.one(sqlFile('obvius/get_configs_by_id.sql'), {id: id});
 		return Configfile.mapRow(row);
 	}
 
@@ -62,28 +63,32 @@ class Configfile {
 	 * Returns a promise to get all the Configfile associated with the serial number,
 	 * ordered by the date of creation, ascending.
 	 * @param {string} id the serial number to look up
-	 * @param conn The connection to use. Defaults to the default DB connection.
+	 * @param conn The connection to use..
 	 */
-	static async getBySerial(id, conn = getDB) {
-		const rows = await conn().any(sqlFile('obvius/get_configs_by_sn.sql'), {serialId: id});
+	static async getBySerial(id, conn) {
+		const rows = await conn.any(sqlFile('obvius/get_configs_by_sn.sql'), {serialId: id});
 		return rows.map(Configfile.mapRow);
 	}
 
 	/**
 	 * Returns a promise to get all the Configfiles stored.
-	 * @param conn The connection to use. Defaults to the default DB connection.
+	 * @param conn The connection to use.
 	 */
-	static async getAll(conn = getDB) {
-		const rows = await conn().any(sqlFile('obvius/get_all_configs.sql'));
+	static async getAll(conn) {
+		const rows = await conn.any(sqlFile('obvius/get_all_configs.sql'));
 		return rows.map(Configfile.mapRow);
 	}
 
-	async insert(conn = getDB) {
+	/**
+	 * Returns ??
+	 * @param conn The connection to use.
+	 */
+	async insert(conn) {
 		const configfile = this;
 		if (this.id !== undefined) {
 			throw new Error('Attempt to insert a Configfile with an existing ID.');
 		}
-		const resp = await conn().one(sqlFile('obvius/insert_new_config.sql'), configfile);
+		const resp = await conn.one(sqlFile('obvius/insert_new_config.sql'), configfile);
 		this.id = resp.id;
 	}
 

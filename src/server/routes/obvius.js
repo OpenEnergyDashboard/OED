@@ -26,6 +26,7 @@ const streamBuffers = require('stream-buffers');
 const loadLogfileToReadings = require('../services/obvius/loadLogfileToReadings');
 const middleware = require('../middleware');
 const obvius = require('../util').obvius;
+const { getConnection, dropConnection } = require('../db');
 
 const upload = multer({ storage: multer.memoryStorage() });
 const router = express.Router();
@@ -127,6 +128,7 @@ router.all('/', async (req, res) => {
 			failure(req, res, 'Logfile Upload Requires Serial Number');
 			return;
 		}
+		const conn = getConnection();
 		for (const fx of req.files) {
 			log.info(`Received ${fx.fieldname}: ${fx.originalname}`);
 			// Logfiles are always gzipped.
@@ -138,8 +140,9 @@ router.all('/', async (req, res) => {
 				failure(req, res, `Unable to gunzip incoming buffer: ${err}`);
 				return;
 			}
-			loadLogfileToReadings(req.param('serialnumber'), ip, data);
+			loadLogfileToReadings(req.param('serialnumber'), ip, data, conn);
 		}
+		dropConnection();
 
 		success(req, res, 'Logfile Upload IS PROVISIONAL');
 		return;
@@ -150,8 +153,10 @@ router.all('/', async (req, res) => {
 		return;
 	}
 
-	if (mode === obvius.mode.config_file.manifest) {
-		success(req, res, await listConfigfiles());
+	if (mode === obvius.mode.config_file_manifest) {
+		const conn = getConnection();
+		success(req, res, await listConfigfiles(conn));
+		dropConnection();
 		return;
 	}
 
@@ -165,6 +170,7 @@ router.all('/', async (req, res) => {
 			failure(req, res, 'Config Upload Requires Modbus Device ID');
 			return;
 		}
+		const conn = getConnection();
 		for (const fx of req.files) {
 			log.info(`Received ${fx.fieldname}: ${fx.originalname}`);
 
@@ -176,9 +182,10 @@ router.all('/', async (req, res) => {
 			}
 
 			const cf = new Configfile(undefined, req.param('serialnumber'), req.param('modbusdevice'), moment(), md5(data), data, true);
-			await cf.insert();
+			await cf.insert(conn);
 			success(req, res, `Acquired config log with (pseudo)filename ${cf.makeFilename()}.`);
 		}
+		dropConnection();
 		return;
 	}
 

@@ -12,12 +12,12 @@ class Meter {
 	 * @param id This meter's ID. Should be undefined if the meter is being newly created
 	 * @param name This meter's name
 	 * @param ipAddress This meter's IP Address
-	 * @param identifier Additional identification for this meter
 	 * @param enabled This meter is being actively read from
 	 * @param displayable This meters is available to users for charting
 	 * @param type What kind of meter this is
+	 * @param identifier Another way to identify a meter
 	 */
-	constructor(id, name, ipAddress, enabled, displayable, type, identifier) {
+	constructor(id, name, ipAddress, enabled, displayable, type, identifier = name) {
 		this.id = id;
 		this.name = name;
 		this.ipAddress = ipAddress;

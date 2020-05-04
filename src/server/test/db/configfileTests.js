@@ -2,20 +2,11 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
 
-const chai = require('chai');
-const chaiAsPromised = require('chai-as-promised');
-
-chai.use(chaiAsPromised);
-const expect = chai.expect;
-
+const { mocha, expect, testDB } = require('../common');
 const md5 = require('md5');
 const moment = require('moment');
-
-const recreateDB = require('./common').recreateDB;
 const Configfile = require('../../models/obvius/Configfile');
 const listConfigfiles = require('../../services/obvius/listConfigfiles');
-
-const mocha = require('mocha');
 
 function expectConfigfilesToBeEquivalent(expected, actual) {
 	expect(actual).to.have.property('id', expected.id);
@@ -29,27 +20,31 @@ function expectConfigfilesToBeEquivalent(expected, actual) {
 }
 
 mocha.describe('Configfiles', () => {
-	mocha.beforeEach(recreateDB);
+
+	mocha.beforeEach(async () => {
+		conn = testDB.getConnection();
+	});
+
 	mocha.it('can be saved and retrieved', async () => {
 		const contents = 'Some test contents for the log file.';
 		const chash = md5(contents);
 		const configfilePreInsert = new Configfile(undefined, '0', 'md1', moment(), chash, contents, false);
-		await configfilePreInsert.insert();
-		const configfilePostInsertByID = await Configfile.getByID(1);
+		await configfilePreInsert.insert(conn);
+		const configfilePostInsertByID = await Configfile.getByID(1, conn);
 		expectConfigfilesToBeEquivalent(configfilePreInsert, configfilePostInsertByID);
 	});
 	mocha.it('can be retrieved by serial ID', async () => {
 		const configfile1 = new Configfile(undefined, '0', 'md1', moment().subtract(1, 'd'), md5('contents'), 'contents', true);
 		const configfile2 = new Configfile(undefined, '0', 'md1', moment(), md5('contents'), 'contents', true);
 		const configfile3 = new Configfile(undefined, '1', 'md2', moment(), md5('contents'), 'contents', true);
-		await configfile1.insert();
-		await configfile2.insert();
-		await configfile3.insert();
+		await configfile1.insert(conn);
+		await configfile2.insert(conn);
+		await configfile3.insert(conn);
 
 		// Test correct length.
-		const configfilesForAllZeroes = await Configfile.getBySerial('0');
+		const configfilesForAllZeroes = await Configfile.getBySerial('0', conn);
 		expect(configfilesForAllZeroes).to.have.length(2);
-		const configfilesForOneOne = await Configfile.getBySerial('1');
+		const configfilesForOneOne = await Configfile.getBySerial('1', conn);
 		expect(configfilesForOneOne).to.have.length(1);
 
 		// Test correct ordering.
@@ -61,13 +56,13 @@ mocha.describe('Configfiles', () => {
 		const configfile2 = new Configfile(undefined, '0', 'md1', moment('1970-01-02'), md5('contents2'), 'contents2', true);
 		const configfile3 = new Configfile(undefined, '0', 'md1', moment('1970-01-03'), md5('contents3'), 'contents3', true);
 
-		await configfile1.insert();
-		await configfile2.insert();
-		await configfile3.insert();
+		await configfile1.insert(conn);
+		await configfile2.insert(conn);
+		await configfile3.insert(conn);
 
 		//tslint:disable-next-line max-line-length
 		const expectation = 'CONFIGFILE,0-mb-md1.ini,4891e2a24026da4dea5b4119e1dc1863,1970-01-01 12:00:00\nCONFIGFILE,0-mb-md1.ini,b2d0efbdc48f4b7bf42f8ab76d71f84e,1970-01-02 12:00:00\nCONFIGFILE,0-mb-md1.ini,2635f317ed53a4fc4014650181fa7ccd,1970-01-03 12:00:00\n';
 
-		expect(await listConfigfiles()).to.equal(expectation);
+		expect(await listConfigfiles(conn)).to.equal(expectation);
 	});
 });

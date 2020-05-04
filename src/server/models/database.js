@@ -97,7 +97,7 @@ async function createSchema(conn) {
 	await Reading.createCompareReadingsFunction(conn);
 	await Baseline.createTable(conn);
 	await conn.none(sqlFile('baseline/create_function_get_average_reading.sql'));
-	await Configfile.createTable();
+	await Configfile.createTable(conn);
 }
 
 module.exports = {

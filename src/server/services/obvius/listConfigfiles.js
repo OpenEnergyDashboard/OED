@@ -6,11 +6,12 @@ const Configfile = require('../../models/obvius/Configfile');
 
 /**
  * Generates and returns an Obvius config manifest format list of all known config files.
+ * @param conn The connection to use.
  * @returns {string}
  */
-async function listConfigfiles() {
+async function listConfigfiles(conn) {
 	// List all log files we have received and fully processed.
-	const allConfigfiles = await Configfile.getAll();
+	const allConfigfiles = await Configfile.getAll(conn);
 	let response = '';
 	for (f of allConfigfiles) {
 		if (f.processed) {

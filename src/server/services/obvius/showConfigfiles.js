@@ -3,12 +3,13 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
 
 const Configfile = require('../../models/obvius/Configfile');
-const stopDB = require('../../models/database').stopDB;
 const { log } = require('../../log');
+const { getConnection, dropConnection } = require('../../db');
 
 async function showConfigfiles() {
 	try {
-		const allConfigfiles = await Configfile.getAll();
+		const conn = getConnection();
+		const allConfigfiles = await Configfile.getAll(conn);
 		let response = '';
 		for (f of allConfigfiles) {
 			// tslint:disable no-console
@@ -20,7 +21,7 @@ async function showConfigfiles() {
 	} catch (err) {
 		log.error(`Error listing Obvius config logs: ${err}`, err);
 	} finally {
-		stopDB();
+		dropConnection();
 	}
 }
 

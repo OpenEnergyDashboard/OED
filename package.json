@@ -24,8 +24,8 @@
     "editUser": "node ./src/server/services/user/editUser.js",
     "sendLogEmail": "node ./src/server/services/sendLogEmail.js",
     "refreshReadingViews": "node ./src/server/services/refreshReadingViews.js",
-    "obvius:showConfigfiles": "node ./src/server/services/obvius/showLogfiles.js",
-    "obvius:purgeConfigfiles": "node ./src/server/services/obvius/purgeLogfiles.js"
+    "obvius:showConfigfiles": "node ./src/server/services/obvius/showConfigfiles.js",
+    "obvius:purgeConfigfiles": "node ./src/server/services/obvius/purgeConfigfiles.js"
   },
   "nodemonConfig": {
     "watch": [
