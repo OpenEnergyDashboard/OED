@@ -49,7 +49,7 @@
     "event-stream": "~3.3.5",
     "express": "~4.16.4",
     "history": "~2.1.2",
-    "jquery": "~3.4.1",
+    "jquery": "~3.5.0",
     "jsonschema": "~1.2.4",
     "jsonwebtoken": "~8.3.0",
     "lodash": "~4.17.11",
