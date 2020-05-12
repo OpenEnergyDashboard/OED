@@ -92,7 +92,7 @@ function mapStateToProps(state: State) {
 
 	// Customize the layout of the plot
 	const layout: any = {
-		barmode: 'group',
+		barmode: (state.graph.barStacking ? 'stack' : 'group'),
 		bargap: 0.2,
 		bargroupgap: 0.1,
 		autosize: true,
