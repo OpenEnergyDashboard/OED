@@ -127,6 +127,6 @@
     "tslint": "~5.8.0",
     "tslint-react": "~3.2.0",
     "tsutils": "~3.0.0",
-    "typescript": "~3.3.3333"
+    "typescript": "~3.5.1"
   }
 }
