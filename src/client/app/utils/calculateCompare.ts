@@ -128,7 +128,7 @@ export function getComparePeriodLabels(comparePeriod: ComparePeriod): ComparePer
 
 /**
  * Composes a label to summarize compare chart data.
- * @param change the radio of change between the current and previous period
+ * @param change the ratio of change between the current and previous period
  * @param name the name of the entity being measured
  * @param labels the names of the periods in question
  */
