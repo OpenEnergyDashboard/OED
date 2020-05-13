@@ -31,9 +31,9 @@ See the full licensing agreement [here](License.txt)
 ### Contributions ###
 
 We welcome others to contribute to this project by writing code for submission or collaborating with us. Before contributing, please sign our Contributor License Agreement [here](https://goo.gl/forms/nR9MtVHUOqYn8WbP2).
-If you have any questions or concerns feel free to email us at oed@beloit.edu.
+If you have any questions or concerns feel free to email us at OpenEnergyDashboard@gmail.com.
 
 ### Contact ###
 
-To contact us, send an email to oed@beloit.edu or open an issue on GitHub.
+To contact us, send an email to OpenEnergyDashboard@gmail.com or open an issue on GitHub.
 
