@@ -28,7 +28,7 @@ mocha.describe('meters API', () => {
 		expect(res).to.be.json;
 		expect(res.body).to.have.lengthOf(3);
 
-		for (let i = 0; i++; i < 3) {
+		for (let i = 0; i < 3; i++) {
 			const meter = res.body[i];
 			expect(meter).to.have.property('id');
 			expect(meter).to.have.property('name', `Meter ${i + 1}`);
@@ -56,7 +56,7 @@ mocha.describe('meters API', () => {
 			expect(res).to.be.json;
 			expect(res.body).to.have.lengthOf(4);
 
-			for (let i = 0; i++; i < 4) {
+			for (let i = 0; i < 4; i++) {
 				const meter = res.body[i];
 				expect(meter).to.have.property('id');
 				expect(meter).to.have.property('name', `Meter ${i + 1}`);
