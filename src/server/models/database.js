@@ -74,7 +74,7 @@ async function createSchema(conn) {
 	const User = require('./User');
 	const Group = require('./Group');
 	const Preferences = require('./Preferences');
-	const Configfile = require('./Configfile');
+	const Configfile = require('./obvius/Configfile');
 	const Migration = require('./Migration');
 	const LogEmail = require('./LogEmail');
 	const Baseline = require('./Baseline');
