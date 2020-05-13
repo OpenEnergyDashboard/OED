@@ -4,5 +4,6 @@
 
 export enum LanguageTypes {
 	en = 'en',
-	fr = 'fr'
+	fr = 'fr',
+	es = 'es'
 }
