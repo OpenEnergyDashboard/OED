@@ -3,24 +3,17 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
 
 import * as _ from 'lodash';
-import { Line, ChartComponentProps } from 'react-chartjs-2';
-import { ChartData, ChartDataSets, ChartPoint, ChartTooltipItem } from 'chart.js';
 import * as moment from 'moment';
 import { connect } from 'react-redux';
 import getGraphColor from '../utils/getGraphColor';
 import { State } from '../types/redux/state';
-import {CompressedLineReading} from '../types/compressed-readings';
-
-
-function compressedReadingToChartPoint(compressedReading: CompressedLineReading): ChartPoint {
-	return { x: compressedReading.startTimestamp, y: compressedReading.reading };
-}
+import PlotlyChart, { IPlotlyChartProps } from 'react-plotlyjs-ts';
 
 function mapStateToProps(state: State) {
 	const timeInterval = state.graph.timeInterval;
-	const datasets: ChartDataSets[] = [];
+	const datasets: any[] = [];
 
-	// Add all meters data to the chart
+	// Add all valid data from existing meters to the line plot
 	for (const meterID of state.graph.selectedMeters) {
 		const byMeterID = state.readings.line.byMeterID[meterID];
 		if (byMeterID !== undefined) {
@@ -31,19 +24,51 @@ function mapStateToProps(state: State) {
 					throw new Error('Unacceptable condition: readingsData.readings is undefined.');
 				}
 
-				const dataPoints: ChartPoint[] = _.values(readingsData.readings).map(compressedReadingToChartPoint);
+				// Create two arrays for the x and y values. Fill the array with the data from the compressed readings
+				const xData: string[] = [];
+				const yData: number[] = [];
+				const hoverText: string[] = [];
+				const readings = _.values(readingsData.readings);
+				readings.forEach(reading => {
+					const timeReading = moment(reading.startTimestamp);
+					xData.push(timeReading.format('YYYY-MM-DD HH:mm:ss'));
+					yData.push(reading.reading);
+					hoverText.push(`<b> ${timeReading.format('dddd, MMM DD, YYYY hh:mm a')} </b> <br> ${label}: ${reading.reading} kW`);
+				});
 
+				// Save the timestamp range of the plot
+				let minTimestamp: string = '';
+				let maxTimestamp: string = '';
+				if (readings.length > 0) {
+					minTimestamp = readings[0]['startTimestamp'].toString();
+					maxTimestamp = readings[readings.length - 1]['startTimestamp'].toString();
+				}
+				const root: any = document.getElementById('root');
+				root.setAttribute('min-timestamp', minTimestamp);
+				root.setAttribute('max-timestamp', maxTimestamp);
+
+				// This variable contains all the elements (x and y values, line type, etc.) assigned to the data parameter of the Plotly object
 				datasets.push({
-					label,
-					data: dataPoints,
-					fill: false,
-					borderColor: getGraphColor(label)
+					name: label,
+					x: xData,
+					y: yData,
+					text: hoverText,
+					hoverinfo: 'text',
+					type: 'scatter',
+					mode: 'lines',
+					line: {
+						shape: 'spline',
+						width: 3
+					},
+					marker: {color: getGraphColor(label)}
 				});
 			}
 		}
 	}
 
-	// Add all groups data to the chart
+// TODO The meters and groups code is very similar and maybe it should be refactored out to create a function to do
+// both. This would mean future changes would automatically happen to both.
+	// Add all valid data from existing groups to the line plot
 	for (const groupID of state.graph.selectedGroups) {
 		const byGroupID = state.readings.line.byGroupID[groupID];
 		if (byGroupID !== undefined) {
@@ -54,73 +79,72 @@ function mapStateToProps(state: State) {
 					throw new Error('Unacceptable condition: readingsData.readings is undefined.');
 				}
 
-				const dataPoints: ChartPoint[] = _.values(readingsData.readings).map(compressedReadingToChartPoint);
+				// Create two arrays for the x and y values. Fill the array with the data from the compressed readings
+				const xData: string[] = [];
+				const yData: number[] = [];
+				const hoverText: string[] = [];
+				const readings = _.values(readingsData.readings);
+				readings.forEach(reading => {
+					const timeReading = moment(reading.startTimestamp);
+					xData.push(timeReading.format('YYYY-MM-DD HH:mm:ss'));
+					yData.push(reading.reading);
+					hoverText.push(`<b> ${timeReading.format('dddd, MMM DD, YYYY hh:mm a')} </b> <br> ${label}: ${reading.reading} kW`);
+				});
 
+				// This variable contains all the elements (x and y values, line type, etc.) assigned to the data parameter of the Plotly object
 				datasets.push({
-					label,
-					data: dataPoints,
-					fill: false,
-					borderColor: getGraphColor(label)
+					name: label,
+					x: xData,
+					y: yData,
+					text: hoverText,
+					hoverinfo: 'text',
+					type: 'scatter',
+					mode: 'lines',
+					line: {
+						shape: 'spline',
+						width: 3
+					},
+					marker: {color: getGraphColor(label)}
 				});
 			}
 		}
 	}
 
-	const options = {
-		animation: {
-			duration: 0
+	// Customize the layout of the plot
+	const layout: any = {
+		autosize: true,
+		showlegend: true,
+		legend: {
+			x: 0,
+			y: 1.1,
+			orientation: 'h'
 		},
-		elements: {
-			point: {
-				radius: 0
-			}
+		yaxis: {
+			title: 'kW',
+			gridcolor: '#ddd'
 		},
-		scales: {
-			xAxes: [{
-				type: 'time'
-			}],
-			yAxes: [{
-				scaleLabel: {
-					display: true,
-					labelString: 'kW'
-				},
-				ticks: {
-					min: 0
-				}
-			}]
+		xaxis: {
+			rangeslider: {thickness: 0.1},
+			showgrid: true,
+			gridcolor: '#ddd'
 		},
-		tooltips: {
-			mode: 'nearest',
-			intersect: false,
-			backgroundColor: 'rgba(0,0,0,0.6)',
-			displayColors: false,
-			callbacks: {
-				title: (tooltipItems: ChartTooltipItem[]) => `${moment(tooltipItems[0].xLabel).format('dddd, MMM DD, YYYY hh:mm a')}`,
-				label: (tooltipItems: ChartTooltipItem) => {
-					if (tooltipItems.datasetIndex !== undefined) {
-						return `${datasets[tooltipItems.datasetIndex].label}: ${Number(parseFloat(tooltipItems.yLabel || '0').toFixed(3))} kW`;
-					} else {
-						throw new Error('tooltipItems.datasetIndex was undefined in line chart tooltip label callback');
-					}
-				}
-			}
-		},
-		plugins: {
-			datalabels: {
-				display: false
-			}
+		margin: {
+			t: 10,
+			b: 10
 		}
 	};
 
-	const data: ChartData = { datasets };
-
-	const props: ChartComponentProps = {
-		data,
-		options,
-		redraw: true
+	// Assign all the parameters required to create the Plotly object (data, layout, config) to the variable props, returned by mapStateToProps
+	// The Plotly toolbar is displayed if displayModeBar is set to true
+	const props: IPlotlyChartProps = {
+		data: datasets,
+		layout,
+		config: {
+			displayModeBar: true
+		}
 	};
 
 	return props;
 }
 
-export default connect(mapStateToProps)(Line);
+export default connect(mapStateToProps)(PlotlyChart);
