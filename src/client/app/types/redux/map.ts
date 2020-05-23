@@ -5,18 +5,22 @@ export enum MapModeTypes {
 	display = 'display',
 }
 
+export interface ChangeMapModeAction {
+
+}
+
+export type MapAction =
+	| ChangeMapModeAction;
+
+
+
 export interface MapState {
-	mode: MapModeTypes,
-	isLoading: boolean,
-	initiate: MapInitiateState,
-	calibrate: MapCalibrateState,
+	mode: MapModeTypes;
+	isLoading: boolean;
+	source: string;
 }
 
-export interface MapInitiateState {
-	source: string,
-}
-
-export  interface MapCalibrateState {
+export interface MapCalibrateState {
 	numDataPoint: number,
 	graphCoordinates: number[],
 	gpsCoordinates: number[], //Todo: check gps storing object and refactor data structure to store gps coordinates;
