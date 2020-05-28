@@ -106,9 +106,6 @@ export default class RouteComponent extends React.Component<RouteProps, {}> {
 			try {
 				const options: LinkOptions = {};
 				for (const [key, infoObj] of _.entries(queries)) {
-<<<<<<< HEAD
-					const info: string = infoObj.toString();
-=======
 					// TODO The upgrade of TypeScript lead to it giving an error for the type of infoObj
 					// which it thinks is unknown. I'm not sure why and this is code from the history
 					// package (see modules/@types/history/index.d.ts). What follows is a hack where
@@ -120,7 +117,6 @@ export default class RouteComponent extends React.Component<RouteProps, {}> {
 					// we should look into this typing issue more to see what might be a better fix.
 					const fixTypeIssue: any = infoObj as any;
 					const info: string = fixTypeIssue.toString();
->>>>>>> upstream/development
 					switch (key) {
 						case 'meterIDs':
 							options.meterIDs = info.split(',').map(s => parseInt(s));
