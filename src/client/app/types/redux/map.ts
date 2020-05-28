@@ -1,3 +1,4 @@
+import {ActionType} from './actions';
 
 export enum MapModeTypes {
 	initiate = 'initiate',
@@ -6,11 +7,24 @@ export enum MapModeTypes {
 }
 
 export interface ChangeMapModeAction {
+	type: ActionType.UpdateMapMode,
+	nextMode: MapModeTypes,
+}
 
+export interface UpdateMapSourceAction {
+	type: ActionType.UpdateMapSource,
+	imageSource: string,
+}
+
+export interface StallMapLoadingAction {
+	type: ActionType.StallMapLoad,
+	loadState: boolean,
 }
 
 export type MapAction =
-	| ChangeMapModeAction;
+	| ChangeMapModeAction
+	| UpdateMapSourceAction
+	| StallMapLoadingAction;
 
 
 

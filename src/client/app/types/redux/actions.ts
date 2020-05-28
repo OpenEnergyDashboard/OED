@@ -72,7 +72,11 @@ export enum ActionType {
 	RequestPreferences = 'REQUEST_PREFERENCES',
 	ReceivePreferences = 'RECEIVE_PREFERENCES',
 	MarkPreferencesNotSubmitted = 'MARK_PREFERENCES_NOT_SUBMITTED',
-	MarkPreferencesSubmitted = 'MARK_PREFERENCES_SUBMITTED'
+	MarkPreferencesSubmitted = 'MARK_PREFERENCES_SUBMITTED',
+
+	UpdateMapMode = 'UPDATE_MAP_MODE',
+	UpdateMapSource = 'UPDATE_MAP_IMAGE',
+	StallMapLoad = 'STALL_MAP_LOAD',
 }
 
 /**

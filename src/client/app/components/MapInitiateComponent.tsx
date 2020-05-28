@@ -4,6 +4,7 @@ import Button from 'reactstrap/lib/Button';
 interface MapInitiateProps {
 	isLoading: boolean,
 	uploadMapImage(imageURI: string): any,
+	stallSourceUpload(): any,
 }
 
 export default class MapInitiateComponent extends React.Component<MapInitiateProps, {}>{
@@ -40,7 +41,7 @@ export default class MapInitiateComponent extends React.Component<MapInitiatePro
 
 	private getURI() {
 		if (this.props.isLoading) return;
-		//TODO: write up action to change isLoading in mapState to true;
+		this.props.stallSourceUpload();
 		let fileReader = new FileReader();
 		let file;
 		fileReader.onload = function () {
@@ -53,6 +54,7 @@ export default class MapInitiateComponent extends React.Component<MapInitiatePro
 				source: file,
 			});
 		}
+		//TODO: release sourceUpload Lock;
 		MapInitiateComponent.notifyLoadComplete();
 	}
 }
