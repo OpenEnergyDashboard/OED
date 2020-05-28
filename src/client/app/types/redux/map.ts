@@ -16,15 +16,10 @@ export interface UpdateMapSourceAction {
 	imageSource: string,
 }
 
-export interface StallMapLoadingAction {
-	type: ActionType.StallMapLoad,
-	loadState: boolean,
-}
 
 export type MapAction =
 	| ChangeMapModeAction
-	| UpdateMapSourceAction
-	| StallMapLoadingAction;
+	| UpdateMapSourceAction;
 
 
 

@@ -19,10 +19,5 @@ export default function map(state = defaultState, action: MapAction) {
 				...state,
 				source: action.imageSource,
 			};
-		case ActionType.StallMapLoad:
-			return {
-				...state,
-				isLoading: action.loadState,
-			};
 	}
 }

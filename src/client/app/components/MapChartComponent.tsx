@@ -1,7 +1,6 @@
 import * as React from 'react';
 import { MapModeTypes } from '../types/redux/map';
 import MapInitiateContainer from '../containers/MapInitiateContainer';
-import MapCalibrationContainer from '../containers/MapCalibrationContainer';
 
 interface MapChartProps {
 	mode: MapModeTypes,
