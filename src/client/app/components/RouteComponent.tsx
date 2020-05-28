@@ -106,7 +106,21 @@ export default class RouteComponent extends React.Component<RouteProps, {}> {
 			try {
 				const options: LinkOptions = {};
 				for (const [key, infoObj] of _.entries(queries)) {
+<<<<<<< HEAD
 					const info: string = infoObj.toString();
+=======
+					// TODO The upgrade of TypeScript lead to it giving an error for the type of infoObj
+					// which it thinks is unknown. I'm not sure why and this is code from the history
+					// package (see modules/@types/history/index.d.ts). What follows is a hack where
+					// the type is cast to any. This removes the problem and also allowed the removal
+					// of the ! to avoid calling toString when it is a bad value. I think this is okay
+					// because the toString documentation indicates it works fine with any type including
+					// null and unknown. If it does convert then the default case will catch it as an error.
+					// I want to get rid of this issue so Travis testing is not stopped by this. However,
+					// we should look into this typing issue more to see what might be a better fix.
+					const fixTypeIssue: any = infoObj as any;
+					const info: string = fixTypeIssue.toString();
+>>>>>>> upstream/development
 					switch (key) {
 						case 'meterIDs':
 							options.meterIDs = info.split(',').map(s => parseInt(s));
