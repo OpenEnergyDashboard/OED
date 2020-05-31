@@ -19,5 +19,7 @@ export default function map(state = defaultState, action: MapAction) {
 				...state,
 				source: action.imageSource,
 			};
+		default:
+			return state;
 	}
 }

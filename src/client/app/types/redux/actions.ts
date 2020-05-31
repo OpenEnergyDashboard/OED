@@ -76,8 +76,8 @@ export enum ActionType {
 
 	UpdateMapMode = 'UPDATE_MAP_MODE',
 	UpdateMapSource = 'UPDATE_MAP_IMAGE',
-	StallMapLoad = 'STALL_MAP_LOAD',
-	ReleaseMapLoad = 'RELEASE_MAP_LOAD',
+	// StallMapLoad = 'STALL_MAP_LOAD',
+	// ReleaseMapLoad = 'RELEASE_MAP_LOAD',
 }
 
 /**

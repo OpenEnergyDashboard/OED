@@ -1,14 +1,21 @@
+/**
+ * accepts image URI data stored in a .txt file as user input,
+ * used to initiate map view for next stage of calibration.
+ */
+
 import * as React from 'react';
 import Button from 'reactstrap/lib/Button';
+import {MapModeTypes} from '../types/redux/map';
 
 interface MapInitiateProps {
 	isLoading: boolean,
-	uploadMapImage(imageURI: string): any,
+	uploadMapImage(imageURI: string): Promise<any>,
+	updateMapMode(nextMode: MapModeTypes): any,
 }
 
 interface MapInitiateState {
 	source: string,
-	confirmed: false,
+	confirmed: boolean,
 }
 
 export default class MapInitiateComponent extends React.Component<MapInitiateProps, MapInitiateState>{
@@ -24,11 +31,11 @@ export default class MapInitiateComponent extends React.Component<MapInitiatePro
 
 	public render() {
 		return (
-			<div>
-				<p>Upload map image to begin.</p>
-				<input type="file" name="inputFile"
-					   id="inputFile" onChange={() => this.getURI}
-				/>
+			<div id='initiateContainer'>
+				<p>Upload map image URI to begin.</p>
+				<label>
+					<textarea cols={50}/>
+				</label>
 				<Button onClick={() => this.confirmUpload}>Confirm</Button>
 			</div>
 		);
@@ -40,24 +47,19 @@ export default class MapInitiateComponent extends React.Component<MapInitiatePro
 	}
 
 	private confirmUpload() {
+		this.getURI();
+		this.props.uploadMapImage(this.state.source);
+		MapInitiateComponent.notifyLoadComplete();
 
 	}
 
 	private getURI() {
-		if (this.props.isLoading) return;
-		let fileReader = new FileReader();
-		let file;
-		fileReader.onload = function () {
-			file = fileReader.result;
-		};
-		let inputFile:any = document.getElementById('inputFile');
-		fileReader.readAsText(inputFile.files[0]);
-		if (file) {
+		let input = document.querySelector('textarea');
+		if (input) {
+			let imageURI = input.value;
 			this.setState({
-				source: file,
+				source: imageURI,
 			});
 		}
-		this.props.uploadMapImage(this.state.source);
-		MapInitiateComponent.notifyLoadComplete();
 	}
 }

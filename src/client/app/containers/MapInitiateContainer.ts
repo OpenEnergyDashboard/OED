@@ -2,7 +2,8 @@ import { connect } from 'react-redux';
 import { State } from '../types/redux/state';
 import MapInitiateComponent from '../components/MapInitiateComponent';
 import { Dispatch } from '../types/redux/actions';
-import {updateMapSource} from '../actions/map';
+import { updateMapSource, updateMapMode } from '../actions/map';
+import { MapModeTypes } from '../types/redux/map';
 
 function mapStateToProps(state: State) {
 	let isLoading = state.map.isLoading;
@@ -14,6 +15,7 @@ function mapStateToProps(state: State) {
 function mapDispatchToProps(dispatch: Dispatch) {
 	return {
 		uploadMapImage: (imageURI: string) => dispatch(updateMapSource(imageURI)),
+		updateMapMode: (nextMode: MapModeTypes) => dispatch(updateMapMode(nextMode)),
 	};
 }
 
