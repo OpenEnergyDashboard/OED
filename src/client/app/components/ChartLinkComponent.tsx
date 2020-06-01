@@ -19,7 +19,7 @@ interface ChartLinkState {
 	sliderRange: string;
 	showOptionalLink: boolean;
 	optionalLink: string;
-	hideOptions: boolean;
+	hideOptionsInLinkedPage: boolean;
 }
 
 export default class ChartLinkComponent extends React.Component<ChartLinkProps, ChartLinkState> {
@@ -34,7 +34,7 @@ export default class ChartLinkComponent extends React.Component<ChartLinkProps, 
 			sliderRange: '',
 			showOptionalLink: true,
 			optionalLink: '',
-			hideOptions: false,
+			hideOptionsInLinkedPage: false,
 		};
 	}
 
@@ -56,7 +56,7 @@ export default class ChartLinkComponent extends React.Component<ChartLinkProps, 
 				{this.state.showLink &&
 					<>
                         <div className='checkbox'>
-                            <label><input type='checkbox' onChange={this.handleOptionsVisibility} checked={this.state.hideOptions}/>
+                            <label><input type='checkbox' onChange={this.handleOptionsVisibility} checked={this.state.hideOptionsInLinkedPage}/>
                                 <FormattedMessage id='hide.options.in.link' />
                             </label>
                         </div>
@@ -117,13 +117,14 @@ export default class ChartLinkComponent extends React.Component<ChartLinkProps, 
 	}
 
 	/**
-	 * TODO: suggest future refactor into interface that holds all user-selected options and can produce output as a single string in a loop
+	 * TODO: this could be refactor into part of an interface that holds all user-selected options
+	 * and produce output as a single string in a loop.
 	 */
 	private handleOptionsVisibility() {
-		let currState = this.state.hideOptions;
+		let currState = this.state.hideOptionsInLinkedPage;
 		let optionsVisibilityToken = '&optionsVisibility=false';
 		this.setState({
-			hideOptions: !currState,
+			hideOptionsInLinkedPage: !currState,
 			optionalLink: (currState)? '':optionsVisibilityToken,
 		});
 	}
