@@ -3,17 +3,17 @@ import {ActionType} from './actions';
 export enum MapModeTypes {
 	initiate = 'initiate',
 	calibrate = 'calibrate',
-	display = 'display',
+	display = 'display'
 }
 
 export interface ChangeMapModeAction {
-	type: ActionType.UpdateMapMode,
-	nextMode: MapModeTypes,
+	type: ActionType.UpdateMapMode;
+	nextMode: MapModeTypes;
 }
 
 export interface UpdateMapSourceAction {
-	type: ActionType.UpdateMapSource,
-	imageSource: string,
+	type: ActionType.UpdateMapSource;
+	imageSource: string;
 }
 
 
@@ -30,7 +30,7 @@ export interface MapState {
 }
 
 export interface MapCalibrateState {
-	numDataPoint: number,
-	graphCoordinates: number[],
-	gpsCoordinates: number[], //Todo: check gps storing object and refactor data structure to store gps coordinates;
+	numDataPoint: number;
+	graphCoordinates: number[];
+	gpsCoordinates: number[]; // Todo: check gps storing object and refactor data structure to store gps coordinates;
 }

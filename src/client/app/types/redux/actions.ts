@@ -75,7 +75,7 @@ export enum ActionType {
 	MarkPreferencesSubmitted = 'MARK_PREFERENCES_SUBMITTED',
 
 	UpdateMapMode = 'UPDATE_MAP_MODE',
-	UpdateMapSource = 'UPDATE_MAP_IMAGE',
+	UpdateMapSource = 'UPDATE_MAP_IMAGE'
 	// StallMapLoad = 'STALL_MAP_LOAD',
 	// ReleaseMapLoad = 'RELEASE_MAP_LOAD',
 }

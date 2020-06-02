@@ -11,7 +11,7 @@ export enum ChartTypes {
 	line = 'line',
 	bar = 'bar',
 	compare = 'compare',
-	map = 'map',
+	map = 'map'
 }
 
 export interface UpdateSelectedMetersAction {

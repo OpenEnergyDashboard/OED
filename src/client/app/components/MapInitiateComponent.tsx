@@ -8,22 +8,27 @@ import Button from 'reactstrap/lib/Button';
 import {MapModeTypes} from '../types/redux/map';
 
 interface MapInitiateProps {
-	isLoading: boolean,
-	uploadMapImage(imageURI: string): Promise<any>,
-	updateMapMode(nextMode: MapModeTypes): any,
+	isLoading: boolean;
+	uploadMapImage(imageURI: string): Promise<any>;
+	updateMapMode(nextMode: MapModeTypes): any;
 }
 
 interface MapInitiateState {
-	source: string,
-	confirmed: boolean,
+	source: string;
+	confirmed: boolean;
 }
 
-export default class MapInitiateComponent extends React.Component<MapInitiateProps, MapInitiateState>{
+export default class MapInitiateComponent extends React.Component<MapInitiateProps, MapInitiateState> {
+	private static notifyLoadComplete() {
+		// change isLoading to false;
+		window.alert('Map load complete.');
+	}
+
 	constructor(props: MapInitiateProps) {
 		super(props);
 		this.state = {
 			source: '',
-			confirmed: false,
+			confirmed: false
 		};
 		this.getURI = this.getURI.bind(this);
 		this.confirmUpload = this.confirmUpload.bind(this);
@@ -41,11 +46,6 @@ export default class MapInitiateComponent extends React.Component<MapInitiatePro
 		);
 	}
 
-	private static notifyLoadComplete() {
-		//change isLoading to false;
-		window.alert('Map load complete.');
-	}
-
 	private confirmUpload() {
 		this.getURI();
 		this.props.uploadMapImage(this.state.source);
@@ -54,11 +54,11 @@ export default class MapInitiateComponent extends React.Component<MapInitiatePro
 	}
 
 	private getURI() {
-		let input = document.querySelector('textarea');
+		const input = document.querySelector('textarea');
 		if (input) {
-			let imageURI = input.value;
+			const imageURI = input.value;
 			this.setState({
-				source: imageURI,
+				source: imageURI
 			});
 		}
 	}

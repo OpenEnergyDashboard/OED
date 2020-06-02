@@ -3,8 +3,8 @@ import { MapModeTypes } from '../types/redux/map';
 import MapInitiateContainer from '../containers/MapInitiateContainer';
 
 interface MapChartProps {
-	mode: MapModeTypes,
-	isLoading: boolean,
+	mode: MapModeTypes;
+	isLoading: boolean;
 }
 
 export default class MapChartComponent extends React.Component<MapChartProps, {}> {
@@ -22,7 +22,7 @@ export default class MapChartComponent extends React.Component<MapChartProps, {}
 				// <MapCalibrationContainer />
 				<p>Coming soon...</p>
 			);
-		} else { //display-mode containers
+		} else { // display-mode containers
 			return (
 				<p>Coming soon...</p>
 			);

@@ -6,16 +6,16 @@ import { updateMapSource, updateMapMode } from '../actions/map';
 import { MapModeTypes } from '../types/redux/map';
 
 function mapStateToProps(state: State) {
-	let isLoading = state.map.isLoading;
+	const isLoading = state.map.isLoading;
 	return {
-		isLoading,
-	}
+		isLoading
+	};
 }
 
 function mapDispatchToProps(dispatch: Dispatch) {
 	return {
 		uploadMapImage: (imageURI: string) => dispatch(updateMapSource(imageURI)),
-		updateMapMode: (nextMode: MapModeTypes) => dispatch(updateMapMode(nextMode)),
+		updateMapMode: (nextMode: MapModeTypes) => dispatch(updateMapMode(nextMode))
 	};
 }
 

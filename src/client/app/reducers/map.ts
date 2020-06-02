@@ -4,7 +4,7 @@ import {ActionType} from '../types/redux/actions';
 const defaultState: MapState = {
 	mode: MapModeTypes.initiate,
 	isLoading: false,
-	source: '',
+	source: ''
 };
 
 export default function map(state = defaultState, action: MapAction) {
@@ -12,12 +12,12 @@ export default function map(state = defaultState, action: MapAction) {
 		case ActionType.UpdateMapMode:
 			return {
 				...state,
-				mode: action.nextMode,
+				mode: action.nextMode
 			};
 		case ActionType.UpdateMapSource:
 			return {
 				...state,
-				source: action.imageSource,
+				source: action.imageSource
 			};
 		default:
 			return state;

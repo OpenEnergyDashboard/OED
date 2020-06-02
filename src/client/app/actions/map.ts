@@ -3,7 +3,7 @@ import * as t from '../types/redux/map';
 import {MapModeTypes} from '../types/redux/map';
 
 export function updateMapSource(imageSource: string): Thunk {
-	return  (dispatch) => {
+	return dispatch => {
 		// dispatch(stallMapLoad());
 		dispatch(uploadMapSource(imageSource));
 		// dispatch(releaseMapSourceLock());
@@ -11,7 +11,7 @@ export function updateMapSource(imageSource: string): Thunk {
 	};
 }
 
-function uploadMapSource(imageSource: string): t.UpdateMapSourceAction {
+export function uploadMapSource(imageSource: string): t.UpdateMapSourceAction {
 	return { type: ActionType.UpdateMapSource, imageSource };
 }
 

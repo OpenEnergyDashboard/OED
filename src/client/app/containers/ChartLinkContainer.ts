@@ -22,9 +22,9 @@ function mapStateToProps(state: State) {
 			break;
 		case 'line':
 			linkText += `&serverRange=${state.graph.timeInterval.toString()}`;
-			//under construction;
+			// under construction;
 			let root:any = document.getElementById('root');
-			// linkText += `&displayRange=${state.graph.timeInterval.toString().split('_')}`;		
+			// linkText += `&displayRange=${state.graph.timeInterval.toString().split('_')}`;
 			break;
 		case 'compare':
 			linkText += `&comparePeriod=${state.graph.comparePeriod}`;
