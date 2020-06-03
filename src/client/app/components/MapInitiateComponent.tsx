@@ -4,7 +4,6 @@
  */
 
 import * as React from 'react';
-import Button from 'reactstrap/lib/Button';
 import {MapModeTypes} from '../types/redux/map';
 
 interface MapInitiateProps {
@@ -19,9 +18,10 @@ interface MapInitiateState {
 }
 
 export default class MapInitiateComponent extends React.Component<MapInitiateProps, MapInitiateState> {
-	private static notifyLoadComplete() {
+	private readonly fileInput: any;
+	private notifyLoadComplete() {
 		// change isLoading to false;
-		window.alert('Map load complete.');
+		window.alert(`Map load complete from item ${this.fileInput.current.files[0].name}.`);
 	}
 
 	constructor(props: MapInitiateProps) {
@@ -30,36 +30,46 @@ export default class MapInitiateComponent extends React.Component<MapInitiatePro
 			source: '',
 			confirmed: false
 		};
-		this.getURI = this.getURI.bind(this);
+		this.fileInput = React.createRef();
+		this.handleInput = this.handleInput.bind(this);
 		this.confirmUpload = this.confirmUpload.bind(this);
+		this.notifyLoadComplete = this.notifyLoadComplete.bind(this);
 	}
 
 	public render() {
 		return (
-			<div id='initiateContainer'>
-				<p>Upload map image URI to begin.</p>
+			<form onSubmit={this.confirmUpload}>
 				<label>
-					<textarea cols={50}/>
+					Upload map image URI to begin.
+					<input type="file" ref={this.fileInput} />
 				</label>
-				<Button onClick={() => this.confirmUpload}>Confirm</Button>
-			</div>
+				<br />
+				<input type="submit" value="Submit" />
+			</form>
 		);
 	}
 
-	private confirmUpload() {
-		this.getURI();
-		this.props.uploadMapImage(this.state.source);
-		MapInitiateComponent.notifyLoadComplete();
-
+	private async confirmUpload(event: any) {
+		await this.handleInput(event);
+		await this.props.uploadMapImage(this.state.source);
+		this.notifyLoadComplete();
+		this.props.updateMapMode(MapModeTypes.calibrate);
 	}
 
-	private getURI() {
-		const input = document.querySelector('textarea');
-		if (input) {
-			const imageURI = input.value;
+	private async handleInput(event: any) {
+		event.preventDefault();
+		const imageURI = this.getURI();
+		if (typeof imageURI === 'string') {
 			this.setState({
 				source: imageURI
 			});
 		}
+	}
+
+	private getURI() {
+		const file = this.fileInput.current.files[0];
+		let fileReader = new FileReader();
+		fileReader.readAsText(file);
+		return fileReader.result;
 	}
 }
