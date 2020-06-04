@@ -1,10 +1,14 @@
+/* This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this
+ * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
+
+import * as React from 'react';
+import {MapModeTypes} from '../types/redux/map';
+
 /**
  * accepts image URI data stored in a .txt file as user input,
  * used to initiate map view for next stage of calibration.
  */
-
-import * as React from 'react';
-import {MapModeTypes} from '../types/redux/map';
 
 interface MapInitiateProps {
 	isLoading: boolean;
@@ -14,7 +18,6 @@ interface MapInitiateProps {
 
 interface MapInitiateState {
 	source: string;
-	confirmed: boolean;
 }
 
 export default class MapInitiateComponent extends React.Component<MapInitiateProps, MapInitiateState> {
@@ -27,8 +30,7 @@ export default class MapInitiateComponent extends React.Component<MapInitiatePro
 	constructor(props: MapInitiateProps) {
 		super(props);
 		this.state = {
-			source: '',
-			confirmed: false
+			source: ''
 		};
 		this.fileInput = React.createRef();
 		this.handleInput = this.handleInput.bind(this);
