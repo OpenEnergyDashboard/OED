@@ -45,6 +45,7 @@ export default class MapInitiateComponent extends React.Component<MapInitiatePro
 			<form onSubmit={this.confirmUpload}>
 				<label>
 					Upload map image URI to begin.
+					<br />
 					<input type="file" ref={this.fileInput} />
 				</label>
 				<br />
