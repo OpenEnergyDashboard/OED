@@ -6,8 +6,10 @@ import * as React from 'react';
 import {MapModeTypes} from '../types/redux/map';
 
 /**
- * accepts image URI data stored in a .txt file as user input,
- * used to initiate map view for next stage of calibration.
+ * Accepts image file from user upload,
+ * parse the file into DataURL,
+ * store dataURL in state to use for calibration at next stage,
+ * Other configurations could also be selected during this phase;
  */
 
 interface MapInitiateProps {
