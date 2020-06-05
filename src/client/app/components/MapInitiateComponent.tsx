@@ -23,8 +23,8 @@ interface MapInitiateState {
 export default class MapInitiateComponent extends React.Component<MapInitiateProps, MapInitiateState> {
 	private readonly fileInput: any;
 	private notifyLoadComplete() {
-		// change isLoading to false;
 		window.alert(`Map load complete from item ${this.fileInput.current.files[0].name}.`);
+		console.log(`currState: ${this.state.source}`);
 	}
 
 	constructor(props: MapInitiateProps) {
@@ -60,18 +60,26 @@ export default class MapInitiateComponent extends React.Component<MapInitiatePro
 
 	private async handleInput(event: any) {
 		event.preventDefault();
-		const imageURI = this.getURI();
-		if (typeof imageURI === 'string') {
-			this.setState({
-				source: imageURI
+		try {
+			const imageURL = await this.getDataURL();
+			await this.setState({
+				source: imageURL
 			});
+		} catch (err) {
+			console.log(err);
 		}
 	}
 
-	private getURI() {
-		const file = this.fileInput.current.files[0];
-		let fileReader = new FileReader();
-		fileReader.readAsText(file);
-		return fileReader.result;
+	private getDataURL(): Promise<string> {
+		return new Promise((resolve, reject) => {
+			const file = this.fileInput.current.files[0];
+			let fileReader = new FileReader();
+			fileReader.onloadend = () => {
+				// @ts-ignore
+				resolve(fileReader.result);
+			}
+			fileReader.onerror = reject;
+			fileReader.readAsDataURL(file);
+		})
 	}
 }
