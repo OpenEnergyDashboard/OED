@@ -4,6 +4,7 @@
 
 import * as React from 'react';
 import {MapModeTypes} from '../types/redux/map';
+import {MapChartState} from './MapChartComponent';
 
 /**
  * Accepts image file from user upload,
@@ -13,27 +14,19 @@ import {MapModeTypes} from '../types/redux/map';
  */
 
 interface MapInitiateProps {
-	isLoading: boolean;
-	uploadMapImage(imageURI: string): Promise<any>;
 	updateMapMode(nextMode: MapModeTypes): any;
+	onSourceChange(sourceURL: string): any;
 }
 
-interface MapInitiateState {
-	source: string;
-}
-
-export default class MapInitiateComponent extends React.Component<MapInitiateProps, MapInitiateState> {
+export default class MapInitiateComponent extends React.Component<MapInitiateProps, MapChartState> {
 	private readonly fileInput: any;
 	private notifyLoadComplete() {
 		window.alert(`Map load complete from item ${this.fileInput.current.files[0].name}.`);
-		console.log(`currState: ${this.state.source}`);
 	}
+
 
 	constructor(props: MapInitiateProps) {
 		super(props);
-		this.state = {
-			source: ''
-		};
 		this.fileInput = React.createRef();
 		this.handleInput = this.handleInput.bind(this);
 		this.confirmUpload = this.confirmUpload.bind(this);
@@ -44,7 +37,7 @@ export default class MapInitiateComponent extends React.Component<MapInitiatePro
 		return (
 			<form onSubmit={this.confirmUpload}>
 				<label>
-					Upload map image URI to begin.
+					Upload map image to begin.
 					<br />
 					<input type="file" ref={this.fileInput} />
 				</label>
@@ -56,7 +49,6 @@ export default class MapInitiateComponent extends React.Component<MapInitiatePro
 
 	private async confirmUpload(event: any) {
 		await this.handleInput(event);
-		await this.props.uploadMapImage(this.state.source);
 		this.notifyLoadComplete();
 		this.props.updateMapMode(MapModeTypes.calibrate);
 	}
@@ -65,9 +57,7 @@ export default class MapInitiateComponent extends React.Component<MapInitiatePro
 		event.preventDefault();
 		try {
 			const imageURL = await this.getDataURL();
-			await this.setState({
-				source: imageURL
-			});
+			await this.props.onSourceChange(imageURL);
 		} catch (err) {
 			console.log(err);
 		}

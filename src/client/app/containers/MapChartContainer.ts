@@ -5,6 +5,9 @@
 import {connect} from 'react-redux';
 import { State } from '../types/redux/state';
 import MapChartComponent from '../components/MapChartComponent';
+import {updateMapMode, updateMapSource} from '../actions/map';
+import {Dispatch} from '../types/redux/actions';
+import {MapModeTypes} from '../types/redux/map';
 
 function mapStateToProps(state: State) {
 	return {
@@ -12,4 +15,12 @@ function mapStateToProps(state: State) {
 		isLoading: state.map.isLoading
 	};
 }
-export default connect(mapStateToProps)(MapChartComponent);
+
+function mapDispatchToProps(dispatch: Dispatch) {
+	return {
+		uploadMapImage: (imageURI: string) => dispatch(updateMapSource(imageURI)),
+		updateMapMode: (nextMode: MapModeTypes) => dispatch(updateMapMode(nextMode)),
+	}
+}
+
+export default connect(mapStateToProps, mapDispatchToProps)(MapChartComponent);
