@@ -16,43 +16,53 @@ interface MapChartProps {
 }
 
 export interface MapChartState {
-	source: string;
+	mapImage: HTMLImageElement;
 	calibration: MapCalibrationData;
 }
 
 export interface MapCalibrationData {
 	numDataPoint: number;
-	graphCoordinates: number[];
-	gpsCoordinates: number[]; // Todo: check gps storing object and refactor data structure to store gps coordinates;
+	graphCoordinates: [];
+	gpsCoordinates: []; // Todo: check gps storing object and refactor data structure to store gps coordinates;
 }
 
 export default class MapChartComponent extends React.Component<MapChartProps, MapChartState> {
 	constructor(props: MapChartProps) {
 		super(props);
 		this.state = {
-			source: '',
+			mapImage: new Image(),
 			calibration: {
 				numDataPoint: 0,
 				graphCoordinates: [],
 				gpsCoordinates: [],
 			},
 		};
-		this.handleImageSourceChange.bind(this);
 	}
 
 	public render() {
+		const graphCoordinates = this.state.calibration.graphCoordinates;
+		const gpsCoordinates = this.state.calibration.gpsCoordinates;
 		if (this.props.mode === MapModeTypes.initiate) {
 			return (
-				<MapInitiateComponent updateMapMode={this.props.updateMapMode} onSourceChange={this.handleImageSourceChange.bind(this)}/>
+				<MapInitiateComponent
+					updateMapMode={this.props.updateMapMode}
+					onSourceChange={this.handleImageSourceChange.bind(this)}
+				/>
 			);
 		} else if (this.props.mode === MapModeTypes.calibrate) {
 			return (
 				<div id={'MapCalibrationContainer'}>
-					<MapCalibration_ChartDisplayComponent data={[]} source={this.state.source}/>
+					<MapCalibration_ChartDisplayComponent
+						mapImage={this.state.mapImage}
+						graphCoordinates={graphCoordinates}
+						gpsCoordinates={gpsCoordinates}
+					 	updateGraphCoordinate={this.setCurrentGraphCoordinates}
+					/>
 					<MapCalibration_InfoDisplayComponent
-						numDataPoint={this.state.calibration.numDataPoint}
-						graphCoordinates={this.state.calibration.gpsCoordinates}
-						gpsCoordinates={this.state.calibration.gpsCoordinates}
+						calibrate={this.calibrate.bind(this)}
+						onReset={this.resetCurrent.bind(this)}
+						inputDisplay={this.checkCurrent()}
+						calibrationReady={this.checkIfReady()}
 					/>
 				</div>
 			);
@@ -64,8 +74,31 @@ export default class MapChartComponent extends React.Component<MapChartProps, Ma
 	}
 
 	public handleImageSourceChange(dataURL: string) {
+		let image = this.state.mapImage;
+		image.src = dataURL;
 		this.setState({
-			source: dataURL
+			mapImage: image,
 		});
+	}
+
+	setCurrentGraphCoordinates() {
+
+	}
+
+	resetCurrent() {
+
+	}
+
+	private checkIfReady() {
+		const calibrationThreshold = 3;
+		return this.state.calibration.numDataPoint >= calibrationThreshold;
+	}
+
+	private checkCurrent() {
+		return false;
+	}
+
+	calibrate() {
+
 	}
 }

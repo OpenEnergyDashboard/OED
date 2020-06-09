@@ -1,14 +1,18 @@
-import PlotlyChart, {IPlotlyChartProps} from 'react-plotlyjs-ts';
+import PlotlyChart from 'react-plotlyjs-ts';
+import * as plotly from 'plotly.js';
 import * as React from 'react';
 
-interface MapCalibrationProps extends IPlotlyChartProps {
-	source: string;
-	data: any;
+interface MapCalibrationProps {
+	mapImage: HTMLImageElement;
+	graphCoordinates: number[][];
+	gpsCoordinates: number[][];
+	updateGraphCoordinate(currentPoint: object): any;
 }
 
 export default class MapCalibration_ChartDisplayComponent extends React.Component<MapCalibrationProps, any>{
 	constructor(props: MapCalibrationProps) {
 		super(props);
+		this.handlePointClick = this.handlePointClick.bind(this);
 	}
 
 	public render() {
@@ -44,9 +48,16 @@ export default class MapCalibration_ChartDisplayComponent extends React.Componen
 			return trace;
 		}
 
-		let x = [500];
-		let y = [500];
-		let texts = ['placeHolder'];
+		let x: number[] = [];
+		let y: number[] = [];
+		let texts: string[] = [];
+
+		let graph = this.props.graphCoordinates;
+		let gps = this.props.gpsCoordinates;
+		for (let i = 0; i < graph.length; i++) {
+			x.push(graph[i][0]);
+		}
+
 		let backTrace = createBackgroundGrid();
 		let trace1 = {
 			x: x,
@@ -64,8 +75,7 @@ export default class MapCalibration_ChartDisplayComponent extends React.Componen
 		};
 		let data = [backTrace,trace1];
 
-		const source = this.props.source;
-		console.log(`layout source: ${this.props.source}`);
+		const source = this.props.mapImage.src;
 
 		const layout: any = {
 			width: 1000,
@@ -100,8 +110,31 @@ export default class MapCalibration_ChartDisplayComponent extends React.Componen
 		};
 
 		return (
-			<PlotlyChart data={data} layout={layout}/>
+			<PlotlyChart data={data} layout={layout} onClick={() => this.handlePointClick.bind(this)}/>
 		);
+	}
+
+	private handlePointClick(event: plotly.PlotMouseEvent) {
+		let currentPoint = this.getGraphCoordinates(event);
+		this.props.updateGraphCoordinate(currentPoint);
+	}
+
+	private getGraphCoordinates(event: plotly.PlotMouseEvent) {
+		// both points will be captured if there is already a datapoint nearby
+		for(let i=0; i < event.points.length; i++) {
+			let pn = event.points[i].pointNumber;
+			let tn = event.points[i].curveNumber;
+			console.log(`trace number: ${tn}`);
+		}
+		// actual code;
+		const xValue = event.points[0].x as number;
+		const yValue = event.points[0].y as number;
+		const currentPoint = {
+			x: xValue.toFixed(6),
+			y: yValue.toFixed(6),
+		}
+		window.alert(`Current point: ${currentPoint}, \nPlease enter GPS coordinates for this point below.`);
+		return currentPoint;
 	}
 
 }

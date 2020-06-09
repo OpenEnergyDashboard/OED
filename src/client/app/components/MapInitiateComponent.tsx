@@ -57,6 +57,8 @@ export default class MapInitiateComponent extends React.Component<MapInitiatePro
 		event.preventDefault();
 		try {
 			const imageURL = await this.getDataURL();
+			let image = new Image();
+			image.src = imageURL;
 			await this.props.onSourceChange(imageURL);
 		} catch (err) {
 			console.log(err);
