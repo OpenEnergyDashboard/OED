@@ -1,31 +1,58 @@
-export class CartesianPoint {
+export interface CartesianPoint {
 	x: number;
 	y: number;
-	constructor(x: number, y: number) {
-		this.x = x;
-		this.y = y;
-	}
 }
 
-export class GPSPoint {
+export interface GPSPoint {
 	latitude: number;
 	longitude: number;
-	constructor(latitude: number, longitude: number) {
-		this.latitude = latitude;
-		this.longitude = longitude;
+}
+
+interface MapScale {
+	degreePerUnitX: number;
+	degreePerUnitY: number;
+}
+
+export class CalibratedPoint {
+	private cartesian: CartesianPoint;
+	private gps: GPSPoint;
+
+	constructor() {
+	}
+
+	public setCartesian(cartesian: CartesianPoint) {
+		this.cartesian = cartesian;
+	}
+
+	public setGPS(gps: GPSPoint) {
+		this.gps = gps;
+	}
+
+	public isComplete() {
+		return this.cartesian !== undefined && this.gps !== undefined;
+	}
+
+	public hasCartesian() {
+		return this.cartesian !== undefined;
+	}
+
+	public getGPS() {
+		return this.gps;
+	}
+
+	public getCartesian() {
+		return this.cartesian;
 	}
 }
 
-export function calibrate(gpsCoordinates: GPSPoint[], graphCoordinates: CartesianPoint[], imageDimentions: number[]) {
-	const oppositeCornerX = imageDimentions[0];
-	const oppositeCornerY = imageDimentions[1];
+export default function calibrate(calibrationSet: CalibratedPoint[], imageDimensions: number[]) {
+	const oppositeCornerX = imageDimensions[0];
+	const oppositeCornerY = imageDimensions[1];
 	// calculate scale by taking average of (n choose 2) of data points;
-	let scales = [];
-	for (let i = 0; i < gpsCoordinates.length; i++) {
-		for (let j = i+1; j < gpsCoordinates.length; j++) {
-			let chooseGPSCoordinates = [gpsCoordinates[i],gpsCoordinates[j]];
-			let chooseGraphCoordinates = [graphCoordinates[i],graphCoordinates[j]];
-			let mapScale = calculateScale(chooseGPSCoordinates, chooseGraphCoordinates);
+	let scales: MapScale[] = [];
+	for (let i = 0; i < calibrationSet.length; i++) {
+		for (let j = i+1; j < calibrationSet.length; j++) {
+			let mapScale: MapScale = calculateScale(calibrationSet[i], calibrationSet[j]);
 			scales.push(mapScale);
 		}
 	}
@@ -33,15 +60,15 @@ export function calibrate(gpsCoordinates: GPSPoint[], graphCoordinates: Cartesia
 	let YScaleSum = 0;
 	let numDataPoints = scales.length;
 	for (let i = 0; i < numDataPoints; i++) {
-		XScaleSum += scales[i][xIndex];
-		YScaleSum += scales[i][yIndex];
+		XScaleSum += scales[i].degreePerUnitX;
+		YScaleSum += scales[i].degreePerUnitY;
 	}
 	const degreePerUnitX = XScaleSum/numDataPoints;
 	const degreePerUnitY = YScaleSum/numDataPoints;
 
 	// calculate gps coordinates for origin and the point on its opposite corner;
-	let originLatitude = gpsCoordinates[0][latitudeIndex] - degreePerUnitY * graphCoordinates[0][yIndex];
-	let originLongitude = gpsCoordinates[0][longitudeIndex] - degreePerUnitX * graphCoordinates[0][xIndex];
+	let originLatitude = calibrationSet[0].getGPS().latitude - degreePerUnitY * calibrationSet[0].getCartesian().y;
+	let originLongitude = calibrationSet[0].getGPS().longitude - degreePerUnitX * calibrationSet[0].getCartesian().x;
 	let originCoordinate = [originLatitude, originLongitude];
 
 	let oppositeCornerLatitude = originLatitude + oppositeCornerY * degreePerUnitY;
@@ -50,14 +77,14 @@ export function calibrate(gpsCoordinates: GPSPoint[], graphCoordinates: Cartesia
 
 }
 
-function calculateScale(gpsCoordinates: number[][], graphCoordinates: number[][]) {
-	let deltaLatitude = gpsCoordinates[0][latitudeIndex] - gpsCoordinates[1][latitudeIndex];
-	let deltaYInUnits = graphCoordinates[0][yIndex] - graphCoordinates[1][yIndex];
+function calculateScale(p1: CalibratedPoint, p2: CalibratedPoint) {
+	let deltaLatitude = p1.getGPS().latitude - p2.getGPS().latitude;
+	let deltaYInUnits = p1.getCartesian().y - p2.getCartesian().y;
 	let degreePerUnitY = deltaLatitude/deltaYInUnits;
 
-	let deltaLongitude = gpsCoordinates[0][longitudeIndex] - gpsCoordinates[1][longitudeIndex];
-	let deltaXInUnits = graphCoordinates[0][xIndex] - graphCoordinates[1][xIndex];
+	let deltaLongitude = p1.getGPS().longitude - p2.getGPS().longitude;
+	let deltaXInUnits = p1.getCartesian().x - p2.getCartesian().x;
 	let degreePerUnitX = deltaLongitude/deltaXInUnits;
 
-	return [degreePerUnitX, degreePerUnitY];
+	return {degreePerUnitX, degreePerUnitY};
 }

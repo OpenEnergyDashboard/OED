@@ -7,6 +7,7 @@ import { MapModeTypes } from '../types/redux/map';
 import MapInitiateComponent from './MapInitiateComponent';
 import MapCalibration_InfoDisplayComponent from './MapCalibration_InfoDisplayComponent';
 import MapCalibration_ChartDisplayComponent from './MapCalibration_ChartDisplayComponent';
+import calibrate, {CartesianPoint, GPSPoint, CalibratedPoint} from '../utils/calibration';
 
 interface MapChartProps {
 	mode: MapModeTypes;
@@ -15,15 +16,10 @@ interface MapChartProps {
 	updateMapMode(nextMode: MapModeTypes): any;
 }
 
-export interface MapChartState {
+interface MapChartState {
 	mapImage: HTMLImageElement;
-	calibration: MapCalibrationData;
-}
-
-export interface MapCalibrationData {
-	numDataPoint: number;
-	graphCoordinates: [];
-	gpsCoordinates: []; // Todo: check gps storing object and refactor data structure to store gps coordinates;
+	calibrationSet: CalibratedPoint[];
+	currentPoint: CalibratedPoint;
 }
 
 export default class MapChartComponent extends React.Component<MapChartProps, MapChartState> {
@@ -31,17 +27,12 @@ export default class MapChartComponent extends React.Component<MapChartProps, Ma
 		super(props);
 		this.state = {
 			mapImage: new Image(),
-			calibration: {
-				numDataPoint: 0,
-				graphCoordinates: [],
-				gpsCoordinates: [],
-			},
+			calibrationSet: [],
+			currentPoint: new CalibratedPoint(),
 		};
 	}
 
 	public render() {
-		const graphCoordinates = this.state.calibration.graphCoordinates;
-		const gpsCoordinates = this.state.calibration.gpsCoordinates;
 		if (this.props.mode === MapModeTypes.initiate) {
 			return (
 				<MapInitiateComponent
@@ -54,15 +45,15 @@ export default class MapChartComponent extends React.Component<MapChartProps, Ma
 				<div id={'MapCalibrationContainer'}>
 					<MapCalibration_ChartDisplayComponent
 						mapImage={this.state.mapImage}
-						graphCoordinates={graphCoordinates}
-						gpsCoordinates={gpsCoordinates}
-					 	updateGraphCoordinate={this.setCurrentGraphCoordinates}
+						acceptedPoints={this.state.calibrationSet}
+					 	updateGraphCoordinates={this.setCurrentGraphCoordinates.bind(this)}
 					/>
 					<MapCalibration_InfoDisplayComponent
-						calibrate={this.calibrate.bind(this)}
+						calibrate={this.prepareDataToCalibration.bind(this)}
 						onReset={this.resetCurrent.bind(this)}
 						inputDisplay={this.checkCurrent()}
 						calibrationReady={this.checkIfReady()}
+						updateGPSCoordinates={this.setCurrentGPSCoordinates.bind(this)}
 					/>
 				</div>
 			);
@@ -81,24 +72,50 @@ export default class MapChartComponent extends React.Component<MapChartProps, Ma
 		});
 	}
 
-	setCurrentGraphCoordinates() {
-
+	setCurrentGraphCoordinates(currentCartesian: CartesianPoint) {
+		let current = this.state.currentPoint;
+		current.setCartesian(currentCartesian);
+		this.setState({
+			currentPoint: current
+		});
 	}
 
-	resetCurrent() {
+	setCurrentGPSCoordinates(currentGPS: GPSPoint) {
+		let current = this.state.currentPoint;
+		current.setGPS(currentGPS);
+		this.setState({
+			currentPoint: current
+		})
+	}
 
+	/**
+	 *  when user wants to cancel a selected point, clear current point's data,
+	 */
+	resetCurrent() {
+		this.setState({
+			currentPoint: new CalibratedPoint()
+		})
 	}
 
 	private checkIfReady() {
 		const calibrationThreshold = 3;
-		return this.state.calibration.numDataPoint >= calibrationThreshold;
+		return this.state.calibrationSet.length >= calibrationThreshold;
 	}
 
+	/**
+	 * check if it's necessary to get gps data for current point
+	 */
 	private checkCurrent() {
-		return false;
+		return this.state.currentPoint.hasCartesian();
 	}
 
-	calibrate() {
-
+	/**
+	 *  prepare data to required formats to pass it to function calculating mapScales
+	 */
+	prepareDataToCalibration() {
+		const imageDimensions = [this.state.mapImage.width, this.state.mapImage.height];
+		calibrate(
+			this.state.calibrationSet,
+			imageDimensions);
 	}
 }

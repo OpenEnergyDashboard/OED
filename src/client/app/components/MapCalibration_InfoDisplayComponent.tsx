@@ -3,14 +3,14 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
 
 import * as React from 'react';
-import {MapModeTypes} from '../types/redux/map';
-import {MapCalibrationData} from './MapChartComponent';
+import {GPSPoint} from '../utils/calibration';
 
 interface InfoDisplayProps {
 	onReset: any;
 	calibrate: any;
 	inputDisplay: boolean;
 	calibrationReady: boolean;
+	updateGPSCoordinates(gpsCoordinate: GPSPoint): any;
 }
 
 export default class MapCalibration_InfoDisplayComponent extends React.Component<InfoDisplayProps, {}> {
@@ -21,13 +21,14 @@ export default class MapCalibration_InfoDisplayComponent extends React.Component
 		return (
 			<div id='UserInput'>
 				{this.props.inputDisplay &&
-					<div id='inputField' className="input"> {/*Todo: find new place to store css properties: display = none*/}
+					<div id='inputField' className="input">
 						<p id='inputDescription'/>
 						<label>
 							<textarea cols={50}/>
 						</label>
+						<br/>
 						<button id='acceptInput'>Ok</button>
-						<button id='cancelInput' onClick={this.resetInputField}>Cancel</button>
+						<button id='cancelInput' onClick={this.resetInputField.bind(this)}>Cancel</button>
 					</div>
 				}
 				{this.props.calibrationReady &&

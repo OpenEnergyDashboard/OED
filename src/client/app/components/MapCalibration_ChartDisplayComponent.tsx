@@ -1,64 +1,28 @@
 import PlotlyChart from 'react-plotlyjs-ts';
 import * as plotly from 'plotly.js';
 import * as React from 'react';
+import {CalibratedPoint, CartesianPoint} from '../utils/calibration';
 
 interface MapCalibrationProps {
 	mapImage: HTMLImageElement;
-	graphCoordinates: number[][];
-	gpsCoordinates: number[][];
-	updateGraphCoordinate(currentPoint: object): any;
+	acceptedPoints: CalibratedPoint[];
+	updateGraphCoordinates(currentPoint: CartesianPoint): any;
 }
 
-export default class MapCalibration_ChartDisplayComponent extends React.Component<MapCalibrationProps, any>{
+export default class MapCalibration_ChartDisplayComponent extends React.Component<MapCalibrationProps, {}>{
 	constructor(props: MapCalibrationProps) {
 		super(props);
 		this.handlePointClick = this.handlePointClick.bind(this);
+		this.getGraphCoordinates = this.getGraphCoordinates.bind(this);
+		this.createBackgroundGrid = this.createBackgroundGrid.bind(this);
 	}
 
 	public render() {
-		function createBackgroundGrid() {
-			let x = [];
-			let y = [];
-			for (let i = 0; i < 500; i = i + 0.1) {
-				x.push(i);
-			}
-			for (let j = 0; j < 500; j = j + 0.1) {
-				y.push(j);
-			}
-			let z = [];
-			for (let j = 0; j < y.length; j++) {
-				let temp = [];
-				for (let k = 0; k < x.length; k++) {
-					temp.push(0);
-				}
-				z.push(temp);
-			}
+		let x = [500];
+		let y = [500];
+		let texts = ['placeHolder'];
 
-			let trace = {
-				x: x,
-				y: y,
-				z: z,
-				type: 'heatmap',
-				colorscale: [['0.0', 'rgba(0,0,0,0.97)'], ['1.0', 'rgb(255, 255, 255, 0.5)']],
-				xgap: 1,
-				ygap: 1,
-				hoverinfo: 'x',
-				showscale: false
-			};
-			return trace;
-		}
-
-		let x: number[] = [];
-		let y: number[] = [];
-		let texts: string[] = [];
-
-		let graph = this.props.graphCoordinates;
-		let gps = this.props.gpsCoordinates;
-		for (let i = 0; i < graph.length; i++) {
-			x.push(graph[i][0]);
-		}
-
-		let backTrace = createBackgroundGrid();
+		let backTrace = this.createBackgroundGrid();
 		let trace1 = {
 			x: x,
 			y: y,
@@ -110,17 +74,49 @@ export default class MapCalibration_ChartDisplayComponent extends React.Componen
 		};
 
 		return (
-			<PlotlyChart data={data} layout={layout} onClick={() => this.handlePointClick.bind(this)}/>
+			<PlotlyChart data={data} layout={layout} onClick={this.handlePointClick.bind(this)}/>
 		);
+	}
+
+	private createBackgroundGrid() {
+		let x = [];
+		let y = [];
+		for (let i = 0; i < 500; i = i + 0.1) {
+			x.push(i);
+		}
+		for (let j = 0; j < 500; j = j + 0.1) {
+			y.push(j);
+		}
+		let z = [];
+		for (let j = 0; j < y.length; j++) {
+			let temp = [];
+			for (let k = 0; k < x.length; k++) {
+				temp.push(0);
+			}
+			z.push(temp);
+		}
+
+		let trace = {
+			x: x,
+			y: y,
+			z: z,
+			type: 'heatmap',
+			colorscale: [['0.0', 'rgba(0,0,0,0.97)'], ['1.0', 'rgb(255, 255, 255, 0.5)']],
+			xgap: 1,
+			ygap: 1,
+			hoverinfo: 'x',
+			showscale: false
+		};
+		return trace;
 	}
 
 	private handlePointClick(event: plotly.PlotMouseEvent) {
 		let currentPoint = this.getGraphCoordinates(event);
-		this.props.updateGraphCoordinate(currentPoint);
+		this.props.updateGraphCoordinates(currentPoint);
 	}
 
 	private getGraphCoordinates(event: plotly.PlotMouseEvent) {
-		// both points will be captured if there is already a datapoint nearby
+		// both points will be captured if there is already a data point nearby
 		for(let i=0; i < event.points.length; i++) {
 			let pn = event.points[i].pointNumber;
 			let tn = event.points[i].curveNumber;
@@ -129,9 +125,9 @@ export default class MapCalibration_ChartDisplayComponent extends React.Componen
 		// actual code;
 		const xValue = event.points[0].x as number;
 		const yValue = event.points[0].y as number;
-		const currentPoint = {
-			x: xValue.toFixed(6),
-			y: yValue.toFixed(6),
+		const currentPoint: CartesianPoint = {
+			x: Number(xValue.toFixed(6)),
+			y: Number(yValue.toFixed(6)),
 		}
 		window.alert(`Current point: ${currentPoint}, \nPlease enter GPS coordinates for this point below.`);
 		return currentPoint;

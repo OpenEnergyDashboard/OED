@@ -4,7 +4,6 @@
 
 import * as React from 'react';
 import {MapModeTypes} from '../types/redux/map';
-import {MapChartState} from './MapChartComponent';
 
 /**
  * Accepts image file from user upload,
@@ -18,7 +17,7 @@ interface MapInitiateProps {
 	onSourceChange(sourceURL: string): any;
 }
 
-export default class MapInitiateComponent extends React.Component<MapInitiateProps, MapChartState> {
+export default class MapInitiateComponent extends React.Component<MapInitiateProps, {} > {
 	private readonly fileInput: any;
 	private notifyLoadComplete() {
 		window.alert(`Map load complete from item ${this.fileInput.current.files[0].name}.`);
