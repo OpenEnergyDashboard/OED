@@ -20,6 +20,7 @@ interface MapChartState {
 	mapImage: HTMLImageElement;
 	calibrationSet: CalibratedPoint[];
 	currentPoint: CalibratedPoint;
+	result: number[][];
 }
 
 export default class MapChartComponent extends React.Component<MapChartProps, MapChartState> {
@@ -29,6 +30,7 @@ export default class MapChartComponent extends React.Component<MapChartProps, Ma
 			mapImage: new Image(),
 			calibrationSet: [],
 			currentPoint: new CalibratedPoint(),
+			result: []
 		};
 	}
 
@@ -49,10 +51,9 @@ export default class MapChartComponent extends React.Component<MapChartProps, Ma
 					 	updateGraphCoordinates={this.setCurrentGraphCoordinates.bind(this)}
 					/>
 					<MapCalibration_InfoDisplayComponent
-						calibrate={this.prepareDataToCalibration.bind(this)}
 						onReset={this.resetCurrent.bind(this)}
-						inputDisplay={this.checkCurrent()}
-						calibrationReady={this.checkIfReady()}
+						currentPoint={this.state.currentPoint}
+						calibrationResults={this.state.result}
 						updateGPSCoordinates={this.setCurrentGPSCoordinates.bind(this)}
 					/>
 				</div>
@@ -83,9 +84,15 @@ export default class MapChartComponent extends React.Component<MapChartProps, Ma
 	setCurrentGPSCoordinates(currentGPS: GPSPoint) {
 		let current = this.state.currentPoint;
 		current.setGPS(currentGPS);
-		this.setState({
-			currentPoint: current
-		})
+		if (this.state.currentPoint.isComplete()) {
+			let set = this.state.calibrationSet;
+			set.push(current);
+			this.setState({
+				calibrationSet: set,
+			})
+		}
+		this.prepareDataToCalibration();
+		this.resetCurrent();
 	}
 
 	/**
@@ -114,8 +121,11 @@ export default class MapChartComponent extends React.Component<MapChartProps, Ma
 	 */
 	prepareDataToCalibration() {
 		const imageDimensions = [this.state.mapImage.width, this.state.mapImage.height];
-		calibrate(
+		const result = calibrate(
 			this.state.calibrationSet,
 			imageDimensions);
+		this.setState({
+			result: result
+		});
 	}
 }

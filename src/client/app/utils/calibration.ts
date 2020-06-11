@@ -40,8 +40,16 @@ export class CalibratedPoint {
 		return this.gps;
 	}
 
+	public getGPSString() {
+		return `latitude: ${this.gps.latitude}, longitude: ${this.gps.longitude}`;
+	}
+
 	public getCartesian() {
 		return this.cartesian;
+	}
+
+	public getCartesianString() {
+		return `x: ${this.cartesian.x}, y: ${this.cartesian.y}`;
 	}
 }
 
@@ -74,7 +82,7 @@ export default function calibrate(calibrationSet: CalibratedPoint[], imageDimens
 	let oppositeCornerLatitude = originLatitude + oppositeCornerY * degreePerUnitY;
 	let oppositeCornerLongitude = originLongitude + oppositeCornerX * degreePerUnitX;
 	let oppositeCornerCoordinate = [oppositeCornerLatitude, oppositeCornerLongitude];
-
+	return [originCoordinate, oppositeCornerCoordinate];
 }
 
 function calculateScale(p1: CalibratedPoint, p2: CalibratedPoint) {

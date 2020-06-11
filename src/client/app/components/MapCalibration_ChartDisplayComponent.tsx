@@ -14,13 +14,20 @@ export default class MapCalibration_ChartDisplayComponent extends React.Componen
 		super(props);
 		this.handlePointClick = this.handlePointClick.bind(this);
 		this.getGraphCoordinates = this.getGraphCoordinates.bind(this);
-		this.createBackgroundGrid = this.createBackgroundGrid.bind(this);
 	}
 
 	public render() {
-		let x = [500];
-		let y = [500];
-		let texts = ['placeHolder'];
+		let x: number[] = [];
+		let y: number[] = [];
+		let texts: string[] = [];
+
+		const points = this.props.acceptedPoints;
+		for (let i = 0; i < points.length; i++) {
+			const current = points[i];
+			x.push(current.getCartesian().x);
+			y.push(current.getCartesian().y);
+			texts.push(current.getGPSString());
+		}
 
 		let backTrace = this.createBackgroundGrid();
 		let trace1 = {
@@ -129,8 +136,7 @@ export default class MapCalibration_ChartDisplayComponent extends React.Componen
 			x: Number(xValue.toFixed(6)),
 			y: Number(yValue.toFixed(6)),
 		}
-		window.alert(`Current point: ${currentPoint}, \nPlease enter GPS coordinates for this point below.`);
+		window.alert(`Please enter GPS coordinates for this point below.`);
 		return currentPoint;
 	}
-
 }
