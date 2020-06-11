@@ -7,7 +7,7 @@ import { MapModeTypes } from '../types/redux/map';
 import MapInitiateComponent from './MapInitiateComponent';
 import MapCalibration_InfoDisplayComponent from './MapCalibration_InfoDisplayComponent';
 import MapCalibration_ChartDisplayComponent from './MapCalibration_ChartDisplayComponent';
-import calibrate, {CartesianPoint, GPSPoint, CalibratedPoint} from '../utils/calibration';
+import calibrate, {CartesianPoint, GPSPoint, CalibratedPoint, Dimensions} from '../utils/calibration';
 
 interface MapChartProps {
 	mode: MapModeTypes;
@@ -91,7 +91,7 @@ export default class MapChartComponent extends React.Component<MapChartProps, Ma
 				calibrationSet: set,
 			})
 		}
-		this.prepareDataToCalibration();
+		if (this.checkIfReady()) this.prepareDataToCalibration();
 		this.resetCurrent();
 	}
 
@@ -110,17 +110,13 @@ export default class MapChartComponent extends React.Component<MapChartProps, Ma
 	}
 
 	/**
-	 * check if it's necessary to get gps data for current point
-	 */
-	private checkCurrent() {
-		return this.state.currentPoint.hasCartesian();
-	}
-
-	/**
 	 *  prepare data to required formats to pass it to function calculating mapScales
 	 */
 	prepareDataToCalibration() {
-		const imageDimensions = [this.state.mapImage.width, this.state.mapImage.height];
+		const imageDimensions: Dimensions = {
+			width: this.state.mapImage.width,
+			height: this.state.mapImage.height
+		};
 		const result = calibrate(
 			this.state.calibrationSet,
 			imageDimensions);

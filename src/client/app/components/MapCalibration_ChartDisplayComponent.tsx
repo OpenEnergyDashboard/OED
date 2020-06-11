@@ -118,11 +118,13 @@ export default class MapCalibration_ChartDisplayComponent extends React.Componen
 	}
 
 	private handlePointClick(event: plotly.PlotMouseEvent) {
+		event.event.preventDefault();
 		let currentPoint = this.getGraphCoordinates(event);
 		this.props.updateGraphCoordinates(currentPoint);
 	}
 
 	private getGraphCoordinates(event: plotly.PlotMouseEvent) {
+		event.event.preventDefault();
 		// both points will be captured if there is already a data point nearby
 		for(let i=0; i < event.points.length; i++) {
 			let pn = event.points[i].pointNumber;
@@ -136,7 +138,6 @@ export default class MapCalibration_ChartDisplayComponent extends React.Componen
 			x: Number(xValue.toFixed(6)),
 			y: Number(yValue.toFixed(6)),
 		}
-		window.alert(`Please enter GPS coordinates for this point below.`);
 		return currentPoint;
 	}
 }

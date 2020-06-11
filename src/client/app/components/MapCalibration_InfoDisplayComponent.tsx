@@ -13,7 +13,11 @@ interface InfoDisplayProps {
 	updateGPSCoordinates(gpsCoordinate: GPSPoint): any;
 }
 
-export default class MapCalibration_InfoDisplayComponent extends React.Component<InfoDisplayProps, any> {
+interface InfoDisplayState {
+	value: string;
+}
+
+export default class MapCalibration_InfoDisplayComponent extends React.Component<InfoDisplayProps, InfoDisplayState> {
 	constructor(props: InfoDisplayProps) {
 		super(props);
 		this.state = {
@@ -24,7 +28,7 @@ export default class MapCalibration_InfoDisplayComponent extends React.Component
 		this.handleSubmit.bind(this);
 	}
 	render() {
-		const calibrationDisplay = `res: ${this.props.calibrationResults}`;
+		const calibrationDisplay = `res: ${(this.props.calibrationResults)? this.props.calibrationResults:'N/A'}`;
 		const currentData = this.props.currentPoint.hasCartesian()? this.props.currentPoint.getCartesianString():'null';
 		return (
 			<div id='UserInput'>
@@ -49,7 +53,7 @@ export default class MapCalibration_InfoDisplayComponent extends React.Component
 		this.props.onReset();
 	}
 
-	private handleSubmit(event: FormEvent) {
+	private handleSubmit = (event: FormEvent) => {
 		event.preventDefault();
 		const input = this.state.value;
 		const array = input.split(',').map((value:string) => parseFloat(value));
