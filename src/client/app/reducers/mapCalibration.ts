@@ -25,7 +25,7 @@ export default function mapCalibration(state = defaultState, action: MapCalibrat
 		case ActionType.UpdateMapSource:
 			return {
 				...state,
-				source: action.image
+				image: action.image
 			};
 		case ActionType.UpdateCurrentCartesian:
 			let changeCartesian = state.currentPoint.clone();
@@ -52,7 +52,7 @@ export default function mapCalibration(state = defaultState, action: MapCalibrat
 			return {
 				...state,
 				calibrationSet: calibrationSet,
-			}
+			};
 		default:
 			return state;
 	}

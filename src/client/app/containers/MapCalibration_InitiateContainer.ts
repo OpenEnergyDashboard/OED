@@ -15,4 +15,4 @@ function mapDispatchToProps(dispatch: Dispatch) {
 	};
 }
 
-export default connect(mapDispatchToProps)(MapCalibration_InitiateComponent);
+export default connect(null, mapDispatchToProps)(MapCalibration_InitiateComponent);

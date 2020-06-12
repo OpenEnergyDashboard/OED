@@ -8,8 +8,8 @@ import MapCalibrationComponent from '../components/MapCalibrationComponent';
 
 function mapStateToProps(state: State) {
 	return {
-		mode: state.map.mode,
-		isLoading: state.map.isLoading
+		mode: state.map.calibration.mode,
+		isLoading: state.map.calibration.isLoading,
 	};
 }
 

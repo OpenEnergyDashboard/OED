@@ -6,11 +6,12 @@ import PlotlyChart from 'react-plotlyjs-ts';
 import * as plotly from 'plotly.js';
 import * as React from 'react';
 import {CartesianPoint} from '../utils/calibration';
+import {PlotMouseEvent} from "plotly.js";
 
-interface CalibrationChartProps {
+export interface CalibrationChartProps {
 	data: object;
 	layout: object;
-	updateGraphCoordinates: any;
+	updateGraphCoordinates(coordinates: CartesianPoint): any;
 }
 
 export default class MapCalibration_ChartDisplayComponent extends React.Component<CalibrationChartProps, {}>{
@@ -22,27 +23,27 @@ export default class MapCalibration_ChartDisplayComponent extends React.Componen
 
 	public render() {
 		return (
-			<PlotlyChart data={this.props.data} layout={this.props.layout} onClick={this.handlePointClick.bind(this)}/>
+			<PlotlyChart data={this.props.data} layout={this.props.layout} onClick={({points, event}) => this.handlePointClick(points, event)}/>
 		);
 	}
 
-	private handlePointClick(event: plotly.PlotMouseEvent) {
-		event.event.preventDefault();
-		let currentPoint = this.getClickedCoordinates(event);
+	private handlePointClick(points: plotly.PlotDatum[], event: MouseEvent) {
+		event.preventDefault();
+		let currentPoint: CartesianPoint = this.getClickedCoordinates(points, event);
 		this.props.updateGraphCoordinates(currentPoint);
 	}
 
-	private getClickedCoordinates(event: plotly.PlotMouseEvent) {
-		event.event.preventDefault();
+	private getClickedCoordinates(points: plotly.PlotDatum[], event: MouseEvent) {
+		event.preventDefault();
 		// both points will be captured if there is already a data point nearby
-		for(let i=0; i < event.points.length; i++) {
-			let pn = event.points[i].pointNumber;
-			let tn = event.points[i].curveNumber;
+		for(let i=0; i < points.length; i++) {
+			let pn = points[i].pointNumber;
+			let tn = points[i].curveNumber;
 			console.log(`trace number: ${tn}`);
 		}
 		// actual code;
-		const xValue = event.points[0].x as number;
-		const yValue = event.points[0].y as number;
+		const xValue = points[0].x as number;
+		const yValue = points[0].y as number;
 		const clickedPoint: CartesianPoint = {
 			x: Number(xValue.toFixed(6)),
 			y: Number(yValue.toFixed(6)),

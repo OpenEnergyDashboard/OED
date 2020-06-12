@@ -38,33 +38,19 @@ export default class MapCalibrationComponent extends React.Component<MapChartPro
 		}
 	}
 
-	setCurrentGPSCoordinates(currentGPS: GPSPoint) {
-		let current = this.state.currentPoint;
-		current.setGPS(currentGPS);
-		if (this.state.currentPoint.isComplete()) {
-			let set = this.state.calibrationSet;
-			set.push(current);
-			this.setState({
-				calibrationSet: set,
-			})
-		}
-		if (this.checkIfReady()) this.prepareDataToCalibration();
-		this.resetCurrent();
-	}
-
 	/**
 	 *  prepare data to required formats to pass it to function calculating mapScales
 	 */
-	prepareDataToCalibration() {
-		const imageDimensions: Dimensions = {
-			width: this.state.mapImage.width,
-			height: this.state.mapImage.height
-		};
-		const result = calibrate(
-			this.state.calibrationSet,
-			imageDimensions);
-		this.setState({
-			result: result
-		});
-	}
+	// prepareDataToCalibration() {
+	// 	const imageDimensions: Dimensions = {
+	// 		width: this.state.mapImage.width,
+	// 		height: this.state.mapImage.height
+	// 	};
+	// 	const result = calibrate(
+	// 		this.state.calibrationSet,
+	// 		imageDimensions);
+	// 	this.setState({
+	// 		result: result
+	// 	});
+	// }
 }

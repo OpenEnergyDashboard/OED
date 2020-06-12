@@ -20,7 +20,9 @@ export interface State {
 		compare: CompareReadingsState;
 	};
 	graph: GraphState;
-	map: MapCalibrationState;
+	map: {
+		calibration: MapCalibrationState
+	};
 	groups: GroupsState;
 	notifications: NotificationsState;
 	admin: AdminState;

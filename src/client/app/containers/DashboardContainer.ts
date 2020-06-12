@@ -17,7 +17,7 @@ function mapStateToProps(state: State) {
 		lineLoading: state.readings.line.isFetching,
 		barLoading: state.readings.bar.isFetching,
 		compareLoading: state.readings.bar.isFetching,
-		mapLoading: state.map.isLoading,
+		mapLoading: state.map.calibration.isLoading,
 		optionsVisibility: state.graph.optionsVisibility,
 		selectedTimeInterval: state.graph.timeInterval
 	};

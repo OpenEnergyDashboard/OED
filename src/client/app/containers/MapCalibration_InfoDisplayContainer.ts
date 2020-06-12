@@ -11,8 +11,8 @@ import {resetCurrentPoint, offerCurrentGPS} from "../actions/map";
 import {GPSPoint} from "../utils/calibration";
 
 function mapStateToProps(state: State) {
-	const calibrationResults = state.map.result;
-	const currentCartesian = state.map.currentPoint.getCartesianString();
+	const calibrationResults = state.map.calibration.result;
+	const currentCartesian = state.map.calibration.currentPoint.getCartesianString();
 	return {
 		currentCartesian,
 		calibrationResults,

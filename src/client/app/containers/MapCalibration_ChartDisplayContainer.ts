@@ -2,7 +2,6 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
 
-import MapCalibration_ChartDisplayComponent from "../components/MapCalibration_ChartDisplayComponent";
 import {connect} from "react-redux";
 import PlotlyChart, {IPlotlyChartProps} from "react-plotlyjs-ts";
 import {State} from "../types/redux/state";
@@ -10,13 +9,14 @@ import * as plotly from "plotly.js";
 import {CartesianPoint} from "../utils/calibration";
 import {Dispatch} from "../types/redux/actions";
 import {updateCurrentCartesian} from "../actions/map";
+import store from "../index";
 
 function mapStateToProps(state: State) {
 	let x: number[] = [];
 	let y: number[] = [];
 	let texts: string[] = [];
 
-	const points = state.map.calibrationSet;
+	const points = state.map.calibration.calibrationSet;
 	for (let i = 0; i < points.length; i++) {
 		const current = points[i];
 		x.push(current.getCartesian().x);
@@ -41,7 +41,7 @@ function mapStateToProps(state: State) {
 	};
 	let data = [backTrace,trace1];
 
-	const source = state.map.image.src;
+	const imageSource = state.map.calibration.image.src;
 
 	const layout: any = {
 		width: 1000,
@@ -61,7 +61,7 @@ function mapStateToProps(state: State) {
 		},
 		images: [{
 			layer: 'below',
-			source: source,
+			source: imageSource,
 			xref: 'x',
 			yref: 'y',
 			x: 0,
@@ -78,6 +78,7 @@ function mapStateToProps(state: State) {
 	const props: IPlotlyChartProps = {
 		data: data,
 		layout: layout,
+		onClick: ({points, event}) => handlePointClick(points, event)
 	}
 	return props;
 }
@@ -99,11 +100,42 @@ function createBackgroundGrid() {
 		}
 		z.push(temp);
 	}
+	let trace = {
+		x: x,
+		y: y,
+		z: z,
+		type: 'heatmap',
+		colorscale: [['0.0', 'rgba(0,0,0,0.97)'], ['1.0', 'rgb(255, 255, 255, 0.5)']],
+		xgap: 1,
+		ygap: 1,
+		hoverinfo: 'x',
+		showscale: false
+	};
+	return trace;
 }
 
-function mapDispatchToProps(dispatch: Dispatch) {
-	return {
-		updateGraphCoordinates: (currentCartesian: CartesianPoint) => dispatch(updateCurrentCartesian(currentCartesian))
-	}
+function handlePointClick(points: plotly.PlotDatum[], event: MouseEvent) {
+	event.preventDefault();
+	let currentPoint: CartesianPoint = getClickedCoordinates(points, event);
+	store.dispatch(updateCurrentCartesian(currentPoint));
 }
-export default connect(mapStateToProps, mapDispatchToProps)(MapCalibration_ChartDisplayComponent);
+
+function getClickedCoordinates(points: plotly.PlotDatum[], event: MouseEvent) {
+	event.preventDefault();
+	// both points will be captured if there is already a data point nearby
+	for(let i=0; i < points.length; i++) {
+		let pn = points[i].pointNumber;
+		let tn = points[i].curveNumber;
+		console.log(`trace number: ${tn}`);
+	}
+	// actual code;
+	const xValue = points[0].x as number;
+	const yValue = points[0].y as number;
+	const clickedPoint: CartesianPoint = {
+		x: Number(xValue.toFixed(6)),
+		y: Number(yValue.toFixed(6)),
+	};
+	return clickedPoint;
+}
+
+export default connect(mapStateToProps)(PlotlyChart);

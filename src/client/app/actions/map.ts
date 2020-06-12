@@ -28,8 +28,8 @@ export function updateCurrentCartesian(currentCartesian: CartesianPoint): t.Upda
 
 export function offerCurrentGPS(currentGPS: GPSPoint): Thunk {
 	return (dispatch, getState) => {
-		if (getState().map.currentPoint.hasCartesian()) {
-			const point = getState().map.currentPoint.clone()
+		if (getState().map.calibration.currentPoint.hasCartesian()) {
+			const point = getState().map.calibration.currentPoint.clone()
 			point.setGPS(currentGPS);
 			dispatch(updateCalibrationSet(point));
 			dispatch(resetCurrentPoint());
