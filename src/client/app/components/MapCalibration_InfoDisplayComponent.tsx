@@ -3,13 +3,13 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
 
 import * as React from 'react';
-import {CalibratedPoint, GPSPoint} from '../utils/calibration';
+import {GPSPoint} from '../utils/calibration';
 import {ChangeEvent, FormEvent} from 'react';
 
 interface InfoDisplayProps {
-	onReset: any;
-	currentPoint: CalibratedPoint;
-	calibrationResults: number[][];
+	currentCartesian: string;
+	calibrationResults: string;
+	onReset(): any;
 	updateGPSCoordinates(gpsCoordinate: GPSPoint): any;
 }
 
@@ -29,14 +29,13 @@ export default class MapCalibration_InfoDisplayComponent extends React.Component
 	}
 	render() {
 		const calibrationDisplay = `res: ${(this.props.calibrationResults)? this.props.calibrationResults:'N/A'}`;
-		const currentData = this.props.currentPoint.hasCartesian()? this.props.currentPoint.getCartesianString():'null';
 		return (
 			<div id='UserInput'>
 				<form onSubmit={this.handleSubmit}>
 					<label>
-						input GPS coordinate that corresponds to the point: {currentData}
+						input GPS coordinate that corresponds to the point: {this.props.currentCartesian}
 						<br/>
-						<textarea cols={50} value={this.state.value} onChange={this.handleGPSInput.bind(this)}/>
+						<textarea id={'text'} cols={50} value={this.state.value} onChange={this.handleGPSInput.bind(this)}/>
 					</label>
 					<br/>
 					<input type={"submit"} value={"Submit"}/>
@@ -48,8 +47,8 @@ export default class MapCalibration_InfoDisplayComponent extends React.Component
 	}
 
 	private resetInputField() {
-		let textarea = document.querySelector('textarea');
-		textarea!.value = '';
+		let textarea = document.getElementById('text');
+		textarea!.innerText = '';
 		this.props.onReset();
 	}
 

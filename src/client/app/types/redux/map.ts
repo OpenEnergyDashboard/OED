@@ -3,32 +3,55 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
 
 import {ActionType} from './actions';
+import {CalibratedPoint, CartesianPoint, GPSPoint} from '../../utils/calibration';
 
-export enum MapModeTypes {
+export enum CalibrationModeTypes {
 	initiate = 'initiate',
 	calibrate = 'calibrate',
-	display = 'display'
 }
 
 export interface ChangeMapModeAction {
 	type: ActionType.UpdateMapMode;
-	nextMode: MapModeTypes;
+	nextMode: CalibrationModeTypes;
 }
 
 export interface UpdateMapSourceAction {
 	type: ActionType.UpdateMapSource;
-	imageSource: string;
+	image: HTMLImageElement;
 }
 
+export interface UpdateCurrentCartesianAction {
+	type: ActionType.UpdateCurrentCartesian;
+	currentCartesian: CartesianPoint;
+}
 
-export type MapAction =
+export interface UpdateCurrentGPSAction {
+	type: ActionType.UpdateCurrentGPS;
+	currentGPS: GPSPoint;
+}
+
+export interface ResetCurrentPointAction {
+	type: ActionType.ResetCurrentPoint;
+}
+
+export interface AppendCalibrationSetAction {
+	type: ActionType.AppendCalibrationSet;
+	calibratedPoint: CalibratedPoint;
+}
+
+export type MapCalibrationAction =
 	| ChangeMapModeAction
-	| UpdateMapSourceAction;
+	| UpdateMapSourceAction
+	| UpdateCurrentCartesianAction
+	| UpdateCurrentGPSAction
+	| ResetCurrentPointAction
+	| AppendCalibrationSetAction;
 
-
-
-export interface MapState {
-	mode: MapModeTypes;
+export interface MapCalibrationState {
+	mode: CalibrationModeTypes;
 	isLoading: boolean;
-	source: string;
+	image: HTMLImageElement;
+	currentPoint: CalibratedPoint;
+	calibrationSet: CalibratedPoint[];
+	result: string;
 }

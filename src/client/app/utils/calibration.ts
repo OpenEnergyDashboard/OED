@@ -1,3 +1,7 @@
+/* This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this
+ * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
+
 export interface CartesianPoint {
 	x: number;
 	y: number;
@@ -18,6 +22,15 @@ export class CalibratedPoint {
 	private gps: GPSPoint;
 
 	constructor() {
+		this.cartesian = new class implements CartesianPoint {
+			x: number;
+			y: number;
+		};
+		this.gps = new class implements GPSPoint {
+			latitude: number;
+			longitude: number;
+		}
+
 	}
 
 	public setCartesian(cartesian: CartesianPoint) {
@@ -50,6 +63,13 @@ export class CalibratedPoint {
 
 	public getCartesianString() {
 		return `x: ${this.cartesian.x}, y: ${this.cartesian.y}`;
+	}
+
+	public clone() {
+		let copy = new CalibratedPoint();
+		copy.setCartesian(this.cartesian);
+		copy.setGPS(this.gps);
+		return copy;
 	}
 }
 
@@ -129,4 +149,13 @@ function normalizeImageDimensions(dimensions: Dimensions) {
 		};
 	}
 	return res;
+}
+
+// Typescript functions to determine whether an object is one of these points
+function isCartesian(object: any): object is CartesianPoint {
+	return 'x' in object && 'y' in object;
+}
+
+function isGPS(object: any): object is GPSPoint {
+	return 'latitude' in object && 'longitude' in object;
 }

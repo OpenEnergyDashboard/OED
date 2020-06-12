@@ -7,7 +7,7 @@ import UIOptionsContainer from '../containers/UIOptionsContainer';
 import LineChartContainer from '../containers/LineChartContainer';
 import BarChartContainer from '../containers/BarChartContainer';
 import MultiCompareChartContainer from '../containers/MultiCompareChartContainer';
-import MapChartContainer from '../containers/MapChartContainer';
+import MapCalibrationContainer from '../containers/MapCalibrationContainer';
 import SpinnerComponent from './SpinnerComponent';
 import {ChartTypes} from '../types/redux/graph';
 
@@ -42,7 +42,7 @@ export default class DashboardComponent extends React.Component<DashboardProps, 
 	}
 
 	public render() {
-		let ChartToRender: typeof LineChartContainer | typeof MultiCompareChartContainer | typeof BarChartContainer | typeof MapChartContainer;
+		let ChartToRender: typeof LineChartContainer | typeof MultiCompareChartContainer | typeof BarChartContainer | typeof MapCalibrationContainer;
 		let showSpinner = false;
 		if (this.props.chartToRender === ChartTypes.line) {
 			if (this.props.lineLoading) {
@@ -63,7 +63,7 @@ export default class DashboardComponent extends React.Component<DashboardProps, 
 			// if (this.props.mapLoading) {
 			// 	showSpinner = true;
 			// }
-			ChartToRender = MapChartContainer;
+			ChartToRender = MapCalibrationContainer;
 		}
 
 		const optionsClassName = this.props.optionsVisibility ? 'col-2 d-none d-lg-block' : 'd-none';

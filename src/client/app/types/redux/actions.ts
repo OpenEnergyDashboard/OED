@@ -75,9 +75,11 @@ export enum ActionType {
 	MarkPreferencesSubmitted = 'MARK_PREFERENCES_SUBMITTED',
 
 	UpdateMapMode = 'UPDATE_MAP_MODE',
-	UpdateMapSource = 'UPDATE_MAP_IMAGE'
-	// StallMapLoad = 'STALL_MAP_LOAD',
-	// ReleaseMapLoad = 'RELEASE_MAP_LOAD',
+	UpdateMapSource = 'UPDATE_MAP_IMAGE',
+	UpdateCurrentCartesian = 'UPDATE_CURRENT_CARTESIAN',
+	UpdateCurrentGPS = 'UPDATE_CURRENT_GPS',
+	ResetCurrentPoint = 'RESET_CURRENT_POINT',
+	AppendCalibrationSet = 'APPEND_CALIBRATION_SET'
 }
 
 /**
