@@ -75,6 +75,12 @@ function mapStateToProps(state: State) {
 		}],
 	};
 
+	/***
+	 * Usage:
+	 *  <PlotlyChart data={toJS(this.model_data)}
+	 *               layout={layout}
+	 *               onClick={({points, event}) => console.log(points, event)}>
+	 */
 	const props: IPlotlyChartProps = {
 		data: data,
 		layout: layout,

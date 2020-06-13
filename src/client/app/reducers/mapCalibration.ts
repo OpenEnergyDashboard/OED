@@ -53,6 +53,11 @@ export default function mapCalibration(state = defaultState, action: MapCalibrat
 				...state,
 				calibrationSet: calibrationSet,
 			};
+		case ActionType.UpdateCalibrationResults:
+			return {
+				...state,
+				result: action.result
+			};
 		default:
 			return state;
 	}

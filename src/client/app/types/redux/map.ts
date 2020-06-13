@@ -39,13 +39,19 @@ export interface AppendCalibrationSetAction {
 	calibratedPoint: CalibratedPoint;
 }
 
+export interface UpdateCalibrationResultAction {
+	type: ActionType.UpdateCalibrationResults;
+	result: string;
+}
+
 export type MapCalibrationAction =
 	| ChangeMapModeAction
 	| UpdateMapSourceAction
 	| UpdateCurrentCartesianAction
 	| UpdateCurrentGPSAction
 	| ResetCurrentPointAction
-	| AppendCalibrationSetAction;
+	| AppendCalibrationSetAction
+	| UpdateCalibrationResultAction;
 
 export interface MapCalibrationState {
 	mode: CalibrationModeTypes;

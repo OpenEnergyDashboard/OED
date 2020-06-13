@@ -79,7 +79,8 @@ export enum ActionType {
 	UpdateCurrentCartesian = 'UPDATE_CURRENT_CARTESIAN',
 	UpdateCurrentGPS = 'UPDATE_CURRENT_GPS',
 	ResetCurrentPoint = 'RESET_CURRENT_POINT',
-	AppendCalibrationSet = 'APPEND_CALIBRATION_SET'
+	AppendCalibrationSet = 'APPEND_CALIBRATION_SET',
+	UpdateCalibrationResults = 'UPDATE_CALIBRATION_RESULTS',
 }
 
 /**
