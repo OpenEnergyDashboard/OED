@@ -70,7 +70,7 @@ function prepareDataToCalibration(state: State): string {
 	const result = calibrate(
 		state.map.calibration.calibrationSet,
 		imageDimensions);
-	return result.toString();
+	return result;
 }
 
 function updateResult(result: string): t.UpdateCalibrationResultAction {

@@ -7,8 +7,8 @@ import {GPSPoint} from '../utils/calibration';
 import {ChangeEvent, FormEvent} from 'react';
 
 interface InfoDisplayProps {
-	currentCartesian: string;
-	calibrationResults: string;
+	currentCartesianDisplay: string;
+	resultDisplay: string;
 	onReset(): any;
 	updateGPSCoordinates(gpsCoordinate: GPSPoint): any;
 }
@@ -28,12 +28,12 @@ export default class MapCalibration_InfoDisplayComponent extends React.Component
 		this.handleSubmit.bind(this);
 	}
 	render() {
-		const calibrationDisplay = `res: ${(this.props.calibrationResults)? this.props.calibrationResults:'N/A'}`;
+		const calibrationDisplay = `result: ${this.props.resultDisplay}`;
 		return (
 			<div id='UserInput'>
 				<form onSubmit={this.handleSubmit}>
 					<label>
-						input GPS coordinate that corresponds to the point: {this.props.currentCartesian}
+						input GPS coordinate that corresponds to the point: {this.props.currentCartesianDisplay}
 						<br/>
 						<textarea id={'text'} cols={50} value={this.state.value} onChange={this.handleGPSInput.bind(this)}/>
 					</label>

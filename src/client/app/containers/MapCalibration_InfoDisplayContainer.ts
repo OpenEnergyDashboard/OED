@@ -11,11 +11,11 @@ import {resetCurrentPoint, offerCurrentGPS} from "../actions/map";
 import {GPSPoint} from "../utils/calibration";
 
 function mapStateToProps(state: State) {
-	const calibrationResults = state.map.calibration.result;
-	const currentCartesian = state.map.calibration.currentPoint.getCartesianString();
+	const resultDisplay = (state.map.calibration.result)? state.map.calibration.result : "Need more points";
+	const currentCartesianDisplay = state.map.calibration.currentPoint.getCartesianString();
 	return {
-		currentCartesian,
-		calibrationResults,
+		currentCartesianDisplay: currentCartesianDisplay,
+		resultDisplay: resultDisplay,
 	}
 }
 

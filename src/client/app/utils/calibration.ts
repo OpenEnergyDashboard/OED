@@ -2,6 +2,9 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
 
+import forEach = require("core-js/fn/array/for-each");
+import {hide} from "react-tooltip";
+
 export interface CartesianPoint {
 	x: number;
 	y: number;
@@ -80,7 +83,7 @@ export interface Dimensions {
 
 export default function calibrate(calibrationSet: CalibratedPoint[], imageDimensions: Dimensions) {
 	const normalizedDimensions = normalizeImageDimensions(imageDimensions);
-	// calculate scale by taking average of (n choose 2) of data points;
+	// calculate (n choose 2) scales for each pair of data points;
 	let scales: MapScale[] = [];
 	for (let i = 0; i < calibrationSet.length; i++) {
 		for (let j = i+1; j < calibrationSet.length; j++) {
@@ -88,6 +91,7 @@ export default function calibrate(calibrationSet: CalibratedPoint[], imageDimens
 			scales.push(mapScale);
 		}
 	}
+	// take average to get the calibrated scale;
 	let XScaleSum = 0;
 	let YScaleSum = 0;
 	let numDataPoints = scales.length;
@@ -98,11 +102,12 @@ export default function calibrate(calibrationSet: CalibratedPoint[], imageDimens
 	const degreePerUnitX = XScaleSum/numDataPoints;
 	const degreePerUnitY = YScaleSum/numDataPoints;
 
-	// calculate gps coordinates for origin and the point on its opposite corner;
+	// calculate gps coordinates for the origin;
 	let originLatitude = calibrationSet[0].getGPS().latitude - degreePerUnitY * calibrationSet[0].getCartesian().y;
 	let originLongitude = calibrationSet[0].getGPS().longitude - degreePerUnitX * calibrationSet[0].getCartesian().x;
 	let originCoordinate = [originLatitude, originLongitude];
-	//
+
+	// uncomment this block to get gps coordinates of the opposite corner from origin
 	// let oppositeCornerLatitude = originLatitude + oppositeCornerY * degreePerUnitY;
 	// let oppositeCornerLongitude = originLongitude + oppositeCornerX * degreePerUnitX;
 	// let oppositeCornerCoordinate = [oppositeCornerLatitude, oppositeCornerLongitude];
@@ -113,10 +118,38 @@ export default function calibrate(calibrationSet: CalibratedPoint[], imageDimens
 	let topLeftLongitude = originLongitude;
 	let topLeftCoordinate = [topLeftLatitude, topLeftLongitude];
 
-	let downRightCornerLatitude = originLatitude;
-	let downRightCornerLongitude = originLongitude + normalizedDimensions.width * degreePerUnitX;
-	let downRightCornerCoordinate = [downRightCornerLatitude, downRightCornerLongitude];
-	return [topLeftCoordinate, downRightCornerCoordinate];
+	let downRightLatitude = originLatitude;
+	let downRightLongitude = originLongitude + normalizedDimensions.width * degreePerUnitX;
+	let downRightCoordinate = [downRightLatitude, downRightLongitude];
+
+	// calculate max error
+	const diagonal = Math.sqrt(Math.pow(normalizedDimensions.width/degreePerUnitX, 2) + Math.pow(normalizedDimensions.height/degreePerUnitY, 2));
+	let scalesWithMaxDifference: MapScale = {
+		degreePerUnitX: 0,
+		degreePerUnitY: 0,
+	};
+	let pointIndexWithMaxDifference = {
+		x: -1,
+		y: -1,
+	};
+	for (let i = 0; i < calibrationSet.length; i++) {
+		const XScaleDifference = Math.abs(scales[i].degreePerUnitX - degreePerUnitX);
+		const YScaleDifference = Math.abs(scales[i].degreePerUnitY - degreePerUnitY);
+		if (XScaleDifference > scalesWithMaxDifference.degreePerUnitX) {
+			pointIndexWithMaxDifference.x = i;
+			scalesWithMaxDifference.degreePerUnitX = XScaleDifference;
+		}
+		if (YScaleDifference > scalesWithMaxDifference.degreePerUnitY) {
+			pointIndexWithMaxDifference.y = i;
+			scalesWithMaxDifference.degreePerUnitY = YScaleDifference;
+		}
+	}
+	const maxErrorPercentage = {
+		x: Number.parseFloat((scalesWithMaxDifference.degreePerUnitX/diagonal * 100).toFixed(2)),
+		y: Number.parseFloat((scalesWithMaxDifference.degreePerUnitY/diagonal * 100).toFixed(2))
+	}
+	const result = `Max error: x: ${maxErrorPercentage.x}%, y: ${maxErrorPercentage.y}; TopLeftCorner: ${topLeftCoordinate}, DownRightCorner: ${downRightCoordinate}`;
+	return result;
 }
 
 function calculateScale(p1: CalibratedPoint, p2: CalibratedPoint) {
@@ -131,6 +164,11 @@ function calculateScale(p1: CalibratedPoint, p2: CalibratedPoint) {
 	return {degreePerUnitX, degreePerUnitY};
 }
 
+/**
+ * normalize image dimensions to fit in the default 500*500 pixel-sized graph
+ * @param dimensions Dimensions: { width: number, height: number};
+ * @return normalized Dimensions object
+ */
 function normalizeImageDimensions(dimensions: Dimensions) {
 	let res: Dimensions;
 	if (dimensions.width > dimensions.height) {

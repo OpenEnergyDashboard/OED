@@ -4,7 +4,6 @@
 
 import * as React from 'react';
 import { CalibrationModeTypes } from '../types/redux/map';
-import calibrate, {CartesianPoint, GPSPoint, CalibratedPoint, Dimensions} from '../utils/calibration';
 import MapCalibration_InitiateContainer from "../containers/MapCalibration_InitiateContainer";
 import MapCalibration_ChartDisplayContainer from "../containers/MapCalibration_ChartDisplayContainer";
 import MapCalibration_InfoDisplayContainer from "../containers/MapCalibration_InfoDisplayContainer";
