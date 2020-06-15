@@ -148,7 +148,8 @@ export default function calibrate(calibrationSet: CalibratedPoint[], imageDimens
 		x: Number.parseFloat((scalesWithMaxDifference.degreePerUnitX/diagonal * 100).toFixed(2)),
 		y: Number.parseFloat((scalesWithMaxDifference.degreePerUnitY/diagonal * 100).toFixed(2))
 	}
-	const result = `Max error: x: ${maxErrorPercentage.x}%, y: ${maxErrorPercentage.y}; TopLeftCorner: ${topLeftCoordinate}, DownRightCorner: ${downRightCoordinate}`;
+	const result = `Max error: x: ${maxErrorPercentage.x}%, y: ${maxErrorPercentage.y};
+	TopLeftCorner: ${topLeftCoordinate[0]},${topLeftCoordinate[1]}, DownRightCorner: ${downRightCoordinate[0]}, ${downRightCoordinate[1]}`;
 	return result;
 }
 
