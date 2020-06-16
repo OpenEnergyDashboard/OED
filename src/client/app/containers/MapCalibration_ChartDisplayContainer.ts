@@ -7,7 +7,6 @@ import PlotlyChart, {IPlotlyChartProps} from "react-plotlyjs-ts";
 import {State} from "../types/redux/state";
 import * as plotly from "plotly.js";
 import {CartesianPoint} from "../utils/calibration";
-import {Dispatch} from "../types/redux/actions";
 import {updateCurrentCartesian} from "../actions/map";
 import store from "../index";
 
@@ -43,20 +42,17 @@ function mapStateToProps(state: State) {
 
 	const imageSource = state.map.calibration.image.src;
 
+	// for a detailed description of layout attributes: https://plotly.com/javascript/reference/#layout
 	const layout: any = {
 		width: 1000,
 		height: 1000,
 		xaxis: {
-			range: [0, 500], //range of displayed graph
-			showgrid: true, // hide grid lines in graph
-			zeroline: true,
-			showticklabels: false // hide numbers on zeroline
+			visible: false, // changes all visibility settings including showgrid, zeroline, showticklabels and hiding ticks
+			range: [0, 500], // range of displayed graph
 		},
 		yaxis: {
+			visible: false,
 			range: [0, 500],
-			showgrid: true,
-			zeroline: true,
-			showticklabels: false,
 			scaleanchor:'x',
 		},
 		images: [{
@@ -114,7 +110,7 @@ function createBackgroundGrid() {
 		colorscale: [['0.0', 'rgba(0,0,0,0.97)'], ['1.0', 'rgb(255, 255, 255, 0.5)']],
 		xgap: 1,
 		ygap: 1,
-		hoverinfo: 'x',
+		hoverinfo: 'none',
 		showscale: false
 	};
 	return trace;
