@@ -116,11 +116,11 @@ export default function calibrate(calibrationSet: CalibratedPoint[], imageDimens
 	// calculate gps coordinates for top-left and down-right corner
 	let topLeftLatitude = originLatitude + normalizedDimensions.height * degreePerUnitY;
 	let topLeftLongitude = originLongitude;
-	let topLeftCoordinate = [topLeftLatitude, topLeftLongitude];
+	let topLeftCoordinate = [topLeftLatitude.toFixed(6), topLeftLongitude.toFixed(6)];
 
 	let downRightLatitude = originLatitude;
 	let downRightLongitude = originLongitude + normalizedDimensions.width * degreePerUnitX;
-	let downRightCoordinate = [downRightLatitude, downRightLongitude];
+	let downRightCoordinate = [downRightLatitude.toFixed(6), downRightLongitude.toFixed(6)];
 
 	// calculate max error
 	const diagonal = Math.sqrt(Math.pow(normalizedDimensions.width/degreePerUnitX, 2) + Math.pow(normalizedDimensions.height/degreePerUnitY, 2));
@@ -145,10 +145,10 @@ export default function calibrate(calibrationSet: CalibratedPoint[], imageDimens
 		}
 	}
 	const maxErrorPercentage = {
-		x: Number.parseFloat((scalesWithMaxDifference.degreePerUnitX/diagonal * 100).toFixed(2)),
-		y: Number.parseFloat((scalesWithMaxDifference.degreePerUnitY/diagonal * 100).toFixed(2))
+		x: Number.parseFloat((scalesWithMaxDifference.degreePerUnitX/diagonal * 100).toFixed(3)),
+		y: Number.parseFloat((scalesWithMaxDifference.degreePerUnitY/diagonal * 100).toFixed(3))
 	}
-	const result = `Max error: x: ${maxErrorPercentage.x}%, y: ${maxErrorPercentage.y};
+	const result = `Max error: x: ${maxErrorPercentage.x}%, y: ${maxErrorPercentage.y}%;
 	TopLeftCorner: ${topLeftCoordinate[0]},${topLeftCoordinate[1]}, DownRightCorner: ${downRightCoordinate[0]}, ${downRightCoordinate[1]}`;
 	return result;
 }
