@@ -47,8 +47,9 @@ export default class MapCalibration_InfoDisplayComponent extends React.Component
 	}
 
 	private resetInputField() {
-		let textarea = document.getElementById('text');
-		textarea!.innerText = '';
+		this.setState({
+			value: "latitude,longitude"
+		});
 		this.props.onReset();
 	}
 
@@ -61,6 +62,7 @@ export default class MapCalibration_InfoDisplayComponent extends React.Component
 			latitude: array[0]
 		}
 		this.props.updateGPSCoordinates(gps);
+		this.resetInputField();
 	}
 
 	private handleGPSInput(event: ChangeEvent<HTMLTextAreaElement>) {
