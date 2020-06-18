@@ -77,6 +77,7 @@ async function createSchema(conn) {
 	const Migration = require('./Migration');
 	const LogEmail = require('./LogEmail');
 	const Baseline = require('./Baseline');
+	const Map = require('./Map');
 
 	/* eslint-enable global-require */
 	await Meter.createMeterTypesEnum(conn);
@@ -95,6 +96,7 @@ async function createSchema(conn) {
 	await Reading.createCompressedReadingsMaterializedViews(conn);
 	await Reading.createCompareReadingsFunction(conn);
 	await Baseline.createTable(conn);
+	await Map.createTables(conn);
 	await conn.none(sqlFile('baseline/create_function_get_average_reading.sql'));
 }
 
