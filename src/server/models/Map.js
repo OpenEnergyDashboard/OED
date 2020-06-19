@@ -53,6 +53,19 @@ class Map {
 	}
 
 	/**
+	 * Returns a promise to update an existing map in the database
+	 * @param conn the connection to use.
+	 * @returns {Promise.<>}
+	 */
+	async update(conn) {
+		const map = this;
+		if (map.id === undefined) {
+			throw new Error('Attempt to update a map with no ID');
+		}
+		await conn.none(sqlFile('map/update_map.sql'), map);
+	}
+
+	/**
 	 * Creates a new map based on the data in a row
 	 * @param row the row from which a map is to be created
 	 * @returns {Map}
