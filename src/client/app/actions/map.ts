@@ -4,9 +4,18 @@
 
 import {ActionType, Thunk} from '../types/redux/actions';
 import * as t from '../types/redux/map';
-import {CalibrationModeTypes} from '../types/redux/map';
+import {CalibrationModeTypes, MapData} from '../types/redux/map';
 import calibrate, {CalibratedPoint, CartesianPoint, Dimensions, GPSPoint} from "../utils/calibration";
 import {State} from "../types/redux/state";
+import {mapsApi} from "../utils/api";
+
+export function displayLoading(): t.DisplayMapLoadingAction {
+	return { type: ActionType.DisplayMapLoading };
+}
+
+function finishLoading() {
+
+}
 
 export function updateMapSource(imageSource: HTMLImageElement): Thunk {
 	return dispatch => {
@@ -40,7 +49,7 @@ export function offerCurrentGPS(currentGPS: GPSPoint): Thunk {
 					dispatch2(updateResult(result));
 				}
 				dispatch2(resetCurrentPoint());
-			})
+			});
 		}
 		return Promise.resolve();
 	}
@@ -50,6 +59,10 @@ function updateCalibrationSet(calibratedPoint: CalibratedPoint): t.AppendCalibra
 	return { type: ActionType.AppendCalibrationSet, calibratedPoint};
 }
 
+/**
+ * use a default number as the threshold in determining if it's safe to call the calibration function
+ * @param calibrationSet an any array used as dataset
+ */
 function isReadyForCalibration(calibrationSet: any[]): boolean {
 	const calibrationThreshold = 3;
 	return calibrationSet.length >= calibrationThreshold;
@@ -80,4 +93,3 @@ function updateResult(result: string): t.UpdateCalibrationResultAction {
 export function resetCurrentPoint(): t.ResetCurrentPointAction {
 	return { type: ActionType.ResetCurrentPoint } ;
 }
-

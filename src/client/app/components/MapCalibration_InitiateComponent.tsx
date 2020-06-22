@@ -15,6 +15,7 @@ import { CalibrationModeTypes } from '../types/redux/map';
 interface MapInitiateProps {
 	updateMapMode(nextMode: CalibrationModeTypes): any;
 	onSourceChange(image: HTMLImageElement): any;
+	displayLoading(): any;
 }
 
 export default class MapCalibration_InitiateComponent extends React.Component<MapInitiateProps, {} > {
@@ -58,6 +59,7 @@ export default class MapCalibration_InitiateComponent extends React.Component<Ma
 			const imageURL = await this.getDataURL();
 			let image = new Image();
 			image.src = imageURL;
+			await this.props.displayLoading();
 			await this.props.onSourceChange(image);
 		} catch (err) {
 			console.log(err);

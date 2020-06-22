@@ -44,6 +44,10 @@ export interface UpdateCalibrationResultAction {
 	result: string;
 }
 
+export interface DisplayMapLoadingAction {
+	type: ActionType.DisplayMapLoading;
+}
+
 export type MapCalibrationAction =
 	| ChangeMapModeAction
 	| UpdateMapSourceAction
@@ -51,7 +55,8 @@ export type MapCalibrationAction =
 	| UpdateCurrentGPSAction
 	| ResetCurrentPointAction
 	| AppendCalibrationSetAction
-	| UpdateCalibrationResultAction;
+	| UpdateCalibrationResultAction
+	| DisplayMapLoadingAction;
 
 export interface MapCalibrationState {
 	mode: CalibrationModeTypes;
