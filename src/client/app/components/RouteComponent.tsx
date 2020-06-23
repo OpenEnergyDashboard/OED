@@ -161,7 +161,7 @@ export default class RouteComponent extends React.Component<RouteProps, {}> {
 		let messages;
 		if (lang === 'fr') {
 			messages = (localeData as any).fr;
-		} else if (lang === 'es'){
+		} else if (lang === 'es') {
 			messages = (localeData as any).es;
 		} else {
 			messages = (localeData as any).en;
