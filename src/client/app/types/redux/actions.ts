@@ -81,7 +81,9 @@ export enum ActionType {
 	ResetCurrentPoint = 'RESET_CURRENT_POINT',
 	AppendCalibrationSet = 'APPEND_CALIBRATION_SET',
 	UpdateCalibrationResults = 'UPDATE_CALIBRATION_RESULTS',
-	DisplayMapLoading = 'DISPLAY_MAP_LOADING'
+	DisplayMapLoading = 'DISPLAY_MAP_LOADING',
+	RequestSelectedMap = 'REQUEST_SELECTED_MAP',
+	ReceiveSelectedMap = 'RECEIVE_SELECTED_MAP',
 }
 
 /**

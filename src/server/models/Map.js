@@ -6,7 +6,6 @@ const database = require('./database');
 const sqlFile = database.sqlFile;
 
 class Map {
-
 	/**
 	 * @param id should be undefined when creating a new group
 	 * @param name map's name
@@ -33,8 +32,8 @@ class Map {
 	 * @param conn the database connection to use
 	 * @returns {Promise<>}
 	 */
-	static createTables(conn) {
-		return conn.none(sqlFile('map/create_maps_tables.sql'));
+	static createTable(conn) {
+		return conn.none(sqlFile('map/create_maps_table.sql'));
 	}
 
 	/**
@@ -67,11 +66,11 @@ class Map {
 
 	/**
 	 * Creates a new map based on the data in a row
-	 * @param row the row from which a map is to be created
+	 * @param row
 	 * @returns {Map}
 	 */
 	static mapRow(row) {
-		return new Map(row.id, row.name, row.note, row.filename, row.modifiedDate, row.origin, row.opposite, row.mapSource);
+		return new Map(row.id, row.name, row.note, row.filename, row.modified_date, row.origin, row.opposite, row.map_source);
 	}
 
 	/**
@@ -82,7 +81,7 @@ class Map {
 	 * @returns {Promise.<Map>}
 	 */
 	static async getByName(name, conn) {
-		const row = await conn.one(sqlFile('group/get_map_by_name.sql'), { name: name });
+		const row = await conn.one(sqlFile('map/get_map_by_name.sql'), { name: name });
 		return Map.mapRow(row);
 	}
 
@@ -94,7 +93,7 @@ class Map {
 	 * @returns {Promise.<*>}
 	 */
 	static async getByID(id, conn) {
-		const row = await conn.one(sqlFile('group/get_map_by_id.sql'), { id: id });
+		const row = await conn.one(sqlFile('map/get_map_by_id.sql'), { id: id });
 		return Map.mapRow(row);
 	}
 
@@ -104,7 +103,7 @@ class Map {
 	 * @returns {Promise.<void>}
 	 */
 	static async getAll(conn) {
-		const rows = await conn.any(sqlFile('group/get_all_maps.sql'));
+		const rows = await conn.any(sqlFile('map/get_all_maps.sql'));
 		return rows.map(Map.mapRow);
 	}
 
@@ -115,7 +114,7 @@ class Map {
 	 * @return {Promise.<void>}
 	 */
 	async rename(newName, conn) {
-		await conn.none(sqlFile('group/rename_map.sql'), { new_name: newName, id: this.id });
+		await conn.none(sqlFile('map/rename_map.sql'), { new_name: newName, id: this.id });
 	}
 
 	/**
@@ -125,7 +124,7 @@ class Map {
 	 * @return {Promise.<void>}
 	 */
 	static async delete(mapID, conn) {
-		await conn.none(sqlFile('group/delete_map.sql'), { id: mapID });
+		await conn.none(sqlFile('map/delete_map.sql'), { id: mapID });
 	}
 }
 module.exports = Map;

@@ -25,6 +25,7 @@ const version = require('./routes/version');
 const createRouterForNewCompressedReadings = require('./routes/compressedReadings').createRouter;
 const createRouterForCompareReadings = require('./routes/compareReadings').createRouter;
 const baseline = require('./routes/baseline');
+const maps = require('./routes/maps');
 
 const app = express();
 
@@ -35,8 +36,8 @@ if (log.level !== LogLevel.SILENT) {
 }
 
 app.use(favicon(path.join(__dirname, '..', 'client', 'public', 'favicon.ico')));
-app.use(bodyParser.json());
-app.use(bodyParser.urlencoded({ extended: false }));
+app.use(bodyParser.json({limit: '50mb'}));
+app.use(bodyParser.urlencoded({ extended: false, limit:'50mb'}));
 app.use(cookieParser());
 
 app.use('/api/users', users);
@@ -51,11 +52,12 @@ app.use('/api/version', version);
 app.use('/api/compressedReadings', createRouterForNewCompressedReadings());
 app.use('/api/compareReadings', createRouterForCompareReadings());
 app.use('/api/baselines', baseline);
+app.use('/api/maps', maps);
 app.use(express.static(path.join(__dirname, '..', 'client', 'public')));
 
 const router = express.Router();
 
-router.get(/^(\/)(login|admin|groups|createGroup|editGroup|graph|meters|editMeter)?$/, (req, res) => {
+router.get(/^(\/)(login|admin|groups|createGroup|editGroup|graph|meters|editMeter|maps)?$/, (req, res) => {
 	fs.readFile(path.resolve(__dirname, '..', 'client', 'index.html'), (err, html) => {
 		const subdir = config.subdir || '/';
 		let htmlPlusData = html.toString().replace('SUBDIR', subdir);

@@ -10,6 +10,16 @@ export enum CalibrationModeTypes {
 	calibrate = 'calibrate',
 }
 
+export interface MapData{
+	name: string;
+	note?: string;
+	filename?: string;
+	modifiedDate?: number;
+	origin?: CalibratedPoint;
+	opposite?: CalibratedPoint;
+	mapSource: string;
+}
+
 export interface ChangeMapModeAction {
 	type: ActionType.UpdateMapMode;
 	nextMode: CalibrationModeTypes;
@@ -48,8 +58,19 @@ export interface DisplayMapLoadingAction {
 	type: ActionType.DisplayMapLoading;
 }
 
+export interface RequestSelectedMapAction {
+	type: ActionType.RequestSelectedMap;
+}
+
+export interface ReceiveSelectedMapAction {
+	type: ActionType.ReceiveSelectedMap;
+	map: MapData
+}
+
 export type MapCalibrationAction =
 	| ChangeMapModeAction
+	| RequestSelectedMapAction
+	| ReceiveSelectedMapAction
 	| UpdateMapSourceAction
 	| UpdateCurrentCartesianAction
 	| UpdateCurrentGPSAction

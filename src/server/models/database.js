@@ -96,7 +96,7 @@ async function createSchema(conn) {
 	await Reading.createCompressedReadingsMaterializedViews(conn);
 	await Reading.createCompareReadingsFunction(conn);
 	await Baseline.createTable(conn);
-	await Map.createTables(conn);
+	await Map.createTable(conn);
 	await conn.none(sqlFile('baseline/create_function_get_average_reading.sql'));
 }
 

@@ -22,6 +22,20 @@ export default function mapCalibration(state = defaultState, action: MapCalibrat
 				...state,
 				mode: action.nextMode
 			};
+		case ActionType.RequestSelectedMap:
+			return {
+				...state,
+				isLoading: true
+			};
+		case ActionType.ReceiveSelectedMap:
+			return {
+				...state,
+				isLoading: false,
+				image: {
+					...state.image,
+					src: action.map.mapSource
+				}
+			}
 		case ActionType.UpdateMapSource:
 			return {
 				...state,

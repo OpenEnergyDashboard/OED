@@ -2,7 +2,7 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
 
-import {ActionType, Thunk} from '../types/redux/actions';
+import {ActionType, Dispatch, GetState, Thunk} from '../types/redux/actions';
 import * as t from '../types/redux/map';
 import {CalibrationModeTypes, MapData} from '../types/redux/map';
 import calibrate, {CalibratedPoint, CartesianPoint, Dimensions, GPSPoint} from "../utils/calibration";
@@ -13,13 +13,42 @@ export function displayLoading(): t.DisplayMapLoadingAction {
 	return { type: ActionType.DisplayMapLoading };
 }
 
-function finishLoading() {
+function requestSelectedMap() {
+	return { type: ActionType.RequestSelectedMap };
+}
 
+function receiveSelectedMap(map: MapData) {
+	return { type: ActionType.ReceiveSelectedMap, map};
+}
+
+export function fetchSelectedMap(): Thunk {
+	return async (dispatch: Dispatch, getState: GetState) => {
+		dispatch(requestSelectedMap());
+		const map: MapData = await mapsApi.getMapById(8);
+		console.log(`${map.name},${map.origin}; ${map.mapSource}`);
+		await dispatch(receiveSelectedMap(map));
+		console.log(`${getState().map.calibration.mode},fetched source: ${getState().map.calibration.image.src}`);
+
+		if (getState().map.calibration.image.src) {
+			dispatch((dispatch2) => {
+				dispatch2(updateMapMode(CalibrationModeTypes.calibrate));
+			});
+		}
+	};
 }
 
 export function updateMapSource(imageSource: HTMLImageElement): Thunk {
-	return dispatch => {
-		dispatch(uploadMapSource(imageSource));
+	return async dispatch => {
+		dispatch(displayLoading());
+		dispatch((dispatch2) => {
+			const newMap: MapData = {
+				name: "test3",
+				mapSource: "placeHolder",
+			};
+			dispatch2(uploadMapSource(imageSource));
+			console.log(imageSource.src);
+			mapsApi.create(newMap); //TODO: remove after test
+		})
 		return Promise.resolve();
 	};
 }
