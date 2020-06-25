@@ -10,7 +10,7 @@ const { getConnection } = require('../db');
 const requiredAuthenticator = require('./authenticator').authMiddleware;
 const optionalAuthenticator = require('./authenticator').optionalAuthMiddleware;
 const moment = require('moment');
-const point = require('../models/parse-point-type');
+const point = require('../models/Point');
 
 const router = express.Router();
 

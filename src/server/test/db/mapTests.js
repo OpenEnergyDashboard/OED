@@ -6,7 +6,7 @@
 
 const { mocha, expect, testDB } = require('../common');
 const Map = require('../../models/Map');
-const Point = require('../../models/parse-point-type');
+const Point = require('../../models/Point');
 const moment = require('moment');
 
 function expectMapsToBeEquivalent(expected, actual) {
@@ -15,7 +15,8 @@ function expectMapsToBeEquivalent(expected, actual) {
 	expect(actual).to.have.property('note', expected.note);
 	expect(actual).to.have.property('filename', expected.filename);
 	expect(actual.modifiedDate.isSame(expected.modifiedDate)).to.equal(true);
-	// expect(actual).to.have.property('origin', expected.origin);
+	expect(actual).to.have.property('origin', expected.origin);
+	// expect(actual.origin).to.have.property('x', expected.origin.x).and.to.have.property('y', expected.origin.y);
 	// expect(actual).to.have.property('opposite', expected.opposite);
 	expect(actual).to.have.property('mapSource', expected.mapSource);
 }
@@ -23,11 +24,14 @@ function expectMapsToBeEquivalent(expected, actual) {
 mocha.describe('Maps', () => {
 	mocha.it('can be saved and retrieved', async () => {
 		const conn = testDB.getConnection();
-		const mapPreInsert = new Map(undefined, 'Map', null, "default", moment('2000-10-10'), new Point(0.000001, 0.000001), new Point(100.000001, 100.000001), "placeholder");
+		const origin = new Point(0.000001, 0.000001);
+		const opposite = new Point(100.000001, 100.000001);
+		const mapPreInsert = new Map(undefined, 'Map', null, "default", moment('2000-10-10'), origin, opposite, "placeholder");
 		await mapPreInsert.insert(conn);
 		const mapPostInsertByName = await Map.getByName(mapPreInsert.name, conn);
 		expectMapsToBeEquivalent(mapPreInsert, mapPostInsertByName);
 		// const mapPostInsertByID = await Map.getByID(mapPreInsert.id, conn);
 		// expectMapsToBeEquivalent(mapPreInsert, mapPostInsertByID);
+		return Promise.resolve();
 	});
 });

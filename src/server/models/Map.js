@@ -4,6 +4,7 @@
 
 const database = require('./database');
 const sqlFile = database.sqlFile;
+const Point = require('./Point');
 
 class Map {
 	/**
@@ -12,8 +13,8 @@ class Map {
 	 * @param note notes on the map
 	 * @param filename name of file used to upload data
 	 * @param modifiedDate last modified date of the map
-	 * @param origin coordinates of (0,0) on map
-	 * @param opposite coordinates of opposite corner from origin
+	 * @param origin {Point} coordinates of (0,0) on map
+	 * @param opposite {Point} coordinates of opposite corner from origin
 	 * @param mapSource data URL of image of the map
 	 */
 	constructor(id, name, note, filename, modifiedDate, origin, opposite, mapSource) {
@@ -66,7 +67,7 @@ class Map {
 
 	/**
 	 * Creates a new map based on the data in a row
-	 * @param row
+	 * @param row field names used to extract from row must match column names inside SQL functions
 	 * @returns {Map}
 	 */
 	static mapRow(row) {

@@ -14,8 +14,10 @@ const pgp = require('pg-promise')({
 
 const path = require('path');
 const patchMomentType = require('./patch-moment-type');
+const patchPointType = require('./patch-point-type');
 
 patchMomentType(pgp);
+patchPointType(pgp);
 
 /**
  * Create a new connection to the database.
