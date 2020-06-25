@@ -10,7 +10,9 @@ const { getConnection, dropConnection } = require('../../db');
 
 (async () => {
 	let email;
-	let password;
+	// Set password to unused value. Coverity Scan thinks it is not set but logic below seems to
+	// always set of call terminateReadline that stops to process. This should fix this.
+	let password = 'whatever';
 
 	// If there aren't enough args, go interactive.
 	const cmdArgs = process.argv;
