@@ -4,19 +4,19 @@
 
 /**
  * transform data passed from frontend into objects acceptable for postgres
- * @param x
- * @param y
+ * @param longitude
+ * @param latitude
  * @constructor
  */
-function Point(x, y) {
-	this.x = x;
-	this.y = y;
+function Point(longitude, latitude) {
+	this.longitude = longitude;
+	this.latitude = latitude;
 
 	// Custom Type Formatting:
 	this._rawDBType = true; // to make the type return the string without escaping it;
 
 	this.formatDBType = function formatDBType() {
-		return `point(${this.x}, ${this.y})`;
+		return `point(${this.longitude}, ${this.latitude})`;
 	};
 }
 

@@ -8,8 +8,8 @@ export interface CartesianPoint {
 }
 
 export interface GPSPoint {
-	latitude: number;
 	longitude: number;
+	latitude: number;
 }
 
 interface MapScale {
@@ -27,8 +27,8 @@ export class CalibratedPoint {
 			y: number;
 		};
 		this.gps = new class implements GPSPoint {
-			latitude: number;
 			longitude: number;
+			latitude: number;
 		}
 
 	}

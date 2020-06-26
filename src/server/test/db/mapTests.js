@@ -10,8 +10,8 @@ const Point = require('../../models/Point');
 const moment = require('moment');
 
 function expectPointsToBeEquivalent(expected, actual) {
-	expect(actual).to.have.property('x', expected.x);
-	expect(actual).to.have.property('y', expected.y);
+	expect(actual).to.have.property('longitude', expected.longitude);
+	expect(actual).to.have.property('latitude', expected.latitude);
 }
 
 function expectMapsToBeEquivalent(expected, actual) {
