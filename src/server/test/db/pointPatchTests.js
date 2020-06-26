@@ -24,7 +24,7 @@ mocha.describe('Point patching', () => {
 	//
 	mocha.it('patches returned points to defined point types', async () => {
 		const conn = testDB.getConnection();
-		const point = new Point(0.000001, 0.000001);
+		const point = new Point(100.000001, 100.000001);
 		const { returned } = await conn.one('SELECT ${point} AS returned', { point: point });
 		expect(returned).to.have.property('x');
 		expect(returned).to.have.property('y');
@@ -34,9 +34,13 @@ mocha.describe('Point patching', () => {
 
 	mocha.it('patches points to the correct value', async () => {
 		const conn = testDB.getConnection();
-		const point = new Point(0.000001, 0.000001);
-		const { returned } = await conn.one('SELECT ${point} AS returned', { point: point });
-		expect(returned).to.have.property('x', point.x);
-		expect(returned).to.have.property('y', point.y);
+		const point1 = new Point(0.000001, 0.000001);
+		const { returned1 } = await conn.one('SELECT ${point2} AS returned', { point: point1 });
+		expect(returned1).to.have.property('x', point1.x);
+		expect(returned1).to.have.property('y', point1.y);
+		const point2 = new Point(100.000001, 100.000001);
+		const { returned2 } = await conn.one('SELECT ${point2} AS returned', { point: point2 });
+		expect(returned2).to.have.property('x', point2.x);
+		expect(returned2).to.have.property('y', point2.y);
 	});
 });

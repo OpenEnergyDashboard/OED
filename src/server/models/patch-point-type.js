@@ -12,14 +12,16 @@ function patchPointType(pgp) {
 	const types = pgp.pg.types;
 
 	const POINT_OID = 600;
-	types.setTypeParser(POINT_OID, function (val) {
+	types.setTypeParser(POINT_OID,
+		/**
+		 * parse the string representation of a 'postgres point type' into a {Point}
+		 * @param val a string in the form "(floatA,floatB)"
+		 * @return {Point}
+		 */
+		function (val) {
 		const coordinates = val.slice(1, val.length-1).split(',');
 		const parsedCoordinates = coordinates.map(scientific => {
-			const integerAndExponent = scientific.split('e');
-			const integer = parseInt(integerAndExponent[0]);
-			const exponentSign = integerAndExponent[1].charAt(0);
-			const exponentNumber = parseInt(integerAndExponent[1].substr(1));
-			return exponentSign === '+'? integer * Math.pow(10, exponentNumber): integer / Math.pow(10, exponentNumber)
+			return Number(scientific);
 		});
 		return new Point(parsedCoordinates[0], parsedCoordinates[1]);
 	});

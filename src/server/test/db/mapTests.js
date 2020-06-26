@@ -9,19 +9,27 @@ const Map = require('../../models/Map');
 const Point = require('../../models/Point');
 const moment = require('moment');
 
+function expectPointsToBeEquivalent(expected, actual) {
+	expect(actual).to.have.property('x', expected.x);
+	expect(actual).to.have.property('y', expected.y);
+}
+
 function expectMapsToBeEquivalent(expected, actual) {
 	expect(actual).to.have.property('id', expected.id);
 	expect(actual).to.have.property('name', expected.name);
 	expect(actual).to.have.property('note', expected.note);
 	expect(actual).to.have.property('filename', expected.filename);
 	expect(actual.modifiedDate.isSame(expected.modifiedDate)).to.equal(true);
-	expect(actual).to.have.property('origin', expected.origin);
-	// expect(actual.origin).to.have.property('x', expected.origin.x).and.to.have.property('y', expected.origin.y);
-	// expect(actual).to.have.property('opposite', expected.opposite);
+	expectPointsToBeEquivalent(expected.origin, actual.origin);
+	expectPointsToBeEquivalent(expected.opposite, actual.opposite);
 	expect(actual).to.have.property('mapSource', expected.mapSource);
 }
 
 mocha.describe('Maps', () => {
+	mocha.beforeEach(async () => {
+		conn = await testDB.getConnection();
+	});
+
 	mocha.it('can be saved and retrieved', async () => {
 		const conn = testDB.getConnection();
 		const origin = new Point(0.000001, 0.000001);
@@ -30,8 +38,8 @@ mocha.describe('Maps', () => {
 		await mapPreInsert.insert(conn);
 		const mapPostInsertByName = await Map.getByName(mapPreInsert.name, conn);
 		expectMapsToBeEquivalent(mapPreInsert, mapPostInsertByName);
-		// const mapPostInsertByID = await Map.getByID(mapPreInsert.id, conn);
-		// expectMapsToBeEquivalent(mapPreInsert, mapPostInsertByID);
+		const mapPostInsertByID = await Map.getByID(mapPreInsert.id, conn);
+		expectMapsToBeEquivalent(mapPreInsert, mapPostInsertByID);
 		return Promise.resolve();
 	});
 });
