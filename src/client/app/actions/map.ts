@@ -24,10 +24,14 @@ function receiveSelectedMap(map: MapData) {
 export function fetchSelectedMap(): Thunk {
 	return async (dispatch: Dispatch, getState: GetState) => {
 		dispatch(requestSelectedMap());
-		const map: MapData = await mapsApi.getMapById(8);
-		console.log(`${map.name},${map.origin}; ${map.mapSource}`);
+		const map: MapData = await mapsApi.getMapById(9);
+		// @ts-ignore
+		// console.log(map.origin.x);
+		// map.origin is still a Point() type;
+		// TODO: write function to set the origin with type of CalibratedPoint with data from Point() origin
+		map.origin = new CalibratedPoint();
 		await dispatch(receiveSelectedMap(map));
-		console.log(`${getState().map.calibration.mode},fetched source: ${getState().map.calibration.image.src}`);
+		// console.log(`${getState().map.calibration.mode},fetched source: ${getState().map.calibration.image.src}`);
 
 		if (getState().map.calibration.image.src) {
 			dispatch((dispatch2) => {
@@ -39,11 +43,10 @@ export function fetchSelectedMap(): Thunk {
 
 export function updateMapSource(imageSource: HTMLImageElement): Thunk {
 	return async dispatch => {
-		dispatch(displayLoading());
 		dispatch((dispatch2) => {
 			const newMap: MapData = {
-				name: "test3",
-				mapSource: "placeHolder",
+				name: "test1",
+				mapSource: imageSource.src,
 			};
 			dispatch2(uploadMapSource(imageSource));
 			console.log(imageSource.src);

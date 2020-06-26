@@ -60,10 +60,9 @@ export default class DashboardComponent extends React.Component<DashboardProps, 
 			}
 			ChartToRender = MultiCompareChartContainer;
 		} else {
-			// TODO: adding this caused the bug
-			// if (this.props.mapLoading) {
-			// 	showSpinner = true;
-			// }
+			if (this.props.mapLoading) {
+				showSpinner = true;
+			}
 			ChartToRender = MapCalibrationContainer;
 		}
 

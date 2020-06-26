@@ -23,6 +23,6 @@ export default class MapsApi {
 	}
 
 	public async getMapByName(name: string): Promise<MapData> {
-		return await this.backend.doGetRequest<MapData>('/api/maps/getByName', {name});
+		return await this.backend.doGetRequest<MapData>('/api/maps/getByName', {'name':name});
 	}
 }

@@ -10,7 +10,7 @@ const { getConnection } = require('../db');
 const requiredAuthenticator = require('./authenticator').authMiddleware;
 const optionalAuthenticator = require('./authenticator').optionalAuthMiddleware;
 const moment = require('moment');
-const point = require('../models/Point');
+const Point = require('../models/Point');
 
 const router = express.Router();
 
@@ -30,10 +30,9 @@ function formatMapForResponse(map) {
 
 router.get('/', async (req, res) => {
 	const conn = getConnection();
-	const query = Map.getAll;
 	try {
-		const rows = await query(conn);
-		res.json(rows.map(row => formatMapForResponse(row, req.hasValidAuthToken)));
+		const rows = await Map.getAll(conn);
+		res.json(rows.map(row => formatMapForResponse(row)));
 	} catch (err) {
 		log.error(`Error while performing GET all maps query: ${err}`, err);
 	}
@@ -63,14 +62,6 @@ router.get('/:map_id', async (req, res) => {
 			res.sendStatus(500);
 		}
 	}
-	// const conn = getConnection();
-	// try {
-	// 	const map = await Map.getByID(req.params.map_id, conn);
-	// 	res.json(formatMapForResponse(map));
-	// } catch (err) {
-	// 	log.error(`Error while performing GET specific map by id query: ${err}`, err);
-	// 	res.sendStatus(500);
-	// }
 });
 
 router.get('/getByName', async (req, res) => {
@@ -132,8 +123,8 @@ router.post('/create', async (req, res) => {
 		const conn = getConnection();
 		try {
 			await conn.tx(async t => {
-				const origin = (req.body.origin)? point.Point(req.body.origin): point.Point(1.000001,1.000001);
-				const opposite = (req.body.opposite)? point.Point(req.body.opposite): point.Point(180.000001,180.000001);
+				const origin = (req.body.origin)? new Point(req.body.origin): new Point(1.000001,1.000001);
+				const opposite = (req.body.opposite)? new Point(req.body.opposite): new Point(180.000001,180.000001);
 				const newMap = new Map(
 					undefined,
 					req.body.name,
