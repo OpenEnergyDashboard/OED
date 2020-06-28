@@ -5,14 +5,13 @@
 import MapCalibration_InitiateComponent from '../components/MapCalibration_InitiateComponent';
 import { connect } from 'react-redux';
 import { Dispatch } from '../types/redux/actions';
-import {updateMapMode, updateMapSource, displayLoading} from "../actions/map";
-import {CalibrationModeTypes} from "../types/redux/map";
+import {updateMapMode, updateMapSource} from "../actions/map";
+import {CalibrationModeTypes, MapData} from "../types/redux/map";
 
 function mapDispatchToProps(dispatch: Dispatch) {
 	return {
 		updateMapMode: (nextMode: CalibrationModeTypes) => dispatch(updateMapMode(nextMode)),
-		onSourceChange: (image: HTMLImageElement) => dispatch(updateMapSource(image)),
-		displayLoading: () => dispatch(displayLoading())
+		onSourceChange: (data: MapData) => dispatch(updateMapSource(data)),
 	};
 }
 

@@ -3,7 +3,7 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
 
 import * as React from 'react';
-import { CalibrationModeTypes } from '../types/redux/map';
+import {CalibrationModeTypes, MapData} from '../types/redux/map';
 
 /**
  * Accepts image file from user upload,
@@ -14,7 +14,7 @@ import { CalibrationModeTypes } from '../types/redux/map';
 
 interface MapInitiateProps {
 	updateMapMode(nextMode: CalibrationModeTypes): any;
-	onSourceChange(image: HTMLImageElement): any;
+	onSourceChange(data: MapData): any;
 	displayLoading(): any;
 }
 
@@ -59,8 +59,12 @@ export default class MapCalibration_InitiateComponent extends React.Component<Ma
 			const imageURL = await this.getDataURL();
 			let image = new Image();
 			image.src = imageURL;
-			await this.props.displayLoading();
-			await this.props.onSourceChange(image);
+			const source: MapData = {
+				name: 'map',
+				filename: this.fileInput.current.files[0].name,
+				mapSource: imageURL,
+			}
+			await this.props.onSourceChange(source);
 		} catch (err) {
 			console.log(err);
 		}

@@ -18,8 +18,8 @@ interface MapScale {
 }
 
 export class CalibratedPoint {
-	private cartesian: CartesianPoint;
-	private gps: GPSPoint;
+	cartesian: CartesianPoint;
+	gps: GPSPoint;
 
 	constructor() {
 		this.cartesian = new class implements CartesianPoint {
@@ -33,14 +33,6 @@ export class CalibratedPoint {
 
 	}
 
-	public setCartesian(cartesian: CartesianPoint) {
-		this.cartesian = cartesian;
-	}
-
-	public setGPS(gps: GPSPoint) {
-		this.gps = gps;
-	}
-
 	public isComplete() {
 		return this.cartesian !== undefined && this.gps !== undefined;
 	}
@@ -49,28 +41,22 @@ export class CalibratedPoint {
 		return this.cartesian !== undefined;
 	}
 
-	public getGPS() {
-		return this.gps;
-	}
-
 	public getGPSString() {
 		return `latitude: ${this.gps.latitude}, longitude: ${this.gps.longitude}`;
-	}
-
-	public getCartesian() {
-		return this.cartesian;
 	}
 
 	public getCartesianString() {
 		return `x: ${this.cartesian.x}, y: ${this.cartesian.y}`;
 	}
+}
 
-	public clone() {
-		let copy = new CalibratedPoint();
-		copy.setCartesian(this.cartesian);
-		copy.setGPS(this.gps);
-		return copy;
-	}
+export interface CalibrationResult {
+	maxError?: {
+		x: number,
+		y: number,
+	},
+	origin?: GPSPoint,
+	opposite?: GPSPoint,
 }
 
 export interface Dimensions {
@@ -100,8 +86,8 @@ export default function calibrate(calibrationSet: CalibratedPoint[], imageDimens
 	const degreePerUnitY = YScaleSum/numDataPoints;
 
 	// calculate gps coordinates for the origin;
-	let originLatitude = calibrationSet[0].getGPS().latitude - degreePerUnitY * calibrationSet[0].getCartesian().y;
-	let originLongitude = calibrationSet[0].getGPS().longitude - degreePerUnitX * calibrationSet[0].getCartesian().x;
+	let originLatitude = calibrationSet[0].gps.latitude - degreePerUnitY * calibrationSet[0].cartesian.y;
+	let originLongitude = calibrationSet[0].gps.longitude - degreePerUnitX * calibrationSet[0].cartesian.x;
 	let originCoordinate = [originLatitude, originLongitude];
 
 	// uncomment this block to get gps coordinates of the opposite corner from origin
@@ -113,11 +99,17 @@ export default function calibrate(calibrationSet: CalibratedPoint[], imageDimens
 	// calculate gps coordinates for top-left and down-right corner
 	let topLeftLatitude = originLatitude + normalizedDimensions.height * degreePerUnitY;
 	let topLeftLongitude = originLongitude;
-	let topLeftCoordinate = [topLeftLatitude.toFixed(6), topLeftLongitude.toFixed(6)];
+	let topLeftCoordinate: GPSPoint = {
+		latitude: Number(topLeftLatitude.toFixed(6)),
+		longitude: Number(topLeftLongitude.toFixed(6)),
+	};
 
 	let downRightLatitude = originLatitude;
 	let downRightLongitude = originLongitude + normalizedDimensions.width * degreePerUnitX;
-	let downRightCoordinate = [downRightLatitude.toFixed(6), downRightLongitude.toFixed(6)];
+	let downRightCoordinate: GPSPoint = {
+		latitude: Number(downRightLatitude.toFixed(6)),
+		longitude: Number(downRightLongitude.toFixed(6)),
+	};
 
 	// calculate max error
 	const diagonal = Math.sqrt(Math.pow(normalizedDimensions.width/degreePerUnitX, 2) + Math.pow(normalizedDimensions.height/degreePerUnitY, 2));
@@ -145,18 +137,21 @@ export default function calibrate(calibrationSet: CalibratedPoint[], imageDimens
 		x: Number.parseFloat((scalesWithMaxDifference.degreePerUnitX/diagonal * 100).toFixed(3)),
 		y: Number.parseFloat((scalesWithMaxDifference.degreePerUnitY/diagonal * 100).toFixed(3))
 	}
-	const result = `Max error: x: ${maxErrorPercentage.x}%, y: ${maxErrorPercentage.y}%;
-	TopLeftCorner: ${topLeftCoordinate[0]},${topLeftCoordinate[1]}, DownRightCorner: ${downRightCoordinate[0]}, ${downRightCoordinate[1]}`;
+	const result: CalibrationResult = {
+		maxError: maxErrorPercentage,
+		origin: topLeftCoordinate,
+		opposite: downRightCoordinate,
+	}
 	return result;
 }
 
 function calculateScale(p1: CalibratedPoint, p2: CalibratedPoint) {
-	let deltaLatitude = p1.getGPS().latitude - p2.getGPS().latitude;
-	let deltaYInUnits = p1.getCartesian().y - p2.getCartesian().y;
+	let deltaLatitude = p1.gps.latitude - p2.gps.latitude;
+	let deltaYInUnits = p1.cartesian.y - p2.cartesian.y;
 	let degreePerUnitY = deltaLatitude / deltaYInUnits;
 
-	let deltaLongitude = p1.getGPS().longitude - p2.getGPS().longitude;
-	let deltaXInUnits = p1.getCartesian().x - p2.getCartesian().x;
+	let deltaLongitude = p1.gps.longitude - p2.gps.longitude;
+	let deltaXInUnits = p1.cartesian.x - p2.cartesian.x;
 	let degreePerUnitX = deltaLongitude / deltaXInUnits;
 
 	return {degreePerUnitX, degreePerUnitY};

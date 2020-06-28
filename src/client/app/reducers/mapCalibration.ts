@@ -9,10 +9,13 @@ import {CalibratedPoint} from "../utils/calibration";
 const defaultState: MapCalibrationState = {
 	mode: CalibrationModeTypes.initiate,
 	isLoading: false,
+	name: 'default',
+	note: 'left as blank',
+	filename: 'image',
 	image: new Image(),
 	currentPoint: new CalibratedPoint,
 	calibrationSet: [],
-	result: '',
+	calibrationResult: {},
 };
 
 export default function mapCalibration(state = defaultState, action: MapCalibrationAction) {
@@ -31,30 +34,46 @@ export default function mapCalibration(state = defaultState, action: MapCalibrat
 			return {
 				...state,
 				isLoading: false,
+				name: action.map.name,
+				note: action.map.note,
 				image: {
 					...state.image,
 					src: action.map.mapSource
+				},
+				filename: action.map.filename,
+				calibrationResult: {
+					origin: action.map.origin,
+					opposite: action.map.opposite,
+					// do we keep track of maxError too?
 				}
 			}
 		case ActionType.UpdateMapSource:
 			return {
 				...state,
-				image: action.image,
+				name: action.data.name,
+				note: action.data.note, //should notes be updated only after upload is complete?
+				image: {
+					...state.image,
+					src: action.data.mapSource
+				},
+				filename: action.data.filename,
 				isLoading: false
 			};
 		case ActionType.UpdateCurrentCartesian:
-			let changeCartesian = state.currentPoint.clone();
-			changeCartesian.setCartesian(action.currentCartesian);
 			return {
 				...state,
-				currentPoint: changeCartesian,
+				currentPoint: {
+					...state.currentPoint,
+					cartesian: action.currentCartesian,
+				},
 			};
 		case ActionType.UpdateCurrentGPS:
-			let changeGPS = state.currentPoint.clone();
-			changeGPS.setGPS(action.currentGPS);
 			return {
 				...state,
-				currentPoint: changeGPS
+				currentPoint: {
+					...state.currentPoint,
+					gps: action.currentGPS,
+				}
 			};
 		case ActionType.ResetCurrentPoint:
 			return {
@@ -62,11 +81,12 @@ export default function mapCalibration(state = defaultState, action: MapCalibrat
 				currentPoint: new CalibratedPoint()
 			};
 		case ActionType.AppendCalibrationSet:
-			let calibrationSet = state.calibrationSet;
-			calibrationSet.push(action.calibratedPoint);
 			return {
 				...state,
-				calibrationSet: calibrationSet,
+				calibrationSet: [
+					...state.calibrationSet.slice(0),
+					action.calibratedPoint,
+				],
 			};
 		case ActionType.UpdateCalibrationResults:
 			return {

@@ -3,20 +3,29 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
 
 import {ActionType} from './actions';
-import {CalibratedPoint, CartesianPoint, GPSPoint} from '../../utils/calibration';
+import {CalibratedPoint, CalibrationResult, CartesianPoint, GPSPoint} from '../../utils/calibration';
 
 export enum CalibrationModeTypes {
 	initiate = 'initiate',
 	calibrate = 'calibrate',
 }
 
+/**
+ * @param name
+ * @param note
+ * @param filename
+ * @param modifiedDate
+ * @param origin
+ * @param opposite
+ * @param mapSource
+ */
 export interface MapData{
 	name: string;
 	note?: string;
 	filename?: string;
 	modifiedDate?: number;
-	origin?: CalibratedPoint;
-	opposite?: CalibratedPoint;
+	origin?: GPSPoint;
+	opposite?: GPSPoint;
 	mapSource: string;
 }
 
@@ -27,7 +36,7 @@ export interface ChangeMapModeAction {
 
 export interface UpdateMapSourceAction {
 	type: ActionType.UpdateMapSource;
-	image: HTMLImageElement;
+	data: MapData;
 }
 
 export interface UpdateCurrentCartesianAction {
@@ -51,7 +60,7 @@ export interface AppendCalibrationSetAction {
 
 export interface UpdateCalibrationResultAction {
 	type: ActionType.UpdateCalibrationResults;
-	result: string;
+	result: CalibrationResult;
 }
 
 export interface DisplayMapLoadingAction {
@@ -82,8 +91,12 @@ export type MapCalibrationAction =
 export interface MapCalibrationState {
 	mode: CalibrationModeTypes;
 	isLoading: boolean;
+	name: string;
+	note: string;
+	// add modified date
+	filename: string;
 	image: HTMLImageElement;
 	currentPoint: CalibratedPoint;
 	calibrationSet: CalibratedPoint[];
-	result: string;
+	calibrationResult: CalibrationResult;
 }
