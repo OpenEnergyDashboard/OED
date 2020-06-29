@@ -88,12 +88,13 @@ export type MapCalibrationAction =
 	| UpdateCalibrationResultAction
 	| DisplayMapLoadingAction;
 
-export interface MapCalibrationState {
+export interface MapState {
 	mode: CalibrationModeTypes;
 	isLoading: boolean;
+	isDisplayable: boolean;
 	name: string;
 	note: string;
-	// add modified date
+	lastModified: string;
 	filename: string;
 	image: HTMLImageElement;
 	currentPoint: CalibratedPoint;

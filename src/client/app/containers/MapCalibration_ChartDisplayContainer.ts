@@ -15,11 +15,11 @@ function mapStateToProps(state: State) {
 	let y: number[] = [];
 	let texts: string[] = [];
 
-	const points = state.map.calibration.calibrationSet;
+	const points = state.map.calibrationSet;
 	for (let i = 0; i < points.length; i++) {
 		const current = points[i];
-		x.push(current.getCartesian().x);
-		y.push(current.getCartesian().y);
+		x.push(current.cartesian.x);
+		y.push(current.cartesian.y);
 		texts.push(current.getGPSString());
 	}
 
@@ -40,7 +40,7 @@ function mapStateToProps(state: State) {
 	};
 	let data = [backTrace,trace1];
 
-	const imageSource = state.map.calibration.image.src;
+	const imageSource = state.map.image.src;
 
 	// for a detailed description of layout attributes: https://plotly.com/javascript/reference/#layout
 	const layout: any = {

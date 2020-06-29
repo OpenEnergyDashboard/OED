@@ -9,7 +9,7 @@ import barReadings from './barReadings';
 import compareReadings from './compareReadings';
 import graph from './graph';
 import groups from './groups';
-import mapCalibration from './mapCalibration';
+import maps from './maps';
 import notifications from './notifications';
 import admin from './admin';
 
@@ -22,10 +22,7 @@ export default combineReducers({
 		compare: compareReadings
 	}),
 	graph,
-	map: combineReducers({
-		calibration: mapCalibration,
-		// placeholder for display mode
-	}),
+	maps,
 	groups,
 	notifications,
 	admin

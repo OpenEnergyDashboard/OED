@@ -64,32 +64,6 @@ router.get('/:map_id', async (req, res) => {
 	}
 });
 
-router.get('/getByName', async (req, res) => {
-	const validParams = {
-		type: 'object',
-		maxProperties: 1,
-		required: ['name'],
-		properties: {
-			name: {
-				type: 'string',
-				minLength: 1
-			}
-		}
-	};
-	// if (!validate(req.params, validParams).valid) {
-	// 	res.sendStatus(400);
-	// } else {
-		const conn = getConnection();
-		try {
-			const map = await Map.getByName(req.params.name, conn);
-			res.json(formatMapForResponse(map));
-		} catch (err) {
-			log.error(`Error while performing GET specific map by name query: ${err}`, err);
-			res.sendStatus(500);
-		}
-	// }
-});
-
 router.post('/create', async (req, res) => {
 	const validGroup = {
 		type: 'object',
@@ -123,8 +97,8 @@ router.post('/create', async (req, res) => {
 		const conn = getConnection();
 		try {
 			await conn.tx(async t => {
-				const origin = (req.body.origin)? new Point(req.body.origin): new Point(1.000001,1.000001);
-				const opposite = (req.body.opposite)? new Point(req.body.opposite): new Point(180.000001,180.000001);
+				const origin = (req.body.origin)? new Point(req.body.origin.longitude, req.body.origin.latitude): new Point(1.000001,1.000001);
+				const opposite = (req.body.opposite)? new Point(req.body.opposite.longitude, req.body.opposite.latitude): new Point(180.000001,180.000001);
 				const newMap = new Map(
 					undefined,
 					req.body.name,

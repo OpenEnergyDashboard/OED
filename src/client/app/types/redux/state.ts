@@ -10,7 +10,7 @@ import { MetersState } from './meters';
 import { NotificationsState } from './notifications';
 import { AdminState } from './admin';
 import { CompareReadingsState } from './compareReadings';
-import {MapCalibrationState} from './map';
+import {MapState} from './map';
 
 export interface State {
 	meters: MetersState;
@@ -20,9 +20,7 @@ export interface State {
 		compare: CompareReadingsState;
 	};
 	graph: GraphState;
-	map: {
-		calibration: MapCalibrationState
-	};
+	map: MapState;
 	groups: GroupsState;
 	notifications: NotificationsState;
 	admin: AdminState;

@@ -7,12 +7,12 @@ import { State } from '../types/redux/state';
 import { Dispatch } from '../types/redux/actions';
 import { CalibrationModeTypes } from '../types/redux/map';
 import MapCalibration_InfoDisplayComponent from '../components/MapCalibration_InfoDisplayComponent';
-import {resetCurrentPoint, offerCurrentGPS} from "../actions/map";
+import {resetCurrentPoint, offerCurrentGPS, uploadMapData} from "../actions/map";
 import {GPSPoint} from "../utils/calibration";
 
 function mapStateToProps(state: State) {
-	const resultDisplay = (state.map.calibration.result)? state.map.calibration.result : "Need more points";
-	const currentCartesianDisplay = state.map.calibration.currentPoint.getCartesianString();
+	const resultDisplay = (state.map.calibrationResult.maxError)? state.map.calibrationResult.maxError : "Need more points";
+	const currentCartesianDisplay = state.map.currentPoint.getCartesianString();
 	return {
 		currentCartesianDisplay: currentCartesianDisplay,
 		resultDisplay: resultDisplay,
@@ -22,7 +22,8 @@ function mapStateToProps(state: State) {
 function mapDispatchToProps(dispatch: Dispatch) {
 	return {
 		onReset:() => dispatch(resetCurrentPoint()),
-		updateGPSCoordinates: (gpsCoordinate: GPSPoint) => dispatch(offerCurrentGPS(gpsCoordinate))
+		updateGPSCoordinates: (gpsCoordinate: GPSPoint) => dispatch(offerCurrentGPS(gpsCoordinate)),
+		uploadMap: () => dispatch(uploadMapData()),
 	}
 }
 export default connect(mapStateToProps, mapDispatchToProps)(MapCalibration_InfoDisplayComponent);

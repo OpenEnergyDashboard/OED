@@ -2,23 +2,25 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
 
-import {CalibrationModeTypes, MapCalibrationAction, MapCalibrationState} from '../types/redux/map';
+import {CalibrationModeTypes, MapCalibrationAction, MapState} from '../types/redux/map';
 import {ActionType} from '../types/redux/actions';
 import {CalibratedPoint} from "../utils/calibration";
 
-const defaultState: MapCalibrationState = {
+const defaultState: MapState = {
 	mode: CalibrationModeTypes.initiate,
+	isDisplayable: false,
 	isLoading: false,
 	name: 'default',
 	note: 'left as blank',
 	filename: 'image',
+	lastModified: '',
 	image: new Image(),
 	currentPoint: new CalibratedPoint,
 	calibrationSet: [],
 	calibrationResult: {},
 };
 
-export default function mapCalibration(state = defaultState, action: MapCalibrationAction) {
+export default function maps(state = defaultState, action: MapCalibrationAction) {
 	switch (action.type) {
 		case ActionType.UpdateMapMode:
 			return {

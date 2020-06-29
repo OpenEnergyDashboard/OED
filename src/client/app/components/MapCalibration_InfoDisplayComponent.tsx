@@ -11,6 +11,7 @@ interface InfoDisplayProps {
 	resultDisplay: string;
 	onReset(): any;
 	updateGPSCoordinates(gpsCoordinate: GPSPoint): any;
+	uploadMap(): any;
 }
 
 interface InfoDisplayState {
@@ -40,6 +41,7 @@ export default class MapCalibration_InfoDisplayComponent extends React.Component
 					<br/>
 					<input type={"submit"} value={"Submit"}/>
 					<button onClick={this.resetInputField.bind(this)}>Cancel</button>
+					<button onClick={this.props.uploadMap}>Save</button>
 				</form>
 				<p>{calibrationDisplay}</p>
 			</div>
