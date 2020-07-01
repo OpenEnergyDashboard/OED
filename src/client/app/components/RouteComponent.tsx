@@ -185,6 +185,8 @@ export default class RouteComponent extends React.Component<RouteProps, {}> {
 						<Route path='/groups' component={GroupsDetailContainer} onEnter={this.checkAuth} />
 						<Route path='/meters' component={MetersDetailContainer} onEnter={this.checkAuth} />
 						<Route path='/graph' component={HomeComponent} onEnter={this.linkToGraph} />
+						<Route path='/maps' component={MapCalibrationContainer} onEnter={this.requireAuth} />
+						//TODO: need a mapsDetailContainer at this layer to select which map to calibrate
 						<Route path='/createGroup' component={CreateGroupContainer} onEnter={this.requireAuth} />
 						<Route path='/editGroup' component={EditGroupsContainer} onEnter={this.requireAuth} />
 						<Route path='*' component={HomeComponent} />
