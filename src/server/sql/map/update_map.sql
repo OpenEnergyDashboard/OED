@@ -5,6 +5,7 @@
 UPDATE maps
 	SET name = ${name},
 		note = ${note},
+		displayable = ${displayable},
 		filename = ${filename},
 		modified_date = ${modifiedDate},
 		origin = ${origin},

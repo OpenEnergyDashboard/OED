@@ -17,6 +17,7 @@ function expectPointsToBeEquivalent(expected, actual) {
 function expectMapsToBeEquivalent(expected, actual) {
 	expect(actual).to.have.property('id', expected.id);
 	expect(actual).to.have.property('name', expected.name);
+	expect(actual).to.have.property('displayable', expected.displayable);
 	expect(actual).to.have.property('note', expected.note);
 	expect(actual).to.have.property('filename', expected.filename);
 	expect(actual.modifiedDate.isSame(expected.modifiedDate)).to.equal(true);
@@ -34,7 +35,7 @@ mocha.describe('Maps', () => {
 		const conn = testDB.getConnection();
 		const origin = new Point(0.000001, 0.000001);
 		const opposite = new Point(100.000001, 100.000001);
-		const mapPreInsert = new Map(undefined, 'Map', null, "default", moment('2000-10-10'), origin, opposite, "placeholder");
+		const mapPreInsert = new Map(undefined, 'Map', false, null, "default", moment('2000-10-10'), origin, opposite, "placeholder");
 		await mapPreInsert.insert(conn);
 		const mapPostInsertByName = await Map.getByName(mapPreInsert.name, conn);
 		expectMapsToBeEquivalent(mapPreInsert, mapPostInsertByName);

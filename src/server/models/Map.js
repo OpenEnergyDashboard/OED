@@ -10,6 +10,7 @@ class Map {
 	/**
 	 * @param id should be undefined when creating a new group
 	 * @param name map's name
+	 * @param displayable is the map set for display
 	 * @param note notes on the map
 	 * @param filename name of file used to upload data
 	 * @param modifiedDate last modified date of the map
@@ -17,9 +18,10 @@ class Map {
 	 * @param opposite {Point} coordinates of opposite corner from origin
 	 * @param mapSource data URL of image of the map
 	 */
-	constructor(id, name, note, filename, modifiedDate, origin, opposite, mapSource) {
+	constructor(id, name, displayable, note, filename, modifiedDate, origin, opposite, mapSource) {
 		this.id = id;
 		this.name = name;
+		this.displayable = displayable;
 		this.note = note;
 		this.filename = filename;
 		this.modifiedDate = modifiedDate;
@@ -71,7 +73,7 @@ class Map {
 	 * @returns {Map}
 	 */
 	static mapRow(row) {
-		return new Map(row.id, row.name, row.note, row.filename, row.modified_date, row.origin, row.opposite, row.map_source);
+		return new Map(row.id, row.name, row.displayable, row.note, row.filename, row.modified_date, row.origin, row.opposite, row.map_source);
 	}
 
 	/**
