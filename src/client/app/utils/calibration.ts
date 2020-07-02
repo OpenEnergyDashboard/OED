@@ -12,6 +12,10 @@ export interface GPSPoint {
 	latitude: number;
 }
 
+/**
+ * @param degreePerUnitX
+ * @param degreePerUnitY
+ */
 interface MapScale {
 	degreePerUnitX: number;
 	degreePerUnitY: number;
@@ -30,7 +34,6 @@ export class CalibratedPoint {
 			longitude: number;
 			latitude: number;
 		}
-
 	}
 
 	public isComplete() {
@@ -55,8 +58,8 @@ export interface CalibrationResult {
 		x: number,
 		y: number,
 	},
-	origin?: GPSPoint,
-	opposite?: GPSPoint,
+	origin: GPSPoint,
+	opposite: GPSPoint,
 }
 
 export interface Dimensions {
@@ -64,7 +67,19 @@ export interface Dimensions {
 	height: number;
 }
 
-export default function calibrate(calibrationSet: CalibratedPoint[], imageDimensions: Dimensions) {
+export function calculateScaleFromEndpoints(origin: GPSPoint, opposite: GPSPoint, imageDimensions: Dimensions) {
+	const normalizedDimensions = normalizeImageDimensions(imageDimensions);
+	const originComplete: CalibratedPoint = new CalibratedPoint();
+	originComplete.gps = origin;
+	originComplete.cartesian = {x: 0, y: 0};
+	const oppositeComplete: CalibratedPoint = new CalibratedPoint();
+	oppositeComplete.gps = opposite;
+	oppositeComplete.cartesian = {x: normalizedDimensions.width, y: normalizedDimensions.height};
+	let mapScale: MapScale = calculateScale(originComplete, oppositeComplete);
+	return mapScale;
+}
+
+export function calibrate(calibrationSet: CalibratedPoint[], imageDimensions: Dimensions) {
 	const normalizedDimensions = normalizeImageDimensions(imageDimensions);
 	// calculate (n choose 2) scales for each pair of data points;
 	let scales: MapScale[] = [];
