@@ -35,22 +35,6 @@ export class CalibratedPoint {
 			latitude: number;
 		}
 	}
-
-	public isComplete() {
-		return this.cartesian !== undefined && this.gps !== undefined;
-	}
-
-	public hasCartesian() {
-		return this.cartesian !== undefined;
-	}
-
-	public getGPSString() {
-		return `latitude: ${this.gps.latitude}, longitude: ${this.gps.longitude}`;
-	}
-
-	public getCartesianString() {
-		return `x: ${this.cartesian.x}, y: ${this.cartesian.y}`;
-	}
 }
 
 export interface CalibrationResult {
@@ -79,11 +63,11 @@ export function calculateScaleFromEndpoints(origin: GPSPoint, opposite: GPSPoint
 	return mapScale;
 }
 
-export function calibrate(calibrationSet: CalibratedPoint[], imageDimensions: Dimensions) {
+export function calibrate(calibrationSet: ({ gps: { latitude: number, longitude: number }, cartesian: { x: number, y: number } })[], imageDimensions: Dimensions) {
 	const normalizedDimensions = normalizeImageDimensions(imageDimensions);
 	// calculate (n choose 2) scales for each pair of data points;
 	let scales: MapScale[] = [];
-	for (let i = 0; i < calibrationSet.length; i++) {
+	for (let i = 0; i < calibrationSet.length - 1; i++) {
 		for (let j = i+1; j < calibrationSet.length; j++) {
 			let mapScale: MapScale = calculateScale(calibrationSet[i], calibrationSet[j]);
 			scales.push(mapScale);
@@ -205,3 +189,5 @@ function isCartesian(object: any): object is CartesianPoint {
 function isGPS(object: any): object is GPSPoint {
 	return 'latitude' in object && 'longitude' in object;
 }
+
+module.exports = calibrate;

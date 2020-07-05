@@ -15,7 +15,6 @@ import {CalibrationModeTypes, MapData} from '../types/redux/map';
 interface MapInitiateProps {
 	updateMapMode(nextMode: CalibrationModeTypes): any;
 	onSourceChange(data: MapData): any;
-	displayLoading(): any;
 }
 
 export default class MapCalibration_InitiateComponent extends React.Component<MapInitiateProps, {} > {

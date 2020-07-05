@@ -14,8 +14,12 @@ export default class MapsApi {
 		this.backend = backend;
 	}
 
+	public async details(): Promise<MapData[]> {
+		return await this.backend.doGetRequest<MapData[]>('/api/maps/');
+	}
+
 	public async create(mapData: MapData): Promise<void> {
-		return await this.backend.doPostRequest<void>('api/maps/create', mapData);
+		return await this.backend.doPostRequest<void>('/api/maps/create', mapData);
 	}
 
 	public async getMapById(id: number): Promise<MapData> {

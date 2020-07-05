@@ -17,7 +17,7 @@ const defaultState: MapState = {
 	image: new Image(),
 	currentPoint: new CalibratedPoint,
 	calibrationSet: [],
-	calibrationResult: {},
+	calibrationResult: {origin: {longitude: 0, latitude: 0}, opposite: {longitude: 0, latitude: 0}},
 };
 
 export default function maps(state = defaultState, action: MapCalibrationAction) {
@@ -46,7 +46,6 @@ export default function maps(state = defaultState, action: MapCalibrationAction)
 				calibrationResult: {
 					origin: action.map.origin,
 					opposite: action.map.opposite,
-					// do we keep track of maxError too?
 				}
 			}
 		case ActionType.UpdateMapSource:
@@ -93,7 +92,7 @@ export default function maps(state = defaultState, action: MapCalibrationAction)
 		case ActionType.UpdateCalibrationResults:
 			return {
 				...state,
-				result: action.result
+				calibrationResult: action.result
 			};
 		case ActionType.DisplayMapLoading:
 			return {

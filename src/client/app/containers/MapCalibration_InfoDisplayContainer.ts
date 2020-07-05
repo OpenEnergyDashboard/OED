@@ -8,11 +8,14 @@ import { Dispatch } from '../types/redux/actions';
 import { CalibrationModeTypes } from '../types/redux/map';
 import MapCalibration_InfoDisplayComponent from '../components/MapCalibration_InfoDisplayComponent';
 import {resetCurrentPoint, offerCurrentGPS, uploadMapData} from "../actions/map";
-import {GPSPoint} from "../utils/calibration";
+import {GPSPoint, CalibratedPoint} from "../utils/calibration";
 
 function mapStateToProps(state: State) {
-	const resultDisplay = (state.map.calibrationResult.maxError)? state.map.calibrationResult.maxError : "Need more points";
-	const currentCartesianDisplay = state.map.currentPoint.getCartesianString();
+	const resultDisplay = (state.maps.calibrationResult.maxError)?
+		`x: ${state.maps.calibrationResult.maxError.x}, y: ${state.maps.calibrationResult.maxError.y}`
+		: "Need more points";
+	const currentPoint: CalibratedPoint = state.maps.currentPoint;
+	const currentCartesianDisplay = `x: ${currentPoint.cartesian.x}, y: ${currentPoint.cartesian.y}`;
 	return {
 		currentCartesianDisplay: currentCartesianDisplay,
 		resultDisplay: resultDisplay,

@@ -11,7 +11,6 @@ const requiredAuthenticator = require('./authenticator').authMiddleware;
 const optionalAuthenticator = require('./authenticator').optionalAuthMiddleware;
 const moment = require('moment');
 const Point = require('../models/Point');
-
 const router = express.Router();
 
 function formatMapForResponse(map) {
@@ -30,8 +29,14 @@ function formatMapForResponse(map) {
 
 router.get('/', async (req, res) => {
 	const conn = getConnection();
+	let query;
+	if (req.hasValidAuthToken) {
+		query = Meter.getAll; // only logged in users can see disabled maps;
+	} else {
+		query = Meter.getDisplayable;
+	}
 	try {
-		const rows = await Map.getAll(conn);
+		const rows = await query(conn);
 		res.json(rows.map(row => formatMapForResponse(row)));
 	} catch (err) {
 		log.error(`Error while performing GET all maps query: ${err}`, err);
@@ -67,23 +72,23 @@ router.get('/:map_id', async (req, res) => {
 router.post('/create', async (req, res) => {
 	const validGroup = {
 		type: 'object',
-		maxProperties: 2,
+		maxProperties: 7,
 		required: ['name', 'mapSource'],
 		properties: {
 			name: {
 				type: 'string',
 				minLength: 1
 			},
-			// note: {
-			// 	type: 'string',
-			// 	minLength: 0
-			// },
-			// filename: {
-			// 	type: 'string',
-			// },
-			// modifiedDate: {
-			// 	type: 'string',
-			// },
+			note: {
+				type: 'string',
+				minLength: 0
+			},
+			filename: {
+				type: 'string',
+			},
+			modifiedDate: {
+				type: 'string',
+			},
 			mapSource: {
 				type: 'string',
 			}
@@ -102,9 +107,10 @@ router.post('/create', async (req, res) => {
 				const newMap = new Map(
 					undefined,
 					req.body.name,
+					false,
 					undefined,
 					"default",
-					moment('2020-10-10'),
+					req.body.modifiedDate,
 					origin,
 					opposite,
 					req.body.mapSource

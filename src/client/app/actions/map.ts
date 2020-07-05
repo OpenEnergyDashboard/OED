@@ -5,9 +5,12 @@
 import {ActionType, Dispatch, GetState, Thunk} from '../types/redux/actions';
 import * as t from '../types/redux/map';
 import {CalibrationModeTypes, MapData} from '../types/redux/map';
-import calibrate, {CalibratedPoint, CartesianPoint, Dimensions, GPSPoint} from "../utils/calibration";
+import { calibrate, CalibratedPoint,
+	CalibrationResult, CartesianPoint, Dimensions, GPSPoint
+} from "../utils/calibration";
 import {State} from "../types/redux/state";
 import {mapsApi} from "../utils/api";
+const moment = require('moment');
 
 export function displayLoading(): t.DisplayMapLoadingAction {
 	return { type: ActionType.DisplayMapLoading };
@@ -21,6 +24,22 @@ function receiveSelectedMap(map: MapData) {
 	return { type: ActionType.ReceiveSelectedMap, map};
 }
 
+// export function fetchMapDetails(): Thunk {
+// 	return async (dispatch: Dispatch) => {
+// 		dispatch(requestMapDetails());
+// 		const maps = await mapsApi.details();
+// 		dispatch(receiveMapDetails());
+// 	}
+// }
+//
+// export function requestMapDetails() {
+//
+// }
+//
+// export function receiveMapDetails() {
+//
+// }
+
 export function fetchSelectedMap(): Thunk {
 	return async (dispatch: Dispatch, getState: GetState) => {
 		dispatch(requestSelectedMap());
@@ -28,12 +47,9 @@ export function fetchSelectedMap(): Thunk {
 		// @ts-ignore
 		// console.log(map.origin.x);
 		// map.origin is still a Point() type;
-		// TODO: write function to set the origin with type of CalibratedPoint with data from Point() origin
-		map.origin = new CalibratedPoint();
 		await dispatch(receiveSelectedMap(map));
 		// console.log(`${getState().map.calibration.mode},fetched source: ${getState().map.calibration.image.src}`);
-
-		if (getState().map.calibration.image.src) {
+		if (getState().maps.image.src) {
 			dispatch((dispatch2) => {
 				dispatch2(updateMapMode(CalibrationModeTypes.calibrate));
 			});
@@ -41,23 +57,29 @@ export function fetchSelectedMap(): Thunk {
 	};
 }
 
-export function updateMapSource(imageSource: HTMLImageElement): Thunk {
-	return async dispatch => {
-		dispatch((dispatch2) => {
-			const newMap: MapData = {
-				name: "test1",
-				mapSource: imageSource.src,
+export function uploadMapData(): Thunk {
+	return async (dispatch: Dispatch, getState: GetState) => {
+		const state = getState();
+		try {
+			const map: MapData = {
+				name: state.maps.name,
+				note: state.maps.note,
+				filename: state.maps.filename,
+				modifiedDate: moment.utc(),
+				origin: state.maps.calibrationResult.origin,
+				opposite: state.maps.calibrationResult.opposite,
+				mapSource: state.maps.image.src,
 			};
-			dispatch2(uploadMapSource(imageSource));
-			console.log(imageSource.src);
-			mapsApi.create(newMap); //TODO: remove after test
-		})
-		return Promise.resolve();
-	};
+			await mapsApi.create(map);
+			window.alert('success');
+		} catch (e) {
+			window.alert(e);
+		}
+	}
 }
 
-export function uploadMapSource(image: HTMLImageElement): t.UpdateMapSourceAction {
-	return { type: ActionType.UpdateMapSource, image };
+export function updateMapSource(data: MapData): t.UpdateMapSourceAction {
+	return { type: ActionType.UpdateMapSource, data };
 }
 
 export function updateMapMode(nextMode: CalibrationModeTypes): t.ChangeMapModeAction {
@@ -68,19 +90,23 @@ export function updateCurrentCartesian(currentCartesian: CartesianPoint): t.Upda
 	return { type: ActionType.UpdateCurrentCartesian, currentCartesian };
 }
 
+function hasCartesian(point: CalibratedPoint) {
+	return point.cartesian.x != 0 && point.cartesian.y != 0;
+}
+
 export function offerCurrentGPS(currentGPS: GPSPoint): Thunk {
 	return (dispatch, getState) => {
-		if (getState().map.calibration.currentPoint.hasCartesian()) {
-			const point = getState().map.calibration.currentPoint.clone()
-			point.setGPS(currentGPS);
+		const point:CalibratedPoint = getState().maps.currentPoint;
+		if (hasCartesian(point)) {
+			point.gps = currentGPS;
 			dispatch(updateCalibrationSet(point));
+			dispatch(resetCurrentPoint());
 			// Nesting dispatches to preserve that updateCalibrationSet() is called before calibration
-			dispatch(dispatch2 => {
-				if (isReadyForCalibration(getState().map.calibration.calibrationSet)) {
+			dispatch((dispatch2, getState2) => {
+				if (isReadyForCalibration(getState2())) {
 					const result = prepareDataToCalibration(getState());
 					dispatch2(updateResult(result));
 				}
-				dispatch2(resetCurrentPoint());
 			});
 		}
 		return Promise.resolve();
@@ -93,11 +119,11 @@ function updateCalibrationSet(calibratedPoint: CalibratedPoint): t.AppendCalibra
 
 /**
  * use a default number as the threshold in determining if it's safe to call the calibration function
- * @param calibrationSet an any array used as dataset
+ * @param state
  */
-function isReadyForCalibration(calibrationSet: any[]): boolean {
+function isReadyForCalibration(state: State): boolean {
 	const calibrationThreshold = 3;
-	return calibrationSet.length >= calibrationThreshold;
+	return state.maps.calibrationSet.length >= calibrationThreshold;
 }
 
 function updateCurrentGPS(currentGPS: GPSPoint): t.UpdateCurrentGPSAction {
@@ -107,18 +133,16 @@ function updateCurrentGPS(currentGPS: GPSPoint): t.UpdateCurrentGPSAction {
 /**
  *  prepare data to required formats to pass it to function calculating mapScales
  */
-function prepareDataToCalibration(state: State): string {
+function prepareDataToCalibration(state: State): CalibrationResult {
 	const imageDimensions: Dimensions = {
-		width: state.map.calibration.image.width,
-		height: state.map.calibration.image.height
+		width: state.maps.image.width,
+		height: state.maps.image.height
 	};
-	const result = calibrate(
-		state.map.calibration.calibrationSet,
-		imageDimensions);
+	const result = calibrate(state.maps.calibrationSet, imageDimensions);
 	return result;
 }
 
-function updateResult(result: string): t.UpdateCalibrationResultAction {
+function updateResult(result: CalibrationResult): t.UpdateCalibrationResultAction {
 	return { type: ActionType.UpdateCalibrationResults, result}
 }
 

@@ -57,6 +57,7 @@ export default class MapCalibration_InfoDisplayComponent extends React.Component
 
 	private handleSubmit = (event: FormEvent) => {
 		event.preventDefault();
+		if (this.props.currentCartesianDisplay === 'x: undefined, y: undefined') return;
 		const input = this.state.value;
 		const array = input.split(',').map((value:string) => parseFloat(value));
 		let gps: GPSPoint = {
