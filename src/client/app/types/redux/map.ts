@@ -88,6 +88,28 @@ export type MapCalibrationAction =
 	| UpdateCalibrationResultAction
 	| DisplayMapLoadingAction;
 
+interface MapMetadata {
+	id: number;
+	name: string;
+	displayable: boolean;
+	note: string;
+	lastModified: string;
+	filename: string;
+}
+
+interface MapMetadataByID {
+	[mapID: number]: MapMetadata;
+}
+
+interface State {
+	mode: CalibrationModeTypes;
+	isLoading: boolean;
+	byMapID: MapMetadataByID;
+	selectedMap: MapMetadata;
+	editedMaps: MapMetadataByID;
+	submitting: number[];
+}
+
 export interface MapState {
 	mode: CalibrationModeTypes;
 	isLoading: boolean;

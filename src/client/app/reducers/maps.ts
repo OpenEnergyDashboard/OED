@@ -15,7 +15,7 @@ const defaultState: MapState = {
 	filename: 'image',
 	lastModified: '',
 	image: new Image(),
-	currentPoint: new CalibratedPoint,
+	currentPoint: {gps: {longitude: -1, latitude: -1}, cartesian: {x: -1, y: -1}},
 	calibrationSet: [],
 	calibrationResult: {origin: {longitude: 0, latitude: 0}, opposite: {longitude: 0, latitude: 0}},
 };
@@ -49,14 +49,13 @@ export default function maps(state = defaultState, action: MapCalibrationAction)
 				}
 			}
 		case ActionType.UpdateMapSource:
+			const newImage = new Image();
+			newImage.src = action.data.mapSource;
 			return {
 				...state,
 				name: action.data.name,
 				note: action.data.note, //should notes be updated only after upload is complete?
-				image: {
-					...state.image,
-					src: action.data.mapSource
-				},
+				image: newImage,
 				filename: action.data.filename,
 				isLoading: false
 			};
@@ -79,7 +78,7 @@ export default function maps(state = defaultState, action: MapCalibrationAction)
 		case ActionType.ResetCurrentPoint:
 			return {
 				...state,
-				currentPoint: new CalibratedPoint()
+				currentPoint: {gps: {longitude: -1, latitude: -1}, cartesian: {x: -1, y: -1}},
 			};
 		case ActionType.AppendCalibrationSet:
 			return {

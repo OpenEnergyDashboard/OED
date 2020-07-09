@@ -91,7 +91,7 @@ export function updateCurrentCartesian(currentCartesian: CartesianPoint): t.Upda
 }
 
 function hasCartesian(point: CalibratedPoint) {
-	return point.cartesian.x != 0 && point.cartesian.y != 0;
+	return point.cartesian.x != -1 && point.cartesian.y != -1;
 }
 
 export function offerCurrentGPS(currentGPS: GPSPoint): Thunk {

@@ -21,20 +21,9 @@ interface MapScale {
 	degreePerUnitY: number;
 }
 
-export class CalibratedPoint {
+export interface CalibratedPoint {
 	cartesian: CartesianPoint;
 	gps: GPSPoint;
-
-	constructor() {
-		this.cartesian = new class implements CartesianPoint {
-			x: number;
-			y: number;
-		};
-		this.gps = new class implements GPSPoint {
-			longitude: number;
-			latitude: number;
-		}
-	}
 }
 
 export interface CalibrationResult {
@@ -53,12 +42,8 @@ export interface Dimensions {
 
 export function calculateScaleFromEndpoints(origin: GPSPoint, opposite: GPSPoint, imageDimensions: Dimensions) {
 	const normalizedDimensions = normalizeImageDimensions(imageDimensions);
-	const originComplete: CalibratedPoint = new CalibratedPoint();
-	originComplete.gps = origin;
-	originComplete.cartesian = {x: 0, y: 0};
-	const oppositeComplete: CalibratedPoint = new CalibratedPoint();
-	oppositeComplete.gps = opposite;
-	oppositeComplete.cartesian = {x: normalizedDimensions.width, y: normalizedDimensions.height};
+	const originComplete: CalibratedPoint = {gps: origin, cartesian: {x: 0, y: 0}};
+	const oppositeComplete: CalibratedPoint = {gps: opposite, cartesian: {x: normalizedDimensions.width, y: normalizedDimensions.height}};
 	let mapScale: MapScale = calculateScale(originComplete, oppositeComplete);
 	return mapScale;
 }
@@ -111,7 +96,7 @@ export function calibrate(calibrationSet: ({ gps: { latitude: number, longitude:
 	};
 
 	// calculate max error
-	const diagonal = Math.sqrt(Math.pow(normalizedDimensions.width/degreePerUnitX, 2) + Math.pow(normalizedDimensions.height/degreePerUnitY, 2));
+	const diagonal = Math.sqrt(Math.pow(normalizedDimensions.width*degreePerUnitX, 2) + Math.pow(normalizedDimensions.height*degreePerUnitY, 2));
 	let scalesWithMaxDifference: MapScale = {
 		degreePerUnitX: 0,
 		degreePerUnitY: 0,
@@ -165,14 +150,14 @@ function normalizeImageDimensions(dimensions: Dimensions) {
 	let res: Dimensions;
 	if (dimensions.width > dimensions.height) {
 		const width = 500;
-		const height = width/500*dimensions.height;
+		const height = 500 * dimensions.height / dimensions.width;
 		res = {
 			width: width,
 			height: height
 		};
 	} else {
 		const height = 500;
-		const width = height/500*dimensions.width;
+		const width = 500 * dimensions.width / dimensions.height;
 		res = {
 			width: width,
 			height: height,
@@ -189,5 +174,3 @@ function isCartesian(object: any): object is CartesianPoint {
 function isGPS(object: any): object is GPSPoint {
 	return 'latitude' in object && 'longitude' in object;
 }
-
-module.exports = calibrate;
