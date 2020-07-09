@@ -15,7 +15,7 @@ function mapStateToProps(state: State) {
 		`x: ${state.maps.calibrationResult.maxError.x}, y: ${state.maps.calibrationResult.maxError.y}`
 		: "Need more points";
 	const currentPoint: CalibratedPoint = state.maps.currentPoint;
-	const currentCartesianDisplay = `x: ${currentPoint.cartesian.x}, y: ${currentPoint.cartesian.y}`;
+	const currentCartesianDisplay = `x: ${currentPoint.cartesian.x}%, y: ${currentPoint.cartesian.y}%`;
 	return {
 		currentCartesianDisplay: currentCartesianDisplay,
 		resultDisplay: resultDisplay,
@@ -24,7 +24,6 @@ function mapStateToProps(state: State) {
 
 function mapDispatchToProps(dispatch: Dispatch) {
 	return {
-		onReset:() => dispatch(resetCurrentPoint()),
 		updateGPSCoordinates: (gpsCoordinate: GPSPoint) => dispatch(offerCurrentGPS(gpsCoordinate)),
 		uploadMap: () => dispatch(uploadMapData()),
 	}

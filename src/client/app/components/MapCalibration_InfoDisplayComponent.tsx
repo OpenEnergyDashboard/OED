@@ -9,7 +9,6 @@ import {ChangeEvent, FormEvent} from 'react';
 interface InfoDisplayProps {
 	currentCartesianDisplay: string;
 	resultDisplay: string;
-	onReset(): any;
 	updateGPSCoordinates(gpsCoordinate: GPSPoint): any;
 	uploadMap(): any;
 }
@@ -40,7 +39,6 @@ export default class MapCalibration_InfoDisplayComponent extends React.Component
 					</label>
 					<br/>
 					<input type={"submit"} value={"Submit"}/>
-					<button onClick={this.resetInputField.bind(this)}>Cancel</button>
 					<button onClick={this.props.uploadMap}>Save</button>
 				</form>
 				<p>{calibrationDisplay}</p>
@@ -52,7 +50,6 @@ export default class MapCalibration_InfoDisplayComponent extends React.Component
 		this.setState({
 			value: "latitude,longitude"
 		});
-		this.props.onReset();
 	}
 
 	private handleSubmit = (event: FormEvent) => {
