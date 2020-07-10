@@ -89,25 +89,33 @@ export type MapCalibrationAction =
 	| DisplayMapLoadingAction;
 
 interface MapMetadata {
-	id: number;
+	id?: number;
 	name: string;
 	displayable: boolean;
 	note: string;
 	lastModified: string;
 	filename: string;
+	image?: HTMLImageElement;
+	currentPoint?: CalibratedPoint;
+	calibrationSet?: CalibratedPoint[];
+	calibrationResult?: CalibrationResult;
 }
 
 interface MapMetadataByID {
 	[mapID: number]: MapMetadata;
 }
 
-interface State {
+export interface State {
 	mode: CalibrationModeTypes;
 	isLoading: boolean;
 	byMapID: MapMetadataByID;
-	selectedMap: MapMetadata;
-	editedMaps: MapMetadataByID;
-	submitting: number[];
+	selectedMap: MapMetadataByID;
+	editedMaps: MapMetadataByID; // Holds all maps that have been edited locally
+	calibratedMap: MapMetadata | undefined,
+	image: HTMLImageElement,
+	currentPoint: CalibratedPoint;
+	calibrationSet: CalibratedPoint[];
+	calibrationResult: CalibrationResult;
 }
 
 export interface MapState {
