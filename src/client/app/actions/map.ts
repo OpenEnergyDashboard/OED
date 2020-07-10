@@ -43,7 +43,7 @@ function receiveSelectedMap(map: MapData) {
 export function fetchSelectedMap(): Thunk {
 	return async (dispatch: Dispatch, getState: GetState) => {
 		dispatch(requestSelectedMap());
-		const map: MapData = await mapsApi.getMapById(9);
+		const map: MapData = await mapsApi.getMapById(1);
 		// @ts-ignore
 		// console.log(map.origin.x);
 		// map.origin is still a Point() type;

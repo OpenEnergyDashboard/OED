@@ -8,12 +8,16 @@ import {CalibratedPoint} from "../utils/calibration";
 
 const defaultState: MapState = {
 	mode: CalibrationModeTypes.initiate,
-	isDisplayable: false,
 	isLoading: false,
 	name: 'default',
+	isDisplayable: false,
 	note: 'left as blank',
 	filename: 'image',
 	lastModified: '',
+	// byMapID: [],
+	// selectedMap: [],
+	// editedMaps: [],
+	// calibratedMap: undefined,
 	image: new Image(),
 	currentPoint: {gps: {longitude: -1, latitude: -1}, cartesian: {x: -1, y: -1}},
 	calibrationSet: [],
@@ -33,15 +37,14 @@ export default function maps(state = defaultState, action: MapCalibrationAction)
 				isLoading: true
 			};
 		case ActionType.ReceiveSelectedMap:
+			const receivedImage = new Image();
+			receivedImage.src = action.map.mapSource;
 			return {
 				...state,
 				isLoading: false,
 				name: action.map.name,
 				note: action.map.note,
-				image: {
-					...state.image,
-					src: action.map.mapSource
-				},
+				image: receivedImage,
 				filename: action.map.filename,
 				calibrationResult: {
 					origin: action.map.origin,

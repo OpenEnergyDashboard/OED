@@ -28,7 +28,7 @@ function mapDispatchToProps(dispatch: Dispatch) {
 		fetchMeterDetailsIfNeeded: () => dispatch(fetchMetersDetailsIfNeeded()),
 		fetchGroupDetailsIfNeeded: () => dispatch(fetchGroupsDetailsIfNeeded()),
 		fetchPreferencesIfNeeded: () => dispatch(fetchPreferencesIfNeeded()),
-		// fetchMapDetailsIfNeeded: () => dispatch(fetchSelectedMap()),
+		fetchMapDetailsIfNeeded: () => dispatch(fetchSelectedMap()),
 		changeOptionsFromLink: (options: LinkOptions) => dispatch(changeOptionsFromLink(options))
 	};
 }

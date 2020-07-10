@@ -81,16 +81,18 @@ router.post('/create', async (req, res) => {
 			},
 			note: {
 				type: 'string',
-				minLength: 0
 			},
 			filename: {
 				type: 'string',
+				minLength: 1,
 			},
 			modifiedDate: {
 				type: 'string',
+				minLength: 1,
 			},
 			mapSource: {
 				type: 'string',
+				minLength: 1,
 			}
 		}
 	};
@@ -108,8 +110,8 @@ router.post('/create', async (req, res) => {
 					undefined,
 					req.body.name,
 					false,
-					undefined,
-					"default",
+					req.body.note,
+					req.body.filename,
 					req.body.modifiedDate,
 					origin,
 					opposite,
