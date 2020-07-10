@@ -44,22 +44,22 @@ function mapStateToProps(state: State) {
 		{latitude: 42.507376, longitude: -89.029548}, // front door of Maurer
 		{latitude: 42.506774, longitude: -89.030068}  // down-right corner of Aldrich
 		];
-	const texts = ['Maurer', 'Aldrich'];
+	const texts = ['Maurer: 6', 'Aldrich: 60'];
 	const origin = state.maps.calibrationResult.origin;
 	const opposite = state.maps.calibrationResult.opposite;
 	const mapScale = calculateScaleFromEndpoints(origin, opposite, {width: state.maps.image.width, height: state.maps.image.height});
 	// map coordinates to individual traces, todo: finalize mapping function
-	const x = points.map(point => (point.latitude - origin.latitude) / mapScale.degreePerUnitX);
-	const y = points.map(point => (point.longitude - origin.longitude) / mapScale.degreePerUnitY);
+	const x = points.map(point => (point.longitude - origin.longitude) / mapScale.degreePerUnitX);
+	const y = points.map(point => (point.latitude - origin.latitude) / mapScale.degreePerUnitY);
 	const trace1 = {
 		x: x,
 		y: y,
 		type: 'scatter',
 		mode: 'markers',
 		marker: {
-			color: 'rgb(7,110,180)',
+			color: 'rgb(44,183,19)',
 			opacity: 0.5,
-			size: 6,
+			size: [6,60],
 		},
 		text: texts,
 		opacity: 1,
