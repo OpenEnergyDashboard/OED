@@ -12,10 +12,10 @@ import {GPSPoint, CalibratedPoint} from "../utils/calibration";
 
 function mapStateToProps(state: State) {
 	const resultDisplay = (state.maps.calibrationResult.maxError)?
-		`x: ${state.maps.calibrationResult.maxError.x}, y: ${state.maps.calibrationResult.maxError.y}`
+		`x: ${state.maps.calibrationResult.maxError.x}%, y: ${state.maps.calibrationResult.maxError.y}%`
 		: "Need more points";
 	const currentPoint: CalibratedPoint = state.maps.currentPoint;
-	const currentCartesianDisplay = `x: ${currentPoint.cartesian.x}%, y: ${currentPoint.cartesian.y}%`;
+	const currentCartesianDisplay = `x: ${currentPoint.cartesian.x}, y: ${currentPoint.cartesian.y}`;
 	return {
 		currentCartesianDisplay: currentCartesianDisplay,
 		resultDisplay: resultDisplay,

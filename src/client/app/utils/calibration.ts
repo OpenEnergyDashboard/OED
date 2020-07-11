@@ -70,26 +70,28 @@ export function calibrate(calibrationSet: ({ gps: { latitude: number, longitude:
 	const degreePerUnitY = YScaleSum/numDataPoints;
 
 	// calculate gps coordinates for the origin;
-	let originLatitude = calibrationSet[0].gps.latitude - degreePerUnitY * calibrationSet[0].cartesian.y;
-	let originLongitude = calibrationSet[0].gps.longitude - degreePerUnitX * calibrationSet[0].cartesian.x;
-	let originCoordinate = [originLatitude, originLongitude];
+	const originCoordinate: GPSPoint = {
+		latitude: calibrationSet[0].gps.latitude - degreePerUnitY * calibrationSet[0].cartesian.y,
+		longitude: calibrationSet[0].gps.longitude - degreePerUnitX * calibrationSet[0].cartesian.x,
+	}
 
 	// uncomment this block to get gps coordinates of the opposite corner from origin
-	// let oppositeCornerLatitude = originLatitude + oppositeCornerY * degreePerUnitY;
-	// let oppositeCornerLongitude = originLongitude + oppositeCornerX * degreePerUnitX;
-	// let oppositeCornerCoordinate = [oppositeCornerLatitude, oppositeCornerLongitude];
-	// return [originCoordinate, oppositeCornerCoordinate];
+
+	const oppositeCoordinate: GPSPoint = {
+		latitude: originCoordinate.latitude + normalizedDimensions.height * degreePerUnitY,
+		longitude: originCoordinate.longitude + normalizedDimensions.width * degreePerUnitX,
+	};
 
 	// calculate gps coordinates for top-left and down-right corner
-	let topLeftLatitude = originLatitude + normalizedDimensions.height * degreePerUnitY;
-	let topLeftLongitude = originLongitude;
+	let topLeftLatitude = originCoordinate.latitude + normalizedDimensions.height * degreePerUnitY;
+	let topLeftLongitude = originCoordinate.longitude;
 	let topLeftCoordinate: GPSPoint = {
 		latitude: Number(topLeftLatitude.toFixed(6)),
 		longitude: Number(topLeftLongitude.toFixed(6)),
 	};
 
-	let downRightLatitude = originLatitude;
-	let downRightLongitude = originLongitude + normalizedDimensions.width * degreePerUnitX;
+	let downRightLatitude = originCoordinate.latitude;
+	let downRightLongitude = originCoordinate.longitude + normalizedDimensions.width * degreePerUnitX;
 	let downRightCoordinate: GPSPoint = {
 		latitude: Number(downRightLatitude.toFixed(6)),
 		longitude: Number(downRightLongitude.toFixed(6)),
@@ -123,8 +125,8 @@ export function calibrate(calibrationSet: ({ gps: { latitude: number, longitude:
 	}
 	const result: CalibrationResult = {
 		maxError: maxErrorPercentage,
-		origin: topLeftCoordinate,
-		opposite: downRightCoordinate,
+		origin: originCoordinate,
+		opposite: oppositeCoordinate,
 	}
 	return result;
 }

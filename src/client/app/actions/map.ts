@@ -71,7 +71,7 @@ export function uploadMapData(): Thunk {
 				mapSource: state.maps.image.src,
 			};
 			await mapsApi.create(map);
-			window.alert('success');
+			window.alert('Map uploaded to database');
 		} catch (e) {
 			window.alert(e);
 		}
