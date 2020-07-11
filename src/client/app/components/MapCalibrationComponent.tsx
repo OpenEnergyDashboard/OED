@@ -7,6 +7,7 @@ import { CalibrationModeTypes } from '../types/redux/map';
 import MapCalibration_InitiateContainer from "../containers/MapCalibration_InitiateContainer";
 import MapCalibration_ChartDisplayContainer from "../containers/MapCalibration_ChartDisplayContainer";
 import MapCalibration_InfoDisplayContainer from "../containers/MapCalibration_InfoDisplayContainer";
+import HeaderContainer from "../containers/HeaderContainer";
 
 interface MapChartProps {
 	mode: CalibrationModeTypes;
@@ -21,18 +22,27 @@ export default class MapCalibrationComponent extends React.Component<MapChartPro
 	public render() {
 		if (this.props.mode === CalibrationModeTypes.initiate) {
 			return (
-				<MapCalibration_InitiateContainer/>
+				<div>
+					<HeaderContainer />
+					<MapCalibration_InitiateContainer/>
+				</div>
 			);
 		} else if (this.props.mode === CalibrationModeTypes.calibrate) {
 			return (
-				<div id={'MapCalibrationContainer'}>
-					<MapCalibration_ChartDisplayContainer/>
-					<MapCalibration_InfoDisplayContainer/>
+				<div>
+					<HeaderContainer />
+					<div id={'MapCalibrationContainer'}>
+						<MapCalibration_ChartDisplayContainer/>
+						<MapCalibration_InfoDisplayContainer/>
+					</div>
 				</div>
 			);
 		} else { // display-mode containers
 			return (
-				<p>Coming soon...</p>
+				<div>
+					<HeaderContainer />
+					<p>Coming soon...</p>
+				</div>
 			);
 		}
 	}
