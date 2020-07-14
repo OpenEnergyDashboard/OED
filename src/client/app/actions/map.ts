@@ -4,13 +4,22 @@
 
 import {ActionType, Dispatch, GetState, Thunk} from '../types/redux/actions';
 import * as t from '../types/redux/map';
-import {CalibrationModeTypes, MapData} from '../types/redux/map';
+import {CalibrationModeTypes, MapData, MapMetadata} from '../types/redux/map';
 import { calibrate, CalibratedPoint,
 	CalibrationResult, CartesianPoint, Dimensions, GPSPoint
 } from "../utils/calibration";
 import {State} from "../types/redux/state";
-import {mapsApi} from "../utils/api";
+import {mapsApi, metersApi} from "../utils/api";
+import {receiveMetersDetails, requestMetersDetails} from "./meters";
 const moment = require('moment');
+
+export function requestMapsDetails(): t.RequestMapsDetailsAction {
+	return { type: ActionType.RequestMapsDetails };
+}
+
+export function receiveMapsDetails(data: MapData[]): t.ReceiveMapsDetailsAction {
+	return { type: ActionType.ReceiveMapsDetails, data };
+}
 
 export function displayLoading(): t.DisplayMapLoadingAction {
 	return { type: ActionType.DisplayMapLoading };
@@ -24,21 +33,13 @@ function receiveSelectedMap(map: MapData) {
 	return { type: ActionType.ReceiveSelectedMap, map};
 }
 
-// export function fetchMapDetails(): Thunk {
-// 	return async (dispatch: Dispatch) => {
-// 		dispatch(requestMapDetails());
-// 		const maps = await mapsApi.details();
-// 		dispatch(receiveMapDetails());
-// 	}
-// }
-//
-// export function requestMapDetails() {
-//
-// }
-//
-// export function receiveMapDetails() {
-//
-// }
+export function fetchMapsDetails(): Thunk {
+	return async (dispatch: Dispatch) => {
+		dispatch(requestMapsDetails());
+		const mapsDetails = await mapsApi.details();
+		dispatch(receiveMapsDetails(mapsDetails));
+	};
+}
 
 export function fetchSelectedMap(): Thunk {
 	return async (dispatch: Dispatch, getState: GetState) => {

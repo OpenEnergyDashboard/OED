@@ -4,11 +4,11 @@
 
 import {connect} from "react-redux";
 import PlotlyChart, {IPlotlyChartProps} from "react-plotlyjs-ts";
-import {State} from "../types/redux/state";
+import {State} from "../../types/redux/state";
 import * as plotly from "plotly.js";
-import {CartesianPoint, Dimensions, normalizeImageDimensions} from "../utils/calibration";
-import {updateCurrentCartesian} from "../actions/map";
-import store from "../index";
+import {CartesianPoint, Dimensions, normalizeImageDimensions} from "../../utils/calibration";
+import {updateCurrentCartesian} from "../../actions/map";
+import store from "../../index";
 
 function mapStateToProps(state: State) {
 	let x: number[] = [];

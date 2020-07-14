@@ -3,12 +3,12 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
 
 import { connect } from 'react-redux';
-import { State } from '../types/redux/state';
-import MapCalibrationComponent from '../components/MapCalibrationComponent';
+import { State } from '../../types/redux/state';
+import MapCalibrationComponent from '../../components/MapCalibrationComponent';
 
 function mapStateToProps(state: State) {
 	return {
-		mode: state.maps.mode,
+		mode: state.maps.calibrationMode,
 		isLoading: state.maps.isLoading,
 	};
 }

@@ -3,12 +3,12 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
 
 import {connect} from 'react-redux';
-import { State } from '../types/redux/state';
-import { Dispatch } from '../types/redux/actions';
-import { CalibrationModeTypes } from '../types/redux/map';
-import MapCalibration_InfoDisplayComponent from '../components/MapCalibration_InfoDisplayComponent';
-import {resetCurrentPoint, offerCurrentGPS, uploadMapData} from "../actions/map";
-import {GPSPoint, CalibratedPoint} from "../utils/calibration";
+import { State } from '../../types/redux/state';
+import { Dispatch } from '../../types/redux/actions';
+import { CalibrationModeTypes } from '../../types/redux/map';
+import MapCalibration_InfoDisplayComponent from '../../components/MapCalibration_InfoDisplayComponent';
+import {resetCurrentPoint, offerCurrentGPS, uploadMapData} from "../../actions/map";
+import {GPSPoint, CalibratedPoint} from "../../utils/calibration";
 
 function mapStateToProps(state: State) {
 	const resultDisplay = (state.maps.calibrationResult.maxError)?

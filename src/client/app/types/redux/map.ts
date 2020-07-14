@@ -10,28 +10,18 @@ export enum CalibrationModeTypes {
 	calibrate = 'calibrate',
 }
 
-/**
- * @param name
- * @param note
- * @param filename
- * @param modifiedDate
- * @param origin
- * @param opposite
- * @param mapSource
- */
-export interface MapData{
-	name: string;
-	note?: string;
-	filename?: string;
-	modifiedDate?: number;
-	origin?: GPSPoint;
-	opposite?: GPSPoint;
-	mapSource: string;
-}
-
 export interface ChangeMapModeAction {
 	type: ActionType.UpdateMapMode;
 	nextMode: CalibrationModeTypes;
+}
+
+export interface RequestMapsDetailsAction {
+	type: ActionType.RequestMapsDetails;
+}
+
+export interface ReceiveMapsDetailsAction {
+	type: ActionType.ReceiveMapsDetails;
+	data: MapData[];
 }
 
 export interface UpdateMapSourceAction {
@@ -76,8 +66,10 @@ export interface ReceiveSelectedMapAction {
 	map: MapData
 }
 
-export type MapCalibrationAction =
+export type MapsAction =
 	| ChangeMapModeAction
+	| RequestMapsDetailsAction
+	| ReceiveMapsDetailsAction
 	| RequestSelectedMapAction
 	| ReceiveSelectedMapAction
 	| UpdateMapSourceAction
@@ -88,14 +80,42 @@ export type MapCalibrationAction =
 	| UpdateCalibrationResultAction
 	| DisplayMapLoadingAction;
 
-interface MapMetadata {
+/**
+ * data format stored in the database
+ * @param id
+ * @param name
+ * @param note
+ * @param filename
+ * @param modifiedDate
+ * @param origin
+ * @param opposite
+ * @param mapSource
+ */
+export interface MapData{
 	id?: number;
 	name: string;
 	displayable: boolean;
-	note: string;
-	lastModified: string;
+	note?: string;
 	filename: string;
-	image?: HTMLImageElement;
+	modifiedDate: number;
+	origin?: GPSPoint;
+	opposite?: GPSPoint;
+	mapSource: string;
+}
+
+/**
+ *  data format used keep track of map's state
+ */
+export interface MapMetadata {
+	id?: number;
+	name: string;
+	displayable: boolean;
+	note?: string;
+	filename: string;
+	modifiedDate: number;
+	origin?: GPSPoint;
+	opposite?: GPSPoint;
+	image: HTMLImageElement;
 	currentPoint?: CalibratedPoint;
 	calibrationSet?: CalibratedPoint[];
 	calibrationResult?: CalibrationResult;
@@ -105,29 +125,24 @@ interface MapMetadataByID {
 	[mapID: number]: MapMetadata;
 }
 
-export interface State {
-	mode: CalibrationModeTypes;
+export interface MapState {
+	calibrationMode: CalibrationModeTypes;
 	isLoading: boolean;
 	byMapID: MapMetadataByID;
-	selectedMap: MapMetadataByID;
+	selectedMaps: MapMetadataByID;
 	editedMaps: MapMetadataByID; // Holds all maps that have been edited locally
-	calibratedMap: MapMetadata | undefined,
-	image: HTMLImageElement,
-	currentPoint: CalibratedPoint;
-	calibrationSet: CalibratedPoint[];
-	calibrationResult: CalibrationResult;
 }
 
-export interface MapState {
-	mode: CalibrationModeTypes;
-	isLoading: boolean;
-	isDisplayable: boolean;
-	name: string;
-	note: string;
-	lastModified: string;
-	filename: string;
-	image: HTMLImageElement;
-	currentPoint: CalibratedPoint;
-	calibrationSet: CalibratedPoint[];
-	calibrationResult: CalibrationResult;
-}
+// export interface MapState {
+// 	mode: CalibrationModeTypes;
+// 	isLoading: boolean;
+// 	isDisplayable: boolean;
+// 	name: string;
+// 	note: string;
+// 	lastModified: string;
+// 	filename: string;
+// 	image: HTMLImageElement;
+// 	currentPoint: CalibratedPoint;
+// 	calibrationSet: CalibratedPoint[];
+// 	calibrationResult: CalibrationResult;
+// }

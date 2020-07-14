@@ -13,13 +13,13 @@ import FooterComponent from '../FooterComponent';
 interface MetersDetailProps {
 	meters: number[];
 	unsavedChanges: boolean;
-	fetchMetersDetails(): Promise<any>;
-	submitEditedMeters(): Promise<any>;
+	fetchMapsDetails(): Promise<any>;
+	submitEditedMaps(): Promise<any>;
 }
 
 export default class MetersDetailComponent extends React.Component<MetersDetailProps, {}> {
 	public componentWillMount() {
-		this.props.fetchMetersDetails();
+		this.props.fetchMapsDetails();
 	}
 
 	public render() {
@@ -77,7 +77,7 @@ export default class MetersDetailComponent extends React.Component<MetersDetailP
 						color='success'
 						style={buttonContainerStyle}
 						disabled={!this.props.unsavedChanges}
-						onClick={this.props.submitEditedMeters}
+						onClick={this.props.submitEditedMaps}
 					>
 						<FormattedMessage id='save.meter.edits' />
 					</Button> }

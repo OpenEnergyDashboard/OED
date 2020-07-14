@@ -4,9 +4,9 @@
 
 import * as React from 'react';
 import { CalibrationModeTypes } from '../types/redux/map';
-import MapCalibration_InitiateContainer from "../containers/MapCalibration_InitiateContainer";
-import MapCalibration_ChartDisplayContainer from "../containers/MapCalibration_ChartDisplayContainer";
-import MapCalibration_InfoDisplayContainer from "../containers/MapCalibration_InfoDisplayContainer";
+import MapCalibration_InitiateContainer from "../containers/maps/MapCalibration_InitiateContainer";
+import MapCalibration_ChartDisplayContainer from "../containers/maps/MapCalibration_ChartDisplayContainer";
+import MapCalibration_InfoDisplayContainer from "../containers/maps/MapCalibration_InfoDisplayContainer";
 import HeaderContainer from "../containers/HeaderContainer";
 
 interface MapChartProps {

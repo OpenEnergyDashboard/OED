@@ -2,34 +2,53 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
 
-import {CalibrationModeTypes, MapCalibrationAction, MapState} from '../types/redux/map';
+import {CalibrationModeTypes, MapMetadata, MapsAction, MapState} from '../types/redux/map';
 import {ActionType} from '../types/redux/actions';
 import {CalibratedPoint} from "../utils/calibration";
+import * as _ from "lodash";
 
 const defaultState: MapState = {
-	mode: CalibrationModeTypes.initiate,
+	calibrationMode: CalibrationModeTypes.initiate,
 	isLoading: false,
-	name: 'default',
-	isDisplayable: false,
-	note: 'left as blank',
-	filename: 'image',
-	lastModified: '',
-	// byMapID: [],
-	// selectedMap: [],
-	// editedMaps: [],
-	// calibratedMap: undefined,
-	image: new Image(),
-	currentPoint: {gps: {longitude: -1, latitude: -1}, cartesian: {x: -1, y: -1}},
-	calibrationSet: [],
-	calibrationResult: {origin: {longitude: 0, latitude: 0}, opposite: {longitude: 0, latitude: 0}},
+	byMapID: {},
+	selectedMaps: [],
+	editedMaps: {},
+	// name: 'default',
+	// isDisplayable: false,
+	// note: 'left as blank',
+	// filename: 'image',
+	// lastModified: '',
+	// image: new Image(),
+	// currentPoint: {gps: {longitude: -1, latitude: -1}, cartesian: {x: -1, y: -1}},
+	// calibrationSet: [],
+	// calibrationResult: {origin: {longitude: 0, latitude: 0}, opposite: {longitude: 0, latitude: 0}},
 };
 
-export default function maps(state = defaultState, action: MapCalibrationAction) {
+export default function maps(state = defaultState, action: MapsAction) {
 	switch (action.type) {
 		case ActionType.UpdateMapMode:
 			return {
 				...state,
-				mode: action.nextMode
+				calibrationMode: action.nextMode
+			};
+		case ActionType.RequestMapsDetails:
+			return {
+				...state,
+				isLoading: true
+			};
+		case ActionType.ReceiveMapsDetails:
+			const data: MapMetadata[] = action.data.map(mapData => {
+				let image = new Image();
+				image.src = mapData.mapSource;
+				return {
+					...mapData,
+					image: image,
+				}
+			});
+			return {
+				...state,
+				isLoading: false,
+				byMapID: _.keyBy(data, map => map.id)
 			};
 		case ActionType.RequestSelectedMap:
 			return {
