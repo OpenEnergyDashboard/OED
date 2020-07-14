@@ -8,7 +8,7 @@ const Point = require('./Point');
 
 class Map {
 	/**
-	 * @param id should be undefined when creating a new group
+	 * @param id should be undefined when creating a new map
 	 * @param name map's name
 	 * @param displayable is the map set for display
 	 * @param note notes on the map
@@ -47,7 +47,7 @@ class Map {
 	async insert(conn) {
 		const map = this;
 		if (map.id !== undefined) {
-			throw new Error('Attempt to insert a group that already has an ID');
+			throw new Error('Attempt to insert a map that already has an ID');
 		}
 		const resp = await conn.one(sqlFile('map/insert_new_map.sql'), map);
 		// resp = { id: 42 }, hence this line
@@ -79,7 +79,7 @@ class Map {
 	/**
 	 * // not quite relevant at present
 	 * Returns a promise to retrieve the map with the given name.
-	 * @param name the groups name
+	 * @param name the map's name
 	 * @param conn the connection to be used.
 	 * @returns {Promise.<Map>}
 	 */
@@ -91,9 +91,9 @@ class Map {
 	/**
 	 * // not quite relevant at present
 	 * Returns a promise to retrieve the map with the given id.
-	 * @param id the id of the group
+	 * @param id the id of the map
 	 * @param conn the connection to be used.
-	 * @returns {Promise.<*>}
+	 * @returns {Promise.<Map>}
 	 */
 	static async getByID(id, conn) {
 		const row = await conn.one(sqlFile('map/get_map_by_id.sql'), { id: id });
@@ -103,10 +103,20 @@ class Map {
 	/**
 	 * returns a promise to retrieve all maps in the database
 	 * @param conn the connection to be used.
-	 * @returns {Promise.<void>}
+	 * @returns {Promise.<array.<Map>>}
 	 */
 	static async getAll(conn) {
 		const rows = await conn.any(sqlFile('map/get_all_maps.sql'));
+		return rows.map(Map.mapRow);
+	}
+
+	/**
+	 * Returns a promise to get all of the displayable maps from the database
+	 * @param conn the connection to use. Defaults to the default database connection.
+	 * @returns {Promise.<array.<Map>>}
+	 */
+	static async getDisplayable(conn) {
+		const rows = await conn.any(sqlFile('maps/get_displayable_maps.sql'));
 		return rows.map(Map.mapRow);
 	}
 
@@ -121,7 +131,7 @@ class Map {
 	}
 
 	/**
-	 * Returns a promise to delete a group and purge all trace of it form the memories of its parents and children
+	 * Returns a promise to delete a map
 	 * @param mapID The ID of the map to be deleted
 	 * @param conn the connection to be used.
 	 * @return {Promise.<void>}

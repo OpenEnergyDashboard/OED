@@ -31,9 +31,9 @@ router.get('/', async (req, res) => {
 	const conn = getConnection();
 	let query;
 	if (req.hasValidAuthToken) {
-		query = Meter.getAll; // only logged in users can see disabled maps;
+		query = Map.getAll; // only logged in users can see disabled maps;
 	} else {
-		query = Meter.getDisplayable;
+		query = Map.getDisplayable;
 	}
 	try {
 		const rows = await query(conn);
@@ -70,10 +70,10 @@ router.get('/:map_id', async (req, res) => {
 });
 
 router.post('/create', async (req, res) => {
-	const validGroup = {
+	const validMap = {
 		type: 'object',
 		maxProperties: 7,
-		required: ['name', 'mapSource'],
+		required: ['name', 'note', 'modifiedDate', '','mapSource'],
 		properties: {
 			name: {
 				type: 'string',
@@ -97,7 +97,7 @@ router.post('/create', async (req, res) => {
 		}
 	};
 
-	if (!validate(req.body, validGroup).valid) {
+	if (!validate(req.body, validMap).valid) {
 		log.error(`Invalid input for mapAPI.`)
 		res.sendStatus(400);
 	} else {
