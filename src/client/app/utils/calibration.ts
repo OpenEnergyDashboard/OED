@@ -148,7 +148,7 @@ function calculateScale(p1: CalibratedPoint, p2: CalibratedPoint) {
  * @param dimensions Dimensions: { width: number, height: number};
  * @return normalized Dimensions object
  */
-function normalizeImageDimensions(dimensions: Dimensions) {
+export function normalizeImageDimensions(dimensions: Dimensions) {
 	let res: Dimensions;
 	if (dimensions.width > dimensions.height) {
 		const width = 500;

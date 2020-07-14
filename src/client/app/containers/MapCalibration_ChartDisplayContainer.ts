@@ -6,7 +6,7 @@ import {connect} from "react-redux";
 import PlotlyChart, {IPlotlyChartProps} from "react-plotlyjs-ts";
 import {State} from "../types/redux/state";
 import * as plotly from "plotly.js";
-import {CartesianPoint} from "../utils/calibration";
+import {CartesianPoint, Dimensions, normalizeImageDimensions} from "../utils/calibration";
 import {updateCurrentCartesian} from "../actions/map";
 import store from "../index";
 
@@ -23,8 +23,12 @@ function mapStateToProps(state: State) {
 		texts.push(`latitude: ${current.gps.latitude}, longitude: ${current.gps.longitude}`);
 	}
 
-	let backTrace = createBackgroundGrid();
-	let trace1 = {
+	const imageDimensions: Dimensions = normalizeImageDimensions( {
+		width: state.maps.image.width,
+		height: state.maps.image.height,
+	});
+	let backgroundTrace = createBackgroundTrace(imageDimensions);
+	let dataPointTrace = {
 		x: x,
 		y: y,
 		type: 'scatter',
@@ -38,7 +42,7 @@ function mapStateToProps(state: State) {
 		opacity: 1,
 		showlegend: false
 	};
-	let data = [backTrace,trace1];
+	let data = [backgroundTrace,dataPointTrace];
 
 	const imageSource = state.maps.image.src;
 
@@ -80,20 +84,27 @@ function mapStateToProps(state: State) {
 	const props: IPlotlyChartProps = {
 		data: data,
 		layout: layout,
-		onClick: ({points, event}) => handlePointClick(points, event)
+		onClick: (event: plotly.PlotMouseEvent) => handlePointClick(event),
 	}
 	return props;
 }
 
-function createBackgroundGrid() {
+/**
+ * use a transparent heatmap to capture which point the user clicked on the map
+ * @param imageDimensions {Dimensions} normalized dimensions of the image
+ */
+function createBackgroundTrace(imageDimensions: Dimensions) {
+	// define what the grid of the heatmap look like
 	let x = [];
 	let y = [];
-	for (let i = 0; i < 500; i = i + 0.1) {
+	// bound the grid to image dimensions to avoid clicking outside of the map
+	for (let i = 0; i <= Math.ceil(imageDimensions.width); i = i + 1) {
 		x.push(i);
 	}
-	for (let j = 0; j < 500; j = j + 0.1) {
+	for (let j = 0; j <= Math.ceil(imageDimensions.height); j = j + 1) {
 		y.push(j);
 	}
+	// define the actual points of the graph, numbers in the array are used to designate different colors;
 	let z = [];
 	for (let j = 0; j < y.length; j++) {
 		let temp = [];
@@ -107,32 +118,60 @@ function createBackgroundGrid() {
 		y: y,
 		z: z,
 		type: 'heatmap',
-		colorscale: [['0.0', 'rgba(0,0,0,0.97)'], ['1.0', 'rgb(255, 255, 255, 0.5)']],
+		colorscale: [['0.0', 'rgba(6,86,157,0)']], // set colors to be fully transparent
 		xgap: 1,
 		ygap: 1,
 		hoverinfo: 'none',
 		showscale: false
 	};
+	// let x = [];
+	// let y = [];
+	// for (let i = 0; i < 500; i = i + 1) {
+	// 	for (let j = 0; j < 500; j = j + 1) {
+	// 		x.push(i);
+	// 		y.push(j);
+	// 	}
+	// }
+	// let trace = {
+	// 		x: x,
+	// 		y: y,
+	// 		type: 'scatter',
+	// 		mode: 'markers',
+	// 		xgap: 1,
+	// 		ygap: 1,
+	// 		hoverinfo: 'none',
+	// 		showscale: false,
+	// 		marker: {
+	// 			color: 'rgb(2,84,140)',
+	// 			opacity: 0.5,
+	// 			size: 1,
+	// 		},
+	// 	};
 	return trace;
 }
 
-function handlePointClick(points: plotly.PlotDatum[], event: MouseEvent) {
-	event.preventDefault();
-	let currentPoint: CartesianPoint = getClickedCoordinates(points, event);
+function handlePointClick(event: plotly.PlotMouseEvent) {
+	event.event.preventDefault();
+	let currentPoint: CartesianPoint = getClickedCoordinates(event);
 	store.dispatch(updateCurrentCartesian(currentPoint));
 }
 
-function getClickedCoordinates(points: plotly.PlotDatum[], event: MouseEvent) {
-	event.preventDefault();
-	// both points will be captured if there is already a data point nearby
-	for(let i=0; i < points.length; i++) {
-		let pn = points[i].pointNumber;
-		let tn = points[i].curveNumber;
-		console.log(`trace number: ${tn}`);
+function getClickedCoordinates(event: plotly.PlotMouseEvent) {
+	event.event.preventDefault();
+	/**
+	 *  points on backgroundTrace and dataPointTrace will be captured if they are both close to the click
+	 *  for now, all of the points from dataPointTrace are ignored;
+ 	 */
+	let eligiblePoints = [];
+	for (let i=0; i < event.points.length; i++) {
+		let pointNumber = event.points[i].pointNumber;
+		let traceNumber = event.points[i].curveNumber;
+		if (traceNumber != 0) {
+			eligiblePoints.push(event.points[i]);
+		}
 	}
-	// actual code;
-	const xValue = points[0].x as number;
-	const yValue = points[0].y as number;
+	const xValue = eligiblePoints[0].x as number;
+	const yValue = eligiblePoints[0].y as number;
 	const clickedPoint: CartesianPoint = {
 		x: Number(xValue.toFixed(6)),
 		y: Number(yValue.toFixed(6)),
