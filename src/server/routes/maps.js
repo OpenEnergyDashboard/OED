@@ -11,12 +11,15 @@ const requiredAuthenticator = require('./authenticator').authMiddleware;
 const optionalAuthenticator = require('./authenticator').optionalAuthMiddleware;
 const moment = require('moment');
 const Point = require('../models/Point');
+
 const router = express.Router();
+router.use(optionalAuthenticator);
 
 function formatMapForResponse(map) {
 	const formattedMap = {
 		id: map.id,
 		name: map.name,
+		displayable: map.displayable,
 		note: map.note,
 		fileName: map.fileName,
 		modifiedDate: map.modifiedDate,
@@ -69,18 +72,17 @@ router.get('/:map_id', async (req, res) => {
 	}
 });
 
+router.use(requiredAuthenticator);
+
 router.post('/create', async (req, res) => {
 	const validMap = {
 		type: 'object',
 		maxProperties: 7,
-		required: ['name', 'note', 'modifiedDate', '','mapSource'],
+		required: ['name', 'filename', 'modifiedDate', 'mapSource'],
 		properties: {
 			name: {
 				type: 'string',
 				minLength: 1
-			},
-			note: {
-				type: 'string',
 			},
 			filename: {
 				type: 'string',
@@ -93,7 +95,7 @@ router.post('/create', async (req, res) => {
 			mapSource: {
 				type: 'string',
 				minLength: 1,
-			}
+			},
 		}
 	};
 
@@ -125,6 +127,80 @@ router.post('/create', async (req, res) => {
 				res.status(400).json({error: `Map "${req.body.name}" is already in use.`});
 			} else {
 				log.error(`Error while inserting new map ${err}`, err);
+				res.sendStatus(500);
+			}
+		}
+	}
+});
+
+router.post('/edit', async (req, res) => {
+	const validMap = {
+		type: 'object',
+		maxProperties: 9,
+		required: ['id', 'name', 'modifiedDate', 'mapSource'],
+		properties: {
+			id: {
+				type: 'integer',
+			},
+			name: {
+				type: 'string',
+				minLength: 1
+			},
+			// filename: {
+			// 	type: 'string',
+			// 	minLength: 1,
+			// },
+			modifiedDate: {
+				type: 'string',
+				minLength: 1,
+			},
+			mapSource: {
+				type: 'string',
+				minLength: 1,
+			},
+			// note: {
+			// 	type: 'string',
+			// },
+			// displayable: {
+			// 	type: 'bool',
+			// },
+			// origin: {
+			// 	type: 'object',
+			// },
+			// opposite: {
+			// 	type: 'object',
+			// },
+		}
+	};
+	const validatorResult = validate(req.body, validMap);
+	if (!validatorResult.valid) {
+		log.error(`Invalid map data supplied, err: ${validatorResult.errors}`);
+		res.status(400);
+	} else {
+		const conn = getConnection();
+		try {
+			await conn.tx(async t => {
+				const origin = (req.body.origin)? new Point(req.body.origin.longitude, req.body.origin.latitude): new Point(1.000001,1.000001);
+				const opposite = (req.body.opposite)? new Point(req.body.opposite.longitude, req.body.opposite.latitude): new Point(180.000001,180.000001);
+				const editedMap = new Map(
+					req.body.id,
+					req.body.name,
+					req.body.displayable,
+					req.body.note,
+					req.body.filename,
+					req.body.modifiedDate,
+					origin,
+					opposite,
+					req.body.mapSource
+				);
+				await editedMap.update(t);
+			});
+			res.sendStatus(200).json({ message: `Successfully edited map ${req.body.id}` });
+		} catch (err) {
+			if (err.toString() === 'error: duplicate key value violates unique constraint "maps_name_key"') {
+				res.status(400).json({error: `Map "${req.body.name}" is already in use.`});
+			} else {
+				log.error(`Error while updating map ${err}`, err);
 				res.sendStatus(500);
 			}
 		}

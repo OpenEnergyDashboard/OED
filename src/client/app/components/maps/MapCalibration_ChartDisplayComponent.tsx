@@ -5,7 +5,7 @@
 import PlotlyChart from 'react-plotlyjs-ts';
 import * as plotly from 'plotly.js';
 import * as React from 'react';
-import {CartesianPoint} from '../utils/calibration';
+import {CartesianPoint} from '../../utils/calibration';
 import {PlotMouseEvent} from "plotly.js";
 
 export interface CalibrationChartProps {

@@ -6,20 +6,20 @@ import * as React from 'react';
 import { Table, Button } from 'reactstrap';
 import { FormattedMessage } from 'react-intl';
 import { hasToken } from '../../utils/token';
-import MeterViewContainer from '../../containers/meters/MeterViewContainer';
 import HeaderContainer from '../../containers/HeaderContainer';
 import FooterComponent from '../FooterComponent';
+import MapViewContainer from "../../containers/maps/MapViewContainer";
 
-interface MetersDetailProps {
-	meters: number[];
+interface MapsDetailProps {
+	maps: number[];
 	unsavedChanges: boolean;
-	fetchMetersDetails(): Promise<any>;
-	submitEditedMeters(): Promise<any>;
+	fetchMapsDetails(): Promise<any>;
+	submitEditedMaps(): Promise<any>;
 }
 
-export default class MetersDetailComponent extends React.Component<MetersDetailProps, {}> {
+export default class MapsDetailComponent extends React.Component<MapsDetailProps, {}> {
 	public componentWillMount() {
-		this.props.fetchMetersDetails();
+		this.props.fetchMapsDetails();
 	}
 
 	public render() {
@@ -37,8 +37,8 @@ export default class MetersDetailComponent extends React.Component<MetersDetailP
 		};
 
 		const tableStyle: React.CSSProperties = {
-			marginLeft: '10%',
-			marginRight: '10%'
+			marginLeft: '5%',
+			marginRight: '5%'
 		};
 
 		const buttonContainerStyle: React.CSSProperties = {
@@ -53,23 +53,24 @@ export default class MetersDetailComponent extends React.Component<MetersDetailP
 				<HeaderContainer />
 				<div className='container-fluid'>
 					<h2 style={titleStyle}>
-						<FormattedMessage id='meters' />
+						<FormattedMessage id='maps' />
 					</h2>
 					<div style={tableStyle}>
 					<Table striped bordered hover>
 					<thead>
 						<tr>
-						<th> <FormattedMessage id='meter.id' /> </th>
-						<th> <FormattedMessage id='meter.name' /> </th>
-						{hasToken() && <th> <FormattedMessage id='meter.type' /> </th>}
-						{hasToken() && <th> <FormattedMessage id='meter.ip'/> </th>}
-						<th> <FormattedMessage id='meter.enabled' /> </th>
-						<th> <FormattedMessage id='meter.displayable' /> </th>
+						<th> <FormattedMessage id='map.id' /> </th>
+						<th> <FormattedMessage id='map.name' /> </th>
+						{hasToken() && <th> <FormattedMessage id='map.displayable' /> </th>}
+						{hasToken() && <th> <FormattedMessage id='map.modified.date' /> </th>}
+						{hasToken() && <th> <FormattedMessage id='map.filename'/> </th>}
+						{hasToken() && <th> <FormattedMessage id='map.note'/> </th>}
+						{hasToken() && <th> <FormattedMessage id='map.calibration'/> </th>}
 						</tr>
 					</thead>
 					<tbody>
-					{ this.props.meters.map(meterID =>
-						( <MeterViewContainer key={meterID} id={meterID} /> ))}
+					{ this.props.maps.map(mapID =>
+						( <MapViewContainer key={mapID} id={mapID} /> ))}
 					</tbody>
 					</Table>
 					</div>
@@ -77,9 +78,9 @@ export default class MetersDetailComponent extends React.Component<MetersDetailP
 						color='success'
 						style={buttonContainerStyle}
 						disabled={!this.props.unsavedChanges}
-						onClick={this.props.submitEditedMeters}
+						onClick={this.props.submitEditedMaps}
 					>
-						<FormattedMessage id='save.meter.edits' />
+						<FormattedMessage id='save.map.edits' />
 					</Button> }
 				</div>
 				<FooterComponent />

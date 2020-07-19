@@ -9,9 +9,23 @@ import * as plotly from "plotly.js";
 import {calculateScaleFromEndpoints, CartesianPoint} from "../utils/calibration";
 
 function mapStateToProps(state: State) {
+	let map;
+	if (state.maps.selectedMap != 0) {
+		const mapID = state.maps.selectedMap;
+		if (state.maps.byMapID[mapID]) {
+			map = state.maps.byMapID[mapID];
+			if (state.maps.editedMaps[mapID]) {
+				map = state.maps.editedMaps[mapID];
+			}
+		}
+	}
 	// set map background image
-	const imageSource = state.maps.image.src;
+	const imageSource = (map)? map.image.src : '';
+	const data: any[] = [];
 	const layout: any = {
+		title: {
+			text: (map)? map.name : 'There\'s not an available map',
+		},
 		width: 1000,
 		height: 1000,
 		xaxis: {
@@ -40,33 +54,45 @@ function mapStateToProps(state: State) {
 	};
 
 	// calculate coordinates
-	const points = [
-		{latitude: 42.507376, longitude: -89.029548}, // front door of Maurer
-		{latitude: 42.506774, longitude: -89.030068}  // down-right corner of Aldrich
+	let x: number[] = [];
+	let y: number[] = [];
+	let texts: string[] = [];
+	if (map && map.origin && map.opposite) {
+		/**
+		 * todo: replace with automatic code
+		 */
+		const points = [
+			{latitude: 42.507376, longitude: -89.029548}, // front door of Maurer
+			{latitude: 42.506774, longitude: -89.030068}  // down-right corner of Aldrich
 		];
-	const texts = ['Maurer: 6', 'Aldrich: 60'];
-	const origin = state.maps.calibrationResult.origin;
-	const opposite = state.maps.calibrationResult.opposite;
-	const mapScale = calculateScaleFromEndpoints(origin, opposite, {width: state.maps.image.width, height: state.maps.image.height});
-	// map coordinates to individual traces, todo: finalize mapping function
-	const x = points.map(point => (point.longitude - origin.longitude) / mapScale.degreePerUnitX);
-	const y = points.map(point => (point.latitude - origin.latitude) / mapScale.degreePerUnitY);
-	const trace1 = {
-		x: x,
-		y: y,
-		type: 'scatter',
-		mode: 'markers',
-		marker: {
-			color: 'rgb(44,183,19)',
-			opacity: 0.5,
-			size: [6,60],
-		},
-		text: texts,
-		opacity: 1,
-		showlegend: false
-	};
-	const data = [trace1];
+		texts = ['Maurer: 6', 'Aldrich: 60'];
 
+		const origin = map.origin;
+		const opposite = map.opposite;
+		const mapScale = calculateScaleFromEndpoints(origin, opposite, {
+			width: map.image.width,
+			height: map.image.height
+		});
+		// map coordinates to individual traces, todo: finalize mapping function
+		x = points.map(point => (point.longitude - origin.longitude) / mapScale.degreePerUnitX);
+		y = points.map(point => (point.latitude - origin.latitude) / mapScale.degreePerUnitY);
+
+		const trace1 = {
+			x: x,
+			y: y,
+			type: 'scatter',
+			mode: 'markers',
+			marker: {
+				color: 'rgb(44,183,19)',
+				opacity: 0.5,
+				size: [6, 60],
+			},
+			text: texts,
+			opacity: 1,
+			showlegend: false
+		};
+		data.push(trace1);
+	}
 	/***
 	 * Usage:
 	 *  <PlotlyChart data={toJS(this.model_data)}

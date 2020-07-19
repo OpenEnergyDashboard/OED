@@ -22,6 +22,10 @@ export default class MapsApi {
 		return await this.backend.doPostRequest<void>('/api/maps/create', mapData);
 	}
 
+	public async edit(mapData: MapData): Promise<{}> {
+		return await this.backend.doPostRequest<MapData>('api/maps/edit', mapData);
+	}
+
 	public async getMapById(id: number): Promise<MapData> {
 		return await this.backend.doGetRequest<MapData>(`/api/maps/${id}`);
 	}

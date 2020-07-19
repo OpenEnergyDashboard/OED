@@ -4,13 +4,19 @@
 
 import { connect } from 'react-redux';
 import { State } from '../../types/redux/state';
-import MapCalibrationComponent from '../../components/MapCalibrationComponent';
+import MapCalibrationComponent from '../../components/maps/MapCalibrationComponent';
 
-function mapStateToProps(state: State) {
+interface MapCalibrationProps {
+	calibrationTag: string;
+}
+
+function mapStateToProps(ownProps: MapCalibrationProps) {
+	const IDAndMode = ownProps.calibrationTag.split('_');
 	return {
-		mode: state.maps.calibrationMode,
-		isLoading: state.maps.isLoading,
+		mode: IDAndMode[1],
+		isLoading: false,
+		mapID: Number(IDAndMode[0]),
 	};
 }
 
-export default connect(mapStateToProps)(MapCalibrationComponent);
+// export default connect(mapStateToProps)(MapCalibrationComponent);

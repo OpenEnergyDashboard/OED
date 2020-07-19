@@ -75,6 +75,7 @@ export enum ActionType {
 	MarkPreferencesSubmitted = 'MARK_PREFERENCES_SUBMITTED',
 
 	UpdateMapMode = 'UPDATE_MAP_MODE',
+	UpdateSelectedMap = 'UPDATE_SELECTED_MAPS',
 	UpdateMapSource = 'UPDATE_MAP_IMAGE',
 	UpdateCurrentCartesian = 'UPDATE_CURRENT_CARTESIAN',
 	UpdateCurrentGPS = 'UPDATE_CURRENT_GPS',
@@ -86,6 +87,9 @@ export enum ActionType {
 	ReceiveMapsDetails = 'RECEIVE_MAP_DETAILS',
 	RequestSelectedMap = 'REQUEST_SELECTED_MAP',
 	ReceiveSelectedMap = 'RECEIVE_SELECTED_MAP',
+	EditMapDetails = 'EDIT_MAP_DETAILS',
+	SubmitEditedMap = 'SUBMIT_EDITED_MAP',
+	ConfirmEditedMap = 'CONFIRM_EDITED_MAP',
 }
 
 /**

@@ -4,15 +4,14 @@
 
 import {CalibrationModeTypes, MapMetadata, MapsAction, MapState} from '../types/redux/map';
 import {ActionType} from '../types/redux/actions';
-import {CalibratedPoint} from "../utils/calibration";
 import * as _ from "lodash";
 
 const defaultState: MapState = {
-	calibrationMode: CalibrationModeTypes.initiate,
 	isLoading: false,
 	byMapID: {},
-	selectedMaps: [],
+	selectedMap: 0,
 	editedMaps: {},
+	submitting: [],
 	// name: 'default',
 	// isDisplayable: false,
 	// note: 'left as blank',
@@ -25,12 +24,19 @@ const defaultState: MapState = {
 };
 
 export default function maps(state = defaultState, action: MapsAction) {
+	let submitting;
+	let editedMaps;
 	switch (action.type) {
 		case ActionType.UpdateMapMode:
 			return {
 				...state,
 				calibrationMode: action.nextMode
 			};
+		case ActionType.UpdateSelectedMap:
+			return {
+				...state,
+				selectedMap: action.mapID,
+			}
 		case ActionType.RequestMapsDetails:
 			return {
 				...state,
@@ -38,12 +44,12 @@ export default function maps(state = defaultState, action: MapsAction) {
 			};
 		case ActionType.ReceiveMapsDetails:
 			const data: MapMetadata[] = action.data.map(mapData => {
+				// parse JSON format to MapMetadata object
+				const parsedMap = JSON.parse(JSON.stringify(mapData));
 				let image = new Image();
-				image.src = mapData.mapSource;
-				return {
-					...mapData,
-					image: image,
-				}
+				image.src = parsedMap.mapSource;
+				parsedMap.image = image;
+				return parsedMap;
 			});
 			return {
 				...state,
@@ -80,6 +86,35 @@ export default function maps(state = defaultState, action: MapsAction) {
 				image: newImage,
 				filename: action.data.filename,
 				isLoading: false
+			};
+		case ActionType.EditMapDetails:
+			editedMaps = state.editedMaps;
+			editedMaps[action.map.id] = action.map;
+			return {
+				...state,
+				editedMaps,
+			};
+		case ActionType.SubmitEditedMap:
+			submitting = state.submitting;
+			submitting.push(action.mapID);
+			return {
+				...state,
+				submitting
+			};
+		case ActionType.ConfirmEditedMap:
+			submitting = state.submitting;
+			submitting.splice(submitting.indexOf(action.mapID));
+
+			const byMapID = state.byMapID;
+			editedMaps = state.editedMaps;
+			byMapID[action.mapID] = editedMaps[action.mapID];
+
+			delete editedMaps[action.mapID];
+			return {
+				...state,
+				submitting,
+				editedMaps,
+				byMapID
 			};
 		case ActionType.UpdateCurrentCartesian:
 			return {

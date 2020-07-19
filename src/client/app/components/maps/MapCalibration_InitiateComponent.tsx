@@ -3,7 +3,8 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
 
 import * as React from 'react';
-import {CalibrationModeTypes, MapData} from '../types/redux/map';
+import {CalibrationModeTypes, MapMetadata} from '../../types/redux/map';
+import * as moment from 'moment';
 
 /**
  * Accepts image file from user upload,
@@ -13,8 +14,10 @@ import {CalibrationModeTypes, MapData} from '../types/redux/map';
  */
 
 interface MapInitiateProps {
+	mapID: number;
+	map: MapMetadata;
 	updateMapMode(nextMode: CalibrationModeTypes): any;
-	onSourceChange(data: MapData): any;
+	onSourceChange(data: MapMetadata): any;
 }
 
 export default class MapCalibration_InitiateComponent extends React.Component<MapInitiateProps, {} > {
@@ -22,7 +25,6 @@ export default class MapCalibration_InitiateComponent extends React.Component<Ma
 	private notifyLoadComplete() {
 		window.alert(`Map load complete from item ${this.fileInput.current.files[0].name}.`);
 	}
-
 
 	constructor(props: MapInitiateProps) {
 		super(props);
@@ -58,10 +60,12 @@ export default class MapCalibration_InitiateComponent extends React.Component<Ma
 			const imageURL = await this.getDataURL();
 			let image = new Image();
 			image.src = imageURL;
-			const source: MapData = {
+			const source: MapMetadata = {
+				...this.props.map,
 				name: 'map',
 				filename: this.fileInput.current.files[0].name,
-				mapSource: imageURL,
+				modifiedDate: moment().toISOString(),
+				image: image,
 			}
 			await this.props.onSourceChange(source);
 		} catch (err) {

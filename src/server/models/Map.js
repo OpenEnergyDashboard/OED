@@ -116,7 +116,7 @@ class Map {
 	 * @returns {Promise.<array.<Map>>}
 	 */
 	static async getDisplayable(conn) {
-		const rows = await conn.any(sqlFile('maps/get_displayable_maps.sql'));
+		const rows = await conn.any(sqlFile('map/get_displayable_maps.sql'));
 		return rows.map(Map.mapRow);
 	}
 

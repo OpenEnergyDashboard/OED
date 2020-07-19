@@ -6,8 +6,8 @@ import {connect} from 'react-redux';
 import { State } from '../../types/redux/state';
 import { Dispatch } from '../../types/redux/actions';
 import { CalibrationModeTypes } from '../../types/redux/map';
-import MapCalibration_InfoDisplayComponent from '../../components/MapCalibration_InfoDisplayComponent';
-import {resetCurrentPoint, offerCurrentGPS, uploadMapData} from "../../actions/map";
+import MapCalibration_InfoDisplayComponent from '../../components/maps/MapCalibration_InfoDisplayComponent';
+import {resetCurrentPoint, offerCurrentGPS, submitNewMap} from "../../actions/map";
 import {GPSPoint, CalibratedPoint} from "../../utils/calibration";
 
 function mapStateToProps(state: State) {
@@ -25,7 +25,7 @@ function mapStateToProps(state: State) {
 function mapDispatchToProps(dispatch: Dispatch) {
 	return {
 		updateGPSCoordinates: (gpsCoordinate: GPSPoint) => dispatch(offerCurrentGPS(gpsCoordinate)),
-		uploadMap: () => dispatch(uploadMapData()),
+		uploadMap: () => dispatch(submitNewMap()),
 	}
 }
 export default connect(mapStateToProps, mapDispatchToProps)(MapCalibration_InfoDisplayComponent);

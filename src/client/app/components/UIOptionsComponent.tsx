@@ -16,6 +16,7 @@ import ChartLinkContainer from '../containers/ChartLinkContainer';
 import { ChartTypes } from '../types/redux/graph';
 import { ComparePeriod, SortingOrder } from '../utils/calculateCompare';
 import 'rc-slider/assets/index.css';
+import MapChartSelectContainer from "../containers/MapChartSelectContainer";
 
 const Slider = createSliderWithTooltip(sliderWithoutTooltips);
 
@@ -202,6 +203,9 @@ class UIOptionsComponent extends React.Component<UIOptionsPropsWithIntl, UIOptio
 				</div>
 				}
 
+				{this.props.chartToRender === ChartTypes.map &&
+					<MapChartSelectContainer />
+				}
 
 				{/* We can't export compare data */}
 				{this.props.chartToRender !== ChartTypes.compare &&

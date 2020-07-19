@@ -5,20 +5,34 @@
 import {ActionType, Dispatch, GetState, Thunk} from '../types/redux/actions';
 import * as t from '../types/redux/map';
 import {CalibrationModeTypes, MapData, MapMetadata} from '../types/redux/map';
-import { calibrate, CalibratedPoint,
-	CalibrationResult, CartesianPoint, Dimensions, GPSPoint
+import {
+	calibrate,
+	CalibratedPoint,
+	CalibrationResult,
+	CartesianPoint,
+	Dimensions,
+	GPSPoint
 } from "../utils/calibration";
 import {State} from "../types/redux/state";
-import {mapsApi, metersApi} from "../utils/api";
-import {receiveMetersDetails, requestMetersDetails} from "./meters";
-const moment = require('moment');
+import {mapsApi} from "../utils/api";
+import {showErrorNotification} from "../utils/notifications";
+import translate from "../utils/translate";
+import * as moment from 'moment';
 
-export function requestMapsDetails(): t.RequestMapsDetailsAction {
+function requestMapsDetails(): t.RequestMapsDetailsAction {
 	return { type: ActionType.RequestMapsDetails };
 }
 
-export function receiveMapsDetails(data: MapData[]): t.ReceiveMapsDetailsAction {
+function receiveMapsDetails(data: MapData[]): t.ReceiveMapsDetailsAction {
 	return { type: ActionType.ReceiveMapsDetails, data };
+}
+
+function submitMapEdits(mapID: number): t.SubmitEditedMapAction {
+	return { type: ActionType.SubmitEditedMap, mapID };
+}
+
+function confirmMapEdits(mapID: number): t.ConfirmEditedMapAction {
+	return { type: ActionType.ConfirmEditedMap, mapID};
 }
 
 export function displayLoading(): t.DisplayMapLoadingAction {
@@ -37,6 +51,7 @@ export function fetchMapsDetails(): Thunk {
 	return async (dispatch: Dispatch) => {
 		dispatch(requestMapsDetails());
 		const mapsDetails = await mapsApi.details();
+		console.log(mapsDetails);
 		dispatch(receiveMapsDetails(mapsDetails));
 	};
 }
@@ -58,7 +73,11 @@ export function fetchSelectedMap(): Thunk {
 	};
 }
 
-export function uploadMapData(): Thunk {
+export function editMapDetails(map: MapMetadata): t.EditMapDetailsAction {
+	return {type: ActionType.EditMapDetails, map: map};
+}
+
+export function submitNewMap(mapID: number): Thunk {
 	return async (dispatch: Dispatch, getState: GetState) => {
 		const state = getState();
 		try {
@@ -79,12 +98,16 @@ export function uploadMapData(): Thunk {
 	}
 }
 
-export function updateMapSource(data: MapData): t.UpdateMapSourceAction {
+export function updateMapSource(data: MapMetadata): t.UpdateMapSourceAction {
 	return { type: ActionType.UpdateMapSource, data };
 }
 
 export function updateMapMode(nextMode: CalibrationModeTypes): t.ChangeMapModeAction {
 	return { type: ActionType.UpdateMapMode, nextMode };
+}
+
+export function changeSelectedMap(newSelectedMapID: number): t.UpdateSelectedMapAction {
+	return { type: ActionType.UpdateSelectedMap, mapID: newSelectedMapID };
 }
 
 export function updateCurrentCartesian(currentCartesian: CartesianPoint): t.UpdateCurrentCartesianAction {
@@ -149,4 +172,37 @@ function updateResult(result: CalibrationResult): t.UpdateCalibrationResultActio
 
 export function resetCurrentPoint(): t.ResetCurrentPointAction {
 	return { type: ActionType.ResetCurrentPoint } ;
+}
+
+export function submitEditedMaps(): Thunk {
+	return async (dispatch: Dispatch, getState: GetState) => {
+		Object.keys(getState().maps.editedMaps).forEach(mapID2Submit => {
+			const mapID = parseInt(mapID2Submit);
+			if (getState().maps.submitting.indexOf(mapID) === -1) {
+				if (mapID <= -1) {
+					dispatch(submitNewMap(mapID));
+				} else {
+					dispatch(submitEditedMap(mapID));
+				}
+			}
+		});
+	};
+}
+
+export function submitEditedMap(mapID: number): Thunk {
+	return async (dispatch: Dispatch, getState: GetState) => {
+		const submittingMap = getState().maps.editedMaps[mapID];
+		dispatch(submitMapEdits(mapID));
+		try {
+			const acceptableMap: MapData = {
+				...submittingMap,
+				mapSource: submittingMap.image.src,
+				modifiedDate: moment().toISOString()
+			}
+			await mapsApi.edit(acceptableMap);
+			dispatch(confirmMapEdits(mapID));
+		} catch (err) {
+			showErrorNotification(translate('failed.to.edit.map'));
+		}
+	};
 }

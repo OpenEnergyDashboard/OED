@@ -5,8 +5,8 @@
 CREATE TABLE IF NOT EXISTS maps (
 	id SERIAL PRIMARY KEY,
 	name VARCHAR(50) UNIQUE NOT NULL,
-	displayable boolean NOT NULL,
 	note VARCHAR(500),
+	displayable boolean NOT NULL,
 	filename VARCHAR(200) NOT NULL,
 	modified_date TIMESTAMP NOT NULL,
 	origin POINT,
