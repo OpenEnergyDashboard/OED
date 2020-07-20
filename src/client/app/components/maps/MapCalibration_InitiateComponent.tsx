@@ -14,8 +14,7 @@ import * as moment from 'moment';
  */
 
 interface MapInitiateProps {
-	mapID: number;
-	map: MapMetadata;
+	map: MapMetadata
 	updateMapMode(nextMode: CalibrationModeTypes): any;
 	onSourceChange(data: MapMetadata): any;
 }

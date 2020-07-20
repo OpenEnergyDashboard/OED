@@ -3,11 +3,10 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
 
 import * as React from 'react';
-import { Button } from 'reactstrap';
-import ListDisplayComponent from '../ListDisplayComponent';
-import { Link } from 'react-router';
-import { hasToken } from '../../utils/token';
-import { FormattedMessage } from 'react-intl';
+import {Button} from 'reactstrap';
+import {Link} from 'react-router';
+import {hasToken} from '../../utils/token';
+import {FormattedMessage} from 'react-intl';
 import {CalibrationModeTypes, MapMetadata} from '../../types/redux/map';
 import * as moment from 'moment';
 
@@ -20,6 +19,7 @@ interface MapViewProps {
 	isSubmitting: boolean;
 	// The function used to dispatch the action to edit map details
 	editMapDetails(map: MapMetadata): any;
+	setCalibration(mode: CalibrationModeTypes, mapID: number): any;
 }
 
 export default class MapViewComponent extends React.Component<MapViewProps, {}> {
@@ -112,7 +112,19 @@ export default class MapViewComponent extends React.Component<MapViewProps, {}> 
 		);
 	}
 
-	private formatName
+	private formatName() {
+		if (hasToken()) {
+			return ( //add onClick
+				<span>
+					{this.props.map.name}
+				</span>
+			);
+		} else {
+			return (
+				<span>{this.props.map.name}</span>
+			);
+		}
+	}
 
 	private styleCalibrated(): React.CSSProperties {
 		return { color: 'black' };
@@ -123,7 +135,6 @@ export default class MapViewComponent extends React.Component<MapViewProps, {}> 
 	}
 
 	private formatCalibrationStatus() {
-		const linkAddress = `/${this.props.map.id}_${CalibrationModeTypes.calibrate}`;
 		let styleFn;
 		let messageID;
 		if (this.props.map.origin && this.props.map.opposite) {
@@ -138,7 +149,7 @@ export default class MapViewComponent extends React.Component<MapViewProps, {}> 
 				<span style={styleFn()}>
 					<FormattedMessage id={messageID} />
 				</span>
-				<Link to={linkAddress}><Button style={this.styleToggleBtn()} color='primary'>
+				<Link to='/calibration' onClick={() => this.handleCalibrationSetting(CalibrationModeTypes.calibrate)}><Button style={this.styleToggleBtn()} color='primary'>
 					<FormattedMessage id='map.calibrate' />
 				</Button></Link>
 			</span>
@@ -146,15 +157,18 @@ export default class MapViewComponent extends React.Component<MapViewProps, {}> 
 	}
 
 	private formatFilename() {
-		const linkAddress = `/maps/${this.props.map.id}_${CalibrationModeTypes.initiate}`;
 		return (
 			<span>
 				<span>{this.props.map.filename}</span>
-				<Link to={linkAddress}><Button style={this.styleToggleBtn()} color='primary'>
+				<Link to='/calibration' onClick={() => this.handleCalibrationSetting(CalibrationModeTypes.initiate)}><Button style={this.styleToggleBtn()} color='primary'>
 					<FormattedMessage id='map.upload.new.file' />
 				</Button></Link>
 			</span>
 		);
+	}
+
+	private handleCalibrationSetting(mode: CalibrationModeTypes) {
+		this.props.setCalibration(mode, this.props.id);
 	}
 }
 

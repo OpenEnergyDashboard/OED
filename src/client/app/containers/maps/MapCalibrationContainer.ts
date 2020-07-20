@@ -6,17 +6,13 @@ import { connect } from 'react-redux';
 import { State } from '../../types/redux/state';
 import MapCalibrationComponent from '../../components/maps/MapCalibrationComponent';
 
-interface MapCalibrationProps {
-	calibrationTag: string;
-}
-
-function mapStateToProps(ownProps: MapCalibrationProps) {
-	const IDAndMode = ownProps.calibrationTag.split('_');
+function mapStateToProps(state: State) {
+	const mapID = state.maps.calibratingMap;
 	return {
-		mode: IDAndMode[1],
+		mode: state.maps.byMapID[mapID].calibrationMode,
 		isLoading: false,
-		mapID: Number(IDAndMode[0]),
+		mapID: mapID,
 	};
 }
 
-// export default connect(mapStateToProps)(MapCalibrationComponent);
+export default connect(mapStateToProps)(MapCalibrationComponent);

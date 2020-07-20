@@ -87,6 +87,12 @@ export interface ConfirmEditedMapAction {
 	mapID: number;
 }
 
+export interface SetCalibrationAction {
+	type: ActionType.SetCalibration;
+	mapID: number;
+	mode: CalibrationModeTypes;
+}
+
 export type MapsAction =
 	| ChangeMapModeAction
 	| UpdateSelectedMapAction
@@ -103,7 +109,8 @@ export type MapsAction =
 	| ResetCurrentPointAction
 	| AppendCalibrationSetAction
 	| UpdateCalibrationResultAction
-	| DisplayMapLoadingAction;
+	| DisplayMapLoadingAction
+	| SetCalibrationAction;
 
 /**
  * data format stored in the database
@@ -159,6 +166,7 @@ export interface MapState {
 	isLoading: boolean;
 	byMapID: MapMetadataByID;
 	selectedMap: number;
+	calibratingMap: number;
 	editedMaps: MapMetadataByID; // Holds all maps that have been edited locally
 	// Maps the app is currently attempting to upload map changes
 	submitting: number[];
@@ -174,16 +182,3 @@ export interface MapEditData {
 	opposite?: GPSPoint;
 	mapSource?: string;
 }
-// export interface MapState {
-// 	mode: CalibrationModeTypes;
-// 	isLoading: boolean;
-// 	isDisplayable: boolean;
-// 	name: string;
-// 	note: string;
-// 	lastModified: string;
-// 	filename: string;
-// 	image: HTMLImageElement;
-// 	currentPoint: CalibratedPoint;
-// 	calibrationSet: CalibratedPoint[];
-// 	calibrationResult: CalibrationResult;
-// }

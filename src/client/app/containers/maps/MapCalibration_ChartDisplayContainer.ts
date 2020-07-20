@@ -15,17 +15,21 @@ function mapStateToProps(state: State) {
 	let y: number[] = [];
 	let texts: string[] = [];
 
-	const points = state.maps.calibrationSet;
-	for (let i = 0; i < points.length; i++) {
-		const current = points[i];
-		x.push(current.cartesian.x);
-		y.push(current.cartesian.y);
-		texts.push(`latitude: ${current.gps.latitude}, longitude: ${current.gps.longitude}`);
+	const mapID = state.maps.calibratingMap;
+	const map = state.maps.byMapID[mapID]
+	const points = map.calibrationSet;
+	if (points) {
+		for (let i = 0; i < points.length; i++) {
+			const current = points[i];
+			x.push(current.cartesian.x);
+			y.push(current.cartesian.y);
+			texts.push(`latitude: ${current.gps.latitude}, longitude: ${current.gps.longitude}`);
+		}
 	}
 
 	const imageDimensions: Dimensions = normalizeImageDimensions( {
-		width: state.maps.image.width,
-		height: state.maps.image.height,
+		width: map.image.width,
+		height: map.image.height,
 	});
 	let backgroundTrace = createBackgroundTrace(imageDimensions);
 	let dataPointTrace = {
@@ -44,7 +48,7 @@ function mapStateToProps(state: State) {
 	};
 	let data = [backgroundTrace,dataPointTrace];
 
-	const imageSource = state.maps.image.src;
+	const imageSource = map.image.src;
 
 	// for a detailed description of layout attributes: https://plotly.com/javascript/reference/#layout
 	const layout: any = {
@@ -122,31 +126,9 @@ function createBackgroundTrace(imageDimensions: Dimensions) {
 		xgap: 1,
 		ygap: 1,
 		hoverinfo: 'none',
+		opacity: '0',
 		showscale: false
 	};
-	// let x = [];
-	// let y = [];
-	// for (let i = 0; i < 500; i = i + 1) {
-	// 	for (let j = 0; j < 500; j = j + 1) {
-	// 		x.push(i);
-	// 		y.push(j);
-	// 	}
-	// }
-	// let trace = {
-	// 		x: x,
-	// 		y: y,
-	// 		type: 'scatter',
-	// 		mode: 'markers',
-	// 		xgap: 1,
-	// 		ygap: 1,
-	// 		hoverinfo: 'none',
-	// 		showscale: false,
-	// 		marker: {
-	// 			color: 'rgb(2,84,140)',
-	// 			opacity: 0.5,
-	// 			size: 1,
-	// 		},
-	// 	};
 	return trace;
 }
 

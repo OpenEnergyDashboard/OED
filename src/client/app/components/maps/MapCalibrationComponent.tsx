@@ -9,36 +9,32 @@ import MapCalibration_ChartDisplayContainer from "../../containers/maps/MapCalib
 import MapCalibration_InfoDisplayContainer from "../../containers/maps/MapCalibration_InfoDisplayContainer";
 import HeaderContainer from "../../containers/HeaderContainer";
 
-interface MapCalibrationState {
-	id: number;
-	mode: string;
+interface MapCalibrationProps {
+	mode: CalibrationModeTypes;
+	isLoading: boolean;
+	mapID: number;
 }
 
-export default class MapCalibrationComponent extends React.Component<MapCalibrationProps, MapCalibrationState> {
+export default class MapCalibrationComponent extends React.Component<MapCalibrationProps, {}> {
 	constructor(props: any) {
 		super(props);
-		const IDAndMode = window.location.pathname.split('_');
-		this.state = {
-			id: Number(IDAndMode[0]),
-			mode: IDAndMode[1],
-		};
 	}
 
 	public render() {
-		if (this.state.mode === CalibrationModeTypes.initiate) {
+		if (this.props.mode === CalibrationModeTypes.initiate) {
 			return (
 				<div className='container-fluid'>
 					<HeaderContainer />
-					<MapCalibration_InitiateContainer mapID={this.state.id}/>
+					<MapCalibration_InitiateContainer/>
 				</div>
 			);
-		} else if (this.state.mode === CalibrationModeTypes.calibrate) {
+		} else if (this.props.mode === CalibrationModeTypes.calibrate) {
 			return (
 				<div className='container-fluid'>
 					<HeaderContainer />
 					<div id={'MapCalibrationContainer'}>
-						<MapCalibration_ChartDisplayContainer mapID={this.state.id}/>
-						<MapCalibration_InfoDisplayContainer mapID={this.props.mapID}/>
+						<MapCalibration_ChartDisplayContainer/>
+						<MapCalibration_InfoDisplayContainer/>
 					</div>
 				</div>
 			);

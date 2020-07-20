@@ -27,7 +27,7 @@ export interface CalibratedPoint {
 }
 
 export interface CalibrationResult {
-	maxError?: {
+	maxError: {
 		x: number,
 		y: number,
 	},

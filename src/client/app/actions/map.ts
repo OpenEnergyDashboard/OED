@@ -85,7 +85,7 @@ export function submitNewMap(mapID: number): Thunk {
 				name: state.maps.name,
 				note: state.maps.note,
 				filename: state.maps.filename,
-				modifiedDate: moment.utc(),
+				modifiedDate: moment.utc().toISOString(),
 				origin: state.maps.calibrationResult.origin,
 				opposite: state.maps.calibrationResult.opposite,
 				mapSource: state.maps.image.src,
@@ -96,6 +96,10 @@ export function submitNewMap(mapID: number): Thunk {
 			window.alert(e);
 		}
 	}
+}
+
+export function setCalibration(mode: CalibrationModeTypes, mapID: number): t.SetCalibrationAction {
+	return { type: ActionType.SetCalibration, mode, mapID };
 }
 
 export function updateMapSource(data: MapMetadata): t.UpdateMapSourceAction {

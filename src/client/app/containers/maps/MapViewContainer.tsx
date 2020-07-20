@@ -6,9 +6,8 @@ import { connect } from 'react-redux';
 import MapViewComponent from '../../components/maps/MapViewComponent';
 import { Dispatch } from '../../types/redux/actions';
 import { State } from '../../types/redux/state';
-import { MeterMetadata } from '../../types/redux/meters';
-import {MapMetadata} from "../../types/redux/map";
-import {editMapDetails} from "../../actions/map";
+import {CalibrationModeTypes, MapMetadata} from "../../types/redux/map";
+import {editMapDetails, setCalibration} from "../../actions/map";
 
 function mapStateToProps(state: State, ownProps: {id: number}) {
 	let map = state.maps.byMapID[ownProps.id];
@@ -24,7 +23,8 @@ function mapStateToProps(state: State, ownProps: {id: number}) {
 
 function mapDispatchToProps(dispatch: Dispatch) {
 	return {
-		editMapDetails: (map: MapMetadata) => dispatch(editMapDetails(map))
+		editMapDetails: (map: MapMetadata) => dispatch(editMapDetails(map)),
+		setCalibration: (mode: CalibrationModeTypes, mapID: number) => dispatch(setCalibration(mode, mapID)),
 	};
 }
 

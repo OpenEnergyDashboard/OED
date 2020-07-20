@@ -5,17 +5,18 @@
 import {connect} from 'react-redux';
 import { State } from '../../types/redux/state';
 import { Dispatch } from '../../types/redux/actions';
-import { CalibrationModeTypes } from '../../types/redux/map';
+import {CalibrationModeTypes, MapMetadata} from '../../types/redux/map';
 import MapCalibration_InfoDisplayComponent from '../../components/maps/MapCalibration_InfoDisplayComponent';
 import {resetCurrentPoint, offerCurrentGPS, submitNewMap} from "../../actions/map";
 import {GPSPoint, CalibratedPoint} from "../../utils/calibration";
 
 function mapStateToProps(state: State) {
-	const resultDisplay = (state.maps.calibrationResult.maxError)?
-		`x: ${state.maps.calibrationResult.maxError.x}%, y: ${state.maps.calibrationResult.maxError.y}%`
+	const mapID = state.maps.calibratingMap;
+	const map = state.maps.byMapID[mapID];
+	const resultDisplay = (map.calibrationResult)?
+		`x: ${map.calibrationResult.maxError.x}%, y: ${map.calibrationResult.maxError.y}%`
 		: "Need more points";
-	const currentPoint: CalibratedPoint = state.maps.currentPoint;
-	const currentCartesianDisplay = `x: ${currentPoint.cartesian.x}, y: ${currentPoint.cartesian.y}`;
+	const currentCartesianDisplay =(map.currentPoint)? `x: ${map.currentPoint.cartesian.x}, y: ${map.currentPoint.cartesian.y}` : 'undefined';
 	return {
 		currentCartesianDisplay: currentCartesianDisplay,
 		resultDisplay: resultDisplay,
@@ -25,7 +26,7 @@ function mapStateToProps(state: State) {
 function mapDispatchToProps(dispatch: Dispatch) {
 	return {
 		updateGPSCoordinates: (gpsCoordinate: GPSPoint) => dispatch(offerCurrentGPS(gpsCoordinate)),
-		uploadMap: () => dispatch(submitNewMap()),
+		uploadMap: (newMap: MapMetadata) => dispatch(submitNewMap(newMap)),
 	}
 }
 export default connect(mapStateToProps, mapDispatchToProps)(MapCalibration_InfoDisplayComponent);

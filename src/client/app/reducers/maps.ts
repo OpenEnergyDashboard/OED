@@ -10,22 +10,15 @@ const defaultState: MapState = {
 	isLoading: false,
 	byMapID: {},
 	selectedMap: 0,
+	calibratingMap: 0,
 	editedMaps: {},
 	submitting: [],
-	// name: 'default',
-	// isDisplayable: false,
-	// note: 'left as blank',
-	// filename: 'image',
-	// lastModified: '',
-	// image: new Image(),
-	// currentPoint: {gps: {longitude: -1, latitude: -1}, cartesian: {x: -1, y: -1}},
-	// calibrationSet: [],
-	// calibrationResult: {origin: {longitude: 0, latitude: 0}, opposite: {longitude: 0, latitude: 0}},
 };
 
 export default function maps(state = defaultState, action: MapsAction) {
 	let submitting;
 	let editedMaps;
+	let byMapID;
 	switch (action.type) {
 		case ActionType.UpdateMapMode:
 			return {
@@ -56,6 +49,14 @@ export default function maps(state = defaultState, action: MapsAction) {
 				isLoading: false,
 				byMapID: _.keyBy(data, map => map.id)
 			};
+		case ActionType.SetCalibration:
+			byMapID = state.byMapID;
+			if (action.mapID !== 0) byMapID[action.mapID].calibrationMode = action.mode;
+			return {
+				...state,
+				calibratingMap: action.mapID,
+				byMapID: byMapID
+			}
 		case ActionType.RequestSelectedMap:
 			return {
 				...state,
@@ -104,8 +105,7 @@ export default function maps(state = defaultState, action: MapsAction) {
 		case ActionType.ConfirmEditedMap:
 			submitting = state.submitting;
 			submitting.splice(submitting.indexOf(action.mapID));
-
-			const byMapID = state.byMapID;
+			byMapID = state.byMapID;
 			editedMaps = state.editedMaps;
 			byMapID[action.mapID] = editedMaps[action.mapID];
 

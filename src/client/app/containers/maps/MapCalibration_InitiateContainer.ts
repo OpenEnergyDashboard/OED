@@ -9,13 +9,9 @@ import {updateMapMode, updateMapSource} from "../../actions/map";
 import {CalibrationModeTypes, MapData, MapMetadata} from "../../types/redux/map";
 import {State} from "../../types/redux/state";
 
-function mapStateToProps(state: State, ownProps: {mapID: number}) {
-	let map = JSON.parse(JSON.stringify(state.maps.byMapID[ownProps.mapID]));
-	if (state.maps.editedMaps[ownProps.mapID]) {
-		map = JSON.parse(JSON.stringify(state.maps.editedMaps[ownProps.mapID]));
-	}
+function mapStateToProps(state: State) {
 	return {
-		map: map,
+		map: state.maps.byMapID[state.maps.calibratingMap]
 	}
 }
 
