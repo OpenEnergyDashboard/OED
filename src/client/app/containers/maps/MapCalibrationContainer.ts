@@ -9,7 +9,7 @@ import MapCalibrationComponent from '../../components/maps/MapCalibrationCompone
 function mapStateToProps(state: State) {
 	const mapID = state.maps.calibratingMap;
 	return {
-		mode: state.maps.byMapID[mapID].calibrationMode,
+		mode: state.maps.editedMaps[mapID].calibrationMode,
 		isLoading: false,
 		mapID: mapID,
 	};

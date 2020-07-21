@@ -2,9 +2,10 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
 
-import {CalibrationModeTypes, MapMetadata, MapsAction, MapState} from '../types/redux/map';
+import {MapMetadata, MapsAction, MapState} from '../types/redux/map';
 import {ActionType} from '../types/redux/actions';
 import * as _ from "lodash";
+import {CalibratedPoint} from "../utils/calibration";
 
 const defaultState: MapState = {
 	isLoading: false,
@@ -19,11 +20,18 @@ export default function maps(state = defaultState, action: MapsAction) {
 	let submitting;
 	let editedMaps;
 	let byMapID;
+	let calibrated = state.calibratingMap;
 	switch (action.type) {
-		case ActionType.UpdateMapMode:
+		case ActionType.UpdateCalibrationMode:
 			return {
 				...state,
-				calibrationMode: action.nextMode
+				editedMaps: {
+					...state.editedMaps,
+					[calibrated]: {
+						...state.editedMaps[calibrated],
+						calibrationMode: action.nextMode,
+					}
+				}
 			};
 		case ActionType.UpdateSelectedMap:
 			return {
@@ -38,11 +46,7 @@ export default function maps(state = defaultState, action: MapsAction) {
 		case ActionType.ReceiveMapsDetails:
 			const data: MapMetadata[] = action.data.map(mapData => {
 				// parse JSON format to MapMetadata object
-				const parsedMap = JSON.parse(JSON.stringify(mapData));
-				let image = new Image();
-				image.src = parsedMap.mapSource;
-				parsedMap.image = image;
-				return parsedMap;
+				return JSON.parse(JSON.stringify(mapData));
 			});
 			return {
 				...state,
@@ -51,11 +55,31 @@ export default function maps(state = defaultState, action: MapsAction) {
 			};
 		case ActionType.SetCalibration:
 			byMapID = state.byMapID;
-			if (action.mapID !== 0) byMapID[action.mapID].calibrationMode = action.mode;
-			return {
-				...state,
-				calibratingMap: action.mapID,
-				byMapID: byMapID
+			// copy map from byMapID to editedMaps if there is not already a dirty map(with unsaved changes) in editedMaps
+			if (state.editedMaps[action.mapID] === undefined) {
+				return {
+					...state,
+					calibratingMap: action.mapID,
+					editedMaps: {
+						...state.editedMaps,
+						[action.mapID]: {
+							...state.byMapID[action.mapID],
+							calibrationMode: action.mode
+						}
+					}
+				}
+			} else {
+				return {
+					...state,
+					calibratingMap: action.mapID,
+					editedMaps: {
+						...state.editedMaps,
+						[action.mapID]: {
+							...state.editedMaps[action.mapID],
+							calibrationMode: action.mode
+						}
+					}
+				}
 			}
 		case ActionType.RequestSelectedMap:
 			return {
@@ -78,15 +102,12 @@ export default function maps(state = defaultState, action: MapsAction) {
 				}
 			}
 		case ActionType.UpdateMapSource:
-			const newImage = new Image();
-			newImage.src = action.data.mapSource;
 			return {
 				...state,
-				name: action.data.name,
-				note: action.data.note, //should notes be updated only after upload is complete?
-				image: newImage,
-				filename: action.data.filename,
-				isLoading: false
+				editedMaps: {
+					...state.editedMaps,
+					[action.data.id]: action.data
+				}
 			};
 		case ActionType.EditMapDetails:
 			editedMaps = state.editedMaps;
@@ -104,11 +125,12 @@ export default function maps(state = defaultState, action: MapsAction) {
 			};
 		case ActionType.ConfirmEditedMap:
 			submitting = state.submitting;
-			submitting.splice(submitting.indexOf(action.mapID));
 			byMapID = state.byMapID;
 			editedMaps = state.editedMaps;
-			byMapID[action.mapID] = editedMaps[action.mapID];
-
+			if (action.mapID > 0) {
+				submitting.splice(submitting.indexOf(action.mapID));
+				byMapID[action.mapID] = editedMaps[action.mapID];
+			}
 			delete editedMaps[action.mapID];
 			return {
 				...state,
@@ -117,43 +139,74 @@ export default function maps(state = defaultState, action: MapsAction) {
 				byMapID
 			};
 		case ActionType.UpdateCurrentCartesian:
+			const newDataPoint: CalibratedPoint = {
+				cartesian: action.currentCartesian,
+				gps: {longitude: -1, latitude: -1},
+			};
 			return {
 				...state,
-				currentPoint: {
-					...state.currentPoint,
-					cartesian: action.currentCartesian,
-				},
+				editedMaps: {
+					...state.editedMaps,
+					[calibrated]: {
+						...state.editedMaps[calibrated],
+						currentPoint: newDataPoint,
+					}
+				}
 			};
 		case ActionType.UpdateCurrentGPS:
 			return {
 				...state,
-				currentPoint: {
-					...state.currentPoint,
-					gps: action.currentGPS,
+				editedMaps: {
+					...state.editedMaps,
+					[calibrated]: {
+						...state.editedMaps[calibrated],
+						currentPoint: {
+							...state.editedMaps[calibrated].currentPoint,
+							gps: action.currentGPS,
+						},
+					}
 				}
 			};
 		case ActionType.ResetCurrentPoint:
 			return {
 				...state,
-				currentPoint: {gps: {longitude: -1, latitude: -1}, cartesian: {x: -1, y: -1}},
+				editedMaps: {
+					...state.editedMaps,
+					[calibrated]: {
+						...state.editedMaps[calibrated],
+						currentPoint: undefined,
+					}
+				}
 			};
 		case ActionType.AppendCalibrationSet:
+			const originalSet = state.editedMaps[calibrated].calibrationSet;
+			let copiedSet;
+			if (originalSet) {
+				copiedSet = originalSet.map(point => point);
+				copiedSet.push(action.calibratedPoint);
+			} else {
+				copiedSet = [action.calibratedPoint];
+			}
 			return {
 				...state,
-				calibrationSet: [
-					...state.calibrationSet.slice(0),
-					action.calibratedPoint,
-				],
+				editedMaps: {
+					...state.editedMaps,
+					[calibrated]: {
+						...state.editedMaps[calibrated],
+						calibrationSet: copiedSet
+					}
+				}
 			};
 		case ActionType.UpdateCalibrationResults:
 			return {
 				...state,
-				calibrationResult: action.result
-			};
-		case ActionType.DisplayMapLoading:
-			return {
-				...state,
-				isLoading: true
+				editedMaps: {
+					...state.editedMaps,
+					[calibrated]: {
+						...state.editedMaps[calibrated],
+						calibrationResult: action.result
+					}
+				}
 			};
 		default:
 			return state;

@@ -12,7 +12,7 @@ export enum CalibrationModeTypes {
 }
 
 export interface ChangeMapModeAction {
-	type: ActionType.UpdateMapMode;
+	type: ActionType.UpdateCalibrationMode;
 	nextMode: CalibrationModeTypes;
 }
 
@@ -57,10 +57,6 @@ export interface AppendCalibrationSetAction {
 export interface UpdateCalibrationResultAction {
 	type: ActionType.UpdateCalibrationResults;
 	result: CalibrationResult;
-}
-
-export interface DisplayMapLoadingAction {
-	type: ActionType.DisplayMapLoading;
 }
 
 export interface RequestSelectedMapAction {
@@ -109,7 +105,6 @@ export type MapsAction =
 	| ResetCurrentPointAction
 	| AppendCalibrationSetAction
 	| UpdateCalibrationResultAction
-	| DisplayMapLoadingAction
 	| SetCalibrationAction;
 
 /**
@@ -148,7 +143,7 @@ export interface MapMetadata {
 	modifiedDate: string;
 	origin?: GPSPoint;
 	opposite?: GPSPoint;
-	image: HTMLImageElement;
+	mapSource: string;
 	calibrationMode?: CalibrationModeTypes;
 	currentPoint?: CalibratedPoint;
 	calibrationSet?: CalibratedPoint[];

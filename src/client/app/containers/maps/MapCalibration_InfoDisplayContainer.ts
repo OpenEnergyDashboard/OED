@@ -7,12 +7,12 @@ import { State } from '../../types/redux/state';
 import { Dispatch } from '../../types/redux/actions';
 import {CalibrationModeTypes, MapMetadata} from '../../types/redux/map';
 import MapCalibration_InfoDisplayComponent from '../../components/maps/MapCalibration_InfoDisplayComponent';
-import {resetCurrentPoint, offerCurrentGPS, submitNewMap} from "../../actions/map";
+import {offerCurrentGPS, submitNewMap} from "../../actions/map";
 import {GPSPoint, CalibratedPoint} from "../../utils/calibration";
 
 function mapStateToProps(state: State) {
 	const mapID = state.maps.calibratingMap;
-	const map = state.maps.byMapID[mapID];
+	const map = state.maps.editedMaps[mapID];
 	const resultDisplay = (map.calibrationResult)?
 		`x: ${map.calibrationResult.maxError.x}%, y: ${map.calibrationResult.maxError.y}%`
 		: "Need more points";
@@ -26,7 +26,7 @@ function mapStateToProps(state: State) {
 function mapDispatchToProps(dispatch: Dispatch) {
 	return {
 		updateGPSCoordinates: (gpsCoordinate: GPSPoint) => dispatch(offerCurrentGPS(gpsCoordinate)),
-		uploadMap: (newMap: MapMetadata) => dispatch(submitNewMap(newMap)),
+		uploadMap: (newMap: number) => dispatch(submitNewMap(newMap)),
 	}
 }
 export default connect(mapStateToProps, mapDispatchToProps)(MapCalibration_InfoDisplayComponent);

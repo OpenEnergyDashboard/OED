@@ -74,7 +74,7 @@ export enum ActionType {
 	MarkPreferencesNotSubmitted = 'MARK_PREFERENCES_NOT_SUBMITTED',
 	MarkPreferencesSubmitted = 'MARK_PREFERENCES_SUBMITTED',
 
-	UpdateMapMode = 'UPDATE_MAP_MODE',
+	UpdateCalibrationMode = 'UPDATE_MAP_MODE',
 	UpdateSelectedMap = 'UPDATE_SELECTED_MAPS',
 	UpdateMapSource = 'UPDATE_MAP_IMAGE',
 	UpdateCurrentCartesian = 'UPDATE_CURRENT_CARTESIAN',
@@ -82,7 +82,6 @@ export enum ActionType {
 	ResetCurrentPoint = 'RESET_CURRENT_POINT',
 	AppendCalibrationSet = 'APPEND_CALIBRATION_SET',
 	UpdateCalibrationResults = 'UPDATE_CALIBRATION_RESULTS',
-	DisplayMapLoading = 'DISPLAY_MAP_LOADING',
 	RequestMapsDetails = 'REQUEST_MAP_DETAILS',
 	ReceiveMapsDetails = 'RECEIVE_MAP_DETAILS',
 	RequestSelectedMap = 'REQUEST_SELECTED_MAP',

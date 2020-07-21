@@ -20,7 +20,8 @@ function mapStateToProps(state: State) {
 		}
 	}
 	// set map background image
-	const imageSource = (map)? map.image.src : '';
+	let image = new Image();
+	image.src = (map)? map.mapSource : '';
 	const data: any[] = [];
 	const layout: any = {
 		title: {
@@ -39,7 +40,7 @@ function mapStateToProps(state: State) {
 		},
 		images: [{
 			layer: 'below',
-			source: imageSource,
+			source: image.src,
 			xref: 'x',
 			yref: 'y',
 			x: 0,
@@ -70,8 +71,8 @@ function mapStateToProps(state: State) {
 		const origin = map.origin;
 		const opposite = map.opposite;
 		const mapScale = calculateScaleFromEndpoints(origin, opposite, {
-			width: map.image.width,
-			height: map.image.height
+			width: image.width,
+			height: image.height
 		});
 		// map coordinates to individual traces, todo: finalize mapping function
 		x = points.map(point => (point.longitude - origin.longitude) / mapScale.degreePerUnitX);

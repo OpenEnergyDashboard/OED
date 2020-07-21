@@ -34,7 +34,6 @@ export default class MapViewComponent extends React.Component<MapViewProps, {}> 
 			display: renderEditButton ? 'inline' : 'none',
 			paddingLeft: '5px'
 		};
-		console.log(`${this.props.map.modifiedDate}, ${typeof this.props.map.modifiedDate}`);
 		return (
 			<tr>
 				<td> {this.props.map.id} {this.formatStatus()} </td>

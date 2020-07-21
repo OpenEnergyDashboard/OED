@@ -95,7 +95,7 @@ router.post('/create', async (req, res) => {
 			mapSource: {
 				type: 'string',
 				minLength: 1,
-			},
+			}
 		}
 	};
 
@@ -106,8 +106,8 @@ router.post('/create', async (req, res) => {
 		const conn = getConnection();
 		try {
 			await conn.tx(async t => {
-				const origin = (req.body.origin)? new Point(req.body.origin.longitude, req.body.origin.latitude): new Point(1.000001,1.000001);
-				const opposite = (req.body.opposite)? new Point(req.body.opposite.longitude, req.body.opposite.latitude): new Point(180.000001,180.000001);
+				const origin = (req.body.origin)? new Point(req.body.origin.longitude, req.body.origin.latitude): null;
+				const opposite = (req.body.opposite)? new Point(req.body.opposite.longitude, req.body.opposite.latitude): null;
 				const newMap = new Map(
 					undefined,
 					req.body.name,
@@ -136,20 +136,19 @@ router.post('/create', async (req, res) => {
 router.post('/edit', async (req, res) => {
 	const validMap = {
 		type: 'object',
-		maxProperties: 9,
-		required: ['id', 'name', 'modifiedDate', 'mapSource'],
+		required: ['id', 'name', 'modifiedDate', 'filename', 'mapSource', 'displayable', 'note', 'origin', 'opposite'],
 		properties: {
 			id: {
 				type: 'integer',
+				minimum: 1
 			},
 			name: {
 				type: 'string',
 				minLength: 1
 			},
-			// filename: {
-			// 	type: 'string',
-			// 	minLength: 1,
-			// },
+			filename: {
+				type: 'string',
+			},
 			modifiedDate: {
 				type: 'string',
 				minLength: 1,
@@ -158,18 +157,44 @@ router.post('/edit', async (req, res) => {
 				type: 'string',
 				minLength: 1,
 			},
-			// note: {
-			// 	type: 'string',
-			// },
-			// displayable: {
-			// 	type: 'bool',
-			// },
-			// origin: {
-			// 	type: 'object',
-			// },
-			// opposite: {
-			// 	type: 'object',
-			// },
+			note: {
+				oneOf: [
+					{type: 'string'},
+					{type: 'null'}
+				]
+			},
+			displayable: {
+				type: 'bool',
+			},
+			if: {
+				properties: {
+					origin: {
+						type: 'object',
+						required: ['latitude', 'longitude'],
+						properties: {
+							latitude: { type: 'number', minimum: '-90', maximum: '90' },
+							longitude: { type: 'number', minimum: '-180', maximum: '180', }
+						}
+					},
+				}
+			},
+			then: {
+				properties: {
+					opposite: {
+						type: 'object',
+						required: ['latitude', 'longitude'],
+						properties: {
+							latitude: { type: 'number', minimum: '-90', maximum: '90' },
+							longitude: { type: 'number', minimum: '-180', maximum: '180', }
+						}
+					}
+				}
+			},
+			else: {
+				properties: {
+					opposite: { type: 'null'}
+				}
+			},
 		}
 	};
 	const validatorResult = validate(req.body, validMap);
@@ -180,8 +205,8 @@ router.post('/edit', async (req, res) => {
 		const conn = getConnection();
 		try {
 			await conn.tx(async t => {
-				const origin = (req.body.origin)? new Point(req.body.origin.longitude, req.body.origin.latitude): new Point(1.000001,1.000001);
-				const opposite = (req.body.opposite)? new Point(req.body.opposite.longitude, req.body.opposite.latitude): new Point(180.000001,180.000001);
+				const origin = (req.body.origin)? new Point(req.body.origin.longitude, req.body.origin.latitude): null;
+				const opposite = (req.body.opposite)? new Point(req.body.opposite.longitude, req.body.opposite.latitude): null;
 				const editedMap = new Map(
 					req.body.id,
 					req.body.name,

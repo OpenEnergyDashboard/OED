@@ -39,6 +39,7 @@
 	"failed.to.delete.group": "Failed to delete group",
 	"failed.to.edit.group": "Failed to edit group",
 	"failed.to.edit.meter": "Failed to edit meter",
+	"failed.to.create.map": "Failed to create map",
 	"failed.to.edit.map": "Failed to edit map",
 	"failed.to.link.graph": "Failed to link graph",
 	"failed.to.read.file": "Failed to read file",

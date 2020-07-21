@@ -35,10 +35,6 @@ function confirmMapEdits(mapID: number): t.ConfirmEditedMapAction {
 	return { type: ActionType.ConfirmEditedMap, mapID};
 }
 
-export function displayLoading(): t.DisplayMapLoadingAction {
-	return { type: ActionType.DisplayMapLoading };
-}
-
 function requestSelectedMap() {
 	return { type: ActionType.RequestSelectedMap };
 }
@@ -56,46 +52,8 @@ export function fetchMapsDetails(): Thunk {
 	};
 }
 
-export function fetchSelectedMap(): Thunk {
-	return async (dispatch: Dispatch, getState: GetState) => {
-		dispatch(requestSelectedMap());
-		const map: MapData = await mapsApi.getMapById(1);
-		// @ts-ignore
-		// console.log(map.origin.x);
-		// map.origin is still a Point() type;
-		await dispatch(receiveSelectedMap(map));
-		// console.log(`${getState().map.calibration.mode},fetched source: ${getState().map.calibration.image.src}`);
-		if (getState().maps.image.src) {
-			dispatch((dispatch2) => {
-				dispatch2(updateMapMode(CalibrationModeTypes.calibrate));
-			});
-		}
-	};
-}
-
 export function editMapDetails(map: MapMetadata): t.EditMapDetailsAction {
 	return {type: ActionType.EditMapDetails, map: map};
-}
-
-export function submitNewMap(mapID: number): Thunk {
-	return async (dispatch: Dispatch, getState: GetState) => {
-		const state = getState();
-		try {
-			const map: MapData = {
-				name: state.maps.name,
-				note: state.maps.note,
-				filename: state.maps.filename,
-				modifiedDate: moment.utc().toISOString(),
-				origin: state.maps.calibrationResult.origin,
-				opposite: state.maps.calibrationResult.opposite,
-				mapSource: state.maps.image.src,
-			};
-			await mapsApi.create(map);
-			window.alert('Map uploaded to database');
-		} catch (e) {
-			window.alert(e);
-		}
-	}
 }
 
 export function setCalibration(mode: CalibrationModeTypes, mapID: number): t.SetCalibrationAction {
@@ -107,7 +65,7 @@ export function updateMapSource(data: MapMetadata): t.UpdateMapSourceAction {
 }
 
 export function updateMapMode(nextMode: CalibrationModeTypes): t.ChangeMapModeAction {
-	return { type: ActionType.UpdateMapMode, nextMode };
+	return { type: ActionType.UpdateCalibrationMode, nextMode };
 }
 
 export function changeSelectedMap(newSelectedMapID: number): t.UpdateSelectedMapAction {
@@ -124,8 +82,9 @@ function hasCartesian(point: CalibratedPoint) {
 
 export function offerCurrentGPS(currentGPS: GPSPoint): Thunk {
 	return (dispatch, getState) => {
-		const point:CalibratedPoint = getState().maps.currentPoint;
-		if (hasCartesian(point)) {
+		const mapID = getState().maps.calibratingMap;
+		const point = getState().maps.editedMaps[mapID].currentPoint;
+		if (point && hasCartesian(point)) {
 			point.gps = currentGPS;
 			dispatch(updateCalibrationSet(point));
 			dispatch(resetCurrentPoint());
@@ -151,7 +110,8 @@ function updateCalibrationSet(calibratedPoint: CalibratedPoint): t.AppendCalibra
  */
 function isReadyForCalibration(state: State): boolean {
 	const calibrationThreshold = 3;
-	return state.maps.calibrationSet.length >= calibrationThreshold;
+	// @ts-ignore
+	return state.maps.editedMaps[state.maps.calibratingMap].calibrationSet.length >= calibrationThreshold;
 }
 
 function updateCurrentGPS(currentGPS: GPSPoint): t.UpdateCurrentGPSAction {
@@ -162,11 +122,15 @@ function updateCurrentGPS(currentGPS: GPSPoint): t.UpdateCurrentGPSAction {
  *  prepare data to required formats to pass it to function calculating mapScales
  */
 function prepareDataToCalibration(state: State): CalibrationResult {
+	const mapID = state.maps.calibratingMap;
+	let image = new Image();
+	image.src = state.maps.editedMaps[mapID].mapSource;
 	const imageDimensions: Dimensions = {
-		width: state.maps.image.width,
-		height: state.maps.image.height
+		width: image.width,
+		height: image.height
 	};
-	const result = calibrate(state.maps.calibrationSet, imageDimensions);
+	// @ts-ignore
+	const result = calibrate(state.maps.editedMaps[mapID].calibrationSet, imageDimensions);
 	return result;
 }
 
@@ -183,24 +147,38 @@ export function submitEditedMaps(): Thunk {
 		Object.keys(getState().maps.editedMaps).forEach(mapID2Submit => {
 			const mapID = parseInt(mapID2Submit);
 			if (getState().maps.submitting.indexOf(mapID) === -1) {
-				if (mapID <= -1) {
-					dispatch(submitNewMap(mapID));
-				} else {
-					dispatch(submitEditedMap(mapID));
-				}
+				dispatch(submitEditedMap(mapID));
 			}
 		});
 	};
 }
 
+export function submitNewMap(mapID: number): Thunk {
+	return async (dispatch: Dispatch, getState: GetState) => {
+		const map = getState().maps.editedMaps[mapID];
+		try {
+			const acceptableMap: MapData = {
+				...map,
+				modifiedDate: moment().toISOString(),
+			};
+			await mapsApi.create(acceptableMap);
+			window.alert('Map uploaded to database');
+		} catch (e) {
+			showErrorNotification(translate('failed.to.create.map'));
+			log(`failed to create map, ${e}`);
+		} finally {
+			dispatch(confirmMapEdits(mapID));
+		}
+	}
+}
+
 export function submitEditedMap(mapID: number): Thunk {
 	return async (dispatch: Dispatch, getState: GetState) => {
-		const submittingMap = getState().maps.editedMaps[mapID];
+		const submittingEdit = getState().maps.editedMaps[mapID];
 		dispatch(submitMapEdits(mapID));
 		try {
 			const acceptableMap: MapData = {
-				...submittingMap,
-				mapSource: submittingMap.image.src,
+				...submittingEdit,
 				modifiedDate: moment().toISOString()
 			}
 			await mapsApi.edit(acceptableMap);

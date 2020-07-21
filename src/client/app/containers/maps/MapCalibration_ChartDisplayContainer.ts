@@ -16,7 +16,7 @@ function mapStateToProps(state: State) {
 	let texts: string[] = [];
 
 	const mapID = state.maps.calibratingMap;
-	const map = state.maps.byMapID[mapID]
+	const map = state.maps.editedMaps[mapID]
 	const points = map.calibrationSet;
 	if (points) {
 		for (let i = 0; i < points.length; i++) {
@@ -26,10 +26,11 @@ function mapStateToProps(state: State) {
 			texts.push(`latitude: ${current.gps.latitude}, longitude: ${current.gps.longitude}`);
 		}
 	}
-
+	let image = new Image();
+	image.src = map.mapSource;
 	const imageDimensions: Dimensions = normalizeImageDimensions( {
-		width: map.image.width,
-		height: map.image.height,
+		width: image.width,
+		height: image.height,
 	});
 	let backgroundTrace = createBackgroundTrace(imageDimensions);
 	let dataPointTrace = {
@@ -48,7 +49,7 @@ function mapStateToProps(state: State) {
 	};
 	let data = [backgroundTrace,dataPointTrace];
 
-	const imageSource = map.image.src;
+	const imageSource = map.mapSource;
 
 	// for a detailed description of layout attributes: https://plotly.com/javascript/reference/#layout
 	const layout: any = {
@@ -148,10 +149,11 @@ function getClickedCoordinates(event: plotly.PlotMouseEvent) {
 	for (let i=0; i < event.points.length; i++) {
 		let pointNumber = event.points[i].pointNumber;
 		let traceNumber = event.points[i].curveNumber;
-		if (traceNumber != 0) {
+		if (traceNumber == 0) {
 			eligiblePoints.push(event.points[i]);
 		}
 	}
+	console.log(eligiblePoints);
 	const xValue = eligiblePoints[0].x as number;
 	const yValue = eligiblePoints[0].y as number;
 	const clickedPoint: CartesianPoint = {

@@ -48,7 +48,7 @@ export function calculateScaleFromEndpoints(origin: GPSPoint, opposite: GPSPoint
 	return mapScale;
 }
 
-export function calibrate(calibrationSet: ({ gps: { latitude: number, longitude: number }, cartesian: { x: number, y: number } })[], imageDimensions: Dimensions) {
+export function calibrate(calibrationSet: CalibratedPoint[], imageDimensions: Dimensions) {
 	const normalizedDimensions = normalizeImageDimensions(imageDimensions);
 	// calculate (n choose 2) scales for each pair of data points;
 	let scales: MapScale[] = [];

@@ -4,7 +4,6 @@
 
 import * as React from 'react';
 import {CalibrationModeTypes, MapMetadata} from '../../types/redux/map';
-import * as moment from 'moment';
 
 /**
  * Accepts image file from user upload,
@@ -19,14 +18,21 @@ interface MapInitiateProps {
 	onSourceChange(data: MapMetadata): any;
 }
 
-export default class MapCalibration_InitiateComponent extends React.Component<MapInitiateProps, {} > {
+interface MapInitiateState {
+	filename: string;
+}
+
+export default class MapCalibration_InitiateComponent extends React.Component<MapInitiateProps, MapInitiateState > {
 	private readonly fileInput: any;
 	private notifyLoadComplete() {
-		window.alert(`Map load complete from item ${this.fileInput.current.files[0].name}.`);
+		window.alert(`Map load complete from ${this.state.filename}.`);
 	}
 
 	constructor(props: MapInitiateProps) {
 		super(props);
+		this.state = {
+			filename: ''
+		};
 		this.fileInput = React.createRef();
 		this.handleInput = this.handleInput.bind(this);
 		this.confirmUpload = this.confirmUpload.bind(this);
@@ -42,14 +48,14 @@ export default class MapCalibration_InitiateComponent extends React.Component<Ma
 					<input type="file" ref={this.fileInput} />
 				</label>
 				<br />
-				<input type="submit" value="Submit" />
+				<input type="submit" value="Save and continue" />
 			</form>
 		);
 	}
 
 	private async confirmUpload(event: any) {
 		await this.handleInput(event);
-		this.notifyLoadComplete();
+		await this.notifyLoadComplete();
 		this.props.updateMapMode(CalibrationModeTypes.calibrate);
 	}
 
@@ -57,14 +63,12 @@ export default class MapCalibration_InitiateComponent extends React.Component<Ma
 		event.preventDefault();
 		try {
 			const imageURL = await this.getDataURL();
-			let image = new Image();
-			image.src = imageURL;
+			this.setState({filename: this.fileInput.current.files[0].name});
 			const source: MapMetadata = {
 				...this.props.map,
 				name: 'map',
 				filename: this.fileInput.current.files[0].name,
-				modifiedDate: moment().toISOString(),
-				image: image,
+				mapSource: imageURL,
 			}
 			await this.props.onSourceChange(source);
 		} catch (err) {

@@ -6,7 +6,7 @@ import MapCalibration_InitiateComponent from '../../components/maps/MapCalibrati
 import { connect } from 'react-redux';
 import { Dispatch } from '../../types/redux/actions';
 import {updateMapMode, updateMapSource} from "../../actions/map";
-import {CalibrationModeTypes, MapData, MapMetadata} from "../../types/redux/map";
+import {CalibrationModeTypes, MapMetadata} from "../../types/redux/map";
 import {State} from "../../types/redux/state";
 
 function mapStateToProps(state: State) {

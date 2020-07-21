@@ -10,7 +10,7 @@ class Map {
 	/**
 	 * @param id should be undefined when creating a new map
 	 * @param name map's name
-	 * @param displayable is the map set for display
+	 * @param displayable This map is available to users for charting
 	 * @param note notes on the map
 	 * @param filename name of file used to upload data
 	 * @param modifiedDate last modified date of the map
