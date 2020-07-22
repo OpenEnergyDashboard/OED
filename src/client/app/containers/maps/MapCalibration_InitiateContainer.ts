@@ -11,7 +11,7 @@ import {State} from "../../types/redux/state";
 
 function mapStateToProps(state: State) {
 	return {
-		map: state.maps.byMapID[state.maps.calibratingMap]
+		map: state.maps.editedMaps[state.maps.calibratingMap]
 	}
 }
 

@@ -89,6 +89,10 @@ export interface SetCalibrationAction {
 	mode: CalibrationModeTypes;
 }
 
+export interface IncrementCounterAction {
+	type: ActionType.IncrementCounter;
+}
+
 export type MapsAction =
 	| ChangeMapModeAction
 	| UpdateSelectedMapAction
@@ -105,7 +109,8 @@ export type MapsAction =
 	| ResetCurrentPointAction
 	| AppendCalibrationSetAction
 	| UpdateCalibrationResultAction
-	| SetCalibrationAction;
+	| SetCalibrationAction
+	| IncrementCounterAction;
 
 /**
  * data format stored in the database
@@ -165,6 +170,7 @@ export interface MapState {
 	editedMaps: MapMetadataByID; // Holds all maps that have been edited locally
 	// Maps the app is currently attempting to upload map changes
 	submitting: number[];
+	newMapCounter: number;
 }
 
 export interface MapEditData {

@@ -77,7 +77,6 @@ router.use(requiredAuthenticator);
 router.post('/create', async (req, res) => {
 	const validMap = {
 		type: 'object',
-		maxProperties: 7,
 		required: ['name', 'filename', 'modifiedDate', 'mapSource'],
 		properties: {
 			name: {
@@ -98,9 +97,9 @@ router.post('/create', async (req, res) => {
 			}
 		}
 	};
-
-	if (!validate(req.body, validMap).valid) {
-		log.error(`Invalid input for mapAPI.`)
+	const validationResult = validate(req.body, validMap);
+	if (!validationResult.valid) {
+		log.error(`Invalid input for mapAPI. ${validationResult.errors}`);
 		res.sendStatus(400);
 	} else {
 		const conn = getConnection();
@@ -220,10 +219,12 @@ router.post('/edit', async (req, res) => {
 				);
 				await editedMap.update(t);
 			});
-			res.sendStatus(200).json({ message: `Successfully edited map ${req.body.id}` });
+			res.sendStatus(200);
+			log.info(`Successfully edited map ${req.body.id}` );
 		} catch (err) {
 			if (err.toString() === 'error: duplicate key value violates unique constraint "maps_name_key"') {
-				res.status(400).json({error: `Map "${req.body.name}" is already in use.`});
+				res.status(400);
+				log.error(`Map "${req.body.name}" is already in use.`);
 			} else {
 				log.error(`Error while updating map ${err}`, err);
 				res.sendStatus(500);

@@ -22,10 +22,28 @@ interface MapViewProps {
 	setCalibration(mode: CalibrationModeTypes, mapID: number): any;
 }
 
-export default class MapViewComponent extends React.Component<MapViewProps, {}> {
+interface MapViewState {
+	nameFocus: boolean;
+	nameInput: string;
+	noteFocus: boolean;
+	noteInput: string;
+}
+
+export default class MapViewComponent extends React.Component<MapViewProps, MapViewState> {
 	constructor(props: MapViewProps) {
 		super(props);
+		this.state = {
+			nameFocus: false,
+			nameInput: this.props.map.name,
+			noteFocus: false,
+			noteInput: (this.props.map.note)? this.props.map.note : ''
+		}
+		this.handleCalibrationSetting = this.handleCalibrationSetting.bind(this);
 		this.toggleMapDisplayable = this.toggleMapDisplayable.bind(this);
+		this.toggleNameInput = this.toggleNameInput.bind(this);
+		this.handleNameChange = this.handleNameChange.bind(this);
+		this.toggleNoteInput = this.toggleNoteInput.bind(this);
+		this.handleNoteChange = this.handleNoteChange.bind(this);
 	}
 
 	public render() {
@@ -37,11 +55,11 @@ export default class MapViewComponent extends React.Component<MapViewProps, {}> 
 		return (
 			<tr>
 				<td> {this.props.map.id} {this.formatStatus()} </td>
-				<td> {this.props.map.name} </td>
+				<td> {this.formatName()} </td>
 				{hasToken() && <td> {this.formatDisplayable()} </td>}
 				{hasToken() && <td> {moment(this.props.map.modifiedDate).format('dddd, MMM DD, YYYY hh:mm a')} </td>}
 				{hasToken() && <td> {this.formatFilename()} </td>}
-				{hasToken() && <td> {this.props.map.note} </td>}
+				{hasToken() && <td> {this.formatNote()} </td>}
 				{hasToken() && <td> {this.formatCalibrationStatus()} </td>}
 			</tr>
 		);
@@ -72,8 +90,10 @@ export default class MapViewComponent extends React.Component<MapViewProps, {}> 
 	}
 
 	private toggleMapDisplayable() {
-		const editedMap = this.props.map;
-		editedMap.displayable = !editedMap.displayable;
+		const editedMap = {
+			...this.props.map,
+			displayable: !this.props.map.displayable
+		}
 		this.props.editMapDetails(editedMap);
 	}
 
@@ -111,16 +131,106 @@ export default class MapViewComponent extends React.Component<MapViewProps, {}> 
 		);
 	}
 
+	private toggleNameInput() {
+		if (this.state.nameFocus) {
+			const editedMap = {
+				...this.props.map,
+				name: this.state.nameInput,
+			}
+			this.props.editMapDetails(editedMap);
+		}
+		this.setState({nameFocus: !this.state.nameFocus});
+	}
+
+	private handleNameChange(event: React.ChangeEvent<HTMLTextAreaElement>) {
+		this.setState({ nameInput: event.target.value});
+	}
+
 	private formatName() {
+		let formattedName;
+		let buttonMessageId;
+		if (this.state.nameFocus) {
+			formattedName = <textarea id={'name'} value={this.state.nameInput} onChange={event => this.handleNameChange(event)}/>
+			buttonMessageId = 'update';
+		} else {
+			formattedName = <div>{this.state.nameInput}</div>
+			buttonMessageId = 'edit';
+		}
+
+		let toggleButton;
+		if (hasToken()) {
+			toggleButton = <Button style={this.styleToggleBtn()} color='primary' onClick={this.toggleNameInput}>
+				<FormattedMessage id={buttonMessageId} />
+			</Button>;
+		} else {
+			toggleButton = <div />;
+		}
+
 		if (hasToken()) {
 			return ( //add onClick
-				<span>
-					{this.props.map.name}
-				</span>
+				<div>
+					{formattedName}
+					{toggleButton}
+				</div>
 			);
 		} else {
 			return (
-				<span>{this.props.map.name}</span>
+				<div>
+					{this.props.map.name}
+					{toggleButton}
+				</div>
+			);
+		}
+	}
+
+	private toggleNoteInput() {
+		if (this.state.noteFocus) {
+			const editedMap = {
+				...this.props.map,
+				note: this.state.noteInput,
+			}
+			this.props.editMapDetails(editedMap);
+		}
+		this.setState({noteFocus: !this.state.noteFocus});
+	}
+
+	private handleNoteChange(event: React.ChangeEvent<HTMLTextAreaElement>) {
+		this.setState({ noteInput: event.target.value});
+	}
+
+	private formatNote() {
+		let formattedNote;
+		let buttonMessageId;
+		if (this.state.noteFocus) {
+			formattedNote = <textarea id={'note'} value={this.state.noteInput} onChange={event => this.handleNoteChange(event)}/>
+			buttonMessageId = 'update';
+		} else {
+			formattedNote = <div>{this.state.noteInput}</div>
+			buttonMessageId = 'edit';
+		}
+
+		let toggleButton;
+		if (hasToken()) {
+			toggleButton = <Button style={this.styleToggleBtn()} color='primary' onClick={this.toggleNoteInput}>
+				<FormattedMessage id={buttonMessageId} />
+			</Button>;
+		} else {
+			toggleButton = <div />;
+		}
+
+		if (hasToken()) {
+			return ( //add onClick
+				<div>
+					{formattedNote}
+					{toggleButton}
+				</div>
+			);
+		} else {
+			return (
+				<div>
+					{this.props.map.note}
+					{toggleButton}
+				</div>
 			);
 		}
 	}

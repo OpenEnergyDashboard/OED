@@ -56,6 +56,20 @@ export function editMapDetails(map: MapMetadata): t.EditMapDetailsAction {
 	return {type: ActionType.EditMapDetails, map: map};
 }
 
+function incrementCounter(): t.IncrementCounterAction {
+	return { type: ActionType.IncrementCounter};
+}
+
+export function setNewMap(): Thunk {
+	return async (dispatch: Dispatch) => {
+		dispatch(incrementCounter());
+		dispatch((dispatch2, getState2) => {
+			const temporaryID = getState2().maps.newMapCounter * -1;
+			dispatch2(setCalibration(CalibrationModeTypes.initiate, temporaryID));
+		});
+	}
+}
+
 export function setCalibration(mode: CalibrationModeTypes, mapID: number): t.SetCalibrationAction {
 	return { type: ActionType.SetCalibration, mode, mapID };
 }
@@ -153,19 +167,22 @@ export function submitEditedMaps(): Thunk {
 	};
 }
 
-export function submitNewMap(mapID: number): Thunk {
+export function submitNewMap(): Thunk {
 	return async (dispatch: Dispatch, getState: GetState) => {
+		const mapID = getState().maps.calibratingMap;
 		const map = getState().maps.editedMaps[mapID];
 		try {
 			const acceptableMap: MapData = {
 				...map,
 				modifiedDate: moment().toISOString(),
+				origin: map.origin,
+				opposite: map.opposite
 			};
 			await mapsApi.create(acceptableMap);
 			window.alert('Map uploaded to database');
 		} catch (e) {
 			showErrorNotification(translate('failed.to.create.map'));
-			log(`failed to create map, ${e}`);
+			log.error(`failed to create map, ${e}`);
 		} finally {
 			dispatch(confirmMapEdits(mapID));
 		}

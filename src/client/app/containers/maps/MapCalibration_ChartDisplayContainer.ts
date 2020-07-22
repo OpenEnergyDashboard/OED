@@ -134,6 +134,7 @@ function createBackgroundTrace(imageDimensions: Dimensions) {
 }
 
 function handlePointClick(event: plotly.PlotMouseEvent) {
+	console.log(event);
 	event.event.preventDefault();
 	let currentPoint: CartesianPoint = getClickedCoordinates(event);
 	store.dispatch(updateCurrentCartesian(currentPoint));

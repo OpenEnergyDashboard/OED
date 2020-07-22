@@ -2,7 +2,7 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
 
-import {MapMetadata, MapsAction, MapState} from '../types/redux/map';
+import {CalibrationModeTypes, MapMetadata, MapsAction, MapState} from '../types/redux/map';
 import {ActionType} from '../types/redux/actions';
 import * as _ from "lodash";
 import {CalibratedPoint} from "../utils/calibration";
@@ -14,6 +14,7 @@ const defaultState: MapState = {
 	calibratingMap: 0,
 	editedMaps: {},
 	submitting: [],
+	newMapCounter: 0,
 };
 
 export default function maps(state = defaultState, action: MapsAction) {
@@ -53,16 +54,35 @@ export default function maps(state = defaultState, action: MapsAction) {
 				isLoading: false,
 				byMapID: _.keyBy(data, map => map.id)
 			};
+		case ActionType.IncrementCounter:
+			const counter = state.newMapCounter;
+			return {
+				...state,
+				newMapCounter: counter + 1
+			};
 		case ActionType.SetCalibration:
 			byMapID = state.byMapID;
-			// copy map from byMapID to editedMaps if there is not already a dirty map(with unsaved changes) in editedMaps
-			if (state.editedMaps[action.mapID] === undefined) {
+			// if the map is first created just add a new instance into
+			if (action.mapID < 0) {
 				return {
 					...state,
 					calibratingMap: action.mapID,
 					editedMaps: {
 						...state.editedMaps,
 						[action.mapID]: {
+							id: action.mapID,
+							calibrationMode: action.mode
+						}
+					}
+				}
+			} else if (state.editedMaps[action.mapID] === undefined) {
+				return {
+					...state,
+					calibratingMap: action.mapID,
+					editedMaps: {
+						...state.editedMaps,
+						[action.mapID]: {
+							// copy map from byMapID to editedMaps if there is not already a dirty map(with unsaved changes) in editedMaps
 							...state.byMapID[action.mapID],
 							calibrationMode: action.mode
 						}

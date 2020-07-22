@@ -26,7 +26,7 @@ function mapStateToProps(state: State) {
 function mapDispatchToProps(dispatch: Dispatch) {
 	return {
 		updateGPSCoordinates: (gpsCoordinate: GPSPoint) => dispatch(offerCurrentGPS(gpsCoordinate)),
-		uploadMap: (newMap: number) => dispatch(submitNewMap(newMap)),
+		uploadMap: () => dispatch(submitNewMap()),
 	}
 }
 export default connect(mapStateToProps, mapDispatchToProps)(MapCalibration_InfoDisplayComponent);

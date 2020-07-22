@@ -4,8 +4,8 @@
 
 UPDATE maps
 	SET name = ${name},
-		note = ${note},
 		displayable = ${displayable},
+		note = ${note},
 		filename = ${filename},
 		modified_date = ${modifiedDate},
 		origin = ${origin},

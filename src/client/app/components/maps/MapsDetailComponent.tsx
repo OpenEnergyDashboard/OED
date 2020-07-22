@@ -9,12 +9,14 @@ import { hasToken } from '../../utils/token';
 import HeaderContainer from '../../containers/HeaderContainer';
 import FooterComponent from '../FooterComponent';
 import MapViewContainer from "../../containers/maps/MapViewContainer";
+import {Link} from "react-router";
 
 interface MapsDetailProps {
 	maps: number[];
 	unsavedChanges: boolean;
 	fetchMapsDetails(): Promise<any>;
 	submitEditedMaps(): Promise<any>;
+	createNewMap(): any;
 }
 
 export default class MapsDetailComponent extends React.Component<MapsDetailProps, {}> {
@@ -71,6 +73,15 @@ export default class MapsDetailComponent extends React.Component<MapsDetailProps
 					<tbody>
 					{ this.props.maps.map(mapID =>
 						( <MapViewContainer key={mapID} id={mapID} /> ))}
+					<tr>
+						<td colSpan={7}>
+							<Link to='/calibration' onClick={() => this.props.createNewMap()}>
+								<Button style={buttonContainerStyle} color='primary'>
+									<FormattedMessage id='create.map' />
+								</Button>
+							</Link>
+						</td>
+					</tr>
 					</tbody>
 					</Table>
 					</div>

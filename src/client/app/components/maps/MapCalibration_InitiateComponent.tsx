@@ -4,6 +4,7 @@
 
 import * as React from 'react';
 import {CalibrationModeTypes, MapMetadata} from '../../types/redux/map';
+import {ChangeEvent} from "react";
 
 /**
  * Accepts image file from user upload,
@@ -20,6 +21,7 @@ interface MapInitiateProps {
 
 interface MapInitiateState {
 	filename: string;
+	mapName: string;
 }
 
 export default class MapCalibration_InitiateComponent extends React.Component<MapInitiateProps, MapInitiateState > {
@@ -31,7 +33,8 @@ export default class MapCalibration_InitiateComponent extends React.Component<Ma
 	constructor(props: MapInitiateProps) {
 		super(props);
 		this.state = {
-			filename: ''
+			filename: '',
+			mapName: '',
 		};
 		this.fileInput = React.createRef();
 		this.handleInput = this.handleInput.bind(this);
@@ -48,6 +51,12 @@ export default class MapCalibration_InitiateComponent extends React.Component<Ma
 					<input type="file" ref={this.fileInput} />
 				</label>
 				<br />
+				<label>
+					Define a name for the map:
+					<br/>
+					<textarea id={'text'} cols={50} value={this.state.mapName} onChange={this.handleNameInput.bind(this)}/>
+				</label>
+				<br/>
 				<input type="submit" value="Save and continue" />
 			</form>
 		);
@@ -66,7 +75,7 @@ export default class MapCalibration_InitiateComponent extends React.Component<Ma
 			this.setState({filename: this.fileInput.current.files[0].name});
 			const source: MapMetadata = {
 				...this.props.map,
-				name: 'map',
+				name: this.state.mapName,
 				filename: this.fileInput.current.files[0].name,
 				mapSource: imageURL,
 			}
@@ -74,6 +83,12 @@ export default class MapCalibration_InitiateComponent extends React.Component<Ma
 		} catch (err) {
 			console.log(err);
 		}
+	}
+
+	private handleNameInput(event: ChangeEvent<HTMLTextAreaElement>) {
+		this.setState({
+			mapName: event.target.value
+		});
 	}
 
 	private getDataURL(): Promise<string> {
