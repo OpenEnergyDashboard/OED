@@ -21,7 +21,7 @@ function formatMapForResponse(map) {
 		name: map.name,
 		displayable: map.displayable,
 		note: map.note,
-		fileName: map.fileName,
+		filename: map.filename,
 		modifiedDate: map.modifiedDate,
 		origin: map.origin,
 		opposite: map.opposite,
