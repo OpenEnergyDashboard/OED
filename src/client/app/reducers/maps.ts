@@ -154,6 +154,7 @@ export default function maps(state = defaultState, action: MapsAction) {
 			delete editedMaps[action.mapID];
 			return {
 				...state,
+				calibratingMap: 0,
 				submitting,
 				editedMaps,
 				byMapID
