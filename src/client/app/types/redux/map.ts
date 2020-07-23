@@ -9,6 +9,7 @@ import * as moment from 'moment';
 export enum CalibrationModeTypes {
 	initiate = 'initiate',
 	calibrate = 'calibrate',
+	unavailable = 'unavailable',
 }
 
 export interface ChangeMapModeAction {

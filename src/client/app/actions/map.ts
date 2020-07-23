@@ -167,6 +167,17 @@ export function submitEditedMaps(): Thunk {
 	};
 }
 
+export function submitCalibratingMap(): Thunk {
+	return async (dispatch: Dispatch, getState: GetState) => {
+		const mapID = getState().maps.calibratingMap;
+		if (mapID < 0) {
+			dispatch(submitNewMap());
+		} else {
+			dispatch(submitEditedMap(mapID));
+		}
+	}
+}
+
 export function submitNewMap(): Thunk {
 	return async (dispatch: Dispatch, getState: GetState) => {
 		const mapID = getState().maps.calibratingMap;
@@ -175,8 +186,8 @@ export function submitNewMap(): Thunk {
 			const acceptableMap: MapData = {
 				...map,
 				modifiedDate: moment().toISOString(),
-				origin: map.origin,
-				opposite: map.opposite
+				origin: (map.calibrationResult)? map.calibrationResult.origin : undefined,
+				opposite: (map.calibrationResult)? map.calibrationResult.opposite : undefined
 			};
 			await mapsApi.create(acceptableMap);
 			window.alert('Map uploaded to database');
@@ -191,12 +202,14 @@ export function submitNewMap(): Thunk {
 
 export function submitEditedMap(mapID: number): Thunk {
 	return async (dispatch: Dispatch, getState: GetState) => {
-		const submittingEdit = getState().maps.editedMaps[mapID];
+		const map = getState().maps.editedMaps[mapID];
 		dispatch(submitMapEdits(mapID));
 		try {
 			const acceptableMap: MapData = {
-				...submittingEdit,
-				modifiedDate: moment().toISOString()
+				...map,
+				modifiedDate: moment().toISOString(),
+				origin: (map.calibrationResult)? map.calibrationResult.origin : map.origin,
+				opposite: (map.calibrationResult)? map.calibrationResult.opposite : map.opposite,
 			}
 			await mapsApi.edit(acceptableMap);
 			dispatch(confirmMapEdits(mapID));

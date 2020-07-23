@@ -39,12 +39,18 @@ export default class MapCalibrationComponent extends React.Component<MapCalibrat
 				</div>
 			);
 		} else { // preview mode containers
+			// return (
+			// 	<div className='container-fluid'>
+			// 		<HeaderContainer />
+			// 		<p>Coming soon...</p>
+			// 	</div>
+			// );
 			return (
 				<div className='container-fluid'>
 					<HeaderContainer />
-					<p>Coming soon...</p>
+					<div />
 				</div>
-			);
+			)
 		}
 	}
 }

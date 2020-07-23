@@ -10,7 +10,7 @@ interface InfoDisplayProps {
 	currentCartesianDisplay: string;
 	resultDisplay: string;
 	updateGPSCoordinates(gpsCoordinate: GPSPoint): any;
-	uploadMap(): any;
+	submitCalibratingMap(): any;
 }
 
 interface InfoDisplayState {
@@ -26,6 +26,7 @@ export default class MapCalibration_InfoDisplayComponent extends React.Component
 		this.handleGPSInput.bind(this);
 		this.resetInputField.bind(this);
 		this.handleSubmit.bind(this);
+		this.handleChanges.bind(this);
 	}
 	render() {
 		const calibrationDisplay = `result: ${this.props.resultDisplay}`;
@@ -39,7 +40,7 @@ export default class MapCalibration_InfoDisplayComponent extends React.Component
 					</label>
 					<br/>
 					<input type={"submit"} value={"Submit"}/>
-					<button onClick={this.props.uploadMap}>Save</button>
+					<button onClick={this.handleChanges.bind(this)}>Save changes to database</button>
 				</form>
 				<p>{calibrationDisplay}</p>
 			</div>
@@ -69,6 +70,10 @@ export default class MapCalibration_InfoDisplayComponent extends React.Component
 		this.setState({
 			value: event.target.value
 		});
+	}
+
+	private handleChanges() {
+		this.props.submitCalibratingMap();
 	}
 }
 
