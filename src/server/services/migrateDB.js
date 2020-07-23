@@ -17,7 +17,9 @@ function findMaxVersion(list) {
 }
 
 (async () => {
-	let toVersion;
+	// Set toVersion to unacceptable value. Coverity Scan thinks it is not set but logic below seems to
+	// always set of call terminateReadline that stops to process. This should fix this.
+	let toVersion = '0.0.0';
 
 	// If there aren't enough args, go interactive.
 	const cmdArgs = process.argv;

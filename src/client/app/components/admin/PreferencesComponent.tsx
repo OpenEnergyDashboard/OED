@@ -150,6 +150,18 @@ class PreferencesComponent extends React.Component<PreferencesPropsWithIntl, {}>
 							Français
 						</label>
 					</div>
+					<div className='radio'>
+						<label>
+							<input
+								type='radio'
+								name='languageTypes'
+								value={LanguageTypes.es}
+								onChange={this.handleDefaultLanguageChange}
+								checked={this.props.defaultLanguage === LanguageTypes.es}
+							/>
+							Español
+						</label>
+					</div>
 				</div>
 				<Button
 					type='submit'
