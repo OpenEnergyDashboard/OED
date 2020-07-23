@@ -8,6 +8,9 @@ import MapCalibration_InitiateContainer from "../../containers/maps/MapCalibrati
 import MapCalibration_ChartDisplayContainer from "../../containers/maps/MapCalibration_ChartDisplayContainer";
 import MapCalibration_InfoDisplayContainer from "../../containers/maps/MapCalibration_InfoDisplayContainer";
 import HeaderContainer from "../../containers/HeaderContainer";
+import {Button} from "reactstrap";
+import {FormattedMessage} from "react-intl";
+import {Link} from "react-router";
 
 interface MapCalibrationProps {
 	mode: CalibrationModeTypes;
@@ -39,18 +42,12 @@ export default class MapCalibrationComponent extends React.Component<MapCalibrat
 				</div>
 			);
 		} else { // preview mode containers
-			// return (
-			// 	<div className='container-fluid'>
-			// 		<HeaderContainer />
-			// 		<p>Coming soon...</p>
-			// 	</div>
-			// );
 			return (
 				<div className='container-fluid'>
 					<HeaderContainer />
-					<div />
+					<p/>
 				</div>
-			)
+			);
 		}
 	}
 }

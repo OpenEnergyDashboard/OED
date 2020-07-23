@@ -15,9 +15,10 @@ import {
 } from "../utils/calibration";
 import {State} from "../types/redux/state";
 import {mapsApi} from "../utils/api";
-import {showErrorNotification} from "../utils/notifications";
+import {showErrorNotification, showSuccessNotification} from "../utils/notifications";
 import translate from "../utils/translate";
 import * as moment from 'moment';
+import { browserHistory } from '../utils/history';
 
 function requestMapsDetails(): t.RequestMapsDetailsAction {
 	return { type: ActionType.RequestMapsDetails };
@@ -191,6 +192,8 @@ export function submitNewMap(): Thunk {
 			};
 			await mapsApi.create(acceptableMap);
 			window.alert('Map uploaded to database');
+			showSuccessNotification(translate('updated.map'));
+			browserHistory.push('/maps');
 		} catch (e) {
 			showErrorNotification(translate('failed.to.create.map'));
 			log.error(`failed to create map, ${e}`);
@@ -213,6 +216,8 @@ export function submitEditedMap(mapID: number): Thunk {
 			}
 			await mapsApi.edit(acceptableMap);
 			dispatch(confirmMapEdits(mapID));
+			showSuccessNotification(translate('updated.map'));
+			browserHistory.push('/maps');
 		} catch (err) {
 			showErrorNotification(translate('failed.to.edit.map'));
 		}

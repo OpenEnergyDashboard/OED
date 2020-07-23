@@ -10,7 +10,7 @@ import {CalibrationModeTypes} from "../../types/redux/map";
 function mapStateToProps(state: State) {
 	const mapID = state.maps.calibratingMap;
 	return {
-		mode: (state.maps.editedMaps[mapID].calibrationMode)? state.maps.editedMaps[mapID].calibrationMode: CalibrationModeTypes.unavailable,
+		mode: (state.maps.editedMaps[mapID])? state.maps.editedMaps[mapID].calibrationMode: CalibrationModeTypes.unavailable,
 		isLoading: false,
 		mapID: mapID,
 	};
