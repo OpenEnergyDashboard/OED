@@ -13,7 +13,6 @@ function mapStateToProps(state: State) {
 	return {
 		barStacking: state.graph.barStacking,
 		defaultLanguage: state.admin.defaultLanguage,
-		calibratingID: state.maps.calibratingMap
 	};
 }
 

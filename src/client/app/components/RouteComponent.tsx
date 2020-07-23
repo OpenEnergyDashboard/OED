@@ -34,7 +34,6 @@ import MapCalibrationContainer from "../containers/maps/MapCalibrationContainer"
 interface RouteProps {
 	barStacking: boolean;
 	defaultLanguage: LanguageTypes;
-	calibratingID: number;
 	changeOptionsFromLink(options: LinkOptions): Promise<any[]>;
 }
 
