@@ -75,6 +75,18 @@ export function setCalibration(mode: CalibrationModeTypes, mapID: number): t.Set
 	return { type: ActionType.SetCalibration, mode, mapID };
 }
 
+export function dropCalibration(): Thunk {
+	return async (dispatch: Dispatch, getState: GetState) => {
+		const mapToReset = getState().maps.calibratingMap;
+		dispatch(resetCalibration());
+		logToServer('info', `reset calibration for map, id: ${mapToReset}.`);
+	}
+}
+
+function resetCalibration(): t.ResetCalibrationAction {
+	return { type: ActionType.ResetCalibration};
+}
+
 export function updateMapSource(data: MapMetadata): t.UpdateMapSourceAction {
 	return { type: ActionType.UpdateMapSource, data };
 }

@@ -26,6 +26,7 @@ const createRouterForNewCompressedReadings = require('./routes/compressedReading
 const createRouterForCompareReadings = require('./routes/compareReadings').createRouter;
 const baseline = require('./routes/baseline');
 const maps = require('./routes/maps');
+const logs = require('./routes/logs');
 
 const app = express();
 
@@ -53,11 +54,12 @@ app.use('/api/compressedReadings', createRouterForNewCompressedReadings());
 app.use('/api/compareReadings', createRouterForCompareReadings());
 app.use('/api/baselines', baseline);
 app.use('/api/maps', maps);
+app.use('/api/logs', logs);
 app.use(express.static(path.join(__dirname, '..', 'client', 'public')));
 
 const router = express.Router();
 
-router.get(/^(\/)(login|admin|groups|createGroup|editGroup|graph|meters|editMeter|maps)?$/, (req, res) => {
+router.get(/^(\/)(login|admin|groups|createGroup|editGroup|graph|meters|editMeter|maps|calibration)?$/, (req, res) => {
 	fs.readFile(path.resolve(__dirname, '..', 'client', 'index.html'), (err, html) => {
 		const subdir = config.subdir || '/';
 		let htmlPlusData = html.toString().replace('SUBDIR', subdir);

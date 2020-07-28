@@ -90,6 +90,7 @@ export enum ActionType {
 	SubmitEditedMap = 'SUBMIT_EDITED_MAP',
 	ConfirmEditedMap = 'CONFIRM_EDITED_MAP',
 	SetCalibration = 'SET_CALIBRATION',
+	ResetCalibration = 'RESET_CALIBRATION',
 	IncrementCounter = 'INCREMENT_COUNTER',
 }
 

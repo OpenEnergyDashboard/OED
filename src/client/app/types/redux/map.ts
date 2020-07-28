@@ -94,6 +94,10 @@ export interface IncrementCounterAction {
 	type: ActionType.IncrementCounter;
 }
 
+export interface ResetCalibrationAction {
+	type: ActionType.ResetCalibration;
+}
+
 export type MapsAction =
 	| ChangeMapModeAction
 	| UpdateSelectedMapAction
@@ -111,6 +115,7 @@ export type MapsAction =
 	| AppendCalibrationSetAction
 	| UpdateCalibrationResultAction
 	| SetCalibrationAction
+	| ResetCalibrationAction
 	| IncrementCounterAction;
 
 /**
@@ -172,15 +177,4 @@ export interface MapState {
 	// Maps the app is currently attempting to upload map changes
 	submitting: number[];
 	newMapCounter: number;
-}
-
-export interface MapEditData {
-	name?: string;
-	displayable?: boolean;
-	note?: string;
-	filename?: string;
-	modifiedDate: string;
-	origin?: GPSPoint;
-	opposite?: GPSPoint;
-	mapSource?: string;
 }

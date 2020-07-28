@@ -5,7 +5,7 @@
 import { connect } from 'react-redux';
 import { State } from '../../types/redux/state';
 import {Dispatch} from '../../types/redux/actions';
-import {fetchMapsDetails, setCalibration, setNewMap, submitEditedMaps} from "../../actions/map";
+import {fetchMapsDetails, setNewMap, submitEditedMaps} from "../../actions/map";
 import MapsDetailComponent from "../../components/maps/MapsDetailComponent";
 
 function mapStateToProps(state: State) {

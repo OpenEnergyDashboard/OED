@@ -74,7 +74,7 @@ export default function maps(state = defaultState, action: MapsAction) {
 							calibrationMode: action.mode
 						}
 					}
-				}
+				};
 			} else if (state.editedMaps[action.mapID] === undefined) {
 				return {
 					...state,
@@ -87,7 +87,7 @@ export default function maps(state = defaultState, action: MapsAction) {
 							calibrationMode: action.mode
 						}
 					}
-				}
+				};
 			} else {
 				return {
 					...state,
@@ -99,8 +99,23 @@ export default function maps(state = defaultState, action: MapsAction) {
 							calibrationMode: action.mode
 						}
 					}
-				}
+				};
 			}
+		case ActionType.ResetCalibration:
+			editedMaps = state.editedMaps;
+			let mapToReset = {...editedMaps[calibrated]};
+			delete mapToReset.currentPoint;
+			delete mapToReset.calibrationResult;
+			delete mapToReset.calibrationSet;
+			delete mapToReset.calibrationMode;
+			return {
+				...state,
+				calibratingMap: 0,
+				editedMaps: {
+					...state.editedMaps,
+					[calibrated]: mapToReset
+				},
+			};
 		case ActionType.RequestSelectedMap:
 			return {
 				...state,
