@@ -19,6 +19,7 @@ import {showErrorNotification, showSuccessNotification} from "../utils/notificat
 import translate from "../utils/translate";
 import * as moment from 'moment';
 import { browserHistory } from '../utils/history';
+import {logToServer} from "./logs";
 
 function requestMapsDetails(): t.RequestMapsDetailsAction {
 	return { type: ActionType.RequestMapsDetails };
@@ -66,12 +67,22 @@ export function setNewMap(): Thunk {
 		dispatch(incrementCounter());
 		dispatch((dispatch2, getState2) => {
 			const temporaryID = getState2().maps.newMapCounter * -1;
+			dispatch2(logToServer('info', `Set up new map, id = ${temporaryID}`));
 			dispatch2(setCalibration(CalibrationModeTypes.initiate, temporaryID));
 		});
 	}
 }
 
-export function setCalibration(mode: CalibrationModeTypes, mapID: number): t.SetCalibrationAction {
+export function setCalibration(mode: CalibrationModeTypes, mapID: number): Thunk {
+	return async (dispatch: Dispatch) => {
+		dispatch(prepareCalibration(mode, mapID));
+		dispatch((dispatch2) => {
+			dispatch2(logToServer('info', `Start Calibration for map, id=${mapID}, mode:${mode}`));
+		});
+	}
+}
+
+function prepareCalibration(mode: CalibrationModeTypes, mapID: number): t.SetCalibrationAction {
 	return { type: ActionType.SetCalibration, mode, mapID };
 }
 
@@ -79,7 +90,9 @@ export function dropCalibration(): Thunk {
 	return async (dispatch: Dispatch, getState: GetState) => {
 		const mapToReset = getState().maps.calibratingMap;
 		dispatch(resetCalibration());
-		logToServer('info', `reset calibration for map, id: ${mapToReset}.`);
+		dispatch((dispatch2) => {
+			dispatch2(logToServer('info', `reset calibration for map, id: ${mapToReset}.`));
+		});
 	}
 }
 
@@ -117,9 +130,15 @@ export function offerCurrentGPS(currentGPS: GPSPoint): Thunk {
 			dispatch(resetCurrentPoint());
 			// Nesting dispatches to preserve that updateCalibrationSet() is called before calibration
 			dispatch((dispatch2, getState2) => {
+				dispatch2(logToServer('info', `accepted gps input: latitude:${currentGPS.latitude},longitude:${currentGPS.longitude}
+				and added to data point`));
 				if (isReadyForCalibration(getState2())) {
 					const result = prepareDataToCalibration(getState());
 					dispatch2(updateResult(result));
+					dispatch2(logToServer('info', `calculation complete, maxError: x:${result.maxError.x},y:${result.maxError.y},
+					origin:${result.origin.latitude},${result.origin.longitude}, opposite:${result.opposite.latitude},${result.opposite.longitude}`));
+				} else {
+					dispatch2(logToServer('info', 'threshold not met, didn\'t trigger calibration'));
 				}
 			});
 		}
@@ -203,14 +222,18 @@ export function submitNewMap(): Thunk {
 				opposite: (map.calibrationResult)? map.calibrationResult.opposite : undefined
 			};
 			await mapsApi.create(acceptableMap);
-			window.alert('Map uploaded to database');
-			showSuccessNotification(translate('updated.map'));
+			if (map.calibrationResult) {
+				dispatch(logToServer('info', 'New calibrated map uploaded to database'));
+				showSuccessNotification(translate('upload.new.map.with.calibration'));
+			} else {
+				dispatch(logToServer('info', 'New map uploaded to database(without calibration)'));
+				showSuccessNotification(translate('upload.new.map.without.calibration'));
+			}
+			dispatch(confirmMapEdits(mapID));
 			browserHistory.push('/maps');
 		} catch (e) {
 			showErrorNotification(translate('failed.to.create.map'));
-			log.error(`failed to create map, ${e}`);
-		} finally {
-			dispatch(confirmMapEdits(mapID));
+			dispatch(logToServer('error', `failed to create map, ${e}`));
 		}
 	}
 }
@@ -227,11 +250,18 @@ export function submitEditedMap(mapID: number): Thunk {
 				opposite: (map.calibrationResult)? map.calibrationResult.opposite : map.opposite,
 			}
 			await mapsApi.edit(acceptableMap);
+			if (map.calibrationResult) {
+				dispatch(logToServer('info', 'Edited map uploaded to database(calibrated)'));
+				showSuccessNotification(translate("updated.map.with.calibration"));
+			} else {
+				dispatch(logToServer('info', 'New map uploaded to database(without calibration)'));
+				showSuccessNotification(translate("updated.map.without.calibration"));
+			}
 			dispatch(confirmMapEdits(mapID));
-			showSuccessNotification(translate('updated.map'));
 			browserHistory.push('/maps');
 		} catch (err) {
 			showErrorNotification(translate('failed.to.edit.map'));
+			dispatch(logToServer('error', `failed to edit map, ${err}`));
 		}
 	};
 }

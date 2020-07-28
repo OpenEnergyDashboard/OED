@@ -8,7 +8,7 @@ import { Dispatch } from '../../types/redux/actions';
 import MapCalibration_InfoDisplayComponent from '../../components/maps/MapCalibration_InfoDisplayComponent';
 import {dropCalibration, offerCurrentGPS, submitCalibratingMap} from "../../actions/map";
 import {GPSPoint} from "../../utils/calibration";
-import logToServer from "../../actions/logs";
+import {logToServer} from "../../actions/logs";
 
 function mapStateToProps(state: State) {
 	const mapID = state.maps.calibratingMap;

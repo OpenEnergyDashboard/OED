@@ -4,7 +4,7 @@
 import { LogData } from "../types/redux/logs";
 import { logsApi } from "../utils/api";
 
-export default function logToServer(level: string, message: string, error?: Error, skipMail?: boolean) {
+export function logToServer(level: string, message: string, error?: Error, skipMail?: boolean) {
 	let log: LogData = {
 		message: message,
 	};
