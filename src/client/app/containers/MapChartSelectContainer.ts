@@ -10,8 +10,8 @@ import MapChartSelectComponent from "../components/MapChartSelectComponent";
 import {changeSelectedMap} from "../actions/map";
 
 function mapStateToProps(state: State) {
-	const displayableMaps = _.filter(state.maps.byMapID, 'displayable');
-	const sortedMaps = _.sortBy(_.values(displayableMaps).map(map => ({ value: map.id, label: map.name.trim() })), 'id');
+	const maps = state.maps.byMapID;
+	const sortedMaps = _.sortBy(_.values(maps).map(map => ({ value: map.id, label: map.name.trim() })), 'id');
 
 	const selectedMap =
 		{
