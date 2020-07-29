@@ -77,15 +77,18 @@ router.use(requiredAuthenticator);
 router.post('/create', async (req, res) => {
 	const validMap = {
 		type: 'object',
-		required: ['name', 'filename', 'modifiedDate', 'mapSource'],
+		required: ['id', 'name', 'modifiedDate', 'filename', 'mapSource', 'displayable', 'note', 'origin', 'opposite'],
 		properties: {
+			id: {
+				type: 'integer',
+				minimum: 1
+			},
 			name: {
 				type: 'string',
 				minLength: 1
 			},
 			filename: {
 				type: 'string',
-				minLength: 1,
 			},
 			modifiedDate: {
 				type: 'string',
@@ -94,7 +97,45 @@ router.post('/create', async (req, res) => {
 			mapSource: {
 				type: 'string',
 				minLength: 1,
-			}
+			},
+			note: {
+				oneOf: [
+					{type: 'string'},
+					{type: 'null'}
+				]
+			},
+			displayable: {
+				type: 'bool',
+			},
+			if: {
+				properties: {
+					origin: {
+						type: 'object',
+						required: ['latitude', 'longitude'],
+						properties: {
+							latitude: { type: 'number', minimum: '-90', maximum: '90' },
+							longitude: { type: 'number', minimum: '-180', maximum: '180', }
+						}
+					},
+				}
+			},
+			then: {
+				properties: {
+					opposite: {
+						type: 'object',
+						required: ['latitude', 'longitude'],
+						properties: {
+							latitude: { type: 'number', minimum: '-90', maximum: '90' },
+							longitude: { type: 'number', minimum: '-180', maximum: '180', }
+						}
+					}
+				}
+			},
+			else: {
+				properties: {
+					opposite: { type: 'null'}
+				}
+			},
 		}
 	};
 	const validationResult = validate(req.body, validMap);

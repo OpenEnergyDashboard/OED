@@ -11,7 +11,8 @@ const Point = require('../../models/Point');
 const moment = require('moment');
 
 const origin = new Point(0.000001, 0.000001);
-const opposite = new Point(100.000001, 100.000001);
+const opposite = new Point(179.999999, 89.999999);
+const invalidOpposite = new Point(200, 100);
 
 function expectPointsToBeEquivalent(expected, actual) {
 	expect(actual).to.have.property('longitude', expected.longitude);
