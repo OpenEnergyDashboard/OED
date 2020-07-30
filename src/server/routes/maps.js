@@ -9,7 +9,6 @@ const validate = require('jsonschema').validate;
 const { getConnection } = require('../db');
 const requiredAuthenticator = require('./authenticator').authMiddleware;
 const optionalAuthenticator = require('./authenticator').optionalAuthMiddleware;
-const moment = require('moment');
 const Point = require('../models/Point');
 
 const router = express.Router();
@@ -114,7 +113,7 @@ router.post('/create', async (req, res) => {
 						required: ['latitude', 'longitude'],
 						properties: {
 							latitude: { type: 'number', minimum: '-90', maximum: '90' },
-							longitude: { type: 'number', minimum: '-180', maximum: '180', }
+							longitude: { type: 'number', minimum: '-180', maximum: '180'}
 						}
 					},
 				}
@@ -126,7 +125,7 @@ router.post('/create', async (req, res) => {
 						required: ['latitude', 'longitude'],
 						properties: {
 							latitude: { type: 'number', minimum: '-90', maximum: '90' },
-							longitude: { type: 'number', minimum: '-180', maximum: '180', }
+							longitude: { type: 'number', minimum: '-180', maximum: '180'}
 						}
 					}
 				}
@@ -213,7 +212,7 @@ router.post('/edit', async (req, res) => {
 						required: ['latitude', 'longitude'],
 						properties: {
 							latitude: { type: 'number', minimum: '-90', maximum: '90' },
-							longitude: { type: 'number', minimum: '-180', maximum: '180', }
+							longitude: { type: 'number', minimum: '-180', maximum: '180' }
 						}
 					},
 				}
@@ -225,7 +224,7 @@ router.post('/edit', async (req, res) => {
 						required: ['latitude', 'longitude'],
 						properties: {
 							latitude: { type: 'number', minimum: '-90', maximum: '90' },
-							longitude: { type: 'number', minimum: '-180', maximum: '180', }
+							longitude: { type: 'number', minimum: '-180', maximum: '180' }
 						}
 					}
 				}

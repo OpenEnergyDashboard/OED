@@ -7,6 +7,11 @@ export interface CartesianPoint {
 	y: number;
 }
 
+/**
+ * if copied from places such as google map, the format is actually latitude, longitude
+ * @param longitude: the 'x' axis of GIS coordinate system, min: -180, max: 180;
+ * @param latitude: the 'y' axis of GIS coordinate system, min: -90, max: 90;
+ */
 export interface GPSPoint {
 	longitude: number;
 	latitude: number;
@@ -38,6 +43,15 @@ export interface CalibrationResult {
 export interface Dimensions {
 	width: number;
 	height: number;
+}
+
+export function isValidGPSInput(input: string) {
+	if (input.indexOf(',') == -1) return false;
+	const array = input.split(',').map((value:string) => parseFloat(value));
+	const latitudeIndex = 0;
+	const longitudeIndex = 1;
+	return array[latitudeIndex] >= -90 && array[latitudeIndex] <= 90
+		&& array[longitudeIndex] >= -180 && array[longitudeIndex] <= 180;
 }
 
 export function calculateScaleFromEndpoints(origin: GPSPoint, opposite: GPSPoint, imageDimensions: Dimensions) {

@@ -49,7 +49,6 @@ export function fetchMapsDetails(): Thunk {
 	return async (dispatch: Dispatch) => {
 		dispatch(requestMapsDetails());
 		const mapsDetails = await mapsApi.details();
-		console.log(mapsDetails);
 		dispatch(receiveMapsDetails(mapsDetails));
 	};
 }

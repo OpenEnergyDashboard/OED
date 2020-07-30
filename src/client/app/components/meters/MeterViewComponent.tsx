@@ -9,6 +9,7 @@ import { Link } from 'react-router';
 import { hasToken } from '../../utils/token';
 import { FormattedMessage } from 'react-intl';
 import { MeterMetadata, EditMeterDetailsAction } from '../../types/redux/meters';
+import {GPSPoint, isValidGPSInput} from "../../utils/calibration";
 
 interface MeterViewProps {
 	// The ID of the meter to be displayed
@@ -19,13 +20,25 @@ interface MeterViewProps {
 	isSubmitting: boolean;
 	// The function used to dispatch the action to edit meter details
 	editMeterDetails(meter: MeterMetadata): EditMeterDetailsAction;
+	log(level: string, message: string): any;
 }
 
-export default class MeterViewComponent extends React.Component<MeterViewProps, {}> {
+interface MeterViewState {
+	gpsFocus: boolean;
+	gpsInput: string;
+}
+
+export default class MeterViewComponent extends React.Component<MeterViewProps, MeterViewState> {
 	constructor(props: MeterViewProps) {
 		super(props);
+		this.state = {
+			gpsFocus: false,
+			gpsInput: (this.props.meter.gps)? `${this.props.meter.gps.longitude},${this.props.meter.gps.latitude}` : ''
+		}
 		this.toggleMeterDisplayable = this.toggleMeterDisplayable.bind(this);
 		this.toggleMeterEnabled = this.toggleMeterEnabled.bind(this);
+		this.toggleGPSInput = this.toggleGPSInput.bind(this);
+		this.handleGPSChange = this.handleGPSChange.bind(this);
 	}
 
 	public render() {
@@ -40,6 +53,7 @@ export default class MeterViewComponent extends React.Component<MeterViewProps, 
 				<td> {this.props.meter.name} </td>
 				{hasToken() && <td> {this.props.meter.meterType} </td>}
 				{hasToken() && <td> {this.props.meter.ipAddress} </td>}
+				{hasToken() && <td> {this.formatGPSInput()} </td>}
 				<td> {this.formatEnabled()} </td>
 				<td> {this.formatDisplayable()} </td>
 			</tr>
@@ -149,6 +163,79 @@ export default class MeterViewComponent extends React.Component<MeterViewProps, 
 			</span>
 		);
 
+	}
+
+	private toggleGPSInput() {
+		if (this.state.gpsFocus) {
+			const input = this.state.gpsInput;
+			if (input.length == 0) {
+				const editedMeter = {
+					...this.props.meter,
+					gps: undefined,
+				};
+				this.props.editMeterDetails(editedMeter);
+			} else if (isValidGPSInput(input)) {
+				const latitudeIndex = 0;
+				const longitudeIndex = 1;
+				const array = input.split(',').map((value:string) => parseFloat(value));
+				let gps: GPSPoint = {
+					longitude: array[longitudeIndex],
+					latitude: array[latitudeIndex]
+				}
+				const editedMeter = {
+					...this.props.meter,
+					gps: gps,
+				};
+				this.props.editMeterDetails(editedMeter);
+			} else {
+				this.props.log('info', 'refused gps coordinates with invalid input');
+				window.alert('invalid gps coordinate, ' +
+					'\nlatitude should be an integer between -90 and 90, ' +
+					'\nlongitude should be an integer between -180 and 180');
+			}
+		}
+		this.setState({gpsFocus: !this.state.gpsFocus});
+	}
+
+	private handleGPSChange(event: React.ChangeEvent<HTMLTextAreaElement>) {
+		this.setState({ gpsInput: event.target.value});
+	}
+
+	private formatGPSInput() {
+		let formattedGPS;
+		let buttonMessageId;
+		if (this.state.gpsFocus) {
+			formattedGPS = <textarea id={'gps'} value={this.state.gpsInput} onChange={event => this.handleGPSChange(event)}/>
+			buttonMessageId = 'update';
+		} else {
+			formattedGPS = <div>{this.state.gpsInput}</div>
+			buttonMessageId = 'edit';
+		}
+
+		let toggleButton;
+		if (hasToken()) {
+			toggleButton = <Button style={this.styleToggleBtn()} color='primary' onClick={this.toggleGPSInput}>
+				<FormattedMessage id={buttonMessageId} />
+			</Button>;
+		} else {
+			toggleButton = <div />;
+		}
+
+		if (hasToken()) {
+			return ( //add onClick
+				<div>
+					{formattedGPS}
+					{toggleButton}
+				</div>
+			);
+		} else {
+			return (
+				<div>
+					{this.state.gpsInput}
+					{toggleButton}
+				</div>
+			);
+		}
 	}
 }
 

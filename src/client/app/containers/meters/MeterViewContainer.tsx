@@ -8,6 +8,7 @@ import { Dispatch } from '../../types/redux/actions';
 import { State } from '../../types/redux/state';
 import { editMeterDetails } from '../../actions/meters';
 import { MeterMetadata } from '../../types/redux/meters';
+import {logToServer} from "../../actions/logs";
 
 function mapStateToProps(state: State, ownProps: {id: number}) {
 	let meter = JSON.parse(JSON.stringify(state.meters.byMeterID[ownProps.id]));
@@ -23,7 +24,8 @@ function mapStateToProps(state: State, ownProps: {id: number}) {
 
 function mapDispatchToProps(dispatch: Dispatch) {
 	return {
-		editMeterDetails: (meter: MeterMetadata) => dispatch(editMeterDetails(meter))
+		editMeterDetails: (meter: MeterMetadata) => dispatch(editMeterDetails(meter)),
+		log: (level: string, message: string) => dispatch(logToServer(level, message))
 	};
 }
 

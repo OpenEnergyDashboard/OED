@@ -4,6 +4,7 @@
 
 /**
  * transform data passed from frontend into objects acceptable for postgres
+ * postgres store points in the format: longitude, latitude
  * @param longitude
  * @param latitude
  * @constructor

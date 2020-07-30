@@ -3,7 +3,7 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
 
 import * as React from 'react';
-import {GPSPoint} from '../../utils/calibration';
+import {GPSPoint, isValidGPSInput} from '../../utils/calibration';
 import {ChangeEvent, FormEvent} from 'react';
 
 interface InfoDisplayProps {
@@ -64,8 +64,8 @@ export default class MapCalibration_InfoDisplayComponent extends React.Component
 		const longitudeIndex = 1;
 		if (this.props.currentCartesianDisplay === 'x: undefined, y: undefined') return;
 		const input = this.state.value;
-		const array = input.split(',').map((value:string) => parseFloat(value));
-		if (isValidGPSInput(array)) {
+		if (isValidGPSInput(input)) {
+			const array = input.split(',').map((value:string) => parseFloat(value));
 			let gps: GPSPoint = {
 				longitude: array[longitudeIndex],
 				latitude: array[latitudeIndex]
@@ -77,10 +77,6 @@ export default class MapCalibration_InfoDisplayComponent extends React.Component
 			window.alert('invalid gps coordinate, ' +
 				'\nlatitude should be an integer between -90 and 90, ' +
 				'\nlongitude should be an integer between -180 and 180');
-		}
-		function isValidGPSInput(array: number[]) {
-			return array[latitudeIndex] >= -90 && array[latitudeIndex] <= 90
-				&& array[longitudeIndex] >= -180 && array[longitudeIndex] <= 180;
 		}
 	}
 

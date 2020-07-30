@@ -15,14 +15,16 @@ class Meter {
 	 * @param enabled This meter is being actively read from
 	 * @param displayable This meters is available to users for charting
 	 * @param type What kind of meter this is
+	 * @param gps location in format of GIS coordinates
 	 */
-	constructor(id, name, ipAddress, enabled, displayable, type) {
+	constructor(id, name, ipAddress, enabled, displayable, type, gps) {
 		this.id = id;
 		this.name = name;
 		this.ipAddress = ipAddress;
 		this.enabled = enabled;
 		this.displayable = displayable;
 		this.type = type;
+		this.gps = gps;
 	}
 
 	/**
@@ -66,7 +68,7 @@ class Meter {
 	}
 
 	static mapRow(row) {
-		return new Meter(row.id, row.name, row.ipaddress, row.enabled, row.displayable, row.meter_type);
+		return new Meter(row.id, row.name, row.ipaddress, row.enabled, row.displayable, row.meter_type, row.gps);
 	}
 
 	/**

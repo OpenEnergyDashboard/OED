@@ -9,6 +9,7 @@ const validate = require('jsonschema').validate;
 const { getConnection } = require('../db');
 const requiredAuthenticator = require('./authenticator').authMiddleware;
 const optionalAuthenticator = require('./authenticator').optionalAuthMiddleware;
+const Point = require('../models/Point');
 
 const router = express.Router();
 router.use(optionalAuthenticator);
@@ -25,7 +26,8 @@ function formatMeterForResponse(meter, loggedIn) {
 		enabled: meter.enabled,
 		displayable: meter.displayable,
 		ipAddress: null,
-		meterType: null
+		meterType: null,
+		gps: meter.gps,
 	};
 
 	// Only logged in users can see IP addresses and types
@@ -99,32 +101,45 @@ router.use(requiredAuthenticator);
 router.post('/edit', async (req, res) => {
 	const validParams = {
 		type: 'object',
-		maxProperties: 3,
+		maxProperties: 4,
 		required: ['id', 'enabled', 'displayable'],
 		properties: {
 			id: { type: 'integer' },
 			enabled: { type: 'bool' },
-			displayable: { type: 'bool' }
+			displayable: { type: 'bool' },
+			gps: {
+				oneOf: [
+					{
+						type: 'object',
+						required: ['latitude', 'longitude'],
+						properties: {
+							latitude: { type: 'number', minimum: '-90', maximum: '90' },
+							longitude: { type: 'number', minimum: '-180', maximum: '180'},
+						}
+					},
+					{type: 'null'},
+				]
+			}
 		}
 	};
 
 	const validatorResult = validate(req.body, validParams);
 	if (!validatorResult.valid) {
-		log.warn('Got request to edit meters with invalid meter data.');
-		res.status(400)
-			.json({ message: 'Invalid meter data supplied.', err: validatorResult.errors });
+		log.warn(`Got request to edit meters with invalid meter data, errors:${validatorResult.errors}`);
+		res.status(400);
+			// .json({ message: 'Invalid meter data supplied.', err: validatorResult.errors });
 	} else {
 		const conn = getConnection();
 		try {
 			const meter = await Meter.getByID(req.body.id, conn);
 			meter.enabled = req.body.enabled;
 			meter.displayable = req.body.displayable;
+			meter.gps = (req.body.gps)? new Point(req.body.gps.longitude, req.body.gps.latitude): null;
 			await meter.update(conn);
 		} catch (err) {
 			log.error('Failed to edit meter', err);
 			res.status(500).json({ message: 'Unable to edit meters.', err });
 		}
-
 		res.status(200).json({ message: `Successfully edited meter ${req.body.id}` });
 	}
 });

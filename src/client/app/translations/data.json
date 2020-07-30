@@ -91,6 +91,7 @@
 	"meter": "Meter",
 	"meters": "Meters",
 	"meter.id": "Meter ID",
+	"meter.gps": "Meter GPS: latitude, longitude",
 	"meter.name": "Meter Name",
 	"meter.type": "Meter Type",
 	"meter.ip": "Meter Address",
