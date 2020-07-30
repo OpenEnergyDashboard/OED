@@ -102,7 +102,7 @@ router.post('/edit', async (req, res) => {
 	const validParams = {
 		type: 'object',
 		maxProperties: 4,
-		required: ['id', 'enabled', 'displayable'],
+		required: ['id', 'enabled', 'displayable', 'gps'],
 		properties: {
 			id: { type: 'integer' },
 			enabled: { type: 'bool' },
@@ -114,7 +114,7 @@ router.post('/edit', async (req, res) => {
 						required: ['latitude', 'longitude'],
 						properties: {
 							latitude: { type: 'number', minimum: '-90', maximum: '90' },
-							longitude: { type: 'number', minimum: '-180', maximum: '180'},
+							longitude: { type: 'number', minimum: '-180', maximum: '180'}
 						}
 					},
 					{type: 'null'},

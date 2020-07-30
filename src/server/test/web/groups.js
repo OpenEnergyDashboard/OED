@@ -7,6 +7,8 @@
 const { chai, mocha, expect, app, testUser, testDB } = require('../common');
 const Group = require('../../models/Group');
 const Meter = require('../../models/Meter');
+const Point = require('../../models/Point');
+const gps = new Point(90, 45);
 
 mocha.describe('groups API', () => {
 	let groupA;
@@ -30,9 +32,9 @@ mocha.describe('groups API', () => {
 		groupB = new Group(undefined, 'B');
 		groupC = new Group(undefined, 'C');
 		await Promise.all([groupA, groupB, groupC].map(group => group.insert(conn)));
-		meterA = new Meter(undefined, 'A', null, false, true, Meter.type.MAMAC);
-		meterB = new Meter(undefined, 'B', null, false, true, Meter.type.MAMAC);
-		meterC = new Meter(undefined, 'C', null, false, true, Meter.type.METASYS);
+		meterA = new Meter(undefined, 'A', null, false, true, Meter.type.MAMAC, gps);
+		meterB = new Meter(undefined, 'B', null, false, true, Meter.type.MAMAC, gps);
+		meterC = new Meter(undefined, 'C', null, false, true, Meter.type.METASYS, gps);
 		await Promise.all([meterA, meterB, meterC].map(meter => meter.insert(conn)));
 
 		await Promise.all([groupA.adoptMeter(meterA.id, conn), groupA.adoptGroup(groupB.id, conn),
@@ -121,7 +123,7 @@ mocha.describe('groups API', () => {
 			});
 			mocha.it('allows adding a new child meter to a group', async () => {
 				const conn = testDB.getConnection();
-				const meterD = new Meter(undefined, 'D', null, false, true, Meter.type.MAMAC);
+				const meterD = new Meter(undefined, 'D', null, false, true, Meter.type.MAMAC, gps);
 				await meterD.insert(conn);
 				let res = await chai.request(app).put('/api/groups/edit').set('token', token).type('json').send({
 					id: groupC.id,
