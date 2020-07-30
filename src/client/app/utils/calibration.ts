@@ -8,7 +8,8 @@ export interface CartesianPoint {
 }
 
 /**
- * if copied from places such as google map, the format is actually latitude, longitude
+ * if copied from places such as google map, the format is latitude, longitude;
+ * stored as (longitude, latitude) in postgres as POINTS
  * @param longitude: the 'x' axis of GIS coordinate system, min: -180, max: 180;
  * @param latitude: the 'y' axis of GIS coordinate system, min: -90, max: 90;
  */
