@@ -168,8 +168,8 @@ function updateCurrentGPS(currentGPS: GPSPoint): t.UpdateCurrentGPSAction {
  */
 function prepareDataToCalibration(state: State): CalibrationResult {
 	const mapID = state.maps.calibratingMap;
-	let image = new Image();
-	image.src = state.maps.editedMaps[mapID].mapSource;
+	const image = state.maps.byMapID[mapID].image;
+	console.log(image);
 	const imageDimensions: Dimensions = {
 		width: image.width,
 		height: image.height
@@ -216,6 +216,7 @@ export function submitNewMap(): Thunk {
 		try {
 			const acceptableMap: MapData = {
 				...map,
+				mapSource: map.image.src,
 				modifiedDate: moment().toISOString(),
 				origin: (map.calibrationResult)? map.calibrationResult.origin : undefined,
 				opposite: (map.calibrationResult)? map.calibrationResult.opposite : undefined
@@ -244,6 +245,7 @@ export function submitEditedMap(mapID: number): Thunk {
 		try {
 			const acceptableMap: MapData = {
 				...map,
+				mapSource: map.image.src,
 				modifiedDate: moment().toISOString(),
 				origin: (map.calibrationResult)? map.calibrationResult.origin : map.origin,
 				opposite: (map.calibrationResult)? map.calibrationResult.opposite : map.opposite,

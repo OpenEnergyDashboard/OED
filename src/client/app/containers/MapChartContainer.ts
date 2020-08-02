@@ -19,8 +19,7 @@ function mapStateToProps(state: State) {
 		}
 	}
 	// set map background image
-	let image = new Image();
-	image.src = (map)? map.mapSource : '';
+	let image = (map)? map.image : new Image();
 	const data: any[] = [];
 	const layout: any = {
 		title: {

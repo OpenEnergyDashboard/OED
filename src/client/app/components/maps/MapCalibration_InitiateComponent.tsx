@@ -73,11 +73,13 @@ export default class MapCalibration_InitiateComponent extends React.Component<Ma
 		try {
 			const imageURL = await this.getDataURL();
 			this.setState({filename: this.fileInput.current.files[0].name});
+			const image = new Image();
+			image.src = imageURL;
 			const source: MapMetadata = {
 				...this.props.map,
 				name: this.state.mapName,
 				filename: this.fileInput.current.files[0].name,
-				mapSource: imageURL,
+				image: image,
 			}
 			await this.props.onSourceChange(source);
 		} catch (err) {

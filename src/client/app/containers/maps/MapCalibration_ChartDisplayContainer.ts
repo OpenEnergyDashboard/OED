@@ -26,11 +26,9 @@ function mapStateToProps(state: State) {
 			texts.push(`latitude: ${current.gps.latitude}, longitude: ${current.gps.longitude}`);
 		}
 	}
-	let image = new Image();
-	image.src = map.mapSource;
 	const imageDimensions: Dimensions = normalizeImageDimensions( {
-		width: image.width,
-		height: image.height,
+		width: map.image.width,
+		height: map.image.height,
 	});
 	let backgroundTrace = createBackgroundTrace(imageDimensions);
 	let dataPointTrace = {
@@ -49,7 +47,7 @@ function mapStateToProps(state: State) {
 	};
 	let data = [backgroundTrace,dataPointTrace];
 
-	const imageSource = map.mapSource;
+	const imageSource = map.image.src;
 
 	// for a detailed description of layout attributes: https://plotly.com/javascript/reference/#layout
 	const layout: any = {

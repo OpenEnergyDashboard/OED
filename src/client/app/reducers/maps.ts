@@ -47,7 +47,10 @@ export default function maps(state = defaultState, action: MapsAction) {
 		case ActionType.ReceiveMapsDetails:
 			const data: MapMetadata[] = action.data.map(mapData => {
 				// parse JSON format to MapMetadata object
-				return JSON.parse(JSON.stringify(mapData));
+				let parsedData = JSON.parse(JSON.stringify(mapData));
+				parsedData.image = new Image();
+				parsedData.image.src = parsedData.mapSource;
+				return parsedData;
 			});
 			return {
 				...state,

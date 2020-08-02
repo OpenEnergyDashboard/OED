@@ -156,7 +156,7 @@ export interface MapMetadata {
 	modifiedDate: string;
 	origin?: GPSPoint;
 	opposite?: GPSPoint;
-	mapSource: string;
+	image: HTMLImageElement;
 	calibrationMode?: CalibrationModeTypes;
 	currentPoint?: CalibratedPoint;
 	calibrationSet?: CalibratedPoint[];
