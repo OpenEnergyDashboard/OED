@@ -11,6 +11,7 @@ import { LanguageTypes } from '../types/i18n';
 export interface SelectOption {
 	label: string;
 	value: number;
+	disabled?: boolean;
 }
 
 /**

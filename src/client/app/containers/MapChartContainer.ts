@@ -5,8 +5,7 @@
 import {connect} from "react-redux";
 import PlotlyChart, {IPlotlyChartProps} from "react-plotlyjs-ts";
 import {State} from "../types/redux/state";
-import * as plotly from "plotly.js";
-import {calculateScaleFromEndpoints, CartesianPoint} from "../utils/calibration";
+import {calculateScaleFromEndpoints, GPSPoint} from "../utils/calibration";
 
 function mapStateToProps(state: State) {
 	let map;
@@ -62,10 +61,17 @@ function mapStateToProps(state: State) {
 		/**
 		 * todo: replace with automatic code
 		 */
-		const points = [
-			{latitude: 42.507376, longitude: -89.029548}, // front door of Maurer
-			{latitude: 42.506774, longitude: -89.030068}  // down-right corner of Aldrich
-		];
+		const points: any[] = [];
+		for (const meterID of state.graph.selectedMeters) {
+			console.log(state.meters.selectedMeters);
+			console.log(state.graph.selectedMeters);
+			console.log(state.meters.byMeterID);
+			const byMeterID = state.readings.line.byMeterID[meterID];
+			const gps = state.meters.byMeterID[meterID].gps;
+			if (gps !== undefined && gps !== null) {
+				points.push(gps);
+			}
+		}
 		texts = ['Maurer: 6', 'Aldrich: 60'];
 
 		const origin = map.origin;

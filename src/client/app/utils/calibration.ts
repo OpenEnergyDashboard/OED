@@ -2,6 +2,9 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
 
+import {MapMetadata} from "../types/redux/map";
+import {logToServer} from "../actions/logs";
+
 export interface CartesianPoint {
 	x: number;
 	y: number;
@@ -44,6 +47,22 @@ export interface CalibrationResult {
 export interface Dimensions {
 	width: number;
 	height: number;
+}
+
+export function meterDisplayableOnMap(meterInfo: {gps?: GPSPoint, meterID: number}, map: MapMetadata): boolean {
+	if (map === undefined) return false;
+	if ((meterInfo.gps === null || meterInfo.gps === undefined) || map.origin === undefined || map.opposite === undefined) return false;
+	if (!isValidGPSInput(`${meterInfo.gps.latitude},${meterInfo.gps.longitude}`)) {
+		logToServer('error', `Found invalid meter gps stored in database, id = ${meterInfo.meterID}`);
+	}
+	const deltaLongitude = map.opposite.longitude - map.origin.longitude;
+	const longitudeValidation = (deltaLongitude > 0)?
+		meterInfo.gps.longitude - map.origin.longitude < deltaLongitude : meterInfo.gps.longitude - map.origin.longitude > deltaLongitude;
+	const deltaLatitude = map.opposite.latitude - map.origin.latitude;
+	const latitudeValidation = (deltaLatitude > 0)?
+		meterInfo.gps.latitude - map.origin.latitude < deltaLatitude : meterInfo.gps.latitude - map.origin.latitude > deltaLatitude;
+
+	return longitudeValidation && latitudeValidation;
 }
 
 export function isValidGPSInput(input: string) {

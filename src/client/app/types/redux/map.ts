@@ -144,6 +144,8 @@ export interface MapData{
 /**
  *  data format used keep track of map's state
  *  @param id {number} id <= -1 means it's a new map;
+ *  @param name
+ *  @param displayable
  */
 export interface MapMetadata {
 	id: number;
