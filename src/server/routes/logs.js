@@ -26,10 +26,10 @@ router.post('/info', async (req, res) => {
 	const validationResult = validate(req.body, validLog);
 	if (validationResult.valid) {
 		log.info(req.body.message);
-		res.status(200);
+		res.sendStatus(200);
 	} else {
 		log.error('invalid input from client logger');
-		res.status(400);
+		res.sendStatus(400);
 	}
 });
 
@@ -37,10 +37,10 @@ router.post('/warn', async (req, res) => {
 	const validationResult = validate(req.body, validLog);
 	if (validationResult.valid) {
 		log.warn(req.body.message);
-		res.status(200);
+		res.sendStatus(200);
 	} else {
 		log.error('invalid input from client logger');
-		res.status(400);
+		res.sendStatus(400);
 	}
 });
 
@@ -48,10 +48,10 @@ router.post('/error', async (req, res) => {
 	const validationResult = validate(req.body, validLog);
 	if (validationResult.valid) {
 		log.error(req.body.message);
-		res.status(200);
+		res.sendStatus(200);
 	} else {
 		log.error('invalid input from client logger');
-		res.status(400);
+		res.sendStatus(400);
 	}
 });
 

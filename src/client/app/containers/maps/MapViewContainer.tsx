@@ -7,7 +7,7 @@ import MapViewComponent from '../../components/maps/MapViewComponent';
 import { Dispatch } from '../../types/redux/actions';
 import { State } from '../../types/redux/state';
 import {CalibrationModeTypes, MapMetadata} from "../../types/redux/map";
-import {editMapDetails, setCalibration} from "../../actions/map";
+import {editMapDetails, removeMap, setCalibration} from "../../actions/map";
 
 function mapStateToProps(state: State, ownProps: {id: number}) {
 	let map = state.maps.byMapID[ownProps.id];
@@ -25,6 +25,7 @@ function mapDispatchToProps(dispatch: Dispatch) {
 	return {
 		editMapDetails: (map: MapMetadata) => dispatch(editMapDetails(map)),
 		setCalibration: (mode: CalibrationModeTypes, mapID: number) => dispatch(setCalibration(mode, mapID)),
+		removeMap: (id: number) => dispatch(removeMap(id)),
 	};
 }
 

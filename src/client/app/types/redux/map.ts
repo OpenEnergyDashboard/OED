@@ -69,6 +69,11 @@ export interface ReceiveSelectedMapAction {
 	map: MapData;
 }
 
+export interface DeleteMapAction {
+	type: ActionType.DeleteMap;
+	mapID: number;
+}
+
 export interface EditMapDetailsAction {
 	type: ActionType.EditMapDetails;
 	map: MapMetadata;
@@ -96,6 +101,7 @@ export interface IncrementCounterAction {
 
 export interface ResetCalibrationAction {
 	type: ActionType.ResetCalibration;
+	mapID: number;
 }
 
 export type MapsAction =
@@ -116,7 +122,8 @@ export type MapsAction =
 	| UpdateCalibrationResultAction
 	| SetCalibrationAction
 	| ResetCalibrationAction
-	| IncrementCounterAction;
+	| IncrementCounterAction
+	| DeleteMapAction;
 
 /**
  * data format stored in the database

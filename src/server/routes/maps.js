@@ -76,12 +76,8 @@ router.use(requiredAuthenticator);
 router.post('/create', async (req, res) => {
 	const validMap = {
 		type: 'object',
-		required: ['id', 'name', 'modifiedDate', 'filename', 'mapSource', 'displayable', 'note', 'origin', 'opposite'],
+		required: ['name', 'modifiedDate', 'filename', 'mapSource'],
 		properties: {
-			id: {
-				type: 'integer',
-				minimum: 1
-			},
 			name: {
 				type: 'string',
 				minLength: 1
@@ -263,12 +259,35 @@ router.post('/edit', async (req, res) => {
 			log.info(`Successfully edited map ${req.body.id}` );
 		} catch (err) {
 			if (err.toString() === 'error: duplicate key value violates unique constraint "maps_name_key"') {
-				res.status(400);
+				res.sendStatus(400);
 				log.error(`Map "${req.body.name}" is already in use.`);
 			} else {
 				log.error(`Error while updating map ${err}`, err);
 				res.sendStatus(500);
 			}
+		}
+	}
+});
+
+router.post('/delete', async (req, res) => {
+	const validParams = {
+		type: 'object',
+		maxProperties: 1,
+		required: ['id'],
+		properties: {
+			id: { type: 'integer' }
+		}
+	};
+	if (!validate(req.body, validParams).valid) {
+		res.sendStatus(400);
+	} else {
+		const conn = getConnection();
+		try {
+			await Map.delete(req.body.id, conn);
+			res.sendStatus(200);
+		} catch (err) {
+			log.error(`Error while deleting group ${err}`, err);
+			res.sendStatus(500);
 		}
 	}
 });

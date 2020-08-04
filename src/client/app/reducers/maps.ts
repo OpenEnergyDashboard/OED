@@ -2,7 +2,7 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
 
-import {CalibrationModeTypes, MapMetadata, MapsAction, MapState} from '../types/redux/map';
+import {MapMetadata, MapsAction, MapState} from '../types/redux/map';
 import {ActionType} from '../types/redux/actions';
 import * as _ from "lodash";
 import {CalibratedPoint} from "../utils/calibration";
@@ -106,14 +106,12 @@ export default function maps(state = defaultState, action: MapsAction) {
 			}
 		case ActionType.ResetCalibration:
 			editedMaps = state.editedMaps;
-			let mapToReset = {...editedMaps[calibrated]};
+			let mapToReset = {...editedMaps[action.mapID]};
 			delete mapToReset.currentPoint;
 			delete mapToReset.calibrationResult;
 			delete mapToReset.calibrationSet;
-			delete mapToReset.calibrationMode;
 			return {
 				...state,
-				calibratingMap: 0,
 				editedMaps: {
 					...state.editedMaps,
 					[calibrated]: mapToReset
@@ -144,7 +142,9 @@ export default function maps(state = defaultState, action: MapsAction) {
 				...state,
 				editedMaps: {
 					...state.editedMaps,
-					[action.data.id]: action.data
+					[action.data.id]: {
+						...action.data
+					}
 				}
 			};
 		case ActionType.EditMapDetails:
@@ -167,13 +167,23 @@ export default function maps(state = defaultState, action: MapsAction) {
 			editedMaps = state.editedMaps;
 			if (action.mapID > 0) {
 				submitting.splice(submitting.indexOf(action.mapID));
-				byMapID[action.mapID] = editedMaps[action.mapID];
+				byMapID[action.mapID] = {...editedMaps[action.mapID]};
 			}
 			delete editedMaps[action.mapID];
 			return {
 				...state,
 				calibratingMap: 0,
 				submitting,
+				editedMaps,
+				byMapID
+			};
+		case ActionType.DeleteMap:
+			editedMaps = state.editedMaps;
+			delete editedMaps[action.mapID];
+			byMapID = state.byMapID;
+			delete byMapID[action.mapID];
+			return {
+				...state,
 				editedMaps,
 				byMapID
 			};

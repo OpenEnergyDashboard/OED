@@ -86,6 +86,7 @@ export enum ActionType {
 	ReceiveMapsDetails = 'RECEIVE_MAP_DETAILS',
 	RequestSelectedMap = 'REQUEST_SELECTED_MAP',
 	ReceiveSelectedMap = 'RECEIVE_SELECTED_MAP',
+	DeleteMap = 'DELETE_MAP',
 	EditMapDetails = 'EDIT_MAP_DETAILS',
 	SubmitEditedMap = 'SUBMIT_EDITED_MAP',
 	ConfirmEditedMap = 'CONFIRM_EDITED_MAP',

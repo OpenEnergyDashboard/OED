@@ -20,6 +20,7 @@ interface MapViewProps {
 	// The function used to dispatch the action to edit map details
 	editMapDetails(map: MapMetadata): any;
 	setCalibration(mode: CalibrationModeTypes, mapID: number): any;
+	removeMap(id: number): any;
 }
 
 interface MapViewState {
@@ -44,23 +45,20 @@ export default class MapViewComponent extends React.Component<MapViewProps, MapV
 		this.handleNameChange = this.handleNameChange.bind(this);
 		this.toggleNoteInput = this.toggleNoteInput.bind(this);
 		this.handleNoteChange = this.handleNoteChange.bind(this);
+		this.toggleDelete = this.toggleDelete.bind(this);
 	}
 
 	public render() {
-		const renderEditButton = true;
-		const editButtonStyle: React.CSSProperties = {
-			display: renderEditButton ? 'inline' : 'none',
-			paddingLeft: '5px'
-		};
 		return (
 			<tr>
-				<td> {this.props.map.id} {this.formatStatus()} </td>
+				<td> {this.props.map.id} {this.formatStatus()}</td>
 				<td> {this.formatName()} </td>
 				{hasToken() && <td> {this.formatDisplayable()} </td>}
 				{hasToken() && <td> {moment(this.props.map.modifiedDate).format('dddd, MMM DD, YYYY hh:mm a')} </td>}
 				{hasToken() && <td> {this.formatFilename()} </td>}
 				{hasToken() && <td> {this.formatNote()} </td>}
 				{hasToken() && <td> {this.formatCalibrationStatus()} </td>}
+				{hasToken() && <td> {this.formatDeleteButton()} </td>}
 			</tr>
 		);
 	}
@@ -75,6 +73,21 @@ export default class MapViewComponent extends React.Component<MapViewProps, MapV
 		}
 
 		return '';
+	}
+
+	private toggleDelete() {
+		this.props.removeMap(this.props.id);
+	}
+
+	private formatDeleteButton() {
+
+		const editButtonStyle: React.CSSProperties = {
+			display: 'inline', // or 'none'
+			paddingLeft: '5px'
+		};
+		return <Button style={editButtonStyle} color='primary' onClick={this.toggleDelete}>
+			<FormattedMessage id={'delete.map'} />
+		</Button>
 	}
 
 	private styleEnabled(): React.CSSProperties {

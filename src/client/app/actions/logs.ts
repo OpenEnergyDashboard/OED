@@ -3,6 +3,7 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
 import { LogData } from "../types/redux/logs";
 import { logsApi } from "../utils/api";
+const moment = require('moment');
 
 export function logToServer(level: string, message: string, error?: Error, skipMail?: boolean) {
 	let log: LogData = {

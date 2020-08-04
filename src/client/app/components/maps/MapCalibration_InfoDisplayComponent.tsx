@@ -38,6 +38,7 @@ export default class MapCalibration_InfoDisplayComponent extends React.Component
 				<form onSubmit={this.handleSubmit}>
 					<label>
 						input GPS coordinate that corresponds to the point: {this.props.currentCartesianDisplay}
+						<br/>
 						in this format -> latitude,longitude
 						<br/>
 						<textarea id={'text'} cols={50} value={this.state.value} onChange={this.handleGPSInput.bind(this)}/>

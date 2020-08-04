@@ -26,6 +26,10 @@ export default class MapsApi {
 		return await this.backend.doPostRequest<MapData>('/api/maps/edit', mapData);
 	}
 
+	public async delete(id: number): Promise<void> {
+		return await this.backend.doPostRequest<void>('/api/maps/delete', {id: id});
+	}
+
 	public async getMapById(id: number): Promise<MapData> {
 		return await this.backend.doGetRequest<MapData>(`/api/maps/${id}`);
 	}

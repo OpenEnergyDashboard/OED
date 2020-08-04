@@ -152,7 +152,6 @@ function getClickedCoordinates(event: plotly.PlotMouseEvent) {
 			eligiblePoints.push(event.points[i]);
 		}
 	}
-	console.log(eligiblePoints);
 	const xValue = eligiblePoints[0].x as number;
 	const yValue = eligiblePoints[0].y as number;
 	const clickedPoint: CartesianPoint = {
