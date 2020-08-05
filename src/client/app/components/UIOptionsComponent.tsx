@@ -52,7 +52,6 @@ class UIOptionsComponent extends React.Component<UIOptionsPropsWithIntl, UIOptio
 		this.formatSliderTip = this.formatSliderTip.bind(this);
 		this.handleBarButton = this.handleBarButton.bind(this);
 		this.handleCompareButton = this.handleCompareButton.bind(this);
-		this.handleSortingButton = this.handleSortingButton.bind(this);
 		this.handleSortingChange = this.handleSortingChange.bind(this);
 		this.handleSetOptionsVisibility = this.handleSetOptionsVisibility.bind(this);
 		this.toggleSlider = this.toggleSlider.bind(this);
