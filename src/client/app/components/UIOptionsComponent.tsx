@@ -16,6 +16,8 @@ import ChartLinkContainer from '../containers/ChartLinkContainer';
 import { ChartTypes } from '../types/redux/graph';
 import { ComparePeriod, SortingOrder } from '../utils/calculateCompare';
 import 'rc-slider/assets/index.css';
+import SingleSelectComponent from './SingleSelectComponent';
+import {SelectOption} from '../types/items';
 
 const Slider = createSliderWithTooltip(sliderWithoutTooltips);
 
@@ -51,6 +53,7 @@ class UIOptionsComponent extends React.Component<UIOptionsPropsWithIntl, UIOptio
 		this.handleBarButton = this.handleBarButton.bind(this);
 		this.handleCompareButton = this.handleCompareButton.bind(this);
 		this.handleSortingButton = this.handleSortingButton.bind(this);
+		this.handleSortingChange = this.handleSortingChange.bind(this);
 		this.handleSetOptionsVisibility = this.handleSetOptionsVisibility.bind(this);
 		this.toggleSlider = this.toggleSlider.bind(this);
 		this.toggleDropdown = this.toggleDropdown.bind(this);
@@ -76,7 +79,16 @@ class UIOptionsComponent extends React.Component<UIOptionsPropsWithIntl, UIOptio
 		const zIndexFix: React.CSSProperties = {
 			zIndex: 0
 		};
-		const messages = defineMessages({ barStackingTip: {	id: 'bar.stacking.tip' }});
+		const messages = defineMessages({
+			barStackingTip: {	id: 'bar.stacking.tip' },
+			sort: {id: 'sort'}
+		});
+		const { formatMessage } = this.props.intl;
+		const sortingChoices: SelectOption[] = [
+			{label: SortingOrder.Alphabetical, value: 1},
+			{label: SortingOrder.Ascending, value: 2},
+			{label: SortingOrder.Descending, value: 3}
+		];
 
 		return (
 			<div>
@@ -174,31 +186,11 @@ class UIOptionsComponent extends React.Component<UIOptionsPropsWithIntl, UIOptio
 							<FormattedMessage id='4.weeks' />
 						</Button>
 					</ButtonGroup>
-					<Dropdown isOpen={this.state.compareSortingDropdownOpen} toggle={this.toggleDropdown}>
-						<DropdownToggle caret>
-							<FormattedMessage id='sort' />
-						</DropdownToggle>
-						<DropdownMenu>
-							<DropdownItem
-								active={this.props.compareSortingOrder === SortingOrder.Alphabetical}
-								onClick={() => this.handleSortingButton(SortingOrder.Alphabetical)}
-							>
-								<FormattedMessage id='alphabetically' />
-							</DropdownItem>
-							<DropdownItem
-								active={this.props.compareSortingOrder === SortingOrder.Ascending}
-								onClick={() => this.handleSortingButton(SortingOrder.Ascending)}
-							>
-								<FormattedMessage id='ascending' />
-							</DropdownItem>
-							<DropdownItem
-								active={this.props.compareSortingOrder === SortingOrder.Descending}
-								onClick={() => this.handleSortingButton(SortingOrder.Descending)}
-							>
-								<FormattedMessage id='descending' />
-							</DropdownItem>
-						</DropdownMenu>
-					</Dropdown>
+					<SingleSelectComponent
+						placeholder={formatMessage(messages.sort)}
+						options={sortingChoices}
+						onValueChange={this.handleSortingChange}
+					/>
 				</div>
 				}
 
@@ -257,8 +249,9 @@ class UIOptionsComponent extends React.Component<UIOptionsPropsWithIntl, UIOptio
 		this.props.changeCompareGraph(comparePeriod);
 	}
 
-	private handleSortingButton(sortingOrder: SortingOrder) {
-		this.props.changeCompareSortingOrder(sortingOrder);
+	private handleSortingChange(selection: SelectOption) {
+		const typedSortString = selection.label as keyof typeof SortingOrder;
+		this.props.changeCompareSortingOrder(SortingOrder[typedSortString]);
 	}
 
 	private handleSetOptionsVisibility() {
