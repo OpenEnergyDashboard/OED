@@ -63,21 +63,18 @@ export default class MapCalibration_InfoDisplayComponent extends React.Component
 		event.preventDefault();
 		const latitudeIndex = 0;
 		const longitudeIndex = 1;
-		if (this.props.currentCartesianDisplay === 'x: undefined, y: undefined') return;
+		if (this.props.currentCartesianDisplay === 'x: undefined, y: undefined') { return; }
 		const input = this.state.value;
 		if (isValidGPSInput(input)) {
-			const array = input.split(',').map((value:string) => parseFloat(value));
-			let gps: GPSPoint = {
+			const array = input.split(',').map((value: string) => parseFloat(value));
+			const gps: GPSPoint = {
 				longitude: array[longitudeIndex],
 				latitude: array[latitudeIndex]
-			}
+			};
 			this.props.updateGPSCoordinates(gps);
 			this.resetInputField();
 		} else {
 			this.props.log('info', 'refused data point with invalid input');
-			window.alert('invalid gps coordinate, ' +
-				'\nlatitude should be an integer between -90 and 90, ' +
-				'\nlongitude should be an integer between -180 and 180');
 		}
 	}
 

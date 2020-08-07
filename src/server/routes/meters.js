@@ -102,7 +102,7 @@ router.post('/edit', async (req, res) => {
 	const validParams = {
 		type: 'object',
 		maxProperties: 4,
-		required: ['id', 'enabled', 'displayable', 'gps'],
+		required: ['id', 'enabled', 'displayable'],
 		properties: {
 			id: { type: 'integer' },
 			enabled: { type: 'bool' },
