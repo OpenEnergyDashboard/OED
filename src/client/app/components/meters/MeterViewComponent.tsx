@@ -44,7 +44,7 @@ export default class MeterViewComponent extends React.Component<MeterViewProps, 
 	public render() {
 		const renderEditButton = true;
 		const editButtonStyle: React.CSSProperties = {
-			display: renderEditButton ? 'inline' : 'none',
+			display: 'inline',
 			paddingLeft: '5px'
 		};
 		return (

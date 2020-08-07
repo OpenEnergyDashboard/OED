@@ -30,16 +30,17 @@ mocha.describe('meters API', () => {
 		expect(res).to.be.json;
 		expect(res.body).to.have.lengthOf(3);
 
-		for (let i = 0; i++; i < 3) {
+		for (let i = 0; i < 3; i++) {
 			const meter = res.body[i];
 			expect(meter).to.have.property('id');
 			expect(meter).to.have.property('name', `Meter ${i + 1}`);
-			expect(meter).not.to.have.property('ipAddress');
-			expect(meter).not.to.have.property('enabled');
-			expect(meter).not.to.have.property('type');
 			expect(meter).to.have.property('gps');
 			expect(meter.gps).to.have.property('latitude', gps.latitude);
 			expect(meter.gps).to.have.property('longitude', gps.longitude);
+			expect(meter).to.have.property('ipAddress', null);
+			expect(meter).to.have.property('enabled', true);
+			expect(meter).to.have.property('displayable', true);
+			expect(meter).to.have.property('meterType', null);
 		}
 	});
 	mocha.describe('with authentication', () => {
@@ -61,16 +62,22 @@ mocha.describe('meters API', () => {
 			expect(res).to.be.json;
 			expect(res.body).to.have.lengthOf(4);
 
-			for (let i = 0; i++; i < 4) {
+			for (let i = 0; i < 4; i++) {
 				const meter = res.body[i];
 				expect(meter).to.have.property('id');
-				expect(meter).to.have.property('name', `Meter ${i + 1}`);
-				expect(meter).not.to.have.property('ipAddress');
-				expect(meter).not.to.have.property('enabled');
-				expect(meter).not.to.have.property('type');
 				expect(meter).to.have.property('gps');
 				expect(meter.gps).to.have.property('latitude', gps.latitude);
 				expect(meter.gps).to.have.property('longitude', gps.longitude);
+				if (i < 3) {
+					expect(meter).to.have.property('name', `Meter ${i + 1}`);
+					expect(meter).to.have.property('displayable', true);
+				} else {
+					expect(meter).to.have.property('name', `Not Visible`);
+					expect(meter).to.have.property('displayable', false);
+				}
+				expect(meter).to.have.property('ipAddress', '1.1.1.1');
+				expect(meter).to.have.property('enabled', true);
+				expect(meter).to.have.property('meterType', Meter.type.MAMAC);
 			}
 		});
 	});

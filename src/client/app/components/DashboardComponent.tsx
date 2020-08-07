@@ -90,13 +90,13 @@ export default class DashboardComponent extends React.Component<DashboardProps, 
 								key={1}
 								style={buttonMargin}
 								onClick={() => this.handleTimeIntervalChange('range')}
-							> Redraw
+							> <FormattedMessage id='redraw'/>
 							</Button>,
 							<Button
 								key={2}
 								style={buttonMargin}
 								onClick={() => this.handleTimeIntervalChange('all')}
-							> Restore
+							> <FormattedMessage id='restore'/>
 							</Button>]
 						) : (
 							null
