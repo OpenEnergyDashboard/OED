@@ -61,20 +61,21 @@ export function changeBarDuration(barDuration: moment.Duration): Thunk {
 	};
 }
 
-function updateComparePeriod(comparePeriod: ComparePeriod): t.UpdateComparePeriodAction {
+function updateComparePeriod(comparePeriod: ComparePeriod, currentTime: moment.Moment): t.UpdateComparePeriodAction {
 	return {
 		type: ActionType.UpdateComparePeriod,
 		comparePeriod,
-		currentTime: moment()
+		currentTime
 	};
 }
 
 export function changeCompareGraph(comparePeriod: ComparePeriod): Thunk {
 	return (dispatch: Dispatch) => {
-		return Promise.all([
-			dispatch(updateComparePeriod(comparePeriod)),
-			dispatch(fetchNeededCompareReadings(comparePeriod))
-		]);
+		dispatch(updateComparePeriod(comparePeriod, moment()));
+		dispatch(dispatch2 => {
+			dispatch2(fetchNeededCompareReadings(comparePeriod));
+		});
+		return Promise.resolve();
 	};
 }
 
