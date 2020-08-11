@@ -6,17 +6,21 @@ import * as _ from 'lodash';
 import { connect } from 'react-redux';
 import { State } from '../types/redux/state';
 import { Dispatch } from '../types/redux/actions';
-import MapChartSelectComponent from "../components/MapChartSelectComponent";
-import {changeSelectedMap} from "../actions/map";
+import MapChartSelectComponent from '../components/MapChartSelectComponent';
+import {changeSelectedMap} from '../actions/map';
+import {SelectOption} from '../types/items';
 
 function mapStateToProps(state: State) {
 	const maps = state.maps.byMapID;
-	const sortedMaps = _.sortBy(_.values(maps).map(map => ({ value: map.id, label: map.name.trim() })), 'id');
-
-	const selectedMap =
+	const sortedMaps = _.sortBy(_.values(maps).map(map => (
 		{
+		value: map.id, label: map.name.trim(), disabled: !(map.origin && map.opposite)
+		} as SelectOption
+	)), 'id');
+
+	const selectedMap = {
 		label: state.maps.byMapID[state.maps.selectedMap] ? state.maps.byMapID[state.maps.selectedMap].name : '',
-		value: state.maps.selectedMap,
+		value: state.maps.selectedMap
 		};
 
 	return {
@@ -27,7 +31,7 @@ function mapStateToProps(state: State) {
 
 function mapDispatchToProps(dispatch: Dispatch) {
 	return {
-		selectMap: ((newSelectedMapID: number) => dispatch(changeSelectedMap(newSelectedMapID))),
+		selectMap: ((newSelectedMapID: number) => dispatch(changeSelectedMap(newSelectedMapID)))
 	};
 }
 
