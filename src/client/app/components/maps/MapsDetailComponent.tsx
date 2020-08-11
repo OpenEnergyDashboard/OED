@@ -68,6 +68,7 @@ export default class MapsDetailComponent extends React.Component<MapsDetailProps
 						{hasToken() && <th> <FormattedMessage id='map.filename'/> </th>}
 						{hasToken() && <th> <FormattedMessage id='map.note'/> </th>}
 						{hasToken() && <th> <FormattedMessage id='map.calibration'/> </th>}
+						{hasToken() && <th> <FormattedMessage id='remove'/> </th>}
 						</tr>
 					</thead>
 					<tbody>

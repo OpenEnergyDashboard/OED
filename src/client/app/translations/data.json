@@ -114,6 +114,7 @@
 	"projected.to.be.used": "projected to be used",
 	"redraw": "Redraw",
 	"restore": "Restore",
+	"remove": "Remove",
 	"save.meter.edits": "Save meter edits",
 	"select.groups": "Select Groups",
 	"select.meter": "Select Meter",
@@ -276,7 +277,7 @@
 	"yesterday": "Hier",
 	"you.cannot.create.a.cyclic.group": "Vous ne pouvez pas créer un groupe cyclique"
   },
- "es": { 
+ "es": {
 	"404": "404 Página no encontrada",
 	"4.weeks": "4 Semanas",
 	"add.new.meters": "Agregar nuevos medidores",
@@ -333,7 +334,7 @@
 	"import.meter.readings": "Importar lecturas del medidor",
 	"incorrect.file.format": "Formato del archivo esta incorrecto",
 	"info": " para obtener más información.",
-	"insufficient.readings": "Datos de lecturas insuficientes para procesar la comparación de", 
+	"insufficient.readings": "Datos de lecturas insuficientes para procesar la comparación de",
 	"invalid.email.password": "Correo electrónico o contraseña no válidos",
 	"invalid.token.login.or.logout": "El token ha expirado. Inicie sesión nuevamente o cierre sesión",
 	"last.four.weeks": "Últimas cuatro semanas",
@@ -383,7 +384,7 @@
 	"tip.meters.csv.format": "El formato de archivo es un archivo CSV con 'ip' como la primera línea seguida de una lista de IP del medidor, cada una separada por una nueva línea",
 	"today": "Hoy",
 	"toggle.custom.slider": "deslizador personalizada",
-	"toggle.link": "Alternar enlace de gráfico", 
+	"toggle.link": "Alternar enlace de gráfico",
 	"total": "Total",
 	"unused.groups": "Grupos no utilizados",
 	"unused.meters": "Metros no utilizados",
