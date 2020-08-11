@@ -37,8 +37,8 @@ export default class MapViewComponent extends React.Component<MapViewProps, MapV
 			nameFocus: false,
 			nameInput: this.props.map.name,
 			noteFocus: false,
-			noteInput: (this.props.map.note)? this.props.map.note : ''
-		}
+			noteInput: (this.props.map.note) ? this.props.map.note : ''
+		};
 		this.handleCalibrationSetting = this.handleCalibrationSetting.bind(this);
 		this.toggleMapDisplayable = this.toggleMapDisplayable.bind(this);
 		this.toggleNameInput = this.toggleNameInput.bind(this);
@@ -76,7 +76,8 @@ export default class MapViewComponent extends React.Component<MapViewProps, MapV
 	}
 
 	private toggleDelete() {
-		this.props.removeMap(this.props.id);
+		const consent = window.confirm(`Are you sure you want to remove map "${this.props.map.name}"?`);
+		if (consent) { this.props.removeMap(this.props.id); }
 	}
 
 	private formatDeleteButton() {
@@ -87,7 +88,7 @@ export default class MapViewComponent extends React.Component<MapViewProps, MapV
 		};
 		return <Button style={editButtonStyle} color='primary' onClick={this.toggleDelete}>
 			<FormattedMessage id={'delete.map'} />
-		</Button>
+			</Button>;
 	}
 
 	private styleEnabled(): React.CSSProperties {
@@ -106,7 +107,7 @@ export default class MapViewComponent extends React.Component<MapViewProps, MapV
 		const editedMap = {
 			...this.props.map,
 			displayable: !this.props.map.displayable
-		}
+		};
 		this.props.editMapDetails(editedMap);
 	}
 
@@ -148,8 +149,8 @@ export default class MapViewComponent extends React.Component<MapViewProps, MapV
 		if (this.state.nameFocus) {
 			const editedMap = {
 				...this.props.map,
-				name: this.state.nameInput,
-			}
+				name: this.state.nameInput
+			};
 			this.props.editMapDetails(editedMap);
 		}
 		this.setState({nameFocus: !this.state.nameFocus});
@@ -163,10 +164,10 @@ export default class MapViewComponent extends React.Component<MapViewProps, MapV
 		let formattedName;
 		let buttonMessageId;
 		if (this.state.nameFocus) {
-			formattedName = <textarea id={'name'} value={this.state.nameInput} onChange={event => this.handleNameChange(event)}/>
+			formattedName = <textarea id={'name'} value={this.state.nameInput} onChange={event => this.handleNameChange(event)}/>;
 			buttonMessageId = 'update';
 		} else {
-			formattedName = <div>{this.state.nameInput}</div>
+			formattedName = <div>{this.state.nameInput}</div>;
 			buttonMessageId = 'edit';
 		}
 
@@ -180,7 +181,7 @@ export default class MapViewComponent extends React.Component<MapViewProps, MapV
 		}
 
 		if (hasToken()) {
-			return ( //add onClick
+			return (
 				<div>
 					{formattedName}
 					{toggleButton}
@@ -200,8 +201,8 @@ export default class MapViewComponent extends React.Component<MapViewProps, MapV
 		if (this.state.noteFocus) {
 			const editedMap = {
 				...this.props.map,
-				note: this.state.noteInput,
-			}
+				note: this.state.noteInput
+			};
 			this.props.editMapDetails(editedMap);
 		}
 		this.setState({noteFocus: !this.state.noteFocus});
@@ -215,10 +216,10 @@ export default class MapViewComponent extends React.Component<MapViewProps, MapV
 		let formattedNote;
 		let buttonMessageId;
 		if (this.state.noteFocus) {
-			formattedNote = <textarea id={'note'} value={this.state.noteInput} onChange={event => this.handleNoteChange(event)}/>
+			formattedNote = <textarea id={'note'} value={this.state.noteInput} onChange={event => this.handleNoteChange(event)}/>;
 			buttonMessageId = 'update';
 		} else {
-			formattedNote = <div>{this.state.noteInput}</div>
+			formattedNote = <div>{this.state.noteInput}</div>;
 			buttonMessageId = 'edit';
 		}
 
@@ -232,7 +233,7 @@ export default class MapViewComponent extends React.Component<MapViewProps, MapV
 		}
 
 		if (hasToken()) {
-			return ( //add onClick
+			return (
 				<div>
 					{formattedNote}
 					{toggleButton}
@@ -271,9 +272,11 @@ export default class MapViewComponent extends React.Component<MapViewProps, MapV
 				<span style={styleFn()}>
 					<FormattedMessage id={messageID} />
 				</span>
-				<Link to='/calibration' onClick={() => this.handleCalibrationSetting(CalibrationModeTypes.calibrate)}><Button style={this.styleToggleBtn()} color='primary'>
-					<FormattedMessage id='map.calibrate' />
-				</Button></Link>
+				<Link to='/calibration' onClick={() => this.handleCalibrationSetting(CalibrationModeTypes.calibrate)}>
+					<Button style={this.styleToggleBtn()} color='primary'>
+						<FormattedMessage id='map.calibrate' />
+					</Button>
+				</Link>
 			</span>
 		);
 	}
@@ -282,9 +285,11 @@ export default class MapViewComponent extends React.Component<MapViewProps, MapV
 		return (
 			<span>
 				<span>{this.props.map.filename}</span>
-				<Link to='/calibration' onClick={() => this.handleCalibrationSetting(CalibrationModeTypes.initiate)}><Button style={this.styleToggleBtn()} color='primary'>
-					<FormattedMessage id='map.upload.new.file' />
-				</Button></Link>
+				<Link to='/calibration' onClick={() => this.handleCalibrationSetting(CalibrationModeTypes.initiate)}>
+					<Button style={this.styleToggleBtn()} color='primary'>
+						<FormattedMessage id='map.upload.new.file' />
+					</Button>
+				</Link>
 			</span>
 		);
 	}
