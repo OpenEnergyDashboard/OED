@@ -15,6 +15,7 @@ import * as moment from 'moment';
 import {TimeInterval} from '../../../common/TimeInterval';
 
 import Button from 'reactstrap/lib/Button';
+import { FormattedMessage } from 'react-intl';
 
 // TODO lowercase plotly for the import in index.d.ts but uppercase here.
 
@@ -98,9 +99,7 @@ export default class DashboardComponent extends React.Component<DashboardProps, 
 								onClick={() => this.handleTimeIntervalChange('all')}
 							> <FormattedMessage id='restore'/>
 							</Button>]
-						) : (
-							null
-						)}
+						) : null}
 					</div>
 				</div>
 			</div>
