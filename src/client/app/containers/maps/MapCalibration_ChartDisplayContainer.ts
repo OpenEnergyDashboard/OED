@@ -2,50 +2,49 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
 
-import {connect} from "react-redux";
-import PlotlyChart, {IPlotlyChartProps} from "react-plotlyjs-ts";
-import {State} from "../../types/redux/state";
-import * as plotly from "plotly.js";
-import {CartesianPoint, Dimensions, normalizeImageDimensions} from "../../utils/calibration";
-import {updateCurrentCartesian} from "../../actions/map";
-import store from "../../index";
+import {connect} from 'react-redux';
+import PlotlyChart, {IPlotlyChartProps} from 'react-plotlyjs-ts';
+import {State} from '../../types/redux/state';
+import * as plotly from 'plotly.js';
+import {CartesianPoint, Dimensions, normalizeImageDimensions} from '../../utils/calibration';
+import {updateCurrentCartesian} from '../../actions/map';
+import store from '../../index';
 
 function mapStateToProps(state: State) {
-	let x: number[] = [];
-	let y: number[] = [];
-	let texts: string[] = [];
+	const x: number[] = [];
+	const y: number[] = [];
+	const texts: string[] = [];
 
 	const mapID = state.maps.calibratingMap;
-	const map = state.maps.editedMaps[mapID]
+	const map = state.maps.editedMaps[mapID];
 	const points = map.calibrationSet;
 	if (points) {
-		for (let i = 0; i < points.length; i++) {
-			const current = points[i];
-			x.push(current.cartesian.x);
-			y.push(current.cartesian.y);
-			texts.push(`latitude: ${current.gps.latitude}, longitude: ${current.gps.longitude}`);
+		for (const point of points) {
+			x.push(point.cartesian.x);
+			y.push(point.cartesian.y);
+			texts.push(`latitude: ${point.gps.latitude}, longitude: ${point.gps.longitude}`);
 		}
 	}
 	const imageDimensions: Dimensions = normalizeImageDimensions( {
 		width: map.image.width,
-		height: map.image.height,
+		height: map.image.height
 	});
-	let backgroundTrace = createBackgroundTrace(imageDimensions);
-	let dataPointTrace = {
-		x: x,
-		y: y,
+	const backgroundTrace = createBackgroundTrace(imageDimensions);
+	const dataPointTrace = {
+		x,
+		y,
 		type: 'scatter',
 		mode: 'markers',
 		marker: {
 			color: 'rgb(7,110,180)',
 			opacity: 0.5,
-			size: 6,
+			size: 6
 		},
 		text: texts,
 		opacity: 1,
 		showlegend: false
 	};
-	let data = [backgroundTrace,dataPointTrace];
+	const data = [backgroundTrace, dataPointTrace];
 
 	const imageSource = map.image.src;
 
@@ -55,12 +54,12 @@ function mapStateToProps(state: State) {
 		height: 1000,
 		xaxis: {
 			visible: false, // changes all visibility settings including showgrid, zeroline, showticklabels and hiding ticks
-			range: [0, 500], // range of displayed graph
+			range: [0, 500] // range of displayed graph
 		},
 		yaxis: {
 			visible: false,
 			range: [0, 500],
-			scaleanchor:'x',
+			scaleanchor: 'x'
 		},
 		images: [{
 			layer: 'below',
@@ -74,8 +73,8 @@ function mapStateToProps(state: State) {
 			xanchor: 'left',
 			yanchor: 'bottom',
 			sizing: 'contain',
-			opacity: 1,
-		}],
+			opacity: 1
+		}]
 	};
 
 	/***
@@ -85,10 +84,10 @@ function mapStateToProps(state: State) {
 	 *               onClick={({points, event}) => console.log(points, event)}>
 	 */
 	const props: IPlotlyChartProps = {
-		data: data,
-		layout: layout,
-		onClick: (event: plotly.PlotMouseEvent) => handlePointClick(event),
-	}
+		data,
+		layout,
+		onClick: (event: plotly.PlotMouseEvent) => handlePointClick(event)
+	};
 	return props;
 }
 
@@ -97,9 +96,9 @@ function mapStateToProps(state: State) {
  * @param imageDimensions {Dimensions} normalized dimensions of the image
  */
 function createBackgroundTrace(imageDimensions: Dimensions) {
-	// define what the grid of the heatmap look like
-	let x = [];
-	let y = [];
+	// define the grid of heatmap
+	const x = [];
+	const y = [];
 	// bound the grid to image dimensions to avoid clicking outside of the map
 	for (let i = 0; i <= Math.ceil(imageDimensions.width); i = i + 1) {
 		x.push(i);
@@ -108,55 +107,54 @@ function createBackgroundTrace(imageDimensions: Dimensions) {
 		y.push(j);
 	}
 	// define the actual points of the graph, numbers in the array are used to designate different colors;
-	let z = [];
+	const z = [];
 	for (let j = 0; j < y.length; j++) {
-		let temp = [];
+		const temp = [];
 		for (let k = 0; k < x.length; k++) {
 			temp.push(0);
 		}
 		z.push(temp);
 	}
-	let trace = {
-		x: x,
-		y: y,
-		z: z,
+	const trace = {
+		x,
+		y,
+		z,
 		type: 'heatmap',
-		colorscale: [['0.0', 'rgba(6,86,157,0)']], // set colors to be fully transparent
+		colorscale: [['0.5', 'rgba(6,86,157,0)']], // set colors to be fully transparent
 		xgap: 1,
 		ygap: 1,
-		hoverinfo: 'none',
-		opacity: '0',
+		hoverinfo: 'x+y',
+		opacity: '0', // controls whether the grids will be displayed
 		showscale: false
 	};
 	return trace;
 }
 
 function handlePointClick(event: plotly.PlotMouseEvent) {
-	console.log(event);
 	event.event.preventDefault();
-	let currentPoint: CartesianPoint = getClickedCoordinates(event);
+	const currentPoint: CartesianPoint = getClickedCoordinates(event);
 	store.dispatch(updateCurrentCartesian(currentPoint));
 }
 
 function getClickedCoordinates(event: plotly.PlotMouseEvent) {
 	event.event.preventDefault();
-	/**
+	/*
 	 *  points on backgroundTrace and dataPointTrace will be captured if they are both close to the click
 	 *  for now, all of the points from dataPointTrace are ignored;
  	 */
-	let eligiblePoints = [];
-	for (let i=0; i < event.points.length; i++) {
-		let pointNumber = event.points[i].pointNumber;
-		let traceNumber = event.points[i].curveNumber;
-		if (traceNumber == 0) {
-			eligiblePoints.push(event.points[i]);
+	const eligiblePoints = [];
+	for (const point of event.points) {
+		const pointNumber = point.pointNumber;
+		const traceNumber = point.curveNumber;
+		if (traceNumber === 0) {
+			eligiblePoints.push(point);
 		}
 	}
 	const xValue = eligiblePoints[0].x as number;
 	const yValue = eligiblePoints[0].y as number;
 	const clickedPoint: CartesianPoint = {
 		x: Number(xValue.toFixed(6)),
-		y: Number(yValue.toFixed(6)),
+		y: Number(yValue.toFixed(6))
 	};
 	return clickedPoint;
 }

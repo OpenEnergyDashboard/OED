@@ -15,7 +15,7 @@ function mapStateToProps(state: State, ownProps: {id: number}) {
 		map = state.maps.editedMaps[ownProps.id];
 	}
 	return {
-		map: map,
+		map,
 		isEdited: state.maps.editedMaps[ownProps.id] !== undefined,
 		isSubmitting: state.maps.submitting.indexOf(ownProps.id) !== -1
 	};
@@ -25,7 +25,7 @@ function mapDispatchToProps(dispatch: Dispatch) {
 	return {
 		editMapDetails: (map: MapMetadata) => dispatch(editMapDetails(map)),
 		setCalibration: (mode: CalibrationModeTypes, mapID: number) => dispatch(setCalibration(mode, mapID)),
-		removeMap: (id: number) => dispatch(removeMap(id)),
+		removeMap: (id: number) => dispatch(removeMap(id))
 	};
 }
 
