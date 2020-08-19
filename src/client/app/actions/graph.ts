@@ -13,6 +13,7 @@ import { Dispatch, Thunk, ActionType } from '../types/redux/actions';
 import { State } from '../types/redux/state';
 import * as t from '../types/redux/graph';
 import { ComparePeriod, SortingOrder } from '../utils/calculateCompare';
+import {fetchNeededMapReadings} from "./mapReadings";
 
 export function changeChartToRender(chartType: t.ChartTypes): t.ChangeChartToRenderAction {
 	return { type: ActionType.ChangeChartToRender, chartType };
@@ -90,6 +91,7 @@ export function changeSelectedMeters(meterIDs: number[]): Thunk {
 			dispatch2(fetchNeededLineReadings(getState().graph.timeInterval));
 			dispatch2(fetchNeededBarReadings(getState().graph.timeInterval));
 			dispatch2(fetchNeededCompareReadings(getState().graph.comparePeriod));
+			dispatch2(fetchNeededMapReadings(getState().graph.timeInterval));
 		});
 		return Promise.resolve();
 	};
@@ -103,6 +105,7 @@ export function changeSelectedGroups(groupIDs: number[]): Thunk {
 			dispatch2(fetchNeededLineReadings(getState().graph.timeInterval));
 			dispatch2(fetchNeededBarReadings(getState().graph.timeInterval));
 			dispatch2(fetchNeededCompareReadings(getState().graph.comparePeriod));
+			dispatch2(fetchNeededMapReadings(getState().graph.timeInterval));
 		});
 		return Promise.resolve();
 	};
@@ -112,6 +115,7 @@ function fetchNeededReadingsForGraph(timeInterval: TimeInterval): Thunk {
 	return dispatch => {
 		dispatch(fetchNeededLineReadings(timeInterval));
 		dispatch(fetchNeededBarReadings(timeInterval));
+		dispatch(fetchNeededMapReadings(timeInterval));
 		return Promise.resolve();
 	};
 }
