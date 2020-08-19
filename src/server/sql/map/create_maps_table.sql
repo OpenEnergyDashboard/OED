@@ -9,7 +9,7 @@ CREATE TABLE IF NOT EXISTS maps (
 	note VARCHAR(500),
 	filename VARCHAR(200) NOT NULL,
 	modified_date TIMESTAMP NOT NULL,
-	origin POINT,
-	opposite POINT,
+	origin POINT DEFAULT NULL,
+	opposite POINT DEFAULT NULL,
 	map_source TEXT NOT NULL
 );
