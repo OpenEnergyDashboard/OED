@@ -33,7 +33,7 @@ export default class MeterViewComponent extends React.Component<MeterViewProps, 
 		super(props);
 		this.state = {
 			gpsFocus: false,
-			gpsInput: (this.props.meter.gps) ? `${this.props.meter.gps.longitude},${this.props.meter.gps.latitude}` : ''
+			gpsInput: (this.props.meter.gps) ? `${this.props.meter.gps.latitude},${this.props.meter.gps.longitude}` : ''
 		};
 		this.toggleMeterDisplayable = this.toggleMeterDisplayable.bind(this);
 		this.toggleMeterEnabled = this.toggleMeterEnabled.bind(this);
