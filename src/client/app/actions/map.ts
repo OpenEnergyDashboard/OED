@@ -81,6 +81,10 @@ export function setCalibration(mode: CalibrationModeTypes, mapID: number): Thunk
 	}
 }
 
+export function changeGridDisplay(): t.ChangeGridDisplayAction {
+	return { type: ActionType.ChangeGridDisplay };
+}
+
 function prepareCalibration(mode: CalibrationModeTypes, mapID: number): t.SetCalibrationAction {
 	return { type: ActionType.SetCalibration, mode, mapID };
 }

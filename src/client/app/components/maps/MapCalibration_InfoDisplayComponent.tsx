@@ -5,10 +5,14 @@
 import * as React from 'react';
 import {GPSPoint, isValidGPSInput} from '../../utils/calibration';
 import {ChangeEvent, FormEvent} from 'react';
+import {FormattedMessage} from "react-intl";
+import TooltipHelpComponent from "../TooltipHelpComponent";
 
 interface InfoDisplayProps {
+	showGrid: boolean;
 	currentCartesianDisplay: string;
 	resultDisplay: string;
+	changeGridDisplay(): any;
 	updateGPSCoordinates(gpsCoordinate: GPSPoint): any;
 	submitCalibratingMap(): any;
 	dropCurrentCalibration(): any;
@@ -25,6 +29,7 @@ export default class MapCalibration_InfoDisplayComponent extends React.Component
 		this.state = {
 			value: ''
 		}
+		this.handleGridDisplay = this.handleGridDisplay.bind(this);
 		this.handleGPSInput = this.handleGPSInput.bind(this);
 		this.resetInputField = this.resetInputField.bind(this);
 		this.handleSubmit = this.handleSubmit.bind(this);
@@ -34,23 +39,34 @@ export default class MapCalibration_InfoDisplayComponent extends React.Component
 	render() {
 		const calibrationDisplay = `result: ${this.props.resultDisplay}`;
 		return (
-			<div id='UserInput'>
-				<form onSubmit={this.handleSubmit}>
-					<label>
-						input GPS coordinate that corresponds to the point: {this.props.currentCartesianDisplay}
-						<br/>
-						in this format -> latitude,longitude
-						<br/>
-						<textarea id={'text'} cols={50} value={this.state.value} onChange={this.handleGPSInput.bind(this)}/>
+			<div>
+				<div className='checkbox'>
+					<label><input type='checkbox' onChange={this.handleGridDisplay} checked={this.props.showGrid} />
+						<FormattedMessage id='show.grid' />
 					</label>
-					<br/>
-					<input type={"submit"} value={"Submit"}/>
-				</form>
-				<button onClick={this.dropCurrentCalibration}>Reset</button>
-				<button onClick={this.handleChanges.bind(this)}>Save changes to database</button>
-				<p>{calibrationDisplay}</p>
+				</div>
+				<div id='UserInput'>
+					<form onSubmit={this.handleSubmit}>
+						<label>
+							input GPS coordinate that corresponds to the point: {this.props.currentCartesianDisplay}
+							<br/>
+							in this format -> latitude,longitude
+							<br/>
+							<textarea id={'text'} cols={50} value={this.state.value} onChange={this.handleGPSInput.bind(this)}/>
+						</label>
+						<br/>
+						<input type={"submit"} value={"Submit"}/>
+					</form>
+					<button onClick={this.dropCurrentCalibration}>Reset</button>
+					<button onClick={this.handleChanges.bind(this)}>Save changes to database</button>
+					<p>{calibrationDisplay}</p>
+				</div>
 			</div>
 		);
+	}
+
+	private handleGridDisplay() {
+		this.props.changeGridDisplay();
 	}
 
 	private resetInputField() {

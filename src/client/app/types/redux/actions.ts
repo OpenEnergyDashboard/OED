@@ -77,6 +77,7 @@ export enum ActionType {
 	UpdateCalibrationMode = 'UPDATE_MAP_MODE',
 	UpdateSelectedMap = 'UPDATE_SELECTED_MAPS',
 	UpdateMapSource = 'UPDATE_MAP_IMAGE',
+	ChangeGridDisplay = 'CHANGE_GRID_DISPLAY',
 	UpdateCurrentCartesian = 'UPDATE_CURRENT_CARTESIAN',
 	UpdateCurrentGPS = 'UPDATE_CURRENT_GPS',
 	ResetCurrentPoint = 'RESET_CURRENT_POINT',

@@ -9,6 +9,7 @@ import * as plotly from 'plotly.js';
 import {CartesianPoint, Dimensions, normalizeImageDimensions} from '../../utils/calibration';
 import {updateCurrentCartesian} from '../../actions/map';
 import store from '../../index';
+import {CalibrationSettings} from "../../types/redux/map";
 
 function mapStateToProps(state: State) {
 	const x: number[] = [];
@@ -29,7 +30,8 @@ function mapStateToProps(state: State) {
 		width: map.image.width,
 		height: map.image.height
 	});
-	const backgroundTrace = createBackgroundTrace(imageDimensions);
+	const settings = state.maps.calibrationSettings;
+	const backgroundTrace = createBackgroundTrace(imageDimensions, settings);
 	const dataPointTrace = {
 		x,
 		y,
@@ -93,9 +95,10 @@ function mapStateToProps(state: State) {
 
 /**
  * use a transparent heatmap to capture which point the user clicked on the map
- * @param imageDimensions {Dimensions} normalized dimensions of the image
+ * @param imageDimensions {Dimensions} Normalized dimensions of the image
+ * @param settings {CalibrationSettings} Settings for calibration displays
  */
-function createBackgroundTrace(imageDimensions: Dimensions) {
+function createBackgroundTrace(imageDimensions: Dimensions, settings: CalibrationSettings) {
 	// define the grid of heatmap
 	const x = [];
 	const y = [];
@@ -124,7 +127,7 @@ function createBackgroundTrace(imageDimensions: Dimensions) {
 		xgap: 1,
 		ygap: 1,
 		hoverinfo: 'x+y',
-		opacity: '0', // controls whether the grids will be displayed
+		opacity: (settings.showGrid)? '0.5' : '0', // controls whether the grids will be displayed
 		showscale: false
 	};
 	return trace;

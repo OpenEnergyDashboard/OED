@@ -15,6 +15,7 @@ const defaultState: MapState = {
 	editedMaps: {},
 	submitting: [],
 	newMapCounter: 0,
+	calibrationSettings: {showGrid: false},
 };
 
 export default function maps(state = defaultState, action: MapsAction) {
@@ -104,6 +105,14 @@ export default function maps(state = defaultState, action: MapsAction) {
 					}
 				};
 			}
+		case ActionType.ChangeGridDisplay:
+			return {
+				...state,
+				calibrationSettings: {
+					...state.calibrationSettings,
+					showGrid: !state.calibrationSettings.showGrid
+				}
+			};
 		case ActionType.ResetCalibration:
 			editedMaps = state.editedMaps;
 			let mapToReset = {...editedMaps[action.mapID]};

@@ -6,7 +6,7 @@ import {connect} from 'react-redux';
 import { State } from '../../types/redux/state';
 import { Dispatch } from '../../types/redux/actions';
 import MapCalibration_InfoDisplayComponent from '../../components/maps/MapCalibration_InfoDisplayComponent';
-import {dropCalibration, offerCurrentGPS, submitCalibratingMap} from "../../actions/map";
+import {changeGridDisplay, dropCalibration, offerCurrentGPS, submitCalibratingMap} from "../../actions/map";
 import {GPSPoint} from "../../utils/calibration";
 import {logToServer} from "../../actions/logs";
 
@@ -18,6 +18,7 @@ function mapStateToProps(state: State) {
 		: "Need more points";
 	const currentCartesianDisplay =(map.currentPoint)? `x: ${map.currentPoint.cartesian.x}, y: ${map.currentPoint.cartesian.y} ` : 'undefined';
 	return {
+		showGrid: state.maps.calibrationSettings.showGrid,
 		currentCartesianDisplay: currentCartesianDisplay,
 		resultDisplay: resultDisplay,
 	}
@@ -29,6 +30,7 @@ function mapDispatchToProps(dispatch: Dispatch) {
 		submitCalibratingMap: () => dispatch(submitCalibratingMap()),
 		dropCurrentCalibration: () => dispatch(dropCalibration()),
 		log: (level: string, message: string) => dispatch(logToServer(level, message)),
+		changeGridDisplay: () => dispatch(changeGridDisplay()),
 	}
 }
 export default connect(mapStateToProps, mapDispatchToProps)(MapCalibration_InfoDisplayComponent);

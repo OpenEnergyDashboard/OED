@@ -121,6 +121,7 @@
 	"select.meters": "Select Meters",
 	"select.map": "Select Map",
 	"show": "Show",
+	"show.grid": "Show grid",
 	"show.options": "Show options",
 	"sort": "Sort",
 	"submit.changes": "Submit changes",

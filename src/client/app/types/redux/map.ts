@@ -31,6 +31,10 @@ export interface UpdateMapSourceAction {
 	data: MapMetadata;
 }
 
+export interface ChangeGridDisplayAction {
+	type: ActionType.ChangeGridDisplay;
+}
+
 export interface UpdateSelectedMapAction {
 	type: ActionType.UpdateSelectedMap;
 	mapID: number;
@@ -112,6 +116,7 @@ export type MapsAction =
 	| RequestSelectedMapAction
 	| ReceiveSelectedMapAction
 	| UpdateMapSourceAction
+	| ChangeGridDisplayAction
 	| EditMapDetailsAction
 	| SubmitEditedMapAction
 	| ConfirmEditedMapAction
@@ -149,7 +154,7 @@ export interface MapData{
 }
 
 /**
- *  data format used keep track of map's state
+ *  Data format used keep track of map's state
  *  @param id {number} id <= -1 means it's a new map;
  *  @param name
  *  @param displayable
@@ -171,6 +176,13 @@ export interface MapMetadata {
 }
 
 /**
+ * Stores settings for calibration
+ */
+export interface CalibrationSettings {
+	showGrid: boolean;
+}
+
+/**
  * @param mapID <= -1 means it's a new map;
  */
 interface MapMetadataByID {
@@ -186,4 +198,5 @@ export interface MapState {
 	// Maps the app is currently attempting to upload map changes
 	submitting: number[];
 	newMapCounter: number;
+	calibrationSettings: CalibrationSettings;
 }
