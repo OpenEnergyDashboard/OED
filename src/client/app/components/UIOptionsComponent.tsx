@@ -16,8 +16,6 @@ import ChartLinkContainer from '../containers/ChartLinkContainer';
 import { ChartTypes } from '../types/redux/graph';
 import { ComparePeriod, SortingOrder } from '../utils/calculateCompare';
 import 'rc-slider/assets/index.css';
-import SingleSelectComponent from './SingleSelectComponent';
-import {SelectOption} from '../types/items';
 
 const Slider = createSliderWithTooltip(sliderWithoutTooltips);
 
@@ -52,7 +50,7 @@ class UIOptionsComponent extends React.Component<UIOptionsPropsWithIntl, UIOptio
 		this.formatSliderTip = this.formatSliderTip.bind(this);
 		this.handleBarButton = this.handleBarButton.bind(this);
 		this.handleCompareButton = this.handleCompareButton.bind(this);
-		this.handleSortingChange = this.handleSortingChange.bind(this);
+		this.handleSortingButton = this.handleSortingButton.bind(this);
 		this.handleSetOptionsVisibility = this.handleSetOptionsVisibility.bind(this);
 		this.toggleSlider = this.toggleSlider.bind(this);
 		this.toggleDropdown = this.toggleDropdown.bind(this);
@@ -78,16 +76,7 @@ class UIOptionsComponent extends React.Component<UIOptionsPropsWithIntl, UIOptio
 		const zIndexFix: React.CSSProperties = {
 			zIndex: 0
 		};
-		const messages = defineMessages({
-			barStackingTip: {	id: 'bar.stacking.tip' },
-			sort: {id: 'sort'}
-		});
-		const { formatMessage } = this.props.intl;
-		const sortingChoices: SelectOption[] = [
-			{label: SortingOrder.Alphabetical, value: 1},
-			{label: SortingOrder.Ascending, value: 2},
-			{label: SortingOrder.Descending, value: 3}
-		];
+		const messages = defineMessages({ barStackingTip: {	id: 'bar.stacking.tip' }});
 
 		return (
 			<div>
@@ -96,65 +85,65 @@ class UIOptionsComponent extends React.Component<UIOptionsPropsWithIntl, UIOptio
 
 				{/* Controls specific to the bar chart. */}
 				{this.props.chartToRender === ChartTypes.bar &&
-					<div>
-						<div className='checkbox'>
-							<label><input type='checkbox' onChange={this.handleChangeBarStacking} checked={this.props.barStacking} />
-								<FormattedMessage id='bar.stacking' /><TooltipHelpComponent tip={this.props.intl.formatMessage(messages.barStackingTip)} />
-							</label>
-						</div>
-						<p style={labelStyle}>
-							<FormattedMessage id='bar.interval' />:
-						</p>
-						<ButtonGroup
-							style={zIndexFix}
-						>
-							<Button
-								outline={this.state.barDurationDays !== 1}
-								onClick={() => this.handleBarButton(1)}
-							>
-								<FormattedMessage id='day' />
-							</Button>
-							<Button
-								outline={this.state.barDurationDays !== 7}
-								onClick={() => this.handleBarButton(7)}
-							>
-								<FormattedMessage id='week' />
-							</Button>
-							<Button
-								outline={this.state.barDurationDays !== 28}
-								onClick={() => this.handleBarButton(28)}
-							>
-								<FormattedMessage id='4.weeks' />
-							</Button>
-						</ButtonGroup>
-						<Button
-							outline={!this.state.showSlider}
-							onClick={this.toggleSlider}
-						>
-							<FormattedMessage id='toggle.custom.slider' />
-						</Button>
-						{this.state.showSlider &&
-							<div style={divTopPadding}>
-								<Slider
-									min={1}
-									max={365}
-									value={this.state.barDurationDays}
-									onChange={this.handleBarDurationChange}
-									onAfterChange={this.handleBarDurationChangeComplete}
-									tipFormatter={this.formatSliderTip}
-									trackStyle={{ backgroundColor: 'gray', height: 10 }}
-									handleStyle={[{
-										height: 28,
-										width: 28,
-										marginLeft: -14,
-										marginTop: -9,
-										backgroundColor: 'white'
-									}]}
-									railStyle={{ backgroundColor: 'gray', height: 10 }}
-								/>
-							</div>
-						}
+				<div>
+					<div className='checkbox'>
+						<label><input type='checkbox' onChange={this.handleChangeBarStacking} checked={this.props.barStacking} />
+							<FormattedMessage id='bar.stacking' /><TooltipHelpComponent tip={this.props.intl.formatMessage(messages.barStackingTip)} />
+						</label>
 					</div>
+					<p style={labelStyle}>
+						<FormattedMessage id='bar.interval' />:
+					</p>
+					<ButtonGroup
+						style={zIndexFix}
+					>
+						<Button
+							outline={this.state.barDurationDays !== 1}
+							onClick={() => this.handleBarButton(1)}
+						>
+							<FormattedMessage id='day' />
+						</Button>
+						<Button
+							outline={this.state.barDurationDays !== 7}
+							onClick={() => this.handleBarButton(7)}
+						>
+							<FormattedMessage id='week' />
+						</Button>
+						<Button
+							outline={this.state.barDurationDays !== 28}
+							onClick={() => this.handleBarButton(28)}
+						>
+							<FormattedMessage id='4.weeks' />
+						</Button>
+					</ButtonGroup>
+					<Button
+						outline={!this.state.showSlider}
+						onClick={this.toggleSlider}
+					>
+						<FormattedMessage id='toggle.custom.slider' />
+					</Button>
+					{this.state.showSlider &&
+					<div style={divTopPadding}>
+						<Slider
+							min={1}
+							max={365}
+							value={this.state.barDurationDays}
+							onChange={this.handleBarDurationChange}
+							onAfterChange={this.handleBarDurationChangeComplete}
+							tipFormatter={this.formatSliderTip}
+							trackStyle={{ backgroundColor: 'gray', height: 10 }}
+							handleStyle={[{
+								height: 28,
+								width: 28,
+								marginLeft: -14,
+								marginTop: -9,
+								backgroundColor: 'white'
+							}]}
+							railStyle={{ backgroundColor: 'gray', height: 10 }}
+						/>
+					</div>
+					}
+				</div>
 
 				}
 				{/* Controls specific to the compare chart */}
@@ -185,20 +174,40 @@ class UIOptionsComponent extends React.Component<UIOptionsPropsWithIntl, UIOptio
 							<FormattedMessage id='4.weeks' />
 						</Button>
 					</ButtonGroup>
-					<SingleSelectComponent
-						placeholder={formatMessage(messages.sort)}
-						options={sortingChoices}
-						onValueChange={this.handleSortingChange}
-					/>
+					<Dropdown isOpen={this.state.compareSortingDropdownOpen} toggle={this.toggleDropdown}>
+						<DropdownToggle caret>
+							<FormattedMessage id='sort' />
+						</DropdownToggle>
+						<DropdownMenu>
+							<DropdownItem
+								active={this.props.compareSortingOrder === SortingOrder.Alphabetical}
+								onClick={() => this.handleSortingButton(SortingOrder.Alphabetical)}
+							>
+								<FormattedMessage id='alphabetically' />
+							</DropdownItem>
+							<DropdownItem
+								active={this.props.compareSortingOrder === SortingOrder.Ascending}
+								onClick={() => this.handleSortingButton(SortingOrder.Ascending)}
+							>
+								<FormattedMessage id='ascending' />
+							</DropdownItem>
+							<DropdownItem
+								active={this.props.compareSortingOrder === SortingOrder.Descending}
+								onClick={() => this.handleSortingButton(SortingOrder.Descending)}
+							>
+								<FormattedMessage id='descending' />
+							</DropdownItem>
+						</DropdownMenu>
+					</Dropdown>
 				</div>
 				}
 
 
 				{/* We can't export compare data */}
 				{this.props.chartToRender !== ChartTypes.compare &&
-					<div style={divTopPadding}>
-						<ExportContainer />
-					</div>
+				<div style={divTopPadding}>
+					<ExportContainer />
+				</div>
 				}
 				<div style={divTopPadding}>
 					<ChartLinkContainer />
@@ -248,9 +257,8 @@ class UIOptionsComponent extends React.Component<UIOptionsPropsWithIntl, UIOptio
 		this.props.changeCompareGraph(comparePeriod);
 	}
 
-	private handleSortingChange(selection: SelectOption) {
-		const typedSortString = selection.label as keyof typeof SortingOrder;
-		this.props.changeCompareSortingOrder(SortingOrder[typedSortString]);
+	private handleSortingButton(sortingOrder: SortingOrder) {
+		this.props.changeCompareSortingOrder(sortingOrder);
 	}
 
 	private handleSetOptionsVisibility() {
