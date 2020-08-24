@@ -146,8 +146,9 @@ export default class RouteComponent extends React.Component<RouteProps, {}> {
 						case 'optionsVisibility':
 							options.optionsVisibility = (info === 'true');
 							break;
-						case 'serverRange':
-							options.serverRange = TimeInterval.fromString(info);
+						case 'mapID':
+							options.mapID = (parseInt(info));
+							break;
 						default:
 							throw new Error('Unknown query parameter');
 					}

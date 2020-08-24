@@ -12,8 +12,10 @@ import { TimeInterval } from '../../../common/TimeInterval';
 import { Dispatch, Thunk, ActionType } from '../types/redux/actions';
 import { State } from '../types/redux/state';
 import * as t from '../types/redux/graph';
+import * as m from '../types/redux/map';
 import { ComparePeriod, SortingOrder } from '../utils/calculateCompare';
 import {fetchNeededMapReadings} from "./mapReadings";
+import {changeSelectedMap} from "./map";
 
 export function changeChartToRender(chartType: t.ChartTypes): t.ChangeChartToRenderAction {
 	return { type: ActionType.ChangeChartToRender, chartType };
@@ -144,6 +146,7 @@ export interface LinkOptions {
 	comparePeriod?: ComparePeriod;
 	compareSortingOrder?: SortingOrder;
 	optionsVisibility?: boolean;
+	mapID?: number;
 }
 
 /**
@@ -154,7 +157,8 @@ export interface LinkOptions {
 export function changeOptionsFromLink(options: LinkOptions) {
 	const dispatchFirst: Thunk[] = [setHotlinkedAsync(true)];
 	const dispatchSecond: Array<Thunk | t.ChangeChartToRenderAction | t.ChangeBarStackingAction
-		| t.ChangeGraphZoomAction |t.ChangeCompareSortingOrderAction | t.SetOptionsVisibility> = [];
+		| t.ChangeGraphZoomAction |t.ChangeCompareSortingOrderAction | t.SetOptionsVisibility
+		| m.UpdateSelectedMapAction > = [];
 	if (options.meterIDs) {
 		dispatchFirst.push(fetchMetersDetailsIfNeeded());
 		dispatchSecond.push(changeSelectedMeters(options.meterIDs));
@@ -172,9 +176,6 @@ export function changeOptionsFromLink(options: LinkOptions) {
 	if (options.toggleBarStacking) {
 		dispatchSecond.push(changeBarStacking());
 	}
-	if (options.serverRange) {
-		dispatchSecond.push(changeGraphZoomIfNeeded(options.serverRange));
-	}
 	if (options.comparePeriod) {
 		dispatchSecond.push(changeCompareGraph(options.comparePeriod));
 	}
@@ -183,6 +184,9 @@ export function changeOptionsFromLink(options: LinkOptions) {
 	}
 	if (options.optionsVisibility != null) {
 		dispatchSecond.push(setOptionsVisibility(options.optionsVisibility));
+	}
+	if (options.mapID) {
+		dispatchSecond.push(changeSelectedMap(options.mapID));
 	}
 	return (dispatch: Dispatch) => Promise.all(dispatchFirst.map(dispatch))
 		.then(() => Promise.all(dispatchSecond.map(dispatch)));
