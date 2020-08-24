@@ -204,7 +204,7 @@ export default class MeterViewComponent extends React.Component<MeterViewProps, 
 		let formattedGPS;
 		let buttonMessageId;
 		if (this.state.gpsFocus) {
-			formattedGPS = <textarea id={'gps'} value={this.state.gpsInput} onChange={event => this.handleGPSChange(event)}/>;
+			formattedGPS = <textarea id={'gps'} autoFocus={true} value={this.state.gpsInput} onChange={event => this.handleGPSChange(event)}/>;
 			buttonMessageId = 'update';
 		} else {
 			formattedGPS = <div>{this.state.gpsInput}</div>;
