@@ -31,6 +31,7 @@ services:
             - OED_DB_DATABASE=oed
             - OED_DB_TEST_DATABASE=oed_testing
             - OED_DB_PASSWORD=opened
+            - POSTGRES_PASSWORD=pleaseChange # default postgres password that can be changed for security.
             - OED_DB_HOST=database # Docker will set this hostname
             - OED_DB_PORT=5432
             - OED_TOKEN_SECRET=?
