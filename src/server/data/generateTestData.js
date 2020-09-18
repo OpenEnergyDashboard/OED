@@ -2,11 +2,6 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
 
-/* This file exports two useful items: testDB, which provides the method .getConnection,
- * returning a connection to the testing database, and recreateDB, which destroys the
- * database and creates a new schema there.
- */
-
 var TWO_PI = Math.PI * 2;
 
 /* Test 1: Sine Function
