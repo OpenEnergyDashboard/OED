@@ -38,10 +38,7 @@ const { getConnection, dropConnection } = require('../../db');
 
 	const passwordHash = bcrypt.hashSync(password, 10);
 	const admin = new User(undefined, email, passwordHash);
-	console.log("DEBUG: getting DB connection");
 	const conn = getConnection();
-	console.log("DEBUG: insert user into DB");
-	console.log("conn: " + conn);
 	try {
 		await admin.insert(conn);
 		terminateReadline('User created');
@@ -50,5 +47,4 @@ const { getConnection, dropConnection } = require('../../db');
 	} finally {
 		dropConnection();
 	}
-	console.log("DEBUG: finishing createUser.js");
 })();
