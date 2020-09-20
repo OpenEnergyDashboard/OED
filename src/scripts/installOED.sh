@@ -67,7 +67,8 @@ while [ $create_error == 0 ]; do
     # Redirect stderr to a file
     npm run createdb |& tee /tmp/oed.error > /dev/null
     # search the file for the kind of error we can recover from
-    grep -q 'Error: connect ECONNREFUSED' /tmp/oed.error
+	# This is not getting a DB connection or if the DB is not yet ready.
+    grep -q -e 'Error: connect ECONNREFUSED' -e 'error: the database system is starting up' /tmp/oed.error
     create_error=$?
 
     # Check loop runtime
