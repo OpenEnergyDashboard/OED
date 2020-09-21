@@ -20,12 +20,16 @@ let connmanager = {
  */
 function getConnection() {
 	if (connmanager.config === null) {
+		// console.log("DEBUG: getConnection has null config");
 		connmanager.config = config.database;
 	}
 
 	if (connmanager.connection === null) {
+		// console.log("DEBUG: getConnection has null connection");
 		connmanager.connection = getDB(connmanager.config);
 	}
+	// console.log("DEBUG: getConnection has connmanager.config of:", connmanager.config);
+	// console.log("DEBUG: getConnection has connmanager.connection of:", connmanager.connection);
 
 	return connmanager.connection;
 }
@@ -35,6 +39,7 @@ function getConnection() {
  * New calls to getConnection() will use a new connection pool.
  */
 function dropConnection() {
+	console.log("DEBUG: in dropConnection");
 	connmanager.config = null;
 	connmanager.connection = null;
 	stopDB();

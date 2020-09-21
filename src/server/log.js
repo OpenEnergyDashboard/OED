@@ -49,6 +49,7 @@ class Logger {
 	 * @param {boolean?} skipMail Don't e-mail this message even if we would normally emit an e-mail for this level.
 	 */
 	log(level, message, error = null, skipMail = false) {
+		console.log("DEBUG: starting to log something");
 		let messageToLog = `[${level.name}@${new Date(Date.now()).toISOString()}] ${message}\n`;
 
 		const conn = getConnection();
