@@ -14,7 +14,7 @@ const mocha = require('mocha');
 
 const expect = chai.expect;
 
-const { sample } = require('../data/generateTestData');
+const { sample, sineWave, write_to_csv } = require('../data/generateTestData');
 
 mocha.describe('Trying out mocha', () => {
 	mocha.it('should be able to compare two arrays', () => {
@@ -44,7 +44,8 @@ mocha.describe('The sample data generator', () => {
 // The sine wave function should work
 mocha.describe('The sine wave generator', () => {
 	mocha.it('can generate a simple sinewave', () => {
-		const simple_sinwave = [];
+		const simple_sinwave = sample(0, Math.PI, 1000).map(Math.sin);
+		const test_sinewave = sineWave(sample(0, Math.PI, 1000));
+		expect(simple_sinwave).to.deep.equal(test_sinewave);
 	});
 });
-// make sure we can write to a csv file
