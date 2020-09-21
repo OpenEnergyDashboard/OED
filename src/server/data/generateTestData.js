@@ -4,22 +4,13 @@
 
 var TWO_PI = Math.PI * 2;
 
-/* Test 1: Sine Function
- * We have a proper sin function
- */
-const test1 = (sin(0) == Math.sin(0)) && (sin(Math.PI * 2) == Math.sin(Math.PI * 2)) && (sin(Math.PI) == Math.sin(Math.PI))
-console.log(`Test 1: We should have a proper sin function: ${test1}`)
-
-/* Test 2: Sine Wave
- * We have a function that takes an array of numbers(x-values) and returns the value of the 
- * Sine wave on that numbers
- */
-const test2 = arraysMatch(sineWave([0]), [0].map(Math.sin)) && arraysMatch(sineWave([0, TWO_PI]), [0, TWO_PI].map(Math.sin))
-console.log(`Test 2: We should have a proper sine wave function: ${test2}`)
-
-/* Functions
- */
-
+// https://github.com/nodebox/g.js/blob/master/src/libraries/math.js#L315
+// https://itnext.io/heres-why-mapping-a-constructed-array-doesn-t-work-in-javascript-f1195138615a
+function sample(min, max, steps) {
+	const stepSize = (max - min) / steps;
+	const result = [...Array(steps + 1)].map((_, i) => min + i * stepSize);
+	return result;
+}
 /* A function that determines the value of sine at a given x-value
  */
 function sin(x, options = {}) {
@@ -33,23 +24,7 @@ function sineWave(array, options = {}) {
 	return array.map(Math.sin)
 }
 
-/* Testing functions
- */
-
-/* Compare if two arrays are equivalent
- * Taken from https://gomakethings.com/how-to-check-if-two-arrays-are-equal-with-vanilla-js/
- */
-function arraysMatch(arr1, arr2) {
-
-	// Check if the arrays are the same length
-	if (arr1.length !== arr2.length) return false;
-
-	// Check if all items exist and are in the same order
-	for (var i = 0; i < arr1.length; i++) {
-		if (arr1[i] !== arr2[i]) return false;
-	}
-
-	// Otherwise, return true
-	return true;
-
-};
+module.exports = {
+	sineWave,
+	sample
+}
