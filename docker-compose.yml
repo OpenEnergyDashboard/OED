@@ -69,5 +69,5 @@ services:
                     # We need the database and it has to be ready for work (see healthcheck above).
                 # condition: service_healthy
             # Lets docker-compose up work right
-        command: ["bash", "./src/scripts/installOED.sh"]
+        command: ["bash", "./src/scripts/installOED.sh", "${install_args}"]
         # Reverse proxy, for testing
