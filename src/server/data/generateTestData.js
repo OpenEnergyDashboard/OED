@@ -6,6 +6,7 @@
 const fs = require('fs');
 const stringify = require('csv-stringify');
 const _ = require('lodash');
+const moment = require('moment');
 
 var TWO_PI = Math.PI * 2;
 
@@ -66,7 +67,6 @@ function write_to_csv(data, filename = 'test.csv') {
  * account for day in period, percentage
  */
 function sectionInterval(array_from_start_to_end, period) {
-	let moment = 1;
 	let buffer = [];
 	const accumulator = [];
 	if (array_from_start_to_end.length === 0) {
@@ -77,16 +77,45 @@ function sectionInterval(array_from_start_to_end, period) {
 		if (periodReached(buffer, period)) {
 			accumulator.push(buffer);
 			buffer = [];
-			moment = 1;
 		} else if (idx === array_from_start_to_end.length - 1) {
 			accumulator.push(buffer);
 			return accumulator;
-		} else {
-			moment++;
 		}
-	})
+	});
 	function periodReached(buffer, period) {
 		return (buffer[buffer.length - 1] - buffer[0] + 1 === period);
+	}
+	return accumulator;
+}
+
+// chunk moments
+// we assume that the period is greater than the difference
+// between two consecutive moments
+// period in milliseconds
+function chunkMoments(array_of_moments, period) {
+	if (array_of_moments.length <= 1) {
+		return array_of_moments;
+	}
+	// initialize the buffer
+	let buffer = [array_of_moments[0]];
+	const moments = array_of_moments.slice(1);
+	const accumulator = [];
+	moments.forEach((element, idx) => {
+		if (exceedsPeriod(buffer[0], element)) {
+			// adding the next element would cause the
+			// period of the buffer to exceed the specified period
+			accumulator.push(buffer);
+			buffer = [element];
+		} else {
+			// adding next element is safe
+			buffer.push(element);
+		}
+		if (idx === moments.length - 1) {
+			accumulator.push(buffer);
+		}
+	});
+	function exceedsPeriod(startTime, endTime) {
+		return endTime.diff(startTime) - period > 0;
 	}
 	return accumulator;
 }
@@ -104,6 +133,7 @@ function sineOverEmbeddedPercentages(array_of_embedded_percentages) {
 }
 
 module.exports = {
+	chunkMoments,
 	sineWave,
 	sample,
 	sectionInterval,
