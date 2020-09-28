@@ -14,7 +14,7 @@ const mocha = require('mocha');
 
 const expect = chai.expect;
 
-const { sample, sineWave, write_to_csv } = require('../data/generateTestData');
+const { sample, sectionInterval, sineOverEmbeddedPercentages } = require('../data/generateTestData');
 
 mocha.describe('Trying out mocha', () => {
 	mocha.it('should be able to compare two arrays', () => {
@@ -41,11 +41,29 @@ mocha.describe('The sample data generator', () => {
 	});
 });
 
-// The sine wave function should work
-mocha.describe('The sine wave generator', () => {
-	mocha.it('can generate a simple sinewave', () => {
-		const simple_sinwave = sample(0, Math.PI, 1000).map(Math.sin);
-		const test_sinewave = sineWave(sample(0, Math.PI, 1000));
-		expect(simple_sinwave).to.deep.equal(test_sinewave);
+mocha.describe('The sectioning function', () => {
+	mocha.it('should cover the empty case', () => {
+		expect([]).to.deep.equal(sectionInterval([], 1));
+		// make a two-d-array, section off every periods worth until the end
 	});
-});
+	mocha.it('should be able to cover a simple single period', () => {
+		const array_to_section = [1, 2, 3];
+		expect([[1], [2], [3]]).to.deep.equal(sectionInterval(array_to_section, 1));
+	});
+	mocha.it('should be able to cover a simple double period', () => {
+		const array_to_section = [1, 2, 3, 4, 5, 6, 7, 8, 9];
+		console.log(sectionInterval(array_to_section, 2))
+		expect([[1, 2], [3, 4], [5, 6], [7, 8], [9]]).to.deep.equal(sectionInterval(array_to_section, 2));
+	});
+})
+
+mocha.describe('The sine percentage function', () => {
+	mocha.it('should cover the empty case', () => {
+		expect([]).to.deep.equal(sineOverEmbeddedPercentages([]));
+	});
+	mocha.it('should do the singleton case', () => {
+		const array_of_percentages = [[.1], [.2], [.3, .4]]
+		expect([Math.sin(.1 * 2 * Math.PI), Math.sin(.2 * 2 * Math.PI), Math.sin(.3 * 2 * Math.PI), Math.sin(.4 * 2 * Math.PI)])
+			.to.deep.equal(sineOverEmbeddedPercentages(array_of_percentages));
+	});
+})

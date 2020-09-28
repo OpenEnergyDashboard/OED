@@ -5,6 +5,7 @@
 //import
 const fs = require('fs');
 const stringify = require('csv-stringify');
+const _ = require('lodash');
 
 var TWO_PI = Math.PI * 2;
 
@@ -59,9 +60,54 @@ function write_to_csv(data, filename = 'test.csv') {
 	});
 }
 
+// we assume that the diff between consecutive array elements are equal
+/* Given an array of something creat
+ * Parameters: an array of moments, period
+ * account for day in period, percentage
+ */
+function sectionInterval(array_from_start_to_end, period) {
+	let moment = 1;
+	let buffer = [];
+	const accumulator = [];
+	if (array_from_start_to_end.length === 0) {
+		return [];
+	}
+	array_from_start_to_end.forEach((element, idx) => {
+		buffer.push(element);
+		if (periodReached(buffer, period)) {
+			accumulator.push(buffer);
+			buffer = [];
+			moment = 1;
+		} else if (idx === array_from_start_to_end.length - 1) {
+			accumulator.push(buffer);
+			return accumulator;
+		} else {
+			moment++;
+		}
+	})
+	function periodReached(buffer, period) {
+		return (buffer[buffer.length - 1] - buffer[0] + 1 === period);
+	}
+	return accumulator;
+}
+
+// apply the sin funciton on each percentaged moment
+function sineOverEmbeddedPercentages(array_of_embedded_percentages) {
+	if (array_of_embedded_percentages.length === 0) {
+		return [];
+	} else {
+		return _.flatten(array_of_embedded_percentages.map(array_of_percentages => (array_of_percentages.map(result))))
+	}
+	function result(percentage) {
+		return Math.sin(percentage * TWO_PI);
+	}
+}
+
 module.exports = {
 	sineWave,
 	sample,
+	sectionInterval,
+	sineOverEmbeddedPercentages,
 	waveGenerator,
 	write_to_csv,
 }
