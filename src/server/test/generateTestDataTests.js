@@ -14,7 +14,7 @@ const mocha = require('mocha');
 
 const expect = chai.expect;
 const moment = require('moment');
-const { chunkMoments, sample, sectionInterval, sineOverEmbeddedPercentages } = require('../data/generateTestData');
+const { chunkMoments, nested_moments, sample, sectionInterval, sineOverEmbeddedPercentages } = require('../data/generateTestData');
 
 mocha.describe('Trying out mocha', () => {
 	mocha.it('should be able to compare two arrays', () => {
@@ -101,5 +101,54 @@ mocha.describe('The moment chunk function', () => {
 			[moments[3], moments[4]],
 			[moments[5]]
 		]).to.deep.equal(chunkMoments(moments, milliseconds_diff));
+	})
+})
+
+mocha.describe('The nested moments generator', () => {
+	mocha.it('should be able to cover the empty case', () => {
+		expect([]).to.deep.equal(nested_moments([]))
+	});
+	mocha.it('should be able to cover the singleton case', () => {
+		const test = ['2019-09-10T00:00:14', '2019-09-10T00:00:15'];
+		const moments = test.map(time => [moment(time)]);
+		expect([
+			[1], [1]
+		]).to.deep.equal(nested_moments(moments))
+	});
+	mocha.it('should handle where each period has two datetimes', () => {
+		const milliseconds_diff = 15000;
+		const test = ['2019-09-10T00:00:15',
+			'2019-09-10T00:00:30', '2019-09-10T00:00:45', '2019-09-10T00:01:00',
+			'2019-09-10T00:01:15', '2019-09-10T00:01:30'];
+		const moments = chunkMoments(test.map(time => moment(time)), milliseconds_diff);
+		expect([
+			[0, 1],
+			[0, 1],
+			[0, 1]
+		]).to.deep.equals(nested_moments(moments));
+	});
+	mocha.it('should handle where each period has three datetimes', () => {
+		const milliseconds_diff = 30000;
+		const test = ['2019-09-10T00:00:15',
+			'2019-09-10T00:00:30', '2019-09-10T00:00:45', '2019-09-10T00:01:00',
+			'2019-09-10T00:01:15', '2019-09-10T00:01:30'];
+		const moments = chunkMoments(test.map(time => moment(time)), milliseconds_diff);
+		expect([
+			[0, 1 / 2, 1],
+			[0, 1 / 2, 1],
+		]).to.deep.equals(nested_moments(moments));
+	});
+	mocha.it('should handle where each period has a different number of datetimes', () => {
+		const milliseconds_diff = 15000;
+		const test = ['2019-09-10T00:00:15',
+			'2019-09-10T00:00:55', '2019-09-10T00:01:00',
+			'2019-09-10T00:01:10', '2019-09-10T00:01:30'];
+		const moments = chunkMoments(test.map(time => moment(time)), milliseconds_diff);
+		expect([
+			[1],
+			[0, 1 / 3, 1],
+			[1]
+		]).to.deep.equals(nested_moments(moments));
+
 	})
 })

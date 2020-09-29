@@ -119,6 +119,21 @@ function chunkMoments(array_of_moments, period) {
 	}
 	return accumulator;
 }
+// convert moments into percentages
+// https://stackoverflow.com/questions/18960327/javascript-moment-js-calculate-percentage-between-two-dates
+// we assume that the first moment of the first subarray in the moments_array
+// is the date of the entire period
+function nested_moments(moments_array, period = 0) {
+	if (moments_array.length === 0)
+		return [];
+	const moments_into_percentages = moments_array.map(moments => {
+		const startDate = moments[0];
+		const endDate = moments[moments.length - 1];
+		// inaccurate when array is not properly aligned or diff'd
+		return moments.map(single_moment => (single_moment - startDate) / (endDate - startDate))
+	})
+	return moments_into_percentages;
+}
 
 // apply the sin funciton on each percentaged moment
 function sineOverEmbeddedPercentages(array_of_embedded_percentages) {
@@ -134,6 +149,7 @@ function sineOverEmbeddedPercentages(array_of_embedded_percentages) {
 
 module.exports = {
 	chunkMoments,
+	nested_moments,
 	sineWave,
 	sample,
 	sectionInterval,
