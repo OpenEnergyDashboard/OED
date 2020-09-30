@@ -9,19 +9,23 @@
  * library Chai.
  */
 
+const _ = require('lodash');
 const chai = require('chai');
 const mocha = require('mocha');
 
 const expect = chai.expect;
 const moment = require('moment');
 const {
+	_period_of_moments_to_portion,
 	bin_moments,
 	chunkMoments,
 	generateDates,
 	nested_moments,
 	sample,
 	sectionInterval,
-	sineOverEmbeddedPercentages } = require('../data/generateTestData');
+	sineOverEmbeddedPercentages,
+	momenting,
+	write_to_csv } = require('../data/generateTestData');
 
 mocha.describe('Trying out mocha', () => {
 	mocha.it('should be able to compare two arrays', () => {
@@ -165,7 +169,7 @@ mocha.describe('The nested moments generator', () => {
 	});
 });
 
-mocha.describe('The generateDates function should', () => {
+mocha.describe('The generateDates function', () => {
 	mocha.it('should be able to generate one date', () => {
 		const date = '2019-09-10 00:00:15';
 		expect([date]).to.deep.equals(generateDates(date, date));
@@ -177,3 +181,59 @@ mocha.describe('The generateDates function should', () => {
 		expect([startDate, endDate]).to.deep.equals(generateDates(startDate, endDate));
 	})
 })
+
+mocha.describe('Converting periods of moments to percentages', () => {
+	mocha.it('should cover the simple singleton case', () => {
+		const date = '2019-09-10 00:00:15';
+		const period_of_moments = [moment(date)]
+		expect([1]).to.deep.equals(_period_of_moments_to_portion(period_of_moments))
+	});
+	mocha.it('should cover a simple two case', () => {
+		const startMoment = moment('2019-09-10 00:00:15');
+		const time_step_ms = 15000;
+		expect([0, 1]).to.deep.equals(_period_of_moments_to_portion([startMoment, startMoment.clone().add(time_step_ms)]));
+	});
+	mocha.it('should cover a simple two case where the startTime is not in the period', () => {
+		const startMoment = moment('2019-09-10 00:00:15');
+		const time_step_ms = 15000;
+		const test = [
+			startMoment.clone().add(time_step_ms),
+			startMoment.clone().add(time_step_ms * 2)
+		]
+		expect([.5, 1]).to.deep.equals(_period_of_moments_to_portion(test, startMoment));
+	});
+});
+
+mocha.describe('momenting', () => {
+	mocha.it('should cover the simple singleton case', () => {
+		const date = '2019-09-10 00:00:15';
+		const period_of_moments = [moment(date)]
+		expect([1]).to.deep.equals(momenting(period_of_moments))
+	});
+	mocha.it('should cover a simple two case', () => {
+		const startMoment = moment('2019-09-10 00:00:15');
+		const time_step_ms = 15000;
+		expect([0, 1]).to.deep.equals(momenting([startMoment, startMoment.clone().add(time_step_ms)], time_step_ms));
+	});
+	mocha.it('should cover the a skipped datetime', () => {
+		const test = ['2019-09-10T00:00:15',
+			'2019-09-10T00:00:30', '2019-09-10T00:01:00'];
+		const time_step_ms = 15000;
+		expect(momenting(test.map(time_stamp => moment(time_stamp)), time_step_ms)).to.deep.equals([0, 1, 1]);
+	});
+	mocha.it('should work on irregular timesteps', () => {
+		const test = ['2019-09-10T00:00:15',
+			'2019-09-10T00:00:30', '2019-09-10T00:00:50'];
+		const time_step_ms = 15000;
+		expect(momenting(test.map(time_stamp => moment(time_stamp)), time_step_ms)).to.deep.equals([0, 1, 5 / 15]);
+	});
+	mocha.it('should work over a large set', () => {
+		const dates = generateDates('2019-09-30 01:00:00', '2019-09-30 02:00:00', 1000);
+		const dates_as_moments = dates.map(date => moment(date));
+		const period_length = 15000;
+		const sineValues = (momenting(dates_as_moments, period_length)).map(x => Math.sin(Math.PI * 2 * x));
+		console.log(_.zip(dates, sineValues));
+		write_to_csv(_.zip(dates, sineValues));
+	});
+
+});

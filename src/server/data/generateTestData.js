@@ -141,16 +141,42 @@ function nested_moments(moments_array, period = 0) {
 		return moments.map(single_moment => moment_percentage(startDate, endDate, single_moment))
 	})
 
-	// https://stackoverflow.com/questions/18960327/javascript-moment-js-calculate-percentage-between-two-dates
-	// Determine what percentage of elapsed time passed 
-	// that is at what percentage if the moment between startTime 
-	// and endTime.
-	// Parameters are all moment objects
-	// startTime <= moment <= endTime
-	function moment_percentage(startTime, endTime, moment) {
-		return (moment - startTime) / (endTime - startTime);
-	}
 	return moments_into_percentages;
+}
+
+// https://stackoverflow.com/questions/18960327/javascript-moment-js-calculate-percentage-between-two-dates
+// Determine what percentage of elapsed time passed 
+// that is at what percentage if the moment between startTime 
+// and endTime.
+// Parameters are all moment objects
+// startTime < endTime
+// startTime <= moment
+function moment_percentage(startTime, endTime, moment) {
+	if (endTime - startTime <= 0) return 1;
+	return (moment - startTime) / (endTime - startTime);
+}
+
+function _period_of_moments_to_portion(array_of_moments, start = null, end = null) {
+	if (array_of_moments.length == 1) return [1]
+	const startMoment = start || array_of_moments[0];
+	const endMoment = end || array_of_moments[array_of_moments.length - 1];
+	const result = [];
+	array_of_moments.forEach(moment => result.push(
+		moment_percentage(startMoment, endMoment, moment)));
+	return result;
+}
+// main
+function momenting(array_of_moments, period_length) {
+	const startMoment = array_of_moments[0];
+	const endMoment = startMoment.clone().add(period_length);
+	const result = array_of_moments.map(moment => {
+		while (moment.isAfter(endMoment)) {
+			startMoment.add(period_length);
+			endMoment.add(period_length);
+		}
+		return (moment_percentage(startMoment, endMoment, moment))
+	});
+	return result;
 }
 
 // apply the sin funciton on each percentaged moment
@@ -171,6 +197,7 @@ function sineOverEmbeddedPercentages(array_of_embedded_percentages) {
 // endDate is an upperbound
 // if we lose one day it is okay since we would have many days
 // timeStep is in milliseconds
+// timeStep needs to be at least 1 second
 function generateDates(startDate, endDate, timeStep = 15000) {
 	const array_of_moments = [];
 	const startMoment = moment(startDate);
@@ -193,4 +220,6 @@ module.exports = {
 	sineOverEmbeddedPercentages,
 	waveGenerator,
 	write_to_csv,
+	_period_of_moments_to_portion,
+	momenting
 }
