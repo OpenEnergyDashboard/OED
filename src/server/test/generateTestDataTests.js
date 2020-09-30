@@ -14,7 +14,14 @@ const mocha = require('mocha');
 
 const expect = chai.expect;
 const moment = require('moment');
-const { chunkMoments, nested_moments, sample, sectionInterval, sineOverEmbeddedPercentages } = require('../data/generateTestData');
+const {
+	bin_moments,
+	chunkMoments,
+	generateDates,
+	nested_moments,
+	sample,
+	sectionInterval,
+	sineOverEmbeddedPercentages } = require('../data/generateTestData');
 
 mocha.describe('Trying out mocha', () => {
 	mocha.it('should be able to compare two arrays', () => {
@@ -54,7 +61,7 @@ mocha.describe('The sectioning function', () => {
 		const array_to_section = [1, 2, 3, 4, 5, 6, 7, 8, 9];
 		expect([[1, 2], [3, 4], [5, 6], [7, 8], [9]]).to.deep.equal(sectionInterval(array_to_section, 2));
 	});
-})
+});
 
 mocha.describe('The sine percentage function', () => {
 	mocha.it('should cover the empty case', () => {
@@ -65,7 +72,7 @@ mocha.describe('The sine percentage function', () => {
 		expect([Math.sin(.1 * 2 * Math.PI), Math.sin(.2 * 2 * Math.PI), Math.sin(.3 * 2 * Math.PI), Math.sin(.4 * 2 * Math.PI)])
 			.to.deep.equal(sineOverEmbeddedPercentages(array_of_percentages));
 	});
-})
+});
 
 mocha.describe('The moment chunk function', () => {
 	mocha.it('should cover the empty case', () => {
@@ -101,8 +108,14 @@ mocha.describe('The moment chunk function', () => {
 			[moments[3], moments[4]],
 			[moments[5]]
 		]).to.deep.equal(chunkMoments(moments, milliseconds_diff));
-	})
-})
+	});
+});
+
+mocha.describe('The bin_moments function', () => {
+	mocha.it('should be able to cover the empty case', () => {
+		expect([]).to.deep.equal(bin_moments([]));
+	});
+});
 
 mocha.describe('The nested moments generator', () => {
 	mocha.it('should be able to cover the empty case', () => {
@@ -149,6 +162,18 @@ mocha.describe('The nested moments generator', () => {
 			[0, 1 / 3, 1],
 			[1]
 		]).to.deep.equals(nested_moments(moments));
+	});
+});
 
+mocha.describe('The generateDates function should', () => {
+	mocha.it('should be able to generate one date', () => {
+		const date = '2019-09-10 00:00:15';
+		expect([date]).to.deep.equals(generateDates(date, date));
+	});
+	mocha.it('should be able to generate two dates at 15000 ms a part', () => {
+		const startDate = "2019-09-10 00:00:15";
+		const endDate = "2019-09-10 00:00:30";
+		const time_step_ms = 15000;
+		expect([startDate, endDate]).to.deep.equals(generateDates(startDate, endDate));
 	})
 })

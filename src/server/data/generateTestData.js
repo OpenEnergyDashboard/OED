@@ -119,6 +119,13 @@ function chunkMoments(array_of_moments, period) {
 	}
 	return accumulator;
 }
+
+// should bin moments
+// i.e. 00:00, 00:15, 00:30 for 00:15 => 00:00, 00:15
+function bin_moments(moments_array, period) {
+	if (moments_array.length < 1) return moments_array;
+}
+
 // convert moments into percentages
 // we assume that the first moment of the first subarray in the moments_array
 // is the date of the entire period
@@ -158,8 +165,27 @@ function sineOverEmbeddedPercentages(array_of_embedded_percentages) {
 	}
 }
 
+// expect startDate,endDate  
+// may not necessarily include endDate depending on the timestep
+// output format will be YYYY-MM-DD HH:MM:SS
+// endDate is an upperbound
+// if we lose one day it is okay since we would have many days
+// timeStep is in milliseconds
+function generateDates(startDate, endDate, timeStep = 15000) {
+	const array_of_moments = [];
+	const startMoment = moment(startDate);
+	const endMoment = moment(endDate);
+	const temp = startMoment.clone();
+	while (!temp.isAfter(endMoment)) {
+		array_of_moments.push(temp.clone());
+		temp.add(timeStep);
+	}
+	return array_of_moments.map(moment => moment.format('YYYY-MM-DD HH:mm:ss').toString())
+}
 module.exports = {
+	bin_moments,
 	chunkMoments,
+	generateDates,
 	nested_moments,
 	sineWave,
 	sample,
