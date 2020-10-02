@@ -101,7 +101,7 @@ function isEpsilon(number) {
  * Generates sine data over a period of time. By default the timeStep is 1 day 
  * and the peiord_length is one day.
  */
-function _generateSineData(startTimeStamp, endTimeStamp, options = { timeStep: { day: 1 }, period_length: { day: 1 } }) {
+function _generateSineData(startTimeStamp, endTimeStamp, options = { timeStep: { hour: 12 }, period_length: { day: 1 } }) {
 	const defaultOptions = {
 		timeStep: { day: 1 },
 		period_length: { day: 1 },
@@ -120,7 +120,7 @@ function _generateSineData(startTimeStamp, endTimeStamp, options = { timeStep: {
 /** data needs to be of form
  * 
  * [
- * [...row],
+ * [...row]_generateSineData(startTimeStamp, endTimeStamp),
  * [...row],
  * [...row],
  * 
@@ -142,8 +142,21 @@ function write_to_csv(data, filename = 'test.csv') {
 	});
 }
 
+/**
+ * 
+ * @param {String} startTimeStamp 
+ * @param {String} endTimeStamp 
+ * @param {Object} options 
+ * 
+ * Creates a csv with sine data 
+ */
+function generateSine(startTimeStamp, endTimeStamp, options = { timeStep: { hour: 12 }, period: { day: 1 } }) {
+	write_to_csv(_generateSineData(startTimeStamp, endTimeStamp, options));
+}
+
 module.exports = {
 	generateDates,
+	generateSine,
 	write_to_csv,
 	momenting,
 	_generateSineData

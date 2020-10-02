@@ -82,7 +82,7 @@ mocha.describe('Generate sinewave helper', () => {
     mocha.it('should be able to generate data for simply one day', () => {
         const startTimeStamp = '2019-09-10 00:00:00';
         const endTimeStamp = '2019-09-11 00:00:00'
-        expect(_generateSineData(startTimeStamp, endTimeStamp)).to.deep.equals([[startTimeStamp, 0], [endTimeStamp, 0]]);
+        expect(_generateSineData(startTimeStamp, endTimeStamp, { timeStep: { day: 1 } })).to.deep.equals([[startTimeStamp, 0], [endTimeStamp, 0]]);
     });
     mocha.it('should be able to generate data for half a day', () => {
         const startTimeStamp = '2019-09-10 00:00:00';
