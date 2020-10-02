@@ -1,239 +1,92 @@
 /*
- * This Source Code Form is subject to the terms of the Mozilla Public
- * License, v. 2.0. If a copy of the MPL was not distributed with this
- * file, You can obtain one at http://mozilla.org/MPL/2.0/.
+ * this source code form is subject to the terms of the mozilla public
+ * license, v. 2.0. if a copy of the mpl was not distributed with this
+ * file, you can obtain one at http://mozilla.org/mpl/2.0/.
  */
 
 /*
- * Imports. We use the testing TDD testing framework Mocha and the assertion
- * library Chai.
+ * imports. we use the testing tdd testing framework mocha and the assertion
+ * library chai.
  */
 
 const _ = require('lodash');
 const chai = require('chai');
 const mocha = require('mocha');
-
 const expect = chai.expect;
 const moment = require('moment');
+
 const {
-	_period_of_moments_to_portion,
-	bin_moments,
-	chunkMoments,
-	generateDates,
-	nested_moments,
-	sample,
-	sectionInterval,
-	sineOverEmbeddedPercentages,
-	momenting,
-	write_to_csv } = require('../data/generateTestData');
-
-mocha.describe('Trying out mocha', () => {
-	mocha.it('should be able to compare two arrays', () => {
-		const test_array = [0, 1];
-		expect(test_array).deep.to.equal([0, 1]);
-	});
-});
-
-// Generate a simple set of numbers
-mocha.describe('The sample data generator', () => {
-	mocha.it('should be able to generate a simple array from 1 to 100 with step 1', () => {
-		// https://stackoverflow.com/questions/3746725/how-to-create-an-array-containing-1-n
-		const one_to_hundred = Array.from({ length: 100 }, (_, i) => i + 1);
-		const sample_array = sample(1, 100, 99);
-		expect(one_to_hundred).to.deep.equal(sample_array);
-	});
-	mocha.it('should be able to generate an array with .2 stepSize', () => {
-		const test = [];
-		for (i = 0; i <= 100; i++) {
-			test[i] = i * .2 + 0;
-		}
-		const sample_array = sample(0, 20, 100);
-		expect(test).to.deep.equal(sample_array);
-	});
-});
-
-mocha.describe('The sectioning function', () => {
-	mocha.it('should cover the empty case', () => {
-		expect([]).to.deep.equal(sectionInterval([], 1));
-		// make a two-d-array, section off every periods worth until the end
-	});
-	mocha.it('should be able to cover a simple single period', () => {
-		const array_to_section = [1, 2, 3];
-		expect([[1], [2], [3]]).to.deep.equal(sectionInterval(array_to_section, 1));
-	});
-	mocha.it('should be able to cover a simple double period', () => {
-		const array_to_section = [1, 2, 3, 4, 5, 6, 7, 8, 9];
-		expect([[1, 2], [3, 4], [5, 6], [7, 8], [9]]).to.deep.equal(sectionInterval(array_to_section, 2));
-	});
-});
-
-mocha.describe('The sine percentage function', () => {
-	mocha.it('should cover the empty case', () => {
-		expect([]).to.deep.equal(sineOverEmbeddedPercentages([]));
-	});
-	mocha.it('should do the singleton case', () => {
-		const array_of_percentages = [[.1], [.2], [.3, .4]]
-		expect([Math.sin(.1 * 2 * Math.PI), Math.sin(.2 * 2 * Math.PI), Math.sin(.3 * 2 * Math.PI), Math.sin(.4 * 2 * Math.PI)])
-			.to.deep.equal(sineOverEmbeddedPercentages(array_of_percentages));
-	});
-});
-
-mocha.describe('The moment chunk function', () => {
-	mocha.it('should cover the empty case', () => {
-		expect([]).to.deep.equal(chunkMoments([]));
-	});
-	mocha.it('should be able to chunk a single day', () => {
-		const milliseconds_in_day = 86400000;
-		const start = '2019-09-10';
-		const end = '2019-09-11';
-		const test = [moment(start), moment(end)];
-		expect([[test[0], test[1]]]).to.deep.equal(chunkMoments(test, milliseconds_in_day));
-	});
-	mocha.it('should be able to chunk 15 seconds', () => {
-		const milliseconds_diff = 15000;
-		const test = ['2019-09-10T00:00:15',
-			'2019-09-10T00:00:30', '2019-09-10T00:00:45', '2019-09-10T00:01:00', '2019-09-10T00:01:15'];
-		const moments = test.map(time => moment(time));
-		expect([
-			[moments[0], moments[1]],
-			[moments[2], moments[3]],
-			[moments[4]]
-		]).to.deep.equal(chunkMoments(moments, milliseconds_diff));
-	});
-	mocha.it('should be able to chunk 15 seconds properly if the moments don\'t step by 15 seconds', () => {
-		const milliseconds_diff = 15000;
-		const test = ['2019-09-10T00:00:14',
-			'2019-09-10T00:00:30', '2019-09-10T00:00:45', '2019-09-10T00:01:00',
-			'2019-09-10T00:01:14', '2019-09-10T00:01:40'];
-		const moments = test.map(time => moment(time));
-		expect([
-			[moments[0]],
-			[moments[1], moments[2]],
-			[moments[3], moments[4]],
-			[moments[5]]
-		]).to.deep.equal(chunkMoments(moments, milliseconds_diff));
-	});
-});
-
-mocha.describe('The bin_moments function', () => {
-	mocha.it('should be able to cover the empty case', () => {
-		expect([]).to.deep.equal(bin_moments([]));
-	});
-});
-
-mocha.describe('The nested moments generator', () => {
-	mocha.it('should be able to cover the empty case', () => {
-		expect([]).to.deep.equal(nested_moments([]))
-	});
-	mocha.it('should be able to cover the singleton case', () => {
-		const test = ['2019-09-10T00:00:14', '2019-09-10T00:00:15'];
-		const moments = test.map(time => [moment(time)]);
-		expect([
-			[1], [1]
-		]).to.deep.equal(nested_moments(moments))
-	});
-	mocha.it('should handle where each period has two datetimes', () => {
-		const milliseconds_diff = 15000;
-		const test = ['2019-09-10T00:00:15',
-			'2019-09-10T00:00:30', '2019-09-10T00:00:45', '2019-09-10T00:01:00',
-			'2019-09-10T00:01:15', '2019-09-10T00:01:30'];
-		const moments = chunkMoments(test.map(time => moment(time)), milliseconds_diff);
-		expect([
-			[0, 1],
-			[0, 1],
-			[0, 1]
-		]).to.deep.equals(nested_moments(moments));
-	});
-	mocha.it('should handle where each period has three datetimes', () => {
-		const milliseconds_diff = 30000;
-		const test = ['2019-09-10T00:00:15',
-			'2019-09-10T00:00:30', '2019-09-10T00:00:45', '2019-09-10T00:01:00',
-			'2019-09-10T00:01:15', '2019-09-10T00:01:30'];
-		const moments = chunkMoments(test.map(time => moment(time)), milliseconds_diff);
-		expect([
-			[0, 1 / 2, 1],
-			[0, 1 / 2, 1],
-		]).to.deep.equals(nested_moments(moments));
-	});
-	mocha.it('should handle where each period has a different number of datetimes', () => {
-		const milliseconds_diff = 15000;
-		const test = ['2019-09-10T00:00:15',
-			'2019-09-10T00:00:55', '2019-09-10T00:01:00',
-			'2019-09-10T00:01:10', '2019-09-10T00:01:30'];
-		const moments = chunkMoments(test.map(time => moment(time)), milliseconds_diff);
-		expect([
-			[1],
-			[0, 1 / 3, 1],
-			[1]
-		]).to.deep.equals(nested_moments(moments));
-	});
-});
+    _generateSineData,
+    momenting,
+    generateDates,
+} = require('../data/generateTestData');
 
 mocha.describe('The generateDates function', () => {
-	mocha.it('should be able to generate one date', () => {
-		const date = '2019-09-10 00:00:15';
-		expect([date]).to.deep.equals(generateDates(date, date));
-	});
-	mocha.it('should be able to generate two dates at 15000 ms a part', () => {
-		const startDate = "2019-09-10 00:00:15";
-		const endDate = "2019-09-10 00:00:30";
-		const time_step_ms = 15000;
-		expect([startDate, endDate]).to.deep.equals(generateDates(startDate, endDate));
-	})
-})
-
-mocha.describe('Converting periods of moments to percentages', () => {
-	mocha.it('should cover the simple singleton case', () => {
-		const date = '2019-09-10 00:00:15';
-		const period_of_moments = [moment(date)]
-		expect([1]).to.deep.equals(_period_of_moments_to_portion(period_of_moments))
-	});
-	mocha.it('should cover a simple two case', () => {
-		const startMoment = moment('2019-09-10 00:00:15');
-		const time_step_ms = 15000;
-		expect([0, 1]).to.deep.equals(_period_of_moments_to_portion([startMoment, startMoment.clone().add(time_step_ms)]));
-	});
-	mocha.it('should cover a simple two case where the startTime is not in the period', () => {
-		const startMoment = moment('2019-09-10 00:00:15');
-		const time_step_ms = 15000;
-		const test = [
-			startMoment.clone().add(time_step_ms),
-			startMoment.clone().add(time_step_ms * 2)
-		]
-		expect([.5, 1]).to.deep.equals(_period_of_moments_to_portion(test, startMoment));
-	});
+    mocha.it('should exist.', () => {
+        expect(typeof (generateDates)).to.equal('function');
+    });
+    mocha.it('should be able to generate dates at different time steps.', () => {
+        const startTimeStamp = '2020-10-01 21:00:00';
+        const endTimeStamp = '2020-10-02 21:00:00';
+        const timeStep = { days: 1 };
+        expect(generateDates(startTimeStamp, endTimeStamp, timeStep)).to.deep.equal(
+            [startTimeStamp, endTimeStamp]
+        );
+    });
+    mocha.it('should be able to generate dates at a time step 15 seconds', () => {
+        const startTimeStamp = '2020-10-01 21:00:00';
+        const endTimeStamp = '2020-10-02 21:00:00';
+        const timeStep = { hour: 1 };
+        const startMoment = moment(startTimeStamp);
+        const endMoment = moment(endTimeStamp);
+        const result = [];
+        while (!startMoment.isAfter(endMoment)) {
+            result.push(startMoment.format('YYYY-MM-DD HH:mm:ss'));
+            startMoment.add(timeStep);
+        }
+        expect(generateDates(startTimeStamp, endTimeStamp, timeStep)).to.deep.equal(
+            result
+        );
+    });
 });
 
 mocha.describe('momenting', () => {
-	mocha.it('should cover the simple singleton case', () => {
-		const date = '2019-09-10 00:00:15';
-		const period_of_moments = [moment(date)]
-		expect([1]).to.deep.equals(momenting(period_of_moments))
-	});
-	mocha.it('should cover a simple two case', () => {
-		const startMoment = moment('2019-09-10 00:00:15');
-		const time_step_ms = 15000;
-		expect([0, 1]).to.deep.equals(momenting([startMoment, startMoment.clone().add(time_step_ms)], time_step_ms));
-	});
-	mocha.it('should cover the a skipped datetime', () => {
-		const test = ['2019-09-10T00:00:15',
-			'2019-09-10T00:00:30', '2019-09-10T00:01:00'];
-		const time_step_ms = 15000;
-		expect(momenting(test.map(time_stamp => moment(time_stamp)), time_step_ms)).to.deep.equals([0, 1, 1]);
-	});
-	mocha.it('should work on irregular timesteps', () => {
-		const test = ['2019-09-10T00:00:15',
-			'2019-09-10T00:00:30', '2019-09-10T00:00:50'];
-		const time_step_ms = 15000;
-		expect(momenting(test.map(time_stamp => moment(time_stamp)), time_step_ms)).to.deep.equals([0, 1, 5 / 15]);
-	});
-	mocha.it('should work over a large set', () => {
-		const dates = generateDates('2019-09-30 01:00:00', '2019-09-30 02:00:00', 1000);
-		const dates_as_moments = dates.map(date => moment(date));
-		const period_length = 15000;
-		const sineValues = (momenting(dates_as_moments, period_length)).map(x => Math.sin(Math.PI * 2 * x));
-		console.log(_.zip(dates, sineValues));
-		write_to_csv(_.zip(dates, sineValues));
-	});
+    mocha.it('should cover the simple singleton case', () => {
+        const date = '2019-09-10 00:00:15';
+        const period_of_moments = [moment(date)]
+        expect([1]).to.deep.equals(momenting(period_of_moments))
+    });
+    mocha.it('should cover a simple two case', () => {
+        const startMoment = moment('2019-09-10 00:00:15');
+        const time_step_ms = 15000;
+        expect([0, 1]).to.deep.equals(momenting([startMoment, startMoment.clone().add(time_step_ms)], time_step_ms));
+    });
+    mocha.it('should cover the a skipped datetime', () => {
+        const test = ['2019-09-10T00:00:15',
+            '2019-09-10T00:00:30', '2019-09-10T00:01:00'];
+        const time_step_ms = 15000;
+        expect(momenting(test.map(time_stamp => moment(time_stamp)), time_step_ms)).to.deep.equals([0, 1, 1]);
+    });
+    mocha.it('should work on irregular timesteps', () => {
+        const test = ['2019-09-10T00:00:15',
+            '2019-09-10T00:00:30', '2019-09-10T00:00:50'];
+        const time_step_ms = 15000;
+        expect(momenting(test.map(time_stamp => moment(time_stamp)), time_step_ms)).to.deep.equals([0, 1, 5 / 15]);
+    });
+});
 
+mocha.describe('Generate sinewave helper', () => {
+    mocha.it('should exist', () => {
+        expect(typeof (_generateSineData)).to.equal('function');
+    });
+    mocha.it('should be able to generate data for simply one day', () => {
+        const startTimeStamp = '2019-09-10 00:00:00';
+        const endTimeStamp = '2019-09-11 00:00:00'
+        expect(_generateSineData(startTimeStamp, endTimeStamp, { timeStep: { day: 1 } })).to.deep.equals([[startTimeStamp, 0], [endTimeStamp, 0]]);
+    });
+    mocha.it('should be able to generate data for half a day', () => {
+        const startTimeStamp = '2019-09-10 00:00:00';
+        const endTimeStamp = '2019-09-11 00:00:00'
+        expect(_generateSineData(startTimeStamp, endTimeStamp, { timeStep: { hour: 12 } })).to.deep.equals([[startTimeStamp, 0], ['2019-09-10 12:00:00', 0], [endTimeStamp, 0]]);
+    })
 });
