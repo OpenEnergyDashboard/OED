@@ -31,7 +31,12 @@ while test $# -gt 0; do
 			shift
 			continue_on_db_error=yes
 			;;
+		"")
+			# Empty string so just ignore. Esp. happens if no install_args on docker-compose up.
+			shift
+			;;
 		*)
+			printf "Unknown argument \"%s\"\n" $1
 			printf "%s\n" $USAGE
 			exit 1
 	esac
