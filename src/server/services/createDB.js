@@ -51,7 +51,6 @@ const { getConnection, dropConnection } = require('../db');
 		log.info('Schema created', null, true);
 		process.exitCode = 0;
 	} catch (err) {
-		// Should we really catch all errors and then allow the code to continue?? TODO
 		console.log(`DEBUG: in err clause createSchema in createDB.js with err/stack: ${err.stack}: end err/stack`);
 		log.error(`Error creating schema: ${err}`, err, skipMail = true);
 		process.exitCode = 1;
