@@ -48,7 +48,7 @@ const { getConnection, dropConnection } = require('../db');
 		console.log("DEBUG: begin createSchema in createDB.js");
 		await createSchema(conn);
 		console.log("DEBUG: finish createSchema in createDB.js");
-		log.info('Schema created', skipMail = true);
+		log.info('Schema created', null, true);
 		process.exitCode = 0;
 	} catch (err) {
 		// Should we really catch all errors and then allow the code to continue?? TODO
