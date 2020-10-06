@@ -19,6 +19,7 @@ let connmanager = {
  * Reuses an existing connection pool if one is available.
  */
 function getConnection() {
+	// console.log("at start of getConnection()");
 	if (connmanager.config === null) {
 		// console.log("DEBUG: getConnection has null config");
 		connmanager.config = config.database;
@@ -39,17 +40,38 @@ function getConnection() {
  * New calls to getConnection() will use a new connection pool.
  */
 function dropConnection() {
-	console.log("DEBUG: in dropConnection");
+	// console.log("DEBUG: in dropConnection");
 	connmanager.config = null;
 	connmanager.connection = null;
 	stopDB();
 }
 
 /**
+ * Drop the current connmanager.connection. Unlike dropConnection() it
+ * should not disconnect other connections.
+ */
+function dropCurrentConnection() {
+	// console.log("DEBUG: in dropCurrentConnection");
+	if (connmanager.connection !== null) {
+		// Disconnect this specific connection.
+		// console.log("DEBUG: before poll.end in dropCurrentConnection");
+		connmanager.connection.$pool.end();
+	}
+	connmanager.config = null;
+	connmanager.connection = null;
+}
+
+/**
  * Swaps the connection to the database with a new connection and config.
  */
 function swapConnection(newConfig, newConnection) {
-	dropConnection();
+	// console.log("DEBUG: connmanager.connection", connmanager.connection);
+	// This used to call dropConnection but that removes all connections to DB
+	// including the one you are about to swap in so it failed.
+	// When this is called by connectTestDB(), the connection is still null so
+	// this really isn't needed but do to be extra safe and consistent with other code
+	// and in case it is used somewhere else.
+	dropCurrentConnection();
 	connmanager.config = newConfig;
 	if (newConnection !== null) {
 		connmanager.connection = newConnection;
