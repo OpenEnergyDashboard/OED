@@ -71,6 +71,11 @@ max_tries=10
 
 # Try to create the schema until it succeeds
 while [ $create_error == 0 ]; do
+	# See if exceed allowed number of tries and stop install if you have.
+	if [ $tries -ge $max_tries ]; then
+		printf "%s\n" "FAILED! Too many tries. Try again but then check if your database at $OED_DB_HOST:$OED_DB_PORT is down."
+		exit 1
+	fi
     # Sleep to let PostgreSQL chill out
     sleep 1
     printf "%s\n" "Attempting to create database."
@@ -106,20 +111,31 @@ while [ $create_error == 0 ]; do
 		create_error=1
 		printf "%s\n" "  database creation had no errors so assume schema creation worked."
 	fi
-
-	# Check loop runtime
+	# Did one more attempt
 	((tries=tries+1))
-	if [ $tries -ge $max_tries ]; then
-		printf "%s\n" "FAILED! Too many tries. Try again but then check if your database at $OED_DB_HOST:$OED_DB_PORT is down."
-		exit 1
-	fi
 done
 
 # Create a user
 set -e
 if [ "$production" == "no" ] && [ ! "$OED_PRODUCTION" == "yes" ]; then
     npm run createUser -- test@example.com password
-	printf "%s\n" "Created development user 'test@example.com' with password 'password'"
+	createuser_code=$?
+	if [ $createuser_code_code -ne 0 ]; then
+		# There was an error so stop process unless asked to continue on DB issues.
+		if [ "$continue_on_db_error" = "no" ]; then
+			# We should stop the install process. This means it won't try to bring up the web service.
+			printf "%s\n" "FAILURE: creation of user failed so stopping install. Use --continue_on_db_error if you want install to continue"
+			exit 4
+		else
+			printf "\n%s\n" "WARNING: an unknown error occurred during user creation."
+			printf "%s\n" "The validity of the database and test user is uncertain."
+			printf "%s\n" "Install continuing because of flag --continue_on_db_error"
+		fi
+	else
+		# There was no createdb error so assume database ready for use so stop process
+		printf "%s\n" "User creation had no errors so default user 'test@example.com' with password 'password' should exist"
+	fi
+
 fi
 
 # Build webpack if needed
