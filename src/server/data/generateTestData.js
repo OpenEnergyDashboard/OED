@@ -22,9 +22,6 @@ const stringify = require('csv-stringify');
 const _ = require('lodash');
 const moment = require('moment');
 
-// Global Constants
-var TWO_PI = Math.PI * 2;
-
 // SHL: I'm an advocate for big picture comments on how the software features are designed to work.
 // This would be the overall design and why it works. I think that helps a lot in understanding what 
 // is being done. This is not a requirement and could be a separate document if appropriate.
