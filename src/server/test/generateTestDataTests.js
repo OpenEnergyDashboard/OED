@@ -41,7 +41,7 @@ mocha.describe('The generateDates function', () => {
     mocha.it('should be able to generate dates at a time step 15 seconds', () => {
         const startTimeStamp = '2020-10-01 21:00:00';
         const endTimeStamp = '2020-10-02 21:00:00';
-        const timeStep = { hour: 1 };
+        const timeStep = { second: 15 };
         const startMoment = moment(startTimeStamp);
         const endMoment = moment(endTimeStamp);
         const result = [];
@@ -107,7 +107,6 @@ mocha.describe('Generate Sinewave', () => {
         // https://stackabuse.com/reading-and-writing-csv-files-in-nodejs-with-node-csv/
         const dataFromFile = await fs.readFile(`${__dirname}/${filename}`);
         const records = await parseCsv(dataFromFile);
-        console.log(records)
 
         expect(records).to.deep.equal(data);
     });
