@@ -61,7 +61,7 @@ mocha.describe('momenting', () => {
         const period_of_moments = [moment(date)]
         expect([1]).to.deep.equals(momenting(period_of_moments))
     });
-    mocha.it('should cover a simple two case', () => {
+    mocha.it('should be able to partition an array with just two elements', () => {
         const startMoment = moment('2019-09-10 00:00:15');
         const time_step_ms = 15000;
         expect([0, 1]).to.deep.equals(momenting([startMoment, startMoment.clone().add(time_step_ms)], time_step_ms));
