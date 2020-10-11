@@ -13,9 +13,6 @@
 
 // SHL: I think this should be TypeScript with added types.
 
-// SHL: I don't see where this might allow making the value not be -1 to 1.
-// Meter data generally goes from 0 to some max value.
-
 // Imports
 const fs = require('fs');
 const stringify = require('csv-stringify');
@@ -113,19 +110,22 @@ function isEpsilon(number, epsilon = 1e-10) {
  * @param {Object} options controls the timeStep and the period_length 
  * @returns {Array[String[]]} Matrix of rows representing each csv row of the form timeStamp, value
  */
-function _generateSineData(startTimeStamp, endTimeStamp, options = { timeStep: { hour: 12 }, period_length: { day: 1 } }) {
+function _generateSineData(startTimeStamp, endTimeStamp, options = { timeStep: { hour: 12 }, period_length: { day: 1 }, maxAmplitude: 2 }) {
 	const defaultOptions = {
 		timeStep: { hour: 12 },
 		period_length: { day: 1 },
+		maxAmplitude: 2,
 		...options,
 	}
 	const dates = generateDates(startTimeStamp, endTimeStamp, defaultOptions.timeStep);
 	const dates_as_moments = dates.map(date => moment(date));
+	const halfMaxAmplitude = defaultOptions.maxAmplitude / 2;
 	// SHL: I think some comments here (and maybe elsewhere) would help other more readily understand this.
 	const sineValues = momenting(dates_as_moments, defaultOptions.period_length)
 		.map(x => {
 			const result = Math.sin(Math.PI * 2 * x);
-			return (isEpsilon(result) ? '0' : `${result}`)
+			const scaledResult = halfMaxAmplitude * (isEpsilon(result) ? 0 : result) + halfMaxAmplitude;
+			return `${scaledResult}`;
 		});
 	return (_.zip(dates, sineValues));
 } // _generateSineData
@@ -165,8 +165,8 @@ function write_to_csv(data, filename = 'test.csv') {
  * @param {String} endTimeStamp 
  * @param {Object} options 
  */
-function generateSine(startTimeStamp, endTimeStamp, options = { filename: 'test.csv', timeStep: { hour: 12 }, period_length: { day: 1 } }) {
-	const chosen_data_options = { timeStep: options.timeStep, period_length: options.period_length };
+function generateSine(startTimeStamp, endTimeStamp, options = { filename: 'test.csv', timeStep: { hour: 12 }, period_length: { day: 1 }, maxAmplitude: 2 }) {
+	const chosen_data_options = { timeStep: options.timeStep, period_length: options.period_length, maxAmplitude: 2 };
 	write_to_csv(_generateSineData(startTimeStamp, endTimeStamp, chosen_data_options), options.filename);
 } // generateSine
 
