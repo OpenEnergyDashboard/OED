@@ -102,7 +102,7 @@ function isEpsilon(number) {
  */
 function _generateSineData(startTimeStamp, endTimeStamp, options = { timeStep: { hour: 12 }, period_length: { day: 1 } }) {
 	const defaultOptions = {
-		timeStep: { day: 1 },
+		timeStep: { hour: 12 },
 		period_length: { day: 1 },
 		...options,
 	}
@@ -111,7 +111,7 @@ function _generateSineData(startTimeStamp, endTimeStamp, options = { timeStep: {
 	const sineValues = momenting(dates_as_moments, defaultOptions.period_length)
 		.map(x => {
 			const result = Math.sin(Math.PI * 2 * x);
-			return (isEpsilon(result) ? 0 : result)
+			return (isEpsilon(result) ? '0' : `${result}`)
 		});
 	return (_.zip(dates, sineValues));
 } // _generateSineData(String,String,Object)
@@ -130,7 +130,7 @@ function _generateSineData(startTimeStamp, endTimeStamp, options = { timeStep: {
  * https://csv.js.org/stringify/api/
  * https://stackoverflow.com/questions/2496710/writing-files-in-node-js
  */
-function write_to_csv(data, filename = 'test.csv') {
+async function write_to_csv(data, filename = 'test.csv') {
 	stringify(data, (err, output) => {
 		if (err) {
 			return console.log(err);
@@ -152,7 +152,7 @@ function write_to_csv(data, filename = 'test.csv') {
  * 
  * Creates a csv with sine data 
  */
-function generateSine(startTimeStamp, endTimeStamp, options = { filename: 'test.csv', timeStep: { hour: 12 }, period_length: { day: 1 } }) {
+async function generateSine(startTimeStamp, endTimeStamp, options = { filename: 'test.csv', timeStep: { hour: 12 }, period_length: { day: 1 } }) {
 	const chosen_data_options = { timeStep: options.timeStep, period_length: options.period_length };
 	write_to_csv(_generateSineData(startTimeStamp, endTimeStamp, chosen_data_options), options.filename);
 } // generateSine(String,String,Object)
