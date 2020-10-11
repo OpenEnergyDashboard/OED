@@ -30,20 +30,24 @@ const moment = require('moment');
  * @param {String} startDate String of the form 'YYYY-MM-DD HH:MM:SS'
  * @param {String} endDate String of the form 'YYYY-MM-DD HH:MM:SS'
  * @param {Object} timeStep Object with keys describe the time step, by default 
- * this is { minute: 20 } or 20 minutes. 
+ * this is { minute: 20 } or 20 minutes and to at be at least 1 second. 
  * @returns {String[]} An array of timestamps between startDate and endDate, at a given timestep
  * (default 20 minutes). The first element of the output will be the startDate, but the last element
  * may not necessarily be the endDate.
  */
 function generateDates(startDate, endDate, timeStep = { minute: 20 }) {
-	// SHL: check timeStep is at least 1 second and maybe error if not (or return empty values?).
+	// Check timeStep is at least 1 second, if not throw an error.
+	const temp = moment();
+	if (temp.clone().add(timeStep).isBefore(temp.clone().add({ second: 1 }))) {
+		throw Error('The timestep needs to be at least 1 second.')
+	};
 	const array_of_moments = [];
 	const startMoment = moment(startDate);
 	const endMoment = moment(endDate);
 	while (!startMoment.isAfter(endMoment)) {
 		array_of_moments.push(startMoment.format('YYYY-MM-DD HH:mm:ss'));
 		startMoment.add(timeStep);
-	}
+	};
 	return array_of_moments;
 } // generateDates
 
@@ -106,7 +110,8 @@ function isEpsilon(number, epsilon = 1e-10) {
  * and the period_length is one day.
  * @param {String} startTimeStamp 
  * @param {String} endTimeStamp 
- * @param {Object} options controls the timeStep and the period_length 
+ * @param {Object} options controls the timeStep and the period_length, the timeStep needs to be at least
+ * 1 second. 
  * @returns {String[][]} Matrix of rows representing each csv row of the form timeStamp, value
  */
 function _generateSineData(startTimeStamp, endTimeStamp, options = { timeStep: { minute: 20 }, period_length: { day: 1 }, maxAmplitude: 2 }) {
