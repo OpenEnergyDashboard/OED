@@ -69,11 +69,11 @@ function _momentPercentage(startTime, endTime, currentMoment) {
 /**
  * Takes each moment and converts them into the percentage of time elapsed in 
  * its specific period as a decimal from 0 to 1.
- * @param {Array[moment]} array_of_moments Array of moment objects 
+ * @param {moment[]} array_of_moments Array of moment objects 
  * @param {Object} period_length Object whose keys describe the length of the 
  * length of the period, which should be greater than the timestep between 
  * consecutive moments. 
- * @returns {Array[number]} an array where each element corresponds to the percentage of time elasped at the
+ * @returns {Number[]} an array where each element corresponds to the percentage of time elasped at the
  * the corresponding timestamp in array_of_moments 
  */
 function momenting(array_of_moments, period_length) {
@@ -107,7 +107,7 @@ function isEpsilon(number, epsilon = 1e-10) {
  * @param {String} startTimeStamp 
  * @param {String} endTimeStamp 
  * @param {Object} options controls the timeStep and the period_length 
- * @returns {Array[String[]]} Matrix of rows representing each csv row of the form timeStamp, value
+ * @returns {String[][]} Matrix of rows representing each csv row of the form timeStamp, value
  */
 function _generateSineData(startTimeStamp, endTimeStamp, options = { timeStep: { minute: 20 }, period_length: { day: 1 }, maxAmplitude: 2 }) {
 	const defaultOptions = {
