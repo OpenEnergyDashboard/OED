@@ -30,16 +30,17 @@ var TWO_PI = Math.PI * 2;
 // is being done. This is not a requirement and could be a separate document if appropriate.
 
 /**
- * 
+ * Generates an array of dates of the form 'YYYY-MM-DD HH:MM:SS' with the upper bound
+ * at endDate, which may or may not be included. Because of the date format, 
+ * the timeStep should also be at least 1 second. 
  * @param {String} startDate String of the form 'YYYY-MM-DD HH:MM:SS'
  * @param {String} endDate String of the form 'YYYY-MM-DD HH:MM:SS'
  * SHL: maybe make default 20 minutes.
  * @param {Object} timeStep Object with keys describe the time step, by default 
  * this is { ms: 15000 } or 15 seconds. 
- * 
- * Generates an array of dates of the form 'YYYY-MM-DD HH:MM:SS' with the upper bound
- * at endDate, which may or may not be included. Because of the date format, 
- * the timeStep should also be at least 1 second. 
+ * @returns {String[]} An array of timestamps between startDate and endDate, at a given timestep
+ * (default 20 minutes). The first element of the output will be the startDate, but the last element
+ * may not necessarily be the endDate.
  */
 function generateDates(startDate, endDate, timeStep = { ms: 15000 }) {
 	// SHL: check timeStep is at least 1 second and maybe error if not (or return empty values?).
@@ -54,14 +55,12 @@ function generateDates(startDate, endDate, timeStep = { ms: 15000 }) {
 } // generateDates
 
 /**
- * 
+ * Determine what percentage of elapsed time passed that is at what percentage 
+ * if the moment between startTime and endTime.
  * @param {moment} startTime should not be after the endTime: !startTime.isAfter(endTime) should return true 
  * @param {moment} endTime should or be before startTime: !endTime.isBefore(startTime) should return true 
  * @param {moment} currentMoment should be in between startTime and endTime 
- * 
- * Determine what percentage of elapsed time passed that is at what percentage 
- * if the moment between startTime and endTime.
- * Source: https://stackoverflow.com/questions/18960327/javascript-moment-js-calculate-percentage-between-two-dates
+ * @source: https://stackoverflow.com/questions/18960327/javascript-moment-js-calculate-percentage-between-two-dates
  */
 function _momentPercentage(startTime, endTime, currentMoment) {
 	// Check pre-conditions
@@ -75,14 +74,14 @@ function _momentPercentage(startTime, endTime, currentMoment) {
 } // _momentPercentage
 
 /**
- * 
+ * Takes each moment and converts them into the percentage of time elapsed in 
+ * its specific period as a decimal from 0 to 1.
  * @param {Array[moment]} array_of_moments Array of moment objects 
  * @param {Object} period_length Object whose keys describe the length of the 
  * length of the period, which should be greater than the timestep between 
  * consecutive moments. 
- * 
- * Takes each moment and converts them into the percentage of time elapsed in 
- * its specific period as a decimal from 0 to 1.
+ * @returns {Array[number]} an array where each element corresponds to the percentage of time elasped at the
+ * the corresponding timestamp in array_of_moments 
  */
 function momenting(array_of_moments, period_length) {
 	const startMoment = array_of_moments[0];
@@ -98,26 +97,24 @@ function momenting(array_of_moments, period_length) {
 } // momenting
 
 /**
- * 
- * @param {Number} number 
- * 
  * Checks if a number is really close to zero.
- * Source: https://www.quora.com/In-JavaScript-how-do-I-test-if-a-number-is-close-to-zero
+ * @param {Number} number 
+ * @param {Number} epsilon our default for what is close to zero is 1e-10
+ * @returns {Boolean} whether or not number is really close to zero 
+ * @source: https://www.quora.com/In-JavaScript-how-do-I-test-if-a-number-is-close-to-zero
  */
 function isEpsilon(number, epsilon = 1e-10) {
 	return Math.abs(number) < epsilon;
 } // isEpisilon
 
 // SHL: should you describe the format of the Time's? (I think they are allowed moment format?)
-// SHL: Your descriptions of methods don't include return info.
 /**
- * 
+ * Generates sine data over a period of time. By default the timeStep is 1 day 
+ * and the period_length is one day.
  * @param {String} startTimeStamp 
  * @param {String} endTimeStamp 
  * @param {Object} options controls the timeStep and the period_length 
- * 
- * Generates sine data over a period of time. By default the timeStep is 1 day 
- * and the period_length is one day.
+ * @returns {Array[String[]]} Matrix of rows representing each csv row of the form timeStamp, value
  */
 function _generateSineData(startTimeStamp, endTimeStamp, options = { timeStep: { hour: 12 }, period_length: { day: 1 } }) {
 	const defaultOptions = {
@@ -166,12 +163,10 @@ function write_to_csv(data, filename = 'test.csv') {
 
 // SHL: should options be described?
 /**
- * 
+ * Creates a csv with sine data 
  * @param {String} startTimeStamp 
  * @param {String} endTimeStamp 
  * @param {Object} options 
- * 
- * Creates a csv with sine data 
  */
 function generateSine(startTimeStamp, endTimeStamp, options = { filename: 'test.csv', timeStep: { hour: 12 }, period_length: { day: 1 } }) {
 	const chosen_data_options = { timeStep: options.timeStep, period_length: options.period_length };
