@@ -64,10 +64,13 @@ function generateDates(startDate, endDate, timeStep = { ms: 15000 }) {
  * Source: https://stackoverflow.com/questions/18960327/javascript-moment-js-calculate-percentage-between-two-dates
  */
 function _momentPercentage(startTime, endTime, currentMoment) {
-	// SHL: I really believe in using {} for all statements, even one line ifs.
-	if (endTime - startTime <= 0) return 1;
-	// SHL: if someone makes a mistake and moment < startTime then you get a negative %.
-	// Would it be better to check for this as you do endTime - startTime above?
+	// Check pre-conditions
+	if (endTime.isBefore(startTime)) { throw RangeError('The endTime must be after or equal to the startTime.') };
+	if (currentMoment.isBefore(startTime)) { throw RangeError('The currentMoment must be after or equal to the starTime.') };
+	if (currentMoment.isAfter(endTime)) { throw RangeError('The currentMoment must be before or equal to the endTime.') };
+	if (startTime.isAfter(endTime)) { throw RangeError('The startTime must be before or equal to the endTime.') };
+
+	if (endTime - startTime <= 0) { return 1 };
 	return (currentMoment - startTime) / (endTime - startTime);
 } // _momentPercentage
 
