@@ -29,14 +29,13 @@ const moment = require('moment');
  * the timeStep should also be at least 1 second. 
  * @param {String} startDate String of the form 'YYYY-MM-DD HH:MM:SS'
  * @param {String} endDate String of the form 'YYYY-MM-DD HH:MM:SS'
- * SHL: maybe make default 20 minutes.
  * @param {Object} timeStep Object with keys describe the time step, by default 
- * this is { ms: 15000 } or 15 seconds. 
+ * this is { minute: 20 } or 20 minutes. 
  * @returns {String[]} An array of timestamps between startDate and endDate, at a given timestep
  * (default 20 minutes). The first element of the output will be the startDate, but the last element
  * may not necessarily be the endDate.
  */
-function generateDates(startDate, endDate, timeStep = { ms: 15000 }) {
+function generateDates(startDate, endDate, timeStep = { minute: 20 }) {
 	// SHL: check timeStep is at least 1 second and maybe error if not (or return empty values?).
 	const array_of_moments = [];
 	const startMoment = moment(startDate);
@@ -103,16 +102,16 @@ function isEpsilon(number, epsilon = 1e-10) {
 
 // SHL: should you describe the format of the Time's? (I think they are allowed moment format?)
 /**
- * Generates sine data over a period of time. By default the timeStep is 1 day 
+ * Generates sine data over a period of time. By default the timeStep is 20 minutes. 
  * and the period_length is one day.
  * @param {String} startTimeStamp 
  * @param {String} endTimeStamp 
  * @param {Object} options controls the timeStep and the period_length 
  * @returns {Array[String[]]} Matrix of rows representing each csv row of the form timeStamp, value
  */
-function _generateSineData(startTimeStamp, endTimeStamp, options = { timeStep: { hour: 12 }, period_length: { day: 1 }, maxAmplitude: 2 }) {
+function _generateSineData(startTimeStamp, endTimeStamp, options = { timeStep: { minute: 20 }, period_length: { day: 1 }, maxAmplitude: 2 }) {
 	const defaultOptions = {
-		timeStep: { hour: 12 },
+		timeStep: { minute: 20 },
 		period_length: { day: 1 },
 		maxAmplitude: 2,
 		...options,
@@ -165,8 +164,8 @@ function write_to_csv(data, filename = 'test.csv') {
  * @param {String} endTimeStamp 
  * @param {Object} options 
  */
-function generateSine(startTimeStamp, endTimeStamp, options = { filename: 'test.csv', timeStep: { hour: 12 }, period_length: { day: 1 }, maxAmplitude: 2 }) {
-	const chosen_data_options = { timeStep: options.timeStep, period_length: options.period_length, maxAmplitude: 2 };
+function generateSine(startTimeStamp, endTimeStamp, options = { filename: 'test.csv', timeStep: { minute: 20 }, period_length: { day: 1 }, maxAmplitude: 2 }) {
+	const chosen_data_options = { timeStep: options.timeStep, period_length: options.period_length, maxAmplitude: options.maxAmplitude };
 	write_to_csv(_generateSineData(startTimeStamp, endTimeStamp, chosen_data_options), options.filename);
 } // generateSine
 
