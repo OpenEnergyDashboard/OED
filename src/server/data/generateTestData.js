@@ -11,17 +11,21 @@
  *
  */
 
-// SHL: I think this should be TypeScript with added types.
-
 // Imports
 const fs = require('fs');
 const stringify = require('csv-stringify');
 const _ = require('lodash');
 const moment = require('moment');
 
-// SHL: I'm an advocate for big picture comments on how the software features are designed to work.
-// This would be the overall design and why it works. I think that helps a lot in understanding what 
-// is being done. This is not a requirement and could be a separate document if appropriate.
+/* Our main export is the generateSine function. We break this into several parts:
+ * 1. Generate the moments in time within a specificed range and at a specified time step from a given range.
+ * 2. For each moment determine how much time as elapsed (as a decimal) within its respective period.
+ * 3. Calculate the value of sine at that moment in time.
+ * 		Conceptually this is sin(decimal_percentage * 2*PI) and it works because the sine function we will 
+ * 		use is a function of radians and sin(x) = sin(x/P * P * 2 * PI) 
+ * 4. We zip the array of moments and their corresponding sine values into a matrix,
+ * which we will use write into a csv file.
+ */
 
 /**
  * Generates an array of dates of the form 'YYYY-MM-DD HH:MM:SS' with the upper bound
@@ -104,12 +108,11 @@ function isEpsilon(number, epsilon = 1e-10) {
 	return Math.abs(number) < epsilon;
 } // isEpisilon
 
-// SHL: should you describe the format of the Time's? (I think they are allowed moment format?)
 /**
  * Generates sine data over a period of time. By default the timeStep is 20 minutes. 
  * and the period_length is one day.
- * @param {String} startTimeStamp 
- * @param {String} endTimeStamp 
+ * @param {String} startTimeStamp, the time's format is 'YYYY-MM-DD HH:MM:SS'
+ * @param {String} endTimeStamp, the time's format is 'YYYY-MM-DD HH:MM:SS' 
  * @param {Object} options controls the timeStep and the period_length, the timeStep needs to be at least
  * 1 second. 
  * @returns {String[][]} Matrix of rows representing each csv row of the form timeStamp, value
@@ -124,7 +127,8 @@ function _generateSineData(startTimeStamp, endTimeStamp, options = { timeStep: {
 	const dates = generateDates(startTimeStamp, endTimeStamp, defaultOptions.timeStep);
 	const dates_as_moments = dates.map(date => moment(date));
 	const halfMaxAmplitude = defaultOptions.maxAmplitude / 2;
-	// SHL: I think some comments here (and maybe elsewhere) would help other more readily understand this.
+	// We take our array of moment percentages and scale it with the half max amplitude
+	// and shift it up by that amount. 
 	const sineValues = momenting(dates_as_moments, defaultOptions.period_length)
 		.map(x => {
 			const result = Math.sin(Math.PI * 2 * x);
@@ -162,12 +166,14 @@ function write_to_csv(data, filename = 'test.csv') {
 	});
 } // write_to_csv
 
-// SHL: should options be described?
 /**
  * Creates a csv with sine data 
- * @param {String} startTimeStamp 
- * @param {String} endTimeStamp 
- * @param {Object} options 
+ * @param {String} startTimeStamp, the time's format is 'YYYY-MM-DD HH:MM:SS'
+ * @param {String} endTimeStamp, the time's format is 'YYYY-MM-DD HH:MM:SS'
+ * @param {Object} options, options is an object that will be parsed by 
+ * moment.js. The format should be {unit: value, ...}. Examples are shown 
+ * in the link below: 
+ * @source: https://momentjs.com/docs/#/parsing/object/
  */
 function generateSine(startTimeStamp, endTimeStamp, options = { filename: 'test.csv', timeStep: { minute: 20 }, period_length: { day: 1 }, maxAmplitude: 2 }) {
 	const chosen_data_options = { timeStep: options.timeStep, period_length: options.period_length, maxAmplitude: options.maxAmplitude };
