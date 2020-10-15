@@ -76,7 +76,12 @@ class UIOptionsComponent extends React.Component<UIOptionsPropsWithIntl, UIOptio
 		const zIndexFix: React.CSSProperties = {
 			zIndex: 0
 		};
-		const messages = defineMessages({ barStackingTip: {	id: 'bar.stacking.tip' }});
+		const messages = defineMessages({
+			barStackingTip: { id: 'bar.stacking.tip' },
+			helpExportGraphData: { id: 'help.home.export.graph.data' },
+			helpHideOrShowOptions: { id: 'help.home.hide.or.show.options' },
+			helpToggleChartLink: { id: 'help.home.toggle.chart.link' },
+		});
 
 		return (
 			<div>
@@ -223,7 +228,7 @@ class UIOptionsComponent extends React.Component<UIOptionsPropsWithIntl, UIOptio
 							<FormattedMessage id='show.options' />
 						}
 					</Button>
-					<TooltipHelpComponent tip={'STUB'}/>
+					<TooltipHelpComponent tip={this.props.intl.formatMessage(messages.helpHideOrShowOptions)}/>
 				</div>
 			</div>
 		);

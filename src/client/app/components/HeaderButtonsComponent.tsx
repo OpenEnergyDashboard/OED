@@ -10,6 +10,7 @@ import MenuModalComponent from './MenuModalComponent';
 import { hasToken } from '../utils/token';
 import getPage from '../utils/getPage';
 import TooltipHelpComponent from './TooltipHelpComponent';
+import {renderToString} from 'react-dom/server';
 
 interface HeaderButtonsProps {
 	showCollapsedMenuButton: boolean;
