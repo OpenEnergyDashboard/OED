@@ -223,6 +223,7 @@ class UIOptionsComponent extends React.Component<UIOptionsPropsWithIntl, UIOptio
 							<FormattedMessage id='show.options' />
 						}
 					</Button>
+					<TooltipHelpComponent tip={'STUB'}/>
 				</div>
 			</div>
 		);

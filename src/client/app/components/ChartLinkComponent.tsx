@@ -5,6 +5,7 @@
 import * as React from 'react';
 import { FormattedMessage } from 'react-intl';
 import { Button } from 'reactstrap';
+import TooltipHelpComponent from './TooltipHelpComponent';
 
 interface ChartLinkProps {
 	linkText: string;
@@ -38,6 +39,7 @@ export default class ChartLinkComponent extends React.Component<ChartLinkProps, 
 				<Button	outline	onClick={this.toggleLink}>
 					<FormattedMessage id='toggle.link' />
 				</Button>
+				<TooltipHelpComponent tip={'STUB'}/>
 				{this.state.showLink &&
 					<div style={wellStyle}>
 						{this.props.linkText}

@@ -19,6 +19,7 @@ import { FormattedMessage } from 'react-intl';
 import { Dispatch, Thunk, ActionType } from '../types/redux/actions';
 
 import * as Plotly from 'plotly.js';
+import TooltipHelpComponent from './TooltipHelpComponent';
 // TODO lowercase plotly for the import in index.d.ts but uppercase here.
 
 
@@ -98,6 +99,7 @@ export default class DashboardComponent extends React.Component<DashboardProps, 
 						) : (
 							null
 						)}
+						<TooltipHelpComponent tip={'TIP'} />
 					</div>
 				</div>
 			</div>
