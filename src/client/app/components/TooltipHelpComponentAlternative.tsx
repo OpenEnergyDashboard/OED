@@ -22,7 +22,7 @@ import { FormattedMessage } from 'react-intl';
 			<i data-for={`${props.tipId}`} data-tip className='fa fa-question-circle' />
              <ReactTooltip id={`${props.tipId}`} event='click'>
                  <div style={{ width: '300px'}}>
-                    <FormattedMessage id={props.tipId}/>
+                    <FormattedMessage id={props.tipId} data-html={true}/>
                 </div>
              </ReactTooltip>
          </div>
