@@ -18,8 +18,8 @@ export default function TooltipHelpComponent(props: TooltipHelpProps) {
 	};
 	return (
 		<div style={divStyle}>
-			<i data-tip={props.tip} className='fa fa-question-circle' />
-			<ReactTooltip />
+			<i data-tip={`<div style="max-width:300px">${props.tip}</div>`} className='fa fa-question-circle' />
+			<ReactTooltip html={true} event='click'/>
 		</div>
 	);
 }
