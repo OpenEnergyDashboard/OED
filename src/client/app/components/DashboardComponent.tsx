@@ -20,6 +20,7 @@ import { Dispatch, Thunk, ActionType } from '../types/redux/actions';
 
 import * as Plotly from 'plotly.js';
 import TooltipHelpComponent from './TooltipHelpComponent';
+import TooltipHelpComponentAlternative from './TooltipHelpComponentAlternative';
 // TODO lowercase plotly for the import in index.d.ts but uppercase here.
 
 
@@ -99,7 +100,7 @@ export default class DashboardComponent extends React.Component<DashboardProps, 
 						) : (
 							null
 						)}
-						<TooltipHelpComponent tip={'TIP'} />
+						<TooltipHelpComponentAlternative tipId={'help.home.chart.redraw.restore'} />
 					</div>
 				</div>
 			</div>

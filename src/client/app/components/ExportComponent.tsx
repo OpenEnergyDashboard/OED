@@ -8,8 +8,7 @@ import * as moment from 'moment';
 import graphExport from '../utils/exportData';
 import { ExportDataSet } from '../types/readings';
 import { FormattedMessage } from 'react-intl';
-import Tooltip from 'reactstrap/lib/Tooltip';
-import TooltipHelpComponent from './TooltipHelpComponent';
+import TooltipHelpComponentAlternative from './TooltipHelpComponentAlternative';
 
 interface ExportProps {
 	selectedMeters: number[];
@@ -57,7 +56,7 @@ export default function ExportComponent(props: ExportProps) {
 			<Button outline onClick={exportReading}>
 				<FormattedMessage id='export.graph.data' />
 			</Button>
-			<TooltipHelpComponent tip={'STUB'}/>
+			<TooltipHelpComponentAlternative tipId={'help.home.export.graph.data'} />
 		</div>
 	);
 }

@@ -11,6 +11,7 @@ import { hasToken } from '../utils/token';
 import getPage from '../utils/getPage';
 import TooltipHelpComponent from './TooltipHelpComponent';
 import {renderToString} from 'react-dom/server';
+import TooltipHelpComponentAlternative from './TooltipHelpComponentAlternative';
 
 interface HeaderButtonsProps {
 	showCollapsedMenuButton: boolean;
@@ -69,7 +70,7 @@ export default class HeaderButtonsComponent extends React.Component<HeaderButton
 					}
 				</div>
 				<div className={this.props.showCollapsedMenuButton ? 'd-none d-lg-block' : ''}>
-					<TooltipHelpComponent tip={'STUB'}/>
+					<TooltipHelpComponentAlternative tipId={'help.home.header'} />
 					<Link style={adminLinkStyle} to='/admin'><Button outline><FormattedMessage id='admin.panel'/></Button></Link>
 					<Link style={groupsLinkStyle} to='/groups'><Button outline><FormattedMessage id='groups' /></Button></Link>
 					<Link style={metersLinkStyle} to='/meters'><Button outline><FormattedMessage id='meters' /></Button></Link>
