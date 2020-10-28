@@ -120,7 +120,7 @@ set -e
 if [ "$production" == "no" ] && [ ! "$OED_PRODUCTION" == "yes" ]; then
     npm run createUser -- test@example.com password
 	createuser_code=$?
-	if [ $createuser_code_code -ne 0 ]; then
+	if [ $createuser_code -ne 0 ]; then
 		# There was an error so stop process unless asked to continue on DB issues.
 		if [ "$continue_on_db_error" = "no" ]; then
 			# We should stop the install process. This means it won't try to bring up the web service.
