@@ -4,7 +4,7 @@
 
  import * as React from 'react';
 import { FormattedMessage } from 'react-intl';
- import * as ReactTooltip from 'react-tooltip';
+ import ReactTooltip from 'react-tooltip';
  
  interface TooltipHelpProps {
      tipId: string;
