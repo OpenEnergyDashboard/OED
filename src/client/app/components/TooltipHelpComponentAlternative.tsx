@@ -32,7 +32,7 @@ export default function TooltipHelpComponentAlternative(props: TooltipHelpProps)
     return (
         <div style={divStyle}>
             <i data-for={`${props.tipId}`} data-tip className='fa fa-question-circle' />
-            <ReactTooltip id={`${props.tipId}`} event='click' clickable={true}>
+            <ReactTooltip id={`${props.tipId}`} event='click' clickable={true} effect='solid'>
                 <div style={{ width: '300px' }}>
                     <FormattedMessage
                         id={props.tipId}
