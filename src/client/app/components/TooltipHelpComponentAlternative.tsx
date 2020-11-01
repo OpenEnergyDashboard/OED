@@ -18,21 +18,25 @@ export default function TooltipHelpComponentAlternative(props: TooltipHelpProps)
     const divStyle = {
         display: 'inline-block'
     };
-    const link = helpLinks[props.tipId];
+
+    // Create links
+    const values = helpLinks[props.tipId];
+    const links: Record<string, JSX.Element> = {};
+    Object.keys(values).forEach(key => {
+        const link = values[key];
+        links[key] = (<a target="_blank" href={link}>
+            {link}
+        </a>)
+    });
+    
     return (
         <div style={divStyle}>
             <i data-for={`${props.tipId}`} data-tip className='fa fa-question-circle' />
-            <ReactTooltip id={`${props.tipId}`} event='click'>
+            <ReactTooltip id={`${props.tipId}`} event='click' clickable={true}>
                 <div style={{ width: '300px' }}>
                     <FormattedMessage
                         id={props.tipId}
-                        values={{
-                            link: (
-                                <a target="_blank" href={link}>
-                                    {link}
-                                </a>
-                            )
-                        }}
+                        values={links}
                     />
                 </div>
              </ReactTooltip>

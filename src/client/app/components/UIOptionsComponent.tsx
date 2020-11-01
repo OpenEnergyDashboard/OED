@@ -8,6 +8,7 @@ import sliderWithoutTooltips, { createSliderWithTooltip } from 'rc-slider';
 import * as moment from 'moment';
 import { Button, ButtonGroup, Dropdown, DropdownToggle, DropdownMenu, DropdownItem } from 'reactstrap';
 import TooltipHelpComponent from './TooltipHelpComponent';
+import TooltipHelpComponentAlternative from './TooltipHelpComponentAlternative';
 import ExportContainer from '../containers/ExportContainer';
 import ChartSelectContainer from '../containers/ChartSelectContainer';
 import ChartDataSelectContainer from '../containers/ChartDataSelectContainer';
@@ -78,9 +79,6 @@ class UIOptionsComponent extends React.Component<UIOptionsPropsWithIntl, UIOptio
 		};
 		const messages = defineMessages({
 			barStackingTip: { id: 'bar.stacking.tip' },
-			helpExportGraphData: { id: 'help.home.export.graph.data' },
-			helpHideOrShowOptions: { id: 'help.home.hide.or.show.options' },
-			helpToggleChartLink: { id: 'help.home.toggle.chart.link' },
 		});
 
 		return (
@@ -228,7 +226,7 @@ class UIOptionsComponent extends React.Component<UIOptionsPropsWithIntl, UIOptio
 							<FormattedMessage id='show.options' />
 						}
 					</Button>
-					<TooltipHelpComponent tip={this.props.intl.formatMessage(messages.helpHideOrShowOptions)}/>
+					<TooltipHelpComponentAlternative tipId='help.home.hide.or.show.options'/>
 				</div>
 			</div>
 		);
