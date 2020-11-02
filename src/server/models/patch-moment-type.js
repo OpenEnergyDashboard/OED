@@ -4,11 +4,11 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/.
  */
 
-const moment = require('moment');
+const moment = require('moment-timezone');
 
 function patchMomentType(pgp) {
 	const types = pgp.pg.types;
-	// This patches momentjs objects to work with pg-promise.
+	// This patches moment.js objects to work with pg-promise.
 // See https://github.com/vitaly-t/pg-promise#custom-type-formatting
 	moment.fn.formatDBType = function formatDBType() {
 		return this.toDate();
@@ -18,7 +18,14 @@ function patchMomentType(pgp) {
 	const TIMESTAMPTZ_OID = 1184;
 	const TIMESTAMP_OID = 1114;
 
-	types.setTypeParser(TIMESTAMP_OID, moment);
+	types.setTypeParser(TIMESTAMP_OID, function (val) {
+		console.log(val);
+		utc = moment.utc(val);
+		console.log(utc.format());
+		console.log(utc.utc().format());
+		console.log(moment(val).format());
+		return moment(val);
+	});
 	types.setTypeParser(TIMESTAMPTZ_OID, moment);
 
 	moment.duration.fn._rawDBType = true; // eslint-disable-line no-underscore-dangle

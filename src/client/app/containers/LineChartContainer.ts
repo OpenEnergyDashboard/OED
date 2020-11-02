@@ -3,14 +3,16 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
 
 import * as _ from 'lodash';
-import * as moment from 'moment';
+import * as moment from 'moment-timezone';
 import { connect } from 'react-redux';
 import getGraphColor from '../utils/getGraphColor';
 import { State } from '../types/redux/state';
 import PlotlyChart, { IPlotlyChartProps } from 'react-plotlyjs-ts';
+import {changeTimezoneOffset} from '../utils/timezoneHandler';
 
 function mapStateToProps(state: State) {
 	const timeInterval = state.graph.timeInterval;
+	console.log(timeInterval);
 	const datasets: any[] = [];
 
 	// Add all valid data from existing meters to the line plot
@@ -30,7 +32,7 @@ function mapStateToProps(state: State) {
 				const hoverText: string[] = [];
 				const readings = _.values(readingsData.readings);
 				readings.forEach(reading => {
-					const timeReading = moment(reading.startTimestamp);
+					const timeReading = changeTimezoneOffset(reading.startTimestamp, 'America/Chicago').tz('America/Chicago');
 					xData.push(timeReading.format('YYYY-MM-DD HH:mm:ss'));
 					yData.push(reading.reading);
 					hoverText.push(`<b> ${timeReading.format('dddd, MMM DD, YYYY hh:mm a')} </b> <br> ${label}: ${reading.reading} kW`);
@@ -46,6 +48,8 @@ function mapStateToProps(state: State) {
 				const root: any = document.getElementById('root');
 				root.setAttribute('min-timestamp', minTimestamp);
 				root.setAttribute('max-timestamp', maxTimestamp);
+				console.log('min-timestamp:' + minTimestamp);
+				console.log('max-timestamp:' + maxTimestamp);
 
 				// This variable contains all the elements (x and y values, line type, etc.) assigned to the data parameter of the Plotly object
 				datasets.push({
