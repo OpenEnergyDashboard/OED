@@ -30,9 +30,9 @@ mocha.describe('groups API', () => {
 		groupB = new Group(undefined, 'B');
 		groupC = new Group(undefined, 'C');
 		await Promise.all([groupA, groupB, groupC].map(group => group.insert(conn)));
-		meterA = new Meter(undefined, 'A', null, false, true, Meter.type.MAMAC);
-		meterB = new Meter(undefined, 'B', null, false, true, Meter.type.MAMAC);
-		meterC = new Meter(undefined, 'C', null, false, true, Meter.type.METASYS);
+		meterA = new Meter(undefined, 'A', null, false, true, Meter.type.MAMAC, null);
+		meterB = new Meter(undefined, 'B', null, false, true, Meter.type.MAMAC, null);
+		meterC = new Meter(undefined, 'C', null, false, true, Meter.type.METASYS, null);
 		await Promise.all([meterA, meterB, meterC].map(meter => meter.insert(conn)));
 
 		await Promise.all([groupA.adoptMeter(meterA.id, conn), groupA.adoptGroup(groupB.id, conn),

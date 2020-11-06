@@ -39,8 +39,8 @@ mocha.describe('Meters', () => {
 
 	mocha.it('can get only enabled meters', async () => {
 		const conn = testDB.getConnection();
-		const enabledMeter = new Meter(undefined, 'EnabledMeter', null, true, true, Meter.type.MAMAC);
-		const disabledMeter = new Meter(undefined, 'DisabledMeter', null, false, true, Meter.type.MAMAC);
+		const enabledMeter = new Meter(undefined, 'EnabledMeter', null, true, true, Meter.type.MAMAC, null);
+		const disabledMeter = new Meter(undefined, 'DisabledMeter', null, false, true, Meter.type.MAMAC, null);
 
 		await enabledMeter.insert(conn);
 		await disabledMeter.insert(conn);
@@ -52,8 +52,8 @@ mocha.describe('Meters', () => {
 
 	mocha.it('can get only visible meters', async () => {
 		const conn = testDB.getConnection();
-		const visibleMeter = new Meter(undefined, 'VisibleMeter', null, true, true, Meter.type.MAMAC);
-		const invisibleMeter = new Meter(undefined, 'InvisibleMeter', null, true, false, Meter.type.MAMAC);
+		const visibleMeter = new Meter(undefined, 'VisibleMeter', null, true, true, Meter.type.MAMAC, null);
+		const invisibleMeter = new Meter(undefined, 'InvisibleMeter', null, true, false, Meter.type.MAMAC, null);
 
 		await visibleMeter.insert(conn);
 		await invisibleMeter.insert(conn);
