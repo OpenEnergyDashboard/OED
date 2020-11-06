@@ -2,6 +2,8 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
 
-INSERT INTO meters(name, ipaddress, enabled, displayable, meter_type, default_timezone_meter)
-    VALUES (${name}, ${ipAddress}, ${enabled}, ${displayable}, ${type}, ${meterTimezone})
-    RETURNING id;
+DO $$ BEGIN
+    ALTER TABLE meters ADD COLUMN default_timezone_meter TEXT DEFAULT NULL ;
+EXCEPTION
+    WHEN duplicate_column THEN NULL;
+END $$;
