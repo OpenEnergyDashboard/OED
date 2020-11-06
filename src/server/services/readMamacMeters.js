@@ -52,7 +52,7 @@ async function getMeterInfo(url, ip, csvLine) {
 		.then(raw => parseXMLPromisified(raw))
 		.then(xml => {
 			const name = xml.Maverick.NodeID[0];
-			return new Meter(undefined, name, ip, true, true, Meter.type.MAMAC);
+			return new Meter(undefined, name, ip, true, true, Meter.type.MAMAC, null);
 		});
 }
 

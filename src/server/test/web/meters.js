@@ -78,7 +78,7 @@ mocha.describe('meters API', () => {
 
 	mocha.it('returns details on a single meter by ID', async () => {
 		const conn = testDB.getConnection();
-		await new Meter(undefined, 'Meter 1', '1.1.1.1', true, true, Meter.type.MAMAC).insert(conn);
+		await new Meter(undefined, 'Meter 1', '1.1.1.1', true, true, Meter.type.MAMAC, null).insert(conn);
 		const meter2 = new Meter(undefined, 'Meter 2', '1.1.1.1', true, true, Meter.type.MAMAC, null);
 		await meter2.insert(conn);
 
