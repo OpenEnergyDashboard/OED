@@ -53,6 +53,7 @@ mocha.describe('Obvius meter config processing', () => {
 /**
  * Creates meters from a config file 
  * @param {ConfigFile} configFile
+ * @returns {Meter[]} an array of Meter objects
  */
 function processConfigFile(configFile) {
     const config = ini.parse(configFile.contents);
