@@ -10,31 +10,66 @@
 // let { chai, mocha, expect, app, testDB, testUser } = require('../common');
 mocha = require('mocha');
 chai = require('chai');
-const Meter = require('../../models/Meter');
 const ini = require('ini');
-const fs = require('fs'); 
+const fs = require('fs');
+const Meter = require('../../models/Meter');
+const ConfigFile = require('../../models/obvius/Configfile');
 
 mocha.describe('Obvius meter config processing', () => {
     mocha.it('should create the right meters based on the config file', () => {
-       const configSerialNumber = 'mb-001';
-       const configFilePath = `./obvius/${configSerialNumber}.ini`;
-       const config = ini.parse(fs.readFileSync(configFilePath, 'utf-8')); 
-       const regularExpression = /([0-9][0-9])/;
-       // For the metersHash we assume each key corresponds 
-       // to a hash of structure { NAME: <alternative name>, UNITS: <units>, LOW:<>, HIGHT:<>, CONSOLE:<> }
-       const metersHash = {};
-       // Array of Meter (from models) objects
-       const metersArray = [];
-       for(key in config){
-           const [, number, characteristic] = key.split(regularExpression);
-           const internalMeterName = `${configSerialNumber}.${parseInt(number)}`
-           const meter = metersHash[internalMeterName];
-           metersHash[internalMeterName] = {...meter, [characteristic]: config[key]}
-       };
-       for(internalMeterName in metersHash){
-           metersArray.push(new Meter(undefined, internalMeterName, undefined, undefined, undefined, undefined, metersHash[internalMeterName].NAME));
-       }
-       console.log('', metersHash);
-       console.log(metersArray);
+        const configSerialNumber = 'mb-001';
+        const configFilePath = `./obvius/${configSerialNumber}.ini`;
+        const config = ini.parse(fs.readFileSync(configFilePath, 'utf-8'));
+        const regularExpression = /([0-9][0-9])/;
+        // For the metersHash we assume each key corresponds 
+        // to a hash of structure { NAME: <alternative name>, UNITS: <units>, LOW:<>, HIGHT:<>, CONSOLE:<> }
+        const metersHash = {};
+        // Array of Meter (from models) objects
+        const metersArray = [];
+        for (key in config) {
+            const [, number, characteristic] = key.split(regularExpression);
+            const internalMeterName = `${configSerialNumber}.${parseInt(number)}`
+            const meter = metersHash[internalMeterName];
+            metersHash[internalMeterName] = { ...meter, [characteristic]: config[key] }
+        };
+        for (internalMeterName in metersHash) {
+            metersArray.push(new Meter(undefined, internalMeterName, undefined, undefined, undefined, undefined, metersHash[internalMeterName].NAME));
+        }
+        console.log('', metersHash);
+        console.log(metersArray);
+    });
+    mocha.it('should consume a ConfigFile Object', () => {
+        const configSerialNumber = 'mb-001';
+        const configFilePath = `./obvius/${configSerialNumber}.ini`;
+        const contents = (fs.readFileSync(configFilePath, 'utf-8'))
+        //const blob = new Blob([content], { type: "text/plain;charset=utf-9"});
+        //const file = new File(blob, 'mb-001.ini');
+        // const req = {params: {serialNumber: 'mb-001'}, files: [file]}
+        const configFile = new ConfigFile(undefined, configSerialNumber, undefined, undefined, undefined, contents, false);
+        console.log(processConfigFile(configFile));
     });
 });
+
+/**
+ * Creates meters from a config file 
+ * @param {ConfigFile} configFile
+ */
+function processConfigFile(configFile) {
+    const config = ini.parse(configFile.contents);
+    const regularExpression = /([0-9][0-9])/;
+    // For the metersHash we assume each key corresponds 
+    // to a hash of structure { NAME: <alternative name>, UNITS: <units>, LOW:<>, HIGHT:<>, CONSOLE:<> }
+    const metersHash = {};
+    // Array of Meter (from models) objects
+    const metersArray = [];
+    for (key in config) {
+        const [, number, characteristic] = key.split(regularExpression);
+        const internalMeterName = `${configFile.serialId}.${parseInt(number)}`
+        const meter = metersHash[internalMeterName];
+        metersHash[internalMeterName] = { ...meter, [characteristic]: config[key] }
+    };
+    for (internalMeterName in metersHash) {
+        metersArray.push(new Meter(undefined, internalMeterName, undefined, undefined, undefined, undefined, metersHash[internalMeterName].NAME));
+    }
+    return metersArray;
+}
