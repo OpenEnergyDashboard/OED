@@ -79,11 +79,8 @@ async function createSchema(conn) {
 	const Baseline = require('./Baseline');
 
 	/* eslint-enable global-require */
-	console.log("DEBUG: start createMeterTypesEnum in database.js");
 	await Meter.createMeterTypesEnum(conn);
-	// console.log("DEBUG: end createMeterTypesEnum in database.js");
 	await Meter.createTable(conn);
-	// console.log("DEBUG: end createTable (Meter) in database.js");
 	await Reading.createTable(conn);
 	await Reading.createCompressedReadingsFunction(conn);
 	await Reading.createCompressedGroupsReadingsFunction(conn);
@@ -99,7 +96,6 @@ async function createSchema(conn) {
 	await Reading.createCompareReadingsFunction(conn);
 	await Baseline.createTable(conn);
 	await conn.none(sqlFile('baseline/create_function_get_average_reading.sql'));
-	console.log("DEBUG: end of database.js");
 }
 
 module.exports = {
