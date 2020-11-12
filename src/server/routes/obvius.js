@@ -142,8 +142,6 @@ router.all('/', async (req, res) => {
 			}
 			loadLogfileToReadings(req.param('serialnumber'), ip, data, conn);
 		}
-		dropConnection();
-
 		success(req, res, 'Logfile Upload IS PROVISIONAL');
 		return;
 	}
@@ -156,7 +154,6 @@ router.all('/', async (req, res) => {
 	if (mode === obvius.mode.config_file_manifest) {
 		const conn = getConnection();
 		success(req, res, await listConfigfiles(conn));
-		dropConnection();
 		return;
 	}
 
@@ -185,7 +182,6 @@ router.all('/', async (req, res) => {
 			await cf.insert(conn);
 			success(req, res, `Acquired config log with (pseudo)filename ${cf.makeFilename()}.`);
 		}
-		dropConnection();
 		return;
 	}
 
