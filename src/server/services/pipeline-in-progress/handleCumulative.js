@@ -7,7 +7,7 @@
 const moment = require('moment');
 
 /**
- * Handle cummulative data, assume that last row is the first reading (skip this row).
+ * Handle cumulative data, assume that last row is the first reading (skip this row).
  * @Example
  * 	row 0: reading #0 + #1 + #2
  *  row 1: reading #0 + #1
@@ -19,7 +19,7 @@ const moment = require('moment');
  * @param readingRepetition value is 1 if reading is not duplicated. 2 if repeated twice and so on (E-mon D-mon meters)
  */
 
-function handleCummulative(rows, readingRepetition) {
+function handleCumulative(rows, readingRepetition) {
 	const result = [];
 	// Initialize timestamps and other variables
 	let startTimestamp = moment(0);
@@ -49,4 +49,4 @@ function handleCummulative(rows, readingRepetition) {
 	return result;
 }
 
-module.exports = handleCummulative;
+module.exports = handleCumulative;

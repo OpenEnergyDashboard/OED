@@ -4,11 +4,11 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/.
  */
 const { mocha, expect } = require('../common');
-const handleCummulative = require('../../services/pipeline-in-progress/handleCummulative');
+const handleCumulative = require('../../services/pipeline-in-progress/handleCumulative');
 const Reading = require('../../models/Reading');
 const moment = require('moment');
 
-mocha.describe('PIPELINE: Handle cummulative', () => {
+mocha.describe('PIPELINE: Handle cumulative', () => {
 	let sampleArray = [[10000, moment('1970-01-01 00:00:00'), moment('1970-01-01 00:00:30')]];
 	const valGap = 2;
 	const timeGap = 30;
@@ -18,7 +18,7 @@ mocha.describe('PIPELINE: Handle cummulative', () => {
 						sampleArray[i - 1][2].subtract(timeGap * i, 'second')]);
 	}
 	mocha.describe('with non-duplicated value', () => {
-		result = handleCummulative(sampleArray, 1);
+		result = handleCumulative(sampleArray, 1);
 		mocha.it('returned array length', async () => {
 			expect(result.length).to.equal(sampleArray.length - 1);
 		});
@@ -47,13 +47,13 @@ mocha.describe('PIPELINE: Handle cummulative', () => {
 	mocha.describe('with duplicated value', () => {
 		mocha.it('returned array length', async () => {
 			for (let repetition = 2; repetition < 7; ++repetition) {
-				result = handleCummulative(sampleArray, repetition);
+				result = handleCumulative(sampleArray, repetition);
 				expect(result.length).to.equal(Math.floor((sampleArray.length - 1) / repetition));
 			}
 		});
 		mocha.it('reading values', async () => {
 			for (let repetition = 2; repetition < 7; ++repetition) {
-				result = handleCummulative(sampleArray, repetition);
+				result = handleCumulative(sampleArray, repetition);
 				let k = 0;
 				for (let i = 1; i < 12; ++i) {
 					if ((i - repetition) % repetition === 0) {
@@ -65,7 +65,7 @@ mocha.describe('PIPELINE: Handle cummulative', () => {
 		});
 		mocha.it('startTimeStamps', async () => {
 			for (let repetition = 2; repetition < 7; ++repetition) {
-				result = handleCummulative(sampleArray, repetition);
+				result = handleCumulative(sampleArray, repetition);
 				let k = 0;
 				for (let i = 1; i < 12; ++i) {
 					if ((i - repetition) % repetition === 0) {
@@ -77,7 +77,7 @@ mocha.describe('PIPELINE: Handle cummulative', () => {
 		});
 		mocha.it('endTimeStamps', async () => {
 			for (let repetition = 2; repetition < 7; ++repetition) {
-				result = handleCummulative(sampleArray, repetition);
+				result = handleCumulative(sampleArray, repetition);
 				let k = 0;
 				for (let i = 1; i < 12; ++i) {
 					if ((i - repetition) % repetition === 0) {
