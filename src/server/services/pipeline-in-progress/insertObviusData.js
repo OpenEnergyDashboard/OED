@@ -6,7 +6,7 @@ const moment = require('moment');
 const Meter = require('../../models/Meter');
 const Reading = require('../../models/Reading');
 const { log } = require('../../log');
-const demuxCsvWithSingleColumnTimestamps = require('./csvDemux');
+const demuxCsvWithSingleColumnTimestamps = require('../obvius/csvDemux');
 const loadArrayInput = require('./loadArrayInput');
 
 async function insertObviusData(serialNumber, ipAddress, logfile) {
