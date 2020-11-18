@@ -3,8 +3,7 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
 
 DO $$ BEGIN
-  INSERT INTO users(email, password_hash)
-    VALUES (${email}, ${passwordHash});
-EXCEPTION WHEN unique_violation THEN
-    -- Ignore duplicate inserts.
+    ALTER TABLE meters ADD COLUMN default_timezone_meter TEXT DEFAULT NULL ;
+EXCEPTION
+    WHEN duplicate_column THEN NULL;
 END $$;

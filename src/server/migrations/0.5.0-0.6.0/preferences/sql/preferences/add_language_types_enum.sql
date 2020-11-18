@@ -3,8 +3,7 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
 
 DO $$ BEGIN
-  INSERT INTO users(email, password_hash)
-    VALUES (${email}, ${passwordHash});
-EXCEPTION WHEN unique_violation THEN
-    -- Ignore duplicate inserts.
+    alter TYPE language_type ADD VALUE 'es' AFTER 'fr';
+EXCEPTION
+    WHEN duplicate_object THEN null;
 END $$;

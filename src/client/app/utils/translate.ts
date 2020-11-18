@@ -6,9 +6,10 @@ import store from '../index';
 import { addLocaleData, IntlProvider, defineMessages } from 'react-intl';
 import * as en from 'react-intl/locale-data/en';
 import * as fr from 'react-intl/locale-data/fr';
+import * as es from 'react-intl/locale-data/es';
 import * as localeData from '../translations/data.json';
 
-addLocaleData([...en, ...fr]);
+addLocaleData([...en, ...fr, ...es]);
 
 const enum AsTranslated {}
 export type TranslatedString = string & AsTranslated;
@@ -20,6 +21,8 @@ export default function translate(messageID: string): TranslatedString {
 	let messages;
 	if (lang === 'fr') {
 		messages = (localeData as any).fr;
+	} else if (lang === 'es') {
+		messages = (localeData as any).es;
 	} else {
 		messages = (localeData as any).en;
 	}

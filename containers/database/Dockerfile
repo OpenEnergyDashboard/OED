@@ -6,7 +6,9 @@
 
 # Dockerfile for OED Postgres server.
 # Use a pinned version
-FROM postgres:9.6
+# FROM postgres:9.6
+# FROM postgres:10.4
+FROM postgres:10.13
 
 # All SQL files in the build context
 # get copied into the container and
