@@ -10,13 +10,16 @@ const demuxCsvWithSingleColumnTimestamps = require('./csvDemux');
 
 async function loadLogfileToReadings(serialNumber, ipAddress, logfile, conn) {
 	// Get demultiplexed, parsed data from the CSV.
-	const data = demuxCsvWithSingleColumnTimestamps(logfile);
-
+	const unprocessedData = demuxCsvWithSingleColumnTimestamps(logfile);
+	// Check if the first three are zeroes
+	const data = (unprocessedData[0] === 0 && unprocessedData[1] === 0 && unprocessedData[2] === 0) ?
+		unprocessedData.slice(3) : unprocessedData;
 	for (let i = 0; i < data.length; i++) {
 		let meter;
 		try {
 			meter = await Meter.getByName(`${serialNumber}.${i}`, conn);
 		} catch (v) {
+			log.info('WARNING: Creating a meter that does not already exist. Typically we expect that obvius meters have already been created by parsing the corresponding ConfigFile.')
 			// For now, new Obvius meters collect data (enabled) but do not display (not displayable).
 			// Also, the identifier is the same as the meter name for now. The longer-term plan is to read
 			// the configuration file and use information in that to set this value before meters are read
