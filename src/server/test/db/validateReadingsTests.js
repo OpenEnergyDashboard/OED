@@ -35,7 +35,7 @@ mocha.describe('PIPELINE: Validate Readings', () => {
 		const minVal = 10;
 		const maxVal = 20;
 		// testing sequence: lower, in-bound, higher, in-bound, lower, in-bound, higher
-		let readingVals = [9, 10, 21, 20, -Number.MAX_VALUE, 15, Number.MAX_VALUE];
+		let readingVals = [9, 10, 21, 20, Number.NEGATIVE_INFINITY, 15, Number.POSITIVE_INFINITY];
 		const results = readingVals.map(val => new Reading(
 			undefined,
 			val,
