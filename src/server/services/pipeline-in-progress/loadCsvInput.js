@@ -20,7 +20,6 @@ const { log } = require('../../log');
  * @param {array} conditionSet used to validate readings (minVal, maxVal, minDate, maxDate, threshold, maxError)
  * @param {array} conn connection to database
  */
-
 async function loadCsvInput(filePath, meterID, mapRowToModel, readAsStream, isCummulative, readingRepetition, conditionSet, conn) {
 	try {
 		if (readAsStream) {

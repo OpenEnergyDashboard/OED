@@ -17,7 +17,6 @@ const path = require('path');
  * @param  cumulativeIndicator false if readings are not cumulative and vice-versa.
  * @param conn the database connection to use
  */
-
 async function insertMetasysData(filePath, readingInterval, readingRepetition, cumulativeIndicator, conn) {
 	const fileName = path.basename(filePath);
 	const meter = await Meter.getByName(fileName.replace('.csv', ''), conn);

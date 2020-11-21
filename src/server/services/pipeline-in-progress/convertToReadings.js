@@ -15,7 +15,6 @@ const moment = require('moment');
  * @param {int} meterID ID of the meter which all the Reading values belong to
  * @param {dict} conditionSet used to validate readings (minVal, maxVal, minDate, maxDate, interval, maxError)
  */
-
 function convertToReadings(toConvert, meterID, conditionSet) {
 	readings = toConvert.map(row => new Reading(meterID, row[0], row[1], row[2]));
 	if (conditionSet !== undefined && !validateReadings(readings, conditionSet)) {

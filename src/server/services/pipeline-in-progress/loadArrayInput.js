@@ -17,7 +17,6 @@ const handleCumulative = require('./handleCumulative');
  * @param {boolean} isCumulative true if the given data is Cumulative
  * @param {array} conditionSet used to validate readings (minVal, maxVal, minDate, maxDate, interval, maxError)
  */
-
 async function loadArrayInput(dataRows, meterID, mapRowToModel, isCumulative, readingRepetition, conditionSet, conn) {
 	readingsArray = dataRows.map(mapRowToModel);
 	if (isCumulative) {
