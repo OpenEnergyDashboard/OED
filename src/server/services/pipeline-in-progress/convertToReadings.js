@@ -14,11 +14,12 @@ const moment = require('moment');
  * @param {2d array} toConvert a number array in which each row represents a Reading values (reading, startTime, endTime)
  * @param {int} meterID ID of the meter which all the Reading values belong to
  * @param {dict} conditionSet used to validate readings (minVal, maxVal, minDate, maxDate, interval, maxError)
+ * @return a set of Reading or null if any reading is not validated
  */
 function convertToReadings(toConvert, meterID, conditionSet) {
 	readings = toConvert.map(row => new Reading(meterID, row[0], row[1], row[2]));
 	if (conditionSet !== undefined && !validateReadings(readings, conditionSet)) {
-		log.warn(`ERROR WHEN VALIDATING READINGS FROM METER ${ipAddress}`);
+		log.error(`REJECTED ALL READINGS FROM METER ${ipAddress} DUE TO ERROR WHEN VALIDATING DATA`);
 		return null;
 	}
 	return readings;

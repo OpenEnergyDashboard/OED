@@ -31,7 +31,7 @@ async function insertMetasysData(filePath, readingInterval, readingRepetition, c
 							return [readRate, startTimestamp, endTimestamp];
 						},
 						readAsStream = false,
-						isCummulative = cumulativeIndicator,
+						isCumulative = cumulativeIndicator,
 						readingRepetition = readingRepetition,
 						conditionSet = undefined,
 						conn = conn);
