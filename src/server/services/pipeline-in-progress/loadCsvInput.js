@@ -30,7 +30,7 @@ async function loadCsvInput(filePath, meterID, mapRowToModel, readAsStream, isCu
 			return loadArrayInput(dataRows, meterID, mapRowToModel, isCumulative, readingRepetition, conditionSet, conn);
 		}
 	} catch (err) {
-		log.error(`Error updating meter ${meterID}: ${err}`, err);
+		log.error(`Error updating meter ${meterID} with data from ${filePath}: ${err}`, err);
 	}
 }
 

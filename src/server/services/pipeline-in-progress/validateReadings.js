@@ -63,11 +63,11 @@ function checkValue(arrayToValidate, minVal, maxVal, maxError) {
 			break;
 		}
 		if (reading.reading < minVal) {
-			log.warn(`ERROR WHEN CHECKING READING VALUE FROM METER ${reading.meterID}: ${reading.reading} is smaller than lower bound ${minVal}`);
+			log.warn(`ERROR WHEN CHECKING READING VALUE FROM METER ${reading.meterID}: Value ${reading.reading} is smaller than lower bound ${minVal}`);
 			--maxError;
 			validValues = false;
 		} else if (reading.reading > maxVal) {
-			log.warn(`ERROR WHEN CHECKING READING VALUE FROM METER ${reading.meterID}: ${reading.reading} is larger than upper bound ${maxVal}`);
+			log.warn(`ERROR WHEN CHECKING READING VALUE FROM METER ${reading.meterID}: Value ${reading.reading} is larger than upper bound ${maxVal}`);
 			--maxError;
 			validValues = false;
 		}
