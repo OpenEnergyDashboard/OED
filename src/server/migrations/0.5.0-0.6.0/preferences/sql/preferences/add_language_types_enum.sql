@@ -2,8 +2,8 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
 
-export enum LanguageTypes {
-	en = 'en',
-	fr = 'fr',
-	es = 'es'
-}
+DO $$ BEGIN
+    alter TYPE language_type ADD VALUE 'es' AFTER 'fr';
+EXCEPTION
+    WHEN duplicate_object THEN null;
+END $$;

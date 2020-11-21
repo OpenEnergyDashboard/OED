@@ -5,10 +5,11 @@
 # * file, You can obtain one at http://mozilla.org/MPL/2.0/.
 # *
 
-USAGE="Usage: $0 [--production] [--nostart]"
+USAGE="Usage: $0 [--production] [--nostart] [--keep_node_modules]"
 
 production=no
 dostart=yes
+keep_node_modules=no
 
 # Run through all flags and match
 while test $# -gt 0; do
@@ -20,6 +21,10 @@ while test $# -gt 0; do
 		--nostart)
 			shift
 			dostart=no
+			;;
+		--keep_node_modules)
+			shift
+			keep_node_modules=yes
 			;;
 		*)
 			echo $USAGE
@@ -34,12 +39,19 @@ if [ -f ".env" ]; then
 fi
 
 # Install NPM dependencies
-if [ -d "node_modules" ]; then
-	echo "node_modules/ exists, skipping NPM install."
+if [ "$keep_node_modules" == "yes" ]; then
+	echo "skipping NPM install as requested"
 else
 	echo "NPM install..."
-	npm install --loglevel=warn --progress=false
-	echo "NPM install finished."
+	npm ci --loglevel=warn
+	if [ $? == 0 ]; then
+		echo "NPM install finished."
+	else
+		# npm reported an error. Sometimes it does so can skip steps.
+		# Using printf since it is more reliable.
+		printf "\n%s\n" "NPM reported an error so stopping"
+		exit 2
+	fi
 fi
 
 create_error=0 # Boolean
