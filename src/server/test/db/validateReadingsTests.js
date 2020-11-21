@@ -4,7 +4,7 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/.
  */
 const { mocha, expect } = require('../common');
-const { checkDate, checkValue, checkIntervals} = require('../../services/pipeline-in-progress/validateReadings');
+const { checkDate, checkValue, checkIntervals, validateReadings} = require('../../services/pipeline-in-progress/validateReadings');
 const Reading = require('../../models/Reading');
 const moment = require('moment');
 
@@ -54,14 +54,46 @@ mocha.describe('PIPELINE: Validate Readings', () => {
 		let testing = [ new Reading(undefined, 0, moment('1970-01-01 00:00:00'), moment('1970-01-01 00:00:01')),
 						new Reading(undefined, 0, moment('1970-01-01 00:01:00'), moment('1970-01-01 00:01:01')),
 						new Reading(undefined, 0, moment('1970-01-01 00:04:00'), moment('1970-01-01 00:04:01'))];
-		let result = checkIntervals(testing, 0);
+		let result = checkIntervals(testing, 119);
 		expect(result).to.equal(false);
 	});
 	mocha.it('detects equal intervals', async () => {
 		let testing = [ new Reading(undefined, 0, moment('1970-01-01 00:00:00'), moment('1970-01-01 00:01:00')),
 						new Reading(undefined, 0, moment('1970-01-01 00:01:00'), moment('1970-01-01 00:01:01')),
 						new Reading(undefined, 0, moment('1970-01-01 00:01:30'), moment('1970-01-01 00:02:01'))];
-		let result = checkIntervals(testing, 60);
+		let result = checkIntervals(testing, 29);
 		expect(result).to.equal(true);
 	});
+	mocha.it('reject data with any type of error', async() => {	
+		let conditionSet = {
+			minVal: 0,
+			maxVal: 20,
+			minDate: moment('1970-01-01 00:00:00'),
+			maxDate: moment('2000-01-01 00:00:00'),
+			threshold: 119,
+			maxError: 10
+		};
+
+		let badIntervals = [ new Reading(undefined, 0, moment('1970-01-01 00:00:00'), moment('1970-01-01 00:00:01')),
+						new Reading(undefined, 0, moment('1970-01-01 00:01:00'), moment('1970-01-01 00:01:01')),
+						new Reading(undefined, 0, moment('1970-01-01 00:04:00'), moment('1970-01-01 00:04:01'))];
+
+		let badDate = [ new Reading(undefined, 0, moment('1969-01-01 00:00:00'), moment('1969-01-01 00:01:00')),
+						new Reading(undefined, 0, moment('1969-01-01 00:01:00'), moment('1969-01-01 00:01:01')),
+						new Reading(undefined, 0, moment('1969-01-01 00:01:30'), moment('1969-01-01 00:02:01'))];
+
+		let badValue = [ new Reading(undefined, 30, moment('1970-01-01 00:00:00'), moment('1970-01-01 00:01:00')),
+						new Reading(undefined, 0, moment('1970-01-01 00:01:00'), moment('1970-01-01 00:01:01')),
+						new Reading(undefined, 0, moment('1970-01-01 00:01:30'), moment('1970-01-01 00:02:01'))];
+
+		let goodData = [ new Reading(undefined, 0, moment('1970-01-01 00:00:00'), moment('1970-01-01 00:01:00')),
+						new Reading(undefined, 20, moment('1970-01-01 00:01:00'), moment('1970-01-01 00:01:01')),
+						new Reading(undefined, 0, moment('1970-01-01 00:01:30'), moment('1970-01-01 00:02:01'))];
+
+		expect(validateReadings(badIntervals, conditionSet)).to.equal(false);
+		expect(validateReadings(badDate, conditionSet)).to.equal(false);
+		expect(validateReadings(badValue, conditionSet)).to.equal(false);
+		expect(validateReadings(goodData, conditionSet)).to.equal(true);
+
+	})
 });

@@ -10,7 +10,7 @@ const { log } = require('../../log');
 /**
  * Validate an array of Readings value according to certain criteria
  * @param {Reading[]} arrayToValidate
- * @param {dict} conditionSet used to validate readings (minVal, maxVal, minDate, maxDate, interval, maxError)
+ * @param {dict} conditionSet used to validate readings (minVal, maxVal, minDate, maxDate, threshold, maxError)
  */
 function validateReadings(arrayToValidate, conditionSet) {
 	validDates = checkDate(arrayToValidate, conditionSet['minDate'], conditionSet['maxDate'], conditionSet['maxError'] / 2);
