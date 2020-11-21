@@ -15,7 +15,7 @@ const moment = require('moment');
  * => reading #1 = row 0 - row 1
  *    reading #2 = row 1 - row 2
  *    reading #0 is cumulative value from unknown readings that may or may not have been inserted before
- * @param {2d array} rows
+ * @param {object[[]]} rows
  * @param readingRepetition value is 1 if reading is not duplicated. 2 if repeated twice and so on (E-mon D-mon meters)
  */
 function handleCumulative(rows, readingRepetition) {

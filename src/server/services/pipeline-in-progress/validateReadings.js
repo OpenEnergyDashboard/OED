@@ -9,7 +9,7 @@ const { log } = require('../../log');
 
 /**
  * Validate an array of Readings value according to certain criteria
- * @param {array of Readings} arrayToValidate
+ * @param {Reading[]} arrayToValidate
  * @param {dict} conditionSet used to validate readings (minVal, maxVal, minDate, maxDate, interval, maxError)
  */
 function validateReadings(arrayToValidate, conditionSet) {
@@ -21,7 +21,7 @@ function validateReadings(arrayToValidate, conditionSet) {
 
 /**
  * Check and report any out-of-bound date. Can be ignored by passing null minDate and maxDate
- * @param {array of Readings} arrayToValidate
+ * @param {Reading[]} arrayToValidate
  * @param {Moment} minDate inclusive earliest acceptable date (won't be rejected)
  * @param {Moment} maxDate inclusive latest acceptable date (won't be rejected)
  * @param {number} maxError maximum number of errors to be reported, ignore the rest
@@ -51,7 +51,7 @@ function checkDate(arrayToValidate, minDate, maxDate, maxError) {
 
 /**
  * Check and report any out-of-bound reading value. Can be ignored by passing MIN_VALUE & MAX_VALUE
- * @param {array of Readings} arrayToValidate
+ * @param {Reading[]} arrayToValidate
  * @param {number} minVal inclusive minimum acceptable reading value (won't be rejected)
  * @param {number} maxVal inclusive maximum acceptable reading value (won't be rejected)
  * @param {number} maxError maximum number of errors to be reported, ignore the rest

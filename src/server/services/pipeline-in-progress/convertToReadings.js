@@ -11,7 +11,7 @@ const moment = require('moment');
 
 /**
  * Convert an matrix of number values to an array of Readings
- * @param {2d array} toConvert a number array in which each row represents a Reading values (reading, startTime, endTime)
+ * @param {object[[]]} toConvert a 2d array in which each row represents a Reading values (reading, startTime, endTime)
  * @param {int} meterID ID of the meter which all the Reading values belong to
  * @param {dict} conditionSet used to validate readings (minVal, maxVal, minDate, maxDate, interval, maxError)
  * @return a set of Reading or null if any reading is not validated
