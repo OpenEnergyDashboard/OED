@@ -23,7 +23,7 @@ const {
 	_generateSineData,
 	momenting,
 	generateDates,
-	generateSine,
+	generateSine
 } = require('../data/generateTestData');
 
 mocha.describe('The generateDates function', () => {
@@ -58,25 +58,25 @@ mocha.describe('The generateDates function', () => {
 mocha.describe('momenting', () => {
 	mocha.it('should cover the simple singleton case', () => {
 		const date = '2019-09-10 00:00:15';
-		const period_of_moments = [moment(date)]
-		expect([1]).to.deep.equals(momenting(period_of_moments))
+		const periodOfMoments = [moment(date)];
+		expect([1]).to.deep.equals(momenting(periodOfMoments));
 	});
 	mocha.it('should be able to partition an array with just two elements', () => {
 		const startMoment = moment('2019-09-10 00:00:15');
-		const time_step_ms = 15000;
-		expect([0, 1]).to.deep.equals(momenting([startMoment, startMoment.clone().add(time_step_ms)], time_step_ms));
+		const timeStepMs = 15000;
+		expect([0, 1]).to.deep.equals(momenting([startMoment, startMoment.clone().add(timeStepMs)], timeStepMs));
 	});
 	mocha.it('should cover the a skipped datetime', () => {
 		const test = ['2019-09-10T00:00:15',
 			'2019-09-10T00:00:30', '2019-09-10T00:01:00'];
-		const time_step_ms = 15000;
-		expect(momenting(test.map(time_stamp => moment(time_stamp)), time_step_ms)).to.deep.equals([0, 1, 1]);
+		const timeStepMs = 15000;
+		expect(momenting(test.map(timeStamp => moment(timeStamp)), timeStepMs)).to.deep.equals([0, 1, 1]);
 	});
 	mocha.it('should work on irregular timesteps', () => {
 		const test = ['2019-09-10T00:00:15',
 			'2019-09-10T00:00:30', '2019-09-10T00:00:50'];
-		const time_step_ms = 15000;
-		expect(momenting(test.map(time_stamp => moment(time_stamp)), time_step_ms)).to.deep.equals([0, 1, 5 / 15]);
+		const timeStepMs = 15000;
+		expect(momenting(test.map(timeStamp => moment(timeStamp)), timeStepMs)).to.deep.equals([0, 1, 5 / 15]);
 	});
 });
 
@@ -86,20 +86,21 @@ mocha.describe('Generate sinewave helper', () => {
 	});
 	mocha.it('should be able to generate data for simply one day', () => {
 		const startTimeStamp = '2019-09-10 00:00:00';
-		const endTimeStamp = '2019-09-11 00:00:00'
+		const endTimeStamp = '2019-09-11 00:00:00';
 		expect(_generateSineData(startTimeStamp, endTimeStamp, { timeStep: { day: 1 } })).to.deep.equals([[startTimeStamp, '1'], [endTimeStamp, '1']]);
 	});
 	mocha.it('should be able to generate data for half a day', () => {
 		const startTimeStamp = '2019-09-10 00:00:00';
-		const endTimeStamp = '2019-09-11 00:00:00'
-		expect(_generateSineData(startTimeStamp, endTimeStamp, { timeStep: { hour: 12 } })).to.deep.equals([[startTimeStamp, '1'], ['2019-09-10 12:00:00', '1'], [endTimeStamp, '1']]);
+		const endTimeStamp = '2019-09-11 00:00:00';
+		expect(_generateSineData(startTimeStamp, endTimeStamp, { timeStep: { hour: 12 } }))
+		.to.deep.equals([[startTimeStamp, '1'], ['2019-09-10 12:00:00', '1'], [endTimeStamp, '1']]);
 	});
 });
 
 mocha.describe('Generate Sinewave', () => {
 	mocha.it('should properly write to file', async () => {
 		const startTimeStamp = '2019-09-10 00:00:00';
-		const endTimeStamp = '2019-09-11 00:00:00'
+		const endTimeStamp = '2019-09-11 00:00:00';
 		const filename = 'test1.csv';
 		const timeOptions = { timeStep: { minute: 20 }, period_length: { day: 1 } };
 		const maxAmplitude = 2;

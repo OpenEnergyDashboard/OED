@@ -17,6 +17,8 @@ const stringify = require('csv-stringify');
 const _ = require('lodash');
 const moment = require('moment');
 
+const { log } = require('../log');
+
 /* Our main export is the generateSine function. We break this into several parts:
  * 1. Generate the moments in time within a specificed range and at a specified time step from a given range.
  * 2. For each moment determine how much time as elapsed (as a decimal) within its respective period.
@@ -43,15 +45,15 @@ function generateDates(startDate, endDate, timeStep = { minute: 20 }) {
 	// Check timeStep is at least 1 second, if not throw an error.
 	const temp = moment();
 	if (temp.clone().add(timeStep).isBefore(temp.clone().add({ second: 1 }))) {
-		throw Error('The timestep needs to be at least 1 second.')
-	};
-	const array_of_moments = [];
+		throw Error('The time step needs to be at least 1 second.');
+	}
+	const arrayOfMoments = [];
 	const startMoment = moment(startDate);
 	const endMoment = moment(endDate);
 	while (!startMoment.isAfter(endMoment)) {
 		array_of_moments.push(startMoment.format('YYYY-MM-DD HH:mm:ss'));
 		startMoment.add(timeStep);
-	};
+	}
 	return array_of_moments;
 } // generateDates
 
@@ -65,48 +67,58 @@ function generateDates(startDate, endDate, timeStep = { minute: 20 }) {
  */
 function _momentPercentage(startTime, endTime, currentMoment) {
 	// Check pre-conditions
-	if (endTime.isBefore(startTime)) { throw RangeError('The endTime must be after or equal to the startTime.') };
-	if (currentMoment.isBefore(startTime)) { throw RangeError('The currentMoment must be after or equal to the starTime.') };
-	if (currentMoment.isAfter(endTime)) { throw RangeError('The currentMoment must be before or equal to the endTime.') };
-	if (startTime.isAfter(endTime)) { throw RangeError('The startTime must be before or equal to the endTime.') };
+	if (endTime.isBefore(startTime)) {
+		throw RangeError('The endTime must be after or equal to the startTime.');
+	}
+	if (currentMoment.isBefore(startTime)) {
+		throw RangeError('The currentMoment must be after or equal to the starTime.');
+	}
+	if (currentMoment.isAfter(endTime)) {
+		throw RangeError('The currentMoment must be before or equal to the endTime.');
+	}
+	if (startTime.isAfter(endTime)) {
+		throw RangeError('The startTime must be before or equal to the endTime.');
+	}
 
-	if (endTime - startTime <= 0) { return 1 };
+	if (endTime - startTime <= 0) {
+		return 1;
+	}
 	return (currentMoment - startTime) / (endTime - startTime);
 } // _momentPercentage
 
 /**
  * Takes each moment and converts them into the percentage of time elapsed in
  * its specific period as a decimal from 0 to 1.
- * @param {moment[]} array_of_moments Array of moment objects
- * @param {Object} period_length Object whose keys describe the length of the
- * length of the period, which should be greater than the timestep between
+ * @param {moment[]} arrayOfMoments Array of moment objects
+ * @param {Object} periodLength Object whose keys describe the length of the
+ * length of the period, which should be greater than the time step between
  * consecutive moments.
- * @returns {Number[]} an array where each element corresponds to the percentage of time elasped at the
+ * @returns {Number[]} an array where each element corresponds to the percentage of time elapsed at the
  * the corresponding timestamp in array_of_moments
  */
-function momenting(array_of_moments, period_length) {
-	const startMoment = array_of_moments[0];
-	const endMoment = startMoment.clone().add(period_length);
-	const result = array_of_moments.map(moment => {
-		while (moment.isAfter(endMoment)) {
-			startMoment.add(period_length);
-			endMoment.add(period_length);
-		};
-		return (_momentPercentage(startMoment, endMoment, moment));
+function momenting(arrayOfMoments, periodLength) {
+	const startMoment = arrayOfMoments[0];
+	const endMoment = startMoment.clone().add(periodLength);
+	const result = arrayOfMoments.map(singleMoment => {
+		while (singleMoment.isAfter(endMoment)) {
+			startMoment.add(periodLength);
+			endMoment.add(periodLength);
+		}
+		return (_momentPercentage(startMoment, endMoment, singleMoment));
 	});
 	return result;
 } // momenting
 
 /**
  * Checks if a number is really close to zero.
- * @param {Number} number
+ * @param {Number} x
  * @param {Number} epsilon our default for what is close to zero is 1e-10
  * @returns {Boolean} whether or not number is really close to zero
  * @source: https://www.quora.com/In-JavaScript-how-do-I-test-if-a-number-is-close-to-zero
  */
-function isEpsilon(number, epsilon = 1e-10) {
-	return Math.abs(number) < epsilon;
-} // isEpisilon
+function isEpsilon(x, epsilon = 1e-10) {
+	return Math.abs(x) < epsilon;
+} // isEpsilon
 
 /**
  * Generates sine data over a period of time. By default the timeStep is 20 minutes.
@@ -117,19 +129,19 @@ function isEpsilon(number, epsilon = 1e-10) {
  * 1 second.
  * @returns {String[][]} Matrix of rows representing each csv row of the form timeStamp, value
  */
-function _generateSineData(startTimeStamp, endTimeStamp, options = { timeStep: { minute: 20 }, period_length: { day: 1 }, maxAmplitude: 2 }) {
+function _generateSineData(startTimeStamp, endTimeStamp, options = { timeStep: { minute: 20 }, periodLength: { day: 1 }, maxAmplitude: 2 }) {
 	const defaultOptions = {
 		timeStep: { minute: 20 },
-		period_length: { day: 1 },
+		periodLength: { day: 1 },
 		maxAmplitude: 2,
-		...options,
-	}
+		...options
+	};
 	const dates = generateDates(startTimeStamp, endTimeStamp, defaultOptions.timeStep);
-	const dates_as_moments = dates.map(date => moment(date));
+	const datesAsMoments = dates.map(date => moment(date));
 	const halfMaxAmplitude = defaultOptions.maxAmplitude / 2;
 	// We take our array of moment percentages and scale it with the half max amplitude
 	// and shift it up by that amount.
-	const sineValues = momenting(dates_as_moments, defaultOptions.period_length)
+	const sineValues = momenting(datesAsMoments, defaultOptions.periodLength)
 		.map(x => {
 			const result = Math.sin(Math.PI * 2 * x);
 			const scaledResult = halfMaxAmplitude * (isEpsilon(result) ? 0 : result) + halfMaxAmplitude;
@@ -153,15 +165,15 @@ function _generateSineData(startTimeStamp, endTimeStamp, options = { timeStep: {
  * https://stackoverflow.com/questions/2496710/writing-files-in-node-js
  */
 function write_to_csv(data, filename = 'test.csv') {
-	stringify(data, (err, output) => {
-		if (err) {
-			return console.log(err);
+	stringify(data, (stringifyErr, output) => {
+		if (stringifyErr) {
+			log.error(stringifyErr);
 		}
-		fs.writeFile(filename, output, function (err) {
+		fs.writeFile(filename, output, err => {
 			if (err) {
-				return console.log(err);
+				return log.error(err);
 			}
-			console.log("The file was saved!");
+			log.info('The file was saved!');
 		});
 	});
 } // write_to_csv
@@ -175,9 +187,17 @@ function write_to_csv(data, filename = 'test.csv') {
  * in the link below:
  * @source: https://momentjs.com/docs/#/parsing/object/
  */
-function generateSine(startTimeStamp, endTimeStamp, options = { filename: 'test.csv', timeStep: { minute: 20 }, period_length: { day: 1 }, maxAmplitude: 2 }) {
-	const chosen_data_options = { timeStep: options.timeStep, period_length: options.period_length, maxAmplitude: options.maxAmplitude };
-	write_to_csv(_generateSineData(startTimeStamp, endTimeStamp, chosen_data_options), options.filename);
+function generateSine(
+	startTimeStamp,
+	endTimeStamp,
+	options = {
+		filename: 'test.csv',
+		timeStep: { minute: 20 },
+		periodLength: { day: 1 },
+		maxAmplitude: 2
+	}) {
+	const chosenDataOptions = { timeStep: options.timeStep, periodLength: options.periodLength, maxAmplitude: options.maxAmplitude };
+	write_to_csv(_generateSineData(startTimeStamp, endTimeStamp, chosenDataOptions), options.filename);
 } // generateSine
 
 module.exports = {
@@ -186,4 +206,4 @@ module.exports = {
 	write_to_csv,
 	momenting,
 	_generateSineData
-}
+};
