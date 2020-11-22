@@ -11,9 +11,8 @@ const demuxCsvWithSingleColumnTimestamps = require('./csvDemux');
 async function loadLogfileToReadings(serialNumber, ipAddress, logfile, conn) {
 	// Get demultiplexed, parsed data from the CSV.
 	const unprocessedData = demuxCsvWithSingleColumnTimestamps(logfile);
-	// Check if the first three are zeroes
-	const data = (unprocessedData[0] === 0 && unprocessedData[1] === 0 && unprocessedData[2] === 0) ?
-		unprocessedData.slice(3) : unprocessedData;
+	// Removes the first three values because we expect it to be all zeroes
+	const data = unprocessedData.slice(3);
 	for (let i = 0; i < data.length; i++) {
 		let meter;
 		try {
