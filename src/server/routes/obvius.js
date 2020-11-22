@@ -35,6 +35,7 @@ const router = express.Router();
 // integrate form/multipart data into the generic parameter pipeline along with
 // POST and GET params.
 router.use(upload.any(), middleware.lowercaseAllParamNames);
+router.use(middleware.paramsLookupMixin);
 
 /**
  * Inform the client of a failure (406 Not Acceptable), and log it.
@@ -82,8 +83,8 @@ function handleStatus(req, res) {
 	// Build a log entry for this request
 	let s = `Handling request from ${ip}\n`;
 	for (const paramName of paramNames) {
-		if (req.body[paramName] !== false && req.body[paramName] !== undefined) {
-			s += `\tGot ${paramName}: ${req.body[paramName]}\n`;
+		if (req.param(paramName) !== false && req.param(paramName) !== undefined) {
+			s += `\tGot ${paramName}: ${req.param(paramName)}\n`;
 		} else {
 			s += `\tNo ${paramName} submitted\n`;
 		}
@@ -103,15 +104,15 @@ router.all('/', async (req, res) => {
 	log.info(`Received Obvious protocol request from ${ip}`);
 
 	// Attempt to verify the password
-	if (!req.body['password']) {
+	if (!req.param('password')) {
 		failure(req, res, 'password parameter is required.');
 		return;
-	} else if (req.body['password'] !== config.obvius.password) {
+	} else if (req.param('password') !== config.obvius.password) {
 		failure(req, res, 'password was not correct.');
 		return;
 	}
 
-	const mode = req.body['mode'] || false;
+	const mode = req.param('mode', false);
 	if (mode === false) {
 		failure(req, res, 'Request must include mode parameter.');
 		return;
@@ -123,7 +124,7 @@ router.all('/', async (req, res) => {
 	}
 
 	if (mode === obvius.mode.logfile_upload) {
-		if (!req.body['serialnumber']) {
+		if (!req.param('serialnumber', false)) {
 			failure(req, res, 'Logfile Upload Requires Serial Number');
 			return;
 		}
@@ -139,7 +140,7 @@ router.all('/', async (req, res) => {
 				failure(req, res, `Unable to gunzip incoming buffer: ${err}`);
 				return;
 			}
-			loadLogfileToReadings(req.body['serialnumber'], ip, data, conn);
+			loadLogfileToReadings(req.param('serialnumber'), ip, data, conn);
 		}
 		success(req, res, 'Logfile Upload IS PROVISIONAL');
 		return;
@@ -158,11 +159,11 @@ router.all('/', async (req, res) => {
 
 	if (mode === obvius.mode.config_file_upload) {
 		// Check required parameters
-		if (!req.body['serialnumber']) {
+		if (!req.param('serialnumber', false)) {
 			failure(req, res, 'Config Upload Requires Serial Number');
 			return;
 		}
-		if (!req.body['modbusdevice']) {
+		if (!req.param('modbusdevice', false)) {
 			failure(req, res, 'Config Upload Requires Modbus Device ID');
 			return;
 		}
@@ -177,7 +178,7 @@ router.all('/', async (req, res) => {
 				data = fx.buffer.toString('utf-8');
 			}
 
-			const cf = new Configfile(undefined, req.body['serialnumber'], req.body['modbusdevice'], moment(), md5(data), data, true);
+			const cf = new Configfile(undefined, req.param('serialnumber'), req.param('modbusdevice'), moment(), md5(data), data, true);
 			await cf.insert(conn);
 			success(req, res, `Acquired config log with (pseudo)filename ${cf.makeFilename()}.`);
 		}
