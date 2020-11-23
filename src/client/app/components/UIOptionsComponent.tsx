@@ -78,7 +78,7 @@ class UIOptionsComponent extends React.Component<UIOptionsPropsWithIntl, UIOptio
 			zIndex: 0
 		};
 		const messages = defineMessages({
-			barStackingTip: { id: 'bar.stacking.tip' },
+			barStackingTip: { id: 'bar.stacking.tip' }
 		});
 
 		return (
