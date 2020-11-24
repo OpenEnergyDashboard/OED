@@ -18,13 +18,13 @@ async function loadLogfileToReadings(serialNumber, ipAddress, logfile, conn) {
 		try {
 			meter = await Meter.getByName(`${serialNumber}.${i}`, conn);
 		} catch (v) {
-			log.info('WARNING: Creating a meter that does not already exist. We expect obvius meters to be created by an uploaded ConfigFile.');
 			// For now, new Obvius meters collect data (enabled) but do not display (not displayable).
 			// Also, the identifier is the same as the meter name for now. The longer-term plan is to read
 			// the configuration file and use information in that to set this value before meters are read
 			// so they are not created here.
 			meter = new Meter(undefined, `${serialNumber}.${i}`, ipAddress, true, false, Meter.type.OBVIUS);
 			await meter.insert(conn);
+			log.warn('WARNING: Created a meter that does not already exist. We expect obvius meters to be created by an uploaded ConfigFile.');
 		}
 
 		for (const rawReading of data[i]) {
