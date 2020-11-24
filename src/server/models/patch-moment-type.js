@@ -19,12 +19,7 @@ function patchMomentType(pgp) {
 	const TIMESTAMP_OID = 1114;
 
 	types.setTypeParser(TIMESTAMP_OID, function (val) {
-		console.log(val);
-		utc = moment.utc(val);
-		console.log(utc.format());
-		console.log(utc.utc().format());
-		console.log(moment(val).format());
-		return moment(val);
+		return moment(val); //timestamp without timezone will create moment using UTC time as offset
 	});
 	types.setTypeParser(TIMESTAMPTZ_OID, moment);
 
