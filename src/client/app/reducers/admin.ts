@@ -46,7 +46,8 @@ export default function admin(state = defaultState, action: AdminAction) {
 		case ActionType.UpdateDefaultTimeZone:
 			return {
 				...state,
-				defaultTimeZone: action.timeZone
+				defaultTimeZone: action.timeZone,
+				submitted: false
 			};
 		case ActionType.UpdateDefaultLanguage:
 			return {
@@ -66,7 +67,8 @@ export default function admin(state = defaultState, action: AdminAction) {
 				displayTitle: action.data.displayTitle,
 				defaultChartToRender: action.data.defaultChartToRender,
 				defaultBarStacking: action.data.defaultBarStacking,
-				defaultLanguage: action.data.defaultLanguage
+				defaultLanguage: action.data.defaultLanguage,
+				defaultTimeZone: action.data.defaultTimezone
 			};
 		case ActionType.MarkPreferencesNotSubmitted:
 			return {

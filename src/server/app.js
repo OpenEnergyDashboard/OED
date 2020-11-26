@@ -22,6 +22,7 @@ const login = require('./routes/login');
 const verification = require('./routes/verification');
 const groups = require('./routes/groups');
 const version = require('./routes/version');
+const timezones = require('./routes/timezones')
 const createRouterForNewCompressedReadings = require('./routes/compressedReadings').createRouter;
 const createRouterForCompareReadings = require('./routes/compareReadings').createRouter;
 const baseline = require('./routes/baseline');
@@ -51,6 +52,7 @@ app.use('/api/version', version);
 app.use('/api/compressedReadings', createRouterForNewCompressedReadings());
 app.use('/api/compareReadings', createRouterForCompareReadings());
 app.use('/api/baselines', baseline);
+app.use('/api/timezones', timezones);
 app.use(express.static(path.join(__dirname, '..', 'client', 'public')));
 
 const router = express.Router();

@@ -32,6 +32,7 @@ function formatMeterForResponse(meter, loggedIn) {
 	if (loggedIn) {
 		formattedMeter.ipAddress = meter.ipAddress;
 		formattedMeter.meterType = meter.type;
+		formattedMeter.timeZone = meter.meterTimezone;
 	}
 
 	return formattedMeter;
@@ -99,12 +100,13 @@ router.use(requiredAuthenticator);
 router.post('/edit', async (req, res) => {
 	const validParams = {
 		type: 'object',
-		maxProperties: 3,
-		required: ['id', 'enabled', 'displayable'],
+		maxProperties: 4,
+		required: ['id', 'enabled', 'displayable', 'timeZone'],
 		properties: {
 			id: { type: 'integer' },
 			enabled: { type: 'bool' },
-			displayable: { type: 'bool' }
+			displayable: { type: 'bool' },
+			timeZone: { type: 'string' }
 		}
 	};
 
@@ -119,6 +121,7 @@ router.post('/edit', async (req, res) => {
 			const meter = await Meter.getByID(req.body.id, conn);
 			meter.enabled = req.body.enabled;
 			meter.displayable = req.body.displayable;
+			meter.meterTimezone = req.body.timeZone;
 			await meter.update(conn);
 		} catch (err) {
 			log.error('Failed to edit meter', err);

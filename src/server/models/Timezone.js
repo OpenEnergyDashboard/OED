@@ -2,7 +2,7 @@ const database = require('./database');
 
 const sqlFile = database.sqlFile;
 
-class Timezone{
+class Timezone {
 	/**
 	 * Creates a new reading
 	 * @param name The name of the timezone
@@ -15,8 +15,8 @@ class Timezone{
 		this.offset = offset;
 	}
 	static mapRow(row) {
-		return new Timezone(row.name, row.abbrev, row.offset);
-	}    
+		return new Timezone(row.name, row.abbrev, row.utc_offset);
+	}
 	/**
 	 * Returns a promise to get all of the timezones from the database.
 	 * @param conn is the connection to use.
@@ -27,3 +27,5 @@ class Timezone{
 		return rows.map(Timezone.mapRow);
 	}
 }
+
+module.exports = Timezone;
