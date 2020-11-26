@@ -26,4 +26,4 @@ class Timezone{
 		const rows = await conn.any(sqlFile('preferences/get_all_timezones.sql'));
 		return rows.map(Timezone.mapRow);
 	}
- }
+}
