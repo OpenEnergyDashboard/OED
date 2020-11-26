@@ -74,6 +74,7 @@
 	"meter.name": "Meter Name",
 	"meter.type": "Meter Type",
 	"meter.ip": "Meter Address",
+	"meter.time.zone": "Meter Time Zone",
 	"meter.enabled": "Meter Updates",
 	"meter.displayable": "Meter Display",
 	"meter.is.enabled": "Updates Enabled",

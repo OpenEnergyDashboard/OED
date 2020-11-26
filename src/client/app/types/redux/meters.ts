@@ -49,6 +49,7 @@ export interface MeterMetadata {
 	displayable: boolean;
 	meterType?: string;
 	ipAddress?: string;
+	timeZone?: string;
 }
 
 export interface MeterMetadataByID {

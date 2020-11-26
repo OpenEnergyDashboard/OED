@@ -13,7 +13,7 @@ interface TimeZoneSelectProps {
 }
 
 const options = timezones.map(timezone => {
-	return { value: timezone.name, label: `${timezone.name} (${timezone.abbrev}) ${timezone.offset}` }
+	return { value: timezone.name, label: `${timezone.name} (${timezone.abbrev}) ${timezone.offset}` };
 });
 
 const TimeZoneSelect = ({ current, handleClick }: TimeZoneSelectProps) => {
