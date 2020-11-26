@@ -3,7 +3,7 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
 
 DO $$ BEGIN
-    ALTER TABLE preferences ADD COLUMN defualt_timezone TEXT DEFAULT NULL ;
+    ALTER TABLE preferences ADD COLUMN default_timezone TEXT DEFAULT NULL ;
 EXCEPTION
     WHEN duplicate_column THEN NULL;
 END $$;
