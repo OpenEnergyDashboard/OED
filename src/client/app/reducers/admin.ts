@@ -12,6 +12,7 @@ const defaultState: AdminState = {
 	displayTitle: '',
 	defaultChartToRender: ChartTypes.line,
 	defaultBarStacking: false,
+	defaultTimeZone: '',
 	defaultLanguage: LanguageTypes.en,
 	isFetching: false,
 	submitted: true
@@ -41,6 +42,11 @@ export default function admin(state = defaultState, action: AdminAction) {
 				...state,
 				defaultBarStacking: !state.defaultBarStacking,
 				submitted: false
+			};
+		case ActionType.UpdateDefaultTimeZone:
+			return {
+				...state,
+				defaultTimeZone: action.timeZone
 			};
 		case ActionType.UpdateDefaultLanguage:
 			return {

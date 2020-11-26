@@ -22,6 +22,10 @@ export function updateDisplayTitle(displayTitle: string): t.UpdateDisplayTitleAc
 	return { type: ActionType.UpdateDisplayTitle, displayTitle };
 }
 
+export function updateTimeZone(timeZone: string): t.UpdateDefaultTimeZone {
+	return { type: ActionType.UpdateDefaultTimeZone, timeZone };
+}
+
 export function updateDefaultChartToRender(defaultChartToRender: ChartTypes): t.UpdateDefaultChartToRenderAction {
 	return { type: ActionType.UpdateDefaultChartToRender, defaultChartToRender };
 }

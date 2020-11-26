@@ -16,6 +16,7 @@ export type AdminAction =
 	| RequestPreferencesAction
 	| ReceivePreferencesAction
 	| MarkPreferencesNotSubmittedAction
+	| UpdateDefaultTimeZone
 	| MarkPreferencesSubmittedAction;
 
 export interface UpdateImportMeterAction {
@@ -35,6 +36,11 @@ export interface UpdateDefaultChartToRenderAction {
 
 export interface ToggleDefaultBarStackingAction {
 	type: ActionType.ToggleDefaultBarStacking;
+}
+
+export interface UpdateDefaultTimeZone {
+	type: ActionType.UpdateDefaultTimeZone;
+	timeZone: string;
 }
 
 export interface UpdateDefaultLanguageAction {
@@ -64,6 +70,7 @@ export interface AdminState {
 	displayTitle: string;
 	defaultChartToRender: ChartTypes;
 	defaultBarStacking: boolean;
+	defaultTimeZone: string;
 	defaultLanguage: LanguageTypes;
 	isFetching: boolean;
 	submitted: boolean;
