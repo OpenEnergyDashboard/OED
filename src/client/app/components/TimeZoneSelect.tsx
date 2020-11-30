@@ -1,12 +1,11 @@
+/* This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this
+ * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
+
 import * as React from 'react';
 import Select from 'react-select';
 import axios from 'axios';
-
-export interface TimeZones {
-	name: string;
-	abbrev: string;
-	offset: string;
-}
+import { TimeZones } from 'types/timezone';
 
 interface TimeZoneSelectProps {
 	current: string;
@@ -22,7 +21,6 @@ let options: null | TimeZoneOption[] = null;
 
 axios.get('/api/timezones').then(res => {
 	const timezones = res.data;
-	console.log(timezones);
 	options = timezones.map((timezone: TimeZones) => {
 		return { value: timezone.name, label: `${timezone.name} (${timezone.abbrev}) ${timezone.offset}` };
 	});

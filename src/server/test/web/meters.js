@@ -65,7 +65,7 @@ mocha.describe('meters API', () => {
 					expect(meter).to.have.property('name', `Meter ${i + 1}`);
 					expect(meter).to.have.property('displayable', true);
 				} else {
-					expect(meter).to.have.property('name', `Not Visible`);
+					expect(meter).to.have.property('name', 'Not Visible');
 					expect(meter).to.have.property('displayable', false);
 				}
 				expect(meter).to.have.property('ipAddress', '1.1.1.1');
