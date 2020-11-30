@@ -36,7 +36,7 @@ const TimeZoneSelect = ({ current, handleClick }: TimeZoneSelectProps) => {
 		}
 	};
 
-	return (options !== null ? <Select value={current} options={options} onChange={handleChange} /> : <h1>Please Reload</h1>);
+	return (options !== null ? <Select value={current} options={options} onChange={handleChange} /> : <span>Please Reload</span>);
 };
 
 export default TimeZoneSelect;
