@@ -44,7 +44,7 @@ function handleCumulative(rows, readingRepetition, meterID) {
 			}
 			meterReading = meterReading1 - meterReading2;
 			// To handle cumulative readings that resets at midnight
-			if (meterReading < 0) {
+			if (meterReading < 0 && endTimestamp.isAfter(startTimestamp, 'date')) {
 				meterReading = meterReading1;
 			}
 			// Push into reading Array
