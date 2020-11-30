@@ -10,15 +10,24 @@ const moment = require('moment');
 
 mocha.describe('PIPELINE: Handle cumulative', () => {
 	let sampleArray = [[10000, moment('1970-01-01 00:00:00'), moment('1970-01-01 00:00:30')]];
+	let sampleNegativeArray = [[10, moment('1970-01-01 00:00:00'), moment('1970-01-01 00:00:30')]];
 	const valGap = 2;
 	const timeGap = 30;
 	for (let i = 1; i < 12; ++i) {
 		sampleArray.push([sampleArray[i - 1][0] - valGap * i,
 						sampleArray[i - 1][1].subtract(timeGap * i, 'second'),
 						sampleArray[i - 1][2].subtract(timeGap * i, 'second')]);
+		sampleNegativeArray.push([sampleNegativeArray[i - 1][0] - valGap * i,
+						sampleNegativeArray[i - 1][1].subtract(timeGap * i, 'second'),
+						sampleNegativeArray[i - 1][2].subtract(timeGap * i, 'second')]);
 	}
+	mocha.describe('with some negative values', () => {
+		mocha.it('rejected all values', async () => {
+			expect(handleCumulative(sampleNegativeArray, 1, 'testing').length).to.equal(0);
+		});
+	});
 	mocha.describe('with non-duplicated value', () => {
-		result = handleCumulative(sampleArray, 1);
+		result = handleCumulative(sampleArray, 1, 'testing');
 		mocha.it('returned array length', async () => {
 			expect(result.length).to.equal(sampleArray.length - 1);
 		});
@@ -47,13 +56,13 @@ mocha.describe('PIPELINE: Handle cumulative', () => {
 	mocha.describe('with duplicated value', () => {
 		mocha.it('returned array length', async () => {
 			for (let repetition = 2; repetition < 7; ++repetition) {
-				result = handleCumulative(sampleArray, repetition);
+				result = handleCumulative(sampleArray, repetition, 'testing');
 				expect(result.length).to.equal(Math.floor((sampleArray.length - 1) / repetition));
 			}
 		});
 		mocha.it('reading values', async () => {
 			for (let repetition = 2; repetition < 7; ++repetition) {
-				result = handleCumulative(sampleArray, repetition);
+				result = handleCumulative(sampleArray, repetition, 'testing');
 				let k = 0;
 				for (let i = 1; i < 12; ++i) {
 					if ((i - repetition) % repetition === 0) {
@@ -65,7 +74,7 @@ mocha.describe('PIPELINE: Handle cumulative', () => {
 		});
 		mocha.it('startTimeStamps', async () => {
 			for (let repetition = 2; repetition < 7; ++repetition) {
-				result = handleCumulative(sampleArray, repetition);
+				result = handleCumulative(sampleArray, repetition, 'testing');
 				let k = 0;
 				for (let i = 1; i < 12; ++i) {
 					if ((i - repetition) % repetition === 0) {
@@ -77,7 +86,7 @@ mocha.describe('PIPELINE: Handle cumulative', () => {
 		});
 		mocha.it('endTimeStamps', async () => {
 			for (let repetition = 2; repetition < 7; ++repetition) {
-				result = handleCumulative(sampleArray, repetition);
+				result = handleCumulative(sampleArray, repetition, 'testing');
 				let k = 0;
 				for (let i = 1; i < 12; ++i) {
 					if ((i - repetition) % repetition === 0) {

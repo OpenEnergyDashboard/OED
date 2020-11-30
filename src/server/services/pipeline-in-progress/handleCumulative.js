@@ -5,6 +5,7 @@
  */
 
 const moment = require('moment');
+const { log } = require('../../log');
 
 /**
  * Handle cumulative data, assume that last row is the first reading (skip this row).
@@ -17,8 +18,9 @@ const moment = require('moment');
  *    reading #0 is cumulative value from unknown readings that may or may not have been inserted before
  * @param {object[[]]} rows
  * @param readingRepetition value is 1 if reading is not duplicated. 2 if repeated twice and so on (E-mon D-mon meters)
+ * @param {string} meterID
  */
-function handleCumulative(rows, readingRepetition) {
+function handleCumulative(rows, readingRepetition, meterID) {
 	const result = [];
 	// Initialize timestamps and other variables
 	let startTimestamp = moment(0);
@@ -36,12 +38,16 @@ function handleCumulative(rows, readingRepetition) {
 			// meterReading
 			meterReading1 = rows[index - readingRepetition][0];
 			meterReading2 = rows[index][0];
+			if (meterReading1 < 0) {
+				log.error(`DECTECTED A NEGATIVE VALUE WHILE HANDLING CUMULATIVE READINGS FROM METER ${meterID}, ROW ${index - readingRepetition}. REJECTED ALL READINGS`);
+				return [];
+			}
 			meterReading = meterReading1 - meterReading2;
 			// To handle cumulative readings that resets at midnight
 			if (meterReading < 0) {
 				meterReading = meterReading1;
 			}
-			// push into reading Array
+			// Push into reading Array
 			result.push([meterReading, startTimestamp, endTimestamp]);
 		}
 	}

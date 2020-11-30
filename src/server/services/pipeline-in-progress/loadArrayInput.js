@@ -20,7 +20,7 @@ const handleCumulative = require('./handleCumulative');
 async function loadArrayInput(dataRows, meterID, mapRowToModel, isCumulative, readingRepetition, conditionSet, conn) {
 	readingsArray = dataRows.map(mapRowToModel);
 	if (isCumulative) {
-		readingsArray = handleCumulative(readingsArray, readingRepetition);
+		readingsArray = handleCumulative(readingsArray, readingRepetition, meterID);
 	}
 	readings = convertToReadings(readingsArray, meterID, conditionSet);
 	return await Reading.insertOrIgnoreAll(readings, conn);

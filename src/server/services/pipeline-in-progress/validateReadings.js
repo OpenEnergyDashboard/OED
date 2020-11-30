@@ -95,7 +95,7 @@ function checkIntervals(arrayToValidate, threshold) {
 		currGap = reading.startTimestamp.diff(lastTime, 'seconds');
 		// Compare the current time gap with the expected interval. Terminate if the difference is larger than accepted threshold
 		if (Math.abs(currGap - interval) > threshold) {
-			log.error(`UNEQUAL INTERVAL IS DETECTED FROM METER ${reading.meterID}: Time gap between ${reading.startTimestamp} and ${lastTime} is too big`);
+			log.warn(`UNEQUAL INTERVAL IS DETECTED FROM METER ${reading.meterID}: Time gap between ${reading.startTimestamp} and ${lastTime} is too big`);
 			return false;
 		}
 		lastTime = reading.endTimestamp;
