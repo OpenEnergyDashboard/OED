@@ -38,11 +38,12 @@ function handleCumulative(rows, readingRepetition, meterID) {
 			// meterReading
 			meterReading1 = rows[index - readingRepetition][0];
 			meterReading2 = rows[index][0];
+			meterReading = meterReading1 - meterReading2;
+			// Reject negative readings
 			if (meterReading1 < 0) {
 				log.error(`DECTECTED A NEGATIVE VALUE WHILE HANDLING CUMULATIVE READINGS FROM METER ${meterID}, ROW ${index - readingRepetition}. REJECTED ALL READINGS`);
 				return [];
 			}
-			meterReading = meterReading1 - meterReading2;
 			// To handle cumulative readings that resets at midnight
 			if (meterReading < 0 && endTimestamp.isAfter(startTimestamp, 'date')) {
 				meterReading = meterReading1;
