@@ -102,14 +102,15 @@ mocha.describe('Generate Sinewave', () => {
 		const startTimeStamp = '2019-09-10 00:00:00';
 		const endTimeStamp = '2019-09-11 00:00:00';
 		const filename = 'test1.csv';
-		const timeOptions = { timeStep: { minute: 20 }, period_length: { day: 1 } };
+		const timeOptions = { timeStep: { minute: 20 }, periodLength: { day: 1 } };
 		const maxAmplitude = 2;
 		const data = _generateSineData(startTimeStamp, endTimeStamp, { ...timeOptions, maxAmplitude: maxAmplitude });
-		await generateSine(startTimeStamp, endTimeStamp, { ...timeOptions, filename: filename, maxAmplitude: maxAmplitude });
+		await generateSine(startTimeStamp, endTimeStamp, { ...timeOptions, filename: `${__dirname}/${filename}`, maxAmplitude: maxAmplitude });
 		// https://stackabuse.com/reading-and-writing-csv-files-in-nodejs-with-node-csv/
 		const dataFromFile = await fs.readFile(`${__dirname}/${filename}`);
 		const records = await parseCsv(dataFromFile);
 
 		expect(records).to.deep.equal(data);
+		await fs.unlink(`${__dirname}/${filename}`); // delete test file created
 	});
 });

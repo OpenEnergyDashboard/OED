@@ -8,7 +8,6 @@
  * generateSine,
  * write_to_csv,
  * generateSine
- *
  */
 
 // Imports
@@ -20,10 +19,10 @@ const moment = require('moment');
 const { log } = require('../log');
 
 /* Our main export is the generateSine function. We break this into several parts:
- * 1. Generate the moments in time within a specificed range and at a specified time step from a given range.
+ * 1. Generate the moments in time within a specified range and at a specified time step from a given range.
  * 2. For each moment determine how much time as elapsed (as a decimal) within its respective period.
  * 3. Calculate the value of sine at that moment in time.
- * 		Conceptually this is sin(decimal_percentage * 2*PI) and it works because the sine function we will
+ * 		Conceptually this is sin(decimal_percentage * 2* PI) and it works because the sine function we will
  * 		use is a function of radians and sin(x) = sin(x/P * P * 2 * PI)
  * 4. We zip the array of moments and their corresponding sine values into a matrix,
  * which we will use write into a csv file.
@@ -37,7 +36,7 @@ const { log } = require('../log');
  * @param {String} endDate String of the form 'YYYY-MM-DD HH:MM:SS'
  * @param {Object} timeStep Object with keys describe the time step, by default
  * this is { minute: 20 } or 20 minutes and to at be at least 1 second.
- * @returns {String[]} An array of timestamps between startDate and endDate, at a given timestep
+ * @returns {String[]} An array of timestamps between startDate and endDate, at a given time step
  * (default 20 minutes). The first element of the output will be the startDate, but the last element
  * may not necessarily be the endDate.
  */
@@ -45,17 +44,17 @@ function generateDates(startDate, endDate, timeStep = { minute: 20 }) {
 	// Check timeStep is at least 1 second, if not throw an error.
 	const temp = moment();
 	if (temp.clone().add(timeStep).isBefore(temp.clone().add({ second: 1 }))) {
-		throw Error('The time step needs to be at least 1 second.');
+		throw Error(`The time step provided is ${JSON.stringify(timeStep)} needs to be at least 1 second.`);
 	}
 	const arrayOfMoments = [];
 	const startMoment = moment(startDate);
 	const endMoment = moment(endDate);
 	while (!startMoment.isAfter(endMoment)) {
-		array_of_moments.push(startMoment.format('YYYY-MM-DD HH:mm:ss'));
+		arrayOfMoments.push(startMoment.format('YYYY-MM-DD HH:mm:ss'));
 		startMoment.add(timeStep);
 	}
-	return array_of_moments;
-} // generateDates
+	return arrayOfMoments;
+}
 
 /**
  * Determine what percentage of elapsed time passed that is at what percentage
@@ -84,7 +83,7 @@ function _momentPercentage(startTime, endTime, currentMoment) {
 		return 1;
 	}
 	return (currentMoment - startTime) / (endTime - startTime);
-} // _momentPercentage
+}
 
 /**
  * Takes each moment and converts them into the percentage of time elapsed in
@@ -94,7 +93,7 @@ function _momentPercentage(startTime, endTime, currentMoment) {
  * length of the period, which should be greater than the time step between
  * consecutive moments.
  * @returns {Number[]} an array where each element corresponds to the percentage of time elapsed at the
- * the corresponding timestamp in array_of_moments
+ * the corresponding timestamp in arrayOfMoments
  */
 function momenting(arrayOfMoments, periodLength) {
 	const startMoment = arrayOfMoments[0];
@@ -107,7 +106,7 @@ function momenting(arrayOfMoments, periodLength) {
 		return (_momentPercentage(startMoment, endMoment, singleMoment));
 	});
 	return result;
-} // momenting
+}
 
 /**
  * Checks if a number is really close to zero.
@@ -148,7 +147,7 @@ function _generateSineData(startTimeStamp, endTimeStamp, options = { timeStep: {
 			return `${scaledResult}`;
 		});
 	return (_.zip(dates, sineValues));
-} // _generateSineData
+}
 
 /** data needs to be of form
  *
@@ -164,7 +163,7 @@ function _generateSineData(startTimeStamp, endTimeStamp, options = { timeStep: {
  * https://csv.js.org/stringify/api/
  * https://stackoverflow.com/questions/2496710/writing-files-in-node-js
  */
-function write_to_csv(data, filename = 'test.csv') {
+function writeToCSV(data, filename = 'test.csv') {
 	stringify(data, (stringifyErr, output) => {
 		if (stringifyErr) {
 			log.error(stringifyErr);
@@ -173,10 +172,10 @@ function write_to_csv(data, filename = 'test.csv') {
 			if (err) {
 				return log.error(err);
 			}
-			log.info('The file was saved!');
+			log.info(`The file ${filename} was saved for generating test data.`);
 		});
 	});
-} // write_to_csv
+}
 
 /**
  * Creates a csv with sine data
@@ -197,13 +196,13 @@ function generateSine(
 		maxAmplitude: 2
 	}) {
 	const chosenDataOptions = { timeStep: options.timeStep, periodLength: options.periodLength, maxAmplitude: options.maxAmplitude };
-	write_to_csv(_generateSineData(startTimeStamp, endTimeStamp, chosenDataOptions), options.filename);
-} // generateSine
+	writeToCSV(_generateSineData(startTimeStamp, endTimeStamp, chosenDataOptions), options.filename);
+}
 
 module.exports = {
 	generateDates,
 	generateSine,
-	write_to_csv,
+	writeToCSV,
 	momenting,
 	_generateSineData
 };
