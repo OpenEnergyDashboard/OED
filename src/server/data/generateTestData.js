@@ -49,7 +49,7 @@ function generateDates(startDate, endDate, timeStep = { minute: 20 }) {
 	const arrayOfMoments = [];
 	const startMoment = moment(startDate);
 	const endMoment = moment(endDate);
-	while (!startMoment.isAfter(endMoment)) {
+	while (startMoment.isSameOrBefore(endMoment)) {
 		arrayOfMoments.push(startMoment.format('YYYY-MM-DD HH:mm:ss'));
 		startMoment.add(timeStep);
 	}
