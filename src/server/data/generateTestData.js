@@ -193,9 +193,28 @@ function generateSine(
 		filename: 'test.csv',
 		timeStep: { minute: 20 },
 		periodLength: { day: 1 },
-		maxAmplitude: 2
+		maxAmplitude: 2,
+		normalizeByHour: false
 	}) {
-	const chosenDataOptions = { timeStep: options.timeStep, periodLength: options.periodLength, maxAmplitude: options.maxAmplitude };
+	const defaultOptions = {
+		filename: 'test.csv',
+		timeStep: { minute: 20 },
+		periodLength: { day: 1 },
+		maxAmplitude: 2,
+		normalizeByHour: false
+	}
+	const chosenDataOptions = {
+		...defaultOptions,
+		filename: options.filename,
+		timeStep: options.timeStep,
+		periodLength: options.periodLength,
+		maxAmplitude: options.maxAmplitude,
+		normalizeByHour: options.normalizeByHour
+	};
+	if (chosenDataOptions.normalizeByHour) {
+		const scale = _momentPercentage(moment({ hour: 0 }), moment({ hour: 1 }), moment(chosenDataOptions.timeStep));
+		chosenDataOptions.maxAmplitude = chosenDataOptions.maxAmplitude * scale;
+	}
 	writeToCSV(_generateSineData(startTimeStamp, endTimeStamp, chosenDataOptions), options.filename);
 }
 

@@ -113,4 +113,23 @@ mocha.describe('Generate Sinewave', () => {
 		expect(records).to.deep.equal(data);
 		await fs.unlink(`${__dirname}/${filename}`); // delete test file created
 	});
+	mocha.it('should be able to normalize values for OED', async () => {
+		const startTimeStamp = '2019-09-10 00:00:00';
+		const endTimeStamp = '2019-09-11 00:00:00';
+		const filename = 'test1.csv';
+		const timeOptions = { timeStep: { minute: 20 }, periodLength: { day: 1 }, normalizeByHour: true};
+		const maxAmplitude = 2;
+		// we reduce numbers down to 8 decimals places because there will be differences at very 
+		// low significant places.
+		const data = _generateSineData(startTimeStamp, endTimeStamp, { ...timeOptions, maxAmplitude: maxAmplitude }).map(row => [row[0], (parseFloat(row[1]) * 1/3).toFixed(8)] );
+		await generateSine(startTimeStamp, endTimeStamp, { ...timeOptions, filename: `${__dirname}/${filename}`, maxAmplitude: maxAmplitude });
+		// https://stackabuse.com/reading-and-writing-csv-files-in-nodejs-with-node-csv/
+		const dataFromFile = await fs.readFile(`${__dirname}/${filename}`);
+		const preprocessedRecords = await parseCsv(dataFromFile);
+		// we reduce numbers down to 8 decimals places because there will be differences at very 
+		// low significant places.
+		const records = preprocessedRecords.map(row => [row[0], parseFloat(row[1]).toFixed(8)])
+		expect(records).to.deep.equal(data);
+		await fs.unlink(`${__dirname}/${filename}`); // delete test file created
+	});
 });
