@@ -35,7 +35,7 @@ const { log } = require('../log');
  * @param {String} startDate String of the form 'YYYY-MM-DD HH:MM:SS'
  * @param {String} endDate String of the form 'YYYY-MM-DD HH:MM:SS'
  * @param {Object} timeStep Object with keys describe the time step, by default
- * this is { minute: 20 } or 20 minutes and to at be at least 1 second.
+ * this is { minute: 20 } or 20 minutes and needs to be at least 1 second.
  * @returns {String[]} An array of timestamps between startDate and endDate, at a given time step
  * (default 20 minutes). The first element of the output will be the startDate, but the last element
  * may not necessarily be the endDate.
@@ -79,10 +79,10 @@ function _momentPercentage(startTime, endTime, currentMoment) {
 		throw RangeError('The startTime must be before or equal to the endTime.');
 	}
 
-	if (endTime - startTime <= 0) {
-		return 1;
-	}
-	return (currentMoment - startTime) / (endTime - startTime);
+    if (endTime.isSame(startTime)){
+        return 1
+    }
+    return currentMoment.diff(startTime) / endTime.diff(startTime);
 }
 
 /**
