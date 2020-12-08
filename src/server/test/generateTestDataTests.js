@@ -22,7 +22,7 @@ const {
 	momenting,
 	generateDates,
 	generateSine
-} = require('../data/generateTestData');
+} = require('../data/generateTestingData.js');
 
 mocha.describe('The generateDates function', () => {
 	mocha.it('should exist.', () => {

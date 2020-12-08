@@ -152,10 +152,66 @@ function _generateSineData(startTimeStamp: string, endTimeStamp: string, options
 	return (_.zip(dates, sineValues));
 }
 
+/** 
+ * Write csv data into a csv file
+ * @param {[[string, string]]} data an matrix with two columns of strings 
+ * @param {string} filename the name of the file
+ * Sources:
+ * https://csv.js.org/stringify/api/
+ * https://stackoverflow.com/questions/2496710/writing-files-in-node-js
+ */
+function writeToCSV(data: Array<[string, string]>, filename = 'test.csv') {
+	stringify(data, (stringifyErr: Error, output) => {
+		if (stringifyErr) {
+			log.error(`Failed to csv-stringify the contents of data: ${JSON.stringify(data)}`, stringifyErr);
+		}
+		fs.writeFile(filename, output, err => {
+			if (err) {
+				return log.error(`Failed to write the file: ${filename}`, err);
+			}
+			log.info(`The file ${filename} was saved for generating test data.`);
+		});
+	});
+}
+
+/**
+ * This is an object that sets the parameters for generating a data file for OED.
+ * 
+ * @interface GenerateDataFileOptions
+ * @member {string} filename, the name of the data file to be generated
+ * @member {boolean} normalizeByHour, if true then we normalize data for OED
+ */
+interface GenerateDataFileOptions extends GenerateDataOptions {
+	filename?: 'test.csv';
+	normalizeByHour?: false;
+}
+
+/**
+ * Creates a csv with sine data
+ * @param {string} startTimeStamp, the time's format is 'YYYY-MM-DD HH:MM:SS'
+ * @param {string} endTimeStamp, the time's format is 'YYYY-MM-DD HH:MM:SS'
+ * @param {GenerateDataFileOptions} options, the parameters for generating a data file for OED
+ */
+function generateSine(startTimeStamp: string, endTimeStamp: string, options: GenerateDataFileOptions) {
+	const chosenOptions = {
+		timeStep: { minute: 20 },
+		periodLength: { day: 1 },
+		maxAmplitude: 2,
+		...options
+	};
+
+	if (chosenOptions.normalizeByHour) {
+		const scale = _momentPercentage(moment({ hour: 0 }), moment({ hour: 1 }), moment(chosenOptions.timeStep));
+		chosenOptions.maxAmplitude = chosenOptions.maxAmplitude * scale;
+	}
+
+	writeToCSV(_generateSineData(startTimeStamp, endTimeStamp, chosenOptions), options.filename);
+}
+
 export = {
 	generateDates,
-	// generateSine,
-	// writeToCSV,
+	generateSine,
+	writeToCSV,
 	momenting,
 	_generateSineData
 };
