@@ -27,6 +27,7 @@ const loadLogfileToReadings = require('../services/obvius/loadLogfileToReadings'
 const middleware = require('../middleware');
 const obvius = require('../util').obvius;
 const { getConnection, dropConnection } = require('../db');
+const escapeHtml = require('core-js/fn/string/escape-html');
 
 const upload = multer({ storage: multer.memoryStorage() });
 const router = express.Router();
@@ -46,6 +47,7 @@ router.use(middleware.paramsLookupMixin);
  *
  */
 function failure(req, res, reason = '') {
+	reason = escapeHtml(reason); // escape html to sanitize html
 	const ip = req.headers['x-forwarded-for'] || req.connection.remoteAddress;
 	log.error(`Obvius protocol request from ${ip} failed due to ${reason}`);
 
@@ -62,6 +64,7 @@ function failure(req, res, reason = '') {
  *
  */
 function success(req, res, comment = '') {
+	comment = escapeHtml(comment); // escape html to sanitize html
 	res.status(200) // 200 OK
 		.send(`<pre>\nSUCCESS\n${comment}</pre>\n`);
 }
