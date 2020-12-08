@@ -18,7 +18,7 @@ import * as moment from 'moment';
 import * as promisify from 'es6-promisify';
 import { log } from '../log';
 
-const stringifyCSV = promisify(stringify);
+const stringifyCSV = promisify(stringify); // this is a strange error; when compiled it is okay
 /* Our main export is the generateSine function. We break this into several parts:
  * 1. Generate the moments in time within a specified range and at a specified time step from a given range.
  * 2. For each moment determine how much time as elapsed (as a decimal) within its respective period.
@@ -136,10 +136,9 @@ interface GenerateDataOptions {
  */
 function _generateSineData(startTimeStamp: string, endTimeStamp: string, options: GenerateDataOptions): Array<[string, string]> {
 	const chosenOptions: GenerateDataOptions = {
-		timeStep: { minute: 20 },
-		periodLength: { day: 1 },
-		maxAmplitude: 2,
-		...options
+		timeStep: options.timeStep || { minute: 20 },
+		periodLength: options.periodLength || { day: 1 },
+		maxAmplitude: options.maxAmplitude || 2
 	};
 	const dates = generateDates(startTimeStamp, endTimeStamp, chosenOptions.timeStep);
 	const datesAsMoments = dates.map(date => moment(date));
@@ -155,9 +154,9 @@ function _generateSineData(startTimeStamp: string, endTimeStamp: string, options
 	return (_.zip(dates, sineValues));
 }
 
-/** 
+/**
  * Write csv data into a csv file
- * @param {[[string, string]]} data an matrix with two columns of strings 
+ * @param {[[string, string]]} data an matrix with two columns of strings
  * @param {string} filename the name of the file
  * Sources:
  * https://csv.js.org/stringify/api/
@@ -165,7 +164,7 @@ function _generateSineData(startTimeStamp: string, endTimeStamp: string, options
  */
 async function writeToCSV(data: Array<[string, string]>, filename = 'test.csv') {
 	try {
-		const output = await stringifyCSV(data); // generate csv data 
+		const output = await stringifyCSV(data); // generate csv data
 		await fs.writeFile(filename, output)
 			.then(() => log.info(`The file ${filename} was saved for generating test data.`)) // log success
 			.catch(reason => log.error(`Failed to write the file: ${filename}`, reason)); // write data file
@@ -174,31 +173,25 @@ async function writeToCSV(data: Array<[string, string]>, filename = 'test.csv') 
 	}
 }
 
-/**
- * This is an object that sets the parameters for generating a data file for OED.
- * 
- * @interface GenerateDataFileOptions
- * @member {string} filename, the name of the data file to be generated
- * @member {boolean} normalizeByHour, if true then we normalize data for OED
- */
 interface GenerateDataFileOptions extends GenerateDataOptions {
-	filename?: 'test.csv';
-	normalizeByHour?: false;
+	filename?: string;
+	normalizeByHour?: boolean;
 }
 
 /**
  * Creates a csv with sine data
- * 
+ *
  * @param {string} startTimeStamp, the time's format is 'YYYY-MM-DD HH:MM:SS'
  * @param {string} endTimeStamp, the time's format is 'YYYY-MM-DD HH:MM:SS'
- * @param {GenerateDataFileOptions} options, the parameters for generating a data file for OED
+ * @param {object} options, the parameters for generating a data file for OED
  */
 async function generateSine(startTimeStamp: string, endTimeStamp: string, options: GenerateDataFileOptions) {
-	const chosenOptions = {
-		timeStep: { minute: 20 },
-		periodLength: { day: 1 },
-		maxAmplitude: 2,
-		...options
+	const chosenOptions: GenerateDataFileOptions = {
+		timeStep: options.timeStep || { minute: 20 },
+		periodLength: options.periodLength || { day: 1 },
+		maxAmplitude: options.maxAmplitude || 2,
+		filename: options.filename || 'test.csv',
+		normalizeByHour: options.normalizeByHour || false
 	};
 
 	if (chosenOptions.normalizeByHour) {
@@ -206,7 +199,7 @@ async function generateSine(startTimeStamp: string, endTimeStamp: string, option
 		chosenOptions.maxAmplitude = chosenOptions.maxAmplitude * scale;
 	}
 
-	await writeToCSV(_generateSineData(startTimeStamp, endTimeStamp, chosenOptions), options.filename);
+	await writeToCSV(_generateSineData(startTimeStamp, endTimeStamp, chosenOptions), chosenOptions.filename);
 }
 
 export = {
