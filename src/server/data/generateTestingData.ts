@@ -11,11 +11,11 @@
  */
 
 // Imports
-import * as fs from "fs";
-import stringify from "csv-stringify";
-import * as _ from "lodash";
-import * as moment from "moment";
-import { log } from "../log";
+import * as fs from 'fs';
+import stringify from 'csv-stringify';
+import * as _ from 'lodash';
+import * as moment from 'moment';
+import { log } from '../log';
 /* Our main export is the generateSine function. We break this into several parts:
  * 1. Generate the moments in time within a specified range and at a specified time step from a given range.
  * 2. For each moment determine how much time as elapsed (as a decimal) within its respective period.
@@ -34,7 +34,7 @@ import { log } from "../log";
  * @source: https://www.quora.com/In-JavaScript-how-do-I-test-if-a-number-is-close-to-zero
  */
 function isEpsilon(x: number, epsilon = 1e-10) {
-    return Math.abs(x) < epsilon;
+	return Math.abs(x) < epsilon;
 }
 
 /**
@@ -50,7 +50,7 @@ function isEpsilon(x: number, epsilon = 1e-10) {
  * may not necessarily be the endDate.
  */
 function generateDates(startDate: string, endDate: string, timeStep: moment.MomentInputObject = { minute: 20 }): string[] {
-    // Check timeStep is at least 1 second, if not throw an error.
+	// Check timeStep is at least 1 second, if not throw an error.
 	const temp = moment();
 	if (temp.clone().add(timeStep).isBefore(temp.clone().add({ second: 1 }))) {
 		throw Error(`The time step provided is ${JSON.stringify(timeStep)} needs to be at least 1 second.`);
@@ -88,10 +88,10 @@ function _momentPercentage(startTime: moment.Moment, endTime: moment.Moment, cur
 	if (startTime.isAfter(endTime)) {
 		throw RangeError('The startTime must be before or equal to the endTime.');
 	}
-    if (endTime.isSame(startTime)){
-        return 1
-    }
-    return currentMoment.diff(startTime) / endTime.diff(startTime);
+	if (endTime.isSame(startTime)) {
+		return 1;
+	}
+	return currentMoment.diff(startTime) / endTime.diff(startTime);
 }
 
 /**
@@ -103,7 +103,7 @@ function _momentPercentage(startTime: moment.Moment, endTime: moment.Moment, cur
  * @returns {number[]} an array where each element corresponds to the percentage of time elapsed at the
  * the corresponding timestamp in arrayOfMoments
  */
-function momenting(arrayOfMoments: moment.Moment[], periodLength: moment.MomentInputObject) : number[]{
+function momenting(arrayOfMoments: moment.Moment[], periodLength: moment.MomentInputObject): number[] {
 	const startMoment = arrayOfMoments[0];
 	const endMoment = startMoment.clone().add(periodLength);
 	const result = arrayOfMoments.map(singleMoment => {
@@ -117,9 +117,9 @@ function momenting(arrayOfMoments: moment.Moment[], periodLength: moment.MomentI
 }
 
 interface GenerateDataOptions {
-    timeStep?: moment.MomentInputObject,
-    periodLength?: moment.MomentInputObject,
-    maxAmplitude?: number
+	timeStep?: moment.MomentInputObject;
+	periodLength?: moment.MomentInputObject;
+	maxAmplitude?: number;
 }
 
 /**
@@ -131,7 +131,7 @@ interface GenerateDataOptions {
  * 1 second.
  * @returns {[string, string][]} Matrix of rows representing each csv row of the form timeStamp, value
  */
-function _generateSineData(startTimeStamp:string, endTimeStamp:string, options:GenerateDataOptions): [string, string][] {
+function _generateSineData(startTimeStamp: string, endTimeStamp: string, options: GenerateDataOptions): Array<[string, string]> {
 	const chosenOptions: GenerateDataOptions = {
 		timeStep: { minute: 20 },
 		periodLength: { day: 1 },
@@ -152,12 +152,10 @@ function _generateSineData(startTimeStamp:string, endTimeStamp:string, options:G
 	return (_.zip(dates, sineValues));
 }
 
-
-
 export = {
 	generateDates,
 	// generateSine,
 	// writeToCSV,
 	momenting,
 	_generateSineData
-}
+};

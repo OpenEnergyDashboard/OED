@@ -79,10 +79,10 @@ function _momentPercentage(startTime, endTime, currentMoment) {
 		throw RangeError('The startTime must be before or equal to the endTime.');
 	}
 
-    if (endTime.isSame(startTime)){
-        return 1
-    }
-    return currentMoment.diff(startTime) / endTime.diff(startTime);
+	if (endTime.isSame(startTime)) {
+		return 1;
+	}
+	return currentMoment.diff(startTime) / endTime.diff(startTime);
 }
 
 /**
@@ -202,7 +202,7 @@ function generateSine(
 		periodLength: { day: 1 },
 		maxAmplitude: 2,
 		normalizeByHour: false
-	}
+	};
 	const chosenDataOptions = {
 		...defaultOptions,
 		filename: options.filename,
