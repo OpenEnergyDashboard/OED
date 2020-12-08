@@ -11,11 +11,14 @@
  */
 
 // Imports
-import * as fs from 'fs';
-import stringify from 'csv-stringify';
+import { promises as fs } from 'fs';
+import * as stringify from 'csv-stringify';
 import * as _ from 'lodash';
 import * as moment from 'moment';
+import * as promisify from 'es6-promisify';
 import { log } from '../log';
+
+const stringifyCSV = promisify(stringify);
 /* Our main export is the generateSine function. We break this into several parts:
  * 1. Generate the moments in time within a specified range and at a specified time step from a given range.
  * 2. For each moment determine how much time as elapsed (as a decimal) within its respective period.
@@ -160,18 +163,15 @@ function _generateSineData(startTimeStamp: string, endTimeStamp: string, options
  * https://csv.js.org/stringify/api/
  * https://stackoverflow.com/questions/2496710/writing-files-in-node-js
  */
-function writeToCSV(data: Array<[string, string]>, filename = 'test.csv') {
-	stringify(data, (stringifyErr: Error, output) => {
-		if (stringifyErr) {
-			log.error(`Failed to csv-stringify the contents of data: ${JSON.stringify(data)}`, stringifyErr);
-		}
-		fs.writeFile(filename, output, err => {
-			if (err) {
-				return log.error(`Failed to write the file: ${filename}`, err);
-			}
-			log.info(`The file ${filename} was saved for generating test data.`);
-		});
-	});
+async function writeToCSV(data: Array<[string, string]>, filename = 'test.csv') {
+	try {
+		const output = await stringifyCSV(data); // generate csv data 
+		await fs.writeFile(filename, output)
+			.then(() => log.info(`The file ${filename} was saved for generating test data.`)) // log success
+			.catch(reason => log.error(`Failed to write the file: ${filename}`, reason)); // write data file
+	} catch (error) {
+		log.error(`Failed to csv-stringify the contents of data: ${JSON.stringify(data)}`, error); // log failure
+	}
 }
 
 /**
@@ -188,11 +188,12 @@ interface GenerateDataFileOptions extends GenerateDataOptions {
 
 /**
  * Creates a csv with sine data
+ * 
  * @param {string} startTimeStamp, the time's format is 'YYYY-MM-DD HH:MM:SS'
  * @param {string} endTimeStamp, the time's format is 'YYYY-MM-DD HH:MM:SS'
  * @param {GenerateDataFileOptions} options, the parameters for generating a data file for OED
  */
-function generateSine(startTimeStamp: string, endTimeStamp: string, options: GenerateDataFileOptions) {
+async function generateSine(startTimeStamp: string, endTimeStamp: string, options: GenerateDataFileOptions) {
 	const chosenOptions = {
 		timeStep: { minute: 20 },
 		periodLength: { day: 1 },
@@ -205,7 +206,7 @@ function generateSine(startTimeStamp: string, endTimeStamp: string, options: Gen
 		chosenOptions.maxAmplitude = chosenOptions.maxAmplitude * scale;
 	}
 
-	writeToCSV(_generateSineData(startTimeStamp, endTimeStamp, chosenOptions), options.filename);
+	await writeToCSV(_generateSineData(startTimeStamp, endTimeStamp, chosenOptions), options.filename);
 }
 
 export = {
