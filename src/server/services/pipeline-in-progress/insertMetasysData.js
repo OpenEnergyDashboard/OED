@@ -15,9 +15,10 @@ const path = require('path');
  * @param readingInterval  value of the reading interval. For example 60 minutes, 30 minutes.
  * @param readingRepetition value is 1 if reading is not duplicated. 2 if repeated twice and so on.
  * @param  cumulativeIndicator false if readings are not cumulative and vice-versa.
+ * @param cumulativeReset true if the cumlative data is reset at midnight
  * @param conn the database connection to use
  */
-async function insertMetasysData(filePath, readingInterval, readingRepetition, cumulativeIndicator, conn) {
+async function insertMetasysData(filePath, readingInterval, readingRepetition, cumulativeIndicator, cumulativeReset, conn) {
 	const fileName = path.basename(filePath);
 	const meter = await Meter.getByName(fileName.replace('.csv', ''), conn);
 	return loadCsvInput(filePath = filePath,
@@ -32,6 +33,7 @@ async function insertMetasysData(filePath, readingInterval, readingRepetition, c
 						},
 						readAsStream = false,
 						isCumulative = cumulativeIndicator,
+						cumulativeReset = cumulativeReset,
 						readingRepetition = readingRepetition,
 						conditionSet = undefined,
 						conn = conn);

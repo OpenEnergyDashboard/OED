@@ -19,7 +19,7 @@ mocha.describe('PIPELINE: insert MetasysData from csv file', () => {
 		mocha.it('handles duplicate readings', async () => {
 			conn = testDB.getConnection();
 			const testFilePath = path.join(__dirname, 'data', 'metasys-duplicate.csv');
-			await insertMetasysData(testFilePath, 60, 2, false, conn);
+			await insertMetasysData(testFilePath, 60, 2, false, false, conn);
 			const count = await Reading.count(conn);
 			expect(count).to.equal(37);
 		});
@@ -27,7 +27,7 @@ mocha.describe('PIPELINE: insert MetasysData from csv file', () => {
 		mocha.it('handles cumulative readings', async () => {
 			conn = testDB.getConnection();
 			const testFilePath = path.join(__dirname, 'data', 'metasys-duplicate.csv');
-			await insertMetasysData(testFilePath, 60, 2, true, conn);
+			await insertMetasysData(testFilePath, 60, 2, true, true, conn);
 			const { reading } = await conn.one('SELECT reading FROM readings LIMIT 1');
 			expect(parseInt(reading)).to.equal(280);
 		});
@@ -41,14 +41,14 @@ mocha.describe('PIPELINE: insert MetasysData from csv file', () => {
 		mocha.it('errors correctly on an invalid file', () => {
 			conn = testDB.getConnection();
 			const testFilePath = path.join(__dirname, 'data', 'metasys-invalid.csv');
-			return expect(insertMetasysData(testFilePath, 30, 1, false, conn)).to.eventually.be.rejected;
+			return expect(insertMetasysData(testFilePath, 30, 1, false, false, conn)).to.eventually.be.rejected;
 		});
 
 		mocha.it('rolls back correctly when it rejects', async () => {
 			conn = testDB.getConnection();
 			const testFilePath = path.join(__dirname, 'data', 'metasys-invalid.csv');
 			try {
-				await insertMetasysData(testFilePath, 30, 1, false, conn);
+				await insertMetasysData(testFilePath, 30, 1, false, false, conn);
 			} catch (e) {
 				const count = await Reading.count(conn);
 				expect(count).to.equal(0);
@@ -65,7 +65,7 @@ mocha.describe('PIPELINE: insert MetasysData from csv file', () => {
 		mocha.it('loads the correct number of rows from a file (drop last row)', async () => {
 			conn = testDB.getConnection();
 			const testFilePath = path.join(__dirname, 'data', 'metasys-valid.csv');
-			await insertMetasysData(testFilePath, 30, 1, true, conn);
+			await insertMetasysData(testFilePath, 30, 1, true, true, conn);
 			const count = await Reading.count(conn);
 			expect(count).to.equal(124);
 		});

@@ -17,17 +17,18 @@ const { log } = require('../../log');
  * @param {function} mapRowToModel a customized function that map needed values from each row to the Reading model
  * @param {boolean} readAsStream true if prefer to read file as CSV stream
  * @param {boolean} isCumulative true if the given data is cumulative
+ * @param {boolean} cumulativeReset true if the cumlative data is reset at midnight
  * @param {array} conditionSet used to validate readings (minVal, maxVal, minDate, maxDate, threshold, maxError)
  * @param {array} conn connection to database
  */
-async function loadCsvInput(filePath, meterID, mapRowToModel, readAsStream, isCumulative, readingRepetition, conditionSet, conn) {
+async function loadCsvInput(filePath, meterID, mapRowToModel, readAsStream, isCumulative, cumulativeReset, readingRepetition, conditionSet, conn) {
 	try {
 		if (readAsStream) {
 			const stream = fs.createReadStream(filePath);
 			return loadCsvStream(stream, meterID, mapRowToModel, conditionSet, conn);
 		} else {
 			const dataRows = await readCSV(filePath);
-			return loadArrayInput(dataRows, meterID, mapRowToModel, isCumulative, readingRepetition, conditionSet, conn);
+			return loadArrayInput(dataRows, meterID, mapRowToModel, isCumulative, cumulativeReset, readingRepetition, conditionSet, conn);
 		}
 	} catch (err) {
 		log.error(`Error updating meter ${meterID} with data from ${filePath}: ${err}`, err);

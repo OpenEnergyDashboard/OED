@@ -32,6 +32,7 @@ async function insertObviusData(serialNumber, ipAddress, logfile) {
 								return [reading, startTimestamp, endTimestamp];
 							},
 							isCumulative = false,
+							cumulativeReset = false,
 							readingRepetition = 1,
 							conditionSet = undefined,
 							conn = conn);

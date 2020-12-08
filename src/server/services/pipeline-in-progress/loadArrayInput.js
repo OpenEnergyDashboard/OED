@@ -15,12 +15,13 @@ const handleCumulative = require('./handleCumulative');
  * @param {string} meterID
  * @param {function} mapRowToModel a customized function that map needed values from each row to the Reading model
  * @param {boolean} isCumulative true if the given data is Cumulative
+ * @param {boolean} cumulativeReset true if the cumlative data is reset at midnight
  * @param {array} conditionSet used to validate readings (minVal, maxVal, minDate, maxDate, interval, maxError)
  */
-async function loadArrayInput(dataRows, meterID, mapRowToModel, isCumulative, readingRepetition, conditionSet, conn) {
+async function loadArrayInput(dataRows, meterID, mapRowToModel, isCumulative, cumulativeReset, readingRepetition, conditionSet, conn) {
 	readingsArray = dataRows.map(mapRowToModel);
 	if (isCumulative) {
-		readingsArray = handleCumulative(readingsArray, readingRepetition, meterID);
+		readingsArray = handleCumulative(readingsArray, readingRepetition, cumulativeReset, meterID);
 	}
 	readings = convertToReadings(readingsArray, meterID, conditionSet);
 	return await Reading.insertOrIgnoreAll(readings, conn);
