@@ -168,7 +168,10 @@ class PreferencesComponent extends React.Component<PreferencesPropsWithIntl, {}>
 						</label>
 					</div>
 				</div>
-				<div>
+				<div style={bottomPaddingStyle}>
+					<p style={titleStyle}>
+						<FormattedMessage id='default.time.zone' />:
+					</p>
 					<TimeZoneSelect current={this.props.defaultTimeZone} handleClick={this.handleDefaultTimeZoneChange} />
 				</div>
 				<Button
