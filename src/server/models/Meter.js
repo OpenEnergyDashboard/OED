@@ -15,14 +15,16 @@ class Meter {
 	 * @param enabled This meter is being actively read from
 	 * @param displayable This meters is available to users for charting
 	 * @param type What kind of meter this is
+	 * @param identifier Another way to identify a meter
 	 */
-	constructor(id, name, ipAddress, enabled, displayable, type) {
+	constructor(id, name, ipAddress, enabled, displayable, type, identifier = name) {
 		this.id = id;
 		this.name = name;
 		this.ipAddress = ipAddress;
 		this.enabled = enabled;
 		this.displayable = displayable;
 		this.type = type;
+		this.identifier = identifier;
 	}
 
 	/**
@@ -149,7 +151,8 @@ class Meter {
 
 Meter.type = {
 	MAMAC: 'mamac',
-	METASYS: 'metasys'
+	METASYS: 'metasys',
+	OBVIUS: 'obvius'
 };
 
 module.exports = Meter;

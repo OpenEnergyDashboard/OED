@@ -23,7 +23,9 @@
     "createUser": "node ./src/server/services/user/createUser.js",
     "editUser": "node ./src/server/services/user/editUser.js",
     "sendLogEmail": "node ./src/server/services/sendLogEmail.js",
-    "refreshReadingViews": "node ./src/server/services/refreshReadingViews.js"
+    "refreshReadingViews": "node ./src/server/services/refreshReadingViews.js",
+    "obvius:showConfigfiles": "node ./src/server/services/obvius/showConfigfiles.js",
+    "obvius:purgeConfigfiles": "node ./src/server/services/obvius/purgeConfigfiles.js"
   },
   "nodemonConfig": {
     "watch": [
@@ -54,6 +56,7 @@
     "jsonwebtoken": "~8.3.0",
     "lodash": "~4.17.19",
     "lodash-webpack-plugin": "~0.11.5",
+    "md5": "~2.2.1",
     "moment": "~2.24.0",
     "morgan": "~1.9.0",
     "multer": "~1.3.1",

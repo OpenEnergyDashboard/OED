@@ -16,12 +16,10 @@ services:
             - POSTGRES_PASSWORD=pleaseChange # default postgres password that can be changed for security.
         volumes:
             - ./postgres-data:/var/lib/postgresql/data/pgdata
-        # healthcheck:
-            # This checks if postgres is ready for work.
-            # test: ["CMD-SHELL", "pg_isready -U postgres"]
-            # interval: 5s
-            # timeout: 5s
-            # retries: 5
+        #ports:
+        #    - "5432:5432"
+        # Uncomment the above lines to enable access to the PostgreSQL server
+        # from the host machine.
     # Web service runs Node
     web:
         # Configuration variables for the app.
@@ -42,6 +40,7 @@ services:
             - OED_MAIL_FROM=mydomain@example.com
             - OED_MAIL_TO=mydomain@example.com  # Set the destination address here
             - OED_MAIL_ORG=My Organization Name # Org name for mail formatting
+            - OED_OBVIUS_PASSWORD=password
             # If in a subdirectory, set it here
             # - OED_SUBDIR=/subdir/
         # Set the correct build environment.
