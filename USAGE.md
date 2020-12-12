@@ -107,6 +107,7 @@ OED_DB_DATABASE=oed
 OED_DB_TEST_DATABASE=oed_testing
 OED_DB_PASSWORD=opened
 OED_DB_HOST=localhost
+POSTGRES_PASSWORD=xxx
 OED_DB_PORT=5432
 OED_LOG_FILE=log.txt
 OED_MAIL_METHOD=none
@@ -153,6 +154,7 @@ The OED server is configured via environment variables, as follows.
 - OED_DB_DATABASE: The database you just created, so likely oed
 - OED_DB_TEST_DATABASE: The test database you just created, so likely oed_testing
 - OED_DB_PASSWORD: The password for your postgres user
+- POSTGRES_PASSWORD: The password for the postgres running in the container. You might want to change its value for security reasons.
 - OED_DB_HOST: The host for your postgres db, likely localhost
 - OED_DB_PORT: The port for your postgres db, likely 5432
 - OED_LOG_FILE: Path to the log file, defaults to ./log.txt
@@ -244,4 +246,7 @@ To upgrade the app:
 1. Replace your local changes with `git stash pop`
 1. Re-build the app (`docker-compose run --rm web ./src/scripts/updateOED.sh`)
 1. Restart the app (`systemctl start oed.service`)
+
+Some old installations (from 0.3.0 or before) need to upgrade their PostgreSQL user to
+superuser.
 

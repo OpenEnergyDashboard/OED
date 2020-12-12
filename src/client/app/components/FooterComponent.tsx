@@ -30,7 +30,7 @@ export default function FooterComponent() {
 			<footer className='footer' style={footerStyle}>
 				<span>
 					<FormattedMessage id='oed.description' />
-					<a href='mailto:oed@beloit.edu'>
+					<a href='mailto:OpenEnergyDashboard@gmail.com'>
 						<FormattedMessage id='contact.us' />
 					</a>
 					<FormattedMessage id='visit'/>

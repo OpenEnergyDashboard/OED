@@ -92,7 +92,7 @@ function mapStateToProps(state: State) {
 
 	// Customize the layout of the plot
 	const layout: any = {
-		barmode: 'group',
+		barmode: (state.graph.barStacking ? 'stack' : 'group'),
 		bargap: 0.2, // Gap between different times of readings
 		bargroupgap: 0.1, //Gap between different meter's readings under the same timestamp
 		autosize: true,
