@@ -5,11 +5,12 @@
 # * file, You can obtain one at http://mozilla.org/MPL/2.0/.
 # *
 
-USAGE="Usage: $0 [--production] [--nostart] [--keep_node_modules]"
+USAGE="Usage: $0 [--production] [--nostart] [--keep_node_modules] [--continue_on_db_error]"
 
 production=no
 dostart=yes
 keep_node_modules=no
+continue_on_db_error=no
 
 # Run through all flags and match
 while test $# -gt 0; do
@@ -26,8 +27,17 @@ while test $# -gt 0; do
 			shift
 			keep_node_modules=yes
 			;;
+		--continue_on_db_error)
+			shift
+			continue_on_db_error=yes
+			;;
+		"")
+			# Empty string so just ignore. Esp. happens if no install_args on docker-compose up.
+			shift
+			;;
 		*)
-			echo $USAGE
+			printf "Unknown argument \"%s\"\n" $1
+			printf "%s\n" $USAGE
 			exit 1
 	esac
 done
@@ -40,12 +50,12 @@ fi
 
 # Install NPM dependencies
 if [ "$keep_node_modules" == "yes" ]; then
-	echo "skipping NPM install as requested"
+	printf "%s\n" "skipping NPM install as requested"
 else
-	echo "NPM install..."
+	printf "%s\n" "NPM install..."
 	npm ci --loglevel=warn
 	if [ $? == 0 ]; then
-		echo "NPM install finished."
+		printf "%s\n" "NPM install finished."
 	else
 		# npm reported an error. Sometimes it does so can skip steps.
 		# Using printf since it is more reliable.
@@ -61,30 +71,70 @@ max_tries=10
 
 # Try to create the schema until it succeeds
 while [ $create_error == 0 ]; do
+	# See if exceed allowed number of tries and stop install if you have.
+	if [ $tries -ge $max_tries ]; then
+		printf "%s\n" "FAILED! Too many tries. Try again but then check if your database at $OED_DB_HOST:$OED_DB_PORT is down."
+		exit 1
+	fi
     # Sleep to let PostgreSQL chill out
     sleep 1
-    echo "Attempting to create database."
+    printf "%s\n" "Attempting to create database."
     # Redirect stderr to a file
-    npm run createdb 2>&1 | tee /tmp/oed.error > /dev/null
-    # search the file for the kind of error we can recover from
-    grep -q 'Error: connect ECONNREFUSED' /tmp/oed.error
-    create_error=$?
-
-    # Check loop runtime
-    ((tries=tries+1))
-    if [ $tries -ge $max_tries ]; then
-        echo "FAILED! Too many tries. Is your database at $OED_DB_HOST:$OED_DB_PORT down?"
-        exit 1
-    fi
+    npm run createdb |& tee /tmp/oed.error > /dev/null
+	createdb_code=${PIPESTATUS[0]}
+	if [ $createdb_code -ne 0 ]; then
+		# An error occurred during createdb.
+		# search the file for the kind of error we can recover from
+		# This is not getting a DB connection or if the DB is not yet ready.
+		grep -q -e 'Error: connect ECONNREFUSED' -e 'error: the database system is starting up' /tmp/oed.error
+		known_error=$?
+		if [ $known_error -eq 0 ]; then
+			# There was an error in createdb but it is one we believe we can recover from.
+			create_error=0
+			printf "%s\n" "  known database issue occurred so will try again..."
+		else
+			# There was an error in createdb and we cannot recover.
+			create_error=1
+			if [ "$continue_on_db_error" = "no" ]; then
+				# We should stop the install process. This means it won't try to bring up the web service.
+				printf "%s\n" "FAILURE: creation of database failed so stopping install. Use --continue_on_db_error if you want install to continue"
+				exit 3
+			else
+				printf "\n%s\n" "WARNING: an unknown error occurred during database creation so stopping database creation."
+				printf "%s\n" "The validity of the database is uncertain."
+				printf "%s\n" "Install continuing because of flag --continue_on_db_error"
+			fi
+		fi
+	else
+		# There was no createdb error so assume database ready for use so stop process
+		create_error=1
+		printf "%s\n" "  database creation had no errors so assume schema creation worked."
+	fi
+	# Did one more attempt
+	((tries=tries+1))
 done
-
-echo "Schema created or already exists."
 
 # Create a user
 set -e
 if [ "$production" == "no" ] && [ ! "$OED_PRODUCTION" == "yes" ]; then
     npm run createUser -- test@example.com password
-	echo "Created development user 'test@example.com' with password 'password'"
+	createuser_code=$?
+	if [ $createuser_code -ne 0 ]; then
+		# There was an error so stop process unless asked to continue on DB issues.
+		if [ "$continue_on_db_error" = "no" ]; then
+			# We should stop the install process. This means it won't try to bring up the web service.
+			printf "%s\n" "FAILURE: creation of user failed so stopping install. Use --continue_on_db_error if you want install to continue"
+			exit 4
+		else
+			printf "\n%s\n" "WARNING: an unknown error occurred during user creation."
+			printf "%s\n" "The validity of the database and test user is uncertain."
+			printf "%s\n" "Install continuing because of flag --continue_on_db_error"
+		fi
+	else
+		# There was no createdb error so assume database ready for use so stop process
+		printf "%s\n" "User creation had no errors so default user 'test@example.com' with password 'password' should exist"
+	fi
+
 fi
 
 # Build webpack if needed
@@ -94,17 +144,17 @@ elif [ "$dostart" == "no" ]; then
 	npm run webpack
 fi
 
-echo "OED install finished"
+printf "%s\n" "OED install finished"
 
 # Start OED
 if [ "$dostart" == "yes" ]; then
 	if [ "$production" == "yes" ] || [ "$OED_PRODUCTION" == "yes" ]; then
-		echo "Starting OED in production mode"
+		printf "%s\n" "Starting OED in production mode"
 		npm run start
 	else
-		echo "Starting OED in development mode"
+		printf "%s\n" "Starting OED in development mode"
 		./src/scripts/devstart.sh
 	fi
 else
-	echo "Not starting OED due to --nostart"
+	printf "%s\n" "Not starting OED due to --nostart"
 fi
