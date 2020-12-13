@@ -17,15 +17,10 @@ const promisify = require('es6-promisify');
 const csv = require('csv');
 const parseCsv = promisify(csv.parse);
 
-const {
-	_generateSineData,
-	momenting,
-	generateDates,
-	generateSine,
-	generateCosine
-} = require('../data/generateTestingData.js'); // To get this file compile ../data/generateTestingData.ts
+const generateData = require('../data/generateTestingData'); // To get this file compile ../data/generateTestingData.ts
 
 mocha.describe('The generateDates function', () => {
+	const generateDates = generateData.generateDates;
 	mocha.it('should exist.', () => {
 		expect(typeof (generateDates)).to.equal('function');
 	});
@@ -55,6 +50,7 @@ mocha.describe('The generateDates function', () => {
 });
 
 mocha.describe('momenting', () => {
+	const momenting = generateData.momenting;
 	mocha.it('should cover the simple singleton case', () => {
 		const date = '2019-09-10 00:00:15';
 		const periodOfMoments = [moment(date)];
@@ -80,6 +76,7 @@ mocha.describe('momenting', () => {
 });
 
 mocha.describe('Generate sinewave helper', () => {
+	const _generateSineData = generateData._generateSineData;
 	mocha.it('should exist', () => {
 		expect(typeof (_generateSineData)).to.equal('function');
 	});
@@ -97,6 +94,8 @@ mocha.describe('Generate sinewave helper', () => {
 });
 
 mocha.describe('Generate Sinewave', () => {
+	const _generateSineData = generateData._generateSineData;
+	const generateSine = generateData.generateSine;
 	mocha.it('should properly write to file', async () => {
 		const startTimeStamp = '2019-09-10 00:00:00';
 		const endTimeStamp = '2019-09-11 00:00:00';
@@ -137,6 +136,8 @@ mocha.describe('Generate Sinewave', () => {
 });
 
 mocha.describe('Generate Cosine wave', () => {
+	const _generateSineData = generateData._generateSineData;
+	const generateCosine = generateData.generateCosine;
 	mocha.it('should properly write to file', async () => {
 		const startTimeStamp = '2019-09-10 00:00:00';
 		const endTimeStamp = '2019-09-11 00:00:00';
