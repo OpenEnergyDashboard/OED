@@ -12,7 +12,11 @@ type Options = {
 	timeSort?: TimeSortDirection;
 	update?: boolean;
 }
-
+// csv shape after parsing rows? and types and column names
+// create csv data matrix
+// insert readings into database
+// OR insert meter data into database (what is the structure of the meters csv file?
+// just one row?)
 class CanonicalCsv {
 	mode: Mode;
 	meter: string;
