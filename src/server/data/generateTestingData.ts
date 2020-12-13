@@ -125,6 +125,10 @@ interface GenerateDataOptions {
 	maxAmplitude?: number;
 }
 
+interface GenerateSinusoidalDataOptions extends GenerateDataOptions{
+	phaseShift?: number;
+}
+
 /**
  * Generates sine data over a period of time. By default the timeStep is 20 minutes.
  * and the period_length is one day.
@@ -134,11 +138,12 @@ interface GenerateDataOptions {
  * 1 second.
  * @returns {[string, string][]} Matrix of rows representing each csv row of the form timeStamp, value
  */
-function _generateSineData(startTimeStamp: string, endTimeStamp: string, options: GenerateDataOptions): Array<[string, string]> {
-	const chosenOptions: GenerateDataOptions = {
+function _generateSineData(startTimeStamp: string, endTimeStamp: string, options: GenerateSinusoidalDataOptions): Array<[string, string]> {
+	const chosenOptions: GenerateSinusoidalDataOptions = {
 		timeStep: options.timeStep || { minute: 20 },
 		periodLength: options.periodLength || { day: 1 },
-		maxAmplitude: options.maxAmplitude || 2
+		maxAmplitude: options.maxAmplitude || 2,
+		phaseShift: options.phaseShift || 0
 	};
 	const dates = generateDates(startTimeStamp, endTimeStamp, chosenOptions.timeStep);
 	const datesAsMoments = dates.map(date => moment(date));
@@ -147,7 +152,7 @@ function _generateSineData(startTimeStamp: string, endTimeStamp: string, options
 	// and shift it up by that amount.
 	const sineValues = momenting(datesAsMoments, chosenOptions.periodLength)
 		.map(x => {
-			const result = Math.sin(Math.PI * 2 * x);
+			const result = Math.sin(Math.PI * 2 * x + chosenOptions.phaseShift);
 			const scaledResult = halfMaxAmplitude * (isEpsilon(result) ? 0 : result) + halfMaxAmplitude;
 			return `${scaledResult}`;
 		});
@@ -178,6 +183,10 @@ interface GenerateDataFileOptions extends GenerateDataOptions {
 	normalizeByHour?: boolean;
 }
 
+interface GenerateSinusoidalDataFileOptions extends GenerateDataFileOptions {
+	phaseShift?: number;
+}
+
 /**
  * Creates a csv with sine data
  *
@@ -185,13 +194,14 @@ interface GenerateDataFileOptions extends GenerateDataOptions {
  * @param {string} endTimeStamp, the time's format is 'YYYY-MM-DD HH:MM:SS'
  * @param {object} options, the parameters for generating a data file for OED
  */
-async function generateSine(startTimeStamp: string, endTimeStamp: string, options: GenerateDataFileOptions) {
-	const chosenOptions: GenerateDataFileOptions = {
+async function generateSine(startTimeStamp: string, endTimeStamp: string, options: GenerateSinusoidalDataFileOptions) {
+	const chosenOptions: GenerateSinusoidalDataFileOptions = {
 		timeStep: options.timeStep || { minute: 20 },
 		periodLength: options.periodLength || { day: 1 },
 		maxAmplitude: options.maxAmplitude || 2,
 		filename: options.filename || 'test.csv',
-		normalizeByHour: options.normalizeByHour || false
+		normalizeByHour: options.normalizeByHour || false,
+		phaseShift: options.phaseShift || 0
 	};
 
 	if (chosenOptions.normalizeByHour) {
@@ -202,9 +212,36 @@ async function generateSine(startTimeStamp: string, endTimeStamp: string, option
 	await writeToCSV(_generateSineData(startTimeStamp, endTimeStamp, chosenOptions), chosenOptions.filename);
 }
 
+/**
+ * Creates a csv with cosine data
+ *
+ * @param {string} startTimeStamp, the time's format is 'YYYY-MM-DD HH:MM:SS'
+ * @param {string} endTimeStamp, the time's format is 'YYYY-MM-DD HH:MM:SS'
+ * @param {object} options, the parameters for generating a data file for OED
+ */
+async function generateCosine(startTimeStamp: string, endTimeStamp: string, options: GenerateSinusoidalDataFileOptions) {
+	const chosenOptions: GenerateSinusoidalDataFileOptions = {
+		timeStep: options.timeStep || { minute: 20 },
+		periodLength: options.periodLength || { day: 1 },
+		maxAmplitude: options.maxAmplitude || 2,
+		filename: options.filename || 'test.csv',
+		normalizeByHour: options.normalizeByHour || false,
+		phaseShift: (options.phaseShift || 0 ) + (Math.PI / 2)
+	};
+
+	if (chosenOptions.normalizeByHour) {
+		const scale = _momentPercentage(moment({ hour: 0 }), moment({ hour: 1 }), moment(chosenOptions.timeStep));
+		chosenOptions.maxAmplitude = chosenOptions.maxAmplitude * scale;
+	}
+
+	await writeToCSV(_generateSineData(startTimeStamp, endTimeStamp, chosenOptions), chosenOptions.filename);
+}
+
+
 export = {
 	generateDates,
 	generateSine,
+	generateCosine,
 	writeToCSV,
 	momenting,
 	_generateSineData

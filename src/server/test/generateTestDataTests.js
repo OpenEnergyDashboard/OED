@@ -21,7 +21,8 @@ const {
 	_generateSineData,
 	momenting,
 	generateDates,
-	generateSine
+	generateSine,
+	generateCosine
 } = require('../data/generateTestingData.js'); // To get this file compile ../data/generateTestingData.ts
 
 mocha.describe('The generateDates function', () => {
@@ -130,6 +131,24 @@ mocha.describe('Generate Sinewave', () => {
 		// we reduce numbers down to 8 decimals places because there will be differences at very
 		// low significant places.
 		const records = preprocessedRecords.map(row => [row[0], parseFloat(row[1]).toFixed(8)]);
+		expect(records).to.deep.equal(data);
+		await fs.unlink(`${__dirname}/${filename}`); // delete test file created
+	});
+});
+
+mocha.describe('Generate Cosine wave', () => {
+	mocha.it('should properly write to file', async () => {
+		const startTimeStamp = '2019-09-10 00:00:00';
+		const endTimeStamp = '2019-09-11 00:00:00';
+		const filename = 'test1.csv';
+		const timeOptions = { timeStep: { minute: 20 }, periodLength: { day: 1 } };
+		const maxAmplitude = 2;
+		const data = _generateSineData(startTimeStamp, endTimeStamp, { ...timeOptions, maxAmplitude: maxAmplitude, phaseShift: (Math.PI / 2)});
+		await generateCosine(startTimeStamp, endTimeStamp, { ...timeOptions, filename: `${__dirname}/${filename}`, maxAmplitude: maxAmplitude });
+		// https://stackabuse.com/reading-and-writing-csv-files-in-nodejs-with-node-csv/
+		const dataFromFile = await fs.readFile(`${__dirname}/${filename}`);
+		const records = await parseCsv(dataFromFile);
+
 		expect(records).to.deep.equal(data);
 		await fs.unlink(`${__dirname}/${filename}`); // delete test file created
 	});
