@@ -37,7 +37,6 @@ function mapStateToProps(state: State) {
 	return {
 		linkText,
 		chartType
-		// weeklyLink // removed after commit caa6109e7624c1ad0bee2b20aa8f9c91cf48c8e4
 	};
 }
 

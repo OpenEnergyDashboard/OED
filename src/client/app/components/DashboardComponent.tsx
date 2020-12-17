@@ -112,17 +112,6 @@ export default class DashboardComponent extends React.Component<DashboardProps, 
 			const timeInterval = TimeInterval.fromString(getRangeSliderInterval());
 			this.props.changeTimeInterval(timeInterval);
 		}
-		/**
-		 * Used to switch graph interval to the past week, function removed since commit 4d6f1819de14e34c66ec8f4a46655fb0719d5749;
-		 */
-		// } else {
-		// 	const numDays = parseInt(mode.substring(0, mode.indexOf('dfp')));
-		// 	const current = moment();
-		// 	const newMinXTimestamp = current.clone();
-		// 	newMinXTimestamp.subtract(numDays, 'days');
-		// 	const timeInterval = TimeInterval.fromString(newMinXTimestamp.toISOString().substring(0, 19)
-		// 		+ 'Z_' + current.toISOString().substring(0, 19) + 'Z');
-		// 	this.props.changeTimeInterval(timeInterval);
 	}
 }
 
