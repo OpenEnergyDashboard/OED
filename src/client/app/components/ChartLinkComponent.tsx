@@ -33,7 +33,7 @@ export default class ChartLinkComponent extends React.Component<ChartLinkProps, 
 			sliderRange: '',
 			showOptionalLink: true,
 			optionalLink: '',
-			hideOptionsInLinkedPage: false,
+			hideOptionsInLinkedPage: false
 		};
 	}
 
@@ -54,11 +54,11 @@ export default class ChartLinkComponent extends React.Component<ChartLinkProps, 
 				</Button>
 				{this.state.showLink &&
 					<>
-                        <div className='checkbox'>
-                            <label><input type='checkbox' onChange={this.handleOptionsVisibility} checked={this.state.hideOptionsInLinkedPage}/>
-                                <FormattedMessage id='hide.options.in.link' />
-                            </label>
-                        </div>
+						<div className='checkbox'>
+							<label><input type='checkbox' onChange={this.handleOptionsVisibility} checked={this.state.hideOptionsInLinkedPage}/>
+								<FormattedMessage id='hide.options.in.link' />
+							</label>
+						</div>
 						<div style={wellStyle}>
 							{this.props.linkText}
 							{this.state.showSliderRange && this.state.sliderRange}
@@ -78,7 +78,7 @@ export default class ChartLinkComponent extends React.Component<ChartLinkProps, 
 			});
 		} else {
 			if (this.props.chartType === 'line') {
-				const newSliderRange = this.getSliderRangeString(); //get sliderRange on demand;
+				const newSliderRange = this.getSliderRangeString(); // get sliderRange on demand;
 				this.setState({
 					showLink: !this.state.showLink,
 					showSliderRange: true,
@@ -102,11 +102,11 @@ export default class ChartLinkComponent extends React.Component<ChartLinkProps, 
 	 * and produce output as a single string by iterating over a loop.
 	 */
 	private handleOptionsVisibility() {
-		let currState = this.state.hideOptionsInLinkedPage;
-		let optionsVisibilityToken = '&optionsVisibility=false';
+		const currState = this.state.hideOptionsInLinkedPage;
+		const optionsVisibilityToken = '&optionsVisibility=false';
 		this.setState({
 			hideOptionsInLinkedPage: !currState,
-			optionalLink: (currState)? '':optionsVisibilityToken,
+			optionalLink: (currState) ? '' : optionsVisibilityToken
 		});
 	}
 }
