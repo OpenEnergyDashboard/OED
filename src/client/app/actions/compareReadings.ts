@@ -10,7 +10,7 @@ import { CompareReadings } from '../types/readings';
 import * as t from '../types/redux/compareReadings';
 import { metersApi, groupsApi } from '../utils/api';
 import { ComparePeriod, calculateCompareShift, calculateCompareTimeInterval } from '../utils/calculateCompare';
-import {changeCompareGraph} from "./graph";
+import {changeCompareGraph} from './graph';
 
 /**
  * @param {State} state the Redux state
