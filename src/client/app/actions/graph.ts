@@ -124,8 +124,34 @@ function shouldChangeGraphZoom(state: State, timeInterval: TimeInterval): boolea
 export function changeGraphZoomIfNeeded(timeInterval: TimeInterval): Thunk {
 	return (dispatch, getState) => {
 		if (shouldChangeGraphZoom(getState(), timeInterval)) {
+			dispatch(resetRangeSliderStack());
 			dispatch(changeGraphZoom(timeInterval));
 			dispatch(fetchNeededReadingsForGraph(timeInterval));
+		}
+		return Promise.resolve();
+	};
+}
+
+function shouldChangeRangeSlider(range: TimeInterval): boolean {
+	return range !== TimeInterval.unbounded();
+}
+
+function changeRangeSlider(sliderInterval: TimeInterval): t.ChangeSliderRangeAction {
+	return {type: ActionType.ChangeSliderRange, sliderInterval};
+}
+
+/**
+ * remove constraints for rangeslider after user clicked redraw or restore
+ * by setting sliderRange to an empty string
+ */
+function resetRangeSliderStack(): t.ResetRangeSliderStackAction {
+	return {type: ActionType.ResetRangeSliderStack};
+}
+
+function changeRangeSliderIfNeeded(interval: TimeInterval): Thunk {
+	return dispatch => {
+		if (shouldChangeRangeSlider(interval)) {
+			dispatch(changeRangeSlider(interval));
 		}
 		return Promise.resolve();
 	};
@@ -136,6 +162,8 @@ export interface LinkOptions {
 	groupIDs?: number[];
 	chartType?: t.ChartTypes;
 	barDuration?: moment.Duration;
+	serverRange?: TimeInterval;
+	sliderRange?: TimeInterval;
 	toggleBarStacking?: boolean;
 	serverRange?: TimeInterval;
 	comparePeriod?: ComparePeriod;
@@ -165,6 +193,12 @@ export function changeOptionsFromLink(options: LinkOptions) {
 	}
 	if (options.barDuration) {
 		dispatchSecond.push(changeBarDuration(options.barDuration));
+	}
+	if (options.serverRange) {
+		dispatchSecond.push(changeGraphZoomIfNeeded(options.serverRange));
+	}
+	if (options.sliderRange) {
+		dispatchSecond.push(changeRangeSliderIfNeeded(options.sliderRange));
 	}
 	if (options.toggleBarStacking) {
 		dispatchSecond.push(changeBarStacking());
