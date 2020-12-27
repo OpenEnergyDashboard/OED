@@ -27,6 +27,7 @@ router.post('/', upload.single('csvFile'), async () => {
 
 	const { createmeter, cumulative, duplications, length, meter, mode, password,
 	timeSort, update } = req.query; // extract query parameters
+	const cumulativeReset = false;
 
 	// create buffer to save into file; will need to gunzip file 
 	const myReadableStreamBuffer = new streamBuffers.ReadableStreamBuffer({
