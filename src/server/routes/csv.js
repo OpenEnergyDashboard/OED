@@ -21,12 +21,12 @@ const zlib = require('zlib');
 const upload = multer({ storage: multer.memoryStorage() });
 const router = express.Router();
 
-router.post('/', upload.single('csvFile'), async () => {
+router.post('/', upload.single('csvFile'), async (req) => {
 	// We do readings for meters first then meter data later
 	// since the pipeline only supports readings atm.
 
 	const { createmeter, cumulative, duplications, length, meter, mode, password,
-	timeSort, update } = req.query; // extract query parameters
+		timeSort, update } = req.query; // extract query parameters
 	const cumulativeReset = false;
 
 	// create buffer to save into file; will need to gunzip file 
@@ -38,14 +38,23 @@ router.post('/', upload.single('csvFile'), async () => {
 	myReadableStreamBuffer.stop(); // stop() indicates we are done putting the data in our readable stream.
 	// save this buffer into a file
 	const filePath = './readings.txt';
-	await fs.writeFile(filePath. myReadableStreamBuffer)
+	await fs.writeFile(filePath.myReadableStreamBuffer)
 		.then(() => log.info(`The file ${filePath} was created to upload csv data`))
 		.catch(reason => log.error(`Failed to write the file: ${filePath}`, reason));
 
 	const mapRowToModel = (row) => (row); // stub func to satisfy param
 	const conn = getConnection();
-	loadCsvInput(filePath, meter, mapRowToModel, false, cumulative, cumulativeReset, 
-	duplications, undefined, conn); // load csv data
+	loadCsvInput(filePath, meter, mapRowToModel, false, cumulative, cumulativeReset,
+		duplications, undefined, conn); // load csv data
+
+	switch (mode) {
+		case 'readings':
+			return;
+		case 'meter':
+			return;
+		default:
+			return;
+	}
 });
 
 module.exports = router;
