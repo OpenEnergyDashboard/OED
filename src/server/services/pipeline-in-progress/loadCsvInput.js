@@ -5,7 +5,7 @@
  */
 
 const fs = require('fs');
-const readCSV = require('./readCSV');
+const readCSV = require('./readCsv');
 const loadArrayInput = require('./loadArrayInput');
 const loadCsvStream = require('./loadCsvStream');
 const { log } = require('../../log');
