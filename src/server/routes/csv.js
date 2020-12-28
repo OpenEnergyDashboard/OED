@@ -14,6 +14,7 @@ const fs = require('fs').promises;
 const { getConnection } = require('../db');
 const { loadCsvInput } = require('../services/pipeline-in-progress/loadCsvInput');
 const { log } = require('../log');
+const Meter = require('../models/Meter');
 const multer = require('multer');
 const streamBuffers = require('stream-buffers');
 const zlib = require('zlib');
@@ -65,19 +66,13 @@ router.post('/', upload.single('csvFile'), async (req, res) => {
 	// We do readings for meters first then meter data later
 	// since the pipeline only supports readings atm.
 
-	const { createmeter: createMeter, cumulative, cumulativereset: cumulativeReset, duplications, length, meter, mode, password,
-		timesort: timeSort, update } = req.query; // extract query parameters
+	const { createmeter: createMeter, cumulative, cumulativereset: cumulativeReset, duplications, length, meter: meterName, 
+		mode, password, timesort: timeSort, update } = req.query; // extract query parameters
 
 	if (!req.file) {
 		failure(req, res, 'No file uploaded.');
 		return;
 	}// TODO: Validate file upload
-
-	// Invalidate improper mode, meter pair.
-	if (mode === 'readings' && !meter) {
-		failure(req, res, `Readings are provided, but no meter is provided. Meter '${meter}' is invalid.`)
-		return;
-	}
 
 	// Invalidate unimplemented time sort.
 	if (timeSort !== 'increasing') {
@@ -90,15 +85,24 @@ router.post('/', upload.single('csvFile'), async (req, res) => {
 			// create buffer to save into file; will need to gunzip file 
 			const myWritableStreamBuffer = streamToWriteBuffer(req.file.buffer);
 			// save this buffer into a file
-			const filePath = './readings.txt'; // TODO: use a unique name and use that name in the new meter creation
+			const randomFileName = 'willBeRandom'; // TODO: use a unique name and use that name in the new meter creation 
+			const filePath = `./${randomFileName}.csv`;
 			await fs.writeFile(filePath, myWritableStreamBuffer)
 				.then(() => log.info(`The file ${filePath} was created to upload csv data`))
 				.catch(reason => log.error(`Failed to write the file: ${filePath}`, reason));
 
-			const mapRowToModel = (row) => (row); // stub func to satisfy param
 			const conn = getConnection();
-			loadCsvInput(filePath, meter, mapRowToModel, false, cumulative, cumulativeReset,
-				duplications, undefined, conn); // load csv data
+
+			let meter = await Meter.getByName(new String(meterName)); // retrieve meter by name
+			if (!meter.id){ // If no meter is found, we create the meter and log it.
+				meter = new Meter(undefined, randomFileName, undefined, undefined, undefined, undefined, undefined);
+				log.warn(`Creating the meter ${randomFileName} for readings since it did not exist.`);
+				await meter.insert(conn); // does not seem to actually return a promise
+			}
+
+			const mapRowToModel = (row) => (row); // stub func to satisfy param
+			loadCsvInput(filePath, meter.id, mapRowToModel, false, cumulative, cumulativeReset, duplications, undefined, conn); // load csv data
+			// Problem here is that we will not know if csv was loaded successfully.
 			return;
 		case 'meter':
 			failure(req, res, `Mode meter has not been implemented`);
