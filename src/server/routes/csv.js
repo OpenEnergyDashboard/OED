@@ -65,8 +65,25 @@ router.post('/', upload.single('csvFile'), async (req, res) => {
 	// We do readings for meters first then meter data later
 	// since the pipeline only supports readings atm.
 
-	const { createmeter, cumulative, cumulativereset, duplications, length, meter, mode, password,
-		timeSort, update } = req.query; // extract query parameters
+	const { createmeter: createMeter, cumulative, cumulativereset: cumulativeReset, duplications, length, meter, mode, password,
+		timesort: timeSort, update } = req.query; // extract query parameters
+
+	if (!req.file) {
+		failure(req, res, 'No file uploaded.');
+		return;
+	}// TODO: Validate file upload
+
+	// Invalidate improper mode, meter pair.
+	if (mode === 'readings' && !meter) {
+		failure(req, res, `Readings are provided, but no meter is provided. Meter '${meter}' is invalid.`)
+		return;
+	}
+
+	// Invalidate unimplemented time sort.
+	if (timeSort !== 'increasing') {
+		failure(req, res, `Time sort '${timeSort}' is invalid. Only 'increasing' is currently implemented.`);
+		return;
+	}
 
 	switch (mode) {
 		case 'readings':
@@ -80,7 +97,7 @@ router.post('/', upload.single('csvFile'), async (req, res) => {
 
 			const mapRowToModel = (row) => (row); // stub func to satisfy param
 			const conn = getConnection();
-			loadCsvInput(filePath, meter, mapRowToModel, false, cumulative, cumulativereset,
+			loadCsvInput(filePath, meter, mapRowToModel, false, cumulative, cumulativeReset,
 				duplications, undefined, conn); // load csv data
 			return;
 		case 'meter':
