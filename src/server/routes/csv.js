@@ -8,6 +8,7 @@
  *
  */
 
+const escapeHtml = require('core-js/fn/string/escape-html');
 const express = require('express');
 const fs = require('fs').promises;
 const { getConnection } = require('../db');
@@ -17,42 +18,76 @@ const multer = require('multer');
 const streamBuffers = require('stream-buffers');
 const zlib = require('zlib');
 
-// The upload here ensures that the file is saved to server RAM rather than disk
+// The upload here ensures that the file is saved to server RAM rather than disk; TODO: Think about large uploads
 const upload = multer({ storage: multer.memoryStorage() });
 const router = express.Router();
 
-router.post('/', upload.single('csvFile'), async (req) => {
-	// We do readings for meters first then meter data later
-	// since the pipeline only supports readings atm.
+/**
+ * Inform the client of a failure (406 Not Acceptable), and log it.
+ *
+ * @param {express.Request} req The Express request object
+ * @param {express.Response} res The Express response object
+ * @param {string} reason The reason for the failure.
+ *
+ */
+function failure(req, res, reason = '') {
+	const ip = req.headers['x-forwarded-for'] || req.connection.remoteAddress;
+	log.error(`Obvius protocol request from ${ip} failed due to ${reason}`);
 
-	const { createmeter, cumulative, duplications, length, meter, mode, password,
-		timeSort, update } = req.query; // extract query parameters
-	const cumulativeReset = false;
+	res.status(406) // 406 Not Acceptable error, as required by Obvius
+		.send(`<pre>\n${escapeHtml(reason)}\n</pre>\n`);
+}
 
-	// create buffer to save into file; will need to gunzip file 
-	const myReadableStreamBuffer = new streamBuffers.ReadableStreamBuffer({
+/**
+ * Inform the client of a success (200 OK).
+ *
+ * @param {express.Request} req The Express request object
+ * @param {express.Response} res The Express response object
+ * @param {string} comment Any additional data to be returned to the client.
+ *
+ */
+function success(req, res, comment = '') {
+	res.status(200) // 200 OK
+		.send(`<pre>\nSUCCESS\n${escapeHtml(comment)}</pre>\n`);
+}
+
+function streamToWriteBuffer(stream) {
+	const writableStreamBuffer = new streamBuffers.WritableStreamBuffer({
 		frequency: 10,
 		chunkSize: 2048
 	});
-	myReadableStreamBuffer.put(req.file.buffer);
-	myReadableStreamBuffer.stop(); // stop() indicates we are done putting the data in our readable stream.
-	// save this buffer into a file
-	const filePath = './readings.txt';
-	await fs.writeFile(filePath.myReadableStreamBuffer)
-		.then(() => log.info(`The file ${filePath} was created to upload csv data`))
-		.catch(reason => log.error(`Failed to write the file: ${filePath}`, reason));
+	writableStreamBuffer.put(stream);
+	writableStreamBuffer.stop(); // stop() indicates we are done putting the data in our readable stream.
+	return writableStreamBuffer;
+}
 
-	const mapRowToModel = (row) => (row); // stub func to satisfy param
-	const conn = getConnection();
-	loadCsvInput(filePath, meter, mapRowToModel, false, cumulative, cumulativeReset,
-		duplications, undefined, conn); // load csv data
+router.post('/', upload.single('csvFile'), async (req, res) => {
+	// We do readings for meters first then meter data later
+	// since the pipeline only supports readings atm.
+
+	const { createmeter, cumulative, cumulativereset, duplications, length, meter, mode, password,
+		timeSort, update } = req.query; // extract query parameters
 
 	switch (mode) {
 		case 'readings':
+			// create buffer to save into file; will need to gunzip file 
+			const myWritableStreamBuffer = streamToWriteBuffer(req.file.buffer);
+			// save this buffer into a file
+			const filePath = './readings.txt'; // TODO: use a unique name and use that name in the new meter creation
+			await fs.writeFile(filePath, myWritableStreamBuffer)
+				.then(() => log.info(`The file ${filePath} was created to upload csv data`))
+				.catch(reason => log.error(`Failed to write the file: ${filePath}`, reason));
+
+			const mapRowToModel = (row) => (row); // stub func to satisfy param
+			const conn = getConnection();
+			loadCsvInput(filePath, meter, mapRowToModel, false, cumulative, cumulativereset,
+				duplications, undefined, conn); // load csv data
 			return;
 		case 'meter':
+			failure(req, res, `Mode meter has not been implemented`);
 			return;
 		default:
+			failure(req, res, `Mode ${mode} is invalid. Mode can either be 'readings' or 'meter'.`)
 			return;
 	}
 });
