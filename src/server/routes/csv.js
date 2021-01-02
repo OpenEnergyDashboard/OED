@@ -35,7 +35,7 @@ function failure(req, res, reason = '') {
 	const ip = req.headers['x-forwarded-for'] || req.connection.remoteAddress;
 	log.error(`Obvius protocol request from ${ip} failed due to ${reason}`);
 
-	res.status(406) // 406 Not Acceptable error, as required by Obvius
+	res.status(400) 
 		.send(`<pre>\n${escapeHtml(reason)}\n</pre>\n`);
 }
 
@@ -66,28 +66,29 @@ router.get('/', (req, res) => {
 	success(req, res, "Lookie here you accessed the route file");
 });
 
-router.post('/', upload.single('csvFile'), async (req, res) => {
+router.post('/', upload.single('csvfile'), async (req, res) => {
 	// we need to sanitize req query params, res
 
 	// We do readings for meters first then meter data later
 	// since the pipeline only supports readings atm.
 
-	const { createmeter: createMeter, cumulative, cumulativereset: cumulativeReset, duplications, length, meter: meterName, 
-		mode, password, timesort: timeSort, update } = req.query; // extract query parameters
+	const { createmeter: createMeter, cumulative, cumulativereset: cumulativeReset, duplications, length, meter: meterName,
+		mode, password, timesort: timeSort, update } = req.body; // extract query parameters
 
 	if (!req.file) {
 		failure(req, res, 'No file uploaded.');
 		return;
 	}// TODO: Validate file upload
 
-	// Invalidate unimplemented time sort.
-	if (timeSort !== 'increasing') {
-		failure(req, res, `Time sort '${timeSort}' is invalid. Only 'increasing' is currently implemented.`);
-		return;
-	}
 
 	switch (mode) {
 		case 'readings':
+			// Invalidate unimplemented time sort.
+			if (timeSort !== 'increasing') {
+				failure(req, res, `Time sort '${timeSort}' is invalid. Only 'increasing' is currently implemented.`);
+				return;
+			}
+
 			// create buffer to save into file; will need to gunzip file 
 			const myWritableStreamBuffer = streamToWriteBuffer(req.file.buffer);
 			// save this buffer into a file
@@ -100,7 +101,7 @@ router.post('/', upload.single('csvFile'), async (req, res) => {
 			const conn = getConnection();
 
 			let meter = await Meter.getByName(new String(meterName)); // retrieve meter by name
-			if (!meter.id){ // If no meter is found, we create the meter and log it.
+			if (!meter.id) { // If no meter is found, we create the meter and log it.
 				meter = new Meter(undefined, randomFileName, undefined, undefined, undefined, undefined, undefined);
 				log.warn(`Creating the meter ${randomFileName} for readings since it did not exist.`);
 				await meter.insert(conn); // does not seem to actually return a promise
