@@ -62,7 +62,13 @@ function streamToWriteBuffer(stream) {
 	return writableStreamBuffer;
 }
 
+router.get('/', (req, res) => {
+	success(req, res, "Lookie here you accessed the route file");
+});
+
 router.post('/', upload.single('csvFile'), async (req, res) => {
+	// we need to sanitize req query params, res
+
 	// We do readings for meters first then meter data later
 	// since the pipeline only supports readings atm.
 

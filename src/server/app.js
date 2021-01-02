@@ -26,6 +26,7 @@ const createRouterForNewCompressedReadings = require('./routes/compressedReading
 const createRouterForCompareReadings = require('./routes/compareReadings').createRouter;
 const baseline = require('./routes/baseline');
 const obvius = require('./routes/obvius');
+const csv = require('./routes/csv');
 
 const app = express();
 
@@ -53,6 +54,7 @@ app.use('/api/compressedReadings', createRouterForNewCompressedReadings());
 app.use('/api/compareReadings', createRouterForCompareReadings());
 app.use('/api/baselines', baseline);
 app.use('/api/obvius', obvius);
+app.use('/api/csv', csv);
 app.use(express.static(path.join(__dirname, '..', 'client', 'public')));
 
 const router = express.Router();
