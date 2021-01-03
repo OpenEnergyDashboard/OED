@@ -13,9 +13,16 @@ mocha.describe('csv API', () => {
 	mocha.it('should be able to accept a post request to upload meter data.', async () => {
 		const res = await chai.request(app).post(CSV_ROUTE)
 			.field('mode', 'meter')
-			.field('timesort', 'increasing')
-			.attach('csvfile', './sampleMeters.csv')
-		expect(res).to.have.status(400); // Uploading meters is not implemented
+			.attach('csvfile', './sampleMeter.csv')
+		expect(res).to.have.status(200); // Uploading meters is not implemented
+		const csvMeter = await async function(){
+			const row = (await readCSV('./sampleMeter.csv'))[0];
+			return new Meter(undefined, row[0], row[1], row[2] === 'TRUE', row[3] === 'TRUE', row[4], row[5]);
+		}();
+		const conn = testDB.getConnection();
+		const meter = await Meter.getByName(csvMeter.name, conn);
+		csvMeter.id = meter.id; // set ids to be the same for testing purposes
+		expect(meter).to.deep.equal(csvMeter);
 	});
 	mocha.it('should be able to load readings data for an existing meter.', async () => {
 		const conn = testDB.getConnection();

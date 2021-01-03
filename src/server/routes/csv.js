@@ -3,7 +3,7 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
 
 /*
- * This file implements the /api/csv route. This route accepts csv data for 
+ * This file implements the /api/csv route. This route accepts csv data for
  * meter and readings data.
  */
 
@@ -13,8 +13,9 @@ const fs = require('fs').promises;
 const { getConnection } = require('../db');
 const loadCsvInput = require('../services/pipeline-in-progress/loadCsvInput');
 const { log } = require('../log');
-const Meter = require('../models/Meter');
 const multer = require('multer');
+const Meter = require('../models/Meter');
+const readCSV = require('../services/pipeline-in-progress/readCsv');
 const streamBuffers = require('stream-buffers');
 const zlib = require('zlib');
 
@@ -58,6 +59,51 @@ function streamToWriteBuffer(stream) {
 	});
 	writableStreamBuffer.write(stream);
 	return writableStreamBuffer;
+}
+
+async function uploadMeter(req, res) {
+	try {
+		const { password, update } = req.body; // extract query parameters // TODO: validate password.
+		// Fail if request to update meters.
+		if (update && update !== 'false') {
+			failure(req, res, `Update data for a meter is not implemented for update=${update}.`);
+			return;
+		}
+		// create buffer to save into file; will need to gunzip file
+		const myWritableStreamBuffer = streamToWriteBuffer(req.file.buffer);
+		// save this buffer into a file
+		const randomFileName = `willBeRandom`; // TODO: use a unique name
+		const filePath = `./${randomFileName}.csv`; // TODO: You might want to change this so you don't read from a file
+		await fs.writeFile(filePath, myWritableStreamBuffer.getContents())
+			.then(() => log.info(`The file ${filePath} was created to upload csv data`))
+		// .catch(reason => log.error(`Failed to write the file: ${filePath}`, reason)); // TODO: this error needs to stop the entire function
+		const { name, ipAddress, enabled, displayable, type, identifier } = await async function () {
+			const row = (await readCSV(filePath))[0];
+			const meterHash = {
+				name: row[0],
+				ipAddress: row[1],
+				enabled: row[2] === 'TRUE',
+				displayable: row[3] === 'TRUE',
+				type: row[4],
+				identifier: row[5]
+			};
+			return meterHash;
+		}(); // TODO: There are various points of failure for when extracting meter data that we need to think about.
+		const conn = getConnection();
+		const newMeter = new Meter(undefined, name, ipAddress, enabled, displayable, type, identifier);
+		await newMeter.insert(conn);
+		await fs.unlink(filePath); // remove file
+		success(req, res, `Successfully inserted the meter ${name}.`);
+		// .catch(err => {
+		// 	log.error(`Creating the meter ${name} via the csv pipeline failed due to: `, err);
+		// 	failure(req, res, `Meter ${name} failed to be created. Check log for reason.`);
+		// });
+		return;
+	} catch (error) {
+		const message = `Creating meter via csv pipeline failed due to error: `;
+		log.error(message, error);
+		failure(req, res, message + error);
+	}
 }
 
 router.get('/', (req, res) => {
@@ -108,16 +154,16 @@ router.post('/', upload.single('csvfile'), async (req, res) => {
 				failure(req, res, `Time sort '${timeSort}' is invalid. Only 'increasing' is currently implemented.`);
 				return;
 			}
-			// Fail if request to update readings.	
+			// Fail if request to update readings.
 			if (update && update !== 'false') {
 				failure(req, res, `Update value for readings is not implemented for update=${update}.`);
 				return;
 			}
 
-			// create buffer to save into file; will need to gunzip file 
+			// create buffer to save into file; will need to gunzip file
 			const myWritableStreamBuffer = streamToWriteBuffer(req.file.buffer);
 			// save this buffer into a file
-			const randomFileName = `${meterName}-willBeRandom`; // TODO: use a unique name and use that name in the new meter creation 
+			const randomFileName = `${meterName}-willBeRandom`; // TODO: use a unique name and use that name in the new meter creation
 			const filePath = `./${randomFileName}.csv`;
 			await fs.writeFile(filePath, myWritableStreamBuffer.getContents())
 				.then(() => log.info(`The file ${filePath} was created to upload csv data`))
@@ -140,7 +186,7 @@ router.post('/', upload.single('csvfile'), async (req, res) => {
 			success(req, res, `It looks like success.`); // TODO: We need a try catch for all these awaits.
 			return;
 		case 'meter':
-			failure(req, res, `Mode meter has not been implemented`);
+			await uploadMeter(req, res);
 			return;
 		default:
 			failure(req, res, `Mode ${mode} is invalid. Mode can either be 'readings' or 'meter'.`)
