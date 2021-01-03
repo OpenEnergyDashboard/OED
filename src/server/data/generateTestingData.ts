@@ -17,7 +17,6 @@ import * as _ from 'lodash';
 import * as moment from 'moment';
 import * as promisify from 'es6-promisify';
 import { log } from '../log';
-import { filename } from '../util/obvius';
 
 const stringifyCSV = promisify(stringify); // this is a strange error; when compiled it is okay
 /* Our main export is the generateSine function. We break this into several parts:
@@ -204,12 +203,10 @@ async function generateSine(startTimeStamp: string, endTimeStamp: string, option
 		phaseShift: options.phaseShift || 0
 	};
 	try {
-
 		if (chosenOptions.normalizeByHour) {
 			const scale = _momentPercentage(moment({ hour: 0 }), moment({ hour: 1 }), moment(chosenOptions.timeStep));
 			chosenOptions.maxAmplitude = chosenOptions.maxAmplitude * scale;
 		}
-
 		await writeToCSV(_generateSineData(startTimeStamp, endTimeStamp, chosenOptions), chosenOptions.filename);
 	} catch (error) {
 		log.error(`Failed to generate sine data for file: ${chosenOptions.filename}.`, error);
@@ -233,7 +230,6 @@ async function generateCosine(startTimeStamp: string, endTimeStamp: string, opti
 		phaseShift: (options.phaseShift || 0) + (Math.PI / 2)
 	};
 	try {
-
 		if (chosenOptions.normalizeByHour) {
 			const scale = _momentPercentage(moment({ hour: 0 }), moment({ hour: 1 }), moment(chosenOptions.timeStep));
 			chosenOptions.maxAmplitude = chosenOptions.maxAmplitude * scale;
