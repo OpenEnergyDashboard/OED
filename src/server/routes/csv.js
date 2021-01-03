@@ -5,7 +5,6 @@
 /*
  * This file implements the /api/csv route. This route accepts csv data for 
  * meter and readings data.
- *
  */
 
 const escapeHtml = require('core-js/fn/string/escape-html');
@@ -66,10 +65,9 @@ router.get('/', (req, res) => {
 });
 
 router.post('/', upload.single('csvfile'), async (req, res) => {
-	// we need to sanitize req query params, res
-
-	// We do readings for meters first then meter data later
-	// since the pipeline only supports readings atm.
+	// TODO: we need to sanitize req query params, res
+	// TODO: we need to create a condition set
+	// TODO: we need to check incorrect parameters
 
 	const { createmeter: createMeter, cumulative, cumulativereset: cumulativeReset, duplications, length, meter: meterName,
 		mode, password, timesort: timeSort, update } = req.body; // extract query parameters
@@ -79,12 +77,40 @@ router.post('/', upload.single('csvfile'), async (req, res) => {
 		return;
 	}// TODO: Validate file upload
 
-
 	switch (mode) {
 		case 'readings':
-			// Invalidate unimplemented time sort.
-			if (timeSort !== 'increasing') {
+			// Fail unimplemented createmeter value.
+			if (createMeter && createMeter !== 'true') {
+				failure(req, res, `Create meter value ${createMeter} is not implemented.`);
+				return;
+			}
+			// Fail unimplemented cumulative value.
+			if (cumulative && cumulative !== 'yes' && cumulative !== 'no') {
+				failure(req, res, `Cumulative value ${cumulative} is not implemented.`);
+				return;
+			} // TODO: Think about how to handle the case where the cumulative is incorrectly 'yes' when it should actually be 'no'.
+			const areReadingsCumulative = (cumulative === 'yes');
+			// Fail on incorrect duplication value.
+			if (duplications && isNaN(duplications)) {
+				failure(req, res, `Duplications value ${duplications} is invalid.`);
+				return;
+			}
+			// Set reading repetition
+			const readingRepetition = duplications ? parseFloat(duplications) : 1;
+
+			// Fail if no meter name provided
+			if (!meterName) {
+				failure(req, res, `Meter name must be provided as field meter.`);
+				return;
+			}
+			// Fail unimplemented time sort.
+			if (timeSort && timeSort !== 'increasing') {
 				failure(req, res, `Time sort '${timeSort}' is invalid. Only 'increasing' is currently implemented.`);
+				return;
+			}
+			// Fail if request to update readings.	
+			if (update && update !== 'false') {
+				failure(req, res, `Update value for readings is not implemented for update=${update}.`);
 				return;
 			}
 
@@ -107,12 +133,11 @@ router.post('/', upload.single('csvfile'), async (req, res) => {
 					log.warn(`Creating the meter ${meterName} for readings since it did not exist.`);
 					await meter.insert(conn); // does not seem to actually return a promise
 				}) // if no meter is found an error is thrown and we create the meter and log it. TODO: there may be other reasons for error; QueryResultError may be a type to switch on
-
 			const mapRowToModel = (row) => { return row; }; // stub func to satisfy param
-			await loadCsvInput(filePath, meter.id, mapRowToModel, false, cumulative, cumulativeReset, duplications, undefined, conn); // load csv data
-			// Problem here is that we will not know if csv was loaded successfully.
+			await loadCsvInput(filePath, meter.id, mapRowToModel, false, areReadingsCumulative, cumulativeReset, readingRepetition, undefined, conn); // load csv data
+			// TODO: If unsuccessful upload then an error will be thrown. We need to catch this error.
 			await fs.unlink(filePath); // TODO: do we really need this to complete before sending back a response and should this file be removed on an unsuccessful upload?
-			success(req, res, `It looks like success.`); // TODO: need try catch for all these awaits
+			success(req, res, `It looks like success.`); // TODO: We need a try catch for all these awaits.
 			return;
 		case 'meter':
 			failure(req, res, `Mode meter has not been implemented`);
