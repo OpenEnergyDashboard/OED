@@ -43,10 +43,10 @@ function isEpsilon(x: number, epsilon = 1e-10) {
 
 /**
  * Generates an array of dates of the form 'YYYY-MM-DD HH:MM:SS' with the upper bound
- * at endDate, which may or may not be included. Because of the date format,
- * the timeStep should also be at least 1 second.
- * @param {string} startDate String of the form 'YYYY-MM-DD HH:MM:SS'
- * @param {string} endDate String of the form 'YYYY-MM-DD HH:MM:SS'
+ * at endDate, which may be excluded if it does not lie exactly timeStep (i.e. there is no integer value n such that 
+ * endDate = startDate + n * timeStep). Because of the date format, the timeStep should also be at least 1 second.
+ * @param {string} startDate The start date with the form 'YYYY-MM-DD HH:MM:SS'
+ * @param {string} endDate The end date with the form 'YYYY-MM-DD HH:MM:SS'
  * @param {moment.MomentInputObject} timeStep Object with keys describe the time step, by default
  * this is { minute: 20 } or 20 minutes and needs to be at at least 1 second.
  * @returns {string[]} An array of timestamps between startDate and endDate, at a given time step
@@ -130,12 +130,12 @@ interface GenerateSinusoidalDataOptions extends GenerateDataOptions {
 }
 
 /**
- * Generates sine data over a period of time. By default the timeStep is 20 minutes.
- * and the period_length is one day.
- * @param {string} startTimeStamp, the time's format is 'YYYY-MM-DD HH:MM:SS'
- * @param {string} endTimeStamp, the time's format is 'YYYY-MM-DD HH:MM:SS'
- * @param {GenerateDataOptions} options controls the timeStep and the period_length, the timeStep needs to be at least
- * 1 second.
+ * Generates sine data over a period of time. By default the timeStep is 20 minutes and 
+ * the periodLength is one day. These can be changed by supplying them in the options parameter.
+ * @param {string} startTimeStamp This is the start time of the data generation; its format needs to be 'YYYY-MM-DD HH:MM:SS'
+ * @param {string} endTimeStamp This is the end time of the data generation; it needs to have the format 'YYYY-MM-DD HH:MM:SS' and may not be included. 
+ * Check the generateDates function for more details.
+ * @param {GenerateDataOptions} options controls the timeStep and the periodLength, the timeStep needs to be at least 1 second.
  * @returns {[string, string][]} Matrix of rows representing each csv row of the form timeStamp, value
  */
 function _generateSineData(startTimeStamp: string, endTimeStamp: string, options: GenerateSinusoidalDataOptions): Array<[string, string]> {
@@ -163,7 +163,7 @@ function _generateSineData(startTimeStamp: string, endTimeStamp: string, options
  * Write csv data into a csv file
  * @param {[[string, string]]} data an matrix with two columns of strings
  * @param {string} filename the name of the file
- * Sources:
+ * @sources:
  * https://csv.js.org/stringify/api/
  * https://stackoverflow.com/questions/2496710/writing-files-in-node-js
  */
@@ -189,10 +189,10 @@ interface GenerateSinusoidalDataFileOptions extends GenerateDataFileOptions {
 
 /**
  * Creates a csv with sine data
- *
- * @param {string} startTimeStamp, the time's format is 'YYYY-MM-DD HH:MM:SS'
- * @param {string} endTimeStamp, the time's format is 'YYYY-MM-DD HH:MM:SS'
- * @param {object} options, the parameters for generating a data file for OED
+ * @param {string} startTimeStamp This is the start time of the data generation; its format needs to be 'YYYY-MM-DD HH:MM:SS'
+ * @param {string} endTimeStamp This is the end time of the data generation; it needs to have the format 'YYYY-MM-DD HH:MM:SS' and may not be included.
+ * Check the generateDates function for more details.
+ * @param {object} options the parameters for generating a data file for OED
  */
 async function generateSine(startTimeStamp: string, endTimeStamp: string, options: GenerateSinusoidalDataFileOptions) {
 	const chosenOptions: GenerateSinusoidalDataFileOptions = {
@@ -217,11 +217,11 @@ async function generateSine(startTimeStamp: string, endTimeStamp: string, option
 }
 
 /**
- * Creates a csv with cosine data
- *
- * @param {string} startTimeStamp, the time's format is 'YYYY-MM-DD HH:MM:SS'
- * @param {string} endTimeStamp, the time's format is 'YYYY-MM-DD HH:MM:SS'
- * @param {object} options, the parameters for generating a data file for OED
+ * Creates a csv with sine data
+ * @param {string} startTimeStamp This is the start time of the data generation; its format needs to be 'YYYY-MM-DD HH:MM:SS'
+ * @param {string} endTimeStamp This is the end time of the data generation; it needs to have the format 'YYYY-MM-DD HH:MM:SS' and may not be included.
+ * Check the generateDates function for more details.
+ * @param {object} options the parameters for generating a data file for OED
  */
 async function generateCosine(startTimeStamp: string, endTimeStamp: string, options: GenerateSinusoidalDataFileOptions) {
 	const chosenOptions: GenerateSinusoidalDataFileOptions = {
