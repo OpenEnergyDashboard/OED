@@ -111,6 +111,7 @@ router.post('/', upload.single('csvfile'), async (req, res) => {
 			const mapRowToModel = (row) => { return row; }; // stub func to satisfy param
 			await loadCsvInput(filePath, meter.id, mapRowToModel, false, cumulative, cumulativeReset, duplications, undefined, conn); // load csv data
 			// Problem here is that we will not know if csv was loaded successfully.
+			await fs.unlink(filePath); // TODO: do we really need this to complete before sending back a response and should this file be removed on an unsuccessful upload?
 			success(req, res, `It looks like success.`); // TODO: need try catch for all these awaits
 			return;
 		case 'meter':
