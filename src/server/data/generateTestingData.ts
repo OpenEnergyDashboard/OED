@@ -70,8 +70,7 @@ function generateDates(startDate: string, endDate: string, timeStep: moment.Mome
 }
 
 /**
- * Determine what percentage of elapsed time passed that is at what percentage
- * if the moment between startTime and endTime.
+ * Determine what percentage of elapsed time passed that is at what percentage if the moment between startTime and endTime.
  * @param {moment.Moment} startTime should not be after the endTime: !startTime.isAfter(endTime) should return true
  * @param {moment.Moment} endTime should or be before startTime: !endTime.isBefore(startTime) should return true
  * @param {moment.Moment} currentMoment should be in between startTime and endTime
@@ -84,7 +83,7 @@ function _momentPercentage(startTime: moment.Moment, endTime: moment.Moment, cur
 		throw RangeError('The endTime must be after or equal to the startTime.');
 	}
 	if (currentMoment.isBefore(startTime)) {
-		throw RangeError('The currentMoment must be after or equal to the starTime.');
+		throw RangeError('The currentMoment must be after or equal to the startTime.');
 	}
 	if (currentMoment.isAfter(endTime)) {
 		throw RangeError('The currentMoment must be before or equal to the endTime.');
