@@ -7,5 +7,6 @@ UPDATE meters
 		ipaddress = ${ipAddress},
 		enabled = ${enabled},
 		displayable = ${displayable},
-		meter_type = ${type}
+		meter_type = ${type},
+		identifier = ${identifier}
 	WHERE id = ${id};

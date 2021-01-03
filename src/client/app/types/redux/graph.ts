@@ -42,6 +42,15 @@ export interface ChangeGraphZoomAction {
 	timeInterval: TimeInterval;
 }
 
+export interface ChangeSliderRangeAction {
+	type: ActionType.ChangeSliderRange;
+	sliderInterval: TimeInterval;
+}
+
+export interface ResetRangeSliderStackAction {
+	type: ActionType.ResetRangeSliderStack;
+}
+
 export interface UpdateComparePeriodAction {
 	type: ActionType.UpdateComparePeriod;
 	comparePeriod: ComparePeriod;
@@ -65,6 +74,8 @@ export interface SetOptionsVisibility {
 
 export type GraphAction =
 	| ChangeGraphZoomAction
+	| ChangeSliderRangeAction
+	| ResetRangeSliderStackAction
 	| ChangeBarStackingAction
 	| ChangeChartToRenderAction
 	| UpdateBarDurationAction
@@ -79,6 +90,7 @@ export interface GraphState {
 	selectedMeters: number[];
 	selectedGroups: number[];
 	timeInterval: TimeInterval;
+	rangeSliderInterval: TimeInterval;
 	barDuration: moment.Duration;
 	comparePeriod: ComparePeriod;
 	compareTimeInterval: TimeInterval;
