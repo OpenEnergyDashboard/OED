@@ -35,7 +35,7 @@ function failure(req, res, reason = '') {
 	const ip = req.headers['x-forwarded-for'] || req.connection.remoteAddress;
 	log.error(`Csv protocol request from ${ip} failed due to ${reason}`);
 
-	res.status(400) 
+	res.status(400)
 		.send(`<pre>\n${escapeHtml(reason)}\n</pre>\n`);
 }
 
@@ -91,7 +91,7 @@ router.post('/', upload.single('csvfile'), async (req, res) => {
 			// create buffer to save into file; will need to gunzip file 
 			const myWritableStreamBuffer = streamToWriteBuffer(req.file.buffer);
 			// save this buffer into a file
-			const randomFileName = 'willBeRandom'; // TODO: use a unique name and use that name in the new meter creation 
+			const randomFileName = `${meterName}-willBeRandom`; // TODO: use a unique name and use that name in the new meter creation 
 			const filePath = `./${randomFileName}.csv`;
 			await fs.writeFile(filePath, myWritableStreamBuffer.getContents())
 				.then(() => log.info(`The file ${filePath} was created to upload csv data`))
@@ -99,17 +99,19 @@ router.post('/', upload.single('csvfile'), async (req, res) => {
 
 			const conn = getConnection();
 
-			let meter = await Meter.getByName(meterName, conn); // retrieve meter by name
-			if (!meter.id) { // If no meter is found, we create the meter and log it.
-				meter = new Meter(undefined, randomFileName, undefined, undefined, undefined, undefined, undefined);
-				log.warn(`Creating the meter ${randomFileName} for readings since it did not exist.`);
-				await meter.insert(conn); // does not seem to actually return a promise
-			}
+			let meter;
+			await Meter.getByName(meterName, conn)
+				.then(row => meter = row) // retrieve meter by name
+				.catch(async err => {
+					meter = new Meter(undefined, meterName, undefined, false, false, Meter.type.MAMAC, meterName);
+					log.warn(`Creating the meter ${meterName} for readings since it did not exist.`);
+					await meter.insert(conn); // does not seem to actually return a promise
+				}) // if no meter is found an error is thrown and we create the meter and log it. TODO: there may be other reasons for error; QueryResultError may be a type to switch on
 
 			const mapRowToModel = (row) => { return row; }; // stub func to satisfy param
 			await loadCsvInput(filePath, meter.id, mapRowToModel, false, cumulative, cumulativeReset, duplications, undefined, conn); // load csv data
 			// Problem here is that we will not know if csv was loaded successfully.
-			success(req, res, `It looks like success.`); // need try catch for all these awaits
+			success(req, res, `It looks like success.`); // TODO: need try catch for all these awaits
 			return;
 		case 'meter':
 			failure(req, res, `Mode meter has not been implemented`);
