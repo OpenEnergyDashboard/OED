@@ -1,2 +1,2 @@
-name,ipaddress,enabled,displayable,meter_type
+name,ipaddress,enabled,displayable,meter_type,identifier
 XXX,123.45.6.0,FALSE,TRUE,mamac

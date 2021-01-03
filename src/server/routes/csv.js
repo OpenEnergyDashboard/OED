@@ -12,7 +12,7 @@ const escapeHtml = require('core-js/fn/string/escape-html');
 const express = require('express');
 const fs = require('fs').promises;
 const { getConnection } = require('../db');
-const { loadCsvInput } = require('../services/pipeline-in-progress/loadCsvInput');
+const loadCsvInput = require('../services/pipeline-in-progress/loadCsvInput');
 const { log } = require('../log');
 const Meter = require('../models/Meter');
 const multer = require('multer');
@@ -33,7 +33,7 @@ const router = express.Router();
  */
 function failure(req, res, reason = '') {
 	const ip = req.headers['x-forwarded-for'] || req.connection.remoteAddress;
-	log.error(`Obvius protocol request from ${ip} failed due to ${reason}`);
+	log.error(`Csv protocol request from ${ip} failed due to ${reason}`);
 
 	res.status(400) 
 		.send(`<pre>\n${escapeHtml(reason)}\n</pre>\n`);
@@ -57,8 +57,7 @@ function streamToWriteBuffer(stream) {
 		frequency: 10,
 		chunkSize: 2048
 	});
-	writableStreamBuffer.put(stream);
-	writableStreamBuffer.stop(); // stop() indicates we are done putting the data in our readable stream.
+	writableStreamBuffer.write(stream);
 	return writableStreamBuffer;
 }
 
@@ -94,22 +93,23 @@ router.post('/', upload.single('csvfile'), async (req, res) => {
 			// save this buffer into a file
 			const randomFileName = 'willBeRandom'; // TODO: use a unique name and use that name in the new meter creation 
 			const filePath = `./${randomFileName}.csv`;
-			await fs.writeFile(filePath, myWritableStreamBuffer)
+			await fs.writeFile(filePath, myWritableStreamBuffer.getContents())
 				.then(() => log.info(`The file ${filePath} was created to upload csv data`))
 				.catch(reason => log.error(`Failed to write the file: ${filePath}`, reason));
 
 			const conn = getConnection();
 
-			let meter = await Meter.getByName(new String(meterName)); // retrieve meter by name
+			let meter = await Meter.getByName(meterName, conn); // retrieve meter by name
 			if (!meter.id) { // If no meter is found, we create the meter and log it.
 				meter = new Meter(undefined, randomFileName, undefined, undefined, undefined, undefined, undefined);
 				log.warn(`Creating the meter ${randomFileName} for readings since it did not exist.`);
 				await meter.insert(conn); // does not seem to actually return a promise
 			}
 
-			const mapRowToModel = (row) => (row); // stub func to satisfy param
-			loadCsvInput(filePath, meter.id, mapRowToModel, false, cumulative, cumulativeReset, duplications, undefined, conn); // load csv data
+			const mapRowToModel = (row) => { return row; }; // stub func to satisfy param
+			await loadCsvInput(filePath, meter.id, mapRowToModel, false, cumulative, cumulativeReset, duplications, undefined, conn); // load csv data
 			// Problem here is that we will not know if csv was loaded successfully.
+			success(req, res, `It looks like success.`); // need try catch for all these awaits
 			return;
 		case 'meter':
 			failure(req, res, `Mode meter has not been implemented`);
