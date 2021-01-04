@@ -77,7 +77,7 @@ function checkValue(arrayToValidate, minVal, maxVal, maxError) {
 
 /**
  * Check and report unequal intervals. Can be ignore by passing null interval
- * @param {array of Readings} arrayToValidate
+ * @param {Readings[]} arrayToValidate
  * @param {number} threshold the maximum allowed difference between consecutive data points' intervals
  */
 function checkIntervals(arrayToValidate, threshold) {

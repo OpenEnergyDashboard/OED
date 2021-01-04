@@ -18,8 +18,8 @@ const { log } = require('../../log');
  *    reading #0 is cumulative value from unknown readings that may or may not have been inserted before
  * @param {object[[]]} rows
  * @param readingRepetition value is 1 if reading is not duplicated. 2 if repeated twice and so on (E-mon D-mon meters)
- * @param {boolean} cumulativeReset true if the cumlative data is reset at midnight
- * @param {string} meterID
+ * @param {boolean} cumulativeReset true if the cumulative data is reset at midnight
+ * @param {number} meterID
  */
 function handleCumulative(rows, readingRepetition, cumulativeReset, meterID) {
 	const result = [];
