@@ -37,7 +37,7 @@ function failure(req, res, error, statusCode = 400) {
 	const ip = req.headers['x-forwarded-for'] || req.connection.remoteAddress;
 	if (error instanceof CSVPipelineError) {
 		const { logErrorMessage, responseMessage } = error;
-		log.error(`Csv protocol request from ${ip} failed due to ${error.logErrorMessage}`, error);
+		log.error(`Csv protocol request from ${ip} failed due to ${logErrorMessage}`, error);
 		res.status(statusCode)
 			.send(`<pre>\n${escapeHtml(responseMessage)}\n</pre>\n`);
 	} else { // we do not actually expect to reach this case however just in case we receive an error we still want to respond.
@@ -117,7 +117,17 @@ async function uploadMeter(req, res) {
 }
 
 // STUB, TODO: Validate Password
-async function validatePassword(password) {
+async function validatePassword(req, res, next) {
+	try {
+		const { password } = req;
+		if (password === 'password') {
+			next();
+		} else {
+			throw CSVPipelineError('Password provided is not valid.');
+		}
+	} catch (error) {
+		failure(req, res, error);
+	}
 	return password === 'password';
 };
 
@@ -125,14 +135,12 @@ router.get('/', (req, res) => {
 	success(req, res, "Lookie here you accessed the route file");
 });
 
-router.post('/', upload.single('csvfile'), async (req, res) => {
+router.post('/', validatePassword, upload.single('csvfile'), async (req, res) => {
 	// TODO: we need to sanitize req query params, res
 	// TODO: we need to create a condition set
 	// TODO: we need to check incorrect parameters
 
 	try {
-		const { password } = req.body;
-		const isValidated = await validatePassword(password); // TODO: Validate password
 
 		if (!isValidated) {
 			throw CSVPipelineError('Failed to supply valid password. Request to upload a csv file is rejected.');
@@ -150,7 +158,7 @@ router.post('/', upload.single('csvfile'), async (req, res) => {
 					throw CSVPipelineError(`Create meter value ${createMeter} is not implemented.`);
 				}
 				// Fail unimplemented cumulative value.
-				if (cumulative && cumulative !== 'yes' && cumulative !== 'no') {
+				if (cumulative && cumulative !== 'true' && cumulative !== 'false') {
 					throw CSVPipelineError(req, res, `Cumulative value ${cumulative} is not implemented.`);
 				} // TODO: Think about how to handle the case where the cumulative is incorrectly 'yes' when it should actually be 'no'.
 				const areReadingsCumulative = (cumulative === 'yes');
