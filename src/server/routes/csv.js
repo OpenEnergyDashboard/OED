@@ -123,7 +123,7 @@ async function validatePassword(req, res, next) {
 		if (password === 'password') {
 			next();
 		} else {
-			throw CSVPipelineError('Password provided is not valid.');
+			throw CSVPipelineError('Failed to supply valid password. Request to upload a csv file is rejected.');
 		}
 	} catch (error) {
 		failure(req, res, error);
@@ -142,9 +142,6 @@ router.post('/', validatePassword, upload.single('csvfile'), async (req, res) =>
 
 	try {
 
-		if (!isValidated) {
-			throw CSVPipelineError('Failed to supply valid password. Request to upload a csv file is rejected.');
-		}
 		if (!req.file) {
 			throw CSVPipelineError('No csv file uploaded.');
 		}// TODO: For now we assume canonical csv structure. In the future we will have to validate csv files via headers.
