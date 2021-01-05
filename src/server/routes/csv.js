@@ -19,6 +19,7 @@ const multer = require('multer');
 const Meter = require('../models/Meter');
 const readCSV = require('../services/pipeline-in-progress/readCsv');
 const streamBuffers = require('stream-buffers');
+const validateCsvUploadParams = require('../middleware/validateCsvUploadParams');
 const zlib = require('zlib');
 
 // The upload here ensures that the file is saved to server RAM rather than disk; TODO: Think about large uploads
@@ -226,4 +227,7 @@ router.post('/', validatePassword, upload.single('csvfile'), async (req, res) =>
 	}
 });
 
-module.exports = router;
+module.exports = {
+	router,
+	failure
+};
