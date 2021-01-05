@@ -7,7 +7,6 @@
  * meter and readings data.
  */
 
-const crypto = require('crypto');
 const { CSVPipelineError } = require('../services/csvPipeline/CustomErrors');
 const escapeHtml = require('core-js/fn/string/escape-html');
 const express = require('express');
@@ -17,10 +16,9 @@ const loadCsvInput = require('../services/pipeline-in-progress/loadCsvInput');
 const { log } = require('../log');
 const multer = require('multer');
 const Meter = require('../models/Meter');
-const readCSV = require('../services/pipeline-in-progress/readCsv');
-const streamBuffers = require('stream-buffers');
+const readCsv = require('../services/pipeline-in-progress/readCsv');
+const saveCsv = require('../services/csvPipeline/saveCsv');
 const validateCsvUploadParams = require('../middleware/validateCsvUploadParams');
-const zlib = require('zlib');
 
 // The upload here ensures that the file is saved to server RAM rather than disk; TODO: Think about large uploads
 const upload = multer({ storage: multer.memoryStorage() });
@@ -62,14 +60,6 @@ function success(req, res, comment = '') {
 		.send(`<pre>\nSUCCESS\n${escapeHtml(comment)}</pre>\n`);
 }
 
-function streamToWriteBuffer(stream) {
-	const writableStreamBuffer = new streamBuffers.WritableStreamBuffer({
-		frequency: 10,
-		chunkSize: 2048
-	});
-	writableStreamBuffer.write(stream);
-	return writableStreamBuffer;
-}
 
 async function uploadMeter(req, res) {
 	try {
@@ -88,7 +78,7 @@ async function uploadMeter(req, res) {
 			.then(() => log.info(`The file ${filePath} was created to upload csv data`))
 		// .catch(reason => log.error(`Failed to write the file: ${filePath}`, reason)); // TODO: this error needs to stop the entire function
 		const { name, ipAddress, enabled, displayable, type, identifier } = await async function () {
-			const row = (await readCSV(filePath))[0];
+			const row = (await readCsv(filePath))[0];
 			const meterHash = {
 				name: row[0],
 				ipAddress: row[1],
@@ -136,65 +126,19 @@ router.get('/', (req, res) => {
 	success(req, res, "Lookie here you accessed the route file");
 });
 
-router.post('/', validatePassword, upload.single('csvfile'), async (req, res) => {
+router.post('/', validatePassword, upload.single('csvfile'), validateCsvUploadParams, async (req, res) => {
 	// TODO: we need to sanitize req query params, res
 	// TODO: we need to create a condition set
 	// TODO: we need to check incorrect parameters
 
 	try {
-
-		if (!req.file) {
-			throw CSVPipelineError('No csv file uploaded.');
-		}// TODO: For now we assume canonical csv structure. In the future we will have to validate csv files via headers.
-
 		const { createmeter: createMeter, cumulative, cumulativereset: cumulativeReset, duplications, length, meter: meterName,
 			mode, timesort: timeSort, update } = req.body; // extract query parameters
+		const filepath = await saveCsv(req.file.buffer, meterName);
+		log.info(`The file ${filepath} was created to upload csv data`);
+		const conn = getConnection(); // TODO: when should we close this connection?
 		switch (mode) {
 			case 'readings':
-				// Fail unimplemented createmeter value.
-				if (createMeter && createMeter !== 'true') { // default flag based on what exists on the meter
-					throw CSVPipelineError(`Create meter value ${createMeter} is not implemented.`);
-				}
-				// Fail unimplemented cumulative value.
-				if (cumulative && cumulative !== 'true' && cumulative !== 'false') {
-					throw CSVPipelineError(req, res, `Cumulative value ${cumulative} is not implemented.`);
-				} // TODO: Think about how to handle the case where the cumulative is incorrectly 'yes' when it should actually be 'no'.
-				const areReadingsCumulative = (cumulative === 'yes');
-				// Fail on incorrect duplication value.
-				if (duplications && isNaN(duplications)) {
-					throw CSVPipelineError(`Duplications value ${duplications} is invalid.`);
-				}
-				// Set reading repetition
-				const readingRepetition = duplications ? parseFloat(duplications) : 1;
-
-				// Fail if no meter name provided
-				if (!meterName) {
-					throw CSVPipelineError(`Meter name must be provided as field meter.`);
-				}
-				// Fail unimplemented time sort.
-				if (timeSort && timeSort !== 'increasing') {
-					throw CSVPipelineError(`Time sort '${timeSort}' is invalid. Only 'increasing' is currently implemented.`);
-				}
-				// Fail if request to update readings.
-				if (update && update !== 'false') {
-					throw CSVPipelineError(`Update value for readings is not implemented for update=${update}.`);
-				}
-
-				// create buffer to save into file; will need to gunzip file
-				const myWritableStreamBuffer = streamToWriteBuffer(req.file.buffer);
-				// save this buffer into a file
-				const randomFilename = `${meterName}-${(new Date(Date.now()).toISOString())}-${crypto.randomBytes(16).toString('hex')}`;
-				const filepath = `${__dirname}/${randomFilename}.csv`;
-				await fs.writeFile(filepath, myWritableStreamBuffer.getContents())
-					.catch(err => {
-						const message = `Failed to write the file: ${filepath}`;
-						throw CSVPipelineError(`Internal OED error: ${message}`, err.message);
-					}); // separate logs function that logs for error message, 1. log it, 2. passback error codes to user, 3. stop process; 
-				log.info(`The file ${filepath} was created to upload csv data`);
-				// log new meters with csv then add data; error code resend data. HTTP Error responses. Specific code. error code or string
-
-				const conn = getConnection();
-
 				let meter = await Meter.getByName(meterName, conn)
 					.catch(err => {
 						if (createMeter !== 'true') {
@@ -208,7 +152,6 @@ router.post('/', validatePassword, upload.single('csvfile'), async (req, res) =>
 							throw CSVPipelineError('Internal OED error: Failed to insert meter into the database.', err.message);
 						});
 				}
-
 				const mapRowToModel = (row) => { return row; }; // stub func to satisfy param
 				await loadCsvInput(filepath, meter.id, mapRowToModel, false, areReadingsCumulative, cumulativeReset, readingRepetition, undefined, conn); // load csv data
 				// TODO: If unsuccessful upload then an error will be thrown. We need to catch this error.
