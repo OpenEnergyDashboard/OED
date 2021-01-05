@@ -14,7 +14,7 @@ mocha.describe('csv API', () => {
 		const res = await chai.request(app).post(CSV_ROUTE)
 			.field('mode', 'meter')
 			.attach('csvfile', './sampleMeter.csv')
-		expect(res).to.have.status(200); // Uploading meters is not implemented
+		expect(res).to.have.status(200);
 		const csvMeter = await async function(){
 			const row = (await readCSV('./sampleMeter.csv'))[0];
 			return new Meter(undefined, row[0], row[1], row[2] === 'TRUE', row[3] === 'TRUE', row[4], row[5]);
