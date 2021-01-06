@@ -34,11 +34,15 @@ async function validateCsvUploadParams(req, res, next) {
 				// Fail if request to update readings.
 				if (update && update !== 'false') {
 					throw CSVPipelineError(`Update value for readings is not implemented for update=${update}.`);
-                }
-                break;
+				}
+				break;
 			case 'meter':
+				// Fail if request to update meters.
+				if (update && update !== 'false') {
+					throw CSVPipelineError(`Update data for a meter is not implemented for update=${update}.`);
+				}
 				throw CSVPipelineError('Temporarily disabled.');
-				// return;
+			// return;
 			default:
 				throw CSVPipelineError(`Mode ${mode} is invalid. Mode can only be either 'readings' or 'meter'.`);
 		}

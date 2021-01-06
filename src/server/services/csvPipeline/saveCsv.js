@@ -12,7 +12,7 @@ function streamToWriteBuffer(stream) {
     return writableStreamBuffer;
 }
 
-async function saveCsv(buffer, pronoun) {
+async function saveCsv(buffer, pronoun='meters') {
     const myWritableStreamBuffer = streamToWriteBuffer(buffer);
     // save this buffer into a file
     const randomFilename = `${pronoun}-${(new Date(Date.now()).toISOString())}-${crypto.randomBytes(16).toString('hex')}`;

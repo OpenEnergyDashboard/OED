@@ -63,20 +63,6 @@ function success(req, res, comment = '') {
 
 async function uploadMeter(req, res) {
 	try {
-		const { update } = req.body; // extract query parameters // TODO: validate password.
-		// Fail if request to update meters.
-		if (update && update !== 'false') {
-			failure(req, res, `Update data for a meter is not implemented for update=${update}.`);
-			return;
-		}
-		// create buffer to save into file; will need to gunzip file
-		const myWritableStreamBuffer = streamToWriteBuffer(req.file.buffer);
-		// save this buffer into a file
-		const randomFileName = `willBeRandom`; // TODO: use a unique name // TODO: Dumping file needs to be the save, whatDoing param dumping readings/ dumping meters
-		const filePath = `./${randomFileName}.csv`; // TODO: You might want to change this so you don't read from a file
-		await fs.writeFile(filePath, myWritableStreamBuffer.getContents())
-			.then(() => log.info(`The file ${filePath} was created to upload csv data`))
-		// .catch(reason => log.error(`Failed to write the file: ${filePath}`, reason)); // TODO: this error needs to stop the entire function
 		const { name, ipAddress, enabled, displayable, type, identifier } = await async function () {
 			const row = (await readCsv(filePath))[0];
 			const meterHash = {
