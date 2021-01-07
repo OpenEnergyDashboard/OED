@@ -21,6 +21,7 @@ function mapStateToProps(state: State) {
 			const readingsData = byMeterID[timeInterval.toString()][barDuration.toISOString()];
 			if (readingsData !== undefined && !readingsData.isFetching) {
 				const label = state.meters.byMeterID[meterID].name;
+				const colorID = state.meters.byMeterID[meterID].id;
 				if (readingsData.readings === undefined) {
 					throw new Error('Unacceptable condition: readingsData.readings is undefined.');
 				}
@@ -46,7 +47,7 @@ function mapStateToProps(state: State) {
 					text: hoverText,
 					hoverinfo: 'text',
 					type: 'bar',
-					marker: {color: getGraphColor(label)}
+					marker: {color: getGraphColor(colorID, 'meter')}
 				});
 			}
 		}
@@ -58,6 +59,7 @@ function mapStateToProps(state: State) {
 			const readingsData = byGroupID[timeInterval.toString()][barDuration.toISOString()];
 			if (readingsData !== undefined && !readingsData.isFetching) {
 				const label = state.groups.byGroupID[groupID].name;
+				const colorID = state.groups.byGroupID[groupID].id;
 				if (readingsData.readings === undefined) {
 					throw new Error('Unacceptable condition: readingsData.readings is undefined.');
 				}
@@ -83,7 +85,7 @@ function mapStateToProps(state: State) {
 					text: hoverText,
 					hoverinfo: 'text',
 					type: 'bar',
-					marker: {color: getGraphColor(label)}
+					marker: {color: getGraphColor(colorID, 'group')}
 				});
 			}
 		}
