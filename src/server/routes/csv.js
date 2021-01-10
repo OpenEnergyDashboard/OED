@@ -8,7 +8,6 @@
  */
 
 const { CSVPipelineError } = require('../services/csvPipeline/CustomErrors');
-const escapeHtml = require('core-js/fn/string/escape-html');
 const express = require('express');
 const fs = require('fs').promises;
 const { getConnection } = require('../db');
@@ -24,47 +23,13 @@ const validateCsvUploadParams = require('../middleware/validateCsvUploadParams')
 const upload = multer({ storage: multer.memoryStorage() });
 const router = express.Router();
 
-/**
- * Inform the client of a failure (406 Not Acceptable), and log it.
- *
- * @param {express.Request} req The Express request object
- * @param {express.Response} res The Express response object
- * @param {Error || CSVPipelineError.class} error The reason for the failure.
- *
- */
-function failure(req, res, error, statusCode = 400) {
-	const ip = req.headers['x-forwarded-for'] || req.connection.remoteAddress;
-	if (error instanceof CSVPipelineError) {
-		const { logErrorMessage, responseMessage } = error;
-		log.error(`Csv protocol request from ${ip} failed due to ${logErrorMessage}`, error);
-		res.status(statusCode)
-			.send(`<pre>\n${escapeHtml(responseMessage)}\n</pre>\n`);
-	} else { // we do not actually expect to reach this case however just in case we receive an error we still want to respond.
-		const { message } = error;
-		log.error(`Csv protocol request from ${ip} failed due to ${error.message}`, error);
-		res.status(statusCode)
-			.send(`<pre>\n${escapeHtml(message)}\n</pre>\n`);
-	}
-}
+const failure = require('../services/csvPipeline/failure');
+const success = require('../services/csvPipeline/success');
 
-/**
- * Inform the client of a success (200 OK).
- *
- * @param {express.Request} req The Express request object
- * @param {express.Response} res The Express response object
- * @param {string} comment Any additional data to be returned to the client.
- *
- */
-function success(req, res, comment = '') {
-	res.status(200) // 200 OK
-		.send(`<pre>\nSUCCESS\n${escapeHtml(comment)}</pre>\n`);
-}
-
-
-async function uploadMeter(req, res) {
+async function uploadMeter(req, res, filepath) {
 	try {
 		const { name, ipAddress, enabled, displayable, type, identifier } = await async function () {
-			const row = (await readCsv(filePath))[0];
+			const row = (await readCsv(filepath))[0];
 			const meterHash = {
 				name: row[0],
 				ipAddress: row[1],
@@ -79,7 +44,7 @@ async function uploadMeter(req, res) {
 		const conn = getConnection(); // TODO: one csv can have many meters
 		const newMeter = new Meter(undefined, name, ipAddress, enabled, displayable, type, identifier);
 		await newMeter.insert(conn);
-		await fs.unlink(filePath); // remove file
+		await fs.unlink(filepath); // remove file
 		success(req, res, `Successfully inserted the meter ${name}.`);
 		// .catch(err => {
 		// 	log.error(`Creating the meter ${name} via the csv pipeline failed due to: `, err);
@@ -94,9 +59,9 @@ async function uploadMeter(req, res) {
 }
 
 // STUB, TODO: Validate Password
-async function validatePassword(req, res, next) {
+function validatePassword(req, res, next) {
 	try {
-		const { password } = req;
+		const { password } = req.body;
 		if (password === 'password') {
 			next();
 		} else {
@@ -105,14 +70,13 @@ async function validatePassword(req, res, next) {
 	} catch (error) {
 		failure(req, res, error);
 	}
-	return password === 'password';
 };
 
 router.get('/', (req, res) => {
 	success(req, res, "Lookie here you accessed the route file");
 });
 
-router.post('/', validatePassword, upload.single('csvfile'), validateCsvUploadParams, async (req, res) => {
+router.post('/', upload.single('csvfile'), validatePassword, validateCsvUploadParams, async (req, res) => {
 	// TODO: we need to sanitize req query params, res
 	// TODO: we need to create a condition set
 	// TODO: we need to check incorrect parameters
@@ -120,6 +84,10 @@ router.post('/', validatePassword, upload.single('csvfile'), validateCsvUploadPa
 	try {
 		const { createmeter: createMeter, cumulative, cumulativereset: cumulativeReset, duplications, length, meter: meterName,
 			mode, timesort: timeSort, update } = req.body; // extract query parameters
+
+		const areReadingsCumulative = (cumulative === 'yes');
+		const readingRepetition = duplications;
+
 		const filepath = await saveCsv(req.file.buffer, meterName);
 		log.info(`The file ${filepath} was created to upload csv data`);
 		const conn = getConnection(); // TODO: when should we close this connection?
@@ -145,8 +113,7 @@ router.post('/', validatePassword, upload.single('csvfile'), validateCsvUploadPa
 				success(req, res, `It looks like success.`); // TODO: We need a try catch for all these awaits.
 				return;
 			case 'meter':
-				throw new CSVPipelineError('Temporarily disabled.');
-				// await uploadMeter(req, res);
+				await uploadMeter(req, res, filepath);
 				return;
 			default:
 				throw new CSVPipelineError(`Mode ${mode} is invalid. Mode can only be either 'readings' or 'meter'.`);
@@ -156,7 +123,4 @@ router.post('/', validatePassword, upload.single('csvfile'), validateCsvUploadPa
 	}
 });
 
-module.exports = {
-	router,
-	failure
-};
+module.exports = router;

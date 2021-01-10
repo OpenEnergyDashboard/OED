@@ -1,5 +1,5 @@
 const { CSVPipelineError } = require('../services/csvPipeline/CustomErrors');
-const { failure } = require('../routes/csv');
+const failure = require('../services/csvPipeline/failure');
 
 async function validateCsvUploadParams(req, res, next) {
 	try {
@@ -18,7 +18,6 @@ async function validateCsvUploadParams(req, res, next) {
 				if (cumulative && cumulative !== 'true' && cumulative !== 'false') {
 					throw new CSVPipelineError(req, res, `Cumulative value ${cumulative} is not implemented.`);
 				} // TODO: Think about how to handle the case where the cumulative is incorrectly 'yes' when it should actually be 'no'.
-				const areReadingsCumulative = (cumulative === 'yes');
 				// Fail on incorrect duplication value.
 				if (duplications && isNaN(duplications)) {
 					throw new CSVPipelineError(`Duplications value ${duplications} is invalid.`);
@@ -41,8 +40,7 @@ async function validateCsvUploadParams(req, res, next) {
 				if (update && update !== 'false') {
 					throw new CSVPipelineError(`Update data for a meter is not implemented for update=${update}.`);
 				}
-				throw new CSVPipelineError('Temporarily disabled.');
-			// return;
+				break;
 			default:
 				throw CSVPipelineError(`Mode ${mode} is invalid. Mode can only be either 'readings' or 'meter'.`);
 		}
