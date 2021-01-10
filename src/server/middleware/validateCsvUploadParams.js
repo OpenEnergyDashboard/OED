@@ -11,12 +11,12 @@ async function validateCsvUploadParams(req, res, next) {
 		switch (mode) {
 			case 'readings':
 				// Fail unimplemented createmeter value.
-				if (createMeter && createMeter !== 'true') { // default flag based on what exists on the meter
+				if (createMeter && createMeter !== 'true' && createMeter !== 'false') { // default flag based on what exists on the meter
 					throw new CSVPipelineError(`Create meter value ${createMeter} is not implemented.`);
 				}
 				// Fail unimplemented cumulative value.
 				if (cumulative && cumulative !== 'true' && cumulative !== 'false') {
-					throw new CSVPipelineError(req, res, `Cumulative value ${cumulative} is not implemented.`);
+					throw new CSVPipelineError(`Cumulative value ${cumulative} is not implemented.`);
 				} // TODO: Think about how to handle the case where the cumulative is incorrectly 'yes' when it should actually be 'no'.
 				// Fail on incorrect duplication value.
 				if (duplications && isNaN(duplications)) {

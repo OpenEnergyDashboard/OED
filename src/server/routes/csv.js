@@ -59,7 +59,7 @@ async function uploadMeter(req, res, filepath) {
 }
 
 // STUB, TODO: Validate Password
-function validatePassword(req, res, next) {
+async function validatePassword(req, res, next) {
 	try {
 		const { password } = req.body;
 		if (password === 'password') {

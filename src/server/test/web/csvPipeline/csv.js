@@ -46,6 +46,7 @@ mocha.describe('csv API', () => {
 		const conn = testDB.getConnection();
 		const res = await chai.request(app).post(CSV_ROUTE) // make request to api to upload readings data for this meter
 			.field('password', 'password')
+			.field('createmeter', 'true')
 			.field('mode', 'readings')
 			.field('meter', 'ABG')
 			.field('timesort', 'increasing')
