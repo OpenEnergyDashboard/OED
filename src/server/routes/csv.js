@@ -100,7 +100,7 @@ async function validatePassword(req, res, next) {
 		if (password === 'password') {
 			next();
 		} else {
-			throw CSVPipelineError('Failed to supply valid password. Request to upload a csv file is rejected.');
+			throw new CSVPipelineError('Failed to supply valid password. Request to upload a csv file is rejected.');
 		}
 	} catch (error) {
 		failure(req, res, error);
@@ -128,14 +128,14 @@ router.post('/', validatePassword, upload.single('csvfile'), validateCsvUploadPa
 				let meter = await Meter.getByName(meterName, conn)
 					.catch(err => {
 						if (createMeter !== 'true') {
-							throw CSVPipelineError(`Internal OED error: Meter with name ${meterName} is not found. createMeter was not set to true.`, err.message);
+							throw new CSVPipelineError(`Internal OED error: Meter with name ${meterName} is not found. createMeter was not set to true.`, err.message);
 						}
 					});
 				if (!meter) {
 					meter = new Meter(undefined, meterName, undefined, false, false, Meter.type.MAMAC, meterName);
 					await meter.insert(conn)
 						.catch(err => {
-							throw CSVPipelineError('Internal OED error: Failed to insert meter into the database.', err.message);
+							throw new CSVPipelineError('Internal OED error: Failed to insert meter into the database.', err.message);
 						});
 				}
 				const mapRowToModel = (row) => { return row; }; // stub func to satisfy param
@@ -145,11 +145,11 @@ router.post('/', validatePassword, upload.single('csvfile'), validateCsvUploadPa
 				success(req, res, `It looks like success.`); // TODO: We need a try catch for all these awaits.
 				return;
 			case 'meter':
-				throw CSVPipelineError('Temporarily disabled.');
+				throw new CSVPipelineError('Temporarily disabled.');
 				// await uploadMeter(req, res);
 				return;
 			default:
-				throw CSVPipelineError(`Mode ${mode} is invalid. Mode can only be either 'readings' or 'meter'.`);
+				throw new CSVPipelineError(`Mode ${mode} is invalid. Mode can only be either 'readings' or 'meter'.`);
 		}
 	} catch (error) {
 		failure(req, res, error);
