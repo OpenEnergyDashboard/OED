@@ -9,19 +9,19 @@
 
 const { CSVPipelineError } = require('../services/csvPipeline/CustomErrors');
 const express = require('express');
-const fs = require('fs').promises;
 const { getConnection } = require('../db');
-const loadCsvInput = require('../services/pipeline-in-progress/loadCsvInput');
 const { log } = require('../log');
 const multer = require('multer');
-const Meter = require('../models/Meter');
-const readCsv = require('../services/pipeline-in-progress/readCsv');
 const saveCsv = require('../services/csvPipeline/saveCsv');
-const validateCsvUploadParams = require('../middleware/validateCsvUploadParams');
 const zlib = require('zlib');
+
+/** Middleware validation */
+const validateCsvUploadParams = require('../middleware/validateCsvUploadParams');
+const validatePassword = require('../middleware/validatePassword');
 
 // The upload here ensures that the file is saved to server RAM rather than disk; TODO: Think about large uploads
 const upload = multer({ storage: multer.memoryStorage() });
+
 const router = express.Router();
 
 const failure = require('../services/csvPipeline/failure');
@@ -30,24 +30,11 @@ const success = require('../services/csvPipeline/success');
 const uploadMeters = require('../services/csvPipeline/uploadMeters');
 const uploadReadings = require('../services/csvPipeline/uploadReadings');
 
-// STUB, TODO: Validate Password
-async function validatePassword(req, res, next) {
-	try {
-		const { password } = req.body;
-		if (password === 'password') {
-			next();
-		} else {
-			throw new CSVPipelineError('Failed to supply valid password. Request to upload a csv file is rejected.');
-		}
-	} catch (error) {
-		failure(req, res, error);
-	}
-};
-
 router.get('/', (req, res) => {
 	success(req, res, "Lookie here you accessed the route file");
 });
 
+// NOTE: for some reason upload needs to come before the other middleware for this to work.
 router.post('/', upload.single('csvfile'), validatePassword, validateCsvUploadParams, async (req, res) => {
 	// TODO: we need to sanitize req query params, res
 	// TODO: we need to create a condition set
