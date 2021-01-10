@@ -7,20 +7,18 @@ const success = require('../csvPipeline/success');
 
 async function uploadMeters(req, res, filepath, conn) {
 	try {
-		const temp = (await readCsv(filepath)).map(row => (
-			{
-				name: row[0],
-				ipAddress: row[1],
-				enabled: row[2] === 'TRUE',
-				displayable: row[3] === 'TRUE',
-				type: row[4],
-				identifier: row[5]
-			}
-		)); // TODO: Loop over the Meters Class fields instead
+		const columns = Object.keys(new Meter()).slice(1);
+		const temp = (await readCsv(filepath)).map(row => {
+			const hash = {};
+			columns.forEach((entry, idx) => {
+				hash[entry] = row[idx];
+			});
+			return hash;
+		});
 		const meters = (req.body.headerrow === 'true') ? temp.slice(1) : temp;
 		// TODO: gzip validation and makes filesize smaller
 		await Promise.all(meters.map(meter => {
-			return (new Meter(undefined, meter.name, meter.ipAddress, meter.enabled, meter.displayable, meter.type, meter.identifier)).insert(conn);
+			return (new Meter(undefined, meter.name, meter.ipAddress, meter.enabled === 'TRUE', meter.displayable === 'TRUE', meter.type, meter.identifier)).insert(conn);
 		}));
 		fs.unlink(filepath)
 			.catch(err => {
