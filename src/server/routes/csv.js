@@ -82,7 +82,7 @@ router.post('/', upload.single('csvfile'), validatePassword, validateCsvUploadPa
 	// TODO: we need to check incorrect parameters
 
 	try {
-		const { createmeter: createMeter, cumulative, cumulativereset: cumulativeReset, duplications, length, meter: meterName,
+		const { createmeter, cumulative, cumulativereset: cumulativeReset, duplications, length, meter: meterName,
 			mode, timesort: timeSort, update } = req.body; // extract query parameters
 
 		const areReadingsCumulative = (cumulative === 'yes');

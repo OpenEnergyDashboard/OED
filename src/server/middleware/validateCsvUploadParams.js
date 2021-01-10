@@ -27,22 +27,22 @@ async function validateCsvUploadParams(req, res, next) {
 					throw new CSVPipelineError(`Meter name must be provided as field meter.`);
 				}
 				// Fail unimplemented time sort.
-				if (timeSort && timeSort !== 'increasing') {
+				if (timeSort && timeSort !== 'increasing' && timeSort !== 'decreasing') {
 					throw new CSVPipelineError(`Time sort '${timeSort}' is invalid. Only 'increasing' is currently implemented.`);
 				}
 				// Fail if request to update readings.
-				if (update && update !== 'false') {
+				if (update &&  update !== 'true' && update !== 'false') {
 					throw new CSVPipelineError(`Update value for readings is not implemented for update=${update}.`);
 				}
 				break;
 			case 'meter':
 				// Fail if request to update meters.
-				if (update && update !== 'false') {
+				if (update && update !== 'true' && update !== 'false') {
 					throw new CSVPipelineError(`Update data for a meter is not implemented for update=${update}.`);
 				}
 				break;
 			default:
-				throw CSVPipelineError(`Mode ${mode} is invalid. Mode can only be either 'readings' or 'meter'.`);
+				throw new CSVPipelineError(`Mode ${mode} is invalid. Mode can only be either 'readings' or 'meter'.`);
 		}
 		next();
 	} catch (error) {
