@@ -18,8 +18,6 @@ async function uploadMeters(req, res, filepath, conn) {
 			}
 		)); // TODO: Loop over the Meters Class fields instead
 		const meters = (req.body.headerrow === 'true') ? temp.slice(1) : temp;
-		log.info("metersddddddddddd" + meters)
-		console.log('headerrow ' + req.body.headerrow + meters);
 		// TODO: gzip validation and makes filesize smaller
 		await Promise.all(meters.map(meter => {
 			return (new Meter(undefined, meter.name, meter.ipAddress, meter.enabled, meter.displayable, meter.type, meter.identifier)).insert(conn);
