@@ -18,6 +18,7 @@ const Meter = require('../models/Meter');
 const readCsv = require('../services/pipeline-in-progress/readCsv');
 const saveCsv = require('../services/csvPipeline/saveCsv');
 const validateCsvUploadParams = require('../middleware/validateCsvUploadParams');
+const zlib = require('zlib');
 
 // The upload here ensures that the file is saved to server RAM rather than disk; TODO: Think about large uploads
 const upload = multer({ storage: multer.memoryStorage() });
@@ -59,13 +60,13 @@ router.post('/', upload.single('csvfile'), validatePassword, validateCsvUploadPa
 		let filepath, conn;
 		switch (mode) {
 			case 'readings':
-				filepath = await saveCsv(req.file.buffer, meterName);
+				filepath = await saveCsv(zlib.gunzipSync(req.file.buffer), meterName);
 				log.info(`The file ${filepath} was created to upload readings csv data`);
 				conn = getConnection(); // TODO: when should we close this connection?
 				await uploadReadings(req, res, filepath, conn);
 				return;
 			case 'meter':
-				filepath = await saveCsv(req.file.buffer, "meters");
+				filepath = await saveCsv(zlib.gunzipSync(req.file.buffer), "meters");
 				log.info(`The file ${filepath} was created to upload meters csv data`);
 				conn = getConnection(); // TODO: when should we close this connection?
 				await uploadMeters(req, res, filepath, conn);

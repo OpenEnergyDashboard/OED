@@ -4,21 +4,11 @@ const fs = require('fs').promises;
 const streamBuffers = require('stream-buffers');
 const zlib = require('zlib');
 
-function streamToWriteBuffer(stream) {
-    const writableStreamBuffer = new streamBuffers.WritableStreamBuffer({
-        frequency: 10,
-        chunkSize: 2048
-    });
-    writableStreamBuffer.write(stream);
-    return writableStreamBuffer;
-}
-
 async function saveCsv(buffer, filename) {
-    const myWritableStreamBuffer = streamToWriteBuffer(buffer);
     // save this buffer into a file
     const randomFilename = `${filename}-${(new Date(Date.now()).toISOString())}-${crypto.randomBytes(16).toString('hex')}`;
     const filepath = `${__dirname}/${randomFilename}.csv`;
-    await fs.writeFile(filepath, myWritableStreamBuffer.getContents())
+    await fs.writeFile(filepath, buffer)
         .catch(err => {
             const message = `Failed to write the file: ${filepath}`;
             throw new CSVPipelineError(`Internal OED error: ${message}`, err.message);

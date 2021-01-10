@@ -1,9 +1,18 @@
 const { chai, mocha, expect, app, testDB, testUser } = require('../../common');
 const Meter = require('../../../models/Meter');
-const readCSV = require('../../../services/pipeline-in-progress/readCsv');
 const Reading = require('../../../models/Reading');
+const zlib = require('zlib');
+
+const fs = require('fs');
+const csv = require('csv');
+const promisify = require('es6-promisify');
+
+const parseCsv = promisify(csv.parse);
 
 const CSV_ROUTE = '/api/csv';
+const readingsPath = './sampleReadings.csv.gz';
+const metersPath = './sampleMeters.csv.gz';
+const metersWithHeaderPath = './sampleMetersWithHeader.csv.gz';
 
 mocha.describe('csv API', () => {
 	mocha.it('should exist on the route "/api/csv" ', async () => {
@@ -14,9 +23,9 @@ mocha.describe('csv API', () => {
 		const res = await chai.request(app).post(CSV_ROUTE)
 			.field('password', 'password')
 			.field('mode', 'meter')
-			.attach('csvfile', './sampleMeter.csv')
+			.attach('csvfile', metersPath)
 		expect(res).to.have.status(200);
-		const csvMeters = (await readCSV('./sampleMeter.csv')).map(row =>
+		const csvMeters = (await parseCsv(zlib.gunzipSync(fs.readFileSync(metersPath)))).map(row =>
 			(new Meter(undefined, row[0], row[1], row[2] === 'TRUE', row[3] === 'TRUE', row[4], row[5]))
 		);
 
@@ -34,9 +43,9 @@ mocha.describe('csv API', () => {
 			.field('password', 'password')
 			.field('mode', 'meter')
 			.field('headerrow', 'true')
-			.attach('csvfile', './sampleMeterWithHeader.csv')
+			.attach('csvfile', metersWithHeaderPath)
 		expect(res).to.have.status(200);
-		const csvMeters = (await readCSV('./sampleMeterWithHeader.csv')).map(row =>
+		const csvMeters = (await parseCsv(zlib.gunzipSync(fs.readFileSync(metersWithHeaderPath)))).map(row =>
 			(new Meter(undefined, row[0], row[1], row[2] === 'TRUE', row[3] === 'TRUE', row[4], row[5]))
 		).slice(1);
 
@@ -58,12 +67,12 @@ mocha.describe('csv API', () => {
 			.field('mode', 'readings')
 			.field('meter', 'XXX')
 			.field('timesort', 'increasing')
-			.attach('csvfile', './sampleReadings.csv')
+			.attach('csvfile', readingsPath)
 		const readings = await Reading.getAllByMeterID(meter.id, conn);
 		const extractedReadings = readings.map(reading => {
 			return [`${reading.reading}`, reading.startTimestamp._i, reading.endTimestamp._i];
 		});
-		const fileReadings = await readCSV('./sampleReadings.csv');
+		const fileReadings = await parseCsv(zlib.gunzipSync(fs.readFileSync(readingsPath)));
 		expect(extractedReadings).to.deep.equals(fileReadings);
 	});
 	mocha.it('should be able to load readings data for a non existing meter.', async () => {
@@ -74,13 +83,13 @@ mocha.describe('csv API', () => {
 			.field('mode', 'readings')
 			.field('meter', 'ABG')
 			.field('timesort', 'increasing')
-			.attach('csvfile', './sampleReadings.csv');
+			.attach('csvfile', readingsPath);
 		const meter = await Meter.getByName('ABG', conn);
 		const readings = await Reading.getAllByMeterID(meter.id, conn);
 		const extractedReadings = readings.map(reading => {
 			return [`${reading.reading}`, reading.startTimestamp._i, reading.endTimestamp._i];
 		});
-		const fileReadings = await readCSV('./sampleReadings.csv');
+		const fileReadings = await parseCsv(zlib.gunzipSync(fs.readFileSync(readingsPath)));
 		expect(extractedReadings).to.deep.equals(fileReadings);
 	});
 	mocha.describe('should fail on unimplemented features.', async () => {
@@ -90,7 +99,7 @@ mocha.describe('csv API', () => {
 				.field('mode', 'readings')
 				.field('meter', 'ABG')
 				.field('timesort', 'decreasing')
-				.attach('csvfile', './sampleReadings.csv');
+				.attach('csvfile', readingsPath);
 			expect(res).to.have.status(400);
 		});
 		mocha.it('should fail on request that updates data.', async () => {
@@ -99,7 +108,7 @@ mocha.describe('csv API', () => {
 				.field('mode', 'readings')
 				.field('meter', 'ABG')
 				.field('update', 'true')
-				.attach('csvfile', './sampleReadings.csv');
+				.attach('csvfile', readingsPath);
 			expect(res).to.have.status(400);
 		});
 		mocha.it('should fail on request that asks to disable create meter automatically.', async () => {
@@ -108,7 +117,7 @@ mocha.describe('csv API', () => {
 				.field('mode', 'readings')
 				.field('meter', 'ABG')
 				.field('createmeter', 'false')
-				.attach('csvfile', './sampleReadings.csv');
+				.attach('csvfile', readingsPath);
 			expect(res).to.have.status(400);
 		});
 		mocha.it('should fail on request that asks to invalid duplications.', async () => {
@@ -117,7 +126,7 @@ mocha.describe('csv API', () => {
 				.field('mode', 'readings')
 				.field('meter', 'ABG')
 				.field('duplications', 'INVALIDVALUE')
-				.attach('csvfile', './sampleReadings.csv');
+				.attach('csvfile', readingsPath);
 			expect(res).to.have.status(400);
 		});
 		mocha.it('should fail on request that asks to invalid cumulative value.', async () => {
@@ -126,7 +135,7 @@ mocha.describe('csv API', () => {
 				.field('mode', 'readings')
 				.field('meter', 'ABG')
 				.field('cumulative', 'INVALIDVALUE')
-				.attach('csvfile', './sampleReadings.csv');
+				.attach('csvfile', readingsPath);
 			expect(res).to.have.status(400);
 		});
 	});
