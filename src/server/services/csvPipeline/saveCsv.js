@@ -13,10 +13,10 @@ function streamToWriteBuffer(stream) {
     return writableStreamBuffer;
 }
 
-async function saveCsv(buffer, pronoun='meters') {
+async function saveCsv(buffer, filename) {
     const myWritableStreamBuffer = streamToWriteBuffer(buffer);
     // save this buffer into a file
-    const randomFilename = `${pronoun}-${(new Date(Date.now()).toISOString())}-${crypto.randomBytes(16).toString('hex')}`;
+    const randomFilename = `${filename}-${(new Date(Date.now()).toISOString())}-${crypto.randomBytes(16).toString('hex')}`;
     const filepath = `${__dirname}/${randomFilename}.csv`;
     await fs.writeFile(filepath, myWritableStreamBuffer.getContents())
         .catch(err => {
