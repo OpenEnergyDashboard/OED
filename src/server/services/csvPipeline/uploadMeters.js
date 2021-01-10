@@ -16,7 +16,6 @@ async function uploadMeters(req, res, filepath, conn) {
 			return hash;
 		});
 		const meters = (req.body.headerrow === 'true') ? temp.slice(1) : temp;
-		// TODO: gzip validation and makes filesize smaller
 		await Promise.all(meters.map(meter => {
 			return (new Meter(undefined, meter.name, meter.ipAddress, meter.enabled === 'TRUE', meter.displayable === 'TRUE', meter.type, meter.identifier)).insert(conn);
 		}));
