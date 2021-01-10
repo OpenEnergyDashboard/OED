@@ -16,14 +16,17 @@ mocha.describe('csv API', () => {
 			.field('mode', 'meter')
 			.attach('csvfile', './sampleMeter.csv')
 		expect(res).to.have.status(200);
-		const csvMeter = await async function () {
-			const row = (await readCSV('./sampleMeter.csv'))[0];
-			return new Meter(undefined, row[0], row[1], row[2] === 'TRUE', row[3] === 'TRUE', row[4], row[5]);
-		}();
+		const csvMeters = (await readCSV('./sampleMeter.csv')).map(row =>
+			(new Meter(undefined, row[0], row[1], row[2] === 'TRUE', row[3] === 'TRUE', row[4], row[5]))
+		);
+
 		const conn = testDB.getConnection();
-		const meter = await Meter.getByName(csvMeter.name, conn);
-		csvMeter.id = meter.id; // set ids to be the same for testing purposes
-		expect(meter).to.deep.equal(csvMeter);
+		const dbMeters = await Promise.all(csvMeters.map(async (meter, idx) => {
+			const meter_1 = await Meter.getByName(meter.name, conn);
+			csvMeters[idx].id = meter_1.id;
+			return meter_1;
+		}));
+		expect(dbMeters).to.deep.equal(csvMeters);
 	});
 	mocha.it('should be able to load readings data for an existing meter.', async () => {
 		const conn = testDB.getConnection();
