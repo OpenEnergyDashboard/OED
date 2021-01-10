@@ -27,6 +27,27 @@ mocha.describe('csv API', () => {
 			return meter_1;
 		}));
 		expect(dbMeters).to.deep.equal(csvMeters);
+		expect((await Meter.getAll(conn)).length).to.equal(3);
+	});
+	mocha.it('should be able to accept a post request to upload meter data with header row.', async () => {
+		const res = await chai.request(app).post(CSV_ROUTE)
+			.field('password', 'password')
+			.field('mode', 'meter')
+			.field('headerrow', 'true')
+			.attach('csvfile', './sampleMeterWithHeader.csv')
+		expect(res).to.have.status(200);
+		const csvMeters = (await readCSV('./sampleMeterWithHeader.csv')).map(row =>
+			(new Meter(undefined, row[0], row[1], row[2] === 'TRUE', row[3] === 'TRUE', row[4], row[5]))
+		).slice(1);
+
+		const conn = testDB.getConnection();
+		const dbMeters = await Promise.all(csvMeters.map(async (meter, idx) => {
+			const meter_1 = await Meter.getByName(meter.name, conn);
+			csvMeters[idx].id = meter_1.id;
+			return meter_1;
+		}));
+		expect(dbMeters).to.deep.equal(csvMeters);
+		expect((await Meter.getAll(conn)).length).to.equal(3);
 	});
 	mocha.it('should be able to load readings data for an existing meter.', async () => {
 		const conn = testDB.getConnection();

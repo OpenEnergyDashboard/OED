@@ -20,15 +20,16 @@ const { log } = require('../../log');
  * @param {boolean} cumulativeReset true if the cumulative data is reset at midnight
  * @param {number} readingRepetition number of times each reading is repeated where 1 means no repetition
  * @param {array} conditionSet used to validate readings (minVal, maxVal, minDate, maxDate, threshold, maxError)
+ * @param {boolean} headerRow true if the given file has a header row
  * @param {array} conn connection to database
  */
-async function loadCsvInput(filePath, meterID, mapRowToModel, readAsStream, isCumulative, cumulativeReset, readingRepetition, conditionSet, conn) {
+async function loadCsvInput(filePath, meterID, mapRowToModel, readAsStream, isCumulative, cumulativeReset, readingRepetition, conditionSet, headerRow, conn) {
 	try {
 		if (readAsStream) {
 			const stream = fs.createReadStream(filePath);
 			return loadCsvStream(stream, meterID, mapRowToModel, conditionSet, conn);
 		} else {
-			const dataRows = await readCSV(filePath);
+			const dataRows = headerRow ? (await readCSV(filePath)).shift() : (await readCSV(filePath));
 			return loadArrayInput(dataRows, meterID, mapRowToModel, isCumulative, cumulativeReset, readingRepetition, conditionSet, conn);
 		}
 	} catch (err) {

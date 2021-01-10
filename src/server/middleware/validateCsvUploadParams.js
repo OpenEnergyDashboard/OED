@@ -6,8 +6,14 @@ async function validateCsvUploadParams(req, res, next) {
 		if (!req.file) {
 			throw new CSVPipelineError('No csv file uploaded.');
 		}// TODO: For now we assume canonical csv structure. In the future we will have to validate csv files via headers.
-		const { createmeter: createMeter, cumulative, cumulativereset: cumulativeReset, duplications, length, meter: meterName,
-			mode, timesort: timeSort, update } = req.body; // extract query parameters
+		const { createmeter: createMeter, cumulative, cumulativereset: cumulativeReset, duplications,
+			headerrow: headerRow, length, meter: meterName, mode, timesort: timeSort, update } = req.body; // extract query parameters
+
+		if (!headerRow) {
+			req.body.headerrow = 'false';
+		} else if (headerRow !== 'true' && headerRow !== 'false') {
+			throw new CSVPipelineError(`headerrow value of ${headerRow} is not valid. Possible values are 'true' or 'false'.`);
+		}
 		switch (mode) {
 			case 'readings':
 				// Fail unimplemented createmeter value.

@@ -6,10 +6,11 @@ const success = require('../csvPipeline/success');
 
 async function uploadReadings(req, res, filepath, conn) {
 
-	const { createmeter: createMeter, cumulative, cumulativereset: cumulativeReset, duplications, length, meter: meterName,
-		mode, timesort: timeSort, update } = req.body; // extract query parameters
+	const { createmeter: createMeter, cumulative, cumulativereset: cumulativeReset, duplications, headerrow,
+		length, meter: meterName, mode, timesort: timeSort, update } = req.body; // extract query parameters
 
 	const areReadingsCumulative = (cumulative === 'true');
+	const headerRow = (headerrow === 'true');
 	const readingRepetition = duplications;
 
 	let meter = await Meter.getByName(meterName, conn)
@@ -26,7 +27,7 @@ async function uploadReadings(req, res, filepath, conn) {
 			});
 	}
 	const mapRowToModel = (row) => { return row; }; // stub func to satisfy param
-	await loadCsvInput(filepath, meter.id, mapRowToModel, false, areReadingsCumulative, cumulativeReset, readingRepetition, undefined, conn); // load csv data
+	await loadCsvInput(filepath, meter.id, mapRowToModel, false, areReadingsCumulative, cumulativeReset, readingRepetition, undefined, headerRow, conn); // load csv data
 	// TODO: If unsuccessful upload then an error will be thrown. We need to catch this error.
 	fs.unlink(filepath).catch(err => log.error(`Failed to remove the file ${filepath}.`, err)); // TODO: do we really need this to complete before sending back a response and should this file be removed on an unsuccessful upload?
 	success(req, res, `It looks like success.`); // TODO: We need a try catch for all these awaits.
