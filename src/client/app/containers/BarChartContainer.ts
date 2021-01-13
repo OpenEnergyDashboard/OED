@@ -47,7 +47,7 @@ function mapStateToProps(state: State) {
 					text: hoverText,
 					hoverinfo: 'text',
 					type: 'bar',
-					marker: {color: getGraphColor(colorID, 'meter')}
+					marker: {color: getGraphColor(colorID, 'Meter')} // TODO: The second parameter should be an enum
 				});
 			}
 		}
@@ -85,7 +85,7 @@ function mapStateToProps(state: State) {
 					text: hoverText,
 					hoverinfo: 'text',
 					type: 'bar',
-					marker: {color: getGraphColor(colorID, 'group')}
+					marker: {color: getGraphColor(colorID, 'Group')} // TODO: The second parameter should be an enum
 				});
 			}
 		}

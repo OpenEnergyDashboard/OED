@@ -62,7 +62,7 @@ function mapStateToProps(state: State) {
 						shape: 'spline',
 						width: 3
 					},
-					marker: {color: getGraphColor(colorID, 'meter')}
+					marker: {color: getGraphColor(colorID, 'Meter')} // TODO: The second parameter should be an enum
 				});
 			}
 		}
@@ -107,7 +107,7 @@ function mapStateToProps(state: State) {
 						shape: 'spline',
 						width: 3
 					},
-					marker: {color: getGraphColor(colorID, 'group')}
+					marker: {color: getGraphColor(colorID, 'Group')} // TODO: The second parameter should be an enum
 				});
 			}
 		}
