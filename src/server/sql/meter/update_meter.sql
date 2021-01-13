@@ -9,4 +9,5 @@ UPDATE meters
 		displayable = ${displayable},
 		meter_type = ${type},
 		gps = ${gps}
+		identifier = ${identifier}
 	WHERE id = ${id};

@@ -3,31 +3,31 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
 
 import * as React from 'react';
-import {Router, Route, RedirectFunction, RouterState} from 'react-router';
-import { addLocaleData, IntlProvider } from 'react-intl';
+import {RedirectFunction, Route, Router, RouterState} from 'react-router';
+import {addLocaleData, IntlProvider} from 'react-intl';
 import * as en from 'react-intl/locale-data/en';
 import * as fr from 'react-intl/locale-data/fr';
 import * as localeData from '../translations/data.json';
-import { browserHistory } from '../utils/history';
+import {browserHistory} from '../utils/history';
 import * as _ from 'lodash';
 import * as moment from 'moment';
 import InitializationContainer from '../containers/InitializationContainer';
 import HomeComponent from './HomeComponent';
 import LoginComponent from '../components/LoginComponent';
 import AdminComponent from './admin/AdminComponent';
-import { LinkOptions } from 'actions/graph';
-import { hasToken } from '../utils/token';
-import { showErrorNotification } from '../utils/notifications';
-import { ChartTypes } from '../types/redux/graph';
-import { LanguageTypes } from '../types/i18n';
-import { verificationApi } from '../utils/api';
+import {LinkOptions} from 'actions/graph';
+import {hasToken} from '../utils/token';
+import {showErrorNotification} from '../utils/notifications';
+import {ChartTypes} from '../types/redux/graph';
+import {LanguageTypes} from '../types/i18n';
+import {verificationApi} from '../utils/api';
 import translate from '../utils/translate';
-import { validateComparePeriod, validateSortingOrder } from '../utils/calculateCompare';
+import {validateComparePeriod, validateSortingOrder} from '../utils/calculateCompare';
 import EditGroupsContainer from '../containers/groups/EditGroupsContainer';
 import CreateGroupContainer from '../containers/groups/CreateGroupContainer';
 import GroupsDetailContainer from '../containers/groups/GroupsDetailContainer';
 import MetersDetailContainer from '../containers/meters/MetersDetailContainer';
-import { TimeInterval } from '../../../common/TimeInterval.js';
+import {TimeInterval} from '../../../common/TimeInterval';
 import MapsDetailContainer from "../containers/maps/MapsDetailContainer";
 import MapCalibrationContainer from "../containers/maps/MapCalibrationContainer";
 
@@ -103,7 +103,7 @@ export default class RouteComponent extends React.Component<RouteProps, {}> {
 	 * @param replace Function that allows a route redirect
 	 */
 	public linkToGraph(nextState: RouterState, replace: RedirectFunction) {
-		const queries = nextState.location.query;
+		const queries: any = nextState.location.query;
 		if (!_.isEmpty(queries)) {
 			try {
 				const options: LinkOptions = {};
@@ -148,6 +148,22 @@ export default class RouteComponent extends React.Component<RouteProps, {}> {
 							break;
 						case 'mapID':
 							options.mapID = (parseInt(info));
+						case 'serverRange':
+							options.serverRange = TimeInterval.fromString(info);
+							/**
+							 * commented out since days from present feature is not currently used
+							 */
+							// const index = info.indexOf('dfp');
+							// if (index === -1) {
+							// 	options.serverRange = TimeInterval.fromString(info);
+							// } else {
+							// 	const message = info.substring(0, index);
+							// 	const stringField = this.getNewIntervalFromMessage(message);
+							// 	options.serverRange = TimeInterval.fromString(stringField);
+							// }
+							break;
+						case 'sliderRange':
+							options.sliderRange = TimeInterval.fromString(info);
 							break;
 						default:
 							throw new Error('Unknown query parameter');
@@ -199,4 +215,17 @@ export default class RouteComponent extends React.Component<RouteProps, {}> {
 			</div>
 		);
 	}
+
+	/**
+	 * Generates new time interval based on current time and user selected amount to trace back;
+	 * @param message: currently able to accept how many days to go back in time;
+	 */
+	// private getNewIntervalFromMessage(message: string) {
+	// 	const numDays = parseInt(message);
+	//
+	// 	const current = moment();
+	// 	const newMinTimeStamp = current.clone();
+	// 	newMinTimeStamp.subtract(numDays, 'days');
+	// 	return newMinTimeStamp.toISOString().substring(0, 19) + 'Z_' + current.toISOString().substring(0, 19) + 'Z';
+	// }
 }

@@ -10,4 +10,5 @@ CREATE TABLE IF NOT EXISTS meters (
 	displayable BOOLEAN NOT NULL,
 	meter_type meter_type NOT NULL,
 	gps POINT
+	identifier TEXT
 );

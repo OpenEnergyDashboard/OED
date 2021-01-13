@@ -27,6 +27,7 @@ const createRouterForCompareReadings = require('./routes/compareReadings').creat
 const baseline = require('./routes/baseline');
 const maps = require('./routes/maps');
 const logs = require('./routes/logs');
+const obvius = require('./routes/obvius');
 
 const app = express();
 
@@ -55,6 +56,7 @@ app.use('/api/compareReadings', createRouterForCompareReadings());
 app.use('/api/baselines', baseline);
 app.use('/api/maps', maps);
 app.use('/api/logs', logs);
+app.use('/api/obvius', obvius);
 app.use(express.static(path.join(__dirname, '..', 'client', 'public')));
 
 const router = express.Router();

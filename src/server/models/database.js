@@ -4,9 +4,9 @@
 
 const pgp = require('pg-promise')({
 	// This sets the style of returned durations so that Moment can parse them
-	connect: (client, dc, fresh) => {
+	connect(client, dc, useCount) {
 		// Only set the style on fresh connections
-		if (fresh === true || fresh === undefined) {
+		if (useCount === 0) {
 			client.query('SET intervalStyle = iso_8601');
 		}
 	}
@@ -76,6 +76,7 @@ async function createSchema(conn) {
 	const User = require('./User');
 	const Group = require('./Group');
 	const Preferences = require('./Preferences');
+	const Configfile = require('./obvius/Configfile');
 	const Migration = require('./Migration');
 	const LogEmail = require('./LogEmail');
 	const Baseline = require('./Baseline');
@@ -100,6 +101,7 @@ async function createSchema(conn) {
 	await Baseline.createTable(conn);
 	await Map.createTable(conn);
 	await conn.none(sqlFile('baseline/create_function_get_average_reading.sql'));
+	await Configfile.createTable(conn);
 }
 
 module.exports = {

@@ -16,8 +16,9 @@ class Meter {
 	 * @param displayable This meters is available to users for charting
 	 * @param type What kind of meter this is
 	 * @param gps location in format of GIS coordinates
+	 * @param identifier Another way to identify a meter
 	 */
-	constructor(id, name, ipAddress, enabled, displayable, type, gps) {
+	constructor(id, name, ipAddress, enabled, displayable, type, gps = unknown, identifier = name) {
 		this.id = id;
 		this.name = name;
 		this.ipAddress = ipAddress;
@@ -25,6 +26,7 @@ class Meter {
 		this.displayable = displayable;
 		this.type = type;
 		this.gps = gps;
+		this.identifier = identifier;
 	}
 
 	/**
@@ -68,7 +70,7 @@ class Meter {
 	}
 
 	static mapRow(row) {
-		return new Meter(row.id, row.name, row.ipaddress, row.enabled, row.displayable, row.meter_type, row.gps);
+		return new Meter(row.id, row.name, row.ipaddress, row.enabled, row.displayable, row.meter_type, row.gps, row.identifier);
 	}
 
 	/**
@@ -151,7 +153,8 @@ class Meter {
 
 Meter.type = {
 	MAMAC: 'mamac',
-	METASYS: 'metasys'
+	METASYS: 'metasys',
+	OBVIUS: 'obvius'
 };
 
 module.exports = Meter;
