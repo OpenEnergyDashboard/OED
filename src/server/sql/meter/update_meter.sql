@@ -8,6 +8,6 @@ UPDATE meters
 		enabled = ${enabled},
 		displayable = ${displayable},
 		meter_type = ${type},
-		gps = ${gps}
+		gps = ${gps},
 		identifier = ${identifier}
 	WHERE id = ${id};
