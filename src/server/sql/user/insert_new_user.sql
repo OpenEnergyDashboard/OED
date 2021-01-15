@@ -2,5 +2,9 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
 
-INSERT INTO users(email, password_hash)
-VALUES (${email}, ${passwordHash});
+DO $$ BEGIN
+  INSERT INTO users(email, password_hash)
+    VALUES (${email}, ${passwordHash});
+EXCEPTION WHEN unique_violation THEN
+    -- Ignore duplicate inserts.
+END $$;
