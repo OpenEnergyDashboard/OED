@@ -9,13 +9,17 @@ sudo: required
 
 language: node_js
 node_js:
-  - "7"
+  - "14"
 services:
   - postgresql
   - docker
 
 addons:
   postgresql: "10.13"
+  apt:
+         packages:
+         - postgresql-10
+         - postgresql-client-10
 
 env:
     - OED_DB_USER=test OED_DB_PASSWORD=test OED_DB_DATABASE=travis_ci_dummy OED_DB_TEST_DATABASE=travis_ci_test OED_DB_HOST=localhost OED_DB_PORT=5432 OED_TOKEN_SECRET=travis OED_SERVER_PORT=3000 DOCKER_COMPOSE_VERSION=1.27.4 POSTGRES_PASSWORD=travisTest
