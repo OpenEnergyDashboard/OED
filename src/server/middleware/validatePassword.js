@@ -1,18 +1,12 @@
 const { CSVPipelineError } = require('../services/csvPipeline/CustomErrors');
-const failure = require('../services/csvPipeline/failure');
 
-// STUB, TODO: Validate Password
-async function validatePassword(req, res, next) {
+// STUB, TODO: Validate password
+async function validatePassword(password){
 	try {
-		const { password } = req.body;
-		if (password === 'password') {
-			next();
-		} else {
-			throw new CSVPipelineError('Failed to supply valid password. Request to upload a csv file is rejected.');
-		}
+		return password === 'password';
 	} catch (error) {
-		failure(req, res, error);
+		const { message } = error;
+		throw new CSVPipelineError(`Internal OED error. Failed to validate password. `, message);
 	}
-};
-
+}
 module.exports = validatePassword;

@@ -7,7 +7,6 @@
  * meter and readings data.
  */
 
-const bodyParser = require('body-parser');
 const express = require('express');
 const failure = require('../services/csvPipeline/failure');
 const { getConnection } = require('../db');
@@ -24,11 +23,35 @@ const { validateMetersCsvUploadParams, validateReadingsCsvUploadParams } = requi
 const validatePassword = require('../middleware/validatePassword');
 
 // The upload here ensures that the file is saved to server RAM rather than disk; TODO: Think about large uploads
-const upload = multer({ storage: multer.memoryStorage() });
+const upload = multer({
+	storage: multer.memoryStorage(),
+	// This filter stop form processing if supplied password is invalid. 
+	// The password param was precede the file on upload so that multer will have processed the form by the time this filter is called on a file.
+	fileFilter: async function (req, file, cb) {
+		try {
+			const { password } = req.body;
+			const valid = await validatePassword(password);
+			if (valid) {
+				cb(null, true);
+			} else {
+				cb(new Error("Submitted password is invalid."));
+			}
+		} catch (error) {
+			cb(error);
+		}
+	}
+}).single('csvfile');
 
 const router = express.Router();
-router.use(upload.single('csvfile'), middleware.lowercaseAllParamNames);
-router.use(validatePassword);
+router.use(function (req, res, next) {
+	upload(req, res, function (err) {
+		if (err) {
+			failure(req, res, err);
+			return;
+		}
+		next();
+	})
+}, middleware.lowercaseAllParamNames);
 
 // TODO: we need to sanitize req query params, res
 // TODO: we need to create a condition set
