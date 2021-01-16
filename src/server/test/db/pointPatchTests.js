@@ -28,8 +28,8 @@ mocha.describe('Point patching', () => {
 		const { returned } = await conn.one('SELECT ${point} AS returned', { point: point });
 		expect(returned).to.have.property('longitude');
 		expect(returned).to.have.property('latitude');
-		expect(returned).to.have.property('_rawDBType');
-		expect(returned).to.have.property('formatDBType');
+		expect(returned).to.have.property('rawType');
+		expect(returned).to.have.property('toPostgres');
 	});
 
 	mocha.it('patches points to the correct value', async () => {

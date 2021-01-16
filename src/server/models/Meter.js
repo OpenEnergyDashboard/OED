@@ -18,7 +18,7 @@ class Meter {
 	 * @param gps location in format of GIS coordinates
 	 * @param identifier Another way to identify a meter
 	 */
-	constructor(id, name, ipAddress, enabled, displayable, type, gps = unknown, identifier = name) {
+	constructor(id, name, ipAddress, enabled, displayable, type, gps = undefined, identifier = name) {
 		this.id = id;
 		this.name = name;
 		this.ipAddress = ipAddress;

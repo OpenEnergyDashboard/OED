@@ -170,7 +170,6 @@ export interface LinkOptions {
 	serverRange?: TimeInterval;
 	sliderRange?: TimeInterval;
 	toggleBarStacking?: boolean;
-	serverRange?: TimeInterval;
 	comparePeriod?: ComparePeriod;
 	compareSortingOrder?: SortingOrder;
 	optionsVisibility?: boolean;
