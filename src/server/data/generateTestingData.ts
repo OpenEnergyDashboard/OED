@@ -6,7 +6,8 @@
  * generateTestData.js exports four functions:
  * generateDates,
  * generateSine,
- * write_to_csv,
+ * writeToCSV,
+ * generateCosine,
  * generateSine
  */
 
@@ -23,7 +24,7 @@ const stringifyCSV = promisify(stringify); // this is a strange error; when comp
  * 1. Generate the moments in time within a specified range and at a specified time step from a given range.
  * 2. For each moment determine how much time as elapsed (as a decimal) within its respective period.
  * 3. Calculate the value of sine at that moment in time.
- * 		Conceptually this is sin(decimal_percentage * 2* PI) and it works because the sine function we will
+ * 		Conceptually this is sin(decimal_percentage * 2 * PI) and it works because the sine function we will
  * 		use is a function of radians and sin(x) = sin(x/P * P * 2 * PI)
  * 4. We zip the array of moments and their corresponding sine values into a matrix,
  * which we will use write into a csv file.
@@ -56,7 +57,7 @@ function generateDates(startDate: string, endDate: string, timeStep: moment.Mome
 	// Check timeStep is at least 1 second, if not throw an error.
 	const temp = moment();
 	if (temp.clone().add(timeStep).isBefore(temp.clone().add({ second: 1 }))) {
-		throw Error(`The time step provided is ${JSON.stringify(timeStep)} needs to be at least 1 second.`);
+		throw new Error(`The time step provided is ${JSON.stringify(timeStep)} needs to be at least 1 second.`);
 	}
 	const arrayOfMoments: string[] = [];
 	const startMoment = moment(startDate);
@@ -79,16 +80,16 @@ function generateDates(startDate: string, endDate: string, timeStep: moment.Mome
 function _momentPercentage(startTime: moment.Moment, endTime: moment.Moment, currentMoment: moment.Moment): number {
 	// Check pre-conditions
 	if (endTime.isBefore(startTime)) {
-		throw RangeError('The endTime must be after or equal to the startTime.');
+		throw new RangeError('The endTime must be after or equal to the startTime.');
 	}
 	if (currentMoment.isBefore(startTime)) {
-		throw RangeError('The currentMoment must be after or equal to the startTime.');
+		throw new RangeError('The currentMoment must be after or equal to the startTime.');
 	}
 	if (currentMoment.isAfter(endTime)) {
-		throw RangeError('The currentMoment must be before or equal to the endTime.');
+		throw new RangeError('The currentMoment must be before or equal to the endTime.');
 	}
 	if (startTime.isAfter(endTime)) {
-		throw RangeError('The startTime must be before or equal to the endTime.');
+		throw new RangeError('The startTime must be before or equal to the endTime.');
 	}
 	if (endTime.isSame(startTime)) {
 		return 1;
@@ -227,7 +228,7 @@ async function generateCosine(startTimeStamp: string, endTimeStamp: string, opti
 		maxAmplitude: options.maxAmplitude || 2,
 		filename: options.filename || 'test.csv',
 		normalizeByHour: options.normalizeByHour || false,
-		phaseShift: (options.phaseShift || 0) + (Math.PI / 2)
+		phaseShift: (options.phaseShift || 0) + (Math.PI / 2) // phase shifting by PI/2 converts from sine to cosine.
 	};
 	try {
 		if (chosenOptions.normalizeByHour) {
