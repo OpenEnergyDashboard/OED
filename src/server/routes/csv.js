@@ -7,60 +7,52 @@
  * meter and readings data.
  */
 
-const { CSVPipelineError } = require('../services/csvPipeline/CustomErrors');
+const bodyParser = require('body-parser');
 const express = require('express');
+const failure = require('../services/csvPipeline/failure');
 const { getConnection } = require('../db');
 const { log } = require('../log');
+const middleware = require('../middleware');
 const multer = require('multer');
 const saveCsv = require('../services/csvPipeline/saveCsv');
+const uploadMeters = require('../services/csvPipeline/uploadMeters');
+const uploadReadings = require('../services/csvPipeline/uploadReadings');
 const zlib = require('zlib');
 
 /** Middleware validation */
-const validateCsvUploadParams = require('../middleware/validateCsvUploadParams');
+const { validateMetersCsvUploadParams, validateReadingsCsvUploadParams } = require('../middleware/validateCsvUploadParams');
 const validatePassword = require('../middleware/validatePassword');
 
 // The upload here ensures that the file is saved to server RAM rather than disk; TODO: Think about large uploads
 const upload = multer({ storage: multer.memoryStorage() });
 
 const router = express.Router();
+router.use(upload.single('csvfile'), middleware.lowercaseAllParamNames);
+router.use(validatePassword);
 
-const failure = require('../services/csvPipeline/failure');
-const success = require('../services/csvPipeline/success');
+// TODO: we need to sanitize req query params, res
+// TODO: we need to create a condition set
+// TODO: we need to check incorrect parameters
 
-const uploadMeters = require('../services/csvPipeline/uploadMeters');
-const uploadReadings = require('../services/csvPipeline/uploadReadings');
-
-router.get('/', (req, res) => {
-	success(req, res, "Lookie here you accessed the route file");
+// NOTE: for some reason upload needs to come before the other middleware for this to work.
+router.post('/meters', validateMetersCsvUploadParams, async (req, res) => {
+	try {
+		const filepath = await saveCsv(zlib.gunzipSync(req.file.buffer), "meters");
+		log.info(`The file ${filepath} was created to upload meters csv data`);
+		const conn = getConnection(); // TODO: when should we close this connection?
+		await uploadMeters(req, res, filepath, conn);
+	} catch (error) {
+		failure(req, res, error);
+	}
 });
 
 // NOTE: for some reason upload needs to come before the other middleware for this to work.
-router.post('/', upload.single('csvfile'), validatePassword, validateCsvUploadParams, async (req, res) => {
-	// TODO: we need to sanitize req query params, res
-	// TODO: we need to create a condition set
-	// TODO: we need to check incorrect parameters
-
+router.post('/readings', validateReadingsCsvUploadParams, async (req, res) => {
 	try {
-		const { createmeter, cumulative, cumulativereset: cumulativeReset, duplications, length, meter: meterName,
-			mode, timesort: timeSort, update } = req.body; // extract query parameters
-
-		let filepath, conn;
-		switch (mode) {
-			case 'readings':
-				filepath = await saveCsv(zlib.gunzipSync(req.file.buffer), meterName);
-				log.info(`The file ${filepath} was created to upload readings csv data`);
-				conn = getConnection(); // TODO: when should we close this connection?
-				await uploadReadings(req, res, filepath, conn);
-				return;
-			case 'meter':
-				filepath = await saveCsv(zlib.gunzipSync(req.file.buffer), "meters");
-				log.info(`The file ${filepath} was created to upload meters csv data`);
-				conn = getConnection(); // TODO: when should we close this connection?
-				await uploadMeters(req, res, filepath, conn);
-				return;
-			default:
-				throw new CSVPipelineError(`Mode ${mode} is invalid. Mode can only be either 'readings' or 'meter'.`);
-		}
+		const filepath = await saveCsv(zlib.gunzipSync(req.file.buffer), "metersUpload");
+		log.info(`The file ${filepath} was created to upload readings csv data`);
+		const conn = getConnection();
+		await uploadReadings(req, res, filepath, conn);
 	} catch (error) {
 		failure(req, res, error);
 	}

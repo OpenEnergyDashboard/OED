@@ -10,19 +10,16 @@ const promisify = require('es6-promisify');
 const parseCsv = promisify(csv.parse);
 
 const CSV_ROUTE = '/api/csv';
+const UPLOAD_METERS_ROUTE = '/api/csv/meters';
+const UPLOAD_READINGS_ROUTE = '/api/csv/readings';
 const readingsPath = './sampleReadings.csv.gz';
 const metersPath = './sampleMeters.csv.gz';
 const metersWithHeaderPath = './sampleMetersWithHeader.csv.gz';
 
 mocha.describe('csv API', () => {
-	mocha.it('should exist on the route "/api/csv" ', async () => {
-		const res = await chai.request(app).get(CSV_ROUTE);
-		expect(res).to.have.status(200);
-	});
 	mocha.it('should be able to accept a post request to upload meter data.', async () => {
-		const res = await chai.request(app).post(CSV_ROUTE)
+		const res = await chai.request(app).post(UPLOAD_METERS_ROUTE)
 			.field('password', 'password')
-			.field('mode', 'meter')
 			.attach('csvfile', metersPath)
 		expect(res).to.have.status(200);
 		const csvMeters = (await parseCsv(zlib.gunzipSync(fs.readFileSync(metersPath)))).map(row =>
@@ -39,9 +36,8 @@ mocha.describe('csv API', () => {
 		expect((await Meter.getAll(conn)).length).to.equal(3);
 	});
 	mocha.it('should be able to accept a post request to upload meter data with header row.', async () => {
-		const res = await chai.request(app).post(CSV_ROUTE)
+		const res = await chai.request(app).post(UPLOAD_METERS_ROUTE)
 			.field('password', 'password')
-			.field('mode', 'meter')
 			.field('headerrow', 'true')
 			.attach('csvfile', metersWithHeaderPath)
 		expect(res).to.have.status(200);
@@ -62,9 +58,8 @@ mocha.describe('csv API', () => {
 		const conn = testDB.getConnection();
 		const meter = new Meter(undefined, 'XXX', undefined, false, false, Meter.type.MAMAC, 'XXX')
 		await meter.insert(conn); // insert meter
-		const res = await chai.request(app).post(CSV_ROUTE) // make request to api to upload readings data for this meter
+		const res = await chai.request(app).post(UPLOAD_READINGS_ROUTE) // make request to api to upload readings data for this meter
 			.field('password', 'password')
-			.field('mode', 'readings')
 			.field('meter', 'XXX')
 			.field('timesort', 'increasing')
 			.attach('csvfile', readingsPath)
@@ -77,10 +72,9 @@ mocha.describe('csv API', () => {
 	});
 	mocha.it('should be able to load readings data for a non existing meter.', async () => {
 		const conn = testDB.getConnection();
-		const res = await chai.request(app).post(CSV_ROUTE) // make request to api to upload readings data for this meter
+		const res = await chai.request(app).post(UPLOAD_READINGS_ROUTE) // make request to api to upload readings data for this meter
 			.field('password', 'password')
 			.field('createmeter', 'true')
-			.field('mode', 'readings')
 			.field('meter', 'ABG')
 			.field('timesort', 'increasing')
 			.attach('csvfile', readingsPath);
@@ -94,45 +88,40 @@ mocha.describe('csv API', () => {
 	});
 	mocha.describe('should fail on unimplemented features.', async () => {
 		mocha.it('should fail on non-increasing timesort.', async () => {
-			const res = await chai.request(app).post(CSV_ROUTE) // make request to api to upload readings data for this meter
+			const res = await chai.request(app).post(UPLOAD_READINGS_ROUTE) // make request to api to upload readings data for this meter
 				.field('password', 'password')
-				.field('mode', 'readings')
 				.field('meter', 'ABG')
 				.field('timesort', 'decreasing')
 				.attach('csvfile', readingsPath);
 			expect(res).to.have.status(400);
 		});
 		mocha.it('should fail on request that updates data.', async () => {
-			const res = await chai.request(app).post(CSV_ROUTE) // make request to api to upload readings data for this meter
+			const res = await chai.request(app).post(UPLOAD_READINGS_ROUTE) // make request to api to upload readings data for this meter
 				.field('password', 'password')
-				.field('mode', 'readings')
 				.field('meter', 'ABG')
 				.field('update', 'true')
 				.attach('csvfile', readingsPath);
 			expect(res).to.have.status(400);
 		});
 		mocha.it('should fail on request that asks to disable create meter automatically.', async () => {
-			const res = await chai.request(app).post(CSV_ROUTE) // make request to api to upload readings data for this meter
+			const res = await chai.request(app).post(UPLOAD_READINGS_ROUTE) // make request to api to upload readings data for this meter
 				.field('password', 'password')
-				.field('mode', 'readings')
 				.field('meter', 'ABG')
 				.field('createmeter', 'false')
 				.attach('csvfile', readingsPath);
 			expect(res).to.have.status(400);
 		});
 		mocha.it('should fail on request that asks to invalid duplications.', async () => {
-			const res = await chai.request(app).post(CSV_ROUTE) // make request to api to upload readings data for this meter
+			const res = await chai.request(app).post(UPLOAD_READINGS_ROUTE) // make request to api to upload readings data for this meter
 				.field('password', 'password')
-				.field('mode', 'readings')
 				.field('meter', 'ABG')
 				.field('duplications', 'INVALIDVALUE')
 				.attach('csvfile', readingsPath);
 			expect(res).to.have.status(400);
 		});
 		mocha.it('should fail on request that asks to invalid cumulative value.', async () => {
-			const res = await chai.request(app).post(CSV_ROUTE) // make request to api to upload readings data for this meter
+			const res = await chai.request(app).post(UPLOAD_READINGS_ROUTE) // make request to api to upload readings data for this meter
 				.field('password', 'password')
-				.field('mode', 'readings')
 				.field('meter', 'ABG')
 				.field('cumulative', 'INVALIDVALUE')
 				.attach('csvfile', readingsPath);
