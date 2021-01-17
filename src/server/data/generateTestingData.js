@@ -156,8 +156,8 @@ function momenting(arrayOfMoments, periodLength) {
  * @param {number} options.phaseShift - The amount to phase shift the generated sine wave.
  * @returns {[string, string][]} Matrix of rows representing each csv row of the form timeStamp, value
  */
-function _generateSineData(startTimeStamp, endTimeStamp, options = {}) {
-	// function _generateSineData(startTimeStamp: string, endTimeStamp: string, options: GenerateSinusoidalDataOptions={}): Array<[string, string]> {
+function generateSineData(startTimeStamp, endTimeStamp, options = {}) {
+	// function generateSineData(startTimeStamp: string, endTimeStamp: string, options: GenerateSinusoidalDataOptions={}): Array<[string, string]> {
 	const chosenOptions = {
 		// const chosenOptions: GenerateSinusoidalDataOptions = {
 		timeStep: options.timeStep || { minute: 20 },
@@ -237,7 +237,7 @@ async function generateSine(startTimeStamp, endTimeStamp, options = {}) {
 			const scale = _momentPercentage(moment({ hour: 0 }), moment({ hour: 1 }), moment(chosenOptions.timeStep));
 			chosenOptions.maxAmplitude = chosenOptions.maxAmplitude * scale;
 		}
-		await writeToCSV(_generateSineData(startTimeStamp, endTimeStamp, chosenOptions), chosenOptions.filename);
+		await writeToCSV(generateSineData(startTimeStamp, endTimeStamp, chosenOptions), chosenOptions.filename);
 	} catch (error) {
 		log.error(`Failed to generate sine data for file: ${chosenOptions.filename}.`, error);
 	}
@@ -272,7 +272,7 @@ async function generateCosine(startTimeStamp, endTimeStamp, options = {}) {
 			const scale = _momentPercentage(moment({ hour: 0 }), moment({ hour: 1 }), moment(chosenOptions.timeStep));
 			chosenOptions.maxAmplitude = chosenOptions.maxAmplitude * scale;
 		}
-		await writeToCSV(_generateSineData(startTimeStamp, endTimeStamp, chosenOptions), chosenOptions.filename);
+		await writeToCSV(generateSineData(startTimeStamp, endTimeStamp, chosenOptions), chosenOptions.filename);
 	} catch (error) {
 		log.error(`Failed to generate cosine data for file: ${chosenOptions.filename}.`, error);
 	}
@@ -282,8 +282,8 @@ module.exports = {
 	// export = {
 	generateDates,
 	generateSine,
+	generateSineData,
 	generateCosine,
 	writeToCSV,
 	momenting,
-	_generateSineData
 };
