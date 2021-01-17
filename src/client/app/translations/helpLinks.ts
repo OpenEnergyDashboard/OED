@@ -1,16 +1,17 @@
+const BASE_URL = 'https://openenergydashboard.org';
 const links: Record<string, Record<string, string>> = {
 	'help.home.chart.plotly.controls': { link: 'https://plotly.com/chart-studio-help/getting-to-know-the-plotly-modebar/' },
-	'help.home.chart.redraw.restore': { link: 'https://openenergydashboard.github.io/help/graphing' },
-	'help.home.chart.select': { link: 'https://openenergydashboard.github.io/help/graphs' },
-	'help.home.export.graph.data': { link: 'https://openenergydashboard.github.io/help/general#export' },
+	'help.home.chart.redraw.restore': { link: `${BASE_URL}/help/graphing` },
+	'help.home.chart.select': { link: `${BASE_URL}/help/graphs` },
+	'help.home.export.graph.data': { link: `${BASE_URL}/help/general#export` },
 	'help.home.header': {
-		link0: 'https://openenergydashboard.github.io/help/metersAndGroups',
-		link1: 'https://openenergydashboard.github.io/help/admins'
+		link0: `${BASE_URL}/help/metersAndGroups`,
+		link1: `${BASE_URL}/help/admins`
 	},
-	'help.home.hide.or.show.options': { link: 'https://openenergydashboard.github.io/help/general#hideOptions' },
-	'help.home.select.groups': { link: 'https://openenergydashboard.github.io/help/metersAndGroups' },
-	'help.home.select.meters': { link: 'https://openenergydashboard.github.io/help/metersAndGroups' },
-	'help.home.toggle.chart.link': { link: 'https://openenergydashboard.github.io/help/general#chartlink' }
+	'help.home.hide.or.show.options': { link: `${BASE_URL}/help/general#hideOptions` },
+	'help.home.select.groups': { link: `${BASE_URL}/help/metersAndGroups` },
+	'help.home.select.meters': { link: `${BASE_URL}/help/metersAndGroups` },
+	'help.home.toggle.chart.link': { link: `${BASE_URL}/help/general#chartlink` }
 };
 
 export default links;
