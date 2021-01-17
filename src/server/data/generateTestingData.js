@@ -41,18 +41,6 @@ const stringifyCSV = promisify(stringify);
  */
 
 /**
- * Checks if a number is close to zero.
- * @param {number} x
- * @param {number?} epsilon our default for what is close to zero is 1e-10
- * @returns {boolean} whether or not number is really close to zero
- * @source: https://www.quora.com/In-JavaScript-how-do-I-test-if-a-number-is-close-to-zero
- */
-function isEpsilon(x, epsilon = 1e-10) {
-	// function isEpsilon(x: number, epsilon = 1e-10) {
-	return Math.abs(x) < epsilon;
-}
-
-/**
  * Generates an array of dates of the form 'YYYY-MM-DD HH:MM:SS' with the upper bound at endDate, which may be excluded if it does not lie exactly
  * timeStep (i.e. there is no integer value n such that endDate = startDate + n * timeStep). Because of the date format, the timeStep should also
  * be at least 1 second.
@@ -173,7 +161,7 @@ function generateSineData(startTimeStamp, endTimeStamp, options = {}) {
 	const sineValues = momenting(datesAsMoments, chosenOptions.periodLength)
 		.map(x => {
 			const result = Math.sin(Math.PI * 2 * x + chosenOptions.phaseShift);
-			const scaledResult = halfMaxAmplitude * (isEpsilon(result) ? 0 : result) + halfMaxAmplitude;
+			const scaledResult = halfMaxAmplitude * result + halfMaxAmplitude;
 			return `${scaledResult}`;
 		});
 	return (_.zip(dates, sineValues));
