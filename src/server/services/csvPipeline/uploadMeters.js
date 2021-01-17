@@ -7,7 +7,7 @@ const success = require('../csvPipeline/success');
 
 async function uploadMeters(req, res, filepath, conn) {
 	try {
-		const columns = Object.keys(new Meter()).slice(1);
+		const columns = Object.keys(new Meter()).slice(1); // used for the shape of the csv
 		const temp = (await readCsv(filepath)).map(row => {
 			const hash = {};
 			columns.forEach((entry, idx) => {
