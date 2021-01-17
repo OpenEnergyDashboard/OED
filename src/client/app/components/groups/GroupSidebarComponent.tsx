@@ -7,10 +7,12 @@ import { Button } from 'reactstrap';
 import { FormattedMessage } from 'react-intl';
 import { ChangeDisplayedGroupsAction } from '../../types/redux/groups';
 import { Link } from 'react-router';
-import {hasToken} from '../../utils/token';
+import { hasToken } from '../../utils/token';
 
 interface GroupSidebarProps {
-	groups: Array<{id: number, name: string}>;
+	/* tslint:disable:array-type */
+	groups: Array<{ id: number, name: string }>;
+	/* tslint:enable:array-type */
 	selectGroups(groups: number[]): ChangeDisplayedGroupsAction;
 }
 

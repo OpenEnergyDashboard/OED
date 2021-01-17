@@ -61,6 +61,7 @@
 	"help.home.toggle.chart.link": "With the “Toggle chart link” button a box appears that gives a URL that will recreate the current graphic. This is used to post or send graphic for others to see. The person using this URL will be in a fully functional OED so they can make changes after the original graphic is displayed. You can help discourage changes by choose the option to dock the menu choices so they are not visible when using the URL. Please visit {link} for further details and information.",
 	"hide": "Hide",
 	"hide.options": "Hide options",
+  	"hide.options.in.link": "Hide menu from link",
 	"home": "Home",
 	"import.meter.readings": "Import Meter Readings",
 	"incorrect.file.format": "Incorrect file format",

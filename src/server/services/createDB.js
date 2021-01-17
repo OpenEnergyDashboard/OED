@@ -9,9 +9,11 @@ const { getConnection, dropConnection } = require('../db');
 	const conn = getConnection();
 	try {
 		await createSchema(conn);
-		log.info('Schema created', skipMail = true);
+		log.info('Schema created', null, true);
+		process.exitCode = 0;
 	} catch (err) {
 		log.error(`Error creating schema: ${err}`, err, skipMail = true);
+		process.exitCode = 1;
 	} finally {
 		dropConnection();
 	}
