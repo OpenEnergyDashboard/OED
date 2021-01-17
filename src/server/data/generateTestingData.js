@@ -2,10 +2,10 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
 
- /**
-  * This file was previous rewritten into TypeScript. Due to complications of importing typescript to a JavaScript program. 
-  * The typescript annotations have been commented out in case the server code will be rewritten to TypeScript.
-  */
+/**
+ * This file was previous rewritten into TypeScript. Due to complications of importing typescript to a JavaScript program.
+ * The typescript annotations have been commented out in case the server code will be rewritten to TypeScript.
+ */
 /**
  * generateTestData.js exports four functions:
  * generateDates,
@@ -273,5 +273,5 @@ module.exports = {
 	generateSineData,
 	generateCosine,
 	writeToCSV,
-	momenting,
+	momenting
 };

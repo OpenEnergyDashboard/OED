@@ -44,9 +44,7 @@ mocha.describe('The generateDates function', () => {
 			startMoment.add(timeStep);
 		}
 		const dates = generateDates(startTimeStamp, endTimeStamp, timeStep)
-		expect(dates).to.deep.equal(
-			result
-		);
+		expect(dates).to.deep.equal(result);
 		expect(dates[dates.length - 1]).to.not.equal(endTimeStamp);
 	});
 });
@@ -98,7 +96,7 @@ mocha.describe('Generate Sine wave helper', () => {
 		generateSineData(startTimeStamp, endTimeStamp, { timeStep: { hour: 12 } }).forEach((row, idx) => {
 			expect(row[0]).to.equal(expectation[idx][0]);
 			expect(parseFloat(row[1])).to.be.closeTo(expectation[idx][1], 0.0001);
-		})
+		});
 	});
 });
 
