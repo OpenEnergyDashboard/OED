@@ -56,7 +56,7 @@ mocha.describe('momenting', () => {
 	mocha.it('should cover the simple singleton case', () => {
 		const date = '2019-09-10 00:00:15';
 		const periodOfMoments = [moment(date)];
-		expect(momenting(periodOfMoments)).to.deep.equals([1]);
+		expect(momenting(periodOfMoments, undefined)).to.deep.equals([1]);
 	});
 	mocha.it('should be able to partition an array with just two elements', () => {
 		const startMoment = moment('2019-09-10 00:00:15');
