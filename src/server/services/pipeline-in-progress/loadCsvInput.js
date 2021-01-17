@@ -5,11 +5,7 @@
  */
 
 const fs = require('fs');
-<<<<<<< HEAD
-const readCSV = require('./readCsv');
-=======
 const readCsv = require('./readCsv');
->>>>>>> development
 const loadArrayInput = require('./loadArrayInput');
 const loadCsvStream = require('./loadCsvStream');
 const { log } = require('../../log');
@@ -33,7 +29,7 @@ async function loadCsvInput(filePath, meterID, mapRowToModel, readAsStream, isCu
 			const stream = fs.createReadStream(filePath);
 			return loadCsvStream(stream, meterID, mapRowToModel, conditionSet, conn);
 		} else {
-			const dataRows = headerRow ? (await readCSV(filePath)).shift() : (await readCSV(filePath));
+			const dataRows = headerRow ? (await readCsv(filePath)).shift() : (await readCsv(filePath));
 			return loadArrayInput(dataRows, meterID, mapRowToModel, isCumulative, cumulativeReset, readingRepetition, conditionSet, conn);
 		}
 	} catch (err) {
