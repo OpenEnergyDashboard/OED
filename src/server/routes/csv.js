@@ -43,6 +43,7 @@ const upload = multer({
 }).single('csvfile');
 
 const router = express.Router();
+// Process form data with multer, if password check fails then the request ends with failure.
 router.use(function (req, res, next) {
 	upload(req, res, function (err) {
 		if (err) {
@@ -55,12 +56,10 @@ router.use(function (req, res, next) {
 
 // TODO: we need to sanitize req query params, res
 // TODO: we need to create a condition set
-// TODO: we need to check incorrect parameters
 
-// NOTE: for some reason upload needs to come before the other middleware for this to work.
 router.post('/meters', validateMetersCsvUploadParams, async (req, res) => {
 	try {
-		const filepath = await saveCsv(zlib.gunzipSync(req.file.buffer), "meters");
+		const filepath = await saveCsv(zlib.gunzipSync(req.file.buffer), 'meters');
 		log.info(`The file ${filepath} was created to upload meters csv data`);
 		const conn = getConnection(); // TODO: when should we close this connection?
 		await uploadMeters(req, res, filepath, conn);
@@ -72,7 +71,7 @@ router.post('/meters', validateMetersCsvUploadParams, async (req, res) => {
 // NOTE: for some reason upload needs to come before the other middleware for this to work.
 router.post('/readings', validateReadingsCsvUploadParams, async (req, res) => {
 	try {
-		const filepath = await saveCsv(zlib.gunzipSync(req.file.buffer), "metersUpload");
+		const filepath = await saveCsv(zlib.gunzipSync(req.file.buffer), 'readings');
 		log.info(`The file ${filepath} was created to upload readings csv data`);
 		const conn = getConnection();
 		await uploadReadings(req, res, filepath, conn);
