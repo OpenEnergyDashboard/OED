@@ -46,7 +46,7 @@ the readings table (to aggregate data over a large time range).
 The small tables, on the other hand, are only queried for small time ranges that produce a few hundred data points.
 This is the best-case scenario for these queries, and leads to quick execution times if the table is properly clustered.
  */
-CREATE VIEW
+CREATE OR REPLACE VIEW
 minutely_readings
 	AS SELECT
 				r.meter_id AS meter_id,
@@ -77,7 +77,7 @@ minutely_readings
 				) gen(interval_start)
 			GROUP BY r.meter_id, gen.interval_start;
 
-CREATE VIEW
+CREATE OR REPLACE VIEW
 hourly_readings
 	AS SELECT
 				r.meter_id AS meter_id,
@@ -108,7 +108,7 @@ hourly_readings
 				) gen(interval_start)
 			GROUP BY r.meter_id, gen.interval_start;
 
-CREATE MATERIALIZED VIEW
+CREATE MATERIALIZED VIEW IF NOT EXISTS
 daily_readings
 	AS SELECT
 				r.meter_id AS meter_id,
@@ -143,13 +143,13 @@ daily_readings
 
 CREATE EXTENSION IF NOT EXISTS btree_gist;
 -- We need a gist index to support the @> operation.
-CREATE INDEX idx_daily_readings ON daily_readings USING GIST(time_interval, meter_id);
+CREATE INDEX if not exists idx_daily_readings ON daily_readings USING GIST(time_interval, meter_id);
 
 
 /*
 The following function determines the correct duration view to query from, and returns compressed data from it.
  */
-CREATE FUNCTION compressed_readings_2(meter_ids INTEGER[], start_stamp TIMESTAMP, end_stamp TIMESTAMP)
+CREATE OR REPLACE FUNCTION compressed_readings_2(meter_ids INTEGER[], start_stamp TIMESTAMP, end_stamp TIMESTAMP)
 	RETURNS TABLE(meter_id INTEGER, reading_rate FLOAT, start_timestamp TIMESTAMP, end_timestamp TIMESTAMP)
 AS $$
 DECLARE
@@ -208,7 +208,7 @@ END;
 $$ LANGUAGE 'plpgsql';
 
 
-CREATE FUNCTION compressed_group_readings_2(group_ids INTEGER[], start_stamp TIMESTAMP, end_stamp TIMESTAMP)
+CREATE OR REPLACE FUNCTION compressed_group_readings_2(group_ids INTEGER[], start_stamp TIMESTAMP, end_stamp TIMESTAMP)
 	RETURNS TABLE(group_id INTEGER, reading_rate FLOAT, start_timestamp TIMESTAMP, end_timestamp TIMESTAMP)
 AS $$
 	DECLARE
@@ -233,7 +233,7 @@ AS $$
 $$ LANGUAGE 'plpgsql';
 
 
-CREATE FUNCTION compressed_barchart_readings_2(
+CREATE OR REPLACE FUNCTION compressed_barchart_readings_2(
 	meter_ids INTEGER[],
 	bar_width_days INTEGER,
 	start_stamp TIMESTAMP,
@@ -268,7 +268,7 @@ END;
 $$ LANGUAGE 'plpgsql';
 
 
-CREATE FUNCTION compressed_barchart_group_readings_2(
+CREATE OR REPLACE FUNCTION compressed_barchart_group_readings_2(
 	group_ids INTEGER[],
 	bar_width_days INTEGER,
 	start_stamp TIMESTAMP,
