@@ -101,8 +101,8 @@ function _momentPercentage(startTime: moment.Moment, endTime: moment.Moment, cur
  * Takes each moment and converts them into the percentage of time elapsed in
  * its specific period as a decimal from 0 to 1.
  * @param {moment.Moment[]} arrayOfMoments Array of moment objects
- * @param {moment.MomentInputObject} periodLength Object whose keys describe the length of the
- * length of the period, which should be greater than the time step between consecutive moments.
+ * @param {moment.MomentInputObject} periodLength Moment Input Object whose keys describe length of the period, 
+ * which should be greater than the time step between consecutive moments.
  * @returns {number[]} an array where each element corresponds to the percentage of time elapsed at the
  * the corresponding timestamp in arrayOfMoments
  */
@@ -161,7 +161,7 @@ function _generateSineData(startTimeStamp: string, endTimeStamp: string, options
 
 /**
  * Write csv data into a csv file
- * @param {[[string, string]]} data an matrix with two columns of strings
+ * @param {[string, string][]]} data an matrix with two columns of strings
  * @param {string} filename the name of the file
  * @sources:
  * https://csv.js.org/stringify/api/
