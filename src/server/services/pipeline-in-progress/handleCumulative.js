@@ -42,7 +42,8 @@ function handleCumulative(rows, readingRepetition, cumulativeReset, meterID) {
 			meterReading = meterReading1 - meterReading2;
 			// Reject negative readings
 			if (meterReading1 < 0) {
-				log.error(`DECTECTED A NEGATIVE VALUE WHILE HANDLING CUMULATIVE READINGS FROM METER ${meterID}, ROW ${index - readingRepetition}. REJECTED ALL READINGS`);
+				log.error(`DETECTED A NEGATIVE VALUE WHILE HANDLING CUMULATIVE READINGS FROM METER ${meterID}, ` +
+					`ROW ${index - readingRepetition}. REJECTED ALL READINGS`);
 				return [];
 			}
 			// To handle cumulative readings that resets at midnight
