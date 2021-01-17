@@ -61,13 +61,13 @@ mocha.describe('momenting', () => {
 		const timeStepMs = 15000;
 		expect(momenting([startMoment, startMoment.clone().add(timeStepMs)], timeStepMs)).to.deep.equals([0, 1]);
 	});
-	mocha.it('should cover the a skipped datetime', () => {
+	mocha.it('should cover the a skipped date time', () => {
 		const test = ['2019-09-10T00:00:15',
 			'2019-09-10T00:00:30', '2019-09-10T00:01:00'];
 		const timeStepMs = 15000;
 		expect(momenting(test.map(timeStamp => moment(timeStamp)), timeStepMs)).to.deep.equals([0, 1, 1]);
 	});
-	mocha.it('should work on irregular timesteps', () => {
+	mocha.it('should work on irregular time steps', () => {
 		const test = ['2019-09-10T00:00:15',
 			'2019-09-10T00:00:30', '2019-09-10T00:00:50'];
 		const timeStepMs = 15000;
