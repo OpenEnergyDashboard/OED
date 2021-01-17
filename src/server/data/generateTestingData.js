@@ -2,6 +2,10 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
 
+ /**
+  * This file was previous rewritten into TypeScript. Due to complications of importing typescript to a JavaScript program. 
+  * The typescript annotations have been commented out in case the server code will be rewritten to TypeScript.
+  */
 /**
  * generateTestData.js exports four functions:
  * generateDates,
@@ -12,14 +16,20 @@
  */
 
 // Imports
-import { promises as fs } from 'fs';
-import * as stringify from 'csv-stringify';
-import * as _ from 'lodash';
-import * as moment from 'moment';
-import * as promisify from 'es6-promisify';
-import { log } from '../log';
+const fs = require('fs').promises;
+const stringify = require('csv-stringify');
+const _ = require('lodash');
+const moment = require('moment');
+const promisify = require('es6-promisify');
+const { log } = require('../log');
+// import { promises as fs } from 'fs';
+// import * as stringify from 'csv-stringify';
+// import * as _ from 'lodash';
+// import * as moment from 'moment';
+// import * as promisify from 'es6-promisify';
+// import { log } from '../log';
 
-const stringifyCSV = promisify(stringify); // this is a strange error; when compiled it is okay
+const stringifyCSV = promisify(stringify);
 /* Our main export is the generateSine function. We break this into several parts:
  * 1. Generate the moments in time within a specified range and at a specified time step from a given range.
  * 2. For each moment determine how much time as elapsed (as a decimal) within its respective period.
@@ -33,32 +43,35 @@ const stringifyCSV = promisify(stringify); // this is a strange error; when comp
 /**
  * Checks if a number is close to zero.
  * @param {number} x
- * @param {number} epsilon our default for what is close to zero is 1e-10
+ * @param {number?} epsilon our default for what is close to zero is 1e-10
  * @returns {boolean} whether or not number is really close to zero
  * @source: https://www.quora.com/In-JavaScript-how-do-I-test-if-a-number-is-close-to-zero
  */
-function isEpsilon(x: number, epsilon = 1e-10) {
+function isEpsilon(x, epsilon = 1e-10) {
+	// function isEpsilon(x: number, epsilon = 1e-10) {
 	return Math.abs(x) < epsilon;
 }
 
 /**
- * Generates an array of dates of the form 'YYYY-MM-DD HH:MM:SS' with the upper bound at endDate, which may be excluded if it does not lie exactly 
- * timeStep (i.e. there is no integer value n such that endDate = startDate + n * timeStep). Because of the date format, the timeStep should also 
+ * Generates an array of dates of the form 'YYYY-MM-DD HH:MM:SS' with the upper bound at endDate, which may be excluded if it does not lie exactly
+ * timeStep (i.e. there is no integer value n such that endDate = startDate + n * timeStep). Because of the date format, the timeStep should also
  * be at least 1 second.
  * @param {string} startDate The start date with the form 'YYYY-MM-DD HH:MM:SS'
  * @param {string} endDate The end date with the form 'YYYY-MM-DD HH:MM:SS'
- * @param {moment.MomentInputObject} timeStep Object with keys describe the time step, by default
+ * @param {moment.MomentInputObject?} timeStep Object with keys describe the time step, by default
  * this is { minute: 20 } or 20 minutes and needs to be at at least 1 second.
- * @returns {string[]} An array of timestamps between startDate and endDate, at a given time step (default 20 minutes). The first element of the 
+ * @returns {string[]} An array of timestamps between startDate and endDate, at a given time step (default 20 minutes). The first element of the
  * output will be the startDate, but the last element may not necessarily be the endDate.
  */
-function generateDates(startDate: string, endDate: string, timeStep: moment.MomentInputObject = { minute: 20 }): string[] {
+function generateDates(startDate, endDate, timeStep = { minute: 20 }) {
+	// function generateDates(startDate: string, endDate: string, timeStep: moment.MomentInputObject = { minute: 20 }): string[] {
 	// Check timeStep is at least 1 second, if not throw an error.
 	const temp = moment();
 	if (temp.clone().add(timeStep).isBefore(temp.clone().add({ second: 1 }))) {
 		throw new Error(`The time step provided is ${JSON.stringify(timeStep)} needs to be at least 1 second.`);
 	}
-	const arrayOfMoments: string[] = [];
+	const arrayOfMoments = [];
+	// const arrayOfMoments: string[] = [];
 	const startMoment = moment(startDate);
 	const endMoment = moment(endDate);
 	while (startMoment.isSameOrBefore(endMoment)) {
@@ -76,7 +89,8 @@ function generateDates(startDate: string, endDate: string, timeStep: moment.Mome
  * @returns {number} the percentage of elapsed time between startTime and endTime at currentMoment.
  * @source: https://stackoverflow.com/questions/18960327/javascript-moment-js-calculate-percentage-between-two-dates
  */
-function _momentPercentage(startTime: moment.Moment, endTime: moment.Moment, currentMoment: moment.Moment): number {
+function _momentPercentage(startTime, endTime, currentMoment) {
+	// function _momentPercentage(startTime: moment.Moment, endTime: moment.Moment, currentMoment: moment.Moment): number {
 	// Check pre-conditions
 	if (endTime.isBefore(startTime)) {
 		throw new RangeError('The endTime must be after or equal to the startTime.');
@@ -99,12 +113,13 @@ function _momentPercentage(startTime: moment.Moment, endTime: moment.Moment, cur
 /**
  * Takes each moment and converts them into the percentage of time elapsed in its specific period as a decimal from 0 to 1.
  * @param {moment.Moment[]} arrayOfMoments - Array of moment objects
- * @param {moment.MomentInputObject} periodLength - Moment Input Object whose keys describe length of the period, 
+ * @param {moment.MomentInputObject} periodLength - Moment Input Object whose keys describe length of the period,
  * which should be greater than the time step between consecutive moments.
  * @returns {number[]} - an array where each element corresponds to the percentage of time elapsed at the
  * the corresponding timestamp in arrayOfMoments
  */
-function momenting(arrayOfMoments: moment.Moment[], periodLength: moment.MomentInputObject): number[] {
+function momenting(arrayOfMoments, periodLength) {
+	// function momenting(arrayOfMoments: moment.Moment[], periodLength: moment.MomentInputObject): number[] {
 	const startMoment = arrayOfMoments[0];
 	const endMoment = startMoment.clone().add(periodLength);
 	const result = arrayOfMoments.map(singleMoment => {
@@ -117,32 +132,34 @@ function momenting(arrayOfMoments: moment.Moment[], periodLength: moment.MomentI
 	return result;
 }
 
-interface GenerateDataOptions {
-	timeStep?: moment.MomentInputObject;
-	periodLength?: moment.MomentInputObject;
-	maxAmplitude?: number;
-}
+// interface GenerateDataOptions {
+// 	timeStep?: moment.MomentInputObject;
+// 	periodLength?: moment.MomentInputObject;
+// 	maxAmplitude?: number;
+// }
 
-interface GenerateSinusoidalDataOptions extends GenerateDataOptions {
-	phaseShift?: number;
-}
+// interface GenerateSinusoidalDataOptions extends GenerateDataOptions {
+// 	phaseShift?: number;
+// }
 
 /**
- * Generates sine data over a period of time. By default the timeStep is 20 minutes and the periodLength is one day. These can be changed by 
+ * Generates sine data over a period of time. By default the timeStep is 20 minutes and the periodLength is one day. These can be changed by
  * supplying them in the options parameter.
  * @param {string} startTimeStamp - This is the start time of the data generation; its format needs to be 'YYYY-MM-DD HH:MM:SS'
  * @param {string} endTimeStamp - This is the end time of the data generation; it needs to have the format 'YYYY-MM-DD HH:MM:SS' and may not
- * be included. 
+ * be included.
  * Check the generateDates function for more details.
- * @param {object} options - controls the timeStep and the periodLength, the timeStep needs to be at least 1 second.
+ * @param {object?} options - controls the timeStep and the periodLength, the timeStep needs to be at least 1 second.
  * @param {moment.MomentInputObject} options.timeStep - The length of time between two consecutive data points.
  * @param {moment.MomentInputObject} options.periodLength - The length of the period of the generated sine wave.
  * @param {number} options.maxAmplitude - The max height of the generated sine wave.
  * @param {number} options.phaseShift - The amount to phase shift the generated sine wave.
  * @returns {[string, string][]} Matrix of rows representing each csv row of the form timeStamp, value
  */
-function _generateSineData(startTimeStamp: string, endTimeStamp: string, options: GenerateSinusoidalDataOptions): Array<[string, string]> {
-	const chosenOptions: GenerateSinusoidalDataOptions = {
+function _generateSineData(startTimeStamp, endTimeStamp, options = {}) {
+	// function _generateSineData(startTimeStamp: string, endTimeStamp: string, options: GenerateSinusoidalDataOptions={}): Array<[string, string]> {
+	const chosenOptions = {
+		// const chosenOptions: GenerateSinusoidalDataOptions = {
 		timeStep: options.timeStep || { minute: 20 },
 		periodLength: options.periodLength || { day: 1 },
 		maxAmplitude: options.maxAmplitude || 2,
@@ -165,12 +182,13 @@ function _generateSineData(startTimeStamp: string, endTimeStamp: string, options
 /**
  * Write csv data into a csv file
  * @param {[string, string][]]} data - A matrix with two columns of strings
- * @param {string} filename - The name of the file.
+ * @param {string?} filename - The name of the file.
  * @sources:
  * https://csv.js.org/stringify/api/
  * https://stackoverflow.com/questions/2496710/writing-files-in-node-js
  */
-async function writeToCSV(data: Array<[string, string]>, filename = 'test.csv') {
+async function writeToCSV(data, filename = 'test.csv') {
+	// async function writeToCSV(data: Array<[string, string]>, filename = 'test.csv') {
 	try {
 		const output = await stringifyCSV(data); // generate csv data
 		await fs.writeFile(filename, output)
@@ -181,21 +199,21 @@ async function writeToCSV(data: Array<[string, string]>, filename = 'test.csv') 
 	}
 }
 
-interface GenerateDataFileOptions extends GenerateDataOptions {
-	filename?: string;
-	normalizeByHour?: boolean;
-}
+// interface GenerateDataFileOptions extends GenerateDataOptions {
+// 	filename?: string;
+// 	normalizeByHour?: boolean;
+// }
 
-interface GenerateSinusoidalDataFileOptions extends GenerateDataFileOptions {
-	phaseShift?: number;
-}
+// interface GenerateSinusoidalDataFileOptions extends GenerateDataFileOptions {
+// 	phaseShift?: number;
+// }
 
 /**
  * Creates a csv with sine data
  * @param {string} startTimeStamp - This is the start time of the data generation; its format needs to be 'YYYY-MM-DD HH:MM:SS'
- * @param {string} endTimeStamp - This is the end time of the data generation; it needs to have the format 'YYYY-MM-DD HH:MM:SS' 
+ * @param {string} endTimeStamp - This is the end time of the data generation; it needs to have the format 'YYYY-MM-DD HH:MM:SS'
  * and may not be included. Check the generateDates function for more details.
- * @param {object} options - the parameters for generating a data file for OED
+ * @param {object?} options - The parameters for generating a data file for OED
  * @param {moment.MomentInputObject} options.timeStep - The time step between each data point.
  * @param {moment.MomentInputObject} options.periodLength - The length of the period of the sine wave.
  * @param {number} options.maxAmplitude - The max amplitude of the sine wave.
@@ -203,8 +221,10 @@ interface GenerateSinusoidalDataFileOptions extends GenerateDataFileOptions {
  * @param {boolean} options.normalizeByHour - If true normalizes data by the hour due to how OED displays data.
  * @param {number} options.phaseShift - The amount to phase shift the generated sine wave.
  */
-async function generateSine(startTimeStamp: string, endTimeStamp: string, options: GenerateSinusoidalDataFileOptions) {
-	const chosenOptions: GenerateSinusoidalDataFileOptions = {
+async function generateSine(startTimeStamp, endTimeStamp, options = {}) {
+	// async function generateSine(startTimeStamp: string, endTimeStamp: string, options: GenerateSinusoidalDataFileOptions={}) {
+	const chosenOptions = {
+		// const chosenOptions: GenerateSinusoidalDataFileOptions = {
 		timeStep: options.timeStep || { minute: 20 },
 		periodLength: options.periodLength || { day: 1 },
 		maxAmplitude: options.maxAmplitude || 2,
@@ -226,9 +246,9 @@ async function generateSine(startTimeStamp: string, endTimeStamp: string, option
 /**
  * Creates a csv with cosine data
  * @param {string} startTimeStamp - This is the start time of the data generation; its format needs to be 'YYYY-MM-DD HH:MM:SS'
- * @param {string} endTimeStamp - This is the end time of the data generation; it needs to have the format 'YYYY-MM-DD HH:MM:SS' 
+ * @param {string} endTimeStamp - This is the end time of the data generation; it needs to have the format 'YYYY-MM-DD HH:MM:SS'
  * and may not be included. Check the generateDates function for more details.
- * @param {object} options - The parameters for generating a data file for OED.
+ * @param {object?} options - The parameters for generating a data file for OED.
  * @param {moment.MomentInputObject} options.timeStep - The length of time between two consecutive data points.
  * @param {moment.MomentInputObject} options.periodLength - The length of the period of the cosine wave.
  * @param {number} options.maxAmplitude - The max amplitude of the cosine wave.
@@ -236,8 +256,10 @@ async function generateSine(startTimeStamp: string, endTimeStamp: string, option
  * @param {boolean} options.normalizeByHour - If true normalizes data by the hour due to how OED displays data.
  * @param {number} options.phaseShift - The amount to phase shift the generated cosine wave.
  */
-async function generateCosine(startTimeStamp: string, endTimeStamp: string, options: GenerateSinusoidalDataFileOptions) {
-	const chosenOptions: GenerateSinusoidalDataFileOptions = {
+async function generateCosine(startTimeStamp, endTimeStamp, options = {}) {
+	// async function generateCosine(startTimeStamp: string, endTimeStamp: string, options: GenerateSinusoidalDataFileOptions={}) {
+	const chosenOptions = {
+		// const chosenOptions: GenerateSinusoidalDataFileOptions = {
 		timeStep: options.timeStep || { minute: 20 },
 		periodLength: options.periodLength || { day: 1 },
 		maxAmplitude: options.maxAmplitude || 2,
@@ -256,8 +278,8 @@ async function generateCosine(startTimeStamp: string, endTimeStamp: string, opti
 	}
 }
 
-
-export = {
+module.exports = {
+	// export = {
 	generateDates,
 	generateSine,
 	generateCosine,
