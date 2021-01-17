@@ -14,9 +14,9 @@ const parseCsv = promisify(csv.parse);
  * @param fileName the filename to read
  * @return {Promise.<array.<array>>}
  */
-async function readCSV(fileName) {
+async function readCsv(fileName) {
 	const buffer = await readFile(fileName);
 	return await parseCsv(buffer.toString());
 }
 
-module.exports = readCSV;
+module.exports = readCsv;
