@@ -136,7 +136,7 @@ function shouldChangeRangeSlider(range: TimeInterval): boolean {
 }
 
 function changeRangeSlider(sliderInterval: TimeInterval): t.ChangeSliderRangeAction {
-	return {type: ActionType.ChangeSliderRange, sliderInterval};
+	return { type: ActionType.ChangeSliderRange, sliderInterval };
 }
 
 /**
@@ -144,7 +144,7 @@ function changeRangeSlider(sliderInterval: TimeInterval): t.ChangeSliderRangeAct
  * by setting sliderRange to an empty string
  */
 function resetRangeSliderStack(): t.ResetRangeSliderStackAction {
-	return {type: ActionType.ResetRangeSliderStack};
+	return { type: ActionType.ResetRangeSliderStack };
 }
 
 function changeRangeSliderIfNeeded(interval: TimeInterval): Thunk {
@@ -176,8 +176,10 @@ export interface LinkOptions {
  */
 export function changeOptionsFromLink(options: LinkOptions) {
 	const dispatchFirst: Thunk[] = [setHotlinkedAsync(true)];
+	/* tslint:disable:array-type */
 	const dispatchSecond: Array<Thunk | t.ChangeChartToRenderAction | t.ChangeBarStackingAction
-		| t.ChangeCompareSortingOrderAction | t.SetOptionsVisibility > = [];
+		| t.ChangeCompareSortingOrderAction | t.SetOptionsVisibility> = [];
+	/* tslint:enable:array-type */
 	if (options.meterIDs) {
 		dispatchFirst.push(fetchMetersDetailsIfNeeded());
 		dispatchSecond.push(changeSelectedMeters(options.meterIDs));
