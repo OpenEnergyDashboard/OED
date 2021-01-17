@@ -10,7 +10,7 @@
  * generateTestData.js exports four functions:
  * generateDates,
  * generateSine,
- * writeToCSV,
+ * writeToCsv,
  * generateCosine,
  * generateSine
  */
@@ -175,8 +175,8 @@ function generateSineData(startTimeStamp, endTimeStamp, options = {}) {
  * https://csv.js.org/stringify/api/
  * https://stackoverflow.com/questions/2496710/writing-files-in-node-js
  */
-async function writeToCSV(data, filename = 'test.csv') {
-	// async function writeToCSV(data: Array<[string, string]>, filename = 'test.csv') {
+async function writeToCsv(data, filename = 'test.csv') {
+	// async function writeToCsv(data: Array<[string, string]>, filename = 'test.csv') {
 	try {
 		const output = await stringifyCSV(data); // generate csv data
 		await fs.writeFile(filename, output)
@@ -225,7 +225,7 @@ async function generateSine(startTimeStamp, endTimeStamp, options = {}) {
 			const scale = _momentPercentage(moment({ hour: 0 }), moment({ hour: 1 }), moment(chosenOptions.timeStep));
 			chosenOptions.maxAmplitude = chosenOptions.maxAmplitude * scale;
 		}
-		await writeToCSV(generateSineData(startTimeStamp, endTimeStamp, chosenOptions), chosenOptions.filename);
+		await writeToCsv(generateSineData(startTimeStamp, endTimeStamp, chosenOptions), chosenOptions.filename);
 	} catch (error) {
 		log.error(`Failed to generate sine data for file: ${chosenOptions.filename}.`, error);
 	}
@@ -260,7 +260,7 @@ async function generateCosine(startTimeStamp, endTimeStamp, options = {}) {
 			const scale = _momentPercentage(moment({ hour: 0 }), moment({ hour: 1 }), moment(chosenOptions.timeStep));
 			chosenOptions.maxAmplitude = chosenOptions.maxAmplitude * scale;
 		}
-		await writeToCSV(generateSineData(startTimeStamp, endTimeStamp, chosenOptions), chosenOptions.filename);
+		await writeToCsv(generateSineData(startTimeStamp, endTimeStamp, chosenOptions), chosenOptions.filename);
 	} catch (error) {
 		log.error(`Failed to generate cosine data for file: ${chosenOptions.filename}.`, error);
 	}
@@ -272,6 +272,6 @@ module.exports = {
 	generateSine,
 	generateSineData,
 	generateCosine,
-	writeToCSV,
+	writeToCsv,
 	momenting
 };
