@@ -54,12 +54,12 @@ mocha.describe('momenting', () => {
 	mocha.it('should cover the simple singleton case', () => {
 		const date = '2019-09-10 00:00:15';
 		const periodOfMoments = [moment(date)];
-		expect([1]).to.deep.equals(momenting(periodOfMoments));
+		expect(momenting(periodOfMoments)).to.deep.equals([1]);
 	});
 	mocha.it('should be able to partition an array with just two elements', () => {
 		const startMoment = moment('2019-09-10 00:00:15');
 		const timeStepMs = 15000;
-		expect([0, 1]).to.deep.equals(momenting([startMoment, startMoment.clone().add(timeStepMs)], timeStepMs));
+		expect(momenting([startMoment, startMoment.clone().add(timeStepMs)], timeStepMs)).to.deep.equals([0, 1]);
 	});
 	mocha.it('should cover the a skipped datetime', () => {
 		const test = ['2019-09-10T00:00:15',
