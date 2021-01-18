@@ -69,7 +69,7 @@ class AddMetersComponent extends React.Component<AddMetersPropsWithIntl, {}> {
 			paddingBottom: '5px',
 			display: 'inline'
 		};
-		const messages = defineMessages({ tipFormat: { id: 'tip.meters.csv.format' }});
+		const messages = defineMessages({ tipFormat: { id: 'help.admin.csv.format' }});
 		const { formatMessage } = this.props.intl;
 
 		return (
