@@ -30,7 +30,7 @@ See the full licensing agreement [here](License.txt)
 
 ### Contributions ###
 
-We welcome others to contribute to this project by writing code for submission or collaborating with us. Before contributing, please sign our Contributor License Agreement [here](https://goo.gl/forms/nR9MtVHUOqYn8WbP2).
+We welcome others to contribute to this project by writing code for submission or collaborating with us. Before contributing, please sign our Contributor License Agreement [here](https://docs.google.com/forms/d/e/1FAIpQLSc2zdF2PqJ14FljfQIyQn_X70xDhnpv-zCda1wU0xIOQ5mp_w/viewform).
 If you have any questions or concerns feel free to email us at OpenEnergyDashboard@gmail.com.
 
 ### Contact ###
