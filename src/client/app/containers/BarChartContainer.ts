@@ -8,6 +8,7 @@ import { connect } from 'react-redux';
 import getGraphColor from '../utils/getGraphColor';
 import { State } from '../types/redux/state';
 import PlotlyChart, { IPlotlyChartProps } from 'react-plotlyjs-ts';
+import { DataType } from '../types/Datasources';
 
 function mapStateToProps(state: State) {
 	const timeInterval = state.graph.timeInterval;
@@ -47,7 +48,7 @@ function mapStateToProps(state: State) {
 					text: hoverText,
 					hoverinfo: 'text',
 					type: 'bar',
-					marker: {color: getGraphColor(colorID, 'Meter')} // TODO: The second parameter should be an enum
+					marker: {color: getGraphColor(colorID, DataType.Meter)}
 				});
 			}
 		}
@@ -85,7 +86,7 @@ function mapStateToProps(state: State) {
 					text: hoverText,
 					hoverinfo: 'text',
 					type: 'bar',
-					marker: {color: getGraphColor(colorID, 'Group')} // TODO: The second parameter should be an enum
+					marker: {color: getGraphColor(colorID, DataType.Group)}
 				});
 			}
 		}
