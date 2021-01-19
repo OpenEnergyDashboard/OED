@@ -13,9 +13,11 @@ const { log } = require('../../log');
  * @param {dict} conditionSet used to validate readings (minVal, maxVal, minDate, maxDate, threshold, maxError)
  */
 function validateReadings(arrayToValidate, conditionSet) {
+	/* tslint:disable:no-string-literal */
 	validDates = checkDate(arrayToValidate, conditionSet['minDate'], conditionSet['maxDate'], conditionSet['maxError'] / 2);
 	validValues = checkValue(arrayToValidate, conditionSet['minVal'], conditionSet['maxVal'], conditionSet['maxError'] / 2);
 	validIntervals = checkIntervals(arrayToValidate, conditionSet['threshold']);
+	/* tslint:enable:no-string-literal */
 	return validDates && validValues && validIntervals;
 }
 
@@ -77,7 +79,7 @@ function checkValue(arrayToValidate, minVal, maxVal, maxError) {
 
 /**
  * Check and report unequal intervals. Can be ignore by passing null interval
- * @param {array of Readings} arrayToValidate
+ * @param {Readings[]} arrayToValidate
  * @param {number} threshold the maximum allowed difference between consecutive data points' intervals
  */
 function checkIntervals(arrayToValidate, threshold) {
@@ -87,7 +89,7 @@ function checkIntervals(arrayToValidate, threshold) {
 	// Set the expected interval to be the time gap between the first 2 data points
 	interval = arrayToValidate[1].startTimestamp.diff(arrayToValidate[0].endTimestamp, 'seconds');
 	lastTime = arrayToValidate[1].endTimestamp;
-	// Calculate the time gap between every pair of consecutive data points 
+	// Calculate the time gap between every pair of consecutive data points
 	for (reading of arrayToValidate) {
 		if (reading === arrayToValidate[0]) {
 			continue;

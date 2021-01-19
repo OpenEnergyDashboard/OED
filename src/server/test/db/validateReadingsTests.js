@@ -64,7 +64,7 @@ mocha.describe('PIPELINE: Validate Readings', () => {
 		let result = checkIntervals(testing, 29);
 		expect(result).to.equal(true);
 	});
-	mocha.it('reject data with any type of error', async() => {	
+	mocha.it('reject data with any type of error', async () => {
 		let conditionSet = {
 			minVal: 0,
 			maxVal: 20,
@@ -95,5 +95,5 @@ mocha.describe('PIPELINE: Validate Readings', () => {
 		expect(validateReadings(badValue, conditionSet)).to.equal(false);
 		expect(validateReadings(goodData, conditionSet)).to.equal(true);
 
-	})
+	});
 });
