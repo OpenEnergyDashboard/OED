@@ -24,7 +24,7 @@ export default function TooltipHelpComponentAlternative(props: TooltipHelpProps)
 	const links: Record<string, JSX.Element> = {};
 	Object.keys(values).forEach(key => {
 		const link = values[key];
-		links[key] = (<a target='_blank' rel="noopener noreferrer" href={link}>
+		links[key] = (<a target='_blank' rel='noopener noreferrer' href={link}>
 			{link}
 		</a>);
 	});
