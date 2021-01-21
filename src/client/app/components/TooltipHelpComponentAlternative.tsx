@@ -25,7 +25,7 @@ export default function TooltipHelpComponentAlternative(props: TooltipHelpProps)
 	Object.keys(values).forEach(key => {
 		const link = values[key];
 		links[key] = (<a target='_blank' rel='noopener noreferrer' href={link}>
-			{link}
+			here
 		</a>);
 	});
 
