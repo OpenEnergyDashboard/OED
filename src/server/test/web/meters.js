@@ -18,10 +18,10 @@ mocha.describe('meters API', () => {
 
 	mocha.it('returns all visible meters', async () => {
 		const conn = testDB.getConnection();
-		await new Meter(undefined, 'Meter 1', '1.1.1.1', true, true, Meter.type.MAMAC, null).insert(conn);
-		await new Meter(undefined, 'Meter 2', '1.1.1.1', true, true, Meter.type.MAMAC, null).insert(conn);
-		await new Meter(undefined, 'Meter 3', '1.1.1.1', true, true, Meter.type.MAMAC, null).insert(conn);
-		await new Meter(undefined, 'Not Visible', '1.1.1.1', true, false, Meter.type.MAMAC, null).insert(conn);
+		await new Meter(undefined, 'Meter 1', '1.1.1.1', true, true, Meter.type.MAMAC, 'TZ1').insert(conn);
+		await new Meter(undefined, 'Meter 2', '1.1.1.1', true, true, Meter.type.MAMAC, 'TZ2').insert(conn);
+		await new Meter(undefined, 'Meter 3', '1.1.1.1', true, true, Meter.type.MAMAC, 'TZ3').insert(conn);
+		await new Meter(undefined, 'Not Visible', '1.1.1.1', true, false, Meter.type.MAMAC, 'TZ4').insert(conn);
 
 		const res = await chai.request(app).get('/api/meters');
 		expect(res).to.have.status(200);
@@ -36,7 +36,7 @@ mocha.describe('meters API', () => {
 			expect(meter).to.have.property('enabled', true);
 			expect(meter).to.have.property('displayable', true);
 			expect(meter).to.have.property('meterType', null);
-			expect(meter).to.have.property('meterTimezone', null);
+			expect(meter).to.have.property('timeZone', null);
 		}
 	});
 	mocha.describe('with authentication', () => {
@@ -48,10 +48,10 @@ mocha.describe('meters API', () => {
 		});
 		mocha.it('returns all meters', async () => {
 			const conn = testDB.getConnection();
-			await new Meter(undefined, 'Meter 1', '1.1.1.1', true, true, Meter.type.MAMAC, null).insert(conn);
-			await new Meter(undefined, 'Meter 2', '1.1.1.1', true, true, Meter.type.MAMAC, null).insert(conn);
-			await new Meter(undefined, 'Meter 3', '1.1.1.1', true, true, Meter.type.MAMAC, null).insert(conn);
-			await new Meter(undefined, 'Not Visible', '1.1.1.1', true, false, Meter.type.MAMAC, null).insert(conn);
+			await new Meter(undefined, 'Meter 1', '1.1.1.1', true, true, Meter.type.MAMAC, 'TZ1').insert(conn);
+			await new Meter(undefined, 'Meter 2', '1.1.1.1', true, true, Meter.type.MAMAC, 'TZ2').insert(conn);
+			await new Meter(undefined, 'Meter 3', '1.1.1.1', true, true, Meter.type.MAMAC, 'TZ3').insert(conn);
+			await new Meter(undefined, 'Not Visible', '1.1.1.1', true, false, Meter.type.MAMAC, 'TZ4').insert(conn);
 
 			const res = await chai.request(app).get('/api/meters').set('token', token);
 			expect(res).to.have.status(200);
@@ -71,7 +71,7 @@ mocha.describe('meters API', () => {
 				expect(meter).to.have.property('ipAddress', '1.1.1.1');
 				expect(meter).to.have.property('enabled', true);
 				expect(meter).to.have.property('meterType', Meter.type.MAMAC);
-				expect(meter).to.have.property('meterTimezone', null);
+				expect(meter).to.have.property('timeZone', 'TZ'+(i+1));
 			}
 		});
 	});

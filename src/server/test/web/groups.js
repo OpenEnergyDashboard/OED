@@ -121,7 +121,7 @@ mocha.describe('groups API', () => {
 			});
 			mocha.it('allows adding a new child meter to a group', async () => {
 				const conn = testDB.getConnection();
-				const meterD = new Meter(undefined, 'D', null, false, true, Meter.type.MAMAC);
+				const meterD = new Meter(undefined, 'D', null, false, true, Meter.type.MAMAC, null);
 				await meterD.insert(conn);
 				let res = await chai.request(app).put('/api/groups/edit').set('token', token).type('json').send({
 					id: groupC.id,

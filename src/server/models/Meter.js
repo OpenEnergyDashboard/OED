@@ -15,9 +15,10 @@ class Meter {
 	 * @param enabled This meter is being actively read from
 	 * @param displayable This meters is available to users for charting
 	 * @param type What kind of meter this is
-	 * @param meterTimezonep Default timezone for meter
+	 * @param meterTimezone Default timezone for meter
+	 * @param identifier Another way to identify a meter
 	 */
-	constructor(id, name, ipAddress, enabled, displayable, type, meterTimezone) {
+	constructor(id, name, ipAddress, enabled, displayable, type, meterTimezone, identifier = name) {
 		this.id = id;
 		this.name = name;
 		this.ipAddress = ipAddress;
@@ -25,6 +26,7 @@ class Meter {
 		this.displayable = displayable;
 		this.type = type;
 		this.meterTimezone = meterTimezone;
+		this.identifier = identifier;
 	}
 
 	/**
@@ -68,7 +70,7 @@ class Meter {
 	}
 
 	static mapRow(row) {
-		return new Meter(row.id, row.name, row.ipaddress, row.enabled, row.displayable, row.meter_type, row.default_timezone_meter);
+		return new Meter(row.id, row.name, row.ipaddress, row.enabled, row.displayable, row.meter_type, row.default_timezone_meter, row.identifier);
 	}
 
 	/**
@@ -151,7 +153,8 @@ class Meter {
 
 Meter.type = {
 	MAMAC: 'mamac',
-	METASYS: 'metasys'
+	METASYS: 'metasys',
+	OBVIUS: 'obvius'
 };
 
 module.exports = Meter;

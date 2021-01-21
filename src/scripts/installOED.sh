@@ -77,7 +77,7 @@ while [ $create_error == 0 ]; do
 		exit 1
 	fi
     # Sleep to let PostgreSQL chill out
-    sleep 1
+    sleep 5
     printf "%s\n" "Attempting to create database."
     # Redirect stderr to a file
     npm run createdb |& tee /tmp/oed.error > /dev/null

@@ -25,7 +25,8 @@ function formatMeterForResponse(meter, loggedIn) {
 		enabled: meter.enabled,
 		displayable: meter.displayable,
 		ipAddress: null,
-		meterType: null
+		meterType: null,
+		timeZone: null
 	};
 
 	// Only logged in users can see IP addresses and types

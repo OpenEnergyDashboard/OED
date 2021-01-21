@@ -8,6 +8,7 @@ import { connect } from 'react-redux';
 import getGraphColor from '../utils/getGraphColor';
 import { State } from '../types/redux/state';
 import PlotlyChart, { IPlotlyChartProps } from 'react-plotlyjs-ts';
+import {TimeInterval} from '../../../common/TimeInterval';
 
 function mapStateToProps(state: State) {
 	const timeInterval = state.graph.timeInterval;
@@ -40,8 +41,10 @@ function mapStateToProps(state: State) {
 				let minTimestamp: string = '';
 				let maxTimestamp: string = '';
 				if (readings.length > 0) {
+					/* tslint:disable:no-string-literal */
 					minTimestamp = readings[0]['startTimestamp'].toString();
 					maxTimestamp = readings[readings.length - 1]['startTimestamp'].toString();
+					/* tslint:enable:no-string-literal */
 				}
 				const root: any = document.getElementById('root');
 				root.setAttribute('min-timestamp', minTimestamp);
@@ -110,6 +113,11 @@ function mapStateToProps(state: State) {
 		}
 	}
 
+	// Calculate slider interval if rangeSliderInterval is specified;
+	const sliderInterval = (state.graph.rangeSliderInterval.equals(TimeInterval.unbounded())) ? timeInterval : state.graph.rangeSliderInterval;
+	const start = Date.parse(moment(sliderInterval.getStartTimestamp()).toISOString());
+	const end = Date.parse(moment(sliderInterval.getEndTimestamp()).toISOString());
+
 	// Customize the layout of the plot
 	const layout: any = {
 		autosize: true,
@@ -123,8 +131,12 @@ function mapStateToProps(state: State) {
 			title: 'kW',
 			gridcolor: '#ddd'
 		},
+
 		xaxis: {
-			rangeslider: {thickness: 0.1},
+			range: [start, end], // Specifies the start and end points of visible part of graph(unshaded region on slider);
+			rangeslider: {
+				thickness: 0.1
+			},
 			showgrid: true,
 			gridcolor: '#ddd'
 		},
