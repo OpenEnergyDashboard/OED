@@ -18,7 +18,7 @@ Node.js - JavaScript runtime environment ([nodejs.org](https://nodejs.org/en/))
 
 ### Authors ###
 
-This application was created by a team of Beloit College CS students led by Prof. Steven Huss-Lederman
+This application was originally created by a team of Beloit College CS students led by Prof. Steven Huss-Lederman but is now an independent open source project with developers from several schools.
 
 For a list of contributors, [click here](https://github.com/OpenEnergyDashboard/OED/graphs/contributors)
 
@@ -30,10 +30,10 @@ See the full licensing agreement [here](License.txt)
 
 ### Contributions ###
 
-We welcome others to contribute to this project by writing code for submission or collaborating with us. Before contributing, please sign our Contributor License Agreement [here](https://goo.gl/forms/nR9MtVHUOqYn8WbP2).
-If you have any questions or concerns feel free to email us at oed@beloit.edu.
+We welcome others to contribute to this project by writing code for submission or collaborating with us. Before contributing, please sign our Contributor License Agreement [here](https://docs.google.com/forms/d/e/1FAIpQLSc2zdF2PqJ14FljfQIyQn_X70xDhnpv-zCda1wU0xIOQ5mp_w/viewform).
+If you have any questions or concerns feel free to email us at OpenEnergyDashboard@gmail.com.
 
 ### Contact ###
 
-To contact us, send an email to oed@beloit.edu or open an issue on GitHub.
+To contact us, send an email to OpenEnergyDashboard@gmail.com or open an issue on GitHub.
 

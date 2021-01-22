@@ -3,30 +3,31 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
 
 import * as React from 'react';
-import { Router, Route, RedirectFunction, RouterState } from 'react-router';
-import { addLocaleData, IntlProvider } from 'react-intl';
+import {RedirectFunction, Route, Router, RouterState} from 'react-router';
+import {addLocaleData, IntlProvider} from 'react-intl';
 import * as en from 'react-intl/locale-data/en';
 import * as fr from 'react-intl/locale-data/fr';
 import * as localeData from '../translations/data.json';
-import { browserHistory } from '../utils/history';
+import {browserHistory} from '../utils/history';
 import * as _ from 'lodash';
 import * as moment from 'moment';
 import InitializationContainer from '../containers/InitializationContainer';
 import HomeComponent from './HomeComponent';
 import LoginComponent from '../components/LoginComponent';
 import AdminComponent from './admin/AdminComponent';
-import { LinkOptions } from 'actions/graph';
-import { hasToken } from '../utils/token';
-import { showErrorNotification } from '../utils/notifications';
-import { ChartTypes } from '../types/redux/graph';
-import { LanguageTypes } from '../types/i18n';
-import { verificationApi } from '../utils/api';
+import {LinkOptions} from 'actions/graph';
+import {hasToken} from '../utils/token';
+import {showErrorNotification} from '../utils/notifications';
+import {ChartTypes} from '../types/redux/graph';
+import {LanguageTypes} from '../types/i18n';
+import {verificationApi} from '../utils/api';
 import translate from '../utils/translate';
-import { validateComparePeriod, validateSortingOrder } from '../utils/calculateCompare';
+import {validateComparePeriod, validateSortingOrder} from '../utils/calculateCompare';
 import EditGroupsContainer from '../containers/groups/EditGroupsContainer';
 import CreateGroupContainer from '../containers/groups/CreateGroupContainer';
 import GroupsDetailContainer from '../containers/groups/GroupsDetailContainer';
 import MetersDetailContainer from '../containers/meters/MetersDetailContainer';
+import {TimeInterval} from '../../../common/TimeInterval';
 
 interface RouteProps {
 	barStacking: boolean;
@@ -100,15 +101,22 @@ export default class RouteComponent extends React.Component<RouteProps, {}> {
 	 * @param replace Function that allows a route redirect
 	 */
 	public linkToGraph(nextState: RouterState, replace: RedirectFunction) {
-		const queries = nextState.location.query;
+		const queries: any = nextState.location.query;
 		if (!_.isEmpty(queries)) {
 			try {
 				const options: LinkOptions = {};
 				for (const [key, infoObj] of _.entries(queries)) {
-					// TODO Verify that this is not null/undefined as travis warning is giving or there is a better fix than this quick one.
-					// This removes the static check issue but not a runtime complaint per
-					// https://stackoverflow.com/questions/40349987/how-to-suppress-error-ts2533-object-is-possibly-null-or-undefined
-					const info: string = infoObj!.toString();
+					// TODO The upgrade of TypeScript lead to it giving an error for the type of infoObj
+					// which it thinks is unknown. I'm not sure why and this is code from the history
+					// package (see modules/@types/history/index.d.ts). What follows is a hack where
+					// the type is cast to any. This removes the problem and also allowed the removal
+					// of the ! to avoid calling toString when it is a bad value. I think this is okay
+					// because the toString documentation indicates it works fine with any type including
+					// null and unknown. If it does convert then the default case will catch it as an error.
+					// I want to get rid of this issue so Travis testing is not stopped by this. However,
+					// we should look into this typing issue more to see what might be a better fix.
+					const fixTypeIssue: any = infoObj as any;
+					const info: string = fixTypeIssue.toString();
 					switch (key) {
 						case 'meterIDs':
 							options.meterIDs = info.split(',').map(s => parseInt(s));
@@ -136,6 +144,23 @@ export default class RouteComponent extends React.Component<RouteProps, {}> {
 						case 'optionsVisibility':
 							options.optionsVisibility = (info === 'true');
 							break;
+						case 'serverRange':
+							options.serverRange = TimeInterval.fromString(info);
+							/**
+							 * commented out since days from present feature is not currently used
+							 */
+							// const index = info.indexOf('dfp');
+							// if (index === -1) {
+							// 	options.serverRange = TimeInterval.fromString(info);
+							// } else {
+							// 	const message = info.substring(0, index);
+							// 	const stringField = this.getNewIntervalFromMessage(message);
+							// 	options.serverRange = TimeInterval.fromString(stringField);
+							// }
+							break;
+						case 'sliderRange':
+							options.sliderRange = TimeInterval.fromString(info);
+							break;
 						default:
 							throw new Error('Unknown query parameter');
 					}
@@ -161,6 +186,8 @@ export default class RouteComponent extends React.Component<RouteProps, {}> {
 		let messages;
 		if (lang === 'fr') {
 			messages = (localeData as any).fr;
+		} else if (lang === 'es') {
+			messages = (localeData as any).es;
 		} else {
 			messages = (localeData as any).en;
 		}
@@ -182,4 +209,17 @@ export default class RouteComponent extends React.Component<RouteProps, {}> {
 			</div>
 		);
 	}
+
+	/**
+	 * Generates new time interval based on current time and user selected amount to trace back;
+	 * @param message: currently able to accept how many days to go back in time;
+	 */
+	// private getNewIntervalFromMessage(message: string) {
+	// 	const numDays = parseInt(message);
+	//
+	// 	const current = moment();
+	// 	const newMinTimeStamp = current.clone();
+	// 	newMinTimeStamp.subtract(numDays, 'days');
+	// 	return newMinTimeStamp.toISOString().substring(0, 19) + 'Z_' + current.toISOString().substring(0, 19) + 'Z';
+	// }
 }

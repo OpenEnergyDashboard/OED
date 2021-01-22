@@ -9,7 +9,7 @@ own system.
 
 ## Legal Stuff
 
-Please sign our [CLA](https://goo.gl/forms/nR9MtVHUOqYn8WbP2) before
+Please sign our [CLA](https://docs.google.com/forms/d/e/1FAIpQLSc2zdF2PqJ14FljfQIyQn_X70xDhnpv-zCda1wU0xIOQ5mp_w/viewform) before
 contributing code to OED. It is not necessary to sign the CLA in order to
 contribute by filing or discussing issues.
 

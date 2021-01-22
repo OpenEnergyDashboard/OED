@@ -33,7 +33,7 @@ export default function groups(state = defaultState, action: GroupsAction) {
 			 arrays to store the IDs of child groups and Meters. We get all other data from other parts of state.
 
 			 NOTE: if you get an error here saying `action.data.map` is not a function, please comment on
-			 this issue: https://github.com/beloitcollegecomputerscience/OED/issues/86
+			 this issue: https://github.com/OpenEnergyDashboard/OED/issues/86
 			 */
 			const newGroups = action.data.map(group => ({
 				...group,
