@@ -8,7 +8,6 @@ import sliderWithoutTooltips, { createSliderWithTooltip } from 'rc-slider';
 import * as moment from 'moment';
 import { Button, ButtonGroup, Dropdown, DropdownToggle, DropdownMenu, DropdownItem } from 'reactstrap';
 import TooltipHelpComponent from './TooltipHelpComponent';
-import TooltipHelpComponentAlternative from './TooltipHelpComponentAlternative';
 import ExportContainer from '../containers/ExportContainer';
 import ChartSelectContainer from '../containers/ChartSelectContainer';
 import ChartDataSelectContainer from '../containers/ChartDataSelectContainer';
@@ -226,7 +225,7 @@ class UIOptionsComponent extends React.Component<UIOptionsPropsWithIntl, UIOptio
 							<FormattedMessage id='show.options' />
 						}
 					</Button>
-					<TooltipHelpComponentAlternative tipId='help.home.hide.or.show.options'/>
+					<i data-for='help.home.hide.or.show.options' data-tip className='fa fa-question-circle' />
 				</div>
 			</div>
 		);

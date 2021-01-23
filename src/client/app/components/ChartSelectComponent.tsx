@@ -62,7 +62,7 @@ export default class ChartSelectComponent extends React.Component<ChartSelectPro
 					</Button>
 				</ButtonGroup>
 				<div>
-					<TooltipHelpComponentAlternative tipId={'help.home.chart.select'}/>
+					{/* <TooltipHelpComponentAlternative tipId={'help.home.chart.select'}/> */}
 				</div>
 			</div>
 		);

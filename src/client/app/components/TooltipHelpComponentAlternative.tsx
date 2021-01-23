@@ -6,6 +6,7 @@ import * as React from 'react';
 import { FormattedMessage } from 'react-intl';
 import ReactTooltip from 'react-tooltip';
 import helpLinks from '../translations/helpLinks';
+import '../styles/tooltip.css';
 
 interface TooltipHelpProps {
 	tipId: string;
@@ -31,8 +32,7 @@ export default function TooltipHelpComponentAlternative(props: TooltipHelpProps)
 
 	return (
 		<div style={divStyle}>
-			<i data-for={`${props.tipId}`} data-tip className='fa fa-question-circle' />
-			<ReactTooltip id={`${props.tipId}`} event='click' clickable effect='solid'>
+			<ReactTooltip className='tip' id={`${props.tipId}`} event='click' clickable effect='solid'>
 				<div style={{ width: '300px' }}>
 					<FormattedMessage
 						id={props.tipId}

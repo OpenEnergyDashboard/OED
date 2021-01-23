@@ -28,6 +28,7 @@ import CreateGroupContainer from '../containers/groups/CreateGroupContainer';
 import GroupsDetailContainer from '../containers/groups/GroupsDetailContainer';
 import MetersDetailContainer from '../containers/meters/MetersDetailContainer';
 import {TimeInterval} from '../../../common/TimeInterval';
+import TooltipHelpComponentAlternative from './TooltipHelpComponentAlternative';
 
 interface RouteProps {
 	barStacking: boolean;
@@ -195,6 +196,10 @@ export default class RouteComponent extends React.Component<RouteProps, {}> {
 			<div>
 				<InitializationContainer />
 				<IntlProvider locale={lang} messages={messages} key={lang}>
+					<>
+					<TooltipHelpComponentAlternative tipId='help.home.hide.or.show.options'/>
+					<TooltipHelpComponentAlternative tipId='help.home.select.groups'/>
+					<TooltipHelpComponentAlternative tipId='help.home.header'/>
 					<Router history={browserHistory}>
 						<Route path='/login' component={LoginComponent} />
 						<Route path='/admin' component={AdminComponent} onEnter={this.requireAuth} />
@@ -205,6 +210,7 @@ export default class RouteComponent extends React.Component<RouteProps, {}> {
 						<Route path='/editGroup' component={EditGroupsContainer} onEnter={this.requireAuth} />
 						<Route path='*' component={HomeComponent} />
 					</Router>
+					</>
 				</IntlProvider>
 			</div>
 		);

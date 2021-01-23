@@ -101,7 +101,7 @@ export default class DashboardComponent extends React.Component<DashboardProps, 
 						) : (
 							null
 						)}
-						<TooltipHelpComponentAlternative tipId={'help.home.chart.redraw.restore'} />
+						{/* <TooltipHelpComponentAlternative tipId={'help.home.chart.redraw.restore'} /> */}
 					</div>
 				</div>
 			</div>

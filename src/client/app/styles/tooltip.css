@@ -1,0 +1,3 @@
+.tip {
+   z-index:2001; /* This allows the tooltip to render on top of the modal whose z-index is by default 1000 ;*/
+}

@@ -59,7 +59,7 @@ class ChartDataSelectComponent extends React.Component<ChartDataSelectPropsWithI
 						placeholder={formatMessage(messages.selectGroups)}
 						onValuesChange={handleGroupSelect}
 					/>
-					<TooltipHelpComponentAlternative tipId={'help.home.select.groups'} />
+					<i data-for='help.home.select.groups' data-tip className='fa fa-question-circle'/>
 				</div>
 				<p style={labelStyle}>
 					<FormattedMessage id='meters' />:
@@ -71,7 +71,7 @@ class ChartDataSelectComponent extends React.Component<ChartDataSelectPropsWithI
 						placeholder={formatMessage(messages.selectMeters)}
 						onValuesChange={this.handleMeterSelect}
 					/>
-					<TooltipHelpComponentAlternative tipId={'help.home.select.meters'} />
+					{/* <TooltipHelpComponentAlternative tipId={'help.home.select.meters'} /> */}
 				</div>
 			</div>
 		);
