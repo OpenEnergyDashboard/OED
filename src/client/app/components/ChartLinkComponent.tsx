@@ -53,7 +53,7 @@ export default class ChartLinkComponent extends React.Component<ChartLinkProps, 
 				<Button	outline	onClick={this.toggleLink}>
 					<FormattedMessage id='toggle.link' />
 				</Button>
-				{/* <TooltipHelpComponentAlternative tipId='help.home.toggle.chart.link' /> */}
+				<i data-for='help.home.toggle.chart.link' data-tip className='fa fa-question-circle'/>
 				{this.state.showLink &&
 					<>
 						<div className='checkbox'>

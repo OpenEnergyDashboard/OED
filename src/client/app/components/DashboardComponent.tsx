@@ -101,7 +101,7 @@ export default class DashboardComponent extends React.Component<DashboardProps, 
 						) : (
 							null
 						)}
-						{/* <TooltipHelpComponentAlternative tipId={'help.home.chart.redraw.restore'} /> */}
+						<i data-for='help.home.chart.redraw.restore' data-tip className='fa fa-question-circle'/>
 					</div>
 				</div>
 			</div>

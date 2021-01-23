@@ -56,7 +56,7 @@ export default function ExportComponent(props: ExportProps) {
 			<Button outline onClick={exportReading}>
 				<FormattedMessage id='export.graph.data' />
 			</Button>
-			{/* <TooltipHelpComponentAlternative tipId={'help.home.export.graph.data'} /> */}
+			<i data-for='help.home.export.graph.data' data-tip className='fa fa-question-circle'/>
 		</div>
 	);
 }
