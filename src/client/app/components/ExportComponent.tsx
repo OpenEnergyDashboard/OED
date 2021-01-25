@@ -8,7 +8,7 @@ import * as moment from 'moment';
 import graphExport from '../utils/exportData';
 import { ExportDataSet } from '../types/readings';
 import { FormattedMessage } from 'react-intl';
-import TooltipHelpComponentAlternative from './TooltipHelpComponentAlternative';
+import TooltipMarker from './TooltipMarker';
 
 interface ExportProps {
 	selectedMeters: number[];
@@ -56,7 +56,7 @@ export default function ExportComponent(props: ExportProps) {
 			<Button outline onClick={exportReading}>
 				<FormattedMessage id='export.graph.data' />
 			</Button>
-			<i data-for='help.home.export.graph.data' data-tip className='fa fa-question-circle'/>
+			<TooltipMarker page='home' helpTextId='help.home.export.graph.data'/>
 		</div>
 	);
 }

@@ -19,8 +19,7 @@ import { FormattedMessage } from 'react-intl';
 import { Dispatch, Thunk, ActionType } from '../types/redux/actions';
 
 import * as Plotly from 'plotly.js';
-import TooltipHelpComponent from './TooltipHelpComponent';
-import TooltipHelpComponentAlternative from './TooltipHelpComponentAlternative';
+import TooltipMarker from './TooltipMarker';
 // TODO lowercase plotly for the import in index.d.ts but uppercase here.
 
 
@@ -101,7 +100,7 @@ export default class DashboardComponent extends React.Component<DashboardProps, 
 						) : (
 							null
 						)}
-						<i data-for='help.home.chart.redraw.restore' data-tip className='fa fa-question-circle'/>
+						<TooltipMarker page='home' helpTextId='help.home.chart.redraw.restore'/>
 					</div>
 				</div>
 			</div>

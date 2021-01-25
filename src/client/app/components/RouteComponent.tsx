@@ -197,14 +197,6 @@ export default class RouteComponent extends React.Component<RouteProps, {}> {
 				<InitializationContainer />
 				<IntlProvider locale={lang} messages={messages} key={lang}>
 					<>
-					<TooltipHelpComponentAlternative tipId='help.home.hide.or.show.options'/>
-					<TooltipHelpComponentAlternative tipId='help.home.select.groups'/>
-					<TooltipHelpComponentAlternative tipId='help.home.header'/>
-					<TooltipHelpComponentAlternative tipId='help.home.chart.select'/>
-					<TooltipHelpComponentAlternative tipId='help.home.toggle.chart.link'/>
-					<TooltipHelpComponentAlternative tipId='help.home.select.meters'/>
-					<TooltipHelpComponentAlternative tipId='help.home.export.graph.data'/>
-					<TooltipHelpComponentAlternative tipId='help.home.chart.redraw.restore'/>
 					<Router history={browserHistory}>
 						<Route path='/login' component={LoginComponent} />
 						<Route path='/admin' component={AdminComponent} onEnter={this.requireAuth} />

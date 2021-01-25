@@ -9,7 +9,7 @@ import helpLinks from '../translations/helpLinks';
 import '../styles/tooltip.css';
 
 interface TooltipHelpProps {
-	tipId: string;
+	page: string; // Specifies which page the tip is in.
 }
 
 /**
@@ -20,26 +20,31 @@ export default function TooltipHelpComponentAlternative(props: TooltipHelpProps)
 		display: 'inline-block'
 	};
 
-	// Create links
-	const values = helpLinks[props.tipId];
-	const links: Record<string, JSX.Element> = {};
-	Object.keys(values).forEach(key => {
-		const link = values[key];
-		links[key] = (<a target='_blank' rel='noopener noreferrer' href={link}>
-			here
-		</a>);
-	});
-
 	return (
 		<div style={divStyle}>
-			<ReactTooltip className='tip' id={`${props.tipId}`} event='click' clickable effect='solid'>
-				<div style={{ width: '300px' }}>
-					<FormattedMessage
-						id={props.tipId}
-						values={links}
-					/>
-				</div>
-			</ReactTooltip>
+			<ReactTooltip className='tip' id={`${props.page}`} event='click' clickable effect='solid' globalEventOff="click" getContent={(dataTip) => {
+				if (dataTip === null) {
+					return;
+				}
+				// Create links
+				const values = helpLinks[dataTip];
+				const links: Record<string, JSX.Element> = {};
+				// Object.keys(values).forEach(key => {
+				// 	const link = values[key];
+				// 	links[key] = (<a target='_blank' rel='noopener noreferrer' href={link}>
+				// 		here
+				// 	</a>);
+				// });
+				return (
+					<div style={{ width: '300px' }}>
+						<FormattedMessage
+							id={dataTip}
+							values={links}
+						/>
+					</div>
+				);
+			}} />
+
 		</div>
 	);
 }

@@ -5,9 +5,9 @@
 import * as React from 'react';
 import { FormattedMessage } from 'react-intl';
 import { Button } from 'reactstrap';
-import TooltipHelpComponentAlternative from './TooltipHelpComponentAlternative';
 import {ChartTypes} from '../types/redux/graph';
 import {getRangeSliderInterval} from './DashboardComponent';
+import TooltipMarker from './TooltipMarker';
 
 interface ChartLinkProps {
 	linkText: string;
@@ -53,7 +53,7 @@ export default class ChartLinkComponent extends React.Component<ChartLinkProps, 
 				<Button	outline	onClick={this.toggleLink}>
 					<FormattedMessage id='toggle.link' />
 				</Button>
-				<i data-for='help.home.toggle.chart.link' data-tip className='fa fa-question-circle'/>
+				<TooltipMarker page='home' helpTextId='help.home.toggle.chart.link'/>
 				{this.state.showLink &&
 					<>
 						<div className='checkbox'>

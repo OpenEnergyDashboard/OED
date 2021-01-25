@@ -15,6 +15,7 @@ import { ChangeBarStackingAction, ChangeCompareSortingOrderAction, SetOptionsVis
 import ChartLinkContainer from '../containers/ChartLinkContainer';
 import { ChartTypes } from '../types/redux/graph';
 import { ComparePeriod, SortingOrder } from '../utils/calculateCompare';
+import TooltipMarker from './TooltipMarker';
 import 'rc-slider/assets/index.css';
 
 const Slider = createSliderWithTooltip(sliderWithoutTooltips);
@@ -225,7 +226,7 @@ class UIOptionsComponent extends React.Component<UIOptionsPropsWithIntl, UIOptio
 							<FormattedMessage id='show.options' />
 						}
 					</Button>
-					<i data-for='help.home.hide.or.show.options' data-tip className='fa fa-question-circle' />
+					<TooltipMarker page='home' helpTextId='help.home.hide.or.show.options' />
 				</div>
 			</div>
 		);
