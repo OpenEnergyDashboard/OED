@@ -1,7 +1,7 @@
 /* This Source Code Form is subject to the terms of the Mozilla Public
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
-const BASE_URL = 'https://openenergydashboard.org';
+const BASE_URL = 'https://openenergydashboard.github.io';
 
 const links: Record<string, Record<string, string>> = {
 	'help.home.chart.plotly.controls': { link: 'https://plotly.com/chart-studio-help/getting-to-know-the-plotly-modebar/' },
