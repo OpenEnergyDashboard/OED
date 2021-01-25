@@ -61,14 +61,13 @@ router.post('/meters', validateMetersCsvUploadParams, async (req, res) => {
 	try {
 		const filepath = await saveCsv(zlib.gunzipSync(req.file.buffer), 'meters');
 		log.info(`The file ${filepath} was created to upload meters csv data`);
-		const conn = getConnection(); // TODO: when should we close this connection?
+		const conn = getConnection();
 		await uploadMeters(req, res, filepath, conn);
 	} catch (error) {
 		failure(req, res, error);
 	}
 });
 
-// NOTE: for some reason upload needs to come before the other middleware for this to work.
 router.post('/readings', validateReadingsCsvUploadParams, async (req, res) => {
 	try {
 		const filepath = await saveCsv(zlib.gunzipSync(req.file.buffer), 'readings');
