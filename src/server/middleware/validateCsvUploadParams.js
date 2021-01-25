@@ -1,6 +1,23 @@
 const { CSVPipelineError } = require('../services/csvPipeline/CustomErrors');
 const failure = require('../services/csvPipeline/failure');
 
+const DEFAULTS = {
+	common: {
+		headerrow: 'false'
+	},
+	meters: {
+		update: 'false'
+	},
+	readings: {
+		createMeter: 'false',
+		cumulative: 'false',
+		cumulativeReset: 'false',
+		duplications: '1',
+		timeSort: 'increasing',
+		update: 'false'
+	}
+}
+
 function validateCommonUploadParams(req) {
 	if (!req.file) {
 		throw new CSVPipelineError('No csv file uploaded.');
@@ -8,7 +25,7 @@ function validateCommonUploadParams(req) {
 	const { headerrow: headerRow } = req.body; // extract query parameters
 
 	if (!headerRow) {
-		req.body.headerrow = 'false';
+		req.body.headerrow = DEFAULTS.common.headerrow;
 	} else if (headerRow !== 'true' && headerRow !== 'false') {
 		throw new CSVPipelineError(`headerrow value of ${headerRow} is not valid. Possible values are 'true' or 'false'.`);
 	}
@@ -20,18 +37,18 @@ function validateReadingsCsvUploadParams(req, res, next) {
 		const { createmeter: createMeter, cumulative, cumulativereset: cumulativeReset, duplications,
 			length, meter: meterName, timesort: timeSort, update } = req.body; // extract query parameters
 		if (!createMeter) {
-			req.body.createmeter = 'false'; // set default createmeter param if not supplied
+			req.body.createmeter = DEFAULTS.readings.createMeter;
 		} else if (createMeter !== 'true' && createMeter !== 'false') {
 			throw new CSVPipelineError(`Create meter value ${createMeter} is not a valid value.`);
 		}
 		if (!cumulative) {
-			req.body.cumulative = 'false'; // set default cumulative param if not supplied
+			req.body.cumulative = DEFAULTS.readings.cumulative;
 		} else if (cumulative !== 'true' && cumulative !== 'false') {
 			throw new CSVPipelineError(`Cumulative value ${cumulative} is not implemented.`);
 		}
 
 		if (!duplications) {
-			req.body.duplications = '1'; // set default duplications param if not supplied
+			req.body.duplications = DEFAULTS.readings.duplications;
 		} else if (Number.isInteger(Number.parseFloat(duplications))) {
 			throw new CSVPipelineError(`Duplications value ${duplications} is invalid.`);
 		}
@@ -39,13 +56,12 @@ function validateReadingsCsvUploadParams(req, res, next) {
 			throw new CSVPipelineError(`Meter name must be provided as field meter.`);
 		}
 		if (!timeSort) {
-			req.body.timesort = 'increasing'; // set default timesort param if not supplied
-		} else if (timeSort !== 'increasing' && timeSort !== 'decreasing') {
+			req.body.timesort = DEFAULTS.readings.timeSort;
+		} else if (timeSort !== 'increasing') { // timesort has to be increasing for the pipeline to function.
 			throw new CSVPipelineError(`Time sort '${timeSort}' is invalid.`);
 		}
-		// Fail if request to update readings.
 		if (!update) {
-			req.body.update = 'false'; // set default update param if not supplied
+			req.body.update = DEFAULTS.readings.update;
 		} else if (update !== 'true' && update !== 'false') {
 			throw new CSVPipelineError(`Update value for readings is not implemented for update=${update}.`);
 		}
@@ -58,10 +74,9 @@ function validateReadingsCsvUploadParams(req, res, next) {
 function validateMetersCsvUploadParams(req, res, next) {
 	try {
 		validateCommonUploadParams(req);
-		const { createmeter: createMeter, cumulative, cumulativereset: cumulativeReset, duplications,
-			length, meter: meterName, timesort: timeSort, update } = req.body; // extract query parameters
+		const { update } = req.body; // extract query parameters
 		if (!update) {
-			req.body.update = 'false'; // set default update param if not supplied
+			req.body.update = DEFAULTS.meters.update; // set default update param if not supplied
 		} else if (update !== 'true' && update !== 'false') {
 			throw new CSVPipelineError(`Update data for meters is not implemented for update=${update}.`);
 		}
