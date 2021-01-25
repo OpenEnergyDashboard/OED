@@ -32,7 +32,7 @@ function validateReadingsCsvUploadParams(req, res, next) {
 
 		if (!duplications) {
 			req.body.duplications = '1'; // set default duplications param if not supplied
-		} else if (isNaN(duplications)) {
+		} else if (Number.isInteger(Number.parseFloat(duplications))) {
 			throw new CSVPipelineError(`Duplications value ${duplications} is invalid.`);
 		}
 		if (!meterName) {
