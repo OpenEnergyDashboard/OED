@@ -22,28 +22,36 @@ export default function TooltipHelpComponentAlternative(props: TooltipHelpProps)
 
 	return (
 		<div style={divStyle}>
-			<ReactTooltip className='tip' id={`${props.page}`} event='click' clickable effect='solid' globalEventOff="click" getContent={(dataTip) => {
-				if (dataTip === null) {
-					return;
-				}
-				// Create links
-				const values = helpLinks[dataTip];
-				const links: Record<string, JSX.Element> = {};
-				Object.keys(values).forEach(key => {
-					const link = values[key];
-					links[key] = (<a target='_blank' rel='noopener noreferrer' href={link}>
-						here
-					</a>);
-				});
-				return (
-					<div style={{ width: '300px' }}>
-						<FormattedMessage
-							id={dataTip}
-							values={links}
-						/>
-					</div>
-				);
-			}} />
+			<ReactTooltip
+				className='tip'
+				id={`${props.page}`}
+				event='click'
+				clickable
+				effect='solid'
+				globalEventOff='click'
+				getContent={dataTip => {
+					if (dataTip === null) {
+						return;
+					}
+					// Create links
+					const values = helpLinks[dataTip];
+					const links: Record<string, JSX.Element> = {};
+					Object.keys(values).forEach(key => {
+						const link = values[key];
+						links[key] = (<a target='_blank' rel='noopener noreferrer' href={link}>
+							here
+						</a>);
+					});
+					return (
+						<div style={{ width: '300px' }}>
+							<FormattedMessage
+								id={dataTip}
+								values={links}
+							/>
+						</div>
+					);
+				}}
+			/>
 
 		</div>
 	);
