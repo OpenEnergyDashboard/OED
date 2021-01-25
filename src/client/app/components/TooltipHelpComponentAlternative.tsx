@@ -29,12 +29,12 @@ export default function TooltipHelpComponentAlternative(props: TooltipHelpProps)
 				// Create links
 				const values = helpLinks[dataTip];
 				const links: Record<string, JSX.Element> = {};
-				// Object.keys(values).forEach(key => {
-				// 	const link = values[key];
-				// 	links[key] = (<a target='_blank' rel='noopener noreferrer' href={link}>
-				// 		here
-				// 	</a>);
-				// });
+				Object.keys(values).forEach(key => {
+					const link = values[key];
+					links[key] = (<a target='_blank' rel='noopener noreferrer' href={link}>
+						here
+					</a>);
+				});
 				return (
 					<div style={{ width: '300px' }}>
 						<FormattedMessage
