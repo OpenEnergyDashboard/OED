@@ -28,7 +28,6 @@ import CreateGroupContainer from '../containers/groups/CreateGroupContainer';
 import GroupsDetailContainer from '../containers/groups/GroupsDetailContainer';
 import MetersDetailContainer from '../containers/meters/MetersDetailContainer';
 import {TimeInterval} from '../../../common/TimeInterval';
-import TooltipHelpComponentAlternative from './TooltipHelpComponentAlternative';
 
 interface RouteProps {
 	barStacking: boolean;
