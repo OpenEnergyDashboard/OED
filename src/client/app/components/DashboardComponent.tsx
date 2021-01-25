@@ -47,7 +47,7 @@ export default class DashboardComponent extends React.Component<DashboardProps, 
 
 	public componentDidUpdate(prev: DashboardProps){
 		if(prev.chartToRender !== this.props.chartToRender){
-			ReactTooltip.rebuild(); // This rebuilds the tooltip so that it detects the marker that disappear because the chart type changes. 
+			ReactTooltip.rebuild(); // This rebuilds the tooltip so that it detects the marker that disappear because the chart type changes.
 		}
 	}
 
@@ -103,12 +103,15 @@ export default class DashboardComponent extends React.Component<DashboardProps, 
 								onClick={() => this.handleTimeIntervalChange('all')}
 							> <FormattedMessage id='restore'/>
 							</Button>,
-							<TooltipMarker page='home' helpTextId='help.home.chart.redraw.restore'/>,
+							<TooltipMarker
+								key={3}
+								page='home'
+								helpTextId='help.home.chart.redraw.restore'
+							/>
 							]
 						) : (
 							null
 						)}
-						{ (this.props.chartToRender === ChartTypes.compare)}
 					</div>
 				</div>
 			</div>
