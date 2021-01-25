@@ -20,6 +20,7 @@ import { Dispatch, Thunk, ActionType } from '../types/redux/actions';
 
 import * as Plotly from 'plotly.js';
 import TooltipMarker from './TooltipMarker';
+import ReactTooltip from 'react-tooltip';
 // TODO lowercase plotly for the import in index.d.ts but uppercase here.
 
 
@@ -42,6 +43,12 @@ export default class DashboardComponent extends React.Component<DashboardProps, 
 	constructor(props: DashboardProps) {
 		super(props);
 		this.handleTimeIntervalChange = this.handleTimeIntervalChange.bind(this);
+	}
+
+	public componentDidUpdate(prev: DashboardProps){
+		if(prev.chartToRender !== this.props.chartToRender){
+			ReactTooltip.rebuild(); // This rebuilds the tooltip so that it detects the marker that disappear because the chart type changes. 
+		}
 	}
 
 	public render() {
@@ -95,12 +102,13 @@ export default class DashboardComponent extends React.Component<DashboardProps, 
 								style={buttonMargin}
 								onClick={() => this.handleTimeIntervalChange('all')}
 							> <FormattedMessage id='restore'/>
-							</Button>
+							</Button>,
+							<TooltipMarker page='home' helpTextId='help.home.chart.redraw.restore'/>,
 							]
 						) : (
 							null
 						)}
-						<TooltipMarker page='home' helpTextId='help.home.chart.redraw.restore'/>
+						{ (this.props.chartToRender === ChartTypes.compare)}
 					</div>
 				</div>
 			</div>
