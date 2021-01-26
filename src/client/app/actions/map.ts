@@ -12,14 +12,14 @@ import {
 	CartesianPoint,
 	Dimensions,
 	GPSPoint
-} from "../utils/calibration";
-import {State} from "../types/redux/state";
-import {mapsApi} from "../utils/api";
-import {showErrorNotification, showSuccessNotification} from "../utils/notifications";
-import translate from "../utils/translate";
+} from '../utils/calibration';
+import {State} from '../types/redux/state';
+import {mapsApi} from '../utils/api';
+import {showErrorNotification, showSuccessNotification} from '../utils/notifications';
+import translate from '../utils/translate';
 import * as moment from 'moment';
 import {browserHistory} from '../utils/history';
-import {logToServer} from "./logs";
+import {logToServer} from './logs';
 
 function requestMapsDetails(): t.RequestMapsDetailsAction {
 	return { type: ActionType.RequestMapsDetails };
@@ -37,10 +37,12 @@ function confirmMapEdits(mapID: number): t.ConfirmEditedMapAction {
 	return { type: ActionType.ConfirmEditedMap, mapID};
 }
 
+// deprecated, used for debugging
 function requestSelectedMap() {
 	return { type: ActionType.RequestSelectedMap };
 }
 
+// deprecated, used for debugging
 function receiveSelectedMap(map: MapData) {
 	return { type: ActionType.ReceiveSelectedMap, map};
 }
@@ -54,7 +56,7 @@ export function fetchMapsDetails(): Thunk {
 }
 
 export function editMapDetails(map: MapMetadata): t.EditMapDetailsAction {
-	return {type: ActionType.EditMapDetails, map: map};
+	return {type: ActionType.EditMapDetails, map};
 }
 
 function incrementCounter(): t.IncrementCounterAction {
@@ -69,34 +71,45 @@ export function setNewMap(): Thunk {
 			dispatch2(logToServer('info', `Set up new map, id = ${temporaryID}`));
 			dispatch2(setCalibration(CalibrationModeTypes.initiate, temporaryID));
 		});
-	}
+	};
 }
 
+/**
+ * start a new calibration session
+ * @param mode {CalibrationModeTypes} calibration modes
+ * @param mapID {number} id of map being calibrated
+ */
 export function setCalibration(mode: CalibrationModeTypes, mapID: number): Thunk {
 	return async (dispatch: Dispatch) => {
 		dispatch(prepareCalibration(mode, mapID));
-		dispatch((dispatch2) => {
+		dispatch( dispatch2 => {
 			dispatch2(logToServer('info', `Start Calibration for map, id=${mapID}, mode:${mode}`));
 		});
-	}
-}
-
-export function changeGridDisplay(): t.ChangeGridDisplayAction {
-	return { type: ActionType.ChangeGridDisplay };
+	};
 }
 
 function prepareCalibration(mode: CalibrationModeTypes, mapID: number): t.SetCalibrationAction {
 	return { type: ActionType.SetCalibration, mode, mapID };
 }
 
+/**
+ * toggle display of grids during calibration
+ */
+export function changeGridDisplay(): t.ChangeGridDisplayAction {
+	return { type: ActionType.ChangeGridDisplay };
+}
+
+/**
+ * drop present calibration session in a traceable manner
+ */
 export function dropCalibration(): Thunk {
 	return async (dispatch: Dispatch, getState: GetState) => {
 		const mapToReset = getState().maps.calibratingMap;
 		dispatch(resetCalibration(mapToReset));
-		dispatch((dispatch2) => {
+		dispatch( dispatch2 => {
 			dispatch2(logToServer('info', `reset calibration for map, id: ${mapToReset}.`));
 		});
-	}
+	};
 }
 
 function resetCalibration(mapToReset: number): t.ResetCalibrationAction {
@@ -119,10 +132,11 @@ export function updateCurrentCartesian(currentCartesian: CartesianPoint): t.Upda
 	return { type: ActionType.UpdateCurrentCartesian, currentCartesian };
 }
 
-function hasCartesian(point: CalibratedPoint) {
-	return point.cartesian.x != -1 && point.cartesian.y != -1;
-}
-
+/**
+ * pair collected GPS coordinate with cartesian coordinate to form a complete data point,
+ * append to calibration set and trigger calibration if needed
+ * @param currentGPS {GPSPoint} GPS data, from user input
+ */
 export function offerCurrentGPS(currentGPS: GPSPoint): Thunk {
 	return (dispatch: Dispatch, getState: GetState) => {
 		const mapID = getState().maps.calibratingMap;
@@ -132,7 +146,7 @@ export function offerCurrentGPS(currentGPS: GPSPoint): Thunk {
 			dispatch(updateCalibrationSet(point));
 			dispatch(resetCurrentPoint());
 			// Nesting dispatches to preserve that updateCalibrationSet() is called before calibration
-			dispatch(async (dispatch2) => {
+			dispatch(async dispatch2 => {
 				dispatch2(logToServer('info', `gps input (lat:${currentGPS.latitude},long:${currentGPS.longitude})
 				provided for cartesian point:${point.cartesian.x},${point.cartesian.y}
 				and added to data point`));
@@ -147,7 +161,11 @@ export function offerCurrentGPS(currentGPS: GPSPoint): Thunk {
 			});
 		}
 		return Promise.resolve();
-	}
+	};
+}
+
+function hasCartesian(point: CalibratedPoint) {
+	return point.cartesian.x != -1 && point.cartesian.y != -1;
 }
 
 function updateCalibrationSet(calibratedPoint: CalibratedPoint): t.AppendCalibrationSetAction {
@@ -184,7 +202,7 @@ function prepareDataToCalculation(state: State): CalibrationResult {
 }
 
 function updateResult(result: CalibrationResult): t.UpdateCalibrationResultAction {
-	return { type: ActionType.UpdateCalibrationResults, result}
+	return { type: ActionType.UpdateCalibrationResults, result};
 }
 
 export function resetCurrentPoint(): t.ResetCurrentPointAction {
@@ -210,9 +228,12 @@ export function submitCalibratingMap(): Thunk {
 		} else {
 			dispatch(submitEditedMap(mapID));
 		}
-	}
+	};
 }
 
+/**
+ * submit a new map to database at the end of a calibration session
+ */
 export function submitNewMap(): Thunk {
 	return async (dispatch: Dispatch, getState: GetState) => {
 		const mapID = getState().maps.calibratingMap;
@@ -223,8 +244,8 @@ export function submitNewMap(): Thunk {
 				mapSource: map.image.src,
 				displayable: false,
 				modifiedDate: moment().toISOString(),
-				origin: (map.calibrationResult)? map.calibrationResult.origin : undefined,
-				opposite: (map.calibrationResult)? map.calibrationResult.opposite : undefined
+				origin: (map.calibrationResult) ? map.calibrationResult.origin : undefined,
+				opposite: (map.calibrationResult) ? map.calibrationResult.opposite : undefined
 			};
 			await mapsApi.create(acceptableMap);
 			if (map.calibrationResult) {
@@ -240,9 +261,13 @@ export function submitNewMap(): Thunk {
 			showErrorNotification(translate('failed.to.create.map'));
 			dispatch(logToServer('error', `failed to create map, ${e}`));
 		}
-	}
+	};
 }
 
+/**
+ * submit changes of an existing map to database at the end of a calibration session
+ * @param mapID the edited map being updated at database
+ */
 export function submitEditedMap(mapID: number): Thunk {
 	return async (dispatch: Dispatch, getState: GetState) => {
 		const map = getState().maps.editedMaps[mapID];
@@ -252,19 +277,19 @@ export function submitEditedMap(mapID: number): Thunk {
 				...map,
 				mapSource: map.image.src,
 				modifiedDate: moment().toISOString(),
-				origin: (map.calibrationResult)? map.calibrationResult.origin : map.origin,
-				opposite: (map.calibrationResult)? map.calibrationResult.opposite : map.opposite,
-			}
+				origin: (map.calibrationResult) ? map.calibrationResult.origin : map.origin,
+				opposite: (map.calibrationResult) ? map.calibrationResult.opposite : map.opposite
+			};
 			await mapsApi.edit(acceptableMap);
 			if (map.calibrationResult) {
-				dispatch(logToServer('info', `Edited map uploaded to database(newly calibrated)`));
-				showSuccessNotification(translate("updated.map.with.calibration"));
+				dispatch(logToServer('info', 'Edited map uploaded to database(newly calibrated)'));
+				showSuccessNotification(translate('updated.map.with.calibration'));
 			} else if (map.origin && map.opposite) {
 				dispatch(logToServer('info', 'Edited map uploaded to database(calibration not updated)'));
-				showSuccessNotification(translate("updated.map.without.new.calibration"));
+				showSuccessNotification(translate('updated.map.without.new.calibration'));
 			} else {
 				dispatch(logToServer('info', 'Edited map uploaded to database(without calibration)'));
-				showSuccessNotification(translate("updated.map.without.calibration"));
+				showSuccessNotification(translate('updated.map.without.calibration'));
 			}
 			dispatch(confirmMapEdits(mapID));
 			browserHistory.push('/maps');
@@ -274,6 +299,11 @@ export function submitEditedMap(mapID: number): Thunk {
 		}
 	};
 }
+
+/**
+ * permanently remove a map
+ * @param mapID map to be removed
+ */
 
 export function removeMap(mapID: number): Thunk {
 	return async (dispatch: Dispatch) => {
@@ -291,5 +321,5 @@ export function removeMap(mapID: number): Thunk {
 }
 
 function deleteMap(mapID: number): t.DeleteMapAction {
-	return { type: ActionType.DeleteMap, mapID: mapID };
+	return { type: ActionType.DeleteMap, mapID };
 }
