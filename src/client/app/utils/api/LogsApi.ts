@@ -5,7 +5,7 @@
  */
 
 import ApiBackend from './ApiBackend';
-import {LogData} from "../../types/redux/logs";
+import {LogData} from '../../types/redux/logs';
 
 export default class LogsApi {
 	private readonly backend: ApiBackend;

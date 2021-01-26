@@ -11,8 +11,8 @@ import FileProcessingApi from './FileProcessingApi';
 import PreferencesApi from './PreferencesApi';
 import VerificationApi from './VerificationApi';
 import CompressedReadingsApi from './CompressedReadingsApi';
-import MapsApi from "./MapsApi";
-import LogsApi from "./LogsApi";
+import MapsApi from './MapsApi';
+import LogsApi from './LogsApi';
 
 const apiBackend = new ApiBackend();
 
