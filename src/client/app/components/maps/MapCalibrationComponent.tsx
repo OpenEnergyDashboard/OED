@@ -27,7 +27,7 @@ export default class MapCalibrationComponent extends React.Component<MapCalibrat
 		if (this.props.mode === CalibrationModeTypes.initiate) {
 			return (
 				<div className='container-fluid'>
-					<HeaderContainer />
+					<HeaderContainer/>
 					<MapCalibration_InitiateContainer/>
 				</div>
 			);
@@ -44,7 +44,7 @@ export default class MapCalibrationComponent extends React.Component<MapCalibrat
 		} else { // preview mode containers
 			return (
 				<div className='container-fluid'>
-					<HeaderContainer />
+					<HeaderContainer/>
 					<p/>
 				</div>
 			);
