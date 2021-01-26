@@ -38,6 +38,8 @@ export enum ActionType {
 	ChangeChartToRender = 'CHANGE_CHART_TO_RENDER',
 	ChangeBarStacking = 'CHANGE_BAR_STACKING',
 	ChangeGraphZoom = 'CHANGE_GRAPH_ZOOM',
+	ChangeSliderRange = 'CHANGE_SLIDER_RANGE',
+	ResetRangeSliderStack = 'RESET_RANGE_SLIDER_STACK',
 	SetOptionsVisibility = 'SET_OPTIONS_VISIBILITY',
 	UpdateComparePeriod = 'UPDATE_COMPARE_PERIOD',
 	ChangeCompareSortingOrder = 'CHANGE_COMPARE_SORTING_ORDER',

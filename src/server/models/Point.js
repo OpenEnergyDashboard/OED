@@ -14,9 +14,9 @@ function Point(longitude, latitude) {
 	this.latitude = latitude;
 
 	// Custom Type Formatting:
-	this._rawDBType = true; // to make the type return the string without escaping it;
+	this.rawType = true; // to make the type return the string without escaping it;
 
-	this.formatDBType = function formatDBType() {
+	this.toPostgres = function toPostgres() {
 		return `point(${this.longitude}, ${this.latitude})`;
 	};
 }
