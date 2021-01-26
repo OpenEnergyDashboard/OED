@@ -15,7 +15,7 @@ import * as moment from 'moment';
 import {TimeInterval} from '../../../common/TimeInterval';
 
 import Button from 'reactstrap/lib/Button';
-import { FormattedMessage } from 'react-intl';
+import {FormattedMessage} from 'react-intl';
 
 interface DashboardProps {
 	chartToRender: ChartTypes;
@@ -56,11 +56,13 @@ export default class DashboardComponent extends React.Component<DashboardProps, 
 				showSpinner = true;
 			}
 			ChartToRender = MultiCompareChartContainer;
-		} else {
+		} else if (this.props.chartToRender === ChartTypes.map) {
 			if (this.props.mapLoading) {
 				showSpinner = true;
 			}
 			ChartToRender = MapChartContainer;
+		} else {
+			throw new Error('unrecognized type of chart');
 		}
 
 		const optionsClassName = this.props.optionsVisibility ? 'col-2 d-none d-lg-block' : 'd-none';
