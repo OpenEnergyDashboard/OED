@@ -17,10 +17,6 @@ import {TimeInterval} from '../../../common/TimeInterval';
 import Button from 'reactstrap/lib/Button';
 import { FormattedMessage } from 'react-intl';
 
-// TODO lowercase plotly for the import in index.d.ts but uppercase here.
-
-
-
 interface DashboardProps {
 	chartToRender: ChartTypes;
 	optionsVisibility: boolean;
