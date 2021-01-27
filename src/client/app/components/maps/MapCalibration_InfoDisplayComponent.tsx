@@ -28,7 +28,7 @@ export default class MapCalibration_InfoDisplayComponent extends React.Component
 		super(props);
 		this.state = {
 			value: ''
-		}
+		};
 		this.handleGridDisplay = this.handleGridDisplay.bind(this);
 		this.handleGPSInput = this.handleGPSInput.bind(this);
 		this.resetInputField = this.resetInputField.bind(this);
@@ -55,7 +55,7 @@ export default class MapCalibration_InfoDisplayComponent extends React.Component
 							<textarea id={'text'} cols={50} value={this.state.value} onChange={this.handleGPSInput.bind(this)}/>
 						</label>
 						<br/>
-						<input type={"submit"} value={"Submit"}/>
+						<input type={'submit'} value={'Submit'}/>
 					</form>
 					<button onClick={this.dropCurrentCalibration}>Reset</button>
 					<button onClick={this.handleChanges.bind(this)}>Save changes to database</button>
@@ -90,7 +90,7 @@ export default class MapCalibration_InfoDisplayComponent extends React.Component
 			this.props.updateGPSCoordinates(gps);
 			this.resetInputField();
 		} else {
-			this.props.log('info', 'refused data point with invalid input');
+			this.props.log('info', `refused data point with invalid input: ${input}`);
 		}
 	}
 
