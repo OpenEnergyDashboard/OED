@@ -32,6 +32,7 @@ function mapStateToProps(state: State) {
 	if (chart === ChartTypes.line) {
 		for (const groupID of state.graph.selectedGroups) {
 			const byGroupID = state.readings.line.byGroupID[groupID];
+			console.log(byGroupID);
 			if (byGroupID !== undefined) {
 				const readingsData = byGroupID[timeInterval.toString()];
 				if (readingsData !== undefined && !readingsData.isFetching) {
@@ -142,7 +143,9 @@ function mapStateToProps(state: State) {
 
 	return {
 		selectedMeters: state.graph.selectedMeters,
-		exportVals: { datasets }
+		selectedGroups: state.graph.selectedGroups,
+		exportVals: { datasets },
+		timeInterval: state.graph.timeInterval
 	};
 }
 

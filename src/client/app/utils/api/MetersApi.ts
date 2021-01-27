@@ -30,6 +30,14 @@ export default class MetersApi {
 		);
 	}
 
+	public async rawLineReadings(meterIDs: number[], timeInterval: TimeInterval): Promise<LineReadings> {
+		const stringifiedIDs = meterIDs.join(',');
+		return await this.backend.doGetRequest<LineReadings>(
+			`/api/readings/line/raw/meters/${stringifiedIDs}`,
+			{ timeInterval: timeInterval.toString() }
+		);
+	}
+	
 	public async barReadings(meterIDs: number[], timeInterval: TimeInterval, barDuration: moment.Duration): Promise<BarReadings> {
 		const stringifiedIDs = meterIDs.join(',');
 		return await this.backend.doGetRequest<BarReadings>(

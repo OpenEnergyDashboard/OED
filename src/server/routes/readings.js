@@ -71,6 +71,54 @@ router.get('/line/meters/:meter_ids', async (req, res) => {
 	}
 });
 
+router.get('/line/raw/meters/:meter_ids', async (req, res) => {
+	const validParams = {
+		type: 'object',
+		maxProperties: 1,
+		required: ['meter_ids'],
+		properties: {
+			meter_ids: {
+				type: 'string'
+			}
+		}
+	};
+	const validQueries = {
+		type: 'object',
+		maxProperties: 1,
+		required: ['timeInterval'],
+		properties: {
+			timeInterval: {
+				type: 'string'
+			}
+		}
+	};
+	if (!validate(req.params, validParams).valid || !validate(req.query, validQueries).valid) {
+		res.sendStatus(400);
+	} else {
+		const conn = getConnection();
+		// We can't do .map(parseInt) here because map would give parseInt a radix value of the current array position.
+		const meterIDs = req.params.meter_ids.split(',').map(s => parseInt(s));
+		const timeInterval = TimeInterval.fromString(req.query.timeInterval);
+		console.log(timeInterval.startTimestamp,timeInterval.endTimestamp);
+		try {
+			//const rawCompressedReadings = await Reading.getCompressedReadings(meterIDs, timeInterval.startTimestamp, timeInterval.endTimestamp, 100, conn);
+			//const formattedCompressedReadings = _.mapValues(rawCompressedReadings, formatLineReadings);
+			//res.json(formattedCompressedReadings);
+			let toReturn=[];
+			for(let i=0;i<meterIDs.length;i++){
+				meterID=meterIDs[i];
+				const rawReadings= await Reading.getReadingsByMeterIDAndDateRange(meterID,timeInterval.startTimestamp,timeInterval.endTimestamp,conn)
+				console.log(typeof rawReadings)
+				toReturn.push(rawReadings);
+			}
+			//console.log(toReturn);
+			res.send(toReturn);		
+		} catch (err) {
+			log.error(`Error while performing GET readings for line with meters ${meterIDs} with time interval ${timeInterval}: ${err}`, err);
+			res.sendStatus(500);
+		}
+	}
+});
 
 /**
  * GET group readings by meter id for line chart

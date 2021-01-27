@@ -8,10 +8,13 @@ import * as moment from 'moment';
 import graphExport from '../utils/exportData';
 import { ExportDataSet } from '../types/readings';
 import { FormattedMessage } from 'react-intl';
+import { TimeInterval } from '../../../common/TimeInterval';
+import { metersApi } from '../utils/api'
 
 interface ExportProps {
 	selectedMeters: number[];
 	exportVals: { datasets: ExportDataSet[] };
+	timeInterval : TimeInterval;
 }
 
 export default function ExportComponent(props: ExportProps) {
@@ -50,10 +53,24 @@ export default function ExportComponent(props: ExportProps) {
 		const name = `oedExport_${chartName}_${startTimeString}_to_${endTimeString}.csv`;
 		graphExport(compressedData,	name);
 	};
+
+	const exportRAWReadings = async() => {
+		let timeInterval = props.timeInterval.toString();
+		let startTime = props.timeInterval.getStartTimestamp()
+		let endTime= props.timeInterval.getEndTimestamp();
+		console.log(timeInterval,startTime,endTime);
+		const lineReading=await metersApi.rawLineReadings(props.selectedMeters,props.timeInterval);
+		console.log('thaoneu',lineReading)		
+		// graphExport(, "testRAWw");
+	}
+
 	return (
 		<div>
 			<Button outline onClick={exportReading}>
 				<FormattedMessage id='export.graph.data' />
+			</Button>
+			<Button outline onClick={exportRAWReadings}>
+				<FormattedMessage id='export.raw.graph.data' />
 			</Button>
 		</div>
 	);
