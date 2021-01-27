@@ -5,6 +5,7 @@
 import * as React from 'react';
 import {CalibrationModeTypes, MapMetadata} from '../../types/redux/map';
 import {ChangeEvent} from "react";
+import {logToServer} from "../../actions/logs";
 
 /**
  * Accepts image file from user upload,
@@ -34,7 +35,7 @@ export default class MapCalibration_InitiateComponent extends React.Component<Ma
 		super(props);
 		this.state = {
 			filename: '',
-			mapName: '',
+			mapName: ''
 		};
 		this.fileInput = React.createRef();
 		this.handleInput = this.handleInput.bind(this);
@@ -47,8 +48,8 @@ export default class MapCalibration_InitiateComponent extends React.Component<Ma
 			<form onSubmit={this.confirmUpload}>
 				<label>
 					Upload map image to begin.
-					<br />
-					<input type="file" ref={this.fileInput} />
+					<br/>
+					<input type='file' ref={this.fileInput} />
 				</label>
 				<br />
 				<label>
@@ -57,7 +58,7 @@ export default class MapCalibration_InitiateComponent extends React.Component<Ma
 					<textarea id={'text'} cols={50} value={this.state.mapName} onChange={this.handleNameInput.bind(this)}/>
 				</label>
 				<br/>
-				<input type="submit" value="Save and continue" />
+				<input type='submit' value='Save and continue' />
 			</form>
 		);
 	}
@@ -79,11 +80,11 @@ export default class MapCalibration_InitiateComponent extends React.Component<Ma
 				...this.props.map,
 				name: this.state.mapName,
 				filename: this.fileInput.current.files[0].name,
-				image: image,
-			}
+				image: image
+			};
 			await this.props.onSourceChange(source);
 		} catch (err) {
-			console.log(err);
+			logToServer('error', `Error, map source image uploading: ${err}`);
 		}
 	}
 
@@ -96,13 +97,13 @@ export default class MapCalibration_InitiateComponent extends React.Component<Ma
 	private getDataURL(): Promise<string> {
 		return new Promise((resolve, reject) => {
 			const file = this.fileInput.current.files[0];
-			let fileReader = new FileReader();
+			const fileReader = new FileReader();
 			fileReader.onloadend = () => {
 				// @ts-ignore
 				resolve(fileReader.result);
-			}
+			};
 			fileReader.onerror = reject;
 			fileReader.readAsDataURL(file);
-		})
+		});
 	}
 }
