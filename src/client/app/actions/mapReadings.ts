@@ -2,8 +2,8 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
 
-import {Dispatch, GetState, Thunk} from "../types/redux/actions";
-import {TimeInterval} from "../../../common/TimeInterval";
+import {Dispatch, GetState, Thunk} from '../types/redux/actions';
+import {TimeInterval} from '../../../common/TimeInterval';
 import * as moment from 'moment';
 import {
 	receiveGroupBarReadings,
@@ -12,16 +12,15 @@ import {
 	requestMeterBarReadings,
 	shouldFetchGroupBarReadings,
 	shouldFetchMeterBarReadings
-} from "./barReadings";
-import {compressedReadingsApi} from "../utils/api";
+} from './barReadings';
+import {compressedReadingsApi} from '../utils/api';
 
 export function fetchNeededMapReadings(timeInterval: TimeInterval): Thunk {
 	return (dispatch: Dispatch, getState: GetState) => {
 		const state = getState();
 		const promises: Array<Promise<any>> = [];
-		const mapDuration = (timeInterval.equals(TimeInterval.unbounded()))? moment.duration(4, 'weeks')
+		const mapDuration = (timeInterval.equals(TimeInterval.unbounded())) ? moment.duration(4, 'weeks')
 			: moment.duration(timeInterval.duration('days'), 'days');
-		console.log(mapDuration);
 		// Determine which meters are missing data for this time interval
 		const meterIDsToFetchForMap = state.graph.selectedMeters.filter(
 			id => shouldFetchMeterBarReadings(state, id, timeInterval, mapDuration)
