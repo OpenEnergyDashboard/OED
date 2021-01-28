@@ -52,9 +52,9 @@ function loadFromCsvStream(stream, mapRowToModel, bulkInsertModels, conn) {
 				}
 			}
 		});
-		parser.on('error', err => {
+		parser.on('error', async err => {
 			if (!rejected) {
-				resolve(t.batch(pendingInserts).then(() => Promise.reject(err)));
+				resolve(await t.batch(pendingInserts));
 			}
 			rejected = true;
 		});
