@@ -23,15 +23,6 @@ export default class MetersDetailComponent extends React.Component<MetersDetailP
 	}
 
 	public render() {
-		const flexContainerStyle = {
-			display: 'flex',
-			flexFlow: 'row wrap'
-		};
-
-		const flexChildStyle = {
-			marginRight: '10px'
-		};
-
 		const titleStyle: React.CSSProperties = {
 			textAlign: 'center'
 		};

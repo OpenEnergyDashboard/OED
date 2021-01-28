@@ -14,15 +14,7 @@ import * as moment from 'moment';
 import { TimeInterval } from '../../../common/TimeInterval';
 
 import Button from 'reactstrap/lib/Button';
-import { FormEvent } from 'react';
 import { FormattedMessage } from 'react-intl';
-import { Dispatch, Thunk, ActionType } from '../types/redux/actions';
-
-import * as Plotly from 'plotly.js';
-// TODO lowercase plotly for the import in index.d.ts but uppercase here.
-
-
-
 interface DashboardProps {
 	chartToRender: ChartTypes;
 	optionsVisibility: boolean;

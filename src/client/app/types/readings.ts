@@ -3,7 +3,6 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
 
 import { ChartTypes } from './redux/graph';
-import { TimeInterval } from '../../../common/TimeInterval';
 
 /**
  * The type of line readings in actions.

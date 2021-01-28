@@ -247,12 +247,6 @@ class UIOptionsComponent extends React.Component<UIOptionsPropsWithIntl, UIOptio
 		this.props.changeBarStacking();
 	}
 
-	// This is an issue with typings for React.FormEvent<> and ChangeEvent<>
-	// The type of value is actually number
-	private handleSpanButton(value: any) {
-		this.props.changeDuration(moment.duration(value, 'days'));
-	}
-
 	private handleCompareButton(comparePeriod: ComparePeriod) {
 		this.props.changeCompareGraph(comparePeriod);
 	}
