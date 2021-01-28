@@ -19,7 +19,7 @@ import { FormattedMessage } from 'react-intl';
 import { Dispatch, Thunk, ActionType } from '../types/redux/actions';
 
 import * as Plotly from 'plotly.js';
-import TooltipMarker from './TooltipMarker';
+import TooltipMarkerComponent from './TooltipMarkerComponent';
 import ReactTooltip from 'react-tooltip';
 // TODO lowercase plotly for the import in index.d.ts but uppercase here.
 
@@ -103,7 +103,7 @@ export default class DashboardComponent extends React.Component<DashboardProps, 
 								onClick={() => this.handleTimeIntervalChange('all')}
 							> <FormattedMessage id='restore'/>
 							</Button>,
-							<TooltipMarker
+							<TooltipMarkerComponent
 								key={3}
 								page='home'
 								helpTextId='help.home.chart.redraw.restore'

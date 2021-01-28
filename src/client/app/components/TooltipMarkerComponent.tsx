@@ -11,7 +11,7 @@ interface TooltipMarker {
 /**
  * Component that renders a help icon that shows a tooltip on hover
  */
-export default function TooltipHelpComponentAlternative(props: TooltipMarker) {
+export default function TooltipMarkerComponent(props: TooltipMarker) {
 	return (
 		<i data-for={props.page} data-tip={props.helpTextId} className='fa fa-question-circle' />
 	);

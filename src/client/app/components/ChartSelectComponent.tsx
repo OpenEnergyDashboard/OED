@@ -10,7 +10,7 @@ import Button from 'reactstrap/lib/Button';
 import ButtonGroup from 'reactstrap/lib/ButtonGroup';
 import { FormEvent } from 'react';
 import { FormattedMessage } from 'react-intl';
-import TooltipMarker from './TooltipMarker';
+import TooltipMarkerComponent from './TooltipMarkerComponent';
 
 interface ChartSelectProps {
 	selectedChart: ChartTypes;
@@ -62,7 +62,7 @@ export default class ChartSelectComponent extends React.Component<ChartSelectPro
 					</Button>
 				</ButtonGroup>
 				<div>
-					<TooltipMarker page='home' helpTextId='help.home.chart.select'/>
+					<TooltipMarkerComponent page='home' helpTextId='help.home.chart.select'/>
 				</div>
 			</div>
 		);
