@@ -22,7 +22,7 @@ function mapStateToProps(state: State) {
 			const readingsData = byMeterID[timeInterval.toString()];
 			if (readingsData !== undefined && !readingsData.isFetching) {
 				const label = state.meters.byMeterID[meterID].name;
-				const colorID = state.meters.byMeterID[meterID].id;
+				const colorID = meterID;
 				if (readingsData.readings === undefined) {
 					throw new Error('Unacceptable condition: readingsData.readings is undefined.');
 				}
@@ -80,7 +80,7 @@ function mapStateToProps(state: State) {
 			const readingsData = byGroupID[timeInterval.toString()];
 			if (readingsData !== undefined && !readingsData.isFetching) {
 				const label = state.groups.byGroupID[groupID].name;
-				const colorID = state.groups.byGroupID[groupID].id;
+				const colorID = groupID;
 				if (readingsData.readings === undefined) {
 					throw new Error('Unacceptable condition: readingsData.readings is undefined.');
 				}
