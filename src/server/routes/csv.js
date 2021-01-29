@@ -21,6 +21,7 @@ const zlib = require('zlib');
 /** Middleware validation */
 const { validateMetersCsvUploadParams, validateReadingsCsvUploadParams } = require('../middleware/validateCsvUploadParams');
 const validatePassword = require('../middleware/validatePassword');
+const { CSVPipelineError } = require('../services/csvPipeline/CustomErrors');
 
 // The upload here ensures that the file is saved to server RAM rather than disk; TODO: Think about large uploads
 const upload = multer({
@@ -43,8 +44,8 @@ const upload = multer({
 }).single('csvfile');
 
 const router = express.Router();
-// Process form data with multer, if password check fails then the request ends with failure.
-router.use(function (req, res, next) {
+
+router.use(function (req, res, next) { // Process form data with multer, if password check fails then the request ends with failure.
 	upload(req, res, function (err) {
 		if (err) {
 			failure(req, res, err);
@@ -52,7 +53,17 @@ router.use(function (req, res, next) {
 		}
 		next();
 	})
-}, middleware.lowercaseAllParamNames);
+});
+
+router.use(function(req, res, next){ // This ensures that at least one csv file has been submitted.
+	if(!req.file){
+		failure(req, res, new CSVPipelineError('No csv file was uploaded. A csv file must be submitted via the csvfile parameter.'));
+	} else {
+		next();
+	}
+});
+
+router.use(middleware.lowercaseAllParamNames); // Lowercase all parameters.
 
 // TODO: we need to sanitize req query params, res
 // TODO: we need to create a condition set
