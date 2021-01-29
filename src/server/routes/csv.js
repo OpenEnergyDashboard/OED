@@ -59,6 +59,7 @@ router.use(function(req, res, next){ // This ensures that at least one csv file 
 	if(!req.file){
 		failure(req, res, new CSVPipelineError('No csv file was uploaded. A csv file must be submitted via the csvfile parameter.'));
 	} else {
+		// TODO: For now we assume canonical csv structure. In the future we will have to validate csv files via headers.
 		next();
 	}
 });

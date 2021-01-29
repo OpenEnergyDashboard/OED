@@ -96,9 +96,6 @@ const VALIDATION = {
 }
 
 function validateCommonUploadParams(req) {
-	if (!req.file) {
-		throw new CSVPipelineError('No csv file uploaded.');
-	}// TODO: For now we assume canonical csv structure. In the future we will have to validate csv files via headers.
 	const { headerrow: headerRow } = req.body; // extract query parameters
 
 	if (!headerRow) {
