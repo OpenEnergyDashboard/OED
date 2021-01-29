@@ -124,7 +124,7 @@ function validateReadingsCsvUploadParams(req, res, next) {
 			throw new CSVPipelineError(responseMessage);
 		}
 		const { createmeter: createMeter, cumulative, cumulativereset: cumulativeReset, duplications,
-			length, meter: meterName, timesort: timeSort, update } = req.body; // extract query parameters
+			length, timesort: timeSort, update } = req.body; // extract query parameters
 		if (!createMeter) {
 			req.body.createmeter = DEFAULTS.readings.createMeter;
 		} 
@@ -133,9 +133,6 @@ function validateReadingsCsvUploadParams(req, res, next) {
 		}
 		if (!duplications) {
 			req.body.duplications = DEFAULTS.readings.duplications;
-		}
-		if (!meterName) {
-			throw new CSVPipelineError(`Meter name must be provided as field meter.`);
 		}
 		if (!timeSort) {
 			req.body.timesort = DEFAULTS.readings.timeSort;
