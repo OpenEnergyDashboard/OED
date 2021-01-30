@@ -9,7 +9,6 @@ const promisify = require('es6-promisify');
 
 const parseCsv = promisify(csv.parse);
 
-const CSV_ROUTE = '/api/csv';
 const UPLOAD_METERS_ROUTE = '/api/csv/meters';
 const UPLOAD_READINGS_ROUTE = '/api/csv/readings';
 const readingsPath = './sampleReadings.csv.gz';
