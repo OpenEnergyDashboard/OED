@@ -31,7 +31,7 @@ class Param {
 		this.field = paramName;
 		this.description = description;
 		this.message = function (provided) {
-			return `Provided value ${this.field}=${provided} is invalid. ${this.description}\n`
+			return `Provided value ${this.field}=${provided} is invalid. ${this.description}`
 		}
 	}
 }
@@ -109,11 +109,11 @@ function validateRequestParams(body, schema) {
 	if (errors.length !== 0) {
 		errors.forEach(err => {
 			if (err.schema instanceof Param) {
-				responseMessage = responseMessage + err.schema.message(err.instance);
+				responseMessage = 'User Error: ' + responseMessage + err.schema.message(err.instance) + '\n';
 			} else if (err.name === 'required') {
-				responseMessage = responseMessage + `${err.argument} must be provided as the field ${err.argument}=.\n`;
+				responseMessage = 'User Error: ' + responseMessage + `${err.argument} must be provided as the field ${err.argument}=.\n`;
 			} else if (err.name === 'additionalProperties') {
-				responseMessage = responseMessage + err.argument + ' is an unexpected argument.\n';
+				responseMessage = 'User Error: ' + responseMessage + err.argument + ' is an unexpected argument.\n';
 			} else {
 				responseMessage = responseMessage + err.message;
 			}
