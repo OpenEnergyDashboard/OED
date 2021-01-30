@@ -1,3 +1,7 @@
+/* This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this
+ * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
+
 const { CSVPipelineError } = require('../csvPipeline/CustomErrors');
 const fs = require('fs').promises;
 const loadCsvInput = require('../pipeline-in-progress/loadCsvInput');
@@ -16,7 +20,8 @@ async function uploadReadings(req, res, filepath, conn) {
 	let meter = await Meter.getByName(meterName, conn)
 		.catch(err => {
 			if (createMeter !== 'true') {
-				throw new CSVPipelineError(`Internal OED error: Meter with name ${meterName} is not found. createMeter was not set to true.`, err.message);
+				throw new CSVPipelineError(`Internal OED error: Meter with name ${meterName} is not found. createMeter was not set to true.`,
+					err.message);
 			}
 		});
 	if (!meter) {
@@ -26,11 +31,12 @@ async function uploadReadings(req, res, filepath, conn) {
 				throw new CSVPipelineError('Internal OED error: Failed to insert meter into the database.', err.message);
 			});
 	}
-	const mapRowToModel = (row) => { return row; }; // stub func to satisfy param
-	await loadCsvInput(filepath, meter.id, mapRowToModel, false, areReadingsCumulative, cumulativeReset, readingRepetition, undefined, headerRow, conn); // load csv data
+	const mapRowToModel = row => { return row; }; // stub func to satisfy param
+	await loadCsvInput(filepath, meter.id, mapRowToModel, false, areReadingsCumulative,
+		cumulativeReset, readingRepetition, undefined, headerRow, conn); // load csv data
 	// TODO: If unsuccessful upload then an error will be thrown. We need to catch this error.
 	fs.unlink(filepath).catch(err => log.error(`Failed to remove the file ${filepath}.`, err));
-	success(req, res, `It looks like success.`); // TODO: We need a try catch for all these awaits.
+	success(req, res, 'It looks like success.'); // TODO: We need a try catch for all these awaits.
 	return;
 }
 

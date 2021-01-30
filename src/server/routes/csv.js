@@ -35,7 +35,7 @@ const upload = multer({
 			if (valid) {
 				cb(null, true);
 			} else {
-				cb(new Error("Submitted password is invalid."));
+				cb(new Error('Submitted password is invalid.'));
 			}
 		} catch (error) {
 			cb(error);

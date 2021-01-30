@@ -1,3 +1,7 @@
+/* This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this
+ * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
+
 const failure = require('../services/csvPipeline/failure');
 const validate = require('jsonschema').validate;
 
@@ -13,11 +17,11 @@ const DEFAULTS = {
 		cumulative: 'false',
 		cumulativeReset: 'false',
 		duplications: '1',
-		timeSort: 'increasing',
+		timeSort: 'increasing'
 	}
 }
 
-class PARAM {
+class Param {
 	/**
 	 * @param {string} paramName - The name of the parameter.
 	 * @param {string} description - The description of what the parameter needs to be.
@@ -31,7 +35,7 @@ class PARAM {
 	}
 }
 
-class ENUM_PARAM extends PARAM {
+class EnumParam extends Param {
 	/**
 	 * @param {string} paramName - The name of the parameter
 	 * @param {array} enums - The array of values to check against. enums.length must be greater or equal to one.
@@ -41,7 +45,7 @@ class ENUM_PARAM extends PARAM {
 		this.enum = enums;
 	}
 }
-class BOOLEAN_PARAM extends ENUM_PARAM {
+class BooleanParam extends EnumParam {
 	/**
 	 * @param {string} paramName - The name of the parameter.
 	 */
@@ -50,7 +54,7 @@ class BOOLEAN_PARAM extends ENUM_PARAM {
 	}
 }
 
-class STRING_PARAM extends PARAM {
+class StringParam extends Param {
 	/**
 	 * 
 	 * @param {string} paramName - The name of the parameter.
@@ -65,9 +69,9 @@ class STRING_PARAM extends PARAM {
 }
 
 const COMMON_PROPERTIES = {
-	headerrow: new BOOLEAN_PARAM('headerrow'),
-	password: new STRING_PARAM('password', undefined, undefined), // This is put here so it would not trigger the additionalProperties error.
-	update: new BOOLEAN_PARAM('update')
+	headerrow: new BooleanParam('headerrow'),
+	password: new StringParam('password', undefined, undefined), // This is put here so it would not trigger the additionalProperties error.
+	update: new BooleanParam('update')
 }
 
 const VALIDATION = {
@@ -83,12 +87,12 @@ const VALIDATION = {
 		required: ['meter'],
 		properties: {
 			...COMMON_PROPERTIES,
-			createmeter: new BOOLEAN_PARAM('createmeter'),
-			cumulative: new BOOLEAN_PARAM('cumulative'),
-			cumulativeReset: new BOOLEAN_PARAM('cumulativereset'),
-			duplications: new STRING_PARAM('duplications', '^\\d+$', 'duplications must be an integer.'),
-			meter: new STRING_PARAM('meter', undefined, undefined),
-			timesort: new ENUM_PARAM('timesort', ['increasing'])
+			createmeter: new BooleanParam('createmeter'),
+			cumulative: new BooleanParam('cumulative'),
+			cumulativeReset: new BooleanParam('cumulativereset'),
+			duplications: new StringParam('duplications', '^\\d+$', 'duplications must be an integer.'),
+			meter: new StringParam('meter', undefined, undefined),
+			timesort: new EnumParam('timesort', ['increasing'])
 		},
 		additionalProperties: false // This protects us from unintended parameters.
 	}
@@ -102,7 +106,7 @@ function validateRequestParams(body, schema) {
 	let responseMessage = '';
 	if (errors.length !== 0) {
 		errors.forEach(err => {
-			if (err.schema instanceof PARAM) {
+			if (err.schema instanceof Param) {
 				responseMessage = responseMessage + err.schema.message(err.instance);
 			} else if (err.name === 'required') {
 				responseMessage = responseMessage + `${err.argument} must be provided as the field ${err.argument}=.\n`;

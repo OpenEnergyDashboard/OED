@@ -1,3 +1,7 @@
+/* This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this
+ * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
+
 const { chai, mocha, expect, app, testDB, testUser } = require('../../common');
 const Meter = require('../../../models/Meter');
 const Reading = require('../../../models/Reading');
@@ -93,7 +97,6 @@ mocha.describe('csv API', () => {
 				.field('timesort', 'decreasing')
 				.attach('csvfile', readingsPath);
 			expect(res).to.have.status(400);
-			console.log(res.text);
 		});
 		mocha.it('should fail on request that updates data.', async () => {
 			const res = await chai.request(app).post(UPLOAD_READINGS_ROUTE) // make request to api to upload readings data for this meter
@@ -102,7 +105,6 @@ mocha.describe('csv API', () => {
 				.field('update', 'true')
 				.attach('csvfile', readingsPath);
 			expect(res).to.have.status(400);
-			console.log(res.text);
 		});
 		mocha.it('should fail on request that asks to disable create meter automatically.', async () => {
 			const res = await chai.request(app).post(UPLOAD_READINGS_ROUTE) // make request to api to upload readings data for this meter
@@ -111,7 +113,6 @@ mocha.describe('csv API', () => {
 				.field('createmeter', 'false')
 				.attach('csvfile', readingsPath);
 			expect(res).to.have.status(400);
-			console.log(res.text);
 		});
 		mocha.it('should fail on request that asks to invalid duplications.', async () => {
 			const res = await chai.request(app).post(UPLOAD_READINGS_ROUTE) // make request to api to upload readings data for this meter
@@ -120,7 +121,6 @@ mocha.describe('csv API', () => {
 				.field('duplications', 'INVALIDVALUE')
 				.attach('csvfile', readingsPath);
 			expect(res).to.have.status(400);
-			console.log(res.text);
 		});
 		mocha.it('should fail on request that asks to invalid cumulative value.', async () => {
 			const res = await chai.request(app).post(UPLOAD_READINGS_ROUTE) // make request to api to upload readings data for this meter
@@ -129,7 +129,6 @@ mocha.describe('csv API', () => {
 				.field('cumulative', 'INVALIDVALUE')
 				.attach('csvfile', readingsPath);
 			expect(res).to.have.status(400);
-			console.log(res.text);
 		});
 	});
 });
