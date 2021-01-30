@@ -7,6 +7,7 @@ const validate = require('jsonschema').validate;
 
 const DEFAULTS = {
 	common: {
+		gzip: 'true',
 		headerRow: 'false',
 		update: 'false'
 	},
@@ -69,6 +70,7 @@ class StringParam extends Param {
 }
 
 const COMMON_PROPERTIES = {
+	gzip: new BooleanParam('gzip'),
 	headerrow: new BooleanParam('headerrow'),
 	password: new StringParam('password', undefined, undefined), // This is put here so it would not trigger the additionalProperties error.
 	update: new BooleanParam('update')
@@ -133,8 +135,8 @@ function validateReadingsCsvUploadParams(req, res, next) {
 		failure(req, res, new Error(responseMessage));
 		return;
 	}
-	const { createmeter: createMeter, cumulative, cumulativereset: cumulativeReset, duplications,
-		length, headerrow: headerRow, timesort: timeSort, update } = req.body; // extract query parameters
+	const { createmeter: createMeter, cumulative, duplications,
+		gzip, headerrow: headerRow, timesort: timeSort, update } = req.body; // extract query parameters
 	if (!createMeter) {
 		req.body.createmeter = DEFAULTS.readings.createMeter;
 	}
@@ -143,6 +145,9 @@ function validateReadingsCsvUploadParams(req, res, next) {
 	}
 	if (!duplications) {
 		req.body.duplications = DEFAULTS.readings.duplications;
+	}
+	if (!gzip) {
+		req.body.gzip = DEFAULTS.common.gzip;
 	}
 	if (!headerRow) {
 		req.body.headerrow = DEFAULTS.common.headerRow;
@@ -162,7 +167,10 @@ function validateMetersCsvUploadParams(req, res, next) {
 		failure(req, res, new Error(responseMessage));
 		return;
 	}
-	const { headerrow: headerRow, update } = req.body; // extract query parameters
+	const { gzip, headerrow: headerRow, update } = req.body; // extract query parameters
+	if (!gzip) {
+		req.body.gzip = DEFAULTS.common.gzip;
+	}
 	if (!headerRow) {
 		req.body.headerrow = DEFAULTS.common.headerRow;
 	}

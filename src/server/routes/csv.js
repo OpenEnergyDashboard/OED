@@ -71,7 +71,7 @@ router.use(middleware.lowercaseAllParamNames); // Lowercase all parameters.
 
 router.post('/meters', validateMetersCsvUploadParams, async (req, res) => {
 	try {
-		const filepath = await saveCsv(zlib.gunzipSync(req.file.buffer), 'meters');
+		const filepath = await saveCsv(req.body.gzip ? zlib.gunzipSync(req.file.buffer) : req.file.buffer, 'meters');
 		log.info(`The file ${filepath} was created to upload meters csv data`);
 		const conn = getConnection();
 		await uploadMeters(req, res, filepath, conn);
