@@ -4,6 +4,7 @@
 
 const express = require('express');
 const Meter = require('../models/Meter');
+const User = require('../models/User');
 const { log } = require('../log');
 const validate = require('jsonschema').validate;
 const { getConnection } = require('../db');
@@ -38,12 +39,12 @@ function formatMeterForResponse(meter, loggedIn) {
 }
 
 /**
- * GET information on displayable meters (or all meters, if logged in)
+ * GET information on displayable meters (or all meters, if logged in as an admin.)
  */
 router.get('/', async (req, res) => {
 	const conn = getConnection();
 	let query;
-	if (req.hasValidAuthToken) {
+	if (req.hasValidAuthToken && req.decoded.role === User.role.ADMIN) {
 		query = Meter.getAll;
 	} else {
 		query = Meter.getDisplayable;
@@ -96,7 +97,18 @@ router.get('/:meter_id', async (req, res) => {
 
 router.use(requiredAuthenticator);
 
-router.post('/edit', async (req, res) => {
+// This middleware checks that the user is an admin before proceeding.
+function checkIsAdmin(req, res, next, action) {
+	if (req.decoded && req.decoded.role === User.role.ADMIN) {
+		next();
+	} else {
+		log.warn(`Got request to \'${action}\' meters with invalid credentials.`);
+		res.status(400)
+			.json({ message: `Invalid credentials supplied. Only admins can ${action}.` });
+	}
+}
+
+router.post('/edit', (req, res, next) => checkIsAdmin(req, res, next, 'edit meters'), async (req, res) => {
 	const validParams = {
 		type: 'object',
 		maxProperties: 3,
