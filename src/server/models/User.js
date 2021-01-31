@@ -37,7 +37,7 @@ class User {
 	 */
 	static async getByID(id, conn) {
 		const row = await conn.one(sqlFile('user/get_user_by_id.sql'), { id: id });
-		return new User(row.id, row.email, row.role);
+		return new User(row.id, row.email, undefined, row.role);
 	}
 
 	/**
