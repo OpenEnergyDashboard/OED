@@ -15,7 +15,7 @@ function expectMetersToBeEquivalent(expected, actual) {
 mocha.describe('Meters', () => {
 	mocha.it('can be saved and retrieved', async () => {
 		const conn = testDB.getConnection();
-		const meterPreInsert = new Meter(undefined, 'Meter', null, false, true, Meter.type.MAMAC, 'UTC', null);
+		const meterPreInsert = new Meter(undefined, 'Meter', null, false, true, Meter.type.MAMAC, 'UTC');
 		await meterPreInsert.insert(conn);
 		const meterPostInsertByName = await Meter.getByName(meterPreInsert.name, conn);
 		expectMetersToBeEquivalent(meterPreInsert, meterPostInsertByName);
@@ -25,7 +25,7 @@ mocha.describe('Meters', () => {
 
 	mocha.it('can be saved, edited, and retrieved', async () => {
 		const conn = testDB.getConnection();
-		const meterPreInsert = new Meter(undefined, 'Meter', null, false, true, Meter.type.MAMAC, 'UTC', null);
+		const meterPreInsert = new Meter(undefined, 'Meter', null, false, true, Meter.type.MAMAC, 'UTC');
 		await meterPreInsert.insert(conn);
 		const meterPostInsertByID = await Meter.getByID(meterPreInsert.id, conn);
 		expectMetersToBeEquivalent(meterPreInsert, meterPostInsertByID);
