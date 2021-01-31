@@ -35,7 +35,7 @@ authMiddleware = (req, res, next) => {
 };
 
 // Returns middleware that only proceeds if an Admin is the requestor of an action.
-// Action is a string that is a verb that is can be prefixed by to for the proper response and warning messages.
+// Action is a string that is a verb that can be prefixed by to for the proper response and warning messages.
 adminAuthMiddleware = (action) => {
 	return function (req, res, next) {
 		this.authMiddleware(req, res, () => {
