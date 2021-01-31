@@ -59,7 +59,7 @@ class User {
 	 */
 	static async getAll(conn) {
 		const rows = await conn.any(sqlFile('user/get_all_users.sql'));
-		return rows.map(row => new User(row.id, row.email, row.role));
+		return rows.map(row => new User(row.id, row.email, undefined, row.role));
 	}
 
 	/**
