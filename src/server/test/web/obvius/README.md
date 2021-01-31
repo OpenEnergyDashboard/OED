@@ -6,6 +6,7 @@ For instance:
 
 ```bash
 curl localhost:3000/api/obvius -X POST \
+	-F 'email=obvius@example.com' \
 	-F 'password=password' \
 	-F 'mode=LOGFILEUPLOAD' \
 	-F 'serialnumber=mb-001' \
