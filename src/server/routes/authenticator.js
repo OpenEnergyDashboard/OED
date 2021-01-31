@@ -4,6 +4,8 @@
 
 const jwt = require('jsonwebtoken');
 const secretToken = require('../config').secretToken;
+const User = require('../models/User');
+const { log } = require('../log');
 const validate = require('jsonschema').validate;
 
 /**
@@ -31,6 +33,22 @@ authMiddleware = (req, res, next) => {
 		res.status(403).send({ success: false, message: 'No token provided.' });
 	}
 };
+
+// Returns middleware that only proceeds if an Admin is the requestor of an action.
+// Action is a string that is a verb that is can be prefixed by to for the proper response and warning messages.
+adminAuthMiddleware = (action) => {
+	return function (req, res, next) {
+		this.authMiddleware(req, res, () => {
+			if (req.decoded && req.decoded.role === User.role.ADMIN) {
+				next();
+			} else {
+				log.warn(`Got request to \'${action}\' with invalid credentials. Admin role is required to \'${action}\'.`);
+				res.status(400)
+					.json({ message: `Invalid credentials supplied. Only admins can ${action}.` });
+			}
+		})
+	}
+}
 
 /**
  * Middleware function to force a route to provide optional authentication
@@ -65,6 +83,7 @@ optionalAuthMiddleware = (req, res, next) => {
 };
 
 module.exports = {
+	adminAuthMiddleware,
 	authMiddleware,
 	optionalAuthMiddleware
 };
