@@ -44,8 +44,12 @@ router.post('/', async (req, res) => {
 			const user = await User.getByEmail(req.body.email, conn);
 			const isValid = await bcrypt.compare(req.body.password, user.passwordHash);
 			if (isValid) {
+				let users;
+				if(user.role === User.role.ADMIN){
+					users = await User.getAll(conn);
+				}
 				const token = jwt.sign({ data: user.id }, secretToken, { expiresIn: 86400 });
-				res.json({ token: token });
+				res.json({ token: token, users: users, role: user.role });
 			} else {
 				throw new Error('Unauthorized password');
 			}
