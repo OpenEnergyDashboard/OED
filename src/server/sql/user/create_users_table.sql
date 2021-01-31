@@ -6,5 +6,5 @@ CREATE TABLE IF NOT EXISTS users(
   id SERIAL PRIMARY KEY NOT NULL,
   email VARCHAR(254) UNIQUE,
   password_hash CHAR(60) NOT NULL,
-  role integer NOT NULL
+  role ENUM(0, 1, 2) NOT NULL
 )

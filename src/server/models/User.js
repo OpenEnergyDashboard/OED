@@ -11,11 +11,13 @@ class User {
 	 * @param id This users's ID. Should be undefined if the user is being newly created
 	 * @param email This user's email
 	 * @param passwordHash The user's passwordHash
+	 * @param role The user's role
 	 */
-	constructor(id, email, passwordHash) {
+	constructor(id, email, passwordHash, role) {
 		this.id = id;
 		this.email = email;
 		this.passwordHash = passwordHash;
+		this.role = role;
 	}
 
 	/**
@@ -84,5 +86,13 @@ class User {
 		return await conn.none(sqlFile('user/insert_new_user.sql'), user);
 	}
 }
+
+const role = {
+	ADMIN: 0,
+	CSV: 1,
+	OBVIUS: 2
+}
+
+User.role = Object.freeze(role);
 
 module.exports = User;
