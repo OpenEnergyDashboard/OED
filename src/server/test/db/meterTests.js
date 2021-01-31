@@ -32,7 +32,7 @@ mocha.describe('Meters', () => {
 
 		meterPreInsert.name = 'Something Else';
 		meterPreInsert.enabled = true;
-        meterPreInsert.meterTimezone = 'GMT';
+		meterPreInsert.meterTimezone = 'GMT';
 		await meterPreInsert.update(conn);
 		const meterPostUpdate = await Meter.getByID(meterPreInsert.id, conn);
 		expectMetersToBeEquivalent(meterPreInsert, meterPostUpdate);
