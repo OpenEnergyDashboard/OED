@@ -11,6 +11,7 @@ const { getConnection, dropConnection } = require('../../db');
 (async () => {
 	let email;
 	let password;
+	let role;
 	try {
 		email = await ask('Email of user to modify: ');
 	} catch (err) {
@@ -20,6 +21,12 @@ const { getConnection, dropConnection } = require('../../db');
 
 	if (password.length < 8) {
 		terminateReadline('Password must be at least eight characters, user\'s password not modified');
+	}
+
+	role = await ask('Role: '); // untested
+	role = role.toUpperCase();
+	if(User.role[role] === undefined){
+		terminateReadline('Role must be one of Admin, CSV, Obvius. user\'s role not modified');
 	}
 
 	const conn = getConnection();
