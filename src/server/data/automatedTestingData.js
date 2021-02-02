@@ -109,7 +109,7 @@ async function generateOneMinuteTestingData() {
         timeStep: { minute: 1 }, // Data point intervals set to 1 minute.
         periodLength: { month: 1.5 },
         maxAmplitude: 3,
-        filename: `${__dirname}/../test/db/data/automatedTests/twentyThreeMinuteFreqTestData.csv` // Data saved in 'oneMinuteFreqTestData.csv' file.
+        filename: `${__dirname}/../test/db/data/automatedTests/oneMinuteFreqTestData.csv` // Data saved in 'oneMinuteFreqTestData.csv' file.
     }
     await generateSine(startDate, endDate, options);
 }

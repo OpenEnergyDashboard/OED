@@ -142,7 +142,7 @@ function momenting(arrayOfMoments, periodLength) {
  * @param {moment.MomentInputObject} options.periodLength - The length of the period of the generated sine wave.
  * @param {number} options.maxAmplitude - The max height of the generated sine wave.
  * @param {number} options.phaseShift - The amount to phase shift the generated sine wave.
- * @returns {[string, string][]} Matrix of rows representing each csv row of the form timeStamp, value
+ * @returns {[string, string][]} Matrix of rows representing each csv row of the form value, startTimeStamp, endTimeStamp.
  */
 function generateSineData(startTimeStamp, endTimeStamp, options = {}) {
 	// function generateSineData(startTimeStamp: string, endTimeStamp: string, options: GenerateSinusoidalDataOptions={}): Array<[string, string]> {
@@ -153,8 +153,11 @@ function generateSineData(startTimeStamp, endTimeStamp, options = {}) {
 		maxAmplitude: options.maxAmplitude || 2,
 		phaseShift: options.phaseShift || 0
 	};
-	const dates = generateDates(startTimeStamp, endTimeStamp, chosenOptions.timeStep);
-	const datesAsMoments = dates.map(date => moment(date));
+	const startDates = generateDates(startTimeStamp, endTimeStamp, chosenOptions.timeStep);
+	// We create another equally-sized array of timestamps with values that are each shifted 
+	// forward from the corresponding timestamp in the startDates array by the time step.
+	const endDates = startDates.map(date => moment(date).add(options.timeStep).format('YYYY-MM-DD HH:mm:ss'));
+	const datesAsMoments = startDates.map(date => moment(date));
 	const halfMaxAmplitude = chosenOptions.maxAmplitude / 2;
 	// We take our array of moment percentages and scale it with the half max amplitude
 	// and shift it up by that amount.
@@ -164,12 +167,12 @@ function generateSineData(startTimeStamp, endTimeStamp, options = {}) {
 			const scaledResult = halfMaxAmplitude * result + halfMaxAmplitude;
 			return `${scaledResult}`;
 		});
-	return (_.zip(dates, sineValues));
+	return (_.zip(sineValues, startDates, endDates));
 }
 
 /**
- * Write csv data into a csv file
- * @param {[string, string][]]} data - A matrix with two columns of strings
+ * Write csv data and header into a csv file
+ * @param {[string, string, string][]]} data - A matrix with three columns of strings
  * @param {string?} filename - The name of the file.
  * @sources:
  * https://csv.js.org/stringify/api/
@@ -178,10 +181,13 @@ function generateSineData(startTimeStamp, endTimeStamp, options = {}) {
 async function writeToCsv(data, filename = 'test.csv') {
 	// async function writeToCsv(data: Array<[string, string]>, filename = 'test.csv') {
 	try {
+		header = 'reading,start_timestamp,end_timestamp' + '\r\n';
+		await fs.writeFile(filename, header) // insert header into file
+			.catch(reason => log.error(`Failed to write the header to file: ${filename}`, reason));
 		const output = await stringifyCSV(data); // generate csv data
-		await fs.writeFile(filename, output)
+		await fs.appendFile(filename, output) // insert csv data into file
 			.then(() => log.info(`The file ${filename} was saved for generating test data.`)) // log success
-			.catch(reason => log.error(`Failed to write the file: ${filename}`, reason)); // write data file
+			.catch(reason => log.error(`Failed to write the file: ${filename}`, reason));
 	} catch (error) {
 		log.error(`Failed to csv-stringify the contents of data: ${JSON.stringify(data)}`, error); // log failure
 	}
