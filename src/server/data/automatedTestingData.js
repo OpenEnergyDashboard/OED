@@ -11,26 +11,47 @@
 const promisify = require('es6-promisify');
 const csv = require('csv');
 const parseCsv = promisify(csv.parse);
-const { generateSine } = require('../data/generateTestingData');
+const { generateSine, generateCosine } = require('../data/generateTestingData');
 
 
 
 /**
- * Generates sinusoidal automated testing data with a variable-length amplitude over a two year period (from 2020 to 2021) and then saves the data in
- * the file '${amplitude}AmpTestData.csv' under '../test/db/data/automatedTests/'.
- * @param {number} amplitude - the desired amplitude of the sinusoidal test data.
+ * Generates sinusoidal automated testing data with a variable-length amplitude over a two year period (2020 to 2021, inclusive) and
+ * then saves the data in an appropriately-named file under '../test/db/data/automatedTests/'.
+ * @param {number} [frequency=15] - desired frequency of the sinusoidal test data in minutes.
+ * @param {number} amplitude - desired amplitude of the sinusoidal test data.
  */
-async function generateVariableAmpTestingData(amplitude) {
+async function generateVariableSineTestingData(frequency = 15, amplitude) {
 	const startDate = '2020-01-01 00:00:00';
 	const endDate = '2021-12-31 23:59:59';
 	const options = {
-		timeStep: { minute: 15 }, // Data point intervals set to 15 minutes.
-		periodLength: { month: 1.5 }, // Wave period set to 1.5 months (See line 41).
+		timeStep: { minute: frequency },
+		periodLength: { month: 1.5 }, // Wave period set to 1.5 months (See explanation below).
 		maxAmplitude: amplitude,
-		filename: `${__dirname}/../test/db/data/automatedTests/${amplitude}AmpTestData.csv`
+		filename: `${__dirname}/../test/db/data/automatedTests/${amplitude}Amp_${frequency}MinFreq_TestData.csv`
 	}
 	await generateSine(startDate, endDate, options);
 }
+
+
+/**
+ * Generates automated testing data as a series of cosine waves, as specified by frequency and amplitude parameters, over a two year period
+ * (2020 to 2021, inclusive) and then saves the data in an appropriately-named file under '../test/db/data/automatedTests/'.
+ * @param {number} [frequency=15] - desired frequency of the cosinusoidal test data, in minutes.
+ * @param {number} amplitude - desired frequency of the cosinusoidal test data.
+ */
+async function generateVariableCosineTestingData(frequency = 15, amplitude) {
+	const startDate = '2020-01-01 00:00:00';
+	const endDate = '2021-12-31 23:59:59';
+	const options = {
+		timeStep: { minute: frequency },
+		periodLength: { month: 1.5 }, // Wave period set to 1.5 months (See explanation below).
+		maxAmplitude: amplitude,
+		filename: `${__dirname}/../test/db/data/automatedTests/${amplitude}Amp_${frequency}MinFreq_TestData.csv`
+	}
+	await generateCosine(startDate, endDate, options);
+}
+
 
 
 /**
@@ -117,7 +138,7 @@ async function generateOneMinuteTestingData() {
 
 
 module.exports = {
-	generateVariableAmpTestingData,
+	generateVariableSineTestingData,
 	generateFourDayTestingData,
 	generateFourHourTestingData,
 	generateTwentyThreeMinuteTestingData,
