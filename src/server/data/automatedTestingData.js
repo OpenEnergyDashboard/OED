@@ -8,10 +8,10 @@
  */
 
 
+const parseCsv = promisify(csv.parse);
 const promisify = require('es6-promisify');
 const csv = require('csv');
-const parseCsv = promisify(csv.parse);
-const { generateSine, generateCosine } = require('../data/generateTestingData');
+const { generateSine, generateCosine } = require('./testingDataFunctions');
 
 
 
@@ -62,7 +62,7 @@ async function generateVariableCosineTestingData(frequency = 15, amplitude) {
  *  - periodLength (the period of the cycles) is set to 1.5 months so that over 12 months, the data consists of 12 / 1.5 = 8 sinusoidal cycles.
  *  - maxAmplitude (the amplitude of the cycles) is set to 3 so that the vertical oscillation of the data is easily visible when graphed.
  * 
- * Please see the documentation for 'generateSine' under 'generateTestingData.js' for more details.
+ * Please see the documentation for 'generateSine' under 'testingDataFunctions.js' for more details.
  */
 
 
@@ -139,6 +139,7 @@ async function generateOneMinuteTestingData() {
 
 module.exports = {
 	generateVariableSineTestingData,
+	generateVariableCosineTestingData,
 	generateFourDayTestingData,
 	generateFourHourTestingData,
 	generateTwentyThreeMinuteTestingData,
