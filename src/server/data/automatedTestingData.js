@@ -8,9 +8,9 @@
  */
 
 
-const parseCsv = promisify(csv.parse);
 const promisify = require('es6-promisify');
 const csv = require('csv');
+const parseCsv = promisify(csv.parse);
 const { generateSine, generateCosine } = require('./testingDataFunctions');
 
 
