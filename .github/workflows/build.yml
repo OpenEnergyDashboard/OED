@@ -34,18 +34,16 @@ jobs:
           - 5432:5432
 
     steps:
-      # see: https://github.com/actions/checkout/issues/335
-      - name: upgrade git
-        run: |
-          apt-get update && apt-get upgrade -y \
-          && apt-get install -y software-properties-common \
-          apt-get update && apt-get upgrade -y \
-          && add-apt-repository -y ppa:git-core/ppa \
-          apt-get update && apt-get upgrade -y \
-          && apt-get install -y git
+      # Checkout actions just downloads code, does not git init
+      # Find more info on the bug here - https://github.com/actions/checkout/issues/126
+      - uses: actions/checkout@v2
 
-      - name: Check out repository code
-        uses: actions/checkout@v2
+      # Sets up the git repo so that scripts that depend on it will run
+      - name: git init
+        run: |
+          git init
+          git remote add origin https://github.com/OpenEnergyDashboard/OED
+          git add .
 
       - name: Install dependencies
         run: npm ci
