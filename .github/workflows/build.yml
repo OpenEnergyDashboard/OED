@@ -37,11 +37,11 @@ jobs:
       # see: https://github.com/actions/checkout/issues/335
       - name: upgrade git
         run: |
-          apt-get update && apt-get upgrade \
+          apt-get update && apt-get upgrade -y \
           && apt-get install -y software-properties-common \
-          apt-get update && apt-get upgrade \
+          apt-get update && apt-get upgrade -y \
           && add-apt-repository -y ppa:git-core/ppa \
-          apt-get update && apt-get upgrade \
+          apt-get update && apt-get upgrade -y \
           && apt-get install -y git
 
       - name: Check out repository code
