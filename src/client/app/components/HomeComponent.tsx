@@ -6,7 +6,7 @@ import * as React from 'react';
 import HeaderContainer from '../containers/HeaderContainer';
 import DashboardContainer from '../containers/DashboardContainer';
 import FooterComponent from '../components/FooterComponent';
-import TooltipHelpComponentAlternative from '../components/TooltipHelpComponentAlternative';
+import TooltipHelpComponent from '../components/TooltipHelpComponentAlternative';
 
 /**
  * Top-level React component that controls the home page
@@ -15,7 +15,7 @@ import TooltipHelpComponentAlternative from '../components/TooltipHelpComponentA
 export default function HomeComponent() {
 	return (
 		<div>
-			<TooltipHelpComponentAlternative page='home'/>
+			<TooltipHelpComponent page='home'/>
 			<HeaderContainer />
 			<DashboardContainer />
 			<FooterComponent />
