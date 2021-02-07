@@ -6,7 +6,7 @@
 
 import ApiBackend from './ApiBackend';
 import { NamedIDItem } from '../../types/items';
-import { BarReadings, CompareReadings, LineReadings } from '../../types/readings';
+import { BarReadings, CompareReadings, LineReadings, RawReadings } from '../../types/readings';
 import { TimeInterval } from '../../../../common/TimeInterval';
 import { MeterMetadata, MeterEditData } from '../../types/redux/meters';
 import * as moment from 'moment';
@@ -37,9 +37,9 @@ export default class MetersApi {
 		);
 	}
 
-	public async rawLineReadings(meterIDs: number[], timeInterval: TimeInterval): Promise<LineReadings> {
+	public async rawLineReadings(meterIDs: number[], timeInterval: TimeInterval): Promise<RawReadings[]> {
 		const stringifiedIDs = meterIDs.join(',');
-		return await this.backend.doGetRequest<LineReadings>(
+		return await this.backend.doGetRequest<RawReadings[]>(
 			`/api/readings/line/raw/meters/${stringifiedIDs}`,
 			{ timeInterval: timeInterval.toString() }
 		);

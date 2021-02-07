@@ -5,6 +5,7 @@
 const express = require('express');
 const _ = require('lodash');
 const moment = require('moment');
+const Meter = require('../models/Meter');
 const Reading = require('../models/Reading');
 const TimeInterval = require('../../common/TimeInterval').TimeInterval;
 const { log } = require('../log');
@@ -135,8 +136,14 @@ router.get('/line/raw/meters/:meter_ids', async (req, res) => {
 			for(let i=0;i<meterIDs.length;i++){
 				meterID=meterIDs[i];
 				const rawReadings= await Reading.getReadingsByMeterIDAndDateRange(meterID,timeInterval.startTimestamp,timeInterval.endTimestamp,conn)
+				const meterLabel=(await Meter.getByID(meterID,conn)).name;
 				console.log(typeof rawReadings)
-				toReturn.push(rawReadings);
+				rawReadings.map((ele)=>{
+					delete ele.meterID;
+					ele['label']=meterLabel;
+					delete ele.endTimestamp;
+					toReturn.push(ele);
+				})
 			}
 			res.send(toReturn);		
 		} catch (err) {
