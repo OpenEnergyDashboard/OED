@@ -87,12 +87,12 @@ class User {
 	}
 }
 
-const role = {
+const _role = {
 	ADMIN: 0,
 	CSV: 1,
 	OBVIUS: 2
 }
 
-User.role = Object.freeze(role);
+User.role = Object.freeze(_role);
 
 module.exports = User;
