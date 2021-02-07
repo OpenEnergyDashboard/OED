@@ -31,7 +31,7 @@ function FileUploaderComponent(props: FileUploader) {
 			<Input innerRef={props.reference} type='file' name='csvfile' id='fileUploader' required={props.required} />
 			<FormText color='muted'>
 				Upload your CSV file here.
-        	</FormText>
+			</FormText>
 		</FormGroup>
 	)
 
@@ -45,14 +45,14 @@ export class ReadingsCSVUploadComponent extends React.Component<ReadingsCSVUploa
 		this.fileInput = React.createRef();
 	}
 
-	private handleSubmit = async (e) => {
+	private handleSubmit = async e => {
 		try {
 			e.preventDefault();
 			await this.props.submitCSV(this.fileInput.current.files[0]); // Not sure how to respond to this typescript error.
 			// Respond to success.
 		} catch (error) {
 			// A failed axios request should result in an error.
-			console.log(error);
+			// console.log(error);
 		}
 	}
 
@@ -87,7 +87,7 @@ export class ReadingsCSVUploadComponent extends React.Component<ReadingsCSVUploa
 					<Label for='duplications'> Duplications </Label>
 					<Input value={this.props.duplications} type='select' name='duplications' id='duplications' onChange={({ target }) => this.props.selectDuplications(target.value)} >
 						{range(1, 10).map(number => (
-							<option value={`${number}`}> {number} </option>
+							<option key={number} value={`${number}`}> {number} </option>
 						))}
 					</Input>
 				</FormGroup>
@@ -144,7 +144,6 @@ export class MetersCSVUploadComponent extends React.Component<MetersCSVUploadPro
 				<FileUploaderComponent required reference={this.fileInput} />
 				</FormGroup>
 				<SubmitButton />
-				{console.log(-1)}
 			</Form>
 		)
 	}

@@ -176,14 +176,14 @@ export default class UploadCSVContainer extends React.Component<{}, UploadCSVCon
 							onClick={() => { this.toggleTab(mode.readings); }}
 						>
 							Readings
-          				</NavLink>
+		  				</NavLink>
 					</NavItem>
 					<NavItem>
 						<NavLink
 							onClick={() => { this.toggleTab(mode.meters); }}
 						>
 							Meters
-         				</NavLink>
+		 				</NavLink>
 					</NavItem>
 				</Nav>
 				<TabContent activeTab={this.state.activeTab}>
