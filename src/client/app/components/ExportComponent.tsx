@@ -61,10 +61,10 @@ export default function ExportComponent(props: ExportProps) {
 		let endTime= props.timeInterval.getEndTimestamp();
 		console.log(timeInterval,startTime,endTime);
 		const lineReading=await metersApi.rawLineReadings(props.selectedMeters,props.timeInterval);
-		const count=await metersApi.lineReadingsCount(props.selectedMeters)
+		const count=await metersApi.lineReadingsCount(props.selectedMeters,props.timeInterval);
 		console.log(count);
 		console.log('new');
-		//console.log('thaoneu',lineReading)		
+		console.log('thaoneu',lineReading)		
 		// graphExport(, "testRAWw");
 	}
 

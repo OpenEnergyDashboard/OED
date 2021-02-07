@@ -70,7 +70,7 @@ class Meter {
 	}
 
 	static mapRow(row) {
-		return new Meter(row.id, row.name, row.ipaddress, row.enabled, row.displayable, row.meter_type, row.default_timezone_meter, row.identifier);
+		return new Meter(row.id, row.name, row.ipaddress, row.enabled, row.displayable, row.meter_type, row.default_timezone_meter);
 	}
 
 	/**

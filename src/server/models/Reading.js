@@ -153,9 +153,13 @@ class Reading {
 	 * @param meterID 
 	 * @param conn 
 	 */
-	static async getAllLineCountByMeterID(meterID,conn){
-		const count=await conn.any(sqlFile('reading/get_reading_count_by_meter_id.sql'), { meterID: meterID })
-		return count
+	static async getCountByMeterIDAndDateRange(meterID,startDate,endDate,conn){
+		const row=await conn.any(sqlFile('reading/get_count_by_meter_id_and_date_range.sql'), {
+			meterID: meterID,
+			startDate: startDate,
+			endDate: endDate
+		});
+		return parseInt(row[0].count);
 	}
 
 	/**

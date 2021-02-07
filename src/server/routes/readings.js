@@ -83,18 +83,31 @@ router.get('/line/count/meters/:meter_ids', async(req,res)=>{
 			}
 		}
 	};
-	if(!validate(req.params, validParams).valid){
+	const validQueries = {
+		type: 'object',
+		maxProperties: 1,
+		required: ['timeInterval'],
+		properties: {
+			timeInterval: {
+				type: 'string'
+			}
+		}
+	};
+	if (!validate(req.params, validParams).valid || !validate(req.query, validQueries).valid) {
 		res.sendStatus(400);
 	} else {
 		const conn=getConnection();
-		const meterIDs = req.params.meter_ids.split(',').map(s => parseInt(s));
+		const meterIDs = req.params.meter_ids.split(',').map(s => parseInt(s)); 
+		const timeInterval = TimeInterval.fromString(req.query.timeInterval);
 		try{
 			let count=0;
 			for(var i=0; i<meterIDs.length;i++){
-				const curr=await Reading.getAllLineCountByMeterID(meterIDs[i],conn);
+				console.log('tha');
+				const curr=await Reading.getCountByMeterIDAndDateRange(meterIDs[i],timeInterval.startTimestamp,timeInterval.endTimestamp,conn);
+				console.log(curr);
 				count+=curr
 			}
-			res.send(count);
+			res.send(JSON.stringify(count));
 		} catch (err) {
 			log.error(`Error while performing GET readings COUNT for line with meters ${meterIDs} with time interval ${timeInterval}: ${err}`, err);
 			res.sendStatus(500);
@@ -130,7 +143,6 @@ router.get('/line/raw/meters/:meter_ids', async (req, res) => {
 		// We can't do .map(parseInt) here because map would give parseInt a radix value of the current array position.
 		const meterIDs = req.params.meter_ids.split(',').map(s => parseInt(s));
 		const timeInterval = TimeInterval.fromString(req.query.timeInterval);
-		console.log(timeInterval.startTimestamp,timeInterval.endTimestamp);
 		try {
 			let toReturn=[];
 			for(let i=0;i<meterIDs.length;i++){

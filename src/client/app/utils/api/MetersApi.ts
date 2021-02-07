@@ -22,10 +22,11 @@ export default class MetersApi {
 		return await this.backend.doGetRequest<NamedIDItem[]>('/api/meters');
 	}
 
-	public async lineReadingsCount(meterIDs:number[]):Promise<number> {
+	public async lineReadingsCount(meterIDs:number[], timeInterval: TimeInterval):Promise<number> {
 		const stringifiedIDs = meterIDs.join(',');
 		return await this.backend.doGetRequest<number>(
-			`/api/readings/line/count/meters/${stringifiedIDs}`
+			`/api/readings/line/count/meters/${stringifiedIDs}`,
+			{ timeInterval: timeInterval.toString() }
 		);
 	}
 
