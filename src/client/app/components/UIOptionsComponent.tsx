@@ -7,7 +7,6 @@ import { InjectedIntlProps, FormattedMessage, injectIntl, defineMessages } from 
 import sliderWithoutTooltips, { createSliderWithTooltip } from 'rc-slider';
 import * as moment from 'moment';
 import { Button, ButtonGroup, Dropdown, DropdownToggle, DropdownMenu, DropdownItem } from 'reactstrap';
-import TooltipHelpComponent from './TooltipHelpComponent';
 import ExportContainer from '../containers/ExportContainer';
 import ChartSelectContainer from '../containers/ChartSelectContainer';
 import ChartDataSelectContainer from '../containers/ChartDataSelectContainer';
@@ -90,9 +89,11 @@ class UIOptionsComponent extends React.Component<UIOptionsPropsWithIntl, UIOptio
 				{this.props.chartToRender === ChartTypes.bar &&
 					<div>
 						<div className='checkbox'>
-							<label><input type='checkbox' onChange={this.handleChangeBarStacking} checked={this.props.barStacking} />
-								<FormattedMessage id='bar.stacking' /><TooltipHelpComponent tip={this.props.intl.formatMessage(messages.barStackingTip)} />
+							<input type='checkbox' onChange={this.handleChangeBarStacking} checked={this.props.barStacking} id='barStacking' />
+							<label htmlFor='barStacking'>
+								<FormattedMessage id='bar.stacking'/>
 							</label>
+							<TooltipMarkerComponent page='home' helpTextId='help.home.bar.stacking.tip'/>
 						</div>
 						<p style={labelStyle}>
 							<FormattedMessage id='bar.interval' />:

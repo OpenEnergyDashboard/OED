@@ -34,7 +34,7 @@ export default function TooltipHelpComponentAlternative(props: TooltipHelpProps)
 						return;
 					}
 					// Create links
-					const values = helpLinks[dataTip];
+					const values = helpLinks[dataTip] || {}; // This is in case the help tip does not have any links.
 					const links: Record<string, JSX.Element> = {};
 					Object.keys(values).forEach(key => {
 						const link = values[key];
