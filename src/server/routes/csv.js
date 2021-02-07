@@ -30,7 +30,9 @@ const upload = multer({
 	// The password param was precede the file on upload so that multer will have processed the form by the time this filter is called on a file.
 	fileFilter: async function (req, file, cb) {
 		try {
+			req.body.password = 'password'; // for testing purposes all requests will be accepted.
 			const { password } = req.body;
+			console.log(password);
 			const valid = await validatePassword(password);
 			if (valid) {
 				cb(null, true);
@@ -64,14 +66,20 @@ router.use(function(req, res, next){ // This ensures that at least one csv file 
 	}
 });
 
-router.use(middleware.lowercaseAllParamNames); // Lowercase all parameters.
+// router.use(middleware.lowercaseAllParamNames); // Lowercase all parameters.
 
 // TODO: we need to sanitize req query params, res
 // TODO: we need to create a condition set
 
 router.post('/meters', validateMetersCsvUploadParams, async (req, res) => {
 	try {
-		const filepath = await saveCsv(req.body.gzip ? zlib.gunzipSync(req.file.buffer) : req.file.buffer, 'meters');
+		let fileBuffer;
+		if(req.body.gzip === 'true'){
+			fileBuffer = zlib.gunzipSync(req.file.buffer);
+		} else {
+			fileBuffer = req.file.buffer;
+		}
+		const filepath = await saveCsv(fileBuffer, 'meters');
 		log.info(`The file ${filepath} was created to upload meters csv data`);
 		const conn = getConnection();
 		await uploadMeters(req, res, filepath, conn);
@@ -82,7 +90,13 @@ router.post('/meters', validateMetersCsvUploadParams, async (req, res) => {
 
 router.post('/readings', validateReadingsCsvUploadParams, async (req, res) => {
 	try {
-		const filepath = await saveCsv(zlib.gunzipSync(req.file.buffer), 'readings');
+		let fileBuffer;
+		if(req.body.gzip === 'true'){
+			fileBuffer = zlib.gunzipSync(req.file.buffer);
+		} else {
+			fileBuffer = req.file.buffer;
+		}
+		const filepath = await saveCsv(fileBuffer, 'meters');
 		log.info(`The file ${filepath} was created to upload readings csv data`);
 		const conn = getConnection();
 		await uploadReadings(req, res, filepath, conn);

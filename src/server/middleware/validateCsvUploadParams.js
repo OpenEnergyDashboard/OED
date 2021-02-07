@@ -71,7 +71,7 @@ class StringParam extends Param {
 
 const COMMON_PROPERTIES = {
 	gzip: new BooleanParam('gzip'),
-	headerrow: new BooleanParam('headerrow'),
+	headerRow: new BooleanParam('headerRow'),
 	password: new StringParam('password', undefined, undefined), // This is put here so it would not trigger the additionalProperties error.
 	update: new BooleanParam('update')
 }
@@ -86,15 +86,15 @@ const VALIDATION = {
 	},
 	readings: {
 		type: 'object',
-		required: ['meter'],
+		required: ['meterName'],
 		properties: {
 			...COMMON_PROPERTIES,
-			createmeter: new BooleanParam('createmeter'),
+			createMeter: new BooleanParam('createMeter'),
 			cumulative: new BooleanParam('cumulative'),
-			cumulativeReset: new BooleanParam('cumulativereset'),
+			cumulativeReset: new BooleanParam('cumulativeReset'),
 			duplications: new StringParam('duplications', '^\\d+$', 'duplications must be an integer.'),
-			meter: new StringParam('meter', undefined, undefined),
-			timesort: new EnumParam('timesort', ['increasing'])
+			meterName: new StringParam('meterName', undefined, undefined),
+			timeSort: new EnumParam('timeSort', ['increasing'])
 		},
 		additionalProperties: false // This protects us from unintended parameters.
 	}
@@ -135,10 +135,10 @@ function validateReadingsCsvUploadParams(req, res, next) {
 		failure(req, res, new Error(responseMessage));
 		return;
 	}
-	const { createmeter: createMeter, cumulative, duplications,
-		gzip, headerrow: headerRow, timesort: timeSort, update } = req.body; // extract query parameters
+	const { createMeter, cumulative, duplications,
+		gzip, headerRow, timeSort, update } = req.body; // extract query parameters
 	if (!createMeter) {
-		req.body.createmeter = DEFAULTS.readings.createMeter;
+		req.body.createMeter = DEFAULTS.readings.createMeter;
 	}
 	if (!cumulative) {
 		req.body.cumulative = DEFAULTS.readings.cumulative;
@@ -150,10 +150,10 @@ function validateReadingsCsvUploadParams(req, res, next) {
 		req.body.gzip = DEFAULTS.common.gzip;
 	}
 	if (!headerRow) {
-		req.body.headerrow = DEFAULTS.common.headerRow;
+		req.body.headerRow = DEFAULTS.common.headerRow;
 	}
 	if (!timeSort) {
-		req.body.timesort = DEFAULTS.readings.timeSort;
+		req.body.timeSort = DEFAULTS.readings.timeSort;
 	}
 	if (!update) {
 		req.body.update = DEFAULTS.common.update;
@@ -167,12 +167,12 @@ function validateMetersCsvUploadParams(req, res, next) {
 		failure(req, res, new Error(responseMessage));
 		return;
 	}
-	const { gzip, headerrow: headerRow, update } = req.body; // extract query parameters
+	const { gzip, headerRow, update } = req.body; // extract query parameters
 	if (!gzip) {
 		req.body.gzip = DEFAULTS.common.gzip;
 	}
 	if (!headerRow) {
-		req.body.headerrow = DEFAULTS.common.headerRow;
+		req.body.headerRow = DEFAULTS.common.headerRow;
 	}
 	if (!update) {
 		req.body.update = DEFAULTS.common.update; // set default update param if not supplied
