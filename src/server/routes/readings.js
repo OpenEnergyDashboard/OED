@@ -71,6 +71,36 @@ router.get('/line/meters/:meter_ids', async (req, res) => {
 	}
 });
 
+router.get('/line/count/meters/:meter_ids', async(req,res)=>{
+	const validParams = {
+		type: 'object',
+		maxProperties: 1,
+		required: ['meter_ids'],
+		properties: {
+			meter_ids: {
+				type: 'string'
+			}
+		}
+	};
+	if(!validate(req.params, validParams).valid){
+		res.sendStatus(400);
+	} else {
+		const conn=getConnection();
+		const meterIDs = req.params.meter_ids.split(',').map(s => parseInt(s));
+		try{
+			let count=0;
+			for(var i=0; i<meterIDs.length;i++){
+				const curr=await Reading.getAllLineCountByMeterID(meterIDs[i],conn);
+				count+=curr
+			}
+			res.send(count);
+		} catch (err) {
+			log.error(`Error while performing GET readings COUNT for line with meters ${meterIDs} with time interval ${timeInterval}: ${err}`, err);
+			res.sendStatus(500);
+		}
+	}
+})
+
 router.get('/line/raw/meters/:meter_ids', async (req, res) => {
 	const validParams = {
 		type: 'object',
@@ -101,9 +131,6 @@ router.get('/line/raw/meters/:meter_ids', async (req, res) => {
 		const timeInterval = TimeInterval.fromString(req.query.timeInterval);
 		console.log(timeInterval.startTimestamp,timeInterval.endTimestamp);
 		try {
-			//const rawCompressedReadings = await Reading.getCompressedReadings(meterIDs, timeInterval.startTimestamp, timeInterval.endTimestamp, 100, conn);
-			//const formattedCompressedReadings = _.mapValues(rawCompressedReadings, formatLineReadings);
-			//res.json(formattedCompressedReadings);
 			let toReturn=[];
 			for(let i=0;i<meterIDs.length;i++){
 				meterID=meterIDs[i];
@@ -111,10 +138,9 @@ router.get('/line/raw/meters/:meter_ids', async (req, res) => {
 				console.log(typeof rawReadings)
 				toReturn.push(rawReadings);
 			}
-			//console.log(toReturn);
 			res.send(toReturn);		
 		} catch (err) {
-			log.error(`Error while performing GET readings for line with meters ${meterIDs} with time interval ${timeInterval}: ${err}`, err);
+			log.error(`Error while performing GET raw readings for line with meters ${meterIDs} with time interval ${timeInterval}: ${err}`, err);
 			res.sendStatus(500);
 		}
 	}

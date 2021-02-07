@@ -22,6 +22,13 @@ export default class MetersApi {
 		return await this.backend.doGetRequest<NamedIDItem[]>('/api/meters');
 	}
 
+	public async lineReadingsCount(meterIDs:number[]):Promise<number> {
+		const stringifiedIDs = meterIDs.join(',');
+		return await this.backend.doGetRequest<number>(
+			`/api/readings/line/count/meters/${stringifiedIDs}`
+		);
+	}
+
 	public async lineReadings(meterIDs: number[], timeInterval: TimeInterval): Promise<LineReadings> {
 		const stringifiedIDs = meterIDs.join(',');
 		return await this.backend.doGetRequest<LineReadings>(

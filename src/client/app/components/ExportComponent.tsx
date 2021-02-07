@@ -12,6 +12,7 @@ import { TimeInterval } from '../../../common/TimeInterval';
 import { metersApi } from '../utils/api'
 
 interface ExportProps {
+	showRawExport:boolean;
 	selectedMeters: number[];
 	exportVals: { datasets: ExportDataSet[] };
 	timeInterval : TimeInterval;
@@ -60,18 +61,25 @@ export default function ExportComponent(props: ExportProps) {
 		let endTime= props.timeInterval.getEndTimestamp();
 		console.log(timeInterval,startTime,endTime);
 		const lineReading=await metersApi.rawLineReadings(props.selectedMeters,props.timeInterval);
-		console.log('thaoneu',lineReading)		
+		const count=await metersApi.lineReadingsCount(props.selectedMeters)
+		console.log(count);
+		console.log('new');
+		//console.log('thaoneu',lineReading)		
 		// graphExport(, "testRAWw");
 	}
 
 	return (
+		<>
 		<div>
 			<Button outline onClick={exportReading}>
 				<FormattedMessage id='export.graph.data' />
 			</Button>
-			<Button outline onClick={exportRAWReadings}>
-				<FormattedMessage id='export.raw.graph.data' />
-			</Button>
 		</div>
+		{props.showRawExport?<div style={{paddingTop:'10px'}}>
+				<Button outline onClick={exportRAWReadings}>
+					<FormattedMessage id='export.raw.graph.data' />
+				</Button>
+			</div>:''}
+		</>
 	);
 }

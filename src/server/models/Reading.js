@@ -149,6 +149,16 @@ class Reading {
 	}
 
 	/**
+	 * Returns the count(number of rows) for a meter
+	 * @param meterID 
+	 * @param conn 
+	 */
+	static async getAllLineCountByMeterID(meterID,conn){
+		const count=await conn.any(sqlFile('reading/get_reading_count_by_meter_id.sql'), { meterID: meterID })
+		return count
+	}
+
+	/**
 	 * Returns a promise to get all of the readings for this meter from the database.
 	 * @param meterID The id of the meter to find readings for
 	 * @param conn is the connection to use.

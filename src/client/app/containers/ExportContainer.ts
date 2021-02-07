@@ -142,6 +142,7 @@ function mapStateToProps(state: State) {
 	}
 
 	return {
+		showRawExport:state.graph.chartToRender==='line'?true:false,
 		selectedMeters: state.graph.selectedMeters,
 		selectedGroups: state.graph.selectedGroups,
 		exportVals: { datasets },
