@@ -14,7 +14,7 @@ function isRoleAuthorized(role, requestedRole){
 	}
 }
 
-/** Checks if a token has the authorization capabilities as the requested role. */
+/** Checks if a token (assumed to be verified) has the authorization capabilities as the requested role. */
 function isTokenAuthorized(token, requestedRole) {
 	const payload = jwt.decode(token);
 	const { role } = payload;
