@@ -8,6 +8,13 @@ interface CSVUploadPreferences {
     update: boolean;
 }
 
+interface CSVUploadProps extends CSVUploadPreferences {
+    submitCSV: (file: File) => Promise<void>;
+    toggleGzip: () => void;
+    toggleHeaderRow: () => void;
+    toggleUpdate: () => void;
+}
+
 export const enum TimeSortTypes {
     increasing = "increasing"
 }
@@ -21,27 +28,23 @@ export interface ReadingsCSVUploadPreferencesItem extends CSVUploadPreferences {
     timeSort: TimeSortTypes;
 }
 
-export interface ReadingsCSVUploadProps extends ReadingsCSVUploadPreferencesItem {
+export interface ReadingsCSVUploadProps extends ReadingsCSVUploadPreferencesItem, CSVUploadProps{
     // Note: each of these will have to change in consideration of redux;
-	submitCSV: (file: File) => Promise<void>;
     selectDuplications: (value: string) => void;
     selectTimeSort: (value: TimeSortTypes) => void;
     setMeterName: (value: string) => void;
     toggleCreateMeter: () => void;
     toggleCumulative: () => void;
     toggleCumulativeReset: () => void;
-    toggleGzip: () => void;
-    toggleHeaderRow: () => void;
-    toggleUpdate: () => void;
-	createMeter: boolean;
-	cumulative: boolean;
-	cumulativeReset: boolean;
-	duplications: string; // Not sure how to type this an integer string;
-	gzip: boolean;
-	headerRow: boolean;
-	meterName: string;
-	timeSort: TimeSortTypes;
-	update: boolean;
+    createMeter: boolean;
+    cumulative: boolean;
+    cumulativeReset: boolean;
+    duplications: string; // Not sure how to type this an integer string;
+    gzip: boolean;
+    headerRow: boolean;
+    meterName: string;
+    timeSort: TimeSortTypes;
+    update: boolean;
 };
 
 export interface MetersCSVUpload extends CSVUploadPreferences {
@@ -50,5 +53,5 @@ export interface MetersCSVUpload extends CSVUploadPreferences {
 export interface MetersCSVUploadPreferencesItem extends MetersCSVUpload {
 }
 
-export interface MetersCSVUploadProps extends MetersCSVUploadPreferencesItem {
+export interface MetersCSVUploadProps extends MetersCSVUploadPreferencesItem, CSVUploadProps {
 }

@@ -25,7 +25,7 @@ export default class UploadCSVApi {
 		await this.backend.doPostRequest<void>(`/api/csv/readings`, formData);
 	}
 
-	public async submitMeters(uploadPreferences: MetersCSVUploadPreferencesItem ,metersFile: File): Promise<void> {
+	public async submitMeters(uploadPreferences: MetersCSVUploadPreferencesItem, metersFile: File): Promise<void> {
 		const formData = new FormData();
 		for (const preference in uploadPreferences){
 			uploadPreferences[preference];

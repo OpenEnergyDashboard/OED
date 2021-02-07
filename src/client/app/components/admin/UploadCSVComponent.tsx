@@ -4,7 +4,16 @@
 
 import * as React from 'react';
 import { Button, Input, Form, FormGroup, FormText, Label } from 'reactstrap';
-import { ReadingsCSVUploadProps, TimeSortTypes } from 'types/csvUploadForm';
+import { MetersCSVUploadProps, ReadingsCSVUploadProps, TimeSortTypes } from 'types/csvUploadForm';
+
+/** A range of values, inclusive lower bound and exclusive upper bound. */
+function range(lower: number, upper: number): number[] {
+	const arr = [];
+	for (let i = lower; i < upper; i++) {
+		arr.push(i);
+	}
+	return arr;
+}
 
 function SubmitButton() {
 	return (<Button type='submit'> Submit CSV Data </Button>)
@@ -28,7 +37,7 @@ function FileUploaderComponent(props: FileUploader) {
 
 }
 
-class ReadingsCSVUploadComponent extends React.Component<ReadingsCSVUploadProps> {
+export class ReadingsCSVUploadComponent extends React.Component<ReadingsCSVUploadProps> {
 	private fileInput: React.RefObject<HTMLInputElement>;
 	constructor(props: ReadingsCSVUploadProps) {
 		super(props);
@@ -36,7 +45,7 @@ class ReadingsCSVUploadComponent extends React.Component<ReadingsCSVUploadProps>
 		this.fileInput = React.createRef();
 	}
 
-	handleSubmit = async (e) => {
+	private handleSubmit = async (e) => {
 		try {
 			e.preventDefault();
 			await this.props.submitCSV(this.fileInput.current.files[0]); // Not sure how to respond to this typescript error.
@@ -93,20 +102,51 @@ class ReadingsCSVUploadComponent extends React.Component<ReadingsCSVUploadProps>
 					<Input required value={this.props.meterName} name='meterName' id='meterName' onChange={({target}) => this.props.setMeterName(target.value)} />
 				</FormGroup>
 				<FileUploaderComponent required reference={this.fileInput} />
-				{console.log(8)}
 				<SubmitButton />
 			</Form>
 		)
 	}
 }
 
-/** A range of values, inclusive lower bound and exclusive upper bound. */
-function range(lower: number, upper: number): number[] {
-	const arr = [];
-	for (let i = lower; i < upper; i++) {
-		arr.push(i);
+export class MetersCSVUploadComponent extends React.Component<MetersCSVUploadProps> {
+	private fileInput: React.RefObject<HTMLInputElement>;
+	constructor(props: MetersCSVUploadProps) {
+		super(props);
+		this.handleSubmit = this.handleSubmit.bind(this);
+		this.fileInput = React.createRef();
 	}
-	return arr;
-}
 
-export default ReadingsCSVUploadComponent;
+	private handleSubmit = async (e) => {
+		try {
+			e.preventDefault();
+			await this.props.submitCSV(this.fileInput.current.files[0]); // Not sure how to respond to this typescript error.
+			// Respond to success.
+		} catch (error) {
+			// A failed axios request should result in an error.
+			console.log(error);
+		}
+	}
+
+	public render() {
+		return (
+			<Form onSubmit={this.handleSubmit}>
+				<FormGroup>
+					<Input checked={this.props.gzip} type='checkbox' name='gzip' id='gzip' onChange={this.props.toggleGzip} />
+					<Label for='gzip'> Gzip </Label>
+				</FormGroup>
+				<FormGroup>
+					<Input checked={this.props.headerRow} type='checkbox' name='headerRow' id='headerRow' onChange={this.props.toggleHeaderRow} />
+					<Label for='headerRow'> Header Row </Label>
+				</FormGroup>
+				<FormGroup>
+					<Input checked={this.props.update} type='checkbox' name='update' id='update' onChange={this.props.toggleUpdate} />
+					<Label for='update'> Update </Label>
+				<FileUploaderComponent required reference={this.fileInput} />
+				</FormGroup>
+				<SubmitButton />
+				{console.log(-1)}
+			</Form>
+		)
+	}
+
+}
