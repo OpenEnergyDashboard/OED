@@ -6,7 +6,7 @@ const jwt = require('jsonwebtoken');
 const User = require('../models/User');
 
 /** Checks if a role has the authorization capabilities as the requested role. */
-function isRoleAuthorized(role, requestedRole){
+function isRoleAuthorized(role, requestedRole) {
 	if (role === User.role.ADMIN) {
 		return true;
 	} else {
@@ -21,19 +21,17 @@ function isTokenAuthorized(token, requestedRole) {
 	return isRoleAuthorized(role, requestedRole);
 }
 
-/** Checks if credentials has the authorization capabilities as the requested role. */
-async function areCredentialsAuthorized(email, password, requestedRole) {
-	const conn = getConnection();
-	const user = await User.getByEmail(email, conn);
-	const isValid = await bcrypt.compare(password, user.passwordHash);
-	if (isValid) {
-		return isRoleAuthorized(user.role, requestedRole);
-	} else {
-		throw new Error('Invalid Password');
-	}
+/** Checks if a user is authorized. */
+/**
+ * 
+ * @param {User} user 
+ * @param requestedRole 
+ */
+function isUserAuthorized(user, requestedRole) {
+	return isRoleAuthorized(user.role, requestedRole);
 }
 
 module.exports = {
-	areCredentialsAuthorized,
+	isUserAuthorized,
 	isTokenAuthorized
 }

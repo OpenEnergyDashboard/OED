@@ -8,6 +8,7 @@ const secretToken = require('../config').secretToken;
 const User = require('../models/User');
 const { log } = require('../log');
 const validate = require('jsonschema').validate;
+const { isTokenAuthorized, isUserAuthorized } = require('./userRoles');
 const { getConnection } = require('../db');
 
 /**
@@ -36,10 +37,7 @@ authMiddleware = (req, res, next) => {
 	}
 };
 
-/**
- * Authenticate users via email and password.
- */
-async function emailAndPasswordAuthMiddleware(req, res, next) {
+function credentialsRequestValidationMiddleware(req, res, next) {
 	const validParams = {
 		type: 'object',
 		required: ['email', 'password'],
@@ -58,41 +56,26 @@ async function emailAndPasswordAuthMiddleware(req, res, next) {
 	if (!validate(req.body, validParams).valid) {
 		res.status(400).send('Invalid JSON. \n');
 	} else {
-		const conn = getConnection();
-		try {
-			const user = await User.getByEmail(req.body.email, conn);
-			const isValid = await bcrypt.compare(req.body.password, user.passwordHash);
-			if (isValid) {
-				// We use the decoded field to be consistent with authMiddleware. 
-				// The stored information is also consistent with the information stored in a jwt token.
-				req.decoded = {
-					data: user.id,
-					role: user.role
-				};
-				next();
-			} else {
-				throw new Error('Unauthorized password');
-			}
-		} catch (err) {
-			if (err.message === 'Unauthorized password' || err.message === 'No data returned from the query.') {
-				res.status(401).send({ text: 'Not authorized' });
-			} else {
-				log.error(`Unable to check user password for ${req.body.email}`, err);
-				res.status(500).send({ text: 'Internal Server Error' });
-			}
-		}
+		next();
 	}
-};
+}
+
+async function verifyCredentials(email, password, returnUser = false) {
+	const conn = getConnection();
+	const user = await User.getByEmail(email, conn);
+	const isValid = await bcrypt.compare(password, user.passwordHash);
+	return (returnUser ? isValid && user : isValid);
+}
 
 // Returns middleware that only proceeds if an Admin is the requestor of an action.
 // Action is a string that is a verb that can be prefixed by to for the proper response and warning messages.
 adminAuthMiddleware = (action) => {
 	return function (req, res, next) {
 		this.authMiddleware(req, res, () => {
-			if (req.decoded && req.decoded.role === User.role.ADMIN) {
+			if (req.decoded && isTokenAuthorized(req.decoded.role, User.role.ADMIN)) {
 				next();
 			} else {
-				log.warn(`Got request to \'${action}\' with invalid credentials. Admin role is required to \'${action}\'.`);
+				log.warn(`Got request to '${action}' with invalid credentials. Admin role is required to '${action}'.`);
 				res.status(400)
 					.json({ message: `Invalid credentials supplied. Only admins can ${action}.` });
 			}
@@ -106,15 +89,33 @@ adminAuthMiddleware = (action) => {
  */
 function obviusEmailAndPasswordAuthMiddleware(action) {
 	return function (req, res, next) {
-		emailAndPasswordAuthMiddleware(req, res, () => {
-			if (req.decoded && (req.decoded.role === User.role.ADMIN || req.decoded.role === User.role.OBVIUS)) {
-				next();
-			} else {
-				log.warn(`Got request to \'${action}\' with invalid credentials. Admin or Obvius role is required to \'${action}\'.`);
-				res.status(400)
-					.json({ message: `Invalid credentials supplied. Only admins or Obvius users can ${action}.` });
+		credentialsRequestValidationMiddleware(req, res, async () => {
+			try {
+				const user = await verifyCredentials(req.email, req.password, true);
+				if (user) {
+					if (isUserAuthorized(user, User.role.OBVIUS)) {
+						next();
+					} else {
+						const message = `Got request to '${action}' with invalid authorization level. Obvius role is at least required to '${action}'.`;
+						log.warn(message);
+						res.status(400)
+							.text(message);
+					}
+				} else {
+					const message = `Got request to '${action} with invalid credentials.`;
+					log.warn(message);
+					res.status(400)
+						.text(message);
+				}
+			} catch (error) {
+				if (error.message === 'No data returned from the query.') {
+					res.status(400).text(`No user corresponding to the email: ${req.email} was found. Please make a request with a valid email.`);
+				} else {
+					log.error(`Internal Server Error for Obvius request.`, error);
+					res.status(400).text('Internal OED Server Error for Obvius request.');
+				}
 			}
-		})
+		});
 	}
 }
 
@@ -156,4 +157,3 @@ module.exports = {
 	obviusEmailAndPasswordAuthMiddleware,
 	optionalAuthMiddleware
 };
-
