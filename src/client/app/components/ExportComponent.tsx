@@ -5,7 +5,7 @@
 import * as React from 'react';
 import { Button } from 'reactstrap';
 import * as moment from 'moment';
-import graphExport from '../utils/exportData';
+import graphExport, { graphRawExport } from '../utils/exportData';
 import { ExportDataSet } from '../types/readings';
 import { FormattedMessage } from 'react-intl';
 import { TimeInterval } from '../../../common/TimeInterval';
@@ -66,6 +66,7 @@ export default function ExportComponent(props: ExportProps) {
 		console.log('new');
 		console.log('thaoneu',lineReading)		
 		// graphExport(, "testRAWw");
+		graphRawExport();
 	}
 
 	return (

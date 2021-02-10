@@ -64,3 +64,40 @@ export function convertRawToCSV(items:RawReadings[],filename:string){
     })
     downloadCSV(csvOutput,filename);
 }
+
+/**
+ * Function that adds a div to handle exporting raw data
+ * 
+ */
+export function graphRawExport(){
+	const mainContainer=document.createElement('div');
+	const innerContainer=document.createElement('div');
+	mainContainer.appendChild(innerContainer);
+	mainContainer.classList.add('fixed-top');
+	mainContainer.classList.add('bg-dark');
+	mainContainer.style.width='100vw';
+	mainContainer.style.height='100vh';
+	mainContainer.style.display='flex';
+	mainContainer.style.opacity='0.7';
+	mainContainer.style.justifyContent='center';
+	mainContainer.style.alignItems='center';
+
+	innerContainer.style.padding='20px 10px';
+	innerContainer.style.backgroundColor='white';
+	innerContainer.style.border='2px solid black';
+	innerContainer.style.borderRadius='10px';
+
+	const noButton=document.createElement('button');
+	noButton.innerHTML='No';
+	const yesButton=document.createElement('button');
+	yesButton.innerHTML='Yes';
+
+	innerContainer.appendChild(yesButton);
+	innerContainer.appendChild(noButton);
+
+	noButton.addEventListener('click',()=>{
+		document.body.removeChild(mainContainer);
+	})
+
+	document.body.appendChild(mainContainer);
+}
