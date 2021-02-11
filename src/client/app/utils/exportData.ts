@@ -4,6 +4,7 @@
 
 import * as moment from 'moment';
 import { ExportDataSet, RawReadings } from '../types/readings';
+import { hasToken } from './token';
 
 /**
  * Function to converts the compressed meter data into a CSV formatted string.
@@ -57,11 +58,14 @@ export default function graphExport(dataSets: ExportDataSet[], name: string) {
  * @param items list of readings directly from the database
  * @param filename export filename
  */
-export function downloadRawCSV(items:RawReadings[],filename:string){
+export function downloadRawCSV(items:RawReadings[]){
 	let csvOutput = 'Label,Readings,Start Timestamp\n';
 	items.forEach(ele => {
-		csvOutput += `"${ele.label}",${ele.reading},${ele.startTimestamp}\n`
+		csvOutput += `"${ele.label}",${ele.reading} kW,${ele.startTimestamp}\n`
 	})
+	const startTime=new Date(items[0].startTimestamp).toDateString().replace(/ /g,'-'); // Use Regex to replace all ' ' with '-'
+	const endTime=new Date(items[items.length-1].startTimestamp).toDateString().replace(/ /g,'-');
+	const filename=`oedRawExport_line_${startTime}_${endTime}.csv`;
 	downloadCSV(csvOutput,filename);
 }
 
@@ -70,7 +74,14 @@ export function downloadRawCSV(items:RawReadings[],filename:string){
  * @param count number of lines in the file
  * @param done async function that does another request to get all data then download it
  */
-export function graphRawExport(count:number,done:()=>Promise<void>){
+// NOTE: This function is made with the idea that it will not be called very often
+// Ideally we would have a component that prompts the user and handles all the logic
+export function graphRawExport(count:number,done:()=>Promise<void>):any{
+	const fileSize=(count*0.042/1000)
+	if(fileSize<=5){
+		return done();
+	}
+
 	const mainContainer=document.createElement('div');
 	const innerContainer=document.createElement('div');
 	mainContainer.appendChild(innerContainer);
@@ -86,11 +97,25 @@ export function graphRawExport(count:number,done:()=>Promise<void>){
 	innerContainer.style.backgroundColor='white';
 	innerContainer.style.border='2px solid black';
 	innerContainer.style.borderRadius='10px';
+	innerContainer.style.textAlign='center';
 
 	innerContainer.innerHTML=`
-		<p>File size will be about ${(count*0.042/1000).toFixed(2)}MB.</p>
+		<p>File size will be about ${fileSize.toFixed(2)}MB.</p>
 		<p>Are you sure you want to download</p>
 	`;
+
+	if(fileSize>25 && !hasToken()){ // 25 is hard coded but we should get it from state
+		innerContainer.innerHTML=`
+			<p>Sorry you don't have permissions to download.</p>
+		`;
+		const okButton=document.createElement('button');
+		okButton.innerHTML='ok';
+		okButton.addEventListener('click',()=>{
+			document.body.removeChild(mainContainer);
+		})
+		innerContainer.appendChild(okButton);
+		return document.body.appendChild(mainContainer);
+	}
 
 	const noButton=document.createElement('button');
 	noButton.innerHTML='No';

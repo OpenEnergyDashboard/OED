@@ -11,6 +11,7 @@ const TimeInterval = require('../../common/TimeInterval').TimeInterval;
 const { log } = require('../log');
 const validate = require('jsonschema').validate;
 const { getConnection } = require('../db');
+const { formatRawDateToExport } = require('../util/formatDate');
 
 const router = express.Router();
 
@@ -150,6 +151,7 @@ router.get('/line/raw/meters/:meter_ids', async (req, res) => {
 				rawReadings.map(ele=>{
 					delete ele.meterID;
 					ele.label=meterLabel;
+					ele.startTimestamp=formatRawDateToExport(ele.startTimestamp);
 					delete ele.endTimestamp;
 					toReturn.push(ele);
 				})
