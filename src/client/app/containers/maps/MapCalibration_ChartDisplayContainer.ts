@@ -9,7 +9,7 @@ import * as plotly from 'plotly.js';
 import {CartesianPoint, Dimensions, normalizeImageDimensions} from '../../utils/calibration';
 import {updateCurrentCartesian} from '../../actions/map';
 import store from '../../index';
-import {CalibrationSettings} from "../../types/redux/map";
+import {CalibrationSettings} from '../../types/redux/map';
 
 function mapStateToProps(state: State) {
 	const x: number[] = [];
@@ -127,7 +127,7 @@ function createBackgroundTrace(imageDimensions: Dimensions, settings: Calibratio
 		xgap: 1,
 		ygap: 1,
 		hoverinfo: 'x+y',
-		opacity: (settings.showGrid)? '0.5' : '0', // controls whether the grids will be displayed
+		opacity: (settings.showGrid) ? '0.5' : '0', // controls whether the grids will be displayed
 		showscale: false
 	};
 	return trace;
@@ -142,8 +142,10 @@ function handlePointClick(event: plotly.PlotMouseEvent) {
 function getClickedCoordinates(event: plotly.PlotMouseEvent) {
 	event.event.preventDefault();
 	/*
-	 *  points on backgroundTrace and dataPointTrace will be captured if they are both close to the click
-	 *  for now, all of the points from dataPointTrace are ignored;
+	 *  trace 0 keeps a transparent trace of closely positioned points used for calibration(backgroundTrace),
+	 *  trace 1 keeps the data points used for calibration are automatically added to the same trace(dataPointTrace),
+	 *  event.points will include all points near a mouse click, including those in the backgroundTrace and the dataPointTrace,
+	 *  so the algorithm only looks at trace 0 since points from trace 1 are already put into the data set used for calibration.
  	 */
 	const eligiblePoints = [];
 	for (const point of event.points) {
