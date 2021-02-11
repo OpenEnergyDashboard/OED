@@ -66,12 +66,17 @@ export function meterDisplayableOnMap(meterInfo: {gps?: GPSPoint, meterID: numbe
 }
 
 export function isValidGPSInput(input: string) {
-	if (input.indexOf(',') === -1) { return false; }
+	if (input.indexOf(',') === -1)  { // if there is no comma
+		return false;
+	} else if (input.indexOf(',') !== input.lastIndexOf(',')) { // if there are multiple commas
+		return false;
+	}
 	const array = input.split(',').map((value: string) => parseFloat(value));
 	const latitudeIndex = 0;
 	const longitudeIndex = 1;
-	const result = array[latitudeIndex] >= -90 && array[latitudeIndex] <= 90
-		&& array[longitudeIndex] >= -180 && array[longitudeIndex] <= 180;
+	const latitudeConstraint = array[latitudeIndex] >= -90 && array[latitudeIndex] <= 90;
+	const longitudeConstraint = array[longitudeIndex] >= -180 && array[longitudeIndex] <= 180;
+	const result = latitudeConstraint && longitudeConstraint;
 	if (!result) {
 		window.alert('invalid gps coordinate, ' +
 			'\nlatitude should be an integer between -90 and 90, ' +
@@ -172,13 +177,14 @@ export function calibrate(calibrationSet: CalibratedPoint[], imageDimensions: Di
 }
 
 function calculateScale(p1: CalibratedPoint, p2: CalibratedPoint) {
-	const deltaLatitude = p1.gps.latitude - p2.gps.latitude;
-	const deltaYInUnits = p1.cartesian.y - p2.cartesian.y;
-	const degreePerUnitY = deltaLatitude / deltaYInUnits;
 
 	const deltaLongitude = p1.gps.longitude - p2.gps.longitude;
 	const deltaXInUnits = p1.cartesian.x - p2.cartesian.x;
 	const degreePerUnitX = deltaLongitude / deltaXInUnits;
+
+	const deltaLatitude = p1.gps.latitude - p2.gps.latitude;
+	const deltaYInUnits = p1.cartesian.y - p2.cartesian.y;
+	const degreePerUnitY = deltaLatitude / deltaYInUnits;
 
 	return {degreePerUnitX, degreePerUnitY};
 }
@@ -190,21 +196,19 @@ function calculateScale(p1: CalibratedPoint, p2: CalibratedPoint) {
  */
 export function normalizeImageDimensions(dimensions: Dimensions) {
 	let res: Dimensions;
+	let width;
+	let height;
 	if (dimensions.width > dimensions.height) {
-		const width = 500;
-		const height = 500 * dimensions.height / dimensions.width;
-		res = {
-			width,
-			height
-		};
+		width = 500;
+		height = 500 * dimensions.height / dimensions.width;
 	} else {
-		const height = 500;
-		const width = 500 * dimensions.width / dimensions.height;
-		res = {
-			width,
-			height
-		};
+		height = 500;
+		width = 500 * dimensions.width / dimensions.height;
 	}
+	res = {
+		width,
+		height
+	};
 	return res;
 }
 
