@@ -5,7 +5,7 @@
 import * as React from 'react';
 import { Button } from 'reactstrap';
 import * as moment from 'moment';
-import graphExport, { graphRawExport } from '../utils/exportData';
+import graphExport, { graphRawExport, downloadRawCSV } from '../utils/exportData';
 import { ExportDataSet } from '../types/readings';
 import { FormattedMessage } from 'react-intl';
 import { TimeInterval } from '../../../common/TimeInterval';
@@ -56,17 +56,15 @@ export default function ExportComponent(props: ExportProps) {
 	};
 
 	const exportRAWReadings = async() => {
-		let timeInterval = props.timeInterval.toString();
 		let startTime = props.timeInterval.getStartTimestamp()
 		let endTime= props.timeInterval.getEndTimestamp();
-		console.log(timeInterval,startTime,endTime);
-		const lineReading=await metersApi.rawLineReadings(props.selectedMeters,props.timeInterval);
+		if(props.selectedMeters.length===0)
+			return;
 		const count=await metersApi.lineReadingsCount(props.selectedMeters,props.timeInterval);
-		console.log(count);
-		console.log('new');
-		console.log('thaoneu',lineReading)		
-		// graphExport(, "testRAWw");
-		graphRawExport();
+		graphRawExport(count,async()=>{
+			const lineReading=await metersApi.rawLineReadings(props.selectedMeters,props.timeInterval);
+			downloadRawCSV(lineReading,`oedRawExport_${props.selectedMeters[0].toString()}_${startTime===null?'all':startTime}_${endTime===null?'all':endTime}.csv`);
+		});
 	}
 
 	return (

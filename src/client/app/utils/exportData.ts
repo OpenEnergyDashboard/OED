@@ -57,28 +57,28 @@ export default function graphExport(dataSets: ExportDataSet[], name: string) {
  * @param items list of readings directly from the database
  * @param filename export filename
  */
-export function convertRawToCSV(items:RawReadings[],filename:string){
+export function downloadRawCSV(items:RawReadings[],filename:string){
 	let csvOutput = 'Label,Readings,Start Timestamp\n';
 	items.forEach(ele => {
-	    csvOutput += `"${ele.label}",${ele.reading},${ele.startTimestamp}`
+	    csvOutput += `"${ele.label}",${ele.reading},${ele.startTimestamp}\n`
     })
     downloadCSV(csvOutput,filename);
 }
 
 /**
  * Function that adds a div to handle exporting raw data
- * 
+ * @param count number of lines in the file
+ * @param done async function that does another request to get all data then download it
  */
-export function graphRawExport(){
+export function graphRawExport(count:number,done:()=>Promise<void>){
 	const mainContainer=document.createElement('div');
 	const innerContainer=document.createElement('div');
 	mainContainer.appendChild(innerContainer);
 	mainContainer.classList.add('fixed-top');
-	mainContainer.classList.add('bg-dark');
 	mainContainer.style.width='100vw';
 	mainContainer.style.height='100vh';
 	mainContainer.style.display='flex';
-	mainContainer.style.opacity='0.7';
+	mainContainer.style.background='rgba(107,107,107,0.4)';
 	mainContainer.style.justifyContent='center';
 	mainContainer.style.alignItems='center';
 
@@ -86,6 +86,11 @@ export function graphRawExport(){
 	innerContainer.style.backgroundColor='white';
 	innerContainer.style.border='2px solid black';
 	innerContainer.style.borderRadius='10px';
+
+	innerContainer.innerHTML=`
+		<p>File size will be about ${(count*0.042/1000).toFixed(2)}MB.</p>
+		<p>Are you sure you want to download</p>
+	`;
 
 	const noButton=document.createElement('button');
 	noButton.innerHTML='No';
@@ -97,6 +102,11 @@ export function graphRawExport(){
 
 	noButton.addEventListener('click',()=>{
 		document.body.removeChild(mainContainer);
+	})
+
+	yesButton.addEventListener('click',()=>{
+		document.body.removeChild(mainContainer);
+		done();
 	})
 
 	document.body.appendChild(mainContainer);
