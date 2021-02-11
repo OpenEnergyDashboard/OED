@@ -127,7 +127,6 @@ router.post('/edit', async (req, res) => {
 	if (!validatorResult.valid) {
 		log.warn(`Got request to edit meters with invalid meter data, errors:${validatorResult.errors}`);
 		res.status(400);
-			// .json({ message: 'Invalid meter data supplied.', err: validatorResult.errors });
 	} else {
 		const conn = getConnection();
 		try {
