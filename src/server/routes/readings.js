@@ -102,9 +102,7 @@ router.get('/line/count/meters/:meter_ids', async(req,res)=>{
 		try{
 			let count=0;
 			for(var i=0; i<meterIDs.length;i++){
-				console.log('tha');
 				const curr=await Reading.getCountByMeterIDAndDateRange(meterIDs[i],timeInterval.startTimestamp,timeInterval.endTimestamp,conn);
-				console.log(curr);
 				count+=curr
 			}
 			res.send(JSON.stringify(count));
@@ -149,10 +147,9 @@ router.get('/line/raw/meters/:meter_ids', async (req, res) => {
 				meterID=meterIDs[i];
 				const rawReadings= await Reading.getReadingsByMeterIDAndDateRange(meterID,timeInterval.startTimestamp,timeInterval.endTimestamp,conn)
 				const meterLabel=(await Meter.getByID(meterID,conn)).name;
-				console.log(typeof rawReadings)
-				rawReadings.map((ele)=>{
+				rawReadings.map(ele=>{
 					delete ele.meterID;
-					ele['label']=meterLabel;
+					ele.label=meterLabel;
 					delete ele.endTimestamp;
 					toReturn.push(ele);
 				})

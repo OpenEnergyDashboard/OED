@@ -45,7 +45,7 @@ export default class MetersApi {
 			{ timeInterval: timeInterval.toString() }
 		);
 	}
-	
+
 	public async barReadings(meterIDs: number[], timeInterval: TimeInterval, barDuration: moment.Duration): Promise<BarReadings> {
 		const stringifiedIDs = meterIDs.join(',');
 		return await this.backend.doGetRequest<BarReadings>(

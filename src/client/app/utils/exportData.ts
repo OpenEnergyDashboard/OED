@@ -60,9 +60,9 @@ export default function graphExport(dataSets: ExportDataSet[], name: string) {
 export function downloadRawCSV(items:RawReadings[],filename:string){
 	let csvOutput = 'Label,Readings,Start Timestamp\n';
 	items.forEach(ele => {
-	    csvOutput += `"${ele.label}",${ele.reading},${ele.startTimestamp}\n`
-    })
-    downloadCSV(csvOutput,filename);
+		csvOutput += `"${ele.label}",${ele.reading},${ele.startTimestamp}\n`
+	})
+	downloadCSV(csvOutput,filename);
 }
 
 /**

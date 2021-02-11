@@ -56,8 +56,8 @@ export default function ExportComponent(props: ExportProps) {
 	};
 
 	const exportRAWReadings = async() => {
-		let startTime = props.timeInterval.getStartTimestamp()
-		let endTime= props.timeInterval.getEndTimestamp();
+		const startTime = props.timeInterval.getStartTimestamp()
+		const endTime= props.timeInterval.getEndTimestamp();
 		if(props.selectedMeters.length===0)
 			return;
 		const count=await metersApi.lineReadingsCount(props.selectedMeters,props.timeInterval);
