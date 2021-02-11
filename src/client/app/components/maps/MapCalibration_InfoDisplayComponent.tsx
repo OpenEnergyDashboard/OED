@@ -5,8 +5,7 @@
 import * as React from 'react';
 import {GPSPoint, isValidGPSInput} from '../../utils/calibration';
 import {ChangeEvent, FormEvent} from 'react';
-import {FormattedMessage} from "react-intl";
-import TooltipHelpComponent from "../TooltipHelpComponent";
+import {FormattedMessage} from 'react-intl';
 
 interface InfoDisplayProps {
 	showGrid: boolean;
@@ -36,7 +35,7 @@ export default class MapCalibration_InfoDisplayComponent extends React.Component
 		this.handleChanges = this.handleChanges.bind(this);
 		this.dropCurrentCalibration = this.dropCurrentCalibration.bind(this);
 	}
-	render() {
+	public render() {
 		const calibrationDisplay = `result: ${this.props.resultDisplay}`;
 		return (
 			<div>

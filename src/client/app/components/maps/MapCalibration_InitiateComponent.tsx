@@ -80,7 +80,7 @@ export default class MapCalibration_InitiateComponent extends React.Component<Ma
 				...this.props.map,
 				name: this.state.mapName,
 				filename: this.fileInput.current.files[0].name,
-				image: image
+				image
 			};
 			await this.props.onSourceChange(source);
 		} catch (err) {

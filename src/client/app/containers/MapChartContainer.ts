@@ -3,13 +3,13 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
 
 import * as moment from 'moment';
-import {connect} from "react-redux";
-import PlotlyChart, {IPlotlyChartProps} from "react-plotlyjs-ts";
-import {State} from "../types/redux/state";
-import {calculateScaleFromEndpoints, meterDisplayableOnMap} from "../utils/calibration";
-import * as _ from "lodash";
-import getGraphColor from "../utils/getGraphColor";
-import {TimeInterval} from "../../../common/TimeInterval";
+import {connect} from 'react-redux';
+import PlotlyChart, {IPlotlyChartProps} from 'react-plotlyjs-ts';
+import {State} from '../types/redux/state';
+import {calculateScaleFromEndpoints, meterDisplayableOnMap} from '../utils/calibration';
+import * as _ from 'lodash';
+import getGraphColor from '../utils/getGraphColor';
+import {TimeInterval} from '../../../common/TimeInterval';
 
 function mapStateToProps(state: State) {
 	let map;
@@ -25,15 +25,15 @@ function mapStateToProps(state: State) {
 		}
 		let x: number[] = [];
 		let y: number[] = [];
-		let texts: string[] = [];
-		let size: number[] = [];
-		let colors: string[] = [];
+		const texts: string[] = [];
+		const size: number[] = [];
+		const colors: string[] = [];
 		data = [];
-		image = (map)? map.image : new Image();
+		image = (map) ? map.image : new Image();
 
 		// calculate coordinates
 		const timeInterval = state.graph.timeInterval;
-		const barDuration = (timeInterval.equals(TimeInterval.unbounded()))? moment.duration(4, 'weeks')
+		const barDuration = (timeInterval.equals(TimeInterval.unbounded())) ? moment.duration(4, 'weeks')
 			: moment.duration(timeInterval.duration('days'), 'days');
 		if (map && map.origin && map.opposite) {
 			/**
@@ -41,9 +41,6 @@ function mapStateToProps(state: State) {
 			 */
 			const points: any[] = [];
 			for (const meterID of state.graph.selectedMeters) {
-				// console.log(state.meters.selectedMeters);
-				// console.log(state.graph.selectedMeters);
-				// console.log(state.meters.byMeterID);
 				const byMeterID = state.readings.bar.byMeterID[meterID];
 				const gps = state.meters.byMeterID[meterID].gps;
 				if (gps !== undefined && gps !== null) {
@@ -60,7 +57,7 @@ function mapStateToProps(state: State) {
 							readings.forEach(mapReading => {
 								const timeReading: string =
 									`${moment(mapReading.startTimestamp).format('MMM DD, YYYY')} - ${moment(mapReading.endTimestamp).format('MMM DD, YYYY')}`;
-								const averagedReading = mapReading.reading/barDuration.asDays(); // average total reading by days of duration
+								const averagedReading = mapReading.reading / barDuration.asDays(); // average total reading by days of duration
 								size.push(averagedReading);
 								texts.push(`<b> ${timeReading} </b> <br> ${label}: ${averagedReading} kW/day`);
 							});
@@ -75,19 +72,18 @@ function mapStateToProps(state: State) {
 				width: image.width,
 				height: image.height
 			});
-			// map coordinates to individual traces, todo: finalize mapping function
 			x = points.map(point => (point.longitude - origin.longitude) / mapScale.degreePerUnitX);
 			y = points.map(point => (point.latitude - origin.latitude) / mapScale.degreePerUnitY);
 
 			const trace1 = {
-				x: x,
-				y: y,
+				x,
+				y,
 				type: 'scatter',
 				mode: 'markers',
 				marker: {
 					color: colors,
 					opacity: 0.5,
-					size: size,
+					size
 				},
 				text: texts,
 				opacity: 1,
@@ -100,22 +96,22 @@ function mapStateToProps(state: State) {
 	// set map background image
 	const layout: any = {
 		title: {
-			text: (map)? map.name : 'There\'s not an available map',
+			text: (map) ? map.name : 'There\'s not an available map'
 		},
 		width: 1000,
 		height: 1000,
 		xaxis: {
 			visible: false, // changes all visibility settings including showgrid, zeroline, showticklabels and hiding ticks
-			range: [0, 500], // range of displayed graph
+			range: [0, 500] // range of displayed graph
 		},
 		yaxis: {
 			visible: false,
 			range: [0, 500],
-			scaleanchor:'x',
+			scaleanchor: 'x'
 		},
 		images: [{
 			layer: 'below',
-			source: (image)? image.src : '',
+			source: (image) ? image.src : '',
 			xref: 'x',
 			yref: 'y',
 			x: 0,
@@ -125,8 +121,8 @@ function mapStateToProps(state: State) {
 			xanchor: 'left',
 			yanchor: 'bottom',
 			sizing: 'contain',
-			opacity: 1,
-		}],
+			opacity: 1
+		}]
 	};
 
 	/***
@@ -136,9 +132,9 @@ function mapStateToProps(state: State) {
 	 *               onClick={({points, event}) => console.log(points, event)}>
 	 */
 	const props: IPlotlyChartProps = {
-		data: data,
-		layout: layout,
-	}
+		data,
+		layout
+	};
 	return props;
 }
 

@@ -5,8 +5,8 @@
 import { connect } from 'react-redux';
 import { State } from '../../types/redux/state';
 import {Dispatch} from '../../types/redux/actions';
-import {fetchMapsDetails, setNewMap, submitEditedMaps} from "../../actions/map";
-import MapsDetailComponent from "../../components/maps/MapsDetailComponent";
+import {fetchMapsDetails, setNewMap, submitEditedMaps} from '../../actions/map';
+import MapsDetailComponent from '../../components/maps/MapsDetailComponent';
 
 function mapStateToProps(state: State) {
 	return {
@@ -21,7 +21,7 @@ function mapDispatchToProps(dispatch: Dispatch) {
 	return {
 		fetchMapsDetails: () => dispatch(fetchMapsDetails()),
 		submitEditedMaps: () => dispatch(submitEditedMaps()),
-		createNewMap: () => dispatch(setNewMap()),
+		createNewMap: () => dispatch(setNewMap())
 	};
 }
 

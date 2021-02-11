@@ -5,14 +5,14 @@
 import {connect} from 'react-redux';
 import {State} from '../../types/redux/state';
 import MapCalibrationComponent from '../../components/maps/MapCalibrationComponent';
-import {CalibrationModeTypes} from "../../types/redux/map";
+import {CalibrationModeTypes} from '../../types/redux/map';
 
 function mapStateToProps(state: State) {
 	const mapID = state.maps.calibratingMap;
 	return {
-		mode: (state.maps.editedMaps[mapID])? state.maps.editedMaps[mapID].calibrationMode: CalibrationModeTypes.unavailable,
+		mode: (state.maps.editedMaps[mapID]) ? state.maps.editedMaps[mapID].calibrationMode : CalibrationModeTypes.unavailable,
 		isLoading: false,
-		mapID: mapID,
+		mapID
 	};
 }
 

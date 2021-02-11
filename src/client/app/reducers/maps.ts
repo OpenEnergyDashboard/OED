@@ -66,7 +66,7 @@ export default function maps(state = defaultState, action: MapsAction) {
 			};
 		case ActionType.SetCalibration:
 			byMapID = state.byMapID;
-			// if the map is first created just add a new instance into editedMaps
+			// if the map is freshly created, just add a new instance into editedMaps
 			if (action.mapID < 0) {
 				return {
 					...state,

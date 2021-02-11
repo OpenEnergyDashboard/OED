@@ -4,13 +4,10 @@
 
 import * as React from 'react';
 import { CalibrationModeTypes } from '../../types/redux/map';
-import MapCalibration_InitiateContainer from "../../containers/maps/MapCalibration_InitiateContainer";
-import MapCalibration_ChartDisplayContainer from "../../containers/maps/MapCalibration_ChartDisplayContainer";
-import MapCalibration_InfoDisplayContainer from "../../containers/maps/MapCalibration_InfoDisplayContainer";
-import HeaderContainer from "../../containers/HeaderContainer";
-import {Button} from "reactstrap";
-import {FormattedMessage} from "react-intl";
-import {Link} from "react-router";
+import MapCalibration_InitiateContainer from '../../containers/maps/MapCalibration_InitiateContainer';
+import MapCalibration_ChartDisplayContainer from '../../containers/maps/MapCalibration_ChartDisplayContainer';
+import MapCalibration_InfoDisplayContainer from '../../containers/maps/MapCalibration_InfoDisplayContainer';
+import HeaderContainer from '../../containers/HeaderContainer';
 
 interface MapCalibrationProps {
 	mode: CalibrationModeTypes;

@@ -67,11 +67,9 @@ export default class MapViewComponent extends React.Component<MapViewProps, MapV
 		if (this.props.isSubmitting) {
 			return '(submitting)';
 		}
-
 		if (this.props.isEdited) {
 			return '(edited)';
 		}
-
 		return '';
 	}
 
@@ -81,7 +79,6 @@ export default class MapViewComponent extends React.Component<MapViewProps, MapV
 	}
 
 	private formatDeleteButton() {
-
 		const editButtonStyle: React.CSSProperties = {
 			display: 'inline', // or 'none'
 			paddingLeft: '5px'

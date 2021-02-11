@@ -6,7 +6,7 @@ import {connect} from 'react-redux';
 import { State } from '../../types/redux/state';
 import { Dispatch } from '../../types/redux/actions';
 import MapCalibration_InfoDisplayComponent from '../../components/maps/MapCalibration_InfoDisplayComponent';
-import {changeGridDisplay, dropCalibration, offerCurrentGPS, submitCalibratingMap} from "../../actions/map";
+import {changeGridDisplay, dropCalibration, offerCurrentGPS, submitCalibratingMap} from '../../actions/map';
 import {GPSPoint} from '../../utils/calibration';
 import {logToServer} from '../../actions/logs';
 
@@ -16,7 +16,7 @@ function mapStateToProps(state: State) {
 	const resultDisplay = (map.calibrationResult) ?
 		`x: ${map.calibrationResult.maxError.x}%, y: ${map.calibrationResult.maxError.y}%`
 		: 'Need more points';
-	const currentCartesianDisplay = (map.currentPoint) ? `x: ${map.currentPoint.cartesian.x}, y: ${map.currentPoint.cartesian.y} ` : 'undefined';
+	const currentCartesianDisplay = (map.currentPoint) ? `x: ${map.currentPoint.cartesian.x}, y: ${map.currentPoint.cartesian.y}` : 'undefined';
 	return {
 		showGrid: state.maps.calibrationSettings.showGrid,
 		currentCartesianDisplay,
