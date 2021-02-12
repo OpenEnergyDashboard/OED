@@ -63,7 +63,7 @@ export default function ExportComponent(props: ExportProps) {
 		const count=await metersApi.lineReadingsCount(props.selectedMeters,props.timeInterval);
 		graphRawExport(count,async()=>{
 			const lineReading=await metersApi.rawLineReadings(props.selectedMeters,props.timeInterval);
-			downloadRawCSV(lineReading,`oedRawExport_${props.selectedMeters[0].toString()}_${startTime===null?'all':startTime}_${endTime===null?'all':endTime}.csv`);
+			downloadRawCSV(lineReading);
 		});
 	}
 
