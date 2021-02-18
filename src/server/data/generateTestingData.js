@@ -179,7 +179,7 @@ function generateSineData(startTimeStamp, endTimeStamp, options = {}) {
  * https://stackoverflow.com/questions/2496710/writing-files-in-node-js
  */
 async function writeToCsv(data, filename = 'test.csv') {
-	// async function writeToCsv(data: Array<[string, string]>, filename = 'test.csv') {
+	// async function writeToCsv(data: Array<[string, string, string]>, filename = 'test.csv') {
 	try {
 		header = 'reading,start_timestamp,end_timestamp' + '\r\n';
 		await fs.writeFile(filename, header) // insert header into file
@@ -192,6 +192,7 @@ async function writeToCsv(data, filename = 'test.csv') {
 		log.error(`Failed to csv-stringify the contents of data: ${JSON.stringify(data)}`, error); // log failure
 	}
 }
+
 
 // interface GenerateDataFileOptions extends GenerateDataOptions {
 // 	filename?: string;

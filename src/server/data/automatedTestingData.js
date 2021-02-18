@@ -11,7 +11,7 @@
 const promisify = require('es6-promisify');
 const csv = require('csv');
 const parseCsv = promisify(csv.parse);
-const { generateSine, generateCosine } = require('./testingDataFunctions');
+const { generateSine, generateCosine } = require('./generateTestingData');
 
 
 
@@ -55,18 +55,20 @@ async function generateVariableCosineTestingData(frequency = 15, amplitude) {
 
 
 /**
- * The following five functions each generate one year of sinusoidal testing data at pre-specified intervals. The data is then saved in an 
- * appropriately-named csv file under '../test/db/data/automatedTests/'.
- * 
- * The functions have the following specifications:
+ * The next five functions -- generateFourDayTestingData(), generateFourHourTestingData(), generateTwentyThreeMinuteTestingData(), 
+ * generateFifteenMinuteTestingData(), and generateOneMinuteTestingData() -- have the following specifications:
  *  - periodLength (the period of the cycles) is set to 1.5 months so that over 12 months, the data consists of 12 / 1.5 = 8 sinusoidal cycles.
  *  - maxAmplitude (the amplitude of the cycles) is set to 3 so that the vertical oscillation of the data is easily visible when graphed.
  * 
- * Please see the documentation for 'generateSine' under 'testingDataFunctions.js' for more details.
+ * Please see the documentation for 'generateSine()' under 'generateTestingData.js' for more details.
  */
 
 
-// Generates automated testing data over a one year period (for the whole year of 2020) at 4 day intervals.
+
+/**
+ * Generates one year of sinusoidal testing data (for the whole year of 2020) at 4 day intervals. The data is then stored in
+ * 'fourDayFreqTestData.csv' under '../test/db/data/automatedTests/'.
+ */
 async function generateFourDayTestingData() {
 	const startDate = '2020-01-01 00:00:00';
 	const endDate = '2020-12-31 23:59:59';
@@ -80,7 +82,11 @@ async function generateFourDayTestingData() {
 }
 
 
-// Generates automated testing data over a one year period (for the whole year of 2020) at 4 hour intervals.
+
+/**
+ * Generates one year of sinusoidal testing data (for the whole year of 2020) at 4 hour intervals. The data is then stored in
+ * 'fourHourFreqTestData.csv' under '../test/db/data/automatedTests/'.
+ */
 async function generateFourHourTestingData() {
 	const startDate = '2020-01-01 00:00:00';
 	const endDate = '2020-12-31 23:59:59';
@@ -94,7 +100,11 @@ async function generateFourHourTestingData() {
 }
 
 
-// Generates automated testing data over a one year period (for the whole year of 2020) at 23 minute intervals.
+
+/**
+ * Generates one year of sinusoidal testing data (for the whole year of 2020) at 23 minute intervals. The data is then stored in
+ * 'twentyThreeMinuteFreqTestData.csv' under '../test/db/data/automatedTests/'.
+ */
 async function generateTwentyThreeMinuteTestingData() {
 	const startDate = '2020-01-01 00:00:00';
 	const endDate = '2020-12-31 23:59:59';
@@ -108,7 +118,11 @@ async function generateTwentyThreeMinuteTestingData() {
 }
 
 
-// Generates automated testing data over a one year period (for the whole year of 2020) at 15 minute intervals.
+
+/**
+ * Generates one year of sinusoidal testing data (for the whole year of 2020) at 15 minute intervals. The data is then stored in
+ * 'fifteenMinuteFreqTestData.csv' under '../test/db/data/automatedTests/'.
+ */
 async function generateFifteenMinuteTestingData() {
 	const startDate = '2020-01-01 00:00:00';
 	const endDate = '2020-12-31 23:59:59';
@@ -122,7 +136,11 @@ async function generateFifteenMinuteTestingData() {
 }
 
 
-// Generates automated testing data over a one year period (for the whole year of 2020) at 1 minute intervals.
+
+/**
+ * Generates one year of sinusoidal testing data (for the whole year of 2020) at 4 hour intervals. The data is then stored in
+ * 'oneMinuteFreqTestData.csv' under '../test/db/data/automatedTests/'.
+ */
 async function generateOneMinuteTestingData() {
 	const startDate = '2020-01-01 00:00:00';
 	const endDate = '2020-12-31 23:59:59';
@@ -137,12 +155,45 @@ async function generateOneMinuteTestingData() {
 
 
 
+/**
+ * Calls the above functions with the appropriate parameters to generate all the necessary testing data. Each of the function calls 
+ * will generate a csv file under '../test/db/data/automatedTests' that is needed for automated testing.
+ */
+function generateTestingData() {
+
+// Generates 1 year of sinusoidal data with data points at 4-day intervals
+generateFourDayTestingData();
+
+// Generates 1 year of sinusoidal data with data points at 4-hour intervals
+generateFourHourTestingData();
+
+// Generates 1 year of sinusoidal data with data points at 4-day intervals
+generateTwentyThreeMinuteTestingData();
+
+// Generates 1 year of sinusoidal data with data points at 4-day intervals
+generateFifteenMinuteTestingData();
+
+// Generates 1 year of sinusoidal data with data points at 4-day intervals
+generateOneMinuteTestingData();
+
+
+// Generates 7 files, all containing 2 years of sinusoidal data, and each with a unique amplitude between 1 and 7. More specifically,
+// the first file contains sine waves with an amplitude of 1, the second contains waves with an amplitude of 2, and so on until 
+// the seventh which contains waves an amplitude of 7.
+for(var i = 1; i <= 7; i++) {
+	generateVariableSineTestingData(15, i);
+}
+
+
+// Generates 2 years of sinusoidal data with an amplitude of 2 and with data points at 15-minute intervals.
+generateVariableSineTestingData(15, 2);
+
+// Generates 2 years of cosinusoidal data with an amplitude of 3 and with data points at 2-minute intervals.
+generateVariableCosineTestingData(23, 3);
+}
+
+
+
 module.exports = {
-	generateVariableSineTestingData,
-	generateVariableCosineTestingData,
-	generateFourDayTestingData,
-	generateFourHourTestingData,
-	generateTwentyThreeMinuteTestingData,
-	generateFifteenMinuteTestingData,
-	generateOneMinuteTestingData
-};
+	generateTestingData
+}
