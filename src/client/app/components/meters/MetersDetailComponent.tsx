@@ -9,6 +9,8 @@ import { hasToken } from '../../utils/token';
 import MeterViewContainer from '../../containers/meters/MeterViewContainer';
 import HeaderContainer from '../../containers/HeaderContainer';
 import FooterComponent from '../FooterComponent';
+import TooltipHelpComponent from '../TooltipHelpComponentAlternative';
+import TooltipMarkerComponent from '../TooltipMarkerComponent';
 
 interface MetersDetailProps {
 	meters: number[];
@@ -33,7 +35,7 @@ export default class MetersDetailComponent extends React.Component<MetersDetailP
 		};
 
 		const titleStyle: React.CSSProperties = {
-			textAlign: 'center'
+			textAlign: 'center',
 		};
 
 		const tableStyle: React.CSSProperties = {
@@ -51,9 +53,13 @@ export default class MetersDetailComponent extends React.Component<MetersDetailP
 		return (
 			<div>
 				<HeaderContainer />
+				<TooltipHelpComponent page='meters' />
 				<div className='container-fluid'>
 					<h2 style={titleStyle}>
 						<FormattedMessage id='meters' />
+						<div style={{display: 'inline-block'}}>
+						<TooltipMarkerComponent page='meters' helpTextId='help.meters.meterview'/>
+						</div>
 					</h2>
 					<div style={tableStyle}>
 					<Table striped bordered hover>

@@ -7,6 +7,7 @@ import GroupSidebarContainer from '../../containers/groups/GroupSidebarContainer
 import GroupViewContainer from '../../containers/groups/GroupViewContainer';
 import HeaderContainer from '../../containers/HeaderContainer';
 import FooterComponent from '../FooterComponent';
+import TooltipHelpComponent from '../TooltipHelpComponentAlternative';
 
 interface GroupsDetailProps {
 	selectedGroups: number[];
@@ -31,6 +32,7 @@ export default class GroupsDetailComponent extends React.Component<GroupsDetailP
 		return (
 			<div>
 				<HeaderContainer />
+				<TooltipHelpComponent page='groups' />
 				<div className='container-fluid'>
 					<div className='row'>
 						<div className='col-12 col-lg-2'>
