@@ -10,6 +10,7 @@ const BASE_URL = 'https://openenergydashboard.github.io';
 //  const BASE_URL = 'https://xxx.github.io/OpenEnergyDashboard.github.io';
 
 const links: Record<string, Record<string, string>> = {
+	'help.admin.header': { link: `${BASE_URL}/help/admin.html`},
 	'help.home.chart.plotly.controls': { link: 'https://plotly.com/chart-studio-help/getting-to-know-the-plotly-modebar/' },
 	'help.home.chart.redraw.restore': { link: `${BASE_URL}/help/lineGraphic.html#redrawRestore` },
 	'help.home.chart.select': { link: `${BASE_URL}/help/graphType.html` },
@@ -23,7 +24,9 @@ const links: Record<string, Record<string, string>> = {
 	'help.home.hide.or.show.options': { link: `${BASE_URL}/help/hideOptions.html` },
 	'help.home.select.groups': { link: `${BASE_URL}/help/graphingGroups.html` },
 	'help.home.select.meters': { link: `${BASE_URL}/help/graphingMeters.html` },
-	'help.home.toggle.chart.link': { link: `${BASE_URL}/help/chartLink.html` }
+	'help.home.toggle.chart.link': { link: `${BASE_URL}/help/chartLink.html` },
+	'help.groups.groupview': { link: `${BASE_URL}/help/groupViewing.html`},
+	'help.meters.meterview': { link: `${BASE_URL}/help/meterViewing.html`}
 };
 
 export default links;

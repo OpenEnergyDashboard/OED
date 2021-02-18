@@ -8,6 +8,7 @@ import { FormattedMessage } from 'react-intl';
 import { ChangeDisplayedGroupsAction } from '../../types/redux/groups';
 import { Link } from 'react-router';
 import { hasToken } from '../../utils/token';
+import TooltipMarkerComponent from '../TooltipMarkerComponent';
 
 interface GroupSidebarProps {
 	/* tslint:disable:array-type */
@@ -36,6 +37,9 @@ export default class GroupSidebarComponent extends React.Component<GroupSidebarP
 			<div className='form-group'>
 				<p style={labelStyle}>
 					<FormattedMessage id='view.groups' />:
+					<div style={{display: "inline"}}>
+					<TooltipMarkerComponent page='groups' helpTextId='help.groups.groupview'/>
+					</div>
 				</p>
 				<select multiple className='form-control' id='groupList' size={8} onChange={this.handleGroupSelect}>
 					{this.props.groups.map(group =>
