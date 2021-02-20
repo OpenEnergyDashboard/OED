@@ -119,7 +119,9 @@ export function fetchNeededCompareReadings(comparePeriod: ComparePeriod): Thunk 
 		const state = getState();
 		const compareShift = calculateCompareShift(comparePeriod);
 		const timeInterval = state.graph.compareTimeInterval;
+		/* tslint:disable:array-type */
 		const promises: Array<Promise<any>> = [];
+		/* tslint:enable:array-type */
 
 		// Determine which meters are missing data for this time interval
 		const meterIDsToFetchForCompare = state.graph.selectedMeters.filter(

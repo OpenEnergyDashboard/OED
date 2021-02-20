@@ -6,7 +6,7 @@
 
 const moment = require('moment');
 const { mocha, expect, testDB } = require('../common');
-const readCSV = require('../../services/pipeline-in-progress/readCSV');
+const readCsv = require('../../services/pipeline-in-progress/readCsv');
 const Reading = require('../../models/Reading');
 const Meter = require('../../models/Meter');
 const path = require('path');
@@ -22,7 +22,7 @@ mocha.describe('PIPELINE: Load data from csv file', () => {
 	}
 	mocha.it('as array', async () => {
 		const conn = testDB.getConnection();
-		const arrayInput = await readCSV(testFilePath);
+		const arrayInput = await readCsv(testFilePath);
 		const arrayMeter = new Meter(undefined, 'test_array', 1, true, true, Meter.type.MAMAC);
 		await arrayMeter.insert(conn);
 		await loadCsvInput(testFilePath, arrayMeter.id, mapRowsToModel, false, false, false, 1, undefined, conn);
@@ -39,7 +39,7 @@ mocha.describe('PIPELINE: Load data from csv file', () => {
 	});
 	mocha.it('as stream', async () => {
 		const conn = testDB.getConnection();
-		const arrayInput = await readCSV(testFilePath);
+		const arrayInput = await readCsv(testFilePath);
 		const streamMeter = new Meter(undefined, 'test_stream', 2, true, true, Meter.type.MAMAC);
 		await streamMeter.insert(conn);
 		await loadCsvInput(testFilePath, streamMeter.id, mapRowsToModel, true, false, false, 1, undefined, conn);
