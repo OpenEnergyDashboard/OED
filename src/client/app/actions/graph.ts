@@ -61,20 +61,21 @@ export function changeBarDuration(barDuration: moment.Duration): Thunk {
 	};
 }
 
-function updateComparePeriod(comparePeriod: ComparePeriod): t.UpdateComparePeriodAction {
+function updateComparePeriod(comparePeriod: ComparePeriod, currentTime: moment.Moment): t.UpdateComparePeriodAction {
 	return {
 		type: ActionType.UpdateComparePeriod,
 		comparePeriod,
-		currentTime: moment()
+		currentTime
 	};
 }
 
 export function changeCompareGraph(comparePeriod: ComparePeriod): Thunk {
 	return (dispatch: Dispatch) => {
-		return Promise.all([
-			dispatch(updateComparePeriod(comparePeriod)),
-			dispatch(fetchNeededCompareReadings(comparePeriod))
-		]);
+		dispatch(updateComparePeriod(comparePeriod, moment()));
+		dispatch(dispatch2 => {
+			dispatch2(fetchNeededCompareReadings(comparePeriod));
+		});
+		return Promise.resolve();
 	};
 }
 
@@ -178,7 +179,7 @@ export function changeOptionsFromLink(options: LinkOptions) {
 	const dispatchFirst: Thunk[] = [setHotlinkedAsync(true)];
 	/* tslint:disable:array-type */
 	const dispatchSecond: Array<Thunk | t.ChangeChartToRenderAction | t.ChangeBarStackingAction
-		| t.ChangeCompareSortingOrderAction | t.SetOptionsVisibility> = [];
+		| t.ChangeGraphZoomAction |t.ChangeCompareSortingOrderAction | t.SetOptionsVisibility> = [];
 	/* tslint:enable:array-type */
 	if (options.meterIDs) {
 		dispatchFirst.push(fetchMetersDetailsIfNeeded());
@@ -202,6 +203,9 @@ export function changeOptionsFromLink(options: LinkOptions) {
 	}
 	if (options.toggleBarStacking) {
 		dispatchSecond.push(changeBarStacking());
+	}
+	if (options.serverRange) {
+		dispatchSecond.push(changeGraphZoomIfNeeded(options.serverRange));
 	}
 	if (options.comparePeriod) {
 		dispatchSecond.push(changeCompareGraph(options.comparePeriod));

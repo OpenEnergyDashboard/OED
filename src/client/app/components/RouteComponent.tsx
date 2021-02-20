@@ -128,7 +128,7 @@ export default class RouteComponent extends React.Component<RouteProps, {}> {
 							options.chartType = info as ChartTypes;
 							break;
 						case 'barDuration':
-							options.barDuration = moment.duration(parseInt(info), 'days');
+							options.barDuration = moment.duration(parseInt(info));
 							break;
 						case 'barStacking':
 							if (this.props.barStacking.toString() !== info) {
