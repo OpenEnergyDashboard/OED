@@ -8,7 +8,7 @@ import FooterComponent from '../FooterComponent';
 import AddMetersContainer from '../../containers/admin/AddMetersContainer';
 import AddReadingsContainer from '../../containers/admin/AddReadingsContainer';
 import PreferencesContainer from '../../containers/admin/PreferencesContainer';
-import { ViewUsersButtonComponent } from '../../containers/admin/UsersDetailContainer';
+import UsersManagementComponent from './UsersManagementComponent';
 
 /**
  * Top-level React component that controls the home page
@@ -38,7 +38,7 @@ export default function AdminComponent() {
 						<div style={bottomPaddingStyle}>
 							<p style={titleStyle}>Manage users:</p>
 							<div>
-								<ViewUsersButtonComponent />
+								<UsersManagementComponent />
 							</div>
 						</div>
 						<PreferencesContainer />
