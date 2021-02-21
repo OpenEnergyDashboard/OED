@@ -10,6 +10,7 @@ const BASE_URL = 'https://openenergydashboard.github.io';
 //  const BASE_URL = 'https://xxx.github.io/OpenEnergyDashboard.github.io';
 
 const links: Record<string, Record<string, string>> = {
+	'help.admin.groupview': { link: `${BASE_URL}/help/adminGroupViewing.html`},
 	'help.admin.header': { link: `${BASE_URL}/help/admin.html`},
 	'help.admin.meterview': { link: `${BASE_URL}/help/adminMeterViewing.html`},
 	'help.home.chart.plotly.controls': { link: 'https://plotly.com/chart-studio-help/getting-to-know-the-plotly-modebar/' },

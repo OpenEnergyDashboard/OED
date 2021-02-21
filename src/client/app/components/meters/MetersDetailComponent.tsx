@@ -53,7 +53,7 @@ export default class MetersDetailComponent extends React.Component<MetersDetailP
 
 		const tooltipStyle = {
 			display: 'inline-block',
-			tooltipTextID: renderCreateAdminTooltip? 'help.admin.meterview' : 'help.meters.meterview'
+			tooltipMeterView: renderCreateAdminTooltip? 'help.admin.meterview' : 'help.meters.meterview'
 		};
 
 		return (
@@ -64,7 +64,7 @@ export default class MetersDetailComponent extends React.Component<MetersDetailP
 					<h2 style={titleStyle}>
 						<FormattedMessage id='meters' />
 						<div style={tooltipStyle}>
-						<TooltipMarkerComponent page='meters' helpTextId={tooltipStyle.tooltipTextID} />
+						<TooltipMarkerComponent page='meters' helpTextId={tooltipStyle.tooltipMeterView} />
 						</div>
 					</h2>
 					<div style={tableStyle}>
