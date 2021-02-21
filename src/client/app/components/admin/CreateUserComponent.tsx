@@ -7,11 +7,11 @@ import HeaderContainer from '../../containers/HeaderContainer';
 import FooterComponent from '../../components/FooterComponent';
 
 export default function CreateUserComponent() {
-    return (
-        <div>
-            <HeaderContainer />
-            <h1> Create User </h1>
-            <FooterComponent />
-        </div>
-    )
+	return (
+		<div>
+			<HeaderContainer />
+			<h1> Create User </h1>
+			<FooterComponent />
+		</div>
+	)
 }

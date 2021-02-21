@@ -50,10 +50,3 @@ export default class UsersDetailContainer extends React.Component<UsersDisplayCo
 		)
 	}
 }
-
-/** This button redirects to the Users page. */
-export function ViewUsersButtonComponent() {
-	return (
-		<Link to='/users'><Button outline> View Users </Button></Link>
-	)
-}
