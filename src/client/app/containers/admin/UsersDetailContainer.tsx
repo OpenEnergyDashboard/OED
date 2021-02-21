@@ -7,6 +7,7 @@ import { User } from '../../types/items';
 import UserDetailComponent from '../../components/admin/UsersDetailComponent';
 import HeaderContainer from '../HeaderContainer';
 import FooterComponent from '../../components/FooterComponent';
+import { usersApi } from '../../utils/api';
 import { Link } from 'react-router';
 import { Button } from 'reactstrap';
 
@@ -36,8 +37,7 @@ export default class UsersDetailContainer extends React.Component<UsersDisplayCo
 	}
 
 	private async fetchUsers() {
-		console.log('fetching data')
-		return users;
+		return await usersApi.getUsers();
 	}
 
 	public render() {
