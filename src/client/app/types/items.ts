@@ -49,3 +49,12 @@ export interface User {
 	email: string;
 	role: string;
 }
+
+/**
+ * This is a enum that should match User.role on the server side.
+ */
+export enum UserRole {
+	admin = 'ADMIN',
+	obvius = 'OBVIUS',
+	csv = 'CSV',
+};

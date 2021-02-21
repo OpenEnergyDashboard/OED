@@ -2,6 +2,7 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
 
+const bcrypt = require('bcryptjs');
 const express = require('express');
 const User = require('../models/User');
 const { log } = require('../log');
@@ -49,6 +50,43 @@ router.get('/:user_id', async (req, res) => {
 		} catch (err) {
 			log.error(`Error while performing GET specific user by id query: ${err}`, err);
 			res.sendStatus(500);
+		}
+	}
+});
+
+router.post('/', async (req, res) => {
+	const validParams = {
+		type: 'object',
+		maxProperties: 1,
+		required: ['email', 'password', 'role'],
+		properties: {
+			email: {
+				type: 'string',
+				pattern: '^\\d+$'
+			},
+			password: {
+				type: 'string',
+				pattern: '^\\d+$'
+			},
+			role: {
+				type: 'string',
+				enum: Object.keys(User.role)
+			}
+		}
+	};
+	if (!validate(req.body, validParams)) {
+		res.status(400).json({ message: 'Invalid params' });
+	} else {
+		try {
+			const conn = getConnection();
+			const { email, password, role } = req.body;
+			const hashedPassword = bcrypt.hash(password)
+			const userRole = User.role[role];
+			const user = new User(undefined, email, hashedPassword, userRole);
+			user.insert(conn);
+		} catch (error) {
+			log.error(`Error while performing POST request to create user: ${error}`, error);
+			res.status(500).json({ message: 'Internal Server Error', error: error });
 		}
 	}
 });
