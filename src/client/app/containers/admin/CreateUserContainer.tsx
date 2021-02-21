@@ -6,7 +6,8 @@ import * as React from 'react';
 import HeaderContainer from '../../containers/HeaderContainer';
 import FooterComponent from '../../components/FooterComponent';
 import CreateUserComponent from '../../components/admin/CreateUserComponent';
-import { User, UserRole } from '../../types/items';
+import { UserRole } from '../../types/items';
+import { usersApi } from '../../utils/api';
 
 export default class CreateUserFormContainer extends React.Component<{}, {}>{
     constructor(props: {}) {
@@ -37,9 +38,13 @@ export default class CreateUserFormContainer extends React.Component<{}, {}>{
     private handleRoleChange = (newRole: UserRole) => {
         this.setState({ role: newRole })
     }
-    private submitNewUser = () => {
+    private submitNewUser = async () => {
         if (this.state.password === this.state.confirmPassword) {
-            console.log('form state', this.state);
+            await usersApi.createUser({
+                email: this.state.email,
+                password: this.state.password,
+                role: this.state.role
+            })
         }
     }
     public render() {
