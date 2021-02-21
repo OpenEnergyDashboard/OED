@@ -41,3 +41,11 @@ export interface TooltipItems {
 		xLabel: string;
 	};
 }
+
+/**
+ * A user object to be displayed for Administrators.
+ */
+export interface User {
+	email: string;
+	role: string;
+}
