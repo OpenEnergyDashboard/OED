@@ -57,7 +57,7 @@ app.use(express.static(path.join(__dirname, '..', 'client', 'public')));
 
 const router = express.Router();
 
-router.get(/^(\/)(login|admin|groups|createGroup|editGroup|graph|meters|editMeter)?$/, (req, res) => {
+router.get(/^(\/)(login|admin|groups|createGroup|editGroup|graph|meters|editMeter|users)?$/, (req, res) => {
 	fs.readFile(path.resolve(__dirname, '..', 'client', 'index.html'), (err, html) => {
 		const subdir = config.subdir || '/';
 		let htmlPlusData = html.toString().replace('SUBDIR', subdir);

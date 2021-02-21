@@ -27,6 +27,7 @@ import EditGroupsContainer from '../containers/groups/EditGroupsContainer';
 import CreateGroupContainer from '../containers/groups/CreateGroupContainer';
 import GroupsDetailContainer from '../containers/groups/GroupsDetailContainer';
 import MetersDetailContainer from '../containers/meters/MetersDetailContainer';
+import UsersDetailContainer from '../containers/admin/UsersDetailContainer';
 import {TimeInterval} from '../../../common/TimeInterval';
 
 interface RouteProps {
@@ -203,6 +204,7 @@ export default class RouteComponent extends React.Component<RouteProps, {}> {
 						<Route path='/graph' component={HomeComponent} onEnter={this.linkToGraph} />
 						<Route path='/createGroup' component={CreateGroupContainer} onEnter={this.requireAuth} />
 						<Route path='/editGroup' component={EditGroupsContainer} onEnter={this.requireAuth} />
+						<Route path='/users' component={UsersDetailContainer} onEnter={this.requireAuth} />
 						<Route path='*' component={HomeComponent} />
 					</Router>
 				</IntlProvider>
