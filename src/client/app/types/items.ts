@@ -51,7 +51,7 @@ export interface User {
 }
 
 /**
- * This is a enum that should match User.role on the server side.
+ * The values of this enum that needs to match the keys of User.role on the server side.
  */
 export enum UserRole {
 	admin = 'ADMIN',
