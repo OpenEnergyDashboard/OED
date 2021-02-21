@@ -9,6 +9,7 @@ import { hasToken } from '../../utils/token';
 import MeterViewContainer from '../../containers/meters/MeterViewContainer';
 import HeaderContainer from '../../containers/HeaderContainer';
 import FooterComponent from '../FooterComponent';
+import TooltipHelpComponent from '../TooltipHelpComponentAlternative';
 import TooltipMarkerComponent from '../TooltipMarkerComponent';
 
 interface MetersDetailProps {
@@ -58,12 +59,12 @@ export default class MetersDetailComponent extends React.Component<MetersDetailP
 		return (
 			<div>
 				<HeaderContainer />
+				<TooltipHelpComponent page='meters' />
 				<div className='container-fluid'>
 					<h2 style={titleStyle}>
 						<FormattedMessage id='meters' />
 						<div style={tooltipStyle}>
 						<TooltipMarkerComponent page='meters' helpTextId={tooltipStyle.tooltipTextID} />
-						{tooltipStyle.tooltipTextID}
 						</div>
 					</h2>
 					<div style={tableStyle}>

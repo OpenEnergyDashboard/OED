@@ -9,7 +9,6 @@ import { Link } from 'react-router';
 import { hasToken } from '../../utils/token';
 import { FormattedMessage } from 'react-intl';
 import { MeterMetadata, EditMeterDetailsAction } from '../../types/redux/meters';
-import TooltipHelpComponent from '../TooltipHelpComponentAlternative';
 
 interface MeterViewProps {
 	// The ID of the meter to be displayed
@@ -35,7 +34,6 @@ export default class MeterViewComponent extends React.Component<MeterViewProps, 
 			display: 'inline',
 			paddingLeft: '5px'
 		};
-		<TooltipHelpComponent page='meters' />
 		return (
 			<tr>
 				<td> {this.props.meter.id} {this.formatStatus()} </td>
