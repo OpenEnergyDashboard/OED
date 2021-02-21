@@ -11,6 +11,7 @@ const BASE_URL = 'https://openenergydashboard.github.io';
 
 const links: Record<string, Record<string, string>> = {
 	'help.admin.header': { link: `${BASE_URL}/help/admin.html`},
+	'help.admin.meterview': { link: `${BASE_URL}/help/adminMeterViewing.html`},
 	'help.home.chart.plotly.controls': { link: 'https://plotly.com/chart-studio-help/getting-to-know-the-plotly-modebar/' },
 	'help.home.chart.redraw.restore': { link: `${BASE_URL}/help/lineGraphic.html#redrawRestore` },
 	'help.home.chart.select': { link: `${BASE_URL}/help/graphType.html` },

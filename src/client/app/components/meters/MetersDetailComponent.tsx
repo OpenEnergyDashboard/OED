@@ -9,7 +9,6 @@ import { hasToken } from '../../utils/token';
 import MeterViewContainer from '../../containers/meters/MeterViewContainer';
 import HeaderContainer from '../../containers/HeaderContainer';
 import FooterComponent from '../FooterComponent';
-import TooltipHelpComponent from '../TooltipHelpComponentAlternative';
 import TooltipMarkerComponent from '../TooltipMarkerComponent';
 
 interface MetersDetailProps {
@@ -25,6 +24,7 @@ export default class MetersDetailComponent extends React.Component<MetersDetailP
 	}
 
 	public render() {
+		const renderCreateAdminTooltip = hasToken();
 		const flexContainerStyle = {
 			display: 'flex',
 			flexFlow: 'row wrap'
@@ -50,15 +50,20 @@ export default class MetersDetailComponent extends React.Component<MetersDetailP
 			marginRight: '40%'
 		};
 
+		const tooltipStyle = {
+			display: 'inline-block',
+			tooltipTextID: renderCreateAdminTooltip? 'help.admin.meterview' : 'help.meters.meterview'
+		};
+
 		return (
 			<div>
 				<HeaderContainer />
-				<TooltipHelpComponent page='meters' />
 				<div className='container-fluid'>
 					<h2 style={titleStyle}>
 						<FormattedMessage id='meters' />
-						<div style={{display: 'inline-block'}}>
-						<TooltipMarkerComponent page='meters' helpTextId='help.meters.meterview'/>
+						<div style={tooltipStyle}>
+						<TooltipMarkerComponent page='meters' helpTextId={tooltipStyle.tooltipTextID} />
+						{tooltipStyle.tooltipTextID}
 						</div>
 					</h2>
 					<div style={tableStyle}>
