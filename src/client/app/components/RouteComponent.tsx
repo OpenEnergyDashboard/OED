@@ -195,6 +195,7 @@ export default class RouteComponent extends React.Component<RouteProps, {}> {
 			<div>
 				<InitializationContainer />
 				<IntlProvider locale={lang} messages={messages} key={lang}>
+					<>
 					<Router history={browserHistory}>
 						<Route path='/login' component={LoginComponent} />
 						<Route path='/admin' component={AdminComponent} onEnter={this.requireAuth} />
@@ -205,6 +206,7 @@ export default class RouteComponent extends React.Component<RouteProps, {}> {
 						<Route path='/editGroup' component={EditGroupsContainer} onEnter={this.requireAuth} />
 						<Route path='*' component={HomeComponent} />
 					</Router>
+					</>
 				</IntlProvider>
 			</div>
 		);
