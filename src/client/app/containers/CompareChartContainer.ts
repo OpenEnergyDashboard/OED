@@ -66,6 +66,8 @@ function mapStateToProps(state: State, ownProps: CompareChartContainerProps): IP
 		},
 		hovermode: 'closest',
 		autosize: true,
+		width: 370,
+		height: 450,
 		showlegend: false,
 		legend: {
 		},

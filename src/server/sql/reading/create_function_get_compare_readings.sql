@@ -79,4 +79,4 @@ BEGIN
 			ON cr.meter_id = gdm.meter_id
 	GROUP by gids.id;
 END;
-$$ LANGUAGE 'plpgsql'
+$$ LANGUAGE 'plpgsql';
