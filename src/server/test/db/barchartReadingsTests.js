@@ -17,7 +17,7 @@ mocha.describe('Barchart Readings', () => {
 
 	mocha.beforeEach(async () => {
 		conn = testDB.getConnection();
-		await new Meter(undefined, 'Meter', null, false, true, Meter.type.MAMAC).insert(conn);
+		await new Meter(undefined, 'Meter', null, false, true, Meter.type.MAMAC, null).insert(conn);
 		meter = await Meter.getByName('Meter', conn);
 	});
 
@@ -115,8 +115,8 @@ mocha.describe('Barchart Readings', () => {
 
 	mocha.it('barchart readings with multiple meters', async () => {
 		conn = testDB.getConnection();
-		await new Meter(undefined, 'Meter2', null, false, true, Meter.type.MAMAC).insert(conn);
-		await new Meter(undefined, 'Meter3', null, false, true, Meter.type.MAMAC).insert(conn);
+		await new Meter(undefined, 'Meter2', null, false, true, Meter.type.MAMAC, null).insert(conn);
+		await new Meter(undefined, 'Meter3', null, false, true, Meter.type.MAMAC, null).insert(conn);
 		const meter2 = await Meter.getByName('Meter2', conn);
 		const meter3 = await Meter.getByName('Meter3', conn);
 		const readingMeter1 = new Reading(meter.id, 100, timestamp1, timestamp2);
