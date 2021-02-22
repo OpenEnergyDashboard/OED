@@ -3,7 +3,7 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
 
 import * as React from 'react';
-import * as ReactTooltip from 'react-tooltip';
+import ReactTooltip from 'react-tooltip';
 
 interface TooltipHelpProps {
 	tip: string;
@@ -18,8 +18,8 @@ export default function TooltipHelpComponent(props: TooltipHelpProps) {
 	};
 	return (
 		<div style={divStyle}>
-			<i data-tip={props.tip} className='fa fa-question-circle' />
-			<ReactTooltip />
+			<i data-tip={`<div style="max-width:300px">${props.tip}</div>`} className='fa fa-question-circle' />
+			<ReactTooltip html event='click'/>
 		</div>
 	);
 }
