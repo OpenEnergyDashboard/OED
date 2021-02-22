@@ -5,6 +5,7 @@
 import * as React from 'react';
 import { User } from '../../types/items';
 import { Table, Button } from 'reactstrap';
+import CreateUserLinkButtonComponent from './users/CreateUserLinkButtonComponent';
 
 interface UserDisplayComponentProps {
 	users: User[];
@@ -32,7 +33,7 @@ export default function UserDetailComponent(props: UserDisplayComponentProps) {
 							<tr>
 								<th> Email </th>
 								<th> Role </th>
-								<th> <Button> Create User </Button> </th>
+								<th> Action </th>
 							</tr>
 						</thead>
 						<tbody>
@@ -45,6 +46,7 @@ export default function UserDetailComponent(props: UserDisplayComponentProps) {
 							))}
 						</tbody>
 					</Table>
+					<CreateUserLinkButtonComponent />
 				</div>
 			</div>
 		</div>

@@ -6,16 +6,17 @@ import * as React from 'react';
 import { Link } from 'react-router';
 import { Button } from 'reactstrap';
 
-export default function UsersManagementComponent() {
+interface ManageUserLinkButtonComponentProps {
+	style?: React.CSSProperties;
+}
+
+export default function ManageUsersLinkButtonComponent(props: ManageUserLinkButtonComponentProps) {
 	const inlineButtonStyle: React.CSSProperties = {
 		display: 'inline',
 		paddingLeft: '5px'
 	}
 
 	return (
-		<div>
-			<Link style={inlineButtonStyle} to='/users/new'><Button outline> Create a User </Button></Link>
-			<Link style={inlineButtonStyle} to='/users' ><Button outline> View Users </Button></Link>
-		</div>
+		<Link style={{ ...inlineButtonStyle, ...props.style }} to='/users' ><Button outline> Users </Button></Link>
 	)
 }
