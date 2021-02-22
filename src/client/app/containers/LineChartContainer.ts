@@ -34,7 +34,7 @@ function mapStateToProps(state: State) {
 					const timeReading = moment(reading.startTimestamp);
 					xData.push(timeReading.format('YYYY-MM-DD HH:mm:ss'));
 					yData.push(reading.reading);
-					hoverText.push(`<b> ${timeReading.format('dddd, MMM DD, YYYY hh:mm a')} </b> <br> ${label}: ${reading.reading} kW`);
+					hoverText.push(`<b> ${timeReading.format('dddd, MMM DD, YYYY hh:mm a')} </b> <br> ${label}: ${reading.reading.toPrecision(6)} kW`);
 				});
 
 				// Save the timestamp range of the plot
@@ -91,7 +91,7 @@ function mapStateToProps(state: State) {
 					const timeReading = moment(reading.startTimestamp);
 					xData.push(timeReading.format('YYYY-MM-DD HH:mm:ss'));
 					yData.push(reading.reading);
-					hoverText.push(`<b> ${timeReading.format('dddd, MMM DD, YYYY hh:mm a')} </b> <br> ${label}: ${reading.reading} kW`);
+					hoverText.push(`<b> ${timeReading.format('dddd, MMM DD, YYYY hh:mm a')} </b> <br> ${label}: ${reading.reading.toPrecision(6)} kW`);
 				});
 
 				// This variable contains all the elements (x and y values, line type, etc.) assigned to the data parameter of the Plotly object
