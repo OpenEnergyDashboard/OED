@@ -7,7 +7,7 @@ const Meter = require('../../models/Meter');
 const ConfigFile = require('../../models/obvius/Configfile');
 
 /**
- * Creates meters from a config file
+ * Creates array of meters from a config file
  * @param {ConfigFile} configFile
  * @returns {Meter[]} an array of Meter objects
  */

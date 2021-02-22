@@ -82,7 +82,7 @@ class Configfile {
 	}
 
 	/**
-	 * Returns ??
+	 * Returns Promise<>
 	 * @param conn The connection to use.
 	 */
 	async insert(conn) {
