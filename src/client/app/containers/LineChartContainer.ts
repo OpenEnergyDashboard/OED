@@ -155,13 +155,13 @@ function mapStateToProps(state: State) {
 		layout,
 		config: {
 			displayModeBar: true,
-			locales: {'es':es,'fr':fr} //makes languages available for use
+			locales: {'es':es,'fr':fr} // makes languages available for use
 		}
 	};
 	const lang = state.admin.defaultLanguage;
-	if(lang == 'fr')
+	if(lang === 'fr')
 		props.config.locale = 'fr'
-	else if(lang == 'es')
+	else if(lang === 'es')
 		props.config.locale = 'es'
 	return props;
 }
