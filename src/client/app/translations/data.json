@@ -85,6 +85,7 @@
 	"navigation": "Navigation",
 	"oed": "Open Energy Dashboard",
 	"oed.description": "Open Energy Dashboard is an independent open source project. ",
+	"oed.version": "OED version ",
 	"options": "Options",
 	"password": "Password",
 	"please.select.meter": "Please select a meter",
