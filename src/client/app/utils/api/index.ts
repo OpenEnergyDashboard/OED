@@ -11,6 +11,7 @@ import FileProcessingApi from './FileProcessingApi';
 import PreferencesApi from './PreferencesApi';
 import VerificationApi from './VerificationApi';
 import CompressedReadingsApi from './CompressedReadingsApi';
+import VersionApi from './VersionApi';
 
 const apiBackend = new ApiBackend();
 
@@ -21,5 +22,6 @@ const fileProcessingApi = new FileProcessingApi(apiBackend);
 const preferencesApi = new PreferencesApi(apiBackend);
 const verificationApi = new VerificationApi(apiBackend);
 const compressedReadingsApi = new CompressedReadingsApi(apiBackend);
+const versionApi = new VersionApi(apiBackend);
 
-export { groupsApi, metersApi, fileProcessingApi, preferencesApi, verificationApi, compressedReadingsApi };
+export { groupsApi, metersApi, fileProcessingApi, preferencesApi, verificationApi, compressedReadingsApi , versionApi };
