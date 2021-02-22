@@ -85,12 +85,22 @@ class User {
 		}
 		return await conn.none(sqlFile('user/insert_new_user.sql'), user);
 	}
+
+	/**
+	 * Returns a promise to create the user_type type.
+	 * This needs to be run before User.createTable().
+	 * @param conn the connection to use
+	 * @return {Promise<void>}
+	 */
+	static createUserTypesEnum(conn) {
+		return conn.none(sqlFile('user/create_user_types_enum.sql'));
+	}
 }
 
 const _role = {
-	ADMIN: 0,
-	CSV: 1,
-	OBVIUS: 2
+	ADMIN: "admin",
+	CSV: "csv",
+	OBVIUS: "obvius"
 }
 
 User.role = Object.freeze(_role);
