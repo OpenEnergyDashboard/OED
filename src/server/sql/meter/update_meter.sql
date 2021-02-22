@@ -8,5 +8,6 @@ UPDATE meters
 		enabled = ${enabled},
 		displayable = ${displayable},
 		meter_type = ${type},
-  		default_timezone_meter = ${meterTimezone}
+  		default_timezone_meter = ${meterTimezone},
+		identifier = ${identifier}
 	WHERE id = ${id};
