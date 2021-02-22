@@ -71,7 +71,7 @@ mocha.describe('meters API', () => {
 				expect(meter).to.have.property('ipAddress', '1.1.1.1');
 				expect(meter).to.have.property('enabled', true);
 				expect(meter).to.have.property('meterType', Meter.type.MAMAC);
-				expect(meter).to.have.property('timeZone', 'TZ'+(i+1));
+				expect(meter).to.have.property('timeZone', 'TZ' + (i + 1));
 			}
 		});
 	});

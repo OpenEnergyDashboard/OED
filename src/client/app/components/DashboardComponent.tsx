@@ -45,8 +45,8 @@ export default class DashboardComponent extends React.Component<DashboardProps, 
 		this.handleTimeIntervalChange = this.handleTimeIntervalChange.bind(this);
 	}
 
-	public componentDidUpdate(prev: DashboardProps){
-		if(prev.chartToRender !== this.props.chartToRender){
+	public componentDidUpdate(prev: DashboardProps) {
+		if (prev.chartToRender !== this.props.chartToRender) {
 			ReactTooltip.rebuild(); // This rebuilds the tooltip so that it detects the marker that disappear because the chart type changes.
 		}
 	}
