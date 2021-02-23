@@ -8,7 +8,7 @@ import ExportComponent from '../components/ExportComponent';
 import { ChartTypes } from '../types/redux/graph';
 import { ExportDataSet } from '../types/readings';
 import { State } from '../types/redux/state';
-import {CompressedBarReading, CompressedBarReadings, CompressedLineReading} from '../types/compressed-readings';
+import { CompressedBarReading, CompressedBarReadings, CompressedLineReading } from '../types/compressed-readings';
 
 
 function transformLineReadingToLegacy(reading: CompressedLineReading): [number, number] {
@@ -40,10 +40,12 @@ function mapStateToProps(state: State) {
 						throw new Error('Unacceptable condition: readingsData.readings is undefined.');
 					}
 
-					const dataPoints: Array<{x: number, y: number}> = _.values(readingsData.readings)
+					/* tslint:disable:array-type */
+					const dataPoints: Array<{ x: number, y: number }> = _.values(readingsData.readings)
 						.map(transformLineReadingToLegacy)
-						.map((v: [number, number]) => ({ x: v[0], y: v[1]})
-					);
+						.map((v: [number, number]) => ({ x: v[0], y: v[1] })
+						);
+					/* tslint:enable:array-type */
 					datasets.push({
 						label,
 						id: state.groups.byGroupID[groupID].id,
@@ -63,11 +65,13 @@ function mapStateToProps(state: State) {
 						throw new Error('Unacceptable condition: readingsData.readings is undefined.');
 					}
 
-					const dataPoints: Array<{x: number, y: number}> = _.values(readingsData.readings)
+					/* tslint:disable:array-type */
+					const dataPoints: Array<{ x: number, y: number }> = _.values(readingsData.readings)
 						.map(transformLineReadingToLegacy)
 						.map(
-						(v: [number, number]) => ({ x: v[0], y: v[1]})
-					);
+							(v: [number, number]) => ({ x: v[0], y: v[1] })
+						);
+					/* tslint:enable:array-type */
 					datasets.push({
 						label,
 						id: state.meters.byMeterID[meterID].id,
@@ -90,10 +94,12 @@ function mapStateToProps(state: State) {
 							throw new Error('Unacceptable condition: readingsData.readings is undefined.');
 						}
 
-						const dataPoints: Array<{x: number, y: number}> = _.values(readingsData.readings)
+						/* tslint:disable:array-type */
+						const dataPoints: Array<{ x: number, y: number }> = _.values(readingsData.readings)
 							.map(transformBarReadingToLegacy)
-							.map((v: [number, number]) => ({ x: v[0], y: v[1]})
-						);
+							.map((v: [number, number]) => ({ x: v[0], y: v[1] })
+							);
+						/* tslint:enable:array-type */
 						datasets.push({
 							label,
 							id: state.groups.byGroupID[groupID].id,
@@ -116,10 +122,12 @@ function mapStateToProps(state: State) {
 							throw new Error('Unacceptable condition: readingsData.readings is undefined.');
 						}
 
-						const dataPoints: Array<{x: number, y: number}> = _.values(readingsData.readings)
+						/* tslint:disable:array-type */
+						const dataPoints: Array<{ x: number, y: number }> = _.values(readingsData.readings)
 							.map(transformBarReadingToLegacy)
-							.map((v: [number, number]) => ({ x: v[0], y: v[1]})
-						);
+							.map((v: [number, number]) => ({ x: v[0], y: v[1] })
+							);
+						/* tslint:enable:array-type */
 						datasets.push({
 							label,
 							id: state.meters.byMeterID[meterID].id,

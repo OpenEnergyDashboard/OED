@@ -22,6 +22,10 @@ export function updateDisplayTitle(displayTitle: string): t.UpdateDisplayTitleAc
 	return { type: ActionType.UpdateDisplayTitle, displayTitle };
 }
 
+export function updateTimeZone(timeZone: string): t.UpdateDefaultTimeZone {
+	return { type: ActionType.UpdateDefaultTimeZone, timeZone };
+}
+
 export function updateDefaultChartToRender(defaultChartToRender: ChartTypes): t.UpdateDefaultChartToRenderAction {
 	return { type: ActionType.UpdateDefaultChartToRender, defaultChartToRender };
 }
@@ -75,7 +79,8 @@ function submitPreferences() {
 				displayTitle: state.admin.displayTitle,
 				defaultChartToRender: state.admin.defaultChartToRender,
 				defaultBarStacking: state.admin.defaultBarStacking,
-				defaultLanguage: state.admin.defaultLanguage
+				defaultLanguage: state.admin.defaultLanguage,
+				defaultTimezone: state.admin.defaultTimeZone
 			});
 			dispatch(markPreferencesSubmitted());
 			showSuccessNotification(translate('updated.preferences'));

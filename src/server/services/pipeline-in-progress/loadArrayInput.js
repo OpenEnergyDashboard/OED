@@ -12,7 +12,7 @@ const handleCumulative = require('./handleCumulative');
 /**
  * Select and process needed values from a matrix and return an array of reading value and reading time
  * @param {object[[]]} dataRows where each row is defined by mapRowToModel function
- * @param {string} meterID meter id being input
+ * @param {number} meterID meter id being input
  * @param {function} mapRowToModel a customized function that map needed values from each row to the Reading model
  * @param {boolean} isCumulative true if the given data is Cumulative
  * @param {boolean} cumulativeReset true if the cumulative data is reset at midnight

@@ -31,9 +31,17 @@ FILES=$(echo "$FILES" | grep -v "src\/scripts\/refreshReadingViewsCron\.bash")
 FILES=$(echo "$FILES" | grep -v "src\/client\/app\/translations\/data.json")
 # Filter out test data for Obvius
 FILES=$(echo "$FILES" | grep -v "src\/server\/test\/web\/obvius\/.*")
+# Filter out .github files
+FILES=$(echo "$FILES" | grep -v ".github\/**")
 
 # Counts the files listed in FILES
 NFILES=$(echo $FILES | wc -w)
+
+if [ "$NFILES" -eq "0" ]; then
+   echo "[MPL2] No files to check for header, please check the checkHeader.sh script.";
+   exit 1;
+fi
+
 echo "[MPL2] Checking $NFILES files for a Mozilla Public License 2.0 header."
 
 # This searches for the above regex.

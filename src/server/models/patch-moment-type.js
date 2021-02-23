@@ -21,8 +21,8 @@ function patchMomentType(pgp) {
 	types.setTypeParser(TIMESTAMP_OID, moment);
 	types.setTypeParser(TIMESTAMPTZ_OID, moment);
 
-	moment.duration.fn._rawDBType = true; // eslint-disable-line no-underscore-dangle
-	moment.duration.fn.formatDBType = function formatDBType() {
+	moment.duration.fn.rawType = true; // eslint-disable-line no-underscore-dangle
+	moment.duration.fn.toPostgres = function toPostgres() {
 		return `'${this.toISOString()}'::INTERVAL`;
 	};
 

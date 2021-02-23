@@ -18,7 +18,7 @@ async function insertObviusData(serialNumber, ipAddress, logfile) {
 		try {
 			meter = await Meter.getByName(`${serialNumber}.${i}`);
 		} catch (v) {
-			meter = new Meter(undefined, `${serialNumber}.${i}`, ipAddress, true, Meter.type.OBVIUS, `OBVIUS ${serialNumber} COLUMN ${i}`);
+			meter = new Meter(undefined, `${serialNumber}.${i}`, ipAddress, true, false, Meter.type.OBVIUS, null, `OBVIUS ${serialNumber} COLUMN ${i}`);
 			await meter.insert();
 		}
 

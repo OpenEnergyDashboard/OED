@@ -5,7 +5,7 @@
  */
 
 const fs = require('fs');
-const readCSV = require('./readCSV');
+const readCsv = require('./readCsv');
 const loadArrayInput = require('./loadArrayInput');
 const loadCsvStream = require('./loadCsvStream');
 const { log } = require('../../log');
@@ -13,7 +13,7 @@ const { log } = require('../../log');
 /**
  * Read a CSV file and select needed column to return an array of reading value and reading time
  * @param {string} filePath path to file to load including file name
- * @param {string} meterID meter id being input
+ * @param {number} meterID meter id being input
  * @param {function} mapRowToModel a customized function that map needed values from each row to the Reading model
  * @param {boolean} readAsStream true if prefer to read file as CSV stream
  * @param {boolean} isCumulative true if the given data is cumulative
@@ -28,7 +28,7 @@ async function loadCsvInput(filePath, meterID, mapRowToModel, readAsStream, isCu
 			const stream = fs.createReadStream(filePath);
 			return loadCsvStream(stream, meterID, mapRowToModel, conditionSet, conn);
 		} else {
-			const dataRows = await readCSV(filePath);
+			const dataRows = await readCsv(filePath);
 			return loadArrayInput(dataRows, meterID, mapRowToModel, isCumulative, cumulativeReset, readingRepetition, conditionSet, conn);
 		}
 	} catch (err) {

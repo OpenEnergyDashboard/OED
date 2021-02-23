@@ -7,6 +7,7 @@ import { Modal, ModalHeader, ModalBody, Button } from 'reactstrap';
 import UIOptionsContainer from '../containers/UIOptionsContainer';
 import HeaderButtonsComponent from './HeaderButtonsComponent';
 import { FormattedMessage } from 'react-intl';
+import ReactTooltip from 'react-tooltip';
 
 interface MenuModalProps {
 	showOptions: boolean;
@@ -44,7 +45,7 @@ export default class MenuModalComponent extends React.Component<MenuModalProps, 
 				<Button outline onClick={this.toggle}>
 					<FormattedMessage id='menu'/>
 				</Button>
-				<Modal isOpen={this.state.showModal} toggle={this.toggle}>
+				<Modal isOpen={this.state.showModal} toggle={this.toggle} onOpened={ReactTooltip.rebuild}>
 					<ModalHeader toggle={this.toggle}>
 						<FormattedMessage id='options' />
 					</ModalHeader>

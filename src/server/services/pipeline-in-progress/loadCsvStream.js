@@ -7,6 +7,7 @@
 const csv = require('csv');
 const Reading = require('../../models/Reading');
 const convertToReading = require('./convertToReadings');
+const { log } = require('../../log');
 
 /**
  * Function to load a CSV file into the database in a configurable manner.
@@ -18,7 +19,7 @@ const convertToReading = require('./convertToReadings');
  *     &#9;(readings, tx) => Reading.insertAll(readings, tx)
  * ).then(() => log('Inserted!'));
  * @param stream the raw stream to load from
- * @param meterID
+ * @param {number} meterID
  * @param {function(Array.<*>, ...*): M} mapRowToModel maps a CSV row to a fixed [readings, (Moment) startTimeStamp, (Moment) endTimeStap] format
  * @param conditionSet
  * @param conn the database connection to use
@@ -57,9 +58,7 @@ function loadCsvStream(stream, meterID, mapRowToModel, conditionSet, conn) {
 			}
 		});
 		parser.on('error', err => {
-			if (!rejected) {
-				resolve(t.batch(pendingInserts).then(() => Promise.reject(err)));
-			}
+			log.warn('Error parsing CSV input', err);
 			rejected = true;
 		});
 		// Defines what happens when the parser's input stream is finished (and thus the promise needs to be resolved)
