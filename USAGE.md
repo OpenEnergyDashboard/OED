@@ -1,4 +1,9 @@
+# Transition to Developer Website
+
+The [developer website](https://openenergydashboard.github.io/developer/) is now available and becoming the preferred way to learn about working with the OED project. The information on this page is being transferred to that site but this page still contains useful information that has yet to be transferred. We suggest you start with the new website and visit here if you want some information not yet on that site. Note that some of the information here is out of date and will updated during the transition. Thanks for your understanding.
+
 # Quick Start With Docker #
+
 If using Docker, you first need to install [Docker](https://docs.docker.com/engine/installation/)
 and [docker-compose](https://docs.docker.com/compose/install/).
 
