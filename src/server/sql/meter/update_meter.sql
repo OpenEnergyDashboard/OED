@@ -7,5 +7,7 @@ UPDATE meters
 		ipaddress = ${ipAddress},
 		enabled = ${enabled},
 		displayable = ${displayable},
-		meter_type = ${type}
+		meter_type = ${type},
+  		default_timezone_meter = ${meterTimezone},
+		identifier = ${identifier}
 	WHERE id = ${id};

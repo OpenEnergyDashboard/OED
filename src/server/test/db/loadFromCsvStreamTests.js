@@ -21,7 +21,7 @@ mocha.describe('Read Mamac log from a file: ', () => {
 		// TODO: This should be refactored into a method as it appears in at least
 		// four test suites verbiatim
 		const conn = testDB.getConnection();
-		await new Meter(undefined, 'Meter', null, false, true, Meter.type.MAMAC).insert(conn);
+		await new Meter(undefined, 'Meter', null, false, true, Meter.type.MAMAC, null).insert(conn);
 		meter = await Meter.getByName('Meter', conn);
 	});
 
