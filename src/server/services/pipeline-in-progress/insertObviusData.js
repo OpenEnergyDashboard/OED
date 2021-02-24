@@ -21,7 +21,7 @@ async function insertObviusData(serialNumber, ipAddress, logfile) {
 			// Meters created are not displayable but are enabled so collect data.
 			// There is no timezone nor GPS value when automatically created.
 			meter = new Meter(undefined, `${serialNumber}.${i}`, ipAddress, true, false, Meter.type.OBVIUS,
-				null, unknown, `OBVIUS ${serialNumber} COLUMN ${i}`);
+				null, undefined, `OBVIUS ${serialNumber} COLUMN ${i}`);
 			await meter.insert();
 		}
 

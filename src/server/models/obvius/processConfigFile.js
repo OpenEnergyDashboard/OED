@@ -34,7 +34,7 @@ function processConfigFile(configFile) {
 			false,
 			Meter.type.OBVIUS,
 			null,
-			unknown,
+			undefined,
 			metersHash[internalMeterName].NAME));
 	}
 	return metersArray;
