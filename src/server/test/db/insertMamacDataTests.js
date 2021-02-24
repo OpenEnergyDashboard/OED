@@ -15,7 +15,7 @@ mocha.describe('PIPELINE: Insert Mamac Readings from a CSV file', () => {
 	let meter;
 	mocha.beforeEach(async () => {
 		conn = testDB.getConnection();
-		await new Meter(undefined, 'Mamac Meter', null, false, true, Meter.type.MAMAC).insert(conn);
+		await new Meter(undefined, 'Mamac Meter', null, false, true, Meter.type.MAMAC, null, unknown).insert(conn);
 		meter = await Meter.getByName('Mamac Meter', conn);
 	});
 

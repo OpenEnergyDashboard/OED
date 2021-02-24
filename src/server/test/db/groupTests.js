@@ -15,9 +15,9 @@ async function setupGroupsAndMeters(conn) {
 	const groupB = new Group(undefined, 'B');
 	const groupC = new Group(undefined, 'C');
 	await Promise.all([groupA, groupB, groupC].map(group => group.insert(conn)));
-	const meterA = new Meter(undefined, 'A', null, false, true, Meter.type.MAMAC, gps);
-	const meterB = new Meter(undefined, 'B', null, false, true, Meter.type.MAMAC, gps);
-	const meterC = new Meter(undefined, 'C', null, false, true, Meter.type.METASYS, gps);
+	const meterA = new Meter(undefined, 'A', null, false, true, Meter.type.MAMAC, null, gps);
+	const meterB = new Meter(undefined, 'B', null, false, true, Meter.type.MAMAC, null, gps);
+	const meterC = new Meter(undefined, 'C', null, false, true, Meter.type.METASYS, null), gps);
 	await Promise.all([meterA, meterB, meterC].map(meter => meter.insert(conn)));
 }
 

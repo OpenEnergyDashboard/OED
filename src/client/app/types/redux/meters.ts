@@ -51,6 +51,7 @@ export interface MeterMetadata {
 	meterType?: string;
 	ipAddress?: string;
 	gps?: GPSPoint;
+	timeZone?: string;
 }
 
 export interface MeterMetadataByID {

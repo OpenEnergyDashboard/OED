@@ -13,7 +13,7 @@ mocha.describe('PIPELINE: insert MetasysData from csv file', () => {
 	mocha.describe('with metasys-duplicate meter', () => {
 		mocha.beforeEach(async () => {
 			conn = testDB.getConnection();
-			await new Meter(undefined, 'metasys-duplicate', null, false, true, Meter.type.METASYS).insert(conn);
+			await new Meter(undefined, 'metasys-duplicate', null, false, true, Meter.type.METASYS, null, unknown).insert(conn);
 		});
 
 		mocha.it('handles duplicate readings', async () => {
@@ -35,7 +35,7 @@ mocha.describe('PIPELINE: insert MetasysData from csv file', () => {
 	mocha.describe('with metasys-invalid meter', () => {
 		mocha.beforeEach(async () => {
 			conn = testDB.getConnection();
-			await new Meter(undefined, 'metasys-invalid', null, false, true, Meter.type.METASYS).insert(conn);
+			await new Meter(undefined, 'metasys-invalid', null, false, true, Meter.type.METASYS, null, unknown).insert(conn);
 		});
 
 		mocha.it('errors correctly on an invalid file', () => {
@@ -59,7 +59,7 @@ mocha.describe('PIPELINE: insert MetasysData from csv file', () => {
 	mocha.describe('with metasys-valid meter', () => {
 		mocha.beforeEach(async () => {
 			conn = testDB.getConnection();
-			await new Meter(undefined, 'metasys-valid', null, false, true, Meter.type.METASYS).insert(conn);
+			await new Meter(undefined, 'metasys-valid', null, false, true, Meter.type.METASYS, null, unknown).insert(conn);
 		});
 
 		mocha.it('loads the correct number of rows from a file (drop last row)', async () => {

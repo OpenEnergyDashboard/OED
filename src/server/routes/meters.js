@@ -27,13 +27,15 @@ function formatMeterForResponse(meter, loggedIn) {
 		displayable: meter.displayable,
 		ipAddress: null,
 		meterType: null,
-		gps: meter.gps,
+		timeZone: null,
+		gps: meter.gps
 	};
 
 	// Only logged in users can see IP addresses and types
 	if (loggedIn) {
 		formattedMeter.ipAddress = meter.ipAddress;
 		formattedMeter.meterType = meter.type;
+		formattedMeter.timeZone = meter.meterTimezone;
 	}
 
 	return formattedMeter;
@@ -102,11 +104,12 @@ router.post('/edit', async (req, res) => {
 	const validParams = {
 		type: 'object',
 		maxProperties: 4,
-		required: ['id', 'enabled', 'displayable'],
+		required: ['id', 'enabled', 'displayable', 'timeZone'],
 		properties: {
 			id: { type: 'integer' },
 			enabled: { type: 'bool' },
 			displayable: { type: 'bool' },
+			timeZone: { type: 'string' }
 			gps: {
 				oneOf: [
 					{
@@ -133,6 +136,7 @@ router.post('/edit', async (req, res) => {
 			const meter = await Meter.getByID(req.body.id, conn);
 			meter.enabled = req.body.enabled;
 			meter.displayable = req.body.displayable;
+			meter.meterTimezone = req.body.timeZone;
 			meter.gps = (req.body.gps)? new Point(req.body.gps.longitude, req.body.gps.latitude): null;
 			await meter.update(conn);
 		} catch (err) {

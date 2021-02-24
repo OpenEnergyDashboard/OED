@@ -9,6 +9,7 @@ CREATE TABLE IF NOT EXISTS meters (
 	enabled BOOLEAN NOT NULL,
 	displayable BOOLEAN NOT NULL,
 	meter_type meter_type NOT NULL,
+	default_timezone_meter TEXT DEFAULT NULL,
 	gps POINT DEFAULT NULL,
 	identifier TEXT
 );

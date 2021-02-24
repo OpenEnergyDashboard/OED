@@ -9,6 +9,8 @@ import { FormattedMessage } from 'react-intl';
 import MenuModalComponent from './MenuModalComponent';
 import { hasToken } from '../utils/token';
 import getPage from '../utils/getPage';
+import TooltipMarkerComponent from './TooltipMarkerComponent';
+import TooltipHelpComponentAlternative from './TooltipHelpComponentAlternative';
 
 interface HeaderButtonsProps {
 	showCollapsedMenuButton: boolean;
@@ -24,7 +26,7 @@ export default class HeaderButtonsComponent extends React.Component<HeaderButton
 	}
 
 	public render() {
-		const showOptions = false;
+		const showOptions = getPage() === '';
 		const renderLoginButton = !hasToken();
 		const renderHomeButton = getPage() !== '';
 		const renderAdminButton = hasToken() && getPage() !== 'admin';
@@ -72,6 +74,8 @@ export default class HeaderButtonsComponent extends React.Component<HeaderButton
 					}
 				</div>
 				<div className={this.props.showCollapsedMenuButton ? 'd-none d-lg-block' : ''}>
+					<TooltipHelpComponentAlternative page='all' />
+					<TooltipMarkerComponent page='all' helpTextId='help.home.header' />
 					<Link style={adminLinkStyle} to='/admin'><Button outline><FormattedMessage id='admin.panel'/></Button></Link>
 					<Link style={groupsLinkStyle} to='/groups'><Button outline><FormattedMessage id='groups' /></Button></Link>
 					<Link style={metersLinkStyle} to='/meters'><Button outline><FormattedMessage id='meters' /></Button></Link>

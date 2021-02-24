@@ -66,6 +66,7 @@ export default class MetersDetailComponent extends React.Component<MetersDetailP
 						{hasToken() && <th> <FormattedMessage id='meter.gps'/> </th>}
 						<th> <FormattedMessage id='meter.enabled' /> </th>
 						<th> <FormattedMessage id='meter.displayable' /> </th>
+						{hasToken() && <th> <FormattedMessage id='meter.time.zone' /> </th>}
 						</tr>
 					</thead>
 					<tbody>

@@ -30,6 +30,7 @@ export interface PreferenceRequestItem {
 	defaultChartToRender: ChartTypes;
 	defaultBarStacking: boolean;
 	defaultLanguage: LanguageTypes;
+	defaultTimezone: string;
 }
 
 /**

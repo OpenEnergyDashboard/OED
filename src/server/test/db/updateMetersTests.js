@@ -16,10 +16,10 @@ const gps = new Point(90, 45);
 mocha.describe('Meter Update', () => {
 	mocha.it('can persist over a failed request', async () => {
 		const conn = testDB.getConnection();
-		const goodMeter = new Meter(undefined, 'GOOD', 1, true, true, Meter.type.MAMAC, gps);
+		const goodMeter = new Meter(undefined, 'GOOD', 1, true, true, Meter.type.MAMAC, null, gps);
 		await goodMeter.insert(conn);
 
-		const badMeter = new Meter(undefined, 'BAD', 2, true, true, Meter.type.MAMAC, gps);
+		const badMeter = new Meter(undefined, 'BAD', 2, true, true, Meter.type.MAMAC, null, gps);
 		await badMeter.insert(conn);
 
 		const metersToUpdate = [goodMeter, badMeter];
