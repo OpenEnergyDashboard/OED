@@ -24,7 +24,7 @@ function formatMapForResponse(map) {
 		modifiedDate: map.modifiedDate,
 		origin: map.origin,
 		opposite: map.opposite,
-		mapSource: map.mapSource,
+		mapSource: map.mapSource
 	};
 	return formattedMap;
 }
@@ -83,15 +83,15 @@ router.post('/create', async (req, res) => {
 				minLength: 1
 			},
 			filename: {
-				type: 'string',
+				type: 'string'
 			},
 			modifiedDate: {
 				type: 'string',
-				minLength: 1,
+				minLength: 1
 			},
 			mapSource: {
 				type: 'string',
-				minLength: 1,
+				minLength: 1
 			},
 			note: {
 				oneOf: [
@@ -100,7 +100,7 @@ router.post('/create', async (req, res) => {
 				]
 			},
 			displayable: {
-				type: 'bool',
+				type: 'bool'
 			},
 			if: {
 				properties: {
@@ -111,7 +111,7 @@ router.post('/create', async (req, res) => {
 							latitude: { type: 'number', minimum: '-90', maximum: '90' },
 							longitude: { type: 'number', minimum: '-180', maximum: '180'}
 						}
-					},
+					}
 				}
 			},
 			then: {
@@ -130,7 +130,7 @@ router.post('/create', async (req, res) => {
 				properties: {
 					opposite: { type: 'null'}
 				}
-			},
+			}
 		}
 	};
 	const validationResult = validate(req.body, validMap);
@@ -182,15 +182,15 @@ router.post('/edit', async (req, res) => {
 				minLength: 1
 			},
 			filename: {
-				type: 'string',
+				type: 'string'
 			},
 			modifiedDate: {
 				type: 'string',
-				minLength: 1,
+				minLength: 1
 			},
 			mapSource: {
 				type: 'string',
-				minLength: 1,
+				minLength: 1
 			},
 			note: {
 				oneOf: [
@@ -199,7 +199,7 @@ router.post('/edit', async (req, res) => {
 				]
 			},
 			displayable: {
-				type: 'bool',
+				type: 'bool'
 			},
 			if: {
 				properties: {
@@ -210,7 +210,7 @@ router.post('/edit', async (req, res) => {
 							latitude: { type: 'number', minimum: '-90', maximum: '90' },
 							longitude: { type: 'number', minimum: '-180', maximum: '180' }
 						}
-					},
+					}
 				}
 			},
 			then: {
@@ -229,7 +229,7 @@ router.post('/edit', async (req, res) => {
 				properties: {
 					opposite: { type: 'null'}
 				}
-			},
+			}
 		}
 	};
 	const validatorResult = validate(req.body, validMap);

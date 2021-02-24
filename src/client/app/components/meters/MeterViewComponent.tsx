@@ -9,7 +9,7 @@ import { Link } from 'react-router';
 import { hasToken } from '../../utils/token';
 import { FormattedMessage } from 'react-intl';
 import { MeterMetadata, EditMeterDetailsAction } from '../../types/redux/meters';
-import {GPSPoint, isValidGPSInput} from '../../utils/calibration';
+import { GPSPoint, isValidGPSInput } from '../../utils/calibration';
 import TimeZoneSelect from '../TimeZoneSelect';
 
 interface MeterViewProps {
@@ -199,21 +199,22 @@ export default class MeterViewComponent extends React.Component<MeterViewProps, 
 			} else {
 				this.props.log('info', 'refused gps coordinates with invalid input');
 				const originalGPS = this.props.meter.gps;
-				this.setState({gpsInput: (originalGPS) ? `${originalGPS.longitude},${originalGPS.latitude}` : ''});
+				this.setState({ gpsInput: (originalGPS) ? `${originalGPS.longitude},${originalGPS.latitude}` : '' });
 			}
 		}
-		this.setState({gpsFocus: !this.state.gpsFocus});
+		this.setState({ gpsFocus: !this.state.gpsFocus });
 	}
 
 	private handleGPSChange(event: React.ChangeEvent<HTMLTextAreaElement>) {
-		this.setState({ gpsInput: event.target.value});
+		this.setState({ gpsInput: event.target.value });
 	}
 
 	private formatGPSInput() {
 		let formattedGPS;
 		let buttonMessageId;
 		if (this.state.gpsFocus) {
-			formattedGPS = <textarea id={'gps'} autoFocus={true} value={this.state.gpsInput} onChange={event => this.handleGPSChange(event)}/>;
+			// default value for autoFocus is true and for all attributes that would be set autoFocus={true}
+			formattedGPS = <textarea id={'gps'} autoFocus value={this.state.gpsInput} onChange={event => this.handleGPSChange(event)} />;
 			buttonMessageId = 'update';
 		} else {
 			formattedGPS = <div>{this.state.gpsInput}</div>;

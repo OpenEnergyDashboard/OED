@@ -13,7 +13,7 @@ import { changeOptionsFromLink, LinkOptions } from '../actions/graph';
 import { fetchPreferencesIfNeeded } from '../actions/admin';
 import { State } from '../types/redux/state';
 import { Dispatch } from '../types/redux/actions';
-import {fetchMapsDetails} from "../actions/map";
+import {fetchMapsDetails} from '../actions/map';
 
 
 function mapStateToProps(state: State) {

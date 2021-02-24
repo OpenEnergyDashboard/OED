@@ -28,8 +28,8 @@ import CreateGroupContainer from '../containers/groups/CreateGroupContainer';
 import GroupsDetailContainer from '../containers/groups/GroupsDetailContainer';
 import MetersDetailContainer from '../containers/meters/MetersDetailContainer';
 import {TimeInterval} from '../../../common/TimeInterval';
-import MapsDetailContainer from "../containers/maps/MapsDetailContainer";
-import MapCalibrationContainer from "../containers/maps/MapCalibrationContainer";
+import MapsDetailContainer from '../containers/maps/MapsDetailContainer';
+import MapCalibrationContainer from '../containers/maps/MapCalibrationContainer';
 
 interface RouteProps {
 	barStacking: boolean;

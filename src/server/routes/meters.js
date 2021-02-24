@@ -109,7 +109,7 @@ router.post('/edit', async (req, res) => {
 			id: { type: 'integer' },
 			enabled: { type: 'bool' },
 			displayable: { type: 'bool' },
-			timeZone: { type: 'string' }
+			timeZone: { type: 'string' },
 			gps: {
 				oneOf: [
 					{
@@ -120,7 +120,7 @@ router.post('/edit', async (req, res) => {
 							longitude: { type: 'number', minimum: '-180', maximum: '180'}
 						}
 					},
-					{type: 'null'},
+					{type: 'null'}
 				]
 			}
 		}

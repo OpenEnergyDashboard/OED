@@ -2,14 +2,14 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
 
-import {connect} from 'react-redux';
-import PlotlyChart, {IPlotlyChartProps} from 'react-plotlyjs-ts';
-import {State} from '../../types/redux/state';
+import { connect } from 'react-redux';
+import PlotlyChart, { IPlotlyChartProps } from 'react-plotlyjs-ts';
+import { State } from '../../types/redux/state';
 import * as plotly from 'plotly.js';
-import {CartesianPoint, Dimensions, normalizeImageDimensions} from '../../utils/calibration';
-import {updateCurrentCartesian} from '../../actions/map';
+import { CartesianPoint, Dimensions, normalizeImageDimensions } from '../../utils/calibration';
+import { updateCurrentCartesian } from '../../actions/map';
 import store from '../../index';
-import {CalibrationSettings} from '../../types/redux/map';
+import { CalibrationSettings } from '../../types/redux/map';
 
 function mapStateToProps(state: State) {
 	const x: number[] = [];
@@ -26,7 +26,7 @@ function mapStateToProps(state: State) {
 			texts.push(`latitude: ${point.gps.latitude}, longitude: ${point.gps.longitude}`);
 		}
 	}
-	const imageDimensions: Dimensions = normalizeImageDimensions( {
+	const imageDimensions: Dimensions = normalizeImageDimensions({
 		width: map.image.width,
 		height: map.image.height
 	});
@@ -111,9 +111,9 @@ function createBackgroundTrace(imageDimensions: Dimensions, settings: Calibratio
 	}
 	// define the actual points of the graph, numbers in the array are used to designate different colors;
 	const z = [];
-	for (let j = 0; j < y.length; j++) {
+	for (const item of y) {
 		const temp = [];
-		for (let k = 0; k < x.length; k++) {
+		for (const it of x) {
 			temp.push(0);
 		}
 		z.push(temp);
@@ -146,7 +146,7 @@ function getClickedCoordinates(event: plotly.PlotMouseEvent) {
 	 *  trace 1 keeps the data points used for calibration are automatically added to the same trace(dataPointTrace),
 	 *  event.points will include all points near a mouse click, including those in the backgroundTrace and the dataPointTrace,
 	 *  so the algorithm only looks at trace 0 since points from trace 1 are already put into the data set used for calibration.
- 	 */
+	   */
 	const eligiblePoints = [];
 	for (const point of event.points) {
 		const pointNumber = point.pointNumber;

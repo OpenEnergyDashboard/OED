@@ -16,7 +16,7 @@ import { ChartTypes } from '../types/redux/graph';
 import { ComparePeriod, SortingOrder } from '../utils/calculateCompare';
 import TooltipMarkerComponent from './TooltipMarkerComponent';
 import 'rc-slider/assets/index.css';
-import MapChartSelectContainer from "../containers/MapChartSelectContainer";
+import MapChartSelectContainer from '../containers/MapChartSelectContainer';
 
 const Slider = createSliderWithTooltip(sliderWithoutTooltips);
 

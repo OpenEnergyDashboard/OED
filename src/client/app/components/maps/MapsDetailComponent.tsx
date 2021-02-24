@@ -8,8 +8,8 @@ import { FormattedMessage } from 'react-intl';
 import { hasToken } from '../../utils/token';
 import HeaderContainer from '../../containers/HeaderContainer';
 import FooterComponent from '../FooterComponent';
-import MapViewContainer from "../../containers/maps/MapViewContainer";
-import {Link} from "react-router";
+import MapViewContainer from '../../containers/maps/MapViewContainer';
+import {Link} from 'react-router';
 
 interface MapsDetailProps {
 	maps: number[];

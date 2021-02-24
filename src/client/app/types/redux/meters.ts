@@ -4,7 +4,7 @@
 
 import { ActionType } from './actions';
 import { NamedIDItem } from '../items';
-import {GPSPoint} from "../../utils/calibration";
+import {GPSPoint} from '../../utils/calibration';
 
 export interface RequestMetersDetailsAction {
 	type: ActionType.RequestMetersDetails;

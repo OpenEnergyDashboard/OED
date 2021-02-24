@@ -18,8 +18,8 @@ const validLog = {
 	properties: {
 		message: {
 			type: 'string',
-			minLength: 1,
-		},
+			minLength: 1
+		}
 	}
 }
 router.post('/info', async (req, res) => {

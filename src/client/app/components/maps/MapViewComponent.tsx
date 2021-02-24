@@ -161,7 +161,8 @@ export default class MapViewComponent extends React.Component<MapViewProps, MapV
 		let formattedName;
 		let buttonMessageId;
 		if (this.state.nameFocus) {
-			formattedName = <textarea id={'name'} autoFocus={true} value={this.state.nameInput} onChange={event => this.handleNameChange(event)}/>;
+			// default value for autoFocus is true and for all attributes that would be set autoFocus={true}
+			formattedName = <textarea id={'name'} autoFocus value={this.state.nameInput} onChange={event => this.handleNameChange(event)}/>;
 			buttonMessageId = 'update';
 		} else {
 			formattedName = <div>{this.state.nameInput}</div>;
@@ -213,7 +214,8 @@ export default class MapViewComponent extends React.Component<MapViewProps, MapV
 		let formattedNote;
 		let buttonMessageId;
 		if (this.state.noteFocus) {
-			formattedNote = <textarea id={'note'} autoFocus={true} value={this.state.noteInput} onChange={event => this.handleNoteChange(event)}/>;
+			// default value for autoFocus is true and for all attributes that would be set autoFocus={true}
+			formattedNote = <textarea id={'note'} autoFocus value={this.state.noteInput} onChange={event => this.handleNoteChange(event)}/>;
 			buttonMessageId = 'update';
 		} else {
 			formattedNote = <div>{this.state.noteInput}</div>;

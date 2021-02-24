@@ -5,7 +5,7 @@
 import {connect} from 'react-redux';
 import { State } from '../../types/redux/state';
 import { Dispatch } from '../../types/redux/actions';
-import MapCalibration_InfoDisplayComponent from '../../components/maps/MapCalibration_InfoDisplayComponent';
+import MapCalibrationInfoDisplayComponent from '../../components/maps/MapCalibrationInfoDisplayComponent';
 import {changeGridDisplay, dropCalibration, offerCurrentGPS, submitCalibratingMap} from '../../actions/map';
 import {GPSPoint} from '../../utils/calibration';
 import {logToServer} from '../../actions/logs';
@@ -33,4 +33,4 @@ function mapDispatchToProps(dispatch: Dispatch) {
 		changeGridDisplay: () => dispatch(changeGridDisplay())
 	};
 }
-export default connect(mapStateToProps, mapDispatchToProps)(MapCalibration_InfoDisplayComponent);
+export default connect(mapStateToProps, mapDispatchToProps)(MapCalibrationInfoDisplayComponent);

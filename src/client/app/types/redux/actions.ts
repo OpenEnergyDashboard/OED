@@ -96,7 +96,7 @@ export enum ActionType {
 	ConfirmEditedMap = 'CONFIRM_EDITED_MAP',
 	SetCalibration = 'SET_CALIBRATION',
 	ResetCalibration = 'RESET_CALIBRATION',
-	IncrementCounter = 'INCREMENT_COUNTER',
+	IncrementCounter = 'INCREMENT_COUNTER'
 }
 
 /**

@@ -15,7 +15,7 @@ function mapStateToProps(state: State) {
 	let map;
 	let data;
 	let image;
-	if (state.maps.selectedMap != 0) {
+	if (state.maps.selectedMap !== 0) {
 		const mapID = state.maps.selectedMap;
 		if (state.maps.byMapID[mapID]) {
 			map = state.maps.byMapID[mapID];

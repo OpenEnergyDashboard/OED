@@ -4,9 +4,9 @@
 
 import * as React from 'react';
 import { CalibrationModeTypes } from '../../types/redux/map';
-import MapCalibration_InitiateContainer from '../../containers/maps/MapCalibration_InitiateContainer';
-import MapCalibration_ChartDisplayContainer from '../../containers/maps/MapCalibration_ChartDisplayContainer';
-import MapCalibration_InfoDisplayContainer from '../../containers/maps/MapCalibration_InfoDisplayContainer';
+import MapCalibrationInitiateContainer from '../../containers/maps/MapCalibrationInitiateContainer';
+import MapCalibrationChartDisplayContainer from '../../containers/maps/MapCalibrationChartDisplayContainer';
+import MapCalibrationInfoDisplayContainer from '../../containers/maps/MapCalibrationInfoDisplayContainer';
 import HeaderContainer from '../../containers/HeaderContainer';
 
 interface MapCalibrationProps {
@@ -25,7 +25,7 @@ export default class MapCalibrationComponent extends React.Component<MapCalibrat
 			return (
 				<div className='container-fluid'>
 					<HeaderContainer/>
-					<MapCalibration_InitiateContainer/>
+					<MapCalibrationInitiateContainer/>
 				</div>
 			);
 		} else if (this.props.mode === CalibrationModeTypes.calibrate) {
@@ -33,8 +33,8 @@ export default class MapCalibrationComponent extends React.Component<MapCalibrat
 				<div className='container-fluid'>
 					<HeaderContainer />
 					<div id={'MapCalibrationContainer'}>
-						<MapCalibration_ChartDisplayContainer/>
-						<MapCalibration_InfoDisplayContainer/>
+						<MapCalibrationChartDisplayContainer/>
+						<MapCalibrationInfoDisplayContainer/>
 					</div>
 				</div>
 			);

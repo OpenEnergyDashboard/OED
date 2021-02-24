@@ -22,7 +22,7 @@ interface InfoDisplayState {
 	value: string;
 }
 
-export default class MapCalibration_InfoDisplayComponent extends React.Component<InfoDisplayProps, InfoDisplayState> {
+export default class MapCalibrationInfoDisplayComponent extends React.Component<InfoDisplayProps, InfoDisplayState> {
 	constructor(props: InfoDisplayProps) {
 		super(props);
 		this.state = {
@@ -51,13 +51,13 @@ export default class MapCalibration_InfoDisplayComponent extends React.Component
 							<br/>
 							in this format -> latitude,longitude
 							<br/>
-							<textarea id={'text'} cols={50} value={this.state.value} onChange={this.handleGPSInput.bind(this)}/>
+							<textarea id={'text'} cols={50} value={this.state.value} onChange={this.handleGPSInput}/>
 						</label>
 						<br/>
 						<input type={'submit'} value={'Submit'}/>
 					</form>
 					<button onClick={this.dropCurrentCalibration}>Reset</button>
-					<button onClick={this.handleChanges.bind(this)}>Save changes to database</button>
+					<button onClick={this.handleChanges}>Save changes to database</button>
 					<p>{calibrationDisplay}</p>
 				</div>
 			</div>

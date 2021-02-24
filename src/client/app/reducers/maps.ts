@@ -4,8 +4,8 @@
 
 import {MapMetadata, MapsAction, MapState} from '../types/redux/map';
 import {ActionType} from '../types/redux/actions';
-import * as _ from "lodash";
-import {CalibratedPoint} from "../utils/calibration";
+import * as _ from 'lodash';
+import {CalibratedPoint} from '../utils/calibration';
 
 const defaultState: MapState = {
 	isLoading: false,
@@ -15,14 +15,14 @@ const defaultState: MapState = {
 	editedMaps: {},
 	submitting: [],
 	newMapCounter: 0,
-	calibrationSettings: {showGrid: false},
+	calibrationSettings: {showGrid: false}
 };
 
 export default function maps(state = defaultState, action: MapsAction) {
 	let submitting;
 	let editedMaps;
 	let byMapID;
-	let calibrated = state.calibratingMap;
+	const calibrated = state.calibratingMap;
 	switch (action.type) {
 		case ActionType.UpdateCalibrationMode:
 			return {
@@ -31,14 +31,14 @@ export default function maps(state = defaultState, action: MapsAction) {
 					...state.editedMaps,
 					[calibrated]: {
 						...state.editedMaps[calibrated],
-						calibrationMode: action.nextMode,
+						calibrationMode: action.nextMode
 					}
 				}
 			};
 		case ActionType.UpdateSelectedMap:
 			return {
 				...state,
-				selectedMap: action.mapID,
+				selectedMap: action.mapID
 			}
 		case ActionType.RequestMapsDetails:
 			return {
@@ -48,7 +48,7 @@ export default function maps(state = defaultState, action: MapsAction) {
 		case ActionType.ReceiveMapsDetails:
 			const data: MapMetadata[] = action.data.map(mapData => {
 				// parse JSON format to MapMetadata object
-				let parsedData = JSON.parse(JSON.stringify(mapData));
+				const parsedData = JSON.parse(JSON.stringify(mapData));
 				parsedData.image = new Image();
 				parsedData.image.src = parsedData.mapSource;
 				return parsedData;
@@ -115,7 +115,7 @@ export default function maps(state = defaultState, action: MapsAction) {
 			};
 		case ActionType.ResetCalibration:
 			editedMaps = state.editedMaps;
-			let mapToReset = {...editedMaps[action.mapID]};
+			const mapToReset = {...editedMaps[action.mapID]};
 			delete mapToReset.currentPoint;
 			delete mapToReset.calibrationResult;
 			delete mapToReset.calibrationSet;
@@ -124,7 +124,7 @@ export default function maps(state = defaultState, action: MapsAction) {
 				editedMaps: {
 					...state.editedMaps,
 					[calibrated]: mapToReset
-				},
+				}
 			};
 		case ActionType.RequestSelectedMap:
 			return {
@@ -143,7 +143,7 @@ export default function maps(state = defaultState, action: MapsAction) {
 				filename: action.map.filename,
 				calibrationResult: {
 					origin: action.map.origin,
-					opposite: action.map.opposite,
+					opposite: action.map.opposite
 				}
 			}
 		case ActionType.UpdateMapSource:
@@ -161,7 +161,7 @@ export default function maps(state = defaultState, action: MapsAction) {
 			editedMaps[action.map.id] = action.map;
 			return {
 				...state,
-				editedMaps,
+				editedMaps
 			};
 		case ActionType.SubmitEditedMap:
 			submitting = state.submitting;
@@ -199,7 +199,7 @@ export default function maps(state = defaultState, action: MapsAction) {
 		case ActionType.UpdateCurrentCartesian:
 			const newDataPoint: CalibratedPoint = {
 				cartesian: action.currentCartesian,
-				gps: {longitude: -1, latitude: -1},
+				gps: {longitude: -1, latitude: -1}
 			};
 			return {
 				...state,
@@ -207,7 +207,7 @@ export default function maps(state = defaultState, action: MapsAction) {
 					...state.editedMaps,
 					[calibrated]: {
 						...state.editedMaps[calibrated],
-						currentPoint: newDataPoint,
+						currentPoint: newDataPoint
 					}
 				}
 			};
@@ -220,8 +220,8 @@ export default function maps(state = defaultState, action: MapsAction) {
 						...state.editedMaps[calibrated],
 						currentPoint: {
 							...state.editedMaps[calibrated].currentPoint,
-							gps: action.currentGPS,
-						},
+							gps: action.currentGPS
+						}
 					}
 				}
 			};
@@ -232,7 +232,7 @@ export default function maps(state = defaultState, action: MapsAction) {
 					...state.editedMaps,
 					[calibrated]: {
 						...state.editedMaps[calibrated],
-						currentPoint: undefined,
+						currentPoint: undefined
 					}
 				}
 			};

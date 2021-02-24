@@ -7,7 +7,7 @@ import { SelectOption } from '../types/items';
 import { defineMessages, FormattedMessage, injectIntl, InjectedIntlProps } from 'react-intl';
 import '../styles/react-select-css.css';
 import 'react-select/dist/react-select.css';
-import SingleSelectComponent from "./SingleSelectComponent";
+import SingleSelectComponent from './SingleSelectComponent';
 
 interface MapChartSelectProps {
 	maps: SelectOption[];
@@ -32,7 +32,7 @@ class MapChartSelectComponent extends React.Component<MapChartSelectPropsWithInt
 			margin: 0
 		};
 		const messages = defineMessages({
-			selectMap: {id: 'select.map'},
+			selectMap: {id: 'select.map'}
 		});
 		const { formatMessage } = this.props.intl;
 

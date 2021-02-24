@@ -38,6 +38,7 @@ function expectMapsToBeEquivalent(maps, length) {
 
 mocha.describe('maps API', () => {
 	mocha.beforeEach(async () => {
+		// TODO Why is there an empty body here?
 	});
 
 	mocha.it('returns nothing when no map is present', async () => {
@@ -49,10 +50,10 @@ mocha.describe('maps API', () => {
 
 	mocha.it('returns all visible maps', async () => {
 		const conn = testDB.getConnection();
-		await new Map(undefined, 'Map 1', true, null, "default", moment('2000-10-10'), origin, opposite, "placeholder").insert(conn);
-		await new Map(undefined, 'Map 2', true, null, "default", moment('2000-10-10'), origin, opposite, "placeholder").insert(conn);
-		await new Map(undefined, 'Map 3', true, null, "default", moment('2000-10-10'), origin, opposite, "placeholder").insert(conn);
-		await new Map(undefined, 'Not Visible', false, null, "default", moment('2000-10-10'), origin, opposite, "placeholder").insert(conn);
+		await new Map(undefined, 'Map 1', true, null, 'default', moment('2000-10-10'), origin, opposite, 'placeholder').insert(conn);
+		await new Map(undefined, 'Map 2', true, null, 'default', moment('2000-10-10'), origin, opposite, 'placeholder').insert(conn);
+		await new Map(undefined, 'Map 3', true, null, 'default', moment('2000-10-10'), origin, opposite, 'placeholder').insert(conn);
+		await new Map(undefined, 'Not Visible', false, null, 'default', moment('2000-10-10'), origin, opposite, 'placeholder').insert(conn);
 
 		const res = await chai.request(app).get('/api/maps');
 		expect(res).to.have.status(200);
@@ -70,10 +71,10 @@ mocha.describe('maps API', () => {
 		});
 		mocha.it('returns all maps', async () => {
 			const conn = testDB.getConnection();
-			await new Map(undefined, 'Map 1', true, null, "default", moment('2000-10-10'), origin, opposite, "placeholder").insert(conn);
-			await new Map(undefined, 'Map 2', true, null, "default", moment('2000-10-10'), origin, opposite, "placeholder").insert(conn);
-			await new Map(undefined, 'Map 3', true, null, "default", moment('2000-10-10'), origin, opposite, "placeholder").insert(conn);
-			await new Map(undefined, 'Not Visible', false, null, "default", moment('2000-10-10'), origin, opposite, "placeholder").insert(conn);
+			await new Map(undefined, 'Map 1', true, null, 'default', moment('2000-10-10'), origin, opposite, 'placeholder').insert(conn);
+			await new Map(undefined, 'Map 2', true, null, 'default', moment('2000-10-10'), origin, opposite, 'placeholder').insert(conn);
+			await new Map(undefined, 'Map 3', true, null, 'default', moment('2000-10-10'), origin, opposite, 'placeholder').insert(conn);
+			await new Map(undefined, 'Not Visible', false, null, 'default', moment('2000-10-10'), origin, opposite, 'placeholder').insert(conn);
 
 			const res = await chai.request(app).get('/api/maps').set('token', token);
 			expect(res).to.have.status(200);
@@ -86,8 +87,8 @@ mocha.describe('maps API', () => {
 
 	mocha.it('returns details on a single map by ID', async () => {
 		const conn = testDB.getConnection();
-		await new Map(undefined, 'Map 1', true, null, "default", moment('2000-10-10'), origin, opposite, "placeholder").insert(conn);
-		const map2 = new Map(undefined, 'Map 2', true, null, "default", moment('2000-10-10'), origin, opposite, "placeholder");
+		await new Map(undefined, 'Map 1', true, null, 'default', moment('2000-10-10'), origin, opposite, 'placeholder').insert(conn);
+		const map2 = new Map(undefined, 'Map 2', true, null, 'default', moment('2000-10-10'), origin, opposite, 'placeholder');
 		await map2.insert(conn);
 
 		const res = await chai.request(app).get(`/api/maps/${map2.id}`);
@@ -99,7 +100,7 @@ mocha.describe('maps API', () => {
 
 	mocha.it('responds appropriately when the meter in question does not exist', async () => {
 		const conn = testDB.getConnection();
-		const map = new Map(undefined, 'Map', true, null, "default", moment('2000-10-10'), origin, opposite, "placeholder");
+		const map = new Map(undefined, 'Map', true, null, 'default', moment('2000-10-10'), origin, opposite, 'placeholder');
 		await map.insert(conn);
 
 		const res = await chai.request(app).get(`/api/maps/${map.id + 1}`);

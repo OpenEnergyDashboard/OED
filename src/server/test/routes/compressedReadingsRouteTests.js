@@ -20,7 +20,7 @@ const { compressedLineReadings,
 	validateLineReadingsQueryParams,
 	compressedMeterBarReadings,
 	validateMeterBarReadingsParams,
-	validateBarReadingsQueryParams,
+	validateBarReadingsQueryParams
 } = require('../../routes/compressedReadings');
 
 const { TimeInterval } = require('../../../common/TimeInterval');

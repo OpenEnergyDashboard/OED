@@ -18,7 +18,7 @@ import {compressedReadingsApi} from '../utils/api';
 export function fetchNeededMapReadings(timeInterval: TimeInterval): Thunk {
 	return (dispatch: Dispatch, getState: GetState) => {
 		const state = getState();
-		const promises: Array<Promise<any>> = [];
+		const promises: Promise<any>[] = [];
 		const mapDuration = (timeInterval.equals(TimeInterval.unbounded())) ? moment.duration(4, 'weeks')
 			: moment.duration(timeInterval.duration('days'), 'days');
 		// Determine which meters are missing data for this time interval

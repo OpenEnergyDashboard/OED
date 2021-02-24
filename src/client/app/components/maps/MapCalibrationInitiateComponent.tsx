@@ -4,8 +4,8 @@
 
 import * as React from 'react';
 import {CalibrationModeTypes, MapMetadata} from '../../types/redux/map';
-import {ChangeEvent} from "react";
-import {logToServer} from "../../actions/logs";
+import {ChangeEvent} from 'react';
+import {logToServer} from '../../actions/logs';
 
 /**
  * Accepts image file from user upload,
@@ -25,7 +25,7 @@ interface MapInitiateState {
 	mapName: string;
 }
 
-export default class MapCalibration_InitiateComponent extends React.Component<MapInitiateProps, MapInitiateState > {
+export default class MapCalibrationInitiateComponent extends React.Component<MapInitiateProps, MapInitiateState > {
 	private readonly fileInput: any;
 	private notifyLoadComplete() {
 		window.alert(`Map load complete from ${this.state.filename}.`);
@@ -41,6 +41,7 @@ export default class MapCalibration_InitiateComponent extends React.Component<Ma
 		this.handleInput = this.handleInput.bind(this);
 		this.confirmUpload = this.confirmUpload.bind(this);
 		this.notifyLoadComplete = this.notifyLoadComplete.bind(this);
+		this.handleNameInput = this.handleNameInput.bind(this);
 	}
 
 	public render() {
@@ -55,7 +56,7 @@ export default class MapCalibration_InitiateComponent extends React.Component<Ma
 				<label>
 					Define a name for the map:
 					<br/>
-					<textarea id={'text'} cols={50} value={this.state.mapName} onChange={this.handleNameInput.bind(this)}/>
+					<textarea id={'text'} cols={50} value={this.state.mapName} onChange={this.handleNameInput.bind}/>
 				</label>
 				<br/>
 				<input type='submit' value='Save and continue' />
