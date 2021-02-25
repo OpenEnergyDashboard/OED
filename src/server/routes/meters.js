@@ -103,7 +103,7 @@ router.use(requiredAuthenticator);
 router.post('/edit', async (req, res) => {
 	const validParams = {
 		type: 'object',
-		maxProperties: 4,
+		maxProperties: 5,
 		required: ['id', 'enabled', 'displayable', 'timeZone'],
 		properties: {
 			id: { type: 'integer' },
