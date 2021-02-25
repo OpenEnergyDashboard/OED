@@ -56,7 +56,7 @@ export default class MapCalibrationInitiateComponent extends React.Component<Map
 				<label>
 					Define a name for the map:
 					<br/>
-					<textarea id={'text'} cols={50} value={this.state.mapName} onChange={this.handleNameInput.bind}/>
+					<textarea id={'text'} cols={50} value={this.state.mapName} onChange={this.handleNameInput}/>
 				</label>
 				<br/>
 				<input type='submit' value='Save and continue' />
