@@ -3,13 +3,13 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
 
 import * as moment from 'moment';
-import {connect} from 'react-redux';
-import PlotlyChart, {IPlotlyChartProps} from 'react-plotlyjs-ts';
-import {State} from '../types/redux/state';
-import {calculateScaleFromEndpoints, meterDisplayableOnMap} from '../utils/calibration';
+import { connect } from 'react-redux';
+import PlotlyChart, { IPlotlyChartProps } from 'react-plotlyjs-ts';
+import { State } from '../types/redux/state';
+import { calculateScaleFromEndpoints, meterDisplayableOnMap } from '../utils/calibration';
 import * as _ from 'lodash';
 import getGraphColor from '../utils/getGraphColor';
-import {TimeInterval} from '../../../common/TimeInterval';
+import { TimeInterval } from '../../../common/TimeInterval';
 
 function mapStateToProps(state: State) {
 	let map;
@@ -44,7 +44,7 @@ function mapStateToProps(state: State) {
 				const byMeterID = state.readings.bar.byMeterID[meterID];
 				const gps = state.meters.byMeterID[meterID].gps;
 				if (gps !== undefined && gps !== null) {
-					if (meterDisplayableOnMap({gps, meterID}, map)) {
+					if (meterDisplayableOnMap({ gps, meterID }, map)) {
 						points.push(gps);
 						const readingsData = byMeterID[timeInterval.toString()][barDuration.toISOString()];
 						if (readingsData !== undefined && !readingsData.isFetching) {
@@ -53,14 +53,16 @@ function mapStateToProps(state: State) {
 							if (readingsData.readings === undefined) {
 								throw new Error('Unacceptable condition: readingsData.readings is undefined.');
 							}
-							const readings = _.orderBy(readingsData.readings, ['startTimestamp'], ['asc']);
-							readings.forEach(mapReading => {
-								const timeReading: string =
-									`${moment(mapReading.startTimestamp).format('MMM DD, YYYY')} - ${moment(mapReading.endTimestamp).format('MMM DD, YYYY')}`;
-								const averagedReading = mapReading.reading / barDuration.asDays(); // average total reading by days of duration
-								size.push(averagedReading);
-								texts.push(`<b> ${timeReading} </b> <br> ${label}: ${averagedReading} kW/day`);
-							});
+							// Use the most recent time reading for the circle on the map.
+							// This has the limitations of the bar value.
+							// TODO: It might be better to do this similarly to compare. (See GitHub issue)
+							const readings = _.orderBy(readingsData.readings, ['startTimestamp'], ['desc']);
+							const mapReading = readings[0];
+							const timeReading: string =
+								`${moment(mapReading.startTimestamp).format('MMM DD, YYYY')} - ${moment(mapReading.endTimestamp).format('MMM DD, YYYY')}`;
+							const averagedReading = mapReading.reading / barDuration.asDays(); // average total reading by days of duration
+							size.push(averagedReading);
+							texts.push(`<b> ${timeReading} </b> <br> ${label}: ${averagedReading} kW/day`);
 						}
 					}
 				}
@@ -75,7 +77,7 @@ function mapStateToProps(state: State) {
 			x = points.map(point => (point.longitude - origin.longitude) / mapScale.degreePerUnitX);
 			y = points.map(point => (point.latitude - origin.latitude) / mapScale.degreePerUnitY);
 
-			const trace1 = {
+			const traceOne = {
 				x,
 				y,
 				type: 'scatter',
@@ -89,7 +91,7 @@ function mapStateToProps(state: State) {
 				opacity: 1,
 				showlegend: false
 			};
-			data.push(trace1);
+			data.push(traceOne);
 		}
 	}
 

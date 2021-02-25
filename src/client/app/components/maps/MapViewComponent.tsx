@@ -297,4 +297,3 @@ export default class MapViewComponent extends React.Component<MapViewProps, MapV
 		this.props.setCalibration(mode, this.props.id);
 	}
 }
-

@@ -19,12 +19,12 @@ function patchPointType(pgp) {
 		 * @return {Point}
 		 */
 		function (val) {
-		const coordinates = val.slice(1, val.length-1).split(',');
-		const parsedCoordinates = coordinates.map(scientific => {
-			return Number(scientific);
+			const coordinates = val.slice(1, val.length - 1).split(',');
+			const parsedCoordinates = coordinates.map(scientific => {
+				return Number(scientific);
+			});
+			return new Point(parsedCoordinates[0], parsedCoordinates[1]);
 		});
-		return new Point(parsedCoordinates[0], parsedCoordinates[1]);
-	});
 }
 
 module.exports = patchPointType;

@@ -71,6 +71,7 @@ export function isValidGPSInput(input: string) {
 	} else if (input.indexOf(',') !== input.lastIndexOf(',')) { // if there are multiple commas
 		return false;
 	}
+	// Works if value is not a number since parseFloat returns a NaN so treated as invalid later.
 	const array = input.split(',').map((value: string) => parseFloat(value));
 	const latitudeIndex = 0;
 	const longitudeIndex = 1;
