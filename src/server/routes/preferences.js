@@ -54,7 +54,7 @@ router.post('/', async (req, res) => {
 						{ type: 'string' },
 						{ type: 'null' }
 					]
-				},
+				}
 			}
 		}
 	};
