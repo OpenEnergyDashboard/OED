@@ -9,6 +9,8 @@ const { mocha, expect, testDB } = require('../common');
 const Meter = require('../../models/Meter');
 const Reading = require('../../models/Reading');
 const Group = require('../../models/Group');
+const Point = require('../../models/Point');
+const gps = new Point(90, 45);
 
 mocha.describe('Compressed Readings 2', () => {
 
@@ -21,7 +23,7 @@ mocha.describe('Compressed Readings 2', () => {
 		const timestamp5 = timestamp4.clone().add(1, 'hour');
 		mocha.beforeEach(async () => {
 			const conn = testDB.getConnection();
-			await new Meter(undefined, 'Meter', null, false, true, Meter.type.MAMAC, null).insert(conn);
+			await new Meter(undefined, 'Meter', null, false, true, Meter.type.MAMAC, null, gps).insert(conn);
 			meter = await Meter.getByName('Meter', conn);
 		});
 
@@ -219,8 +221,8 @@ mocha.describe('Compressed Readings 2', () => {
 		let group2;
 		mocha.beforeEach(async () => {
 			const conn = testDB.getConnection();
-			await new Meter(undefined, 'Meter1', null, false, true, Meter.type.MAMAC, null).insert(conn);
-			await new Meter(undefined, 'Meter2', null, false, true, Meter.type.MAMAC, null).insert(conn);
+			await new Meter(undefined, 'Meter1', null, false, true, Meter.type.MAMAC, null, gps).insert(conn);
+			await new Meter(undefined, 'Meter2', null, false, true, Meter.type.MAMAC, null, gps).insert(conn);
 			meter1 = await Meter.getByName('Meter1', conn);
 			meter2 = await Meter.getByName('Meter2', conn);
 
@@ -292,9 +294,9 @@ mocha.describe('Compressed Readings 2', () => {
 		const timestamp5 = timestamp4.clone().add(1, 'day');
 		mocha.beforeEach(async () => {
 			const conn = testDB.getConnection();
-			await new Meter(undefined, 'Meter', null, false, true, Meter.type.MAMAC, null).insert(conn);
+			await new Meter(undefined, 'Meter', null, false, true, Meter.type.MAMAC, null, gps).insert(conn);
 			meter = await Meter.getByName('Meter', conn);
-			await new Meter(undefined, 'Meter2', null, false, true, Meter.type.MAMAC, null).insert(conn);
+			await new Meter(undefined, 'Meter2', null, false, true, Meter.type.MAMAC, null, gps).insert(conn);
 			meter2 = await Meter.getByName('Meter2', conn);
 		});
 

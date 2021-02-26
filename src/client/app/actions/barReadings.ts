@@ -17,7 +17,7 @@ import { CompressedBarReadings } from '../types/compressed-readings';
  * @param {Moment.Duration} barDuration the duration of each bar for which to check
  * @returns {boolean} True if the readings for the given meter, time, and duration are missing; false otherwise.
  */
-function shouldFetchMeterBarReadings(state: State, meterID: number, timeInterval: TimeInterval, barDuration: moment.Duration): boolean {
+export function shouldFetchMeterBarReadings(state: State, meterID: number, timeInterval: TimeInterval, barDuration: moment.Duration): boolean {
 	const readingsForID = state.readings.bar.byMeterID[meterID];
 	if (readingsForID === undefined) {
 		return true;
@@ -43,7 +43,7 @@ function shouldFetchMeterBarReadings(state: State, meterID: number, timeInterval
  * @param {Moment.Duration} barDuration the duration of each bar for which to check
  * @returns {boolean} True if the readings for the given group, time, and duration are missing; false otherwise.
  */
-function shouldFetchGroupBarReadings(state: State, groupID: number, timeInterval: TimeInterval, barDuration: moment.Duration): boolean {
+export function shouldFetchGroupBarReadings(state: State, groupID: number, timeInterval: TimeInterval, barDuration: moment.Duration): boolean {
 	const readingsForID = state.readings.bar.byMeterID[groupID];
 	if (readingsForID === undefined) {
 		return true;
@@ -62,21 +62,23 @@ function shouldFetchGroupBarReadings(state: State, groupID: number, timeInterval
 	return !readingsForBarDuration.isFetching;
 }
 
-function requestMeterBarReadings(meterIDs: number[], timeInterval: TimeInterval, barDuration: moment.Duration): t.RequestMeterBarReadingsAction {
+export function requestMeterBarReadings(meterIDs: number[], timeInterval: TimeInterval, barDuration: moment.Duration):
+		t.RequestMeterBarReadingsAction {
 	return { type: ActionType.RequestMeterBarReadings, meterIDs, timeInterval, barDuration };
 }
 
-function receiveMeterBarReadings(meterIDs: number[], timeInterval: TimeInterval, barDuration: moment.Duration, readings: CompressedBarReadings):
-	t.ReceiveMeterBarReadingsAction {
+export function receiveMeterBarReadings(meterIDs: number[], timeInterval: TimeInterval, barDuration: moment.Duration,
+		readings: CompressedBarReadings): t.ReceiveMeterBarReadingsAction {
 	return { type: ActionType.ReceiveMeterBarReadings, meterIDs, timeInterval, barDuration, readings };
 }
 
-function requestGroupBarReadings(groupIDs: number[], timeInterval: TimeInterval, barDuration: moment.Duration): t.RequestGroupBarReadingsAction {
+export function requestGroupBarReadings(groupIDs: number[], timeInterval: TimeInterval, barDuration: moment.Duration):
+		t.RequestGroupBarReadingsAction {
 	return { type: ActionType.RequestGroupBarReadings, groupIDs, timeInterval, barDuration };
 }
 
-function receiveGroupBarReadings(groupIDs: number[], timeInterval: TimeInterval, barDuration: moment.Duration, readings: CompressedBarReadings):
-	t.ReceiveGroupBarReadingsAction {
+export function receiveGroupBarReadings(groupIDs: number[], timeInterval: TimeInterval, barDuration: moment.Duration,
+		readings: CompressedBarReadings): t.ReceiveGroupBarReadingsAction {
 	return { type: ActionType.ReceiveGroupBarReadings, groupIDs, timeInterval, barDuration, readings };
 }
 
