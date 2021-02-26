@@ -4,6 +4,7 @@
 
 import { ActionType } from './actions';
 import { NamedIDItem } from '../items';
+import {GPSPoint} from '../../utils/calibration';
 
 export interface RequestMetersDetailsAction {
 	type: ActionType.RequestMetersDetails;
@@ -49,7 +50,8 @@ export interface MeterMetadata {
 	displayable: boolean;
 	meterType?: string;
 	ipAddress?: string;
-	timezone: string;
+	timeZone?: string;
+	gps?: GPSPoint;
 }
 
 export interface MeterMetadataByID {
@@ -60,6 +62,7 @@ export interface MeterEditData {
 	id: number;
 	enabled: boolean;
 	displayable: boolean;
+	gps: GPSPoint;
 }
 
 export interface MetersState {

@@ -1,4 +1,9 @@
+# Transition to Developer Website
+
+The [developer website](https://openenergydashboard.github.io/developer/) is now available and becoming the preferred way to learn about working with the OED project. The information on this page is being transferred to that site but this page still contains useful information that has yet to be transferred. We suggest you start with the new website and visit here if you want some information not yet on that site. Note that some of the information here is out of date and will updated during the transition. Thanks for your understanding.
+
 # Quick Start With Docker #
+
 If using Docker, you first need to install [Docker](https://docs.docker.com/engine/installation/)
 and [docker-compose](https://docs.docker.com/compose/install/).
 
@@ -107,6 +112,7 @@ OED_DB_DATABASE=oed
 OED_DB_TEST_DATABASE=oed_testing
 OED_DB_PASSWORD=opened
 OED_DB_HOST=localhost
+POSTGRES_PASSWORD=xxx
 OED_DB_PORT=5432
 OED_LOG_FILE=log.txt
 OED_MAIL_METHOD=none
@@ -153,6 +159,7 @@ The OED server is configured via environment variables, as follows.
 - OED_DB_DATABASE: The database you just created, so likely oed
 - OED_DB_TEST_DATABASE: The test database you just created, so likely oed_testing
 - OED_DB_PASSWORD: The password for your postgres user
+- POSTGRES_PASSWORD: The password for the postgres running in the container. You might want to change its value for security reasons.
 - OED_DB_HOST: The host for your postgres db, likely localhost
 - OED_DB_PORT: The port for your postgres db, likely 5432
 - OED_LOG_FILE: Path to the log file, defaults to ./log.txt

@@ -11,6 +11,7 @@ import { LanguageTypes } from '../types/i18n';
 export interface SelectOption {
 	label: string;
 	value: number;
+	disabled?: boolean;
 }
 
 /**
@@ -29,6 +30,7 @@ export interface PreferenceRequestItem {
 	defaultChartToRender: ChartTypes;
 	defaultBarStacking: boolean;
 	defaultLanguage: LanguageTypes;
+	defaultTimezone: string;
 }
 
 /**

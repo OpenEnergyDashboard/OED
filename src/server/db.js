@@ -41,10 +41,28 @@ function dropConnection() {
 }
 
 /**
+ * Drop the current connmanager.connection. Unlike dropConnection() it
+ * should not disconnect other connections.
+ */
+function dropCurrentConnection() {
+	if (connmanager.connection !== null) {
+		// Disconnect this specific connection.
+		connmanager.connection.$pool.end();
+	}
+	connmanager.config = null;
+	connmanager.connection = null;
+}
+
+/**
  * Swaps the connection to the database with a new connection and config.
  */
 function swapConnection(newConfig, newConnection) {
-	dropConnection();
+	// This used to call dropConnection but that removes all connections to DB
+	// including the one you are about to swap in so it failed.
+	// When this is called by connectTestDB(), the connection is still null so
+	// this really isn't needed but do to be extra safe and consistent with other code
+	// and in case it is used somewhere else.
+	dropCurrentConnection();
 	connmanager.config = newConfig;
 	if (newConnection !== null) {
 		connmanager.connection = newConnection;

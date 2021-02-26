@@ -2,6 +2,6 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
 
-INSERT INTO meters(name, ipaddress, enabled, displayable, meter_type)
-    VALUES (${name}, ${ipAddress}, ${enabled}, ${displayable}, ${type})
+INSERT INTO meters(name, ipaddress, enabled, displayable, meter_type, default_timezone_meter, gps, identifier)
+    VALUES (${name}, ${ipAddress}, ${enabled}, ${displayable}, ${type}, ${meterTimezone}, ${gps}, ${identifier})
     RETURNING id;

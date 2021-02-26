@@ -20,12 +20,17 @@ function ask(question) {
 	});
 }
 
-function terminateReadline(message) {
+/**
+ * Outputs a log message and stops process with provided code.
+ * @param {*} message what to place in log
+ * @param {*} errorCode code the process returns on exit
+ */
+function terminateReadline(message, errorCode = 0) {
 	if (message) {
 		log.info(message);
 	}
 	rl.close();
-	process.exit(0);
+	process.exit(errorCode);
 }
 
 module.exports = {

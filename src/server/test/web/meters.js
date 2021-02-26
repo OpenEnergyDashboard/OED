@@ -7,6 +7,8 @@
 
 const { chai, mocha, expect, app, testDB, testUser } = require('../common');
 const Meter = require('../../models/Meter');
+const Point = require('../../models/Point');
+const gps = new Point(90, 45);
 
 mocha.describe('meters API', () => {
 	mocha.it('returns nothing with no meters present', async () => {
@@ -18,10 +20,10 @@ mocha.describe('meters API', () => {
 
 	mocha.it('returns all visible meters', async () => {
 		const conn = testDB.getConnection();
-		await new Meter(undefined, 'Meter 1', '1.1.1.1', true, true, Meter.type.MAMAC).insert(conn);
-		await new Meter(undefined, 'Meter 2', '1.1.1.1', true, true, Meter.type.MAMAC).insert(conn);
-		await new Meter(undefined, 'Meter 3', '1.1.1.1', true, true, Meter.type.MAMAC).insert(conn);
-		await new Meter(undefined, 'Not Visible', '1.1.1.1', true, false, Meter.type.MAMAC).insert(conn);
+		await new Meter(undefined, 'Meter 1', '1.1.1.1', true, true, Meter.type.MAMAC, 'TZ1', gps).insert(conn);
+		await new Meter(undefined, 'Meter 2', '1.1.1.1', true, true, Meter.type.MAMAC, 'TZ2', gps).insert(conn);
+		await new Meter(undefined, 'Meter 3', '1.1.1.1', true, true, Meter.type.MAMAC, 'TZ3', gps).insert(conn);
+		await new Meter(undefined, 'Not Visible', '1.1.1.1', true, false, Meter.type.MAMAC, 'TZ4', gps).insert(conn);
 
 		const res = await chai.request(app).get('/api/meters');
 		expect(res).to.have.status(200);
@@ -32,10 +34,14 @@ mocha.describe('meters API', () => {
 			const meter = res.body[i];
 			expect(meter).to.have.property('id');
 			expect(meter).to.have.property('name', `Meter ${i + 1}`);
+			expect(meter).to.have.property('gps');
+			expect(meter.gps).to.have.property('latitude', gps.latitude);
+			expect(meter.gps).to.have.property('longitude', gps.longitude);
 			expect(meter).to.have.property('ipAddress', null);
 			expect(meter).to.have.property('enabled', true);
 			expect(meter).to.have.property('displayable', true);
 			expect(meter).to.have.property('meterType', null);
+			expect(meter).to.have.property('timeZone', null);
 		}
 	});
 	mocha.describe('with authentication', () => {
@@ -47,10 +53,10 @@ mocha.describe('meters API', () => {
 		});
 		mocha.it('returns all meters', async () => {
 			const conn = testDB.getConnection();
-			await new Meter(undefined, 'Meter 1', '1.1.1.1', true, true, Meter.type.MAMAC).insert(conn);
-			await new Meter(undefined, 'Meter 2', '1.1.1.1', true, true, Meter.type.MAMAC).insert(conn);
-			await new Meter(undefined, 'Meter 3', '1.1.1.1', true, true, Meter.type.MAMAC).insert(conn);
-			await new Meter(undefined, 'Not Visible', '1.1.1.1', true, false, Meter.type.MAMAC).insert(conn);
+			await new Meter(undefined, 'Meter 1', '1.1.1.1', true, true, Meter.type.MAMAC, 'TZ1', gps).insert(conn);
+			await new Meter(undefined, 'Meter 2', '1.1.1.1', true, true, Meter.type.MAMAC, 'TZ2', gps).insert(conn);
+			await new Meter(undefined, 'Meter 3', '1.1.1.1', true, true, Meter.type.MAMAC, 'TZ3', gps).insert(conn);
+			await new Meter(undefined, 'Not Visible', '1.1.1.1', true, false, Meter.type.MAMAC, 'TZ4', gps).insert(conn);
 
 			const res = await chai.request(app).get('/api/meters').set('token', token);
 			expect(res).to.have.status(200);
@@ -60,24 +66,28 @@ mocha.describe('meters API', () => {
 			for (let i = 0; i < 4; i++) {
 				const meter = res.body[i];
 				expect(meter).to.have.property('id');
+				expect(meter).to.have.property('gps');
+				expect(meter.gps).to.have.property('latitude', gps.latitude);
+				expect(meter.gps).to.have.property('longitude', gps.longitude);
 				if (i < 3) {
 					expect(meter).to.have.property('name', `Meter ${i + 1}`);
 					expect(meter).to.have.property('displayable', true);
 				} else {
-					expect(meter).to.have.property('name', `Not Visible`);
+					expect(meter).to.have.property('name', 'Not Visible');
 					expect(meter).to.have.property('displayable', false);
 				}
 				expect(meter).to.have.property('ipAddress', '1.1.1.1');
 				expect(meter).to.have.property('enabled', true);
 				expect(meter).to.have.property('meterType', Meter.type.MAMAC);
+				expect(meter).to.have.property('timeZone', 'TZ' + (i + 1));
 			}
 		});
 	});
 
 	mocha.it('returns details on a single meter by ID', async () => {
 		const conn = testDB.getConnection();
-		await new Meter(undefined, 'Meter 1', '1.1.1.1', true, true, Meter.type.MAMAC).insert(conn);
-		const meter2 = new Meter(undefined, 'Meter 2', '1.1.1.1', true, true, Meter.type.MAMAC);
+		await new Meter(undefined, 'Meter 1', '1.1.1.1', true, true, Meter.type.MAMAC, null, gps).insert(conn);
+		const meter2 = new Meter(undefined, 'Meter 2', '1.1.1.1', true, true, Meter.type.MAMAC, null, gps);
 		await meter2.insert(conn);
 
 		const res = await chai.request(app).get(`/api/meters/${meter2.id}`);
@@ -85,11 +95,14 @@ mocha.describe('meters API', () => {
 		expect(res).to.be.json;
 		expect(res.body).to.have.property('id', meter2.id);
 		expect(res.body).to.have.property('name', 'Meter 2');
+		expect(res.body).to.have.property('gps');
+		expect(res.body.gps).to.have.property('latitude', gps.latitude);
+		expect(res.body.gps).to.have.property('longitude', gps.longitude);
 	});
 
 	mocha.it('responds appropriately when the meter in question does not exist', async () => {
 		const conn = testDB.getConnection();
-		const meter = new Meter(undefined, 'Meter', '1.1.1.1', true, true, Meter.type.MAMAC);
+		const meter = new Meter(undefined, 'Meter', '1.1.1.1', true, true, Meter.type.MAMAC, null, gps);
 		await meter.insert(conn);
 
 		const res = await chai.request(app).get(`/api/meters/${meter.id + 1}`);

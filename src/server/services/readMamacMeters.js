@@ -3,7 +3,7 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
 
 const reqPromise = require('request-promise-native');
-const readCSV = require('./readCSV');
+const readCsv = require('./readCsv');
 const promisify = require('es6-promisify');
 const parseString = require('xml2js').parseString;
 const Meter = require('../models/Meter');
@@ -15,7 +15,7 @@ const parseXMLPromisified = promisify(parseString);
 
 async function parseCSV(filename) {
 	// returns a list of lists representing the lines of the file
-	const meterInfo = await readCSV(filename);
+	const meterInfo = await readCsv(filename);
 	// the headers should be in the first line
 	const headers = meterInfo[0];
 	const meterDataRows = meterInfo.slice(1);
@@ -52,7 +52,7 @@ async function getMeterInfo(url, ip, csvLine) {
 		.then(raw => parseXMLPromisified(raw))
 		.then(xml => {
 			const name = xml.Maverick.NodeID[0];
-			return new Meter(undefined, name, ip, true, true, Meter.type.MAMAC);
+			return new Meter(undefined, name, ip, true, true, Meter.type.MAMAC, null);
 		});
 }
 

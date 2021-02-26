@@ -7,21 +7,15 @@ import UIOptionsContainer from '../containers/UIOptionsContainer';
 import LineChartContainer from '../containers/LineChartContainer';
 import BarChartContainer from '../containers/BarChartContainer';
 import MultiCompareChartContainer from '../containers/MultiCompareChartContainer';
+import MapChartContainer from '../containers/MapChartContainer';
 import SpinnerComponent from './SpinnerComponent';
-import { ChartTypes } from '../types/redux/graph';
-
+import {ChartTypes} from '../types/redux/graph';
 import * as moment from 'moment';
-import { TimeInterval } from '../../../common/TimeInterval';
-
+import {TimeInterval} from '../../../common/TimeInterval';
 import Button from 'reactstrap/lib/Button';
-import { FormEvent } from 'react';
 import { FormattedMessage } from 'react-intl';
-import { Dispatch, Thunk, ActionType } from '../types/redux/actions';
-
-import * as Plotly from 'plotly.js';
-// TODO lowercase plotly for the import in index.d.ts but uppercase here.
-
-
+import TooltipMarkerComponent from './TooltipMarkerComponent';
+import ReactTooltip from 'react-tooltip';
 
 interface DashboardProps {
 	chartToRender: ChartTypes;
@@ -29,6 +23,7 @@ interface DashboardProps {
 	lineLoading: false;
 	barLoading: false;
 	compareLoading: false;
+	mapLoading: false;
 	selectedTimeInterval: TimeInterval;
 	changeTimeInterval(timeInterval: TimeInterval): Promise<any>;
 }
@@ -43,8 +38,14 @@ export default class DashboardComponent extends React.Component<DashboardProps, 
 		this.handleTimeIntervalChange = this.handleTimeIntervalChange.bind(this);
 	}
 
+	public componentDidUpdate(prev: DashboardProps) {
+		if (prev.chartToRender !== this.props.chartToRender) {
+			ReactTooltip.rebuild(); // This rebuilds the tooltip so that it detects the marker that disappear because the chart type changes.
+		}
+	}
+
 	public render() {
-		let ChartToRender: typeof LineChartContainer | typeof MultiCompareChartContainer | typeof BarChartContainer;
+		let ChartToRender: typeof LineChartContainer | typeof MultiCompareChartContainer | typeof BarChartContainer | typeof MapChartContainer;
 		let showSpinner = false;
 		if (this.props.chartToRender === ChartTypes.line) {
 			if (this.props.lineLoading) {
@@ -56,11 +57,18 @@ export default class DashboardComponent extends React.Component<DashboardProps, 
 				showSpinner = true;
 			}
 			ChartToRender = BarChartContainer;
-		} else {
+		} else if (this.props.chartToRender === ChartTypes.compare) {
 			if (this.props.compareLoading) {
 				showSpinner = true;
 			}
 			ChartToRender = MultiCompareChartContainer;
+		} else if (this.props.chartToRender === ChartTypes.map) {
+			if (this.props.mapLoading) {
+				showSpinner = true;
+			}
+			ChartToRender = MapChartContainer;
+		} else {
+			throw new Error('unrecognized type of chart');
 		}
 
 		const optionsClassName = this.props.optionsVisibility ? 'col-2 d-none d-lg-block' : 'd-none';
@@ -94,7 +102,13 @@ export default class DashboardComponent extends React.Component<DashboardProps, 
 								style={buttonMargin}
 								onClick={() => this.handleTimeIntervalChange('all')}
 							> <FormattedMessage id='restore'/>
-							</Button>]
+							</Button>,
+							<TooltipMarkerComponent
+								key={3}
+								page='home'
+								helpTextId='help.home.chart.redraw.restore'
+							/>
+							]
 						) : (
 							null
 						)}
@@ -105,37 +119,42 @@ export default class DashboardComponent extends React.Component<DashboardProps, 
 	}
 
 	private handleTimeIntervalChange(mode: string) {
-// TODO Should mode be an enum since it has clearly defined values. Since the if/else uses it below
-// it could use a boolean but that implies there will only be two possible values forever
-// which seems likely to be the case.
 		if (mode === 'all') {
 			this.props.changeTimeInterval(TimeInterval.unbounded());
-		} else {
-			const sliderContainer: any = document.querySelector('.rangeslider-bg');
-			const sliderBox: any = document.querySelector('.rangeslider-slidebox');
-			const root: any = document.getElementById('root');
-
-			if (sliderContainer && sliderBox && root) {
-				// Attributes of the slider: full width and the min & max values of the box
-				const fullWidth: number = parseInt(sliderContainer.getAttribute('width'));
-				const sliderMinX: number = parseInt(sliderBox.getAttribute('x'));
-				const sliderMaxX: number = sliderMinX + parseInt(sliderBox.getAttribute('width'));
-				if (sliderMaxX - sliderMinX === fullWidth) {return; }
-
-				// From the Plotly line graph, get current min and max times in seconds
-				const minTimeStamp: number = parseInt(root.getAttribute('min-timestamp'));
-				const maxTimeStamp: number = parseInt(root.getAttribute('max-timestamp'));
-
-				// Seconds displayed on graph
-				const deltaSeconds: number = maxTimeStamp - minTimeStamp;
-				const secondsPerPixel: number = deltaSeconds / fullWidth;
-
-				// Get the new min and max times, in seconds, from the slider box
-				const newMinXTimestamp = Math.floor(minTimeStamp + (secondsPerPixel * sliderMinX));
-				const newMaxXTimestamp = Math.floor(minTimeStamp + (secondsPerPixel * sliderMaxX));
-				const timeInterval = new TimeInterval(moment(newMinXTimestamp), moment(newMaxXTimestamp));
-				this.props.changeTimeInterval(timeInterval);
-			}
+		} else if (mode === 'range') {
+			const timeInterval = TimeInterval.fromString(getRangeSliderInterval());
+			this.props.changeTimeInterval(timeInterval);
 		}
+	}
+}
+
+export function getRangeSliderInterval(): string {
+	const sliderContainer: any = document.querySelector('.rangeslider-bg');
+	const sliderBox: any = document.querySelector('.rangeslider-slidebox');
+	const root: any = document.getElementById('root');
+
+	if (sliderContainer && sliderBox && root) {
+		// Attributes of the slider: full width and the min & max values of the box
+		const fullWidth: number = parseInt(sliderContainer.getAttribute('width'));
+		const sliderMinX: number = parseInt(sliderBox.getAttribute('x'));
+		const sliderMaxX: number = sliderMinX + parseInt(sliderBox.getAttribute('width'));
+		if (sliderMaxX - sliderMinX === fullWidth) {
+			return 'all';
+		}
+
+		// From the Plotly line graph, get current min and max times in seconds
+		const minTimeStamp: number = parseInt(root.getAttribute('min-timestamp'));
+		const maxTimeStamp: number = parseInt(root.getAttribute('max-timestamp'));
+
+		// Seconds displayed on graph
+		const deltaSeconds: number = maxTimeStamp - minTimeStamp;
+		const secondsPerPixel: number = deltaSeconds / fullWidth;
+
+		// Get the new min and max times, in seconds, from the slider box
+		const newMinXTimestamp = Math.floor(minTimeStamp + (secondsPerPixel * sliderMinX));
+		const newMaxXTimestamp = Math.floor(minTimeStamp + (secondsPerPixel * sliderMaxX));
+		return new TimeInterval(moment(newMinXTimestamp), moment(newMaxXTimestamp)).toString();
+	} else {
+		throw new Error('unable to get range slider params');
 	}
 }

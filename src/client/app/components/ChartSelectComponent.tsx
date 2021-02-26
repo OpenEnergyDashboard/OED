@@ -10,6 +10,7 @@ import Button from 'reactstrap/lib/Button';
 import ButtonGroup from 'reactstrap/lib/ButtonGroup';
 import { FormEvent } from 'react';
 import { FormattedMessage } from 'react-intl';
+import TooltipMarkerComponent from './TooltipMarkerComponent';
 
 interface ChartSelectProps {
 	selectedChart: ChartTypes;
@@ -59,7 +60,16 @@ export default class ChartSelectComponent extends React.Component<ChartSelectPro
 					>
 						<FormattedMessage id='compare' />
 					</Button>
+					<Button
+						outline={this.props.selectedChart !== ChartTypes.map}
+						onClick={() => this.handleChangeChartType(ChartTypes.map)}
+					>
+						<FormattedMessage id='map' />
+					</Button>
 				</ButtonGroup>
+				<div>
+					<TooltipMarkerComponent page='home' helpTextId='help.home.chart.select'/>
+				</div>
 			</div>
 		);
 	}

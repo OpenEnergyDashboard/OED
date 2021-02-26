@@ -10,7 +10,7 @@ function patchMomentType(pgp) {
 	const types = pgp.pg.types;
 	// This patches moment.js objects to work with pg-promise.
 // See https://github.com/vitaly-t/pg-promise#custom-type-formatting
-	moment.fn.formatDBType = function formatDBType() {
+	moment.fn.toPostgres = function toPostgres() {
 		return this.toDate();
 	};
 
@@ -23,8 +23,8 @@ function patchMomentType(pgp) {
 	});
 	types.setTypeParser(TIMESTAMPTZ_OID, moment);
 
-	moment.duration.fn._rawDBType = true; // eslint-disable-line no-underscore-dangle
-	moment.duration.fn.formatDBType = function formatDBType() {
+	moment.duration.fn.rawType = true; // eslint-disable-line no-underscore-dangle
+	moment.duration.fn.toPostgres = function toPostgres() {
 		return `'${this.toISOString()}'::INTERVAL`;
 	};
 

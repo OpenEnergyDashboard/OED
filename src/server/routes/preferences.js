@@ -48,6 +48,9 @@ router.post('/', async (req, res) => {
 				},
 				defaultLanguage: {
 					type: 'string'
+				},
+				defaultTimezone: {
+					type: 'string'
 				}
 			}
 		}
