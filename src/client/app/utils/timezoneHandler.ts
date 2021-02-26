@@ -5,6 +5,9 @@
 import * as moment from 'moment-timezone';
 import {State} from '../types/redux/state';
 
+// TODO: These are not currently used but leaving in case new export feature needs them. They might
+// be removed in the future.
+
 /**
  * recreate a timestamp created in default timezone(UTC) with its true timezone
  * this is invoked only when the user wishes to export data in their absolute time in UNIX timestamps
