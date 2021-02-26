@@ -38,7 +38,6 @@ function mapStateToProps(state: State, ownProps: CompareChartContainerProps): IP
 	const previousPeriod = entity.prevUsage;
 	const currentPeriod = entity.currUsage;
 
-
 	datasets.push(
 		{
 			x: [periodLabels.prev, periodLabels.current],
