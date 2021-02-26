@@ -23,7 +23,7 @@ mocha.describe('PIPELINE: Load data from csv file', () => {
 	mocha.it('as array', async () => {
 		const conn = testDB.getConnection();
 		const arrayInput = await readCsv(testFilePath);
-		const arrayMeter = new Meter(undefined, 'test_array', 1, true, true, Meter.type.MAMAC, null);
+		const arrayMeter = new Meter(undefined, 'test_array', 1, true, true, Meter.type.MAMAC, null, undefined);
 		await arrayMeter.insert(conn);
 		await loadCsvInput(testFilePath, arrayMeter.id, mapRowsToModel, false, false, false, 1, undefined, conn);
 		const result = await Reading.getAllByMeterID(arrayMeter.id, conn);
@@ -40,7 +40,7 @@ mocha.describe('PIPELINE: Load data from csv file', () => {
 	mocha.it('as stream', async () => {
 		const conn = testDB.getConnection();
 		const arrayInput = await readCsv(testFilePath);
-		const streamMeter = new Meter(undefined, 'test_stream', 2, true, true, Meter.type.MAMAC, null);
+		const streamMeter = new Meter(undefined, 'test_stream', 2, true, true, Meter.type.MAMAC, null, undefined);
 		await streamMeter.insert(conn);
 		await loadCsvInput(testFilePath, streamMeter.id, mapRowsToModel, true, false, false, 1, undefined, conn);
 		const result = await Reading.getAllByMeterID(streamMeter.id, conn);

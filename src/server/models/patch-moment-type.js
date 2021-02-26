@@ -10,7 +10,7 @@ function patchMomentType(pgp) {
 	const types = pgp.pg.types;
 	// This patches momentjs objects to work with pg-promise.
 // See https://github.com/vitaly-t/pg-promise#custom-type-formatting
-	moment.fn.formatDBType = function formatDBType() {
+	moment.fn.toPostgres = function toPostgres() {
 		return this.toDate();
 	};
 
