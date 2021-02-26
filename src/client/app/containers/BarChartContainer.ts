@@ -35,7 +35,7 @@ function mapStateToProps(state: State) {
 						`${moment(barReading.startTimestamp).utc().format('MMM DD, YYYY')} - ${moment(barReading.endTimestamp).utc().format('MMM DD, YYYY')}`;
 					xData.push(timeReading);
 					yData.push(barReading.reading);
-					hoverText.push(`<b> ${timeReading} </b> <br> ${label}: ${barReading.reading} kW`);
+					hoverText.push(`<b> ${timeReading} </b> <br> ${label}: ${barReading.reading} kWh`);
 				});
 
 				// This variable contains all the elements (x and y values, bar type, etc.) assigned to the data parameter of the Plotly object
@@ -72,7 +72,7 @@ function mapStateToProps(state: State) {
 						`${moment(barReading.startTimestamp).utc().format('MMM DD, YYYY')} - ${moment(barReading.endTimestamp).utc().format('MMM DD, YYYY')}`;
 					xData.push(timeReading);
 					yData.push(barReading.reading);
-					hoverText.push(`<b> ${timeReading} </b> <br> ${label}: ${barReading.reading} kW`);
+					hoverText.push(`<b> ${timeReading} </b> <br> ${label}: ${barReading.reading} kWh`);
 				});
 
 				// This variable contains all the elements (x and y values, bar chart, etc.) assigned to the data parameter of the Plotly object
@@ -103,7 +103,7 @@ function mapStateToProps(state: State) {
 			orientation: 'h'
 		},
 		yaxis: {
-			title: 'kW',
+			title: 'kWh',
 			showgrid: true,
 			gridcolor: '#ddd'
 		},
