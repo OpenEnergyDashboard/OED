@@ -34,6 +34,9 @@ function mapStateToProps(state: State) {
 			linkText += `&comparePeriod=${state.graph.comparePeriod}`;
 			linkText += `&compareSortingOrder=${state.graph.compareSortingOrder}`;
 			break;
+		case 'map':
+			linkText += `&mapID=${state.maps.selectedMap.toString()}`;
+			break;
 		default:
 			break;
 	}

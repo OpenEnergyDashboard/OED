@@ -28,6 +28,8 @@ import CreateGroupContainer from '../containers/groups/CreateGroupContainer';
 import GroupsDetailContainer from '../containers/groups/GroupsDetailContainer';
 import MetersDetailContainer from '../containers/meters/MetersDetailContainer';
 import {TimeInterval} from '../../../common/TimeInterval';
+import MapsDetailContainer from '../containers/maps/MapsDetailContainer';
+import MapCalibrationContainer from '../containers/maps/MapCalibrationContainer';
 
 interface RouteProps {
 	barStacking: boolean;
@@ -144,6 +146,8 @@ export default class RouteComponent extends React.Component<RouteProps, {}> {
 						case 'optionsVisibility':
 							options.optionsVisibility = (info === 'true');
 							break;
+						case 'mapID':
+							options.mapID = (parseInt(info));
 						case 'serverRange':
 							options.serverRange = TimeInterval.fromString(info);
 							/**
@@ -202,6 +206,8 @@ export default class RouteComponent extends React.Component<RouteProps, {}> {
 						<Route path='/groups' component={GroupsDetailContainer} onEnter={this.checkAuth} />
 						<Route path='/meters' component={MetersDetailContainer} onEnter={this.checkAuth} />
 						<Route path='/graph' component={HomeComponent} onEnter={this.linkToGraph} />
+						<Route path='/calibration' component={MapCalibrationContainer} onEnter={this.requireAuth} />
+						<Route path='/maps' component={MapsDetailContainer} onEnter={this.requireAuth} />
 						<Route path='/createGroup' component={CreateGroupContainer} onEnter={this.requireAuth} />
 						<Route path='/editGroup' component={EditGroupsContainer} onEnter={this.requireAuth} />
 						<Route path='*' component={HomeComponent} />

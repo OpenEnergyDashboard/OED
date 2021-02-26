@@ -212,5 +212,8 @@ module.exports = {
 	compressedLineReadings,
 	validateLineReadingsParams: validateMeterLineReadingsParams,
 	validateLineReadingsQueryParams,
+	compressedMeterBarReadings,
+	validateMeterBarReadingsParams: validateMeterBarReadingsParams,
+	validateBarReadingsQueryParams,
 	createRouter
 };

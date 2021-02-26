@@ -12,7 +12,10 @@ import { TimeInterval } from '../../../common/TimeInterval';
 import { Dispatch, Thunk, ActionType } from '../types/redux/actions';
 import { State } from '../types/redux/state';
 import * as t from '../types/redux/graph';
+import * as m from '../types/redux/map';
 import { ComparePeriod, SortingOrder } from '../utils/calculateCompare';
+import {fetchNeededMapReadings} from './mapReadings';
+import {changeSelectedMap} from './map';
 
 export function changeChartToRender(chartType: t.ChartTypes): t.ChangeChartToRenderAction {
 	return { type: ActionType.ChangeChartToRender, chartType };
@@ -91,6 +94,7 @@ export function changeSelectedMeters(meterIDs: number[]): Thunk {
 			dispatch2(fetchNeededLineReadings(getState().graph.timeInterval));
 			dispatch2(fetchNeededBarReadings(getState().graph.timeInterval));
 			dispatch2(fetchNeededCompareReadings(getState().graph.comparePeriod));
+			dispatch2(fetchNeededMapReadings(getState().graph.timeInterval));
 		});
 		return Promise.resolve();
 	};
@@ -104,6 +108,7 @@ export function changeSelectedGroups(groupIDs: number[]): Thunk {
 			dispatch2(fetchNeededLineReadings(getState().graph.timeInterval));
 			dispatch2(fetchNeededBarReadings(getState().graph.timeInterval));
 			dispatch2(fetchNeededCompareReadings(getState().graph.comparePeriod));
+			dispatch2(fetchNeededMapReadings(getState().graph.timeInterval));
 		});
 		return Promise.resolve();
 	};
@@ -113,6 +118,7 @@ function fetchNeededReadingsForGraph(timeInterval: TimeInterval): Thunk {
 	return dispatch => {
 		dispatch(fetchNeededLineReadings(timeInterval));
 		dispatch(fetchNeededBarReadings(timeInterval));
+		dispatch(fetchNeededMapReadings(timeInterval));
 		return Promise.resolve();
 	};
 }
@@ -168,6 +174,7 @@ export interface LinkOptions {
 	comparePeriod?: ComparePeriod;
 	compareSortingOrder?: SortingOrder;
 	optionsVisibility?: boolean;
+	mapID?: number;
 }
 
 /**
@@ -179,8 +186,8 @@ export function changeOptionsFromLink(options: LinkOptions) {
 	const dispatchFirst: Thunk[] = [setHotlinkedAsync(true)];
 	/* tslint:disable:array-type */
 	const dispatchSecond: Array<Thunk | t.ChangeChartToRenderAction | t.ChangeBarStackingAction
-		| t.ChangeGraphZoomAction |t.ChangeCompareSortingOrderAction | t.SetOptionsVisibility> = [];
-	/* tslint:enable:array-type */
+		| t.ChangeGraphZoomAction |t.ChangeCompareSortingOrderAction | t.SetOptionsVisibility
+		| m.UpdateSelectedMapAction > = [];
 	if (options.meterIDs) {
 		dispatchFirst.push(fetchMetersDetailsIfNeeded());
 		dispatchSecond.push(changeSelectedMeters(options.meterIDs));
@@ -204,9 +211,6 @@ export function changeOptionsFromLink(options: LinkOptions) {
 	if (options.toggleBarStacking) {
 		dispatchSecond.push(changeBarStacking());
 	}
-	if (options.serverRange) {
-		dispatchSecond.push(changeGraphZoomIfNeeded(options.serverRange));
-	}
 	if (options.comparePeriod) {
 		dispatchSecond.push(changeCompareGraph(options.comparePeriod));
 	}
@@ -215,6 +219,9 @@ export function changeOptionsFromLink(options: LinkOptions) {
 	}
 	if (options.optionsVisibility != null) {
 		dispatchSecond.push(setOptionsVisibility(options.optionsVisibility));
+	}
+	if (options.mapID) {
+		dispatchSecond.push(changeSelectedMap(options.mapID));
 	}
 	return (dispatch: Dispatch) => Promise.all(dispatchFirst.map(dispatch))
 		.then(() => Promise.all(dispatchSecond.map(dispatch)));
