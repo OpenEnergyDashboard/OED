@@ -58,8 +58,9 @@ function mapStateToProps(state: State) {
 							// TODO: It might be better to do this similarly to compare. (See GitHub issue)
 							const readings = _.orderBy(readingsData.readings, ['startTimestamp'], ['desc']);
 							const mapReading = readings[0];
+							// Shift by UTC since want database time not local/browser time which is what moment does.
 							const timeReading: string =
-								`${moment(mapReading.startTimestamp).format('MMM DD, YYYY')} - ${moment(mapReading.endTimestamp).format('MMM DD, YYYY')}`;
+								`${moment(mapReading.startTimestamp).utc().format('MMM DD, YYYY')} - ${moment(mapReading.endTimestamp).utc().format('MMM DD, YYYY')}`;
 							const averagedReading = mapReading.reading / barDuration.asDays(); // average total reading by days of duration
 							size.push(averagedReading);
 							texts.push(`<b> ${timeReading} </b> <br> ${label}: ${averagedReading} kW/day`);
