@@ -89,7 +89,7 @@ function mapStateToProps(state: State) {
 				const readings = _.values(readingsData.readings);
 				readings.forEach(reading => {
 					const timeReading = moment(reading.startTimestamp);
-					xData.push(timeReading.format('YYYY-MM-DD HH:mm:ss'));
+					xData.push(timeReading.utc().format('YYYY-MM-DD HH:mm:ss'));
 					yData.push(reading.reading);
 					hoverText.push(`<b> ${timeReading.format('dddd, MMM DD, YYYY hh:mm a')} </b> <br> ${label}: ${reading.reading} kW`);
 				});
