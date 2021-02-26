@@ -50,8 +50,11 @@ router.post('/', async (req, res) => {
 					type: 'string'
 				},
 				defaultTimezone: {
-					type: 'string'
-				}
+					oneOf: [
+						{ type: 'string' },
+						{ type: 'null' }
+					]
+				},
 			}
 		}
 	};

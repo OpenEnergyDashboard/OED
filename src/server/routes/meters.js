@@ -109,7 +109,12 @@ router.post('/edit', async (req, res) => {
 			id: { type: 'integer' },
 			enabled: { type: 'bool' },
 			displayable: { type: 'bool' },
-			timeZone: { type: 'string' },
+			timeZone: {
+				oneOf: [
+					{ type: 'string' },
+					{ type: 'null' }
+				]
+			},
 			gps: {
 				oneOf: [
 					{
@@ -117,10 +122,10 @@ router.post('/edit', async (req, res) => {
 						required: ['latitude', 'longitude'],
 						properties: {
 							latitude: { type: 'number', minimum: '-90', maximum: '90' },
-							longitude: { type: 'number', minimum: '-180', maximum: '180'}
+							longitude: { type: 'number', minimum: '-180', maximum: '180' }
 						}
 					},
-					{type: 'null'}
+					{ type: 'null' }
 				]
 			}
 		}
@@ -137,7 +142,7 @@ router.post('/edit', async (req, res) => {
 			meter.enabled = req.body.enabled;
 			meter.displayable = req.body.displayable;
 			meter.meterTimezone = req.body.timeZone;
-			meter.gps = (req.body.gps)? new Point(req.body.gps.longitude, req.body.gps.latitude): null;
+			meter.gps = (req.body.gps) ? new Point(req.body.gps.longitude, req.body.gps.latitude) : null;
 			await meter.update(conn);
 		} catch (err) {
 			log.error('Failed to edit meter', err);
