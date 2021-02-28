@@ -47,14 +47,14 @@ export interface TooltipItems {
  */
 export interface User {
 	email: string;
-	role: string;
+	role: UserRole;
 }
 
 /**
  * The values of this enum that needs to match the keys of User.role on the server side.
  */
 export enum UserRole {
-	admin = 'ADMIN',
-	obvius = 'OBVIUS',
-	csv = 'CSV'
+	ADMIN = 'admin',
+	OBVIUS = 'obvius',
+	CSV = 'csv'
 };
