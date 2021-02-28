@@ -4,8 +4,8 @@
 
 import * as React from 'react';
 import { FormattedMessage } from 'react-intl';
-//import VERSION from '../../../server/version';
 import { versionApi } from '../utils/api';
+import VersionComponent from './VersionComponent';
 
 
 /**
@@ -14,9 +14,9 @@ import { versionApi } from '../utils/api';
 export default function FooterComponent() {
 	const footerStyle: React.CSSProperties = {
 		position: 'absolute',
-		bottom: '30px',
+		bottom: '60px',
 		height: '10px',
-		lineHeight: '10px',
+		lineHeight: '20px',
 		paddingTop: '20px',
 		borderTop: '1px #e1e4e8 solid',
 		textAlign: 'center',
@@ -24,9 +24,17 @@ export default function FooterComponent() {
 	};
 	const phantomStyle: React.CSSProperties = {
 		display: 'block',
-		height: '60px',
+		height: '100px',
 		width: '100%'
 	};
+	let versionString = "";
+	fetchVersion().then(function (result) {
+		console.log("Second checkpoint");
+		versionString = result;
+		console.log(versionString);
+	});
+	console.log("Third checkpoint")
+	console.log(versionString);
 	return (
 		<div>
 			<div style={phantomStyle} />
@@ -41,21 +49,19 @@ export default function FooterComponent() {
 						<FormattedMessage id='website' />
 					</a>
 					<FormattedMessage id='info' />
-					<FormattedMessage id='oed.version'/> <span id="myspan"> 0.0.0 </span>
+					<VersionComponent version={versionString}/>
 				</span>
 			</footer>
 		</div>
 	);
 }
 
-async function getVersion() {
-    try {
-		const versionObj = await versionApi.getVersion();
-        const version = versionObj.toString();
-		console.log("VERSIONNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNN");
-		console.log(version);
-    }
-    catch(err) {
-        console.log('Error: ', err.message);
-    }
+// async functions always return a promise
+async function fetchVersion() {
+	// the await call contains and relies on a promise already
+	// await: if it succeeds, returns result, otherwise, throws error
+	const versionPromise = await versionApi.getVersion();
+	console.log("This is the version promise")
+	console.log(versionPromise);
+	return versionPromise;
 }
