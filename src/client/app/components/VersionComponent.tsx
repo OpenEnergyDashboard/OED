@@ -21,7 +21,8 @@ export default class VersionComponent extends React.Component<VersionProps, {}> 
 		return (
 			<div>
 				<FormattedMessage id='oed.version'/>
-				{this.props.version}
+				<div>{this.props.version}</div>
+				{this.props.version == "v0.5.0" ? <p>Case 1</p> : <p>Case 2</p>}
 			</div>
 		);
 	}
