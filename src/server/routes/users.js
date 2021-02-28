@@ -80,10 +80,11 @@ router.post('/', async (req, res) => {
 		try {
 			const conn = getConnection();
 			const { email, password, role } = req.body;
-			const hashedPassword = bcrypt.hash(password)
+			const hashedPassword = await bcrypt.hash(password, 10);
 			const userRole = User.role[role];
 			const user = new User(undefined, email, hashedPassword, userRole);
 			user.insert(conn);
+			res.sendStatus(200);
 		} catch (error) {
 			log.error(`Error while performing POST request to create user: ${error}`, error);
 			res.status(500).json({ message: 'Internal Server Error', error: error });
