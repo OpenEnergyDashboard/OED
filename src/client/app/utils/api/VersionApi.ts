@@ -13,7 +13,7 @@ export default class VersionApi {
 		this.backend = backend;
 	}
 
-	public async getVersion(): Promise<any> {
-		return await this.backend.doGetRequest<any>('/api/version');
+	public async getVersion(): Promise<string> {
+		return await this.backend.doGetRequest<string>('/api/version');
 	}
 }
