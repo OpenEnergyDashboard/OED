@@ -57,32 +57,28 @@ router.get('/:user_id', async (req, res) => {
 router.post('/', async (req, res) => {
 	const validParams = {
 		type: 'object',
-		maxProperties: 1,
 		required: ['email', 'password', 'role'],
 		properties: {
 			email: {
 				type: 'string',
-				pattern: '^\\d+$'
 			},
 			password: {
 				type: 'string',
-				pattern: '^\\d+$'
 			},
 			role: {
 				type: 'string',
-				enum: Object.keys(User.role)
+				enum: Object.values(User.role)
 			}
 		}
 	};
-	if (!validate(req.body, validParams)) {
+	if (!validate(req.body, validParams).valid) {
 		res.status(400).json({ message: 'Invalid params' });
 	} else {
 		try {
 			const conn = getConnection();
 			const { email, password, role } = req.body;
 			const hashedPassword = await bcrypt.hash(password, 10);
-			const userRole = User.role[role];
-			const user = new User(undefined, email, hashedPassword, userRole);
+			const user = new User(undefined, email, hashedPassword, role);
 			user.insert(conn);
 			res.sendStatus(200);
 		} catch (error) {
