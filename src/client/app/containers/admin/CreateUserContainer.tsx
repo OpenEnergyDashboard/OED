@@ -23,7 +23,8 @@ export default class CreateUserFormContainer extends React.Component<{}, {}>{
         email: '',
         password: '',
         confirmPassword: '',
-        role: UserRole.admin
+        role: UserRole.admin,
+        submittedOnce: false
     }
 
     private handleEmailChange = (newEmail: string) => {
@@ -39,6 +40,7 @@ export default class CreateUserFormContainer extends React.Component<{}, {}>{
         this.setState({ role: newRole })
     }
     private submitNewUser = async () => {
+        this.setState({ submittedOnce: true })
         if (this.state.password === this.state.confirmPassword) {
             await usersApi.createUser({
                 email: this.state.email,
@@ -58,6 +60,7 @@ export default class CreateUserFormContainer extends React.Component<{}, {}>{
                     confirmPassword={this.state.confirmPassword}
                     doPasswordsMatch={this.state.password === this.state.confirmPassword}
                     role={this.state.role}
+                    submittedOnce={this.state.submittedOnce}
                     handleEmailChange={this.handleEmailChange}
                     handlePasswordChange={this.handlePasswordChange}
                     handleConfirmPasswordChange={this.handleConfirmPasswordChange}
