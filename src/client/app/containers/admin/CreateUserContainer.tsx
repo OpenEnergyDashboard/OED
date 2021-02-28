@@ -8,6 +8,7 @@ import FooterComponent from '../../components/FooterComponent';
 import CreateUserComponent from '../../components/admin/CreateUserComponent';
 import { UserRole } from '../../types/items';
 import { usersApi } from '../../utils/api';
+import { browserHistory } from '../../utils/history';
 
 export default class CreateUserFormContainer extends React.Component<{}, {}>{
     constructor(props: {}) {
@@ -46,7 +47,8 @@ export default class CreateUserFormContainer extends React.Component<{}, {}>{
                 email: this.state.email,
                 password: this.state.password,
                 role: this.state.role
-            })
+            });
+			browserHistory.push('/users');
         }
     }
     public render() {
