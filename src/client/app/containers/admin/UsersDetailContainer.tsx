@@ -8,10 +8,6 @@ import UserDetailComponent from '../../components/admin/UsersDetailComponent';
 import HeaderContainer from '../HeaderContainer';
 import FooterComponent from '../../components/FooterComponent';
 import { usersApi } from '../../utils/api';
-import { Link } from 'react-router';
-import { Button } from 'reactstrap';
-
-const users: User[] = [{ email: 'davin@example.com', role: 'csv' }, { email: 'babu@example.com', role: 'obvius' }, { email: 'bibi@example.com', role: 'admin' }]
 
 interface UsersDisplayContainerProps {
 	fetchUsers: () => User[];
@@ -33,7 +29,7 @@ export default class UsersDetailContainer extends React.Component<UsersDisplayCo
 
 	async componentDidMount() {
 		const users = await this.fetchUsers();
-		this.setState({ users: users });
+		this.setState({ users });
 	}
 
 	private async fetchUsers() {

@@ -8,20 +8,20 @@ import ApiBackend from './ApiBackend';
 import { User } from '../../types/items';
 
 interface NewUser extends User {
-    password: string;
+	password: string;
 }
 export default class UsersApi {
-    private readonly backend: ApiBackend;
+	private readonly backend: ApiBackend;
 
-    constructor(backend: ApiBackend){
-        this.backend = backend;
-    }
+	constructor(backend: ApiBackend){
+		this.backend = backend;
+	}
 
-    public async getUsers(): Promise<User[]>{
-        return await this.backend.doGetRequest<User[]>('/api/users');
-    }
+	public async getUsers(): Promise<User[]>{
+		return await this.backend.doGetRequest<User[]>('/api/users');
+	}
 
-    public async createUser(user: NewUser): Promise<void>{
-        await this.backend.doPostRequest('/api/users', user);
-    }
+	public async createUser(user: NewUser): Promise<void>{
+		await this.backend.doPostRequest('/api/users', user);
+	}
 }

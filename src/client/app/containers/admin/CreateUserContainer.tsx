@@ -11,66 +11,66 @@ import { usersApi } from '../../utils/api';
 import { browserHistory } from '../../utils/history';
 
 export default class CreateUserFormContainer extends React.Component<{}, {}>{
-    constructor(props: {}) {
-        super(props);
-        this.handleEmailChange = this.handleEmailChange.bind(this);
-        this.handlePasswordChange = this.handlePasswordChange.bind(this);
-        this.handleConfirmPasswordChange = this.handleConfirmPasswordChange.bind(this);
-        this.handleRoleChange = this.handleRoleChange.bind(this);
-        this.submitNewUser = this.submitNewUser.bind(this);
-    }
+	constructor(props: {}) {
+		super(props);
+		this.handleEmailChange = this.handleEmailChange.bind(this);
+		this.handlePasswordChange = this.handlePasswordChange.bind(this);
+		this.handleConfirmPasswordChange = this.handleConfirmPasswordChange.bind(this);
+		this.handleRoleChange = this.handleRoleChange.bind(this);
+		this.submitNewUser = this.submitNewUser.bind(this);
+	}
 
-    state = {
-        email: '',
-        password: '',
-        confirmPassword: '',
-        role: UserRole.admin,
-        submittedOnce: false
-    }
+	state = {
+		email: '',
+		password: '',
+		confirmPassword: '',
+		role: UserRole.admin,
+		submittedOnce: false
+	}
 
-    private handleEmailChange = (newEmail: string) => {
-        this.setState({ email: newEmail })
-    }
-    private handlePasswordChange = (newPassword: string) => {
-        this.setState({ password: newPassword })
-    }
-    private handleConfirmPasswordChange = (newConfirmPassword: string) => {
-        this.setState({ confirmPassword: newConfirmPassword })
-    }
-    private handleRoleChange = (newRole: UserRole) => {
-        this.setState({ role: newRole })
-    }
-    private submitNewUser = async () => {
-        this.setState({ submittedOnce: true })
-        if (this.state.password === this.state.confirmPassword) {
-            await usersApi.createUser({
-                email: this.state.email,
-                password: this.state.password,
-                role: this.state.role
-            });
+	private handleEmailChange = (newEmail: string) => {
+		this.setState({ email: newEmail })
+	}
+	private handlePasswordChange = (newPassword: string) => {
+		this.setState({ password: newPassword })
+	}
+	private handleConfirmPasswordChange = (newConfirmPassword: string) => {
+		this.setState({ confirmPassword: newConfirmPassword })
+	}
+	private handleRoleChange = (newRole: UserRole) => {
+		this.setState({ role: newRole })
+	}
+	private submitNewUser = async () => {
+		this.setState({ submittedOnce: true })
+		if (this.state.password === this.state.confirmPassword) {
+			await usersApi.createUser({
+				email: this.state.email,
+				password: this.state.password,
+				role: this.state.role
+			});
 			browserHistory.push('/users');
-        }
-    }
-    public render() {
-        return (
-            <div>
-                <HeaderContainer />
-                <h1> Create User </h1>
-                <CreateUserComponent
-                    email={this.state.email}
-                    password={this.state.password}
-                    confirmPassword={this.state.confirmPassword}
-                    doPasswordsMatch={this.state.password === this.state.confirmPassword}
-                    role={this.state.role}
-                    submittedOnce={this.state.submittedOnce}
-                    handleEmailChange={this.handleEmailChange}
-                    handlePasswordChange={this.handlePasswordChange}
-                    handleConfirmPasswordChange={this.handleConfirmPasswordChange}
-                    handleRoleChange={this.handleRoleChange}
-                    submitNewUser={this.submitNewUser}
-                />
-                <FooterComponent />
-            </div>
-        )
-    }
+		}
+	}
+	public render() {
+		return (
+			<div>
+				<HeaderContainer />
+				<h1> Create User </h1>
+				<CreateUserComponent
+					email={this.state.email}
+					password={this.state.password}
+					confirmPassword={this.state.confirmPassword}
+					doPasswordsMatch={this.state.password === this.state.confirmPassword}
+					role={this.state.role}
+					submittedOnce={this.state.submittedOnce}
+					handleEmailChange={this.handleEmailChange}
+					handlePasswordChange={this.handlePasswordChange}
+					handleConfirmPasswordChange={this.handleConfirmPasswordChange}
+					handleRoleChange={this.handleRoleChange}
+					submitNewUser={this.submitNewUser}
+				/>
+				<FooterComponent />
+			</div>
+		)
+	}
 }

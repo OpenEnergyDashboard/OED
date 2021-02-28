@@ -56,5 +56,5 @@ export interface User {
 export enum UserRole {
 	admin = 'ADMIN',
 	obvius = 'OBVIUS',
-	csv = 'CSV',
+	csv = 'CSV'
 };

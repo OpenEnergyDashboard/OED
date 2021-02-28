@@ -69,7 +69,7 @@ async function verifyCredentials(email, password, returnUser = false) {
 
 // Returns middleware that only proceeds if an Admin is the requestor of an action.
 // Action is a string that is a verb that can be prefixed by to for the proper response and warning messages.
-adminAuthMiddleware = (action) => {
+adminAuthMiddleware = action => {
 	return function (req, res, next) {
 		this.authMiddleware(req, res, () => {
 			if (req.decoded && isTokenAuthorized(req.decoded.role, User.role.ADMIN)) {
@@ -111,7 +111,7 @@ function obviusEmailAndPasswordAuthMiddleware(action) {
 				if (error.message === 'No data returned from the query.') {
 					res.status(400).text(`No user corresponding to the email: ${req.email} was found. Please make a request with a valid email.`);
 				} else {
-					log.error(`Internal Server Error for Obvius request.`, error);
+					log.error('Internal Server Error for Obvius request.', error);
 					res.status(400).text('Internal OED Server Error for Obvius request.');
 				}
 			}
