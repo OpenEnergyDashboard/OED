@@ -2,6 +2,7 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at http://mozilla.org/MPL/2.0/.
  */
+//this is a comment
 const database = require('./database');
 const { TimeInterval } = require('../../common/TimeInterval');
 const sqlFile = database.sqlFile;
