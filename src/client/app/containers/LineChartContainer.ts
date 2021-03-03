@@ -9,6 +9,7 @@ import getGraphColor from '../utils/getGraphColor';
 import { State } from '../types/redux/state';
 import PlotlyChart, { IPlotlyChartProps } from 'react-plotlyjs-ts';
 import {TimeInterval} from '../../../common/TimeInterval';
+import { DataType } from '../types/Datasources';
 
 function mapStateToProps(state: State) {
 	const timeInterval = state.graph.timeInterval;
@@ -21,6 +22,7 @@ function mapStateToProps(state: State) {
 			const readingsData = byMeterID[timeInterval.toString()];
 			if (readingsData !== undefined && !readingsData.isFetching) {
 				const label = state.meters.byMeterID[meterID].name;
+				const colorID = meterID;
 				if (readingsData.readings === undefined) {
 					throw new Error('Unacceptable condition: readingsData.readings is undefined.');
 				}
@@ -63,7 +65,7 @@ function mapStateToProps(state: State) {
 						shape: 'spline',
 						width: 3
 					},
-					marker: {color: getGraphColor(label)}
+					marker: {color: getGraphColor(colorID, DataType.Meter)}
 				});
 			}
 		}
@@ -78,6 +80,7 @@ function mapStateToProps(state: State) {
 			const readingsData = byGroupID[timeInterval.toString()];
 			if (readingsData !== undefined && !readingsData.isFetching) {
 				const label = state.groups.byGroupID[groupID].name;
+				const colorID = groupID;
 				if (readingsData.readings === undefined) {
 					throw new Error('Unacceptable condition: readingsData.readings is undefined.');
 				}
@@ -107,7 +110,7 @@ function mapStateToProps(state: State) {
 						shape: 'spline',
 						width: 3
 					},
-					marker: {color: getGraphColor(label)}
+					marker: {color: getGraphColor(colorID, DataType.Group)}
 				});
 			}
 		}
