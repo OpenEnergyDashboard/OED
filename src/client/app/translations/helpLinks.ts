@@ -12,6 +12,7 @@ const BASE_URL = 'https://openenergydashboard.github.io';
 const links: Record<string, Record<string, string>> = {
 	'help.admin.groupview': { link: `${BASE_URL}/help/adminGroupViewing.html`},
 	'help.admin.header': { link: `${BASE_URL}/help/admin.html`},
+	'help.admin.mapview': { link: `${BASE_URL}/help/adminMap.html`},
 	'help.admin.meterview': { link: `${BASE_URL}/help/adminMeterViewing.html`},
 	'help.home.chart.plotly.controls': { link: 'https://plotly.com/chart-studio-help/getting-to-know-the-plotly-modebar/' },
 	'help.home.chart.redraw.restore': { link: `${BASE_URL}/help/lineGraphic.html#redrawRestore` },
@@ -28,6 +29,7 @@ const links: Record<string, Record<string, string>> = {
 	'help.home.select.meters': { link: `${BASE_URL}/help/graphingMeters.html` },
 	'help.home.toggle.chart.link': { link: `${BASE_URL}/help/chartLink.html` },
 	'help.groups.groupview': { link: `${BASE_URL}/help/groupViewing.html`},
+	'help.maps.mapview': { link: `${BASE_URL}/help/mapGraphic.html`},
 	'help.meters.meterview': { link: `${BASE_URL}/help/meterViewing.html`}
 };
 

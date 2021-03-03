@@ -10,6 +10,8 @@ import HeaderContainer from '../../containers/HeaderContainer';
 import FooterComponent from '../FooterComponent';
 import MapViewContainer from '../../containers/maps/MapViewContainer';
 import {Link} from 'react-router';
+import TooltipHelpComponent from '../TooltipHelpComponentAlternative';
+import TooltipMarkerComponent from '../TooltipMarkerComponent';
 
 interface MapsDetailProps {
 	maps: number[];
@@ -25,7 +27,7 @@ export default class MapsDetailComponent extends React.Component<MapsDetailProps
 	}
 
 	public render() {
-
+		const renderCreateAdminTooltip = hasToken();
 
 		const titleStyle: React.CSSProperties = {
 			textAlign: 'center'
@@ -43,12 +45,21 @@ export default class MapsDetailComponent extends React.Component<MapsDetailProps
 			marginRight: '40%'
 		};
 
+		const tooltipStyle = {
+			display: 'inline-block',
+			tooltipMeterView: renderCreateAdminTooltip? 'help.admin.mapview' : 'help.maps.mapview'
+		};
+
 		return (
 			<div>
 				<HeaderContainer />
+				<TooltipHelpComponent page='maps' />
 				<div className='container-fluid'>
 					<h2 style={titleStyle}>
 						<FormattedMessage id='maps' />
+						<div style={tooltipStyle}>
+						<TooltipMarkerComponent page='maps' helpTextId={tooltipStyle.tooltipMeterView} />
+						</div>
 					</h2>
 					<div style={tableStyle}>
 					<Table striped bordered hover>
