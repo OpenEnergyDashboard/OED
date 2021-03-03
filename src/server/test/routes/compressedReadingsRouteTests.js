@@ -17,7 +17,10 @@ const Reading = require('../../models/Reading');
 
 const { compressedLineReadings,
 	validateLineReadingsParams,
-	validateLineReadingsQueryParams
+	validateLineReadingsQueryParams,
+	compressedMeterBarReadings,
+	validateMeterBarReadingsParams,
+	validateBarReadingsQueryParams
 } = require('../../routes/compressedReadings');
 
 const { TimeInterval } = require('../../../common/TimeInterval');
@@ -58,6 +61,44 @@ mocha.describe('Compressed readings routes', () => {
 			});
 			const response = await compressedLineReadings([1], timeInterval);
 
+			const expectedResponse = {
+				1: [
+					{reading: 1, startTimestamp: timeInterval.startTimestamp.valueOf(), endTimestamp: timeInterval.endTimestamp.valueOf()}
+				]
+			};
+
+			expect(response).to.deep.equal(expectedResponse);
+		});
+	});
+	mocha.describe('the compressed bar readings route', () => {
+
+		mocha.describe('validation', () => {
+			mocha.it('fails to validate when the meter_ids param is wrong', () => {
+				const validationResult = validateMeterBarReadingsParams({ meter_ids: 'not_a_number' });
+				expect(validationResult).to.equal(false);
+			});
+			mocha.it('validates when the meter_ids param is valid', () => {
+				const validationResult = validateMeterBarReadingsParams({ meter_ids: '1,2,3' });
+				expect(validationResult).to.equal(true);
+			});
+			mocha.it('validates when the time interval is valid', () => {
+				const validationResult = validateBarReadingsQueryParams(
+					{timeInterval: TimeInterval.unbounded().toString(), barWidthDays: '28' }
+					);
+				expect(validationResult).to.equal(true);
+			});
+		});
+
+		mocha.it('returns bar readings correctly when called correctly', async () => {
+			const timeInterval = new TimeInterval(moment('2017-01-01'), moment('2017-01-02'));
+
+			const compressedReadingsStub = sinon.stub(Reading, 'getNewCompressedBarchartReadings');
+			compressedReadingsStub.resolves({
+				1: [
+					{reading: 1, start_timestamp: timeInterval.startTimestamp, end_timestamp: timeInterval.endTimestamp}
+				]
+			});
+			const response = await compressedMeterBarReadings([1], 1, timeInterval);
 			const expectedResponse = {
 				1: [
 					{reading: 1, startTimestamp: timeInterval.startTimestamp.valueOf(), endTimestamp: timeInterval.endTimestamp.valueOf()}

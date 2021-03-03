@@ -3,7 +3,7 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
 
 import * as _ from 'lodash';
-import * as moment from 'moment';
+import * as moment from 'moment-timezone';
 import { connect } from 'react-redux';
 import getGraphColor from '../utils/getGraphColor';
 import { State } from '../types/redux/state';
@@ -34,7 +34,7 @@ function mapStateToProps(state: State) {
 				const readings = _.values(readingsData.readings);
 				readings.forEach(reading => {
 					const timeReading = moment(reading.startTimestamp);
-					xData.push(timeReading.format('YYYY-MM-DD HH:mm:ss'));
+					xData.push(timeReading.utc().format('YYYY-MM-DD HH:mm:ss'));
 					yData.push(reading.reading);
 					hoverText.push(`<b> ${timeReading.format('dddd, MMM DD, YYYY hh:mm a')} </b> <br> ${label}: ${reading.reading} kW`);
 				});
@@ -92,7 +92,7 @@ function mapStateToProps(state: State) {
 				const readings = _.values(readingsData.readings);
 				readings.forEach(reading => {
 					const timeReading = moment(reading.startTimestamp);
-					xData.push(timeReading.format('YYYY-MM-DD HH:mm:ss'));
+					xData.push(timeReading.utc().format('YYYY-MM-DD HH:mm:ss'));
 					yData.push(reading.reading);
 					hoverText.push(`<b> ${timeReading.format('dddd, MMM DD, YYYY hh:mm a')} </b> <br> ${label}: ${reading.reading} kW`);
 				});

@@ -13,6 +13,7 @@ import { changeOptionsFromLink, LinkOptions } from '../actions/graph';
 import { fetchPreferencesIfNeeded } from '../actions/admin';
 import { State } from '../types/redux/state';
 import { Dispatch } from '../types/redux/actions';
+import {fetchMapsDetails} from '../actions/map';
 
 
 function mapStateToProps(state: State) {
@@ -27,6 +28,7 @@ function mapDispatchToProps(dispatch: Dispatch) {
 		fetchMeterDetailsIfNeeded: () => dispatch(fetchMetersDetailsIfNeeded()),
 		fetchGroupDetailsIfNeeded: () => dispatch(fetchGroupsDetailsIfNeeded()),
 		fetchPreferencesIfNeeded: () => dispatch(fetchPreferencesIfNeeded()),
+		fetchMapDetailsIfNeeded: () => dispatch(fetchMapsDetails()),
 		changeOptionsFromLink: (options: LinkOptions) => dispatch(changeOptionsFromLink(options))
 	};
 }
