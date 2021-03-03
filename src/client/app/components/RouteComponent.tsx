@@ -77,12 +77,6 @@ export default class RouteComponent extends React.Component<RouteProps, {}> {
 	 * @param replace Function that allows a route redirect
 	 */
 	public checkAuth(nextState: RouterState, replace: RedirectFunction) {
-		function redirectRoute() {
-			replace({
-				pathname: '/login',
-				state: { nextPathname: nextState.location.pathname }
-			});
-		}
 		// Only check the token if the auth token does not exist
 		if (hasToken()) {
 			// Verify that the auth token is valid.
