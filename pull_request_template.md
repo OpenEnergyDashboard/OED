@@ -19,7 +19,7 @@ Fixes #[issue]
 (Note what you have done by placing an "x" instead of the space in the [ ] so it becomes [x]. It is hoped you do all of them.)
 
 - [ ] I have followed the [OED pull request](https://openenergydashboard.github.io/developer/pr.html) ideas
-- [ ] Remove text in ( ) from the issue request
+- [ ] I have removed text in ( ) from the issue request
 
 ## Limitations
 
