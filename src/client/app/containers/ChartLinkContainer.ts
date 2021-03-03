@@ -25,10 +25,16 @@ function mapStateToProps(state: State) {
 			linkText += `&barStacking=${state.graph.barStacking}`;
 			break;
 		case 'line':
+			linkText += `&serverRange=${state.graph.timeInterval.toString()}`;
+			// under construction;
+			// linkText += `&displayRange=${state.graph.timeInterval.toString().split('_')}`;
 			break;
 		case 'compare':
 			linkText += `&comparePeriod=${state.graph.comparePeriod}`;
 			linkText += `&compareSortingOrder=${state.graph.compareSortingOrder}`;
+			break;
+		case 'map':
+			linkText += `&mapID=${state.maps.selectedMap.toString()}`;
 			break;
 		default:
 			break;

@@ -8,7 +8,6 @@ import { ChartTypes } from '../types/redux/graph';
 import { ChangeChartToRenderAction } from '../types/redux/graph';
 import Button from 'reactstrap/lib/Button';
 import ButtonGroup from 'reactstrap/lib/ButtonGroup';
-import { FormEvent } from 'react';
 import { FormattedMessage } from 'react-intl';
 import TooltipMarkerComponent from './TooltipMarkerComponent';
 
@@ -59,6 +58,12 @@ export default class ChartSelectComponent extends React.Component<ChartSelectPro
 						onClick={() => this.handleChangeChartType(ChartTypes.compare)}
 					>
 						<FormattedMessage id='compare' />
+					</Button>
+					<Button
+						outline={this.props.selectedChart !== ChartTypes.map}
+						onClick={() => this.handleChangeChartType(ChartTypes.map)}
+					>
+						<FormattedMessage id='map' />
 					</Button>
 				</ButtonGroup>
 				<div>

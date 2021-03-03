@@ -4,7 +4,7 @@
 
 import * as _ from 'lodash';
 import { ActionType, Dispatch, GetState, Thunk } from '../types/redux/actions';
-import { MeterMetadata, MeterMetadataByID } from '../types/redux/meters';
+import { MeterMetadata } from '../types/redux/meters';
 import { State } from '../types/redux/state';
 import * as t from '../types/redux/meters';
 import { NamedIDItem } from '../types/items';

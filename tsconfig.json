@@ -20,6 +20,7 @@
         "noImplicitThis": true,
         "noImplicitAny": true,
         "strictNullChecks": true,
+        "noUnusedLocals": true,
         "typeRoots": [
             "./node_modules/@types",
             "./src/client/app/types"

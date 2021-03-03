@@ -2,6 +2,8 @@
 
 [![Build Status](https://travis-ci.org/OpenEnergyDashboard/OED.svg?branch=master)](https://travis-ci.org/OpenEnergyDashboard/OED)
 
+![Github Build](https://github.com/OpenEnergyDashboard/OED/workflows/Build/badge.svg)
+
 Open Energy Dashboard is a user-friendly way to display energy information from smart energy meters. It is available to anyone and is optimized for non-technical users with a simple interface that provides access to your organization's energy data. To learn more, see [our website](https://openenergydashboard.github.io/).
 
 Open Energy Dashboard is available under the Mozilla Public Licence v2, and contributions, in the form of bug reports, feature requests, and code contributions, are welcome.
