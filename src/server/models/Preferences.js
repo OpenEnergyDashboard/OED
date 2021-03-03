@@ -13,12 +13,14 @@ class Preferences {
 	 * @param {String} defaultChartToRender - Chart to display as default
 	 * @param {Boolean} defaultBarStacking - Option to set default toggle of bar stacking
 	 * @param {String} defaultLanguage - Option to set the default language
+	 * @param {String} defaultTimezone - Option to set the default timezone
 	 */
-	constructor(displayTitle, defaultChartToRender, defaultBarStacking, defaultLanguage) {
+	constructor(displayTitle, defaultChartToRender, defaultBarStacking, defaultLanguage, defaultTimezone) {
 		this.displayTitle = displayTitle;
 		this.defaultChartToRender = defaultChartToRender;
 		this.defaultBarStacking = defaultBarStacking;
 		this.defaultLanguage = defaultLanguage;
+		this.defaultTimezone = defaultTimezone;
 	}
 
 	/**
@@ -34,7 +36,7 @@ class Preferences {
 	}
 
 	static mapRow(row) {
-		return new Preferences(row.display_title, row.default_chart_to_render, row.default_bar_stacking, row.default_language);
+		return new Preferences(row.display_title, row.default_chart_to_render, row.default_bar_stacking, row.default_language, row.default_timezone);
 	}
 
 	/**
@@ -58,7 +60,8 @@ class Preferences {
 				displayTitle: preferences.displayTitle,
 				defaultChartToRender: preferences.defaultChartToRender,
 				defaultBarStacking: preferences.defaultBarStacking,
-				defaultLanguage: preferences.defaultLanguage
+				defaultLanguage: preferences.defaultLanguage,
+				defaultTimezone: preferences.defaultTimezone
 			});
 	}
 }

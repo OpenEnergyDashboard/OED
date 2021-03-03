@@ -10,7 +10,8 @@ import { ComparePeriod, SortingOrder } from '../../utils/calculateCompare';
 export enum ChartTypes {
 	line = 'line',
 	bar = 'bar',
-	compare = 'compare'
+	compare = 'compare',
+	map = 'map'
 }
 
 export interface UpdateSelectedMetersAction {

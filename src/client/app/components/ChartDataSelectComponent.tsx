@@ -6,6 +6,7 @@ import * as React from 'react';
 import MultiSelectComponent from './MultiSelectComponent';
 import { SelectOption } from '../types/items';
 import { defineMessages, FormattedMessage, injectIntl, InjectedIntlProps } from 'react-intl';
+import TooltipMarkerComponent from './TooltipMarkerComponent';
 
 interface ChartDataSelectProps {
 	meters: SelectOption[];
@@ -38,7 +39,9 @@ class ChartDataSelectComponent extends React.Component<ChartDataSelectPropsWithI
 		};
 		const messages = defineMessages({
 			selectGroups: {	id: 'select.groups' },
-			selectMeters: { id: 'select.meters' }
+			selectMeters: { id: 'select.meters' },
+			helpSelectGroups: {id: 'help.home.select.groups'},
+			helpSelectMeters: {id: 'help.home.select.meters'}
 		});
 		const { formatMessage } = this.props.intl;
 
@@ -56,6 +59,7 @@ class ChartDataSelectComponent extends React.Component<ChartDataSelectPropsWithI
 						placeholder={formatMessage(messages.selectGroups)}
 						onValuesChange={handleGroupSelect}
 					/>
+					<TooltipMarkerComponent page='home' helpTextId='help.home.select.groups'/>
 				</div>
 				<p style={labelStyle}>
 					<FormattedMessage id='meters' />:
@@ -67,6 +71,7 @@ class ChartDataSelectComponent extends React.Component<ChartDataSelectPropsWithI
 						placeholder={formatMessage(messages.selectMeters)}
 						onValuesChange={this.handleMeterSelect}
 					/>
+					<TooltipMarkerComponent page='home' helpTextId='help.home.select.meters'/>
 				</div>
 			</div>
 		);

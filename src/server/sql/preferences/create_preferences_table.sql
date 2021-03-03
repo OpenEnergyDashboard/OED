@@ -8,5 +8,6 @@ CREATE TABLE IF NOT EXISTS preferences (
 	display_title VARCHAR(50) NOT NULL,
 	default_chart_to_render graph_type NOT NULL,
 	default_bar_stacking BOOLEAN NOT NULL,
-	default_language language_type NOT NULL
+	default_language language_type NOT NULL,
+	default_timezone TEXT DEFAULT NULL 
 );

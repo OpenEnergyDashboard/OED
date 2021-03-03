@@ -37,19 +37,18 @@ function mapStateToProps(state: State, ownProps: CompareChartContainerProps): IP
 	const previousPeriod = entity.prevUsage;
 	const currentPeriod = entity.currUsage;
 
-
 	datasets.push(
 		{
 			x: [periodLabels.prev, periodLabels.current],
 			y: [previousPeriod, currentPeriod],
 			hovertext: [
-				`<b>${previousPeriod} KW</b> ${translate('used.this.time')}<br>${periodLabels.prev.toLowerCase()}`,
-				`<b>${currentPeriod} KW</b> ${translate('used.so.far')}<br>${periodLabels.current.toLowerCase()}`
+				`<b>${previousPeriod} KWh</b> ${translate('used.this.time')}<br>${periodLabels.prev.toLowerCase()}`,
+				`<b>${currentPeriod} KWh</b> ${translate('used.so.far')}<br>${periodLabels.current.toLowerCase()}`
 			],
 			hoverinfo: 'text',
 			type: 'bar',
 			marker: {color: barColor},
-			text: [ `<b>${previousPeriod} kW</b>`, `<b>${currentPeriod} kW</b>`],
+			text: [ `<b>${previousPeriod} kWh</b>`, `<b>${currentPeriod} kWh</b>`],
 			textposition: 'auto',
 			textfont: {
 				color: 'rgba(0,0,0,1)'
@@ -65,11 +64,13 @@ function mapStateToProps(state: State, ownProps: CompareChartContainerProps): IP
 		},
 		hovermode: 'closest',
 		autosize: true,
+		width: 370,
+		height: 450,
 		showlegend: false,
 		legend: {
 		},
 		yaxis: {
-			title: 'kW',
+			title: 'kWh',
 			showgrid: true,
 			gridcolor: '#ddd'
 		},
