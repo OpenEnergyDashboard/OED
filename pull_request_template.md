@@ -8,11 +8,15 @@ Fixes #[issue]
 
 ## Type of change
 
+(Check the ones that apply by placing an "x" instead of the space in the [ ] so it becomes [x])
+
 - [ ] Note merging this changes the node modules
 - [ ] Note merging this changes the database configuration.
 - [ ] This change requires a documentation update
 
 ## Checklist
+
+(Note what you have done by placing an "x" instead of the space in the [ ] so it becomes [x]. It is hoped you do all of them.)
 
 - [ ] I have followed the [OED pull request](https://openenergydashboard.github.io/developer/pr.html) ideas
 - [ ] Remove text in ( ) from the issue request
