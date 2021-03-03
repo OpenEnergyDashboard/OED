@@ -129,19 +129,7 @@ export function calibrate(calibrationSet: CalibratedPoint[], imageDimensions: Di
 	};
 
 	// calculate gps coordinates for top-left and down-right corner
-	const topLeftLatitude = originCoordinate.latitude + normalizedDimensions.height * degreePerUnitY;
-	const topLeftLongitude = originCoordinate.longitude;
-	const topLeftCoordinate: GPSPoint = {
-		latitude: Number(topLeftLatitude.toFixed(6)),
-		longitude: Number(topLeftLongitude.toFixed(6))
-	};
 
-	const downRightLatitude = originCoordinate.latitude;
-	const downRightLongitude = originCoordinate.longitude + normalizedDimensions.width * degreePerUnitX;
-	const downRightCoordinate: GPSPoint = {
-		latitude: Number(downRightLatitude.toFixed(6)),
-		longitude: Number(downRightLongitude.toFixed(6))
-	};
 
 	// calculate max error
 	const diagonal = Math.sqrt(Math.pow(normalizedDimensions.width * degreePerUnitX, 2) + Math.pow(normalizedDimensions.height * degreePerUnitY, 2));
@@ -211,13 +199,4 @@ export function normalizeImageDimensions(dimensions: Dimensions) {
 		height
 	};
 	return res;
-}
-
-// Typescript functions to determine whether an object is one of these points
-function isCartesian(object: any): object is CartesianPoint {
-	return 'x' in object && 'y' in object;
-}
-
-function isGPS(object: any): object is GPSPoint {
-	return 'latitude' in object && 'longitude' in object;
 }

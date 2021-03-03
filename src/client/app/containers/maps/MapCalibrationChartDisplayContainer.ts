@@ -111,9 +111,9 @@ function createBackgroundTrace(imageDimensions: Dimensions, settings: Calibratio
 	}
 	// define the actual points of the graph, numbers in the array are used to designate different colors;
 	const z = [];
-	for (const item of y) {
+	for (const {} of y) {
 		const temp = [];
-		for (const it of x) {
+		for (const {} of x) {
 			temp.push(0);
 		}
 		z.push(temp);
@@ -149,7 +149,6 @@ function getClickedCoordinates(event: plotly.PlotMouseEvent) {
 	   */
 	const eligiblePoints = [];
 	for (const point of event.points) {
-		const pointNumber = point.pointNumber;
 		const traceNumber = point.curveNumber;
 		if (traceNumber === 0) {
 			eligiblePoints.push(point);

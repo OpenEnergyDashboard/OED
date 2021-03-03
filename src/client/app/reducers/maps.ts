@@ -126,26 +126,6 @@ export default function maps(state = defaultState, action: MapsAction) {
 					[calibrated]: mapToReset
 				}
 			};
-		case ActionType.RequestSelectedMap:
-			return {
-				...state,
-				isLoading: true
-			};
-		case ActionType.ReceiveSelectedMap:
-			const receivedImage = new Image();
-			receivedImage.src = action.map.mapSource;
-			return {
-				...state,
-				isLoading: false,
-				name: action.map.name,
-				note: action.map.note,
-				image: receivedImage,
-				filename: action.map.filename,
-				calibrationResult: {
-					origin: action.map.origin,
-					opposite: action.map.opposite
-				}
-			}
 		case ActionType.UpdateMapSource:
 			return {
 				...state,
@@ -208,20 +188,6 @@ export default function maps(state = defaultState, action: MapsAction) {
 					[calibrated]: {
 						...state.editedMaps[calibrated],
 						currentPoint: newDataPoint
-					}
-				}
-			};
-		case ActionType.UpdateCurrentGPS:
-			return {
-				...state,
-				editedMaps: {
-					...state.editedMaps,
-					[calibrated]: {
-						...state.editedMaps[calibrated],
-						currentPoint: {
-							...state.editedMaps[calibrated].currentPoint,
-							gps: action.currentGPS
-						}
 					}
 				}
 			};
