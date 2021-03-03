@@ -28,7 +28,7 @@ export default class MetersDetailComponent extends React.Component<MetersDetailP
 		const renderCreateAdminTooltip = hasToken();
 
 		const titleStyle: React.CSSProperties = {
-			textAlign: 'center',
+			textAlign: 'center'
 		};
 
 		const tableStyle: React.CSSProperties = {

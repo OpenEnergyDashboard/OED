@@ -65,7 +65,7 @@ class PreferencesComponent extends React.Component<PreferencesPropsWithIntl, {}>
 				<div style={bottomPaddingStyle}>
 					<p style={titleStyle}>
 						<FormattedMessage id='default.site.title' />:
-						<div style={{display: "inline"}}>
+						<div style={{display: 'inline'}}>
 						<TooltipMarkerComponent page='admin' helpTextId='help.admin.header' />
 						</div>
 					</p>

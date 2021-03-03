@@ -42,7 +42,7 @@ export default class GroupSidebarComponent extends React.Component<GroupSidebarP
 			<div className='form-group'>
 				<p style={labelStyle}>
 					<FormattedMessage id='view.groups' />:
-					<div style={{display: "inline"}}>
+					<div style={{display: 'inline'}}>
 					<TooltipMarkerComponent page='groups' helpTextId={tooltipStyle.tooltipGroupView}/>
 					</div>
 				</p>
