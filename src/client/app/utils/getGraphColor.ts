@@ -4,14 +4,16 @@
 
 import { DataType } from '../types/Datasources';
 
-// Color list (48 colors) with darker hues towards beginning of array and lighter hues towards end of array.
+// Color list (47 colors) with darker hues towards beginning of array and lighter hues towards end of array.
+// The array length was made a prime number just in case the IDs are not ordered because it better scrambles
+// values as in a hash table.
 const graphColors = [
 	'#1b2631', '#78281f', '#4a235a', '#1b4f72', '#0b5345', '#186a3b', '#7e5109', '#6e2c00',
 	'#515a5a', '#7b241c', '#633974', '#1a5276', '#117864', '#196f3d', '#9a7d0a', '#935116',
 	'#283747', '#b03a2e', '#6c3483', '#2874a6', '#117a65', '#239b56', '#b9770e', '#a04000',
 	'#707b7c', '#a93226', '#884ea0', '#2471a3', '#17a589', '#229954', '#d4ac0d', '#ca6f1e',
 	'#34495e', '#e74c3c', '#8e44ad', '#3498db',	'#16a085', '#2ecc71', '#f39c12', '#d35400',
-	'#99a3a4', '#cd6155', '#af7ac5', '#5499c7', '#48c9b0', '#52be80', '#f4d03f', '#eb984e'
+	'#99a3a4', '#cd6155', '#af7ac5', '#5499c7', '#48c9b0', '#52be80', '#f4d03f'
 ];
 
 // Creates a reversed copy of the original array with lighter hues towards beginning of array and darker towards the end.
