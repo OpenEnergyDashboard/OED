@@ -57,15 +57,15 @@ export default function graphExport(dataSets: ExportDataSet[], name: string) {
  * Function to export raw data that we request on button click
  * @param items list of readings directly from the database
  */
-export function downloadRawCSV(items:RawReadings[]){
+export function downloadRawCSV(items: RawReadings[]) {
 	let csvOutput = 'Label,Readings,Start Timestamp\n';
 	items.forEach(ele => {
 		csvOutput += `"${ele.label}",${ele.reading} kW,${ele.startTimestamp}\n`
 	})
-	const startTime=new Date(items[0].startTimestamp).toDateString().replace(/ /g,'-'); // Use Regex to replace all ' ' with '-'
-	const endTime=new Date(items[items.length-1].startTimestamp).toDateString().replace(/ /g,'-');
-	const filename=`oedRawExport_line_${startTime}_${endTime}.csv`;
-	downloadCSV(csvOutput,filename);
+	const startTime = new Date(items[0].startTimestamp).toDateString().replace(/ /g, '-'); // Use Regex to replace all ' ' with '-'
+	const endTime = new Date(items[items.length - 1].startTimestamp).toDateString().replace(/ /g, '-');
+	const filename = `oedRawExport_line_${startTime}_${endTime}.csv`;
+	downloadCSV(csvOutput, filename);
 }
 
 /**
@@ -75,60 +75,64 @@ export function downloadRawCSV(items:RawReadings[]){
  */
 // NOTE: This function is made with the idea that it will not be called very often
 // Ideally we would have a component that prompts the user and handles all the logic
-export function graphRawExport(count:number,done:()=>Promise<void>):any{
-	const fileSize=(count*0.042/1000)
-	if(fileSize<=5){
+export function graphRawExport(count: number, done: () => Promise<void>): any {
+	const fileSize = (count * 0.042 / 1000)
+	// 5 MB will download for anyone.
+	// TODO Make this admin controllable
+	if (fileSize <= 5) {
 		return done();
 	}
 
-	const mainContainer=document.createElement('div');
-	const innerContainer=document.createElement('div');
+	const mainContainer = document.createElement('div');
+	const innerContainer = document.createElement('div');
 	mainContainer.appendChild(innerContainer);
 	mainContainer.classList.add('fixed-top');
-	mainContainer.style.width='100vw';
-	mainContainer.style.height='100vh';
-	mainContainer.style.display='flex';
-	mainContainer.style.background='rgba(107,107,107,0.4)';
-	mainContainer.style.justifyContent='center';
-	mainContainer.style.alignItems='center';
+	mainContainer.style.width = '100vw';
+	mainContainer.style.height = '100vh';
+	mainContainer.style.display = 'flex';
+	mainContainer.style.background = 'rgba(107,107,107,0.4)';
+	mainContainer.style.justifyContent = 'center';
+	mainContainer.style.alignItems = 'center';
 
-	innerContainer.style.padding='20px 10px';
-	innerContainer.style.backgroundColor='white';
-	innerContainer.style.border='2px solid black';
-	innerContainer.style.borderRadius='10px';
-	innerContainer.style.textAlign='center';
+	innerContainer.style.padding = '20px 10px';
+	innerContainer.style.backgroundColor = 'white';
+	innerContainer.style.border = '2px solid black';
+	innerContainer.style.borderRadius = '10px';
+	innerContainer.style.textAlign = 'center';
 
-	innerContainer.innerHTML=`
+	innerContainer.innerHTML = `
 		<p>File size will be about ${fileSize.toFixed(2)}MB.</p>
 		<p>Are you sure you want to download</p>
 	`;
 
-	if(fileSize>25 && !hasToken()){ // 25 is hard coded but we should get it from state
-		innerContainer.innerHTML=`
+	// 25 MB is limit for an admin without checking they really want to download,
+	// TODO: Should this be under admin control?
+	if (fileSize > 25 && !hasToken()) { // 25 is hard coded but we should get it from state
+		innerContainer.innerHTML = `
 			<p>Sorry you don't have permissions to download.</p>
 		`;
-		const okButton=document.createElement('button');
-		okButton.innerHTML='ok';
-		okButton.addEventListener('click',()=>{
+		const okButton = document.createElement('button');
+		okButton.innerHTML = 'ok';
+		okButton.addEventListener('click', () => {
 			document.body.removeChild(mainContainer);
 		})
 		innerContainer.appendChild(okButton);
 		return document.body.appendChild(mainContainer);
 	}
 
-	const noButton=document.createElement('button');
-	noButton.innerHTML='No';
-	const yesButton=document.createElement('button');
-	yesButton.innerHTML='Yes';
+	const noButton = document.createElement('button');
+	noButton.innerHTML = 'No';
+	const yesButton = document.createElement('button');
+	yesButton.innerHTML = 'Yes';
 
 	innerContainer.appendChild(yesButton);
 	innerContainer.appendChild(noButton);
 
-	noButton.addEventListener('click',()=>{
+	noButton.addEventListener('click', () => {
 		document.body.removeChild(mainContainer);
 	})
 
-	yesButton.addEventListener('click',()=>{
+	yesButton.addEventListener('click', () => {
 		document.body.removeChild(mainContainer);
 		done();
 	})
