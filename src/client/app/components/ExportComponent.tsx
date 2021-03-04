@@ -55,7 +55,7 @@ export default function ExportComponent(props: ExportProps) {
 		graphExport(compressedData,	name);
 	};
 
-	const exportRAWReadings = async() => {
+	const exportRawReadings = async() => {
 		const startTime = props.timeInterval.getStartTimestamp()
 		const endTime= props.timeInterval.getEndTimestamp();
 		if(props.selectedMeters.length===0)
@@ -75,7 +75,7 @@ export default function ExportComponent(props: ExportProps) {
 			</Button>
 		</div>
 		{props.showRawExport?<div style={{paddingTop:'10px'}}>
-				<Button outline onClick={exportRAWReadings}>
+				<Button outline onClick={exportRawReadings}>
 					<FormattedMessage id='export.raw.graph.data' />
 				</Button>
 			</div>:''}
