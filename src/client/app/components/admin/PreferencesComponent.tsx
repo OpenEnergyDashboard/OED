@@ -75,7 +75,7 @@ class PreferencesComponent extends React.Component<PreferencesPropsWithIntl, {}>
 						value={this.props.displayTitle}
 						onChange={this.handleDisplayTitleChange}
 						maxLength={50}
-					/>	
+					/>
 				</div>
 				<div>
 					<p style={labelStyle}>
