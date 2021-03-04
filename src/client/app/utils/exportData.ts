@@ -56,7 +56,6 @@ export default function graphExport(dataSets: ExportDataSet[], name: string) {
 /**
  * Function to export raw data that we request on button click
  * @param items list of readings directly from the database
- * @param filename export filename
  */
 export function downloadRawCSV(items:RawReadings[]){
 	let csvOutput = 'Label,Readings,Start Timestamp\n';
