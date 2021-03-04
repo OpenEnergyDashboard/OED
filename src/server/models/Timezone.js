@@ -8,7 +8,7 @@ const sqlFile = database.sqlFile;
 
 class Timezone {
 	/**
-	 * Creates a new reading
+	 * Represents a Timezone object retrieved from postgres
 	 * @param name The name of the timezone
 	 * @param abbrev The abbrevation of the timezone
 	 * @param offset The offset of the timezone

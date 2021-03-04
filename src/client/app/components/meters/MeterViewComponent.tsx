@@ -4,11 +4,10 @@
 
 import * as React from 'react';
 import { Button } from 'reactstrap';
-import ListDisplayComponent from '../ListDisplayComponent';
-import { Link } from 'react-router';
 import { hasToken } from '../../utils/token';
 import { FormattedMessage } from 'react-intl';
 import { MeterMetadata, EditMeterDetailsAction } from '../../types/redux/meters';
+import { GPSPoint, isValidGPSInput } from '../../utils/calibration';
 import TimeZoneSelect from '../TimeZoneSelect';
 
 interface MeterViewProps {
@@ -20,28 +19,36 @@ interface MeterViewProps {
 	isSubmitting: boolean;
 	// The function used to dispatch the action to edit meter details
 	editMeterDetails(meter: MeterMetadata): EditMeterDetailsAction;
+	log(level: string, message: string): any;
 }
 
-export default class MeterViewComponent extends React.Component<MeterViewProps, {}> {
+interface MeterViewState {
+	gpsFocus: boolean;
+	gpsInput: string;
+}
+
+export default class MeterViewComponent extends React.Component<MeterViewProps, MeterViewState> {
 	constructor(props: MeterViewProps) {
 		super(props);
+		this.state = {
+			gpsFocus: false,
+			gpsInput: (this.props.meter.gps) ? `${this.props.meter.gps.latitude},${this.props.meter.gps.longitude}` : ''
+		};
 		this.toggleMeterDisplayable = this.toggleMeterDisplayable.bind(this);
 		this.toggleMeterEnabled = this.toggleMeterEnabled.bind(this);
+		this.toggleGPSInput = this.toggleGPSInput.bind(this);
+		this.handleGPSChange = this.handleGPSChange.bind(this);
 		this.changeTimeZone = this.changeTimeZone.bind(this);
 	}
 
 	public render() {
-		const renderEditButton = true;
-		const editButtonStyle: React.CSSProperties = {
-			display: 'inline',
-			paddingLeft: '5px'
-		};
 		return (
 			<tr>
 				<td> {this.props.meter.id} {this.formatStatus()} </td>
 				<td> {this.props.meter.name} </td>
 				{hasToken() && <td> {this.props.meter.meterType} </td>}
 				{hasToken() && <td> {this.props.meter.ipAddress} </td>}
+				{hasToken() && <td> {this.formatGPSInput()} </td>}
 				<td> {this.formatEnabled()} </td>
 				<td> {this.formatDisplayable()} </td>
 				{hasToken() && <td> <TimeZoneSelect current={this.props.meter.timeZone || ''} handleClick={this.changeTimeZone} /> </td>}
@@ -158,6 +165,79 @@ export default class MeterViewComponent extends React.Component<MeterViewProps, 
 			</span>
 		);
 
+	}
+
+	private toggleGPSInput() {
+		if (this.state.gpsFocus) {
+			const input = this.state.gpsInput;
+			if (input.length === 0) {
+				const editedMeter = {
+					...this.props.meter,
+					gps: undefined
+				};
+				this.props.editMeterDetails(editedMeter);
+			} else if (isValidGPSInput(input)) {
+				const latitudeIndex = 0;
+				const longitudeIndex = 1;
+				const array = input.split(',').map((value: string) => parseFloat(value));
+				const gps: GPSPoint = {
+					longitude: array[longitudeIndex],
+					latitude: array[latitudeIndex]
+				};
+				const editedMeter = {
+					...this.props.meter,
+					gps
+				};
+				this.props.editMeterDetails(editedMeter);
+			} else {
+				this.props.log('info', 'refused gps coordinates with invalid input');
+				const originalGPS = this.props.meter.gps;
+				this.setState({ gpsInput: (originalGPS) ? `${originalGPS.longitude},${originalGPS.latitude}` : '' });
+			}
+		}
+		this.setState({ gpsFocus: !this.state.gpsFocus });
+	}
+
+	private handleGPSChange(event: React.ChangeEvent<HTMLTextAreaElement>) {
+		this.setState({ gpsInput: event.target.value });
+	}
+
+	private formatGPSInput() {
+		let formattedGPS;
+		let buttonMessageId;
+		if (this.state.gpsFocus) {
+			// default value for autoFocus is true and for all attributes that would be set autoFocus={true}
+			formattedGPS = <textarea id={'gps'} autoFocus value={this.state.gpsInput} onChange={event => this.handleGPSChange(event)} />;
+			buttonMessageId = 'update';
+		} else {
+			formattedGPS = <div>{this.state.gpsInput}</div>;
+			buttonMessageId = 'edit';
+		}
+
+		let toggleButton;
+		if (hasToken()) {
+			toggleButton = <Button style={this.styleToggleBtn()} color='primary' onClick={this.toggleGPSInput}>
+				<FormattedMessage id={buttonMessageId} />
+			</Button>;
+		} else {
+			toggleButton = <div />;
+		}
+
+		if (hasToken()) {
+			return ( // add onClick
+				<div>
+					{formattedGPS}
+					{toggleButton}
+				</div>
+			);
+		} else {
+			return (
+				<div>
+					{this.state.gpsInput}
+					{toggleButton}
+				</div>
+			);
+		}
 	}
 }
 

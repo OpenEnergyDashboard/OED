@@ -10,6 +10,7 @@ import { ExportDataSet } from '../types/readings';
 import { FormattedMessage } from 'react-intl';
 import { TimeInterval } from '../../../common/TimeInterval';
 import { metersApi } from '../utils/api'
+import TooltipMarkerComponent from './TooltipMarkerComponent';
 
 interface ExportProps {
 	showRawExport:boolean;
@@ -73,6 +74,7 @@ export default function ExportComponent(props: ExportProps) {
 			<Button outline onClick={exportReading}>
 				<FormattedMessage id='export.graph.data' />
 			</Button>
+			<TooltipMarkerComponent page='home' helpTextId='help.home.export.graph.data'/>
 		</div>
 		{props.showRawExport?<div style={{paddingTop:'10px'}}>
 				<Button outline onClick={exportRawReadings}>

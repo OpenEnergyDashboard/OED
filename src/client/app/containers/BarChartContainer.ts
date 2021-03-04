@@ -8,6 +8,7 @@ import { connect } from 'react-redux';
 import getGraphColor from '../utils/getGraphColor';
 import { State } from '../types/redux/state';
 import PlotlyChart, { IPlotlyChartProps } from 'react-plotlyjs-ts';
+import { DataType } from '../types/Datasources';
 
 function mapStateToProps(state: State) {
 	const timeInterval = state.graph.timeInterval;
@@ -21,6 +22,7 @@ function mapStateToProps(state: State) {
 			const readingsData = byMeterID[timeInterval.toString()][barDuration.toISOString()];
 			if (readingsData !== undefined && !readingsData.isFetching) {
 				const label = state.meters.byMeterID[meterID].name;
+				const colorID = meterID;
 				if (readingsData.readings === undefined) {
 					throw new Error('Unacceptable condition: readingsData.readings is undefined.');
 				}
@@ -32,10 +34,10 @@ function mapStateToProps(state: State) {
 				const readings = _.orderBy(readingsData.readings, ['startTimestamp'], ['asc']);
 				readings.forEach(barReading => {
 					const timeReading: string =
-						`${moment(barReading.startTimestamp).format('MMM DD, YYYY')} - ${moment(barReading.endTimestamp).format('MMM DD, YYYY')}`;
+						`${moment(barReading.startTimestamp).utc().format('MMM DD, YYYY')} - ${moment(barReading.endTimestamp).utc().format('MMM DD, YYYY')}`;
 					xData.push(timeReading);
 					yData.push(barReading.reading);
-					hoverText.push(`<b> ${timeReading} </b> <br> ${label}: ${barReading.reading} kW`);
+					hoverText.push(`<b> ${timeReading} </b> <br> ${label}: ${barReading.reading} kWh`);
 				});
 
 				// This variable contains all the elements (x and y values, bar type, etc.) assigned to the data parameter of the Plotly object
@@ -46,7 +48,7 @@ function mapStateToProps(state: State) {
 					text: hoverText,
 					hoverinfo: 'text',
 					type: 'bar',
-					marker: {color: getGraphColor(label)}
+					marker: {color: getGraphColor(colorID, DataType.Meter)}
 				});
 			}
 		}
@@ -58,6 +60,7 @@ function mapStateToProps(state: State) {
 			const readingsData = byGroupID[timeInterval.toString()][barDuration.toISOString()];
 			if (readingsData !== undefined && !readingsData.isFetching) {
 				const label = state.groups.byGroupID[groupID].name;
+				const colorID = groupID;
 				if (readingsData.readings === undefined) {
 					throw new Error('Unacceptable condition: readingsData.readings is undefined.');
 				}
@@ -69,10 +72,10 @@ function mapStateToProps(state: State) {
 				const readings = _.orderBy(readingsData.readings, ['startTimestamp'], ['asc']);
 				readings.forEach(barReading => {
 					const timeReading: string =
-						`${moment(barReading.startTimestamp).format('MMM DD, YYYY')} - ${moment(barReading.endTimestamp).format('MMM DD, YYYY')}`;
+						`${moment(barReading.startTimestamp).utc().format('MMM DD, YYYY')} - ${moment(barReading.endTimestamp).utc().format('MMM DD, YYYY')}`;
 					xData.push(timeReading);
 					yData.push(barReading.reading);
-					hoverText.push(`<b> ${timeReading} </b> <br> ${label}: ${barReading.reading} kW`);
+					hoverText.push(`<b> ${timeReading} </b> <br> ${label}: ${barReading.reading} kWh`);
 				});
 
 				// This variable contains all the elements (x and y values, bar chart, etc.) assigned to the data parameter of the Plotly object
@@ -83,7 +86,7 @@ function mapStateToProps(state: State) {
 					text: hoverText,
 					hoverinfo: 'text',
 					type: 'bar',
-					marker: {color: getGraphColor(label)}
+					marker: {color: getGraphColor(colorID, DataType.Group)}
 				});
 			}
 		}
@@ -103,7 +106,7 @@ function mapStateToProps(state: State) {
 			orientation: 'h'
 		},
 		yaxis: {
-			title: 'kW',
+			title: 'kWh',
 			showgrid: true,
 			gridcolor: '#ddd'
 		},

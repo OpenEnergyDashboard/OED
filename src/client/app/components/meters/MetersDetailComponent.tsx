@@ -23,15 +23,6 @@ export default class MetersDetailComponent extends React.Component<MetersDetailP
 	}
 
 	public render() {
-		const flexContainerStyle = {
-			display: 'flex',
-			flexFlow: 'row wrap'
-		};
-
-		const flexChildStyle = {
-			marginRight: '10px'
-		};
-
 		const titleStyle: React.CSSProperties = {
 			textAlign: 'center'
 		};
@@ -63,6 +54,7 @@ export default class MetersDetailComponent extends React.Component<MetersDetailP
 						<th> <FormattedMessage id='meter.name' /> </th>
 						{hasToken() && <th> <FormattedMessage id='meter.type' /> </th>}
 						{hasToken() && <th> <FormattedMessage id='meter.ip'/> </th>}
+						{hasToken() && <th> <FormattedMessage id='meter.gps'/> </th>}
 						<th> <FormattedMessage id='meter.enabled' /> </th>
 						<th> <FormattedMessage id='meter.displayable' /> </th>
 						{hasToken() && <th> <FormattedMessage id='meter.time.zone' /> </th>}

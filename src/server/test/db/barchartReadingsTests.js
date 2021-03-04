@@ -6,6 +6,8 @@ const { mocha, expect, testDB } = require('../common');
 const moment = require('moment');
 const Meter = require('../../models/Meter');
 const Reading = require('../../models/Reading');
+const Point = require('../../models/Point');
+const gps = new Point(90, 45);
 
 mocha.describe('Barchart Readings', () => {
 	let meter;
@@ -17,7 +19,7 @@ mocha.describe('Barchart Readings', () => {
 
 	mocha.beforeEach(async () => {
 		conn = testDB.getConnection();
-		await new Meter(undefined, 'Meter', null, false, true, Meter.type.MAMAC, null).insert(conn);
+		await new Meter(undefined, 'Meter', null, false, true, Meter.type.MAMAC, null, gps).insert(conn);
 		meter = await Meter.getByName('Meter', conn);
 	});
 
@@ -115,8 +117,8 @@ mocha.describe('Barchart Readings', () => {
 
 	mocha.it('barchart readings with multiple meters', async () => {
 		conn = testDB.getConnection();
-		await new Meter(undefined, 'Meter2', null, false, true, Meter.type.MAMAC, null).insert(conn);
-		await new Meter(undefined, 'Meter3', null, false, true, Meter.type.MAMAC, null).insert(conn);
+		await new Meter(undefined, 'Meter2', null, false, true, Meter.type.MAMAC, null, gps).insert(conn);
+		await new Meter(undefined, 'Meter3', null, false, true, Meter.type.MAMAC, null, gps).insert(conn);
 		const meter2 = await Meter.getByName('Meter2', conn);
 		const meter3 = await Meter.getByName('Meter3', conn);
 		const readingMeter1 = new Reading(meter.id, 100, timestamp1, timestamp2);

@@ -50,7 +50,7 @@ export default class GroupsApi {
 		const currStart: moment.Moment = timeInterval.getStartTimestamp();
 		const currEnd: moment.Moment = timeInterval.getEndTimestamp();
 		return await this.backend.doGetRequest<CompareReadings>(
-			`/api/compareReadings/group/${stringifiedIDs}`,
+			`/api/compareReadings/groups/${stringifiedIDs}`,
 			{
 				curr_start: currStart.toISOString(),
 				curr_end: currEnd.toISOString(),

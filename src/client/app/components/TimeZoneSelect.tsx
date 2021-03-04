@@ -19,14 +19,21 @@ interface TimeZoneOption {
 
 let options: null | TimeZoneOption[] = null;
 
-axios.get('/api/timezones').then(res => {
-	const timezones = res.data;
-	options = timezones.map((timezone: TimeZones) => {
-		return { value: timezone.name, label: `${timezone.name} (${timezone.abbrev}) ${timezone.offset}` };
-	});
-});
+const TimeZoneSelect: React.FC<TimeZoneSelectProps> = ({ current, handleClick }) => {
 
-const TimeZoneSelect = ({ current, handleClick }: TimeZoneSelectProps) => {
+	const [optionsLoaded, setOptionsLoaded] = React.useState(false);
+
+	React.useEffect(() => {
+		if (!optionsLoaded) {
+			axios.get('/api/timezones').then(res => {
+				const timezones = res.data;
+				options = timezones.map((timezone: TimeZones) => {
+					return { value: timezone.name, label: `${timezone.name} (${timezone.abbrev}) ${timezone.offset}` };
+				});
+				setOptionsLoaded(true);
+			});
+		}
+	}, []);
 
 	const handleChange = (selectedOption: TimeZoneOption | null) => {
 		if (selectedOption != null) {

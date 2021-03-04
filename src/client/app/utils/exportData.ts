@@ -2,9 +2,9 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
 
-import * as moment from 'moment';
 import { ExportDataSet, RawReadings } from '../types/readings';
 import { hasToken } from './token';
+import * as moment from 'moment-timezone';
 
 /**
  * Function to converts the compressed meter data into a CSV formatted string.
@@ -19,7 +19,7 @@ function convertToCSV(items: ExportDataSet[]) {
 		const label = set.label;
 		data.forEach(reading => {
 			const info = reading.y;
-			const startTimeStamp = moment(reading.x).format('dddd MMM DD YYYY hh:mm a');
+			const startTimeStamp = moment(reading.x).utc().format('dddd MMM DD YYYY hh:mm a');
 			csvOutput += `"${label}",${info} kW,${startTimeStamp}\n`; // this assumes that meter readings are in kW
 		});
 	});

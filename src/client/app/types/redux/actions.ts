@@ -75,7 +75,25 @@ export enum ActionType {
 	RequestPreferences = 'REQUEST_PREFERENCES',
 	ReceivePreferences = 'RECEIVE_PREFERENCES',
 	MarkPreferencesNotSubmitted = 'MARK_PREFERENCES_NOT_SUBMITTED',
-	MarkPreferencesSubmitted = 'MARK_PREFERENCES_SUBMITTED'
+	MarkPreferencesSubmitted = 'MARK_PREFERENCES_SUBMITTED',
+
+	UpdateCalibrationMode = 'UPDATE_MAP_MODE',
+	UpdateSelectedMap = 'UPDATE_SELECTED_MAPS',
+	UpdateMapSource = 'UPDATE_MAP_IMAGE',
+	ChangeGridDisplay = 'CHANGE_GRID_DISPLAY',
+	UpdateCurrentCartesian = 'UPDATE_CURRENT_CARTESIAN',
+	ResetCurrentPoint = 'RESET_CURRENT_POINT',
+	AppendCalibrationSet = 'APPEND_CALIBRATION_SET',
+	UpdateCalibrationResults = 'UPDATE_CALIBRATION_RESULTS',
+	RequestMapsDetails = 'REQUEST_MAP_DETAILS',
+	ReceiveMapsDetails = 'RECEIVE_MAP_DETAILS',
+	DeleteMap = 'DELETE_MAP',
+	EditMapDetails = 'EDIT_MAP_DETAILS',
+	SubmitEditedMap = 'SUBMIT_EDITED_MAP',
+	ConfirmEditedMap = 'CONFIRM_EDITED_MAP',
+	SetCalibration = 'SET_CALIBRATION',
+	ResetCalibration = 'RESET_CALIBRATION',
+	IncrementCounter = 'INCREMENT_COUNTER'
 }
 
 /**

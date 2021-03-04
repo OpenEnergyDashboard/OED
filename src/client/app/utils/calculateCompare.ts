@@ -46,22 +46,38 @@ export function validateSortingOrder(sortingOrder: string): SortingOrder {
 
 export function calculateCompareTimeInterval(comparePeriod: ComparePeriod, currentTime: moment.Moment): TimeInterval {
 	let compareTimeInterval;
+	// Moment changes the times by shifting to local (client/browser) timezone. To fix this up, we need
+	// to know the shift between UTC and local timezone. The value below is the time in minutes that
+	// must be added to go from UTC to local time. For example, for CST it is -360 (Central U.S.A.
+	// without daylight savings) since CST is 6 hours behind UTC.
+	const utcShift = moment().utcOffset();
+	// begin will be the start of the compare time and end will be the end of the compare time.
+	let begin;
+	const end = currentTime.add(utcShift, 'minutes');
 	switch (comparePeriod) {
 		case ComparePeriod.Day:
-			// TimeInterval for today 12 am to current time
-			compareTimeInterval = new TimeInterval(moment().startOf('day'), currentTime);
+			// We need to shift all the times by utcShift because later on they will be shifted back.
+			// begin is the start of the day (shifted) and end is the current time (shifted).
+			// The range is one day without any time remaining in this day to the previous hour.
+			begin = moment().startOf('day').add(utcShift, 'minutes');
 			break;
 		case ComparePeriod.Week:
-			// TimeInterval for this week, from last Sunday 12 am to current time
-			compareTimeInterval = new TimeInterval(moment().startOf('week'), currentTime);
+			// We need to shift all the times by utcShift because later on they will be shifted back.
+			// begin is the start of the day on last Sunday (shifted) and end is the current time (shifted).
+			// The range is one week without any time remaining in this week to the previous hour.
+			begin = moment().startOf('week').add(utcShift, 'minutes');
 			break;
 		case ComparePeriod.FourWeeks:
-			// TimeInterval for this 4 weeks period
-			compareTimeInterval = new TimeInterval(moment().startOf('week').subtract(3, 'weeks'), currentTime);
+			// We need to shift all the times by utcShift because later on they will be shifted back.
+			// begin is the start of the day on Sunday three weeks earlier than the Sunday of this week (shifted)
+			// and end is the current time (shifted). The range of time used is or four weeks without any time
+			// remaining in this week  to the previous hour.
+			begin = moment().startOf('week').subtract(3, 'weeks').add(utcShift, 'minutes');
 			break;
 		default:
 			throw new Error(`Unknown period value: ${comparePeriod}`);
 	}
+	compareTimeInterval = new TimeInterval(begin, end);
 	return compareTimeInterval;
 }
 
@@ -76,7 +92,7 @@ export function calculateCompareDuration(comparePeriod: ComparePeriod): moment.D
 			compareDuration = moment.duration(1, 'days');
 			break;
 		case ComparePeriod.FourWeeks:
-			compareDuration = moment.duration(1, 'days');
+			compareDuration = moment.duration(28, 'days');
 			break;
 		default:
 			throw new Error(`Unknown period value: ${comparePeriod}`);
