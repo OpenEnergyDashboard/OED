@@ -27,7 +27,6 @@ function mapStateToProps(state: State) {
 		case 'line':
 			linkText += `&serverRange=${state.graph.timeInterval.toString()}`;
 			// under construction;
-			const root: any = document.getElementById('root');
 			// linkText += `&displayRange=${state.graph.timeInterval.toString().split('_')}`;
 			break;
 		case 'compare':

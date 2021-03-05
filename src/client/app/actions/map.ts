@@ -37,16 +37,6 @@ function confirmMapEdits(mapID: number): t.ConfirmEditedMapAction {
 	return { type: ActionType.ConfirmEditedMap, mapID};
 }
 
-// deprecated, used for debugging
-function requestSelectedMap() {
-	return { type: ActionType.RequestSelectedMap };
-}
-
-// deprecated, used for debugging
-function receiveSelectedMap(map: MapData) {
-	return { type: ActionType.ReceiveSelectedMap, map};
-}
-
 export function fetchMapsDetails(): Thunk {
 	return async (dispatch: Dispatch) => {
 		dispatch(requestMapsDetails());
@@ -180,10 +170,6 @@ function isReadyForCalculation(state: State): boolean {
 	const calibrationThreshold = 3;
 	// @ts-ignore
 	return state.maps.editedMaps[state.maps.calibratingMap].calibrationSet.length >= calibrationThreshold;
-}
-
-function updateCurrentGPS(currentGPS: GPSPoint): t.UpdateCurrentGPSAction {
-	return { type: ActionType.UpdateCurrentGPS, currentGPS};
 }
 
 /**

@@ -6,7 +6,6 @@ import * as React from 'react';
 
 import { ChartTypes } from '../types/redux/graph';
 import { ChangeChartToRenderAction } from '../types/redux/graph';
-import { FormEvent } from 'react';
 import { FormattedMessage } from 'react-intl';
 import TooltipMarkerComponent from './TooltipMarkerComponent';
 import Dropdown from 'reactstrap/lib/Dropdown';

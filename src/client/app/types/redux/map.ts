@@ -4,7 +4,6 @@
 
 import {ActionType} from './actions';
 import {CalibratedPoint, CalibrationResult, CartesianPoint, GPSPoint} from '../../utils/calibration';
-import * as moment from 'moment';
 
 export enum CalibrationModeTypes {
 	initiate = 'initiate',
@@ -45,11 +44,6 @@ export interface UpdateCurrentCartesianAction {
 	currentCartesian: CartesianPoint;
 }
 
-export interface UpdateCurrentGPSAction {
-	type: ActionType.UpdateCurrentGPS;
-	currentGPS: GPSPoint;
-}
-
 export interface ResetCurrentPointAction {
 	type: ActionType.ResetCurrentPoint;
 }
@@ -62,15 +56,6 @@ export interface AppendCalibrationSetAction {
 export interface UpdateCalibrationResultAction {
 	type: ActionType.UpdateCalibrationResults;
 	result: CalibrationResult;
-}
-
-export interface RequestSelectedMapAction {
-	type: ActionType.RequestSelectedMap;
-}
-
-export interface ReceiveSelectedMapAction {
-	type: ActionType.ReceiveSelectedMap;
-	map: MapData;
 }
 
 export interface DeleteMapAction {
@@ -113,15 +98,12 @@ export type MapsAction =
 	| UpdateSelectedMapAction
 	| RequestMapsDetailsAction
 	| ReceiveMapsDetailsAction
-	| RequestSelectedMapAction
-	| ReceiveSelectedMapAction
 	| UpdateMapSourceAction
 	| ChangeGridDisplayAction
 	| EditMapDetailsAction
 	| SubmitEditedMapAction
 	| ConfirmEditedMapAction
 	| UpdateCurrentCartesianAction
-	| UpdateCurrentGPSAction
 	| ResetCurrentPointAction
 	| AppendCalibrationSetAction
 	| UpdateCalibrationResultAction

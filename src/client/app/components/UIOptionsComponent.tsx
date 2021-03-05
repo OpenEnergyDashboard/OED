@@ -77,9 +77,6 @@ class UIOptionsComponent extends React.Component<UIOptionsPropsWithIntl, UIOptio
 		const zIndexFix: React.CSSProperties = {
 			zIndex: 0
 		};
-		const messages = defineMessages({
-			barStackingTip: { id: 'bar.stacking.tip' }
-		});
 
 		return (
 			<div>
@@ -254,12 +251,6 @@ class UIOptionsComponent extends React.Component<UIOptionsPropsWithIntl, UIOptio
 
 	private handleChangeBarStacking() {
 		this.props.changeBarStacking();
-	}
-
-	// This is an issue with typings for React.FormEvent<> and ChangeEvent<>
-	// The type of value is actually number
-	private handleSpanButton(value: any) {
-		this.props.changeDuration(moment.duration(value, 'days'));
 	}
 
 	private handleCompareButton(comparePeriod: ComparePeriod) {
