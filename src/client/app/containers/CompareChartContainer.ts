@@ -9,7 +9,6 @@ import { State } from '../types/redux/state';
 import { getComparePeriodLabels, getCompareChangeSummary } from '../utils/calculateCompare';
 import { CompareEntity } from './MultiCompareChartContainer';
 import translate from '../utils/translate';
-import {CompressedBarReading} from '../types/compressed-readings';
 import PlotlyChart, { IPlotlyChartProps } from 'react-plotlyjs-ts';
 
 interface CompareChartContainerProps {
