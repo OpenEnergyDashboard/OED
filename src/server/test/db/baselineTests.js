@@ -7,12 +7,14 @@ const Baseline = require('../../models/Baseline');
 const Meter = require('../../models/Meter');
 const Reading = require('../../models/Reading');
 const moment = require('moment');
+const Point = require('../../models/Point');
+const gps = new Point(90, 45);
 
 mocha.describe('Baselines', () => {
 	mocha.it('can be saved and retrieved', async () => {
 		conn = testDB.getConnection();
 		// Need a meter in the database
-		const meter = new Meter(undefined, 'Larry', null, false, true, Meter.type.MAMAC, null);
+		const meter = new Meter(undefined, 'Larry', null, false, true, Meter.type.MAMAC, null, gps);
 		await meter.insert(conn);
 		const reading = new Reading(
 			meter.id,

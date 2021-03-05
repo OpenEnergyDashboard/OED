@@ -7,15 +7,17 @@
 const { mocha, expect, testDB } = require('../common');
 const Group = require('../../models/Group');
 const Meter = require('../../models/Meter');
+const Point = require('../../models/Point');
+const gps = new Point(90, 45);
 
 async function setupGroupsAndMeters(conn) {
 	const groupA = new Group(undefined, 'A');
 	const groupB = new Group(undefined, 'B');
 	const groupC = new Group(undefined, 'C');
 	await Promise.all([groupA, groupB, groupC].map(group => group.insert(conn)));
-	const meterA = new Meter(undefined, 'A', null, false, true, Meter.type.MAMAC, null);
-	const meterB = new Meter(undefined, 'B', null, false, true, Meter.type.MAMAC, null);
-	const meterC = new Meter(undefined, 'C', null, false, true, Meter.type.METASYS, null);
+	const meterA = new Meter(undefined, 'A', null, false, true, Meter.type.MAMAC, null, gps);
+	const meterB = new Meter(undefined, 'B', null, false, true, Meter.type.MAMAC, null, gps);
+	const meterC = new Meter(undefined, 'C', null, false, true, Meter.type.METASYS, null, gps);
 	await Promise.all([meterA, meterB, meterC].map(meter => meter.insert(conn)));
 }
 
