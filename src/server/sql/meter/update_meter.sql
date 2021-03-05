@@ -10,5 +10,13 @@ UPDATE meters
 		meter_type = ${type},
   		default_timezone_meter = ${meterTimezone},
 		gps = ${gps},
-		identifier = ${identifier}
+		identifier = ${identifier},
+		note = ${note},
+		area = ${area},
+		cumulative = ${cumulative},
+		cumulative_reset = ${cumulative_reset},
+		cumulative_reset_start = ${cumulative_reset_start},
+		reading = ${reading},
+		start_timestamp = ${start_timestamp},
+		end_timestamp = ${end_timestamp}
 	WHERE id = ${id};

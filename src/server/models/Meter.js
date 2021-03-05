@@ -18,8 +18,17 @@ class Meter {
 	 * @param gps location in format of GIS coordinates
 	 * @param meterTimezone Default timezone for meter
 	 * @param identifier Another way to identify a meter
+	 * @param note Note about the meter
+	 * @param area area of the meter meter
+	 * @param cumulative 
+	 * @param cumulative_reset
+	 * @param cumulative_reset_start
+	 * @param reading
+	 * @param start_timestamp
+	 * @param end_timestamp     
+	 * What details should I write in this javadoc regarding these new parameters?
 	 */
-	constructor(id, name, ipAddress, enabled, displayable, type, meterTimezone, gps = undefined, identifier = name) {
+	constructor(id, name, ipAddress, enabled, displayable, type, meterTimezone, gps = undefined, identifier = name, note, area, cumulative, cumulative_reset, cumulative_reset_start, reading, start_timestamp, end_timestamp) {
 		this.id = id;
 		this.name = name;
 		this.ipAddress = ipAddress;
@@ -29,6 +38,14 @@ class Meter {
 		this.gps = gps;
 		this.meterTimezone = meterTimezone;
 		this.identifier = identifier;
+		this.note = note;
+		this.area = area;
+		this.cumulative = cumulative;
+		this.cumulative_reset = cumulative_reset;
+		this.cumulative_reset_start = cumulative_reset_start;
+		this.reading = reading;
+		this.start_timestamp = start_timestamp;
+		this.end_timestamp = end_timestamp;
 	}
 
 	/**
@@ -73,7 +90,8 @@ class Meter {
 
 	static mapRow(row) {
 		return new Meter(row.id, row.name, row.ipaddress, row.enabled, row.displayable, row.meter_type,
-			row.default_timezone_meter, row.gps, row.identifier);
+			row.default_timezone_meter, row.gps, row.identifier, row.note, row.area, row.cumulative, row.cumulative_reset,
+			row.cumulative_reset_start, row.reading, row.start_timestamp, row.end_timestamp);
 	}
 
 	/**
