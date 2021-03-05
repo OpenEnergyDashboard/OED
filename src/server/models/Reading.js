@@ -149,6 +149,20 @@ class Reading {
 	}
 
 	/**
+	 * Returns the count(number of rows) for a meter
+	 * @param meterID 
+	 * @param conn 
+	 */
+	static async getCountByMeterIDAndDateRange(meterID,startDate,endDate,conn){
+		const row=await conn.any(sqlFile('reading/get_count_by_meter_id_and_date_range.sql'), {
+			meterID: meterID,
+			startDate: startDate,
+			endDate: endDate
+		});
+		return parseInt(row[0].count);
+	}
+
+	/**
 	 * Returns a promise to get all of the readings for this meter from the database.
 	 * @param meterID The id of the meter to find readings for
 	 * @param conn is the connection to use.

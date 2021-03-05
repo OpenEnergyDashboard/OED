@@ -141,8 +141,11 @@ function mapStateToProps(state: State) {
 	}
 
 	return {
+		showRawExport:state.graph.chartToRender==='line'?true:false,
 		selectedMeters: state.graph.selectedMeters,
-		exportVals: { datasets }
+		selectedGroups: state.graph.selectedGroups,
+		exportVals: { datasets },
+		timeInterval: state.graph.timeInterval
 	};
 }
 
