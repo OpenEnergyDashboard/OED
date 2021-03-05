@@ -68,7 +68,13 @@ class LoginComponent extends React.Component<InjectedIntlProps, LoginState> {
 							onChange={this.handlePasswordChange}
 						/>
 					</InputGroup>
-					<Button outline style={buttonStyle} type='submit' onClick={this.handleSubmit}>
+					<Button
+						outline
+						style={buttonStyle}
+						type='submit'
+						onClick={this.handleSubmit}
+						disabled={this.state.email.length === 0 || this.state.password.length === 0}
+					>
 						<FormattedMessage id='submit' />
 					</Button>
 				</Form>

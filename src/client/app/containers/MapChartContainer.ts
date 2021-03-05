@@ -10,6 +10,7 @@ import { calculateScaleFromEndpoints, meterDisplayableOnMap } from '../utils/cal
 import * as _ from 'lodash';
 import getGraphColor from '../utils/getGraphColor';
 import { TimeInterval } from '../../../common/TimeInterval';
+import { DataType } from '../types/Datasources';
 
 function mapStateToProps(state: State) {
 	let map;
@@ -49,7 +50,7 @@ function mapStateToProps(state: State) {
 						const readingsData = byMeterID[timeInterval.toString()][barDuration.toISOString()];
 						if (readingsData !== undefined && !readingsData.isFetching) {
 							const label = state.meters.byMeterID[meterID].name;
-							colors.push(getGraphColor(label));
+							colors.push(getGraphColor(meterID, DataType.Meter));
 							if (readingsData.readings === undefined) {
 								throw new Error('Unacceptable condition: readingsData.readings is undefined.');
 							}
