@@ -166,6 +166,7 @@ class PreferencesComponent extends React.Component<PreferencesPropsWithIntl, {}>
 						<label>
 							<input
 								type='radio'
+								style={{marginRight: '10px'}}
 								name='languageTypes'
 								value={LanguageTypes.es}
 								onChange={this.handleDefaultLanguageChange}
