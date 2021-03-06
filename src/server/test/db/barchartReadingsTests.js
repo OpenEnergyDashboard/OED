@@ -6,6 +6,8 @@ const { mocha, expect, testDB } = require('../common');
 const moment = require('moment');
 const Meter = require('../../models/Meter');
 const Reading = require('../../models/Reading');
+const Point = require('../../models/Point');
+const gps = new Point(90, 45);
 
 mocha.describe('Barchart Readings', () => {
 	let meter;
@@ -17,7 +19,7 @@ mocha.describe('Barchart Readings', () => {
 
 	mocha.beforeEach(async () => {
 		conn = testDB.getConnection();
-		await new Meter(undefined, 'Meter', null, false, true, Meter.type.MAMAC).insert(conn);
+		await new Meter(undefined, 'Meter', null, false, true, Meter.type.MAMAC, null, gps).insert(conn);
 		meter = await Meter.getByName('Meter', conn);
 	});
 
@@ -32,7 +34,7 @@ mocha.describe('Barchart Readings', () => {
 		// TODO: This is awkward. Is there a better way to have conn as a non-optional
 		// without requiring changing EVERY call to getBarchartReadings?
 		// If not, well, we need to change every call.
-		const barchartReadings = await Reading.getBarchartReadings([meter.id], moment.duration(2, 'h'), null, null, conn);
+		const barchartReadings = await Reading.getBarchartReadings([meter.id], moment.duration(2, 'h').toISOString(), null, null, conn);
 		expect(barchartReadings[meter.id]).to.have.lengthOf(2);
 		const expectedFirstReading = Math.floor(reading1.reading + reading2.reading);
 		expect(barchartReadings[meter.id][0].reading_sum).to.equal(expectedFirstReading);
@@ -50,7 +52,7 @@ mocha.describe('Barchart Readings', () => {
 
 		const startTimestamp = timestamp1.clone().add(30, 'minutes');
 		const endTimestamp = startTimestamp.clone().add(2, 'hours');
-		const barchartReadings = await Reading.getBarchartReadings([meter.id], moment.duration(2, 'h'), startTimestamp, endTimestamp, conn);
+		const barchartReadings = await Reading.getBarchartReadings([meter.id], moment.duration(2, 'h').toISOString(), startTimestamp, endTimestamp, conn);
 		expect(barchartReadings[meter.id]).to.have.lengthOf(1);
 		const expectedFirstReading = Math.floor((reading1.reading * 0.5) + reading2.reading + (reading3.reading * 0.5));
 		expect(barchartReadings[meter.id][0].reading_sum).to.equal(expectedFirstReading);
@@ -66,7 +68,7 @@ mocha.describe('Barchart Readings', () => {
 
 		const startTimestamp = timestamp1.clone().add(15, 'minutes');
 		const endTimestamp = startTimestamp.clone().add(50, 'days');
-		const barchartReadings = await Reading.getBarchartReadings([meter.id], moment.duration(1, 'h'), startTimestamp, endTimestamp, conn);
+		const barchartReadings = await Reading.getBarchartReadings([meter.id], moment.duration(1, 'h').toISOString(), startTimestamp, endTimestamp, conn);
 		expect(barchartReadings[meter.id]).to.have.lengthOf(4);
 		const expectedFirstReading = Math.floor((reading1.reading * 0.75) + (reading2.reading * 0.25));
 		expect(barchartReadings[meter.id][0].reading_sum).to.equal(expectedFirstReading);
@@ -87,7 +89,7 @@ mocha.describe('Barchart Readings', () => {
 
 		const startTimestamp = timestamp1.clone().add(30, 'minutes');
 		const endTimestamp = startTimestamp.clone().add(5, 'hours');
-		const barchartReadings = await Reading.getBarchartReadings([meter.id], moment.duration(1, 'h'), startTimestamp, endTimestamp, conn);
+		const barchartReadings = await Reading.getBarchartReadings([meter.id], moment.duration(1, 'h').toISOString(), startTimestamp, endTimestamp, conn);
 		expect(barchartReadings[meter.id]).to.have.lengthOf(4);
 		const expectedFirstReading = Math.floor((reading1.reading * 0.5) + (reading2.reading * 0.5));
 		expect(barchartReadings[meter.id][0].reading_sum).to.equal(expectedFirstReading);
@@ -107,7 +109,7 @@ mocha.describe('Barchart Readings', () => {
 
 		const startTimestamp = timestamp1.clone().add(30, 'minutes');
 		const endTimestamp = startTimestamp.clone().add(15, 'minutes');
-		const barchartReadings = await Reading.getBarchartReadings([meter.id], moment.duration(1, 'h'), startTimestamp, endTimestamp, conn);
+		const barchartReadings = await Reading.getBarchartReadings([meter.id], moment.duration(1, 'h').toISOString(), startTimestamp, endTimestamp, conn);
 		expect(barchartReadings[meter.id]).to.have.lengthOf(1);
 		const expectedFirstReading = Math.floor(reading1.reading * 0.25);
 		expect(barchartReadings[meter.id][0].reading_sum).to.equal(expectedFirstReading);
@@ -115,8 +117,8 @@ mocha.describe('Barchart Readings', () => {
 
 	mocha.it('barchart readings with multiple meters', async () => {
 		conn = testDB.getConnection();
-		await new Meter(undefined, 'Meter2', null, false, true, Meter.type.MAMAC).insert(conn);
-		await new Meter(undefined, 'Meter3', null, false, true, Meter.type.MAMAC).insert(conn);
+		await new Meter(undefined, 'Meter2', null, false, true, Meter.type.MAMAC, null, gps).insert(conn);
+		await new Meter(undefined, 'Meter3', null, false, true, Meter.type.MAMAC, null, gps).insert(conn);
 		const meter2 = await Meter.getByName('Meter2', conn);
 		const meter3 = await Meter.getByName('Meter3', conn);
 		const readingMeter1 = new Reading(meter.id, 100, timestamp1, timestamp2);
@@ -128,7 +130,7 @@ mocha.describe('Barchart Readings', () => {
 		const endTimestamp = startTimestamp.clone().add(2, 'hours');
 		const barchartReadings = await Reading.getBarchartReadings(
 			[meter.id, meter2.id, meter3.id],
-			moment.duration(1, 'hour'),
+			moment.duration(1, 'hour').toISOString(),
 			startTimestamp,
 			endTimestamp,
 			conn
@@ -144,7 +146,7 @@ mocha.describe('Barchart Readings', () => {
 
 	mocha.it('returns correct results when no readings exist', async () => {
 		conn = testDB.getConnection();
-		const result = await Reading.getBarchartReadings([meter.id], moment.duration(1, 'day'), null, null, conn);
+		const result = await Reading.getBarchartReadings([meter.id], moment.duration(1, 'day').toISOString(), null, null, conn);
 		expect(result).to.deep.equal({ [meter.id]: [] });
 	});
 });

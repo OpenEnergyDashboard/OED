@@ -1,0 +1,7 @@
+/* This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this
+ * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
+
+.tip {
+   z-index:2001; /* This allows the tooltip to render on top of the modal whose z-index is by default 1000 ;*/
+}

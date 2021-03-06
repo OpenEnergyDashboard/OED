@@ -4,12 +4,12 @@
 
 import * as moment from 'moment';
 import { TimeInterval } from '../../../common/TimeInterval';
-import { Dispatch, Thunk, ActionType } from '../types/redux/actions';
+import {Dispatch, Thunk, ActionType, GetState} from '../types/redux/actions';
 import { State } from '../types/redux/state';
 import { CompareReadings } from '../types/readings';
 import * as t from '../types/redux/compareReadings';
 import { metersApi, groupsApi } from '../utils/api';
-import { ComparePeriod, calculateCompareShift, calculateCompareTimeInterval } from '../utils/calculateCompare';
+import { ComparePeriod, calculateCompareShift } from '../utils/calculateCompare';
 
 /**
  * @param {State} state the Redux state
@@ -80,13 +80,12 @@ function receiveGroupCompareReadings(groupIDs: number[], timeInterval: TimeInter
 /**
  * Fetch the data for the given meters over the given interval. Fully manages the Redux lifecycle.
  * @param {[number]} meterIDs The IDs of the meters whose data should be fetched
- * @param {TimeInterval} timeInterval The time interval over which data should be fetched
- * @param {compareShift} compareShift The time shift between curr and prev
+ * @param {ComparePeriod} comparePeriod enum to represent a kind of time shift between curr and prev
  */
 function fetchMeterCompareReadings(meterIDs: number[], comparePeriod: ComparePeriod): Thunk {
-	const compareShift = calculateCompareShift(comparePeriod);
-	const currTimeInterval = calculateCompareTimeInterval(comparePeriod, moment());
-	return async (dispatch: Dispatch) => {
+	return async (dispatch: Dispatch, getState: GetState) => {
+		const compareShift = calculateCompareShift(comparePeriod);
+		const currTimeInterval = getState().graph.compareTimeInterval;
 		dispatch(requestMeterCompareReadings(meterIDs, currTimeInterval, compareShift));
 		const readings: CompareReadings = await metersApi.compareReadings(meterIDs, currTimeInterval, compareShift);
 		dispatch(receiveMeterCompareReadings(meterIDs, currTimeInterval, compareShift, readings));
@@ -96,13 +95,12 @@ function fetchMeterCompareReadings(meterIDs: number[], comparePeriod: ComparePer
 /**
  * Fetch the data for the given groups over the given interval. Fully manages the Redux lifecycle.
  * @param {[number]} groupIDs The IDs of the groups whose data should be fetched
- * @param {TimeInterval} timeInterval The time interval over which data should be fetched
- * @param {compareShift} compareShift The time shift between curr and prev
+ * @param {ComparePeriod} comparePeriod enum to represent a kind of time shift between curr and prev
  */
 function fetchGroupCompareReadings(groupIDs: number[], comparePeriod: ComparePeriod): Thunk {
-	const compareShift = calculateCompareShift(comparePeriod);
-	const currTimeInterval = calculateCompareTimeInterval(comparePeriod, moment());
-	return async (dispatch: Dispatch) => {
+	return async (dispatch: Dispatch, getState: GetState) => {
+		const compareShift = calculateCompareShift(comparePeriod);
+		const currTimeInterval = getState().graph.compareTimeInterval;
 		dispatch(requestGroupCompareReadings(groupIDs, currTimeInterval, compareShift));
 		const readings = await groupsApi.compareReadings(groupIDs, currTimeInterval, compareShift);
 		dispatch(receiveGroupCompareReadings(groupIDs, currTimeInterval, compareShift, readings));
@@ -117,10 +115,12 @@ function fetchGroupCompareReadings(groupIDs: number[], comparePeriod: ComparePer
  */
 export function fetchNeededCompareReadings(comparePeriod: ComparePeriod): Thunk {
 	return (dispatch, getState) => {
-		const compareShift = calculateCompareShift(comparePeriod);
-		const timeInterval = calculateCompareTimeInterval(comparePeriod, moment());
 		const state = getState();
+		const compareShift = calculateCompareShift(comparePeriod);
+		const timeInterval = state.graph.compareTimeInterval;
+		/* tslint:disable:array-type */
 		const promises: Array<Promise<any>> = [];
+		/* tslint:enable:array-type */
 
 		// Determine which meters are missing data for this time interval
 		const meterIDsToFetchForCompare = state.graph.selectedMeters.filter(

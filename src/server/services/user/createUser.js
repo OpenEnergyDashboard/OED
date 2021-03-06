@@ -10,7 +10,9 @@ const { getConnection, dropConnection } = require('../../db');
 
 (async () => {
 	let email;
-	let password;
+	// Set password to unused value. Coverity Scan thinks it is not set but logic below seems to
+	// always set of call terminateReadline that stops to process. This should fix this.
+	let password = 'whatever';
 
 	// If there aren't enough args, go interactive.
 	const cmdArgs = process.argv;
@@ -39,9 +41,16 @@ const { getConnection, dropConnection } = require('../../db');
 	const conn = getConnection();
 	try {
 		await admin.insert(conn);
-		terminateReadline('User created');
+		// We could select to check if user already there to report separately but not
+		// doing since we don't do for createDB. This might be useful if we have issues
+		// around this insert.
+
+		// Insert did not report an error so user should be there. Return ok error code.
+		terminateReadline('User created or already exists', 0);
 	} catch (err) {
-		terminateReadline('User already exists, no additional user created');
+		// Something went wrong with insertion so return error code.
+		// This assumes the err has a message. This could be done better.
+		terminateReadline('Creation of user failed with err: ' + err.message, 11);
 	} finally {
 		dropConnection();
 	}

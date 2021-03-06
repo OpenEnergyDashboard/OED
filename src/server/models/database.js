@@ -4,9 +4,9 @@
 
 const pgp = require('pg-promise')({
 	// This sets the style of returned durations so that Moment can parse them
-	connect: (client, dc, fresh) => {
+	connect(client, dc, useCount) {
 		// Only set the style on fresh connections
-		if (fresh === true || fresh === undefined) {
+		if (useCount === 0) {
 			client.query('SET intervalStyle = iso_8601');
 		}
 	}
@@ -14,8 +14,10 @@ const pgp = require('pg-promise')({
 
 const path = require('path');
 const patchMomentType = require('./patch-moment-type');
+const patchPointType = require('./patch-point-type');
 
 patchMomentType(pgp);
+patchPointType(pgp);
 
 /**
  * Create a new connection to the database.
@@ -74,9 +76,11 @@ async function createSchema(conn) {
 	const User = require('./User');
 	const Group = require('./Group');
 	const Preferences = require('./Preferences');
+	const Configfile = require('./obvius/Configfile');
 	const Migration = require('./Migration');
 	const LogEmail = require('./LogEmail');
 	const Baseline = require('./Baseline');
+	const Map = require('./Map');
 
 	/* eslint-enable global-require */
 	await Meter.createMeterTypesEnum(conn);
@@ -95,7 +99,9 @@ async function createSchema(conn) {
 	await Reading.createCompressedReadingsMaterializedViews(conn);
 	await Reading.createCompareReadingsFunction(conn);
 	await Baseline.createTable(conn);
+	await Map.createTable(conn);
 	await conn.none(sqlFile('baseline/create_function_get_average_reading.sql'));
+	await Configfile.createTable(conn);
 }
 
 module.exports = {

@@ -5,7 +5,7 @@
  */
 
 const Reading = require('./../models/Reading');
-const readCsv = require('./readCSV');
+const readCsv = require('./readCsv');
 const Meter = require('./../models/Meter');
 const moment = require('moment');
 const path = require('path');
