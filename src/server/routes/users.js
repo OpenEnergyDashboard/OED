@@ -60,10 +60,10 @@ router.post('/', async (req, res) => {
 		required: ['email', 'password', 'role'],
 		properties: {
 			email: {
-				type: 'string',
+				type: 'string'
 			},
 			password: {
-				type: 'string',
+				type: 'string'
 			},
 			role: {
 				type: 'string',
@@ -84,6 +84,48 @@ router.post('/', async (req, res) => {
 		} catch (error) {
 			log.error(`Error while performing POST request to create user: ${error}`, error);
 			res.status(500).json({ message: 'Internal Server Error', error: error });
+		}
+	}
+});
+
+/**
+ * Route for updating user role
+ */
+router.post('/edit', async (req, res) => {
+	const validParams = {
+		type: 'object',
+		required: ['users'],
+		properties: {
+			users: {
+				type: 'array',
+				items: {
+					type: 'object',
+					required: ['email', 'role'],
+					properties: {
+						email: {
+							type: 'string'
+						},
+						role: {
+							type: 'string',
+							enum: Object.values(User.role)
+						}
+
+					}
+				}
+			}
+		}
+	};
+	if (!validate(req.body, validParams).valid) {
+		res.status(400).json({ message: 'Invalid params' });
+	} else {
+		try {
+			const conn = getConnection();
+			const { users } = req.body;
+			const roleUpdates = users.map(async user => await User.updateUserRole(user.email, user.role, conn));
+			await Promise.all(roleUpdates);
+			res.sendStatus(200);
+		} catch (error) {
+			console.log(error);
 		}
 	}
 });

@@ -42,5 +42,26 @@ mocha.describe('Users API', () => {
 			const users = await User.getAll(conn);
 			expect(users).to.have.lengthOf(1);
 		});
+		mocha.it('update role', async () => {
+			const conn = testDB.getConnection();
+			const password = await bcrypt.hash('password', 10);
+			const csv = new User(undefined, 'csv@example.com', password, User.role.CSV);
+			await csv.insert(conn);
+			const obvius = new User(undefined, 'obvius@example.com', password, User.role.OBVIUS);
+			await obvius.insert(conn);
+			const users = await User.getAll(conn);
+			expect(users).to.have.lengthOf(3);
+			const res = await chai.request(app).post('/api/users/edit').send({
+				users: [
+					{ email: csv.email, role: User.role.OBVIUS },
+					{ email: obvius.email, role: User.role.CSV }
+				]
+			});
+			expect(res).to.have.status(200);
+			const modifiedCsv = await User.getByEmail(csv.email, conn);
+			expect(modifiedCsv.role).to.equal(User.role.OBVIUS);
+			const modifiedObvius = await User.getByEmail(obvius.email, conn);
+			expect(modifiedObvius.role).to.equal(User.role.CSV);
+		});
 	});
 })
