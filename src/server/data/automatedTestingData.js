@@ -154,10 +154,10 @@ async function generateOneMinuteTestingData() {
 }
 
 
-
+ 
 /**
- * Calls the above functions with the appropriate parameters to generate all the necessary testing data. Each of the function calls 
- * will generate a csv file under '../test/db/data/automatedTests' that is needed for automated testing.
+ * Calls the above functions with appropriate parameters to generate all the necessary testing data. 
+ * Each of the function calls will generate a csv file under '../test/db/data/automatedTests' that is needed for automated testing.
  */
 function generateTestingData() {
 
@@ -195,5 +195,11 @@ generateVariableCosineTestingData(23, 3);
 
 
 module.exports = {
-	generateTestingData
+	generateFourDayTestingData,
+	generateFourHourTestingData,
+	generateTwentyThreeMinuteTestingData,
+	generateFifteenMinuteTestingData,
+	generateOneMinuteTestingData,
+	generateVariableSineTestingData,
+	generateVariableCosineTestingData
 }
