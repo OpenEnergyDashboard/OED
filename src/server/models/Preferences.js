@@ -35,6 +35,12 @@ class Preferences {
 		await conn.none(sqlFile('preferences/insert_default_row.sql'));
 	}
 
+
+	/**
+	 * Creates a new set of preferences from the data in a row.
+	 * @param row the row from which the preferences object is to be created
+	 * @returns Preference object from row
+	 */
 	static mapRow(row) {
 		return new Preferences(row.display_title, row.default_chart_to_render, row.default_bar_stacking, row.default_language, row.default_timezone);
 	}
