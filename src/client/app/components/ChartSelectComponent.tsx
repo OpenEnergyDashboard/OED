@@ -51,7 +51,7 @@ export default class ChartSelectComponent extends React.Component<ChartSelectPro
 					<FormattedMessage id='graph.type' />:
 				</p>
 				<Dropdown isOpen={this.state.dropdownOpen} toggle={this.toggleDropdown}>
-					<DropdownToggle caret>
+					<DropdownToggle outline caret>
 						<FormattedMessage id='chart.select' />
 					</DropdownToggle>
 					<DropdownMenu>
