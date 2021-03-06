@@ -50,7 +50,7 @@ class PreferencesComponent extends React.Component<PreferencesPropsWithIntl, {}>
 			margin: 0
 		};
 		const bottomPaddingStyle: React.CSSProperties = {
-			paddingBottom: '15px',
+			paddingBottom: '15px'
 		};
 
 		const titleStyle: React.CSSProperties = {
