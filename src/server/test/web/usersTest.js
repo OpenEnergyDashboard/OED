@@ -26,6 +26,14 @@ mocha.describe('Users API', () => {
 			expect(res).to.have.status(200);
 			expect(res.body).to.have.lengthOf(2);
 		});
+		mocha.it('successfully creates a user', async () => {
+			const user = { email: 'a@ex.com', password: 'abc', role: User.role.CSV };
+			const res = await chai.request(app).post('/api/users').send(user);
+			expect(res).to.have.status(200);
+			const conn = testDB.getConnection();
+			const dbUser = await User.getByEmail(user.email, conn);
+			expect(dbUser.role).to.equal(user.role);
+		});
 		mocha.it('rejects invalid user creation', async () => {
 			const user = { email: 'a@ex.com', password: 'abc' };
 			const res = await chai.request(app).post('/api/users').send(user);
@@ -33,6 +41,6 @@ mocha.describe('Users API', () => {
 			const conn = testDB.getConnection();
 			const users = await User.getAll(conn);
 			expect(users).to.have.lengthOf(1);
-		})
-	})
+		});
+	});
 })
