@@ -25,9 +25,20 @@ export default function CreateUserFormComponent(props: CreateUserFormProps) {
 	const formInputStyle: React.CSSProperties = {
 		paddingBottom: '5px'
 	}
+	const titleStyle: React.CSSProperties = {
+		textAlign: 'center'
+	};
+
+	const tableStyle: React.CSSProperties = {
+		marginLeft: '25%',
+		marginRight: '25%',
+		width: '50%'
+	};
+
 	return (
 		<div className='container-fluid'>
-			<div className='col-6'>
+			<h1 style={titleStyle}> Create User </h1>
+			<div style={tableStyle}>
 				<form onSubmit={e => { e.preventDefault(); props.submitNewUser(); }}>
 					<div style={formInputStyle}>
 						<label> Email </label><br />

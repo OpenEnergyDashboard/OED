@@ -62,7 +62,6 @@ export default class CreateUserFormContainer extends React.Component<{}, {}>{
 		return (
 			<div>
 				<HeaderContainer />
-				<h1> Create User </h1>
 				<CreateUserComponent
 					email={this.state.email}
 					password={this.state.password}
