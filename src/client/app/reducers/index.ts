@@ -11,7 +11,7 @@ import graph from './graph';
 import groups from './groups';
 import notifications from './notifications';
 import admin from './admin';
-
+import version from './version';
 
 export default combineReducers({
 	meters,
@@ -23,5 +23,6 @@ export default combineReducers({
 	graph,
 	groups,
 	notifications,
-	admin
+	admin,
+	version
 });
