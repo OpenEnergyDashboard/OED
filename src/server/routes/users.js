@@ -130,5 +130,31 @@ router.post('/edit', async (req, res) => {
 	}
 });
 
-module.exports = router;
+/**
+ * Route for deleting users
+ */
+router.post('/delete', async (req, res) => {
+	const validParams = {
+		type: 'object',
+		required: ['email'],
+		properties: {
+			email: {
+				type: 'string'
+			}
+		}
+	};
+	if (!validate(req.body, validParams).valid) {
+		res.status(400).json({ message: 'Invalid params!' });
+	} else {
+		try {
+			const conn = getConnection();
+			const { email } = req.body;
+			await User.deleteUser(email, conn);
+			res.sendStatus(200);
+		} catch (error) {
+			console.log(error);
+		}
+	}
+});
 
+module.exports = router;

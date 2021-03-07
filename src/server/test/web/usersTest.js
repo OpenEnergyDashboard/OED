@@ -63,5 +63,18 @@ mocha.describe('Users API', () => {
 			const modifiedObvius = await User.getByEmail(obvius.email, conn);
 			expect(modifiedObvius.role).to.equal(User.role.CSV);
 		});
+		mocha.it('deletes a user', async () => {
+			const conn = testDB.getConnection();
+			const password = await bcrypt.hash('password', 10);
+			const csv = new User(undefined, 'csv@example.com', password, User.role.CSV);
+			await csv.insert(conn);
+			const user = await User.getByEmail(csv.email, conn);
+			expect(user.email).to.equal(csv.email);
+			const res = await chai.request(app).post('/api/users/delete').send({
+				email: csv.email
+			});
+			expect(res).to.have.status(200);
+			expect((await User.getAll(conn)).filter(user => user === csv.email)).to.have.length(0);	
+		});
 	});
 })
