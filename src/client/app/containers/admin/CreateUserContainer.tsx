@@ -24,7 +24,7 @@ export default class CreateUserFormContainer extends React.Component<{}, {}>{
 		email: '',
 		password: '',
 		confirmPassword: '',
-		role: UserRole.admin,
+		role: UserRole.ADMIN,
 		submittedOnce: false
 	}
 
