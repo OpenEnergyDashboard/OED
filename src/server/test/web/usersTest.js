@@ -51,7 +51,7 @@ mocha.describe('Users API', () => {
 			await obvius.insert(conn);
 			const users = await User.getAll(conn);
 			expect(users).to.have.lengthOf(3);
-			const res = await chai.request(app).post('/api/users/edit').send({
+			const res = await chai.request(app).post('/api/users/edit').set('token', token).send({
 				users: [
 					{ email: csv.email, role: User.role.OBVIUS },
 					{ email: obvius.email, role: User.role.CSV }
@@ -70,7 +70,7 @@ mocha.describe('Users API', () => {
 			await csv.insert(conn);
 			const user = await User.getByEmail(csv.email, conn);
 			expect(user.email).to.equal(csv.email);
-			const res = await chai.request(app).post('/api/users/delete').send({ email: csv.email });
+			const res = await chai.request(app).post('/api/users/delete').set('token', token).send({ email: csv.email });
 			expect(res).to.have.status(200);
 			expect((await User.getAll(conn)).filter(user => user === csv.email)).to.have.length(0);
 		});
