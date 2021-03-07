@@ -60,6 +60,9 @@ export default class UsersDetailContainer extends React.Component<UsersDisplayCo
 		try {
 			await usersApi.editUsers(this.state.users);
 			showSuccessNotification(translate('Successfully edited users.'));
+			this.setState(currentState => ({ 
+				history: [_.cloneDeep<User[]>(currentState.users)]
+			}));
 		} catch (error) {
 			showErrorNotification(translate('Failed to edit users.'));
 		}
