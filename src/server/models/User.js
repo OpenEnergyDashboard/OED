@@ -116,8 +116,8 @@ class User {
 const _role = {
 	ADMIN: 'admin',
 	CSV: 'csv',
-	OBVIUS: 'obvius',
-	EXPORT: 'export'
+	EXPORT: 'export',
+	OBVIUS: 'obvius'
 }
 
 User.role = Object.freeze(_role);
