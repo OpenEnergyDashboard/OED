@@ -8,6 +8,7 @@ const User = require('../models/User');
 const { log } = require('../log');
 const validate = require('jsonschema').validate;
 const { getConnection } = require('../db');
+const { adminAuthMiddleware } = require('./authenticator');
 
 const router = express.Router();
 
@@ -54,7 +55,7 @@ router.get('/:user_id', async (req, res) => {
 	}
 });
 
-router.post('/', async (req, res) => {
+router.post('/', adminAuthMiddleware('create a user.'), async (req, res) => {
 	const validParams = {
 		type: 'object',
 		required: ['email', 'password', 'role'],
@@ -91,7 +92,7 @@ router.post('/', async (req, res) => {
 /**
  * Route for updating user role
  */
-router.post('/edit', async (req, res) => {
+router.post('/edit', adminAuthMiddleware('update a user role'), async (req, res) => {
 	const validParams = {
 		type: 'object',
 		required: ['users'],
@@ -131,9 +132,9 @@ router.post('/edit', async (req, res) => {
 });
 
 /**
- * Route for deleting users
+ * Route for deleting a user
  */
-router.post('/delete', async (req, res) => {
+router.post('/delete', adminAuthMiddleware('delete a user'), async (req, res) => {
 	const validParams = {
 		type: 'object',
 		required: ['email'],

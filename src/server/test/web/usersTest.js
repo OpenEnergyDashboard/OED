@@ -10,7 +10,7 @@ const User = require('../../models/User');
 const bcrypt = require('bcryptjs');
 
 mocha.describe('Users API', () => {
-	mocha.describe('with authentication', async () => {
+	mocha.describe('with authentication', () => {
 		let token;
 		mocha.before(async () => {
 			let res = await chai.request(app).post('/api/login')
@@ -28,7 +28,7 @@ mocha.describe('Users API', () => {
 		});
 		mocha.it('successfully creates a user', async () => {
 			const user = { email: 'a@ex.com', password: 'abc', role: User.role.CSV };
-			const res = await chai.request(app).post('/api/users').send(user);
+			const res = await chai.request(app).post('/api/users').set('token', token).send(user);
 			expect(res).to.have.status(200);
 			const conn = testDB.getConnection();
 			const dbUser = await User.getByEmail(user.email, conn);
@@ -36,7 +36,7 @@ mocha.describe('Users API', () => {
 		});
 		mocha.it('rejects invalid user creation', async () => {
 			const user = { email: 'a@ex.com', password: 'abc' };
-			const res = await chai.request(app).post('/api/users').send(user);
+			const res = await chai.request(app).post('/api/users').set('token', token).send(user);
 			expect(res).to.have.status(400);
 			const conn = testDB.getConnection();
 			const users = await User.getAll(conn);
@@ -70,11 +70,35 @@ mocha.describe('Users API', () => {
 			await csv.insert(conn);
 			const user = await User.getByEmail(csv.email, conn);
 			expect(user.email).to.equal(csv.email);
-			const res = await chai.request(app).post('/api/users/delete').send({
-				email: csv.email
-			});
+			const res = await chai.request(app).post('/api/users/delete').send({ email: csv.email });
 			expect(res).to.have.status(200);
-			expect((await User.getAll(conn)).filter(user => user === csv.email)).to.have.length(0);	
+			expect((await User.getAll(conn)).filter(user => user === csv.email)).to.have.length(0);
+		});
+	});
+	mocha.describe('without proper admin authorization level', async () => {
+		let token;
+		mocha.before(async () => {
+			const conn = testDB.getConnection();
+			const password = 'password';
+			const hashedPassword = await bcrypt.hash(password, 10);
+			const notAdmin = new User(undefined, 'notAdmin@example.com', hashedPassword, User.role.CSV);
+			await notAdmin.insert(conn);
+			notAdmin.password = password;
+			let res = await chai.request(app).post('/api/login')
+				.send({ email: notAdmin.email, password: notAdmin.password });
+			token = res.body.token;
+		});
+		mocha.it('should reject request to delete a user with 401 unauthorized code', async () => {
+			const res = await chai.request(app).post('/api/users/delete').set('token', token);
+			expect(res).to.have.status(401);
+		});
+		mocha.it('should reject request to edit a user with 401 unauthorized code', async () => {
+			const res = await chai.request(app).post('/api/users/edit').set('token', token);
+			expect(res).to.have.status(401);
+		});
+		mocha.it('should reject a request to create a user with 401 unauthorized code', async () => {
+			const res = await chai.request(app).post('/api/users/').set('token', token);
+			expect(res).to.have.status(401);
 		});
 	});
 })

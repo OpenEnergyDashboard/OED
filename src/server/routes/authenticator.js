@@ -67,16 +67,18 @@ async function verifyCredentials(email, password, returnUser = false) {
 	return (returnUser ? isValid && user : isValid);
 }
 
-// Returns middleware that only proceeds if an Admin is the requestor of an action.
-// Action is a string that is a verb that can be prefixed by to for the proper response and warning messages.
-adminAuthMiddleware = action => {
+/**
+ * Returns middleware that verifies the requested token and only proceeds if the requestor is an  Admin.
+ */
+function adminAuthMiddleware(action) {
 	return function (req, res, next) {
 		this.authMiddleware(req, res, () => {
-			if (req.decoded && isTokenAuthorized(req.decoded.role, User.role.ADMIN)) {
+			const token = req.headers.token || req.body.token || req.query.token;
+			if (isTokenAuthorized(token, User.role.ADMIN)) {
 				next();
 			} else {
 				log.warn(`Got request to '${action}' with invalid credentials. Admin role is required to '${action}'.`);
-				res.status(400)
+				res.status(401)
 					.json({ message: `Invalid credentials supplied. Only admins can ${action}.` });
 			}
 		})
