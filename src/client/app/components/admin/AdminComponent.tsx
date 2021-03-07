@@ -4,7 +4,7 @@
 
 import * as React from 'react';
 import HeaderContainer from '../../containers/HeaderContainer';
-import FooterComponent from '../FooterComponent';
+import FooterContainer from '../../containers/FooterContainer';
 import AddMetersContainer from '../../containers/admin/AddMetersContainer';
 import AddReadingsContainer from '../../containers/admin/AddReadingsContainer';
 import PreferencesContainer from '../../containers/admin/PreferencesContainer';
@@ -34,7 +34,7 @@ export default function AdminComponent() {
 					</div>
 				</div>
 			</div>
-			<FooterComponent />
+			<FooterContainer />
 		</div>
 	);
 }
