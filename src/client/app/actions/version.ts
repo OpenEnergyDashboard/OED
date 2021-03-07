@@ -8,7 +8,7 @@ import * as t from '../types/redux/version';
 
 /*
 * Defines function that performs the API call to retrieve the current version of the app,
-* and dispacthes the corresponding action types.
+* and dispatches the corresponding action types.
 * This function will be called on app initialization.
 */
  
