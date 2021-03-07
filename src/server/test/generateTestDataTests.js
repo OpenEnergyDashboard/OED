@@ -43,7 +43,7 @@ mocha.describe('The generateDates function', () => {
 			result.push(startMoment.format('YYYY-MM-DD HH:mm:ss'));
 			startMoment.add(timeStep);
 		}
-		const dates = generateDates(startTimeStamp, endTimeStamp, timeStep)
+		const dates = generateDates(startTimeStamp, endTimeStamp, timeStep);
 		expect(dates).to.deep.equal(result);
 		expect(dates[dates.length - 1]).to.not.equal(endTimeStamp);
 	});

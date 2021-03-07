@@ -9,6 +9,7 @@ import AddMetersContainer from '../../containers/admin/AddMetersContainer';
 import AddReadingsContainer from '../../containers/admin/AddReadingsContainer';
 import PreferencesContainer from '../../containers/admin/PreferencesContainer';
 import ManageUsersLinkButtonComponent from './users/ManageUsersLinkButtonComponent';
+import TooltipHelpComponent from '../TooltipHelpComponentAlternative';
 
 /**
  * Top-level React component that controls the home page
@@ -32,6 +33,7 @@ export default function AdminComponent() {
 	return (
 		<div>
 			<HeaderContainer />
+			<TooltipHelpComponent page='admin' />
 			<div className='container-fluid'>
 				<div className='row'>
 					<div className='col-12 col-lg-6'>
@@ -55,5 +57,3 @@ export default function AdminComponent() {
 		</div>
 	);
 }
-
-

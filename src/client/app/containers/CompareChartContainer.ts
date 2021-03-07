@@ -9,13 +9,17 @@ import { State } from '../types/redux/state';
 import { getComparePeriodLabels, getCompareChangeSummary } from '../utils/calculateCompare';
 import { CompareEntity } from './MultiCompareChartContainer';
 import translate from '../utils/translate';
-import {CompressedBarReading} from '../types/compressed-readings';
 import PlotlyChart, { IPlotlyChartProps } from 'react-plotlyjs-ts';
 
 interface CompareChartContainerProps {
 	entity: CompareEntity;
 }
 
+/* Passes the current redux state of the of the chart container and it's props, and turns it into props for the React
+*  component, which is what will be visible on the page. Makes it possible to access
+*  your reducer state objects from within your React components.
+*
+*  Returns the props object. */
 function mapStateToProps(state: State, ownProps: CompareChartContainerProps): IPlotlyChartProps {
 	const comparePeriod = state.graph.comparePeriod;
 	const datasets: any[] = [];
@@ -38,19 +42,18 @@ function mapStateToProps(state: State, ownProps: CompareChartContainerProps): IP
 	const previousPeriod = entity.prevUsage;
 	const currentPeriod = entity.currUsage;
 
-
 	datasets.push(
 		{
 			x: [periodLabels.prev, periodLabels.current],
 			y: [previousPeriod, currentPeriod],
 			hovertext: [
-				`<b>${previousPeriod} KW</b> ${translate('used.this.time')}<br>${periodLabels.prev.toLowerCase()}`,
-				`<b>${currentPeriod} KW</b> ${translate('used.so.far')}<br>${periodLabels.current.toLowerCase()}`
+				`<b>${previousPeriod} KWh</b> ${translate('used.this.time')}<br>${periodLabels.prev.toLowerCase()}`,
+				`<b>${currentPeriod} KWh</b> ${translate('used.so.far')}<br>${periodLabels.current.toLowerCase()}`
 			],
 			hoverinfo: 'text',
 			type: 'bar',
 			marker: {color: barColor},
-			text: [ `<b>${previousPeriod} kW</b>`, `<b>${currentPeriod} kW</b>`],
+			text: [ `<b>${previousPeriod} kWh</b>`, `<b>${currentPeriod} kWh</b>`],
 			textposition: 'auto',
 			textfont: {
 				color: 'rgba(0,0,0,1)'
@@ -66,11 +69,13 @@ function mapStateToProps(state: State, ownProps: CompareChartContainerProps): IP
 		},
 		hovermode: 'closest',
 		autosize: true,
+		width: 370,
+		height: 450,
 		showlegend: false,
 		legend: {
 		},
 		yaxis: {
-			title: 'kW',
+			title: 'kWh',
 			showgrid: true,
 			gridcolor: '#ddd'
 		},
