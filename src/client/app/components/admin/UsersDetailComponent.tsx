@@ -9,8 +9,10 @@ import CreateUserLinkButtonComponent from './users/CreateUserLinkButtonComponent
 
 interface UserDisplayComponentProps {
 	users: User[];
+	deleteUser: (email: string) => Promise<void>;
 	edited: boolean;
 	editUser: (email: string, newRole: UserRole) => void;
+	submitUserEdits: () => Promise<void>;
 }
 
 export default function UserDetailComponent(props: UserDisplayComponentProps) {
@@ -55,14 +57,14 @@ export default function UserDetailComponent(props: UserDisplayComponentProps) {
 										</Input>
 
 									</td>
-									<td><Button>Disable User</Button></td>
+									<td><Button onClick={() => { props.deleteUser(user.email); }}>Delete User</Button></td>
 								</tr>
 							))}
 						</tbody>
 					</Table>
 					<div style={buttonsStyle}>
 						<CreateUserLinkButtonComponent />
-						<Button color='success' disabled={!props.edited} onClick={() => console.log("submit edited users")}> Save user edits </Button>
+						<Button color='success' disabled={!props.edited} onClick={props.submitUserEdits}> Save user edits </Button>
 					</div>
 				</div>
 			</div>

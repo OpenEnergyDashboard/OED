@@ -9,6 +9,8 @@ import UserDetailComponent from '../../components/admin/UsersDetailComponent';
 import HeaderContainer from '../HeaderContainer';
 import FooterComponent from '../../components/FooterComponent';
 import { usersApi } from '../../utils/api';
+import { showSuccessNotification, showErrorNotification } from '../../utils/notifications';
+import translate from '../../utils/translate';
 
 interface UsersDisplayContainerProps {
 	fetchUsers: () => User[];
@@ -22,8 +24,10 @@ interface UsersDisplayContainerState {
 export default class UsersDetailContainer extends React.Component<UsersDisplayContainerProps, UsersDisplayContainerState> {
 	constructor(props: UsersDisplayContainerProps) {
 		super(props);
+		this.deleteUser = this.deleteUser.bind(this);
 		this.editUser = this.editUser.bind(this);
 		this.fetchUsers = this.fetchUsers.bind(this);
+		this.submitUserEdits = this.submitUserEdits.bind(this);
 	}
 
 	state: UsersDisplayContainerState = {
@@ -40,7 +44,7 @@ export default class UsersDetailContainer extends React.Component<UsersDisplayCo
 		return await usersApi.getUsers();
 	}
 
-	private async editUser(email: string, newRole: UserRole) {
+	private editUser(email: string, newRole: UserRole) {
 		const newUsers = _.cloneDeep<User[]>(this.state.users);
 		const user = newUsers.find(user => user.email === email);
 		if (user !== undefined) {
@@ -49,7 +53,26 @@ export default class UsersDetailContainer extends React.Component<UsersDisplayCo
 				users: newUsers,
 				history: [...prevState.history, newUsers]
 			}));
-			console.log("edit user");
+		}
+	}
+
+	private async submitUserEdits(){
+		try {
+			await usersApi.editUsers(this.state.users);
+			showSuccessNotification(translate('Successfully edited users.'));
+		} catch (error) {
+			showErrorNotification(translate('Failed to edit users.'));
+		}
+	}
+
+	private async deleteUser(email: string){
+		try {
+			await usersApi.deleteUser(email);
+			const users = await this.fetchUsers();
+			this.setState({  users });
+			showSuccessNotification(translate('Successfully deleted user.'));
+		} catch (error) {
+			showErrorNotification(translate('Failed to delete user.'));
 		}
 	}
 
@@ -58,9 +81,12 @@ export default class UsersDetailContainer extends React.Component<UsersDisplayCo
 			<div>
 				<HeaderContainer />
 				<UserDetailComponent
+					deleteUser={this.deleteUser}
 					edited={!_.isEqual(this.state.users, this.state.history[0])}
 					editUser={this.editUser}
-					users={this.state.users} />
+					users={this.state.users} 
+					submitUserEdits={this.submitUserEdits}
+					/>
 				<FooterComponent />
 			</div>
 		)

@@ -13,15 +13,23 @@ interface NewUser extends User {
 export default class UsersApi {
 	private readonly backend: ApiBackend;
 
-	constructor(backend: ApiBackend){
+	constructor(backend: ApiBackend) {
 		this.backend = backend;
 	}
 
-	public async getUsers(): Promise<User[]>{
+	public async getUsers(): Promise<User[]> {
 		return await this.backend.doGetRequest<User[]>('/api/users');
 	}
 
-	public async createUser(user: NewUser): Promise<void>{
-		await this.backend.doPostRequest('/api/users', user);
+	public async createUser(user: NewUser): Promise<void> {
+		return await this.backend.doPostRequest('/api/users', user);
+	}
+
+	public async editUsers(users: User[]) {
+		return await this.backend.doPostRequest('/api/users/edit', { users });
+	}
+
+	public async deleteUser(email: string) {
+		return await this.backend.doPostRequest('/api/users/delete', { email });
 	}
 }
