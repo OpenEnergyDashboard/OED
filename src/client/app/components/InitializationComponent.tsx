@@ -15,6 +15,7 @@ interface InitializationProps {
 	fetchGroupDetailsIfNeeded(): Promise<any>;
 	fetchPreferencesIfNeeded(): Promise<any>;
 	changeOptionsFromLink(options: LinkOptions): Promise<any>;
+	fetchVersionIfNeeded(): Promise<any>;
 }
 
 export default class InitializationComponent extends React.Component<InitializationProps, {}> {
@@ -24,6 +25,7 @@ export default class InitializationComponent extends React.Component<Initializat
 		this.props.fetchMeterDetailsIfNeeded();
 		this.props.fetchGroupDetailsIfNeeded();
 		this.props.fetchPreferencesIfNeeded();
+		this.props.fetchVersionIfNeeded();
 	}
 
 	public componentWillReceiveProps(nextProps: InitializationProps) {
