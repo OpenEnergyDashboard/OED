@@ -5,7 +5,7 @@
 const express = require('express');
 const Preferences = require('../models/Preferences');
 const { log } = require('../log');
-const authentication = require('./authenticator').authMiddleware;
+const adminAuthentication = require('./authenticator').adminAuthMiddleware;
 const validate = require('jsonschema').validate;
 const { getConnection } = require('../db');
 
@@ -24,7 +24,7 @@ router.get('/', async (req, res) => {
 	}
 });
 
-router.use(authentication);
+router.use(adminAuthentication('edit preferences'));
 
 /**
  * Route for updating the preferences
@@ -52,7 +52,10 @@ router.post('/', async (req, res) => {
 			}
 		}
 	};
+	console.log('here')
 	if (!validate(req.body, validParams).valid) {
+		console.log(validate(req.body).err);
+		console.log('hit')
 		res.sendStatus(400);
 	} else {
 		const conn = getConnection();
