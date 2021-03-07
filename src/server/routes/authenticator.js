@@ -72,9 +72,9 @@ async function verifyCredentials(email, password, returnUser = false) {
  */
 function adminAuthMiddleware(action) {
 	return function (req, res, next) {
-		this.authMiddleware(req, res, () => {
+		this.authMiddleware(req, res, async () => {
 			const token = req.headers.token || req.body.token || req.query.token;
-			if (isTokenAuthorized(token, User.role.ADMIN)) {
+			if (await isTokenAuthorized(token, User.role.ADMIN)) {
 				next();
 			} else {
 				log.warn(`Got request to '${action}' with invalid credentials. Admin role is required to '${action}'.`);

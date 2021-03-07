@@ -4,6 +4,7 @@
 
 const jwt = require('jsonwebtoken');
 const User = require('../models/User');
+const { getConnection } = require('../db');
 
 /** Checks if a role has the authorization capabilities as the requested role. */
 function isRoleAuthorized(role, requestedRole) {
@@ -15,9 +16,11 @@ function isRoleAuthorized(role, requestedRole) {
 }
 
 /** Checks if a token (assumed to be verified) has the authorization capabilities as the requested role. */
-function isTokenAuthorized(token, requestedRole) {
+async function isTokenAuthorized(token, requestedRole) {
 	const payload = jwt.decode(token);
-	const { role } = payload;
+	const { data: id } = payload;
+	const conn = getConnection();
+	const { role } = await User.getByID(id, conn);
 	return isRoleAuthorized(role, requestedRole);
 }
 
