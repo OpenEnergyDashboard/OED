@@ -53,6 +53,7 @@ mocha.describe('Users API', () => {
 			expect(users).to.have.lengthOf(3);
 			const res = await chai.request(app).post('/api/users/edit').set('token', token).send({
 				users: [
+					{ email: testUser.email, role: testUser.role},
 					{ email: csv.email, role: User.role.OBVIUS },
 					{ email: obvius.email, role: User.role.CSV }
 				]

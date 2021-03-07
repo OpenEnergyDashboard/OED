@@ -122,9 +122,15 @@ router.post('/edit', adminAuthMiddleware('update a user role'), async (req, res)
 		try {
 			const conn = getConnection();
 			const { users } = req.body;
-			const roleUpdates = users.map(async user => await User.updateUserRole(user.email, user.role, conn));
-			await Promise.all(roleUpdates);
-			res.sendStatus(200);
+			const minimumUser = users.find(user => user.role === User.role.ADMIN);
+			// This protects the database so that there will always be at least one admin during role updates.
+			if (minimumUser === undefined) {
+				res.sendStatus(400);
+			} else {
+				const roleUpdates = users.map(async user => await User.updateUserRole(user.email, user.role, conn));
+				await Promise.all(roleUpdates);
+				res.sendStatus(200);
+			}
 		} catch (error) {
 			console.log(error);
 		}
