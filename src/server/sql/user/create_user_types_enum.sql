@@ -5,7 +5,7 @@
 -- This should avoid an error when the type already exists. This is an issue since
 -- the OED install stops the creation of database items after this.
 DO $$ BEGIN
-    CREATE TYPE user_type AS ENUM('admin', 'csv', 'obvius');
+    CREATE TYPE user_type AS ENUM('admin', 'csv', 'obvius', 'export');
 EXCEPTION
     WHEN duplicate_object THEN null;
 END $$;

@@ -26,7 +26,7 @@ const { getConnection, dropConnection } = require('../../db');
 	role = await ask('Role: '); // untested
 	role = role.toUpperCase();
 	if(User.role[role] === undefined){
-		terminateReadline('Role must be one of Admin, CSV, Obvius. user\'s role not modified');
+		terminateReadline('Role must be one of Admin, CSV, Obvius, Export. user\'s role not modified');
 	}
 
 	const conn = getConnection();
