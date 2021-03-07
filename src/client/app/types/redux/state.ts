@@ -10,6 +10,7 @@ import { MetersState } from './meters';
 import { NotificationsState } from './notifications';
 import { AdminState } from './admin';
 import { CompareReadingsState } from './compareReadings';
+import { VersionState } from './version';
 
 export interface State {
 	meters: MetersState;
@@ -22,4 +23,5 @@ export interface State {
 	groups: GroupsState;
 	notifications: NotificationsState;
 	admin: AdminState;
+	version: VersionState;
 }
