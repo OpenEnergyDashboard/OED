@@ -53,7 +53,7 @@ mocha.describe('Users API', () => {
 			expect(users).to.have.lengthOf(3);
 			const res = await chai.request(app).post('/api/users/edit').set('token', token).send({
 				users: [
-					{ email: testUser.email, role: testUser.role},
+					{ email: testUser.email, role: testUser.role },
 					{ email: csv.email, role: User.role.OBVIUS },
 					{ email: obvius.email, role: User.role.CSV }
 				]
@@ -76,30 +76,43 @@ mocha.describe('Users API', () => {
 			expect((await User.getAll(conn)).filter(user => user === csv.email)).to.have.length(0);
 		});
 	});
-	mocha.describe('without proper admin authorization level', async () => {
-		let token;
-		mocha.before(async () => {
-			const conn = testDB.getConnection();
-			const password = 'password';
-			const hashedPassword = await bcrypt.hash(password, 10);
-			const notAdmin = new User(undefined, 'notAdmin@example.com', hashedPassword, User.role.CSV);
-			await notAdmin.insert(conn);
-			notAdmin.password = password;
-			let res = await chai.request(app).post('/api/login')
-				.send({ email: notAdmin.email, password: notAdmin.password });
-			token = res.body.token;
-		});
-		mocha.it('should reject request to delete a user with 401 unauthorized code', async () => {
-			const res = await chai.request(app).post('/api/users/delete').set('token', token);
-			expect(res).to.have.status(401);
-		});
-		mocha.it('should reject request to edit a user with 401 unauthorized code', async () => {
-			const res = await chai.request(app).post('/api/users/edit').set('token', token);
-			expect(res).to.have.status(401);
-		});
-		mocha.it('should reject a request to create a user with 401 unauthorized code', async () => {
-			const res = await chai.request(app).post('/api/users/').set('token', token);
-			expect(res).to.have.status(401);
-		});
+	mocha.describe('without admin authorization level', async () => {
+		try {
+			/**
+			 * Loop User roles for non admin users
+			 */
+			for (const role in User.role) {
+				if (User.role[role] !== User.role.ADMIN) {
+					mocha.it(`should reject requests from ${role}`, async () => {
+						const conn = testDB.getConnection();
+						const password = 'password';
+						const hashedPassword = await bcrypt.hash(password, 10);
+						const notAdmin = new User(undefined, 'notAdmin@example.com', hashedPassword, User.role[role]);
+						await notAdmin.insert(conn);
+						notAdmin.password = password;
+
+						let res;
+						// login
+						res = await chai.request(app).post('/api/login')
+							.send({ email: notAdmin.email, password: notAdmin.password });
+						const token = res.body.token;
+						expect(res).to.have.status(200);
+
+						// delete
+						res = await chai.request(app).post('/api/users/delete').set('token', token);
+						expect(res).to.have.status(401);
+						// edit
+						res = await chai.request(app).post('/api/users/edit').set('token', token);
+						expect(res).to.have.status(401);
+
+						// create
+						res = await chai.request(app).post('/api/users/').set('token', token);
+						expect(res).to.have.status(401);
+					});
+				}
+			}
+		} catch (error) {
+			console.log(error);
+		}
 	});
-})
+});
