@@ -93,28 +93,28 @@ function obviusEmailAndPasswordAuthMiddleware(action) {
 	return function (req, res, next) {
 		credentialsRequestValidationMiddleware(req, res, async () => {
 			try {
-				const user = await verifyCredentials(req.email, req.password, true);
+				const user = await verifyCredentials(req.body.email, req.body.password, true);
 				if (user) {
 					if (isUserAuthorized(user, User.role.OBVIUS)) {
 						next();
 					} else {
 						const message = `Got request to '${action}' with invalid authorization level. Obvius role is at least required to '${action}'.`;
 						log.warn(message);
-						res.status(400)
-							.text(message);
+						res.status(401).send(message);
+						return;
 					}
 				} else {
 					const message = `Got request to '${action} with invalid credentials.`;
 					log.warn(message);
-					res.status(400)
-						.text(message);
+					res.status(400).send(message);
+					return;
 				}
 			} catch (error) {
 				if (error.message === 'No data returned from the query.') {
-					res.status(400).text(`No user corresponding to the email: ${req.email} was found. Please make a request with a valid email.`);
+					res.status(400).send(`No user corresponding to the email: ${req.body.email} was found. Please make a request with a valid email.`);
 				} else {
 					log.error('Internal Server Error for Obvius request.', error);
-					res.status(400).text('Internal OED Server Error for Obvius request.');
+					res.status(500).send('Internal OED Server Error for Obvius request.');
 				}
 			}
 		});
