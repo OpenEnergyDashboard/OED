@@ -6,6 +6,8 @@ const database = require('../database');
 
 const sqlFile = database.sqlFile;
 
+const { processConfigFile } = require('./processConfigFile');
+
 class Configfile {
 	/**
 	 *
@@ -80,16 +82,20 @@ class Configfile {
 	}
 
 	/**
-	 * Returns ??
+	 * Returns Promise<>
 	 * @param conn The connection to use.
 	 */
 	async insert(conn) {
-		const configfile = this;
+		const configFile = this;
 		if (this.id !== undefined) {
 			throw new Error('Attempt to insert a Configfile with an existing ID.');
 		}
-		const resp = await conn.one(sqlFile('obvius/insert_new_config.sql'), configfile);
+		const resp = await conn.one(sqlFile('obvius/insert_new_config.sql'), configFile);
 		this.id = resp.id;
+
+		// insert meters from file contents
+		const obviusMeters = processConfigFile(configFile);
+		obviusMeters.forEach(meter => meter.insert(conn));
 	}
 
 	/**

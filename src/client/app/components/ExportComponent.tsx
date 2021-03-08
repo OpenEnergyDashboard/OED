@@ -5,13 +5,18 @@
 import * as React from 'react';
 import { Button } from 'reactstrap';
 import * as moment from 'moment';
-import graphExport from '../utils/exportData';
+import graphExport, { graphRawExport, downloadRawCSV } from '../utils/exportData';
 import { ExportDataSet } from '../types/readings';
 import { FormattedMessage } from 'react-intl';
+import { TimeInterval } from '../../../common/TimeInterval';
+import { metersApi } from '../utils/api'
+import TooltipMarkerComponent from './TooltipMarkerComponent';
 
 interface ExportProps {
+	showRawExport: boolean;
 	selectedMeters: number[];
 	exportVals: { datasets: ExportDataSet[] };
+	timeInterval: TimeInterval;
 }
 
 export default function ExportComponent(props: ExportProps) {
@@ -48,13 +53,32 @@ export default function ExportComponent(props: ExportProps) {
 
 		const chartName = compressedData[0].currentChart;
 		const name = `oedExport_${chartName}_${startTimeString}_to_${endTimeString}.csv`;
-		graphExport(compressedData,	name);
+		graphExport(compressedData, name);
 	};
+
+	const exportRawReadings = async () => {
+		if (props.selectedMeters.length === 0)
+			return;
+		const count = await metersApi.lineReadingsCount(props.selectedMeters, props.timeInterval);
+		graphRawExport(count, async () => {
+			const lineReading = await metersApi.rawLineReadings(props.selectedMeters, props.timeInterval);
+			downloadRawCSV(lineReading);
+		});
+	}
+
 	return (
-		<div>
-			<Button outline onClick={exportReading}>
-				<FormattedMessage id='export.graph.data' />
-			</Button>
-		</div>
+		<>
+			<div>
+				<Button outline onClick={exportReading}>
+					<FormattedMessage id='export.graph.data' />
+				</Button>
+				<TooltipMarkerComponent page='home' helpTextId='help.home.export.graph.data' />
+			</div>
+			{props.showRawExport ? <div style={{ paddingTop: '10px' }}>
+				<Button outline onClick={exportRawReadings}>
+					<FormattedMessage id='export.raw.graph.data' />
+				</Button>
+			</div> : ''}
+		</>
 	);
 }

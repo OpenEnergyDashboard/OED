@@ -2,16 +2,21 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
 
+/**
+ * This class is for testing meter readings.
+ */
 const { mocha, expect, testDB } = require('../common');
 const moment = require('moment');
 const Meter = require('../../models/Meter');
 const Reading = require('../../models/Reading');
+const Point = require('../../models/Point');
+const gps = new Point(90, 45);
 
 mocha.describe('Readings', () => {
 	let meter;
 	mocha.beforeEach(async () => {
 		const conn = testDB.getConnection();
-		await new Meter(undefined, 'Meter', null, false, true, Meter.type.MAMAC).insert(conn);
+		await new Meter(undefined, 'Meter', null, false, true, Meter.type.MAMAC, null, gps).insert(conn);
 		meter = await Meter.getByName('Meter', conn);
 	});
 

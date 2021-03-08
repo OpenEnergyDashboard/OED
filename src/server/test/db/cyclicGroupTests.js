@@ -7,6 +7,9 @@
 const { mocha, expect, testDB } = require('../common');
 const Group = require('../../models/Group');
 
+/*
+ * Tests to ensure group cycles are forbidden.
+ */
 mocha.describe('Group Cycles', async () => {
 	let group1;
 	let group2;
@@ -21,12 +24,18 @@ mocha.describe('Group Cycles', async () => {
 		group3 = await Group.getByName('group3', conn);
 	});
 
+	/*
+	 * Tests that the child group of a group cannot also be set as its parent.
+	 */
 	mocha.it('Cannot save immediate cycles', async () => {
 		conn = testDB.getConnection();
 		await group1.adoptGroup(group2.id, conn);
 		await expect(group2.adoptGroup(group1.id, conn), 'cyclic group insert was not rejected').to.eventually.be.rejected;
 	});
 
+	/*
+	 * Tests that the grandchild group of a group cannot also be set as its parent.
+	 */
 	mocha.it('Cannot save deeply nested cycles', async () => {
 		conn = testDB.getConnection();
 		await group1.adoptGroup(group2.id, conn);
@@ -34,6 +43,10 @@ mocha.describe('Group Cycles', async () => {
 		await expect(group3.adoptGroup(group1.id, conn), 'cyclic group insert was not rejected').to.eventually.be.rejected;
 	});
 
+	/*
+	 * Tests that the child group of a parent group cannot be updated so that the child group is also the
+	 * parent of the parent group.
+	 */
 	mocha.it('Cannot run update queries that create cycles', async () => {
 		conn = testDB.getConnection();
 		await group1.adoptGroup(group2.id, conn);
