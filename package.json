@@ -25,7 +25,13 @@
     "sendLogEmail": "node ./src/server/services/sendLogEmail.js",
     "refreshReadingViews": "node ./src/server/services/refreshReadingViews.js",
     "obvius:showConfigfiles": "node ./src/server/services/obvius/showConfigfiles.js",
-    "obvius:purgeConfigfiles": "node ./src/server/services/obvius/purgeConfigfiles.js"
+    "obvius:purgeConfigfiles": "node ./src/server/services/obvius/purgeConfigfiles.js",
+	"generateFourDayTestingData": "node -e 'require(\"./src/server/data/automatedTestingData\").generateFourDayTestingData()'",
+    "generateFourHourTestingData": "node -e 'require(\"./src/server/data/automatedTestingData\").generateFourHourTestingData()'",
+    "generateTwentyThreeMinuteTestingData": "node -e 'require(\"./src/server/data/automatedTestingData\").generateTwentyThreeMinuteTestingData()'",
+    "generateFifteenMinuteTestingData": "node -e 'require(\"./src/server/data/automatedTestingData\").generateFifteenMinuteTestingData()'",
+    "generateOneMinuteTestingData": "node -e 'require(\"./src/server/data/automatedTestingData\").generateOneMinuteTestingData()'",
+    "generateTestingData": "node -e 'require(\"./src/server/data/automatedTestingData\").generateTestingData()'"
   },
   "nodemonConfig": {
     "watch": [

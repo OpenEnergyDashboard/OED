@@ -154,7 +154,7 @@ function generateSineData(startTimeStamp, endTimeStamp, options = {}) {
 		phaseShift: options.phaseShift || 0
 	};
 	const startDates = generateDates(startTimeStamp, endTimeStamp, chosenOptions.timeStep);
-	// We create another equally-sized array of timestamps with values that are each shifted 
+	// We create another equally-sized array of timestamps with values that are each shifted
 	// forward from the corresponding timestamp in the startDates array by the time step.
 	const endDates = startDates.map(date => moment(date).add(options.timeStep).format('YYYY-MM-DD HH:mm:ss'));
 	const datesAsMoments = startDates.map(date => moment(date));
