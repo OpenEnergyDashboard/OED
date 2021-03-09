@@ -27,7 +27,6 @@ export default class MapsDetailComponent extends React.Component<MapsDetailProps
 	}
 
 	public render() {
-		const renderCreateAdminTooltip = hasToken();
 
 		const titleStyle: React.CSSProperties = {
 			textAlign: 'center'
@@ -47,7 +46,7 @@ export default class MapsDetailComponent extends React.Component<MapsDetailProps
 
 		const tooltipStyle = {
 			display: 'inline-block',
-			tooltipMeterView: renderCreateAdminTooltip? 'help.admin.mapview' : 'help.maps.mapview'
+			fontSize: '50%',
 		};
 
 		return (
@@ -58,7 +57,7 @@ export default class MapsDetailComponent extends React.Component<MapsDetailProps
 					<h2 style={titleStyle}>
 						<FormattedMessage id='maps' />
 						<div style={tooltipStyle}>
-						<TooltipMarkerComponent page='maps' helpTextId={tooltipStyle.tooltipMeterView} />
+						<TooltipMarkerComponent page='maps' helpTextId='help.admin.mapview' />
 						</div>
 					</h2>
 					<div style={tableStyle}>

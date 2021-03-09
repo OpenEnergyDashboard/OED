@@ -14,7 +14,6 @@ import {
 } from '../../types/redux/admin';
 import { defineMessages, FormattedMessage, injectIntl, InjectedIntlProps } from 'react-intl';
 import { LanguageTypes } from '../../types/i18n';
-import TooltipMarkerComponent from '../TooltipMarkerComponent';
 import TimeZoneSelect from '../TimeZoneSelect';
 
 interface PreferencesProps {
@@ -65,9 +64,6 @@ class PreferencesComponent extends React.Component<PreferencesPropsWithIntl, {}>
 				<div style={bottomPaddingStyle}>
 					<p style={titleStyle}>
 						<FormattedMessage id='default.site.title' />:
-						<div style={{display: 'inline'}}>
-						<TooltipMarkerComponent page='admin' helpTextId='help.admin.header' />
-						</div>
 					</p>
 					<Input
 						type='text'
