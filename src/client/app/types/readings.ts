@@ -39,3 +39,9 @@ export interface ExportDataSet {
 	exportVals: Array<{ x: number, y: number }>;
 	/* tslint:enable:array-type */
 }
+
+export interface RawReadings{
+	label:string,
+	reading:number,
+	startTimestamp:string
+}
