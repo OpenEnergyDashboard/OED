@@ -15,19 +15,19 @@ import { FormattedMessage } from 'react-intl';
 /**
  * Top-level React component that controls the home page
  * @return JSX to create the home page
- */	
+ */
 
 export default function AdminComponent() {
 	const divMarginTop: React.CSSProperties = {
 		marginTop: '50px'
 	};
 	const titleStyle: React.CSSProperties ={
-		textAlign: 'center',
+		textAlign: 'center'
 	};
 	const tooltipStyle = {
 		display: 'inline',
-		fontSize: '50%',
-   }
+		fontSize: '50%'
+	};
 	return (
 		<div>
 			<HeaderContainer />

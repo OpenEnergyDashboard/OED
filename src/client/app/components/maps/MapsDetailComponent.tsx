@@ -46,7 +46,7 @@ export default class MapsDetailComponent extends React.Component<MapsDetailProps
 
 		const tooltipStyle = {
 			display: 'inline-block',
-			fontSize: '50%',
+			fontSize: '50%'
 		};
 
 		return (
