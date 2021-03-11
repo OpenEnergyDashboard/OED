@@ -8,7 +8,6 @@ import { FormattedMessage, injectIntl, InjectedIntlProps } from 'react-intl';
 import { fileProcessingApi } from '../../utils/api';
 import { showSuccessNotification, showErrorNotification } from '../../utils/notifications';
 import translate from '../../utils/translate';
-import TooltipMarkerComponent from '../TooltipMarkerComponent';
 
 interface AddMetersProps {
 	fetchMeterDetailsIfNeeded(alwaysFetch?: boolean): Promise<any>;
@@ -76,7 +75,6 @@ class AddMetersComponent extends React.Component<AddMetersPropsWithIntl, {}> {
 
 					<FormattedMessage id='add.new.meters' />
 				</p>
-				<TooltipMarkerComponent page='admin' helpTextId='help.admin.csv.format' />
 				<Dropzone accept='text/csv, application/vnd.ms-excel,' onDrop={this.handleMeterToImport}>
 					<div style={{marginLeft: '10px'}}>
 						<FormattedMessage id='upload.meters.csv' />

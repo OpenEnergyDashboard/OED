@@ -10,6 +10,8 @@ import AddReadingsContainer from '../../containers/admin/AddReadingsContainer';
 import PreferencesContainer from '../../containers/admin/PreferencesContainer';
 import ManageUsersLinkButtonComponent from './users/ManageUsersLinkButtonComponent';
 import TooltipHelpComponent from '../TooltipHelpComponentAlternative';
+import TooltipMarkerComponent from '../TooltipMarkerComponent';
+import { FormattedMessage } from 'react-intl';
 
 /**
  * Top-level React component that controls the home page
@@ -25,20 +27,33 @@ export default function AdminComponent() {
 		paddingBottom: '15px'
 	};
 
-	const titleStyle: React.CSSProperties = {
+	const sectionTitleStyle: React.CSSProperties = {
 		fontWeight: 'bold',
 		margin: 0,
 		paddingBottom: '5px'
+	}
+	const titleStyle: React.CSSProperties ={
+		textAlign: 'center'
+	};
+	const tooltipStyle = {
+		display: 'inline',
+		fontSize: '50%'
 	};
 	return (
 		<div>
 			<HeaderContainer />
 			<TooltipHelpComponent page='admin' />
 			<div className='container-fluid'>
+				<h2 style={titleStyle}>
+					<FormattedMessage id='admin.panel' />
+					<div style={tooltipStyle}>
+						<TooltipMarkerComponent page='admin' helpTextId='help.admin.header'/>
+					</div>
+				</h2>
 				<div className='row'>
 					<div className='col-12 col-lg-6'>
 						<div style={bottomPaddingStyle}>
-							<p style={titleStyle}>Manage:</p>
+							<p style={sectionTitleStyle}>Manage:</p>
 							<div>
 								<ManageUsersLinkButtonComponent />
 							</div>

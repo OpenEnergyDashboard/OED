@@ -32,6 +32,7 @@ export default class GroupSidebarComponent extends React.Component<GroupSidebarP
 			display: renderCreateNewGroupButton ? 'inline' : 'none',
 			paddingLeft: '5px'
 		};
+
 		return (
 			<div className='form-group'>
 				<p style={labelStyle}>
