@@ -46,9 +46,9 @@ export default class UsersDetailContainer extends React.Component<UsersDisplayCo
 
 	private editUser(email: string, newRole: UserRole) {
 		const newUsers = _.cloneDeep<User[]>(this.state.users);
-		const user = newUsers.find(user => user.email === email);
-		if (user !== undefined) {
-			user.role = newRole;
+		const targetUser = newUsers.find(user => user.email === email);
+		if (targetUser !== undefined) {
+			targetUser.role = newRole;
 			this.setState(prevState => ({
 				users: newUsers,
 				history: [...prevState.history, newUsers]
@@ -56,11 +56,11 @@ export default class UsersDetailContainer extends React.Component<UsersDisplayCo
 		}
 	}
 
-	private async submitUserEdits(){
+	private async submitUserEdits() {
 		try {
 			await usersApi.editUsers(this.state.users);
 			showSuccessNotification(translate('Successfully edited users.'));
-			this.setState(currentState => ({ 
+			this.setState(currentState => ({
 				history: [_.cloneDeep<User[]>(currentState.users)]
 			}));
 		} catch (error) {
@@ -68,11 +68,11 @@ export default class UsersDetailContainer extends React.Component<UsersDisplayCo
 		}
 	}
 
-	private async deleteUser(email: string){
+	private async deleteUser(email: string) {
 		try {
 			await usersApi.deleteUser(email);
 			const users = await this.fetchUsers();
-			this.setState({  users });
+			this.setState({ users });
 			showSuccessNotification(translate('Successfully deleted user.'));
 		} catch (error) {
 			showErrorNotification(translate('Failed to delete user.'));
@@ -87,9 +87,9 @@ export default class UsersDetailContainer extends React.Component<UsersDisplayCo
 					deleteUser={this.deleteUser}
 					edited={!_.isEqual(this.state.users, this.state.history[0])}
 					editUser={this.editUser}
-					users={this.state.users} 
+					users={this.state.users}
 					submitUserEdits={this.submitUserEdits}
-					/>
+				/>
 				<FooterComponent />
 			</div>
 		)

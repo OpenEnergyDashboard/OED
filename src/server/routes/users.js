@@ -132,7 +132,8 @@ router.post('/edit', adminAuthMiddleware('update a user role'), async (req, res)
 				res.sendStatus(200);
 			}
 		} catch (error) {
-			console.log(error);
+			log.error('Error while performing edit user request.', error);
+			res.sendStatus(500);
 		}
 	}
 });
@@ -165,7 +166,8 @@ router.post('/delete', adminAuthMiddleware('delete a user'), async (req, res) =>
 				res.sendStatus(200);
 			}
 		} catch (error) {
-			console.log(error);
+			log.error('Error while performing delete user request', error);
+			res.sendStatus(500);
 		}
 	}
 });

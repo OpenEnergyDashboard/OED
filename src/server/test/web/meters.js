@@ -85,35 +85,31 @@ mocha.describe('meters API', () => {
 			}
 		});
 		mocha.describe('without admin authorization level', async () => {
-			try {
-				/**
-				 * Loop User roles for non admin users
-				 */
-				for (const role in User.role) {
-					if (User.role[role] !== User.role.ADMIN) {
-						mocha.it(`should reject requests from ${role} to edit meters`, async () => {
-							const conn = testDB.getConnection();
-							const password = 'password';
-							const hashedPassword = await bcrypt.hash(password, 10);
-							const notAdmin = new User(undefined, 'notAdmin@example.com', hashedPassword, User.role[role]);
-							await notAdmin.insert(conn);
-							notAdmin.password = password;
+			/**
+			 * Loop User roles for non admin users
+			 */
+			for (const role in User.role) {
+				if (User.role[role] !== User.role.ADMIN) {
+					mocha.it(`should reject requests from ${role} to edit meters`, async () => {
+						const conn = testDB.getConnection();
+						const password = 'password';
+						const hashedPassword = await bcrypt.hash(password, 10);
+						const notAdmin = new User(undefined, 'notAdmin@example.com', hashedPassword, User.role[role]);
+						await notAdmin.insert(conn);
+						notAdmin.password = password;
 
-							let res;
-							// login
-							res = await chai.request(app).post('/api/login')
-								.send({ email: notAdmin.email, password: notAdmin.password });
-							const token = res.body.token;
-							expect(res).to.have.status(200);
+						let res;
+						// login
+						res = await chai.request(app).post('/api/login')
+							.send({ email: notAdmin.email, password: notAdmin.password });
+						const currentToken = res.body.token;
+						expect(res).to.have.status(200);
 
-							// edit
-							res = await chai.request(app).post('/api/meters/edit').set('token', token);
-							expect(res).to.have.status(401);
-						});
-					}
+						// edit
+						res = await chai.request(app).post('/api/meters/edit').set('token', currentToken);
+						expect(res).to.have.status(401);
+					});
 				}
-			} catch (error) {
-				console.log(error);
 			}
 		});
 	});

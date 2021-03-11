@@ -57,9 +57,9 @@ export default function CreateUserFormComponent(props: CreateUserFormProps) {
 					</div>
 					<div style={formInputStyle}>
 						<label> Role </label><br />
-						<Input type='select' onChange={({ target }) => props.handleRoleChange(target.value)} value={props.role}>
+						<Input type='select' onChange={({ target }) => props.handleRoleChange(target.value as UserRole)} value={props.role}>
 							{Object.entries(UserRole).map(([role, val]) => (
-								<option value={val}> {role} </option>
+								<option value={val} key={val}> {role} </option>
 							))}
 						</Input>
 					</div>

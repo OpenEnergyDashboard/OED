@@ -47,7 +47,7 @@ export default function UserDetailComponent(props: UserDisplayComponentProps) {
 						</thead>
 						<tbody>
 							{props.users.map(user => (
-								<tr>
+								<tr key={user.email}>
 									<td>{user.email}</td>
 									<td>
 										<Input type='select' value={user.role} onChange={({ target }) => props.editUser(user.email, target.value as UserRole)}>

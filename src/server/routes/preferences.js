@@ -58,10 +58,7 @@ router.post('/', async (req, res) => {
 			}
 		}
 	};
-	console.log('here')
 	if (!validate(req.body, validParams).valid) {
-		console.log(validate(req.body).err);
-		console.log('hit')
 		res.sendStatus(400);
 	} else {
 		const conn = getConnection();
