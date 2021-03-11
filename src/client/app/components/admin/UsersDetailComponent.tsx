@@ -56,7 +56,7 @@ export default function UserDetailComponent(props: UserDisplayComponentProps) {
 											))}
 										</Input>
 									</td>
-									<td><Button onClick={() => { props.deleteUser(user.email); }}>Delete User</Button></td>
+									<td><Button color='danger' onClick={() => { props.deleteUser(user.email); }}>Delete User</Button></td>
 								</tr>
 							))}
 						</tbody>
