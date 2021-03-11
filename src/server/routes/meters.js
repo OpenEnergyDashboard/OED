@@ -47,16 +47,15 @@ function formatMeterForResponse(meter, loggedIn) {
  * GET information on displayable meters (or all meters, if logged in as an admin.)
  */
 router.get('/', async (req, res) => {
-	const conn = getConnection();
-	let query;
-	const token = req.headers.token || req.body.token || req.query.token;
-	if (req.hasValidAuthToken && isTokenAuthorized(token, User.role.ADMIN)) {
-		query = Meter.getAll;
-	} else {
-		query = Meter.getDisplayable;
-	}
-
 	try {
+		const conn = getConnection();
+		let query;
+		const token = req.headers.token || req.body.token || req.query.token;
+		if (req.hasValidAuthToken && (await isTokenAuthorized(token, User.role.ADMIN))) {
+			query = Meter.getAll;
+		} else {
+			query = Meter.getDisplayable;
+		}
 		const rows = await query(conn);
 		res.json(rows.map(row => formatMeterForResponse(row, req.hasValidAuthToken)));
 	} catch (err) {
