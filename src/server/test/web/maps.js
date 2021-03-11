@@ -7,6 +7,8 @@
 
 const { chai, mocha, expect, app, testDB, testUser } = require('../common');
 const Map = require('../../models/Map');
+const User = require('../../models/User');
+const bcrypt = require('bcryptjs');
 const Point = require('../../models/Point');
 const moment = require('moment');
 
@@ -62,7 +64,7 @@ mocha.describe('maps API', () => {
 
 		expectMapsToBeEquivalent(res.body, 3);
 	});
-	mocha.describe('with authentication', () => {
+	mocha.describe('with admin role authentication', () => {
 		let token;
 		mocha.before(async () => {
 			let res = await chai.request(app).post('/api/login')
@@ -83,6 +85,40 @@ mocha.describe('maps API', () => {
 
 			expectMapsToBeEquivalent(res.body, 4);
 		});
+	});
+	mocha.describe('without admin role authentication', () => {
+		for (const role in User.role) {
+			if (User.role[role] !== User.role.ADMIN) {
+				mocha.it(`should reject requests from ${role}`, async () => {
+					const conn = testDB.getConnection();
+					// Insert maps
+					await new Map(undefined, 'Map 1', true, null, 'default', moment('2000-10-10'), origin, opposite, 'placeholder').insert(conn);
+					await new Map(undefined, 'Map 2', true, null, 'default', moment('2000-10-10'), origin, opposite, 'placeholder').insert(conn);
+					await new Map(undefined, 'Map 3', true, null, 'default', moment('2000-10-10'), origin, opposite, 'placeholder').insert(conn);
+					await new Map(undefined, 'Not Visible', false, null, 'default', moment('2000-10-10'), origin, opposite, 'placeholder').insert(conn);
+					// Insert user
+					const password = 'password';
+					const hashedPassword = await bcrypt.hash(password, 10);
+					const unauthorizedUser = new User(undefined, `${role}@example.com`, hashedPassword, User.role[role]);
+					await unauthorizedUser.insert(conn);
+					unauthorizedUser.password = password;
+
+					// login
+					let res = await chai.request(app).post('/api/login')
+						.send({ email: unauthorizedUser.email, password: unauthorizedUser.password });
+					expect(res).to.have.status(200);
+					const token = res.body.token;
+
+					// get maps
+					res = await chai.request(app).get('/api/maps').set('token', token);
+					expect(res).to.have.status(200);
+					expect(res).to.be.json;
+					expect(res.body).to.have.lengthOf(3);
+
+					expectMapsToBeEquivalent(res.body, 3);
+				})
+			}
+		}
 	});
 
 	mocha.it('returns details on a single map by ID', async () => {
