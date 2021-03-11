@@ -30,7 +30,8 @@ authMiddleware = (req, res, next) => {
 			} else {
 				req.decoded = decoded;
 				try {
-					await User.getByID(decoded.data); // checks if user exists in the database in case it was deleted
+					const conn = getConnection();
+					await User.getByID(decoded.data, conn); // checks if user exists in the database in case it was deleted
 					next();
 				} catch (error) {
 					res.status(401).json({ success: false, message: 'User does not exist in database.' });
