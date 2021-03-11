@@ -8,7 +8,7 @@ const User = require('../models/User');
 const { log } = require('../log');
 const validate = require('jsonschema').validate;
 const { getConnection } = require('../db');
-const requiredAuthenticator = require('./authenticator').authMiddleware;
+const { isTokenAuthorized } = require('./userRoles');
 const requiredAdmin = require('./authenticator').adminAuthMiddleware;
 const optionalAuthenticator = require('./authenticator').optionalAuthMiddleware;
 const Point = require('../models/Point');
@@ -49,7 +49,8 @@ function formatMeterForResponse(meter, loggedIn) {
 router.get('/', async (req, res) => {
 	const conn = getConnection();
 	let query;
-	if (req.hasValidAuthToken && req.decoded.role === User.role.ADMIN) {
+	const token = req.headers.token || req.body.token || req.query.token;
+	if (req.hasValidAuthToken && isTokenAuthorized(token, User.role.ADMIN)) {
 		query = Meter.getAll;
 	} else {
 		query = Meter.getDisplayable;
