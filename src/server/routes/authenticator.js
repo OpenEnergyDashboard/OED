@@ -24,12 +24,17 @@ authMiddleware = (req, res, next) => {
 	if (!validate(token, validParams).valid) {
 		res.status(403).json({ success: false, message: 'No token provided or JSON was invalid.' });
 	} else if (token) {
-		jwt.verify(token, secretToken, (err, decoded) => {
+		jwt.verify(token, secretToken, async (err, decoded) => {
 			if (err) {
 				res.status(401).json({ success: false, message: 'Failed to authenticate token.' });
 			} else {
 				req.decoded = decoded;
-				next();
+				try {
+					await User.getByID(decoded.data); // checks if user exists in the database in case it was deleted
+					next();
+				} catch (error) {
+					res.status(401).json({ success: false, message: 'User does not exist in database.' });
+				}
 			}
 		});
 	} else {
