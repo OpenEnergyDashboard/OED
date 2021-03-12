@@ -94,7 +94,7 @@ function mapStateToProps(state: State, ownProps: CompareChartContainerProps): IP
 		data: datasets,
 		layout,
 		config: {
-			displayModeBar: false
+			displayModeBar: false,
 			locales: {'es':es,'fr':fr} // makes languages available for use
 		}
 	};
