@@ -136,6 +136,7 @@ function momenting(arrayOfMoments, periodLength) {
  * @param {string} startTimeStamp - This is the start time of the data generation; its format needs to be 'YYYY-MM-DD HH:MM:SS'
  * @param {string} endTimeStamp - This is the end time of the data generation; it needs to have the format 'YYYY-MM-DD HH:MM:SS' and may not
  * be included.
+ * @param {boolean} squared - Indicates whether output sine data should be squared (if True) or not (if False).
  * Check the generateDates function for more details.
  * @param {object?} options - controls the timeStep and the periodLength, the timeStep needs to be at least 1 second.
  * @param {moment.MomentInputObject} options.timeStep - The length of time between two consecutive data points.
@@ -144,7 +145,7 @@ function momenting(arrayOfMoments, periodLength) {
  * @param {number} options.phaseShift - The amount to phase shift the generated sine wave.
  * @returns {[string, string][]} Matrix of rows representing each csv row of the form value, startTimeStamp, endTimeStamp.
  */
-function generateSineData(startTimeStamp, endTimeStamp, options = {}) {
+function generateSineData(startTimeStamp, endTimeStamp, squared, options = {}) {
 	// function generateSineData(startTimeStamp: string, endTimeStamp: string, options: GenerateSinusoidalDataOptions={}): Array<[string, string]> {
 	const chosenOptions = {
 		// const chosenOptions: GenerateSinusoidalDataOptions = {
@@ -165,7 +166,8 @@ function generateSineData(startTimeStamp, endTimeStamp, options = {}) {
 		.map(x => {
 			const result = Math.sin(Math.PI * 2 * x + chosenOptions.phaseShift);
 			const scaledResult = halfMaxAmplitude * result + halfMaxAmplitude;
-			return `${scaledResult}`;
+			// Squares each sine value if desired output is a series of sine-squared values
+			return `${squared === true ? (scaledResult * scaledResult) : scaledResult}`;
 		});
 	return (_.zip(sineValues, startDates, endDates));
 }
@@ -207,6 +209,7 @@ async function writeToCsv(data, filename = 'test.csv') {
  * Creates a csv with sine data
  * @param {string} startTimeStamp - This is the start time of the data generation; its format needs to be 'YYYY-MM-DD HH:MM:SS'
  * @param {string} endTimeStamp - This is the end time of the data generation; it needs to have the format 'YYYY-MM-DD HH:MM:SS'
+ * @param {boolean} squared - Indicates whether output sine data should be squared (if True) or not (if False).
  * and may not be included. Check the generateDates function for more details.
  * @param {object?} options - The parameters for generating a data file for OED
  * @param {moment.MomentInputObject} options.timeStep - The time step between each data point.
@@ -216,7 +219,7 @@ async function writeToCsv(data, filename = 'test.csv') {
  * @param {boolean} options.normalizeByHour - If true normalizes data by the hour due to how OED displays data.
  * @param {number} options.phaseShift - The amount to phase shift the generated sine wave.
  */
-async function generateSine(startTimeStamp, endTimeStamp, options = {}) {
+async function generateSine(startTimeStamp, endTimeStamp, squared, options = {}) {
 	// async function generateSine(startTimeStamp: string, endTimeStamp: string, options: GenerateSinusoidalDataFileOptions={}) {
 	const chosenOptions = {
 		// const chosenOptions: GenerateSinusoidalDataFileOptions = {
@@ -232,7 +235,7 @@ async function generateSine(startTimeStamp, endTimeStamp, options = {}) {
 			const scale = _momentPercentage(moment({ hour: 0 }), moment({ hour: 1 }), moment(chosenOptions.timeStep));
 			chosenOptions.maxAmplitude = chosenOptions.maxAmplitude * scale;
 		}
-		await writeToCsv(generateSineData(startTimeStamp, endTimeStamp, chosenOptions), chosenOptions.filename);
+		await writeToCsv(generateSineData(startTimeStamp, endTimeStamp, squared, chosenOptions), chosenOptions.filename);
 	} catch (error) {
 		log.error(`Failed to generate sine data for file: ${chosenOptions.filename}.`, error);
 	}
@@ -242,6 +245,7 @@ async function generateSine(startTimeStamp, endTimeStamp, options = {}) {
  * Creates a csv with cosine data
  * @param {string} startTimeStamp - This is the start time of the data generation; its format needs to be 'YYYY-MM-DD HH:MM:SS'
  * @param {string} endTimeStamp - This is the end time of the data generation; it needs to have the format 'YYYY-MM-DD HH:MM:SS'
+ * @param {boolean} squared - Indicates whether output sine data should be squared (if True) or not (if False).
  * and may not be included. Check the generateDates function for more details.
  * @param {object?} options - The parameters for generating a data file for OED.
  * @param {moment.MomentInputObject} options.timeStep - The length of time between two consecutive data points.
@@ -251,7 +255,7 @@ async function generateSine(startTimeStamp, endTimeStamp, options = {}) {
  * @param {boolean} options.normalizeByHour - If true normalizes data by the hour due to how OED displays data.
  * @param {number} options.phaseShift - The amount to phase shift the generated cosine wave.
  */
-async function generateCosine(startTimeStamp, endTimeStamp, options = {}) {
+async function generateCosine(startTimeStamp, endTimeStamp, squared, options = {}) {
 	// async function generateCosine(startTimeStamp: string, endTimeStamp: string, options: GenerateSinusoidalDataFileOptions={}) {
 	const chosenOptions = {
 		// const chosenOptions: GenerateSinusoidalDataFileOptions = {
@@ -267,7 +271,7 @@ async function generateCosine(startTimeStamp, endTimeStamp, options = {}) {
 			const scale = _momentPercentage(moment({ hour: 0 }), moment({ hour: 1 }), moment(chosenOptions.timeStep));
 			chosenOptions.maxAmplitude = chosenOptions.maxAmplitude * scale;
 		}
-		await writeToCsv(generateSineData(startTimeStamp, endTimeStamp, chosenOptions), chosenOptions.filename);
+		await writeToCsv(generateSineData(startTimeStamp, endTimeStamp, squared, chosenOptions), chosenOptions.filename);
 	} catch (error) {
 		log.error(`Failed to generate cosine data for file: ${chosenOptions.filename}.`, error);
 	}

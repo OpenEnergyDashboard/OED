@@ -84,7 +84,7 @@ mocha.describe('Generate Sine wave helper', () => {
 		const startTimeStamp = '2019-09-10 00:00:00';
 		const endTimeStamp = '2019-09-11 00:00:00';
 		const expectation = [[startTimeStamp, 1], [endTimeStamp, 1]];
-		generateSineData(startTimeStamp, endTimeStamp, { timeStep: { day: 1 } }).forEach((row, idx) => {
+		generateSineData(startTimeStamp, endTimeStamp, false, { timeStep: { day: 1 } }).forEach((row, idx) => {
 			expect(row[0]).to.equal(expectation[idx][0]);
 			expect(parseFloat(row[1])).to.be.closeTo(expectation[idx][1], 0.0001);
 		});
@@ -93,7 +93,7 @@ mocha.describe('Generate Sine wave helper', () => {
 		const startTimeStamp = '2019-09-10 00:00:00';
 		const endTimeStamp = '2019-09-11 00:00:00';
 		const expectation = [[startTimeStamp, 1], ['2019-09-10 12:00:00', 1], [endTimeStamp, 1]];
-		generateSineData(startTimeStamp, endTimeStamp, { timeStep: { hour: 12 } }).forEach((row, idx) => {
+		generateSineData(startTimeStamp, endTimeStamp, false, { timeStep: { hour: 12 } }).forEach((row, idx) => {
 			expect(row[0]).to.equal(expectation[idx][0]);
 			expect(parseFloat(row[1])).to.be.closeTo(expectation[idx][1], 0.0001);
 		});
@@ -109,7 +109,7 @@ mocha.describe('Generate Sine wave', () => {
 		const filename = 'test1.csv';
 		const timeOptions = { timeStep: { minute: 20 }, periodLength: { day: 1 } };
 		const maxAmplitude = 2;
-		const data = generateSineData(startTimeStamp, endTimeStamp, { ...timeOptions, maxAmplitude: maxAmplitude });
+		const data = generateSineData(startTimeStamp, endTimeStamp, false, { ...timeOptions, maxAmplitude: maxAmplitude });
 		await generateSine(startTimeStamp, endTimeStamp, { ...timeOptions, filename: `${__dirname}/${filename}`, maxAmplitude: maxAmplitude });
 		// https://stackabuse.com/reading-and-writing-csv-files-in-nodejs-with-node-csv/
 		const dataFromFile = await fs.readFile(`${__dirname}/${filename}`);
@@ -124,7 +124,7 @@ mocha.describe('Generate Sine wave', () => {
 		const filename = 'test2.csv';
 		const timeOptions = { timeStep: { minute: 20 }, periodLength: { day: 1 }, normalizeByHour: true };
 		const maxAmplitude = 2;
-		const data = generateSineData(startTimeStamp, endTimeStamp, { ...timeOptions, maxAmplitude: maxAmplitude })
+		const data = generateSineData(startTimeStamp, endTimeStamp, false, { ...timeOptions, maxAmplitude: maxAmplitude })
 			.map(row => {
 				let scaledValue = row[1] * 1 / 3;
 				scaledValue = scaledValue.toFixed(8); // we reduce numbers down to 8 decimals places because the rest are insignificant
@@ -151,8 +151,8 @@ mocha.describe('Generate Cosine wave', () => {
 		const filename = 'test1.csv';
 		const timeOptions = { timeStep: { minute: 20 }, periodLength: { day: 1 } };
 		const maxAmplitude = 2;
-		const data = generateSineData(startTimeStamp, endTimeStamp, { ...timeOptions, maxAmplitude: maxAmplitude, phaseShift: (Math.PI / 2) });
-		await generateCosine(startTimeStamp, endTimeStamp, { ...timeOptions, filename: `${__dirname}/${filename}`, maxAmplitude: maxAmplitude });
+		const data = generateSineData(startTimeStamp, endTimeStamp, false, { ...timeOptions, maxAmplitude: maxAmplitude, phaseShift: (Math.PI / 2) });
+		await generateCosine(startTimeStamp, endTimeStamp, false, { ...timeOptions, filename: `${__dirname}/${filename}`, maxAmplitude: maxAmplitude });
 		// https://stackabuse.com/reading-and-writing-csv-files-in-nodejs-with-node-csv/
 		const dataFromFile = await fs.readFile(`${__dirname}/${filename}`);
 		const records = await parseCsv(dataFromFile);
