@@ -10,8 +10,8 @@ import { calculateScaleFromEndpoints, meterDisplayableOnMap } from '../utils/cal
 import * as _ from 'lodash';
 import getGraphColor from '../utils/getGraphColor';
 import { TimeInterval } from '../../../common/TimeInterval';
-import * as es from 'plotly.js/lib/locales/es'
-import * as fr from 'plotly.js/lib/locales/fr'
+import * as es from 'plotly.js/lib/locales/es';
+import * as fr from 'plotly.js/lib/locales/fr';
 import { DataType } from '../types/Datasources';
 
 function mapStateToProps(state: State) {
