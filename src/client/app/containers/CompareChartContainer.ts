@@ -93,9 +93,14 @@ function mapStateToProps(state: State, ownProps: CompareChartContainerProps): IP
 		layout,
 		config: {
 			displayModeBar: false
+			locales: {'es':es,'fr':fr} // makes languages available for use
 		}
 	};
-
+	const lang = state.admin.defaultLanguage;
+	if(lang === 'fr')
+		props.config.locale = 'fr'
+	else if(lang === 'es')
+		props.config.locale = 'es'
 	return props;
 }
 
