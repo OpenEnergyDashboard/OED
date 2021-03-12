@@ -9,12 +9,9 @@ import getGraphColor from '../utils/getGraphColor';
 import { State } from '../types/redux/state';
 import PlotlyChart, { IPlotlyChartProps } from 'react-plotlyjs-ts';
 import {TimeInterval} from '../../../common/TimeInterval';
-<<<<<<< HEAD
 import * as es from 'plotly.js/lib/locales/es'
 import * as fr from 'plotly.js/lib/locales/fr'
-=======
 import { DataType } from '../types/Datasources';
->>>>>>> upstream/development
 
 function mapStateToProps(state: State) {
 	const timeInterval = state.graph.timeInterval;
