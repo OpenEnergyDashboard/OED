@@ -10,6 +10,8 @@ import { calculateScaleFromEndpoints, meterDisplayableOnMap } from '../utils/cal
 import * as _ from 'lodash';
 import getGraphColor from '../utils/getGraphColor';
 import { TimeInterval } from '../../../common/TimeInterval';
+import * as es from 'plotly.js/lib/locales/es'
+import * as fr from 'plotly.js/lib/locales/fr'
 import { DataType } from '../types/Datasources';
 
 function mapStateToProps(state: State) {
@@ -138,7 +140,15 @@ function mapStateToProps(state: State) {
 	const props: IPlotlyChartProps = {
 		data,
 		layout
+		config: {
+			locales: {'es':es,'fr':fr} // makes languages available for use
+		}
 	};
+	const lang = state.admin.defaultLanguage;
+	if(lang === 'fr')
+		props.config.locale = 'fr'
+	else if(lang === 'es')
+		props.config.locale = 'es'
 	return props;
 }
 
