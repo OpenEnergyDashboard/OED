@@ -139,7 +139,7 @@ function mapStateToProps(state: State) {
 	 */
 	const props: IPlotlyChartProps = {
 		data,
-		layout
+		layout,
 		config: {
 			locales: {'es':es,'fr':fr} // makes languages available for use
 		}
