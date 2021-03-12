@@ -10,6 +10,8 @@ import { getComparePeriodLabels, getCompareChangeSummary } from '../utils/calcul
 import { CompareEntity } from './MultiCompareChartContainer';
 import translate from '../utils/translate';
 import PlotlyChart, { IPlotlyChartProps } from 'react-plotlyjs-ts';
+import * as es from 'plotly.js/lib/locales/es';
+import * as fr from 'plotly.js/lib/locales/fr';
 
 interface CompareChartContainerProps {
 	entity: CompareEntity;
