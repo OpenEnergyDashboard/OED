@@ -92,6 +92,24 @@ function adminAuthMiddleware(action) {
 }
 
 /**
+ * Returns middleware that verifies the requested token and only proceeds if the requestor is an  Admin.
+ */
+function exportAuthMiddleware(action) {
+	return function (req, res, next) {
+		this.authMiddleware(req, res, async () => {
+			const token = req.headers.token || req.body.token || req.query.token;
+			if (await isTokenAuthorized(token, User.role.EXPORT)) {
+				next();
+			} else {
+				log.warn(`Got request to '${action}' with invalid credentials. EXPORT role is required to '${action}'.`);
+				res.status(401)
+					.json({ message: `Invalid credentials supplied. Only admins can ${action}.` });
+			}
+		})
+	}
+}
+
+/**
  * Returns middleware that only authenticates an Admin or Obvius user.
  * @param {string} action - is a phrase or word that can be prefixed by 'to' for the proper response and warning messages.
  */
@@ -162,6 +180,7 @@ optionalAuthMiddleware = (req, res, next) => {
 module.exports = {
 	adminAuthMiddleware,
 	authMiddleware,
+	exportAuthMiddleware,
 	obviusEmailAndPasswordAuthMiddleware,
 	optionalAuthMiddleware
 };
