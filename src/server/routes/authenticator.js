@@ -74,16 +74,18 @@ async function verifyCredentials(email, password, returnUser = false) {
 }
 
 /**
- * Returns middleware that verifies the requested token and only proceeds if the requestor is an  Admin.
+ * Creates middleware that verifies the requested token and only proceeds if the requestor is a particular user role or Admin.
+ * @param {string} role 
+ * @param action 
  */
-function adminAuthMiddleware(action) {
+function roleAuthMiddleware(role, action){
 	return function (req, res, next) {
 		this.authMiddleware(req, res, async () => {
 			const token = req.headers.token || req.body.token || req.query.token;
-			if (await isTokenAuthorized(token, User.role.ADMIN)) {
+			if (await isTokenAuthorized(token, role)) {
 				next();
 			} else {
-				log.warn(`Got request to '${action}' with invalid credentials. Admin role is required to '${action}'.`);
+				log.warn(`Got request to '${action}' with invalid credentials. ${role.toUpperCase()} role is required to '${action}'.`);
 				res.status(401)
 					.json({ message: `Invalid credentials supplied. Only admins can ${action}.` });
 			}
@@ -94,19 +96,15 @@ function adminAuthMiddleware(action) {
 /**
  * Returns middleware that verifies the requested token and only proceeds if the requestor is an  Admin.
  */
+function adminAuthMiddleware(action) {
+	return roleAuthMiddleware(User.role.ADMIN, action);
+}
+
+/**
+ * Returns middleware that verifies the requested token and only proceeds if the requestor is an  Admin.
+ */
 function exportAuthMiddleware(action) {
-	return function (req, res, next) {
-		this.authMiddleware(req, res, async () => {
-			const token = req.headers.token || req.body.token || req.query.token;
-			if (await isTokenAuthorized(token, User.role.EXPORT)) {
-				next();
-			} else {
-				log.warn(`Got request to '${action}' with invalid credentials. EXPORT role is required to '${action}'.`);
-				res.status(401)
-					.json({ message: `Invalid credentials supplied. Only admins can ${action}.` });
-			}
-		})
-	}
+	return roleAuthMiddleware(User.role.EXPORT, action);
 }
 
 /**
