@@ -6,7 +6,10 @@ import * as moment from 'moment';
 import { connect } from 'react-redux';
 import PlotlyChart, { IPlotlyChartProps } from 'react-plotlyjs-ts';
 import { State } from '../types/redux/state';
-import { calculateScaleFromEndpoints, meterDisplayableOnMap } from '../utils/calibration';
+import {
+	calculateScaleFromEndpoints, meterDisplayableOnMap, shift, rotate, Dimensions,
+	CartesianPoint, normalizeImageDimensions
+} from '../utils/calibration';
 import * as _ from 'lodash';
 import getGraphColor from '../utils/getGraphColor';
 import { TimeInterval } from '../../../common/TimeInterval';
@@ -24,29 +27,54 @@ function mapStateToProps(state: State) {
 				map = state.maps.editedMaps[mapID];
 			}
 		}
-		let x: number[] = [];
-		let y: number[] = [];
 		const texts: string[] = [];
 		const size: number[] = [];
 		const colors: string[] = [];
 		data = [];
 		image = (map) ? map.image : new Image();
+		// Arrays to hold the Plotly grid location (x, y) for circles to place on map.
+		const x: number[] = [];
+		const y: number[] = [];
 
 		// calculate coordinates
 		const timeInterval = state.graph.timeInterval;
 		const barDuration = (timeInterval.equals(TimeInterval.unbounded())) ? moment.duration(4, 'weeks')
 			: moment.duration(timeInterval.duration('days'), 'days');
 		if (map && map.origin && map.opposite) {
-			/**
-			 * filter meters/groups with valid gps coordinates
-			 */
-			const points: any[] = [];
+			// TODO The angle is hard coded but needs to come from the admin/DB.
+			const angle = 30.0;
+			// The size of the image.
+			const imageDimensions: Dimensions = {
+				width: image.width,
+				height: image.height
+			};
+			const imageDimensionNormalized = normalizeImageDimensions(imageDimensions);
+			// This is the origin & opposite from the calibration. It is the lower, left
+			// and upper, right corners of the user map.
+			const origin = map.origin;
+			const opposite = map.opposite;
+			// Get the GPS degrees per unit of Plotly grid for x and y. By knowing the two corners
+			// (or really any two distinct points) you can calculate this by the change in GPS over the
+			// change in x or y which is the map's width & height in this case.
+			const mapScale = calculateScaleFromEndpoints(origin, opposite, imageDimensions);
 			for (const meterID of state.graph.selectedMeters) {
 				const byMeterID = state.readings.bar.byMeterID[meterID];
 				const gps = state.meters.byMeterID[meterID].gps;
+				// filter meters with valid gps coordinates
 				if (gps !== undefined && gps !== null) {
+					// Only display items within map.
 					if (meterDisplayableOnMap({ gps, meterID }, map)) {
-						points.push(gps);
+						// Convert the gps value to the equivalent Plotly grid coordinates on user map.
+						// First, convert from GPS to grid units. Since we are doing a GPS calculation, this happens on the true north map.
+						const gridTrueNorth: CartesianPoint = { x: gps.longitude / mapScale.degreePerUnitX, y: gps.latitude / mapScale.degreePerUnitY };
+						// Rotate about center so now on the user map. Since going from true north to user map
+						// the rotation angle is negative. You don't need to shift before doing this because
+						// this started as a GPS point.
+						const gridUserShifted: CartesianPoint = rotate(-angle, gridTrueNorth);
+						// Shift origin from center to bottom, left as this is the grid in Plotly.
+						const gridUser = shift(imageDimensionNormalized, gridUserShifted, 1);
+						x.push(gridUser.x);
+						y.push(gridUser.y);
 						const readingsData = byMeterID[timeInterval.toString()][barDuration.toISOString()];
 						if (readingsData !== undefined && !readingsData.isFetching) {
 							const label = state.meters.byMeterID[meterID].name;
@@ -70,15 +98,29 @@ function mapStateToProps(state: State) {
 				}
 			}
 
-			const origin = map.origin;
-			const opposite = map.opposite;
-			const mapScale = calculateScaleFromEndpoints(origin, opposite, {
-				width: image.width,
-				height: image.height
-			});
-			x = points.map(point => (point.longitude - origin.longitude) / mapScale.degreePerUnitX);
-			y = points.map(point => (point.latitude - origin.latitude) / mapScale.degreePerUnitY);
+			// TODO Using the following if seems to have no impact on the code. It has been noticed that this function is called
+			// many times for each change. Some should look at why that is happening and why some have no items in the arrays.
+			// if (size.length > 0) {
+			// TODO The max circle diameter should come from admin/DB.
+			const maxFeatureFraction = 0.2;
+			// The width of the map should be smaller so use that.
+			// The circle size is set to area below. Thus, we need to convert from wanting a max
+			// diameter of width of the map * maxFeatureFraction to an area.
+			// Clearly 4 * (1/2)^2 = 1 but I thought this was clear.
+			const maxCircleSize = Math.PI / 4 * Math.pow(imageDimensionNormalized.width * maxFeatureFraction / 2, 2);
+			// Find the largest circle.
+			const largestCircleSize = Math.max(...size);
+			// Scale largest circle to the max size and others will be scaled to be smaller.
+			const scaling = maxCircleSize / largestCircleSize;
 
+			// Per https://plotly.com/javascript/reference/scatter/:
+			// Set the sizemode to area not diameter.
+			// Set the sizemin so a circle cannot get so small that it might disappear. Unsure the best size.
+			// Set the sizeref to scale each point to the desired area.
+			// Note all sizes are in px so have to estimate the actual size. This could be an issue but maps are currently
+			// a fixed size so not too much of an issue.
+			// Also note that the circle can go off the edge of the map. At some point it would be nice to have a border
+			// around the map to avoid this.
 			const traceOne = {
 				x,
 				y,
@@ -87,13 +129,17 @@ function mapStateToProps(state: State) {
 				marker: {
 					color: colors,
 					opacity: 0.5,
-					size
+					size,
+					sizemin: 6,
+					sizeref: scaling,
+					sizemode: 'area'
 				},
 				text: texts,
 				opacity: 1,
 				showlegend: false
 			};
 			data.push(traceOne);
+			// }
 		}
 	}
 
