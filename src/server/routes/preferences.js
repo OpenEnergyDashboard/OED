@@ -24,7 +24,7 @@ router.get('/', async (req, res) => {
 	}
 });
 
-router.use(adminAuthentication('edit preferences'));
+router.use(adminAuthentication('edit site preferences'));
 
 /**
  * Route for updating the preferences
