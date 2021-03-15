@@ -15,8 +15,5 @@ mocha.describe('version API', () => {
 		expect(res).to.have.status(200);
 		expect(res).to.be.json;
 		expect(res).to.be.string;
-		//expect(res.body).to.have.property('major', VERSION.major);
-		//expect(res.body).to.have.property('minor', VERSION.minor);
-		//expect(res.body).to.have.property('patch', VERSION.patch);
 	});
 });

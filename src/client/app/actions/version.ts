@@ -10,7 +10,7 @@ import * as t from '../types/redux/version';
 /*
 * Defines function that performs the API call to retrieve the current version of the app,
 * and dispatches the corresponding action types.
-* This function will be called on app initialization.
+* This function will be called on component initialization.
 */
 export function requestVersion(): t.RequestVersion {
 	return { type: ActionType.RequestVersion };
