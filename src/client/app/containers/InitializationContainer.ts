@@ -29,7 +29,7 @@ function mapDispatchToProps(dispatch: Dispatch) {
 		fetchGroupDetailsIfNeeded: () => dispatch(fetchGroupsDetailsIfNeeded()),
 		fetchPreferencesIfNeeded: () => dispatch(fetchPreferencesIfNeeded()),
 		fetchMapDetailsIfNeeded: () => dispatch(fetchMapsDetails()),
-		changeOptionsFromLink: (options: LinkOptions) => dispatch(changeOptionsFromLink(options)),
+		changeOptionsFromLink: (options: LinkOptions) => dispatch(changeOptionsFromLink(options))
 	};
 }
 
