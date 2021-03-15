@@ -8,7 +8,13 @@ import { FormattedMessage } from 'react-intl';
 import { hasToken } from '../../utils/token';
 import MeterViewContainer from '../../containers/meters/MeterViewContainer';
 import HeaderContainer from '../../containers/HeaderContainer';
+<<<<<<< HEAD
 import FooterContainer from '../../containers/FooterContainer';
+=======
+import FooterComponent from '../FooterComponent';
+import TooltipHelpComponent from '../TooltipHelpComponentAlternative';
+import TooltipMarkerComponent from '../TooltipMarkerComponent';
+>>>>>>> development
 
 interface MetersDetailProps {
 	meters: number[];
@@ -23,14 +29,7 @@ export default class MetersDetailComponent extends React.Component<MetersDetailP
 	}
 
 	public render() {
-		const flexContainerStyle = {
-			display: 'flex',
-			flexFlow: 'row wrap'
-		};
-
-		const flexChildStyle = {
-			marginRight: '10px'
-		};
+		const renderCreateAdminTooltip = hasToken();
 
 		const titleStyle: React.CSSProperties = {
 			textAlign: 'center'
@@ -48,12 +47,22 @@ export default class MetersDetailComponent extends React.Component<MetersDetailP
 			marginRight: '40%'
 		};
 
+		const tooltipStyle = {
+			display: 'inline',
+			fontSize: '50%',
+			tooltipMeterView: renderCreateAdminTooltip? 'help.admin.meterview' : 'help.meters.meterview'
+		};
+
 		return (
 			<div>
 				<HeaderContainer />
+				<TooltipHelpComponent page='meters' />
 				<div className='container-fluid'>
 					<h2 style={titleStyle}>
 						<FormattedMessage id='meters' />
+						<div style={tooltipStyle}>
+							<TooltipMarkerComponent page='meters' helpTextId={tooltipStyle.tooltipMeterView} />
+						</div>
 					</h2>
 					<div style={tableStyle}>
 					<Table striped bordered hover>
@@ -63,8 +72,10 @@ export default class MetersDetailComponent extends React.Component<MetersDetailP
 						<th> <FormattedMessage id='meter.name' /> </th>
 						{hasToken() && <th> <FormattedMessage id='meter.type' /> </th>}
 						{hasToken() && <th> <FormattedMessage id='meter.ip'/> </th>}
+						{hasToken() && <th> <FormattedMessage id='meter.gps'/> </th>}
 						<th> <FormattedMessage id='meter.enabled' /> </th>
 						<th> <FormattedMessage id='meter.displayable' /> </th>
+						{hasToken() && <th> <FormattedMessage id='meter.time.zone' /> </th>}
 						</tr>
 					</thead>
 					<tbody>

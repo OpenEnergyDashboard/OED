@@ -12,6 +12,8 @@ import PreferencesApi from './PreferencesApi';
 import VerificationApi from './VerificationApi';
 import CompressedReadingsApi from './CompressedReadingsApi';
 import VersionApi from './VersionApi';
+import MapsApi from './MapsApi';
+import LogsApi from './LogsApi';
 
 const apiBackend = new ApiBackend();
 
@@ -22,6 +24,8 @@ const fileProcessingApi = new FileProcessingApi(apiBackend);
 const preferencesApi = new PreferencesApi(apiBackend);
 const verificationApi = new VerificationApi(apiBackend);
 const compressedReadingsApi = new CompressedReadingsApi(apiBackend);
+const mapsApi = new MapsApi(apiBackend);
+const logsApi = new LogsApi(apiBackend);
 const versionApi = new VersionApi(apiBackend);
 
-export { groupsApi, metersApi, fileProcessingApi, preferencesApi, verificationApi, compressedReadingsApi , versionApi };
+export { groupsApi, metersApi, fileProcessingApi, preferencesApi, verificationApi, compressedReadingsApi, mapsApi, logsApi, versionApi };

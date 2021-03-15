@@ -9,6 +9,7 @@ import barReadings from './barReadings';
 import compareReadings from './compareReadings';
 import graph from './graph';
 import groups from './groups';
+import maps from './maps';
 import notifications from './notifications';
 import admin from './admin';
 import version from './version';
@@ -21,6 +22,7 @@ export default combineReducers({
 		compare: compareReadings
 	}),
 	graph,
+	maps,
 	groups,
 	notifications,
 	admin,

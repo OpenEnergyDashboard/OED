@@ -4,9 +4,8 @@
 
 import * as React from 'react';
 import Dropzone from 'react-dropzone';
-import { defineMessages, FormattedMessage, injectIntl, InjectedIntlProps } from 'react-intl';
+import { FormattedMessage, injectIntl, InjectedIntlProps } from 'react-intl';
 import { fileProcessingApi } from '../../utils/api';
-import TooltipHelpComponent from '../TooltipHelpComponent';
 import { showSuccessNotification, showErrorNotification } from '../../utils/notifications';
 import translate from '../../utils/translate';
 
@@ -69,19 +68,15 @@ class AddMetersComponent extends React.Component<AddMetersPropsWithIntl, {}> {
 			paddingBottom: '5px',
 			display: 'inline'
 		};
-		const messages = defineMessages({ tipFormat: { id: 'tip.meters.csv.format' }});
-		const { formatMessage } = this.props.intl;
 
 		return (
 			<div>
 				<p style={titleStyle}>
+
 					<FormattedMessage id='add.new.meters' />
 				</p>
-				<TooltipHelpComponent
-					tip={formatMessage(messages.tipFormat)}
-				/>
 				<Dropzone accept='text/csv, application/vnd.ms-excel,' onDrop={this.handleMeterToImport}>
-					<div>
+					<div style={{marginLeft: '10px'}}>
 						<FormattedMessage id='upload.meters.csv' />
 					</div>
 				</Dropzone>
