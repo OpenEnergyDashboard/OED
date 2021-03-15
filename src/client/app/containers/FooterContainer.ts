@@ -3,24 +3,23 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
 
 import { connect } from 'react-redux';
-import { fetchVersion } from '../actions/version'
+import { fetchVersionIfNeeded } from '../actions/version'
 import FooterComponent from '../components/FooterComponent';
 import { State } from '../types/redux/state';
 import { Dispatch } from '../types/redux/actions';
 
- /*
- * A container that does data fetching for FooterComponent and connects it to the redux store.
- */
-
+/*
+* A container that does data fetching for FooterComponent and connects it to the redux store.
+*/
 function mapStateToProps(state: State) {
 	return {
-		version: state.version.version,
+		version: state.version.version
 	};
 }
 
 function mapDispatchToProps(dispatch: Dispatch) {
 	return {
-		fetchVersion: () => dispatch(fetchVersion())
+		fetchVersionIfNeeded: () => dispatch(fetchVersionIfNeeded())
 	};
 }
 

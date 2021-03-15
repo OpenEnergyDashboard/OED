@@ -7,19 +7,19 @@ import { ActionType } from './actions';
 /*
 * Defines the action interfaces used in the corresponding reducers.
 */
- 
+
 export interface RequestVersion {
-    type: ActionType.RequestVersion;
+	type: ActionType.RequestVersion;
 }
- 
+
 export interface ReceiveVersion {
-    type: ActionType.ReceiveVersion;
-    data: string;
+	type: ActionType.ReceiveVersion;
+	data: string;
 }
- 
+
 export type VersionAction = RequestVersion | ReceiveVersion;
 
 export interface VersionState {
-    isFetching: boolean;
+	isFetching: boolean;
 	version: string;
 }

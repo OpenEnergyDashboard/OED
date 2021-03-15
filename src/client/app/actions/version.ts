@@ -12,13 +12,12 @@ import * as t from '../types/redux/version';
 * and dispatches the corresponding action types.
 * This function will be called on app initialization.
 */
- 
 export function requestVersion(): t.RequestVersion {
-    return { type: ActionType.RequestVersion };
+	return { type: ActionType.RequestVersion };
 }
- 
+
 export function receiveVersion(data: string): t.ReceiveVersion {
-    return { type: ActionType.ReceiveVersion, data };
+	return { type: ActionType.ReceiveVersion, data };
 }
 
 function shouldFetchVersion(state: State): boolean {

@@ -8,13 +8,9 @@ import { FormattedMessage } from 'react-intl';
 import { hasToken } from '../../utils/token';
 import MeterViewContainer from '../../containers/meters/MeterViewContainer';
 import HeaderContainer from '../../containers/HeaderContainer';
-<<<<<<< HEAD
 import FooterContainer from '../../containers/FooterContainer';
-=======
-import FooterComponent from '../FooterComponent';
 import TooltipHelpComponent from '../TooltipHelpComponentAlternative';
 import TooltipMarkerComponent from '../TooltipMarkerComponent';
->>>>>>> development
 
 interface MetersDetailProps {
 	meters: number[];

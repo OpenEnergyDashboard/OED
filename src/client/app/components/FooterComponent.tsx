@@ -7,19 +7,19 @@ import { FormattedMessage } from 'react-intl';
 
 interface FooterProps {
 	version: string;
-	fetchVersion(): Promise<any>;
+	fetchVersionIfNeeded(): Promise<any>;
 }
 
-// export default function FooterComponent(props: FooterProps) {
+/*
+* Footer loaded at the bottom of every webpage, which loads the site version from the redux store
+*/
 export default class FooterComponent extends React.Component<FooterProps, {}> {
 	constructor(props: FooterProps) {
 		super(props);
-		this.props.fetchVersion();
 	}
 
 	public componentWillMount() {
-		console.log("Footer component mounted");
-		this.props.fetchVersion();
+		this.props.fetchVersionIfNeeded();
 	}
 
 	public render() {
