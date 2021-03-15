@@ -14,7 +14,7 @@ import { Dispatch } from '../types/redux/actions';
 
 function mapStateToProps(state: State) {
 	return {
-		version: state.versionState.versionString,
+		version: state.version.version,
 	};
 }
 
