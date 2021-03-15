@@ -14,7 +14,7 @@ interface FooterProps {
 export default class FooterComponent extends React.Component<FooterProps, {}> {
 	constructor(props: FooterProps) {
 		super(props);
-		//this.props.fetchVersion();
+		this.props.fetchVersion();
 	}
 
 	public componentWillMount() {
@@ -53,10 +53,8 @@ export default class FooterComponent extends React.Component<FooterProps, {}> {
 						</a>
 						<FormattedMessage id='info' />
 						<FormattedMessage id='oed.version'/>
-						<div className='d-lg-none col-4 text-center'>
-							<h6>{this.props.version}</h6>
-						</div>
 					</span>
+					<span>{this.props.version}</span>
 				</footer>
 			</div>
 		);
