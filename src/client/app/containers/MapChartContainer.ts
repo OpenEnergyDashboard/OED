@@ -7,8 +7,8 @@ import { connect } from 'react-redux';
 import PlotlyChart, { IPlotlyChartProps } from 'react-plotlyjs-ts';
 import { State } from '../types/redux/state';
 import {
-	calculateScaleFromEndpoints, meterDisplayableOnMap, shift, rotate, Dimensions,
-	CartesianPoint, normalizeImageDimensions
+	calculateScaleFromEndpoints, meterDisplayableOnMap, rotate, Dimensions,
+	CartesianPoint, normalizeImageDimensions, trueNorthAngle
 } from '../utils/calibration';
 import * as _ from 'lodash';
 import getGraphColor from '../utils/getGraphColor';
@@ -41,8 +41,6 @@ function mapStateToProps(state: State) {
 		const barDuration = (timeInterval.equals(TimeInterval.unbounded())) ? moment.duration(4, 'weeks')
 			: moment.duration(timeInterval.duration('days'), 'days');
 		if (map && map.origin && map.opposite) {
-			// TODO The angle is hard coded but needs to come from the admin/DB.
-			const angle = 30.0;
 			// The size of the image.
 			const imageDimensions: Dimensions = {
 				width: image.width,
@@ -66,13 +64,16 @@ function mapStateToProps(state: State) {
 					if (meterDisplayableOnMap({ gps, meterID }, map)) {
 						// Convert the gps value to the equivalent Plotly grid coordinates on user map.
 						// First, convert from GPS to grid units. Since we are doing a GPS calculation, this happens on the true north map.
-						const gridTrueNorth: CartesianPoint = { x: gps.longitude / mapScale.degreePerUnitX, y: gps.latitude / mapScale.degreePerUnitY };
+						// Calculate how far the point is from origin and then the units for this distance from zero.
+						const gridTrueNorth: CartesianPoint = { x: (gps.longitude - origin.longitude) / mapScale.degreePerUnitX,
+							y: (gps.latitude - origin.latitude) / mapScale.degreePerUnitY };
 						// Rotate about center so now on the user map. Since going from true north to user map
 						// the rotation angle is negative. You don't need to shift before doing this because
 						// this started as a GPS point.
-						const gridUserShifted: CartesianPoint = rotate(-angle, gridTrueNorth);
+						const gridUserShifted: CartesianPoint = rotate(-trueNorthAngle.angle, gridTrueNorth);
 						// Shift origin from center to bottom, left as this is the grid in Plotly.
-						const gridUser = shift(imageDimensionNormalized, gridUserShifted, 1);
+						// const gridUser = shift(imageDimensionNormalized, gridUserShifted, 1);
+						const gridUser = gridUserShifted;
 						x.push(gridUser.x);
 						y.push(gridUser.y);
 						const readingsData = byMeterID[timeInterval.toString()][barDuration.toISOString()];

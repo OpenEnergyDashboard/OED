@@ -56,19 +56,34 @@ export function meterDisplayableOnMap(meterInfo: { gps?: GPSPoint, meterID: numb
 		logToServer('error', `Found invalid meter gps stored in database, id = ${meterInfo.meterID}`);
 	}
 
-	// TODO The angle is hard coded but needs to come from the admin/DB.
-	const angle = 30.0;
-	// return longitudeValidation && latitudeValidation;
 	// We need to map the GPS coordinates onto the user map. Logically the GPS values reside on the true north map.
 	// However, only the user map has the rectangle that outlines the map as parallel the the grid axis. Having this
 	// makes it easy to tell if a point is inside or not. Thus, the GPS value is rotated onto the user map
-	// and then the check is done.
+	// and then the check is done. This must be done for origin, opposite and the meter.
 	// Rotate by - angle (since going from true north to user map) where must reverse latitude, longitude so x, y.
-	const gpsRotated: CartesianPoint = rotate(-angle, { x: meterInfo.gps.longitude, y: meterInfo.gps.latitude });
-	// Must be above origin and below opposite to reside inside of rectangle that is the map. Again, switch for usual
-	// for x, y and latitude, longitude.
-	return (gpsRotated.y >= map.origin.latitude && gpsRotated.y <= map.opposite.latitude &&
-		gpsRotated.x >= map.origin.longitude && gpsRotated.x <= map.opposite.longitude);
+	let meterRotated: CartesianPoint = rotate(-trueNorthAngle.angle, { x: meterInfo.gps.longitude, y: meterInfo.gps.latitude });
+	let originRotated: CartesianPoint = rotate(-trueNorthAngle.angle, { x: map.origin.longitude, y: map.origin.latitude });
+	let oppositeRotated: CartesianPoint = rotate(-trueNorthAngle.angle, { x: map.opposite.longitude, y: map.opposite.latitude });
+	// Must be above origin and below opposite to reside inside of rectangle that is the map. Since all the points were
+	// reversed can just use them since mirror checks on longitude and latitude.
+	// However, the coordinates may have flipped from positive to negative so the check must be reversed. Since origin and
+	// opposite are equal distance from the center (rotation point), if one changes sign then the other should too.
+	// This is done with one check by inverting all the values. Must do for latitude (y) and longitude (x) separately.
+	// Also check for the unlikely case of it going to zero using short circuiting.
+	if (originRotated.x != 0 && meterInfo.gps.longitude / originRotated.x < 0) {
+		// The sign changed since ratio is negative.
+		meterRotated.x = - meterRotated.x;
+		originRotated.x = - originRotated.x;
+		oppositeRotated.x = - oppositeRotated.x;
+	}
+	if (originRotated.y != 0 && meterInfo.gps.latitude / originRotated.y < 0) {
+		// The sign changed since ratio is negative.
+		meterRotated.y = - meterRotated.y;
+		originRotated.y = - originRotated.y;
+		oppositeRotated.y = - oppositeRotated.y;
+	}
+	return (meterRotated.x >= originRotated.x && meterRotated.x <= oppositeRotated.x &&
+		meterRotated.y >= originRotated.y && meterRotated.y <= oppositeRotated.y);
 }
 
 export function isValidGPSInput(input: string) {
@@ -111,8 +126,6 @@ export function calculateScaleFromEndpoints(origin: GPSPoint, opposite: GPSPoint
 }
 
 export function calibrate(calibrationSet: CalibratedPoint[], imageDimensions: Dimensions) {
-	// TODO The angle is hard coded but needs to come from the admin/DB.
-	const angle = 30.0;
 	// Normalize dimensions to grid used in Plotly
 	const normalizedDimensions = normalizeImageDimensions(imageDimensions);
 	// calculate (n choose 2) scales for each pair of data points;
@@ -126,10 +139,10 @@ export function calibrate(calibrationSet: CalibratedPoint[], imageDimensions: Di
 			const p1Shifted: CartesianPoint = shift(res, calibrationSet[i].cartesian, -1);
 			const p2Shifted: CartesianPoint = shift(res, calibrationSet[j].cartesian, -1);
 			// Rotate counterclockwise by the angle.
-			const p1Rotated: CartesianPoint = rotate(angle, p1Shifted);
-			const p2Rotated: CartesianPoint = rotate(angle, p2Shifted);
-			const first: CalibratedPoint = {cartesian: p1Rotated, gps: calibrationSet[i].gps};
-			const second: CalibratedPoint = {cartesian: p2Rotated, gps: calibrationSet[j].gps};
+			const p1Rotated: CartesianPoint = rotate(trueNorthAngle.angle, p1Shifted);
+			const p2Rotated: CartesianPoint = rotate(trueNorthAngle.angle, p2Shifted);
+			const first: CalibratedPoint = { cartesian: p1Rotated, gps: calibrationSet[i].gps };
+			const second: CalibratedPoint = { cartesian: p2Rotated, gps: calibrationSet[j].gps };
 			const mapScale: MapScale = calculateScale(first, second);
 			scales.push(mapScale);
 		}
@@ -155,7 +168,7 @@ export function calibrate(calibrationSet: CalibratedPoint[], imageDimensions: Di
 	// This is done since the rotation must be about the center.
 	const pShifted: CartesianPoint = shift(normalizedDimensions, calibrationSet[0].cartesian, -1);
 	// Rotate about center so now on true north.
-	const pRotated: CartesianPoint = rotate(angle, pShifted);
+	const pRotated: CartesianPoint = rotate(trueNorthAngle.angle, pShifted);
 	// Shift other way so on true north so origin at bottom, left.
 	const pRotatedShifted = shift(normalizedDimensions, pRotated, 1);
 	// Calculate the GPS value at the origin. This is done by taking the GPS of the point
@@ -222,7 +235,7 @@ export function calibrate(calibrationSet: CalibratedPoint[], imageDimensions: Di
  * @param p2 Second point to use in calculation.
  * @returns a pair {deltaX, deltaY} representing the GPS degree per unit (x, y) on map grid.
  */
-	function calculateScale(p1: CalibratedPoint, p2: CalibratedPoint) {
+function calculateScale(p1: CalibratedPoint, p2: CalibratedPoint) {
 	// Calculate the change in GPS longitude and x point and then use to get the GPS degree
 	// change per x unit. Note that GPS latitude, longitude corresponds to (y, x) so the
 	// grid coordinates are reversed for this reason.
@@ -295,3 +308,7 @@ export function rotate(angleDeg: number, point: CartesianPoint): CartesianPoint 
 	const p: CartesianPoint = { x: xRotated, y: yRotated };
 	return p;
 }
+
+// TODO The angle is hard coded but needs to come from the admin/DB.
+// This hack lets the angle be set to use elsewhere.
+export const trueNorthAngle = { angle: -90.0 };
