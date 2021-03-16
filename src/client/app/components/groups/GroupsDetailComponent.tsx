@@ -6,7 +6,7 @@ import * as React from 'react';
 import GroupSidebarContainer from '../../containers/groups/GroupSidebarContainer';
 import GroupViewContainer from '../../containers/groups/GroupViewContainer';
 import HeaderContainer from '../../containers/HeaderContainer';
-import FooterComponent from '../FooterComponent';
+import FooterContainer from '../../containers/FooterContainer';
 import TooltipHelpComponent from '../TooltipHelpComponentAlternative';
 import TooltipMarkerComponent from '../TooltipMarkerComponent';
 import { FormattedMessage } from 'react-intl';
@@ -65,7 +65,7 @@ export default class GroupsDetailComponent extends React.Component<GroupsDetailP
 						</div>
 					</div>
 				</div>
-				<FooterComponent />
+				<FooterContainer />
 			</div>
 		);
 	}
