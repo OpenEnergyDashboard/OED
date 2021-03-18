@@ -11,5 +11,5 @@ UPDATE maps
 		origin = ${origin},
 		opposite = ${opposite},
 		map_source = ${mapSource},
-		north_angle = ${north_angle}
+		north_angle = ${northAngle}
 	WHERE id = ${id};

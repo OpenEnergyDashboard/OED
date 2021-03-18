@@ -14,9 +14,9 @@ UPDATE meters
 		note = ${note},
 		area = ${area},
 		cumulative = ${cumulative},
-		cumulative_reset = ${cumulative_reset},
-		cumulative_reset_start = ${cumulative_reset_start},
+		cumulative_reset = ${cumulativeReset},
+		cumulative_reset_start = ${cumulativeResetStart},
 		reading = ${reading},
-		start_timestamp = ${start_timestamp},
-		end_timestamp = ${end_timestamp}
+		start_timestamp = ${startTimestamp},
+		end_timestamp = ${endTimestamp}
 	WHERE id = ${id};

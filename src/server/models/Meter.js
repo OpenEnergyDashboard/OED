@@ -28,7 +28,8 @@ class Meter {
 	 * @param end_timestamp     
 	 * What details should I write in this javadoc regarding these new parameters?
 	 */
-	constructor(id, name, ipAddress, enabled, displayable, type, meterTimezone, gps = undefined, identifier = name, note, area, cumulative, cumulative_reset, cumulative_reset_start, reading, start_timestamp, end_timestamp) {
+	constructor(id, name, ipAddress, enabled, displayable, type, meterTimezone, gps = undefined, identifier = name, note, area,
+		cumulative, cumulativeReset, cumulativeResetStart, reading, startTimestamp, endTimestamp) {
 		this.id = id;
 		this.name = name;
 		this.ipAddress = ipAddress;
@@ -41,11 +42,11 @@ class Meter {
 		this.note = note;
 		this.area = area;
 		this.cumulative = cumulative;
-		this.cumulative_reset = cumulative_reset;
-		this.cumulative_reset_start = cumulative_reset_start;
+		this.cumulativeReset = cumulativeReset;
+		this.cumulativeResetStart = cumulativeResetStart;
 		this.reading = reading;
-		this.start_timestamp = start_timestamp;
-		this.end_timestamp = end_timestamp;
+		this.startTimestamp = startTimestamp;
+		this.endTimestamp = endTimestamp;
 	}
 
 	/**
