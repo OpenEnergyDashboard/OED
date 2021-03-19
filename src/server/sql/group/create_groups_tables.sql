@@ -4,7 +4,11 @@
 
 CREATE TABLE IF NOT EXISTS groups (
 	id SERIAL PRIMARY KEY NOT NULL,
-	name VARCHAR(50) UNIQUE NOT NULL CHECK (char_length(name) >= 1)
+	name VARCHAR(50) UNIQUE NOT NULL CHECK (char_length(name) >= 1),
+	displayable BOOLEAN,
+	gps POINT DEFAULT NULL,
+	note VARCHAR(500),
+	area FLOAT(8) DEFAULT NULL
 );
 
 /*

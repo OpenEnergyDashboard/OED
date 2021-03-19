@@ -11,5 +11,6 @@ UPDATE maps
 		origin = ${origin},
 		opposite = ${opposite},
 		map_source = ${mapSource},
-		north_angle = ${northAngle}
+		north_angle = ${northAngle},
+		max_circle_size_fraction = ${maxCircleSizeFraction}
 	WHERE id = ${id};

@@ -12,10 +12,18 @@ class Group {
 	/**
 	 * @param id should be undefined when creating a new group
 	 * @param name group's name
+	 * @param displayable The group is available for display
+	 * @param gps Location in format of GIS coordinates
+	 * @param note Note about the group
+	 * @param area Area of the group
 	 */
-	constructor(id, name) {
+	constructor(id, name, displayable, gps, note, area) {
 		this.id = id;
 		this.name = name;
+		this.displayable = displayable;
+		this.gps = gps;
+		this.note = note;
+		this.area = area;
 	}
 
 	/**
@@ -48,7 +56,7 @@ class Group {
 	 * @returns {Group}
 	 */
 	static mapRow(row) {
-		return new Group(row.id, row.name);
+		return new Group(row.id, row.name, row.displayable, row.gps, row.note, row.area);
 	}
 
 	/**

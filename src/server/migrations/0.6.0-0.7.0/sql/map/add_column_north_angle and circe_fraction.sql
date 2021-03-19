@@ -3,4 +3,5 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
 
 ALTER TABLE maps
-	ADD COLUMN IF NOT EXISTS north_angle FLOAT(8);
+	ADD COLUMN IF NOT EXISTS north_angle FLOAT(8),
+	ADD COLUMN IF NOT EXISTS max_circle_size_fraction FLOAT(8);

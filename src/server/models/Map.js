@@ -18,8 +18,9 @@ class Map {
 	 * @param opposite {Point} coordinates of opposite corner from origin
 	 * @param mapSource data URL of image of the map
 	 * @param northAngle stores angle between map orientation and true north
+	 * @param maxCircleSizeFraction Stores the fraction of horizontle map
 	 */
-	constructor(id, name, displayable, note, filename, modifiedDate, origin, opposite, mapSource, northAngle) {
+	constructor(id, name, displayable, note, filename, modifiedDate, origin, opposite, mapSource, northAngle, maxCircleSizeFraction) {
 		this.id = id;
 		this.name = name;
 		this.displayable = displayable;
@@ -30,6 +31,7 @@ class Map {
 		this.opposite = opposite;
 		this.mapSource = mapSource;
 		this.northAngle = northAngle;
+		this.maxCircleSizeFraction = maxCircleSizeFraction;
 	}
 
 	/**
@@ -76,7 +78,7 @@ class Map {
 	 */
 	static mapRow(row) {
 		return new Map(row.id, row.name, row.displayable, row.note, row.filename, 
-			row.modified_date, row.origin, row.opposite, row.map_source, row.north_angle);
+			row.modified_date, row.origin, row.opposite, row.map_source, row.north_angle, row.max_circle_size_fraction);
 	}
 
 	/**
