@@ -13,6 +13,7 @@ import VerificationApi from './VerificationApi';
 import CompressedReadingsApi from './CompressedReadingsApi';
 import MapsApi from './MapsApi';
 import LogsApi from './LogsApi';
+import UploadCSVApi from './UploadCSVApi';
 
 const apiBackend = new ApiBackend();
 
@@ -25,5 +26,7 @@ const verificationApi = new VerificationApi(apiBackend);
 const compressedReadingsApi = new CompressedReadingsApi(apiBackend);
 const mapsApi = new MapsApi(apiBackend);
 const logsApi = new LogsApi(apiBackend);
+const uploadCSVApi = new UploadCSVApi(apiBackend);
 
-export { groupsApi, metersApi, fileProcessingApi, preferencesApi, verificationApi, compressedReadingsApi, mapsApi, logsApi };
+export { groupsApi, metersApi, fileProcessingApi, preferencesApi, verificationApi, compressedReadingsApi, uploadCSVApi, mapsApi, logsApi };
+

@@ -1,0 +1,4 @@
+name,ipaddress,enabled,displayable,type,identifier
+XXX,123.45.6.0,FALSE,TRUE,mamac,XXX
+POPO,123.45.6.0,FALSE,TRUE,mamac,XXX
+HOPO,123.45.6.0,FALSE,TRUE,mamac,XXX

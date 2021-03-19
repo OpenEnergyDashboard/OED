@@ -29,6 +29,7 @@ const baseline = require('./routes/baseline');
 const maps = require('./routes/maps');
 const logs = require('./routes/logs');
 const obvius = require('./routes/obvius');
+const csv = require('./routes/csv');
 
 const app = express();
 
@@ -59,6 +60,7 @@ app.use('/api/maps', maps);
 app.use('/api/logs', logs);
 app.use('/api/timezones', timezones);
 app.use('/api/obvius', obvius);
+app.use('/api/csv', csv);
 app.use(express.static(path.join(__dirname, '..', 'client', 'public')));
 
 const router = express.Router();

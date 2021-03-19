@@ -11,6 +11,7 @@ import PreferencesContainer from '../../containers/admin/PreferencesContainer';
 import TooltipHelpComponent from '../TooltipHelpComponentAlternative';
 import TooltipMarkerComponent from '../TooltipMarkerComponent';
 import { FormattedMessage } from 'react-intl';
+import UploadCSVContainer from '../../containers/admin/UploadCSVContainer';
 
 /**
  * Top-level React component that controls the home page
@@ -43,10 +44,15 @@ export default function AdminComponent() {
 					<div className='col-12 col-lg-6'>
 						<PreferencesContainer />
 					</div>
-					<div className='col-12 col-lg-6'>
+					{/* <div className='col-12 col-lg-6'>
 						<AddReadingsContainer />
 						<div style={divMarginTop}>
 							<AddMetersContainer />
+						</div>
+					</div> */}
+					<div className='col-12 col-lg-6'>
+						<div style={divMarginTop}>
+							<UploadCSVContainer />
 						</div>
 					</div>
 				</div>
