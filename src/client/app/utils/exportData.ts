@@ -61,12 +61,12 @@ export default function graphExport(dataSets: ExportDataSet[], name: string) {
 export function downloadRawCSV(items: RawReadings[], defaultLanguage: string) {
 	let csvOutput = 'Label,Readings,Start Timestamp\n';
 	items.forEach(ele => {
-		let timestamp = moment(ele.startTimestamp).format("LL LTS").replace(/,/g,''); // Use Regex to remove all ','
+		const timestamp = moment(ele.startTimestamp).format('LL LTS').replace(/,/g,''); // Use Regex to remove all ','
 		csvOutput += `"${ele.label}",${ele.reading} kW,${timestamp}\n`;
 	})
 	// Use Regex to remove all ',', replace all ' ' with '-', and replace all ':' with '_'
-	const startTime = moment(items[0].startTimestamp).format("LL LTS").replace(/,/g,'').replace(/ /g, '-').replace(/:/g,'_');
-	const endTime = moment(items[items.length-1].startTimestamp).format("LL LTS").replace(/,/g,'').replace(/ /g, '-').replace(/:/g,'_');
+	const startTime = moment(items[0].startTimestamp).format('LL LTS').replace(/,/g,'').replace(/ /g, '-').replace(/:/g,'_');
+	const endTime = moment(items[items.length-1].startTimestamp).format('LL LTS').replace(/,/g,'').replace(/ /g, '-').replace(/:/g,'_');
 	const filename = `oedRawExport_line_${startTime}_${endTime}.csv`;
 	downloadCSV(csvOutput, filename);
 }

@@ -3,6 +3,6 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
 
 export enum Locales {
-    fr = 'plotly.js/lib/locales/fr',
-    es = 'plotly.js/lib/locales/es'
+	fr = 'plotly.js/lib/locales/fr',
+	es = 'plotly.js/lib/locales/es'
 }
