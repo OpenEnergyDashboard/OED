@@ -9,49 +9,49 @@ const { chai, mocha, expect, app, testDB, testUser } = require('../common');
 const User = require('../../models/User');
 const bcrypt = require('bcryptjs');
 
-mocha.describe('Preferences API', () => {
-	mocha.describe('with admin role', async () => {
-		mocha.it('should accept request to edit', async () => {
-			let res = await chai.request(app).post('/api/login')
-				.send({ email: testUser.email, password: testUser.password });
-			expect(res).to.have.status(200);
-			const token = res.body.token;
-			const preferences = {
-				displayTitle: 'title',
-				defaultChartToRender: 'line',
-				defaultBarStacking: true,
-				defaultLanguage: 'en'
-			}
-			res = await chai.request(app).post('/api/preferences').set('token', token).send({ preferences });
-			expect(res).to.have.status(200);
+mocha.describe('preferences API', () => {
+	mocha.describe('modification api', () => {
+		mocha.describe('edit endpoint', () => {
+			mocha.it('should accept requests from authorized role', async () => {
+				let res = await chai.request(app).post('/api/login')
+					.send({ email: testUser.email, password: testUser.password });
+				expect(res).to.have.status(200);
+				const token = res.body.token;
+				const preferences = {
+					displayTitle: 'title',
+					defaultChartToRender: 'line',
+					defaultBarStacking: true,
+					defaultLanguage: 'en'
+				}
+				res = await chai.request(app).post('/api/preferences').set('token', token).send({ preferences });
+				expect(res).to.have.status(200);
+			});
+
+			mocha.describe('unauthorized roles: ', () => {
+				for (const role in User.role) {
+					if (User.role[role] !== User.role.ADMIN) {
+						let token;
+						mocha.beforeEach(async () => {
+							// insert test user
+							const conn = testDB.getConnection();
+							const password = 'password';
+							const hashedPassword = await bcrypt.hash(password, 10);
+							const testUser = new User(undefined, `${role}@example.com`, hashedPassword, User.role[role]);
+							await testUser.insert(conn);
+							testUser.password = password;
+
+							// login
+							let res = await chai.request(app).post('/api/login')
+								.send({ email: testUser.email, password: testUser.password });
+							token = res.body.token;
+						});
+						mocha.it(`should reject requests from ${role}`, async () => {
+							let res = await chai.request(app).post('/api/preferences').set('token', token);
+							expect(res).to.have.status(403);
+						});
+					}
+				}
+			});
 		});
-
-	});
-	mocha.describe('without admin authorization level', async () => {
-		/**
-		 * Loop User roles for non admin users
-		 */
-		for (const role in User.role) {
-			if (User.role[role] !== User.role.ADMIN) {
-				mocha.it(`should reject requests from ${role} to edit meters`, async () => {
-					const conn = testDB.getConnection();
-					const password = 'password';
-					const hashedPassword = await bcrypt.hash(password, 10);
-					const notAdmin = new User(undefined, 'notAdmin@example.com', hashedPassword, User.role[role]);
-					await notAdmin.insert(conn);
-					notAdmin.password = password;
-
-					let res;
-					// login
-					res = await chai.request(app).post('/api/login')
-						.send({ email: notAdmin.email, password: notAdmin.password });
-					const token = res.body.token;
-					expect(res).to.have.status(200);
-					// edit
-					res = await chai.request(app).post('/api/preferences').set('token', token);
-					expect(res).to.have.status(401);
-				});
-			}
-		}
 	});
 })
