@@ -46,7 +46,7 @@ mocha.describe('meters API', () => {
 			expect(meter).to.have.property('timeZone', null);
 		}
 	});
-	mocha.describe('with authentication', () => {
+	mocha.describe('authorized role:', () => {
 		let token;
 		mocha.before(async () => {
 			let res = await chai.request(app).post('/api/login')
@@ -84,30 +84,55 @@ mocha.describe('meters API', () => {
 				expect(meter).to.have.property('timeZone', 'TZ' + (i + 1));
 			}
 		});
-		mocha.describe('without admin authorization level', async () => {
-			/**
-			 * Loop User roles for non admin users
-			 */
+		mocha.describe('unauthorized role:', () => {
 			for (const role in User.role) {
 				if (User.role[role] !== User.role.ADMIN) {
-					mocha.it(`should reject requests from ${role} to edit meters`, async () => {
+					let token;
+					mocha.beforeEach(async () => {
+						// insert test user
 						const conn = testDB.getConnection();
 						const password = 'password';
 						const hashedPassword = await bcrypt.hash(password, 10);
-						const notAdmin = new User(undefined, 'notAdmin@example.com', hashedPassword, User.role[role]);
-						await notAdmin.insert(conn);
-						notAdmin.password = password;
+						const testUser = new User(undefined, `${role}@example.com`, hashedPassword, User.role[role]);
+						await testUser.insert(conn);
+						testUser.password = password;
 
-						let res;
 						// login
-						res = await chai.request(app).post('/api/login')
-							.send({ email: notAdmin.email, password: notAdmin.password });
-						const currentToken = res.body.token;
-						expect(res).to.have.status(200);
+						let res = await chai.request(app).post('/api/login')
+							.send({ email: testUser.email, password: testUser.password });
+						token = res.body.token;
+					});
 
-						// edit
-						res = await chai.request(app).post('/api/meters/edit').set('token', currentToken);
-						expect(res).to.have.status(401);
+					mocha.it('should only return visible meters', async () => {
+						const conn = testDB.getConnection();
+						await new Meter(undefined, 'Meter 1', '1.1.1.1', true, true, Meter.type.MAMAC, 'TZ1', gps).insert(conn);
+						await new Meter(undefined, 'Meter 2', '1.1.1.1', true, true, Meter.type.MAMAC, 'TZ2', gps).insert(conn);
+						await new Meter(undefined, 'Meter 3', '1.1.1.1', true, true, Meter.type.MAMAC, 'TZ3', gps).insert(conn);
+						await new Meter(undefined, 'Not Visible', '1.1.1.1', true, false, Meter.type.MAMAC, 'TZ4', gps).insert(conn);
+
+						const res = await chai.request(app).get('/api/meters').set('token', token);
+						expect(res).to.have.status(200);
+						expect(res).to.be.json;
+						expect(res.body).to.have.lengthOf(3);
+
+						for (let i = 0; i < 3; i++) {
+							const meter = res.body[i];
+							expect(meter).to.have.property('id');
+							expect(meter).to.have.property('name', `Meter ${i + 1}`);
+							expect(meter).to.have.property('gps');
+							expect(meter.gps).to.have.property('latitude', gps.latitude);
+							expect(meter.gps).to.have.property('longitude', gps.longitude);
+							expect(meter).to.have.property('ipAddress', '1.1.1.1');
+							expect(meter).to.have.property('enabled', true);
+							expect(meter).to.have.property('displayable', true);
+							expect(meter).to.have.property('meterType', Meter.type.MAMAC);
+							expect(meter).to.have.property('timeZone', `TZ${i + 1}`);
+						}
+					});
+
+					mocha.it(`should reject requests from ${role} to edit meters`, async () => {
+						let res = await chai.request(app).post('/api/meters/edit').set('token', token);
+						expect(res).to.have.status(403);
 					});
 				}
 			}
