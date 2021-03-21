@@ -10,6 +10,7 @@ import { CartesianPoint, Dimensions, normalizeImageDimensions } from '../../util
 import { updateCurrentCartesian } from '../../actions/map';
 import store from '../../index';
 import { CalibrationSettings } from '../../types/redux/map';
+import { Locales } from '../../types/locales'
 
 function mapStateToProps(state: State) {
 	const x: number[] = [];
@@ -88,8 +89,16 @@ function mapStateToProps(state: State) {
 	const props: IPlotlyChartProps = {
 		data,
 		layout,
-		onClick: (event: plotly.PlotMouseEvent) => handlePointClick(event)
+		onClick: (event: plotly.PlotMouseEvent) => handlePointClick(event),
+		config: {
+			locales: Locales // makes languages available for use
+		}
 	};
+	const lang = state.admin.defaultLanguage;
+	if(lang === 'fr')
+		props.config.locale = 'fr'
+	else if(lang === 'es')
+		props.config.locale = 'es'
 	return props;
 }
 
