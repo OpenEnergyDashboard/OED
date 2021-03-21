@@ -86,8 +86,8 @@ function roleAuthMiddleware(role, action){
 				next();
 			} else {
 				log.warn(`Got request to '${action}' with invalid credentials. ${role.toUpperCase()} role is required to '${action}'.`);
-				res.status(401)
-					.json({ message: `Invalid credentials supplied. Only admins can ${action}.` });
+				res.status(403)
+					.json({ message: `Invalid credentials supplied. Only ${role.toUpperCase()} can ${action}.` });
 			}
 		})
 	}
