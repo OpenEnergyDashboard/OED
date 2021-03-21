@@ -145,7 +145,8 @@ function mapStateToProps(state: State) {
 		selectedMeters: state.graph.selectedMeters,
 		selectedGroups: state.graph.selectedGroups,
 		exportVals: { datasets },
-		timeInterval: state.graph.timeInterval
+		timeInterval: state.graph.timeInterval,
+		defaultLanguage: state.admin.defaultLanguage
 	};
 }
 
