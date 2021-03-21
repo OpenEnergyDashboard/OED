@@ -60,24 +60,13 @@ export default function graphExport(dataSets: ExportDataSet[], name: string) {
  */
 export function downloadRawCSV(items: RawReadings[], defaultLanguage: string) {
 	let csvOutput = 'Label,Readings,Start Timestamp\n';
-	// see https://tc39.es/ecma402/#table-datetimeformat-components for specification of the formatting options
-	let intl = new Intl.DateTimeFormat(defaultLanguage, { 
-		weekday: 	`long`, 
-		year: 		'numeric', 
-		month: 		'long', 
-		day: 		'numeric', 
-		hour: 		'numeric', 
-		minute: 	'numeric', 
-		second: 	'numeric', 
-		timeZone: 	'UTC' 
-	});
 	items.forEach(ele => {
-		let timestamp = intl.format(new Date(ele.startTimestamp)).replace(/,/g,''); // Use Regex to remove all ','
+		let timestamp = moment(ele.startTimestamp).format("LL LTS").replace(/,/g,''); // Use Regex to remove all ','
 		csvOutput += `"${ele.label}",${ele.reading} kW,${timestamp}\n`;
 	})
 	// Use Regex to remove all ',', replace all ' ' with '-', and replace all ':' with '_'
-	const startTime = intl.format(new Date(items[0].startTimestamp)).replace(/,/g,'').replace(/ /g, '-').replace(/:/g,'_');
-	const endTime = intl.format(new Date(items[items.length-1].startTimestamp)).replace(/,/g,'').replace(/ /g, '-').replace(/:/g,'_');
+	const startTime = moment(items[0].startTimestamp).format("LL LTS").replace(/,/g,'').replace(/ /g, '-').replace(/:/g,'_');
+	const endTime = moment(items[items.length-1].startTimestamp).format("LL LTS").replace(/,/g,'').replace(/ /g, '-').replace(/:/g,'_');
 	const filename = `oedRawExport_line_${startTime}_${endTime}.csv`;
 	downloadCSV(csvOutput, filename);
 }
