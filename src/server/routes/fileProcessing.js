@@ -9,7 +9,7 @@ const streamBuffers = require('stream-buffers');
 const multer = require('multer');
 const streamToDB = require('../services/loadFromCsvStream');
 const { insertMeters } = require('../services/readMamacMeters');
-const authenticator = require('./authenticator').authMiddleware;
+const csvAuthenticator = require('./authenticator').csvAuthMiddleware;
 const validate = require('jsonschema').validate;
 const { getConnection } = require('../db');
 
@@ -18,8 +18,7 @@ const router = express.Router();
 // The upload here ensures that the file is saved to server RAM rather than disk
 const upload = multer({ storage: multer.memoryStorage() });
 
-router.use(authenticator);
-router.post('/readings/:meter_id', upload.single('csvFile'), async (req, res) => {
+router.post('/readings/:meter_id', csvAuthenticator('upload readings'), upload.single('csvFile'), async (req, res) => {
 	const validParams = {
 		type: 'object',
 		maxProperties: 1,
@@ -64,7 +63,7 @@ router.post('/readings/:meter_id', upload.single('csvFile'), async (req, res) =>
 	}
 });
 
-router.post('/meters', async (req, res) => {
+router.post('/meters', csvAuthenticator('upload meters'), async (req, res) => {
 	const validBody = {
 		type: 'object',
 		maxProperties: 1,

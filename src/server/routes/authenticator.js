@@ -94,17 +94,24 @@ function roleAuthMiddleware(role, action){
 }
 
 /**
- * Returns middleware that verifies the requested token and only proceeds if the requestor is an  Admin.
+ * Returns middleware that verifies the requested token and only proceeds if the requestor is an ADMIN role.
  */
 function adminAuthMiddleware(action) {
 	return roleAuthMiddleware(User.role.ADMIN, action);
 }
 
 /**
- * Returns middleware that verifies the requested token and only proceeds if the requestor is an  Admin.
+ * Returns middleware that verifies the requested token and only proceeds if the requestor has the EXPORT role.
  */
 function exportAuthMiddleware(action) {
 	return roleAuthMiddleware(User.role.EXPORT, action);
+}
+
+/**
+ * Returns middleware that verifies the requested token and only proceeds if the requestor has the CSV role.
+ */
+function csvAuthMiddleware(action) {
+	return roleAuthMiddleware(User.role.CSV, action);
 }
 
 /**
@@ -178,6 +185,7 @@ optionalAuthMiddleware = (req, res, next) => {
 module.exports = {
 	adminAuthMiddleware,
 	authMiddleware,
+	csvAuthMiddleware,
 	exportAuthMiddleware,
 	obviusEmailAndPasswordAuthMiddleware,
 	optionalAuthMiddleware
