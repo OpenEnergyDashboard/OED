@@ -139,11 +139,7 @@ function mapStateToProps(state: State) {
 			locales: Locales // makes locales available for use
 		}
 	};
-	const lang = state.admin.defaultLanguage;
-	if(lang === 'fr')
-		props.config.locale = 'fr'
-	else if(lang === 'es')
-		props.config.locale = 'es'
+	props.config.locale = state.admin.defaultLanguage;
 	return props;
 }
 
