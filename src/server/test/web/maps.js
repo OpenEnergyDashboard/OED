@@ -64,7 +64,7 @@ mocha.describe('maps API', () => {
 
 		expectMapsToBeEquivalent(res.body, 3);
 	});
-	mocha.describe('with admin role authentication', () => {
+	mocha.describe('authorized role:', () => {
 		let token;
 		mocha.before(async () => {
 			let res = await chai.request(app).post('/api/login')
@@ -87,7 +87,7 @@ mocha.describe('maps API', () => {
 		});
 	});
 
-	mocha.describe('without authorized role', () => {
+	mocha.describe('unauthorized role:', () => {
 		for (const role in User.role) {
 			if (User.role[role] !== User.role.ADMIN) {
 				let token;
