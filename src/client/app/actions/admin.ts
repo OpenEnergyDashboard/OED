@@ -11,7 +11,7 @@ import { ActionType, Dispatch, GetState, Thunk } from '../types/redux/actions';
 import { State } from '../types/redux/state';
 import { preferencesApi } from '../utils/api';
 import translate from '../utils/translate';
-import { LanguageTypes } from '../types/i18n';
+import { LanguageTypes } from '../types/redux/i18n';
 
 
 export function updateSelectedMeter(meterID: number): t.UpdateImportMeterAction {
