@@ -7,7 +7,7 @@ const Map = require('../models/Map');
 const { log } = require('../log');
 const validate = require('jsonschema').validate;
 const { getConnection } = require('../db');
-const requiredAuthenticator = require('./authenticator').authMiddleware;
+const adminAuthenticator = require('./authenticator').adminAuthMiddleware;
 const optionalAuthenticator = require('./authenticator').optionalAuthMiddleware;
 const Point = require('../models/Point');
 const { isTokenAuthorized } = require('./userRoles');
@@ -74,9 +74,7 @@ router.get('/:map_id', async (req, res) => {
 	}
 });
 
-router.use(requiredAuthenticator);
-
-router.post('/create', async (req, res) => {
+router.post('/create', adminAuthenticator('create maps'), async (req, res) => {
 	const validMap = {
 		type: 'object',
 		required: ['name', 'modifiedDate', 'filename', 'mapSource'],
@@ -171,7 +169,7 @@ router.post('/create', async (req, res) => {
 	}
 });
 
-router.post('/edit', async (req, res) => {
+router.post('/edit', adminAuthenticator('edit maps'), async (req, res) => {
 	const validMap = {
 		type: 'object',
 		required: ['id', 'name', 'modifiedDate', 'filename', 'mapSource', 'displayable', 'note', 'origin', 'opposite'],
@@ -272,7 +270,7 @@ router.post('/edit', async (req, res) => {
 	}
 });
 
-router.post('/delete', async (req, res) => {
+router.post('/delete', adminAuthenticator('delete maps'), async (req, res) => {
 	const validParams = {
 		type: 'object',
 		maxProperties: 1,
