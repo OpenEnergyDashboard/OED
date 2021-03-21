@@ -85,13 +85,13 @@ mocha.describe('Users API', () => {
 					const conn = testDB.getConnection();
 					const password = 'password';
 					const hashedPassword = await bcrypt.hash(password, 10);
-					const testUser = new User(undefined, `${role}@example.com`, hashedPassword, User.role[role]);
-					await testUser.insert(conn);
-					testUser.password = password;
+					const unauthorizedUser = new User(undefined, `${role}@example.com`, hashedPassword, User.role[role]);
+					await unauthorizedUser.insert(conn);
+					unauthorizedUser.password = password;
 
 					// login
 					let res = await chai.request(app).post('/api/login')
-						.send({ email: testUser.email, password: testUser.password });
+						.send({ email: unauthorizedUser.email, password: unauthorizedUser.password });
 					token = res.body.token;
 				});
 				mocha.it('should reject request to retrieve users', async () => {

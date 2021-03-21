@@ -92,25 +92,26 @@ mocha.describe('groups API', () => {
 				const res = await chai.request(app).post('/api/groups/create').set('token', token + 'nope').type('json').send({});
 				expect(res).to.have.status(401);
 			});
-			mocha.describe('from unauthorized role:', () => {
+			mocha.describe('unauthorized role:', () => {
 				for (const role in User.role) {
 					if (User.role[role] !== User.role.ADMIN) {
 						mocha.it(`should reject requests from ${role}`, async () => {
-							let token, res;
+							let currentToken;
+							let res;
 							// insert test user
 							const conn = testDB.getConnection();
 							const password = 'password';
 							const hashedPassword = await bcrypt.hash(password, 10);
-							const testUser = new User(undefined, `${role}@example.com`, hashedPassword, User.role[role]);
-							await testUser.insert(conn);
-							testUser.password = password;
+							const unauthorizedUser = new User(undefined, `${role}@example.com`, hashedPassword, User.role[role]);
+							await unauthorizedUser.insert(conn);
+							unauthorizedUser.password = password;
 
 							// login
 							res = await chai.request(app).post('/api/login')
-								.send({ email: testUser.email, password: testUser.password });
-							token = res.body.token;
+								.send({ email: unauthorizedUser.email, password: unauthorizedUser.password });
+							currentToken = res.body.token;
 							// create
-							res = await chai.request(app).post('/api/groups/create').set('token', token);
+							res = await chai.request(app).post('/api/groups/create').set('token', currentToken);
 							expect(res).to.have.status(403);
 						});
 					}
@@ -151,21 +152,22 @@ mocha.describe('groups API', () => {
 				for (const role in User.role) {
 					if (User.role[role] !== User.role.ADMIN) {
 						mocha.it(`should reject requests from ${role}`, async () => {
-							let token, res;
+							let currentToken;
+							let res;
 							// insert test user
 							const conn = testDB.getConnection();
 							const password = 'password';
 							const hashedPassword = await bcrypt.hash(password, 10);
-							const testUser = new User(undefined, `${role}@example.com`, hashedPassword, User.role[role]);
-							await testUser.insert(conn);
-							testUser.password = password;
+							const unauthorizedUser = new User(undefined, `${role}@example.com`, hashedPassword, User.role[role]);
+							await unauthorizedUser.insert(conn);
+							unauthorizedUser.password = password;
 
 							// login
 							res = await chai.request(app).post('/api/login')
-								.send({ email: testUser.email, password: testUser.password });
-							token = res.body.token;
+								.send({ email: unauthorizedUser.email, password: unauthorizedUser.password });
+							currentToken = res.body.token;
 							// edit
-							res = await chai.request(app).put('/api/groups/edit').set('token', token);
+							res = await chai.request(app).put('/api/groups/edit').set('token', currentToken);
 							expect(res).to.have.status(403);
 						});
 					}
