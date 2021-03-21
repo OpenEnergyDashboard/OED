@@ -2,11 +2,7 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
 
-declare module 'plotly.js/lib/locales/es'{
-	const value: any;
-	export default value;
-}
-declare module 'plotly.js/lib/locales/fr'{
-	const value: any;
-	export default value;
+export enum Locales {
+    fr = 'plotly.js/lib/locales/fr',
+    es = 'plotly.js/lib/locales/es'
 }
