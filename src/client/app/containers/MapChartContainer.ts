@@ -10,7 +10,7 @@ import { calculateScaleFromEndpoints, meterDisplayableOnMap } from '../utils/cal
 import * as _ from 'lodash';
 import getGraphColor from '../utils/getGraphColor';
 import { TimeInterval } from '../../../common/TimeInterval';
-import { Locales } from '../types/locales';
+import Locales from '../types/locales';
 import { DataType } from '../types/Datasources';
 
 function mapStateToProps(state: State) {
@@ -140,7 +140,7 @@ function mapStateToProps(state: State) {
 		data,
 		layout,
 		config: {
-			locales: Locales // makes languages available for use
+			locales: Locales // makes locales available for use
 		}
 	};
 	const lang = state.admin.defaultLanguage;

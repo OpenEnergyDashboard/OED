@@ -8,7 +8,7 @@ import { connect } from 'react-redux';
 import getGraphColor from '../utils/getGraphColor';
 import { State } from '../types/redux/state';
 import PlotlyChart, { IPlotlyChartProps } from 'react-plotlyjs-ts';
-import { Locales } from '../types/locales';
+import Locales from '../types/locales';
 import { DataType } from '../types/Datasources';
 
 function mapStateToProps(state: State) {
@@ -136,7 +136,7 @@ function mapStateToProps(state: State) {
 		layout,
 		config: {
 			displayModeBar: false,
-			locales: Locales // makes languages available for use
+			locales: Locales // makes locales available for use
 		}
 	};
 	const lang = state.admin.defaultLanguage;
