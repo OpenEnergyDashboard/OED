@@ -17,6 +17,7 @@ interface ExportProps {
 	selectedMeters: number[];
 	exportVals: { datasets: ExportDataSet[] };
 	timeInterval: TimeInterval;
+	defaultLanguage: string;
 }
 
 export default function ExportComponent(props: ExportProps) {
@@ -37,7 +38,7 @@ export default function ExportComponent(props: ExportProps) {
 				}
 			}
 		}
-		const startTimeString = startTime.format('YYYY-MMM-DD-dddd');
+		const startTimeString = startTime.format('dddd, LL');
 
 		// Determine and format the last time in the dataset
 		let endTime = moment(compressedData[0].exportVals[compressedData[0].exportVals.length - 1].x);
@@ -49,8 +50,7 @@ export default function ExportComponent(props: ExportProps) {
 				}
 			}
 		}
-		const endTimeString = endTime.format('YYYY-MMM-DD-dddd');
-
+		const endTimeString = endTime.format('dddd, LL');
 		const chartName = compressedData[0].currentChart;
 		const name = `oedExport_${chartName}_${startTimeString}_to_${endTimeString}.csv`;
 		graphExport(compressedData, name);
@@ -62,7 +62,7 @@ export default function ExportComponent(props: ExportProps) {
 		const count = await metersApi.lineReadingsCount(props.selectedMeters, props.timeInterval);
 		graphRawExport(count, async () => {
 			const lineReading = await metersApi.rawLineReadings(props.selectedMeters, props.timeInterval);
-			downloadRawCSV(lineReading);
+			downloadRawCSV(lineReading,props.defaultLanguage);
 		});
 	}
 
