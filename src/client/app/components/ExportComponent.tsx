@@ -38,7 +38,6 @@ export default function ExportComponent(props: ExportProps) {
 				}
 			}
 		}
-		const startTimeString = startTime.format('dddd, LL');
 
 		// Determine and format the last time in the dataset
 		let endTime = moment(compressedData[0].exportVals[compressedData[0].exportVals.length - 1].x);
@@ -50,7 +49,9 @@ export default function ExportComponent(props: ExportProps) {
 				}
 			}
 		}
-		const endTimeString = endTime.format('dddd, LL');
+		// Use regex to remove spaces and colons from filename
+		const startTimeString = startTime.utc().format('LL_LTS').replace(/\s/g,'-').replace(/:/g,'-');
+		const endTimeString = endTime.utc().format('LL_LTS').replace(/\s/g,'-').replace(/:/g,'-');
 		const chartName = compressedData[0].currentChart;
 		const name = `oedExport_${chartName}_${startTimeString}_to_${endTimeString}.csv`;
 		graphExport(compressedData, name);

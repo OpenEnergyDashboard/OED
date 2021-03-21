@@ -19,8 +19,8 @@ function convertToCSV(items: ExportDataSet[]) {
 		const label = set.label;
 		data.forEach(reading => {
 			const info = reading.y;
-			const startTimeStamp = moment(reading.x).utc().format('dddd MMM DD YYYY hh:mm a');
-			csvOutput += `"${label}",${info} kW,${startTimeStamp}\n`; // this assumes that meter readings are in kW
+			const startTimeStamp = moment(reading.x).utc().format('LL LTS');
+			csvOutput += `"${label}",${info},${startTimeStamp}\n`; // TODO: add column for units
 		});
 	});
 	return csvOutput;
@@ -61,13 +61,13 @@ export default function graphExport(dataSets: ExportDataSet[], name: string) {
 export function downloadRawCSV(items: RawReadings[], defaultLanguage: string) {
 	let csvOutput = 'Label,Readings,Start Timestamp\n';
 	items.forEach(ele => {
-		const timestamp = moment(ele.startTimestamp).format('LL LTS').replace(/,/g,''); // Use Regex to remove all ','
-		csvOutput += `"${ele.label}",${ele.reading} kW,${timestamp}\n`;
+		const timestamp = moment(ele.startTimestamp).utc().format('LL LTS'); // this date format doesn't use commas
+		csvOutput += `"${ele.label}",${ele.reading},${timestamp}\n`; // TODO: add column for units
 	})
-	// Use Regex to remove all ',', replace all ' ' with '-', and replace all ':' with '_'
-	const startTime = moment(items[0].startTimestamp).format('LL LTS').replace(/,/g,'').replace(/ /g, '-').replace(/:/g,'_');
-	const endTime = moment(items[items.length-1].startTimestamp).format('LL LTS').replace(/,/g,'').replace(/ /g, '-').replace(/:/g,'_');
-	const filename = `oedRawExport_line_${startTime}_${endTime}.csv`;
+	// Use regex to remove spaces and colons from filename
+	const startTime = moment(items[0].startTimestamp).utc().format('LL_LTS').replace(/\s/g,'-').replace(/:/g,'-');
+	const endTime = moment(items[items.length-1].startTimestamp).utc().format('LL_LTS').replace(/\s/g,'-').replace(/:/g,'-');
+	const filename = `oedRawExport_line_${startTime}_to_${endTime}.csv`;
 	downloadCSV(csvOutput, filename);
 }
 
