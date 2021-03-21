@@ -9,7 +9,7 @@ import { SelectionType } from '../../containers/groups/DatasourceBoxContainer';
 import { NamedIDItem } from '../../types/items';
 import { CreateNewBlankGroupAction, EditGroupNameAction, ChangeDisplayModeAction } from '../../types/redux/groups';
 import HeaderContainer from '../../containers/HeaderContainer';
-import FooterComponent from '../FooterComponent';
+import FooterContainer from '../../containers/FooterContainer';
 import { browserHistory } from '../../utils/history';
 import { FormattedMessage, InjectedIntlProps, injectIntl, defineMessages } from 'react-intl';
 import TooltipHelpComponent from '../TooltipHelpComponentAlternative';
@@ -93,7 +93,7 @@ class CreateGroupComponent extends React.Component<CreateGroupPropsWithIntl, {}>
 						</div>
 					</div>
 				</div>
-				<FooterComponent />
+				<FooterContainer />
 			</div>
 		);
 	}
