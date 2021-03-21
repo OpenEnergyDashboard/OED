@@ -56,14 +56,28 @@ export default function graphExport(dataSets: ExportDataSet[], name: string) {
 /**
  * Function to export raw data that we request on button click
  * @param items list of readings directly from the database
+ * @param defaultLanguage the preferred localization to use for date/time formatting
  */
-export function downloadRawCSV(items: RawReadings[]) {
+export function downloadRawCSV(items: RawReadings[], defaultLanguage: string) {
 	let csvOutput = 'Label,Readings,Start Timestamp\n';
+	// see https://tc39.es/ecma402/#table-datetimeformat-components for specification of the formatting options
+	let intl = new Intl.DateTimeFormat(defaultLanguage, { 
+		weekday: 	`long`, 
+		year: 		'numeric', 
+		month: 		'long', 
+		day: 		'numeric', 
+		hour: 		'numeric', 
+		minute: 	'numeric', 
+		second: 	'numeric', 
+		timeZone: 	'UTC' 
+	});
 	items.forEach(ele => {
-		csvOutput += `"${ele.label}",${ele.reading} kW,${ele.startTimestamp}\n`
+		let timestamp = intl.format(new Date(ele.startTimestamp)).replace(/,/g,''); // Use Regex to remove all ','
+		csvOutput += `"${ele.label}",${ele.reading} kW,${timestamp}\n`;
 	})
-	const startTime = new Date(items[0].startTimestamp).toDateString().replace(/ /g, '-'); // Use Regex to replace all ' ' with '-'
-	const endTime = new Date(items[items.length - 1].startTimestamp).toDateString().replace(/ /g, '-');
+	// Use Regex to remove all ',', replace all ' ' with '-', and replace all ':' with '_'
+	const startTime = intl.format(new Date(items[0].startTimestamp)).replace(/,/g,'').replace(/ /g, '-').replace(/:/g,'_');
+	const endTime = intl.format(new Date(items[items.length-1].startTimestamp)).replace(/,/g,'').replace(/ /g, '-').replace(/:/g,'_');
 	const filename = `oedRawExport_line_${startTime}_${endTime}.csv`;
 	downloadCSV(csvOutput, filename);
 }
