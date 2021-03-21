@@ -22,17 +22,16 @@ const { generateSine, generateCosine } = require('./generateTestingData');
  * @param {number} [amplitude] - desired amplitude of the sinusoidal test data.
  */
 async function generateSineTestingData(frequency = 15, amplitude) {
-	adjustedAmp = amplitude * (frequency / 60);
 	const startDate = '2020-01-01 00:00:00';
 	const endDate = '2021-12-31 23:59:59';
 	const options = {
 		timeStep: { minute: frequency },
-		periodLength: { day: 1 }, // Wave period set to 1 day (See explanation below).
-		maxAmplitude: adjustedAmp, // Since the data points are spaced every 'frequency' minutes ('frequency'/60 hours), the maxAmplitude is set to
-		// adjustedAmp so that the maximum *graphed* energy value will be adjustedAmp / (frequency / 60) = 3 * (frequency / 60) / (frequency / 60) = 3 kWh.
-		filename: `${__dirname}/../test/db/data/automatedTests/${frequency}FreqSineTestData.csv`
+		periodLength: { day: 45 }, // Wave period set to 45 days.
+		maxAmplitude: amplitude,
+		filename: `${__dirname}/../test/db/data/automatedTests/${frequency}FreqSineTestData.csv`,
+		normalizeByHour: true
 	};
-	await generateSine(startDate, endDate, false, options);
+	await generateSine(startDate, endDate, options);
 }
 
 
@@ -43,17 +42,17 @@ async function generateSineTestingData(frequency = 15, amplitude) {
  * @param {number} [amplitude] - desired amplitude of the squared sinusoidal test data.
  */
 async function generateSineSquaredTestingData(frequency = 15, amplitude) {
-	adjustedAmp = amplitude * (frequency / 60);
 	const startDate = '2020-01-01 00:00:00';
 	const endDate = '2021-12-31 23:59:59';
 	const options = {
 		timeStep: { minute: frequency },
-		periodLength: { day: 1 }, // Wave period set to 1 day (See explanation below).
-		maxAmplitude: adjustedAmp, // Since the data points are spaced every 'frequency' minutes ('frequency'/60 hours), the maxAmplitude is set to
-		// adjustedAmp so that the maximum *graphed* energy value will be adjustedAmp / (frequency / 60) = 3 * (frequency / 60) / (frequency / 60) = 3 kWh.
-		filename: `${__dirname}/../test/db/data/automatedTests/${frequency}FreqSineSquaredTestData.csv`
+		periodLength: { day: 45 }, // Wave period set to 45 days.
+		maxAmplitude: amplitude,
+		filename: `${__dirname}/../test/db/data/automatedTests/${frequency}FreqSineSquaredTestData.csv`,
+		normalizeByHour: true,
+		squared: true // Option set to true because want sine *squared* data.
 	};
-	await generateSine(startDate, endDate, true, options); // Third parameter set to true because want sine *squared* data.
+	await generateSine(startDate, endDate, options); 
 }
 
 
@@ -64,17 +63,16 @@ async function generateSineSquaredTestingData(frequency = 15, amplitude) {
  * @param {number} [amplitude] - desired amplitude of the cosinusoidal test data.
  */
 async function generateCosineTestingData(frequency = 15, amplitude) {
-	adjustedAmp = amplitude * (frequency / 60);
 	const startDate = '2020-01-01 00:00:00';
 	const endDate = '2021-12-31 23:59:59';
 	const options = {
 		timeStep: { minute: frequency },
-		periodLength: { day: 1 }, // Wave period set to 1 day (See explanation below).
-		maxAmplitude: adjustedAmp, // Since the data points are spaced every 'frequency' minutes ('frequency'/60 hours), the maxAmplitude is set to
-		// adjustedAmp so that the maximum *graphed* energy value will be adjustedAmp / (frequency / 60) = 3 * (frequency / 60) / (frequency / 60) = 3 kWh.
-		filename: `${__dirname}/../test/db/data/automatedTests/${frequency}FreqCosineTestData.csv`
+		periodLength: { day: 45 }, // Wave period set to 45 days.
+		maxAmplitude: amplitude,
+		filename: `${__dirname}/../test/db/data/automatedTests/${frequency}FreqCosineTestData.csv`,
+		normalizeByHour: true
 	};
-	await generateCosine(startDate, endDate, false, options);
+	await generateCosine(startDate, endDate, options);
 }
 
 
@@ -85,28 +83,26 @@ async function generateCosineTestingData(frequency = 15, amplitude) {
  * @param {number} [amplitude] - desired amplitude of the squared cosinusoidal test data.
  */
 async function generateCosineSquaredTestingData(frequency = 15, amplitude) {
-	adjustedAmp = amplitude * (frequency / 60);
 	const startDate = '2020-01-01 00:00:00';
 	const endDate = '2021-12-31 23:59:59';
 	const options = {
 		timeStep: { minute: frequency },
-		periodLength: { day: 1 }, // Wave period set to 1 day (See explanation below).
-		maxAmplitude: adjustedAmp, // Since the data points are spaced every 'frequency' minutes ('frequency'/60 hours), the maxAmplitude is set to
-		// adjustedAmp so that the maximum *graphed* energy value will be adjustedAmp / (frequency / 60) = 3 * (frequency / 60) / (frequency / 60) = 3 kWh.
-		filename: `${__dirname}/../test/db/data/automatedTests/${frequency}FreqCosineSquaredTestData.csv`
+		periodLength: { day: 45 }, // Wave period set to 45 days.
+		maxAmplitude: amplitude,
+		filename: `${__dirname}/../test/db/data/automatedTests/${frequency}FreqCosineSquaredTestData.csv`,
+		normalizeByHour: true,
+		squared: true // Option set to true because want cosine *squared* data.
 	};
-	await generateCosine(startDate, endDate, true, options); // Third parameter set to true because want cosine *squared* data.
+	await generateCosine(startDate, endDate, options);
 }
 
 
 
 /**
  * The next five functions -- generateFourDayTestingData(), generateFourHourTestingData(), generateTwentyThreeMinuteTestingData(),
- * generateFifteenMinuteTestingData(), and generateOneMinuteTestingData() -- have the following specifications:
- *  - periodLength (the period of the cycles) is set to 1 day so that over 12 months (360 days), the data consists of 360 sinusoidal cycles.
- *  - maxAmplitude (the amplitude of the cycles) is set differently for each function so that the maximum amplitude of the *graphed* data is 
- *    always 3 kWh.
- *
+ * generateFifteenMinuteTestingData(), and generateOneMinuteTestingData() -- have no parameters as they generate one year of data at
+ * pre-specified intervals. All have wave periods of 45 minutes for easy visual display.
+ * 
  * Please see the documentation for 'generateSine()' under 'generateTestingData.js' for more details.
  */
 
@@ -120,13 +116,13 @@ async function generateFourDayTestingData() {
 	const startDate = '2020-01-01 00:00:00';
 	const endDate = '2020-12-31 23:59:59';
 	const options = {
-		timeStep: { day: 4 }, // Data point intervals set to 4 days.
-		periodLength: { day: 1 },
-		maxAmplitude: 288, // Since the data points are spaced every 96 hours (4 days), the maxAmplitude is set to 288 so that the maximum
-		// *graphed* energy value will be 288/96 = 3 kWh.
-		filename: `${__dirname}/../test/db/data/automatedTests/fourDayFreqTestData.csv` // Data saved in 'fourDayFreqTestData.csv' file.
+		timeStep: { minute: 5760 }, // Data point intervals set to 5760 minutes = 96 hours = 4 days.
+		periodLength: { day: 45 },
+		maxAmplitude: 3,
+		filename: `${__dirname}/../test/db/data/automatedTests/fourDayFreqTestData.csv`, // Data saved in 'fourDayFreqTestData.csv' file.
+		normalizeByHour: true
 	};
-	await generateSine(startDate, endDate, false, options);
+	await generateSine(startDate, endDate, options);
 }
 
 
@@ -139,13 +135,13 @@ async function generateFourHourTestingData() {
 	const startDate = '2020-01-01 00:00:00';
 	const endDate = '2020-12-31 23:59:59';
 	const options = {
-		timeStep: { hour: 4 }, // Data point intervals set to 4 hours.
-		periodLength: { day: 1 },
-		maxAmplitude: 12, // Since the data points are spaced every 4 hours, the maxAmplitude is set to 12 so that the maximum *graphed*
-		// energy value will be 12/4 = 3 kWh.
-		filename: `${__dirname}/../test/db/data/automatedTests/fourHourFreqTestData.csv` // Data saved in 'fourHourFreqTestData.csv' file.
+		timeStep: { minute: 240 }, // Data point intervals set to 240 minutes = 4 hours.
+		periodLength: { day: 45 },
+		maxAmplitude: 3,
+		filename: `${__dirname}/../test/db/data/automatedTests/fourHourFreqTestData.csv`, // Data saved in 'fourHourFreqTestData.csv' file
+		normalizeByHour: true
 	};
-	await generateSine(startDate, endDate, false, options);
+	await generateSine(startDate, endDate, options);
 }
 
 
@@ -159,12 +155,13 @@ async function generateTwentyThreeMinuteTestingData() {
 	const endDate = '2020-12-31 23:59:59';
 	const options = {
 		timeStep: { minute: 23 }, // Data point intervals set to 23 minutes.
-		periodLength: { day: 1 },
-		maxAmplitude: 1.15, // Since the data points are spaced every 23 minutes (0.383 hours), the maxAmplitude is set to 1.15 so that the maximum
-		// *graphed* energy value will be 1.15/0.383 = 3 kWh.
-		filename: `${__dirname}/../test/db/data/automatedTests/twentyThreeMinuteFreqTestData.csv` // Data saved in 'twentyThreeMinuteFreqTestData.csv' file.
+		periodLength: { day: 45 },
+		maxAmplitude: 3,
+		filename: `${__dirname}/../test/db/data/automatedTests/twentyThreeMinuteFreqTestData.csv`, /* Data saved in
+		'twentyThreeMinuteFreqTestData.csv' file. */
+		normalizeByHour: true
 	};
-	await generateSine(startDate, endDate, false, options);
+	await generateSine(startDate, endDate, options);
 }
 
 
@@ -178,12 +175,12 @@ async function generateFifteenMinuteTestingData() {
 	const endDate = '2020-12-31 23:59:59';
 	const options = {
 		timeStep: { minute: 15 }, // Data point intervals set to 15 minutes.
-		periodLength: { day: 1 },
-		maxAmplitude: 0.75, // Since the data points are spaced every 15 minutes (0.25 hours), the maxAmplitude is set to 0.75 so that the maximum
-		// *graphed* energy value will be 0.75/0.25 = 3 kWh.
-		filename: `${__dirname}/../test/db/data/automatedTests/fifteenMinuteFreqTestData.csv` // Data saved in 'fifteenMinuteFreqTestData.csv' file.
+		periodLength: { day: 45 },
+		maxAmplitude: 3,
+		filename: `${__dirname}/../test/db/data/automatedTests/fifteenMinuteFreqTestData.csv`, // Data saved in 'fifteenMinuteFreqTestData.csv' file.
+		normalizeByHour: true
 	};
-	await generateSine(startDate, endDate, false, options);
+	await generateSine(startDate, endDate, options);
 }
 
 
@@ -197,12 +194,12 @@ async function generateOneMinuteTestingData() {
 	const endDate = '2020-12-31 23:59:59';
 	const options = {
 		timeStep: { minute: 1 }, // Data point intervals set to 1 minute.
-		periodLength: { day: 1 },
-		maxAmplitude: 0.05, // Since the data points are spaced every minute (0.0167 hours), the maxAmplitude is set to 0.05 so that the maximum
-		// *graphed* energy value will be 0.05/0.0167 = 3 kWh.
-		filename: `${__dirname}/../test/db/data/automatedTests/oneMinuteFreqTestData.csv` // Data saved in 'oneMinuteFreqTestData.csv' file.
+		periodLength: { day: 45 },
+		maxAmplitude: 3,
+		filename: `${__dirname}/../test/db/data/automatedTests/oneMinuteFreqTestData.csv`, // Data saved in 'oneMinuteFreqTestData.csv' file.
+		normalizeByHour: true
 	};
-	await generateSine(startDate, endDate, false, options);
+	await generateSine(startDate, endDate, options);
 }
 
 
@@ -213,32 +210,32 @@ async function generateOneMinuteTestingData() {
  */
 function generateTestingData() {
 
-// Generates 1 year of sinusoidal data with data points at 4-day intervals
-generateFourDayTestingData();
+	// Generates 1 year of sinusoidal data with data points at 4-day intervals
+	generateFourDayTestingData();
 
-// Generates 1 year of sinusoidal data with data points at 4-hour intervals
-generateFourHourTestingData();
+	// Generates 1 year of sinusoidal data with data points at 4-hour intervals
+	generateFourHourTestingData();
 
-// Generates 1 year of sinusoidal data with data points at 23-minute intervals
-generateTwentyThreeMinuteTestingData();
+	// Generates 1 year of sinusoidal data with data points at 23-minute intervals
+	generateTwentyThreeMinuteTestingData();
 
-// Generates 1 year of sinusoidal data with data points at 15-minute intervals
-generateFifteenMinuteTestingData();
+	// Generates 1 year of sinusoidal data with data points at 15-minute intervals
+	generateFifteenMinuteTestingData();
 
-// Generates 1 year of sinusoidal data with data points at 1-minute intervals
-generateOneMinuteTestingData();
+	// Generates 1 year of sinusoidal data with data points at 1-minute intervals
+	generateOneMinuteTestingData();
 
-// Generates 2 years of sinusoidal data with an amplitude of 2 and with data points at 15-minute intervals.
-generateSineTestingData(15, 2);
+	// Generates 2 years of sinusoidal data with an amplitude of 2 and with data points at 15-minute intervals.
+	generateSineTestingData(15, 2);
 
-// Generates 2 years of cosinusoidal data with an amplitude of 3 and with data points at 23-minute intervals.
-generateCosineTestingData(23, 3);
+	// Generates 2 years of cosinusoidal data with an amplitude of 3 and with data points at 23-minute intervals.
+	generateCosineTestingData(23, 3);
 
-// Generates 2 years of *squared* sinusoidal data with an amplitude of 2 and with data points at 15-minute intervals.
-generateSineSquaredTestingData(15, 2);
+	// Generates 2 years of *squared* sinusoidal data with an amplitude of 2 and with data points at 15-minute intervals.
+	generateSineSquaredTestingData(15, 2);
 
-// Generates 2 years of *squared* cosinusoidal data with an amplitude of 3 and with data points at 23-minute intervals.
-generateCosineSquaredTestingData(23, 3);
+	// Generates 2 years of *squared* cosinusoidal data with an amplitude of 3 and with data points at 23-minute intervals.
+	generateCosineSquaredTestingData(23, 3);
 }
 
 
