@@ -15,7 +15,7 @@ const router = express.Router();
 /**
  * Route for getting all users
  */
-router.get('/', async (req, res) => {
+router.get('/', adminAuthMiddleware('get all users'), async (req, res) => {
 	const conn = getConnection();
 	try {
 		const rows = await User.getAll(conn);
@@ -29,7 +29,7 @@ router.get('/', async (req, res) => {
  * Route for getting a specific user by ID
  * @param user_id
  */
-router.get('/:user_id', async (req, res) => {
+router.get('/:user_id', adminAuthMiddleware('get one user'), async (req, res) => {
 	const validParams = {
 		type: 'object',
 		maxProperties: 1,

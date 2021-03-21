@@ -8,9 +8,8 @@
 const { chai, mocha, expect, app, testDB, testUser } = require('../common');
 const User = require('../../models/User');
 const bcrypt = require('bcryptjs');
-
 mocha.describe('Users API', () => {
-	mocha.describe('with authentication', () => {
+	mocha.describe('authorized role:', () => {
 		let token;
 		mocha.before(async () => {
 			let res = await chai.request(app).post('/api/login')
@@ -76,37 +75,45 @@ mocha.describe('Users API', () => {
 			expect((await User.getAll(conn)).filter(user => user === csv.email)).to.have.length(0);
 		});
 	});
-	mocha.describe('without admin authorization level', async () => {
-		/**
-		 * Loop User roles for non admin users
-		 */
+
+	mocha.describe('unauthorized role:', () => {
 		for (const role in User.role) {
 			if (User.role[role] !== User.role.ADMIN) {
-				mocha.it(`should reject requests from ${role}`, async () => {
+				let token;
+				mocha.beforeEach(async () => {
+					// insert test user
 					const conn = testDB.getConnection();
 					const password = 'password';
 					const hashedPassword = await bcrypt.hash(password, 10);
-					const notAdmin = new User(undefined, 'notAdmin@example.com', hashedPassword, User.role[role]);
-					await notAdmin.insert(conn);
-					notAdmin.password = password;
+					const testUser = new User(undefined, `${role}@example.com`, hashedPassword, User.role[role]);
+					await testUser.insert(conn);
+					testUser.password = password;
 
-					let res;
 					// login
-					res = await chai.request(app).post('/api/login')
-						.send({ email: notAdmin.email, password: notAdmin.password });
-					const token = res.body.token;
-					expect(res).to.have.status(200);
-
-					// delete
-					res = await chai.request(app).post('/api/users/delete').set('token', token);
-					expect(res).to.have.status(401);
-					// edit
-					res = await chai.request(app).post('/api/users/edit').set('token', token);
-					expect(res).to.have.status(401);
-
+					let res = await chai.request(app).post('/api/login')
+						.send({ email: testUser.email, password: testUser.password });
+					token = res.body.token;
+				});
+				mocha.it('should reject request to retrieve users', async () => {
+					const res = await chai.request(app).get('/api/users').set('token', token);
+					expect(res).to.have.status(403);
+				});
+				mocha.it(`should reject requests from ${role} to create users`, async () => {
 					// create
-					res = await chai.request(app).post('/api/users/').set('token', token);
-					expect(res).to.have.status(401);
+					const res = await chai.request(app).post('/api/users/').set('token', token);
+					expect(res).to.have.status(403);
+				});
+
+				mocha.it(`should reject requests from ${role} to edit users`, async () => {
+					// edit
+					let res = await chai.request(app).post('/api/users/edit').set('token', token);
+					expect(res).to.have.status(403);
+				});
+
+				mocha.it(`should reject requests from ${role} to delete users`, async () => {
+					// delete
+					const res = await chai.request(app).post('/api/users/delete').set('token', token);
+					expect(res).to.have.status(403);
 				});
 			}
 		}
