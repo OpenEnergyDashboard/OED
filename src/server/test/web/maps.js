@@ -86,10 +86,41 @@ mocha.describe('maps API', () => {
 			expectMapsToBeEquivalent(res.body, 4);
 		});
 	});
-	mocha.describe('without admin role authentication', () => {
+
+	mocha.describe('without authorized role', () => {
 		for (const role in User.role) {
 			if (User.role[role] !== User.role.ADMIN) {
-				mocha.it(`should reject requests from ${role}`, async () => {
+				let token;
+				mocha.beforeEach(async () => {
+					// insert test user
+					const conn = testDB.getConnection();
+					const password = 'password';
+					const hashedPassword = await bcrypt.hash(password, 10);
+					const testUser = new User(undefined, `${role}@example.com`, hashedPassword, User.role[role]);
+					await testUser.insert(conn);
+					testUser.password = password;
+
+					// login
+					let res = await chai.request(app).post('/api/login')
+						.send({ email: testUser.email, password: testUser.password });
+					token = res.body.token;
+				});
+				mocha.it(`should reject requests from ${role} to create maps`, async () => {
+					// get maps
+					let res = await chai.request(app).post('/api/maps/create').set('token', token);
+					expect(res).to.have.status(403);
+				});
+
+				mocha.it(`should reject requests from ${role} to edit maps`, async () => {
+					let res = await chai.request(app).post('/api/maps/edit').set('token', token);
+					expect(res).to.have.status(403);
+				});
+
+				mocha.it(`should reject requests from ${role} to delete maps`, async () => {
+					let res = await chai.request(app).post('/api/maps/delete').set('token', token);
+					expect(res).to.have.status(403);
+				});
+				mocha.it(`should only show visible maps to ${role}`, async () => {
 					const conn = testDB.getConnection();
 					// Insert maps
 					await new Map(undefined, 'Map 1', true, null, 'default', moment('2000-10-10'), origin, opposite, 'placeholder').insert(conn);
@@ -103,20 +134,14 @@ mocha.describe('maps API', () => {
 					await unauthorizedUser.insert(conn);
 					unauthorizedUser.password = password;
 
-					// login
-					let res = await chai.request(app).post('/api/login')
-						.send({ email: unauthorizedUser.email, password: unauthorizedUser.password });
-					expect(res).to.have.status(200);
-					const token = res.body.token;
-
 					// get maps
-					res = await chai.request(app).get('/api/maps').set('token', token);
+					let res = await chai.request(app).get('/api/maps').set('token', token);
 					expect(res).to.have.status(200);
 					expect(res).to.be.json;
 					expect(res.body).to.have.lengthOf(3);
-
-					expectMapsToBeEquivalent(res.body, 3);
-				})
+					const allMapsAreDisplayable = res.body.reduce((acc, map) => acc && map.displayable, true);
+					expect(allMapsAreDisplayable).to.be.true;
+				});
 			}
 		}
 	});
