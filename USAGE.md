@@ -43,6 +43,14 @@ If you want to install OED so you can contribute code, see the "Development" sec
 you are setting up OED in order to gather data from power meters and display it, see the
 "Production" section.
 
+### On Linux ###
+
+In order to run OED with Docker on Linux, your operating system must be `docker-compose`
+compatible.  A good standard of whether or not your distro will work is if it supports the
+x86-64 instruction set; if it does, you're probably in the clear.  It is recommended that
+you check [this list](https://github.com/semicolon-madness/RCOS/blob/main/64bitLinuxOSs.md) 
+to be sure.
+
 ## Notes ##
 
 ### On The Terminal ###

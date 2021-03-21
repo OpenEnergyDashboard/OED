@@ -16,6 +16,11 @@ interface CompareChartContainerProps {
 	entity: CompareEntity;
 }
 
+/* Passes the current redux state of the of the chart container and it's props, and turns it into props for the React
+*  component, which is what will be visible on the page. Makes it possible to access
+*  your reducer state objects from within your React components.
+*
+*  Returns the props object. */
 function mapStateToProps(state: State, ownProps: CompareChartContainerProps): IPlotlyChartProps {
 	const comparePeriod = state.graph.comparePeriod;
 	const datasets: any[] = [];

@@ -7,9 +7,11 @@ import { Table, Button } from 'reactstrap';
 import { FormattedMessage } from 'react-intl';
 import { hasToken } from '../../utils/token';
 import HeaderContainer from '../../containers/HeaderContainer';
-import FooterComponent from '../FooterComponent';
+import FooterContainer from '../../containers/FooterContainer';
 import MapViewContainer from '../../containers/maps/MapViewContainer';
 import {Link} from 'react-router';
+import TooltipHelpComponent from '../TooltipHelpComponentAlternative';
+import TooltipMarkerComponent from '../TooltipMarkerComponent';
 
 interface MapsDetailProps {
 	maps: number[];
@@ -25,7 +27,6 @@ export default class MapsDetailComponent extends React.Component<MapsDetailProps
 	}
 
 	public render() {
-
 
 		const titleStyle: React.CSSProperties = {
 			textAlign: 'center'
@@ -43,12 +44,21 @@ export default class MapsDetailComponent extends React.Component<MapsDetailProps
 			marginRight: '40%'
 		};
 
+		const tooltipStyle = {
+			display: 'inline-block',
+			fontSize: '50%'
+		};
+
 		return (
 			<div>
 				<HeaderContainer />
+				<TooltipHelpComponent page='maps' />
 				<div className='container-fluid'>
 					<h2 style={titleStyle}>
 						<FormattedMessage id='maps' />
+						<div style={tooltipStyle}>
+						<TooltipMarkerComponent page='maps' helpTextId='help.admin.mapview' />
+						</div>
 					</h2>
 					<div style={tableStyle}>
 					<Table striped bordered hover>
@@ -88,7 +98,7 @@ export default class MapsDetailComponent extends React.Component<MapsDetailProps
 						<FormattedMessage id='save.map.edits' />
 					</Button> }
 				</div>
-				<FooterComponent />
+				<FooterContainer />
 			</div>
 		);
 	}

@@ -8,6 +8,7 @@ import { defineMessages, FormattedMessage, injectIntl, InjectedIntlProps } from 
 import '../styles/react-select-css.css';
 import 'react-select/dist/react-select.css';
 import SingleSelectComponent from './SingleSelectComponent';
+import TooltipMarkerComponent from './TooltipMarkerComponent';
 
 interface MapChartSelectProps {
 	maps: SelectOption[];
@@ -48,6 +49,7 @@ class MapChartSelectComponent extends React.Component<MapChartSelectPropsWithInt
 						placeholder={formatMessage(messages.selectMap)}
 						onValueChange={this.handleMapSelect}
 					/>
+					<TooltipMarkerComponent page='home' helpTextId='help.home.select.maps'/>
 				</div>
 			</div>
 		);

@@ -13,6 +13,11 @@ import {SelectOption} from '../types/items';
 import {meterDisplayableOnMap} from '../utils/calibration';
 
 
+/* Passes the current redux state of the chart select container, and turns it into props for the React
+*  component, which is what will be visible on the page. Makes it possible to access
+*  your reducer state objects from within your React components.
+*
+*  Returns the selected and sorted object. */
 function mapStateToProps(state: State) {
 	// Map information about meters and groups into a format the component can display.
 	const sortedMeters = _.sortBy(_.values(state.meters.byMeterID).map(meter =>
@@ -64,6 +69,8 @@ function mapStateToProps(state: State) {
 	};
 }
 
+
+// function to dispatch selected meter information
 function mapDispatchToProps(dispatch: Dispatch) {
 	return {
 		selectMeters: (newSelectedMeterIDs: number[]) => dispatch(changeSelectedMeters(newSelectedMeterIDs)),
@@ -71,4 +78,5 @@ function mapDispatchToProps(dispatch: Dispatch) {
 	};
 }
 
+// function that connects the React container to the Redux store of states
 export default connect(mapStateToProps, mapDispatchToProps)(ChartDataSelectComponent);
