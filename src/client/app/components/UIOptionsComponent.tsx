@@ -12,6 +12,7 @@ import ChartSelectContainer from '../containers/ChartSelectContainer';
 import ChartDataSelectContainer from '../containers/ChartDataSelectContainer';
 import { ChangeBarStackingAction, ChangeCompareSortingOrderAction, SetOptionsVisibility } from '../types/redux/graph';
 import ChartLinkContainer from '../containers/ChartLinkContainer';
+import LanguageSelectorContainer from '../containers/LanguageSelectorContainer'
 import { ChartTypes } from '../types/redux/graph';
 import { ComparePeriod, SortingOrder } from '../utils/calculateCompare';
 import TooltipMarkerComponent from './TooltipMarkerComponent';
@@ -221,6 +222,9 @@ class UIOptionsComponent extends React.Component<UIOptionsPropsWithIntl, UIOptio
 				<div style={divTopPadding}>
 					<ChartLinkContainer />
 				</div>
+
+				<LanguageSelectorContainer />
+
 				<div style={divTopPadding} className='d-none d-lg-block'>
 					<Button
 						onClick={this.handleSetOptionsVisibility}
