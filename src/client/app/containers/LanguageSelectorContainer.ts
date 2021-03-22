@@ -8,25 +8,25 @@ import { State } from '../types/redux/state';
 import { Dispatch } from '../types/redux/actions';
 import { updateDefaultLanguage } from '../actions/admin';
 import { LanguageTypes } from '../types/redux/i18n';
- 
- 
-/* 
+
+
+/*
 *  Passes the current redux state of the language selection, and turns it into props for the React
 *  component, which is what will be visible on the page. Makes it possible to access
 *  your reducer state objects from within your React components.
 */
 function mapStateToProps(state: State) {
-	return {		
+	return {
 		selectedLanguage: state.admin.defaultLanguage
 	};
 }
- 
- // Function to dispatch the changed language choice
- function mapDispatchToProps(dispatch: Dispatch) {
-	 return {
-		 changeLanguage: (languageType: LanguageTypes) => dispatch(updateDefaultLanguage(languageType))
-	 };
- }
- 
- // function that connects the React container to the Redux store of states
+
+// Function to dispatch the changed language choice
+function mapDispatchToProps(dispatch: Dispatch) {
+	return {
+		changeLanguage: (languageType: LanguageTypes) => dispatch(updateDefaultLanguage(languageType))
+	};
+}
+
+// function that connects the React container to the Redux store of states
 export default connect(mapStateToProps, mapDispatchToProps)(LanguageSelectorComponent);
