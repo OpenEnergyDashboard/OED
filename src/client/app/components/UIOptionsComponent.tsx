@@ -223,6 +223,7 @@ class UIOptionsComponent extends React.Component<UIOptionsPropsWithIntl, UIOptio
 					<ChartLinkContainer />
 				</div>
 
+				{/* Language selector dropdown*/}
 				<LanguageSelectorContainer />
 
 				<div style={divTopPadding} className='d-none d-lg-block'>
