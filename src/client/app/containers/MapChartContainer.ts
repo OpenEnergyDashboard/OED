@@ -8,7 +8,7 @@ import PlotlyChart, { IPlotlyChartProps } from 'react-plotlyjs-ts';
 import { State } from '../types/redux/state';
 import {
 	calculateScaleFromEndpoints, meterDisplayableOnMap, rotate, Dimensions,
-	CartesianPoint, normalizeImageDimensions, trueNorthAngle
+	CartesianPoint, normalizeImageDimensions, trueNorthAngle, shift
 } from '../utils/calibration';
 import * as _ from 'lodash';
 import getGraphColor from '../utils/getGraphColor';
@@ -65,15 +65,18 @@ function mapStateToProps(state: State) {
 						// Convert the gps value to the equivalent Plotly grid coordinates on user map.
 						// First, convert from GPS to grid units. Since we are doing a GPS calculation, this happens on the true north map.
 						// Calculate how far the point is from origin and then the units for this distance from zero.
-						const gridTrueNorth: CartesianPoint = { x: (gps.longitude - origin.longitude) / mapScale.degreePerUnitX,
-							y: (gps.latitude - origin.latitude) / mapScale.degreePerUnitY };
+						const gridTrueNorth: CartesianPoint = {
+							x: (gps.longitude - origin.longitude) / mapScale.degreePerUnitX,
+							y: (gps.latitude - origin.latitude) / mapScale.degreePerUnitY
+						};
+						// Shift origin from bottom, left to center since rotation about center.
+						const gridTrueNorthShifted = shift(imageDimensionNormalized, gridTrueNorth, -1);
 						// Rotate about center so now on the user map. Since going from true north to user map
-						// the rotation angle is negative. You don't need to shift before doing this because
-						// this started as a GPS point.
-						const gridUserShifted: CartesianPoint = rotate(-trueNorthAngle.angle, gridTrueNorth);
+						// the rotation angle is negative. 
+						const gridUserShifted: CartesianPoint = rotate(-trueNorthAngle.angle, gridTrueNorthShifted);
 						// Shift origin from center to bottom, left as this is the grid in Plotly.
-						// const gridUser = shift(imageDimensionNormalized, gridUserShifted, 1);
-						const gridUser = gridUserShifted;
+						const gridUser = shift(imageDimensionNormalized, gridUserShifted, 1);
+						// const gridUser = gridUserShifted;
 						x.push(gridUser.x);
 						y.push(gridUser.y);
 						const readingsData = byMeterID[timeInterval.toString()][barDuration.toISOString()];
@@ -104,6 +107,7 @@ function mapStateToProps(state: State) {
 			// if (size.length > 0) {
 			// TODO The max circle diameter should come from admin/DB.
 			const maxFeatureFraction = 0.2;
+			// TODO either dimension could be smaller.
 			// The width of the map should be smaller so use that.
 			// The circle size is set to area below. Thus, we need to convert from wanting a max
 			// diameter of width of the map * maxFeatureFraction to an area.
