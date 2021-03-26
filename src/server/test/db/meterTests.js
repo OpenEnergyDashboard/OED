@@ -25,8 +25,6 @@ function expectMetersToBeEquivalent(expected, actual) {
 	expect(actual).to.have.property('previousDay', expected.previousDay);
 	expect(actual).to.have.property('readingLength', expected.readingLength);
 	expect(actual).to.have.property('readingVariation', expected.readingVariation);
-	//expect(actual).to.have.property('start_timestamp', expected.start_timestamp);
-	//expect(actual).to.have.property('end_timestamp', expected.end_timestamp);
 }
 
 mocha.describe('Meters', () => {
