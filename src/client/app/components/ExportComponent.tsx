@@ -49,9 +49,9 @@ export default function ExportComponent(props: ExportProps) {
 				}
 			}
 		}
-		// Use regex to remove spaces and colons from filename
-		const startTimeString = startTime.utc().format('LL_LTS').replace(/\s/g,'-').replace(/:/g,'-');
-		const endTimeString = endTime.utc().format('LL_LTS').replace(/\s/g,'-').replace(/:/g,'-');
+		// Use regex to remove commas and replace spaces/colons/hyphens with underscores
+		const startTimeString = startTime.utc().format('LL_LTS').replace(/,/g,'').replace(/[\s:-]/g,'_');
+		const endTimeString = endTime.utc().format('LL_LTS').replace(/,/g,'').replace(/[\s:-]/g,'_');
 		const chartName = compressedData[0].currentChart;
 		const name = `oedExport_${chartName}_${startTimeString}_to_${endTimeString}.csv`;
 		graphExport(compressedData, name);

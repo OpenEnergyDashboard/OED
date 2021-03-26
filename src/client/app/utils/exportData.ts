@@ -19,7 +19,7 @@ function convertToCSV(items: ExportDataSet[]) {
 		const label = set.label;
 		data.forEach(reading => {
 			const info = reading.y;
-			const startTimeStamp = moment(reading.x).utc().format('LL LTS');
+			const startTimeStamp = moment(reading.x).utc().format('dddd LL LTS').replace(/,/g,''); // use regex to omit pesky commas
 			csvOutput += `"${label}",${info},${startTimeStamp}\n`; // TODO: add column for units
 		});
 	});
@@ -59,14 +59,15 @@ export default function graphExport(dataSets: ExportDataSet[], name: string) {
  * @param defaultLanguage the preferred localization to use for date/time formatting
  */
 export function downloadRawCSV(items: RawReadings[], defaultLanguage: string) {
+	// note that utc() is not needed
 	let csvOutput = 'Label,Readings,Start Timestamp\n';
 	items.forEach(ele => {
-		const timestamp = moment(ele.startTimestamp).utc().format('LL LTS'); // this date format doesn't use commas
+		const timestamp = moment(ele.startTimestamp).format('dddd LL LTS').replace(/,/g,''); // use regex to omit pesky commas
 		csvOutput += `"${ele.label}",${ele.reading},${timestamp}\n`; // TODO: add column for units
 	})
-	// Use regex to remove spaces and colons from filename
-	const startTime = moment(items[0].startTimestamp).utc().format('LL_LTS').replace(/\s/g,'-').replace(/:/g,'-');
-	const endTime = moment(items[items.length-1].startTimestamp).utc().format('LL_LTS').replace(/\s/g,'-').replace(/:/g,'-');
+	// Use regex to remove commas and replace spaces/colons/hyphens with underscores
+	const startTime = moment(items[0].startTimestamp).format('LL_LTS').replace(/,/g,'').replace(/[\s:-]/g,'_');
+	const endTime = moment(items[items.length-1].startTimestamp).format('LL_LTS').replace(/,/g,'').replace(/[\s:-]/g,'_');
 	const filename = `oedRawExport_line_${startTime}_to_${endTime}.csv`;
 	downloadCSV(csvOutput, filename);
 }
