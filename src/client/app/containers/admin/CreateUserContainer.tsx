@@ -3,8 +3,8 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
 
 import * as React from 'react';
-import HeaderContainer from '../../containers/HeaderContainer';
-import FooterComponent from '../../components/FooterComponent';
+import HeaderContainer from '../HeaderContainer';
+import FooterContainer from '../FooterContainer';
 import CreateUserComponent from '../../components/admin/CreateUserComponent';
 import { UserRole } from '../../types/items';
 import { usersApi } from '../../utils/api';
@@ -75,7 +75,7 @@ export default class CreateUserFormContainer extends React.Component<{}, {}>{
 					handleRoleChange={this.handleRoleChange}
 					submitNewUser={this.submitNewUser}
 				/>
-				<FooterComponent />
+				<FooterContainer />
 			</div>
 		)
 	}

@@ -7,7 +7,7 @@ import * as _ from 'lodash';
 import { User, UserRole } from '../../types/items';
 import UserDetailComponent from '../../components/admin/UsersDetailComponent';
 import HeaderContainer from '../HeaderContainer';
-import FooterComponent from '../../components/FooterComponent';
+import FooterContainer from '../FooterContainer';
 import { usersApi } from '../../utils/api';
 import { showSuccessNotification, showErrorNotification } from '../../utils/notifications';
 import translate from '../../utils/translate';
@@ -90,7 +90,7 @@ export default class UsersDetailContainer extends React.Component<UsersDisplayCo
 					users={this.state.users}
 					submitUserEdits={this.submitUserEdits}
 				/>
-				<FooterComponent />
+				<FooterContainer />
 			</div>
 		)
 	}
