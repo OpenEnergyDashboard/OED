@@ -20,7 +20,6 @@ authMiddleware = (req, res, next) => {
 	const validParams = {
 		type: 'string'
 	};
-
 	if (!validate(token, validParams).valid) {
 		res.status(403).json({ success: false, message: 'No token provided or JSON was invalid.' });
 	} else if (token) {
@@ -28,10 +27,10 @@ authMiddleware = (req, res, next) => {
 			if (err) {
 				res.status(401).json({ success: false, message: 'Failed to authenticate token.' });
 			} else {
-				req.decoded = decoded;
 				try {
 					const conn = getConnection();
 					await User.getByID(decoded.data, conn); // checks if user exists in the database in case it was deleted
+					req.decoded = decoded;
 					next();
 				} catch (error) {
 					res.status(401).json({ success: false, message: 'User does not exist in database.' });
