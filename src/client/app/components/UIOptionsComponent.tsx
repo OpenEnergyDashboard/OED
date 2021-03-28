@@ -212,8 +212,8 @@ class UIOptionsComponent extends React.Component<UIOptionsPropsWithIntl, UIOptio
 					<MapChartSelectContainer />
 				}
 
-				{/* We can't export compare data */}
-				{this.props.chartToRender !== ChartTypes.compare &&
+				{/* We can't export compare data or map data */}
+				{this.props.chartToRender !== ChartTypes.compare && this.props.chartToRender !== ChartTypes.map &&
 					<div style={divTopPadding}>
 						<ExportContainer />
 					</div>
