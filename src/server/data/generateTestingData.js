@@ -197,7 +197,6 @@ async function writeToCsv(data, filename = 'test.csv') {
 	}
 }
 
-
 // interface GenerateDataFileOptions extends GenerateDataOptions {
 // 	filename?: string;
 // 	normalizeByHour?: boolean;
