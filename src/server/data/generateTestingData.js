@@ -141,7 +141,7 @@ function momenting(arrayOfMoments, periodLength) {
  * @param {moment.MomentInputObject} options.periodLength - The length of the period of the generated sine wave.
  * @param {number} options.maxAmplitude - The max height of the generated sine wave.
  * @param {number} options.phaseShift - The amount to phase shift the generated sine wave.
- * @param {boolean} options.squared - Indicates whether output sine data should be squared (if True) or not (if False).
+ * @param {boolean} options.squared - Indicates whether output sine data should be squared (if true) or not (if false).
  * @returns {[string, string, string][]} Matrix of rows representing each csv row of the form value, startTimeStamp, endTimeStamp.
  */
 function generateSineData(startTimeStamp, endTimeStamp, options = {}) {
@@ -174,20 +174,22 @@ function generateSineData(startTimeStamp, endTimeStamp, options = {}) {
 
 /**
  * Write csv data and header into a csv file
- * @param {[string, string, string][]]} data - A matrix with three columns of strings
+ * @param {[string, string, string]} data - A matrix with three columns of strings
  * @param {string?} filename - The name of the file.
  * @sources:
  * https://csv.js.org/stringify/api/
  * https://stackoverflow.com/questions/2496710/writing-files-in-node-js
  */
 async function writeToCsv(data, filename = 'test.csv') {
-	// async function writeToCsv(data: Array<[string, string, string]>, filename = 'test.csv') {
 	try {
-		header = 'reading,start_timestamp,end_timestamp' + '\r\n';
+		// Assuming \n works on all systems but fine in our Unix containers.
+		const header = 'reading,start_timestamp,end_timestamp\n';
 		await fs.writeFile(filename, header) // insert header into file
 			.catch(reason => log.error(`Failed to write the header to file: ${filename}`, reason));
-		const output = await stringifyCSV(data); // generate csv data
-		await fs.appendFile(filename, output) // insert csv data into file
+		// generate csv data
+		const output = await stringifyCSV(data);
+		// append csv data into file
+		await fs.appendFile(filename, output)
 			.then(() => log.info(`The file ${filename} was saved for generating test data.`)) // log success
 			.catch(reason => log.error(`Failed to write the file: ${filename}`, reason));
 	} catch (error) {
