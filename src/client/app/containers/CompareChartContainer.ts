@@ -10,6 +10,7 @@ import { getComparePeriodLabels, getCompareChangeSummary } from '../utils/calcul
 import { CompareEntity } from './MultiCompareChartContainer';
 import translate from '../utils/translate';
 import PlotlyChart, { IPlotlyChartProps } from 'react-plotlyjs-ts';
+import Locales from '../types/locales';
 
 interface CompareChartContainerProps {
 	entity: CompareEntity;
@@ -97,10 +98,11 @@ function mapStateToProps(state: State, ownProps: CompareChartContainerProps): IP
 		data: datasets,
 		layout,
 		config: {
-			displayModeBar: false
+			displayModeBar: false,
+			locales: Locales // makes locales available for use
 		}
 	};
-
+	props.config.locale = state.admin.defaultLanguage;
 	return props;
 }
 

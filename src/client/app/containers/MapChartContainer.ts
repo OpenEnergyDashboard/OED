@@ -10,6 +10,7 @@ import { calculateScaleFromEndpoints, meterDisplayableOnMap } from '../utils/cal
 import * as _ from 'lodash';
 import getGraphColor from '../utils/getGraphColor';
 import { TimeInterval } from '../../../common/TimeInterval';
+import Locales from '../types/locales';
 import { DataType } from '../types/Datasources';
 
 function mapStateToProps(state: State) {
@@ -61,7 +62,7 @@ function mapStateToProps(state: State) {
 							const mapReading = readings[0];
 							// Shift by UTC since want database time not local/browser time which is what moment does.
 							const timeReading: string =
-								`${moment(mapReading.startTimestamp).utc().format('MMM DD, YYYY')} - ${moment(mapReading.endTimestamp).utc().format('MMM DD, YYYY')}`;
+								`${moment(mapReading.startTimestamp).utc().format('LL')} - ${moment(mapReading.endTimestamp).utc().format('LL')}`;
 							const averagedReading = mapReading.reading / barDuration.asDays(); // average total reading by days of duration
 							size.push(averagedReading);
 							texts.push(`<b> ${timeReading} </b> <br> ${label}: ${averagedReading} kWh/day`);
@@ -137,8 +138,12 @@ function mapStateToProps(state: State) {
 	 */
 	const props: IPlotlyChartProps = {
 		data,
-		layout
+		layout,
+		config: {
+			locales: Locales // makes locales available for use
+		}
 	};
+	props.config.locale = state.admin.defaultLanguage;
 	return props;
 }
 
