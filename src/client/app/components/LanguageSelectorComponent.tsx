@@ -61,19 +61,19 @@ export default class LanguageSelectorComponent extends React.Component<LanguageS
 							outline={this.props.selectedLanguage !== LanguageTypes.en}
 							onClick={() => this.handleChangeLanguage(LanguageTypes.en)}
 						>
-							<FormattedMessage id='language.en' />
+							English
 						</DropdownItem>
 						<DropdownItem
 							outline={this.props.selectedLanguage !== LanguageTypes.fr}
 							onClick={() => this.handleChangeLanguage(LanguageTypes.fr)}
 						>
-							<FormattedMessage id='language.fr' />
+							Français
 						</DropdownItem>
 						<DropdownItem
 							outline={this.props.selectedLanguage !== LanguageTypes.es}
 							onClick={() => this.handleChangeLanguage(LanguageTypes.es)}
 						>
-							<FormattedMessage id='language.es' />
+							Español
 						</DropdownItem>
 					</DropdownMenu>
 				</Dropdown>
