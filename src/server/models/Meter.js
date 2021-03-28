@@ -15,15 +15,19 @@ class Meter {
 	 * @param enabled This meter is being actively read from
 	 * @param displayable This meters is available to users for charting
 	 * @param type What kind of meter this is
+	 * @param gps location in format of GIS coordinates
+	 * @param meterTimezone Default timezone for meter
 	 * @param identifier Another way to identify a meter
 	 */
-	constructor(id, name, ipAddress, enabled, displayable, type, identifier = name) {
+	constructor(id, name, ipAddress, enabled, displayable, type, meterTimezone, gps = undefined, identifier = name) {
 		this.id = id;
 		this.name = name;
 		this.ipAddress = ipAddress;
 		this.enabled = enabled;
 		this.displayable = displayable;
 		this.type = type;
+		this.gps = gps;
+		this.meterTimezone = meterTimezone;
 		this.identifier = identifier;
 	}
 
@@ -52,7 +56,7 @@ class Meter {
 	 * @param conn the connection to be used.
 	 * @returns {Promise.<Meter>}
 	 */
-	static async getByName(name, conn ) {
+	static async getByName(name, conn) {
 		const row = await conn.one(sqlFile('meter/get_meter_by_name.sql'), { name: name });
 		return Meter.mapRow(row);
 	}
@@ -67,8 +71,14 @@ class Meter {
 		return row !== null;
 	}
 
+	/**
+	 * Creates a new meter from the data in a row.
+	 * @param row the row from which the meter is to be created
+	 * @returns Meter from row
+	 */
 	static mapRow(row) {
-		return new Meter(row.id, row.name, row.ipaddress, row.enabled, row.displayable, row.meter_type);
+		return new Meter(row.id, row.name, row.ipaddress, row.enabled, row.displayable, row.meter_type,
+			row.default_timezone_meter, row.gps, row.identifier);
 	}
 
 	/**
@@ -149,6 +159,7 @@ class Meter {
 	}
 }
 
+// Enum of meter types
 Meter.type = {
 	MAMAC: 'mamac',
 	METASYS: 'metasys',

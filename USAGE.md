@@ -1,4 +1,9 @@
+# Transition to Developer Website
+
+The [developer website](https://openenergydashboard.github.io/developer/) is now available and becoming the preferred way to learn about working with the OED project. The information on this page is being transferred to that site but this page still contains useful information that has yet to be transferred. We suggest you start with the new website and visit here if you want some information not yet on that site. Note that some of the information here is out of date and will updated during the transition. Thanks for your understanding.
+
 # Quick Start With Docker #
+
 If using Docker, you first need to install [Docker](https://docs.docker.com/engine/installation/)
 and [docker-compose](https://docs.docker.com/compose/install/).
 
@@ -37,6 +42,14 @@ will need Docker version 18.06 CE or higher and `docker-compose` version 1.21 or
 If you want to install OED so you can contribute code, see the "Development" section. If
 you are setting up OED in order to gather data from power meters and display it, see the
 "Production" section.
+
+### On Linux ###
+
+In order to run OED with Docker on Linux, your operating system must be `docker-compose`
+compatible.  A good standard of whether or not your distro will work is if it supports the
+x86-64 instruction set; if it does, you're probably in the clear.  It is recommended that
+you check [this list](https://github.com/semicolon-madness/RCOS/blob/main/64bitLinuxOSs.md) 
+to be sure.
 
 ## Notes ##
 

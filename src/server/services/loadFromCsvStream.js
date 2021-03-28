@@ -5,6 +5,7 @@
  */
 
 const csv = require('csv');
+const { log } = require('../log');
 
 /**
  * Function to load a CSV file into the database in a configurable manner.
@@ -53,9 +54,7 @@ function loadFromCsvStream(stream, mapRowToModel, bulkInsertModels, conn) {
 			}
 		});
 		parser.on('error', err => {
-			if (!rejected) {
-				resolve(t.batch(pendingInserts).then(() => Promise.reject(err)));
-			}
+			log.warn('Error parsing CSV input', err);
 			rejected = true;
 		});
 		// Defines what happens when the parser's input stream is finished (and thus the promise needs to be resolved)

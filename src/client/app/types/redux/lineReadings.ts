@@ -3,7 +3,6 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
 
 import { TimeInterval } from '../../../../common/TimeInterval';
-import { LineReadings } from '../readings';
 import { ActionType } from './actions';
 import {CompressedLineReading, CompressedLineReadings} from '../compressed-readings';
 

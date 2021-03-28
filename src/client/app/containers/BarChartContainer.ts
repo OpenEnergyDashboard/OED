@@ -8,8 +8,14 @@ import { connect } from 'react-redux';
 import getGraphColor from '../utils/getGraphColor';
 import { State } from '../types/redux/state';
 import PlotlyChart, { IPlotlyChartProps } from 'react-plotlyjs-ts';
+import Locales from '../types/locales';
 import { DataType } from '../types/Datasources';
 
+/* Passes the current redux state of the barchart, and turns it into props for the React
+*  component, which is what will be visible on the page. Makes it possible to access
+*  your reducer state objects from within your React components.
+*
+*  Returns the props object. */
 function mapStateToProps(state: State) {
 	const timeInterval = state.graph.timeInterval;
 	const barDuration = state.graph.barDuration;
@@ -34,10 +40,10 @@ function mapStateToProps(state: State) {
 				const readings = _.orderBy(readingsData.readings, ['startTimestamp'], ['asc']);
 				readings.forEach(barReading => {
 					const timeReading: string =
-						`${moment(barReading.startTimestamp).format('MMM DD, YYYY')} - ${moment(barReading.endTimestamp).format('MMM DD, YYYY')}`;
+						`${moment(barReading.startTimestamp).utc().format('LL')} - ${moment(barReading.endTimestamp).utc().format('LL')}`;
 					xData.push(timeReading);
 					yData.push(barReading.reading);
-					hoverText.push(`<b> ${timeReading} </b> <br> ${label}: ${barReading.reading} kW`);
+					hoverText.push(`<b> ${timeReading} </b> <br> ${label}: ${barReading.reading} kWh`);
 				});
 
 				// This variable contains all the elements (x and y values, bar type, etc.) assigned to the data parameter of the Plotly object
@@ -53,6 +59,7 @@ function mapStateToProps(state: State) {
 			}
 		}
 	}
+
 
 	for (const groupID of state.graph.selectedGroups) {
 		const byGroupID = state.readings.bar.byGroupID[groupID];
@@ -72,10 +79,10 @@ function mapStateToProps(state: State) {
 				const readings = _.orderBy(readingsData.readings, ['startTimestamp'], ['asc']);
 				readings.forEach(barReading => {
 					const timeReading: string =
-						`${moment(barReading.startTimestamp).format('MMM DD, YYYY')} - ${moment(barReading.endTimestamp).format('MMM DD, YYYY')}`;
+						`${moment(barReading.startTimestamp).utc().format('LL')} - ${moment(barReading.endTimestamp).utc().format('LL')}`;
 					xData.push(timeReading);
 					yData.push(barReading.reading);
-					hoverText.push(`<b> ${timeReading} </b> <br> ${label}: ${barReading.reading} kW`);
+					hoverText.push(`<b> ${timeReading} </b> <br> ${label}: ${barReading.reading} kWh`);
 				});
 
 				// This variable contains all the elements (x and y values, bar chart, etc.) assigned to the data parameter of the Plotly object
@@ -106,7 +113,7 @@ function mapStateToProps(state: State) {
 			orientation: 'h'
 		},
 		yaxis: {
-			title: 'kW',
+			title: 'kWh',
 			showgrid: true,
 			gridcolor: '#ddd'
 		},
@@ -134,10 +141,11 @@ function mapStateToProps(state: State) {
 		data: datasets,
 		layout,
 		config: {
-			displayModeBar: false
+			displayModeBar: false,
+			locales: Locales // makes locales available for use
 		}
 	};
-
+	props.config.locale = state.admin.defaultLanguage;
 	return props;
 }
 

@@ -7,21 +7,15 @@ import UIOptionsContainer from '../containers/UIOptionsContainer';
 import LineChartContainer from '../containers/LineChartContainer';
 import BarChartContainer from '../containers/BarChartContainer';
 import MultiCompareChartContainer from '../containers/MultiCompareChartContainer';
+import MapChartContainer from '../containers/MapChartContainer';
 import SpinnerComponent from './SpinnerComponent';
-import { ChartTypes } from '../types/redux/graph';
-
+import {ChartTypes} from '../types/redux/graph';
 import * as moment from 'moment';
-import { TimeInterval } from '../../../common/TimeInterval';
-
+import {TimeInterval} from '../../../common/TimeInterval';
 import Button from 'reactstrap/lib/Button';
-import { FormEvent } from 'react';
 import { FormattedMessage } from 'react-intl';
-import { Dispatch, Thunk, ActionType } from '../types/redux/actions';
-
-import * as Plotly from 'plotly.js';
-// TODO lowercase plotly for the import in index.d.ts but uppercase here.
-
-
+import TooltipMarkerComponent from './TooltipMarkerComponent';
+import ReactTooltip from 'react-tooltip';
 
 interface DashboardProps {
 	chartToRender: ChartTypes;
@@ -29,6 +23,7 @@ interface DashboardProps {
 	lineLoading: false;
 	barLoading: false;
 	compareLoading: false;
+	mapLoading: false;
 	selectedTimeInterval: TimeInterval;
 	changeTimeInterval(timeInterval: TimeInterval): Promise<any>;
 }
@@ -43,8 +38,14 @@ export default class DashboardComponent extends React.Component<DashboardProps, 
 		this.handleTimeIntervalChange = this.handleTimeIntervalChange.bind(this);
 	}
 
+	public componentDidUpdate(prev: DashboardProps) {
+		if (prev.chartToRender !== this.props.chartToRender) {
+			ReactTooltip.rebuild(); // This rebuilds the tooltip so that it detects the marker that disappear because the chart type changes.
+		}
+	}
+
 	public render() {
-		let ChartToRender: typeof LineChartContainer | typeof MultiCompareChartContainer | typeof BarChartContainer;
+		let ChartToRender: typeof LineChartContainer | typeof MultiCompareChartContainer | typeof BarChartContainer | typeof MapChartContainer;
 		let showSpinner = false;
 		if (this.props.chartToRender === ChartTypes.line) {
 			if (this.props.lineLoading) {
@@ -56,11 +57,18 @@ export default class DashboardComponent extends React.Component<DashboardProps, 
 				showSpinner = true;
 			}
 			ChartToRender = BarChartContainer;
-		} else {
+		} else if (this.props.chartToRender === ChartTypes.compare) {
 			if (this.props.compareLoading) {
 				showSpinner = true;
 			}
 			ChartToRender = MultiCompareChartContainer;
+		} else if (this.props.chartToRender === ChartTypes.map) {
+			if (this.props.mapLoading) {
+				showSpinner = true;
+			}
+			ChartToRender = MapChartContainer;
+		} else {
+			throw new Error('unrecognized type of chart');
 		}
 
 		const optionsClassName = this.props.optionsVisibility ? 'col-2 d-none d-lg-block' : 'd-none';
@@ -94,7 +102,12 @@ export default class DashboardComponent extends React.Component<DashboardProps, 
 								style={buttonMargin}
 								onClick={() => this.handleTimeIntervalChange('all')}
 							> <FormattedMessage id='restore'/>
-							</Button>
+							</Button>,
+							<TooltipMarkerComponent
+								key={3}
+								page='home'
+								helpTextId='help.home.chart.redraw.restore'
+							/>
 							]
 						) : (
 							null

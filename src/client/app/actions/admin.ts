@@ -12,6 +12,7 @@ import { State } from '../types/redux/state';
 import { preferencesApi } from '../utils/api';
 import translate from '../utils/translate';
 import { LanguageTypes } from '../types/i18n';
+import moment = require('moment');
 
 
 export function updateSelectedMeter(meterID: number): t.UpdateImportMeterAction {
@@ -20,6 +21,10 @@ export function updateSelectedMeter(meterID: number): t.UpdateImportMeterAction 
 
 export function updateDisplayTitle(displayTitle: string): t.UpdateDisplayTitleAction {
 	return { type: ActionType.UpdateDisplayTitle, displayTitle };
+}
+
+export function updateTimeZone(timeZone: string): t.UpdateDefaultTimeZone {
+	return { type: ActionType.UpdateDefaultTimeZone, timeZone };
 }
 
 export function updateDefaultChartToRender(defaultChartToRender: ChartTypes): t.UpdateDefaultChartToRenderAction {
@@ -31,6 +36,7 @@ export function toggleDefaultBarStacking(): t.ToggleDefaultBarStackingAction {
 }
 
 export function updateDefaultLanguage(defaultLanguage: LanguageTypes): t.UpdateDefaultLanguageAction {
+	moment.locale(defaultLanguage);
 	return { type: ActionType.UpdateDefaultLanguage, defaultLanguage };
 }
 
@@ -55,6 +61,7 @@ function fetchPreferences(): Thunk {
 		dispatch(requestPreferences());
 		const preferences = await preferencesApi.getPreferences();
 		dispatch(receivePreferences(preferences));
+		moment.locale(getState().admin.defaultLanguage);
 		if (!getState().graph.hotlinked) {
 			dispatch((dispatch2: Dispatch, getState2: GetState) => {
 				const state = getState();
@@ -75,7 +82,8 @@ function submitPreferences() {
 				displayTitle: state.admin.displayTitle,
 				defaultChartToRender: state.admin.defaultChartToRender,
 				defaultBarStacking: state.admin.defaultBarStacking,
-				defaultLanguage: state.admin.defaultLanguage
+				defaultLanguage: state.admin.defaultLanguage,
+				defaultTimezone: state.admin.defaultTimeZone
 			});
 			dispatch(markPreferencesSubmitted());
 			showSuccessNotification(translate('updated.preferences'));
