@@ -120,8 +120,7 @@ async function generateFourDayTestingData() {
 	const startDate = '2020-01-01 00:00:00';
 	const endDate = '2020-12-31 23:59:59';
 	const options = {
-		// Data point intervals set to 5760 minutes = 96 hours = 4 days.
-		timeStep: { minute: 5760 },
+		timeStep: { day: 4 },
 		// Wave period set to 45 days.
 		// Use days instead of 1.5 months because moment changes number of days depending on length
 		// of the month.
@@ -144,7 +143,7 @@ async function generateFourHourTestingData() {
 	const endDate = '2020-12-31 23:59:59';
 	const options = {
 		// Data point intervals set to 240 minutes = 4 hours.
-		timeStep: { minute: 240 },
+		timeStep: { hour: 4 },
 		// Wave period set to 45 days.
 		// Use days instead of 1.5 months because moment changes number of days depending on length
 		// of the month.

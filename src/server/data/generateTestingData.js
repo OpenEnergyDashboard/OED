@@ -234,7 +234,20 @@ async function generateSine(startTimeStamp, endTimeStamp, options = {}) {
 	};
 	try {
 		if (chosenOptions.normalizeByHour) {
-			const scale = _momentPercentage(moment({ hour: 0 }), moment({ hour: 1 }), moment(chosenOptions.timeStep));
+			// You want to normalize the data to one hour.
+			// The idea is you expect OED to show the data at one point per hour so you
+			// scale the output to take this into account. This is needed since OED calculates
+			// usage at the rate it displays. For example, if you have a point every 20 minutes
+			// then you need to scale each point by 1/3 because OED will average the 3 points
+			// in that one hour.
+			// Set the length of time that OED is going to plot that you want to normalize to.
+			// Can use any time frame instead of asMinutes since give full value with decimals.
+			let oedTimePoints = moment.duration({ hour: 1 }).asMinutes();
+			// Set the length of time between points you are generating.
+			let step = moment.duration(chosenOptions.timeStep).asMinutes();
+			// The ratio is the scale needed.
+			const scale = step / oedTimePoints;
+			// Now scale the points.
 			chosenOptions.maxAmplitude = chosenOptions.maxAmplitude * scale;
 		}
 		await writeToCsv(generateSineData(startTimeStamp, endTimeStamp, chosenOptions), chosenOptions.filename);
