@@ -78,7 +78,7 @@ export default class LanguageSelectorComponent extends React.Component<LanguageS
 					</DropdownMenu>
 				</Dropdown>
 				<div>
-					<TooltipMarkerComponent page='home' helpTextId='help.home.chart.select'/>
+					<TooltipMarkerComponent page='home' helpTextId='help.home.language'/>
 				</div>
 			</div>
 		);
