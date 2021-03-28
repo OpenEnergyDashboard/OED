@@ -5,7 +5,7 @@
  */
 
 import ApiBackend from './ApiBackend';
-import { User } from '../../types/items';
+import { User, UserRole } from '../../types/items';
 
 interface NewUser extends User {
 	password: string;
@@ -16,6 +16,19 @@ export default class UsersApi {
 	constructor(backend: ApiBackend) {
 		this.backend = backend;
 	}
+
+	public async getProfile(): Promise<User> {
+		return await this.backend.doGetRequest<User>('/api/users/token');
+	};
+
+	public async hasRolePermissions(role: UserRole): Promise<boolean> {
+		try {
+			const user = await this.getProfile();
+			return user.role === UserRole.ADMIN || user.role === role;
+		} catch (error) {
+			return false;
+		}
+	};
 
 	public async getUsers(): Promise<User[]> {
 		return await this.backend.doGetRequest<User[]>('/api/users');

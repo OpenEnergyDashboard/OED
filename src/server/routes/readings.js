@@ -12,7 +12,6 @@ const { log } = require('../log');
 const validate = require('jsonschema').validate;
 const { getConnection } = require('../db');
 const { formatRawDateToExport } = require('../util/formatDate');
-const { exportAuthMiddleware } = require('./authenticator');
 
 const router = express.Router();
 
@@ -122,7 +121,7 @@ router.get('/line/count/meters/:meter_ids', async (req, res) => {
 	}
 })
 
-router.get('/line/raw/meters/:meter_ids', exportAuthMiddleware('export data'), async (req, res) => {
+router.get('/line/raw/meters/:meter_ids', async (req, res) => {
 	const validParams = {
 		type: 'object',
 		maxProperties: 1,

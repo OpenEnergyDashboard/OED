@@ -9,6 +9,8 @@ const { log } = require('../log');
 const validate = require('jsonschema').validate;
 const { getConnection } = require('../db');
 const { adminAuthMiddleware } = require('./authenticator');
+const jwt = require('jsonwebtoken');
+const secretToken = require('../config').secretToken;
 
 const router = express.Router();
 
@@ -22,6 +24,36 @@ router.get('/', adminAuthMiddleware('get all users'), async (req, res) => {
 		res.json(rows);
 	} catch (err) {
 		log.error(`Error while performing GET all users query: ${err}`, err);
+	}
+});
+
+
+/**
+ * Route for obtaining the requestor's user info
+ */
+router.get('/token', async(req, res) => {
+	const token = req.headers.token || req.body.token || req.query.token;
+	const validParams = {
+		type: 'string'
+	};
+	if (!validate(token, validParams).valid) {
+		res.status(403).json({ message: 'No token provided or JSON was invalid.' });
+	} else if (token) {
+		jwt.verify(token, secretToken, async (err, decoded) => {
+			if (err) {
+				res.status(401).json({ message: 'Failed to authenticate token.' });
+			} else {
+				try {
+					const conn = getConnection();
+					const userProfile = await User.getByID(decoded.data, conn);
+					res.status(200).json(userProfile);
+				} catch (error) {
+					res.status(401).json({ message: 'User does not exist in database.' });
+				}
+			}
+		});
+	} else {
+		res.status(403).send({ message: 'No token provided.' });
 	}
 });
 
