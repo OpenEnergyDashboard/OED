@@ -26,7 +26,7 @@ async function generateSineTestingData(frequency = 15, amplitude) {
 		timeStep: { minute: frequency },
 		periodLength: { day: 45 }, // Wave period set to 45 days.
 		maxAmplitude: amplitude,
-		filename: `${__dirname}/../test/db/data/automatedTests/${frequency}FreqSineTestData.csv`,
+		filename: path.join(__dirname, '../test/db/data/automatedTests/' + frequency.toString() + 'FreqSineTestData.csv'),
 		normalizeByHour: true
 	};
 	await generateSine(startDate, endDate, options);
@@ -49,7 +49,7 @@ async function generateSineSquaredTestingData(frequency = 15, amplitude = 1) {
 		// of the month.
 		periodLength: { day: 45 },
 		maxAmplitude: amplitude,
-		filename: `${__dirname}/../test/db/data/automatedTests/${frequency}FreqSineSquaredTestData.csv`,
+		filename: path.join(__dirname, '../test/db/data/automatedTests/' + frequency.toString() + 'FreqSineSquaredTestData.csv'),
 		normalizeByHour: true,
 		squared: true // Option set to true because want sine *squared* data.
 	};
@@ -73,7 +73,7 @@ async function generateCosineTestingData(frequency = 15, amplitude) {
 		// of the month.
 		periodLength: { day: 45 },
 		maxAmplitude: amplitude,
-		filename: `${__dirname}/../test/db/data/automatedTests/${frequency}FreqCosineTestData.csv`,
+		filename: path.join(__dirname, '../test/db/data/automatedTests/' + frequency.toString() + 'FreqCosineTestData.csv'),
 		normalizeByHour: true
 	};
 	await generateCosine(startDate, endDate, options);
@@ -96,7 +96,7 @@ async function generateCosineSquaredTestingData(frequency = 15, amplitude = 1) {
 		// of the month.
 		periodLength: { day: 45 },
 		maxAmplitude: amplitude,
-		filename: `${__dirname}/../test/db/data/automatedTests/${frequency}FreqCosineSquaredTestData.csv`,
+		filename: path.join(__dirname, '../test/db/data/automatedTests/' + frequency.toString() + 'FreqCosineSquaredTestData.csv'),
 		normalizeByHour: true,
 		squared: true // Option set to true because want cosine *squared* data.
 	};
@@ -127,7 +127,8 @@ async function generateFourDayTestingData() {
 		// of the month.
 		periodLength: { day: 45 },
 		maxAmplitude: 3,
-		filename: `${__dirname}/../test/db/data/automatedTests/fourDayFreqTestData.csv`, // Data saved in 'fourDayFreqTestData.csv' file.
+		// Data saved in 'fourDayFreqTestData.csv' file.
+		filename: path.join(__dirname, '../test/db/data/automatedTests/fourDayFreqTestData.csv'),
 		normalizeByHour: true
 	};
 	await generateSine(startDate, endDate, options);
@@ -149,7 +150,8 @@ async function generateFourHourTestingData() {
 		// of the month.
 		periodLength: { day: 45 },
 		maxAmplitude: 3,
-		filename: `${__dirname}/../test/db/data/automatedTests/fourHourFreqTestData.csv`, // Data saved in 'fourHourFreqTestData.csv' file
+		// Data saved in 'fourHourFreqTestData.csv' file
+		filename: path.join(__dirname, '../test/db/data/automatedTests/fourHourFreqTestData.csv'),
 		normalizeByHour: true
 	};
 	await generateSine(startDate, endDate, options);
@@ -170,8 +172,8 @@ async function generateTwentyThreeMinuteTestingData() {
 		// of the month.
 		periodLength: { day: 45 },
 		maxAmplitude: 3,
-		filename: `${__dirname}/../test/db/data/automatedTests/twentyThreeMinuteFreqTestData.csv`, /* Data saved in
-		'twentyThreeMinuteFreqTestData.csv' file. */
+		// Data saved in 'twentyThreeMinuteFreqTestData.csv' file.
+		filename: path.join(__dirname, '../test/db/data/automatedTests/twentyThreeMinuteFreqTestData.csv'),
 		normalizeByHour: true
 	};
 	await generateSine(startDate, endDate, options);
@@ -192,7 +194,8 @@ async function generateFifteenMinuteTestingData() {
 		// of the month.
 		periodLength: { day: 45 },
 		maxAmplitude: 3,
-		filename: `${__dirname}/../test/db/data/automatedTests/fifteenMinuteFreqTestData.csv`, // Data saved in 'fifteenMinuteFreqTestData.csv' file.
+		// Data saved in 'fifteenMinuteFreqTestData.csv' file.
+		filename: path.join(__dirname, '../test/db/data/automatedTests/fifteenMinuteFreqTestData.csv'),
 		normalizeByHour: true
 	};
 	await generateSine(startDate, endDate, options);
@@ -210,7 +213,8 @@ async function generateOneMinuteTestingData() {
 		timeStep: { minute: 1 }, // Data point intervals set to 1 minute.
 		periodLength: { day: 45 },
 		maxAmplitude: 3,
-		filename: `${__dirname}/../test/db/data/automatedTests/oneMinuteFreqTestData.csv`, // Data saved in 'oneMinuteFreqTestData.csv' file.
+		// Data saved in 'oneMinuteFreqTestData.csv' file.
+		filename: path.join(__dirname, '../test/db/data/automatedTests/oneMinuteFreqTestData.csv'),
 		normalizeByHour: true
 	};
 	await generateSine(startDate, endDate, options);
