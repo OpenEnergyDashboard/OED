@@ -48,11 +48,12 @@ export class ReadingsCSVUploadComponent extends React.Component<ReadingsCSVUploa
 	private handleSubmit = async e => {
 		try {
 			e.preventDefault();
+			console.log("This is run");
 			await this.props.submitCSV(this.fileInput.current.files[0]); // Not sure how to respond to this typescript error.
 			// Respond to success.
 		} catch (error) {
 			// A failed axios request should result in an error.
-			// console.log(error);
+		 	// console.log(error);
 		}
 	}
 

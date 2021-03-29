@@ -19,7 +19,7 @@ class Meter {
 	 * @param meterTimezone Default timezone for meter
 	 * @param identifier Another way to identify a meter
 	 */
-	constructor(id, name, ipAddress, enabled, displayable, type, meterTimezone, gps = undefined, identifier = name) {
+	constructor(id, name, ipAddress, enabled, displayable, type, meterTimezone = undefined, gps = undefined, identifier = name) {
 		this.id = id;
 		this.name = name;
 		this.ipAddress = ipAddress;

@@ -8,7 +8,7 @@ const Reading = require('../../models/Reading');
 const convertToReadings = require('./convertToReadings');
 const { log } = require('../../log');
 const handleCumulative = require('./handleCumulative');
-
+const processData = require('./processData');
 /**
  * Select and process needed values from a matrix and return an array of reading value and reading time
  * @param {object[[]]} dataRows where each row is defined by mapRowToModel function
@@ -21,11 +21,29 @@ const handleCumulative = require('./handleCumulative');
  * @param {array} conn connection to database
  */
 async function loadArrayInput(dataRows, meterID, mapRowToModel, isCumulative, cumulativeReset, readingRepetition, conditionSet, conn) {
+	//readingsArray = dataRows.map(mapRowToModel);
+	//console.log("dataRows is: "+dataRows);
 	readingsArray = dataRows.map(mapRowToModel);
+	/*console.log("readingsArray.Length is: "+readingsArray.length);
+	for (var i = 0; i < readingsArray.length; i++){
+		console.log("this reading is: "+readingsArray[i]);
+	}*/
+	//console.log("mapRowToModel: ");
+	//console.log(dataRows.map(mapRowToModel));
+	//console.log("readingsArray is: "+readingsArray);
+
+	// Temporary values for params
+	let onlyEndtime = true;
+	let Tgap = 0;
+	let Tlen = 0;
+
+	readingsArray = processData(readingsArray, meterID, isCumulative, cumulativeReset, readingRepetition, onlyEndtime, Tgap, Tlen, conn);
+	/*
 	if (isCumulative) {
-		readingsArray = handleCumulative(readingsArray, readingRepetition, cumulativeReset, meterID);
-	}
+		readingsArray = handleCumulative(readingsArray, readingRepetition, cumulativeReset, meterID, true, 0, 0, conn);
+	}*/
 	readings = convertToReadings(readingsArray, meterID, conditionSet);
+	//console.log("readings are: "+readings);
 	return await Reading.insertOrIgnoreAll(readings, conn);
 }
 

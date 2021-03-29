@@ -11,18 +11,28 @@ const success = require('../csvPipeline/success');
 
 async function uploadMeters(req, res, filepath, conn) {
 	try {
-		const columns = Object.keys(new Meter()).slice(1); // used for the shape of the csv
+		//console.log("trying to create columns");
+		const columns = Object.keys(new Meter()).slice(0); // used for the shape of the csv
+		//console.log("We want meter() to give: ");
+		//console.log(Object.keys(new Meter()).slice(0);
+		//console.log("columns succesfully created");
+		//console.log(columns);
 		const temp = (await readCsv(filepath)).map(row => {
 			const hash = {};
+			//console.log("columns is: ");
+			//console.log(columns);
 			columns.forEach((entry, idx) => {
 				hash[entry] = row[idx];
 			});
 			return hash;
 		});
-		const meters = (req.body.headerrow === 'true') ? temp.slice(1) : temp;
+		const meters = (req.body.headerRow === 'true') ? temp.slice(1) : temp;
+		//console.log(temp.slice(1));
+		//console.log(meters);
 		await Promise.all(meters.map(meter => {
+			//console.log(meter);
 			return (new Meter(undefined, meter.name, meter.ipAddress, meter.enabled === 'TRUE', meter.displayable === 'TRUE', meter.type,
-				meter.identifier)).insert(conn);
+				meter.meterTimezone, undefined, meter.identifier)).insert(conn);
 		}));
 		fs.unlink(filepath)
 			.catch(err => {

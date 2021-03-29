@@ -29,7 +29,26 @@ async function loadCsvInput(filePath, meterID, mapRowToModel, readAsStream, isCu
 			const stream = fs.createReadStream(filePath);
 			return loadCsvStream(stream, meterID, mapRowToModel, conditionSet, conn);
 		} else {
-			const dataRows = headerRow ? (await readCsv(filePath)).shift() : (await readCsv(filePath));
+			//const dataRows = headerRow ? (await readCsv(filePath)).shift() : (await readCsv(filePath));
+			const dataRows = (await readCsv(filePath));
+			//console.log("Before any change: ",dataRows);
+			if (headerRow == true){
+				dataRows.shift();
+				// We could maybe use await readCsv(filePath).slice(1)
+				// However, this will return a shallow copy which might be a problem since readingsArray in loadArrayInput uses map which will then create a shallow copy of dataRows.
+				// Currently dataRows holds too much info. I.e. it also contains meter_id. A possible fix is dataRows.shift() or dataRows.slice(1);
+			}
+			//console.log(dataRows);
+			//console.log(headerRow);
+			//console.log(dataRows.shift());
+			//console.log(dataRows.shift());
+			//console.log(dataRows.shift());
+			//console.log(dataRows.shift());
+			//console.log(headerRow);
+			//console.log(dataRows[0]);
+			//console.log(dataRows[1]);
+			//console.log("mapRowToModel: ");
+			//console.log(dataRows.map(mapRowToModel));
 			return loadArrayInput(dataRows, meterID, mapRowToModel, isCumulative, cumulativeReset, readingRepetition, conditionSet, conn);
 		}
 	} catch (err) {

@@ -29,13 +29,26 @@ function handleCumulative(rows, readingRepetition, cumulativeReset, meterID) {
 	let meterReading = 0;
 	let meterReading1 = 0;
 	let meterReading2 = 0;
+	//let initialReading = false;
 
+	/*console.log("cumulative readings array on entry gives: ");
+	for (var i = 0; i < rows.length; i++){
+		console.log("this row is: "+rows[i]);
+	}*/
 	for (let index = readingRepetition; index < rows.length; ++index) {
 		// To read data where same reading is repeated. Like E-mon D-mon meters
 		if ((index - readingRepetition) % readingRepetition === 0) {
+			/*if (index == readingRepetition){
+				// Set index to 0 and fix it after this iteration
+				original_index = index;
+				index = 0;
+				initialReading = true;
+			}*/
 			// set start_timestamp and end_timestamp
 			startTimestamp = moment(rows[index][1], 'MM/DD/YY HH:mm');
+			//console.log("startTimestamp is: "+rows[index][0]);
 			endTimestamp = moment(rows[index - readingRepetition][2], 'MM/DD/YY HH:mm');
+			//console.log("startTimestamp is: "+rows[index][1]);
 			// meterReading
 			meterReading1 = rows[index - readingRepetition][0];
 			meterReading2 = rows[index][0];
@@ -52,6 +65,9 @@ function handleCumulative(rows, readingRepetition, cumulativeReset, meterID) {
 			}
 			// Push into reading Array
 			result.push([meterReading, startTimestamp, endTimestamp]);
+			/*if (initialReading){
+				index = original_index;
+			}*/
 		}
 	}
 	return result;
