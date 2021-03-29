@@ -53,7 +53,12 @@ function mapStateToProps(state: State) {
 					text: hoverText,
 					hoverinfo: 'text',
 					type: 'bar',
-					marker: {color: getGraphColor(colorID, DataType.Meter)}
+					line: {
+						shape: 'spline',
+						width: 3,
+						color: getGraphColor(colorID, DataType.Meter)
+					},
+					//marker: {color: getGraphColor(colorID, DataType.Meter)}
 				});
 			}
 		}
@@ -92,7 +97,12 @@ function mapStateToProps(state: State) {
 					text: hoverText,
 					hoverinfo: 'text',
 					type: 'bar',
-					marker: {color: getGraphColor(colorID, DataType.Group)}
+					line: {
+						shape: 'spline',
+						width: 3,
+						color: getGraphColor(colorID, DataType.Meter)
+					},
+					//marker: {color: getGraphColor(colorID, DataType.Meter)}
 				});
 			}
 		}
