@@ -5,7 +5,7 @@
 import { ChartTypes } from '../types/redux/graph';
 import { ActionType } from '../types/redux/actions';
 import { AdminState, AdminAction } from '../types/redux/admin';
-import { LanguageTypes } from '../types/i18n';
+import { LanguageTypes } from '../types/redux/i18n';
 
 const defaultState: AdminState = {
 	selectedMeter: null,
