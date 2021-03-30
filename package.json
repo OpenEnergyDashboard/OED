@@ -27,12 +27,16 @@
     "refreshReadingViews": "node ./src/server/services/refreshReadingViews.js",
     "obvius:showConfigfiles": "node ./src/server/services/obvius/showConfigfiles.js",
     "obvius:purgeConfigfiles": "node ./src/server/services/obvius/purgeConfigfiles.js",
-	"generateFourDayTestingData": "node -e 'require(\"./src/server/data/automatedTestingData\").generateFourDayTestingData()'",
+    "generateFourDayTestingData": "node -e 'require(\"./src/server/data/automatedTestingData\").generateFourDayTestingData()'",
     "generateFourHourTestingData": "node -e 'require(\"./src/server/data/automatedTestingData\").generateFourHourTestingData()'",
     "generateTwentyThreeMinuteTestingData": "node -e 'require(\"./src/server/data/automatedTestingData\").generateTwentyThreeMinuteTestingData()'",
     "generateFifteenMinuteTestingData": "node -e 'require(\"./src/server/data/automatedTestingData\").generateFifteenMinuteTestingData()'",
     "generateOneMinuteTestingData": "node -e 'require(\"./src/server/data/automatedTestingData\").generateOneMinuteTestingData()'",
-    "generateTestingData": "node -e 'require(\"./src/server/data/automatedTestingData\").generateTestingData()'"
+    "generateVariableAmplitudeTestingData": "node -e 'require(\"./src/server/data/automatedTestingData\").generateVariableAmplitudeTestingData()'",
+    "generateSineSquaredTestingData": "node -e 'require(\"./src/server/data/automatedTestingData\").generateSineSquaredTestingData(2.5)'",
+    "generateCosineSquaredTestingData": "node -e 'require(\"./src/server/data/automatedTestingData\").generateCosineSquaredTestingData(2.5)'",
+    "generateTestingData": "node -e 'require(\"./src/server/data/automatedTestingData\").generateTestingData()'",
+    "testData": "./src/scripts/testData.sh"
   },
   "nodemonConfig": {
     "watch": [

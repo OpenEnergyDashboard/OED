@@ -140,6 +140,7 @@ function momenting(arrayOfMoments, periodLength) {
  * @param {moment.MomentInputObject} options.timeStep - The length of time between two consecutive data points.
  * @param {moment.MomentInputObject} options.periodLength - The length of the period of the generated sine wave.
  * @param {number} options.maxAmplitude - The max height of the generated sine wave.
+ * @param {boolean} options.noShift - If false then shift so all values positive, true then no shift.
  * @param {number} options.phaseShift - The amount to phase shift the generated sine wave.
  * @param {boolean} options.squared - Indicates whether output sine data should be squared (if true) or not (if false).
  * @returns {[string, string, string][]} Matrix of rows representing each csv row of the form value, startTimeStamp, endTimeStamp.
@@ -151,6 +152,7 @@ function generateSineData(startTimeStamp, endTimeStamp, options = {}) {
 		timeStep: options.timeStep || { minute: 20 },
 		periodLength: options.periodLength || { day: 1 },
 		maxAmplitude: options.maxAmplitude || 2,
+		noShift: options.noShift || false,
 		phaseShift: options.phaseShift || 0,
 		squared: options.squared || false
 	};
@@ -165,9 +167,10 @@ function generateSineData(startTimeStamp, endTimeStamp, options = {}) {
 	const sineValues = momenting(datesAsMoments, chosenOptions.periodLength)
 		.map(x => {
 			const result = Math.sin(Math.PI * 2 * x + chosenOptions.phaseShift);
-			const scaledResult = halfMaxAmplitude * result + halfMaxAmplitude;
+			const scaledResult = chosenOptions.noShift ? result * chosenOptions.maxAmplitude :
+				halfMaxAmplitude * result + halfMaxAmplitude;
 			// Squares each sine value if desired output is a series of sine-squared values
-			return `${chosenOptions.squared === true ? (scaledResult * scaledResult) : scaledResult}`;
+			return `${chosenOptions.squared ? (scaledResult * scaledResult) : scaledResult}`;
 		});
 	return (_.zip(sineValues, startDates, endDates));
 }
@@ -199,7 +202,7 @@ async function writeToCsv(data, filename = 'test.csv') {
 
 // interface GenerateDataFileOptions extends GenerateDataOptions {
 // 	filename?: string;
-// 	normalizeByHour?: boolean;
+// 	skipNormalize?: boolean;
 // }
 
 // interface GenerateSinusoidalDataFileOptions extends GenerateDataFileOptions {
@@ -215,8 +218,10 @@ async function writeToCsv(data, filename = 'test.csv') {
  * @param {moment.MomentInputObject} options.timeStep - The time step between each data point.
  * @param {moment.MomentInputObject} options.periodLength - The length of the period of the sine wave.
  * @param {number} options.maxAmplitude - The max amplitude of the sine wave.
+ * @param {boolean} options.noShift - If false then shift so all values positive, true then no shift.
  * @param {string} options.filename - The name of the csv file containing the sine wave data.
- * @param {boolean} options.normalizeByHour - If true normalizes data by the hour due to how OED displays data.
+ * @param {boolean} options.skipNormalize - If true skip normalizing data to how OED displays data.
+ * @param options.normalizeTime - The time you want to normalize to (1 hour default value)
  * @param {number} options.phaseShift - The amount to phase shift the generated sine wave.
  * @param {boolean} options.squared - Indicates whether output sine data should be squared (if True) or not (if False).
  */
@@ -227,13 +232,17 @@ async function generateSine(startTimeStamp, endTimeStamp, options = {}) {
 		timeStep: options.timeStep || { minute: 20 },
 		periodLength: options.periodLength || { day: 1 },
 		maxAmplitude: options.maxAmplitude || 2,
+		noShift: options.noShift || false,
 		filename: options.filename || 'test.csv',
-		normalizeByHour: options.normalizeByHour || false,
+		skipNormalize: options.skipNormalize || false,
+		// OED line graphs normalize to the hour so you normally don't need to set this value. You might to change
+		// the bar graph value to something desired.
+		normalizeTime: options.normalizeTime || { hour: 1 },
 		phaseShift: options.phaseShift || 0,
 		squared: options.squared || false
 	};
 	try {
-		if (chosenOptions.normalizeByHour) {
+		if (!chosenOptions.skipNormalize) {
 			// You want to normalize the data to one hour.
 			// The idea is you expect OED to show the data at one point per hour so you
 			// scale the output to take this into account. This is needed since OED calculates
@@ -242,7 +251,7 @@ async function generateSine(startTimeStamp, endTimeStamp, options = {}) {
 			// in that one hour.
 			// Set the length of time that OED is going to plot that you want to normalize to.
 			// Can use any time frame instead of asMinutes since give full value with decimals.
-			let oedTimePoints = moment.duration({ hour: 1 }).asMinutes();
+			let oedTimePoints = moment.duration(chosenOptions.normalizeTime).asMinutes();
 			// Set the length of time between points you are generating.
 			let step = moment.duration(chosenOptions.timeStep).asMinutes();
 			// The ratio is the scale needed.
@@ -265,8 +274,10 @@ async function generateSine(startTimeStamp, endTimeStamp, options = {}) {
  * @param {moment.MomentInputObject} options.timeStep - The length of time between two consecutive data points.
  * @param {moment.MomentInputObject} options.periodLength - The length of the period of the cosine wave.
  * @param {number} options.maxAmplitude - The max amplitude of the cosine wave.
+ * @param {boolean} options.noShift - If false then shift so all values positive, true then no shift.
  * @param {string} options.filename - The name of the csv file containing the cosine wave data.
- * @param {boolean} options.normalizeByHour - If true normalizes data by the hour due to how OED displays data.
+ * @param {boolean} options.skipNormalize - If true skips normalizing data to how OED displays data.
+ * @param options.normalizeTime - The time you want to normalize to (1 hour default value)
  * @param {number} options.phaseShift - The amount to phase shift the generated cosine wave.
  * @param {boolean} options.squared - Indicates whether output sine data should be squared (if True) or not (if False).
  */
@@ -277,14 +288,31 @@ async function generateCosine(startTimeStamp, endTimeStamp, options = {}) {
 		timeStep: options.timeStep || { minute: 20 },
 		periodLength: options.periodLength || { day: 1 },
 		maxAmplitude: options.maxAmplitude || 2,
+		noShift: options.noShift || false,
 		filename: options.filename || 'test.csv',
-		normalizeByHour: options.normalizeByHour || false,
+		skipNormalize: options.skipNormalize || false,
+		// OED line graphs normalize to the hour so you normally don't need to set this value. You might to change
+		// the bar graph value to something desired.
+		normalizeTime: options.normalizeTime || { hour: 1 },
 		phaseShift: (options.phaseShift || 0) + (Math.PI / 2), // phase shifting by PI/2 converts from sine to cosine.
 		squared: options.squared || false
 	};
 	try {
-		if (chosenOptions.normalizeByHour) {
-			const scale = _momentPercentage(moment({ hour: 0 }), moment({ hour: 1 }), moment(chosenOptions.timeStep));
+		if (!chosenOptions.skipNormalize) {
+			// You want to normalize the data to one hour.
+			// The idea is you expect OED to show the data at one point per hour so you
+			// scale the output to take this into account. This is needed since OED calculates
+			// usage at the rate it displays. For example, if you have a point every 20 minutes
+			// then you need to scale each point by 1/3 because OED will average the 3 points
+			// in that one hour.
+			// Set the length of time that OED is going to plot that you want to normalize to.
+			// Can use any time frame instead of asMinutes since give full value with decimals.
+			let oedTimePoints = moment.duration(chosenOptions.normalizeTime).asMinutes();
+			// Set the length of time between points you are generating.
+			let step = moment.duration(chosenOptions.timeStep).asMinutes();
+			// The ratio is the scale needed.
+			const scale = step / oedTimePoints;
+			// Now scale the points.
 			chosenOptions.maxAmplitude = chosenOptions.maxAmplitude * scale;
 		}
 		await writeToCsv(generateSineData(startTimeStamp, endTimeStamp, chosenOptions), chosenOptions.filename);
