@@ -20,11 +20,15 @@ function isRoleAuthorized(role, requestedRole) {
 
 /** Checks if a token (assumed to be verified) has the authorization capabilities as the requested role. */
 async function isTokenAuthorized(token, requestedRole) {
-	const payload = await jwtVerify(token, secretToken);
-	const { data: id } = payload;
-	const conn = getConnection();
-	const { role } = await User.getByID(id, conn);
-	return isRoleAuthorized(role, requestedRole);
+	try {
+		const payload = await jwtVerify(token, secretToken);
+		const { data: id } = payload;
+		const conn = getConnection();
+		const { role } = await User.getByID(id, conn);
+		return isRoleAuthorized(role, requestedRole);
+	} catch (error) {
+		return false;
+	}
 }
 
 /** Checks if a user is authorized. */
