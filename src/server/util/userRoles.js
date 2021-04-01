@@ -4,7 +4,10 @@
 
 const jwt = require('jsonwebtoken');
 const User = require('../models/User');
+const promisify = require('es6-promisify');
+const jwtVerify = promisify(jwt.verify);
 const { getConnection } = require('../db');
+const secretToken = require('../config').secretToken;
 
 /** Checks if a role has the authorization capabilities as the requested role. */
 function isRoleAuthorized(role, requestedRole) {
@@ -17,7 +20,7 @@ function isRoleAuthorized(role, requestedRole) {
 
 /** Checks if a token (assumed to be verified) has the authorization capabilities as the requested role. */
 async function isTokenAuthorized(token, requestedRole) {
-	const payload = jwt.decode(token);
+	const payload = await jwtVerify(token, secretToken);
 	const { data: id } = payload;
 	const conn = getConnection();
 	const { role } = await User.getByID(id, conn);
