@@ -64,7 +64,7 @@ export default class MetersDetailComponent extends React.Component<MetersDetailP
 					<Table striped bordered hover>
 					<thead>
 						<tr>
-						<th> <FormattedMessage id='meter.id' /> </th>
+						{hasToken() && <th> <FormattedMessage id='meter.id' /> </th>}
 						<th> <FormattedMessage id='meter.name' /> </th>
 						{hasToken() && <th> <FormattedMessage id='meter.type' /> </th>}
 						{hasToken() && <th> <FormattedMessage id='meter.ip'/> </th>}

@@ -2,8 +2,7 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
 
-export enum LanguageTypes {
-	en = 'en',
-	fr = 'fr',
-	es = 'es'
+export default class Locales{
+	static es = require('plotly.js/lib/locales/es');
+	static fr = require('plotly.js/lib/locales/fr');
 }

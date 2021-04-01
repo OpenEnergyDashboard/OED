@@ -15,7 +15,7 @@ import {
 import { State } from '../../types/redux/state';
 import { Dispatch } from '../../types/redux/actions';
 import { ChartTypes } from '../../types/redux/graph';
-import { LanguageTypes } from '../../types/i18n';
+import { LanguageTypes } from '../../types/redux/i18n';
 
 function mapStateToProps(state: State) {
 	return {
