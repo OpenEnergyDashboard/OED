@@ -2,11 +2,11 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
 
-const { CSVPipelineError } = require('../csvPipeline/CustomErrors');
+const { CSVPipelineError } = require('./CustomErrors');
+const success = require('./success');
 const fs = require('fs').promises;
 const loadCsvInput = require('../pipeline-in-progress/loadCsvInput');
 const Meter = require('../../models/Meter');
-const success = require('../csvPipeline/success');
 
 async function uploadReadings(req, res, filepath, conn) {
 
