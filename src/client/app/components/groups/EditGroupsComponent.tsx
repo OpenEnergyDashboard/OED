@@ -10,7 +10,7 @@ import DatasourceBoxContainer from '../../containers/groups/DatasourceBoxContain
 import { NamedIDItem } from '../../types/items';
 import { SelectionType } from '../../containers/groups/DatasourceBoxContainer';
 import { EditGroupNameAction, ChangeChildMetersAction, ChangeChildGroupsAction, ChangeDisplayModeAction } from '../../types/redux/groups';
-import FooterComponent from '../FooterComponent';
+import FooterContainer from '../../containers/FooterContainer';
 import HeaderContainer from '../../containers/HeaderContainer';
 import {  browserHistory } from '../../utils/history';
 import { FormattedMessage, InjectedIntlProps, injectIntl, defineMessages } from 'react-intl';
@@ -196,7 +196,7 @@ class EditGroupsComponent extends React.Component<EditGroupsPropsWithIntl, EditG
 						</div>
 					</div>
 				</div>
-				<FooterComponent />
+				<FooterContainer />
 			</div>
 		);
 	}

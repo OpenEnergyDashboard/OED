@@ -6,7 +6,7 @@
 
 import ApiBackend from './ApiBackend';
 import { NamedIDItem } from '../../types/items';
-import { BarReadings, CompareReadings, LineReadings } from '../../types/readings';
+import { BarReadings, CompareReadings, LineReadings, RawReadings } from '../../types/readings';
 import { TimeInterval } from '../../../../common/TimeInterval';
 import { MeterMetadata, MeterEditData } from '../../types/redux/meters';
 import * as moment from 'moment';
@@ -22,10 +22,26 @@ export default class MetersApi {
 		return await this.backend.doGetRequest<NamedIDItem[]>('/api/meters');
 	}
 
+	public async lineReadingsCount(meterIDs:number[], timeInterval: TimeInterval):Promise<number> {
+		const stringifiedIDs = meterIDs.join(',');
+		return await this.backend.doGetRequest<number>(
+			`/api/readings/line/count/meters/${stringifiedIDs}`,
+			{ timeInterval: timeInterval.toString() }
+		);
+	}
+
 	public async lineReadings(meterIDs: number[], timeInterval: TimeInterval): Promise<LineReadings> {
 		const stringifiedIDs = meterIDs.join(',');
 		return await this.backend.doGetRequest<LineReadings>(
 			`/api/readings/line/meters/${stringifiedIDs}`,
+			{ timeInterval: timeInterval.toString() }
+		);
+	}
+
+	public async rawLineReadings(meterIDs: number[], timeInterval: TimeInterval): Promise<RawReadings[]> {
+		const stringifiedIDs = meterIDs.join(',');
+		return await this.backend.doGetRequest<RawReadings[]>(
+			`/api/readings/line/raw/meters/${stringifiedIDs}`,
 			{ timeInterval: timeInterval.toString() }
 		);
 	}

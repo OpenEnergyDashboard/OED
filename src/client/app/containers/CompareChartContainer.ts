@@ -9,13 +9,18 @@ import { State } from '../types/redux/state';
 import { getComparePeriodLabels, getCompareChangeSummary } from '../utils/calculateCompare';
 import { CompareEntity } from './MultiCompareChartContainer';
 import translate from '../utils/translate';
-import {CompressedBarReading} from '../types/compressed-readings';
 import PlotlyChart, { IPlotlyChartProps } from 'react-plotlyjs-ts';
+import Locales from '../types/locales';
 
 interface CompareChartContainerProps {
 	entity: CompareEntity;
 }
 
+/* Passes the current redux state of the of the chart container and it's props, and turns it into props for the React
+*  component, which is what will be visible on the page. Makes it possible to access
+*  your reducer state objects from within your React components.
+*
+*  Returns the props object. */
 function mapStateToProps(state: State, ownProps: CompareChartContainerProps): IPlotlyChartProps {
 	const comparePeriod = state.graph.comparePeriod;
 	const datasets: any[] = [];
@@ -93,10 +98,11 @@ function mapStateToProps(state: State, ownProps: CompareChartContainerProps): IP
 		data: datasets,
 		layout,
 		config: {
-			displayModeBar: false
+			displayModeBar: false,
+			locales: Locales // makes locales available for use
 		}
 	};
-
+	props.config.locale = state.admin.defaultLanguage;
 	return props;
 }
 

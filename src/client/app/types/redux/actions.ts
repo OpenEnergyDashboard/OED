@@ -7,6 +7,9 @@ import { ThunkAction } from 'redux-thunk';
 import { State } from './state';
 
 export enum ActionType {
+	RequestVersion = 'REQUEST_VERSION',
+	ReceiveVersion = 'RECEIVE_VERSION',
+
 	RequestMetersDetails = 'REQUEST_METERS_DETAILS',
 	ReceiveMetersDetails = 'RECEIVE_METERS_DETAILS',
 	ChangeDisplayedMeters = 'CHANGE_DISPLAYED_METERS',
@@ -82,14 +85,11 @@ export enum ActionType {
 	UpdateMapSource = 'UPDATE_MAP_IMAGE',
 	ChangeGridDisplay = 'CHANGE_GRID_DISPLAY',
 	UpdateCurrentCartesian = 'UPDATE_CURRENT_CARTESIAN',
-	UpdateCurrentGPS = 'UPDATE_CURRENT_GPS',
 	ResetCurrentPoint = 'RESET_CURRENT_POINT',
 	AppendCalibrationSet = 'APPEND_CALIBRATION_SET',
 	UpdateCalibrationResults = 'UPDATE_CALIBRATION_RESULTS',
 	RequestMapsDetails = 'REQUEST_MAP_DETAILS',
 	ReceiveMapsDetails = 'RECEIVE_MAP_DETAILS',
-	RequestSelectedMap = 'REQUEST_SELECTED_MAP',
-	ReceiveSelectedMap = 'RECEIVE_SELECTED_MAP',
 	DeleteMap = 'DELETE_MAP',
 	EditMapDetails = 'EDIT_MAP_DETAILS',
 	SubmitEditedMap = 'SUBMIT_EDITED_MAP',

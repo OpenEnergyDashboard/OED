@@ -2,11 +2,20 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
 
+/**
+ * Tests if the expected properties are the actual results from meters.
+ */
+
 const { mocha, expect, testDB } = require('../common');
 const Meter = require('../../models/Meter');
 const Point = require('../../models/Point');
 const gps = new Point(90, 45);
 
+/**
+ * Checks if the expected meter properties have the actual properties.
+ * @param expected expected meter properties
+ * @param actual actual meter properties
+ */
 function expectMetersToBeEquivalent(expected, actual) {
 	expect(actual).to.have.property('id', expected.id);
 	expect(actual).to.have.property('name', expected.name);

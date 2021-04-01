@@ -8,7 +8,7 @@ import ExportComponent from '../components/ExportComponent';
 import { ChartTypes } from '../types/redux/graph';
 import { ExportDataSet } from '../types/readings';
 import { State } from '../types/redux/state';
-import { CompressedBarReading, CompressedBarReadings, CompressedLineReading } from '../types/compressed-readings';
+import { CompressedBarReading, CompressedLineReading } from '../types/compressed-readings';
 
 
 function transformLineReadingToLegacy(reading: CompressedLineReading): [number, number] {
@@ -141,8 +141,12 @@ function mapStateToProps(state: State) {
 	}
 
 	return {
+		showRawExport:state.graph.chartToRender==='line'?true:false,
 		selectedMeters: state.graph.selectedMeters,
-		exportVals: { datasets }
+		selectedGroups: state.graph.selectedGroups,
+		exportVals: { datasets },
+		timeInterval: state.graph.timeInterval,
+		defaultLanguage: state.admin.defaultLanguage
 	};
 }
 

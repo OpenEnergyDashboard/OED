@@ -19,7 +19,7 @@ import {LinkOptions} from 'actions/graph';
 import {hasToken} from '../utils/token';
 import {showErrorNotification} from '../utils/notifications';
 import {ChartTypes} from '../types/redux/graph';
-import {LanguageTypes} from '../types/i18n';
+import {LanguageTypes} from '../types/redux/i18n';
 import {verificationApi} from '../utils/api';
 import translate from '../utils/translate';
 import {validateComparePeriod, validateSortingOrder} from '../utils/calculateCompare';
@@ -77,12 +77,6 @@ export default class RouteComponent extends React.Component<RouteProps, {}> {
 	 * @param replace Function that allows a route redirect
 	 */
 	public checkAuth(nextState: RouterState, replace: RedirectFunction) {
-		function redirectRoute() {
-			replace({
-				pathname: '/login',
-				state: { nextPathname: nextState.location.pathname }
-			});
-		}
 		// Only check the token if the auth token does not exist
 		if (hasToken()) {
 			// Verify that the auth token is valid.

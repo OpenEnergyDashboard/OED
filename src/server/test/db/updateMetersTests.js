@@ -2,6 +2,10 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
 
+/*
+ * Tests for updating meters.
+ */
+
 const { mocha, expect, testDB } = require('../common');
 const moment = require('moment');
 
@@ -24,6 +28,7 @@ mocha.describe('Meter Update', () => {
 
 		const metersToUpdate = [goodMeter, badMeter];
 
+		// Create a stub to resolve a Reading for the "good" meter and reject the "bad" meter.
 		const dataReader = sinon.stub();
 		dataReader.withArgs(goodMeter).resolves(new Reading(
 			goodMeter.id,
@@ -38,6 +43,7 @@ mocha.describe('Meter Update', () => {
 		const goodReadings = await Reading.getAllByMeterID(goodMeter.id, conn);
 		const badReadings = await Reading.getAllByMeterID(badMeter.id, conn);
 
+		// Check that the good meter has one reading and the bad meter has none.
 		expect(goodReadings.length).to.equal(1);
 		expect(badReadings.length).to.equal(0);
 	});

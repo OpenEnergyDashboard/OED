@@ -7,7 +7,7 @@ import {  browserHistory } from '../utils/history';
 import { InjectedIntlProps, injectIntl, defineMessages, FormattedMessage } from 'react-intl';
 import { Input, Button, InputGroup, Form } from 'reactstrap';
 import HeaderContainer from '../containers/HeaderContainer';
-import FooterComponent from '../components/FooterComponent';
+import FooterContainer from '../containers/FooterContainer';
 import { showErrorNotification } from '../utils/notifications';
 import { verificationApi } from '../utils/api';
 import translate from '../utils/translate';
@@ -68,11 +68,17 @@ class LoginComponent extends React.Component<InjectedIntlProps, LoginState> {
 							onChange={this.handlePasswordChange}
 						/>
 					</InputGroup>
-					<Button outline style={buttonStyle} type='submit' onClick={this.handleSubmit}>
+					<Button
+						outline
+						style={buttonStyle}
+						type='submit'
+						onClick={this.handleSubmit}
+						disabled={this.state.email.length === 0 || this.state.password.length === 0}
+					>
 						<FormattedMessage id='submit' />
 					</Button>
 				</Form>
-				<FooterComponent />
+				<FooterContainer />
 			</div>
 		);
 	}

@@ -2,6 +2,10 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
 
+/**
+ * This class tests compressing the meter readings.
+ */
+
 const { mocha, expect, testDB } = require('../common');
 const moment = require('moment');
 const Group = require('../../models/Group');
@@ -10,6 +14,10 @@ const Reading = require('../../models/Reading');
 const Point = require('../../models/Point');
 const gps = new Point(90, 45);
 
+/**
+ * Tests for compressed meter readings.
+ * Here, timestamps are created for meter readings.
+ */
 mocha.describe('Compressed Readings', () => {
 	let meter;
 	const timestamp1 = moment('2017-01-01');

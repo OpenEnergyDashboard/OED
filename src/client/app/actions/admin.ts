@@ -11,7 +11,8 @@ import { ActionType, Dispatch, GetState, Thunk } from '../types/redux/actions';
 import { State } from '../types/redux/state';
 import { preferencesApi } from '../utils/api';
 import translate from '../utils/translate';
-import { LanguageTypes } from '../types/i18n';
+import { LanguageTypes } from '../types/redux/i18n';
+import moment = require('moment');
 
 
 export function updateSelectedMeter(meterID: number): t.UpdateImportMeterAction {
@@ -35,6 +36,7 @@ export function toggleDefaultBarStacking(): t.ToggleDefaultBarStackingAction {
 }
 
 export function updateDefaultLanguage(defaultLanguage: LanguageTypes): t.UpdateDefaultLanguageAction {
+	moment.locale(defaultLanguage);
 	return { type: ActionType.UpdateDefaultLanguage, defaultLanguage };
 }
 
@@ -59,6 +61,7 @@ function fetchPreferences(): Thunk {
 		dispatch(requestPreferences());
 		const preferences = await preferencesApi.getPreferences();
 		dispatch(receivePreferences(preferences));
+		moment.locale(getState().admin.defaultLanguage);
 		if (!getState().graph.hotlinked) {
 			dispatch((dispatch2: Dispatch, getState2: GetState) => {
 				const state = getState();

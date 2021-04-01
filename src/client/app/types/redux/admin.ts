@@ -2,9 +2,9 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
 
-import { PreferenceRequestItem, SelectOption } from '../items';
+import { PreferenceRequestItem } from '../items';
 import { ChartTypes } from './graph';
-import { LanguageTypes } from '../i18n';
+import { LanguageTypes } from './i18n';
 import { ActionType } from './actions';
 
 export type AdminAction =

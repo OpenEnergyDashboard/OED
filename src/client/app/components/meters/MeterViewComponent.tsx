@@ -4,8 +4,6 @@
 
 import * as React from 'react';
 import { Button } from 'reactstrap';
-import ListDisplayComponent from '../ListDisplayComponent';
-import { Link } from 'react-router';
 import { hasToken } from '../../utils/token';
 import { FormattedMessage } from 'react-intl';
 import { MeterMetadata, EditMeterDetailsAction } from '../../types/redux/meters';
@@ -44,14 +42,9 @@ export default class MeterViewComponent extends React.Component<MeterViewProps, 
 	}
 
 	public render() {
-		const renderEditButton = true;
-		const editButtonStyle: React.CSSProperties = {
-			display: 'inline',
-			paddingLeft: '5px'
-		};
 		return (
 			<tr>
-				<td> {this.props.meter.id} {this.formatStatus()} </td>
+				{hasToken() && <td> {this.props.meter.id} {this.formatStatus()} </td>}
 				<td> {this.props.meter.name} </td>
 				{hasToken() && <td> {this.props.meter.meterType} </td>}
 				{hasToken() && <td> {this.props.meter.ipAddress} </td>}

@@ -67,8 +67,8 @@ function ensureIfFromAndToExist(curr, to, adjListArray) {
 }
 
 /**
- * Do a breath first search traversal to find the shortest path
- * from the current version to the version user want to migrate
+ * Do a breadth first search traversal to find the shortest path
+ * from the current version to the version user wants to migrate to.
  * It also works for down migration.
  * @param curr current version of the database
  * @param to version want to migrate to
