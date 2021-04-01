@@ -58,7 +58,9 @@ function mapStateToProps(state: State) {
 			// and upper, right corners of the user map.
 			const origin = state.maps.byMapID[state.maps.selectedMap].origin;
 			const opposite = state.maps.byMapID[state.maps.selectedMap].opposite;
-			if (origin !== undefined && opposite !== undefined && gps !== undefined) {
+			// The gps value can be null from the database. Note using gps !== null to check for both null and undefined
+			// causes TS to complain about the unknown case so not used.
+			if (origin !== undefined && opposite !== undefined && gps !== undefined && gps !== null) {
 				// Get the GPS degrees per unit of Plotly grid for x and y. By knowing the two corners
 				// (or really any two distinct points) you can calculate this by the change in GPS over the
 				// change in x or y which is the map's width & height in this case.
