@@ -5,7 +5,7 @@
 import * as React from 'react';
 import HeaderContainer from '../containers/HeaderContainer';
 import DashboardContainer from '../containers/DashboardContainer';
-import FooterComponent from '../components/FooterComponent';
+import FooterContainer from '../containers/FooterContainer';
 import TooltipHelpComponent from '../components/TooltipHelpComponentAlternative';
 
 /**
@@ -18,7 +18,7 @@ export default function HomeComponent() {
 			<TooltipHelpComponent page='home'/>
 			<HeaderContainer />
 			<DashboardContainer />
-			<FooterComponent />
+			<FooterContainer />
 		</div>
 	);
 }

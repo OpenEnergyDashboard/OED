@@ -14,6 +14,7 @@ import {
 import * as _ from 'lodash';
 import getGraphColor from '../utils/getGraphColor';
 import { TimeInterval } from '../../../common/TimeInterval';
+import Locales from '../types/locales';
 import { DataType } from '../types/Datasources';
 
 function mapStateToProps(state: State) {
@@ -110,7 +111,7 @@ function mapStateToProps(state: State) {
 							} else {
 								// Shift to UTC since want database time not local/browser time which is what moment does.
 								timeReading =
-									`${moment(mapReading.startTimestamp).utc().format('MMM DD, YYYY')} - ${moment(mapReading.endTimestamp).utc().format('MMM DD, YYYY')}`;
+								`${moment(mapReading.startTimestamp).utc().format('LL')} - ${moment(mapReading.endTimestamp).utc().format('LL')}`;
 								// The value for the circle is the average daily usage.
 								averagedReading = mapReading.reading / barDuration.asDays();
 								// The size is the reading value. It will be scaled later.
@@ -213,8 +214,12 @@ function mapStateToProps(state: State) {
 	 */
 	const props: IPlotlyChartProps = {
 		data,
-		layout
+		layout,
+		config: {
+			locales: Locales // makes locales available for use
+		}
 	};
+	props.config.locale = state.admin.defaultLanguage;
 	return props;
 }
 
