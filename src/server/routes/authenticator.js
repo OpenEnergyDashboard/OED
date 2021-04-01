@@ -42,6 +42,10 @@ authMiddleware = (req, res, next) => {
 	}
 };
 
+/**
+ * Middleware that checks the request body for the email and password parameters. If the body contains the email and password parameters, then next 
+ * is executed. Otherwise, the server responds with a 400 error.
+ */
 function credentialsRequestValidationMiddleware(req, res, next) {
 	const validParams = {
 		type: 'object',
@@ -65,19 +69,30 @@ function credentialsRequestValidationMiddleware(req, res, next) {
 	}
 }
 
+/**
+ * Verifies the email and password of a user.
+ * @param {string} email 
+ * @param {string} password 
+ * @param {boolean} returnUser 
+ * @returns true if the user exists in the database. False otherwise. Returns the user itself if returnUser is set to true and user is verified.
+ */
 async function verifyCredentials(email, password, returnUser = false) {
 	const conn = getConnection();
 	const user = await User.getByEmail(email, conn);
 	const isValid = await bcrypt.compare(password, user.passwordHash);
-	return (returnUser ? isValid && user : isValid);
+	if (returnUser) {
+		return isValid && user;
+	} else {
+		return isValid;
+	}
 }
 
 /**
- * Creates middleware that verifies the requested token and only proceeds if the requestor is a particular user role or Admin.
+ * Returns middleware that verifies the requested token and only proceeds if the requestor is a particular user role or is Admin.
  * @param {string} role 
  * @param action 
  */
-function roleAuthMiddleware(role, action){
+function roleTokenAuthMiddleware(role, action) {
 	return function (req, res, next) {
 		this.authMiddleware(req, res, async () => {
 			const token = req.headers.token || req.body.token || req.query.token;
@@ -96,25 +111,25 @@ function roleAuthMiddleware(role, action){
  * Returns middleware that verifies the requested token and only proceeds if the requestor is an ADMIN role.
  */
 function adminAuthMiddleware(action) {
-	return roleAuthMiddleware(User.role.ADMIN, action);
+	return roleTokenAuthMiddleware(User.role.ADMIN, action);
 }
 
 /**
  * Returns middleware that verifies the requested token and only proceeds if the requestor has the EXPORT role.
  */
 function exportAuthMiddleware(action) {
-	return roleAuthMiddleware(User.role.EXPORT, action);
+	return roleTokenAuthMiddleware(User.role.EXPORT, action);
 }
 
 /**
  * Returns middleware that verifies the requested token and only proceeds if the requestor has the CSV role.
  */
 function csvAuthMiddleware(action) {
-	return roleAuthMiddleware(User.role.CSV, action);
+	return roleTokenAuthMiddleware(User.role.CSV, action);
 }
 
 /**
- * Returns middleware that only authenticates an Admin or Obvius user.
+ * Returns middleware that only authenticates an Admin or Obvius user via email and password credentials.
  * @param {string} action - is a phrase or word that can be prefixed by 'to' for the proper response and warning messages.
  */
 function obviusEmailAndPasswordAuthMiddleware(action) {

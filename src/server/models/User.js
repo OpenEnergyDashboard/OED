@@ -85,6 +85,12 @@ class User {
 		return conn.none(sqlFile('user/update_user_role.sql'), { email: email, role: role });
 	}
 
+	/**
+	 * Returns a promise to delete a user
+	 * @param email the email of the user
+	 * @param conn is the connection to use.
+	 * @returns {Promise<void>}
+	 */
 	static deleteUser(email, conn) {
 		return conn.none(sqlFile('user/delete_user.sql'), { email: email });
 	}
