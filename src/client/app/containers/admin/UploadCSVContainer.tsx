@@ -149,13 +149,21 @@ export default class UploadCSVContainer extends React.Component<{}, UploadCSVCon
 	}
 
 	private async submitReadings(file: File) {
-		const uploadPreferences = this.state.uploadReadingsPreferences;
-		await uploadCSVApi.submitReadings(uploadPreferences, file);
+		try {
+			const uploadPreferences = this.state.uploadReadingsPreferences;
+			await uploadCSVApi.submitReadings(uploadPreferences, file);
+		} catch (error) {
+			console.log(error);
+		}
 	}
 
 	private async submitMeters(file: File) {
-		const uploadPreferences = this.state.uploadMetersPreferences;
-		await uploadCSVApi.submitMeters(uploadPreferences, file);
+		try {
+			const uploadPreferences = this.state.uploadMetersPreferences;
+			await uploadCSVApi.submitMeters(uploadPreferences, file);
+		} catch (error) {
+			console.log(error);
+		}
 	}
 
 
