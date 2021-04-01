@@ -8,7 +8,7 @@ const secretToken = require('../config').secretToken;
 const User = require('../models/User');
 const { log } = require('../log');
 const validate = require('jsonschema').validate;
-const { isTokenAuthorized, isUserAuthorized } = require('./userRoles');
+const { isTokenAuthorized, isUserAuthorized } = require('../util/userRoles');
 const { getConnection } = require('../db');
 
 /**

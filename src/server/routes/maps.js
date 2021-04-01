@@ -10,7 +10,7 @@ const { getConnection } = require('../db');
 const adminAuthenticator = require('./authenticator').adminAuthMiddleware;
 const optionalAuthenticator = require('./authenticator').optionalAuthMiddleware;
 const Point = require('../models/Point');
-const { isTokenAuthorized } = require('./userRoles');
+const { isTokenAuthorized } = require('../util/userRoles');
 const User = require('../models/User');
 
 const router = express.Router();
