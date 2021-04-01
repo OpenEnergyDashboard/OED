@@ -35,7 +35,7 @@ export default class UsersApi {
 	}
 
 	public async createUser(user: NewUser): Promise<void> {
-		return await this.backend.doPostRequest('/api/users', user);
+		return await this.backend.doPostRequest('/api/users/create', user);
 	}
 
 	public async editUsers(users: User[]) {

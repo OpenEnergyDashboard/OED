@@ -87,7 +87,7 @@ router.get('/:user_id', adminAuthMiddleware('get one user'), async (req, res) =>
 	}
 });
 
-router.post('/', adminAuthMiddleware('create a user.'), async (req, res) => {
+router.post('/create', adminAuthMiddleware('create a user.'), async (req, res) => {
 	const validParams = {
 		type: 'object',
 		required: ['email', 'password', 'role'],

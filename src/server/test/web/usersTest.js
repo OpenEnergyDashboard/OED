@@ -27,7 +27,7 @@ mocha.describe('Users API', () => {
 		});
 		mocha.it('successfully creates a user', async () => {
 			const user = { email: 'a@ex.com', password: 'abc', role: User.role.CSV };
-			const res = await chai.request(app).post('/api/users').set('token', token).send(user);
+			const res = await chai.request(app).post('/api/users/create').set('token', token).send(user);
 			expect(res).to.have.status(200);
 			const conn = testDB.getConnection();
 			const dbUser = await User.getByEmail(user.email, conn);
@@ -35,7 +35,7 @@ mocha.describe('Users API', () => {
 		});
 		mocha.it('rejects invalid user creation', async () => {
 			const user = { email: 'a@ex.com', password: 'abc' };
-			const res = await chai.request(app).post('/api/users').set('token', token).send(user);
+			const res = await chai.request(app).post('/api/users/create').set('token', token).send(user);
 			expect(res).to.have.status(400);
 			const conn = testDB.getConnection();
 			const users = await User.getAll(conn);
@@ -100,7 +100,7 @@ mocha.describe('Users API', () => {
 				});
 				mocha.it(`should reject requests from ${role} to create users`, async () => {
 					// create
-					const res = await chai.request(app).post('/api/users/').set('token', token);
+					const res = await chai.request(app).post('/api/users/create').set('token', token);
 					expect(res).to.have.status(403);
 				});
 
