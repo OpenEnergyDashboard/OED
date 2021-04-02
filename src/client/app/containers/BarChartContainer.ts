@@ -8,6 +8,7 @@ import { connect } from 'react-redux';
 import getGraphColor from '../utils/getGraphColor';
 import { State } from '../types/redux/state';
 import PlotlyChart, { IPlotlyChartProps } from 'react-plotlyjs-ts';
+import Locales from '../types/locales';
 import { DataType } from '../types/Datasources';
 
 /* Passes the current redux state of the barchart, and turns it into props for the React
@@ -39,7 +40,7 @@ function mapStateToProps(state: State) {
 				const readings = _.orderBy(readingsData.readings, ['startTimestamp'], ['asc']);
 				readings.forEach(barReading => {
 					const timeReading: string =
-						`${moment(barReading.startTimestamp).utc().format('MMM DD, YYYY')} - ${moment(barReading.endTimestamp).utc().format('MMM DD, YYYY')}`;
+						`${moment(barReading.startTimestamp).utc().format('LL')} - ${moment(barReading.endTimestamp).utc().format('LL')}`;
 					xData.push(timeReading);
 					yData.push(barReading.reading);
 					hoverText.push(`<b> ${timeReading} </b> <br> ${label}: ${barReading.reading} kWh`);
@@ -78,7 +79,7 @@ function mapStateToProps(state: State) {
 				const readings = _.orderBy(readingsData.readings, ['startTimestamp'], ['asc']);
 				readings.forEach(barReading => {
 					const timeReading: string =
-						`${moment(barReading.startTimestamp).utc().format('MMM DD, YYYY')} - ${moment(barReading.endTimestamp).utc().format('MMM DD, YYYY')}`;
+						`${moment(barReading.startTimestamp).utc().format('LL')} - ${moment(barReading.endTimestamp).utc().format('LL')}`;
 					xData.push(timeReading);
 					yData.push(barReading.reading);
 					hoverText.push(`<b> ${timeReading} </b> <br> ${label}: ${barReading.reading} kWh`);
@@ -140,10 +141,11 @@ function mapStateToProps(state: State) {
 		data: datasets,
 		layout,
 		config: {
-			displayModeBar: false
+			displayModeBar: false,
+			locales: Locales // makes locales available for use
 		}
 	};
-
+	props.config.locale = state.admin.defaultLanguage;
 	return props;
 }
 

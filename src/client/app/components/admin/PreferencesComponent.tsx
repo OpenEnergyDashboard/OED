@@ -13,7 +13,7 @@ import {
 	UpdateDisplayTitleAction
 } from '../../types/redux/admin';
 import { defineMessages, FormattedMessage, injectIntl, InjectedIntlProps } from 'react-intl';
-import { LanguageTypes } from '../../types/i18n';
+import { LanguageTypes } from '../../types/redux/i18n';
 import TimeZoneSelect from '../TimeZoneSelect';
 
 interface PreferencesProps {

@@ -12,6 +12,7 @@ import ChartSelectContainer from '../containers/ChartSelectContainer';
 import ChartDataSelectContainer from '../containers/ChartDataSelectContainer';
 import { ChangeBarStackingAction, ChangeCompareSortingOrderAction, SetOptionsVisibility } from '../types/redux/graph';
 import ChartLinkContainer from '../containers/ChartLinkContainer';
+import LanguageSelectorContainer from '../containers/LanguageSelectorContainer'
 import { ChartTypes } from '../types/redux/graph';
 import { ComparePeriod, SortingOrder } from '../utils/calculateCompare';
 import TooltipMarkerComponent from './TooltipMarkerComponent';
@@ -212,8 +213,8 @@ class UIOptionsComponent extends React.Component<UIOptionsPropsWithIntl, UIOptio
 					<MapChartSelectContainer />
 				}
 
-				{/* We can't export compare data */}
-				{this.props.chartToRender !== ChartTypes.compare &&
+				{/* We can't export compare data or map data */}
+				{this.props.chartToRender !== ChartTypes.compare && this.props.chartToRender !== ChartTypes.map &&
 					<div style={divTopPadding}>
 						<ExportContainer />
 					</div>
@@ -221,6 +222,12 @@ class UIOptionsComponent extends React.Component<UIOptionsPropsWithIntl, UIOptio
 				<div style={divTopPadding}>
 					<ChartLinkContainer />
 				</div>
+
+				{/* Language selector dropdown*/}
+				<div style={divTopPadding}>
+					<LanguageSelectorContainer />
+				</div>
+
 				<div style={divTopPadding} className='d-none d-lg-block'>
 					<Button
 						onClick={this.handleSetOptionsVisibility}

@@ -33,5 +33,5 @@ postgres-data
 *.txt
 !License.txt
 
-# For Mac developers to ignore file system info
-.DS_Store
+# Test data (normally for developers)
+src/server/test/db/data/automatedTests/*.csv
