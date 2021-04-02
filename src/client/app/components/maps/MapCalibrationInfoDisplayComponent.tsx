@@ -47,17 +47,17 @@ export default class MapCalibrationInfoDisplayComponent extends React.Component<
 				<div id='UserInput'>
 					<form onSubmit={this.handleSubmit}>
 						<label>
-							input GPS coordinate that corresponds to the point: {this.props.currentCartesianDisplay}
+							<FormattedMessage id='input.gps.coordinates' /> {this.props.currentCartesianDisplay}
 							<br/>
-							in this format -> latitude,longitude
+							<FormattedMessage id='in.this.format' />
 							<br/>
 							<textarea id={'text'} cols={50} value={this.state.value} onChange={this.handleGPSInput}/>
 						</label>
 						<br/>
 						<input type={'submit'} value={'Submit'}/>
 					</form>
-					<button onClick={this.dropCurrentCalibration}>Reset</button>
-					<button onClick={this.handleChanges}>Save changes to database</button>
+					<button onClick={this.dropCurrentCalibration}><FormattedMessage id='reset' /></button>
+					<button onClick={this.handleChanges}><FormattedMessage id='save.changes.to.database' /></button>
 					<p>{calibrationDisplay}</p>
 				</div>
 			</div>

@@ -6,6 +6,7 @@ import * as React from 'react';
 import {CalibrationModeTypes, MapMetadata} from '../../types/redux/map';
 import {ChangeEvent} from 'react';
 import {logToServer} from '../../actions/logs';
+import { FormattedMessage } from 'react-intl';
 
 /**
  * Accepts image file from user upload,
@@ -48,13 +49,13 @@ export default class MapCalibrationInitiateComponent extends React.Component<Map
 		return (
 			<form onSubmit={this.confirmUpload}>
 				<label>
-					Upload map image to begin.
+					<FormattedMessage id='upload.map.image.to.begin' />
 					<br/>
 					<input type='file' ref={this.fileInput} />
 				</label>
 				<br />
 				<label>
-					Define a name for the map:
+					<FormattedMessage id='define.name.for.map' />
 					<br/>
 					<textarea id={'text'} cols={50} value={this.state.mapName} onChange={this.handleNameInput}/>
 				</label>
