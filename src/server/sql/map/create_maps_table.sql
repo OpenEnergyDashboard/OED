@@ -12,6 +12,6 @@ CREATE TABLE IF NOT EXISTS maps (
 	origin POINT DEFAULT NULL,
 	opposite POINT DEFAULT NULL,
 	map_source TEXT NOT NULL,
-	north_angle FLOAT(8),
-	max_circle_size_fraction FLOAT(8)
+	north_angle FLOAT(8) DEFAULT 0.0,
+	max_circle_size_fraction FLOAT(8) DEFAULT 0.15
 );

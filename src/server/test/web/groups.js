@@ -28,13 +28,19 @@ mocha.describe('groups API', () => {
 			* - - group C
 			* - - - meter C
 			*/
-		groupA = new Group(undefined, 'A');
-		groupB = new Group(undefined, 'B');
-		groupC = new Group(undefined, 'C');
+		groupA = new Group(undefined, 'A', true, gps, 'notes', 33.5);
+		groupB = new Group(undefined, 'B', false, gps, 'notes 2', 43.5);
+		groupC = new Group(undefined, 'C', true, gps, 'notes 3', 53.5);
 		await Promise.all([groupA, groupB, groupC].map(group => group.insert(conn)));
-		meterA = new Meter(undefined, 'A', null, false, true, Meter.type.MAMAC, null, gps);
-		meterB = new Meter(undefined, 'B', null, false, true, Meter.type.MAMAC, null, gps);
-		meterC = new Meter(undefined, 'C', null, false, true, Meter.type.METASYS, null, gps);
+		meterA = new Meter(undefined, 'A', null, false, true, Meter.type.MAMAC, null, gps,
+		'Identified 1' ,'Notes', 35.0, true, true, '01:01:25' , '00:00:00', true, '05:00:00','00:00:00', 1.5,
+		'0011-05-22 : 23:59:59', '2020-07-02 : 01:00:10');
+		meterB = new Meter(undefined, 'B', null, false, true, Meter.type.MAMAC, null, gps, 
+		'IDENTIFIED', 'notess', 33.5, true, true, '05:05:09', '09:00:01', true, '00:00:00', 
+		'00:00:00', 25.5, '0011-05-022 : 23:59:59', '2020-07-02 : 01:00:10');
+		meterC = new Meter(undefined, 'C', null, false, true, Meter.type.METASYS, null, gps, 
+		'IDENTIFIED 2', 'notess', 33.5, true, true, '05:05:09', '09:00:01', true, '00:00:00', 
+		'00:00:00', 25.5, '0011-05-022 : 23:59:59', '2020-07-02 : 01:00:10');
 		await Promise.all([meterA, meterB, meterC].map(meter => meter.insert(conn)));
 
 		await Promise.all([groupA.adoptMeter(meterA.id, conn), groupA.adoptGroup(groupB.id, conn),
@@ -47,6 +53,7 @@ mocha.describe('groups API', () => {
 			expect(res).to.have.status(200);
 			expect(res).to.be.json;
 			expect(res.body).to.be.a('array').with.a.lengthOf(3);
+			// This gives the error "AssertionError: expected [ Array(3) ] to be a superset of [ Array(3) ]"
 			expect(res.body).to.deep.include.members([groupA, groupB, groupC]);
 		});
 		mocha.it('returns the immediate children of a group', async () => {
@@ -123,7 +130,9 @@ mocha.describe('groups API', () => {
 			});
 			mocha.it('allows adding a new child meter to a group', async () => {
 				const conn = testDB.getConnection();
-				const meterD = new Meter(undefined, 'D', null, false, true, Meter.type.MAMAC, null, gps);
+				const meterD = new Meter(undefined, 'D', null, false, true, Meter.type.MAMAC, null, gps,
+				'IDENTIFIED 5', 'notess', 33.5, true, true, '05:05:09', '09:00:01', true, '00:00:00', 
+				'00:00:00', 25.5, '0011-05-022 : 23:59:59', '2020-07-02 : 01:00:10');
 				await meterD.insert(conn);
 				let res = await chai.request(app).put('/api/groups/edit').set('token', token).type('json').send({
 					id: groupC.id,
@@ -143,7 +152,7 @@ mocha.describe('groups API', () => {
 			});
 			mocha.it('allows adding a new child group to a group', async () => {
 				const conn = testDB.getConnection();
-				const groupD = new Group(undefined, 'D');
+				const groupD = new Group(undefined, 'D', true, gps, 'notes 2', 43.5);
 				await groupD.insert(conn);
 				let res = await chai.request(app).put('/api/groups/edit').set('token', token).type('json').send({
 					id: groupC.id,

@@ -33,6 +33,8 @@ function expectMapsToBeEquivalent(maps, length) {
 		expect(map).to.have.property('opposite');
 		expectPointsToBeEquivalent(map.opposite, opposite);
 		expect(map).to.have.property('mapSource', 'placeholder');
+		expect(map).to.have.property('northAngle');
+		expect(map).to.have.property('maxCircleSizeFraction');
 	}
 }
 
@@ -50,10 +52,10 @@ mocha.describe('maps API', () => {
 
 	mocha.it('returns all visible maps', async () => {
 		const conn = testDB.getConnection();
-		await new Map(undefined, 'Map 1', true, null, 'default', moment('2000-10-10'), origin, opposite, 'placeholder').insert(conn);
-		await new Map(undefined, 'Map 2', true, null, 'default', moment('2000-10-10'), origin, opposite, 'placeholder').insert(conn);
-		await new Map(undefined, 'Map 3', true, null, 'default', moment('2000-10-10'), origin, opposite, 'placeholder').insert(conn);
-		await new Map(undefined, 'Not Visible', false, null, 'default', moment('2000-10-10'), origin, opposite, 'placeholder').insert(conn);
+		await new Map(undefined, 'Map 1', true, null, 'default', moment('2000-10-10'), origin, opposite, 'placeholder', 0.0, 0.0).insert(conn);
+		await new Map(undefined, 'Map 2', true, null, 'default', moment('2000-10-10'), origin, opposite, 'placeholder', 0.0, 0.0).insert(conn);
+		await new Map(undefined, 'Map 3', true, null, 'default', moment('2000-10-10'), origin, opposite, 'placeholder', 0.0, 0.0).insert(conn);
+		await new Map(undefined, 'Not Visible', false, null, 'default', moment('2000-10-10'), origin, opposite, 'placeholder', 0.0, 0.0).insert(conn);
 
 		const res = await chai.request(app).get('/api/maps');
 		expect(res).to.have.status(200);
@@ -71,10 +73,10 @@ mocha.describe('maps API', () => {
 		});
 		mocha.it('returns all maps', async () => {
 			const conn = testDB.getConnection();
-			await new Map(undefined, 'Map 1', true, null, 'default', moment('2000-10-10'), origin, opposite, 'placeholder').insert(conn);
-			await new Map(undefined, 'Map 2', true, null, 'default', moment('2000-10-10'), origin, opposite, 'placeholder').insert(conn);
-			await new Map(undefined, 'Map 3', true, null, 'default', moment('2000-10-10'), origin, opposite, 'placeholder').insert(conn);
-			await new Map(undefined, 'Not Visible', false, null, 'default', moment('2000-10-10'), origin, opposite, 'placeholder').insert(conn);
+			await new Map(undefined, 'Map 1', true, null, 'default', moment('2000-10-10'), origin, opposite, 'placeholder', 0.0, 0.0).insert(conn);
+			await new Map(undefined, 'Map 2', true, null, 'default', moment('2000-10-10'), origin, opposite, 'placeholder', 0.0, 0.0).insert(conn);
+			await new Map(undefined, 'Map 3', true, null, 'default', moment('2000-10-10'), origin, opposite, 'placeholder', 0.0, 0.0).insert(conn);
+			await new Map(undefined, 'Not Visible', false, null, 'default', moment('2000-10-10'), origin, opposite, 'placeholder', 0.0, 0.0).insert(conn);
 
 			const res = await chai.request(app).get('/api/maps').set('token', token);
 			expect(res).to.have.status(200);
@@ -87,8 +89,8 @@ mocha.describe('maps API', () => {
 
 	mocha.it('returns details on a single map by ID', async () => {
 		const conn = testDB.getConnection();
-		await new Map(undefined, 'Map 1', true, null, 'default', moment('2000-10-10'), origin, opposite, 'placeholder').insert(conn);
-		const map2 = new Map(undefined, 'Map 2', true, null, 'default', moment('2000-10-10'), origin, opposite, 'placeholder');
+		await new Map(undefined, 'Map 1', true, null, 'default', moment('2000-10-10'), origin, opposite, 'placeholder', 0.0, 0.0).insert(conn);
+		const map2 = new Map(undefined, 'Map 2', true, null, 'default', moment('2000-10-10'), origin, opposite, 'placeholder', 0.0, 0.0);
 		await map2.insert(conn);
 
 		const res = await chai.request(app).get(`/api/maps/${map2.id}`);
@@ -100,7 +102,7 @@ mocha.describe('maps API', () => {
 
 	mocha.it('responds appropriately when the meter in question does not exist', async () => {
 		const conn = testDB.getConnection();
-		const map = new Map(undefined, 'Map', true, null, 'default', moment('2000-10-10'), origin, opposite, 'placeholder');
+		const map = new Map(undefined, 'Map', true, null, 'default', moment('2000-10-10'), origin, opposite, 'placeholder', 0.0, 0.0);
 		await map.insert(conn);
 
 		const res = await chai.request(app).get(`/api/maps/${map.id + 1}`);
