@@ -65,8 +65,7 @@ function mapStateToProps(state: State) {
 						shape: 'spline',
 						width: 3,
 						color: getGraphColor(colorID, DataType.Meter)
-					},
-					//marker: {color: getGraphColor(colorID, DataType.Meter)}
+					}
 				});
 			}
 		}
@@ -111,8 +110,7 @@ function mapStateToProps(state: State) {
 						shape: 'spline',
 						width: 3,
 						color: getGraphColor(colorID, DataType.Meter)
-					},
-					//marker: {color: getGraphColor(colorID, DataType.Meter)}
+					}
 				});
 			}
 		}
