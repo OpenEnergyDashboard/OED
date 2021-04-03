@@ -10,6 +10,7 @@ const { log } = require('../log');
 const validate = require('jsonschema').validate;
 const { isTokenAuthorized, isUserAuthorized } = require('../util/userRoles');
 const { getConnection } = require('../db');
+const escapeHtml = require('core-js/fn/string/escape-html');
 
 /**
  * Middleware function to force a route to require authentication
@@ -154,7 +155,7 @@ function obviusEmailAndPasswordAuthMiddleware(action) {
 				}
 			} catch (error) {
 				if (error.message === 'No data returned from the query.') {
-					res.status(400).send(`No user corresponding to the email: ${req.body.email} was found. Please make a request with a valid email.`);
+					res.status(400).send(`No user corresponding to the email: ${escapeHtml(req.body.email)} was found. Please make a request with a valid email.`);
 				} else {
 					log.error('Internal Server Error for Obvius request.', error);
 					res.status(500).send('Internal OED Server Error for Obvius request.');
