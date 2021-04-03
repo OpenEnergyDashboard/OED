@@ -15,7 +15,7 @@ async function saveCsv(buffer, filename) {
 	await fs.writeFile(filepath, buffer)
 		.catch(err => {
 			const message = `Failed to write the file: ${filepath}`;
-			throw new CSVPipelineError(`Internal OED error: ${message}`, err.message);
+			throw new CSVPipelineError(`Internal OED error: ${message}`, err.message, 500);
 		}); // separate logs function that logs for error message, 1. log it, 2. passback error codes to user, 3. stop process; 
 	return filepath;
 }

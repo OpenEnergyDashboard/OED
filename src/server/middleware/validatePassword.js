@@ -10,7 +10,7 @@ async function validatePassword(password){
 		return password === 'password';
 	} catch (error) {
 		const { message } = error;
-		throw new CSVPipelineError('Internal OED error. Failed to validate password.', message);
+		throw new CSVPipelineError('Internal OED error. Failed to validate password.', message, 500);
 	}
 }
 module.exports = validatePassword;

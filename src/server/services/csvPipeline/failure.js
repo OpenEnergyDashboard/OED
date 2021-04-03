@@ -14,18 +14,18 @@ const { log } = require('../../log');
  * @param {Error || CSVPipelineError.class} error The reason for the failure.
  *
  */
-function failure(req, res, error, statusCode = 400) {
+function failure(req, res, error) {
 	const ip = req.headers['x-forwarded-for'] || req.connection.remoteAddress;
 	if (error instanceof CSVPipelineError) {
-		const { logMessage, responseMessage } = error.data;
+		const { logMessage, responseMessage, statusCode } = error.data;
 		log.error(`Csv protocol request from ${ip} failed due to ${logMessage}`, error);
 		res.status(statusCode)
-			.send(`<pre>\n${escapeHtml(responseMessage)}\n</pre>\n`);
+			.send(escapeHtml(responseMessage));
 	} else { // we do not actually expect to reach this case however just in case we receive an error we still want to respond.
 		const { message } = error;
-		log.error(`Csv protocol request from ${ip} failed due to ${error.message}`, error);
-		res.status(statusCode)
-			.send(`<pre>\n${escapeHtml(message)}\n</pre>\n`);
+		log.error(`Csv protocol request from ${ip} failed due to ${message}`, error);
+		res.status(500) // since it is an unexpected case we do 500 for internal server error
+			.send(escapeHtml(message));
 	}
 }
 

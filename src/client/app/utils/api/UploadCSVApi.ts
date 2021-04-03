@@ -16,8 +16,8 @@ export default class UploadCSVApi {
 
 	public async submitReadings(uploadPreferences: ReadingsCSVUploadPreferencesItem, readingsFile: File): Promise<void> {
 		const formData = new FormData();
-		for (const preference in uploadPreferences){
-			formData.append(preference, uploadPreferences[preference].toString());
+		for (const [preference, value] of Object.entries(uploadPreferences)){
+			formData.append(preference, value.toString());
 		}
 		formData.append('csvfile', readingsFile); // It is important for the server than the file is attached last.
 		await this.backend.doPostRequest<void>('/api/csv/readings', formData);
@@ -25,8 +25,8 @@ export default class UploadCSVApi {
 
 	public async submitMeters(uploadPreferences: MetersCSVUploadPreferencesItem, metersFile: File): Promise<void> {
 		const formData = new FormData();
-		for (const preference in uploadPreferences){
-			formData.append(preference, uploadPreferences[preference].toString());
+		for (const [preference, value] of Object.entries(uploadPreferences)){
+			formData.append(preference, value.toString());
 		}
 		formData.append('csvfile', metersFile); // It is important for the server than the file is attached last.
 		await this.backend.doPostRequest<void>('/api/csv/meters', formData);

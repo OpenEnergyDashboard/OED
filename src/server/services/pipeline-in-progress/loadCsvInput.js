@@ -23,7 +23,18 @@ const { log } = require('../../log');
  * @param {boolean} headerRow true if the given file has a header row
  * @param {array} conn connection to database
  */
-async function loadCsvInput(filePath, meterID, mapRowToModel, readAsStream, isCumulative, cumulativeReset, readingRepetition, conditionSet, headerRow, conn) {
+async function loadCsvInput(
+	filePath,
+	meterID,
+	mapRowToModel,
+	readAsStream,
+	isCumulative,
+	cumulativeReset,
+	readingRepetition,
+	conditionSet,
+	headerRow,
+	conn
+) {
 	try {
 		if (readAsStream) {
 			const stream = fs.createReadStream(filePath);

@@ -31,7 +31,7 @@ async function uploadMeters(req, res, filepath, conn) {
 		success(req, res, 'Successfully inserted the meters.');
 		return;
 	} catch (error) {
-		throw new CSVPipelineError(`Failed to upload meters due to internal OED Error: ${error.message}`);
+		throw new CSVPipelineError(`Failed to upload meters due to internal OED Error: ${error.message}`, undefined, 500);
 	}
 }
 
