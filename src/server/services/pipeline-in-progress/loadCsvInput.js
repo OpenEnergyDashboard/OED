@@ -29,7 +29,10 @@ async function loadCsvInput(filePath, meterID, mapRowToModel, readAsStream, isCu
 			const stream = fs.createReadStream(filePath);
 			return loadCsvStream(stream, meterID, mapRowToModel, conditionSet, conn);
 		} else {
-			const dataRows = headerRow ? (await readCsv(filePath)).shift() : (await readCsv(filePath));
+			const dataRows = await readCsv(filePath);
+			if (headerRow) {
+				dataRows.shift();
+			}
 			return loadArrayInput(dataRows, meterID, mapRowToModel, isCumulative, cumulativeReset, readingRepetition, conditionSet, conn);
 		}
 	} catch (err) {
