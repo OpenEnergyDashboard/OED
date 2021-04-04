@@ -82,12 +82,11 @@ function createRouter() {
 			res.sendStatus(400);
 			return;
 		}
-		const conn = getConnection();
 		const meterIDs = req.params.meter_ids.split(',').map(id => parseInt(id));
 		const currStart = moment(req.query.curr_start);
 		const currEnd = moment(req.query.curr_end);
 		const shift = moment.duration(req.query.shift);
-		res.json(await meterCompareReadings(meterIDs, currStart, currEnd, shift, conn));
+		res.json(await meterCompareReadings(meterIDs, currStart, currEnd, shift));
 	});
 
 	router.get('/groups/:group_ids', async (req, res) => {

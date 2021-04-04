@@ -3,12 +3,14 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
 
 import * as _ from 'lodash';
-import * as moment from 'moment';
+import * as moment from 'moment-timezone';
 import { connect } from 'react-redux';
 import getGraphColor from '../utils/getGraphColor';
 import { State } from '../types/redux/state';
 import PlotlyChart, { IPlotlyChartProps } from 'react-plotlyjs-ts';
 import {TimeInterval} from '../../../common/TimeInterval';
+import Locales from '../types/locales';
+import { DataType } from '../types/Datasources';
 
 function mapStateToProps(state: State) {
 	const timeInterval = state.graph.timeInterval;
@@ -21,6 +23,7 @@ function mapStateToProps(state: State) {
 			const readingsData = byMeterID[timeInterval.toString()];
 			if (readingsData !== undefined && !readingsData.isFetching) {
 				const label = state.meters.byMeterID[meterID].name;
+				const colorID = meterID;
 				if (readingsData.readings === undefined) {
 					throw new Error('Unacceptable condition: readingsData.readings is undefined.');
 				}
@@ -32,9 +35,9 @@ function mapStateToProps(state: State) {
 				const readings = _.values(readingsData.readings);
 				readings.forEach(reading => {
 					const timeReading = moment(reading.startTimestamp);
-					xData.push(timeReading.format('YYYY-MM-DD HH:mm:ss'));
+					xData.push(timeReading.utc().format('YYYY-MM-DD HH:mm:ss'));
 					yData.push(reading.reading);
-					hoverText.push(`<b> ${timeReading.format('dddd, MMM DD, YYYY hh:mm a')} </b> <br> ${label}: ${reading.reading} kW`);
+					hoverText.push(`<b> ${timeReading.format('dddd, LL LTS')} </b> <br> ${label}: ${reading.reading.toPrecision(6)} kW`);
 				});
 
 				// Save the timestamp range of the plot
@@ -63,7 +66,7 @@ function mapStateToProps(state: State) {
 						shape: 'spline',
 						width: 3
 					},
-					marker: {color: getGraphColor(label)}
+					marker: {color: getGraphColor(colorID, DataType.Meter)}
 				});
 			}
 		}
@@ -78,6 +81,7 @@ function mapStateToProps(state: State) {
 			const readingsData = byGroupID[timeInterval.toString()];
 			if (readingsData !== undefined && !readingsData.isFetching) {
 				const label = state.groups.byGroupID[groupID].name;
+				const colorID = groupID;
 				if (readingsData.readings === undefined) {
 					throw new Error('Unacceptable condition: readingsData.readings is undefined.');
 				}
@@ -89,9 +93,9 @@ function mapStateToProps(state: State) {
 				const readings = _.values(readingsData.readings);
 				readings.forEach(reading => {
 					const timeReading = moment(reading.startTimestamp);
-					xData.push(timeReading.format('YYYY-MM-DD HH:mm:ss'));
+					xData.push(timeReading.utc().format('YYYY-MM-DD HH:mm:ss'));
 					yData.push(reading.reading);
-					hoverText.push(`<b> ${timeReading.format('dddd, MMM DD, YYYY hh:mm a')} </b> <br> ${label}: ${reading.reading} kW`);
+					hoverText.push(`<b> ${timeReading.format('dddd, LL LTS')} </b> <br> ${label}: ${reading.reading.toPrecision(6)} kW`);
 				});
 
 				// This variable contains all the elements (x and y values, line type, etc.) assigned to the data parameter of the Plotly object
@@ -107,7 +111,7 @@ function mapStateToProps(state: State) {
 						shape: 'spline',
 						width: 3
 					},
-					marker: {color: getGraphColor(label)}
+					marker: {color: getGraphColor(colorID, DataType.Group)}
 				});
 			}
 		}
@@ -152,10 +156,11 @@ function mapStateToProps(state: State) {
 		data: datasets,
 		layout,
 		config: {
-			displayModeBar: true
+			displayModeBar: true,
+			locales: Locales // makes locales available for use
 		}
 	};
-
+	props.config.locale = state.admin.defaultLanguage;
 	return props;
 }
 

@@ -13,12 +13,14 @@ class Preferences {
 	 * @param {String} defaultChartToRender - Chart to display as default
 	 * @param {Boolean} defaultBarStacking - Option to set default toggle of bar stacking
 	 * @param {String} defaultLanguage - Option to set the default language
+	 * @param {String} defaultTimezone - Option to set the default timezone
 	 */
-	constructor(displayTitle, defaultChartToRender, defaultBarStacking, defaultLanguage) {
+	constructor(displayTitle, defaultChartToRender, defaultBarStacking, defaultLanguage, defaultTimezone) {
 		this.displayTitle = displayTitle;
 		this.defaultChartToRender = defaultChartToRender;
 		this.defaultBarStacking = defaultBarStacking;
 		this.defaultLanguage = defaultLanguage;
+		this.defaultTimezone = defaultTimezone;
 	}
 
 	/**
@@ -33,8 +35,14 @@ class Preferences {
 		await conn.none(sqlFile('preferences/insert_default_row.sql'));
 	}
 
+
+	/**
+	 * Creates a new set of preferences from the data in a row.
+	 * @param row the row from which the preferences object is to be created
+	 * @returns Preference object from row
+	 */
 	static mapRow(row) {
-		return new Preferences(row.display_title, row.default_chart_to_render, row.default_bar_stacking, row.default_language);
+		return new Preferences(row.display_title, row.default_chart_to_render, row.default_bar_stacking, row.default_language, row.default_timezone);
 	}
 
 	/**
@@ -58,7 +66,8 @@ class Preferences {
 				displayTitle: preferences.displayTitle,
 				defaultChartToRender: preferences.defaultChartToRender,
 				defaultBarStacking: preferences.defaultBarStacking,
-				defaultLanguage: preferences.defaultLanguage
+				defaultLanguage: preferences.defaultLanguage,
+				defaultTimezone: preferences.defaultTimezone
 			});
 	}
 }

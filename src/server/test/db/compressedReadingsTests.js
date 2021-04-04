@@ -2,12 +2,22 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
 
+/**
+ * This class tests compressing the meter readings.
+ */
+
 const { mocha, expect, testDB } = require('../common');
 const moment = require('moment');
 const Group = require('../../models/Group');
 const Meter = require('../../models/Meter');
 const Reading = require('../../models/Reading');
+const Point = require('../../models/Point');
+const gps = new Point(90, 45);
 
+/**
+ * Tests for compressed meter readings.
+ * Here, timestamps are created for meter readings.
+ */
 mocha.describe('Compressed Readings', () => {
 	let meter;
 	const timestamp1 = moment('2017-01-01');
@@ -19,7 +29,7 @@ mocha.describe('Compressed Readings', () => {
 	mocha.beforeEach(async () => {
 		conn = testDB.getConnection();
 		await conn.tx(async t => {
-			await new Meter(undefined, 'Meter', null, false, true, Meter.type.MAMAC).insert(t);
+			await new Meter(undefined, 'Meter', null, false, true, Meter.type.MAMAC, null, gps).insert(t);
 			meter = await Meter.getByName('Meter', t);
 		});
 	});
@@ -72,8 +82,8 @@ mocha.describe('Compressed Readings', () => {
 
 	mocha.it('compresses readings for multiple meters at once', async () => {
 		conn = testDB.getConnection();
-		await new Meter(undefined, 'Meter2', null, false, true, Meter.type.MAMAC).insert(conn);
-		await new Meter(undefined, 'Meter3', null, false, true, Meter.type.MAMAC).insert(conn);
+		await new Meter(undefined, 'Meter2', null, false, true, Meter.type.MAMAC, null, gps).insert(conn);
+		await new Meter(undefined, 'Meter3', null, false, true, Meter.type.MAMAC, null, gps).insert(conn);
 		const meter2 = await Meter.getByName('Meter2', conn);
 		const meter3 = await Meter.getByName('Meter3', conn);
 		const readingMeter1 = new Reading(meter.id, 100, timestamp1, timestamp2);
@@ -110,7 +120,7 @@ mocha.describe('Compressed Readings', () => {
 			await Promise.all([groupA, groupB, groupC].map(group => group.insert(conn)));
 
 			// Create and get a handle to a new meter
-			await new Meter(undefined, 'Meter2', null, false, true, Meter.type.MAMAC).insert(conn);
+			await new Meter(undefined, 'Meter2', null, false, true, Meter.type.MAMAC, null, gps).insert(conn);
 			meter2 = await Meter.getByName('Meter2', conn);
 
 			// Place meters & groups in hierarchy

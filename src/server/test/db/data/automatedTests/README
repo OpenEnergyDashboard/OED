@@ -1,0 +1,4 @@
+This folder is need by src/server/data/automatedTestingData.js for placing
+files for the automatically generated test data. The file name generally
+explains the data in the file. Note that without a file in a directory,
+git does not want to put it in the repo so this README avoids this issue.

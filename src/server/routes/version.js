@@ -10,7 +10,7 @@ const router = express.Router();
  * Returns the version of the application to the client.
  */
 router.get('/', (req, res) => {
-	res.json(VERSION);
+	res.json(VERSION.toString());
 });
 
 module.exports = router;

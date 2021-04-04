@@ -9,15 +9,18 @@ import {
 	ToggleDefaultBarStackingAction,
 	UpdateDefaultChartToRenderAction,
 	UpdateDefaultLanguageAction,
+	UpdateDefaultTimeZone,
 	UpdateDisplayTitleAction
 } from '../../types/redux/admin';
 import { defineMessages, FormattedMessage, injectIntl, InjectedIntlProps } from 'react-intl';
-import { LanguageTypes } from '../../types/i18n';
+import { LanguageTypes } from '../../types/redux/i18n';
+import TimeZoneSelect from '../TimeZoneSelect';
 
 interface PreferencesProps {
 	displayTitle: string;
 	defaultChartToRender: ChartTypes;
 	defaultBarStacking: boolean;
+	defaultTimeZone: string;
 	defaultLanguage: LanguageTypes;
 	disableSubmitPreferences: boolean;
 	updateDisplayTitle(title: string): UpdateDisplayTitleAction;
@@ -25,6 +28,7 @@ interface PreferencesProps {
 	toggleDefaultBarStacking(): ToggleDefaultBarStackingAction;
 	updateDefaultLanguage(defaultLanguage: LanguageTypes): UpdateDefaultLanguageAction;
 	submitPreferences(): Promise<void>;
+	updateDefaultTimeZone(timeZone: string): UpdateDefaultTimeZone;
 }
 
 type PreferencesPropsWithIntl = PreferencesProps & InjectedIntlProps;
@@ -35,6 +39,7 @@ class PreferencesComponent extends React.Component<PreferencesPropsWithIntl, {}>
 		this.handleDisplayTitleChange = this.handleDisplayTitleChange.bind(this);
 		this.handleDefaultChartToRenderChange = this.handleDefaultChartToRenderChange.bind(this);
 		this.handleDefaultBarStackingChange = this.handleDefaultBarStackingChange.bind(this);
+		this.handleDefaultTimeZoneChange = this.handleDefaultTimeZoneChange.bind(this);
 		this.handleDefaultLanguageChange = this.handleDefaultLanguageChange.bind(this);
 		this.handleSubmitPreferences = this.handleSubmitPreferences.bind(this);
 	}
@@ -47,12 +52,13 @@ class PreferencesComponent extends React.Component<PreferencesPropsWithIntl, {}>
 		const bottomPaddingStyle: React.CSSProperties = {
 			paddingBottom: '15px'
 		};
+
 		const titleStyle: React.CSSProperties = {
 			fontWeight: 'bold',
 			margin: 0,
 			paddingBottom: '5px'
 		};
-		const messages = defineMessages({ name: {	id: 'name' }});
+		const messages = defineMessages({ name: { id: 'name' } });
 		const { formatMessage } = this.props.intl;
 		return (
 			<div>
@@ -73,15 +79,16 @@ class PreferencesComponent extends React.Component<PreferencesPropsWithIntl, {}>
 						<FormattedMessage id='default.graph.type' />:
 					</p>
 					<div className='radio'>
-						<label>
+						<label >
 							<input
 								type='radio'
 								name='chartTypes'
+								style={{marginRight: '10px'}}
 								value={ChartTypes.line}
 								onChange={this.handleDefaultChartToRenderChange}
 								checked={this.props.defaultChartToRender === ChartTypes.line}
 							/>
-							<FormattedMessage id='line' />
+							<FormattedMessage id='line'/>
 						</label>
 					</div>
 					<div className='radio'>
@@ -89,6 +96,7 @@ class PreferencesComponent extends React.Component<PreferencesPropsWithIntl, {}>
 							<input
 								type='radio'
 								name='chartTypes'
+								style={{marginRight: '10px'}}
 								value={ChartTypes.bar}
 								onChange={this.handleDefaultChartToRenderChange}
 								checked={this.props.defaultChartToRender === ChartTypes.bar}
@@ -101,11 +109,12 @@ class PreferencesComponent extends React.Component<PreferencesPropsWithIntl, {}>
 							<input
 								type='radio'
 								name='chartTypes'
+								style={{marginRight: '10px'}}
 								value={ChartTypes.compare}
 								onChange={this.handleDefaultChartToRenderChange}
 								checked={this.props.defaultChartToRender === ChartTypes.compare}
 							/>
-							<FormattedMessage id='compare' />
+							<FormattedMessage id='compare'/>
 						</label>
 					</div>
 				</div>
@@ -116,6 +125,7 @@ class PreferencesComponent extends React.Component<PreferencesPropsWithIntl, {}>
 					<label>
 						<input
 							type='checkbox'
+							style={{marginRight: '10px'}}
 							onChange={this.handleDefaultBarStackingChange}
 							checked={this.props.defaultBarStacking}
 						/>
@@ -130,6 +140,7 @@ class PreferencesComponent extends React.Component<PreferencesPropsWithIntl, {}>
 						<label>
 							<input
 								type='radio'
+								style={{marginRight: '10px'}}
 								name='languageTypes'
 								value={LanguageTypes.en}
 								onChange={this.handleDefaultLanguageChange}
@@ -142,6 +153,7 @@ class PreferencesComponent extends React.Component<PreferencesPropsWithIntl, {}>
 						<label>
 							<input
 								type='radio'
+								style={{marginRight: '10px'}}
 								name='languageTypes'
 								value={LanguageTypes.fr}
 								onChange={this.handleDefaultLanguageChange}
@@ -154,6 +166,7 @@ class PreferencesComponent extends React.Component<PreferencesPropsWithIntl, {}>
 						<label>
 							<input
 								type='radio'
+								style={{marginRight: '10px'}}
 								name='languageTypes'
 								value={LanguageTypes.es}
 								onChange={this.handleDefaultLanguageChange}
@@ -162,6 +175,12 @@ class PreferencesComponent extends React.Component<PreferencesPropsWithIntl, {}>
 							Español
 						</label>
 					</div>
+				</div>
+				<div style={bottomPaddingStyle}>
+					<p style={titleStyle}>
+						<FormattedMessage id='default.time.zone' />:
+					</p>
+					<TimeZoneSelect current={this.props.defaultTimeZone} handleClick={this.handleDefaultTimeZoneChange} />
 				</div>
 				<Button
 					type='submit'
@@ -188,6 +207,10 @@ class PreferencesComponent extends React.Component<PreferencesPropsWithIntl, {}>
 
 	private handleDefaultLanguageChange(e: React.FormEvent<HTMLInputElement>) {
 		this.props.updateDefaultLanguage((e.target as HTMLInputElement).value as LanguageTypes);
+	}
+
+	private handleDefaultTimeZoneChange(value: string) {
+		this.props.updateDefaultTimeZone(value);
 	}
 
 	private handleSubmitPreferences() {
