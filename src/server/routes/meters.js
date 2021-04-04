@@ -22,21 +22,29 @@ router.use(optionalAuthenticator);
 function formatMeterForResponse(meter, loggedIn) {
 	const formattedMeter = {
 		id: meter.id,
-		name: meter.name,
+		name: null,
 		enabled: meter.enabled,
 		displayable: meter.displayable,
 		ipAddress: null,
 		meterType: null,
 		timeZone: null,
-		gps: meter.gps
+		gps: meter.gps,
+		identifier: meter.identifier
 	};
 
-	// Only logged in users can see IP addresses and types
+	// Only logged in users can see IP addresses, types, timezones, and internal names
 	if (loggedIn) {
 		formattedMeter.ipAddress = meter.ipAddress;
 		formattedMeter.meterType = meter.type;
 		formattedMeter.timeZone = meter.meterTimezone;
+		formattedMeter.name = meter.name;
 	}
+
+	// TODO: remove this line when usages of meter.name are replaced with meter.identifer
+	// Without this, things will break for non-logged in users because we currently rely on
+	// the internal name being available. As noted in #605, the intent is to not send the
+	// name to a user if they are not logged in.
+	formattedMeter.name = meter.name;
 
 	return formattedMeter;
 }

@@ -46,6 +46,7 @@ export type MetersAction =
 export interface MeterMetadata {
 	id: number;
 	name: string;
+	identifier: string;
 	enabled: boolean;
 	displayable: boolean;
 	meterType?: string;

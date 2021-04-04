@@ -57,7 +57,7 @@ export default class MetersApi {
 	public async edit(meter: MeterMetadata): Promise<{}> {
 		return await this.backend.doPostRequest<MeterEditData>(
 			'/api/meters/edit',
-			{ id: meter.id, enabled: meter.enabled, displayable: meter.displayable, timeZone: meter.timeZone, gps: meter.gps }
+			{ id: meter.id, enabled: meter.enabled, displayable: meter.displayable, timeZone: meter.timeZone, gps: meter.gps, identifier: meter.identifier }
 		);
 	}
 
