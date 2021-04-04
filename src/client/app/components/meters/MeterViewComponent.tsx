@@ -268,7 +268,12 @@ export default class MeterViewComponent extends React.Component<MeterViewProps, 
 		let formattedIdentifier;
 		let buttonMessageId;
 		if(this.state.identifierFocus){
-			formattedIdentifier = <textarea id={'identifier'} autoFocus value={this.state.identifierInput} onChange={event => this.handleIdentifierChange(event)} />;
+			formattedIdentifier = <textarea
+				id={'identifier'}
+				autoFocus
+				value={this.state.identifierInput}
+				onChange={event => this.handleIdentifierChange(event)}
+			/>;
 			buttonMessageId = 'update';
 		} else {
 			formattedIdentifier = <div>{this.state.identifierInput}</div>;
