@@ -64,6 +64,7 @@ export interface MeterEditData {
 	enabled: boolean;
 	displayable: boolean;
 	gps: GPSPoint;
+	identifier: string;
 }
 
 export interface MetersState {

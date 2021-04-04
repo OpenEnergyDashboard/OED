@@ -111,7 +111,7 @@ router.use(requiredAuthenticator);
 router.post('/edit', async (req, res) => {
 	const validParams = {
 		type: 'object',
-		maxProperties: 5,
+		maxProperties: 6,
 		required: ['id', 'enabled', 'displayable', 'timeZone'],
 		properties: {
 			id: { type: 'integer' },
@@ -135,6 +135,12 @@ router.post('/edit', async (req, res) => {
 					},
 					{ type: 'null' }
 				]
+			},
+			identifier: {
+				oneOf: [
+					{ type: 'string' },
+					{ type: 'null' }
+				]
 			}
 		}
 	};
@@ -151,6 +157,7 @@ router.post('/edit', async (req, res) => {
 			meter.displayable = req.body.displayable;
 			meter.meterTimezone = req.body.timeZone;
 			meter.gps = (req.body.gps) ? new Point(req.body.gps.longitude, req.body.gps.latitude) : null;
+			meter.identifier = req.body.identifier;
 			await meter.update(conn);
 		} catch (err) {
 			log.error('Failed to edit meter', err);
