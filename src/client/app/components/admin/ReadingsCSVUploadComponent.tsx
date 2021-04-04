@@ -32,7 +32,13 @@ export default class ReadingsCSVUploadComponent extends React.Component<Readings
 	private async handleSubmit(e: React.MouseEvent<HTMLFormElement>) {
 		try {
 			e.preventDefault();
-			await this.props.submitCSV(this.fileInput.current.files[0]); // Not sure how to respond to this typescript error.
+			const current = this.fileInput.current as HTMLInputElement;
+			const { files } = current;
+			if (files && (files as FileList).length !== 0) {
+				await this.props.submitCSV(files[0]);
+			} else {
+				showErrorNotification(translate('No Meters CSV File was uploaded!'), undefined, 10);
+			}
 			// Respond to success.
 		} catch (error) {
 			// A failed axios request should result in an error.
@@ -40,17 +46,17 @@ export default class ReadingsCSVUploadComponent extends React.Component<Readings
 		}
 	}
 
-	private handleSelectDuplications(e){
+	private handleSelectDuplications(e: React.ChangeEvent<HTMLInputElement>) {
 		const target = e.target;
 		this.props.selectDuplications(target.value);
 	}
 
-	private handleSelectTimeSort(e){
+	private handleSelectTimeSort(e: React.ChangeEvent<HTMLInputElement>) {
 		const target = e.target;
 		this.props.selectTimeSort(target.value as TimeSortTypes);
 	}
 
-	private handleSetMeterName(e){
+	private handleSetMeterName(e: React.ChangeEvent<HTMLInputElement>) {
 		const target = e.target;
 		this.props.setMeterName(target.value);
 	}

@@ -5,8 +5,6 @@
 import * as React from 'react';
 import HeaderContainer from '../../containers/HeaderContainer';
 import FooterContainer from '../../containers/FooterContainer';
-import AddMetersContainer from '../../containers/admin/AddMetersContainer';
-import AddReadingsContainer from '../../containers/admin/AddReadingsContainer';
 import PreferencesContainer from '../../containers/admin/PreferencesContainer';
 import UploadCSVContainer from '../../containers/admin/UploadCSVContainer';
 import TooltipHelpComponent from '../TooltipHelpComponentAlternative';

@@ -34,7 +34,6 @@ export default class UploadCSVContainer extends React.Component<{}, UploadCSVCon
 		this.toggleGzip = this.toggleGzip.bind(this);
 		this.toggleHeaderRow = this.toggleHeaderRow.bind(this);
 		this.toggleUpdate = this.toggleUpdate.bind(this);
-		this.toggleMode = this.toggleTab.bind(this);
 		this.toggleTab = this.toggleTab.bind(this);
 	}
 
@@ -166,10 +165,6 @@ export default class UploadCSVContainer extends React.Component<{}, UploadCSVCon
 				activeTab: tab
 			});
 		}
-	}
-
-	private toggleMode(mode: MODE) {
-		return () => this.toggleTab(mode);
 	}
 
 	public render() {

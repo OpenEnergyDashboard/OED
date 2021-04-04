@@ -30,4 +30,15 @@ const mapsApi = new MapsApi(apiBackend);
 const logsApi = new LogsApi(apiBackend);
 const versionApi = new VersionApi(apiBackend);
 
-export { groupsApi, metersApi, fileProcessingApi, preferencesApi, verificationApi, compressedReadingsApi, mapsApi, logsApi, versionApi, uploadCSVApi };
+export {
+	groupsApi,
+	metersApi,
+	fileProcessingApi,
+	preferencesApi,
+	verificationApi,
+	compressedReadingsApi,
+	mapsApi,
+	logsApi,
+	versionApi,
+	uploadCSVApi
+};

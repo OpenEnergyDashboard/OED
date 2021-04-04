@@ -11,16 +11,23 @@ import translate from '../../utils/translate';
 
 export default class MetersCSVUploadComponent extends React.Component<MetersCSVUploadProps> {
 	private fileInput: React.RefObject<HTMLInputElement>;
+
 	constructor(props: MetersCSVUploadProps) {
 		super(props);
 		this.handleSubmit = this.handleSubmit.bind(this);
-		this.fileInput = React.createRef();
+		this.fileInput = React.createRef<HTMLInputElement>();
 	}
 
 	private async handleSubmit(e: React.MouseEvent<HTMLFormElement>) {
 		try {
 			e.preventDefault();
-			await this.props.submitCSV(this.fileInput.current.files[0]); // Not sure how to respond to this typescript error.
+			const current = this.fileInput.current as HTMLInputElement;
+			const { files } = current;
+			if(files && (files as FileList).length !== 0){
+				await this.props.submitCSV(files[0]);
+			} else {
+				showErrorNotification(translate('No Meters CSV File was uploaded!'), undefined, 10);
+			}
 			// Respond to success.
 		} catch (error) {
 			// A failed axios request should result in an error.
@@ -42,7 +49,7 @@ export default class MetersCSVUploadComponent extends React.Component<MetersCSVU
 				<FormGroup>
 					<Input checked={this.props.update} type='checkbox' name='update' id='update' onChange={this.props.toggleUpdate} />
 					<Label for='update'> Update </Label>
-					<FormFileUploaderComponent buttonText='Upload Meters CSV' id='uploadMeters' reference={this.fileInput} required />
+					<FormFileUploaderComponent buttonText='Upload Meters CSV' reference={this.fileInput} required />
 				</FormGroup>
 				<Button type='submit'> Submit CSV Data </Button>
 			</Form>
