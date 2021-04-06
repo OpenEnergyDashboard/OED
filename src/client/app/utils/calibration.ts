@@ -142,6 +142,30 @@ export function calculateScaleFromEndpoints(origin: GPSPoint, opposite: GPSPoint
 }
 
 /**
+ * Convert the gps value to the equivalent Plotly grid coordinates on user map.
+ * @param size The normalized size of the map
+ * @param gps The GPS coordinate to convert
+ * @param originGPS The GPS value of the origin on the true north map.
+ * @param scaleOfMap The GPS degree per unit x, y on the true north map.
+ * @returns x, y value of the gps point on the user map.
+ */
+ export function gpsToUserGrid(size: Dimensions, gps: GPSPoint, originGPS: GPSPoint, scaleOfMap: MapScale): CartesianPoint {
+	// We need the origin x, y value by starting from 0, 0 on the user map and
+	// shift/rotate into true north.
+	const originTrueNorth = trueNorthOrigin(size);
+	// Now, convert from GPS to true north grid (x, y).
+	// Calculate how far the point is from origin and then the units for this distance.
+	const gridTrueNorth: CartesianPoint = {
+		x: originTrueNorth.x + (gps.longitude - originGPS.longitude) / scaleOfMap.degreePerUnitX,
+		y: originTrueNorth.y + (gps.latitude - originGPS.latitude) / scaleOfMap.degreePerUnitY
+	};
+	// Now rotate to user map and shift so origin at bottom, left. Do - angle since going from
+	// true north to user map.
+	const userGrid: CartesianPoint = rotateShift(size, gridTrueNorth, 1, -trueNorthAngle.angle);
+	return userGrid;
+}
+
+/**
  * @param calibrationSet All the points clicked by the user for calibration.
  * @param imageDimensions The dimensions of the original map to use from the user.
  * @returns The error and the origin & opposite point in GPS to use for mapping.

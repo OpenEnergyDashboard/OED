@@ -11,7 +11,7 @@ import { Dispatch } from '../types/redux/actions';
 import { ChartTypes } from '../types/redux/graph';
 import { SelectOption } from '../types/items';
 import { CartesianPoint, Dimensions, normalizeImageDimensions, calculateScaleFromEndpoints, meterDisplayableOnMap, meterMapInfoOk } from '../utils/calibration';
-import { gpsToUserGrid } from './MapChartContainer';
+import { gpsToUserGrid } from './../utils/calibration';
 
 
 /* Passes the current redux state of the chart select container, and turns it into props for the React
@@ -107,7 +107,6 @@ function mapStateToProps(state: State) {
 		selectedGroups
 	};
 }
-
 
 // function to dispatch selected meter information
 function mapDispatchToProps(dispatch: Dispatch) {
