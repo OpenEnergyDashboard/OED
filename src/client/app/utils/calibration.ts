@@ -149,7 +149,7 @@ export function calculateScaleFromEndpoints(origin: GPSPoint, opposite: GPSPoint
  * @param scaleOfMap The GPS degree per unit x, y on the true north map.
  * @returns x, y value of the gps point on the user map.
  */
- export function gpsToUserGrid(size: Dimensions, gps: GPSPoint, originGPS: GPSPoint, scaleOfMap: MapScale): CartesianPoint {
+export function gpsToUserGrid(size: Dimensions, gps: GPSPoint, originGPS: GPSPoint, scaleOfMap: MapScale): CartesianPoint {
 	// We need the origin x, y value by starting from 0, 0 on the user map and
 	// shift/rotate into true north.
 	const originTrueNorth = trueNorthOrigin(size);
