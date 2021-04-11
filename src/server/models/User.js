@@ -120,7 +120,7 @@ class User {
 }
 
 /**
- * If enum needs to be kept in sync with the src/server/sql/create_user_types_enum.sql and the UserRoles enum in src/client/types/items.ts 
+ * This enum needs to be kept in sync with the src/server/sql/create_user_types_enum.sql and the UserRoles enum in src/client/types/items.ts 
  */
 const _role = {
 	ADMIN: 'admin',

@@ -31,11 +31,11 @@ async function isTokenAuthorized(token, requestedRole) {
 	}
 }
 
-/** Checks if a user is authorized. */
 /**
- * 
+ * Checks if a user is authorized.
  * @param {User} user 
  * @param requestedRole 
+ * @returns {boolean} true if the user object has permissions of the requestedRole. Returns false otherwise.
  */
 function isUserAuthorized(user, requestedRole) {
 	return isRoleAuthorized(user.role, requestedRole);
