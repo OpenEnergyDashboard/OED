@@ -8,6 +8,7 @@
 const { chai, mocha, expect, app, testDB, testUser } = require('../common');
 const User = require('../../models/User');
 const bcrypt = require('bcryptjs');
+
 mocha.describe('Users API', () => {
 	mocha.describe('authorized role:', () => {
 		let token;

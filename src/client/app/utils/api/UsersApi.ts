@@ -10,6 +10,7 @@ import { User, UserRole } from '../../types/items';
 interface NewUser extends User {
 	password: string;
 }
+
 export default class UsersApi {
 	private readonly backend: ApiBackend;
 
