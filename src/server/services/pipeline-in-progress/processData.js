@@ -4,6 +4,7 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/.
  */
 
+const { is } = require('core-js/core/object');
 const moment = require('moment');
 const { log } = require('../../log');
 const Reading = require('../../models/Reading');
@@ -53,6 +54,9 @@ function processData(rows, meterID, isCumulative, cumulativeReset, readingRepeti
 			if (onlyEndTime){
 				// The startTimestamp of this reading is the endTimestamp of the previous reading
 				startTimestamp = prevReading.endTimestamp;
+				endTimestamp = moment(rows[index-readingRepetition][1], 'M/D/Y H:mm');
+				console.log(startTimestamp.toString());
+				console.log(endTimestamp.toString());
 			}
 			else{
 				startTimestamp = moment(rows[index-readingRepetition][1], 'M/D/Y H:mm');
@@ -62,6 +66,10 @@ function processData(rows, meterID, isCumulative, cumulativeReset, readingRepeti
                 readingOK = false;
                 errMsg = "The first reading must be dropped when dealing with cumulative data.";
             }
+			if (onlyEndTime && isFirst(prevReading.endTimestamp)){
+				readingOK = false;
+				errMsg = "The first reading must be dropped when dealing only with endTimestamps.";
+			}
             if (readingOK && startTimestamp.isSameOrAfter(endTimestamp)){
 				readingOK = false;	
 				errMsg = "The reading end time is not after the start time.";
@@ -127,7 +135,7 @@ function processData(rows, meterID, isCumulative, cumulativeReset, readingRepeti
 				// An error occurred, for now log it, let the user know and continue
 				log.error(errMsg);
 				readingOK = true;
-				if (isCumulative){
+				if (isCumulative && !onlyEndTime || onlyEndTime && !isCumulative || isCumulative && onlyEndTime){
 					meterReading = rows[index-readingRepetition][0];
 					currentReading = new Reading(meterID, meterReading, startTimestamp, endTimestamp);
 					// This currentReading will become the previousReading for the first reading if isCumulative is true

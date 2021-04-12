@@ -23,7 +23,7 @@ const processData = require('./processData');
 async function loadArrayInput(dataRows, meterID, mapRowToModel, isCumulative, cumulativeReset, readingRepetition, conditionSet, conn) {
 	readingsArray = dataRows.map(mapRowToModel);
 	// Temporary values for params
-	let onlyEndtime = false;
+	let onlyEndtime = true;
 	let Tgap = 0;
 	let Tlen = 0;
 

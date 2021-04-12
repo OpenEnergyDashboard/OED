@@ -24,8 +24,7 @@ async function uploadReadings(req, res, filepath, conn) {
 			}
 		});
 	if (!meter) {
-		meter = new Meter(undefined, meterName, undefined, false, true, Meter.type.MAMAC, undefined, undefined, undefined);
-		//console.log(meter);
+		meter = new Meter(undefined, meterName, undefined, false, false, Meter.type.MAMAC, undefined, undefined, undefined);
 		await meter.insert(conn)
 			.catch(err => {
 				throw new CSVPipelineError('Internal OED error: Failed to insert meter into the database.', err.message);
