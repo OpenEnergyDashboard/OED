@@ -16,7 +16,6 @@ const parseCsv = promisify(csv.parse);
  */
 async function readCsv(fileName) {
 	const buffer = await readFile(fileName);
-	//console.log("buffer is given as: ");
 	console.log(await parseCsv(buffer.toString()));
 	return await parseCsv(buffer.toString());
 }

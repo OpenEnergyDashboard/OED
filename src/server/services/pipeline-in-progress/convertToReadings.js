@@ -18,7 +18,6 @@ const moment = require('moment');
  */
 function convertToReadings(toConvert, meterID, conditionSet) {
 	readings = toConvert.map(row => new Reading(meterID, row[0], row[1], row[2]));
-	//readings = toConvert.map(row => new Reading(meterID, row[1], row[2], row[3]));
 	if (conditionSet !== undefined && !validateReadings(readings, conditionSet)) {
 		log.error(`REJECTED ALL READINGS FROM METER ${ipAddress} DUE TO ERROR WHEN VALIDATING DATA`);
 		return null;

@@ -21,30 +21,14 @@ const processData = require('./processData');
  * @param {array} conn connection to database
  */
 async function loadArrayInput(dataRows, meterID, mapRowToModel, isCumulative, cumulativeReset, readingRepetition, conditionSet, conn) {
-	//readingsArray = dataRows.map(mapRowToModel);
-	//console.log("dataRows is: "+dataRows);
 	readingsArray = dataRows.map(mapRowToModel);
-	/*console.log("readingsArray.Length is: "+readingsArray.length);
-	for (var i = 0; i < readingsArray.length; i++){
-		console.log("this reading is: "+readingsArray[i]);
-	}*/
-	//console.log("mapRowToModel: ");
-	//console.log(dataRows.map(mapRowToModel));
-	//console.log("readingsArray is: "+readingsArray);
-
 	// Temporary values for params
-	let onlyEndtime = true;
+	let onlyEndtime = false;
 	let Tgap = 0;
 	let Tlen = 0;
 
-	readingsArray = processData(readingsArray, meterID, isCumulative, cumulativeReset, readingRepetition, onlyEndtime, Tgap, Tlen, conn);
-	/*
-	if (isCumulative) {
-		readingsArray = handleCumulative(readingsArray, readingRepetition, cumulativeReset, meterID, true, 0, 0, conn);
-	}*/
-	readings = convertToReadings(readingsArray, meterID, conditionSet);
-	//console.log("readings are: "+readings);
-	return await Reading.insertOrIgnoreAll(readings, conn);
+	readingsArray = processData(readingsArray, meterID, isCumulative, cumulativeReset, readingRepetition, onlyEndtime, Tgap, Tlen, conditionSet);
+	return await Reading.insertOrIgnoreAll(readingsArray, conn);
 }
 
 module.exports = loadArrayInput;
