@@ -34,6 +34,7 @@ async function uploadReadings(req, res, filepath, conn) {
 	await loadCsvInput(filepath, meter.id, mapRowToModel, false, areReadingsCumulative,
 		cumulativeReset, readingRepetition, undefined, hasHeaderRow, conn); // load csv data
 	// TODO: If unsuccessful upload then an error will be thrown. We need to catch this error.
+	require ('../refreshReadingViews');
 	fs.unlink(filepath).catch(err => log.error(`Failed to remove the file ${filepath}.`, err));
 	success(req, res, 'It looks like success.'); // TODO: We need a try catch for all these awaits.
 	return;

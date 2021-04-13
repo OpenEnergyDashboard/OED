@@ -21,7 +21,9 @@ const Reading = require('../../models/Reading');
  * @param {object[[]]} rows
  * @param {number} meterID
  * @param {boolean} isCumulative true if the data is cumulative
- * @param {boolean} cumulativeReset true if the cumulative data is reset at midnight
+ * @param {boolean} cumulativeReset true if the cumulative data can reset
+ * @param {moment} resetStart start time a cumulativeReset may occur after
+ * @param {moment} resetEnd end time a cumulativeReset may occur before
  * @param readingRepetition value is 1 if reading is not duplicated. 2 if repeated twice and so on (E-mon D-mon meters)
  * @param {boolean} onlyEndTime true if the data only has an endTimestamp
  * @param {number} Tgap the acceptable Date/Time gaps between two readings 
@@ -29,12 +31,11 @@ const Reading = require('../../models/Reading');
  * @param {dict} conditionSet used to validate readings (minVal, maxVal, minDate, maxDate, interval, maxError)
  */
 
-function processData(rows, meterID, isCumulative, cumulativeReset, readingRepetition, onlyEndTime, Tgap, Tlen, conditionSet) {
+function processData(rows, meterID, isCumulative, cumulativeReset, resetStart, resetEnd, readingRepetition, onlyEndTime, Tgap, Tlen, conditionSet) {
 
     // If we can successfully processData return result = [R0, R1, R2...RN]
 	const result = [];
 
-    // Get all the prevReadings
     let errMsg = "";
 
 	let meterReading = 0;

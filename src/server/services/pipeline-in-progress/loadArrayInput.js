@@ -22,12 +22,17 @@ const processData = require('./processData');
  */
 async function loadArrayInput(dataRows, meterID, mapRowToModel, isCumulative, cumulativeReset, readingRepetition, conditionSet, conn) {
 	readingsArray = dataRows.map(mapRowToModel);
+
 	// Temporary values for params
 	let onlyEndtime = true;
 	let Tgap = 0;
 	let Tlen = 0;
+	let resetStart = moment(0);
+	let resetEnd = moment(0);
+	// expect 2 times. If we only get 1 resetTime error. In the future we can grab the meter values from the db.
+	// seperate function to handle cumulativeReset
 
-	readingsArray = processData(readingsArray, meterID, isCumulative, cumulativeReset, readingRepetition, onlyEndtime, Tgap, Tlen, conditionSet);
+	readingsArray = processData(readingsArray, meterID, isCumulative, cumulativeReset, resetStart, resetEnd, readingRepetition, onlyEndtime, Tgap, Tlen, conditionSet);
 	return await Reading.insertOrIgnoreAll(readingsArray, conn);
 }
 
