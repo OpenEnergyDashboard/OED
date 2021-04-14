@@ -6,6 +6,7 @@ import * as React from 'react';
 import {CalibrationModeTypes, MapMetadata} from '../../types/redux/map';
 import {ChangeEvent} from 'react';
 import {logToServer} from '../../actions/logs';
+import { FormattedMessage } from 'react-intl';
 
 /**
  * Accepts image file from user upload,
@@ -29,6 +30,7 @@ export default class MapCalibrationInitiateComponent extends React.Component<Map
 	private readonly fileInput: any;
 	private notifyLoadComplete() {
 		window.alert(`Map load complete from ${this.state.filename}.`);
+		
 	}
 
 	constructor(props: MapInitiateProps) {
@@ -48,18 +50,20 @@ export default class MapCalibrationInitiateComponent extends React.Component<Map
 		return (
 			<form onSubmit={this.confirmUpload}>
 				<label>
-					Upload map image to begin.
+					<FormattedMessage id='map.new.upload' />
 					<br/>
 					<input type='file' ref={this.fileInput} />
 				</label>
 				<br />
 				<label>
-					Define a name for the map:
+					<FormattedMessage id='map.new.name' />
 					<br/>
 					<textarea id={'text'} cols={50} value={this.state.mapName} onChange={this.handleNameInput}/>
 				</label>
 				<br/>
-				<input type='submit' value='Save and continue' />
+				<FormattedMessage id="map.new.submit">
+					{placeholder => <input type='submit' value={placeholder.toString()} />}
+				</FormattedMessage>
 			</form>
 		);
 	}
