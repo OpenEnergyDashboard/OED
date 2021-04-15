@@ -50,17 +50,6 @@ mocha.describe('meters API', () => {
 			expect(meter).to.have.property('displayable', true);
 			expect(meter).to.have.property('meterType', null);
 			expect(meter).to.have.property('timeZone', null);
-			// ERROR when run this test "AssertionError: expected { Object (id, name, ...) } to have a property 'identifier'" "
-			// expect(meter).to.have.property('identifier');
-			// expect(meter).to.have.property('note');
-			// expect(meter).to.have.property('area', null);
-			// expect(meter).to.have.property('cumulative',true);
-			// expect(meter).to.have.property('cumulativeReset',true);
-			// expect(meter).to.have.property('cumulativeResetStart', null);
-			// expect(meter).to.have.property('cumulativeResetEnd', null);
-			// expect(meter).to.have.property('previousDay', true);
-			// expect(meter).to.have.property('readingLength', null);
-			// expect(meter).to.have.property('readingVariation', null);
 		}
 	});
 	mocha.describe('with authentication', () => {
