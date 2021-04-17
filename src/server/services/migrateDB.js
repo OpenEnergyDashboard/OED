@@ -10,7 +10,7 @@ const { ask, terminateReadline } = require('./utils');
 const { findMaxSemanticVersion } = require('../util');
 const { showPossibleMigrations, migrateAll, getUniqueVersions } = require('../migrations/migrateDatabase');
 const migrationList = require('../migrations/registerMigration');
-const { getConnection, dropConnection } = require('../db');
+const { getConnection } = require('../db');
 
 function findMaxVersion(list) {
 	return findMaxSemanticVersion(getUniqueVersions(list));
