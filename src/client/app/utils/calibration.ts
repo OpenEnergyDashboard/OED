@@ -166,6 +166,10 @@ export function gpsToUserGrid(size: Dimensions, gps: GPSPoint, originGPS: GPSPoi
 }
 
 /**
+ * Calculates the normalized scale of a map and stores in the database as the
+ * origin and opposite points. It also calculates the relative error for this
+ * scale by finding the maximum difference between the calculated scale and the
+ * one from each pair of calibration points. It returns all three of these values.
  * @param calibrationSet All the points clicked by the user for calibration.
  * @param imageDimensions The dimensions of the original map to use from the user.
  * @returns The error and the origin & opposite point in GPS to use for mapping.
@@ -397,6 +401,8 @@ export function rotateShift(size: Dimensions, point: CartesianPoint, direction: 
 }
 
 /**
+ * Returns the origin of the user map converted to the true north map. Note that it is in
+ * in the bottom, left on the user map but in the center on the true north map.
  * @param size the normalized map dimensions
  * @returns The origin coordinates on the true north map
  */
@@ -408,6 +414,9 @@ export function trueNorthOrigin(size: Dimensions): CartesianPoint {
 }
 
 /**
+ * Similar to trueNorthOrigin function but returns the opposite corner of the user map converted
+ * to the true north map. Note that it is in the top, right of the user map but
+ * relative to the center on the true north map.
  * @param size the normalized map dimensions
  * @returns The opposite coordinates on the true north map
  */
