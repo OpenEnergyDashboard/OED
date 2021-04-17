@@ -120,15 +120,15 @@ class User {
 }
 
 /**
+ * Enum of roles.
  * This enum needs to be kept in sync with the src/server/sql/create_user_types_enum.sql and the UserRoles enum in src/client/types/items.ts 
+ * @enum {string}
  */
-const _role = {
+User.role = Object.freeze({
 	ADMIN: 'admin',
 	CSV: 'csv',
 	EXPORT: 'export',
 	OBVIUS: 'obvius'
-}
-
-User.role = Object.freeze(_role);
+});
 
 module.exports = User;

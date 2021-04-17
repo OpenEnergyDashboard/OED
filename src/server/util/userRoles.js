@@ -9,7 +9,12 @@ const jwtVerify = promisify(jwt.verify);
 const { getConnection } = require('../db');
 const secretToken = require('../config').secretToken;
 
-/** Checks if a role has the authorization capabilities as the requested role. */
+/**
+ * Checks if a role has the authorization capabilities as the requested role. 
+ * @param {User.role} role is a role listed in User.role
+ * @param {User.role} requestedRole is a role listed in User.role
+ * @returns {boolean} true if role has the permissions of the requestedRole. Returns false otherwise.
+ */
 function isRoleAuthorized(role, requestedRole) {
 	if (role === User.role.ADMIN) {
 		return true;
@@ -18,7 +23,12 @@ function isRoleAuthorized(role, requestedRole) {
 	}
 }
 
-/** Checks if a token (assumed to be verified) has the authorization capabilities as the requested role. */
+/**
+ * Checks if a token (assumed to be verified) has the authorization capabilities as the requested role. 
+ * @param token is a jwt token
+ * @param {User.role} requestedRole is a role listed in User.role
+ * @returns {boolean} true if the token has the permissions of the requestedRole. Returns false otherwise.
+ */
 async function isTokenAuthorized(token, requestedRole) {
 	try {
 		const payload = await jwtVerify(token, secretToken);
@@ -32,9 +42,9 @@ async function isTokenAuthorized(token, requestedRole) {
 }
 
 /**
- * Checks if a user is authorized.
+ * Checks if a user is authorized by role.
  * @param {User} user 
- * @param requestedRole 
+ * @param {User.role} requestedRole is a role listed in User.role
  * @returns {boolean} true if the user object has permissions of the requestedRole. Returns false otherwise.
  */
 function isUserAuthorized(user, requestedRole) {
