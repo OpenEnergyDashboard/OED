@@ -54,12 +54,12 @@ function credentialsRequestValidationMiddleware(req, res, next) {
 		properties: {
 			email: {
 				type: 'string',
-				minLength: 3,
+				minLength: 5,
 				maxLength: 254
 			},
 			password: {
 				type: 'string',
-				minLength: 3
+				minLength: 8
 			}
 		}
 	};
