@@ -12,7 +12,7 @@ const bcrypt = require('bcryptjs');
 mocha.describe('preferences API', () => {
 	mocha.describe('modification api', () => {
 		mocha.describe('edit endpoint', () => {
-			mocha.it('should accept requests from authorized role', async () => {
+			mocha.it('should accept requests from Admin role', async () => {
 				let res = await chai.request(app).post('/api/login')
 					.send({ email: testUser.email, password: testUser.password });
 				expect(res).to.have.status(200);
@@ -27,7 +27,7 @@ mocha.describe('preferences API', () => {
 				expect(res).to.have.status(200);
 			});
 
-			mocha.describe('unauthorized roles: ', () => {
+			mocha.describe('Non-Admin roles: ', () => {
 				for (const role in User.role) {
 					if (User.role[role] !== User.role.ADMIN) {
 						let token;

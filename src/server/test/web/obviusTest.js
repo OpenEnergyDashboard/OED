@@ -11,7 +11,7 @@ const bcrypt = require('bcryptjs');
 
 mocha.describe('Obvius API', () => {
 	mocha.describe('upload: ', () => {
-		mocha.describe('authorized roles:', () => {
+		mocha.describe('authorized roles (Admin or Obvius):', () => {
 			mocha.it('should accept requests from Admin users', async () => {
 				const res = await chai.request(app).post('/api/obvius').send({ email: testUser.email, password: testUser.password });
 				expect(res).to.have.status(406); // this passes role verification but fails due to improper input
