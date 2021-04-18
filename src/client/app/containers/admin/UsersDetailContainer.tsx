@@ -59,12 +59,12 @@ export default class UsersDetailContainer extends React.Component<UsersDisplayCo
 	private async submitUserEdits() {
 		try {
 			await usersApi.editUsers(this.state.users);
-			showSuccessNotification(translate('Successfully edited users.'));
+			showSuccessNotification(translate('users.successfully.edit.users'));
 			this.setState(currentState => ({
 				history: [_.cloneDeep<User[]>(currentState.users)]
 			}));
 		} catch (error) {
-			showErrorNotification(translate('Failed to edit users.'));
+			showErrorNotification(translate('users.failed.to.edit.users'));
 		}
 	}
 
@@ -73,9 +73,9 @@ export default class UsersDetailContainer extends React.Component<UsersDisplayCo
 			await usersApi.deleteUser(email);
 			const users = await this.fetchUsers();
 			this.setState({ users });
-			showSuccessNotification(translate('Successfully deleted user.'));
+			showSuccessNotification(translate('users.successfully.delete.user'));
 		} catch (error) {
-			showErrorNotification(translate('Failed to delete user.'));
+			showErrorNotification(translate('users.failed.to.delete.user'));
 		}
 	}
 

@@ -51,10 +51,10 @@ export default class CreateUserFormContainer extends React.Component<{}, {}>{
 					password: this.state.password,
 					role: this.state.role
 				});
-				showSuccessNotification(translate('Successfully created a user.'))
+				showSuccessNotification(translate('users.successfully.create.user'))
 				browserHistory.push('/users');
 			} catch (error) {
-				showErrorNotification(translate('Failed to create a user.'));
+				showErrorNotification(translate('users.failed.to.create.user'));
 			}
 		}
 	}
