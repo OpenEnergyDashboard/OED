@@ -53,11 +53,7 @@ function mapStateToProps(state: State) {
 					text: hoverText,
 					hoverinfo: 'text',
 					type: 'bar',
-					line: {
-						shape: 'spline',
-						width: 3,
-						color: getGraphColor(colorID, DataType.Meter)
-					}
+					marker: {color: getGraphColor(colorID, DataType.Meter)}
 				});
 			}
 		}
@@ -96,16 +92,11 @@ function mapStateToProps(state: State) {
 					text: hoverText,
 					hoverinfo: 'text',
 					type: 'bar',
-					line: {
-						shape: 'spline',
-						width: 3,
-						color: getGraphColor(colorID, DataType.Meter)
-					}
+					marker: {color: getGraphColor(colorID, DataType.Group)}
 				});
 			}
 		}
 	}
-
 
 	// Customize the layout of the plot
 	const layout: any = {
