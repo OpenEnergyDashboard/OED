@@ -8,6 +8,8 @@ const { is } = require('core-js/core/object');
 const moment = require('moment');
 const { log } = require('../../log');
 const Reading = require('../../models/Reading');
+const handleCumulativeReset = require('./handleCumulativeReset');
+
 
 /**
  * Handle all data, assume that the first row is the first reading (skip this row).
@@ -22,8 +24,8 @@ const Reading = require('../../models/Reading');
  * @param {number} meterID
  * @param {boolean} isCumulative true if the data is cumulative
  * @param {boolean} cumulativeReset true if the cumulative data can reset
- * @param {moment} resetStart start time a cumulativeReset may occur after
- * @param {moment} resetEnd end time a cumulativeReset may occur before
+ * @param {string} resetStart a string representation of the start time a cumulativeReset may occur after
+ * @param {string} resetEnd a string representation of the end time a cumulativeReset may occur before
  * @param readingRepetition value is 1 if reading is not duplicated. 2 if repeated twice and so on (E-mon D-mon meters)
  * @param {boolean} onlyEndTime true if the data only has an endTimestamp
  * @param {number} Tgap the acceptable Date/Time gaps between two readings 
@@ -56,8 +58,6 @@ function processData(rows, meterID, isCumulative, cumulativeReset, resetStart, r
 				// The startTimestamp of this reading is the endTimestamp of the previous reading
 				startTimestamp = prevReading.endTimestamp;
 				endTimestamp = moment(rows[index-readingRepetition][1], 'M/D/Y H:mm');
-				console.log(startTimestamp.toString());
-				console.log(endTimestamp.toString());
 			}
 			else{
 				startTimestamp = moment(rows[index-readingRepetition][1], 'M/D/Y H:mm');
@@ -116,23 +116,33 @@ function processData(rows, meterID, isCumulative, cumulativeReset, resetStart, r
 					meterReading = rows[index-readingRepetition][0];
 				}
 				// Reject negative readings
-				if (meterReading1 < 0) {
+				if (isCumulative && meterReading1 < 0) {
+					// If the value isCumulative and the first reading is negative reject unless cumulativeReset is true
 					log.error(`DETECTED A NEGATIVE VALUE WHILE HANDLING CUMULATIVE READINGS FROM METER ${meterID}, ` +
 						`ROW ${index - readingRepetition}. REJECTED ALL READINGS`);
 					return [];
 				}
 				// To handle cumulative readings that resets at midnight
-				if (meterReading < 0 && endTimestamp.isAfter(startTimestamp, 'date') && cumulativeReset) {
-					meterReading = meterReading1;
+				if (meterReading < 0) {
+					// if meterReading is negative and cumulative check that the times fall within an acceptable reset range
+					if (handleCumulativeReset(cumulativeReset, resetStart, resetEnd, startTimestamp)){
+						meterReading = meterReading2;
+					}
+					else{
+						//cumulativeReset is not expected so throw an error
+						errMsg = ("A negative meterReading has been detected but either cumulativeReset is not enabled, or the start time and end time of this reading is out of the reset range.")
+						readingOK = false;
+					}
 				}
-				if (Math.abs(prevReading.endTimestamp.diff(prevReading.startTimestamp)-endTimestamp.diff(startTimestamp)) > Tlen && !isFirst(prevReading.endTimestamp)){
-					errMsg = "The previous reading has a different time length than the current reading.";
+				if (readingOK){
+					if (Math.abs(prevReading.endTimestamp.diff(prevReading.startTimestamp)-endTimestamp.diff(startTimestamp)) > Tlen && !isFirst(prevReading.endTimestamp)){
+						errMsg = "The previous reading has a different time length than the current reading.";
+					}
+					currentReading = new Reading(meterID, meterReading, startTimestamp, endTimestamp);	
+					result.push(currentReading);
 				}
-				currentReading = new Reading(meterID, meterReading, startTimestamp, endTimestamp);	
-				result.push(currentReading);
-				//console.log(errMsg);
 			}
-			else{
+			if(!readingOK){
 				// An error occurred, for now log it, let the user know and continue
 				log.error(errMsg);
 				readingOK = true;
