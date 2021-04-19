@@ -64,7 +64,7 @@ function mapStateToProps(state: State) {
 								`${moment(mapReading.startTimestamp).utc().format('MMM DD, YYYY')} - ${moment(mapReading.endTimestamp).utc().format('MMM DD, YYYY')}`;
 							const averagedReading = mapReading.reading / barDuration.asDays(); // average total reading by days of duration
 							size.push(averagedReading);
-							texts.push(`<b> ${timeReading} </b> <br> ${label}: ${averagedReading} kWh/day`);
+							texts.push(`<b> ${timeReading} </b> <br> ${label}: ${averagedReading.toPrecision(6)} kWh/day`);
 						}
 					}
 				}
