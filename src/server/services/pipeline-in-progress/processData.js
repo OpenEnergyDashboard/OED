@@ -4,7 +4,6 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/.
  */
 
-const { is } = require('core-js/core/object');
 const moment = require('moment');
 const { log } = require('../../log');
 const Reading = require('../../models/Reading');
@@ -28,12 +27,12 @@ const handleCumulativeReset = require('./handleCumulativeReset');
  * @param {string} resetEnd a string representation of the end time a cumulativeReset may occur before
  * @param readingRepetition value is 1 if reading is not duplicated. 2 if repeated twice and so on (E-mon D-mon meters)
  * @param {boolean} onlyEndTime true if the data only has an endTimestamp
- * @param {number} Tgap the acceptable Date/Time gaps between two readings 
- * @param {number} Tlen the acceptable Date/Time ranges in milliseconds two reading may deviate from each other
+ * @param {number} Tgap the allowed time variation in millisecond that a gap may occur between two readings 
+ * @param {number} Tlen the allowed time variation in milliseconds that two readings may deviate from each other
  * @param {dict} conditionSet used to validate readings (minVal, maxVal, minDate, maxDate, interval, maxError)
  */
 
-function processData(rows, meterID, isCumulative, cumulativeReset, resetStart, resetEnd, readingRepetition, onlyEndTime, Tgap, Tlen, conditionSet) {
+function processData(rows, meterID, isCumulative, cumulativeReset, resetStart="0:00:00", resetEnd="23:59:99", readingRepetition, onlyEndTime, Tgap, Tlen, conditionSet) {
 
     // If we can successfully processData return result = [R0, R1, R2...RN]
 	const result = [];
