@@ -30,7 +30,6 @@ export default class MapCalibrationInitiateComponent extends React.Component<Map
 	private readonly fileInput: any;
 	private notifyLoadComplete() {
 		window.alert(`Map load complete from ${this.state.filename}.`);
-		
 	}
 
 	constructor(props: MapInitiateProps) {
@@ -61,7 +60,7 @@ export default class MapCalibrationInitiateComponent extends React.Component<Map
 					<textarea id={'text'} cols={50} value={this.state.mapName} onChange={this.handleNameInput}/>
 				</label>
 				<br/>
-				<FormattedMessage id="map.new.submit">
+				<FormattedMessage id='map.new.submit'>
 					{placeholder => <input type='submit' value={placeholder.toString()} />}
 				</FormattedMessage>
 			</form>
