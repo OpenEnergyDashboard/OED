@@ -93,7 +93,7 @@ mocha.describe('groups API', () => {
 				expect(res).to.have.status(401);
 			});
 			mocha.describe('properly process roles:', () => {
-				for (const role in User.role) {
+				for (const role of Object.keys(User.role)) {
 					const isAdmin = User.role[role] === User.role.ADMIN;
 					const message = `should ${isAdmin ? 'accept' : 'reject'} requests from ${role}`;
 					// Response status code should be 403 if improper role, but 400 if proper role, but improper user input.
@@ -152,7 +152,7 @@ mocha.describe('groups API', () => {
 				expect(res).to.have.status(401);
 			});
 			mocha.describe('properly process roles', () => {
-				for (const role in User.role) {
+				for (const role of Object.keys(User.role)) {
 					const isAdmin = User.role[role] === User.role.ADMIN;
 					const message = `should ${isAdmin ? 'accept' : 'reject'} requests from ${role}`;
 					// Response status code should be 403 if improper role, but 400 if proper role, but improper user input.
