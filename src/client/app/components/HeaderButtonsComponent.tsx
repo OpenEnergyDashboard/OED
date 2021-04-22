@@ -24,6 +24,7 @@ interface HeaderButtonsProps {
 export default class HeaderButtonsComponent extends React.Component<HeaderButtonsProps, {}> {
 	constructor(props: HeaderButtonsProps) {
 		super(props);
+		this.handleLogOut = this.handleLogOut.bind(this);
 	}
 
 	public render() {
@@ -84,10 +85,15 @@ export default class HeaderButtonsComponent extends React.Component<HeaderButton
 					<Link style={mapsLinkStyle} to='/maps'><Button outline><FormattedMessage id='maps' /></Button></Link>
 					<Link style={homeLinkStyle} to='/'><Button outline><FormattedMessage id='home'/></Button></Link>
 					<Link style={loginLinkStyle} to='/login'><Button outline><FormattedMessage id='log.in'/></Button></Link>
-					<Link style={logoutButtonStyle} to='/'><Button outline onClick={this.props.handleLogOut}><FormattedMessage id='log.out'/></Button></Link>
+					<Link style={logoutButtonStyle} to='/'><Button outline onClick={this.handleLogOut}><FormattedMessage id='log.out'/></Button></Link>
 				</div>
 			</div>
 		);
+	}
+
+	private handleLogOut() {
+		this.props.handleLogOut();
+		this.forceUpdate();
 	}
 
 }
