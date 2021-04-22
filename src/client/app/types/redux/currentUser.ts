@@ -17,7 +17,11 @@ export interface ReceiveCurrentUser {
 	data: User;
 }
 
-export type CurrentUserAction = RequestCurrentUser | ReceiveCurrentUser;
+export interface ClearCurrentUser {
+	type: ActionType.ClearCurrentUser;
+}
+
+export type CurrentUserAction = RequestCurrentUser | ReceiveCurrentUser | ClearCurrentUser;
 
 export interface CurrentUserState {
 	isFetching: boolean;

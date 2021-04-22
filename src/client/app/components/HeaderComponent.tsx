@@ -5,12 +5,11 @@
 import * as React from 'react';
 import { Link } from 'react-router';
 import LogoComponent from './LogoComponent';
-import HeaderButtonsComponent from './HeaderButtonsComponent';
 import MenuModalComponent from './MenuModalComponent';
+import HeaderButtonsContainer from '../containers/HeaderButtonsContainer';
 import getPage from '../utils/getPage';
 
 interface HeaderProps {
-	loggedInAsAdmin: boolean;
 	title: string;
 	optionsVisibility: boolean;
 }
@@ -51,9 +50,8 @@ function HeaderComponent(props: HeaderProps) {
 				</div>
 				<div className='col-4 justify-content-end' style={divRightStyle}>
 					{ props.optionsVisibility ?
-						<HeaderButtonsComponent showCollapsedMenuButton loggedInAsAdmin={props.loggedInAsAdmin}/>
+						<HeaderButtonsContainer showCollapsedMenuButton />
 						: <MenuModalComponent
-							loggedInAsAdmin={props.loggedInAsAdmin}
 							showOptions={getPage() === ''}
 							showCollapsedMenuButton={false}
 						/>

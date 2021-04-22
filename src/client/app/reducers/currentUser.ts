@@ -25,6 +25,12 @@ export default function profile(state = defaultState, action: CurrentUserAction)
 				isFetching: false,
 				profile: action.data
 			};
+		case ActionType.ClearCurrentUser:
+			// Removes the current user from the redux store.
+			return {
+				...state,
+				profile: null
+			}
 		default:
 			return state;
 	}
