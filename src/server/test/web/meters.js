@@ -105,7 +105,7 @@ mocha.describe('meters API', () => {
 					token = res.body.token;
 				});
 
-				mocha.it('should only return visible meters', async () => {
+				mocha.it('should only return visible meters and visible data', async () => {
 					const conn = testDB.getConnection();
 					await new Meter(undefined, 'Meter 1', '1.1.1.1', true, true, Meter.type.MAMAC, 'TZ1', gps).insert(conn);
 					await new Meter(undefined, 'Meter 2', '1.1.1.1', true, true, Meter.type.MAMAC, 'TZ2', gps).insert(conn);
@@ -120,15 +120,21 @@ mocha.describe('meters API', () => {
 					for (let i = 0; i < 3; i++) {
 						const meter = res.body[i];
 						expect(meter).to.have.property('id');
-						expect(meter).to.have.property('name', `Meter ${i + 1}`);
 						expect(meter).to.have.property('gps');
 						expect(meter.gps).to.have.property('latitude', gps.latitude);
 						expect(meter.gps).to.have.property('longitude', gps.longitude);
-						expect(meter).to.have.property('ipAddress', '1.1.1.1');
+						expect(meter).to.have.property('ipAddress', null);
 						expect(meter).to.have.property('enabled', true);
 						expect(meter).to.have.property('displayable', true);
-						expect(meter).to.have.property('meterType', Meter.type.MAMAC);
-						expect(meter).to.have.property('timeZone', `TZ${i + 1}`);
+						expect(meter).to.have.property('meterType', null);
+						expect(meter).to.have.property('timeZone', null);
+
+						// Copied from /src/server/routes/meters.js
+						// TODO: remove this line when usages of meter.name are replaced with meter.identifer
+						// Without this, things will break for non-logged in users because we currently rely on
+						// the internal name being available. As noted in #605, the intent is to not send the
+						// name to a user if they are not logged in.
+						expect(meter).to.have.property('name', `Meter ${i + 1}`);
 					}
 				});
 
