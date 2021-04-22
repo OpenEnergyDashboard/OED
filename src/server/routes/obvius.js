@@ -26,8 +26,8 @@ const streamBuffers = require('stream-buffers');
 const loadLogfileToReadings = require('../services/obvius/loadLogfileToReadings');
 const middleware = require('../middleware');
 const obvius = require('../util').obvius;
-const { getConnection, dropConnection } = require('../db');
 const { obviusEmailAndPasswordAuthMiddleware } = require('./authenticator');
+const { getConnection } = require('../db');
 const escapeHtml = require('core-js/fn/string/escape-html');
 
 const upload = multer({ storage: multer.memoryStorage() });

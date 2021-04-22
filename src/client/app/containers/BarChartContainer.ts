@@ -99,7 +99,6 @@ function mapStateToProps(state: State) {
 		}
 	}
 
-
 	// Customize the layout of the plot
 	const layout: any = {
 		barmode: (state.graph.barStacking ? 'stack' : 'group'),

@@ -6,7 +6,7 @@ const bcrypt = require('bcryptjs');
 const User = require('../../models/User');
 const { validateEmail } = require('./utils');
 const { ask, terminateReadline } = require('../utils');
-const { getConnection, dropConnection } = require('../../db');
+const { getConnection } = require('../../db');
 
 (async () => {
 	let email;
@@ -51,7 +51,5 @@ const { getConnection, dropConnection } = require('../../db');
 		// Something went wrong with insertion so return error code.
 		// This assumes the err has a message. This could be done better.
 		terminateReadline('Creation of user failed with err: ' + err.message, 11);
-	} finally {
-		dropConnection();
 	}
 })();

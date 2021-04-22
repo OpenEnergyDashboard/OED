@@ -4,7 +4,7 @@
 
 const Configfile = require('../../models/obvius/Configfile');
 const { log } = require('../../log');
-const { getConnection, dropConnection } = require('../../db');
+const { getConnection } = require('../../db');
 
 async function showConfigfiles() {
 	try {
@@ -20,8 +20,6 @@ async function showConfigfiles() {
 		}
 	} catch (err) {
 		log.error(`Error listing Obvius config logs: ${err}`, err);
-	} finally {
-		dropConnection();
 	}
 }
 
