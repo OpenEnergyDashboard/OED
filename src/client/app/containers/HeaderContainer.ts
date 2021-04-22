@@ -9,7 +9,7 @@ import { hasToken } from '../utils/token';
 import { isRoleAdmin } from '../utils/hasPermissions';
 
 function mapStateToProps(state: State) {
-	const currentUser = state.profile.profile;
+	const currentUser = state.currentUser.profile;
 	let loggedInAsAdmin = false;
 	if(currentUser !== null){
 		loggedInAsAdmin = hasToken() && isRoleAdmin(currentUser.role);

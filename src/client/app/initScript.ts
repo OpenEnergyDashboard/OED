@@ -3,11 +3,11 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
 
 import { Dispatch } from './types/redux/actions';
-import { fetchProfileIfNeeded } from './actions/profile';
+import { fetchCurrentUserIfNeeded } from './actions/currentUser';
 
 // The purpose of this is to store the user's role or any other information that would rarely change just once into the store.
 export default function initScript()  {
 	return (dispatch: Dispatch) => {
-		dispatch(fetchProfileIfNeeded());
+		dispatch(fetchCurrentUserIfNeeded());
 	};
 }

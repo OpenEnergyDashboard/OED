@@ -4,7 +4,7 @@
 
 import { connect } from 'react-redux';
 import { User } from '../types/items';
-import { receiveProfile } from '../actions/profile'
+import { receiveCurrentUser } from '../actions/currentUser'
 import LoginComponent from '../components/LoginComponent';
 import { Dispatch } from '../types/redux/actions';
 
@@ -14,7 +14,7 @@ import { Dispatch } from '../types/redux/actions';
 
 function mapDispatchToProps(dispatch: Dispatch) {
 	return {
-		saveProfile: (profile: User) => dispatch(receiveProfile(profile))
+		saveCurrentUser: (profile: User) => dispatch(receiveCurrentUser(profile))
 	};
 }
 

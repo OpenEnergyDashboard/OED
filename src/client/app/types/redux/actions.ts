@@ -8,8 +8,8 @@ import { State } from './state';
 
 export enum ActionType {
 
-	RequestProfile = 'REQUEST_PROFILE',
-	ReceiveProfile = 'RECEIVE_PROFILE',
+	RequestCurrentUser = 'REQUEST_CURRENT_USER',
+	ReceiveCurrentUser = 'RECEIVE_CURRENT_USER',
 
 	RequestVersion = 'REQUEST_VERSION',
 	ReceiveVersion = 'RECEIVE_VERSION',

@@ -19,13 +19,13 @@ export default class UsersApi {
 		this.backend = backend;
 	}
 
-	public async getProfile(): Promise<User> {
+	public async getCurrentUser(): Promise<User> {
 		return await this.backend.doGetRequest<User>('/api/users/token');
 	};
 
 	public async hasRolePermissions(role: UserRole): Promise<boolean> {
 		try {
-			const user = await this.getProfile();
+			const user = await this.getCurrentUser();
 			return hasPermissions(user.role, role);
 		} catch (error) {
 			return false;

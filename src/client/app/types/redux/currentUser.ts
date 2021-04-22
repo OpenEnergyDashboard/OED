@@ -9,17 +9,17 @@ import { User } from '../items';
 * Defines the action interfaces used in the corresponding reducers.
 */
 
-export interface RequestProfile {
-	type: ActionType.RequestProfile;
+export interface RequestCurrentUser {
+	type: ActionType.RequestCurrentUser;
 }
-export interface ReceiveProfile {
-	type: ActionType.ReceiveProfile;
+export interface ReceiveCurrentUser {
+	type: ActionType.ReceiveCurrentUser;
 	data: User;
 }
 
-export type ProfileAction = RequestProfile | ReceiveProfile;
+export type CurrentUserAction = RequestCurrentUser | ReceiveCurrentUser;
 
-export interface ProfileState {
+export interface CurrentUserState {
 	isFetching: boolean;
 	profile: User | null;
 }

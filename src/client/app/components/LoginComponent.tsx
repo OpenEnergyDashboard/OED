@@ -3,7 +3,7 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
 
 import * as React from 'react';
-import {  browserHistory } from '../utils/history';
+import { browserHistory } from '../utils/history';
 import { InjectedIntlProps, injectIntl, defineMessages, FormattedMessage } from 'react-intl';
 import { Input, Button, InputGroup, Form } from 'reactstrap';
 import HeaderContainer from '../containers/HeaderContainer';
@@ -19,7 +19,7 @@ interface LoginState {
 }
 
 interface LoginProps {
-	saveProfile(profile: User): any;
+	saveCurrentUser(profile: User): any;
 }
 
 type LoginPropsWithIntl = LoginProps & InjectedIntlProps;
@@ -33,7 +33,7 @@ class LoginComponent extends React.Component<LoginPropsWithIntl, LoginState> {
 		this.handleEmailChange = this.handleEmailChange.bind(this);
 		this.handlePasswordChange = this.handlePasswordChange.bind(this);
 		this.handleSubmit = this.handleSubmit.bind(this);
-		this.saveProfile = this.saveProfile.bind(this);
+		this.saveCurrentUser = this.saveCurrentUser.bind(this);
 	}
 
 	/**
@@ -107,8 +107,8 @@ class LoginComponent extends React.Component<LoginPropsWithIntl, LoginState> {
 		this.setState({ password: e.target.value });
 	}
 
-	private saveProfile(profile: User){
-		this.props.saveProfile(profile);
+	private saveCurrentUser(profile: User) {
+		this.props.saveCurrentUser(profile);
 	}
 
 	/**
@@ -122,7 +122,7 @@ class LoginComponent extends React.Component<LoginPropsWithIntl, LoginState> {
 			try {
 				const loginResponse = await verificationApi.login(this.state.email, this.state.password);
 				localStorage.setItem('token', loginResponse.token);
-				this.saveProfile(loginResponse);
+				this.saveCurrentUser({ email: loginResponse.email, role: loginResponse.role });
 				browserHistory.push('/');
 			} catch (err) {
 				if (err.response && err.response.status === 401) {
