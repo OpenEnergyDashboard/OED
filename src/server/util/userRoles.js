@@ -27,7 +27,7 @@ function isRoleAuthorized(role, requestedRole) {
  * Checks if a token (assumed to be verified) has the authorization capabilities as the requested role. 
  * @param token is a jwt token
  * @param {User.role} requestedRole is a role listed in User.role
- * @returns {boolean} true if the token has the permissions of the requestedRole. Returns false otherwise.
+ * @returns {Promise<boolean>} true if the token has the permissions of the requestedRole. Returns false otherwise.
  */
 async function isTokenAuthorized(token, requestedRole) {
 	try {
