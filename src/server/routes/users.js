@@ -46,7 +46,11 @@ router.get('/token', async(req, res) => {
 				try {
 					const conn = getConnection();
 					const userProfile = await User.getByID(decoded.data, conn);
-					res.status(200).json(userProfile);
+					res.status(200).json(
+						{ 
+							email: userProfile.email,
+							role: userProfile.role
+						});
 				} catch (error) {
 					res.status(401).json({ message: 'User does not exist in database.' });
 				}
