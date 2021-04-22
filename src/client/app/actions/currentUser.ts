@@ -19,7 +19,7 @@ export function receiveCurrentUser(data: User): t.ReceiveCurrentUser {
 
 /**
  * Check if we should fetch the current user's data. This function has the side effect of deleting an invalid token from local storage.
- * @param state 
+ * @param state
  * @returns Return true if we should fetch the current user's data. Returns false otherwise.
  */
 async function shouldFetchCurrentUser(state: State): Promise<boolean> {
