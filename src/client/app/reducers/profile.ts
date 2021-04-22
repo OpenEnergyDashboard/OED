@@ -13,13 +13,13 @@ const defaultState: ProfileState = { isFetching: false, profile: null  };
 export default function profile(state = defaultState, action: ProfileAction): ProfileState {
 	switch (action.type) {
 		case ActionType.RequestProfile:
-			// When version is requested, indicate app is fetching data from API
+			// When profile is requested, indicate app is fetching data from API
 			return {
 				...state,
 				isFetching: true
 			};
 		case ActionType.ReceiveProfile:
-			// When version is received, update the store with result from API
+			// When profile is received, update the store with result from API
 			return {
 				...state,
 				isFetching: false,

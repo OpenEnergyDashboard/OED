@@ -11,21 +11,29 @@ import FooterContainer from '../containers/FooterContainer';
 import { showErrorNotification } from '../utils/notifications';
 import { verificationApi } from '../utils/api';
 import translate from '../utils/translate';
+import { User } from '../types/items';
 
 interface LoginState {
 	email: string;
 	password: string;
 }
 
-class LoginComponent extends React.Component<InjectedIntlProps, LoginState> {
+interface LoginProps {
+	saveProfile(profile: User): any;
+}
+
+type LoginPropsWithIntl = LoginProps & InjectedIntlProps;
+
+class LoginComponent extends React.Component<LoginPropsWithIntl, LoginState> {
 	private inputEmail: HTMLInputElement | null;
 
-	constructor(props: InjectedIntlProps) {
+	constructor(props: LoginPropsWithIntl) {
 		super(props);
 		this.state = { email: '', password: '' };
 		this.handleEmailChange = this.handleEmailChange.bind(this);
 		this.handlePasswordChange = this.handlePasswordChange.bind(this);
 		this.handleSubmit = this.handleSubmit.bind(this);
+		this.saveProfile = this.saveProfile.bind(this);
 	}
 
 	/**
@@ -99,6 +107,10 @@ class LoginComponent extends React.Component<InjectedIntlProps, LoginState> {
 		this.setState({ password: e.target.value });
 	}
 
+	private saveProfile(profile: User){
+		this.props.saveProfile(profile);
+	}
+
 	/**
 	 * Makes a GET request to the login api whenever the user click the submit button, then clears the state
 	 * If the request is successful, the JWT auth token is stored in local storage and the app routes to the admin page
@@ -108,8 +120,9 @@ class LoginComponent extends React.Component<InjectedIntlProps, LoginState> {
 		e.preventDefault();
 		(async () => {
 			try {
-				const token = await verificationApi.login(this.state.email, this.state.password);
-				localStorage.setItem('token', token);
+				const loginResponse = await verificationApi.login(this.state.email, this.state.password);
+				localStorage.setItem('token', loginResponse.token);
+				this.saveProfile(loginResponse);
 				browserHistory.push('/');
 			} catch (err) {
 				if (err.response && err.response.status === 401) {
@@ -129,4 +142,4 @@ class LoginComponent extends React.Component<InjectedIntlProps, LoginState> {
 	}
 }
 
-export default injectIntl<{}>(LoginComponent);
+export default injectIntl<LoginProps>(LoginComponent);

@@ -12,9 +12,13 @@ import RouteContainer from './containers/RouteContainer';
 import reducers from './reducers';
 import './styles/index.css';
 import { composeWithDevTools } from 'redux-devtools-extension';
+import initScript from './initScript';
 
 // Creates and applies thunk middleware to the Redux store, which is defined from the Redux reducers
 const store = createStore(reducers, composeWithDevTools(applyMiddleware(thunkMiddleware)));
+
+// Store information that would rarely change throughout using OED into the Redux store when the application first mounts.
+store.dispatch(initScript());
 
 // Renders the entire application, starting with RouteComponent, into the root div
 // Provides the Redux store to all child components

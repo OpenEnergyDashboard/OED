@@ -8,7 +8,6 @@ import { Dispatch } from '../types/redux/actions';
 import { State } from '../types/redux/state';
 import { changeOptionsFromLink, LinkOptions } from '../actions/graph';
 
-
 function mapStateToProps(state: State) {
 	return {
 		barStacking: state.graph.barStacking,

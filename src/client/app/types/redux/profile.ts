@@ -12,13 +12,12 @@ import { User } from '../items';
 export interface RequestProfile {
 	type: ActionType.RequestProfile;
 }
-
 export interface ReceiveProfile {
 	type: ActionType.ReceiveProfile;
 	data: User;
 }
 
-export type ProfileAction = RequestProfile | ReceiveProfile ;
+export type ProfileAction = RequestProfile | ReceiveProfile;
 
 export interface ProfileState {
 	isFetching: boolean;

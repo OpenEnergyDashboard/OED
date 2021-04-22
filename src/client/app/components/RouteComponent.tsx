@@ -13,7 +13,7 @@ import * as _ from 'lodash';
 import * as moment from 'moment';
 import InitializationContainer from '../containers/InitializationContainer';
 import HomeComponent from './HomeComponent';
-import LoginComponent from '../components/LoginComponent';
+import LoginContainer from '../containers/LoginContainer';
 import AdminComponent from './admin/AdminComponent';
 import {LinkOptions} from 'actions/graph';
 import {hasToken} from '../utils/token';
@@ -197,7 +197,7 @@ export default class RouteComponent extends React.Component<RouteProps, {}> {
 				<IntlProvider locale={lang} messages={messages} key={lang}>
 					<>
 					<Router history={browserHistory}>
-						<Route path='/login' component={LoginComponent} />
+						<Route path='/login' component={LoginContainer} />
 						<Route path='/admin' component={AdminComponent} onEnter={this.requireAuth} />
 						<Route path='/groups' component={GroupsDetailContainer} onEnter={this.checkAuth} />
 						<Route path='/meters' component={MetersDetailContainer} onEnter={this.checkAuth} />

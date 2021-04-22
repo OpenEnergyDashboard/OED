@@ -7,12 +7,8 @@ import { Thunk, ActionType, Dispatch, GetState } from '../types/redux/actions';
 import { State } from '../types/redux/state';
 import * as t from '../types/redux/profile';
 import { User } from '../types/items';
+import { hasToken } from '../utils/token';
 
-/*
-* Defines function that performs the API call to retrieve the current version of the app,
-* and dispatches the corresponding action types.
-* This function will be called on component initialization.
-*/
 export function requestProfile(): t.RequestProfile {
 	return { type: ActionType.RequestProfile };
 }
@@ -21,9 +17,8 @@ export function receiveProfile(data: User): t.ReceiveProfile {
 	return { type: ActionType.ReceiveProfile, data };
 }
 
-
 async function shouldFetchProfile(state: State): Promise<boolean> {
-	return !state.profile.isFetching && (await verificationApi.checkTokenValid());
+	return !state.profile.isFetching && hasToken() && (await verificationApi.checkTokenValid());
 }
 
 export function fetchProfile(): Thunk {
