@@ -7,6 +7,10 @@ import { ThunkAction } from 'redux-thunk';
 import { State } from './state';
 
 export enum ActionType {
+
+	RequestProfile = 'REQUEST_PROFILE',
+	ReceiveProfile = 'RECEIVE_PROFILE',
+
 	RequestVersion = 'REQUEST_VERSION',
 	ReceiveVersion = 'RECEIVE_VERSION',
 

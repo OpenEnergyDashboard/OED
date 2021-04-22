@@ -12,6 +12,7 @@ import { AdminState } from './admin';
 import { CompareReadingsState } from './compareReadings';
 import { VersionState } from './version';
 import {MapState} from './map';
+import { ProfileState } from './profile';
 
 export interface State {
 	meters: MetersState;
@@ -26,4 +27,5 @@ export interface State {
 	notifications: NotificationsState;
 	admin: AdminState;
 	version: VersionState;
+	profile: ProfileState;
 }
