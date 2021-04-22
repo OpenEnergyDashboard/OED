@@ -6,6 +6,7 @@
 
 import ApiBackend from './ApiBackend';
 import { User, UserRole } from '../../types/items';
+import { hasPermissions } from '../../utils/hasPermissions';
 
 interface NewUser extends User {
 	password: string;
@@ -25,7 +26,7 @@ export default class UsersApi {
 	public async hasRolePermissions(role: UserRole): Promise<boolean> {
 		try {
 			const user = await this.getProfile();
-			return user.role === UserRole.ADMIN || user.role === role;
+			return hasPermissions(user.role, role);
 		} catch (error) {
 			return false;
 		}
