@@ -16,7 +16,7 @@ import HomeComponent from './HomeComponent';
 import LoginContainer from '../containers/LoginContainer';
 import AdminComponent from './admin/AdminComponent';
 import {LinkOptions} from 'actions/graph';
-import {hasToken} from '../utils/token';
+import {hasToken, deleteToken} from '../utils/token';
 import {showErrorNotification} from '../utils/notifications';
 import {ChartTypes} from '../types/redux/graph';
 import {LanguageTypes} from '../types/redux/i18n';
@@ -37,6 +37,7 @@ interface RouteProps {
 	barStacking: boolean;
 	defaultLanguage: LanguageTypes;
 	changeOptionsFromLink(options: LinkOptions): Promise<any[]>;
+	clearCurrentUser(): any;
 }
 
 export default class RouteComponent extends React.Component<RouteProps, {}> {
@@ -69,6 +70,10 @@ export default class RouteComponent extends React.Component<RouteProps, {}> {
 			if (!(await verificationApi.checkTokenValid())) {
 				// Route to login page if the auth token is not valid
 				browserHistory.push('/login');
+				// We should delete the token when we know that it is expired. Ensures that we don't not leave any unwanted tokens around.
+				deleteToken();
+				// This ensures that if there is no token then there is no stale profile in the redux store.
+				this.props.clearCurrentUser();
 			}
 		})();
 	}
@@ -88,6 +93,10 @@ export default class RouteComponent extends React.Component<RouteProps, {}> {
 					// Route to login page if the auth token is not valid
 					showErrorNotification(translate('invalid.token.login.or.logout'));
 					browserHistory.push('/login');
+					// We should delete the token when we know that it is expired. Ensures that we don't not leave any unwanted tokens around.
+					deleteToken();
+					// This ensures that if there is no token then there is no stale profile in the redux store.
+					this.props.clearCurrentUser();
 				}
 			})();
 		}

@@ -7,6 +7,7 @@ import RouteComponent from '../components/RouteComponent';
 import { Dispatch } from '../types/redux/actions';
 import { State } from '../types/redux/state';
 import { changeOptionsFromLink, LinkOptions } from '../actions/graph';
+import { clearCurrentUser } from '../actions/currentUser';
 
 function mapStateToProps(state: State) {
 	return {
@@ -17,7 +18,8 @@ function mapStateToProps(state: State) {
 
 function mapDispatchToProps(dispatch: Dispatch) {
 	return {
-		changeOptionsFromLink: (options: LinkOptions) => dispatch(changeOptionsFromLink(options))
+		changeOptionsFromLink: (options: LinkOptions) => dispatch(changeOptionsFromLink(options)),
+		clearCurrentUser: () => dispatch(clearCurrentUser())
 	};
 }
 
