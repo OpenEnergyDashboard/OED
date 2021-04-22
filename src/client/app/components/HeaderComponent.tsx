@@ -10,6 +10,7 @@ import MenuModalComponent from './MenuModalComponent';
 import getPage from '../utils/getPage';
 
 interface HeaderProps {
+	loggedInAsAdmin: boolean;
 	title: string;
 	optionsVisibility: boolean;
 }
@@ -17,7 +18,7 @@ interface HeaderProps {
 /**
  * React component that controls the header strip at the top of all pages
  */
-export default function HeaderComponent(props: HeaderProps) {
+function HeaderComponent(props: HeaderProps) {
 	const divStyle = {
 		marginTop: '5px',
 		paddingBottom: '5px'
@@ -50,8 +51,9 @@ export default function HeaderComponent(props: HeaderProps) {
 				</div>
 				<div className='col-4 justify-content-end' style={divRightStyle}>
 					{ props.optionsVisibility ?
-						<HeaderButtonsComponent showCollapsedMenuButton />
+						<HeaderButtonsComponent showCollapsedMenuButton loggedInAsAdmin={props.loggedInAsAdmin}/>
 						: <MenuModalComponent
+							loggedInAsAdmin={props.loggedInAsAdmin}
 							showOptions={getPage() === ''}
 							showCollapsedMenuButton={false}
 						/>
@@ -61,3 +63,5 @@ export default function HeaderComponent(props: HeaderProps) {
 		</div>
 	);
 }
+
+export default HeaderComponent;

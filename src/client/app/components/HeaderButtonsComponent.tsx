@@ -14,6 +14,7 @@ import TooltipHelpComponentAlternative from './TooltipHelpComponentAlternative';
 
 interface HeaderButtonsProps {
 	showCollapsedMenuButton: boolean;
+	loggedInAsAdmin: boolean;
 }
 
 /**
@@ -26,13 +27,14 @@ export default class HeaderButtonsComponent extends React.Component<HeaderButton
 	}
 
 	public render() {
+		const loggedInAsAdmin = this.props.loggedInAsAdmin;
 		const showOptions = getPage() === '';
 		const renderLoginButton = !hasToken();
 		const renderHomeButton = getPage() !== '';
-		const renderAdminButton = hasToken() && getPage() !== 'admin';
+		const renderAdminButton = loggedInAsAdmin && getPage() !== 'admin';
 		const renderGroupsButton = getPage() !== 'groups';
 		const renderMetersButton = getPage() !== 'meters';
-		const renderMapsButton = hasToken() && getPage() !== 'maps';
+		const renderMapsButton = loggedInAsAdmin && getPage() !== 'maps';
 		const renderLogoutButton = hasToken();
 
 		const loginLinkStyle: React.CSSProperties = {
@@ -68,6 +70,7 @@ export default class HeaderButtonsComponent extends React.Component<HeaderButton
 				<div className='d-lg-none'>
 					{(this.props.showCollapsedMenuButton) ?
 						<MenuModalComponent
+							loggedInAsAdmin={loggedInAsAdmin}
 							showOptions={showOptions}
 							showCollapsedMenuButton={false}
 						/> : null

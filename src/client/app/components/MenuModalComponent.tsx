@@ -10,6 +10,7 @@ import { FormattedMessage } from 'react-intl';
 import ReactTooltip from 'react-tooltip';
 
 interface MenuModalProps {
+	loggedInAsAdmin: boolean;
 	showOptions: boolean;
 	showCollapsedMenuButton: boolean;
 }
@@ -54,7 +55,7 @@ export default class MenuModalComponent extends React.Component<MenuModalProps, 
 							<p style={labelStyle}>
 								<FormattedMessage id='navigation' />:
 							</p>
-							<HeaderButtonsComponent showCollapsedMenuButton={false} />
+							<HeaderButtonsComponent loggedInAsAdmin={this.props.loggedInAsAdmin} showCollapsedMenuButton={false} />
 						</div>
 						{ this.props.showOptions &&
 							<UIOptionsContainer />
