@@ -17,11 +17,12 @@ const router = express.Router();
 router.use(optionalAuthenticator);
 
 /**
- * Defines the format in which we want to send meters and controls what information we send to the client, if logged in or not.
+ * Defines the format in which we want to send meters and controls what information we send to the client, if logged in and an Admin or not.
  * @param meter
+ * @param loggedInAsAdmin
  * @returns {{id, name}}
  */
-function formatMeterForResponse(meter, loggedIn) {
+function formatMeterForResponse(meter, loggedInAsAdmin) {
 	const formattedMeter = {
 		id: meter.id,
 		name: meter.name,
@@ -33,8 +34,8 @@ function formatMeterForResponse(meter, loggedIn) {
 		gps: meter.gps
 	};
 
-	// Only logged in users can see IP addresses and types
-	if (loggedIn) {
+	// Only logged in Admins can see IP addresses and types
+	if (loggedInAsAdmin) {
 		formattedMeter.ipAddress = meter.ipAddress;
 		formattedMeter.meterType = meter.type;
 		formattedMeter.timeZone = meter.meterTimezone;
@@ -51,13 +52,15 @@ router.get('/', async (req, res) => {
 		const conn = getConnection();
 		let query;
 		const token = req.headers.token || req.body.token || req.query.token;
-		if (req.hasValidAuthToken && (await isTokenAuthorized(token, User.role.ADMIN))) {
+		const loggedInAsAdmin = req.hasValidAuthToken && (await isTokenAuthorized(token, User.role.ADMIN));
+		if (loggedInAsAdmin) {
 			query = Meter.getAll;
 		} else {
 			query = Meter.getDisplayable;
 		}
+
 		const rows = await query(conn);
-		res.json(rows.map(row => formatMeterForResponse(row, req.hasValidAuthToken)));
+		res.json(rows.map(row => formatMeterForResponse(row, loggedInAsAdmin)));
 	} catch (err) {
 		log.error(`Error while performing GET all meters query: ${err}`, err);
 	}
