@@ -8,14 +8,13 @@ import { State } from '../../types/redux/state';
 import { fetchMetersDetails, submitEditedMeters } from '../../actions/meters';
 import {Dispatch} from '../../types/redux/actions';
 import { isRoleAdmin } from '../../utils/hasPermissions';
-import { hasToken } from '../../utils/token';
 
 
 function mapStateToProps(state: State) {
 	const currentUser = state.currentUser.profile;
 	let loggedInAsAdmin = false;
 	if(currentUser !== null){
-		loggedInAsAdmin = hasToken() && isRoleAdmin(currentUser.role);
+		loggedInAsAdmin = isRoleAdmin(currentUser.role);
 	}
 
 	return {

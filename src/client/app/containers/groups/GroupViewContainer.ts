@@ -8,7 +8,6 @@ import { fetchGroupChildrenIfNeeded, beginEditingIfPossible, changeDisplayMode }
 import { Dispatch } from '../../types/redux/actions';
 import { State } from '../../types/redux/state';
 import { DisplayMode } from '../../types/redux/groups';
-import { hasToken } from '../../utils/token';
 import { isRoleAdmin } from '../../utils/hasPermissions';
 
 function mapStateToProps(state: State, ownProps: {id: number}) {
@@ -18,7 +17,7 @@ function mapStateToProps(state: State, ownProps: {id: number}) {
 	const currentUser = state.currentUser.profile;
 	let loggedInAsAdmin = false;
 	if(currentUser !== null){
-		loggedInAsAdmin = hasToken() && isRoleAdmin(currentUser.role);
+		loggedInAsAdmin = isRoleAdmin(currentUser.role);
 	}
 	return {
 		id,

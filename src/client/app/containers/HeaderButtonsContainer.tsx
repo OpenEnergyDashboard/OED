@@ -6,7 +6,7 @@ import { connect } from 'react-redux';
 import HeaderButtonsComponent from '../components/HeaderButtonsComponent';
 import { Dispatch } from '../types/redux/actions';
 import { State } from '../types/redux/state';
-import { hasToken, deleteToken } from '../utils/token';
+import { deleteToken } from '../utils/token';
 import { isRoleAdmin } from '../utils/hasPermissions';
 import { clearCurrentUser } from '../actions/currentUser';
 
@@ -14,7 +14,7 @@ function mapStateToProps(state: State, ownProps: { showCollapsedMenuButton: bool
 	const currentUser = state.currentUser.profile;
 	let loggedInAsAdmin = false;
 	if (currentUser !== null) {
-		loggedInAsAdmin = hasToken() && isRoleAdmin(currentUser.role);
+		loggedInAsAdmin = isRoleAdmin(currentUser.role);
 	}
 	return {
 		loggedInAsAdmin,

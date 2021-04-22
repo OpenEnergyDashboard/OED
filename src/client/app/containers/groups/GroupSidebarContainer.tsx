@@ -4,7 +4,6 @@
 
 import * as _ from 'lodash';
 import { connect } from 'react-redux';
-import { hasToken } from '../../utils/token';
 import { changeDisplayedGroups } from '../../actions/groups';
 import GroupSidebarComponent from '../../components/groups/GroupSidebarComponent';
 import { Dispatch } from '../../types/redux/actions';
@@ -16,7 +15,7 @@ function mapStateToProps(state: State) {
 	const currentUser = state.currentUser.profile;
 	let loggedInAsAdmin = false;
 	if (currentUser !== null){
-		loggedInAsAdmin = hasToken() && isRoleAdmin(currentUser.role);
+		loggedInAsAdmin = isRoleAdmin(currentUser.role);
 	}
 	return {
 		groups: sortedGroups,
