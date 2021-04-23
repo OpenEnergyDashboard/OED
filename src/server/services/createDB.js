@@ -4,7 +4,7 @@
 
 const { createSchema } = require('../models/database');
 const { log } = require('../log');
-const { getConnection, dropConnection } = require('../db');
+const { getConnection } = require('../db');
 (async function createSchemaWrapper() {
 	const conn = getConnection();
 	try {
@@ -14,8 +14,6 @@ const { getConnection, dropConnection } = require('../db');
 	} catch (err) {
 		log.error(`Error creating schema: ${err}`, err, skipMail = true);
 		process.exitCode = 1;
-	} finally {
-		dropConnection();
 	}
 }());
 

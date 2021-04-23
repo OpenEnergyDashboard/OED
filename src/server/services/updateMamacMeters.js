@@ -8,7 +8,7 @@ const Meter = require('../models/Meter');
 const readMamacData = require('./readMamacData');
 const updateMeters = require('./updateMeters');
 const { log } = require('../log');
-const { getConnection, dropConnection } = require('../db');
+const { getConnection } = require('../db');
 
 async function updateMamacMeters() {
 	const conn = getConnection();
@@ -19,8 +19,6 @@ async function updateMamacMeters() {
 		await updateMeters(readMamacData, metersToUpdate, conn);
 	} catch (err) {
 		log.error(`Error fetching Mamac meter data: ${err}`, err);
-	} finally {
-		dropConnection();
 	}
 }
 

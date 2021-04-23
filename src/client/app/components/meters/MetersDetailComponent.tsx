@@ -8,7 +8,9 @@ import { FormattedMessage } from 'react-intl';
 import { hasToken } from '../../utils/token';
 import MeterViewContainer from '../../containers/meters/MeterViewContainer';
 import HeaderContainer from '../../containers/HeaderContainer';
-import FooterComponent from '../FooterComponent';
+import FooterContainer from '../../containers/FooterContainer';
+import TooltipHelpComponent from '../TooltipHelpComponentAlternative';
+import TooltipMarkerComponent from '../TooltipMarkerComponent';
 
 interface MetersDetailProps {
 	meters: number[];
@@ -23,6 +25,8 @@ export default class MetersDetailComponent extends React.Component<MetersDetailP
 	}
 
 	public render() {
+		const renderCreateAdminTooltip = hasToken();
+
 		const titleStyle: React.CSSProperties = {
 			textAlign: 'center'
 		};
@@ -39,19 +43,30 @@ export default class MetersDetailComponent extends React.Component<MetersDetailP
 			marginRight: '40%'
 		};
 
+		const tooltipStyle = {
+			display: 'inline',
+			fontSize: '50%',
+			tooltipMeterView: renderCreateAdminTooltip? 'help.admin.meterview' : 'help.meters.meterview'
+		};
+
 		return (
 			<div>
 				<HeaderContainer />
+				<TooltipHelpComponent page='meters' />
 				<div className='container-fluid'>
 					<h2 style={titleStyle}>
 						<FormattedMessage id='meters' />
+						<div style={tooltipStyle}>
+							<TooltipMarkerComponent page='meters' helpTextId={tooltipStyle.tooltipMeterView} />
+						</div>
 					</h2>
 					<div style={tableStyle}>
 					<Table striped bordered hover>
 					<thead>
 						<tr>
-						<th> <FormattedMessage id='meter.id' /> </th>
-						<th> <FormattedMessage id='meter.name' /> </th>
+						{hasToken() && <th> <FormattedMessage id='meter.id' /> </th>}
+						{hasToken() && <th> <FormattedMessage id='meter.name' /> </th>}
+						<th> <FormattedMessage id='meter.identifier' /> </th>
 						{hasToken() && <th> <FormattedMessage id='meter.type' /> </th>}
 						{hasToken() && <th> <FormattedMessage id='meter.ip'/> </th>}
 						{hasToken() && <th> <FormattedMessage id='meter.gps'/> </th>}
@@ -75,7 +90,7 @@ export default class MetersDetailComponent extends React.Component<MetersDetailP
 						<FormattedMessage id='save.meter.edits' />
 					</Button> }
 				</div>
-				<FooterComponent />
+				<FooterContainer />
 			</div>
 		);
 	}

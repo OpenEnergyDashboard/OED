@@ -36,7 +36,7 @@ export default class MapCalibrationInfoDisplayComponent extends React.Component<
 		this.dropCurrentCalibration = this.dropCurrentCalibration.bind(this);
 	}
 	public render() {
-		const calibrationDisplay = `result: ${this.props.resultDisplay}`;
+		const calibrationDisplay = `${this.props.resultDisplay}`;
 		return (
 			<div>
 				<div className='checkbox'>
@@ -47,18 +47,26 @@ export default class MapCalibrationInfoDisplayComponent extends React.Component<
 				<div id='UserInput'>
 					<form onSubmit={this.handleSubmit}>
 						<label>
-							input GPS coordinate that corresponds to the point: {this.props.currentCartesianDisplay}
+							<FormattedMessage id='input.gps.coords.first'/> {this.props.currentCartesianDisplay}
 							<br/>
-							in this format -> latitude,longitude
+							<FormattedMessage id='input.gps.coords.second'/>
 							<br/>
 							<textarea id={'text'} cols={50} value={this.state.value} onChange={this.handleGPSInput}/>
 						</label>
 						<br/>
-						<input type={'submit'} value={'Submit'}/>
+						<FormattedMessage id='calibration.submit.button'>
+							{intlSubmitText => <input type={'submit'} value={intlSubmitText.toString()}/>}
+						</FormattedMessage>
 					</form>
-					<button onClick={this.dropCurrentCalibration}>Reset</button>
-					<button onClick={this.handleChanges}>Save changes to database</button>
-					<p>{calibrationDisplay}</p>
+					<FormattedMessage id='calibration.reset.button'>
+						{intlResetButton => <button onClick={this.dropCurrentCalibration}>{intlResetButton.toString()}</button>}
+					</FormattedMessage>
+					<FormattedMessage id='calibration.save.database'>
+						{intlSaveChanges => <button onClick={this.handleChanges}>{intlSaveChanges.toString()}</button>}
+					</FormattedMessage>
+					<FormattedMessage id='calibration.display'>
+						{intlResult => <p>{intlResult.toString()}{calibrationDisplay}</p>}
+					</FormattedMessage>
 				</div>
 			</div>
 		);

@@ -5,7 +5,7 @@
 const bcrypt = require('bcryptjs');
 const User = require('../../models/User');
 const { ask, terminateReadline } = require('../utils');
-const { getConnection, dropConnection } = require('../../db');
+const { getConnection } = require('../../db');
 
 
 (async () => {
@@ -26,7 +26,6 @@ const { getConnection, dropConnection } = require('../../db');
 	try {
 		await User.getByEmail(email, conn);
 	} catch (err) {
-		dropConnection();
 		terminateReadline('No user with that email exists');
 	}
 
@@ -36,7 +35,5 @@ const { getConnection, dropConnection } = require('../../db');
 		terminateReadline('User\'s password updated');
 	} catch (err) {
 		terminateReadline('Failed to update user\'s password');
-	} finally {
-		dropConnection();
 	}
 })();

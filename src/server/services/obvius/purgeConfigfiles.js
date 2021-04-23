@@ -4,7 +4,7 @@
 
 const Configfile = require('../../models/obvius/Configfile');
 const { log } = require('../../log');
-const { getConnection, dropConnection } = require('../../db');
+const { getConnection } = require('../../db');
 
 async function purgeConfigfiles() {
 	log.info('Purging Obvius config logs.');
@@ -13,8 +13,6 @@ async function purgeConfigfiles() {
 		Configfile.purgeAll(conn);
 	} catch (err) {
 		log.error(`Error purging Obvius config logs: ${err}`, err);
-	} finally {
-		dropConnection();
 	}
 }
 

@@ -82,7 +82,7 @@ class Meter {
 	 * @param conn the connection to be used.
 	 * @returns {Promise.<Meter>}
 	 */
-	static async getByName(name, conn ) {
+	static async getByName(name, conn) {
 		const row = await conn.one(sqlFile('meter/get_meter_by_name.sql'), { name: name });
 		return Meter.mapRow(row);
 	}
@@ -97,6 +97,11 @@ class Meter {
 		return row !== null;
 	}
 
+	/**
+	 * Creates a new meter from the data in a row.
+	 * @param row the row from which the meter is to be created
+	 * @returns Meter from row
+	 */
 	static mapRow(row) {
 		return new Meter(row.id, row.name, row.ipaddress, row.enabled, row.displayable, row.meter_type,
 			row.default_timezone_meter, row.gps, row.identifier, row.note, row.area, row.cumulative, row.cumulative_reset,
@@ -182,6 +187,7 @@ class Meter {
 	}
 }
 
+// Enum of meter types
 Meter.type = {
 	MAMAC: 'mamac',
 	METASYS: 'metasys',

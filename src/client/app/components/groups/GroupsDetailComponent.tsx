@@ -6,7 +6,11 @@ import * as React from 'react';
 import GroupSidebarContainer from '../../containers/groups/GroupSidebarContainer';
 import GroupViewContainer from '../../containers/groups/GroupViewContainer';
 import HeaderContainer from '../../containers/HeaderContainer';
-import FooterComponent from '../FooterComponent';
+import FooterContainer from '../../containers/FooterContainer';
+import TooltipHelpComponent from '../TooltipHelpComponentAlternative';
+import TooltipMarkerComponent from '../TooltipMarkerComponent';
+import { FormattedMessage } from 'react-intl';
+import { hasToken } from '../../utils/token';
 
 interface GroupsDetailProps {
 	selectedGroups: number[];
@@ -21,6 +25,7 @@ export default class GroupsDetailComponent extends React.Component<GroupsDetailP
 	}
 
 	public render() {
+		const renderCreateAdminTooltip = hasToken();
 		const flexContainerStyle = {
 			display: 'flex',
 			flexFlow: 'row wrap'
@@ -28,10 +33,25 @@ export default class GroupsDetailComponent extends React.Component<GroupsDetailP
 		const flexChildStyle = {
 			marginRight: '10px'
 		};
+		const titleStyle: React.CSSProperties = {
+			textAlign: 'center'
+		};
+		const tooltipStyle = {
+			display: 'inline',
+			fontSize: '50%',
+			tooltipGroupView: renderCreateAdminTooltip? 'help.admin.groupview' : 'help.groups.groupview'
+		};
 		return (
 			<div>
 				<HeaderContainer />
+				<TooltipHelpComponent page='groups' />
 				<div className='container-fluid'>
+					<h2 style={titleStyle}>
+						<FormattedMessage id='groups' />
+						<div style={tooltipStyle}>
+							<TooltipMarkerComponent page='groups' helpTextId={tooltipStyle.tooltipGroupView} />
+						</div>
+					</h2>
 					<div className='row'>
 						<div className='col-12 col-lg-2'>
 							<GroupSidebarContainer />
@@ -45,7 +65,7 @@ export default class GroupsDetailComponent extends React.Component<GroupsDetailP
 						</div>
 					</div>
 				</div>
-				<FooterComponent />
+				<FooterContainer />
 			</div>
 		);
 	}

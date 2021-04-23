@@ -19,8 +19,8 @@ function convertToCSV(items: ExportDataSet[]) {
 		const label = set.label;
 		data.forEach(reading => {
 			const info = reading.y;
-			const startTimeStamp = moment(reading.x).utc().format('dddd MMM DD YYYY hh:mm a');
-			csvOutput += `"${label}",${info} kW,${startTimeStamp}\n`; // this assumes that meter readings are in kW
+			const startTimeStamp = moment(reading.x).utc().format('dddd LL LTS').replace(/,/g,''); // use regex to omit pesky commas
+			csvOutput += `"${label}",${info},${startTimeStamp}\n`; // TODO: add column for units
 		});
 	});
 	return csvOutput;
@@ -56,15 +56,19 @@ export default function graphExport(dataSets: ExportDataSet[], name: string) {
 /**
  * Function to export raw data that we request on button click
  * @param items list of readings directly from the database
+ * @param defaultLanguage the preferred localization to use for date/time formatting
  */
-export function downloadRawCSV(items: RawReadings[]) {
+export function downloadRawCSV(items: RawReadings[], defaultLanguage: string) {
+	// note that utc() is not needed
 	let csvOutput = 'Label,Readings,Start Timestamp\n';
 	items.forEach(ele => {
-		csvOutput += `"${ele.label}",${ele.reading} kW,${ele.startTimestamp}\n`
+		const timestamp = moment(ele.startTimestamp).format('dddd LL LTS').replace(/,/g,''); // use regex to omit pesky commas
+		csvOutput += `"${ele.label}",${ele.reading},${timestamp}\n`; // TODO: add column for units
 	})
-	const startTime = new Date(items[0].startTimestamp).toDateString().replace(/ /g, '-'); // Use Regex to replace all ' ' with '-'
-	const endTime = new Date(items[items.length - 1].startTimestamp).toDateString().replace(/ /g, '-');
-	const filename = `oedRawExport_line_${startTime}_${endTime}.csv`;
+	// Use regex to remove commas and replace spaces/colons/hyphens with underscores
+	const startTime = moment(items[0].startTimestamp).format('LL_LTS').replace(/,/g,'').replace(/[\s:-]/g,'_');
+	const endTime = moment(items[items.length-1].startTimestamp).format('LL_LTS').replace(/,/g,'').replace(/[\s:-]/g,'_');
+	const filename = `oedRawExport_line_${startTime}_to_${endTime}.csv`;
 	downloadCSV(csvOutput, filename);
 }
 
