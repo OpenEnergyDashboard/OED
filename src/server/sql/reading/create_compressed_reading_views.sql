@@ -76,6 +76,7 @@ minutely_readings
 						'1 minute'::INTERVAL
 				) gen(interval_start)
 			GROUP BY r.meter_id, gen.interval_start;
+			
 
 CREATE OR REPLACE VIEW
 hourly_readings
@@ -193,17 +194,24 @@ BEGIN
 			FROM hourly_readings hourly
 			INNER JOIN unnest(meter_ids) meters(id) ON hourly.meter_id = meters.id
 		WHERE requested_range @> time_interval;
-	ELSE
+	/* Change the code below and get meterid, readings, start and end timestamp from readings table instead(raw data)*/
+	 ELSE
 		RETURN QUERY
-		SELECT
+	 	SELECT
 			minutely_readings.meter_id as meter_id,
-			minutely_readings.reading_rate as reading_rate,
-			lower(minutely_readings.time_interval) AS start_timestamp,
-			upper(minutely_readings.time_interval) AS end_timestamp
-		FROM minutely_readings
-			INNER JOIN unnest(meter_ids) meters(id) ON minutely_readings.meter_id = meters.id
-		WHERE requested_range @> minutely_readings.time_interval;
-	END IF;
+	 		minutely_readings.reading_rate as reading_rate,
+	 		lower(minutely_readings.time_interval) AS start_timestamp,
+	 		upper(minutely_readings.time_interval) AS end_timestamp
+		-- 	meter_id,
+	 	-- 	reading as reading_rate,
+	 	-- 	start_timestamp,
+	 	-- 	end_timestamp
+		-- FROM readings
+	 	FROM minutely_readings
+	 		INNER JOIN unnest(meter_ids) meters(id) ON minutely_readings.meter_id = meters.id
+	 	-- WHERE requested range > (end_timestamp - start_timestamp)
+		 WHERE requested_range @> minutely_readings.time_interval;
+	 END IF;
 END;
 $$ LANGUAGE 'plpgsql';
 
