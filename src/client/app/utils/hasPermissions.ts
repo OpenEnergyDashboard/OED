@@ -7,8 +7,9 @@ import { UserRole } from '../types/items';
 /**
  * Checks if the role A has the permission of the role B.
  */
-export function hasPermissions(A: UserRole, B: UserRole): boolean {
-	return A === UserRole.ADMIN || A === B;
+export function hasPermissions(userA: UserRole, userB: UserRole): boolean {
+	// Admins always have any other role.
+	return userA === UserRole.ADMIN || userA === userB;
 }
 
 /**
