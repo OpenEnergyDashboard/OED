@@ -4,7 +4,6 @@
 
 import * as React from 'react';
 import { Button } from 'reactstrap';
-import { hasToken } from '../../utils/token';
 import { FormattedMessage } from 'react-intl';
 import { MeterMetadata, EditMeterDetailsAction } from '../../types/redux/meters';
 import { GPSPoint, isValidGPSInput } from '../../utils/calibration';
@@ -17,6 +16,7 @@ interface MeterViewProps {
 	meter: MeterMetadata;
 	isEdited: boolean;
 	isSubmitting: boolean;
+	loggedInAsAdmin: boolean;
 	// The function used to dispatch the action to edit meter details
 	editMeterDetails(meter: MeterMetadata): EditMeterDetailsAction;
 	log(level: string, message: string): any;
@@ -48,17 +48,18 @@ export default class MeterViewComponent extends React.Component<MeterViewProps, 
 	}
 
 	public render() {
+		const loggedInAsAdmin = this.props.loggedInAsAdmin;
 		return (
 			<tr>
-				{hasToken() && <td> {this.props.meter.id} {this.formatStatus()} </td>}
-				{hasToken() && <td> {this.props.meter.name} </td>}
+				{loggedInAsAdmin && <td> {this.props.meter.id} {this.formatStatus()} </td>}
+				{loggedInAsAdmin && <td> {this.props.meter.name} </td>}
 				<td> {this.formatIdentifierInput()} </td>
-				{hasToken() && <td> {this.props.meter.meterType} </td>}
-				{hasToken() && <td> {this.props.meter.ipAddress} </td>}
-				{hasToken() && <td> {this.formatGPSInput()} </td>}
+				{loggedInAsAdmin && <td> {this.props.meter.meterType} </td>}
+				{loggedInAsAdmin && <td> {this.props.meter.ipAddress} </td>}
+				{loggedInAsAdmin && <td> {this.formatGPSInput()} </td>}
 				<td> {this.formatEnabled()} </td>
 				<td> {this.formatDisplayable()} </td>
-				{hasToken() && <td> <TimeZoneSelect current={this.props.meter.timeZone || ''} handleClick={this.changeTimeZone} /> </td>}
+				{loggedInAsAdmin && <td> <TimeZoneSelect current={this.props.meter.timeZone || ''} handleClick={this.changeTimeZone} /> </td>}
 			</tr>
 		);
 	}
@@ -121,7 +122,8 @@ export default class MeterViewComponent extends React.Component<MeterViewProps, 
 		}
 
 		let toggleButton;
-		if (hasToken()) {
+		const loggedInAsAdmin = this.props.loggedInAsAdmin;
+		if (loggedInAsAdmin) {
 			toggleButton = <Button style={this.styleToggleBtn()} color='primary' onClick={this.toggleMeterDisplayable}>
 				<FormattedMessage id={buttonMessageId} />
 			</Button>;
@@ -155,7 +157,8 @@ export default class MeterViewComponent extends React.Component<MeterViewProps, 
 		}
 
 		let toggleButton;
-		if (hasToken()) {
+		const loggedInAsAdmin = this.props.loggedInAsAdmin;
+		if (loggedInAsAdmin) {
 			toggleButton = <Button style={this.styleToggleBtn()} color='primary' onClick={this.toggleMeterEnabled}>
 				<FormattedMessage id={buttonMessageId} />
 			</Button>;
@@ -222,7 +225,8 @@ export default class MeterViewComponent extends React.Component<MeterViewProps, 
 		}
 
 		let toggleButton;
-		if (hasToken()) {
+		const loggedInAsAdmin = this.props.loggedInAsAdmin;
+		if (loggedInAsAdmin) {
 			toggleButton = <Button style={this.styleToggleBtn()} color='primary' onClick={this.toggleGPSInput}>
 				<FormattedMessage id={buttonMessageId} />
 			</Button>;
@@ -230,7 +234,7 @@ export default class MeterViewComponent extends React.Component<MeterViewProps, 
 			toggleButton = <div />;
 		}
 
-		if (hasToken()) {
+		if (loggedInAsAdmin) {
 			return ( // add onClick
 				<div>
 					{formattedGPS}
@@ -281,7 +285,8 @@ export default class MeterViewComponent extends React.Component<MeterViewProps, 
 		}
 
 		let toggleButton;
-		if (hasToken()) {
+		const loggedInAsAdmin = this.props.loggedInAsAdmin;
+		if (loggedInAsAdmin) {
 			toggleButton = <Button style={this.styleToggleBtn()} color='primary' onClick={this.toggleIdentifierInput}>
 				<FormattedMessage id={buttonMessageId} />
 			</Button>;
@@ -289,7 +294,7 @@ export default class MeterViewComponent extends React.Component<MeterViewProps, 
 			toggleButton = <div />;
 		}
 
-		if (hasToken()) {
+		if (loggedInAsAdmin) {
 			return ( // add onClick
 				<div>
 					{formattedIdentifier}
