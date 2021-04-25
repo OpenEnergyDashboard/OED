@@ -4,10 +4,12 @@
 
 const express = require('express');
 const Meter = require('../models/Meter');
+const User = require('../models/User');
 const { log } = require('../log');
 const validate = require('jsonschema').validate;
 const { getConnection } = require('../db');
-const requiredAuthenticator = require('./authenticator').authMiddleware;
+const { isTokenAuthorized } = require('../util/userRoles');
+const requiredAdmin = require('./authenticator').adminAuthMiddleware;
 const optionalAuthenticator = require('./authenticator').optionalAuthMiddleware;
 const Point = require('../models/Point');
 
@@ -15,47 +17,58 @@ const router = express.Router();
 router.use(optionalAuthenticator);
 
 /**
- * Defines the format in which we want to send meters and controls what information we send to the client, if logged in or not.
+ * Defines the format in which we want to send meters and controls what information we send to the client, if logged in and an Admin or not.
  * @param meter
+ * @param loggedInAsAdmin
  * @returns {{id, name}}
  */
-function formatMeterForResponse(meter, loggedIn) {
+function formatMeterForResponse(meter, loggedInAsAdmin) {
 	const formattedMeter = {
 		id: meter.id,
-		name: meter.name,
+		name: null,
 		enabled: meter.enabled,
 		displayable: meter.displayable,
 		ipAddress: null,
 		meterType: null,
 		timeZone: null,
-		gps: meter.gps
+		gps: meter.gps,
+		identifier: meter.identifier
 	};
 
-	// Only logged in users can see IP addresses and types
-	if (loggedIn) {
+	// Only logged in Admins can see IP addresses, types, timezones, and internal names
+	if (loggedInAsAdmin) {
 		formattedMeter.ipAddress = meter.ipAddress;
 		formattedMeter.meterType = meter.type;
 		formattedMeter.timeZone = meter.meterTimezone;
+		formattedMeter.name = meter.name;
 	}
+
+	// TODO: remove this line when usages of meter.name are replaced with meter.identifer
+	// Without this, things will break for non-logged in users because we currently rely on
+	// the internal name being available. As noted in #605, the intent is to not send the
+	// name to a user if they are not logged in.
+	formattedMeter.name = meter.name;
 
 	return formattedMeter;
 }
 
 /**
- * GET information on displayable meters (or all meters, if logged in)
+ * GET information on displayable meters (or all meters, if logged in as an admin.)
  */
 router.get('/', async (req, res) => {
-	const conn = getConnection();
-	let query;
-	if (req.hasValidAuthToken) {
-		query = Meter.getAll;
-	} else {
-		query = Meter.getDisplayable;
-	}
-
 	try {
+		const conn = getConnection();
+		let query;
+		const token = req.headers.token || req.body.token || req.query.token;
+		const loggedInAsAdmin = req.hasValidAuthToken && (await isTokenAuthorized(token, User.role.ADMIN));
+		if (loggedInAsAdmin) {
+			query = Meter.getAll;
+		} else {
+			query = Meter.getDisplayable;
+		}
+
 		const rows = await query(conn);
-		res.json(rows.map(row => formatMeterForResponse(row, req.hasValidAuthToken)));
+		res.json(rows.map(row => formatMeterForResponse(row, loggedInAsAdmin)));
 	} catch (err) {
 		log.error(`Error while performing GET all meters query: ${err}`, err);
 	}
@@ -98,12 +111,10 @@ router.get('/:meter_id', async (req, res) => {
 	}
 });
 
-router.use(requiredAuthenticator);
-
-router.post('/edit', async (req, res) => {
+router.post('/edit', requiredAdmin('edit meters'), async (req, res) => {
 	const validParams = {
 		type: 'object',
-		maxProperties: 5,
+		maxProperties: 6,
 		required: ['id', 'enabled', 'displayable', 'timeZone'],
 		properties: {
 			id: { type: 'integer' },
@@ -127,6 +138,12 @@ router.post('/edit', async (req, res) => {
 					},
 					{ type: 'null' }
 				]
+			},
+			identifier: {
+				oneOf: [
+					{ type: 'string' },
+					{ type: 'null' }
+				]
 			}
 		}
 	};
@@ -143,6 +160,7 @@ router.post('/edit', async (req, res) => {
 			meter.displayable = req.body.displayable;
 			meter.meterTimezone = req.body.timeZone;
 			meter.gps = (req.body.gps) ? new Point(req.body.gps.longitude, req.body.gps.latitude) : null;
+			meter.identifier = req.body.identifier;
 			await meter.update(conn);
 		} catch (err) {
 			log.error('Failed to edit meter', err);

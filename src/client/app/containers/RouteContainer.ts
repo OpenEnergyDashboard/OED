@@ -7,18 +7,27 @@ import RouteComponent from '../components/RouteComponent';
 import { Dispatch } from '../types/redux/actions';
 import { State } from '../types/redux/state';
 import { changeOptionsFromLink, LinkOptions } from '../actions/graph';
-
+import { clearCurrentUser } from '../actions/currentUser';
+import { isRoleAdmin } from '../utils/hasPermissions';
 
 function mapStateToProps(state: State) {
+	const currentUser = state.currentUser.profile;
+	let loggedInAsAdmin = false;
+	if(currentUser !== null){
+		loggedInAsAdmin = isRoleAdmin(currentUser.role);
+	}
+
 	return {
 		barStacking: state.graph.barStacking,
-		defaultLanguage: state.admin.defaultLanguage
+		defaultLanguage: state.admin.defaultLanguage,
+		loggedInAsAdmin
 	};
 }
 
 function mapDispatchToProps(dispatch: Dispatch) {
 	return {
-		changeOptionsFromLink: (options: LinkOptions) => dispatch(changeOptionsFromLink(options))
+		changeOptionsFromLink: (options: LinkOptions) => dispatch(changeOptionsFromLink(options)),
+		clearCurrentUser: () => dispatch(clearCurrentUser())
 	};
 }
 

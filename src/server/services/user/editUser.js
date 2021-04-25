@@ -5,12 +5,12 @@
 const bcrypt = require('bcryptjs');
 const User = require('../../models/User');
 const { ask, terminateReadline } = require('../utils');
-const { getConnection, dropConnection } = require('../../db');
-
+const { getConnection } = require('../../db');
 
 (async () => {
 	let email;
 	let password;
+	let role;
 	try {
 		email = await ask('Email of user to modify: ');
 	} catch (err) {
@@ -22,11 +22,16 @@ const { getConnection, dropConnection } = require('../../db');
 		terminateReadline('Password must be at least eight characters, user\'s password not modified');
 	}
 
+	role = await ask('Role: '); // untested
+	role = role.toUpperCase();
+	if (User.role[role] === undefined) {
+		terminateReadline('Role must be one of Admin, CSV, Obvius, Export. user\'s role not modified');
+	}
+
 	const conn = getConnection();
 	try {
 		await User.getByEmail(email, conn);
 	} catch (err) {
-		dropConnection();
 		terminateReadline('No user with that email exists');
 	}
 
@@ -36,7 +41,5 @@ const { getConnection, dropConnection } = require('../../db');
 		terminateReadline('User\'s password updated');
 	} catch (err) {
 		terminateReadline('Failed to update user\'s password');
-	} finally {
-		dropConnection();
 	}
 })();

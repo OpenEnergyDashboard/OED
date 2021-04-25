@@ -43,3 +43,21 @@ export interface TooltipItems {
 		xLabel: string;
 	};
 }
+
+/**
+ * A user object to be displayed for Administrators.
+ */
+export interface User {
+	email: string;
+	role: UserRole;
+}
+
+/**
+ * The values of this enum that needs to match the keys of User.role in src/server/models/User
+ */
+export enum UserRole {
+	ADMIN = 'admin',
+	CSV = 'csv',
+	EXPORT = 'export',
+	OBVIUS = 'obvius'
+};

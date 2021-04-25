@@ -6,7 +6,7 @@ import { VersionAction, VersionState } from '../types/redux/version';
 import { ActionType } from '../types/redux/actions';
 
 /*
-* Defines store interactions when version related actions are dispatched to the store.
+* Defines store interactions when user profile related actions are dispatched to the store.
 */
 const defaultState: VersionState = { isFetching: false, version: '' };
 

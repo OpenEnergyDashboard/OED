@@ -4,7 +4,9 @@
 
 import { ExportDataSet, RawReadings } from '../types/readings';
 import { hasToken } from './token';
+import { usersApi } from '../utils/api'
 import * as moment from 'moment-timezone';
+import { UserRole } from '../types/items';
 
 /**
  * Function to converts the compressed meter data into a CSV formatted string.
@@ -79,7 +81,7 @@ export function downloadRawCSV(items: RawReadings[], defaultLanguage: string) {
  */
 // NOTE: This function is made with the idea that it will not be called very often
 // Ideally we would have a component that prompts the user and handles all the logic
-export function graphRawExport(count: number, done: () => Promise<void>): any {
+export async function graphRawExport(count: number, done: () => Promise<void>): Promise<any> {
 	const fileSize = (count * 0.0442 / 1000)
 	// 5 MB will download for anyone.
 	// TODO Make this admin controllable
@@ -111,10 +113,8 @@ export function graphRawExport(count: number, done: () => Promise<void>): any {
 
 	// 25 MB is limit for an admin without checking they really want to download,
 	// TODO: Should this be under admin control?
-	if (fileSize > 25 && !hasToken()) { // 25 is hard coded but we should get it from state
-		innerContainer.innerHTML = `
-			<p>Sorry you don't have permissions to download due to large number of points.</p>
-		`;
+	if (fileSize > 25 && (!hasToken() || !(await usersApi.hasRolePermissions(UserRole.EXPORT)))) { // 25 is hard coded but we should get it from state
+		innerContainer.innerHTML = "<p>Sorry you don't have permissions to download due to large number of points.</p>";
 		const okButton = document.createElement('button');
 		okButton.innerHTML = 'ok';
 		okButton.addEventListener('click', () => {

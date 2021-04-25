@@ -8,7 +8,7 @@ const validate = require('jsonschema').validate;
 
 const { getConnection } = require('../db');
 const Group = require('../models/Group');
-const authenticator = require('./authenticator').authMiddleware;
+const adminAuthenticator = require('./authenticator').adminAuthMiddleware;
 const { log } = require('../log');
 
 const router = express.Router();
@@ -109,9 +109,7 @@ router.get('/deep/meters/:group_id', async (req, res) => {
 	}
 });
 
-router.use(authenticator);
-
-router.post('/create', async (req, res) => {
+router.post('/create', adminAuthenticator('create groups'), async (req, res) => {
 	const validGroup = {
 		type: 'object',
 		maxProperties: 3,
@@ -162,7 +160,7 @@ router.post('/create', async (req, res) => {
 	}
 });
 
-router.put('/edit', async (req, res) => {
+router.put('/edit', adminAuthenticator('edit groups'), async (req, res) => {
 	const validGroup = {
 		type: 'object',
 		maxProperties: 4,
@@ -232,7 +230,7 @@ router.put('/edit', async (req, res) => {
 	}
 });
 
-router.post('/delete', async (req, res) => {
+router.post('/delete', adminAuthenticator('delete groups'), async (req, res) => {
 	const validParams = {
 		type: 'object',
 		maxProperties: 1,

@@ -7,6 +7,7 @@ import HeaderComponent from '../components/HeaderComponent';
 import { State } from '../types/redux/state';
 
 function mapStateToProps(state: State) {
+
 	return {
 		title: state.admin.displayTitle,
 		optionsVisibility: state.graph.optionsVisibility

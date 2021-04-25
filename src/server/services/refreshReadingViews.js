@@ -6,7 +6,7 @@
 
 const { log } = require('../log');
 
-const { getConnection, dropConnection } = require('../db');
+const { getConnection } = require('../db');
 const Reading = require('../models/Reading');
 /* tslint:disable no-console */
 async function refreshReadingViews() {
@@ -15,7 +15,6 @@ async function refreshReadingViews() {
 	log.info('Refreshing Reading Views');
 	await Reading.refreshCompressedReadings(conn);
 	log.info('Views Refreshed');
-	dropConnection();
 }
 
 refreshReadingViews();

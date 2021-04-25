@@ -8,11 +8,18 @@ import { changeDisplayedGroups } from '../../actions/groups';
 import GroupSidebarComponent from '../../components/groups/GroupSidebarComponent';
 import { Dispatch } from '../../types/redux/actions';
 import { State } from '../../types/redux/state';
+import { isRoleAdmin } from '../../utils/hasPermissions';
 
 function mapStateToProps(state: State) {
 	const sortedGroups = _.sortBy(_.values(state.groups.byGroupID).map(group => ({ id: group.id, name: group.name.trim() })), 'name');
+	const currentUser = state.currentUser.profile;
+	let loggedInAsAdmin = false;
+	if (currentUser !== null){
+		loggedInAsAdmin = isRoleAdmin(currentUser.role);
+	}
 	return {
-		groups: sortedGroups
+		groups: sortedGroups,
+		loggedInAsAdmin
 	};
 }
 

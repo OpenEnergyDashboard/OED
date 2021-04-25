@@ -57,7 +57,7 @@ function connectTestDB() {
 }
 
 // The user for use by tests.
-const testUser = new User(undefined, 'test@example.invalid', bcrypt.hashSync('password', 10));
+const testUser = new User(undefined, 'test@example.invalid', bcrypt.hashSync('password', 10), User.role.ADMIN);
 testUser.password = 'password';
 
 async function recreateDB() {

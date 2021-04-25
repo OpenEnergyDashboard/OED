@@ -10,9 +10,9 @@ import FooterContainer from '../../containers/FooterContainer';
 import TooltipHelpComponent from '../TooltipHelpComponentAlternative';
 import TooltipMarkerComponent from '../TooltipMarkerComponent';
 import { FormattedMessage } from 'react-intl';
-import { hasToken } from '../../utils/token';
 
 interface GroupsDetailProps {
+	loggedInAsAdmin: boolean;
 	selectedGroups: number[];
 	fetchGroupsDetailsIfNeeded(): Promise<any>;
 	fetchMetersDetailsIfNeeded(): Promise<any>;
@@ -25,7 +25,7 @@ export default class GroupsDetailComponent extends React.Component<GroupsDetailP
 	}
 
 	public render() {
-		const renderCreateAdminTooltip = hasToken();
+		const renderCreateAdminTooltip = this.props.loggedInAsAdmin;
 		const flexContainerStyle = {
 			display: 'flex',
 			flexFlow: 'row wrap'
