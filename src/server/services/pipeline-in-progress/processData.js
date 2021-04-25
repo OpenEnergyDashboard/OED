@@ -49,18 +49,19 @@ function processData(rows, meterID, isCumulative, cumulativeReset, resetStart="0
 	let currentReading = new Reading(meterID, -1,  startTimestamp, endTimestamp);
 	let prevReading = currentReading;
 	let readingOK = true;
-
+	//console.log("readings array given as: ",rows);
 	for (let index = readingRepetition; index <= rows.length; ++index) {
 		// To read data where same reading is repeated. Like E-mon D-mon meters
 		if ((index - readingRepetition) % readingRepetition === 0) {
+			//console.log("This reading is: ", rows[index-readingRepetition][0], " ", rows[index-readingRepetition][1], " ", rows[index-readingRepetition][2]);
 			if (onlyEndTime){
 				// The startTimestamp of this reading is the endTimestamp of the previous reading
 				startTimestamp = prevReading.endTimestamp;
-				endTimestamp = moment(rows[index-readingRepetition][1], 'M/D/Y H:mm');
+				endTimestamp = moment(rows[index-readingRepetition][1], 'Y/M/D H:mm');
 			}
 			else{
-				startTimestamp = moment(rows[index-readingRepetition][1], 'M/D/Y H:mm');
-				endTimestamp = moment(rows[index-readingRepetition][2], 'M/D/Y H:mm');
+				startTimestamp = moment(rows[index-readingRepetition][1], 'Y/M/D H:mm');
+				endTimestamp = moment(rows[index-readingRepetition][2], 'Y/M/D H:mm');
 			}
             if (isCumulative && isFirst(prevReading.endTimestamp)){
                 readingOK = false;

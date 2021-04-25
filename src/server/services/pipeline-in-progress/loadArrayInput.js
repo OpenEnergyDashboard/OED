@@ -24,7 +24,7 @@ async function loadArrayInput(dataRows, meterID, mapRowToModel, isCumulative, cu
 	readingsArray = dataRows.map(mapRowToModel);
 
 	// Temporary values for params
-	let onlyEndtime = true;
+	let onlyEndtime = false;
 	let Tgap = 0; //1 day in milliseconds
 	let Tlen = 0;
 	let resetStart = "0:00:00";
@@ -34,6 +34,7 @@ async function loadArrayInput(dataRows, meterID, mapRowToModel, isCumulative, cu
 	// If no reset values passed in we should take values from meter database and pass those in instead.
 
 	readingsArray = processData(readingsArray, meterID, isCumulative, cumulativeReset, resetStart, resetEnd, readingRepetition, onlyEndtime, Tgap, Tlen, conditionSet);
+	//console.log("succesfully returned with array: ",readingsArray);
 	return await Reading.insertOrIgnoreAll(readingsArray, conn);
 }
 
