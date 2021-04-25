@@ -5,7 +5,6 @@
 import * as React from 'react';
 import { Table, Button } from 'reactstrap';
 import { FormattedMessage } from 'react-intl';
-import { hasToken } from '../../utils/token';
 import MeterViewContainer from '../../containers/meters/MeterViewContainer';
 import HeaderContainer from '../../containers/HeaderContainer';
 import FooterContainer from '../../containers/FooterContainer';
@@ -13,6 +12,7 @@ import TooltipHelpComponent from '../TooltipHelpComponentAlternative';
 import TooltipMarkerComponent from '../TooltipMarkerComponent';
 
 interface MetersDetailProps {
+	loggedInAsAdmin: boolean;
 	meters: number[];
 	unsavedChanges: boolean;
 	fetchMetersDetails(): Promise<any>;
@@ -25,7 +25,7 @@ export default class MetersDetailComponent extends React.Component<MetersDetailP
 	}
 
 	public render() {
-		const renderCreateAdminTooltip = hasToken();
+		const loggedInAsAdmin = this.props.loggedInAsAdmin;
 
 		const titleStyle: React.CSSProperties = {
 			textAlign: 'center'
@@ -46,7 +46,7 @@ export default class MetersDetailComponent extends React.Component<MetersDetailP
 		const tooltipStyle = {
 			display: 'inline',
 			fontSize: '50%',
-			tooltipMeterView: renderCreateAdminTooltip? 'help.admin.meterview' : 'help.meters.meterview'
+			tooltipMeterView: loggedInAsAdmin? 'help.admin.meterview' : 'help.meters.meterview'
 		};
 
 		return (
@@ -64,15 +64,15 @@ export default class MetersDetailComponent extends React.Component<MetersDetailP
 					<Table striped bordered hover>
 					<thead>
 						<tr>
-						{hasToken() && <th> <FormattedMessage id='meter.id' /> </th>}
-						{hasToken() && <th> <FormattedMessage id='meter.name' /> </th>}
+						{loggedInAsAdmin && <th> <FormattedMessage id='meter.id' /> </th>}
+						{loggedInAsAdmin && <th> <FormattedMessage id='meter.name' /> </th>}
 						<th> <FormattedMessage id='meter.identifier' /> </th>
-						{hasToken() && <th> <FormattedMessage id='meter.type' /> </th>}
-						{hasToken() && <th> <FormattedMessage id='meter.ip'/> </th>}
-						{hasToken() && <th> <FormattedMessage id='meter.gps'/> </th>}
+						{loggedInAsAdmin && <th> <FormattedMessage id='meter.type' /> </th>}
+						{loggedInAsAdmin && <th> <FormattedMessage id='meter.ip'/> </th>}
+						{loggedInAsAdmin && <th> <FormattedMessage id='meter.gps'/> </th>}
 						<th> <FormattedMessage id='meter.enabled' /> </th>
 						<th> <FormattedMessage id='meter.displayable' /> </th>
-						{hasToken() && <th> <FormattedMessage id='meter.time.zone' /> </th>}
+						{loggedInAsAdmin && <th> <FormattedMessage id='meter.time.zone' /> </th>}
 						</tr>
 					</thead>
 					<tbody>
@@ -81,7 +81,7 @@ export default class MetersDetailComponent extends React.Component<MetersDetailP
 					</tbody>
 					</Table>
 					</div>
-					{ hasToken() && <Button
+					{ loggedInAsAdmin && <Button
 						color='success'
 						style={buttonContainerStyle}
 						disabled={!this.props.unsavedChanges}

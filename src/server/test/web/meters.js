@@ -7,6 +7,8 @@
 
 const { chai, mocha, expect, app, testDB, testUser } = require('../common');
 const Meter = require('../../models/Meter');
+const User = require('../../models/User');
+const bcrypt = require('bcryptjs');
 const Point = require('../../models/Point');
 const gps = new Point(90, 45);
 
@@ -44,7 +46,7 @@ mocha.describe('meters API', () => {
 			expect(meter).to.have.property('timeZone', null);
 		}
 	});
-	mocha.describe('with authentication', () => {
+	mocha.describe('Admin role:', () => {
 		let token;
 		mocha.before(async () => {
 			let res = await chai.request(app).post('/api/login')
@@ -82,6 +84,66 @@ mocha.describe('meters API', () => {
 				expect(meter).to.have.property('timeZone', 'TZ' + (i + 1));
 			}
 		});
+	});
+
+	mocha.describe('Non-Admin role:', () => {
+		for (const role in User.role) {
+			if (User.role[role] !== User.role.ADMIN) {
+				let token;
+				mocha.beforeEach(async () => {
+					// insert test user
+					const conn = testDB.getConnection();
+					const password = 'password';
+					const hashedPassword = await bcrypt.hash(password, 10);
+					const unauthorizedUser = new User(undefined, `${role}@example.com`, hashedPassword, User.role[role]);
+					await unauthorizedUser.insert(conn);
+					unauthorizedUser.password = password;
+
+					// login
+					let res = await chai.request(app).post('/api/login')
+						.send({ email: unauthorizedUser.email, password: unauthorizedUser.password });
+					token = res.body.token;
+				});
+
+				mocha.it('should only return visible meters and visible data', async () => {
+					const conn = testDB.getConnection();
+					await new Meter(undefined, 'Meter 1', '1.1.1.1', true, true, Meter.type.MAMAC, 'TZ1', gps).insert(conn);
+					await new Meter(undefined, 'Meter 2', '1.1.1.1', true, true, Meter.type.MAMAC, 'TZ2', gps).insert(conn);
+					await new Meter(undefined, 'Meter 3', '1.1.1.1', true, true, Meter.type.MAMAC, 'TZ3', gps).insert(conn);
+					await new Meter(undefined, 'Not Visible', '1.1.1.1', true, false, Meter.type.MAMAC, 'TZ4', gps).insert(conn);
+
+					const res = await chai.request(app).get('/api/meters').set('token', token);
+					expect(res).to.have.status(200);
+					expect(res).to.be.json;
+					expect(res.body).to.have.lengthOf(3);
+
+					for (let i = 0; i < 3; i++) {
+						const meter = res.body[i];
+						expect(meter).to.have.property('id');
+						expect(meter).to.have.property('gps');
+						expect(meter.gps).to.have.property('latitude', gps.latitude);
+						expect(meter.gps).to.have.property('longitude', gps.longitude);
+						expect(meter).to.have.property('ipAddress', null);
+						expect(meter).to.have.property('enabled', true);
+						expect(meter).to.have.property('displayable', true);
+						expect(meter).to.have.property('meterType', null);
+						expect(meter).to.have.property('timeZone', null);
+
+						// Copied from /src/server/routes/meters.js
+						// TODO: remove this line when usages of meter.name are replaced with meter.identifer
+						// Without this, things will break for non-logged in users because we currently rely on
+						// the internal name being available. As noted in #605, the intent is to not send the
+						// name to a user if they are not logged in.
+						expect(meter).to.have.property('name', `Meter ${i + 1}`);
+					}
+				});
+
+				mocha.it(`should reject requests from ${role} to edit meters`, async () => {
+					let res = await chai.request(app).post('/api/meters/edit').set('token', token);
+					expect(res).to.have.status(403);
+				});
+			}
+		}
 	});
 
 	mocha.it('returns details on a single meter by ID', async () => {

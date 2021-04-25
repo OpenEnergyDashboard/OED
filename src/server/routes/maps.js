@@ -7,9 +7,11 @@ const Map = require('../models/Map');
 const { log } = require('../log');
 const validate = require('jsonschema').validate;
 const { getConnection } = require('../db');
-const requiredAuthenticator = require('./authenticator').authMiddleware;
+const adminAuthenticator = require('./authenticator').adminAuthMiddleware;
 const optionalAuthenticator = require('./authenticator').optionalAuthMiddleware;
 const Point = require('../models/Point');
+const { isTokenAuthorized } = require('../util/userRoles');
+const User = require('../models/User');
 
 const router = express.Router();
 router.use(optionalAuthenticator);
@@ -30,14 +32,15 @@ function formatMapForResponse(map) {
 }
 
 router.get('/', async (req, res) => {
-	const conn = getConnection();
-	let query;
-	if (req.hasValidAuthToken) {
-		query = Map.getAll; // only logged in users can see disabled maps;
-	} else {
-		query = Map.getDisplayable;
-	}
 	try {
+		const conn = getConnection();
+		let query;
+		const token = req.headers.token || req.body.token || req.query.token;
+		if (req.hasValidAuthToken && (await isTokenAuthorized(token, User.role.ADMIN))) {
+			query = Map.getAll; // only admins can see disabled maps;
+		} else {
+			query = Map.getDisplayable;
+		}
 		const rows = await query(conn);
 		res.json(rows.map(row => formatMapForResponse(row)));
 	} catch (err) {
@@ -71,9 +74,7 @@ router.get('/:map_id', async (req, res) => {
 	}
 });
 
-router.use(requiredAuthenticator);
-
-router.post('/create', async (req, res) => {
+router.post('/create', adminAuthenticator('create maps'), async (req, res) => {
 	const validMap = {
 		type: 'object',
 		required: ['name', 'modifiedDate', 'filename', 'mapSource'],
@@ -95,8 +96,8 @@ router.post('/create', async (req, res) => {
 			},
 			note: {
 				oneOf: [
-					{type: 'string'},
-					{type: 'null'}
+					{ type: 'string' },
+					{ type: 'null' }
 				]
 			},
 			displayable: {
@@ -109,7 +110,7 @@ router.post('/create', async (req, res) => {
 						required: ['latitude', 'longitude'],
 						properties: {
 							latitude: { type: 'number', minimum: '-90', maximum: '90' },
-							longitude: { type: 'number', minimum: '-180', maximum: '180'}
+							longitude: { type: 'number', minimum: '-180', maximum: '180' }
 						}
 					}
 				}
@@ -121,14 +122,14 @@ router.post('/create', async (req, res) => {
 						required: ['latitude', 'longitude'],
 						properties: {
 							latitude: { type: 'number', minimum: '-90', maximum: '90' },
-							longitude: { type: 'number', minimum: '-180', maximum: '180'}
+							longitude: { type: 'number', minimum: '-180', maximum: '180' }
 						}
 					}
 				}
 			},
 			else: {
 				properties: {
-					opposite: { type: 'null'}
+					opposite: { type: 'null' }
 				}
 			}
 		}
@@ -141,8 +142,8 @@ router.post('/create', async (req, res) => {
 		const conn = getConnection();
 		try {
 			await conn.tx(async t => {
-				const origin = (req.body.origin)? new Point(req.body.origin.longitude, req.body.origin.latitude): null;
-				const opposite = (req.body.opposite)? new Point(req.body.opposite.longitude, req.body.opposite.latitude): null;
+				const origin = (req.body.origin) ? new Point(req.body.origin.longitude, req.body.origin.latitude) : null;
+				const opposite = (req.body.opposite) ? new Point(req.body.opposite.longitude, req.body.opposite.latitude) : null;
 				const newMap = new Map(
 					undefined,
 					req.body.name,
@@ -159,7 +160,7 @@ router.post('/create', async (req, res) => {
 			res.sendStatus(200);
 		} catch (err) {
 			if (err.toString() === 'error: duplicate key value violates unique constraint "maps_name_key"') {
-				res.status(400).json({error: `Map "${req.body.name}" is already in use.`});
+				res.status(400).json({ error: `Map "${req.body.name}" is already in use.` });
 			} else {
 				log.error(`Error while inserting new map ${err}`, err);
 				res.sendStatus(500);
@@ -168,7 +169,7 @@ router.post('/create', async (req, res) => {
 	}
 });
 
-router.post('/edit', async (req, res) => {
+router.post('/edit', adminAuthenticator('edit maps'), async (req, res) => {
 	const validMap = {
 		type: 'object',
 		required: ['id', 'name', 'modifiedDate', 'filename', 'mapSource', 'displayable', 'note', 'origin', 'opposite'],
@@ -194,8 +195,8 @@ router.post('/edit', async (req, res) => {
 			},
 			note: {
 				oneOf: [
-					{type: 'string'},
-					{type: 'null'}
+					{ type: 'string' },
+					{ type: 'null' }
 				]
 			},
 			displayable: {
@@ -227,7 +228,7 @@ router.post('/edit', async (req, res) => {
 			},
 			else: {
 				properties: {
-					opposite: { type: 'null'}
+					opposite: { type: 'null' }
 				}
 			}
 		}
@@ -240,8 +241,8 @@ router.post('/edit', async (req, res) => {
 		const conn = getConnection();
 		try {
 			await conn.tx(async t => {
-				const origin = (req.body.origin)? new Point(req.body.origin.longitude, req.body.origin.latitude): null;
-				const opposite = (req.body.opposite)? new Point(req.body.opposite.longitude, req.body.opposite.latitude): null;
+				const origin = (req.body.origin) ? new Point(req.body.origin.longitude, req.body.origin.latitude) : null;
+				const opposite = (req.body.opposite) ? new Point(req.body.opposite.longitude, req.body.opposite.latitude) : null;
 				const editedMap = new Map(
 					req.body.id,
 					req.body.name,
@@ -256,7 +257,7 @@ router.post('/edit', async (req, res) => {
 				await editedMap.update(t);
 			});
 			res.sendStatus(200);
-			log.info(`Successfully edited map ${req.body.id}` );
+			log.info(`Successfully edited map ${req.body.id}`);
 		} catch (err) {
 			if (err.toString() === 'error: duplicate key value violates unique constraint "maps_name_key"') {
 				res.sendStatus(400);
@@ -269,7 +270,7 @@ router.post('/edit', async (req, res) => {
 	}
 });
 
-router.post('/delete', async (req, res) => {
+router.post('/delete', adminAuthenticator('delete maps'), async (req, res) => {
 	const validParams = {
 		type: 'object',
 		maxProperties: 1,

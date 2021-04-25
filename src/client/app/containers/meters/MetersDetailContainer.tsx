@@ -7,10 +7,18 @@ import MetersDetailComponent from '../../components/meters/MetersDetailComponent
 import { State } from '../../types/redux/state';
 import { fetchMetersDetails, submitEditedMeters } from '../../actions/meters';
 import {Dispatch} from '../../types/redux/actions';
+import { isRoleAdmin } from '../../utils/hasPermissions';
 
 
 function mapStateToProps(state: State) {
+	const currentUser = state.currentUser.profile;
+	let loggedInAsAdmin = false;
+	if(currentUser !== null){
+		loggedInAsAdmin = isRoleAdmin(currentUser.role);
+	}
+
 	return {
+		loggedInAsAdmin,
 		meters: Object.keys(state.meters.byMeterID)
 			.map(key => parseInt(key))
 			.filter(key => !isNaN(key)),

@@ -8,17 +8,25 @@ import { Dispatch } from '../../types/redux/actions';
 import { State } from '../../types/redux/state';
 import { editMeterDetails } from '../../actions/meters';
 import { MeterMetadata } from '../../types/redux/meters';
-import {logToServer} from '../../actions/logs';
+import { logToServer } from '../../actions/logs';
+import { isRoleAdmin } from '../../utils/hasPermissions';
 
-function mapStateToProps(state: State, ownProps: {id: number}) {
+function mapStateToProps(state: State, ownProps: { id: number }) {
 	let meter = JSON.parse(JSON.stringify(state.meters.byMeterID[ownProps.id]));
 	if (state.meters.editedMeters[ownProps.id]) {
 		meter = JSON.parse(JSON.stringify(state.meters.editedMeters[ownProps.id]));
 	}
+
+	const currentUser = state.currentUser.profile;
+	let loggedInAsAdmin = false;
+	if (currentUser !== null) {
+		loggedInAsAdmin = isRoleAdmin(currentUser.role);
+	}
 	return {
 		meter,
 		isEdited: state.meters.editedMeters[ownProps.id] !== undefined,
-		isSubmitting: state.meters.submitting.indexOf(ownProps.id) !== -1
+		isSubmitting: state.meters.submitting.indexOf(ownProps.id) !== -1,
+		loggedInAsAdmin
 	};
 }
 

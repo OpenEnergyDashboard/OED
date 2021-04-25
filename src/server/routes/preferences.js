@@ -5,7 +5,7 @@
 const express = require('express');
 const Preferences = require('../models/Preferences');
 const { log } = require('../log');
-const authentication = require('./authenticator').authMiddleware;
+const adminAuthenticator = require('./authenticator').adminAuthMiddleware;
 const validate = require('jsonschema').validate;
 const { getConnection } = require('../db');
 
@@ -24,7 +24,7 @@ router.get('/', async (req, res) => {
 	}
 });
 
-router.use(authentication);
+router.use(adminAuthenticator('edit site preferences'));
 
 /**
  * Route for updating the preferences

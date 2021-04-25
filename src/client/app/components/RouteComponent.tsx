@@ -3,38 +3,42 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
 
 import * as React from 'react';
-import {RedirectFunction, Route, Router, RouterState} from 'react-router';
-import {addLocaleData, IntlProvider} from 'react-intl';
+import { RedirectFunction, Route, Router, RouterState } from 'react-router';
+import { addLocaleData, IntlProvider } from 'react-intl';
 import * as en from 'react-intl/locale-data/en';
 import * as fr from 'react-intl/locale-data/fr';
 import * as localeData from '../translations/data.json';
-import {browserHistory} from '../utils/history';
+import { browserHistory } from '../utils/history';
 import * as _ from 'lodash';
 import * as moment from 'moment';
 import InitializationContainer from '../containers/InitializationContainer';
 import HomeComponent from './HomeComponent';
-import LoginComponent from '../components/LoginComponent';
+import LoginContainer from '../containers/LoginContainer';
 import AdminComponent from './admin/AdminComponent';
-import {LinkOptions} from 'actions/graph';
-import {hasToken} from '../utils/token';
-import {showErrorNotification} from '../utils/notifications';
-import {ChartTypes} from '../types/redux/graph';
-import {LanguageTypes} from '../types/redux/i18n';
-import {verificationApi} from '../utils/api';
+import { LinkOptions } from 'actions/graph';
+import { hasToken, deleteToken } from '../utils/token';
+import { showErrorNotification } from '../utils/notifications';
+import { ChartTypes } from '../types/redux/graph';
+import { LanguageTypes } from '../types/redux/i18n';
+import { verificationApi } from '../utils/api';
 import translate from '../utils/translate';
-import {validateComparePeriod, validateSortingOrder} from '../utils/calculateCompare';
+import { validateComparePeriod, validateSortingOrder } from '../utils/calculateCompare';
 import EditGroupsContainer from '../containers/groups/EditGroupsContainer';
 import CreateGroupContainer from '../containers/groups/CreateGroupContainer';
 import GroupsDetailContainer from '../containers/groups/GroupsDetailContainer';
 import MetersDetailContainer from '../containers/meters/MetersDetailContainer';
-import {TimeInterval} from '../../../common/TimeInterval';
+import UsersDetailContainer from '../containers/admin/UsersDetailContainer';
+import CreateUserContainer from '../containers/admin/CreateUserContainer';
+import { TimeInterval } from '../../../common/TimeInterval';
 import MapsDetailContainer from '../containers/maps/MapsDetailContainer';
 import MapCalibrationContainer from '../containers/maps/MapCalibrationContainer';
 
 interface RouteProps {
 	barStacking: boolean;
 	defaultLanguage: LanguageTypes;
+	loggedInAsAdmin: boolean;
 	changeOptionsFromLink(options: LinkOptions): Promise<any[]>;
+	clearCurrentUser(): any;
 }
 
 export default class RouteComponent extends React.Component<RouteProps, {}> {
@@ -61,12 +65,20 @@ export default class RouteComponent extends React.Component<RouteProps, {}> {
 			redirectRoute();
 			return;
 		}
+
 		// Verify that the auth token is valid.
 		// Needs to be async because of the network request
 		(async () => {
 			if (!(await verificationApi.checkTokenValid())) {
 				// Route to login page if the auth token is not valid
 				browserHistory.push('/login');
+				// We should delete the token when we know that it is expired. Ensures that we don't not leave any unwanted tokens around.
+				deleteToken();
+				// This ensures that if there is no token then there is no stale profile in the redux store.
+				this.props.clearCurrentUser();
+			} else if (!this.props.loggedInAsAdmin) {
+				// Even though the auth token is valid, we still need to check that the user is an admin.
+				browserHistory.push('/');
 			}
 		})();
 	}
@@ -86,6 +98,13 @@ export default class RouteComponent extends React.Component<RouteProps, {}> {
 					// Route to login page if the auth token is not valid
 					showErrorNotification(translate('invalid.token.login.or.logout'));
 					browserHistory.push('/login');
+					// We should delete the token when we know that it is expired. Ensures that we don't not leave any unwanted tokens around.
+					deleteToken();
+					// This ensures that if there is no token then there is no stale profile in the redux store.
+					this.props.clearCurrentUser();
+				} else if (!this.props.loggedInAsAdmin) {
+					// Even though the auth token is valid, we still need to check that the user is an admin.
+					browserHistory.push('/');
 				}
 			})();
 		}
@@ -194,18 +213,20 @@ export default class RouteComponent extends React.Component<RouteProps, {}> {
 				<InitializationContainer />
 				<IntlProvider locale={lang} messages={messages} key={lang}>
 					<>
-					<Router history={browserHistory}>
-						<Route path='/login' component={LoginComponent} />
-						<Route path='/admin' component={AdminComponent} onEnter={this.requireAuth} />
-						<Route path='/groups' component={GroupsDetailContainer} onEnter={this.checkAuth} />
-						<Route path='/meters' component={MetersDetailContainer} onEnter={this.checkAuth} />
-						<Route path='/graph' component={HomeComponent} onEnter={this.linkToGraph} />
-						<Route path='/calibration' component={MapCalibrationContainer} onEnter={this.requireAuth} />
-						<Route path='/maps' component={MapsDetailContainer} onEnter={this.requireAuth} />
-						<Route path='/createGroup' component={CreateGroupContainer} onEnter={this.requireAuth} />
-						<Route path='/editGroup' component={EditGroupsContainer} onEnter={this.requireAuth} />
-						<Route path='*' component={HomeComponent} />
-					</Router>
+						<Router history={browserHistory}>
+							<Route path='/login' component={LoginContainer} />
+							<Route path='/admin' component={AdminComponent} onEnter={this.requireAuth} />
+							<Route path='/groups' component={GroupsDetailContainer} onEnter={this.checkAuth} />
+							<Route path='/meters' component={MetersDetailContainer} onEnter={this.checkAuth} />
+							<Route path='/graph' component={HomeComponent} onEnter={this.linkToGraph} />
+							<Route path='/calibration' component={MapCalibrationContainer} onEnter={this.requireAuth} />
+							<Route path='/maps' component={MapsDetailContainer} onEnter={this.requireAuth} />
+							<Route path='/createGroup' component={CreateGroupContainer} onEnter={this.requireAuth} />
+							<Route path='/editGroup' component={EditGroupsContainer} onEnter={this.requireAuth} />
+							<Route path='/users' component={UsersDetailContainer} onEnter={this.requireAuth} />
+							<Route path='/users/new' component={CreateUserContainer} onEnter={this.requireAuth} />
+							<Route path='*' component={HomeComponent} />
+						</Router>
 					</>
 				</IntlProvider>
 			</div>

@@ -7,10 +7,10 @@
 const express = require('express');
 const { log } = require('../log');
 const validate = require('jsonschema').validate;
-const requiredAuthenticator = require('./authenticator').authMiddleware;
+const adminAuthenticator = require('./authenticator').adminAuthMiddleware;
 
 const router = express.Router();
-router.use(requiredAuthenticator);
+router.use(adminAuthenticator('log API'));
 
 const validLog = {
 	type: 'object',

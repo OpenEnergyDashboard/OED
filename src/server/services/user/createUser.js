@@ -37,7 +37,7 @@ const { getConnection } = require('../../db');
 	}
 
 	const passwordHash = bcrypt.hashSync(password, 10);
-	const admin = new User(undefined, email, passwordHash);
+	const admin = new User(undefined, email, passwordHash, User.role.ADMIN);
 	const conn = getConnection();
 	try {
 		await admin.insert(conn);
