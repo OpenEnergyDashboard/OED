@@ -66,7 +66,7 @@ export default class MetersDetailComponent extends React.Component<MetersDetailP
 						<tr>
 						{loggedInAsAdmin && <th> <FormattedMessage id='meter.id' /> </th>}
 						{loggedInAsAdmin && <th> <FormattedMessage id='meter.name' /> </th>}
-						<th> <FormattedMessage id='meter.name' /> </th>
+						<th> <FormattedMessage id='meter.identifier' /> </th>
 						{loggedInAsAdmin && <th> <FormattedMessage id='meter.type' /> </th>}
 						{loggedInAsAdmin && <th> <FormattedMessage id='meter.ip'/> </th>}
 						{loggedInAsAdmin && <th> <FormattedMessage id='meter.gps'/> </th>}
