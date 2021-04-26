@@ -12,7 +12,6 @@ async function uploadReadings(req, res, filepath, conn) {
 
 	const { createMeter, cumulative, cumulativeReset, duplications, headerRow,
 		length, meterName, mode, timeSort, update } = req.body; // extract query parameters
-	//console.log(req.body);
 	const areReadingsCumulative = (cumulative === 'true');
 	const hasHeaderRow = (headerRow === 'true');
 	const readingRepetition = duplications;
