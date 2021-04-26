@@ -34,7 +34,7 @@ const handleCumulativeReset = require('./handleCumulativeReset');
 
 function processData(rows, meterID, isCumulative, cumulativeReset, resetStart="0:00:00.000", resetEnd="23:59:99.999", readingRepetition, onlyEndTime=false, Tgap, Tlen, conditionSet) {
 
-    // If we can successfully processData return result = [R0, R1, R2...RN]
+    // If processData is succesfully finished then return result = [R0, R1, R2...RN]
 	const result = [];
 
     let errMsg = "";

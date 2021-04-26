@@ -7,11 +7,11 @@ import { Button } from 'reactstrap';
 import { FormattedMessage } from 'react-intl';
 import { ChangeDisplayedGroupsAction } from '../../types/redux/groups';
 import { Link } from 'react-router';
-import { hasToken } from '../../utils/token';
 
 interface GroupSidebarProps {
 	/* tslint:disable:array-type */
 	groups: Array<{ id: number, name: string }>;
+	loggedInAsAdmin: boolean;
 	/* tslint:enable:array-type */
 	selectGroups(groups: number[]): ChangeDisplayedGroupsAction;
 }
@@ -23,7 +23,7 @@ export default class GroupSidebarComponent extends React.Component<GroupSidebarP
 	}
 
 	public render() {
-		const renderCreateNewGroupButton = hasToken();
+		const renderCreateNewGroupButton = this.props.loggedInAsAdmin;
 		const labelStyle: React.CSSProperties = {
 			fontWeight: 'bold',
 			margin: '0px'

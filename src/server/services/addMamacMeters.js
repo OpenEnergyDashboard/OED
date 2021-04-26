@@ -5,7 +5,7 @@
 const path = require('path');
 const { log } = require('../log');
 const { insertMetersWrapper } = require('./readMamacMeters');
-const { getConnection, dropConnection } = require('../db');
+const { getConnection } = require('../db');
 
 // Script to add meters from a .xlsx file
 // The first two elements are 'node' and the name of the file. We only want arguments passed to it.
@@ -24,7 +24,6 @@ const { getConnection, dropConnection } = require('../db');
 				log.error(`Error inserting meters: ${err}`, err);
 			}
 		} finally {
-			dropConnection();
 			log.info('Done inserting meters');
 		}
 	}

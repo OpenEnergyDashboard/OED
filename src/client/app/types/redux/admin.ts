@@ -4,7 +4,7 @@
 
 import { PreferenceRequestItem } from '../items';
 import { ChartTypes } from './graph';
-import { LanguageTypes } from '../i18n';
+import { LanguageTypes } from './i18n';
 import { ActionType } from './actions';
 
 export type AdminAction =

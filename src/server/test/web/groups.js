@@ -5,9 +5,11 @@
 /* This file tests the groups API. */
 
 const { chai, mocha, expect, app, testUser, testDB } = require('../common');
+const bcrypt = require('bcryptjs');
 const Group = require('../../models/Group');
 const Meter = require('../../models/Meter');
 const Point = require('../../models/Point');
+const User = require('../../models/User');
 const gps = new Point(90, 45);
 
 mocha.describe('groups API', () => {
@@ -38,8 +40,8 @@ mocha.describe('groups API', () => {
 		await Promise.all([meterA, meterB, meterC].map(meter => meter.insert(conn)));
 
 		await Promise.all([groupA.adoptMeter(meterA.id, conn), groupA.adoptGroup(groupB.id, conn),
-			groupB.adoptGroup(groupC.id, conn), groupB.adoptMeter(meterB.id, conn),
-			groupC.adoptMeter(meterC.id, conn)]);
+		groupB.adoptGroup(groupC.id, conn), groupB.adoptMeter(meterB.id, conn),
+		groupC.adoptMeter(meterC.id, conn)]);
 	});
 	mocha.describe('retrieval', () => {
 		mocha.it('returns the list of existing groups', async () => {
@@ -90,6 +92,34 @@ mocha.describe('groups API', () => {
 				const res = await chai.request(app).post('/api/groups/create').set('token', token + 'nope').type('json').send({});
 				expect(res).to.have.status(401);
 			});
+			mocha.describe('properly process roles:', () => {
+				for (const role of Object.keys(User.role)) {
+					const isAdmin = User.role[role] === User.role.ADMIN;
+					const message = `should ${isAdmin ? 'accept' : 'reject'} requests from ${role}`;
+					// Response status code should be 403 if improper role, but 400 if proper role, but improper user input.
+					const expectedResponseStatus = isAdmin ? 400 : 403;
+					mocha.it(message, async () => {
+						let currentToken;
+						let res;
+						// insert test user
+						const conn = testDB.getConnection();
+						const password = 'password';
+						const hashedPassword = await bcrypt.hash(password, 10);
+						const unauthorizedUser = new User(undefined, `${role}@example.com`, hashedPassword, User.role[role]);
+						await unauthorizedUser.insert(conn);
+						unauthorizedUser.password = password;
+
+						// login
+						res = await chai.request(app).post('/api/login')
+							.send({ email: unauthorizedUser.email, password: unauthorizedUser.password });
+						currentToken = res.body.token;
+						// create
+						res = await chai.request(app).post('/api/groups/create').set('token', currentToken);
+						expect(res).to.have.status(expectedResponseStatus);
+					});
+
+				}
+			});
 			mocha.it('creates new groups when given valid parameters', async () => {
 				// Create a duplicate of Group C with a different name.
 				const res = await chai.request(app).post('/api/groups/create').type('json').set('token', token).send({
@@ -120,6 +150,34 @@ mocha.describe('groups API', () => {
 			mocha.it('rejects all requests with an invalid token with 401', async () => {
 				const res = await chai.request(app).put('/api/groups/edit').set('token', token + 'nope').type('json').send({});
 				expect(res).to.have.status(401);
+			});
+			mocha.describe('properly process roles', () => {
+				for (const role of Object.keys(User.role)) {
+					const isAdmin = User.role[role] === User.role.ADMIN;
+					const message = `should ${isAdmin ? 'accept' : 'reject'} requests from ${role}`;
+					// Response status code should be 403 if improper role, but 400 if proper role, but improper user input.
+					const expectedResponseStatus = isAdmin ? 400 : 403;
+					mocha.it(message, async () => {
+						let currentToken;
+						let res;
+						// insert test user
+						const conn = testDB.getConnection();
+						const password = 'password';
+						const hashedPassword = await bcrypt.hash(password, 10);
+						const unauthorizedUser = new User(undefined, `${role}@example.com`, hashedPassword, User.role[role]);
+						await unauthorizedUser.insert(conn);
+						unauthorizedUser.password = password;
+
+						// login
+						res = await chai.request(app).post('/api/login')
+							.send({ email: unauthorizedUser.email, password: unauthorizedUser.password });
+						currentToken = res.body.token;
+						// edit
+						res = await chai.request(app).put('/api/groups/edit').set('token', currentToken);
+						expect(res).to.have.status(expectedResponseStatus);
+					});
+
+				}
 			});
 			mocha.it('allows adding a new child meter to a group', async () => {
 				const conn = testDB.getConnection();

@@ -46,6 +46,7 @@ export type MetersAction =
 export interface MeterMetadata {
 	id: number;
 	name: string;
+	identifier: string;
 	enabled: boolean;
 	displayable: boolean;
 	meterType?: string;
@@ -63,6 +64,7 @@ export interface MeterEditData {
 	enabled: boolean;
 	displayable: boolean;
 	gps: GPSPoint;
+	identifier: string;
 }
 
 export interface MetersState {

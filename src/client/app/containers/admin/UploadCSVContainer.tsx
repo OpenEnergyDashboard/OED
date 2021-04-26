@@ -3,12 +3,13 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
 
 import * as React from 'react';
-import { ReadingsCSVUploadComponent, MetersCSVUploadComponent } from '../../components/admin/UploadCSVComponent';
+import MetersCSVUploadComponent from '../../components/admin/MetersCSVUploadComponent';
+import ReadingsCSVUploadComponent from '../../components/admin/ReadingsCSVUploadComponent';
 import { uploadCSVApi } from '../../utils/api';
 import { ReadingsCSVUploadPreferencesItem, MetersCSVUploadPreferencesItem, TimeSortTypes } from '../../types/csvUploadForm';
 import { TabContent, TabPane, Nav, NavItem, NavLink } from 'reactstrap';
 
-const enum mode {
+const enum MODE {
 	meters = 'meters',
 	readings = 'readings'
 }
@@ -16,7 +17,7 @@ const enum mode {
 interface UploadCSVContainerState {
 	uploadReadingsPreferences: ReadingsCSVUploadPreferencesItem;
 	uploadMetersPreferences: MetersCSVUploadPreferencesItem;
-	activeTab: mode;
+	activeTab: MODE;
 }
 
 export default class UploadCSVContainer extends React.Component<{}, UploadCSVContainerState> {
@@ -37,7 +38,7 @@ export default class UploadCSVContainer extends React.Component<{}, UploadCSVCon
 	}
 
 	state = {
-		activeTab: mode.readings,
+		activeTab: MODE.readings,
 		uploadMetersPreferences: {
 			gzip: false,
 			headerRow: false,
@@ -110,7 +111,7 @@ export default class UploadCSVContainer extends React.Component<{}, UploadCSVCon
 			}
 		}))
 	}
-	private toggleGzip(mode: mode) {
+	private toggleGzip(mode: MODE) {
 		const preference = (mode === 'readings') ? 'uploadReadingsPreferences' : 'uploadMetersPreferences';
 		return () => {
 			this.setState(previousState => ({
@@ -122,7 +123,7 @@ export default class UploadCSVContainer extends React.Component<{}, UploadCSVCon
 			}))
 		}
 	}
-	private toggleHeaderRow(mode: mode) {
+	private toggleHeaderRow(mode: MODE) {
 		const preference = (mode === 'readings') ? 'uploadReadingsPreferences' : 'uploadMetersPreferences';
 		return () => {
 			this.setState(previousState => ({
@@ -135,7 +136,7 @@ export default class UploadCSVContainer extends React.Component<{}, UploadCSVCon
 		}
 	}
 
-	private toggleUpdate(mode: mode) {
+	private toggleUpdate(mode: MODE) {
 		const preference = (mode === 'readings') ? 'uploadReadingsPreferences' : 'uploadMetersPreferences';
 		return () => {
 			this.setState(previousState => ({
@@ -158,8 +159,7 @@ export default class UploadCSVContainer extends React.Component<{}, UploadCSVCon
 		await uploadCSVApi.submitMeters(uploadPreferences, file);
 	}
 
-
-	private toggleTab(tab: mode) {
+	private toggleTab(tab: MODE) {
 		if (this.state.activeTab !== tab) {
 			this.setState({
 				activeTab: tab
@@ -172,22 +172,14 @@ export default class UploadCSVContainer extends React.Component<{}, UploadCSVCon
 			<div>
 				<Nav tabs>
 					<NavItem>
-						<NavLink
-							onClick={() => { this.toggleTab(mode.readings); }}
-						>
-							Readings
-		  				</NavLink>
+						<NavLink onClick={() => this.toggleTab(MODE.readings)}> Readings </NavLink>
 					</NavItem>
 					<NavItem>
-						<NavLink
-							onClick={() => { this.toggleTab(mode.meters); }}
-						>
-							Meters
-		 				</NavLink>
+						<NavLink onClick={() => this.toggleTab(MODE.meters)}> Meters </NavLink>
 					</NavItem>
 				</Nav>
 				<TabContent activeTab={this.state.activeTab}>
-					<TabPane tabId={mode.readings}>
+					<TabPane tabId={MODE.readings}>
 						<ReadingsCSVUploadComponent
 							{...this.state.uploadReadingsPreferences}
 							selectDuplications={this.selectDuplications}
@@ -197,18 +189,18 @@ export default class UploadCSVContainer extends React.Component<{}, UploadCSVCon
 							toggleCreateMeter={this.toggleCreateMeter}
 							toggleCumulative={this.toggleCumulative}
 							toggleCumulativeReset={this.toggleCumulativeReset}
-							toggleGzip={this.toggleGzip(mode.readings)}
-							toggleHeaderRow={this.toggleHeaderRow(mode.readings)}
-							toggleUpdate={this.toggleUpdate(mode.readings)}
+							toggleGzip={this.toggleGzip(MODE.readings)}
+							toggleHeaderRow={this.toggleHeaderRow(MODE.readings)}
+							toggleUpdate={this.toggleUpdate(MODE.readings)}
 						/>
 					</TabPane>
-					<TabPane tabId={mode.meters}>
+					<TabPane tabId={MODE.meters}>
 						<MetersCSVUploadComponent
 							{...this.state.uploadMetersPreferences}
 							submitCSV={this.submitMeters}
-							toggleGzip={this.toggleGzip(mode.meters)}
-							toggleHeaderRow={this.toggleHeaderRow(mode.meters)}
-							toggleUpdate={this.toggleUpdate(mode.meters)}
+							toggleGzip={this.toggleGzip(MODE.meters)}
+							toggleHeaderRow={this.toggleHeaderRow(MODE.meters)}
+							toggleUpdate={this.toggleUpdate(MODE.meters)}
 						/>
 					</TabPane>
 				</TabContent>

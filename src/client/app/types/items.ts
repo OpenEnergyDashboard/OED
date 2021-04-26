@@ -3,7 +3,7 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
 
 import { ChartTypes } from '../types/redux/graph';
-import { LanguageTypes } from '../types/i18n';
+import { LanguageTypes } from './redux/i18n';
 
 /**
  * The type of options displayed in Select components.
@@ -43,3 +43,21 @@ export interface TooltipItems {
 		xLabel: string;
 	};
 }
+
+/**
+ * A user object to be displayed for Administrators.
+ */
+export interface User {
+	email: string;
+	role: UserRole;
+}
+
+/**
+ * The values of this enum that needs to match the keys of User.role in src/server/models/User
+ */
+export enum UserRole {
+	ADMIN = 'admin',
+	CSV = 'csv',
+	EXPORT = 'export',
+	OBVIUS = 'obvius'
+};

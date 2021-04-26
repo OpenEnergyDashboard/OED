@@ -7,7 +7,7 @@ import { Table, Button } from 'reactstrap';
 import { FormattedMessage } from 'react-intl';
 import { hasToken } from '../../utils/token';
 import HeaderContainer from '../../containers/HeaderContainer';
-import FooterComponent from '../FooterComponent';
+import FooterContainer from '../../containers/FooterContainer';
 import MapViewContainer from '../../containers/maps/MapViewContainer';
 import {Link} from 'react-router';
 import TooltipHelpComponent from '../TooltipHelpComponentAlternative';
@@ -98,7 +98,7 @@ export default class MapsDetailComponent extends React.Component<MapsDetailProps
 						<FormattedMessage id='save.map.edits' />
 					</Button> }
 				</div>
-				<FooterComponent />
+				<FooterContainer />
 			</div>
 		);
 	}

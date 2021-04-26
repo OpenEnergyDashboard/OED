@@ -7,6 +7,14 @@ import { ThunkAction } from 'redux-thunk';
 import { State } from './state';
 
 export enum ActionType {
+
+	RequestCurrentUser = 'REQUEST_CURRENT_USER',
+	ReceiveCurrentUser = 'RECEIVE_CURRENT_USER',
+	ClearCurrentUser = 'CLEAR_CURRENT_USER',
+
+	RequestVersion = 'REQUEST_VERSION',
+	ReceiveVersion = 'RECEIVE_VERSION',
+
 	RequestMetersDetails = 'REQUEST_METERS_DETAILS',
 	ReceiveMetersDetails = 'RECEIVE_METERS_DETAILS',
 	ChangeDisplayedMeters = 'CHANGE_DISPLAYED_METERS',

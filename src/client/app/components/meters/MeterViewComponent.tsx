@@ -4,7 +4,6 @@
 
 import * as React from 'react';
 import { Button } from 'reactstrap';
-import { hasToken } from '../../utils/token';
 import { FormattedMessage } from 'react-intl';
 import { MeterMetadata, EditMeterDetailsAction } from '../../types/redux/meters';
 import { GPSPoint, isValidGPSInput } from '../../utils/calibration';
@@ -17,6 +16,7 @@ interface MeterViewProps {
 	meter: MeterMetadata;
 	isEdited: boolean;
 	isSubmitting: boolean;
+	loggedInAsAdmin: boolean;
 	// The function used to dispatch the action to edit meter details
 	editMeterDetails(meter: MeterMetadata): EditMeterDetailsAction;
 	log(level: string, message: string): any;
@@ -25,6 +25,8 @@ interface MeterViewProps {
 interface MeterViewState {
 	gpsFocus: boolean;
 	gpsInput: string;
+	identifierFocus: boolean;
+	identifierInput: string;
 }
 
 export default class MeterViewComponent extends React.Component<MeterViewProps, MeterViewState> {
@@ -32,26 +34,32 @@ export default class MeterViewComponent extends React.Component<MeterViewProps, 
 		super(props);
 		this.state = {
 			gpsFocus: false,
-			gpsInput: (this.props.meter.gps) ? `${this.props.meter.gps.latitude},${this.props.meter.gps.longitude}` : ''
+			gpsInput: (this.props.meter.gps) ? `${this.props.meter.gps.latitude},${this.props.meter.gps.longitude}` : '',
+			identifierFocus: false,
+			identifierInput: this.props.meter.identifier
 		};
 		this.toggleMeterDisplayable = this.toggleMeterDisplayable.bind(this);
 		this.toggleMeterEnabled = this.toggleMeterEnabled.bind(this);
 		this.toggleGPSInput = this.toggleGPSInput.bind(this);
 		this.handleGPSChange = this.handleGPSChange.bind(this);
 		this.changeTimeZone = this.changeTimeZone.bind(this);
+		this.toggleIdentifierInput = this.toggleIdentifierInput.bind(this);
+		this.handleIdentifierChange = this.handleIdentifierChange.bind(this);
 	}
 
 	public render() {
+		const loggedInAsAdmin = this.props.loggedInAsAdmin;
 		return (
 			<tr>
-				<td> {this.props.meter.id} {this.formatStatus()} </td>
-				<td> {this.props.meter.name} </td>
-				{hasToken() && <td> {this.props.meter.meterType} </td>}
-				{hasToken() && <td> {this.props.meter.ipAddress} </td>}
-				{hasToken() && <td> {this.formatGPSInput()} </td>}
+				{loggedInAsAdmin && <td> {this.props.meter.id} {this.formatStatus()} </td>}
+				{loggedInAsAdmin && <td> {this.props.meter.name} </td>}
+				<td> {this.formatIdentifierInput()} </td>
+				{loggedInAsAdmin && <td> {this.props.meter.meterType} </td>}
+				{loggedInAsAdmin && <td> {this.props.meter.ipAddress} </td>}
+				{loggedInAsAdmin && <td> {this.formatGPSInput()} </td>}
 				<td> {this.formatEnabled()} </td>
 				<td> {this.formatDisplayable()} </td>
-				{hasToken() && <td> <TimeZoneSelect current={this.props.meter.timeZone || ''} handleClick={this.changeTimeZone} /> </td>}
+				{loggedInAsAdmin && <td> <TimeZoneSelect current={this.props.meter.timeZone || ''} handleClick={this.changeTimeZone} /> </td>}
 			</tr>
 		);
 	}
@@ -114,7 +122,8 @@ export default class MeterViewComponent extends React.Component<MeterViewProps, 
 		}
 
 		let toggleButton;
-		if (hasToken()) {
+		const loggedInAsAdmin = this.props.loggedInAsAdmin;
+		if (loggedInAsAdmin) {
 			toggleButton = <Button style={this.styleToggleBtn()} color='primary' onClick={this.toggleMeterDisplayable}>
 				<FormattedMessage id={buttonMessageId} />
 			</Button>;
@@ -148,7 +157,8 @@ export default class MeterViewComponent extends React.Component<MeterViewProps, 
 		}
 
 		let toggleButton;
-		if (hasToken()) {
+		const loggedInAsAdmin = this.props.loggedInAsAdmin;
+		if (loggedInAsAdmin) {
 			toggleButton = <Button style={this.styleToggleBtn()} color='primary' onClick={this.toggleMeterEnabled}>
 				<FormattedMessage id={buttonMessageId} />
 			</Button>;
@@ -215,7 +225,8 @@ export default class MeterViewComponent extends React.Component<MeterViewProps, 
 		}
 
 		let toggleButton;
-		if (hasToken()) {
+		const loggedInAsAdmin = this.props.loggedInAsAdmin;
+		if (loggedInAsAdmin) {
 			toggleButton = <Button style={this.styleToggleBtn()} color='primary' onClick={this.toggleGPSInput}>
 				<FormattedMessage id={buttonMessageId} />
 			</Button>;
@@ -223,7 +234,7 @@ export default class MeterViewComponent extends React.Component<MeterViewProps, 
 			toggleButton = <div />;
 		}
 
-		if (hasToken()) {
+		if (loggedInAsAdmin) {
 			return ( // add onClick
 				<div>
 					{formattedGPS}
@@ -234,6 +245,66 @@ export default class MeterViewComponent extends React.Component<MeterViewProps, 
 			return (
 				<div>
 					{this.state.gpsInput}
+					{toggleButton}
+				</div>
+			);
+		}
+	}
+
+	private toggleIdentifierInput() {
+		if (this.state.identifierFocus) {
+			const identifier = this.state.identifierInput;
+
+			const editedMeter = {
+				...this.props.meter,
+				identifier
+			};
+			this.props.editMeterDetails(editedMeter);
+		}
+		this.setState({ identifierFocus: !this.state.identifierFocus });
+	}
+
+	private handleIdentifierChange(event: React.ChangeEvent<HTMLTextAreaElement>) {
+		this.setState({ identifierInput: event.target.value });
+	}
+
+	private formatIdentifierInput(){
+		let formattedIdentifier;
+		let buttonMessageId;
+		if(this.state.identifierFocus){
+			formattedIdentifier = <textarea
+				id={'identifier'}
+				autoFocus
+				value={this.state.identifierInput}
+				onChange={event => this.handleIdentifierChange(event)}
+			/>;
+			buttonMessageId = 'update';
+		} else {
+			formattedIdentifier = <div>{this.state.identifierInput}</div>;
+			buttonMessageId = 'edit';
+		}
+
+		let toggleButton;
+		const loggedInAsAdmin = this.props.loggedInAsAdmin;
+		if (loggedInAsAdmin) {
+			toggleButton = <Button style={this.styleToggleBtn()} color='primary' onClick={this.toggleIdentifierInput}>
+				<FormattedMessage id={buttonMessageId} />
+			</Button>;
+		} else {
+			toggleButton = <div />;
+		}
+
+		if (loggedInAsAdmin) {
+			return ( // add onClick
+				<div>
+					{formattedIdentifier}
+					{toggleButton}
+				</div>
+			);
+		} else {
+			return (
+				<div>
+					{this.state.identifierInput}
 					{toggleButton}
 				</div>
 			);

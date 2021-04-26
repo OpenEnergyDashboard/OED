@@ -32,7 +32,6 @@ const upload = multer({
 		try {
 			req.body.password = 'password'; // for testing purposes all requests will be accepted.
 			const { password } = req.body;
-			console.log(password);
 			const valid = await validatePassword(password);
 			if (valid) {
 				cb(null, true);

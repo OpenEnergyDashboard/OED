@@ -31,9 +31,9 @@ mocha.describe('csv API', () => {
 
 		const conn = testDB.getConnection();
 		const dbMeters = await Promise.all(csvMeters.map(async (meter, idx) => {
-			const meter_1 = await Meter.getByName(meter.name, conn);
-			csvMeters[idx].id = meter_1.id;
-			return meter_1;
+			const meter = await Meter.getByName(meter.name, conn);
+			csvMeters[idx].id = meter.id;
+			return meter;
 		}));
 		expect(dbMeters).to.deep.equal(csvMeters);
 		expect((await Meter.getAll(conn)).length).to.equal(3);
@@ -50,9 +50,9 @@ mocha.describe('csv API', () => {
 
 		const conn = testDB.getConnection();
 		const dbMeters = await Promise.all(csvMeters.map(async (meter, idx) => {
-			const meter_1 = await Meter.getByName(meter.name, conn);
-			csvMeters[idx].id = meter_1.id;
-			return meter_1;
+			const meter = await Meter.getByName(meter.name, conn);
+			csvMeters[idx].id = meter.id;
+			return meter;
 		}));
 		expect(dbMeters).to.deep.equal(csvMeters);
 		expect((await Meter.getAll(conn)).length).to.equal(3);

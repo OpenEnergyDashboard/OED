@@ -47,11 +47,11 @@ export interface ReadingsCSVUploadProps extends ReadingsCSVUploadPreferencesItem
 	update: boolean;
 };
 
-export interface MetersCSVUpload extends CSVUploadPreferences {
-}
+// MetersCSVUpload, MetersCSVUploadPreferencesItem, MetersCSVUploadProps should be interfaces. However, at the moment does not add anything new.
+// Hence, we define a new type rather than a new interface that extends CSVUploadPreferences and CSVUploadProps to pass our linter.
 
-export interface MetersCSVUploadPreferencesItem extends MetersCSVUpload {
-}
+export type MetersCSVUpload = CSVUploadPreferences;
 
-export interface MetersCSVUploadProps extends MetersCSVUploadPreferencesItem, CSVUploadProps {
-}
+export type MetersCSVUploadPreferencesItem = MetersCSVUpload;
+
+export type MetersCSVUploadProps = CSVUploadProps;

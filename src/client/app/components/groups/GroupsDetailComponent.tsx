@@ -6,13 +6,13 @@ import * as React from 'react';
 import GroupSidebarContainer from '../../containers/groups/GroupSidebarContainer';
 import GroupViewContainer from '../../containers/groups/GroupViewContainer';
 import HeaderContainer from '../../containers/HeaderContainer';
-import FooterComponent from '../FooterComponent';
+import FooterContainer from '../../containers/FooterContainer';
 import TooltipHelpComponent from '../TooltipHelpComponentAlternative';
 import TooltipMarkerComponent from '../TooltipMarkerComponent';
 import { FormattedMessage } from 'react-intl';
-import { hasToken } from '../../utils/token';
 
 interface GroupsDetailProps {
+	loggedInAsAdmin: boolean;
 	selectedGroups: number[];
 	fetchGroupsDetailsIfNeeded(): Promise<any>;
 	fetchMetersDetailsIfNeeded(): Promise<any>;
@@ -25,7 +25,7 @@ export default class GroupsDetailComponent extends React.Component<GroupsDetailP
 	}
 
 	public render() {
-		const renderCreateAdminTooltip = hasToken();
+		const renderCreateAdminTooltip = this.props.loggedInAsAdmin;
 		const flexContainerStyle = {
 			display: 'flex',
 			flexFlow: 'row wrap'
@@ -65,7 +65,7 @@ export default class GroupsDetailComponent extends React.Component<GroupsDetailP
 						</div>
 					</div>
 				</div>
-				<FooterComponent />
+				<FooterContainer />
 			</div>
 		);
 	}
