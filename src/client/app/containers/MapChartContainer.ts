@@ -117,7 +117,7 @@ function mapStateToProps(state: State) {
 								size.push(averagedReading);
 							}
 							// The hover text.
-							texts.push(`<b> ${timeReading} </b> <br> ${label}: ${averagedReading} kWh/day`);
+							texts.push(`<b> ${timeReading} </b> <br> ${label}: ${averagedReading.toPrecision(6)} kWh/day`);
 						}
 					}
 				}
