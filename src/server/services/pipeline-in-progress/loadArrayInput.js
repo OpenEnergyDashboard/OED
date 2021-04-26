@@ -5,9 +5,6 @@
  */
 
 const Reading = require('../../models/Reading');
-const convertToReadings = require('./convertToReadings');
-const { log } = require('../../log');
-const handleCumulative = require('./handleCumulative');
 const processData = require('./processData');
 /**
  * Select and process needed values from a matrix and return an array of reading value and reading time
