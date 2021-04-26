@@ -55,11 +55,11 @@ function processData(rows, meterID, isCumulative, cumulativeReset, resetStart="0
 			if (onlyEndTime){
 				// The startTimestamp of this reading is the endTimestamp of the previous reading
 				startTimestamp = prevReading.endTimestamp;
-				endTimestamp = moment(rows[index-readingRepetition][1], 'Y/M/D H:mm');
+				endTimestamp = moment(rows[index-readingRepetition][1], ['YYYY/MM/DD HH:mm','MM/DD/YYYY HH:mm']);
 			}
 			else{
-				startTimestamp = moment(rows[index-readingRepetition][1], 'Y/M/D H:mm');
-				endTimestamp = moment(rows[index-readingRepetition][2], 'Y/M/D H:mm');
+				startTimestamp = moment(rows[index-readingRepetition][1], ['YYYY/MM/DD HH:mm','MM/DD/YYYY HH:mm']);
+				endTimestamp = moment(rows[index-readingRepetition][2], ['YYYY/MM/DD HH:mm','MM/DD/YYYY HH:mm']);
 			}
             if (isCumulative && isFirst(prevReading.endTimestamp)){
                 readingOK = false;

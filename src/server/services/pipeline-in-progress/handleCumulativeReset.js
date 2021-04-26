@@ -19,9 +19,16 @@ function handleCumulativeReset(cumulativeReset, resetStart, resetEnd, startTimes
         return false;
     }
     else{
+        let momentFormat = "";
+        if (moment(startTimestamp, "YYYY-MM-DD", true).isValid()){
+            momentFormat = "YYYY-MM-DD HH:mm:ss";
+        }
+        else{
+            momentFormat = "MM-DD-YYYY HH:mm:ss"
+        }
         let testStart = moment(startTimestamp);
-        let testResetStart = moment(testStart.format('YYYY-MM-DD')+" "+resetStart, "YYYY/MM/DD HH:mm:ss");
-        let testResetEnd = moment(testStart.format('YYYY-MM-DD')+" "+resetEnd, "YYYY/MM/DD HH:mm:ss");
+        let testResetStart = moment(testStart.format(momentFormat)+" "+resetStart, ['YYYY/MM/DD HH:mm:ss','MM/DD/YYYY HH:mm:ss']);
+        let testResetEnd = moment(testStart.format(momentFormat)+" "+resetEnd, ['YYYY/MM/DD HH:mm:ss','MM/DD/YYYY HH:mm:ss']);
         if (testStart.isSameOrAfter(testResetStart) && testStart.isSameOrBefore(testResetEnd)){
             return true;
         }
