@@ -14,25 +14,25 @@ const handleCumulativeReset = require('./handleCumulativeReset');
  * Handle all data, assume that the first row is the first reading (skip this row).
  * @Example
  * 	row 0: reading #0
- *  row 1: reading #0 + #1
- * 	row 2: reading #0 + #1 + #2
- * => reading #1 = row 1 - row 0
- *    reading #2 = row 2 - row 1
- *    reading #0 is cumulative value from unknown readings that may or may not have been inserted before
+ *  row 1: reading #1
+ * 	row 2: reading #2
+ * => reading #1 = row 1
+ *    reading #2 = row 2
+ *    reading #0 may be the cumulative value from unknown readings that may or may not have been inserted before
  * @param {object[[]]} rows
- * @param {number} meterID
+ * @param {number} meterID meter id being input
  * @param {boolean} isCumulative true if the data is cumulative
  * @param {boolean} cumulativeReset true if the cumulative data can reset
  * @param {string} resetStart a string representation of the start time a cumulativeReset may occur after. The default resetStart time is 0:00:00
  * @param {string} resetEnd a string representation of the end time a cumulativeReset may occur before. The default resetEnd time is 23:59:99
  * @param readingRepetition value is 1 if reading is not duplicated. 2 if repeated twice and so on (E-mon D-mon meters)
  * @param {boolean} onlyEndTime true if the data only has an endTimestamp
- * @param {number} Tgap the allowed time variation in millisecond that a gap may occur between two readings 
+ * @param {number} Tgap the allowed time variation in milliseconds that a gap may occur between two readings 
  * @param {number} Tlen the allowed time variation in milliseconds that two readings may deviate from each other
  * @param {dict} conditionSet used to validate readings (minVal, maxVal, minDate, maxDate, interval, maxError)
  */
 
-function processData(rows, meterID, isCumulative, cumulativeReset, resetStart="0:00:00", resetEnd="23:59:99", readingRepetition, onlyEndTime, Tgap, Tlen, conditionSet) {
+function processData(rows, meterID, isCumulative, cumulativeReset, resetStart="0:00:00.000", resetEnd="23:59:99.999", readingRepetition, onlyEndTime=false, Tgap, Tlen, conditionSet) {
 
     // If we can successfully processData return result = [R0, R1, R2...RN]
 	const result = [];

@@ -21,14 +21,14 @@ function handleCumulativeReset(cumulativeReset, resetStart, resetEnd, startTimes
     else{
         let momentFormat = "";
         if (moment(startTimestamp, "YYYY-MM-DD", true).isValid()){
-            momentFormat = "YYYY-MM-DD HH:mm:ss";
+            momentFormat = "YYYY-MM-DD HH:mm:ss.SSS";
         }
         else{
-            momentFormat = "MM-DD-YYYY HH:mm:ss"
+            momentFormat = "MM-DD-YYYY HH:mm:ss.SSS"
         }
         let testStart = moment(startTimestamp);
-        let testResetStart = moment(testStart.format(momentFormat)+" "+resetStart, ['YYYY/MM/DD HH:mm:ss','MM/DD/YYYY HH:mm:ss']);
-        let testResetEnd = moment(testStart.format(momentFormat)+" "+resetEnd, ['YYYY/MM/DD HH:mm:ss','MM/DD/YYYY HH:mm:ss']);
+        let testResetStart = moment(testStart.format(momentFormat)+" "+resetStart, ['YYYY/MM/DD HH:mm:ss.SSS','MM/DD/YYYY HH:mm:ss.SSS']);
+        let testResetEnd = moment(testStart.format(momentFormat)+" "+resetEnd, ['YYYY/MM/DD HH:mm:ss.SSS','MM/DD/YYYY HH:mm:ss.SSS']);
         if (testStart.isSameOrAfter(testResetStart) && testStart.isSameOrBefore(testResetEnd)){
             return true;
         }
