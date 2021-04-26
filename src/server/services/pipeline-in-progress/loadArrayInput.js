@@ -25,16 +25,12 @@ async function loadArrayInput(dataRows, meterID, mapRowToModel, isCumulative, cu
 
 	// Temporary values for params
 	let onlyEndtime = false;
-	let Tgap = 0; //1 day in milliseconds
+	let Tgap = 0; 
 	let Tlen = 0;
-	let resetStart = "0:00:00";
-	let resetEnd = "0:15:00";
-	// expect 2 times. If we only get 1 resetTime error. In the future we can grab the meter values from the db.
-	// seperate function to handle cumulativeReset
-	// If no reset values passed in we should take values from meter database and pass those in instead.
+	let resetStart = "00:00:00";
+	let resetEnd = "23:59:99";
 
 	readingsArray = processData(readingsArray, meterID, isCumulative, cumulativeReset, resetStart, resetEnd, readingRepetition, onlyEndtime, Tgap, Tlen, conditionSet);
-	//console.log("succesfully returned with array: ",readingsArray);
 	return await Reading.insertOrIgnoreAll(readingsArray, conn);
 }
 

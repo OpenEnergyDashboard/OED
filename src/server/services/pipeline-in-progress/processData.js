@@ -23,8 +23,8 @@ const handleCumulativeReset = require('./handleCumulativeReset');
  * @param {number} meterID
  * @param {boolean} isCumulative true if the data is cumulative
  * @param {boolean} cumulativeReset true if the cumulative data can reset
- * @param {string} resetStart a string representation of the start time a cumulativeReset may occur after
- * @param {string} resetEnd a string representation of the end time a cumulativeReset may occur before
+ * @param {string} resetStart a string representation of the start time a cumulativeReset may occur after. The default resetStart time is 0:00:00
+ * @param {string} resetEnd a string representation of the end time a cumulativeReset may occur before. The default resetEnd time is 23:59:99
  * @param readingRepetition value is 1 if reading is not duplicated. 2 if repeated twice and so on (E-mon D-mon meters)
  * @param {boolean} onlyEndTime true if the data only has an endTimestamp
  * @param {number} Tgap the allowed time variation in millisecond that a gap may occur between two readings 
@@ -49,11 +49,9 @@ function processData(rows, meterID, isCumulative, cumulativeReset, resetStart="0
 	let currentReading = new Reading(meterID, -1,  startTimestamp, endTimestamp);
 	let prevReading = currentReading;
 	let readingOK = true;
-	//console.log("readings array given as: ",rows);
 	for (let index = readingRepetition; index <= rows.length; ++index) {
 		// To read data where same reading is repeated. Like E-mon D-mon meters
 		if ((index - readingRepetition) % readingRepetition === 0) {
-			//console.log("This reading is: ", rows[index-readingRepetition][0], " ", rows[index-readingRepetition][1], " ", rows[index-readingRepetition][2]);
 			if (onlyEndTime){
 				// The startTimestamp of this reading is the endTimestamp of the previous reading
 				startTimestamp = prevReading.endTimestamp;

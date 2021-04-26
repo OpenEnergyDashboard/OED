@@ -15,13 +15,13 @@ const moment = require('moment');
 */
 function handleCumulativeReset(cumulativeReset, resetStart, resetEnd, startTimestamp) {
     if (!cumulativeReset){
-        // If isCumulative is false
+        // If isCumulative is false then it is not possible to handleCumulativeReset
         return false;
     }
     else{
         let testStart = moment(startTimestamp);
-        let testResetStart = moment(testStart.format('MM-DD-YYYY')+" "+resetStart, "MM/DD/YYYY HH:mm:ss");
-        let testResetEnd = moment(testStart.format('MM-DD-YYYY')+" "+resetEnd, "MM/DD/YYYY HH:mm:ss");
+        let testResetStart = moment(testStart.format('YYYY-MM-DD')+" "+resetStart, "YYYY/MM/DD HH:mm:ss");
+        let testResetEnd = moment(testStart.format('YYYY-MM-DD')+" "+resetEnd, "YYYY/MM/DD HH:mm:ss");
         if (testStart.isSameOrAfter(testResetStart) && testStart.isSameOrBefore(testResetEnd)){
             return true;
         }
