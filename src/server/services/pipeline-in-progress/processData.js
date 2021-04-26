@@ -32,12 +32,13 @@ const handleCumulativeReset = require('./handleCumulativeReset');
  * @param {dict} conditionSet used to validate readings (minVal, maxVal, minDate, maxDate, interval, maxError)
  */
 
-function processData(rows, meterID, isCumulative, cumulativeReset, resetStart="0:00:00.000", resetEnd="23:59:99.999", readingRepetition, onlyEndTime=false, Tgap, Tlen, conditionSet) {
+function processData(rows, meterID, isCumulative, cumulativeReset, resetStart = '0:00:00.000', 
+					resetEnd = '23:59:99.999', readingRepetition, onlyEndTime = false, Tgap, Tlen, conditionSet) {
 
-    // If processData is succesfully finished then return result = [R0, R1, R2...RN]
+	// If processData is succesfully finished then return result = [R0, R1, R2...RN]
 	const result = [];
 
-    let errMsg = "";
+	let errMsg = '';
 
 	let meterReading = 0;
 	let meterReading1 = 0;
@@ -46,72 +47,72 @@ function processData(rows, meterID, isCumulative, cumulativeReset, resetStart="0
 	let startTimestamp = moment(0);
 	let endTimestamp = moment(0);
 
-	let currentReading = new Reading(meterID, -1,  startTimestamp, endTimestamp);
+	let currentReading = new Reading(meterID, -1, startTimestamp, endTimestamp);
 	let prevReading = currentReading;
 	let readingOK = true;
 	for (let index = readingRepetition; index <= rows.length; ++index) {
 		// To read data where same reading is repeated. Like E-mon D-mon meters
 		if ((index - readingRepetition) % readingRepetition === 0) {
-			if (onlyEndTime){
+			if (onlyEndTime) {
 				// The startTimestamp of this reading is the endTimestamp of the previous reading
 				startTimestamp = prevReading.endTimestamp;
-				endTimestamp = moment(rows[index-readingRepetition][1], ['YYYY/MM/DD HH:mm','MM/DD/YYYY HH:mm']);
+				endTimestamp = moment(rows[index - readingRepetition][1], ['YYYY/MM/DD HH:mm', 'MM/DD/YYYY HH:mm']);
 			}
-			else{
-				startTimestamp = moment(rows[index-readingRepetition][1], ['YYYY/MM/DD HH:mm','MM/DD/YYYY HH:mm']);
-				endTimestamp = moment(rows[index-readingRepetition][2], ['YYYY/MM/DD HH:mm','MM/DD/YYYY HH:mm']);
+			else {
+				startTimestamp = moment(rows[index - readingRepetition][1], ['YYYY/MM/DD HH:mm', 'MM/DD/YYYY HH:mm']);
+				endTimestamp = moment(rows[index - readingRepetition][2], ['YYYY/MM/DD HH:mm', 'MM/DD/YYYY HH:mm']);
 			}
-            if (isCumulative && isFirst(prevReading.endTimestamp)){
-                readingOK = false;
-                errMsg = "The first reading must be dropped when dealing with cumulative data.";
-            }
-			if (onlyEndTime && isFirst(prevReading.endTimestamp)){
+			if (isCumulative && isFirst(prevReading.endTimestamp)) {
 				readingOK = false;
-				errMsg = "The first reading must be dropped when dealing only with endTimestamps.";
+				errMsg = 'The first reading must be dropped when dealing with cumulative data.';
 			}
-            if (readingOK && startTimestamp.isSameOrAfter(endTimestamp)){
-				readingOK = false;	
-				errMsg = "The reading end time is not after the start time.";
-				if (onlyEndTime){
-					errMsg += " The start time came from the previous readings end time.";
+			if (onlyEndTime && isFirst(prevReading.endTimestamp)) {
+				readingOK = false;
+				errMsg = 'The first reading must be dropped when dealing only with endTimestamps.';
+			}
+			if (readingOK && startTimestamp.isSameOrAfter(endTimestamp)) {
+				readingOK = false;
+				errMsg = 'The reading end time is not after the start time.';
+				if (onlyEndTime) {
+					errMsg += ' The start time came from the previous readings end time.';
 				}
 			}
-			if (readingOK){
+			if (readingOK) {
 				// Check that startTimestamp is not before the previous endTimestamp
-				if (onlyEndTime && endTimestamp.isSameOrBefore(prevReading.endTimestamp)){
+				if (onlyEndTime && endTimestamp.isSameOrBefore(prevReading.endTimestamp)) {
 					readingOK = false;
-					errMsg = "The reading is not after the previous reading with only end time given so we must drop the reading.";
+					errMsg = 'The reading is not after the previous reading with only end time given so we must drop the reading.';
 				}
-				else if (startTimestamp.isBefore(prevReading.endTimestamp)){
-					if (isCumulative){
+				else if (startTimestamp.isBefore(prevReading.endTimestamp)) {
+					if (isCumulative) {
 						readingOK = false;
-						errMsg = "The reading start time is before the previous endTime and cumulative so OED cannot use this reading."
+						errMsg = 'The reading start time is before the previous endTime and cumulative so OED cannot use this reading.'
 					}
-					else if (! isFirst(prevReading.endTimestamp)){
+					else if (!isFirst(prevReading.endTimestamp)) {
 						//Only treat this as a warning since the readings may be sent in a different order.
-						errMsg = "The current reading startTime is not after the previous reading's end time. This is expected on the first reading ever.";
+						errMsg = 'The current reading startTime is not after the previous reading\'s end time. This is expected on the first reading ever.';
 					}
 				}
 			}
-			if (readingOK && Math.abs(startTimestamp.diff(prevReading.endTimestamp)) > Tgap){
-				if (isCumulative){
+			if (readingOK && Math.abs(startTimestamp.diff(prevReading.endTimestamp)) > Tgap) {
+				if (isCumulative) {
 					readingOK = false;
-					errMsg = "The end of the previous reading is too far from the start of the next readings in cumulative data so drop the readings.";
+					errMsg = 'The end of the previous reading is too far from the start of the next readings in cumulative data so drop the readings.';
 				}
-				else if (! isFirst(prevReading.endTimestamp)){
+				else if (!isFirst(prevReading.endTimestamp)) {
 					//Only treat this as a warning since we expect a gap in the first ever reading.
-					errMsg = "There is a gap in time between this reading and the previous reading.";
+					errMsg = 'There is a gap in time between this reading and the previous reading.';
 				}
 			}
-			if (readingOK){
+			if (readingOK) {
 				//This reading can be used
-				if (isCumulative){
-					meterReading1 = rows[index - 2*readingRepetition][0]; // use this if regular
+				if (isCumulative) {
+					meterReading1 = rows[index - 2 * readingRepetition][0]; // use this if regular
 					meterReading2 = rows[index - readingRepetition][0];
 					meterReading = meterReading2 - meterReading1; // use this ifCumulative
 				}
-				else{
-					meterReading = rows[index-readingRepetition][0];
+				else {
+					meterReading = rows[index - readingRepetition][0];
 				}
 				// Reject negative readings
 				if (isCumulative && meterReading1 < 0) {
@@ -123,29 +124,30 @@ function processData(rows, meterID, isCumulative, cumulativeReset, resetStart="0
 				// To handle cumulative readings that resets at midnight
 				if (meterReading < 0) {
 					// if meterReading is negative and cumulative check that the times fall within an acceptable reset range
-					if (handleCumulativeReset(cumulativeReset, resetStart, resetEnd, startTimestamp)){
+					if (handleCumulativeReset(cumulativeReset, resetStart, resetEnd, startTimestamp)) {
 						meterReading = meterReading2;
 					}
-					else{
+					else {
 						//cumulativeReset is not expected so throw an error
-						errMsg = ("A negative meterReading has been detected but either cumulativeReset is not enabled, or the start time and end time of this reading is out of the reset range.")
+						errMsg = ('A negative meterReading has been detected but either cumulativeReset is not enabled, or the start time and end time of this reading is out of the reset range.')
 						readingOK = false;
 					}
 				}
-				if (readingOK){
-					if (Math.abs(prevReading.endTimestamp.diff(prevReading.startTimestamp)-endTimestamp.diff(startTimestamp)) > Tlen && !isFirst(prevReading.endTimestamp)){
-						errMsg = "The previous reading has a different time length than the current reading.";
+				if (readingOK) {
+					if (Math.abs(prevReading.endTimestamp.diff(prevReading.startTimestamp) - endTimestamp.diff(startTimestamp)) 
+						> Tlen && !isFirst(prevReading.endTimestamp)) {
+						errMsg = 'The previous reading has a different time length than the current reading.';
 					}
-					currentReading = new Reading(meterID, meterReading, startTimestamp, endTimestamp);	
+					currentReading = new Reading(meterID, meterReading, startTimestamp, endTimestamp);
 					result.push(currentReading);
 				}
 			}
-			if(!readingOK){
+			if (!readingOK) {
 				// An error occurred, for now log it, let the user know and continue
 				log.error(errMsg);
 				readingOK = true;
-				if (isCumulative && !onlyEndTime || onlyEndTime && !isCumulative || isCumulative && onlyEndTime){
-					meterReading = rows[index-readingRepetition][0];
+				if (isCumulative && !onlyEndTime || onlyEndTime && !isCumulative || isCumulative && onlyEndTime) {
+					meterReading = rows[index - readingRepetition][0];
 					currentReading = new Reading(meterID, meterReading, startTimestamp, endTimestamp);
 					// This currentReading will become the previousReading for the first reading if isCumulative is true
 				}
@@ -159,7 +161,7 @@ function processData(rows, meterID, isCumulative, cumulativeReset, resetStart="0
 	}
 	return result;
 }
-function isFirst(t){
+function isFirst(t) {
 	const E0 = moment(0);
 	return t.isSame(E0);
 }

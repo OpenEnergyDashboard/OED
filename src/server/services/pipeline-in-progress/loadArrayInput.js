@@ -22,12 +22,14 @@ async function loadArrayInput(dataRows, meterID, mapRowToModel, isCumulative, cu
 
 	// Temporary values for params
 	let onlyEndtime = false;
-	let Tgap = 0; 
+	let Tgap = 0;
 	let Tlen = 0;
-	let resetStart = "00:00:00.000";
-	let resetEnd = "23:59:99.999";
+	let resetStart = '00:00:00.000';
+	let resetEnd = '23:59:99.999';
 
-	readingsArray = processData(readingsArray, meterID, isCumulative, cumulativeReset, resetStart, resetEnd, readingRepetition, onlyEndtime, Tgap, Tlen, conditionSet);
+	readingsArray = processData(readingsArray, meterID, isCumulative, cumulativeReset, resetStart, resetEnd, 
+								readingRepetition, onlyEndtime, Tgap, Tlen, conditionSet);
+								
 	return await Reading.insertOrIgnoreAll(readingsArray, conn);
 }
 
