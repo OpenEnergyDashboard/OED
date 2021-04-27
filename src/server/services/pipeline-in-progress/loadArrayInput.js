@@ -29,7 +29,7 @@ async function loadArrayInput(dataRows, meterID, mapRowToModel, isCumulative, cu
 
 	readingsArray = processData(readingsArray, meterID, isCumulative, cumulativeReset, resetStart, resetEnd, 
 								readingRepetition, onlyEndtime, Tgap, Tlen, conditionSet);
-								
+							
 	return await Reading.insertOrIgnoreAll(readingsArray, conn);
 }
 
