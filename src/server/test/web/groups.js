@@ -50,6 +50,7 @@ mocha.describe('groups API', () => {
 		groupC.adoptMeter(meterC.id, conn)]);
 	});
 	mocha.describe('retrieval', () => {
+		// For the test below: AssertionError: expected [ Array(3) ] to be a superset of [ Array(3) ]
 		mocha.it('returns the list of existing groups', async () => {
 			const res = await chai.request(app).get('/api/groups');
 			expect(res).to.have.status(200);

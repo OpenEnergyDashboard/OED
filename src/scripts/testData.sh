@@ -54,21 +54,21 @@ sed -i "" -e "s/^[0-9]/313,&/" src/server/test/db/data/automatedTests/15Freq7Amp
 # This will probably not be necesary once can use curl to get the files in
 # CSV with meter info
 cat > $postgresdir/testMeters.csv << EOF
-id,name,ipaddress,enabled,displayable,meter_type,default_timezone_meter,gps,identifier
-300,test4DaySin,123.45.6.0,FALSE,TRUE,mamac,,,test4DaySin
-301,test4HourSin,123.45.6.0,FALSE,TRUE,mamac,,,test4HourSin
-302,test23MinSin,123.45.6.0,FALSE,TRUE,mamac,,,test23MinSin
-303,test15MinSin,123.45.6.0,FALSE,TRUE,mamac,,,test15MinSin
-304,test23MinCos,123.45.6.0,FALSE,TRUE,mamac,,,test23MinCos
-305,testSqSin,123.45.6.0,FALSE,TRUE,mamac,,,testSqSin
-306,testSqCos,123.45.6.0,FALSE,TRUE,mamac,,,testSqCos
-307,testAmp1Sin,123.45.6.0,FALSE,TRUE,mamac,,,testAmp1Sin
-308,testAmp2Sin,123.45.6.0,FALSE,TRUE,mamac,,,testAmp2Sin
-309,testAmp3Sin,123.45.6.0,FALSE,TRUE,mamac,,,testAmp3Sin
-310,testAmp4Sin,123.45.6.0,FALSE,TRUE,mamac,,,testAmp4Sin
-311,testAmp5Sin,123.45.6.0,FALSE,TRUE,mamac,,,testAmp5Sin
-312,testAmp6Sin,123.45.6.0,FALSE,TRUE,mamac,,,testAmp6Sin
-313,testAmp7Sin,123.45.6.0,FALSE,TRUE,mamac,,,testAmp7Sin
+id,name,ipaddress,enabled,displayable,meter_type,default_timezone_meter,gps,identifier,note,area,cumulative,cumulative_reset,cumulative_reset_start,cumulative_reset_end,previous_day,reading_length,reading_variation,reading,start_timestamp,end_timestamp
+300,test4DaySin,123.45.6.0,FALSE,TRUE,mamac,,,test4DaySin,notesTest,25.0,FALSE,TRUE,00:00:00,00:00:00,FALSE,,,20.0,,0001-01-01 : 00:00:00
+301,test4HourSin,123.45.6.0,FALSE,TRUE,mamac,,,test4HourSin,notesTest,25.0,FALSE,TRUE,00:00:00,00:00:00,FALSE,,,20.0,,0001-01-01 : 00:00:00
+302,test23MinSin,123.45.6.0,FALSE,TRUE,mamac,,,test23MinSin,notesTest,25.0,FALSE,TRUE,00:00:00,00:00:00,FALSE,,,20.0,,0001-01-01 : 00:00:00
+303,test15MinSin,123.45.6.0,FALSE,TRUE,mamac,,,test15MinSin,notesTest,25.0,FALSE,TRUE,00:00:00,00:00:00,FALSE,,,20.0,,0001-01-01 : 00:00:00
+304,test23MinCos,123.45.6.0,FALSE,TRUE,mamac,,,test23MinCos,notesTest,25.0,FALSE,TRUE,00:00:00,00:00:00,FALSE,,,20.0,,0001-01-01 : 00:00:00
+305,testSqSin,123.45.6.0,FALSE,TRUE,mamac,,,testSqSin,notesTest,25.0,FALSE,TRUE,00:00:00,00:00:00,FALSE,,,20.0,,0001-01-01 : 00:00:00
+306,testSqCos,123.45.6.0,FALSE,TRUE,mamac,,,testSqCos,notesTest,25.0,FALSE,TRUE,00:00:00,00:00:00,FALSE,,,20.0,,0001-01-01 : 00:00:00
+307,testAmp1Sin,123.45.6.0,FALSE,TRUE,mamac,,,testAmp1Sin,notesTest,25.0,FALSE,TRUE,00:00:00,00:00:00,FALSE,,,20.0,,0001-01-01 : 00:00:00
+308,testAmp2Sin,123.45.6.0,FALSE,TRUE,mamac,,,testAmp2Sin,notesTest,25.0,FALSE,TRUE,00:00:00,00:00:00,FALSE,,,20.0,,0001-01-01 : 00:00:00
+309,testAmp3Sin,123.45.6.0,FALSE,TRUE,mamac,,,testAmp3Sin,notesTest,25.0,FALSE,TRUE,00:00:00,00:00:00,FALSE,,,20.0,,0001-01-01 : 00:00:00
+310,testAmp4Sin,123.45.6.0,FALSE,TRUE,mamac,,,testAmp4Sin,notesTest,25.0,FALSE,TRUE,00:00:00,00:00:00,FALSE,,,20.0,,0001-01-01 : 00:00:00
+311,testAmp5Sin,123.45.6.0,FALSE,TRUE,mamac,,,testAmp5Sin,notesTest,25.0,FALSE,TRUE,00:00:00,00:00:00,FALSE,,,20.0,,0001-01-01 : 00:00:00
+312,testAmp6Sin,123.45.6.0,FALSE,TRUE,mamac,,,testAmp6Sin,notesTest,25.0,FALSE,TRUE,00:00:00,00:00:00,FALSE,,,20.0,,0001-01-01 : 00:00:00
+313,testAmp7Sin,123.45.6.0,FALSE,TRUE,mamac,,,testAmp7Sin,notesTest,25.0,FALSE,TRUE,00:00:00,00:00:00,FALSE,,,20.0,,0001-01-01 : 00:00:00
 EOF
 # Put meters into OED
 docker-compose exec database psql -U oed  -c "copy meters from 'testMeters.csv' CSV HEADER"
