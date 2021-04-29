@@ -26,6 +26,7 @@ const streamBuffers = require('stream-buffers');
 const loadLogfileToReadings = require('../services/obvius/loadLogfileToReadings');
 const middleware = require('../middleware');
 const obvius = require('../util').obvius;
+const { obviusEmailAndPasswordAuthMiddleware } = require('./authenticator');
 const { getConnection } = require('../db');
 const escapeHtml = require('core-js/fn/string/escape-html');
 
@@ -98,22 +99,44 @@ function handleStatus(req, res) {
 }
 
 /**
- * Handle an Obvius upload request.
- * Unfortunately the Obvious API does not specify a HTTP verb.
+ * Logs the Obvius request and sets the req.IP field to be the ip address.
  */
-router.all('/', async (req, res) => {
+function obviusLog(req, res, next){
 	// Log the IP of the requester
 	const ip = req.headers['x-forwarded-for'] || req.connection.remoteAddress;
+	req.IP = ip;
 	log.info(`Received Obvious protocol request from ${ip}`);
+	next();
+}
 
-	// Attempt to verify the password
+/**
+ * Verifies an Obvius request via username and password.
+ */
+function verifyObviusUser(req, res, next){
+	// First we ensure that the password and email parameters are provided.
 	if (!req.param('password')) {
 		failure(req, res, 'password parameter is required.');
+		return;
+	} else if (!req.param('email')){
+		failure(req, res, 'email parameter is required.');
 		return;
 	} else if (req.param('password') !== config.obvius.password) {
 		failure(req, res, 'password was not correct.');
 		return;
+	} else { // Authenticate Obvius user.
+		req.body.email = req.param('email');
+		req.body.password = req.param('password');
+		obviusEmailAndPasswordAuthMiddleware('Obvius pipeline')(req, res, next);
 	}
+}
+
+
+/**
+ * Handle an Obvius upload request.
+ * Unfortunately the Obvious API does not specify a HTTP verb.
+ */
+router.all('/', obviusLog, verifyObviusUser, async (req, res) => {
+	const ip = req.IP;
 
 	const mode = req.param('mode', false);
 	if (mode === false) {

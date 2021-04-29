@@ -3,8 +3,8 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
 
 DO $$ BEGIN
-  INSERT INTO users(email, password_hash)
-    VALUES (${email}, ${passwordHash});
+  INSERT INTO users(email, password_hash, role)
+    VALUES (${email}, ${passwordHash}, ${role});
 EXCEPTION WHEN unique_violation THEN
     -- Ignore duplicate inserts.
 END $$;

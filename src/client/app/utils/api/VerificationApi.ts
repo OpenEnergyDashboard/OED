@@ -6,6 +6,11 @@
 
 import ApiBackend from './ApiBackend';
 import { getToken } from '../token';
+import { User } from '../../types/items';
+
+type LoginResponse = User & {
+	token: string
+};
 
 export default class VerificationApi {
 	private readonly backend: ApiBackend;
@@ -25,8 +30,8 @@ export default class VerificationApi {
 		return success;
 	}
 
-	public async login(email: string, password: string): Promise<string> {
-		const response = await this.backend.doPostRequest<{token: string}>('/api/login/', {email, password});
-		return response.token;
+	public async login(email: string, password: string): Promise<LoginResponse> {
+		const response = await this.backend.doPostRequest<LoginResponse>('/api/login/', {email, password});
+		return response;
 	}
 }

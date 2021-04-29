@@ -13,6 +13,7 @@ import maps from './maps';
 import notifications from './notifications';
 import admin from './admin';
 import version from './version';
+import currentUser from './currentUser';
 
 export default combineReducers({
 	meters,
@@ -26,5 +27,6 @@ export default combineReducers({
 	groups,
 	notifications,
 	admin,
-	version
+	version,
+	currentUser
 });

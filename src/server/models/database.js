@@ -90,6 +90,7 @@ async function createSchema(conn) {
 	await Reading.createCompressedGroupsReadingsFunction(conn);
 	await Reading.createBarchartReadingsFunction(conn);
 	await Reading.createCompressedGroupsBarchartReadingsFunction(conn);
+	await User.createUserTypesEnum(conn);
 	await User.createTable(conn);
 	await Preferences.createTable(conn);
 	await Group.createTables(conn);

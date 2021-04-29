@@ -6,7 +6,6 @@ import * as React from 'react';
 import { Button } from 'reactstrap';
 import ListDisplayComponent from '../ListDisplayComponent';
 import { Link } from 'react-router';
-import { hasToken } from '../../utils/token';
 import { FormattedMessage } from 'react-intl';
 import { ChangeDisplayModeAction } from '../../types/redux/groups';
 
@@ -15,6 +14,7 @@ interface GroupViewProps {
 	id: number;
 	childMeterNames: string[];
 	childGroupNames: string[];
+	loggedInAsAdmin: boolean;
 	fetchGroupChildren(id: number): Promise<any>;
 	beginEditingIfPossible(id: number): Promise<any>;
 	changeDisplayModeToEdit(): ChangeDisplayModeAction;
@@ -31,7 +31,7 @@ export default class GroupViewComponent extends React.Component<GroupViewProps, 
 	}
 
 	public render() {
-		const renderEditGroupButton = hasToken();
+		const renderEditGroupButton = this.props.loggedInAsAdmin;
 		const nameStyle: React.CSSProperties = {
 			textAlign: 'center'
 		};

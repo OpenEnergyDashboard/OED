@@ -4,10 +4,12 @@
 
 const express = require('express');
 const Meter = require('../models/Meter');
+const User = require('../models/User');
 const { log } = require('../log');
 const validate = require('jsonschema').validate;
 const { getConnection } = require('../db');
-const requiredAuthenticator = require('./authenticator').authMiddleware;
+const { isTokenAuthorized } = require('../util/userRoles');
+const requiredAdmin = require('./authenticator').adminAuthMiddleware;
 const optionalAuthenticator = require('./authenticator').optionalAuthMiddleware;
 const Point = require('../models/Point');
 
@@ -15,11 +17,12 @@ const router = express.Router();
 router.use(optionalAuthenticator);
 
 /**
- * Defines the format in which we want to send meters and controls what information we send to the client, if logged in or not.
+ * Defines the format in which we want to send meters and controls what information we send to the client, if logged in and an Admin or not.
  * @param meter
+ * @param loggedInAsAdmin
  * @returns {{id, name}}
  */
-function formatMeterForResponse(meter, loggedIn) {
+function formatMeterForResponse(meter, loggedInAsAdmin) {
 	const formattedMeter = {
 		id: meter.id,
 		name: null,
@@ -32,8 +35,8 @@ function formatMeterForResponse(meter, loggedIn) {
 		identifier: meter.identifier
 	};
 
-	// Only logged in users can see IP addresses, types, timezones, and internal names
-	if (loggedIn) {
+	// Only logged in Admins can see IP addresses, types, timezones, and internal names
+	if (loggedInAsAdmin) {
 		formattedMeter.ipAddress = meter.ipAddress;
 		formattedMeter.meterType = meter.type;
 		formattedMeter.timeZone = meter.meterTimezone;
@@ -50,20 +53,22 @@ function formatMeterForResponse(meter, loggedIn) {
 }
 
 /**
- * GET information on displayable meters (or all meters, if logged in)
+ * GET information on displayable meters (or all meters, if logged in as an admin.)
  */
 router.get('/', async (req, res) => {
-	const conn = getConnection();
-	let query;
-	if (req.hasValidAuthToken) {
-		query = Meter.getAll;
-	} else {
-		query = Meter.getDisplayable;
-	}
-
 	try {
+		const conn = getConnection();
+		let query;
+		const token = req.headers.token || req.body.token || req.query.token;
+		const loggedInAsAdmin = req.hasValidAuthToken && (await isTokenAuthorized(token, User.role.ADMIN));
+		if (loggedInAsAdmin) {
+			query = Meter.getAll;
+		} else {
+			query = Meter.getDisplayable;
+		}
+
 		const rows = await query(conn);
-		res.json(rows.map(row => formatMeterForResponse(row, req.hasValidAuthToken)));
+		res.json(rows.map(row => formatMeterForResponse(row, loggedInAsAdmin)));
 	} catch (err) {
 		log.error(`Error while performing GET all meters query: ${err}`, err);
 	}
@@ -106,9 +111,7 @@ router.get('/:meter_id', async (req, res) => {
 	}
 });
 
-router.use(requiredAuthenticator);
-
-router.post('/edit', async (req, res) => {
+router.post('/edit', requiredAdmin('edit meters'), async (req, res) => {
 	const validParams = {
 		type: 'object',
 		maxProperties: 6,

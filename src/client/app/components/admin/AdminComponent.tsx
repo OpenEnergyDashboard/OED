@@ -8,6 +8,7 @@ import FooterContainer from '../../containers/FooterContainer';
 import AddMetersContainer from '../../containers/admin/AddMetersContainer';
 import AddReadingsContainer from '../../containers/admin/AddReadingsContainer';
 import PreferencesContainer from '../../containers/admin/PreferencesContainer';
+import ManageUsersLinkButtonComponent from './users/ManageUsersLinkButtonComponent';
 import TooltipHelpComponent from '../TooltipHelpComponentAlternative';
 import TooltipMarkerComponent from '../TooltipMarkerComponent';
 import { FormattedMessage } from 'react-intl';
@@ -21,6 +22,16 @@ export default function AdminComponent() {
 	const divMarginTop: React.CSSProperties = {
 		marginTop: '50px'
 	};
+
+	const bottomPaddingStyle: React.CSSProperties = {
+		paddingBottom: '15px'
+	};
+
+	const sectionTitleStyle: React.CSSProperties = {
+		fontWeight: 'bold',
+		margin: 0,
+		paddingBottom: '5px'
+	}
 	const titleStyle: React.CSSProperties ={
 		textAlign: 'center'
 	};
@@ -41,6 +52,12 @@ export default function AdminComponent() {
 				</h2>
 				<div className='row'>
 					<div className='col-12 col-lg-6'>
+						<div style={bottomPaddingStyle}>
+							<p style={sectionTitleStyle}>Manage:</p>
+							<div>
+								<ManageUsersLinkButtonComponent />
+							</div>
+						</div>
 						<PreferencesContainer />
 					</div>
 					<div className='col-12 col-lg-6'>

@@ -45,7 +45,7 @@ router.post('/', async (req, res) => {
 			const isValid = await bcrypt.compare(req.body.password, user.passwordHash);
 			if (isValid) {
 				const token = jwt.sign({ data: user.id }, secretToken, { expiresIn: 86400 });
-				res.json({ token: token });
+				res.json({ token: token, email: user.email, role: user.role });
 			} else {
 				throw new Error('Unauthorized password');
 			}
