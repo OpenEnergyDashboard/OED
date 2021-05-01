@@ -17,9 +17,6 @@ import { FormattedMessage } from 'react-intl';
  */
 
 export default function AdminComponent() {
-	const divMarginTop: React.CSSProperties = {
-		marginTop: '50px'
-	};
 
 	const bottomPaddingStyle: React.CSSProperties = {
 		paddingBottom: '15px'
@@ -58,12 +55,6 @@ export default function AdminComponent() {
 						</div>
 						<PreferencesContainer />
 					</div>
-					{/* <div className='col-12 col-lg-6'>
-						<AddReadingsContainer />
-						<div style={divMarginTop}>
-							<AddMetersContainer />
-						</div>
-					</div> */}
 				</div>
 			</div>
 			<FooterContainer />
