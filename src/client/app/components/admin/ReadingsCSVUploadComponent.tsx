@@ -3,7 +3,7 @@
 * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
 
 import * as React from 'react';
-import { Button, Input, Form, FormGroup, Label } from 'reactstrap';
+import { Button, Col, Input, Form, FormGroup, Label } from 'reactstrap';
 import { ReadingsCSVUploadProps, TimeSortTypes } from 'types/csvUploadForm';
 import { showErrorNotification } from '../../utils/notifications';
 import FormFileUploaderComponent from '../FormFileUploaderComponent';
@@ -65,60 +65,85 @@ export default class ReadingsCSVUploadComponent extends React.Component<Readings
 		const titleStyle: React.CSSProperties = {
 			fontWeight: 'bold',
 			margin: 0,
-			paddingBottom: '5px'
+			paddingBottom: '5px',
+			textAlign: 'right'
 		};
 
+		const checkboxStyle: React.CSSProperties = {
+			textAlign: 'right'
+		}
+
 		return (
-			<Form onSubmit={this.handleSubmit}>
-				<FormGroup>
-					<Input checked={this.props.gzip} type='checkbox' name='gzip' onChange={this.props.toggleGzip} />
-					<Label> Gzip </Label>
+			<Form onSubmit={this.handleSubmit} style={{ padding: '20px' }}>
+				<FormGroup row>
+					<Label sm={2} style={titleStyle}>
+						Meter name
+					</Label>
+					<Col sm={10}>
+						<Input required value={this.props.meterName} name='meterName' onChange={this.handleSetMeterName} style={{ width: '200px' }} />
+					</Col>
 				</FormGroup>
-				<FormGroup>
-					<Input checked={this.props.headerRow} type='checkbox' name='headerRow' onChange={this.props.toggleHeaderRow} />
-					<Label> Header Row </Label>
+				<FormGroup row>
+					<Label sm={2} style={titleStyle}>
+						Time Sort
+					</Label>
+					<Col sm={10}>
+						<Input type='select' name='timeSort' onChange={this.handleSelectTimeSort} style={{ width: '200px' }}>
+							<option value={TimeSortTypes.increasing}> {TimeSortTypes.increasing} </option>
+						</Input>
+					</Col>
 				</FormGroup>
-				<FormGroup>
-					<Input checked={this.props.update} type='checkbox' name='update' onChange={this.props.toggleUpdate} />
-					<Label> Update </Label>
+				<FormGroup row>
+					<Label sm={2} style={titleStyle}>
+						Duplications
+					</Label>
+					<Col sm={10}>
+						<Input value={this.props.duplications} type='select' name='duplications' onChange={this.handleSelectDuplications} style={{ width: '200px' }}>
+							{range(1, 10).map(i => (
+								<option key={i} value={`${i}`}> {i} </option>
+							))}
+						</Input>
+					</Col>
 				</FormGroup>
-				<FormGroup>
-					<Input checked={this.props.createMeter} type='checkbox' name='createMeter' onChange={this.props.toggleCreateMeter} />
-					<Label> Create Meter </Label>
+				<FormFileUploaderComponent buttonText='Upload Readings CSV' reference={this.fileInput} required labelStyle={titleStyle} />
+				<FormGroup row>
+					<Col sm={2} style={checkboxStyle}>
+						<Input checked={this.props.gzip} type='checkbox' name='gzip' onChange={this.props.toggleGzip} id='readingsGzip' />
+					</Col>
+					<Label htmlFor='readingsGzip' sm={10}>
+						Gzip
+					</Label>
 				</FormGroup>
-				<FormGroup>
-					<Input checked={this.props.cumulative} type='checkbox' name='cumulative' onChange={this.props.toggleCumulative} />
-					<Label> Cumulative </Label>
+				<FormGroup row>
+					<Col sm={2} style={checkboxStyle}>
+						<Input checked={this.props.headerRow} type='checkbox' name='headerRow' onChange={this.props.toggleHeaderRow} id='readingsHeaderRow' />
+					</Col>
+					<Label htmlFor='readingsHeaderRow' sm={10}> Header Row </Label>
 				</FormGroup>
-				<FormGroup>
-					<Input checked={this.props.cumulativeReset} type='checkbox' name='cumulativeReset' onChange={this.props.toggleCumulativeReset} />
-					<Label> Cumulative Reset </Label>
+				<FormGroup row>
+					<Col sm={2} style={checkboxStyle}>
+						<Input checked={this.props.update} type='checkbox' name='update' onChange={this.props.toggleUpdate} id='readingsUpdate' />
+					</Col>
+					<Label htmlFor='readingsUpdate' sm={10}> Update </Label>
 				</FormGroup>
-				<FormGroup>
-					<p style={titleStyle}>
-						Duplications:
-					</p>
-					<Input value={this.props.duplications} type='select' name='duplications' onChange={this.handleSelectDuplications} >
-						{range(1, 10).map(i => (
-							<option key={i} value={`${i}`}> {i} </option>
-						))}
-					</Input>
+				<FormGroup row>
+					<Col sm={2} style={checkboxStyle}>
+						<Input checked={this.props.createMeter} type='checkbox' name='createMeter' onChange={this.props.toggleCreateMeter} id='createMeter' />
+					</Col>
+					<Label htmlFor='createMeter' sm={10}> Create Meter </Label>
 				</FormGroup>
-				<FormGroup>
-					<p style={titleStyle}>
-						Time Sort:
-					</p>
-					<Input type='select' name='duplications' onChange={this.handleSelectTimeSort}>
-						<option value={TimeSortTypes.increasing}> {TimeSortTypes.increasing} </option>
-					</Input>
+				<FormGroup row>
+					<Col sm={2} style={checkboxStyle}>
+						<Input checked={this.props.cumulative} type='checkbox' name='cumulative' onChange={this.props.toggleCumulative} id='cumulative' />
+					</Col>
+					<Label htmlFor='cumulative' sm={10}> Cumulative </Label>
 				</FormGroup>
-				<FormGroup>
-					<p style={titleStyle}>
-						Meter Name:
-					</p>
-					<Input required value={this.props.meterName} name='meterName' onChange={this.handleSetMeterName} />
+				<FormGroup row>
+					<Col sm={2} style={checkboxStyle}>
+						<Input checked={this.props.cumulativeReset} type='checkbox' name='cumulativeReset' onChange={this.props.toggleCumulativeReset} id='cumulativeReset' />
+					</Col>
+					<Label htmlFor='cumulativeReset' sm={10}> Cumulative Reset </Label>
 				</FormGroup>
-				<FormFileUploaderComponent buttonText='Upload Readings CSV' reference={this.fileInput} required />
 				<Button type='submit'> Submit CSV Data </Button>
 			</Form>
 		)
