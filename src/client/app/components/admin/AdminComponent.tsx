@@ -6,7 +6,6 @@ import * as React from 'react';
 import HeaderContainer from '../../containers/HeaderContainer';
 import FooterContainer from '../../containers/FooterContainer';
 import PreferencesContainer from '../../containers/admin/PreferencesContainer';
-import UploadCSVContainer from '../../containers/admin/UploadCSVContainer';
 import ManageUsersLinkButtonComponent from './users/ManageUsersLinkButtonComponent';
 import TooltipHelpComponent from '../TooltipHelpComponentAlternative';
 import TooltipMarkerComponent from '../TooltipMarkerComponent';
@@ -65,11 +64,6 @@ export default function AdminComponent() {
 							<AddMetersContainer />
 						</div>
 					</div> */}
-					<div className='col-12 col-lg-6'>
-						<div style={divMarginTop}>
-							<UploadCSVContainer />
-						</div>
-					</div>
 				</div>
 			</div>
 			<FooterContainer />

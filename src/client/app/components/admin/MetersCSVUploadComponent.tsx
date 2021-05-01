@@ -3,7 +3,7 @@
 * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
 
 import * as React from 'react';
-import { Button, Col, Input, Form, FormGroup, Label } from 'reactstrap';
+import { Button, Input, Form, FormGroup, Label } from 'reactstrap';
 import { MetersCSVUploadProps } from 'types/csvUploadForm';
 import { showErrorNotification } from '../../utils/notifications';
 import FormFileUploaderComponent from '../FormFileUploaderComponent';
@@ -38,40 +38,44 @@ export default class MetersCSVUploadComponent extends React.Component<MetersCSVU
 	public render() {
 		const titleStyle: React.CSSProperties = {
 			fontWeight: 'bold',
-			margin: 0,
-			paddingBottom: '5px',
-			textAlign: 'right'
+			paddingBottom: '5px'
 		};
 
 		const checkboxStyle: React.CSSProperties = {
-			textAlign: 'right'
+			paddingBottom: '15px'
+		}
+
+		const formStyle: React.CSSProperties = {
+			display: 'flex',
+			justifyContent: 'center',
+			padding: '20px'
 		}
 
 		return (
-			<Form onSubmit={this.handleSubmit} style={{ padding: '20px' }}>
-				<FormFileUploaderComponent buttonText='Upload Meters CSV' reference={this.fileInput} required labelStyle={titleStyle} />
-				<FormGroup row>
-					<Col sm={2} style={checkboxStyle}>
-						<Input checked={this.props.gzip} type='checkbox' name='gzip' onChange={this.props.toggleGzip} id='metersGzip' />
-					</Col>
-					<Label htmlFor='metersGzip' sm={10}>
-						Gzip
-					</Label>
-				</FormGroup>
-				<FormGroup row>
-					<Col sm={2} style={checkboxStyle}>
-						<Input checked={this.props.headerRow} type='checkbox' name='headerRow' onChange={this.props.toggleHeaderRow} id='metersHeaderRowMeter' />
-					</Col>
-					<Label htmlFor='metersHeaderRowMeter' sm={10}> Header Row </Label>
-				</FormGroup>
-				<FormGroup row>
-					<Col sm={2} style={checkboxStyle}>
-						<Input checked={this.props.update} type='checkbox' name='update' onChange={this.props.toggleUpdate} id='metersUpdate' />
-					</Col>
-					<Label htmlFor='metersUpdate' sm={10}> Update </Label>
-				</FormGroup>
-				<Button type='submit'> Submit CSV Data </Button>
-			</Form>
+			<div style={formStyle}>
+				<Form onSubmit={this.handleSubmit}>
+					<FormFileUploaderComponent buttonText='Upload Meters CSV' reference={this.fileInput} required labelStyle={titleStyle} />
+					<FormGroup check style={checkboxStyle}>
+						<Label>
+							<Input checked={this.props.gzip} type='checkbox' name='gzip' onChange={this.props.toggleGzip} />
+							Gzip
+						</Label>
+					</FormGroup>
+					<FormGroup check style={checkboxStyle}>
+						<Label check>
+							<Input checked={this.props.headerRow} type='checkbox' name='headerRow' onChange={this.props.toggleHeaderRow} />
+							Header Row
+						</Label>
+					</FormGroup>
+					<FormGroup check style={checkboxStyle}>
+						<Label check>
+							<Input checked={this.props.update} type='checkbox' name='update' onChange={this.props.toggleUpdate} />
+							Update
+							</Label>
+					</FormGroup>
+					<Button type='submit'> Submit CSV Data </Button>
+				</Form>
+			</div>
 		)
 	}
 

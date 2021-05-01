@@ -11,7 +11,7 @@ const express = require('express');
 const failure = require('../services/csvPipeline/failure');
 const { getConnection } = require('../db');
 const { log } = require('../log');
-const middleware = require('../middleware');
+const { csvAuthMiddleware } = require('./authenticator');
 const multer = require('multer');
 const saveCsv = require('../services/csvPipeline/saveCsv');
 const uploadMeters = require('../services/csvPipeline/uploadMeters');
@@ -65,12 +65,9 @@ router.use(function(req, res, next){ // This ensures that at least one csv file 
 	}
 });
 
-// router.use(middleware.lowercaseAllParamNames); // Lowercase all parameters.
-
 // TODO: we need to sanitize req query params, res
-// TODO: we need to create a condition set
 
-router.post('/meters', validateMetersCsvUploadParams, async (req, res) => {
+router.post('/meters', csvAuthMiddleware('upload meters'), validateMetersCsvUploadParams, async (req, res) => {
 	try {
 		let fileBuffer;
 		if(req.body.gzip === 'true'){
@@ -87,7 +84,7 @@ router.post('/meters', validateMetersCsvUploadParams, async (req, res) => {
 	}
 });
 
-router.post('/readings', validateReadingsCsvUploadParams, async (req, res) => {
+router.post('/readings', csvAuthMiddleware('upload readings'), validateReadingsCsvUploadParams, async (req, res) => {
 	try {
 		let fileBuffer;
 		if(req.body.gzip === 'true'){

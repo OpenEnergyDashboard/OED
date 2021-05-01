@@ -14,14 +14,14 @@ interface FileUploader {
 
 export default function FileUploaderComponent(props: FileUploader) {
 	return (
-		<FormGroup row>
-			<Label sm={2} style={props.labelStyle}>
+		<FormGroup>
+			<Label style={props.labelStyle}>
 				CSV File
 			</Label>
-			<Col sm={10}>
+			<Col>
 				<Input innerRef={props.reference} type='file' name='csvfile' required={props.required} />
 			</Col>
-			<FormText sm={2} color='muted' style={{ textAlign: 'right'}}>
+			<FormText color='muted'>
 				{props.buttonText}
 			</FormText>
 		</FormGroup>
