@@ -2,6 +2,7 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
 
+const express = require('express');
 const { CSVPipelineError } = require('./CustomErrors');
 const success = require('./success');
 const fs = require('fs').promises;
@@ -9,6 +10,14 @@ const { log } = require('../../log');
 const Meter = require('../../models/Meter');
 const readCsv = require('../pipeline-in-progress/readCsv');
 
+/**
+ * Middleware that uploads meters via the pipeline. This should be the final stage of the CSV Pipeline.
+ * @param {express.Request} req 
+ * @param {express.Response} res 
+ * @param {filepath} filepath Path to meters csv file.
+ * @param conn 
+ * @returns 
+ */
 async function uploadMeters(req, res, filepath, conn) {
 	try {
 		const columns = Object.keys(new Meter()).slice(1); // used for the shape of the csv

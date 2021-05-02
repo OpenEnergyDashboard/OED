@@ -2,6 +2,7 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
 
+const express = require('express');
 const { CSVPipelineError } = require('./CustomErrors');
 const { Param, EnumParam, BooleanParam, StringParam } = require('./ValidationSchemas');
 const failure = require('./failure');
@@ -25,6 +26,7 @@ const DEFAULTS = {
 	}
 }
 
+// These are the common upload params shared between meters and readings upload.
 const COMMON_PROPERTIES = {
 	gzip: new BooleanParam('gzip'),
 	headerRow: new BooleanParam('headerRow'),
@@ -32,13 +34,15 @@ const COMMON_PROPERTIES = {
 	update: new BooleanParam('update')
 }
 
+// This sets the validation schemas for jsonschema.
+// Validation is case sensitive. We could not find an elegant solution to perform case-insensitive validation.
 const VALIDATION = {
 	meters: {
 		type: 'object',
 		properties: {
 			...COMMON_PROPERTIES
 		},
-		additionalProperties: false // This protects us from unintended parameters.
+		additionalProperties: false // This protects us from unintended parameters as well as typos.
 	},
 	readings: {
 		type: 'object',
@@ -85,6 +89,12 @@ function validateRequestParams(body, schema) {
 	}
 }
 
+/**
+ * Middleware that validates a request to upload readings via the CSV Pipeline and sets defaults for upload parameters.
+ * @param {express.Request} req 
+ * @param {express.Response} res 
+ * @param {express.NextFunction} next 
+ */
 function validateReadingsCsvUploadParams(req, res, next) {
 	// Validate the parameters of the request. Failure out if there are any unintended mistakes such as additional parameters and typos.
 	const { responseMessage, success } = validateRequestParams(req.body, VALIDATION.readings);
@@ -121,6 +131,12 @@ function validateReadingsCsvUploadParams(req, res, next) {
 	next();
 }
 
+/**
+ * Middleware that validates a request to upload meters via the CSV Pipeline and sets defaults for upload parameters.
+ * @param {express.Request} req 
+ * @param {express.Response} res 
+ * @param {express.NextFunction} next 
+ */
 function validateMetersCsvUploadParams(req, res, next) {
 	// Validate the parameters of the request. Failure out if there are any unintended mistakes such as additional parameters and typos.
 	const { responseMessage, success } = validateRequestParams(req.body, VALIDATION.meters);
