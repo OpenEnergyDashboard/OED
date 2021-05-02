@@ -36,6 +36,7 @@ async function insertMetasysData(filePath, readingInterval, readingRepetition, c
 						cumulativeReset = cumulativeReset,
 						readingRepetition = readingRepetition,
 						conditionSet = undefined,
+						headerRow = false,
 						conn = conn);
 }
 
