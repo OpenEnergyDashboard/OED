@@ -8,6 +8,7 @@ import { ReadingsCSVUploadProps, TimeSortTypes } from '../../types/csvUploadForm
 import { showErrorNotification } from '../../utils/notifications';
 import FormFileUploaderComponent from '../FormFileUploaderComponent';
 import translate from '../../utils/translate';
+import { FormattedMessage } from 'react-intl';
 
 /** A range of values, inclusive lower bound and exclusive upper bound. */
 function range(lower: number, upper: number): number[] {
@@ -35,11 +36,10 @@ export default class ReadingsCSVUploadComponent extends React.Component<Readings
 			const current = this.fileInput.current as HTMLInputElement;
 			const { files } = current;
 			if (files && (files as FileList).length !== 0) {
-				await this.props.submitCSV(files[0]);
-			} else {
-				showErrorNotification(translate('No Meters CSV File was uploaded!'), undefined, 10);
+				const res = await this.props.submitCSV(files[0]);
+				console.log(res);
+				// Respond to success.
 			}
-			// Respond to success.
 		} catch (error) {
 			// A failed axios request should result in an error.
 			showErrorNotification(translate(error.response.data as string), undefined, 10);
@@ -102,7 +102,7 @@ export default class ReadingsCSVUploadComponent extends React.Component<Readings
 				<Form onSubmit={this.handleSubmit}>
 					<FormGroup>
 						<Label style={titleStyle}>
-							Meter name
+							<FormattedMessage id='csv.readings.param.meter.name' />
 						</Label>
 						<Col sm={8}>
 							<Input required value={this.props.meterName} name='meterName' onChange={this.handleSetMeterName} />
@@ -110,7 +110,7 @@ export default class ReadingsCSVUploadComponent extends React.Component<Readings
 					</FormGroup>
 					<FormGroup>
 						<Label style={titleStyle}>
-							Time Sort
+							<FormattedMessage id='csv.readings.param.time.sort' />
 						</Label>
 						<Col sm={8}>
 							<Input type='select' name='timeSort' onChange={this.handleSelectTimeSort}>
@@ -120,7 +120,7 @@ export default class ReadingsCSVUploadComponent extends React.Component<Readings
 					</FormGroup>
 					<FormGroup>
 						<Label style={titleStyle}>
-							Duplications
+							<FormattedMessage id='csv.readings.param.duplications' />
 						</Label>
 						<Col sm={8}>
 							<Input value={this.props.duplications} type='select' name='duplications' onChange={this.handleSelectDuplications}>
@@ -130,27 +130,27 @@ export default class ReadingsCSVUploadComponent extends React.Component<Readings
 							</Input>
 						</Col>
 					</FormGroup>
-					<FormFileUploaderComponent buttonText='Upload Readings CSV' reference={this.fileInput} required labelStyle={titleStyle} />
+					<FormFileUploaderComponent formText='csv.upload.readings' reference={this.fileInput} required labelStyle={titleStyle} />
 					<FormGroup>
 						<Label style={titleStyle}>
-							Cumulative Data
+							<FormattedMessage id='csv.readings.section.cumulative.data'/>
 						</Label>
 						<Col sm={8}>
 							<FormGroup check style={checkboxStyle}>
 								<Label check>
 									<Input checked={this.props.cumulative} type='checkbox' name='cumulative' onChange={this.props.toggleCumulative} />
-									Cumulative
+									<FormattedMessage id='csv.readings.param.cumulative'/>
 								</Label>
 							</FormGroup>
 							<FormGroup check style={checkboxStyle}>
 								<Label check>
 									<Input checked={this.props.cumulativeReset} type='checkbox' name='cumulativeReset' onChange={this.props.toggleCumulativeReset} />
-									Cumulative Reset
+									<FormattedMessage id='csv.readings.param.cumulative.reset'/>
 								</Label>
 							</FormGroup>
 							<FormGroup>
 								<Label style={titleStyle}>
-									Cumulative Reset Start
+									<FormattedMessage id='csv.readings.param.cumulative.reset.start'/>
 								</Label>
 								<Col sm={8}>
 									<Input value={this.props.cumulativeResetStart} name='cumulativeResetStart' onChange={this.handleSetCumulativeResetStart} />
@@ -158,7 +158,7 @@ export default class ReadingsCSVUploadComponent extends React.Component<Readings
 							</FormGroup>
 							<FormGroup>
 								<Label style={titleStyle}>
-									Cumulative Reset End
+									<FormattedMessage id='csv.readings.param.cumulative.reset.end'/>
 								</Label>
 								<Col sm={8}>
 									<Input value={this.props.cumulativeResetEnd} name='cumulativeResetEnd' onChange={this.handleSetCumulativeResetEnd} />
@@ -168,12 +168,12 @@ export default class ReadingsCSVUploadComponent extends React.Component<Readings
 					</FormGroup>
 					<FormGroup>
 						<Label style={titleStyle}>
-							Time Gaps
+							<FormattedMessage id='csv.readings.section.time.gaps'/>
 						</Label>
 						<Col sm={8}>
 							<FormGroup>
 								<Label style={titleStyle}>
-									Length
+									<FormattedMessage id='csv.readings.param.length'/>
 								</Label>
 								<Col sm={8}>
 									<Input value={this.props.length} name='length' onChange={this.handleSetLength} />
@@ -181,7 +181,7 @@ export default class ReadingsCSVUploadComponent extends React.Component<Readings
 							</FormGroup>
 							<FormGroup>
 								<Label style={titleStyle}>
-									Length Variation
+									<FormattedMessage id='csv.readings.param.length.variation' />
 								</Label>
 								<Col sm={8}>
 									<Input value={this.props.cumulativeResetEnd} name='lengthVariation' onChange={this.handleSetLengthVariation} />
@@ -192,34 +192,36 @@ export default class ReadingsCSVUploadComponent extends React.Component<Readings
 					<FormGroup check style={checkboxStyle}>
 						<Label check>
 							<Input checked={this.props.createMeter} type='checkbox' name='createMeter' onChange={this.props.toggleCreateMeter} />
-							Create Meter
+							<FormattedMessage id='csv.readings.param.create.meter' />
 						</Label>
 					</FormGroup>
 					<FormGroup check style={checkboxStyle}>
 						<Label check>
 							<Input checked={this.props.gzip} type='checkbox' name='gzip' onChange={this.props.toggleGzip} />
-							Gzip
+							<FormattedMessage id='csv.common.param.gzip' />
 						</Label>
 					</FormGroup>
 					<FormGroup check style={checkboxStyle}>
 						<Label check>
 							<Input checked={this.props.headerRow} type='checkbox' name='headerRow' onChange={this.props.toggleHeaderRow} />
-							Header Row
+							<FormattedMessage id='csv.common.param.header.row' />
 						</Label>
 					</FormGroup>
 					<FormGroup check style={checkboxStyle}>
 						<Label check>
 							<Input checked={this.props.refreshReadings} type='checkbox' name='refreshReadings' onChange={this.props.toggleRefreshReadings} />
-							Refresh Readings
+							<FormattedMessage id='csv.readings.param.refresh.readings' />
 						</Label>
 					</FormGroup>
 					<FormGroup check style={checkboxStyle}>
 						<Label check>
 							<Input checked={this.props.update} type='checkbox' name='update' onChange={this.props.toggleUpdate} />
-							Update
+							<FormattedMessage id='csv.common.param.update' />
 						</Label>
 					</FormGroup>
-					<Button type='submit'> Submit CSV Data </Button>
+					<Button type='submit'> 
+						<FormattedMessage id='csv.submit.button'/>
+					</Button>
 				</Form>
 			</div>
 		)
