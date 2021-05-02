@@ -27,7 +27,10 @@ const { CSVPipelineError } = require('../services/csvPipeline/CustomErrors');
 // Config so that multer stores the uploaded file to disk rather than to memory.
 const storage = multer.diskStorage({
 	destination: function (req, file, cb) {
-		cb(null, `${__dirname}/../tmp/uploads/csvPipeline`)
+		const path = `${__dirname}/../tmp/uploads/csvPipeline`;
+		fs.mkdirSync(path, { recursive: true }); // creates directory if not exists
+
+		cb(null, path);
 	},
 	filename: function (req, file, cb) {
 
@@ -36,7 +39,7 @@ const storage = multer.diskStorage({
 		let extension = extArray[extArray.length - 1];
 
 		// Save file with original name
-		cb(null, file.originalname + '-' + Date.now() + '.' + extension)
+		cb(null, file.originalname + '-' + Date.now() + '.' + extension);
 	}
 })
 
