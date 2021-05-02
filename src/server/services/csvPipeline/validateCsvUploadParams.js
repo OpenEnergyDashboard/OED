@@ -2,10 +2,12 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
 
-const failure = require('../services/csvPipeline/failure');
+const { CSVPipelineError } = require('./CustomErrors');
+const { Param, EnumParam, BooleanParam, StringParam } = require('./ValidationSchemas');
+const failure = require('./failure');
 const validate = require('jsonschema').validate;
-const { CSVPipelineError } = require('../services/csvPipeline/CustomErrors');
 
+// These are the default values of CSV Pipeline upload parameters.
 const DEFAULTS = {
 	common: {
 		gzip: 'true',
@@ -20,53 +22,6 @@ const DEFAULTS = {
 		cumulativeReset: 'false',
 		duplications: '1',
 		timeSort: 'increasing'
-	}
-}
-
-class Param {
-	/**
-	 * @param {string} paramName - The name of the parameter.
-	 * @param {string} description - The description of what the parameter needs to be.
-	 */
-	constructor(paramName, description) {
-		this.field = paramName;
-		this.description = description;
-		this.message = function (provided) {
-			return `Provided value ${this.field}=${provided} is invalid. ${this.description}`
-		}
-	}
-}
-
-class EnumParam extends Param {
-	/**
-	 * @param {string} paramName - The name of the parameter
-	 * @param {array} enums - The array of values to check against. enums.length must be greater or equal to one.
-	 */
-	constructor(paramName, enums) {
-		super(paramName, `${paramName} can ${enums.length > 1 ? 'be one of' : 'be'} ${enums.toString()}.`);
-		this.enum = enums;
-	}
-}
-class BooleanParam extends EnumParam {
-	/**
-	 * @param {string} paramName - The name of the parameter.
-	 */
-	constructor(paramName) {
-		super(paramName, ['true', 'false']);
-	}
-}
-
-class StringParam extends Param {
-	/**
-	 * 
-	 * @param {string} paramName - The name of the parameter.
-	 * @param {string} pattern - Regular expression pattern to be used in validation. This can be undefined to avoid checking.
-	 * @param {string} description - The description of what the parameter needs to be.
-	 */
-	constructor(paramName, pattern, description) {
-		super(paramName, description);
-		this.pattern = pattern;
-		this.type = 'string';
 	}
 }
 
@@ -97,7 +52,7 @@ const VALIDATION = {
 			meterName: new StringParam('meterName', undefined, undefined),
 			timeSort: new EnumParam('timeSort', ['increasing'])
 		},
-		additionalProperties: false // This protects us from unintended parameters.
+		additionalProperties: false // This protects us from unintended parameters as well as typos.
 	}
 }
 
@@ -131,13 +86,17 @@ function validateRequestParams(body, schema) {
 }
 
 function validateReadingsCsvUploadParams(req, res, next) {
+	// Validate the parameters of the request. Failure out if there are any unintended mistakes such as additional parameters and typos.
 	const { responseMessage, success } = validateRequestParams(req.body, VALIDATION.readings);
 	if (!success) {
 		failure(req, res, new CSVPipelineError(responseMessage));
 		return;
 	}
+
 	const { createMeter, cumulative, duplications,
 		gzip, headerRow, timeSort, update } = req.body; // extract query parameters
+
+	// Set default values of not supplied parameters.
 	if (!createMeter) {
 		req.body.createMeter = DEFAULTS.readings.createMeter;
 	}
@@ -163,12 +122,16 @@ function validateReadingsCsvUploadParams(req, res, next) {
 }
 
 function validateMetersCsvUploadParams(req, res, next) {
+	// Validate the parameters of the request. Failure out if there are any unintended mistakes such as additional parameters and typos.
 	const { responseMessage, success } = validateRequestParams(req.body, VALIDATION.meters);
 	if (!success) {
 		failure(req, res, new CSVPipelineError(responseMessage));
 		return;
 	}
-	const { gzip, headerRow, update } = req.body; // extract query parameters
+
+	const { gzip, headerRow, update } = req.body; // Extract query parameters
+
+	// Set default values of not supplied parameters.
 	if (!gzip) {
 		req.body.gzip = DEFAULTS.common.gzip;
 	}
@@ -176,7 +139,7 @@ function validateMetersCsvUploadParams(req, res, next) {
 		req.body.headerRow = DEFAULTS.common.headerRow;
 	}
 	if (!update) {
-		req.body.update = DEFAULTS.common.update; // set default update param if not supplied
+		req.body.update = DEFAULTS.common.update;
 	}
 	next();
 }

@@ -8,6 +8,7 @@
  */
 
 const express = require('express');
+const router = express.Router();
 const failure = require('../services/csvPipeline/failure');
 const { getConnection } = require('../db');
 const { log } = require('../log');
@@ -20,7 +21,7 @@ const uploadReadings = require('../services/csvPipeline/uploadReadings');
 const zlib = require('zlib');
 
 /** Middleware validation */
-const { validateMetersCsvUploadParams, validateReadingsCsvUploadParams } = require('../middleware/validateCsvUploadParams');
+const { validateMetersCsvUploadParams, validateReadingsCsvUploadParams } = require('../services/csvPipeline/validateCsvUploadParams');
 const validatePassword = require('../middleware/validatePassword');
 const { CSVPipelineError } = require('../services/csvPipeline/CustomErrors');
 
@@ -43,6 +44,7 @@ const storage = multer.diskStorage({
 	}
 })
 
+// Multer Config
 const upload = multer({
 	storage: storage,
 	// This filter stop form processing if supplied password is invalid. 
@@ -64,9 +66,8 @@ const upload = multer({
 	}
 }).single('csvfile');
 
-const router = express.Router();
-
-router.use(function (req, res, next) { // Process form data with multer, if password check fails then the request ends with failure.
+// Set router to use multer
+router.use(function (req, res, next) {
 	upload(req, res, function (err) {
 		if (err) {
 			failure(req, res, err);
@@ -106,7 +107,6 @@ router.post('/readings', validateReadingsCsvUploadParams, async (req, res) => {
 	try {
 		let fileBuffer = fs.readFileSync(req.file.path);
 		if (req.body.gzip === 'true') {
-			// fileBuffer = zlib.gunzipSync(fileBuffer);
 			fileBuffer = zlib.gunzipSync(fileBuffer);
 		}
 		const filepath = await saveCsv(fileBuffer, 'meters');
