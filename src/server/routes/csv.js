@@ -70,6 +70,8 @@ router.use(function (req, res, next) {
 					const verifiedUser = await verifyCredentials(email, password, true);
 					if(verifiedUser){
 						isUserAuthorized(verifiedUser, csvRole) ? cb(null, true): cb(new Error('Invalid credentials'));
+					} else {
+						cb(new Error('Invalid credentials'));
 					}
 				}
 			} catch (error) {
