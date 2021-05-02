@@ -4,6 +4,7 @@
 
 const failure = require('../services/csvPipeline/failure');
 const validate = require('jsonschema').validate;
+const { CSVPipelineError } = require('../services/csvPipeline/CustomErrors');
 
 const DEFAULTS = {
 	common: {
@@ -132,7 +133,7 @@ function validateRequestParams(body, schema) {
 function validateReadingsCsvUploadParams(req, res, next) {
 	const { responseMessage, success } = validateRequestParams(req.body, VALIDATION.readings);
 	if (!success) {
-		failure(req, res, new Error(responseMessage));
+		failure(req, res, new CSVPipelineError(responseMessage));
 		return;
 	}
 	const { createMeter, cumulative, duplications,
@@ -164,7 +165,7 @@ function validateReadingsCsvUploadParams(req, res, next) {
 function validateMetersCsvUploadParams(req, res, next) {
 	const { responseMessage, success } = validateRequestParams(req.body, VALIDATION.meters);
 	if (!success) {
-		failure(req, res, new Error(responseMessage));
+		failure(req, res, new CSVPipelineError(responseMessage));
 		return;
 	}
 	const { gzip, headerRow, update } = req.body; // extract query parameters

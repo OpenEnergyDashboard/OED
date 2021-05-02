@@ -12,6 +12,7 @@ const failure = require('../services/csvPipeline/failure');
 const { getConnection } = require('../db');
 const { log } = require('../log');
 const { csvAuthMiddleware } = require('./authenticator');
+const fs = require('fs');
 const multer = require('multer');
 const saveCsv = require('../services/csvPipeline/saveCsv');
 const uploadMeters = require('../services/csvPipeline/uploadMeters');
@@ -23,11 +24,27 @@ const { validateMetersCsvUploadParams, validateReadingsCsvUploadParams } = requi
 const validatePassword = require('../middleware/validatePassword');
 const { CSVPipelineError } = require('../services/csvPipeline/CustomErrors');
 
-// The upload here ensures that the file is saved to server RAM rather than disk; TODO: Think about large uploads
+// Config so that multer stores the uploaded file to disk rather than to memory.
+const storage = multer.diskStorage({
+	destination: function (req, file, cb) {
+		cb(null, `${__dirname}/../tmp/uploads/csvPipeline`)
+	},
+	filename: function (req, file, cb) {
+
+		// Get the file extension.
+		let extArray = file.mimetype.split('/');
+		let extension = extArray[extArray.length - 1];
+
+		// Save file with original name
+		cb(null, file.originalname + '-' + Date.now() + '.' + extension)
+	}
+})
+
 const upload = multer({
-	storage: multer.memoryStorage(),
+	storage: storage,
 	// This filter stop form processing if supplied password is invalid. 
-	// The password param was precede the file on upload so that multer will have processed the form by the time this filter is called on a file.
+	// The password param needs to precede the file when uploading so that 
+	// multer will have processed the form by the time this filter is called on a file.
 	fileFilter: async function (req, file, cb) {
 		try {
 			req.body.password = 'password'; // for testing purposes all requests will be accepted.
@@ -56,8 +73,8 @@ router.use(function (req, res, next) { // Process form data with multer, if pass
 	})
 });
 
-router.use(function(req, res, next){ // This ensures that at least one csv file has been submitted.
-	if(!req.file){
+router.use(function (req, res, next) { // This ensures that at least one csv file has been submitted.
+	if (!req.file) {
 		failure(req, res, new CSVPipelineError('No csv file was uploaded. A csv file must be submitted via the csvfile parameter.'));
 	} else {
 		// TODO: For now we assume canonical csv structure. In the future we will have to validate csv files via headers.
@@ -65,15 +82,12 @@ router.use(function(req, res, next){ // This ensures that at least one csv file 
 	}
 });
 
-// TODO: we need to sanitize req query params, res
-
-router.post('/meters', csvAuthMiddleware('upload meters'), validateMetersCsvUploadParams, async (req, res) => {
+// router.post('/meters', csvAuthMiddleware('upload meters'), validateMetersCsvUploadParams, async (req, res) => {
+router.post('/meters', validateMetersCsvUploadParams, async (req, res) => {
 	try {
-		let fileBuffer;
-		if(req.body.gzip === 'true'){
-			fileBuffer = zlib.gunzipSync(req.file.buffer);
-		} else {
-			fileBuffer = req.file.buffer;
+		let fileBuffer = fs.readFileSync(req.file.path);
+		if (req.body.gzip === 'true') {
+			fileBuffer = zlib.gunzipSync(fileBuffer);
 		}
 		const filepath = await saveCsv(fileBuffer, 'meters');
 		log.info(`The file ${filepath} was created to upload meters csv data`);
@@ -84,13 +98,13 @@ router.post('/meters', csvAuthMiddleware('upload meters'), validateMetersCsvUplo
 	}
 });
 
-router.post('/readings', csvAuthMiddleware('upload readings'), validateReadingsCsvUploadParams, async (req, res) => {
+// router.post('/readings', csvAuthMiddleware('upload readings'), validateReadingsCsvUploadParams, async (req, res) => {
+router.post('/readings', validateReadingsCsvUploadParams, async (req, res) => {
 	try {
-		let fileBuffer;
-		if(req.body.gzip === 'true'){
-			fileBuffer = zlib.gunzipSync(req.file.buffer);
-		} else {
-			fileBuffer = req.file.buffer;
+		let fileBuffer = fs.readFileSync(req.file.path);
+		if (req.body.gzip === 'true') {
+			// fileBuffer = zlib.gunzipSync(fileBuffer);
+			fileBuffer = zlib.gunzipSync(fileBuffer);
 		}
 		const filepath = await saveCsv(fileBuffer, 'meters');
 		log.info(`The file ${filepath} was created to upload readings csv data`);
