@@ -21,7 +21,12 @@ const DEFAULTS = {
 		createMeter: 'false',
 		cumulative: 'false',
 		cumulativeReset: 'false',
+		cumulativeResetStart: '0:00:00',
+		cumulativeResetEnd: '23:59:59',
 		duplications: '1',
+		length: '',
+		lengthVariation: '',
+		refreshReadings: 'false',
 		timeSort: 'increasing'
 	}
 }
@@ -52,8 +57,13 @@ const VALIDATION = {
 			createMeter: new BooleanParam('createMeter'),
 			cumulative: new BooleanParam('cumulative'),
 			cumulativeReset: new BooleanParam('cumulativeReset'),
+			cumulativeResetStart: new StringParam('cumulativeResetStart', undefined, undefined),
+			cumulativeResetEnd: new StringParam('cumulativeResetEnd', undefined, undefined),
 			duplications: new StringParam('duplications', '^\\d+$', 'duplications must be an integer.'),
 			meterName: new StringParam('meterName', undefined, undefined),
+			length: new StringParam('length', undefined, undefined),
+			lengthVariation: new StringParam('lengthVariation', undefined, undefined),
+			refreshReadings: new BooleanParam('refreshReadings'),
 			timeSort: new EnumParam('timeSort', ['increasing'])
 		},
 		additionalProperties: false // This protects us from unintended parameters as well as typos.

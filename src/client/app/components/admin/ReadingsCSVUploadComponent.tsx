@@ -61,6 +61,26 @@ export default class ReadingsCSVUploadComponent extends React.Component<Readings
 		this.props.setMeterName(target.value);
 	}
 
+	private handleSetCumulativeResetStart(e: React.ChangeEvent<HTMLInputElement>) {
+		const target = e.target;
+		this.props.setCumulativeResetStart(target.value);
+	}
+
+	private handleSetCumulativeResetEnd(e: React.ChangeEvent<HTMLInputElement>) {
+		const target = e.target;
+		this.props.setCumulativeResetEnd(target.value);
+	}
+
+	private handleSetLength(e: React.ChangeEvent<HTMLInputElement>) {
+		const target = e.target;
+		this.props.setLength(target.value);
+	}
+
+	private handleSetLengthVariation(e: React.ChangeEvent<HTMLInputElement>) {
+		const target = e.target;
+		this.props.setLengthVariation(target.value);
+	}
+
 	public render() {
 		const titleStyle: React.CSSProperties = {
 			fontWeight: 'bold',
@@ -111,22 +131,68 @@ export default class ReadingsCSVUploadComponent extends React.Component<Readings
 						</Col>
 					</FormGroup>
 					<FormFileUploaderComponent buttonText='Upload Readings CSV' reference={this.fileInput} required labelStyle={titleStyle} />
+					<FormGroup>
+						<Label style={titleStyle}>
+							Cumulative Data
+						</Label>
+						<Col sm={8}>
+							<FormGroup check style={checkboxStyle}>
+								<Label check>
+									<Input checked={this.props.cumulative} type='checkbox' name='cumulative' onChange={this.props.toggleCumulative} />
+									Cumulative
+								</Label>
+							</FormGroup>
+							<FormGroup check style={checkboxStyle}>
+								<Label check>
+									<Input checked={this.props.cumulativeReset} type='checkbox' name='cumulativeReset' onChange={this.props.toggleCumulativeReset} />
+									Cumulative Reset
+								</Label>
+							</FormGroup>
+							<FormGroup>
+								<Label style={titleStyle}>
+									Cumulative Reset Start
+								</Label>
+								<Col sm={8}>
+									<Input value={this.props.cumulativeResetStart} name='cumulativeResetStart' onChange={this.handleSetCumulativeResetStart} />
+								</Col>
+							</FormGroup>
+							<FormGroup>
+								<Label style={titleStyle}>
+									Cumulative Reset End
+								</Label>
+								<Col sm={8}>
+									<Input value={this.props.cumulativeResetEnd} name='cumulativeResetEnd' onChange={this.handleSetCumulativeResetEnd} />
+								</Col>
+							</FormGroup>
+						</Col>
+					</FormGroup>
+					<FormGroup>
+						<Label style={titleStyle}>
+							Time Gaps
+						</Label>
+						<Col sm={8}>
+							<FormGroup>
+								<Label style={titleStyle}>
+									Length
+								</Label>
+								<Col sm={8}>
+									<Input value={this.props.length} name='length' onChange={this.handleSetLength} />
+								</Col>
+							</FormGroup>
+							<FormGroup>
+								<Label style={titleStyle}>
+									Length Variation
+								</Label>
+								<Col sm={8}>
+									<Input value={this.props.cumulativeResetEnd} name='lengthVariation' onChange={this.handleSetLengthVariation} />
+								</Col>
+							</FormGroup>
+						</Col>
+					</FormGroup>
 					<FormGroup check style={checkboxStyle}>
 						<Label check>
 							<Input checked={this.props.createMeter} type='checkbox' name='createMeter' onChange={this.props.toggleCreateMeter} />
 							Create Meter
-						</Label>
-					</FormGroup>
-					<FormGroup check style={checkboxStyle}>
-						<Label check>
-							<Input checked={this.props.cumulative} type='checkbox' name='cumulative' onChange={this.props.toggleCumulative} />
-							Cumulative
-						</Label>
-					</FormGroup>
-					<FormGroup check style={checkboxStyle}>
-						<Label check>
-							<Input checked={this.props.cumulativeReset} type='checkbox' name='cumulativeReset' onChange={this.props.toggleCumulativeReset} />
-							Cumulative Reset
 						</Label>
 					</FormGroup>
 					<FormGroup check style={checkboxStyle}>
@@ -139,6 +205,12 @@ export default class ReadingsCSVUploadComponent extends React.Component<Readings
 						<Label check>
 							<Input checked={this.props.headerRow} type='checkbox' name='headerRow' onChange={this.props.toggleHeaderRow} />
 							Header Row
+						</Label>
+					</FormGroup>
+					<FormGroup check style={checkboxStyle}>
+						<Label check>
+							<Input checked={this.props.refreshReadings} type='checkbox' name='refreshReadings' onChange={this.props.toggleRefreshReadings} />
+							Refresh Readings
 						</Label>
 					</FormGroup>
 					<FormGroup check style={checkboxStyle}>
