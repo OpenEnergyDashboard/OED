@@ -5,7 +5,7 @@
 import * as React from 'react';
 import { Button, Input, Form, FormGroup, Label } from 'reactstrap';
 import { MetersCSVUploadProps } from '../../types/csvUploadForm';
-import { showErrorNotification } from '../../utils/notifications';
+import { showErrorNotification, showSuccessNotification } from '../../utils/notifications';
 import FormFileUploaderComponent from '../FormFileUploaderComponent';
 import translate from '../../utils/translate';
 import { FormattedMessage } from 'react-intl';
@@ -25,9 +25,8 @@ export default class MetersCSVUploadComponent extends React.Component<MetersCSVU
 			const current = this.fileInput.current as HTMLInputElement;
 			const { files } = current;
 			if (files && (files as FileList).length !== 0) {
-				const res = await this.props.submitCSV(files[0]);
-				console.log(res);
-				// Respond to success.
+				await this.props.submitCSV(files[0]);
+				showSuccessNotification(translate('csv.success.upload.meters'));
 			}
 		} catch (error) {
 			// A failed axios request should result in an error.
@@ -71,10 +70,10 @@ export default class MetersCSVUploadComponent extends React.Component<MetersCSVU
 						<Label check>
 							<Input checked={this.props.update} type='checkbox' name='update' onChange={this.props.toggleUpdate} />
 							<FormattedMessage id='csv.common.param.update' />
-							</Label>
+						</Label>
 					</FormGroup>
-					<Button type='submit'> 
-						<FormattedMessage id='csv.submit.button'/>
+					<Button type='submit'>
+						<FormattedMessage id='csv.submit.button' />
 					</Button>
 				</Form>
 			</div>

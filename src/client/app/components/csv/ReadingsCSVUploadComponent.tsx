@@ -5,7 +5,7 @@
 import * as React from 'react';
 import { Button, Col, Input, Form, FormGroup, Label } from 'reactstrap';
 import { ReadingsCSVUploadProps, TimeSortTypes } from '../../types/csvUploadForm';
-import { showErrorNotification } from '../../utils/notifications';
+import { showErrorNotification, showSuccessNotification } from '../../utils/notifications';
 import FormFileUploaderComponent from '../FormFileUploaderComponent';
 import translate from '../../utils/translate';
 import { FormattedMessage } from 'react-intl';
@@ -36,9 +36,8 @@ export default class ReadingsCSVUploadComponent extends React.Component<Readings
 			const current = this.fileInput.current as HTMLInputElement;
 			const { files } = current;
 			if (files && (files as FileList).length !== 0) {
-				const res = await this.props.submitCSV(files[0]);
-				console.log(res);
-				// Respond to success.
+				await this.props.submitCSV(files[0]);
+				showSuccessNotification(translate('csv.success.upload.readings'));
 			}
 		} catch (error) {
 			// A failed axios request should result in an error.
@@ -133,24 +132,24 @@ export default class ReadingsCSVUploadComponent extends React.Component<Readings
 					<FormFileUploaderComponent formText='csv.upload.readings' reference={this.fileInput} required labelStyle={titleStyle} />
 					<FormGroup>
 						<Label style={titleStyle}>
-							<FormattedMessage id='csv.readings.section.cumulative.data'/>
+							<FormattedMessage id='csv.readings.section.cumulative.data' />
 						</Label>
 						<Col sm={8}>
 							<FormGroup check style={checkboxStyle}>
 								<Label check>
 									<Input checked={this.props.cumulative} type='checkbox' name='cumulative' onChange={this.props.toggleCumulative} />
-									<FormattedMessage id='csv.readings.param.cumulative'/>
+									<FormattedMessage id='csv.readings.param.cumulative' />
 								</Label>
 							</FormGroup>
 							<FormGroup check style={checkboxStyle}>
 								<Label check>
 									<Input checked={this.props.cumulativeReset} type='checkbox' name='cumulativeReset' onChange={this.props.toggleCumulativeReset} />
-									<FormattedMessage id='csv.readings.param.cumulative.reset'/>
+									<FormattedMessage id='csv.readings.param.cumulative.reset' />
 								</Label>
 							</FormGroup>
 							<FormGroup>
 								<Label style={titleStyle}>
-									<FormattedMessage id='csv.readings.param.cumulative.reset.start'/>
+									<FormattedMessage id='csv.readings.param.cumulative.reset.start' />
 								</Label>
 								<Col sm={8}>
 									<Input value={this.props.cumulativeResetStart} name='cumulativeResetStart' onChange={this.handleSetCumulativeResetStart} />
@@ -158,7 +157,7 @@ export default class ReadingsCSVUploadComponent extends React.Component<Readings
 							</FormGroup>
 							<FormGroup>
 								<Label style={titleStyle}>
-									<FormattedMessage id='csv.readings.param.cumulative.reset.end'/>
+									<FormattedMessage id='csv.readings.param.cumulative.reset.end' />
 								</Label>
 								<Col sm={8}>
 									<Input value={this.props.cumulativeResetEnd} name='cumulativeResetEnd' onChange={this.handleSetCumulativeResetEnd} />
@@ -168,12 +167,12 @@ export default class ReadingsCSVUploadComponent extends React.Component<Readings
 					</FormGroup>
 					<FormGroup>
 						<Label style={titleStyle}>
-							<FormattedMessage id='csv.readings.section.time.gaps'/>
+							<FormattedMessage id='csv.readings.section.time.gaps' />
 						</Label>
 						<Col sm={8}>
 							<FormGroup>
 								<Label style={titleStyle}>
-									<FormattedMessage id='csv.readings.param.length'/>
+									<FormattedMessage id='csv.readings.param.length' />
 								</Label>
 								<Col sm={8}>
 									<Input value={this.props.length} name='length' onChange={this.handleSetLength} />
@@ -219,8 +218,8 @@ export default class ReadingsCSVUploadComponent extends React.Component<Readings
 							<FormattedMessage id='csv.common.param.update' />
 						</Label>
 					</FormGroup>
-					<Button type='submit'> 
-						<FormattedMessage id='csv.submit.button'/>
+					<Button type='submit'>
+						<FormattedMessage id='csv.submit.button' />
 					</Button>
 				</Form>
 			</div>

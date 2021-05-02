@@ -235,12 +235,12 @@ export default class UploadCSVContainer extends React.Component<{}, UploadCSVCon
 				<HeaderContainer />
 				<Nav tabs style={{ display: 'flex', justifyContent: 'center' }}>
 					<NavItem style={navStyle}>
-						<NavLink onClick={() => this.toggleTab(MODE.readings)}> 
+						<NavLink onClick={() => this.toggleTab(MODE.readings)}>
 							<FormattedMessage id='csv.tab.readings'/>
 						</NavLink>
 					</NavItem>
 					<NavItem style={navStyle}>
-						<NavLink onClick={() => this.toggleTab(MODE.meters)}> 
+						<NavLink onClick={() => this.toggleTab(MODE.meters)}>
 							<FormattedMessage id='csv.tab.meters'/>
 						</NavLink>
 					</NavItem>
