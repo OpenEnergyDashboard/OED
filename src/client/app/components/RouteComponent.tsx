@@ -32,7 +32,7 @@ import CreateUserContainer from '../containers/admin/CreateUserContainer';
 import { TimeInterval } from '../../../common/TimeInterval';
 import MapsDetailContainer from '../containers/maps/MapsDetailContainer';
 import MapCalibrationContainer from '../containers/maps/MapCalibrationContainer';
-import UploadCSVContainer from '../containers/admin/UploadCSVContainer';
+import UploadCSVContainer from '../containers/csv/UploadCSVContainer';
 import { UserRole } from '../types/items';
 import { hasPermissions } from '../utils/hasPermissions';
 
