@@ -30,7 +30,8 @@ const zippedMetersWithHeaderBuffer = zlib.gzipSync(metersWithHeaderBuffer);
 mocha.describe('csv API', () => {
 	mocha.it('should be able to accept a post request to upload meter data.', async () => {
 		const res = await chai.request(app).post(UPLOAD_METERS_ROUTE)
-			.field('password', 'password')
+			.field('email', testUser.email)
+			.field('password', testUser.password)
 			.attach('csvfile', zippedMetersBuffer, `${readingsPath}.gz`)
 
 		expect(res).to.have.status(200);
@@ -49,7 +50,8 @@ mocha.describe('csv API', () => {
 	});
 	mocha.it('should be able to accept a post request to upload meter data with header row.', async () => {
 		const res = await chai.request(app).post(UPLOAD_METERS_ROUTE)
-			.field('password', 'password')
+			.field('email', testUser.email)
+			.field('password', testUser.password)
 			.field('headerRow', 'true')
 			.attach('csvfile', zippedMetersWithHeaderBuffer, `${metersPathWithHeader}.gz`)
 		expect(res).to.have.status(200);
@@ -71,7 +73,8 @@ mocha.describe('csv API', () => {
 		const meter = new Meter(undefined, 'XXX', undefined, false, false, Meter.type.MAMAC, 'XXX')
 		await meter.insert(conn); // insert meter
 		const res = await chai.request(app).post(UPLOAD_READINGS_ROUTE) // make request to api to upload readings data for this meter
-			.field('password', 'password')
+			.field('email', testUser.email)
+			.field('password', testUser.password)
 			.field('meterName', 'XXX')
 			.field('timeSort', 'increasing')
 			.attach('csvfile', zippedReadingsBuffer, `${readingsPath}.gz`)
@@ -87,7 +90,8 @@ mocha.describe('csv API', () => {
 	mocha.it('should be able to load readings data for a non existing meter.', async () => {
 		const conn = testDB.getConnection();
 		const res = await chai.request(app).post(UPLOAD_READINGS_ROUTE) // make request to api to upload readings data for this meter
-			.field('password', 'password')
+			.field('email', testUser.email)
+			.field('password', testUser.password)
 			.field('createMeter', 'true')
 			.field('meterName', 'ABG')
 			.field('timeSort', 'increasing')
