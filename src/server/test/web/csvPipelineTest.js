@@ -17,13 +17,13 @@ const UPLOAD_METERS_ROUTE = '/api/csv/meters';
 const UPLOAD_READINGS_ROUTE = '/api/csv/readings';
 
 // File buffers for testing
-const readingsPath = './sampleReadings.csv';
+const readingsPath = './csvPipeline/sampleReadings.csv';
 const readingsBuffer = fs.readFileSync(readingsPath);
 const zippedReadingsBuffer = zlib.gzipSync(readingsBuffer);
-const metersPath = './sampleMeters.csv';
+const metersPath = './csvPipeline/sampleMeters.csv';
 const metersBuffer = fs.readFileSync(metersPath);
 const zippedMetersBuffer = zlib.gzipSync(metersBuffer);
-const metersPathWithHeader = './sampleMetersWithHeader.csv';
+const metersPathWithHeader = './csvPipeline/sampleMetersWithHeader.csv';
 const metersWithHeaderBuffer = fs.readFileSync(metersPathWithHeader);
 const zippedMetersWithHeaderBuffer = zlib.gzipSync(metersWithHeaderBuffer);
 
