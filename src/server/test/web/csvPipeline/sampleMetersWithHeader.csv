@@ -1,4 +1,4 @@
-name,ipaddress,enabled,displayable,type,identifier
-XXX,123.45.6.0,FALSE,TRUE,mamac,XXX
-POPO,123.45.6.0,FALSE,TRUE,mamac,XXX
-HOPO,123.45.6.0,FALSE,TRUE,mamac,XXX
+name,ipaddress,enabled,displayable,type,timezone,gps,identifier
+XXX,123.45.6.0,FALSE,TRUE,mamac,,,test1
+POPO,123.45.6.0,FALSE,TRUE,mamac,,,test2
+HOPO,123.45.6.0,FALSE,TRUE,mamac,,,test3

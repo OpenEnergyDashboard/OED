@@ -20,18 +20,20 @@ const readCsv = require('../pipeline-in-progress/readCsv');
  */
 async function uploadMeters(req, res, filepath, conn) {
 	try {
-		const columns = Object.keys(new Meter()).slice(1); // used for the shape of the csv
+		// const columns = Object.keys(new Meter()).slice(1); // used for the shape of the csv
 		const temp = (await readCsv(filepath)).map(row => {
-			const hash = {};
-			columns.forEach((entry, idx) => {
-				hash[entry] = row[idx];
-			});
-			return hash;
+			// The Canonical structure of each row in the Meters CSV file is the order of the fields 
+			// declared in the Meter constructor. If no headerRow is provided (i.e. headerRow === false),
+			// then we assume that the uploaded CSV file follows this Canonical structure.
+			
+			// For now, we do not use the header row to remap the ordering of the columns.
+			// To Do: Use header row to remap the indices to fit the Meter constructor
+			return row.map(val => val === '' ? undefined : val);
 		});
+
 		const meters = (req.body.headerRow === 'true') ? temp.slice(1) : temp;
 		await Promise.all(meters.map(meter => {
-			return (new Meter(undefined, meter.name, meter.ipAddress, meter.enabled === 'TRUE', meter.displayable === 'TRUE', meter.type,
-				meter.identifier)).insert(conn);
+			return (new Meter(undefined, ...meter).insert(conn));
 		}));
 		fs.unlink(filepath)
 			.catch(err => {

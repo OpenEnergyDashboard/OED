@@ -21,6 +21,7 @@ class Meter {
 	 */
 	constructor(id, name, ipAddress, enabled, displayable, type, meterTimezone, gps = undefined, identifier = name) {
 		// In order for the CSV pipeline to work, the order of the parameters needs to match the order that the fields are declared.
+		// In addition, each new parameter has to be added at the very end.
 		this.id = id;
 		this.name = name;
 		this.ipAddress = ipAddress;
