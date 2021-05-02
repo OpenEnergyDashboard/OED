@@ -3,8 +3,8 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
 
 import * as React from 'react';
-import MetersCSVUploadComponent from '../../components/admin/MetersCSVUploadComponent';
-import ReadingsCSVUploadComponent from '../../components/admin/ReadingsCSVUploadComponent';
+import MetersCSVUploadComponent from '../../components/csv/MetersCSVUploadComponent';
+import ReadingsCSVUploadComponent from '../../components/csv/ReadingsCSVUploadComponent';
 import HeaderContainer from '../HeaderContainer';
 import FooterContainer from '../FooterContainer';
 import { uploadCSVApi } from '../../utils/api';

@@ -4,7 +4,7 @@
 
 import * as React from 'react';
 import { Button, Input, Form, FormGroup, Label } from 'reactstrap';
-import { MetersCSVUploadProps } from 'types/csvUploadForm';
+import { MetersCSVUploadProps } from '../../types/csvUploadForm';
 import { showErrorNotification } from '../../utils/notifications';
 import FormFileUploaderComponent from '../FormFileUploaderComponent';
 import translate from '../../utils/translate';
