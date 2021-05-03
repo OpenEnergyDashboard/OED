@@ -19,17 +19,17 @@ class Meter {
 	 * @param meterTimezone Default timezone for meter
 	 * @param identifier Another way to identify a meter
 	 * @param note Note about the meter
-	 * @param area Area of the meter 
-	 * @param cumulative Checks if the reading is a sum of usage or the particular reading
-	 * @param cumulativeReset Tells if the system reset is needed or not
-	 * @param cumulativeResetStart The earliest time of day that a reset can occur
-	 * @param cumulativeResetEnd The latest time of day that a reset can occur
-	 * @param previousDay Checks if the if the reading is of the previous day
-	 * @param readingLength Specifies the time range on every reading in the CSV file
-	 * @param readingVariation +/- time allowed on length to consider within allowed length
-	 * @param reading The value of reading
-	 * @param startTimestamp Start timestamp of reading
-	 * @param endTimestamp  End timestamp of reading 
+	 * @param area Area of the meter default null
+	 * @param cumulative Identifies if meter readings that are stored are the sum of usage or the particular reading, default false
+	 * @param cumulativeReset True if cumulative values can reset back to zero., default false
+	 * @param cumulativeResetStart The earliest time of day that a reset can occur, default '00:00:00'
+	 * @param cumulativeResetEnd The latest time of day that a reset can occur, default '23:59:59'
+	 * @param previousDay Checks if the if the reading is of the previous day, defualt false
+	 * @param readingLength Specifies the time range on every reading in the CSV file, default '00:00:00'
+	 * @param readingVariation +/- time allowed on length to consider within allowed length, default '23:59:59'
+	 * @param reading The value of reading, default 0.0
+	 * @param startTimestamp Start timestamp of reading, default '0001-01-01 00:00:00'
+	 * @param endTimestamp  End timestamp of reading, '0001-01-01 00:00:00' 
 	 */
 	constructor(id, name, ipAddress, enabled, displayable, type, meterTimezone, gps = undefined, identifier = name, note, area,
 		cumulative, cumulativeReset, cumulativeResetStart, cumulativeResetEnd, previousDay, readingLength, readingVariation, reading, 

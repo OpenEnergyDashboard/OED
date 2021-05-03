@@ -7,8 +7,8 @@ CREATE TABLE IF NOT EXISTS groups (
 	name VARCHAR(50) UNIQUE NOT NULL CHECK (char_length(name) >= 1),
 	displayable BOOLEAN,
 	gps POINT DEFAULT NULL,
-	note VARCHAR(500),
-	area FLOAT(8) DEFAULT NULL
+	note TEXT,
+	area REAL DEFAULT NULL
 );
 
 /*

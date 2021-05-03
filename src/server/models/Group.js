@@ -13,9 +13,9 @@ class Group {
 	 * @param id should be undefined when creating a new group
 	 * @param name group's name
 	 * @param displayable The group is available for display
-	 * @param gps Location in format of GIS coordinates
+	 * @param gps Location in format of GIS coordinates, default null
 	 * @param note Note about the group
-	 * @param area Area of the group
+	 * @param area Area of the group, default null
 	 */
 	constructor(id, name, displayable, gps, note, area) {
 		this.id = id;

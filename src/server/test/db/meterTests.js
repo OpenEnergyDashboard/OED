@@ -9,6 +9,7 @@
 const { mocha, expect, testDB } = require('../common');
 const Meter = require('../../models/Meter');
 const Point = require('../../models/Point');
+const moment = require('moment');
 const gps = new Point(90, 45);
 
 /**
@@ -24,6 +25,7 @@ function expectMetersToBeEquivalent(expected, actual) {
 	expect(actual).to.have.property('gps');
 	expect(actual.gps).to.have.property('latitude', expected.gps.latitude);
 	expect(actual.gps).to.have.property('longitude', expected.gps.longitude);
+	expect(actual).to.have.property('meterTimezone', expected.meterTimezone);
 	expect(actual).to.have.property('identifier', expected.identifier);
 	expect(actual).to.have.property('note', expected.note);
 	expect(actual).to.have.property('area', expected.area);
@@ -34,14 +36,17 @@ function expectMetersToBeEquivalent(expected, actual) {
 	expect(actual).to.have.property('previousDay', expected.previousDay);
 	expect(actual).to.have.property('readingLength', expected.readingLength);
 	expect(actual).to.have.property('readingVariation', expected.readingVariation);
+	expect(actual).to.have.property('reading', expected.reading);
+	expect(actual.startTimestamp.isSame(moment('0001-01-01 23:59:59'))).to.equal(true);
+	expect(actual.endTimestamp.isSame(moment('2020-07-02 01:00:10'))).to.equal(true);
 }
 
 mocha.describe('Meters', () => {
 	mocha.it('can be saved and retrieved', async () => {
 		const conn = testDB.getConnection();
 		const meterPreInsert = new Meter(undefined, 'Meter', null, false, true, Meter.type.MAMAC, 'UTC',
-		gps,'IDENTIFIED', 'notess', 33.5, true, true, '05:05:09', '09:00:01', true, '00:00:00', 
-		'00:00:00', 25.5, '0011-05-022 : 23:59:59', '2020-07-02 : 01:00:10' );
+		gps,'Identified', 'notes', 33.5, true, true, '05:05:09', '09:00:01', true, '00:00:00', 
+		'00:00:00', 25.5, '0001-01-01 23:59:59', '2020-07-02 01:00:10');
 		await meterPreInsert.insert(conn);
 		const meterPostInsertByName = await Meter.getByName(meterPreInsert.name, conn);
 		expectMetersToBeEquivalent(meterPreInsert, meterPostInsertByName);
@@ -52,8 +57,8 @@ mocha.describe('Meters', () => {
 	mocha.it('can be saved, edited, and retrieved', async () => {
 		const conn = testDB.getConnection();
 		const meterPreInsert = new Meter(undefined, 'Meter', null, false, true, Meter.type.MAMAC, 'UTC', gps,
-			'Identified 1' ,'Notes', 35.0, true, true, '01:01:25' , '00:00:00', true, '05:00:00','00:00:00', 1.5,
-			'0011-05-22 : 23:59:59', '2020-07-02 : 01:00:10');
+			'Identified' ,'notes', 35.0, true, true, '01:01:25' , '00:00:00', true, '05:00:00','00:00:00', 1.5,
+			'0001-01-01 23:59:59', '2020-07-02 01:00:10');
 		await meterPreInsert.insert(conn);
 		const meterPostInsertByID = await Meter.getByID(meterPreInsert.id, conn);
 		expectMetersToBeEquivalent(meterPreInsert, meterPostInsertByID);
@@ -69,11 +74,11 @@ mocha.describe('Meters', () => {
 	mocha.it('can get only enabled meters', async () => {
 		const conn = testDB.getConnection();
 		const enabledMeter = new Meter(undefined, 'EnabledMeter', null, true, true, Meter.type.MAMAC, null, gps, 
-		'Identified 2', 'Notes', 35.0, true, true, '01:01:25' , '00:00:00', true, '05:00:00','00:00:00', 1.5, 
-		'0011-05-022 : 23:59:59', '2020-07-02 : 01:00:10');
+		'Identified', 'notes', 35.0, true, true, '01:01:25' , '00:00:00', true, '05:00:00','00:00:00', 1.5, 
+		'0001-01-01 23:59:59', '2020-07-02 01:00:10');
 		const disabledMeter = new Meter(undefined, 'DisabledMeter', null, false, true, Meter.type.MAMAC, null, gps,
-		'Identified 3' ,'Notes', 35.0, true, true, '01:01:25' , '00:00:00', true, '05:00:00','00:00:00', 1.5, 
-		'0011-05-022 : 23:59:59', '2020-07-02 : 01:00:10');
+		'Identified 1' ,'Notes 1', 35.0, true, true, '01:01:25' , '00:00:00', true, '05:00:00','00:00:00', 1.5, 
+		'0002-01-01 23:59:59', '2020-07-02 01:00:10');
 		await enabledMeter.insert(conn);
 		await disabledMeter.insert(conn);
 
@@ -85,11 +90,11 @@ mocha.describe('Meters', () => {
 	mocha.it('can get only visible meters', async () => {
 		const conn = testDB.getConnection();
 		const visibleMeter = new Meter(undefined, 'VisibleMeter', null, true, true, Meter.type.MAMAC, null, gps, 
-		'Identified 4' ,'Notes', 35.0, true, true, '01:01:25' , '00:00:00', true, '05:00:00','00:00:00', 1.5, 
-		'0011-05-022 : 23:59:59', '2020-07-02 : 01:00:10');
+		'Identified 1' ,'notes 1', 35.0, true, true, '01:01:25' , '00:00:00', true, '05:00:00','00:00:00', 1.5, 
+		'0001-01-01 23:59:59', '2020-07-02 01:00:10');
 		const invisibleMeter = new Meter(undefined, 'InvisibleMeter', null, true, false, Meter.type.MAMAC, null, gps, 
-		'Identified 5' ,'Notes', 35.0, true, true, '01:01:25' , '00:00:00', true, '05:00:00','00:00:00', 1.5, 
-		'0011-05-022 : 23:59:59', '2020-07-02 : 01:00:10');
+		'Identified 2' ,'Notes 2', 35.0, true, true, '01:01:25' , '00:00:00', true, '05:00:00','00:00:00', 1.5, 
+		'0002-01-01 23:59:59', '2020-07-02 01:00:10');
 
 		await visibleMeter.insert(conn);
 		await invisibleMeter.insert(conn);

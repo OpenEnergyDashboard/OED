@@ -37,7 +37,7 @@ mocha.describe('Maps', () => {
 		const conn = testDB.getConnection();
 		const origin = new Point(0.000001, 0.000001);
 		const opposite = new Point(100.000001, 100.000001);
-		const mapPreInsert = new Map(undefined, 'Map', false, null, 'default', moment('2000-10-10'), origin, opposite, 'placeholder', 22.5, 10.5);
+		const mapPreInsert = new Map(undefined, 'Map', false, null, 'default', moment('2000-10-10'), origin, opposite, 'placeholder', 22.5, 0.2);
 		await mapPreInsert.insert(conn);
 		const mapPostInsertByName = await Map.getByName(mapPreInsert.name, conn);
 		expectMapsToBeEquivalent(mapPreInsert, mapPostInsertByName);

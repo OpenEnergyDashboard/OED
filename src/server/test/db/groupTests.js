@@ -11,19 +11,19 @@ const Point = require('../../models/Point');
 const gps = new Point(90, 45);
 
 async function setupGroupsAndMeters(conn) {
-	const groupA = new Group(undefined, 'A', true, gps, 'notes', 33.5);
-	const groupB = new Group(undefined, 'B', false, gps, 'notes 2', 43.5);
-	const groupC = new Group(undefined, 'C', true, gps, 'notes 3', 53.5);
+	const groupA = new Group(undefined, 'A', true, gps, 'notes A', 33.5);
+	const groupB = new Group(undefined, 'B', false, gps, 'notes B', 43.5);
+	const groupC = new Group(undefined, 'C', true, gps, 'notes C', 53.5);
 	await Promise.all([groupA, groupB, groupC].map(group => group.insert(conn)));
 	const meterA = new Meter(undefined, 'A', null, false, true, Meter.type.MAMAC, null, gps, 
-	'Identified 1' ,'Notes', 35.0, true, true, '01:01:25' , '00:00:00', true, '05:00:00','00:00:00', 1.5,
-	'0011-05-22 : 23:59:59', '2020-07-02 : 01:00:10');
+	'Identified A' ,'notes A', 35.0, true, true, '01:01:25' , '00:00:00', true, '05:00:00','00:00:00', 1.5,
+	'0001-01-01 23:59:59', '2020-07-02 01:00:10');
 	const meterB = new Meter(undefined, 'B', null, false, true, Meter.type.MAMAC, null, gps,
-	'IDENTIFIED', 'notess', 33.5, true, true, '05:05:09', '09:00:01', true, '00:00:00', 
-	'00:00:00', 25.5, '0011-05-022 : 23:59:59', '2020-07-02 : 01:00:10');
+	'IDENTIFIED B', 'notes B', 33.5, true, true, '05:05:09', '09:00:01', true, '00:00:00', 
+	'00:00:00', 25.5, '0002-01-01 23:59:59', '2020-07-02 01:00:10');
 	const meterC = new Meter(undefined, 'C', null, false, true, Meter.type.METASYS, null, gps,
-	'IDENTIFIED 2', 'notess', 33.5, true, true, '05:05:09', '09:00:01', true, '00:00:00', 
-	'00:00:00', 25.5, '0011-05-022 : 23:59:59', '2020-07-02 : 01:00:10');
+	'IDENTIFIED C', 'notes C', 33.5, true, true, '05:05:09', '09:00:01', true, '00:00:00', 
+	'00:00:00', 25.5, '0003-01-01 23:59:59', '2020-07-02 01:00:10');
 	await Promise.all([meterA, meterB, meterC].map(meter => meter.insert(conn)));
 }
 

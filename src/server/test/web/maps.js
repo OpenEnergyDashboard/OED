@@ -35,8 +35,8 @@ function expectMapsToBeEquivalent(maps, length) {
 		expect(map).to.have.property('opposite');
 		expectPointsToBeEquivalent(map.opposite, opposite);
 		expect(map).to.have.property('mapSource', 'placeholder');
-		expect(map).to.have.property('northAngle');
-		expect(map).to.have.property('maxCircleSizeFraction');
+		expect(map).to.have.property('northAngle',0.0);
+		expect(map).to.have.property('maxCircleSizeFraction',0.15);
 	}
 }
 
@@ -54,8 +54,8 @@ mocha.describe('maps API', () => {
 
 	mocha.it('returns all visible maps', async () => {
 		const conn = testDB.getConnection();
-		await new Map(undefined, 'Map 1', true, null, 'default', moment('2000-10-10'), origin, opposite, 'placeholder', 0.0, 0.0).insert(conn);
-		await new Map(undefined, 'Map 2', true, null, 'default', moment('2000-10-10'), origin, opposite, 'placeholder', 0.0, 0.0).insert(conn);
+		await new Map(undefined, 'Map 1', true, null, 'default', moment('2000-10-10'), origin, opposite, 'placeholder', 45.0, 0.2).insert(conn);
+		await new Map(undefined, 'Map 2', true, null, 'default', moment('2000-10-10'), origin, opposite, 'placeholder', 10.0, 0.5).insert(conn);
 		await new Map(undefined, 'Map 3', true, null, 'default', moment('2000-10-10'), origin, opposite, 'placeholder', 0.0, 0.0).insert(conn);
 		await new Map(undefined, 'Not Visible', false, null, 'default', moment('2000-10-10'), origin, opposite, 'placeholder', 0.0, 0.0).insert(conn);
 
