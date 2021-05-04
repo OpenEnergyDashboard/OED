@@ -44,6 +44,6 @@ CREATE TABLE IF NOT EXISTS meters (
     reading_length TIME DEFAULT '00:00:00',
     reading_variation TIME DEFAULT '23:59:59.999999',
     reading REAL DEFAULT 0.0,
-    start_timestamp TIMESTAMP DEFAULT '01-01-01 00:00:00',
-    end_timestamp TIMESTAMP DEFAULT '01-01-01 00:00:00'
+    start_timestamp TIMESTAMP DEFAULT '0001-01-01 00:00:00',
+    end_timestamp TIMESTAMP DEFAULT '0001-01-01 00:00:00'
 );
