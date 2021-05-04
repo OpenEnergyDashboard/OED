@@ -32,15 +32,37 @@ function formatMeterForResponse(meter, loggedInAsAdmin) {
 		meterType: null,
 		timeZone: null,
 		gps: meter.gps,
-		identifier: meter.identifier
+		identifier: meter.identifier,
+		area: meter.area,
+		note: null,
+		cumulative: null,
+		cumulativeReset : null,
+		cumulativeResetStart : null,
+		cumulativeResetEnd : null,
+		readingLength : null,
+		readingVariation : null,
+		reading : null,
+		startTimestamp : null,
+		endTimestamp : null
 	};
 
 	// Only logged in Admins can see IP addresses, types, timezones, and internal names
+	// and lots of other items now.
 	if (loggedInAsAdmin) {
 		formattedMeter.ipAddress = meter.ipAddress;
 		formattedMeter.meterType = meter.type;
 		formattedMeter.timeZone = meter.meterTimezone;
 		formattedMeter.name = meter.name;
+		formattedMeter.note = meter.note;
+		formattedMeter.cumulative = meter.cumulative;
+		formattedMeter.cumulativeReset = meter.cumulativeReset;
+		formattedMeter.cumulativeResetStart = meter.cumulativeResetStart;
+		formattedMeter.cumulativeResetEnd = meter.cumulativeResetEnd;
+		formattedMeter.readingLength = meter.readingLength;
+		formattedMeter.readingVariation = meter.readingVariation;
+		formattedMeter.reading = meter.reading;
+		formattedMeter.startTimestamp = meter.startTimestamp;
+		formattedMeter.endTimestamp = meter.endTimestamp;
 	}
 
 	// TODO: remove this line when usages of meter.name are replaced with meter.identifer
