@@ -33,7 +33,6 @@ function expectMetersToBeEquivalent(expected, actual) {
 	expect(actual).to.have.property('cumulativeReset', expected.cumulativeReset);
 	expect(actual).to.have.property('cumulativeResetStart', expected.cumulativeResetStart);
 	expect(actual).to.have.property('cumulativeResetEnd', expected.cumulativeResetEnd);
-	expect(actual).to.have.property('previousDay', expected.previousDay);
 	expect(actual).to.have.property('readingLength', expected.readingLength);
 	expect(actual).to.have.property('readingVariation', expected.readingVariation);
 	expect(actual).to.have.property('reading', expected.reading);

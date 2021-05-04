@@ -19,7 +19,6 @@ cumulative: True if cumulative values can reset back to zero
 cumulative_reset: True if pipline is to be reset
 cumulative_reset_start: The earliest time of day that a reset can occur
 cumulative_reset_end: The latest time of day that a reset can occur
-previous_day: True if reading is from previous day 
 reading_length: Specify the time range on every reading
 reading_variation: +/- time allowed on length to consider within allowed length
 reading: The reading from the meter
@@ -42,7 +41,6 @@ CREATE TABLE IF NOT EXISTS meters (
 	cumulative_reset BOOLEAN DEFAULT false,
 	cumulative_reset_start TIME DEFAULT '00:00:00',
 	cumulative_reset_end TIME DEFAULT '23:59:59.999999',
-	previous_day BOOLEAN DEFAULT false,
 	reading_length TIME DEFAULT '00:00:00',
 	reading_variation TIME DEFAULT '23:59:59.999999',
 	reading REAL DEFAULT 0.0,

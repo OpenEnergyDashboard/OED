@@ -24,7 +24,6 @@ class Meter {
 	 * @param cumulativeReset True if cumulative values can reset back to zero., default false
 	 * @param cumulativeResetStart The earliest time of day that a reset can occur, default '00:00:00'
 	 * @param cumulativeResetEnd The latest time of day that a reset can occur, default '23:59:59'
-	 * @param previousDay Checks if the if the reading is of the previous day, defualt false
 	 * @param readingLength Specifies the time range on every reading in the CSV file, default '00:00:00'
 	 * @param readingVariation +/- time allowed on length to consider within allowed length, default '23:59:59'
 	 * @param reading The value of reading, default 0.0
@@ -32,7 +31,7 @@ class Meter {
 	 * @param endTimestamp  End timestamp of reading, '0001-01-01 00:00:00' 
 	 */
 	constructor(id, name, ipAddress, enabled, displayable, type, meterTimezone, gps = undefined, identifier = name, note, area,
-		cumulative, cumulativeReset, cumulativeResetStart, cumulativeResetEnd, previousDay, readingLength, readingVariation, reading, 
+		cumulative, cumulativeReset, cumulativeResetStart, cumulativeResetEnd, readingLength, readingVariation, reading, 
 		startTimestamp, endTimestamp) {
 		this.id = id;
 		this.name = name;
@@ -49,7 +48,6 @@ class Meter {
 		this.cumulativeReset = cumulativeReset;
 		this.cumulativeResetStart = cumulativeResetStart;
 		this.cumulativeResetEnd = cumulativeResetEnd;
-		this.previousDay = previousDay;
 		this.readingLength = readingLength;
 		this.readingVariation = readingVariation;
 		this.reading = reading;
@@ -105,7 +103,7 @@ class Meter {
 	static mapRow(row) {
 		return new Meter(row.id, row.name, row.ipaddress, row.enabled, row.displayable, row.meter_type,
 			row.default_timezone_meter, row.gps, row.identifier, row.note, row.area, row.cumulative, row.cumulative_reset,
-			row.cumulative_reset_start, row.cumulative_reset_end, row.previous_day, row.reading_length, row.reading_variation, 
+			row.cumulative_reset_start, row.cumulative_reset_end, row.reading_length, row.reading_variation, 
 			row.reading, row.start_timestamp, row.end_timestamp);
 	}
 

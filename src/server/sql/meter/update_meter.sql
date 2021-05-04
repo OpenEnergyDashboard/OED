@@ -17,7 +17,6 @@ UPDATE meters
 		cumulative_reset = ${cumulativeReset},
 		cumulative_reset_start = ${cumulativeResetStart},
 		cumulative_reset_end = ${cumulativeResetEnd},
-		previous_day = ${previousDay},
 		reading_length = ${readingLength},
 		reading_variation = ${readingVariation},
 		reading = ${reading},
