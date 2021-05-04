@@ -23,12 +23,12 @@ class Meter {
 	 * @param cumulative Identifies if meter readings that are stored are the sum of usage or the particular reading, default false
 	 * @param cumulativeReset True if cumulative values can reset back to zero., default false
 	 * @param cumulativeResetStart The earliest time of day that a reset can occur, default '00:00:00'
-	 * @param cumulativeResetEnd The latest time of day that a reset can occur, default '23:59:59'
+	 * @param cumulativeResetEnd The latest time of day that a reset can occur, default '23:59:59.999999'
 	 * @param readingLength Specifies the time range on every reading in the CSV file, default '00:00:00'
-	 * @param readingVariation +/- time allowed on length to consider within allowed length, default '23:59:59'
+	 * @param readingVariation +/- time allowed on length to consider within allowed length, default '23:59:59.999999'
 	 * @param reading The value of reading, default 0.0
-	 * @param startTimestamp Start timestamp of reading, default '0001-01-01 00:00:00'
-	 * @param endTimestamp  End timestamp of reading, '0001-01-01 00:00:00' 
+	 * @param startTimestamp Start timestamp of last reading input for this meter, default '01-01-01 00:00:00'
+	 * @param endTimestamp  End timestamp of last reading input for this meter, '01-01-01 00:00:00' 
 	 */
 	constructor(id, name, ipAddress, enabled, displayable, type, meterTimezone, gps = undefined, identifier = name, note, area,
 		cumulative, cumulativeReset, cumulativeResetStart, cumulativeResetEnd, readingLength, readingVariation, reading, 
