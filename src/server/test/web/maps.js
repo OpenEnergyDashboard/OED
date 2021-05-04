@@ -22,21 +22,28 @@ function expectPointsToBeEquivalent(expected, actual) {
 }
 
 function expectMapsToBeEquivalent(maps, length) {
-	for (let i = 0; i++; i < length) {
+	for (let i = 0; i < length; i++) {
 		const map = maps[i];
 		expect(map).to.have.property('id');
-		expect(map).to.have.property('name', `Map ${i + 1}`);
-		expect(map).to.have.property('displayable', true);
+		if (i === 3) {
+			// Map not visible, only happens on admin map checks.
+			expect(map).to.have.property('name', 'Not Visible');
+			expect(map).to.have.property('displayable', false);
+		} else {
+			expect(map).to.have.property('name', `Map ${i + 1}`);
+			expect(map).to.have.property('displayable', true);
+		}
 		expect(map).to.have.property('note', null);
 		expect(map).to.have.property('filename', 'default');
-		expect(map.modifiedDate.isSame(moment('2000-10-10'))).to.equal(true);
+		// The date set in the test code has a midnight time added and it comes back as a string.
+		expect(map).to.have.property('modifiedDate', '2000-10-10T00:00:00.000Z');
 		expect(map).to.have.property('origin');
 		expectPointsToBeEquivalent(map.origin, origin);
 		expect(map).to.have.property('opposite');
 		expectPointsToBeEquivalent(map.opposite, opposite);
 		expect(map).to.have.property('mapSource', 'placeholder');
-		expect(map).to.have.property('northAngle',0.0);
-		expect(map).to.have.property('maxCircleSizeFraction',0.15);
+		expect(map).to.have.property('northAngle', i + 1);
+		expect(map).to.have.property('maxCircleSizeFraction', (i + 1) / 10);
 	}
 }
 
@@ -54,9 +61,10 @@ mocha.describe('maps API', () => {
 
 	mocha.it('returns all visible maps', async () => {
 		const conn = testDB.getConnection();
-		await new Map(undefined, 'Map 1', true, null, 'default', moment('2000-10-10'), origin, opposite, 'placeholder', 45.0, 0.2).insert(conn);
-		await new Map(undefined, 'Map 2', true, null, 'default', moment('2000-10-10'), origin, opposite, 'placeholder', 10.0, 0.5).insert(conn);
-		await new Map(undefined, 'Map 3', true, null, 'default', moment('2000-10-10'), origin, opposite, 'placeholder', 0.0, 0.0).insert(conn);
+		await new Map(undefined, 'Map 1', true, null, 'default', moment('2000-10-10'), origin, opposite, 'placeholder', 1.0, 0.1).insert(conn);
+		await new Map(undefined, 'Map 2', true, null, 'default', moment('2000-10-10'), origin, opposite, 'placeholder', 2.0, 0.2).insert(conn);
+		await new Map(undefined, 'Map 3', true, null, 'default', moment('2000-10-10'), origin, opposite, 'placeholder', 3.0, 0.3).insert(conn);
+		// Not visible.
 		await new Map(undefined, 'Not Visible', false, null, 'default', moment('2000-10-10'), origin, opposite, 'placeholder', 0.0, 0.0).insert(conn);
 
 		const res = await chai.request(app).get('/api/maps');
@@ -75,10 +83,11 @@ mocha.describe('maps API', () => {
 		});
 		mocha.it('returns all maps', async () => {
 			const conn = testDB.getConnection();
-			await new Map(undefined, 'Map 1', true, null, 'default', moment('2000-10-10'), origin, opposite, 'placeholder', 0.0, 0.0).insert(conn);
-			await new Map(undefined, 'Map 2', true, null, 'default', moment('2000-10-10'), origin, opposite, 'placeholder', 0.0, 0.0).insert(conn);
-			await new Map(undefined, 'Map 3', true, null, 'default', moment('2000-10-10'), origin, opposite, 'placeholder', 0.0, 0.0).insert(conn);
-			await new Map(undefined, 'Not Visible', false, null, 'default', moment('2000-10-10'), origin, opposite, 'placeholder', 0.0, 0.0).insert(conn);
+			await new Map(undefined, 'Map 1', true, null, 'default', moment('2000-10-10'), origin, opposite, 'placeholder', 1.0, 0.1).insert(conn);
+			await new Map(undefined, 'Map 2', true, null, 'default', moment('2000-10-10'), origin, opposite, 'placeholder', 2.0, 0.2).insert(conn);
+			await new Map(undefined, 'Map 3', true, null, 'default', moment('2000-10-10'), origin, opposite, 'placeholder', 3.0, 0.3).insert(conn);
+			// Not visible.
+			await new Map(undefined, 'Not Visible', false, null, 'default', moment('2000-10-10'), origin, opposite, 'placeholder', 4.0, 0.4).insert(conn);
 
 			const res = await chai.request(app).get('/api/maps').set('token', token);
 			expect(res).to.have.status(200);
