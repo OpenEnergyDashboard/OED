@@ -6,7 +6,7 @@
 Creates a table of meters containing 
 primary key (generally set by DB,
 name: The name of a meter used for getting data and currently shown to user,
-IP addresF: 			for meter data,
+IP addresF: for meter data,
 enabled: True if the meter should get data,
 displayable: True if meter visible to non-admin users,
 meter_type: The meter type,
@@ -21,29 +21,29 @@ cumulative_reset_start: The earliest time of day that a reset can occur
 cumulative_reset_end: The latest time of day that a reset can occur
 reading_length: Specify the time range on every reading
 reading_variation: +/- time allowed on length to consider within allowed length
-reading: The reading from the meter
-start_timestamp: Start timestamp of reading
-end_timestamp: End timestamp of reading
+reading: The last reading input for the meter
+start_timestamp: Start timestamp of last reading input for this meter
+end_timestamp: End timestamp of last reading for this meter
 */
 CREATE TABLE IF NOT EXISTS meters (
-	id SERIAL PRIMARY KEY,
-	name VARCHAR(50) UNIQUE NOT NULL,
-	ipAddress VARCHAR(20),
-	enabled BOOLEAN NOT NULL,
-	displayable BOOLEAN NOT NULL,
-	meter_type meter_type NOT NULL,
-	default_timezone_meter TEXT DEFAULT NULL,
-	gps POINT DEFAULT NULL,
-	identifier TEXT UNIQUE NOT NULL,
-	note TEXT,
-	area REAL DEFAULT NULL,
-	cumulative BOOLEAN DEFAULT false,
-	cumulative_reset BOOLEAN DEFAULT false,
-	cumulative_reset_start TIME DEFAULT '00:00:00',
-	cumulative_reset_end TIME DEFAULT '23:59:59.999999',
-	reading_length TIME DEFAULT '00:00:00',
-	reading_variation TIME DEFAULT '23:59:59.999999',
-	reading REAL DEFAULT 0.0,
-	start_timestamp TIMESTAMP DEFAULT '0001-01-01 00:00:00',
-	end_timestamp TIMESTAMP DEFAULT '0001-01-01 00:00:00'
+    id SERIAL PRIMARY KEY,
+    name VARCHAR(50) UNIQUE NOT NULL,
+    ipAddress VARCHAR(20),
+    enabled BOOLEAN NOT NULL,
+    displayable BOOLEAN NOT NULL,
+    meter_type meter_type NOT NULL,
+    default_timezone_meter TEXT DEFAULT NULL,
+    gps POINT DEFAULT NULL,
+    identifier TEXT UNIQUE NOT NULL,
+    note TEXT,
+    area REAL DEFAULT NULL,
+    cumulative BOOLEAN DEFAULT false,
+    cumulative_reset BOOLEAN DEFAULT false,
+    cumulative_reset_start TIME DEFAULT '00:00:00',
+    cumulative_reset_end TIME DEFAULT '23:59:59.999999',
+    reading_length TIME DEFAULT '00:00:00',
+    reading_variation TIME DEFAULT '23:59:59.999999',
+    reading REAL DEFAULT 0.0,
+    start_timestamp TIMESTAMP DEFAULT '01-01-01 00:00:00',
+    end_timestamp TIMESTAMP DEFAULT '01-01-01 00:00:00'
 );
