@@ -6,10 +6,12 @@ CREATE TABLE IF NOT EXISTS maps (
 	id SERIAL PRIMARY KEY,
 	name VARCHAR(50) UNIQUE NOT NULL,
 	displayable boolean NOT NULL,
-	note VARCHAR(500),
+	note TEXT,
 	filename VARCHAR(200) NOT NULL,
 	modified_date TIMESTAMP NOT NULL,
 	origin POINT DEFAULT NULL,
 	opposite POINT DEFAULT NULL,
-	map_source TEXT NOT NULL
+	map_source TEXT NOT NULL,
+	north_angle REAL DEFAULT 0.0,
+	max_circle_size_fraction REAL DEFAULT 0.15
 );

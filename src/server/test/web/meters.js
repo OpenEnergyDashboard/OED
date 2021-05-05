@@ -11,6 +11,71 @@ const User = require('../../models/User');
 const bcrypt = require('bcryptjs');
 const Point = require('../../models/Point');
 const gps = new Point(90, 45);
+const moment = require('moment');
+
+function expectMetersToBeEquivalent(meters, length, offset) {
+	for (let i = 0; i < length; i++) {
+		// If length is 1 then it is not an array.
+		let meter;
+		if (length === 1) {
+			meter = meters;
+		} else {
+			meter = meters[i];
+		}
+		// Everyone can see this info on all meters
+		expect(meter).to.have.property('id');
+		expect(meter).to.have.property('gps');
+		expect(meter.gps).to.have.property('latitude', gps.latitude);
+		expect(meter.gps).to.have.property('longitude', gps.longitude);
+		expect(meter).to.have.property('enabled', true);
+		// Copied from /src/server/routes/meters.js
+		// TODO: remove this line when usages of meter.name are replaced with meter.identifer
+		// Without this, things will break for non-logged in users because we currently rely on
+		// the internal name being available. As noted in #605, the intent is to not send the
+		// name to a user if they are not logged in.
+		expect(meter).to.have.property('identifier', 'Identified ' + (i + offset));
+		expect(meter).to.have.property('area', (i + offset) * 10.0);
+		// A couple of properties differ if displayable or not.
+		if (i < 3) {
+			expect(meter).to.have.property('name', `Meter ${i + offset}`);
+			expect(meter).to.have.property('displayable', true);
+		} else {
+			// This is the extra meter visible to admins.
+			expect(meter).to.have.property('name', 'Not Visible');
+			expect(meter).to.have.property('displayable', false);
+		}
+		if (length === 4) {
+			// Admin so see more values
+			expect(meter).to.have.property('ipAddress', '1.1.1.1');
+			expect(meter).to.have.property('meterType', Meter.type.MAMAC);
+			expect(meter).to.have.property('timeZone', 'TZ' + (i + offset));
+			expect(meter).to.have.property('note', `notes ${i + offset}`);
+			expect(meter).to.have.property('cumulative', true);
+			expect(meter).to.have.property('cumulativeReset', true);
+			expect(meter).to.have.property('cumulativeResetStart', '01:01:25');
+			expect(meter).to.have.property('cumulativeResetEnd', '05:05:05');
+			expect(meter).to.have.property('readingLength', '05:00:00');
+			expect(meter).to.have.property('readingVariation', '00:01:00');
+			expect(meter).to.have.property('reading', (i + offset) * 1.0);
+			expect(meter).to.have.property('startTimestamp', '0001-01-01T23:59:59.000Z');
+			expect(meter).to.have.property('endTimestamp', '2020-07-02T01:00:10.000Z');
+		} else {
+			expect(meter).to.have.property('ipAddress', null);
+			expect(meter).to.have.property('meterType', null);
+			expect(meter).to.have.property('timeZone', null);
+			expect(meter).to.have.property('note', null);
+			expect(meter).to.have.property('cumulative', null);
+			expect(meter).to.have.property('cumulativeReset', null);
+			expect(meter).to.have.property('cumulativeResetStart', null);
+			expect(meter).to.have.property('cumulativeResetEnd', null);
+			expect(meter).to.have.property('readingLength', null);
+			expect(meter).to.have.property('readingVariation', null);
+			expect(meter).to.have.property('reading', null);
+			expect(meter).to.have.property('startTimestamp', null);
+			expect(meter).to.have.property('endTimestamp', null);
+		}
+	}
+}
 
 mocha.describe('meters API', () => {
 	mocha.it('returns nothing with no meters present', async () => {
@@ -22,29 +87,24 @@ mocha.describe('meters API', () => {
 
 	mocha.it('returns all visible meters', async () => {
 		const conn = testDB.getConnection();
-		await new Meter(undefined, 'Meter 1', '1.1.1.1', true, true, Meter.type.MAMAC, 'TZ1', gps).insert(conn);
-		await new Meter(undefined, 'Meter 2', '1.1.1.1', true, true, Meter.type.MAMAC, 'TZ2', gps).insert(conn);
-		await new Meter(undefined, 'Meter 3', '1.1.1.1', true, true, Meter.type.MAMAC, 'TZ3', gps).insert(conn);
-		await new Meter(undefined, 'Not Visible', '1.1.1.1', true, false, Meter.type.MAMAC, 'TZ4', gps).insert(conn);
+		await new Meter(undefined, 'Meter 1', '1.1.1.1', true, true, Meter.type.MAMAC, 'TZ1', gps,
+			'Identified 1', 'notes 1', 10.0, true, true, '01:01:25', '05:05:05', '05:00:00', '00:01:00', 1.0,
+			'0001-01-01 23:59:59', '2020-07-02 01:00:10').insert(conn);
+		await new Meter(undefined, 'Meter 2', '1.1.1.1', true, true, Meter.type.MAMAC, 'TZ2', gps,
+			'Identified 2', 'notes 2', 20.0, true, true, '01:01:25', '05:05:05', '05:00:00', '00:01:00', 2.0,
+			'0001-01-01 23:59:59', '2020-07-02 01:00:10').insert(conn);
+		await new Meter(undefined, 'Meter 3', '1.1.1.1', true, true, Meter.type.MAMAC, 'TZ3', gps,
+			'Identified 3', 'notes 3', 30.0, true, true, '01:01:25', '05:05:05', '05:00:00', '00:01:00', 3.0,
+			'0001-01-01 23:59:59', '2020-07-02 01:00:10').insert(conn);
+		await new Meter(undefined, 'Not Visible', '1.1.1.1', true, false, Meter.type.MAMAC, 'TZ4', gps,
+			'Identified 4', 'notes 4', 40.0, true, true, '01:01:25', '05:05:05', '05:00:00', '00:01:00', 4.0,
+			'0001-01-01 23:59:59', '2020-07-02 01:00:10').insert(conn);
 
 		const res = await chai.request(app).get('/api/meters');
 		expect(res).to.have.status(200);
 		expect(res).to.be.json;
 		expect(res.body).to.have.lengthOf(3);
-
-		for (let i = 0; i < 3; i++) {
-			const meter = res.body[i];
-			expect(meter).to.have.property('id');
-			expect(meter).to.have.property('name', `Meter ${i + 1}`);
-			expect(meter).to.have.property('gps');
-			expect(meter.gps).to.have.property('latitude', gps.latitude);
-			expect(meter.gps).to.have.property('longitude', gps.longitude);
-			expect(meter).to.have.property('ipAddress', null);
-			expect(meter).to.have.property('enabled', true);
-			expect(meter).to.have.property('displayable', true);
-			expect(meter).to.have.property('meterType', null);
-			expect(meter).to.have.property('timeZone', null);
-		}
+		expectMetersToBeEquivalent(res.body, 3, 1);
 	});
 	mocha.describe('Admin role:', () => {
 		let token;
@@ -55,34 +115,24 @@ mocha.describe('meters API', () => {
 		});
 		mocha.it('returns all meters', async () => {
 			const conn = testDB.getConnection();
-			await new Meter(undefined, 'Meter 1', '1.1.1.1', true, true, Meter.type.MAMAC, 'TZ1', gps).insert(conn);
-			await new Meter(undefined, 'Meter 2', '1.1.1.1', true, true, Meter.type.MAMAC, 'TZ2', gps).insert(conn);
-			await new Meter(undefined, 'Meter 3', '1.1.1.1', true, true, Meter.type.MAMAC, 'TZ3', gps).insert(conn);
-			await new Meter(undefined, 'Not Visible', '1.1.1.1', true, false, Meter.type.MAMAC, 'TZ4', gps).insert(conn);
+			await new Meter(undefined, 'Meter 1', '1.1.1.1', true, true, Meter.type.MAMAC, 'TZ1', gps,
+				'Identified 1', 'notes 1', 10.0, true, true, '01:01:25', '05:05:05', '05:00:00', '00:01:00', 1.0,
+				'0001-01-01 23:59:59', '2020-07-02 01:00:10').insert(conn);
+			await new Meter(undefined, 'Meter 2', '1.1.1.1', true, true, Meter.type.MAMAC, 'TZ2', gps,
+				'Identified 2', 'notes 2', 20.0, true, true, '01:01:25', '05:05:05', '05:00:00', '00:01:00', 2.0,
+				'0001-01-01 23:59:59', '2020-07-02 01:00:10').insert(conn);
+			await new Meter(undefined, 'Meter 3', '1.1.1.1', true, true, Meter.type.MAMAC, 'TZ3', gps,
+				'Identified 3', 'notes 3', 30.0, true, true, '01:01:25', '05:05:05', '05:00:00', '00:01:00', 3.0,
+				'0001-01-01 23:59:59', '2020-07-02 01:00:10').insert(conn);
+			await new Meter(undefined, 'Not Visible', '1.1.1.1', true, false, Meter.type.MAMAC, 'TZ4', gps,
+				'Identified 4', 'notes 4', 40.0, true, true, '01:01:25', '05:05:05', '05:00:00', '00:01:00', 4.0,
+				'0001-01-01 23:59:59', '2020-07-02 01:00:10').insert(conn);
 
 			const res = await chai.request(app).get('/api/meters').set('token', token);
 			expect(res).to.have.status(200);
 			expect(res).to.be.json;
 			expect(res.body).to.have.lengthOf(4);
-
-			for (let i = 0; i < 4; i++) {
-				const meter = res.body[i];
-				expect(meter).to.have.property('id');
-				expect(meter).to.have.property('gps');
-				expect(meter.gps).to.have.property('latitude', gps.latitude);
-				expect(meter.gps).to.have.property('longitude', gps.longitude);
-				if (i < 3) {
-					expect(meter).to.have.property('name', `Meter ${i + 1}`);
-					expect(meter).to.have.property('displayable', true);
-				} else {
-					expect(meter).to.have.property('name', 'Not Visible');
-					expect(meter).to.have.property('displayable', false);
-				}
-				expect(meter).to.have.property('ipAddress', '1.1.1.1');
-				expect(meter).to.have.property('enabled', true);
-				expect(meter).to.have.property('meterType', Meter.type.MAMAC);
-				expect(meter).to.have.property('timeZone', 'TZ' + (i + 1));
-			}
+			expectMetersToBeEquivalent(res.body, 4, 1);
 		});
 	});
 
@@ -107,35 +157,24 @@ mocha.describe('meters API', () => {
 
 				mocha.it('should only return visible meters and visible data', async () => {
 					const conn = testDB.getConnection();
-					await new Meter(undefined, 'Meter 1', '1.1.1.1', true, true, Meter.type.MAMAC, 'TZ1', gps).insert(conn);
-					await new Meter(undefined, 'Meter 2', '1.1.1.1', true, true, Meter.type.MAMAC, 'TZ2', gps).insert(conn);
-					await new Meter(undefined, 'Meter 3', '1.1.1.1', true, true, Meter.type.MAMAC, 'TZ3', gps).insert(conn);
-					await new Meter(undefined, 'Not Visible', '1.1.1.1', true, false, Meter.type.MAMAC, 'TZ4', gps).insert(conn);
+					await new Meter(undefined, 'Meter 1', '1.1.1.1', true, true, Meter.type.MAMAC, 'TZ1', gps,
+						'Identified 1', 'notes 1', 10.0, true, true, '01:01:25', '05:05:05', '05:00:00', '00:01:00', 1.0,
+						'0001-01-01 23:59:59', '2020-07-02 01:00:10').insert(conn);
+					await new Meter(undefined, 'Meter 2', '1.1.1.1', true, true, Meter.type.MAMAC, 'TZ2', gps,
+						'Identified 2', 'notes 2', 20.0, true, true, '01:01:25', '05:05:05', '05:00:00', '00:01:00', 2.0,
+						'0001-01-01 23:59:59', '2020-07-02 01:00:10').insert(conn);
+					await new Meter(undefined, 'Meter 3', '1.1.1.1', true, true, Meter.type.MAMAC, 'TZ3', gps,
+						'Identified 3', 'notes 3', 30.0, true, true, '01:01:25', '05:05:05', '05:00:00', '00:01:00', 3.0,
+						'0001-01-01 23:59:59', '2020-07-02 01:00:10').insert(conn);
+					await new Meter(undefined, 'Not Visible', '1.1.1.1', true, false, Meter.type.MAMAC, 'TZ4', gps,
+						'Identified 4', 'notes 4', 40.0, true, true, '01:01:25', '05:05:05', '05:00:00', '00:01:00', 4.0,
+						'0001-01-01 23:59:59', '2020-07-02 01:00:10').insert(conn);
 
 					const res = await chai.request(app).get('/api/meters').set('token', token);
 					expect(res).to.have.status(200);
 					expect(res).to.be.json;
 					expect(res.body).to.have.lengthOf(3);
-
-					for (let i = 0; i < 3; i++) {
-						const meter = res.body[i];
-						expect(meter).to.have.property('id');
-						expect(meter).to.have.property('gps');
-						expect(meter.gps).to.have.property('latitude', gps.latitude);
-						expect(meter.gps).to.have.property('longitude', gps.longitude);
-						expect(meter).to.have.property('ipAddress', null);
-						expect(meter).to.have.property('enabled', true);
-						expect(meter).to.have.property('displayable', true);
-						expect(meter).to.have.property('meterType', null);
-						expect(meter).to.have.property('timeZone', null);
-
-						// Copied from /src/server/routes/meters.js
-						// TODO: remove this line when usages of meter.name are replaced with meter.identifer
-						// Without this, things will break for non-logged in users because we currently rely on
-						// the internal name being available. As noted in #605, the intent is to not send the
-						// name to a user if they are not logged in.
-						expect(meter).to.have.property('name', `Meter ${i + 1}`);
-					}
+					expectMetersToBeEquivalent(res.body, 3, 1);
 				});
 
 				mocha.it(`should reject requests from ${role} to edit meters`, async () => {
@@ -148,23 +187,25 @@ mocha.describe('meters API', () => {
 
 	mocha.it('returns details on a single meter by ID', async () => {
 		const conn = testDB.getConnection();
-		await new Meter(undefined, 'Meter 1', '1.1.1.1', true, true, Meter.type.MAMAC, null, gps).insert(conn);
-		const meter2 = new Meter(undefined, 'Meter 2', '1.1.1.1', true, true, Meter.type.MAMAC, null, gps);
+		await new Meter(undefined, 'Meter 1', '1.1.1.1', true, true, Meter.type.MAMAC, 'TZ1', gps,
+			'Identified 1', 'notes 1', 10.0, true, true, '01:01:25', '05:05:05', '05:00:00', '00:01:00', 1.0,
+			'0001-01-01 23:59:59', '2020-07-02 01:00:10').insert(conn);
+		const meter2 = new Meter(undefined, 'Meter 2', '1.1.1.1', true, true, Meter.type.MAMAC, 'TZ2', gps,
+			'Identified 2', 'notes 2', 20.0, true, true, '01:01:25', '05:05:05', '05:00:00', '00:01:00', 2.0,
+			'0001-01-01 23:59:59', '2020-07-02 01:00:10');
 		await meter2.insert(conn);
 
 		const res = await chai.request(app).get(`/api/meters/${meter2.id}`);
 		expect(res).to.have.status(200);
 		expect(res).to.be.json;
-		expect(res.body).to.have.property('id', meter2.id);
-		expect(res.body).to.have.property('name', 'Meter 2');
-		expect(res.body).to.have.property('gps');
-		expect(res.body.gps).to.have.property('latitude', gps.latitude);
-		expect(res.body.gps).to.have.property('longitude', gps.longitude);
+		expectMetersToBeEquivalent(res.body, 1, 2);
 	});
 
 	mocha.it('responds appropriately when the meter in question does not exist', async () => {
 		const conn = testDB.getConnection();
-		const meter = new Meter(undefined, 'Meter', '1.1.1.1', true, true, Meter.type.MAMAC, null, gps);
+		const meter =  new Meter(undefined, 'Meter 1', '1.1.1.1', true, true, Meter.type.MAMAC, 'TZ1', gps,
+			'Identified 1', 'notes 1', 10.0, true, true, '01:01:25', '05:05:05', '05:00:00', '00:01:00', 1.0,
+			'0001-01-01 23:59:59', '2020-07-02 01:00:10');
 		await meter.insert(conn);
 
 		const res = await chai.request(app).get(`/api/meters/${meter.id + 1}`);

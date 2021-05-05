@@ -2,5 +2,6 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
 
-SELECT id, name, displayable, note, filename, modified_date, origin, opposite, map_source, north_angle, max_circle_size_fraction FROM maps
-    WHERE id=${id};
+ALTER TABLE maps
+	ADD COLUMN IF NOT EXISTS north_angle REAL DEFAULT 0.0,
+	ADD COLUMN IF NOT EXISTS max_circle_size_fraction REAL DEFAULT 0.15;
