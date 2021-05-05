@@ -15,14 +15,14 @@ async function setupGroupsAndMeters(conn) {
 	const groupB = new Group(undefined, 'GB', false, gps, 'notes GB', 43.5);
 	const groupC = new Group(undefined, 'GC', true, gps, 'notes GC', 53.5);
 	await Promise.all([groupA, groupB, groupC].map(group => group.insert(conn)));
-	const meterA = new Meter(undefined, 'MA', null, false, true, Meter.type.MAMAC, null, gps, 
-	'Identified MA' ,'notes MA', 35.0, true, true, '01:01:25', '00:00:00', true, '05:00:00','00:00:00', 1.5,
+	const meterA = new Meter(undefined, 'MA', null, false, true, Meter.type.MAMAC, null, gps,
+	'Identified MA' ,'notes MA', 35.0, true, true, '01:01:25', '00:00:00', '05:00:00','00:00:00', 1.5,
 	'0001-01-01 23:59:59', '2020-07-02 01:00:10');
 	const meterB = new Meter(undefined, 'MB', null, false, true, Meter.type.MAMAC, null, gps,
-	'Identified MB', 'notes MB', 33.5, true, true, '05:05:09', '09:00:01', true, '00:00:00', 
+	'Identified MB', 'notes MB', 33.5, true, true, '05:05:09', '09:00:01', '00:00:00',
 	'00:00:00', 25.5, '0002-01-01 23:59:59', '2020-07-02 01:00:10');
 	const meterC = new Meter(undefined, 'MC', null, false, true, Meter.type.METASYS, null, gps,
-	'Identified MC', 'notes MC', 33.5, true, true, '05:05:09', '09:00:01', true, '00:00:00', 
+	'Identified MC', 'notes MC', 33.5, true, true, '05:05:09', '09:00:01', '00:00:00',
 	'00:00:00', 25.5, '0003-01-01 23:59:59', '2020-07-02 01:00:10');
 	await Promise.all([meterA, meterB, meterC].map(meter => meter.insert(conn)));
 }
@@ -61,8 +61,8 @@ mocha.describe('Groups', () => {
 		mocha.beforeEach(() => setupGroupsAndMeters(testDB.getConnection()));
 		mocha.it('can be given a child group', async () => {
 			conn = testDB.getConnection();
-			const parent = await Group.getByName('A', conn);
-			const child = await Group.getByName('B', conn);
+			const parent = await Group.getByName('GA', conn);
+			const child = await Group.getByName('GB', conn);
 			await parent.adoptGroup(child.id, conn);
 			const childrenOfParent = await (Group.getImmediateGroupsByGroupID(parent.id, conn));
 			expect(childrenOfParent).to.deep.equal([child.id]);
@@ -72,8 +72,8 @@ mocha.describe('Groups', () => {
 
 		mocha.it('can be given a child meter', async () => {
 			conn = testDB.getConnection();
-			const parent = await Group.getByName('A', conn);
-			const meter = await Meter.getByName('A', conn);
+			const parent = await Group.getByName('GA', conn);
+			const meter = await Meter.getByName('MA', conn);
 			await parent.adoptMeter(meter.id, conn);
 			const metersOfParent = await (Group.getImmediateMetersByGroupID(parent.id, conn));
 			expect(metersOfParent).to.deep.equal([meter.id]);
@@ -83,9 +83,9 @@ mocha.describe('Groups', () => {
 
 		mocha.it('can be given a deep child group', async () => {
 			conn = testDB.getConnection();
-			const parent = await Group.getByName('A', conn);
-			const child = await Group.getByName('B', conn);
-			const grandchild = await Group.getByName('C', conn);
+			const parent = await Group.getByName('GA', conn);
+			const child = await Group.getByName('GB', conn);
+			const grandchild = await Group.getByName('GC', conn);
 			await parent.adoptGroup(child.id, conn);
 			await child.adoptGroup(grandchild.id, conn);
 			const deepChildrenOfParent = await Group.getDeepGroupsByGroupID(parent.id, conn);
@@ -94,12 +94,12 @@ mocha.describe('Groups', () => {
 
 		mocha.it('can be given both deep children and deep meters', async () => {
 			conn = testDB.getConnection();
-			const parent = await Group.getByName('A', conn);
-			const child = await Group.getByName('B', conn);
-			const grandchild = await Group.getByName('C', conn);
-			const immediateMeter = await Meter.getByName('A', conn);
-			const childsMeter = await Meter.getByName('B', conn);
-			const grandchildsMeter = await Meter.getByName('C', conn);
+			const parent = await Group.getByName('GA', conn);
+			const child = await Group.getByName('GB', conn);
+			const grandchild = await Group.getByName('GC', conn);
+			const immediateMeter = await Meter.getByName('MA', conn);
+			const childsMeter = await Meter.getByName('MB', conn);
+			const grandchildsMeter = await Meter.getByName('MC', conn);
 			await parent.adoptMeter(immediateMeter.id, conn);
 			await parent.adoptGroup(child.id, conn);
 			await child.adoptMeter(childsMeter.id, conn);
@@ -117,9 +117,9 @@ mocha.describe('Groups', () => {
 
 		mocha.it('can disown child groups', async () => {
 			conn = testDB.getConnection();
-			const parent = await Group.getByName('A', conn);
-			const lovedChild = await Group.getByName('B', conn);
-			const impendingOrphan = await Group.getByName('C', conn);
+			const parent = await Group.getByName('GA', conn);
+			const lovedChild = await Group.getByName('GB', conn);
+			const impendingOrphan = await Group.getByName('GC', conn);
 
 			await parent.adoptGroup(lovedChild.id, conn);
 			await parent.adoptGroup(impendingOrphan.id, conn);
@@ -134,9 +134,9 @@ mocha.describe('Groups', () => {
 
 		mocha.it('can disown child meters', async () => {
 			conn = testDB.getConnection();
-			const parent = await Group.getByName('A', conn);
-			const lovedMeter = await Meter.getByName('A', conn);
-			const impendingOrphan = await Meter.getByName('B', conn);
+			const parent = await Group.getByName('GA', conn);
+			const lovedMeter = await Meter.getByName('MA', conn);
+			const impendingOrphan = await Meter.getByName('MB', conn);
 
 			await parent.adoptMeter(lovedMeter.id, conn);
 			await parent.adoptMeter(impendingOrphan.id, conn);
@@ -151,10 +151,10 @@ mocha.describe('Groups', () => {
 
 		mocha.it('can be deleted', async () => {
 			conn = testDB.getConnection();
-			const unwanted = await Group.getByName('A', conn);
-			const parent = await Group.getByName('B', conn);
-			const child = await Group.getByName('C', conn);
-			const meter = await Meter.getByName('A', conn);
+			const unwanted = await Group.getByName('GA', conn);
+			const parent = await Group.getByName('GB', conn);
+			const child = await Group.getByName('GC', conn);
+			const meter = await Meter.getByName('MA', conn);
 
 			// both unwanted and child are children of parent
 			await parent.adoptGroup(unwanted.id, conn);
