@@ -3,21 +3,27 @@
 * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
 
 import * as React from 'react';
-import { Input, FormGroup, FormText, Label } from 'reactstrap';
+import { FormattedMessage } from 'react-intl';
+import { Col, Input, FormGroup, FormText, Label } from 'reactstrap';
 
 interface FileUploader {
 	reference: React.RefObject<HTMLInputElement>;
 	required: boolean;
-	buttonText: string;
+	formText: string;
+	labelStyle?: React.CSSProperties;
 }
 
 export default function FileUploaderComponent(props: FileUploader) {
 	return (
 		<FormGroup>
-			<Label>CSV File</Label>
-			<Input innerRef={props.reference} type='file' name='csvfile' required={props.required} />
+			<Label style={props.labelStyle}>
+				<FormattedMessage id='csv.file' />
+			</Label>
+			<Col>
+				<Input innerRef={props.reference} type='file' name='csvfile' required={props.required} />
+			</Col>
 			<FormText color='muted'>
-				{props.buttonText}
+				<FormattedMessage id={props.formText}/>
 			</FormText>
 		</FormGroup>
 	)

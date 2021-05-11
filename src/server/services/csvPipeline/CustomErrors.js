@@ -2,6 +2,12 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
 
+/**
+ * This is a custom error used by the CSV Pipeline.
+ * When this error is triggered, it should be passed into the failure function
+ * also used in the pipeline. It stores the status code of the failure response
+ * as well as the log and response messages.
+ */
 class CSVPipelineError extends Error {
 	constructor(responseMessage, logMessage = responseMessage, statusCode=400) {
 		super(responseMessage);

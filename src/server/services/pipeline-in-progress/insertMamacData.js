@@ -33,6 +33,7 @@ function insertMamacData(filePath, meter, readingDuration, conn) {
 						cumulativeReset = false,
 						readingRepetition = 1,
 						conditionSet = undefined,
+						headerRow = false,
 						conn = conn);
 }
 

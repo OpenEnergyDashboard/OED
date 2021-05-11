@@ -13,7 +13,7 @@ const escapeHtml = require('core-js/fn/string/escape-html');
  */
 function success(req, res, comment = '') {
 	res.status(200) // 200 OK
-		.send(`<pre>\nSUCCESS\n${escapeHtml(comment)}</pre>\n`);
+		.send(`<pre>\nSUCCESS\n${escapeHtml(comment)}\n</pre>\n`);
 }
 
 module.exports = success;

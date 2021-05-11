@@ -2,9 +2,13 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
 
-const failure = require('../services/csvPipeline/failure');
+const express = require('express');
+const { CSVPipelineError } = require('./CustomErrors');
+const { Param, EnumParam, BooleanParam, StringParam } = require('./ValidationSchemas');
+const failure = require('./failure');
 const validate = require('jsonschema').validate;
 
+// These are the default values of CSV Pipeline upload parameters.
 const DEFAULTS = {
 	common: {
 		gzip: 'true',
@@ -17,72 +21,38 @@ const DEFAULTS = {
 		createMeter: 'false',
 		cumulative: 'false',
 		cumulativeReset: 'false',
+		cumulativeResetStart: '0:00:00',
+		cumulativeResetEnd: '23:59:59',
 		duplications: '1',
+		length: '',
+		lengthVariation: '',
+		refreshReadings: 'false',
 		timeSort: 'increasing'
 	}
 }
 
-class Param {
-	/**
-	 * @param {string} paramName - The name of the parameter.
-	 * @param {string} description - The description of what the parameter needs to be.
-	 */
-	constructor(paramName, description) {
-		this.field = paramName;
-		this.description = description;
-		this.message = function (provided) {
-			return `Provided value ${this.field}=${provided} is invalid. ${this.description}`
-		}
-	}
-}
-
-class EnumParam extends Param {
-	/**
-	 * @param {string} paramName - The name of the parameter
-	 * @param {array} enums - The array of values to check against. enums.length must be greater or equal to one.
-	 */
-	constructor(paramName, enums) {
-		super(paramName, `${paramName} can ${enums.length > 1 ? 'be one of' : 'be'} ${enums.toString()}.`);
-		this.enum = enums;
-	}
-}
-class BooleanParam extends EnumParam {
-	/**
-	 * @param {string} paramName - The name of the parameter.
-	 */
-	constructor(paramName) {
-		super(paramName, ['true', 'false']);
-	}
-}
-
-class StringParam extends Param {
-	/**
-	 * 
-	 * @param {string} paramName - The name of the parameter.
-	 * @param {string} pattern - Regular expression pattern to be used in validation. This can be undefined to avoid checking.
-	 * @param {string} description - The description of what the parameter needs to be.
-	 */
-	constructor(paramName, pattern, description) {
-		super(paramName, description);
-		this.pattern = pattern;
-		this.type = 'string';
-	}
-}
-
+// These are the common upload params shared between meters and readings upload.
+// Note: Even though, the 'email' and 'password' properties are not used to validate the upload, 
+// they may be attached to the request body when the CSV Pipeline handles user authentication 
+// (i.e. when the user performs a curl request to the pipeline). Thus, we list these properties 
+// here so that they do not falsely trigger the 'additionalProperties' User Error.
 const COMMON_PROPERTIES = {
 	gzip: new BooleanParam('gzip'),
 	headerRow: new BooleanParam('headerRow'),
-	password: new StringParam('password', undefined, undefined), // This is put here so it would not trigger the additionalProperties error.
+	email: new StringParam('email', undefined, undefined),
+	password: new StringParam('password', undefined, undefined),
 	update: new BooleanParam('update')
 }
 
+// This sets the validation schemas for jsonschema.
+// Validation is case sensitive. We could not find an elegant solution to perform case-insensitive validation.
 const VALIDATION = {
 	meters: {
 		type: 'object',
 		properties: {
 			...COMMON_PROPERTIES
 		},
-		additionalProperties: false // This protects us from unintended parameters.
+		additionalProperties: false // This protects us from unintended parameters as well as typos.
 	},
 	readings: {
 		type: 'object',
@@ -92,11 +62,16 @@ const VALIDATION = {
 			createMeter: new BooleanParam('createMeter'),
 			cumulative: new BooleanParam('cumulative'),
 			cumulativeReset: new BooleanParam('cumulativeReset'),
+			cumulativeResetStart: new StringParam('cumulativeResetStart', undefined, undefined),
+			cumulativeResetEnd: new StringParam('cumulativeResetEnd', undefined, undefined),
 			duplications: new StringParam('duplications', '^\\d+$', 'duplications must be an integer.'),
 			meterName: new StringParam('meterName', undefined, undefined),
+			length: new StringParam('length', undefined, undefined),
+			lengthVariation: new StringParam('lengthVariation', undefined, undefined),
+			refreshReadings: new BooleanParam('refreshReadings'),
 			timeSort: new EnumParam('timeSort', ['increasing'])
 		},
-		additionalProperties: false // This protects us from unintended parameters.
+		additionalProperties: false // This protects us from unintended parameters as well as typos.
 	}
 }
 
@@ -129,14 +104,24 @@ function validateRequestParams(body, schema) {
 	}
 }
 
+/**
+ * Middleware that validates a request to upload readings via the CSV Pipeline and sets defaults for upload parameters.
+ * @param {express.Request} req 
+ * @param {express.Response} res 
+ * @param {express.NextFunction} next 
+ */
 function validateReadingsCsvUploadParams(req, res, next) {
+	// Validate the parameters of the request. Failure out if there are any unintended mistakes such as additional parameters and typos.
 	const { responseMessage, success } = validateRequestParams(req.body, VALIDATION.readings);
 	if (!success) {
-		failure(req, res, new Error(responseMessage));
+		failure(req, res, new CSVPipelineError(responseMessage));
 		return;
 	}
+
 	const { createMeter, cumulative, duplications,
 		gzip, headerRow, timeSort, update } = req.body; // extract query parameters
+
+	// Set default values of not supplied parameters.
 	if (!createMeter) {
 		req.body.createMeter = DEFAULTS.readings.createMeter;
 	}
@@ -161,13 +146,23 @@ function validateReadingsCsvUploadParams(req, res, next) {
 	next();
 }
 
+/**
+ * Middleware that validates a request to upload meters via the CSV Pipeline and sets defaults for upload parameters.
+ * @param {express.Request} req 
+ * @param {express.Response} res 
+ * @param {express.NextFunction} next 
+ */
 function validateMetersCsvUploadParams(req, res, next) {
+	// Validate the parameters of the request. Failure out if there are any unintended mistakes such as additional parameters and typos.
 	const { responseMessage, success } = validateRequestParams(req.body, VALIDATION.meters);
 	if (!success) {
-		failure(req, res, new Error(responseMessage));
+		failure(req, res, new CSVPipelineError(responseMessage));
 		return;
 	}
-	const { gzip, headerRow, update } = req.body; // extract query parameters
+
+	const { gzip, headerRow, update } = req.body; // Extract query parameters
+
+	// Set default values of not supplied parameters.
 	if (!gzip) {
 		req.body.gzip = DEFAULTS.common.gzip;
 	}
@@ -175,7 +170,7 @@ function validateMetersCsvUploadParams(req, res, next) {
 		req.body.headerRow = DEFAULTS.common.headerRow;
 	}
 	if (!update) {
-		req.body.update = DEFAULTS.common.update; // set default update param if not supplied
+		req.body.update = DEFAULTS.common.update;
 	}
 	next();
 }

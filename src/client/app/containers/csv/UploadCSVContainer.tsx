@@ -3,11 +3,14 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
 
 import * as React from 'react';
-import MetersCSVUploadComponent from '../../components/admin/MetersCSVUploadComponent';
-import ReadingsCSVUploadComponent from '../../components/admin/ReadingsCSVUploadComponent';
+import MetersCSVUploadComponent from '../../components/csv/MetersCSVUploadComponent';
+import ReadingsCSVUploadComponent from '../../components/csv/ReadingsCSVUploadComponent';
+import HeaderContainer from '../HeaderContainer';
+import FooterContainer from '../FooterContainer';
 import { uploadCSVApi } from '../../utils/api';
 import { ReadingsCSVUploadPreferencesItem, MetersCSVUploadPreferencesItem, TimeSortTypes } from '../../types/csvUploadForm';
 import { TabContent, TabPane, Nav, NavItem, NavLink } from 'reactstrap';
+import { FormattedMessage } from 'react-intl';
 
 const enum MODE {
 	meters = 'meters',
@@ -26,6 +29,10 @@ export default class UploadCSVContainer extends React.Component<{}, UploadCSVCon
 		this.selectDuplications = this.selectDuplications.bind(this);
 		this.selectTimeSort = this.selectTimeSort.bind(this);
 		this.setMeterName = this.setMeterName.bind(this);
+		this.setCumulativeResetStart = this.setCumulativeResetStart.bind(this);
+		this.setCumulativeResetEnd = this.setCumulativeResetEnd.bind(this);
+		this.setLength = this.setLength.bind(this);
+		this.setLengthVariation = this.setLengthVariation.bind(this);
 		this.submitReadings = this.submitReadings.bind(this);
 		this.submitMeters = this.submitMeters.bind(this);
 		this.toggleCreateMeter = this.toggleCreateMeter.bind(this);
@@ -33,6 +40,7 @@ export default class UploadCSVContainer extends React.Component<{}, UploadCSVCon
 		this.toggleCumulativeReset = this.toggleCumulativeReset.bind(this);
 		this.toggleGzip = this.toggleGzip.bind(this);
 		this.toggleHeaderRow = this.toggleHeaderRow.bind(this);
+		this.toggleRefreshReadings = this.toggleRefreshReadings.bind(this);
 		this.toggleUpdate = this.toggleUpdate.bind(this);
 		this.toggleTab = this.toggleTab.bind(this);
 	}
@@ -48,10 +56,15 @@ export default class UploadCSVContainer extends React.Component<{}, UploadCSVCon
 			createMeter: false,
 			cumulative: false,
 			cumulativeReset: false,
+			cumulativeResetStart: '',
+			cumulativeResetEnd: '',
 			duplications: '1',
 			gzip: false,
 			headerRow: false,
+			length: '',
+			lengthVariation: '',
 			meterName: '',
+			refreshReadings: false,
 			timeSort: TimeSortTypes.increasing,
 			update: false
 		}
@@ -81,6 +94,42 @@ export default class UploadCSVContainer extends React.Component<{}, UploadCSVCon
 			uploadReadingsPreferences: {
 				...previousState.uploadReadingsPreferences,
 				meterName: value
+			}
+		}))
+	}
+	private setCumulativeResetStart(value: string) {
+		this.setState(previousState => ({
+			...previousState,
+			uploadReadingsPreferences: {
+				...previousState.uploadReadingsPreferences,
+				cumulativeResetStart: value
+			}
+		}))
+	}
+	private setCumulativeResetEnd(value: string) {
+		this.setState(previousState => ({
+			...previousState,
+			uploadReadingsPreferences: {
+				...previousState.uploadReadingsPreferences,
+				cumulativeResetEnd: value
+			}
+		}))
+	}
+	private setLength(value: string) {
+		this.setState(previousState => ({
+			...previousState,
+			uploadReadingsPreferences: {
+				...previousState.uploadReadingsPreferences,
+				length: value
+			}
+		}))
+	}
+	private setLengthVariation(value: string) {
+		this.setState(previousState => ({
+			...previousState,
+			uploadReadingsPreferences: {
+				...previousState.uploadReadingsPreferences,
+				lengthVariation: value
 			}
 		}))
 	}
@@ -136,6 +185,16 @@ export default class UploadCSVContainer extends React.Component<{}, UploadCSVCon
 		}
 	}
 
+	private toggleRefreshReadings() {
+		this.setState(previousState => ({
+			...previousState,
+			uploadReadingsPreferences: {
+				...previousState.uploadReadingsPreferences,
+				refreshReadings: !previousState.uploadReadingsPreferences.refreshReadings
+			}
+		}))
+	}
+
 	private toggleUpdate(mode: MODE) {
 		const preference = (mode === 'readings') ? 'uploadReadingsPreferences' : 'uploadMetersPreferences';
 		return () => {
@@ -168,14 +227,22 @@ export default class UploadCSVContainer extends React.Component<{}, UploadCSVCon
 	}
 
 	public render() {
+		const navStyle: React.CSSProperties = {
+			cursor: 'pointer'
+		}
 		return (
 			<div>
-				<Nav tabs>
-					<NavItem>
-						<NavLink onClick={() => this.toggleTab(MODE.readings)}> Readings </NavLink>
+				<HeaderContainer />
+				<Nav tabs style={{ display: 'flex', justifyContent: 'center' }}>
+					<NavItem style={navStyle}>
+						<NavLink onClick={() => this.toggleTab(MODE.readings)}>
+							<FormattedMessage id='csv.tab.readings'/>
+						</NavLink>
 					</NavItem>
-					<NavItem>
-						<NavLink onClick={() => this.toggleTab(MODE.meters)}> Meters </NavLink>
+					<NavItem style={navStyle}>
+						<NavLink onClick={() => this.toggleTab(MODE.meters)}>
+							<FormattedMessage id='csv.tab.meters'/>
+						</NavLink>
 					</NavItem>
 				</Nav>
 				<TabContent activeTab={this.state.activeTab}>
@@ -185,12 +252,17 @@ export default class UploadCSVContainer extends React.Component<{}, UploadCSVCon
 							selectDuplications={this.selectDuplications}
 							selectTimeSort={this.selectTimeSort}
 							setMeterName={this.setMeterName}
+							setCumulativeResetStart={this.setCumulativeResetStart}
+							setCumulativeResetEnd={this.setCumulativeResetEnd}
+							setLength={this.setLength}
+							setLengthVariation={this.setLengthVariation}
 							submitCSV={this.submitReadings}
 							toggleCreateMeter={this.toggleCreateMeter}
 							toggleCumulative={this.toggleCumulative}
 							toggleCumulativeReset={this.toggleCumulativeReset}
 							toggleGzip={this.toggleGzip(MODE.readings)}
 							toggleHeaderRow={this.toggleHeaderRow(MODE.readings)}
+							toggleRefreshReadings={this.toggleRefreshReadings}
 							toggleUpdate={this.toggleUpdate(MODE.readings)}
 						/>
 					</TabPane>
@@ -204,6 +276,7 @@ export default class UploadCSVContainer extends React.Component<{}, UploadCSVCon
 						/>
 					</TabPane>
 				</TabContent>
+				<FooterContainer />
 			</div>
 		)
 	}

@@ -9,18 +9,22 @@ import { State } from '../types/redux/state';
 import { changeOptionsFromLink, LinkOptions } from '../actions/graph';
 import { clearCurrentUser } from '../actions/currentUser';
 import { isRoleAdmin } from '../utils/hasPermissions';
+import { UserRole } from '../types/items';
 
 function mapStateToProps(state: State) {
 	const currentUser = state.currentUser.profile;
 	let loggedInAsAdmin = false;
+	let role: UserRole | null = null;
 	if(currentUser !== null){
 		loggedInAsAdmin = isRoleAdmin(currentUser.role);
+		role = currentUser.role;
 	}
 
 	return {
 		barStacking: state.graph.barStacking,
 		defaultLanguage: state.admin.defaultLanguage,
-		loggedInAsAdmin
+		loggedInAsAdmin,
+		role
 	};
 }
 

@@ -11,10 +11,13 @@ import { hasToken } from '../utils/token';
 import getPage from '../utils/getPage';
 import TooltipMarkerComponent from './TooltipMarkerComponent';
 import TooltipHelpComponentAlternative from './TooltipHelpComponentAlternative';
+import { UserRole } from '../types/items';
+import { hasPermissions } from '../utils/hasPermissions';
 
 interface HeaderButtonsProps {
 	showCollapsedMenuButton: boolean;
 	loggedInAsAdmin: boolean;
+	role: UserRole | null;
 	handleLogOut: () => any;
 }
 
@@ -28,6 +31,7 @@ export default class HeaderButtonsComponent extends React.Component<HeaderButton
 	}
 
 	public render() {
+		const role = this.props.role;
 		const loggedInAsAdmin = this.props.loggedInAsAdmin;
 		const showOptions = getPage() === '';
 		const renderLoginButton = !hasToken();
@@ -36,6 +40,7 @@ export default class HeaderButtonsComponent extends React.Component<HeaderButton
 		const renderGroupsButton = getPage() !== 'groups';
 		const renderMetersButton = getPage() !== 'meters';
 		const renderMapsButton = loggedInAsAdmin && getPage() !== 'maps';
+		const renderCSVButton = role && hasPermissions(role, UserRole.CSV) && getPage() !== 'csv';
 		const renderLogoutButton = hasToken();
 
 		const loginLinkStyle: React.CSSProperties = {
@@ -48,6 +53,10 @@ export default class HeaderButtonsComponent extends React.Component<HeaderButton
 		};
 		const adminLinkStyle: React.CSSProperties = {
 			display: renderAdminButton ? 'inline' : 'none'
+		};
+		const csvLinkStyle: React.CSSProperties = {
+			display: renderCSVButton ? 'inline' : 'none',
+			paddingLeft: '5px'
 		};
 		const groupsLinkStyle: React.CSSProperties = {
 			display: renderGroupsButton ? 'inline' : 'none',
@@ -83,6 +92,7 @@ export default class HeaderButtonsComponent extends React.Component<HeaderButton
 					<Link style={groupsLinkStyle} to='/groups'><Button outline><FormattedMessage id='groups' /></Button></Link>
 					<Link style={metersLinkStyle} to='/meters'><Button outline><FormattedMessage id='meters' /></Button></Link>
 					<Link style={mapsLinkStyle} to='/maps'><Button outline><FormattedMessage id='maps' /></Button></Link>
+					<Link style={csvLinkStyle} to='/csv'><Button outline><FormattedMessage id='csv'/></Button></Link>
 					<Link style={homeLinkStyle} to='/'><Button outline><FormattedMessage id='home'/></Button></Link>
 					<Link style={loginLinkStyle} to='/login'><Button outline><FormattedMessage id='log.in'/></Button></Link>
 					<Link style={logoutButtonStyle} to='/'><Button outline onClick={this.handleLogOut}><FormattedMessage id='log.out'/></Button></Link>

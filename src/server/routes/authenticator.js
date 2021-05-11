@@ -203,5 +203,6 @@ module.exports = {
 	csvAuthMiddleware,
 	exportAuthMiddleware,
 	obviusEmailAndPasswordAuthMiddleware,
-	optionalAuthMiddleware
+	optionalAuthMiddleware,
+	verifyCredentials
 };

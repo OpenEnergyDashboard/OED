@@ -25,6 +25,7 @@ export interface ReadingsCSVUploadPreferencesItem extends CSVUploadPreferences {
 	cumulativeReset: boolean;
 	duplications: string; // Not sure how to type this an integer string;
 	meterName: string;
+	refreshReadings: boolean;
 	timeSort: TimeSortTypes;
 }
 
@@ -32,17 +33,27 @@ export interface ReadingsCSVUploadProps extends ReadingsCSVUploadPreferencesItem
 	// Note: each of these will have to change in consideration of redux;
 	selectDuplications: (value: string) => void;
 	selectTimeSort: (value: TimeSortTypes) => void;
+	setCumulativeResetStart: (value: string) => void;
+	setCumulativeResetEnd: (value: string) => void;
+	setLength: (value: string) => void;
+	setLengthVariation: (value: string) => void;
 	setMeterName: (value: string) => void;
 	toggleCreateMeter: () => void;
 	toggleCumulative: () => void;
 	toggleCumulativeReset: () => void;
+	toggleRefreshReadings: () => void;
 	createMeter: boolean;
 	cumulative: boolean;
 	cumulativeReset: boolean;
+	cumulativeResetStart: string;
+	cumulativeResetEnd: string;
 	duplications: string; // Not sure how to type this an integer string;
 	gzip: boolean;
 	headerRow: boolean;
+	length: string;
+	lengthVariation: string;
 	meterName: string;
+	refreshReadings: boolean;
 	timeSort: TimeSortTypes;
 	update: boolean;
 };
