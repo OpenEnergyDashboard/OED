@@ -26,7 +26,9 @@ function formatMapForResponse(map) {
 		modifiedDate: map.modifiedDate,
 		origin: map.origin,
 		opposite: map.opposite,
-		mapSource: map.mapSource
+		mapSource: map.mapSource,
+		northAngle: map.northAngle,
+		maxCircleSizeFraction: map.maxCircleSizeFraction
 	};
 	return formattedMap;
 }
