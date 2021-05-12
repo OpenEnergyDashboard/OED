@@ -6,6 +6,7 @@
 
 const moment = require('moment');
 const { log } = require('../../log');
+const Meter = require('../../models/Meter');
 const Reading = require('../../models/Reading');
 const handleCumulativeReset = require('./handleCumulativeReset');
 const E0 = moment(0);
@@ -31,9 +32,11 @@ const E0 = moment(0);
  * @param {number} Tgap the allowed time variation in seconds that a gap may occur between two readings 
  * @param {number} Tlen the allowed time variation in seconds that two readings may deviate from each other
  * @param {dict} conditionSet used to validate readings (minVal, maxVal, minDate, maxDate, interval, maxError)
+ * @param {array} conn the connection to the database
  */
 function processData(rows, meterID, isCumulative, cumulativeReset, resetStart = '0:00:00.000', 
-					resetEnd = '23:59:99.999', readingRepetition, onlyEndTime = false, Tgap, Tlen, conditionSet) {
+					resetEnd = '23:59:99.999', readingRepetition, onlyEndTime = false, Tgap, Tlen, 
+					conditionSet, conn) {
 
 	// If processData is successfully finished then return result = [R0, R1, R2...RN]
 	const result = [];
@@ -43,15 +46,13 @@ function processData(rows, meterID, isCumulative, cumulativeReset, resetStart = 
 
 	let errMsg = '';
 
-	// Set the initial meterReading values to be 0 on entry because there is no reading that has been parsed yet.
-	let meterReading = 0;
-	let meterReading1 = 0;
-	let meterReading2 = 0;
-
-	// Set the initial startTimestamp and endTimestamp to be the very first date/time since Epoch time
-	// These values will be used to initialize the previousReading value on entry
-	let startTimestamp = E0;
-	let endTimestamp = E0;
+	// Retrieve and set the last reading stored for the meter
+	const meter = await Meter.getByID(meterID, conn);
+	let meterReading = meter.reading;
+	let meterReading1 = meter.reading;
+	let meterReading2 = meter.reading;
+	let startTimestamp = meter.startTimestamp;
+	let endTimestamp = meter.endTimestamp;
 
 	/* The currentReading will represent the current reading being parsed in the csv file. i.e. if index == 1, currentReading = rows[1] where
 	*  rows[1] : {reading_value, startTimestamp, endTimestamp}
@@ -66,7 +67,7 @@ function processData(rows, meterID, isCumulative, cumulativeReset, resetStart = 
 	*  currentReading = row[2] : {reading_value2, startTimestamp2, endTimestamp2} 
 	*  
 	*  If the currentReading passes all checks then we add the currentReading to result and begin parsing and checking the next reading*/
-	let currentReading = new Reading(meterID, -1, startTimestamp, endTimestamp);
+	let currentReading = new Reading(meterID, meterReading, startTimestamp, endTimestamp);
 	let prevReading = currentReading;
 	let readingOK = true;
 	for (let index = readingRepetition; index <= rows.length; ++index) {
@@ -124,9 +125,8 @@ function processData(rows, meterID, isCumulative, cumulativeReset, resetStart = 
 				}
 			}
 			if (readingOK) {
-				//This reading can be used
 				if (isCumulative) {
-					meterReading1 = rows[index - 2 * readingRepetition][0]; // use this if regular
+					meterReading1 = rows[index - 2 * readingRepetition][0]; // use this if there are both start and end timestamps
 					meterReading2 = rows[index - readingRepetition][0];
 					meterReading = meterReading2 - meterReading1; // use this ifCumulative
 				}
@@ -147,7 +147,7 @@ function processData(rows, meterID, isCumulative, cumulativeReset, resetStart = 
 						meterReading = meterReading2;
 					}
 					else {
-						//cumulativeReset is not expected so throw an error
+						//cumulativeReset is not expected but there is a negative meter reading so throw an error
 						errMsg = ('A negative meterReading has been detected but either cumulativeReset is not enabled, or the start time and end time of this reading is out of the reset range.')
 						readingOK = false;
 					}
@@ -156,9 +156,17 @@ function processData(rows, meterID, isCumulative, cumulativeReset, resetStart = 
 					if (Math.abs(prevReading.endTimestamp.diff(prevReading.startTimestamp) - endTimestamp.diff(startTimestamp)) 
 						> msTlen && !isFirst(prevReading.endTimestamp)) {
 						errMsg = 'The previous reading has a different time length than the current reading.';
+						// If this is true we still add the reading to the results
 					}
+					// This reading has passed all checks and can be added to result where it will be inserted into the db if all other readings pass all checks
 					currentReading = new Reading(meterID, meterReading, startTimestamp, endTimestamp);
 					result.push(currentReading);
+					if (index === rows.length){
+						// This is the last reading in the csv file so update the meter to hold the last reading stores for this meter
+						meter.reading = meterReading;
+						meter.startTimestamp = startTimestamp;
+						meter.endTimestamp = endTimestamp;
+					}
 				}
 			}
 			if (!readingOK) {

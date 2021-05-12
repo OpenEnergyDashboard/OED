@@ -29,7 +29,7 @@ async function loadArrayInput(dataRows, meterID, mapRowToModel, isCumulative, cu
 	let resetEnd = '23:59:99.999'; // time in format HH:mm:ss.SSS
 
 	readingsArray = processData(readingsArray, meterID, isCumulative, cumulativeReset, resetStart, resetEnd, 
-								readingRepetition, onlyEndTime, Tgap, Tlen, conditionSet);
+								readingRepetition, onlyEndTime, Tgap, Tlen, conditionSet, conn);
 							
 	return await Reading.insertOrIgnoreAll(readingsArray, conn);
 }
