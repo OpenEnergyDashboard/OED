@@ -8,7 +8,7 @@ const moment = require('moment');
 const { log } = require('../../log');
 const Reading = require('../../models/Reading');
 const handleCumulativeReset = require('./handleCumulativeReset');
-
+const E0 = moment(0);
 
 /**
  * Handle all data, assume that the first row is the first reading (skip this row).
@@ -23,30 +23,49 @@ const handleCumulativeReset = require('./handleCumulativeReset');
  * @param {number} meterID meter id being input
  * @param {boolean} isCumulative true if the data is cumulative
  * @param {boolean} cumulativeReset true if the cumulative data can reset
- * @param {string} resetStart a string representation of the start time a cumulativeReset may occur after. The default resetStart time is 0:00:00
- * @param {string} resetEnd a string representation of the end time a cumulativeReset may occur before. The default resetEnd time is 23:59:99
+ * @param {string} resetStart a string representation in the format of HH:mm:ss.SSS which represents the start time a cumulativeReset may occur after. \
+ *  The default resetStart time is 0:00:00.000.
+ * @param {string} resetEnd a string representation in the format of HH:mm:ss.SSS which represents the end time a cumulativeReset may occur before. The default resetEnd time is 23:59:99.999
  * @param readingRepetition value is 1 if reading is not duplicated. 2 if repeated twice and so on (E-mon D-mon meters)
  * @param {boolean} onlyEndTime true if the data only has an endTimestamp
- * @param {number} Tgap the allowed time variation in milliseconds that a gap may occur between two readings 
- * @param {number} Tlen the allowed time variation in milliseconds that two readings may deviate from each other
+ * @param {number} Tgap the allowed time variation in seconds that a gap may occur between two readings 
+ * @param {number} Tlen the allowed time variation in seconds that two readings may deviate from each other
  * @param {dict} conditionSet used to validate readings (minVal, maxVal, minDate, maxDate, interval, maxError)
  */
-
 function processData(rows, meterID, isCumulative, cumulativeReset, resetStart = '0:00:00.000', 
 					resetEnd = '23:59:99.999', readingRepetition, onlyEndTime = false, Tgap, Tlen, conditionSet) {
 
-	// If processData is succesfully finished then return result = [R0, R1, R2...RN]
+	// If processData is successfully finished then return result = [R0, R1, R2...RN]
 	const result = [];
+	// Convert Tgap and Tlen to milliseconds to stay consistent with moment.diff() which returns the difference in milliseconds
+	const msTgap = Tgap*1000;
+	const msTlen = Tlen*1000;
 
 	let errMsg = '';
 
+	// Set the initial meterReading values to be 0 on entry because there is no reading that has been parsed yet.
 	let meterReading = 0;
 	let meterReading1 = 0;
 	let meterReading2 = 0;
 
-	let startTimestamp = moment(0);
-	let endTimestamp = moment(0);
+	// Set the initial startTimestamp and endTimestamp to be the very first date/time since Epoch time
+	// These values will be used to initialize the previousReading value on entry
+	let startTimestamp = E0;
+	let endTimestamp = E0;
 
+	/* The currentReading will represent the current reading being parsed in the csv file. i.e. if index == 1, currentReading = rows[1] where
+	*  rows[1] : {reading_value, startTimestamp, endTimestamp}
+	*  Note that rows[1] may not contain a startTimestamp and may contain only an endTimestamp which must be reflected by onlyEndTime == True where we have,
+	*  rows[1] : {reading_value, endTimestamp}
+	*
+	*  On entry there is no previousReading yet so intialize it to be the very first date/time since Epoch time. After a currentReading has
+	*  been processed that currentReading will become the new prevReading. For example,
+	*
+	*  currentReading = row[1] : {reading_value1, startTimestamp1, endTimestamp1}
+	*  prevReading = row[1] : {reading_value1, startTimestamp1, endTimestamp1}
+	*  currentReading = row[2] : {reading_value2, startTimestamp2, endTimestamp2} 
+	*  
+	*  If the currentReading passes all checks then we add the currentReading to result and begin parsing and checking the next reading*/
 	let currentReading = new Reading(meterID, -1, startTimestamp, endTimestamp);
 	let prevReading = currentReading;
 	let readingOK = true;
@@ -94,7 +113,7 @@ function processData(rows, meterID, isCumulative, cumulativeReset, resetStart = 
 					}
 				}
 			}
-			if (readingOK && Math.abs(startTimestamp.diff(prevReading.endTimestamp)) > Tgap) {
+			if (readingOK && Math.abs(startTimestamp.diff(prevReading.endTimestamp)) > msTgap) {
 				if (isCumulative) {
 					readingOK = false;
 					errMsg = 'The end of the previous reading is too far from the start of the next readings in cumulative data so drop the readings.';
@@ -135,7 +154,7 @@ function processData(rows, meterID, isCumulative, cumulativeReset, resetStart = 
 				}
 				if (readingOK) {
 					if (Math.abs(prevReading.endTimestamp.diff(prevReading.startTimestamp) - endTimestamp.diff(startTimestamp)) 
-						> Tlen && !isFirst(prevReading.endTimestamp)) {
+						> msTlen && !isFirst(prevReading.endTimestamp)) {
 						errMsg = 'The previous reading has a different time length than the current reading.';
 					}
 					currentReading = new Reading(meterID, meterReading, startTimestamp, endTimestamp);
@@ -161,8 +180,10 @@ function processData(rows, meterID, isCumulative, cumulativeReset, resetStart = 
 	}
 	return result;
 }
+/**
+ * @param {moment} t moment date/time to compare against the first ever possible moment date/time which may exist
+ */
 function isFirst(t) {
-	const E0 = moment(0);
 	return t.isSame(E0);
 }
 

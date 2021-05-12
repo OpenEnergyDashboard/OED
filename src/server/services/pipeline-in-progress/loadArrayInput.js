@@ -20,15 +20,16 @@ const processData = require('./processData');
 async function loadArrayInput(dataRows, meterID, mapRowToModel, isCumulative, cumulativeReset, readingRepetition, conditionSet, conn) {
 	readingsArray = dataRows.map(mapRowToModel);
 
+	// TODO: Need to implement interface to let user pass in the params to the pipeline formally
 	// Temporary values for params
-	let onlyEndtime = false;
-	let Tgap = 0;
-	let Tlen = 0;
-	let resetStart = '00:00:00.000';
-	let resetEnd = '23:59:99.999';
+	let onlyEndTime = false; // onlyEndtime is false by default
+	let Tgap = 0; // time in seconds
+	let Tlen = 0; // time in seconds
+	let resetStart = '00:00:00.000'; // time in format HH:mm:ss.SSS
+	let resetEnd = '23:59:99.999'; // time in format HH:mm:ss.SSS
 
 	readingsArray = processData(readingsArray, meterID, isCumulative, cumulativeReset, resetStart, resetEnd, 
-								readingRepetition, onlyEndtime, Tgap, Tlen, conditionSet);
+								readingRepetition, onlyEndTime, Tgap, Tlen, conditionSet);
 							
 	return await Reading.insertOrIgnoreAll(readingsArray, conn);
 }

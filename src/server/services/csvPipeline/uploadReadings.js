@@ -56,6 +56,8 @@ async function uploadReadings(req, res, filepath, conn) {
 		conn
 	); // load csv data
 	// TODO: If unsuccessful upload then an error will be thrown. We need to catch this error.
+	// Call the refreshReadingViews script. If not called then new readings will not be seen until the daily readings view is refreshed.
+	// TODO: Extend the interface to allow the client to determine if they would like to refreshReadings immediately upon uploading new readings
 	require ('../refreshReadingViews');
 	fs.unlink(filepath).catch(err => log.error(`Failed to remove the file ${filepath}.`, err));
 	success(req, res, 'It looks like success.'); // TODO: We need a try catch for all these awaits.
