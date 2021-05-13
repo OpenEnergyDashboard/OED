@@ -2,6 +2,7 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
 
+const moment = require('moment');
 const database = require('./database');
 const Reading = require('./Reading');
 
@@ -31,8 +32,8 @@ class Meter {
 	 * @param endTimestamp  End timestamp of last reading input for this meter, '01-01-01 00:00:00' 
 	 */
 	constructor(id, name, ipAddress, enabled, displayable, type, meterTimezone, gps = undefined, identifier = name, note, area,
-		cumulative, cumulativeReset, cumulativeResetStart, cumulativeResetEnd, readingLength, readingVariation, reading, 
-		startTimestamp, endTimestamp) {
+		cumulative, cumulativeReset, cumulativeResetStart, cumulativeResetEnd, readingLength, readingVariation, reading=0.0, 
+		startTimestamp=moment(0), endTimestamp=moment(0)) {
 		// In order for the CSV pipeline to work, the order of the parameters needs to match the order that the fields are declared.
 		// In addition, each new parameter has to be added at the very end.
 		this.id = id;

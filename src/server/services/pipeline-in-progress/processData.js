@@ -34,18 +34,16 @@ const E0 = moment(0);
  * @param {dict} conditionSet used to validate readings (minVal, maxVal, minDate, maxDate, interval, maxError)
  * @param {array} conn the connection to the database
  */
-function processData(rows, meterID, isCumulative, cumulativeReset, resetStart = '0:00:00.000', 
+async function processData(rows, meterID, isCumulative, cumulativeReset, resetStart = '0:00:00.000', 
 					resetEnd = '23:59:99.999', readingRepetition, onlyEndTime = false, Tgap, Tlen, 
 					conditionSet, conn) {
 
 	// If processData is successfully finished then return result = [R0, R1, R2...RN]
 	const result = [];
+	let errMsg = '';
 	// Convert Tgap and Tlen to milliseconds to stay consistent with moment.diff() which returns the difference in milliseconds
 	const msTgap = Tgap*1000;
 	const msTlen = Tlen*1000;
-
-	let errMsg = '';
-
 	// Retrieve and set the last reading stored for the meter
 	const meter = await Meter.getByID(meterID, conn);
 	let meterReading = meter.reading;
@@ -82,11 +80,27 @@ function processData(rows, meterID, isCumulative, cumulativeReset, resetStart = 
 				startTimestamp = moment(rows[index - readingRepetition][1], ['YYYY/MM/DD HH:mm', 'MM/DD/YYYY HH:mm']);
 				endTimestamp = moment(rows[index - readingRepetition][2], ['YYYY/MM/DD HH:mm', 'MM/DD/YYYY HH:mm']);
 			}
+			// Determine the meter reading value to use based on if the data is cumulative or not cumulative
+			if (isCumulative) {
+				meterReading1 = meter.reading; // In cumulative this is the previous raw reading
+				meterReading2 = rows[index - readingRepetition][0]; // In cumulative this is the current raw reading
+
+				// In cumulative the reading we use will be the difference between the current raw reading and the previous raw reading
+				// Note the above assumes that the csv file is sorted in ASCENDING ORDER. If it is not in ascending order we must change this.
+
+				meterReading = meterReading2 - meterReading1; // use this ifCumulative
+				meter.reading = meterReading2; // Update the meter table with the raw cumulative value
+			}
+			else {
+				// The data is not cumulative use the raw reading value
+				meterReading = rows[index - readingRepetition][0];
+				meter.reading = meterReading;
+			}
 			if (isCumulative && isFirst(prevReading.endTimestamp)) {
 				readingOK = false;
 				errMsg = 'The first reading must be dropped when dealing with cumulative data.';
 			}
-			if (onlyEndTime && isFirst(prevReading.endTimestamp)) {
+			if (onlyEndTime && isFirst(prevReading.endTimestamp) && readingOK) {
 				readingOK = false;
 				errMsg = 'The first reading must be dropped when dealing only with endTimestamps.';
 			}
@@ -125,26 +139,12 @@ function processData(rows, meterID, isCumulative, cumulativeReset, resetStart = 
 				}
 			}
 			if (readingOK) {
-				if (isCumulative) {
-					meterReading1 = rows[index - 2 * readingRepetition][0]; // use this if there are both start and end timestamps
-					meterReading2 = rows[index - readingRepetition][0];
-					meterReading = meterReading2 - meterReading1; // use this ifCumulative
-				}
-				else {
-					meterReading = rows[index - readingRepetition][0];
-				}
-				// Reject negative readings
-				if (isCumulative && meterReading1 < 0) {
-					// If the value isCumulative and the first reading is negative reject unless cumulativeReset is true
-					log.error(`DETECTED A NEGATIVE VALUE WHILE HANDLING CUMULATIVE READINGS FROM METER ${meterID}, ` +
-						`ROW ${index - readingRepetition}. REJECTED ALL READINGS`);
-					return [];
-				}
 				// To handle cumulative readings that resets at midnight
 				if (meterReading < 0) {
 					// if meterReading is negative and cumulative check that the times fall within an acceptable reset range
 					if (handleCumulativeReset(cumulativeReset, resetStart, resetEnd, startTimestamp)) {
 						meterReading = meterReading2;
+						// Note that in the case of a reset the raw cumulative value is still meterReading2
 					}
 					else {
 						//cumulativeReset is not expected but there is a negative meter reading so throw an error
@@ -162,10 +162,10 @@ function processData(rows, meterID, isCumulative, cumulativeReset, resetStart = 
 					currentReading = new Reading(meterID, meterReading, startTimestamp, endTimestamp);
 					result.push(currentReading);
 					if (index === rows.length){
-						// This is the last reading in the csv file so update the meter to hold the last reading stores for this meter
-						meter.reading = meterReading;
+						// This is the last reading in the csv file which contains the reading value, start timestamp and endtimestamp this meter will hold
 						meter.startTimestamp = startTimestamp;
 						meter.endTimestamp = endTimestamp;
+						meter.update(conn);
 					}
 				}
 			}
@@ -173,8 +173,7 @@ function processData(rows, meterID, isCumulative, cumulativeReset, resetStart = 
 				// An error occurred, for now log it, let the user know and continue
 				log.error(errMsg);
 				readingOK = true;
-				if (isCumulative && !onlyEndTime || onlyEndTime && !isCumulative || isCumulative && onlyEndTime) {
-					meterReading = rows[index - readingRepetition][0];
+				if (isCumulative && !onlyEndTime || !isCumulative && onlyEndTime || isCumulative && onlyEndTime) {
 					currentReading = new Reading(meterID, meterReading, startTimestamp, endTimestamp);
 					// This currentReading will become the previousReading for the first reading if isCumulative is true
 				}
