@@ -10,5 +10,7 @@ UPDATE maps
 		modified_date = ${modifiedDate},
 		origin = ${origin},
 		opposite = ${opposite},
-		map_source = ${mapSource}
+		map_source = ${mapSource},
+		north_angle = ${northAngle},
+		max_circle_size_fraction = ${maxCircleSizeFraction}
 	WHERE id = ${id};
