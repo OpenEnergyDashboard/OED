@@ -34,7 +34,7 @@ mocha.describe('csv API', () => {
 				.field('email', testUser.email)
 				.field('password', testUser.password)
 				.field('gzip', 'false')
-				.attach('csvfile', metersBuffer, `${readingsPath}.gz`)
+				.attach('csvfile', metersBuffer, `${readingsPath}`)
 
 			expect(res).to.have.status(200);
 			const csvMeters = (await parseCsv(metersBuffer)).map(row =>
@@ -57,7 +57,7 @@ mocha.describe('csv API', () => {
 				.field('password', testUser.password)
 				.field('headerRow', 'true')
 				.field('gzip', 'false')
-				.attach('csvfile', metersWithHeaderBuffer, `${metersPathWithHeader}.gz`)
+				.attach('csvfile', metersWithHeaderBuffer, `${metersPathWithHeader}`)
 
 			expect(res).to.have.status(200);
 			const csvMeters = (await parseCsv(metersWithHeaderBuffer)).map(row =>
@@ -83,7 +83,7 @@ mocha.describe('csv API', () => {
 				.field('meterName', 'XXX')
 				.field('timeSort', 'increasing')
 				.field('gzip', 'false')
-				.attach('csvfile', readingsBuffer, `${readingsPath}.gz`)
+				.attach('csvfile', readingsBuffer, `${readingsPath}`)
 
 			expect(res).to.have.status(200);
 			const readings = await Reading.getAllByMeterID(meter.id, conn);
@@ -102,7 +102,7 @@ mocha.describe('csv API', () => {
 				.field('meterName', 'ABG')
 				.field('timeSort', 'increasing')
 				.field('gzip', 'false')
-				.attach('csvfile', readingsBuffer, `${readingsPath}.gz`)
+				.attach('csvfile', readingsBuffer, `${readingsPath}`)
 
 			const meter = await Meter.getByName('ABG', conn);
 			const readings = await Reading.getAllByMeterID(meter.id, conn);

@@ -35,10 +35,6 @@ async function uploadMeters(req, res, filepath, conn) {
 		await Promise.all(meters.map(meter => {
 			return (new Meter(undefined, ...meter).insert(conn));
 		}));
-		fs.unlink(filepath)
-			.catch(err => {
-				log.error(`Failed to remove the file ${filepath}.`, err);
-			}); // remove file
 		success(req, res, 'Successfully inserted the meters.');
 		return;
 	} catch (error) {

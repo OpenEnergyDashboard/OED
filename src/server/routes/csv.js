@@ -7,13 +7,15 @@
  * meter and readings data.
  */
 
+const crypto = require('crypto');
 const express = require('express');
 const router = express.Router();
 const failure = require('../services/csvPipeline/failure');
 const { getConnection } = require('../db');
 const { log } = require('../log');
 const { verifyCredentials } = require('./authenticator');
-const fs = require('fs');
+const fs = require('fs').promises;
+const { mkdirSync } = require('fs');
 const multer = require('multer');
 const saveCsv = require('../services/csvPipeline/saveCsv');
 const uploadMeters = require('../services/csvPipeline/uploadMeters');
@@ -33,17 +35,13 @@ router.use(function (req, res, next) {
 	const storage = multer.diskStorage({
 		destination: function () {
 			const path = `${__dirname}/../tmp/uploads/csvPipeline`;
-			fs.mkdirSync(path, { recursive: true }); // creates directory if not exists
+			mkdirSync(path, { recursive: true }); // creates directory if not exists
 			return path;
 		}(),
 		filename: function (r, file, cb) {
-
-			// Get the file extension.
-			let extArray = file.mimetype.split('/');
-			let extension = extArray[extArray.length - 1];
-
-			// Save file with original name
-			cb(null, file.originalname + '-' + Date.now() + '.' + extension);
+			// Save file with original name and date time to prevent accidental overwrites.
+			const modifiedFilename = `${(new Date(Date.now()).toISOString())}-${crypto.randomBytes(2).toString('hex')}-${file.originalname}`;
+			cb(null, modifiedFilename);
 		}
 	})
 
@@ -51,12 +49,12 @@ router.use(function (req, res, next) {
 	let upload = multer({
 		storage: storage,
 		// We will use this filter to handle user authentication. If the user is doing a curl request
-		// we need the supplied password param to precede the file when uploading so that 
+		// we need the supplied password param to precede the file when uploading so that
 		// multer will have stored 'password' in req.body by the time this filter is called on a file.
 		// If the user is uploading via the webapp, we expect the request to have a token.
 		fileFilter: async function (request, file, cb) {
-			// Multer only executes the file filter when a file is being processed. If no file is 
-			// uploaded, then the authentication checks below are not called. This is okay, because 
+			// Multer only executes the file filter when a file is being processed. If no file is
+			// uploaded, then the authentication checks below are not called. This is okay, because
 			// if no file is uploaded the subsequent middleware will end the request.
 			try {
 				const token = request.headers.token || request.body.token || request.query.token;
@@ -64,7 +62,7 @@ router.use(function (req, res, next) {
 					// If a token is found, then we will check authentication and validation via the token.
 					(await isTokenAuthorized(token, csvRole)) ? cb(null, true) : cb(new Error('Invalid token'));
 				} else {
-					// If no token is found, then the request is mostly like a curl request. We require an 
+					// If no token is found, then the request is mostly like a curl request. We require an
 					// email and password to be supplied for curl requests.
 					const { email, password } = request.body;
 					const verifiedUser = await verifyCredentials(email, password, true);
@@ -93,7 +91,7 @@ router.use(function (req, res, next) {
 });
 
 // This middleware ensures that one CSV file has been uploaded. If no file is uploaded, the request ends. Otherwise, it proceeds.
-// We need this extra middleware because multer does not provide an option to guard against the case where no file is uploaded. 
+// We need this extra middleware because multer does not provide an option to guard against the case where no file is uploaded.
 router.use(function (req, res, next) {
 	if (!req.file) {
 		failure(req, res, new CSVPipelineError('No csv file was uploaded. A csv file must be submitted via the csvfile parameter.'));
@@ -103,36 +101,83 @@ router.use(function (req, res, next) {
 });
 
 router.post('/meters', validateMetersCsvUploadParams, async (req, res) => {
+	const uploadedFilepath = req.file.path;
+	let csvFilepath;
 	try {
-		let fileBuffer = fs.readFileSync(req.file.path);
+		let fileBuffer = await fs.readFile(uploadedFilepath);
 		if (req.body.gzip === 'true') {
 			fileBuffer = zlib.gunzipSync(fileBuffer);
+			// We expect this directories to have been created by this stage of the pipeline.
+			const dir = `${__dirname}/../tmp/uploads/csvPipeline`;
+			csvFilepath = await saveCsv(fileBuffer, 'meters', dir);
+			log.info(`The file ${csvFilepath} was created to upload meters csv data`);
+		} else {
+			csvFilepath = uploadedFilepath;
 		}
-		const filepath = await saveCsv(fileBuffer, 'meters');
-		log.info(`The file ${filepath} was created to upload meters csv data`);
+
 		const conn = getConnection();
-		await uploadMeters(req, res, filepath, conn);
+		await uploadMeters(req, res, csvFilepath, conn);
 	} catch (error) {
 		failure(req, res, error);
+	}
+
+	// Clean up files
+	fs.unlink(uploadedFilepath) // Delete the uploaded file.
+		.then(() => log.info(`Successfully deleted the uploaded file ${uploadedFilepath}.`))
+		.catch(err => {
+			log.error(`Failed to remove the file ${uploadedFilepath}.`, err);
+		});
+
+	if (csvFilepath) {
+		// Delete the unzipped csv file if it exists.
+		fs.unlink(csvFilepath)
+			.then(() => log.info(`Successfully deleted the csv file ${csvFilepath}.`))
+			.catch(err => {
+				log.error(`Failed to remove the file ${csvFilepath}.`, err);
+			});
 	}
 });
 
 router.post('/readings', validateReadingsCsvUploadParams, async (req, res) => {
+	const uploadedFilepath = req.file.path;
+	let csvFilepath;
 	try {
-		let fileBuffer = fs.readFileSync(req.file.path);
+		let fileBuffer = await fs.readFile(uploadedFilepath);
 		if (req.body.gzip === 'true') {
 			fileBuffer = zlib.gunzipSync(fileBuffer);
+			// We expect this directories to have been created by this stage of the pipeline.
+			const dir = `${__dirname}/../tmp/uploads/csvPipeline`;
+			csvFilepath = await saveCsv(fileBuffer, 'meters', dir);
+			log.info(`The file ${csvFilepath} was created to upload meters csv data`);
+		} else {
+			csvFilepath = uploadedFilepath;
 		}
-		const filepath = await saveCsv(fileBuffer, 'readings');
-		log.info(`The file ${filepath} was created to upload readings csv data`);
+
+		log.info(`The file ${csvFilepath} was created to upload readings csv data`);
 		const conn = getConnection();
-		await uploadReadings(req, res, filepath, conn);
+		await uploadReadings(req, res, csvFilepath, conn);
 		if (req.body.refreshReadings) {
 			// Call the refreshReadingViews script
 			require('../services/refreshReadingViews');
 		}
 	} catch (error) {
 		failure(req, res, error);
+	}
+
+	// Clean up files
+	fs.unlink(uploadedFilepath) // Delete the uploaded file.
+		.then(() => log.info(`Successfully deleted the uploaded file ${uploadedFilepath}.`))
+		.catch(err => {
+			log.error(`Failed to remove the file ${uploadedFilepath}.`, err);
+		});
+
+	if (csvFilepath) {
+		// Delete the unzipped csv file if it exists.
+		fs.unlink(csvFilepath)
+			.then(() => log.info(`Successfully deleted the csv file ${csvFilepath}.`))
+			.catch(err => {
+				log.error(`Failed to remove the file ${csvFilepath}.`, err);
+			});
 	}
 });
 
