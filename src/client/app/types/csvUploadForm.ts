@@ -23,8 +23,12 @@ export interface ReadingsCSVUploadPreferencesItem extends CSVUploadPreferences {
 	createMeter: boolean;
 	cumulative: boolean;
 	cumulativeReset: boolean;
+	cumulativeResetStart: string;
+	cumulativeResetEnd: string;
 	duplications: string; // Not sure how to type this an integer string;
 	meterName: string;
+	length: string;
+	lengthVariation: string;
 	refreshReadings: boolean;
 	timeSort: TimeSortTypes;
 }
@@ -42,20 +46,6 @@ export interface ReadingsCSVUploadProps extends ReadingsCSVUploadPreferencesItem
 	toggleCumulative: () => void;
 	toggleCumulativeReset: () => void;
 	toggleRefreshReadings: () => void;
-	createMeter: boolean;
-	cumulative: boolean;
-	cumulativeReset: boolean;
-	cumulativeResetStart: string;
-	cumulativeResetEnd: string;
-	duplications: string; // Not sure how to type this an integer string;
-	gzip: boolean;
-	headerRow: boolean;
-	length: string;
-	lengthVariation: string;
-	meterName: string;
-	refreshReadings: boolean;
-	timeSort: TimeSortTypes;
-	update: boolean;
 };
 
 // MetersCSVUpload, MetersCSVUploadPreferencesItem, MetersCSVUploadProps should be interfaces. However, at the moment does not add anything new.

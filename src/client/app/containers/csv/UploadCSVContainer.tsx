@@ -9,6 +9,7 @@ import HeaderContainer from '../HeaderContainer';
 import FooterContainer from '../FooterContainer';
 import { uploadCSVApi } from '../../utils/api';
 import { ReadingsCSVUploadPreferencesItem, MetersCSVUploadPreferencesItem, TimeSortTypes } from '../../types/csvUploadForm';
+import { ReadingsCSVUploadDefaults, MetersCSVUploadDefaults } from '../../utils/csvUploadDefaults';
 import { TabContent, TabPane, Nav, NavItem, NavLink } from 'reactstrap';
 import { FormattedMessage } from 'react-intl';
 
@@ -48,25 +49,10 @@ export default class UploadCSVContainer extends React.Component<{}, UploadCSVCon
 	state = {
 		activeTab: MODE.readings,
 		uploadMetersPreferences: {
-			gzip: false,
-			headerRow: false,
-			update: false
+			...MetersCSVUploadDefaults
 		},
 		uploadReadingsPreferences: {
-			createMeter: false,
-			cumulative: false,
-			cumulativeReset: false,
-			cumulativeResetStart: '',
-			cumulativeResetEnd: '',
-			duplications: '1',
-			gzip: false,
-			headerRow: false,
-			length: '',
-			lengthVariation: '',
-			meterName: '',
-			refreshReadings: false,
-			timeSort: TimeSortTypes.increasing,
-			update: false
+			...ReadingsCSVUploadDefaults
 		}
 	}
 
