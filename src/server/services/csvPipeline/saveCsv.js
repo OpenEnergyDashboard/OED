@@ -5,8 +5,6 @@
 const crypto = require('crypto');
 const { CSVPipelineError } = require('./CustomErrors');
 const fs = require('fs').promises;
-const streamBuffers = require('stream-buffers');
-const zlib = require('zlib');
 
 async function saveCsv(buffer, filename) {
 	// save this buffer into a file

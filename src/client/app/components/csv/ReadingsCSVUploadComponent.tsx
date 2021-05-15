@@ -10,7 +10,12 @@ import FormFileUploaderComponent from '../FormFileUploaderComponent';
 import translate from '../../utils/translate';
 import { FormattedMessage } from 'react-intl';
 
-/** A range of values, inclusive lower bound and exclusive upper bound. */
+/**
+ * Returns a range of values between the specified lower and upper bounds.
+ * @param {number} lower The lower bound, which will be included in the range.
+ * @param {number} upper The upper bound, which will be excluded from the range.
+ * @returns {number[]} An array of values between starting from the lower bound and up to and excluding the upper bound.
+ */
 function range(lower: number, upper: number): number[] {
 	const arr = [];
 	for (let i = lower; i < upper; i++) {

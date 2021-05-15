@@ -62,14 +62,14 @@ router.use(function (req, res, next) {
 				const token = request.headers.token || request.body.token || request.query.token;
 				if (token) {
 					// If a token is found, then we will check authentication and validation via the token.
-					(await isTokenAuthorized(token, csvRole)) ? cb(null, true): cb(new Error('Invalid token'));
+					(await isTokenAuthorized(token, csvRole)) ? cb(null, true) : cb(new Error('Invalid token'));
 				} else {
 					// If no token is found, then the request is mostly like a curl request. We require an 
 					// email and password to be supplied for curl requests.
 					const { email, password } = request.body;
 					const verifiedUser = await verifyCredentials(email, password, true);
-					if(verifiedUser){
-						isUserAuthorized(verifiedUser, csvRole) ? cb(null, true): cb(new Error('Invalid credentials'));
+					if (verifiedUser) {
+						isUserAuthorized(verifiedUser, csvRole) ? cb(null, true) : cb(new Error('Invalid credentials'));
 					} else {
 						cb(new Error('Invalid credentials'));
 					}
@@ -123,7 +123,7 @@ router.post('/readings', validateReadingsCsvUploadParams, async (req, res) => {
 		if (req.body.gzip === 'true') {
 			fileBuffer = zlib.gunzipSync(fileBuffer);
 		}
-		const filepath = await saveCsv(fileBuffer, 'meters');
+		const filepath = await saveCsv(fileBuffer, 'readings');
 		log.info(`The file ${filepath} was created to upload readings csv data`);
 		const conn = getConnection();
 		await uploadReadings(req, res, filepath, conn);

@@ -19,7 +19,7 @@ export default class UploadCSVApi {
 		for (const [preference, value] of Object.entries(uploadPreferences)){
 			formData.append(preference, value.toString());
 		}
-		formData.append('csvfile', readingsFile); // It is important for the server than the file is attached last.
+		formData.append('csvfile', readingsFile); // It is important for the server that the file is attached last.
 		await this.backend.doPostRequest<void>('/api/csv/readings', formData);
 	}
 
@@ -28,7 +28,7 @@ export default class UploadCSVApi {
 		for (const [preference, value] of Object.entries(uploadPreferences)){
 			formData.append(preference, value.toString());
 		}
-		formData.append('csvfile', metersFile); // It is important for the server than the file is attached last.
+		formData.append('csvfile', metersFile); // It is important for the server that the file is attached last.
 		await this.backend.doPostRequest<void>('/api/csv/meters', formData);
 	}
 }

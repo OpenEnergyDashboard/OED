@@ -84,7 +84,7 @@ export default class UploadCSVContainer extends React.Component<{}, UploadCSVCon
 			...previousState,
 			uploadReadingsPreferences: {
 				...previousState.uploadReadingsPreferences,
-				duplications: value
+				timeSort: value
 			}
 		}))
 	}

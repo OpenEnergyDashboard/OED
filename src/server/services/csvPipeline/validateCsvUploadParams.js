@@ -22,12 +22,12 @@ const DEFAULTS = {
 		cumulative: 'false',
 		cumulativeReset: 'false',
 		cumulativeResetStart: '0:00:00',
-		cumulativeResetEnd: '23:59:59',
+		cumulativeResetEnd: '23:59:59.999999',
 		duplications: '1',
 		length: '',
 		lengthVariation: '',
 		refreshReadings: 'false',
-		timeSort: 'increasing'
+		timeSort: 'increasing' // This corresponds to one of the values in TimeSortTypes exported from /src/client/app/types/csvUploadForm.ts
 	}
 }
 
@@ -69,7 +69,7 @@ const VALIDATION = {
 			length: new StringParam('length', undefined, undefined),
 			lengthVariation: new StringParam('lengthVariation', undefined, undefined),
 			refreshReadings: new BooleanParam('refreshReadings'),
-			timeSort: new EnumParam('timeSort', ['increasing'])
+			timeSort: new EnumParam('timeSort', ['increasing']) // This array is the TimeSortTypes exported by /src/client/app/types/csvUploadForm.ts
 		},
 		additionalProperties: false // This protects us from unintended parameters as well as typos.
 	}

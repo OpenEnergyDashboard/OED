@@ -15,7 +15,7 @@ function mapStateToProps(state: State) {
 	const currentUser = state.currentUser.profile;
 	let loggedInAsAdmin = false;
 	let role: UserRole | null = null;
-	if(currentUser !== null){
+	if (currentUser !== null) {
 		loggedInAsAdmin = isRoleAdmin(currentUser.role);
 		role = currentUser.role;
 	}
