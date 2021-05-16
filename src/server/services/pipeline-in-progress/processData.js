@@ -74,6 +74,7 @@ async function processData(rows, meterID, isCumulative, cumulativeReset, resetSt
 	for (let index = readingRepetition; index <= rows.length; ++index) {
 		// To read data where same reading is repeated. Like E-mon D-mon meters
 		if ((index - readingRepetition) % readingRepetition === 0) {
+			errMsg = '';
 			if (onlyEndTime) {
 				// The startTimestamp of this reading is the endTimestamp of the previous reading
 				startTimestamp = prevReading.endTimestamp;
@@ -100,7 +101,6 @@ async function processData(rows, meterID, isCumulative, cumulativeReset, resetSt
 				meter.reading = meterReading;
 			}
 			if (isCumulative && isFirst(prevReading.endTimestamp)) {
-				console.log(meterReading, startTimestamp.toString(), endTimestamp.toString());
 				readingOK = false;
 				errMsg = 'The first reading must be dropped when dealing with cumulative data. ';
 			}
@@ -187,7 +187,7 @@ async function processData(rows, meterID, isCumulative, cumulativeReset, resetSt
 			}
 			if (!readingOK) {
 				// An error occurred so add it to the readings dropped array and let the client know why before continuing
-				log.error(`Error parsing Reading #`,index-readingRepetition,`. Reading value gives `,meterReading, ` with error message: `,'\"',errMsg,'\"');
+				log.error(`Error parsing Reading #`+(index-readingRepetition)+`. Reading value gives `+meterReading+` with error message: `+'\"'+errMsg+'\"');
 				readingOK = true;
 				// index-readingReptition = reading # dropped in the data
 				readingsDropped.push(index-readingRepetition);
