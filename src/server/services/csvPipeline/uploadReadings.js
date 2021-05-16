@@ -20,7 +20,7 @@ const Meter = require('../../models/Meter');
 async function uploadReadings(req, res, filepath, conn) {
 
 	const { createMeter, cumulative, cumulativeReset, duplications, headerRow,
-		length, meterName, mode, timeSort, update } = req.body; // extract query parameters
+		length, meterName, mode, timeSort, update, refreshReadings } = req.body; // extract query parameters
 	const areReadingsCumulative = (cumulative === 'true');
 	const hasHeaderRow = (headerRow === 'true');
 	const readingRepetition = duplications;
@@ -57,8 +57,9 @@ async function uploadReadings(req, res, filepath, conn) {
 	); // load csv data
 	// TODO: If unsuccessful upload then an error will be thrown. We need to catch this error.
 	// Call the refreshReadingViews script. If not called then new readings will not be seen until the daily readings view is refreshed.
-	// TODO: Extend the interface to allow the client to determine if they would like to refreshReadings immediately upon uploading new readings
-	require ('../refreshReadingViews');
+	if (refreshReadings){
+		require ('../refreshReadingViews');
+	}
 	fs.unlink(filepath).catch(err => log.error(`Failed to remove the file ${filepath}.`, err));
 	success(req, res, 'It looks like success.'); // TODO: We need a try catch for all these awaits.
 	return;

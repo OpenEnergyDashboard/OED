@@ -46,6 +46,7 @@ async function processData(rows, meterID, isCumulative, cumulativeReset, resetSt
 	const msTgap = Tgap*1000;
 	const msTlen = Tlen*1000;
 	// Retrieve and set the last reading stored for the meter
+	// TODO: Create a redux state to hold these values with other meter states
 	const meter = await Meter.getByID(meterID, conn);
 	let meterReading = meter.reading;
 	let meterReading1 = meter.reading;
