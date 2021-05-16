@@ -106,7 +106,7 @@ class Meter {
 	static mapRow(row) {
 		return new Meter(row.id, row.name, row.ipaddress, row.enabled, row.displayable, row.meter_type,
 			row.default_timezone_meter, row.gps, row.identifier, row.note, row.area, row.cumulative, row.cumulative_reset,
-			row.cumulative_reset_start, row.cumulative_reset_end, row.reading_length, row.reading_variation, 
+			row.cumulative_reset_start, row.cumulative_reset_end, row.reading_length, row.reading_variation,
 			row.reading, row.start_timestamp, row.end_timestamp);
 	}
 

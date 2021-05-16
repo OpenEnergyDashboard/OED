@@ -5,13 +5,11 @@
 const crypto = require('crypto');
 const { CSVPipelineError } = require('./CustomErrors');
 const fs = require('fs').promises;
-const streamBuffers = require('stream-buffers');
-const zlib = require('zlib');
 
-async function saveCsv(buffer, filename) {
+async function saveCsv(buffer, filename, dir=__dirname) {
 	// save this buffer into a file
-	const randomFilename = `${filename}-${(new Date(Date.now()).toISOString())}-${crypto.randomBytes(16).toString('hex')}`;
-	const filepath = `${__dirname}/${randomFilename}.csv`;
+	const randomFilename = `${filename}-${(new Date(Date.now()).toISOString())}-${crypto.randomBytes(2).toString('hex')}`;
+	const filepath = `${dir}/${randomFilename}.csv`;
 	await fs.writeFile(filepath, buffer)
 		.catch(err => {
 			const message = `Failed to write the file: ${filepath}`;

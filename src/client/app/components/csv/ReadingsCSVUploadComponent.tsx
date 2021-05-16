@@ -5,12 +5,18 @@
 import * as React from 'react';
 import { Button, Col, Input, Form, FormGroup, Label } from 'reactstrap';
 import { ReadingsCSVUploadProps, TimeSortTypes } from '../../types/csvUploadForm';
+import { ReadingsCSVUploadDefaults } from '../../utils/csvUploadDefaults';
 import { showErrorNotification, showSuccessNotification } from '../../utils/notifications';
 import FormFileUploaderComponent from '../FormFileUploaderComponent';
 import translate from '../../utils/translate';
 import { FormattedMessage } from 'react-intl';
 
-/** A range of values, inclusive lower bound and exclusive upper bound. */
+/**
+ * Returns a range of values between the specified lower and upper bounds.
+ * @param {number} lower The lower bound, which will be included in the range.
+ * @param {number} upper The upper bound, which will be excluded from the range.
+ * @returns {number[]} An array of values between starting from the lower bound and up to and excluding the upper bound.
+ */
 function range(lower: number, upper: number): number[] {
 	const arr = [];
 	for (let i = lower; i < upper; i++) {
@@ -23,6 +29,10 @@ export default class ReadingsCSVUploadComponent extends React.Component<Readings
 	private fileInput: React.RefObject<HTMLInputElement>;
 	constructor(props: ReadingsCSVUploadProps) {
 		super(props);
+		this.handleSetCumulativeResetStart = this.handleSetCumulativeResetStart.bind(this);
+		this.handleSetCumulativeResetEnd = this.handleSetCumulativeResetEnd.bind(this);
+		this.handleSetLength = this.handleSetLength.bind(this);
+		this.handleSetLengthVariation = this.handleSetLengthVariation.bind(this);
 		this.handleSelectDuplications = this.handleSelectDuplications.bind(this);
 		this.handleSelectTimeSort = this.handleSelectTimeSort.bind(this);
 		this.handleSetMeterName = this.handleSetMeterName.bind(this);
@@ -151,16 +161,26 @@ export default class ReadingsCSVUploadComponent extends React.Component<Readings
 								<Label style={titleStyle}>
 									<FormattedMessage id='csv.readings.param.cumulative.reset.start' />
 								</Label>
-								<Col sm={8}>
-									<Input value={this.props.cumulativeResetStart} name='cumulativeResetStart' onChange={this.handleSetCumulativeResetStart} />
+								<Col sm={12}>
+									<Input
+										value={this.props.cumulativeResetStart}
+										name='cumulativeResetStart'
+										onChange={this.handleSetCumulativeResetStart}
+										placeholder={ReadingsCSVUploadDefaults.cumulativeResetStart}
+									/>
 								</Col>
 							</FormGroup>
 							<FormGroup>
 								<Label style={titleStyle}>
 									<FormattedMessage id='csv.readings.param.cumulative.reset.end' />
 								</Label>
-								<Col sm={8}>
-									<Input value={this.props.cumulativeResetEnd} name='cumulativeResetEnd' onChange={this.handleSetCumulativeResetEnd} />
+								<Col sm={12}>
+									<Input
+										value={this.props.cumulativeResetEnd}
+										name='cumulativeResetEnd'
+										onChange={this.handleSetCumulativeResetEnd}
+										placeholder={ReadingsCSVUploadDefaults.cumulativeResetEnd}
+									/>
 								</Col>
 							</FormGroup>
 						</Col>
@@ -174,7 +194,7 @@ export default class ReadingsCSVUploadComponent extends React.Component<Readings
 								<Label style={titleStyle}>
 									<FormattedMessage id='csv.readings.param.length' />
 								</Label>
-								<Col sm={8}>
+								<Col sm={12}>
 									<Input value={this.props.length} name='length' onChange={this.handleSetLength} />
 								</Col>
 							</FormGroup>
@@ -182,8 +202,8 @@ export default class ReadingsCSVUploadComponent extends React.Component<Readings
 								<Label style={titleStyle}>
 									<FormattedMessage id='csv.readings.param.length.variation' />
 								</Label>
-								<Col sm={8}>
-									<Input value={this.props.cumulativeResetEnd} name='lengthVariation' onChange={this.handleSetLengthVariation} />
+								<Col sm={12}>
+									<Input value={this.props.lengthVariation} name='lengthVariation' onChange={this.handleSetLengthVariation} />
 								</Col>
 							</FormGroup>
 						</Col>

@@ -15,12 +15,11 @@ const readCsv = require('../pipeline-in-progress/readCsv');
  * @param {express.Request} req 
  * @param {express.Response} res 
  * @param {filepath} filepath Path to meters csv file.
- * @param conn 
+ * @param conn Connection to the database.
  * @returns 
  */
 async function uploadMeters(req, res, filepath, conn) {
 	try {
-		// const columns = Object.keys(new Meter()).slice(1); // used for the shape of the csv
 		const temp = (await readCsv(filepath)).map(row => {
 			// The Canonical structure of each row in the Meters CSV file is the order of the fields 
 			// declared in the Meter constructor. If no headerRow is provided (i.e. headerRow === false),
@@ -31,14 +30,11 @@ async function uploadMeters(req, res, filepath, conn) {
 			return row.map(val => val === '' ? undefined : val);
 		});
 
+		// If there is a header row, we remove and ignore it for now.
 		const meters = (req.body.headerRow === 'true') ? temp.slice(1) : temp;
 		await Promise.all(meters.map(meter => {
 			return (new Meter(undefined, ...meter).insert(conn));
 		}));
-		fs.unlink(filepath)
-			.catch(err => {
-				log.error(`Failed to remove the file ${filepath}.`, err);
-			}); // remove file
 		success(req, res, 'Successfully inserted the meters.');
 		return;
 	} catch (error) {
