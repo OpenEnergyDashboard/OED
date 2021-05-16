@@ -41,6 +41,7 @@ async function processData(rows, meterID, isCumulative, cumulativeReset, resetSt
 
 	// If processData is successfully finished then return result = [R0, R1, R2...RN]
 	const result = [];
+	const readingsDropped = [];
 	let errMsg = '';
 	// Convert Tgap and Tlen to milliseconds to stay consistent with moment.diff() which returns the difference in milliseconds
 	const msTgap = Tgap*1000;
@@ -99,6 +100,7 @@ async function processData(rows, meterID, isCumulative, cumulativeReset, resetSt
 				meter.reading = meterReading;
 			}
 			if (isCumulative && isFirst(prevReading.endTimestamp)) {
+				console.log(meterReading, startTimestamp.toString(), endTimestamp.toString());
 				readingOK = false;
 				errMsg = 'The first reading must be dropped when dealing with cumulative data. ';
 			}
@@ -184,9 +186,11 @@ async function processData(rows, meterID, isCumulative, cumulativeReset, resetSt
 				}
 			}
 			if (!readingOK) {
-				// An error occurred, for now log it, let the user know and continue
-				log.error(`Error parsing Reading # `,index-readingRepetition,`. Reading value gives `,meterReading, ` with error message: `,errMsg);
+				// An error occurred so add it to the readings dropped array and let the client know why before continuing
+				log.error(`Error parsing Reading #`,index-readingRepetition,`. Reading value gives `,meterReading, ` with error message: `,'\"',errMsg,'\"');
 				readingOK = true;
+				// index-readingReptition = reading # dropped in the data
+				readingsDropped.push(index-readingRepetition);
 				/* If the data is cumulative then regardless of if it comes with end timestamps only or both end timestamps and start timestamps the first reading ever 
 				*  should become the previous reading. This is necessary because there are no previous readings in the db yet so we must drop the first point ever and 
 				*  use this first point as the first previous reading in order to begin calculating net readings since the data is cumulative.
@@ -206,6 +210,8 @@ async function processData(rows, meterID, isCumulative, cumulativeReset, resetSt
 		log.error(`REJECTED ALL READINGS FROM METER ${ipAddress} DUE TO ERROR WHEN VALIDATING DATA`);
 		return null;
 	}
+	// Let the user know exactly which readings were dropped if any before continuing
+	readingsDropped.forEach(readingNum => console.log("Dropped Reading #",readingNum));
 	return result;
 }
 
