@@ -20,16 +20,18 @@ const processData = require('./processData');
 async function loadArrayInput(dataRows, meterID, mapRowToModel, isCumulative, cumulativeReset, readingRepetition, conditionSet, conn) {
 	readingsArray = dataRows.map(mapRowToModel);
 
-	// TODO: Need to implement interface to let user pass in the params to the pipeline formally
-	// Temporary values for params
-	let onlyEndTime = false; // onlyEndtime is false by default
-	let Tgap = 0; // time in seconds
-	let Tlen = 0; // time in seconds
-	let resetStart = '00:00:00.000'; // time in format HH:mm:ss.SSS
-	let resetEnd = '23:59:99.999'; // time in format HH:mm:ss.SSS
+	// TODO: Need to implement interface to let user pass in the following params to the pipeline formally
+	
+	// Temporary values for params. Note they are currently initialized to their default values.
+	let onlyEndTime = false; // onlyEndtime is true if the readings have only endTimestamps. This is false by default.
+	let Tgap = 0; // time in seconds that a gap may occur between two readings. This is 0 seconds by default since we expect data to not have gaps.
+	let Tlen = 0; // time in seconds that two readings may differ from one another. This is 0 seconds by default since we expect meter readings to be recorded in the same time intervals.
+	let resetStart = '00:00:00.000'; // time in format HH:mm:ss.SSS that a cumulative reset may begin. This is '00:00:00.000' by default which means a cumulative reset may begin at the very beginning of any given day.
+	let resetEnd = '23:59:99.999'; // time in format HH:mm:ss.SSS that a cumulative reset may end. This is '23:59:99.999' by default which means a cumulative reset may NOT occur after .001 milliseconds till the end of any given day.
+	// end of temporary values for params
 
-	readingsArray = await processData(readingsArray, meterID, isCumulative, cumulativeReset, resetStart, resetEnd, 
-								readingRepetition, onlyEndTime, Tgap, Tlen, conditionSet, conn);
+	readingsArray = await processData(readingsArray, meterID, isCumulative, cumulativeReset, resetStart='00:00:00.000', resetEnd='23:59:99.999', 
+								readingRepetition, onlyEndTime=false, Tgap=0, Tlen=0, conditionSet, conn);
 
 	return await Reading.insertOrIgnoreAll(readingsArray, conn);
 }

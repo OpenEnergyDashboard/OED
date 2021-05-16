@@ -13,7 +13,7 @@ const { validateReadings } = require('./validateReadings');
 const E0 = moment(0);
 
 /**
- * Handle all data, assume that the first row is the first reading (skip this row).
+ * Handle all data, assume that the first row is the first reading. Also assume that the date/time values are in the format: 'YYYY/MM/DD HH:mm' or 'MM/DD/YYYY HH:mm'
  * @Example
  * 	row 0: reading #0
  *  row 1: reading #1
@@ -36,7 +36,7 @@ const E0 = moment(0);
  * @param {array} conn the connection to the database
  */
 async function processData(rows, meterID, isCumulative, cumulativeReset, resetStart = '0:00:00.000', 
-					resetEnd = '23:59:99.999', readingRepetition, onlyEndTime = false, Tgap, Tlen, 
+					resetEnd = '23:59:99.999', readingRepetition, onlyEndTime = false, Tgap=0, Tlen=0, 
 					conditionSet, conn) {
 
 	// If processData is successfully finished then return result = [R0, R1, R2...RN]
@@ -142,12 +142,12 @@ async function processData(rows, meterID, isCumulative, cumulativeReset, resetSt
 			if (readingOK) {
 				// Reject negative readings
 				if (isCumulative && meterReading1 < 0) {
-					// If the value isCumulative and the prior reading is negative reject unless cumulativeReset is true
+					// If the value isCumulative and the prior reading is negative reject because OED cannot accept any negative readings
 					log.error(`DETECTED A NEGATIVE VALUE WHILE HANDLING CUMULATIVE READINGS FROM METER ${meterID}, ` +
 						`ROW ${index - readingRepetition}. REJECTED ALL READINGS`);
 					return [];
 				}
-				// To handle cumulative readings that resets at midnight
+				// To handle net cumulative readings which are negative. These cases can only be accepted if cumulativeReset is enabled and the reading falls within the allowed time range.
 				if (meterReading < 0) {
 					// if meterReading is negative and cumulative check that the times fall within an acceptable reset range
 					if (handleCumulativeReset(cumulativeReset, resetStart, resetEnd, startTimestamp)) {
@@ -155,16 +155,21 @@ async function processData(rows, meterID, isCumulative, cumulativeReset, resetSt
 						// Note that in the case of a reset the raw cumulative value is still meterReading2
 					}
 					else {
-						//cumulativeReset is not expected but there is a negative meter reading so throw an error
+						//cumulativeReset is not expected but there is a negative net meter reading so reject all readings.
 						errMsg = ('A negative meterReading has been detected but either cumulativeReset is not enabled, or the start time and end time of this reading is out of the reset range.')
-						readingOK = false;
+						log.error(errMsg);
+						return [];
 					}
 				}
 				if (readingOK) {
 					if (Math.abs(prevReading.endTimestamp.diff(prevReading.startTimestamp) - endTimestamp.diff(startTimestamp)) 
 						> msTlen && !isFirst(prevReading.endTimestamp)) {
-						errMsg = 'The previous reading has a different time length than the current reading.';
+						errMsg = 'The previous reading has a different time length than the current reading. Note this is treated only as a warning since this may be expected for certain meters.';
 						// If this is true we still add the reading to the results
+					}
+					if (!(errMsg === '')){
+						// There may be warnings to output even if OED accepts the readings so output all warnings which may exist
+						log.warn(errMsg);
 					}
 					// This reading has passed all checks and can be added to result
 					currentReading = new Reading(meterID, meterReading, startTimestamp, endTimestamp);
@@ -181,6 +186,13 @@ async function processData(rows, meterID, isCumulative, cumulativeReset, resetSt
 				// An error occurred, for now log it, let the user know and continue
 				log.error(`Error parsing Reading # `,index-readingRepetition,`. Reading value gives `,meterReading, ` with error message: `,errMsg);
 				readingOK = true;
+				/* If the data is cumulative then regardless of if it comes with end timestamps only or both end timestamps and start timestamps the first reading ever 
+				*  should become the previous reading. This is necessary because there are no previous readings in the db yet so we must drop the first point ever and 
+				*  use this first point as the first previous reading in order to begin calculating net readings since the data is cumulative.
+				*
+				*  If the data is not cumulative but there are only end timestamps then we still must drop the first reading ever in order to use that reading as the 
+				*  first start timestamp for the next reading. All following readings can then use the previous end timestamps as the current readings start timestamp 
+				*  until all further readings have been processed. */
 				if (isCumulative && !onlyEndTime || !isCumulative && onlyEndTime || isCumulative && onlyEndTime) {
 					currentReading = new Reading(meterID, meterReading, startTimestamp, endTimestamp);
 					// This currentReading will become the previousReading for the first reading if isCumulative is true
