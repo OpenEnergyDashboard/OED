@@ -105,9 +105,11 @@ router.post('/meters', validateMetersCsvUploadParams, async (req, res) => {
 	let csvFilepath;
 	try {
 		let fileBuffer = await fs.readFile(uploadedFilepath);
+		// Unzip uploaded file and save file to disk if the user 
+		// has indicated that the file is (g)zipped.
 		if (req.body.gzip === 'true') {
 			fileBuffer = zlib.gunzipSync(fileBuffer);
-			// We expect this directories to have been created by this stage of the pipeline.
+			// We expect this directory to have been created by this stage of the pipeline.
 			const dir = `${__dirname}/../tmp/uploads/csvPipeline`;
 			csvFilepath = await saveCsv(fileBuffer, 'meters', dir);
 			log.info(`The file ${csvFilepath} was created to upload meters csv data`);
@@ -143,9 +145,11 @@ router.post('/readings', validateReadingsCsvUploadParams, async (req, res) => {
 	let csvFilepath;
 	try {
 		let fileBuffer = await fs.readFile(uploadedFilepath);
+		// Unzip uploaded file and save file to disk if the user 
+		// has indicated that the file is (g)zipped.
 		if (req.body.gzip === 'true') {
 			fileBuffer = zlib.gunzipSync(fileBuffer);
-			// We expect this directories to have been created by this stage of the pipeline.
+			// We expect this directory to have been created by this stage of the pipeline.
 			const dir = `${__dirname}/../tmp/uploads/csvPipeline`;
 			csvFilepath = await saveCsv(fileBuffer, 'meters', dir);
 			log.info(`The file ${csvFilepath} was created to upload meters csv data`);
