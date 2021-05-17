@@ -13,7 +13,7 @@ const { validateReadings } = require('./validateReadings');
 const E0 = moment(0);
 
 /**
- * Handle all data, assume that the first row is the first reading. 
+ * Handle all data, assume that the first row is the first reading.
  * Also assume that the date/time values are in the format: 'YYYY/MM/DD HH:mm' or 'MM/DD/YYYY HH:mm'
  * @Example
  * 	row 0: reading #0
@@ -56,10 +56,9 @@ async function processData(rows, meterID, isCumulative, cumulativeReset, resetSt
 	let meterReading2 = meter.reading;
 	let startTimestamp = meter.startTimestamp;
 	let endTimestamp = meter.endTimestamp;
-
 	/* The currentReading will represent the current reading being parsed in the csv file. i.e. if index == 1, currentReading = rows[1] where
 	*  rows[1] : {reading_value, startTimestamp, endTimestamp}
-	*  Note that rows[1] may not contain a startTimestamp and may contain only an endTimestamp which must be reflected by 
+	*  Note that rows[1] may not contain a startTimestamp and may contain only an endTimestamp which must be reflected by
 	*  onlyEndTime == True where we have,
 	*  rows[1] : {reading_value, endTimestamp}
 	*
@@ -68,7 +67,7 @@ async function processData(rows, meterID, isCumulative, cumulativeReset, resetSt
 	*
 	*  currentReading = row[1] : {reading_value1, startTimestamp1, endTimestamp1}
 	*  prevReading = row[1] : {reading_value1, startTimestamp1, endTimestamp1}
-	*  currentReading = row[2] : {reading_value2, startTimestamp2, endTimestamp2} 
+	*  currentReading = row[2] : {reading_value2, startTimestamp2, endTimestamp2}
 	*  
 	*  If the currentReading passes all checks then we add the currentReading to result and begin parsing and checking the next reading*/
 	let currentReading = new Reading(meterID, meterReading, startTimestamp, endTimestamp);
@@ -194,12 +193,12 @@ async function processData(rows, meterID, isCumulative, cumulativeReset, resetSt
 				readingOK = true;
 				// index-readingReptition = reading # dropped in the data
 				readingsDropped.push(index-readingRepetition);
-				/* If the data is cumulative then regardless of if it comes with end timestamps only or both end timestamps and start timestamps 
-				*  the first reading ever should become the previous reading. This is necessary because there are no previous readings in the db 
-				*  yet so we must drop the first point ever and use this first point as the first previous reading in order to begin calculating 
+				/* If the data is cumulative then regardless of if it comes with end timestamps only or both end timestamps and start timestamps
+				*  the first reading ever should become the previous reading. This is necessary because there are no previous readings in the db
+				*  yet so we must drop the first point ever and use this first point as the first previous reading in order to begin calculating
 				*  net readings since the data is cumulative.
 				*
-				*  If the data is not cumulative but there are only end timestamps then we still must drop the first reading ever in order to use 
+				*  If the data is not cumulative but there are only end timestamps then we still must drop the first reading ever in order to use
 				*  that reading as the first start timestamp for the next reading. All following readings can then use the previous end timestamps
 				*  as the current readings start timestamp until all further readings have been processed.*/
 				if (isCumulative && !onlyEndTime || !isCumulative && onlyEndTime || isCumulative && onlyEndTime) {
