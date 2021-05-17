@@ -163,7 +163,7 @@ router.post('/readings', validateReadingsCsvUploadParams, async (req, res) => {
 		log.info(`The file ${csvFilepath} was created to upload readings csv data`);
 		const conn = getConnection();
 		await uploadReadings(req, res, csvFilepath, conn);
-		if (req.body.refreshReadings) {
+		if (req.body.refreshReadings === 'true') {
 			// Call the refreshReadingViews script
 			require('../services/refreshReadingViews');
 		}
