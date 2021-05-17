@@ -13,7 +13,8 @@ const { validateReadings } = require('./validateReadings');
 const E0 = moment(0);
 
 /**
- * Handle all data, assume that the first row is the first reading. Also assume that the date/time values are in the format: 'YYYY/MM/DD HH:mm' or 'MM/DD/YYYY HH:mm'
+ * Handle all data, assume that the first row is the first reading. 
+ * Also assume that the date/time values are in the format: 'YYYY/MM/DD HH:mm' or 'MM/DD/YYYY HH:mm'
  * @Example
  * 	row 0: reading #0
  *  row 1: reading #1
@@ -25,9 +26,10 @@ const E0 = moment(0);
  * @param {number} meterID meter id being input
  * @param {boolean} isCumulative true if the data is cumulative
  * @param {boolean} cumulativeReset true if the cumulative data can reset
- * @param {string} resetStart a string representation in the format of HH:mm:ss.SSS which represents the start time a cumulativeReset may occur after. \
- *  The default resetStart time is 0:00:00.000.
- * @param {string} resetEnd a string representation in the format of HH:mm:ss.SSS which represents the end time a cumulativeReset may occur before. The default resetEnd time is 23:59:99.999
+ * @param {string} resetStart a string representation in the format "HH:mm:ss.SSS" which represents the start time a cumulativeReset may occur after\
+ *  The default resetStart time is 0:00:00.000
+ * @param {string} resetEnd a string representation in the format "HH:mm:ss.SSS" which represents the end time a cumulativeReset may occur before\
+ *  The default resetEnd time is 23:59:99.999
  * @param readingRepetition value is 1 if reading is not duplicated. 2 if repeated twice and so on (E-mon D-mon meters)
  * @param {boolean} onlyEndTime true if the data only has an endTimestamp
  * @param {number} Tgap the allowed time variation in seconds that a gap may occur between two readings 
@@ -35,8 +37,8 @@ const E0 = moment(0);
  * @param {dict} conditionSet used to validate readings (minVal, maxVal, minDate, maxDate, interval, maxError)
  * @param {array} conn the connection to the database
  */
-async function processData(rows, meterID, isCumulative, cumulativeReset, resetStart = '0:00:00.000', 
-					resetEnd = '23:59:99.999', readingRepetition, onlyEndTime = false, Tgap=0, Tlen=0, 
+async function processData(rows, meterID, isCumulative, cumulativeReset, resetStart='0:00:00.000', 
+					resetEnd='23:59:99.999', readingRepetition, onlyEndTime=false, Tgap=0, Tlen=0, 
 					conditionSet, conn) {
 
 	// If processData is successfully finished then return result = [R0, R1, R2...RN]
@@ -57,7 +59,8 @@ async function processData(rows, meterID, isCumulative, cumulativeReset, resetSt
 
 	/* The currentReading will represent the current reading being parsed in the csv file. i.e. if index == 1, currentReading = rows[1] where
 	*  rows[1] : {reading_value, startTimestamp, endTimestamp}
-	*  Note that rows[1] may not contain a startTimestamp and may contain only an endTimestamp which must be reflected by onlyEndTime == True where we have,
+	*  Note that rows[1] may not contain a startTimestamp and may contain only an endTimestamp which must be reflected by 
+	*  onlyEndTime == True where we have,
 	*  rows[1] : {reading_value, endTimestamp}
 	*
 	*  On entry there is no previousReading yet so intialize it to be the very first date/time since Epoch time. After a currentReading has
@@ -128,18 +131,18 @@ async function processData(rows, meterID, isCumulative, cumulativeReset, resetSt
 					}
 					else if (!isFirst(prevReading.endTimestamp)) {
 						//Only treat this as a warning since the readings may be sent in a different order.
-						errMsg = 'The current reading startTime is not after the previous reading\'s end time. Note this is treated only as a warning since readings may be sent out of order.';
+						errMsg = 'The current reading startTime is not after the previous reading\'s end time. Note this is treated only as a warning since readings may be sent out of order. ';
 					}
 				}
 			}
 			if (readingOK && Math.abs(startTimestamp.diff(prevReading.endTimestamp)) > msTgap) {
 				if (isCumulative) {
 					readingOK = false;
-					errMsg = 'The end of the previous reading is too far from the start of the next readings in cumulative data so drop the readings. ';
+					errMsg = 'The end of the previous reading is too far from the start of the next readings in cumulative data so drop this reading. ';
 				}
 				else if (!isFirst(prevReading.endTimestamp)) {
 					//Only treat this as a warning since we expect a gap in the first ever reading.
-					errMsg += 'There is a gap in time between this reading and the previous reading. Note this is treated only as a warning since OED expects a gap to occur in the first ever reading.';
+					errMsg += 'There is a gap in time between this reading and the previous reading. Note this is treated only as a warning since OED expects a gap to occur in the first ever reading. ';
 				}
 			}
 			if (readingOK) {
@@ -150,7 +153,7 @@ async function processData(rows, meterID, isCumulative, cumulativeReset, resetSt
 						`ROW ${index - readingRepetition}. REJECTED ALL READINGS`);
 					return [];
 				}
-				// To handle net cumulative readings which are negative. These cases can only be accepted if cumulativeReset is enabled and the reading falls within the allowed time range.
+				// To handle net cumulative readings which are negative.
 				if (meterReading < 0) {
 					// if meterReading is negative and cumulative check that the times fall within an acceptable reset range
 					if (handleCumulativeReset(cumulativeReset, resetStart, resetEnd, startTimestamp)) {
@@ -178,7 +181,7 @@ async function processData(rows, meterID, isCumulative, cumulativeReset, resetSt
 					currentReading = new Reading(meterID, meterReading, startTimestamp, endTimestamp);
 					result.push(currentReading);
 					if (index === rows.length){
-						// This is the last reading in the csv file which contains the reading value, start timestamp and endtimestamp this meter will hold
+						// Update the meter to contain information for the last reading in the data file
 						meter.startTimestamp = startTimestamp;
 						meter.endTimestamp = endTimestamp;
 						meter.update(conn);
@@ -187,17 +190,18 @@ async function processData(rows, meterID, isCumulative, cumulativeReset, resetSt
 			}
 			if (!readingOK) {
 				// An error occurred so add it to the readings dropped array and let the client know why before continuing
-				log.error(`Error parsing Reading #`+(index-readingRepetition)+`. Reading value gives `+meterReading+` with error message: `+'\"'+errMsg+'\"');
+				log.error(`Error parsing Reading #`+(index-readingRepetition)+`. Reading value gives `+meterReading+` with error message: `+`\"`+errMsg+`\"`);
 				readingOK = true;
 				// index-readingReptition = reading # dropped in the data
 				readingsDropped.push(index-readingRepetition);
-				/* If the data is cumulative then regardless of if it comes with end timestamps only or both end timestamps and start timestamps the first reading ever 
-				*  should become the previous reading. This is necessary because there are no previous readings in the db yet so we must drop the first point ever and 
-				*  use this first point as the first previous reading in order to begin calculating net readings since the data is cumulative.
+				/* If the data is cumulative then regardless of if it comes with end timestamps only or both end timestamps and start timestamps 
+				*  the first reading ever should become the previous reading. This is necessary because there are no previous readings in the db 
+				*  yet so we must drop the first point ever and use this first point as the first previous reading in order to begin calculating 
+				*  net readings since the data is cumulative.
 				*
-				*  If the data is not cumulative but there are only end timestamps then we still must drop the first reading ever in order to use that reading as the 
-				*  first start timestamp for the next reading. All following readings can then use the previous end timestamps as the current readings start timestamp 
-				*  until all further readings have been processed. */
+				*  If the data is not cumulative but there are only end timestamps then we still must drop the first reading ever in order to use 
+				*  that reading as the first start timestamp for the next reading. All following readings can then use the previous end timestamps
+				*  as the current readings start timestamp until all further readings have been processed.*/
 				if (isCumulative && !onlyEndTime || !isCumulative && onlyEndTime || isCumulative && onlyEndTime) {
 					currentReading = new Reading(meterID, meterReading, startTimestamp, endTimestamp);
 					// This currentReading will become the previousReading for the first reading if isCumulative is true
@@ -211,7 +215,7 @@ async function processData(rows, meterID, isCumulative, cumulativeReset, resetSt
 		return null;
 	}
 	// Let the user know exactly which readings were dropped if any before continuing
-	readingsDropped.forEach(readingNum => console.log("Dropped Reading #",readingNum));
+	readingsDropped.forEach(readingNum => log.info(`Dropped Reading #`+readingNum));
 	return result;
 }
 

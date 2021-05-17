@@ -20,14 +20,22 @@ const processData = require('./processData');
 async function loadArrayInput(dataRows, meterID, mapRowToModel, isCumulative, cumulativeReset, readingRepetition, conditionSet, conn) {
 	readingsArray = dataRows.map(mapRowToModel);
 
-	// TODO: Need to implement interface to let user pass in the following params to the pipeline formally
+	// TODO: Need to implement interface to let user pass in the following params to the pipeline
 	
 	// Temporary values for params. Note they are currently initialized to their default values.
-	let onlyEndTime = false; // onlyEndtime is true if the readings have only endTimestamps. This is false by default.
-	let Tgap = 0; // time in seconds that a gap may occur between two readings. This is 0 seconds by default since we expect data to not have gaps.
-	let Tlen = 0; // time in seconds that two readings may differ from one another. This is 0 seconds by default since we expect meter readings to be recorded in the same time intervals.
-	let resetStart = '00:00:00.000'; // time in format HH:mm:ss.SSS that a cumulative reset may begin. This is '00:00:00.000' by default which means a cumulative reset may begin at the very beginning of any given day.
-	let resetEnd = '23:59:99.999'; // time in format HH:mm:ss.SSS that a cumulative reset may end. This is '23:59:99.999' by default which means a cumulative reset may NOT occur after .001 milliseconds till the end of any given day.
+	// onlyEndtime is true if the readings have only endTimestamps. This is false by default.
+	let onlyEndTime = false;
+	// time in seconds that a gap may occur between two readings. This is 0 seconds by default since we expect data to not have gaps.
+	let Tgap = 0;
+	// time in seconds that two readings may differ from one another.
+	// This is 0 seconds by default since we expect meter readings to be recorded in the same time intervals.
+	let Tlen = 0;
+	// time in format HH:mm:ss.SSS that a cumulative reset may begin.
+	// This is '00:00:00.000' by default which means a cumulative reset may begin at the very beginning of any given day.
+	let resetStart = '00:00:00.000';
+	// time in format HH:mm:ss.SSS that a cumulative reset may end.
+	// This is '23:59:99.999' by default which means a cumulative reset may NOT occur after .001 milliseconds till the end of any given day.
+	let resetEnd = '23:59:99.999';
 	// end of temporary values for params
 
 	readingsArray = await processData(readingsArray, meterID, isCumulative, cumulativeReset, resetStart='00:00:00.000', resetEnd='23:59:99.999', 

@@ -102,6 +102,7 @@ router.use(function (req, res, next) {
 
 router.post('/meters', validateMetersCsvUploadParams, async (req, res) => {
 	const uploadedFilepath = req.file.path;
+	const isgzip = req.body.gzip;
 	let csvFilepath;
 	try {
 		let fileBuffer = await fs.readFile(uploadedFilepath);
@@ -128,7 +129,7 @@ router.post('/meters', validateMetersCsvUploadParams, async (req, res) => {
 			log.error(`Failed to remove the file ${uploadedFilepath}.`, err);
 		});
 
-	if (csvFilepath) {
+	if (isgzip) {
 		// Delete the unzipped csv file if it exists.
 		fs.unlink(csvFilepath)
 			.then(() => log.info(`Successfully deleted the csv file ${csvFilepath}.`))
@@ -140,6 +141,7 @@ router.post('/meters', validateMetersCsvUploadParams, async (req, res) => {
 
 router.post('/readings', validateReadingsCsvUploadParams, async (req, res) => {
 	const uploadedFilepath = req.file.path;
+	const isgzip = req.body.gzip;
 	let csvFilepath;
 	try {
 		let fileBuffer = await fs.readFile(uploadedFilepath);
@@ -171,7 +173,7 @@ router.post('/readings', validateReadingsCsvUploadParams, async (req, res) => {
 			log.error(`Failed to remove the file ${uploadedFilepath}.`, err);
 		});
 
-	if (csvFilepath) {
+	if (isgzip) {
 		// Delete the unzipped csv file if it exists.
 		fs.unlink(csvFilepath)
 			.then(() => log.info(`Successfully deleted the csv file ${csvFilepath}.`))
