@@ -37,7 +37,8 @@ async function insertMetasysData(filePath, readingInterval, readingRepetition, c
 						readingRepetition = readingRepetition,
 						conditionSet = undefined,
 						headerRow = false,
-						conn = conn);
+						conn = conn,
+						timeSort = 'decreasing');
 }
 
 module.exports = insertMetasysData;

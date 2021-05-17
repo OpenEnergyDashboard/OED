@@ -102,11 +102,11 @@ router.use(function (req, res, next) {
 
 router.post('/meters', validateMetersCsvUploadParams, async (req, res) => {
 	const uploadedFilepath = req.file.path;
-	const isgzip = req.body.gzip;
+	const isgzip = (req.body.gzip === 'true');
 	let csvFilepath;
 	try {
 		let fileBuffer = await fs.readFile(uploadedFilepath);
-		if (req.body.gzip === 'true') {
+		if (isgzip) {
 			fileBuffer = zlib.gunzipSync(fileBuffer);
 			// We expect this directories to have been created by this stage of the pipeline.
 			const dir = `${__dirname}/../tmp/uploads/csvPipeline`;
@@ -141,11 +141,11 @@ router.post('/meters', validateMetersCsvUploadParams, async (req, res) => {
 
 router.post('/readings', validateReadingsCsvUploadParams, async (req, res) => {
 	const uploadedFilepath = req.file.path;
-	const isgzip = req.body.gzip;
+	const isgzip = (req.body.gzip === 'true');
 	let csvFilepath;
 	try {
 		let fileBuffer = await fs.readFile(uploadedFilepath);
-		if (req.body.gzip === 'true') {
+		if (isgzip) {
 			fileBuffer = zlib.gunzipSync(fileBuffer);
 			// We expect this directories to have been created by this stage of the pipeline.
 			const dir = `${__dirname}/../tmp/uploads/csvPipeline`;
@@ -158,7 +158,7 @@ router.post('/readings', validateReadingsCsvUploadParams, async (req, res) => {
 		log.info(`The file ${csvFilepath} was created to upload readings csv data`);
 		const conn = getConnection();
 		await uploadReadings(req, res, csvFilepath, conn);
-		if (req.body.refreshReadings) {
+		if (req.body.refreshReadings === 'true') {
 			// Call the refreshReadingViews script
 			require('../services/refreshReadingViews');
 		}

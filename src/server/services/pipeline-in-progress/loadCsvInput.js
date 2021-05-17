@@ -22,6 +22,7 @@ const { log } = require('../../log');
  * @param {array} conditionSet used to validate readings (minVal, maxVal, minDate, maxDate, threshold, maxError)
  * @param {boolean} headerRow true if the given file has a header row
  * @param {array} conn connection to database
+ * @param {string} timeSort the canonical order sorted by date/time in which the data appears in the CSV file
  */
 async function loadCsvInput(
 	filePath,
@@ -33,7 +34,8 @@ async function loadCsvInput(
 	readingRepetition,
 	conditionSet,
 	headerRow,
-	conn
+	conn,
+	timeSort
 ) {
 	try {
 		if (readAsStream) {
@@ -44,7 +46,7 @@ async function loadCsvInput(
 			if (headerRow) {
 				dataRows.shift();
 			}
-			return loadArrayInput(dataRows, meterID, mapRowToModel, isCumulative, cumulativeReset, readingRepetition, conditionSet, conn);
+			return loadArrayInput(dataRows, meterID, mapRowToModel, isCumulative, cumulativeReset, readingRepetition, conditionSet, conn, timeSort);
 		}
 	} catch (err) {
 		log.error(`Error updating meter ${meterID} with data from ${filePath}: ${err}`, err);

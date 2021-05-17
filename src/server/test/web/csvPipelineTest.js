@@ -51,7 +51,7 @@ mocha.describe('csv API', () => {
 			expect(dbMeters).to.deep.equal(csvMeters);
 			expect((await Meter.getAll(conn)).length).to.equal(3);
 		});
-		mocha.it('should be able to accept a post request to upload unzipped  meter data with header row.', async () => {
+		mocha.it('should be able to accept a post request to upload unzipped meter data with header row.', async () => {
 			const res = await chai.request(app).post(UPLOAD_METERS_ROUTE)
 				.field('email', testUser.email)
 				.field('password', testUser.password)

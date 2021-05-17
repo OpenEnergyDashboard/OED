@@ -20,10 +20,11 @@ const Meter = require('../../models/Meter');
 async function uploadReadings(req, res, filepath, conn) {
 
 	const { createMeter, cumulative, cumulativeReset, duplications, headerRow,
-		length, meterName, mode, timeSort, update, refreshReadings } = req.body; // extract query parameters
+		length, meterName, mode, timeSort, update } = req.body; // extract query parameters
 	const areReadingsCumulative = (cumulative === 'true');
+	const isCumulativeReset = (cumulativeReset === 'true');
 	const hasHeaderRow = (headerRow === 'true');
-	const readingRepetition = duplications;
+	const readingRepetition = parseInt(duplications,10);
 	let meter = await Meter.getByName(meterName, conn)
 		.catch(async err => {
 			// Meter#getByNames throws an error when no meter is found. We need the catch clause to account for this error.
@@ -41,7 +42,6 @@ async function uploadReadings(req, res, filepath, conn) {
 				return tempMeter;
 			}
 		});
-
 	const mapRowToModel = row => { return row; }; // STUB function to satisfy the parameter of loadCsvInput.
 	await loadCsvInput(
 		filepath,
@@ -49,11 +49,12 @@ async function uploadReadings(req, res, filepath, conn) {
 		mapRowToModel,
 		false,
 		areReadingsCumulative,
-		cumulativeReset,
+		isCumulativeReset,
 		readingRepetition,
 		undefined,
 		hasHeaderRow,
-		conn
+		conn,
+		timeSort
 	); // load csv data
 	// TODO: If unsuccessful upload then an error will be thrown. We need to catch this error.
 	//fs.unlink(filepath).catch(err => log.error(`Failed to remove the file ${filepath}.`, err));

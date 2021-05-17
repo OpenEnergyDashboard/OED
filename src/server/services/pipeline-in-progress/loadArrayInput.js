@@ -16,12 +16,13 @@ const processData = require('./processData');
  * @param {number} readingRepetition number of times each reading is repeated where 1 means no repetition
  * @param {array} conditionSet used to validate readings (minVal, maxVal, minDate, maxDate, interval, maxError)
  * @param {array} conn connection to database
+ * @param {string} timeSort the canonical order sorted by date/time in which the data appears in the data file
  */
-async function loadArrayInput(dataRows, meterID, mapRowToModel, isCumulative, cumulativeReset, readingRepetition, conditionSet, conn) {
+async function loadArrayInput(dataRows, meterID, mapRowToModel, isCumulative, cumulativeReset, readingRepetition, conditionSet, conn, timeSort) {
 	readingsArray = dataRows.map(mapRowToModel);
 
 	// TODO: Need to implement interface to let user pass in the following params to the pipeline
-	
+
 	// Temporary values for params. Note they are currently initialized to their default values.
 	// onlyEndtime is true if the readings have only endTimestamps. This is false by default.
 	let onlyEndTime = false;
@@ -37,9 +38,8 @@ async function loadArrayInput(dataRows, meterID, mapRowToModel, isCumulative, cu
 	// This is '23:59:99.999' by default which means a cumulative reset may NOT occur after .001 milliseconds till the end of any given day.
 	let resetEnd = '23:59:99.999';
 	// end of temporary values for params
-
-	readingsArray = await processData(readingsArray, meterID, isCumulative, cumulativeReset, resetStart='00:00:00.000', resetEnd='23:59:99.999', 
-								readingRepetition, onlyEndTime=false, Tgap=0, Tlen=0, conditionSet, conn);
+	readingsArray = await processData(readingsArray, meterID, isCumulative, cumulativeReset, resetStart, resetEnd, 
+								readingRepetition, onlyEndTime, Tgap, Tlen, timeSort, conditionSet, conn);
 
 	return await Reading.insertOrIgnoreAll(readingsArray, conn);
 }
