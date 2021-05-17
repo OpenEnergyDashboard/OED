@@ -130,7 +130,7 @@ async function processData(rows, meterID, isCumulative, cumulativeReset, resetSt
 				errMsg = 'The reading is not after the previous reading with only end time given so we must drop the reading.';
 			}
 			else if ((!isAscending && startTimestamp.isAfter(prevReading.endTimestamp))
-					  || (isAscending && startTimestamp.isBefore(prevReading.endTimestamp))) {
+					|| (isAscending && startTimestamp.isBefore(prevReading.endTimestamp))) {
 				if (isCumulative) {
 					/* Check if the data is in ascending order. If it is and the start time of the current reading by canonical order is
 					*  before the previous readings end time then reject because OED must subtract the previous reading value which cannot be done
