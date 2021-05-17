@@ -190,7 +190,7 @@ async function processData(rows, meterID, isCumulative, cumulativeReset, resetSt
 			}
 			if (!readingOK) {
 				// An error occurred so add it to the readings dropped array and let the client know why before continuing
-				log.error(`Error parsing Reading #`+(index-readingRepetition)+`. Reading value gives `+meterReading+` with error message: `+`\"`+errMsg+`\"`);
+				log.error('Error parsing Reading #'+(index-readingRepetition)+'. Reading value gives '+meterReading+' with error message: '+'\"'+errMsg+'\"');
 				readingOK = true;
 				// index-readingReptition = reading # dropped in the data
 				readingsDropped.push(index-readingRepetition);
@@ -215,7 +215,7 @@ async function processData(rows, meterID, isCumulative, cumulativeReset, resetSt
 		return null;
 	}
 	// Let the user know exactly which readings were dropped if any before continuing
-	readingsDropped.forEach(readingNum => log.info(`Dropped Reading #`+readingNum));
+	readingsDropped.forEach(readingNum => log.info('Dropped Reading #'+readingNum));
 	return result;
 }
 
