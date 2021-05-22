@@ -18,10 +18,9 @@ const Meter = require('../../models/Meter');
  */
 async function uploadReadings(req, res, filepath, conn) {
 
-	const { createMeter, cumulative, cumulativeReset, duplications, headerRow,
+	const { createMeter, duplications, headerRow,
 		length, meterName, mode, timeSort, update } = req.body; // extract query parameters
 
-	const areReadingsCumulative = (cumulative === 'true');
 	const hasHeaderRow = (headerRow === 'true');
 	const readingRepetition = duplications;
 
@@ -39,9 +38,40 @@ async function uploadReadings(req, res, filepath, conn) {
 				// The meter type cannot be null. We use MAMAC as a default.
 				const tempMeter = new Meter(undefined, meterName, undefined, false, false, Meter.type.MAMAC, meterName);
 				await tempMeter.insert(conn);
-				return tempMeter;
+				return await Meter.getByName(tempMeter.name, conn); // Get meter from DB after insert because some defaults are set within the DB.
 			}
 		});
+
+	console.log('meter', meter);
+	// Handle cumulative defaults
+	let { cumulative, cumulativeReset } = req.body;
+	let areReadingsCumulative;
+	let doReadingsReset;
+	// We know from the validation stage of the pipeline that the 'cumulative' and 'cumulativeReset' fields
+	// will have one of the follow values undefined, 'true', or 'false'. If undefined, this means that 
+	// the uploader wants the pipeline to use the database's (i.e. the meter's) default value.
+	// TODO: We made the assumption that in the DB, the cumulative and cumulativeReset columns is either true or false.
+	// On further inspection, these values can be null. At the moment, we are not sure what this means for the pipeline.
+	// As a quick fix, we will assume that null, means false.
+	if (cumulative === undefined){
+		if (meter.cumulative === null){
+			areReadingsCumulative = false;
+		} else {
+			areReadingsCumulative = meter.cumulative;
+		}
+	} else {
+		areReadingsCumulative = (cumulative === 'true');
+	}
+
+	if (cumulativeReset === undefined){
+		if(meter.cumulativeReset === null){
+			doReadingsReset = false;
+		} else {
+			doReadingsReset = meter.cumulativeReset;
+		}
+	} else {
+		doReadingsReset = (cumulativeReset === 'true');
+	}
 
 	const mapRowToModel = row => { return row; }; // STUB function to satisfy the parameter of loadCsvInput.
 	await loadCsvInput(
@@ -50,7 +80,7 @@ async function uploadReadings(req, res, filepath, conn) {
 		mapRowToModel,
 		false,
 		areReadingsCumulative,
-		cumulativeReset,
+		doReadingsReset,
 		readingRepetition,
 		undefined,
 		hasHeaderRow,
