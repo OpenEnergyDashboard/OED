@@ -42,7 +42,6 @@ async function uploadReadings(req, res, filepath, conn) {
 			}
 		});
 
-	console.log('meter', meter);
 	// Handle cumulative defaults
 	let { cumulative, cumulativeReset } = req.body;
 	let areReadingsCumulative;
