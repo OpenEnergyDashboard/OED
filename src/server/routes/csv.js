@@ -21,6 +21,7 @@ const saveCsv = require('../services/csvPipeline/saveCsv');
 const uploadMeters = require('../services/csvPipeline/uploadMeters');
 const uploadReadings = require('../services/csvPipeline/uploadReadings');
 const zlib = require('zlib');
+const { refreshReadingViews } = require('../services/refreshReadingViews');
 
 /** Middleware validation */
 const { validateMetersCsvUploadParams, validateReadingsCsvUploadParams } = require('../services/csvPipeline/validateCsvUploadParams');
@@ -144,6 +145,7 @@ router.post('/meters', validateMetersCsvUploadParams, async (req, res) => {
 
 router.post('/readings', validateReadingsCsvUploadParams, async (req, res) => {
 	const isGzip = req.body.gzip === 'true';
+	const isRefreshReadings = req.body.refreshReadings === 'true';
 	const uploadedFilepath = req.file.path;
 	let csvFilepath;
 	try {
@@ -163,9 +165,9 @@ router.post('/readings', validateReadingsCsvUploadParams, async (req, res) => {
 		log.info(`The file ${csvFilepath} was created to upload readings csv data`);
 		const conn = getConnection();
 		await uploadReadings(req, res, csvFilepath, conn);
-		if (req.body.refreshReadings === 'true') {
-			// Call the refreshReadingViews script
-			require('../services/refreshReadingViews');
+		if (isRefreshReadings) {
+			// Refresh readings so show when daily data is used.
+			await refreshReadingViews();
 		}
 	} catch (error) {
 		failure(req, res, error);
