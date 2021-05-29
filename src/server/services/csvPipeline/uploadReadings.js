@@ -36,7 +36,7 @@ async function uploadReadings(req, res, filepath, conn) {
 			} else {
 				// If createMeter is true, we will create the meter for the user.
 				// The meter type cannot be null. We use MAMAC as a default.
-				const tempMeter = new Meter(undefined, meterName, undefined, false, false, Meter.type.MAMAC, meterName);
+				const tempMeter = new Meter(undefined, meterName, undefined, false, false, Meter.type.MAMAC, undefined, undefined, meterName);
 				await tempMeter.insert(conn);
 				return await Meter.getByName(tempMeter.name, conn); // Get meter from DB after insert because some defaults are set within the DB.
 			}
