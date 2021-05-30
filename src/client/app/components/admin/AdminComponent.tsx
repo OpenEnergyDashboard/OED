@@ -5,8 +5,6 @@
 import * as React from 'react';
 import HeaderContainer from '../../containers/HeaderContainer';
 import FooterContainer from '../../containers/FooterContainer';
-import AddMetersContainer from '../../containers/admin/AddMetersContainer';
-import AddReadingsContainer from '../../containers/admin/AddReadingsContainer';
 import PreferencesContainer from '../../containers/admin/PreferencesContainer';
 import ManageUsersLinkButtonComponent from './users/ManageUsersLinkButtonComponent';
 import TooltipHelpComponent from '../TooltipHelpComponentAlternative';
@@ -19,9 +17,6 @@ import { FormattedMessage } from 'react-intl';
  */
 
 export default function AdminComponent() {
-	const divMarginTop: React.CSSProperties = {
-		marginTop: '50px'
-	};
 
 	const bottomPaddingStyle: React.CSSProperties = {
 		paddingBottom: '15px'
@@ -59,12 +54,6 @@ export default function AdminComponent() {
 							</div>
 						</div>
 						<PreferencesContainer />
-					</div>
-					<div className='col-12 col-lg-6'>
-						<AddReadingsContainer />
-						<div style={divMarginTop}>
-							<AddMetersContainer />
-						</div>
 					</div>
 				</div>
 			</div>

@@ -32,11 +32,15 @@ import CreateUserContainer from '../containers/admin/CreateUserContainer';
 import { TimeInterval } from '../../../common/TimeInterval';
 import MapsDetailContainer from '../containers/maps/MapsDetailContainer';
 import MapCalibrationContainer from '../containers/maps/MapCalibrationContainer';
+import UploadCSVContainer from '../containers/csv/UploadCSVContainer';
+import { UserRole } from '../types/items';
+import { hasPermissions } from '../utils/hasPermissions';
 
 interface RouteProps {
 	barStacking: boolean;
 	defaultLanguage: LanguageTypes;
 	loggedInAsAdmin: boolean;
+	role: UserRole;
 	changeOptionsFromLink(options: LinkOptions): Promise<any[]>;
 	clearCurrentUser(): any;
 }
@@ -46,6 +50,45 @@ export default class RouteComponent extends React.Component<RouteProps, {}> {
 		super(props);
 		this.requireAuth = this.requireAuth.bind(this);
 		this.linkToGraph = this.linkToGraph.bind(this);
+		this.requireRole = this.requireRole.bind(this);
+	}
+
+	/**
+	 * Generates middleware that requires proper role and authentication for a page route
+	 * @param requiredRole The role that is necessary to access a page route
+	 * @returns middleware that requires proper role and authentication for a page route
+	 */
+	public requireRole(requiredRole: UserRole) {
+
+		return (nextState: RouterState, replace: RedirectFunction) => {
+			function redirectRoute() {
+				replace({
+					pathname: '/login',
+					state: { nextPathname: nextState.location.pathname }
+				});
+			}
+			// Redirect route to login page if the auth token does not exist
+			if (!hasToken()) {
+				redirectRoute();
+				return;
+			}
+
+			// Verify that the auth token is valid.
+			// Needs to be async because of the network request
+			(async () => {
+				if (!(await verificationApi.checkTokenValid())) {
+					// Route to login page if the auth token is not valid
+					browserHistory.push('/login');
+					// We should delete the token when we know that it is expired. Ensures that we don't not leave any unwanted tokens around.
+					deleteToken();
+					// This ensures that if there is no token then there is no stale profile in the redux store.
+					this.props.clearCurrentUser();
+				} else if (!hasPermissions(this.props.role, requiredRole)) {
+					// Even though the auth token is valid, we still need to check that the user is a certain role.
+					browserHistory.push('/');
+				}
+			})();
+		}
 	}
 
 	/**
@@ -216,6 +259,7 @@ export default class RouteComponent extends React.Component<RouteProps, {}> {
 						<Router history={browserHistory}>
 							<Route path='/login' component={LoginContainer} />
 							<Route path='/admin' component={AdminComponent} onEnter={this.requireAuth} />
+							<Route path='/csv' component={UploadCSVContainer} onEnter={this.requireRole(UserRole.CSV)} />
 							<Route path='/groups' component={GroupsDetailContainer} onEnter={this.checkAuth} />
 							<Route path='/meters' component={MetersDetailContainer} onEnter={this.checkAuth} />
 							<Route path='/graph' component={HomeComponent} onEnter={this.linkToGraph} />

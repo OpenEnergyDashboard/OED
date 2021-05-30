@@ -8,7 +8,7 @@ const { log } = require('../log');
 
 const { getConnection } = require('../db');
 const Reading = require('../models/Reading');
-/* tslint:disable no-console */
+
 async function refreshReadingViews() {
 	const conn = getConnection();
 
@@ -17,4 +17,4 @@ async function refreshReadingViews() {
 	log.info('Views Refreshed');
 }
 
-refreshReadingViews();
+module.exports = { refreshReadingViews };

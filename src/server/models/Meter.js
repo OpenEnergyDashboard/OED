@@ -31,16 +31,18 @@ class Meter {
 	 * @param endTimestamp  End timestamp of last reading input for this meter, '01-01-01 00:00:00' 
 	 */
 	constructor(id, name, ipAddress, enabled, displayable, type, meterTimezone, gps = undefined, identifier = name, note, area,
-		cumulative, cumulativeReset, cumulativeResetStart, cumulativeResetEnd, readingLength, readingVariation, reading, 
+		cumulative, cumulativeReset, cumulativeResetStart, cumulativeResetEnd, readingLength, readingVariation, reading,
 		startTimestamp, endTimestamp) {
+		// In order for the CSV pipeline to work, the order of the parameters needs to match the order that the fields are declared.
+		// In addition, each new parameter has to be added at the very end.
 		this.id = id;
 		this.name = name;
 		this.ipAddress = ipAddress;
 		this.enabled = enabled;
 		this.displayable = displayable;
 		this.type = type;
-		this.gps = gps;
 		this.meterTimezone = meterTimezone;
+		this.gps = gps;
 		this.identifier = identifier;
 		this.note = note;
 		this.area = area;
@@ -103,7 +105,7 @@ class Meter {
 	static mapRow(row) {
 		return new Meter(row.id, row.name, row.ipaddress, row.enabled, row.displayable, row.meter_type,
 			row.default_timezone_meter, row.gps, row.identifier, row.note, row.area, row.cumulative, row.cumulative_reset,
-			row.cumulative_reset_start, row.cumulative_reset_end, row.reading_length, row.reading_variation, 
+			row.cumulative_reset_start, row.cumulative_reset_end, row.reading_length, row.reading_variation,
 			row.reading, row.start_timestamp, row.end_timestamp);
 	}
 

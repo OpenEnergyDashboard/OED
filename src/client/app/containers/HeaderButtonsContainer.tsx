@@ -9,15 +9,19 @@ import { State } from '../types/redux/state';
 import { deleteToken } from '../utils/token';
 import { isRoleAdmin } from '../utils/hasPermissions';
 import { clearCurrentUser } from '../actions/currentUser';
+import { UserRole } from '../types/items';
 
 function mapStateToProps(state: State, ownProps: { showCollapsedMenuButton: boolean }) {
 	const currentUser = state.currentUser.profile;
 	let loggedInAsAdmin = false;
+	let role: UserRole | null = null;
 	if (currentUser !== null) {
 		loggedInAsAdmin = isRoleAdmin(currentUser.role);
+		role = currentUser.role;
 	}
 	return {
 		loggedInAsAdmin,
+		role,
 		...ownProps
 	};
 }
