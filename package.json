@@ -65,7 +65,7 @@
     "jquery": "~3.5.0",
     "jsonschema": "~1.2.4",
     "jsonwebtoken": "~8.3.0",
-    "lodash": "~4.17.19",
+    "lodash": "~4.17.21",
     "lodash-webpack-plugin": "~0.11.5",
     "md5": "~2.2.1",
     "moment": "~2.24.0",
