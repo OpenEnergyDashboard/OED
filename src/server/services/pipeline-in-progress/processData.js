@@ -39,9 +39,9 @@ const E0 = moment(0);
  * @param {dict} conditionSet used to validate readings (minVal, maxVal, minDate, maxDate, interval, maxError)
  * @param {array} conn the connection to the database
  */
-async function processData(rows, meterID, isCumulative, cumulativeReset, resetStart='00:00:00.000', 
-					resetEnd='23:59:99.999', readingRepetition, onlyEndTime=false, Tgap=0, Tlen=0, 
-					timeSort='increasing', conditionSet, conn) {
+async function processData(rows, meterID, isCumulative, cumulativeReset, resetStart = '00:00:00.000',
+	resetEnd = '23:59:99.999', readingRepetition, onlyEndTime = false, Tgap = 0, Tlen = 0,
+	timeSort = 'increasing', conditionSet, conn) {
 
 	// If processData is successfully finished then return result = [R0, R1, R2...RN]
 	const result = [];
@@ -49,8 +49,8 @@ async function processData(rows, meterID, isCumulative, cumulativeReset, resetSt
 	const isAscending = (timeSort === 'increasing');
 	let errMsg = '';
 	// Convert Tgap and Tlen to milliseconds to stay consistent with moment.diff() which returns the difference in milliseconds
-	const msTgap = Tgap*1000;
-	const msTlen = Tlen*1000;
+	const msTgap = Tgap * 1000;
+	const msTlen = Tlen * 1000;
 	// Retrieve and set the last reading stored for the meter
 	// TODO: Create a redux state to hold these values with other meter states
 	const meter = await Meter.getByID(meterID, conn);
@@ -76,7 +76,7 @@ async function processData(rows, meterID, isCumulative, cumulativeReset, resetSt
 	let currentReading = new Reading(meterID, meterReading, startTimestamp, endTimestamp);
 	let prevReading = currentReading;
 	let readingOK = true;
-	for (let index = 0; index < rows.length; index+=readingRepetition) {
+	for (let index = 0; index < rows.length; index += readingRepetition) {
 		errMsg = '';
 		if (onlyEndTime) {
 			// The startTimestamp of this reading is the endTimestamp of the previous reading
@@ -95,10 +95,10 @@ async function processData(rows, meterID, isCumulative, cumulativeReset, resetSt
 			// In cumulative the reading we use will be the difference between the current raw reading and the previous raw reading
 			// Note the above assumes that the csv file is sorted in ASCENDING ORDER. If it is not in ascending order we must change this
 
-			if (isAscending){
+			if (isAscending) {
 				meterReading = meterReading2 - meterReading1; // use this ifCumulative. This is the net reading value
 			}
-			else{
+			else {
 				meterReading = meterReading1 - meterReading2;
 			}
 			meter.reading = meterReading2; // Always update the meter table with the most current raw cumulative value
@@ -130,7 +130,7 @@ async function processData(rows, meterID, isCumulative, cumulativeReset, resetSt
 				errMsg = 'The reading is not after the previous reading with only end time given so we must drop the reading.';
 			}
 			else if ((!isAscending && startTimestamp.isAfter(prevReading.endTimestamp))
-					|| (isAscending && startTimestamp.isBefore(prevReading.endTimestamp))) {
+				|| (isAscending && startTimestamp.isBefore(prevReading.endTimestamp))) {
 				if (isCumulative) {
 					/* Check if the data is in ascending order. If it is and the start time of the current reading by canonical order is
 					*  before the previous readings end time then reject because OED must subtract the previous reading value which cannot be done
@@ -139,10 +139,10 @@ async function processData(rows, meterID, isCumulative, cumulativeReset, resetSt
 					*  end time then also reject because OED cannot use the previous reading value in order to determine the correct net
 					*  reading value.*/
 					readingOK = false;
-					if (isAscending){
+					if (isAscending) {
 						errMsg = 'The reading start time is before the previous end time and the data is cumulative and in ascending order so OED cannot use this reading.';
 					}
-					else{
+					else {
 						errMsg = 'The reading start time is after the previous end time and the data is cumulative and in descending order so OED cannot use this reading.';
 					}
 				}
@@ -183,11 +183,11 @@ async function processData(rows, meterID, isCumulative, cumulativeReset, resetSt
 				// if meterReading is negative and cumulative check that the times fall within an acceptable reset range
 				if (handleCumulativeReset(cumulativeReset, resetStart, resetEnd, startTimestamp)) {
 					// If there is a cumulative reset then the meterReading should always use the canonical previous raw reading value
-					if (isAscending){
+					if (isAscending) {
 						// For data which is in ascending order the canonical previous raw reading value = meterReading2;
 						meterReading = meterReading2;
 					}
-					else{
+					else {
 						// For data which is in descending order the canonical previous raw reading value = meterReading1;
 						meterReading = meterReading1;
 					}
@@ -200,19 +200,19 @@ async function processData(rows, meterID, isCumulative, cumulativeReset, resetSt
 				}
 			}
 			if (readingOK) {
-				if (Math.abs(prevReading.endTimestamp.diff(prevReading.startTimestamp) - endTimestamp.diff(startTimestamp)) 
+				if (Math.abs(prevReading.endTimestamp.diff(prevReading.startTimestamp) - endTimestamp.diff(startTimestamp))
 					> msTlen && !isFirst(prevReading.endTimestamp)) {
 					errMsg = 'The previous reading has a different time length than the current reading. Note this is treated only as a warning since this may be expected for certain meters.';
 					// If this is true we still add the reading to the results
 				}
-				if (!(errMsg === '')){
+				if (!(errMsg === '')) {
 					// There may be warnings to output even if OED accepts the readings so output all warnings which may exist
 					log.warn(errMsg);
 				}
 				// This reading has passed all checks and can be added to result
 				currentReading = new Reading(meterID, meterReading, startTimestamp, endTimestamp);
 				result.push(currentReading);
-				if (index === rows.length-1){
+				if (index === rows.length - 1) {
 					// Update the meter to contain information for the last reading in the data file
 					meter.startTimestamp = startTimestamp;
 					meter.endTimestamp = endTimestamp;
@@ -222,7 +222,7 @@ async function processData(rows, meterID, isCumulative, cumulativeReset, resetSt
 		}
 		if (!readingOK) {
 			// An error occurred so add it to the readings dropped array and let the client know why before continuing
-			log.error('Error parsing Reading #'+index+'. Reading value gives '+meterReading+' with error message: '+'\"'+errMsg+'\"');
+			log.error('Error parsing Reading #' + index + '. Reading value gives ' + meterReading + ' with error message: ' + '\"' + errMsg + '\"');
 			readingOK = true;
 			// index-readingReptition = reading # dropped in the data
 			readingsDropped.push(index);
@@ -246,7 +246,7 @@ async function processData(rows, meterID, isCumulative, cumulativeReset, resetSt
 		return null;
 	}
 	// Let the user know exactly which readings were dropped if any before continuing
-	readingsDropped.forEach(readingNum => log.info('Dropped Reading #'+readingNum));
+	readingsDropped.forEach(readingNum => log.info('Dropped Reading #' + readingNum));
 	return result;
 }
 
