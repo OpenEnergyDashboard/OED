@@ -21,6 +21,7 @@ const saveCsv = require('../services/csvPipeline/saveCsv');
 const uploadMeters = require('../services/csvPipeline/uploadMeters');
 const uploadReadings = require('../services/csvPipeline/uploadReadings');
 const zlib = require('zlib');
+const { refreshReadingViews } = require('../services/refreshReadingViews');
 
 /** Middleware validation */
 const { validateMetersCsvUploadParams, validateReadingsCsvUploadParams } = require('../services/csvPipeline/validateCsvUploadParams');
@@ -101,14 +102,16 @@ router.use(function (req, res, next) {
 });
 
 router.post('/meters', validateMetersCsvUploadParams, async (req, res) => {
+	const isGzip = req.body.gzip === 'true';
 	const uploadedFilepath = req.file.path;
-	const isgzip = (req.body.gzip === 'true');
 	let csvFilepath;
 	try {
 		let fileBuffer = await fs.readFile(uploadedFilepath);
-		if (isgzip) {
+		// Unzip uploaded file and save file to disk if the user 
+		// has indicated that the file is (g)zipped.
+		if (isGzip) {
 			fileBuffer = zlib.gunzipSync(fileBuffer);
-			// We expect this directories to have been created by this stage of the pipeline.
+			// We expect this directory to have been created by this stage of the pipeline.
 			const dir = `${__dirname}/../tmp/uploads/csvPipeline`;
 			csvFilepath = await saveCsv(fileBuffer, 'meters', dir);
 			log.info(`The file ${csvFilepath} was created to upload meters csv data`);
@@ -129,10 +132,11 @@ router.post('/meters', validateMetersCsvUploadParams, async (req, res) => {
 			log.error(`Failed to remove the file ${uploadedFilepath}.`, err);
 		});
 
-	if (isgzip) {
+	// If user has indicated that the file is (g)zipped, then we also have to remove the unzipped file.
+	if (isGzip) {
 		// Delete the unzipped csv file if it exists.
 		fs.unlink(csvFilepath)
-			.then(() => log.info(`Successfully deleted the csv file ${csvFilepath}.`))
+			.then(() => log.info(`Successfully deleted the unzipped csv file ${csvFilepath}.`))
 			.catch(err => {
 				log.error(`Failed to remove the file ${csvFilepath}.`, err);
 			});
@@ -140,14 +144,17 @@ router.post('/meters', validateMetersCsvUploadParams, async (req, res) => {
 });
 
 router.post('/readings', validateReadingsCsvUploadParams, async (req, res) => {
+	const isGzip = req.body.gzip === 'true';
+	const isRefreshReadings = req.body.refreshReadings === 'true';
 	const uploadedFilepath = req.file.path;
-	const isgzip = (req.body.gzip === 'true');
 	let csvFilepath;
 	try {
 		let fileBuffer = await fs.readFile(uploadedFilepath);
-		if (isgzip) {
+		// Unzip uploaded file and save file to disk if the user 
+		// has indicated that the file is (g)zipped.
+		if (isGzip) {
 			fileBuffer = zlib.gunzipSync(fileBuffer);
-			// We expect this directories to have been created by this stage of the pipeline.
+			// We expect this directory to have been created by this stage of the pipeline.
 			const dir = `${__dirname}/../tmp/uploads/csvPipeline`;
 			csvFilepath = await saveCsv(fileBuffer, 'meters', dir);
 			log.info(`The file ${csvFilepath} was created to upload meters csv data`);
@@ -158,9 +165,9 @@ router.post('/readings', validateReadingsCsvUploadParams, async (req, res) => {
 		log.info(`The file ${csvFilepath} was created to upload readings csv data`);
 		const conn = getConnection();
 		await uploadReadings(req, res, csvFilepath, conn);
-		if (req.body.refreshReadings === 'true') {
-			// Call the refreshReadingViews script
-			require('../services/refreshReadingViews');
+		if (isRefreshReadings) {
+			// Refresh readings so show when daily data is used.
+			await refreshReadingViews();
 		}
 	} catch (error) {
 		failure(req, res, error);
@@ -173,10 +180,11 @@ router.post('/readings', validateReadingsCsvUploadParams, async (req, res) => {
 			log.error(`Failed to remove the file ${uploadedFilepath}.`, err);
 		});
 
-	if (isgzip) {
+	// If user has indicated that the file is (g)zipped, then we also have to remove the unzipped file.
+	if (isGzip) {
 		// Delete the unzipped csv file if it exists.
 		fs.unlink(csvFilepath)
-			.then(() => log.info(`Successfully deleted the csv file ${csvFilepath}.`))
+			.then(() => log.info(`Successfully deleted the unzipped csv file ${csvFilepath}.`))
 			.catch(err => {
 				log.error(`Failed to remove the file ${csvFilepath}.`, err);
 			});

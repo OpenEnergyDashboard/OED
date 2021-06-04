@@ -8,7 +8,21 @@ const { Param, EnumParam, BooleanParam, StringParam } = require('./ValidationSch
 const failure = require('./failure');
 const validate = require('jsonschema').validate;
 
-// These are the default values of CSV Pipeline upload parameters.
+// These are the default values of CSV Pipeline upload parameters. If a user does not specify
+// a choice for a particular parameter, then these defaults will be used.
+// Some defaults are listed as `undefined`; this is only relevant for cURL requests. It means that the default will be acquired from some external 
+// source at runtime. For example, the defaults for cumulative and cumulativeReset are `undefined` because the pipeline will read them from the 
+// database if they were not specified by the user. To override this default, the user would supply the appropriate value. 
+// Even though, we could simply leave out such fields from DEFAULTS and achieve the same effect
+// as listing them as `undefined`, we should still list them here to indicate that such fields have an "external runtime default".
+// All of this is less relevant when using the webapp, because (TODO) it would load these external runtime defaults for the user.
+// TODO:
+// cumulativeResetStart and cumulativeResetEnd should be set to undefined because their default values would be read from the DB.
+// We leave this as a future task, because at the moment cumulativeResetStart and cumulativeResetEnd are not used in this version 
+// of the CSV pipeline.
+// TODO: 
+// We use strings to represent the true/false values of an option. The pipeline should really not be doing checks against raw strings, 
+// we should change these strings to booleans.
 const DEFAULTS = {
 	common: {
 		gzip: 'true',
@@ -19,8 +33,8 @@ const DEFAULTS = {
 	},
 	readings: {
 		createMeter: 'false',
-		cumulative: 'false',
-		cumulativeReset: 'false',
+		cumulative: undefined,
+		cumulativeReset: undefined,
 		cumulativeResetStart: '0:00:00',
 		cumulativeResetEnd: '23:59:59.999999',
 		duplications: '1',
