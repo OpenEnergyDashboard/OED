@@ -195,7 +195,8 @@ async function processData(rows, meterID, isCumulative, cumulativeReset, resetSt
 				else {
 					//cumulativeReset is not expected but there is a negative net meter reading so reject all readings.
 					errMsg = ('A negative meterReading has been detected but either cumulativeReset is not enabled, or the start time and end time of this reading is out of the reset range. Reject all readings.')
-					log.error(errMsg);
+					log.error('Error parsing Reading #' + (index + 1) + '. Reading value of ' + meterReading2 + ' gives ' + meterReading + ' with error message: ' + '\"' + errMsg + '\"');
+
 					return [];
 				}
 			}
