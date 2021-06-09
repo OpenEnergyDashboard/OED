@@ -222,7 +222,7 @@ async function processData(rows, meterID, isCumulative, cumulativeReset, resetSt
 		}
 		if (!readingOK) {
 			// An error occurred so add it to the readings dropped array and let the client know why before continuing
-			log.error('Error parsing Reading #' + index + '. Reading value gives ' + meterReading + ' with error message: ' + '\"' + errMsg + '\"');
+			log.error('Error parsing Reading #' + (index + 1) + '. Reading value gives ' + meterReading + ' with error message: ' + '\"' + errMsg + '\"');
 			readingOK = true;
 			// index-readingReptition = reading # dropped in the data
 			readingsDropped.push(index);
