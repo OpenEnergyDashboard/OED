@@ -208,7 +208,7 @@ async function processData(rows, meterID, isCumulative, cumulativeReset, resetSt
 				}
 				if (!(errMsg === '')) {
 					// There may be warnings to output even if OED accepts the readings so output all warnings which may exist
-					log.warn(errMsg);
+					log.warn('Warning parsing Reading #' + (index + 1) + '. Reading value gives ' + meterReading + ' with warning message: ' + '\"' + errMsg + '\"');
 				}
 				// This reading has passed all checks and can be added to result
 				currentReading = new Reading(meterID, meterReading, startTimestamp, endTimestamp);
