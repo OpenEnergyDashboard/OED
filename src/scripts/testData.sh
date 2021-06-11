@@ -5,124 +5,92 @@
 # * file, You can obtain one at http://mozilla.org/MPL/2.0/.
 # *
 
-# This script assumes you have OED running.
+echo "This script assumes you have OED running."
+echo "This script should not be run with a different container meaning don't user docker compose."
+echo "Time estimates will vary depending on your machine and what it is doing."
+echo "The terminal where you started OED will show any errors and some of the activity going on"
+echo "  but normally only once the loading of data into OED begins."
+echo "Comments inside this script tell you how to delete all current readings and meters from the"
+echo "  database if you already ran this before and need to remove that data. You will likley get "
+echo "  a warning about"
+echo "  \"The current reading startTime is not after the previous reading's end time\"..."
+echo "  if you rerun without doing this but the result is normally fine."
+
+# The following lines can be used to remove all the readings and meter associated with
+# the test data. This is valuable if you want to run the process again and the
+# meters and readings already exist.
+# NOTE this removes the meters and readings. You may need to remove dependent groups
+# before doing this in the web groups page in OED.
+# Get into postgres in the terminal.
+# docker-compose exec database psql -U oed
+# Remove all the readings. Normally gives "DELETE 575218"
+# > delete from readings where meter_id in (select id from meters where name in ('test4DaySin', 'test4HourSin', 'test23MinSin', 'test15MinSin', 'test23MinCos', 'testSqSin', 'testSqCos', 'testAmp1Sin', 'testAmp2Sin', 'testAmp3Sin', 'testAmp4Sin', 'testAmp5Sin', 'testAmp6Sin', 'testAmp7Sin'));
+# Remove all the meters. Normally gives "DELETE 14"
+# > delete from meters where name in ('test4DaySin', 'test4HourSin', 'test23MinSin', 'test15MinSin', 'test23MinCos', 'testSqSin', 'testSqCos', 'testAmp1Sin', 'testAmp2Sin', 'testAmp3Sin', 'testAmp4Sin', 'testAmp5Sin', 'testAmp6Sin', 'testAmp7Sin');
+# Quit postgres.
+# > \q
 
 # OED main directory (normally this is run from that directory)
 oeddir=.
-# This is where the postgres directory is for OED.
-postgresdir="$oeddir/postgres-data"
+# This is the directory where the test data will be placed.
+testdatadir=$oeddir/src/server/test/db/data/automatedTests/
+# This is the OED user that can upload CSV files and used. It is the default admin.
+csvuser=test@example.com
+# The password for the user
+csvpassword='password'
+# The names of the csv files to process
+csvfiles=(
+    fourDayFreqTestData.csv fourHourFreqTestData.csv twentyThreeMinuteFreqTestData.csv fifteenMinuteFreqTestData.csv 
+    23FreqCosineTestData.csv 2.5AmpSineSquaredTestData.csv 2.5AmpCosineSquaredTestData.csv 15Freq1AmpSineTestData.csv 15Freq2AmpSineTestData.csv 
+    15Freq3AmpSineTestData.csv 15Freq4AmpSineTestData.csv 15Freq5AmpSineTestData.csv 15Freq6AmpSineTestData.csv 15Freq7AmpSineTestData.csv
+ )
+# The names of the meters that will be used for each file (in same order)
+ meternames=(
+    test4DaySin test4HourSin test23MinSin test15MinSin test23MinCos testSqSin testSqCos testAmp1Sin testAmp2Sin testAmp3Sin testAmp4Sin testAmp5Sin testAmp6Sin testAmp7Sin 
+ )
 
 # Go to OED directory
 cd $oeddir
 
-# The following lines can be used to remove all the readings and meter associated with
-# the test data. This is valuable if you want to run the process again and the
-# meters and readings already exist. At this time it is not working in the script
-# so have to do on the command line.
-# NOTE this removes the meters and readings. You may need to remove dependent groups
-# before doing this.
-# docker-compose exec database psql -U oed
-# > delete from readings where meter_id between 300 and 313;
-# > delete from meters where id between 300 and 313;
-# > q
-
 # Generate the standard sample data.
-# Various time lengths & the sin^, cos^2
-docker-compose run --rm web npm run generateTestingData
-# Sin at various amplitudes
-docker-compose run --rm web npm run generateVariableAmplitudeTestingData
+echo
+echo "Start generating first set of test data (square, varying freq of readings)."
+echo "  This normally takes less than a minute:"
+# This assumes you have a newer version (as of 2021) docker that has compose built in.
+# In the past it was docker-compose.
+docker compose run --rm web npm run generateTestingData
+echo
+echo "Start generating second set of test data (varying amplitudes)"
+echo "  This normally takes about a minute:"
+docker compose run --rm web npm run generateVariableAmplitudeTestingData
 
-# 
-# Edit the readings files to add the meter id
-# This will not be necessary once we use curl to get the files in
-sed -i "" -e "s/^[0-9]/300,&/" src/server/test/db/data/automatedTests/fourDayFreqTestData.csv
-sed -i "" -e "s/^[0-9]/301,&/" src/server/test/db/data/automatedTests/fourHourFreqTestData.csv
-sed -i "" -e "s/^[0-9]/302,&/" src/server/test/db/data/automatedTests/twentyThreeMinuteFreqTestData.csv
-sed -i "" -e "s/^[0-9]/303,&/" src/server/test/db/data/automatedTests/fifteenMinuteFreqTestData.csv
-sed -i "" -e "s/^[0-9]/304,&/" src/server/test/db/data/automatedTests/23FreqCosineTestData.csv
-sed -i "" -e "s/^[0-9]/305,&/" src/server/test/db/data/automatedTests/2.5AmpSineSquaredTestData.csv
-sed -i "" -e "s/^[0-9]/306,&/" src/server/test/db/data/automatedTests/2.5AmpCosineSquaredTestData.csv
-sed -i "" -e "s/^[0-9]/307,&/" src/server/test/db/data/automatedTests/15Freq1AmpSineTestData.csv
-sed -i "" -e "s/^[0-9]/308,&/" src/server/test/db/data/automatedTests/15Freq2AmpSineTestData.csv
-sed -i "" -e "s/^[0-9]/309,&/" src/server/test/db/data/automatedTests/15Freq3AmpSineTestData.csv
-sed -i "" -e "s/^[0-9]/310,&/" src/server/test/db/data/automatedTests/15Freq4AmpSineTestData.csv
-sed -i "" -e "s/^[0-9]/311,&/" src/server/test/db/data/automatedTests/15Freq5AmpSineTestData.csv
-sed -i "" -e "s/^[0-9]/312,&/" src/server/test/db/data/automatedTests/15Freq6AmpSineTestData.csv
-sed -i "" -e "s/^[0-9]/313,&/" src/server/test/db/data/automatedTests/15Freq7AmpSineTestData.csv
+# Go to directory with test data
+cd $testdatadir
+# Load each set of test data readings into OED where create meter
+echo
+echo "Start loading each set of test data into OED."
+echo "  This could take a number of minutes (maybe around 10 minutes):"
+for ((i=0; i < ${#csvfiles[@]}; i++))
+do
+    echo "    loading meter ${meternames[i]} from file ${csvfiles[i]}"
+    if [ $i == $((${#csvfiles[@]} - 1)) ]
+    then
+        # The last loaded data does a refresh of the readings so can see in OED and will do it for all previous data.
+        curl localhost:3000/api/csv/readings -X POST -F "meterName=${meternames[i]}" -F 'refreshReadings=true' -F 'createMeter=true' -F 'headerRow=true' -F 'gzip=false' -F "email=$csvuser" -F "password=$csvpassword" -F "csvfile=@${csvfiles[i]}"
+    else
+        curl localhost:3000/api/csv/readings -X POST -F "meterName=${meternames[i]}" -F 'createMeter=true' -F 'headerRow=true' -F 'gzip=false' -F "email=$csvuser" -F "password=$csvpassword" -F "csvfile=@${csvfiles[i]}"
+    fi
+done
 
-# Create needed meters.
-# This will probably not be necesary once can use curl to get the files in
-# CSV with meter info
-cat > $postgresdir/testMeters.csv << EOF
-id,name,ipaddress,enabled,displayable,meter_type,default_timezone_meter,gps,identifier,note,area,cumulative,cumulative_reset,cumulative_reset_start,cumulative_reset_end,reading_length,reading_variation,reading,start_timestamp,end_timestamp
-300,test4DaySin,123.45.6.0,FALSE,TRUE,mamac,,,test4DaySin,notesTest,25.0,FALSE,TRUE,00:00:00,00:00:00,,,20.0,,0001-01-01 : 00:00:00
-301,test4HourSin,123.45.6.0,FALSE,TRUE,mamac,,,test4HourSin,notesTest,25.0,FALSE,TRUE,00:00:00,00:00:00,,,20.0,,0001-01-01 : 00:00:00
-302,test23MinSin,123.45.6.0,FALSE,TRUE,mamac,,,test23MinSin,notesTest,25.0,FALSE,TRUE,00:00:00,00:00:00,,,20.0,,0001-01-01 : 00:00:00
-303,test15MinSin,123.45.6.0,FALSE,TRUE,mamac,,,test15MinSin,notesTest,25.0,FALSE,TRUE,00:00:00,00:00:00,,,20.0,,0001-01-01 : 00:00:00
-304,test23MinCos,123.45.6.0,FALSE,TRUE,mamac,,,test23MinCos,notesTest,25.0,FALSE,TRUE,00:00:00,00:00:00,,,20.0,,0001-01-01 : 00:00:00
-305,testSqSin,123.45.6.0,FALSE,TRUE,mamac,,,testSqSin,notesTest,25.0,FALSE,TRUE,00:00:00,00:00:00,,,20.0,,0001-01-01 : 00:00:00
-306,testSqCos,123.45.6.0,FALSE,TRUE,mamac,,,testSqCos,notesTest,25.0,FALSE,TRUE,00:00:00,00:00:00,,,20.0,,0001-01-01 : 00:00:00
-307,testAmp1Sin,123.45.6.0,FALSE,TRUE,mamac,,,testAmp1Sin,notesTest,25.0,FALSE,TRUE,00:00:00,00:00:00,,,20.0,,0001-01-01 : 00:00:00
-308,testAmp2Sin,123.45.6.0,FALSE,TRUE,mamac,,,testAmp2Sin,notesTest,25.0,FALSE,TRUE,00:00:00,00:00:00,,,20.0,,0001-01-01 : 00:00:00
-309,testAmp3Sin,123.45.6.0,FALSE,TRUE,mamac,,,testAmp3Sin,notesTest,25.0,FALSE,TRUE,00:00:00,00:00:00,,,20.0,,0001-01-01 : 00:00:00
-310,testAmp4Sin,123.45.6.0,FALSE,TRUE,mamac,,,testAmp4Sin,notesTest,25.0,FALSE,TRUE,00:00:00,00:00:00,,,20.0,,0001-01-01 : 00:00:00
-311,testAmp5Sin,123.45.6.0,FALSE,TRUE,mamac,,,testAmp5Sin,notesTest,25.0,FALSE,TRUE,00:00:00,00:00:00,,,20.0,,0001-01-01 : 00:00:00
-312,testAmp6Sin,123.45.6.0,FALSE,TRUE,mamac,,,testAmp6Sin,notesTest,25.0,FALSE,TRUE,00:00:00,00:00:00,,,20.0,,0001-01-01 : 00:00:00
-313,testAmp7Sin,123.45.6.0,FALSE,TRUE,mamac,,,testAmp7Sin,notesTest,25.0,FALSE,TRUE,00:00:00,00:00:00,,,20.0,,0001-01-01 : 00:00:00
-EOF
-# Put meters into OED
-docker-compose exec database psql -U oed  -c "copy meters from 'testMeters.csv' CSV HEADER"
+echo
+echo "Starting to remove the CSV files with the test data. No output unless an issue."
+for ((i=0; i < ${#csvfiles[@]}; i++))
+do
+        rm ${csvfiles[i]}
+done
 
-# Move generated csv files to Postgres directory
-# This will not be necessary once can use curl to get the files in
-mv src/server/test/db/data/automatedTests/fourDayFreqTestData.csv $postgresdir
-mv src/server/test/db/data/automatedTests/fourHourFreqTestData.csv $postgresdir
-mv src/server/test/db/data/automatedTests/twentyThreeMinuteFreqTestData.csv $postgresdir
-mv src/server/test/db/data/automatedTests/fifteenMinuteFreqTestData.csv $postgresdir
-mv src/server/test/db/data/automatedTests/23FreqCosineTestData.csv $postgresdir
-mv src/server/test/db/data/automatedTests/2.5AmpSineSquaredTestData.csv $postgresdir
-mv src/server/test/db/data/automatedTests/2.5AmpCosineSquaredTestData.csv $postgresdir
-mv src/server/test/db/data/automatedTests/15Freq1AmpSineTestData.csv $postgresdir
-mv src/server/test/db/data/automatedTests/15Freq2AmpSineTestData.csv $postgresdir
-mv src/server/test/db/data/automatedTests/15Freq3AmpSineTestData.csv $postgresdir
-mv src/server/test/db/data/automatedTests/15Freq4AmpSineTestData.csv $postgresdir
-mv src/server/test/db/data/automatedTests/15Freq5AmpSineTestData.csv $postgresdir
-mv src/server/test/db/data/automatedTests/15Freq6AmpSineTestData.csv $postgresdir
-mv src/server/test/db/data/automatedTests/15Freq7AmpSineTestData.csv $postgresdir
-# Put readings into OED.
-# This will become curl later.
-docker-compose exec database psql -U oed  -c "copy readings from 'fourDayFreqTestData.csv' CSV HEADER"
-docker-compose exec database psql -U oed  -c "copy readings from 'fourHourFreqTestData.csv' CSV HEADER"
-docker-compose exec database psql -U oed  -c "copy readings from 'twentyThreeMinuteFreqTestData.csv' CSV HEADER"
-docker-compose exec database psql -U oed  -c "copy readings from 'fifteenMinuteFreqTestData.csv' CSV HEADER"
-docker-compose exec database psql -U oed  -c "copy readings from '23FreqCosineTestData.csv' CSV HEADER"
-docker-compose exec database psql -U oed  -c "copy readings from '2.5AmpSineSquaredTestData.csv' CSV HEADER"
-docker-compose exec database psql -U oed  -c "copy readings from '2.5AmpCosineSquaredTestData.csv' CSV HEADER"
-docker-compose exec database psql -U oed  -c "copy readings from '15Freq1AmpSineTestData.csv' CSV HEADER"
-docker-compose exec database psql -U oed  -c "copy readings from '15Freq2AmpSineTestData.csv' CSV HEADER"
-docker-compose exec database psql -U oed  -c "copy readings from '15Freq3AmpSineTestData.csv' CSV HEADER"
-docker-compose exec database psql -U oed  -c "copy readings from '15Freq4AmpSineTestData.csv' CSV HEADER"
-docker-compose exec database psql -U oed  -c "copy readings from '15Freq5AmpSineTestData.csv' CSV HEADER"
-docker-compose exec database psql -U oed  -c "copy readings from '15Freq6AmpSineTestData.csv' CSV HEADER"
-docker-compose exec database psql -U oed  -c "copy readings from '15Freq7AmpSineTestData.csv' CSV HEADER"
-
-# refresh the readings so can see in OED
-docker-compose exec web npm run refreshReadingViews
-
-# Remove the data files now that in OED.
-# Will be different place once use curl.
-rm $postgresdir/testMeters.csv
-rm $postgresdir/fourDayFreqTestData.csv
-rm $postgresdir/fourHourFreqTestData.csv
-rm $postgresdir/twentyThreeMinuteFreqTestData.csv
-rm $postgresdir/fifteenMinuteFreqTestData.csv
-rm $postgresdir/23FreqCosineTestData.csv
-rm $postgresdir/2.5AmpSineSquaredTestData.csv
-rm $postgresdir/2.5AmpCosineSquaredTestData.csv
-rm $postgresdir/15Freq1AmpSineTestData.csv
-rm $postgresdir/15Freq2AmpSineTestData.csv
-rm $postgresdir/15Freq3AmpSineTestData.csv
-rm $postgresdir/15Freq4AmpSineTestData.csv
-rm $postgresdir/15Freq5AmpSineTestData.csv
-rm $postgresdir/15Freq6AmpSineTestData.csv
-rm $postgresdir/15Freq7AmpSineTestData.csv
+echo
+echo "The process is now done."
+echo
+echo "***Meters created through this script are only visible by an admin."
+echo "   You can change this on the web meters page in OED (make sure to save changes).***"
