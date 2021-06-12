@@ -226,7 +226,7 @@ async function processData(rows, meterID, isCumulative, cumulativeReset, resetSt
 			log.error('Error parsing Reading #' + (index + 1) + '. Reading value gives ' + meterReading + ' with error message: ' + '\"' + errMsg + '\"');
 			readingOK = true;
 			// index-readingReptition = reading # dropped in the data
-			readingsDropped.push(index);
+			readingsDropped.push(index + 1);
 			/* If the data is cumulative then regardless of if it comes with end timestamps only or both end timestamps and start timestamps
 			*  the first reading ever should become the previous reading. This is necessary because there are no previous readings in the db
 			*  yet so we must drop the first point ever and use this first point as the first previous reading in order to begin calculating
