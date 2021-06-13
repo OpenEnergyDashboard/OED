@@ -53,22 +53,19 @@ csvfiles=(
 cd $oeddir
 
 # Generate the standard sample data.
-echo
-echo "Start generating first set of test data (square, varying freq of readings)."
+echo -e "\nStart generating first set of test data (square, varying freq of readings)."
 echo "  This normally takes less than a minute:"
 # This assumes you have a newer version (as of 2021) docker that has compose built in.
 # In the past it was docker-compose.
 docker compose run --rm web npm run generateTestingData
-echo
-echo "Start generating second set of test data (varying amplitudes)"
+echo -e "\nStart generating second set of test data (varying amplitudes)"
 echo "  This normally takes about a minute:"
 docker compose run --rm web npm run generateVariableAmplitudeTestingData
 
 # Go to directory with test data
 cd $testdatadir
 # Load each set of test data readings into OED where create meter
-echo
-echo "Start loading each set of test data into OED."
+echo -e "\nStart loading each set of test data into OED."
 echo "  This could take a number of minutes (maybe around 10 minutes):"
 for ((i=0; i < ${#csvfiles[@]}; i++))
 do
@@ -82,15 +79,12 @@ do
     fi
 done
 
-echo
-echo "Starting to remove the CSV files with the test data. No output unless an issue."
+echo -e "\nStarting to remove the CSV files with the test data. No output unless an issue."
 for ((i=0; i < ${#csvfiles[@]}; i++))
 do
         rm ${csvfiles[i]}
 done
 
-echo
-echo "The process is now done."
-echo
-echo "***Meters created through this script are only visible by an admin."
+echo -e "\nThe process is now done."
+echo -e "\n***Meters created through this script are only visible by an admin."
 echo "   You can change this on the web meters page in OED (make sure to save changes).***"
