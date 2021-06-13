@@ -31,6 +31,8 @@ mocha.describe('PIPELINE: Load data from array', () => {
 								},
 							false,
 							false,
+							'0:00:00',
+							'0:00:00',
 							1,
 							undefined,
 							conn);

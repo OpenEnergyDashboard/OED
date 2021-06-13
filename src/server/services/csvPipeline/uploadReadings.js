@@ -21,7 +21,7 @@ async function uploadReadings(req, res, filepath, conn) {
 	const { createMeter, duplications, headerRow,
 		length, meterName, mode, timeSort, update } = req.body; // extract query parameters
 	const hasHeaderRow = (headerRow === 'true');
-	const readingRepetition = parseInt(duplications,10);
+	const readingRepetition = parseInt(duplications, 10);
 	let meter = await Meter.getByName(meterName, conn)
 		.catch(async err => {
 			// Meter#getByNames throws an error when no meter is found. We need the catch clause to account for this error.
@@ -41,7 +41,7 @@ async function uploadReadings(req, res, filepath, conn) {
 		});
 
 	// Handle cumulative defaults
-	let { cumulative, cumulativeReset } = req.body;
+	let { cumulative, cumulativeReset, cumulativeResetStart, cumulativeResetEnd } = req.body;
 	let areReadingsCumulative;
 	let doReadingsReset;
 	// We know from the validation stage of the pipeline that the 'cumulative' and 'cumulativeReset' fields
@@ -50,8 +50,8 @@ async function uploadReadings(req, res, filepath, conn) {
 	// TODO: We made the assumption that in the DB, the cumulative and cumulativeReset columns is either true or false.
 	// On further inspection, these values can be null. At the moment, we are not sure what this means for the pipeline.
 	// As a quick fix, we will assume that null, means false.
-	if (cumulative === undefined){
-		if (meter.cumulative === null){
+	if (cumulative === undefined) {
+		if (meter.cumulative === null) {
 			areReadingsCumulative = false;
 		} else {
 			areReadingsCumulative = meter.cumulative;
@@ -60,14 +60,33 @@ async function uploadReadings(req, res, filepath, conn) {
 		areReadingsCumulative = (cumulative === 'true');
 	}
 
-	if (cumulativeReset === undefined){
-		if(meter.cumulativeReset === null){
+	if (cumulativeReset === undefined) {
+		if (meter.cumulativeReset === null) {
 			doReadingsReset = false;
 		} else {
 			doReadingsReset = meter.cumulativeReset;
 		}
 	} else {
 		doReadingsReset = (cumulativeReset === 'true');
+	}
+
+	// For cumulative reset times the validation step sets to undefined if not provided so do similar to ones above
+	// but just pass if value was defined.
+	if (cumulativeResetStart === undefined) {
+		if (meter.cumulativeResetStart === null) {
+			// This probably should not happen with a new DB but keep just in case.
+			cumulativeResetStart = '0:00:00';
+		} else {
+			cumulativeResetStart = meter.cumulativeResetStart;
+		}
+	}
+	if (cumulativeResetEnd === undefined) {
+		if (meter.cumulativeResetEnd === null) {
+			// This probably should not happen with a new DB but keep just in case.
+			cumulativeResetEnd = '23:59:59.999999';
+		} else {
+			cumulativeResetEnd = meter.cumulativeResetEnd;
+		}
 	}
 
 	const mapRowToModel = row => { return row; }; // STUB function to satisfy the parameter of loadCsvInput.
@@ -78,6 +97,8 @@ async function uploadReadings(req, res, filepath, conn) {
 		false,
 		areReadingsCumulative,
 		doReadingsReset,
+		cumulativeResetStart,
+		cumulativeResetEnd,
 		readingRepetition,
 		undefined,
 		hasHeaderRow,

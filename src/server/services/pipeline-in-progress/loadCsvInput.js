@@ -18,6 +18,8 @@ const { log } = require('../../log');
  * @param {boolean} readAsStream true if prefer to read file as CSV stream
  * @param {boolean} isCumulative true if the given data is cumulative
  * @param {boolean} cumulativeReset true if the cumulative data is reset at midnight
+ * @param {time} cumulativeResetStart defines the first time a cumulative reset is allowed
+ * @param {time} cumulativeResetEnd defines the last time a cumulative reset is allowed
  * @param {number} readingRepetition number of times each reading is repeated where 1 means no repetition
  * @param {array} conditionSet used to validate readings (minVal, maxVal, minDate, maxDate, threshold, maxError)
  * @param {boolean} headerRow true if the given file has a header row
@@ -31,6 +33,8 @@ async function loadCsvInput(
 	readAsStream,
 	isCumulative,
 	cumulativeReset,
+	cumulativeResetStart,
+	cumulativeResetEnd,
 	readingRepetition,
 	conditionSet,
 	headerRow,
@@ -46,7 +50,8 @@ async function loadCsvInput(
 			if (headerRow) {
 				dataRows.shift();
 			}
-			return loadArrayInput(dataRows, meterID, mapRowToModel, isCumulative, cumulativeReset, readingRepetition, conditionSet, conn, timeSort);
+			return loadArrayInput(dataRows, meterID, mapRowToModel, isCumulative, cumulativeReset,
+				cumulativeResetStart, cumulativeResetEnd,readingRepetition, conditionSet, conn, timeSort);
 		}
 	} catch (err) {
 		log.error(`Error updating meter ${meterID} with data from ${filePath}: ${err}`, err);

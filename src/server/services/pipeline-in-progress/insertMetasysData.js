@@ -15,7 +15,7 @@ const path = require('path');
  * @param readingInterval  value of the reading interval. For example 60 minutes, 30 minutes.
  * @param readingRepetition value is 1 if reading is not duplicated. 2 if repeated twice and so on.
  * @param  cumulativeIndicator false if readings are not cumulative and vice-versa.
- * @param cumulativeReset true if the cumlative data is reset at midnight
+ * @param cumulativeReset true if the cumulative data is reset at midnight
  * @param conn the database connection to use
  */
 async function insertMetasysData(filePath, readingInterval, readingRepetition, cumulativeIndicator, cumulativeReset, conn) {
@@ -34,6 +34,9 @@ async function insertMetasysData(filePath, readingInterval, readingRepetition, c
 						readAsStream = false,
 						isCumulative = cumulativeIndicator,
 						cumulativeReset = cumulativeReset,
+						// TODO This pipeline is going away. Using dummy times that allow reset at any time.
+						'0:00:00',
+						'23:59:59.99999',
 						readingRepetition = readingRepetition,
 						conditionSet = undefined,
 						headerRow = false,

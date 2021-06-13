@@ -18,25 +18,27 @@ function handleCumulativeReset(cumulativeReset, resetStart, resetEnd, startTimes
 		return false;
 	}
 	else {
-		let momentFormat = '';
-		// Use strict parsing so input startTimestamp must exactly match the specified format and invalid dates are caught instead of incorrect dates.
-		if (moment(startTimestamp, 'YYYY-MM-DD', true).isValid()) {
-			// Check if the startTimestamp is passed in the date format "Year-Month-Day" and append time to it if the startTimestamp is in this format.
-			momentFormat = 'YYYY-MM-DD HH:mm:ss.SSS';
+		// The range test is if the start time is within the reset time.
+		testStart = startTimestamp;
+		// Need the reset to be on a day relative to the testStart day.
+		// The resetStartDuration and resetEndDuration is a time without a date.
+		let resetStartDuration = moment.duration(resetStart);
+		let resetEndDuration = moment.duration(resetEnd);
+		// Do by getting the start of the day for testStart and then adding in the time for reset.
+		let testResetStart = moment(testStart.clone().startOf('day') + resetStartDuration);
+		if (resetStartDuration.subtract(resetEndDuration) > 0) {
+			// If the start time is after the end time for reset then the start time is for the previous day.
+			testResetStart = testResetStart.subtract(1, 'days');
 		}
-		else {
-			// If the startTimestamp is not in the format "Year-Month-Day" we expect that the date format must be "Month-Day-Year".
-			momentFormat = 'MM-DD-YYYY HH:mm:ss.SSS';
-		}
-		let testStart = moment(startTimestamp);
-		// Use momentFormat to define the start and end dates to check if the cumulative drop occurs within the expected resetStart time and resetEnd time.
-		let testResetStart = moment(testStart.format(momentFormat) + ' ' + resetStart, ['YYYY/MM/DD HH:mm:ss.SSS', 'MM/DD/YYYY HH:mm:ss.SSS']);
-		let testResetEnd = moment(testStart.format(momentFormat) + ' ' + resetEnd, ['YYYY/MM/DD HH:mm:ss.SSS', 'MM/DD/YYYY HH:mm:ss.SSS']);
+		let testResetEnd = moment(testStart.clone().startOf('day') + moment.duration(resetEnd));
 		if (testStart.isSameOrAfter(testResetStart) && testStart.isSameOrBefore(testResetEnd)) {
+			// The reading is between the reset times so it is okay to use.
 			return true;
+		} else {
+			// Reset not valid.
+			return false;
 		}
 	}
-	return false;
 }
 
 module.exports = handleCumulativeReset

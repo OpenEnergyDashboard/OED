@@ -16,10 +16,6 @@ const validate = require('jsonschema').validate;
 // Even though, we could simply leave out such fields from DEFAULTS and achieve the same effect
 // as listing them as `undefined`, we should still list them here to indicate that such fields have an "external runtime default".
 // All of this is less relevant when using the webapp, because (TODO) it would load these external runtime defaults for the user.
-// TODO:
-// cumulativeResetStart and cumulativeResetEnd should be set to undefined because their default values would be read from the DB.
-// We leave this as a future task, because at the moment cumulativeResetStart and cumulativeResetEnd are not used in this version 
-// of the CSV pipeline.
 // TODO: 
 // We use strings to represent the true/false values of an option. The pipeline should really not be doing checks against raw strings, 
 // we should change these strings to booleans.
@@ -35,8 +31,8 @@ const DEFAULTS = {
 		createMeter: 'false',
 		cumulative: undefined,
 		cumulativeReset: undefined,
-		cumulativeResetStart: '0:00:00',
-		cumulativeResetEnd: '23:59:59.999999',
+		cumulativeResetStart: undefined,
+		cumulativeResetEnd: undefined,
 		duplications: '1',
 		length: '',
 		lengthVariation: '',

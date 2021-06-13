@@ -31,6 +31,9 @@ function insertMamacData(filePath, meter, readingDuration, conn) {
 						readAsStream = true,
 						isCumulative = false,
 						cumulativeReset = false,
+						// No cumulative reset so dummy times.
+						'0:00:00',
+						'0:00:00',
 						readingRepetition = 1,
 						conditionSet = undefined,
 						headerRow = false,
