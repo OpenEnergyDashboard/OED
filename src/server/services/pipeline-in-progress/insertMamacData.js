@@ -12,10 +12,21 @@ const loadCsvInput = require('./loadCsvInput');
  * Returns a promise to insert readings from a MAMAC csv file with the given path into the database
  *
  * Uses a long-running transaction to send information to the database and discard it as soon as possible.
- * @param {string} filePath the path to the csv file
- * @param {Meter} meter the meter to associate the readings with
- * @param {moment.Duration} readingDuration The duration of the readings in this csv file.
- * @param conn the database connection to use
+ * @param {string} filePath path to file to load including file name
+ * @param {Meter} meter the meter id to associate the readings with
+ * @param {function} mapRowToModel a customized function that map needed values from each row to the Reading model
+ * @param {boolean} readAsStream true if prefer to read file as CSV stream
+ * @param {boolean} isCumulative true if the given data is cumulative
+ * @param {boolean} cumulativeReset true if the cumulative data is reset at midnight
+ * @param {time} cumulativeResetStart defines the first time a cumulative reset is allowed
+ * @param {time} cumulativeResetEnd defines the last time a cumulative reset is allowed
+ * @param {number} readingGap defines how far apart (end time of previous to start time of next) that a pair of reading can be
+ * @param {number} readingLengthVariation defines how much the length of a pair of readings can vary in seconds.
+ * @param {number} readingRepetition number of times each reading is repeated where 1 means no repetition
+ * @param {string} timeSort the canonical order sorted by date/time in which the data appears in the CSV file
+ * @param {boolean} headerRow true if the given file has a header row
+ * @param {array} conditionSet used to validate readings (minVal, maxVal, minDate, maxDate, threshold, maxError)
+ * @param {array} conn connection to database
  * @return {Promise.<>}
  */
 function insertMamacData(filePath, meter, readingDuration, conn) {
@@ -34,11 +45,14 @@ function insertMamacData(filePath, meter, readingDuration, conn) {
 						// No cumulative reset so dummy times.
 						'0:00:00',
 						'0:00:00',
+						// Every reading should be adjacent (no gap)
+						0,
 						// Every reading should be the same length
 						0,
 						readingRepetition = 1,
-						conditionSet = undefined,
+						'increasing',
 						headerRow = false,
+						conditionSet = undefined,
 						conn = conn);
 }
 

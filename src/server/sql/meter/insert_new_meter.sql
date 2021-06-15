@@ -3,9 +3,9 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
 
 INSERT INTO meters(name, ipaddress, enabled, displayable, meter_type, default_timezone_meter, gps, identifier,
-    note, area, cumulative, cumulative_reset, cumulative_reset_start, cumulative_reset_end, reading_length,
+    note, area, cumulative, cumulative_reset, cumulative_reset_start, cumulative_reset_end, reading_gap,
     reading_variation, reading, start_timestamp, end_timestamp)
 VALUES (${name}, ${ipAddress}, ${enabled}, ${displayable}, ${type}, ${meterTimezone}, ${gps}, ${identifier},
     ${note}, ${area}, ${cumulative}, ${cumulativeReset}, ${cumulativeResetStart}, ${cumulativeResetEnd},
-    ${readingLength}, ${readingVariation}, ${reading}, ${startTimestamp}, ${endTimestamp})
+    ${readingGap}, ${readingVariation}, ${reading}, ${startTimestamp}, ${endTimestamp})
 RETURNING id;

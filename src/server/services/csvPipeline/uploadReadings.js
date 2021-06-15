@@ -18,7 +18,7 @@ const Meter = require('../../models/Meter');
  */
 async function uploadReadings(req, res, filepath, conn) {
 	const { createMeter, duplications, headerRow,
-		length, meterName, mode, timeSort, update } = req.body; // extract query parameters
+		meterName, mode, timeSort, update } = req.body; // extract query parameters
 	const hasHeaderRow = (headerRow === 'true');
 	const readingRepetition = parseInt(duplications, 10);
 	let meter = await Meter.getByName(meterName, conn)
@@ -40,9 +40,11 @@ async function uploadReadings(req, res, filepath, conn) {
 		});
 
 	// Handle other parameter defaults
-	let { cumulative, cumulativeReset, cumulativeResetStart, cumulativeResetEnd, lengthVariation } = req.body;
+	// TODO length should be renamed lengthGap
+	let { cumulative, cumulativeReset, cumulativeResetStart, cumulativeResetEnd, lengthVariation, length } = req.body;
 	let areReadingsCumulative;
 	let doReadingsReset;
+	let readingGap = length;
 	let readingLengthVariation = lengthVariation;
 	// We know from the validation stage of the pipeline that the 'cumulative' and 'cumulativeReset' fields
 	// will have one of the follow values undefined, 'true', or 'false'. If undefined, this means that 
@@ -89,9 +91,21 @@ async function uploadReadings(req, res, filepath, conn) {
 		}
 	}
 
-	// Similar for time variation in length and gap between readings
-
-	// length is not currently used.
+	// Similar for time variation in gap and length between readings
+	
+		if (length === undefined) {
+			if (meter.reading_gap === null) {
+				// This probably should not happen with a new DB but keep just in case.
+				// No variation allowed.
+				readingGap = 0;
+			} else {
+				readingGap = meter.reading_gap;
+			}
+		} else {
+			// Convert string that is a real number to a value.
+			// Note the variable changes from string to real number.
+			readingGap = parseFloat(readingGap);
+		}
 
 	if (readingLengthVariation === undefined) {
 		if (meter.reading_variation === null) {
@@ -117,12 +131,13 @@ async function uploadReadings(req, res, filepath, conn) {
 		doReadingsReset,
 		cumulativeResetStart,
 		cumulativeResetEnd,
+		readingGap,
 		readingLengthVariation,
 		readingRepetition,
-		undefined,
+		timeSort,
 		hasHeaderRow,
-		conn,
-		timeSort
+		undefined,
+		conn
 	); // load csv data
 	// TODO: If unsuccessful upload then an error will be thrown. We need to catch this error.
 	//fs.unlink(filepath).catch(err => log.error(`Failed to remove the file ${filepath}.`, err));

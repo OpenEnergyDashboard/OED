@@ -31,17 +31,16 @@ const E0 = moment(0);
  *  The default resetStart time is '00:00:00.000'
  * @param {string} resetEnd a string representation in the format "HH:mm:ss.SSS" which represents the end time a cumulativeReset may occur before\
  *  The default resetEnd time is '23:59:99.999'
- * @param {number} readingLengthVariation how many seconds a pair of readings can vary in length
+ * @param {number} readingGap the allowed time variation in seconds that a gap may occur between two readings, default 0
+ * @param {number} readingLengthVariation the allowed time variation in seconds that two readings may deviate from each other, default 0
  * @param {number} readingRepetition value is 1 if reading is not duplicated. 2 if repeated twice and so on (E-mon D-mon meters)
  * @param {boolean} onlyEndTime true if the data only has an endTimestamp, default false
- * @param {number} Tgap the allowed time variation in seconds that a gap may occur between two readings, default 0
- * @param {number} Tlen the allowed time variation in seconds that two readings may deviate from each other, default 0
  * @param {string} timeSort the canonical order sorted by date/time in which the data appears in the data file, default 'increasing'
  * @param {dict} conditionSet used to validate readings (minVal, maxVal, minDate, maxDate, interval, maxError)
  * @param {array} conn the connection to the database
  */
 async function processData(rows, meterID, isCumulative, cumulativeReset, resetStart = '00:00:00.000',
-	resetEnd = '23:59:99.999', readingLengthVariation = 0, readingRepetition, onlyEndTime = false, Tgap = 0,
+	resetEnd = '23:59:99.999', readingGap = 0, readingLengthVariation = 0, readingRepetition, onlyEndTime = false,
 	timeSort = 'increasing', conditionSet, conn) {
 
 	// If processData is successfully finished then return result = [R0, R1, R2...RN]
@@ -49,8 +48,8 @@ async function processData(rows, meterID, isCumulative, cumulativeReset, resetSt
 	const readingsDropped = [];
 	const isAscending = (timeSort === 'increasing');
 	let errMsg = '';
-	// Convert Tgap and Tlen to milliseconds to stay consistent with moment.diff() which returns the difference in milliseconds
-	const msTgap = Tgap * 1000;
+	// Convert readingGap and readingLengthVariation to milliseconds to stay consistent with moment.diff() which returns the difference in milliseconds
+	const msReadingGap = readingGap * 1000;
 	const msReadingLengthVariation = readingLengthVariation * 1000;
 	// Retrieve and set the last reading stored for the meter
 	// TODO: Create a redux state to hold these values with other meter states
@@ -153,8 +152,8 @@ async function processData(rows, meterID, isCumulative, cumulativeReset, resetSt
 				}
 			}
 		}
-		if ((readingOK && isAscending && Math.abs(startTimestamp.diff(prevReading.endTimestamp)) > msTgap)
-			|| (readingOK && !isAscending && Math.abs(endTimestamp.diff(prevReading.startTimestamp)) > msTgap)) {
+		if ((readingOK && isAscending && Math.abs(startTimestamp.diff(prevReading.endTimestamp)) > msReadingGap)
+			|| (readingOK && !isAscending && Math.abs(endTimestamp.diff(prevReading.startTimestamp)) > msReadingGap)) {
 			if (isCumulative) {
 				/* Check if the data is in ascending order. If it is and the start time of the current reading by canonical order is not
 				*  immediately after the previous reading by canonical order then there is a gap. If the gap is greater than the expected
@@ -167,8 +166,9 @@ async function processData(rows, meterID, isCumulative, cumulativeReset, resetSt
 				errMsg = 'The end of the previous reading is too far from the start of the next readings in cumulative data so drop this reading. ';
 			}
 			else if (!isFirst(prevReading.endTimestamp)) {
-				//Only treat this as a warning since we expect a gap in the first ever reading.
-				errMsg += 'There is a gap in time between this reading and the previous reading. Note this is treated only as a warning since OED expects a gap to occur in the first ever reading. ';
+				// Only treat this as a warning. We don't warn on the first ever reading since we expect a gap in that case.
+				errMsg += 'There is a gap in time between this reading and the previous reading that exceeds the allowed amount of ' +
+					msReadingGap / 1000 + ' seconds';
 			}
 		}
 		if (readingOK) {
@@ -204,7 +204,9 @@ async function processData(rows, meterID, isCumulative, cumulativeReset, resetSt
 			if (readingOK) {
 				if (Math.abs(prevReading.endTimestamp.diff(prevReading.startTimestamp) - endTimestamp.diff(startTimestamp))
 					> msReadingLengthVariation && !isFirst(prevReading.endTimestamp)) {
-					errMsg = 'The previous reading has a different time length than the current reading. Note this is treated only as a warning since this may be expected for certain meters.';
+					errMsg = 'The previous reading has a different time length than the current reading and exceeds the tolerance of ' +
+						msReadingLengthVariation / 1000 +
+						' seconds. Note this is treated only as a warning since this may be expected for certain meters.';
 					// If this is true we still add the reading to the results
 				}
 				if (!(errMsg === '')) {

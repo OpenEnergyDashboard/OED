@@ -39,7 +39,7 @@ function formatMeterForResponse(meter, loggedInAsAdmin) {
 		cumulativeReset : null,
 		cumulativeResetStart : null,
 		cumulativeResetEnd : null,
-		readingLength : null,
+		readingGap : null,
 		readingVariation : null,
 		reading : null,
 		startTimestamp : null,
@@ -58,7 +58,7 @@ function formatMeterForResponse(meter, loggedInAsAdmin) {
 		formattedMeter.cumulativeReset = meter.cumulativeReset;
 		formattedMeter.cumulativeResetStart = meter.cumulativeResetStart;
 		formattedMeter.cumulativeResetEnd = meter.cumulativeResetEnd;
-		formattedMeter.readingLength = meter.readingLength;
+		formattedMeter.readingGap = meter.readingGap;
 		formattedMeter.readingVariation = meter.readingVariation;
 		formattedMeter.reading = meter.reading;
 		formattedMeter.startTimestamp = meter.startTimestamp;

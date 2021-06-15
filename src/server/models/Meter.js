@@ -16,8 +16,8 @@ class Meter {
 	 * @param enabled This meter is being actively read from
 	 * @param displayable This meters is available to users for charting
 	 * @param type What kind of meter this is
-	 * @param gps location in format of GIS coordinates
 	 * @param meterTimezone Default timezone for meter
+	 * @param gps location in format of GIS coordinates
 	 * @param identifier Another way to identify a meter
 	 * @param note Note about the meter
 	 * @param area Area of the meter default null
@@ -25,15 +25,15 @@ class Meter {
 	 * @param cumulativeReset True if cumulative values can reset back to zero., default false
 	 * @param cumulativeResetStart The earliest time of day that a reset can occur, default '00:00:00'
 	 * @param cumulativeResetEnd The latest time of day that a reset can occur, default '23:59:59.999999'
-	 * @param readingLength Specifies the time range on every reading in the CSV file, default '00:00:00'
+	 * @param readingGap Specifies the time range on every reading in the CSV file, default '00:00:00'
 	 * @param readingVariation +/- time allowed on length to consider within allowed length, default '23:59:59.999999'
 	 * @param reading The value of reading, default 0.0
 	 * @param startTimestamp Start timestamp of last reading input for this meter, default '01-01-01 00:00:00'
 	 * @param endTimestamp  End timestamp of last reading input for this meter, '01-01-01 00:00:00' 
 	 */
 	constructor(id, name, ipAddress, enabled, displayable, type, meterTimezone, gps = undefined, identifier = name, note, area,
-		cumulative, cumulativeReset, cumulativeResetStart, cumulativeResetEnd, readingLength, readingVariation, reading = 0.0,
-		startTimestamp = moment(0), endTimestamp = moment(0)) {
+		cumulative = false, cumulativeReset = false, cumulativeResetStart = '00:00:00', cumulativeResetEnd = '23:59:59.999999',
+		readingGap = 0, readingVariation = 0, reading = 0.0, startTimestamp = moment(0), endTimestamp = moment(0)) {
 		// In order for the CSV pipeline to work, the order of the parameters needs to match the order that the fields are declared.
 		// In addition, each new parameter has to be added at the very end.
 		this.id = id;
@@ -51,7 +51,7 @@ class Meter {
 		this.cumulativeReset = cumulativeReset;
 		this.cumulativeResetStart = cumulativeResetStart;
 		this.cumulativeResetEnd = cumulativeResetEnd;
-		this.readingLength = readingLength;
+		this.readingGap = readingGap;
 		this.readingVariation = readingVariation;
 		this.reading = reading;
 		this.startTimestamp = startTimestamp;
@@ -106,7 +106,7 @@ class Meter {
 	static mapRow(row) {
 		return new Meter(row.id, row.name, row.ipaddress, row.enabled, row.displayable, row.meter_type,
 			row.default_timezone_meter, row.gps, row.identifier, row.note, row.area, row.cumulative, row.cumulative_reset,
-			row.cumulative_reset_start, row.cumulative_reset_end, row.reading_length, row.reading_variation,
+			row.cumulative_reset_start, row.cumulative_reset_end, row.reading_gap, row.reading_variation,
 			row.reading, row.start_timestamp, row.end_timestamp);
 	}
 

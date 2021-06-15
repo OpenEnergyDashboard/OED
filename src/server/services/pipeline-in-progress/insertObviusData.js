@@ -39,9 +39,12 @@ async function insertObviusData(serialNumber, ipAddress, logfile) {
 			cumulativeReset = meter.cumulativeReset,
 			meter.cumulativeResetStart,
 			meter.cumulativeResetEnd,
+			meter.readingGap,
 			meter.readingVariation,
 			// TODO Currently this is not on meter so assume no duplication.
-			readingRepetition = 1,
+			1,
+			// TODO Currently this is not on meter so assume increasing.
+			'increasing',
 			conditionSet = undefined,
 			conn = conn);
 	}

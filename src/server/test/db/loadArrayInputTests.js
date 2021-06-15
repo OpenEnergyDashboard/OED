@@ -34,7 +34,9 @@ mocha.describe('PIPELINE: Load data from array', () => {
 							'0:00:00',
 							'0:00:00',
 							0,
+							0,
 							1,
+							'increasing',
 							undefined,
 							conn);
 		const result = await Reading.getAllByMeterID(meter.id, conn);
