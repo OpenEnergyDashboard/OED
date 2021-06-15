@@ -34,8 +34,9 @@ const DEFAULTS = {
 		cumulativeResetStart: undefined,
 		cumulativeResetEnd: undefined,
 		duplications: '1',
-		length: '',
-		lengthVariation: '',
+		// TODO length is not currently used.
+		length: undefined,
+		lengthVariation: undefined,
 		refreshReadings: 'false',
 		timeSort: 'increasing' // This corresponds to one of the values in TimeSortTypes exported from /src/client/app/types/csvUploadForm.ts
 	}

@@ -31,6 +31,7 @@ const E0 = moment(0);
  *  The default resetStart time is '00:00:00.000'
  * @param {string} resetEnd a string representation in the format "HH:mm:ss.SSS" which represents the end time a cumulativeReset may occur before\
  *  The default resetEnd time is '23:59:99.999'
+ * @param {number} readingLengthVariation how many seconds a pair of readings can vary in length
  * @param {number} readingRepetition value is 1 if reading is not duplicated. 2 if repeated twice and so on (E-mon D-mon meters)
  * @param {boolean} onlyEndTime true if the data only has an endTimestamp, default false
  * @param {number} Tgap the allowed time variation in seconds that a gap may occur between two readings, default 0
@@ -40,7 +41,7 @@ const E0 = moment(0);
  * @param {array} conn the connection to the database
  */
 async function processData(rows, meterID, isCumulative, cumulativeReset, resetStart = '00:00:00.000',
-	resetEnd = '23:59:99.999', readingRepetition, onlyEndTime = false, Tgap = 0, Tlen = 0,
+	resetEnd = '23:59:99.999', readingLengthVariation = 0, readingRepetition, onlyEndTime = false, Tgap = 0,
 	timeSort = 'increasing', conditionSet, conn) {
 
 	// If processData is successfully finished then return result = [R0, R1, R2...RN]
@@ -50,7 +51,7 @@ async function processData(rows, meterID, isCumulative, cumulativeReset, resetSt
 	let errMsg = '';
 	// Convert Tgap and Tlen to milliseconds to stay consistent with moment.diff() which returns the difference in milliseconds
 	const msTgap = Tgap * 1000;
-	const msTlen = Tlen * 1000;
+	const msReadingLengthVariation = readingLengthVariation * 1000;
 	// Retrieve and set the last reading stored for the meter
 	// TODO: Create a redux state to hold these values with other meter states
 	const meter = await Meter.getByID(meterID, conn);
@@ -65,7 +66,7 @@ async function processData(rows, meterID, isCumulative, cumulativeReset, resetSt
 	*  onlyEndTime == True where we have,
 	*  rows[1] : {reading_value, endTimestamp}
 	*
-	*  On entry there is no previousReading yet so intialize it to be the very first date/time since Epoch time. After a currentReading has
+	*  On entry there is no previousReading yet so initialize it to be the very first date/time since Epoch time. After a currentReading has
 	*  been processed that currentReading will become the new prevReading. For example,
 	*
 	*  currentReading = row[1] : {reading_value1, startTimestamp1, endTimestamp1}
@@ -202,7 +203,7 @@ async function processData(rows, meterID, isCumulative, cumulativeReset, resetSt
 			}
 			if (readingOK) {
 				if (Math.abs(prevReading.endTimestamp.diff(prevReading.startTimestamp) - endTimestamp.diff(startTimestamp))
-					> msTlen && !isFirst(prevReading.endTimestamp)) {
+					> msReadingLengthVariation && !isFirst(prevReading.endTimestamp)) {
 					errMsg = 'The previous reading has a different time length than the current reading. Note this is treated only as a warning since this may be expected for certain meters.';
 					// If this is true we still add the reading to the results
 				}

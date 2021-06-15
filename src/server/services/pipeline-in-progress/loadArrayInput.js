@@ -15,13 +15,14 @@ const processData = require('./processData');
  * @param {boolean} cumulativeReset true if the cumulative data is reset at midnight
  * @param {time} cumulativeResetStart defines the first time a cumulative reset is allowed
  * @param {time} cumulativeResetEnd defines the last time a cumulative reset is allowed
+ * @param {time} readingLengthVariation defines how much the length of a pair of readings can vary in seconds.
  * @param {number} readingRepetition number of times each reading is repeated where 1 means no repetition
  * @param {array} conditionSet used to validate readings (minVal, maxVal, minDate, maxDate, interval, maxError)
  * @param {array} conn connection to database
  * @param {string} timeSort the canonical order sorted by date/time in which the data appears in the data file
  */
 async function loadArrayInput(dataRows, meterID, mapRowToModel, isCumulative, cumulativeReset,
-	cumulativeResetStart, cumulativeResetEnd, readingRepetition, conditionSet, conn, timeSort) {
+	cumulativeResetStart, cumulativeResetEnd, readingLengthVariation, readingRepetition, conditionSet, conn, timeSort) {
 	readingsArray = dataRows.map(mapRowToModel);
 
 	// TODO: Need to implement interface to let user pass in the following params to the pipeline
@@ -31,12 +32,9 @@ async function loadArrayInput(dataRows, meterID, mapRowToModel, isCumulative, cu
 	let onlyEndTime = false;
 	// time in seconds that a gap may occur between two readings. This is 0 seconds by default since we expect data to not have gaps.
 	let Tgap = 0;
-	// time in seconds that two readings may differ from one another.
-	// This is 0 seconds by default since we expect meter readings to be recorded in the same time intervals.
-	let Tlen = 0;
 	// end of temporary values for params
 	readingsArray = await processData(readingsArray, meterID, isCumulative, cumulativeReset, cumulativeResetStart, cumulativeResetEnd, 
-								readingRepetition, onlyEndTime, Tgap, Tlen, timeSort, conditionSet, conn);
+		readingLengthVariation, readingRepetition, onlyEndTime, Tgap, timeSort, conditionSet, conn);
 
 	return await Reading.insertOrIgnoreAll(readingsArray, conn);
 }

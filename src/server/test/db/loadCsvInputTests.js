@@ -25,7 +25,7 @@ mocha.describe('PIPELINE: Load data from csv file', () => {
 		const arrayInput = await readCsv(testFilePath);
 		const arrayMeter = new Meter(undefined, 'test_array', 1, true, true, Meter.type.MAMAC, null, undefined);
 		await arrayMeter.insert(conn);
-		await loadCsvInput(testFilePath, arrayMeter.id, mapRowsToModel, false, false, false, '0:00:00', '0:00:00', 1, undefined, false, conn);
+		await loadCsvInput(testFilePath, arrayMeter.id, mapRowsToModel, false, false, false, '0:00:00', '0:00:00', 0, 1, undefined, false, conn);
 		const result = await Reading.getAllByMeterID(arrayMeter.id, conn);
 		expect(result.length).to.equal(arrayInput.length);
 		let i = 0;
@@ -42,7 +42,7 @@ mocha.describe('PIPELINE: Load data from csv file', () => {
 		const arrayInput = await readCsv(testFilePath);
 		const streamMeter = new Meter(undefined, 'test_stream', 2, true, true, Meter.type.MAMAC, null, undefined);
 		await streamMeter.insert(conn);
-		await loadCsvInput(testFilePath, streamMeter.id, mapRowsToModel, true, false, false, '0:00:00', '0:00:00', 1, undefined, false, conn);
+		await loadCsvInput(testFilePath, streamMeter.id, mapRowsToModel, true, false, false, '0:00:00', '0:00:00', 0, 1, undefined, false, conn);
 		const result = await Reading.getAllByMeterID(streamMeter.id, conn);
 		expect(result.length).to.equal(arrayInput.length);
 		let i = 0;

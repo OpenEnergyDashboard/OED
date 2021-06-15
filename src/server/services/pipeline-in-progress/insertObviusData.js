@@ -34,11 +34,13 @@ async function insertObviusData(serialNumber, ipAddress, logfile) {
 				endTimestamp.add(moment.duration(60, 'minutes'));
 				return [reading, startTimestamp, endTimestamp];
 			},
-			isCumulative = false,
-			cumulativeReset = false,
-			// No cumulative reset so dummy times.
-			'0:00:00',
-			'0:00:00',
+			// For the next set of values we don't get from Obvius so use meter defaults.
+			isCumulative = meter.cumulative,
+			cumulativeReset = meter.cumulativeReset,
+			meter.cumulativeResetStart,
+			meter.cumulativeResetEnd,
+			meter.readingVariation,
+			// TODO Currently this is not on meter so assume no duplication.
 			readingRepetition = 1,
 			conditionSet = undefined,
 			conn = conn);

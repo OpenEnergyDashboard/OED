@@ -17,7 +17,6 @@ const Meter = require('../../models/Meter');
  * @returns 
  */
 async function uploadReadings(req, res, filepath, conn) {
-
 	const { createMeter, duplications, headerRow,
 		length, meterName, mode, timeSort, update } = req.body; // extract query parameters
 	const hasHeaderRow = (headerRow === 'true');
@@ -40,10 +39,11 @@ async function uploadReadings(req, res, filepath, conn) {
 			}
 		});
 
-	// Handle cumulative defaults
-	let { cumulative, cumulativeReset, cumulativeResetStart, cumulativeResetEnd } = req.body;
+	// Handle other parameter defaults
+	let { cumulative, cumulativeReset, cumulativeResetStart, cumulativeResetEnd, lengthVariation } = req.body;
 	let areReadingsCumulative;
 	let doReadingsReset;
+	let readingLengthVariation = lengthVariation;
 	// We know from the validation stage of the pipeline that the 'cumulative' and 'cumulativeReset' fields
 	// will have one of the follow values undefined, 'true', or 'false'. If undefined, this means that 
 	// the uploader wants the pipeline to use the database's (i.e. the meter's) default value.
@@ -89,6 +89,24 @@ async function uploadReadings(req, res, filepath, conn) {
 		}
 	}
 
+	// Similar for time variation in length and gap between readings
+
+	// length is not currently used.
+
+	if (readingLengthVariation === undefined) {
+		if (meter.reading_variation === null) {
+			// This probably should not happen with a new DB but keep just in case.
+			// No variation allowed.
+			readingLengthVariation = 0;
+		} else {
+			readingLengthVariation = meter.reading_variation;
+		}
+	} else {
+		// Convert string that is a real number to a value.
+		// Note the variable changes from string to real number.
+		readingLengthVariation = parseFloat(readingLengthVariation);
+	}
+
 	const mapRowToModel = row => { return row; }; // STUB function to satisfy the parameter of loadCsvInput.
 	await loadCsvInput(
 		filepath,
@@ -99,6 +117,7 @@ async function uploadReadings(req, res, filepath, conn) {
 		doReadingsReset,
 		cumulativeResetStart,
 		cumulativeResetEnd,
+		readingLengthVariation,
 		readingRepetition,
 		undefined,
 		hasHeaderRow,

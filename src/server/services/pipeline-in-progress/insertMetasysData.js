@@ -34,9 +34,10 @@ async function insertMetasysData(filePath, readingInterval, readingRepetition, c
 						readAsStream = false,
 						isCumulative = cumulativeIndicator,
 						cumulativeReset = cumulativeReset,
-						// TODO This pipeline is going away. Using dummy times that allow reset at any time.
+						// TODO This pipeline is going away. Using dummy times that allow reset at any time and no variation in reading length.
 						'0:00:00',
 						'23:59:59.99999',
+						0,
 						readingRepetition = readingRepetition,
 						conditionSet = undefined,
 						headerRow = false,

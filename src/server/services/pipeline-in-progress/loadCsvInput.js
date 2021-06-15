@@ -35,6 +35,7 @@ async function loadCsvInput(
 	cumulativeReset,
 	cumulativeResetStart,
 	cumulativeResetEnd,
+	readingLengthVariation,
 	readingRepetition,
 	conditionSet,
 	headerRow,
@@ -51,7 +52,7 @@ async function loadCsvInput(
 				dataRows.shift();
 			}
 			return loadArrayInput(dataRows, meterID, mapRowToModel, isCumulative, cumulativeReset,
-				cumulativeResetStart, cumulativeResetEnd,readingRepetition, conditionSet, conn, timeSort);
+				cumulativeResetStart, cumulativeResetEnd,readingLengthVariation, readingRepetition, conditionSet, conn, timeSort);
 		}
 	} catch (err) {
 		log.error(`Error updating meter ${meterID} with data from ${filePath}: ${err}`, err);
