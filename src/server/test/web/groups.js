@@ -192,8 +192,8 @@ mocha.describe('groups API', () => {
 			mocha.it('allows adding a new child meter to a group', async () => {
 				const conn = testDB.getConnection();
 				const meterD = new Meter(undefined, 'D', null, false, true, Meter.type.MAMAC, null, gpsPoint,
-				'Identified D', 'notes D', 33.5, true, true, '05:05:09', '09:00:01', '00:00:00', 
-				'00:00:00', 25.5, '0001-01-01 23:59:59', '2020-07-02 01:00:10');
+				'Identified D', 'notes D', 33.5, true, true, '05:05:09', '09:00:01', '0',
+				0, 25.5, '0001-01-01 23:59:59', '2020-07-02 01:00:10');
 				await meterD.insert(conn);
 				let res = await chai.request(app).put('/api/groups/edit').set('token', token).type('json').send({
 					id: groupC.id,
