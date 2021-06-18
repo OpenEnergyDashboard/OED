@@ -123,7 +123,8 @@ export default class ReadingsCSVUploadComponent extends React.Component<Readings
 						</Label>
 						<Col sm={8}>
 							<Input type='select' name='timeSort' onChange={this.handleSelectTimeSort}>
-								<option value={TimeSortTypes.increasing}> {TimeSortTypes.increasing} </option>
+							<option value={TimeSortTypes.increasing}> {TimeSortTypes.increasing} </option>
+							<option value={TimeSortTypes.decreasing}> {TimeSortTypes.decreasing} </option>
 							</Input>
 						</Col>
 					</FormGroup>

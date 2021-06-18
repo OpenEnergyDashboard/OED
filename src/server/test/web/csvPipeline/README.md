@@ -83,7 +83,7 @@ The script also describes how to delete all the meters/readings if you want to r
    </td>
    <td>
    </td>
-   <td>
+   <td>Decreasing time for readings but expect usual values.
    </td>
   </tr>
   <tr>

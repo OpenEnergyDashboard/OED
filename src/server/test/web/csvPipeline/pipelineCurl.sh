@@ -21,8 +21,8 @@ oedHome=~/OED/OED
 echo -e "\nstarting pipe1"
 curl localhost:3000/api/csv/readings -X POST -F 'meterName=pipe1' -F 'createMeter=true' -F 'gzip=false' -F 'email=test@example.com' -F 'password=password' -F 'csvfile=@regAsc.csv'
 # allow when descending working and have parameter for it.
-# echo -e "\nstarting pipe2"
-# curl localhost:3000/api/csv/readings -X POST -F 'meterName=pipe2' -F 'createMeter=true' -F 'gzip=false' -F 'email=test@example.com' -F 'password=password' -F 'csvfile=@regDsc.csv'
+echo -e "\nstarting pipe2"
+curl localhost:3000/api/csv/readings -X POST -F 'meterName=pipe2' -F 'timeSort=decreasing' -F 'createMeter=true' -F 'gzip=false' -F 'email=test@example.com' -F 'password=password' -F 'csvfile=@regDsc.csv'
 echo -e "\nstarting pipe3"
 curl localhost:3000/api/csv/readings -X POST -F 'cumulative=true' -F 'meterName=pipe3' -F 'createMeter=true' -F 'gzip=false' -F 'email=test@example.com' -F 'password=password' -F 'csvfile=@cumAsc.csv'
 echo -e "\nstarting pipe4"

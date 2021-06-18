@@ -16,7 +16,8 @@ interface CSVUploadProps extends CSVUploadPreferences {
 }
 
 export const enum TimeSortTypes {
-	increasing = 'increasing'
+	increasing = 'increasing',
+	decreasing = 'decreasing'
 }
 
 export interface ReadingsCSVUploadPreferencesItem extends CSVUploadPreferences {

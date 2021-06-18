@@ -79,7 +79,8 @@ const VALIDATION = {
 			lengthGap: new StringParam('lengthGap', undefined, undefined),
 			lengthVariation: new StringParam('lengthVariation', undefined, undefined),
 			refreshReadings: new BooleanParam('refreshReadings'),
-			timeSort: new EnumParam('timeSort', ['increasing']) // This array is the TimeSortTypes exported by /src/client/app/types/csvUploadForm.ts
+			// This array is the TimeSortTypes exported by /src/client/app/types/csvUploadForm.ts
+			timeSort: new EnumParam('timeSort', ['increasing', 'decreasing'])
 		},
 		additionalProperties: false // This protects us from unintended parameters as well as typos.
 	}
