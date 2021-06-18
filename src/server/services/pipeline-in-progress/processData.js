@@ -174,9 +174,17 @@ async function processData(rows, meterID, isCumulative, cumulativeReset, resetSt
 		if (readingOK) {
 			// Reject negative readings
 			if (isCumulative && meterReading1 < 0) {
-				// If the value isCumulative and the prior reading is negative reject because OED cannot accept any negative readings
-				log.error(`DETECTED A NEGATIVE VALUE WHILE HANDLING CUMULATIVE READINGS FROM METER ${meterID}, ` +
-					`ROW ${index - readingRepetition}. REJECTED ALL READINGS`);
+				// If the value isCumulative and the prior reading is negative reject because OED cannot accept any negative readings.
+				// You go back by readingRepetition since this is the previous reading.
+				let negRow = index - readingRepetition + 1;
+				if (negRow < 1) {
+					// The previous reading came from meter not this CSV file.
+					log.error('The last meter reading (logical previous reading) was negative with value ' + meterReading1 +
+						'. With cumulative readings the previous reading cannot be negative so all reading are rejected.');
+				} else {
+					log.error('Error parsing Reading #' + negRow +
+						'. Detected a negative value while handling cumulative readings so all reading are rejected.');
+				}
 				return [];
 			}
 			// To handle net cumulative readings which are negative.

@@ -44,8 +44,8 @@ async function uploadReadings(req, res, filepath, conn) {
 	let { cumulative, cumulativeReset, cumulativeResetStart, cumulativeResetEnd, lengthVariation, length } = req.body;
 	let areReadingsCumulative;
 	let doReadingsReset;
-	let readingGap = length;
-	let readingLengthVariation = lengthVariation;
+	let readingGap;
+	let readingLengthVariation;
 	// We know from the validation stage of the pipeline that the 'cumulative' and 'cumulativeReset' fields
 	// will have one of the follow values undefined, 'true', or 'false'. If undefined, this means that 
 	// the uploader wants the pipeline to use the database's (i.e. the meter's) default value.
@@ -92,33 +92,33 @@ async function uploadReadings(req, res, filepath, conn) {
 	}
 
 	// Similar for time variation in gap and length between readings
-	
-		if (length === undefined) {
-			if (meter.reading_gap === null) {
-				// This probably should not happen with a new DB but keep just in case.
-				// No variation allowed.
-				readingGap = 0;
-			} else {
-				readingGap = meter.reading_gap;
-			}
-		} else {
-			// Convert string that is a real number to a value.
-			// Note the variable changes from string to real number.
-			readingGap = parseFloat(readingGap);
-		}
 
-	if (readingLengthVariation === undefined) {
-		if (meter.reading_variation === null) {
+	if (length === undefined) {
+		if (meter.readingGap === null) {
 			// This probably should not happen with a new DB but keep just in case.
 			// No variation allowed.
-			readingLengthVariation = 0;
+			readingGap = 0;
 		} else {
-			readingLengthVariation = meter.reading_variation;
+			readingGap = meter.readingGap;
 		}
 	} else {
 		// Convert string that is a real number to a value.
 		// Note the variable changes from string to real number.
-		readingLengthVariation = parseFloat(readingLengthVariation);
+		readingGap = parseFloat(length);
+	}
+
+	if (lengthVariation === undefined) {
+		if (meter.readingVariation === null) {
+			// This probably should not happen with a new DB but keep just in case.
+			// No variation allowed.
+			readingLengthVariation = 0;
+		} else {
+			readingLengthVariation = meter.readingVariation;
+		}
+	} else {
+		// Convert string that is a real number to a value.
+		// Note the variable changes from string to real number.
+		readingLengthVariation = parseFloat(lengthVariation);
 	}
 
 	const mapRowToModel = row => { return row; }; // STUB function to satisfy the parameter of loadCsvInput.

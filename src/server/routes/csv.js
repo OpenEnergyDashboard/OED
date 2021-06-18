@@ -106,6 +106,7 @@ router.post('/meters', validateMetersCsvUploadParams, async (req, res) => {
 	const uploadedFilepath = req.file.path;
 	let csvFilepath;
 	try {
+		log.info(`The file ${uploadedFilepath} was created to upload meters csv data`);
 		let fileBuffer = await fs.readFile(uploadedFilepath);
 		// Unzip uploaded file and save file to disk if the user 
 		// has indicated that the file is (g)zipped.
@@ -114,7 +115,7 @@ router.post('/meters', validateMetersCsvUploadParams, async (req, res) => {
 			// We expect this directory to have been created by this stage of the pipeline.
 			const dir = `${__dirname}/../tmp/uploads/csvPipeline`;
 			csvFilepath = await saveCsv(fileBuffer, 'meters', dir);
-			log.info(`The file ${csvFilepath} was created to upload meters csv data`);
+			log.info(`The unzipped file ${csvFilepath} was created to upload meters csv data`);
 		} else {
 			csvFilepath = uploadedFilepath;
 		}
@@ -149,6 +150,7 @@ router.post('/readings', validateReadingsCsvUploadParams, async (req, res) => {
 	const uploadedFilepath = req.file.path;
 	let csvFilepath;
 	try {
+		log.info(`The uploaded file ${uploadedFilepath} was created to upload readings csv data`);
 		let fileBuffer = await fs.readFile(uploadedFilepath);
 		// Unzip uploaded file and save file to disk if the user 
 		// has indicated that the file is (g)zipped.
@@ -156,13 +158,11 @@ router.post('/readings', validateReadingsCsvUploadParams, async (req, res) => {
 			fileBuffer = zlib.gunzipSync(fileBuffer);
 			// We expect this directory to have been created by this stage of the pipeline.
 			const dir = `${__dirname}/../tmp/uploads/csvPipeline`;
-			csvFilepath = await saveCsv(fileBuffer, 'meters', dir);
-			log.info(`The file ${csvFilepath} was created to upload meters csv data`);
+			csvFilepath = await saveCsv(fileBuffer, 'readings', dir);
+			log.info(`The unzipped file ${csvFilepath} was created to upload readings csv data`);
 		} else {
 			csvFilepath = uploadedFilepath;
 		}
-
-		log.info(`The file ${csvFilepath} was created to upload readings csv data`);
 		const conn = getConnection();
 		await uploadReadings(req, res, csvFilepath, conn);
 		if (isRefreshReadings) {
