@@ -27,7 +27,7 @@ export interface ReadingsCSVUploadPreferencesItem extends CSVUploadPreferences {
 	cumulativeResetEnd: string;
 	duplications: string; // Not sure how to type this an integer string;
 	meterName: string;
-	length: string;
+	lengthGap: string;
 	lengthVariation: string;
 	refreshReadings: boolean;
 	timeSort: TimeSortTypes;
@@ -39,7 +39,7 @@ export interface ReadingsCSVUploadProps extends ReadingsCSVUploadPreferencesItem
 	selectTimeSort: (value: TimeSortTypes) => void;
 	setCumulativeResetStart: (value: string) => void;
 	setCumulativeResetEnd: (value: string) => void;
-	setLength: (value: string) => void;
+	setLengthGap: (value: string) => void;
 	setLengthVariation: (value: string) => void;
 	setMeterName: (value: string) => void;
 	toggleCreateMeter: () => void;

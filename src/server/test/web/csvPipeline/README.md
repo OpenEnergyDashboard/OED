@@ -535,11 +535,28 @@ The script also describes how to delete all the meters/readings if you want to r
    </td>
    <td>The meter in DB is set to cumulative, cumulative_reset to true & reset range is 11:45-12:15 but not sent via curl. The reset value should be reject row 4 since negative and no readings for meter.
    </td>
-  </tr>
-  <tr>
-   <td>RegAscGapLength & meterPipe28 (to create meter)
+  </tr><tr>
+   <td>cumAscResetMidnight & meterPipe28 (to create meter)
    </td>
    <td>pipe28
+   </td>
+   <td>
+   </td>
+   <td>X
+   </td>
+   <td>
+   </td>
+   <td>
+   </td>
+   <td>
+   </td>
+   <td>The meter in DB is set to cumulative, cumulative_reset to true & reset range is 11:45-12:15 but then sent via curl so should reset around midnight. Should get usual cumulative values.
+   </td>
+  </tr>
+  <tr>
+   <td>RegAscGapLength & meterPipe29 (to create meter)
+   </td>
+   <td>pipe29
    </td>
    <td>
    </td>
@@ -552,6 +569,24 @@ The script also describes how to delete all the meters/readings if you want to r
    <td>
    </td>
    <td>The meter in DB is set to reading_gap=60 and reading_variation=120. Should get warning for gap for line 4 and Length variation for line 5. Expect 1, 2+, 3, 4+, 5-, 5- (same as previous point and extra one since last reading goes into next day)
+   </td>
+  </tr>
+ <tr>
+   <td>RegAscGapLength & meterPipe30 (to create meter)
+   </td>
+   <td>pipe30
+   </td>
+   <td>
+   </td>
+   <td>
+   </td>
+   <td>
+   </td>
+   <td>
+   </td>
+   <td>
+   </td>
+   <td>The meter in DB is set to reading_gap=60 and reading_variation=120 but then the curl passes 120 and 121 for gap & variation. Should get Length variation for line 5. Expect 1, 2+, 3, 4+, 5-, 5- (same as previous point and extra one since last reading goes into next day)
    </td>
   </tr>
 </table>

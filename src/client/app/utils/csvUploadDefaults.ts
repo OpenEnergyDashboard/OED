@@ -16,7 +16,7 @@ export const ReadingsCSVUploadDefaults: ReadingsCSVUploadPreferencesItem = {
 	duplications: '1',
 	gzip: false,
 	headerRow: false,
-	length: '',
+	lengthGap: '',
 	lengthVariation: '',
 	meterName: '',
 	refreshReadings: false,

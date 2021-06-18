@@ -40,8 +40,7 @@ async function uploadReadings(req, res, filepath, conn) {
 		});
 
 	// Handle other parameter defaults
-	// TODO length should be renamed lengthGap
-	let { cumulative, cumulativeReset, cumulativeResetStart, cumulativeResetEnd, lengthVariation, length } = req.body;
+	let { cumulative, cumulativeReset, cumulativeResetStart, cumulativeResetEnd, lengthVariation, lengthGap } = req.body;
 	let areReadingsCumulative;
 	let doReadingsReset;
 	let readingGap;
@@ -72,9 +71,10 @@ async function uploadReadings(req, res, filepath, conn) {
 		doReadingsReset = (cumulativeReset === 'true');
 	}
 
-	// For cumulative reset times the validation step sets to undefined if not provided so do similar to ones above
-	// but just pass if value was defined.
-	if (cumulativeResetStart === undefined) {
+	// If the cumulative reset times or length parameters are not set, they will be and empty string if coming from the
+	// web page and undefined if coming from a curl request. Thus, both conditions are tested.
+	// If not provided then the DB value is used unless missing then the default value.
+	if (cumulativeResetStart === undefined || cumulativeResetStart === '') {
 		if (meter.cumulativeResetStart === null) {
 			// This probably should not happen with a new DB but keep just in case.
 			cumulativeResetStart = '0:00:00';
@@ -82,7 +82,7 @@ async function uploadReadings(req, res, filepath, conn) {
 			cumulativeResetStart = meter.cumulativeResetStart;
 		}
 	}
-	if (cumulativeResetEnd === undefined) {
+	if (cumulativeResetEnd === undefined || cumulativeResetEnd === '') {
 		if (meter.cumulativeResetEnd === null) {
 			// This probably should not happen with a new DB but keep just in case.
 			cumulativeResetEnd = '23:59:59.999999';
@@ -90,10 +90,7 @@ async function uploadReadings(req, res, filepath, conn) {
 			cumulativeResetEnd = meter.cumulativeResetEnd;
 		}
 	}
-
-	// Similar for time variation in gap and length between readings
-
-	if (length === undefined) {
+	if (lengthGap === undefined || lengthGap === '') {
 		if (meter.readingGap === null) {
 			// This probably should not happen with a new DB but keep just in case.
 			// No variation allowed.
@@ -104,10 +101,10 @@ async function uploadReadings(req, res, filepath, conn) {
 	} else {
 		// Convert string that is a real number to a value.
 		// Note the variable changes from string to real number.
-		readingGap = parseFloat(length);
+		readingGap = parseFloat(lengthGap);
 	}
 
-	if (lengthVariation === undefined) {
+	if (lengthVariation === undefined || lengthVariation === '') {
 		if (meter.readingVariation === null) {
 			// This probably should not happen with a new DB but keep just in case.
 			// No variation allowed.

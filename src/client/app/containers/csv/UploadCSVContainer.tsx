@@ -32,7 +32,7 @@ export default class UploadCSVContainer extends React.Component<{}, UploadCSVCon
 		this.setMeterName = this.setMeterName.bind(this);
 		this.setCumulativeResetStart = this.setCumulativeResetStart.bind(this);
 		this.setCumulativeResetEnd = this.setCumulativeResetEnd.bind(this);
-		this.setLength = this.setLength.bind(this);
+		this.setLengthGap = this.setLengthGap.bind(this);
 		this.setLengthVariation = this.setLengthVariation.bind(this);
 		this.submitReadings = this.submitReadings.bind(this);
 		this.submitMeters = this.submitMeters.bind(this);
@@ -101,12 +101,12 @@ export default class UploadCSVContainer extends React.Component<{}, UploadCSVCon
 			}
 		}))
 	}
-	private setLength(value: string) {
+	private setLengthGap(value: string) {
 		this.setState(previousState => ({
 			...previousState,
 			uploadReadingsPreferences: {
 				...previousState.uploadReadingsPreferences,
-				length: value
+				lengthGap: value
 			}
 		}))
 	}
@@ -240,7 +240,7 @@ export default class UploadCSVContainer extends React.Component<{}, UploadCSVCon
 							setMeterName={this.setMeterName}
 							setCumulativeResetStart={this.setCumulativeResetStart}
 							setCumulativeResetEnd={this.setCumulativeResetEnd}
-							setLength={this.setLength}
+							setLengthGap={this.setLengthGap}
 							setLengthVariation={this.setLengthVariation}
 							submitCSV={this.submitReadings}
 							toggleCreateMeter={this.toggleCreateMeter}

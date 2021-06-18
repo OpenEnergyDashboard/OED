@@ -34,8 +34,7 @@ const DEFAULTS = {
 		cumulativeResetStart: undefined,
 		cumulativeResetEnd: undefined,
 		duplications: '1',
-		// TODO length is not currently used.
-		length: undefined,
+		lengthGap: undefined,
 		lengthVariation: undefined,
 		refreshReadings: 'false',
 		timeSort: 'increasing' // This corresponds to one of the values in TimeSortTypes exported from /src/client/app/types/csvUploadForm.ts
@@ -77,7 +76,7 @@ const VALIDATION = {
 			cumulativeResetEnd: new StringParam('cumulativeResetEnd', undefined, undefined),
 			duplications: new StringParam('duplications', '^\\d+$', 'duplications must be an integer.'),
 			meterName: new StringParam('meterName', undefined, undefined),
-			length: new StringParam('length', undefined, undefined),
+			lengthGap: new StringParam('lengthGap', undefined, undefined),
 			lengthVariation: new StringParam('lengthVariation', undefined, undefined),
 			refreshReadings: new BooleanParam('refreshReadings'),
 			timeSort: new EnumParam('timeSort', ['increasing']) // This array is the TimeSortTypes exported by /src/client/app/types/csvUploadForm.ts

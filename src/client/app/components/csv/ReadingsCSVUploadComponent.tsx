@@ -31,7 +31,7 @@ export default class ReadingsCSVUploadComponent extends React.Component<Readings
 		super(props);
 		this.handleSetCumulativeResetStart = this.handleSetCumulativeResetStart.bind(this);
 		this.handleSetCumulativeResetEnd = this.handleSetCumulativeResetEnd.bind(this);
-		this.handleSetLength = this.handleSetLength.bind(this);
+		this.handleSetLengthGap = this.handleSetLengthGap.bind(this);
 		this.handleSetLengthVariation = this.handleSetLengthVariation.bind(this);
 		this.handleSelectDuplications = this.handleSelectDuplications.bind(this);
 		this.handleSelectTimeSort = this.handleSelectTimeSort.bind(this);
@@ -80,9 +80,9 @@ export default class ReadingsCSVUploadComponent extends React.Component<Readings
 		this.props.setCumulativeResetEnd(target.value);
 	}
 
-	private handleSetLength(e: React.ChangeEvent<HTMLInputElement>) {
+	private handleSetLengthGap(e: React.ChangeEvent<HTMLInputElement>) {
 		const target = e.target;
-		this.props.setLength(target.value);
+		this.props.setLengthGap(target.value);
 	}
 
 	private handleSetLengthVariation(e: React.ChangeEvent<HTMLInputElement>) {
@@ -192,10 +192,10 @@ export default class ReadingsCSVUploadComponent extends React.Component<Readings
 						<Col sm={8}>
 							<FormGroup>
 								<Label style={titleStyle}>
-									<FormattedMessage id='csv.readings.param.length' />
+									<FormattedMessage id='csv.readings.param.lengthGap' />
 								</Label>
 								<Col sm={12}>
-									<Input value={this.props.length} name='length' onChange={this.handleSetLength} />
+									<Input value={this.props.lengthGap} name='lengthGap' onChange={this.handleSetLengthGap} />
 								</Col>
 							</FormGroup>
 							<FormGroup>
