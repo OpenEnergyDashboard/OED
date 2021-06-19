@@ -185,7 +185,10 @@ async function processData(rows, meterID, isCumulative, cumulativeReset, resetSt
 					log.error('Error parsing Reading #' + negRow +
 						'. Detected a negative value while handling cumulative readings so all reading are rejected.');
 				}
-				return [];
+				logStatus(negRow, prevReading, currentReading, isCumulative, cumulativeReset, resetStart,
+					resetEnd, readingGap, readingLengthVariation, readingRepetition, onlyEndTime,
+					timeSort);
+					return [];
 			}
 			// To handle net cumulative readings which are negative.
 			if (meterReading < 0) {
@@ -205,8 +208,10 @@ async function processData(rows, meterID, isCumulative, cumulativeReset, resetSt
 					//cumulativeReset is not expected but there is a negative net meter reading so reject all readings.
 					errMsg = ('A negative meterReading has been detected but either cumulativeReset is not enabled, or the start time and end time of this reading is out of the reset range. Reject all readings.')
 					log.error('Error parsing Reading #' + (index + 1) + '. Reading value of ' + meterReading2 + ' gives ' + meterReading + ' with error message: ' + '\"' + errMsg + '\"');
-
-					return [];
+					logStatus(index + 1, prevReading, currentReading, isCumulative, cumulativeReset, resetStart,
+						resetEnd, readingGap, readingLengthVariation, readingRepetition, onlyEndTime,
+						timeSort);
+							return [];
 				}
 			}
 			if (readingOK) {
@@ -220,7 +225,10 @@ async function processData(rows, meterID, isCumulative, cumulativeReset, resetSt
 				if (!(errMsg === '')) {
 					// There may be warnings to output even if OED accepts the readings so output all warnings which may exist
 					log.warn('Warning parsing Reading #' + (index + 1) + '. Reading value gives ' + meterReading + ' with warning message: ' + '\"' + errMsg + '\"');
-				}
+					logStatus(index + 1, prevReading, currentReading, isCumulative, cumulativeReset, resetStart,
+						resetEnd, readingGap, readingLengthVariation, readingRepetition, onlyEndTime,
+						timeSort);
+						}
 				// This reading has passed all checks and can be added to result
 				currentReading = new Reading(meterID, meterReading, startTimestamp, endTimestamp);
 				result.push(currentReading);
@@ -235,6 +243,9 @@ async function processData(rows, meterID, isCumulative, cumulativeReset, resetSt
 		if (!readingOK) {
 			// An error occurred so add it to the readings dropped array and let the client know why before continuing
 			log.error('Error parsing Reading #' + (index + 1) + '. Reading value gives ' + meterReading + ' with error message: ' + '\"' + errMsg + '\"');
+			logStatus(index + 1, prevReading, currentReading, isCumulative, cumulativeReset, resetStart,
+				resetEnd, readingGap, readingLengthVariation, readingRepetition, onlyEndTime,
+				timeSort);
 			readingOK = true;
 			// index-readingReptition = reading # dropped in the data
 			readingsDropped.push(index + 1);
@@ -269,4 +280,20 @@ function isFirst(t) {
 	return t.isSame(E0);
 }
 
+/**
+ * info logs information about pipeline where parameters are all the current information.
+ * This is normally done right after something was logged to give more context.
+ * Note that the logging sometimes puts the output a little earlier/later when there are
+ * multiple messages. It seems to be something about the logging and not looked into.
+ */
+function logStatus(row, prevReading, currentReading, isCumulative, cumulativeReset, resetStart,
+	resetEnd, readingGap, readingLengthVariation, readingRepetition, onlyEndTime,
+	timeSort) {
+	log.info('For reading #' + row + ' in pipeline: ' + 'previous reading has value ' + prevReading.reading + ' start time '
+	 	+ prevReading.startTimestamp.format() + ' end time ' + prevReading.endTimestamp.format() + ' and current reading has value '
+		 + currentReading.reading + ' start time ' + currentReading.startTimestamp.format() + ' end time ' + currentReading.endTimestamp.format()
+	 	+ ' with cumulative ' + isCumulative + ' cumulativeReset ' + cumulativeReset + ' cumulativeResetStart ' + resetStart +
+	 	'; cumulativeResetEnd ' + resetEnd + ' lengthGap ' + readingGap + ' lengthVariation ' + readingLengthVariation + '; duplications '
+		+ readingRepetition + ' onlyEndTime ' + onlyEndTime + ' timeSort ' + timeSort);
+}
 module.exports = processData;
