@@ -105,6 +105,24 @@ The script also describes how to delete all the meters/readings if you want to r
    </td>
   </tr>
   <tr>
+   <td>cumDsc
+   </td>
+   <td>pipe31
+   </td>
+   <td>X
+   </td>
+   <td>X
+   </td>
+   <td>
+   </td>
+   <td>
+   </td>
+   <td>
+   </td>
+   <td>Decreasing in time. Drops 1<sup>st</sup> reading as expected.
+   </td>
+  </tr>
+  <tr>
    <td>cumAscResetMidnight
    </td>
    <td>pipe4
