@@ -7,6 +7,7 @@ const { CSVPipelineError } = require('./CustomErrors');
 const success = require('./success');
 const loadCsvInput = require('../pipeline-in-progress/loadCsvInput');
 const Meter = require('../../models/Meter');
+const { log } = require('../../log');
 
 /**
  * Middleware that uploads readings via the pipeline. This should be the final stage of the CSV Pipeline.
@@ -21,6 +22,7 @@ async function uploadReadings(req, res, filepath, conn) {
 		meterName, mode, timeSort, update } = req.body; // extract query parameters
 	const hasHeaderRow = (headerRow === 'true');
 	const readingRepetition = parseInt(duplications, 10);
+	let meterCreated = false;
 	let meter = await Meter.getByName(meterName, conn)
 		.catch(async err => {
 			// Meter#getByNames throws an error when no meter is found. We need the catch clause to account for this error.
@@ -35,9 +37,14 @@ async function uploadReadings(req, res, filepath, conn) {
 				// The meter type cannot be null. We use MAMAC as a default.
 				const tempMeter = new Meter(undefined, meterName, undefined, false, false, Meter.type.MAMAC, undefined, undefined, meterName);
 				await tempMeter.insert(conn);
+				meterCreated = true;
+				log.info('Creating meter ' + tempMeter.name);
 				return await Meter.getByName(tempMeter.name, conn); // Get meter from DB after insert because some defaults are set within the DB.
 			}
 		});
+	if (!meterCreated && createMeter === 'true') {
+		log.warn('The create meter was set but the meter already existed for meter ' + meter.name);
+	}
 
 	// Handle other parameter defaults
 	let { cumulative, cumulativeReset, cumulativeResetStart, cumulativeResetEnd, lengthVariation, lengthGap } = req.body;
