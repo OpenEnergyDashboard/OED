@@ -290,10 +290,10 @@ function logStatus(row, prevReading, currentReading, isCumulative, cumulativeRes
 	resetEnd, readingGap, readingLengthVariation, readingRepetition, onlyEndTime,
 	timeSort) {
 	log.info('For reading #' + row + ' in pipeline: ' + 'previous reading has value ' + prevReading.reading + ' start time '
-	 	+ prevReading.startTimestamp.format() + ' end time ' + prevReading.endTimestamp.format() + ' and current reading has value '
-		 + currentReading.reading + ' start time ' + currentReading.startTimestamp.format() + ' end time ' + currentReading.endTimestamp.format()
-	 	+ ' with cumulative ' + isCumulative + ' cumulativeReset ' + cumulativeReset + ' cumulativeResetStart ' + resetStart +
-	 	'; cumulativeResetEnd ' + resetEnd + ' lengthGap ' + readingGap + ' lengthVariation ' + readingLengthVariation + '; duplications '
+		+ prevReading.startTimestamp.format() + ' end time ' + prevReading.endTimestamp.format() + ' and current reading has value '
+		+ currentReading.reading + ' start time ' + currentReading.startTimestamp.format() + ' end time ' + currentReading.endTimestamp.format()
+		+ ' with cumulative ' + isCumulative + ' cumulativeReset ' + cumulativeReset + ' cumulativeResetStart ' + resetStart +
+		'; cumulativeResetEnd ' + resetEnd + ' lengthGap ' + readingGap + ' lengthVariation ' + readingLengthVariation + '; duplications '
 		+ readingRepetition + ' onlyEndTime ' + onlyEndTime + ' timeSort ' + timeSort);
 }
 module.exports = processData;
