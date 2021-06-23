@@ -13,14 +13,14 @@ export const ReadingsCSVUploadDefaults: ReadingsCSVUploadPreferencesItem = {
 	cumulativeReset: false,
 	cumulativeResetStart: '',
 	cumulativeResetEnd: '',
-	duplications: '1',
+	duplications: '',
 	gzip: false,
 	headerRow: false,
 	lengthGap: '',
 	lengthVariation: '',
 	meterName: '',
 	refreshReadings: false,
-	timeSort: TimeSortTypes.increasing,
+	timeSort: TimeSortTypes.meter,
 	update: false
 }
 

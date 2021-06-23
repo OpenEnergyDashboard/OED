@@ -27,13 +27,17 @@ class Meter {
 	 * @param cumulativeResetEnd The latest time of day that a reset can occur, default '23:59:59.999999'
 	 * @param readingGap Specifies the time range on every reading in the CSV file, default '00:00:00'
 	 * @param readingVariation +/- time allowed on length to consider within allowed length, default '23:59:59.999999'
+	 * @param readingDuplication number of times each reading is given when 1 means once and is default
+	 * @param timeSort 'ascending' if provided readings increase in time (default) & 'descending' if other way
+	 * @param endOnlyTime true if provided readings only have an end time, false by default
 	 * @param reading The value of reading, default 0.0
 	 * @param startTimestamp Start timestamp of last reading input for this meter, default '01-01-01 00:00:00'
 	 * @param endTimestamp  End timestamp of last reading input for this meter, '01-01-01 00:00:00' 
 	 */
 	constructor(id, name, ipAddress, enabled, displayable, type, meterTimezone, gps = undefined, identifier = name, note, area,
 		cumulative = false, cumulativeReset = false, cumulativeResetStart = '00:00:00', cumulativeResetEnd = '23:59:59.999999',
-		readingGap = 0, readingVariation = 0, reading = 0.0, startTimestamp = moment(0), endTimestamp = moment(0)) {
+		readingGap = 0, readingVariation = 0, readingDuplication = 1, timeSort = 'ascending', endOnlyTime = false,
+		reading = 0.0, startTimestamp = moment(0), endTimestamp = moment(0)) {
 		// In order for the CSV pipeline to work, the order of the parameters needs to match the order that the fields are declared.
 		// In addition, each new parameter has to be added at the very end.
 		this.id = id;
@@ -53,6 +57,9 @@ class Meter {
 		this.cumulativeResetEnd = cumulativeResetEnd;
 		this.readingGap = readingGap;
 		this.readingVariation = readingVariation;
+		this.readingDuplication = readingDuplication;
+		this.timeSort = timeSort;
+		this.endOnlyTime = endOnlyTime;
 		this.reading = reading;
 		this.startTimestamp = startTimestamp;
 		this.endTimestamp = endTimestamp;
@@ -107,6 +114,7 @@ class Meter {
 		return new Meter(row.id, row.name, row.ipaddress, row.enabled, row.displayable, row.meter_type,
 			row.default_timezone_meter, row.gps, row.identifier, row.note, row.area, row.cumulative, row.cumulative_reset,
 			row.cumulative_reset_start, row.cumulative_reset_end, row.reading_gap, row.reading_variation,
+			row.reading_duplication, row.time_sort, row.end_only_time,
 			row.reading, row.start_timestamp, row.end_timestamp);
 	}
 

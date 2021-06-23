@@ -61,7 +61,7 @@ router.use(function (req, res, next) {
 				const token = request.headers.token || request.body.token || request.query.token;
 				if (token) {
 					// If a token is found, then we will check authentication and validation via the token.
-					(await isTokenAuthorized(token, csvRole)) ? cb(null, true) : cb(new Error('Invalid token'));
+					(await isTokenAuthorized(token, csvRole)) ? cb(null, true) : cb(new Error('Invalid token (either unauthorized or logged out'));
 				} else {
 					// If no token is found, then the request is mostly like a curl request. We require an
 					// email and password to be supplied for curl requests.

@@ -42,7 +42,6 @@ const E0 = moment(0);
 async function processData(rows, meterID, isCumulative, cumulativeReset, resetStart = '00:00:00.000',
 	resetEnd = '23:59:99.999', readingGap = 0, readingLengthVariation = 0, readingRepetition, onlyEndTime = false,
 	timeSort = 'increasing', conditionSet, conn) {
-
 	// If processData is successfully finished then return result = [R0, R1, R2...RN]
 	const result = [];
 	const readingsDropped = [];

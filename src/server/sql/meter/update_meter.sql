@@ -19,6 +19,9 @@ UPDATE meters
 		cumulative_reset_end = ${cumulativeResetEnd},
 		reading_gap = ${readingGap},
 		reading_variation = ${readingVariation},
+		reading_duplication = ${readingDuplication},
+		time_sort = ${timeSort},
+		end_only_time = ${endOnlyTime},
 		reading = ${reading},
 		start_timestamp = ${startTimestamp},
 		end_timestamp = ${endTimestamp}

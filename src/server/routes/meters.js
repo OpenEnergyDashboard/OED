@@ -41,6 +41,9 @@ function formatMeterForResponse(meter, loggedInAsAdmin) {
 		cumulativeResetEnd : null,
 		readingGap : null,
 		readingVariation : null,
+		readingDuplication : null,
+		timeSort : null,
+		endOnlyTime : null,
 		reading : null,
 		startTimestamp : null,
 		endTimestamp : null
@@ -60,6 +63,9 @@ function formatMeterForResponse(meter, loggedInAsAdmin) {
 		formattedMeter.cumulativeResetEnd = meter.cumulativeResetEnd;
 		formattedMeter.readingGap = meter.readingGap;
 		formattedMeter.readingVariation = meter.readingVariation;
+		formattedMeter.readingDuplication = meter.readingDuplication;
+		formattedMeter.timeSort = meter.timeSort;
+		formattedMeter.endOnlyTime = meter.endOnlyTime;
 		formattedMeter.reading = meter.reading;
 		formattedMeter.startTimestamp = meter.startTimestamp;
 		formattedMeter.endTimestamp = meter.endTimestamp;

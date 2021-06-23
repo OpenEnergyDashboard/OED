@@ -6,6 +6,7 @@ const express = require('express');
 const { CSVPipelineError } = require('./CustomErrors');
 const success = require('./success');
 const loadCsvInput = require('../pipeline-in-progress/loadCsvInput');
+const { TimeSortTypesJS } = require('./validateCsvUploadParams');
 const Meter = require('../../models/Meter');
 const { log } = require('../../log');
 
@@ -18,10 +19,9 @@ const { log } = require('../../log');
  * @returns 
  */
 async function uploadReadings(req, res, filepath, conn) {
-	const { createMeter, duplications, headerRow,
-		meterName, mode, timeSort, update } = req.body; // extract query parameters
+	// TODO update parameter is not currently used
+	const { createMeter, headerRow, meterName } = req.body; // extract query parameters
 	const hasHeaderRow = (headerRow === 'true');
-	const readingRepetition = parseInt(duplications, 10);
 	let meterCreated = false;
 	let meter = await Meter.getByName(meterName, conn)
 		.catch(async err => {
@@ -47,17 +47,23 @@ async function uploadReadings(req, res, filepath, conn) {
 	}
 
 	// Handle other parameter defaults
-	let { cumulative, cumulativeReset, cumulativeResetStart, cumulativeResetEnd, lengthVariation, lengthGap } = req.body;
+	let { cumulative, cumulativeReset, cumulativeResetStart, cumulativeResetEnd, lengthVariation, lengthGap, duplications, timeSort } = req.body;
 	let areReadingsCumulative;
 	let doReadingsReset;
+	let readingResetStart;
+	let readingResetEnd;
 	let readingGap;
 	let readingLengthVariation;
+	let readingRepetition;
+	let readingTimeSort;
 	// We know from the validation stage of the pipeline that the 'cumulative' and 'cumulativeReset' fields
 	// will have one of the follow values undefined, 'true', or 'false'. If undefined, this means that 
 	// the uploader wants the pipeline to use the database's (i.e. the meter's) default value.
 	// TODO: We made the assumption that in the DB, the cumulative and cumulativeReset columns is either true or false.
 	// On further inspection, these values can be null. At the moment, we are not sure what this means for the pipeline.
 	// As a quick fix, we will assume that null, means false.
+	// TODO At the current time this will not use the DB value if you use the web form because it is a checkbox that makes
+	// it true and is false by default. Need another mechanism to get this to work.
 	if (cumulative === undefined) {
 		if (meter.cumulative === null) {
 			areReadingsCumulative = false;
@@ -67,7 +73,6 @@ async function uploadReadings(req, res, filepath, conn) {
 	} else {
 		areReadingsCumulative = (cumulative === 'true');
 	}
-
 	if (cumulativeReset === undefined) {
 		if (meter.cumulativeReset === null) {
 			doReadingsReset = false;
@@ -84,18 +89,22 @@ async function uploadReadings(req, res, filepath, conn) {
 	if (cumulativeResetStart === undefined || cumulativeResetStart === '') {
 		if (meter.cumulativeResetStart === null) {
 			// This probably should not happen with a new DB but keep just in case.
-			cumulativeResetStart = '0:00:00';
+			readingResetStart = '0:00:00';
 		} else {
-			cumulativeResetStart = meter.cumulativeResetStart;
+			readingResetStart = meter.cumulativeResetStart;
 		}
+	} else {
+		readingResetStart = cumulativeResetStart;
 	}
 	if (cumulativeResetEnd === undefined || cumulativeResetEnd === '') {
 		if (meter.cumulativeResetEnd === null) {
 			// This probably should not happen with a new DB but keep just in case.
-			cumulativeResetEnd = '23:59:59.999999';
+			readingResetEnd = '23:59:59.999999';
 		} else {
-			cumulativeResetEnd = meter.cumulativeResetEnd;
+			readingResetEnd = meter.cumulativeResetEnd;
 		}
+	} else {
+		readingResetEnd = cumulativeResetEnd;
 	}
 	if (lengthGap === undefined || lengthGap === '') {
 		if (meter.readingGap === null) {
@@ -110,7 +119,6 @@ async function uploadReadings(req, res, filepath, conn) {
 		// Note the variable changes from string to real number.
 		readingGap = parseFloat(lengthGap);
 	}
-
 	if (lengthVariation === undefined || lengthVariation === '') {
 		if (meter.readingVariation === null) {
 			// This probably should not happen with a new DB but keep just in case.
@@ -124,6 +132,31 @@ async function uploadReadings(req, res, filepath, conn) {
 		// Note the variable changes from string to real number.
 		readingLengthVariation = parseFloat(lengthVariation);
 	}
+	if (duplications === undefined || duplications === '') {
+		if (meter.readingVariation === null) {
+			// This probably should not happen with a new DB but keep just in case.
+			// No variation allowed.
+			readingRepetition = 1;
+		} else {
+			readingRepetition = meter.readingDuplication;
+		}
+	} else {
+		// Convert string that is a real number to a value.
+		// Note the variable changes from string to real number.
+		readingRepetition = parseInt(duplications, 10);
+	}
+	if (timeSort === undefined || timeSort === TimeSortTypesJS.meter) {
+		if (meter.timeSort === null) {
+			// This probably should not happen with a new DB but keep just in case.
+			// No variation allowed.
+			readingTimeSort = TimeSortTypesJS.increasing;
+			// readingTimeSort = 'increasing';
+		} else {
+			readingTimeSort = TimeSortTypesJS[meter.timeSort];
+		}
+	} else {
+		readingTimeSort = timeSort;
+	}
 
 	const mapRowToModel = row => { return row; }; // STUB function to satisfy the parameter of loadCsvInput.
 	await loadCsvInput(
@@ -133,12 +166,12 @@ async function uploadReadings(req, res, filepath, conn) {
 		false,
 		areReadingsCumulative,
 		doReadingsReset,
-		cumulativeResetStart,
-		cumulativeResetEnd,
+		readingResetStart,
+		readingResetEnd,
 		readingGap,
 		readingLengthVariation,
 		readingRepetition,
-		timeSort,
+		readingTimeSort,
 		hasHeaderRow,
 		undefined,
 		conn

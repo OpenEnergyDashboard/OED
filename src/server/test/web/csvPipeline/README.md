@@ -47,6 +47,8 @@ The script also describes how to delete all the meters/readings if you want to r
    </td>
    <td>Reading gap
    </td>
+   <td>Duplication
+   </td>
    <td>Description
    </td>
   </tr>
@@ -58,6 +60,8 @@ The script also describes how to delete all the meters/readings if you want to r
    <td>
    </td>
    <td>
+   <td>
+   </td>
    </td>
    <td>
    </td>
@@ -74,6 +78,8 @@ The script also describes how to delete all the meters/readings if you want to r
    <td>pipe2
    </td>
    <td>X
+   </td>
+   <td>
    </td>
    <td>
    </td>
@@ -101,17 +107,21 @@ The script also describes how to delete all the meters/readings if you want to r
    </td>
    <td>
    </td>
+   <td>
+   </td>
    <td>Drops 1<sup>st</sup> reading as expected
    </td>
   </tr>
   <tr>
    <td>cumDsc
    </td>
-   <td>pipe31
+   <td>pipe33
    </td>
    <td>X
    </td>
    <td>X
+   </td>
+   <td>
    </td>
    <td>
    </td>
@@ -137,6 +147,8 @@ The script also describes how to delete all the meters/readings if you want to r
    </td>
    <td>
    </td>
+   <td>
+   </td>
    <td>Drops 1<sup>st</sup> reading as expected
    </td>
   </tr>
@@ -150,6 +162,8 @@ The script also describes how to delete all the meters/readings if you want to r
    <td>X
    </td>
    <td>23:45-00:15
+   </td>
+   <td>
    </td>
    <td>
    </td>
@@ -173,6 +187,8 @@ The script also describes how to delete all the meters/readings if you want to r
    </td>
    <td>
    </td>
+   <td>
+   </td>
    <td>Similar to above but reset times wrong so drops all readings; forward for start/end reset
    </td>
   </tr>
@@ -190,7 +206,9 @@ The script also describes how to delete all the meters/readings if you want to r
    <td>
    </td>
    <td>
-   </td>
+   <td>
+  </td>
+  </td>
    <td>Same as second midnight above above but reset times tight so see all but first value
    </td>
   </tr>
@@ -202,6 +220,8 @@ The script also describes how to delete all the meters/readings if you want to r
    <td>
    </td>
    <td>x
+   </td>
+   <td>
    </td>
    <td>
    </td>
@@ -227,6 +247,8 @@ The script also describes how to delete all the meters/readings if you want to r
    </td>
    <td>
    </td>
+   <td>
+   </td>
    <td>Allows reset at any time so all but first value.
    </td>
   </tr>
@@ -238,6 +260,8 @@ The script also describes how to delete all the meters/readings if you want to r
    <td>
    </td>
    <td>X
+   </td>
+   <td>
    </td>
    <td>
    </td>
@@ -263,6 +287,8 @@ The script also describes how to delete all the meters/readings if you want to r
    </td>
    <td>
    </td>
+   <td>
+   </td>
    <td>explicit reset times and forward for start/end so same as 2 above where all but first.
    </td>
   </tr>
@@ -276,6 +302,8 @@ The script also describes how to delete all the meters/readings if you want to r
    <td>X
    </td>
    <td>23:45-00:15
+   </td>
+   <td>
    </td>
    <td>
    </td>
@@ -299,6 +327,8 @@ The script also describes how to delete all the meters/readings if you want to r
    </td>
    <td>
    </td>
+   <td>
+   </td>
    <td>Time varies by 1 & 2 min; All but 1<sup>st</sup> point vary slightly in reading due to time variation  – get low, high, high, low as expected; should get 4 warnings for line 2-5
    </td>
   </tr>
@@ -314,6 +344,8 @@ The script also describes how to delete all the meters/readings if you want to r
    <td>
    </td>
    <td>60
+   </td>
+   <td>
    </td>
    <td>
    </td>
@@ -335,6 +367,8 @@ The script also describes how to delete all the meters/readings if you want to r
    </td>
    <td>
    </td>
+   <td>
+   </td>
    <td>Time varies by 1 & 2 min; Should warn about line 5.
    </td>
   </tr>
@@ -352,6 +386,8 @@ The script also describes how to delete all the meters/readings if you want to r
    <td>121
    </td>
    <td>Default
+   </td>
+   <td>
    </td>
    <td>Should get warning for lines 2 & 4. Length variation so no warnings about that. Point 2 & 4 should be slightly high since shorter length.
    </td>
@@ -371,6 +407,8 @@ The script also describes how to delete all the meters/readings if you want to r
    </td>
    <td>60
    </td>
+   <td>
+   </td>
    <td>Similar to above but now only warning for line 4.
    </td>
   </tr>
@@ -389,6 +427,8 @@ The script also describes how to delete all the meters/readings if you want to r
    </td>
    <td>120
    </td>
+   <td>
+   </td>
    <td>Similar to above but no warnings.
    </td>
   </tr>
@@ -400,6 +440,8 @@ The script also describes how to delete all the meters/readings if you want to r
    <td>
    </td>
    <td>X
+   </td>
+   <td>
    </td>
    <td>
    </td>
@@ -425,6 +467,8 @@ The script also describes how to delete all the meters/readings if you want to r
    </td>
    <td>
    </td>
+   <td>
+   </td>
    <td>Check gzip (with header). Get standard cum values.
    </td>
   </tr>
@@ -442,6 +486,8 @@ The script also describes how to delete all the meters/readings if you want to r
    <td>
    </td>
    <td>
+   </td>
+   <td>3
    </td>
    <td>Repeat every reading 3x but should only see once.  Get standard cum values.
    </td>
@@ -461,6 +507,8 @@ The script also describes how to delete all the meters/readings if you want to r
    </td>
    <td>
    </td>
+   <td>
+   </td>
    <td>Negative reading on #4 with cumulative so should get no reading.
    </td>
   </tr>
@@ -472,6 +520,8 @@ The script also describes how to delete all the meters/readings if you want to r
    <td>
    </td>
    <td>X
+   </td>
+   <td>
    </td>
    <td>
    </td>
@@ -497,6 +547,8 @@ The script also describes how to delete all the meters/readings if you want to r
    </td>
    <td>
    </td>
+   <td>
+   </td>
    <td>Add two more values via second curl but this time the first one involves a reset. Expect normal cum readings plus 6 & 7.
    </td>
   </tr>
@@ -508,6 +560,8 @@ The script also describes how to delete all the meters/readings if you want to r
    <td>
    </td>
    <td>X
+   </td>
+   <td>
    </td>
    <td>
    </td>
@@ -533,6 +587,8 @@ The script also describes how to delete all the meters/readings if you want to r
    </td>
    <td>
    </td>
+   <td>
+   </td>
    <td>The meter in DB is set to cumulative & cumulative_reset but not sent via curl. Expect usual cumulative values.
    </td>
   </tr>
@@ -544,6 +600,8 @@ The script also describes how to delete all the meters/readings if you want to r
    <td>
    </td>
    <td>X
+   </td>
+   <td>
    </td>
    <td>
    </td>
@@ -568,6 +626,8 @@ The script also describes how to delete all the meters/readings if you want to r
    </td>
    <td>
    </td>
+   <td>
+   </td>
    <td>The meter in DB is set to cumulative, cumulative_reset to true & reset range is 11:45-12:15 but then sent via curl so should reset around midnight. Should get usual cumulative values.
    </td>
   </tr>
@@ -575,6 +635,8 @@ The script also describes how to delete all the meters/readings if you want to r
    <td>RegAscGapLength & meterPipe29 (to create meter)
    </td>
    <td>pipe29
+   </td>
+   <td>
    </td>
    <td>
    </td>
@@ -604,7 +666,50 @@ The script also describes how to delete all the meters/readings if you want to r
    </td>
    <td>
    </td>
+   <td>
+   </td>
    <td>The meter in DB is set to reading_gap=60 and reading_variation=120 but then the curl passes 120 and 121 for gap & variation. Should get Length variation for line 5. Expect 1, 2+, 3, 4+, 5-, 5- (same as previous point and extra one since last reading goes into next day)
    </td>
   </tr>
+<tr>
+   <td>cumAscDuplication3 & meterPipe31 (to create meter)
+   </td>
+   <td>pipe31
+   </td>
+   <td>
+   </td>
+   <td>X
+   </td>
+   <td>
+   </td>
+   <td>
+   </td>
+   <td>
+   </td>
+   <td>3
+   </td>
+   <td>The meter in DB is set to reading_duplication=3 and no value in curl. Repeat every reading 3x but should only see once.  Get standard cum values.
+   </td>
+  </tr>
+  <tr>
+   <td>regDsc & meterPipe32 (to create meter)
+   </td>
+   <td>pipe32
+   </td>
+   <td>X
+   </td>
+   <td>
+   </td>
+   <td>
+   </td>
+   <td>
+   </td>
+   <td>
+   </td>
+   <td>
+   </td>
+   <td>The meter in DB is set to time_sort='decreasing' and no value in curl. Should get usual values.
+   </td>
+  </tr>
+
 </table>

@@ -21,6 +21,9 @@ cumulative_reset_start: The earliest time of day that a reset can occur
 cumulative_reset_end: The latest time of day that a reset can occur
 reading_gap: Specify the time in seconds that can exist between the end of the last reading and the start of the next reading
 reading_variation: +/- time allowed on length to consider within allowed length
+reading_duplication: The number of times each reading is given where 1 means only once and is the default.
+time_sort: 'increasing' for reading provided in increasing time and 'decreasing' if other way. Default is 'increasing'
+end_only_time: true if only an end time is given for each reading and false by default
 reading: The last reading input for the meter
 start_timestamp: Start timestamp of last reading input for this meter
 end_timestamp: End timestamp of last reading for this meter
@@ -43,6 +46,9 @@ CREATE TABLE IF NOT EXISTS meters (
     cumulative_reset_end TIME DEFAULT '23:59:59.999999',
     reading_gap REAL DEFAULT 0,
     reading_variation REAL DEFAULT 0,
+    reading_duplication INTEGER DEFAULT 1,
+    time_sort TEXT DEFAULT 'increasing',
+    end_only_time BOOLEAN DEFAULT false,
     reading REAL DEFAULT 0.0,
     start_timestamp TIMESTAMP DEFAULT '0001-01-01 00:00:00',
     end_timestamp TIMESTAMP DEFAULT '0001-01-01 00:00:00'

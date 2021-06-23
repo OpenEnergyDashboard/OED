@@ -17,7 +17,9 @@ interface CSVUploadProps extends CSVUploadPreferences {
 
 export const enum TimeSortTypes {
 	increasing = 'increasing',
-	decreasing = 'decreasing'
+	decreasing = 'decreasing',
+	// meter means to use value stored on meter or the default if not.
+	meter = 'meter or default'
 }
 
 export interface ReadingsCSVUploadPreferencesItem extends CSVUploadPreferences {

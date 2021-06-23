@@ -16,14 +16,14 @@ async function setupGroupsAndMeters(conn) {
 	const groupC = new Group(undefined, 'GC', true, gps, 'notes GC', 53.5);
 	await Promise.all([groupA, groupB, groupC].map(group => group.insert(conn)));
 	const meterA = new Meter(undefined, 'MA', null, false, true, Meter.type.MAMAC, null, gps,
-	'Identified MA' ,'notes MA', 35.0, true, true, '01:01:25', '00:00:00', 5, 1, 1.5,
-	'0001-01-01 23:59:59', '2020-07-02 01:00:10');
+	'Identified MA' ,'notes MA', 35.0, true, true, '01:01:25', '00:00:00', 5, 1, 1, 'increasing', false,
+	1.5, '0001-01-01 23:59:59', '2020-07-02 01:00:10');
 	const meterB = new Meter(undefined, 'MB', null, false, true, Meter.type.MAMAC, null, gps,
-	'Identified MB', 'notes MB', 33.5, true, true, '05:05:09', '09:00:01', 0, 0, 25.5,
-	'0002-01-01 23:59:59', '2020-07-02 01:00:10');
+	'Identified MB', 'notes MB', 33.5, true, true, '05:05:09', '09:00:01', 0, 0, 1, 'increasing', false,
+	25.5, '0002-01-01 23:59:59', '2020-07-02 01:00:10');
 	const meterC = new Meter(undefined, 'MC', null, false, true, Meter.type.METASYS, null, gps,
-	'Identified MC', 'notes MC', 33.5, true, true, '05:05:09', '09:00:01', 0, 0, 25.5,
-	'0003-01-01 23:59:59', '2020-07-02 01:00:10');
+	'Identified MC', 'notes MC', 33.5, true, true, '05:05:09', '09:00:01', 0, 0, 1, 'increasing', false,
+	25.5, '0003-01-01 23:59:59', '2020-07-02 01:00:10');
 	await Promise.all([meterA, meterB, meterC].map(meter => meter.insert(conn)));
 }
 

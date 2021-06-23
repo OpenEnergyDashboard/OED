@@ -8,6 +8,18 @@ const { Param, EnumParam, BooleanParam, StringParam } = require('./ValidationSch
 const failure = require('./failure');
 const validate = require('jsonschema').validate;
 
+/**
+ * Enum of CSV input type sorting.
+ * This enum needs to be kept in sync with the enum in src/client/app/types/csvUploadForm.ts 
+ * @enum {string}
+ */
+TimeSortTypesJS = Object.freeze({
+	increasing: 'increasing',
+	decreasing: 'decreasing',
+	// meter means to use value stored on meter or the default if not.
+	meter: 'meter or default'
+});
+
 // These are the default values of CSV Pipeline upload parameters. If a user does not specify
 // a choice for a particular parameter, then these defaults will be used.
 // Some defaults are listed as `undefined`; this is only relevant for cURL requests. It means that the default will be acquired from some external 
@@ -33,11 +45,11 @@ const DEFAULTS = {
 		cumulativeReset: undefined,
 		cumulativeResetStart: undefined,
 		cumulativeResetEnd: undefined,
-		duplications: '1',
+		duplications: undefined,
 		lengthGap: undefined,
 		lengthVariation: undefined,
 		refreshReadings: 'false',
-		timeSort: 'increasing' // This corresponds to one of the values in TimeSortTypes exported from /src/client/app/types/csvUploadForm.ts
+		timeSort: undefined
 	}
 }
 
@@ -74,13 +86,12 @@ const VALIDATION = {
 			cumulativeReset: new BooleanParam('cumulativeReset'),
 			cumulativeResetStart: new StringParam('cumulativeResetStart', undefined, undefined),
 			cumulativeResetEnd: new StringParam('cumulativeResetEnd', undefined, undefined),
-			duplications: new StringParam('duplications', '^\\d+$', 'duplications must be an integer.'),
+			duplications: new StringParam('duplications', undefined, undefined),
 			meterName: new StringParam('meterName', undefined, undefined),
 			lengthGap: new StringParam('lengthGap', undefined, undefined),
 			lengthVariation: new StringParam('lengthVariation', undefined, undefined),
 			refreshReadings: new BooleanParam('refreshReadings'),
-			// This array is the TimeSortTypes exported by /src/client/app/types/csvUploadForm.ts
-			timeSort: new EnumParam('timeSort', ['increasing', 'decreasing'])
+			timeSort: new EnumParam('timeSort', [TimeSortTypesJS.increasing, TimeSortTypesJS.decreasing, TimeSortTypesJS.meter])
 		},
 		additionalProperties: false // This protects us from unintended parameters as well as typos.
 	}
@@ -188,5 +199,6 @@ function validateMetersCsvUploadParams(req, res, next) {
 
 module.exports = {
 	validateMetersCsvUploadParams,
-	validateReadingsCsvUploadParams
+	validateReadingsCsvUploadParams,
+	TimeSortTypesJS
 };

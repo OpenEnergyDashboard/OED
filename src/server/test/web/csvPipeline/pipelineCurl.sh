@@ -20,13 +20,12 @@ oedHome=~/OED/OED
 
 echo -e "\nstarting pipe1"
 curl localhost:3000/api/csv/readings -X POST -F 'meterName=pipe1' -F 'createMeter=true' -F 'gzip=false' -F 'email=test@example.com' -F 'password=password' -F 'csvfile=@regAsc.csv'
-# allow when descending working and have parameter for it.
 echo -e "\nstarting pipe2"
 curl localhost:3000/api/csv/readings -X POST -F 'meterName=pipe2' -F 'timeSort=decreasing' -F 'createMeter=true' -F 'gzip=false' -F 'email=test@example.com' -F 'password=password' -F 'csvfile=@regDsc.csv'
 echo -e "\nstarting pipe3"
 curl localhost:3000/api/csv/readings -X POST -F 'cumulative=true' -F 'meterName=pipe3' -F 'createMeter=true' -F 'gzip=false' -F 'email=test@example.com' -F 'password=password' -F 'csvfile=@cumAsc.csv'
-echo -e "\nstarting pipe31"
-curl localhost:3000/api/csv/readings -X POST -F 'timeSort=decreasing' -F 'cumulative=true' -F 'meterName=pipe31' -F 'createMeter=true' -F 'gzip=false' -F 'email=test@example.com' -F 'password=password' -F 'csvfile=@cumDsc.csv'
+echo -e "\nstarting pipe33"
+curl localhost:3000/api/csv/readings -X POST -F 'timeSort=decreasing' -F 'cumulative=true' -F 'meterName=pipe33' -F 'createMeter=true' -F 'gzip=false' -F 'email=test@example.com' -F 'password=password' -F 'csvfile=@cumDsc.csv'
 echo -e "\nstarting pipe4"
 curl localhost:3000/api/csv/readings -X POST -F 'cumulative=true' -F 'cumulativeReset=true' -F 'meterName=pipe4' -F 'createMeter=true' -F 'gzip=false' -F 'email=test@example.com' -F 'password=password' -F 'csvfile=@cumAscResetMidnight.csv'
 echo -e "\nstarting pipe5"
@@ -95,13 +94,24 @@ docker compose -f $oedHome/docker-compose.yml exec database psql -U oed -c "upda
 curl localhost:3000/api/csv/readings -X POST -F 'cumulative=true' -F 'cumulativeReset=true' -F'cumulativeResetStart=23:45' -F'cumulativeResetEnd=00:15' -F 'meterName=pipe28' -F 'gzip=false' -F 'email=test@example.com' -F 'password=password' -F 'csvfile=@cumAscResetMidnight.csv'
 echo -e "\nstarting pipe29"
 curl localhost:3000/api/csv/meters -X POST -F 'headerRow=false' -F 'gzip=false' -F 'email=test@example.com' -F 'password=password' -F 'csvfile=@meterPipe29.csv'
-# edit meter so reset is true
+# edit meter so gap & variation are set
 docker compose -f $oedHome/docker-compose.yml exec database psql -U oed -c "update meters set reading_gap=60 where name='pipe29'; update meters set reading_variation=120 where name='pipe29'"
 curl localhost:3000/api/csv/readings -X POST -F 'meterName=pipe29' -F 'gzip=false' -F 'email=test@example.com' -F 'password=password' -F 'csvfile=@regAscGapLength.csv'
 echo -e "\nstarting pipe30"
 curl localhost:3000/api/csv/meters -X POST -F 'headerRow=false' -F 'gzip=false' -F 'email=test@example.com' -F 'password=password' -F 'csvfile=@meterPipe30.csv'
-# edit meter so reset is true
+# edit meter so gap & variation are set
 docker compose -f $oedHome/docker-compose.yml exec database psql -U oed -c "update meters set reading_gap=60 where name='pipe30'; update meters set reading_variation=60 where name='pipe30'"
 # override DB by providing parameters
 # refresh on last upload of readings and all will be available for graphing
-curl localhost:3000/api/csv/readings -X POST -F 'refreshReadings=true' -F 'meterName=pipe30' -F 'lengthGap=120' -F 'lengthVariation=121' -F 'gzip=false' -F 'email=test@example.com' -F 'password=password' -F 'csvfile=@regAscGapLength.csv'
+curl localhost:3000/api/csv/readings -X POST -F 'meterName=pipe30' -F 'lengthGap=120' -F 'lengthVariation=121' -F 'gzip=false' -F 'email=test@example.com' -F 'password=password' -F 'csvfile=@regAscGapLength.csv'
+echo -e "\nstarting pipe31"
+curl localhost:3000/api/csv/meters -X POST -F 'headerRow=false' -F 'gzip=false' -F 'email=test@example.com' -F 'password=password' -F 'csvfile=@meterPipe31.csv'
+# edit meter so set duplication
+docker compose -f $oedHome/docker-compose.yml exec database psql -U oed -c "update meters set reading_duplication=3 where name='pipe31'"
+# refresh on last upload of readings and all will be available for graphing
+curl localhost:3000/api/csv/readings -X POST -F 'refreshReadings=true' -F 'cumulative=true' -F 'meterName=pipe31' -F 'createMeter=true' -F 'gzip=false' -F 'email=test@example.com' -F 'password=password' -F 'csvfile=@cumAscDuplication3.csv'
+echo -e "\nstarting pipe32"
+curl localhost:3000/api/csv/meters -X POST -F 'headerRow=false' -F 'gzip=false' -F 'email=test@example.com' -F 'password=password' -F 'csvfile=@meterPipe32.csv'
+# edit meter so set timesort to decreasing
+docker compose -f $oedHome/docker-compose.yml exec database psql -U oed -c "update meters set time_sort='decreasing' where name='pipe32'"
+curl localhost:3000/api/csv/readings -X POST -F 'meterName=pipe32' -F 'createMeter=true' -F 'gzip=false' -F 'email=test@example.com' -F 'password=password' -F 'csvfile=@regDsc.csv'
