@@ -17,7 +17,19 @@ TimeSortTypesJS = Object.freeze({
 	increasing: 'increasing',
 	decreasing: 'decreasing',
 	// meter means to use value stored on meter or the default if not.
-	meter: 'meter or default'
+	meter: 'meter value or default'
+});
+
+/**
+ * Enum of Boolean types.
+ * This enum needs to be kept in sync with the enum in src/client/app/types/csvUploadForm.ts 
+ * @enum {string}
+ */
+BooleanTypesJS = Object.freeze({
+	true: 'true',
+	false: 'false',
+	// meter means to use value stored on meter or the default if not.
+	meter: 'meter value or default'
 });
 
 // These are the default values of CSV Pipeline upload parameters. If a user does not specify
@@ -41,8 +53,8 @@ const DEFAULTS = {
 	},
 	readings: {
 		createMeter: 'false',
-		cumulative: undefined,
-		cumulativeReset: undefined,
+		cumulative: BooleanTypesJS.meter,
+		cumulativeReset: BooleanTypesJS.meter,
 		cumulativeResetStart: undefined,
 		cumulativeResetEnd: undefined,
 		duplications: undefined,
@@ -82,11 +94,11 @@ const VALIDATION = {
 		properties: {
 			...COMMON_PROPERTIES,
 			createMeter: new BooleanParam('createMeter'),
-			cumulative: new BooleanParam('cumulative'),
-			cumulativeReset: new BooleanParam('cumulativeReset'),
+			cumulative: new EnumParam('cumulative', [BooleanTypesJS.true, BooleanTypesJS.false, BooleanTypesJS.meter]),
+			cumulativeReset: new EnumParam('cumulativeReset', [BooleanTypesJS.true, BooleanTypesJS.false, BooleanTypesJS.meter]),
 			cumulativeResetStart: new StringParam('cumulativeResetStart', undefined, undefined),
 			cumulativeResetEnd: new StringParam('cumulativeResetEnd', undefined, undefined),
-			duplications: new StringParam('duplications', undefined, undefined),
+			duplications: new StringParam('duplications', '^\\d+$|^(?![\s\S])', 'duplications must be an integer or empty.'),
 			meterName: new StringParam('meterName', undefined, undefined),
 			lengthGap: new StringParam('lengthGap', undefined, undefined),
 			lengthVariation: new StringParam('lengthVariation', undefined, undefined),
@@ -200,5 +212,6 @@ function validateMetersCsvUploadParams(req, res, next) {
 module.exports = {
 	validateMetersCsvUploadParams,
 	validateReadingsCsvUploadParams,
-	TimeSortTypesJS
+	TimeSortTypesJS,
+	BooleanTypesJS
 };

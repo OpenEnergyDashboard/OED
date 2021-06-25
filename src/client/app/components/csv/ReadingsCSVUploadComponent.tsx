@@ -4,7 +4,7 @@
 
 import * as React from 'react';
 import { Button, Col, Input, Form, FormGroup, Label } from 'reactstrap';
-import { ReadingsCSVUploadProps, TimeSortTypes } from '../../types/csvUploadForm';
+import { ReadingsCSVUploadProps, TimeSortTypes, BooleanTypes } from '../../types/csvUploadForm';
 import { ReadingsCSVUploadDefaults } from '../../utils/csvUploadDefaults';
 import { showErrorNotification, showSuccessNotification } from '../../utils/notifications';
 import FormFileUploaderComponent from '../FormFileUploaderComponent';
@@ -29,6 +29,8 @@ export default class ReadingsCSVUploadComponent extends React.Component<Readings
 	private fileInput: React.RefObject<HTMLInputElement>;
 	constructor(props: ReadingsCSVUploadProps) {
 		super(props);
+		this.handleSelectCumulative = this.handleSelectCumulative.bind(this);
+		this.handleSelectCumulativeReset = this.handleSelectCumulativeReset.bind(this);
 		this.handleSetCumulativeResetStart = this.handleSetCumulativeResetStart.bind(this);
 		this.handleSetCumulativeResetEnd = this.handleSetCumulativeResetEnd.bind(this);
 		this.handleSetLengthGap = this.handleSetLengthGap.bind(this);
@@ -68,6 +70,16 @@ export default class ReadingsCSVUploadComponent extends React.Component<Readings
 	private handleSetMeterName(e: React.ChangeEvent<HTMLInputElement>) {
 		const target = e.target;
 		this.props.setMeterName(target.value);
+	}
+
+	private handleSelectCumulative(e: React.ChangeEvent<HTMLInputElement>) {
+		const target = e.target;
+		this.props.selectCumulative(target.value as BooleanTypes);
+	}
+
+	private handleSelectCumulativeReset(e: React.ChangeEvent<HTMLInputElement>) {
+		const target = e.target;
+		this.props.selectCumulativeReset(target.value as BooleanTypes);
 	}
 
 	private handleSetCumulativeResetStart(e: React.ChangeEvent<HTMLInputElement>) {
@@ -123,9 +135,9 @@ export default class ReadingsCSVUploadComponent extends React.Component<Readings
 						</Label>
 						<Col sm={8}>
 							<Input type='select' name='timeSort' onChange={this.handleSelectTimeSort}>
-							<option value={TimeSortTypes.meter}> {TimeSortTypes.meter} </option>
-							<option value={TimeSortTypes.increasing}> {TimeSortTypes.increasing} </option>
-							<option value={TimeSortTypes.decreasing}> {TimeSortTypes.decreasing} </option>
+								<option value={TimeSortTypes.meter}> {TimeSortTypes.meter} </option>
+								<option value={TimeSortTypes.increasing}> {TimeSortTypes.increasing} </option>
+								<option value={TimeSortTypes.decreasing}> {TimeSortTypes.decreasing} </option>
 							</Input>
 						</Col>
 					</FormGroup>
@@ -147,17 +159,29 @@ export default class ReadingsCSVUploadComponent extends React.Component<Readings
 							<FormattedMessage id='csv.readings.section.cumulative.data' />
 						</Label>
 						<Col sm={8}>
-							<FormGroup check style={checkboxStyle}>
-								<Label check>
-									<Input checked={this.props.cumulative} type='checkbox' name='cumulative' onChange={this.props.toggleCumulative} />
+							<FormGroup>
+								<Label style={titleStyle}>
 									<FormattedMessage id='csv.readings.param.cumulative' />
 								</Label>
+								<Col sm={12}>
+									<Input type='select' name='cumulative' onChange={this.handleSelectCumulative}>
+										<option value={BooleanTypes.meter}> {BooleanTypes.meter} </option>
+										<option value={BooleanTypes.true}> {BooleanTypes.true} </option>
+										<option value={BooleanTypes.false}> {BooleanTypes.false} </option>
+									</Input>
+								</Col>
 							</FormGroup>
-							<FormGroup check style={checkboxStyle}>
-								<Label check>
-									<Input checked={this.props.cumulativeReset} type='checkbox' name='cumulativeReset' onChange={this.props.toggleCumulativeReset} />
+							<FormGroup>
+								<Label style={titleStyle}>
 									<FormattedMessage id='csv.readings.param.cumulative.reset' />
 								</Label>
+								<Col sm={12}>
+									<Input type='select' name='cumulativeReset' onChange={this.handleSelectCumulativeReset}>
+										<option value={BooleanTypes.meter}> {BooleanTypes.meter} </option>
+										<option value={BooleanTypes.true}> {BooleanTypes.true} </option>
+										<option value={BooleanTypes.false}> {BooleanTypes.false} </option>
+									</Input>
+								</Col>
 							</FormGroup>
 							<FormGroup>
 								<Label style={titleStyle}>

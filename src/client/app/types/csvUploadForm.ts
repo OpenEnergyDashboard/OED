@@ -19,13 +19,20 @@ export const enum TimeSortTypes {
 	increasing = 'increasing',
 	decreasing = 'decreasing',
 	// meter means to use value stored on meter or the default if not.
-	meter = 'meter or default'
+	meter = 'meter value or default'
+}
+
+export const enum BooleanTypes {
+	true = 'true',
+	false = 'false',
+	// meter means to use value stored on meter or the default if not.
+	meter = 'meter value or default'
 }
 
 export interface ReadingsCSVUploadPreferencesItem extends CSVUploadPreferences {
 	createMeter: boolean;
-	cumulative: boolean;
-	cumulativeReset: boolean;
+	cumulative: BooleanTypes;
+	cumulativeReset: BooleanTypes;
 	cumulativeResetStart: string;
 	cumulativeResetEnd: string;
 	duplications: string; // Not sure how to type this an integer string;
@@ -40,14 +47,14 @@ export interface ReadingsCSVUploadProps extends ReadingsCSVUploadPreferencesItem
 	// Note: each of these will have to change in consideration of redux;
 	selectDuplications: (value: string) => void;
 	selectTimeSort: (value: TimeSortTypes) => void;
+	selectCumulative: (value: BooleanTypes) => void;
+	selectCumulativeReset: (value: BooleanTypes) => void;
 	setCumulativeResetStart: (value: string) => void;
 	setCumulativeResetEnd: (value: string) => void;
 	setLengthGap: (value: string) => void;
 	setLengthVariation: (value: string) => void;
 	setMeterName: (value: string) => void;
 	toggleCreateMeter: () => void;
-	toggleCumulative: () => void;
-	toggleCumulativeReset: () => void;
 	toggleRefreshReadings: () => void;
 };
 

@@ -8,7 +8,7 @@ import ReadingsCSVUploadComponent from '../../components/csv/ReadingsCSVUploadCo
 import HeaderContainer from '../HeaderContainer';
 import FooterContainer from '../FooterContainer';
 import { uploadCSVApi } from '../../utils/api';
-import { ReadingsCSVUploadPreferencesItem, MetersCSVUploadPreferencesItem, TimeSortTypes } from '../../types/csvUploadForm';
+import { ReadingsCSVUploadPreferencesItem, MetersCSVUploadPreferencesItem, TimeSortTypes, BooleanTypes } from '../../types/csvUploadForm';
 import { ReadingsCSVUploadDefaults, MetersCSVUploadDefaults } from '../../utils/csvUploadDefaults';
 import { TabContent, TabPane, Nav, NavItem, NavLink } from 'reactstrap';
 import { FormattedMessage } from 'react-intl';
@@ -30,6 +30,8 @@ export default class UploadCSVContainer extends React.Component<{}, UploadCSVCon
 		this.selectDuplications = this.selectDuplications.bind(this);
 		this.selectTimeSort = this.selectTimeSort.bind(this);
 		this.setMeterName = this.setMeterName.bind(this);
+		this.selectCumulative = this.selectCumulative.bind(this);
+		this.selectCumulativeReset = this.selectCumulativeReset.bind(this);
 		this.setCumulativeResetStart = this.setCumulativeResetStart.bind(this);
 		this.setCumulativeResetEnd = this.setCumulativeResetEnd.bind(this);
 		this.setLengthGap = this.setLengthGap.bind(this);
@@ -37,8 +39,6 @@ export default class UploadCSVContainer extends React.Component<{}, UploadCSVCon
 		this.submitReadings = this.submitReadings.bind(this);
 		this.submitMeters = this.submitMeters.bind(this);
 		this.toggleCreateMeter = this.toggleCreateMeter.bind(this);
-		this.toggleCumulative = this.toggleCumulative.bind(this);
-		this.toggleCumulativeReset = this.toggleCumulativeReset.bind(this);
 		this.toggleGzip = this.toggleGzip.bind(this);
 		this.toggleHeaderRow = this.toggleHeaderRow.bind(this);
 		this.toggleRefreshReadings = this.toggleRefreshReadings.bind(this);
@@ -80,6 +80,24 @@ export default class UploadCSVContainer extends React.Component<{}, UploadCSVCon
 			uploadReadingsPreferences: {
 				...previousState.uploadReadingsPreferences,
 				meterName: value
+			}
+		}))
+	}
+	private selectCumulative(value: BooleanTypes) {
+		this.setState(previousState => ({
+			...previousState,
+			uploadReadingsPreferences: {
+				...previousState.uploadReadingsPreferences,
+				cumulative: value
+			}
+		}))
+	}
+	private selectCumulativeReset(value: BooleanTypes) {
+		this.setState(previousState => ({
+			...previousState,
+			uploadReadingsPreferences: {
+				...previousState.uploadReadingsPreferences,
+				cumulativeReset: value
 			}
 		}))
 	}
@@ -125,24 +143,6 @@ export default class UploadCSVContainer extends React.Component<{}, UploadCSVCon
 			uploadReadingsPreferences: {
 				...previousState.uploadReadingsPreferences,
 				createMeter: !previousState.uploadReadingsPreferences.createMeter
-			}
-		}))
-	}
-	private toggleCumulative() {
-		this.setState(previousState => ({
-			...previousState,
-			uploadReadingsPreferences: {
-				...previousState.uploadReadingsPreferences,
-				cumulative: !previousState.uploadReadingsPreferences.cumulative
-			}
-		}))
-	}
-	private toggleCumulativeReset() {
-		this.setState(previousState => ({
-			...previousState,
-			uploadReadingsPreferences: {
-				...previousState.uploadReadingsPreferences,
-				cumulativeReset: !previousState.uploadReadingsPreferences.cumulativeReset
 			}
 		}))
 	}
@@ -238,14 +238,14 @@ export default class UploadCSVContainer extends React.Component<{}, UploadCSVCon
 							selectDuplications={this.selectDuplications}
 							selectTimeSort={this.selectTimeSort}
 							setMeterName={this.setMeterName}
+							selectCumulative={this.selectCumulative}
+							selectCumulativeReset={this.selectCumulativeReset}
 							setCumulativeResetStart={this.setCumulativeResetStart}
 							setCumulativeResetEnd={this.setCumulativeResetEnd}
 							setLengthGap={this.setLengthGap}
 							setLengthVariation={this.setLengthVariation}
 							submitCSV={this.submitReadings}
 							toggleCreateMeter={this.toggleCreateMeter}
-							toggleCumulative={this.toggleCumulative}
-							toggleCumulativeReset={this.toggleCumulativeReset}
 							toggleGzip={this.toggleGzip(MODE.readings)}
 							toggleHeaderRow={this.toggleHeaderRow(MODE.readings)}
 							toggleRefreshReadings={this.toggleRefreshReadings}

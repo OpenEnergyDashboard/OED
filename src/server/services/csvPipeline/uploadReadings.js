@@ -6,7 +6,7 @@ const express = require('express');
 const { CSVPipelineError } = require('./CustomErrors');
 const success = require('./success');
 const loadCsvInput = require('../pipeline-in-progress/loadCsvInput');
-const { TimeSortTypesJS } = require('./validateCsvUploadParams');
+const { TimeSortTypesJS, BooleanTypesJS } = require('./validateCsvUploadParams');
 const Meter = require('../../models/Meter');
 const { log } = require('../../log');
 
@@ -21,6 +21,7 @@ const { log } = require('../../log');
 async function uploadReadings(req, res, filepath, conn) {
 	// TODO update parameter is not currently used
 	const { createMeter, headerRow, meterName } = req.body; // extract query parameters
+	// headerRow has no value in the DB for a meter so always use the value passed.
 	const hasHeaderRow = (headerRow === 'true');
 	let meterCreated = false;
 	let meter = await Meter.getByName(meterName, conn)
@@ -48,44 +49,53 @@ async function uploadReadings(req, res, filepath, conn) {
 
 	// Handle other parameter defaults
 	let { cumulative, cumulativeReset, cumulativeResetStart, cumulativeResetEnd, lengthVariation, lengthGap, duplications, timeSort } = req.body;
-	let areReadingsCumulative;
-	let doReadingsReset;
+	let readingsCumulative;
+	let readingsReset;
 	let readingResetStart;
 	let readingResetEnd;
 	let readingGap;
 	let readingLengthVariation;
 	let readingRepetition;
 	let readingTimeSort;
-	// We know from the validation stage of the pipeline that the 'cumulative' and 'cumulativeReset' fields
-	// will have one of the follow values undefined, 'true', or 'false'. If undefined, this means that 
-	// the uploader wants the pipeline to use the database's (i.e. the meter's) default value.
+	// For the parameters, they either have one of the desired values or a "empty" value.
+	// An empty value means use the value from the DB meter or, in the unlikely event it is not set,
+	// then use the default value. For values coming from the web page:
+	//   In the case of timeSort, cumulative and cumulativeReset empty is the enum 'meter' value.
+	//   For other parameters it is an empty string.
+	// For parameters coming from a curl command, the values will be undefined.
+	// For this reason both possibilities are tested (the web page one and the curl one) to know if the
+	// meter or default value should be used.
 	// TODO: We made the assumption that in the DB, the cumulative and cumulativeReset columns is either true or false.
 	// On further inspection, these values can be null. At the moment, we are not sure what this means for the pipeline.
 	// As a quick fix, we will assume that null, means false.
-	// TODO At the current time this will not use the DB value if you use the web form because it is a checkbox that makes
-	// it true and is false by default. Need another mechanism to get this to work.
-	if (cumulative === undefined) {
+	if (cumulative === undefined || cumulative === BooleanTypesJS.meter) {
 		if (meter.cumulative === null) {
-			areReadingsCumulative = false;
+			// This probably should not happen with a new DB but keep just in case.
+			// No variation allowed.
+			readingCumulative= BooleanTypesJS.false;
+			// readingTimeSort = 'increasing';
 		} else {
-			areReadingsCumulative = meter.cumulative;
+			readingCumulative = BooleanTypesJS[meter.cumulative];
 		}
 	} else {
-		areReadingsCumulative = (cumulative === 'true');
+		readingCumulative = cumulative;
 	}
-	if (cumulativeReset === undefined) {
-		if (meter.cumulativeReset === null) {
-			doReadingsReset = false;
-		} else {
-			doReadingsReset = meter.cumulativeReset;
-		}
-	} else {
-		doReadingsReset = (cumulativeReset === 'true');
-	}
+	const areReadingsCumulative = (readingCumulative === 'true');
 
-	// If the cumulative reset times or length parameters are not set, they will be and empty string if coming from the
-	// web page and undefined if coming from a curl request. Thus, both conditions are tested.
-	// If not provided then the DB value is used unless missing then the default value.
+	if (cumulativeReset === undefined || cumulativeReset === BooleanTypesJS.meter) {
+		if (meter.cumulativeReset === null) {
+			// This probably should not happen with a new DB but keep just in case.
+			// No variation allowed.
+			readingsReset= BooleanTypesJS.false;
+			// readingTimeSort = 'increasing';
+		} else {
+			readingsReset = BooleanTypesJS[meter.cumulativeReset];
+		}
+	} else {
+		readingsReset = cumulativeReset;
+	}
+	const doReadingsReset = (readingsReset === 'true');
+
 	if (cumulativeResetStart === undefined || cumulativeResetStart === '') {
 		if (meter.cumulativeResetStart === null) {
 			// This probably should not happen with a new DB but keep just in case.
@@ -96,6 +106,7 @@ async function uploadReadings(req, res, filepath, conn) {
 	} else {
 		readingResetStart = cumulativeResetStart;
 	}
+
 	if (cumulativeResetEnd === undefined || cumulativeResetEnd === '') {
 		if (meter.cumulativeResetEnd === null) {
 			// This probably should not happen with a new DB but keep just in case.
@@ -106,6 +117,7 @@ async function uploadReadings(req, res, filepath, conn) {
 	} else {
 		readingResetEnd = cumulativeResetEnd;
 	}
+
 	if (lengthGap === undefined || lengthGap === '') {
 		if (meter.readingGap === null) {
 			// This probably should not happen with a new DB but keep just in case.
@@ -119,6 +131,7 @@ async function uploadReadings(req, res, filepath, conn) {
 		// Note the variable changes from string to real number.
 		readingGap = parseFloat(lengthGap);
 	}
+
 	if (lengthVariation === undefined || lengthVariation === '') {
 		if (meter.readingVariation === null) {
 			// This probably should not happen with a new DB but keep just in case.
@@ -132,6 +145,7 @@ async function uploadReadings(req, res, filepath, conn) {
 		// Note the variable changes from string to real number.
 		readingLengthVariation = parseFloat(lengthVariation);
 	}
+	
 	if (duplications === undefined || duplications === '') {
 		if (meter.readingVariation === null) {
 			// This probably should not happen with a new DB but keep just in case.
@@ -145,6 +159,7 @@ async function uploadReadings(req, res, filepath, conn) {
 		// Note the variable changes from string to real number.
 		readingRepetition = parseInt(duplications, 10);
 	}
+
 	if (timeSort === undefined || timeSort === TimeSortTypesJS.meter) {
 		if (meter.timeSort === null) {
 			// This probably should not happen with a new DB but keep just in case.

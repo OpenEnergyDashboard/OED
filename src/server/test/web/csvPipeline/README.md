@@ -27,7 +27,7 @@ The CSV test files are described in the following table. The script pipelineCurl
 
 Note get two warning messages if load more than once on many cases because the time of the first reading is before the last time loaded before.
 
-Looked at readings with: select * from readings where meter_id in (select id from meters where name='pipe#');
+Looked at readings with: select * from readings where meter_id in (select id from meters where name='pipe#'); 
 
 The script also describes how to delete all the meters/readings if you want to rerun from scratch.
 
