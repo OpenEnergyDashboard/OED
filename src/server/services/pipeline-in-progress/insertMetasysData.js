@@ -12,19 +12,10 @@ const path = require('path');
 /**
  * Reads CSV file passed to input all the Metasys readings into database.
  * @param {string} filePath path to file to load including file name
- * @param {Meter} meter the meter id to associate the readings with
- * @param {function} mapRowToModel a customized function that map needed values from each row to the Reading model
- * @param {boolean} readAsStream true if prefer to read file as CSV stream
- * @param {boolean} isCumulative true if the given data is cumulative
- * @param {boolean} cumulativeReset true if the cumulative data is reset at midnight
- * @param {time} cumulativeResetStart defines the first time a cumulative reset is allowed
- * @param {time} cumulativeResetEnd defines the last time a cumulative reset is allowed
- * @param {number} readingGap defines how far apart (end time of previous to start time of next) that a pair of reading can be
- * @param {number} readingLengthVariation defines how much the length of a pair of readings can vary in seconds.
+ * @param {time} readingInterval the length in time for each reading
  * @param {number} readingRepetition number of times each reading is repeated where 1 means no repetition
- * @param {string} timeSort the canonical order sorted by date/time in which the data appears in the CSV file
- * @param {boolean} headerRow true if the given file has a header row
- * @param {array} conditionSet used to validate readings (minVal, maxVal, minDate, maxDate, threshold, maxError)
+ * @param {boolean} cumulativeIndicator true if the given data is cumulative
+ * @param {boolean} cumulativeReset true if the cumulative data is reset at midnight
  * @param {array} conn connection to database
  */
 async function insertMetasysData(filePath, readingInterval, readingRepetition, cumulativeIndicator, cumulativeReset, conn) {
@@ -43,16 +34,17 @@ async function insertMetasysData(filePath, readingInterval, readingRepetition, c
 							return [readRate, startTimestamp, endTimestamp];
 						},
 						readAsStream = false,
+						timeSort = 'decreasing',
+						readingRepetition = readingRepetition,
 						isCumulative = cumulativeIndicator,
 						cumulativeReset = cumulativeReset,
 						// TODO This pipeline is going away. Using dummy times that allow reset at any time and no variation in gap & reading length.
-						'0:00:00',
-						'23:59:59.99999',
-						0,
-						0,
-						readingRepetition,
-						'decreasing',
-						false,
+						cumulativeResetStart = '0:00:00',
+						cumulativeResetEnd = '23:59:59.99999',
+						readingGap = 0,
+						readingLengthVariation = 0,
+						isEndOnly = false,
+						headerRow = false,
 						conditionSet = undefined,
 						conn = conn);
 }

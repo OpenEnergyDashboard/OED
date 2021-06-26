@@ -25,6 +25,8 @@ const E0 = moment(0);
  *    reading #0 may be the cumulative value from unknown readings that may or may not have been inserted before
  * @param {object[[]]} rows
  * @param {number} meterID meter id being input
+ * @param {string} timeSort the canonical order sorted by date/time in which the data appears in the data file, default 'increasing'
+ * @param {number} readingRepetition value is 1 if reading is not duplicated. 2 if repeated twice and so on (E-mon D-mon meters)
  * @param {boolean} isCumulative true if the data is cumulative
  * @param {boolean} cumulativeReset true if the cumulative data can reset
  * @param {string} resetStart a string representation in the format "HH:mm:ss.SSS" which represents the start time a cumulativeReset may occur after\
@@ -33,15 +35,13 @@ const E0 = moment(0);
  *  The default resetEnd time is '23:59:99.999'
  * @param {number} readingGap the allowed time variation in seconds that a gap may occur between two readings, default 0
  * @param {number} readingLengthVariation the allowed time variation in seconds that two readings may deviate from each other, default 0
- * @param {number} readingRepetition value is 1 if reading is not duplicated. 2 if repeated twice and so on (E-mon D-mon meters)
- * @param {boolean} onlyEndTime true if the data only has an endTimestamp, default false
- * @param {string} timeSort the canonical order sorted by date/time in which the data appears in the data file, default 'increasing'
+ * @param {boolean} isEndTime true if the data only has an endTimestamp, default false
  * @param {dict} conditionSet used to validate readings (minVal, maxVal, minDate, maxDate, interval, maxError)
  * @param {array} conn the connection to the database
  */
-async function processData(rows, meterID, isCumulative, cumulativeReset, resetStart = '00:00:00.000',
-	resetEnd = '23:59:99.999', readingGap = 0, readingLengthVariation = 0, readingRepetition, onlyEndTime = false,
-	timeSort = 'increasing', conditionSet, conn) {
+async function processData(rows, meterID, timeSort = 'increasing', readingRepetition, isCumulative, cumulativeReset,
+	resetStart = '00:00:00.000', resetEnd = '23:59:99.999', readingGap = 0, readingLengthVariation = 0, isEndTime = false,
+	conditionSet, conn) {
 	// If processData is successfully finished then return result = [R0, R1, R2...RN]
 	const result = [];
 	const readingsDropped = [];
@@ -75,9 +75,22 @@ async function processData(rows, meterID, isCumulative, cumulativeReset, resetSt
 	let currentReading = new Reading(meterID, meterReading, startTimestamp, endTimestamp);
 	let prevReading = currentReading;
 	let readingOK = true;
-	for (let index = 0; index < rows.length; index += readingRepetition) {
+	// Control values for the loop. By reversing the loop if the readings are decreasing in time they appear
+	// to be increasing so it is very similar to the increasing case.
+	let startLoop;
+	let stepLoop;
+	if (isAscending) {
+		// The data increases in time so process from first to last row.
+		startLoop = 0;
+		stepLoop = readingRepetition;
+	} else {
+		// The data decreases in time so process from the last to first row.
+		startLoop = rows.length - readingRepetition;
+		stepLoop = -readingRepetition;
+	}
+	for (let index = startLoop; continueLoop(index, isAscending, rows.length); index += stepLoop) {
 		errMsg = '';
-		if (onlyEndTime) {
+		if (isEndTime) {
 			// The startTimestamp of this reading is the endTimestamp of the previous reading
 			startTimestamp = prevReading.endTimestamp;
 			endTimestamp = moment(rows[index][1], ['YYYY/MM/DD HH:mm', 'MM/DD/YYYY HH:mm']);
@@ -90,16 +103,8 @@ async function processData(rows, meterID, isCumulative, cumulativeReset, resetSt
 		if (isCumulative) {
 			meterReading1 = meter.reading; // In cumulative this is the canonical previous raw reading
 			meterReading2 = rows[index][0]; // In cumulative this is the canonical current raw reading
-
 			// In cumulative the reading we use will be the difference between the current raw reading and the previous raw reading
-			// Note the above assumes that the csv file is sorted in ASCENDING ORDER. If it is not in ascending order we must change this
-
-			if (isAscending) {
-				meterReading = meterReading2 - meterReading1; // use this ifCumulative. This is the net reading value
-			}
-			else {
-				meterReading = meterReading1 - meterReading2;
-			}
+			meterReading = meterReading2 - meterReading1;
 			meter.reading = meterReading2; // Always update the meter table with the most current raw cumulative value
 		}
 		else {
@@ -107,75 +112,64 @@ async function processData(rows, meterID, isCumulative, cumulativeReset, resetSt
 			meterReading = rows[index][0];
 			meter.reading = meterReading;
 		}
+		// This value is used when logging messages if done before the last section.
+		const logReading = new Reading(meterID, meterReading, startTimestamp, endTimestamp);
 		if (isCumulative && isFirst(prevReading.endTimestamp)) {
 			readingOK = false;
 			errMsg = 'The first ever reading must be dropped when dealing with cumulative data. ';
 		}
-		if (onlyEndTime && isFirst(prevReading.endTimestamp)) {
+		if (isEndTime && isFirst(prevReading.endTimestamp)) {
 			readingOK = false;
 			errMsg += 'The first ever reading must be dropped when dealing only with endTimestamps.';
 		}
 		if (readingOK && startTimestamp.isSameOrAfter(endTimestamp)) {
 			readingOK = false;
 			errMsg = 'The reading end time is not after the start time.';
-			if (onlyEndTime) {
+			if (isEndTime) {
 				errMsg += ' The start time came from the previous readings end time.';
 			}
 		}
 		if (readingOK) {
 			// Check that startTimestamp is not before the previous endTimestamp
-			if (onlyEndTime && endTimestamp.isSameOrBefore(prevReading.endTimestamp)) {
+			if (isEndTime && endTimestamp.isSameOrBefore(prevReading.endTimestamp)) {
 				readingOK = false;
 				errMsg = 'The reading is not after the previous reading with only end time given so we must drop the reading.';
-			}
-			else if ((!isAscending && startTimestamp.isAfter(prevReading.endTimestamp))
-				|| (isAscending && startTimestamp.isBefore(prevReading.endTimestamp))) {
+			} else if (startTimestamp.isBefore(prevReading.endTimestamp)) {
 				if (isCumulative) {
-					/* Check if the data is in ascending order. If it is and the start time of the current reading by canonical order is
-					*  before the previous readings end time then reject because OED must subtract the previous reading value which cannot be done
-					*
-					*  If the data is in descending order and the start time of the current reading by canonical order is after the previous readings
-					*  end time then also reject because OED cannot use the previous reading value in order to determine the correct net
-					*  reading value.*/
+					// If start time of the current reading by canonical order is before the previous readings end time then reject
+					// because OED must subtract the previous reading value which cannot be done
 					readingOK = false;
-					if (isAscending) {
-						errMsg = 'The reading start time is before the previous end time and the data is cumulative and in ascending order so OED cannot use this reading.';
-					}
-					else {
-						errMsg = 'The reading start time is after the previous end time and the data is cumulative and in descending order so OED cannot use this reading.';
-					}
-				}
-				else if (!isFirst(prevReading.endTimestamp)) {
+					errMsg = 'The reading start time is before the previous end time and the data is cumulative so OED cannot use this reading.';
+				} else if (!isFirst(prevReading.endTimestamp)) {
 					//Only treat this as a warning since the readings may be sent in a different order.
 					errMsg = 'The current reading startTime is not after the previous reading\'s end time. Note this is treated only as a warning since readings may be sent out of order. ';
 				}
 			}
 		}
-		if ((readingOK && isAscending && Math.abs(startTimestamp.diff(prevReading.endTimestamp)) > msReadingGap)
-			|| (readingOK && !isAscending && Math.abs(endTimestamp.diff(prevReading.startTimestamp)) > msReadingGap)) {
+		if (readingOK && Math.abs(startTimestamp.diff(prevReading.endTimestamp)) > msReadingGap) {
 			if (isCumulative) {
-				/* Check if the data is in ascending order. If it is and the start time of the current reading by canonical order is not
+				/* If the current reading by canonical order is not
 				*  immediately after the previous reading by canonical order then there is a gap. If the gap is greater than the expected
-				*  variation then OED should drop this reading.
-				*
-				*  If the data is in descending order and the start time of the previous reading by canonical order is not immediately after 
-				*  the current reading's end time by canonical order then there is also a gap. If this gap is greater than the expected variation
-				*  then OED should also drop this reading.*/
+				*  variation then OED should drop this reading. */
 				readingOK = false;
 				errMsg = 'The end of the previous reading is too far from the start of the next readings in cumulative data so drop this reading. ';
-			}
-			else if (!isFirst(prevReading.endTimestamp)) {
+			} else if (!isFirst(prevReading.endTimestamp)) {
 				// Only treat this as a warning. We don't warn on the first ever reading since we expect a gap in that case.
 				errMsg += 'There is a gap in time between this reading and the previous reading that exceeds the allowed amount of ' +
 					msReadingGap / 1000 + ' seconds';
 			}
 		}
 		if (readingOK) {
-			// Reject negative readings
-			if (isCumulative && meterReading1 < 0) {
+			// Reject negative readings for cumulative.
+			// Note one can make the case that we should accept them since we don't automatically exclude negative readings.
+			// The conditionSet could be used instead to catch this if desired. However, we decided that cumulative
+			// normally don't go negative so are excluding these values.
+			// This could be changed by commenting out this block of code. Note that the next reading will be larger than
+			// what is received since subtracting the previous negative reading.
+			if (isCumulative && meterReading2 < 0) {
 				// If the value isCumulative and the prior reading is negative reject because OED cannot accept any negative readings.
 				// You go back by readingRepetition since this is the previous reading.
-				let negRow = index - readingRepetition + 1;
+				let negRow = row(index, isAscending, rows.length) - readingRepetition + 1;
 				if (negRow < 1) {
 					// The previous reading came from meter not this CSV file.
 					log.error('The last meter reading (logical previous reading) was negative with value ' + meterReading1 +
@@ -184,70 +178,55 @@ async function processData(rows, meterID, isCumulative, cumulativeReset, resetSt
 					log.error('Error parsing Reading #' + negRow +
 						'. Detected a negative value while handling cumulative readings so all reading are rejected.');
 				}
-				logStatus(negRow, prevReading, currentReading, isCumulative, cumulativeReset, resetStart,
-					resetEnd, readingGap, readingLengthVariation, readingRepetition, onlyEndTime,
-					timeSort);
-					return [];
+				logStatus(negRow, prevReading, logReading, timeSort, readingRepetition, isCumulative, cumulativeReset,
+					resetStart, resetEnd, readingGap, readingLengthVariation, isEndTime);
+				return [];
 			}
 			// To handle net cumulative readings which are negative.
 			if (meterReading < 0) {
 				// if meterReading is negative and cumulative check that the times fall within an acceptable reset range
 				if (handleCumulativeReset(cumulativeReset, resetStart, resetEnd, startTimestamp)) {
 					// If there is a cumulative reset then the meterReading should always use the canonical previous raw reading value
-					if (isAscending) {
-						// For data which is in ascending order the canonical previous raw reading value = meterReading2;
-						meterReading = meterReading2;
-					}
-					else {
-						// For data which is in descending order the canonical previous raw reading value = meterReading1;
-						meterReading = meterReading1;
-					}
-				}
-				else {
+					meterReading = meterReading2;
+				} else {
 					//cumulativeReset is not expected but there is a negative net meter reading so reject all readings.
 					errMsg = ('A negative meterReading has been detected but either cumulativeReset is not enabled, or the start time and end time of this reading is out of the reset range. Reject all readings.')
-					log.error('Error parsing Reading #' + (index + 1) + '. Reading value of ' + meterReading2 + ' gives ' + meterReading + ' with error message: ' + '\"' + errMsg + '\"');
-					logStatus(index + 1, prevReading, currentReading, isCumulative, cumulativeReset, resetStart,
-						resetEnd, readingGap, readingLengthVariation, readingRepetition, onlyEndTime,
-						timeSort);
-							return [];
+					log.error('Error parsing Reading #' + row(index, isAscending, rows.length) + '. Reading value of ' + meterReading2 + ' gives ' + meterReading + ' with error message: ' + '\"' + errMsg + '\"');
+					logStatus(row(index, isAscending, rows.length), prevReading, logReading, timeSort, readingRepetition, isCumulative, cumulativeReset,
+						resetStart, resetEnd, readingGap, readingLengthVariation, isEndTime);
+					return [];
 				}
 			}
-			if (readingOK) {
-				if (Math.abs(prevReading.endTimestamp.diff(prevReading.startTimestamp) - endTimestamp.diff(startTimestamp))
-					> msReadingLengthVariation && !isFirst(prevReading.endTimestamp)) {
+		}
+		if (readingOK) {
+			if (Math.abs(prevReading.endTimestamp.diff(prevReading.startTimestamp) - endTimestamp.diff(startTimestamp))
+				> msReadingLengthVariation && !isFirst(prevReading.endTimestamp)) {
+					// The previous reading cannot be the the first one since reading length not from a real reading.
+				if (!isFirst(prevReading.startTimestamp)) {
 					errMsg = 'The previous reading has a different time length than the current reading and exceeds the tolerance of ' +
 						msReadingLengthVariation / 1000 +
 						' seconds. Note this is treated only as a warning since this may be expected for certain meters.';
 					// If this is true we still add the reading to the results
 				}
-				if (!(errMsg === '')) {
-					// There may be warnings to output even if OED accepts the readings so output all warnings which may exist
-					log.warn('Warning parsing Reading #' + (index + 1) + '. Reading value gives ' + meterReading + ' with warning message: ' + '\"' + errMsg + '\"');
-					logStatus(index + 1, prevReading, currentReading, isCumulative, cumulativeReset, resetStart,
-						resetEnd, readingGap, readingLengthVariation, readingRepetition, onlyEndTime,
-						timeSort);
-						}
-				// This reading has passed all checks and can be added to result
-				currentReading = new Reading(meterID, meterReading, startTimestamp, endTimestamp);
-				result.push(currentReading);
-				if (index === rows.length - 1) {
-					// Update the meter to contain information for the last reading in the data file
-					meter.startTimestamp = startTimestamp;
-					meter.endTimestamp = endTimestamp;
-					meter.update(conn);
-				}
 			}
-		}
-		if (!readingOK) {
+			// This reading has passed all checks and can be added to result
+			currentReading = new Reading(meterID, meterReading, startTimestamp, endTimestamp);
+			if (!(errMsg === '')) {
+				// There may be warnings to output even if OED accepts the readings so output all warnings which may exist
+				log.warn('Warning parsing Reading #' + row(index, isAscending, rows.length) + '. Reading value gives ' +
+					meterReading + ' with warning message: ' + '\"' + errMsg + '\"');
+				logStatus(row(index, isAscending, rows.length), prevReading, currentReading, timeSort, readingRepetition, isCumulative, cumulativeReset,
+					resetStart, resetEnd, readingGap, readingLengthVariation, isEndTime);
+			}
+			result.push(currentReading);
+			if (row(index, isAscending, rows.length) === rows.length) {
+				// Update the meter to contain information for the last reading in the data file
+				meter.startTimestamp = startTimestamp;
+				meter.endTimestamp = endTimestamp;
+				meter.update(conn);
+			}
+		} else {
 			// An error occurred so add it to the readings dropped array and let the client know why before continuing
-			log.error('Error parsing Reading #' + (index + 1) + '. Reading value gives ' + meterReading + ' with error message: ' + '\"' + errMsg + '\"');
-			logStatus(index + 1, prevReading, currentReading, isCumulative, cumulativeReset, resetStart,
-				resetEnd, readingGap, readingLengthVariation, readingRepetition, onlyEndTime,
-				timeSort);
-			readingOK = true;
-			// index-readingReptition = reading # dropped in the data
-			readingsDropped.push(index + 1);
 			/* If the data is cumulative then regardless of if it comes with end timestamps only or both end timestamps and start timestamps
 			*  the first reading ever should become the previous reading. This is necessary because there are no previous readings in the db
 			*  yet so we must drop the first point ever and use this first point as the first previous reading in order to begin calculating
@@ -256,10 +235,16 @@ async function processData(rows, meterID, isCumulative, cumulativeReset, resetSt
 			*  If the data is not cumulative but there are only end timestamps then we still must drop the first reading ever in order to use
 			*  that reading as the first start timestamp for the next reading. All following readings can then use the previous end timestamps
 			*  as the current readings start timestamp until all further readings have been processed.*/
-			if (isCumulative && !onlyEndTime || !isCumulative && onlyEndTime || isCumulative && onlyEndTime) {
+			if (isCumulative || (!isCumulative && isEndTime)) {
 				currentReading = new Reading(meterID, meterReading, startTimestamp, endTimestamp);
 				// This currentReading will become the previousReading for the first reading if isCumulative is true
 			}
+			log.error('Error parsing Reading #' + row(index, isAscending, rows.length) + '. Reading value gives ' + meterReading + ' with error message: ' + '\"' + errMsg + '\"');
+			logStatus(row(index, isAscending, rows.length), prevReading, currentReading, timeSort, readingRepetition, isCumulative, cumulativeReset,
+				resetStart, resetEnd, readingGap, readingLengthVariation, isEndTime);
+			readingOK = true;
+			// index-readingRepetition = reading # dropped in the data
+			readingsDropped.push(row(index, isAscending, rows.length));
 		}
 		prevReading = currentReading;
 	}
@@ -279,20 +264,53 @@ function isFirst(t) {
 	return t.isSame(E0);
 }
 
+/** Tell if the main for loop should continue.
+ * @param index the current index of the loop
+ * @param isAscending true if rows are chronologically increasing and false if reverse
+ * @param length the number of rows
+ * @returns true if loop should continue and false otherwise
+ */
+function continueLoop(index, isAscending, length) {
+	if (isAscending) {
+		// The loop is increasing chronologically so need to see if past end of array
+		// since going from first to last.
+		return index < length;
+	} else {
+		// The loop is decreasing chronologically so need to see if past start of array
+		// since going from last to first.
+		return index >= 0;
+	}
+}
+
+/** Converts the loop index into a reading row.
+ * @param index the current index of the loop
+ * @param isAscending true if rows are chronologically increasing and false if reverse
+ * @param length the number of rows
+ * @returns reading row from index
+ */
+function row(index, isAscending, length) {
+	if (isAscending) {
+		// Started with row 0/first row of CSV so readings are shifted up by 1.
+		return index + 1
+	} else {
+		// Stared with last row of CSV so readings are the number of readings minus the index.
+		return length - index;
+	}
+}
+
 /**
  * info logs information about pipeline where parameters are all the current information.
  * This is normally done right after something was logged to give more context.
  * Note that the logging sometimes puts the output a little earlier/later when there are
  * multiple messages. It seems to be something about the logging and not looked into.
  */
-function logStatus(row, prevReading, currentReading, isCumulative, cumulativeReset, resetStart,
-	resetEnd, readingGap, readingLengthVariation, readingRepetition, onlyEndTime,
-	timeSort) {
-	log.info('For reading #' + row + ' in pipeline: ' + 'previous reading has value ' + prevReading.reading + ' start time '
+function logStatus(rowNum, prevReading, currentReading, timeSort, readingRepetition, isCumulative,
+	cumulativeReset, resetStart, resetEnd, readingGap, readingLengthVariation, onlyEndTime) {
+	log.info('For reading #' + rowNum + ' in pipeline: ' + 'previous reading has value ' + prevReading.reading + ' start time '
 		+ prevReading.startTimestamp.format() + ' end time ' + prevReading.endTimestamp.format() + ' and current reading has value '
 		+ currentReading.reading + ' start time ' + currentReading.startTimestamp.format() + ' end time ' + currentReading.endTimestamp.format()
-		+ ' with cumulative ' + isCumulative + ' cumulativeReset ' + cumulativeReset + ' cumulativeResetStart ' + resetStart +
-		'; cumulativeResetEnd ' + resetEnd + ' lengthGap ' + readingGap + ' lengthVariation ' + readingLengthVariation + '; duplications '
-		+ readingRepetition + ' onlyEndTime ' + onlyEndTime + ' timeSort ' + timeSort);
+		+ ' with timeSort ' + timeSort + '; duplications '
+		+ readingRepetition + '; cumulative ' + isCumulative + '; cumulativeReset ' + cumulativeReset + '; cumulativeResetStart ' + resetStart +
+		'; cumulativeResetEnd ' + resetEnd + '; lengthGap ' + readingGap + '; lengthVariation ' + readingLengthVariation + '; onlyEndTime ' + onlyEndTime);
 }
 module.exports = processData;

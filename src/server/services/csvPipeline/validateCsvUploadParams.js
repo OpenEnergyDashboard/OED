@@ -52,16 +52,17 @@ const DEFAULTS = {
 	meters: {
 	},
 	readings: {
-		createMeter: 'false',
+		timeSort: undefined,
+		duplications: undefined,
 		cumulative: BooleanTypesJS.meter,
 		cumulativeReset: BooleanTypesJS.meter,
 		cumulativeResetStart: undefined,
 		cumulativeResetEnd: undefined,
-		duplications: undefined,
 		lengthGap: undefined,
 		lengthVariation: undefined,
-		refreshReadings: 'false',
-		timeSort: undefined
+		endOnly: undefined,
+		createMeter: 'false',
+		refreshReadings: 'false'
 	}
 }
 
@@ -71,10 +72,10 @@ const DEFAULTS = {
 // (i.e. when the user performs a curl request to the pipeline). Thus, we list these properties 
 // here so that they do not falsely trigger the 'additionalProperties' User Error.
 const COMMON_PROPERTIES = {
-	gzip: new BooleanParam('gzip'),
-	headerRow: new BooleanParam('headerRow'),
 	email: new StringParam('email', undefined, undefined),
 	password: new StringParam('password', undefined, undefined),
+	gzip: new BooleanParam('gzip'),
+	headerRow: new BooleanParam('headerRow'),
 	update: new BooleanParam('update')
 }
 
@@ -93,17 +94,18 @@ const VALIDATION = {
 		required: ['meterName'],
 		properties: {
 			...COMMON_PROPERTIES,
-			createMeter: new BooleanParam('createMeter'),
+			meterName: new StringParam('meterName', undefined, undefined),
+			timeSort: new EnumParam('timeSort', [TimeSortTypesJS.increasing, TimeSortTypesJS.decreasing, TimeSortTypesJS.meter]),
+			duplications: new StringParam('duplications', '^\\d+$|^(?![\s\S])', 'duplications must be an integer or empty.'),
 			cumulative: new EnumParam('cumulative', [BooleanTypesJS.true, BooleanTypesJS.false, BooleanTypesJS.meter]),
 			cumulativeReset: new EnumParam('cumulativeReset', [BooleanTypesJS.true, BooleanTypesJS.false, BooleanTypesJS.meter]),
 			cumulativeResetStart: new StringParam('cumulativeResetStart', undefined, undefined),
 			cumulativeResetEnd: new StringParam('cumulativeResetEnd', undefined, undefined),
-			duplications: new StringParam('duplications', '^\\d+$|^(?![\s\S])', 'duplications must be an integer or empty.'),
-			meterName: new StringParam('meterName', undefined, undefined),
 			lengthGap: new StringParam('lengthGap', undefined, undefined),
 			lengthVariation: new StringParam('lengthVariation', undefined, undefined),
-			refreshReadings: new BooleanParam('refreshReadings'),
-			timeSort: new EnumParam('timeSort', [TimeSortTypesJS.increasing, TimeSortTypesJS.decreasing, TimeSortTypesJS.meter])
+			endOnly: new EnumParam('endOnly', [BooleanTypesJS.true, BooleanTypesJS.false, BooleanTypesJS.meter]),
+			createMeter: new BooleanParam('createMeter'),
+			refreshReadings: new BooleanParam('refreshReadings')
 		},
 		additionalProperties: false // This protects us from unintended parameters as well as typos.
 	}

@@ -35,16 +35,15 @@ async function insertObviusData(serialNumber, ipAddress, logfile) {
 				return [reading, startTimestamp, endTimestamp];
 			},
 			// For the next set of values we don't get from Obvius so use meter defaults.
+			timeSort = meter.timeSort,
+			readingRepetition = meter.readingDuplication,
 			isCumulative = meter.cumulative,
 			cumulativeReset = meter.cumulativeReset,
-			meter.cumulativeResetStart,
-			meter.cumulativeResetEnd,
-			meter.readingGap,
-			meter.readingVariation,
-			// TODO Currently this is not on meter so assume no duplication.
-			1,
-			// TODO Currently this is not on meter so assume increasing.
-			'increasing',
+			cumulativeResetStart = meter.cumulativeResetStart,
+			cumulativeResetEnd = meter.cumulativeResetEnd,
+			readingGap = meter.readingGap,
+			readingLengthVariation = meter.readingVariation,
+			isEndOnly = meter.endOnlyTime,
 			conditionSet = undefined,
 			conn = conn);
 	}

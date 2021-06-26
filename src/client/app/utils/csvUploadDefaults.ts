@@ -8,19 +8,20 @@ import { ReadingsCSVUploadPreferencesItem, MetersCSVUploadPreferencesItem, TimeS
 // specified in /src/server/services/csvPipeline/validateCsvUploadParams and with /src/server/sql/create_meters_table.sql.
 // TODO: Some values such as cumulative, cumulativeReset, cumulativeResetStart, cumulativeResetEnd should be loaded from the server.
 export const ReadingsCSVUploadDefaults: ReadingsCSVUploadPreferencesItem = {
-	createMeter: false,
+	meterName: '',
+	timeSort: TimeSortTypes.meter,
+	duplications: '',
 	cumulative: BooleanTypes.meter,
 	cumulativeReset: BooleanTypes.meter,
 	cumulativeResetStart: '',
 	cumulativeResetEnd: '',
-	duplications: '',
-	gzip: false,
-	headerRow: false,
 	lengthGap: '',
 	lengthVariation: '',
-	meterName: '',
+	endOnly: BooleanTypes.meter,
+	createMeter: false,
+	gzip: false,
+	headerRow: false,
 	refreshReadings: false,
-	timeSort: TimeSortTypes.meter,
 	update: false
 }
 

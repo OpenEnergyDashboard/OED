@@ -28,7 +28,7 @@ mocha.describe('PIPELINE: insert MetasysData from csv file', () => {
 			conn = testDB.getConnection();
 			const testFilePath = path.join(__dirname, 'data', 'metasys-duplicate.csv');
 			await insertMetasysData(testFilePath, 60, 2, true, true, conn);
-			const { reading } = await conn.one('SELECT reading FROM readings LIMIT 1');
+			const { reading } = await conn.one('SELECT reading FROM readings ORDER BY start_timestamp DESC LIMIT 1');
 			expect(parseInt(reading)).to.equal(280);
 		});
 	});

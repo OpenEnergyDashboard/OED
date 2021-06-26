@@ -29,15 +29,16 @@ export default class ReadingsCSVUploadComponent extends React.Component<Readings
 	private fileInput: React.RefObject<HTMLInputElement>;
 	constructor(props: ReadingsCSVUploadProps) {
 		super(props);
-		this.handleSelectCumulative = this.handleSelectCumulative.bind(this);
-		this.handleSelectCumulativeReset = this.handleSelectCumulativeReset.bind(this);
+		this.handleSetMeterName = this.handleSetMeterName.bind(this);
+		this.handleSetTimeSort = this.handleSetTimeSort.bind(this);
+		this.handleSetDuplications = this.handleSetDuplications.bind(this);
+		this.handleSetCumulative = this.handleSetCumulative.bind(this);
+		this.handleSetCumulativeReset = this.handleSetCumulativeReset.bind(this);
 		this.handleSetCumulativeResetStart = this.handleSetCumulativeResetStart.bind(this);
 		this.handleSetCumulativeResetEnd = this.handleSetCumulativeResetEnd.bind(this);
 		this.handleSetLengthGap = this.handleSetLengthGap.bind(this);
 		this.handleSetLengthVariation = this.handleSetLengthVariation.bind(this);
-		this.handleSelectDuplications = this.handleSelectDuplications.bind(this);
-		this.handleSelectTimeSort = this.handleSelectTimeSort.bind(this);
-		this.handleSetMeterName = this.handleSetMeterName.bind(this);
+		this.handleSetEndOnly = this.handleSetEndOnly.bind(this);
 		this.handleSubmit = this.handleSubmit.bind(this);
 		this.fileInput = React.createRef();
 	}
@@ -57,27 +58,27 @@ export default class ReadingsCSVUploadComponent extends React.Component<Readings
 		}
 	}
 
-	private handleSelectDuplications(e: React.ChangeEvent<HTMLInputElement>) {
-		const target = e.target;
-		this.props.selectDuplications(target.value);
-	}
-
-	private handleSelectTimeSort(e: React.ChangeEvent<HTMLInputElement>) {
-		const target = e.target;
-		this.props.selectTimeSort(target.value as TimeSortTypes);
-	}
-
 	private handleSetMeterName(e: React.ChangeEvent<HTMLInputElement>) {
 		const target = e.target;
 		this.props.setMeterName(target.value);
 	}
 
-	private handleSelectCumulative(e: React.ChangeEvent<HTMLInputElement>) {
+	private handleSetTimeSort(e: React.ChangeEvent<HTMLInputElement>) {
+		const target = e.target;
+		this.props.selectTimeSort(target.value as TimeSortTypes);
+	}
+
+	private handleSetDuplications(e: React.ChangeEvent<HTMLInputElement>) {
+		const target = e.target;
+		this.props.selectDuplications(target.value);
+	}
+
+	private handleSetCumulative(e: React.ChangeEvent<HTMLInputElement>) {
 		const target = e.target;
 		this.props.selectCumulative(target.value as BooleanTypes);
 	}
 
-	private handleSelectCumulativeReset(e: React.ChangeEvent<HTMLInputElement>) {
+	private handleSetCumulativeReset(e: React.ChangeEvent<HTMLInputElement>) {
 		const target = e.target;
 		this.props.selectCumulativeReset(target.value as BooleanTypes);
 	}
@@ -100,6 +101,11 @@ export default class ReadingsCSVUploadComponent extends React.Component<Readings
 	private handleSetLengthVariation(e: React.ChangeEvent<HTMLInputElement>) {
 		const target = e.target;
 		this.props.setLengthVariation(target.value);
+	}
+
+	private handleSetEndOnly(e: React.ChangeEvent<HTMLInputElement>) {
+		const target = e.target;
+		this.props.selectEndOnly(target.value as BooleanTypes);
 	}
 
 	public render() {
@@ -134,7 +140,7 @@ export default class ReadingsCSVUploadComponent extends React.Component<Readings
 							<FormattedMessage id='csv.readings.param.time.sort' />
 						</Label>
 						<Col sm={8}>
-							<Input type='select' name='timeSort' onChange={this.handleSelectTimeSort}>
+							<Input type='select' name='timeSort' onChange={this.handleSetTimeSort}>
 								<option value={TimeSortTypes.meter}> {TimeSortTypes.meter} </option>
 								<option value={TimeSortTypes.increasing}> {TimeSortTypes.increasing} </option>
 								<option value={TimeSortTypes.decreasing}> {TimeSortTypes.decreasing} </option>
@@ -146,7 +152,7 @@ export default class ReadingsCSVUploadComponent extends React.Component<Readings
 							<FormattedMessage id='csv.readings.param.duplications' />
 						</Label>
 						<Col sm={8}>
-							<Input value={this.props.duplications} type='select' name='duplications' onChange={this.handleSelectDuplications}>
+							<Input value={this.props.duplications} type='select' name='duplications' onChange={this.handleSetDuplications}>
 								{range(1, 10).map(i => (
 									<option key={i} value={`${i}`}> {i} </option>
 								))}
@@ -164,7 +170,7 @@ export default class ReadingsCSVUploadComponent extends React.Component<Readings
 									<FormattedMessage id='csv.readings.param.cumulative' />
 								</Label>
 								<Col sm={12}>
-									<Input type='select' name='cumulative' onChange={this.handleSelectCumulative}>
+									<Input type='select' name='cumulative' onChange={this.handleSetCumulative}>
 										<option value={BooleanTypes.meter}> {BooleanTypes.meter} </option>
 										<option value={BooleanTypes.true}> {BooleanTypes.true} </option>
 										<option value={BooleanTypes.false}> {BooleanTypes.false} </option>
@@ -176,7 +182,7 @@ export default class ReadingsCSVUploadComponent extends React.Component<Readings
 									<FormattedMessage id='csv.readings.param.cumulative.reset' />
 								</Label>
 								<Col sm={12}>
-									<Input type='select' name='cumulativeReset' onChange={this.handleSelectCumulativeReset}>
+									<Input type='select' name='cumulativeReset' onChange={this.handleSetCumulativeReset}>
 										<option value={BooleanTypes.meter}> {BooleanTypes.meter} </option>
 										<option value={BooleanTypes.true}> {BooleanTypes.true} </option>
 										<option value={BooleanTypes.false}> {BooleanTypes.false} </option>
@@ -234,6 +240,18 @@ export default class ReadingsCSVUploadComponent extends React.Component<Readings
 							</FormGroup>
 						</Col>
 					</FormGroup>
+					<FormGroup>
+						<Label style={titleStyle}>
+							<FormattedMessage id='csv.readings.param.endOnly' />
+						</Label>
+						<Col sm={8}>
+							<Input type='select' name='endOnly' onChange={this.handleSetEndOnly}>
+								<option value={BooleanTypes.meter}> {BooleanTypes.meter} </option>
+								<option value={BooleanTypes.true}> {BooleanTypes.true} </option>
+								<option value={BooleanTypes.false}> {BooleanTypes.false} </option>
+							</Input>
+						</Col>
+					</FormGroup>
 					<FormGroup check style={checkboxStyle}>
 						<Label check>
 							<Input checked={this.props.createMeter} type='checkbox' name='createMeter' onChange={this.props.toggleCreateMeter} />
@@ -254,14 +272,14 @@ export default class ReadingsCSVUploadComponent extends React.Component<Readings
 					</FormGroup>
 					<FormGroup check style={checkboxStyle}>
 						<Label check>
-							<Input checked={this.props.refreshReadings} type='checkbox' name='refreshReadings' onChange={this.props.toggleRefreshReadings} />
-							<FormattedMessage id='csv.readings.param.refresh.readings' />
+							<Input checked={this.props.update} type='checkbox' name='update' onChange={this.props.toggleUpdate} />
+							<FormattedMessage id='csv.common.param.update' />
 						</Label>
 					</FormGroup>
 					<FormGroup check style={checkboxStyle}>
 						<Label check>
-							<Input checked={this.props.update} type='checkbox' name='update' onChange={this.props.toggleUpdate} />
-							<FormattedMessage id='csv.common.param.update' />
+							<Input checked={this.props.refreshReadings} type='checkbox' name='refreshReadings' onChange={this.props.toggleRefreshReadings} />
+							<FormattedMessage id='csv.readings.param.refresh.readings' />
 						</Label>
 					</FormGroup>
 					<Button type='submit'>

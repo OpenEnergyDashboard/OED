@@ -49,6 +49,8 @@ The script also describes how to delete all the meters/readings if you want to r
    </td>
    <td>Duplication
    </td>
+   <td>End only
+   </td>
    <td>Description
    </td>
   </tr>
@@ -68,6 +70,8 @@ The script also describes how to delete all the meters/readings if you want to r
    <td>
    </td>
    <td>
+   </td>
+    <td>
    </td>
    <td>Normal 1-5 values
    </td>
@@ -89,7 +93,9 @@ The script also describes how to delete all the meters/readings if you want to r
    </td>
    <td>
    </td>
-   <td>Decreasing time for readings but expect usual values.
+   <td>
+   </td>
+    <td>Decreasing time for readings but expect usual values.
    </td>
   </tr>
   <tr>
@@ -109,7 +115,9 @@ The script also describes how to delete all the meters/readings if you want to r
    </td>
    <td>
    </td>
-   <td>Drops 1<sup>st</sup> reading as expected
+   <td>
+   </td>
+    <td>Drops 1<sup>st</sup> reading as expected
    </td>
   </tr>
   <tr>
@@ -129,7 +137,9 @@ The script also describes how to delete all the meters/readings if you want to r
    </td>
    <td>
    </td>
-   <td>Decreasing in time. Drops 1<sup>st</sup> reading as expected.
+   <td>
+   </td>
+    <td>Decreasing in time. Drops 1<sup>st</sup> reading as expected.
    </td>
   </tr>
   <tr>
@@ -149,7 +159,9 @@ The script also describes how to delete all the meters/readings if you want to r
    </td>
    <td>
    </td>
-   <td>Drops 1<sup>st</sup> reading as expected
+   <td>
+   </td>
+    <td>Drops 1<sup>st</sup> reading as expected
    </td>
   </tr>
   <tr>
@@ -169,7 +181,9 @@ The script also describes how to delete all the meters/readings if you want to r
    </td>
    <td>
    </td>
-   <td>Same as above but explicit reset times and backward for start/end
+   <td>
+   </td>
+    <td>Same as above but explicit reset times and backward for start/end
    </td>
   </tr>
   <tr>
@@ -189,7 +203,9 @@ The script also describes how to delete all the meters/readings if you want to r
    </td>
    <td>
    </td>
-   <td>Similar to above but reset times wrong so drops all readings; forward for start/end reset
+   <td>
+   </td>
+    <td>Similar to above but reset times wrong so reading 4 wrong and drops all readings; forward for start/end reset
    </td>
   </tr>
   <tr>
@@ -209,7 +225,9 @@ The script also describes how to delete all the meters/readings if you want to r
    <td>
   </td>
   </td>
-   <td>Same as second midnight above above but reset times tight so see all but first value
+   <td>
+   </td>
+    <td>Same as second midnight above above but reset times tight so see all but first value
    </td>
   </tr>
   <tr>
@@ -229,7 +247,9 @@ The script also describes how to delete all the meters/readings if you want to r
    </td>
    <td>
    </td>
-   <td>Make sure rejects all readings if reset not indicated
+   <td>
+   </td>
+    <td>Make sure rejects all readings if reset not indicated where reading 4 causes issue.
    </td>
   </tr>
   <tr>
@@ -249,7 +269,9 @@ The script also describes how to delete all the meters/readings if you want to r
    </td>
    <td>
    </td>
-   <td>Allows reset at any time so all but first value.
+   <td>
+   </td>
+    <td>Allows reset at any time so all but first value.
    </td>
   </tr>
   <tr>
@@ -269,7 +291,9 @@ The script also describes how to delete all the meters/readings if you want to r
    </td>
    <td>
    </td>
-   <td>Make sure rejects all readings if reset not indicated
+   <td>
+   </td>
+    <td>Make sure rejects all readings if reset not indicated where reading 4 is the issue
    </td>
   </tr>
   <tr>
@@ -289,7 +313,9 @@ The script also describes how to delete all the meters/readings if you want to r
    </td>
    <td>
    </td>
-   <td>explicit reset times and forward for start/end so same as 2 above where all but first.
+   <td>
+   </td>
+    <td>explicit reset times and forward for start/end so same as 2 above where all but first.
    </td>
   </tr>
   <tr>
@@ -309,7 +335,9 @@ The script also describes how to delete all the meters/readings if you want to r
    </td>
    <td>
    </td>
-   <td>reset times wrong and backward for start/end so should have no values
+   <td>
+   </td>
+    <td>reset times wrong and backward for start/end so should have no values where reading 4 is issue
    </td>
   </tr>
   <tr>
@@ -329,7 +357,9 @@ The script also describes how to delete all the meters/readings if you want to r
    </td>
    <td>
    </td>
-   <td>Time varies by 1 & 2 min; All but 1<sup>st</sup> point vary slightly in reading due to time variation  – get low, high, high, low as expected; should get 4 warnings for line 2-5
+   <td>
+   </td>
+    <td>Time varies by 1 & 2 min; All but 1<sup>st</sup> point vary slightly in reading due to time variation  – get low, high, high, low as expected; should get 4 warnings for line 2-5
    </td>
   </tr>
   <tr>
@@ -349,7 +379,9 @@ The script also describes how to delete all the meters/readings if you want to r
    </td>
    <td>
    </td>
-   <td>Time varies by 1 & 2 min and allow 1 min (60 sec); Should warn about lines 3, 5.
+   <td>
+   </td>
+    <td>Time varies by 1 & 2 min and allow 1 min (60 sec); Should warn about lines 3, 5.
    </td>
   </tr>
   <tr>
@@ -369,7 +401,9 @@ The script also describes how to delete all the meters/readings if you want to r
    </td>
    <td>
    </td>
-   <td>Time varies by 1 & 2 min; Should warn about line 5.
+   <td>
+   </td>
+    <td>Time varies by 1 & 2 min; Should warn about line 5.
    </td>
   </tr>
   <tr>
@@ -388,6 +422,8 @@ The script also describes how to delete all the meters/readings if you want to r
    <td>Default
    </td>
    <td>
+   </td>
+    <td>
    </td>
    <td>Should get warning for lines 2 & 4. Length variation so no warnings about that. Point 2 & 4 should be slightly high since shorter length.
    </td>
@@ -409,7 +445,9 @@ The script also describes how to delete all the meters/readings if you want to r
    </td>
    <td>
    </td>
-   <td>Similar to above but now only warning for line 4.
+   <td>
+   </td>
+    <td>Similar to above but now only warning for line 4.
    </td>
   </tr>
   <tr>
@@ -428,6 +466,8 @@ The script also describes how to delete all the meters/readings if you want to r
    <td>120
    </td>
    <td>
+   </td>
+    <td>
    </td>
    <td>Similar to above but no warnings.
    </td>
@@ -449,7 +489,9 @@ The script also describes how to delete all the meters/readings if you want to r
    </td>
    <td>
    </td>
-   <td>Check header. Get standard cum values.
+   <td>
+   </td>
+    <td>Check header. Get standard cum values.
    </td>
   </tr>
   <tr>
@@ -468,6 +510,8 @@ The script also describes how to delete all the meters/readings if you want to r
    <td>
    </td>
    <td>
+   </td>
+    <td>
    </td>
    <td>Check gzip (with header). Get standard cum values.
    </td>
@@ -489,6 +533,8 @@ The script also describes how to delete all the meters/readings if you want to r
    </td>
    <td>3
    </td>
+    <td>
+   </td>
    <td>Repeat every reading 3x but should only see once.  Get standard cum values.
    </td>
   </tr>
@@ -509,12 +555,82 @@ The script also describes how to delete all the meters/readings if you want to r
    </td>
    <td>
    </td>
+    <td>
+   </td>
    <td>Negative reading on #4 with cumulative so should get no reading.
+   </td>
+  </tr>
+<tr>
+   <td>regAscEndonly
+   </td>
+   <td>pipe35
+   </td>
+   <td>
+   </td>
+   <td>
+   <td>
+   </td>
+   </td>
+   <td>
+   </td>
+   <td>
+   </td>
+   <td>
+   </td>
+    <td>X
+   </td>
+   <td>Must drop first value in end only so looks like regular cumulative values.
+   </td>
+  </tr>
+  <tr>
+   <td>regDscEndonly
+   </td>
+   <td>pipe36
+   </td>
+   <td>X
+   </td>
+   <td>
+   <td>
+   </td>
+   </td>
+   <td>
+   </td>
+   <td>
+   </td>
+   <td>
+   </td>
+    <td>X
+   </td>
+   <td>Must drop first value in end only so looks like regular cumulative values.
+   </td>
+  </tr>
+  <tr>
+  <td>pipe37
+   </td>
+   <td>X
+   </td>
+   <td>X
+   </td>
+   <td>
+   </td>
+  <td>
+   </td>
+   </td>
+   <td>
+   </td>
+   <td>
+   </td>
+   <td>
+   </td>
+    <td>X
+   </td>
+   <td>Normal cumulative values but get two message since drop first reading because cumulative & end only.
    </td>
   </tr>
   <tr>
    <td>cumAsc & cumAscAdd1 & cumAscAdd2
    </td>
+   regAscEndonly
    <td>pipe23
    </td>
    <td>
@@ -529,6 +645,8 @@ The script also describes how to delete all the meters/readings if you want to r
    </td>
    <td>
    </td>
+    <td>
+   </td>
    <td>Add in cumulative readings via two more uploads of a single value. Expect normal cum readings plus 6 & 7.
    </td>
   </tr>
@@ -541,7 +659,7 @@ The script also describes how to delete all the meters/readings if you want to r
    </td>
    <td>X
    </td>
-   <td>
+   <td>Default
    </td>
    <td>
    </td>
@@ -549,7 +667,9 @@ The script also describes how to delete all the meters/readings if you want to r
    </td>
    <td>
    </td>
-   <td>Add two more values via second curl but this time the first one involves a reset. Expect normal cum readings plus 6 & 7.
+    <td>
+   </td>
+   <td>Add two more values via second curl but this time the second one involves a reset. Expect normal cum readings plus 6 & 7.
    </td>
   </tr>
   <tr>
@@ -568,6 +688,8 @@ The script also describes how to delete all the meters/readings if you want to r
    <td>
    </td>
    <td>
+   </td>
+    <td>
    </td>
    <td>The meter in DB is set to cumulative but not sent via curl. Expect usual cumulative values.
    </td>
@@ -589,6 +711,8 @@ The script also describes how to delete all the meters/readings if you want to r
    </td>
    <td>
    </td>
+    <td>
+   </td>
    <td>The meter in DB is set to cumulative & cumulative_reset but not sent via curl. Expect usual cumulative values.
    </td>
   </tr>
@@ -609,6 +733,8 @@ The script also describes how to delete all the meters/readings if you want to r
    </td>
    <td>
    </td>
+    <td>
+   </td>
    <td>The meter in DB is set to cumulative, cumulative_reset to true & reset range is 11:45-12:15 but not sent via curl. The reset value should be reject row 4 since negative and no readings for meter.
    </td>
   </tr><tr>
@@ -627,6 +753,8 @@ The script also describes how to delete all the meters/readings if you want to r
    <td>
    </td>
    <td>
+   </td>
+    <td>
    </td>
    <td>The meter in DB is set to cumulative, cumulative_reset to true & reset range is 11:45-12:15 but then sent via curl so should reset around midnight. Should get usual cumulative values.
    </td>
@@ -648,6 +776,8 @@ The script also describes how to delete all the meters/readings if you want to r
    </td>
    <td>
    </td>
+    <td>
+   </td>
    <td>The meter in DB is set to reading_gap=60 and reading_variation=120. Should get warning for gap for line 4 and Length variation for line 5. Expect 1, 2+, 3, 4+, 5-, 5- (same as previous point and extra one since last reading goes into next day)
    </td>
   </tr>
@@ -668,7 +798,9 @@ The script also describes how to delete all the meters/readings if you want to r
    </td>
    <td>
    </td>
-   <td>The meter in DB is set to reading_gap=60 and reading_variation=120 but then the curl passes 120 and 121 for gap & variation. Should get Length variation for line 5. Expect 1, 2+, 3, 4+, 5-, 5- (same as previous point and extra one since last reading goes into next day)
+    <td>
+   </td>
+   <td>The meter in DB is set to reading_gap=60 and reading_variation=120 but then the curl passes 120.1 and 121.2 for gap & variation. Should get Length variation for line 5. Expect 1, 2+, 3, 4+, 5-, 5- (same as previous point and extra one since last reading goes into next day). This also checks that floating point numbers come through correctly by seeing message has correct value.
    </td>
   </tr>
 <tr>
@@ -687,6 +819,8 @@ The script also describes how to delete all the meters/readings if you want to r
    <td>
    </td>
    <td>3
+   </td>
+    <td>
    </td>
    <td>The meter in DB is set to reading_duplication=3 and no value in curl. Repeat every reading 3x but should only see once.  Get standard cum values.
    </td>
@@ -708,7 +842,31 @@ The script also describes how to delete all the meters/readings if you want to r
    </td>
    <td>
    </td>
+    <td>
+   </td>
    <td>The meter in DB is set to time_sort='decreasing' and no value in curl. Should get usual values.
+   </td>
+  </tr>
+ <tr>
+   <td>regAscEndonly & meterPipe34 (to create meter)
+   </td>
+   <td>pipe34
+   </td>
+   <td>
+   </td>
+   <td>
+   </td>
+   <td>
+   </td>
+   <td>
+   </td>
+   <td>
+   </td>
+   <td>
+   </td>
+    <td>X
+   </td>
+   <td>The meter in DB is set to end_only_time='true' and no value in curl. Should get usual values with first one dropped.
    </td>
   </tr>
 

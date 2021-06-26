@@ -39,21 +39,23 @@ export interface ReadingsCSVUploadPreferencesItem extends CSVUploadPreferences {
 	meterName: string;
 	lengthGap: string;
 	lengthVariation: string;
+	endOnly: BooleanTypes;
 	refreshReadings: boolean;
 	timeSort: TimeSortTypes;
 }
 
 export interface ReadingsCSVUploadProps extends ReadingsCSVUploadPreferencesItem, CSVUploadProps{
 	// Note: each of these will have to change in consideration of redux;
-	selectDuplications: (value: string) => void;
+	setMeterName: (value: string) => void;
 	selectTimeSort: (value: TimeSortTypes) => void;
+	selectDuplications: (value: string) => void;
 	selectCumulative: (value: BooleanTypes) => void;
 	selectCumulativeReset: (value: BooleanTypes) => void;
 	setCumulativeResetStart: (value: string) => void;
 	setCumulativeResetEnd: (value: string) => void;
 	setLengthGap: (value: string) => void;
 	setLengthVariation: (value: string) => void;
-	setMeterName: (value: string) => void;
+	selectEndOnly: (value: string) => void;
 	toggleCreateMeter: () => void;
 	toggleRefreshReadings: () => void;
 };

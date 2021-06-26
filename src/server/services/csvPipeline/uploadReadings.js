@@ -20,7 +20,7 @@ const { log } = require('../../log');
  */
 async function uploadReadings(req, res, filepath, conn) {
 	// TODO update parameter is not currently used
-	const { createMeter, headerRow, meterName } = req.body; // extract query parameters
+	const { meterName, createMeter, headerRow } = req.body; // extract query parameters
 	// headerRow has no value in the DB for a meter so always use the value passed.
 	const hasHeaderRow = (headerRow === 'true');
 	let meterCreated = false;
@@ -48,32 +48,61 @@ async function uploadReadings(req, res, filepath, conn) {
 	}
 
 	// Handle other parameter defaults
-	let { cumulative, cumulativeReset, cumulativeResetStart, cumulativeResetEnd, lengthVariation, lengthGap, duplications, timeSort } = req.body;
+	let { timeSort, duplications, cumulative, cumulativeReset, cumulativeResetStart, cumulativeResetEnd,
+		lengthGap, lengthVariation, endOnly } = req.body;
+	let readingTimeSort;
+	let readingRepetition;
 	let readingsCumulative;
 	let readingsReset;
 	let readingResetStart;
 	let readingResetEnd;
 	let readingGap;
 	let readingLengthVariation;
-	let readingRepetition;
-	let readingTimeSort;
+	let readingEndOnly;
 	// For the parameters, they either have one of the desired values or a "empty" value.
 	// An empty value means use the value from the DB meter or, in the unlikely event it is not set,
 	// then use the default value. For values coming from the web page:
-	//   In the case of timeSort, cumulative and cumulativeReset empty is the enum 'meter' value.
+	//   In the case of timeSort, cumulative, cumulativeReset & endOnly empty is the enum 'meter' value.
 	//   For other parameters it is an empty string.
 	// For parameters coming from a curl command, the values will be undefined.
 	// For this reason both possibilities are tested (the web page one and the curl one) to know if the
 	// meter or default value should be used.
-	// TODO: We made the assumption that in the DB, the cumulative and cumulativeReset columns is either true or false.
+	// TODO: We made the assumption that in the DB, the cumulative and cumulativeReset columns (and maybe other boolean ones)
+	// is either true or false.
 	// On further inspection, these values can be null. At the moment, we are not sure what this means for the pipeline.
 	// As a quick fix, we will assume that null, means false.
+	
+	if (duplications === undefined || duplications === '') {
+		if (meter.readingVariation === null) {
+			// This probably should not happen with a new DB but keep just in case.
+			// No variation allowed.
+			readingRepetition = 1;
+		} else {
+			readingRepetition = meter.readingDuplication;
+		}
+	} else {
+		// Convert string that is a real number to a value.
+		// Note the variable changes from string to real number.
+		readingRepetition = parseInt(duplications, 10);
+	}
+
+	if (timeSort === undefined || timeSort === TimeSortTypesJS.meter) {
+		if (meter.timeSort === null) {
+			// This probably should not happen with a new DB but keep just in case.
+			// No variation allowed.
+			readingTimeSort = TimeSortTypesJS.increasing;
+		} else {
+			readingTimeSort = TimeSortTypesJS[meter.timeSort];
+		}
+	} else {
+		readingTimeSort = timeSort;
+	}
+
 	if (cumulative === undefined || cumulative === BooleanTypesJS.meter) {
 		if (meter.cumulative === null) {
 			// This probably should not happen with a new DB but keep just in case.
 			// No variation allowed.
 			readingCumulative= BooleanTypesJS.false;
-			// readingTimeSort = 'increasing';
 		} else {
 			readingCumulative = BooleanTypesJS[meter.cumulative];
 		}
@@ -87,7 +116,6 @@ async function uploadReadings(req, res, filepath, conn) {
 			// This probably should not happen with a new DB but keep just in case.
 			// No variation allowed.
 			readingsReset= BooleanTypesJS.false;
-			// readingTimeSort = 'increasing';
 		} else {
 			readingsReset = BooleanTypesJS[meter.cumulativeReset];
 		}
@@ -145,33 +173,19 @@ async function uploadReadings(req, res, filepath, conn) {
 		// Note the variable changes from string to real number.
 		readingLengthVariation = parseFloat(lengthVariation);
 	}
-	
-	if (duplications === undefined || duplications === '') {
-		if (meter.readingVariation === null) {
-			// This probably should not happen with a new DB but keep just in case.
-			// No variation allowed.
-			readingRepetition = 1;
-		} else {
-			readingRepetition = meter.readingDuplication;
-		}
-	} else {
-		// Convert string that is a real number to a value.
-		// Note the variable changes from string to real number.
-		readingRepetition = parseInt(duplications, 10);
-	}
 
-	if (timeSort === undefined || timeSort === TimeSortTypesJS.meter) {
-		if (meter.timeSort === null) {
+	if (endOnly === undefined || endOnly === BooleanTypesJS.meter) {
+		if (meter.endOnlyTime === null) {
 			// This probably should not happen with a new DB but keep just in case.
 			// No variation allowed.
-			readingTimeSort = TimeSortTypesJS.increasing;
-			// readingTimeSort = 'increasing';
+			readingEndOnly= BooleanTypesJS.false;
 		} else {
-			readingTimeSort = TimeSortTypesJS[meter.timeSort];
+			readingEndOnly = BooleanTypesJS[meter.endOnlyTime];
 		}
 	} else {
-		readingTimeSort = timeSort;
+		readingEndOnly = endOnly;
 	}
+	const areReadingsEndOnly = (readingEndOnly === 'true');
 
 	const mapRowToModel = row => { return row; }; // STUB function to satisfy the parameter of loadCsvInput.
 	await loadCsvInput(
@@ -179,14 +193,15 @@ async function uploadReadings(req, res, filepath, conn) {
 		meter.id,
 		mapRowToModel,
 		false,
+		readingTimeSort,
+		readingRepetition,
 		areReadingsCumulative,
 		doReadingsReset,
 		readingResetStart,
 		readingResetEnd,
 		readingGap,
 		readingLengthVariation,
-		readingRepetition,
-		readingTimeSort,
+		areReadingsEndOnly,
 		hasHeaderRow,
 		undefined,
 		conn
