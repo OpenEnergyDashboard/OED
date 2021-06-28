@@ -7,7 +7,6 @@
 const fs = require('fs');
 const readCsv = require('./readCsv');
 const loadArrayInput = require('./loadArrayInput');
-const loadCsvStream = require('./loadCsvStream');
 const { log } = require('../../log');
 
 /**
@@ -15,7 +14,6 @@ const { log } = require('../../log');
  * @param {string} filePath path to file to load including file name
  * @param {number} meterID meter id being input
  * @param {function} mapRowToModel a customized function that map needed values from each row to the Reading model
- * @param {boolean} readAsStream true if prefer to read file as CSV stream
  * @param {string} timeSort the canonical order sorted by date/time in which the data appears in the CSV file
  * @param {number} readingRepetition number of times each reading is repeated where 1 means no repetition
  * @param {boolean} isCumulative true if the given data is cumulative
@@ -33,7 +31,6 @@ async function loadCsvInput(
 	filePath,
 	meterID,
 	mapRowToModel,
-	readAsStream,
 	timeSort,
 	readingRepetition,
 	isCumulative,
@@ -48,18 +45,13 @@ async function loadCsvInput(
 	conn
 ) {
 	try {
-		if (readAsStream) {
-			const stream = fs.createReadStream(filePath);
-			return loadCsvStream(stream, meterID, mapRowToModel, conditionSet, conn);
-		} else {
-			const dataRows = await readCsv(filePath);
-			if (headerRow) {
-				dataRows.shift();
-			}
-			return loadArrayInput(dataRows, meterID, mapRowToModel, timeSort, readingRepetition,
-				isCumulative, cumulativeReset, cumulativeResetStart, cumulativeResetEnd,
-				readingGap, readingLengthVariation, isEndOnly, conditionSet, conn);
+		const dataRows = await readCsv(filePath);
+		if (headerRow) {
+			dataRows.shift();
 		}
+		return loadArrayInput(dataRows, meterID, mapRowToModel, timeSort, readingRepetition,
+			isCumulative, cumulativeReset, cumulativeResetStart, cumulativeResetEnd,
+			readingGap, readingLengthVariation, isEndOnly, conditionSet, conn);
 	} catch (err) {
 		log.error(`Error updating meter ${meterID} with data from ${filePath}: ${err}`, err);
 	}

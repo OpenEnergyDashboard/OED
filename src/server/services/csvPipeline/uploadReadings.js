@@ -192,7 +192,6 @@ async function uploadReadings(req, res, filepath, conn) {
 		filepath,
 		meter.id,
 		mapRowToModel,
-		false,
 		readingTimeSort,
 		readingRepetition,
 		areReadingsCumulative,

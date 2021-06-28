@@ -28,7 +28,6 @@ function insertMamacData(filePath, meter, readingDuration, conn) {
 							const startTimestamp = moment(endTimestamp).subtract(readingDuration);
 							return [readRate, startTimestamp, endTimestamp];
 						},
-						readAsStream = true,
 						timeSort = 'increasing',
 						readingRepetition = 1,
 						isCumulative = false,

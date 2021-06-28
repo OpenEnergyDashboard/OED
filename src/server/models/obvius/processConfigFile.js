@@ -35,7 +35,9 @@ function processConfigFile(configFile) {
 			Meter.type.OBVIUS,
 			null,
 			undefined,
-			metersHash[internalMeterName].NAME));
+			// Sometimes the NAME is not unique so append with internalMeterName so does not fail
+			// the uniqueness of the identifier.
+			metersHash[internalMeterName].NAME + ' for ' + internalMeterName));
 	}
 	return metersArray;
 }
