@@ -4,7 +4,7 @@
 
 const express = require('express');
 const { CSVPipelineError } = require('./CustomErrors');
-const success = require('./success');
+const { success, failure } = require('./success');
 const loadCsvInput = require('../pipeline-in-progress/loadCsvInput');
 const { TimeSortTypesJS, BooleanTypesJS } = require('./validateCsvUploadParams');
 const Meter = require('../../models/Meter');
@@ -71,7 +71,7 @@ async function uploadReadings(req, res, filepath, conn) {
 	// is either true or false.
 	// On further inspection, these values can be null. At the moment, we are not sure what this means for the pipeline.
 	// As a quick fix, we will assume that null, means false.
-	
+
 	if (duplications === undefined || duplications === '') {
 		if (meter.readingVariation === null) {
 			// This probably should not happen with a new DB but keep just in case.
@@ -102,7 +102,7 @@ async function uploadReadings(req, res, filepath, conn) {
 		if (meter.cumulative === null) {
 			// This probably should not happen with a new DB but keep just in case.
 			// No variation allowed.
-			readingCumulative= BooleanTypesJS.false;
+			readingCumulative = BooleanTypesJS.false;
 		} else {
 			readingCumulative = BooleanTypesJS[meter.cumulative];
 		}
@@ -115,7 +115,7 @@ async function uploadReadings(req, res, filepath, conn) {
 		if (meter.cumulativeReset === null) {
 			// This probably should not happen with a new DB but keep just in case.
 			// No variation allowed.
-			readingsReset= BooleanTypesJS.false;
+			readingsReset = BooleanTypesJS.false;
 		} else {
 			readingsReset = BooleanTypesJS[meter.cumulativeReset];
 		}
@@ -178,7 +178,7 @@ async function uploadReadings(req, res, filepath, conn) {
 		if (meter.endOnlyTime === null) {
 			// This probably should not happen with a new DB but keep just in case.
 			// No variation allowed.
-			readingEndOnly= BooleanTypesJS.false;
+			readingEndOnly = BooleanTypesJS.false;
 		} else {
 			readingEndOnly = BooleanTypesJS[meter.endOnlyTime];
 		}
@@ -188,7 +188,7 @@ async function uploadReadings(req, res, filepath, conn) {
 	const areReadingsEndOnly = (readingEndOnly === 'true');
 
 	const mapRowToModel = row => { return row; }; // STUB function to satisfy the parameter of loadCsvInput.
-	await loadCsvInput(
+	let { isAllReadingsOk, msgTotal } = await loadCsvInput(
 		filepath,
 		meter.id,
 		mapRowToModel,
@@ -208,7 +208,18 @@ async function uploadReadings(req, res, filepath, conn) {
 	); // load csv data
 	// TODO: If unsuccessful upload then an error will be thrown. We need to catch this error.
 	//fs.unlink(filepath).catch(err => log.error(`Failed to remove the file ${filepath}.`, err));
-	success(req, res, 'It looks like success.'); // TODO: We need a try catch for all these awaits.
+	let message;
+	if (isAllReadingsOk) {
+		message = '<h2>It looks like the insert of the readings was a success.</h2>'
+		if (msgTotal !== '') {
+			message += '<h3>However, note that the processing of the readings returned these warning(s):</h3>' + msgTotal;
+		}
+		success(req, res, message);
+	} else {
+		message = '<h2>It looks like the insert of the readings had issues with some or all of the readings where' +
+			' the processing of the readings returned these warning(s)/error(s):</h2>' + msgTotal;
+		failure(req, res, message);
+	}
 	return;
 }
 

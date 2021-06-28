@@ -4,7 +4,7 @@
 
 const express = require('express');
 const { CSVPipelineError } = require('./CustomErrors');
-const success = require('./success');
+const { success } = require('./success');
 const Meter = require('../../models/Meter');
 const readCsv = require('../pipeline-in-progress/readCsv');
 

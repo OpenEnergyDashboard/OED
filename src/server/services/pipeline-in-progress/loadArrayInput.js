@@ -5,9 +5,11 @@
  */
 
 const Reading = require('../../models/Reading');
+const { log } = require('../../log');
 const processData = require('./processData');
+
 /**
- * Select and process needed values from a matrix and return an array of reading value and reading time
+ * Select and process needed values from a matrix and insert into DB.
  * @param {object[[]]} dataRows where each row is defined by mapRowToModel function
  * @param {number} meterID meter id being input
  * @param {function} mapRowToModel a customized function that map needed values from each row to the Reading model
@@ -22,20 +24,24 @@ const processData = require('./processData');
  * @param {boolean} isEndOnly true if the given data only has final reading date/time and not start date/time
  * @param {array} conditionSet used to validate readings (minVal, maxVal, minDate, maxDate, interval, maxError)
  * @param {array} conn connection to database
+ * @returns {object[]} {whether readings were all process (true) or false, all the messages from processing the readings as a string}
  */
 async function loadArrayInput(dataRows, meterID, mapRowToModel, timeSort, readingRepetition, isCumulative,
 	cumulativeReset, cumulativeResetStart, cumulativeResetEnd, readingGap, readingLengthVariation, isEndOnly,
 	conditionSet, conn) {
+	// Get the reading, then process them for acceptance and finally insert into the DB.
 	readingsArray = dataRows.map(mapRowToModel);
-
-	// TODO: Need to implement interface to let user pass in the following params to the pipeline
-
-	// Temporary values for params. Note they are currently initialized to their default values.
-	// end of temporary values for params
-	readingsArray = await processData(readingsArray, meterID, timeSort, readingRepetition, isCumulative, cumulativeReset,
-		cumulativeResetStart, cumulativeResetEnd, readingGap, readingLengthVariation, isEndOnly, conditionSet, conn);
-
-	return await Reading.insertOrIgnoreAll(readingsArray, conn);
+	let { result: readingsToInsert, isAllReadingsOk, msgTotal } = await processData(readingsArray, meterID, timeSort, readingRepetition,
+		isCumulative, cumulativeReset, cumulativeResetStart, cumulativeResetEnd, readingGap, readingLengthVariation, isEndOnly, conditionSet, conn);
+	await Reading.insertOrIgnoreAll(readingsToInsert, conn)
+		.catch(error => {
+			// DB insert failed. log it, note that processing is not okay & add to message user will get.
+			log.error('loadArrayInput failed during DB inserts with: ' + error.stack);
+			isAllReadingsOk = false;
+			msgTotal += 'Attempting to insert the readings into the database failed with error: \"' + error.stack +
+				'\n and the pipeline returned these messages: ' + msgTotal;
+		})
+	return { isAllReadingsOk, msgTotal };
 }
 
 module.exports = loadArrayInput;
