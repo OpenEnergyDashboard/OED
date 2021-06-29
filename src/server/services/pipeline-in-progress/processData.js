@@ -23,7 +23,8 @@ const E0 = moment(0);
  * => reading #1 = row 1
  *    reading #2 = row 2
  *    reading #0 may be the cumulative value from unknown readings that may or may not have been inserted before
- * @param {object[[]]} rows
+ * @param {object[[]]} rows [reading, startTime, endTime] where date/time is either a string or a Moment. Note the start/endTime
+ *   are actually date/time where you cannot have the day of month first in date. No start time if isEndOnly true.
  * @param {number} meterID meter id being input
  * @param {string} timeSort the canonical order sorted by date/time in which the data appears in the data file, default 'increasing'
  * @param {number} readingRepetition value is 1 if reading is not duplicated. 2 if repeated twice and so on (E-mon D-mon meters)
@@ -99,14 +100,18 @@ async function processData(rows, meterID, timeSort = 'increasing', readingRepeti
 		// does not matter in many cases (errMsg) is still empty and protects against edge cases,
 		// the code uses accumulation and starts empty each time through the loop.
 		errMsg = '';
+		// If rows already has a moment (instead of a string) this still works fine.
+		// Moment parses readings with date first, time first, dates separated by / or -,
+		// times with or without seconds. The date can have the year first or last but
+		// cannot have the day first (month okay). Thus, we just use the default parsing.
 		if (isEndTime) {
 			// The startTimestamp of this reading is the endTimestamp of the previous reading
 			startTimestamp = prevReading.endTimestamp;
-			endTimestamp = moment(rows[index][1], ['YYYY/MM/DD HH:mm', 'MM/DD/YYYY HH:mm']);
+			endTimestamp = moment(rows[index][1]);
 		}
 		else {
-			startTimestamp = moment(rows[index][1], ['YYYY/MM/DD HH:mm', 'MM/DD/YYYY HH:mm']);
-			endTimestamp = moment(rows[index][2], ['YYYY/MM/DD HH:mm', 'MM/DD/YYYY HH:mm']);
+			startTimestamp = moment(rows[index][1]);
+			endTimestamp = moment(rows[index][2]);
 		}
 		// Determine the meter reading value to use based on if the data is cumulative or not cumulative
 		if (isCumulative) {
