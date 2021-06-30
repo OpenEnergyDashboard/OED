@@ -46,6 +46,8 @@ async function processData(rows, meterID, timeSort = 'increasing', readingRepeti
 	conditionSet, conn) {
 	// Holds all the warning message to pass back to inform user.
 	let msgTotal = '';
+	// Tells if already passed total message length allowed.
+	let msgTotalWarning = false;
 	// If all readings were accepted or not.
 	let isAllReadingsOk = true;
 	// If processData is successfully finished then return result = [R0, R1, R2...RN]
@@ -198,7 +200,9 @@ async function processData(rows, meterID, timeSort = 'increasing', readingRepeti
 				log.error(errMsg);
 				errMsg += logStatus(negRow, prevReading, logReading, timeSort, readingRepetition, isCumulative, cumulativeReset,
 					resetStart, resetEnd, readingGap, readingLengthVariation, isEndTime) + '<br>';
-				msgTotal += errMsg;
+				let { message, alreadyWarned } = appendMsgTotal(msgTotal, errMsg, msgTotalWarning);
+				msgTotal = message;
+				msgTotalWarning = alreadyWarned;
 				// This empties the result array. Should be fast and okay with const.
 				result.splice(0, result.length);
 				isAllReadingsOk = false;
@@ -218,7 +222,9 @@ async function processData(rows, meterID, timeSort = 'increasing', readingRepeti
 					log.error(errMsg);
 					errMsg += logStatus(row(index, isAscending, rows.length), prevReading, logReading, timeSort, readingRepetition, isCumulative, cumulativeReset,
 						resetStart, resetEnd, readingGap, readingLengthVariation, isEndTime) + '<br>';
-					msgTotal += errMsg;
+					let { message, alreadyWarned } = appendMsgTotal(msgTotal, errMsg, msgTotalWarning);
+					msgTotal = message;
+					msgTotalWarning = alreadyWarned;
 					// This empties the result array. Should be fast and okay with const.
 					result.splice(0, result.length);
 					isAllReadingsOk = false;
@@ -246,7 +252,9 @@ async function processData(rows, meterID, timeSort = 'increasing', readingRepeti
 				log.warn(errMsg);
 				errMsg += logStatus(row(index, isAscending, rows.length), prevReading, currentReading, timeSort, readingRepetition, isCumulative, cumulativeReset,
 					resetStart, resetEnd, readingGap, readingLengthVariation, isEndTime) + '<br>';
-				msgTotal += errMsg;
+				let { message, alreadyWarned } = appendMsgTotal(msgTotal, errMsg, msgTotalWarning);
+				msgTotal = message;
+				msgTotalWarning = alreadyWarned;
 			}
 			result.push(currentReading);
 		} else {
@@ -268,7 +276,9 @@ async function processData(rows, meterID, timeSort = 'increasing', readingRepeti
 			log.error(errMsg);
 			errMsg += logStatus(row(index, isAscending, rows.length), prevReading, currentReading, timeSort, readingRepetition, isCumulative, cumulativeReset,
 				resetStart, resetEnd, readingGap, readingLengthVariation, isEndTime) + '<br>';
-			msgTotal += errMsg;
+			let { message, alreadyWarned } = appendMsgTotal(msgTotal, errMsg, msgTotalWarning);
+			msgTotal = message;
+			msgTotalWarning = alreadyWarned;
 			isAllReadingsOk = false;
 			readingOK = true;
 			// index-readingRepetition = reading # dropped in the data
@@ -279,7 +289,9 @@ async function processData(rows, meterID, timeSort = 'increasing', readingRepeti
 	// Validate data if conditions given
 	if (conditionSet !== undefined && !validateReadings(result, conditionSet)) {
 		errMsg = `<h2>REJECTED ALL READINGS FROM METER ${ipAddress} DUE TO ERROR WHEN VALIDATING DATA</h2>`;
-		msgTotal += errMsg;
+		let { message, alreadyWarned } = appendMsgTotal(msgTotal, errMsg, msgTotalWarning);
+		msgTotal = message;
+		msgTotalWarning = alreadyWarned;
 		log.error(errMsg);
 		// This empties the result array. Should be fast and okay with const.
 		result.splice(0, result.length);
@@ -297,9 +309,17 @@ async function processData(rows, meterID, timeSort = 'increasing', readingRepeti
 	await meter.update(conn);
 	// Let the user know exactly which readings were dropped if any before continuing and add to the total messages.
 	if (readingsDropped.length !== 0) {
-		msgTotal += '<h2>Readings Dropped and should have previous messages</h2><ol>'
-		readingsDropped.forEach(readingNum => { let message = '<li>Dropped Reading #' + readingNum + '</li>'; log.info(message); msgTotal += message });
-		msgTotal += '</ol>'
+		let { message, alreadyWarned } = appendMsgTotal(msgTotal, '<h2>Readings Dropped and should have previous messages</h2><ol>', msgTotalWarning);
+		msgTotal = message;
+		msgTotalWarning = alreadyWarned;
+		readingsDropped.forEach(readingNum => {
+			let messageNew = '<li>Dropped Reading #' + readingNum + '</li>'; log.info(messageNew);
+			let { message, alreadyWarned } = appendMsgTotal(msgTotal, messageNew, msgTotalWarning);
+			msgTotal = message;
+			msgTotalWarning = alreadyWarned;
+		});
+		// Assume the <ol> was put in. If not, get minor HTML syntax issue.
+		msgTotal += '</ol>';
 	}
 	return { result, isAllReadingsOk, msgTotal };
 }
@@ -363,4 +383,31 @@ function logStatus(rowNum, prevReading, currentReading, timeSort, readingRepetit
 	log.info(message);
 	return message;
 }
+
+/**
+ * Updates the string with all messages as long as it does not exceed the max size.
+ * @param {string} message The current total message to add to
+ * @param {string} newMsg The new message to append
+ * @param {boolean} alreadyWarned false if have not yet exceeded the allowed message size and true otherwise.
+ * @returns {object[]} {the updated message, update message warning}
+ */
+function appendMsgTotal(message, newMsg, alreadyWarned) {
+	// The limit to number of characters in the msgTotal.
+	// Each message with the reading info is in the 1k byte range. If limit to 75K
+	// then get around 75+ messages and that seems good without being too large a
+	// return message.
+	// Note that at this time we are not limiting the messages that are logged.
+	// This means the log file could get large if a lot of bad points are sent.
+	const MAX_SIZE = 75000;
+	if (message.length < MAX_SIZE) {
+		message += newMsg;
+	} else if (!alreadyWarned) {
+		message = "<h1>WARNING - The total number of messages was stopped due to size." +
+			" The log file has all the messages.</h1>" + message + "<h1>Message lost starting now</h1>";
+		// Note that warned so goes from false to true.
+		alreadyWarned = !alreadyWarned;
+	}
+	return { message, alreadyWarned };
+}
+
 module.exports = processData;
