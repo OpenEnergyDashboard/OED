@@ -73,7 +73,7 @@ async function readMamacData(meter, conn) {
 	});
 	// Insert readings that were okay for this meter.
 	// The pipeline does it one meter at a time.
-	loadArrayInput(dataRows = meterReadings,
+	await loadArrayInput(dataRows = meterReadings,
 		meterID = meter.id,
 		mapRowToModel = row => {
 			const readRate = row[0];

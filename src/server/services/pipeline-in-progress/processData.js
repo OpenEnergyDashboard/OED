@@ -104,6 +104,7 @@ async function processData(rows, meterID, timeSort = 'increasing', readingRepeti
 		// Moment parses readings with date first, time first, dates separated by / or -,
 		// times with or without seconds. The date can have the year first or last but
 		// cannot have the day first (month okay). Thus, we just use the default parsing.
+		// TODO catch error if conversion to moment fails.
 		if (isEndTime) {
 			// The startTimestamp of this reading is the endTimestamp of the previous reading
 			startTimestamp = prevReading.endTimestamp;
@@ -114,6 +115,7 @@ async function processData(rows, meterID, timeSort = 'increasing', readingRepeti
 			endTimestamp = moment(rows[index][2]);
 		}
 		// Determine the meter reading value to use based on if the data is cumulative or not cumulative
+		// TODO should probably check that values are numbers.
 		if (isCumulative) {
 			meterReading1 = meter.reading; // In cumulative this is the canonical previous raw reading
 			meterReading2 = rows[index][0]; // In cumulative this is the canonical current raw reading
@@ -247,12 +249,6 @@ async function processData(rows, meterID, timeSort = 'increasing', readingRepeti
 				msgTotal += errMsg;
 			}
 			result.push(currentReading);
-			if (row(index, isAscending, rows.length) === rows.length) {
-				// Update the meter to contain information for the last reading in the data file
-				meter.startTimestamp = startTimestamp;
-				meter.endTimestamp = endTimestamp;
-				meter.update(conn);
-			}
 		} else {
 			// An error occurred so add it to the readings dropped array and let the client know why before continuing
 			/* If the data is cumulative then regardless of if it comes with end timestamps only or both end timestamps and start timestamps
@@ -280,6 +276,7 @@ async function processData(rows, meterID, timeSort = 'increasing', readingRepeti
 		}
 		prevReading = currentReading;
 	}
+	// Validate data if conditions given
 	if (conditionSet !== undefined && !validateReadings(result, conditionSet)) {
 		errMsg = `<h2>REJECTED ALL READINGS FROM METER ${ipAddress} DUE TO ERROR WHEN VALIDATING DATA</h2>`;
 		msgTotal += errMsg;
@@ -289,6 +286,15 @@ async function processData(rows, meterID, timeSort = 'increasing', readingRepeti
 		isAllReadingsOk = false;
 		return { result, isAllReadingsOk, msgTotal };
 	}
+	// Update the meter to contain information for the last reading in the data file.
+	// Note this means that even if the last value was rejected we still store it as
+	// the next previous reading. This is probably a good idea, in general, but it is
+	// possible an undesirable time is saved at points. This will lead to messages on
+	// the next upload. Also note that the update does not happen if all the values
+	// are rejected as a batch (so return before this point).
+	meter.startTimestamp = startTimestamp;
+	meter.endTimestamp = endTimestamp;
+	await meter.update(conn);
 	// Let the user know exactly which readings were dropped if any before continuing and add to the total messages.
 	if (readingsDropped.length !== 0) {
 		msgTotal += '<h2>Readings Dropped and should have previous messages</h2><ol>'
