@@ -53,8 +53,8 @@ async function processData(rows, meterID, timeSort = 'increasing', readingRepeti
 	// If processData is successfully finished then return result = [R0, R1, R2...RN]
 	const result = [];
 	const readingsDropped = [];
-	const isAscending = (timeSort === 'increasing');
 	let errMsg;
+	const isAscending = (timeSort === 'increasing');
 	// Convert readingGap and readingLengthVariation to milliseconds to stay consistent with moment.diff() which returns the difference in milliseconds
 	const msReadingGap = readingGap * 1000;
 	const msReadingLengthVariation = readingLengthVariation * 1000;
@@ -67,6 +67,13 @@ async function processData(rows, meterID, timeSort = 'increasing', readingRepeti
 	let startTimestamp = meter.startTimestamp;
 	let endTimestamp = meter.endTimestamp;
 	let meterName = meter.name;
+	// To avoid mistakes, processing does not happen if cumulative reset is true but cumulative is false.
+	if (cumulativeReset && !isCumulative) {
+		isAllReadingsOk = false;
+		msgTotal = '<h2>On meter ' + meterName + ' in pipeline: cumulative was false but cumulative reset was true.' +
+			' To avoid mistakes all reading are rejected.</h2>';
+		return { result, isAllReadingsOk, msgTotal };
+	}
 	/* The currentReading will represent the current reading being parsed in the csv file. i.e. if index == 1, currentReading = rows[1] where
 	*  rows[1] : {reading_value, startTimestamp, endTimestamp}
 	*  Note that rows[1] may not contain a startTimestamp and may contain only an endTimestamp which must be reflected by
