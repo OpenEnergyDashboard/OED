@@ -101,7 +101,7 @@ mocha.describe('loadLogfileToReadings', async () => {
 		await loadLogfileToReadings('000', '0.0.0.0', csvDataReal, conn);
 	});
 	mocha.it('adds the right number and type of meters', async () => {
-		csvDataAdd2Meters = '2001-01-01 00:00:00,x,x,x,10,10\n2001-01-02 00:00:00,x,x,x,20,20';
+		const csvDataAdd2Meters = '2001-01-01 00:00:00,x,x,x,10,10\n2001-01-02 00:00:00,x,x,x,20,20';
 		await loadLogfileToReadings('000', '0.0.0.0', csvDataAdd2Meters, conn);
 
 		let m = await Meter.getAll(conn);
@@ -113,7 +113,7 @@ mocha.describe('loadLogfileToReadings', async () => {
 		expect(m2).to.have.property('type', Meter.type.OBVIUS);
 	});
 	mocha.it('does not modify accepted data when multiple data points exist at one time', async () => {
-		csvDataAddDuplicate = '2001-01-01 00:00:00,x,x,x,10\n2001-01-01 01:00:00,x,x,x,10\n2001-01-01 01:00:00,x,x,x,20';
+		const csvDataAddDuplicate = '2001-01-01 00:00:00,x,x,x,10\n2001-01-01 01:00:00,x,x,x,10\n2001-01-01 01:00:00,x,x,x,20';
 		await loadLogfileToReadings('000', '0.0.0.0', csvDataAddDuplicate, conn);
 
 		let m1 = await Meter.getByName('000.0', conn);
@@ -122,6 +122,7 @@ mocha.describe('loadLogfileToReadings', async () => {
 		expect(readings[0]).to.have.property('reading', 10);
 	});
 	mocha.it('does not modify accepted data when the same data is submitted many times', async () => {
+		const csvDataAddDuplicate = '2001-01-01 00:00:00,x,x,x,10\n2001-01-01 01:00:00,x,x,x,10\n2001-01-01 01:00:00,x,x,x,10';
 		await loadLogfileToReadings('000', '0.0.0.0', csvDataAddDuplicate, conn);
 
 		let m1 = await Meter.getByName('000.0', conn);
