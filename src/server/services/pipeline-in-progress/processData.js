@@ -66,6 +66,7 @@ async function processData(rows, meterID, timeSort = 'increasing', readingRepeti
 	let meterReading2 = meter.reading;
 	let startTimestamp = meter.startTimestamp;
 	let endTimestamp = meter.endTimestamp;
+	let meterName = meter.name;
 	/* The currentReading will represent the current reading being parsed in the csv file. i.e. if index == 1, currentReading = rows[1] where
 	*  rows[1] : {reading_value, startTimestamp, endTimestamp}
 	*  Note that rows[1] may not contain a startTimestamp and may contain only an endTimestamp which must be reflected by
@@ -197,12 +198,11 @@ async function processData(rows, meterID, timeSort = 'increasing', readingRepeti
 					errMsg += '<br>Error parsing Reading #' + negRow +
 						'. Detected a negative value while handling cumulative readings so all reading are rejected.<br>';
 				}
+				errMsg = 'For meter ' + meterName + ': ' + errMsg;
 				log.error(errMsg);
-				errMsg += logStatus(negRow, prevReading, logReading, timeSort, readingRepetition, isCumulative, cumulativeReset,
+				errMsg += logStatus(meterName, negRow, prevReading, logReading, timeSort, readingRepetition, isCumulative, cumulativeReset,
 					resetStart, resetEnd, readingGap, readingLengthVariation, isEndTime) + '<br>';
-				let { message, alreadyWarned } = appendMsgTotal(msgTotal, errMsg, msgTotalWarning);
-				msgTotal = message;
-				msgTotalWarning = alreadyWarned;
+				({ msgTotal, msgTotalWarning } = appendMsgTotal(msgTotal, errMsg, msgTotalWarning));
 				// This empties the result array. Should be fast and okay with const.
 				result.splice(0, result.length);
 				isAllReadingsOk = false;
@@ -216,15 +216,14 @@ async function processData(rows, meterID, timeSort = 'increasing', readingRepeti
 					meterReading = meterReading2;
 				} else {
 					//cumulativeReset is not expected but there is a negative net meter reading so reject all readings.
-					errMsg += ('<br>Error parsing Reading #' + row(index, isAscending, rows.length) + '. Reading value of ' + meterReading2 + ' gives ' +
+					errMsg += ('<br>For meter ' + meterName + ': Error parsing Reading #' + row(index, isAscending, rows.length) +
+						'. Reading value of ' + meterReading2 + ' gives ' +
 						meterReading + ' with error message:<br>A negative meterReading has been detected but either cumulativeReset' +
 						' is not enabled, or the start time and end time of this reading is out of the reset range. Reject all readings.<br>');
 					log.error(errMsg);
-					errMsg += logStatus(row(index, isAscending, rows.length), prevReading, logReading, timeSort, readingRepetition, isCumulative, cumulativeReset,
-						resetStart, resetEnd, readingGap, readingLengthVariation, isEndTime) + '<br>';
-					let { message, alreadyWarned } = appendMsgTotal(msgTotal, errMsg, msgTotalWarning);
-					msgTotal = message;
-					msgTotalWarning = alreadyWarned;
+					errMsg += logStatus(meterName, row(index, isAscending, rows.length), prevReading, logReading, timeSort, readingRepetition,
+						isCumulative, cumulativeReset, resetStart, resetEnd, readingGap, readingLengthVariation, isEndTime) + '<br>';
+					({ msgTotal, msgTotalWarning } = appendMsgTotal(msgTotal, errMsg, msgTotalWarning));
 					// This empties the result array. Should be fast and okay with const.
 					result.splice(0, result.length);
 					isAllReadingsOk = false;
@@ -247,14 +246,12 @@ async function processData(rows, meterID, timeSort = 'increasing', readingRepeti
 			currentReading = new Reading(meterID, meterReading, startTimestamp, endTimestamp);
 			if (!(errMsg === '')) {
 				// There may be warnings to output even if OED accepts the readings so output all warnings which may exist
-				errMsg = '<br>Warning parsing Reading #' + row(index, isAscending, rows.length) + '. Reading value gives ' +
+				errMsg = '<br>For meter ' + meterName + ': Warning parsing Reading #' + row(index, isAscending, rows.length) + '. Reading value gives ' +
 					meterReading + ' with warning message:<br>' + errMsg;
 				log.warn(errMsg);
-				errMsg += logStatus(row(index, isAscending, rows.length), prevReading, currentReading, timeSort, readingRepetition, isCumulative, cumulativeReset,
-					resetStart, resetEnd, readingGap, readingLengthVariation, isEndTime) + '<br>';
-				let { message, alreadyWarned } = appendMsgTotal(msgTotal, errMsg, msgTotalWarning);
-				msgTotal = message;
-				msgTotalWarning = alreadyWarned;
+				errMsg += logStatus(meterName, row(index, isAscending, rows.length), prevReading, currentReading, timeSort, readingRepetition,
+					isCumulative, cumulativeReset, resetStart, resetEnd, readingGap, readingLengthVariation, isEndTime) + '<br>';
+				({ msgTotal, msgTotalWarning } = appendMsgTotal(msgTotal, errMsg, msgTotalWarning));
 			}
 			result.push(currentReading);
 		} else {
@@ -271,14 +268,12 @@ async function processData(rows, meterID, timeSort = 'increasing', readingRepeti
 				currentReading = new Reading(meterID, meterReading, startTimestamp, endTimestamp);
 				// This currentReading will become the previousReading for the first reading if isCumulative is true
 			}
-			errMsg = '<br>Error parsing Reading #' + row(index, isAscending, rows.length) + '. Reading value gives ' + meterReading +
-				' with error message:<br>' + errMsg;
+			errMsg = '<br>For meter ' + meterName + ': Error parsing Reading #' + row(index, isAscending, rows.length) +
+				'. Reading value gives ' + meterReading + ' with error message:<br>' + errMsg;
 			log.error(errMsg);
-			errMsg += logStatus(row(index, isAscending, rows.length), prevReading, currentReading, timeSort, readingRepetition, isCumulative, cumulativeReset,
-				resetStart, resetEnd, readingGap, readingLengthVariation, isEndTime) + '<br>';
-			let { message, alreadyWarned } = appendMsgTotal(msgTotal, errMsg, msgTotalWarning);
-			msgTotal = message;
-			msgTotalWarning = alreadyWarned;
+			errMsg += logStatus(meterName, row(index, isAscending, rows.length), prevReading, currentReading, timeSort, readingRepetition,
+				isCumulative, cumulativeReset, resetStart, resetEnd, readingGap, readingLengthVariation, isEndTime) + '<br>';
+			({ msgTotal, msgTotalWarning } = appendMsgTotal(msgTotal, errMsg, msgTotalWarning));
 			isAllReadingsOk = false;
 			readingOK = true;
 			// index-readingRepetition = reading # dropped in the data
@@ -288,10 +283,8 @@ async function processData(rows, meterID, timeSort = 'increasing', readingRepeti
 	}
 	// Validate data if conditions given
 	if (conditionSet !== undefined && !validateReadings(result, conditionSet)) {
-		errMsg = `<h2>REJECTED ALL READINGS FROM METER ${ipAddress} DUE TO ERROR WHEN VALIDATING DATA</h2>`;
-		let { message, alreadyWarned } = appendMsgTotal(msgTotal, errMsg, msgTotalWarning);
-		msgTotal = message;
-		msgTotalWarning = alreadyWarned;
+		errMsg = `<h2>For meter ' + meterName + ': REJECTED ALL READINGS FROM METER ${ipAddress} DUE TO ERROR WHEN VALIDATING DATA</h2>`;
+		({ msgTotal, msgTotalWarning } = appendMsgTotal(msgTotal, errMsg, msgTotalWarning));
 		log.error(errMsg);
 		// This empties the result array. Should be fast and okay with const.
 		result.splice(0, result.length);
@@ -309,14 +302,10 @@ async function processData(rows, meterID, timeSort = 'increasing', readingRepeti
 	await meter.update(conn);
 	// Let the user know exactly which readings were dropped if any before continuing and add to the total messages.
 	if (readingsDropped.length !== 0) {
-		let { message, alreadyWarned } = appendMsgTotal(msgTotal, '<h2>Readings Dropped and should have previous messages</h2><ol>', msgTotalWarning);
-		msgTotal = message;
-		msgTotalWarning = alreadyWarned;
+		({ msgTotal, msgTotalWarning } = appendMsgTotal(msgTotal, '<h2>Readings Dropped and should have previous messages</h2><ol>', msgTotalWarning));
 		readingsDropped.forEach(readingNum => {
-			let messageNew = '<li>Dropped Reading #' + readingNum + '</li>'; log.info(messageNew);
-			let { message, alreadyWarned } = appendMsgTotal(msgTotal, messageNew, msgTotalWarning);
-			msgTotal = message;
-			msgTotalWarning = alreadyWarned;
+			let messageNew = '<li>Dropped Reading #' + readingNum + ' for meter ' + meterName + '</li>'; log.info(messageNew);
+			({ msgTotal, msgTotalWarning } = appendMsgTotal(msgTotal, messageNew, msgTotalWarning));
 		});
 		// Assume the <ol> was put in. If not, get minor HTML syntax issue.
 		msgTotal += '</ol>';
@@ -372,9 +361,9 @@ function row(index, isAscending, length) {
  * multiple messages. It seems to be something about the logging and not looked into.
  * @returns {string} The message just logged.
  */
-function logStatus(rowNum, prevReading, currentReading, timeSort, readingRepetition, isCumulative,
+function logStatus(meterName, rowNum, prevReading, currentReading, timeSort, readingRepetition, isCumulative,
 	cumulativeReset, resetStart, resetEnd, readingGap, readingLengthVariation, onlyEndTime) {
-	let message = 'For reading #' + rowNum + ' in pipeline: ' + 'previous reading has value ' + prevReading.reading + ' start time '
+	let message = 'For reading #' + rowNum + ' on meter ' + meterName + ' in pipeline: ' + 'previous reading has value ' + prevReading.reading + ' start time '
 		+ prevReading.startTimestamp.format() + ' end time ' + prevReading.endTimestamp.format() + ' and current reading has value '
 		+ currentReading.reading + ' start time ' + currentReading.startTimestamp.format() + ' end time ' + currentReading.endTimestamp.format()
 		+ ' with timeSort ' + timeSort + '; duplications ' + readingRepetition + '; cumulative ' +
@@ -386,12 +375,12 @@ function logStatus(rowNum, prevReading, currentReading, timeSort, readingRepetit
 
 /**
  * Updates the string with all messages as long as it does not exceed the max size.
- * @param {string} message The current total message to add to
+ * @param {string} msgTotal The current total message to add to
  * @param {string} newMsg The new message to append
- * @param {boolean} alreadyWarned false if have not yet exceeded the allowed message size and true otherwise.
+ * @param {boolean} msgTotalWarning false if have not yet exceeded the allowed message size and true otherwise.
  * @returns {object[]} {the updated message, update message warning}
  */
-function appendMsgTotal(message, newMsg, alreadyWarned) {
+function appendMsgTotal(msgTotal, newMsg, msgTotalWarning) {
 	// The limit to number of characters in the msgTotal.
 	// Each message with the reading info is in the 1k byte range. If limit to 75K
 	// then get around 75+ messages and that seems good without being too large a
@@ -399,15 +388,15 @@ function appendMsgTotal(message, newMsg, alreadyWarned) {
 	// Note that at this time we are not limiting the messages that are logged.
 	// This means the log file could get large if a lot of bad points are sent.
 	const MAX_SIZE = 75000;
-	if (message.length < MAX_SIZE) {
-		message += newMsg;
-	} else if (!alreadyWarned) {
-		message = "<h1>WARNING - The total number of messages was stopped due to size." +
-			" The log file has all the messages.</h1>" + message + "<h1>Message lost starting now</h1>";
+	if (msgTotal.length < MAX_SIZE) {
+		msgTotal += newMsg;
+	} else if (!msgTotalWarning) {
+		msgTotal = '<h1>WARNING - The total number of messages was stopped due to size.' +
+			' The log file has all the messages.</h1>' + message + '<h1>Message lost starting now</h1>';
 		// Note that warned so goes from false to true.
-		alreadyWarned = !alreadyWarned;
+		msgTotalWarning = !msgTotalWarning;
 	}
-	return { message, alreadyWarned };
+	return { msgTotal, msgTotalWarning };
 }
 
 module.exports = processData;

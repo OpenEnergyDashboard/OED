@@ -50,7 +50,8 @@ async function loadLogfileToReadings(serialNumber, ipAddress, logfile, conn) {
 					meterID = meter.id,
 					mapRowToModel = row => {
 						const readRate = row[0];
-						const endTimestamp = row[1];
+						// Unusual name to avoid shadow name.
+						const endTimestampParam = row[1];
 						return [readRate, endTimestamp];
 					},
 					// TODO Switch these to meter value.
