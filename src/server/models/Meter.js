@@ -28,7 +28,7 @@ class Meter {
 	 * @param readingGap Specifies the time range on every reading in the CSV file, default '00:00:00'
 	 * @param readingVariation +/- time allowed on length to consider within allowed length, default '23:59:59.999999'
 	 * @param readingDuplication number of times each reading is given when 1 means once and is default
-	 * @param timeSort 'ascending' if provided readings increase in time (default) & 'descending' if other way
+	 * @param timeSort 'increasing' if provided readings increase in time (default) & 'decreasing' if other way
 	 * @param endOnlyTime true if provided readings only have an end time, false by default
 	 * @param reading The value of reading, default 0.0
 	 * @param startTimestamp Start timestamp of last reading input for this meter, default '01-01-01 00:00:00'
@@ -36,7 +36,7 @@ class Meter {
 	 */
 	constructor(id, name, ipAddress, enabled, displayable, type, meterTimezone, gps = undefined, identifier = name, note, area,
 		cumulative = false, cumulativeReset = false, cumulativeResetStart = '00:00:00', cumulativeResetEnd = '23:59:59.999999',
-		readingGap = 0, readingVariation = 0, readingDuplication = 1, timeSort = 'ascending', endOnlyTime = false,
+		readingGap = 0, readingVariation = 0, readingDuplication = 1, timeSort = 'increasing', endOnlyTime = false,
 		reading = 0.0, startTimestamp = moment(0), endTimestamp = moment(0)) {
 		// In order for the CSV pipeline to work, the order of the parameters needs to match the order that the fields are declared.
 		// In addition, each new parameter has to be added at the very end.

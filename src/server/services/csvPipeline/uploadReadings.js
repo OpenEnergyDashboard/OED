@@ -9,6 +9,7 @@ const loadCsvInput = require('../pipeline-in-progress/loadCsvInput');
 const { TimeSortTypesJS, BooleanTypesJS } = require('./validateCsvUploadParams');
 const Meter = require('../../models/Meter');
 const { log } = require('../../log');
+const moment = require('moment');
 
 /**
  * Middleware that uploads readings via the pipeline. This should be the final stage of the CSV Pipeline.
@@ -36,7 +37,8 @@ async function uploadReadings(req, res, filepath, conn) {
 			} else {
 				// If createMeter is true, we will create the meter for the user.
 				// The meter type cannot be null. We use MAMAC as a default.
-				const tempMeter = new Meter(undefined, meterName, undefined, false, false, Meter.type.MAMAC, undefined, undefined, meterName);
+				const tempMeter = new Meter(undefined, meterName, undefined, false, false, Meter.type.MAMAC, undefined, undefined, meterName,
+					'created via reading upload on ' + moment().format());
 				await tempMeter.insert(conn);
 				meterCreated = true;
 				log.info('Creating meter ' + tempMeter.name);

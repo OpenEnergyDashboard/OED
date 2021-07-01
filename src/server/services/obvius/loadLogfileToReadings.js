@@ -20,16 +20,19 @@ async function loadLogfileToReadings(serialNumber, ipAddress, logfile, conn) {
 			meter = await Meter.getByName(`${serialNumber}.${i}`, conn);
 		} catch (v) {
 			// For now, new Obvius meters collect data (enabled) but do not display (not displayable).
-			// Also, the identifier is the same as the meter name for now. The longer-term plan is to read
-			// the configuration file and use information in that to set this value before meters are read
-			// so they are not created here.
-			// TODO get meter to have end only as true.
-			meter = new Meter(undefined, `${serialNumber}.${i}`, ipAddress, true, false, Meter.type.OBVIUS, null);
+			// Also, the identifier is similar to the meter name for now.
+			// end only time is true for Obvius meters.
+			meter = new Meter(undefined, `${serialNumber}.${i}`, ipAddress, true, false, Meter.type.OBVIUS,
+				null, undefined, `OBVIUS ${serialNumber} COLUMN ${i}`, 'created via obvious log upload on ' +
+				moment().format(), undefined, undefined, undefined, undefined, undefined, undefined, undefined,
+				undefined, undefined, true, undefined, undefined, undefined);
 			await meter.insert(conn);
 			log.warn('WARNING: Created a meter (' + `${serialNumber}.${i}` +
-				')that does not already exist. Normally obvius meters created by an uploaded ConfigFile.');
+				') that does not already exist. Normally obvius meters created by an uploaded ConfigFile.');
 		}
 
+		let reading = [];
+		let index = 0;
 		for (const rawReading of data[i]) {
 			// If the reading is invalid, throw it out.
 			// Since this does not go to the pipeline the meter dates stay the same so this does not count as
@@ -42,38 +45,35 @@ async function loadLogfileToReadings(serialNumber, ipAddress, logfile, conn) {
 			// TODO if need format here then reconsider mamac/pipeline setup
 			const endTimestamp = moment(rawReading[0], 'YYYY-MM-DD HH:mm:ss');
 			// const reading = new Reading(meter.id, rawReading[1], startTimestamp, endTimestamp);
-			reading = [[rawReading[1], endTimestamp]];
-			// TODO deal with any errors
-			try {
-				// TODO should batch up all readings in array in similar way to Mamac.
-				await loadArrayInput(dataRows = reading,
-					meterID = meter.id,
-					mapRowToModel = row => {
-						const readRate = row[0];
-						// Unusual name to avoid shadow name.
-						const endTimestampParam = row[1];
-						return [readRate, endTimestamp];
-					},
-					// TODO Switch these to meter value.
-					timeSort = 'increasing',
-					readingRepetition = 1,
-					isCumulative = false,
-					cumulativeReset = false,
-					// No cumulative reset so dummy times.
-					cumulativeResetStart = '0:00:00',
-					cumulativeResetEnd = '0:00:00',
-					// Every reading should be adjacent (no gap)
-					readingGap = 0,
-					// Every reading should be the same length
-					readingLengthVariation = 0,
-					isEndOnly = true,
-					conditionSet = undefined,
-					conn = conn
-				);
-				// await reading.insertOrIgnore(conn);
-			} catch (err) {
-				log.error('Could not insert readings from Obvius logfile.', err);
-			}
+			reading[index] = [rawReading[1], endTimestamp];
+			index++;
+		}
+		// TODO deal with any errors/return value
+		try {
+			await loadArrayInput(dataRows = reading,
+				meterID = meter.id,
+				mapRowToModel = row => {
+					const readRate = row[0];
+					// Unusual name to avoid shadow name.
+					const endTimestampParam = row[1];
+					return [readRate, endTimestampParam];
+				},
+				// For the next set of values we don't get from Obvius so use meter defaults.
+				timeSort = meter.timeSort,
+				readingRepetition = meter.readingDuplication,
+				isCumulative = meter.cumulative,
+				cumulativeReset = meter.cumulativeReset,
+				cumulativeResetStart = meter.cumulativeResetStart,
+				cumulativeResetEnd = meter.cumulativeResetEnd,
+				readingGap = meter.readingGap,
+				readingLengthVariation = meter.readingVariation,
+				// Obvius meters have endOnlyTime true by default.
+				isEndOnly = meter.endOnlyTime,
+				conditionSet = undefined,
+				conn = conn
+			);
+		} catch (err) {
+			log.error('Could not insert readings from Obvius logfile.', err);
 		}
 	}
 }
