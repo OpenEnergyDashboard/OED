@@ -50,6 +50,9 @@ async function loadLogfileToReadings(serialNumber, ipAddress, logfile, conn) {
 		}
 		// TODO deal with any errors/return value
 		try {
+			// Ignoring that loadArrayInput returns values
+			// since this is only called by an automated process at this time.
+			// Issues from the pipeline will be logged by called functions.
 			await loadArrayInput(dataRows = reading,
 				meterID = meter.id,
 				mapRowToModel = row => {

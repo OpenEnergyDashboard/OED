@@ -20,6 +20,9 @@ async function updateAllMeters(dataReader, metersToUpdate, conn) {
 	log.info(`Getting meter data ${time.toISOString()}`);
 	try {
 		// Do all the network requests in parallel and log errors.
+		// Ignoring that loadArrayInput is called in this sequence and returns values
+		// since this is only called by an automated process at this time.
+		// Issues from the pipeline will be logged by called functions.
 		await Promise.all(
 			metersToUpdate
 				.map(meter => dataReader(meter, conn))

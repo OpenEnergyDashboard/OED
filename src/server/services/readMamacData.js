@@ -73,6 +73,9 @@ async function readMamacData(meter, conn) {
 	});
 	// Insert readings that were okay for this meter.
 	// The pipeline does it one meter at a time.
+	// Ignoring that loadArrayInput returns values
+	// since this is only called by an automated process at this time.
+	// Issues from the pipeline will be logged by called functions.
 	await loadArrayInput(dataRows = meterReadings,
 		meterID = meter.id,
 		mapRowToModel = row => {

@@ -21,6 +21,7 @@ mocha.describe('PIPELINE: Load data from array', () => {
 		[4, '20:00:00 1/24/20'],
 		[5, '21:00:00 1/24/20']];
 		const readingDuration = 30;
+		// Ignore return value for now.
 		await loadArrayInput(arrayInput,
 			meter.id,
 			row => {
