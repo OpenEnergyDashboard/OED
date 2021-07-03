@@ -10,7 +10,6 @@
 const crypto = require('crypto');
 const express = require('express');
 const router = express.Router();
-const failure = require('../services/csvPipeline/failure');
 const { getConnection } = require('../db');
 const { log } = require('../log');
 const { verifyCredentials } = require('./authenticator');
@@ -22,6 +21,7 @@ const uploadMeters = require('../services/csvPipeline/uploadMeters');
 const uploadReadings = require('../services/csvPipeline/uploadReadings');
 const zlib = require('zlib');
 const { refreshReadingViews } = require('../services/refreshReadingViews');
+const { success, failure } = require('../services/csvPipeline/success');
 
 /** Middleware validation */
 const { validateMetersCsvUploadParams, validateReadingsCsvUploadParams } = require('../services/csvPipeline/validateCsvUploadParams');
@@ -149,6 +149,8 @@ router.post('/readings', validateReadingsCsvUploadParams, async (req, res) => {
 	const isRefreshReadings = req.body.refreshReadings === 'true';
 	const uploadedFilepath = req.file.path;
 	let csvFilepath;
+	let isAllReadingsOk;
+	let msgTotal;
 	try {
 		log.info(`The uploaded file ${uploadedFilepath} was created to upload readings csv data`);
 		let fileBuffer = await fs.readFile(uploadedFilepath);
@@ -164,30 +166,43 @@ router.post('/readings', validateReadingsCsvUploadParams, async (req, res) => {
 			csvFilepath = uploadedFilepath;
 		}
 		const conn = getConnection();
-		await uploadReadings(req, res, csvFilepath, conn);
+		({ isAllReadingsOk, msgTotal } = await uploadReadings(req, res, csvFilepath, conn));
 		if (isRefreshReadings) {
 			// Refresh readings so show when daily data is used.
 			await refreshReadingViews();
 		}
 	} catch (error) {
 		failure(req, res, error);
-	}
-
-	// Clean up files
-	fs.unlink(uploadedFilepath) // Delete the uploaded file.
-		.then(() => log.info(`Successfully deleted the uploaded file ${uploadedFilepath}.`))
-		.catch(err => {
-			log.error(`Failed to remove the file ${uploadedFilepath}.`, err);
-		});
-
-	// If user has indicated that the file is (g)zipped, then we also have to remove the unzipped file.
-	if (isGzip) {
-		// Delete the unzipped csv file if it exists.
-		fs.unlink(csvFilepath)
-			.then(() => log.info(`Successfully deleted the unzipped csv file ${csvFilepath}.`))
+		return;
+	} finally {
+		// Clean up files
+		fs.unlink(uploadedFilepath) // Delete the uploaded file.
+			.then(() => log.info(`Successfully deleted the uploaded file ${uploadedFilepath}.`))
 			.catch(err => {
-				log.error(`Failed to remove the file ${csvFilepath}.`, err);
+				log.error(`Failed to remove the file ${uploadedFilepath}.`, err);
 			});
+
+		// If user has indicated that the file is (g)zipped, then we also have to remove the unzipped file.
+		if (isGzip) {
+			// Delete the unzipped csv file if it exists.
+			fs.unlink(csvFilepath)
+				.then(() => log.info(`Successfully deleted the unzipped csv file ${csvFilepath}.`))
+				.catch(err => {
+					log.error(`Failed to remove the file ${csvFilepath}.`, err);
+				});
+		}
+	}
+	let message;
+	if (isAllReadingsOk) {
+		message = '<h2>It looks like the insert of the readings was a success.</h2>'
+		if (msgTotal !== '') {
+			message += '<h3>However, note that the processing of the readings returned these warning(s):</h3>' + msgTotal;
+		}
+		success(req, res, message);
+	} else {
+		message = '<h2>It looks like the insert of the readings had issues with some or all of the readings where' +
+			' the processing of the readings returned these warning(s)/error(s):</h2>' + msgTotal;
+		failure(req, res, message);
 	}
 });
 

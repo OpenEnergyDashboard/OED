@@ -9,6 +9,7 @@ interface CSVUploadPreferences {
 }
 
 interface CSVUploadProps extends CSVUploadPreferences {
+	// submitCSV: (file: File) => Promise<string>;
 	submitCSV: (file: File) => Promise<void>;
 	toggleGzip: () => void;
 	toggleHeaderRow: () => void;

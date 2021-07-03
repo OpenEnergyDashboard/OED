@@ -4,7 +4,6 @@
 
 const express = require('express');
 const { CSVPipelineError } = require('./CustomErrors');
-const { success, failure } = require('./success');
 const loadCsvInput = require('../pipeline-in-progress/loadCsvInput');
 const { TimeSortTypesJS, BooleanTypesJS } = require('./validateCsvUploadParams');
 const Meter = require('../../models/Meter');
@@ -190,7 +189,7 @@ async function uploadReadings(req, res, filepath, conn) {
 	const areReadingsEndOnly = (readingEndOnly === 'true');
 
 	const mapRowToModel = row => { return row; }; // STUB function to satisfy the parameter of loadCsvInput.
-	let { isAllReadingsOk, msgTotal } = await loadCsvInput(
+	return await loadCsvInput(
 		filepath,
 		meter.id,
 		mapRowToModel,
@@ -207,21 +206,6 @@ async function uploadReadings(req, res, filepath, conn) {
 		undefined,
 		conn
 	); // load csv data
-	// TODO: If unsuccessful upload then an error will be thrown. We need to catch this error.
-	//fs.unlink(filepath).catch(err => log.error(`Failed to remove the file ${filepath}.`, err));
-	let message;
-	if (isAllReadingsOk) {
-		message = '<h2>It looks like the insert of the readings was a success.</h2>'
-		if (msgTotal !== '') {
-			message += '<h3>However, note that the processing of the readings returned these warning(s):</h3>' + msgTotal;
-		}
-		success(req, res, message);
-	} else {
-		message = '<h2>It looks like the insert of the readings had issues with some or all of the readings where' +
-			' the processing of the readings returned these warning(s)/error(s):</h2>' + msgTotal;
-		failure(req, res, message);
-	}
-	return;
 }
 
 module.exports = uploadReadings;
