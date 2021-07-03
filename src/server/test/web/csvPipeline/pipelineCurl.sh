@@ -108,7 +108,6 @@ curl localhost:3000/api/csv/meters -X POST -F 'headerRow=false' -F 'gzip=false' 
 # edit meter so gap & variation are set
 docker compose -f $oedHome/docker-compose.yml exec database psql -U oed -c "update meters set reading_gap=60 where name='pipe30'; update meters set reading_variation=60 where name='pipe30'"
 # override DB by providing parameters
-# refresh on last upload of readings and all will be available for graphing
 curl localhost:3000/api/csv/readings -X POST -F 'meterName=pipe30' -F 'lengthGap=120.1' -F 'lengthVariation=120.2' -F 'gzip=false' -F 'email=test@example.com' -F 'password=password' -F 'csvfile=@regAscGapLength.csv'
 echo -e "\n\n<h3>starting pipe31</h3>"
 curl localhost:3000/api/csv/meters -X POST -F 'headerRow=false' -F 'gzip=false' -F 'email=test@example.com' -F 'password=password' -F 'csvfile=@meterPipe31.csv'
@@ -124,8 +123,16 @@ echo -e "\n\n<h3>starting pipe34</h3>"
 curl localhost:3000/api/csv/meters -X POST -F 'headerRow=false' -F 'gzip=false' -F 'email=test@example.com' -F 'password=password' -F 'csvfile=@meterPipe34.csv'
 # edit meter so set end only to true
 docker compose -f $oedHome/docker-compose.yml exec database psql -U oed -c "update meters set end_only_time='true' where name='pipe34'"
+curl localhost:3000/api/csv/readings -X POST -F 'meterName=pipe34' -F 'gzip=false' -F 'email=test@example.com' -F 'password=password' -F 'csvfile=@regAscEndonly.csv'
+echo -e "\n\n<h3>starting pipe35</h3>"
+curl localhost:3000/api/csv/readings -X POST -F 'meterName=pipe35' -F 'createMeter=true' -F 'gzip=false' -F 'email=test@example.com' -F 'password=password' -F 'csvfile=@regAsc.csv'
+# Insert new 0 at start, 6 at end and update original first to be 1.5 and last to be 5.5.
+curl localhost:3000/api/csv/readings -X POST -F 'meterName=pipe35' -F 'update=true' -F 'gzip=false' -F 'email=test@example.com' -F 'password=password' -F 'csvfile=@regAscUpdate.csv'
+echo -e "\n\n<h3>starting pipe36</h3>"
+curl localhost:3000/api/csv/readings -X POST -F 'meterName=pipe36' -F 'createMeter=true' -F 'gzip=false' -F 'email=test@example.com' -F 'password=password' -F 'csvfile=@regAsc.csv'
+# Insert new 0 at start, 6 at end and update original first to be 1.5 and last to be 5.5.
 # refresh on last upload of readings and all will be available for graphing
-curl localhost:3000/api/csv/readings -X POST -F 'refreshReadings=true' -F 'meterName=pipe34' -F 'gzip=false' -F 'email=test@example.com' -F 'password=password' -F 'csvfile=@regAscEndonly.csv'
+curl localhost:3000/api/csv/readings -X POST -F 'refreshReadings=true' -F 'meterName=pipe36' -F 'gzip=false' -F 'email=test@example.com' -F 'password=password' -F 'csvfile=@regAscUpdate.csv'
 
 # final blank line so easier to see in terminal.
 echo -e ""

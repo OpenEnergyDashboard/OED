@@ -22,25 +22,38 @@ const processData = require('./processData');
  * @param {number} readingGap defines how far apart (end time of previous to start time of next) that a pair of reading can be
  * @param {number} readingLengthVariation defines how much the length of a pair of readings can vary in seconds.
  * @param {boolean} isEndOnly true if the given data only has final reading date/time and not start date/time
+ * @param {boolean} shouldUpdate true if new values should replace old ones, otherwise false
  * @param {array} conditionSet used to validate readings (minVal, maxVal, minDate, maxDate, interval, maxError)
  * @param {array} conn connection to database
  * @returns {object[]} {whether readings were all process (true) or false, all the messages from processing the readings as a string}
  */
 async function loadArrayInput(dataRows, meterID, mapRowToModel, timeSort, readingRepetition, isCumulative,
 	cumulativeReset, cumulativeResetStart, cumulativeResetEnd, readingGap, readingLengthVariation, isEndOnly,
-	conditionSet, conn) {
+	shouldUpdate, conditionSet, conn) {
 	// Get the reading, then process them for acceptance and finally insert into the DB.
 	readingsArray = dataRows.map(mapRowToModel);
 	let { result: readingsToInsert, isAllReadingsOk, msgTotal } = await processData(readingsArray, meterID, timeSort, readingRepetition,
 		isCumulative, cumulativeReset, cumulativeResetStart, cumulativeResetEnd, readingGap, readingLengthVariation, isEndOnly, conditionSet, conn);
-	await Reading.insertOrIgnoreAll(readingsToInsert, conn)
-		.catch(error => {
-			// DB insert failed. log it, note that processing is not okay & add to message user will get.
-			log.error('loadArrayInput failed during DB inserts with: ' + error.stack);
-			isAllReadingsOk = false;
-			msgTotal += 'Attempting to insert the readings into the database failed with error: \"' + error.stack +
-				'\n and the pipeline returned these messages: ' + msgTotal;
-		})
+	if (shouldUpdate) {
+		// New readings should replace old ones.
+		await Reading.insertOrUpdateAll(readingsToInsert, conn)
+			.catch(error => {
+				// DB insert failed. log it, note that processing is not okay & add to message user will get.
+				log.error('loadArrayInput failed during DB inserts with updates with: ' + error.stack);
+				isAllReadingsOk = false;
+				msgTotal += 'Attempting to insert the readings into the database with updates failed with error: \"' + error.stack +
+					'\n and the pipeline returned these messages: ' + msgTotal;
+			})
+	} else {
+		await Reading.insertOrIgnoreAll(readingsToInsert, conn)
+			.catch(error => {
+				// DB insert failed. log it, note that processing is not okay & add to message user will get.
+				log.error('loadArrayInput failed during DB inserts with: ' + error.stack);
+				isAllReadingsOk = false;
+				msgTotal += 'Attempting to insert the readings into the database failed with error: \"' + error.stack +
+					'\n and the pipeline returned these messages: ' + msgTotal;
+			})
+	}
 	return { isAllReadingsOk, msgTotal };
 }
 

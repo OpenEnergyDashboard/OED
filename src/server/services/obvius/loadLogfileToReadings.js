@@ -72,6 +72,8 @@ async function loadLogfileToReadings(serialNumber, ipAddress, logfile, conn) {
 				readingLengthVariation = meter.readingVariation,
 				// Obvius meters have endOnlyTime true by default.
 				isEndOnly = meter.endOnlyTime,
+				// Unsure if previous values should not change but going to assume want the latest one sent.
+				shouldUpdate = true,
 				conditionSet = undefined,
 				conn = conn
 			);

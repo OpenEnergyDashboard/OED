@@ -96,6 +96,8 @@ async function readMamacData(meter, conn) {
 		// Every reading should be the same length
 		readingLengthVariation = 0,
 		isEndOnly = false,
+		// Previous Mamac values should not change.
+		shouldUpdate = false,
 		conditionSet = undefined,
 		conn = conn
 	);

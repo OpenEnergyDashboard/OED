@@ -20,9 +20,10 @@ const moment = require('moment');
  */
 async function uploadReadings(req, res, filepath, conn) {
 	// TODO update parameter is not currently used
-	const { meterName, createMeter, headerRow } = req.body; // extract query parameters
+	const { meterName, createMeter, headerRow, update } = req.body; // extract query parameters
 	// headerRow has no value in the DB for a meter so always use the value passed.
 	const hasHeaderRow = (headerRow === 'true');
+	const shouldUpdate = (update === 'true');
 	let meterCreated = false;
 	let meter = await Meter.getByName(meterName, conn)
 		.catch(async err => {
@@ -103,14 +104,14 @@ async function uploadReadings(req, res, filepath, conn) {
 		if (meter.cumulative === null) {
 			// This probably should not happen with a new DB but keep just in case.
 			// No variation allowed.
-			readingCumulative = BooleanTypesJS.false;
+			readingsCumulative = BooleanTypesJS.false;
 		} else {
-			readingCumulative = BooleanTypesJS[meter.cumulative];
+			readingsCumulative = BooleanTypesJS[meter.cumulative];
 		}
 	} else {
-		readingCumulative = cumulative;
+		readingsCumulative = cumulative;
 	}
-	const areReadingsCumulative = (readingCumulative === 'true');
+	const areReadingsCumulative = (readingsCumulative === 'true');
 
 	if (cumulativeReset === undefined || cumulativeReset === BooleanTypesJS.meter) {
 		if (meter.cumulativeReset === null) {
@@ -203,6 +204,7 @@ async function uploadReadings(req, res, filepath, conn) {
 		readingLengthVariation,
 		areReadingsEndOnly,
 		hasHeaderRow,
+		shouldUpdate,
 		undefined,
 		conn
 	); // load csv data

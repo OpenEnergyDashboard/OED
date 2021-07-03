@@ -24,6 +24,7 @@ const { log } = require('../../log');
  * @param {number} readingLengthVariation defines how much the length of a pair of readings can vary in seconds
  * @param {boolean} isEndOnly true if the given data only has final reading date/time and not start date/time
  * @param {boolean} headerRow true if the given file has a header row
+ * @param {boolean} shouldUpdate true if new values should replace old ones, otherwise false
  * @param {array} conditionSet used to validate readings (minVal, maxVal, minDate, maxDate, threshold, maxError)
  * @param {array} conn connection to database
  */
@@ -41,6 +42,7 @@ async function loadCsvInput(
 	readingLengthVariation,
 	isEndOnly,
 	headerRow,
+	shouldUpdate,
 	conditionSet,
 	conn
 ) {
@@ -51,7 +53,7 @@ async function loadCsvInput(
 		}
 		return loadArrayInput(dataRows, meterID, mapRowToModel, timeSort, readingRepetition,
 			isCumulative, cumulativeReset, cumulativeResetStart, cumulativeResetEnd,
-			readingGap, readingLengthVariation, isEndOnly, conditionSet, conn);
+			readingGap, readingLengthVariation, isEndOnly, shouldUpdate, conditionSet, conn);
 	} catch (err) {
 		log.error(`Error updating meter ${meterID} with data from ${filePath}: ${err}`, err);
 	}

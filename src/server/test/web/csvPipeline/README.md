@@ -869,5 +869,48 @@ The script also describes how to delete all the meters/readings if you want to r
    <td>The meter in DB is set to end_only_time='true' and no value in curl. Should get usual values with first one dropped.
    </td>
   </tr>
-
+  <tr>
+   <td>regAsc & regAscUpdate
+   </td>
+   <td>pipe35
+   </td>
+   <td>
+   </td>
+   <td>
+   <td>
+   </td>
+   </td>
+   <td>
+   </td>
+   <td>
+   </td>
+   <td>
+   </td>
+    <td>
+   </td>
+   <td>Do second insert with update where change value 1 to 1.5 and 5 to 5.5 and insert new value 0 a day earlier and 6 a day later. Should get 0, 1.5, 2, 3, 4, 5.5, 6.
+   </td>
+  </tr>
+  <tr>
+   <td>regAsc & regAscUpdate
+   </td>
+   <td>pipe36
+   </td>
+   <td>
+   </td>
+   <td>
+   <td>
+   </td>
+   </td>
+   <td>
+   </td>
+   <td>
+   </td>
+   <td>
+   </td>
+    <td>
+   </td>
+   <td>Do second insert without update where change value 1 to 1.5 and 5 to 5.5 and insert new value 0 a day earlier and 6 a day later. Should get 0-6.
+   </td>
+  </tr>
 </table>
