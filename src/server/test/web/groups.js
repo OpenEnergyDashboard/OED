@@ -37,7 +37,7 @@ mocha.describe('groups API', () => {
 		meterA = new Meter(undefined, 'A', null, false, true, Meter.type.MAMAC, null, gpsPoint,
 		'Identified A' ,'notes A', 35.0, true, true, '01:01:25' , '00:00:00', 5, 0, 1, 'increasing', false,
 		1.5,'0001-01-01 23:59:59', '2020-07-02 01:00:10');
-		meterB = new Meter(undefined, 'B', null, false, true, Meter.type.MAMAC, null, gpsPoint, 
+		meterB = new Meter(undefined, 'B', null, false, true, Meter.type.OTHER, null, gpsPoint, 
 		'Identified B', 'notes B', 33.5, true, true, '05:05:09', '09:00:01', 0, 0, 1, 'increasing', false,
 		25.5, '0001-01-01 23:59:59', '2020-07-02 01:00:10');
 		meterC = new Meter(undefined, 'C', null, false, true, Meter.type.METASYS, null, gpsPoint, 

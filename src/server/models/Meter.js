@@ -235,7 +235,10 @@ class Meter {
 Meter.type = {
 	MAMAC: 'mamac',
 	METASYS: 'metasys',
-	OBVIUS: 'obvius'
+	OBVIUS: 'obvius',
+	// Other is used when set by OED due to automatic creation and unknown.
+	// Can also be used by others when needed.
+	OTHER: 'other'
 };
 
 module.exports = Meter;

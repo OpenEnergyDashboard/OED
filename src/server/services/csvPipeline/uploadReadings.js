@@ -19,7 +19,6 @@ const moment = require('moment');
  * @returns 
  */
 async function uploadReadings(req, res, filepath, conn) {
-	// TODO update parameter is not currently used
 	const { meterName, createMeter, headerRow, update } = req.body; // extract query parameters
 	// headerRow has no value in the DB for a meter so always use the value passed.
 	const hasHeaderRow = (headerRow === 'true');
@@ -36,8 +35,8 @@ async function uploadReadings(req, res, filepath, conn) {
 				);
 			} else {
 				// If createMeter is true, we will create the meter for the user.
-				// The meter type cannot be null. We use MAMAC as a default.
-				const tempMeter = new Meter(undefined, meterName, undefined, false, false, Meter.type.MAMAC, undefined, undefined, meterName,
+				// The meter type is unknown so set to other.
+				const tempMeter = new Meter(undefined, meterName, undefined, false, false, Meter.type.OTHER, undefined, undefined, meterName,
 					'created via reading upload on ' + moment().format());
 				await tempMeter.insert(conn);
 				meterCreated = true;
