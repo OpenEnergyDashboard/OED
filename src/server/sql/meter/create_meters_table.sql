@@ -50,6 +50,6 @@ CREATE TABLE IF NOT EXISTS meters (
     time_sort TEXT DEFAULT 'increasing',
     end_only_time BOOLEAN DEFAULT false,
     reading REAL DEFAULT 0.0,
-    start_timestamp TIMESTAMP DEFAULT '0001-01-01 00:00:00',
-    end_timestamp TIMESTAMP DEFAULT '0001-01-01 00:00:00'
+    start_timestamp TIMESTAMP DEFAULT '1970-01-01 00:00:00',
+    end_timestamp TIMESTAMP DEFAULT '1970-01-01 00:00:00'
 );

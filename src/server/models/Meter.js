@@ -31,8 +31,8 @@ class Meter {
 	 * @param timeSort 'increasing' if provided readings increase in time (default) & 'decreasing' if other way
 	 * @param endOnlyTime true if provided readings only have an end time, false by default
 	 * @param reading The value of reading, default 0.0
-	 * @param startTimestamp Start timestamp of last reading input for this meter, default '01-01-01 00:00:00'
-	 * @param endTimestamp  End timestamp of last reading input for this meter, '01-01-01 00:00:00' 
+	 * @param startTimestamp Start timestamp of last reading input for this meter, default '1970-01-01 00:00:00'
+	 * @param endTimestamp  End timestamp of last reading input for this meter, '1970-01-01 00:00:00' 
 	 */
 	constructor(id, name, ipAddress, enabled, displayable, type, meterTimezone, gps = undefined, identifier = name, note, area,
 		cumulative = false, cumulativeReset = false, cumulativeResetStart = '00:00:00', cumulativeResetEnd = '23:59:59.999999',
