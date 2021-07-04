@@ -174,6 +174,41 @@ class Meter {
 	}
 
 	/**
+	 * Updates the meter with values passed if not undefined.
+	 * For parameter info see {@link Meter#constructor}.
+	 */
+	merge(name = this.name, ipAddress = this.ipAddress, enabled = this.enabled, displayable = this.displayable, type = this.type,
+		meterTimezone = this.meterTimezone, gps = this.gps, identifier = this.identifier, note = this.note, area = this.area,
+		cumulative = this.cumulative, cumulativeReset = this.cumulativeReset, cumulativeResetStart = this.cumulativeResetStart,
+		cumulativeResetEnd = this.cumulativeResetEnd, readingGap = this.readingGap, readingVariation = this.readingVariation,
+		readingDuplication = this.readingDuplication, timeSort = this.timeSort, endOnlyTime = this.endOnlyTime,
+		reading = this.reading, startTimestamp = this.startTimestamp, endTimestamp = this.endTimestamp) {
+
+		this.name = name;
+		this.ipAddress = ipAddress;
+		this.enabled = enabled;
+		this.displayable = displayable;
+		this.type = type;
+		this.meterTimezone = meterTimezone;
+		this.gps = gps;
+		this.identifier = identifier;
+		this.note = note;
+		this.area = area;
+		this.cumulative = cumulative;
+		this.cumulativeReset = cumulativeReset;
+		this.cumulativeResetStart = cumulativeResetStart;
+		this.cumulativeResetEnd = cumulativeResetEnd;
+		this.readingGap = readingGap;
+		this.readingVariation = readingVariation;
+		this.readingDuplication = readingDuplication;
+		this.timeSort = timeSort;
+		this.endOnlyTime = endOnlyTime;
+		this.reading = reading;
+		this.startTimestamp = startTimestamp;
+		this.endTimestamp = endTimestamp;
+	}
+
+	/**
 	 * Returns a promise to update an existing meter in the database
 	 * @param conn the connection to use.
 	 * @returns {Promise.<>}

@@ -122,25 +122,26 @@ router.post('/meters', validateMetersCsvUploadParams, async (req, res) => {
 
 		const conn = getConnection();
 		await uploadMeters(req, res, csvFilepath, conn);
+		success(req, res, 'Successfully inserted the meters.');
 	} catch (error) {
 		failure(req, res, error);
-	}
-
-	// Clean up files
-	fs.unlink(uploadedFilepath) // Delete the uploaded file.
-		.then(() => log.info(`Successfully deleted the uploaded file ${uploadedFilepath}.`))
-		.catch(err => {
-			log.error(`Failed to remove the file ${uploadedFilepath}.`, err);
-		});
-
-	// If user has indicated that the file is (g)zipped, then we also have to remove the unzipped file.
-	if (isGzip) {
-		// Delete the unzipped csv file if it exists.
-		fs.unlink(csvFilepath)
-			.then(() => log.info(`Successfully deleted the unzipped csv file ${csvFilepath}.`))
+	} finally {
+		// Clean up files
+		fs.unlink(uploadedFilepath) // Delete the uploaded file.
+			.then(() => log.info(`Successfully deleted the uploaded file ${uploadedFilepath}.`))
 			.catch(err => {
-				log.error(`Failed to remove the file ${csvFilepath}.`, err);
+				log.error(`Failed to remove the file ${uploadedFilepath}.`, err);
 			});
+
+		// If user has indicated that the file is (g)zipped, then we also have to remove the unzipped file.
+		if (isGzip) {
+			// Delete the unzipped csv file if it exists.
+			fs.unlink(csvFilepath)
+				.then(() => log.info(`Successfully deleted the unzipped csv file ${csvFilepath}.`))
+				.catch(err => {
+					log.error(`Failed to remove the file ${csvFilepath}.`, err);
+				});
+		}
 	}
 });
 

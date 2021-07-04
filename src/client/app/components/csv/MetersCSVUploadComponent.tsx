@@ -5,9 +5,7 @@
 import * as React from 'react';
 import { Button, Input, Form, FormGroup, Label } from 'reactstrap';
 import { MetersCSVUploadProps } from '../../types/csvUploadForm';
-import { showErrorNotification, showSuccessNotification } from '../../utils/notifications';
 import FormFileUploaderComponent from '../FormFileUploaderComponent';
-import translate from '../../utils/translate';
 import { FormattedMessage } from 'react-intl';
 
 export default class MetersCSVUploadComponent extends React.Component<MetersCSVUploadProps> {
@@ -25,12 +23,14 @@ export default class MetersCSVUploadComponent extends React.Component<MetersCSVU
 			const current = this.fileInput.current as HTMLInputElement;
 			const { files } = current;
 			if (files && (files as FileList).length !== 0) {
-				await this.props.submitCSV(files[0]);
-				showSuccessNotification(translate('csv.success.upload.meters'));
+				await this.props.submitCSV(files[0])
+				// TODO Using an alert is not the best. At some point this should be integrated
+				// with react.
+				window.alert('<h1>SUCCESS</h1>The meter upload was a success.');
 			}
 		} catch (error) {
 			// A failed axios request should result in an error.
-			showErrorNotification(translate(error.response.data as string), undefined, 10);
+			window.alert(error.response.data as string);
 		}
 	}
 

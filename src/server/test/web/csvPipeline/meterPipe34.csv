@@ -1,1 +1,2 @@
-pipe34,123.45.6.0,FALSE,TRUE,mamac,,,pipe34
+name,ipaddress,enabled,displayable,type,timezone,gps,identifier,note,area,cumulative,reset,reset start,reset end,gap,variation,duplicates,timesort,end only,reading,start time,end time
+pipe34,123.45.6.0,false,true,mamac,,,pipe34,,,,,,,,,,,true,,,

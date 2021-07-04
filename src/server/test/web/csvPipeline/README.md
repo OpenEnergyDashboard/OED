@@ -691,11 +691,11 @@ The script also describes how to delete all the meters/readings if you want to r
    </td>
     <td>
    </td>
-   <td>The meter in DB is set to cumulative but not sent via curl. Expect usual cumulative values.
+   <td>The meter in DB is set to cumulative but not sent via curl. Also tests update without header. Expect usual cumulative values.
    </td>
   </tr>
   <tr>
-   <td>cumAscResetMidnight & meterPipe26 (to create meter)
+   <td>cumAscResetMidnight & meterPipe26.csv.gz (to create meter) & meterPipe26Update.csv.gz (to update meter)
    </td>
    <td>pipe26
    </td>
@@ -713,7 +713,7 @@ The script also describes how to delete all the meters/readings if you want to r
    </td>
     <td>
    </td>
-   <td>The meter in DB is set to cumulative & cumulative_reset but not sent via curl. Expect usual cumulative values.
+   <td>The meter in DB is set to cumulative & cumulative_reset but not sent via curl. Checks creating and updating meter with gzip file and header. Expect usual cumulative values.
    </td>
   </tr>
   <tr>
@@ -735,7 +735,7 @@ The script also describes how to delete all the meters/readings if you want to r
    </td>
     <td>
    </td>
-   <td>The meter in DB is set to cumulative, cumulative_reset to true & reset range is 11:45-12:15 but not sent via curl. The reset value should be reject row 4 since negative and no readings for meter.
+   <td>The meter in DB is set to cumulative, cumulative_reset to true & reset range is 11:45-12:15 but not sent via curl. This and following ones test that you can create a meter with various values set. The reset value should be reject row 4 since negative and no readings for meter.
    </td>
   </tr><tr>
    <td>cumAscResetMidnight & meterPipe28 (to create meter)
@@ -910,7 +910,73 @@ The script also describes how to delete all the meters/readings if you want to r
    </td>
     <td>
    </td>
-   <td>Do second insert without update where change value 1 to 1.5 and 5 to 5.5 and insert new value 0 a day earlier and 6 a day later. Should get 0-6.
+   <td>Do second insert without update where change value 1 to 1.5 and 5 to 5.5 and insert new value 0 a day earlier and 6 a day later. The updates to 1.5 and 5.5 should not happen but new values should appear. Should get 0-6.
+   </td>
+   </tr>
+   <tr>
+    <td>meterPipe40
+   </td>
+  <td>pipe40
+   </td>
+  <td>
+   <td>
+   </td>
+   </td>
+  <td>
+   </td>
+    <td>
+   </td>
+   <td>
+   </td>
+   <td>
+   </td>
+    <td>
+   </td>
+   <td>Give update name as parameter when more than one row in CSV on second one. All updates should be rejected with error. Original meter creation should give meters pipe37 and pipe37a. pipe37 sets note to note37, area to 13, reading to 17, start time to 1111-11-10 11:11:11 and end time to 1111-11-11 11:11:11 to test setting these values since not done before.
+   </td>
+  </tr>
+  <tr>
+   <td>meterPipe41
+   </td>
+  <td>pipe41
+   </td>
+   <td>
+   <td>
+   </td>
+   </td>
+   <td>
+   </td>
+   <td>
+   </td>
+   <td>
+   </td>
+   <td>
+   </td>
+    <td>
+   </td>
+   <td>File has two meters to insert where second is same name so should be rejected. Only see meter pipe38 with same values as last one.
+   </td>
+  </tr>
+  <tr>
+   <td>meterPipe42
+   </td>
+  <td>pipe42
+   </td>
+   <td>
+   <td>
+   </td>
+   </td>
+   <td>
+   </td>
+   <td>
+   </td>
+   <td>
+   </td>
+   <td>
+   </td>
+    <td>
+   </td>
+   <td>Update of meter but name does not exist
    </td>
   </tr>
 </table>

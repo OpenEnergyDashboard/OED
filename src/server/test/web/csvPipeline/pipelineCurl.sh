@@ -78,61 +78,61 @@ echo -e "\n\n<h3>starting pipe24</h3>"
 curl localhost:3000/api/csv/readings -X POST -F 'cumulative=true' -F 'meterName=pipe24' -F 'createMeter=true' -F 'gzip=false' -F 'email=test@example.com' -F 'password=password' -F 'csvfile=@cumAsc.csv'
 curl localhost:3000/api/csv/readings -X POST -F 'cumulative=true' -F 'cumulativeReset=true' -F 'meterName=pipe24' -F 'gzip=false' -F 'email=test@example.com' -F 'password=password' -F 'csvfile=@cumAscAddReset.csv'
 echo -e "\n\n<h3>starting pipe25</h3>"
-curl localhost:3000/api/csv/meters -X POST -F 'headerRow=false' -F 'gzip=false' -F 'email=test@example.com' -F 'password=password' -F 'csvfile=@meterPipe25.csv'
-# edit meter so cumulative is true
-docker compose -f $oedHome/docker-compose.yml exec database psql -U oed -c "update meters set cumulative=true where name='pipe25'"
+curl localhost:3000/api/csv/meters -X POST -F 'gzip=false' -F 'email=test@example.com' -F 'password=password' -F 'csvfile=@meterPipe25.csv'
+# update meter so cumulative is true
+curl localhost:3000/api/csv/meters -X POST -F'meterName=pipe25' -F 'update=true' -F 'gzip=false' -F 'email=test@example.com' -F 'password=password' -F 'csvfile=@meterPipe25Update.csv'
 curl localhost:3000/api/csv/readings -X POST -F 'meterName=pipe25' -F 'gzip=false' -F 'email=test@example.com' -F 'password=password' -F 'csvfile=@cumAsc.csv'
 echo -e "\n\n<h3>starting pipe26</h3>"
-curl localhost:3000/api/csv/meters -X POST -F 'headerRow=false' -F 'gzip=false' -F 'email=test@example.com' -F 'password=password' -F 'csvfile=@meterPipe26.csv'
-# edit meter so cumulative & reset is true
-docker compose -f $oedHome/docker-compose.yml exec database psql -U oed -c "update meters set cumulative=true where name='pipe26'; update meters set cumulative_reset=true where name='pipe26'"
+curl localhost:3000/api/csv/meters -X POST -F 'headerRow=true' -F 'email=test@example.com' -F 'password=password' -F 'csvfile=@meterPipe26.csv.gz'
+# update meter so cumulative & reset is true
+curl localhost:3000/api/csv/meters -X POST -F 'meterName=pipe26x' -F 'update=true' -F 'headerRow=true' -F 'email=test@example.com' -F 'password=password' -F 'csvfile=@meterPipe26Update.csv.gz'
 curl localhost:3000/api/csv/readings -X POST -F 'meterName=pipe26' -F 'gzip=false' -F 'email=test@example.com' -F 'password=password' -F 'csvfile=@cumAscResetMidnight.csv'
 echo -e "\n\n<h3>starting pipe27</h3>"
-curl localhost:3000/api/csv/meters -X POST -F 'headerRow=false' -F 'gzip=false' -F 'email=test@example.com' -F 'password=password' -F 'csvfile=@meterPipe27.csv'
-# edit meter so cumulative, reset  & reset times around noon is true
-docker compose -f $oedHome/docker-compose.yml exec database psql -U oed -c "update meters set cumulative=true where name='pipe27'; update meters set cumulative_reset=true where name='pipe27'; update meters set cumulative_reset_start='11:45' where name='pipe27'; update meters set cumulative_reset_end='12:15' where name='pipe27'"
+# create meter so cumulative, reset  & reset times around noon is true
+curl localhost:3000/api/csv/meters -X POST -F 'headerRow=true' -F 'gzip=false' -F 'email=test@example.com' -F 'password=password' -F 'csvfile=@meterPipe27.csv'
 curl localhost:3000/api/csv/readings -X POST -F 'meterName=pipe27' -F 'gzip=false' -F 'email=test@example.com' -F 'password=password' -F 'csvfile=@cumAscResetMidnight.csv'
 echo -e "\n\n<h3>starting pipe28</h3>"
-curl localhost:3000/api/csv/meters -X POST -F 'headerRow=false' -F 'gzip=false' -F 'email=test@example.com' -F 'password=password' -F 'csvfile=@meterPipe28.csv'
-# edit meter so cumulative, reset  & reset times around noon is true
-docker compose -f $oedHome/docker-compose.yml exec database psql -U oed -c "update meters set cumulative=true where name='pipe28'; update meters set cumulative_reset=true where name='pipe28'; update meters set cumulative_reset_start='11:45' where name='pipe28'; update meters set cumulative_reset_end='12:15' where name='pipe28'"
+# create meter so cumulative, reset  & reset times around noon is true
+curl localhost:3000/api/csv/meters -X POST -F 'headerRow=true' -F 'gzip=false' -F 'email=test@example.com' -F 'password=password' -F 'csvfile=@meterPipe28.csv'
 # override DB by providing parameters
 curl localhost:3000/api/csv/readings -X POST -F 'cumulative=true' -F 'cumulativeReset=true' -F'cumulativeResetStart=23:45' -F'cumulativeResetEnd=00:15' -F 'meterName=pipe28' -F 'gzip=false' -F 'email=test@example.com' -F 'password=password' -F 'csvfile=@cumAscResetMidnight.csv'
 echo -e "\n\n<h3>starting pipe29</h3>"
-curl localhost:3000/api/csv/meters -X POST -F 'headerRow=false' -F 'gzip=false' -F 'email=test@example.com' -F 'password=password' -F 'csvfile=@meterPipe29.csv'
-# edit meter so gap & variation are set
-docker compose -f $oedHome/docker-compose.yml exec database psql -U oed -c "update meters set reading_gap=60 where name='pipe29'; update meters set reading_variation=120 where name='pipe29'"
+# create meter so gap & variation are set
+curl localhost:3000/api/csv/meters -X POST -F 'headerRow=true' -F 'gzip=false' -F 'email=test@example.com' -F 'password=password' -F 'csvfile=@meterPipe29.csv'
 curl localhost:3000/api/csv/readings -X POST -F 'meterName=pipe29' -F 'gzip=false' -F 'email=test@example.com' -F 'password=password' -F 'csvfile=@regAscGapLength.csv'
 echo -e "\n\n<h3>starting pipe30</h3>"
-curl localhost:3000/api/csv/meters -X POST -F 'headerRow=false' -F 'gzip=false' -F 'email=test@example.com' -F 'password=password' -F 'csvfile=@meterPipe30.csv'
-# edit meter so gap & variation are set
-docker compose -f $oedHome/docker-compose.yml exec database psql -U oed -c "update meters set reading_gap=60 where name='pipe30'; update meters set reading_variation=60 where name='pipe30'"
+# create meter so gap & variation are set
+curl localhost:3000/api/csv/meters -X POST -F 'headerRow=true' -F 'gzip=false' -F 'email=test@example.com' -F 'password=password' -F 'csvfile=@meterPipe30.csv'
 # override DB by providing parameters
 curl localhost:3000/api/csv/readings -X POST -F 'meterName=pipe30' -F 'lengthGap=120.1' -F 'lengthVariation=120.2' -F 'gzip=false' -F 'email=test@example.com' -F 'password=password' -F 'csvfile=@regAscGapLength.csv'
 echo -e "\n\n<h3>starting pipe31</h3>"
-curl localhost:3000/api/csv/meters -X POST -F 'headerRow=false' -F 'gzip=false' -F 'email=test@example.com' -F 'password=password' -F 'csvfile=@meterPipe31.csv'
-# edit meter so set duplication
-docker compose -f $oedHome/docker-compose.yml exec database psql -U oed -c "update meters set reading_duplication=3 where name='pipe31'"
+# create meter so set duplication
+curl localhost:3000/api/csv/meters -X POST -F 'headerRow=true' -F 'gzip=false' -F 'email=test@example.com' -F 'password=password' -F 'csvfile=@meterPipe31.csv'
 curl localhost:3000/api/csv/readings -X POST -F 'cumulative=true' -F 'meterName=pipe31' -F 'gzip=false' -F 'email=test@example.com' -F 'password=password' -F 'csvfile=@cumAscDuplication3.csv'
 echo -e "\n\n<h3>starting pipe32</h3>"
-curl localhost:3000/api/csv/meters -X POST -F 'headerRow=false' -F 'gzip=false' -F 'email=test@example.com' -F 'password=password' -F 'csvfile=@meterPipe32.csv'
-# edit meter so set timesort to decreasing
-docker compose -f $oedHome/docker-compose.yml exec database psql -U oed -c "update meters set time_sort='decreasing' where name='pipe32'"
+# create meter so set timesort to decreasing
+curl localhost:3000/api/csv/meters -X POST -F 'headerRow=true' -F 'gzip=false' -F 'email=test@example.com' -F 'password=password' -F 'csvfile=@meterPipe32.csv'
 curl localhost:3000/api/csv/readings -X POST -F 'meterName=pipe32' -F 'gzip=false' -F 'email=test@example.com' -F 'password=password' -F 'csvfile=@regDsc.csv'
 echo -e "\n\n<h3>starting pipe34</h3>"
-curl localhost:3000/api/csv/meters -X POST -F 'headerRow=false' -F 'gzip=false' -F 'email=test@example.com' -F 'password=password' -F 'csvfile=@meterPipe34.csv'
-# edit meter so set end only to true
-docker compose -f $oedHome/docker-compose.yml exec database psql -U oed -c "update meters set end_only_time='true' where name='pipe34'"
+# create meter so set end only to true
+curl localhost:3000/api/csv/meters -X POST -F 'headerRow=true' -F 'gzip=false' -F 'email=test@example.com' -F 'password=password' -F 'csvfile=@meterPipe34.csv'
 curl localhost:3000/api/csv/readings -X POST -F 'meterName=pipe34' -F 'gzip=false' -F 'email=test@example.com' -F 'password=password' -F 'csvfile=@regAscEndonly.csv'
-echo -e "\n\n<h3>starting pipe35</h3>"
-curl localhost:3000/api/csv/readings -X POST -F 'meterName=pipe35' -F 'createMeter=true' -F 'gzip=false' -F 'email=test@example.com' -F 'password=password' -F 'csvfile=@regAsc.csv'
+echo -e "\n\n<h3>starting pipe38</h3>"
+curl localhost:3000/api/csv/readings -X POST -F 'meterName=pipe38' -F 'createMeter=true' -F 'gzip=false' -F 'email=test@example.com' -F 'password=password' -F 'csvfile=@regAsc.csv'
 # Insert new 0 at start, 6 at end and update original first to be 1.5 and last to be 5.5.
-curl localhost:3000/api/csv/readings -X POST -F 'meterName=pipe35' -F 'update=true' -F 'gzip=false' -F 'email=test@example.com' -F 'password=password' -F 'csvfile=@regAscUpdate.csv'
-echo -e "\n\n<h3>starting pipe36</h3>"
-curl localhost:3000/api/csv/readings -X POST -F 'meterName=pipe36' -F 'createMeter=true' -F 'gzip=false' -F 'email=test@example.com' -F 'password=password' -F 'csvfile=@regAsc.csv'
+curl localhost:3000/api/csv/readings -X POST -F 'meterName=pipe38' -F 'update=true' -F 'gzip=false' -F 'email=test@example.com' -F 'password=password' -F 'csvfile=@regAscUpdate.csv'
+echo -e "\n\n<h3>starting pipe39</h3>"
+curl localhost:3000/api/csv/readings -X POST -F 'meterName=pipe39' -F 'createMeter=true' -F 'gzip=false' -F 'email=test@example.com' -F 'password=password' -F 'csvfile=@regAsc.csv'
 # Insert new 0 at start, 6 at end and update original first to be 1.5 and last to be 5.5.
 # refresh on last upload of readings and all will be available for graphing
-curl localhost:3000/api/csv/readings -X POST -F 'refreshReadings=true' -F 'meterName=pipe36' -F 'gzip=false' -F 'email=test@example.com' -F 'password=password' -F 'csvfile=@regAscUpdate.csv'
+curl localhost:3000/api/csv/readings -X POST -F 'refreshReadings=true' -F 'meterName=pipe39' -F 'gzip=false' -F 'email=test@example.com' -F 'password=password' -F 'csvfile=@regAscUpdate.csv'
+echo -e "\n\n<h3>starting pipe40</h3>"
+curl localhost:3000/api/csv/meters -X POST -F 'headerRow=true' -F 'gzip=false' -F 'email=test@example.com' -F 'password=password' -F 'csvfile=@meterPipe40.csv'
+curl localhost:3000/api/csv/meters -X POST -F 'meterName=pipe40' -F 'update=true' -F 'headerRow=true' -F 'gzip=false' -F 'email=test@example.com' -F 'password=password' -F 'csvfile=@meterPipe40.csv'
+echo -e "\n\n<h3>starting pipe41</h3>"
+curl localhost:3000/api/csv/meters -X POST -F 'headerRow=true' -F 'gzip=false' -F 'email=test@example.com' -F 'password=password' -F 'csvfile=@meterPipe41.csv'
+echo -e "\n\n<h3>starting pipe42</h3>"
+curl localhost:3000/api/csv/meters -X POST -F 'update=true' -F 'headerRow=true' -F 'gzip=false' -F 'email=test@example.com' -F 'password=password' -F 'csvfile=@meterPipe42.csv'
 
 # final blank line so easier to see in terminal.
 echo -e ""

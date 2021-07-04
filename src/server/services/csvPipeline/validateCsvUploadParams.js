@@ -72,6 +72,7 @@ const DEFAULTS = {
 // (i.e. when the user performs a curl request to the pipeline). Thus, we list these properties 
 // here so that they do not falsely trigger the 'additionalProperties' User Error.
 const COMMON_PROPERTIES = {
+	meterName: new StringParam('meterName', undefined, undefined),
 	email: new StringParam('email', undefined, undefined),
 	password: new StringParam('password', undefined, undefined),
 	gzip: new BooleanParam('gzip'),
@@ -94,7 +95,6 @@ const VALIDATION = {
 		required: ['meterName'],
 		properties: {
 			...COMMON_PROPERTIES,
-			meterName: new StringParam('meterName', undefined, undefined),
 			timeSort: new EnumParam('timeSort', [TimeSortTypesJS.increasing, TimeSortTypesJS.decreasing, TimeSortTypesJS.meter]),
 			duplications: new StringParam('duplications', '^\\d+$|^(?![\s\S])', 'duplications must be an integer or empty.'),
 			cumulative: new EnumParam('cumulative', [BooleanTypesJS.true, BooleanTypesJS.false, BooleanTypesJS.meter]),
