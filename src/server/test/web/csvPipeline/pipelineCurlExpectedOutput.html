@@ -125,3 +125,18 @@
 
 <h3>starting pipe42</h3>
 <h1>FAILURE</h1>CSVPipelineError: Failed to upload meters due to internal OED Error: Meter name of pipe42 does not seem to exist with update for meters and got DB error of: No data returned from the query.
+
+<h3>starting pipe43</h3>
+<h1>FAILURE</h1><h2>It looks like the insert of the readings had issues with some or all of the readings where the processing of the readings returned these warning(s)/error(s):</h2>For meter pipe43: Error parsing Reading #2 The start and/or end time provided did not parse into a valid date/time so all reading are rejected.<br>For reading #2 on meter pipe43 in pipeline: previous reading has value 24 start time 2021-06-01T00:00:00+00:00 end time 2021-06-02T00:00:00+00:00 and current reading has value unknown start time Invalid date end time 2021-06-03T00:00:00+00:00 with timeSort increasing; duplications 1; cumulative false; cumulativeReset false; cumulativeResetStart 00:00:00; cumulativeResetEnd 23:59:59.999999; lengthGap 0; lengthVariation 0; onlyEndTime false<br>
+
+<h3>starting pipe44</h3>
+<h1>FAILURE</h1><h2>It looks like the insert of the readings had issues with some or all of the readings where the processing of the readings returned these warning(s)/error(s):</h2>For meter pipe44: Error parsing Reading #2 The start and/or end time provided did not parse into a valid date/time so all reading are rejected.<br>For reading #2 on meter pipe44 in pipeline: previous reading has value 24 start time 2021-06-01T00:00:00+00:00 end time 2021-06-02T00:00:00+00:00 and current reading has value unknown start time 2021-06-02T00:00:00+00:00 end time Invalid date with timeSort increasing; duplications 1; cumulative false; cumulativeReset false; cumulativeResetStart 00:00:00; cumulativeResetEnd 23:59:59.999999; lengthGap 0; lengthVariation 0; onlyEndTime false<br>
+
+<h3>starting pipe45</h3>
+<h1>SUCCESS</h1><h2>It looks like the insert of the readings was a success.</h2>
+
+<h3>starting pipe46</h3>
+<h1>FAILURE</h1><h2>It looks like the insert of the readings had issues with some or all of the readings where the processing of the readings returned these warning(s)/error(s):</h2><br>For meter pipe46: Error parsing Reading #1. Reading value gives 24 with error message:<br>The first ever reading must be dropped when dealing with cumulative data.<br>For reading #1 on meter pipe46 in pipeline: previous reading has value 0 start time 1970-01-01T00:00:00+00:00 end time 1970-01-01T00:00:00+00:00 and current reading has value 24 start time 2021-06-01T00:00:00+00:00 end time 2021-06-02T00:00:00+00:00 with timeSort increasing; duplications 1; cumulative true; cumulativeReset false; cumulativeResetStart 00:00:00; cumulativeResetEnd 23:59:59.999999; lengthGap 0; lengthVariation 0; onlyEndTime false<br>For meter pipe46: Error parsing Reading #4 with cumulative data. The reading value provided of 240.x is not considered a number so all reading are rejected.<br>
+
+<h3>starting pipe47</h3>
+<h1>FAILURE</h1><h2>It looks like the insert of the readings had issues with some or all of the readings where the processing of the readings returned these warning(s)/error(s):</h2>For meter pipe47: Error parsing Reading #4 The reading value provided of 240.x is not considered a number so all reading are rejected.<br>

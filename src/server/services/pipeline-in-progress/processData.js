@@ -114,21 +114,47 @@ async function processData(rows, meterID, timeSort = 'increasing', readingRepeti
 		// Moment parses readings with date first, time first, dates separated by / or -,
 		// times with or without seconds. The date can have the year first or last but
 		// cannot have the day first (month okay). Thus, we just use the default parsing.
-		// TODO catch error if conversion to moment fails.
+		// Set moment to strict mode so will give Invalid date if any issues.
 		if (isEndTime) {
 			// The startTimestamp of this reading is the endTimestamp of the previous reading
 			startTimestamp = prevReading.endTimestamp;
-			endTimestamp = moment(rows[index][1]);
+			endTimestamp = moment(rows[index][1], undefined, true);
 		}
 		else {
-			startTimestamp = moment(rows[index][1]);
-			endTimestamp = moment(rows[index][2]);
+			startTimestamp = moment(rows[index][1], undefined, true);
+			endTimestamp = moment(rows[index][2], undefined, true);
+		}
+		if (startTimestamp.format() === 'Invalid date' || endTimestamp.format() === 'Invalid date') {
+			errMsg += 'For meter ' + meterName + ': Error parsing Reading #' + row(index, isAscending, rows.length) +
+				' The start and/or end time provided did not parse into a valid date/time so all reading are rejected.<br>';
+			log.error(errMsg);
+			// We use the current reading where provide 'unknown' for reading value since not yet set.
+			// since only output this is okay.
+			errMsg += logStatus(meterName, row(index, isAscending, rows.length), prevReading,
+				new Reading(meterID, 'unknown', startTimestamp, endTimestamp), timeSort, readingRepetition,
+				isCumulative, cumulativeReset, resetStart, resetEnd, readingGap, readingLengthVariation, isEndTime) + '<br>';
+			({ msgTotal, msgTotalWarning } = appendMsgTotal(msgTotal, errMsg, msgTotalWarning));
+			// This empties the result array. Should be fast and okay with const.
+			result.splice(0, result.length);
+			isAllReadingsOk = false;
+			return { result, isAllReadingsOk, msgTotal };
 		}
 		// Determine the meter reading value to use based on if the data is cumulative or not cumulative
-		// TODO should probably check that values are numbers.
 		if (isCumulative) {
 			meterReading1 = meter.reading; // In cumulative this is the canonical previous raw reading
 			meterReading2 = rows[index][0]; // In cumulative this is the canonical current raw reading
+			// Check the current reading is a number. The previous one should already be checked.
+			if (isNaN(meterReading2)) {
+				errMsg += 'For meter ' + meterName + ': Error parsing Reading #' + row(index, isAscending, rows.length) +
+					' with cumulative data. The reading value provided of ' + meterReading2 +
+					' is not considered a number so all reading are rejected.<br>';
+				log.error(errMsg);
+				msgTotal += errMsg;
+				// This empties the result array. Should be fast and okay with const.
+				result.splice(0, result.length);
+				isAllReadingsOk = false;
+				return { result, isAllReadingsOk, msgTotal };
+			}
 			// In cumulative the reading we use will be the difference between the current raw reading and the previous raw reading
 			meterReading = meterReading2 - meterReading1;
 			meter.reading = meterReading2; // Always update the meter table with the most current raw cumulative value
@@ -136,6 +162,17 @@ async function processData(rows, meterID, timeSort = 'increasing', readingRepeti
 		else {
 			// The data is not cumulative use the raw reading value
 			meterReading = rows[index][0];
+			if (isNaN(meterReading)) {
+				errMsg += 'For meter ' + meterName + ': Error parsing Reading #' + row(index, isAscending, rows.length) +
+					' The reading value provided of ' + meterReading +
+					' is not considered a number so all reading are rejected.<br>';
+				log.error(errMsg);
+				msgTotal += errMsg;
+				// This empties the result array. Should be fast and okay with const.
+				result.splice(0, result.length);
+				isAllReadingsOk = false;
+				return { result, isAllReadingsOk, msgTotal };
+			}
 			meter.reading = meterReading;
 		}
 		// This value is used when logging messages if done before the last section.

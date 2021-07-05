@@ -124,8 +124,7 @@ curl localhost:3000/api/csv/readings -X POST -F 'meterName=pipe38' -F 'update=tr
 echo -e "\n\n<h3>starting pipe39</h3>"
 curl localhost:3000/api/csv/readings -X POST -F 'meterName=pipe39' -F 'createMeter=true' -F 'gzip=false' -F 'email=test@example.com' -F 'password=password' -F 'csvfile=@regAsc.csv'
 # Insert new 0 at start, 6 at end and update original first to be 1.5 and last to be 5.5.
-# refresh on last upload of readings and all will be available for graphing
-curl localhost:3000/api/csv/readings -X POST -F 'refreshReadings=true' -F 'meterName=pipe39' -F 'gzip=false' -F 'email=test@example.com' -F 'password=password' -F 'csvfile=@regAscUpdate.csv'
+curl localhost:3000/api/csv/readings -X POST -F 'meterName=pipe39' -F 'gzip=false' -F 'email=test@example.com' -F 'password=password' -F 'csvfile=@regAscUpdate.csv'
 echo -e "\n\n<h3>starting pipe40</h3>"
 curl localhost:3000/api/csv/meters -X POST -F 'headerRow=true' -F 'gzip=false' -F 'email=test@example.com' -F 'password=password' -F 'csvfile=@meterPipe40.csv'
 curl localhost:3000/api/csv/meters -X POST -F 'meterName=pipe40' -F 'update=true' -F 'headerRow=true' -F 'gzip=false' -F 'email=test@example.com' -F 'password=password' -F 'csvfile=@meterPipe40.csv'
@@ -133,6 +132,17 @@ echo -e "\n\n<h3>starting pipe41</h3>"
 curl localhost:3000/api/csv/meters -X POST -F 'headerRow=true' -F 'gzip=false' -F 'email=test@example.com' -F 'password=password' -F 'csvfile=@meterPipe41.csv'
 echo -e "\n\n<h3>starting pipe42</h3>"
 curl localhost:3000/api/csv/meters -X POST -F 'update=true' -F 'headerRow=true' -F 'gzip=false' -F 'email=test@example.com' -F 'password=password' -F 'csvfile=@meterPipe42.csv'
+echo -e "\n\n<h3>starting pipe43</h3>"
+curl localhost:3000/api/csv/readings -X POST -F 'meterName=pipe43' -F 'createMeter=true' -F 'gzip=false' -F 'email=test@example.com' -F 'password=password' -F 'csvfile=@regAscBadStarttime.csv'
+echo -e "\n\n<h3>starting pipe44</h3>"
+curl localhost:3000/api/csv/readings -X POST -F 'meterName=pipe44' -F 'createMeter=true' -F 'gzip=false' -F 'email=test@example.com' -F 'password=password' -F 'csvfile=@regAscBadEndtime.csv'
+echo -e "\n\n<h3>starting pipe45</h3>"
+curl localhost:3000/api/csv/readings -X POST -F 'meterName=pipe45' -F 'createMeter=true' -F 'gzip=false' -F 'email=test@example.com' -F 'password=password' -F 'csvfile=@regAscVariedFormats.csv'
+echo -e "\n\n<h3>starting pipe46</h3>"
+curl localhost:3000/api/csv/readings -X POST -F 'cumulative=true' -F 'meterName=pipe46' -F 'createMeter=true' -F 'gzip=false' -F 'email=test@example.com' -F 'password=password' -F 'csvfile=@cumAscBadReading.csv'
+echo -e "\n\n<h3>starting pipe47</h3>"
+# refresh on last upload of readings and all will be available for graphing
+curl localhost:3000/api/csv/readings -X POST -F 'refreshReadings=true' -F 'meterName=pipe47' -F 'createMeter=true' -F 'gzip=false' -F 'email=test@example.com' -F 'password=password' -F 'csvfile=@regAscBadReading.csv'
 
 # final blank line so easier to see in terminal.
 echo -e ""

@@ -978,5 +978,112 @@ The script also describes how to delete all the meters/readings if you want to r
    </td>
    <td>Update of meter but name does not exist
    </td>
+  </tr> <tr>
+   <td>regAscBadStarttime
+   </td>
+  <td>pipe43
+   </td>
+   <td>
+   <td>
+   </td>
+   </td>
+   <td>
+   </td>
+   <td>
+   </td>
+   <td>
+   </td>
+   <td>
+   </td>
+    <td>
+   </td>
+   <td>The second reading start time is invalid so errors on that one and no readings.
+   </td>
+  </tr> <tr>
+   <td>regAscBadEndtime
+   </td>
+  <td>pipe44
+   </td>
+   <td>
+   <td>
+   </td>
+   </td>
+   <td>
+   </td>
+   <td>
+   </td>
+   <td>
+   </td>
+   <td>
+   </td>
+    <td>
+   </td>
+   <td>The second reading end time is invalid so errors on that one and no readings.
+   </td>
+  </tr> <tr>
+   <td>regAscVariedFormats
+   </td>
+  <td>pipe45
+   </td>
+   <td>
+   <td>
+   </td>
+   </td>
+   <td>
+   </td>
+   <td>
+   </td>
+   <td>
+   </td>
+   <td>
+   </td>
+    <td>
+   </td>
+   <td>Uses various valid formats to make sure work. Should get usual ascending values.
+   </td>
   </tr>
-</table>
+<tr>
+   <td>cumAscBadReading
+   </td>
+   <td>pipe46
+   </td>
+   <td>
+   </td>
+   <td>X
+   </td>
+   <td>
+   </td>
+   <td>
+   </td>
+   <td>
+   </td>
+   <td>
+   </td>
+   <td>
+   </td>
+    <td>The first three readings try various number formats that are fine then the fourth reading has an invalid reading number so error where all readings are rejected.
+   </td>
+  </tr>
+  tr>
+   <td>regAscBadReading
+   </td>
+   <td>pipe47
+   </td>
+   <td>
+   </td>
+   <td>
+   </td>
+   <td>
+   </td>
+   <td>
+   </td>
+   <td>
+   </td>
+   <td>
+   </td>
+   <td>
+   </td>
+    <td>The first three readings try various number formats that are fine then the fourth reading has an invalid reading number so error where all readings are rejected.
+   </td>
+  </tr>
+  </table>

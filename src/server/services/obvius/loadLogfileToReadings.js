@@ -42,13 +42,13 @@ async function loadLogfileToReadings(serialNumber, ipAddress, logfile, conn) {
 			}
 			// Otherwise assume it is kWh and proceed.
 			// Switching to assume one reading is end time and can use default moment parsing of date/timestamp.
-			// TODO if need format here then reconsider mamac/pipeline setup
-			const endTimestamp = moment(rawReading[0], 'YYYY-MM-DD HH:mm:ss');
+			// It is believed that the format from Obvius will always be this way so specify.
+			// Strict mode is used so it will give Invalid date if not correct and should be caught in pipeline.
+			const endTimestamp = moment(rawReading[0], 'YYYY-MM-DD HH:mm:ss', true);
 			// const reading = new Reading(meter.id, rawReading[1], startTimestamp, endTimestamp);
 			reading[index] = [rawReading[1], endTimestamp];
 			index++;
 		}
-		// TODO deal with any errors/return value
 		try {
 			// Ignoring that loadArrayInput returns values
 			// since this is only called by an automated process at this time.

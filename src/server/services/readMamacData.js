@@ -17,7 +17,10 @@ function parseTimestamp(raw, line) {
 	if (!timestampRegExp.test(raw)) {
 		throw new Error(`CSV line ${line}: Raw timestamp ${raw} does not pass regex validation`);
 	}
-	const ts = moment(raw, 'HH:mm:ss MM/DD/YY');
+	// Set moment to strict mode so bad values are noticed.
+	const ts = moment(raw, 'HH:mm:ss MM/DD/YY', true);
+	// This check should be done in pipeline but leave here for now/historical reasons. Note in pipeline check if
+	// format() value is Invalid date.
 	if (!ts.isValid()) {
 		throw new Error(`CSV line ${line}: Raw timestamp ${raw} does not parse to a valid moment object`);
 	}
@@ -47,6 +50,7 @@ async function readMamacData(meter, conn) {
 	let meterReadings = parsedReadings.map((raw, index) => {
 		let line = index + 1;
 		const reading = Number(raw[0]);
+		// This is now checked in the pipeline but leave here for now/historical reasons.
 		if (isNaN(reading)) {
 			const e = Error(`CSV line ${line}: Meter reading ${reading} parses to NaN for meter named ${meter.name} with id ${meter.id}`);
 			e.options = { ipAddress: meter.ipAddress };
