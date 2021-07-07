@@ -8,6 +8,7 @@ import { ReadingsCSVUploadProps, TimeSortTypes, BooleanTypes } from '../../types
 import { ReadingsCSVUploadDefaults } from '../../utils/csvUploadDefaults';
 import FormFileUploaderComponent from '../FormFileUploaderComponent';
 import { FormattedMessage } from 'react-intl';
+import { MODE } from '../../containers/csv/UploadCSVContainer';
 
 /**
  * Returns a range of values between the specified lower and upper bounds.
@@ -60,7 +61,7 @@ export default class ReadingsCSVUploadComponent extends React.Component<Readings
 
 	private handleSetMeterName(e: React.ChangeEvent<HTMLInputElement>) {
 		const target = e.target;
-		this.props.setMeterName(target.value);
+		this.props.setMeterName(MODE.readings, target.value);
 	}
 
 	private handleSetTimeSort(e: React.ChangeEvent<HTMLInputElement>) {

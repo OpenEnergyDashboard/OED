@@ -25,6 +25,7 @@ export const ReadingsCSVUploadDefaults: ReadingsCSVUploadPreferencesItem = {
 }
 
 export const MetersCSVUploadDefaults: MetersCSVUploadPreferencesItem = {
+	meterName: '',
 	gzip: false,
 	headerRow: false,
 	update: false

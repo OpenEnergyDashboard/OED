@@ -7,6 +7,7 @@ import { Button, Input, Form, FormGroup, Label } from 'reactstrap';
 import { MetersCSVUploadProps } from '../../types/csvUploadForm';
 import FormFileUploaderComponent from '../FormFileUploaderComponent';
 import { FormattedMessage } from 'react-intl';
+import { MODE } from '../../containers/csv/UploadCSVContainer';
 
 export default class MetersCSVUploadComponent extends React.Component<MetersCSVUploadProps> {
 	private fileInput: React.RefObject<HTMLInputElement>;
@@ -14,6 +15,7 @@ export default class MetersCSVUploadComponent extends React.Component<MetersCSVU
 	constructor(props: MetersCSVUploadProps) {
 		super(props);
 		this.handleSubmit = this.handleSubmit.bind(this);
+		this.handleSetMeterName = this.handleSetMeterName.bind(this);
 		this.fileInput = React.createRef<HTMLInputElement>();
 	}
 
@@ -32,6 +34,11 @@ export default class MetersCSVUploadComponent extends React.Component<MetersCSVU
 			// A failed axios request should result in an error.
 			window.alert(error.response.data as string);
 		}
+	}
+
+	private handleSetMeterName(e: React.ChangeEvent<HTMLInputElement>) {
+		const target = e.target;
+		this.props.setMeterName(MODE.meters, target.value);
 	}
 
 	public render() {
@@ -71,6 +78,12 @@ export default class MetersCSVUploadComponent extends React.Component<MetersCSVU
 							<Input checked={this.props.update} type='checkbox' name='update' onChange={this.props.toggleUpdate} />
 							<FormattedMessage id='csv.common.param.update' />
 						</Label>
+					</FormGroup>
+					<FormGroup>
+						<Label style={titleStyle}>
+							<FormattedMessage id='csv.readings.param.meter.name' />
+						</Label>
+						<Input value={this.props.meterName} name='meterName' onChange={this.handleSetMeterName} />
 					</FormGroup>
 					<Button type='submit'>
 						<FormattedMessage id='csv.submit.button' />

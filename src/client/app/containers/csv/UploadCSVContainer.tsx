@@ -13,7 +13,7 @@ import { ReadingsCSVUploadDefaults, MetersCSVUploadDefaults } from '../../utils/
 import { TabContent, TabPane, Nav, NavItem, NavLink } from 'reactstrap';
 import { FormattedMessage } from 'react-intl';
 
-const enum MODE {
+export const enum MODE {
 	meters = 'meters',
 	readings = 'readings'
 }
@@ -57,11 +57,12 @@ export default class UploadCSVContainer extends React.Component<{}, UploadCSVCon
 		}
 	}
 
-	private setMeterName(value: string) {
+	private setMeterName(mode: MODE, value: string) {
+		const preference = (mode === MODE.readings) ? 'uploadReadingsPreferences' : 'uploadMetersPreferences';
 		this.setState(previousState => ({
 			...previousState,
-			uploadReadingsPreferences: {
-				...previousState.uploadReadingsPreferences,
+			[preference]: {
+				...previousState[preference],
 				meterName: value
 			}
 		}))
@@ -157,7 +158,7 @@ export default class UploadCSVContainer extends React.Component<{}, UploadCSVCon
 		}))
 	}
 	private toggleGzip(mode: MODE) {
-		const preference = (mode === 'readings') ? 'uploadReadingsPreferences' : 'uploadMetersPreferences';
+		const preference = (mode === MODE.readings) ? 'uploadReadingsPreferences' : 'uploadMetersPreferences';
 		return () => {
 			this.setState(previousState => ({
 				...previousState,
@@ -169,7 +170,7 @@ export default class UploadCSVContainer extends React.Component<{}, UploadCSVCon
 		}
 	}
 	private toggleHeaderRow(mode: MODE) {
-		const preference = (mode === 'readings') ? 'uploadReadingsPreferences' : 'uploadMetersPreferences';
+		const preference = (mode === MODE.readings) ? 'uploadReadingsPreferences' : 'uploadMetersPreferences';
 		return () => {
 			this.setState(previousState => ({
 				...previousState,
@@ -192,7 +193,7 @@ export default class UploadCSVContainer extends React.Component<{}, UploadCSVCon
 	}
 
 	private toggleUpdate(mode: MODE) {
-		const preference = (mode === 'readings') ? 'uploadReadingsPreferences' : 'uploadMetersPreferences';
+		const preference = (mode === MODE.readings) ? 'uploadReadingsPreferences' : 'uploadMetersPreferences';
 		return () => {
 			this.setState(previousState => ({
 				...previousState,
@@ -267,6 +268,7 @@ export default class UploadCSVContainer extends React.Component<{}, UploadCSVCon
 						<MetersCSVUploadComponent
 							{...this.state.uploadMetersPreferences}
 							submitCSV={this.submitMeters}
+							setMeterName={this.setMeterName}
 							toggleGzip={this.toggleGzip(MODE.meters)}
 							toggleHeaderRow={this.toggleHeaderRow(MODE.meters)}
 							toggleUpdate={this.toggleUpdate(MODE.meters)}

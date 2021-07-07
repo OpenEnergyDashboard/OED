@@ -381,7 +381,7 @@ The script also describes how to delete all the meters/readings if you want to r
    </td>
    <td>
    </td>
-    <td>Time varies by 1 & 2 min and allow 1 min (60 sec); Should warn about lines 3, 5.
+    <td>Time varies by 1 & 2 min and allow 1 min (60 sec); Should warn about lines 3, 5. Same values as above.
    </td>
   </tr>
   <tr>
@@ -403,7 +403,7 @@ The script also describes how to delete all the meters/readings if you want to r
    </td>
    <td>
    </td>
-    <td>Time varies by 1 & 2 min; Should warn about line 5.
+    <td>Time varies by 1 & 2 min; Should warn about line 5. Same values as above.
    </td>
   </tr>
   <tr>
@@ -872,7 +872,7 @@ The script also describes how to delete all the meters/readings if you want to r
   <tr>
    <td>regAsc & regAscUpdate
    </td>
-   <td>pipe35
+   <td>pipe38
    </td>
    <td>
    </td>
@@ -894,7 +894,7 @@ The script also describes how to delete all the meters/readings if you want to r
   <tr>
    <td>regAsc & regAscUpdate
    </td>
-   <td>pipe36
+   <td>pipe39
    </td>
    <td>
    </td>
@@ -932,7 +932,7 @@ The script also describes how to delete all the meters/readings if you want to r
    </td>
     <td>
    </td>
-   <td>Give update name as parameter when more than one row in CSV on second one. All updates should be rejected with error. Original meter creation should give meters pipe37 and pipe37a. pipe37 sets note to note37, area to 13, reading to 17, start time to 1111-11-10 11:11:11 and end time to 1111-11-11 11:11:11 to test setting these values since not done before.
+   <td>Give update name as parameter when more than one row in CSV on second one. All updates should be rejected with error. Original meter creation should give meters pipe40 and pipe40b. pipe40 sets note to note40, area to 13, reading to 17, start time to 1111-11-10 11:11:11 and end time to 1111-11-11 11:11:11 to test setting these values since not done before.
    </td>
   </tr>
   <tr>
@@ -954,7 +954,7 @@ The script also describes how to delete all the meters/readings if you want to r
    </td>
     <td>
    </td>
-   <td>File has two meters to insert where second is same name so should be rejected. Only see meter pipe38 with same values as last one.
+   <td>File has two meters to insert where second is same name so should be rejected. Only see meter pipe41 with same values as last one.
    </td>
   </tr>
   <tr>

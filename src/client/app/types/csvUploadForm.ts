@@ -2,15 +2,18 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
 
+import { MODE } from '../containers/csv/UploadCSVContainer';
+
 interface CSVUploadPreferences {
+	meterName: string;
 	gzip: boolean;
 	headerRow: boolean;
 	update: boolean;
 }
 
 interface CSVUploadProps extends CSVUploadPreferences {
-	// submitCSV: (file: File) => Promise<string>;
 	submitCSV: (file: File) => Promise<void>;
+	setMeterName: (mode: MODE, value: string) => void;
 	toggleGzip: () => void;
 	toggleHeaderRow: () => void;
 	toggleUpdate: () => void;
@@ -47,7 +50,6 @@ export interface ReadingsCSVUploadPreferencesItem extends CSVUploadPreferences {
 
 export interface ReadingsCSVUploadProps extends ReadingsCSVUploadPreferencesItem, CSVUploadProps{
 	// Note: each of these will have to change in consideration of redux;
-	setMeterName: (value: string) => void;
 	selectTimeSort: (value: TimeSortTypes) => void;
 	selectDuplications: (value: string) => void;
 	selectCumulative: (value: BooleanTypes) => void;
