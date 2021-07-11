@@ -43,7 +43,7 @@ function mapStateToProps(state: State) {
 						`${moment(barReading.startTimestamp).utc().format('LL')} - ${moment(barReading.endTimestamp).utc().format('LL')}`;
 					xData.push(timeReading);
 					yData.push(barReading.reading);
-					hoverText.push(`<b> ${timeReading} </b> <br> ${label}: ${barReading.reading} kWh`);
+					hoverText.push(`<b> ${timeReading} </b> <br> ${label}: ${barReading.reading.toPrecision(6)} kWh`);
 				});
 
 				// This variable contains all the elements (x and y values, bar type, etc.) assigned to the data parameter of the Plotly object
@@ -82,7 +82,7 @@ function mapStateToProps(state: State) {
 						`${moment(barReading.startTimestamp).utc().format('LL')} - ${moment(barReading.endTimestamp).utc().format('LL')}`;
 					xData.push(timeReading);
 					yData.push(barReading.reading);
-					hoverText.push(`<b> ${timeReading} </b> <br> ${label}: ${barReading.reading} kWh`);
+					hoverText.push(`<b> ${timeReading} </b> <br> ${label}: ${barReading.reading.toPrecision(6)} kWh`);
 				});
 
 				// This variable contains all the elements (x and y values, bar chart, etc.) assigned to the data parameter of the Plotly object
