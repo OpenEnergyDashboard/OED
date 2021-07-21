@@ -54,9 +54,12 @@ function expectMetersToBeEquivalent(meters, length, offset) {
 			expect(meter).to.have.property('cumulativeReset', true);
 			expect(meter).to.have.property('cumulativeResetStart', '01:01:25');
 			expect(meter).to.have.property('cumulativeResetEnd', '05:05:05');
-			expect(meter).to.have.property('readingLength', '05:00:00');
-			expect(meter).to.have.property('readingVariation', '00:01:00');
+			expect(meter).to.have.property('readingGap', 5.1);
+			expect(meter).to.have.property('readingVariation', 7.3);
 			expect(meter).to.have.property('reading', (i + offset) * 1.0);
+			expect(meter).to.have.property('readingDuplication', 1);
+			expect(meter).to.have.property('timeSort', 'increasing');
+			expect(meter).to.have.property('endOnlyTime', false);
 			expect(meter).to.have.property('startTimestamp', '0001-01-01T23:59:59.000Z');
 			expect(meter).to.have.property('endTimestamp', '2020-07-02T01:00:10.000Z');
 		} else {
@@ -68,8 +71,11 @@ function expectMetersToBeEquivalent(meters, length, offset) {
 			expect(meter).to.have.property('cumulativeReset', null);
 			expect(meter).to.have.property('cumulativeResetStart', null);
 			expect(meter).to.have.property('cumulativeResetEnd', null);
-			expect(meter).to.have.property('readingLength', null);
+			expect(meter).to.have.property('readingGap', null);
 			expect(meter).to.have.property('readingVariation', null);
+			expect(meter).to.have.property('readingDuplication', null);
+			expect(meter).to.have.property('timeSort', null);
+			expect(meter).to.have.property('endOnlyTime', null);
 			expect(meter).to.have.property('reading', null);
 			expect(meter).to.have.property('startTimestamp', null);
 			expect(meter).to.have.property('endTimestamp', null);
@@ -88,17 +94,17 @@ mocha.describe('meters API', () => {
 	mocha.it('returns all visible meters', async () => {
 		const conn = testDB.getConnection();
 		await new Meter(undefined, 'Meter 1', '1.1.1.1', true, true, Meter.type.MAMAC, 'TZ1', gps,
-			'Identified 1', 'notes 1', 10.0, true, true, '01:01:25', '05:05:05', '05:00:00', '00:01:00', 1.0,
-			'0001-01-01 23:59:59', '2020-07-02 01:00:10').insert(conn);
+			'Identified 1', 'notes 1', 10.0, true, true, '01:01:25', '05:05:05', 5.1, 7.3, 1, 'increasing', false,
+			1.0, '0001-01-01 23:59:59', '2020-07-02 01:00:10').insert(conn);
 		await new Meter(undefined, 'Meter 2', '1.1.1.1', true, true, Meter.type.MAMAC, 'TZ2', gps,
-			'Identified 2', 'notes 2', 20.0, true, true, '01:01:25', '05:05:05', '05:00:00', '00:01:00', 2.0,
-			'0001-01-01 23:59:59', '2020-07-02 01:00:10').insert(conn);
+			'Identified 2', 'notes 2', 20.0, true, true, '01:01:25', '05:05:05', 5.1, 7.3, 1, 'increasing', false,
+			2.0, '0001-01-01 23:59:59', '2020-07-02 01:00:10').insert(conn);
 		await new Meter(undefined, 'Meter 3', '1.1.1.1', true, true, Meter.type.MAMAC, 'TZ3', gps,
-			'Identified 3', 'notes 3', 30.0, true, true, '01:01:25', '05:05:05', '05:00:00', '00:01:00', 3.0,
-			'0001-01-01 23:59:59', '2020-07-02 01:00:10').insert(conn);
+			'Identified 3', 'notes 3', 30.0, true, true, '01:01:25', '05:05:05', 5.1, 7.3, 1, 'increasing', false,
+			3.0, '0001-01-01 23:59:59', '2020-07-02 01:00:10').insert(conn);
 		await new Meter(undefined, 'Not Visible', '1.1.1.1', true, false, Meter.type.MAMAC, 'TZ4', gps,
-			'Identified 4', 'notes 4', 40.0, true, true, '01:01:25', '05:05:05', '05:00:00', '00:01:00', 4.0,
-			'0001-01-01 23:59:59', '2020-07-02 01:00:10').insert(conn);
+			'Identified 4', 'notes 4', 40.0, true, true, '01:01:25', '05:05:05', 5.1, 7.3, 1, 'increasing', false,
+			4.0, '0001-01-01 23:59:59', '2020-07-02 01:00:10').insert(conn);
 
 		const res = await chai.request(app).get('/api/meters');
 		expect(res).to.have.status(200);
@@ -116,17 +122,17 @@ mocha.describe('meters API', () => {
 		mocha.it('returns all meters', async () => {
 			const conn = testDB.getConnection();
 			await new Meter(undefined, 'Meter 1', '1.1.1.1', true, true, Meter.type.MAMAC, 'TZ1', gps,
-				'Identified 1', 'notes 1', 10.0, true, true, '01:01:25', '05:05:05', '05:00:00', '00:01:00', 1.0,
-				'0001-01-01 23:59:59', '2020-07-02 01:00:10').insert(conn);
+				'Identified 1', 'notes 1', 10.0, true, true, '01:01:25', '05:05:05', 5.1, 7.3, 1, 'increasing', false,
+				1.0, '0001-01-01 23:59:59', '2020-07-02 01:00:10').insert(conn);
 			await new Meter(undefined, 'Meter 2', '1.1.1.1', true, true, Meter.type.MAMAC, 'TZ2', gps,
-				'Identified 2', 'notes 2', 20.0, true, true, '01:01:25', '05:05:05', '05:00:00', '00:01:00', 2.0,
-				'0001-01-01 23:59:59', '2020-07-02 01:00:10').insert(conn);
+				'Identified 2', 'notes 2', 20.0, true, true, '01:01:25', '05:05:05', 5.1, 7.3, 1, 'increasing', false,
+				2.0, '0001-01-01 23:59:59', '2020-07-02 01:00:10').insert(conn);
 			await new Meter(undefined, 'Meter 3', '1.1.1.1', true, true, Meter.type.MAMAC, 'TZ3', gps,
-				'Identified 3', 'notes 3', 30.0, true, true, '01:01:25', '05:05:05', '05:00:00', '00:01:00', 3.0,
-				'0001-01-01 23:59:59', '2020-07-02 01:00:10').insert(conn);
+				'Identified 3', 'notes 3', 30.0, true, true, '01:01:25', '05:05:05', 5.1, 7.3, 1, 'increasing', false,
+				3.0, '0001-01-01 23:59:59', '2020-07-02 01:00:10').insert(conn);
 			await new Meter(undefined, 'Not Visible', '1.1.1.1', true, false, Meter.type.MAMAC, 'TZ4', gps,
-				'Identified 4', 'notes 4', 40.0, true, true, '01:01:25', '05:05:05', '05:00:00', '00:01:00', 4.0,
-				'0001-01-01 23:59:59', '2020-07-02 01:00:10').insert(conn);
+				'Identified 4', 'notes 4', 40.0, true, true, '01:01:25', '05:05:05', 5.1, 7.3, 1, 'increasing', false,
+				4.0, '0001-01-01 23:59:59', '2020-07-02 01:00:10').insert(conn);
 
 			const res = await chai.request(app).get('/api/meters').set('token', token);
 			expect(res).to.have.status(200);
@@ -158,17 +164,17 @@ mocha.describe('meters API', () => {
 				mocha.it('should only return visible meters and visible data', async () => {
 					const conn = testDB.getConnection();
 					await new Meter(undefined, 'Meter 1', '1.1.1.1', true, true, Meter.type.MAMAC, 'TZ1', gps,
-						'Identified 1', 'notes 1', 10.0, true, true, '01:01:25', '05:05:05', '05:00:00', '00:01:00', 1.0,
-						'0001-01-01 23:59:59', '2020-07-02 01:00:10').insert(conn);
+						'Identified 1', 'notes 1', 10.0, true, true, '01:01:25', '05:05:05', 5.1, 7.3, 1, 'increasing', false,
+						1.0, '0001-01-01 23:59:59', '2020-07-02 01:00:10').insert(conn);
 					await new Meter(undefined, 'Meter 2', '1.1.1.1', true, true, Meter.type.MAMAC, 'TZ2', gps,
-						'Identified 2', 'notes 2', 20.0, true, true, '01:01:25', '05:05:05', '05:00:00', '00:01:00', 2.0,
-						'0001-01-01 23:59:59', '2020-07-02 01:00:10').insert(conn);
+						'Identified 2', 'notes 2', 20.0, true, true, '01:01:25', '05:05:05', 5.1, 7.3, 1, 'increasing', false,
+						2.0, '0001-01-01 23:59:59', '2020-07-02 01:00:10').insert(conn);
 					await new Meter(undefined, 'Meter 3', '1.1.1.1', true, true, Meter.type.MAMAC, 'TZ3', gps,
-						'Identified 3', 'notes 3', 30.0, true, true, '01:01:25', '05:05:05', '05:00:00', '00:01:00', 3.0,
-						'0001-01-01 23:59:59', '2020-07-02 01:00:10').insert(conn);
+						'Identified 3', 'notes 3', 30.0, true, true, '01:01:25', '05:05:05', 5.1, 7.3, 1, 'increasing', false,
+						3.0, '0001-01-01 23:59:59', '2020-07-02 01:00:10').insert(conn);
 					await new Meter(undefined, 'Not Visible', '1.1.1.1', true, false, Meter.type.MAMAC, 'TZ4', gps,
-						'Identified 4', 'notes 4', 40.0, true, true, '01:01:25', '05:05:05', '05:00:00', '00:01:00', 4.0,
-						'0001-01-01 23:59:59', '2020-07-02 01:00:10').insert(conn);
+						'Identified 4', 'notes 4', 40.0, true, true, '01:01:25', '05:05:05', 5.1, 7.3, 1, 'increasing', false,
+						4.0, '0001-01-01 23:59:59', '2020-07-02 01:00:10').insert(conn);
 
 					const res = await chai.request(app).get('/api/meters').set('token', token);
 					expect(res).to.have.status(200);
@@ -188,11 +194,11 @@ mocha.describe('meters API', () => {
 	mocha.it('returns details on a single meter by ID', async () => {
 		const conn = testDB.getConnection();
 		await new Meter(undefined, 'Meter 1', '1.1.1.1', true, true, Meter.type.MAMAC, 'TZ1', gps,
-			'Identified 1', 'notes 1', 10.0, true, true, '01:01:25', '05:05:05', '05:00:00', '00:01:00', 1.0,
-			'0001-01-01 23:59:59', '2020-07-02 01:00:10').insert(conn);
+			'Identified 1', 'notes 1', 10.0, true, true, '01:01:25', '05:05:05', 5.1, 7.3, 1, 'increasing', false,
+			1.0, '0001-01-01 23:59:59', '2020-07-02 01:00:10').insert(conn);
 		const meter2 = new Meter(undefined, 'Meter 2', '1.1.1.1', true, true, Meter.type.MAMAC, 'TZ2', gps,
-			'Identified 2', 'notes 2', 20.0, true, true, '01:01:25', '05:05:05', '05:00:00', '00:01:00', 2.0,
-			'0001-01-01 23:59:59', '2020-07-02 01:00:10');
+			'Identified 2', 'notes 2', 20.0, true, true, '01:01:25', '05:05:05', 5.1, 7.3, 1, 'increasing', false,
+			2.0, '0001-01-01 23:59:59', '2020-07-02 01:00:10');
 		await meter2.insert(conn);
 
 		const res = await chai.request(app).get(`/api/meters/${meter2.id}`);
@@ -204,8 +210,8 @@ mocha.describe('meters API', () => {
 	mocha.it('responds appropriately when the meter in question does not exist', async () => {
 		const conn = testDB.getConnection();
 		const meter =  new Meter(undefined, 'Meter 1', '1.1.1.1', true, true, Meter.type.MAMAC, 'TZ1', gps,
-			'Identified 1', 'notes 1', 10.0, true, true, '01:01:25', '05:05:05', '05:00:00', '00:01:00', 1.0,
-			'0001-01-01 23:59:59', '2020-07-02 01:00:10');
+			'Identified 1', 'notes 1', 10.0, true, true, '01:01:25', '05:05:05', 5.1, 7.3, 1, 'increasing', false,
+			1.0, '0001-01-01 23:59:59', '2020-07-02 01:00:10');
 		await meter.insert(conn);
 
 		const res = await chai.request(app).get(`/api/meters/${meter.id + 1}`);

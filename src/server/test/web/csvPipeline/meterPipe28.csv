@@ -1,0 +1,2 @@
+name,ipaddress,enabled,displayable,type,timezone,gps,identifier,note,area,cumulative,reset,reset start,reset end,gap,variation,duplicates,timesort,end only,reading,start time,end time
+pipe28,123.45.6.0,FALSE,TRUE,mamac,,,pipe28,,,TRUE,TRUE,11:45,12:15,,,,,,,,

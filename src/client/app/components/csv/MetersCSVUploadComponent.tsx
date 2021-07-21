@@ -5,10 +5,9 @@
 import * as React from 'react';
 import { Button, Input, Form, FormGroup, Label } from 'reactstrap';
 import { MetersCSVUploadProps } from '../../types/csvUploadForm';
-import { showErrorNotification, showSuccessNotification } from '../../utils/notifications';
 import FormFileUploaderComponent from '../FormFileUploaderComponent';
-import translate from '../../utils/translate';
 import { FormattedMessage } from 'react-intl';
+import { MODE } from '../../containers/csv/UploadCSVContainer';
 
 export default class MetersCSVUploadComponent extends React.Component<MetersCSVUploadProps> {
 	private fileInput: React.RefObject<HTMLInputElement>;
@@ -16,6 +15,7 @@ export default class MetersCSVUploadComponent extends React.Component<MetersCSVU
 	constructor(props: MetersCSVUploadProps) {
 		super(props);
 		this.handleSubmit = this.handleSubmit.bind(this);
+		this.handleSetMeterName = this.handleSetMeterName.bind(this);
 		this.fileInput = React.createRef<HTMLInputElement>();
 	}
 
@@ -25,13 +25,20 @@ export default class MetersCSVUploadComponent extends React.Component<MetersCSVU
 			const current = this.fileInput.current as HTMLInputElement;
 			const { files } = current;
 			if (files && (files as FileList).length !== 0) {
-				await this.props.submitCSV(files[0]);
-				showSuccessNotification(translate('csv.success.upload.meters'));
+				await this.props.submitCSV(files[0])
+				// TODO Using an alert is not the best. At some point this should be integrated
+				// with react.
+				window.alert('<h1>SUCCESS</h1>The meter upload was a success.');
 			}
 		} catch (error) {
 			// A failed axios request should result in an error.
-			showErrorNotification(translate(error.response.data as string), undefined, 10);
+			window.alert(error.response.data as string);
 		}
+	}
+
+	private handleSetMeterName(e: React.ChangeEvent<HTMLInputElement>) {
+		const target = e.target;
+		this.props.setMeterName(MODE.meters, target.value);
 	}
 
 	public render() {
@@ -71,6 +78,12 @@ export default class MetersCSVUploadComponent extends React.Component<MetersCSVU
 							<Input checked={this.props.update} type='checkbox' name='update' onChange={this.props.toggleUpdate} />
 							<FormattedMessage id='csv.common.param.update' />
 						</Label>
+					</FormGroup>
+					<FormGroup>
+						<Label style={titleStyle}>
+							<FormattedMessage id='csv.readings.param.meter.name' />
+						</Label>
+						<Input value={this.props.meterName} name='meterName' onChange={this.handleSetMeterName} />
 					</FormGroup>
 					<Button type='submit'>
 						<FormattedMessage id='csv.submit.button' />

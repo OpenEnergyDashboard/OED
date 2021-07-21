@@ -6,7 +6,7 @@
 -- the OED install stops the creation of database items after this.
 DO $$ BEGIN
     -- Creates enumerated variable that says what type of meter is used.
-    CREATE TYPE meter_type AS ENUM('mamac', 'metasys', 'obvius');
+    CREATE TYPE meter_type AS ENUM('mamac', 'metasys', 'obvius', 'other');
 EXCEPTION
     WHEN duplicate_object THEN null;
 END $$;

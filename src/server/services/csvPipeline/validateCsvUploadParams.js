@@ -8,6 +8,30 @@ const { Param, EnumParam, BooleanParam, StringParam } = require('./ValidationSch
 const failure = require('./failure');
 const validate = require('jsonschema').validate;
 
+/**
+ * Enum of CSV input type sorting.
+ * This enum needs to be kept in sync with the enum in src/client/app/types/csvUploadForm.ts 
+ * @enum {string}
+ */
+TimeSortTypesJS = Object.freeze({
+	increasing: 'increasing',
+	decreasing: 'decreasing',
+	// meter means to use value stored on meter or the default if not.
+	meter: 'meter value or default'
+});
+
+/**
+ * Enum of Boolean types.
+ * This enum needs to be kept in sync with the enum in src/client/app/types/csvUploadForm.ts 
+ * @enum {string}
+ */
+BooleanTypesJS = Object.freeze({
+	true: 'true',
+	false: 'false',
+	// meter means to use value stored on meter or the default if not.
+	meter: 'meter value or default'
+});
+
 // These are the default values of CSV Pipeline upload parameters. If a user does not specify
 // a choice for a particular parameter, then these defaults will be used.
 // Some defaults are listed as `undefined`; this is only relevant for cURL requests. It means that the default will be acquired from some external 
@@ -16,10 +40,6 @@ const validate = require('jsonschema').validate;
 // Even though, we could simply leave out such fields from DEFAULTS and achieve the same effect
 // as listing them as `undefined`, we should still list them here to indicate that such fields have an "external runtime default".
 // All of this is less relevant when using the webapp, because (TODO) it would load these external runtime defaults for the user.
-// TODO:
-// cumulativeResetStart and cumulativeResetEnd should be set to undefined because their default values would be read from the DB.
-// We leave this as a future task, because at the moment cumulativeResetStart and cumulativeResetEnd are not used in this version 
-// of the CSV pipeline.
 // TODO: 
 // We use strings to represent the true/false values of an option. The pipeline should really not be doing checks against raw strings, 
 // we should change these strings to booleans.
@@ -32,16 +52,17 @@ const DEFAULTS = {
 	meters: {
 	},
 	readings: {
+		timeSort: undefined,
+		duplications: undefined,
+		cumulative: BooleanTypesJS.meter,
+		cumulativeReset: BooleanTypesJS.meter,
+		cumulativeResetStart: undefined,
+		cumulativeResetEnd: undefined,
+		lengthGap: undefined,
+		lengthVariation: undefined,
+		endOnly: undefined,
 		createMeter: 'false',
-		cumulative: undefined,
-		cumulativeReset: undefined,
-		cumulativeResetStart: '0:00:00',
-		cumulativeResetEnd: '23:59:59.999999',
-		duplications: '1',
-		length: '',
-		lengthVariation: '',
-		refreshReadings: 'false',
-		timeSort: 'increasing' // This corresponds to one of the values in TimeSortTypes exported from /src/client/app/types/csvUploadForm.ts
+		refreshReadings: 'false'
 	}
 }
 
@@ -51,10 +72,11 @@ const DEFAULTS = {
 // (i.e. when the user performs a curl request to the pipeline). Thus, we list these properties 
 // here so that they do not falsely trigger the 'additionalProperties' User Error.
 const COMMON_PROPERTIES = {
-	gzip: new BooleanParam('gzip'),
-	headerRow: new BooleanParam('headerRow'),
+	meterName: new StringParam('meterName', undefined, undefined),
 	email: new StringParam('email', undefined, undefined),
 	password: new StringParam('password', undefined, undefined),
+	gzip: new BooleanParam('gzip'),
+	headerRow: new BooleanParam('headerRow'),
 	update: new BooleanParam('update')
 }
 
@@ -73,17 +95,17 @@ const VALIDATION = {
 		required: ['meterName'],
 		properties: {
 			...COMMON_PROPERTIES,
-			createMeter: new BooleanParam('createMeter'),
-			cumulative: new BooleanParam('cumulative'),
-			cumulativeReset: new BooleanParam('cumulativeReset'),
+			timeSort: new EnumParam('timeSort', [TimeSortTypesJS.increasing, TimeSortTypesJS.decreasing, TimeSortTypesJS.meter]),
+			duplications: new StringParam('duplications', '^\\d+$|^(?![\s\S])', 'duplications must be an integer or empty.'),
+			cumulative: new EnumParam('cumulative', [BooleanTypesJS.true, BooleanTypesJS.false, BooleanTypesJS.meter]),
+			cumulativeReset: new EnumParam('cumulativeReset', [BooleanTypesJS.true, BooleanTypesJS.false, BooleanTypesJS.meter]),
 			cumulativeResetStart: new StringParam('cumulativeResetStart', undefined, undefined),
 			cumulativeResetEnd: new StringParam('cumulativeResetEnd', undefined, undefined),
-			duplications: new StringParam('duplications', '^\\d+$', 'duplications must be an integer.'),
-			meterName: new StringParam('meterName', undefined, undefined),
-			length: new StringParam('length', undefined, undefined),
+			lengthGap: new StringParam('lengthGap', undefined, undefined),
 			lengthVariation: new StringParam('lengthVariation', undefined, undefined),
-			refreshReadings: new BooleanParam('refreshReadings'),
-			timeSort: new EnumParam('timeSort', ['increasing']) // This array is the TimeSortTypes exported by /src/client/app/types/csvUploadForm.ts
+			endOnly: new EnumParam('endOnly', [BooleanTypesJS.true, BooleanTypesJS.false, BooleanTypesJS.meter]),
+			createMeter: new BooleanParam('createMeter'),
+			refreshReadings: new BooleanParam('refreshReadings')
 		},
 		additionalProperties: false // This protects us from unintended parameters as well as typos.
 	}
@@ -191,5 +213,7 @@ function validateMetersCsvUploadParams(req, res, next) {
 
 module.exports = {
 	validateMetersCsvUploadParams,
-	validateReadingsCsvUploadParams
+	validateReadingsCsvUploadParams,
+	TimeSortTypesJS,
+	BooleanTypesJS
 };

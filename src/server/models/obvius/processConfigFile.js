@@ -5,6 +5,7 @@
 const ini = require('ini');
 const Meter = require('../../models/Meter');
 const ConfigFile = require('../../models/obvius/Configfile');
+const moment = require('moment');
 
 /**
  * Creates array of meters from a config file
@@ -35,7 +36,26 @@ function processConfigFile(configFile) {
 			Meter.type.OBVIUS,
 			null,
 			undefined,
-			metersHash[internalMeterName].NAME));
+			// Sometimes the NAME is not unique so append with internalMeterName so does not fail
+			// the uniqueness of the identifier.
+			metersHash[internalMeterName].NAME + ' for ' + internalMeterName,
+			'created via obvious config upload on ' + moment().format(),
+			undefined,
+			undefined,
+			undefined,
+			undefined,
+			undefined,
+			undefined,
+			undefined,
+			undefined,
+			undefined,
+			// Obvious meters only have one reading so end only.
+			true,
+			undefined,
+			undefined,
+			undefined
+			)
+		);
 	}
 	return metersArray;
 }

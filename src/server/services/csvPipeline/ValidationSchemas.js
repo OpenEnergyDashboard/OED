@@ -52,7 +52,7 @@ class StringParam extends Param {
 	}
 }
 
-module.exports ={
+module.exports = {
 	Param,
 	EnumParam,
 	BooleanParam,

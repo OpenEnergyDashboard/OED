@@ -25,33 +25,18 @@ mocha.describe('PIPELINE: Load data from csv file', () => {
 		const arrayInput = await readCsv(testFilePath);
 		const arrayMeter = new Meter(undefined, 'test_array', 1, true, true, Meter.type.MAMAC, null, undefined);
 		await arrayMeter.insert(conn);
-		await loadCsvInput(testFilePath, arrayMeter.id, mapRowsToModel, false, false, false, 1, undefined, false, conn);
+		// Return value is ignored for now.
+		await loadCsvInput(testFilePath, arrayMeter.id, mapRowsToModel, 'increasing', 1, false, false, '0:00:00', '0:00:00',
+			0, 0, false, false, false, undefined, conn);
 		const result = await Reading.getAllByMeterID(arrayMeter.id, conn);
 		expect(result.length).to.equal(arrayInput.length);
 		let i = 0;
 		result.map(reading => {
-				expect(reading.meterID).to.equal(arrayMeter.id);
-				expect(reading.reading).to.equal(parseInt(arrayInput[i][0]));
-				expect(reading.endTimestamp.format()).to.equal(moment(arrayInput[i][1], 'HH:mm:ss MM/DD/YYYY').format());
-				expect(reading.startTimestamp.format()).to.equal((moment(arrayInput[i][1], 'HH:mm:ss MM/DD/YYYY').subtract(30, 'minute')).format());
-				++i;
-		});
-	});
-	mocha.it('as stream', async () => {
-		const conn = testDB.getConnection();
-		const arrayInput = await readCsv(testFilePath);
-		const streamMeter = new Meter(undefined, 'test_stream', 2, true, true, Meter.type.MAMAC, null, undefined);
-		await streamMeter.insert(conn);
-		await loadCsvInput(testFilePath, streamMeter.id, mapRowsToModel, true, false, false, 1, undefined, false, conn);
-		const result = await Reading.getAllByMeterID(streamMeter.id, conn);
-		expect(result.length).to.equal(arrayInput.length);
-		let i = 0;
-		result.map(reading => {
-				expect(reading.meterID).to.equal(streamMeter.id);
-				expect(reading.reading).to.equal(parseInt(arrayInput[i][0]));
-				expect(reading.endTimestamp.format()).to.equal(moment(arrayInput[i][1], 'HH:mm:ss MM/DD/YYYY').format());
-				expect(reading.startTimestamp.format()).to.equal((moment(arrayInput[i][1], 'HH:mm:ss MM/DD/YYYY').subtract(30, 'minute')).format());
-				++i;
+			expect(reading.meterID).to.equal(arrayMeter.id);
+			expect(reading.reading).to.equal(parseInt(arrayInput[i][0]));
+			expect(reading.endTimestamp.format()).to.equal(moment(arrayInput[i][1], 'HH:mm:ss MM/DD/YYYY').format());
+			expect(reading.startTimestamp.format()).to.equal((moment(arrayInput[i][1], 'HH:mm:ss MM/DD/YYYY').subtract(30, 'minute')).format());
+			++i;
 		});
 	});
 });

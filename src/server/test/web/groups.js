@@ -35,14 +35,14 @@ mocha.describe('groups API', () => {
 		groupC = new Group(undefined, 'C', true, gpsPoint, 'notes C', 53.5);
 		await Promise.all([groupA, groupB, groupC].map(group => group.insert(conn)));
 		meterA = new Meter(undefined, 'A', null, false, true, Meter.type.MAMAC, null, gpsPoint,
-		'Identified A' ,'notes A', 35.0, true, true, '01:01:25' , '00:00:00', '05:00:00','00:00:00', 1.5,
-		'0001-01-01 23:59:59', '2020-07-02 01:00:10');
-		meterB = new Meter(undefined, 'B', null, false, true, Meter.type.MAMAC, null, gpsPoint, 
-		'Identified B', 'notes B', 33.5, true, true, '05:05:09', '09:00:01', '00:00:00', 
-		'00:00:00', 25.5, '0001-01-01 23:59:59', '2020-07-02 01:00:10');
+		'Identified A' ,'notes A', 35.0, true, true, '01:01:25' , '00:00:00', 5, 0, 1, 'increasing', false,
+		1.5,'0001-01-01 23:59:59', '2020-07-02 01:00:10');
+		meterB = new Meter(undefined, 'B', null, false, true, Meter.type.OTHER, null, gpsPoint, 
+		'Identified B', 'notes B', 33.5, true, true, '05:05:09', '09:00:01', 0, 0, 1, 'increasing', false,
+		25.5, '0001-01-01 23:59:59', '2020-07-02 01:00:10');
 		meterC = new Meter(undefined, 'C', null, false, true, Meter.type.METASYS, null, gpsPoint, 
-		'Identified C', 'notes C', 33.5, true, true, '05:05:09', '09:00:01', '00:00:00', 
-		'00:00:00', 25.5, '0001-01-01 23:59:59', '2020-07-02 01:00:10');
+		'Identified C', 'notes C', 33.5, true, true, '05:05:09', '09:00:01', 0, 0, 1, 'increasing', false,
+		25.5, '0001-01-01 23:59:59', '2020-07-02 01:00:10');
 		await Promise.all([meterA, meterB, meterC].map(meter => meter.insert(conn)));
 
 		await Promise.all([groupA.adoptMeter(meterA.id, conn), groupA.adoptGroup(groupB.id, conn),
@@ -192,8 +192,8 @@ mocha.describe('groups API', () => {
 			mocha.it('allows adding a new child meter to a group', async () => {
 				const conn = testDB.getConnection();
 				const meterD = new Meter(undefined, 'D', null, false, true, Meter.type.MAMAC, null, gpsPoint,
-				'Identified D', 'notes D', 33.5, true, true, '05:05:09', '09:00:01', '00:00:00', 
-				'00:00:00', 25.5, '0001-01-01 23:59:59', '2020-07-02 01:00:10');
+				'Identified D', 'notes D', 33.5, true, true, '05:05:09', '09:00:01', '0',
+				0, 1, 'increasing', false, 25.5, '0001-01-01 23:59:59', '2020-07-02 01:00:10');
 				await meterD.insert(conn);
 				let res = await chai.request(app).put('/api/groups/edit').set('token', token).type('json').send({
 					id: groupC.id,
