@@ -182,8 +182,7 @@ async function processData(rows, meterID, timeSort = 'increasing', readingRepeti
 			// one from a previous input as the first previous one on the next input. Note it is stored even if there are issues with
 			// the readings so a future upload will see the last reading.
 			meter.reading = meterReading2;
-		}
-		else {
+		} else {
 			// The data is not cumulative use the raw reading value
 			meterReading = rows[index][0];
 			if (isNaN(meterReading)) {
@@ -212,7 +211,7 @@ async function processData(rows, meterID, timeSort = 'increasing', readingRepeti
 		}
 		if (readingOK && startTimestamp.isSameOrAfter(endTimestamp)) {
 			readingOK = false;
-			errMsg += 'The reading end time is not after the start time.';
+			errMsg += 'The reading end time is not after the start time so we must drop the reading.';
 			if (isEndTime) {
 				errMsg += ' The start time came from the previous readings end time.';
 			}

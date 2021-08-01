@@ -141,8 +141,18 @@ curl localhost:3000/api/csv/readings -X POST -F 'meterName=pipe45' -F 'createMet
 echo -e "\n\n<h3>starting pipe46</h3>"
 curl localhost:3000/api/csv/readings -X POST -F 'cumulative=true' -F 'meterName=pipe46' -F 'createMeter=true' -F 'gzip=false' -F 'email=test@example.com' -F 'password=password' -F 'csvfile=@cumAscBadReading.csv'
 echo -e "\n\n<h3>starting pipe47</h3>"
+curl localhost:3000/api/csv/readings -X POST -F 'meterName=pipe47' -F 'createMeter=true' -F 'gzip=false' -F 'email=test@example.com' -F 'password=password' -F 'csvfile=@regAscBadReading.csv'
+echo -e "\n\n<h3>starting pipe48</h3>"
+curl localhost:3000/api/csv/readings -X POST -F 'meterName=pipe48' -F 'cumulative=true' -F 'lengthVariation=121' -F 'createMeter=true' -F 'gzip=false' -F 'email=test@example.com' -F 'password=password' -F 'csvfile=@cumAscGap.csv'
+echo -e "\n\n<h3>starting pipe49</h3>"
+curl localhost:3000/api/csv/readings -X POST -F 'meterName=pipe49' -F 'cumulative=true' -F 'createMeter=true' -F 'gzip=false' -F 'email=test@example.com' -F 'password=password' -F 'csvfile=@cumAscStartBeforePreviousEnd.csv'
+echo -e "\n\n<h3>starting pipe50</h3>"
+curl localhost:3000/api/csv/readings -X POST -F 'meterName=pipe50' -F 'cumulative=true' -F 'createMeter=true' -F 'gzip=false' -F 'email=test@example.com' -F 'password=password' -F 'csvfile=@cumAscNeg.csv'
+echo -e "\n\n<h3>starting pipe51</h3>"
+curl localhost:3000/api/csv/readings -X POST -F 'meterName=pipe51' -F 'createMeter=true' -F 'gzip=false' -F 'email=test@example.com' -F 'password=password' -F 'csvfile=@regAscZeroTime.csv'
 # refresh on last upload of readings and all will be available for graphing
-curl localhost:3000/api/csv/readings -X POST -F 'refreshReadings=true' -F 'meterName=pipe47' -F 'createMeter=true' -F 'gzip=false' -F 'email=test@example.com' -F 'password=password' -F 'csvfile=@regAscBadReading.csv'
+echo -e "\n\n<h3>starting pipe52</h3>"
+curl localhost:3000/api/csv/readings -X POST -F 'refreshReadings=true' -F 'meterName=pipe52' -F 'endOnly=true' -F 'createMeter=true' -F 'gzip=false' -F 'email=test@example.com' -F 'password=password' -F 'csvfile=@regAscEndonlyEndSamePreviousEnd.csv'
 
 # final blank line so easier to see in terminal.
 echo -e ""

@@ -737,7 +737,8 @@ The script also describes how to delete all the meters/readings if you want to r
    </td>
    <td>The meter in DB is set to cumulative, cumulative_reset to true & reset range is 11:45-12:15 but not sent via curl. This and following ones test that you can create a meter with various values set. The reset value should be reject row 4 since negative and no readings for meter.
    </td>
-  </tr><tr>
+  </tr>
+  <tr>
    <td>cumAscResetMidnight & meterPipe28 (to create meter)
    </td>
    <td>pipe28
@@ -1086,4 +1087,111 @@ The script also describes how to delete all the meters/readings if you want to r
     <td>The first three readings try various number formats that are fine then the fourth reading has an invalid reading number so error where all readings are rejected.
    </td>
   </tr>
-  </table>
+  <tr>
+   <td>regCumGap
+   </td>
+   <td>pipe48
+   </td>
+   <td>
+   </td>
+   <td>
+   </td>
+   <td>
+   </td>
+   <td>121
+   </td>
+   <td>Default
+   </td>
+   <td>
+   </td>
+    <td>
+   </td>
+   <td>This is similar to pipe16 with gaps but here it is an error since cumulative data. Should get error for lines 2 & 4 and dropped. Length variation so no warnings about that. Only get readings 3 & 5.
+   </td>
+  </tr>
+  <tr>
+   <td>cumAscStartBeforePreviousEnd
+   </td>
+   <td>pipe49
+   </td>
+   <td>
+   </td>
+   <td>X
+   </td>
+   <td>
+   </td>
+   <td>
+   </td>
+   <td>
+   </td>
+   <td>
+   </td>
+    <td>
+   </td>
+   <td>The second reading has the start time before the first reading's end time so it is rejected. There is also a warning about reading #3 since reading #2 had a different length. Should see readings 3-5.
+  </tr>
+ <tr>
+   <td>cumAscNeg
+   </td>
+   <td>pipe50
+   </td>
+   <td>
+   </td>
+   <td>X
+   </td>
+   <td>
+   </td>
+   <td>
+   </td>
+   <td>
+   </td>
+   <td>
+   </td>
+    <td>
+   </td>
+   <td>The third reading has a negative value so all readings rejected.
+  </tr>
+<tr>
+   <td>regAsc
+   </td>
+   <td>pipe51
+   </td>
+   <td>
+   </td>
+   <td>
+   <td>
+   </td>
+   </td>
+   <td>
+   </td>
+   <td>
+   </td>
+   <td>
+   </td>
+    <td>
+   </td>
+   <td>The second reading has start and end time the same so length is zero and the reading is rejected. Also get gap warning on reading three since 2nd was wrong. Expect to have readings 1 & 3-5.
+   </td>
+   </tr>tr>
+   <td>regAscEndonlyEndSamePreviousEnd
+   </td>
+   <td>pipe52
+   </td>
+   <td>
+   </td>
+   <td>
+   <td>
+   </td>
+   </td>
+   <td>
+   </td>
+   <td>
+   </td>
+   <td>
+   </td>
+    <td>X
+   </td>
+   <td>The second reading has end time that is same as the first reading's end time and the reading is rejected. In end only data you use the previous to get the current start so the reading spans no time. Also get length warning on reading three since 2nd was wrong. Also get warning length on reading #4 since #3 was messed up. Expect to have readings 3-5.
+   </td>
+   </tr>
+     </table>
