@@ -57,10 +57,11 @@ echo -e "\nStart generating first set of test data (square, varying freq of read
 echo "  This normally takes less than a minute:"
 # This assumes you have a newer version (as of 2021) docker that has compose built in.
 # In the past it was docker-compose.
-docker compose run --rm web npm run generateTestingData
+# Don't use --rm since this seems to cause the newer docker to terminate any other running OED (which is needed for the CSV upload).
+docker compose run web npm run generateTestingData
 echo -e "\nStart generating second set of test data (varying amplitudes)"
 echo "  This normally takes about a minute:"
-docker compose run --rm web npm run generateVariableAmplitudeTestingData
+docker compose run web npm run generateVariableAmplitudeTestingData
 
 # Go to directory with test data
 cd $testdatadir
