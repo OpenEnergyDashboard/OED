@@ -63,6 +63,7 @@ export default class TooltipHelpComponentAlternative extends React.Component<Too
 				link4: `${BASE_URL}/admin.html`
 			},
 			'help.home.hide.or.show.options': { link: `${BASE_URL}/hideOptions.html` },
+			'help.home.language': { link: `${BASE_URL}/language.html` },
 			'help.home.select.groups': { link: `${BASE_URL}/graphingGroups.html` },
 			'help.home.select.maps': { link: `${BASE_URL}/mapGraphic.html` },
 			'help.home.select.meters': { link: `${BASE_URL}/graphingMeters.html` },
