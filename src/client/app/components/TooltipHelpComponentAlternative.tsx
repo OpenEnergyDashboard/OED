@@ -44,6 +44,7 @@ export default class TooltipHelpComponentAlternative extends React.Component<Too
 			'help.admin.header': { link: `${BASE_URL}/adminPreferences.html` },
 			'help.admin.mapview': { link: `${BASE_URL}/adminMap.html` },
 			'help.admin.meterview': { link: `${BASE_URL}/adminMeterViewing.html` },
+			'help.admin.user': { link: `${BASE_URL}/adminUser.html` },
 			'help.home.bar.custom.slider.tip': { link: `${BASE_URL}/barGraphic.html#usage` },
 			'help.home.bar.interval.tip': { link: `${BASE_URL}/barGraphic.html#usage` },
 			'help.home.bar.stacking.tip': { link: `${BASE_URL}/barGraphic.html#barStacking` },
