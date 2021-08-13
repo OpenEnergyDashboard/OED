@@ -10,7 +10,7 @@ import HeaderContainer from '../../containers/HeaderContainer';
 import FooterContainer from '../../containers/FooterContainer';
 import MapViewContainer from '../../containers/maps/MapViewContainer';
 import {Link} from 'react-router';
-import TooltipHelpComponent from '../TooltipHelpComponentAlternative';
+import TooltipHelpContainerAlternative from '../../containers/TooltipHelpContainerAlternative';
 import TooltipMarkerComponent from '../TooltipMarkerComponent';
 
 interface MapsDetailProps {
@@ -52,7 +52,7 @@ export default class MapsDetailComponent extends React.Component<MapsDetailProps
 		return (
 			<div>
 				<HeaderContainer />
-				<TooltipHelpComponent page='maps' />
+				<TooltipHelpContainerAlternative page='maps' />
 				<div className='container-fluid'>
 					<h2 style={titleStyle}>
 						<FormattedMessage id='maps' />
