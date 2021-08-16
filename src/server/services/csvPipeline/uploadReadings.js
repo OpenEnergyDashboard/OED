@@ -44,7 +44,7 @@ async function uploadReadings(req, res, filepath, conn) {
 				return await Meter.getByName(tempMeter.name, conn); // Get meter from DB after insert because some defaults are set within the DB.
 			}
 		});
-	if (!meterCreated && createMeter === 'true') {
+	if (!meterCreated && createMeter === BooleanTypesJS.true) {
 		log.warn('The create meter was set but the meter already existed for meter ' + meter.name);
 	}
 
@@ -110,7 +110,7 @@ async function uploadReadings(req, res, filepath, conn) {
 	} else {
 		readingsCumulative = cumulative;
 	}
-	const areReadingsCumulative = (readingsCumulative === 'true');
+	const areReadingsCumulative = (readingsCumulative === BooleanTypesJS.true);
 
 	if (cumulativeReset === undefined || cumulativeReset === BooleanTypesJS.meter) {
 		if (meter.cumulativeReset === null) {
@@ -123,7 +123,7 @@ async function uploadReadings(req, res, filepath, conn) {
 	} else {
 		readingsReset = cumulativeReset;
 	}
-	const doReadingsReset = (readingsReset === 'true');
+	const doReadingsReset = (readingsReset === BooleanTypesJS.true);
 
 	if (cumulativeResetStart === undefined || cumulativeResetStart === '') {
 		if (meter.cumulativeResetStart === null) {
@@ -186,7 +186,7 @@ async function uploadReadings(req, res, filepath, conn) {
 	} else {
 		readingEndOnly = endOnly;
 	}
-	const areReadingsEndOnly = (readingEndOnly === 'true');
+	const areReadingsEndOnly = (readingEndOnly === BooleanTypesJS.true);
 
 	const mapRowToModel = row => { return row; }; // STUB function to satisfy the parameter of loadCsvInput.
 	return await loadCsvInput(

@@ -22,6 +22,7 @@ const uploadReadings = require('../services/csvPipeline/uploadReadings');
 const zlib = require('zlib');
 const { refreshReadingViews } = require('../services/refreshReadingViews');
 const { success, failure } = require('../services/csvPipeline/success');
+const { BooleanTypesJS } = require('../services/csvPipeline/validateCsvUploadParams');
 
 /** Middleware validation */
 const { validateMetersCsvUploadParams, validateReadingsCsvUploadParams } = require('../services/csvPipeline/validateCsvUploadParams');
@@ -147,7 +148,7 @@ router.post('/meters', validateMetersCsvUploadParams, async (req, res) => {
 
 router.post('/readings', validateReadingsCsvUploadParams, async (req, res) => {
 	const isGzip = req.body.gzip === 'true';
-	const isRefreshReadings = req.body.refreshReadings === 'true';
+	const isRefreshReadings = req.body.refreshReadings === BooleanTypesJS.true;
 	const uploadedFilepath = req.file.path;
 	let csvFilepath;
 	let isAllReadingsOk;

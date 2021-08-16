@@ -11,6 +11,7 @@ const Meter = require('../../models/Meter');
 const Reading = require('../../models/Reading');
 const handleCumulativeReset = require('./handleCumulativeReset');
 const { validateReadings } = require('./validateReadings');
+const { TimeSortTypesJS } = require('../csvPipeline/validateCsvUploadParams');
 const E0 = moment(0);
 
 /**
@@ -44,7 +45,7 @@ const E0 = moment(0);
  * @param {array} conn the connection to the database
  * @returns {object[]} {array of readings accepted, true if all readings accepted and false otherwise, all messages from processing}
  */
-async function processData(rows, meterID, timeSort = 'increasing', readingRepetition, isCumulative, cumulativeReset,
+async function processData(rows, meterID, timeSort = TimeSortTypesJS.increasing, readingRepetition, isCumulative, cumulativeReset,
 	resetStart = '00:00:00.000', resetEnd = '23:59:99.999', readingGap = 0, readingLengthVariation = 0, isEndTime = false,
 	conditionSet, conn) {
 	// Holds all the warning message to pass back to inform user.
@@ -62,7 +63,7 @@ async function processData(rows, meterID, timeSort = 'increasing', readingRepeti
 	// Usually holds current message(s) that are yet to be added to msgTotal.
 	let errMsg;
 	// Tells sorted order of readings.
-	const isAscending = (timeSort === 'increasing');
+	const isAscending = (timeSort === TimeSortTypesJS.increasing);
 	// Convert readingGap and readingLengthVariation to milliseconds to stay consistent with moment.diff() which returns the difference in milliseconds
 	const msReadingGap = readingGap * 1000;
 	const msReadingLengthVariation = readingLengthVariation * 1000;
