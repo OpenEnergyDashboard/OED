@@ -2,6 +2,7 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
 
+const moment = require('moment');
 const database = require('./database');
 const Reading = require('./Reading');
 
@@ -15,8 +16,8 @@ class Meter {
 	 * @param enabled This meter is being actively read from
 	 * @param displayable This meters is available to users for charting
 	 * @param type What kind of meter this is
-	 * @param gps location in format of GIS coordinates
 	 * @param meterTimezone Default timezone for meter
+	 * @param gps location in format of GIS coordinates
 	 * @param identifier Another way to identify a meter
 	 * @param note Note about the meter
 	 * @param area Area of the meter default null
@@ -24,15 +25,19 @@ class Meter {
 	 * @param cumulativeReset True if cumulative values can reset back to zero., default false
 	 * @param cumulativeResetStart The earliest time of day that a reset can occur, default '00:00:00'
 	 * @param cumulativeResetEnd The latest time of day that a reset can occur, default '23:59:59.999999'
-	 * @param readingLength Specifies the time range on every reading in the CSV file, default '00:00:00'
+	 * @param readingGap Specifies the time range on every reading in the CSV file, default '00:00:00'
 	 * @param readingVariation +/- time allowed on length to consider within allowed length, default '23:59:59.999999'
+	 * @param readingDuplication number of times each reading is given when 1 means once and is default
+	 * @param timeSort 'increasing' if provided readings increase in time (default) & 'decreasing' if other way
+	 * @param endOnlyTime true if provided readings only have an end time, false by default
 	 * @param reading The value of reading, default 0.0
-	 * @param startTimestamp Start timestamp of last reading input for this meter, default '01-01-01 00:00:00'
-	 * @param endTimestamp  End timestamp of last reading input for this meter, '01-01-01 00:00:00' 
+	 * @param startTimestamp Start timestamp of last reading input for this meter, default '1970-01-01 00:00:00'
+	 * @param endTimestamp  End timestamp of last reading input for this meter, '1970-01-01 00:00:00' 
 	 */
 	constructor(id, name, ipAddress, enabled, displayable, type, meterTimezone, gps = undefined, identifier = name, note, area,
-		cumulative, cumulativeReset, cumulativeResetStart, cumulativeResetEnd, readingLength, readingVariation, reading,
-		startTimestamp, endTimestamp) {
+		cumulative = false, cumulativeReset = false, cumulativeResetStart = '00:00:00', cumulativeResetEnd = '23:59:59.999999',
+		readingGap = 0, readingVariation = 0, readingDuplication = 1, timeSort = 'increasing', endOnlyTime = false,
+		reading = 0.0, startTimestamp = moment(0), endTimestamp = moment(0)) {
 		// In order for the CSV pipeline to work, the order of the parameters needs to match the order that the fields are declared.
 		// In addition, each new parameter has to be added at the very end.
 		this.id = id;
@@ -50,8 +55,11 @@ class Meter {
 		this.cumulativeReset = cumulativeReset;
 		this.cumulativeResetStart = cumulativeResetStart;
 		this.cumulativeResetEnd = cumulativeResetEnd;
-		this.readingLength = readingLength;
+		this.readingGap = readingGap;
 		this.readingVariation = readingVariation;
+		this.readingDuplication = readingDuplication;
+		this.timeSort = timeSort;
+		this.endOnlyTime = endOnlyTime;
 		this.reading = reading;
 		this.startTimestamp = startTimestamp;
 		this.endTimestamp = endTimestamp;
@@ -105,7 +113,8 @@ class Meter {
 	static mapRow(row) {
 		return new Meter(row.id, row.name, row.ipaddress, row.enabled, row.displayable, row.meter_type,
 			row.default_timezone_meter, row.gps, row.identifier, row.note, row.area, row.cumulative, row.cumulative_reset,
-			row.cumulative_reset_start, row.cumulative_reset_end, row.reading_length, row.reading_variation,
+			row.cumulative_reset_start, row.cumulative_reset_end, row.reading_gap, row.reading_variation,
+			row.reading_duplication, row.time_sort, row.end_only_time,
 			row.reading, row.start_timestamp, row.end_timestamp);
 	}
 
@@ -165,6 +174,41 @@ class Meter {
 	}
 
 	/**
+	 * Updates the meter with values passed if not undefined.
+	 * For parameter info see {@link Meter#constructor}.
+	 */
+	merge(name = this.name, ipAddress = this.ipAddress, enabled = this.enabled, displayable = this.displayable, type = this.type,
+		meterTimezone = this.meterTimezone, gps = this.gps, identifier = this.identifier, note = this.note, area = this.area,
+		cumulative = this.cumulative, cumulativeReset = this.cumulativeReset, cumulativeResetStart = this.cumulativeResetStart,
+		cumulativeResetEnd = this.cumulativeResetEnd, readingGap = this.readingGap, readingVariation = this.readingVariation,
+		readingDuplication = this.readingDuplication, timeSort = this.timeSort, endOnlyTime = this.endOnlyTime,
+		reading = this.reading, startTimestamp = this.startTimestamp, endTimestamp = this.endTimestamp) {
+
+		this.name = name;
+		this.ipAddress = ipAddress;
+		this.enabled = enabled;
+		this.displayable = displayable;
+		this.type = type;
+		this.meterTimezone = meterTimezone;
+		this.gps = gps;
+		this.identifier = identifier;
+		this.note = note;
+		this.area = area;
+		this.cumulative = cumulative;
+		this.cumulativeReset = cumulativeReset;
+		this.cumulativeResetStart = cumulativeResetStart;
+		this.cumulativeResetEnd = cumulativeResetEnd;
+		this.readingGap = readingGap;
+		this.readingVariation = readingVariation;
+		this.readingDuplication = readingDuplication;
+		this.timeSort = timeSort;
+		this.endOnlyTime = endOnlyTime;
+		this.reading = reading;
+		this.startTimestamp = startTimestamp;
+		this.endTimestamp = endTimestamp;
+	}
+
+	/**
 	 * Returns a promise to update an existing meter in the database
 	 * @param conn the connection to use.
 	 * @returns {Promise.<>}
@@ -191,7 +235,10 @@ class Meter {
 Meter.type = {
 	MAMAC: 'mamac',
 	METASYS: 'metasys',
-	OBVIUS: 'obvius'
+	OBVIUS: 'obvius',
+	// Other is used when set by OED due to automatic creation and unknown.
+	// Can also be used by others when needed.
+	OTHER: 'other'
 };
 
 module.exports = Meter;

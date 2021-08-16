@@ -8,12 +8,12 @@ import ReadingsCSVUploadComponent from '../../components/csv/ReadingsCSVUploadCo
 import HeaderContainer from '../HeaderContainer';
 import FooterContainer from '../FooterContainer';
 import { uploadCSVApi } from '../../utils/api';
-import { ReadingsCSVUploadPreferencesItem, MetersCSVUploadPreferencesItem, TimeSortTypes } from '../../types/csvUploadForm';
+import { ReadingsCSVUploadPreferencesItem, MetersCSVUploadPreferencesItem, TimeSortTypes, BooleanTypes } from '../../types/csvUploadForm';
 import { ReadingsCSVUploadDefaults, MetersCSVUploadDefaults } from '../../utils/csvUploadDefaults';
 import { TabContent, TabPane, Nav, NavItem, NavLink } from 'reactstrap';
 import { FormattedMessage } from 'react-intl';
 
-const enum MODE {
+export const enum MODE {
 	meters = 'meters',
 	readings = 'readings'
 }
@@ -27,18 +27,19 @@ interface UploadCSVContainerState {
 export default class UploadCSVContainer extends React.Component<{}, UploadCSVContainerState> {
 	constructor(props: {}) {
 		super(props);
-		this.selectDuplications = this.selectDuplications.bind(this);
-		this.selectTimeSort = this.selectTimeSort.bind(this);
 		this.setMeterName = this.setMeterName.bind(this);
+		this.selectTimeSort = this.selectTimeSort.bind(this);
+		this.selectDuplications = this.selectDuplications.bind(this);
+		this.selectCumulative = this.selectCumulative.bind(this);
+		this.selectCumulativeReset = this.selectCumulativeReset.bind(this);
 		this.setCumulativeResetStart = this.setCumulativeResetStart.bind(this);
 		this.setCumulativeResetEnd = this.setCumulativeResetEnd.bind(this);
-		this.setLength = this.setLength.bind(this);
+		this.setLengthGap = this.setLengthGap.bind(this);
 		this.setLengthVariation = this.setLengthVariation.bind(this);
+		this.selectEndOnly = this.selectEndOnly.bind(this);
 		this.submitReadings = this.submitReadings.bind(this);
 		this.submitMeters = this.submitMeters.bind(this);
 		this.toggleCreateMeter = this.toggleCreateMeter.bind(this);
-		this.toggleCumulative = this.toggleCumulative.bind(this);
-		this.toggleCumulativeReset = this.toggleCumulativeReset.bind(this);
 		this.toggleGzip = this.toggleGzip.bind(this);
 		this.toggleHeaderRow = this.toggleHeaderRow.bind(this);
 		this.toggleRefreshReadings = this.toggleRefreshReadings.bind(this);
@@ -56,12 +57,13 @@ export default class UploadCSVContainer extends React.Component<{}, UploadCSVCon
 		}
 	}
 
-	private selectDuplications(value: string) {
+	private setMeterName(mode: MODE, value: string) {
+		const preference = (mode === MODE.readings) ? 'uploadReadingsPreferences' : 'uploadMetersPreferences';
 		this.setState(previousState => ({
 			...previousState,
-			uploadReadingsPreferences: {
-				...previousState.uploadReadingsPreferences,
-				duplications: value
+			[preference]: {
+				...previousState[preference],
+				meterName: value
 			}
 		}))
 	}
@@ -74,12 +76,30 @@ export default class UploadCSVContainer extends React.Component<{}, UploadCSVCon
 			}
 		}))
 	}
-	private setMeterName(value: string) {
+	private selectDuplications(value: string) {
 		this.setState(previousState => ({
 			...previousState,
 			uploadReadingsPreferences: {
 				...previousState.uploadReadingsPreferences,
-				meterName: value
+				duplications: value
+			}
+		}))
+	}
+	private selectCumulative(value: BooleanTypes) {
+		this.setState(previousState => ({
+			...previousState,
+			uploadReadingsPreferences: {
+				...previousState.uploadReadingsPreferences,
+				cumulative: value
+			}
+		}))
+	}
+	private selectCumulativeReset(value: BooleanTypes) {
+		this.setState(previousState => ({
+			...previousState,
+			uploadReadingsPreferences: {
+				...previousState.uploadReadingsPreferences,
+				cumulativeReset: value
 			}
 		}))
 	}
@@ -101,12 +121,12 @@ export default class UploadCSVContainer extends React.Component<{}, UploadCSVCon
 			}
 		}))
 	}
-	private setLength(value: string) {
+	private setLengthGap(value: string) {
 		this.setState(previousState => ({
 			...previousState,
 			uploadReadingsPreferences: {
 				...previousState.uploadReadingsPreferences,
-				length: value
+				lengthGap: value
 			}
 		}))
 	}
@@ -119,6 +139,15 @@ export default class UploadCSVContainer extends React.Component<{}, UploadCSVCon
 			}
 		}))
 	}
+	private selectEndOnly(value: BooleanTypes) {
+		this.setState(previousState => ({
+			...previousState,
+			uploadReadingsPreferences: {
+				...previousState.uploadReadingsPreferences,
+				endOnly: value
+			}
+		}))
+	}
 	private toggleCreateMeter() {
 		this.setState(previousState => ({
 			...previousState,
@@ -128,26 +157,8 @@ export default class UploadCSVContainer extends React.Component<{}, UploadCSVCon
 			}
 		}))
 	}
-	private toggleCumulative() {
-		this.setState(previousState => ({
-			...previousState,
-			uploadReadingsPreferences: {
-				...previousState.uploadReadingsPreferences,
-				cumulative: !previousState.uploadReadingsPreferences.cumulative
-			}
-		}))
-	}
-	private toggleCumulativeReset() {
-		this.setState(previousState => ({
-			...previousState,
-			uploadReadingsPreferences: {
-				...previousState.uploadReadingsPreferences,
-				cumulativeReset: !previousState.uploadReadingsPreferences.cumulativeReset
-			}
-		}))
-	}
 	private toggleGzip(mode: MODE) {
-		const preference = (mode === 'readings') ? 'uploadReadingsPreferences' : 'uploadMetersPreferences';
+		const preference = (mode === MODE.readings) ? 'uploadReadingsPreferences' : 'uploadMetersPreferences';
 		return () => {
 			this.setState(previousState => ({
 				...previousState,
@@ -159,7 +170,7 @@ export default class UploadCSVContainer extends React.Component<{}, UploadCSVCon
 		}
 	}
 	private toggleHeaderRow(mode: MODE) {
-		const preference = (mode === 'readings') ? 'uploadReadingsPreferences' : 'uploadMetersPreferences';
+		const preference = (mode === MODE.readings) ? 'uploadReadingsPreferences' : 'uploadMetersPreferences';
 		return () => {
 			this.setState(previousState => ({
 				...previousState,
@@ -182,7 +193,7 @@ export default class UploadCSVContainer extends React.Component<{}, UploadCSVCon
 	}
 
 	private toggleUpdate(mode: MODE) {
-		const preference = (mode === 'readings') ? 'uploadReadingsPreferences' : 'uploadMetersPreferences';
+		const preference = (mode === MODE.readings) ? 'uploadReadingsPreferences' : 'uploadMetersPreferences';
 		return () => {
 			this.setState(previousState => ({
 				...previousState,
@@ -196,7 +207,7 @@ export default class UploadCSVContainer extends React.Component<{}, UploadCSVCon
 
 	private async submitReadings(file: File) {
 		const uploadPreferences = this.state.uploadReadingsPreferences;
-		await uploadCSVApi.submitReadings(uploadPreferences, file);
+		return await uploadCSVApi.submitReadings(uploadPreferences, file);
 	}
 
 	private async submitMeters(file: File) {
@@ -222,12 +233,12 @@ export default class UploadCSVContainer extends React.Component<{}, UploadCSVCon
 				<Nav tabs style={{ display: 'flex', justifyContent: 'center' }}>
 					<NavItem style={navStyle}>
 						<NavLink onClick={() => this.toggleTab(MODE.readings)}>
-							<FormattedMessage id='csv.tab.readings'/>
+							<FormattedMessage id='csv.tab.readings' />
 						</NavLink>
 					</NavItem>
 					<NavItem style={navStyle}>
 						<NavLink onClick={() => this.toggleTab(MODE.meters)}>
-							<FormattedMessage id='csv.tab.meters'/>
+							<FormattedMessage id='csv.tab.meters' />
 						</NavLink>
 					</NavItem>
 				</Nav>
@@ -235,17 +246,18 @@ export default class UploadCSVContainer extends React.Component<{}, UploadCSVCon
 					<TabPane tabId={MODE.readings}>
 						<ReadingsCSVUploadComponent
 							{...this.state.uploadReadingsPreferences}
-							selectDuplications={this.selectDuplications}
-							selectTimeSort={this.selectTimeSort}
 							setMeterName={this.setMeterName}
+							selectTimeSort={this.selectTimeSort}
+							selectDuplications={this.selectDuplications}
+							selectCumulative={this.selectCumulative}
+							selectCumulativeReset={this.selectCumulativeReset}
 							setCumulativeResetStart={this.setCumulativeResetStart}
 							setCumulativeResetEnd={this.setCumulativeResetEnd}
-							setLength={this.setLength}
+							setLengthGap={this.setLengthGap}
 							setLengthVariation={this.setLengthVariation}
+							selectEndOnly={this.selectEndOnly}
 							submitCSV={this.submitReadings}
 							toggleCreateMeter={this.toggleCreateMeter}
-							toggleCumulative={this.toggleCumulative}
-							toggleCumulativeReset={this.toggleCumulativeReset}
 							toggleGzip={this.toggleGzip(MODE.readings)}
 							toggleHeaderRow={this.toggleHeaderRow(MODE.readings)}
 							toggleRefreshReadings={this.toggleRefreshReadings}
@@ -256,6 +268,7 @@ export default class UploadCSVContainer extends React.Component<{}, UploadCSVCon
 						<MetersCSVUploadComponent
 							{...this.state.uploadMetersPreferences}
 							submitCSV={this.submitMeters}
+							setMeterName={this.setMeterName}
 							toggleGzip={this.toggleGzip(MODE.meters)}
 							toggleHeaderRow={this.toggleHeaderRow(MODE.meters)}
 							toggleUpdate={this.toggleUpdate(MODE.meters)}

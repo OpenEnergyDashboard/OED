@@ -2,7 +2,10 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
 
+import { MODE } from '../containers/csv/UploadCSVContainer';
+
 interface CSVUploadPreferences {
+	meterName: string;
 	gzip: boolean;
 	headerRow: boolean;
 	update: boolean;
@@ -10,41 +13,53 @@ interface CSVUploadPreferences {
 
 interface CSVUploadProps extends CSVUploadPreferences {
 	submitCSV: (file: File) => Promise<void>;
+	setMeterName: (mode: MODE, value: string) => void;
 	toggleGzip: () => void;
 	toggleHeaderRow: () => void;
 	toggleUpdate: () => void;
 }
 
 export const enum TimeSortTypes {
-	increasing = 'increasing'
+	increasing = 'increasing',
+	decreasing = 'decreasing',
+	// meter means to use value stored on meter or the default if not.
+	meter = 'meter value or default'
+}
+
+export const enum BooleanTypes {
+	true = 'true',
+	false = 'false',
+	// meter means to use value stored on meter or the default if not.
+	meter = 'meter value or default'
 }
 
 export interface ReadingsCSVUploadPreferencesItem extends CSVUploadPreferences {
 	createMeter: boolean;
-	cumulative: boolean;
-	cumulativeReset: boolean;
+	cumulative: BooleanTypes;
+	cumulativeReset: BooleanTypes;
 	cumulativeResetStart: string;
 	cumulativeResetEnd: string;
 	duplications: string; // Not sure how to type this an integer string;
 	meterName: string;
-	length: string;
+	lengthGap: string;
 	lengthVariation: string;
+	endOnly: BooleanTypes;
 	refreshReadings: boolean;
 	timeSort: TimeSortTypes;
 }
 
 export interface ReadingsCSVUploadProps extends ReadingsCSVUploadPreferencesItem, CSVUploadProps{
 	// Note: each of these will have to change in consideration of redux;
-	selectDuplications: (value: string) => void;
 	selectTimeSort: (value: TimeSortTypes) => void;
+	selectDuplications: (value: string) => void;
+	selectCumulative: (value: BooleanTypes) => void;
+	selectCumulativeReset: (value: BooleanTypes) => void;
 	setCumulativeResetStart: (value: string) => void;
 	setCumulativeResetEnd: (value: string) => void;
-	setLength: (value: string) => void;
+	setLengthGap: (value: string) => void;
 	setLengthVariation: (value: string) => void;
-	setMeterName: (value: string) => void;
+	selectEndOnly: (value: string) => void;
 	toggleCreateMeter: () => void;
-	toggleCumulative: () => void;
-	toggleCumulativeReset: () => void;
 	toggleRefreshReadings: () => void;
 };
 
