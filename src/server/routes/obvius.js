@@ -22,7 +22,6 @@ const zlib = require('zlib');
 const { log } = require('../log');
 const Configfile = require('../models/obvius/Configfile');
 const listConfigfiles = require('../services/obvius/listConfigfiles');
-const streamBuffers = require('stream-buffers');
 const loadLogfileToReadings = require('../services/obvius/loadLogfileToReadings');
 const middleware = require('../middleware');
 const obvius = require('../util').obvius;

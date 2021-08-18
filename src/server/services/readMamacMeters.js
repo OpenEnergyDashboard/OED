@@ -10,6 +10,7 @@ const Meter = require('../models/Meter');
 const _ = require('lodash');
 const stopDB = require('../models/database').stopDB;
 const { log } = require('../log');
+const moment = require('moment');
 
 const parseXMLPromisified = promisify(parseString);
 
@@ -52,7 +53,8 @@ async function getMeterInfo(url, ip, csvLine) {
 		.then(raw => parseXMLPromisified(raw))
 		.then(xml => {
 			const name = xml.Maverick.NodeID[0];
-			return new Meter(undefined, name, ip, true, true, Meter.type.MAMAC, null);
+			return new Meter(undefined, name, ip, true, true, Meter.type.MAMAC, null, undefined, undefined,
+				'created via MAMAC meter upload on ' + moment().format());
 		});
 }
 

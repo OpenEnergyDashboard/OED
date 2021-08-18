@@ -33,7 +33,6 @@ function handleCumulative(rows, readingRepetition, cumulativeReset, meterID) {
 	for (let index = readingRepetition; index < rows.length; ++index) {
 		// To read data where same reading is repeated. Like E-mon D-mon meters
 		if ((index - readingRepetition) % readingRepetition === 0) {
-			// set start_timestamp and end_timestamp
 			startTimestamp = moment(rows[index][1], 'MM/DD/YY HH:mm');
 			endTimestamp = moment(rows[index - readingRepetition][2], 'MM/DD/YY HH:mm');
 			// meterReading
