@@ -32,12 +32,11 @@ export default class TooltipHelpComponentAlternative extends React.Component<Too
 		const version = this.props.version
 
 		// Normal/live URL for OED
-		// const BASE_URL = 'https://openenergydashboard.github.io';
+		const BASE_URL = `https://openenergydashboard.github.io/help/${version}`;
 		// Debug URL where need to put own GitHub ID before .github.io.
 		// This works if you have a fork of the web pages and setup your GitHub
 		// account to serve them up.
-		// const BASE_URL = 'https://xxx.github.io/OpenEnergyDashboard.github.io';
-		const BASE_URL = `https://huss.github.io/OpenEnergyDashboard.github.io/help/${version}`;
+		// const BASE_URL = `https://xxx.github.io/OpenEnergyDashboard.github.io/help/${version}`;
 
 		const helpLinks: Record<string, Record<string, string>> = {
 			'help.admin.groupview': { link: `${BASE_URL}/adminGroupViewing.html` },
