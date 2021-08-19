@@ -6,6 +6,8 @@ import * as React from 'react';
 import { User, UserRole } from '../../types/items';
 import { Button, Input, Table } from 'reactstrap';
 import CreateUserLinkButtonComponent from './users/CreateUserLinkButtonComponent';
+import TooltipHelpContainerAlternative from '../../containers/TooltipHelpContainerAlternative';
+import TooltipMarkerComponent from '../TooltipMarkerComponent';
 
 interface UserDisplayComponentProps {
 	users: User[];
@@ -30,11 +32,20 @@ export default function UserDetailComponent(props: UserDisplayComponentProps) {
 		justifyContent: 'space-between'
 	}
 
+	const tooltipStyle = {
+		display: 'inline-block',
+		fontSize: '50%'
+	};
+
 	return (
 		<div>
+			<TooltipHelpContainerAlternative page='users' />
 			<div className='container-fluid'>
 				<h2 style={titleStyle}>
 					Users
+					<div style={tooltipStyle}>
+						<TooltipMarkerComponent page='users' helpTextId='help.admin.user' />
+					</div>
 				</h2>
 				<div style={tableStyle}>
 					<Table striped bordered hover>

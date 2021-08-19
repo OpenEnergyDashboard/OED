@@ -8,8 +8,8 @@ import { FormattedMessage } from 'react-intl';
 import MeterViewContainer from '../../containers/meters/MeterViewContainer';
 import HeaderContainer from '../../containers/HeaderContainer';
 import FooterContainer from '../../containers/FooterContainer';
-import TooltipHelpComponent from '../TooltipHelpComponentAlternative';
 import TooltipMarkerComponent from '../TooltipMarkerComponent';
+import TooltipHelpContainerAlternative from '../../containers/TooltipHelpContainerAlternative';
 
 interface MetersDetailProps {
 	loggedInAsAdmin: boolean;
@@ -52,7 +52,7 @@ export default class MetersDetailComponent extends React.Component<MetersDetailP
 		return (
 			<div>
 				<HeaderContainer />
-				<TooltipHelpComponent page='meters' />
+				<TooltipHelpContainerAlternative page='meters' />
 				<div className='container-fluid'>
 					<h2 style={titleStyle}>
 						<FormattedMessage id='meters' />

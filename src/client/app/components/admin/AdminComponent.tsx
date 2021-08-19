@@ -7,9 +7,9 @@ import HeaderContainer from '../../containers/HeaderContainer';
 import FooterContainer from '../../containers/FooterContainer';
 import PreferencesContainer from '../../containers/admin/PreferencesContainer';
 import ManageUsersLinkButtonComponent from './users/ManageUsersLinkButtonComponent';
-import TooltipHelpComponent from '../TooltipHelpComponentAlternative';
 import TooltipMarkerComponent from '../TooltipMarkerComponent';
 import { FormattedMessage } from 'react-intl';
+import TooltipHelpContainerAlternative from '../../containers/TooltipHelpContainerAlternative';
 
 /**
  * Top-level React component that controls the home page
@@ -37,7 +37,7 @@ export default function AdminComponent() {
 	return (
 		<div>
 			<HeaderContainer />
-			<TooltipHelpComponent page='admin' />
+			<TooltipHelpContainerAlternative page='admin' />
 			<div className='container-fluid'>
 				<h2 style={titleStyle}>
 					<FormattedMessage id='admin.panel' />

@@ -12,6 +12,8 @@ import { ReadingsCSVUploadPreferencesItem, MetersCSVUploadPreferencesItem, TimeS
 import { ReadingsCSVUploadDefaults, MetersCSVUploadDefaults } from '../../utils/csvUploadDefaults';
 import { TabContent, TabPane, Nav, NavItem, NavLink } from 'reactstrap';
 import { FormattedMessage } from 'react-intl';
+import TooltipHelpContainerAlternative from '../../containers/TooltipHelpContainerAlternative';
+import TooltipMarkerComponent from '../../components/TooltipMarkerComponent';
 
 export const enum MODE {
 	meters = 'meters',
@@ -23,6 +25,11 @@ interface UploadCSVContainerState {
 	uploadMetersPreferences: MetersCSVUploadPreferencesItem;
 	activeTab: MODE;
 }
+
+const tooltipStyle = {
+	display: 'inline-block',
+	fontSize: '100%'
+};
 
 export default class UploadCSVContainer extends React.Component<{}, UploadCSVContainerState> {
 	constructor(props: {}) {
@@ -229,6 +236,7 @@ export default class UploadCSVContainer extends React.Component<{}, UploadCSVCon
 		}
 		return (
 			<div>
+				<TooltipHelpContainerAlternative page='csv' />
 				<HeaderContainer />
 				<Nav tabs style={{ display: 'flex', justifyContent: 'center' }}>
 					<NavItem style={navStyle}>
@@ -241,6 +249,9 @@ export default class UploadCSVContainer extends React.Component<{}, UploadCSVCon
 							<FormattedMessage id='csv.tab.meters' />
 						</NavLink>
 					</NavItem>
+					<div style={tooltipStyle}>
+						<TooltipMarkerComponent page='csv' helpTextId='help.csv.header' />
+					</div>
 				</Nav>
 				<TabContent activeTab={this.state.activeTab}>
 					<TabPane tabId={MODE.readings}>
