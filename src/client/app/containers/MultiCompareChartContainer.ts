@@ -129,7 +129,7 @@ function sortIDs(ids: CompareEntity[], sortingOrder: SortingOrder): CompareEntit
 				return 0;
 			});
 			break;
-		case SortingOrder.Descending:
+		case SortingOrder.Ascending:
 			ids.sort((a, b) => {
 				if (a.change < b.change) {
 					return -1;
@@ -140,7 +140,7 @@ function sortIDs(ids: CompareEntity[], sortingOrder: SortingOrder): CompareEntit
 				return 0;
 			});
 			break;
-		case SortingOrder.Ascending:
+		case SortingOrder.Descending:
 			ids.sort((a, b) =>  {
 				if (a.change > b.change) {
 					return -1;
