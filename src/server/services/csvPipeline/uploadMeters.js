@@ -29,6 +29,20 @@ async function uploadMeters(req, res, filepath, conn) {
 	// If there is a header row, we remove and ignore it for now.
 	const meters = (req.body.headerRow === 'true') ? temp.slice(1) : temp;
 	await Promise.all(meters.map(async meter => {
+		// First verify GPS is okay
+		// This assumes that the sixth column is the GPS as order is assumed for now in a GPS file.
+		const gpsInput = meter[6];
+		if (gpsInput.length !== 0) {
+			// Verify GPS is okay values
+			if (!isValidGPSInput(gpsInput)) {
+				let msg = `For meter ${meter[0]} the gps coordinates of ${gpsInput} are invalid`;
+				throw new CSVPipelineError(msg, undefined, 500);
+			}
+		}
+		// Need to reverse latitude & longitude because standard GPS gives in that order but a GPSPoint for the
+		// DB is longitude, latitude.
+		meter[6] = switchGPS(gpsInput);
+
 		if (req.body.update === 'true') {
 			// Updating the new meters.
 			// First get its id.
@@ -62,6 +76,41 @@ async function uploadMeters(req, res, filepath, conn) {
 		.catch(error => {
 			throw new CSVPipelineError(`Failed to upload meters due to internal OED Error: ${error.message}`, undefined, 500);
 		});
+}
+
+/**
+ * Checks if the string is a valid GPS representation. This requires it to be two numbers
+ * separated by a comma and the GPS values to be within allowed values. The should be a latitude, longitude pair.
+ * This is very similar to src/client/app/utils/calibration.ts but not TypeScript and does not do popup.
+ * @param input The string to check for GPS values
+ * @returns true if string is GPS and false otherwise.
+ */
+function isValidGPSInput(input) {
+	if (input.indexOf(',') === -1) { // if there is no comma
+		return false;
+	} else if (input.indexOf(',') !== input.lastIndexOf(',')) { // if there are multiple commas
+		return false;
+	}
+	// Works if value is not a number since parseFloat returns a NaN so treated as invalid later.
+	const array = input.split(',').map((value) => parseFloat(value));
+	const latitudeIndex = 0;
+	const longitudeIndex = 1;
+	const latitudeConstraint = array[latitudeIndex] >= -90 && array[latitudeIndex] <= 90;
+	const longitudeConstraint = array[longitudeIndex] >= -180 && array[longitudeIndex] <= 180;
+	const result = latitudeConstraint && longitudeConstraint;
+	return result;
+}
+
+/**
+ * Reverses the latitude and longitude in GPS string. More basically, it switches the two values separated by a comma.
+ * Assumes went through isValidGPSInput first so know it has a single comma so does what it should.
+ * @param gpsString The string with GPS pair separated by a comma to reverse
+ * @return the new string with the updated GPS pair
+ */
+function switchGPS(gpsString) {
+	const array = gpsString.split(',');
+	// return String(array[1] + "," + array[0]);
+	return (array[1] + "," + array[0]);
 }
 
 module.exports = uploadMeters;
