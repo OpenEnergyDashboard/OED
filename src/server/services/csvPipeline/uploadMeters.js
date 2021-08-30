@@ -32,16 +32,17 @@ async function uploadMeters(req, res, filepath, conn) {
 		// First verify GPS is okay
 		// This assumes that the sixth column is the GPS as order is assumed for now in a GPS file.
 		const gpsInput = meter[6];
-		if (gpsInput.length !== 0) {
+		// Skip if undefined.
+		if (gpsInput) {
 			// Verify GPS is okay values
 			if (!isValidGPSInput(gpsInput)) {
 				let msg = `For meter ${meter[0]} the gps coordinates of ${gpsInput} are invalid`;
 				throw new CSVPipelineError(msg, undefined, 500);
 			}
+			// Need to reverse latitude & longitude because standard GPS gives in that order but a GPSPoint for the
+			// DB is longitude, latitude.
+			meter[6] = switchGPS(gpsInput);
 		}
-		// Need to reverse latitude & longitude because standard GPS gives in that order but a GPSPoint for the
-		// DB is longitude, latitude.
-		meter[6] = switchGPS(gpsInput);
 
 		if (req.body.update === 'true') {
 			// Updating the new meters.
