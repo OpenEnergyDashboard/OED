@@ -92,7 +92,7 @@ function isValidGPSInput(input) {
 		return false;
 	}
 	// Works if value is not a number since parseFloat returns a NaN so treated as invalid later.
-	const array = input.split(',').map((value) => parseFloat(value));
+	const array = input.split(',').map(value => parseFloat(value));
 	const latitudeIndex = 0;
 	const longitudeIndex = 1;
 	const latitudeConstraint = array[latitudeIndex] >= -90 && array[latitudeIndex] <= 90;
@@ -110,7 +110,7 @@ function isValidGPSInput(input) {
 function switchGPS(gpsString) {
 	const array = gpsString.split(',');
 	// return String(array[1] + "," + array[0]);
-	return (array[1] + "," + array[0]);
+	return (array[1] + ',' + array[0]);
 }
 
 module.exports = uploadMeters;
