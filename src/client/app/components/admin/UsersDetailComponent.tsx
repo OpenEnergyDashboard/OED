@@ -68,14 +68,20 @@ export default function UserDetailComponent(props: UserDisplayComponentProps) {
 											))}
 										</Input>
 									</td>
-									<td><Button color='danger' onClick={() => { props.deleteUser(user.email); }}><FormattedMessage id='delete.user'/></Button></td>
+									<td>
+										<Button color='danger' onClick={() => { props.deleteUser(user.email); }}>
+											<FormattedMessage id='delete.user'/>
+										</Button>
+									</td>
 								</tr>
 							))}
 						</tbody>
 					</Table>
 					<div style={buttonsStyle}>
 						<CreateUserLinkButtonComponent />
-						<Button color='success' disabled={!props.edited} onClick={props.submitUserEdits}> <FormattedMessage id='save.role.changes'/> </Button>
+						<Button color='success' disabled={!props.edited} onClick={props.submitUserEdits}>
+							<FormattedMessage id='save.role.changes'/>
+						</Button>
 					</div>
 				</div>
 			</div>

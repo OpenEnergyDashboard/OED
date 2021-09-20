@@ -18,6 +18,7 @@ export default function ManageUsersLinkButtonComponent(props: ManageUserLinkButt
 	}
 
 	return (
-		<Link style={{ ...inlineButtonStyle, ...props.style }} to='/users' ><Button outline> <FormattedMessage id='users'/> </Button></Link>
+		<Link style={{ ...inlineButtonStyle, ...props.style }} to='/users' >
+			<Button outline><FormattedMessage id='users'/> </Button></Link>
 	)
 }

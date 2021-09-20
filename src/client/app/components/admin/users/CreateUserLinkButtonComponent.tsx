@@ -18,6 +18,7 @@ export default function CreateUserLinkButtonComponent(props: CreateUserLinkButto
 	}
 
 	return (
-		<Link style={{ ...inlineButtonStyle, ...props.style }} to='/users/new'><Button color='primary' outline> <FormattedMessage id='create.user'/> </Button></Link>
+		<Link style={{ ...inlineButtonStyle, ...props.style }} to='/users/new'>
+			<Button color='primary' outline> <FormattedMessage id='create.user'/> </Button></Link>
 	)
 }
