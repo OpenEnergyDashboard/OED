@@ -6,7 +6,7 @@ import * as React from 'react';
 import {Button} from 'reactstrap';
 import {Link} from 'react-router';
 import {hasToken} from '../../utils/token';
-import {FormattedMessage} from 'react-intl';
+import {FormattedMessage, InjectedIntlProps, injectIntl} from 'react-intl';
 import {CalibrationModeTypes, MapMetadata} from '../../types/redux/map';
 import * as moment from 'moment';
 
@@ -30,8 +30,10 @@ interface MapViewState {
 	noteInput: string;
 }
 
-export default class MapViewComponent extends React.Component<MapViewProps, MapViewState> {
-	constructor(props: MapViewProps) {
+type MapViewPropsWithIntl = MapViewProps & InjectedIntlProps;
+
+class MapViewComponent extends React.Component<MapViewPropsWithIntl, MapViewState> {
+	constructor(props: MapViewPropsWithIntl) {
 		super(props);
 		this.state = {
 			nameFocus: false,
@@ -68,13 +70,13 @@ export default class MapViewComponent extends React.Component<MapViewProps, MapV
 			return '(submitting)';
 		}
 		if (this.props.isEdited) {
-			return '(edited)';
+			return this.props.intl.formatMessage({id: 'edited'});
 		}
 		return '';
 	}
 
 	private toggleDelete() {
-		const consent = window.confirm(`Are you sure you want to remove map "${this.props.map.name}"?`);
+		const consent = window.confirm(`${this.props.intl.formatMessage({id: 'map.confirm.remove'})} "${this.props.map.name}"?`);
 		if (consent) { this.props.removeMap(this.props.id); }
 	}
 
@@ -297,3 +299,5 @@ export default class MapViewComponent extends React.Component<MapViewProps, MapV
 		this.props.setCalibration(mode, this.props.id);
 	}
 }
+
+export default injectIntl<MapViewProps>(MapViewComponent);

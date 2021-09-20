@@ -25,7 +25,7 @@ export default class MapCalibrationComponent extends React.Component<MapCalibrat
 			return (
 				<div className='container-fluid'>
 					<HeaderContainer/>
-					<MapCalibrationInitiateContainer/>
+					<MapCalibrationInitiateContainer />
 				</div>
 			);
 		} else if (this.props.mode === CalibrationModeTypes.calibrate) {
