@@ -48,7 +48,7 @@ export default function AdminComponent() {
 				<div className='row'>
 					<div className='col-12 col-lg-6'>
 						<div style={bottomPaddingStyle}>
-							<p style={sectionTitleStyle}>Manage:</p>
+							<p style={sectionTitleStyle}><FormattedMessage id = 'manage' />:</p>
 							<div>
 								<ManageUsersLinkButtonComponent />
 							</div>

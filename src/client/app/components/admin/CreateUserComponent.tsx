@@ -5,6 +5,7 @@
 import * as React from 'react';
 import { UserRole } from '../../types/items';
 import { Alert, Button, Input } from 'reactstrap';
+import { FormattedMessage } from 'react-intl';
 
 interface CreateUserFormProps {
 	email: string;
@@ -37,7 +38,7 @@ export default function CreateUserFormComponent(props: CreateUserFormProps) {
 
 	return (
 		<div className='container-fluid'>
-			<h1 style={titleStyle}> Create User </h1>
+			<h1 style={titleStyle}> <FormattedMessage id='create.user'/> </h1>
 			<div style={tableStyle}>
 				<form onSubmit={e => { e.preventDefault(); props.submitNewUser(); }}>
 					<div style={formInputStyle}>
@@ -48,15 +49,15 @@ export default function CreateUserFormComponent(props: CreateUserFormProps) {
 						Error: Passwords Do Not Match
 					</Alert>}
 					<div style={formInputStyle}>
-						<label> Password </label><br />
+						<label> <FormattedMessage id='password'/> </label><br />
 						<Input type='password' onChange={({ target }) => props.handlePasswordChange(target.value)} required value={props.password} />
 					</div>
 					<div style={formInputStyle}>
-						<label> Confirm password </label><br />
+						<label> <FormattedMessage id='password.confirm'/> </label><br />
 						<Input type='password' onChange={({ target }) => props.handleConfirmPasswordChange(target.value)} required value={props.confirmPassword} />
 					</div>
 					<div style={formInputStyle}>
-						<label> Role </label><br />
+						<label> <FormattedMessage id='role'/> </label><br />
 						<Input type='select' onChange={({ target }) => props.handleRoleChange(target.value as UserRole)} value={props.role}>
 							{Object.entries(UserRole).map(([role, val]) => (
 								<option value={val} key={val}> {role} </option>
@@ -64,7 +65,7 @@ export default function CreateUserFormComponent(props: CreateUserFormProps) {
 						</Input>
 					</div>
 					<div>
-						<Button> Submit new user </Button>
+						<Button> <FormattedMessage id='submit.new.user'/> </Button>
 					</div>
 				</form>
 			</div>
