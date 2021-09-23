@@ -194,15 +194,23 @@ BEGIN
 			INNER JOIN unnest(meter_ids) meters(id) ON hourly.meter_id = meters.id
 		WHERE requested_range @> time_interval;
 	 ELSE
-		RETURN QUERY
-	 	SELECT
-			minutely_readings.meter_id as meter_id,
-	 		minutely_readings.reading_rate as reading_rate,
-	 		lower(minutely_readings.time_interval) AS start_timestamp,
-	 		upper(minutely_readings.time_interval) AS end_timestamp
-	 	FROM minutely_readings
-	 		INNER JOIN unnest(meter_ids) meters(id) ON minutely_readings.meter_id = meters.id
-		 WHERE requested_range @> minutely_readings.time_interval;
+ 		RETURN QUERY
+			SELECT r.meter_id as meter_id,
+ 				(r.reading::FLOAT) as reading_rate,
+ 				r.start_timestamp,
+ 				r.end_timestamp
+ 			FROM readings r
+ 			INNER JOIN unnest(meter_ids) meters(id) ON r.meter_id = meters.id
+ 		WHERE lower(requested_range) <= r.start_timestamp AND r.end_timestamp <= upper(requested_range);
+		-- RETURN QUERY
+	 	-- SELECT
+		-- 	minutely_readings.meter_id as meter_id,
+	 	-- 	minutely_readings.reading_rate as reading_rate,
+	 	-- 	lower(minutely_readings.time_interval) AS start_timestamp,
+	 	-- 	upper(minutely_readings.time_interval) AS end_timestamp
+	 	-- FROM minutely_readings
+	 	-- 	INNER JOIN unnest(meter_ids) meters(id) ON minutely_readings.meter_id = meters.id
+		--  WHERE requested_range @> minutely_readings.time_interval;
 	 END IF;
 END;
 $$ LANGUAGE 'plpgsql';
