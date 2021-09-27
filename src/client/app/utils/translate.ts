@@ -26,7 +26,7 @@ export default function translate(messageID: string): TranslatedString {
 	} else {
 		messages = (localeData as any).en;
 	}
-	//possibly use createIntl in the future to replace this
+	// Possibly use createIntl in the future to replace this
 	const { intl } = new IntlProvider({ locale: lang, messages }, {}).getChildContext();
 	return intl.formatMessage(defineMessages({ [messageID]: { id: messageID }})[messageID]) as TranslatedString;
 }
