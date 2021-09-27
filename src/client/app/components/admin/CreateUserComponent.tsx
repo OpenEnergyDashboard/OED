@@ -42,7 +42,7 @@ export default function CreateUserFormComponent(props: CreateUserFormProps) {
 			<div style={tableStyle}>
 				<form onSubmit={e => { e.preventDefault(); props.submitNewUser(); }}>
 					<div style={formInputStyle}>
-						<label> Email </label><br />
+						<label> <FormattedMessage id='email'/> </label><br />
 						<Input type='email' onChange={({ target }) => props.handleEmailChange(target.value)} required value={props.email} />
 					</div>
 					{props.submittedOnce && !props.doPasswordsMatch  && <Alert color='danger'>

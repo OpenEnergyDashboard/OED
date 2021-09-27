@@ -68,7 +68,7 @@ class MeterViewComponent extends React.Component<MeterViewPropsWithIntl, MeterVi
 
 	private formatStatus(): string {
 		if (this.props.isSubmitting) {
-			return '(submitting)';
+			return '(' + this.props.intl.formatMessage({id: 'submitting'}) + ')';
 		}
 
 		if (this.props.isEdited) {

@@ -52,7 +52,7 @@ export default function UserDetailComponent(props: UserDisplayComponentProps) {
 					<Table striped bordered hover>
 						<thead>
 							<tr>
-								<th> Email </th>
+								<th> <FormattedMessage id='email'/> </th>
 								<th> <FormattedMessage id='role'/> </th>
 								<th> <FormattedMessage id='action'/> </th>
 							</tr>

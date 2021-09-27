@@ -67,7 +67,7 @@ class MapViewComponent extends React.Component<MapViewPropsWithIntl, MapViewStat
 
 	private formatStatus(): string {
 		if (this.props.isSubmitting) {
-			return '(submitting)';
+			return '(' + this.props.intl.formatMessage({id: 'submitting'}) + ')';
 		}
 		if (this.props.isEdited) {
 			return this.props.intl.formatMessage({id: 'edited'});
