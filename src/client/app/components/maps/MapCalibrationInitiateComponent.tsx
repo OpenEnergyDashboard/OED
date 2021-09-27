@@ -6,7 +6,7 @@ import * as React from 'react';
 import {CalibrationModeTypes, MapMetadata} from '../../types/redux/map';
 import {ChangeEvent} from 'react';
 import {logToServer} from '../../actions/logs';
-import { FormattedMessage } from 'react-intl';
+import { FormattedMessage, InjectedIntlProps, injectIntl } from 'react-intl';
 
 /**
  * Accepts image file from user upload,
@@ -26,13 +26,15 @@ interface MapInitiateState {
 	mapName: string;
 }
 
-export default class MapCalibrationInitiateComponent extends React.Component<MapInitiateProps, MapInitiateState > {
+type MapInitiatePropsWithIntl = MapInitiateProps & InjectedIntlProps;
+
+class MapCalibrationInitiateComponent extends React.Component<MapInitiatePropsWithIntl, MapInitiateState > {
 	private readonly fileInput: any;
 	private notifyLoadComplete() {
-		window.alert(`Map load complete from ${this.state.filename}.`);
+		window.alert(`${this.props.intl.formatMessage({id: 'map.load.complete'})} ${this.state.filename}.`);
 	}
 
-	constructor(props: MapInitiateProps) {
+	constructor(props: MapInitiatePropsWithIntl) {
 		super(props);
 		this.state = {
 			filename: '',
@@ -111,3 +113,5 @@ export default class MapCalibrationInitiateComponent extends React.Component<Map
 		});
 	}
 }
+
+export default injectIntl<MapInitiateProps>(MapCalibrationInitiateComponent);

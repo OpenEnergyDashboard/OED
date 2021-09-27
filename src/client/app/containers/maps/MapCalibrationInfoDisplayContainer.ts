@@ -9,14 +9,16 @@ import MapCalibrationInfoDisplayComponent from '../../components/maps/MapCalibra
 import {changeGridDisplay, dropCalibration, offerCurrentGPS, submitCalibratingMap} from '../../actions/map';
 import {GPSPoint} from '../../utils/calibration';
 import {logToServer} from '../../actions/logs';
+import translate from '../../utils/translate';
 
 function mapStateToProps(state: State) {
 	const mapID = state.maps.calibratingMap;
 	const map = state.maps.editedMaps[mapID];
 	const resultDisplay = (map.calibrationResult) ?
 		`x: ${map.calibrationResult.maxError.x}%, y: ${map.calibrationResult.maxError.y}%`
-		: 'Need more points';
-	const currentCartesianDisplay = (map.currentPoint) ? `x: ${map.currentPoint.cartesian.x}, y: ${map.currentPoint.cartesian.y}` : 'undefined';
+		: translate('need.more.points');
+	const currentCartesianDisplay = (map.currentPoint) ?
+	`x: ${map.currentPoint.cartesian.x}, y: ${map.currentPoint.cartesian.y}` : translate('undefined');
 	return {
 		showGrid: state.maps.calibrationSettings.showGrid,
 		currentCartesianDisplay,

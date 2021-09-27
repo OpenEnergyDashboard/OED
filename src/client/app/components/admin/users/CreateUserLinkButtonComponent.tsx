@@ -5,6 +5,7 @@
 import * as React from 'react';
 import { Link } from 'react-router';
 import { Button } from 'reactstrap';
+import { FormattedMessage } from 'react-intl';
 
 interface CreateUserLinkButtonComponentProps {
 	style?: React.CSSProperties;
@@ -17,6 +18,7 @@ export default function CreateUserLinkButtonComponent(props: CreateUserLinkButto
 	}
 
 	return (
-		<Link style={{ ...inlineButtonStyle, ...props.style }} to='/users/new'><Button color='primary' outline> Create a User </Button></Link>
+		<Link style={{ ...inlineButtonStyle, ...props.style }} to='/users/new'>
+			<Button color='primary' outline> <FormattedMessage id='create.user'/> </Button></Link>
 	)
 }
