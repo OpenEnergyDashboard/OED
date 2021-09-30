@@ -52,10 +52,31 @@ For each dataset, we use a node script to time the average time of receiving a r
 - Time to load data is not linearly proportionate to amount of data to load even within the same view
 - Reading from a view is significantly slower than reading from either a materialized view or directly from a table
 - Increase in space consumed may be beneficial depending on the underlying data resolution
+- Increase in time **(may) depend linearly** on the amount of data a specific meter when using a view.
 
 
 
 ## Case analysis on trade-off between materializing view and speed of hourly readings
+
+**NOTE:** OED only contains reading data for 1 meter
+
+**Underlying data:** 1-Minute Data for 1 year
+
+**Space without materialized hourly view:** 219M
+
+**Space with materialize hourly view:** 219M
+
+| Interval                                      | Pre-materialize Data (ms) | Post-materialize Data (ms) | Raw data |
+| --------------------------------------------- | ------------------------- | -------------------------- | -------- |
+| Jan 01, 2020 00:00:00 - Apr 15, 2020 00:00:00 | 135.2                     | 99.6                       |          |
+| Jan 01, 2020 00:00:00 - Feb 22, 2020 00:00:00 | 109.2                     | 82                         |          |
+| Jan 01, 2020 00:00:00 - Feb 19, 2020 00:00:00 | 5641.4                    | 73                         |          |
+| Jan 03, 2020 08:00:00 - Feb 14, 2020 23:00:00 | 5390.8                    | 73.2                       |          |
+| Jan 24, 2020 16:00:00 - Feb 14, 2020 23:00:00 | 5302.6                    | 74.2                       |          |
+| Jan 24, 2020 16:00:00 - Feb 04, 2020 07:00:00 | 5189.6                    | 72.8                       |          |
+| Feb 02, 2020 12:00:00 - Feb 04, 2020 08:59:00 | 4861.8                    | 4614                       |          |
+| Feb 02, 2020 12:00:00 - Feb 04, 2020 09:39:00 | 5014.6                    | 4610.4                     |          |
+| Feb 02, 2020 12:00:00 - Feb 04, 2020 22:49:00 | 5173.2                    | 72.4                       |          |
 
 **TODO**
 
