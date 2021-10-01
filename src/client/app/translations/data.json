@@ -505,8 +505,8 @@
 		"csv.readings.param.lengthGap": "Distancia de longitud",
 		"csv.readings.param.length.variation": "Distancia de variación Length Variation",
 		"csv.readings.param.meter.name": "Nombre de medidor",
-		"csv.readings.param.refresh.readings": "(Need Spanish) Refresh Readings",
-		"csv.readings.param.time.sort": "(Need Spanish) Time Sort",
+		"csv.readings.param.refresh.readings": "Réfrescar las lecturas",
+		"csv.readings.param.time.sort": "Ordenar el tiempo"
 		"csv.readings.section.cumulative.data": "(Need Spanish) Cumulative Data",
 		"csv.readings.section.time.gaps": "(Need Spanish) Time Gaps",
 		"csv.submit.button": "(Need Spanish) Submit CSV Data",
