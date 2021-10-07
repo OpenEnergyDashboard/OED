@@ -96,6 +96,17 @@ class Reading {
 	}
 
 	/**
+	 * Refreshes the compressed hourly readings view.
+	 * Should be called at least once a day, preferably in the middle of the night.
+	 * @param conn The connection to use
+	 * @return {Promise<void>}
+	 */
+	static refreshCompressedHourlyReadings(conn) {
+		// This can't be a function because you can't call REFRESH inside a function
+		return conn.none('REFRESH MATERIALIZED VIEW hourly_readings');
+	}
+
+	/**
 	 * Change a row from the readings table into a Reading object.
 	 * @param row The row from the table to be changed.
 	 * @returns Reading object from row

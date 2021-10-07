@@ -14,6 +14,7 @@ async function refreshReadingViews() {
 
 	log.info('Refreshing Reading Views');
 	await Reading.refreshCompressedReadings(conn);
+	await Reading.refreshCompressedHourlyReadings(conn);
 	log.info('Views Refreshed');
 }
 
