@@ -46,6 +46,11 @@ the readings table (to aggregate data over a large time range).
 The small tables, on the other hand, are only queried for small time ranges that produce a few hundred data points.
 This is the best-case scenario for these queries, and leads to quick execution times if the table is properly clustered.
  */
+
+/*
+ The minutely_readings view below is no longer used. Instead of reading from this view,
+ we choose to reading directly from the raw readings table.
+ */
 CREATE OR REPLACE VIEW
 minutely_readings
 	AS SELECT
@@ -77,7 +82,7 @@ minutely_readings
 				) gen(interval_start)
 			GROUP BY r.meter_id, gen.interval_start;
 
-CREATE OR REPLACE VIEW
+CREATE MATERIALIZED VIEW IF NOT EXISTS
 hourly_readings
 	AS SELECT
 				r.meter_id AS meter_id,
@@ -202,15 +207,6 @@ BEGIN
  			FROM readings r
  			INNER JOIN unnest(meter_ids) meters(id) ON r.meter_id = meters.id
  		WHERE lower(requested_range) <= r.start_timestamp AND r.end_timestamp <= upper(requested_range);
-		-- RETURN QUERY
-	 	-- SELECT
-		-- 	minutely_readings.meter_id as meter_id,
-	 	-- 	minutely_readings.reading_rate as reading_rate,
-	 	-- 	lower(minutely_readings.time_interval) AS start_timestamp,
-	 	-- 	upper(minutely_readings.time_interval) AS end_timestamp
-	 	-- FROM minutely_readings
-	 	-- 	INNER JOIN unnest(meter_ids) meters(id) ON minutely_readings.meter_id = meters.id
-		--  WHERE requested_range @> minutely_readings.time_interval;
 	 END IF;
 END;
 $$ LANGUAGE 'plpgsql';
