@@ -1,7 +1,5 @@
 # Testing the OED fast-pt compressed readings system
 
-*fastPts fork commit Hash: #*
-
 **We use a JS script to perform these tests rather than manually because there are many tests and also because we found that using a script has no significant difference when compared to manually requesting data via the web interface.**
 
 We test each data set as a way to observe the time taken for each switch level down the compressed readings function (compressed_readings_2 function).
