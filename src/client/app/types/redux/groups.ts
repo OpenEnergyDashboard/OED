@@ -4,6 +4,7 @@
 
 import { ActionType } from './actions';
 import { NamedIDItem } from '../items';
+import { GPSPoint } from 'utils/calibration';
 
 export enum DisplayMode { View = 'view', Edit = 'edit', Create = 'create' }
 
@@ -122,8 +123,10 @@ export interface MarkOneGroupOutdatedAction {
 export interface GroupMetadata {
 	isFetching: boolean;
 	outdated: boolean;
+	displayable: boolean;
 	selectedGroups: number[];
 	selectedMeters: number[];
+	gps?: GPSPoint;
 }
 
 export interface GroupData {

@@ -31,6 +31,7 @@ function mapStateToProps(state: State) {
 	 */
 	// do extra check for display if using mapChart.
 	const disableMeters: number[] = [];
+	const disableGroups: number[] = [];
 	// Don't do this if there is no selected map.
 	if (state.graph.chartToRender === ChartTypes.map && state.maps.selectedMap !== 0) {
 		// filter meters;
@@ -79,15 +80,40 @@ function mapStateToProps(state: State) {
 			}
 		});
 		// filter groups - this is not yet done as groups do not show up on maps yet.
+		/*
+		sortedGroups.forEach(group => {
+			const gps = state.groups.byGroupID[group.value].gps;
+			const origin = state.maps.byMapID[state.maps.selectedMap].origin;
+			const opposite = state.maps.byMapID[state.maps.selectedMap].opposite;
+
+			if (origin !== undefined && opposite !== undefined && gps !== undefined && gps !== null) {
+				const scaleOfMap = calculateScaleFromEndpoints(origin, opposite, imageDimensionNormalized);
+				const meterGPSInUserGrid: CartesianPoint = gpsToUserGrid(imageDimensionNormalized, gps, origin, scaleOfMap);
+				if (!(meterMapInfoOk({ gps, meterID: group.value }, state.maps.byMapID[state.maps.selectedMap]) &&
+					meterDisplayableOnMap(imageDimensionNormalized, meterGPSInUserGrid))) {
+					group.disabled = true;
+					disableGroups.push(group.value);
+				}
+			} else {
+				// Lack info on this map so skip. This is mostly done since TS complains about the undefined possibility.
+				group.disabled = true;
+				disableGroups.push(group.value);
+			}
+		});*/
 	}
 
-	const selectedGroups = state.graph.selectedGroups.map(groupID => (
-		{
-			label: state.groups.byGroupID[groupID] ? state.groups.byGroupID[groupID].name : '',
-			value: groupID,
-			disabled: false
-		} as SelectOption
-	));
+	const selectedGroups = state.graph.selectedGroups.map(groupID => {
+		if (disableGroups.includes(groupID)) {
+			return;
+		}
+		else {
+			return {
+				label: state.groups.byGroupID[groupID] ? state.groups.byGroupID[groupID].name : '',
+				value: groupID,
+				disabled: false
+			} as SelectOption
+		}
+	});
 	const selectedMeters = state.graph.selectedMeters.map(meterID => {
 		if (disableMeters.includes(meterID)) {
 			return;

@@ -44,7 +44,7 @@ export function shouldFetchMeterBarReadings(state: State, meterID: number, timeI
  * @returns {boolean} True if the readings for the given group, time, and duration are missing; false otherwise.
  */
 export function shouldFetchGroupBarReadings(state: State, groupID: number, timeInterval: TimeInterval, barDuration: moment.Duration): boolean {
-	const readingsForID = state.readings.bar.byMeterID[groupID];
+	const readingsForID = state.readings.bar.byGroupID[groupID];
 	if (readingsForID === undefined) {
 		return true;
 	}

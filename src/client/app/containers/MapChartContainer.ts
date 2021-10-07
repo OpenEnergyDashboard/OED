@@ -122,7 +122,7 @@ function mapStateToProps(state: State) {
 					}
 				}
 			}
-
+			
 			// TODO Using the following seems to have no impact on the code. It has been noticed that this function is called
 			// many times for each change. Someone should look at why that is happening and why some have no items in the arrays.
 			// if (size.length > 0) {
@@ -168,7 +168,84 @@ function mapStateToProps(state: State) {
 				showlegend: false
 			};
 			data.push(traceOne);
-			// }
+
+			
+			const x2: number[] = [];
+			const y2: number[] = [];
+			const colors2: string[] = [];
+			const size2: number[] = [];
+			const texts2: string[] = [];
+			for (const groupID of state.graph.selectedGroups) {
+				const byGroupID = state.readings.bar.byGroupID[groupID];
+				const gps = state.groups.byGroupID[groupID].gps;
+				if (gps !== undefined && gps !== null) {
+					// Convert the gps value to the equivalent Plotly grid coordinates on user map.
+					// First, convert from GPS to grid units. Since we are doing a GPS calculation, this happens on the true north map.
+					// It must be on true north map since only there are the GPS axis parallel to the map axis.
+					// To start, calculate the user grid coordinates (Plotly) from the GPS value. This involves calculating
+					// it coordinates on the true north map and then rotating/shifting to the user map.
+					const meterGPSInUserGrid: CartesianPoint = gpsToUserGrid(imageDimensionNormalized, gps, origin, scaleOfMap);
+					// Only display items within valid info and within map.
+					if (meterMapInfoOk({ gps, meterID: groupID }, map) && meterDisplayableOnMap(imageDimensionNormalized, meterGPSInUserGrid)) {
+						// The x, y value for Plotly to use that are on the user map.
+						x2.push(meterGPSInUserGrid.x);
+						y2.push(meterGPSInUserGrid.y);
+						// Get the bar data to use for the map circle.
+						const readingsData = byGroupID[timeInterval.toString()][barDuration.toISOString()];
+						if (readingsData !== undefined && !readingsData.isFetching) {
+							// Meter name to include in hover on graph.
+							const label = state.groups.byGroupID[groupID].name;
+							// The usual color for this meter.
+							colors2.push(getGraphColor(groupID, DataType.Group));
+							if (readingsData.readings === undefined) {
+								throw new Error('Unacceptable condition: readingsData.readings is undefined.');
+							}
+							// Use the most recent time reading for the circle on the map.
+							// This has the limitations of the bar value where the last one can include ranges without
+							// data (GitHub issue on this).
+							// TODO: It might be better to do this similarly to compare. (See GitHub issue)
+							const readings = _.orderBy(readingsData.readings, ['startTimestamp'], ['desc']);
+							const mapReading = readings[0];
+							let timeReading: string;
+							let averagedReading = 0;
+							if (readings.length === 0) {
+								// No data. The next lines causes an issue so set specially.
+								// There may be a better overall fix for no data.
+								timeReading = 'no data to display';
+								size2.push(0);
+							} else {
+								// Shift to UTC since want database time not local/browser time which is what moment does.
+								timeReading =
+								`${moment(mapReading.startTimestamp).utc().format('LL')} - ${moment(mapReading.endTimestamp).utc().format('LL')}`;
+								// The value for the circle is the average daily usage.
+								averagedReading = mapReading.reading / barDuration.asDays();
+								// The size is the reading value. It will be scaled later.
+								size2.push(averagedReading);
+							}
+							// The hover text.
+							texts2.push(`<b> ${timeReading} </b> <br> ${label}: ${averagedReading.toPrecision(6)} kWh/day`);
+						}
+					}	
+				}
+			}
+			const traceTwo = {
+				x: x2,
+				y: y2,
+				type: 'scatter',
+				mode: 'markers',
+				marker: {
+					color: colors2,
+					opacity: 0.5,
+					size: size2,
+					sizemin: 6,
+					sizeref: scaling,
+					sizemode: 'area'
+				},
+				text: texts2,
+				opacity: 1,
+				showlegend: false
+			};
+			data.push(traceTwo);
 		}
 	}
 
@@ -212,7 +289,7 @@ function mapStateToProps(state: State) {
 	 *               onClick={({points, event}) => console.log(points, event)}>
 	 */
 	const props: IPlotlyChartProps = {
-		data,
+		data: data,
 		layout,
 		config: {
 			locales: Locales // makes locales available for use
