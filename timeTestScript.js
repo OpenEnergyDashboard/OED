@@ -22,18 +22,17 @@ axios.interceptors.response.use(resConfig => {
 })
 
 /**
- * Times a request to the server for data for a given meter id and time interval.
+ * Times a request to the server for data for a given meter id and time interval and returns the total number of points.
  * @param {string} startTimeStamp
  * @param {string} endTimestamp
  * @param {string | number} meterId 
- * @returns Elapsed time of request
- * TODO: maybe double check the expected number of points?
+ * @returns Elapsed time of request, total number of points
  */
 async function requestDataFromInterval(startTimeStamp, endTimestamp, meterId) {
-	const url = 'http://localhost:3000'
-	const endPoint = `api/compressedReadings/line/meters/${meterId}?timeInterval=${startTimeStamp}_${endTimestamp}`
-	const res = await axios.get(`${url}/${endPoint}`)
-	return res.config.meta.elapsedTime;
+	const url = 'http://localhost:3000';
+	const endPoint = `api/compressedReadings/line/meters/${meterId}?timeInterval=${startTimeStamp}_${endTimestamp}`;
+	const res = await axios.get(`${url}/${endPoint}`);
+	return [res.config.meta.elapsedTime, res.data['1'].length];
 }
 
 
@@ -60,24 +59,29 @@ async function main() {
 		['2020-01-24 16:00:00Z', '2020-02-14 23:00:00Z'],
 		['2020-01-24 16:00:00Z', '2020-02-04 07:00:00Z'],
 		['2020-02-02 12:00:00Z', '2020-02-04 08:59:00Z'],
-		['2020-02-02 12:00:00Z', '2020-02-04 09:39:00Z'],
-		['2020-02-04 18:00:00Z', '2020-02-04 22:49:00Z']
+		['2020-02-03 12:00:00Z', '2020-02-04 09:39:00Z'],
+		['2020-02-04 12:00:00Z', '2020-02-04 22:49:00Z']
 	];
 
 	for (let i = 0; i < timeIntervals.length; i++) {
 		const [startTimeStamp, endTimestamp] = timeIntervals[i];
 		let averageElapsedTime = 0;
-		const numRequests = 5; // average elapsed time over 5 requests
+		const numRequests = 10; // average elapsed time over 5 requests
+		let numPoints = 0; 
 		for (let j = 0; j < numRequests; j++) {
 			await requestDataFromInterval(startTimeStamp, endTimestamp, meterId)
-				.then(et => {
+				.then(([et, np]) => {
 					averageElapsedTime += et;
-					console.log(`### elapsed time for request #${i, j} in between ${startTimeStamp}, ${endTimestamp}: ${et} ms`)
+					// commented out for clarity
+					// console.log(`### For request #${i, j} in between ${startTimeStamp}, ${endTimestamp}:`)
+					// console.log(`#### Elapsed time: ${et} ms`)
+					numPoints = np;
 				})
 				.catch(console.log)
 		}
 		averageElapsedTime = averageElapsedTime / numRequests;
 		console.log(`###### AVERAGE elapsed time for request #${i} in between ${startTimeStamp}, ${endTimestamp}: ${averageElapsedTime} ms`)
+		console.log(`###### NUMBER OF POINTS for request #${i}: ${numPoints}`)
 	}
 }
 

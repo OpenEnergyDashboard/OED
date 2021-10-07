@@ -201,7 +201,7 @@ BEGIN
 	 ELSE
  		RETURN QUERY
 			SELECT r.meter_id as meter_id,
-				(r.reading / (extract(EPOCH FROM (r.end_timestamp - r.start_timestamp)) / 3600)) as reading_rate -- Reading rate in kw
+				(r.reading / (extract(EPOCH FROM (r.end_timestamp - r.start_timestamp)) / 3600)) as reading_rate, -- Reading rate in kw
  				r.start_timestamp,
  				r.end_timestamp
  			FROM readings r
