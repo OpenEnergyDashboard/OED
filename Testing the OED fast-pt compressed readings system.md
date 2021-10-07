@@ -1,58 +1,43 @@
 # Testing the OED fast-pt compressed readings system
 
-*OED Commit Hash: #euwasd*
-
-For these tests we have loaded the 15-minute, minutely, and 3-year hourly (maybe also 3-year daily data), and 10-year daily data and no other data.
+*fastPts fork commit Hash: #*
 
 **We use a JS script to perform these tests rather than manually because there are many tests and also because we found that using a script has no significant difference when compared to manually requesting data via the web interface.**
 
-For example, consider these tests performed manually and via script:
-```
-Obtain data five times from the same interval. Use three different intervals. Total 15 tests.
-```
-
 We test each data set as a way to observe the time taken for each switch level down the compressed readings function (compressed_readings_2 function).
 
-To test OED, we load the following datasets:
+To test OED, we load the following dataset:
 
-| Dataset                        | Purpose                                                      | Command to generate/Source                                   |
-| ------------------------------ | ------------------------------------------------------------ | ------------------------------------------------------------ |
-| Four-Day Data for 1 year       | To time the daily view                                       | generateFourDayTestingData                                   |
-| Daily Data for 1 year          | To time the daily view                                       | generateSineSquaredTestingData                               |
-| Four-Hour Data for 1 year      | To time the hourly view                                      | generateFourHourTestingData                                  |
-| Hourly Data for 3 years        | To time the hourly view                                      | https://openenergydashboard.github.io/developer/testData/threeYearA.csv |
-| 23-Minute Data for 1 year**    | To time the hourly view by using a prime number interval length that is prone to contain overlaps along hourly interval boundaries | generateTwentyThreeMinuteTestingData                         |
-| Fifteen-Minute Data for 1 year | To time the minute view                                      | generateFifteenMinuteTestingData                             |
-| 1-Minute Data for 1 year       | To time the minute view                                      | generateOneMinuteTestingData                                 |
-
-** 23-Minute data was intended to be tested on but was not due to issues with inconsistent start-and-end-times documented in the **Problems Experienced Section**.
+| Dataset                  | Command to generate/Source   |
+| ------------------------ | ---------------------------- |
+| 1-Minute Data for 1 year | generateOneMinuteTestingData |
 
 ## Default OED
 
-For each dataset, we use a node script to time the average time of receiving a response for a request at different intervals to provoke shifts in views in the db, to test the amount of time changes. In the final column, of the table below, we record the time (ms) it took to receive a response from the corresponding web request (averaged over 5 requests) from the 1-Minute Data meter.
+We use a node script to time the average time (of 10 requests) it takes for a request for data to return. The elasped time of the request is recorded in the rightmost column. We specifically chose intervals that provoke shifts in views in the db, and to test whether the amount of time take is linearly related to the amount of data points.
 
-**TODO:** Record all meters in a spreadsheet
+| Interval                                      | ~ Expected number of points | Actual number of points* | Expected View        | 1-Minute Data (ms) |
+| --------------------------------------------- | --------------------------- | ------------------------ | -------------------- | ------------------ |
+| Jan 01, 2020 00:00:00 - Apr 15, 2020 00:00:00 | 106 days                    | 105                      | Materialized daily   | 84.7               |
+| Jan 01, 2020 00:00:00 - Feb 22, 2020 00:00:00 | 53 days                     | 52                       | Materialized daily   | 78.6               |
+| Jan 01, 2020 00:00:00 - Feb 19, 2020 00:00:00 | 50 days                     | 1176                     | Materialized daily** | 4982.8             |
+| Jan 03, 2020 08:00:00 - Feb 14, 2020 23:00:00 | 1024 hours (~42 days)       | 1023                     | Hourly               | 5034.4             |
+| Jan 24, 2020 16:00:00 - Feb 14, 2020 23:00:00 | 512 hours (~21 days)        | 511                      | Hourly               | 4831.7             |
+| Jan 24, 2020 16:00:00 - Feb 04, 2020 07:00:00 | 256 hours (~10 days)        | 255                      | Hourly               | 4680.8             |
+| Feb 02, 2020 12:00:00 - Feb 04, 2020 08:59:00 | 2700 minutes (~44 hours)    | 2699                     | Minutely             | 4618.8             |
+| Feb 03, 2020 12:00:00 - Feb 04, 2020 09:39:00 | 1300 minutes (~21 hours)    | 1299                     | Minutely             | 4326.7             |
+| Feb 04, 2020 18:00:00 - Feb 04, 2020 22:49:00 | 650 minutes (~10 hours)     | 649                      | Minutely             | 4185.1             |
 
-| Interval                                      | ~ Expected number of points | Expected View      | 1-Minute Data (ms) |
-| --------------------------------------------- | --------------------------- | ------------------ | ------------------ |
-| Jan 01, 2020 00:00:00 - Apr 15, 2020 00:00:00 | 106 days                    | Materialized daily | 98.8               |
-| Jan 01, 2020 00:00:00 - Feb 22, 2020 00:00:00 | 53 days                     | Materialized daily | 85.8               |
-| Jan 01, 2020 00:00:00 - Feb 19, 2020 00:00:00 | 50 days                     | Materialized daily | 5480.2             |
-| Jan 03, 2020 08:00:00 - Feb 14, 2020 23:00:00 | 1024 hours (~42 days)       | Hourly             | 5584.6             |
-| Jan 24, 2020 16:00:00 - Feb 14, 2020 23:00:00 | 512 hours (~21 days)        | Hourly             | 5464.4             |
-| Jan 24, 2020 16:00:00 - Feb 04, 2020 07:00:00 | 256 hours (~10 days)        | Hourly             | 5360               |
-| Feb 02, 2020 12:00:00 - Feb 04, 2020 08:59:00 | 2700 minutes (~44 hours)    | Minutely           | 6503.4             |
-| Feb 02, 2020 12:00:00 - Feb 04, 2020 09:39:00 | 1300 minutes (~21 hours)    | Minutely           | 6572.2             |
-| Feb 02, 2020 12:00:00 - Feb 04, 2020 22:49:00 | 650 minutes (~10 hours)     | Minutely           | 5279.6             |
+*There seems to consistently be one fewer point than expected. This could be either human calculation error or the boundary timestamps are not included.
 
-
+**Based on the elapsed time of the request, the data was actually read from the hourly view.
 
 ## Observations
 
 - Time to load data is not linearly proportionate to amount of data to load even within the same view
 - Reading from a view is significantly slower than reading from either a materialized view or directly from a table
 - Increase in space consumed may be beneficial depending on the underlying data resolution
-- Increase in time **(may) depend linearly** on the amount of data a specific meter when using a view.
+- Though not recorded here, we observed a somewhat **linear** increase in time depending on the **amount of data** in the database.
 
 
 
@@ -62,37 +47,33 @@ For each dataset, we use a node script to time the average time of receiving a r
 
 **Underlying data:** 1-Minute Data for 1 year
 
-**Space without materialized hourly view:** 219M
+**Space without materialized hourly view:** 218.9 MB
 
-**Space with materialize hourly view:** 219M
+**Space with materialize hourly view:** 219.7 MB
 
-| Interval                                      | Pre-materialize Data (ms) | Post-materialize Data (ms) | Raw data |
-| --------------------------------------------- | ------------------------- | -------------------------- | -------- |
-| Jan 01, 2020 00:00:00 - Apr 15, 2020 00:00:00 | 135.2                     | 99.6                       |          |
-| Jan 01, 2020 00:00:00 - Feb 22, 2020 00:00:00 | 109.2                     | 82                         |          |
-| Jan 01, 2020 00:00:00 - Feb 19, 2020 00:00:00 | 5641.4                    | 73                         |          |
-| Jan 03, 2020 08:00:00 - Feb 14, 2020 23:00:00 | 5390.8                    | 73.2                       |          |
-| Jan 24, 2020 16:00:00 - Feb 14, 2020 23:00:00 | 5302.6                    | 74.2                       |          |
-| Jan 24, 2020 16:00:00 - Feb 04, 2020 07:00:00 | 5189.6                    | 72.8                       |          |
-| Feb 02, 2020 12:00:00 - Feb 04, 2020 08:59:00 | 4861.8                    | 4614                       |          |
-| Feb 02, 2020 12:00:00 - Feb 04, 2020 09:39:00 | 5014.6                    | 4610.4                     |          |
-| Feb 02, 2020 12:00:00 - Feb 04, 2020 22:49:00 | 5173.2                    | 72.4                       |          |
+**Changes to db**: We materialized the hourly view and modify the sql to read from the readings table (raw readings) instead of the minutely view.
 
-**TODO**
+| Interval                                      | Before changes (ms)* | After changes (ms) |
+| --------------------------------------------- | -------------------- | ------------------ |
+| Jan 01, 2020 00:00:00 - Apr 15, 2020 00:00:00 | 84.7                 | 101.6              |
+| Jan 01, 2020 00:00:00 - Feb 22, 2020 00:00:00 | 78.6                 | 96.7               |
+| Jan 01, 2020 00:00:00 - Feb 19, 2020 00:00:00 | 4982.8               | 206.2              |
+| Jan 03, 2020 08:00:00 - Feb 14, 2020 23:00:00 | 5034.4               | 165.2              |
+| Jan 24, 2020 16:00:00 - Feb 14, 2020 23:00:00 | 4831.7               | 122.3              |
+| Jan 24, 2020 16:00:00 - Feb 04, 2020 07:00:00 | 4680.8               | 107.2              |
+| Feb 02, 2020 12:00:00 - Feb 04, 2020 08:59:00 | 4618.8               | 431.3              |
+| Feb 02, 2020 12:00:00 - Feb 04, 2020 09:39:00 | 4326.7               | 284.4              |
+| Feb 02, 2020 12:00:00 - Feb 04, 2020 22:49:00 | 4185.1               | 211.9              |
 
-We then test the conversion from minutely view to raw readings.
-
-We then test the conversion from hourly view to a materialized hourly view.
-**Note**: We (may need to) set an hourly refresh on the materialized view
-
-
+*Data taken from default OED
 
 ## Remaining Work
 
-- Testing on real-world datasets. No particular reason that the time tests will be any different, but could still be good. Could account for holes in data etc...
-- Test on load large years of data on first load (i.e. 10 years of data)
-- Test impact on speed of hourly CRON job to refresh readings
-- Test on intelligent db pulling strategy that takes into account the expected length of readings and max/expected reading length variations or if data is prone to holes (unlikely?).
+- Closely check the impact on size of materialized view. When does size become an issue? The space data up by an empty is 57.3 MB.
+- (Edge case) Test on load large years of data on first load (i.e. 10 years of data)
+- Test on other reading frequencies (23-minute, daily, etc...). We do not expect to see significant differences. 
+- Test of time it takes to refresh hourly readings.
+- Test an intelligent db pulling strategy that takes into account the expected length of readings and max/expected reading length variations or if data is prone to holes (unlikely?).
   - Potentially check if the estimated number of data points in a interval is less than the number of points for a view, then load because it doesn't otherwise make sense to use the view when there is less data in the table.
   - If there is more data in the table, check if the ratio between points in the table to points that would be produced by the view is significant (< 2?), then it may be better to load from table for reasons....
 
