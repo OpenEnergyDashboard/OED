@@ -81,7 +81,7 @@ function mapStateToProps(state: State) {
 			}
 		});
 		// filter groups - this is not yet done as groups do not show up on maps yet.
-		/*
+		
 		sortedGroups.forEach(group => {
 			const gps = state.groups.byGroupID[group.value].gps;
 			const origin = state.maps.byMapID[state.maps.selectedMap].origin;
@@ -90,7 +90,7 @@ function mapStateToProps(state: State) {
 			if (origin !== undefined && opposite !== undefined && gps !== undefined && gps !== null) {
 				const scaleOfMap = calculateScaleFromEndpoints(origin, opposite, imageDimensionNormalized);
 				const meterGPSInUserGrid: CartesianPoint = gpsToUserGrid(imageDimensionNormalized, gps, origin, scaleOfMap);
-				if (!(meterMapInfoOk({ gps, meterID: group.value }, state.maps.byMapID[state.maps.selectedMap]) &&
+				if (!(itemMapInfoOk(group.value, DataType.Group, state.maps.byMapID[state.maps.selectedMap], gps) &&
 					meterDisplayableOnMap(imageDimensionNormalized, meterGPSInUserGrid))) {
 					group.disabled = true;
 					disableGroups.push(group.value);
@@ -100,7 +100,7 @@ function mapStateToProps(state: State) {
 				group.disabled = true;
 				disableGroups.push(group.value);
 			}
-		});*/
+		});
 	}
 
 	const selectedGroups = state.graph.selectedGroups.map(groupID => {
