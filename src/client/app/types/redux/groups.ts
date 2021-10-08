@@ -123,16 +123,16 @@ export interface MarkOneGroupOutdatedAction {
 export interface GroupMetadata {
 	isFetching: boolean;
 	outdated: boolean;
-	displayable: boolean;
 	selectedGroups: number[];
 	selectedMeters: number[];
-	gps?: GPSPoint;
 }
 
 export interface GroupData {
 	name: string;
 	childMeters: number[];
 	childGroups: number[];
+	gps?: GPSPoint;
+	displayable: boolean;
 }
 
 export interface GroupID {

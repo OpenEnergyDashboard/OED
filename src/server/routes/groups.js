@@ -17,10 +17,10 @@ const router = express.Router();
  * Given a meter or group, return only the name and ID of that meter or group.
  * This exists to control what data we send to the client.
  * @param item group or meter
- * @returns {{id, name}}
+ * @returns {{id, name, gps}}
  */
 function formatToOnlyNameAndID(item) {
-	return { id: item.id, name: item.name };
+	return { id: item.id, name: item.name, gps: item.gps };
 }
 
 /**

@@ -4,6 +4,7 @@
 
 import { MapMetadata } from '../types/redux/map';
 import { logToServer } from '../actions/logs';
+import { DataType } from '../types/Datasources';
 
 /**
  * Defines a Cartesian Point with x & y
@@ -65,16 +66,18 @@ export interface Dimensions {
 }
 
 /**
- * Returns true if meter and map and reasonably defined and false otherwise.
- * @param meterInfo meter info to check
+ * Returns true if item (meter or group) and map and reasonably defined and false otherwise.
+ * @param itemID ID to be used for logging errors
+ * @param type DataType to distinguish between meter and group
  * @param map map info to check
+ * @param gps GPS Point to check
  * @returns True if map is defined with origin & opposite and meter with valid GPS
  */
-export function meterMapInfoOk(meterInfo: { gps?: GPSPoint, meterID: number }, map: MapMetadata): boolean {
+export function itemMapInfoOk(itemID: number, type: DataType, map: MapMetadata, gps?: GPSPoint): boolean {
 	if (map === undefined) { return false; }
-	if ((meterInfo.gps === null || meterInfo.gps === undefined) || map.origin === undefined || map.opposite === undefined) { return false; }
-	if (!isValidGPSInput(`${meterInfo.gps.latitude},${meterInfo.gps.longitude}`)) {
-		logToServer('error', `Found invalid meter gps stored in database, id = ${meterInfo.meterID}`);
+	if ((gps === null || gps === undefined) || map.origin === undefined || map.opposite === undefined) { return false; }
+	if (!isValidGPSInput(`${gps.latitude},${gps.longitude}`)) {
+		logToServer('error', `Found invalid ${type === DataType.Meter ? "meter" : "group"} gps stored in database, id = ${itemID}`);
 		return false;
 	}
 	return true;

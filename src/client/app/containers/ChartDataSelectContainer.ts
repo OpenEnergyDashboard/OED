@@ -10,8 +10,9 @@ import { State } from '../types/redux/state';
 import { Dispatch } from '../types/redux/actions';
 import { ChartTypes } from '../types/redux/graph';
 import { SelectOption } from '../types/items';
-import { CartesianPoint, Dimensions, normalizeImageDimensions, calculateScaleFromEndpoints, meterDisplayableOnMap, meterMapInfoOk } from '../utils/calibration';
+import { CartesianPoint, Dimensions, normalizeImageDimensions, calculateScaleFromEndpoints, meterDisplayableOnMap, itemMapInfoOk } from '../utils/calibration';
 import { gpsToUserGrid } from './../utils/calibration';
+import { DataType } from '../types/Datasources';
 
 
 /* Passes the current redux state of the chart select container, and turns it into props for the React
@@ -68,7 +69,7 @@ function mapStateToProps(state: State) {
 				const scaleOfMap = calculateScaleFromEndpoints(origin, opposite, imageDimensionNormalized);
 				// Convert GPS of meter to grid on user map. See calibration.ts for more info on this.
 				const meterGPSInUserGrid: CartesianPoint = gpsToUserGrid(imageDimensionNormalized, gps, origin, scaleOfMap);
-				if (!(meterMapInfoOk({ gps, meterID: meter.value }, state.maps.byMapID[state.maps.selectedMap]) &&
+				if (!(itemMapInfoOk(meter.value, DataType.Meter, state.maps.byMapID[state.maps.selectedMap], gps) &&
 					meterDisplayableOnMap(imageDimensionNormalized, meterGPSInUserGrid))) {
 					meter.disabled = true;
 					disableMeters.push(meter.value);
