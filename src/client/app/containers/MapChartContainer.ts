@@ -173,7 +173,7 @@ function mapStateToProps(state: State) {
 							// The hover text.
 							texts.push(`<b> ${timeReading} </b> <br> ${label}: ${averagedReading.toPrecision(6)} kWh/day`);
 						}
-					}	
+					}
 				}
 			}
 			// TODO Using the following seems to have no impact on the code. It has been noticed that this function is called
@@ -264,7 +264,7 @@ function mapStateToProps(state: State) {
 	 *               onClick={({points, event}) => console.log(points, event)}>
 	 */
 	const props: IPlotlyChartProps = {
-		data: data,
+		data,
 		layout,
 		config: {
 			locales: Locales // makes locales available for use

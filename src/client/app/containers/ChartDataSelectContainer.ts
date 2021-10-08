@@ -81,7 +81,6 @@ function mapStateToProps(state: State) {
 			}
 		});
 		// filter groups - this is not yet done as groups do not show up on maps yet.
-		
 		sortedGroups.forEach(group => {
 			const gps = state.groups.byGroupID[group.value].gps;
 			const origin = state.maps.byMapID[state.maps.selectedMap].origin;
