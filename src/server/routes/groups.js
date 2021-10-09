@@ -14,13 +14,24 @@ const { log } = require('../log');
 const router = express.Router();
 
 /**
+ * Given a meter or group, return only the name, ID, and gps of that meter or group.
+ * This exists to control what data we send to the client.
+ * @param item group or meter
+ * @param gps GPS Point
+ * @returns {{id, name, gps}}
+ */
+function formatToOnlyNameIDAndGPS(item) {
+	return { id: item.id, name: item.name, gps: item.gps };
+}
+
+/**
  * Given a meter or group, return only the name and ID of that meter or group.
  * This exists to control what data we send to the client.
  * @param item group or meter
- * @returns {{id, name, gps}}
+ * @returns {{id, name}}
  */
-function formatToOnlyNameAndID(item) {
-	return { id: item.id, name: item.name, gps: item.gps };
+function formatToOnlyNameID(item) {
+	return { id: item.id, name: item.name };
 }
 
 /**
@@ -30,9 +41,19 @@ router.get('/', async (req, res) => {
 	const conn = getConnection();
 	try {
 		const rows = await Group.getAll(conn);
-		res.json(rows.map(formatToOnlyNameAndID));
+		res.json(rows.map(formatToOnlyNameIDAndGPS));
 	} catch (err) {
 		log.error(`Error while preforming GET all groups query: ${err}`, err);
+	}
+});
+
+router.get('/idname', async (req, res) => {
+	const conn = getConnection();
+	try {
+		const rows = await Group.getAll(conn);
+		res.json(rows.map(formatToOnlyNameID));
+	} catch (err) {
+		log.error(`Error while performing GET all groups query: ${err}`, err);
 	}
 });
 
