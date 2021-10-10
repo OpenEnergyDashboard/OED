@@ -77,7 +77,7 @@ export function itemMapInfoOk(itemID: number, type: DataType, map: MapMetadata, 
 	if (map === undefined) { return false; }
 	if ((gps === null || gps === undefined) || map.origin === undefined || map.opposite === undefined) { return false; }
 	if (!isValidGPSInput(`${gps.latitude},${gps.longitude}`)) {
-		logToServer('error', `Found invalid ${type === DataType.Meter ? 'meter' : 'group'} gps stored in database, id = ${itemID}`);
+		logToServer('error', `Found invalid ${type === DataType.Meter ? 'meter' : 'group'} gps stored in database, id = ${itemID}`)();
 		return false;
 	}
 	return true;
@@ -89,7 +89,7 @@ export function itemMapInfoOk(itemID: number, type: DataType, map: MapMetadata, 
  * @param point The point being considered for display in user map grid coordinates.
  * @returns true if within map and false otherwise.
  */
-export function meterDisplayableOnMap(size: Dimensions, point: CartesianPoint): boolean {
+export function itemDisplayableOnMap(size: Dimensions, point: CartesianPoint): boolean {
 	// The user map is a rectangle that is parallel to the Plotly grid. Thus, the point
 	// must be above origin (bottom, left) and below the opposite (top, right) corner.
 	// The Plotly grid was set up so

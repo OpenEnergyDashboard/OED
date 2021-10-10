@@ -7,7 +7,7 @@ import { connect } from 'react-redux';
 import PlotlyChart, { IPlotlyChartProps } from 'react-plotlyjs-ts';
 import { State } from '../types/redux/state';
 import {
-	calculateScaleFromEndpoints, meterDisplayableOnMap, Dimensions,
+	calculateScaleFromEndpoints, itemDisplayableOnMap, Dimensions,
 	CartesianPoint, normalizeImageDimensions, itemMapInfoOk, gpsToUserGrid
 } from '../utils/calibration';
 import * as _ from 'lodash';
@@ -80,7 +80,7 @@ function mapStateToProps(state: State) {
 					// it coordinates on the true north map and then rotating/shifting to the user map.
 					const meterGPSInUserGrid: CartesianPoint = gpsToUserGrid(imageDimensionNormalized, gps, origin, scaleOfMap);
 					// Only display items within valid info and within map.
-					if (itemMapInfoOk(meterID, DataType.Meter, map, gps) && meterDisplayableOnMap(imageDimensionNormalized, meterGPSInUserGrid)) {
+					if (itemMapInfoOk(meterID, DataType.Meter, map, gps) && itemDisplayableOnMap(imageDimensionNormalized, meterGPSInUserGrid)) {
 						// The x, y value for Plotly to use that are on the user map.
 						x.push(meterGPSInUserGrid.x);
 						y.push(meterGPSInUserGrid.y);
@@ -124,26 +124,29 @@ function mapStateToProps(state: State) {
 			}
 
 			for (const groupID of state.graph.selectedGroups) {
+				// Get group id number.
 				const byGroupID = state.readings.bar.byGroupID[groupID];
+				// Get group GPS value.
 				const gps = state.groups.byGroupID[groupID].gps;
+				// Filter groups with actual gps coordinates.
 				if (gps !== undefined && gps !== null) {
 					// Convert the gps value to the equivalent Plotly grid coordinates on user map.
 					// First, convert from GPS to grid units. Since we are doing a GPS calculation, this happens on the true north map.
 					// It must be on true north map since only there are the GPS axis parallel to the map axis.
 					// To start, calculate the user grid coordinates (Plotly) from the GPS value. This involves calculating
 					// it coordinates on the true north map and then rotating/shifting to the user map.
-					const meterGPSInUserGrid: CartesianPoint = gpsToUserGrid(imageDimensionNormalized, gps, origin, scaleOfMap);
+					const groupGPSInUserGrid: CartesianPoint = gpsToUserGrid(imageDimensionNormalized, gps, origin, scaleOfMap);
 					// Only display items within valid info and within map.
-					if (itemMapInfoOk(groupID, DataType.Group, map, gps) && meterDisplayableOnMap(imageDimensionNormalized, meterGPSInUserGrid)) {
+					if (itemMapInfoOk(groupID, DataType.Group, map, gps) && itemDisplayableOnMap(imageDimensionNormalized, groupGPSInUserGrid)) {
 						// The x, y value for Plotly to use that are on the user map.
-						x.push(meterGPSInUserGrid.x);
-						y.push(meterGPSInUserGrid.y);
+						x.push(groupGPSInUserGrid.x);
+						y.push(groupGPSInUserGrid.y);
 						// Get the bar data to use for the map circle.
 						const readingsData = byGroupID[timeInterval.toString()][barDuration.toISOString()];
 						if (readingsData !== undefined && !readingsData.isFetching) {
-							// Meter name to include in hover on graph.
+							// Group name to include in hover on graph.
 							const label = state.groups.byGroupID[groupID].name;
-							// The usual color for this meter.
+							// The usual color for this group.
 							colors.push(getGraphColor(groupID, DataType.Group));
 							if (readingsData.readings === undefined) {
 								throw new Error('Unacceptable condition: readingsData.readings is undefined.');

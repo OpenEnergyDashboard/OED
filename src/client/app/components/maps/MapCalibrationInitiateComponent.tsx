@@ -90,7 +90,7 @@ class MapCalibrationInitiateComponent extends React.Component<MapInitiatePropsWi
 			};
 			await this.props.onSourceChange(source);
 		} catch (err) {
-			logToServer('error', `Error, map source image uploading: ${err}`);
+			logToServer('error', `Error, map source image uploading: ${err}`)();
 		}
 	}
 
