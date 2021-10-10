@@ -10,7 +10,7 @@ import { State } from '../types/redux/state';
 import { Dispatch } from '../types/redux/actions';
 import { ChartTypes } from '../types/redux/graph';
 import { SelectOption } from '../types/items';
-import { CartesianPoint, Dimensions, normalizeImageDimensions, calculateScaleFromEndpoints, itemDisplayableOnMap, itemMapInfoOk, MapScale } from '../utils/calibration';
+import { CartesianPoint, Dimensions, normalizeImageDimensions, calculateScaleFromEndpoints, itemDisplayableOnMap, itemMapInfoOk } from '../utils/calibration';
 import { gpsToUserGrid } from './../utils/calibration';
 import { DataType } from '../types/Datasources';
 
@@ -59,17 +59,14 @@ function mapStateToProps(state: State) {
 		// causes TS to complain about the unknown case so not used.
 		const origin = state.maps.byMapID[state.maps.selectedMap].origin;
 		const opposite = state.maps.byMapID[state.maps.selectedMap].opposite;
-		var scaleOfMap: MapScale;
-		if (origin !== undefined && opposite !== undefined) {
-			// Get the GPS degrees per unit of Plotly grid for x and y. By knowing the two corners
-			// (or really any two distinct points) you can calculate this by the change in GPS over the
-			// change in x or y which is the map's width & height in this case.
-			scaleOfMap = calculateScaleFromEndpoints(origin, opposite, imageDimensionNormalized);
-		}
 		sortedMeters.forEach(meter => {
 			// This meter's GPS value.
 			const gps = state.meters.byMeterID[meter.value].gps;
 			if (origin !== undefined && opposite !== undefined && gps !== undefined && gps !== null) {
+				// Get the GPS degrees per unit of Plotly grid for x and y. By knowing the two corners
+				// (or really any two distinct points) you can calculate this by the change in GPS over the
+				// change in x or y which is the map's width & height in this case.
+				const scaleOfMap = calculateScaleFromEndpoints(origin, opposite, imageDimensionNormalized);
 				// Convert GPS of meter to grid on user map. See calibration.ts for more info on this.
 				const meterGPSInUserGrid: CartesianPoint = gpsToUserGrid(imageDimensionNormalized, gps, origin, scaleOfMap);
 				if (!(itemMapInfoOk(meter.value, DataType.Meter, state.maps.byMapID[state.maps.selectedMap], gps) &&
@@ -87,6 +84,7 @@ function mapStateToProps(state: State) {
 		sortedGroups.forEach(group => {
 			const gps = state.groups.byGroupID[group.value].gps;
 			if (origin !== undefined && opposite !== undefined && gps !== undefined && gps !== null) {
+				const scaleOfMap = calculateScaleFromEndpoints(origin, opposite, imageDimensionNormalized);
 				const groupGPSInUserGrid: CartesianPoint = gpsToUserGrid(imageDimensionNormalized, gps, origin, scaleOfMap);
 				if (!(itemMapInfoOk(group.value, DataType.Group, state.maps.byMapID[state.maps.selectedMap], gps) &&
 					itemDisplayableOnMap(imageDimensionNormalized, groupGPSInUserGrid))) {
