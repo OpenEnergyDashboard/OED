@@ -282,7 +282,9 @@ export function submitGroupInEditingIfNeeded() {
 			const group = {
 				name: rawGroup.name,
 				childGroups: rawGroup.childGroups,
-				childMeters: rawGroup.childMeters
+				childMeters: rawGroup.childMeters,
+				gps: rawGroup.gps,
+				displayable: rawGroup.displayable
 			};
 			if (creatingNewGroup(getState())) {
 				return dispatch(submitNewGroup(group));

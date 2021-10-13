@@ -4,6 +4,7 @@
 
 import { ActionType } from './actions';
 import { NamedIDItem } from '../items';
+import { GPSPoint } from 'utils/calibration';
 
 export enum DisplayMode { View = 'view', Edit = 'edit', Create = 'create' }
 
@@ -130,6 +131,8 @@ export interface GroupData {
 	name: string;
 	childMeters: number[];
 	childGroups: number[];
+	gps?: GPSPoint;
+	displayable: boolean;
 }
 
 export interface GroupID {

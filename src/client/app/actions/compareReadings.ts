@@ -42,7 +42,7 @@ function shouldFetchMeterCompareReadings(state: State, meterID: number, timeInte
  * @returns {boolean} True if the readings for the given group, and time are missing; false otherwise.
  */
 function shouldFetchGroupCompareReadings(state: State, groupID: number, timeInterval: TimeInterval, compareShift: moment.Duration): boolean {
-	const readingsForID = state.readings.compare.byMeterID[groupID];
+	const readingsForID = state.readings.compare.byGroupID[groupID];
 	if (readingsForID === undefined) {
 		return true;
 	}
