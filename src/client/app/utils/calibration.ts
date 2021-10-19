@@ -431,6 +431,10 @@ export function trueNorthOpposite(size: Dimensions): CartesianPoint {
 	return shiftRotate(size, opposite, -1, trueNorthAngle.angle);
 }
 
+export function changeTrueNorth(map: MapMetadata) {
+	trueNorthAngle.angle = map.angle;
+}
+
 
 // TODO The angle is hard coded but needs to come from the admin/DB.
 // This hack lets the angle be set to use elsewhere. For now leave so
