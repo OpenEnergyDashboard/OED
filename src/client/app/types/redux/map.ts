@@ -155,7 +155,7 @@ export interface MapMetadata {
 	currentPoint?: CalibratedPoint;
 	calibrationSet?: CalibratedPoint[];
 	calibrationResult?: CalibrationResult;
-	angle: number;
+	northAngle: number;
 }
 
 /**
