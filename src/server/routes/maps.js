@@ -155,8 +155,7 @@ router.post('/create', adminAuthenticator('create maps'), async (req, res) => {
 					req.body.modifiedDate,
 					origin,
 					opposite,
-					req.body.mapSource,
-					req.body.northAngle
+					req.body.mapSource
 				);
 				await newMap.insert(t);
 			});
@@ -255,8 +254,7 @@ router.post('/edit', adminAuthenticator('edit maps'), async (req, res) => {
 					req.body.modifiedDate,
 					origin,
 					opposite,
-					req.body.mapSource,
-					req.body.northAngle
+					req.body.mapSource
 				);
 				await editedMap.update(t);
 			});

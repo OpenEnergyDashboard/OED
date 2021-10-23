@@ -126,7 +126,7 @@ class MapCalibrationInitiateComponent extends React.Component<MapInitiatePropsWi
 				name: this.state.mapName,
 				filename: this.fileInput.current.files[0].name,
 				image,
-				northAngle: parseFloat(this.state.angle)
+				angle: parseFloat(this.state.angle)
 			};
 			await this.props.onSourceChange(source);
 		} catch (err) {

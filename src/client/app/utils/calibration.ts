@@ -5,7 +5,6 @@
 import { MapMetadata } from '../types/redux/map';
 import { logToServer } from '../actions/logs';
 import { DataType } from '../types/Datasources';
-import store from '../index';
 
 /**
  * Defines a Cartesian Point with x & y
@@ -165,7 +164,7 @@ export function gpsToUserGrid(size: Dimensions, gps: GPSPoint, originGPS: GPSPoi
 	};
 	// Now rotate to user map and shift so origin at bottom, left. Do - angle since going from
 	// true north to user map.
-	const userGrid: CartesianPoint = rotateShift(size, gridTrueNorth, 1, -trueNorthAngle());
+	const userGrid: CartesianPoint = rotateShift(size, gridTrueNorth, 1, -trueNorthAngle.angle);
 	return userGrid;
 }
 
@@ -191,8 +190,8 @@ export function calibrate(calibrationSet: CalibratedPoint[], imageDimensions: Di
 			// point to place on true north map (logical). The true north map
 			// leaves the origin at the center so no reverse shift. As always,
 			// need to shift before rotate so axis origin is in middle of map.
-			const p1TrueNorth: CartesianPoint = shiftRotate(normalizedDimensions, calibrationSet[i].cartesian, -1, trueNorthAngle());
-			const p2TrueNorth: CartesianPoint = shiftRotate(normalizedDimensions, calibrationSet[j].cartesian, -1, trueNorthAngle());
+			const p1TrueNorth: CartesianPoint = shiftRotate(normalizedDimensions, calibrationSet[i].cartesian, -1, trueNorthAngle.angle);
+			const p2TrueNorth: CartesianPoint = shiftRotate(normalizedDimensions, calibrationSet[j].cartesian, -1, trueNorthAngle.angle);
 			// Put the true north coordinates and gps together as needed for the function. Note the GPS
 			// value is the same on either map so it does not change.
 			const first: CalibratedPoint = { cartesian: p1TrueNorth, gps: calibrationSet[i].gps };
@@ -224,7 +223,7 @@ export function calibrate(calibrationSet: CalibratedPoint[], imageDimensions: Di
 	// As usual, first we shift since the rotation must be about the center.
 	// The coordinate starts at (0, 0) for the lower, left corner of the user map.
 	// TODO Is it okay to use the one point or would an average be better?
-	const clickedTrueNorth: CartesianPoint = shiftRotate(normalizedDimensions, calibrationSet[0].cartesian, -1, trueNorthAngle());
+	const clickedTrueNorth: CartesianPoint = shiftRotate(normalizedDimensions, calibrationSet[0].cartesian, -1, trueNorthAngle.angle);
 	// Now do the same with the origin. This is at (0, 0) on the user map.
 	const originTrueNorth = trueNorthOrigin(normalizedDimensions);
 	// Calculate the GPS value at the origin. This is done by taking the GPS of the point clicked
@@ -245,7 +244,7 @@ export function calibrate(calibrationSet: CalibratedPoint[], imageDimensions: Di
 	// size coordinates.
 	// Similar to above but different point.
 	const opposite: CartesianPoint = { x: normalizedDimensions.width, y: normalizedDimensions.height }
-	const oppositeTrueNorth: CartesianPoint = shiftRotate(normalizedDimensions, opposite, -1, trueNorthAngle());
+	const oppositeTrueNorth: CartesianPoint = shiftRotate(normalizedDimensions, opposite, -1, trueNorthAngle.angle);
 	const oppositeCoordinate: GPSPoint = {
 		latitude: calibrationSet[0].gps.latitude + degreePerUnitY * (oppositeTrueNorth.y - clickedTrueNorth.y),
 		longitude: calibrationSet[0].gps.longitude + degreePerUnitX * (oppositeTrueNorth.x - clickedTrueNorth.x)
@@ -414,7 +413,7 @@ export function trueNorthOrigin(size: Dimensions): CartesianPoint {
 	// Origin coordinate on user map is (0, 0).
 	const origin: CartesianPoint = { x: 0, y: 0 };
 	// Shift this value to center and then rotate to put on true north map.
-	return shiftRotate(size, origin, -1, trueNorthAngle());
+	return shiftRotate(size, origin, -1, trueNorthAngle.angle);
 }
 
 /**
@@ -429,20 +428,15 @@ export function trueNorthOpposite(size: Dimensions): CartesianPoint {
 	// of the user map.
 	const opposite: CartesianPoint = { x: size.width, y: size.height }
 	// Shift this value to center and then rotate to put on true north map.
-	return shiftRotate(size, opposite, -1, trueNorthAngle());
+	return shiftRotate(size, opposite, -1, trueNorthAngle.angle);
 }
 
-/**
- * Returns northAngle that was set earlier when creating/editing a map. Note that this
- * uses state without middleware.
- * @returns trueNorthAngle of current map being calibrated
- */
-export function trueNorthAngle(): number {
-	const state: any = store.getState();
-	if (state.maps.selectedMap != 0) {
-		return state.maps.byMapID[state.maps.selectedMap].northAngle;
-	}
-	else {
-		return state.maps.editedMaps[state.maps.calibratingMap].northAngle;
-	}
+export function changeTrueNorth(map: MapMetadata) {
+	trueNorthAngle.angle = map.angle;
 }
+
+
+// TODO The angle is hard coded but needs to come from the admin/DB.
+// This hack lets the angle be set to use elsewhere. For now leave so
+// no rotation.
+export const trueNorthAngle = { angle: 0.0 };
