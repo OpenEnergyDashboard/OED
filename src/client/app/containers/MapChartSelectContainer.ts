@@ -19,7 +19,7 @@ function mapStateToProps(state: State) {
 	)), 'label');
 
 	// If there is only one map, selectedMap is the id of the only map. ie; display map automatically if only 1 map
-	if (Object.keys(sortedMaps).length == 1) {
+	if (Object.keys(sortedMaps).length === 1) {
 		state.maps.selectedMap = sortedMaps[0].value;
 	}
 	const selectedMap = {
