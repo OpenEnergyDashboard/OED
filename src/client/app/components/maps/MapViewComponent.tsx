@@ -110,6 +110,8 @@ class MapViewComponent extends React.Component<MapViewPropsWithIntl, MapViewStat
 		this.props.editMapDetails(editedMap);
 	}
 
+	
+
 	private formatDisplayable() {
 		let styleFn;
 		let messageId;
@@ -127,16 +129,25 @@ class MapViewComponent extends React.Component<MapViewPropsWithIntl, MapViewStat
 
 		let toggleButton;
 		if (hasToken()) {
+			// throw out alert if the admin wants to display uncalibrated map
+			if (!(this.props.map.origin && this.props.map.opposite)) {
+				toggleButton = <Button style={this.styleToggleBtn()} color='primary' onClick={this.notifyCalibNeeded}>
+				<FormattedMessage id={buttonMessageId} />
+				</Button>;
+			}
+			// if map is already calibrated, the button will allow it to be displayed
+			else {
 			toggleButton = <Button style={this.styleToggleBtn()} color='primary' onClick={this.toggleMapDisplayable}>
 				<FormattedMessage id={buttonMessageId} />
 				</Button>;
+			}
 		} else {
 			toggleButton = <div />;
 		}
 
 		return (
 			<span>
-			<span style={styleFn()}>
+			<span style={styleFn()}> 
 				<FormattedMessage id={messageId} />
 			</span>
 			{toggleButton}
@@ -144,9 +155,16 @@ class MapViewComponent extends React.Component<MapViewPropsWithIntl, MapViewStat
 		);
 	}
 
+	// this function throws alert on the browser notifying that map needs calibrating before display
+	private notifyCalibNeeded() {
+		window.alert("hey there"); // this works
+		// window.alert(`${this.props.intl.formatMessage({id: 'calib.needed'})} "hi" `); // not working 
+		// window.confirm(`${this.props.intl.formatMessage({id: 'map.confirm.remove'})} "${this.props.map.name}"?`); not working
+	}
+
 	private toggleNameInput() {
 		if (this.state.nameFocus) {
-			const editedMap = {
+			const editedMap = { 
 				...this.props.map,
 				name: this.state.nameInput
 			};
