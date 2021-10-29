@@ -27,7 +27,6 @@ function mapStateToProps(state: State) {
 		value: state.maps.selectedMap
 		};
 
-
 	return {
 		maps: sortedMaps,
 		selectedMap

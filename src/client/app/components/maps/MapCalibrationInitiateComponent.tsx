@@ -37,8 +37,11 @@ class MapCalibrationInitiateComponent extends React.Component<MapInitiatePropsWi
 	private notifyBadNumber() {
 		window.alert(`${this.props.intl.formatMessage({id: 'map.bad.number'})}`);
 	}
-	private notifyBadDigit() {
-		window.alert(`${this.props.intl.formatMessage({id: 'map.bad.digit'})}`);
+	private notifyBadDigit360() {
+		window.alert(`${this.props.intl.formatMessage({id: 'map.bad.digita'})}`);
+	}
+	private notifyBadDigit0() {
+		window.alert(`${this.props.intl.formatMessage({id: 'map.bad.digitb'})}`);
 	}
 
 	constructor(props: MapInitiatePropsWithIntl) {
@@ -56,7 +59,8 @@ class MapCalibrationInitiateComponent extends React.Component<MapInitiatePropsWi
 		this.handleAngleInput = this.handleAngleInput.bind(this);
 		this.handleAngle = this.handleAngle.bind(this);
 		this.notifyBadNumber = this.notifyBadNumber.bind(this);
-		this.notifyBadDigit = this.notifyBadDigit.bind(this);
+		this.notifyBadDigit360 = this.notifyBadDigit360.bind(this);
+		this.notifyBadDigit0 = this.notifyBadDigit0.bind(this);
 	}
 
 	public render() {
@@ -98,14 +102,18 @@ class MapCalibrationInitiateComponent extends React.Component<MapInitiatePropsWi
 
 	private handleAngle(event: any) {
 		event.preventDefault();
-		const pattern = /^\d+(\.\d+)?$/;
+		const pattern = /^[-+]?\d+(\.\d+)?$/;
 		if (!pattern.test(this.state.angle)) {
 			this.notifyBadNumber();
 			return false;
 		}
 		else {
 			if (parseFloat(this.state.angle) > 360) {
-				this.notifyBadDigit();
+				this.notifyBadDigit360();
+				return false;
+			}
+			else if (parseFloat(this.state.angle) < 0) {
+				this.notifyBadDigit0();
 				return false;
 			}
 			else {
