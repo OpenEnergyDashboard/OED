@@ -48,6 +48,7 @@ class MapViewComponent extends React.Component<MapViewPropsWithIntl, MapViewStat
 		this.toggleNoteInput = this.toggleNoteInput.bind(this);
 		this.handleNoteChange = this.handleNoteChange.bind(this);
 		this.toggleDelete = this.toggleDelete.bind(this);
+		this.notifyCalibrationNeeded = this.notifyCalibrationNeeded.bind(this);
 	}
 
 	public render() {
@@ -131,7 +132,7 @@ class MapViewComponent extends React.Component<MapViewPropsWithIntl, MapViewStat
 		if (hasToken()) {
 			// throw out alert if the admin wants to display uncalibrated map
 			if (!(this.props.map.origin && this.props.map.opposite)) {
-				toggleButton = <Button style={this.styleToggleBtn()} color='primary' onClick={this.notifyCalibNeeded}>
+				toggleButton = <Button style={this.styleToggleBtn()} color='primary' onClick={this.notifyCalibrationNeeded}>
 				<FormattedMessage id={buttonMessageId} />
 				</Button>;
 			}
@@ -156,10 +157,8 @@ class MapViewComponent extends React.Component<MapViewPropsWithIntl, MapViewStat
 	}
 
 	// this function throws alert on the browser notifying that map needs calibrating before display
-	private notifyCalibNeeded() {
-		window.alert("hey there"); // this works
-		// window.alert(`${this.props.intl.formatMessage({id: 'calib.needed'})} "hi" `); // not working 
-		// window.confirm(`${this.props.intl.formatMessage({id: 'map.confirm.remove'})} "${this.props.map.name}"?`); not working
+	private notifyCalibrationNeeded() {
+		window.alert(`${this.props.intl.formatMessage({id: 'notify.calibration.needed'})} "${this.props.map.name}"`); 
 	}
 
 	private toggleNameInput() {
