@@ -199,6 +199,7 @@ BEGIN
 			INNER JOIN unnest(meter_ids) meters(id) ON hourly.meter_id = meters.id
 		WHERE requested_range @> time_interval;
 	 ELSE
+	-- Default to RAW data
  		RETURN QUERY
 			SELECT r.meter_id as meter_id,
 				(r.reading / (extract(EPOCH FROM (r.end_timestamp - r.start_timestamp)) / 3600)) as reading_rate, -- Reading rate in kw
