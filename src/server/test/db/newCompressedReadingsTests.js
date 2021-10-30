@@ -37,6 +37,9 @@ mocha.describe('Compressed Readings 2', () => {
 				new Reading(meter.id, 400, timestamp4, timestamp5)
 			], conn);
 			await Reading.refreshCompressedReadings(conn);
+
+			// We need to refresh the hourly readings view because it is materialized.
+			await Reading.refreshCompressedHourlyReadings(conn);
 			const { meter_id, reading_rate } = await conn.one('SELECT * FROM hourly_readings WHERE lower(time_interval)=${start_timestamp};',
 				{ start_timestamp: timestamp1 });
 			expect(meter_id).to.equal(meter.id);
@@ -119,6 +122,8 @@ mocha.describe('Compressed Readings 2', () => {
 			expect(Object.keys(meterReadings).length).to.equal(1);
 			const readingsForMeter = meterReadings[meter.id];
 
+			// Problem comes from the switch to serving RAW data.
+			// The data returned is daily data rather than minute data.
 			for (reading of readingsForMeter) {
 				const duration = moment.duration(reading.end_timestamp.diff(reading.start_timestamp));
 				expect(duration.asMilliseconds()).to.equal(moment.duration(1, 'minute').asMilliseconds());
@@ -139,10 +144,16 @@ mocha.describe('Compressed Readings 2', () => {
 
 			await Reading.refreshCompressedReadings(conn);
 
+			// We need to refresh the hourly readings view because it is materialized.
+			await Reading.refreshCompressedHourlyReadings(conn);
+
 			const meterReadings = await Reading.getNewCompressedReadings([meter.id], dayStart, dayStart.clone().add(1, 'minute'), conn);
 
+			// Problem comes from the switch to serving RAW data.
+			// No data is returned because there is no data point in this single-minute interval because the underlying data is daily.
 			expect(meterReadings[meter.id].length).to.equal(1);
 		});
+
 		mocha.it('Retrieves the correct number of readings when asked for a long interval', async () => {
 			const dayStart = moment('2018-01-01');
 			const dayEnd = dayStart.clone().add(1, 'day');
@@ -154,7 +165,13 @@ mocha.describe('Compressed Readings 2', () => {
 
 			await Reading.refreshCompressedReadings(conn);
 
-			const meterReadings = await Reading.getNewCompressedReadings([meter.id], dayStart, dayStart.clone().add(1, 'hours'), conn);
+			// We need to refresh the hourly readings view because it is materialized.
+			await Reading.refreshCompressedHourlyReadings(conn);
+
+			// Problem comes from the switch to serving RAW data.
+			// No data is returned because there is no data point in this single-hour interval because the underlying data is daily.
+
+			const meterReadings = await Reading.getNewCompressedReadings([meter.id], dayStart, dayStart.clone().add(1, 'hours').toString(), conn);
 			expect(meterReadings[meter.id].length).to.equal(60);
 		});
 
@@ -168,6 +185,9 @@ mocha.describe('Compressed Readings 2', () => {
 			], conn);
 
 			await Reading.refreshCompressedReadings(conn);
+			// We need to refresh the hourly readings view because it is materialized.
+			await Reading.refreshCompressedHourlyReadings(conn);
+
 			const allReadings = await Reading.getNewCompressedReadings([meter.id], yearStart, yearStart.clone().add(60, 'hours'), conn);
 			const meterReadings = allReadings[meter.id];
 			expect(meterReadings.length).to.equal(60);
@@ -254,6 +274,8 @@ mocha.describe('Compressed Readings 2', () => {
 			expect(Object.keys(groupReadings).length).to.equal(1);
 			const readingsForGroup = groupReadings[group1.id];
 
+			// Problem comes from the switch to serving RAW data.
+			// No data is returned because there is no data point in this single-hour interval because the underlying data is daily.
 			expect(readingsForGroup.length).to.equal(1 * 60); // Minute compression, 1 hour duration
 		});
 
@@ -279,6 +301,8 @@ mocha.describe('Compressed Readings 2', () => {
 			const readingsForG1 = groupReadings[group1.id];
 			const readingsForG2 = groupReadings[group2.id];
 
+			// Problem comes from the switch to serving RAW data.
+			// No data is returned because there is no data point in this single-hour interval because the underlying data is daily.
 			expect(readingsForG1.length).to.equal(1 * 60); // Minute compression, 1 hour duration
 			expect(readingsForG2.length).to.equal(1 * 60); // Minute compression, 1 hour duration
 		});
