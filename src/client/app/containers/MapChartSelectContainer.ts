@@ -22,7 +22,7 @@ function mapStateToProps(state: State, dispatch: Dispatch) {
 	if (Object.keys(sortedMaps).length === 1) {
 		state.maps.selectedMap = sortedMaps[0].value;
 	}
-	
+
 	const selectedMap = {
 		label: state.maps.byMapID[state.maps.selectedMap] ? state.maps.byMapID[state.maps.selectedMap].name : '',
 		value: state.maps.selectedMap
