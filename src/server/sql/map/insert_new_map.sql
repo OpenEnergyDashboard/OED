@@ -5,5 +5,5 @@
  */
 
  INSERT INTO maps(name, displayable, note, filename, modified_date, origin, opposite, map_source, north_angle, max_circle_size_fraction)
- 	VALUES (${name}, ${displayable}, ${note}, ${filename}, ${modifiedDate}, ${origin}, ${opposite}, ${mapSource}, ${northAngle}, ${maxCircleSizeFraction})
+ 	VALUES (${name}, ${displayable}, ${note}, ${filename}, ${modifiedDate}, ${origin}, ${opposite}, ${mapSource}, ${northAngle}, ${circleSize})
 	RETURNING id;

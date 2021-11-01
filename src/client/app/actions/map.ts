@@ -264,7 +264,8 @@ export function submitEditedMap(mapID: number): Thunk {
 				mapSource: map.image.src,
 				modifiedDate: moment().toISOString(),
 				origin: (map.calibrationResult) ? map.calibrationResult.origin : map.origin,
-				opposite: (map.calibrationResult) ? map.calibrationResult.opposite : map.opposite
+				opposite: (map.calibrationResult) ? map.calibrationResult.opposite : map.opposite,
+				circleSize: map.circleSize
 			};
 			await mapsApi.edit(acceptableMap);
 			if (map.calibrationResult) {

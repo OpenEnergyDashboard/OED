@@ -28,7 +28,7 @@ function formatMapForResponse(map) {
 		opposite: map.opposite,
 		mapSource: map.mapSource,
 		northAngle: map.northAngle,
-		maxCircleSizeFraction: map.maxCircleSizeFraction
+		circleSize: map.circleSize
 	};
 	return formattedMap;
 }
@@ -156,7 +156,8 @@ router.post('/create', adminAuthenticator('create maps'), async (req, res) => {
 					origin,
 					opposite,
 					req.body.mapSource,
-					req.body.northAngle
+					req.body.northAngle,
+					0.15
 				);
 				await newMap.insert(t);
 			});
@@ -256,7 +257,8 @@ router.post('/edit', adminAuthenticator('edit maps'), async (req, res) => {
 					origin,
 					opposite,
 					req.body.mapSource,
-					req.body.northAngle
+					req.body.northAngle,
+					req.body.circleSize
 				);
 				await editedMap.update(t);
 			});

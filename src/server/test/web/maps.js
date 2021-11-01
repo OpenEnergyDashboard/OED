@@ -43,7 +43,7 @@ function expectMapsToBeEquivalent(maps, length) {
 		expectPointsToBeEquivalent(map.opposite, opposite);
 		expect(map).to.have.property('mapSource', 'placeholder');
 		expect(map).to.have.property('northAngle', i + 1);
-		expect(map).to.have.property('maxCircleSizeFraction', (i + 1) / 10);
+		expect(map).to.have.property('circleSize', (i + 1) / 10);
 	}
 }
 
