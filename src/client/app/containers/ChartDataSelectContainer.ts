@@ -35,8 +35,9 @@ function mapStateToProps(state: State) {
 	const disableGroups: number[] = [];
 	// Don't do this if there is no selected map.
 	if (state.graph.chartToRender === ChartTypes.map && state.maps.selectedMap !== 0) {
+		const mp = state.maps.byMapID[state.maps.selectedMap];
 		// filter meters;
-		const image = state.maps.byMapID[state.maps.selectedMap].image;
+		const image = mp.image;
 		// The size of the original map loaded into OED.
 		const imageDimensions: Dimensions = {
 			width: image.width,
@@ -57,8 +58,8 @@ function mapStateToProps(state: State) {
 		// and upper, right corners of the user map.
 		// The gps value can be null from the database. Note using gps !== null to check for both null and undefined
 		// causes TS to complain about the unknown case so not used.
-		const origin = state.maps.byMapID[state.maps.selectedMap].origin;
-		const opposite = state.maps.byMapID[state.maps.selectedMap].opposite;
+		const origin = mp.origin;
+		const opposite = mp.opposite;
 		sortedMeters.forEach(meter => {
 			// This meter's GPS value.
 			const gps = state.meters.byMeterID[meter.value].gps;
@@ -66,9 +67,9 @@ function mapStateToProps(state: State) {
 				// Get the GPS degrees per unit of Plotly grid for x and y. By knowing the two corners
 				// (or really any two distinct points) you can calculate this by the change in GPS over the
 				// change in x or y which is the map's width & height in this case.
-				const scaleOfMap = calculateScaleFromEndpoints(origin, opposite, imageDimensionNormalized);
+				const scaleOfMap = calculateScaleFromEndpoints(origin, opposite, imageDimensionNormalized, mp.northAngle);
 				// Convert GPS of meter to grid on user map. See calibration.ts for more info on this.
-				const meterGPSInUserGrid: CartesianPoint = gpsToUserGrid(imageDimensionNormalized, gps, origin, scaleOfMap);
+				const meterGPSInUserGrid: CartesianPoint = gpsToUserGrid(imageDimensionNormalized, gps, origin, scaleOfMap, mp.northAngle);
 				if (!(itemMapInfoOk(meter.value, DataType.Meter, state.maps.byMapID[state.maps.selectedMap], gps) &&
 					itemDisplayableOnMap(imageDimensionNormalized, meterGPSInUserGrid))) {
 					meter.disabled = true;
@@ -84,8 +85,8 @@ function mapStateToProps(state: State) {
 		sortedGroups.forEach(group => {
 			const gps = state.groups.byGroupID[group.value].gps;
 			if (origin !== undefined && opposite !== undefined && gps !== undefined && gps !== null) {
-				const scaleOfMap = calculateScaleFromEndpoints(origin, opposite, imageDimensionNormalized);
-				const groupGPSInUserGrid: CartesianPoint = gpsToUserGrid(imageDimensionNormalized, gps, origin, scaleOfMap);
+				const scaleOfMap = calculateScaleFromEndpoints(origin, opposite, imageDimensionNormalized, mp.northAngle);
+				const groupGPSInUserGrid: CartesianPoint = gpsToUserGrid(imageDimensionNormalized, gps, origin, scaleOfMap, mp.northAngle);
 				if (!(itemMapInfoOk(group.value, DataType.Group, state.maps.byMapID[state.maps.selectedMap], gps) &&
 					itemDisplayableOnMap(imageDimensionNormalized, groupGPSInUserGrid))) {
 					group.disabled = true;
