@@ -4,7 +4,7 @@
 
 Open Energy Dashboard is a user-friendly way to display energy information from smart energy meters or uploaded via CSV files. It is available to anyone and is optimized for non-technical users with a simple interface that provides access to your organization's energy data. To learn more, see [our website](https://openenergydashboard.github.io/).
 
-Open Energy Dashboard is available under the Mozilla Public Licence v2, and contributions, in the form of bug reports, feature requests, and code contributions, are welcome.
+Open Energy Dashboard is available under the Mozilla Public License v2, and contributions, in the form of bug reports, feature requests, and code contributions, are welcome.
 
 ## Installation and Usage ##
 
@@ -39,9 +39,9 @@ We welcome others to contribute to this project by writing code for submission o
 ## Code of Conduct ##
 
 OED is based on the idea of sharing so everyone benefits from our combined efforts. To benefit everyone, we need to maintain a welcoming and appropriate community. 
-Toward that end, OED has as a [code of conduct](CODE_OF_CONDUCT.md) that follows the [Contributor Copnvent](https://www.contributor-covenant.org/) used by many
+Toward that end, OED has as a [code of conduct](CODE_OF_CONDUCT.md) that follows the [Contributor Covenant](https://www.contributor-covenant.org/) used by many
 open source projects. It specifies
-our expectations and how to report any concerns. If, for any reason, you do not feel confortable with any aspect of the OED project then you are encouraged to 
+our expectations and how to report any concerns. If, for any reason, you do not feel comfortable with any aspect of the OED project then you are encouraged to 
 contact the OED leadership so we can work to make this a welcoming community. This includes formal complaints, informal concerns and suggestions for how OED can
 improve what it does. We commit to a timely response to input that clearly articulates what actions may
 be taken and why. Whatever our decision, you will be informed. We want everyone to know that we take having a welcoming community seriously and will work for and
