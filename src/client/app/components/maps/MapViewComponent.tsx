@@ -111,8 +111,6 @@ class MapViewComponent extends React.Component<MapViewPropsWithIntl, MapViewStat
 		this.props.editMapDetails(editedMap);
 	}
 
-	
-
 	private formatDisplayable() {
 		let styleFn;
 		let messageId;
@@ -148,7 +146,7 @@ class MapViewComponent extends React.Component<MapViewPropsWithIntl, MapViewStat
 
 		return (
 			<span>
-			<span style={styleFn()}> 
+			<span style={styleFn()}>
 				<FormattedMessage id={messageId} />
 			</span>
 			{toggleButton}
@@ -158,12 +156,12 @@ class MapViewComponent extends React.Component<MapViewPropsWithIntl, MapViewStat
 
 	// this function throws alert on the browser notifying that map needs calibrating before display
 	private notifyCalibrationNeeded() {
-		window.alert(`${this.props.intl.formatMessage({id: 'notify.calibration.needed'})} "${this.props.map.name}"`); 
+		window.alert(`${this.props.intl.formatMessage({id: 'notify.calibration.needed'})} "${this.props.map.name}"`);
 	}
 
 	private toggleNameInput() {
 		if (this.state.nameFocus) {
-			const editedMap = { 
+			const editedMap = {
 				...this.props.map,
 				name: this.state.nameInput
 			};
