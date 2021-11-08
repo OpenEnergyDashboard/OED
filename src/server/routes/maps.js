@@ -157,7 +157,7 @@ router.post('/create', adminAuthenticator('create maps'), async (req, res) => {
 					opposite,
 					req.body.mapSource,
 					req.body.northAngle,
-					0.15
+					req.body.circleSize
 				);
 				await newMap.insert(t);
 			});

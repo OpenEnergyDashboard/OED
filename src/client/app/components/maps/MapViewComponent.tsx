@@ -43,7 +43,9 @@ class MapViewComponent extends React.Component<MapViewPropsWithIntl, MapViewStat
 			noteFocus: false,
 			noteInput: (this.props.map.note) ? this.props.map.note : '',
 			circleFocus: false,
-			circleInput: (this.props.map.circleSize.toString()) ? this.props.map.circleSize.toString() : '0.15'
+			// circleInput checks if null because of pre-existing maps having circleSize set to null.
+			circleInput: (this.props.map.circleSize !== null && this.props.map.circleSize.toString()) ? 
+			this.props.map.circleSize.toString() : '0.15'
 		};
 		this.handleCalibrationSetting = this.handleCalibrationSetting.bind(this);
 		this.toggleMapDisplayable = this.toggleMapDisplayable.bind(this);
@@ -52,7 +54,7 @@ class MapViewComponent extends React.Component<MapViewPropsWithIntl, MapViewStat
 		this.toggleNoteInput = this.toggleNoteInput.bind(this);
 		this.handleNoteChange = this.handleNoteChange.bind(this);
 		this.toggleDelete = this.toggleDelete.bind(this);
-		this.handlecSizeChange = this.handlecSizeChange.bind(this);
+		this.handleSizeChange = this.handleSizeChange.bind(this);
 		this.toggleCircleInput = this.toggleCircleInput.bind(this);
 	}
 
@@ -72,7 +74,7 @@ class MapViewComponent extends React.Component<MapViewPropsWithIntl, MapViewStat
 		);
 	}
 
-	private handlecSizeChange(event: React.ChangeEvent<HTMLTextAreaElement>) {
+	private handleSizeChange(event: React.ChangeEvent<HTMLTextAreaElement>) {
 		this.setState({circleInput: event.target.value});
 	}
 
@@ -108,7 +110,7 @@ class MapViewComponent extends React.Component<MapViewPropsWithIntl, MapViewStat
 		let buttonMessageId;
 		if (this.state.circleFocus) {
 			// default value for autoFocus is true and for all attributes that would be set autoFocus={true}
-			formattedCircleSize = <textarea id={'csize'} autoFocus value={this.state.circleInput} onChange={event => this.handlecSizeChange(event)}/>;
+			formattedCircleSize = <textarea id={'csize'} autoFocus value={this.state.circleInput} onChange={event => this.handleSizeChange(event)}/>;
 			buttonMessageId = 'update';
 		} else {
 			formattedCircleSize = <div>{this.state.circleInput}</div>;

@@ -74,11 +74,13 @@ class Map {
 	/**
 	 * Creates a new map based on the data in a row
 	 * @param row field names used to extract from row must match column names inside SQL functions
+	 * checks if max_circle_size_fraction is null because of pre-existing maps
 	 * @returns {Map}
 	 */
 	static mapRow(row) {
 		return new Map(row.id, row.name, row.displayable, row.note, row.filename, 
-			row.modified_date, row.origin, row.opposite, row.map_source, row.north_angle, row.max_circle_size_fraction);
+			row.modified_date, row.origin, row.opposite, row.map_source, row.north_angle,
+			(row.max_circle_size_fraction !== null ? row.max_circle_size_fraction : 0.15));
 	}
 
 	/**
