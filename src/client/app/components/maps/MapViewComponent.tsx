@@ -43,9 +43,8 @@ class MapViewComponent extends React.Component<MapViewPropsWithIntl, MapViewStat
 			noteFocus: false,
 			noteInput: (this.props.map.note) ? this.props.map.note : '',
 			circleFocus: false,
-			// circleInput checks if null because of pre-existing maps having circleSize set to null.
-			circleInput: (this.props.map.circleSize !== null && this.props.map.circleSize.toString()) ?
-			this.props.map.circleSize.toString() : '0.15'
+			// circleSize should always be a valid string due to how stored and mapRow.
+			circleInput: this.props.map.circleSize.toString()
 		};
 		this.handleCalibrationSetting = this.handleCalibrationSetting.bind(this);
 		this.toggleMapDisplayable = this.toggleMapDisplayable.bind(this);

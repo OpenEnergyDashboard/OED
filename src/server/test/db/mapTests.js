@@ -5,7 +5,7 @@
  */
 
 const { mocha, expect, testDB } = require('../common');
-const Map = require('../../models/Map');
+const { Map } = require('../../models/Map');
 const Point = require('../../models/Point');
 const moment = require('moment');
 
