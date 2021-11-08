@@ -1,7 +1,9 @@
 # To use:
 # This should be copied to /etc/systemd/system/ and the copy renamed so that its function will be clear to admins.
-# Modify the WorkingDirectory variable
-# Modify the user variable
+# 1) Modify the WorkingDirectory variable to set it to the root directory of OED
+# 2) Modify the user variable to set it to the user that has permission to run OED. While this could be root, it is best
+# to use a non-privileged user for security reasons. This can normally be the user that cloned the OED git repository
+# and owns the OED files.
 
 [Unit]
 Description=OED

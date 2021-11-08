@@ -19,5 +19,6 @@ module.exports = {
 		await db.none(sqlFile('../migrations/0.3.0-0.5.0/sql/fast-pt-compression/create_compressed_reading_views.sql'));
 		await db.none(sqlFile('../migrations/0.3.0-0.5.0/sql/fast-pt-compression/create_function_get_compare_readings.sql'));
 		await db.none(sqlFile('../migrations/0.3.0-0.5.0/sql/compareReadings/create_function_get_compare_readings.sql'));
+		await db.none(sqlFile('../migrations/0.3.0-0.5.0/sql/obvius/create_config_table.sql'));
 	}
 };

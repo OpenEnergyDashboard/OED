@@ -51,6 +51,8 @@ fi
 # Install NPM dependencies
 if [ "$keep_node_modules" == "yes" ]; then
 	printf "%s\n" "skipping NPM install as requested"
+elif [ "$OED_PRODUCTION" == "yes" ] && [ -d "node_modules" ]; then
+	echo "node_modules/ exists, skipping NPM install in production environment."
 else
 	printf "%s\n" "NPM install..."
 	npm ci --loglevel=warn

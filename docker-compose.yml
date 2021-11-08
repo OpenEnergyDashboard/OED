@@ -13,7 +13,7 @@ services:
         environment:
             # Custom PGDATA per recommendations from official Docker page
             - PGDATA=/var/lib/postgresql/data/pgdata
-            - POSTGRES_PASSWORD=pleaseChange # default postgres password that can be changed for security.
+            - POSTGRES_PASSWORD=pleaseChange # default postgres password that should be changed for security.
         volumes:
             - ./postgres-data:/var/lib/postgresql/data/pgdata
         #ports:
@@ -35,12 +35,12 @@ services:
             - OED_TOKEN_SECRET=?
             - OED_LOG_FILE=log.txt
             - OED_MAIL_METHOD=none # Method of sending mail. Supports "gmail", "mailgun", "none". Case insensitive.
-            - OED_MAIL_IDENT=mydomain@example.com
-            - OED_MAIL_CREDENTIAL=credential # Set the email password here
-            - OED_MAIL_FROM=mydomain@example.com
-            - OED_MAIL_TO=mydomain@example.com  # Set the destination address here
-            - OED_MAIL_ORG=My Organization Name # Org name for mail formatting
-            - OED_OBVIUS_PASSWORD=password
+            - OED_MAIL_IDENT=someone@example.com # The user email that is used for sending emails (SMTP)
+            - OED_MAIL_CREDENTIAL=credential # Set the email password for sending email here
+            - OED_MAIL_FROM=mydomain@example.com # The email address that the email will come from
+            - OED_MAIL_TO=someone@example.com  # Set the destination address here for where to send emails
+            - OED_MAIL_ORG=My Organization Name # Org name for mail that is included in the subject
+            - OED_OBVIUS_PASSWORD=pleaseChange # The password used when Obvius pushes data to OED and should be changed for security if going to use
             # If in a subdirectory, set it here
             # - OED_SUBDIR=/subdir/
         # Set the correct build environment.
@@ -56,11 +56,11 @@ services:
             - ./:/usr/src/app
         # Map the default port.
         ports:
-            - "3000:3000"
-            - "9229:9229" # Debug port
-              # For production you might want something like:
-              # - "80:3000"
-              # and disable the debug port
+            - "3000:3000" # Should be commented out if you uncomment 80:3000 below.
+            - "9229:9229" # Debug port, should be commented out for production
+            # For production you might want something like:
+            # - "80:3000"
+            # and comment out the debug port and 3000:3000 line above
         # Don't bring this up without the DB
         depends_on:
             - database
@@ -68,6 +68,7 @@ services:
                     # We need the database and it has to be ready for work (see healthcheck above).
                 # condition: service_healthy
         # Lets docker-compose up work right
-        # If environment variable install_args is not set the it becomes blank without warning user.
+        # If environment variable install_args is not set then it becomes blank without warning user.
         command: ["bash", "./src/scripts/installOED.sh", "${install_args:-}"]
-        # Reverse proxy, for testing
+        # Use this if you are using a docker-compose that is earlier than version 2 and comment out the one above.
+        # command: ["bash", "./src/scripts/installOED.sh"]
