@@ -6,7 +6,7 @@
  * inserting meters prior to executing the test code. */
 
 const { chai, mocha, expect, app, testDB, testUser } = require('../common');
-const Map = require('../../models/Map');
+const { Map } = require('../../models/Map');
 const User = require('../../models/User');
 const bcrypt = require('bcryptjs');
 const Point = require('../../models/Point');

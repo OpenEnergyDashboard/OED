@@ -3,7 +3,7 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
 
 const express = require('express');
-const Map = require('../models/Map');
+const { Map } = require('../models/Map');
 const { log } = require('../log');
 const validate = require('jsonschema').validate;
 const { getConnection } = require('../db');
@@ -12,6 +12,7 @@ const optionalAuthenticator = require('./authenticator').optionalAuthMiddleware;
 const Point = require('../models/Point');
 const { isTokenAuthorized } = require('../util/userRoles');
 const User = require('../models/User');
+const { DEFAULT_CIRCLE_SIZE } = require('../models/Map');
 
 const router = express.Router();
 router.use(optionalAuthenticator);
@@ -146,6 +147,8 @@ router.post('/create', adminAuthenticator('create maps'), async (req, res) => {
 			await conn.tx(async t => {
 				const origin = (req.body.origin) ? new Point(req.body.origin.longitude, req.body.origin.latitude) : null;
 				const opposite = (req.body.opposite) ? new Point(req.body.opposite.longitude, req.body.opposite.latitude) : null;
+				// Use default value for optional circleSize field
+				const circleSize = (req.body.circleSize) ? req.body.circleSize : DEFAULT_CIRCLE_SIZE;
 				const newMap = new Map(
 					undefined,
 					req.body.name,
@@ -157,7 +160,7 @@ router.post('/create', adminAuthenticator('create maps'), async (req, res) => {
 					opposite,
 					req.body.mapSource,
 					req.body.northAngle,
-					req.body.circleSize
+					circleSize
 				);
 				await newMap.insert(t);
 			});
