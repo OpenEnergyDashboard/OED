@@ -5,7 +5,9 @@
 -- This should avoid an error when the type already exists. This is an issue since
 -- the OED install stops the creation of database items after this.
 DO $$ BEGIN
-    CREATE TYPE graph_type AS ENUM('line', 'bar', 'compare');
+    CREATE TYPE graph_type AS ENUM('line', 'bar', 'compare', 'map');
+    ALTER TABLE preferences ALTER COLUMN default_chart_to_render SET DATA TYPE graph_type
+    USING default_chart_to_render::text::graph_type;
 EXCEPTION
     WHEN duplicate_object THEN null;
 END $$;
