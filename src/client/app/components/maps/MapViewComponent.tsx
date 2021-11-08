@@ -26,6 +26,8 @@ interface MapViewProps {
 interface MapViewState {
 	nameFocus: boolean;
 	nameInput: string;
+	circleFocus: boolean;
+	circleInput: string;
 	noteFocus: boolean;
 	noteInput: string;
 }
@@ -39,7 +41,10 @@ class MapViewComponent extends React.Component<MapViewPropsWithIntl, MapViewStat
 			nameFocus: false,
 			nameInput: this.props.map.name,
 			noteFocus: false,
-			noteInput: (this.props.map.note) ? this.props.map.note : ''
+			noteInput: (this.props.map.note) ? this.props.map.note : '',
+			circleFocus: false,
+			// circleSize should always be a valid string due to how stored and mapRow.
+			circleInput: this.props.map.circleSize.toString()
 		};
 		this.handleCalibrationSetting = this.handleCalibrationSetting.bind(this);
 		this.toggleMapDisplayable = this.toggleMapDisplayable.bind(this);
@@ -48,6 +53,8 @@ class MapViewComponent extends React.Component<MapViewPropsWithIntl, MapViewStat
 		this.toggleNoteInput = this.toggleNoteInput.bind(this);
 		this.handleNoteChange = this.handleNoteChange.bind(this);
 		this.toggleDelete = this.toggleDelete.bind(this);
+		this.handleSizeChange = this.handleSizeChange.bind(this);
+		this.toggleCircleInput = this.toggleCircleInput.bind(this);
 	}
 
 	public render() {
@@ -56,6 +63,7 @@ class MapViewComponent extends React.Component<MapViewPropsWithIntl, MapViewStat
 				<td> {this.props.map.id} {this.formatStatus()}</td>
 				<td> {this.formatName()} </td>
 				{hasToken() && <td> {this.formatDisplayable()} </td>}
+				{hasToken() && <td> {this.formatCircleSize()} </td>}
 				{hasToken() && <td> {moment(this.props.map.modifiedDate).format('dddd, MMM DD, YYYY hh:mm a')} </td>}
 				{hasToken() && <td> {this.formatFilename()} </td>}
 				{hasToken() && <td> {this.formatNote()} </td>}
@@ -63,6 +71,75 @@ class MapViewComponent extends React.Component<MapViewPropsWithIntl, MapViewStat
 				{hasToken() && <td> {this.formatDeleteButton()} </td>}
 			</tr>
 		);
+	}
+
+	private handleSizeChange(event: React.ChangeEvent<HTMLTextAreaElement>) {
+		this.setState({circleInput: event.target.value});
+	}
+
+	private toggleCircleInput() {
+		let checkval: boolean = true;
+		// if trying to submit an updated value
+		if (this.state.circleFocus) {
+			const regtest = /^\d+(\.\d+)?$/;
+			checkval = regtest.test(this.state.circleInput);
+			if (checkval) {
+				if (parseFloat(this.state.circleInput) > 2.0) {
+					checkval = false;
+				}
+				else {
+					const editedMap = {
+						...this.props.map,
+						circleSize: parseFloat(this.state.circleInput)
+					};
+					this.props.editMapDetails(editedMap);
+				}
+			}
+		}
+		if (checkval) {
+			this.setState({circleFocus: !this.state.circleFocus});
+		}
+		else {
+			window.alert(`${this.props.intl.formatMessage({id: 'invalid.number'})}`);
+		}
+	}
+
+	private formatCircleSize() {
+		let formattedCircleSize;
+		let buttonMessageId;
+		if (this.state.circleFocus) {
+			// default value for autoFocus is true and for all attributes that would be set autoFocus={true}
+			formattedCircleSize = <textarea id={'csize'} autoFocus value={this.state.circleInput} onChange={event => this.handleSizeChange(event)}/>;
+			buttonMessageId = 'update';
+		} else {
+			formattedCircleSize = <div>{this.state.circleInput}</div>;
+			buttonMessageId = 'edit';
+		}
+
+		let toggleButton;
+		if (hasToken()) {
+			toggleButton = <Button style={this.styleToggleBtn()} color='primary' onClick={this.toggleCircleInput}>
+				<FormattedMessage id={buttonMessageId} />
+			</Button>;
+		} else {
+			toggleButton = <div />;
+		}
+
+		if (hasToken()) {
+			return (
+				<div>
+					{formattedCircleSize}
+					{toggleButton}
+				</div>
+			);
+		} else {
+			return (
+				<div>
+					{this.props.map.circleSize}
+					{toggleButton}
+				</div>
+			);
+		}
 	}
 
 	private formatStatus(): string {

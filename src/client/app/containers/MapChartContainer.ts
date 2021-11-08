@@ -183,7 +183,7 @@ function mapStateToProps(state: State) {
 			// many times for each change. Someone should look at why that is happening and why some have no items in the arrays.
 			// if (size.length > 0) {
 			// TODO The max circle diameter should come from admin/DB.
-			const maxFeatureFraction = 0.15;
+			const maxFeatureFraction = map.circleSize;
 			// Find the smaller of width and height. This is used since it means the circle size will be
 			// scaled to that dimension and smaller relative to the other coordinate.
 			const minDimension = Math.min(imageDimensionNormalized.width, imageDimensionNormalized.height);

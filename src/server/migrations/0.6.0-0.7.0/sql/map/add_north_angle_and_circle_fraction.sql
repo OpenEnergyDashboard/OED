@@ -4,4 +4,5 @@
 
 ALTER TABLE maps
 	ADD COLUMN IF NOT EXISTS north_angle REAL DEFAULT 0.0,
+	-- This should be kept in sync with src/server/models/Map.js DEFAULT_CIRCLE_SIZE
 	ADD COLUMN IF NOT EXISTS max_circle_size_fraction REAL DEFAULT 0.15;

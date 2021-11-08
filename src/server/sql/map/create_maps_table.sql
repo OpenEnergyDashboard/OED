@@ -13,5 +13,6 @@ CREATE TABLE IF NOT EXISTS maps (
 	opposite POINT DEFAULT NULL,
 	map_source TEXT NOT NULL,
 	north_angle REAL DEFAULT 0.0,
+	-- This should be kept in sync with src/server/models/Map.js DEFAULT_CIRCLE_SIZE
 	max_circle_size_fraction REAL DEFAULT 0.15
 );

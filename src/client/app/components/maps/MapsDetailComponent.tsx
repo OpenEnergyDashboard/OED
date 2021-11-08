@@ -67,6 +67,7 @@ export default class MapsDetailComponent extends React.Component<MapsDetailProps
 						<th> <FormattedMessage id='map.id' /> </th>
 						<th> <FormattedMessage id='map.name' /> </th>
 						{hasToken() && <th> <FormattedMessage id='map.displayable' /> </th>}
+						{hasToken() && <th> <FormattedMessage id='map.circle.size'/> </th>}
 						{hasToken() && <th> <FormattedMessage id='map.modified.date' /> </th>}
 						{hasToken() && <th> <FormattedMessage id='map.filename'/> </th>}
 						{hasToken() && <th> <FormattedMessage id='map.note'/> </th>}
@@ -78,7 +79,7 @@ export default class MapsDetailComponent extends React.Component<MapsDetailProps
 					{ this.props.maps.map(mapID =>
 						( <MapViewContainer key={mapID} id={mapID} /> ))}
 					<tr>
-						<td colSpan={7}>
+						<td colSpan={8}>
 							<Link to='/calibration' onClick={() => this.props.createNewMap()}>
 								<Button style={buttonContainerStyle} color='primary'>
 									<FormattedMessage id='create.map' />
