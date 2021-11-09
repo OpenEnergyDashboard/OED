@@ -133,6 +133,7 @@ export interface MapData{
 	origin?: GPSPoint;
 	opposite?: GPSPoint;
 	mapSource: string;
+	circleSize: number;
 }
 
 /**
@@ -155,6 +156,8 @@ export interface MapMetadata {
 	currentPoint?: CalibratedPoint;
 	calibrationSet?: CalibratedPoint[];
 	calibrationResult?: CalibrationResult;
+	northAngle: number;
+	circleSize: number;
 }
 
 /**

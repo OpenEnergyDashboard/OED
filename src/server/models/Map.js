@@ -6,6 +6,10 @@ const database = require('./database');
 const sqlFile = database.sqlFile;
 const Point = require('./Point');
 
+// The size of the map circle if none is specified when mapped.
+// This should only apply to historical maps before value was set by default.
+const DEFAULT_CIRCLE_SIZE = 0.15;
+
 class Map {
 	/**
 	 * @param id should be undefined when creating a new map
@@ -18,9 +22,9 @@ class Map {
 	 * @param opposite {Point} coordinates of opposite corner from origin
 	 * @param mapSource data URL of image of the map
 	 * @param northAngle stores angle between map orientation and true north, default 0.0
-	 * @param maxCircleSizeFraction Stores the fraction of horizontal map, default 0.15
+	 * @param circleSize Stores the fraction of horizontal map
 	 */
-	constructor(id, name, displayable, note, filename, modifiedDate, origin, opposite, mapSource, northAngle, maxCircleSizeFraction) {
+	constructor(id, name, displayable, note, filename, modifiedDate, origin, opposite, mapSource, northAngle, circleSize) {
 		this.id = id;
 		this.name = name;
 		this.displayable = displayable;
@@ -31,7 +35,7 @@ class Map {
 		this.opposite = opposite;
 		this.mapSource = mapSource;
 		this.northAngle = northAngle;
-		this.maxCircleSizeFraction = maxCircleSizeFraction;
+		this.circleSize = circleSize;
 	}
 
 	/**
@@ -77,8 +81,11 @@ class Map {
 	 * @returns {Map}
 	 */
 	static mapRow(row) {
-		return new Map(row.id, row.name, row.displayable, row.note, row.filename, 
-			row.modified_date, row.origin, row.opposite, row.map_source, row.north_angle, row.max_circle_size_fraction);
+		// checks if max_circle_size_fraction is null because of pre-existing maps where then uses
+		// default circle size that should now be set automatically.
+		return new Map(row.id, row.name, row.displayable, row.note, row.filename,
+			row.modified_date, row.origin, row.opposite, row.map_source, row.north_angle,
+			(row.max_circle_size_fraction !== null ? row.max_circle_size_fraction : DEFAULT_CIRCLE_SIZE));
 	}
 
 	/**
@@ -145,4 +152,4 @@ class Map {
 		await conn.none(sqlFile('map/delete_map.sql'), { id: mapID });
 	}
 }
-module.exports = Map;
+module.exports = { Map, DEFAULT_CIRCLE_SIZE };

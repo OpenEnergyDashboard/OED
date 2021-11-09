@@ -80,7 +80,7 @@ async function createSchema(conn) {
 	const Migration = require('./Migration');
 	const LogEmail = require('./LogEmail');
 	const Baseline = require('./Baseline');
-	const Map = require('./Map');
+	const { Map } = require('./Map');
 
 	/* eslint-enable global-require */
 	await Meter.createMeterTypesEnum(conn);

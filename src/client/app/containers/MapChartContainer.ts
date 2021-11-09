@@ -64,7 +64,7 @@ function mapStateToProps(state: State) {
 			// Get the GPS degrees per unit of Plotly grid for x and y. By knowing the two corners
 			// (or really any two distinct points) you can calculate this by the change in GPS over the
 			// change in x or y which is the map's width & height in this case.
-			const scaleOfMap = calculateScaleFromEndpoints(origin, opposite, imageDimensionNormalized);
+			const scaleOfMap = calculateScaleFromEndpoints(origin, opposite, imageDimensionNormalized, map.northAngle);
 			// Loop over all selected meters. Maps only work for meters at this time.
 			for (const meterID of state.graph.selectedMeters) {
 				// Get meter id number.
@@ -78,7 +78,7 @@ function mapStateToProps(state: State) {
 					// It must be on true north map since only there are the GPS axis parallel to the map axis.
 					// To start, calculate the user grid coordinates (Plotly) from the GPS value. This involves calculating
 					// it coordinates on the true north map and then rotating/shifting to the user map.
-					const meterGPSInUserGrid: CartesianPoint = gpsToUserGrid(imageDimensionNormalized, gps, origin, scaleOfMap);
+					const meterGPSInUserGrid: CartesianPoint = gpsToUserGrid(imageDimensionNormalized, gps, origin, scaleOfMap, map.northAngle);
 					// Only display items within valid info and within map.
 					if (itemMapInfoOk(meterID, DataType.Meter, map, gps) && itemDisplayableOnMap(imageDimensionNormalized, meterGPSInUserGrid)) {
 						// The x, y value for Plotly to use that are on the user map.
@@ -135,7 +135,7 @@ function mapStateToProps(state: State) {
 					// It must be on true north map since only there are the GPS axis parallel to the map axis.
 					// To start, calculate the user grid coordinates (Plotly) from the GPS value. This involves calculating
 					// it coordinates on the true north map and then rotating/shifting to the user map.
-					const groupGPSInUserGrid: CartesianPoint = gpsToUserGrid(imageDimensionNormalized, gps, origin, scaleOfMap);
+					const groupGPSInUserGrid: CartesianPoint = gpsToUserGrid(imageDimensionNormalized, gps, origin, scaleOfMap, map.northAngle);
 					// Only display items within valid info and within map.
 					if (itemMapInfoOk(groupID, DataType.Group, map, gps) && itemDisplayableOnMap(imageDimensionNormalized, groupGPSInUserGrid)) {
 						// The x, y value for Plotly to use that are on the user map.
@@ -183,7 +183,7 @@ function mapStateToProps(state: State) {
 			// many times for each change. Someone should look at why that is happening and why some have no items in the arrays.
 			// if (size.length > 0) {
 			// TODO The max circle diameter should come from admin/DB.
-			const maxFeatureFraction = 0.15;
+			const maxFeatureFraction = map.circleSize;
 			// Find the smaller of width and height. This is used since it means the circle size will be
 			// scaled to that dimension and smaller relative to the other coordinate.
 			const minDimension = Math.min(imageDimensionNormalized.width, imageDimensionNormalized.height);

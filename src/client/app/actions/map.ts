@@ -177,13 +177,13 @@ function isReadyForCalculation(state: State): boolean {
  */
 function prepareDataToCalculation(state: State): CalibrationResult {
 	const mapID = state.maps.calibratingMap;
-	const image = state.maps.editedMaps[mapID].image;
+	const mp = state.maps.editedMaps[mapID];
 	const imageDimensions: Dimensions = {
-		width: image.width,
-		height: image.height
+		width: mp.image.width,
+		height: mp.image.height
 	};
 	// @ts-ignore
-	const result = calibrate(state.maps.editedMaps[mapID].calibrationSet, imageDimensions);
+	const result = calibrate(mp.calibrationSet, imageDimensions, mp.northAngle);
 	return result;
 }
 
@@ -264,7 +264,8 @@ export function submitEditedMap(mapID: number): Thunk {
 				mapSource: map.image.src,
 				modifiedDate: moment().toISOString(),
 				origin: (map.calibrationResult) ? map.calibrationResult.origin : map.origin,
-				opposite: (map.calibrationResult) ? map.calibrationResult.opposite : map.opposite
+				opposite: (map.calibrationResult) ? map.calibrationResult.opposite : map.opposite,
+				circleSize: map.circleSize
 			};
 			await mapsApi.edit(acceptableMap);
 			if (map.calibrationResult) {

@@ -24,6 +24,7 @@ interface MapInitiateProps {
 interface MapInitiateState {
 	filename: string;
 	mapName: string;
+	angle: string;
 }
 
 type MapInitiatePropsWithIntl = MapInitiateProps & InjectedIntlProps;
@@ -33,18 +34,33 @@ class MapCalibrationInitiateComponent extends React.Component<MapInitiatePropsWi
 	private notifyLoadComplete() {
 		window.alert(`${this.props.intl.formatMessage({id: 'map.load.complete'})} ${this.state.filename}.`);
 	}
+	private notifyBadNumber() {
+		window.alert(`${this.props.intl.formatMessage({id: 'map.bad.number'})}`);
+	}
+	private notifyBadDigit360() {
+		window.alert(`${this.props.intl.formatMessage({id: 'map.bad.digita'})}`);
+	}
+	private notifyBadDigit0() {
+		window.alert(`${this.props.intl.formatMessage({id: 'map.bad.digitb'})}`);
+	}
 
 	constructor(props: MapInitiatePropsWithIntl) {
 		super(props);
 		this.state = {
 			filename: '',
-			mapName: ''
+			mapName: '',
+			angle: ''
 		};
 		this.fileInput = React.createRef();
 		this.handleInput = this.handleInput.bind(this);
 		this.confirmUpload = this.confirmUpload.bind(this);
 		this.notifyLoadComplete = this.notifyLoadComplete.bind(this);
 		this.handleNameInput = this.handleNameInput.bind(this);
+		this.handleAngleInput = this.handleAngleInput.bind(this);
+		this.handleAngle = this.handleAngle.bind(this);
+		this.notifyBadNumber = this.notifyBadNumber.bind(this);
+		this.notifyBadDigit360 = this.notifyBadDigit360.bind(this);
+		this.notifyBadDigit0 = this.notifyBadDigit0.bind(this);
 	}
 
 	public render() {
@@ -62,6 +78,12 @@ class MapCalibrationInitiateComponent extends React.Component<MapInitiatePropsWi
 					<textarea id={'text'} cols={50} value={this.state.mapName} onChange={this.handleNameInput}/>
 				</label>
 				<br/>
+				<label>
+					<FormattedMessage id='map.new.angle'/>
+					<br/>
+					<input type='text' value={this.state.angle} onChange={this.handleAngleInput}/>
+				</label>
+				<br/>
 				<FormattedMessage id='map.new.submit'>
 					{placeholder => <input type='submit' value={placeholder.toString()} />}
 				</FormattedMessage>
@@ -70,9 +92,34 @@ class MapCalibrationInitiateComponent extends React.Component<MapInitiatePropsWi
 	}
 
 	private async confirmUpload(event: any) {
-		await this.handleInput(event);
-		await this.notifyLoadComplete();
-		this.props.updateMapMode(CalibrationModeTypes.calibrate);
+		const bcheck = this.handleAngle(event);
+		if (bcheck) {
+			await this.handleInput(event);
+			await this.notifyLoadComplete();
+			this.props.updateMapMode(CalibrationModeTypes.calibrate);
+		}
+	}
+
+	private handleAngle(event: any) {
+		event.preventDefault();
+		const pattern = /^[-+]?\d+(\.\d+)?$/;
+		if (!pattern.test(this.state.angle)) {
+			this.notifyBadNumber();
+			return false;
+		}
+		else {
+			if (parseFloat(this.state.angle) > 360) {
+				this.notifyBadDigit360();
+				return false;
+			}
+			else if (parseFloat(this.state.angle) < 0) {
+				this.notifyBadDigit0();
+				return false;
+			}
+			else {
+				return true;
+			}
+		}
 	}
 
 	private async handleInput(event: any) {
@@ -86,7 +133,8 @@ class MapCalibrationInitiateComponent extends React.Component<MapInitiatePropsWi
 				...this.props.map,
 				name: this.state.mapName,
 				filename: this.fileInput.current.files[0].name,
-				image
+				image,
+				northAngle: parseFloat(this.state.angle)
 			};
 			await this.props.onSourceChange(source);
 		} catch (err) {
@@ -97,6 +145,12 @@ class MapCalibrationInitiateComponent extends React.Component<MapInitiatePropsWi
 	private handleNameInput(event: ChangeEvent<HTMLTextAreaElement>) {
 		this.setState({
 			mapName: event.target.value
+		});
+	}
+
+	private handleAngleInput(event: React.FormEvent<HTMLInputElement>) {
+		this.setState({
+			angle: event.currentTarget.value
 		});
 	}
 
