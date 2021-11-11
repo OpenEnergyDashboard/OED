@@ -22,6 +22,9 @@ class MapChartSelectComponent extends React.Component<MapChartSelectPropsWithInt
 	constructor(props: MapChartSelectPropsWithIntl) {
 		super(props);
 		this.handleMapSelect = this.handleMapSelect.bind(this);
+		if (this.props.maps.length === 1) {
+			this.props.selectMap(this.props.maps[0].value);
+		}
 	}
 
 	public render() {
@@ -45,7 +48,7 @@ class MapChartSelectComponent extends React.Component<MapChartSelectPropsWithInt
 				<div style={divBottomPadding}>
 					<SingleSelectComponent
 						options={this.props.maps}
-						selectedOption={(this.props.selectedMap.value === 0)? undefined: this.props.selectedMap}
+						selectedOption={(this.props.selectedMap.value === 0) ? undefined : this.props.selectedMap}
 						placeholder={formatMessage(messages.selectMap)}
 						onValueChange={this.handleMapSelect}
 					/>

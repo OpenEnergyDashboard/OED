@@ -5,7 +5,7 @@
  */
 
 const { mocha, expect, testDB } = require('../common');
-const Map = require('../../models/Map');
+const { Map } = require('../../models/Map');
 const Point = require('../../models/Point');
 const moment = require('moment');
 
@@ -25,7 +25,7 @@ function expectMapsToBeEquivalent(expected, actual) {
 	expectPointsToBeEquivalent(expected.opposite, actual.opposite);
 	expect(actual).to.have.property('mapSource', expected.mapSource);
 	expect(actual).to.have.property('northAngle', expected.northAngle);
-	expect(actual).to.have.property('maxCircleSizeFraction', expected.maxCircleSizeFraction);
+	expect(actual).to.have.property('circleSize', expected.circleSize);
 }
 
 mocha.describe('Maps', () => {

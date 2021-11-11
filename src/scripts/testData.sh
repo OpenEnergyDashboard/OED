@@ -6,7 +6,8 @@
 # *
 
 echo "This script assumes you have OED running."
-echo "This script should not be run with a different container meaning don't user docker compose."
+echo "This script is normally run for the main OED directory (where package.json is located)"
+echo "This script should not be run with a different container meaning don't user docker-compose."
 echo "Time estimates will vary depending on your machine and what it is doing."
 echo "The terminal where you started OED will show any errors and some of the activity going on"
 echo "  but normally only once the loading of data into OED begins."
@@ -43,11 +44,11 @@ csvfiles=(
     fourDayFreqTestData.csv fourHourFreqTestData.csv twentyThreeMinuteFreqTestData.csv fifteenMinuteFreqTestData.csv 
     23FreqCosineTestData.csv 2.5AmpSineSquaredTestData.csv 2.5AmpCosineSquaredTestData.csv 15Freq1AmpSineTestData.csv 15Freq2AmpSineTestData.csv 
     15Freq3AmpSineTestData.csv 15Freq4AmpSineTestData.csv 15Freq5AmpSineTestData.csv 15Freq6AmpSineTestData.csv 15Freq7AmpSineTestData.csv
- )
+)
 # The names of the meters that will be used for each file (in same order)
- meternames=(
+meternames=(
     test4DaySin test4HourSin test23MinSin test15MinSin test23MinCos testSqSin testSqCos testAmp1Sin testAmp2Sin testAmp3Sin testAmp4Sin testAmp5Sin testAmp6Sin testAmp7Sin 
- )
+)
 
 # Go to OED directory
 cd $oeddir
@@ -80,10 +81,10 @@ do
     fi
 done
 
-echo -e "\nStarting to remove the CSV files with the test data. No output unless an issue."
+echo -e "\n\nStarting to remove the CSV files with the test data. No output unless an issue."
 for ((i=0; i < ${#csvfiles[@]}; i++))
 do
-        rm ${csvfiles[i]}
+    rm ${csvfiles[i]}
 done
 
 echo -e "\nThe process is now done."

@@ -4,6 +4,7 @@
 
 import { MapMetadata } from '../types/redux/map';
 import { logToServer } from '../actions/logs';
+import { DataType } from '../types/Datasources';
 
 /**
  * Defines a Cartesian Point with x & y
@@ -65,16 +66,18 @@ export interface Dimensions {
 }
 
 /**
- * Returns true if meter and map and reasonably defined and false otherwise.
- * @param meterInfo meter info to check
+ * Returns true if item (meter or group) and map and reasonably defined and false otherwise.
+ * @param itemID ID to be used for logging errors
+ * @param type DataType to distinguish between meter and group
  * @param map map info to check
+ * @param gps GPS Point to check
  * @returns True if map is defined with origin & opposite and meter with valid GPS
  */
-export function meterMapInfoOk(meterInfo: { gps?: GPSPoint, meterID: number }, map: MapMetadata): boolean {
+export function itemMapInfoOk(itemID: number, type: DataType, map: MapMetadata, gps?: GPSPoint): boolean {
 	if (map === undefined) { return false; }
-	if ((meterInfo.gps === null || meterInfo.gps === undefined) || map.origin === undefined || map.opposite === undefined) { return false; }
-	if (!isValidGPSInput(`${meterInfo.gps.latitude},${meterInfo.gps.longitude}`)) {
-		logToServer('error', `Found invalid meter gps stored in database, id = ${meterInfo.meterID}`);
+	if ((gps === null || gps === undefined) || map.origin === undefined || map.opposite === undefined) { return false; }
+	if (!isValidGPSInput(`${gps.latitude},${gps.longitude}`)) {
+		logToServer('error', `Found invalid ${type === DataType.Meter ? 'meter' : 'group'} gps stored in database, id = ${itemID}`)();
 		return false;
 	}
 	return true;
@@ -86,7 +89,7 @@ export function meterMapInfoOk(meterInfo: { gps?: GPSPoint, meterID: number }, m
  * @param point The point being considered for display in user map grid coordinates.
  * @returns true if within map and false otherwise.
  */
-export function meterDisplayableOnMap(size: Dimensions, point: CartesianPoint): boolean {
+export function itemDisplayableOnMap(size: Dimensions, point: CartesianPoint): boolean {
 	// The user map is a rectangle that is parallel to the Plotly grid. Thus, the point
 	// must be above origin (bottom, left) and below the opposite (top, right) corner.
 	// The Plotly grid was set up so
@@ -132,11 +135,11 @@ export function isValidGPSInput(input: string): boolean {
  * @returns a pair {deltaX, deltaY} representing the GPS degree per unit (x, y)
  * 	on true north map grid.
  */
-export function calculateScaleFromEndpoints(origin: GPSPoint, opposite: GPSPoint, size: Dimensions): MapScale {
+export function calculateScaleFromEndpoints(origin: GPSPoint, opposite: GPSPoint, size: Dimensions, northAngle: number): MapScale {
 	// GPS values do not need to shift or rotate. The origin/opposite needs to be on the true north map.
 	// See calibrate function for the cartesian values used.
-	const originComplete: CalibratedPoint = { gps: origin, cartesian: trueNorthOrigin(size) };
-	const oppositeComplete: CalibratedPoint = { gps: opposite, cartesian: trueNorthOpposite(size) };
+	const originComplete: CalibratedPoint = { gps: origin, cartesian: trueNorthOrigin(size, northAngle) };
+	const oppositeComplete: CalibratedPoint = { gps: opposite, cartesian: trueNorthOpposite(size, northAngle) };
 	const scaleOfMap: MapScale = calculateScale(originComplete, oppositeComplete);
 	return scaleOfMap;
 }
@@ -149,10 +152,10 @@ export function calculateScaleFromEndpoints(origin: GPSPoint, opposite: GPSPoint
  * @param scaleOfMap The GPS degree per unit x, y on the true north map.
  * @returns x, y value of the gps point on the user map.
  */
-export function gpsToUserGrid(size: Dimensions, gps: GPSPoint, originGPS: GPSPoint, scaleOfMap: MapScale): CartesianPoint {
+export function gpsToUserGrid(size: Dimensions, gps: GPSPoint, originGPS: GPSPoint, scaleOfMap: MapScale, northAngle: number): CartesianPoint {
 	// We need the origin x, y value by starting from 0, 0 on the user map and
 	// shift/rotate into true north.
-	const originTrueNorth = trueNorthOrigin(size);
+	const originTrueNorth = trueNorthOrigin(size, northAngle);
 	// Now, convert from GPS to true north grid (x, y).
 	// Calculate how far the point is from origin and then the units for this distance.
 	const gridTrueNorth: CartesianPoint = {
@@ -161,7 +164,7 @@ export function gpsToUserGrid(size: Dimensions, gps: GPSPoint, originGPS: GPSPoi
 	};
 	// Now rotate to user map and shift so origin at bottom, left. Do - angle since going from
 	// true north to user map.
-	const userGrid: CartesianPoint = rotateShift(size, gridTrueNorth, 1, -trueNorthAngle.angle);
+	const userGrid: CartesianPoint = rotateShift(size, gridTrueNorth, 1, -northAngle);
 	return userGrid;
 }
 
@@ -174,7 +177,7 @@ export function gpsToUserGrid(size: Dimensions, gps: GPSPoint, originGPS: GPSPoi
  * @param imageDimensions The dimensions of the original map to use from the user.
  * @returns The error and the origin & opposite point in GPS to use for mapping.
  */
-export function calibrate(calibrationSet: CalibratedPoint[], imageDimensions: Dimensions): CalibrationResult {
+export function calibrate(calibrationSet: CalibratedPoint[], imageDimensions: Dimensions, northAngle: number): CalibrationResult {
 	// Normalize dimensions to grid used in Plotly
 	const normalizedDimensions = normalizeImageDimensions(imageDimensions);
 	// Array to hold the map scale for each pair of points.
@@ -187,8 +190,8 @@ export function calibrate(calibrationSet: CalibratedPoint[], imageDimensions: Di
 			// point to place on true north map (logical). The true north map
 			// leaves the origin at the center so no reverse shift. As always,
 			// need to shift before rotate so axis origin is in middle of map.
-			const p1TrueNorth: CartesianPoint = shiftRotate(normalizedDimensions, calibrationSet[i].cartesian, -1, trueNorthAngle.angle);
-			const p2TrueNorth: CartesianPoint = shiftRotate(normalizedDimensions, calibrationSet[j].cartesian, -1, trueNorthAngle.angle);
+			const p1TrueNorth: CartesianPoint = shiftRotate(normalizedDimensions, calibrationSet[i].cartesian, -1, northAngle);
+			const p2TrueNorth: CartesianPoint = shiftRotate(normalizedDimensions, calibrationSet[j].cartesian, -1, northAngle);
 			// Put the true north coordinates and gps together as needed for the function. Note the GPS
 			// value is the same on either map so it does not change.
 			const first: CalibratedPoint = { cartesian: p1TrueNorth, gps: calibrationSet[i].gps };
@@ -220,9 +223,9 @@ export function calibrate(calibrationSet: CalibratedPoint[], imageDimensions: Di
 	// As usual, first we shift since the rotation must be about the center.
 	// The coordinate starts at (0, 0) for the lower, left corner of the user map.
 	// TODO Is it okay to use the one point or would an average be better?
-	const clickedTrueNorth: CartesianPoint = shiftRotate(normalizedDimensions, calibrationSet[0].cartesian, -1, trueNorthAngle.angle);
+	const clickedTrueNorth: CartesianPoint = shiftRotate(normalizedDimensions, calibrationSet[0].cartesian, -1, northAngle);
 	// Now do the same with the origin. This is at (0, 0) on the user map.
-	const originTrueNorth = trueNorthOrigin(normalizedDimensions);
+	const originTrueNorth = trueNorthOrigin(normalizedDimensions, northAngle);
 	// Calculate the GPS value at the origin. This is done by taking the GPS of the point clicked
 	// and finding how far it is from the origin in grid units and then
 	// calculating that distance in GPS units.
@@ -241,7 +244,7 @@ export function calibrate(calibrationSet: CalibratedPoint[], imageDimensions: Di
 	// size coordinates.
 	// Similar to above but different point.
 	const opposite: CartesianPoint = { x: normalizedDimensions.width, y: normalizedDimensions.height }
-	const oppositeTrueNorth: CartesianPoint = shiftRotate(normalizedDimensions, opposite, -1, trueNorthAngle.angle);
+	const oppositeTrueNorth: CartesianPoint = shiftRotate(normalizedDimensions, opposite, -1, northAngle);
 	const oppositeCoordinate: GPSPoint = {
 		latitude: calibrationSet[0].gps.latitude + degreePerUnitY * (oppositeTrueNorth.y - clickedTrueNorth.y),
 		longitude: calibrationSet[0].gps.longitude + degreePerUnitX * (oppositeTrueNorth.x - clickedTrueNorth.x)
@@ -406,11 +409,11 @@ export function rotateShift(size: Dimensions, point: CartesianPoint, direction: 
  * @param size the normalized map dimensions
  * @returns The origin coordinates on the true north map
  */
-export function trueNorthOrigin(size: Dimensions): CartesianPoint {
+export function trueNorthOrigin(size: Dimensions, northAngle: number): CartesianPoint {
 	// Origin coordinate on user map is (0, 0).
 	const origin: CartesianPoint = { x: 0, y: 0 };
 	// Shift this value to center and then rotate to put on true north map.
-	return shiftRotate(size, origin, -1, trueNorthAngle.angle);
+	return shiftRotate(size, origin, -1, northAngle);
 }
 
 /**
@@ -420,16 +423,10 @@ export function trueNorthOrigin(size: Dimensions): CartesianPoint {
  * @param size the normalized map dimensions
  * @returns The opposite coordinates on the true north map
  */
-export function trueNorthOpposite(size: Dimensions): CartesianPoint {
+export function trueNorthOpposite(size: Dimensions, northAngle: number): CartesianPoint {
 	// The opposite coordinate is the size since it is in the top, right corner
 	// of the user map.
 	const opposite: CartesianPoint = { x: size.width, y: size.height }
 	// Shift this value to center and then rotate to put on true north map.
-	return shiftRotate(size, opposite, -1, trueNorthAngle.angle);
+	return shiftRotate(size, opposite, -1, northAngle);
 }
-
-
-// TODO The angle is hard coded but needs to come from the admin/DB.
-// This hack lets the angle be set to use elsewhere. For now leave so
-// no rotation.
-export const trueNorthAngle = { angle: 0.0 };

@@ -4,7 +4,7 @@
 
 import * as React from 'react';
 import { Button } from 'reactstrap';
-import { FormattedMessage } from 'react-intl';
+import { FormattedMessage, InjectedIntlProps, injectIntl } from 'react-intl';
 import { MeterMetadata, EditMeterDetailsAction } from '../../types/redux/meters';
 import { GPSPoint, isValidGPSInput } from '../../utils/calibration';
 import TimeZoneSelect from '../TimeZoneSelect';
@@ -29,8 +29,10 @@ interface MeterViewState {
 	identifierInput: string;
 }
 
-export default class MeterViewComponent extends React.Component<MeterViewProps, MeterViewState> {
-	constructor(props: MeterViewProps) {
+type MeterViewPropsWithIntl = MeterViewProps & InjectedIntlProps;
+
+class MeterViewComponent extends React.Component<MeterViewPropsWithIntl, MeterViewState> {
+	constructor(props: MeterViewPropsWithIntl) {
 		super(props);
 		this.state = {
 			gpsFocus: false,
@@ -66,11 +68,11 @@ export default class MeterViewComponent extends React.Component<MeterViewProps, 
 
 	private formatStatus(): string {
 		if (this.props.isSubmitting) {
-			return '(submitting)';
+			return '(' + this.props.intl.formatMessage({id: 'submitting'}) + ')';
 		}
 
 		if (this.props.isEdited) {
-			return '(edited)';
+			return this.props.intl.formatMessage({id: 'edited'});
 		}
 
 		return '';
@@ -312,3 +314,4 @@ export default class MeterViewComponent extends React.Component<MeterViewProps, 
 	}
 }
 
+export default injectIntl<MeterViewProps>(MeterViewComponent);

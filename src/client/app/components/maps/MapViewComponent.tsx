@@ -6,7 +6,7 @@ import * as React from 'react';
 import {Button} from 'reactstrap';
 import {Link} from 'react-router';
 import {hasToken} from '../../utils/token';
-import {FormattedMessage} from 'react-intl';
+import {FormattedMessage, InjectedIntlProps, injectIntl} from 'react-intl';
 import {CalibrationModeTypes, MapMetadata} from '../../types/redux/map';
 import * as moment from 'moment';
 
@@ -26,18 +26,25 @@ interface MapViewProps {
 interface MapViewState {
 	nameFocus: boolean;
 	nameInput: string;
+	circleFocus: boolean;
+	circleInput: string;
 	noteFocus: boolean;
 	noteInput: string;
 }
 
-export default class MapViewComponent extends React.Component<MapViewProps, MapViewState> {
-	constructor(props: MapViewProps) {
+type MapViewPropsWithIntl = MapViewProps & InjectedIntlProps;
+
+class MapViewComponent extends React.Component<MapViewPropsWithIntl, MapViewState> {
+	constructor(props: MapViewPropsWithIntl) {
 		super(props);
 		this.state = {
 			nameFocus: false,
 			nameInput: this.props.map.name,
 			noteFocus: false,
-			noteInput: (this.props.map.note) ? this.props.map.note : ''
+			noteInput: (this.props.map.note) ? this.props.map.note : '',
+			circleFocus: false,
+			// circleSize should always be a valid string due to how stored and mapRow.
+			circleInput: this.props.map.circleSize.toString()
 		};
 		this.handleCalibrationSetting = this.handleCalibrationSetting.bind(this);
 		this.toggleMapDisplayable = this.toggleMapDisplayable.bind(this);
@@ -46,6 +53,8 @@ export default class MapViewComponent extends React.Component<MapViewProps, MapV
 		this.toggleNoteInput = this.toggleNoteInput.bind(this);
 		this.handleNoteChange = this.handleNoteChange.bind(this);
 		this.toggleDelete = this.toggleDelete.bind(this);
+		this.handleSizeChange = this.handleSizeChange.bind(this);
+		this.toggleCircleInput = this.toggleCircleInput.bind(this);
 	}
 
 	public render() {
@@ -54,6 +63,7 @@ export default class MapViewComponent extends React.Component<MapViewProps, MapV
 				<td> {this.props.map.id} {this.formatStatus()}</td>
 				<td> {this.formatName()} </td>
 				{hasToken() && <td> {this.formatDisplayable()} </td>}
+				{hasToken() && <td> {this.formatCircleSize()} </td>}
 				{hasToken() && <td> {moment(this.props.map.modifiedDate).format('dddd, MMM DD, YYYY hh:mm a')} </td>}
 				{hasToken() && <td> {this.formatFilename()} </td>}
 				{hasToken() && <td> {this.formatNote()} </td>}
@@ -63,18 +73,87 @@ export default class MapViewComponent extends React.Component<MapViewProps, MapV
 		);
 	}
 
+	private handleSizeChange(event: React.ChangeEvent<HTMLTextAreaElement>) {
+		this.setState({circleInput: event.target.value});
+	}
+
+	private toggleCircleInput() {
+		let checkval: boolean = true;
+		// if trying to submit an updated value
+		if (this.state.circleFocus) {
+			const regtest = /^\d+(\.\d+)?$/;
+			checkval = regtest.test(this.state.circleInput);
+			if (checkval) {
+				if (parseFloat(this.state.circleInput) > 2.0) {
+					checkval = false;
+				}
+				else {
+					const editedMap = {
+						...this.props.map,
+						circleSize: parseFloat(this.state.circleInput)
+					};
+					this.props.editMapDetails(editedMap);
+				}
+			}
+		}
+		if (checkval) {
+			this.setState({circleFocus: !this.state.circleFocus});
+		}
+		else {
+			window.alert(`${this.props.intl.formatMessage({id: 'invalid.number'})}`);
+		}
+	}
+
+	private formatCircleSize() {
+		let formattedCircleSize;
+		let buttonMessageId;
+		if (this.state.circleFocus) {
+			// default value for autoFocus is true and for all attributes that would be set autoFocus={true}
+			formattedCircleSize = <textarea id={'csize'} autoFocus value={this.state.circleInput} onChange={event => this.handleSizeChange(event)}/>;
+			buttonMessageId = 'update';
+		} else {
+			formattedCircleSize = <div>{this.state.circleInput}</div>;
+			buttonMessageId = 'edit';
+		}
+
+		let toggleButton;
+		if (hasToken()) {
+			toggleButton = <Button style={this.styleToggleBtn()} color='primary' onClick={this.toggleCircleInput}>
+				<FormattedMessage id={buttonMessageId} />
+			</Button>;
+		} else {
+			toggleButton = <div />;
+		}
+
+		if (hasToken()) {
+			return (
+				<div>
+					{formattedCircleSize}
+					{toggleButton}
+				</div>
+			);
+		} else {
+			return (
+				<div>
+					{this.props.map.circleSize}
+					{toggleButton}
+				</div>
+			);
+		}
+	}
+
 	private formatStatus(): string {
 		if (this.props.isSubmitting) {
-			return '(submitting)';
+			return '(' + this.props.intl.formatMessage({id: 'submitting'}) + ')';
 		}
 		if (this.props.isEdited) {
-			return '(edited)';
+			return this.props.intl.formatMessage({id: 'edited'});
 		}
 		return '';
 	}
 
 	private toggleDelete() {
-		const consent = window.confirm(`Are you sure you want to remove map "${this.props.map.name}"?`);
+		const consent = window.confirm(`${this.props.intl.formatMessage({id: 'map.confirm.remove'})} "${this.props.map.name}"?`);
 		if (consent) { this.props.removeMap(this.props.id); }
 	}
 
@@ -297,3 +376,5 @@ export default class MapViewComponent extends React.Component<MapViewProps, MapV
 		this.props.setCalibration(mode, this.props.id);
 	}
 }
+
+export default injectIntl<MapViewProps>(MapViewComponent);

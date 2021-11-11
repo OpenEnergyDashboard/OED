@@ -6,7 +6,7 @@
  * inserting meters prior to executing the test code. */
 
 const { chai, mocha, expect, app, testDB, testUser } = require('../common');
-const Map = require('../../models/Map');
+const { Map } = require('../../models/Map');
 const User = require('../../models/User');
 const bcrypt = require('bcryptjs');
 const Point = require('../../models/Point');
@@ -43,7 +43,7 @@ function expectMapsToBeEquivalent(maps, length) {
 		expectPointsToBeEquivalent(map.opposite, opposite);
 		expect(map).to.have.property('mapSource', 'placeholder');
 		expect(map).to.have.property('northAngle', i + 1);
-		expect(map).to.have.property('maxCircleSizeFraction', (i + 1) / 10);
+		expect(map).to.have.property('circleSize', (i + 1) / 10);
 	}
 }
 

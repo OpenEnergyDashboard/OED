@@ -7,8 +7,8 @@ import { connect } from 'react-redux';
 import PlotlyChart, { IPlotlyChartProps } from 'react-plotlyjs-ts';
 import { State } from '../types/redux/state';
 import {
-	calculateScaleFromEndpoints, meterDisplayableOnMap, Dimensions,
-	CartesianPoint, normalizeImageDimensions, meterMapInfoOk, gpsToUserGrid
+	calculateScaleFromEndpoints, itemDisplayableOnMap, Dimensions,
+	CartesianPoint, normalizeImageDimensions, itemMapInfoOk, gpsToUserGrid
 } from '../utils/calibration';
 import * as _ from 'lodash';
 import getGraphColor from '../utils/getGraphColor';
@@ -64,7 +64,7 @@ function mapStateToProps(state: State) {
 			// Get the GPS degrees per unit of Plotly grid for x and y. By knowing the two corners
 			// (or really any two distinct points) you can calculate this by the change in GPS over the
 			// change in x or y which is the map's width & height in this case.
-			const scaleOfMap = calculateScaleFromEndpoints(origin, opposite, imageDimensionNormalized);
+			const scaleOfMap = calculateScaleFromEndpoints(origin, opposite, imageDimensionNormalized, map.northAngle);
 			// Loop over all selected meters. Maps only work for meters at this time.
 			for (const meterID of state.graph.selectedMeters) {
 				// Get meter id number.
@@ -78,9 +78,9 @@ function mapStateToProps(state: State) {
 					// It must be on true north map since only there are the GPS axis parallel to the map axis.
 					// To start, calculate the user grid coordinates (Plotly) from the GPS value. This involves calculating
 					// it coordinates on the true north map and then rotating/shifting to the user map.
-					const meterGPSInUserGrid: CartesianPoint = gpsToUserGrid(imageDimensionNormalized, gps, origin, scaleOfMap);
+					const meterGPSInUserGrid: CartesianPoint = gpsToUserGrid(imageDimensionNormalized, gps, origin, scaleOfMap, map.northAngle);
 					// Only display items within valid info and within map.
-					if (meterMapInfoOk({ gps, meterID }, map) && meterDisplayableOnMap(imageDimensionNormalized, meterGPSInUserGrid)) {
+					if (itemMapInfoOk(meterID, DataType.Meter, map, gps) && itemDisplayableOnMap(imageDimensionNormalized, meterGPSInUserGrid)) {
 						// The x, y value for Plotly to use that are on the user map.
 						x.push(meterGPSInUserGrid.x);
 						y.push(meterGPSInUserGrid.y);
@@ -123,11 +123,67 @@ function mapStateToProps(state: State) {
 				}
 			}
 
+			for (const groupID of state.graph.selectedGroups) {
+				// Get group id number.
+				const byGroupID = state.readings.bar.byGroupID[groupID];
+				// Get group GPS value.
+				const gps = state.groups.byGroupID[groupID].gps;
+				// Filter groups with actual gps coordinates.
+				if (gps !== undefined && gps !== null) {
+					// Convert the gps value to the equivalent Plotly grid coordinates on user map.
+					// First, convert from GPS to grid units. Since we are doing a GPS calculation, this happens on the true north map.
+					// It must be on true north map since only there are the GPS axis parallel to the map axis.
+					// To start, calculate the user grid coordinates (Plotly) from the GPS value. This involves calculating
+					// it coordinates on the true north map and then rotating/shifting to the user map.
+					const groupGPSInUserGrid: CartesianPoint = gpsToUserGrid(imageDimensionNormalized, gps, origin, scaleOfMap, map.northAngle);
+					// Only display items within valid info and within map.
+					if (itemMapInfoOk(groupID, DataType.Group, map, gps) && itemDisplayableOnMap(imageDimensionNormalized, groupGPSInUserGrid)) {
+						// The x, y value for Plotly to use that are on the user map.
+						x.push(groupGPSInUserGrid.x);
+						y.push(groupGPSInUserGrid.y);
+						// Get the bar data to use for the map circle.
+						const readingsData = byGroupID[timeInterval.toString()][barDuration.toISOString()];
+						if (readingsData !== undefined && !readingsData.isFetching) {
+							// Group name to include in hover on graph.
+							const label = state.groups.byGroupID[groupID].name;
+							// The usual color for this group.
+							colors.push(getGraphColor(groupID, DataType.Group));
+							if (readingsData.readings === undefined) {
+								throw new Error('Unacceptable condition: readingsData.readings is undefined.');
+							}
+							// Use the most recent time reading for the circle on the map.
+							// This has the limitations of the bar value where the last one can include ranges without
+							// data (GitHub issue on this).
+							// TODO: It might be better to do this similarly to compare. (See GitHub issue)
+							const readings = _.orderBy(readingsData.readings, ['startTimestamp'], ['desc']);
+							const mapReading = readings[0];
+							let timeReading: string;
+							let averagedReading = 0;
+							if (readings.length === 0) {
+								// No data. The next lines causes an issue so set specially.
+								// There may be a better overall fix for no data.
+								timeReading = 'no data to display';
+								size.push(0);
+							} else {
+								// Shift to UTC since want database time not local/browser time which is what moment does.
+								timeReading =
+								`${moment(mapReading.startTimestamp).utc().format('LL')} - ${moment(mapReading.endTimestamp).utc().format('LL')}`;
+								// The value for the circle is the average daily usage.
+								averagedReading = mapReading.reading / barDuration.asDays();
+								// The size is the reading value. It will be scaled later.
+								size.push(averagedReading);
+							}
+							// The hover text.
+							texts.push(`<b> ${timeReading} </b> <br> ${label}: ${averagedReading.toPrecision(6)} kWh/day`);
+						}
+					}
+				}
+			}
 			// TODO Using the following seems to have no impact on the code. It has been noticed that this function is called
 			// many times for each change. Someone should look at why that is happening and why some have no items in the arrays.
 			// if (size.length > 0) {
 			// TODO The max circle diameter should come from admin/DB.
-			const maxFeatureFraction = 0.15;
+			const maxFeatureFraction = map.circleSize;
 			// Find the smaller of width and height. This is used since it means the circle size will be
 			// scaled to that dimension and smaller relative to the other coordinate.
 			const minDimension = Math.min(imageDimensionNormalized.width, imageDimensionNormalized.height);
@@ -168,7 +224,6 @@ function mapStateToProps(state: State) {
 				showlegend: false
 			};
 			data.push(traceOne);
-			// }
 		}
 	}
 

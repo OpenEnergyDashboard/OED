@@ -8,6 +8,7 @@ import { Button, Input, Table } from 'reactstrap';
 import CreateUserLinkButtonComponent from './users/CreateUserLinkButtonComponent';
 import TooltipHelpContainerAlternative from '../../containers/TooltipHelpContainerAlternative';
 import TooltipMarkerComponent from '../TooltipMarkerComponent';
+import { FormattedMessage } from 'react-intl';
 
 interface UserDisplayComponentProps {
 	users: User[];
@@ -42,7 +43,7 @@ export default function UserDetailComponent(props: UserDisplayComponentProps) {
 			<TooltipHelpContainerAlternative page='users' />
 			<div className='container-fluid'>
 				<h2 style={titleStyle}>
-					Users
+					<FormattedMessage id='users'/>
 					<div style={tooltipStyle}>
 						<TooltipMarkerComponent page='users' helpTextId='help.admin.user' />
 					</div>
@@ -51,9 +52,9 @@ export default function UserDetailComponent(props: UserDisplayComponentProps) {
 					<Table striped bordered hover>
 						<thead>
 							<tr>
-								<th> Email </th>
-								<th> Role </th>
-								<th> Action </th>
+								<th> <FormattedMessage id='email'/> </th>
+								<th> <FormattedMessage id='role'/> </th>
+								<th> <FormattedMessage id='action'/> </th>
 							</tr>
 						</thead>
 						<tbody>
@@ -67,14 +68,20 @@ export default function UserDetailComponent(props: UserDisplayComponentProps) {
 											))}
 										</Input>
 									</td>
-									<td><Button color='danger' onClick={() => { props.deleteUser(user.email); }}>Delete User</Button></td>
+									<td>
+										<Button color='danger' onClick={() => { props.deleteUser(user.email); }}>
+											<FormattedMessage id='delete.user'/>
+										</Button>
+									</td>
 								</tr>
 							))}
 						</tbody>
 					</Table>
 					<div style={buttonsStyle}>
 						<CreateUserLinkButtonComponent />
-						<Button color='success' disabled={!props.edited} onClick={props.submitUserEdits}> Save role changes </Button>
+						<Button color='success' disabled={!props.edited} onClick={props.submitUserEdits}>
+							<FormattedMessage id='save.role.changes'/>
+						</Button>
 					</div>
 				</div>
 			</div>
