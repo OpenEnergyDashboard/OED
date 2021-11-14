@@ -3,11 +3,11 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
 
 import * as React from 'react';
-import {Button} from 'reactstrap';
-import {Link} from 'react-router';
-import {hasToken} from '../../utils/token';
-import {FormattedMessage, InjectedIntlProps, injectIntl} from 'react-intl';
-import {CalibrationModeTypes, MapMetadata} from '../../types/redux/map';
+import { Button } from 'reactstrap';
+import { Link } from 'react-router';
+import { hasToken } from '../../utils/token';
+import { FormattedMessage, InjectedIntlProps, injectIntl } from 'react-intl';
+import { CalibrationModeTypes, MapMetadata } from '../../types/redux/map';
 import * as moment from 'moment';
 
 interface MapViewProps {
@@ -75,7 +75,7 @@ class MapViewComponent extends React.Component<MapViewPropsWithIntl, MapViewStat
 	}
 
 	private handleSizeChange(event: React.ChangeEvent<HTMLTextAreaElement>) {
-		this.setState({circleInput: event.target.value});
+		this.setState({ circleInput: event.target.value });
 	}
 
 	private toggleCircleInput() {
@@ -98,10 +98,10 @@ class MapViewComponent extends React.Component<MapViewPropsWithIntl, MapViewStat
 			}
 		}
 		if (checkval) {
-			this.setState({circleFocus: !this.state.circleFocus});
+			this.setState({ circleFocus: !this.state.circleFocus });
 		}
 		else {
-			window.alert(`${this.props.intl.formatMessage({id: 'invalid.number'})}`);
+			window.alert(`${this.props.intl.formatMessage({ id: 'invalid.number' })}`);
 		}
 	}
 
@@ -110,7 +110,7 @@ class MapViewComponent extends React.Component<MapViewPropsWithIntl, MapViewStat
 		let buttonMessageId;
 		if (this.state.circleFocus) {
 			// default value for autoFocus is true and for all attributes that would be set autoFocus={true}
-			formattedCircleSize = <textarea id={'csize'} autoFocus value={this.state.circleInput} onChange={event => this.handleSizeChange(event)}/>;
+			formattedCircleSize = <textarea id={'csize'} autoFocus value={this.state.circleInput} onChange={event => this.handleSizeChange(event)} />;
 			buttonMessageId = 'update';
 		} else {
 			formattedCircleSize = <div>{this.state.circleInput}</div>;
@@ -145,16 +145,16 @@ class MapViewComponent extends React.Component<MapViewPropsWithIntl, MapViewStat
 
 	private formatStatus(): string {
 		if (this.props.isSubmitting) {
-			return '(' + this.props.intl.formatMessage({id: 'submitting'}) + ')';
+			return '(' + this.props.intl.formatMessage({ id: 'submitting' }) + ')';
 		}
 		if (this.props.isEdited) {
-			return this.props.intl.formatMessage({id: 'edited'});
+			return this.props.intl.formatMessage({ id: 'edited' });
 		}
 		return '';
 	}
 
 	private toggleDelete() {
-		const consent = window.confirm(`${this.props.intl.formatMessage({id: 'map.confirm.remove'})} "${this.props.map.name}"?`);
+		const consent = window.confirm(`${this.props.intl.formatMessage({ id: 'map.confirm.remove' })} "${this.props.map.name}"?`);
 		if (consent) { this.props.removeMap(this.props.id); }
 	}
 
@@ -165,7 +165,7 @@ class MapViewComponent extends React.Component<MapViewPropsWithIntl, MapViewStat
 		};
 		return <Button style={editButtonStyle} color='primary' onClick={this.toggleDelete}>
 			<FormattedMessage id={'delete.map'} />
-			</Button>;
+		</Button>;
 	}
 
 	private styleEnabled(): React.CSSProperties {
@@ -173,7 +173,7 @@ class MapViewComponent extends React.Component<MapViewPropsWithIntl, MapViewStat
 	}
 
 	private styleDisabled(): React.CSSProperties {
-			return { color: 'red' };
+		return { color: 'red' };
 	}
 
 	private styleToggleBtn(): React.CSSProperties {
@@ -208,13 +208,13 @@ class MapViewComponent extends React.Component<MapViewPropsWithIntl, MapViewStat
 			// throw out alert if the admin wants to display uncalibrated map
 			if (!(this.props.map.origin && this.props.map.opposite)) {
 				toggleButton = <Button style={this.styleToggleBtn()} color='primary' onClick={this.notifyCalibrationNeeded}>
-				<FormattedMessage id={buttonMessageId} />
+					<FormattedMessage id={buttonMessageId} />
 				</Button>;
 			}
 			// if map is already calibrated, the button will allow it to be displayed
 			else {
-			toggleButton = <Button style={this.styleToggleBtn()} color='primary' onClick={this.toggleMapDisplayable}>
-				<FormattedMessage id={buttonMessageId} />
+				toggleButton = <Button style={this.styleToggleBtn()} color='primary' onClick={this.toggleMapDisplayable}>
+					<FormattedMessage id={buttonMessageId} />
 				</Button>;
 			}
 		} else {
@@ -223,17 +223,17 @@ class MapViewComponent extends React.Component<MapViewPropsWithIntl, MapViewStat
 
 		return (
 			<span>
-			<span style={styleFn()}>
-				<FormattedMessage id={messageId} />
-			</span>
-			{toggleButton}
+				<span style={styleFn()}>
+					<FormattedMessage id={messageId} />
+				</span>
+				{toggleButton}
 			</span>
 		);
 	}
 
 	// this function throws alert on the browser notifying that map needs calibrating before display
 	private notifyCalibrationNeeded() {
-		window.alert(`${this.props.intl.formatMessage({id: 'notify.calibration.needed'})} "${this.props.map.name}"`);
+		window.alert(`${this.props.intl.formatMessage({ id: 'map.notify.calibration.needed' })} "${this.props.map.name}"`);
 	}
 
 	private toggleNameInput() {
@@ -244,11 +244,11 @@ class MapViewComponent extends React.Component<MapViewPropsWithIntl, MapViewStat
 			};
 			this.props.editMapDetails(editedMap);
 		}
-		this.setState({nameFocus: !this.state.nameFocus});
+		this.setState({ nameFocus: !this.state.nameFocus });
 	}
 
 	private handleNameChange(event: React.ChangeEvent<HTMLTextAreaElement>) {
-		this.setState({ nameInput: event.target.value});
+		this.setState({ nameInput: event.target.value });
 	}
 
 	private formatName() {
@@ -256,7 +256,7 @@ class MapViewComponent extends React.Component<MapViewPropsWithIntl, MapViewStat
 		let buttonMessageId;
 		if (this.state.nameFocus) {
 			// default value for autoFocus is true and for all attributes that would be set autoFocus={true}
-			formattedName = <textarea id={'name'} autoFocus value={this.state.nameInput} onChange={event => this.handleNameChange(event)}/>;
+			formattedName = <textarea id={'name'} autoFocus value={this.state.nameInput} onChange={event => this.handleNameChange(event)} />;
 			buttonMessageId = 'update';
 		} else {
 			formattedName = <div>{this.state.nameInput}</div>;
@@ -297,11 +297,11 @@ class MapViewComponent extends React.Component<MapViewPropsWithIntl, MapViewStat
 			};
 			this.props.editMapDetails(editedMap);
 		}
-		this.setState({noteFocus: !this.state.noteFocus});
+		this.setState({ noteFocus: !this.state.noteFocus });
 	}
 
 	private handleNoteChange(event: React.ChangeEvent<HTMLTextAreaElement>) {
-		this.setState({ noteInput: event.target.value});
+		this.setState({ noteInput: event.target.value });
 	}
 
 	private formatNote() {
@@ -309,7 +309,7 @@ class MapViewComponent extends React.Component<MapViewPropsWithIntl, MapViewStat
 		let buttonMessageId;
 		if (this.state.noteFocus) {
 			// default value for autoFocus is true and for all attributes that would be set autoFocus={true}
-			formattedNote = <textarea id={'note'} autoFocus value={this.state.noteInput} onChange={event => this.handleNoteChange(event)}/>;
+			formattedNote = <textarea id={'note'} autoFocus value={this.state.noteInput} onChange={event => this.handleNoteChange(event)} />;
 			buttonMessageId = 'update';
 		} else {
 			formattedNote = <div>{this.state.noteInput}</div>;
