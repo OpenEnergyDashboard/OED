@@ -15,17 +15,33 @@ import { UserRole } from '../types/items';
  */
 
 function convertToCSV(items: ExportDataSet[]) {
-	let csvOutput = 'Label,Readings,Start Timestamp\n';
-	items.forEach(set => {
-		const data = set.exportVals;
-		const label = set.label;
-		data.forEach(reading => {
-			const info = reading.y;
-			const startTimeStamp = moment(reading.x).utc().format('dddd LL LTS').replace(/,/g,''); // use regex to omit pesky commas
-			csvOutput += `"${label}",${info},${startTimeStamp}\n`; // TODO: add column for units
+	// Export line chart
+	if (items[0].exportVals[0].z == undefined) {
+		let csvOutput = 'Label,Readings,Start Timestamp\n';
+		items.forEach(set => {
+			const data = set.exportVals;
+			const label = set.label;
+			data.forEach(reading => {
+				const info = reading.y;
+				const startTimeStamp = moment(reading.x).utc().format('dddd LL LTS').replace(/,/g,''); // use regex to omit pesky commas
+				csvOutput += `"${label}",${info},${startTimeStamp}\n`; // TODO: add column for units
+			});
 		});
-	});
-	return csvOutput;
+		return csvOutput;
+	} else {
+		let csvOutput = 'Label,Readings,Start Timestamp,End Timestamp\n';
+		items.forEach(set => {
+			const data = set.exportVals;
+			const label = set.label;
+			data.forEach(reading => {
+				const info = reading.y;
+				const startTimeStamp = moment(reading.x).utc().format('dddd LL LTS').replace(/,/g,''); // use regex to omit pesky commas
+				const endTimeStamp = moment(reading.z).utc().format('dddd LL LTS').replace(/,/g,'');
+				csvOutput += `"${label}",${info},${startTimeStamp},${endTimeStamp}\n`; // TODO: add column for units
+			});
+		});
+		return csvOutput;
+	}
 }
 /**
  * Function to download the formatted CSV file to the users computer.

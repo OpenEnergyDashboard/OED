@@ -15,8 +15,8 @@ function transformLineReadingToLegacy(reading: CompressedLineReading): [number, 
 	return [reading.startTimestamp, reading.reading];
 }
 
-function transformBarReadingToLegacy(reading: CompressedBarReading): [number, number] {
-	return [reading.startTimestamp, reading.reading];
+function transformBarReadingToLegacy(reading: CompressedBarReading): [number, number, number] {
+	return [reading.startTimestamp, reading.reading, reading.endTimestamp];
 }
 
 /**
@@ -41,9 +41,9 @@ function mapStateToProps(state: State) {
 					}
 
 					/* tslint:disable:array-type */
-					const dataPoints: Array<{ x: number, y: number }> = _.values(readingsData.readings)
+					const dataPoints: Array<{ x: number, y: number}> = _.values(readingsData.readings)
 						.map(transformLineReadingToLegacy)
-						.map((v: [number, number]) => ({ x: v[0], y: v[1] })
+						.map((v: [number, number]) => ({ x: v[0], y: v[1]})
 						);
 					/* tslint:enable:array-type */
 					datasets.push({
@@ -66,10 +66,10 @@ function mapStateToProps(state: State) {
 					}
 
 					/* tslint:disable:array-type */
-					const dataPoints: Array<{ x: number, y: number }> = _.values(readingsData.readings)
+					const dataPoints: Array<{ x: number, y: number}> = _.values(readingsData.readings)
 						.map(transformLineReadingToLegacy)
 						.map(
-							(v: [number, number]) => ({ x: v[0], y: v[1] })
+							(v: [number, number]) => ({ x: v[0], y: v[1]})
 						);
 					/* tslint:enable:array-type */
 					datasets.push({
@@ -95,9 +95,9 @@ function mapStateToProps(state: State) {
 						}
 
 						/* tslint:disable:array-type */
-						const dataPoints: Array<{ x: number, y: number }> = _.values(readingsData.readings)
+						const dataPoints: Array<{ x: number, y: number, z: number }> = _.values(readingsData.readings)
 							.map(transformBarReadingToLegacy)
-							.map((v: [number, number]) => ({ x: v[0], y: v[1] })
+							.map((v: [number, number, number]) => ({ x: v[0], y: v[1], z: v[2] })
 							);
 						/* tslint:enable:array-type */
 						datasets.push({
@@ -123,9 +123,9 @@ function mapStateToProps(state: State) {
 						}
 
 						/* tslint:disable:array-type */
-						const dataPoints: Array<{ x: number, y: number }> = _.values(readingsData.readings)
+						const dataPoints: Array<{ x: number, y: number, z: number }> = _.values(readingsData.readings)
 							.map(transformBarReadingToLegacy)
-							.map((v: [number, number]) => ({ x: v[0], y: v[1] })
+							.map((v: [number, number, number]) => ({ x: v[0], y: v[1], z: v[2] })
 							);
 						/* tslint:enable:array-type */
 						datasets.push({
