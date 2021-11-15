@@ -133,6 +133,8 @@ export interface GroupData {
 	childGroups: number[];
 	gps?: GPSPoint;
 	displayable: boolean;
+	note?: string;
+	area?: number;
 }
 
 export interface GroupID {

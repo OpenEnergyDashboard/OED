@@ -284,7 +284,9 @@ export function submitGroupInEditingIfNeeded() {
 				childGroups: rawGroup.childGroups,
 				childMeters: rawGroup.childMeters,
 				gps: rawGroup.gps,
-				displayable: rawGroup.displayable
+				displayable: rawGroup.displayable,
+				note: rawGroup.note,
+				area: rawGroup.area
 			};
 			if (creatingNewGroup(getState())) {
 				return dispatch(submitNewGroup(group));

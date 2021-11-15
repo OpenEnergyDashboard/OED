@@ -148,6 +148,10 @@ export default function groups(state = defaultState, action: GroupsAction) {
 						// True when a request to insert the changes into the DB has been sent
 						submitted: false,
 						name: '',
+						gpsInput: '',
+						displayableStatus: true,
+						groupNote: '',
+						groupArea: '',
 						childGroups: [],
 						childMeters: []
 					}

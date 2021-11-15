@@ -23,12 +23,29 @@ interface CreateGroupProps {
 	changeDisplayModeToView(): ChangeDisplayModeAction;
 }
 
+interface CreateGroupState {
+	gpsInput: string;
+	displayableStatus: boolean;
+	groupNote: string;
+	groupArea: string;
+}
+
 type CreateGroupPropsWithIntl = CreateGroupProps & InjectedIntlProps;
 
-class CreateGroupComponent extends React.Component<CreateGroupPropsWithIntl, {}> {
+class CreateGroupComponent extends React.Component<CreateGroupPropsWithIntl, CreateGroupState> {
 	constructor(props: CreateGroupPropsWithIntl) {
 		super(props);
+		this.state = {
+			displayableStatus: true,
+			gpsInput: '',
+			groupNote: '',
+			groupArea: ''
+		};
 		this.handleNameChange = this.handleNameChange.bind(this);
+		this.handleGPSChange = this.handleGPSChange.bind(this);
+		this.handleDisplayChange = this.handleDisplayChange.bind(this);
+		this.handleNoteChange = this.handleNoteChange.bind(this);
+		this.handleAreaChange = this.handleAreaChange.bind(this);
 		this.handleCreateGroup = this.handleCreateGroup.bind(this);
 		this.handleReturnToView = this.handleReturnToView.bind(this);
 	}
@@ -41,6 +58,9 @@ class CreateGroupComponent extends React.Component<CreateGroupPropsWithIntl, {}>
 		const divStyle: React.CSSProperties = {
 			paddingTop: '35px'
 		};
+		const divFlexStyle: React.CSSProperties = {
+			display: 'flex'
+		}
 		const divBottomStyle: React.CSSProperties = {
 			marginBottom: '20px'
 		};
@@ -50,6 +70,9 @@ class CreateGroupComponent extends React.Component<CreateGroupPropsWithIntl, {}>
 		};
 		const centerTextStyle: React.CSSProperties = {
 			textAlign: 'center'
+		};
+		const textAreaStyle: React.CSSProperties = {
+			paddingLeft: '2px'
 		};
 		const messages = defineMessages({ name: { id: 'name' }});
 		return (
@@ -61,12 +84,45 @@ class CreateGroupComponent extends React.Component<CreateGroupPropsWithIntl, {}>
 						<h3 style={centerTextStyle}>
 							<FormattedMessage id='create.group' />
 						</h3>
-						<div style={divBottomStyle}>
+					</div>
+					<div style={divFlexStyle} className='row col-6'>
+						<div style={divBottomStyle} className='col-4 float-left'>
 							<p style={textStyle}>
 								<FormattedMessage id='name' />:
 							</p>
 							<Input type='text' placeholder={this.props.intl.formatMessage(messages.name)} onChange={this.handleNameChange} />
 						</div>
+						<div style={divBottomStyle} className='col-4'>
+							<p style={textStyle}>
+								<FormattedMessage id='group.gps' />:
+							</p>
+							<Input type='text' onChange={this.handleGPSChange} />
+						</div>
+					</div>
+					<div style={divFlexStyle} className='row col-6'>
+						<div style={divBottomStyle} className='col-4 float-left'>
+							<p style={textStyle}>
+								<FormattedMessage id='displayable' />:
+							</p>
+							<Input type='select' name='displayselect' onChange={this.handleDisplayChange}>
+								<option value='true'> True </option>
+								<option value='false'> False </option>
+							</Input>
+						</div>
+						<div style={divBottomStyle} className='col-4'>
+							<p style={textStyle}>
+								<FormattedMessage id='map.note' />:
+							</p>
+							<textarea className='col-12' style={textAreaStyle} onChange={this.handleNoteChange} />
+						</div>
+						<div style={divBottomStyle} className='col-4'>
+							<p style={textStyle}>
+								<FormattedMessage id='area' />:
+							</p>
+							<Input type='text' onChange={this.handleAreaChange}/>
+						</div>
+					</div>
+					<div className='col-6'>
 						<div style={divBottomStyle}>
 							<p style={textStyle}>
 								<FormattedMessage id='select.meters' />:
@@ -107,8 +163,38 @@ class CreateGroupComponent extends React.Component<CreateGroupPropsWithIntl, {}>
 		}
 	}
 
+	private handleGPSChange(e: React.ChangeEvent<HTMLInputElement>) {
+		this.setState({ gpsInput: e.target.value });
+	}
+
+	private handleDisplayChange(e: React.ChangeEvent<HTMLInputElement>) {
+		this.setState({ displayableStatus: (e.target.value === 'true') });
+	}
+
+	private handleNoteChange(e: React.ChangeEvent<HTMLTextAreaElement>) {
+		this.setState({ groupNote: e.target.value });
+	}
+
+	private handleAreaChange(e: React.ChangeEvent<HTMLInputElement>) {
+		this.setState({ groupArea: e.target.value });
+	}
+
 	private handleCreateGroup() {
-		this.props.submitGroupInEditingIfNeeded();
+		// need to check gps and area
+		// gps and area are still optional so check if blank
+		const pattern = /^(\()?\d+\,\d+(\))?$/;
+		if (this.state.gpsInput === '' || this.state.gpsInput.match(pattern)) {
+			const pattern2 = /^\d+(\.\d+)?$/;
+			if (this.state.groupArea.match(pattern2) || this.state.groupArea === '') {
+				// this.props.submitGroupInEditingIfNeeded();
+			}
+			else {
+				window.alert(this.props.intl.formatMessage({id: 'area.error'}));
+			}
+		}
+		else {
+			window.alert(this.props.intl.formatMessage({id: 'group.gps.error'}));
+		}
 	}
 
 	private handleReturnToView() {
