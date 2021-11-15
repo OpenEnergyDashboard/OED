@@ -8,28 +8,30 @@ import DatasourceBoxContainer from '../../containers/groups/DatasourceBoxContain
 import { SelectionType } from '../../containers/groups/DatasourceBoxContainer';
 import { NamedIDItem } from '../../types/items';
 import { CreateNewBlankGroupAction, EditGroupNameAction,
-	EditGroupGPSAction, EditGroupDisplayableAction, ChangeDisplayModeAction } from '../../types/redux/groups';
+	EditGroupGPSAction, EditGroupDisplayableAction, EditGroupNoteAction, 
+	EditGroupAreaAction, ChangeDisplayModeAction } from '../../types/redux/groups';
 import HeaderContainer from '../../containers/HeaderContainer';
 import FooterContainer from '../../containers/FooterContainer';
 import { browserHistory } from '../../utils/history';
 import { FormattedMessage, InjectedIntlProps, injectIntl, defineMessages } from 'react-intl';
 import TooltipHelpContainerAlternative from '../../containers/TooltipHelpContainerAlternative';
+import { GPSPoint } from 'utils/calibration';
 
 interface CreateGroupProps {
 	meters: NamedIDItem[];
 	groups: NamedIDItem[];
 	createNewBlankGroup(): CreateNewBlankGroupAction;
 	editGroupName(name: string): EditGroupNameAction;
-	editGroupGPS(gps: string): EditGroupGPSAction;
+	editGroupGPS(gps: GPSPoint): EditGroupGPSAction;
 	editGroupDisplayable(display: boolean): EditGroupDisplayableAction;
+	editGroupNote(note: string): EditGroupNoteAction;
+	editGroupArea(area: number): EditGroupAreaAction;
 	submitGroupInEditingIfNeeded(): Promise<any>;
 	changeDisplayModeToView(): ChangeDisplayModeAction;
 }
 
 interface CreateGroupState {
 	gpsInput: string;
-	displayableStatus: boolean;
-	groupNote: string;
 	groupArea: string;
 }
 
@@ -39,9 +41,7 @@ class CreateGroupComponent extends React.Component<CreateGroupPropsWithIntl, Cre
 	constructor(props: CreateGroupPropsWithIntl) {
 		super(props);
 		this.state = {
-			displayableStatus: true,
 			gpsInput: '',
-			groupNote: '',
 			groupArea: ''
 		};
 		this.handleNameChange = this.handleNameChange.bind(this);
@@ -168,12 +168,6 @@ class CreateGroupComponent extends React.Component<CreateGroupPropsWithIntl, Cre
 
 	private handleGPSChange(e: React.ChangeEvent<HTMLInputElement>) {
 		this.setState({ gpsInput: e.target.value });
-		if (e.target.value) {
-			this.props.editGroupGPS(e.target.value as string);
-		}
-		else {
-			this.props.editGroupGPS('');
-		}
 	}
 
 	private handleDisplayChange(e: React.ChangeEvent<HTMLInputElement>) {
@@ -181,11 +175,12 @@ class CreateGroupComponent extends React.Component<CreateGroupPropsWithIntl, Cre
 	}
 
 	private handleNoteChange(e: React.ChangeEvent<HTMLTextAreaElement>) {
-		this.setState({ groupNote: e.target.value });
+		this.props.editGroupNote(e.target.value);
 	}
 
 	private handleAreaChange(e: React.ChangeEvent<HTMLInputElement>) {
 		this.setState({ groupArea: e.target.value });
+		// still need to set state to parse check before submitting
 	}
 
 	private handleCreateGroup() {
@@ -193,8 +188,21 @@ class CreateGroupComponent extends React.Component<CreateGroupPropsWithIntl, Cre
 		// gps and area are still optional so check if blank
 		const pattern = /^(\()?\d+\,\d+(\))?$/;
 		if (this.state.gpsInput === '' || this.state.gpsInput.match(pattern)) {
+			// if it satisfies if condition, and defined, then set GPSPoint
+			if (this.state.gpsInput !== '') {
+				const parseGPS = this.state.gpsInput.replace('(','').replace(')','').split(',');
+				// should only have 1 comma
+				const gPoint: GPSPoint = {
+					longitude: parseFloat(parseGPS[0]),
+					latitude: parseFloat(parseGPS[1])
+				};
+				this.props.editGroupGPS(gPoint);
+			}
 			const pattern2 = /^\d+(\.\d+)?$/;
 			if (this.state.groupArea.match(pattern2) || this.state.groupArea === '') {
+				if (this.state.groupArea !== '') {
+					this.props.editGroupArea(parseFloat(this.state.groupArea));
+				}
 				// this.props.submitGroupInEditingIfNeeded();
 			}
 			else {

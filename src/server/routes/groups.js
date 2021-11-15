@@ -165,6 +165,7 @@ router.post('/create', adminAuthenticator('create groups'), async (req, res) => 
 			await conn.tx(async t => {
 				const newGroup = new Group(undefined, req.body.name);
 				await newGroup.insert(t);
+				// maybe insert something here for gps, displayable, note, area
 				const adoptGroupsQuery = req.body.childGroups.map(gid => newGroup.adoptGroup(gid, t));
 				const adoptMetersQuery = req.body.childMeters.map(mid => newGroup.adoptMeter(mid, t));
 				return t.batch(_.flatten([adoptGroupsQuery, adoptMetersQuery]));

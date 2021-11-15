@@ -10,6 +10,7 @@ import * as t from '../types/redux/groups';
 import { groupsApi } from '../utils/api';
 import { browserHistory } from '../utils/history';
 import translate from '../utils/translate';
+import { GPSPoint } from 'utils/calibration';
 
 function requestGroupsDetails(): t.RequestGroupsDetailsAction {
 	return { type: ActionType.RequestGroupsDetails };
@@ -149,12 +150,40 @@ export function editGroupName(newName: string): t.EditGroupNameAction {
 	return { type: ActionType.EditGroupName, newName };
 }
 
-export function editGroupGPS(newGPS: string): t.EditGroupGPSAction {
+/**
+ * Change the GPS of the group in editing
+ * @param newGPS The new GPS
+ * @return {{type: string, newGPS: GPSPoint}}
+ */
+export function editGroupGPS(newGPS: GPSPoint): t.EditGroupGPSAction {
 	return { type: ActionType.EditGroupGPS, newGPS };
 }
 
+/**
+ * Change the displayable of the group in editing
+ * @param newDisplay The new displayable
+ * @return {{type: string, newDisplay: boolean}}
+ */
 export function editGroupDisplayable(newDisplay: boolean): t.EditGroupDisplayableAction {
 	return { type: ActionType.EditGroupDisplayable, newDisplay };
+}
+
+/**
+ * Change the note of the group in editing
+ * @param newNote The new name
+ * @return {{type: string, newNote: String}}
+ */
+export function editGroupNote(newNote: string): t.EditGroupNoteAction {
+	return { type: ActionType.EditGroupNote, newNote };
+}
+
+/**
+ * Change the area of the group in editing
+ * @param newArea The new area
+ * @return {{type: string, newArea: number}}
+ */
+export function editGroupArea(newArea: number): t.EditGroupAreaAction {
+	return { type: ActionType.EditGroupArea, newArea };
 }
 
 /**

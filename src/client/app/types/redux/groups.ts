@@ -22,6 +22,8 @@ export type GroupsAction =
 	| EditGroupNameAction
 	| EditGroupGPSAction
 	| EditGroupDisplayableAction
+	| EditGroupNoteAction
+	| EditGroupAreaAction
 	| ChangeChildGroupsAction
 	| ChangeChildMetersAction
 	| MarkGroupInEditingSubmittedAction
@@ -89,12 +91,22 @@ export interface EditGroupNameAction {
 
 export interface EditGroupGPSAction {
 	type: ActionType.EditGroupGPS;
-	newGPS: string;
+	newGPS: GPSPoint;
 }
 
 export interface EditGroupDisplayableAction {
 	type: ActionType.EditGroupDisplayable;
 	newDisplay: boolean;
+}
+
+export interface EditGroupNoteAction {
+	type: ActionType.EditGroupNote;
+	newNote: string;
+}
+
+export interface EditGroupAreaAction {
+	type: ActionType.EditGroupArea;
+	newArea: number;
 }
 
 export interface ChangeChildGroupsAction {

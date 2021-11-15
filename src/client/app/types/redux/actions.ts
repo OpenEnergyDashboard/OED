@@ -67,6 +67,8 @@ export enum ActionType {
 	EditGroupName = 'EDIT_GROUP_NAME',
 	EditGroupGPS = 'EDIT_GROUP_GPS',
 	EditGroupDisplayable = 'EDIT_GROUP_DISPLAYABLE',
+	EditGroupNote = 'EDIT_GROUP_NOTE',
+	EditGroupArea = 'EDIT_GROUP_AREA',
 	ChangeChildGroups = 'CHANGE_CHILD_GROUPS',
 	ChangeChildMeters = 'CHANGE_CHILD_METERS',
 	MarkGroupInEditingSubmitted = 'MARK_GROUP_IN_EDITING_SUBMITTED',

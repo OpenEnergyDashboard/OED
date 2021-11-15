@@ -148,10 +148,8 @@ export default function groups(state = defaultState, action: GroupsAction) {
 						// True when a request to insert the changes into the DB has been sent
 						submitted: false,
 						name: '',
-						gpsInput: '',
-						displayableStatus: true,
-						groupNote: '',
-						groupArea: '',
+						displayable: true,
+						note: '',
 						childGroups: [],
 						childMeters: []
 					}
@@ -168,10 +166,10 @@ export default function groups(state = defaultState, action: GroupsAction) {
 					submitted: false,
 					id: currentGroup.id,
 					name: currentGroup.name,
-					gpsInput: String(currentGroup.gps),
-					displayableStatus: currentGroup.displayable,
-					groupNote: currentGroup.note,
-					groupArea: String(currentGroup.area),
+					gps: currentGroup.gps,
+					displayable: currentGroup.displayable,
+					note: currentGroup.note,
+					area: currentGroup.area,
 					childGroups: currentGroup.childGroups,
 					childMeters: currentGroup.childMeters
 				};
@@ -199,7 +197,7 @@ export default function groups(state = defaultState, action: GroupsAction) {
 				...state,
 				groupInEditing: {
 					...state.groupInEditing,
-					gpsInput: action.newGPS,
+					gps: action.newGPS,
 					dirty: true
 				}
 			};
@@ -210,7 +208,29 @@ export default function groups(state = defaultState, action: GroupsAction) {
 				...state,
 				groupInEditing: {
 					...state.groupInEditing,
-					displayableStatus: action.newDisplay,
+					displayable: action.newDisplay,
+					dirty: true
+				}
+			};
+		}
+
+		case ActionType.EditGroupNote: {
+			return {
+				...state,
+				groupInEditing: {
+					...state.groupInEditing,
+					note: action.newNote,
+					dirty: true
+				}
+			};
+		}
+
+		case ActionType.EditGroupArea: {
+			return {
+				...state,
+				groupInEditing: {
+					...state.groupInEditing,
+					area: action.newArea,
 					dirty: true
 				}
 			};
