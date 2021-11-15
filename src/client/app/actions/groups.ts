@@ -149,6 +149,14 @@ export function editGroupName(newName: string): t.EditGroupNameAction {
 	return { type: ActionType.EditGroupName, newName };
 }
 
+export function editGroupGPS(newGPS: string): t.EditGroupGPSAction {
+	return { type: ActionType.EditGroupGPS, newGPS };
+}
+
+export function editGroupDisplayable(newDisplay: boolean): t.EditGroupDisplayableAction {
+	return { type: ActionType.EditGroupDisplayable, newDisplay };
+}
+
 /**
  * Change the child groups of the group in editing
  * @param groupIDs IDs of the new child groups

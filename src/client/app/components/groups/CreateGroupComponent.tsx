@@ -7,7 +7,8 @@ import { Input, Button } from 'reactstrap';
 import DatasourceBoxContainer from '../../containers/groups/DatasourceBoxContainer';
 import { SelectionType } from '../../containers/groups/DatasourceBoxContainer';
 import { NamedIDItem } from '../../types/items';
-import { CreateNewBlankGroupAction, EditGroupNameAction, ChangeDisplayModeAction } from '../../types/redux/groups';
+import { CreateNewBlankGroupAction, EditGroupNameAction,
+	EditGroupGPSAction, EditGroupDisplayableAction, ChangeDisplayModeAction } from '../../types/redux/groups';
 import HeaderContainer from '../../containers/HeaderContainer';
 import FooterContainer from '../../containers/FooterContainer';
 import { browserHistory } from '../../utils/history';
@@ -19,6 +20,8 @@ interface CreateGroupProps {
 	groups: NamedIDItem[];
 	createNewBlankGroup(): CreateNewBlankGroupAction;
 	editGroupName(name: string): EditGroupNameAction;
+	editGroupGPS(gps: string): EditGroupGPSAction;
+	editGroupDisplayable(display: boolean): EditGroupDisplayableAction;
 	submitGroupInEditingIfNeeded(): Promise<any>;
 	changeDisplayModeToView(): ChangeDisplayModeAction;
 }
@@ -165,10 +168,16 @@ class CreateGroupComponent extends React.Component<CreateGroupPropsWithIntl, Cre
 
 	private handleGPSChange(e: React.ChangeEvent<HTMLInputElement>) {
 		this.setState({ gpsInput: e.target.value });
+		if (e.target.value) {
+			this.props.editGroupGPS(e.target.value as string);
+		}
+		else {
+			this.props.editGroupGPS('');
+		}
 	}
 
 	private handleDisplayChange(e: React.ChangeEvent<HTMLInputElement>) {
-		this.setState({ displayableStatus: (e.target.value === 'true') });
+		this.props.editGroupDisplayable(e.target.value === 'true');
 	}
 
 	private handleNoteChange(e: React.ChangeEvent<HTMLTextAreaElement>) {

@@ -168,6 +168,10 @@ export default function groups(state = defaultState, action: GroupsAction) {
 					submitted: false,
 					id: currentGroup.id,
 					name: currentGroup.name,
+					gpsInput: String(currentGroup.gps),
+					displayableStatus: currentGroup.displayable,
+					groupNote: currentGroup.note,
+					groupArea: String(currentGroup.area),
 					childGroups: currentGroup.childGroups,
 					childMeters: currentGroup.childMeters
 				};
@@ -185,6 +189,28 @@ export default function groups(state = defaultState, action: GroupsAction) {
 				groupInEditing: {
 					...state.groupInEditing,
 					name: action.newName,
+					dirty: true
+				}
+			};
+		}
+
+		case ActionType.EditGroupGPS: {
+			return {
+				...state,
+				groupInEditing: {
+					...state.groupInEditing,
+					gpsInput: action.newGPS,
+					dirty: true
+				}
+			};
+		}
+
+		case ActionType.EditGroupDisplayable: {
+			return {
+				...state,
+				groupInEditing: {
+					...state.groupInEditing,
+					displayableStatus: action.newDisplay,
 					dirty: true
 				}
 			};

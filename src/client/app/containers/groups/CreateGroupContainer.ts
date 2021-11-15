@@ -5,7 +5,8 @@
 import * as _ from 'lodash';
 import { connect } from 'react-redux';
 import CreateGroupComponent from '../../components/groups/CreateGroupComponent';
-import { createNewBlankGroup, editGroupName, submitGroupInEditingIfNeeded, changeDisplayMode } from '../../actions/groups';
+import { createNewBlankGroup, editGroupName, editGroupGPS,
+	editGroupDisplayable, submitGroupInEditingIfNeeded, changeDisplayMode } from '../../actions/groups';
 import { Dispatch } from '../../types/redux/actions';
 import { State } from '../../types/redux/state';
 import { NamedIDItem } from '../../types/items';
@@ -27,6 +28,8 @@ function mapDispatchToProps(dispatch: Dispatch) {
 		createNewBlankGroup: () => dispatch(createNewBlankGroup()),
 		submitGroupInEditingIfNeeded: () => dispatch(submitGroupInEditingIfNeeded()),
 		editGroupName: (name: string) => dispatch(editGroupName(name)),
+		editGroupGPS: (gps: string) => dispatch(editGroupGPS(gps)),
+		editGroupDisplayable: (display: boolean) => dispatch(editGroupDisplayable(display)),
 		changeDisplayModeToView: () => dispatch(changeDisplayMode(DisplayMode.View))
 	};
 }

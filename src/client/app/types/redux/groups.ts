@@ -20,6 +20,8 @@ export type GroupsAction =
 	| CreateNewBlankGroupAction
 	| BeginEditingGroupAction
 	| EditGroupNameAction
+	| EditGroupGPSAction
+	| EditGroupDisplayableAction
 	| ChangeChildGroupsAction
 	| ChangeChildMetersAction
 	| MarkGroupInEditingSubmittedAction
@@ -83,6 +85,16 @@ export interface BeginEditingGroupAction {
 export interface EditGroupNameAction {
 	type: ActionType.EditGroupName;
 	newName: string;
+}
+
+export interface EditGroupGPSAction {
+	type: ActionType.EditGroupGPS;
+	newGPS: string;
+}
+
+export interface EditGroupDisplayableAction {
+	type: ActionType.EditGroupDisplayable;
+	newDisplay: boolean;
 }
 
 export interface ChangeChildGroupsAction {
