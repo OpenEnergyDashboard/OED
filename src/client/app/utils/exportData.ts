@@ -16,7 +16,7 @@ import { UserRole } from '../types/items';
 
 function convertToCSV(items: ExportDataSet[]) {
 	// Export line chart
-	if (items[0].exportVals[0].z == undefined) {
+	if (items[0].exportVals[0].z === undefined) {
 		let csvOutput = 'Label,Readings,Start Timestamp\n';
 		items.forEach(set => {
 			const data = set.exportVals;
