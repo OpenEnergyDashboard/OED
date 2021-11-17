@@ -28,13 +28,8 @@ export default function ExportComponent(props: ExportProps) {
 	const exportReading = () => {
 		const compressedData = props.exportVals.datasets;
 
-		//console.log(compressedData);
-
 		// Sort the dataset based on the start time
 		compressedData.forEach(reading => {
-			console.log("OLD\n");
-			console.log(reading);
-
 			if (reading !== undefined) {
 				reading.exportVals.sort((a,b) =>{
 					if (a.x < b.x) {
@@ -42,8 +37,6 @@ export default function ExportComponent(props: ExportProps) {
 					}
 					return 1;
 				})
-				console.log("NEW\n");
-				console.log(reading)
 			}
 		})
 
