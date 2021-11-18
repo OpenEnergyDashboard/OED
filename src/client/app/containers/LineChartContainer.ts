@@ -34,7 +34,9 @@ function mapStateToProps(state: State) {
 				const hoverText: string[] = [];
 				const readings = _.values(readingsData.readings);
 				readings.forEach(reading => {
-					const timeReading = moment(reading.startTimestamp);
+					let st = moment(reading.startTimestamp)
+					// Time reading is in the middle of the start and end timestamp
+					const timeReading = st.add(moment(reading.endTimestamp).diff(st)/2);
 					xData.push(timeReading.utc().format('YYYY-MM-DD HH:mm:ss'));
 					yData.push(reading.reading);
 					hoverText.push(`<b> ${timeReading.format('dddd, LL LTS')} </b> <br> ${label}: ${reading.reading.toPrecision(6)} kW`);
