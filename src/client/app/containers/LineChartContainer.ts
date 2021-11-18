@@ -34,7 +34,7 @@ function mapStateToProps(state: State) {
 				const hoverText: string[] = [];
 				const readings = _.values(readingsData.readings);
 				readings.forEach(reading => {
-					let st = moment(reading.startTimestamp)
+					const st = moment(reading.startTimestamp)
 					// Time reading is in the middle of the start and end timestamp
 					const timeReading = st.add(moment(reading.endTimestamp).diff(st)/2);
 					xData.push(timeReading.utc().format('YYYY-MM-DD HH:mm:ss'));
