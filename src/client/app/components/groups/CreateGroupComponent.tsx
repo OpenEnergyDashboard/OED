@@ -203,7 +203,7 @@ class CreateGroupComponent extends React.Component<CreateGroupPropsWithIntl, Cre
 				if (this.state.groupArea !== '') {
 					this.props.editGroupArea(parseFloat(this.state.groupArea));
 				}
-				// this.props.submitGroupInEditingIfNeeded();
+				this.props.submitGroupInEditingIfNeeded();
 			}
 			else {
 				window.alert(this.props.intl.formatMessage({id: 'area.error'}));

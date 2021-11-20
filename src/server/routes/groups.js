@@ -10,6 +10,7 @@ const { getConnection } = require('../db');
 const Group = require('../models/Group');
 const adminAuthenticator = require('./authenticator').adminAuthMiddleware;
 const { log } = require('../log');
+const Point = require('../models/Point');
 
 const router = express.Router();
 
@@ -133,12 +134,41 @@ router.get('/deep/meters/:group_id', async (req, res) => {
 router.post('/create', adminAuthenticator('create groups'), async (req, res) => {
 	const validGroup = {
 		type: 'object',
-		maxProperties: 3,
-		required: ['name', 'childGroups', 'childMeters'],
+		minProperties: 4,
+		maxProperties: 7,
+		required: ['name', 'displayable', 'childGroups', 'childMeters'],
 		properties: {
 			name: {
 				type: 'string',
 				minLength: 1
+			},
+			displayable: {
+				type: 'bool'
+			},
+			gps: {
+				oneOf: [
+					{
+						type: 'object',
+						required: ['latitude', 'longitude'],
+						properties: {
+							latitude: { type: 'number', minimum: '-90', maximum: '90' },
+							longitude: { type: 'number', minimum: '-180', maximum: '180' }
+						}
+					},
+					{ type: 'null' }
+				]
+			},
+			note: {
+				oneOf: [
+					{ type: 'string' },
+					{ type: 'null' }
+				]
+			},
+			area: {
+				oneOf: [
+					{ type: 'number' },
+					{ type: 'null' }
+				]
 			},
 			childGroups: {
 				type: 'array',
@@ -164,8 +194,11 @@ router.post('/create', adminAuthenticator('create groups'), async (req, res) => 
 		try {
 			await conn.tx(async t => {
 				const newGroup = new Group(undefined, req.body.name);
+				newGroup.displayable = req.body.displayable;
+				newGroup.note = req.body.note;
+				newGroup.area = req.body.area;
+				newGroup.gps = (req.body.gps) ? new Point(req.body.gps.longitude, req.body.gps.latitude) : null;
 				await newGroup.insert(t);
-				// maybe insert something here for gps, displayable, note, area
 				const adoptGroupsQuery = req.body.childGroups.map(gid => newGroup.adoptGroup(gid, t));
 				const adoptMetersQuery = req.body.childMeters.map(mid => newGroup.adoptMeter(mid, t));
 				return t.batch(_.flatten([adoptGroupsQuery, adoptMetersQuery]));
