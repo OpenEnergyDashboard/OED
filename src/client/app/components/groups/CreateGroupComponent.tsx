@@ -63,7 +63,7 @@ class CreateGroupComponent extends React.Component<CreateGroupPropsWithIntl, Cre
 		};
 		const divFlexStyle: React.CSSProperties = {
 			display: 'flex'
-		}
+		};
 		const divBottomStyle: React.CSSProperties = {
 			marginBottom: '20px'
 		};
