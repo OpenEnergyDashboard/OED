@@ -8,7 +8,7 @@ import DatasourceBoxContainer from '../../containers/groups/DatasourceBoxContain
 import { SelectionType } from '../../containers/groups/DatasourceBoxContainer';
 import { NamedIDItem } from '../../types/items';
 import { CreateNewBlankGroupAction, EditGroupNameAction,
-	EditGroupGPSAction, EditGroupDisplayableAction, EditGroupNoteAction, 
+	EditGroupGPSAction, EditGroupDisplayableAction, EditGroupNoteAction,
 	EditGroupAreaAction, ChangeDisplayModeAction } from '../../types/redux/groups';
 import HeaderContainer from '../../containers/HeaderContainer';
 import FooterContainer from '../../containers/FooterContainer';

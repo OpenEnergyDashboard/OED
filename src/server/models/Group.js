@@ -163,7 +163,7 @@ class Group {
 	 * @param conn the connection to use.
 	 * @returns {Promise.<>}
 	 */
-	 async update(conn) {
+	async update(conn) {
 		if (this.id === undefined) {
 			throw new Error('Attempt to update a group with no ID');
 		}

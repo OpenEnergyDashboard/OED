@@ -62,7 +62,7 @@ class EditGroupsComponent extends React.Component<EditGroupsPropsWithIntl, EditG
 		super(props);
 		this.state = {
 			name: this.props.currentName,
-			gpsInput: (this.props.currentGPS !== undefined) ? 
+			gpsInput: (this.props.currentGPS !== undefined) ?
 			`${this.props.currentGPS.longitude}, ${this.props.currentGPS.latitude}` : '',
 			groupArea: (this.props.currentArea !== undefined) ? `${this.props.currentArea}` : '',
 			groupNote: (this.props.currentNote !== undefined) ? `${this.props.currentNote}` : '',
@@ -147,8 +147,7 @@ class EditGroupsComponent extends React.Component<EditGroupsPropsWithIntl, EditG
 							<p style={boldStyle}>
 								<FormattedMessage id='name' />:
 							</p>
-							<Input type='text' placeholder={this.props.intl.formatMessage(messages.name)}
-							value={this.state.name} onChange={this.handleNameChange} />
+							<Input type='text' placeholder={this.props.intl.formatMessage(messages.name)} value={this.state.name} onChange={this.handleNameChange} />
 						</div>
 						<div style={divBottomStyle} className='col-4'>
 							<p style={boldStyle}>
