@@ -159,13 +159,15 @@ class Group {
 	}
 
 	/**
-	 * Change the name of this group
-	 * @param newName New name for the group
-	 * @param conn the connection to be used.
-	 * @return {Promise.<void>}
+	 * Returns a promise to update an existing group in the database
+	 * @param conn the connection to use.
+	 * @returns {Promise.<>}
 	 */
-	async rename(newName, conn) {
-		await conn.none(sqlFile('group/rename_group.sql'), { new_name: newName, id: this.id });
+	 async update(conn) {
+		if (this.id === undefined) {
+			throw new Error('Attempt to update a group with no ID');
+		}
+		await conn.none(sqlFile('group/update_group.sql'), this);
 	}
 
 	/**

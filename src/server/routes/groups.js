@@ -197,11 +197,16 @@ router.post('/create', adminAuthenticator('create groups'), async (req, res) => 
 		const conn = getConnection();
 		try {
 			await conn.tx(async t => {
-				const newGroup = new Group(undefined, req.body.name);
-				newGroup.displayable = req.body.displayable;
-				newGroup.note = req.body.note;
-				newGroup.area = req.body.area;
-				newGroup.gps = (req.body.gps) ? new Point(req.body.gps.longitude, req.body.gps.latitude) : null;
+				const newGPS = (req.body.gps) ? new Point(req.body.gps.longitude, req.body.gps.latitude) : null;
+				const newGroup = new Group(
+					undefined,
+					req.body.name,
+					req.body.displayable,
+					newGPS,
+					req.body.note,
+					req.body.area
+				);
+
 				await newGroup.insert(t);
 				const adoptGroupsQuery = req.body.childGroups.map(gid => newGroup.adoptGroup(gid, t));
 				const adoptMetersQuery = req.body.childMeters.map(mid => newGroup.adoptMeter(mid, t));
@@ -285,16 +290,18 @@ router.put('/edit', adminAuthenticator('edit groups'), async (req, res) => {
 			const currentChildGroups = await Group.getImmediateGroupsByGroupID(currentGroup.id, conn);
 			const currentChildMeters = await Group.getImmediateMetersByGroupID(currentGroup.id, conn);
 
-			await conn.tx(t => {
-				let nameChangeQuery = [];
-				if (req.body.name !== currentGroup.name) {
-					nameChangeQuery = currentGroup.rename(req.body.name, t);
-				}
-				// prototype before update
-				newGroup.displayable = req.body.displayable;
-				newGroup.note = req.body.note;
-				newGroup.area = req.body.area;
-				newGroup.gps = (req.body.gps) ? new Point(req.body.gps.longitude, req.body.gps.latitude) : null;
+			await conn.tx(async t => {
+				const newGPS = (req.body.gps) ? new Point(req.body.gps.longitude, req.body.gps.latitude) : null;
+				const newGroup = new Group(
+					req.body.id,
+					req.body.name,
+					req.body.displayable,
+					newGPS,
+					req.body.note,
+					req.body.area
+				);
+
+				await newGroup.update(t);
 
 				const adoptedGroups = _.difference(req.body.childGroups, currentChildGroups);
 				const adoptGroupsQueries = adoptedGroups.map(gid => currentGroup.adoptGroup(gid, t));
@@ -309,7 +316,7 @@ router.put('/edit', adminAuthenticator('edit groups'), async (req, res) => {
 				const disownedMeters = _.difference(currentChildMeters, req.body.childMeters);
 				const disownMetersQueries = disownedMeters.map(mid => currentGroup.disownMeter(mid, t));
 
-				return t.batch(_.flatten([nameChangeQuery, adoptGroupsQueries, disownGroupsQueries, adoptMetersQueries, disownMetersQueries]));
+				return t.batch(_.flatten([adoptGroupsQueries, disownGroupsQueries, adoptMetersQueries, disownMetersQueries]));
 			});
 			res.sendStatus(200);
 		} catch (err) {
