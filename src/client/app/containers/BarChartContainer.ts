@@ -40,7 +40,7 @@ function mapStateToProps(state: State) {
 				const readings = _.orderBy(readingsData.readings, ['startTimestamp'], ['asc']);
 				readings.forEach(barReading => {
 					const timeReading: string =
-						`${moment(barReading.startTimestamp).utc().format('LL')} - ${moment(barReading.endTimestamp).utc().format('LL')}`;
+						`${moment(barReading.startTimestamp).utc().format('LL')} - ${moment(barReading.endTimestamp).subtract(1, 'days').utc().format('LL')}`;
 					xData.push(timeReading);
 					yData.push(barReading.reading);
 					hoverText.push(`<b> ${timeReading} </b> <br> ${label}: ${barReading.reading.toPrecision(6)} kWh`);
@@ -79,7 +79,7 @@ function mapStateToProps(state: State) {
 				const readings = _.orderBy(readingsData.readings, ['startTimestamp'], ['asc']);
 				readings.forEach(barReading => {
 					const timeReading: string =
-						`${moment(barReading.startTimestamp).utc().format('LL')} - ${moment(barReading.endTimestamp).utc().format('LL')}`;
+						`${moment(barReading.startTimestamp).utc().format('LL')} - ${moment(barReading.endTimestamp).subtract(1, 'days').utc().format('LL')}`;
 					xData.push(timeReading);
 					yData.push(barReading.reading);
 					hoverText.push(`<b> ${timeReading} </b> <br> ${label}: ${barReading.reading.toPrecision(6)} kWh`);
