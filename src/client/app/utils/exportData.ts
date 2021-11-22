@@ -78,7 +78,7 @@ export default function graphExport(dataSets: ExportDataSet[], name: string) {
  */
 export function downloadRawCSV(items: RawReadings[], defaultLanguage: string) {
 	// note that utc() is not needed
-	let csvOutput = 'Label,Readings,Start Timestamp, End Timestamp\n';
+	let csvOutput = 'Label,Readings,Start Timestamp,End Timestamp\n';
 	items.forEach(ele => {
 		const startTimestamp = moment(ele.startTimestamp).format('dddd LL LTS').replace(/,/g, ''); // use regex to omit pesky commas
 		const endTimestamp = moment(ele.endTimestamp).format('dddd LL LTS').replace(/,/g, ''); // use regex to omit pesky commas
