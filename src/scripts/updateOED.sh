@@ -15,6 +15,6 @@ echo "NPM install finished."
 echo "Attempting to migrate database to latest version..."
 npm run migratedb -- highest
 
-npm run webpack:build
+npx webpack build
 
 echo "OED upgrade completed"

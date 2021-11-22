@@ -3,7 +3,7 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
 
 const LodashModuleReplacementPlugin = require('lodash-webpack-plugin');
-const UglifyJsPlugin = require('uglifyjs-webpack-plugin');
+const TerserPlugin = require("terser-webpack-plugin");
 const webpack = require('webpack');
 const path = require('path');
 const { CheckerPlugin } = require('awesome-typescript-loader');
@@ -12,16 +12,18 @@ const BUILD_DIR = path.resolve(__dirname, 'src/client/public/app');
 const APP_DIR = path.resolve(__dirname, 'src/client/app');
 
 const config = {
-    entry: APP_DIR + "/index.tsx",
-    output: {
-        filename: "bundle.js",
-        path: BUILD_DIR
-    },
-
     // Enable sourcemaps for debugging webpack's output.
-    devtool: "source-map",
-
+    devtool: 'source-map',
+    entry: {
+        application: APP_DIR + "/index.tsx",
+    },
+    cache: {
+        type: "filesystem"
+    },
     resolve: {
+        fallback: {
+            "fs": false
+        },
         // Add '.ts' and '.tsx' as resolvable extensions.
         extensions: [".ts", ".tsx", ".js", ".json"]
     },
@@ -30,7 +32,6 @@ const config = {
     performance: {
         hints: false
     },
-
     module: {
         rules: [
             // All TypeScript ('.ts' or '.tsx') will be handled by 'awesome-typescript-loader'.
@@ -44,23 +45,22 @@ const config = {
             { enforce: "pre", test: /\.js$/, loader: "source-map-loader" }
         ]
     },
+    output: {
+        filename: "bundle.js",
+        path: BUILD_DIR
+    },
 	plugins: [
         new LodashModuleReplacementPlugin(),
 		new CheckerPlugin(),
-	],
-	node: {
-		fs: 'empty'
-	}
+	]
 };
 
 if (process.env.NODE_ENV === 'production') {
 	config.plugins.push(
 		new webpack.DefinePlugin({
-			'process.env': {
-				NODE_ENV: JSON.stringify('production')
-			}
+            'process.env': JSON.stringify('production'),
 		}),
-		new UglifyJsPlugin({ sourceMap: true })
+		new TerserPlugin({ sourceMap: true })
 	);
 }
 
