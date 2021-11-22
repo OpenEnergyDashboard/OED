@@ -22,10 +22,13 @@ const config = {
     },
     resolve: {
         fallback: {
+            "buffer": require.resolve('buffer/'),
+            "assert": require.resolve('assert/'),
+            "stream": require.resolve('stream-browserify'),
             "fs": false
         },
         // Add '.ts' and '.tsx' as resolvable extensions.
-        extensions: [".ts", ".tsx", ".js", ".json"]
+        extensions: [".css", ".ts", ".tsx", ".js", ".jsx", ".json"]
     },
 
     // Ignore warnings about bundle size
@@ -36,13 +39,22 @@ const config = {
         rules: [
             // All TypeScript ('.ts' or '.tsx') will be handled by 'awesome-typescript-loader'.
             // Also, for development, JavaScript is handled by 'awesome-typescript-loader' and passed to Babel.
-            { test: /\.[jt]sx?$/, exclude: /node_modules/, loader: "awesome-typescript-loader" },
+            { test: /\.[jt]sx?$/, exclude: /node_modules/, use:[{loader: "awesome-typescript-loader"}] },
             // Any remaining JavaScript ('.js' or '.jsx') will be transpiled by Babel, for production uglification.
-            { test: /\/jsx?$/, exclude: /node_modules/, loader: "babel-loader" },
+            { test: /\/jsx?$/, exclude: /node_modules/, use:[{loader: "babel-loader"}] },
 			// CSS stylesheet loader.
-			{ test: /\.css$/, loader: 'style-loader!css-loader' },
+			{ test: /\.css$/, use: [
+                {loader: "style-loader"},
+                {loader: "css-loader"}
+            ], },
+            {
+                test: /\.m?js/,
+                resolve: {
+                  fullySpecified: false
+                }
+            },
             // All output '.js' files will have any sourcemaps re-processed by 'source-map-loader'.
-            { enforce: "pre", test: /\.js$/, loader: "source-map-loader" }
+            { enforce: "pre", test: /\.js$/, use:[{loader: "source-map-loader"}] }
         ]
     },
     output: {
