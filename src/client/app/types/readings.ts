@@ -43,5 +43,6 @@ export interface ExportDataSet {
 export interface RawReadings {
 	label: string,
 	reading: number,
-	startTimestamp: string
+	startTimestamp: string,
+	endTimestamp: string
 }

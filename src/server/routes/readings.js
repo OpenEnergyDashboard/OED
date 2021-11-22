@@ -160,7 +160,7 @@ router.get('/line/raw/meters/:meter_ids', async (req, res) => {
 					delete ele.meterID;
 					ele.label = meterLabel;
 					ele.startTimestamp = formatRawDateToExport(ele.startTimestamp);
-					delete ele.endTimestamp;
+					ele.endTimestamp = formatRawDateToExport(ele.endTimestamp);
 					toReturn.push(ele);
 				})
 			}
