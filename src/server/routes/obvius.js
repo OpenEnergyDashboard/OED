@@ -119,9 +119,6 @@ function verifyObviusUser(req, res, next){
 	} else if (!req.param('email')){
 		failure(req, res, 'email parameter is required.');
 		return;
-	} else if (req.param('password') !== config.obvius.password) {
-		failure(req, res, 'password was not correct.');
-		return;
 	} else { // Authenticate Obvius user.
 		req.body.email = req.param('email');
 		req.body.password = req.param('password');
