@@ -10,20 +10,15 @@ import DatasourceBoxContainer from '../../containers/groups/DatasourceBoxContain
 import { NamedIDItem } from '../../types/items';
 import { SelectionType } from '../../containers/groups/DatasourceBoxContainer';
 import { EditGroupNameAction, EditGroupGPSAction, EditGroupDisplayableAction, EditGroupNoteAction, EditGroupAreaAction,
-	ChangeChildMetersAction, ChangeChildGroupsAction, ChangeDisplayModeAction } from '../../types/redux/groups';
+	ChangeChildMetersAction, ChangeChildGroupsAction, ChangeDisplayModeAction, GroupDefinition } from '../../types/redux/groups';
 import FooterContainer from '../../containers/FooterContainer';
 import HeaderContainer from '../../containers/HeaderContainer';
 import {  browserHistory } from '../../utils/history';
 import { FormattedMessage, InjectedIntlProps, injectIntl, defineMessages } from 'react-intl';
-import { GPSPoint } from 'utils/calibration';
+import { GPSPoint, isValidGPSInput } from '../../utils/calibration';
 
 interface EditGroupsProps {
-	id: number;
-	currentName: string;
-	currentGPS: any;
-	currentDisplayable: boolean;
-	currentNote: any;
-	currentArea: any;
+	currentGroup: GroupDefinition;
 	childMeters: NamedIDItem[];
 	childGroups: NamedIDItem[];
 	allMetersExceptChildMeters: NamedIDItem[];
@@ -47,6 +42,7 @@ interface EditGroupsState {
 	gpsInput: string;
 	groupArea: string;
 	groupNote: string;
+	groupDisplay: boolean;
 	selectedMeters: number[];
 	defaultSelectedMeters: NamedIDItem[];
 	unusedMeters: number[];
@@ -61,11 +57,12 @@ class EditGroupsComponent extends React.Component<EditGroupsPropsWithIntl, EditG
 	constructor(props: EditGroupsPropsWithIntl) {
 		super(props);
 		this.state = {
-			name: this.props.currentName,
-			gpsInput: (this.props.currentGPS !== undefined) ?
-			`${this.props.currentGPS.longitude}, ${this.props.currentGPS.latitude}` : '',
-			groupArea: (this.props.currentArea !== undefined) ? `${this.props.currentArea}` : '',
-			groupNote: (this.props.currentNote !== undefined) ? `${this.props.currentNote}` : '',
+			name: this.props.currentGroup.name,
+			gpsInput: (this.props.currentGroup.gps) ?
+			`${this.props.currentGroup.gps.longitude}, ${this.props.currentGroup.gps.latitude}` : '',
+			groupArea: (this.props.currentGroup.area) ? `${this.props.currentGroup.area}` : '',
+			groupNote: (this.props.currentGroup.note) ? `${this.props.currentGroup.note}` : '',
+			groupDisplay: (this.props.currentGroup.displayable) ? this.props.currentGroup.displayable : false,
 			selectedMeters: [],
 			defaultSelectedMeters: [],
 			unusedMeters: [],
@@ -75,6 +72,14 @@ class EditGroupsComponent extends React.Component<EditGroupsPropsWithIntl, EditG
 			unusedGroups: [],
 			defaultUnusedGroups: []
 		};
+		// edit displayable to false if previously group had null displayable (past version of group)
+		if (this.props.currentGroup.displayable === null) {
+			this.props.editGroupDisplayable(false);
+		}
+		// make state dirty so submit is possible even if nothing is changed (should this be allowed?)
+		else {
+			this.props.editGroupDisplayable(this.props.currentGroup.displayable);
+		}
 		this.handleNameChange = this.handleNameChange.bind(this);
 		this.handleGPSChange = this.handleGPSChange.bind(this);
 		this.handleDisplayChange = this.handleDisplayChange.bind(this);
@@ -141,7 +146,7 @@ class EditGroupsComponent extends React.Component<EditGroupsPropsWithIntl, EditG
 							<p style={boldStyle}>
 								<FormattedMessage id='group.id' />:
 							</p>
-							{this.props.id}
+							{this.props.currentGroup.id}
 						</div>
 						<div style={divBottomStyle} className='col-4'>
 							<p style={boldStyle}>
@@ -161,7 +166,7 @@ class EditGroupsComponent extends React.Component<EditGroupsPropsWithIntl, EditG
 							<p style={boldStyle}>
 								<FormattedMessage id='displayable' />:
 							</p>
-							<Input type='select' value={this.props.currentDisplayable.toString()} onChange={this.handleDisplayChange}>
+							<Input type='select' value={this.state.groupDisplay.toString()} onChange={this.handleDisplayChange}>
 								<option value='true'> True </option>
 								<option value='false'> False </option>
 							</Input>
@@ -287,7 +292,7 @@ class EditGroupsComponent extends React.Component<EditGroupsPropsWithIntl, EditG
 	}
 
 	private handleNoteChange(e: React.ChangeEvent<HTMLTextAreaElement>) {
-		this.setState({ groupNote: e.target.value as string })
+		this.props.editGroupNote(e.target.value);
 	}
 
 	private handleAreaChange(e: React.ChangeEvent<HTMLInputElement>) {
@@ -332,34 +337,33 @@ class EditGroupsComponent extends React.Component<EditGroupsPropsWithIntl, EditG
 	}
 
 	private handleEditGroup() {
-		this.props.editGroupNote(this.state.groupNote);
+		const gpsProxy = this.state.gpsInput.replace('(','').replace(')','').replace(' ', '');
+		const pattern2 = /^\d+(\.\d+)?$/;
 		// need to check gps and area
 		// gps and area are still optional so check if blank
-		const pattern = /^(\()?\d+\,\d+(\))?$/;
-		if (this.state.gpsInput === '' || this.state.gpsInput.match(pattern)) {
-			// if it satisfies if condition, and defined, then set GPSPoint
-			if (this.state.gpsInput !== '') {
-				const parseGPS = this.state.gpsInput.replace('(','').replace(')','').split(',');
-				// should only have 1 comma
-				const gPoint: GPSPoint = {
-					longitude: parseFloat(parseGPS[0]),
-					latitude: parseFloat(parseGPS[1])
-				};
-				this.props.editGroupGPS(gPoint);
+		if (this.state.groupArea.match(pattern2) || this.state.groupArea === '') {
+			if (this.state.groupArea !== '') {
+				this.props.editGroupArea(parseFloat(this.state.groupArea));
 			}
-			const pattern2 = /^\d+(\.\d+)?$/;
-			if (this.state.groupArea.match(pattern2) || this.state.groupArea === '') {
-				if (this.state.groupArea !== '') {
-					this.props.editGroupArea(parseFloat(this.state.groupArea));
+			if (this.state.gpsInput === '' || isValidGPSInput(gpsProxy)) {
+				if (this.state.gpsInput !== '') {
+					// if it satisfies if condition, and defined, then set GPSPoint
+					const parseGPS = gpsProxy.split(',');
+					// should only have 1 comma
+					const gPoint: GPSPoint = {
+						longitude: parseFloat(parseGPS[0]),
+						latitude: parseFloat(parseGPS[1])
+					};
+					this.props.editGroupGPS(gPoint);
 				}
 				this.props.submitGroupInEditingIfNeeded();
 			}
 			else {
-				window.alert(this.props.intl.formatMessage({id: 'area.error'}));
+				window.alert(this.props.intl.formatMessage({id: 'group.gps.error'}));
 			}
 		}
 		else {
-			window.alert(this.props.intl.formatMessage({id: 'group.gps.error'}));
+			window.alert(this.props.intl.formatMessage({id: 'area.error'}));
 		}
 	}
 
