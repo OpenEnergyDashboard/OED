@@ -51,12 +51,7 @@ function mapStateToProps(state: State) {
 		allGroupsExceptChildGroups,
 		childMeters,
 		childGroups,
-		id: groupInEditing.id,
-		currentName: groupInEditing.name,
-		currentDisplayable: groupInEditing.displayable,
-		currentGPS: groupInEditing.gps,
-		currentNote: groupInEditing.note,
-		currentArea: groupInEditing.area
+		currentGroup: groupInEditing
 	};
 }
 

@@ -138,9 +138,8 @@ router.get('/deep/meters/:group_id', async (req, res) => {
 router.post('/create', adminAuthenticator('create groups'), async (req, res) => {
 	const validGroup = {
 		type: 'object',
-		minProperties: 4,
 		maxProperties: 7,
-		required: ['name', 'displayable', 'childGroups', 'childMeters'],
+		required: ['name', 'childGroups', 'childMeters'],
 		properties: {
 			name: {
 				type: 'string',
@@ -227,9 +226,8 @@ router.post('/create', adminAuthenticator('create groups'), async (req, res) => 
 router.put('/edit', adminAuthenticator('edit groups'), async (req, res) => {
 	const validGroup = {
 		type: 'object',
-		minProperties: 5,
 		maxProperties: 8,
-		required: ['id', 'name', 'displayable', 'childGroups', 'childMeters'],
+		required: ['id', 'name', 'childGroups', 'childMeters'],
 		properties: {
 			id: { type: 'integer' },
 			name: {

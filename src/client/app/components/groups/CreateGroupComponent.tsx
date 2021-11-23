@@ -15,7 +15,7 @@ import FooterContainer from '../../containers/FooterContainer';
 import { browserHistory } from '../../utils/history';
 import { FormattedMessage, InjectedIntlProps, injectIntl, defineMessages } from 'react-intl';
 import TooltipHelpContainerAlternative from '../../containers/TooltipHelpContainerAlternative';
-import { GPSPoint } from 'utils/calibration';
+import { GPSPoint, isValidGPSInput } from '../../utils/calibration';
 
 interface CreateGroupProps {
 	meters: NamedIDItem[];
@@ -184,33 +184,33 @@ class CreateGroupComponent extends React.Component<CreateGroupPropsWithIntl, Cre
 	}
 
 	private handleCreateGroup() {
+		const gpsProxy = this.state.gpsInput.replace('(','').replace(')','').replace(' ', '');
+		const pattern2 = /^\d+(\.\d+)?$/;
 		// need to check gps and area
 		// gps and area are still optional so check if blank
-		const pattern = /^(\()?\d+\,\d+(\))?$/;
-		if (this.state.gpsInput === '' || this.state.gpsInput.match(pattern)) {
-			// if it satisfies if condition, and defined, then set GPSPoint
-			if (this.state.gpsInput !== '') {
-				const parseGPS = this.state.gpsInput.replace('(','').replace(')','').split(',');
-				// should only have 1 comma
-				const gPoint: GPSPoint = {
-					longitude: parseFloat(parseGPS[0]),
-					latitude: parseFloat(parseGPS[1])
-				};
-				this.props.editGroupGPS(gPoint);
+		if (this.state.groupArea.match(pattern2) || this.state.groupArea === '') {
+			if (this.state.groupArea !== '') {
+				this.props.editGroupArea(parseFloat(this.state.groupArea));
 			}
-			const pattern2 = /^\d+(\.\d+)?$/;
-			if (this.state.groupArea.match(pattern2) || this.state.groupArea === '') {
-				if (this.state.groupArea !== '') {
-					this.props.editGroupArea(parseFloat(this.state.groupArea));
+			if (this.state.gpsInput === '' || isValidGPSInput(gpsProxy)) {
+				if (this.state.gpsInput !== '') {
+					// if it satisfies if condition, and defined, then set GPSPoint
+					const parseGPS = gpsProxy.split(',');
+					// should only have 1 comma
+					const gPoint: GPSPoint = {
+						longitude: parseFloat(parseGPS[0]),
+						latitude: parseFloat(parseGPS[1])
+					};
+					this.props.editGroupGPS(gPoint);
 				}
 				this.props.submitGroupInEditingIfNeeded();
 			}
 			else {
-				window.alert(this.props.intl.formatMessage({id: 'area.error'}));
+				window.alert(this.props.intl.formatMessage({id: 'group.gps.error'}));
 			}
 		}
 		else {
-			window.alert(this.props.intl.formatMessage({id: 'group.gps.error'}));
+			window.alert(this.props.intl.formatMessage({id: 'area.error'}));
 		}
 	}
 
