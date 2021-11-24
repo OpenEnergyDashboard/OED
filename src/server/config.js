@@ -47,7 +47,4 @@ config.serverPort = process.env.OED_SERVER_PORT;
 config.logFile = process.env.OED_LOG_FILE || 'log.txt';
 config.subdir = process.env.OED_SUBDIR || '';
 
-config.obvius = {
-	password: process.env.OED_OBVIUS_PASSWORD || 'password'
-};
 module.exports = config;

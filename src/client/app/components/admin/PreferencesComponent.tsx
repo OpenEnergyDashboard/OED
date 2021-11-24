@@ -117,6 +117,19 @@ class PreferencesComponent extends React.Component<PreferencesPropsWithIntl, {}>
 							<FormattedMessage id='compare'/>
 						</label>
 					</div>
+					<div className='radio'>
+						<label>
+							<input
+								type='radio'
+								name='chartTypes'
+								style={{marginRight: '10px'}}
+								value={ChartTypes.map}
+								onChange={this.handleDefaultChartToRenderChange}
+								checked={this.props.defaultChartToRender === ChartTypes.map}
+							/>
+							<FormattedMessage id='map'/>
+						</label>
+					</div>
 				</div>
 				<div className='checkbox'>
 					<p style={labelStyle}>
