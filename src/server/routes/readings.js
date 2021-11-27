@@ -158,8 +158,8 @@ router.get('/line/raw/meters/:meter_ids', async (req, res) => {
 				rawReadings.map(ele => {
 					delete ele.meterID;
 					ele.label = meterLabel;
-					ele.startTimestamp = moment(ele.startTimestamp).format('dddd LL LTS').replace(/,/g, '');
-					ele.endTimestamp = moment(ele.endTimestamp).format('dddd LL LTS').replace(/,/g, '');
+					ele.startTimestamp = moment(ele.startTimestamp).format('dddd LL LTS').replace(/,/g, ''); // use regex to omit pesky commas
+					ele.endTimestamp = moment(ele.endTimestamp).format('dddd LL LTS').replace(/,/g, ''); // use regex to omit pesky commas
 					toReturn.push(ele);
 				})
 			}
