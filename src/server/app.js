@@ -4,6 +4,7 @@
 
 const fs = require('fs');
 const express = require('express');
+const rateLimit = require('express-rate-limit');
 const path = require('path');
 const favicon = require('serve-favicon');
 const logger = require('morgan');
@@ -30,7 +31,11 @@ const logs = require('./routes/logs');
 const obvius = require('./routes/obvius');
 const csv = require('./routes/csv');
 
-const app = express();
+const limiter = new rateLimit({
+	windowMs: 1*60*1000, // 1 minute
+	max: 300
+});
+const app = express().use(limiter);
 
 // If other logging is turned off, there's no reason to log HTTP requests either.
 // TODO: Potentially modify the Morgan logger to use the log API, thus unifying all our logging.
