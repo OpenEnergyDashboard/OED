@@ -36,7 +36,7 @@ export interface ExportDataSet {
 	id: number;
 	currentChart: ChartTypes;
 	/* tslint:disable:array-type */
-	exportVals: Array<{ x: number, y: number, z?: number }>;
+	exportVals: Array<{ x: number, y: number, z: number }>;
 	/* tslint:enable:array-type */
 }
 
