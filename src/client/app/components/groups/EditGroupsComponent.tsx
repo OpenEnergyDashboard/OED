@@ -173,7 +173,7 @@ class EditGroupsComponent extends React.Component<EditGroupsPropsWithIntl, EditG
 						</div>
 						<div style={divBottomStyle} className='col-4'>
 							<p style={boldStyle}>
-								<FormattedMessage id='group.note' />:
+								<FormattedMessage id='note' />:
 							</p>
 							<textarea className='col-12' style={textAreaStyle} value={this.state.groupNote} onChange={this.handleNoteChange} />
 						</div>

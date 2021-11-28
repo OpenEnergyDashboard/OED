@@ -114,7 +114,7 @@ class CreateGroupComponent extends React.Component<CreateGroupPropsWithIntl, Cre
 						</div>
 						<div style={divBottomStyle} className='col-4'>
 							<p style={textStyle}>
-								<FormattedMessage id='group.note' />:
+								<FormattedMessage id='note' />:
 							</p>
 							<textarea className='col-12' style={textAreaStyle} onChange={this.handleNoteChange} />
 						</div>
