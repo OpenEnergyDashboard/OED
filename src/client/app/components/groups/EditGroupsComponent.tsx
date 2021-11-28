@@ -173,7 +173,7 @@ class EditGroupsComponent extends React.Component<EditGroupsPropsWithIntl, EditG
 						</div>
 						<div style={divBottomStyle} className='col-4'>
 							<p style={boldStyle}>
-								<FormattedMessage id='map.note' />:
+								<FormattedMessage id='group.note' />:
 							</p>
 							<textarea className='col-12' style={textAreaStyle} value={this.state.groupNote} onChange={this.handleNoteChange} />
 						</div>
@@ -289,10 +289,12 @@ class EditGroupsComponent extends React.Component<EditGroupsPropsWithIntl, EditG
 
 	private handleDisplayChange(e: React.ChangeEvent<HTMLInputElement>) {
 		this.props.editGroupDisplayable(e.target.value === 'true');
+		this.setState({ groupDisplay: (e.target.value === 'true') })
 	}
 
 	private handleNoteChange(e: React.ChangeEvent<HTMLTextAreaElement>) {
 		this.props.editGroupNote(e.target.value);
+		this.setState({ groupNote: e.target.value });
 	}
 
 	private handleAreaChange(e: React.ChangeEvent<HTMLInputElement>) {
@@ -357,9 +359,6 @@ class EditGroupsComponent extends React.Component<EditGroupsPropsWithIntl, EditG
 					this.props.editGroupGPS(gPoint);
 				}
 				this.props.submitGroupInEditingIfNeeded();
-			}
-			else {
-				window.alert(this.props.intl.formatMessage({id: 'group.gps.error'}));
 			}
 		}
 		else {
