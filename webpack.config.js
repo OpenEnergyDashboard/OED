@@ -4,6 +4,7 @@
 
 const LodashModuleReplacementPlugin = require('lodash-webpack-plugin');
 const TerserPlugin = require("terser-webpack-plugin");
+const NodePolyfillPlugin = require("node-polyfill-webpack-plugin")
 const webpack = require('webpack');
 const path = require('path');
 const { CheckerPlugin } = require('awesome-typescript-loader');
@@ -63,7 +64,8 @@ const config = {
     },
 	plugins: [
         new LodashModuleReplacementPlugin(),
-		new CheckerPlugin(),
+        new NodePolyfillPlugin(),
+        new CheckerPlugin(),
 	]
 };
 
