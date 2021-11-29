@@ -7,28 +7,48 @@ import { Input, Button } from 'reactstrap';
 import DatasourceBoxContainer from '../../containers/groups/DatasourceBoxContainer';
 import { SelectionType } from '../../containers/groups/DatasourceBoxContainer';
 import { NamedIDItem } from '../../types/items';
-import { CreateNewBlankGroupAction, EditGroupNameAction, ChangeDisplayModeAction } from '../../types/redux/groups';
+import { CreateNewBlankGroupAction, EditGroupNameAction,
+	EditGroupGPSAction, EditGroupDisplayableAction, EditGroupNoteAction,
+	EditGroupAreaAction, ChangeDisplayModeAction } from '../../types/redux/groups';
 import HeaderContainer from '../../containers/HeaderContainer';
 import FooterContainer from '../../containers/FooterContainer';
 import { browserHistory } from '../../utils/history';
 import { FormattedMessage, InjectedIntlProps, injectIntl, defineMessages } from 'react-intl';
 import TooltipHelpContainerAlternative from '../../containers/TooltipHelpContainerAlternative';
+import { GPSPoint, isValidGPSInput } from '../../utils/calibration';
 
 interface CreateGroupProps {
 	meters: NamedIDItem[];
 	groups: NamedIDItem[];
 	createNewBlankGroup(): CreateNewBlankGroupAction;
 	editGroupName(name: string): EditGroupNameAction;
+	editGroupGPS(gps: GPSPoint): EditGroupGPSAction;
+	editGroupDisplayable(display: boolean): EditGroupDisplayableAction;
+	editGroupNote(note: string): EditGroupNoteAction;
+	editGroupArea(area: number): EditGroupAreaAction;
 	submitGroupInEditingIfNeeded(): Promise<any>;
 	changeDisplayModeToView(): ChangeDisplayModeAction;
 }
 
+interface CreateGroupState {
+	gpsInput: string;
+	groupArea: string;
+}
+
 type CreateGroupPropsWithIntl = CreateGroupProps & InjectedIntlProps;
 
-class CreateGroupComponent extends React.Component<CreateGroupPropsWithIntl, {}> {
+class CreateGroupComponent extends React.Component<CreateGroupPropsWithIntl, CreateGroupState> {
 	constructor(props: CreateGroupPropsWithIntl) {
 		super(props);
+		this.state = {
+			gpsInput: '',
+			groupArea: ''
+		};
 		this.handleNameChange = this.handleNameChange.bind(this);
+		this.handleGPSChange = this.handleGPSChange.bind(this);
+		this.handleDisplayChange = this.handleDisplayChange.bind(this);
+		this.handleNoteChange = this.handleNoteChange.bind(this);
+		this.handleAreaChange = this.handleAreaChange.bind(this);
 		this.handleCreateGroup = this.handleCreateGroup.bind(this);
 		this.handleReturnToView = this.handleReturnToView.bind(this);
 	}
@@ -41,6 +61,9 @@ class CreateGroupComponent extends React.Component<CreateGroupPropsWithIntl, {}>
 		const divStyle: React.CSSProperties = {
 			paddingTop: '35px'
 		};
+		const divFlexStyle: React.CSSProperties = {
+			display: 'flex'
+		};
 		const divBottomStyle: React.CSSProperties = {
 			marginBottom: '20px'
 		};
@@ -50,6 +73,9 @@ class CreateGroupComponent extends React.Component<CreateGroupPropsWithIntl, {}>
 		};
 		const centerTextStyle: React.CSSProperties = {
 			textAlign: 'center'
+		};
+		const textAreaStyle: React.CSSProperties = {
+			paddingLeft: '2px'
 		};
 		const messages = defineMessages({ name: { id: 'name' }});
 		return (
@@ -61,12 +87,45 @@ class CreateGroupComponent extends React.Component<CreateGroupPropsWithIntl, {}>
 						<h3 style={centerTextStyle}>
 							<FormattedMessage id='create.group' />
 						</h3>
-						<div style={divBottomStyle}>
+					</div>
+					<div style={divFlexStyle} className='row col-6'>
+						<div style={divBottomStyle} className='col-4 float-left'>
 							<p style={textStyle}>
 								<FormattedMessage id='name' />:
 							</p>
 							<Input type='text' placeholder={this.props.intl.formatMessage(messages.name)} onChange={this.handleNameChange} />
 						</div>
+						<div style={divBottomStyle} className='col-4'>
+							<p style={textStyle}>
+								<FormattedMessage id='group.gps' />:
+							</p>
+							<Input type='text' onChange={this.handleGPSChange} />
+						</div>
+					</div>
+					<div style={divFlexStyle} className='row col-6'>
+						<div style={divBottomStyle} className='col-4 float-left'>
+							<p style={textStyle}>
+								<FormattedMessage id='displayable' />:
+							</p>
+							<Input type='select' name='displayselect' onChange={this.handleDisplayChange}>
+								<option value='true'> True </option>
+								<option value='false'> False </option>
+							</Input>
+						</div>
+						<div style={divBottomStyle} className='col-4'>
+							<p style={textStyle}>
+								<FormattedMessage id='note' />:
+							</p>
+							<textarea className='col-12' style={textAreaStyle} onChange={this.handleNoteChange} />
+						</div>
+						<div style={divBottomStyle} className='col-4'>
+							<p style={textStyle}>
+								<FormattedMessage id='area' />:
+							</p>
+							<Input type='text' onChange={this.handleAreaChange}/>
+						</div>
+					</div>
+					<div className='col-6'>
 						<div style={divBottomStyle}>
 							<p style={textStyle}>
 								<FormattedMessage id='select.meters' />:
@@ -107,8 +166,49 @@ class CreateGroupComponent extends React.Component<CreateGroupPropsWithIntl, {}>
 		}
 	}
 
+	private handleGPSChange(e: React.ChangeEvent<HTMLInputElement>) {
+		this.setState({ gpsInput: e.target.value });
+	}
+
+	private handleDisplayChange(e: React.ChangeEvent<HTMLInputElement>) {
+		this.props.editGroupDisplayable(e.target.value === 'true');
+	}
+
+	private handleNoteChange(e: React.ChangeEvent<HTMLTextAreaElement>) {
+		this.props.editGroupNote(e.target.value);
+	}
+
+	private handleAreaChange(e: React.ChangeEvent<HTMLInputElement>) {
+		this.setState({ groupArea: e.target.value });
+		// still need to set state to parse check before submitting
+	}
+
 	private handleCreateGroup() {
-		this.props.submitGroupInEditingIfNeeded();
+		const gpsProxy = this.state.gpsInput.replace('(','').replace(')','').replace(' ', '');
+		const pattern2 = /^\d+(\.\d+)?$/;
+		// need to check gps and area
+		// gps and area are still optional so check if blank
+		if (this.state.groupArea.match(pattern2) || this.state.groupArea === '') {
+			if (this.state.groupArea !== '') {
+				this.props.editGroupArea(parseFloat(this.state.groupArea));
+			}
+			if (this.state.gpsInput === '' || isValidGPSInput(gpsProxy)) {
+				if (this.state.gpsInput !== '') {
+					// if it satisfies if condition, and defined, then set GPSPoint
+					const parseGPS = gpsProxy.split(',');
+					// should only have 1 comma
+					const gPoint: GPSPoint = {
+						longitude: parseFloat(parseGPS[0]),
+						latitude: parseFloat(parseGPS[1])
+					};
+					this.props.editGroupGPS(gPoint);
+				}
+				this.props.submitGroupInEditingIfNeeded();
+			}
+		}
+		else {
+			window.alert(this.props.intl.formatMessage({id: 'area.error'}));
+		}
 	}
 
 	private handleReturnToView() {
