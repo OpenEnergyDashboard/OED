@@ -12,8 +12,6 @@ const BUILD_DIR = path.resolve(__dirname, 'src/client/public/app');
 const APP_DIR = path.resolve(__dirname, 'src/client/app');
 
 const config = {
-    // set to production for now
-    mode: (process.env.NODE_ENV === 'production') ? 'production' : 'development',
     // Enable sourcemaps for debugging webpack's output.
     devtool: 'source-map',
     entry: {
@@ -72,7 +70,9 @@ const config = {
 if (process.env.NODE_ENV === 'production') {
 	config.plugins.push(
 		new webpack.DefinePlugin({
-            'process.env': JSON.stringify('production'),
+            'process.env': {
+                NODE_ENV: JSON.stringify('production')
+            }
 		}),
 		new TerserPlugin({ sourceMap: true })
 	);

@@ -10,5 +10,5 @@
 # but there's no reason not to use it in non-container ones.
 # It starts the autorebuild in the background and then
 # runs the server.
-npx webpack serve &
+npm run webpack:dev &
 npm run start:dev

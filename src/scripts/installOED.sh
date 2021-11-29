@@ -147,9 +147,9 @@ fi
 
 # Build webpack if needed
 if [ "$production" == "yes" ] || [ "$OED_PRODUCTION" == "yes" ]; then
-    npx webpack build
+    npm run webpack:build
 elif [ "$dostart" == "no" ]; then
-	npx webpack
+	npm run webpack
 fi
 
 printf "%s\n" "OED install finished"
