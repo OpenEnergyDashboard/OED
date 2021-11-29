@@ -195,6 +195,15 @@ class PreferencesComponent extends React.Component<PreferencesPropsWithIntl, {}>
 					</p>
 					<TimeZoneSelect current={this.props.defaultTimeZone} handleClick={this.handleDefaultTimeZoneChange} />
 				</div>
+				<div style={bottomPaddingStyle}>
+					<p style={titleStyle}>
+						<FormattedMessage id='default.warning.file.size' />:
+					</p>
+					<Input
+						type='number'
+						maxLength={50}
+					/>
+				</div>
 				<Button
 					type='submit'
 					onClick={this.handleSubmitPreferences}
