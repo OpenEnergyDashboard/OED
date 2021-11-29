@@ -114,7 +114,7 @@ class CreateGroupComponent extends React.Component<CreateGroupPropsWithIntl, Cre
 						</div>
 						<div style={divBottomStyle} className='col-4'>
 							<p style={textStyle}>
-								<FormattedMessage id='map.note' />:
+								<FormattedMessage id='note' />:
 							</p>
 							<textarea className='col-12' style={textAreaStyle} onChange={this.handleNoteChange} />
 						</div>
@@ -204,9 +204,6 @@ class CreateGroupComponent extends React.Component<CreateGroupPropsWithIntl, Cre
 					this.props.editGroupGPS(gPoint);
 				}
 				this.props.submitGroupInEditingIfNeeded();
-			}
-			else {
-				window.alert(this.props.intl.formatMessage({id: 'group.gps.error'}));
 			}
 		}
 		else {
