@@ -32,7 +32,7 @@ const obvius = require('./routes/obvius');
 const csv = require('./routes/csv');
 
 const limiter = new rateLimit({
-	windowMs: 1*60*1000, // 1 minute
+	windowMs: 1 * 60 * 1000, // 1 minute
 	max: 300
 });
 const app = express().use(limiter);
@@ -44,8 +44,8 @@ if (log.level !== LogLevel.SILENT) {
 }
 
 app.use(favicon(path.join(__dirname, '..', 'client', 'public', 'favicon.ico')));
-app.use(bodyParser.json({limit: '50mb'}));
-app.use(bodyParser.urlencoded({ extended: false, limit:'50mb'}));
+app.use(bodyParser.json({ limit: '50mb' }));
+app.use(bodyParser.urlencoded({ extended: false, limit: '50mb' }));
 app.use(cookieParser());
 
 app.use('/api/users', users);
