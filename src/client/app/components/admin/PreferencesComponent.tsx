@@ -23,6 +23,7 @@ interface PreferencesProps {
 	defaultTimeZone: string;
 	defaultLanguage: LanguageTypes;
 	disableSubmitPreferences: boolean;
+	defaultWarningFileSize: number;
 	updateDisplayTitle(title: string): UpdateDisplayTitleAction;
 	updateDefaultChartType(defaultChartToRender: ChartTypes): UpdateDefaultChartToRenderAction;
 	toggleDefaultBarStacking(): ToggleDefaultBarStackingAction;
@@ -201,6 +202,7 @@ class PreferencesComponent extends React.Component<PreferencesPropsWithIntl, {}>
 					</p>
 					<Input
 						type='number'
+						value={this.props.defaultWarningFileSize}
 						maxLength={50}
 					/>
 				</div>

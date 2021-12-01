@@ -15,7 +15,8 @@ const defaultState: AdminState = {
 	defaultTimeZone: '',
 	defaultLanguage: LanguageTypes.en,
 	isFetching: false,
-	submitted: true
+	submitted: true,
+	defaultWarningFileSize: 5
 };
 
 export default function admin(state = defaultState, action: AdminAction) {

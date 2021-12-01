@@ -74,4 +74,5 @@ export interface AdminState {
 	defaultLanguage: LanguageTypes;
 	isFetching: boolean;
 	submitted: boolean;
+	defaultWarningFileSize: number;
 }

@@ -24,7 +24,8 @@ function mapStateToProps(state: State) {
 		defaultTimeZone: state.admin.defaultTimeZone,
 		defaultBarStacking: state.admin.defaultBarStacking,
 		defaultLanguage: state.admin.defaultLanguage,
-		disableSubmitPreferences: state.admin.submitted
+		disableSubmitPreferences: state.admin.submitted,
+		defaultWarningFileSize: state.admin.defaultWarningFileSize
 	};
 }
 
