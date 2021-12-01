@@ -49,7 +49,8 @@ mocha.describe('Groups', () => {
 		// pull larry back out of the db so that we get his ID
 		larry = await Group.getByName('Larry', conn);
 		// rename 'Larry' -> 'Bob'
-		await larry.rename('Bob', conn);
+		larry.name = 'Bob';
+		await larry.update(conn);
 		// bob should be larry, but renamed
 		const bob = await Group.getByID(larry.id, conn);
 		expect(bob.id).to.equal(larry.id);

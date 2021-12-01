@@ -10,18 +10,23 @@ const { getConnection } = require('../db');
 const Group = require('../models/Group');
 const adminAuthenticator = require('./authenticator').adminAuthMiddleware;
 const { log } = require('../log');
+const Point = require('../models/Point');
 
 const router = express.Router();
 
 /**
- * Given a meter or group, return only the name, ID, and gps of that meter or group.
+ * Given a meter or group, return id, name, displayable, gps, note, area.
  * This exists to control what data we send to the client.
  * @param item group or meter
  * @param gps GPS Point
- * @returns {{id, name, gps}}
+ * @param displayable boolean
+ * @param note string
+ * @param area number
+ * @returns {{id, name, gps, displayable, note, area}}
  */
-function formatToOnlyNameIDAndGPS(item) {
-	return { id: item.id, name: item.name, gps: item.gps };
+function formatGroupForResponse(item) {
+	return { id: item.id, name: item.name, gps: item.gps, displayable: item.displayable,
+	note: item.note, area: item.area };
 }
 
 /**
@@ -41,7 +46,7 @@ router.get('/', async (req, res) => {
 	const conn = getConnection();
 	try {
 		const rows = await Group.getAll(conn);
-		res.json(rows.map(formatToOnlyNameIDAndGPS));
+		res.json(rows.map(formatGroupForResponse));
 	} catch (err) {
 		log.error(`Error while preforming GET all groups query: ${err}`, err);
 	}
@@ -133,12 +138,40 @@ router.get('/deep/meters/:group_id', async (req, res) => {
 router.post('/create', adminAuthenticator('create groups'), async (req, res) => {
 	const validGroup = {
 		type: 'object',
-		maxProperties: 3,
+		maxProperties: 7,
 		required: ['name', 'childGroups', 'childMeters'],
 		properties: {
 			name: {
 				type: 'string',
 				minLength: 1
+			},
+			displayable: {
+				type: 'bool'
+			},
+			gps: {
+				oneOf: [
+					{
+						type: 'object',
+						required: ['latitude', 'longitude'],
+						properties: {
+							latitude: { type: 'number', minimum: '-90', maximum: '90' },
+							longitude: { type: 'number', minimum: '-180', maximum: '180' }
+						}
+					},
+					{ type: 'null' }
+				]
+			},
+			note: {
+				oneOf: [
+					{ type: 'string' },
+					{ type: 'null' }
+				]
+			},
+			area: {
+				oneOf: [
+					{ type: 'number' },
+					{ type: 'null' }
+				]
 			},
 			childGroups: {
 				type: 'array',
@@ -163,7 +196,16 @@ router.post('/create', adminAuthenticator('create groups'), async (req, res) => 
 		const conn = getConnection();
 		try {
 			await conn.tx(async t => {
-				const newGroup = new Group(undefined, req.body.name);
+				const newGPS = (req.body.gps) ? new Point(req.body.gps.longitude, req.body.gps.latitude) : null;
+				const newGroup = new Group(
+					undefined,
+					req.body.name,
+					req.body.displayable,
+					newGPS,
+					req.body.note,
+					req.body.area
+				);
+
 				await newGroup.insert(t);
 				const adoptGroupsQuery = req.body.childGroups.map(gid => newGroup.adoptGroup(gid, t));
 				const adoptMetersQuery = req.body.childMeters.map(mid => newGroup.adoptMeter(mid, t));
@@ -184,13 +226,41 @@ router.post('/create', adminAuthenticator('create groups'), async (req, res) => 
 router.put('/edit', adminAuthenticator('edit groups'), async (req, res) => {
 	const validGroup = {
 		type: 'object',
-		maxProperties: 4,
+		maxProperties: 8,
 		required: ['id', 'name', 'childGroups', 'childMeters'],
 		properties: {
 			id: { type: 'integer' },
 			name: {
 				type: 'string',
 				minLength: 1
+			},
+			displayable: {
+				type: 'bool'
+			},
+			gps: {
+				oneOf: [
+					{
+						type: 'object',
+						required: ['latitude', 'longitude'],
+						properties: {
+							latitude: { type: 'number', minimum: '-90', maximum: '90' },
+							longitude: { type: 'number', minimum: '-180', maximum: '180' }
+						}
+					},
+					{ type: 'null' }
+				]
+			},
+			note: {
+				oneOf: [
+					{ type: 'string' },
+					{ type: 'null' }
+				]
+			},
+			area: {
+				oneOf: [
+					{ type: 'number' },
+					{ type: 'null' }
+				]
 			},
 			childGroups: {
 				type: 'array',
@@ -218,11 +288,18 @@ router.put('/edit', adminAuthenticator('edit groups'), async (req, res) => {
 			const currentChildGroups = await Group.getImmediateGroupsByGroupID(currentGroup.id, conn);
 			const currentChildMeters = await Group.getImmediateMetersByGroupID(currentGroup.id, conn);
 
-			await conn.tx(t => {
-				let nameChangeQuery = [];
-				if (req.body.name !== currentGroup.name) {
-					nameChangeQuery = currentGroup.rename(req.body.name, t);
-				}
+			await conn.tx(async t => {
+				const newGPS = (req.body.gps) ? new Point(req.body.gps.longitude, req.body.gps.latitude) : null;
+				const newGroup = new Group(
+					req.body.id,
+					req.body.name,
+					req.body.displayable,
+					newGPS,
+					req.body.note,
+					req.body.area
+				);
+
+				await newGroup.update(t);
 
 				const adoptedGroups = _.difference(req.body.childGroups, currentChildGroups);
 				const adoptGroupsQueries = adoptedGroups.map(gid => currentGroup.adoptGroup(gid, t));
@@ -237,7 +314,7 @@ router.put('/edit', adminAuthenticator('edit groups'), async (req, res) => {
 				const disownedMeters = _.difference(currentChildMeters, req.body.childMeters);
 				const disownMetersQueries = disownedMeters.map(mid => currentGroup.disownMeter(mid, t));
 
-				return t.batch(_.flatten([nameChangeQuery, adoptGroupsQueries, disownGroupsQueries, adoptMetersQueries, disownMetersQueries]));
+				return t.batch(_.flatten([adoptGroupsQueries, disownGroupsQueries, adoptMetersQueries, disownMetersQueries]));
 			});
 			res.sendStatus(200);
 		} catch (err) {

@@ -7,7 +7,7 @@ import { connect } from 'react-redux';
 import EditGroupsComponent from '../../components/groups/EditGroupsComponent';
 import {
 	submitGroupInEditingIfNeeded,
-	editGroupName,
+	editGroupName, editGroupGPS, editGroupDisplayable, editGroupNote, editGroupArea,
 	changeChildMeters,
 	changeChildGroups,
 	changeDisplayMode,
@@ -17,6 +17,7 @@ import { GroupDefinition, DisplayMode } from '../../types/redux/groups';
 import { Dispatch } from '../../types/redux/actions';
 import { State } from '../../types/redux/state';
 import {  browserHistory } from '../../utils/history';
+import { GPSPoint } from 'utils/calibration';
 
 function mapStateToProps(state: State) {
 	const allMeters = _.sortBy(_.values(state.meters.byMeterID).map(meter => ({ id: meter.id, name: meter.name.trim() })), 'name');
@@ -50,7 +51,7 @@ function mapStateToProps(state: State) {
 		allGroupsExceptChildGroups,
 		childMeters,
 		childGroups,
-		name: groupInEditing.name
+		currentGroup: groupInEditing
 	};
 }
 
@@ -59,6 +60,10 @@ function mapDispatchToProps(dispatch: Dispatch) {
 		submitGroupInEditingIfNeeded: () => dispatch(submitGroupInEditingIfNeeded()),
 		deleteGroup: () => dispatch(deleteGroup()),
 		editGroupName: (name: string) => dispatch(editGroupName(name)),
+		editGroupGPS: (gps: GPSPoint) => dispatch(editGroupGPS(gps)),
+		editGroupDisplayable: (display: boolean) => dispatch(editGroupDisplayable(display)),
+		editGroupNote: (note: string) => dispatch(editGroupNote(note)),
+		editGroupArea: (area: number) => dispatch(editGroupArea(area)),
 		changeDisplayModeToView: () => dispatch(changeDisplayMode(DisplayMode.View)),
 		changeChildMeters: (meterIDs: number[]) => dispatch(changeChildMeters(meterIDs)),
 		changeChildGroups: (groupIDs: number[]) => dispatch(changeChildGroups(groupIDs))
