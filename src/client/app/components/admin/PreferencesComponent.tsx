@@ -10,7 +10,8 @@ import {
 	UpdateDefaultChartToRenderAction,
 	UpdateDefaultLanguageAction,
 	UpdateDefaultTimeZone,
-	UpdateDisplayTitleAction
+	UpdateDisplayTitleAction,
+	UpdateDefaultWarningFileSize,
 } from '../../types/redux/admin';
 import { defineMessages, FormattedMessage, injectIntl, InjectedIntlProps } from 'react-intl';
 import { LanguageTypes } from '../../types/redux/i18n';
@@ -30,6 +31,7 @@ interface PreferencesProps {
 	updateDefaultLanguage(defaultLanguage: LanguageTypes): UpdateDefaultLanguageAction;
 	submitPreferences(): Promise<void>;
 	updateDefaultTimeZone(timeZone: string): UpdateDefaultTimeZone;
+	updateDefaultWarningFileSize(updateDefaultWarningFileSize: number): UpdateDefaultWarningFileSize;
 }
 
 type PreferencesPropsWithIntl = PreferencesProps & InjectedIntlProps;
@@ -43,6 +45,7 @@ class PreferencesComponent extends React.Component<PreferencesPropsWithIntl, {}>
 		this.handleDefaultTimeZoneChange = this.handleDefaultTimeZoneChange.bind(this);
 		this.handleDefaultLanguageChange = this.handleDefaultLanguageChange.bind(this);
 		this.handleSubmitPreferences = this.handleSubmitPreferences.bind(this);
+		this.handleDefaultWarningFileSizeChange = this.handleDefaultWarningFileSizeChange.bind(this);
 	}
 
 	public render() {
@@ -203,6 +206,7 @@ class PreferencesComponent extends React.Component<PreferencesPropsWithIntl, {}>
 					<Input
 						type='number'
 						value={this.props.defaultWarningFileSize}
+						onChange={this.handleDefaultWarningFileSizeChange}
 						maxLength={50}
 					/>
 				</div>
@@ -239,6 +243,10 @@ class PreferencesComponent extends React.Component<PreferencesPropsWithIntl, {}>
 
 	private handleSubmitPreferences() {
 		this.props.submitPreferences();
+	}
+
+	private handleDefaultWarningFileSizeChange(e: { target: HTMLInputElement; }) {
+		this.props.updateDefaultWarningFileSize(parseFloat(e.target.value));
 	}
 }
 

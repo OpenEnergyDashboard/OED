@@ -17,6 +17,7 @@ export type AdminAction =
 	| ReceivePreferencesAction
 	| MarkPreferencesNotSubmittedAction
 	| UpdateDefaultTimeZone
+	| UpdateDefaultWarningFileSize
 	| MarkPreferencesSubmittedAction;
 
 export interface UpdateImportMeterAction {
@@ -63,6 +64,11 @@ export interface MarkPreferencesNotSubmittedAction {
 
 export interface MarkPreferencesSubmittedAction {
 	type: ActionType.MarkPreferencesSubmitted;
+}
+
+export interface UpdateDefaultWarningFileSize {
+	type: ActionType.UpdateDefaultWarningFileSize;
+	defaultWarningFileSize: number;
 }
 
 export interface AdminState {

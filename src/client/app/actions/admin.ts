@@ -40,6 +40,10 @@ export function updateDefaultLanguage(defaultLanguage: LanguageTypes): t.UpdateD
 	return { type: ActionType.UpdateDefaultLanguage, defaultLanguage };
 }
 
+export function updateDefaultWarningFileSize(defaultWarningFileSize: number): t.UpdateDefaultWarningFileSize {
+	return { type: ActionType.UpdateDefaultWarningFileSize, defaultWarningFileSize };
+}
+
 function requestPreferences(): t.RequestPreferencesAction {
 	return { type: ActionType.RequestPreferences };
 }

@@ -10,7 +10,8 @@ import {
 	toggleDefaultBarStacking,
 	updateTimeZone,
 	updateDefaultLanguage,
-	submitPreferencesIfNeeded
+	submitPreferencesIfNeeded,
+	updateDefaultWarningFileSize
 } from '../../actions/admin';
 import { State } from '../../types/redux/state';
 import { Dispatch } from '../../types/redux/actions';
@@ -36,7 +37,8 @@ function mapDispatchToProps(dispatch: Dispatch) {
 		updateDefaultTimeZone: (timeZone: string) => dispatch(updateTimeZone(timeZone)),
 		toggleDefaultBarStacking: () => dispatch(toggleDefaultBarStacking()),
 		updateDefaultLanguage: (defaultLanguage: LanguageTypes) => dispatch(updateDefaultLanguage(defaultLanguage)),
-		submitPreferences: () => dispatch(submitPreferencesIfNeeded())
+		submitPreferences: () => dispatch(submitPreferencesIfNeeded()),
+		updateDefaultWarningFileSize: (defaultWarningFileSize: number) => dispatch(updateDefaultWarningFileSize(defaultWarningFileSize))
 	};
 }
 

@@ -81,6 +81,12 @@ export default function admin(state = defaultState, action: AdminAction) {
 				...state,
 				submitted: true
 			};
+		case ActionType.UpdateDefaultWarningFileSize:
+			return {
+				...state,
+				defaultWarningFileSize: action.defaultWarningFileSize,
+				submitted: false
+			}
 		default:
 			return state;
 	}
