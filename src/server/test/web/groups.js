@@ -134,6 +134,7 @@ mocha.describe('groups API', () => {
 				// Create a duplicate of Group C with a different name.
 				const res = await chai.request(app).post('/api/groups/create').type('json').set('token', token).send({
 					name: 'D',
+					displayable: false,
 					childGroups: [groupB.id],
 					childMeters: [meterA.id]
 				});
@@ -198,6 +199,7 @@ mocha.describe('groups API', () => {
 				let res = await chai.request(app).put('/api/groups/edit').set('token', token).type('json').send({
 					id: groupC.id,
 					name: groupC.name,
+					displayable: groupC.displayable,
 					childGroups: [],
 					childMeters: [meterC.id, meterD.id]
 				});
@@ -218,6 +220,7 @@ mocha.describe('groups API', () => {
 				let res = await chai.request(app).put('/api/groups/edit').set('token', token).type('json').send({
 					id: groupC.id,
 					name: groupC.name,
+					displayable: groupC.displayable,
 					childGroups: [groupD.id],
 					childMeters: [meterC.id]
 				});

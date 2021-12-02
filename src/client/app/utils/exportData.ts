@@ -15,18 +15,20 @@ import { UserRole } from '../types/items';
  */
 
 function convertToCSV(items: ExportDataSet[]) {
-	let csvOutput = 'Label,Readings,Start Timestamp\n';
+	let csvOutput = 'Label,Readings,Start Timestamp,End Timestamp\n';
 	items.forEach(set => {
 		const data = set.exportVals;
 		const label = set.label;
 		data.forEach(reading => {
 			const info = reading.y;
-			const startTimeStamp = moment(reading.x).utc().format('dddd LL LTS').replace(/,/g,''); // use regex to omit pesky commas
-			csvOutput += `"${label}",${info},${startTimeStamp}\n`; // TODO: add column for units
+			const startTimeStamp = moment(reading.x).utc().format('dddd LL LTS').replace(/,/g, ''); // use regex to omit pesky commas
+			const endTimeStamp = moment(reading.z).utc().format('dddd LL LTS').replace(/,/g, '');
+			csvOutput += `"${label}",${info},${startTimeStamp},${endTimeStamp}\n`; // TODO: add column for units
 		});
 	});
 	return csvOutput;
 }
+
 /**
  * Function to download the formatted CSV file to the users computer.
  * @param inputCSV A String containing the formatted CSV data.
@@ -62,14 +64,15 @@ export default function graphExport(dataSets: ExportDataSet[], name: string) {
  */
 export function downloadRawCSV(items: RawReadings[], defaultLanguage: string) {
 	// note that utc() is not needed
-	let csvOutput = 'Label,Readings,Start Timestamp\n';
+	let csvOutput = 'Label,Readings,Start Timestamp,End Timestamp\n';
 	items.forEach(ele => {
-		const timestamp = moment(ele.startTimestamp).format('dddd LL LTS').replace(/,/g,''); // use regex to omit pesky commas
-		csvOutput += `"${ele.label}",${ele.reading},${timestamp}\n`; // TODO: add column for units
+		const startTimestamp = moment(ele.startTimestamp).format('dddd LL LTS').replace(/,/g, ''); // use regex to omit pesky commas
+		const endTimestamp = moment(ele.endTimestamp).format('dddd LL LTS').replace(/,/g, ''); // use regex to omit pesky commas
+		csvOutput += `"${ele.label}",${ele.reading},${startTimestamp},${endTimestamp}\n`; // TODO: add column for units
 	})
 	// Use regex to remove commas and replace spaces/colons/hyphens with underscores
-	const startTime = moment(items[0].startTimestamp).format('LL_LTS').replace(/,/g,'').replace(/[\s:-]/g,'_');
-	const endTime = moment(items[items.length-1].startTimestamp).format('LL_LTS').replace(/,/g,'').replace(/[\s:-]/g,'_');
+	const startTime = moment(items[0].startTimestamp).format('LL_LTS').replace(/,/g, '').replace(/[\s:-]/g, '_');
+	const endTime = moment(items[items.length - 1].startTimestamp).format('LL_LTS').replace(/,/g, '').replace(/[\s:-]/g, '_');
 	const filename = `oedRawExport_line_${startTime}_to_${endTime}.csv`;
 	downloadCSV(csvOutput, filename);
 }

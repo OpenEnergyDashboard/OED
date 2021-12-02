@@ -40,7 +40,6 @@ services:
             - OED_MAIL_FROM=mydomain@example.com # The email address that the email will come from
             - OED_MAIL_TO=someone@example.com  # Set the destination address here for where to send emails
             - OED_MAIL_ORG=My Organization Name # Org name for mail that is included in the subject
-            - OED_OBVIUS_PASSWORD=pleaseChange # The password used when Obvius pushes data to OED and should be changed for security if going to use
             # If in a subdirectory, set it here
             # - OED_SUBDIR=/subdir/
         # Set the correct build environment.
