@@ -78,6 +78,7 @@ function mapStateToProps(state: State) {
 				const hoverText: string[] = [];
 				const readings = _.orderBy(readingsData.readings, ['startTimestamp'], ['asc']);
 				readings.forEach(barReading => {
+					// calculate more precise bar duration 
 					const timeReading: string =
 						`${moment(barReading.startTimestamp).utc().format('LL')} - ${moment(barReading.endTimestamp).utc().format('LL')}`;
 					xData.push(timeReading);
