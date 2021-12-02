@@ -85,8 +85,7 @@ export function downloadRawCSV(items: RawReadings[], defaultLanguage: string) {
 // NOTE: This function is made with the idea that it will not be called very often
 // Ideally we would have a component that prompts the user and handles all the logic
 export async function graphRawExport(count: number, defaultWarningFileSize: number, done: () => Promise<void>): Promise<any> {
-	const fileSize = (count * 0.0442 / 1000)	
-	
+	const fileSize = (count * 0.0849 / 1000);	
 	// Download for anyone 
 	if (fileSize <= defaultWarningFileSize) {
 		return done();
