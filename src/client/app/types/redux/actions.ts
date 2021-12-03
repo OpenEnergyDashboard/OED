@@ -89,6 +89,7 @@ export enum ActionType {
 	MarkPreferencesNotSubmitted = 'MARK_PREFERENCES_NOT_SUBMITTED',
 	MarkPreferencesSubmitted = 'MARK_PREFERENCES_SUBMITTED',
 	UpdateDefaultWarningFileSize = "UPDATE_DEFAULT_WARNING_FILE_SIZE",
+	UpdateDefaultFileSizeLimit = "UPDATE_DEFAULT_FILE_SIZE_LIMIT",
 
 	UpdateCalibrationMode = 'UPDATE_MAP_MODE',
 	UpdateSelectedMap = 'UPDATE_SELECTED_MAPS',

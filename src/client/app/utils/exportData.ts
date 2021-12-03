@@ -84,9 +84,10 @@ export function downloadRawCSV(items: RawReadings[], defaultLanguage: string) {
  */
 // NOTE: This function is made with the idea that it will not be called very often
 // Ideally we would have a component that prompts the user and handles all the logic
-export async function graphRawExport(count: number, defaultWarningFileSize: number, done: () => Promise<void>): Promise<any> {
-	const fileSize = (count * 0.0849 / 1000);	
-	// Download for anyone 
+export async function graphRawExport(count: number, defaultWarningFileSize: number, defaultFileSizeLimit: number, done: () => Promise<void>): Promise<any> {
+	const fileSize = (count * 0.0849 / 1000);
+		
+	// Download for anyone without warning
 	if (fileSize <= defaultWarningFileSize) {
 		return done();
 	}
@@ -113,9 +114,8 @@ export async function graphRawExport(count: number, defaultWarningFileSize: numb
 		<p>Are you sure you want to download</p>
 	`;
 
-	// 25 MB is limit for an admin without checking they really want to download,
-	// TODO: Should this be under admin control?
-	if (fileSize > 25 && (!hasToken() || !(await usersApi.hasRolePermissions(UserRole.EXPORT)))) { // 25 is hard coded but we should get it from state
+	// defaultFileSizeLimit is limit for an admin without checking they really want to download,
+	if (fileSize > defaultFileSizeLimit && (!hasToken() || !(await usersApi.hasRolePermissions(UserRole.EXPORT)))) {
 		innerContainer.innerHTML = "<p>Sorry you don't have permissions to download due to large number of points.</p>";
 		const okButton = document.createElement('button');
 		okButton.innerHTML = 'ok';

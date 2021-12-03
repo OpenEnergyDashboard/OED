@@ -9,4 +9,5 @@ SET
 	default_bar_stacking = ${defaultBarStacking},
 	default_language = ${defaultLanguage},
 	default_timezone = ${defaultTimezone},
-	default_warning_file_size = ${defaultWarningFileSize};
+	default_warning_file_size = ${defaultWarningFileSize},
+	default_file_size_limit = ${defaultFileSizeLimit};

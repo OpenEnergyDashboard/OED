@@ -32,6 +32,7 @@ export interface PreferenceRequestItem {
 	defaultLanguage: LanguageTypes;
 	defaultTimezone: string;
 	defaultWarningFileSize: number;
+	defaultFileSizeLimit: number;
 }
 
 /**

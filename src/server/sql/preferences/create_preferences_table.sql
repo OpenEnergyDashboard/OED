@@ -10,5 +10,6 @@ CREATE TABLE IF NOT EXISTS preferences (
 	default_bar_stacking BOOLEAN NOT NULL,
 	default_language language_type NOT NULL,
 	default_timezone TEXT DEFAULT NULL,
-	default_warning_file_size VARCHAR(50) NOT NULL
+	default_warning_file_size VARCHAR(50) NOT NULL,
+	default_file_size_limit VARCHAR(50) NOT NULL
 );

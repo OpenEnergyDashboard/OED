@@ -44,6 +44,10 @@ export function updateDefaultWarningFileSize(defaultWarningFileSize: number): t.
 	return { type: ActionType.UpdateDefaultWarningFileSize, defaultWarningFileSize };
 }
 
+export function updateDefaultFileSizeLimit(defaultFileSizeLimit: number): t.UpdateDefaultFileSizeLimit {
+	return { type: ActionType.UpdateDefaultFileSizeLimit, defaultFileSizeLimit };
+}
+
 function requestPreferences(): t.RequestPreferencesAction {
 	return { type: ActionType.RequestPreferences };
 }
@@ -88,7 +92,8 @@ function submitPreferences() {
 				defaultBarStacking: state.admin.defaultBarStacking,
 				defaultLanguage: state.admin.defaultLanguage,
 				defaultTimezone: state.admin.defaultTimeZone,
-				defaultWarningFileSize: state.admin.defaultWarningFileSize
+				defaultWarningFileSize: state.admin.defaultWarningFileSize,
+				defaultFileSizeLimit: state.admin.defaultFileSizeLimit
 			});
 			dispatch(markPreferencesSubmitted());
 			showSuccessNotification(translate('updated.preferences'));

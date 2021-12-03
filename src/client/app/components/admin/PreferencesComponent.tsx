@@ -12,6 +12,7 @@ import {
 	UpdateDefaultTimeZone,
 	UpdateDisplayTitleAction,
 	UpdateDefaultWarningFileSize,
+	UpdateDefaultFileSizeLimit,
 } from '../../types/redux/admin';
 import { defineMessages, FormattedMessage, injectIntl, InjectedIntlProps } from 'react-intl';
 import { LanguageTypes } from '../../types/redux/i18n';
@@ -25,13 +26,15 @@ interface PreferencesProps {
 	defaultLanguage: LanguageTypes;
 	disableSubmitPreferences: boolean;
 	defaultWarningFileSize: number;
+	defaultFileSizeLimit: number;
 	updateDisplayTitle(title: string): UpdateDisplayTitleAction;
 	updateDefaultChartType(defaultChartToRender: ChartTypes): UpdateDefaultChartToRenderAction;
 	toggleDefaultBarStacking(): ToggleDefaultBarStackingAction;
 	updateDefaultLanguage(defaultLanguage: LanguageTypes): UpdateDefaultLanguageAction;
 	submitPreferences(): Promise<void>;
 	updateDefaultTimeZone(timeZone: string): UpdateDefaultTimeZone;
-	updateDefaultWarningFileSize(updateDefaultWarningFileSize: number): UpdateDefaultWarningFileSize;
+	updateDefaultWarningFileSize(defaultWarningFileSize: number): UpdateDefaultWarningFileSize;
+	updateDefaultFileSizeLimit(defaultFileSizeLimit: number): UpdateDefaultFileSizeLimit;
 }
 
 type PreferencesPropsWithIntl = PreferencesProps & InjectedIntlProps;
@@ -46,6 +49,7 @@ class PreferencesComponent extends React.Component<PreferencesPropsWithIntl, {}>
 		this.handleDefaultLanguageChange = this.handleDefaultLanguageChange.bind(this);
 		this.handleSubmitPreferences = this.handleSubmitPreferences.bind(this);
 		this.handleDefaultWarningFileSizeChange = this.handleDefaultWarningFileSizeChange.bind(this);
+		this.handleDefaultFileSizeLimitChange = this.handleDefaultFileSizeLimitChange.bind(this);
 	}
 
 	public render() {
@@ -210,6 +214,17 @@ class PreferencesComponent extends React.Component<PreferencesPropsWithIntl, {}>
 						maxLength={50}
 					/>
 				</div>
+				<div style={bottomPaddingStyle}>
+					<p style={titleStyle}>
+						<FormattedMessage id='default.file.size.limit' />:
+					</p>
+					<Input
+						type='number'
+						value={this.props.defaultFileSizeLimit}
+						onChange={this.handleDefaultFileSizeLimitChange}
+						maxLength={50}
+					/>
+				</div>
 				<Button
 					type='submit'
 					onClick={this.handleSubmitPreferences}
@@ -247,6 +262,10 @@ class PreferencesComponent extends React.Component<PreferencesPropsWithIntl, {}>
 
 	private handleDefaultWarningFileSizeChange(e: { target: HTMLInputElement; }) {
 		this.props.updateDefaultWarningFileSize(parseFloat(e.target.value));
+	}
+
+	private handleDefaultFileSizeLimitChange(e: { target: HTMLInputElement; }) {
+		this.props.updateDefaultFileSizeLimit(parseFloat(e.target.value));
 	}
 }
 

@@ -19,6 +19,7 @@ interface ExportProps {
 	timeInterval: TimeInterval;
 	defaultLanguage: string;
 	defaultWarningFileSize: number;
+	defaultFileSizeLimit: number;
 }
 
 export default function ExportComponent(props: ExportProps) {
@@ -74,7 +75,7 @@ export default function ExportComponent(props: ExportProps) {
 		if (props.selectedMeters.length === 0)
 			return;
 		const count = await metersApi.lineReadingsCount(props.selectedMeters, props.timeInterval);
-		graphRawExport(count, props.defaultWarningFileSize, async () => {
+		graphRawExport(count, props.defaultWarningFileSize, props.defaultFileSizeLimit, async () => {
 			const lineReading = await metersApi.rawLineReadings(props.selectedMeters, props.timeInterval);
 			downloadRawCSV(lineReading,props.defaultLanguage);
 		});

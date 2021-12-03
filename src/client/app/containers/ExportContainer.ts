@@ -147,7 +147,8 @@ function mapStateToProps(state: State) {
 		exportVals: { datasets },
 		timeInterval: state.graph.timeInterval,
 		defaultLanguage: state.admin.defaultLanguage,
-		defaultWarningFileSize: state.admin.defaultWarningFileSize
+		defaultWarningFileSize: state.admin.defaultWarningFileSize,
+		defaultFileSizeLimit: state.admin.defaultFileSizeLimit
 	};
 }
 

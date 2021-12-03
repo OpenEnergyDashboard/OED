@@ -57,6 +57,9 @@ router.post('/', async (req, res) => {
 				},
 				defaultWarningFileSize: {
 					type: 'number'
+				},
+				defaultFileSizeLimit: {
+					type: 'number'
 				}
 			}
 		}
