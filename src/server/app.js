@@ -31,10 +31,13 @@ const logs = require('./routes/logs');
 const obvius = require('./routes/obvius');
 const csv = require('./routes/csv');
 
+// Limit the rate of overall requests to OED
+// Create a limit of 300 requests/minute
 const limiter = new rateLimit({
 	windowMs: 1 * 60 * 1000, // 1 minute
-	max: 300
+	max: 300 // 300 requests
 });
+// Apply the limit to overall requests
 const app = express().use(limiter);
 
 // If other logging is turned off, there's no reason to log HTTP requests either.
