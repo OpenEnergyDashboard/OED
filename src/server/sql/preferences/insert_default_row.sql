@@ -13,8 +13,8 @@ IF NOT EXISTS(SELECT *
 	FROM preferences
 	)
 	THEN
-	INSERT INTO preferences (display_title, default_chart_to_render, default_bar_stacking, default_language, default_timezone) 
-	VALUES ('', 'line', FALSE, 'en', NULL);
+	INSERT INTO preferences (display_title, default_chart_to_render, default_bar_stacking, default_language, default_timezone, default_warning_file_size) 
+	VALUES ('', 'line', FALSE, 'en', NULL, 5);
 
     END IF ;
 

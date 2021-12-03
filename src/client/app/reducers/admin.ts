@@ -69,7 +69,8 @@ export default function admin(state = defaultState, action: AdminAction) {
 				defaultChartToRender: action.data.defaultChartToRender,
 				defaultBarStacking: action.data.defaultBarStacking,
 				defaultLanguage: action.data.defaultLanguage,
-				defaultTimeZone: action.data.defaultTimezone
+				defaultTimeZone: action.data.defaultTimezone,
+				defaultWarningFileSize: action.data.defaultWarningFileSize
 			};
 		case ActionType.MarkPreferencesNotSubmitted:
 			return {

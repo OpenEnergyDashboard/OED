@@ -87,7 +87,8 @@ function submitPreferences() {
 				defaultChartToRender: state.admin.defaultChartToRender,
 				defaultBarStacking: state.admin.defaultBarStacking,
 				defaultLanguage: state.admin.defaultLanguage,
-				defaultTimezone: state.admin.defaultTimeZone
+				defaultTimezone: state.admin.defaultTimeZone,
+				defaultWarningFileSize: state.admin.defaultWarningFileSize
 			});
 			dispatch(markPreferencesSubmitted());
 			showSuccessNotification(translate('updated.preferences'));

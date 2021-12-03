@@ -14,13 +14,15 @@ class Preferences {
 	 * @param {Boolean} defaultBarStacking - Option to set default toggle of bar stacking
 	 * @param {String} defaultLanguage - Option to set the default language
 	 * @param {String} defaultTimezone - Option to set the default timezone
+	 * @param {Number} defaultWarningFileSize - Option to set the default warning file size
 	 */
-	constructor(displayTitle, defaultChartToRender, defaultBarStacking, defaultLanguage, defaultTimezone) {
+	constructor(displayTitle, defaultChartToRender, defaultBarStacking, defaultLanguage, defaultTimezone, defaultWarningFileSize) {
 		this.displayTitle = displayTitle;
 		this.defaultChartToRender = defaultChartToRender;
 		this.defaultBarStacking = defaultBarStacking;
 		this.defaultLanguage = defaultLanguage;
 		this.defaultTimezone = defaultTimezone;
+		this.defaultWarningFileSize = defaultWarningFileSize;
 	}
 
 	/**
@@ -42,7 +44,7 @@ class Preferences {
 	 * @returns Preference object from row
 	 */
 	static mapRow(row) {
-		return new Preferences(row.display_title, row.default_chart_to_render, row.default_bar_stacking, row.default_language, row.default_timezone);
+		return new Preferences(row.display_title, row.default_chart_to_render, row.default_bar_stacking, row.default_language, row.default_timezone, row.default_warning_file_size);
 	}
 
 	/**
@@ -61,13 +63,15 @@ class Preferences {
 	static async update(newPreferences, conn) {
 		const preferences = await Preferences.get(conn);
 		_.merge(preferences, newPreferences);
+
 		await conn.none(sqlFile('preferences/update_preferences.sql'),
 			{
 				displayTitle: preferences.displayTitle,
 				defaultChartToRender: preferences.defaultChartToRender,
 				defaultBarStacking: preferences.defaultBarStacking,
 				defaultLanguage: preferences.defaultLanguage,
-				defaultTimezone: preferences.defaultTimezone
+				defaultTimezone: preferences.defaultTimezone,
+				defaultWarningFileSize: preferences.defaultWarningFileSize
 			});
 	}
 }

@@ -31,6 +31,7 @@ export interface PreferenceRequestItem {
 	defaultBarStacking: boolean;
 	defaultLanguage: LanguageTypes;
 	defaultTimezone: string;
+	defaultWarningFileSize: number;
 }
 
 /**
