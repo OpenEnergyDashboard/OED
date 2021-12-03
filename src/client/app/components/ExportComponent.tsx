@@ -28,6 +28,18 @@ export default function ExportComponent(props: ExportProps) {
 	const exportReading = () => {
 		const compressedData = props.exportVals.datasets;
 
+		// Sort the dataset based on the start time
+		compressedData.forEach(reading => {
+			if (reading !== undefined) {
+				reading.exportVals.sort((a,b) =>{
+					if (a.x < b.x) {
+						return -1;
+					}
+					return 1;
+				})
+			}
+		})
+
 		// Determine and format the first time in the dataset
 		let startTime = moment(compressedData[0].exportVals[0].x);
 		for (const reading of compressedData) {

@@ -44,8 +44,10 @@ async function loadLogfileToReadings(serialNumber, ipAddress, logfile, conn) {
 			// Switching to assume one reading is end time and can use default moment parsing of date/timestamp.
 			// It is believed that the format from Obvius will always be this way so specify.
 			// Strict mode is used so it will give Invalid date if not correct and should be caught in pipeline.
-			const endTimestamp = moment(rawReading[0], 'YYYY-MM-DD HH:mm:ss', true);
-			// const reading = new Reading(meter.id, rawReading[1], startTimestamp, endTimestamp);
+			// const endTimestamp = moment(rawReading[0], 'YYYY-MM-DD HH:mm:ss', true);
+			// TODO For reasons I do not understand, strict mode causes Invalid date even though debugging seems
+			// to indicate it is correct. I thought it worked before but it does not. Thus, removing strict mode for now.
+			const endTimestamp = moment(rawReading[0], 'YYYY-MM-DD HH:mm:ss');
 			reading[index] = [rawReading[1], endTimestamp];
 			index++;
 		}
