@@ -31,7 +31,7 @@ function mapStateToProps(state: State) {
 			linkText += `&barStacking=${state.graph.barStacking}`;
 			break;
 		case 'line':
-			// no code for this case 
+			// no code for this case
 			// under construction;
 			// linkText += `&displayRange=${state.graph.timeInterval.toString().split('_')}`;
 			break;
