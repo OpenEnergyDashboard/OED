@@ -3,7 +3,6 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
 
 const nodemailer = require('nodemailer');
-const mg = require('nodemailer-mailgun-transport');
 const config = require('./config');
 const { log } = require('./log');
 const LogEmail = require('./models/LogEmail');
@@ -87,25 +86,33 @@ async function logMailer(conn) {
 	// Create transporter based on the service, log error if there is something wrong with the email or credential
 	if (config.mailer.method === 'none') {
 		return;
-	} else if (config.mailer.method === 'mailgun') {
-		transporter = nodemailer.createTransport(mg({
-			auth: {
-				api_key: config.mailer.credential,
-				domain: config.mailer.ident
-			}
-		}));
 	} else if (config.mailer.method === 'gmail') {
 		transporter = nodemailer.createTransport({
-			service: 'gmail',
+			host: 'someone@example.com',
+			port: 465,
+			secure: true,
 			auth: {
 				user: config.mailer.ident,
 				pass: config.mailer.credential
+			},
+			tls: {
+				// do not fail on invalid certs
+				rejectUnauthorized: false
 			}
 		});
 	} else {
 		log.error(`Unable to send e-mail due to unknown mailer method ${config.mailer.method}`, null, true);
 		return;
 	}
+
+	// verify connection configuration
+	transporter.verify(function (error, success) {
+		if (error) {
+			log.error(`${error}`);
+		} else {
+			log.info('Server is ready to take our messages');
+		}
+	});
 
 	transporter.sendMail(mailOptions, async (err, inform) => {
 		if (err) {
