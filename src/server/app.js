@@ -40,11 +40,11 @@ const generalLimiter = new rateLimit({
 // Apply the limit to overall requests
 const app = express().use(generalLimiter);
 
-// Limit the number of raw exports to 1 per 5 seconds
-// Since each raw export takes 2 '/api/readings' requests, the exportRawLimiter is equal to 2 requests/5 seconds
+// Limit the number of raw exports to 5 per 5 seconds
+// Since each raw export takes 2 '/api/readings' requests, the exportRawLimiter is equal to 10 requests/5 seconds
 const exportRawLimiter = new rateLimit({
 	windowMs: 5 * 1000, // 5 seconds
-	max: 2 // 2 requests
+	max: 10 // 10 requests
 });
 // Apply the raw export limit
 app.use('/api/readings', exportRawLimiter);
