@@ -12,7 +12,7 @@ import {
 	UpdateDefaultTimeZone,
 	UpdateDisplayTitleAction,
 	UpdateDefaultWarningFileSize,
-	UpdateDefaultFileSizeLimit,
+	UpdateDefaultFileSizeLimit
 } from '../../types/redux/admin';
 import { defineMessages, FormattedMessage, injectIntl, InjectedIntlProps } from 'react-intl';
 import { LanguageTypes } from '../../types/redux/i18n';

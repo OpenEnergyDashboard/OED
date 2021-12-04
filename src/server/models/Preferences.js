@@ -46,7 +46,15 @@ class Preferences {
 	 * @returns Preference object from row
 	 */
 	static mapRow(row) {
-		return new Preferences(row.display_title, row.default_chart_to_render, row.default_bar_stacking, row.default_language, row.default_timezone, row.default_warning_file_size, row.default_file_size_limit);
+		return new Preferences(
+			row.display_title, 
+			row.default_chart_to_render, 
+			row.default_bar_stacking, 
+			row.default_language, 
+			row.default_timezone, 
+			row.default_warning_file_size, 
+			row.default_file_size_limit
+		);
 	}
 
 	/**

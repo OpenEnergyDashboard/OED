@@ -12,7 +12,7 @@ import {
 	updateDefaultLanguage,
 	submitPreferencesIfNeeded,
 	updateDefaultWarningFileSize,
-	updateDefaultFileSizeLimit,
+	updateDefaultFileSizeLimit
 } from '../../actions/admin';
 import { State } from '../../types/redux/state';
 import { Dispatch } from '../../types/redux/actions';
