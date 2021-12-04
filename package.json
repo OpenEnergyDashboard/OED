@@ -48,11 +48,22 @@
       "src/client/"
     ]
   },
+  "babel": {
+    "presets": [
+      "@babel/preset-env",
+      "@babel/preset-react"
+    ]
+  },
+  "resolutions": {
+    "babel-core": "7.0.0-bridge.0"
+  },
   "dependencies": {
-    "@babel/core": "~7.9.0",
+    "@babel/plugin-proposal-object-rest-spread": "~7.16.0",
+    "@babel/preset-react": "~7.16.0",
     "agent-base": "~6.0.2",
+    "attr-accept": "~2.2.1",
     "axios": "~0.24.0",
-    "babel-plugin-react-intl": "~2.4.0",
+    "babel-plugin-formatjs": "~10.3.12",
     "bcryptjs": "~2.4.3",
     "body-parser": "~1.18.3",
     "bootstrap": "~4.3.1",
@@ -90,7 +101,7 @@
     "rc-slider": "~8.6.6",
     "react": "~16.14.0",
     "react-dom": "~16.14.0",
-    "react-dropzone": "~4.2.13",
+    "react-dropzone": "~11.4.0",
     "react-intl": "~2.4.0",
     "react-notification-system": "~0.2.17",
     "react-plotlyjs-ts": "~2.2.2",
@@ -105,6 +116,7 @@
     "request": "~2.88.2",
     "request-promise-native": "~1.0.7",
     "serve-favicon": "~2.5.0",
+    "source-map-resolve": "~0.5.3",
     "terser-webpack-plugin": "~5.0.0",
     "watchpack": "~2.1.1",
     "webpack": "~5.45.1",
@@ -113,6 +125,9 @@
     "xml2js": "~0.4.19"
   },
   "devDependencies": {
+    "@babel/cli": "~7.16.0",
+    "@babel/core": "~7.13.16",
+    "@babel/preset-env": "~7.16.4",
     "@types/core-js": "~0.9.43",
     "@types/lodash": "~4.14.122",
     "@types/plotly.js": "~1.41.0",
@@ -129,13 +144,10 @@
     "@types/reactstrap": "~5.0.27",
     "assert": "~2.0.0",
     "awesome-typescript-loader": "~5.2.1",
-    "babel-core": "~6.26.3",
+    "babel-core": "~7.0.0-bridge.0",
     "babel-loader": "~8.2.3",
     "babel-plugin-lodash": "~3.2.11",
-    "babel-plugin-transform-object-rest-spread": "~6.26.0",
     "babel-polyfill": "~6.26.0",
-    "babel-preset-env": "~1.7.0",
-    "babel-preset-react": "~6.24.1",
     "buffer": "~6.0.3",
     "chai": "~3.5.0",
     "chai-as-promised": "~6.0.0",
