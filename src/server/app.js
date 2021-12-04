@@ -32,13 +32,22 @@ const obvius = require('./routes/obvius');
 const csv = require('./routes/csv');
 
 // Limit the rate of overall requests to OED
-// Create a limit of 300 requests/minute
-const limiter = new rateLimit({
-	windowMs: 1 * 60 * 1000, // 1 minute
-	max: 300 // 300 requests
+// Create a limit of 200 requests/5 seconds
+const generalLimiter = new rateLimit({
+	windowMs: 5 * 1000, // 5 seconds
+	max: 200 // 200 requests
 });
 // Apply the limit to overall requests
-const app = express().use(limiter);
+const app = express().use(generalLimiter);
+
+// Limit the number of raw exports to 1 per 5 seconds
+// Since each raw export takes 2 '/api/readings' requests, the exportRawLimiter is equal to 2 requests/5 seconds
+const exportRawLimiter = new rateLimit({
+	windowMs: 5 * 1000, // 5 seconds
+	max: 2 // 2 requests
+});
+// Apply the raw export limit
+app.use('/api/readings', exportRawLimiter);
 
 // If other logging is turned off, there's no reason to log HTTP requests either.
 // TODO: Potentially modify the Morgan logger to use the log API, thus unifying all our logging.
