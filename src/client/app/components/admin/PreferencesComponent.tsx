@@ -12,7 +12,7 @@ import {
 	UpdateDefaultTimeZone,
 	UpdateDisplayTitleAction
 } from '../../types/redux/admin';
-import { defineMessages, FormattedMessage, injectIntl, InjectedIntlProps } from 'react-intl';
+import { defineMessages, FormattedMessage, injectIntl, WrappedComponentProps } from 'react-intl';
 import { LanguageTypes } from '../../types/redux/i18n';
 import TimeZoneSelect from '../TimeZoneSelect';
 
@@ -31,7 +31,7 @@ interface PreferencesProps {
 	updateDefaultTimeZone(timeZone: string): UpdateDefaultTimeZone;
 }
 
-type PreferencesPropsWithIntl = PreferencesProps & InjectedIntlProps;
+type PreferencesPropsWithIntl = PreferencesProps & WrappedComponentProps;
 
 class PreferencesComponent extends React.Component<PreferencesPropsWithIntl, {}> {
 	constructor(props: PreferencesPropsWithIntl) {
@@ -59,7 +59,6 @@ class PreferencesComponent extends React.Component<PreferencesPropsWithIntl, {}>
 			paddingBottom: '5px'
 		};
 		const messages = defineMessages({ name: { id: 'name' } });
-		const { formatMessage } = this.props.intl;
 		return (
 			<div>
 				<div style={bottomPaddingStyle}>
@@ -68,7 +67,7 @@ class PreferencesComponent extends React.Component<PreferencesPropsWithIntl, {}>
 					</p>
 					<Input
 						type='text'
-						placeholder={formatMessage(messages.name)}
+						placeholder={this.props.intl.formatMessage(messages.name)}
 						value={this.props.displayTitle}
 						onChange={this.handleDisplayTitleChange}
 						maxLength={50}
@@ -231,4 +230,4 @@ class PreferencesComponent extends React.Component<PreferencesPropsWithIntl, {}>
 	}
 }
 
-export default injectIntl<PreferencesProps>(PreferencesComponent);
+export default injectIntl(PreferencesComponent);

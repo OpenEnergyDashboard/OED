@@ -4,9 +4,11 @@
 
 import * as React from 'react';
 import { RedirectFunction, Route, Router, RouterState } from 'react-router';
-import { addLocaleData, IntlProvider } from 'react-intl';
-import * as en from 'react-intl/locale-data/en';
-import * as fr from 'react-intl/locale-data/fr';
+import { IntlProvider } from 'react-intl';
+import '@formatjs/intl-relativetimeformat/polyfill';
+import '@formatjs/intl-relativetimeformat/locale-data/en';
+import '@formatjs/intl-relativetimeformat/locale-data/es';
+import '@formatjs/intl-relativetimeformat/locale-data/fr';
 import * as localeData from '../translations/data.json';
 import { browserHistory } from '../utils/history';
 import * as _ from 'lodash';
@@ -241,7 +243,6 @@ export default class RouteComponent extends React.Component<RouteProps, {}> {
 	 * @returns JSX to create the RouteComponent
 	 */
 	public render() {
-		addLocaleData([...en, ...fr]);
 		const lang = this.props.defaultLanguage;
 		let messages;
 		if (lang === 'fr') {

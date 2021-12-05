@@ -7,7 +7,7 @@ import MultiSelectComponent from '../MultiSelectComponent';
 import { metersFilterReduce, groupsFilterReduce } from '../../utils/Datasources';
 import { NamedIDItem, SelectOption } from '../../types/items';
 import { DataType, DatasourceID } from '../../types/Datasources';
-import { InjectedIntlProps, injectIntl, defineMessages } from 'react-intl';
+import { defineMessages, injectIntl, WrappedComponentProps } from 'react-intl';
 
 interface DatasourceBoxProps {
 	// TODO: This should be an enum
@@ -17,7 +17,7 @@ interface DatasourceBoxProps {
 	selectDatasource(ids: number[]): void;
 }
 
-type DatasourceBoxPropsWithIntl = DatasourceBoxProps & InjectedIntlProps;
+type DatasourceBoxPropsWithIntl = DatasourceBoxProps & WrappedComponentProps;
 
 // This is just an alias, so it's ok to have it in this file.
 // Aliasing this specialization is required because the meaning of < and > conflict in TypeScript and JSX.
@@ -63,13 +63,12 @@ class DatasourceBoxComponent extends React.Component<DatasourceBoxPropsWithIntl,
 			selectMeters: { id: 'select.meters' },
 			selectGroups: { id: 'select.groups' }
 		});
-		const { formatMessage } = this.props.intl;
 
 		return (
 			<MultiSelectDatasourceComponent
 				options={options}
 				selectedOptions={selectedOptions}
-				placeholder={this.props.type === 'meter' ? formatMessage(messages.selectMeters) : formatMessage(messages.selectGroups)}
+				placeholder={this.props.type === 'meter' ? this.props.intl.formatMessage(messages.selectMeters) : this.props.intl.formatMessage(messages.selectGroups)}
 				onValuesChange={this.handleDatasourceSelect}
 			/>
 		);
@@ -84,4 +83,4 @@ class DatasourceBoxComponent extends React.Component<DatasourceBoxPropsWithIntl,
 	}
 }
 
-export default injectIntl<DatasourceBoxProps>(DatasourceBoxComponent);
+export default injectIntl(DatasourceBoxComponent);

@@ -6,7 +6,7 @@ import * as React from 'react';
 import { Button } from 'reactstrap';
 import { Link } from 'react-router';
 import { hasToken } from '../../utils/token';
-import { FormattedMessage, InjectedIntlProps, injectIntl } from 'react-intl';
+import { FormattedMessage, WrappedComponentProps, injectIntl } from 'react-intl';
 import { CalibrationModeTypes, MapMetadata } from '../../types/redux/map';
 import * as moment from 'moment';
 
@@ -32,7 +32,7 @@ interface MapViewState {
 	noteInput: string;
 }
 
-type MapViewPropsWithIntl = MapViewProps & InjectedIntlProps;
+type MapViewPropsWithIntl = MapViewProps & WrappedComponentProps;
 
 class MapViewComponent extends React.Component<MapViewPropsWithIntl, MapViewState> {
 	constructor(props: MapViewPropsWithIntl) {
@@ -392,4 +392,4 @@ class MapViewComponent extends React.Component<MapViewPropsWithIntl, MapViewStat
 	}
 }
 
-export default injectIntl<MapViewProps>(MapViewComponent);
+export default injectIntl(MapViewComponent);
