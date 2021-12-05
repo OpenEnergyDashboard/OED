@@ -49,7 +49,7 @@
     ]
   },
   "dependencies": {
-    "axios": "~0.21.1",
+    "axios": "~0.21.2",
     "babel-plugin-react-intl": "~2.4.0",
     "bcryptjs": "~2.4.3",
     "body-parser": "~1.18.3",
