@@ -9,7 +9,7 @@
         "baseUrl": "./src/client/app/",
         "outDir": "./src/client/public/app/",
         "sourceMap": true,
-        "module": "commonjs",
+        "module": "es6",
         "target": "es5",
 		"jsx": "react",
 		"allowJs": true,
@@ -31,8 +31,5 @@
     ],
     "exclude": [
         "node_modules"
-    ],
-    "awesomeTypescriptLoaderOptions": {
-        "useBabel": true
-    }
+    ]
 }
