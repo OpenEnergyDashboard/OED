@@ -11,9 +11,13 @@
 
 # Here are examples of how to use this script:
 # See if 3 requests where separated by 0.5 seconds to get the logo are allowed:
-# ./rateTesting.sh 3 0.5 localhost:3000/logo.png 
+# ./rateTesting.sh 3 0.5 localhost:3000/logo.png
 # See if 5 requests where separated by 0.1 seconds to get meter 1 line data over all time are allowed:
-# ./rateTesting.sh 5 0.1 'localhost:3000/api/readings/line/meters/1?timeInterval=all' 
+# ./rateTesting.sh 5 0.1 'localhost:3000/api/readings/line/meters/1?timeInterval=all'
+# Same as above but see the output.
+# ./rateTesting.sh 5 0.1 'localhost:3000/api/readings/line/meters/1?timeInterval=all' true
+# Test the separately limited raw download:
+# ./rateTesting.sh 8 0.1 'localhost:3000/api/readings/line/raw/meters/1'
 
 doRequest() {
     # The first parameter is the test number to use for output.
@@ -29,6 +33,7 @@ doRequest() {
     # The fourth parameter is the file to use for curl output.
     fileName=$4
 
+    # You may need to comment out the echo if you want to do a lot of requests very quickly.
     # This gives time to nearest second and works on both Linux and Mac.
     echo "starting request $testNumber at time $(date)"
     # date to milliseconds that works on most Linux systems
@@ -53,8 +58,13 @@ doRequest() {
 }
 
 # Parameters to main script
-# The first parameter is the number of requests to make.
-numRequests=$1
+# The first parameter is the number of requests to make with default of one.
+if [ -z "$1" ]; then
+    numRequests=1
+else
+    numRequests=$1
+fi
+
 # The second parameter is the time to wait between requests in seconds or zero by default.
 if [ -z "$2" ]; then
     waitBetweenRequests=0
@@ -83,18 +93,13 @@ fi
 
 # file name for curl output with of requests
 fileName="/tmp/curlOutput$RANDOM"
-echo $fileName
 
 echo "Starting $numRequests requests to $requestToMake with a wait of $waitBetweenRequests seconds between each request with show output of $showOutput:"
 for ((i=1; i<=$numRequests; i++)) {
     # Run request in background so others can run at the same time.
-    # Use quotes so spaces so not cause problems.
-    echo "$fileName#$i"
+    # Use quotes so spaces do not cause problems.
     doRequest "$i" "$requestToMake" "$showOutput" "$fileName#$i" &
 
-    #curl -s 'localhost:3000/logo.png'
-    #curl localhost:3000/api/readings/line/meters/1?timeInterval=all -X GET
-    
     sleep $waitBetweenRequests
 }
 # Don't continue until all requests are done.
