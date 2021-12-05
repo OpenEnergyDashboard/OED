@@ -22,7 +22,7 @@ interface MapsDetailProps {
 }
 
 export default class MapsDetailComponent extends React.Component<MapsDetailProps, {}> {
-	public componentWillMount() {
+	public componentDidMount() {
 		this.props.fetchMapsDetails();
 	}
 

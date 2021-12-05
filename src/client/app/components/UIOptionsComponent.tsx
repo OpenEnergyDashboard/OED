@@ -63,8 +63,10 @@ class UIOptionsComponent extends React.Component<UIOptionsPropsWithIntl, UIOptio
 		};
 	}
 
-	public componentWillReceiveProps(nextProps: UIOptionsProps) {
-		this.setState({ barDurationDays: nextProps.barDuration.asDays() });
+	public componentDidUpdate(prevProps: UIOptionsProps, prevState: UIOptionsState) {
+		if (this.state.barDurationDays != prevProps.barDuration.asDays()) {
+			this.setState({ barDurationDays: this.state.barDurationDays });
+		}
 	}
 
 	public render() {

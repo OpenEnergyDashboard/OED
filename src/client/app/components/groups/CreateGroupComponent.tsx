@@ -53,7 +53,7 @@ class CreateGroupComponent extends React.Component<CreateGroupPropsWithIntl, Cre
 		this.handleReturnToView = this.handleReturnToView.bind(this);
 	}
 
-	public componentWillMount() {
+	public componentDidMount() {
 		this.props.createNewBlankGroup();
 	}
 

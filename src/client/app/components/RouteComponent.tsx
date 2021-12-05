@@ -11,8 +11,8 @@ import * as localeData from '../translations/data.json';
 import { browserHistory } from '../utils/history';
 import * as _ from 'lodash';
 import * as moment from 'moment';
-import InitializationContainer from '../containers/InitializationContainer';
 import HomeComponent from './HomeComponent';
+import InitializationContainer from '../containers/InitializationContainer';
 import LoginContainer from '../containers/LoginContainer';
 import AdminComponent from './admin/AdminComponent';
 import { LinkOptions } from 'actions/graph';
@@ -254,25 +254,25 @@ export default class RouteComponent extends React.Component<RouteProps, {}> {
 		return (
 			<div>
 				<InitializationContainer />
+				{ this.props ?
 				<IntlProvider locale={lang} messages={messages} key={lang}>
-					<>
-						<Router history={browserHistory}>
-							<Route path='/login' component={LoginContainer} />
-							<Route path='/admin' component={AdminComponent} onEnter={this.requireAuth} />
-							<Route path='/csv' component={UploadCSVContainer} onEnter={this.requireRole(UserRole.CSV)} />
-							<Route path='/groups' component={GroupsDetailContainer} onEnter={this.checkAuth} />
-							<Route path='/meters' component={MetersDetailContainer} onEnter={this.checkAuth} />
-							<Route path='/graph' component={HomeComponent} onEnter={this.linkToGraph} />
-							<Route path='/calibration' component={MapCalibrationContainer} onEnter={this.requireAuth} />
-							<Route path='/maps' component={MapsDetailContainer} onEnter={this.requireAuth} />
-							<Route path='/createGroup' component={CreateGroupContainer} onEnter={this.requireAuth} />
-							<Route path='/editGroup' component={EditGroupsContainer} onEnter={this.requireAuth} />
-							<Route path='/users' component={UsersDetailContainer} onEnter={this.requireAuth} />
-							<Route path='/users/new' component={CreateUserContainer} onEnter={this.requireAuth} />
-							<Route path='*' component={HomeComponent} />
-						</Router>
-					</>
-				</IntlProvider>
+					<Router history={browserHistory}>
+						<Route path='/login' component={LoginContainer} />
+						<Route path='/admin' component={AdminComponent} onEnter={this.requireAuth} />
+						<Route path='/csv' component={UploadCSVContainer} onEnter={this.requireRole(UserRole.CSV)} />
+						<Route path='/groups' component={GroupsDetailContainer} onEnter={this.checkAuth} />
+						<Route path='/meters' component={MetersDetailContainer} onEnter={this.checkAuth} />
+						<Route path='/graph' component={HomeComponent} onEnter={this.linkToGraph} />
+						<Route path='/calibration' component={MapCalibrationContainer} onEnter={this.requireAuth} />
+						<Route path='/maps' component={MapsDetailContainer} onEnter={this.requireAuth} />
+						<Route path='/createGroup' component={CreateGroupContainer} onEnter={this.requireAuth} />
+						<Route path='/editGroup' component={EditGroupsContainer} onEnter={this.requireAuth} />
+						<Route path='/users' component={UsersDetailContainer} onEnter={this.requireAuth} />
+						<Route path='/users/new' component={CreateUserContainer} onEnter={this.requireAuth} />
+						<Route path='*' component={HomeComponent} />
+					</Router>
+				</IntlProvider> : null
+				}
 			</div>
 		);
 	}
