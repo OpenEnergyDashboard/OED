@@ -4,8 +4,8 @@
 
 DO $$ BEGIN
     ALTER TABLE preferences
-        ADD COLUMN default_warning_file_size VARCHAR(50) NOT NULL DEFAULT '5',
-        ADD COLUMN default_file_size_limit VARCHAR(50) NOT NULL DEFAULT '25';
+        ADD COLUMN default_warning_file_size FLOAT NOT NULL DEFAULT 5,
+        ADD COLUMN default_file_size_limit FLOAT NOT NULL DEFAULT 25;
 EXCEPTION
     WHEN duplicate_column THEN NULL;
 END $$;
