@@ -12,7 +12,7 @@ import { State } from '../types/redux/state';
 import { preferencesApi } from '../utils/api';
 import translate from '../utils/translate';
 import { LanguageTypes } from '../types/redux/i18n';
-import moment = require('moment');
+import * as moment from 'moment';
 
 
 export function updateSelectedMeter(meterID: number): t.UpdateImportMeterAction {

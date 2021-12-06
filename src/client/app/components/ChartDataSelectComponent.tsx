@@ -5,7 +5,7 @@
 import * as React from 'react';
 import MultiSelectComponent from './MultiSelectComponent';
 import { SelectOption } from '../types/items';
-import { defineMessages, FormattedMessage, injectIntl, InjectedIntlProps } from 'react-intl';
+import { defineMessages, FormattedMessage, injectIntl, WrappedComponentProps } from 'react-intl';
 import TooltipMarkerComponent from './TooltipMarkerComponent';
 
 interface ChartDataSelectProps {
@@ -17,7 +17,7 @@ interface ChartDataSelectProps {
 	selectGroups(groupIDs: number[]): Promise<any>;
 }
 
-type ChartDataSelectPropsWithIntl = ChartDataSelectProps & InjectedIntlProps;
+type ChartDataSelectPropsWithIntl = ChartDataSelectProps & WrappedComponentProps;
 
 /**
  * A component which allows the user to select which data should be displayed on the chart.
@@ -43,7 +43,6 @@ class ChartDataSelectComponent extends React.Component<ChartDataSelectPropsWithI
 			helpSelectGroups: {id: 'help.home.select.groups'},
 			helpSelectMeters: {id: 'help.home.select.meters'}
 		});
-		const { formatMessage } = this.props.intl;
 
 		const handleGroupSelect = (s: SelectOption[]) => this.handleGroupSelect(s);
 
@@ -56,7 +55,7 @@ class ChartDataSelectComponent extends React.Component<ChartDataSelectPropsWithI
 					<MultiSelectComponent
 						options={this.props.groups}
 						selectedOptions={this.props.selectedGroups}
-						placeholder={formatMessage(messages.selectGroups)}
+						placeholder={this.props.intl.formatMessage(messages.selectGroups)}
 						onValuesChange={handleGroupSelect}
 					/>
 					<TooltipMarkerComponent page='home' helpTextId='help.home.select.groups'/>
@@ -68,7 +67,7 @@ class ChartDataSelectComponent extends React.Component<ChartDataSelectPropsWithI
 					<MultiSelectComponent
 						options={this.props.meters}
 						selectedOptions={this.props.selectedMeters}
-						placeholder={formatMessage(messages.selectMeters)}
+						placeholder={this.props.intl.formatMessage(messages.selectMeters)}
 						onValuesChange={this.handleMeterSelect}
 					/>
 					<TooltipMarkerComponent page='home' helpTextId='help.home.select.meters'/>
@@ -94,4 +93,4 @@ class ChartDataSelectComponent extends React.Component<ChartDataSelectPropsWithI
 	}
 }
 
-export default injectIntl<ChartDataSelectProps>(ChartDataSelectComponent);
+export default injectIntl(ChartDataSelectComponent);

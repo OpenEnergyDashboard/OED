@@ -20,7 +20,7 @@ interface MetersDetailProps {
 }
 
 export default class MetersDetailComponent extends React.Component<MetersDetailProps, {}> {
-	public componentWillMount() {
+	public componentDidMount() {
 		this.props.fetchMetersDetails();
 	}
 

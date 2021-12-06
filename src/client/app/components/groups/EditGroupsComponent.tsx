@@ -14,8 +14,9 @@ import { EditGroupNameAction, EditGroupGPSAction, EditGroupDisplayableAction, Ed
 import FooterContainer from '../../containers/FooterContainer';
 import HeaderContainer from '../../containers/HeaderContainer';
 import {  browserHistory } from '../../utils/history';
-import { FormattedMessage, InjectedIntlProps, injectIntl, defineMessages } from 'react-intl';
+import { FormattedMessage, defineMessages, injectIntl, WrappedComponentProps } from 'react-intl';
 import { GPSPoint, isValidGPSInput } from '../../utils/calibration';
+import translate from '../../utils/translate';
 
 interface EditGroupsProps {
 	currentGroup: GroupDefinition;
@@ -35,7 +36,7 @@ interface EditGroupsProps {
 	changeDisplayModeToView(): ChangeDisplayModeAction;
 }
 
-type EditGroupsPropsWithIntl = EditGroupsProps & InjectedIntlProps;
+type EditGroupsPropsWithIntl = EditGroupsProps & WrappedComponentProps;
 
 interface EditGroupsState {
 	name: string;
@@ -362,7 +363,7 @@ class EditGroupsComponent extends React.Component<EditGroupsPropsWithIntl, EditG
 			}
 		}
 		else {
-			window.alert(this.props.intl.formatMessage({id: 'area.error'}));
+			window.alert(translate('area.error'));
 		}
 	}
 
@@ -376,4 +377,4 @@ class EditGroupsComponent extends React.Component<EditGroupsPropsWithIntl, EditG
 	}
 }
 
-export default injectIntl<EditGroupsProps>(EditGroupsComponent);
+export default injectIntl(EditGroupsComponent);

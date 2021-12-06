@@ -21,16 +21,16 @@ interface InitializationProps {
 export default class InitializationComponent extends React.Component<InitializationProps, {}> {
 	private notificationSystem: NotificationSystem.System;
 
-	public componentWillMount() {
+	public componentDidMount() {
 		this.props.fetchMeterDetailsIfNeeded();
 		this.props.fetchGroupDetailsIfNeeded();
 		this.props.fetchPreferencesIfNeeded();
 		this.props.fetchMapDetailsIfNeeded();
 	}
 
-	public componentWillReceiveProps(nextProps: InitializationProps) {
-		if (!_.isEmpty(nextProps.notification)) {
-			this.notificationSystem.addNotification(nextProps.notification);
+	public componentDidUpdate() {
+		if (!_.isEmpty(this.props.notification)) {
+			this.notificationSystem.addNotification(this.props.notification);
 			this.props.clearNotifications();
 		}
 	}

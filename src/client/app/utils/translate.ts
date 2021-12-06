@@ -3,13 +3,12 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
 
 import store from '../index';
-import { addLocaleData, IntlProvider, defineMessages } from 'react-intl';
-import * as en from 'react-intl/locale-data/en';
-import * as fr from 'react-intl/locale-data/fr';
-import * as es from 'react-intl/locale-data/es';
+import { defineMessages, createIntl, createIntlCache } from 'react-intl';
+import '@formatjs/intl-relativetimeformat/polyfill';
+import '@formatjs/intl-relativetimeformat/locale-data/en';
+import '@formatjs/intl-relativetimeformat/locale-data/es';
+import '@formatjs/intl-relativetimeformat/locale-data/fr';
 import * as localeData from '../translations/data.json';
-
-addLocaleData([...en, ...fr, ...es]);
 
 const enum AsTranslated {}
 export type TranslatedString = string & AsTranslated;
@@ -26,7 +25,7 @@ export default function translate(messageID: string): TranslatedString {
 	} else {
 		messages = (localeData as any).en;
 	}
-	// Possibly use createIntl in the future to replace this
-	const { intl } = new IntlProvider({ locale: lang, messages }, {}).getChildContext();
+	const cache = createIntlCache();
+	const intl = createIntl({ locale: lang, messages }, cache);
 	return intl.formatMessage(defineMessages({ [messageID]: { id: messageID }})[messageID]) as TranslatedString;
 }

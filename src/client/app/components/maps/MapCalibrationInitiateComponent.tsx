@@ -6,7 +6,7 @@ import * as React from 'react';
 import {CalibrationModeTypes, MapMetadata} from '../../types/redux/map';
 import {ChangeEvent} from 'react';
 import {logToServer} from '../../actions/logs';
-import { FormattedMessage, InjectedIntlProps, injectIntl } from 'react-intl';
+import { FormattedMessage, WrappedComponentProps, injectIntl } from 'react-intl';
 
 /**
  * Accepts image file from user upload,
@@ -21,15 +21,15 @@ interface MapInitiateProps {
 	onSourceChange(data: MapMetadata): any;
 }
 
+type MapInitiatePropsWithIntl = MapInitiateProps & WrappedComponentProps;
+
 interface MapInitiateState {
 	filename: string;
 	mapName: string;
 	angle: string;
 }
 
-type MapInitiatePropsWithIntl = MapInitiateProps & InjectedIntlProps;
-
-class MapCalibrationInitiateComponent extends React.Component<MapInitiatePropsWithIntl, MapInitiateState > {
+class MapCalibrationInitiateComponent extends React.Component<MapInitiatePropsWithIntl, MapInitiateState> {
 	private readonly fileInput: any;
 	private notifyLoadComplete() {
 		window.alert(`${this.props.intl.formatMessage({id: 'map.load.complete'})} ${this.state.filename}.`);
@@ -85,7 +85,7 @@ class MapCalibrationInitiateComponent extends React.Component<MapInitiatePropsWi
 				</label>
 				<br/>
 				<FormattedMessage id='map.new.submit'>
-					{placeholder => <input type='submit' value={placeholder.toString()} />}
+					{placeholder => <input type='submit' value={(placeholder !== null && placeholder !== undefined) ? placeholder.toString() : 'undefined'} />}
 				</FormattedMessage>
 			</form>
 		);
@@ -168,4 +168,4 @@ class MapCalibrationInitiateComponent extends React.Component<MapInitiatePropsWi
 	}
 }
 
-export default injectIntl<MapInitiateProps>(MapCalibrationInitiateComponent);
+export default injectIntl(MapCalibrationInitiateComponent);
