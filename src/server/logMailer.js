@@ -86,20 +86,19 @@ async function logMailer(conn) {
 	// Create transporter based on the service, log error if there is something wrong with the email or credential
 	if (config.mailer.method === 'none') {
 		return;
-	} else {
+	} else if (config.mailer.method === 'secure-smtp') {
 		transporter = nodemailer.createTransport({
-			host: 'someone@example.com',
-			port: 465,
+			host: config.mailer.smtp,
+			port: config.mailer.port,
 			secure: true,
 			auth: {
 				user: config.mailer.ident,
 				pass: config.mailer.credential
-			},
-			tls: {
-				// do not fail on invalid certs
-				rejectUnauthorized: false
 			}
 		});
+	} else {
+		log.error(`Unable to send e-mail due to unknown mailer method ${config.mailer.method}`, null, true);
+		return;
 	}
 
 	// verify connection configuration

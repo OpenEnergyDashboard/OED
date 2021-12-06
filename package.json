@@ -112,7 +112,7 @@
     "@types/core-js": "~0.9.43",
     "@types/lodash": "~4.14.122",
     "@types/moment": "~2.13.0",
-    "@types/plotly.js": "~1.54.12",
+    "@types/plotly.js": "~1.54.17",
     "@types/rc-slider": "~8.2.3",
     "@types/react": "~16.14.2",
     "@types/react-dom": "~16.9.10",
