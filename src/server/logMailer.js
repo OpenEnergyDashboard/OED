@@ -86,7 +86,7 @@ async function logMailer(conn) {
 	// Create transporter based on the service, log error if there is something wrong with the email or credential
 	if (config.mailer.method === 'none') {
 		return;
-	} else if (config.mailer.method === 'gmail') {
+	} else {
 		transporter = nodemailer.createTransport({
 			host: 'someone@example.com',
 			port: 465,
@@ -100,9 +100,6 @@ async function logMailer(conn) {
 				rejectUnauthorized: false
 			}
 		});
-	} else {
-		log.error(`Unable to send e-mail due to unknown mailer method ${config.mailer.method}`, null, true);
-		return;
 	}
 
 	// verify connection configuration

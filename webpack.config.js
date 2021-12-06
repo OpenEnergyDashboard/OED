@@ -47,6 +47,7 @@ const config = {
                 {loader: "style-loader"},
                 {loader: "css-loader"}
             ], },
+            // Babel not able to resolve imports https://github.com/webpack/webpack/issues/11467#issuecomment-691873586
             {
                 test: /\.m?js/,
                 resolve: {
