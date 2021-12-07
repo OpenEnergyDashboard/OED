@@ -353,8 +353,8 @@ class EditGroupsComponent extends React.Component<EditGroupsPropsWithIntl, EditG
 					const parseGPS = gpsProxy.split(',');
 					// should only have 1 comma
 					const gPoint: GPSPoint = {
-						longitude: parseFloat(parseGPS[1]),
-						latitude: parseFloat(parseGPS[0])
+						longitude: parseFloat(parseGPS[0]),
+						latitude: parseFloat(parseGPS[1])
 					};
 					this.props.editGroupGPS(gPoint);
 				}
