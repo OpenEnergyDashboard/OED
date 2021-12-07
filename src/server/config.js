@@ -35,6 +35,8 @@ if (method !== null && method !== undefined) {
 }
 config.mailer = {
 	method: method,
+	smtp: process.env.OED_MAIL_SMTP,
+	port: process.env.OED_MAIL_SMTP_PORT,
 	ident: process.env.OED_MAIL_IDENT,
 	credential: process.env.OED_MAIL_CREDENTIAL,
 	from: process.env.OED_MAIL_FROM,
