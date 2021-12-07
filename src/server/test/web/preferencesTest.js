@@ -21,7 +21,9 @@ mocha.describe('preferences API', () => {
 					displayTitle: 'title',
 					defaultChartToRender: 'line',
 					defaultBarStacking: true,
-					defaultLanguage: 'en'
+					defaultLanguage: 'en',
+					defaultWarningFileSize: 5,
+					defaultFileSizeLimit: 25
 				}
 				res = await chai.request(app).post('/api/preferences').set('token', token).send({ preferences });
 				expect(res).to.have.status(200);
