@@ -10,7 +10,9 @@ import {
 	UpdateDefaultChartToRenderAction,
 	UpdateDefaultLanguageAction,
 	UpdateDefaultTimeZone,
-	UpdateDisplayTitleAction
+	UpdateDisplayTitleAction,
+	UpdateDefaultWarningFileSize,
+	UpdateDefaultFileSizeLimit
 } from '../../types/redux/admin';
 import { defineMessages, FormattedMessage, injectIntl, InjectedIntlProps } from 'react-intl';
 import { LanguageTypes } from '../../types/redux/i18n';
@@ -23,12 +25,16 @@ interface PreferencesProps {
 	defaultTimeZone: string;
 	defaultLanguage: LanguageTypes;
 	disableSubmitPreferences: boolean;
+	defaultWarningFileSize: number;
+	defaultFileSizeLimit: number;
 	updateDisplayTitle(title: string): UpdateDisplayTitleAction;
 	updateDefaultChartType(defaultChartToRender: ChartTypes): UpdateDefaultChartToRenderAction;
 	toggleDefaultBarStacking(): ToggleDefaultBarStackingAction;
 	updateDefaultLanguage(defaultLanguage: LanguageTypes): UpdateDefaultLanguageAction;
 	submitPreferences(): Promise<void>;
 	updateDefaultTimeZone(timeZone: string): UpdateDefaultTimeZone;
+	updateDefaultWarningFileSize(defaultWarningFileSize: number): UpdateDefaultWarningFileSize;
+	updateDefaultFileSizeLimit(defaultFileSizeLimit: number): UpdateDefaultFileSizeLimit;
 }
 
 type PreferencesPropsWithIntl = PreferencesProps & InjectedIntlProps;
@@ -42,6 +48,8 @@ class PreferencesComponent extends React.Component<PreferencesPropsWithIntl, {}>
 		this.handleDefaultTimeZoneChange = this.handleDefaultTimeZoneChange.bind(this);
 		this.handleDefaultLanguageChange = this.handleDefaultLanguageChange.bind(this);
 		this.handleSubmitPreferences = this.handleSubmitPreferences.bind(this);
+		this.handleDefaultWarningFileSizeChange = this.handleDefaultWarningFileSizeChange.bind(this);
+		this.handleDefaultFileSizeLimitChange = this.handleDefaultFileSizeLimitChange.bind(this);
 	}
 
 	public render() {
@@ -195,6 +203,28 @@ class PreferencesComponent extends React.Component<PreferencesPropsWithIntl, {}>
 					</p>
 					<TimeZoneSelect current={this.props.defaultTimeZone} handleClick={this.handleDefaultTimeZoneChange} />
 				</div>
+				<div style={bottomPaddingStyle}>
+					<p style={titleStyle}>
+						<FormattedMessage id='default.warning.file.size' />:
+					</p>
+					<Input
+						type='number'
+						value={this.props.defaultWarningFileSize}
+						onChange={this.handleDefaultWarningFileSizeChange}
+						maxLength={50}
+					/>
+				</div>
+				<div style={bottomPaddingStyle}>
+					<p style={titleStyle}>
+						<FormattedMessage id='default.file.size.limit' />:
+					</p>
+					<Input
+						type='number'
+						value={this.props.defaultFileSizeLimit}
+						onChange={this.handleDefaultFileSizeLimitChange}
+						maxLength={50}
+					/>
+				</div>
 				<Button
 					type='submit'
 					onClick={this.handleSubmitPreferences}
@@ -228,6 +258,14 @@ class PreferencesComponent extends React.Component<PreferencesPropsWithIntl, {}>
 
 	private handleSubmitPreferences() {
 		this.props.submitPreferences();
+	}
+
+	private handleDefaultWarningFileSizeChange(e: { target: HTMLInputElement; }) {
+		this.props.updateDefaultWarningFileSize(parseFloat(e.target.value));
+	}
+
+	private handleDefaultFileSizeLimitChange(e: { target: HTMLInputElement; }) {
+		this.props.updateDefaultFileSizeLimit(parseFloat(e.target.value));
 	}
 }
 

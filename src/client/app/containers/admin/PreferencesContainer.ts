@@ -10,7 +10,9 @@ import {
 	toggleDefaultBarStacking,
 	updateTimeZone,
 	updateDefaultLanguage,
-	submitPreferencesIfNeeded
+	submitPreferencesIfNeeded,
+	updateDefaultWarningFileSize,
+	updateDefaultFileSizeLimit
 } from '../../actions/admin';
 import { State } from '../../types/redux/state';
 import { Dispatch } from '../../types/redux/actions';
@@ -24,7 +26,9 @@ function mapStateToProps(state: State) {
 		defaultTimeZone: state.admin.defaultTimeZone,
 		defaultBarStacking: state.admin.defaultBarStacking,
 		defaultLanguage: state.admin.defaultLanguage,
-		disableSubmitPreferences: state.admin.submitted
+		disableSubmitPreferences: state.admin.submitted,
+		defaultWarningFileSize: state.admin.defaultWarningFileSize,
+		defaultFileSizeLimit: state.admin.defaultFileSizeLimit
 	};
 }
 
@@ -35,7 +39,9 @@ function mapDispatchToProps(dispatch: Dispatch) {
 		updateDefaultTimeZone: (timeZone: string) => dispatch(updateTimeZone(timeZone)),
 		toggleDefaultBarStacking: () => dispatch(toggleDefaultBarStacking()),
 		updateDefaultLanguage: (defaultLanguage: LanguageTypes) => dispatch(updateDefaultLanguage(defaultLanguage)),
-		submitPreferences: () => dispatch(submitPreferencesIfNeeded())
+		submitPreferences: () => dispatch(submitPreferencesIfNeeded()),
+		updateDefaultWarningFileSize: (defaultWarningFileSize: number) => dispatch(updateDefaultWarningFileSize(defaultWarningFileSize)),
+		updateDefaultFileSizeLimit: (defaultFileSizeLimit: number) => dispatch(updateDefaultFileSizeLimit(defaultFileSizeLimit))
 	};
 }
 
