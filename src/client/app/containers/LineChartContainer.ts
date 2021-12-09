@@ -2,15 +2,15 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
 
-import * as _ from "lodash";
-import * as moment from "moment-timezone";
-import { connect } from "react-redux";
-import getGraphColor from "../utils/getGraphColor";
-import { State } from "../types/redux/state";
-import PlotlyChart, { IPlotlyChartProps } from "react-plotlyjs-ts";
-import { TimeInterval } from "../../../common/TimeInterval";
-import Locales from "../types/locales";
-import { DataType } from "../types/Datasources";
+import * as _ from 'lodash';
+import * as moment from 'moment-timezone';
+import { connect } from 'react-redux';
+import getGraphColor from '../utils/getGraphColor';
+import { State } from '../types/redux/state';
+import PlotlyChart, { IPlotlyChartProps } from 'react-plotlyjs-ts';
+import { TimeInterval } from '../../../common/TimeInterval';
+import Locales from '../types/locales';
+import { DataType } from '../types/Datasources';
 
 function mapStateToProps(state: State) {
 	const timeInterval = state.graph.timeInterval;
@@ -26,7 +26,7 @@ function mapStateToProps(state: State) {
 				const colorID = meterID;
 				if (readingsData.readings === undefined) {
 					throw new Error(
-						"Unacceptable condition: readingsData.readings is undefined."
+						'Unacceptable condition: readingsData.readings is undefined.'
 					);
 				}
 
@@ -35,32 +35,32 @@ function mapStateToProps(state: State) {
 				const yData: number[] = [];
 				const hoverText: string[] = [];
 				const readings = _.values(readingsData.readings);
-				readings.forEach((reading) => {
+				readings.forEach(reading => {
 					const st = moment(reading.startTimestamp);
 					// Time reading is in the middle of the start and end timestamp
 					const timeReading = st.add(moment(reading.endTimestamp).diff(st) / 2);
-					xData.push(timeReading.utc().format("YYYY-MM-DD HH:mm:ss"));
+					xData.push(timeReading.utc().format('YYYY-MM-DD HH:mm:ss'));
 					yData.push(reading.reading);
 					hoverText.push(
 						`<b> ${timeReading.format(
-							"dddd, LL LTS"
+							'dddd, LL LTS'
 						)} </b> <br> ${label}: ${reading.reading.toPrecision(6)} kW`
 					);
 				});
 
 				// Save the timestamp range of the plot
-				let minTimestamp: string = "";
-				let maxTimestamp: string = "";
+				let minTimestamp: string = '';
+				let maxTimestamp: string = '';
 				if (readings.length > 0) {
 					/* tslint:disable:no-string-literal */
-					minTimestamp = readings[0]["startTimestamp"].toString();
+					minTimestamp = readings[0]['startTimestamp'].toString();
 					maxTimestamp =
-						readings[readings.length - 1]["startTimestamp"].toString();
+						readings[readings.length - 1]['startTimestamp'].toString();
 					/* tslint:enable:no-string-literal */
 				}
-				const root: any = document.getElementById("root");
-				root.setAttribute("min-timestamp", minTimestamp);
-				root.setAttribute("max-timestamp", maxTimestamp);
+				const root: any = document.getElementById('root');
+				root.setAttribute('min-timestamp', minTimestamp);
+				root.setAttribute('max-timestamp', maxTimestamp);
 
 				// This variable contains all the elements (x and y values, line type, etc.) assigned to the data parameter of the Plotly object
 				datasets.push({
@@ -68,14 +68,14 @@ function mapStateToProps(state: State) {
 					x: xData,
 					y: yData,
 					text: hoverText,
-					hoverinfo: "text",
-					type: "scatter",
-					mode: "lines",
+					hoverinfo: 'text',
+					type: 'scatter',
+					mode: 'lines',
 					line: {
-						shape: "spline",
+						shape: 'spline',
 						width: 2,
-						color: getGraphColor(colorID, DataType.Meter),
-					},
+						color: getGraphColor(colorID, DataType.Meter)
+					}
 				});
 			}
 		}
@@ -93,7 +93,7 @@ function mapStateToProps(state: State) {
 				const colorID = groupID;
 				if (readingsData.readings === undefined) {
 					throw new Error(
-						"Unacceptable condition: readingsData.readings is undefined."
+						'Unacceptable condition: readingsData.readings is undefined.'
 					);
 				}
 
@@ -102,15 +102,15 @@ function mapStateToProps(state: State) {
 				const yData: number[] = [];
 				const hoverText: string[] = [];
 				const readings = _.values(readingsData.readings);
-				readings.forEach((reading) => {
+				readings.forEach(reading => {
 					const st = moment(reading.startTimestamp);
 					// Time reading is in the middle of the start and end timestamp
 					const timeReading = st.add(moment(reading.endTimestamp).diff(st) / 2);
-					xData.push(timeReading.utc().format("YYYY-MM-DD HH:mm:ss"));
+					xData.push(timeReading.utc().format('YYYY-MM-DD HH:mm:ss'));
 					yData.push(reading.reading);
 					hoverText.push(
 						`<b> ${timeReading.format(
-							"dddd, LL LTS"
+							'dddd, LL LTS'
 						)} </b> <br> ${label}: ${reading.reading.toPrecision(6)} kW`
 					);
 				});
@@ -121,14 +121,14 @@ function mapStateToProps(state: State) {
 					x: xData,
 					y: yData,
 					text: hoverText,
-					hoverinfo: "text",
-					type: "scatter",
-					mode: "lines",
+					hoverinfo: 'text',
+					type: 'scatter',
+					mode: 'lines',
 					line: {
-						shape: "spline",
+						shape: 'spline',
 						width: 2,
-						color: getGraphColor(colorID, DataType.Group),
-					},
+						color: getGraphColor(colorID, DataType.Group)
+					}
 				});
 			}
 		}
@@ -154,11 +154,11 @@ function mapStateToProps(state: State) {
 		legend: {
 			x: 0,
 			y: 1.1,
-			orientation: "h",
+			orientation: 'h'
 		},
 		yaxis: {
-			title: "kW",
-			gridcolor: "#ddd",
+			title: 'kW',
+			gridcolor: '#ddd'
 		},
 
 		xaxis: {
@@ -167,12 +167,12 @@ function mapStateToProps(state: State) {
 				thickness: 0.1,
 			},
 			showgrid: true,
-			gridcolor: "#ddd",
+			gridcolor: '#ddd'
 		},
 		margin: {
 			t: 10,
-			b: 10,
-		},
+			b: 10
+		}
 	};
 
 	// Assign all the parameters required to create the Plotly object (data, layout, config) to the variable props, returned by mapStateToProps
@@ -182,8 +182,8 @@ function mapStateToProps(state: State) {
 		layout,
 		config: {
 			displayModeBar: true,
-			locales: Locales, // makes locales available for use
-		},
+			locales: Locales // makes locales available for use
+		}
 	};
 	props.config.locale = state.admin.defaultLanguage;
 	return props;
