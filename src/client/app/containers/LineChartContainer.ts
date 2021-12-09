@@ -25,9 +25,7 @@ function mapStateToProps(state: State) {
 				const label = state.meters.byMeterID[meterID].name;
 				const colorID = meterID;
 				if (readingsData.readings === undefined) {
-					throw new Error(
-						'Unacceptable condition: readingsData.readings is undefined.'
-					);
+					throw new Error('Unacceptable condition: readingsData.readings is undefined.');
 				}
 
 				// Create two arrays for the x and y values. Fill the array with the data from the compressed readings
@@ -41,11 +39,7 @@ function mapStateToProps(state: State) {
 					const timeReading = st.add(moment(reading.endTimestamp).diff(st) / 2);
 					xData.push(timeReading.utc().format('YYYY-MM-DD HH:mm:ss'));
 					yData.push(reading.reading);
-					hoverText.push(
-						`<b> ${timeReading.format(
-							'dddd, LL LTS'
-						)} </b> <br> ${label}: ${reading.reading.toPrecision(6)} kW`
-					);
+					hoverText.push(`<b> ${timeReading.format('dddd, LL LTS')} </b> <br> ${label}: ${reading.reading.toPrecision(6)} kW`);
 				});
 
 				// Save the timestamp range of the plot
@@ -54,8 +48,7 @@ function mapStateToProps(state: State) {
 				if (readings.length > 0) {
 					/* tslint:disable:no-string-literal */
 					minTimestamp = readings[0]['startTimestamp'].toString();
-					maxTimestamp =
-						readings[readings.length - 1]['startTimestamp'].toString();
+					maxTimestamp = readings[readings.length - 1]['startTimestamp'].toString();
 					/* tslint:enable:no-string-literal */
 				}
 				const root: any = document.getElementById('root');
@@ -92,9 +85,7 @@ function mapStateToProps(state: State) {
 				const label = state.groups.byGroupID[groupID].name;
 				const colorID = groupID;
 				if (readingsData.readings === undefined) {
-					throw new Error(
-						'Unacceptable condition: readingsData.readings is undefined.'
-					);
+					throw new Error('Unacceptable condition: readingsData.readings is undefined.');
 				}
 
 				// Create two arrays for the x and y values. Fill the array with the data from the compressed readings
@@ -108,11 +99,7 @@ function mapStateToProps(state: State) {
 					const timeReading = st.add(moment(reading.endTimestamp).diff(st) / 2);
 					xData.push(timeReading.utc().format('YYYY-MM-DD HH:mm:ss'));
 					yData.push(reading.reading);
-					hoverText.push(
-						`<b> ${timeReading.format(
-							'dddd, LL LTS'
-						)} </b> <br> ${label}: ${reading.reading.toPrecision(6)} kW`
-					);
+					hoverText.push(`<b> ${timeReading.format('dddd, LL LTS'	)} </b> <br> ${label}: ${reading.reading.toPrecision(6)} kW`);
 				});
 
 				// This variable contains all the elements (x and y values, line type, etc.) assigned to the data parameter of the Plotly object
@@ -135,17 +122,9 @@ function mapStateToProps(state: State) {
 	}
 
 	// Calculate slider interval if rangeSliderInterval is specified;
-	const sliderInterval = state.graph.rangeSliderInterval.equals(
-		TimeInterval.unbounded()
-	)
-		? timeInterval
-		: state.graph.rangeSliderInterval;
-	const start = Date.parse(
-		moment(sliderInterval.getStartTimestamp()).toISOString()
-	);
-	const end = Date.parse(
-		moment(sliderInterval.getEndTimestamp()).toISOString()
-	);
+	const sliderInterval = state.graph.rangeSliderInterval.equals(TimeInterval.unbounded()) ? timeInterval : state.graph.rangeSliderInterval;
+	const start = Date.parse(moment(sliderInterval.getStartTimestamp()).toISOString());
+	const end = Date.parse(moment(sliderInterval.getEndTimestamp()).toISOString());
 
 	// Customize the layout of the plot
 	const layout: any = {
@@ -164,7 +143,7 @@ function mapStateToProps(state: State) {
 		xaxis: {
 			range: [start, end], // Specifies the start and end points of visible part of graph(unshaded region on slider);
 			rangeslider: {
-				thickness: 0.1,
+				thickness: 0.1
 			},
 			showgrid: true,
 			gridcolor: '#ddd'
