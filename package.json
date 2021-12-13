@@ -50,6 +50,7 @@
   },
   "dependencies": {
     "@babel/core": "~7.9.0",
+    "@types/react-router-dom": "~5.3.2",
     "axios": "~0.24.0",
     "babel-plugin-react-intl": "~2.4.0",
     "bcryptjs": "~2.4.3",
@@ -94,6 +95,7 @@
     "react-plotlyjs-ts": "~2.2.2",
     "react-redux": "~5.0.7",
     "react-router": "~3.0.5",
+    "react-router-dom": "~5.3.0",
     "react-select": "~1.0.1",
     "react-tooltip": "~4.2.10",
     "reactstrap": "~8.0.0",
