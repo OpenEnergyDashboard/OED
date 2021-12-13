@@ -9,7 +9,7 @@ import { hasToken } from '../../utils/token';
 import HeaderContainer from '../../containers/HeaderContainer';
 import FooterContainer from '../../containers/FooterContainer';
 import MapViewContainer from '../../containers/maps/MapViewContainer';
-import {Link} from 'react-router';
+import {Link} from 'react-router-dom';
 import TooltipHelpContainerAlternative from '../../containers/TooltipHelpContainerAlternative';
 import TooltipMarkerComponent from '../TooltipMarkerComponent';
 
