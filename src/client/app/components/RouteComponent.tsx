@@ -3,7 +3,7 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
 
 import * as React from 'react';
-import { RedirectFunction, Route, Router, RouterState } from 'react-router';
+import { Route, Router, Switch } from 'react-router-dom';
 import { addLocaleData, IntlProvider } from 'react-intl';
 import * as en from 'react-intl/locale-data/en';
 import * as fr from 'react-intl/locale-data/fr';
@@ -35,6 +35,7 @@ import MapCalibrationContainer from '../containers/maps/MapCalibrationContainer'
 import UploadCSVContainer from '../containers/csv/UploadCSVContainer';
 import { UserRole } from '../types/items';
 import { hasPermissions } from '../utils/hasPermissions';
+import queryString = require('query-string');
 
 interface RouteProps {
 	barStacking: boolean;
@@ -56,56 +57,43 @@ export default class RouteComponent extends React.Component<RouteProps, {}> {
 	/**
 	 * Generates middleware that requires proper role and authentication for a page route
 	 * @param requiredRole The role that is necessary to access a page route
+	 * @param component The component of the page redirecting
 	 * @returns middleware that requires proper role and authentication for a page route
 	 */
-	public requireRole(requiredRole: UserRole) {
-
-		return (nextState: RouterState, replace: RedirectFunction) => {
-			function redirectRoute() {
-				replace({
-					pathname: '/login',
-					state: { nextPathname: nextState.location.pathname }
-				});
-			}
-			// Redirect route to login page if the auth token does not exist
-			if (!hasToken()) {
-				redirectRoute();
-				return;
-			}
-
-			// Verify that the auth token is valid.
-			// Needs to be async because of the network request
-			(async () => {
-				if (!(await verificationApi.checkTokenValid())) {
-					// Route to login page if the auth token is not valid
-					browserHistory.push('/login');
-					// We should delete the token when we know that it is expired. Ensures that we don't not leave any unwanted tokens around.
-					deleteToken();
-					// This ensures that if there is no token then there is no stale profile in the redux store.
-					this.props.clearCurrentUser();
-				} else if (!hasPermissions(this.props.role, requiredRole)) {
-					// Even though the auth token is valid, we still need to check that the user is a certain role.
-					browserHistory.push('/');
-				}
-			})();
+	public requireRole(requiredRole: UserRole, component: JSX.Element) {
+		// Redirect route to login page if the auth token does not exist
+		if (!hasToken()) {
+			browserHistory.push('/login');
+			return;
 		}
+
+		// Verify that the auth token is valid.
+		// Needs to be async because of the network request
+		(async () => {
+			if (!(await verificationApi.checkTokenValid())) {
+				// Route to login page if the auth token is not valid
+				browserHistory.push('/login');
+				// We should delete the token when we know that it is expired. Ensures that we don't not leave any unwanted tokens around.
+				deleteToken();
+				// This ensures that if there is no token then there is no stale profile in the redux store.
+				this.props.clearCurrentUser();
+			} else if (!hasPermissions(this.props.role, requiredRole)) {
+				// Even though the auth token is valid, we still need to check that the user is a certain role.
+				browserHistory.push('/');
+			}
+		})();
+
+		return component;
 	}
 
 	/**
 	 * Middleware function that requires proper authentication for a page route
-	 * @param nextState The next state of the router
-	 * @param replace Function that allows a route redirect
+	 * @param component The component of the page redirecting
 	 */
-	public requireAuth(nextState: RouterState, replace: RedirectFunction) {
-		function redirectRoute() {
-			replace({
-				pathname: '/login',
-				state: { nextPathname: nextState.location.pathname }
-			});
-		}
+	public requireAuth(component: JSX.Element) {
 		// Redirect route to login page if the auth token does not exist
 		if (!hasToken()) {
-			redirectRoute();
+			browserHistory.push('/login');
 			return;
 		}
 
@@ -124,14 +112,15 @@ export default class RouteComponent extends React.Component<RouteProps, {}> {
 				browserHistory.push('/');
 			}
 		})();
+
+		return component;
 	}
 
 	/**
 	 * Middleware function that checks proper authentication for a page route
-	 * @param nextState The next state of the router
-	 * @param replace Function that allows a route redirect
+	 * @param component The component of the page redirecting
 	 */
-	public checkAuth(nextState: RouterState, replace: RedirectFunction) {
+	public checkAuth(component: JSX.Element) {
 		// Only check the token if the auth token does not exist
 		if (hasToken()) {
 			// Verify that the auth token is valid.
@@ -151,15 +140,18 @@ export default class RouteComponent extends React.Component<RouteProps, {}> {
 				}
 			})();
 		}
+		return component;
 	}
 
 	/**
 	 * Middleware function that allows hotlinking to a graph with options
-	 * @param nextState The next state of the router
-	 * @param replace Function that allows a route redirect
+	 * @param component The component of the page redirecting
+	 * @param search The string of queries in the path
 	 */
-	public linkToGraph(nextState: RouterState, replace: RedirectFunction) {
-		const queries: any = nextState.location.query;
+	public linkToGraph(component: JSX.Element, search: string) {
+		console.log(search);
+		const queries: any = queryString.parse(search);
+		console.log(queries);
 		if (!_.isEmpty(queries)) {
 			try {
 				const options: LinkOptions = {};
@@ -232,7 +224,7 @@ export default class RouteComponent extends React.Component<RouteProps, {}> {
 				showErrorNotification(translate('failed.to.link.graph'));
 			}
 		}
-		replace('/');
+		return component;
 	}
 
 	/**
@@ -257,19 +249,21 @@ export default class RouteComponent extends React.Component<RouteProps, {}> {
 				<IntlProvider locale={lang} messages={messages} key={lang}>
 					<>
 						<Router history={browserHistory}>
-							<Route path='/login' component={LoginContainer} />
-							<Route path='/admin' component={AdminComponent} onEnter={this.requireAuth} />
-							<Route path='/csv' component={UploadCSVContainer} onEnter={this.requireRole(UserRole.CSV)} />
-							<Route path='/groups' component={GroupsDetailContainer} onEnter={this.checkAuth} />
-							<Route path='/meters' component={MetersDetailContainer} onEnter={this.checkAuth} />
-							<Route path='/graph' component={HomeComponent} onEnter={this.linkToGraph} />
-							<Route path='/calibration' component={MapCalibrationContainer} onEnter={this.requireAuth} />
-							<Route path='/maps' component={MapsDetailContainer} onEnter={this.requireAuth} />
-							<Route path='/createGroup' component={CreateGroupContainer} onEnter={this.requireAuth} />
-							<Route path='/editGroup' component={EditGroupsContainer} onEnter={this.requireAuth} />
-							<Route path='/users' component={UsersDetailContainer} onEnter={this.requireAuth} />
-							<Route path='/users/new' component={CreateUserContainer} onEnter={this.requireAuth} />
-							<Route path='*' component={HomeComponent} />
+							<Switch>
+									<Route path='/login' component={LoginContainer}/>
+									<Route path='/admin' render={() => this.requireAuth(AdminComponent())}/>
+									<Route path='/csv' render={() => this.requireRole(UserRole.CSV, <UploadCSVContainer/>)}/>
+									<Route path='/groups' render={() => this.checkAuth(<GroupsDetailContainer/>)}/>
+									<Route path='/meters' render={() => this.checkAuth(<MetersDetailContainer/>)}/>
+									<Route path='/graph' render={({ location }) => this.linkToGraph(<HomeComponent/>, location.search)}/>
+									<Route path='/calibration' render={() => this.requireAuth(<MapCalibrationContainer/>)}/>
+									<Route path='/maps' render={() => this.requireAuth(<MapsDetailContainer/>)}/>
+									<Route path='/createGroup' render={() => this.requireAuth(<CreateGroupContainer/>)}/>
+									<Route path='/editGroup' render={() => this.requireAuth(<EditGroupsContainer/>)}/>
+									<Route path='/users/new' render={() => this.requireAuth(<CreateUserContainer/>)}/>
+									<Route path='/users' render={() => this.requireAuth(<UsersDetailContainer fetchUsers={() => []}/>)}/>
+									<Route path='*' component={HomeComponent}/>
+								</Switch>
 						</Router>
 					</>
 				</IntlProvider>
