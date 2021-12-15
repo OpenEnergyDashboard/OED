@@ -149,9 +149,7 @@ export default class RouteComponent extends React.Component<RouteProps, {}> {
 	 * @param search The string of queries in the path
 	 */
 	public linkToGraph(component: JSX.Element, search: string) {
-		console.log(search);
 		const queries: any = queryString.parse(search);
-		console.log(queries);
 		if (!_.isEmpty(queries)) {
 			try {
 				const options: LinkOptions = {};
@@ -250,20 +248,20 @@ export default class RouteComponent extends React.Component<RouteProps, {}> {
 					<>
 						<Router history={browserHistory}>
 							<Switch>
-									<Route path='/login' component={LoginContainer}/>
-									<Route path='/admin' render={() => this.requireAuth(AdminComponent())}/>
-									<Route path='/csv' render={() => this.requireRole(UserRole.CSV, <UploadCSVContainer/>)}/>
-									<Route path='/groups' render={() => this.checkAuth(<GroupsDetailContainer/>)}/>
-									<Route path='/meters' render={() => this.checkAuth(<MetersDetailContainer/>)}/>
-									<Route path='/graph' render={({ location }) => this.linkToGraph(<HomeComponent/>, location.search)}/>
-									<Route path='/calibration' render={() => this.requireAuth(<MapCalibrationContainer/>)}/>
-									<Route path='/maps' render={() => this.requireAuth(<MapsDetailContainer/>)}/>
-									<Route path='/createGroup' render={() => this.requireAuth(<CreateGroupContainer/>)}/>
-									<Route path='/editGroup' render={() => this.requireAuth(<EditGroupsContainer/>)}/>
-									<Route path='/users/new' render={() => this.requireAuth(<CreateUserContainer/>)}/>
-									<Route path='/users' render={() => this.requireAuth(<UsersDetailContainer fetchUsers={() => []}/>)}/>
-									<Route path='*' component={HomeComponent}/>
-								</Switch>
+								<Route path='/login' component={LoginContainer}/>
+								<Route path='/admin' render={() => this.requireAuth(AdminComponent())}/>
+								<Route path='/csv' render={() => this.requireRole(UserRole.CSV, <UploadCSVContainer/>)}/>
+								<Route path='/groups' render={() => this.checkAuth(<GroupsDetailContainer/>)}/>
+								<Route path='/meters' render={() => this.checkAuth(<MetersDetailContainer/>)}/>
+								<Route path='/graph' render={({ location }) => this.linkToGraph(<HomeComponent/>, location.search)}/>
+								<Route path='/calibration' render={() => this.requireAuth(<MapCalibrationContainer/>)}/>
+								<Route path='/maps' render={() => this.requireAuth(<MapsDetailContainer/>)}/>
+								<Route path='/createGroup' render={() => this.requireAuth(<CreateGroupContainer/>)}/>
+								<Route path='/editGroup' render={() => this.requireAuth(<EditGroupsContainer/>)}/>
+								<Route path='/users/new' render={() => this.requireAuth(<CreateUserContainer/>)}/>
+								<Route path='/users' render={() => this.requireAuth(<UsersDetailContainer fetchUsers={() => []}/>)}/>
+								<Route path='*' component={HomeComponent}/>
+							</Switch>
 						</Router>
 					</>
 				</IntlProvider>
