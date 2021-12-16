@@ -14,6 +14,7 @@ import {
 	UpdateDefaultWarningFileSize,
 	UpdateDefaultFileSizeLimit
 } from '../../types/redux/admin';
+import { RemoveUnsavedChangesAction, UpdateUnsavedChangesAction } from '../../types/redux/unsavedWarning';
 import { defineMessages, FormattedMessage, injectIntl, InjectedIntlProps } from 'react-intl';
 import { LanguageTypes } from '../../types/redux/i18n';
 import TimeZoneSelect from '../TimeZoneSelect';
@@ -35,6 +36,8 @@ interface PreferencesProps {
 	updateDefaultTimeZone(timeZone: string): UpdateDefaultTimeZone;
 	updateDefaultWarningFileSize(defaultWarningFileSize: number): UpdateDefaultWarningFileSize;
 	updateDefaultFileSizeLimit(defaultFileSizeLimit: number): UpdateDefaultFileSizeLimit;
+	updateUnsavedChanges(): UpdateUnsavedChangesAction;
+	removeUnsavedChanges(): RemoveUnsavedChangesAction;
 }
 
 type PreferencesPropsWithIntl = PreferencesProps & InjectedIntlProps;
@@ -238,34 +241,42 @@ class PreferencesComponent extends React.Component<PreferencesPropsWithIntl, {}>
 
 	private handleDisplayTitleChange(e: { target: HTMLInputElement; }) {
 		this.props.updateDisplayTitle(e.target.value);
+		this.props.updateUnsavedChanges();
 	}
 
 	private handleDefaultChartToRenderChange(e: React.FormEvent<HTMLInputElement>) {
 		this.props.updateDefaultChartType((e.target as HTMLInputElement).value as ChartTypes);
+		this.props.updateUnsavedChanges();
 	}
 
 	private handleDefaultBarStackingChange() {
 		this.props.toggleDefaultBarStacking();
+		this.props.updateUnsavedChanges();
 	}
 
 	private handleDefaultLanguageChange(e: React.FormEvent<HTMLInputElement>) {
 		this.props.updateDefaultLanguage((e.target as HTMLInputElement).value as LanguageTypes);
+		this.props.updateUnsavedChanges();
 	}
 
 	private handleDefaultTimeZoneChange(value: string) {
 		this.props.updateDefaultTimeZone(value);
+		this.props.updateUnsavedChanges();
 	}
 
 	private handleSubmitPreferences() {
 		this.props.submitPreferences();
+		this.props.removeUnsavedChanges();
 	}
 
 	private handleDefaultWarningFileSizeChange(e: { target: HTMLInputElement; }) {
 		this.props.updateDefaultWarningFileSize(parseFloat(e.target.value));
+		this.props.updateUnsavedChanges();
 	}
 
 	private handleDefaultFileSizeLimitChange(e: { target: HTMLInputElement; }) {
 		this.props.updateDefaultFileSizeLimit(parseFloat(e.target.value));
+		this.props.updateUnsavedChanges();
 	}
 }
 

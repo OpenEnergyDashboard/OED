@@ -14,6 +14,7 @@ import {
 	updateDefaultWarningFileSize,
 	updateDefaultFileSizeLimit
 } from '../../actions/admin';
+import { removeUnsavedChanges, updateUnsavedChanges } from '../../actions/unsavedWarning';
 import { State } from '../../types/redux/state';
 import { Dispatch } from '../../types/redux/actions';
 import { ChartTypes } from '../../types/redux/graph';
@@ -41,9 +42,10 @@ function mapDispatchToProps(dispatch: Dispatch) {
 		updateDefaultLanguage: (defaultLanguage: LanguageTypes) => dispatch(updateDefaultLanguage(defaultLanguage)),
 		submitPreferences: () => dispatch(submitPreferencesIfNeeded()),
 		updateDefaultWarningFileSize: (defaultWarningFileSize: number) => dispatch(updateDefaultWarningFileSize(defaultWarningFileSize)),
-		updateDefaultFileSizeLimit: (defaultFileSizeLimit: number) => dispatch(updateDefaultFileSizeLimit(defaultFileSizeLimit))
+		updateDefaultFileSizeLimit: (defaultFileSizeLimit: number) => dispatch(updateDefaultFileSizeLimit(defaultFileSizeLimit)),
+		updateUnsavedChanges: () => dispatch(updateUnsavedChanges()),
+		removeUnsavedChanges: () => dispatch(removeUnsavedChanges())
 	};
 }
 
 export default connect(mapStateToProps, mapDispatchToProps)(PreferencesComponent);
-
