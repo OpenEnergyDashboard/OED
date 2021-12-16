@@ -15,6 +15,9 @@ export enum ActionType {
 	RequestVersion = 'REQUEST_VERSION',
 	ReceiveVersion = 'RECEIVE_VERSION',
 
+	UpdateUnsavedChanges = 'UPDATE_UNSAVED_CHANGES',
+	RemoveUnsavedChanges = 'REMOVE_UNSAVED_CHANGES',
+
 	RequestMetersDetails = 'REQUEST_METERS_DETAILS',
 	ReceiveMetersDetails = 'RECEIVE_METERS_DETAILS',
 	ChangeDisplayedMeters = 'CHANGE_DISPLAYED_METERS',
