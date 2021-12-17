@@ -12,7 +12,8 @@ import {
 	updateDefaultLanguage,
 	submitPreferencesIfNeeded,
 	updateDefaultWarningFileSize,
-	updateDefaultFileSizeLimit
+	updateDefaultFileSizeLimit,
+	fetchPreferencesIfNeeded
 } from '../../actions/admin';
 import { removeUnsavedChanges, updateUnsavedChanges } from '../../actions/unsavedWarning';
 import { State } from '../../types/redux/state';
@@ -43,8 +44,9 @@ function mapDispatchToProps(dispatch: Dispatch) {
 		submitPreferences: () => dispatch(submitPreferencesIfNeeded()),
 		updateDefaultWarningFileSize: (defaultWarningFileSize: number) => dispatch(updateDefaultWarningFileSize(defaultWarningFileSize)),
 		updateDefaultFileSizeLimit: (defaultFileSizeLimit: number) => dispatch(updateDefaultFileSizeLimit(defaultFileSizeLimit)),
-		updateUnsavedChanges: (submitFunction: () => any) => dispatch(updateUnsavedChanges(submitFunction)),
-		removeUnsavedChanges: () => dispatch(removeUnsavedChanges())
+		updateUnsavedChanges: (removeFunc: () => any, submitFunc: () => any) => dispatch(updateUnsavedChanges(removeFunc, submitFunc)),
+		removeUnsavedChanges: () => dispatch(removeUnsavedChanges()),
+		fetchPreferences: () => dispatch(fetchPreferencesIfNeeded())
 	};
 }
 

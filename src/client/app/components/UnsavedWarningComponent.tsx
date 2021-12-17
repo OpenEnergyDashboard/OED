@@ -76,6 +76,8 @@ class UnsavedWarningComponent extends React.Component<UnsavedWarningProps> {
                 warningVisible: false
             }, () => {
                 this.props.removeUnsavedChanges();
+                // Return the previous state for inputs
+                this.props.removeFunction();
                 // Navigate to the path that the user wants
                 this.props.history.push(this.state.nextLocation);
             });

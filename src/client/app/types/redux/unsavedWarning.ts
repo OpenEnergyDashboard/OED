@@ -6,17 +6,26 @@ import { ActionType } from './actions';
 
 export type UnsavedWarningAction = UpdateUnsavedChangesAction | RemoveUnsavedChangesAction;
 
+/*
+* The action triggered when there are new unsaved changes
+*/
 export interface UpdateUnsavedChangesAction {
 	type: ActionType.UpdateUnsavedChanges;
+	removeFunction: () => any;
 	submitFunction: () => any;
 }
 
+/*
+* The action triggered when the users decide to discard unsaved changes or click the submit button
+*/
 export interface RemoveUnsavedChangesAction {
 	type: ActionType.RemoveUnsavedChanges;
 }
 
 export interface UnsavedWarningState {
 	hasUnsavedChanges: boolean;
+	// The function to remove unsaved changes
 	removeFunction: () => any;
+	// The function to submit unsaved changes
 	submitFunction: () => any;
 }

@@ -18,6 +18,7 @@ export default function unsavedWarning(state = defaultState, action: UnsavedWarn
             return {
                 ...state,
                 hasUnsavedChanges: true,
+                removeFunction: action.removeFunction,
                 submitFunction: action.submitFunction
             }
         case ActionType.RemoveUnsavedChanges:
