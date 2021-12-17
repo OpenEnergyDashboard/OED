@@ -14,10 +14,11 @@ import {
 	UpdateDefaultWarningFileSize,
 	UpdateDefaultFileSizeLimit,
 } from '../../types/redux/admin';
-import { RemoveUnsavedChangesAction, UpdateUnsavedChangesAction } from '../../types/redux/unsavedWarning';
+import { removeUnsavedChanges, updateUnsavedChanges } from '../../actions/unsavedWarning';
 import { defineMessages, FormattedMessage, injectIntl, InjectedIntlProps } from 'react-intl';
 import { LanguageTypes } from '../../types/redux/i18n';
 import TimeZoneSelect from '../TimeZoneSelect';
+import store from '../../index';
 
 interface PreferencesProps {
 	displayTitle: string;
@@ -36,8 +37,6 @@ interface PreferencesProps {
 	updateDefaultTimeZone(timeZone: string): UpdateDefaultTimeZone;
 	updateDefaultWarningFileSize(defaultWarningFileSize: number): UpdateDefaultWarningFileSize;
 	updateDefaultFileSizeLimit(defaultFileSizeLimit: number): UpdateDefaultFileSizeLimit;
-	updateUnsavedChanges(removeFunction: () => any, submitFunction: () => any): UpdateUnsavedChangesAction;
-	removeUnsavedChanges(): RemoveUnsavedChangesAction;
 	fetchPreferences(): Promise<void>;
 }
 
@@ -240,44 +239,53 @@ class PreferencesComponent extends React.Component<PreferencesPropsWithIntl, {}>
 		);
 	}
 
+	private updateUnsavedChanges() {
+		// Notify that there are unsaved changes
+		store.dispatch(updateUnsavedChanges(this.props.fetchPreferences, this.props.submitPreferences));
+	}
+
+	private removeUnsavedChanges() {
+		// Notify that there are no unsaved changes
+		store.dispatch(removeUnsavedChanges());
+	}
+
 	private handleDisplayTitleChange(e: { target: HTMLInputElement; }) {
 		this.props.updateDisplayTitle(e.target.value);
-		this.props.updateUnsavedChanges(this.props.fetchPreferences, this.props.submitPreferences);
+		this.updateUnsavedChanges();
 	}
 
 	private handleDefaultChartToRenderChange(e: React.FormEvent<HTMLInputElement>) {
 		this.props.updateDefaultChartType((e.target as HTMLInputElement).value as ChartTypes);
-		this.props.updateUnsavedChanges(this.props.fetchPreferences, this.props.submitPreferences);
+		this.updateUnsavedChanges();
 	}
 
 	private handleDefaultBarStackingChange() {
 		this.props.toggleDefaultBarStacking();
-		this.props.updateUnsavedChanges(this.props.fetchPreferences, this.props.submitPreferences);
+		this.updateUnsavedChanges();
 	}
 
 	private handleDefaultLanguageChange(e: React.FormEvent<HTMLInputElement>) {
 		this.props.updateDefaultLanguage((e.target as HTMLInputElement).value as LanguageTypes);
-		this.props.updateUnsavedChanges(this.props.fetchPreferences, this.props.submitPreferences);
+		this.updateUnsavedChanges();
 	}
 
 	private handleDefaultTimeZoneChange(value: string) {
 		this.props.updateDefaultTimeZone(value);
-		this.props.updateUnsavedChanges(this.props.fetchPreferences, this.props.submitPreferences);
+		this.updateUnsavedChanges();
 	}
 
 	private handleSubmitPreferences() {
 		this.props.submitPreferences();
-		this.props.removeUnsavedChanges();
+		this.removeUnsavedChanges();
 	}
 
 	private handleDefaultWarningFileSizeChange(e: { target: HTMLInputElement; }) {
 		this.props.updateDefaultWarningFileSize(parseFloat(e.target.value));
-		this.props.updateUnsavedChanges(this.props.fetchPreferences, this.props.submitPreferences);
+		this.updateUnsavedChanges();
 	}
 
 	private handleDefaultFileSizeLimitChange(e: { target: HTMLInputElement; }) {
-		this.props.updateDefaultFileSizeLimit(parseFloat(e.target.value));
-		this.props.updateUnsavedChanges(this.props.fetchPreferences, this.props.submitPreferences);
+		this.updateUnsavedChanges();
 	}
 }
 
