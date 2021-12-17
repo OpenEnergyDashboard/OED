@@ -2,7 +2,7 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
 
-import { updateUnsavedChanges } from '../actions/unsavedWarning';
+import { removeUnsavedChanges } from '../actions/unsavedWarning';
 import { connect } from 'react-redux';
 import UnsavedWarningComponent from '../components/UnsavedWarningComponent';
 import { State } from '../types/redux/state';
@@ -16,7 +16,7 @@ function mapStateToProps(state: State) {
 
 function mapDispatchToProps(dispatch: Dispatch) {
 	return {
-        updateUnsavedChanges: () => dispatch(updateUnsavedChanges())
+        removeUnsavedChanges: () => dispatch(removeUnsavedChanges())
 	};
 }
  
