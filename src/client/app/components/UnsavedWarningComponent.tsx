@@ -28,13 +28,11 @@ class UnsavedWarningComponent extends React.Component<UnsavedWarningProps> {
     constructor(props: UnsavedWarningProps) {
         super(props);
         this.closeWarning = this.closeWarning.bind(this);
-        this.handleLeaveClick = this.handleLeaveClick.bind(this);
-        this.handleSaveClick = this.handleSaveClick.bind(this);
     }
 
     componentDidUpdate() {
-        const { warningVisible } = this.state;
-        if (warningVisible) {
+        const { hasUnsavedChanges } = this.props;
+        if (hasUnsavedChanges) {
             // Block reloading page or closing oed tab
             window.onbeforeunload = () => true;
         } else {
@@ -64,8 +62,18 @@ class UnsavedWarningComponent extends React.Component<UnsavedWarningProps> {
                     <ModalBody><FormattedMessage id='unsaved.warning' /></ModalBody>
                     <ModalFooter>
                         <Button outline onClick={this.closeWarning}><FormattedMessage id='cancel' /></Button>
-                        <Button color='danger' onClick={this.handleLeaveClick}><FormattedMessage id='leave' /></Button>
-                        <Button color='success' onClick={this.handleSaveClick}><FormattedMessage id='save.all' /></Button>
+                        <Button 
+                            color='danger' 
+                            onClick={() => this.handleNavigateChange(this.props.removeFunction)}
+                        >
+                            <FormattedMessage id='leave' />
+                        </Button>
+                        <Button 
+                            color='success' 
+                            onClick={() => this.handleNavigateChange(this.props.submitFunction)}
+                        >
+                            <FormattedMessage id='save.all' />
+                        </Button>
                     </ModalFooter>
                 </Modal>
             </>
@@ -78,7 +86,10 @@ class UnsavedWarningComponent extends React.Component<UnsavedWarningProps> {
         });
     }
 
-    private handleLeaveClick() {
+    /**
+    * Handle when the user clicks leave or save all.
+    */
+    private handleNavigateChange(func: () => any) {
         const { nextLocation } = this.state;
         if (nextLocation) {
             this.setState({
@@ -86,24 +97,9 @@ class UnsavedWarningComponent extends React.Component<UnsavedWarningProps> {
                 warningVisible: false
             }, () => {
                 this.props.removeUnsavedChanges();
-                // Return the previous state for inputs
-                this.props.removeFunction();
-                // Navigate to the path that the user wants
-                this.props.history.push(this.state.nextLocation);
-            });
-        }
-    }
-
-    private handleSaveClick() {
-        const { nextLocation } = this.state;
-        if (nextLocation) {
-            this.setState({
-                confirmedToLeave: true,
-                warningVisible: false
-            }, () => {
-                this.props.removeUnsavedChanges();
-                // Submit changes
-                this.props.submitFunction();
+                // Unblock reloading page and closing tab
+                window.onbeforeunload = () => undefined;
+                func();
                 // Navigate to the path that the user wants
                 this.props.history.push(this.state.nextLocation);
             });
