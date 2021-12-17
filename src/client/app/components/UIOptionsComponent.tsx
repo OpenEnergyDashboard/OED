@@ -210,7 +210,42 @@ class UIOptionsComponent extends React.Component<UIOptionsPropsWithIntl, UIOptio
 				}
 
 				{this.props.chartToRender === ChartTypes.map &&
-					<MapChartSelectContainer />
+					[<div key='side-options'>
+						<p style={labelStyle}>
+						<FormattedMessage id='bar.interval' />:
+					</p>
+					<ButtonGroup
+						style={zIndexFix}
+					>
+						<Button
+							outline={this.state.barDurationDays !== 1}
+							onClick={() => this.handleBarButton(1)}
+						>
+							<FormattedMessage id='day' />
+						</Button>
+						<Button
+							outline={this.state.barDurationDays !== 7}
+							onClick={() => this.handleBarButton(7)}
+						>
+							<FormattedMessage id='week' />
+						</Button>
+						<Button
+							outline={this.state.barDurationDays !== 28}
+							onClick={() => this.handleBarButton(28)}
+						>
+							<FormattedMessage id='4.weeks' />
+						</Button>
+					</ButtonGroup>
+					<TooltipMarkerComponent page='home' helpTextId='help.home.bar.interval.tip' />
+					<Button
+						outline={!this.state.showSlider}
+						onClick={this.toggleSlider}
+					>
+						<FormattedMessage id='toggle.custom.slider' />
+					</Button>
+					<TooltipMarkerComponent page='home' helpTextId='help.home.bar.custom.slider.tip' />
+					</div>,
+						<MapChartSelectContainer key='chart'/>]
 				}
 
 				{/* We can't export compare data or map data */}
