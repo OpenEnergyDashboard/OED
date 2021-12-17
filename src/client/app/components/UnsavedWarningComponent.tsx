@@ -32,6 +32,16 @@ class UnsavedWarningComponent extends React.Component<UnsavedWarningProps> {
         this.handleSaveClick = this.handleSaveClick.bind(this);
     }
 
+    componentDidUpdate() {
+        const { warningVisible } = this.state;
+        if (warningVisible) {
+            // Block reloading page or closing oed tab
+            window.onbeforeunload = () => true;
+        } else {
+            window.onbeforeunload = () => undefined;
+        }
+    }
+
     render() {
         return (
             <>
