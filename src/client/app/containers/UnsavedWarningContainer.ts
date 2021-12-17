@@ -10,7 +10,9 @@ import { Dispatch } from '../types/redux/actions';
  
 function mapStateToProps(state: State) {
     return {
-        hasUnsavedChanges: state.unsavedWarning.hasUnsavedChanges
+        hasUnsavedChanges: state.unsavedWarning.hasUnsavedChanges,
+        removeFunction: state.unsavedWarning.removeFunction,
+        submitFunction: state.unsavedWarning.submitFunction
     }
 }
 

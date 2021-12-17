@@ -43,7 +43,7 @@ function mapDispatchToProps(dispatch: Dispatch) {
 		submitPreferences: () => dispatch(submitPreferencesIfNeeded()),
 		updateDefaultWarningFileSize: (defaultWarningFileSize: number) => dispatch(updateDefaultWarningFileSize(defaultWarningFileSize)),
 		updateDefaultFileSizeLimit: (defaultFileSizeLimit: number) => dispatch(updateDefaultFileSizeLimit(defaultFileSizeLimit)),
-		updateUnsavedChanges: () => dispatch(updateUnsavedChanges()),
+		updateUnsavedChanges: (submitFunction: () => any) => dispatch(updateUnsavedChanges(submitFunction)),
 		removeUnsavedChanges: () => dispatch(removeUnsavedChanges())
 	};
 }

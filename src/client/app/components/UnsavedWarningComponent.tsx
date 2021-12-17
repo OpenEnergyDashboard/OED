@@ -3,7 +3,7 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
 
 import * as React from 'react';
-import { FormattedHTMLMessage, FormattedMessage } from 'react-intl';
+import { FormattedMessage } from 'react-intl';
 import { Prompt, withRouter, RouteComponentProps } from 'react-router-dom';
 import Button from 'reactstrap/lib/Button';
 import Modal from 'reactstrap/lib/Modal';
@@ -13,6 +13,8 @@ import { RemoveUnsavedChangesAction } from '../types/redux/unsavedWarning';
 
 interface UnsavedWarningProps extends RouteComponentProps<any> {
     hasUnsavedChanges: boolean;
+    removeFunction: () => any;
+    submitFunction: () => any;
     removeUnsavedChanges(): RemoveUnsavedChangesAction
 }
 
@@ -26,7 +28,8 @@ class UnsavedWarningComponent extends React.Component<UnsavedWarningProps> {
     constructor(props: UnsavedWarningProps) {
         super(props);
         this.closeWarning = this.closeWarning.bind(this);
-        this.handleConfirmNavigationClick = this.handleConfirmNavigationClick.bind(this);
+        this.handleLeaveClick = this.handleLeaveClick.bind(this);
+        this.handleSaveClick = this.handleSaveClick.bind(this);
     }
 
     render() {
@@ -51,8 +54,8 @@ class UnsavedWarningComponent extends React.Component<UnsavedWarningProps> {
                     <ModalBody><FormattedMessage id='unsaved.warning' /></ModalBody>
                     <ModalFooter>
                         <Button outline onClick={this.closeWarning}><FormattedMessage id='cancel' /></Button>
-                        <Button onClick={this.handleConfirmNavigationClick}><FormattedMessage id='leave' /></Button>
-                        <Button><FormattedMessage id='save.all' /></Button>
+                        <Button onClick={this.handleLeaveClick}><FormattedMessage id='leave' /></Button>
+                        <Button onClick={this.handleSaveClick}><FormattedMessage id='save.all' /></Button>
                     </ModalFooter>
                 </Modal>
             </>
@@ -65,7 +68,7 @@ class UnsavedWarningComponent extends React.Component<UnsavedWarningProps> {
         });
     }
 
-    private handleConfirmNavigationClick() {
+    private handleLeaveClick() {
         const { nextLocation } = this.state;
         if (nextLocation) {
             this.setState({
@@ -73,6 +76,23 @@ class UnsavedWarningComponent extends React.Component<UnsavedWarningProps> {
                 warningVisible: false
             }, () => {
                 this.props.removeUnsavedChanges();
+                // Navigate to the path that the user wants
+                this.props.history.push(this.state.nextLocation);
+            });
+        }
+    }
+
+    private handleSaveClick() {
+        const { nextLocation } = this.state;
+        if (nextLocation) {
+            this.setState({
+                confirmedToLeave: true,
+                warningVisible: false
+            }, () => {
+                this.props.removeUnsavedChanges();
+                // Submit changes
+                this.props.submitFunction();
+                // Navigate to the path that the user wants
                 this.props.history.push(this.state.nextLocation);
             });
         }

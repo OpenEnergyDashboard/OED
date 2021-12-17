@@ -4,15 +4,21 @@
 
 import { UnsavedWarningAction, UnsavedWarningState } from '../types/redux/unsavedWarning';
 import { ActionType } from '../types/redux/actions';
+import { any } from 'prop-types';
 
-const defaultState: UnsavedWarningState = { hasUnsavedChanges: false };
+const defaultState: UnsavedWarningState = { 
+    hasUnsavedChanges: false,
+    removeFunction: () => any,
+    submitFunction: () => any
+};
 
 export default function unsavedWarning(state = defaultState, action: UnsavedWarningAction) {
     switch (action.type) {
         case ActionType.UpdateUnsavedChanges:
             return {
                 ...state,
-                hasUnsavedChanges: true
+                hasUnsavedChanges: true,
+                submitFunction: action.submitFunction
             }
         case ActionType.RemoveUnsavedChanges:
             return {

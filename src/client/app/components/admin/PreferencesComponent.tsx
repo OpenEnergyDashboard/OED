@@ -36,7 +36,7 @@ interface PreferencesProps {
 	updateDefaultTimeZone(timeZone: string): UpdateDefaultTimeZone;
 	updateDefaultWarningFileSize(defaultWarningFileSize: number): UpdateDefaultWarningFileSize;
 	updateDefaultFileSizeLimit(defaultFileSizeLimit: number): UpdateDefaultFileSizeLimit;
-	updateUnsavedChanges(): UpdateUnsavedChangesAction;
+	updateUnsavedChanges(submitFunction: () => any): UpdateUnsavedChangesAction;
 	removeUnsavedChanges(): RemoveUnsavedChangesAction;
 }
 
@@ -241,27 +241,27 @@ class PreferencesComponent extends React.Component<PreferencesPropsWithIntl, {}>
 
 	private handleDisplayTitleChange(e: { target: HTMLInputElement; }) {
 		this.props.updateDisplayTitle(e.target.value);
-		this.props.updateUnsavedChanges();
+		this.props.updateUnsavedChanges(this.props.submitPreferences);
 	}
 
 	private handleDefaultChartToRenderChange(e: React.FormEvent<HTMLInputElement>) {
 		this.props.updateDefaultChartType((e.target as HTMLInputElement).value as ChartTypes);
-		this.props.updateUnsavedChanges();
+		this.props.updateUnsavedChanges(this.props.submitPreferences);
 	}
 
 	private handleDefaultBarStackingChange() {
 		this.props.toggleDefaultBarStacking();
-		this.props.updateUnsavedChanges();
+		this.props.updateUnsavedChanges(this.props.submitPreferences);
 	}
 
 	private handleDefaultLanguageChange(e: React.FormEvent<HTMLInputElement>) {
 		this.props.updateDefaultLanguage((e.target as HTMLInputElement).value as LanguageTypes);
-		this.props.updateUnsavedChanges();
+		this.props.updateUnsavedChanges(this.props.submitPreferences);
 	}
 
 	private handleDefaultTimeZoneChange(value: string) {
 		this.props.updateDefaultTimeZone(value);
-		this.props.updateUnsavedChanges();
+		this.props.updateUnsavedChanges(this.props.submitPreferences);
 	}
 
 	private handleSubmitPreferences() {
@@ -271,12 +271,12 @@ class PreferencesComponent extends React.Component<PreferencesPropsWithIntl, {}>
 
 	private handleDefaultWarningFileSizeChange(e: { target: HTMLInputElement; }) {
 		this.props.updateDefaultWarningFileSize(parseFloat(e.target.value));
-		this.props.updateUnsavedChanges();
+		this.props.updateUnsavedChanges(this.props.submitPreferences);
 	}
 
 	private handleDefaultFileSizeLimitChange(e: { target: HTMLInputElement; }) {
 		this.props.updateDefaultFileSizeLimit(parseFloat(e.target.value));
-		this.props.updateUnsavedChanges();
+		this.props.updateUnsavedChanges(this.props.submitPreferences);
 	}
 }
 

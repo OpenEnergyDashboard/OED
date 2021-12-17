@@ -8,6 +8,7 @@ export type UnsavedWarningAction = UpdateUnsavedChangesAction | RemoveUnsavedCha
 
 export interface UpdateUnsavedChangesAction {
 	type: ActionType.UpdateUnsavedChanges;
+	submitFunction: () => any;
 }
 
 export interface RemoveUnsavedChangesAction {
@@ -16,4 +17,6 @@ export interface RemoveUnsavedChangesAction {
 
 export interface UnsavedWarningState {
 	hasUnsavedChanges: boolean;
+	removeFunction: () => any;
+	submitFunction: () => any;
 }

@@ -5,8 +5,11 @@
 import { ActionType } from '../types/redux/actions';
 import * as t from '../types/redux/unsavedWarning';
 
-export function updateUnsavedChanges(): t.UpdateUnsavedChangesAction {
-    return { type: ActionType.UpdateUnsavedChanges };
+export function updateUnsavedChanges(submitFunction: () => any): t.UpdateUnsavedChangesAction {
+    return { 
+        type: ActionType.UpdateUnsavedChanges, 
+        submitFunction: submitFunction
+    };
 }
 
 export function removeUnsavedChanges(): t.RemoveUnsavedChangesAction {
