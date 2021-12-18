@@ -3,7 +3,7 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
 
 import * as React from 'react';
-import { Route, Router, Switch } from 'react-router-dom';
+import { Route, Router, Switch, Redirect } from 'react-router-dom';
 import { addLocaleData, IntlProvider } from 'react-intl';
 import * as en from 'react-intl/locale-data/en';
 import * as fr from 'react-intl/locale-data/fr';
@@ -63,23 +63,22 @@ export default class RouteComponent extends React.Component<RouteProps, {}> {
 	public requireRole(requiredRole: UserRole, component: JSX.Element) {
 		// Redirect route to login page if the auth token does not exist
 		if (!hasToken()) {
-			browserHistory.push('/login');
-			return;
+			return <Redirect to='/login'/>;
 		}
 
 		// Verify that the auth token is valid.
 		// Needs to be async because of the network request
 		(async () => {
 			if (!(await verificationApi.checkTokenValid())) {
-				// Route to login page if the auth token is not valid
-				browserHistory.push('/login');
 				// We should delete the token when we know that it is expired. Ensures that we don't not leave any unwanted tokens around.
 				deleteToken();
 				// This ensures that if there is no token then there is no stale profile in the redux store.
 				this.props.clearCurrentUser();
+				// Route to login page if the auth token is not valid
+				return <Redirect to='/login'/>;
 			} else if (!hasPermissions(this.props.role, requiredRole)) {
 				// Even though the auth token is valid, we still need to check that the user is a certain role.
-				browserHistory.push('/');
+				return <Redirect to='/'/>;
 			}
 		})();
 
@@ -93,26 +92,25 @@ export default class RouteComponent extends React.Component<RouteProps, {}> {
 	public requireAuth(component: JSX.Element) {
 		// Redirect route to login page if the auth token does not exist
 		if (!hasToken()) {
-			browserHistory.push('/login');
-			return;
+			return <Redirect to='/login'/>;
 		}
 
 		// Verify that the auth token is valid.
 		// Needs to be async because of the network request
 		(async () => {
 			if (!(await verificationApi.checkTokenValid())) {
-				// Route to login page if the auth token is not valid
-				browserHistory.push('/login');
 				// We should delete the token when we know that it is expired. Ensures that we don't not leave any unwanted tokens around.
 				deleteToken();
 				// This ensures that if there is no token then there is no stale profile in the redux store.
 				this.props.clearCurrentUser();
+				// Route to login page since the auth token is not valid
+				return <Redirect to='/login'/>;
 			} else if (!this.props.loggedInAsAdmin) {
 				// Even though the auth token is valid, we still need to check that the user is an admin.
-				browserHistory.push('/');
+				return <Redirect to='/'/>;
 			}
+			return component;
 		})();
-
 		return component;
 	}
 
@@ -127,17 +125,18 @@ export default class RouteComponent extends React.Component<RouteProps, {}> {
 			// Needs to be async because of the network request
 			(async () => {
 				if (!(await verificationApi.checkTokenValid())) {
-					// Route to login page if the auth token is not valid
 					showErrorNotification(translate('invalid.token.login.or.logout'));
-					browserHistory.push('/login');
 					// We should delete the token when we know that it is expired. Ensures that we don't not leave any unwanted tokens around.
 					deleteToken();
 					// This ensures that if there is no token then there is no stale profile in the redux store.
 					this.props.clearCurrentUser();
+					// Route to login page since the auth token is not valid
+					return <Redirect to='/login'/>;
 				} else if (!this.props.loggedInAsAdmin) {
 					// Even though the auth token is valid, we still need to check that the user is an admin.
-					browserHistory.push('/');
+					return <Redirect to='/'/>;
 				}
+				return component;
 			})();
 		}
 		return component;
