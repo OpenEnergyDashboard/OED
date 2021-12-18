@@ -9,6 +9,9 @@ import CreateUserLinkButtonComponent from './users/CreateUserLinkButtonComponent
 import TooltipHelpContainerAlternative from '../../containers/TooltipHelpContainerAlternative';
 import TooltipMarkerComponent from '../TooltipMarkerComponent';
 import { FormattedMessage } from 'react-intl';
+import UnsavedWarningContainer from '../../containers/UnsavedWarningContainer';
+import { updateUnsavedChanges, removeUnsavedChanges } from '../../actions/unsavedWarning';
+import store from '../../index'
 
 interface UserDisplayComponentProps {
 	users: User[];
@@ -40,6 +43,7 @@ export default function UserDetailComponent(props: UserDisplayComponentProps) {
 
 	return (
 		<div>
+			<UnsavedWarningContainer />
 			<TooltipHelpContainerAlternative page='users' />
 			<div className='container-fluid'>
 				<h2 style={titleStyle}>
@@ -62,7 +66,13 @@ export default function UserDetailComponent(props: UserDisplayComponentProps) {
 								<tr key={user.email}>
 									<td>{user.email}</td>
 									<td>
-										<Input type='select' value={user.role} onChange={({ target }) => props.editUser(user.email, target.value as UserRole)}>
+										<Input 
+											type='select' 
+											value={user.role} 
+											onChange={({ target }) => {
+												props.editUser(user.email, target.value as UserRole);
+												store.dispatch(updateUnsavedChanges(() => {}, props.submitUserEdits));
+										}}>
 											{Object.entries(UserRole).map(([role, val]) => (
 												<option value={val} key={role}> {role} </option>
 											))}
@@ -79,7 +89,14 @@ export default function UserDetailComponent(props: UserDisplayComponentProps) {
 					</Table>
 					<div style={buttonsStyle}>
 						<CreateUserLinkButtonComponent />
-						<Button color='success' disabled={!props.edited} onClick={props.submitUserEdits}>
+						<Button 
+							color='success' 
+							disabled={!props.edited} 
+							onClick={() => {
+								props.submitUserEdits();
+								store.dispatch(removeUnsavedChanges());
+							}	
+						}>
 							<FormattedMessage id='save.role.changes'/>
 						</Button>
 					</div>
