@@ -80,6 +80,7 @@ export default class RouteComponent extends React.Component<RouteProps, {}> {
 				// Even though the auth token is valid, we still need to check that the user is a certain role.
 				return <Redirect to='/'/>;
 			}
+			return component;
 		})();
 
 		return component;

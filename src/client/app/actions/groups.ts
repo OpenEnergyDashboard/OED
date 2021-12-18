@@ -289,7 +289,10 @@ function submitGroupEdits(group: t.GroupData & t.GroupID): Thunk {
 			dispatch(markOneGroupOutdated(group.id));
 			dispatch(dispatch2 => {
 				dispatch2(markGroupInEditingClean());
-				browserHistory.push('/groups');
+				if (browserHistory.location.pathname == '/editGroup') {
+					// Only redirect to /groups if the user at /editGroup
+					browserHistory.push('/groups');
+				}
 			});
 		} catch (e) {
 			dispatch(markGroupInEditingNotSubmitted());
