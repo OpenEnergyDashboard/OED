@@ -59,7 +59,7 @@ class EditGroupsComponent extends React.Component<EditGroupsPropsWithIntl, EditG
 		this.state = {
 			name: this.props.currentGroup.name,
 			gpsInput: (this.props.currentGroup.gps) ?
-			`${this.props.currentGroup.gps.longitude}, ${this.props.currentGroup.gps.latitude}` : '',
+			`${this.props.currentGroup.gps.latitude}, ${this.props.currentGroup.gps.longitude}` : '',
 			groupArea: (this.props.currentGroup.area) ? `${this.props.currentGroup.area}` : '',
 			groupNote: (this.props.currentGroup.note) ? `${this.props.currentGroup.note}` : '',
 			groupDisplay: (this.props.currentGroup.displayable) ? this.props.currentGroup.displayable : false,
@@ -353,8 +353,8 @@ class EditGroupsComponent extends React.Component<EditGroupsPropsWithIntl, EditG
 					const parseGPS = gpsProxy.split(',');
 					// should only have 1 comma
 					const gPoint: GPSPoint = {
-						longitude: parseFloat(parseGPS[0]),
-						latitude: parseFloat(parseGPS[1])
+						longitude: parseFloat(parseGPS[1]),
+						latitude: parseFloat(parseGPS[0])
 					};
 					this.props.editGroupGPS(gPoint);
 				}

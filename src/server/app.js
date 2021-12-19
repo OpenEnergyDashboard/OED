@@ -4,6 +4,7 @@
 
 const fs = require('fs');
 const express = require('express');
+const rateLimit = require('express-rate-limit');
 const path = require('path');
 const favicon = require('serve-favicon');
 const logger = require('morgan');
@@ -30,7 +31,23 @@ const logs = require('./routes/logs');
 const obvius = require('./routes/obvius');
 const csv = require('./routes/csv');
 
-const app = express();
+// Limit the rate of overall requests to OED
+// Note that the rate limit may make the automatic test return the value of 429. In that case, the limiters below need to be increased.
+// Create a limit of 200 requests/5 seconds
+const generalLimiter = new rateLimit({
+	windowMs: 5 * 1000, // 5 seconds
+	max: 200 // 200 requests
+});
+// Apply the limit to overall requests
+const app = express().use(generalLimiter);
+
+// Limit the number of raw exports to 5 per 5 seconds
+const exportRawLimiter = new rateLimit({
+	windowMs: 5 * 1000, // 5 seconds
+	max: 5 // 5 requests
+});
+// Apply the raw export limit
+app.use('/api/readings/line/raw/meters', exportRawLimiter);
 
 // If other logging is turned off, there's no reason to log HTTP requests either.
 // TODO: Potentially modify the Morgan logger to use the log API, thus unifying all our logging.
@@ -39,8 +56,8 @@ if (log.level !== LogLevel.SILENT) {
 }
 
 app.use(favicon(path.join(__dirname, '..', 'client', 'public', 'favicon.ico')));
-app.use(bodyParser.json({limit: '50mb'}));
-app.use(bodyParser.urlencoded({ extended: false, limit:'50mb'}));
+app.use(bodyParser.json({ limit: '50mb' }));
+app.use(bodyParser.urlencoded({ extended: false, limit: '50mb' }));
 app.use(cookieParser());
 
 app.use('/api/users', users);

@@ -17,6 +17,8 @@ export type AdminAction =
 	| ReceivePreferencesAction
 	| MarkPreferencesNotSubmittedAction
 	| UpdateDefaultTimeZone
+	| UpdateDefaultWarningFileSize
+	| UpdateDefaultFileSizeLimit
 	| MarkPreferencesSubmittedAction;
 
 export interface UpdateImportMeterAction {
@@ -65,6 +67,16 @@ export interface MarkPreferencesSubmittedAction {
 	type: ActionType.MarkPreferencesSubmitted;
 }
 
+export interface UpdateDefaultWarningFileSize {
+	type: ActionType.UpdateDefaultWarningFileSize;
+	defaultWarningFileSize: number;
+}
+
+export interface UpdateDefaultFileSizeLimit {
+	type: ActionType.UpdateDefaultFileSizeLimit;
+	defaultFileSizeLimit: number;
+}
+
 export interface AdminState {
 	selectedMeter: number | null;
 	displayTitle: string;
@@ -74,4 +86,6 @@ export interface AdminState {
 	defaultLanguage: LanguageTypes;
 	isFetching: boolean;
 	submitted: boolean;
+	defaultWarningFileSize: number;
+	defaultFileSizeLimit: number;
 }

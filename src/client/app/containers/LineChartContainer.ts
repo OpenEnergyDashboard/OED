@@ -8,7 +8,7 @@ import { connect } from 'react-redux';
 import getGraphColor from '../utils/getGraphColor';
 import { State } from '../types/redux/state';
 import PlotlyChart, { IPlotlyChartProps } from 'react-plotlyjs-ts';
-import {TimeInterval} from '../../../common/TimeInterval';
+import { TimeInterval } from '../../../common/TimeInterval';
 import Locales from '../types/locales';
 import { DataType } from '../types/Datasources';
 
@@ -34,9 +34,9 @@ function mapStateToProps(state: State) {
 				const hoverText: string[] = [];
 				const readings = _.values(readingsData.readings);
 				readings.forEach(reading => {
-					const st = moment(reading.startTimestamp)
+					const st = moment(reading.startTimestamp);
 					// Time reading is in the middle of the start and end timestamp
-					const timeReading = st.add(moment(reading.endTimestamp).diff(st)/2);
+					const timeReading = st.add(moment(reading.endTimestamp).diff(st) / 2);
 					xData.push(timeReading.utc().format('YYYY-MM-DD HH:mm:ss'));
 					yData.push(reading.reading);
 					hoverText.push(`<b> ${timeReading.format('dddd, LL LTS')} </b> <br> ${label}: ${reading.reading.toPrecision(6)} kW`);
@@ -74,8 +74,8 @@ function mapStateToProps(state: State) {
 		}
 	}
 
-// TODO The meters and groups code is very similar and maybe it should be refactored out to create a function to do
-// both. This would mean future changes would automatically happen to both.
+	// TODO The meters and groups code is very similar and maybe it should be refactored out to create a function to do
+	// both. This would mean future changes would automatically happen to both.
 	// Add all valid data from existing groups to the line plot
 	for (const groupID of state.graph.selectedGroups) {
 		const byGroupID = state.readings.line.byGroupID[groupID];
@@ -94,10 +94,12 @@ function mapStateToProps(state: State) {
 				const hoverText: string[] = [];
 				const readings = _.values(readingsData.readings);
 				readings.forEach(reading => {
-					const timeReading = moment(reading.startTimestamp);
+					const st = moment(reading.startTimestamp);
+					// Time reading is in the middle of the start and end timestamp
+					const timeReading = st.add(moment(reading.endTimestamp).diff(st) / 2);
 					xData.push(timeReading.utc().format('YYYY-MM-DD HH:mm:ss'));
 					yData.push(reading.reading);
-					hoverText.push(`<b> ${timeReading.format('dddd, LL LTS')} </b> <br> ${label}: ${reading.reading.toPrecision(6)} kW`);
+					hoverText.push(`<b> ${timeReading.format('dddd, LL LTS'	)} </b> <br> ${label}: ${reading.reading.toPrecision(6)} kW`);
 				});
 
 				// This variable contains all the elements (x and y values, line type, etc.) assigned to the data parameter of the Plotly object
@@ -120,7 +122,7 @@ function mapStateToProps(state: State) {
 	}
 
 	// Calculate slider interval if rangeSliderInterval is specified;
-	const sliderInterval = (state.graph.rangeSliderInterval.equals(TimeInterval.unbounded())) ? timeInterval : state.graph.rangeSliderInterval;
+	const sliderInterval = state.graph.rangeSliderInterval.equals(TimeInterval.unbounded()) ? timeInterval : state.graph.rangeSliderInterval;
 	const start = Date.parse(moment(sliderInterval.getStartTimestamp()).toISOString());
 	const end = Date.parse(moment(sliderInterval.getEndTimestamp()).toISOString());
 
