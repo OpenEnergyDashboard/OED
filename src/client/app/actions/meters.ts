@@ -69,6 +69,15 @@ export function submitEditedMeter(meterId: number): Thunk {
 	};
 }
 
+export function confirmEditedMeters(): Thunk {
+	return async (dispatch: Dispatch, getState: GetState) => {
+		Object.keys(getState().meters.editedMeters).forEach(meterIdS => {
+			const meterId = parseInt(meterIdS);
+			dispatch(confirmMeterEdits(meterId));
+		});
+	}
+}
+
 /**
  * @param {State} state
  */

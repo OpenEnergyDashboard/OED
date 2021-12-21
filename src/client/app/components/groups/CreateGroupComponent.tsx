@@ -16,6 +16,9 @@ import { browserHistory } from '../../utils/history';
 import { FormattedMessage, InjectedIntlProps, injectIntl, defineMessages } from 'react-intl';
 import TooltipHelpContainerAlternative from '../../containers/TooltipHelpContainerAlternative';
 import { GPSPoint, isValidGPSInput } from '../../utils/calibration';
+import store from '../../index';
+import { removeUnsavedChanges, updateUnsavedChanges } from '../../actions/unsavedWarning';
+import UnsavedWarningContainer from '../../containers/UnsavedWarningContainer';
 
 interface CreateGroupProps {
 	meters: NamedIDItem[];
@@ -80,6 +83,7 @@ class CreateGroupComponent extends React.Component<CreateGroupPropsWithIntl, Cre
 		const messages = defineMessages({ name: { id: 'name' }});
 		return (
 			<div>
+				<UnsavedWarningContainer />
 				<HeaderContainer />
 				<TooltipHelpContainerAlternative page='meters' />
 				<div className='container-fluid'>
@@ -157,6 +161,16 @@ class CreateGroupComponent extends React.Component<CreateGroupPropsWithIntl, Cre
 		);
 	}
 
+	private updateUnsavedChanges() {
+		// Notify that there are unsaved changes
+		store.dispatch(updateUnsavedChanges(this.props.changeDisplayModeToView, this.handleCreateGroup));
+	}
+
+	private removeUnsavedChanges() {
+		// Notify that there are no unsaved changes
+		store.dispatch(removeUnsavedChanges());
+	}
+
 	private handleNameChange(e: React.ChangeEvent<HTMLInputElement>) {
 		const value = e.target.value;
 		if (value) {
@@ -164,22 +178,27 @@ class CreateGroupComponent extends React.Component<CreateGroupPropsWithIntl, Cre
 		} else {
 			this.props.editGroupName('');
 		}
+		this.updateUnsavedChanges();
 	}
 
 	private handleGPSChange(e: React.ChangeEvent<HTMLInputElement>) {
 		this.setState({ gpsInput: e.target.value });
+		this.updateUnsavedChanges();
 	}
 
 	private handleDisplayChange(e: React.ChangeEvent<HTMLInputElement>) {
 		this.props.editGroupDisplayable(e.target.value === 'true');
+		this.updateUnsavedChanges();
 	}
 
 	private handleNoteChange(e: React.ChangeEvent<HTMLTextAreaElement>) {
 		this.props.editGroupNote(e.target.value);
+		this.updateUnsavedChanges();
 	}
 
 	private handleAreaChange(e: React.ChangeEvent<HTMLInputElement>) {
 		this.setState({ groupArea: e.target.value });
+		this.updateUnsavedChanges();
 		// still need to set state to parse check before submitting
 	}
 
@@ -209,10 +228,10 @@ class CreateGroupComponent extends React.Component<CreateGroupPropsWithIntl, Cre
 		else {
 			window.alert(this.props.intl.formatMessage({id: 'area.error'}));
 		}
+		this.removeUnsavedChanges();
 	}
 
 	private handleReturnToView() {
-		this.props.changeDisplayModeToView();
 		browserHistory.push('/groups');
 	}
 }

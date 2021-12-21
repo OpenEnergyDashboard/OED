@@ -8,6 +8,9 @@ import { FormattedMessage, InjectedIntlProps, injectIntl } from 'react-intl';
 import { MeterMetadata, EditMeterDetailsAction } from '../../types/redux/meters';
 import { GPSPoint, isValidGPSInput } from '../../utils/calibration';
 import TimeZoneSelect from '../TimeZoneSelect';
+import { updateUnsavedChanges } from '../../actions/unsavedWarning';
+import { fetchMetersDetails, submitEditedMeters, confirmEditedMeters } from '../../actions/meters';
+import store from '../../index';
 
 interface MeterViewProps {
 	// The ID of the meter to be displayed
@@ -64,6 +67,25 @@ class MeterViewComponent extends React.Component<MeterViewPropsWithIntl, MeterVi
 				{loggedInAsAdmin && <td> <TimeZoneSelect current={this.props.meter.timeZone || ''} handleClick={this.changeTimeZone} /> </td>}
 			</tr>
 		);
+	}
+
+	private removeUnsavedChangesFunction() {
+		store.dispatch(confirmEditedMeters());
+		store.dispatch(fetchMetersDetails());
+	}
+
+	private submitEditedMeters() {
+		store.dispatch(submitEditedMeters());
+	}
+
+	private updateUnsavedChanges() {	
+		store.dispatch(updateUnsavedChanges(this.removeUnsavedChangesFunction, this.submitEditedMeters));
+	}
+
+	componentDidUpdate(prevProps: MeterViewProps) {
+		if (this.props.isEdited && !prevProps.isEdited) {
+			this.updateUnsavedChanges();
+		}
 	}
 
 	private formatStatus(): string {

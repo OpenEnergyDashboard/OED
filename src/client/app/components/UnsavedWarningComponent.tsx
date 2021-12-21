@@ -15,14 +15,15 @@ interface UnsavedWarningProps extends RouteComponentProps<any> {
     hasUnsavedChanges: boolean;
     removeFunction: () => any;
     submitFunction: () => any;
-    removeUnsavedChanges(): RemoveUnsavedChangesAction
+    removeUnsavedChanges(): RemoveUnsavedChangesAction;
 }
 
 class UnsavedWarningComponent extends React.Component<UnsavedWarningProps> {
     state = {
         warningVisible: false,
         confirmedToLeave: false,
-        nextLocation: ""
+        nextLocation: "",
+        submitClicked: false
     }
 
     constructor(props: UnsavedWarningProps) {
@@ -31,9 +32,16 @@ class UnsavedWarningComponent extends React.Component<UnsavedWarningProps> {
     }
 
     componentDidUpdate() {
+        const { submitClicked } = this.state;
+        if (submitClicked) {
+            // Remove local changes and redirect to the desired path
+            // We need to remove local changes since the new data may be invalid
+            this.handleNavigateChange(this.props.removeFunction);
+        }
+
         const { hasUnsavedChanges } = this.props;
         if (hasUnsavedChanges) {
-            // Block reloading page or closing oed tab
+            // Block reloading page or closing OED tab
             window.onbeforeunload = () => true;
         } else {
             window.onbeforeunload = () => undefined;
@@ -70,7 +78,7 @@ class UnsavedWarningComponent extends React.Component<UnsavedWarningProps> {
                         </Button>
                         <Button 
                             color='success' 
-                            onClick={() => this.handleNavigateChange(this.props.submitFunction)}
+                            onClick={() => this.handleSubmitClick()}
                         >
                             <FormattedMessage id='save.all' />
                         </Button>
@@ -86,24 +94,29 @@ class UnsavedWarningComponent extends React.Component<UnsavedWarningProps> {
         });
     }
 
-    /**
-    * Handle when the user clicks leave or save all.
-    */
     private handleNavigateChange(func: () => any) {
         const { nextLocation } = this.state;
         if (nextLocation) {
             this.setState({
                 confirmedToLeave: true,
-                warningVisible: false
+                warningVisible: false,
+                submitClicked: false
             }, () => {
+                func();
                 this.props.removeUnsavedChanges();
                 // Unblock reloading page and closing tab
                 window.onbeforeunload = () => undefined;
-                func();
                 // Navigate to the path that the user wants
                 this.props.history.push(this.state.nextLocation);
             });
         }
+    }
+
+    private handleSubmitClick() {
+        this.props.submitFunction();
+        this.setState({
+            submitClicked: true
+        });
     }
 }
 

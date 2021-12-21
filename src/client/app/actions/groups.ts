@@ -289,11 +289,11 @@ function submitGroupEdits(group: t.GroupData & t.GroupID): Thunk {
 			dispatch(markOneGroupOutdated(group.id));
 			dispatch(dispatch2 => {
 				dispatch2(markGroupInEditingClean());
-				if (browserHistory.location.pathname == '/editGroup') {
-					// Only redirect to /groups if the user at /editGroup
-					browserHistory.push('/groups');
-				}
 			});
+			if (browserHistory.location.pathname == '/editGroup') {
+				// Redirect to /groups only when user clicks the submit button
+				browserHistory.push('/groups');
+			}
 		} catch (e) {
 			dispatch(markGroupInEditingNotSubmitted());
 			if (e.response.data.message && e.response.data.message === 'Cyclic group detected') {

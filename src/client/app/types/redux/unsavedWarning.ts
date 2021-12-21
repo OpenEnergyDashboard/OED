@@ -11,8 +11,8 @@ export type UnsavedWarningAction = UpdateUnsavedChangesAction | RemoveUnsavedCha
 */
 export interface UpdateUnsavedChangesAction {
 	type: ActionType.UpdateUnsavedChanges;
-	removeFunction: () => any;
-	submitFunction: () => any;
+	removeFunction: any;
+	submitFunction: any;
 }
 
 /*

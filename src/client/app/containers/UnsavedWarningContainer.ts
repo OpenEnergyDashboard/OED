@@ -12,7 +12,7 @@ function mapStateToProps(state: State) {
     return {
         hasUnsavedChanges: state.unsavedWarning.hasUnsavedChanges,
         removeFunction: state.unsavedWarning.removeFunction,
-        submitFunction: state.unsavedWarning.submitFunction
+        submitFunction: state.unsavedWarning.submitFunction,
     }
 }
 
