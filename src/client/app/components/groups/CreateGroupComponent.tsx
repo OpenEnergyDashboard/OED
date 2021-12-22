@@ -54,6 +54,7 @@ class CreateGroupComponent extends React.Component<CreateGroupPropsWithIntl, Cre
 		this.handleAreaChange = this.handleAreaChange.bind(this);
 		this.handleCreateGroup = this.handleCreateGroup.bind(this);
 		this.handleReturnToView = this.handleReturnToView.bind(this);
+		this.removeUnsavedChangesFunction = this.removeUnsavedChangesFunction.bind(this);
 	}
 
 	public componentWillMount() {
@@ -149,7 +150,7 @@ class CreateGroupComponent extends React.Component<CreateGroupPropsWithIntl, Cre
 								</Button>
 							</div>
 							<div className='col-6 d-flex justify-content-end'>
-								<Button outline type='submit' onClick={this.handleCreateGroup}>
+								<Button outline type='submit' onClick={() => this.handleCreateGroup(null, null)}>
 									<FormattedMessage id='create.group' />
 								</Button>
 							</div>
@@ -161,9 +162,14 @@ class CreateGroupComponent extends React.Component<CreateGroupPropsWithIntl, Cre
 		);
 	}
 
+	private removeUnsavedChangesFunction(callback: () => void) {
+		this.props.changeDisplayModeToView();
+		callback();
+	}
+
 	private updateUnsavedChanges() {
 		// Notify that there are unsaved changes
-		store.dispatch(updateUnsavedChanges(this.props.changeDisplayModeToView, this.handleCreateGroup));
+		store.dispatch(updateUnsavedChanges(this.removeUnsavedChangesFunction, this.handleCreateGroup));
 	}
 
 	private removeUnsavedChanges() {
@@ -202,7 +208,8 @@ class CreateGroupComponent extends React.Component<CreateGroupPropsWithIntl, Cre
 		// still need to set state to parse check before submitting
 	}
 
-	private handleCreateGroup() {
+	private handleCreateGroup(successCallback: any, failureCallback: any) {
+		// The callback is used for displaying unsaved warning.
 		const gpsProxy = this.state.gpsInput.replace('(','').replace(')','').replace(' ', '');
 		const pattern2 = /^\d+(\.\d+)?$/;
 		// need to check gps and area
@@ -222,17 +229,26 @@ class CreateGroupComponent extends React.Component<CreateGroupPropsWithIntl, Cre
 					};
 					this.props.editGroupGPS(gPoint);
 				}
-				this.props.submitGroupInEditingIfNeeded();
+				// Notify that there are no unsaved changes after clicking the create button
+				this.removeUnsavedChanges();
+				if (successCallback != null) {
+					this.props.submitGroupInEditingIfNeeded().then(successCallback, failureCallback);
+				} else {
+					this.props.submitGroupInEditingIfNeeded().then(() => {
+						// Redirect users to /groups when they click the create group button.
+						browserHistory.push('/groups');
+					});
+				}
 			}
 		}
 		else {
 			window.alert(this.props.intl.formatMessage({id: 'area.error'}));
 		}
-		this.removeUnsavedChanges();
 	}
 
 	private handleReturnToView() {
 		browserHistory.push('/groups');
+		this.props.changeDisplayModeToView();
 	}
 }
 

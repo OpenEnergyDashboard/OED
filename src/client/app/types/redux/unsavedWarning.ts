@@ -25,7 +25,7 @@ export interface RemoveUnsavedChangesAction {
 export interface UnsavedWarningState {
 	hasUnsavedChanges: boolean;
 	// The function to remove unsaved changes
-	removeFunction: () => any;
+	removeFunction: (callback: () => void) => any;
 	// The function to submit unsaved changes
-	submitFunction: () => any;
+	submitFunction: (successCallback: () => void, failureCallback: () => void) => any;
 }

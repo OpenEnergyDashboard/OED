@@ -110,7 +110,7 @@ export default class MetersDetailComponent extends React.Component<MetersDetailP
 
 	private handleSubmitClicked() {
 		this.props.submitEditedMeters();
-		// Turn off the unsaved warning
+		// Notify that the unsaved changes have been submitted
 		this.removeUnsavedChanges();
 	}
 }

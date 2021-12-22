@@ -19,6 +19,7 @@ import { GPSPoint, isValidGPSInput } from '../../utils/calibration';
 import store from '../../index';
 import { removeUnsavedChanges, updateUnsavedChanges } from '../../actions/unsavedWarning';
 import UnsavedWarningContainer from '../../containers/UnsavedWarningContainer';
+import { fetchGroupsDetails } from '../../actions/groups';
 
 interface EditGroupsProps {
 	currentGroup: GroupDefinition;
@@ -99,6 +100,7 @@ class EditGroupsComponent extends React.Component<EditGroupsPropsWithIntl, EditG
 		this.handleEditGroup = this.handleEditGroup.bind(this);
 		this.handleDeleteGroup = this.handleDeleteGroup.bind(this);
 		this.handleReturnToView = this.handleReturnToView.bind(this);
+		this.removeUnsavedChangesFunction = this.removeUnsavedChangesFunction.bind(this);
 	}
 
 	public render() {
@@ -262,7 +264,7 @@ class EditGroupsComponent extends React.Component<EditGroupsPropsWithIntl, EditG
 								<Button outline onClick={this.handleReturnToView}>
 									<FormattedMessage id='cancel' />
 								</Button>
-								<Button outline onClick={this.handleEditGroup}>
+								<Button outline onClick={() => this.handleEditGroup(null, null)}>
 									<FormattedMessage id='submit.changes' />
 								</Button>
 							</div>
@@ -279,9 +281,16 @@ class EditGroupsComponent extends React.Component<EditGroupsPropsWithIntl, EditG
 		);
 	}
 
+	private removeUnsavedChangesFunction(callback: () => void) {
+		// This function is called to reset all the inputs to the initial state
+		this.props.changeDisplayModeToView();
+		// Fetch data from database to replace the current one
+		store.dispatch(fetchGroupsDetails()).then(callback);
+	}
+
 	private updateUnsavedChanges() {
 		// Notify that there are unsaved changes
-		store.dispatch(updateUnsavedChanges(this.props.changeDisplayModeToView, this.handleEditGroup));
+		store.dispatch(updateUnsavedChanges(this.removeUnsavedChangesFunction, this.handleEditGroup));
 	}
 
 	private removeUnsavedChanges() {
@@ -361,7 +370,8 @@ class EditGroupsComponent extends React.Component<EditGroupsPropsWithIntl, EditG
 		this.updateUnsavedChanges();
 	}
 
-	private handleEditGroup() {
+	private handleEditGroup(successCallback: any, failureCallback: any) {
+		// The callbacks are used for displaying unsaved warning
 		const gpsProxy = this.state.gpsInput.replace('(','').replace(')','').replace(' ', '');
 		const pattern2 = /^\d+(\.\d+)?$/;
 		// need to check gps and area
@@ -381,13 +391,22 @@ class EditGroupsComponent extends React.Component<EditGroupsPropsWithIntl, EditG
 					};
 					this.props.editGroupGPS(gPoint);
 				}
-				this.props.submitGroupInEditingIfNeeded();
+				// Notify that there are no unsaved changes after clicking the submit button
+				this.removeUnsavedChanges();
+				if (successCallback != null) {
+					// This function is call in displaying unsaved warning process
+					this.props.submitGroupInEditingIfNeeded().then(successCallback, failureCallback);
+				} else {
+					this.props.submitGroupInEditingIfNeeded().then(() => {
+						// Redirect users to /groups when they click the submit button.
+						browserHistory.push('/groups');
+					});
+				}
 			}
 		}
 		else {
 			window.alert(this.props.intl.formatMessage({id: 'area.error'}));
 		}
-		this.removeUnsavedChanges();
 	}
 
 	private handleDeleteGroup() {
@@ -397,6 +416,7 @@ class EditGroupsComponent extends React.Component<EditGroupsPropsWithIntl, EditG
 
 	private handleReturnToView() {
 		browserHistory.push('/groups');
+		this.props.changeDisplayModeToView();
 	}
 }
 

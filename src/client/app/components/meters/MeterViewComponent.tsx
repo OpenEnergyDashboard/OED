@@ -69,21 +69,29 @@ class MeterViewComponent extends React.Component<MeterViewPropsWithIntl, MeterVi
 		);
 	}
 
-	private removeUnsavedChangesFunction() {
-		store.dispatch(confirmEditedMeters());
-		store.dispatch(fetchMetersDetails());
+	private removeUnsavedChangesFunction(callback: () => void) {
+		// This function is called to reset all the inputs to the initial state
+		// store.dispatch(fetchMetersDetails()).then(() => {
+		// 	store.dispatch(confirmEditedMeters()).then(callback);
+		// });
+		store.dispatch(confirmEditedMeters()).then(() => {
+			store.dispatch(fetchMetersDetails()).then(callback);
+		});
 	}
 
-	private submitEditedMeters() {
-		store.dispatch(submitEditedMeters());
+	private submitUnsavedChangesFunction(successCallback: () => void, failureCallback: () => void) {
+		// This function is called to submit the unsaved changes
+		store.dispatch(submitEditedMeters()).then(successCallback, failureCallback);
 	}
 
 	private updateUnsavedChanges() {	
-		store.dispatch(updateUnsavedChanges(this.removeUnsavedChangesFunction, this.submitEditedMeters));
+		// Notifiy that there are unsaved changes
+		store.dispatch(updateUnsavedChanges(this.removeUnsavedChangesFunction, this.submitUnsavedChangesFunction));
 	}
 
 	componentDidUpdate(prevProps: MeterViewProps) {
 		if (this.props.isEdited && !prevProps.isEdited) {
+			// When the props.isEdited changes from false to true, there are unsaved changes
 			this.updateUnsavedChanges();
 		}
 	}

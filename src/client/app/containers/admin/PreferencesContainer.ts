@@ -12,8 +12,7 @@ import {
 	updateDefaultLanguage,
 	submitPreferencesIfNeeded,
 	updateDefaultWarningFileSize,
-	updateDefaultFileSizeLimit,
-	fetchPreferencesIfNeeded
+	updateDefaultFileSizeLimit
 } from '../../actions/admin';
 import { State } from '../../types/redux/state';
 import { Dispatch } from '../../types/redux/actions';
@@ -43,7 +42,6 @@ function mapDispatchToProps(dispatch: Dispatch) {
 		submitPreferences: () => dispatch(submitPreferencesIfNeeded()),
 		updateDefaultWarningFileSize: (defaultWarningFileSize: number) => dispatch(updateDefaultWarningFileSize(defaultWarningFileSize)),
 		updateDefaultFileSizeLimit: (defaultFileSizeLimit: number) => dispatch(updateDefaultFileSizeLimit(defaultFileSizeLimit)),
-		fetchPreferences: () => dispatch(fetchPreferencesIfNeeded())
 	};
 }
 

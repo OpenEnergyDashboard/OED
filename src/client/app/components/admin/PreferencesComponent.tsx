@@ -19,6 +19,7 @@ import { defineMessages, FormattedMessage, injectIntl, InjectedIntlProps } from 
 import { LanguageTypes } from '../../types/redux/i18n';
 import TimeZoneSelect from '../TimeZoneSelect';
 import store from '../../index';
+import { fetchPreferencesIfNeeded, submitPreferences } from '../../actions/admin';
 
 interface PreferencesProps {
 	displayTitle: string;
@@ -37,7 +38,6 @@ interface PreferencesProps {
 	updateDefaultTimeZone(timeZone: string): UpdateDefaultTimeZone;
 	updateDefaultWarningFileSize(defaultWarningFileSize: number): UpdateDefaultWarningFileSize;
 	updateDefaultFileSizeLimit(defaultFileSizeLimit: number): UpdateDefaultFileSizeLimit;
-	fetchPreferences(): Promise<void>;
 }
 
 type PreferencesPropsWithIntl = PreferencesProps & InjectedIntlProps;
@@ -239,9 +239,19 @@ class PreferencesComponent extends React.Component<PreferencesPropsWithIntl, {}>
 		);
 	}
 
+	private removeUnsavedChangesFunction(callback: () => void) {
+		// This function is called to reset all the inputs to the initial state
+		store.dispatch(fetchPreferencesIfNeeded()).then(callback);
+	}
+
+	private submitUnsavedChangesFunction(successCallback: () => void, failureCallback: () => void) {
+		// This function is called to submit the unsaved changes
+		store.dispatch(submitPreferences()).then(successCallback, failureCallback);
+	}
+
 	private updateUnsavedChanges() {
 		// Notify that there are unsaved changes
-		store.dispatch(updateUnsavedChanges(this.props.fetchPreferences, this.props.submitPreferences));
+		store.dispatch(updateUnsavedChanges(this.removeUnsavedChangesFunction, this.submitUnsavedChangesFunction));
 	}
 
 	private removeUnsavedChanges() {

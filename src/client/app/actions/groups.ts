@@ -32,7 +32,7 @@ export function changeDisplayedGroups(groupIDs: number[]): t.ChangeDisplayedGrou
 	return { type: ActionType.ChangeDisplayedGroups, groupIDs };
 }
 
-function fetchGroupsDetails(): Thunk {
+export function fetchGroupsDetails(): Thunk {
 	return async dispatch => {
 		dispatch(requestGroupsDetails());
 		// Returns the names and IDs of all groups in the groups table.
@@ -267,7 +267,6 @@ function submitNewGroup(group: t.GroupData): Thunk {
 			dispatch(markGroupsOutdated());
 			dispatch(dispatch2 => {
 				dispatch2(markGroupInEditingClean());
-				browserHistory.push('/groups');
 			});
 		} catch (e) {
 			dispatch(markGroupInEditingNotSubmitted());
@@ -290,10 +289,6 @@ function submitGroupEdits(group: t.GroupData & t.GroupID): Thunk {
 			dispatch(dispatch2 => {
 				dispatch2(markGroupInEditingClean());
 			});
-			if (browserHistory.location.pathname == '/editGroup') {
-				// Redirect to /groups only when user clicks the submit button
-				browserHistory.push('/groups');
-			}
 		} catch (e) {
 			dispatch(markGroupInEditingNotSubmitted());
 			if (e.response.data.message && e.response.data.message === 'Cyclic group detected') {
