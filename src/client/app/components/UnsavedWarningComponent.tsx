@@ -55,6 +55,13 @@ class UnsavedWarningComponent extends React.Component<UnsavedWarningProps> {
                                 warningVisible: true,
                                 nextLocation: nextLocation.pathname
                             });
+
+                            const currentLocation = this.props.history.location.pathname;
+                            if ((currentLocation == '/maps' && nextLocation.pathname == '/calibration') ||
+                                (currentLocation == '/calibration' && nextLocation.pathname == '/maps')) {
+                                // Don't warn users if they go between /maps and /calibration
+                                return true;
+                            }
                             return false;
                         }
                         return true;

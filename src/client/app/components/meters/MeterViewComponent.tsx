@@ -71,9 +71,6 @@ class MeterViewComponent extends React.Component<MeterViewPropsWithIntl, MeterVi
 
 	private removeUnsavedChangesFunction(callback: () => void) {
 		// This function is called to reset all the inputs to the initial state
-		// store.dispatch(fetchMetersDetails()).then(() => {
-		// 	store.dispatch(confirmEditedMeters()).then(callback);
-		// });
 		store.dispatch(confirmEditedMeters()).then(() => {
 			store.dispatch(fetchMetersDetails()).then(callback);
 		});

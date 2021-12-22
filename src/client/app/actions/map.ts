@@ -279,7 +279,6 @@ export function submitEditedMap(mapID: number): Thunk {
 				showSuccessNotification(translate('updated.map.without.calibration'));
 			}
 			dispatch(confirmMapEdits(mapID));
-			browserHistory.push('/maps');
 		} catch (err) {
 			showErrorNotification(translate('failed.to.edit.map'));
 			dispatch(logToServer('error', `failed to edit map, ${err}`));
@@ -309,4 +308,16 @@ export function removeMap(mapID: number): Thunk {
 
 function deleteMap(mapID: number): t.DeleteMapAction {
 	return { type: ActionType.DeleteMap, mapID };
+}
+
+/**
+* Remove all the maps from editing without submitting them
+*/
+export function confirmEditedMaps() {
+	return async (dispatch: Dispatch, getState: GetState) => {
+		Object.keys(getState().maps.editedMaps).forEach(mapID2Submit => {
+			const mapID = parseInt(mapID2Submit);
+			dispatch(confirmMapEdits(mapID));
+		});
+	};
 }

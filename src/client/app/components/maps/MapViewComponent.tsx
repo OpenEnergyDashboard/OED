@@ -9,6 +9,9 @@ import { hasToken } from '../../utils/token';
 import { FormattedMessage, InjectedIntlProps, injectIntl } from 'react-intl';
 import { CalibrationModeTypes, MapMetadata } from '../../types/redux/map';
 import * as moment from 'moment';
+import store from '../../index';
+import { updateUnsavedChanges } from '../../actions/unsavedWarning';
+import { fetchMapsDetails, submitEditedMaps, confirmEditedMaps } from '../../actions/map';
 
 interface MapViewProps {
 	// The ID of the map to be displayed
@@ -72,6 +75,37 @@ class MapViewComponent extends React.Component<MapViewPropsWithIntl, MapViewStat
 				{hasToken() && <td> {this.formatDeleteButton()} </td>}
 			</tr>
 		);
+	}
+
+	componentDidMount() {
+		if (this.props.isEdited) {
+			// When the props.isEdited is true after loading the page, there are unsaved changes
+			this.updateUnsavedChanges();
+		}
+	}
+
+	componentDidUpdate(prevProps: MapViewProps) {
+		if (this.props.isEdited && !prevProps.isEdited) {
+			// When the props.isEdited changes from false to true, there are unsaved changes
+			this.updateUnsavedChanges();
+		}
+	}
+
+	private removeUnsavedChangesFunction(callback: () => void) {
+		// This function is called to reset all the inputs to the initial state
+		store.dispatch(confirmEditedMaps()).then(() => {
+			store.dispatch(fetchMapsDetails()).then(callback);
+		});
+	}
+
+	private submitUnsavedChangesFunction(successCallback: () => void, failureCallback: () => void) {
+		// This function is called to submit the unsaved changes
+		store.dispatch(submitEditedMaps()).then(successCallback, failureCallback);
+	}
+
+	private updateUnsavedChanges() {	
+		// Notifiy that there are unsaved changes
+		store.dispatch(updateUnsavedChanges(this.removeUnsavedChangesFunction, this.submitUnsavedChangesFunction));
 	}
 
 	private handleSizeChange(event: React.ChangeEvent<HTMLTextAreaElement>) {
@@ -389,6 +423,7 @@ class MapViewComponent extends React.Component<MapViewPropsWithIntl, MapViewStat
 
 	private handleCalibrationSetting(mode: CalibrationModeTypes) {
 		this.props.setCalibration(mode, this.props.id);
+		this.updateUnsavedChanges();
 	}
 }
 
