@@ -12,7 +12,7 @@ import {
 	UpdateDefaultTimeZone,
 	UpdateDisplayTitleAction,
 	UpdateDefaultWarningFileSize,
-	UpdateDefaultFileSizeLimit,
+	UpdateDefaultFileSizeLimit
 } from '../../types/redux/admin';
 import { removeUnsavedChanges, updateUnsavedChanges } from '../../actions/unsavedWarning';
 import { defineMessages, FormattedMessage, injectIntl, InjectedIntlProps } from 'react-intl';
@@ -94,12 +94,12 @@ class PreferencesComponent extends React.Component<PreferencesPropsWithIntl, {}>
 							<input
 								type='radio'
 								name='chartTypes'
-								style={{marginRight: '10px'}}
+								style={{ marginRight: '10px' }}
 								value={ChartTypes.line}
 								onChange={this.handleDefaultChartToRenderChange}
 								checked={this.props.defaultChartToRender === ChartTypes.line}
 							/>
-							<FormattedMessage id='line'/>
+							<FormattedMessage id='line' />
 						</label>
 					</div>
 					<div className='radio'>
@@ -107,7 +107,7 @@ class PreferencesComponent extends React.Component<PreferencesPropsWithIntl, {}>
 							<input
 								type='radio'
 								name='chartTypes'
-								style={{marginRight: '10px'}}
+								style={{ marginRight: '10px' }}
 								value={ChartTypes.bar}
 								onChange={this.handleDefaultChartToRenderChange}
 								checked={this.props.defaultChartToRender === ChartTypes.bar}
@@ -120,12 +120,12 @@ class PreferencesComponent extends React.Component<PreferencesPropsWithIntl, {}>
 							<input
 								type='radio'
 								name='chartTypes'
-								style={{marginRight: '10px'}}
+								style={{ marginRight: '10px' }}
 								value={ChartTypes.compare}
 								onChange={this.handleDefaultChartToRenderChange}
 								checked={this.props.defaultChartToRender === ChartTypes.compare}
 							/>
-							<FormattedMessage id='compare'/>
+							<FormattedMessage id='compare' />
 						</label>
 					</div>
 					<div className='radio'>
@@ -133,12 +133,12 @@ class PreferencesComponent extends React.Component<PreferencesPropsWithIntl, {}>
 							<input
 								type='radio'
 								name='chartTypes'
-								style={{marginRight: '10px'}}
+								style={{ marginRight: '10px' }}
 								value={ChartTypes.map}
 								onChange={this.handleDefaultChartToRenderChange}
 								checked={this.props.defaultChartToRender === ChartTypes.map}
 							/>
-							<FormattedMessage id='map'/>
+							<FormattedMessage id='map' />
 						</label>
 					</div>
 				</div>
@@ -149,7 +149,7 @@ class PreferencesComponent extends React.Component<PreferencesPropsWithIntl, {}>
 					<label>
 						<input
 							type='checkbox'
-							style={{marginRight: '10px'}}
+							style={{ marginRight: '10px' }}
 							onChange={this.handleDefaultBarStackingChange}
 							checked={this.props.defaultBarStacking}
 						/>
@@ -164,7 +164,7 @@ class PreferencesComponent extends React.Component<PreferencesPropsWithIntl, {}>
 						<label>
 							<input
 								type='radio'
-								style={{marginRight: '10px'}}
+								style={{ marginRight: '10px' }}
 								name='languageTypes'
 								value={LanguageTypes.en}
 								onChange={this.handleDefaultLanguageChange}
@@ -177,7 +177,7 @@ class PreferencesComponent extends React.Component<PreferencesPropsWithIntl, {}>
 						<label>
 							<input
 								type='radio'
-								style={{marginRight: '10px'}}
+								style={{ marginRight: '10px' }}
 								name='languageTypes'
 								value={LanguageTypes.fr}
 								onChange={this.handleDefaultLanguageChange}
@@ -190,7 +190,7 @@ class PreferencesComponent extends React.Component<PreferencesPropsWithIntl, {}>
 						<label>
 							<input
 								type='radio'
-								style={{marginRight: '10px'}}
+								style={{ marginRight: '10px' }}
 								name='languageTypes'
 								value={LanguageTypes.es}
 								onChange={this.handleDefaultLanguageChange}
@@ -240,12 +240,12 @@ class PreferencesComponent extends React.Component<PreferencesPropsWithIntl, {}>
 	}
 
 	private removeUnsavedChangesFunction(callback: () => void) {
-		// This function is called to reset all the inputs to the initial state
+		// The function is called to reset all the inputs to the initial state
 		store.dispatch(fetchPreferencesIfNeeded()).then(callback);
 	}
 
 	private submitUnsavedChangesFunction(successCallback: () => void, failureCallback: () => void) {
-		// This function is called to submit the unsaved changes
+		// The function is called to submit the unsaved changes
 		store.dispatch(submitPreferences()).then(successCallback, failureCallback);
 	}
 
@@ -295,6 +295,7 @@ class PreferencesComponent extends React.Component<PreferencesPropsWithIntl, {}>
 	}
 
 	private handleDefaultFileSizeLimitChange(e: { target: HTMLInputElement; }) {
+		this.props.updateDefaultFileSizeLimit(parseFloat(e.target.value));
 		this.updateUnsavedChanges();
 	}
 }

@@ -41,7 +41,7 @@ function mapDispatchToProps(dispatch: Dispatch) {
 		updateDefaultLanguage: (defaultLanguage: LanguageTypes) => dispatch(updateDefaultLanguage(defaultLanguage)),
 		submitPreferences: () => dispatch(submitPreferencesIfNeeded()),
 		updateDefaultWarningFileSize: (defaultWarningFileSize: number) => dispatch(updateDefaultWarningFileSize(defaultWarningFileSize)),
-		updateDefaultFileSizeLimit: (defaultFileSizeLimit: number) => dispatch(updateDefaultFileSizeLimit(defaultFileSizeLimit)),
+		updateDefaultFileSizeLimit: (defaultFileSizeLimit: number) => dispatch(updateDefaultFileSizeLimit(defaultFileSizeLimit))
 	};
 }
 

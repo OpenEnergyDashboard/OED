@@ -69,6 +69,9 @@ export function submitEditedMeter(meterId: number): Thunk {
 	};
 }
 
+/**
+ * Remove all the meters in editing without submitting them
+ */
 export function confirmEditedMeters(): Thunk {
 	return async (dispatch: Dispatch, getState: GetState) => {
 		Object.keys(getState().meters.editedMeters).forEach(meterIdS => {

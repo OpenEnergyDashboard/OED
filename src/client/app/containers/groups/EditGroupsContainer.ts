@@ -29,7 +29,7 @@ function mapStateToProps(state: State) {
 		if (groupInEditing === undefined) {
 			throw new Error('Unacceptable condition: state.groups.groupInEditing has no data.');
 		}
-		if (browserHistory.location.pathname == '/editGroup') {
+		if (browserHistory.location.pathname === '/editGroup') {
 			// Only redirect to /groups if the user is at /editGroup since the UnsavedWarningComponent has already redirected to other paths
 			browserHistory.push('/groups');
 		}

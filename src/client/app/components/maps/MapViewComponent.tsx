@@ -103,7 +103,7 @@ class MapViewComponent extends React.Component<MapViewPropsWithIntl, MapViewStat
 		store.dispatch(submitEditedMaps()).then(successCallback, failureCallback);
 	}
 
-	private updateUnsavedChanges() {	
+	private updateUnsavedChanges() {
 		// Notifiy that there are unsaved changes
 		store.dispatch(updateUnsavedChanges(this.removeUnsavedChangesFunction, this.submitUnsavedChangesFunction));
 	}

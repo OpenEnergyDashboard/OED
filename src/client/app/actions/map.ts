@@ -311,8 +311,8 @@ function deleteMap(mapID: number): t.DeleteMapAction {
 }
 
 /**
-* Remove all the maps from editing without submitting them
-*/
+ * Remove all the maps in editing without submiting them
+ */
 export function confirmEditedMaps() {
 	return async (dispatch: Dispatch, getState: GetState) => {
 		Object.keys(getState().maps.editedMaps).forEach(mapID2Submit => {

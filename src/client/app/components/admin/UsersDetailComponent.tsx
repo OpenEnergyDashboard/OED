@@ -87,13 +87,14 @@ export default function UserDetailComponent(props: UserDisplayComponentProps) {
 								<tr key={user.email}>
 									<td>{user.email}</td>
 									<td>
-										<Input 
-											type='select' 
-											value={user.role} 
+										<Input
+											type='select'
+											value={user.role}
 											onChange={({ target }) => {
 												props.editUser(user.email, target.value as UserRole);
 												addUnsavedChanges();
-											}}>
+											}}
+										>
 											{Object.entries(UserRole).map(([role, val]) => (
 												<option value={val} key={role}> {role} </option>
 											))}
@@ -110,14 +111,14 @@ export default function UserDetailComponent(props: UserDisplayComponentProps) {
 					</Table>
 					<div style={buttonsStyle}>
 						<CreateUserLinkButtonComponent />
-						<Button 
-							color='success' 
-							disabled={!props.edited} 
+						<Button
+							color='success'
+							disabled={!props.edited}
 							onClick={() => {
 								props.submitUserEdits();
 								clearUnsavedChanges();
-							}	
-						}>
+							}}
+						>
 							<FormattedMessage id='save.role.changes'/>
 						</Button>
 					</div>

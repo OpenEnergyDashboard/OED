@@ -7,20 +7,19 @@ import { connect } from 'react-redux';
 import UnsavedWarningComponent from '../components/UnsavedWarningComponent';
 import { State } from '../types/redux/state';
 import { Dispatch } from '../types/redux/actions';
- 
+
 function mapStateToProps(state: State) {
-    return {
-        hasUnsavedChanges: state.unsavedWarning.hasUnsavedChanges,
-        removeFunction: state.unsavedWarning.removeFunction,
-        submitFunction: state.unsavedWarning.submitFunction,
-    }
+	return {
+		hasUnsavedChanges: state.unsavedWarning.hasUnsavedChanges,
+		removeFunction: state.unsavedWarning.removeFunction,
+		submitFunction: state.unsavedWarning.submitFunction
+	}
 }
 
 function mapDispatchToProps(dispatch: Dispatch) {
 	return {
-        removeUnsavedChanges: () => dispatch(removeUnsavedChanges())
+		removeUnsavedChanges: () => dispatch(removeUnsavedChanges())
 	};
 }
- 
+
 export default connect(mapStateToProps, mapDispatchToProps)(UnsavedWarningComponent);
- 
