@@ -41,6 +41,27 @@ export default function UserDetailComponent(props: UserDisplayComponentProps) {
 		fontSize: '50%'
 	};
 
+	const removeUnsavedChangesFunction = (callback: () => void) => {
+		// This function is called to reset all the inputs to the initial state
+		// Do not need to do anything since unsaved changes will be removed after leaving this page
+		callback();
+	}
+
+	const submitUnsavedChangesFunction = (successCallback: () => void, failureCallback: () => void) => {
+		// This function is called to submit the unsaved changes
+		props.submitUserEdits().then(successCallback, failureCallback);
+	}
+
+	const addUnsavedChanges = () => {
+		// Notify that there are unsaved changes
+		store.dispatch(updateUnsavedChanges(removeUnsavedChangesFunction, submitUnsavedChangesFunction));
+	}
+
+	const clearUnsavedChanges = () => {
+		// Notify that there are no unsaved changes
+		store.dispatch(removeUnsavedChanges());
+	}
+
 	return (
 		<div>
 			<UnsavedWarningContainer />
@@ -71,8 +92,8 @@ export default function UserDetailComponent(props: UserDisplayComponentProps) {
 											value={user.role} 
 											onChange={({ target }) => {
 												props.editUser(user.email, target.value as UserRole);
-												store.dispatch(updateUnsavedChanges(() => {}, props.submitUserEdits));
-										}}>
+												addUnsavedChanges();
+											}}>
 											{Object.entries(UserRole).map(([role, val]) => (
 												<option value={val} key={role}> {role} </option>
 											))}
@@ -94,7 +115,7 @@ export default function UserDetailComponent(props: UserDisplayComponentProps) {
 							disabled={!props.edited} 
 							onClick={() => {
 								props.submitUserEdits();
-								store.dispatch(removeUnsavedChanges());
+								clearUnsavedChanges();
 							}	
 						}>
 							<FormattedMessage id='save.role.changes'/>
