@@ -82,7 +82,7 @@ class MeterViewComponent extends React.Component<MeterViewPropsWithIntl, MeterVi
 	}
 
 	private updateUnsavedChanges() {
-		// Notifiy that there are unsaved changes
+		// Notify that there are unsaved changes
 		store.dispatch(updateUnsavedChanges(this.removeUnsavedChangesFunction, this.submitUnsavedChangesFunction));
 	}
 

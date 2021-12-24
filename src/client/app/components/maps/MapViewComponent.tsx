@@ -104,7 +104,7 @@ class MapViewComponent extends React.Component<MapViewPropsWithIntl, MapViewStat
 	}
 
 	private updateUnsavedChanges() {
-		// Notifiy that there are unsaved changes
+		// Notify that there are unsaved changes
 		store.dispatch(updateUnsavedChanges(this.removeUnsavedChangesFunction, this.submitUnsavedChangesFunction));
 	}
 

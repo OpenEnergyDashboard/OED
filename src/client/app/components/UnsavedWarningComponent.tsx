@@ -122,7 +122,7 @@ class UnsavedWarningComponent extends React.Component<UnsavedWarningProps> {
 	}
 
 	/**
-	 * Called when successfully submiting the unsaved changes
+	 * Called when successfully submitting the unsaved changes
 	 * Redirect to the desire path and turn off the unsaved warning
 	 */
 	private handleSubmitLeave() {
