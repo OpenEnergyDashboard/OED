@@ -14,6 +14,7 @@ import notifications from './notifications';
 import admin from './admin';
 import version from './version';
 import currentUser from './currentUser';
+import unsavedWarning from './unsavedWarning';
 
 export default combineReducers({
 	meters,
@@ -28,5 +29,6 @@ export default combineReducers({
 	notifications,
 	admin,
 	version,
-	currentUser
+	currentUser,
+	unsavedWarning
 });

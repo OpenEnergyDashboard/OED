@@ -10,6 +10,9 @@ import HeaderContainer from '../../containers/HeaderContainer';
 import FooterContainer from '../../containers/FooterContainer';
 import TooltipMarkerComponent from '../TooltipMarkerComponent';
 import TooltipHelpContainerAlternative from '../../containers/TooltipHelpContainerAlternative';
+import UnsavedWarningContainer from '../../containers/UnsavedWarningContainer';
+import { removeUnsavedChanges } from '../../actions/unsavedWarning';
+import store from '../../index';
 
 interface MetersDetailProps {
 	loggedInAsAdmin: boolean;
@@ -20,6 +23,11 @@ interface MetersDetailProps {
 }
 
 export default class MetersDetailComponent extends React.Component<MetersDetailProps, {}> {
+	constructor(props: MetersDetailProps) {
+		super(props);
+		this.handleSubmitClicked = this.handleSubmitClicked.bind(this);
+	}
+
 	public componentWillMount() {
 		this.props.fetchMetersDetails();
 	}
@@ -51,6 +59,7 @@ export default class MetersDetailComponent extends React.Component<MetersDetailP
 
 		return (
 			<div>
+				<UnsavedWarningContainer />
 				<HeaderContainer />
 				<TooltipHelpContainerAlternative page='meters' />
 				<div className='container-fluid'>
@@ -85,7 +94,7 @@ export default class MetersDetailComponent extends React.Component<MetersDetailP
 						color='success'
 						style={buttonContainerStyle}
 						disabled={!this.props.unsavedChanges}
-						onClick={this.props.submitEditedMeters}
+						onClick={this.handleSubmitClicked}
 					>
 						<FormattedMessage id='save.meter.edits' />
 					</Button> }
@@ -93,5 +102,15 @@ export default class MetersDetailComponent extends React.Component<MetersDetailP
 				<FooterContainer />
 			</div>
 		);
+	}
+
+	private removeUnsavedChanges() {
+		store.dispatch(removeUnsavedChanges());
+	}
+
+	private handleSubmitClicked() {
+		this.props.submitEditedMeters();
+		// Notify that the unsaved changes have been submitted
+		this.removeUnsavedChanges();
 	}
 }

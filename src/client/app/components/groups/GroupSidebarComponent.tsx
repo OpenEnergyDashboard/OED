@@ -6,7 +6,7 @@ import * as React from 'react';
 import { Button } from 'reactstrap';
 import { FormattedMessage } from 'react-intl';
 import { ChangeDisplayedGroupsAction } from '../../types/redux/groups';
-import { Link } from 'react-router';
+import { Link } from 'react-router-dom';
 
 interface GroupSidebarProps {
 	/* tslint:disable:array-type */

@@ -13,6 +13,7 @@ import { CompareReadingsState } from './compareReadings';
 import { VersionState } from './version';
 import {MapState} from './map';
 import { CurrentUserState } from './currentUser';
+import { UnsavedWarningState } from './unsavedWarning';
 
 export interface State {
 	meters: MetersState;
@@ -28,4 +29,5 @@ export interface State {
 	admin: AdminState;
 	version: VersionState;
 	currentUser: CurrentUserState;
+	unsavedWarning: UnsavedWarningState;
 }

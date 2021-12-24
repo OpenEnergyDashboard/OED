@@ -5,7 +5,7 @@
 import * as React from 'react';
 import { Button } from 'reactstrap';
 import ListDisplayComponent from '../ListDisplayComponent';
-import { Link } from 'react-router';
+import { Link } from 'react-router-dom';
 import { FormattedMessage } from 'react-intl';
 import { ChangeDisplayModeAction } from '../../types/redux/groups';
 

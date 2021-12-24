@@ -8,6 +8,9 @@ import { FormattedMessage, InjectedIntlProps, injectIntl } from 'react-intl';
 import { MeterMetadata, EditMeterDetailsAction } from '../../types/redux/meters';
 import { GPSPoint, isValidGPSInput } from '../../utils/calibration';
 import TimeZoneSelect from '../TimeZoneSelect';
+import { updateUnsavedChanges } from '../../actions/unsavedWarning';
+import { fetchMetersDetails, submitEditedMeters, confirmEditedMeters } from '../../actions/meters';
+import store from '../../index';
 
 interface MeterViewProps {
 	// The ID of the meter to be displayed
@@ -64,6 +67,30 @@ class MeterViewComponent extends React.Component<MeterViewPropsWithIntl, MeterVi
 				{loggedInAsAdmin && <td> <TimeZoneSelect current={this.props.meter.timeZone || ''} handleClick={this.changeTimeZone} /> </td>}
 			</tr>
 		);
+	}
+
+	private removeUnsavedChangesFunction(callback: () => void) {
+		// This function is called to reset all the inputs to the initial state
+		store.dispatch(confirmEditedMeters()).then(() => {
+			store.dispatch(fetchMetersDetails()).then(callback);
+		});
+	}
+
+	private submitUnsavedChangesFunction(successCallback: () => void, failureCallback: () => void) {
+		// This function is called to submit the unsaved changes
+		store.dispatch(submitEditedMeters()).then(successCallback, failureCallback);
+	}
+
+	private updateUnsavedChanges() {
+		// Notify that there are unsaved changes
+		store.dispatch(updateUnsavedChanges(this.removeUnsavedChangesFunction, this.submitUnsavedChangesFunction));
+	}
+
+	componentDidUpdate(prevProps: MeterViewProps) {
+		if (this.props.isEdited && !prevProps.isEdited) {
+			// When the props.isEdited changes from false to true, there are unsaved changes
+			this.updateUnsavedChanges();
+		}
 	}
 
 	private formatStatus(): string {
