@@ -9,9 +9,12 @@ import { hasToken } from '../../utils/token';
 import HeaderContainer from '../../containers/HeaderContainer';
 import FooterContainer from '../../containers/FooterContainer';
 import MapViewContainer from '../../containers/maps/MapViewContainer';
-import {Link} from 'react-router';
+import {Link} from 'react-router-dom';
 import TooltipHelpContainerAlternative from '../../containers/TooltipHelpContainerAlternative';
 import TooltipMarkerComponent from '../TooltipMarkerComponent';
+import { removeUnsavedChanges } from '../../actions/unsavedWarning';
+import store from '../../index';
+import UnsavedWarningContainer from '../../containers/UnsavedWarningContainer';
 
 interface MapsDetailProps {
 	maps: number[];
@@ -22,6 +25,11 @@ interface MapsDetailProps {
 }
 
 export default class MapsDetailComponent extends React.Component<MapsDetailProps, {}> {
+	constructor(props: MapsDetailProps) {
+		super(props);
+		this.handleSubmitClicked = this.handleSubmitClicked.bind(this);
+	}
+
 	public componentWillMount() {
 		this.props.fetchMapsDetails();
 	}
@@ -51,6 +59,7 @@ export default class MapsDetailComponent extends React.Component<MapsDetailProps
 
 		return (
 			<div>
+				<UnsavedWarningContainer />
 				<HeaderContainer />
 				<TooltipHelpContainerAlternative page='maps' />
 				<div className='container-fluid'>
@@ -94,7 +103,7 @@ export default class MapsDetailComponent extends React.Component<MapsDetailProps
 						color='success'
 						style={buttonContainerStyle}
 						disabled={!this.props.unsavedChanges}
-						onClick={this.props.submitEditedMaps}
+						onClick={this.handleSubmitClicked}
 					>
 						<FormattedMessage id='save.map.edits' />
 					</Button> }
@@ -102,5 +111,15 @@ export default class MapsDetailComponent extends React.Component<MapsDetailProps
 				<FooterContainer />
 			</div>
 		);
+	}
+
+	private removeUnsavedChanges() {
+		store.dispatch(removeUnsavedChanges());
+	}
+
+	private handleSubmitClicked() {
+		this.props.submitEditedMaps();
+		// Notify that the unsaved changes have been submitted
+		this.removeUnsavedChanges();
 	}
 }

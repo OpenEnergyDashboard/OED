@@ -16,6 +16,10 @@ import HeaderContainer from '../../containers/HeaderContainer';
 import {  browserHistory } from '../../utils/history';
 import { FormattedMessage, InjectedIntlProps, injectIntl, defineMessages } from 'react-intl';
 import { GPSPoint, isValidGPSInput } from '../../utils/calibration';
+import store from '../../index';
+import { removeUnsavedChanges, updateUnsavedChanges } from '../../actions/unsavedWarning';
+import UnsavedWarningContainer from '../../containers/UnsavedWarningContainer';
+import { fetchGroupsDetails } from '../../actions/groups';
 
 interface EditGroupsProps {
 	currentGroup: GroupDefinition;
@@ -96,6 +100,7 @@ class EditGroupsComponent extends React.Component<EditGroupsPropsWithIntl, EditG
 		this.handleEditGroup = this.handleEditGroup.bind(this);
 		this.handleDeleteGroup = this.handleDeleteGroup.bind(this);
 		this.handleReturnToView = this.handleReturnToView.bind(this);
+		this.removeUnsavedChangesFunction = this.removeUnsavedChangesFunction.bind(this);
 	}
 
 	public render() {
@@ -134,6 +139,7 @@ class EditGroupsComponent extends React.Component<EditGroupsPropsWithIntl, EditG
 		const messages = defineMessages({ name: { id: 'name' }});
 		return (
 			<div>
+				<UnsavedWarningContainer />
 				<HeaderContainer />
 				<div className='container-fluid'>
 					<div style={divStyle} className='col-6'>
@@ -258,7 +264,7 @@ class EditGroupsComponent extends React.Component<EditGroupsPropsWithIntl, EditG
 								<Button outline onClick={this.handleReturnToView}>
 									<FormattedMessage id='cancel' />
 								</Button>
-								<Button outline onClick={this.handleEditGroup}>
+								<Button outline onClick={() => this.handleEditGroup(null, null)}>
 									<FormattedMessage id='submit.changes' />
 								</Button>
 							</div>
@@ -275,30 +281,52 @@ class EditGroupsComponent extends React.Component<EditGroupsPropsWithIntl, EditG
 		);
 	}
 
+	private removeUnsavedChangesFunction(callback: () => void) {
+		// This function is called to reset all the inputs to the initial state
+		this.props.changeDisplayModeToView();
+		// Fetch data from database to replace the current one
+		store.dispatch(fetchGroupsDetails()).then(callback);
+	}
+
+	private updateUnsavedChanges() {
+		// Notify that there are unsaved changes
+		store.dispatch(updateUnsavedChanges(this.removeUnsavedChangesFunction, this.handleEditGroup));
+	}
+
+	private removeUnsavedChanges() {
+		// Notify that there are no unsaved changes
+		store.dispatch(removeUnsavedChanges());
+	}
+
 	private handleNameChange(e: React.ChangeEvent<HTMLInputElement>) {
 		const name = e.currentTarget.value;
 		if (name) {
 			this.setState({ name: name as string });
 			this.props.editGroupName(name as string);
+			this.updateUnsavedChanges();
 		}
 	}
 
 	private handleGPSChange(e: React.ChangeEvent<HTMLInputElement>) {
 		this.setState({ gpsInput: e.target.value });
+		this.updateUnsavedChanges();
 	}
 
 	private handleDisplayChange(e: React.ChangeEvent<HTMLInputElement>) {
 		this.props.editGroupDisplayable(e.target.value === 'true');
-		this.setState({ groupDisplay: (e.target.value === 'true') })
+		this.setState({ groupDisplay: (e.target.value === 'true') });
+		this.updateUnsavedChanges();
 	}
 
 	private handleNoteChange(e: React.ChangeEvent<HTMLTextAreaElement>) {
 		this.props.editGroupNote(e.target.value);
 		this.setState({ groupNote: e.target.value });
+		this.updateUnsavedChanges();
 	}
 
 	private handleAreaChange(e: React.ChangeEvent<HTMLInputElement>) {
 		this.setState({ groupArea: e.target.value });
+		this.updateUnsavedChanges();
 		// still need to set state to parse check before submitting
 	}
 
@@ -321,24 +349,29 @@ class EditGroupsComponent extends React.Component<EditGroupsPropsWithIntl, EditG
 	private handleMoveChildMetersToUnusedMeters() {
 		this.props.changeChildMeters(_.difference(this.props.childMeters.map(meter => meter.id), this.state.selectedMeters));
 		this.setState({ selectedMeters: [], defaultSelectedMeters: [] });
+		this.updateUnsavedChanges();
 	}
 
 	private handleMoveUnusedMetersToChildMeters() {
 		this.props.changeChildMeters(_.union(this.props.childMeters.map(meter => meter.id), this.state.unusedMeters));
 		this.setState({ unusedMeters: [], defaultUnusedMeters: [] });
+		this.updateUnsavedChanges();
 	}
 
 	private handleMoveChildGroupsToUnusedGroups() {
 		this.props.changeChildGroups(_.difference(this.props.childGroups.map(group => group.id), this.state.selectedGroups));
 		this.setState({ selectedGroups: [], defaultSelectedGroups: [] });
+		this.updateUnsavedChanges();
 	}
 
 	private handleMoveUnusedGroupsToChildGroups() {
 		this.props.changeChildGroups(_.union(this.props.childGroups.map(group => group.id), this.state.unusedGroups));
 		this.setState({ unusedGroups: [], defaultUnusedGroups: [] });
+		this.updateUnsavedChanges();
 	}
 
-	private handleEditGroup() {
+	private handleEditGroup(successCallback: any, failureCallback: any) {
+		// The callbacks are used for displaying unsaved warning
 		const gpsProxy = this.state.gpsInput.replace('(','').replace(')','').replace(' ', '');
 		const pattern2 = /^\d+(\.\d+)?$/;
 		// need to check gps and area
@@ -358,7 +391,17 @@ class EditGroupsComponent extends React.Component<EditGroupsPropsWithIntl, EditG
 					};
 					this.props.editGroupGPS(gPoint);
 				}
-				this.props.submitGroupInEditingIfNeeded();
+				// Notify that there are no unsaved changes after clicking the submit button
+				this.removeUnsavedChanges();
+				if (successCallback != null) {
+					// This function is call in displaying unsaved warning process
+					this.props.submitGroupInEditingIfNeeded().then(successCallback, failureCallback);
+				} else {
+					this.props.submitGroupInEditingIfNeeded().then(() => {
+						// Redirect users to /groups when they click the submit button.
+						browserHistory.push('/groups');
+					});
+				}
 			}
 		}
 		else {
@@ -368,6 +411,7 @@ class EditGroupsComponent extends React.Component<EditGroupsPropsWithIntl, EditG
 
 	private handleDeleteGroup() {
 		this.props.deleteGroup();
+		this.removeUnsavedChanges();
 	}
 
 	private handleReturnToView() {

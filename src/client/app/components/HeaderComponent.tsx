@@ -3,7 +3,7 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
 
 import * as React from 'react';
-import { Link } from 'react-router';
+import { Link } from 'react-router-dom';
 import LogoComponent from './LogoComponent';
 import MenuModalComponent from './MenuModalComponent';
 import HeaderButtonsContainer from '../containers/HeaderButtonsContainer';

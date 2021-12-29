@@ -82,7 +82,7 @@ function fetchPreferences(): Thunk {
 	};
 }
 
-function submitPreferences() {
+export function submitPreferences() {
 	return async (dispatch: Dispatch, getState: GetState) => {
 		const state = getState();
 		try {

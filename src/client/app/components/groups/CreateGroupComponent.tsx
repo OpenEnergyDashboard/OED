@@ -16,6 +16,9 @@ import { browserHistory } from '../../utils/history';
 import { FormattedMessage, InjectedIntlProps, injectIntl, defineMessages } from 'react-intl';
 import TooltipHelpContainerAlternative from '../../containers/TooltipHelpContainerAlternative';
 import { GPSPoint, isValidGPSInput } from '../../utils/calibration';
+import store from '../../index';
+import { removeUnsavedChanges, updateUnsavedChanges } from '../../actions/unsavedWarning';
+import UnsavedWarningContainer from '../../containers/UnsavedWarningContainer';
 
 interface CreateGroupProps {
 	meters: NamedIDItem[];
@@ -51,6 +54,7 @@ class CreateGroupComponent extends React.Component<CreateGroupPropsWithIntl, Cre
 		this.handleAreaChange = this.handleAreaChange.bind(this);
 		this.handleCreateGroup = this.handleCreateGroup.bind(this);
 		this.handleReturnToView = this.handleReturnToView.bind(this);
+		this.removeUnsavedChangesFunction = this.removeUnsavedChangesFunction.bind(this);
 	}
 
 	public componentWillMount() {
@@ -80,6 +84,7 @@ class CreateGroupComponent extends React.Component<CreateGroupPropsWithIntl, Cre
 		const messages = defineMessages({ name: { id: 'name' }});
 		return (
 			<div>
+				<UnsavedWarningContainer />
 				<HeaderContainer />
 				<TooltipHelpContainerAlternative page='meters' />
 				<div className='container-fluid'>
@@ -145,7 +150,7 @@ class CreateGroupComponent extends React.Component<CreateGroupPropsWithIntl, Cre
 								</Button>
 							</div>
 							<div className='col-6 d-flex justify-content-end'>
-								<Button outline type='submit' onClick={this.handleCreateGroup}>
+								<Button outline type='submit' onClick={() => this.handleCreateGroup(null, null)}>
 									<FormattedMessage id='create.group' />
 								</Button>
 							</div>
@@ -157,6 +162,21 @@ class CreateGroupComponent extends React.Component<CreateGroupPropsWithIntl, Cre
 		);
 	}
 
+	private removeUnsavedChangesFunction(callback: () => void) {
+		this.props.changeDisplayModeToView();
+		callback();
+	}
+
+	private updateUnsavedChanges() {
+		// Notify that there are unsaved changes
+		store.dispatch(updateUnsavedChanges(this.removeUnsavedChangesFunction, this.handleCreateGroup));
+	}
+
+	private removeUnsavedChanges() {
+		// Notify that there are no unsaved changes
+		store.dispatch(removeUnsavedChanges());
+	}
+
 	private handleNameChange(e: React.ChangeEvent<HTMLInputElement>) {
 		const value = e.target.value;
 		if (value) {
@@ -164,26 +184,32 @@ class CreateGroupComponent extends React.Component<CreateGroupPropsWithIntl, Cre
 		} else {
 			this.props.editGroupName('');
 		}
+		this.updateUnsavedChanges();
 	}
 
 	private handleGPSChange(e: React.ChangeEvent<HTMLInputElement>) {
 		this.setState({ gpsInput: e.target.value });
+		this.updateUnsavedChanges();
 	}
 
 	private handleDisplayChange(e: React.ChangeEvent<HTMLInputElement>) {
 		this.props.editGroupDisplayable(e.target.value === 'true');
+		this.updateUnsavedChanges();
 	}
 
 	private handleNoteChange(e: React.ChangeEvent<HTMLTextAreaElement>) {
 		this.props.editGroupNote(e.target.value);
+		this.updateUnsavedChanges();
 	}
 
 	private handleAreaChange(e: React.ChangeEvent<HTMLInputElement>) {
 		this.setState({ groupArea: e.target.value });
+		this.updateUnsavedChanges();
 		// still need to set state to parse check before submitting
 	}
 
-	private handleCreateGroup() {
+	private handleCreateGroup(successCallback: any, failureCallback: any) {
+		// The callback is used for displaying unsaved warning.
 		const gpsProxy = this.state.gpsInput.replace('(','').replace(')','').replace(' ', '');
 		const pattern2 = /^\d+(\.\d+)?$/;
 		// need to check gps and area
@@ -203,7 +229,16 @@ class CreateGroupComponent extends React.Component<CreateGroupPropsWithIntl, Cre
 					};
 					this.props.editGroupGPS(gPoint);
 				}
-				this.props.submitGroupInEditingIfNeeded();
+				// Notify that there are no unsaved changes after clicking the create button
+				this.removeUnsavedChanges();
+				if (successCallback != null) {
+					this.props.submitGroupInEditingIfNeeded().then(successCallback, failureCallback);
+				} else {
+					this.props.submitGroupInEditingIfNeeded().then(() => {
+						// Redirect users to /groups when they click the create group button.
+						browserHistory.push('/groups');
+					});
+				}
 			}
 		}
 		else {
@@ -212,8 +247,8 @@ class CreateGroupComponent extends React.Component<CreateGroupPropsWithIntl, Cre
 	}
 
 	private handleReturnToView() {
-		this.props.changeDisplayModeToView();
 		browserHistory.push('/groups');
+		this.props.changeDisplayModeToView();
 	}
 }
 

@@ -46,4 +46,3 @@ function mapDispatchToProps(dispatch: Dispatch) {
 }
 
 export default connect(mapStateToProps, mapDispatchToProps)(PreferencesComponent);
-
