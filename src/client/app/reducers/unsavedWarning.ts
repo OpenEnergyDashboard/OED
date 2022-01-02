@@ -8,6 +8,7 @@ import { any } from 'prop-types';
 
 const defaultState: UnsavedWarningState = {
 	hasUnsavedChanges: false,
+	isLogOutClicked: false,
 	removeFunction: () => any,
 	submitFunction: () => any
 };
@@ -25,6 +26,11 @@ export default function unsavedWarning(state = defaultState, action: UnsavedWarn
 			return {
 				...state,
 				hasUnsavedChanges: false
+			}
+		case ActionType.FlipLogOutState:
+			return {
+				...state,
+				isLogOutClicked: !state.isLogOutClicked
 			}
 		default:
 			return state;
