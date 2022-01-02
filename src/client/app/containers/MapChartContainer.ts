@@ -12,7 +12,6 @@ import {
 } from '../utils/calibration';
 import * as _ from 'lodash';
 import getGraphColor from '../utils/getGraphColor';
-import { TimeInterval } from '../../../common/TimeInterval';
 import Locales from '../types/locales';
 import { DataType } from '../types/Datasources';
 
@@ -46,8 +45,7 @@ function mapStateToProps(state: State) {
 
 		// Figure out what time interval the bar is using since user bar data for now.
 		const timeInterval = state.graph.timeInterval;
-		const barDuration = (timeInterval.equals(TimeInterval.unbounded())) ? moment.duration(4, 'weeks')
-			: moment.duration(timeInterval.duration('days'), 'days');
+		const barDuration = state.graph.barDuration
 		// Make sure there is a map with values so avoid issues.
 		if (map && map.origin && map.opposite) {
 			// The size of the original map loaded into OED.
@@ -110,7 +108,7 @@ function mapStateToProps(state: State) {
 							} else {
 								// Shift to UTC since want database time not local/browser time which is what moment does.
 								timeReading =
-								`${moment(mapReading.startTimestamp).utc().format('LL')} - ${moment(mapReading.endTimestamp).utc().format('LL')}`;
+								`${moment(mapReading.startTimestamp).utc().format('LL')} - ${moment(mapReading.endTimestamp).subtract(1, 'days').utc().format('LL')}`;
 								// The value for the circle is the average daily usage.
 								averagedReading = mapReading.reading / barDuration.asDays();
 								// The size is the reading value. It will be scaled later.
@@ -167,7 +165,7 @@ function mapStateToProps(state: State) {
 							} else {
 								// Shift to UTC since want database time not local/browser time which is what moment does.
 								timeReading =
-								`${moment(mapReading.startTimestamp).utc().format('LL')} - ${moment(mapReading.endTimestamp).utc().format('LL')}`;
+								`${moment(mapReading.startTimestamp).utc().format('LL')} - ${moment(mapReading.endTimestamp).subtract(1, 'days').utc().format('LL')}`;
 								// The value for the circle is the average daily usage.
 								averagedReading = mapReading.reading / barDuration.asDays();
 								// The size is the reading value. It will be scaled later.
