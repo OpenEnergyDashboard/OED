@@ -3,7 +3,7 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
 
 import * as React from 'react';
-import { Link } from 'react-router';
+import { Link } from 'react-router-dom';
 import { Button } from 'reactstrap';
 import { FormattedMessage } from 'react-intl';
 import MenuModalComponent from './MenuModalComponent';
@@ -13,12 +13,15 @@ import TooltipMarkerComponent from './TooltipMarkerComponent';
 import TooltipHelpContainerAlternative from '../containers/TooltipHelpContainerAlternative';
 import { UserRole } from '../types/items';
 import { hasPermissions } from '../utils/hasPermissions';
+import { FlipLogOutStateAction } from '../types/redux/unsavedWarning';
 
 interface HeaderButtonsProps {
 	showCollapsedMenuButton: boolean;
 	loggedInAsAdmin: boolean;
 	role: UserRole | null;
+	hasUnsavedChanges: boolean;
 	handleLogOut: () => any;
+	flipLogOutState(): FlipLogOutStateAction;
 }
 
 /**
@@ -102,8 +105,12 @@ export default class HeaderButtonsComponent extends React.Component<HeaderButton
 	}
 
 	private handleLogOut() {
-		this.props.handleLogOut();
-		this.forceUpdate();
+		if (this.props.hasUnsavedChanges) {
+			this.props.flipLogOutState();
+		} else {
+			// Normally log out if there are no unsaved changes
+			this.props.handleLogOut();
+			this.forceUpdate();
+		}
 	}
-
 }

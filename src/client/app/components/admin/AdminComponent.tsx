@@ -10,6 +10,7 @@ import ManageUsersLinkButtonComponent from './users/ManageUsersLinkButtonCompone
 import TooltipMarkerComponent from '../TooltipMarkerComponent';
 import { FormattedMessage } from 'react-intl';
 import TooltipHelpContainerAlternative from '../../containers/TooltipHelpContainerAlternative';
+import UnsavedWarningContainer from '../../containers/UnsavedWarningContainer';
 
 /**
  * Top-level React component that controls the home page
@@ -36,6 +37,7 @@ export default function AdminComponent() {
 	};
 	return (
 		<div>
+			<UnsavedWarningContainer />
 			<HeaderContainer />
 			<TooltipHelpContainerAlternative page='admin' />
 			<div className='container-fluid'>

@@ -15,18 +15,20 @@ import { UserRole } from '../types/items';
  */
 
 function convertToCSV(items: ExportDataSet[]) {
-	let csvOutput = 'Label,Readings,Start Timestamp\n';
+	let csvOutput = 'Label,Readings,Start Timestamp,End Timestamp\n';
 	items.forEach(set => {
 		const data = set.exportVals;
 		const label = set.label;
 		data.forEach(reading => {
 			const info = reading.y;
-			const startTimeStamp = moment(reading.x).utc().format('dddd LL LTS').replace(/,/g,''); // use regex to omit pesky commas
-			csvOutput += `"${label}",${info},${startTimeStamp}\n`; // TODO: add column for units
+			const startTimeStamp = moment(reading.x).utc().format('dddd LL LTS').replace(/,/g, ''); // use regex to omit pesky commas
+			const endTimeStamp = moment(reading.z).utc().format('dddd LL LTS').replace(/,/g, '');
+			csvOutput += `"${label}",${info},${startTimeStamp},${endTimeStamp}\n`; // TODO: add column for units
 		});
 	});
 	return csvOutput;
 }
+
 /**
  * Function to download the formatted CSV file to the users computer.
  * @param inputCSV A String containing the formatted CSV data.
@@ -62,14 +64,15 @@ export default function graphExport(dataSets: ExportDataSet[], name: string) {
  */
 export function downloadRawCSV(items: RawReadings[], defaultLanguage: string) {
 	// note that utc() is not needed
-	let csvOutput = 'Label,Readings,Start Timestamp\n';
+	let csvOutput = 'Label,Readings,Start Timestamp,End Timestamp\n';
 	items.forEach(ele => {
-		const timestamp = moment(ele.startTimestamp).format('dddd LL LTS').replace(/,/g,''); // use regex to omit pesky commas
-		csvOutput += `"${ele.label}",${ele.reading},${timestamp}\n`; // TODO: add column for units
+		const startTimestamp = moment(ele.startTimestamp).format('dddd LL LTS').replace(/,/g, ''); // use regex to omit pesky commas
+		const endTimestamp = moment(ele.endTimestamp).format('dddd LL LTS').replace(/,/g, ''); // use regex to omit pesky commas
+		csvOutput += `"${ele.label}",${ele.reading},${startTimestamp},${endTimestamp}\n`; // TODO: add column for units
 	})
 	// Use regex to remove commas and replace spaces/colons/hyphens with underscores
-	const startTime = moment(items[0].startTimestamp).format('LL_LTS').replace(/,/g,'').replace(/[\s:-]/g,'_');
-	const endTime = moment(items[items.length-1].startTimestamp).format('LL_LTS').replace(/,/g,'').replace(/[\s:-]/g,'_');
+	const startTime = moment(items[0].startTimestamp).format('LL_LTS').replace(/,/g, '').replace(/[\s:-]/g, '_');
+	const endTime = moment(items[items.length - 1].startTimestamp).format('LL_LTS').replace(/,/g, '').replace(/[\s:-]/g, '_');
 	const filename = `oedRawExport_line_${startTime}_to_${endTime}.csv`;
 	downloadCSV(csvOutput, filename);
 }
@@ -81,11 +84,10 @@ export function downloadRawCSV(items: RawReadings[], defaultLanguage: string) {
  */
 // NOTE: This function is made with the idea that it will not be called very often
 // Ideally we would have a component that prompts the user and handles all the logic
-export async function graphRawExport(count: number, done: () => Promise<void>): Promise<any> {
-	const fileSize = (count * 0.0442 / 1000)
-	// 5 MB will download for anyone.
-	// TODO Make this admin controllable
-	if (fileSize <= 5) {
+export async function graphRawExport(count: number, warningFileSize: number, fileSizeLimit: number, done: () => Promise<void>): Promise<any> {
+	const fileSize = (count * 0.0849 / 1000);
+	// Download for anyone without warning
+	if (fileSize <= warningFileSize) {
 		return done();
 	}
 
@@ -111,9 +113,8 @@ export async function graphRawExport(count: number, done: () => Promise<void>): 
 		<p>Are you sure you want to download</p>
 	`;
 
-	// 25 MB is limit for an admin without checking they really want to download,
-	// TODO: Should this be under admin control?
-	if (fileSize > 25 && (!hasToken() || !(await usersApi.hasRolePermissions(UserRole.EXPORT)))) { // 25 is hard coded but we should get it from state
+	// fileSizeLimit is limit for an admin without checking they really want to download,
+	if (fileSize > fileSizeLimit && (!hasToken() || !(await usersApi.hasRolePermissions(UserRole.EXPORT)))) {
 		innerContainer.innerHTML = "<p>Sorry you don't have permissions to download due to large number of points.</p>";
 		const okButton = document.createElement('button');
 		okButton.innerHTML = 'ok';

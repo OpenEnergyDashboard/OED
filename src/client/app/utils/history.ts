@@ -2,10 +2,6 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
 
-import { createHistory } from 'history';
-import { useRouterHistory } from 'react-router';
+import { createBrowserHistory } from 'history';
 
-const baseHref = (document.getElementsByTagName('base')[0] || {}).href;
-export const browserHistory = useRouterHistory(createHistory)({
-	basename: baseHref
-});
+export const browserHistory = createBrowserHistory();

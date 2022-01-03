@@ -40,6 +40,14 @@ export function updateDefaultLanguage(defaultLanguage: LanguageTypes): t.UpdateD
 	return { type: ActionType.UpdateDefaultLanguage, defaultLanguage };
 }
 
+export function updateDefaultWarningFileSize(defaultWarningFileSize: number): t.UpdateDefaultWarningFileSize {
+	return { type: ActionType.UpdateDefaultWarningFileSize, defaultWarningFileSize };
+}
+
+export function updateDefaultFileSizeLimit(defaultFileSizeLimit: number): t.UpdateDefaultFileSizeLimit {
+	return { type: ActionType.UpdateDefaultFileSizeLimit, defaultFileSizeLimit };
+}
+
 function requestPreferences(): t.RequestPreferencesAction {
 	return { type: ActionType.RequestPreferences };
 }
@@ -74,7 +82,7 @@ function fetchPreferences(): Thunk {
 	};
 }
 
-function submitPreferences() {
+export function submitPreferences() {
 	return async (dispatch: Dispatch, getState: GetState) => {
 		const state = getState();
 		try {
@@ -83,7 +91,9 @@ function submitPreferences() {
 				defaultChartToRender: state.admin.defaultChartToRender,
 				defaultBarStacking: state.admin.defaultBarStacking,
 				defaultLanguage: state.admin.defaultLanguage,
-				defaultTimezone: state.admin.defaultTimeZone
+				defaultTimezone: state.admin.defaultTimeZone,
+				defaultWarningFileSize: state.admin.defaultWarningFileSize,
+				defaultFileSizeLimit: state.admin.defaultFileSizeLimit
 			});
 			dispatch(markPreferencesSubmitted());
 			showSuccessNotification(translate('updated.preferences'));

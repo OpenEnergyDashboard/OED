@@ -8,4 +8,6 @@ SET
 	default_chart_to_render = ${defaultChartToRender},
 	default_bar_stacking = ${defaultBarStacking},
 	default_language = ${defaultLanguage},
-	default_timezone = ${defaultTimezone};
+	default_timezone = ${defaultTimezone},
+	default_warning_file_size = ${defaultWarningFileSize},
+	default_file_size_limit = ${defaultFileSizeLimit};

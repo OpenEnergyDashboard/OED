@@ -15,7 +15,9 @@ const defaultState: AdminState = {
 	defaultTimeZone: '',
 	defaultLanguage: LanguageTypes.en,
 	isFetching: false,
-	submitted: true
+	submitted: true,
+	defaultWarningFileSize: 5,
+	defaultFileSizeLimit: 25
 };
 
 export default function admin(state = defaultState, action: AdminAction) {
@@ -68,7 +70,9 @@ export default function admin(state = defaultState, action: AdminAction) {
 				defaultChartToRender: action.data.defaultChartToRender,
 				defaultBarStacking: action.data.defaultBarStacking,
 				defaultLanguage: action.data.defaultLanguage,
-				defaultTimeZone: action.data.defaultTimezone
+				defaultTimeZone: action.data.defaultTimezone,
+				defaultWarningFileSize: action.data.defaultWarningFileSize,
+				defaultFileSizeLimit: action.data.defaultFileSizeLimit
 			};
 		case ActionType.MarkPreferencesNotSubmitted:
 			return {
@@ -80,6 +84,18 @@ export default function admin(state = defaultState, action: AdminAction) {
 				...state,
 				submitted: true
 			};
+		case ActionType.UpdateDefaultWarningFileSize:
+			return {
+				...state,
+				defaultWarningFileSize: action.defaultWarningFileSize,
+				submitted: false
+			}
+		case ActionType.UpdateDefaultFileSizeLimit:
+			return {
+				...state,
+				defaultFileSizeLimit: action.defaultFileSizeLimit,
+				submitted: false
+			}
 		default:
 			return state;
 	}

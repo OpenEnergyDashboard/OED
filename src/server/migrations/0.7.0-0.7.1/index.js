@@ -6,10 +6,9 @@ const database = require('../../models/database');
 const sqlFile = database.sqlFile;
 
 module.exports = {
-	fromVersion: '0.6.0',
-	toVersion: '0.7.0',
+	fromVersion: '0.7.0',
+	toVersion: '0.7.1',
 	up: async db => {
-		await db.none(sqlFile('../migrations/0.7.0-0.7.1/sql/readings/drop_minute_readings.sql'));
-		await db.none(sqlFile('../migrations/0.7.0-0.7.1/sql/readings/create_materialized_hourly_readings.sql'));
+		await db.none(sqlFile('../migrations/0.7.0-0.7.1/sql/preferences/alter_preferences_type.sql'));
 	}
 };

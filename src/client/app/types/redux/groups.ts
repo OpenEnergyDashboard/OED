@@ -20,6 +20,10 @@ export type GroupsAction =
 	| CreateNewBlankGroupAction
 	| BeginEditingGroupAction
 	| EditGroupNameAction
+	| EditGroupGPSAction
+	| EditGroupDisplayableAction
+	| EditGroupNoteAction
+	| EditGroupAreaAction
 	| ChangeChildGroupsAction
 	| ChangeChildMetersAction
 	| MarkGroupInEditingSubmittedAction
@@ -85,6 +89,26 @@ export interface EditGroupNameAction {
 	newName: string;
 }
 
+export interface EditGroupGPSAction {
+	type: ActionType.EditGroupGPS;
+	newGPS: GPSPoint;
+}
+
+export interface EditGroupDisplayableAction {
+	type: ActionType.EditGroupDisplayable;
+	newDisplay: boolean;
+}
+
+export interface EditGroupNoteAction {
+	type: ActionType.EditGroupNote;
+	newNote: string;
+}
+
+export interface EditGroupAreaAction {
+	type: ActionType.EditGroupArea;
+	newArea: number;
+}
+
 export interface ChangeChildGroupsAction {
 	type: ActionType.ChangeChildGroups;
 	groupIDs: number[];
@@ -133,6 +157,8 @@ export interface GroupData {
 	childGroups: number[];
 	gps?: GPSPoint;
 	displayable: boolean;
+	note?: string;
+	area?: number;
 }
 
 export interface GroupID {

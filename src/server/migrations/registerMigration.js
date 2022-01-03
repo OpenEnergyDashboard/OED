@@ -10,7 +10,8 @@ const migrations = [
 	//require('./0.2.0-0.3.0-Template/indexTemplate'),
 	require('./0.3.0-0.5.0'),
 	require('./0.5.0-0.6.0'),
-	require('./0.6.0-0.7.0')
+	require('./0.6.0-0.7.0'),
+	require('./0.7.0-0.7.1')
 	/* eslint-disable global-require */
 ];
 

@@ -15,6 +15,10 @@ export enum ActionType {
 	RequestVersion = 'REQUEST_VERSION',
 	ReceiveVersion = 'RECEIVE_VERSION',
 
+	UpdateUnsavedChanges = 'UPDATE_UNSAVED_CHANGES',
+	RemoveUnsavedChanges = 'REMOVE_UNSAVED_CHANGES',
+	FlipLogOutState = 'FLIP_LOG_OUT_STATE',
+
 	RequestMetersDetails = 'REQUEST_METERS_DETAILS',
 	ReceiveMetersDetails = 'RECEIVE_METERS_DETAILS',
 	ChangeDisplayedMeters = 'CHANGE_DISPLAYED_METERS',
@@ -65,6 +69,10 @@ export enum ActionType {
 	CreateNewBlankGroup = 'CREATE_NEW_BLANK_GROUP',
 	BeginEditingGroup = 'BEGIN_EDITING_GROUP',
 	EditGroupName = 'EDIT_GROUP_NAME',
+	EditGroupGPS = 'EDIT_GROUP_GPS',
+	EditGroupDisplayable = 'EDIT_GROUP_DISPLAYABLE',
+	EditGroupNote = 'EDIT_GROUP_NOTE',
+	EditGroupArea = 'EDIT_GROUP_AREA',
 	ChangeChildGroups = 'CHANGE_CHILD_GROUPS',
 	ChangeChildMeters = 'CHANGE_CHILD_METERS',
 	MarkGroupInEditingSubmitted = 'MARK_GROUP_IN_EDITING_SUBMITTED',
@@ -84,6 +92,8 @@ export enum ActionType {
 	ReceivePreferences = 'RECEIVE_PREFERENCES',
 	MarkPreferencesNotSubmitted = 'MARK_PREFERENCES_NOT_SUBMITTED',
 	MarkPreferencesSubmitted = 'MARK_PREFERENCES_SUBMITTED',
+	UpdateDefaultWarningFileSize = 'UPDATE_DEFAULT_WARNING_FILE_SIZE',
+	UpdateDefaultFileSizeLimit = 'UPDATE_DEFAULT_FILE_SIZE_LIMIT',
 
 	UpdateCalibrationMode = 'UPDATE_MAP_MODE',
 	UpdateSelectedMap = 'UPDATE_SELECTED_MAPS',

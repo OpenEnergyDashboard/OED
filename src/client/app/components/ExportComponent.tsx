@@ -18,6 +18,8 @@ interface ExportProps {
 	exportVals: { datasets: ExportDataSet[] };
 	timeInterval: TimeInterval;
 	defaultLanguage: string;
+	defaultWarningFileSize: number;
+	defaultFileSizeLimit: number;
 }
 
 export default function ExportComponent(props: ExportProps) {
@@ -27,6 +29,18 @@ export default function ExportComponent(props: ExportProps) {
 	 */
 	const exportReading = () => {
 		const compressedData = props.exportVals.datasets;
+
+		// Sort the dataset based on the start time
+		compressedData.forEach(reading => {
+			if (reading !== undefined) {
+				reading.exportVals.sort((a,b) =>{
+					if (a.x < b.x) {
+						return -1;
+					}
+					return 1;
+				})
+			}
+		})
 
 		// Determine and format the first time in the dataset
 		let startTime = moment(compressedData[0].exportVals[0].x);
@@ -61,7 +75,7 @@ export default function ExportComponent(props: ExportProps) {
 		if (props.selectedMeters.length === 0)
 			return;
 		const count = await metersApi.lineReadingsCount(props.selectedMeters, props.timeInterval);
-		graphRawExport(count, async () => {
+		graphRawExport(count, props.defaultWarningFileSize, props.defaultFileSizeLimit, async () => {
 			const lineReading = await metersApi.rawLineReadings(props.selectedMeters, props.timeInterval);
 			downloadRawCSV(lineReading,props.defaultLanguage);
 		});

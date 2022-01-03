@@ -38,7 +38,10 @@ mocha.describe('Obvius API', () => {
 						await unauthorizedUser.insert(conn);
 						unauthorizedUser.password = password;
 						const res = await chai.request(app).post('/api/obvius').send({ email: unauthorizedUser.email, password: unauthorizedUser.password });
-						expect(res).to.have.status(401); // request should respond with http code of 401 for unauthorized request
+						// request should respond with http code of 401 for failed user
+						expect(res).to.have.status(401);
+						// Should also return expected message
+						expect(res.text).equals("Got request to 'Obvius pipeline' with invalid authorization level. Obvius role is at least required to 'Obvius pipeline'.");
 					})
 				}
 			}
