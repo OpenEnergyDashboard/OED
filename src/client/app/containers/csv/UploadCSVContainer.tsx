@@ -49,6 +49,7 @@ export default class UploadCSVContainer extends React.Component<{}, UploadCSVCon
 		this.toggleCreateMeter = this.toggleCreateMeter.bind(this);
 		this.toggleGzip = this.toggleGzip.bind(this);
 		this.toggleHeaderRow = this.toggleHeaderRow.bind(this);
+		this.toggleRefreshHourlyReadings = this.toggleRefreshHourlyReadings.bind(this);
 		this.toggleRefreshReadings = this.toggleRefreshReadings.bind(this);
 		this.toggleUpdate = this.toggleUpdate.bind(this);
 		this.toggleTab = this.toggleTab.bind(this);
@@ -189,6 +190,16 @@ export default class UploadCSVContainer extends React.Component<{}, UploadCSVCon
 		}
 	}
 
+	private toggleRefreshHourlyReadings() {
+		this.setState(previousState => ({
+			...previousState,
+			uploadReadingsPreferences: {
+				...previousState.uploadReadingsPreferences,
+				refreshReadings: !previousState.uploadReadingsPreferences.refreshHourlyReadings
+			}
+		}))
+	}
+
 	private toggleRefreshReadings() {
 		this.setState(previousState => ({
 			...previousState,
@@ -271,6 +282,7 @@ export default class UploadCSVContainer extends React.Component<{}, UploadCSVCon
 							toggleCreateMeter={this.toggleCreateMeter}
 							toggleGzip={this.toggleGzip(MODE.readings)}
 							toggleHeaderRow={this.toggleHeaderRow(MODE.readings)}
+							toggleRefreshHourlyReadings={this.toggleRefreshHourlyReadings}
 							toggleRefreshReadings={this.toggleRefreshReadings}
 							toggleUpdate={this.toggleUpdate(MODE.readings)}
 						/>
