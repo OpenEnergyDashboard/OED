@@ -9,12 +9,12 @@ const { log } = require('../log');
 const { getConnection } = require('../db');
 const Reading = require('../models/Reading');
 
-async function refreshReadingViews() {
+async function refreshHourlyReadingViews() {
 	const conn = getConnection();
 
-	log.info('Refreshing Reading Views');
-	await Reading.refreshCompressedReadings(conn);
-	log.info('Views Refreshed');
+	log.info('Refreshing Materialized Hourly Reading Views');
+	await Reading.refreshCompressedHourlyReadings(conn);
+	log.info('Materialized Hourly Views Refreshed');
 }
 
-module.exports = { refreshReadingViews };
+module.exports = { refreshHourlyReadingViews };
