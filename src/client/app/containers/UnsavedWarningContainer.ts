@@ -2,7 +2,7 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
 
-import { removeUnsavedChanges } from '../actions/unsavedWarning';
+import { removeUnsavedChanges, flipLogOutState } from '../actions/unsavedWarning';
 import { connect } from 'react-redux';
 import UnsavedWarningComponent from '../components/UnsavedWarningComponent';
 import { State } from '../types/redux/state';
@@ -11,6 +11,7 @@ import { Dispatch } from '../types/redux/actions';
 function mapStateToProps(state: State) {
 	return {
 		hasUnsavedChanges: state.unsavedWarning.hasUnsavedChanges,
+		isLogOutClicked: state.unsavedWarning.isLogOutClicked,
 		removeFunction: state.unsavedWarning.removeFunction,
 		submitFunction: state.unsavedWarning.submitFunction
 	}
@@ -18,7 +19,8 @@ function mapStateToProps(state: State) {
 
 function mapDispatchToProps(dispatch: Dispatch) {
 	return {
-		removeUnsavedChanges: () => dispatch(removeUnsavedChanges())
+		removeUnsavedChanges: () => dispatch(removeUnsavedChanges()),
+		flipLogOutState: () => dispatch(flipLogOutState())
 	};
 }
 
