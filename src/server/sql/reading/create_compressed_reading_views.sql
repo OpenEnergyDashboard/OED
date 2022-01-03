@@ -50,7 +50,7 @@ This is the best-case scenario for these queries, and leads to quick execution t
 /*
  The minutely_readings view below is no longer used. Instead of reading from this view,
  we choose to reading directly from the raw readings table.
- */
+
 CREATE OR REPLACE VIEW
 minutely_readings
 	AS SELECT
@@ -81,6 +81,7 @@ minutely_readings
 						'1 minute'::INTERVAL
 				) gen(interval_start)
 			GROUP BY r.meter_id, gen.interval_start;
+*/
 
 CREATE MATERIALIZED VIEW IF NOT EXISTS
 hourly_readings
@@ -160,25 +161,56 @@ AS $$
 DECLARE
 	requested_interval INTERVAL;
 	requested_range TSRANGE;
-	minimum_num_pts INTEGER = 50;
-BEGIN
-	/*
-		We need to figure out which table to query from.
-		We choose that we want at least 50 points for a given time interval because a much larger
-		number would lead to really large scans of the hourly table (which is not materialized) right
-		before the switch to days.
 
-		For example, if we specified at least 100 points, and the range was 99 days and 23 hours, then we would have
-		to scan (100 days * 24 hours - 1 hour) * (60 minutes) * (n meters) worth of data. That's 143940 rows per meter
-		if the meters are minute precision! Each meter reading has at least 4 ints (meter_id, reading, start/end timestamp),
-		totalling slightly over 2.2 megabytes of data per meter. This balloons significantly when it's sent as JSON,
-		leading to unacceptable load times for the client, especially if they're on a mobile device.
+	/*
+		The minimum day and hourly points are determined so that data is read from the daily view when the
+		requested interval is at least two months, from the hourly view when between two months and at least two weeks,
+		and directly from the raw readings table when under two weeks.
+
+		+----------------------+--------------------
+		| Space considerations |
+		+----------------------+
+		Each row returned by this function contains 1 INT (meter_id), 2 TIMESTAMPs (start/end stimestamp), and
+		1 FLOAT (reading_rate). According to PostgreSQL documentation, the storage size of INT is 4 bytes,
+		TIMESTAMP is 8 bytes, and FLOAT is 8 bytes, and so each row totals to 28 bytes of data.
+
+		For example, if the requested range is one year, this algorithm will read from the materialized daily view
+		and return 0.01 megabytes of data.
+		
+		From the hourly view, the number rows that can be read ranges from 360 (the minimum) to 60 * 24 = 1440
+		points. Hence, the amount of data read from the hourly view ranges from 0.010 to 0.040 megabytes
+		per meter. 
+		
+		From the readings table, the number of rows returned depends on the raw reading granularity.
+		The most common reading granularity for electric meters is 15-minutes, which means the meter
+		stores data for every 15-minute interval.
+
+		The transition from hourly to raw readings occurs when the number of hourly points is 359 or less which is
+		less than 15 days or roughly two weeks.
+
+		If the granularity is 15-minutes, then the maximum amount of raw points is 359 * 4 = 1436, which translates
+		to 0.040 megabytes per meter.
+		If instead the raw readings granularity is 1-minute, then the maximum amount of raw points is 359 * 60 = 21540,
+		which translates to 0.60 megabytes per meter. 
+		
+
+		+------+-------------------
+		| TODO |
+		+------+
+		- Note that the above documentation does not account for the increase in data when packaged in JSON format.
+		- This function is complicated by the fact that groups can contain meters with different levels of granularity.
+		We address this now by having sites pick a site-level reading frequency. (Not done)
+		- When resource generalization is implemented in OED, this function will need to be done in a 
+		meter-by-meter basis, since different resource meters will have different levels of granularity.
 	*/
+	minimum_day_points INTEGER = 61;
+	minimum_hour_points INTEGER = 360;
+BEGIN
 
 	requested_range := shrink_tsrange_to_real_readings(tsrange(start_stamp, end_stamp, '[]'));
 	requested_interval := upper(requested_range) - lower(requested_range);
 
-	IF extract(DAY FROM requested_interval) >= minimum_num_pts THEN
+	IF extract(DAY FROM requested_interval) >= minimum_day_points THEN
 		RETURN QUERY
 			SELECT
 				daily.meter_id AS meter_id,
@@ -189,7 +221,7 @@ BEGIN
 			INNER JOIN unnest(meter_ids) meters(id) ON daily.meter_id = meters.id
 			WHERE requested_range @> time_interval;
 	-- There's no quick way to get the number of hours in an interval. extract(HOURS FROM '1 day, 3 hours') gives 3.
-	ELSIF extract(EPOCH FROM requested_interval)/3600 >= minimum_num_pts THEN
+	ELSIF extract(EPOCH FROM requested_interval)/3600 >= minimum_hour_points THEN
 		RETURN QUERY
 			SELECT hourly.meter_id AS meter_id,
 				hourly.reading_rate,
