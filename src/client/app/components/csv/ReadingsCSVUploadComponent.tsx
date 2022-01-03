@@ -285,7 +285,12 @@ export default class ReadingsCSVUploadComponent extends React.Component<Readings
 					</FormGroup>
 					<FormGroup check style={checkboxStyle}>
 						<Label check>
-							<Input checked={this.props.refreshHourlyReadings} type='checkbox' name='refreshHourlyReadings' onChange={this.props.toggleRefreshHourlyReadings} />
+							<Input
+								checked={this.props.refreshHourlyReadings}
+								type='checkbox'
+								name='refreshHourlyReadings'
+								onChange={this.props.toggleRefreshHourlyReadings}
+							/>
 							<FormattedMessage id='csv.readings.param.refresh.hourlyReadings' />
 						</Label>
 					</FormGroup>
