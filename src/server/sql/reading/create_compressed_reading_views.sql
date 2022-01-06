@@ -155,7 +155,7 @@ CREATE INDEX if not exists idx_daily_readings ON daily_readings USING GIST(time_
 /*
 The following function determines the correct duration view to query from, and returns compressed data from it.
  */
-CREATE OR REPLACE FUNCTION compressed_readings_2(meter_ids INTEGER[], start_stamp TIMESTAMP, end_stamp TIMESTAMP)
+CREATE OR REPLACE FUNCTION compressed_readings_2(meter_ids INTEGER[], start_stamp TIMESTAMP, end_stamp TIMESTAMP, min_day_points INTEGER, min_hour_points INTEGER)
 	RETURNS TABLE(meter_id INTEGER, reading_rate FLOAT, start_timestamp TIMESTAMP, end_timestamp TIMESTAMP)
 AS $$
 DECLARE
@@ -203,14 +203,12 @@ DECLARE
 		- When resource generalization is implemented in OED, this function will need to be done in a 
 		meter-by-meter basis, since different resource meters will have different levels of granularity.
 	*/
-	minimum_day_points INTEGER = 61;
-	minimum_hour_points INTEGER = 360;
 BEGIN
 
 	requested_range := shrink_tsrange_to_real_readings(tsrange(start_stamp, end_stamp, '[]'));
 	requested_interval := upper(requested_range) - lower(requested_range);
 
-	IF extract(DAY FROM requested_interval) >= minimum_day_points THEN
+	IF extract(DAY FROM requested_interval) > min_day_points THEN
 		RETURN QUERY
 			SELECT
 				daily.meter_id AS meter_id,
@@ -221,7 +219,7 @@ BEGIN
 			INNER JOIN unnest(meter_ids) meters(id) ON daily.meter_id = meters.id
 			WHERE requested_range @> time_interval;
 	-- There's no quick way to get the number of hours in an interval. extract(HOURS FROM '1 day, 3 hours') gives 3.
-	ELSIF extract(EPOCH FROM requested_interval)/3600 >= minimum_hour_points THEN
+	ELSIF extract(EPOCH FROM requested_interval)/3600 > min_hour_points THEN
 		RETURN QUERY
 			SELECT hourly.meter_id AS meter_id,
 				hourly.reading_rate,
@@ -245,7 +243,7 @@ END;
 $$ LANGUAGE 'plpgsql';
 
 
-CREATE OR REPLACE FUNCTION compressed_group_readings_2(group_ids INTEGER[], start_stamp TIMESTAMP, end_stamp TIMESTAMP)
+CREATE OR REPLACE FUNCTION compressed_group_readings_2(group_ids INTEGER[], start_stamp TIMESTAMP, end_stamp TIMESTAMP, min_day_points INTEGER, min_hour_points INTEGER)
 	RETURNS TABLE(group_id INTEGER, reading_rate FLOAT, start_timestamp TIMESTAMP, end_timestamp TIMESTAMP)
 AS $$
 	DECLARE
@@ -262,7 +260,7 @@ AS $$
 				SUM(compressed.reading_rate) AS reading_rate,
 				compressed.start_timestamp,
 				compressed.end_timestamp
-			FROM compressed_readings_2(meter_ids, start_stamp, end_stamp) compressed
+			FROM compressed_readings_2(meter_ids, start_stamp, end_stamp, min_day_points, min_hour_points) compressed
 			INNER JOIN groups_deep_meters gdm ON compressed.meter_id = gdm.meter_id
 			INNER JOIN unnest(group_ids) gids(id) on gdm.group_id = gids.id
 			GROUP BY gdm.group_id, compressed.start_timestamp, compressed.end_timestamp;

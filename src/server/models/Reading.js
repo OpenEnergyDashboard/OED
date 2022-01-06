@@ -4,6 +4,7 @@
 
 const database = require('./database');
 const { mapToObject } = require('../util');
+const determineMinPoints = require('../sql/reading/determineMinPoints');
 
 const sqlFile = database.sqlFile;
 
@@ -346,10 +347,13 @@ class Reading {
 	 * @return {Promise<object<int, array<{reading_rate: number, start_timestamp: }>>>}
 	 */
 	static async getNewCompressedReadings(meterIDs, fromTimestamp = null, toTimestamp = null, conn) {
+		const [minDayPoints, minHourPoints] = determineMinPoints();
 		/**
 		 * @type {array<{meter_id: int, reading_rate: Number, start_timestamp: Moment, end_timestamp: Moment}>}
 		 */
-		const allCompressedReadings = await conn.func('compressed_readings_2', [meterIDs, fromTimestamp || '-infinity', toTimestamp || 'infinity']);
+		const allCompressedReadings = await conn.func('compressed_readings_2',
+			[meterIDs, fromTimestamp || '-infinity', toTimestamp || 'infinity', minDayPoints, minHourPoints]
+			);
 
 		const compressedReadingsByMeterID = mapToObject(meterIDs, () => []);
 		for (const row of allCompressedReadings) {
@@ -370,10 +374,13 @@ class Reading {
 	 * @return {Promise<object<int, array<{reading_rate: number, start_timestamp: Moment, end_timestamp: Moment}>>>}
 	 */
 	static async getNewCompressedGroupReadings(groupIDs, fromTimestamp, toTimestamp, conn) {
+		const [minDayPoints, minHourPoints] = determineMinPoints();
 		/**
 		 * @type {array<{group_id: int, reading_rate: Number, start_timestamp: Moment, end_timestamp: Moment}>}
 		 */
-		const allCompressedGroupReadings = await conn.func('compressed_group_readings_2', [groupIDs, fromTimestamp, toTimestamp]);
+		const allCompressedGroupReadings = await conn.func('compressed_group_readings_2',
+			[groupIDs, fromTimestamp, toTimestamp, minDayPoints, minHourPoints]
+			);
 
 		const compressedReadingsByGroupID = mapToObject(groupIDs, () => []);
 		for (const row of allCompressedGroupReadings) {
