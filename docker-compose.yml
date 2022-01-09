@@ -42,7 +42,7 @@ services:
             - OED_MAIL_FROM=mydomain@example.com # The email address that the email will come from
             - OED_MAIL_TO=someone@example.com  # Set the destination address here for where to send emails
             - OED_MAIL_ORG=My Organization Name # Org name for mail that is included in the subject
-            - OED_SITE_READING_RATE=00:15:00 # Set the reading rate (i.e. granularity) of meters here. DEFAULT 15 minutes.
+            - OED_SITE_READING_RATE=00:15:00 # Set the reading rate (i.e. granularity) of meters here. This should be formatted hh:mm:ss. DEFAULT 15 minutes.
             - OED_TEST_SITE_READING_RATE=00:15:00
             # If in a subdirectory, set it here
             # - OED_SUBDIR=/subdir/
