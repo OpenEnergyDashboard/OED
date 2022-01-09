@@ -49,7 +49,4 @@ config.serverPort = process.env.OED_SERVER_PORT;
 config.logFile = process.env.OED_LOG_FILE || 'log.txt';
 config.subdir = process.env.OED_SUBDIR || '';
 
-config.siteReadingRate = process.env.OED_SITE_READING_RATE;
-config.siteReadingRateDEFAULT = '00:15:00';
-
 module.exports = config;

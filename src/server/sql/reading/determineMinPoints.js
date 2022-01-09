@@ -2,7 +2,6 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
 
-const config = require('../../config');
 const moment = require('moment');
 const { log } = require('../../log');
 
@@ -24,14 +23,15 @@ function determineMinPoints(){
 	// For other rates we have:
 	// 1 minute -> interval under 24 hours or 1 day
 	// 5 minute -> interval under 120 hours or 2 days
-	const rawDataGranularity = moment.duration(config.siteReadingRate);
+	const siteReadingRate = process.env.OED_SITE_READING_RATE;
+	const rawDataGranularity = moment.duration(siteReadingRate);
 
 	const regex = /^(?:(?:(\d+):)?([0-5]?\d):)?([0-5]?\d)$/
 	// regex checks if string is in the ranges:
 	// 00:00:00 - 00:00:59
 	// 00:01:00 - 00:59:59
 	// 01:00:00 - \d+:59:59
-	if(!regex.test(config.siteReadingRate)){
+	if(!regex.test(siteReadingRate)){
 		log.warn('Invalid Site Level Reading Rate format');
 	}
 
