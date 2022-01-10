@@ -347,7 +347,7 @@ class Reading {
 	 * @return {Promise<object<int, array<{reading_rate: number, start_timestamp: }>>>}
 	 */
 	static async getNewCompressedReadings(meterIDs, fromTimestamp = null, toTimestamp = null, conn) {
-		const [minDayPoints, minHourPoints] = determineMinPoints();
+		const [minHourPoints, minDayPoints] = determineMinPoints();
 		/**
 		 * @type {array<{meter_id: int, reading_rate: Number, start_timestamp: Moment, end_timestamp: Moment}>}
 		 */
@@ -374,7 +374,7 @@ class Reading {
 	 * @return {Promise<object<int, array<{reading_rate: number, start_timestamp: Moment, end_timestamp: Moment}>>>}
 	 */
 	static async getNewCompressedGroupReadings(groupIDs, fromTimestamp, toTimestamp, conn) {
-		const [minDayPoints, minHourPoints] = determineMinPoints();
+		const [minHourPoints, minDayPoints] = determineMinPoints();
 		/**
 		 * @type {array<{group_id: int, reading_rate: Number, start_timestamp: Moment, end_timestamp: Moment}>}
 		 */

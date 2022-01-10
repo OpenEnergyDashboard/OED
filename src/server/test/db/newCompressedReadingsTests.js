@@ -10,6 +10,8 @@ const Meter = require('../../models/Meter');
 const Reading = require('../../models/Reading');
 const Group = require('../../models/Group');
 const Point = require('../../models/Point');
+const { generateSineData } = require('../../data/generateTestingData');
+const { DEFAULT_OPTIONS } = require('../../data/automatedTestingData');
 const gps = new Point(90, 45);
 
 mocha.describe('Compressed Readings 2', () => {
@@ -233,6 +235,91 @@ mocha.describe('Compressed Readings 2', () => {
 			// const aRow = meterReadings[0];
 			// const rowWidth = moment.duration(aRow.end_timestamp.diff(aRow.start_timestamp));
 			// expect(rowWidth.asDays()).to.equal(1);
+		});
+
+		mocha.describe('Compression for underlying 15-minute data:', () => {
+			let meter;
+			// Uploading data that is over one months at 15-minute intervals causes Mocha to timeout.
+			const startDate = '2020-01-01 00:00:00';
+			const endDate = '2020-02-01 00:00:00';
+			mocha.beforeEach(async () => {
+				const conn = testDB.getConnection();
+				await new Meter(undefined, 'Meter1', null, false, true, Meter.type.MAMAC, null, gps).insert(conn);
+				meter = await Meter.getByName('Meter1', conn);
+				const data = generateSineData(startDate, endDate, { timeStep: { minute: 15 }}).map(row => new Reading(meter.id, row[0], row[1], row[2]));
+				await Reading.insertAll(data, conn);
+				await Reading.refreshCompressedReadings(conn);
+
+				// We need to refresh the hourly readings view because it is materialized.
+				await Reading.refreshCompressedHourlyReadings(conn);
+			});
+
+			mocha.it('Daily resolution:', async () => {
+				const start = moment(startDate);
+				const end = moment(startDate).clone();
+				end.add(61, 'days');
+				const allReadings = await Reading.getNewCompressedReadings([meter.id], start, end, conn);
+				expect(allReadings['2'].length).to.greaterThan(61); // more data will be returned because of shift down to the hour view.
+			});
+
+			mocha.it('Hour resolution', async () => {
+				const start = moment(startDate);
+				const end = moment(startDate).clone();
+				end.add(61, 'days');
+				const allReadings = await Reading.getNewCompressedReadings([meter.id], start, end, conn);
+				expect(allReadings['2'].length).to.equal(24 * 31);
+			});
+
+			mocha.it('Raw resolution', async () => {
+				const start = moment(startDate);
+				const end = moment(startDate).clone();
+				end.add(14, 'days');
+				const allReadings = await Reading.getNewCompressedReadings([meter.id], start, end, conn);
+				const hourToRawScaleFactor = 4; // This is four since there are four 15-minute intervals in one hour.
+				expect(allReadings['2'].length).to.equal(14 * 24 * hourToRawScaleFactor);
+			});
+		});
+
+		mocha.describe('Compression for underlying 23-minute data:', () => {
+			let meter;
+			const startDate = '2020-01-01 00:00:00';
+			const endDate = '2020-02-01 00:00:00';
+			mocha.beforeEach(async () => {
+				const conn = testDB.getConnection();
+				await new Meter(undefined, 'Meter1', null, false, true, Meter.type.MAMAC, null, gps).insert(conn);
+				meter = await Meter.getByName('Meter1', conn);
+				const data = generateSineData(startDate, endDate, { timeStep: { minute: 23 }}).map(row => new Reading(meter.id, row[0], row[1], row[2]));
+				await Reading.insertAll(data, conn);
+				await Reading.refreshCompressedReadings(conn);
+
+				// We need to refresh the hourly readings view because it is materialized.
+				await Reading.refreshCompressedHourlyReadings(conn);
+			});
+
+			mocha.it('Daily resolution:', async () => {
+				const start = moment(startDate);
+				const end = moment(startDate).clone();
+				end.add(61, 'days');
+				const allReadings = await Reading.getNewCompressedReadings([meter.id], start, end, conn);
+				expect(allReadings['2'].length).to.greaterThan(61); // more data will be returned because of shift down to the hour view.
+			});
+
+			mocha.it('Hour resolution', async () => {
+				const start = moment(startDate);
+				const end = moment(startDate).clone();
+				end.add(61, 'days');
+				const allReadings = await Reading.getNewCompressedReadings([meter.id], start, end, conn);
+				expect(allReadings['2'].length).to.equal(24 * 31);
+			});
+
+			mocha.it('Raw resolution', async () => {
+				const start = moment(startDate);
+				const end = moment(startDate).clone();
+				end.add(14, 'days');
+				const allReadings = await Reading.getNewCompressedReadings([meter.id], start, end, conn);
+				const hourToRawScaleFactor = 1 / (moment.duration('00:23:00').asHours()); // The number of 23-minute intervals in one hour.
+				expect(allReadings['2'].length).to.be.closeTo(14 * 24 * hourToRawScaleFactor, 1);
+			});
 		});
 
 		mocha.it('Correctly shrinks infinite intervals', async () => {
