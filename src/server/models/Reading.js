@@ -98,7 +98,11 @@ class Reading {
 
 	/**
 	 * Refreshes the compressed hourly readings view.
-	 * Should be called at least once a day, preferably in the middle of the night.
+	 * Should be called at least once a day but need to do hourly if the site wants zooming in
+	 * to see hourly data as it is available. This function can take more time than refreshing
+	 * the daily readings so be sure calling it more frequently does not impact the
+	 * server response time. If only called once a day, then probably best to do so in the middle
+	 * of the night as suggested for daily refresh.
 	 * @param conn The connection to use
 	 * @return {Promise<void>}
 	 */
