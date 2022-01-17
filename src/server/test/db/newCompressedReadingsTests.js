@@ -139,7 +139,7 @@ mocha.describe('Compressed Readings 2', () => {
 
 		mocha.it('Retrieves the correct number of readings when asked for a short interval', async () => {
 			const dayStart = moment('2018-01-01');
-			const dayEnd = dayStart.clone().add(1, 'day');
+			const dayEnd = dayStart.clone().add(15, 'minute');
 
 			const conn = testDB.getConnection();
 			await Reading.insertAll([
@@ -151,19 +151,15 @@ mocha.describe('Compressed Readings 2', () => {
 			// We need to refresh the hourly readings view because it is materialized.
 			await Reading.refreshCompressedHourlyReadings(conn);
 
-			const meterReadings = await Reading.getNewCompressedReadings([meter.id], dayStart, dayStart.clone().add(1, 'minute'), conn);
+			const meterReadings = await Reading.getNewCompressedReadings([meter.id], dayStart, dayStart.clone().add(15, 'minute'), conn);
 
-			// TODO: We want to return at least some value for this interval instead of nothing. 
-			// This will be fixed when meter-by-meter compressed readings is implemented.
-			// Problem: Switching to the raw view results in returning no data
-			// because there is no data point in this single-minute
-			// interval as the underlying data is daily.
-			expect(meterReadings[meter.id].length).to.equal(0);
+			expect(meterReadings[meter.id].length).to.equal(1);
+			expect(meterReadings[meter.id][0].reading_rate).to.equal(100 / (15/60));
 		});
 
 		mocha.it('Retrieves the correct number of readings when asked for a long interval', async () => {
 			const dayStart = moment('2018-01-01');
-			const dayEnd = dayStart.clone().add(1, 'day');
+			const dayEnd = dayStart.clone().add(15, 'minute');
 
 			const conn = testDB.getConnection();
 			await Reading.insertAll([
@@ -175,19 +171,14 @@ mocha.describe('Compressed Readings 2', () => {
 			// We need to refresh the hourly readings view because it is materialized.
 			await Reading.refreshCompressedHourlyReadings(conn);
 
-			// TODO: We want to return at least some value for this interval instead of nothing. 
-			// This will be fixed when meter-by-meter compressed readings is implemented.
-			// Problem: Switching to the raw view results in returning no data
-			// because there is no data point in this single-minute
-			// interval as the underlying data is daily.
 			const meterReadings = await Reading.getNewCompressedReadings([meter.id], dayStart, dayStart.clone().add(1, 'hours').toString(), conn);
-			expect(meterReadings[meter.id].length).to.equal(0);
-			// expect(meterReadings[meter.id].length).to.equal(60);
+			expect(meterReadings[meter.id].length).to.equal(1);
+			expect(meterReadings[meter.id][0].reading_rate).to.equal(100 / (15/60));
 		});
 
 		mocha.it('Retrieves the correct type of readings when asked for an hour-resolution interval', async () => {
 			const yearStart = moment('2018-01-01');
-			const yearEnd = yearStart.clone().add(1, 'year');
+			const yearEnd = yearStart.clone().add(15, 'minute');
 
 			const conn = testDB.getConnection();
 			await Reading.insertAll([
@@ -201,20 +192,12 @@ mocha.describe('Compressed Readings 2', () => {
 			const allReadings = await Reading.getNewCompressedReadings([meter.id], yearStart, yearStart.clone().add(60, 'hours'), conn);
 			const meterReadings = allReadings[meter.id];
 
-			// TODO: We want to return at least some value for this interval instead of nothing. 
-			// This will be fixed when meter-by-meter compressed readings is implemented.
-			// Problem: Switching to the raw view results in returning no data
-			// because there is no data point in this single-minute
-			// interval as the underlying data is daily.
-			expect(meterReadings.length).to.equal(0);
-			// expect(meterReadings.length).to.equal(60);
-			// const aRow = meterReadings[0];
-			// const rowWidth = moment.duration(aRow.end_timestamp.diff(aRow.start_timestamp));
-			// expect(rowWidth.asHours()).to.equal(1);
+			expect(meterReadings.length).to.equal(1);
+			expect(meterReadings[0].reading_rate).to.equal(100 / (15/60));
 		});
 		mocha.it('Retrieves the correct type of readings when asked for a day-resolution interval', async () => {
 			const yearStart = moment('2018-01-01');
-			const yearEnd = yearStart.clone().add(1, 'year');
+			const yearEnd = yearStart.clone().add(15, 'minute');
 
 			const conn = testDB.getConnection();
 			await Reading.insertAll([
@@ -224,16 +207,8 @@ mocha.describe('Compressed Readings 2', () => {
 			await Reading.refreshCompressedReadings(conn);
 			const allReadings = await Reading.getNewCompressedReadings([meter.id], yearStart, yearStart.clone().add(60, 'days'), conn);
 			const meterReadings = allReadings[meter.id];
-			// TODO: We want to return at least some value for this interval instead of nothing. 
-			// This will be fixed when meter-by-meter compressed readings is implemented.
-			// Problem: Switching to the raw view results in returning no data
-			// because there is no data point in this single-minute
-			// interval as the underlying data is daily.
-			expect(meterReadings.length).to.equal(0);
-			// expect(meterReadings.length).to.equal(60);
-			// const aRow = meterReadings[0];
-			// const rowWidth = moment.duration(aRow.end_timestamp.diff(aRow.start_timestamp));
-			// expect(rowWidth.asDays()).to.equal(1);
+			expect(meterReadings.length).to.equal(1);
+			expect(meterReadings[0].reading_rate).to.equal(100 / (15/60));
 		});
 
 		mocha.describe('Compression for underlying 15-minute data:', () => {
@@ -241,7 +216,7 @@ mocha.describe('Compressed Readings 2', () => {
 			const startDate = '2020-01-01 00:00:00';
 			const endDate = '2020-04-01 00:00:00';
 			mocha.beforeEach(async function () {
-				this.timeout(5000); // extend timeout because refreshes take a longer time.
+				this.timeout(10000); // extend timeout because refreshes take a longer time.
 				const conn = testDB.getConnection();
 				await new Meter(undefined, 'Meter1', null, false, true, Meter.type.MAMAC, null, gps).insert(conn);
 				meter1 = await Meter.getByName('Meter1', conn);
