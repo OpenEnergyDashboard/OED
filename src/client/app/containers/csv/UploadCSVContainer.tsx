@@ -195,7 +195,7 @@ export default class UploadCSVContainer extends React.Component<{}, UploadCSVCon
 			...previousState,
 			uploadReadingsPreferences: {
 				...previousState.uploadReadingsPreferences,
-				refreshReadings: !previousState.uploadReadingsPreferences.refreshHourlyReadings
+				refreshHourlyReadings: !previousState.uploadReadingsPreferences.refreshHourlyReadings
 			}
 		}))
 	}
