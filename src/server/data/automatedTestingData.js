@@ -303,7 +303,6 @@ function generateVariableAmplitudeTestingData() {
 }
 
 module.exports = {
-	DEFAULT_OPTIONS,
 	generateSineTestingData,
 	generateSineSquaredTestingData,
 	generateCosineTestingData,

@@ -134,7 +134,7 @@ mocha.describe('Compressed Readings 2', () => {
 				expect(reading.reading_rate).to.be.closeTo(100 / 24, 0.00001);
 			}
 
-			expect(readingsForMeter.length).to.equal(1); // minutes in a day
+			expect(readingsForMeter.length).to.equal(1);
 		});
 
 		mocha.it('Retrieves the correct number of readings when asked for a short interval', async () => {
