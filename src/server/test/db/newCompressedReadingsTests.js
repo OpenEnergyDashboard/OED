@@ -238,10 +238,10 @@ mocha.describe('Compressed Readings 2', () => {
 
 		mocha.describe('Compression for underlying 15-minute data:', () => {
 			let meter1;
-			// Uploading data that is over one months at 15-minute intervals causes Mocha to timeout.
 			const startDate = '2020-01-01 00:00:00';
-			const endDate = '2020-02-01 00:00:00';
-			mocha.beforeEach(async () => {
+			const endDate = '2020-04-01 00:00:00';
+			mocha.beforeEach(async function () {
+				this.timeout(5000); // extend timeout because refreshes take a longer time.
 				const conn = testDB.getConnection();
 				await new Meter(undefined, 'Meter1', null, false, true, Meter.type.MAMAC, null, gps).insert(conn);
 				meter1 = await Meter.getByName('Meter1', conn);
@@ -259,14 +259,14 @@ mocha.describe('Compressed Readings 2', () => {
 				end.add(61, 'days');
 				const allReadings = await Reading.getNewCompressedReadings([meter1.id], start, end, conn);
 				expect(allReadings['2'].length).to.greaterThan(61); // more data will be returned because of shift down to the hour view.
-			});
+			}) //.timeout(10000);
 
 			mocha.it('Hour resolution', async () => {
 				const start = moment(startDate);
 				const end = moment(startDate).clone();
 				end.add(61, 'days');
 				const allReadings = await Reading.getNewCompressedReadings([meter1.id], start, end, conn);
-				expect(allReadings['2'].length).to.equal(24 * 31);
+				expect(allReadings['2'].length).to.equal(24 * 61);
 			});
 
 			mocha.it('Raw resolution', async () => {
@@ -282,8 +282,9 @@ mocha.describe('Compressed Readings 2', () => {
 		mocha.describe('Compression for underlying 23-minute data:', () => {
 			let meter1;
 			const startDate = '2020-01-01 00:00:00';
-			const endDate = '2020-02-01 00:00:00';
-			mocha.beforeEach(async () => {
+			const endDate = '2020-04-01 00:00:00';
+			mocha.beforeEach(async function () {
+				this.timeout(5000); // extend timeout because refreshes take a longer time.
 				const conn = testDB.getConnection();
 				await new Meter(undefined, 'Meter1', null, false, true, Meter.type.MAMAC, null, gps).insert(conn);
 				meter1 = await Meter.getByName('Meter1', conn);
@@ -308,7 +309,7 @@ mocha.describe('Compressed Readings 2', () => {
 				const end = moment(startDate).clone();
 				end.add(61, 'days');
 				const allReadings = await Reading.getNewCompressedReadings([meter1.id], start, end, conn);
-				expect(allReadings['2'].length).to.equal(24 * 31);
+				expect(allReadings['2'].length).to.equal(24 * 61);
 			});
 
 			mocha.it('Raw resolution', async () => {
