@@ -62,7 +62,8 @@ const DEFAULTS = {
 		lengthVariation: undefined,
 		endOnly: undefined,
 		createMeter: 'false',
-		refreshReadings: 'false'
+		refreshReadings: 'false',
+		refreshHourlyReadings: 'false'
 	}
 }
 
@@ -105,7 +106,8 @@ const VALIDATION = {
 			lengthVariation: new StringParam('lengthVariation', undefined, undefined),
 			endOnly: new EnumParam('endOnly', [BooleanTypesJS.true, BooleanTypesJS.false, BooleanTypesJS.meter]),
 			createMeter: new BooleanParam('createMeter'),
-			refreshReadings: new BooleanParam('refreshReadings')
+			refreshReadings: new BooleanParam('refreshReadings'),
+			refreshHourlyReadings: new BooleanParam('refreshHourlyReadings')
 		},
 		additionalProperties: false // This protects us from unintended parameters as well as typos.
 	}

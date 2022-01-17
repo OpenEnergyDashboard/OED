@@ -21,6 +21,7 @@ const uploadMeters = require('../services/csvPipeline/uploadMeters');
 const uploadReadings = require('../services/csvPipeline/uploadReadings');
 const zlib = require('zlib');
 const { refreshReadingViews } = require('../services/refreshReadingViews');
+const { refreshHourlyReadingViews } = require('../services/refreshHourlyReadingViews');
 const { success, failure } = require('../services/csvPipeline/success');
 const { BooleanTypesJS } = require('../services/csvPipeline/validateCsvUploadParams');
 
@@ -149,6 +150,7 @@ router.post('/meters', validateMetersCsvUploadParams, async (req, res) => {
 router.post('/readings', validateReadingsCsvUploadParams, async (req, res) => {
 	const isGzip = req.body.gzip === 'true';
 	const isRefreshReadings = req.body.refreshReadings === BooleanTypesJS.true;
+	const isRefreshHourlyReadings = req.body.refreshHourlyReadings === BooleanTypesJS.true;
 	const uploadedFilepath = req.file.path;
 	let csvFilepath;
 	let isAllReadingsOk;
@@ -172,6 +174,10 @@ router.post('/readings', validateReadingsCsvUploadParams, async (req, res) => {
 		if (isRefreshReadings) {
 			// Refresh readings so show when daily data is used.
 			await refreshReadingViews();
+		}
+		if (isRefreshHourlyReadings) {
+			// Refresh readings so show when hourly data is used.
+			await refreshHourlyReadingViews();
 		}
 	} catch (error) {
 		failure(req, res, error);

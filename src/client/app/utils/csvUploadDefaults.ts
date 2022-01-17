@@ -20,6 +20,7 @@ export const ReadingsCSVUploadDefaults: ReadingsCSVUploadPreferencesItem = {
 	createMeter: false,
 	gzip: false,
 	headerRow: false,
+	refreshHourlyReadings: false,
 	refreshReadings: false,
 	update: false
 }

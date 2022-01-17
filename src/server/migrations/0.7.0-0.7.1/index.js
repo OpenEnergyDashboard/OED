@@ -10,5 +10,8 @@ module.exports = {
 	toVersion: '0.7.1',
 	up: async db => {
 		await db.none(sqlFile('../migrations/0.7.0-0.7.1/sql/preferences/alter_preferences_type.sql'));
+		await db.none(sqlFile('../migrations/0.7.0-0.7.1/sql/readings/create_materialized_hourly_readings.sql'));
+		await db.none(sqlFile('../migrations/0.7.0-0.7.1/sql/readings/drop_minutely_readings.sql'));
+		await db.none(sqlFile('../migrations/0.7.0-0.7.1/sql/readings/replace_compressed_readings_2.sql'));
 	}
 };

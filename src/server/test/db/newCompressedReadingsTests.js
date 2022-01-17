@@ -10,9 +10,12 @@ const Meter = require('../../models/Meter');
 const Reading = require('../../models/Reading');
 const Group = require('../../models/Group');
 const Point = require('../../models/Point');
+const { generateSineData } = require('../../data/generateTestingData');
 const gps = new Point(90, 45);
 
 mocha.describe('Compressed Readings 2', () => {
+	// Set reading rate in case changed at site.
+	process.env.OED_SITE_READING_RATE = process.env.OED_TEST_SITE_READING_RATE;
 
 	mocha.describe('Compressed meter readings', () => {
 		let meter;
@@ -37,6 +40,9 @@ mocha.describe('Compressed Readings 2', () => {
 				new Reading(meter.id, 400, timestamp4, timestamp5)
 			], conn);
 			await Reading.refreshCompressedReadings(conn);
+
+			// We need to refresh the hourly readings view because it is materialized.
+			await Reading.refreshCompressedHourlyReadings(conn);
 			const { meter_id, reading_rate } = await conn.one('SELECT * FROM hourly_readings WHERE lower(time_interval)=${start_timestamp};',
 				{ start_timestamp: timestamp1 });
 			expect(meter_id).to.equal(meter.id);
@@ -119,18 +125,21 @@ mocha.describe('Compressed Readings 2', () => {
 			expect(Object.keys(meterReadings).length).to.equal(1);
 			const readingsForMeter = meterReadings[meter.id];
 
+			// The data returned is daily data rather than minute data.
 			for (reading of readingsForMeter) {
 				const duration = moment.duration(reading.end_timestamp.diff(reading.start_timestamp));
-				expect(duration.asMilliseconds()).to.equal(moment.duration(1, 'minute').asMilliseconds());
+				// Since the interval is one day, compressed readings returns raw data.
+				expect(duration.asMilliseconds()).to.equal(moment.duration(1, 'day').asMilliseconds());
+				// 100 kWh over a day is 100/24 kW.
 				expect(reading.reading_rate).to.be.closeTo(100 / 24, 0.00001);
 			}
 
-			expect(readingsForMeter.length).to.equal(24 * 60); // minutes in a day
+			expect(readingsForMeter.length).to.equal(1);
 		});
 
 		mocha.it('Retrieves the correct number of readings when asked for a short interval', async () => {
 			const dayStart = moment('2018-01-01');
-			const dayEnd = dayStart.clone().add(1, 'day');
+			const dayEnd = dayStart.clone().add(15, 'minute');
 
 			const conn = testDB.getConnection();
 			await Reading.insertAll([
@@ -139,13 +148,18 @@ mocha.describe('Compressed Readings 2', () => {
 
 			await Reading.refreshCompressedReadings(conn);
 
-			const meterReadings = await Reading.getNewCompressedReadings([meter.id], dayStart, dayStart.clone().add(1, 'minute'), conn);
+			// We need to refresh the hourly readings view because it is materialized.
+			await Reading.refreshCompressedHourlyReadings(conn);
+
+			const meterReadings = await Reading.getNewCompressedReadings([meter.id], dayStart, dayStart.clone().add(15, 'minute'), conn);
 
 			expect(meterReadings[meter.id].length).to.equal(1);
+			expect(meterReadings[meter.id][0].reading_rate).to.equal(100 / (15/60));
 		});
+
 		mocha.it('Retrieves the correct number of readings when asked for a long interval', async () => {
 			const dayStart = moment('2018-01-01');
-			const dayEnd = dayStart.clone().add(1, 'day');
+			const dayEnd = dayStart.clone().add(15, 'minute');
 
 			const conn = testDB.getConnection();
 			await Reading.insertAll([
@@ -154,13 +168,17 @@ mocha.describe('Compressed Readings 2', () => {
 
 			await Reading.refreshCompressedReadings(conn);
 
-			const meterReadings = await Reading.getNewCompressedReadings([meter.id], dayStart, dayStart.clone().add(1, 'hours'), conn);
-			expect(meterReadings[meter.id].length).to.equal(60);
+			// We need to refresh the hourly readings view because it is materialized.
+			await Reading.refreshCompressedHourlyReadings(conn);
+
+			const meterReadings = await Reading.getNewCompressedReadings([meter.id], dayStart, dayStart.clone().add(1, 'hours').toString(), conn);
+			expect(meterReadings[meter.id].length).to.equal(1);
+			expect(meterReadings[meter.id][0].reading_rate).to.equal(100 / (15/60));
 		});
 
 		mocha.it('Retrieves the correct type of readings when asked for an hour-resolution interval', async () => {
 			const yearStart = moment('2018-01-01');
-			const yearEnd = yearStart.clone().add(1, 'year');
+			const yearEnd = yearStart.clone().add(15, 'minute');
 
 			const conn = testDB.getConnection();
 			await Reading.insertAll([
@@ -168,16 +186,18 @@ mocha.describe('Compressed Readings 2', () => {
 			], conn);
 
 			await Reading.refreshCompressedReadings(conn);
+			// We need to refresh the hourly readings view because it is materialized.
+			await Reading.refreshCompressedHourlyReadings(conn);
+
 			const allReadings = await Reading.getNewCompressedReadings([meter.id], yearStart, yearStart.clone().add(60, 'hours'), conn);
 			const meterReadings = allReadings[meter.id];
-			expect(meterReadings.length).to.equal(60);
-			const aRow = meterReadings[0];
-			const rowWidth = moment.duration(aRow.end_timestamp.diff(aRow.start_timestamp));
-			expect(rowWidth.asHours()).to.equal(1);
+
+			expect(meterReadings.length).to.equal(1);
+			expect(meterReadings[0].reading_rate).to.equal(100 / (15/60));
 		});
 		mocha.it('Retrieves the correct type of readings when asked for a day-resolution interval', async () => {
 			const yearStart = moment('2018-01-01');
-			const yearEnd = yearStart.clone().add(1, 'year');
+			const yearEnd = yearStart.clone().add(15, 'minute');
 
 			const conn = testDB.getConnection();
 			await Reading.insertAll([
@@ -187,10 +207,94 @@ mocha.describe('Compressed Readings 2', () => {
 			await Reading.refreshCompressedReadings(conn);
 			const allReadings = await Reading.getNewCompressedReadings([meter.id], yearStart, yearStart.clone().add(60, 'days'), conn);
 			const meterReadings = allReadings[meter.id];
-			expect(meterReadings.length).to.equal(60);
-			const aRow = meterReadings[0];
-			const rowWidth = moment.duration(aRow.end_timestamp.diff(aRow.start_timestamp));
-			expect(rowWidth.asDays()).to.equal(1);
+			expect(meterReadings.length).to.equal(1);
+			expect(meterReadings[0].reading_rate).to.equal(100 / (15/60));
+		});
+
+		mocha.describe('Compression for underlying 15-minute data:', () => {
+			let meter1;
+			const startDate = '2020-01-01 00:00:00';
+			const endDate = '2020-04-01 00:00:00';
+			mocha.beforeEach(async function () {
+				this.timeout(10000); // extend timeout because refreshes take a longer time.
+				const conn = testDB.getConnection();
+				await new Meter(undefined, 'Meter1', null, false, true, Meter.type.MAMAC, null, gps).insert(conn);
+				meter1 = await Meter.getByName('Meter1', conn);
+				const data = generateSineData(startDate, endDate, { timeStep: { minute: 15 }}).map(row => new Reading(meter1.id, row[0], row[1], row[2]));
+				await Reading.insertAll(data, conn);
+				await Reading.refreshCompressedReadings(conn);
+
+				// We need to refresh the hourly readings view because it is materialized.
+				await Reading.refreshCompressedHourlyReadings(conn);
+			});
+
+			mocha.it('Daily resolution:', async () => {
+				const start = moment(startDate);
+				const end = moment(startDate).clone();
+				end.add(61, 'days');
+				const allReadings = await Reading.getNewCompressedReadings([meter1.id], start, end, conn);
+				expect(allReadings['2'].length).to.greaterThan(61); // more data will be returned because of shift down to the hour view.
+			}) //.timeout(10000);
+
+			mocha.it('Hour resolution', async () => {
+				const start = moment(startDate);
+				const end = moment(startDate).clone();
+				end.add(61, 'days');
+				const allReadings = await Reading.getNewCompressedReadings([meter1.id], start, end, conn);
+				expect(allReadings['2'].length).to.equal(24 * 61);
+			});
+
+			mocha.it('Raw resolution', async () => {
+				const start = moment(startDate);
+				const end = moment(startDate).clone();
+				end.add(14, 'days');
+				const allReadings = await Reading.getNewCompressedReadings([meter1.id], start, end, conn);
+				const hourToRawScaleFactor = 4; // This is four since there are four 15-minute intervals in one hour.
+				expect(allReadings['2'].length).to.equal(14 * 24 * hourToRawScaleFactor);
+			});
+		});
+
+		mocha.describe('Compression for underlying 23-minute data:', () => {
+			let meter1;
+			const startDate = '2020-01-01 00:00:00';
+			const endDate = '2020-04-01 00:00:00';
+			mocha.beforeEach(async function () {
+				this.timeout(5000); // extend timeout because refreshes take a longer time.
+				const conn = testDB.getConnection();
+				await new Meter(undefined, 'Meter1', null, false, true, Meter.type.MAMAC, null, gps).insert(conn);
+				meter1 = await Meter.getByName('Meter1', conn);
+				const data = generateSineData(startDate, endDate, { timeStep: { minute: 23 }}).map(row => new Reading(meter1.id, row[0], row[1], row[2]));
+				await Reading.insertAll(data, conn);
+				await Reading.refreshCompressedReadings(conn);
+
+				// We need to refresh the hourly readings view because it is materialized.
+				await Reading.refreshCompressedHourlyReadings(conn);
+			});
+
+			mocha.it('Daily resolution:', async () => {
+				const start = moment(startDate);
+				const end = moment(startDate).clone();
+				end.add(61, 'days');
+				const allReadings = await Reading.getNewCompressedReadings([meter1.id], start, end, conn);
+				expect(allReadings['2'].length).to.greaterThan(61); // more data will be returned because of shift down to the hour view.
+			});
+
+			mocha.it('Hour resolution', async () => {
+				const start = moment(startDate);
+				const end = moment(startDate).clone();
+				end.add(61, 'days');
+				const allReadings = await Reading.getNewCompressedReadings([meter1.id], start, end, conn);
+				expect(allReadings['2'].length).to.equal(24 * 61);
+			});
+
+			mocha.it('Raw resolution', async () => {
+				const start = moment(startDate);
+				const end = moment(startDate).clone();
+				end.add(14, 'days');
+				const allReadings = await Reading.getNewCompressedReadings([meter1.id], start, end, conn);
+				const hourToRawScaleFactor = 1 / (moment.duration('00:23:00').asHours()); // The number of 23-minute intervals in one hour.
+				expect(allReadings['2'].length).to.be.closeTo(14 * 24 * hourToRawScaleFactor, 1);
+			});
 		});
 
 		mocha.it('Correctly shrinks infinite intervals', async () => {
@@ -254,7 +358,10 @@ mocha.describe('Compressed Readings 2', () => {
 			expect(Object.keys(groupReadings).length).to.equal(1);
 			const readingsForGroup = groupReadings[group1.id];
 
-			expect(readingsForGroup.length).to.equal(1 * 60); // Minute compression, 1 hour duration
+			// Compressed readings serves data from the raw view, which only
+			// has one data point for this interval. This is changed from
+			// the previous system which would generate 60 points for each minute.
+			expect(readingsForGroup.length).to.equal(1);
 		});
 
 		mocha.it('Compresses when two groups have different meters', async () => {
@@ -279,8 +386,11 @@ mocha.describe('Compressed Readings 2', () => {
 			const readingsForG1 = groupReadings[group1.id];
 			const readingsForG2 = groupReadings[group2.id];
 
-			expect(readingsForG1.length).to.equal(1 * 60); // Minute compression, 1 hour duration
-			expect(readingsForG2.length).to.equal(1 * 60); // Minute compression, 1 hour duration
+			// Compressed readings serves data from the raw view, which only
+			// has one data point for this interval. This is changed from
+			// the previous system which would generate 60 points for each minute.
+			expect(readingsForG1.length).to.equal(1);
+			expect(readingsForG2.length).to.equal(1);
 		});
 	});
 

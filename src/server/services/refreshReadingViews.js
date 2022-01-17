@@ -9,10 +9,17 @@ const { log } = require('../log');
 const { getConnection } = require('../db');
 const Reading = require('../models/Reading');
 
+// While the name of this function is refreshReadingViews, the purpose
+// of this function is to refresh the materialized daily views.
+// To make changes in refreshing all reading views, modify
+// /src/services/refreshAllReadingViews.js.
+/**
+ * Refreshes daily view.
+ */
 async function refreshReadingViews() {
 	const conn = getConnection();
 
-	log.info('Refreshing Reading Views');
+	log.info('Refreshing Materialized Daily Reading Views');
 	await Reading.refreshCompressedReadings(conn);
 	log.info('Views Refreshed');
 }

@@ -4,6 +4,7 @@
 
 const database = require('./database');
 const { mapToObject } = require('../util');
+const determineMinPoints = require('../sql/reading/determineMinPoints');
 
 const sqlFile = database.sqlFile;
 
@@ -93,6 +94,21 @@ class Reading {
 	static refreshCompressedReadings(conn) {
 		// This can't be a function because you can't call REFRESH inside a function
 		return conn.none('REFRESH MATERIALIZED VIEW daily_readings');
+	}
+
+	/**
+	 * Refreshes the compressed hourly readings view.
+	 * Should be called at least once a day but need to do hourly if the site wants zooming in
+	 * to see hourly data as it is available. This function can take more time than refreshing
+	 * the daily readings so be sure calling it more frequently does not impact the
+	 * server response time. If only called once a day, then probably best to do so in the middle
+	 * of the night as suggested for daily refresh.
+	 * @param conn The connection to use
+	 * @return {Promise<void>}
+	 */
+	static refreshCompressedHourlyReadings(conn) {
+		// This can't be a function because you can't call REFRESH inside a function
+		return conn.none('REFRESH MATERIALIZED VIEW hourly_readings');
 	}
 
 	/**
@@ -335,10 +351,13 @@ class Reading {
 	 * @return {Promise<object<int, array<{reading_rate: number, start_timestamp: }>>>}
 	 */
 	static async getNewCompressedReadings(meterIDs, fromTimestamp = null, toTimestamp = null, conn) {
+		const [minHourPoints, minDayPoints] = determineMinPoints();
 		/**
 		 * @type {array<{meter_id: int, reading_rate: Number, start_timestamp: Moment, end_timestamp: Moment}>}
 		 */
-		const allCompressedReadings = await conn.func('compressed_readings_2', [meterIDs, fromTimestamp || '-infinity', toTimestamp || 'infinity']);
+		const allCompressedReadings = await conn.func('compressed_readings_2',
+			[meterIDs, fromTimestamp || '-infinity', toTimestamp || 'infinity', minDayPoints, minHourPoints]
+			);
 
 		const compressedReadingsByMeterID = mapToObject(meterIDs, () => []);
 		for (const row of allCompressedReadings) {
@@ -359,10 +378,13 @@ class Reading {
 	 * @return {Promise<object<int, array<{reading_rate: number, start_timestamp: Moment, end_timestamp: Moment}>>>}
 	 */
 	static async getNewCompressedGroupReadings(groupIDs, fromTimestamp, toTimestamp, conn) {
+		const [minHourPoints, minDayPoints] = determineMinPoints();
 		/**
 		 * @type {array<{group_id: int, reading_rate: Number, start_timestamp: Moment, end_timestamp: Moment}>}
 		 */
-		const allCompressedGroupReadings = await conn.func('compressed_group_readings_2', [groupIDs, fromTimestamp, toTimestamp]);
+		const allCompressedGroupReadings = await conn.func('compressed_group_readings_2',
+			[groupIDs, fromTimestamp, toTimestamp, minDayPoints, minHourPoints]
+			);
 
 		const compressedReadingsByGroupID = mapToObject(groupIDs, () => []);
 		for (const row of allCompressedGroupReadings) {
