@@ -26,7 +26,7 @@ export default class GroupViewComponent extends React.Component<GroupViewProps, 
 		this.handleEditGroup = this.handleEditGroup.bind(this);
 	}
 
-	public componentWillMount() {
+	public componentDidMount() {
 		this.props.fetchGroupChildren(this.props.id);
 	}
 

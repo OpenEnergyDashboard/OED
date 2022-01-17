@@ -28,7 +28,7 @@ export default class MetersDetailComponent extends React.Component<MetersDetailP
 		this.handleSubmitClicked = this.handleSubmitClicked.bind(this);
 	}
 
-	public componentWillMount() {
+	public componentDidMount() {
 		this.props.fetchMetersDetails();
 	}
 

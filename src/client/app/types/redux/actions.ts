@@ -2,7 +2,7 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
 
-import { Dispatch } from 'redux';
+import { Dispatch as Disps } from 'redux';
 import { ThunkAction } from 'redux-thunk';
 import { State } from './state';
 
@@ -117,7 +117,7 @@ export enum ActionType {
 /**
  * The type of the redux-thunk dispatch function.
  */
-export type Dispatch = Dispatch<State>;
+export type Dispatch = Disps<State>;
 
 /**
  * The type of the redux-thunk getState function.

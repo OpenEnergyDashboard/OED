@@ -271,7 +271,7 @@ function submitNewGroup(group: t.GroupData): Thunk {
 		} catch (e) {
 			dispatch(markGroupInEditingNotSubmitted());
 			if (e.response !== undefined && e.response.status === 400) {
-				showErrorNotification(e.response.data.error);
+				showErrorNotification(translate('400'));
 			} else {
 				showErrorNotification(translate('failed.to.create.group'));
 			}

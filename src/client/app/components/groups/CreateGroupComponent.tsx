@@ -57,7 +57,7 @@ class CreateGroupComponent extends React.Component<CreateGroupPropsWithIntl, Cre
 		this.removeUnsavedChangesFunction = this.removeUnsavedChangesFunction.bind(this);
 	}
 
-	public componentWillMount() {
+	public componentDidMount() {
 		this.props.createNewBlankGroup();
 	}
 

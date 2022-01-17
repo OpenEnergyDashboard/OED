@@ -46,7 +46,7 @@ class DatasourceBoxComponent extends React.Component<DatasourceBoxPropsWithIntl,
 			}
 		));
 		/* tslint:disable:array-type */
-		let selectedOptions: Array<SelectOption & DatasourceID> | null;
+		let selectedOptions: Array<SelectOption & DatasourceID> | undefined;
 		/* tslint:enable:array-type */
 		if (this.props.selectedOptions) {
 			selectedOptions = this.props.selectedOptions.map(element => (
@@ -57,7 +57,7 @@ class DatasourceBoxComponent extends React.Component<DatasourceBoxPropsWithIntl,
 				}
 			));
 		} else {
-			selectedOptions = null;
+			selectedOptions = undefined;
 		}
 		const messages = defineMessages({
 			selectMeters: { id: 'select.meters' },

@@ -7,7 +7,6 @@ const TerserPlugin = require("terser-webpack-plugin");
 const NodePolyfillPlugin = require("node-polyfill-webpack-plugin")
 const webpack = require('webpack');
 const path = require('path');
-const { CheckerPlugin } = require('awesome-typescript-loader');
 
 const BUILD_DIR = path.resolve(__dirname, 'src/client/public/app');
 const APP_DIR = path.resolve(__dirname, 'src/client/app');
@@ -40,7 +39,7 @@ const config = {
         rules: [
             // All TypeScript ('.ts' or '.tsx') will be handled by 'awesome-typescript-loader'.
             // Also, for development, JavaScript is handled by 'awesome-typescript-loader' and passed to Babel.
-            { test: /\.[jt]sx?$/, exclude: /node_modules/, use:[{loader: "awesome-typescript-loader"}] },
+            { test: /\.[jt]sx?$/, exclude: /node_modules/, use: 'ts-loader' },
             // Any remaining JavaScript ('.js' or '.jsx') will be transpiled by Babel, for production uglification.
             { test: /\/jsx?$/, exclude: /node_modules/, use:[{loader: "babel-loader"}] },
 			// CSS stylesheet loader.
@@ -65,8 +64,7 @@ const config = {
     },
 	plugins: [
         new LodashModuleReplacementPlugin(),
-        new NodePolyfillPlugin(),
-        new CheckerPlugin(),
+        new NodePolyfillPlugin()
 	]
 };
 
