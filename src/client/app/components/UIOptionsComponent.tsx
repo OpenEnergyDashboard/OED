@@ -3,7 +3,7 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
 
 import * as React from 'react';
-import { InjectedIntlProps, FormattedMessage, injectIntl, defineMessages } from 'react-intl';
+import { FormattedMessage, defineMessages, injectIntl, WrappedComponentProps } from 'react-intl';
 import sliderWithoutTooltips, { createSliderWithTooltip } from 'rc-slider';
 import * as moment from 'moment';
 import { Button, ButtonGroup, Dropdown, DropdownToggle, DropdownMenu, DropdownItem } from 'reactstrap';
@@ -35,7 +35,7 @@ export interface UIOptionsProps {
 	changeCompareSortingOrder(compareSortingOrder: SortingOrder): ChangeCompareSortingOrderAction;
 }
 
-type UIOptionsPropsWithIntl = UIOptionsProps & InjectedIntlProps;
+type UIOptionsPropsWithIntl = UIOptionsProps & WrappedComponentProps;
 
 interface UIOptionsState {
 	barDurationDays: number;
@@ -315,11 +315,10 @@ class UIOptionsComponent extends React.Component<UIOptionsPropsWithIntl, UIOptio
 			day: { id: 'day' },
 			days: { id: 'days' }
 		});
-		const { formatMessage } = this.props.intl;
 		if (value <= 1) {
-			return `${value} ${formatMessage(messages.day)}`;
+			return `${value} ${this.props.intl.formatMessage(messages.day)}`;
 		}
-		return `${value} ${formatMessage(messages.days)}`;
+		return `${value} ${this.props.intl.formatMessage(messages.days)}`;
 	}
 
 	private toggleDropdown() {
@@ -327,4 +326,4 @@ class UIOptionsComponent extends React.Component<UIOptionsPropsWithIntl, UIOptio
 	}
 }
 
-export default injectIntl<UIOptionsProps>(UIOptionsComponent);
+export default injectIntl(UIOptionsComponent);

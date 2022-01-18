@@ -13,7 +13,7 @@
         "target": "es5",
 		"jsx": "react",
 		"allowJs": true,
-        "lib": ["es6", "dom", "es2015.promise"],
+        "lib": ["es6", "dom", "es2021"],
         "moduleResolution": "node",
         "rootDir": "src",
         "noImplicitReturns": true,

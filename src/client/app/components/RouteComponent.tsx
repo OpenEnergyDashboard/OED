@@ -4,10 +4,7 @@
 
 import * as React from 'react';
 import { Route, Router, Switch, Redirect } from 'react-router-dom';
-import { addLocaleData, IntlProvider } from 'react-intl';
-import * as en from 'react-intl/locale-data/en';
-import * as es from 'react-intl/locale-data/es';
-import * as fr from 'react-intl/locale-data/fr';
+import { IntlProvider } from 'react-intl';
 import * as localeData from '../translations/data.json';
 import { browserHistory } from '../utils/history';
 import * as _ from 'lodash';
@@ -232,7 +229,6 @@ export default class RouteComponent extends React.Component<RouteProps, {}> {
 	 * @returns JSX to create the RouteComponent
 	 */
 	public render() {
-		addLocaleData([...en, ...es, ...fr]);
 		const lang = this.props.defaultLanguage;
 		let messages;
 		if (lang === 'fr') {
