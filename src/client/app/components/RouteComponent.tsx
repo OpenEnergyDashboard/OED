@@ -5,7 +5,7 @@
 import * as React from 'react';
 import { Route, Router, Switch, Redirect } from 'react-router-dom';
 import { IntlProvider } from 'react-intl';
-import * as localeData from '../translations/data.json';
+import { default as localeData } from '../translations/data.json';
 import { browserHistory } from '../utils/history';
 import * as _ from 'lodash';
 import * as moment from 'moment';

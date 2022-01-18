@@ -4,7 +4,7 @@
 
 import store from '../index';
 import { defineMessages, createIntl, createIntlCache } from 'react-intl';
-import * as localeData from '../translations/data.json';
+import { default as localeData } from '../translations/data.json';
 
 const enum AsTranslated {}
 export type TranslatedString = string & AsTranslated;
