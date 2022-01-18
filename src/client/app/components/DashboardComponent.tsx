@@ -84,7 +84,7 @@ export default class DashboardComponent extends React.Component<DashboardProps, 
 					<div className={optionsClassName}>
 						<UIOptionsContainer />
 					</div>
-					<div className={`${chartClassName} align-self-center text-center`}>
+					<div className={`${chartClassName} align-self-auto text-center`}>
 						{ showSpinner ? (
 							<SpinnerComponent loading width={50} height={50} />
 						) : (

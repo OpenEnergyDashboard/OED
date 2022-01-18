@@ -6,3 +6,7 @@ html {
 	position: relative;
 	min-height: 100%;
 }
+
+.js-plotly-plot {
+	width: 100%;
+}

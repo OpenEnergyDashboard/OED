@@ -130,6 +130,7 @@ function mapStateToProps(state: State) {
 	const layout: any = {
 		autosize: true,
 		showlegend: true,
+		height: 700,
 		legend: {
 			x: 0,
 			y: 1.1,
@@ -161,6 +162,7 @@ function mapStateToProps(state: State) {
 		layout,
 		config: {
 			displayModeBar: true,
+			responsive: true,
 			locales: Locales // makes locales available for use
 		}
 	};

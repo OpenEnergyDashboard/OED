@@ -107,6 +107,7 @@ function mapStateToProps(state: State) {
 		bargap: 0.2, // Gap between different times of readings
 		bargroupgap: 0.1, // Gap between different meter's readings under the same timestamp
 		autosize: true,
+		height: 700,
 		showlegend: true,
 		legend: {
 			x: 0,
@@ -143,6 +144,7 @@ function mapStateToProps(state: State) {
 		layout,
 		config: {
 			displayModeBar: false,
+			responsive: true,
 			locales: Locales // makes locales available for use
 		}
 	};
