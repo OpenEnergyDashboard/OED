@@ -7,7 +7,7 @@ import * as moment from 'moment-timezone';
 import { connect } from 'react-redux';
 import getGraphColor from '../utils/getGraphColor';
 import { State } from '../types/redux/state';
-import PlotlyChart, { IPlotlyChartProps } from 'react-plotlyjs-ts';
+import Plot from 'react-plotly.js';
 import { TimeInterval } from '../../../common/TimeInterval';
 import Locales from '../types/locales';
 import { DataType } from '../types/Datasources';
@@ -156,7 +156,7 @@ function mapStateToProps(state: State) {
 
 	// Assign all the parameters required to create the Plotly object (data, layout, config) to the variable props, returned by mapStateToProps
 	// The Plotly toolbar is displayed if displayModeBar is set to true
-	const props: IPlotlyChartProps = {
+	const props: any = {
 		data: datasets,
 		layout,
 		config: {
@@ -168,4 +168,4 @@ function mapStateToProps(state: State) {
 	return props;
 }
 
-export default connect(mapStateToProps)(PlotlyChart);
+export default connect(mapStateToProps)(Plot);

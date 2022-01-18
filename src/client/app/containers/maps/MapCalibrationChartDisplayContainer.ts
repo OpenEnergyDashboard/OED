@@ -3,7 +3,7 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
 
 import { connect } from 'react-redux';
-import PlotlyChart, { IPlotlyChartProps } from 'react-plotlyjs-ts';
+import Plot from 'react-plotly.js';
 import { State } from '../../types/redux/state';
 import * as plotly from 'plotly.js';
 import { CartesianPoint, Dimensions, normalizeImageDimensions } from '../../utils/calibration';
@@ -86,7 +86,7 @@ function mapStateToProps(state: State) {
 	 *               layout={layout}
 	 *               onClick={({points, event}) => console.log(points, event)}>
 	 */
-	const props: IPlotlyChartProps = {
+	const props: any = {
 		data,
 		layout,
 		onClick: (event: plotly.PlotMouseEvent) => handlePointClick(event),
@@ -168,4 +168,4 @@ function getClickedCoordinates(event: plotly.PlotMouseEvent) {
 	return clickedPoint;
 }
 
-export default connect(mapStateToProps)(PlotlyChart);
+export default connect(mapStateToProps)(Plot);
