@@ -75,7 +75,11 @@ if (process.env.NODE_ENV === 'production') {
                 NODE_ENV: JSON.stringify('production')
             }
 		}),
-		new TerserPlugin({ sourceMap: true })
+		new TerserPlugin({
+             terserOptions: {
+                 sourceMap: true
+             },
+    })
 	);
 }
 
