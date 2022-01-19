@@ -66,38 +66,38 @@ export default class MapsDetailComponent extends React.Component<MapsDetailProps
 					<h2 style={titleStyle}>
 						<FormattedMessage id='maps' />
 						<div style={tooltipStyle}>
-						<TooltipMarkerComponent page='maps' helpTextId='help.admin.mapview' />
+							<TooltipMarkerComponent page='maps' helpTextId='help.admin.mapview' />
 						</div>
 					</h2>
 					<div style={tableStyle}>
-					<Table striped bordered hover>
-					<thead>
-						<tr>
-						<th> <FormattedMessage id='map.id' /> </th>
-						<th> <FormattedMessage id='map.name' /> </th>
-						{hasToken() && <th> <FormattedMessage id='map.displayable' /> </th>}
-						{hasToken() && <th> <FormattedMessage id='map.circle.size'/> </th>}
-						{hasToken() && <th> <FormattedMessage id='map.modified.date' /> </th>}
-						{hasToken() && <th> <FormattedMessage id='map.filename'/> </th>}
-						{hasToken() && <th> <FormattedMessage id='note'/> </th>}
-						{hasToken() && <th> <FormattedMessage id='map.calibration'/> </th>}
-						{hasToken() && <th> <FormattedMessage id='remove'/> </th>}
-						</tr>
-					</thead>
-					<tbody>
-					{ this.props.maps.map(mapID =>
-						( <MapViewContainer key={mapID} id={mapID} /> ))}
-					<tr>
-						<td colSpan={8}>
-							<Link to='/calibration' onClick={() => this.props.createNewMap()}>
-								<Button style={buttonContainerStyle} color='primary'>
-									<FormattedMessage id='create.map' />
-								</Button>
-							</Link>
-						</td>
-					</tr>
-					</tbody>
-					</Table>
+						<Table striped bordered hover>
+							<thead>
+								<tr>
+									<th> <FormattedMessage id='map.id' /> </th>
+									<th> <FormattedMessage id='map.name' /> </th>
+									{hasToken() && <th> <FormattedMessage id='map.displayable' /> </th>}
+									{hasToken() && <th> <FormattedMessage id='map.circle.size'/> </th>}
+									{hasToken() && <th> <FormattedMessage id='map.modified.date' /> </th>}
+									{hasToken() && <th> <FormattedMessage id='map.filename'/> </th>}
+									{hasToken() && <th> <FormattedMessage id='note'/> </th>}
+									{hasToken() && <th> <FormattedMessage id='map.calibration'/> </th>}
+									{hasToken() && <th> <FormattedMessage id='remove'/> </th>}
+								</tr>
+							</thead>
+							<tbody>
+								{ this.props.maps.map(mapID =>
+									( <MapViewContainer key={mapID} id={mapID} /> ))}
+								<tr>
+									<td colSpan={8}>
+										<Link to='/calibration' onClick={() => this.props.createNewMap()}>
+											<Button style={buttonContainerStyle} color='primary'>
+												<FormattedMessage id='create.map' />
+											</Button>
+										</Link>
+									</td>
+								</tr>
+							</tbody>
+						</Table>
 					</div>
 					{ hasToken() && <Button
 						color='success'

@@ -61,8 +61,7 @@ export default class MetersApi {
 		);
 	}
 
-	public async compareReadings(meterIDs: number[], timeInterval: TimeInterval, shift: moment.Duration):
-		Promise<CompareReadings> {
+	public async compareReadings(meterIDs: number[], timeInterval: TimeInterval, shift: moment.Duration): Promise<CompareReadings> {
 		const stringifiedIDs = meterIDs.join(',');
 		const currStart: moment.Moment = timeInterval.getStartTimestamp();
 		const currEnd: moment.Moment = timeInterval.getEndTimestamp();

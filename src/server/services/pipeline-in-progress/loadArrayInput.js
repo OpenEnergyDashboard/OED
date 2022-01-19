@@ -41,7 +41,7 @@ async function loadArrayInput(dataRows, meterID, mapRowToModel, timeSort, readin
 				// DB insert failed. log it, note that processing is not okay & add to message user will get.
 				log.error('loadArrayInput failed during DB inserts with updates with: ' + error.stack);
 				isAllReadingsOk = false;
-				msgTotal += 'Attempting to insert the readings into the database with updates failed with error: \"' + error.stack +
+				msgTotal += 'Attempting to insert the readings into the database with updates failed with error: ' + error.stack +
 					'\n and the pipeline returned these messages: ' + msgTotal;
 			})
 	} else {
@@ -50,7 +50,7 @@ async function loadArrayInput(dataRows, meterID, mapRowToModel, timeSort, readin
 				// DB insert failed. log it, note that processing is not okay & add to message user will get.
 				log.error('loadArrayInput failed during DB inserts with: ' + error.stack);
 				isAllReadingsOk = false;
-				msgTotal += 'Attempting to insert the readings into the database failed with error: \"' + error.stack +
+				msgTotal += 'Attempting to insert the readings into the database failed with error: ' + error.stack +
 					'\n and the pipeline returned these messages: ' + msgTotal;
 			})
 	}

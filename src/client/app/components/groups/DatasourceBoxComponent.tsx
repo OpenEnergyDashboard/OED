@@ -68,8 +68,8 @@ class DatasourceBoxComponent extends React.Component<DatasourceBoxPropsWithIntl,
 			<MultiSelectDatasourceComponent
 				options={options}
 				selectedOptions={selectedOptions}
-				placeholder={this.props.type === 'meter' ? this.props.intl.formatMessage(messages.selectMeters) :
-															this.props.intl.formatMessage(messages.selectGroups)}
+				placeholder={this.props.type === 'meter' ?
+					this.props.intl.formatMessage(messages.selectMeters) : this.props.intl.formatMessage(messages.selectGroups)}
 				onValuesChange={this.handleDatasourceSelect}
 			/>
 		);

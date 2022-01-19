@@ -54,8 +54,7 @@ function processConfigFile(configFile) {
 			undefined,
 			undefined,
 			undefined
-			)
-		);
+		));
 	}
 	return metersArray;
 }

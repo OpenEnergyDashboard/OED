@@ -71,7 +71,7 @@ function fetchPreferences(): Thunk {
 		dispatch(receivePreferences(preferences));
 		moment.locale(getState().admin.defaultLanguage);
 		if (!getState().graph.hotlinked) {
-			dispatch((dispatch2: Dispatch, getState2: GetState) => {
+			dispatch((dispatch2: Dispatch) => {
 				const state = getState();
 				dispatch2(changeChartToRender(state.admin.defaultChartToRender));
 				if (preferences.defaultBarStacking !== state.graph.barStacking) {

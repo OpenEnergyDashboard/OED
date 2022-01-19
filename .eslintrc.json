@@ -6,11 +6,11 @@
 {
     "env": {
         "browser": true,
-        "es2021": true
+        "es2021": true,
+        "commonjs": true
     },
     "extends": [
         "eslint:recommended",
-        "plugin:react/recommended",
         "plugin:@typescript-eslint/recommended"
     ],
     "parser": "@typescript-eslint/parser",
@@ -22,7 +22,6 @@
         "sourceType": "module"
     },
     "plugins": [
-        "react",
         "@typescript-eslint"
     ],
     "rules": {
@@ -40,7 +39,7 @@
         ],
         "max-len": [
             "error",
-            { "code": 150 }
+            { "code": 150, "tabWidth": 0 }
         ],
         "comma-dangle": [
             "error",

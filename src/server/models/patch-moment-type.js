@@ -9,12 +9,12 @@ const moment = require('moment-timezone');
 function patchMomentType(pgp) {
 	const types = pgp.pg.types;
 	// This patches moment.js objects to work with pg-promise.
-// See https://github.com/vitaly-t/pg-promise#custom-type-formatting
+	// See https://github.com/vitaly-t/pg-promise#custom-type-formatting
 	moment.fn.toPostgres = function toPostgres() {
 		return this.toDate();
 	};
 
-// This patches timestamps returned from postgres so that they are moment objects.
+	// This patches timestamps returned from postgres so that they are moment objects.
 	const TIMESTAMPTZ_OID = 1184;
 	const TIMESTAMP_OID = 1114;
 

@@ -64,7 +64,7 @@ class EditGroupsComponent extends React.Component<EditGroupsPropsWithIntl, EditG
 		this.state = {
 			name: this.props.currentGroup.name,
 			gpsInput: (this.props.currentGroup.gps) ?
-			`${this.props.currentGroup.gps.latitude}, ${this.props.currentGroup.gps.longitude}` : '',
+				`${this.props.currentGroup.gps.latitude}, ${this.props.currentGroup.gps.longitude}` : '',
 			groupArea: (this.props.currentGroup.area) ? `${this.props.currentGroup.area}` : '',
 			groupNote: (this.props.currentGroup.note) ? `${this.props.currentGroup.note}` : '',
 			groupDisplay: (this.props.currentGroup.displayable) ? this.props.currentGroup.displayable : false,

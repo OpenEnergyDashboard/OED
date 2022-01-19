@@ -26,7 +26,7 @@ const router = express.Router();
  */
 function formatGroupForResponse(item) {
 	return { id: item.id, name: item.name, gps: item.gps, displayable: item.displayable,
-	note: item.note, area: item.area };
+		note: item.note, area: item.area };
 }
 
 /**

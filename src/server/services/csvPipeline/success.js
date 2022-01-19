@@ -11,8 +11,7 @@
  *
  */
 function success(req, res, comment = '') {
-	res.status(200) // 200 OK
-	.send(`<h1>SUCCESS</h1>${comment}`);
+	res.status(200).send(`<h1>SUCCESS</h1>${comment}`);
 }
 
 /**
@@ -26,8 +25,7 @@ function success(req, res, comment = '') {
 function failure(req, res, comment = '') {
 	// 400 is client error. There is a small chance the insert into the DB failed
 	// but overlooking that.
-	res.status(400)
-	.send(`<h1>FAILURE</h1>${comment}`);
+	res.status(400).send(`<h1>FAILURE</h1>${comment}`);
 
 }
 
