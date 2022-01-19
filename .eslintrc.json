@@ -1,3 +1,8 @@
+/*
+ * This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this
+ * file, You can obtain one at http://mozilla.org/MPL/2.0/.
+ */
 {
     "env": {
         "browser": true,
@@ -21,10 +26,9 @@
         "@typescript-eslint"
     ],
     "rules": {
-        "indent": [
-            "error",
-            "tab"
-        ],
+        //https://github.com/typescript-eslint/typescript-eslint/issues/1824, indent is therefore turned off and we use typescript-eslint/indent instead
+        "indent": ["off"],
+        "@typescript-eslint/indent": ["error", "tab"],
         "linebreak-style": [
             "error",
             "unix"
@@ -33,10 +37,6 @@
             "error",
             "single",
             { "avoidEscape": true }
-        ],
-        "semi": [
-            "error",
-            "always"
         ],
         "max-len": [
             "error",

@@ -20,6 +20,8 @@ const path = require('path');
 
 const generateData = require('../data/generateTestingData'); // To get this file compile ../data/generateTestingData.ts
 
+const __dirname = path.resolve(path.dirname(''));
+
 mocha.describe('The generateDates function', () => {
 	const generateDates = generateData.generateDates;
 	mocha.it('should exist.', () => {
