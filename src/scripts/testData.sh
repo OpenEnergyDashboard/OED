@@ -75,7 +75,7 @@ do
     if [ $i == $((${#csvfiles[@]} - 1)) ]
     then
         # The last loaded data does a refresh of the readings so can see in OED and will do it for all previous data.
-        curl localhost:3000/api/csv/readings -X POST -F "meterName=${meternames[i]}" -F 'refreshReadings=true' -F 'createMeter=true' -F 'headerRow=true' -F 'gzip=false' -F "email=$csvuser" -F "password=$csvpassword" -F "csvfile=@${csvfiles[i]}"
+        curl localhost:3000/api/csv/readings -X POST -F "meterName=${meternames[i]}" -F 'refreshReadings=true' -F 'refreshHourlyReadings=true' -F 'createMeter=true' -F 'headerRow=true' -F 'gzip=false' -F "email=$csvuser" -F "password=$csvpassword" -F "csvfile=@${csvfiles[i]}"
     else
         curl localhost:3000/api/csv/readings -X POST -F "meterName=${meternames[i]}" -F 'createMeter=true' -F 'headerRow=true' -F 'gzip=false' -F "email=$csvuser" -F "password=$csvpassword" -F "csvfile=@${csvfiles[i]}"
     fi
