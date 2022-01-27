@@ -5,7 +5,7 @@
 -- This should avoid an error when the type already exists. This is an issue since
 -- OED install stops the creation of database items after this.
 DO $$ BEGIN 
-	CREATE TYPE unit_type AS ENUM('unit', 'meter', 'suffix');
+	CREATE TYPE displayable_type AS ENUM('none', 'all', 'admin');
 
 EXCEPTION
 	WHEN duplicate_object THEN null;
