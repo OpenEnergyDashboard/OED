@@ -179,11 +179,11 @@ class Unit {
 	 * @param conn The connection to use.
 	 * @returns {Promise.<>}
 	 */
-		 async update(conn) {
-			const meter = this;
-			if (meter.id === undefined) {
-				throw new Error('Attempt to update a meter with no ID');
-			}
-			await conn.none(sqlFile('meter/update_meter.sql'), meter);
+	async update(conn) {
+		const meter = this;
+		if (meter.id === undefined) {
+			throw new Error('Attempt to update a meter with no ID');
 		}
+		await conn.none(sqlFile('meter/update_meter.sql'), meter);
+	}
 }
