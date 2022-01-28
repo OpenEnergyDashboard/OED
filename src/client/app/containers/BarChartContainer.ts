@@ -41,7 +41,7 @@ function mapStateToProps(state: State) {
 				readings.forEach(barReading => {
 					// subtracting one extra day caused by day ending at midnight of the next day
 					const timeReading: string =
-						`${moment(barReading.startTimestamp).utc().format('LL')} - ${moment(barReading.endTimestamp).subtract(1, 'days').utc().format('LL')}`;
+						`${moment(barReading.startTimestamp).utc().format('ll')} - ${moment(barReading.endTimestamp).subtract(1, 'days').utc().format('ll')}`;
 					xData.push(timeReading);
 					yData.push(barReading.reading);
 					hoverText.push(`<b> ${timeReading} </b> <br> ${label}: ${barReading.reading.toPrecision(6)} kWh`);
@@ -60,7 +60,6 @@ function mapStateToProps(state: State) {
 			}
 		}
 	}
-
 
 	for (const groupID of state.graph.selectedGroups) {
 		const byGroupID = state.readings.bar.byGroupID[groupID];
@@ -81,7 +80,7 @@ function mapStateToProps(state: State) {
 				readings.forEach(barReading => {
 					// subtracting one extra day caused by day ending at midnight of the next day
 					const timeReading: string =
-						`${moment(barReading.startTimestamp).utc().format('LL')} - ${moment(barReading.endTimestamp).subtract(1, 'days').utc().format('LL')}`;
+						`${moment(barReading.startTimestamp).utc().format('ll')} - ${moment(barReading.endTimestamp).subtract(1, 'days').utc().format('ll')}`;
 					xData.push(timeReading);
 					yData.push(barReading.reading);
 					hoverText.push(`<b> ${timeReading} </b> <br> ${label}: ${barReading.reading.toPrecision(6)} kWh`);
