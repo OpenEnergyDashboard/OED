@@ -24,8 +24,12 @@ interface CompareChartContainerProps {
 function mapStateToProps(state: State, ownProps: CompareChartContainerProps): IPlotlyChartProps {
 	const comparePeriod = state.graph.comparePeriod;
 	const datasets: any[] = [];
-
 	const periodLabels = getComparePeriodLabels(comparePeriod);
+
+	// last day/ week/ 4 weeks
+	const startTime: string = state.graph.compareTimeInterval.getStartTimestamp().format('llll');
+	// current time
+	const endTime: string =  state.graph.compareTimeInterval.getEndTimestamp().startOf('hour').format('llll'); // startOf: truncate to the nearest hour
 
 	const colorize = (changeForColorization: number) => {
 		if (changeForColorization < 0) {
@@ -81,8 +85,10 @@ function mapStateToProps(state: State, ownProps: CompareChartContainerProps): IP
 			gridcolor: '#ddd'
 		},
 		xaxis: {
+			title: `From ${startTime}` + "<br>" + `to ${endTime}`,
 			showgrid: false,
-			gridcolor: '#ddd'
+			gridcolor: '#ddd',
+			automargin: true
 		},
 		margin: {
 			t: 20,
