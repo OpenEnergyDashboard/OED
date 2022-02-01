@@ -46,7 +46,7 @@ function mapStateToProps(state: State) {
 					yData.push(barReading.reading);
 					hoverText.push(`<b> ${timeReading} </b> <br> ${label}: ${barReading.reading.toPrecision(6)} kWh`);
 				});
-
+				console.log(moment(readings[0].startTimestamp).utc())
 				// This variable contains all the elements (x and y values, bar type, etc.) assigned to the data parameter of the Plotly object
 				datasets.push({
 					name: label,

@@ -31,6 +31,7 @@ function mapStateToProps(state: State, ownProps: CompareChartContainerProps): IP
 	// current time
 	const endTime: string =  state.graph.compareTimeInterval.getEndTimestamp().startOf('hour').format('llll'); // startOf: truncate to the nearest hour
 
+	console.log(state.graph.compareTimeInterval.getStartTimestamp());
 	const colorize = (changeForColorization: number) => {
 		if (changeForColorization < 0) {
 			return 'green';
