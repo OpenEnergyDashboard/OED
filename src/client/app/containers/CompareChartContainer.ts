@@ -11,6 +11,7 @@ import { CompareEntity } from './MultiCompareChartContainer';
 import translate from '../utils/translate';
 import PlotlyChart, { IPlotlyChartProps } from 'react-plotlyjs-ts';
 import Locales from '../types/locales';
+import * as moment from 'moment';
 
 interface CompareChartContainerProps {
 	entity: CompareEntity;
@@ -27,11 +28,14 @@ function mapStateToProps(state: State, ownProps: CompareChartContainerProps): IP
 	const periodLabels = getComparePeriodLabels(comparePeriod);
 
 	// last day/ week/ 4 weeks
-	const startTime: string = state.graph.compareTimeInterval.getStartTimestamp().format('llll');
+	// It isn't known why you must start from a string to get timezone aware dates, but it is.
+	// There might be a better way to do this.
+	const startTime: string = moment(state.graph.compareTimeInterval.getStartTimestamp().toString()).utc().format('llll');
 	// current time
-	const endTime: string =  state.graph.compareTimeInterval.getEndTimestamp().startOf('hour').format('llll'); // startOf: truncate to the nearest hour
+	const endTime: string =  moment(state.graph.compareTimeInterval.getEndTimestamp().toString()).startOf('hour').utc().format('llll'); // startOf: truncate to the nearest hour
+	// X axis label tells the user what time period they are looking at.
+	const xTitle: string = `${translate('from')} ${startTime} <br> ${translate('to')} ${endTime}`;
 
-	console.log(state.graph.compareTimeInterval.getStartTimestamp());
 	const colorize = (changeForColorization: number) => {
 		if (changeForColorization < 0) {
 			return 'green';
@@ -86,7 +90,7 @@ function mapStateToProps(state: State, ownProps: CompareChartContainerProps): IP
 			gridcolor: '#ddd'
 		},
 		xaxis: {
-			title: `From ${startTime}` + "<br>" + `to ${endTime}`,
+			title: `${xTitle}`,
 			showgrid: false,
 			gridcolor: '#ddd',
 			automargin: true
