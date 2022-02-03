@@ -1,6 +1,6 @@
 {
   "name": "Open-Energy-Dashboard",
-  "version": "0.7.0",
+  "version": "0.8.0",
   "private": false,
   "license": "MPL-2.0",
   "repository": "https://github.com/OpenEnergyDashboard/OED",
@@ -25,6 +25,9 @@
     "editUser": "node ./src/server/services/user/editUser.js",
     "sendLogEmail": "node ./src/server/services/sendLogEmail.js",
     "refreshReadingViews": "node -e 'require(\"./src/server/services/refreshReadingViews\").refreshReadingViews()'",
+    "refreshAllReadingViews": "node -e 'require(\"./src/server/services/refreshAllReadingViews\").refreshAllReadingViews()'",
+    "refreshDailyReadingViews": "node -e 'require(\"./src/server/services/refreshReadingViews\").refreshReadingViews()'",
+    "refreshHourlyReadingViews": "node -e 'require(\"./src/server/services/refreshHourlyReadingViews\").refreshHourlyReadingViews()'",
     "obvius:showConfigfiles": "node ./src/server/services/obvius/showConfigfiles.js",
     "obvius:purgeConfigfiles": "node ./src/server/services/obvius/purgeConfigfiles.js",
     "generateFourDayTestingData": "node -e 'require(\"./src/server/data/automatedTestingData\").generateFourDayTestingData()'",

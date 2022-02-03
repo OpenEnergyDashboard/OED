@@ -44,6 +44,7 @@ export interface ReadingsCSVUploadPreferencesItem extends CSVUploadPreferences {
 	lengthGap: string;
 	lengthVariation: string;
 	endOnly: BooleanTypes;
+	refreshHourlyReadings: boolean;
 	refreshReadings: boolean;
 	timeSort: TimeSortTypes;
 }
@@ -60,6 +61,7 @@ export interface ReadingsCSVUploadProps extends ReadingsCSVUploadPreferencesItem
 	setLengthVariation: (value: string) => void;
 	selectEndOnly: (value: string) => void;
 	toggleCreateMeter: () => void;
+	toggleRefreshHourlyReadings: () => void;
 	toggleRefreshReadings: () => void;
 };
 

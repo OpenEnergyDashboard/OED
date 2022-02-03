@@ -6,7 +6,7 @@
 
 -- Move the currently named type to a temporary name.
 ALTER TYPE graph_type RENAME TO graph_type_temp;
--- Create the type desired with new value, 'other' in this case but need to include old ones.
+-- Create the type desired with new value, 'map' in this case but need to include old ones.
 CREATE TYPE graph_type as enum ('line', 'bar', 'compare', 'map');
 -- Change the column in meters to use the new type with the current rows.
 ALTER TABLE preferences ALTER COLUMN default_chart_to_render TYPE graph_type USING default_chart_to_render::text::graph_type;

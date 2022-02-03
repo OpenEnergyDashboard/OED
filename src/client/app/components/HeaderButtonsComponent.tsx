@@ -13,12 +13,15 @@ import TooltipMarkerComponent from './TooltipMarkerComponent';
 import TooltipHelpContainerAlternative from '../containers/TooltipHelpContainerAlternative';
 import { UserRole } from '../types/items';
 import { hasPermissions } from '../utils/hasPermissions';
+import { FlipLogOutStateAction } from '../types/redux/unsavedWarning';
 
 interface HeaderButtonsProps {
 	showCollapsedMenuButton: boolean;
 	loggedInAsAdmin: boolean;
 	role: UserRole | null;
+	hasUnsavedChanges: boolean;
 	handleLogOut: () => any;
+	flipLogOutState(): FlipLogOutStateAction;
 }
 
 /**
@@ -102,8 +105,12 @@ export default class HeaderButtonsComponent extends React.Component<HeaderButton
 	}
 
 	private handleLogOut() {
-		this.props.handleLogOut();
-		this.forceUpdate();
+		if (this.props.hasUnsavedChanges) {
+			this.props.flipLogOutState();
+		} else {
+			// Normally log out if there are no unsaved changes
+			this.props.handleLogOut();
+			this.forceUpdate();
+		}
 	}
-
 }
