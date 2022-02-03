@@ -4,26 +4,31 @@
 
 import { ActionType } from './actions';
 
-export type UnsavedWarningAction = UpdateUnsavedChangesAction | RemoveUnsavedChangesAction;
+export type UnsavedWarningAction = UpdateUnsavedChangesAction | RemoveUnsavedChangesAction | FlipLogOutStateAction;
 
-/*
-* The action triggered when there are new unsaved changes
-*/
+/**
+ * The action triggered when there are new unsaved changes
+ */
 export interface UpdateUnsavedChangesAction {
 	type: ActionType.UpdateUnsavedChanges;
 	removeFunction: any;
 	submitFunction: any;
 }
 
-/*
-* The action triggered when the users decide to discard unsaved changes or click the submit button
-*/
+/**
+ * The action triggered when the users decide to discard unsaved changes or click the submit button
+ */
 export interface RemoveUnsavedChangesAction {
 	type: ActionType.RemoveUnsavedChanges;
 }
 
+export interface FlipLogOutStateAction {
+	type: ActionType.FlipLogOutState;
+}
+
 export interface UnsavedWarningState {
 	hasUnsavedChanges: boolean;
+	isLogOutClicked: boolean;
 	// The function to remove unsaved changes
 	removeFunction: (callback: () => void) => any;
 	// The function to submit unsaved changes

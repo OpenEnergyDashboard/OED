@@ -9,13 +9,18 @@ import Button from 'reactstrap/lib/Button';
 import Modal from 'reactstrap/lib/Modal';
 import ModalBody from 'reactstrap/lib/ModalBody';
 import ModalFooter from 'reactstrap/lib/ModalFooter';
-import { RemoveUnsavedChangesAction } from '../types/redux/unsavedWarning';
+import { FlipLogOutStateAction, RemoveUnsavedChangesAction } from '../types/redux/unsavedWarning';
+import { deleteToken } from '../utils/token';
+import { clearCurrentUser } from '../actions/currentUser';
+import store from '../index';
 
 interface UnsavedWarningProps extends RouteComponentProps<any> {
 	hasUnsavedChanges: boolean;
+	isLogOutClicked: boolean;
 	removeFunction: (callback: () => void) => any;
 	submitFunction: (successCallback: () => void, failureCallback: () => void) => any;
 	removeUnsavedChanges(): RemoveUnsavedChangesAction;
+	flipLogOutState(): FlipLogOutStateAction;
 }
 
 class UnsavedWarningComponent extends React.Component<UnsavedWarningProps> {
@@ -111,6 +116,12 @@ class UnsavedWarningComponent extends React.Component<UnsavedWarningProps> {
 				warningVisible: false
 			}, () => {
 				this.props.removeFunction(() => {
+					if (this.props.isLogOutClicked) {
+						// Set the logout state to false
+						this.props.flipLogOutState();
+						// Delete token when users click log out
+						this.handleLogOut();
+					}
 					this.props.removeUnsavedChanges();
 					// Unblock reloading page and closing tab
 					window.onbeforeunload = () => undefined;
@@ -132,6 +143,12 @@ class UnsavedWarningComponent extends React.Component<UnsavedWarningProps> {
 				confirmedToLeave: true,
 				warningVisible: false
 			}, () => {
+				if (this.props.isLogOutClicked) {
+					// Set the logout state to false
+					this.props.flipLogOutState();
+					// Delete token when users click log out
+					this.handleLogOut();
+				}
 				this.props.removeUnsavedChanges();
 				// Unblock reloading page and closing tab
 				window.onbeforeunload = () => undefined;
@@ -147,6 +164,11 @@ class UnsavedWarningComponent extends React.Component<UnsavedWarningProps> {
 		}, () => {
 			this.handleLeaveClicked();
 		});
+	}
+
+	private handleLogOut() {
+		deleteToken();
+		store.dispatch(clearCurrentUser());
 	}
 }
 

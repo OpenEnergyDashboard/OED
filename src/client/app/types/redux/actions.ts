@@ -17,6 +17,7 @@ export enum ActionType {
 
 	UpdateUnsavedChanges = 'UPDATE_UNSAVED_CHANGES',
 	RemoveUnsavedChanges = 'REMOVE_UNSAVED_CHANGES',
+	FlipLogOutState = 'FLIP_LOG_OUT_STATE',
 
 	RequestMetersDetails = 'REQUEST_METERS_DETAILS',
 	ReceiveMetersDetails = 'RECEIVE_METERS_DETAILS',

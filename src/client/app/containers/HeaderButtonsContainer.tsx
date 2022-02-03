@@ -10,6 +10,7 @@ import { deleteToken } from '../utils/token';
 import { isRoleAdmin } from '../utils/hasPermissions';
 import { clearCurrentUser } from '../actions/currentUser';
 import { UserRole } from '../types/items';
+import { flipLogOutState } from '../actions/unsavedWarning';
 
 function mapStateToProps(state: State, ownProps: { showCollapsedMenuButton: boolean }) {
 	const currentUser = state.currentUser.profile;
@@ -22,7 +23,8 @@ function mapStateToProps(state: State, ownProps: { showCollapsedMenuButton: bool
 	return {
 		loggedInAsAdmin,
 		role,
-		...ownProps
+		...ownProps,
+		hasUnsavedChanges: state.unsavedWarning.hasUnsavedChanges
 	};
 }
 
@@ -31,7 +33,8 @@ function mapDispatchToProps(dispatch: Dispatch) {
 		handleLogOut: () => {
 			deleteToken();
 			dispatch(clearCurrentUser());
-		}
+		},
+		flipLogOutState: () => dispatch(flipLogOutState())
 	};
 }
 

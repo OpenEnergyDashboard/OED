@@ -20,3 +20,10 @@ export function updateUnsavedChanges(removeFunction: any, submitFunction: any): 
 export function removeUnsavedChanges(): t.RemoveUnsavedChangesAction {
 	return { type: ActionType.RemoveUnsavedChanges };
 }
+
+/**
+ * Notify that the logout button was clicked or unclicked
+ */
+export function flipLogOutState(): t.FlipLogOutStateAction {
+	return { type: ActionType.FlipLogOutState };
+}
