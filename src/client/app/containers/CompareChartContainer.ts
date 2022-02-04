@@ -32,7 +32,8 @@ function mapStateToProps(state: State, ownProps: CompareChartContainerProps): IP
 	// There might be a better way to do this.
 	const startTime: string = moment(state.graph.compareTimeInterval.getStartTimestamp().toString()).utc().format('llll');
 	// current time
-	const endTime: string =  moment(state.graph.compareTimeInterval.getEndTimestamp().toString()).startOf('hour').utc().format('llll'); // startOf: truncate to the nearest hour
+	const endTime: string =  moment(state.graph.compareTimeInterval.getEndTimestamp().toString()).startOf('hour').utc().format('llll');
+	// startOf: truncate to the nearest hour
 	// X axis label tells the user what time period they are looking at.
 	const xTitle: string = `${translate('from')} ${startTime} <br> ${translate('to')} ${endTime}`;
 
