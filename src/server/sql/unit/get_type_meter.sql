@@ -2,4 +2,6 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
 
-SELECT * FROM meters where unit_type = unit_type.meter;
+SELECT * 
+FROM units 
+WHERE unit_type = 'meter';

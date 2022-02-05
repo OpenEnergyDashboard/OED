@@ -16,8 +16,9 @@ class Unit {
 	 * @param {*} displayable Can be none, all, or admin. Restrict the type of user that can see this unit.
 	 * @param {*} primary True if this unit is always displayed. If not, the user needs to ask to see (for future enhancement).
 	 * @param {*} note Note about this unit.
+	 * @param {*} unitRepresentType Tells how the data is fetched for readings (only need for meter type unit).
 	 */
-	constructor(id, name, identifier, unitType, unitIndex, suffix = "", displayable, primary, note) {
+	constructor(id, name, identifier, unitType, unitIndex, suffix = '', displayable, primary, note, unitRepresentType) {
 		this.id = id;
 		this.name = name;
 		this.identifier = identifier;
@@ -27,6 +28,7 @@ class Unit {
 		this.displayable = displayable;
 		this.primary = primary;
 		this.note = note;
+		this.unitRepresentType = unitRepresentType;
 	}
 
 	/**
@@ -35,7 +37,8 @@ class Unit {
 	 * @returns The new unit object.
 	 */
 	static mapRow(row) {
-		return new Unit(row.id, row.name, row.identifier, row.unitType, row.unitIndex, row.suffix, row.displayable, row.primary, row.note);
+		return new Unit(row.id, row.name, row.identifier, row.unit_type, row.unit_index, 
+						row.suffix, row.displayable_type, row.is_primary, row.note, row.unit_represent_type);
 	}
 
 	/**
@@ -75,24 +78,24 @@ class Unit {
 	}
 
 	/**
-	 * Returns all units of unitType of meter that are visible to user.
+	 * Returns all units of meter type that are visible to user.
 	 * @param {*} user Can be all or admin.
 	 * @param {*} conn The connection to use.
 	 * @returns {Promise.<Array.<Unit>>}
 	 */
-	static getVisibleMeter(user, conn) {
+	static async getVisibleMeter(user, conn) {
 		const rows = await conn.any(sqlFile('unit/get_visible_meter.sql'), { user: user });
 		return rows.map(Unit.mapRow);
 	}
 
 	/**
-	 * Returns all units of type of unit or suffix that are visible to user.
+	 * Returns all units of unit or suffix type that are visible to user.
 	 * @param {*} user Can be all or admin.
 	 * @param {*} conn The connection to use.
 	 * @returns {Promise.<Array.<Unit>>}
 	 */
-	static getVisibleUnitOrSuffix(user, conn) {
-		const rows = await conn.any(sqlFile('unit/get_visible_unit_or_suffix'), { user: user });
+	static async getVisibleUnitOrSuffix(user, conn) {
+		const rows = await conn.any(sqlFile('unit/get_visible_unit_or_suffix.sql'), { user: user });
 		return rows.map(Unit.mapRow);
 	}
 
@@ -101,9 +104,9 @@ class Unit {
 	 * @param {*} conn The connection to use.
 	 * @returns {Promise.<Array.<Unit>>}
 	 */
-	static getTypeMeter(conn) {
+	static async getTypeMeter(conn) {
 		const rows = await conn.any(sqlFile('unit/get_type_meter.sql'));
-		return rows.map(Unit.mapRow(rows));
+		return rows.map(Unit.mapRow);
 	}
 
 	/**
@@ -111,11 +114,21 @@ class Unit {
 	 * @param {*} conn The connection to use.
 	 * @returns {Promise.<Array.<Unit>>}
 	 */
-	static getTypeUnit(conn) {
+	static async getTypeUnit(conn) {
 		const rows = await conn.any(sqlFile('unit/get_type_unit.sql'));
-		return rows.map(Unit.mapRow(rows));
+		return rows.map(Unit.mapRow);
 	}
 	
+	/**
+	 * Returns all units that have a suffix.
+	 * @param {*} conn The connection to use.
+	 * @returns {Promise.<Array.<Unit>>}
+	 */
+	static async getSuffix(conn) {
+		const rows = await conn.any(sqlFile('unit/get_suffix.sql'));
+		return rows.map(Unit.mapRow);
+	}
+
 	// TODO: Returns a special value if it doesn't exist
 	/**
 	 * Returns the associated unit for the given id.
@@ -123,8 +136,8 @@ class Unit {
 	 * @param {*} conn The connection to use.
 	 * @returns {Promise.<Unit>}
 	 */
-	static getById(id, conn) {
-		const row = await conn.any(sqlFile('unit/get_by_id.sql'), { id = id });
+	static async getById(id, conn) {
+		const row = await conn.one(sqlFile('unit/get_by_id.sql'), { id: id });
 		return Unit.mapRow(row);
 	}
 
@@ -135,55 +148,80 @@ class Unit {
 	 * @param {*} conn The connection to use.
 	 * @returns {Promise.<Unit>}
 	 */
-	static getByName(name, conn) {
-		const row = await conn(sqlFile('unit/get_by_name.sql'), { name = name });
+	static async getByName(name, conn) {
+		const row = await conn.one(sqlFile('unit/get_by_name.sql'), { name: name });
 		return Unit.mapRow(row);
 	}
 
 	// TODO: Returns a special value if it doesn't exist
 	/**
-	 * Returns the associated unit of type meter for the given unitIndex.
+	 * Returns the associated id of type meter for the given unitIndex.
 	 * @param {*} unitIndex The unit's index.
 	 * @param {*} conn The connection to use.
-	 * @returns {Promise.<Unit>}
+	 * @returns {Promise.<Int>}
 	 */
-	static getByUnitIndexMeter(unitIndex, conn) {
-		const row = await conn(sqlFile('unit/get_by_unit_index_meter.sql'), { unitIndex = unitIndex });
-		return Unit.mapRow(row);
+	static async getByUnitIndexMeter(unitIndex, conn) {
+		const resp = await conn.one(sqlFile('unit/get_by_unit_index_meter.sql'), { unitIndex: unitIndex });
+		return resp.id;
 	}
 
 	// TODO: Returns a special value if it doesn't exist
 	/**
-	 * Returns the associated unit of type unit for the given unitIndex.
+	 * Returns the associated id of type unit for the given unitIndex.
 	 * @param {*} unitIndex The unit's index.
 	 * @param {*} conn The connection to use.
-	 * @returns {Promise.<Unit>}
+	 * @returns {Promise.<Int>}
 	 */
-	static getByUnitIndexUnit(unitIndex, conn) {
-		const row = await conn(sqlFile('unit/get_by_unit_index_unit.sql'), { unitIndex = unitIndex });
-		return Unit.mapRow(row);
-	}
-
-	/**
-	 * Returns all units that have suffix.
-	 * @param {*} conn The connection to use.
-	 * @returns {Promise.<Array.<Unit>>}
-	 */
-	static getSuffix(conn) {
-		const rows = await conn(sqlFile('unit/get_suffix.sql'));
-		return Unit.mapRow(rows);
+	static async getByUnitIndexUnit(unitIndex, conn) {
+		const resp = await conn.one(sqlFile('unit/get_by_unit_index_unit.sql'), { unitIndex: unitIndex });
+		return resp.id;
 	}
 
 	/**
 	 * Returns a promise to update an existing unit in the database.
-	 * @param conn The connection to use.
+	 * @param {*} conn The connection to use.
 	 * @returns {Promise.<>}
 	 */
 	async update(conn) {
-		const meter = this;
-		if (meter.id === undefined) {
+		const unit = this;
+		if (unit.id === undefined) {
 			throw new Error('Attempt to update a meter with no ID');
 		}
-		await conn.none(sqlFile('meter/update_meter.sql'), meter);
+		await conn.none(sqlFile('unit/update_unit.sql'), unit);
+	}
+
+	/**
+	 * Returns a promise to insert an unit to database.
+	 * @param {*} conn The connection to use.
+	 * @returns {Promise.<>}
+	 */
+	async insert(conn) {
+		const unit = this;
+		if (unit.id !== undefined) {
+			throw new Error('Attempt to insert a unit that already has an ID');
+		}
+		const resp = await conn.one(sqlFile('unit/insert_new_unit.sql'), unit);
+		this.id = resp.id;
 	}
 }
+
+Unit.unitType = {
+	UNIT: 'unit',
+	METER: 'meter',
+	SUFFIX: 'suffix'
+};
+
+Unit.displayableType = {
+	NONE: 'none',
+	ALL: 'all',
+	ADMIN: 'admin'
+};
+
+Unit.unitRepresentType = {
+	QUANTITY: 'quantity',
+	FLOW: 'flow',
+	RAW: 'raw',
+	UNUSED: 'unused'
+}
+
+module.exports = Unit;

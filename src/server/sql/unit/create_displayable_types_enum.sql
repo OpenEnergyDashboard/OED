@@ -6,8 +6,6 @@
 -- OED install stops the creation of database items after this.
 DO $$ BEGIN 
 	CREATE TYPE displayable_type AS ENUM('none', 'all', 'admin');
-
 EXCEPTION
 	WHEN duplicate_object THEN null;
-
-END $ $;
+END $$;

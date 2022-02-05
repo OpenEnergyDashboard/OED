@@ -105,6 +105,8 @@ async function createSchema(conn) {
 	await conn.none(sqlFile('baseline/create_function_get_average_reading.sql'));
 	await Configfile.createTable(conn);
 	await Unit.createUnitTypesEnum(conn);
+	await Unit.createDisplayableTypesEnum(conn);
+	await Unit.createUnitRepresentTypesEnum(conn);
 	await Unit.createTable(conn);
 }
 

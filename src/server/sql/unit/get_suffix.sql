@@ -4,4 +4,4 @@
 
 SELECT *
 FROM units 
-WHERE suffix != "";
+WHERE suffix != '';

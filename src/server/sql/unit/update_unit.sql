@@ -5,10 +5,11 @@
 UPDATE units
 	SET name = ${name},
 		identifier = ${identifier},
-		unitType = ${unitType},
-		unitIndex = ${unitIndex},
+		unit_type = ${unitType},
+		unit_index = ${unitIndex},
 		suffix = ${suffix},
-		displayable = ${displayable},
-		primary = ${primary},
-		note = ${note}
+		displayable_type = ${displayable},
+		is_primary = ${primary},
+		note = ${note},
+		unit_represent_type = ${unitRepresentType}
 	WHERE id = ${id};
