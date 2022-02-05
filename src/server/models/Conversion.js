@@ -25,7 +25,7 @@ class Conversion {
 	}
 
 	/**
-	 * Return a promise to create the conversions table.
+	 * Returns a promise to create the conversions table.
 	 * @param {*} conn The connection to use.
 	 * @returns {Promise.<>}
 	 */
@@ -34,7 +34,7 @@ class Conversion {
 	}
 
 	/**
-	 * Create a new conversion from the row's data.
+	 * Creates a new conversion from the row's data.
 	 * @param {*} row The row from which the conversion will be created.
 	 * @returns The new conversion object.
 	 */

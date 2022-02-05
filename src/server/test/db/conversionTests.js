@@ -6,7 +6,7 @@ const { mocha, expect, testDB } = require('../common');
 const Conversion = require('../../models/Conversion');
 
 /**
- * Compares the expected and actual conversion.
+ * Compares the expected and actual conversions.
  * @param {*} expected The exepected conversion.
  * @param {*} actual The actual conversion.
  */
@@ -34,7 +34,7 @@ mocha.describe('Conversions', () => {
 		const conversionPreInsert = new Conversion(0, 1, true, 0, 0, '');
 		await conversionPreInsert.insert(conn);
 		
-		// Update the conversion. Note that the sourceId and destinationId can't be changed.
+		// Updates the conversion. Note that the sourceId and destinationId can't be changed.
 		conversionPreInsert.bidirectional = false;
 		conversionPreInsert.intercept = 3.1415;
 		conversionPreInsert.note = 'New note';

@@ -5,6 +5,11 @@
 const { mocha, expect, testDB } = require('../common');
 const Unit = require('../../models/Unit');
 
+/**
+ * Compares the expected and actual units.
+ * @param {*} expected The expected unit.
+ * @param {*} actual The actual unit.
+ */
 function expectUnitToBeEquivalent(expected, actual) {
 	expect(actual).to.have.property('id', expected.id);
 	expect(actual).to.have.property('name', expected.name);
@@ -18,6 +23,11 @@ function expectUnitToBeEquivalent(expected, actual) {
 	expect(actual).to.have.property('unitRepresentType', expected.unitRepresentType);
 }
 
+/**
+ * Compares the expected and actual lists of units.
+ * @param {*} expected The expected list of unit.
+ * @param {*} actual The actual list of unit.
+ */
 function expectArrayOfUnitsToBeEquivalen(expected, actual) {
 	expect(expected.length).to.be.equal(actual.length);
 	// Need to sort before comparing.

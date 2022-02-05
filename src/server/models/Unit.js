@@ -129,7 +129,6 @@ class Unit {
 		return rows.map(Unit.mapRow);
 	}
 
-	// TODO: Returns a special value if it doesn't exist
 	/**
 	 * Returns the associated unit for the given id.
 	 * @param {*} id The id.
@@ -153,7 +152,6 @@ class Unit {
 		return Unit.mapRow(row);
 	}
 
-	// TODO: Returns a special value if it doesn't exist
 	/**
 	 * Returns the associated id of type meter for the given unitIndex.
 	 * @param {*} unitIndex The unit's index.
