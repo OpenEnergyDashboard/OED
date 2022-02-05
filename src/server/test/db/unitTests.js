@@ -4,8 +4,6 @@
 
 const { mocha, expect, testDB } = require('../common');
 const Unit = require('../../models/Unit');
-const { unitRepresentType } = require('../../models/Unit');
-const { _ } = require('core-js');
 
 function expectUnitToBeEquivalent(expected, actual) {
 	expect(actual).to.have.property('id', expected.id);
@@ -82,7 +80,7 @@ mocha.describe('Units', () => {
 		const unitTypeUnit = new Unit(undefined, 'Unit', 'Unit', 
 										Unit.unitType.UNIT, 0, '', Unit.displayableType.ALL, true, '', Unit.unitRepresentType.UNUSED);
 		const unitTypeMeterAll = new Unit(undefined, 'Meter All', 'Meter All', 
-											Unit.unitType.METER, 1, '', Unit.displayableType.ALL, true, '', unitRepresentType.UNUSED);
+											Unit.unitType.METER, 1, '', Unit.displayableType.ALL, true, '', Unit.unitRepresentType.UNUSED);
 		const unitTypeMeterAdmin = new Unit(undefined, 'Meter Admin', 'Meter Admin', 
 											Unit.unitType.METER, 2, '', Unit.displayableType.ADMIN, true, '', Unit.unitRepresentType.UNUSED);
 		await unitTypeUnit.insert(conn);
@@ -101,7 +99,7 @@ mocha.describe('Units', () => {
 	mocha.it('can get visible unit of type unit or suffix', async () => {
 		const conn = testDB.getConnection();
 		const unitTypeMeter = new Unit(undefined, 'Meter', 'Meter', 
-										Unit.unitType.METER, 0, '', Unit.displayableType.ALL, true, '', unitRepresentType.UNUSED);
+										Unit.unitType.METER, 0, '', Unit.displayableType.ALL, true, '', Unit.unitRepresentType.UNUSED);
 		const unitTypeUnitAll = new Unit(undefined, 'Unit All', 'Unit All', 
 											Unit.unitType.UNIT, 1, '', Unit.displayableType.ALL, true, '', Unit.unitRepresentType.UNUSED);
 		const unitTypeUnitAdmin = new Unit(undefined, 'Unit Admin', 'Unit Admin', 
@@ -130,7 +128,7 @@ mocha.describe('Units', () => {
 		const unitTypeUnit = new Unit(undefined, 'Unit', 'Unit', 
 										Unit.unitType.UNIT, 0, '', Unit.displayableType.ALL, true, '', Unit.unitRepresentType.UNUSED);
 		const unitTypeMeterAll = new Unit(undefined, 'Meter All', 'Meter All', 
-											Unit.unitType.METER, 1, '', Unit.displayableType.ALL, true, '', unitRepresentType.UNUSED);
+											Unit.unitType.METER, 1, '', Unit.displayableType.ALL, true, '', Unit.unitRepresentType.UNUSED);
 		const unitTypeMeterNone = new Unit(undefined, 'Meter None', 'Meter None', 
 											Unit.unitType.METER, 2, '', Unit.displayableType.NONE, true, '', Unit.unitRepresentType.UNUSED);
 		await unitTypeUnit.insert(conn);
@@ -144,7 +142,7 @@ mocha.describe('Units', () => {
 	mocha.it('should only get units of type unit', async () => {
 		const conn = testDB.getConnection();
 		const unitTypeMeter = new Unit(undefined, 'Meter', 'Meter', 
-										Unit.unitType.METER, 0, '', Unit.displayableType.ALL, true, '', unitRepresentType.UNUSED);
+										Unit.unitType.METER, 0, '', Unit.displayableType.ALL, true, '', Unit.unitRepresentType.UNUSED);
 		const unitTypeUnitAll = new Unit(undefined, 'Unit All', 'Unit All', 
 											Unit.unitType.UNIT, 1, '', Unit.displayableType.ALL, true, '', Unit.unitRepresentType.UNUSED);
 		const unitTypeUnitNone = new Unit(undefined, 'Unit None', 'Unit None', 
