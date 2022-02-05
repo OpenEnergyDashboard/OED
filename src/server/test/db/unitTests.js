@@ -167,7 +167,6 @@ mocha.describe('Units', () => {
 		await unitTypeSuffixNone.insert(conn);
 		const expectedUnits = [unitTypeSuffixAll, unitTypeSuffixNone];
 		const actualUnits = await Unit.getSuffix(conn);
-		console.log(actualUnits);
 		expectArrayOfUnitsToBeEquivalen(expectedUnits, actualUnits);
 	});
 });

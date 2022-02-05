@@ -1,0 +1,56 @@
+/* This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this
+ * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
+
+const { mocha, expect, testDB } = require('../common');
+const Conversion = require('../../models/Conversion');
+
+/**
+ * Compares the expected and actual conversion.
+ * @param {*} expected The exepected conversion.
+ * @param {*} actual The actual conversion.
+ */
+function expectConversionToBeEquivalent(expected, actual) {
+	expect(actual).to.have.property('sourceId', expected.sourceId);
+	expect(actual).to.have.property('destinationId', expected.destinationId);
+	expect(actual).to.have.property('bidirectional', expected.bidirectional);
+	expect(actual).to.have.property('slope', expected.slope);
+	expect(actual).to.have.property('intercept', expected.intercept);
+	expect(actual).to.have.property('note', expected.note);
+}
+
+mocha.describe('Conversions', () => {
+	mocha.it('can be saved and retrived', async () => {
+		const conn = testDB.getConnection();
+		const conversionPreInsert = new Conversion(0, 1, true, 0, 0, '');
+		await conversionPreInsert.insert(conn);
+		// Gets conversion by source and destination.
+		const conversionPostInsertBySourceDestination = await Conversion.getBySourceDestination(0, 1, conn);
+		expectConversionToBeEquivalent(conversionPreInsert, conversionPostInsertBySourceDestination);
+	});
+
+	mocha.it('can be updated and retrived', async () => {
+		const conn = testDB.getConnection();
+		const conversionPreInsert = new Conversion(0, 1, true, 0, 0, '');
+		await conversionPreInsert.insert(conn);
+		
+		// Update the conversion. Note that the sourceId and destinationId can't be changed.
+		conversionPreInsert.bidirectional = false;
+		conversionPreInsert.intercept = 3.1415;
+		conversionPreInsert.note = 'New note';
+		await conversionPreInsert.update(conn);
+		
+		const covnersionPostInsert = await Conversion.getBySourceDestination(0, 1, conn);
+		expectConversionToBeEquivalent(conversionPreInsert, covnersionPostInsert); 
+	});
+
+	mocha.it('can be deleted', async () => {
+		const conn = testDB.getConnection();
+		const conversionPreInsert = new Conversion(0, 1, true, 0, 0, '');
+		await conversionPreInsert.insert(conn);
+		await Conversion.delete(0, 1, conn);
+
+		const conversionPostInsert = await Conversion.getBySourceDestination(0, 1, conn);
+		expect(conversionPostInsert).to.be.equal(null);
+	});
+});

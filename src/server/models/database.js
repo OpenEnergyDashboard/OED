@@ -82,6 +82,7 @@ async function createSchema(conn) {
 	const Baseline = require('./Baseline');
 	const { Map } = require('./Map');
 	const Unit = require('./Unit');
+	const Conversion = require('./Conversion');
 
 	/* eslint-enable global-require */
 	await Meter.createMeterTypesEnum(conn);
@@ -108,6 +109,7 @@ async function createSchema(conn) {
 	await Unit.createDisplayableTypesEnum(conn);
 	await Unit.createUnitRepresentTypesEnum(conn);
 	await Unit.createTable(conn);
+	await Conversion.createTable(conn);
 }
 
 module.exports = {
