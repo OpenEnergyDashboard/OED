@@ -5,6 +5,7 @@
 const moment = require('moment');
 const database = require('./database');
 const Reading = require('./Reading');
+const Unit = require('./Unit');
 
 const sqlFile = database.sqlFile;
 
@@ -33,11 +34,13 @@ class Meter {
 	 * @param reading The value of reading, default 0.0
 	 * @param startTimestamp Start timestamp of last reading input for this meter, default '1970-01-01 00:00:00'
 	 * @param endTimestamp  End timestamp of last reading input for this meter, '1970-01-01 00:00:00' 
+	 * @param unitId The foreign key to the unit table. The meter receives data and points to this unit in the graph
+	 * @param defaultGraphicUnit The foreign key to the unit table represents the preferred unit to display this meter
 	 */
 	constructor(id, name, ipAddress, enabled, displayable, type, meterTimezone, gps = undefined, identifier = name, note, area,
 		cumulative = false, cumulativeReset = false, cumulativeResetStart = '00:00:00', cumulativeResetEnd = '23:59:59.999999',
 		readingGap = 0, readingVariation = 0, readingDuplication = 1, timeSort = 'increasing', endOnlyTime = false,
-		reading = 0.0, startTimestamp = moment(0), endTimestamp = moment(0)) {
+		reading = 0.0, startTimestamp = moment(0), endTimestamp = moment(0), unitId, defaultGraphicUnit) {
 		// In order for the CSV pipeline to work, the order of the parameters needs to match the order that the fields are declared.
 		// In addition, each new parameter has to be added at the very end.
 		this.id = id;
@@ -63,6 +66,8 @@ class Meter {
 		this.reading = reading;
 		this.startTimestamp = startTimestamp;
 		this.endTimestamp = endTimestamp;
+		this.unitId = unitId;
+		this.defaultGraphicUnit = defaultGraphicUnit;
 	}
 
 	/**
@@ -115,7 +120,7 @@ class Meter {
 			row.default_timezone_meter, row.gps, row.identifier, row.note, row.area, row.cumulative, row.cumulative_reset,
 			row.cumulative_reset_start, row.cumulative_reset_end, row.reading_gap, row.reading_variation,
 			row.reading_duplication, row.time_sort, row.end_only_time,
-			row.reading, row.start_timestamp, row.end_timestamp);
+			row.reading, row.start_timestamp, row.end_timestamp, row.unit_id, row.defaultGraphicUnit);
 	}
 
 	/**
@@ -157,6 +162,20 @@ class Meter {
 	static async getEnabled(conn) {
 		const rows = await conn.any(sqlFile('meter/get_enabled_meters.sql'));
 		return rows.map(Meter.mapRow);
+	}
+
+	/**
+	 * For the given meter id, gets the associated unitId. 
+	 * Then, returns the unitIndex (the row/column id in the Cij/Pij table) of that unitId.
+	 * @param {*} meterId The meter id.
+	 * @param {*} conn The connection to use.
+	 * @return {Promise.<Int>}
+	 */
+	static async getUnitIndex(meterId, conn) {
+		const resp = await conn.one(sqlFile('meter/get_unit_id.sql'), { meterId: meterId });
+		const unitId = resp.unit_id;
+		const unit = await Unit.getById(unitId, conn);
+		return unit.unitIndex;
 	}
 
 	/**

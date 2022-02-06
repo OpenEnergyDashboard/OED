@@ -24,5 +24,7 @@ UPDATE meters
 		end_only_time = ${endOnlyTime},
 		reading = ${reading},
 		start_timestamp = ${startTimestamp},
-		end_timestamp = ${endTimestamp}
+		end_timestamp = ${endTimestamp},
+		unit_id = ${unitId},
+		default_graphic_unit = ${defaultGraphicUnit}
 	WHERE id = ${id};
