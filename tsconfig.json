@@ -9,7 +9,7 @@
         "baseUrl": "./src/client/app/",
         "outDir": "./src/client/public/app/",
         "sourceMap": true,
-        "module": "es6",
+        "module": "commonjs",
         "target": "es5",
 		"jsx": "react",
 		"allowJs": true,
