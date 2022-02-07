@@ -53,6 +53,17 @@ mocha.describe('Groups', () => {
 		expectGroupToBeEquivalent(groupPreInsert, groupPostInsert);
 	});
 
+	mocha.it('can be saved, updated, and retrieved', async () => {
+		conn = testDB.getConnection();
+		const groupPreInsert = new Group(undefined, 'Group', true, gps, 'notes', 33.5, 0);
+		await groupPreInsert.insert(conn);
+		groupPreInsert.name = 'New name';
+		groupPreInsert.defaultGraphicUnit = -99;
+		await groupPreInsert.update(conn);
+		const groupPostInsert = await Group.getByName('New name', conn);
+		expectGroupToBeEquivalent(groupPreInsert, groupPostInsert);
+	})
+
 	mocha.it('can be renamed', async () => {
 		conn = testDB.getConnection();
 		let larry = new Group(undefined, 'Larry');
@@ -226,8 +237,11 @@ mocha.describe('Groups', () => {
 			expect(expectedGroups.length).to.be.equal(actualGroups.length);
 			// Sorts the list so that groups are in the correct order.
 			actualGroups.sort((a, b) => {
-				return a.name - b.name;
+				return a.id - b.id;
 			});
+			expectedGroups.sort((a, b) => {
+				return a.id - b.id;
+			})
 
 			for (let i = 0; i < actualGroups.length; ++i) {
 				expectGroupToBeEquivalent(expectedGroups[i], actualGroups[i]);

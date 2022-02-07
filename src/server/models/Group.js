@@ -186,7 +186,8 @@ class Group {
 	 * @returns {Promise.<>}
 	 */
 	async update(conn) {
-		const group = this;
+		// Shallow copies the group object so that the original group's unitId will not be changed to null.
+		const group = {...this};
 		if (group.id === undefined) {
 			throw new Error('Attempt to update a group with no ID');
 		}
