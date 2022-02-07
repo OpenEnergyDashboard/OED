@@ -62,7 +62,7 @@ function findMaxSemanticVersion(list) {
 	return max;
 }
 
-export default {
+module.exports = {
 	compareSemanticVersion,
 	findMaxSemanticVersion
 };

@@ -2,7 +2,7 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
 
-import { default as pkgJson } from '../../package.json';
+const pkgJson = require('../../package.json');
 const { log } = require('./log');
 
 /**
@@ -27,4 +27,5 @@ OEDVersion.prototype.toString = function toString() {
 	return `v${this.major}.${this.minor}.${this.patch}`;
 };
 
-export const VERSION = new OEDVersion();
+const VERSION = new OEDVersion();
+module.exports = VERSION;
