@@ -42,6 +42,8 @@ function expectMetersToBeEquivalent(expected, actual) {
 	expect(actual).to.have.property('reading', expected.reading);
 	expect(actual.startTimestamp.isSame(moment(expected.startTimestamp))).to.equal(true);
 	expect(actual.endTimestamp.isSame(moment(expected.endTimestamp))).to.equal(true);
+	expect(actual).to.have.property('unitId', expected.unitId);
+	expect(actual).to.have.property('defaultGraphicUnit', expected.defaultGraphicUnit);
 }
 
 mocha.describe('Meters', () => {

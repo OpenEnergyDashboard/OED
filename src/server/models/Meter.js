@@ -120,7 +120,7 @@ class Meter {
 			row.default_timezone_meter, row.gps, row.identifier, row.note, row.area, row.cumulative, row.cumulative_reset,
 			row.cumulative_reset_start, row.cumulative_reset_end, row.reading_gap, row.reading_variation,
 			row.reading_duplication, row.time_sort, row.end_only_time,
-			row.reading, row.start_timestamp, row.end_timestamp, row.unit_id, row.defaultGraphicUnit);
+			row.reading, row.start_timestamp, row.end_timestamp, row.unit_id, row.default_graphic_unit);
 	}
 
 	/**
