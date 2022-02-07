@@ -11,37 +11,48 @@ const Point = require('../../models/Point');
 const gps = new Point(90, 45);
 
 async function setupGroupsAndMeters(conn) {
-	const groupA = new Group(undefined, 'GA', true, gps, 'notes GA', 33.5);
-	const groupB = new Group(undefined, 'GB', false, gps, 'notes GB', 43.5);
-	const groupC = new Group(undefined, 'GC', true, gps, 'notes GC', 53.5);
+	const groupA = new Group(undefined, 'GA', true, gps, 'notes GA', 33.5, 0);
+	const groupB = new Group(undefined, 'GB', false, gps, 'notes GB', 43.5, 1);
+	const groupC = new Group(undefined, 'GC', true, gps, 'notes GC', 53.5, -99);
 	await Promise.all([groupA, groupB, groupC].map(group => group.insert(conn)));
 	const meterA = new Meter(undefined, 'MA', null, false, true, Meter.type.MAMAC, null, gps,
 	'Identified MA' ,'notes MA', 35.0, true, true, '01:01:25', '00:00:00', 5, 1, 1, 'increasing', false,
-	1.5, '0001-01-01 23:59:59', '2020-07-02 01:00:10');
+	1.5, '0001-01-01 23:59:59', '2020-07-02 01:00:10', 0, 0);
 	const meterB = new Meter(undefined, 'MB', null, false, true, Meter.type.OTHER, null, gps,
 	'Identified MB', 'notes MB', 33.5, true, true, '05:05:09', '09:00:01', 0, 0, 1, 'increasing', false,
-	25.5, '0002-01-01 23:59:59', '2020-07-02 01:00:10');
+	25.5, '0002-01-01 23:59:59', '2020-07-02 01:00:10', 0, 0);
 	const meterC = new Meter(undefined, 'MC', null, false, true, Meter.type.METASYS, null, gps,
 	'Identified MC', 'notes MC', 33.5, true, true, '05:05:09', '09:00:01', 0, 0, 1, 'increasing', false,
-	25.5, '0003-01-01 23:59:59', '2020-07-02 01:00:10');
+	25.5, '0003-01-01 23:59:59', '2020-07-02 01:00:10', 0, 0);
 	await Promise.all([meterA, meterB, meterC].map(meter => meter.insert(conn)));
+}
+
+/**
+ * Compares the expected and the actual groups.
+ * @param {*} expected The expected group.
+ * @param {*} actual The actual group.
+ */
+function expectGroupToBeEquivalent(expected, actual) {
+	expect(actual).to.have.property('id', expected.id);
+	expect(actual).to.have.property('name', expected.name);
+	expect(actual).to.have.property('displayable', expected.displayable);
+	expect(actual).to.have.property('gps');
+	expect(actual.gps).to.have.property('latitude', expected.gps.latitude);
+	expect(actual.gps).to.have.property('longitude', expected.gps.longitude);
+	expect(actual).to.have.property('note', expected.note);
+	expect(actual).to.have.property('area', expected.area);
+	expect(actual).to.have.property('defaultGraphicUnit', expected.defaultGraphicUnit);
 }
 
 mocha.describe('Groups', () => {
 	mocha.it('can be saved and retrieved', async () => {
 		conn = testDB.getConnection();
-		const groupPreInsert = new Group(undefined, 'Group', true, gps, 'notes', 33.5);
+		const groupPreInsert = new Group(undefined, 'Group', true, gps, 'notes', 33.5, -99);
 		await groupPreInsert.insert(conn);
 		const groupPostInsert = await Group.getByName(groupPreInsert.name, conn);
-		expect(groupPostInsert).to.have.property('name', groupPreInsert.name);
-		expect(groupPostInsert).to.have.property('id', groupPreInsert.id);
-		expect(groupPostInsert).to.have.property('displayable', groupPreInsert.displayable);
-		expect(groupPostInsert).to.have.property('gps');
-		expect(groupPostInsert.gps).to.have.property('latitude', groupPreInsert.gps.latitude);
-		expect(groupPostInsert.gps).to.have.property('longitude', groupPreInsert.gps.longitude);
-		expect(groupPostInsert).to.have.property('note', groupPreInsert.note);
-		expect(groupPostInsert).to.have.property('area', groupPreInsert.area);
+		expectGroupToBeEquivalent(groupPreInsert, groupPostInsert);
 	});
+
 	mocha.it('can be renamed', async () => {
 		conn = testDB.getConnection();
 		let larry = new Group(undefined, 'Larry');
@@ -203,6 +214,24 @@ mocha.describe('Groups', () => {
 			allGroups = await Group.getAll(conn);
 			allGroups = allGroups.map(g => g.id);
 			expect(allGroups.sort()).to.deep.equal([parent.id, child.id].sort());
+		});
+
+		mocha.it('can get all displayable groups', async () => {
+			conn = testDB.getConnection();
+			const groupA = await Group.getByName('GA', conn);
+			const groupC = await Group.getByName('GC', conn);
+			const actualGroups = await Group.getDisplayable(conn);
+			const expectedGroups = [groupA, groupC];
+			
+			expect(expectedGroups.length).to.be.equal(actualGroups.length);
+			// Sorts the list so that groups are in the correct order.
+			actualGroups.sort((a, b) => {
+				return a.name - b.name;
+			});
+
+			for (let i = 0; i < actualGroups.length; ++i) {
+				expectGroupToBeEquivalent(expectedGroups[i], actualGroups[i]);
+			}
 		});
 	});
 });
