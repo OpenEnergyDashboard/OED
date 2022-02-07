@@ -4,7 +4,7 @@
 
 import store from '../index';
 import { defineMessages, createIntl, createIntlCache } from 'react-intl';
-import { default as localeData } from '../translations/data.json';
+import localeData from '../translations/data';
 
 const enum AsTranslated {}
 export type TranslatedString = string & AsTranslated;
@@ -13,14 +13,7 @@ export default function translate(messageID: string): TranslatedString {
 	const state: any = store.getState();
 	const lang = state.admin.defaultLanguage;
 
-	let messages;
-	if (lang === 'fr') {
-		messages = (localeData as any).fr;
-	} else if (lang === 'es') {
-		messages = (localeData as any).es;
-	} else {
-		messages = (localeData as any).en;
-	}
+	let messages = (localeData as any)[lang];
 	const cache = createIntlCache();
 	const intl = createIntl({ locale: lang, messages }, cache);
 	return intl.formatMessage(defineMessages({ [messageID]: { id: messageID }})[messageID]) as TranslatedString;

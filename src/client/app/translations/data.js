@@ -1,4 +1,4 @@
-{
+const localeData = {
 	"en": {
 		"400": "400 Bad Request",
 		"404": "404 Not Found",
@@ -765,3 +765,5 @@
 		"you.cannot.create.a.cyclic.group": "No se puede crear un grupo cíclico"
 	}
 }
+
+export default localeData;
