@@ -3,7 +3,7 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
 
 import { default as pkgJson } from '../../package.json';
-import { log } from './log';
+const { log } = require('./log');
 
 /**
  * Creates a new OEDVersion object, which contains a major, minor, and patch release level.

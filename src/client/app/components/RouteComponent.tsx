@@ -192,7 +192,6 @@ export default class RouteComponent extends React.Component<RouteProps, {}> {
 							break;
 						case 'mapID':
 							options.mapID = (parseInt(info));
-							break;
 						case 'serverRange':
 							options.serverRange = TimeInterval.fromString(info);
 							/**

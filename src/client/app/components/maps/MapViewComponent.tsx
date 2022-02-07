@@ -113,8 +113,7 @@ class MapViewComponent extends React.Component<MapViewPropsWithIntl, MapViewStat
 	}
 
 	private toggleCircleInput() {
-		let checkval: boolean;
-		checkval = true;
+		let checkval: boolean = true;
 		// if trying to submit an updated value
 		if (this.state.circleFocus) {
 			const regtest = /^\d+(\.\d+)?$/;

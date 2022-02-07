@@ -53,8 +53,7 @@ async function uploadMeters(req, res, filepath, conn) {
 				nameOfMeter = meter[0];
 			} else if (meters.length !== 1) {
 				// This error could be thrown a number of times, one per meter in CSV, but should only see one of them.
-				throw new
-				CSVPipelineError(`Meter name provided (${nameOfMeter}) in request with update for meters but more than one meter in CSV so not processing`, undefined, 500);
+				throw new CSVPipelineError(`Meter name provided (${nameOfMeter}) in request with update for meters but more than one meter in CSV so not processing`, undefined, 500);
 			}
 			let currentMeter;
 			currentMeter = await Meter.getByName(nameOfMeter, conn)

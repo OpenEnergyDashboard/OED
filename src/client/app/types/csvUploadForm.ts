@@ -63,7 +63,7 @@ export interface ReadingsCSVUploadProps extends ReadingsCSVUploadPreferencesItem
 	toggleCreateMeter: () => void;
 	toggleRefreshHourlyReadings: () => void;
 	toggleRefreshReadings: () => void;
-}
+};
 
 // MetersCSVUpload, MetersCSVUploadPreferencesItem, MetersCSVUploadProps should be interfaces. However, at the moment does not add anything new.
 // Hence, we define a new type rather than a new interface that extends CSVUploadPreferences and CSVUploadProps to pass our linter.
