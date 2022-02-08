@@ -34,13 +34,13 @@ class Meter {
 	 * @param reading The value of reading, default 0.0
 	 * @param startTimestamp Start timestamp of last reading input for this meter, default '1970-01-01 00:00:00'
 	 * @param endTimestamp  End timestamp of last reading input for this meter, '1970-01-01 00:00:00' 
-	 * @param unitId The foreign key to the unit table. The meter receives data and points to this unit in the graph
-	 * @param defaultGraphicUnit The foreign key to the unit table represents the preferred unit to display this meter
+	 * @param unitId The foreign key to the unit table. The meter receives data and points to this unit in the graph, default 0
+	 * @param defaultGraphicUnit The foreign key to the unit table represents the preferred unit to display this meter, default 0
 	 */
 	constructor(id, name, ipAddress, enabled, displayable, type, meterTimezone, gps = undefined, identifier = name, note, area,
 		cumulative = false, cumulativeReset = false, cumulativeResetStart = '00:00:00', cumulativeResetEnd = '23:59:59.999999',
 		readingGap = 0, readingVariation = 0, readingDuplication = 1, timeSort = 'increasing', endOnlyTime = false,
-		reading = 0.0, startTimestamp = moment(0), endTimestamp = moment(0), unitId, defaultGraphicUnit) {
+		reading = 0.0, startTimestamp = moment(0), endTimestamp = moment(0), unitId = 0, defaultGraphicUnit = 0) {
 		// In order for the CSV pipeline to work, the order of the parameters needs to match the order that the fields are declared.
 		// In addition, each new parameter has to be added at the very end.
 		this.id = id;
