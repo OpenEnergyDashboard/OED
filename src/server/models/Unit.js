@@ -148,7 +148,7 @@ class Unit {
 	 * @returns {Promise.<Unit>}
 	 */
 	static async getByName(name, conn) {
-		const row = await conn.one(sqlFile('unit/get_by_name.sql'), { name: name });
+		const row = await conn.oneOrNone(sqlFile('unit/get_by_name.sql'), { name: name });
 		return Unit.mapRow(row);
 	}
 
@@ -171,7 +171,7 @@ class Unit {
 	 * @returns {Promise.<Int>}
 	 */
 	static async getByUnitIndexUnit(unitIndex, conn) {
-		const resp = await conn.one(sqlFile('unit/get_by_unit_index_unit.sql'), { unitIndex: unitIndex });
+		const resp = await conn.oneOrNone(sqlFile('unit/get_by_unit_index_unit.sql'), { unitIndex: unitIndex });
 		return resp.id;
 	}
 
