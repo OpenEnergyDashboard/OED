@@ -230,7 +230,7 @@ export default class RouteComponent extends React.Component<RouteProps, {}> {
 	 */
 	public render() {
 		const lang = this.props.defaultLanguage;
-		let messages = (localeData as any)[lang];
+		const messages = (localeData as any)[lang];
 		return (
 			<div>
 				<InitializationContainer />

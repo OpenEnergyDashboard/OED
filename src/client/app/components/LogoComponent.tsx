@@ -23,6 +23,7 @@ function LogoComponent(props: LogoProps) {
 		oed: { id: 'oed' },
 		logo: { id: 'logo' }
 	});
+	// WrappedComponentProps doesn't really work here as it's a function, so instead we use useIntl() which was part of the updated react-intl
 	const intl = useIntl();
 	return (
 		<img height={props.height} src={props.url} alt={intl.formatMessage(messages.logo)} title={intl.formatMessage(messages.oed)} style={imgStyle} />

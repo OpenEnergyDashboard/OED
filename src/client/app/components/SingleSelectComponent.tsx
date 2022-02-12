@@ -31,10 +31,13 @@ export default class SingleSelectComponent extends React.Component<SingleSelectP
 		};
 	}
 
-	public componentDidUpdate(prevProps: SingleSelectProps) {
-		if (this.props.selectedOption !== prevProps.selectedOption) {
-			this.setState({ selectedOption: this.props.selectedOption });
+	static getDerivedStateFromProps(cProps: SingleSelectProps, cState: SingleSelectState) {
+		if (cState.selectedOption !== cProps.selectedOption) {
+			return {
+				selectedOption: cProps.selectedOption
+			};
 		}
+		return null;
 	}
 
 	public render() {

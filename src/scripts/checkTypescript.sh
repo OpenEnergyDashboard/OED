@@ -10,7 +10,7 @@ CHECK_DIR="./src/client/app"
 echo "[TSC] Checking $CHECK_DIR for JavaScript source files."
 
 # Get a list of files in the tree that are JS or JSX files.
-FILES=$(find "$CHECK_DIR" -iname "*.js" -o -iname "*.jsx")
+FILES=$(find "$CHECK_DIR" \! -name "data.js" -iname "*.js" -o -iname "*.jsx")
 
 # Counts the files listed in FILES
 NFILES=$(echo $FILES | wc -w)

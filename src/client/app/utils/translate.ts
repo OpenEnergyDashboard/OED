@@ -13,7 +13,7 @@ export default function translate(messageID: string): TranslatedString {
 	const state: any = store.getState();
 	const lang = state.admin.defaultLanguage;
 
-	let messages = (localeData as any)[lang];
+	const messages = (localeData as any)[lang];
 	const cache = createIntlCache();
 	const intl = createIntl({ locale: lang, messages }, cache);
 	return intl.formatMessage(defineMessages({ [messageID]: { id: messageID }})[messageID]) as TranslatedString;

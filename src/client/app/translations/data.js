@@ -1,3 +1,6 @@
+/* tslint:disable */
+
+// This file used to be a json file, but had issues with importing, so we declared the json variable in a js file instead.
 const localeData = {
 	"en": {
 		"400": "400 Bad Request",

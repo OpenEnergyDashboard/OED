@@ -260,7 +260,7 @@ function mapStateToProps(state: State) {
 
 	/***
 	 * Usage:
-	 *  <PlotlyChart data={toJS(this.model_data)}
+	 *  <Plot data={toJS(this.model_data)}
 	 *               layout={layout}
 	 *               onClick={({points, event}) => console.log(points, event)}>
 	 */
