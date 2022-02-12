@@ -43,7 +43,7 @@ class Group {
 	 * @return {Promise.<void>}
 	 */
 	async insert(conn) {
-		// Shallow copies the group object so that the original group's unitId will not be changed to null.
+		// Shallow copies the group object so that the original group's defaultGraphicUnit will not be changed to null.
 		const group = {...this};
 		if (group.id !== undefined) {
 			throw new Error('Attempt to insert a group that already has an ID');
@@ -186,7 +186,7 @@ class Group {
 	 * @returns {Promise.<>}
 	 */
 	async update(conn) {
-		// Shallow copies the group object so that the original group's unitId will not be changed to null.
+		// Shallow copies the group object so that the original group's defaultGraphicUnit will not be changed to null.
 		const group = {...this};
 		if (group.id === undefined) {
 			throw new Error('Attempt to update a group with no ID');

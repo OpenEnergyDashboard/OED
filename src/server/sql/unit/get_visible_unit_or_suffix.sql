@@ -4,7 +4,7 @@
 
 SELECT *
 FROM units
-WHERE (unit_type = 'unit' OR unit_type = 'suffix')
--- Returns unit with properly displayable_type. 
+WHERE (type_of_unit = 'unit' OR type_of_unit = 'suffix')
+-- Returns unit with properly displayable. 
 -- If user is admin then return units with displayable of all or admin if user is admin.
-AND (displayable_type = ${user} OR (displayable_type = 'all' AND ${user} = 'admin'));
+AND (displayable = ${user} OR (displayable = 'all' AND ${user} = 'admin'));

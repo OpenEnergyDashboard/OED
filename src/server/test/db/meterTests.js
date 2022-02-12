@@ -112,8 +112,8 @@ mocha.describe('Meters', () => {
 
 	mocha.it('can get unit index', async () => {
 		const conn = testDB.getConnection();
-		const unit = new Unit(undefined, 'Unit', 'Unit', 
-								Unit.unitType.METER, 3, '', Unit.displayableType.ALL, true, '', Unit.unitRepresentType.UNUSED);
+		const unit = new Unit(undefined, 'Unit', 'Unit', Unit.unitRepresentType.UNUSED, 
+								3600, Unit.unitType.METER, 3, '', Unit.displayableType.ALL, true, '');
 		const visibleMeter = new Meter(undefined, 'VisibleMeter', null, true, true, Meter.type.MAMAC, null, gps, 
 		'Identified 1' ,'notes 1', 35.0, true, true, '01:01:25' , '00:00:00', 5, 0, 1, 'increasing', false,
 		1.5, '0001-01-01 23:59:59', '2020-07-02 01:00:10', 1, 0);

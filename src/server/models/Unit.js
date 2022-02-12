@@ -10,25 +10,27 @@ class Unit {
 	 * @param {*} id This unit's ID.
 	 * @param {*} name This unit's name used internally and by the admin.
 	 * @param {*} identifier This unit's identifier displayed to the user. 
-	 * @param {*} unitType This unit's type. Can be meter, unit, or suffix.
+	 * @param {*} unitRepresent Tells how the data is fetched for readings (only need for meter type unit).
+	 * @param {*} secInRate The number of seconds in the unit associated with flow (rate) units.
+	 * @param {*} typeOfUnit This unit's type. Can be meter, unit, or suffix.
 	 * @param {*} unitIndex The unique number for row/column index in conversion table for this unit.
 	 * @param {*} suffix This unit's suffix.
 	 * @param {*} displayable Can be none, all, or admin. Restrict the type of user that can see this unit.
-	 * @param {*} primary True if this unit is always displayed. If not, the user needs to ask to see (for future enhancement).
+	 * @param {*} alwaysDisplay True if this unit is always displayed. If not, the user needs to ask to see (for future enhancement).
 	 * @param {*} note Note about this unit.
-	 * @param {*} unitRepresentType Tells how the data is fetched for readings (only need for meter type unit).
 	 */
-	constructor(id, name, identifier, unitType, unitIndex, suffix = '', displayable, primary, note, unitRepresentType) {
+	constructor(id, name, identifier, unitRepresent, secInRate = 3600, typeOfUnit, unitIndex, suffix = '', displayable, alwaysDisplay, note) {
 		this.id = id;
 		this.name = name;
 		this.identifier = identifier;
-		this.unitType = unitType;
+		this.unitRepresent = unitRepresent;
+		this.secInRate = secInRate;
+		this.typeOfUnit = typeOfUnit;
 		this.unitIndex = unitIndex;
 		this.suffix = suffix;
 		this.displayable = displayable;
-		this.primary = primary;
+		this.alwaysDisplay = alwaysDisplay;
 		this.note = note;
-		this.unitRepresentType = unitRepresentType;
 	}
 
 	/**
@@ -37,8 +39,8 @@ class Unit {
 	 * @returns The new unit object.
 	 */
 	static mapRow(row) {
-		return new Unit(row.id, row.name, row.identifier, row.unit_type, row.unit_index, 
-						row.suffix, row.displayable_type, row.is_primary, row.note, row.unit_represent_type);
+		return new Unit(row.id, row.name, row.identifier, row.unit_represent, row.sec_in_rate, 
+						row.type_of_unit, row.unit_index, row.suffix, row.displayable, row.always_display, row.note);
 	}
 
 	/**
@@ -79,7 +81,7 @@ class Unit {
 
 	/**
 	 * Returns all units of meter type that are visible to user.
-	 * @param {*} user Can be all or admin.
+	 * @param {*} user The user's type.
 	 * @param {*} conn The connection to use.
 	 * @returns {Promise.<Array.<Unit>>}
 	 */
@@ -90,7 +92,7 @@ class Unit {
 
 	/**
 	 * Returns all units of unit or suffix type that are visible to user.
-	 * @param {*} user Can be all or admin.
+	 * @param {*} user The user's type.
 	 * @param {*} conn The connection to use.
 	 * @returns {Promise.<Array.<Unit>>}
 	 */

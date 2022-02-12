@@ -3,7 +3,6 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
 
 const database = require('./database');
-const Unit = require('./Unit');
 const sqlFile = database.sqlFile;
 
 class Conversion {
