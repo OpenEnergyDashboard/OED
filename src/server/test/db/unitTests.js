@@ -57,16 +57,16 @@ mocha.describe('Units', () => {
 		const unitTypePostInsertByName = await Unit.getByName('Unit', conn);
 		expectUnitToBeEquivalent(unitTypePreInsert, unitTypePostInsertByName);
 		// Gets unit by index.
-		const idUnitTypePostInsertByIdentifier = await Unit.getByUnitIndexUnit('Index', conn);
+		const idUnitTypePostInsertByIdentifier = await Unit.getByUnitIndexUnit(0, conn);
 		expect(idUnitTypePostInsertByIdentifier).to.be.equal(1);
 	});
 
-	mocha.it('meter type can be retrieved by index', async () => {
+	mocha.it('meter type can be retrieved by unitIndex', async () => {
 		const conn = testDB.getConnection();
 		const meterTypePreInsert = new Unit(undefined, 'Meter', 'Index', Unit.unitRepresentType.UNUSED, 
 											3600, Unit.unitType.METER, 0, '', Unit.displayableType.ALL, true, '');
 		await meterTypePreInsert.insert(conn);
-		const idMeterTypePostInsertByIdentifier = await Unit.getByUnitIndexMeter('Index', conn);
+		const idMeterTypePostInsertByIdentifier = await Unit.getByUnitIndexMeter(0, conn);
 		expect(idMeterTypePostInsertByIdentifier).to.be.equal(1);
 	});
 
@@ -95,6 +95,7 @@ mocha.describe('Units', () => {
 											3600, Unit.unitType.METER, 1, '', Unit.displayableType.ALL, true, '');
 		const unitTypeMeterAdmin = new Unit(undefined, 'Meter Admin', 'Meter Admin', Unit.unitRepresentType.UNUSED, 
 											3600, Unit.unitType.METER, 2, '', Unit.displayableType.ADMIN, true, '');
+
 		await unitTypeUnit.insert(conn);
 		await unitTypeMeterAdmin.insert(conn);
 		await unitTypeMeterAll.insert(conn);

@@ -32,7 +32,7 @@ default_graphic_unit: The foreign key to the unit table represents the preferred
 */
 CREATE TABLE IF NOT EXISTS meters (
     id SERIAL PRIMARY KEY,
-    name VARCHAR(50) UNIQUE NOT NULL,
+    name VARCHAR(50) UNIQUE NOT NULL CHECK (char_length(name) >= 1),
     ipAddress VARCHAR(20),
     enabled BOOLEAN NOT NULL,
     displayable BOOLEAN NOT NULL,
