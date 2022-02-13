@@ -7,7 +7,7 @@ import * as moment from 'moment';
 import { connect } from 'react-redux';
 import getGraphColor from '../utils/getGraphColor';
 import { State } from '../types/redux/state';
-import PlotlyChart, { IPlotlyChartProps } from 'react-plotlyjs-ts';
+import Plot from 'react-plotly.js';
 import Locales from '../types/locales';
 import { DataType } from '../types/Datasources';
 
@@ -105,6 +105,7 @@ function mapStateToProps(state: State) {
 		bargap: 0.2, // Gap between different times of readings
 		bargroupgap: 0.1, // Gap between different meter's readings under the same timestamp
 		autosize: true,
+		height: 700,	// Height is set to 700 for now, but we do need to scale in the future (issue #466)
 		showlegend: true,
 		legend: {
 			x: 0,
@@ -136,11 +137,12 @@ function mapStateToProps(state: State) {
 
 	// Assign all the parameters required to create the Plotly object (data, layout, config) to the variable props, returned by mapStateToProps
 	// The Plotly toolbar is displayed if displayModeBar is set to true (not for bar charts)
-	const props: IPlotlyChartProps = {
+	const props: any = {
 		data: datasets,
 		layout,
 		config: {
 			displayModeBar: false,
+			responsive: true,
 			locales: Locales // makes locales available for use
 		}
 	};
@@ -148,4 +150,4 @@ function mapStateToProps(state: State) {
 	return props;
 }
 
-export default connect(mapStateToProps)(PlotlyChart);
+export default connect(mapStateToProps)(Plot);

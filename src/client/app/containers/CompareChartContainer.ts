@@ -9,7 +9,7 @@ import { State } from '../types/redux/state';
 import { getComparePeriodLabels, getCompareChangeSummary, calculateCompareShift } from '../utils/calculateCompare';
 import { CompareEntity } from './MultiCompareChartContainer';
 import translate from '../utils/translate';
-import PlotlyChart, { IPlotlyChartProps } from 'react-plotlyjs-ts';
+import Plot from 'react-plotly.js';
 import Locales from '../types/locales';
 import * as moment from 'moment';
 
@@ -22,7 +22,7 @@ interface CompareChartContainerProps {
 *  your reducer state objects from within your React components.
 *
 *  Returns the props object. */
-function mapStateToProps(state: State, ownProps: CompareChartContainerProps): IPlotlyChartProps {
+function mapStateToProps(state: State, ownProps: CompareChartContainerProps): any {
 	const comparePeriod = state.graph.comparePeriod;
 	const datasets: any[] = [];
 	const periodLabels = getComparePeriodLabels(comparePeriod);
@@ -116,7 +116,7 @@ function mapStateToProps(state: State, ownProps: CompareChartContainerProps): IP
 
 	// Assign all the parameters required to create the Plotly object (data, layout, config) to the variable props, returned by mapStateToProps
 	// The Plotly toolbar is displayed if displayModeBar is set to true
-	const props: IPlotlyChartProps = {
+	const props: any = {
 		data: datasets,
 		layout,
 		config: {
@@ -128,5 +128,4 @@ function mapStateToProps(state: State, ownProps: CompareChartContainerProps): IP
 	return props;
 }
 
-const plotlyConstructor: any = PlotlyChart;
-export default connect(mapStateToProps)(plotlyConstructor);
+export default connect(mapStateToProps)(Plot);

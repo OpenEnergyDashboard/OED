@@ -1,5 +1,13 @@
-{
+/* This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this
+ * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
+
+/* tslint:disable */
+
+// This file used to be a json file, but had issues with importing, so we declared the json variable in a js file instead.
+const localeData = {
 	"en": {
+		"400": "400 Bad Request",
 		"404": "404 Not Found",
 		"4.weeks": "4 Weeks",
 		"action": "Action",
@@ -254,6 +262,7 @@
 		"you.cannot.create.a.cyclic.group": "You cannot create a cyclic group"
 	},
 	"fr": {
+		"400": "(Need French) 400 Bad Request",
 		"404": "404 Introuvable",
 		"4.weeks": "4 Semaines",
 		"action": "(Need French) Action",
@@ -508,6 +517,7 @@
 		"you.cannot.create.a.cyclic.group": "Vous ne pouvez pas créer un groupe cyclique"
 	},
 	"es": {
+		"400": "(Need Spanish) 400 Bad Request",
 		"404": "404 Página no encontrada",
 		"4.weeks": "4 Semanas",
 		"action": "Acción",
@@ -762,3 +772,5 @@
 		"you.cannot.create.a.cyclic.group": "No se puede crear un grupo cíclico"
 	}
 }
+
+export default localeData;

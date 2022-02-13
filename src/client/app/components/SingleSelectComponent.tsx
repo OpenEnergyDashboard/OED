@@ -13,7 +13,7 @@ import '../styles/react-select-css.css';
 interface SingleSelectProps {
 	placeholder: string;
 	options: SelectOption[];
-	selectedOption?: SelectOption | null;
+	selectedOption?: SelectOption | undefined;
 	style?: React.CSSProperties;
 	onValueChange(value: SelectOption): void;
 }
@@ -31,10 +31,13 @@ export default class SingleSelectComponent extends React.Component<SingleSelectP
 		};
 	}
 
-	public componentWillReceiveProps(nextProps: SingleSelectProps) {
-		if (nextProps.selectedOption) {
-			this.setState({ selectedOption: nextProps.selectedOption });
+	static getDerivedStateFromProps(cProps: SingleSelectProps, cState: SingleSelectState) {
+		if (cState.selectedOption !== cProps.selectedOption) {
+			return {
+				selectedOption: cProps.selectedOption
+			};
 		}
+		return null;
 	}
 
 	public render() {

@@ -4,7 +4,7 @@
 
 import * as moment from 'moment';
 import { connect } from 'react-redux';
-import PlotlyChart, { IPlotlyChartProps } from 'react-plotlyjs-ts';
+import Plot from 'react-plotly.js';
 import { State } from '../types/redux/state';
 import {
 	calculateScaleFromEndpoints, itemDisplayableOnMap, Dimensions,
@@ -260,11 +260,11 @@ function mapStateToProps(state: State) {
 
 	/***
 	 * Usage:
-	 *  <PlotlyChart data={toJS(this.model_data)}
+	 *  <Plot data={toJS(this.model_data)}
 	 *               layout={layout}
 	 *               onClick={({points, event}) => console.log(points, event)}>
 	 */
-	const props: IPlotlyChartProps = {
+	const props: any = {
 		data,
 		layout,
 		config: {
@@ -275,4 +275,4 @@ function mapStateToProps(state: State) {
 	return props;
 }
 
-export default connect(mapStateToProps)(PlotlyChart);
+export default connect(mapStateToProps)(Plot);

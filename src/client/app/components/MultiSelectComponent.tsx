@@ -12,7 +12,7 @@ interface MultiSelectProps<I> {
 	placeholder: string;
 	/* tslint:disable:array-type */
 	options: Array<SelectOption & I>;
-	selectedOptions: Array<SelectOption & I> | null;
+	selectedOptions: Array<SelectOption & I> | undefined;
 	style?: React.CSSProperties;
 	singleSelect?: boolean;
 	onValuesChange(values: Array<SelectOption & I>): void;
@@ -33,10 +33,13 @@ export default class MultiSelectComponent<I> extends React.Component<MultiSelect
 		};
 	}
 
-	public componentWillReceiveProps(nextProps: MultiSelectProps<I>) {
-		if (nextProps.selectedOptions) {
-			this.setState({ selectedOptions: nextProps.selectedOptions });
+	static getDerivedStateFromProps(cProps: MultiSelectProps<any>, cState: MultiSelectState) {
+		if (cProps.selectedOptions !== cState.selectedOptions) {
+			return {
+				selectedOptions: cProps.selectedOptions
+			};
 		}
+		return null;
 	}
 
 	public render() {
