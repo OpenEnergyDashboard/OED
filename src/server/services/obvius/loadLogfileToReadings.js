@@ -4,12 +4,15 @@
 
 const moment = require('moment');
 const Meter = require('../../models/Meter');
-const Reading = require('../../models/Reading');
+const Unit = require('../../models/Unit');
 const loadArrayInput = require('../pipeline-in-progress/loadArrayInput');
 const { log } = require('../../log');
 const demuxCsvWithSingleColumnTimestamps = require('./csvDemux');
 
 async function loadLogfileToReadings(serialNumber, ipAddress, logfile, conn) {
+	// The unit needed to create new Obvius meters.
+	await new Unit(undefined, 'Unit', 'Unit Id', Unit.unitRepresentType.UNUSED, 1000, 
+					Unit.unitType.UNIT, 1, 'Unit Suffix', Unit.displayableType.ALL, true, 'Unit Note').insert(conn);
 	// Get demultiplexed, parsed data from the CSV.
 	const unprocessedData = demuxCsvWithSingleColumnTimestamps(logfile);
 	// Removes the first three values because we expect it to be all zeroes
@@ -25,7 +28,7 @@ async function loadLogfileToReadings(serialNumber, ipAddress, logfile, conn) {
 			meter = new Meter(undefined, `${serialNumber}.${i}`, ipAddress, true, false, Meter.type.OBVIUS,
 				null, undefined, `OBVIUS ${serialNumber} COLUMN ${i}`, 'created via obvious log upload on ' +
 				moment().format(), undefined, undefined, undefined, undefined, undefined, undefined, undefined,
-				undefined, undefined, true, undefined, undefined, undefined);
+				undefined, undefined, true, undefined, undefined, undefined, 1, 1);
 			await meter.insert(conn);
 			log.warn('WARNING: Created a meter (' + `${serialNumber}.${i}` +
 				') that does not already exist. Normally obvius meters created by an uploaded ConfigFile.');

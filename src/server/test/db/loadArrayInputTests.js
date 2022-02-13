@@ -8,12 +8,17 @@ const moment = require('moment');
 const { mocha, expect, testDB } = require('../common');
 const Reading = require('../../models/Reading');
 const Meter = require('../../models/Meter');
+const Unit = require('../../models/Unit');
 const loadArrayInput = require('../../services/pipeline-in-progress/loadArrayInput');
 
 mocha.describe('PIPELINE: Load data from array', () => {
 	mocha.it('valid data input', async () => {
 		const conn = testDB.getConnection();
-		const meter = new Meter(undefined, 'test_insert_array', 12345, true, true, Meter.type.MAMAC, null, undefined);
+		const unit = new Unit(undefined, 'Unit', 'Unit Id', Unit.unitRepresentType.UNUSED, 1000, 
+								Unit.unitType.UNIT, 1, 'Unit Suffix', Unit.displayableType.ALL, true, 'Unit Note');
+		const meter = new Meter(undefined, 'test_insert_array', 12345, true, true, Meter.type.MAMAC, null, undefined, 'test_insert_array', null, 
+								null, false, false, '00:00:00', '23:59:59.999999', 0, 0, 1, 'increasing', false, 0.0, moment(0), moment(0), 1, 1);
+		await unit.insert(conn);	
 		await meter.insert(conn);
 		const arrayInput = [[1, '17:00:00 1/24/20'],
 		[2, '18:00:00 1/24/20'],

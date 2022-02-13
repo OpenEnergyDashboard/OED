@@ -10,6 +10,7 @@ const Meter = require('../../models/Meter');
 const Reading = require('../../models/Reading');
 const Group = require('../../models/Group');
 const Point = require('../../models/Point');
+const Unit = require('../../models/Unit');
 const gps = new Point(90, 45);
 
 mocha.describe('Compare calculation', () => {
@@ -21,7 +22,10 @@ mocha.describe('Compare calculation', () => {
 	const shift = moment.duration(5, 'days');
 	mocha.beforeEach(async () => {
 		const conn = testDB.getConnection();
-		await new Meter(undefined, 'Meter', null, false, true, Meter.type.MAMAC, null, gps).insert(conn);
+		await new Unit(undefined, 'Unit', 'Unit Id', Unit.unitRepresentType.UNUSED, 1000, 
+						Unit.unitType.UNIT, 1, 'Unit Suffix', Unit.displayableType.ALL, true, 'Unit Note').insert(conn);
+		await new Meter(undefined, 'Meter', null, false, true, Meter.type.MAMAC, null, gps, 'Meter', null, null, false, 
+						false, '00:00:00', '23:59:59.999999', 0, 0, 1, 'increasing', false, 0.0, moment(0), moment(0), 1, 1).insert(conn);
 		meter = await Meter.getByName('Meter', conn);
 		await Reading.insertAll([
 			new Reading(meter.id, 1, prevStart, prevEnd),

@@ -129,7 +129,7 @@ mocha.describe('Meters', () => {
 		await visibleMeter.insert(conn);
 
 		const actualUnitIndex = await Meter.getUnitIndex(1, conn);
-		const expectedUnitIndex = (await Unit.getByName('Unit B', conn)).unitIndex;
+		const expectedUnitIndex = (await Unit.getById(2, conn)).unitIndex;
 		expect(actualUnitIndex).to.be.equal(expectedUnitIndex);
 	})
 });
