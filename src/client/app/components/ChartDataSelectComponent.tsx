@@ -38,10 +38,10 @@ class ChartDataSelectComponent extends React.Component<ChartDataSelectPropsWithI
 			margin: 0
 		};
 		const messages = defineMessages({
-			selectGroups: {	id: 'select.groups' },
+			selectGroups: { id: 'select.groups' },
 			selectMeters: { id: 'select.meters' },
-			helpSelectGroups: {id: 'help.home.select.groups'},
-			helpSelectMeters: {id: 'help.home.select.meters'}
+			helpSelectGroups: { id: 'help.home.select.groups' },
+			helpSelectMeters: { id: 'help.home.select.meters' }
 		});
 
 		const handleGroupSelect = (s: SelectOption[]) => this.handleGroupSelect(s);
@@ -58,7 +58,7 @@ class ChartDataSelectComponent extends React.Component<ChartDataSelectPropsWithI
 						placeholder={this.props.intl.formatMessage(messages.selectGroups)}
 						onValuesChange={handleGroupSelect}
 					/>
-					<TooltipMarkerComponent page='home' helpTextId='help.home.select.groups'/>
+					<TooltipMarkerComponent page='home' helpTextId='help.home.select.groups' />
 				</div>
 				<p style={labelStyle}>
 					<FormattedMessage id='meters' />:
@@ -70,7 +70,7 @@ class ChartDataSelectComponent extends React.Component<ChartDataSelectPropsWithI
 						placeholder={this.props.intl.formatMessage(messages.selectMeters)}
 						onValuesChange={this.handleMeterSelect}
 					/>
-					<TooltipMarkerComponent page='home' helpTextId='help.home.select.meters'/>
+					<TooltipMarkerComponent page='home' helpTextId='help.home.select.meters' />
 				</div>
 			</div>
 		);
