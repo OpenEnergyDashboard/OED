@@ -8,22 +8,30 @@ const { mocha, expect, testDB } = require('../common');
 const Group = require('../../models/Group');
 const Meter = require('../../models/Meter');
 const Point = require('../../models/Point');
+const Unit = require('../../models/Unit');
 const gps = new Point(90, 45);
 
 async function setupGroupsAndMeters(conn) {
-	const groupA = new Group(undefined, 'GA', true, gps, 'notes GA', 33.5, 0);
-	const groupB = new Group(undefined, 'GB', false, gps, 'notes GB', 43.5, 1);
+	const unitA = new Unit(undefined, 'Unit A', 'Unit A Id', Unit.unitRepresentType.UNUSED, 1000, 
+							Unit.unitType.UNIT, 1, 'Unit A Suffix', Unit.displayableType.ALL, true, 'Unit A Note');
+	const unitB = new Unit(undefined, 'Unit B', 'Unit B Id', Unit.unitRepresentType.UNUSED, 2000, 
+							Unit.unitType.UNIT, 2, 'Unit B Suffix', Unit.displayableType.ALL, true, 'Unit B Note');
+	const unitC = new Unit(undefined, 'Unit C', 'Unit C Id', Unit.unitRepresentType.UNUSED, 3000, 
+							Unit.unitType.UNIT, 3, 'Unit C Suffix', Unit.displayableType.ALL, true, 'Unit C Note');
+	const groupA = new Group(undefined, 'GA', true, gps, 'notes GA', 33.5, 1);
+	const groupB = new Group(undefined, 'GB', false, gps, 'notes GB', 43.5, 2);
 	const groupC = new Group(undefined, 'GC', true, gps, 'notes GC', 53.5, -99);
+	await Promise.all([unitA, unitB, unitC].map(unit => unit.insert(conn)));
 	await Promise.all([groupA, groupB, groupC].map(group => group.insert(conn)));
 	const meterA = new Meter(undefined, 'MA', null, false, true, Meter.type.MAMAC, null, gps,
 	'Identified MA' ,'notes MA', 35.0, true, true, '01:01:25', '00:00:00', 5, 1, 1, 'increasing', false,
-	1.5, '0001-01-01 23:59:59', '2020-07-02 01:00:10', 0, 0);
+	1.5, '0001-01-01 23:59:59', '2020-07-02 01:00:10', 1, 2);
 	const meterB = new Meter(undefined, 'MB', null, false, true, Meter.type.OTHER, null, gps,
 	'Identified MB', 'notes MB', 33.5, true, true, '05:05:09', '09:00:01', 0, 0, 1, 'increasing', false,
-	25.5, '0002-01-01 23:59:59', '2020-07-02 01:00:10', 0, 0);
+	25.5, '0002-01-01 23:59:59', '2020-07-02 01:00:10', 2, 3);
 	const meterC = new Meter(undefined, 'MC', null, false, true, Meter.type.METASYS, null, gps,
 	'Identified MC', 'notes MC', 33.5, true, true, '05:05:09', '09:00:01', 0, 0, 1, 'increasing', false,
-	25.5, '0003-01-01 23:59:59', '2020-07-02 01:00:10', 0, 0);
+	25.5, '0003-01-01 23:59:59', '2020-07-02 01:00:10', 3, 1);
 	await Promise.all([meterA, meterB, meterC].map(meter => meter.insert(conn)));
 }
 
@@ -55,10 +63,15 @@ mocha.describe('Groups', () => {
 
 	mocha.it('can be saved, updated, and retrieved', async () => {
 		conn = testDB.getConnection();
-		const groupPreInsert = new Group(undefined, 'Group', true, gps, 'notes', 33.5, 0);
+		const groupPreInsert = new Group(undefined, 'Group', true, gps, 'notes', 33.5, -99);
 		await groupPreInsert.insert(conn);
+
 		groupPreInsert.name = 'New name';
-		groupPreInsert.defaultGraphicUnit = -99;
+		const unit = new Unit(undefined, 'Unit', 'Unit Id', Unit.unitRepresentType.UNUSED, 1000, 
+								Unit.unitType.UNIT, 1, 'Unit Suffix', Unit.displayableType.ALL, true, 'Unit Note');
+		await unit.insert(conn);
+		groupPreInsert.defaultGraphicUnit = 1;
+
 		await groupPreInsert.update(conn);
 		const groupPostInsert = await Group.getByName('New name', conn);
 		expectGroupToBeEquivalent(groupPreInsert, groupPostInsert);

@@ -9,7 +9,7 @@ CREATE TABLE IF NOT EXISTS groups (
 	gps POINT DEFAULT NULL,
 	note TEXT,
 	area REAL DEFAULT NULL,
-	default_graphic_unit INTEGER
+	default_graphic_unit INTEGER REFERENCES units(id)
 );
 
 /*

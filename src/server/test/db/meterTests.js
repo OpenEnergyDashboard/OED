@@ -46,12 +46,23 @@ function expectMetersToBeEquivalent(expected, actual) {
 	expect(actual).to.have.property('defaultGraphicUnit', expected.defaultGraphicUnit);
 }
 
+async function setUpUnits(conn) {
+	const unitA = new Unit(undefined, 'Unit A', 'Unit A Id', Unit.unitRepresentType.UNUSED, 1000, 
+							Unit.unitType.UNIT, 1, 'Unit A Suffix', Unit.displayableType.ALL, true, 'Unit A Note');
+	const unitB = new Unit(undefined, 'Unit B', 'Unit B Id', Unit.unitRepresentType.UNUSED, 2000, 
+							Unit.unitType.UNIT, 2, 'Unit B Suffix', Unit.displayableType.ALL, true, 'Unit B Note');
+	const unitC = new Unit(undefined, 'Unit C', 'Unit C Id', Unit.unitRepresentType.UNUSED, 3000, 
+							Unit.unitType.UNIT, 3, 'Unit C Suffix', Unit.displayableType.ALL, true, 'Unit C Note');
+	await Promise.all([unitA, unitB, unitC].map(unit => unit.insert(conn)));
+}
+
 mocha.describe('Meters', () => {
+	mocha.beforeEach(() => setUpUnits(testDB.getConnection()));
 	mocha.it('can be saved and retrieved', async () => {
 		const conn = testDB.getConnection();
 		const meterPreInsert = new Meter(undefined, 'Meter', null, false, true, Meter.type.MAMAC, 'UTC',
 		gps,'Identified', 'notes', 33.5, true, true, '05:05:09', '09:00:01', 0, 0, 1, 'increasing', false,
-		25.5, '0001-01-01 23:59:59', '2020-07-02 01:00:10', 0, 0);
+		25.5, '0001-01-01 23:59:59', '2020-07-02 01:00:10', 1, 2);
 		await meterPreInsert.insert(conn);
 		const meterPostInsertByName = await Meter.getByName(meterPreInsert.name, conn);
 		expectMetersToBeEquivalent(meterPreInsert, meterPostInsertByName);
@@ -63,7 +74,7 @@ mocha.describe('Meters', () => {
 		const conn = testDB.getConnection();
 		const meterPreInsert = new Meter(undefined, 'Meter', null, false, true, Meter.type.MAMAC, 'UTC', gps,
 			'Identified' ,'notes', 35.0, true, true, '01:01:25' , '00:00:00', 5, 0, 1, 'increasing', false,
-			1.5, '0001-01-01 23:59:59', '2020-07-02 01:00:10', 0, 0);
+			1.5, '0001-01-01 23:59:59', '2020-07-02 01:00:10', 1, 2);
 		await meterPreInsert.insert(conn);
 		const meterPostInsertByID = await Meter.getByID(meterPreInsert.id, conn);
 		expectMetersToBeEquivalent(meterPreInsert, meterPostInsertByID);
@@ -71,7 +82,7 @@ mocha.describe('Meters', () => {
 		meterPreInsert.name = 'Something Else';
 		meterPreInsert.enabled = true;
 		meterPreInsert.meterTimezone = 'GMT';
-		meterPreInsert.unitId = 1;
+		meterPreInsert.unitId = 3;
 		await meterPreInsert.update(conn);
 		const meterPostUpdate = await Meter.getByID(meterPreInsert.id, conn);
 		expectMetersToBeEquivalent(meterPreInsert, meterPostUpdate);
@@ -81,10 +92,10 @@ mocha.describe('Meters', () => {
 		const conn = testDB.getConnection();
 		const enabledMeter = new Meter(undefined, 'EnabledMeter', null, true, true, Meter.type.MAMAC, null, gps, 
 		'Identified', 'notes', 35.0, true, true, '01:01:25' , '00:00:00', 7, 11, 1, 'increasing', false,
-		1.5, '0001-01-01 23:59:59', '2020-07-02 01:00:10', 0, 0);
+		1.5, '0001-01-01 23:59:59', '2020-07-02 01:00:10', 1, 2);
 		const disabledMeter = new Meter(undefined, 'DisabledMeter', null, false, true, Meter.type.MAMAC, null, gps,
 		'Identified 1' ,'Notes 1', 35.0, true, true, '01:01:25' , '00:00:00', 5, 0, 1, 'increasing', false,
-		1.5, '0002-01-01 23:59:59', '2020-07-02 01:00:10', 0, 0);
+		1.5, '0002-01-01 23:59:59', '2020-07-02 01:00:10', 3, 3);
 		await enabledMeter.insert(conn);
 		await disabledMeter.insert(conn);
 
@@ -97,10 +108,10 @@ mocha.describe('Meters', () => {
 		const conn = testDB.getConnection();
 		const visibleMeter = new Meter(undefined, 'VisibleMeter', null, true, true, Meter.type.MAMAC, null, gps, 
 		'Identified 1' ,'notes 1', 35.0, true, true, '01:01:25' , '00:00:00', 5, 0, 1, 'increasing', false,
-		1.5, '0001-01-01 23:59:59', '2020-07-02 01:00:10', 0, 0);
+		1.5, '0001-01-01 23:59:59', '2020-07-02 01:00:10', 1, 2);
 		const invisibleMeter = new Meter(undefined, 'InvisibleMeter', null, true, false, Meter.type.MAMAC, null, gps, 
 		'Identified 2' ,'Notes 2', 35.0, true, true, '01:01:25' , '00:00:00', 5, 0, 1, 'increasing', false,
-		1.5, '0002-01-01 23:59:59', '2020-07-02 01:00:10', 0, 0);
+		1.5, '0002-01-01 23:59:59', '2020-07-02 01:00:10', 2, 3);
 
 		await visibleMeter.insert(conn);
 		await invisibleMeter.insert(conn);
@@ -112,16 +123,13 @@ mocha.describe('Meters', () => {
 
 	mocha.it('can get unit index', async () => {
 		const conn = testDB.getConnection();
-		const unit = new Unit(undefined, 'Unit', 'Unit', Unit.unitRepresentType.UNUSED, 
-								3600, Unit.unitType.METER, 3, '', Unit.displayableType.ALL, true, '');
 		const visibleMeter = new Meter(undefined, 'VisibleMeter', null, true, true, Meter.type.MAMAC, null, gps, 
 		'Identified 1' ,'notes 1', 35.0, true, true, '01:01:25' , '00:00:00', 5, 0, 1, 'increasing', false,
-		1.5, '0001-01-01 23:59:59', '2020-07-02 01:00:10', 1, 0);
-		
-		await unit.insert(conn);
+		1.5, '0001-01-01 23:59:59', '2020-07-02 01:00:10', 2, 3);		
 		await visibleMeter.insert(conn);
 
-		const unitIndex = await Meter.getUnitIndex(1, conn);
-		expect(unitIndex).to.be.equal(unit.unitIndex);
+		const actualUnitIndex = await Meter.getUnitIndex(1, conn);
+		const expectedUnitIndex = (await Unit.getByName('Unit B', conn)).unitIndex;
+		expect(actualUnitIndex).to.be.equal(expectedUnitIndex);
 	})
 });

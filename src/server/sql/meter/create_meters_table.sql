@@ -54,6 +54,6 @@ CREATE TABLE IF NOT EXISTS meters (
     reading FLOAT DEFAULT 0.0,
     start_timestamp TIMESTAMP DEFAULT '1970-01-01 00:00:00',
     end_timestamp TIMESTAMP DEFAULT '1970-01-01 00:00:00',
-    unit_id INTEGER NOT NULL,
-    default_graphic_unit INTEGER NOT NULL
+    unit_id INTEGER REFERENCES units(id),
+    default_graphic_unit INTEGER NOT NULL REFERENCES units(id)
 );

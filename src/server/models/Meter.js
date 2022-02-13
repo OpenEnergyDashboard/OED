@@ -40,7 +40,7 @@ class Meter {
 	constructor(id, name, ipAddress, enabled, displayable, type, meterTimezone, gps = undefined, identifier = name, note, area,
 		cumulative = false, cumulativeReset = false, cumulativeResetStart = '00:00:00', cumulativeResetEnd = '23:59:59.999999',
 		readingGap = 0, readingVariation = 0, readingDuplication = 1, timeSort = 'increasing', endOnlyTime = false,
-		reading = 0.0, startTimestamp = moment(0), endTimestamp = moment(0), unitId = 0, defaultGraphicUnit = 0) {
+		reading = 0.0, startTimestamp = moment(0), endTimestamp = moment(0), unitId, defaultGraphicUnit) {
 		// In order for the CSV pipeline to work, the order of the parameters needs to match the order that the fields are declared.
 		// In addition, each new parameter has to be added at the very end.
 		this.id = id;

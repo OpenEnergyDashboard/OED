@@ -4,6 +4,16 @@
 
 const { mocha, expect, testDB } = require('../common');
 const Conversion = require('../../models/Conversion');
+const Unit = require('../../models/Unit');
+
+async function setUpUnits(conn) {
+	const unitA = new Unit(undefined, 'Unit A', 'Unit A', Unit.unitRepresentType.UNUSED, 1000, 
+							Unit.unitType.UNIT, 1, 'Suffix A', Unit.displayableType.ADMIN, true, 'Note A');
+	const unitB = new Unit(undefined, 'Unit B', 'Unit B', Unit.unitRepresentType.UNUSED, 2000, 
+							Unit.unitType.METER, 1, 'Suffix B', Unit.displayableType.ALL, true, 'Note B');
+	await unitA.insert(conn);
+	await unitB.insert(conn);
+}
 
 /**
  * Compares the expected and actual conversions.
@@ -20,37 +30,38 @@ function expectConversionToBeEquivalent(expected, actual) {
 }
 
 mocha.describe('Conversions', () => {
+	mocha.beforeEach(() => setUpUnits(testDB.getConnection()));
 	mocha.it('can be saved and retrived', async () => {
 		const conn = testDB.getConnection();
-		const conversionPreInsert = new Conversion(0, 1, true, 0, 0, '');
+		const conversionPreInsert = new Conversion(1, 2, false, 1.23, 4.56, 'Note');
 		await conversionPreInsert.insert(conn);
 		// Gets conversion by source and destination.
-		const conversionPostInsertBySourceDestination = await Conversion.getBySourceDestination(0, 1, conn);
+		const conversionPostInsertBySourceDestination = await Conversion.getBySourceDestination(1, 2, conn);
 		expectConversionToBeEquivalent(conversionPreInsert, conversionPostInsertBySourceDestination);
 	});
 
 	mocha.it('can be updated and retrived', async () => {
 		const conn = testDB.getConnection();
-		const conversionPreInsert = new Conversion(0, 1, true, 0, 0, '');
+		const conversionPreInsert = new Conversion(1, 2, true, 1.23, 4.56, 'Note');
 		await conversionPreInsert.insert(conn);
 		
 		// Updates the conversion. Note that the sourceId and destinationId can't be changed.
 		conversionPreInsert.bidirectional = false;
-		conversionPreInsert.intercept = 3.1415;
+		conversionPreInsert.intercept = 3.14;
 		conversionPreInsert.note = 'New note';
 		await conversionPreInsert.update(conn);
 		
-		const covnersionPostInsert = await Conversion.getBySourceDestination(0, 1, conn);
+		const covnersionPostInsert = await Conversion.getBySourceDestination(1, 2, conn);
 		expectConversionToBeEquivalent(conversionPreInsert, covnersionPostInsert); 
 	});
 
 	mocha.it('can be deleted', async () => {
 		const conn = testDB.getConnection();
-		const conversionPreInsert = new Conversion(0, 1, true, 0, 0, '');
+		const conversionPreInsert = new Conversion(1, 2, true, 1.23, 4.56, 'Note');
 		await conversionPreInsert.insert(conn);
-		await Conversion.delete(0, 1, conn);
+		await Conversion.delete(1, 2, conn);
 
-		const conversionPostInsert = await Conversion.getBySourceDestination(0, 1, conn);
+		const conversionPostInsert = await Conversion.getBySourceDestination(1, 2, conn);
 		expect(conversionPostInsert).to.be.equal(null);
 	});
 });
