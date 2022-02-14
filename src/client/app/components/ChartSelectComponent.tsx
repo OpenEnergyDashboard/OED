@@ -56,25 +56,25 @@ export default class ChartSelectComponent extends React.Component<ChartSelectPro
 					</DropdownToggle>
 					<DropdownMenu>
 						<DropdownItem
-							outline={this.props.selectedChart !== ChartTypes.line}
+							outline={(this.props.selectedChart !== ChartTypes.line).toString()}
 							onClick={() => this.handleChangeChartType(ChartTypes.line)}
 						>
 							<FormattedMessage id='line' />
 						</DropdownItem>
 						<DropdownItem
-							outline={this.props.selectedChart !== ChartTypes.bar}
+							outline={(this.props.selectedChart !== ChartTypes.bar).toString()}
 							onClick={() => this.handleChangeChartType(ChartTypes.bar)}
 						>
 							<FormattedMessage id='bar' />
 						</DropdownItem>
 						<DropdownItem
-							outline={this.props.selectedChart !== ChartTypes.compare}
+							outline={(this.props.selectedChart !== ChartTypes.compare).toString()}
 							onClick={() => this.handleChangeChartType(ChartTypes.compare)}
 						>
 							<FormattedMessage id='compare' />
 						</DropdownItem>
 						<DropdownItem
-							outline={this.props.selectedChart !== ChartTypes.map}
+							outline={(this.props.selectedChart !== ChartTypes.map).toString()}
 							onClick={() => this.handleChangeChartType(ChartTypes.map)}
 						>
 							<FormattedMessage id='map' />
