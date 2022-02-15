@@ -11,6 +11,6 @@ UPDATE units
 		unit_index = ${unitIndex},
 		suffix = ${suffix},
 		displayable = ${displayable},
-		always_display = ${alwaysDisplay},
+		preferred_display = ${preferredDisplay},
 		note = ${note}
 	WHERE id = ${id};

@@ -16,10 +16,10 @@ class Unit {
 	 * @param {*} unitIndex The unique number for row/column index in conversion table for this unit.
 	 * @param {*} suffix This unit's suffix.
 	 * @param {*} displayable Can be none, all, or admin. Restrict the type of user that can see this unit.
-	 * @param {*} alwaysDisplay True if this unit is always displayed. If not, the user needs to ask to see (for future enhancement).
+	 * @param {*} preferredDisplay True if this unit is always displayed. If not, the user needs to ask to see (for future enhancement).
 	 * @param {*} note Note about this unit.
 	 */
-	constructor(id, name, identifier, unitRepresent, secInRate = 3600, typeOfUnit, unitIndex, suffix = '', displayable, alwaysDisplay, note) {
+	constructor(id, name, identifier, unitRepresent, secInRate = 3600, typeOfUnit, unitIndex, suffix = '', displayable, preferredDisplay, note) {
 		this.id = id;
 		this.name = name;
 		this.identifier = identifier;
@@ -29,7 +29,7 @@ class Unit {
 		this.unitIndex = unitIndex;
 		this.suffix = suffix;
 		this.displayable = displayable;
-		this.alwaysDisplay = alwaysDisplay;
+		this.preferredDisplay = preferredDisplay;
 		this.note = note;
 	}
 
@@ -40,7 +40,7 @@ class Unit {
 	 */
 	static mapRow(row) {
 		return new Unit(row.id, row.name, row.identifier, row.unit_represent, row.sec_in_rate, 
-						row.type_of_unit, row.unit_index, row.suffix, row.displayable, row.always_display, row.note);
+						row.type_of_unit, row.unit_index, row.suffix, row.displayable, row.preferred_display, row.note);
 	}
 
 	/**

@@ -12,7 +12,7 @@ CREATE TABLE IF NOT EXISTS units (
 	unit_index INTEGER, 
 	suffix VARCHAR(50) DEFAULT '',
 	displayable displayable_type NOT NULL,
-	always_display BOOLEAN NOT NULL,
+	preferred_display BOOLEAN NOT NULL,
 	note TEXT,
 	UNIQUE (type_of_unit, unit_index)
 );

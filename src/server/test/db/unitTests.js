@@ -20,7 +20,7 @@ function expectUnitToBeEquivalent(expected, actual) {
 	expect(actual).to.have.property('unitIndex', expected.unitIndex);
 	expect(actual).to.have.property('suffix', expected.suffix);
 	expect(actual).to.have.property('displayable', expected.displayable);
-	expect(actual).to.have.property('alwaysDisplay', expected.alwaysDisplay);
+	expect(actual).to.have.property('preferredDisplay', expected.preferredDisplay);
 	expect(actual).to.have.property('note', expected.note);
 }
 
