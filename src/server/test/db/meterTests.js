@@ -46,10 +46,6 @@ function expectMetersToBeEquivalent(expected, actual) {
 	expect(actual).to.have.property('defaultGraphicUnit', expected.defaultGraphicUnit);
 }
 
-async function setUpUnits(conn) {
-
-}
-
 mocha.describe('Meters', () => {
 	mocha.beforeEach(async () => {
 		const unitA = new Unit(undefined, 'Unit A', 'Unit A Id', Unit.unitRepresentType.UNUSED, 1000, 
