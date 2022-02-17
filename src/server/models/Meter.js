@@ -6,7 +6,7 @@ const moment = require('moment');
 const database = require('./database');
 const Reading = require('./Reading');
 const Unit = require('./Unit');
-
+const { log } = require('../log');
 const sqlFile = database.sqlFile;
 
 class Meter {
@@ -181,7 +181,7 @@ class Meter {
 	}
 
 	/**
-	 * Returns all meters with a not null unitId.
+	 * Returns all meters where unitId is not null.
 	 * @param {*} conn The connection to be used.
 	 * @returns {Promise.<Array.<Meter>>}
 	 */
@@ -274,11 +274,18 @@ class Meter {
 	static makeMeterDataValid(meter) {
 		if (meter.unitId === -99) {
 			// If there is no unitId, set defaultGraphicUnit to null and displayable to false.
-			meter.defaultGraphicUnit = -99;
-			meter.displayable = false;
+			if (meter.defaultGraphicUnit !== -99) {
+				meter.defaultGraphicUnit = -99;
+				log.warn('defaultGraphicUnit has been removed since there is no unitId.');
+			}
+			if (meter.displayable === true) {
+				meter.displayable = false;
+				log.warn('displayable has been switched to false since there is no unitId.');
+			}
 		} else if (meter.defaultGraphicUnit === -99) {
 			// If the defaultGraphicUnit is null then set it to the unitId
-			meter.defaultGraphicUnit = this.unitId;
+			meter.defaultGraphicUnit = meter.unitId;
+			log.warn('defaultGraphicUnit has been set to unitId.');
 		}
 	}
 

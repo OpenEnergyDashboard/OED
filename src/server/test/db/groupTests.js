@@ -249,12 +249,8 @@ mocha.describe('Groups', () => {
 			
 			expect(expectedGroups.length).to.be.equal(actualGroups.length);
 			// Sorts the list so that groups are in the correct order.
-			actualGroups.sort((a, b) => {
-				return a.id - b.id;
-			});
-			expectedGroups.sort((a, b) => {
-				return a.id - b.id;
-			})
+			actualGroups.sort((a, b) => a.id - b.id);
+			expectedGroups.sort((a, b) => a.id - b.id);
 
 			for (let i = 0; i < actualGroups.length; ++i) {
 				expectGroupToBeEquivalent(expectedGroups[i], actualGroups[i]);

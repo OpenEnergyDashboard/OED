@@ -39,7 +39,7 @@ CREATE TABLE IF NOT EXISTS meters (
     meter_type meter_type NOT NULL,
     default_timezone_meter TEXT DEFAULT NULL,
     gps POINT DEFAULT NULL,
-    identifier TEXT UNIQUE NOT NULL,
+    identifier TEXT UNIQUE NOT NULL CHECK (char_length(identifier) >= 1),
     note TEXT,
     area REAL DEFAULT NULL,
     cumulative BOOLEAN DEFAULT false,

@@ -32,12 +32,8 @@ function expectUnitToBeEquivalent(expected, actual) {
 function expectArrayOfUnitsToBeEquivalen(expected, actual) {
 	expect(expected.length).to.be.equal(actual.length);
 	// Need to sort before comparing.
-	expected.sort(function (a, b) {
-		return a.id - b.id;
-	});
-	actual.sort(function (a, b) {
-		return a.id - b.id;
-	});
+	expected.sort((a, b) => a.id - b.id);
+	actual.sort((a, b) => a.id - b.id);
 
 	for (let i = 0; i < expected.length; ++i) {
 		expectUnitToBeEquivalent(expected[i], actual[i]);
@@ -87,99 +83,81 @@ mocha.describe('Units', () => {
 		expectUnitToBeEquivalent(unitPostInsert, unitPostUpdate);
 	});
 
-	mocha.it('can get visible unit of type meter', async () => {
-		const conn = testDB.getConnection();
-		const unitTypeUnit = new Unit(undefined, 'Unit', 'Unit Id', Unit.unitRepresentType.UNUSED, 1000, 
-										Unit.unitType.UNIT, 1, 'Unit Suffix', Unit.displayableType.ALL, true, 'Unit Note');
-		const unitTypeMeterAll = new Unit(undefined, 'Meter All', 'Meter All Id', Unit.unitRepresentType.UNUSED, 2000, 
-											Unit.unitType.METER, 2, 'Meter All Suffix', Unit.displayableType.ALL, true, 'Meter All Note');
-		const unitTypeMeterAdmin = new Unit(undefined, 'Meter Admin', 'Meter Admin Id', Unit.unitRepresentType.UNUSED, 3000, 
-											Unit.unitType.METER, 3, 'Meter Admin Suffix', Unit.displayableType.ADMIN, true, 'Meter Admin Note');
+	mocha.describe('With units set up', async () => {
+		mocha.beforeEach(async () => {
+			const conn = testDB.getConnection();
+			const unitTypeMeterAll = new Unit(undefined, 'Meter All', 'Meter All Id', Unit.unitRepresentType.UNUSED, 2000, 
+										Unit.unitType.METER, 1, '', Unit.displayableType.ALL, true, 'Meter All Note');
+			const unitTypeMeterAdmin = new Unit(undefined, 'Meter Admin', 'Meter Admin Id', Unit.unitRepresentType.UNUSED, 3000, 
+										Unit.unitType.METER, 2, 'Meter Admin Suffix', Unit.displayableType.ADMIN, true, 'Meter Admin Note');
+			const unitTypeUnitAll = new Unit(undefined, 'Unit All', 'Unit All Id', Unit.unitRepresentType.UNUSED, 4000, 
+										Unit.unitType.UNIT, 3, '', Unit.displayableType.ALL, true, 'Unit All Note');
+			const unitTypeUnitAdmin = new Unit(undefined, 'Unit Admin', 'Unit Admin Id', Unit.unitRepresentType.UNUSED, 5000, 
+										Unit.unitType.UNIT, 4, 'Unit Admin Suffix', Unit.displayableType.ADMIN, true, 'Unit Admin Note');
+			const unitTypeSuffixAll = new Unit(undefined, 'Suffix All', 'Suffix All Id', Unit.unitRepresentType.UNUSED, 6000, 
+										Unit.unitType.SUFFIX, 5, '', Unit.displayableType.ALL, true, 'Suffix All Note');
+			const unitTypeSuffixNone = new Unit(undefined, 'Suffix None', 'Suffix None Id', Unit.unitRepresentType.UNUSED, 7000, 
+										Unit.unitType.SUFFIX, 6, 'Suffix None Suffix', Unit.displayableType.NONE, true, 'Suffix None Note');
+			const units = [unitTypeMeterAll, unitTypeMeterAdmin, unitTypeUnitAll, unitTypeUnitAdmin, unitTypeSuffixAll, unitTypeSuffixNone];
+			await Promise.all(units.map(unit => unit.insert(conn)));
+		});
 
-		await unitTypeUnit.insert(conn);
-		await unitTypeMeterAdmin.insert(conn);
-		await unitTypeMeterAll.insert(conn);
-		// If user is admin then return units with displayableType.admin or displayableType.all
-		const expectedUnitsForAdmin = [unitTypeMeterAll, unitTypeMeterAdmin];
-		const actualUnitsForAdmin = await Unit.getVisibleMeter('admin', conn);
-		expectArrayOfUnitsToBeEquivalen(expectedUnitsForAdmin, actualUnitsForAdmin)
-		// If user is all then return units with displayableType.all
-		const expectedUnitsForAll = [unitTypeMeterAll];
-		const actualUnitsForAll = await Unit.getVisibleMeter('all', conn);
-		expectArrayOfUnitsToBeEquivalen(expectedUnitsForAll, actualUnitsForAll);
-	});
+		mocha.it('can get visible unit of type meter', async () => {
+			const conn = testDB.getConnection();
+			const unitTypeMeterAll = await Unit.getByName('Meter All', conn);
+			const unitTypeMeterAdmin = await Unit.getByName('Meter Admin', conn);
+	
+			// If user is admin then return units with displayableType.admin or displayableType.all
+			const expectedUnitsForAdmin = [unitTypeMeterAll, unitTypeMeterAdmin];
+			const actualUnitsForAdmin = await Unit.getVisibleMeter('admin', conn);
+			expectArrayOfUnitsToBeEquivalen(expectedUnitsForAdmin, actualUnitsForAdmin)
+			// If user is all then return units with displayableType.all
+			const expectedUnitsForAll = [unitTypeMeterAll];
+			const actualUnitsForAll = await Unit.getVisibleMeter('all', conn);
+			expectArrayOfUnitsToBeEquivalen(expectedUnitsForAll, actualUnitsForAll);
+		});
 
-	mocha.it('can get visible unit of type unit or suffix', async () => {
-		const conn = testDB.getConnection();
-		const unitTypeMeter = new Unit(undefined, 'Meter', 'Meter Id', Unit.unitRepresentType.UNUSED, 1000, 
-										Unit.unitType.METER, 1, 'Meter Suffix', Unit.displayableType.ALL, true, 'Meter Note');
-		const unitTypeUnitAll = new Unit(undefined, 'Unit All', 'Unit All Id', Unit.unitRepresentType.UNUSED, 2000, 
-										Unit.unitType.UNIT, 2, 'Unit All Suffix', Unit.displayableType.ALL, true, 'Unit All Note');
-		const unitTypeUnitAdmin = new Unit(undefined, 'Unit Admin', 'Unit Admin Id', Unit.unitRepresentType.UNUSED, 3000, 
-											Unit.unitType.UNIT, 3, 'Unit Admin Suffix', Unit.displayableType.ADMIN, true, 'Unit Admin Note');
-		const unitTypeSuffixAll = new Unit(undefined, 'Suffix All', 'Suffix All Id', Unit.unitRepresentType.UNUSED, 4000, 
-											Unit.unitType.SUFFIX, 4, 'Suffix All Suffix', Unit.displayableType.ALL, true, 'Suffix All Note');
-		const unitTypeSuffixNone = new Unit(undefined, 'Suffix None', 'Suffix None Id', Unit.unitRepresentType.UNUSED, 5000, 
-											Unit.unitType.SUFFIX, 5, 'Suffix None Suffix', Unit.displayableType.NONE, true, 'Suffix None Note');
-		await unitTypeMeter.insert(conn);
-		await unitTypeUnitAll.insert(conn);
-		await unitTypeUnitAdmin.insert(conn);
-		await unitTypeSuffixNone.insert(conn);
-		await unitTypeSuffixAll.insert(conn);
-		// If user is admin then return units with displayableType.admin or displayableType.all
-		const expectedUnitForAdmin = [unitTypeUnitAdmin, unitTypeSuffixAll, unitTypeUnitAll];
-		const actualUnitsForAdmin = await Unit.getVisibleUnitOrSuffix('admin', conn);
-		expectArrayOfUnitsToBeEquivalen(expectedUnitForAdmin, actualUnitsForAdmin);
-		// If user is all then return units with displayableType.all
-		const expectedUnitsForAll = [unitTypeSuffixAll, unitTypeUnitAll];
-		const actualUnitsForAll = await Unit.getVisibleUnitOrSuffix('all', conn);
-		expectArrayOfUnitsToBeEquivalen(expectedUnitsForAll, actualUnitsForAll);
-	});
+		mocha.it('can get visible unit of type unit or suffix', async () => {
+			const conn = testDB.getConnection();
+			const unitTypeUnitAll = await Unit.getByName('Unit All', conn);
+			const unitTypeUnitAdmin = await Unit.getByName('Unit Admin', conn);
+			const unitTypeSuffixAll = await Unit.getByName('Suffix All', conn);
+	
+			// If user is admin then return units with displayableType.admin or displayableType.all
+			const expectedUnitForAdmin = [unitTypeUnitAdmin, unitTypeSuffixAll, unitTypeUnitAll];
+			const actualUnitsForAdmin = await Unit.getVisibleUnitOrSuffix('admin', conn);
+			expectArrayOfUnitsToBeEquivalen(expectedUnitForAdmin, actualUnitsForAdmin);
+			// If user is all then return units with displayableType.all
+			const expectedUnitsForAll = [unitTypeSuffixAll, unitTypeUnitAll];
+			const actualUnitsForAll = await Unit.getVisibleUnitOrSuffix('all', conn);
+			expectArrayOfUnitsToBeEquivalen(expectedUnitsForAll, actualUnitsForAll);
+		});
 
-	mocha.it('should only get units of type meter', async () => {
-		const conn = testDB.getConnection();
-		const unitTypeUnit = new Unit(undefined, 'Unit', 'Unit', Unit.unitRepresentType.UNUSED, 1000, 
-										Unit.unitType.UNIT, 1, 'Unit Suffix', Unit.displayableType.ALL, true, 'Unit Note');
-		const unitTypeMeterAll = new Unit(undefined, 'Meter All', 'Meter All', Unit.unitRepresentType.UNUSED, 2000, 
-											Unit.unitType.METER, 2, 'Meter All Suffix', Unit.displayableType.ALL, true, 'Meter All Note');
-		const unitTypeMeterNone = new Unit(undefined, 'Meter None', 'Meter None', Unit.unitRepresentType.UNUSED, 3000, 
-											Unit.unitType.METER, 3, 'Meter None Suffix', Unit.displayableType.NONE, true, 'Meter None Note');
-		await unitTypeUnit.insert(conn);
-		await unitTypeMeterAll.insert(conn);
-		await unitTypeMeterNone.insert(conn);
-		const expectedUnits = [unitTypeMeterAll, unitTypeMeterNone];
-		const actualUnits = await Unit.getTypeMeter(conn);
-		expectArrayOfUnitsToBeEquivalen(expectedUnits, actualUnits);
-	});
+		mocha.it('should only get units of type meter', async () => {
+			const conn = testDB.getConnection();
+			const unitTypeMeterAll = await Unit.getByName('Meter All', conn);
+			const unitTypeMeterAdmin = await Unit.getByName('Meter Admin', conn);
+			const expectedUnits = [unitTypeMeterAll, unitTypeMeterAdmin];
+			const actualUnits = await Unit.getTypeMeter(conn);
+			expectArrayOfUnitsToBeEquivalen(expectedUnits, actualUnits);
+		});
 
-	mocha.it('should only get units of type unit', async () => {
-		const conn = testDB.getConnection();
-		const unitTypeMeter = new Unit(undefined, 'Meter', 'Meter', Unit.unitRepresentType.UNUSED, 1000, 
-										Unit.unitType.METER, 1, 'Meter Suffix', Unit.displayableType.ALL, true, 'Meter Note');
-		const unitTypeUnitAll = new Unit(undefined, 'Unit All', 'Unit All', Unit.unitRepresentType.UNUSED, 2000, 
-											Unit.unitType.UNIT, 2, 'Unit All Suffix', Unit.displayableType.ALL, true, 'Unit All Note');
-		const unitTypeUnitNone = new Unit(undefined, 'Unit None', 'Unit None', Unit.unitRepresentType.UNUSED, 3000, 
-											Unit.unitType.UNIT, 3, 'Unit None Suffix', Unit.displayableType.NONE, true, 'Unit None Note');
-		await unitTypeMeter.insert(conn);
-		await unitTypeUnitAll.insert(conn);
-		await unitTypeUnitNone.insert(conn);
-		const expectedUnits = [unitTypeUnitAll, unitTypeUnitNone];
-		const actualUnits = await Unit.getTypeUnit(conn);
-		expectArrayOfUnitsToBeEquivalen(expectedUnits, actualUnits);
-	});
+		mocha.it('should only get units of type unit', async () => {
+			const conn = testDB.getConnection();
+			const unitTypeUnitAll = await Unit.getByName('Unit All', conn);
+			const unitTypeUnitAdmin = await Unit.getByName('Unit Admin', conn);
+			const expectedUnits = [unitTypeUnitAll, unitTypeUnitAdmin];
+			const actualUnits = await Unit.getTypeUnit(conn);
+			expectArrayOfUnitsToBeEquivalen(expectedUnits, actualUnits);
+		});
 
-	mocha.it('should only get units with suffix', async () => {
-		const unitTypeUnit = new Unit(undefined, 'Unit', 'Unit', Unit.unitRepresentType.UNUSED, 1000, 
-										Unit.unitType.UNIT, 1, '', Unit.displayableType.ADMIN, true, 'Unit Note');
-		const unitTypeSuffixAll = new Unit(undefined, 'Suffix All', 'Suffix All', Unit.unitRepresentType.UNUSED, 2000, 
-											Unit.unitType.SUFFIX, 2, 'Suffix All Suffix', Unit.displayableType.ALL, true, 'Suffix All Note');
-		const unitTypeSuffixNone = new Unit(undefined, 'Suffix None', 'Suffix None', Unit.unitRepresentType.UNUSED, 3000, 
-											Unit.unitType.SUFFIX, 3, 'Suffix None Suffix', Unit.displayableType.NONE, true, 'Suffix All Note');
-		await unitTypeUnit.insert(conn);
-		await unitTypeSuffixAll.insert(conn);
-		await unitTypeSuffixNone.insert(conn);
-		const expectedUnits = [unitTypeSuffixAll, unitTypeSuffixNone];
-		const actualUnits = await Unit.getSuffix(conn);
-		expectArrayOfUnitsToBeEquivalen(expectedUnits, actualUnits);
+		mocha.it('should only get units with suffix', async () => {
+			const unitTypeMeterAdmin = await Unit.getByName('Meter Admin', conn);
+			const unitTypeUnitAdmin = await Unit.getByName('Unit Admin', conn);
+			const unitTypeSuffixNone = await Unit.getByName('Suffix None', conn);
+			const expectedUnits = [unitTypeMeterAdmin, unitTypeUnitAdmin, unitTypeSuffixNone];
+			const actualUnits = await Unit.getSuffix(conn);
+			expectArrayOfUnitsToBeEquivalen(expectedUnits, actualUnits);
+		});
 	});
 });

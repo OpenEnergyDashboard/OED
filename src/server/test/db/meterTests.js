@@ -47,17 +47,20 @@ function expectMetersToBeEquivalent(expected, actual) {
 }
 
 async function setUpUnits(conn) {
-	const unitA = new Unit(undefined, 'Unit A', 'Unit A Id', Unit.unitRepresentType.UNUSED, 1000, 
-							Unit.unitType.UNIT, 1, 'Unit A Suffix', Unit.displayableType.ALL, true, 'Unit A Note');
-	const unitB = new Unit(undefined, 'Unit B', 'Unit B Id', Unit.unitRepresentType.UNUSED, 2000, 
-							Unit.unitType.UNIT, 2, 'Unit B Suffix', Unit.displayableType.ALL, true, 'Unit B Note');
-	const unitC = new Unit(undefined, 'Unit C', 'Unit C Id', Unit.unitRepresentType.UNUSED, 3000, 
-							Unit.unitType.UNIT, 3, 'Unit C Suffix', Unit.displayableType.ALL, true, 'Unit C Note');
-	await Promise.all([unitA, unitB, unitC].map(unit => unit.insert(conn)));
+
 }
 
 mocha.describe('Meters', () => {
-	mocha.beforeEach(() => setUpUnits(testDB.getConnection()));
+	mocha.beforeEach(async () => {
+		const unitA = new Unit(undefined, 'Unit A', 'Unit A Id', Unit.unitRepresentType.UNUSED, 1000, 
+							Unit.unitType.UNIT, 1, 'Unit A Suffix', Unit.displayableType.ALL, true, 'Unit A Note');
+		const unitB = new Unit(undefined, 'Unit B', 'Unit B Id', Unit.unitRepresentType.UNUSED, 2000, 
+							Unit.unitType.UNIT, 2, 'Unit B Suffix', Unit.displayableType.ALL, true, 'Unit B Note');
+		const unitC = new Unit(undefined, 'Unit C', 'Unit C Id', Unit.unitRepresentType.UNUSED, 3000, 
+							Unit.unitType.UNIT, 3, 'Unit C Suffix', Unit.displayableType.ALL, true, 'Unit C Note');
+		await Promise.all([unitA, unitB, unitC].map(unit => unit.insert(conn)));
+	});
+
 	mocha.it('can be saved and retrieved', async () => {
 		const conn = testDB.getConnection();
 		const meterPreInsert = new Meter(undefined, 'Meter', null, false, true, Meter.type.MAMAC, 'UTC',
@@ -152,7 +155,7 @@ mocha.describe('Meters', () => {
 	mocha.it('can save and retrieve meters with null defaultGraphicUnit', async () => {
 		const missingGraphicUnitMeter = new Meter(undefined, 'MissingGraphicUnit', null, true, true, Meter.type.MAMAC, null, gps, 
 		'MissingGraphicUnit' ,'notes 2', 35.0, true, true, '01:01:25' , '00:00:00', 5, 0, 1, 'increasing', false,
-		1.5, '0001-01-01 23:59:59', '2020-07-02 01:00:10', 1);
+		1.5, '0001-01-01 23:59:59', '2020-07-02 01:00:10', 1, -99);
 		await missingGraphicUnitMeter.insert(conn);
 
 		const actualMissingGraphicUnitMeter = await Meter.getByName('MissingGraphicUnit', conn);
@@ -160,7 +163,7 @@ mocha.describe('Meters', () => {
 		expect(actualMissingGraphicUnitMeter).to.have.property('defaultGraphicUnit', 1);
 	});
 
-	mocha.it('can get all meter with not null unitId', async () => {
+	mocha.it('can get all meter where unitId is not null', async () => {
 		const meterA = new Meter(undefined, 'MeterA', null, true, true, Meter.type.MAMAC, null, gps, 
 		'MeterA' ,'notes 1', 35.0, true, true, '01:01:25' , '00:00:00', 5, 0, 1, 'increasing', false,
 		1.5, '0001-01-01 23:59:59', '2020-07-02 01:00:10', 1, 1);
