@@ -119,11 +119,7 @@ export function isValidGPSInput(input: string): boolean {
 	const longitudeConstraint = array[longitudeIndex] >= -180 && array[longitudeIndex] <= 180;
 	const result = latitudeConstraint && longitudeConstraint;
 	if (!result) {
-		/** window.alert('invalid gps coordinate, ' +
-			'\nlatitude should be an integer between -90 and 90, ' +
-			'\nlongitude should be an integer between -180 and 180');
-		**/
-		window.alert(translate('intlError'));
+		window.alert(translate('input.gps.range'));
 	}
 	return result;
 }
