@@ -10,7 +10,6 @@ const Meter = require('../../models/Meter');
 const Reading = require('../../models/Reading');
 const Group = require('../../models/Group');
 const Point = require('../../models/Point');
-const Unit = require('../../models/Unit');
 const { generateSineData } = require('../../data/generateTestingData');
 const gps = new Point(90, 45);
 
@@ -27,10 +26,7 @@ mocha.describe('Compressed Readings 2', () => {
 		const timestamp5 = timestamp4.clone().add(1, 'hour');
 		mocha.beforeEach(async () => {
 			const conn = testDB.getConnection();
-			await new Unit(undefined, 'Unit', 'Unit Id', Unit.unitRepresentType.UNUSED, 1000, 
-						Unit.unitType.UNIT, 1, 'Unit Suffix', Unit.displayableType.ALL, true, 'Unit Note').insert(conn);
-			await new Meter(undefined, 'Meter', null, false, true, Meter.type.MAMAC, null, gps, 'Meter', null, null, false, 
-						false, '00:00:00', '23:59:59.999999', 0, 0, 1, 'increasing', false, 0.0, moment(0), moment(0), 1, 1).insert(conn);
+			await new Meter(undefined, 'Meter', null, false, true, Meter.type.MAMAC, null, gps).insert(conn);
 			meter = await Meter.getByName('Meter', conn);
 		});
 
@@ -222,8 +218,7 @@ mocha.describe('Compressed Readings 2', () => {
 			mocha.beforeEach(async function () {
 				this.timeout(10000); // extend timeout because refreshes take a longer time.
 				const conn = testDB.getConnection();
-				await new Meter(undefined, 'Meter1', null, false, true, Meter.type.MAMAC, null, gps, 'Meter1', null, null, false, 
-						false, '00:00:00', '23:59:59.999999', 0, 0, 1, 'increasing', false, 0.0, moment(0), moment(0), 1, 1).insert(conn);
+				await new Meter(undefined, 'Meter1', null, false, true, Meter.type.MAMAC, null, gps).insert(conn);
 				meter1 = await Meter.getByName('Meter1', conn);
 				const data = generateSineData(startDate, endDate, { timeStep: { minute: 15 }}).map(row => new Reading(meter1.id, row[0], row[1], row[2]));
 				await Reading.insertAll(data, conn);
@@ -266,8 +261,7 @@ mocha.describe('Compressed Readings 2', () => {
 			mocha.beforeEach(async function () {
 				this.timeout(5000); // extend timeout because refreshes take a longer time.
 				const conn = testDB.getConnection();
-				await new Meter(undefined, 'Meter1', null, false, true, Meter.type.MAMAC, null, gps, 'Meter1', null, null, false, 
-							false, '00:00:00', '23:59:59.999999', 0, 0, 1, 'increasing', false, 0.0, moment(0), moment(0), 1, 1).insert(conn);
+				await new Meter(undefined, 'Meter1', null, false, true, Meter.type.MAMAC, null, gps).insert(conn);
 				meter1 = await Meter.getByName('Meter1', conn);
 				const data = generateSineData(startDate, endDate, { timeStep: { minute: 23 }}).map(row => new Reading(meter1.id, row[0], row[1], row[2]));
 				await Reading.insertAll(data, conn);
@@ -331,12 +325,8 @@ mocha.describe('Compressed Readings 2', () => {
 		let group2;
 		mocha.beforeEach(async () => {
 			const conn = testDB.getConnection();
-			await new Unit(undefined, 'Unit', 'Unit Id', Unit.unitRepresentType.UNUSED, 1000, 
-						Unit.unitType.UNIT, 1, 'Unit Suffix', Unit.displayableType.ALL, true, 'Unit Note').insert(conn);
-			await new Meter(undefined, 'Meter1', null, false, true, Meter.type.MAMAC, null, gps, 'Meter1', null, null, false, 
-						false, '00:00:00', '23:59:59.999999', 0, 0, 1, 'increasing', false, 0.0, moment(0), moment(0), 1, 1).insert(conn);
-			await new Meter(undefined, 'Meter2', null, false, true, Meter.type.MAMAC, null, gps, 'Meter2', null, null, false, 
-						false, '00:00:00', '23:59:59.999999', 0, 0, 1, 'increasing', false, 0.0, moment(0), moment(0), 1, 1).insert(conn);
+			await new Meter(undefined, 'Meter1', null, false, true, Meter.type.MAMAC, null, gps).insert(conn);
+			await new Meter(undefined, 'Meter2', null, false, true, Meter.type.MAMAC, null, gps).insert(conn);
 			meter1 = await Meter.getByName('Meter1', conn);
 			meter2 = await Meter.getByName('Meter2', conn);
 
@@ -414,13 +404,9 @@ mocha.describe('Compressed Readings 2', () => {
 		const timestamp5 = timestamp4.clone().add(1, 'day');
 		mocha.beforeEach(async () => {
 			const conn = testDB.getConnection();
-			await new Unit(undefined, 'Unit', 'Unit Id', Unit.unitRepresentType.UNUSED, 1000, 
-						Unit.unitType.UNIT, 1, 'Unit Suffix', Unit.displayableType.ALL, true, 'Unit Note').insert(conn);
-			await new Meter(undefined, 'Meter', null, false, true, Meter.type.MAMAC, null, gps, 'Meter', null, null, false, 
-						false, '00:00:00', '23:59:59.999999', 0, 0, 1, 'increasing', false, 0.0, moment(0), moment(0), 1, 1).insert(conn);
-			await new Meter(undefined, 'Meter2', null, false, true, Meter.type.MAMAC, null, gps, 'Meter2', null, null, false, 
-						false, '00:00:00', '23:59:59.999999', 0, 0, 1, 'increasing', false, 0.0, moment(0), moment(0), 1, 1).insert(conn);
-			meter = await Meter.getByName('Meter', conn);			
+			await new Meter(undefined, 'Meter', null, false, true, Meter.type.MAMAC, null, gps).insert(conn);
+			meter = await Meter.getByName('Meter', conn);
+			await new Meter(undefined, 'Meter2', null, false, true, Meter.type.MAMAC, null, gps).insert(conn);
 			meter2 = await Meter.getByName('Meter2', conn);
 		});
 

@@ -12,7 +12,6 @@ const Group = require('../../models/Group');
 const Meter = require('../../models/Meter');
 const Reading = require('../../models/Reading');
 const Point = require('../../models/Point');
-const Unit = require('../../models/Unit');
 const gps = new Point(90, 45);
 
 /**
@@ -29,15 +28,10 @@ mocha.describe('Compressed Readings', () => {
 
 	mocha.beforeEach(async () => {
 		conn = testDB.getConnection();
-		await new Unit(undefined, 'Unit', 'Unit Id', Unit.unitRepresentType.UNUSED, 1000, 
-						Unit.unitType.UNIT, 1, 'Unit Suffix', Unit.displayableType.ALL, true, 'Unit Note').insert(conn);
-		await new Meter(undefined, 'Meter', null, false, true, Meter.type.MAMAC, null, gps, 'Meter', null, null, false, 
-						false, '00:00:00', '23:59:59.999999', 0, 0, 1, 'increasing', false, 0.0, moment(0), moment(0), 1, 1).insert(conn);
-		await new Meter(undefined, 'Meter2', null, false, true, Meter.type.MAMAC, null, gps, 'Meter2', null, null, false, 
-						false, '00:00:00', '23:59:59.999999', 0, 0, 1, 'increasing', false, 0.0, moment(0), moment(0), 1, 1).insert(conn);
-		await new Meter(undefined, 'Meter3', null, false, true, Meter.type.MAMAC, null, gps, 'Meter3', null, null, false, 
-						false, '00:00:00', '23:59:59.999999', 0, 0, 1, 'increasing', false, 0.0, moment(0), moment(0), 1, 1).insert(conn);
-		meter = await Meter.getByName('Meter', conn);
+		await conn.tx(async t => {
+			await new Meter(undefined, 'Meter', null, false, true, Meter.type.MAMAC, null, gps).insert(t);
+			meter = await Meter.getByName('Meter', t);
+		});
 	});
 
 	mocha.it('compresses readings', async () => {
@@ -88,6 +82,8 @@ mocha.describe('Compressed Readings', () => {
 
 	mocha.it('compresses readings for multiple meters at once', async () => {
 		conn = testDB.getConnection();
+		await new Meter(undefined, 'Meter2', null, false, true, Meter.type.MAMAC, null, gps).insert(conn);
+		await new Meter(undefined, 'Meter3', null, false, true, Meter.type.MAMAC, null, gps).insert(conn);
 		const meter2 = await Meter.getByName('Meter2', conn);
 		const meter3 = await Meter.getByName('Meter3', conn);
 		const readingMeter1 = new Reading(meter.id, 100, timestamp1, timestamp2);
@@ -123,7 +119,8 @@ mocha.describe('Compressed Readings', () => {
 			const groupC = new Group(undefined, 'C');
 			await Promise.all([groupA, groupB, groupC].map(group => group.insert(conn)));
 
-			// Get a handle to a new meter
+			// Create and get a handle to a new meter
+			await new Meter(undefined, 'Meter2', null, false, true, Meter.type.MAMAC, null, gps).insert(conn);
 			meter2 = await Meter.getByName('Meter2', conn);
 
 			// Place meters & groups in hierarchy

@@ -6,7 +6,6 @@ const { mocha, expect, testDB } = require('../common');
 const Baseline = require('../../models/Baseline');
 const Meter = require('../../models/Meter');
 const Reading = require('../../models/Reading');
-const Unit = require('../../models/Unit');
 const moment = require('moment');
 const Point = require('../../models/Point');
 const gps = new Point(90, 45);
@@ -14,12 +13,8 @@ const gps = new Point(90, 45);
 mocha.describe('Baselines', () => {
 	mocha.it('can be saved and retrieved', async () => {
 		conn = testDB.getConnection();
-		// Need a meter in the database. Need the unit for the meter's unitId and defaultGraphicUnit.
-		const unit = new Unit(undefined, 'Unit', 'Unit Id', Unit.unitRepresentType.UNUSED, 1000, 
-								Unit.unitType.UNIT, 1, 'Unit Suffix', Unit.displayableType.ALL, true, 'Unit Note')
-		const meter = new Meter(undefined, 'Meter', null, false, true, Meter.type.MAMAC, null, gps, 'Meter', null, null, false, 
-								false, '00:00:00', '23:59:59.999999', 0, 0, 1, 'increasing', false, 0.0, moment(0), moment(0), 1, 1);
-		await unit.insert(conn);
+		// Need a meter in the database
+		const meter = new Meter(undefined, 'Larry', null, false, true, Meter.type.MAMAC, null, gps);
 		await meter.insert(conn);
 		const reading = new Reading(
 			meter.id,

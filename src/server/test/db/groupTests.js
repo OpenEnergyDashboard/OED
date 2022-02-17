@@ -75,7 +75,7 @@ mocha.describe('Groups', () => {
 		await groupPreInsert.update(conn);
 		const groupPostInsert = await Group.getByName('New name', conn);
 		expectGroupToBeEquivalent(groupPreInsert, groupPostInsert);
-	})
+	});
 
 	mocha.it('can be renamed', async () => {
 		conn = testDB.getConnection();

@@ -6,15 +6,6 @@ const { mocha, expect, testDB } = require('../common');
 const Conversion = require('../../models/Conversion');
 const Unit = require('../../models/Unit');
 
-async function setUpUnits(conn) {
-	const unitA = new Unit(undefined, 'Unit A', 'Unit A', Unit.unitRepresentType.UNUSED, 1000, 
-							Unit.unitType.UNIT, 1, 'Suffix A', Unit.displayableType.ADMIN, true, 'Note A');
-	const unitB = new Unit(undefined, 'Unit B', 'Unit B', Unit.unitRepresentType.UNUSED, 2000, 
-							Unit.unitType.METER, 1, 'Suffix B', Unit.displayableType.ALL, true, 'Note B');
-	await unitA.insert(conn);
-	await unitB.insert(conn);
-}
-
 /**
  * Compares the expected and actual conversions.
  * @param {*} expected The exepected conversion.
@@ -30,7 +21,16 @@ function expectConversionToBeEquivalent(expected, actual) {
 }
 
 mocha.describe('Conversions', () => {
-	mocha.beforeEach(() => setUpUnits(testDB.getConnection()));
+	mocha.beforeEach(async () => {
+		conn = testDB.getConnection();
+		const unitA = new Unit(undefined, 'Unit A', 'Unit A', Unit.unitRepresentType.UNUSED, 1000, 
+								Unit.unitType.UNIT, 1, 'Suffix A', Unit.displayableType.ADMIN, true, 'Note A');
+		const unitB = new Unit(undefined, 'Unit B', 'Unit B', Unit.unitRepresentType.UNUSED, 2000, 
+								Unit.unitType.METER, 1, 'Suffix B', Unit.displayableType.ALL, true, 'Note B');
+		await unitA.insert(conn);
+		await unitB.insert(conn);
+	});
+	
 	mocha.it('can be saved and retrived', async () => {
 		const conn = testDB.getConnection();
 		const conversionPreInsert = new Conversion(1, 2, false, 1.23, 4.56, 'Note');

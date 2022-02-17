@@ -131,5 +131,53 @@ mocha.describe('Meters', () => {
 		const actualUnitIndex = await Meter.getUnitIndex(1, conn);
 		const expectedUnitIndex = (await Unit.getById(2, conn)).unitIndex;
 		expect(actualUnitIndex).to.be.equal(expectedUnitIndex);
-	})
+	});
+
+	mocha.it('can save and retrieve meters with null unitId', async () => {
+		const conn = testDB.getConnection();
+		const missingUnitIdMeter = new Meter(undefined, 'MissingUnitId', null, true, true, Meter.type.MAMAC, null, gps, 
+		'MissingUnitId' ,'notes 1', 35.0, true, true, '01:01:25' , '00:00:00', 5, 0, 1, 'increasing', false,
+		1.5, '0001-01-01 23:59:59', '2020-07-02 01:00:10', -99, 1);
+		await missingUnitIdMeter.insert(conn);
+
+		const actualMissingUnitIdMeter = await Meter.getByName('MissingUnitId', conn);
+		// displayable is expected to switch to false.
+		expect(actualMissingUnitIdMeter).to.have.property('displayable', false);
+		// defaultGraphicUnit is expected to switch to -99.
+		expect(actualMissingUnitIdMeter).to.have.property('defaultGraphicUnit', -99);
+		// unitId shouldn't change.
+		expect(actualMissingUnitIdMeter).to.have.property('unitId', -99);
+	});
+
+	mocha.it('can save and retrieve meters with null defaultGraphicUnit', async () => {
+		const missingGraphicUnitMeter = new Meter(undefined, 'MissingGraphicUnit', null, true, true, Meter.type.MAMAC, null, gps, 
+		'MissingGraphicUnit' ,'notes 2', 35.0, true, true, '01:01:25' , '00:00:00', 5, 0, 1, 'increasing', false,
+		1.5, '0001-01-01 23:59:59', '2020-07-02 01:00:10', 1);
+		await missingGraphicUnitMeter.insert(conn);
+
+		const actualMissingGraphicUnitMeter = await Meter.getByName('MissingGraphicUnit', conn);
+		// defaultGraphicUnit is expected to automatically set to unitId.
+		expect(actualMissingGraphicUnitMeter).to.have.property('defaultGraphicUnit', 1);
+	});
+
+	mocha.it('can get all meter with not null unitId', async () => {
+		const meterA = new Meter(undefined, 'MeterA', null, true, true, Meter.type.MAMAC, null, gps, 
+		'MeterA' ,'notes 1', 35.0, true, true, '01:01:25' , '00:00:00', 5, 0, 1, 'increasing', false,
+		1.5, '0001-01-01 23:59:59', '2020-07-02 01:00:10', 1, 1);
+		const meterB = new Meter(undefined, 'MeterB', null, true, true, Meter.type.MAMAC, null, gps, 
+		'MeterB' ,'notes 2', 35.0, true, true, '01:01:25' , '00:00:00', 5, 0, 1, 'increasing', false,
+		1.5, '0001-01-01 23:59:59', '2020-07-02 01:00:10', 2, 2);
+		const meterC = new Meter(undefined, 'Meter C', null, true, true, Meter.type.MAMAC, null);
+
+		await Promise.all([meterA, meterB, meterC].map(meter => meter.insert(conn)));
+		const expectedMeters = [meterA, meterB];
+		const actualMeters = await Meter.getUnitNotNull(conn);
+		actualMeters.sort((a, b) => a.id - b.id);
+		expectedMeters.sort((a, b) => a.id - b.id);
+
+		expect(expectedMeters.length).to.be.equal(actualMeters.length);
+		for (let i = 0; i < expectedMeters.length; ++i) {
+			expectMetersToBeEquivalent(expectedMeters[i], actualMeters[i]);
+		}
+	});
 });
