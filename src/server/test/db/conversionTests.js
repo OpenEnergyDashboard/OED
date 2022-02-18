@@ -65,7 +65,7 @@ mocha.describe('Conversions', () => {
 		const unitBId = (await Unit.getByName('Unit B', conn)).id;
 		const conversionPreInsert = new Conversion(unitAId, unitBId, true, 1.23, 4.56, 'Note');
 		await conversionPreInsert.insert(conn);
-		await Conversion.delete(1, 2, conn);
+		await Conversion.delete(unitAId, unitBId, conn);
 
 		const conversionPostInsert = await Conversion.getBySourceDestination(unitAId, unitBId, conn);
 		expect(conversionPostInsert).to.be.equal(null);
