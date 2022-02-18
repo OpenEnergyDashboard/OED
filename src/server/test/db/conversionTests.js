@@ -55,7 +55,7 @@ mocha.describe('Conversions', () => {
 		conversionPreInsert.note = 'New note';
 		await conversionPreInsert.update(conn);
 		
-		const covnersionPostInsert = await Conversion.getBySourceDestination(1, 2, conn);
+		const covnersionPostInsert = await Conversion.getBySourceDestination(unitAId, unitBId, conn);
 		expectConversionToBeEquivalent(conversionPreInsert, covnersionPostInsert); 
 	});
 
@@ -67,7 +67,7 @@ mocha.describe('Conversions', () => {
 		await conversionPreInsert.insert(conn);
 		await Conversion.delete(1, 2, conn);
 
-		const conversionPostInsert = await Conversion.getBySourceDestination(1, 2, conn);
+		const conversionPostInsert = await Conversion.getBySourceDestination(unitAId, unitBId, conn);
 		expect(conversionPostInsert).to.be.equal(null);
 	});
 });

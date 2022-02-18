@@ -53,8 +53,8 @@ mocha.describe('Units', () => {
 		const unitTypePostInsertByName = await Unit.getByName('Unit', conn);
 		expectUnitToBeEquivalent(unitTypePreInsert, unitTypePostInsertByName);
 		// Gets unit by index.
-		const idUnitTypePostInsertByIdentifier = await Unit.getByUnitIndexUnit(5, conn);
-		expect(idUnitTypePostInsertByIdentifier).to.be.equal(1);
+		const idUnitTypePostInsertByIdentifier = await Unit.getByUnitIndexUnit(unitTypePreInsert.unitIndex, conn);
+		expect(idUnitTypePostInsertByIdentifier).to.be.equal(unitTypePostInsertById.id);
 	});
 
 	mocha.it('meter type can be retrieved by unitIndex', async () => {
@@ -62,8 +62,9 @@ mocha.describe('Units', () => {
 		const meterTypePreInsert = new Unit(undefined, 'Meter', 'Meter Id', Unit.unitRepresentType.UNUSED, 
 											1000, Unit.unitType.METER, 5, 'Suffix', Unit.displayableType.ALL, true, 'Note');
 		await meterTypePreInsert.insert(conn);
-		const idMeterTypePostInsertByIdentifier = await Unit.getByUnitIndexMeter(5, conn);
-		expect(idMeterTypePostInsertByIdentifier).to.be.equal(1);
+		const meterTypePostInsertId = (await Unit.getByName('Meter', conn)).id;
+		const idMeterTypePostInsertByIdentifier = await Unit.getByUnitIndexMeter(meterTypePreInsert.unitIndex, conn);
+		expect(idMeterTypePostInsertByIdentifier).to.be.equal(meterTypePostInsertId);
 	});
 
 	mocha.it('can be saved, edited, and retrieved', async () => {
