@@ -34,8 +34,8 @@ class Meter {
 	 * @param reading The value of reading, default 0.0
 	 * @param startTimestamp Start timestamp of last reading input for this meter, default '1970-01-01 00:00:00'
 	 * @param endTimestamp  End timestamp of last reading input for this meter, '1970-01-01 00:00:00' 
-	 * @param unitId The foreign key to the unit table. The meter receives data and points to this unit in the graph, default 0
-	 * @param defaultGraphicUnit The foreign key to the unit table represents the preferred unit to display this meter, default 0
+	 * @param unitId The foreign key to the unit table. The meter receives data and points to this unit in the graph, default -99
+	 * @param defaultGraphicUnit The foreign key to the unit table represents the preferred unit to display this meter, default unitId
 	 */
 	constructor(id, name, ipAddress, enabled, displayable, type, meterTimezone, gps = undefined, identifier = name, note, area,
 		cumulative = false, cumulativeReset = false, cumulativeResetStart = '00:00:00', cumulativeResetEnd = '23:59:59.999999',
@@ -276,16 +276,16 @@ class Meter {
 			// If there is no unitId, set defaultGraphicUnit to null and displayable to false.
 			if (meter.defaultGraphicUnit !== -99) {
 				meter.defaultGraphicUnit = -99;
-				log.warn('defaultGraphicUnit has been removed since there is no unitId.');
+				log.warn(`defaultGraphicUnit of the meter "${meter.name}" has been removed since there is no unitId.`);
 			}
 			if (meter.displayable === true) {
 				meter.displayable = false;
-				log.warn('displayable has been switched to false since there is no unitId.');
+				log.warn(`displayable of the meter "${meter.name}" has been switched to false since there is no unitId.`);
 			}
 		} else if (meter.defaultGraphicUnit === -99) {
 			// If the defaultGraphicUnit is null then set it to the unitId
 			meter.defaultGraphicUnit = meter.unitId;
-			log.warn('defaultGraphicUnit has been set to unitId.');
+			log.warn(`defaultGraphicUnit of the meter "${meter.name}" has been set to unitId.`);
 		}
 	}
 

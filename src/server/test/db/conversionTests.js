@@ -33,7 +33,9 @@ mocha.describe('Conversions', () => {
 	
 	mocha.it('can be saved and retrived', async () => {
 		const conn = testDB.getConnection();
-		const conversionPreInsert = new Conversion(1, 2, false, 1.23, 4.56, 'Note');
+		const unitAId = (await Unit.getByName('Unit A', conn)).id;
+		const unitBId = (await Unit.getByName('Unit B', conn)).id;
+		const conversionPreInsert = new Conversion(unitAId, unitBId, false, 1.23, 4.56, 'Note');
 		await conversionPreInsert.insert(conn);
 		// Gets conversion by source and destination.
 		const conversionPostInsertBySourceDestination = await Conversion.getBySourceDestination(1, 2, conn);
@@ -42,7 +44,9 @@ mocha.describe('Conversions', () => {
 
 	mocha.it('can be updated and retrived', async () => {
 		const conn = testDB.getConnection();
-		const conversionPreInsert = new Conversion(1, 2, true, 1.23, 4.56, 'Note');
+		const unitAId = (await Unit.getByName('Unit A', conn)).id;
+		const unitBId = (await Unit.getByName('Unit B', conn)).id;
+		const conversionPreInsert = new Conversion(unitAId, unitBId, true, 1.23, 4.56, 'Note');
 		await conversionPreInsert.insert(conn);
 		
 		// Updates the conversion. Note that the sourceId and destinationId can't be changed.
@@ -57,7 +61,9 @@ mocha.describe('Conversions', () => {
 
 	mocha.it('can be deleted', async () => {
 		const conn = testDB.getConnection();
-		const conversionPreInsert = new Conversion(1, 2, true, 1.23, 4.56, 'Note');
+		const unitAId = (await Unit.getByName('Unit A', conn)).id;
+		const unitBId = (await Unit.getByName('Unit B', conn)).id;
+		const conversionPreInsert = new Conversion(unitAId, unitBId, true, 1.23, 4.56, 'Note');
 		await conversionPreInsert.insert(conn);
 		await Conversion.delete(1, 2, conn);
 
