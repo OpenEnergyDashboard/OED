@@ -58,7 +58,7 @@ mocha.describe('groups API', () => {
 			// This route only returns the id and name. Since we have other properties, we need to remove them
 			// before doing the compare. All the groups are put into an array first and then a new array is created
 			// with only the two desired properties.
-			const groupArray = [groupA, groupB, groupC].map(({displayable, gps, note, area, ...keepAttrs}) => keepAttrs);
+			const groupArray = [groupA, groupB, groupC].map(({displayable, gps, note, area, defaultGraphicUnit, ...keepAttrs}) => keepAttrs);
 			expect(res.body).to.deep.include.members(groupArray);
 		});
 		mocha.it('returns the immediate children of a group', async () => {

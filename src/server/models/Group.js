@@ -16,14 +16,16 @@ class Group {
 	 * @param gps Location in format of GIS coordinates, default null
 	 * @param note Note about the group
 	 * @param area Area of the group, default null
+	 * @param defaultGraphicUnit The foreign key to the unit table represents the preferred unit to display this group.
 	 */
-	constructor(id, name, displayable, gps, note, area) {
+	constructor(id, name, displayable, gps, note, area, defaultGraphicUnit) {
 		this.id = id;
 		this.name = name;
 		this.displayable = displayable;
 		this.gps = gps;
 		this.note = note;
 		this.area = area;
+		this.defaultGraphicUnit = defaultGraphicUnit;
 	}
 
 	/**
@@ -41,9 +43,14 @@ class Group {
 	 * @return {Promise.<void>}
 	 */
 	async insert(conn) {
-		const group = this;
+		// Shallow copies the group object so that the original group's defaultGraphicUnit will not be changed to null.
+		const group = {...this};
 		if (group.id !== undefined) {
 			throw new Error('Attempt to insert a group that already has an ID');
+		}
+		// Switches the value of defaultGraphicUnit to null if it's equal to -99.
+		if (group.defaultGraphicUnit === -99) {
+			group.defaultGraphicUnit = null;
 		}
 		const resp = await conn.one(sqlFile('group/insert_new_group.sql'), group);
 		// resp = { id: 42 }, hence this line
@@ -56,7 +63,12 @@ class Group {
 	 * @returns {Group}
 	 */
 	static mapRow(row) {
-		return new Group(row.id, row.name, row.displayable, row.gps, row.note, row.area);
+		// Switches the value of defaultGraphicUnit to -99 if it's equal to null.
+		var defaultGraphicUnit = row.default_graphic_unit;
+		if (defaultGraphicUnit === null) {
+			defaultGraphicUnit = -99;
+		}
+		return new Group(row.id, row.name, row.displayable, row.gps, row.note, row.area, defaultGraphicUnit);
 	}
 
 	/**
@@ -88,6 +100,16 @@ class Group {
 	 */
 	static async getAll(conn) {
 		const rows = await conn.any(sqlFile('group/get_all_groups.sql'));
+		return rows.map(Group.mapRow);
+	}
+
+	/**
+	 * Returns a promise to retrive all groups that displayable is equal to true.
+	 * @param {*} conn The connection to be used
+	 * @returns {Promise.<Array.<Group>>}
+	 */
+	static async getDisplayable(conn) {
+		const rows = await conn.any(sqlFile('group/get_displayable.sql'));
 		return rows.map(Group.mapRow);
 	}
 
@@ -164,10 +186,16 @@ class Group {
 	 * @returns {Promise.<>}
 	 */
 	async update(conn) {
-		if (this.id === undefined) {
+		// Shallow copies the group object so that the original group's defaultGraphicUnit will not be changed to null.
+		const group = {...this};
+		if (group.id === undefined) {
 			throw new Error('Attempt to update a group with no ID');
 		}
-		await conn.none(sqlFile('group/update_group.sql'), this);
+		// Switches the value of defaultGraphicUnit to null if it's equal to -99.
+		if (group.defaultGraphicUnit === -99) {
+			group.defaultGraphicUnit = null;
+		}
+		await conn.none(sqlFile('group/update_group.sql'), group);
 	}
 
 	/**

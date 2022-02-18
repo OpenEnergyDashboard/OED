@@ -2,4 +2,6 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
 
-SELECT * FROM meters WHERE id=${id};
+SELECT *
+FROM conversions
+WHERE source_id = ${source} AND destination_id = ${destination};

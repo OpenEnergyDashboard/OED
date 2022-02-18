@@ -4,7 +4,6 @@
 
 const moment = require('moment');
 const Meter = require('../../models/Meter');
-const Reading = require('../../models/Reading');
 const loadArrayInput = require('../pipeline-in-progress/loadArrayInput');
 const { log } = require('../../log');
 const demuxCsvWithSingleColumnTimestamps = require('./csvDemux');

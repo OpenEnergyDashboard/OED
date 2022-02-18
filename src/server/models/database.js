@@ -81,8 +81,14 @@ async function createSchema(conn) {
 	const LogEmail = require('./LogEmail');
 	const Baseline = require('./Baseline');
 	const { Map } = require('./Map');
+	const Unit = require('./Unit');
+	const Conversion = require('./Conversion');
 
 	/* eslint-enable global-require */
+	await Unit.createUnitTypesEnum(conn);
+	await Unit.createDisplayableTypesEnum(conn);
+	await Unit.createUnitRepresentTypesEnum(conn);
+	await Unit.createTable(conn);
 	await Meter.createMeterTypesEnum(conn);
 	await Meter.createTable(conn);
 	await Reading.createTable(conn);
@@ -103,6 +109,7 @@ async function createSchema(conn) {
 	await Map.createTable(conn);
 	await conn.none(sqlFile('baseline/create_function_get_average_reading.sql'));
 	await Configfile.createTable(conn);
+	await Conversion.createTable(conn);
 }
 
 module.exports = {
