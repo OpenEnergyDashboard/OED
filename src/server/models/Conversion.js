@@ -42,6 +42,16 @@ class Conversion {
 	}
 
 	/**
+	 * Get all conversions in the database.
+	 * @param {*} conn The connection to use.
+	 * @returns {Promise.<Array.<Conversion>>}
+	 */
+	static async getAll(conn) {
+		const rows = await conn.any(sqlFile('conversion/get_all.sql'));
+		return rows.map(Conversion.mapRow);
+	}
+
+	/**
 	 * Returns the conversion associated with source and destination. If the conversion doesn't exist then return null.
 	 * @param {*} source The source unit id.
 	 * @param {*} destination The destination unit id.
