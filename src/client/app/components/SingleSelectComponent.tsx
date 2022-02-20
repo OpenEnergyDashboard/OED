@@ -31,15 +31,6 @@ export default class SingleSelectComponent extends React.Component<SingleSelectP
 		};
 	}
 
-	static getDerivedStateFromProps(cProps: SingleSelectProps, cState: SingleSelectState) {
-		if (cState.selectedOption !== cProps.selectedOption) {
-			return {
-				selectedOption: cProps.selectedOption
-			};
-		}
-		return null;
-	}
-
 	public render() {
 		return (
 			<Select

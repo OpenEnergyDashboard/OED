@@ -63,15 +63,6 @@ class UIOptionsComponent extends React.Component<UIOptionsPropsWithIntl, UIOptio
 		};
 	}
 
-	static getDerivedStateFromProps(cProps: UIOptionsProps, cState: UIOptionsState) {
-		if (cState.barDurationDays !== cProps.barDuration.asDays()) {
-			return {
-				barDurationDays: cProps.barDuration.asDays()
-			};
-		}
-		return null;
-	}
-
 	public render() {
 		const labelStyle: React.CSSProperties = {
 			fontWeight: 'bold',
@@ -284,6 +275,7 @@ class UIOptionsComponent extends React.Component<UIOptionsPropsWithIntl, UIOptio
 
 	private handleBarButton(value: number) {
 		this.props.changeDuration(moment.duration(value, 'days'));
+		this.handleBarDurationChange(value);
 	}
 
 	/**
