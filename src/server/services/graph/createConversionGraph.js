@@ -12,18 +12,18 @@ const Conversion = require('../../models/Conversion');
  * @returns {Object}
  */
 async function createConversionGraph(conn) {
-    var graph = createGraph();
-    const units = await Unit.getAll(conn);
-    for (let i = 0; i < units.length; ++i) {
-        graph.addNode(units[i].id, units[i].name);
-    }
+	var graph = createGraph();
+	const units = await Unit.getAll(conn);
+	for (let i = 0; i < units.length; ++i) {
+		graph.addNode(units[i].id, units[i].name);
+	}
 
-    const conversions = await Conversion.getAll(conn);
-    for (let i = 0; i < conversions.length; ++i) {
-        graph.addLink(conversions[i].sourceId, conversions[i].destinationId);
-    }
+	const conversions = await Conversion.getAll(conn);
+	for (let i = 0; i < conversions.length; ++i) {
+		graph.addLink(conversions[i].sourceId, conversions[i].destinationId);
+	}
 
-    return graph;
+	return graph;
 }
 
 module.exports = createConversionGraph;
