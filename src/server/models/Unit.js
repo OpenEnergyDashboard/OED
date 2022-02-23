@@ -4,6 +4,7 @@
 
 const database = require('./database');
 const sqlFile = database.sqlFile;
+const { log } = require('../log');
 
 class Unit {
 	/**
@@ -77,6 +78,16 @@ class Unit {
 	 */
 	static createUnitRepresentTypesEnum(conn) {
 		return conn.none(sqlFile('unit/create_unit_represent_types_enum.sql'));
+	}
+
+	/**
+	 * Returns all units in the database.
+	 * @param {*} conn The connection to use.
+	 * @returns {Promise.<Array.<Unit>>}
+	 */
+	static async getAll(conn) {
+		const rows = await conn.any(sqlFile('unit/get_all.sql'));
+		return rows.map(Unit.mapRow);
 	}
 
 	/**
@@ -184,6 +195,7 @@ class Unit {
 	 */
 	async update(conn) {
 		const unit = this;
+		Unit.setIdentifier(unit);
 		if (unit.id === undefined) {
 			throw new Error('Attempt to update a meter with no ID');
 		}
@@ -197,11 +209,19 @@ class Unit {
 	 */
 	async insert(conn) {
 		const unit = this;
+		Unit.setIdentifier(unit);
 		if (unit.id !== undefined) {
 			throw new Error('Attempt to insert a unit that already has an ID');
 		}
 		const resp = await conn.one(sqlFile('unit/insert_new_unit.sql'), unit);
 		this.id = resp.id;
+	}
+
+	static setIdentifier(unit) {
+		if (unit.identifier === null || unit.identifier.length === 0) {
+			unit.identifier = unit.name;
+			log.warn(`Automatically set identifier of the unit "${unit.name}" to "${unit.name}`);
+		}
 	}
 }
 
