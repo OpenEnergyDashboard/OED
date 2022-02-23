@@ -75,7 +75,7 @@ function updateComparePeriod(comparePeriod: ComparePeriod, currentTime: moment.M
 export function changeCompareGraph(comparePeriod: ComparePeriod): Thunk {
 	return (dispatch: Dispatch) => {
 		dispatch(updateComparePeriod(comparePeriod, moment()));
-		dispatch(dispatch2 => {
+		dispatch((dispatch2: Dispatch) => {
 			dispatch2(fetchNeededCompareReadings(comparePeriod));
 		});
 		return Promise.resolve();
@@ -90,7 +90,7 @@ export function changeSelectedMeters(meterIDs: number[]): Thunk {
 	return (dispatch, getState) => {
 		dispatch(updateSelectedMeters(meterIDs));
 		// Nesting dispatches to preserve that updateSelectedMeters() is called before fetching readings
-		dispatch(dispatch2 => {
+		dispatch((dispatch2: Dispatch) => {
 			dispatch2(fetchNeededLineReadings(getState().graph.timeInterval));
 			dispatch2(fetchNeededBarReadings(getState().graph.timeInterval));
 			dispatch2(fetchNeededCompareReadings(getState().graph.comparePeriod));
@@ -104,7 +104,7 @@ export function changeSelectedGroups(groupIDs: number[]): Thunk {
 	return (dispatch, getState) => {
 		dispatch(updateSelectedGroups(groupIDs));
 		// Nesting dispatches to preserve that updateSelectedGroups() is called before fetching readings
-		dispatch(dispatch2 => {
+		dispatch((dispatch2: Dispatch) => {
 			dispatch2(fetchNeededLineReadings(getState().graph.timeInterval));
 			dispatch2(fetchNeededBarReadings(getState().graph.timeInterval));
 			dispatch2(fetchNeededCompareReadings(getState().graph.comparePeriod));

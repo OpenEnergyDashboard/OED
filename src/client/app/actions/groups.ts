@@ -265,7 +265,7 @@ function submitNewGroup(group: t.GroupData): Thunk {
 		try {
 			await groupsApi.create(group);
 			dispatch(markGroupsOutdated());
-			dispatch(dispatch2 => {
+			dispatch((dispatch2: Dispatch) => {
 				dispatch2(markGroupInEditingClean());
 			});
 		} catch (e) {
@@ -286,7 +286,7 @@ function submitGroupEdits(group: t.GroupData & t.GroupID): Thunk {
 			await groupsApi.edit(group);
 			dispatch(markGroupsOutdated());
 			dispatch(markOneGroupOutdated(group.id));
-			dispatch(dispatch2 => {
+			dispatch((dispatch2: Dispatch) => {
 				dispatch2(markGroupInEditingClean());
 			});
 		} catch (e) {
@@ -348,7 +348,7 @@ export function deleteGroup(): Thunk {
 			await groupsApi.delete(groupInEditing.id);
 			dispatch(markGroupsOutdated());
 			dispatch(changeDisplayedGroups([]));
-			dispatch(dispatch2 => {
+			dispatch((dispatch2: Dispatch) => {
 				dispatch2(markGroupInEditingClean());
 				browserHistory.push('/groups');
 			});
