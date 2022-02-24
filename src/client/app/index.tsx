@@ -12,7 +12,7 @@ import 'bootstrap/dist/css/bootstrap.css';
 import RouteContainer from './containers/RouteContainer';
 import reducers from './reducers';
 import './styles/index.css';
-import { composeWithDevTools } from 'redux-devtools-extension';
+import { composeWithDevTools } from '@redux-devtools/extension';
 import initScript from './initScript';
 
 // Creates and applies thunk middleware to the Redux store, which is defined from the Redux reducers.
