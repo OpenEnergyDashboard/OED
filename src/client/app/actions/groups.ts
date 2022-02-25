@@ -33,7 +33,7 @@ export function changeDisplayedGroups(groupIDs: number[]): t.ChangeDisplayedGrou
 }
 
 export function fetchGroupsDetails(): Thunk {
-	return async dispatch => {
+	return async (dispatch: Dispatch) => {
 		dispatch(requestGroupsDetails());
 		// Returns the names and IDs of all groups in the groups table.
 		const groupsDetails = await groupsApi.details();
@@ -46,7 +46,7 @@ function shouldFetchGroupsDetails(state: State): boolean {
 }
 
 export function fetchGroupsDetailsIfNeeded(): Thunk {
-	return (dispatch, getState) => {
+	return (dispatch: Dispatch, getState: GetState) => {
 		if (shouldFetchGroupsDetails(getState())) {
 			return dispatch(fetchGroupsDetails());
 		}
@@ -132,7 +132,7 @@ function canBeginEditing(state: State): boolean {
  * @return {function(*, *)}
  */
 export function beginEditingIfPossible(groupID: number): Thunk {
-	return (dispatch, getState) => {
+	return (dispatch: Dispatch, getState: GetState) => {
 		if (canBeginEditing(getState())) {
 			dispatch(fetchGroupChildrenIfNeeded(groupID));
 			dispatch(beginEditingGroup(groupID));
@@ -260,7 +260,7 @@ function creatingNewGroup(state: State): boolean {
  * and processing the response.
  */
 function submitNewGroup(group: t.GroupData): Thunk {
-	return async dispatch => {
+	return async (dispatch: Dispatch) => {
 		dispatch(markGroupInEditingSubmitted());
 		try {
 			await groupsApi.create(group);
@@ -280,7 +280,7 @@ function submitNewGroup(group: t.GroupData): Thunk {
 }
 
 function submitGroupEdits(group: t.GroupData & t.GroupID): Thunk {
-	return async dispatch => {
+	return async (dispatch: Dispatch) => {
 		dispatch(markGroupInEditingSubmitted());
 		try {
 			await groupsApi.edit(group);
@@ -338,7 +338,7 @@ export function submitGroupInEditingIfNeeded() {
 }
 
 export function deleteGroup(): Thunk {
-	return async (dispatch, getState) => {
+	return async (dispatch: Dispatch, getState: GetState) => {
 		dispatch(markGroupInEditingDirty());
 		const groupInEditing = getState().groups.groupInEditing as t.GroupDefinition;
 		if (groupInEditing === undefined) {

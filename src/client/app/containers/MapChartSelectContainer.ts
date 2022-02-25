@@ -36,7 +36,7 @@ function mapStateToProps(state: State, dispatch: Dispatch) {
 
 function mapDispatchToProps(dispatch: Dispatch) {
 	return {
-		selectMap: ((newSelectedMapID: number) => dispatch(changeSelectedMap(newSelectedMapID)))
+		selectMap: (newSelectedMapID: number) => dispatch(changeSelectedMap(newSelectedMapID))
 	};
 }
 

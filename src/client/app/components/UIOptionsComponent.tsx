@@ -234,7 +234,7 @@ class UIOptionsComponent extends React.Component<UIOptionsPropsWithIntl, UIOptio
 					</ButtonGroup>
 					<TooltipMarkerComponent page='home' helpTextId='help.home.map.interval.tip' />
 					</div>,
-						<MapChartSelectContainer key='chart'/>]
+					<MapChartSelectContainer key={'chart'} />]
 				}
 
 				{/* We can't export compare data or map data */}

@@ -9,7 +9,7 @@ import { fetchNeededLineReadings } from './lineReadings';
 import { fetchNeededBarReadings } from './barReadings';
 import { fetchNeededCompareReadings } from './compareReadings';
 import { TimeInterval } from '../../../common/TimeInterval';
-import { Dispatch, Thunk, ActionType } from '../types/redux/actions';
+import { Dispatch, Thunk, ActionType, GetState } from '../types/redux/actions';
 import { State } from '../types/redux/state';
 import * as t from '../types/redux/graph';
 import * as m from '../types/redux/map';
@@ -57,7 +57,7 @@ function changeGraphZoom(timeInterval: TimeInterval): t.ChangeGraphZoomAction {
 }
 
 export function changeBarDuration(barDuration: moment.Duration): Thunk {
-	return (dispatch, getState) => {
+	return (dispatch: Dispatch, getState: GetState) => {
 		dispatch(updateBarDuration(barDuration));
 		dispatch(fetchNeededBarReadings(getState().graph.timeInterval));
 		return Promise.resolve();
@@ -87,7 +87,7 @@ export function changeCompareSortingOrder(compareSortingOrder: SortingOrder): t.
 }
 
 export function changeSelectedMeters(meterIDs: number[]): Thunk {
-	return (dispatch, getState) => {
+	return (dispatch: Dispatch, getState: GetState) => {
 		dispatch(updateSelectedMeters(meterIDs));
 		// Nesting dispatches to preserve that updateSelectedMeters() is called before fetching readings
 		dispatch((dispatch2: Dispatch) => {
@@ -101,7 +101,7 @@ export function changeSelectedMeters(meterIDs: number[]): Thunk {
 }
 
 export function changeSelectedGroups(groupIDs: number[]): Thunk {
-	return (dispatch, getState) => {
+	return (dispatch: Dispatch, getState: GetState) => {
 		dispatch(updateSelectedGroups(groupIDs));
 		// Nesting dispatches to preserve that updateSelectedGroups() is called before fetching readings
 		dispatch((dispatch2: Dispatch) => {
@@ -115,7 +115,7 @@ export function changeSelectedGroups(groupIDs: number[]): Thunk {
 }
 
 function fetchNeededReadingsForGraph(timeInterval: TimeInterval): Thunk {
-	return dispatch => {
+	return (dispatch: Dispatch) => {
 		dispatch(fetchNeededLineReadings(timeInterval));
 		dispatch(fetchNeededBarReadings(timeInterval));
 		dispatch(fetchNeededMapReadings(timeInterval));
@@ -128,7 +128,7 @@ function shouldChangeGraphZoom(state: State, timeInterval: TimeInterval): boolea
 }
 
 export function changeGraphZoomIfNeeded(timeInterval: TimeInterval): Thunk {
-	return (dispatch, getState) => {
+	return (dispatch: Dispatch, getState: GetState) => {
 		if (shouldChangeGraphZoom(getState(), timeInterval)) {
 			dispatch(resetRangeSliderStack());
 			dispatch(changeGraphZoom(timeInterval));
@@ -155,7 +155,7 @@ function resetRangeSliderStack(): t.ResetRangeSliderStackAction {
 }
 
 function changeRangeSliderIfNeeded(interval: TimeInterval): Thunk {
-	return dispatch => {
+	return (dispatch: Dispatch) => {
 		if (shouldChangeRangeSlider(interval)) {
 			dispatch(changeRangeSlider(interval));
 		}

@@ -33,7 +33,7 @@ const store = createStore(reducers, composeWithDevTools(applyMiddleware(thunkMid
 // const store = createStore(reducers, composeEnhancers(applyMiddleware(thunkMiddleware)));
 
 // Store information that would rarely change throughout using OED into the Redux store when the application first mounts.
-store.dispatch(initScript());
+store.dispatch<any>(initScript());
 
 // Renders the entire application, starting with RouteComponent, into the root div
 // Provides the Redux store to all child components

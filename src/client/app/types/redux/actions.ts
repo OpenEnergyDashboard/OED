@@ -2,8 +2,8 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
 
-import { AnyAction, Dispatch as Disps } from 'redux';
-import { ThunkAction } from 'redux-thunk';
+import { Action } from 'redux';
+import { ThunkAction, ThunkDispatch } from 'redux-thunk';
 import { State } from './state';
 
 export enum ActionType {
@@ -116,9 +116,10 @@ export enum ActionType {
 
 /**
  * The type of the redux-thunk dispatch function.
+ * Uses the overloaded version from Redux-Thunk.
  */
-//export type Dispatch = Disps<State>;
-export type Dispatch = Disps<AnyAction, State>;
+//export type Dispatch = ThunkDispatch<State, void, Action<any>>;
+export type Dispatch = ThunkDispatch<State, void, Action<any>>;
 
 
 /**
@@ -130,4 +131,4 @@ export type GetState = () => State;
  * The type of promissory actions used in the project.
  * Returns a promise, no extra argument, uses the global state.
  */
-export type Thunk = ThunkAction<Promise<any>, State, void>;
+export type Thunk = ThunkAction<Promise<any>, State, void, Action>;
