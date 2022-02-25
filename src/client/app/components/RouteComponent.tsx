@@ -36,6 +36,7 @@ import UploadCSVContainer from '../containers/csv/UploadCSVContainer';
 import { UserRole } from '../types/items';
 import { hasPermissions } from '../utils/hasPermissions';
 import queryString = require('query-string');
+import UnitsDetailContainer from './unit/UnitsDetailContainer';
 
 interface RouteProps {
 	barStacking: boolean;
@@ -260,6 +261,8 @@ export default class RouteComponent extends React.Component<RouteProps, {}> {
 								<Route path='/editGroup' render={() => this.requireAuth(<EditGroupsContainer/>)}/>
 								<Route path='/users/new' render={() => this.requireAuth(<CreateUserContainer/>)}/>
 								<Route path='/users' render={() => this.requireAuth(<UsersDetailContainer fetchUsers={() => []}/>)}/>
+								<Route path='/units'render={() => this.requireAuth(<UnitsDetailContainer />)}/>
+								<Route path="/addUnit" render={() => this.requireAuth(<UnitsDetailContainer />)}/>
 								<Route path='*' component={HomeComponent}/>
 							</Switch>
 						</Router>
