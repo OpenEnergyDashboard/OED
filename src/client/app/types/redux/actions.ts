@@ -118,9 +118,8 @@ export enum ActionType {
  * The type of the redux-thunk dispatch function.
  * Uses the overloaded version from Redux-Thunk.
  */
-//export type Dispatch = ThunkDispatch<State, void, Action<any>>;
+// export type Dispatch = ThunkDispatch<State, void, Action<any>>;
 export type Dispatch = ThunkDispatch<State, void, Action<any>>;
-
 
 /**
  * The type of the redux-thunk getState function.
