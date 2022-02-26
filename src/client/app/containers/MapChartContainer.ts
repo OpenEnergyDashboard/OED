@@ -70,7 +70,7 @@ function mapStateToProps(state: State) {
 				// Get meter GPS value.
 				const gps = state.meters.byMeterID[meterID].gps;
 				// filter meters with actual gps coordinates.
-				if (gps !== undefined && gps !== null) {
+				if (gps !== undefined && gps !== null && byMeterID !== undefined) {
 					// Convert the gps value to the equivalent Plotly grid coordinates on user map.
 					// First, convert from GPS to grid units. Since we are doing a GPS calculation, this happens on the true north map.
 					// It must be on true north map since only there are the GPS axis parallel to the map axis.
@@ -127,7 +127,7 @@ function mapStateToProps(state: State) {
 				// Get group GPS value.
 				const gps = state.groups.byGroupID[groupID].gps;
 				// Filter groups with actual gps coordinates.
-				if (gps !== undefined && gps !== null) {
+				if (gps !== undefined && gps !== null && byGroupID !== undefined) {
 					// Convert the gps value to the equivalent Plotly grid coordinates on user map.
 					// First, convert from GPS to grid units. Since we are doing a GPS calculation, this happens on the true north map.
 					// It must be on true north map since only there are the GPS axis parallel to the map axis.
