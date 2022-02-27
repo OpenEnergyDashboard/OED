@@ -31,6 +31,12 @@ export default class SingleSelectComponent extends React.Component<SingleSelectP
 		};
 	}
 
+	public componentDidUpdate(prevProps: SingleSelectProps) {
+		if (this.props.selectedOption !== prevProps.selectedOption) {
+			this.setState({ selectedOption: this.props.selectedOption });
+		}
+	}
+
 	public render() {
 		return (
 			<Select

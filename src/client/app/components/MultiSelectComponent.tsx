@@ -33,6 +33,12 @@ export default class MultiSelectComponent<I> extends React.Component<MultiSelect
 		};
 	}
 
+	public componentDidUpdate(prevProps: MultiSelectProps<any>) {
+		if (this.props.selectedOptions !== prevProps.selectedOptions) {
+			this.setState({ selectedOptions: this.props.selectedOptions });
+		}
+	}
+
 	public render() {
 		return (
 			<Select

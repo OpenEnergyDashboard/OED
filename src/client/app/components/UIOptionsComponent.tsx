@@ -206,35 +206,37 @@ class UIOptionsComponent extends React.Component<UIOptionsPropsWithIntl, UIOptio
 				}
 
 				{this.props.chartToRender === ChartTypes.map &&
-					[<div key='side-options'>
-						<p style={labelStyle}>
-						<FormattedMessage id='map.interval' />:
-					</p>
-					<ButtonGroup
-						style={zIndexFix}
-					>
-						<Button
-							outline={this.state.barDurationDays !== 1}
-							onClick={() => this.handleBarButton(1)}
+					<div>
+						<div key='side-options'>
+							<p style={labelStyle}>
+							<FormattedMessage id='map.interval' />:
+						</p>
+						<ButtonGroup
+							style={zIndexFix}
 						>
-							<FormattedMessage id='day' />
-						</Button>
-						<Button
-							outline={this.state.barDurationDays !== 7}
-							onClick={() => this.handleBarButton(7)}
-						>
-							<FormattedMessage id='week' />
-						</Button>
-						<Button
-							outline={this.state.barDurationDays !== 28}
-							onClick={() => this.handleBarButton(28)}
-						>
-							<FormattedMessage id='4.weeks' />
-						</Button>
-					</ButtonGroup>
-					<TooltipMarkerComponent page='home' helpTextId='help.home.map.interval.tip' />
-					</div>,
-						<MapChartSelectContainer key='chart'/>]
+							<Button
+								outline={this.state.barDurationDays !== 1}
+								onClick={() => this.handleBarButton(1)}
+							>
+								<FormattedMessage id='day' />
+							</Button>
+							<Button
+								outline={this.state.barDurationDays !== 7}
+								onClick={() => this.handleBarButton(7)}
+							>
+								<FormattedMessage id='week' />
+							</Button>
+							<Button
+								outline={this.state.barDurationDays !== 28}
+								onClick={() => this.handleBarButton(28)}
+							>
+								<FormattedMessage id='4.weeks' />
+							</Button>
+						</ButtonGroup>
+						<TooltipMarkerComponent page='home' helpTextId='help.home.map.interval.tip' />
+						</div>
+						<MapChartSelectContainer key='chart' />
+					</div>
 				}
 
 				{/* We can't export compare data or map data */}
