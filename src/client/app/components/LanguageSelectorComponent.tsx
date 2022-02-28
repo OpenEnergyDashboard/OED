@@ -28,7 +28,7 @@ interface DropdownState {
 enum LanguageNames {
 	en = 'English',
 	fr = 'Français',
-	es = 'Español',
+	es = 'Español'
 }
 
 /**
