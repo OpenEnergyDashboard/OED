@@ -52,29 +52,26 @@ export default class ChartSelectComponent extends React.Component<ChartSelectPro
 				</p>
 				<Dropdown isOpen={this.state.dropdownOpen} toggle={this.toggleDropdown}>
 					<DropdownToggle outline caret>
-						<FormattedMessage id='chart.select' />
+						{/* Show the currently selected chart as its name */}
+						<FormattedMessage id={this.props.selectedChart} />
 					</DropdownToggle>
 					<DropdownMenu>
 						<DropdownItem
-							outline={this.props.selectedChart !== ChartTypes.line}
 							onClick={() => this.handleChangeChartType(ChartTypes.line)}
 						>
 							<FormattedMessage id='line' />
 						</DropdownItem>
 						<DropdownItem
-							outline={this.props.selectedChart !== ChartTypes.bar}
 							onClick={() => this.handleChangeChartType(ChartTypes.bar)}
 						>
 							<FormattedMessage id='bar' />
 						</DropdownItem>
 						<DropdownItem
-							outline={this.props.selectedChart !== ChartTypes.compare}
 							onClick={() => this.handleChangeChartType(ChartTypes.compare)}
 						>
 							<FormattedMessage id='compare' />
 						</DropdownItem>
 						<DropdownItem
-							outline={this.props.selectedChart !== ChartTypes.map}
 							onClick={() => this.handleChangeChartType(ChartTypes.map)}
 						>
 							<FormattedMessage id='map' />
@@ -82,7 +79,7 @@ export default class ChartSelectComponent extends React.Component<ChartSelectPro
 					</DropdownMenu>
 				</Dropdown>
 				<div>
-					<TooltipMarkerComponent page='home' helpTextId='help.home.chart.select'/>
+					<TooltipMarkerComponent page='home' helpTextId='help.home.chart.select' />
 				</div>
 			</div>
 		);
@@ -92,6 +89,6 @@ export default class ChartSelectComponent extends React.Component<ChartSelectPro
 		this.props.changeChartType(value);
 	}
 	private toggleDropdown() {
-		this.setState(prevState => ({dropdownOpen: !prevState.dropdownOpen}));
+		this.setState(prevState => ({ dropdownOpen: !prevState.dropdownOpen }));
 	}
 }
