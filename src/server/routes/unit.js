@@ -1,12 +1,9 @@
 const express = require('express');
 const { getConnection } = require('../db');
 const { Unit } = require('../models/Unit');
-const User = require('../models/User');
-const { isTokenAuthorized } = require('../util/userRoles') 
-const adminAuthenticator = require('./authenticator').adminAuthMiddleware;
 
 const router = express.Router();
-router.use(optionalAuthenticator);
+//help
 
 function formatUnitForResponse(unit){
     const formattedUnit = {
@@ -28,15 +25,8 @@ function formatUnitForResponse(unit){
 router.get('/', async(req,res) => {
     try{
         const conn = getConnection();
-        let query;
-        const token = req.headers.token || req.body.token || req.query.token;
-        if (req.hasValidAuthToken && (await isTokenAuthorized(token, User.role.ADMIN))) {
-			query = Unit.getAll; // only admins can see disabled maps;
-		} else {
-			query = Unit.getDisplayable;
-		}
-		const rows = await query(conn);
-		res.json(rows.map(row => formatUnitForResponse(row)));
+        let query = Unit.getAll;
+		res.json(query.map(row => formatUnitForResponse(query)));
     }catch(err){
         log.error(`Error while performing GET all units query: ${err}`, err);
     }

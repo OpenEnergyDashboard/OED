@@ -1,5 +1,6 @@
 import * as React from 'react';
 import { Table, Button } from 'reactstrap';
+import { UnitData } from '../../types/redux/unit'
 import { FormattedMessage } from 'react-intl';
 import { hasToken } from '../../utils/token';
 import HeaderContainer from '../../containers/HeaderContainer';
@@ -11,10 +12,20 @@ import { removeUnsavedChanges } from '../../actions/unsavedWarning';
 import store from '../../index';
 import UnsavedWarningContainer from '../../containers/UnsavedWarningContainer';
 
+interface UnitsDetailProps{
+    units: UnitData[];
+    unsavedChanges: boolean;
+    fetchUnitsDetails(): Promise<any>;
+}
 
-export default class UnitsDetailContainer extends React.Component {
+
+export default class UnitsDetailContainer extends React.Component<UnitsDetailProps, {}> {
     constructor(props: any) {
         super(props);
+    }
+
+    public componentWillMount() {
+        this.props.fetchUnitsDetails();
     }
 
 
@@ -42,7 +53,6 @@ export default class UnitsDetailContainer extends React.Component {
         return (
             <div>
 				<UnsavedWarningContainer />
-				<HeaderContainer />
 				<div className='container-fluid'>
 					<h2 style={titleStyle}>
 						<div style={tooltipStyle}>
@@ -64,23 +74,39 @@ export default class UnitsDetailContainer extends React.Component {
                                 <th><FormattedMessage id="unit.note"/></th>
                                 <th><FormattedMessage id="unit.remove"/></th>
                             </tr>
-                            <tr>
-                                <td colSpan={11}>
-                                    {/* 
-                                    Need to implement addUnit route later
-                                     */}
-                                    <Link to="/addUnit">
-                                        <Button style={buttonContainerStyle} color='primary'>
-                                            <FormattedMessage id="create.unit"/>
-                                        </Button>
-                                    </Link>
-                                </td>
-                            </tr>
                         </thead>
+                            <tbody>
+                                {this.props.units.map(unit => (
+                                    <tr key={unit.id}>
+                                        <td>{unit.id}</td>
+                                        <td>{unit.name}</td>
+                                        <td>{unit.identifier}</td>
+                                        <td>{unit.unitRepresent}</td>
+                                        <td>{unit.secInRate}</td>
+                                        <td>{unit.typeOfUnit}</td>
+                                        <td>{unit.suffix}</td>
+                                        <td>{unit.displayable}</td>
+                                        <td>{unit.preferredDisplay}</td>
+                                        <td>{unit.note}</td>
+                                        <td>Button will go here I swear</td>
+                                    </tr>
+                                ))}
+                                <tr>
+                                    <td colSpan={11}>
+                                        {/* 
+                                        Need to implement addUnit route later
+                                        */}
+                                        <Link to="/addUnit">
+                                            <Button style={buttonContainerStyle} color='primary'>
+                                                <FormattedMessage id="create.unit"/>
+                                            </Button>
+                                        </Link>
+                                    </td>
+                                </tr>
+                            </tbody>
 					</Table>
 					</div>
 				</div>
-				<FooterContainer />
 			</div>
         );
     }

@@ -36,7 +36,7 @@ import UploadCSVContainer from '../containers/csv/UploadCSVContainer';
 import { UserRole } from '../types/items';
 import { hasPermissions } from '../utils/hasPermissions';
 import queryString = require('query-string');
-import UnitsDetailContainer from './unit/UnitsDetailContainer';
+import UnitsDetailContainer from '../containers/unit/UnitsDetailContainer';
 
 interface RouteProps {
 	barStacking: boolean;
