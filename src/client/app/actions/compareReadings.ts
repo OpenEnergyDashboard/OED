@@ -114,7 +114,7 @@ function fetchGroupCompareReadings(groupIDs: number[], comparePeriod: ComparePer
  * @return {*} An action to fetch the needed readings
  */
 export function fetchNeededCompareReadings(comparePeriod: ComparePeriod): Thunk {
-	return (dispatch, getState) => {
+	return (dispatch: Dispatch, getState: GetState) => {
 		const state = getState();
 		const compareShift = calculateCompareShift(comparePeriod);
 		const timeInterval = state.graph.compareTimeInterval;
@@ -124,7 +124,7 @@ export function fetchNeededCompareReadings(comparePeriod: ComparePeriod): Thunk 
 
 		// Determine which meters are missing data for this time interval
 		const meterIDsToFetchForCompare = state.graph.selectedMeters.filter(
-			id => shouldFetchMeterCompareReadings(state, id, timeInterval, compareShift)
+			(id: number) => shouldFetchMeterCompareReadings(state, id, timeInterval, compareShift)
 		);
 		// Fetch data for any missing meters
 		if (meterIDsToFetchForCompare.length > 0) {
@@ -133,7 +133,7 @@ export function fetchNeededCompareReadings(comparePeriod: ComparePeriod): Thunk 
 
 		// Determine which groups are missing data for this time interval
 		const groupIDsToFetchForCompare = state.graph.selectedGroups.filter(
-			id => shouldFetchGroupCompareReadings(state, id, timeInterval, compareShift)
+			(id: number) => shouldFetchGroupCompareReadings(state, id, timeInterval, compareShift)
 		);
 		// Fetch data for any missing groups
 		if (groupIDsToFetchForCompare.length > 0) {

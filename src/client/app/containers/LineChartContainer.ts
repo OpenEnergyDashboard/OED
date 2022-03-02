@@ -7,7 +7,7 @@ import * as moment from 'moment-timezone';
 import { connect } from 'react-redux';
 import getGraphColor from '../utils/getGraphColor';
 import { State } from '../types/redux/state';
-import PlotlyChart, { IPlotlyChartProps } from 'react-plotlyjs-ts';
+import Plot from 'react-plotly.js';
 import { TimeInterval } from '../../../common/TimeInterval';
 import Locales from '../types/locales';
 import { DataType } from '../types/Datasources';
@@ -39,7 +39,7 @@ function mapStateToProps(state: State) {
 					const timeReading = st.add(moment(reading.endTimestamp).diff(st) / 2);
 					xData.push(timeReading.utc().format('YYYY-MM-DD HH:mm:ss'));
 					yData.push(reading.reading);
-					hoverText.push(`<b> ${timeReading.format('dddd, LL LTS')} </b> <br> ${label}: ${reading.reading.toPrecision(6)} kW`);
+					hoverText.push(`<b> ${timeReading.format('ddd, ll LTS')} </b> <br> ${label}: ${reading.reading.toPrecision(6)} kW`);
 				});
 
 				// Save the timestamp range of the plot
@@ -99,7 +99,7 @@ function mapStateToProps(state: State) {
 					const timeReading = st.add(moment(reading.endTimestamp).diff(st) / 2);
 					xData.push(timeReading.utc().format('YYYY-MM-DD HH:mm:ss'));
 					yData.push(reading.reading);
-					hoverText.push(`<b> ${timeReading.format('dddd, LL LTS'	)} </b> <br> ${label}: ${reading.reading.toPrecision(6)} kW`);
+					hoverText.push(`<b> ${timeReading.format('ddd, ll LTS'	)} </b> <br> ${label}: ${reading.reading.toPrecision(6)} kW`);
 				});
 
 				// This variable contains all the elements (x and y values, line type, etc.) assigned to the data parameter of the Plotly object
@@ -130,6 +130,7 @@ function mapStateToProps(state: State) {
 	const layout: any = {
 		autosize: true,
 		showlegend: true,
+		height: 700,
 		legend: {
 			x: 0,
 			y: 1.1,
@@ -156,11 +157,12 @@ function mapStateToProps(state: State) {
 
 	// Assign all the parameters required to create the Plotly object (data, layout, config) to the variable props, returned by mapStateToProps
 	// The Plotly toolbar is displayed if displayModeBar is set to true
-	const props: IPlotlyChartProps = {
+	const props: any = {
 		data: datasets,
 		layout,
 		config: {
 			displayModeBar: true,
+			responsive: true,
 			locales: Locales // makes locales available for use
 		}
 	};
@@ -168,4 +170,4 @@ function mapStateToProps(state: State) {
 	return props;
 }
 
-export default connect(mapStateToProps)(PlotlyChart);
+export default connect(mapStateToProps)(Plot);

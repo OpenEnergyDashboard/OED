@@ -4,10 +4,8 @@
 
 import * as React from 'react';
 import { Route, Router, Switch, Redirect } from 'react-router-dom';
-import { addLocaleData, IntlProvider } from 'react-intl';
-import * as en from 'react-intl/locale-data/en';
-import * as fr from 'react-intl/locale-data/fr';
-import * as localeData from '../translations/data.json';
+import { IntlProvider } from 'react-intl';
+import localeData from '../translations/data';
 import { browserHistory } from '../utils/history';
 import * as _ from 'lodash';
 import * as moment from 'moment';
@@ -35,7 +33,7 @@ import MapCalibrationContainer from '../containers/maps/MapCalibrationContainer'
 import UploadCSVContainer from '../containers/csv/UploadCSVContainer';
 import { UserRole } from '../types/items';
 import { hasPermissions } from '../utils/hasPermissions';
-import queryString = require('query-string');
+import * as queryString from 'query-string';
 
 interface RouteProps {
 	barStacking: boolean;
@@ -231,16 +229,8 @@ export default class RouteComponent extends React.Component<RouteProps, {}> {
 	 * @returns JSX to create the RouteComponent
 	 */
 	public render() {
-		addLocaleData([...en, ...fr]);
 		const lang = this.props.defaultLanguage;
-		let messages;
-		if (lang === 'fr') {
-			messages = (localeData as any).fr;
-		} else if (lang === 'es') {
-			messages = (localeData as any).es;
-		} else {
-			messages = (localeData as any).en;
-		}
+		const messages = (localeData as any)[lang];
 		return (
 			<div>
 				<InitializationContainer />

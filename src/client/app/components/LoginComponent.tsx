@@ -4,7 +4,7 @@
 
 import * as React from 'react';
 import { browserHistory } from '../utils/history';
-import { InjectedIntlProps, injectIntl, defineMessages, FormattedMessage } from 'react-intl';
+import { injectIntl, defineMessages, FormattedMessage, WrappedComponentProps } from 'react-intl';
 import { Input, Button, InputGroup, Form } from 'reactstrap';
 import HeaderContainer from '../containers/HeaderContainer';
 import FooterContainer from '../containers/FooterContainer';
@@ -22,7 +22,7 @@ interface LoginProps {
 	saveCurrentUser(profile: User): any;
 }
 
-type LoginPropsWithIntl = LoginProps & InjectedIntlProps;
+type LoginPropsWithIntl = LoginProps & WrappedComponentProps;
 
 class LoginComponent extends React.Component<LoginPropsWithIntl, LoginState> {
 	private inputEmail: HTMLInputElement | null;
@@ -53,7 +53,6 @@ class LoginComponent extends React.Component<LoginPropsWithIntl, LoginState> {
 			email: { id: 'email' },
 			password: { id: 'password' }
 		});
-		const { formatMessage } = this.props.intl;
 
 		return (
 			<div>
@@ -62,7 +61,7 @@ class LoginComponent extends React.Component<LoginPropsWithIntl, LoginState> {
 					<InputGroup>
 						<Input
 							type='text'
-							placeholder={formatMessage(messages.email)}
+							placeholder={this.props.intl.formatMessage(messages.email)}
 							innerRef={c => { this.inputEmail = c; }}
 							value={this.state.email}
 							onChange={this.handleEmailChange}
@@ -71,7 +70,7 @@ class LoginComponent extends React.Component<LoginPropsWithIntl, LoginState> {
 					<InputGroup>
 						<Input
 							type='password'
-							placeholder={formatMessage(messages.password)}
+							placeholder={this.props.intl.formatMessage(messages.password)}
 							value={this.state.password}
 							onChange={this.handlePasswordChange}
 						/>
@@ -142,4 +141,4 @@ class LoginComponent extends React.Component<LoginPropsWithIntl, LoginState> {
 	}
 }
 
-export default injectIntl<LoginProps>(LoginComponent);
+export default injectIntl(LoginComponent);

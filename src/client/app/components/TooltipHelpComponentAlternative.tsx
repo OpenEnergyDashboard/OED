@@ -15,9 +15,6 @@ interface TooltipHelpProps {
 export default class TooltipHelpComponentAlternative extends React.Component<TooltipHelpProps> {
 	constructor(props: TooltipHelpProps) {
 		super(props);
-	}
-
-	public componentWillMount() {
 		this.props.fetchVersionIfNeeded();
 	}
 

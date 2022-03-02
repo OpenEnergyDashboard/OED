@@ -13,7 +13,7 @@
         "target": "es5",
 		"jsx": "react",
 		"allowJs": true,
-        "lib": ["es6", "dom", "es2015.promise"],
+        "lib": ["es6", "dom", "es2021"],
         "moduleResolution": "node",
         "rootDir": "src",
         "noImplicitReturns": true,
@@ -27,12 +27,9 @@
         ]
     },
     "include": [
-        "./src/client/app/**/*"
+        "./src/client/app/**/*", "desc.d.ts"
     ],
     "exclude": [
         "node_modules"
-    ],
-    "awesomeTypescriptLoaderOptions": {
-        "useBabel": true
-    }
+    ]
 }

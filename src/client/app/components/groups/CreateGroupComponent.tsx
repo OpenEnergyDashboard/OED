@@ -13,12 +13,13 @@ import { CreateNewBlankGroupAction, EditGroupNameAction,
 import HeaderContainer from '../../containers/HeaderContainer';
 import FooterContainer from '../../containers/FooterContainer';
 import { browserHistory } from '../../utils/history';
-import { FormattedMessage, InjectedIntlProps, injectIntl, defineMessages } from 'react-intl';
+import { FormattedMessage, defineMessages, injectIntl, WrappedComponentProps } from 'react-intl';
 import TooltipHelpContainerAlternative from '../../containers/TooltipHelpContainerAlternative';
 import { GPSPoint, isValidGPSInput } from '../../utils/calibration';
 import store from '../../index';
 import { removeUnsavedChanges, updateUnsavedChanges } from '../../actions/unsavedWarning';
 import UnsavedWarningContainer from '../../containers/UnsavedWarningContainer';
+import translate from '../../utils/translate';
 
 interface CreateGroupProps {
 	meters: NamedIDItem[];
@@ -38,7 +39,7 @@ interface CreateGroupState {
 	groupArea: string;
 }
 
-type CreateGroupPropsWithIntl = CreateGroupProps & InjectedIntlProps;
+type CreateGroupPropsWithIntl = CreateGroupProps & WrappedComponentProps;
 
 class CreateGroupComponent extends React.Component<CreateGroupPropsWithIntl, CreateGroupState> {
 	constructor(props: CreateGroupPropsWithIntl) {
@@ -57,7 +58,7 @@ class CreateGroupComponent extends React.Component<CreateGroupPropsWithIntl, Cre
 		this.removeUnsavedChangesFunction = this.removeUnsavedChangesFunction.bind(this);
 	}
 
-	public componentWillMount() {
+	public componentDidMount() {
 		this.props.createNewBlankGroup();
 	}
 
@@ -242,7 +243,7 @@ class CreateGroupComponent extends React.Component<CreateGroupPropsWithIntl, Cre
 			}
 		}
 		else {
-			window.alert(this.props.intl.formatMessage({id: 'area.error'}));
+			window.alert(translate('area.error'));
 		}
 	}
 
@@ -252,4 +253,4 @@ class CreateGroupComponent extends React.Component<CreateGroupPropsWithIntl, Cre
 	}
 }
 
-export default injectIntl<CreateGroupProps>(CreateGroupComponent);
+export default injectIntl(CreateGroupComponent);

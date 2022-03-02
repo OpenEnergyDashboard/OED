@@ -7,6 +7,7 @@ const database = require('../database');
 const sqlFile = database.sqlFile;
 
 const { processConfigFile } = require('./processConfigFile');
+const { log } = require('../../log');
 
 class Configfile {
 	/**
@@ -57,7 +58,7 @@ class Configfile {
 	 * @param conn The connection to use.
 	 */
 	static async getByID(id, conn) {
-		const row = await conn.one(sqlFile('obvius/get_configs_by_id.sql'), {id: id});
+		const row = await conn.one(sqlFile('obvius/get_configs_by_id.sql'), { id: id });
 		return Configfile.mapRow(row);
 	}
 
@@ -68,7 +69,7 @@ class Configfile {
 	 * @param conn The connection to use..
 	 */
 	static async getBySerial(id, conn) {
-		const rows = await conn.any(sqlFile('obvius/get_configs_by_sn.sql'), {serialId: id});
+		const rows = await conn.any(sqlFile('obvius/get_configs_by_sn.sql'), { serialId: id });
 		return rows.map(Configfile.mapRow);
 	}
 
@@ -95,7 +96,7 @@ class Configfile {
 
 		// insert meters from file contents
 		const obviusMeters = processConfigFile(configFile);
-		obviusMeters.forEach(meter => meter.insert(conn));
+		await Configfile.insertNewMeters(obviusMeters, conn)
 	}
 
 	/**
@@ -104,6 +105,33 @@ class Configfile {
 	 */
 	makeFilename() {
 		return `${this.serialId}-mb-${this.modbusId}.ini`;
+	}
+
+	/**
+	 * promises to insert the meters into the database
+	 * This version is designed to deal with Obvius config files.
+	 * @param meters rows of the meters
+	 * @param conn the database connection to use
+	 * @returns {Promise.<>}
+	 */
+	static async insertNewMeters(rows, conn) {
+		await Promise.all(rows.map(
+			async meter => {
+				try {
+					// If a configuration file was previously sent for this meter, then don't try to insert.
+					if (await meter.existsByName(conn)) {
+						// TODO We should check when and why Obvius sends us the same meter twice. It might be the case that we need
+						// to update the meter in this case.
+						log.info(`During Obvius configuration file processing the meter ${meter.name} already exists so not added.`);
+					} else {
+						log.info(`During Obvius configuration file processing the meter ${meter.name} is being created`);
+						await meter.insert(conn);
+					}
+				} catch (err) {
+					log.error(`Error inserting meter ${meter.name} during processing of Obvius configuration file with error: `, err)
+				}
+			})
+		);
 	}
 }
 

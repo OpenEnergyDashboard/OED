@@ -10,7 +10,7 @@ import MapChartSelectComponent from '../components/MapChartSelectComponent';
 import {changeSelectedMap} from '../actions/map';
 import {SelectOption} from '../types/items';
 
-function mapStateToProps(state: State, dispatch: Dispatch) {
+function mapStateToProps(state: State) {
 	const maps = state.maps.byMapID;
 	const sortedMaps = _.sortBy(_.values(maps).map(map => (
 		{
@@ -36,7 +36,7 @@ function mapStateToProps(state: State, dispatch: Dispatch) {
 
 function mapDispatchToProps(dispatch: Dispatch) {
 	return {
-		selectMap: ((newSelectedMapID: number) => dispatch(changeSelectedMap(newSelectedMapID)))
+		selectMap: (newSelectedMapID: number) => dispatch(changeSelectedMap(newSelectedMapID))
 	};
 }
 

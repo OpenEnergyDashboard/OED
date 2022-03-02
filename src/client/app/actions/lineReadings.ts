@@ -62,7 +62,7 @@ function receiveGroupLineReadings(
  * Fetch the data for the given meters over the given interval. Fully manages the Redux lifecycle.
  */
 function fetchMeterLineReadings(meterIDs: number[], timeInterval: TimeInterval): Thunk {
-	return async dispatch => {
+	return async (dispatch: Dispatch) => {
 		dispatch(requestMeterLineReadings(meterIDs, timeInterval));
 		const meterLineReadings = await compressedReadingsApi.meterLineReadings(meterIDs, timeInterval);
 		dispatch(receiveMeterLineReadings(meterIDs, timeInterval, meterLineReadings));

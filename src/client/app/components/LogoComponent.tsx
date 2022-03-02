@@ -3,19 +3,17 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
 
 import * as React from 'react';
-import { injectIntl, InjectedIntlProps, defineMessages } from 'react-intl';
+import { defineMessages, useIntl } from 'react-intl';
 
 interface LogoProps {
 	url: string;
 	height: number;
 }
 
-type LogoPropsWithIntl = LogoProps & InjectedIntlProps;
-
 /**
  * React component that creates an logo image from a file path
  */
-function LogoComponent(props: LogoPropsWithIntl) {
+function LogoComponent(props: LogoProps) {
 	const imgStyle: React.CSSProperties = {
 		maxWidth: '100%',
 		height: 'auto',
@@ -25,10 +23,11 @@ function LogoComponent(props: LogoPropsWithIntl) {
 		oed: { id: 'oed' },
 		logo: { id: 'logo' }
 	});
-	const { formatMessage } = props.intl;
+	// WrappedComponentProps doesn't really work here as it's a function, so instead we use useIntl() which was part of the updated react-intl
+	const intl = useIntl();
 	return (
-		<img height={props.height} src={props.url} alt={formatMessage(messages.logo)} title={formatMessage(messages.oed)} style={imgStyle} />
+		<img height={props.height} src={props.url} alt={intl.formatMessage(messages.logo)} title={intl.formatMessage(messages.oed)} style={imgStyle} />
 	);
 }
 
-export default injectIntl<LogoProps>(LogoComponent);
+export default LogoComponent;
