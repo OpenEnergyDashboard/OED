@@ -83,6 +83,7 @@ async function createSchema(conn) {
 	const { Map } = require('./Map');
 	const Unit = require('./Unit');
 	const Conversion = require('./Conversion');
+	const { insertSpecialUnits, insertSpecialConversions } = require('../data/automatedTestingData');
 
 	/* eslint-enable global-require */
 	await Unit.createUnitTypesEnum(conn);
@@ -90,8 +91,10 @@ async function createSchema(conn) {
 	await Unit.createUnitRepresentTypesEnum(conn);
 	await Unit.createTable(conn);
 	await Unit.insertStandardUnits(conn);
+	await insertSpecialUnits(conn);
 	await Conversion.createTable(conn);
 	await Conversion.insertStandardConversions(conn);
+	await insertSpecialConversions(conn);
 	await Meter.createMeterTypesEnum(conn);
 	await Meter.createTable(conn);
 	await Reading.createTable(conn);

@@ -10,6 +10,8 @@ const promisify = require('es6-promisify');
 const csv = require('csv');
 const parseCsv = promisify(csv.parse);
 const { generateSine, generateCosine } = require('./generateTestingData');
+const Unit = require('../models/Unit');
+const Conversion = require('../models/Conversion');
 
 // Define the start and end date for data generation.
 const DEFAULT_OPTIONS = {
@@ -302,6 +304,64 @@ function generateVariableAmplitudeTestingData() {
 	}
 }
 
+/**
+ * Inserts special units into the database.
+ * @param {*} conn The connection to use.
+ */
+async function insertSpecialUnits(conn) {
+	// The table contains special units' data.
+	// Each row contains: name, identifier, typeOfUnit, suffix, displayable, preferredDisplay.
+	const specialUnits = [
+		['Electric_utility', '', Unit.unitType.METER, '', Unit.displayableType.NONE, false],
+		['Natural_Gas_BTU', '', Unit.unitType.METER, '', Unit.displayableType.NONE, false],
+		['100 W bulb', '100 W bulb for 10 hrs', Unit.unitType.UNIT, '', Unit.displayableType.ALL, false],
+		['Natural_Gas_M3', '', Unit.unitType.METER, '', Unit.displayableType.NONE, false],
+		['Natural_Gas_dollar', '', Unit.unitType.METER, '', Unit.displayableType.NONE, false],
+		['US_dollar', 'US $', Unit.unitType.UNIT, '', Unit.displayableType.ALL, true],
+		['Euro', '€', Unit.unitType.UNIT, '', Unit.displayableType.ALL, true],
+		['kg CO2', 'kg CO2', Unit.unitType.UNIT, 'CO2', Unit.displayableType.ALL, false],
+		['Trash', '', Unit.unitType.METER, '', Unit.displayableType.NONE, false]
+	];
+
+	for (let i = 0; i < specialUnits.length; ++i) {
+		const unitData = specialUnits[i];
+		if (await Unit.getByName(unitData[0], conn) === null) {
+			await new Unit(undefined, unitData[0], unitData[1], Unit.unitRepresentType.UNUSED, 3600, 
+				unitData[2], null, unitData[3], unitData[4], unitData[5], null).insert(conn);
+		}
+	}
+}
+
+async function insertSpecialConversions(conn) {
+	// The table contains special conversions' data.
+	// Each row contains: sourceName, destinationName, bidirectional, slope, intercept, note.
+	const specialConversions = [
+		['kWh', '100 W bulb', false, 1, 0, 'kWh → 100 W bulb for 10 hrs'],
+		['Electric_utility', 'kWh', false, 1, 0, 'Electric Utility → kWh'],
+		['Electric_utility', 'US_dollar', false, 0.115, 0, 'Electric Utility → US dollar'],
+		['Electric_utility', 'kg CO2', false, 0.709, 0, 'Electric Utility → CO2'],
+		['Natural_Gas_BTU', 'BTU', false, 1, 0, 'Natural Gas BTU → BTU'],
+		['Natural_Gas_BTU', 'Euro', false, 2.6e-6, 0, 'Natural Gas BTU → Euro'],
+		['Natural_Gas_BTU', 'kg CO2', false, 5.28e-5, 0, 'Natural Gas BTU → CO2'],
+		['Natural_Gas_M3', 'M3_gas', false, 1, 0, 'Natural Gas M3 → M3 of gas'],
+		['Natural_Gas_M3', 'US_dollar', false, 0.11, 0, 'Natural Gas M3 → US dollar'],
+		['US_dollar', 'Euro', true, 0.88, 0, 'US dollar → Euro'],
+		['Natural_Gas_dollar', 'US_dollar', false, 1, 0, 'Natural Gas $ → US dollar'],
+		['kg CO2', 'kg', false, 1, 0, 'CO2 → kg'],
+		['Trash', 'kg CO2', false, 3.24e-6, 0, 'Trash → CO2'],
+		['Trash', 'kg', false, 1, 0, 'Trash → kg']
+	];
+
+	for (let i = 0; i < specialConversions.length; ++i) {
+		const conversionData = specialConversions[i];
+		const sourceId = (await Unit.getByName(conversionData[0], conn)).id;
+		const destinationId = (await Unit.getByName(conversionData[1], conn)).id;
+		if (await Conversion.getBySourceDestination(sourceId, destinationId, conn) === null) {
+			await new Conversion(sourceId, destinationId, conversionData[2], conversionData[3], conversionData[4], conversionData[5]).insert(conn);
+		}
+	}
+}
+
 module.exports = {
 	generateSineTestingData,
 	generateSineSquaredTestingData,
@@ -313,5 +373,7 @@ module.exports = {
 	generateFifteenMinuteTestingData,
 	generateOneMinuteTestingData,
 	generateTestingData,
-	generateVariableAmplitudeTestingData
+	generateVariableAmplitudeTestingData,
+	insertSpecialUnits,
+	insertSpecialConversions
 };
