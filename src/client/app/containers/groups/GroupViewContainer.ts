@@ -9,7 +9,7 @@ import { Dispatch } from '../../types/redux/actions';
 import { State } from '../../types/redux/state';
 import { DisplayMode } from '../../types/redux/groups';
 import { isRoleAdmin } from '../../utils/hasPermissions';
-
+import getDeepMetersByGroupID = require('../../../../server/models/Group');
 function mapStateToProps(state: State, ownProps: {id: number}) {
 	const id = ownProps.id;
 	const childMeterNames = state.groups.byGroupID[id].childMeters.map((meterID: number) => state.meters.byMeterID[meterID].name.trim()).sort();
@@ -19,6 +19,7 @@ function mapStateToProps(state: State, ownProps: {id: number}) {
 	if(currentUser !== null){
 		loggedInAsAdmin = isRoleAdmin(currentUser.role);
 	}
+	getDeepMetersByGroupID(id, 'group/get_deep_meters_by_group_id.sql');
 	return {
 		id,
 		loggedInAsAdmin,
