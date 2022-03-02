@@ -24,6 +24,13 @@ interface DropdownState {
 	compareSortingDropdownOpen: boolean;
 }
 
+// Convert the i18n language type to its full name.
+enum LanguageNames {
+	en = 'English',
+	fr = 'Français',
+	es = 'Español'
+}
+
 /**
  * A component that allows users to select which language the page should be displayed in.
  */
@@ -56,23 +63,21 @@ export default class LanguageSelectorComponent extends React.Component<LanguageS
 				</p>
 				<Dropdown isOpen={this.state.dropdownOpen} toggle={this.toggleDropdown}>
 					<DropdownToggle outline caret>
-						<FormattedMessage id='language.select' />
+						{/* Show the currently selected language as its name */}
+						{LanguageNames[this.props.selectedLanguage]}
 					</DropdownToggle>
 					<DropdownMenu>
 						<DropdownItem
-							outline={this.props.selectedLanguage !== LanguageTypes.en}
 							onClick={() => this.handleChangeLanguage(LanguageTypes.en)}
 						>
 							English
 						</DropdownItem>
 						<DropdownItem
-							outline={this.props.selectedLanguage !== LanguageTypes.fr}
 							onClick={() => this.handleChangeLanguage(LanguageTypes.fr)}
 						>
 							Français
 						</DropdownItem>
 						<DropdownItem
-							outline={this.props.selectedLanguage !== LanguageTypes.es}
 							onClick={() => this.handleChangeLanguage(LanguageTypes.es)}
 						>
 							Español

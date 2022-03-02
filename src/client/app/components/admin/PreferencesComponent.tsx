@@ -240,12 +240,12 @@ class PreferencesComponent extends React.Component<PreferencesPropsWithIntl, {}>
 
 	private removeUnsavedChangesFunction(callback: () => void) {
 		// The function is called to reset all the inputs to the initial state
-		store.dispatch(fetchPreferencesIfNeeded()).then(callback);
+		store.dispatch<any>(fetchPreferencesIfNeeded()).then(callback);
 	}
 
 	private submitUnsavedChangesFunction(successCallback: () => void, failureCallback: () => void) {
 		// The function is called to submit the unsaved changes
-		store.dispatch(submitPreferences()).then(successCallback, failureCallback);
+		store.dispatch<any>(submitPreferences()).then(successCallback, failureCallback);
 	}
 
 	private updateUnsavedChanges() {

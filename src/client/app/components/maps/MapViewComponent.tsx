@@ -93,14 +93,14 @@ class MapViewComponent extends React.Component<MapViewPropsWithIntl, MapViewStat
 
 	private removeUnsavedChangesFunction(callback: () => void) {
 		// This function is called to reset all the inputs to the initial state
-		store.dispatch(confirmEditedMaps()).then(() => {
-			store.dispatch(fetchMapsDetails()).then(callback);
+		store.dispatch<any>(confirmEditedMaps()).then(() => {
+			store.dispatch<any>(fetchMapsDetails()).then(callback);
 		});
 	}
 
 	private submitUnsavedChangesFunction(successCallback: () => void, failureCallback: () => void) {
 		// This function is called to submit the unsaved changes
-		store.dispatch(submitEditedMaps()).then(successCallback, failureCallback);
+		store.dispatch<any>(submitEditedMaps()).then(successCallback, failureCallback);
 	}
 
 	private updateUnsavedChanges() {

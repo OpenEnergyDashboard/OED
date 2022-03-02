@@ -286,7 +286,7 @@ class EditGroupsComponent extends React.Component<EditGroupsPropsWithIntl, EditG
 		// This function is called to reset all the inputs to the initial state
 		this.props.changeDisplayModeToView();
 		// Fetch data from database to replace the current one
-		store.dispatch(fetchGroupsDetails()).then(callback);
+		store.dispatch<any>(fetchGroupsDetails()).then(callback);
 	}
 
 	private updateUnsavedChanges() {
