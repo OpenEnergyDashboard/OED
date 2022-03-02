@@ -81,6 +81,31 @@ class Unit {
 	}
 
 	/**
+	 * Inserts standard units to the database.
+	 * @param {*} conn The connection to use.
+	 */
+	static async insertStandardUnits(conn) {
+		// The table contains units' data. 
+		// Each row contains: name, identifier, typeOfUnit, suffix, displayable, preferredDisplay.
+		const standardUnits = [
+			['kWh', 'kWh', Unit.unitType.UNIT, '', Unit.displayableType.ALL, true],
+			['MJ', 'MegaJoules', Unit.unitType.UNIT, '', Unit.displayableType.ADMIN, false],
+			['BTU', 'BTU', Unit.unitType.UNIT, '', Unit.displayableType.ALL, true],
+			['M3_gas', 'cubic meters of gas', Unit.unitType.UNIT, '', Unit.displayableType.ALL, false],
+			['kg', 'kg', Unit.unitType.UNIT, '', Unit.displayableType.ALL, false],
+			['Metric_ton', 'Metric ton', Unit.unitType.UNIT, '', Unit.displayableType.ALL, false]
+		];
+
+		for (let i = 0; i < standardUnits.length; ++i) {
+            const unitData = standardUnits[i];
+			if (await Unit.getByName(unitData[0], conn) === null) {
+				await new Unit(undefined, unitData[0], unitData[1], Unit.unitRepresentType.UNUSED, 3600, 
+					unitData[2], null, unitData[3], unitData[4], unitData[5], null).insert(conn);
+			}
+        }
+	}
+
+	/**
 	 * Returns all units in the database.
 	 * @param {*} conn The connection to use.
 	 * @returns {Promise.<Array.<Unit>>}
@@ -162,7 +187,7 @@ class Unit {
 	 */
 	static async getByName(name, conn) {
 		const row = await conn.oneOrNone(sqlFile('unit/get_by_name.sql'), { name: name });
-		return Unit.mapRow(row);
+		return row === null ? null : Unit.mapRow(row);
 	}
 
 	/**
@@ -185,7 +210,7 @@ class Unit {
 	 */
 	static async getByUnitIndexUnit(unitIndex, conn) {
 		const resp = await conn.oneOrNone(sqlFile('unit/get_by_unit_index_unit.sql'), { unitIndex: unitIndex });
-		return resp.id;
+		return row === null ? null : resp.id;
 	}
 
 	/**
