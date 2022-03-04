@@ -2,14 +2,8 @@ import * as React from 'react';
 import { Table, Button } from 'reactstrap';
 import { UnitData } from '../../types/redux/unit'
 import { FormattedMessage } from 'react-intl';
-import { hasToken } from '../../utils/token';
-import HeaderContainer from '../../containers/HeaderContainer';
-import FooterContainer from '../../containers/FooterContainer';
 import {Link} from 'react-router-dom';
-import TooltipHelpContainerAlternative from '../../containers/TooltipHelpContainerAlternative';
-import TooltipMarkerComponent from '../TooltipMarkerComponent';
-import { removeUnsavedChanges } from '../../actions/unsavedWarning';
-import store from '../../index';
+
 import UnsavedWarningContainer from '../../containers/UnsavedWarningContainer';
 
 interface UnitsDetailProps{
@@ -20,7 +14,7 @@ interface UnitsDetailProps{
 
 
 export default class UnitsDetailContainer extends React.Component<UnitsDetailProps, {}> {
-    constructor(props: any) {
+    constructor(props: UnitsDetailProps) {
         super(props);
     }
 

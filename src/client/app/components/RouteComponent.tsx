@@ -37,6 +37,7 @@ import { UserRole } from '../types/items';
 import { hasPermissions } from '../utils/hasPermissions';
 import queryString = require('query-string');
 import UnitsDetailContainer from '../containers/unit/UnitsDetailContainer';
+import CreateUnitContainter from '../containers/unit/CreateUnitContainer';
 
 interface RouteProps {
 	barStacking: boolean;
@@ -262,7 +263,7 @@ export default class RouteComponent extends React.Component<RouteProps, {}> {
 								<Route path='/users/new' render={() => this.requireAuth(<CreateUserContainer/>)}/>
 								<Route path='/users' render={() => this.requireAuth(<UsersDetailContainer fetchUsers={() => []}/>)}/>
 								<Route path='/units'render={() => this.requireAuth(<UnitsDetailContainer />)}/>
-								<Route path="/addUnit" render={() => this.requireAuth(<UnitsDetailContainer />)}/>
+								<Route path="/addUnit" render={() => this.requireAuth(<CreateUnitContainter />)}/>
 								<Route path='*' component={HomeComponent}/>
 							</Switch>
 						</Router>

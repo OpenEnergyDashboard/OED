@@ -1,11 +1,7 @@
 import * as React from 'react';
 import * as _ from 'lodash';
-import { State } from '../../types/redux/state'
 import {UnitData} from '../../types/redux/unit'
 import UnitDetailComponent from '../../components/unit/UnitsDetailComponent'
-import {fetchUnitsDetails} from '../../actions/unit'
-import {Dispatch} from '../../types/redux/actions';
-import { connect } from 'react-redux';
 import { unitsApi } from '../../utils/api';
 import HeaderContainer from '../HeaderContainer';
 import FooterContainer from '../FooterContainer';

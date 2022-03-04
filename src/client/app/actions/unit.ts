@@ -1,7 +1,6 @@
-import {ActionType, Dispatch, GetState, Thunk} from '../types/redux/actions';
+import {ActionType, Dispatch, Thunk} from '../types/redux/actions';
 import * as t from '../types/redux/unit'
 import {unitsApi} from '../utils/api';
-import {State} from '../types/redux/state';
 
 function requestUnitsDetails(): t.RequestUnitsDetailsAction {
     return { type: ActionType.RequestUnitsDetails}

@@ -32,7 +32,7 @@ export interface UnitData{
     typeOfUnit: string;
     unitIndex: number;
     suffix: string;
-    displayable: boolean;
+    displayable: string;
     preferredDisplay: boolean;
     note: string;
 }
