@@ -5,6 +5,7 @@
 const database = require('./database');
 const sqlFile = database.sqlFile;
 const { log } = require('../log');
+const { getConnection } = require('../db');
 
 class Unit {
 	/**
@@ -97,12 +98,12 @@ class Unit {
 		];
 
 		for (let i = 0; i < standardUnits.length; ++i) {
-            const unitData = standardUnits[i];
+			const unitData = standardUnits[i];
 			if (await Unit.getByName(unitData[0], conn) === null) {
 				await new Unit(undefined, unitData[0], unitData[1], Unit.unitRepresentType.UNUSED, 3600, 
 					unitData[2], null, unitData[3], unitData[4], unitData[5], null).insert(conn);
 			}
-        }
+		}
 	}
 
 	/**
@@ -210,7 +211,7 @@ class Unit {
 	 */
 	static async getByUnitIndexUnit(unitIndex, conn) {
 		const resp = await conn.oneOrNone(sqlFile('unit/get_by_unit_index_unit.sql'), { unitIndex: unitIndex });
-		return row === null ? null : resp.id;
+		return resp === null ? null : resp.id;
 	}
 
 	/**
@@ -245,28 +246,28 @@ class Unit {
 	static setIdentifier(unit) {
 		if (unit.identifier === null || unit.identifier.length === 0) {
 			unit.identifier = unit.name;
-			log.warn(`Automatically set identifier of the unit "${unit.name}" to "${unit.name}`);
+			log.warn(`Automatically set identifier of the unit "${unit.name}" to "${unit.name}"`);
 		}
 	}
 }
 
-Unit.unitType = {
+Unit.unitType = Object.freeze({
 	UNIT: 'unit',
 	METER: 'meter',
 	SUFFIX: 'suffix'
-};
+});
 
-Unit.displayableType = {
+Unit.displayableType = Object.freeze({
 	NONE: 'none',
 	ALL: 'all',
 	ADMIN: 'admin'
-};
+});
 
-Unit.unitRepresentType = {
+Unit.unitRepresentType = Object.freeze({
 	QUANTITY: 'quantity',
 	FLOW: 'flow',
 	RAW: 'raw',
 	UNUSED: 'unused'
-}
+});
 
 module.exports = Unit;

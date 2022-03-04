@@ -332,6 +332,10 @@ async function insertSpecialUnits(conn) {
 	}
 }
 
+/**
+ * Insert special conversions into the database.
+ * @param {*} conn The connection to use.
+ */
 async function insertSpecialConversions(conn) {
 	// The table contains special conversions' data.
 	// Each row contains: sourceName, destinationName, bidirectional, slope, intercept, note.
