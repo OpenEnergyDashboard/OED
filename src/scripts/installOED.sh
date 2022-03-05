@@ -93,9 +93,6 @@ while [ $create_error == 0 ]; do
     printf "%s\n" "Attempting to create database..."
     # Redirect stderr to a file
     npm run createdb |& tee /tmp/oed.error > /dev/null
-	# Insert special units and conversions
-	npm run insertSpecialUnits
-	npm run insertSpecialConversions
 	createdb_code=${PIPESTATUS[0]}
 	# TODO: This should be moved to the error case below once issues with this process are under control.
 	# If all is well it could go inside the case where an unknown error occurred.
@@ -130,6 +127,9 @@ while [ $create_error == 0 ]; do
 		# There was no createdb error so assume database ready for use so stop process
 		create_error=1
 		printf "%s\n" "  database creation had no errors so assume schema creation worked."
+		# Insert special units and conversions
+		npm run insertSpecialUnits
+		npm run insertSpecialConversions
 	fi
 	# Did one more attempt
 	((tries=tries+1))
