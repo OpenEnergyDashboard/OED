@@ -12,6 +12,7 @@ const parseCsv = promisify(csv.parse);
 const { generateSine, generateCosine } = require('./generateTestingData');
 const Unit = require('../models/Unit');
 const Conversion = require('../models/Conversion');
+const { getConnection } = require('../db');
 
 // Define the start and end date for data generation.
 const DEFAULT_OPTIONS = {
@@ -306,9 +307,9 @@ function generateVariableAmplitudeTestingData() {
 
 /**
  * Inserts special units into the database.
- * @param {*} conn The connection to use.
  */
-async function insertSpecialUnits(conn) {
+async function insertSpecialUnits() {
+	const conn = getConnection();
 	// The table contains special units' data.
 	// Each row contains: name, identifier, typeOfUnit, suffix, displayable, preferredDisplay.
 	const specialUnits = [
@@ -334,9 +335,9 @@ async function insertSpecialUnits(conn) {
 
 /**
  * Insert special conversions into the database.
- * @param {*} conn The connection to use.
  */
-async function insertSpecialConversions(conn) {
+async function insertSpecialConversions() {
+	const conn = getConnection();
 	// The table contains special conversions' data.
 	// Each row contains: sourceName, destinationName, bidirectional, slope, intercept, note.
 	const specialConversions = [

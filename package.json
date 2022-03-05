@@ -39,7 +39,9 @@
     "generateSineSquaredTestingData": "node -e 'require(\"./src/server/data/automatedTestingData\").generateSineSquaredTestingData(2.5)'",
     "generateCosineSquaredTestingData": "node -e 'require(\"./src/server/data/automatedTestingData\").generateCosineSquaredTestingData(2.5)'",
     "generateTestingData": "node -e 'require(\"./src/server/data/automatedTestingData\").generateTestingData()'",
-    "testData": "./src/scripts/testData.sh"
+    "testData": "./src/scripts/testData.sh",
+    "insertSpecialUnits": "node -e 'require(\"./src/server/data/automatedTestingData.js\").insertSpecialUnits()'",
+    "insertSpecialConversions": "node -e 'require(\"./src/server/data/automatedTestingData.js\").insertSpecialConversions()'"
   },
   "nodemonConfig": {
     "watch": [

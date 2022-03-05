@@ -14,8 +14,8 @@ const { insertSpecialUnits, insertSpecialConversions } = require('../data/automa
 		await createSchema(conn);
 		await Unit.insertStandardUnits(conn);
 		await Conversion.insertStandardConversions(conn);
-		await insertSpecialUnits(conn);
-		await insertSpecialConversions(conn);
+		// await insertSpecialUnits(conn);
+		// await insertSpecialConversions(conn);
 		log.info('Schema created', null, true);
 		process.exitCode = 0;
 	} catch (err) {
