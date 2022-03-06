@@ -311,24 +311,24 @@ function generateVariableAmplitudeTestingData() {
 async function insertSpecialUnits() {
 	const conn = getConnection();
 	// The table contains special units' data.
-	// Each row contains: name, identifier, typeOfUnit, suffix, displayable, preferredDisplay.
+	// Each row contains: name, identifier, unitRepresentType, typeOfUnit, suffix, displayable, preferredDisplay.
 	const specialUnits = [
-		['Electric_utility', '', Unit.unitType.METER, '', Unit.displayableType.NONE, false],
-		['Natural_Gas_BTU', '', Unit.unitType.METER, '', Unit.displayableType.NONE, false],
-		['100 W bulb', '100 W bulb for 10 hrs', Unit.unitType.UNIT, '', Unit.displayableType.ALL, false],
-		['Natural_Gas_M3', '', Unit.unitType.METER, '', Unit.displayableType.NONE, false],
-		['Natural_Gas_dollar', '', Unit.unitType.METER, '', Unit.displayableType.NONE, false],
-		['US_dollar', 'US $', Unit.unitType.UNIT, '', Unit.displayableType.ALL, true],
-		['Euro', '€', Unit.unitType.UNIT, '', Unit.displayableType.ALL, true],
-		['kg CO2', 'kg CO2', Unit.unitType.UNIT, 'CO2', Unit.displayableType.ALL, false],
-		['Trash', '', Unit.unitType.METER, '', Unit.displayableType.NONE, false]
+		['Electric_utility', '', Unit.unitRepresentType.QUANTITY, Unit.unitType.METER, '', Unit.displayableType.NONE, false],
+		['Natural_Gas_BTU', '', Unit.unitRepresentType.QUANTITY, Unit.unitType.METER, '', Unit.displayableType.NONE, false],
+		['100 W bulb', '100 W bulb for 10 hrs', Unit.unitRepresentType.UNUSED, Unit.unitType.UNIT, '', Unit.displayableType.ALL, false],
+		['Natural_Gas_M3', '', Unit.unitRepresentType.QUANTITY, Unit.unitType.METER, '', Unit.displayableType.NONE, false],
+		['Natural_Gas_dollar', '', Unit.unitRepresentType.QUANTITY, Unit.unitType.METER, '', Unit.displayableType.NONE, false],
+		['US_dollar', 'US $', Unit.unitRepresentType.UNUSED, Unit.unitType.UNIT, '', Unit.displayableType.ALL, true],
+		['Euro', '€', Unit.unitRepresentType.UNUSED, Unit.unitType.UNIT, '', Unit.displayableType.ALL, true],
+		['kg CO2', 'kg CO2', Unit.unitRepresentType.UNUSED, Unit.unitType.UNIT, 'CO2', Unit.displayableType.ALL, false],
+		['Trash', '', Unit.unitRepresentType.QUANTITY, Unit.unitType.METER, '', Unit.displayableType.NONE, false]
 	];
 
 	for (let i = 0; i < specialUnits.length; ++i) {
 		const unitData = specialUnits[i];
 		if (await Unit.getByName(unitData[0], conn) === null) {
-			await new Unit(undefined, unitData[0], unitData[1], Unit.unitRepresentType.QUANTITY, undefined, 
-				unitData[2], null, unitData[3], unitData[4], unitData[5], 'special unit').insert(conn);
+			await new Unit(undefined, unitData[0], unitData[1], unitData[2], undefined, 
+				unitData[3], null, unitData[4], unitData[5], unitData[6], 'special unit').insert(conn);
 		}
 	}
 }
