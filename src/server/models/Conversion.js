@@ -45,7 +45,7 @@ class Conversion {
 			['MJ', 'M3_gas', true, 2.6e-2, 0, 'MJ → M3_gas'],
 			['MJ', 'BTU', true, 947.8, 0, 'MJ → BTU'],
 			['kg', 'Metric_ton', true, 1e-3, 0, 'kg → Metric ton'],
-			['Fahrenheit', 'Celsius', true, 1.8, 32, 'Fahrenheit → Celsius']
+			['Celsius', 'Fahrenheit', true, 1.8, 32, 'Celsius → Fahrenheit']
 		];
 
 		for (let i = 0; i < standardConversions.length; ++i) {
