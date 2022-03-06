@@ -93,7 +93,9 @@ class Unit {
 			['BTU', 'BTU', Unit.unitType.UNIT, '', Unit.displayableType.ALL, true],
 			['M3_gas', 'cubic meters of gas', Unit.unitType.UNIT, '', Unit.displayableType.ALL, false],
 			['kg', 'kg', Unit.unitType.UNIT, '', Unit.displayableType.ALL, false],
-			['Metric_ton', 'Metric ton', Unit.unitType.UNIT, '', Unit.displayableType.ALL, false]
+			['Metric_ton', 'Metric ton', Unit.unitType.UNIT, '', Unit.displayableType.ALL, false],
+			['Fahrenheit', 'Fahrenheit', Unit.unitType.UNIT, '', Unit.displayableType.ALL, false],
+			['Celsius', 'Celsius', Unit.unitType.UNIT, '', Unit.displayableType.ALL, false]
 		];
 
 		for (let i = 0; i < standardUnits.length; ++i) {
