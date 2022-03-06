@@ -327,8 +327,8 @@ async function insertSpecialUnits() {
 	for (let i = 0; i < specialUnits.length; ++i) {
 		const unitData = specialUnits[i];
 		if (await Unit.getByName(unitData[0], conn) === null) {
-			await new Unit(undefined, unitData[0], unitData[1], Unit.unitRepresentType.UNUSED, 3600, 
-				unitData[2], null, unitData[3], unitData[4], unitData[5], null).insert(conn);
+			await new Unit(undefined, unitData[0], unitData[1], Unit.unitRepresentType.QUANTITY, undefined, 
+				unitData[2], null, unitData[3], unitData[4], unitData[5], 'special unit').insert(conn);
 		}
 	}
 }
@@ -367,6 +367,14 @@ async function insertSpecialConversions() {
 	}
 }
 
+/**
+ * Call the functions to insert special units and conversions.
+ */
+async function insertSpecialUnitsAndConversions() {
+	await insertSpecialUnits();
+	await insertSpecialConversions();
+}
+
 module.exports = {
 	generateSineTestingData,
 	generateSineSquaredTestingData,
@@ -379,6 +387,5 @@ module.exports = {
 	generateOneMinuteTestingData,
 	generateTestingData,
 	generateVariableAmplitudeTestingData,
-	insertSpecialUnits,
-	insertSpecialConversions
+	insertSpecialUnitsAndConversions
 };

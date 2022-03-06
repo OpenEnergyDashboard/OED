@@ -102,7 +102,7 @@ class Unit {
 			const unitData = standardUnits[i];
 			if (await Unit.getByName(unitData[0], conn) === null) {
 				await new Unit(undefined, unitData[0], unitData[1], Unit.unitRepresentType.UNUSED, 3600, 
-					unitData[2], null, unitData[3], unitData[4], unitData[5], null).insert(conn);
+					unitData[2], null, unitData[3], unitData[4], unitData[5], 'standard unit').insert(conn);
 			}
 		}
 	}

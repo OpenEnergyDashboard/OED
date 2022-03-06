@@ -127,9 +127,6 @@ while [ $create_error == 0 ]; do
 		# There was no createdb error so assume database ready for use so stop process
 		create_error=1
 		printf "%s\n" "  database creation had no errors so assume schema creation worked."
-		# Insert special units and conversions
-		npm run insertSpecialUnits
-		npm run insertSpecialConversions
 	fi
 	# Did one more attempt
 	((tries=tries+1))
