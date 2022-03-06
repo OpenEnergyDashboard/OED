@@ -45,14 +45,6 @@ class Conversion {
 			['MJ', 'M3_gas', true, 2.6e-2, 0, 'MJ → M3_gas'],
 			['MJ', 'BTU', true, 947.8, 0, 'MJ → BTU'],
 			['kg', 'Metric_ton', true, 1e-3, 0, 'kg → Metric ton'],
-			['Fahrenheit', 'Celsius', true, 1.8, 32, 'Fahrenheit → Celsius'],
-			['US_Gallon', 'Liter', true, 3.8, 0, 'US Gallon → Liter'],
-			['M3', 'US_Gallon', true, 264.2, 0, 'M3 → US Gallon'],
-			['M3', 'Liter', true, 1000, 0, 'M3 → Liter'],
-			['MJ', 'BTU', true, 947.8, 0, 'MJ → BTU'],
-			['Metric_ton', 'Short_ton', true, 1.1, 0, 'Metric ton → Short ton'],
-			['Short_ton', 'lb', true, 2000, 0, 'Short ton → lb'],
-			['lb', 'kg', true, 0.5, 0, 'lb → kg']
 		];
 
 		for (let i = 0; i < standardConversions.length; ++i) {
