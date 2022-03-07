@@ -9,6 +9,7 @@ import { ActionType } from '../types/redux/actions';
 const defaultState: MetersState = {
 	isFetching: false,
 	byMeterID: {},
+	byMeterIdentifier: {},
 	selectedMeters: [],
 	editedMeters: {},
 	submitting: []

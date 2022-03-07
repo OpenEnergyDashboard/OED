@@ -10,23 +10,41 @@ import { editMeterDetails } from '../../actions/meters';
 import { MeterMetadata } from '../../types/redux/meters';
 import { logToServer } from '../../actions/logs';
 import { isRoleAdmin } from '../../utils/hasPermissions';
-
+import _ = require('lodash');
+var indexArray = 0;
 function mapStateToProps(state: State, ownProps: { id: number }) {
-	let meter = JSON.parse(JSON.stringify(state.meters.byMeterID[ownProps.id]));
-	if (state.meters.editedMeters[ownProps.id]) {
-		meter = JSON.parse(JSON.stringify(state.meters.editedMeters[ownProps.id]));
-	}
+	
+	const meters = state.meters.byMeterID;
+	let sortedMeters = _.sortBy(_.values(meters).map(meter => 
+	({ 
+		identifier: meter.identifier,
+		id: meter.id,
+		name: meter.name,
+		displayable: meter.displayable,
+		enabled: meter.enabled
 
+	})), 'identifier');
+	//first index of ownProps.id - first displayable id 
+	let meter = JSON.parse(JSON.stringify(sortedMeters[ownProps.id - 7]));
+	if (state.meters.editedMeters[ownProps.id]) {
+		meter = JSON.parse(JSON.stringify(sortedMeters[ownProps.id - 7]));
+	}
 	const currentUser = state.currentUser.profile;
 	let loggedInAsAdmin = false;
 	if (currentUser !== null) {
 		loggedInAsAdmin = isRoleAdmin(currentUser.role);
 	}
+	if (indexArray != sortedMeters.length){
+		indexArray += 1;
+	}
+	// math.abs()
+	console.log(indexArray);
 	return {
 		meter,
 		isEdited: state.meters.editedMeters[ownProps.id] !== undefined,
 		isSubmitting: state.meters.submitting.indexOf(ownProps.id) !== -1,
-		loggedInAsAdmin
+		loggedInAsAdmin,
+		sortedMeters
 	};
 }
 

@@ -34,7 +34,7 @@ export default class MetersDetailComponent extends React.Component<MetersDetailP
 
 	public render() {
 		const loggedInAsAdmin = this.props.loggedInAsAdmin;
-
+		
 		const titleStyle: React.CSSProperties = {
 			textAlign: 'center'
 		};

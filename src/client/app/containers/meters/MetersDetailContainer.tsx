@@ -16,7 +16,9 @@ function mapStateToProps(state: State) {
 	if(currentUser !== null){
 		loggedInAsAdmin = isRoleAdmin(currentUser.role);
 	}
-
+	console.log(Object.keys(state.meters.byMeterID)
+	.map(key => parseInt(key))
+	.filter(key => !isNaN(key)));
 	return {
 		loggedInAsAdmin,
 		meters: Object.keys(state.meters.byMeterID)
