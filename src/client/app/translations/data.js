@@ -1,5 +1,13 @@
-{
+/* This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this
+ * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
+
+/* tslint:disable */
+
+// This file used to be a json file, but had issues with importing, so we declared the json variable in a js file instead.
+const localeData = {
 	"en": {
+		"400": "400 Bad Request",
 		"404": "404 Not Found",
 		"4.weeks": "4 Weeks",
 		"action": "Action",
@@ -18,7 +26,6 @@
 		"calibration.save.database": "Save changes to database",
 		"calibration.submit.button": "Submit",
 		"cancel": "Cancel",
-		"chart.select": "Select a graph type",
 		"child.groups": "Child Groups",
 		"child.meters": "Child Meters",
 		"compare": "Compare",
@@ -128,12 +135,12 @@
 		"info": " for more information. ",
 		"input.gps.coords.first": "input GPS coordinate that corresponds to the point: ",
 		"input.gps.coords.second": "in this format -> latitude,longitude",
+		"input.gps.range": "Invalid GPS coordinate, latitude must be an integer between -90 and 90, longitude must be an integer between -180 and 180",
 		"insufficient.readings": "Insufficient readings data to process comparison for ",
 		"invalid.email.password": "Invalid email/password combination",
 		"invalid.number": "Please submit a valid number (between 0 and 2.0)",
 		"invalid.token.login.or.logout": "Token has expired. Either log in again, or log out.",
 		"language": "Language",
-		"language.select": "Select a language type",
 		"last.four.weeks": "Last four weeks",
 		"last.week": "Last week",
 		"leave": "Leave",
@@ -254,6 +261,7 @@
 		"you.cannot.create.a.cyclic.group": "You cannot create a cyclic group"
 	},
 	"fr": {
+		"400": "(Need French) 400 Bad Request",
 		"404": "404 Introuvable",
 		"4.weeks": "4 Semaines",
 		"action": "(Need French) Action",
@@ -272,7 +280,6 @@
 		"calibration.save.database": "(Need French) Save changes to database",
 		"calibration.submit.button": "(Need French) Submit",
 		"cancel": "Annuler",
-		"chart.select": "(Need French) Select a graph type",
 		"child.groups": "Groupes Enfants",
 		"child.meters": "Mètres Enfants",
 		"compare": "Comparer",
@@ -382,12 +389,12 @@
 		"info": " pour plus d'informations. ",
 		"input.gps.coords.first": "(Need French) input GPS coordinate that corresponds to the point: ",
 		"input.gps.coords.second": "(Need French) in this format -> latitude,longitude",
+		"input.gps.range": "Coordonnée GPS invalide, la latitude doit être un nombre entier entre -90 et 90, la longitude doit être un nombre entier entre -180 et 180",
 		"insufficient.readings": "Données de lectures insuffisantes pour la comparaison de processus pour ",
 		"invalid.email.password": "Combinaison email / mot de passe invalide",
 		"invalid.number": "(Need French) Please submit a valid number (between 0 and 2.0)",
 		"invalid.token.login.or.logout": "Le jeton a expiré. Connectez-vous à nouveau ou déconnectez-vous",
 		"language": "Langue",
-		"language.select": "(Need French) Select a language type",
 		"last.four.weeks": "Quatre dernières semaines",
 		"last.week": "La semaine dernière",
 		"leave": "(Need French) Leave",
@@ -508,6 +515,7 @@
 		"you.cannot.create.a.cyclic.group": "Vous ne pouvez pas créer un groupe cyclique"
 	},
 	"es": {
+		"400": "(Need Spanish) 400 Bad Request",
 		"404": "404 Página no encontrada",
 		"4.weeks": "4 Semanas",
 		"action": "Acción",
@@ -526,7 +534,6 @@
 		"calibration.save.database": "Guardar los cambios en la base de datos",
 		"calibration.submit.button": "Enviar",
 		"cancel": "Cancelar",
-		"chart.select": "Seleccionar el tipo de gráfico",
 		"child.groups": "Los grupos secundarios",
 		"child.meters": "Medidores infantiles",
 		"compare": "Comparar",
@@ -636,12 +643,12 @@
 		"info": " para obtener más información. ",
 		"input.gps.coords.first": "Entrada el cordenata de GPS que corresponde al punto: ",
 		"input.gps.coords.second": "En este forma -> latitud, longitud",
+		"input.gps.range": "Coordenada GPS no válida, la latitud debe ser un número entero entre -90 y 90, la longitud debe ser un número entero entre -180 y 180",
 		"insufficient.readings": "Datos de lecturas insuficientes para procesar la comparación de",
 		"invalid.email.password": "Correo electrónico o contraseña no válidos",
 		"invalid.number": "Por favor entregar un número válido (entre 0 a 2.0)",
 		"invalid.token.login.or.logout": "El token ha expirado. Inicie sesión nuevamente o cierre sesión",
 		"language": "Idioma",
-		"language.select": "Seleccionar el tipo de idioma",
 		"last.four.weeks": "Últimas cuatro semanas",
 		"last.week": "La semana pasada",
 		"leave": "Salir",
@@ -762,3 +769,5 @@
 		"you.cannot.create.a.cyclic.group": "No se puede crear un grupo cíclico"
 	}
 }
+
+export default localeData;

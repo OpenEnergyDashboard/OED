@@ -48,11 +48,21 @@ if [ -f ".env" ]; then
 	source .env
 fi
 
+# Skip the install if the node_modules were installed before the package files.
+# The two package files
+packageFile="package.json"
+packageLockFile="package-lock.json"
+# node hidden lock file that is changed each time npm install is run.
+nodeHiddenLockFile="node_modules/.package-lock.json"
+# See if hidden node lock file exists and is newer than the two package files.
+if [ -f "$nodeHiddenLockFile" ] && [ "$nodeHiddenLockFile" -nt "$packageFile" ] && [ "$nodeHiddenLockFile" -nt "$packageLockFile" ] ; then
+    # The node install happened after the package files were created so don't redo
+    keep_node_modules=yes
+fi
+
 # Install NPM dependencies
 if [ "$keep_node_modules" == "yes" ]; then
-	printf "%s\n" "skipping NPM install as requested"
-elif [ "$OED_PRODUCTION" == "yes" ] && [ -d "node_modules" ]; then
-	echo "node_modules/ exists, skipping NPM install in production environment."
+	printf "%s\n" "skipping NPM install as requested or because node_modules seems up to date"
 else
 	printf "%s\n" "NPM install..."
 	npm ci --loglevel=warn

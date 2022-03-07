@@ -15,7 +15,7 @@ import {
 	UpdateDefaultFileSizeLimit
 } from '../../types/redux/admin';
 import { removeUnsavedChanges, updateUnsavedChanges } from '../../actions/unsavedWarning';
-import { defineMessages, FormattedMessage, injectIntl, InjectedIntlProps } from 'react-intl';
+import { defineMessages, FormattedMessage, injectIntl, WrappedComponentProps } from 'react-intl';
 import { LanguageTypes } from '../../types/redux/i18n';
 import TimeZoneSelect from '../TimeZoneSelect';
 import store from '../../index';
@@ -40,7 +40,7 @@ interface PreferencesProps {
 	updateDefaultFileSizeLimit(defaultFileSizeLimit: number): UpdateDefaultFileSizeLimit;
 }
 
-type PreferencesPropsWithIntl = PreferencesProps & InjectedIntlProps;
+type PreferencesPropsWithIntl = PreferencesProps & WrappedComponentProps;
 
 class PreferencesComponent extends React.Component<PreferencesPropsWithIntl, {}> {
 	constructor(props: PreferencesPropsWithIntl) {
@@ -70,7 +70,6 @@ class PreferencesComponent extends React.Component<PreferencesPropsWithIntl, {}>
 			paddingBottom: '5px'
 		};
 		const messages = defineMessages({ name: { id: 'name' } });
-		const { formatMessage } = this.props.intl;
 		return (
 			<div>
 				<div style={bottomPaddingStyle}>
@@ -79,7 +78,7 @@ class PreferencesComponent extends React.Component<PreferencesPropsWithIntl, {}>
 					</p>
 					<Input
 						type='text'
-						placeholder={formatMessage(messages.name)}
+						placeholder={this.props.intl.formatMessage(messages.name)}
 						value={this.props.displayTitle}
 						onChange={this.handleDisplayTitleChange}
 						maxLength={50}
@@ -241,12 +240,12 @@ class PreferencesComponent extends React.Component<PreferencesPropsWithIntl, {}>
 
 	private removeUnsavedChangesFunction(callback: () => void) {
 		// The function is called to reset all the inputs to the initial state
-		store.dispatch(fetchPreferencesIfNeeded()).then(callback);
+		store.dispatch<any>(fetchPreferencesIfNeeded()).then(callback);
 	}
 
 	private submitUnsavedChangesFunction(successCallback: () => void, failureCallback: () => void) {
 		// The function is called to submit the unsaved changes
-		store.dispatch(submitPreferences()).then(successCallback, failureCallback);
+		store.dispatch<any>(submitPreferences()).then(successCallback, failureCallback);
 	}
 
 	private updateUnsavedChanges() {
@@ -300,4 +299,4 @@ class PreferencesComponent extends React.Component<PreferencesPropsWithIntl, {}>
 	}
 }
 
-export default injectIntl<PreferencesProps>(PreferencesComponent);
+export default injectIntl(PreferencesComponent);

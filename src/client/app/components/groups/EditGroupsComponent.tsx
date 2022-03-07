@@ -14,12 +14,13 @@ import { EditGroupNameAction, EditGroupGPSAction, EditGroupDisplayableAction, Ed
 import FooterContainer from '../../containers/FooterContainer';
 import HeaderContainer from '../../containers/HeaderContainer';
 import {  browserHistory } from '../../utils/history';
-import { FormattedMessage, InjectedIntlProps, injectIntl, defineMessages } from 'react-intl';
+import { FormattedMessage, defineMessages, injectIntl, WrappedComponentProps } from 'react-intl';
 import { GPSPoint, isValidGPSInput } from '../../utils/calibration';
 import store from '../../index';
 import { removeUnsavedChanges, updateUnsavedChanges } from '../../actions/unsavedWarning';
 import UnsavedWarningContainer from '../../containers/UnsavedWarningContainer';
 import { fetchGroupsDetails } from '../../actions/groups';
+import translate from '../../utils/translate';
 
 interface EditGroupsProps {
 	currentGroup: GroupDefinition;
@@ -39,7 +40,7 @@ interface EditGroupsProps {
 	changeDisplayModeToView(): ChangeDisplayModeAction;
 }
 
-type EditGroupsPropsWithIntl = EditGroupsProps & InjectedIntlProps;
+type EditGroupsPropsWithIntl = EditGroupsProps & WrappedComponentProps;
 
 interface EditGroupsState {
 	name: string;
@@ -285,7 +286,7 @@ class EditGroupsComponent extends React.Component<EditGroupsPropsWithIntl, EditG
 		// This function is called to reset all the inputs to the initial state
 		this.props.changeDisplayModeToView();
 		// Fetch data from database to replace the current one
-		store.dispatch(fetchGroupsDetails()).then(callback);
+		store.dispatch<any>(fetchGroupsDetails()).then(callback);
 	}
 
 	private updateUnsavedChanges() {
@@ -347,25 +348,25 @@ class EditGroupsComponent extends React.Component<EditGroupsPropsWithIntl, EditG
 	}
 
 	private handleMoveChildMetersToUnusedMeters() {
-		this.props.changeChildMeters(_.difference(this.props.childMeters.map(meter => meter.id), this.state.selectedMeters));
+		this.props.changeChildMeters(_.difference(this.props.childMeters.map((meter: NamedIDItem) => meter.id), this.state.selectedMeters));
 		this.setState({ selectedMeters: [], defaultSelectedMeters: [] });
 		this.updateUnsavedChanges();
 	}
 
 	private handleMoveUnusedMetersToChildMeters() {
-		this.props.changeChildMeters(_.union(this.props.childMeters.map(meter => meter.id), this.state.unusedMeters));
+		this.props.changeChildMeters(_.union(this.props.childMeters.map((meter: NamedIDItem) => meter.id), this.state.unusedMeters));
 		this.setState({ unusedMeters: [], defaultUnusedMeters: [] });
 		this.updateUnsavedChanges();
 	}
 
 	private handleMoveChildGroupsToUnusedGroups() {
-		this.props.changeChildGroups(_.difference(this.props.childGroups.map(group => group.id), this.state.selectedGroups));
+		this.props.changeChildGroups(_.difference(this.props.childGroups.map((group: NamedIDItem) => group.id), this.state.selectedGroups));
 		this.setState({ selectedGroups: [], defaultSelectedGroups: [] });
 		this.updateUnsavedChanges();
 	}
 
 	private handleMoveUnusedGroupsToChildGroups() {
-		this.props.changeChildGroups(_.union(this.props.childGroups.map(group => group.id), this.state.unusedGroups));
+		this.props.changeChildGroups(_.union(this.props.childGroups.map((group: NamedIDItem) => group.id), this.state.unusedGroups));
 		this.setState({ unusedGroups: [], defaultUnusedGroups: [] });
 		this.updateUnsavedChanges();
 	}
@@ -405,7 +406,7 @@ class EditGroupsComponent extends React.Component<EditGroupsPropsWithIntl, EditG
 			}
 		}
 		else {
-			window.alert(this.props.intl.formatMessage({id: 'area.error'}));
+			window.alert(translate('area.error'));
 		}
 	}
 
@@ -420,4 +421,4 @@ class EditGroupsComponent extends React.Component<EditGroupsPropsWithIntl, EditG
 	}
 }
 
-export default injectIntl<EditGroupsProps>(EditGroupsComponent);
+export default injectIntl(EditGroupsComponent);

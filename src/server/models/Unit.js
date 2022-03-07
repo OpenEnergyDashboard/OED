@@ -81,6 +81,33 @@ class Unit {
 	}
 
 	/**
+	 * Inserts standard units to the database.
+	 * @param {*} conn The connection to use.
+	 */
+	static async insertStandardUnits(conn) {
+		// The table contains units' data. 
+		// Each row contains: name, identifier, typeOfUnit, suffix, displayable, preferredDisplay.
+		const standardUnits = [
+			['kWh', 'kWh', Unit.unitType.UNIT, '', Unit.displayableType.ALL, true],
+			['MJ', 'MegaJoules', Unit.unitType.UNIT, '', Unit.displayableType.ADMIN, false],
+			['BTU', 'BTU', Unit.unitType.UNIT, '', Unit.displayableType.ALL, true],
+			['M3_gas', 'cubic meters of gas', Unit.unitType.UNIT, '', Unit.displayableType.ALL, false],
+			['kg', 'kg', Unit.unitType.UNIT, '', Unit.displayableType.ALL, false],
+			['Metric_ton', 'Metric ton', Unit.unitType.UNIT, '', Unit.displayableType.ALL, false],
+			['Fahrenheit', 'Fahrenheit', Unit.unitType.UNIT, '', Unit.displayableType.ALL, false],
+			['Celsius', 'Celsius', Unit.unitType.UNIT, '', Unit.displayableType.ALL, false]
+		];
+
+		for (let i = 0; i < standardUnits.length; ++i) {
+			const unitData = standardUnits[i];
+			if (await Unit.getByName(unitData[0], conn) === null) {
+				await new Unit(undefined, unitData[0], unitData[1], Unit.unitRepresentType.UNUSED, undefined, 
+					unitData[2], null, unitData[3], unitData[4], unitData[5], 'standard unit').insert(conn);
+			}
+		}
+	}
+
+	/**
 	 * Returns all units in the database.
 	 * @param {*} conn The connection to use.
 	 * @returns {Promise.<Array.<Unit>>}
@@ -162,7 +189,7 @@ class Unit {
 	 */
 	static async getByName(name, conn) {
 		const row = await conn.oneOrNone(sqlFile('unit/get_by_name.sql'), { name: name });
-		return Unit.mapRow(row);
+		return row === null ? null : Unit.mapRow(row);
 	}
 
 	/**
@@ -185,7 +212,7 @@ class Unit {
 	 */
 	static async getByUnitIndexUnit(unitIndex, conn) {
 		const resp = await conn.oneOrNone(sqlFile('unit/get_by_unit_index_unit.sql'), { unitIndex: unitIndex });
-		return resp.id;
+		return resp === null ? null : resp.id;
 	}
 
 	/**
@@ -220,28 +247,28 @@ class Unit {
 	static setIdentifier(unit) {
 		if (unit.identifier === null || unit.identifier.length === 0) {
 			unit.identifier = unit.name;
-			log.warn(`Automatically set identifier of the unit "${unit.name}" to "${unit.name}`);
+			log.warn(`Automatically set identifier of the unit "${unit.name}" to "${unit.name}"`);
 		}
 	}
 }
 
-Unit.unitType = {
+Unit.unitType = Object.freeze({
 	UNIT: 'unit',
 	METER: 'meter',
 	SUFFIX: 'suffix'
-};
+});
 
-Unit.displayableType = {
+Unit.displayableType = Object.freeze({
 	NONE: 'none',
 	ALL: 'all',
 	ADMIN: 'admin'
-};
+});
 
-Unit.unitRepresentType = {
+Unit.unitRepresentType = Object.freeze({
 	QUANTITY: 'quantity',
 	FLOW: 'flow',
 	RAW: 'raw',
 	UNUSED: 'unused'
-}
+});
 
 module.exports = Unit;

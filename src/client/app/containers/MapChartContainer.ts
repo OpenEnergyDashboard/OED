@@ -4,7 +4,7 @@
 
 import * as moment from 'moment';
 import { connect } from 'react-redux';
-import PlotlyChart, { IPlotlyChartProps } from 'react-plotlyjs-ts';
+import Plot from 'react-plotly.js';
 import { State } from '../types/redux/state';
 import {
 	calculateScaleFromEndpoints, itemDisplayableOnMap, Dimensions,
@@ -70,7 +70,7 @@ function mapStateToProps(state: State) {
 				// Get meter GPS value.
 				const gps = state.meters.byMeterID[meterID].gps;
 				// filter meters with actual gps coordinates.
-				if (gps !== undefined && gps !== null) {
+				if (gps !== undefined && gps !== null && byMeterID !== undefined) {
 					// Convert the gps value to the equivalent Plotly grid coordinates on user map.
 					// First, convert from GPS to grid units. Since we are doing a GPS calculation, this happens on the true north map.
 					// It must be on true north map since only there are the GPS axis parallel to the map axis.
@@ -108,7 +108,7 @@ function mapStateToProps(state: State) {
 							} else {
 								// Shift to UTC since want database time not local/browser time which is what moment does.
 								timeReading =
-								`${moment(mapReading.startTimestamp).utc().format('LL')} - ${moment(mapReading.endTimestamp).subtract(1, 'days').utc().format('LL')}`;
+								`${moment(mapReading.startTimestamp).utc().format('ll')} - ${moment(mapReading.endTimestamp).subtract(1, 'days').utc().format('ll')}`;
 								// The value for the circle is the average daily usage.
 								averagedReading = mapReading.reading / barDuration.asDays();
 								// The size is the reading value. It will be scaled later.
@@ -127,7 +127,7 @@ function mapStateToProps(state: State) {
 				// Get group GPS value.
 				const gps = state.groups.byGroupID[groupID].gps;
 				// Filter groups with actual gps coordinates.
-				if (gps !== undefined && gps !== null) {
+				if (gps !== undefined && gps !== null && byGroupID !== undefined) {
 					// Convert the gps value to the equivalent Plotly grid coordinates on user map.
 					// First, convert from GPS to grid units. Since we are doing a GPS calculation, this happens on the true north map.
 					// It must be on true north map since only there are the GPS axis parallel to the map axis.
@@ -165,7 +165,7 @@ function mapStateToProps(state: State) {
 							} else {
 								// Shift to UTC since want database time not local/browser time which is what moment does.
 								timeReading =
-								`${moment(mapReading.startTimestamp).utc().format('LL')} - ${moment(mapReading.endTimestamp).subtract(1, 'days').utc().format('LL')}`;
+								`${moment(mapReading.startTimestamp).utc().format('ll')} - ${moment(mapReading.endTimestamp).subtract(1, 'days').utc().format('ll')}`;
 								// The value for the circle is the average daily usage.
 								averagedReading = mapReading.reading / barDuration.asDays();
 								// The size is the reading value. It will be scaled later.
@@ -260,11 +260,11 @@ function mapStateToProps(state: State) {
 
 	/***
 	 * Usage:
-	 *  <PlotlyChart data={toJS(this.model_data)}
+	 *  <Plot data={toJS(this.model_data)}
 	 *               layout={layout}
 	 *               onClick={({points, event}) => console.log(points, event)}>
 	 */
-	const props: IPlotlyChartProps = {
+	const props: any = {
 		data,
 		layout,
 		config: {
@@ -275,4 +275,4 @@ function mapStateToProps(state: State) {
 	return props;
 }
 
-export default connect(mapStateToProps)(PlotlyChart);
+export default connect(mapStateToProps)(Plot);

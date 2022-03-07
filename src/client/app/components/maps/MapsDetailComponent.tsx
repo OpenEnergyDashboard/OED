@@ -30,7 +30,7 @@ export default class MapsDetailComponent extends React.Component<MapsDetailProps
 		this.handleSubmitClicked = this.handleSubmitClicked.bind(this);
 	}
 
-	public componentWillMount() {
+	public componentDidMount() {
 		this.props.fetchMapsDetails();
 	}
 

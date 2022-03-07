@@ -8,13 +8,17 @@
 echo "Upgrading OED"
 
 # Install NPM dependencies
-echo "NPM install..."
-npm install --loglevel=warn --progress=false
+echo "NPM ci to upgrade the packages..."
+npm ci --loglevel=warn --progress=false
 echo "NPM install finished."
 
 echo "Attempting to migrate database to latest version..."
 npm run migratedb -- highest
 
+echo "Doing docker compose up --no-start --build to capture any changes needed for images/containers without starting..."
+docker compose up --no-start --build
+
+echo "Doing webpack:build to update the application..."
 npm run webpack:build
 
 echo "OED upgrade completed"

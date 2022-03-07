@@ -6,11 +6,12 @@
 
 import { connect } from 'react-redux';
 import { State } from '../types/redux/state';
-import { getComparePeriodLabels, getCompareChangeSummary } from '../utils/calculateCompare';
+import { getComparePeriodLabels, getCompareChangeSummary, calculateCompareShift } from '../utils/calculateCompare';
 import { CompareEntity } from './MultiCompareChartContainer';
 import translate from '../utils/translate';
-import PlotlyChart, { IPlotlyChartProps } from 'react-plotlyjs-ts';
+import Plot from 'react-plotly.js';
 import Locales from '../types/locales';
+import * as moment from 'moment';
 
 interface CompareChartContainerProps {
 	entity: CompareEntity;
@@ -21,11 +22,30 @@ interface CompareChartContainerProps {
 *  your reducer state objects from within your React components.
 *
 *  Returns the props object. */
-function mapStateToProps(state: State, ownProps: CompareChartContainerProps): IPlotlyChartProps {
+function mapStateToProps(state: State, ownProps: CompareChartContainerProps): any {
 	const comparePeriod = state.graph.comparePeriod;
 	const datasets: any[] = [];
-
 	const periodLabels = getComparePeriodLabels(comparePeriod);
+
+	// Get the time shift for this comparison as a moment duration
+	const compareShift = calculateCompareShift(comparePeriod);
+	// The start and end of this time period. Need to create new moment objects since subtraction mutates the original.
+	// It isn't known why you must start from a string to get timezone aware dates but it seems needed.
+	// There might be a better way to do this.
+	// Use UTC timezone to avoid timezone issues.
+	const thisStartTime = moment(state.graph.compareTimeInterval.getStartTimestamp().toString()).utc();
+	// Only do to start of the hour since OED is using hourly data so fractions of an hour are not given.
+	// The start time is always midnight so this is not needed.
+	const thisEndTime = moment(state.graph.compareTimeInterval.getEndTimestamp().startOf('hour').toString()).utc();
+	// The desired label times for this interval that is internationalized and shows day of week, date and time with hours.
+	const thisStartTimeLabel: string = thisStartTime.format('llll');
+	const thisEndTimeLabel: string = thisEndTime.format('llll');
+	// The desired label times for last interval that is earlier by the compareShift.
+	const lastStartTimeLabel: string = thisStartTime.subtract(compareShift).format('llll');
+	const LastEndTimeLabel: string = thisEndTime.subtract(compareShift).format('llll');
+	// X axis label tells the user what time period they are looking at. Label A & B so easier for user to know which applies to which bar.
+	// The same A/B labels are used below for the x: value in the plot.
+	const xTitle: string = `${lastStartTimeLabel} -<br> ${LastEndTimeLabel} (A) &<br>${thisStartTimeLabel} -<br> ${thisEndTimeLabel} (B)`;
 
 	const colorize = (changeForColorization: number) => {
 		if (changeForColorization < 0) {
@@ -45,7 +65,7 @@ function mapStateToProps(state: State, ownProps: CompareChartContainerProps): IP
 
 	datasets.push(
 		{
-			x: [periodLabels.prev, periodLabels.current],
+			x: [`${periodLabels.prev} (A)`, `${periodLabels.current} (B)`],
 			y: [previousPeriod, currentPeriod],
 			hovertext: [
 				`<b>${previousPeriod} KWh</b> ${translate('used.this.time')}<br>${periodLabels.prev.toLowerCase()}`,
@@ -81,8 +101,10 @@ function mapStateToProps(state: State, ownProps: CompareChartContainerProps): IP
 			gridcolor: '#ddd'
 		},
 		xaxis: {
+			title: `${xTitle}`,
 			showgrid: false,
-			gridcolor: '#ddd'
+			gridcolor: '#ddd',
+			automargin: true
 		},
 		margin: {
 			t: 20,
@@ -92,9 +114,9 @@ function mapStateToProps(state: State, ownProps: CompareChartContainerProps): IP
 		}
 	};
 
-	// Assign all the paramaters required to create the Plotly object (data, layout, config) to the variable props, returned by mapStateToProps
+	// Assign all the parameters required to create the Plotly object (data, layout, config) to the variable props, returned by mapStateToProps
 	// The Plotly toolbar is displayed if displayModeBar is set to true
-	const props: IPlotlyChartProps = {
+	const props: any = {
 		data: datasets,
 		layout,
 		config: {
@@ -106,5 +128,4 @@ function mapStateToProps(state: State, ownProps: CompareChartContainerProps): IP
 	return props;
 }
 
-const plotlyConstructor: any = PlotlyChart;
-export default connect(mapStateToProps)(plotlyConstructor);
+export default connect(mapStateToProps)(Plot);
