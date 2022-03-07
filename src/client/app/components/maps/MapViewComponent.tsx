@@ -6,7 +6,7 @@ import * as React from 'react';
 import { Button } from 'reactstrap';
 import { Link } from 'react-router-dom';
 import { hasToken } from '../../utils/token';
-import { FormattedMessage, InjectedIntlProps, injectIntl } from 'react-intl';
+import { FormattedMessage, injectIntl, WrappedComponentProps } from 'react-intl';
 import { CalibrationModeTypes, MapMetadata } from '../../types/redux/map';
 import * as moment from 'moment';
 import store from '../../index';
@@ -35,7 +35,7 @@ interface MapViewState {
 	noteInput: string;
 }
 
-type MapViewPropsWithIntl = MapViewProps & InjectedIntlProps;
+type MapViewPropsWithIntl = MapViewProps & WrappedComponentProps;
 
 class MapViewComponent extends React.Component<MapViewPropsWithIntl, MapViewState> {
 	constructor(props: MapViewPropsWithIntl) {
@@ -93,14 +93,14 @@ class MapViewComponent extends React.Component<MapViewPropsWithIntl, MapViewStat
 
 	private removeUnsavedChangesFunction(callback: () => void) {
 		// This function is called to reset all the inputs to the initial state
-		store.dispatch(confirmEditedMaps()).then(() => {
-			store.dispatch(fetchMapsDetails()).then(callback);
+		store.dispatch<any>(confirmEditedMaps()).then(() => {
+			store.dispatch<any>(fetchMapsDetails()).then(callback);
 		});
 	}
 
 	private submitUnsavedChangesFunction(successCallback: () => void, failureCallback: () => void) {
 		// This function is called to submit the unsaved changes
-		store.dispatch(submitEditedMaps()).then(successCallback, failureCallback);
+		store.dispatch<any>(submitEditedMaps()).then(successCallback, failureCallback);
 	}
 
 	private updateUnsavedChanges() {
@@ -427,4 +427,4 @@ class MapViewComponent extends React.Component<MapViewPropsWithIntl, MapViewStat
 	}
 }
 
-export default injectIntl<MapViewProps>(MapViewComponent);
+export default injectIntl(MapViewComponent);

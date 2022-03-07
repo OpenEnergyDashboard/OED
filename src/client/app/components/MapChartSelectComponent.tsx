@@ -4,19 +4,20 @@
 
 import * as React from 'react';
 import { SelectOption } from '../types/items';
-import { defineMessages, FormattedMessage, injectIntl, InjectedIntlProps } from 'react-intl';
+import { defineMessages, FormattedMessage, injectIntl, WrappedComponentProps } from 'react-intl';
 import '../styles/react-select-css.css';
 import 'react-select/dist/react-select.css';
 import SingleSelectComponent from './SingleSelectComponent';
 import TooltipMarkerComponent from './TooltipMarkerComponent';
+import { UpdateSelectedMapAction } from '../types/redux/map';
 
 interface MapChartSelectProps {
 	maps: SelectOption[];
 	selectedMap: SelectOption;
-	selectMap(mapID: number): any;
+	selectMap(mapID: number): UpdateSelectedMapAction;
 }
 
-type MapChartSelectPropsWithIntl = MapChartSelectProps & InjectedIntlProps;
+type MapChartSelectPropsWithIntl = MapChartSelectProps & WrappedComponentProps;
 
 class MapChartSelectComponent extends React.Component<MapChartSelectPropsWithIntl, {}> {
 	constructor(props: MapChartSelectPropsWithIntl) {
@@ -38,7 +39,6 @@ class MapChartSelectComponent extends React.Component<MapChartSelectPropsWithInt
 		const messages = defineMessages({
 			selectMap: {id: 'select.map'}
 		});
-		const { formatMessage } = this.props.intl;
 
 		return (
 			<div>
@@ -49,7 +49,7 @@ class MapChartSelectComponent extends React.Component<MapChartSelectPropsWithInt
 					<SingleSelectComponent
 						options={this.props.maps}
 						selectedOption={(this.props.selectedMap.value === 0) ? undefined : this.props.selectedMap}
-						placeholder={formatMessage(messages.selectMap)}
+						placeholder={this.props.intl.formatMessage(messages.selectMap)}
 						onValueChange={this.handleMapSelect}
 					/>
 					<TooltipMarkerComponent page='home' helpTextId='help.home.select.maps'/>
@@ -67,4 +67,4 @@ class MapChartSelectComponent extends React.Component<MapChartSelectPropsWithInt
 	}
 }
 
-export default injectIntl<MapChartSelectProps>(MapChartSelectComponent);
+export default injectIntl(MapChartSelectComponent);

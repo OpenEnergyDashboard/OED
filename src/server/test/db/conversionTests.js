@@ -38,7 +38,7 @@ mocha.describe('Conversions', () => {
 		const conversionPreInsert = new Conversion(unitAId, unitBId, false, 1.23, 4.56, 'Note');
 		await conversionPreInsert.insert(conn);
 		// Gets conversion by source and destination.
-		const conversionPostInsertBySourceDestination = await Conversion.getBySourceDestination(1, 2, conn);
+		const conversionPostInsertBySourceDestination = await Conversion.getBySourceDestination(unitAId, unitBId, conn);
 		expectConversionToBeEquivalent(conversionPreInsert, conversionPostInsertBySourceDestination);
 	});
 

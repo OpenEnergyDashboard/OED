@@ -53,7 +53,12 @@ export function calculateCompareTimeInterval(comparePeriod: ComparePeriod, curre
 	const utcShift = moment().utcOffset();
 	// begin will be the start of the compare time and end will be the end of the compare time.
 	let begin;
-	const end = currentTime.add(utcShift, 'minutes');
+	// OED uses hourly/daily view data to get comparisons so it is only accurate to the last hour.
+	// By setting the end time to the hour it works properly and avoids changing with each request
+	// within the same hour. This avoids updating the Redux state so it is faster.
+	// You also get an error with groups at times because the state was not to the hour but the final
+	// time used to get the state was the start of the hour. This fixes that.
+	const end = currentTime.add(utcShift, 'minutes').startOf('hour');
 	switch (comparePeriod) {
 		case ComparePeriod.Day:
 			// We need to shift all the times by utcShift because later on they will be shifted back.

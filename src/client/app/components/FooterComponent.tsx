@@ -16,9 +16,6 @@ interface FooterProps {
 export default class FooterComponent extends React.Component<FooterProps, {}> {
 	constructor(props: FooterProps) {
 		super(props);
-	}
-
-	public componentWillMount() {
 		this.props.fetchVersionIfNeeded();
 	}
 

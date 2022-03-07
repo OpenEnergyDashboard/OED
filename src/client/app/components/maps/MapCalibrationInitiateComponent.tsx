@@ -3,10 +3,10 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
 
 import * as React from 'react';
-import {CalibrationModeTypes, MapMetadata} from '../../types/redux/map';
-import {ChangeEvent} from 'react';
-import {logToServer} from '../../actions/logs';
-import { FormattedMessage, InjectedIntlProps, injectIntl } from 'react-intl';
+import { CalibrationModeTypes, MapMetadata } from '../../types/redux/map';
+import { ChangeEvent } from 'react';
+import { logToServer } from '../../actions/logs';
+import { FormattedMessage, injectIntl, WrappedComponentProps } from 'react-intl';
 
 /**
  * Accepts image file from user upload,
@@ -27,7 +27,7 @@ interface MapInitiateState {
 	angle: string;
 }
 
-type MapInitiatePropsWithIntl = MapInitiateProps & InjectedIntlProps;
+type MapInitiatePropsWithIntl = MapInitiateProps & WrappedComponentProps;
 
 class MapCalibrationInitiateComponent extends React.Component<MapInitiatePropsWithIntl, MapInitiateState > {
 	private readonly fileInput: any;
@@ -85,7 +85,7 @@ class MapCalibrationInitiateComponent extends React.Component<MapInitiatePropsWi
 				</label>
 				<br/>
 				<FormattedMessage id='map.new.submit'>
-					{placeholder => <input type='submit' value={placeholder.toString()} />}
+					{placeholder => <input type='submit' value={(placeholder !== null && placeholder !== undefined) ? placeholder.toString() : 'undefined'} />}
 				</FormattedMessage>
 			</form>
 		);
@@ -168,4 +168,4 @@ class MapCalibrationInitiateComponent extends React.Component<MapInitiatePropsWi
 	}
 }
 
-export default injectIntl<MapInitiateProps>(MapCalibrationInitiateComponent);
+export default injectIntl(MapCalibrationInitiateComponent);

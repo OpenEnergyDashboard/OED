@@ -47,7 +47,7 @@ mocha.describe('Units', () => {
 											1000, Unit.unitType.UNIT, 5, 'Suffix', Unit.displayableType.ALL, true, 'Note');
 		await unitTypePreInsert.insert(conn);
 		// Gets unit by id.
-		const unitTypePostInsertById = await Unit.getById(1, conn);
+		const unitTypePostInsertById = await Unit.getById(unitTypePreInsert.id, conn);
 		expectUnitToBeEquivalent(unitTypePreInsert, unitTypePostInsertById);
 		// Gets unit by name.
 		const unitTypePostInsertByName = await Unit.getByName('Unit', conn);

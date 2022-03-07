@@ -4,7 +4,7 @@
 
 import * as React from 'react';
 import { Button } from 'reactstrap';
-import { FormattedMessage, InjectedIntlProps, injectIntl } from 'react-intl';
+import { FormattedMessage, injectIntl, WrappedComponentProps } from 'react-intl';
 import { MeterMetadata, EditMeterDetailsAction } from '../../types/redux/meters';
 import { GPSPoint, isValidGPSInput } from '../../utils/calibration';
 import TimeZoneSelect from '../TimeZoneSelect';
@@ -32,7 +32,7 @@ interface MeterViewState {
 	identifierInput: string;
 }
 
-type MeterViewPropsWithIntl = MeterViewProps & InjectedIntlProps;
+type MeterViewPropsWithIntl = MeterViewProps & WrappedComponentProps;
 
 class MeterViewComponent extends React.Component<MeterViewPropsWithIntl, MeterViewState> {
 	constructor(props: MeterViewPropsWithIntl) {
@@ -71,14 +71,14 @@ class MeterViewComponent extends React.Component<MeterViewPropsWithIntl, MeterVi
 
 	private removeUnsavedChangesFunction(callback: () => void) {
 		// This function is called to reset all the inputs to the initial state
-		store.dispatch(confirmEditedMeters()).then(() => {
-			store.dispatch(fetchMetersDetails()).then(callback);
+		store.dispatch<any>(confirmEditedMeters()).then(() => {
+			store.dispatch<any>(fetchMetersDetails()).then(callback);
 		});
 	}
 
 	private submitUnsavedChangesFunction(successCallback: () => void, failureCallback: () => void) {
 		// This function is called to submit the unsaved changes
-		store.dispatch(submitEditedMeters()).then(successCallback, failureCallback);
+		store.dispatch<any>(submitEditedMeters()).then(successCallback, failureCallback);
 	}
 
 	private updateUnsavedChanges() {
@@ -341,4 +341,4 @@ class MeterViewComponent extends React.Component<MeterViewPropsWithIntl, MeterVi
 	}
 }
 
-export default injectIntl<MeterViewProps>(MeterViewComponent);
+export default injectIntl(MeterViewComponent);
