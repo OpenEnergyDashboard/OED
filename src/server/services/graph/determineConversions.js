@@ -45,6 +45,10 @@ async function conversionValues(sourceUnit, destinationUnit, conn) {
  * @returns 
  */
 function invertConversion(slope, intercept) {
+    // What is stored for this entry in the units table:
+    // destination_value = slope * source_value + intercept
+    // Invert this equation to give:
+    // source_value = (1/slope) * destination_value - (intercept / slope)
     const convertedSlope = 1.0 / slope;
     const convertedIntercept = -(intercept / slope);
     return [convertedSlope, convertedIntercept];
@@ -59,6 +63,13 @@ function invertConversion(slope, intercept) {
  * @returns 
  */
 function updatedCoversion(origSlope, origIntercept, newSlope, newIntercept) {
+    // The current conversion is:
+    // conv(unit, origSlope, origIntercept) = origSlope * unit + origIntercept
+    // We need to update unit for the new conversion so compose with that:
+    // conv(conv(unit, origSlope, origIntercept), newSlope, newIntercept))
+    // = conv(origSlope * unit + origIntercept, newSlope, newIntercept) 
+    // = newSlope * (origSlope * unit + origIntercept) + newIntercept
+    // = (newSlope * origSlope) * unit + (newSlope *  origIntercept + newIntercept)
     const slope = origSlope * newSlope;
     const intercept = newSlope * origIntercept + newIntercept;
     return [slope, intercept];
@@ -74,7 +85,7 @@ async function pathConversion(path, conn) {
     // Initial values so the starting conversion is the identity. Thus, when the first edge on the path
     // is processed you get its conversion.
     let slope = 1, intercept = 0, suffix = '';
-    // We need to reverse path since it contains units from destination to source.
+    // We need to reverse the path since it contains units from destination to source.
     path.reverse();
     for (let i = 0; i < path.length - 1; ++i) {
         const sourceId = path[i].id;
