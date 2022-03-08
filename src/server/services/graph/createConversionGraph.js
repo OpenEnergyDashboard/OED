@@ -21,9 +21,14 @@ async function createConversionGraph(conn) {
 	const conversions = await Conversion.getAll(conn);
 	for (let i = 0; i < conversions.length; ++i) {
 		graph.addLink(conversions[i].sourceId, conversions[i].destinationId);
+		if (conversions[i].bidirectional) {
+			graph.addLink(conversions[i].destinationId, conversions[i].sourceId);
+		}
 	}
 
 	return graph;
 }
 
-module.exports = createConversionGraph;
+module.exports = {
+	createConversionGraph
+};
