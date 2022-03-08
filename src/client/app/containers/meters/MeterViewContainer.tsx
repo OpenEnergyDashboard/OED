@@ -25,24 +25,25 @@ function mapStateToProps(state: State, ownProps: { id: number }) {
 
 	})), 'identifier');
 	//first index of ownProps.id - first displayable id 
-	let meter = JSON.parse(JSON.stringify(sortedMeters[ownProps.id - 7]));
+	let i = sortedMeters[ownProps.id - Math.abs(ownProps.id - indexArray)].id;
+	let meter = JSON.parse(JSON.stringify(state.meters.byMeterID[i]));
 	if (state.meters.editedMeters[ownProps.id]) {
-		meter = JSON.parse(JSON.stringify(sortedMeters[ownProps.id - 7]));
+		meter = JSON.parse(JSON.stringify(state.meters.byMeterID[i]));
 	}
 	const currentUser = state.currentUser.profile;
 	let loggedInAsAdmin = false;
 	if (currentUser !== null) {
 		loggedInAsAdmin = isRoleAdmin(currentUser.role);
 	}
-	if (indexArray != sortedMeters.length){
+	if (indexArray != sortedMeters.length - 1){
 		indexArray += 1;
+	} else {
+		indexArray = 0;
 	}
-	// math.abs()
-	console.log(indexArray);
 	return {
 		meter,
-		isEdited: state.meters.editedMeters[ownProps.id] !== undefined,
-		isSubmitting: state.meters.submitting.indexOf(ownProps.id) !== -1,
+		isEdited: state.meters.editedMeters[i] !== undefined,
+		isSubmitting: state.meters.submitting.indexOf(i) !== -1,
 		loggedInAsAdmin,
 		sortedMeters
 	};
