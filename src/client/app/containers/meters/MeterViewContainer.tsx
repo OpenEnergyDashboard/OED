@@ -13,7 +13,7 @@ import { isRoleAdmin } from '../../utils/hasPermissions';
 import _ = require('lodash');
 var indexArray = 0;
 function mapStateToProps(state: State, ownProps: { id: number }) {
-	
+
 	const meters = state.meters.byMeterID;
 	let sortedMeters = _.sortBy(_.values(meters).map(meter => 
 	({ 
@@ -24,8 +24,9 @@ function mapStateToProps(state: State, ownProps: { id: number }) {
 		enabled: meter.enabled
 
 	})), 'identifier');
-	//first index of ownProps.id - first displayable id 
+	// Algorithm developed to keep sorted Array of meters's index in line with the current passed prop id.
 	let i = sortedMeters[ownProps.id - Math.abs(ownProps.id - indexArray)].id;
+
 	let meter = JSON.parse(JSON.stringify(state.meters.byMeterID[i]));
 	if (state.meters.editedMeters[ownProps.id]) {
 		meter = JSON.parse(JSON.stringify(state.meters.byMeterID[i]));
@@ -35,11 +36,12 @@ function mapStateToProps(state: State, ownProps: { id: number }) {
 	if (currentUser !== null) {
 		loggedInAsAdmin = isRoleAdmin(currentUser.role);
 	}
+	// Keeps track of sortedMeter index. Since page is loaded multiple times resets when count hits the limit.
+	// Needs to be visited when meter page is redesigned. 
 	if (indexArray != sortedMeters.length - 1){
 		indexArray += 1;
-	} else {
-		indexArray = 0;
-	}
+	} else { indexArray = 0; }
+
 	return {
 		meter,
 		isEdited: state.meters.editedMeters[i] !== undefined,
