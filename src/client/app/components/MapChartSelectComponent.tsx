@@ -9,11 +9,12 @@ import '../styles/react-select-css.css';
 import 'react-select/dist/react-select.css';
 import SingleSelectComponent from './SingleSelectComponent';
 import TooltipMarkerComponent from './TooltipMarkerComponent';
+import { UpdateSelectedMapAction } from '../types/redux/map';
 
 interface MapChartSelectProps {
 	maps: SelectOption[];
 	selectedMap: SelectOption;
-	selectMap(mapID: number): any;
+	selectMap(mapID: number): UpdateSelectedMapAction;
 }
 
 type MapChartSelectPropsWithIntl = MapChartSelectProps & WrappedComponentProps;

@@ -25,7 +25,7 @@ function shouldFetchVersion(state: State): boolean {
 }
 
 export function fetchVersion(): Thunk {
-	return async dispatch => {
+	return async (dispatch: Dispatch) => {
 		dispatch(requestVersion());
 		// Returns the version string
 		const version = await versionApi.getVersion();

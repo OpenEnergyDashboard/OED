@@ -56,7 +56,7 @@ function incrementCounter(): t.IncrementCounterAction {
 export function setNewMap(): Thunk {
 	return async (dispatch: Dispatch) => {
 		dispatch(incrementCounter());
-		dispatch((dispatch2, getState2) => {
+		dispatch((dispatch2: Dispatch, getState2: GetState) => {
 			const temporaryID = getState2().maps.newMapCounter * -1;
 			dispatch2(logToServer('info', `Set up new map, id = ${temporaryID}`));
 			dispatch2(setCalibration(CalibrationModeTypes.initiate, temporaryID));
@@ -72,7 +72,7 @@ export function setNewMap(): Thunk {
 export function setCalibration(mode: CalibrationModeTypes, mapID: number): Thunk {
 	return async (dispatch: Dispatch) => {
 		dispatch(prepareCalibration(mode, mapID));
-		dispatch( dispatch2 => {
+		dispatch((dispatch2: Dispatch) => {
 			dispatch2(logToServer('info', `Start Calibration for map, id=${mapID}, mode:${mode}`));
 		});
 	};
@@ -96,7 +96,7 @@ export function dropCalibration(): Thunk {
 	return async (dispatch: Dispatch, getState: GetState) => {
 		const mapToReset = getState().maps.calibratingMap;
 		dispatch(resetCalibration(mapToReset));
-		dispatch( dispatch2 => {
+		dispatch((dispatch2: Dispatch) => {
 			dispatch2(logToServer('info', `reset calibration for map, id: ${mapToReset}.`));
 		});
 	};
@@ -136,7 +136,7 @@ export function offerCurrentGPS(currentGPS: GPSPoint): Thunk {
 			dispatch(updateCalibrationSet(point));
 			dispatch(resetCurrentPoint());
 			// Nesting dispatches to preserve that updateCalibrationSet() is called before calibration
-			dispatch(async dispatch2 => {
+			dispatch(async (dispatch2: Dispatch) => {
 				dispatch2(logToServer('info', `gps input (lat:${currentGPS.latitude},long:${currentGPS.longitude})
 				provided for cartesian point:${point.cartesian.x},${point.cartesian.y}
 				and added to data point`));

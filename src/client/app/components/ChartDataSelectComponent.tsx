@@ -44,8 +44,6 @@ class ChartDataSelectComponent extends React.Component<ChartDataSelectPropsWithI
 			helpSelectMeters: { id: 'help.home.select.meters' }
 		});
 
-		const handleGroupSelect = (s: SelectOption[]) => this.handleGroupSelect(s);
-
 		return (
 			<div>
 				<p style={labelStyle}>
@@ -56,7 +54,7 @@ class ChartDataSelectComponent extends React.Component<ChartDataSelectPropsWithI
 						options={this.props.groups}
 						selectedOptions={this.props.selectedGroups}
 						placeholder={this.props.intl.formatMessage(messages.selectGroups)}
-						onValuesChange={handleGroupSelect}
+						onValuesChange={this.handleGroupSelect}
 					/>
 					<TooltipMarkerComponent page='home' helpTextId='help.home.select.groups' />
 				</div>

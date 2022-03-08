@@ -5,7 +5,7 @@
 # *
 
 # Dockerfile for NodeJS application portion
-FROM node:14
+FROM node:16.13.2
 
 # Create the directory for the app
 RUN mkdir -p "/usr/src/app"
