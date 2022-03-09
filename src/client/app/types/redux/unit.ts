@@ -44,15 +44,16 @@ export interface UnitMetadata{
     note?: string;
 }
 
-interface UnitMetadataByID{
-    [unitID: number]: UnitMetadata;
+interface UnitDataByID{
+    [unitID: number]: UnitData;
 }
 
 export interface UnitState {
     isLoading: boolean;
-    byUnitID: UnitMetadataByID;
-    selectedUnit: number;
-    editedUnits: UnitMetadataByID;
+    byUnitID: UnitDataByID;
+    selectedUnits: number[];
+    editedUnits: UnitDataByID;
+    submitting: number[];
 }
 
 export type UnitsAction = 
