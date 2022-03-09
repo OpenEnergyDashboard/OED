@@ -25,6 +25,7 @@ export interface State {
 	graph: GraphState;
 	maps: MapState;
 	groups: GroupsState;
+	// deepMeters: DeepMetersState;
 	notifications: NotificationsState;
 	admin: AdminState;
 	version: VersionState;
