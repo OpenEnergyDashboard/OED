@@ -155,7 +155,6 @@ export interface GroupData {
 	name: string;
 	childMeters: number[];
 	childGroups: number[];
-	deepMeters: number[];
 	gps?: GPSPoint;
 	displayable: boolean;
 	note?: string;
@@ -183,4 +182,3 @@ export interface GroupsState {
 	groupInEditing: GroupDefinition & StatefulEditable | StatefulEditable;
 	displayMode: DisplayMode;
 }
-
