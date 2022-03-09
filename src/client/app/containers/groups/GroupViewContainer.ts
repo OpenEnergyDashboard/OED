@@ -13,14 +13,12 @@ function mapStateToProps(state: State, ownProps: {id: number}) {
 	const id = ownProps.id;
 	const childMeterNames = state.groups.byGroupID[id].childMeters.map((meterID: number) => state.meters.byMeterID[meterID].name.trim()).sort();
 	const childGroupNames = state.groups.byGroupID[id].childGroups.map((groupID: number) => state.groups.byGroupID[groupID].name.trim()).sort();
-	const deepMeterNames = state.groups.byGroupID[id].childGroups.map((meterID: number) => state.meters.byMeterID[meterID].name.trim()).sort();
+	const deepMeterNames = state.groups.byGroupID[id].deepMeters.map((meterID: number) => state.meters.byMeterID[meterID].name.trim()).sort();
 	const currentUser = state.currentUser.profile;
 	let loggedInAsAdmin = false;
 	if(currentUser !== null){
 		loggedInAsAdmin = isRoleAdmin(currentUser.role);
 	}
-
-	
 
 	return {
 		id,

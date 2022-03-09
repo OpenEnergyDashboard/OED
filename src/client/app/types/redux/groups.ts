@@ -50,7 +50,7 @@ export interface RequestGroupChildrenAction {
 export interface ReceiveGroupChildrenAction {
 	type: ActionType.ReceiveGroupChildren;
 	groupID: number;
-	data: {meters: number[], groups: number[]};
+	data: {meters: number[], groups: number[], deepMeters: number[]};
 }
 
 export interface ChangeDisplayedGroupsAction {
@@ -155,7 +155,6 @@ export interface GroupData {
 	name: string;
 	childMeters: number[];
 	childGroups: number[];
-	deepMeters: number[];
 	gps?: GPSPoint;
 	displayable: boolean;
 	note?: string;
@@ -166,7 +165,11 @@ export interface GroupID {
 	id: number;
 }
 
-export type GroupDefinition = GroupData & GroupMetadata & GroupID;
+export interface GroupDeepMeters {
+	deepMeters: number[];
+}
+
+export type GroupDefinition = GroupData & GroupMetadata & GroupID & GroupDeepMeters;
 
 export interface StatefulEditable {
 	dirty: boolean;

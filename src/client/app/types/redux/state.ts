@@ -25,7 +25,6 @@ export interface State {
 	graph: GraphState;
 	maps: MapState;
 	groups: GroupsState;
-	
 	notifications: NotificationsState;
 	admin: AdminState;
 	version: VersionState;
