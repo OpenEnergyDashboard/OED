@@ -12,6 +12,14 @@ export default class CreateUnitContainter extends React.Component<{}, {}> {
         //TODO: create rest of hanlder functions, bind them, and pass to CreateUnitComponent
         this.handleNameChange = this.handleNameChange.bind(this);
         this.submitNewUnit = this.submitNewUnit.bind(this);
+        this.handleIdentifierChange = this.handleIdentifierChange.bind(this);
+        this.handleUnitRepresentChange = this.handleUnitRepresentChange.bind(this);
+        this.handleSecInRateChange = this.handleSecInRateChange.bind(this);
+        this.handleTypeOfUnitChange = this.handleTypeOfUnitChange.bind(this);
+        this.handleSuffixChange = this.handleSuffixChange.bind(this);
+        this.handleDisplayableChange = this.handleDisplayableChange.bind(this);
+        this.handlePreferredDisplayChange = this.handlePreferredDisplayChange.bind(this);
+        this.handleNoteChange = this.handleNoteChange.bind(this);
     }
 
     state = {
@@ -30,6 +38,35 @@ export default class CreateUnitContainter extends React.Component<{}, {}> {
     //TODO: create rest of hanlder functions, bind them, and pass to CreateUnitComponent
     private handleNameChange = (newName: string) => {
         this.setState({ name :  newName});
+    }
+
+    private handleIdentifierChange = (newIdentifier: string) => {
+        this.setState({ identifier :  newIdentifier});
+    }
+
+    private handleUnitRepresentChange = (newIdentifier: string) => {
+        this.setState({ identifier :  newIdentifier});
+    }
+
+
+    private handleSecInRateChange = (newUnitRepresent: number) => {
+        this.setState({ unitRepresent :  newUnitRepresent});
+    }
+
+    private handleTypeOfUnitChange = (newTypeOfUnit: string) => {
+        this.setState({ typeOfUnit :  newTypeOfUnit});
+    }
+    private handleSuffixChange = (newsuffix: string) => {
+        this.setState({ suffix :  newsuffix})
+    }
+    private handleDisplayableChange = (newDisplayable: string) => {
+        this.setState({ displayable :  newDisplayable});
+    }
+    private handlePreferredDisplayChange = (newPreferredDisplay: boolean) => {
+        this.setState({ preferredDisplay :  newPreferredDisplay});
+    }
+    private handleNoteChange = (newNote: string) => {
+        this.setState({ note :  newNote});
     }
 
     private submitNewUnit = async () => {
@@ -53,6 +90,14 @@ export default class CreateUnitContainter extends React.Component<{}, {}> {
                     note= {this.state.note}
                     submitNewUnit= {this.submitNewUnit}
                     handleNameChange= {this.handleNameChange}
+                    handleIdentifierChange = {this.handleIdentifierChange}
+                    handleUnitRepresentChange = {this.handleUnitRepresentChange}
+                    handleSecInRateChange = {this.handleSecInRateChange}
+                    handleTypeOfUnitChange = {this.handleTypeOfUnitChange}
+                    handleSuffixChange = {this.handleSuffixChange}
+                    handleDisplayableChange = {this.handleDisplayableChange}
+                    handlePreferredDisplayChange = {this.handlePreferredDisplayChange}
+                    handleNoteChange = {this.handleNoteChange}
                 />
                 <FooterContainer />
             </div>

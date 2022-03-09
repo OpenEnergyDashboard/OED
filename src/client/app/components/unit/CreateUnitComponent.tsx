@@ -17,6 +17,14 @@ interface CreateUnitFormProps{
     note: string,
     submitNewUnit: () => void;
     handleNameChange: (val: string) => void;
+    handleIdentifierChange: (val : string) => void;
+    handleUnitRepresentChange: (val : string) => void;
+    handleSecInRateChange: (val : number) => void;
+    handleTypeOfUnitChange: (val : string) => void;
+    handleSuffixChange: (val : string) => void;
+    handleDisplayableChange: (val : string) => void;
+    handlePreferredDisplayChange: (val : boolean) => void;
+    handleNoteChange: (val : string) => void;
 }
 
 export default class CreateUnitComponent extends React.Component<CreateUnitFormProps, {}>{
@@ -66,7 +74,7 @@ export default class CreateUnitComponent extends React.Component<CreateUnitFormP
                         <div style={formInputStyle}>
                             {/* need name formatted message */}
                         <label>Sec In Rate</label><br />
-                        <Input type='number' onChange={({target}) => this.props.handleSecInRateChange(target.value)} required value={this.props.secInRate} />
+                        <Input type='number' onChange={({target}) => this.props.handleSecInRateChange(parseInt(target.value))} required value={this.props.secInRate} />
                         </div>
                         <div style={formInputStyle}>
                             {/* need name formatted message */}

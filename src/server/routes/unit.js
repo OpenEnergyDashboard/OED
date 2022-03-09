@@ -80,21 +80,16 @@ router.post('/addUnit', adminAuthenticator('create unit'), async (req,res) => {
 			// not sure if you need to check based on enum
 			unitRepresent: {
 				type: 'string',
-				minLength: 1
+				minLength: 1,
+				enum: Object.values(Unit.unitRepresentType)
 			},
 			secInRate: {
 				type: 'number',
 			},
 			typeOfUnit: {
 				type: 'string',
-				minLength: 1
-			},
-			// not sure how to handle unit index and type for unique values
-			unitIndex: {
-				oneOf: [
-					{ type: 'number'},
-					{ type: 'null' } 
-				]
+				minLength: 1,
+				enum: Object.values(Unit.unitType)
 			},
 			suffix: {
 				type: 'string',
@@ -102,7 +97,8 @@ router.post('/addUnit', adminAuthenticator('create unit'), async (req,res) => {
 			},
 			displayable: {
 				type: 'string',
-				minLength: 1
+				minLength: 1,
+				enum: Object.values(Unit.displayableType)
 			},
 			preferredDisplay: {
 				type: 'bool'
