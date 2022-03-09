@@ -14,6 +14,7 @@ interface GroupViewProps {
 	id: number;
 	childMeterNames: string[];
 	childGroupNames: string[];
+	deepMetersNames: string[];
 	loggedInAsAdmin: boolean;
 	fetchGroupChildren(id: number): Promise<any>;
 	beginEditingIfPossible(id: number): Promise<any>;
@@ -68,6 +69,13 @@ export default class GroupViewComponent extends React.Component<GroupViewProps, 
 						<FormattedMessage id='edit.a.group' />
 					</Button>
 				</Link>
+				<div className='col-6'>
+						<p style={boldStyle}>
+							<FormattedMessage id='Deep Meters' />:
+						</p>
+						<ListDisplayComponent items={this.props.deepMetersNames} />
+				</div>
+
 			</div>
 		);
 	}
