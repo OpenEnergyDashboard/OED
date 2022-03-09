@@ -6,27 +6,25 @@ import { connect } from 'react-redux';
 import { State } from '../../types/redux/state';
 import {Dispatch} from '../../types/redux/actions';
 import { unitsApi } from '../../utils/api';
-import { fetchUnitsDetails } from 'actions/unit';
+import { fetchUnitsDetails } from '../../actions/unit';
 import HeaderContainer from '../HeaderContainer';
 import FooterContainer from '../FooterContainer';
-import { isRoleAdmin } from 'utils/hasPermissions';
+import { isRoleAdmin } from '../../utils/hasPermissions';
 
 
-function mapStateToProps(state: State, ownProps: { id: number}){  
-    let unit = JSON.parse(JSON.stringify(state.units.byUnitID[ownProps.id]));
-    if(state.units.editedUnits[ownProps.id]){
-        unit = JSON.parse(JSON.stringify(state.units.editedUnits[ownProps.id]))
-    }
-
+function mapStateToProps(state: State){ 
     const currentUser = state.currentUser.profile;
     let loggedInAsAdmin = false;
     if(currentUser !== null){
         loggedInAsAdmin = isRoleAdmin(currentUser.role);
     }
+
     return {
-        unit,
-        isEdited: state.units.editedUnits[ownProps.id] !== undefined,
-        loggedInAsAdmin
+        loggedInAsAdmin, 
+		units: Object.keys(state.units.byUnitID)
+			.map(key => parseInt(key))
+			.filter(key => !isNaN(key)),
+		unsavedChanges: Object.keys(state.units.editedUnits).length > 0
     };
 }
 

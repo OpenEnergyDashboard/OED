@@ -3,11 +3,12 @@ import { Table, Button } from 'reactstrap';
 import { UnitData } from '../../types/redux/unit'
 import { FormattedMessage } from 'react-intl';
 import {Link} from 'react-router-dom';
+import UnitViewContainer from '../../containers/unit/UnitViewContainer';
 
 import UnsavedWarningContainer from '../../containers/UnsavedWarningContainer';
 
 interface UnitsDetailProps{
-    units: UnitData[];
+    units: number[];
     unsavedChanges: boolean;
     fetchUnitsDetails(): Promise<any>;
 }
@@ -70,21 +71,8 @@ export default class UnitsDetailContainer extends React.Component<UnitsDetailPro
                             </tr>
                         </thead>
                             <tbody>
-                                {this.props.units.map(unit => (
-                                    <tr key={unit.id}>
-                                        <td>{unit.id}</td>
-                                        <td>{unit.name}</td>
-                                        <td>{unit.identifier}</td>
-                                        <td>{unit.unitRepresent}</td>
-                                        <td>{unit.secInRate}</td>
-                                        <td>{unit.typeOfUnit}</td>
-                                        <td>{unit.suffix}</td>
-                                        <td>{unit.displayable}</td>
-                                        <td>{unit.preferredDisplay}</td>
-                                        <td>{unit.note}</td>
-                                        <td>Button will go here I swear</td>
-                                    </tr>
-                                ))}
+                                {this.props.units.map(unitID => 
+                                    ( <UnitViewContainer key={unitID} id={unitID} /> ))}
                                 <tr>
                                     <td colSpan={11}>
                                         {/* 
