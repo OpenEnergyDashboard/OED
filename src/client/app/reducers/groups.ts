@@ -43,7 +43,7 @@ export default function groups(state = defaultState, action: GroupsAction) {
 				childMeters: [],
 				selectedGroups: [],
 				selectedMeters: [],
-				deepMeters: [],
+				deepMeters: []
 			}));
 			// newGroups is an array: this converts it into a nested object where the key to each group is its ID.
 			// Without this, byGroupID will not be keyed by group ID.

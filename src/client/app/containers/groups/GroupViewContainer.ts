@@ -25,7 +25,7 @@ function mapStateToProps(state: State, ownProps: {id: number}) {
 		loggedInAsAdmin,
 		name: state.groups.byGroupID[id].name,
 		childMeterNames,
-		childGroupNames, 
+		childGroupNames,
 		deepMeterNames
 	};
 }
