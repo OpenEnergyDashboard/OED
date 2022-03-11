@@ -22,7 +22,7 @@ function mapStateToProps(state: State, ownProps: {id: number}){
     return{
         unit,
         isEdited: state.units.editedUnits[ownProps.id] !== undefined,
-        isSubmitting: state.meters.submitting.indexOf(ownProps.id) !== -1,
+        isSubmitting: state.units.submitting.indexOf(ownProps.id) !== -1,
 		loggedInAsAdmin
     }
 }

@@ -1,8 +1,9 @@
 import { ActionType } from "./actions";
+import { NamedIDItem } from '../items';
 
 export interface ReceiveUnitsDetailsAction{
     type: ActionType.ReceiveUnitsDetails;
-    data: UnitData[];
+    data: NamedIDItem[];
 }
 
 export interface RequestUnitsDetailsAction{
