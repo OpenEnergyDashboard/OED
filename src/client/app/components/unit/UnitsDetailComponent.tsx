@@ -3,6 +3,8 @@ import { Table, Button } from 'reactstrap';
 import { UnitData } from '../../types/redux/unit'
 import { FormattedMessage } from 'react-intl';
 import {Link} from 'react-router-dom';
+import HeaderContainer from '../../containers/HeaderContainer';
+import FooterContainer from '../../containers/FooterContainer';
 import UnitViewContainer from '../../containers/unit/UnitViewContainer';
 
 import UnsavedWarningContainer from '../../containers/UnsavedWarningContainer';
@@ -48,6 +50,7 @@ export default class UnitsDetailContainer extends React.Component<UnitsDetailPro
         return (
             <div>
 				<UnsavedWarningContainer />
+                <HeaderContainer />
 				<div className='container-fluid'>
 					<h2 style={titleStyle}>
 						<div style={tooltipStyle}>
@@ -89,6 +92,7 @@ export default class UnitsDetailContainer extends React.Component<UnitsDetailPro
 					</Table>
 					</div>
 				</div>
+                <FooterContainer />
 			</div>
         );
     }
