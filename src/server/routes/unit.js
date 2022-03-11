@@ -33,31 +33,32 @@ router.get('/', async(req,res) => {
         query = Unit.getAll;
 		const rows = await query(conn);
 		
-		res.json([{
-			id:  1,
-			name:  "unit.name",
-			identifier:  "unit.identifier",
-			unitRepresent:  "unit.unitRepresent",
-			secInRate:  2,
-			typeOfUnit:  "unit.typeOfUnit",
-			unitIndex:  3,
-			suffix:  "unit.suffix",
-			displayable: "true",
-			preferredDisplay: false,
-			note:  "unit.note"
-		}, {
-			id:  4,
-			name:  "unit.name",
-			identifier:  "unit.identifier",
-			unitRepresent:  "unit.unitRepresent",
-			secInRate:  5,
-			typeOfUnit:  "unit.typeOfUnit",
-			unitIndex:  6,
-			suffix:  "unit.suffix",
-			displayable: "true",
-			preferredDisplay: false,
-			note:  "unit.note"
-		}]);
+		// res.json([{
+		// 	id:  1,
+		// 	name:  "unit.name",
+		// 	identifier:  "unit.identifier",
+		// 	unitRepresent:  "unit.unitRepresent",
+		// 	secInRate:  2,
+		// 	typeOfUnit:  "unit.typeOfUnit",
+		// 	unitIndex:  3,
+		// 	suffix:  "unit.suffix",
+		// 	displayable: "true",
+		// 	preferredDisplay: false,
+		// 	note:  "unit.note"
+		// }, {
+		// 	id:  4,
+		// 	name:  "unit.name",
+		// 	identifier:  "unit.identifier",
+		// 	unitRepresent:  "unit.unitRepresent",
+		// 	secInRate:  5,
+		// 	typeOfUnit:  "unit.typeOfUnit",
+		// 	unitIndex:  6,
+		// 	suffix:  "unit.suffix",
+		// 	displayable: "true",
+		// 	preferredDisplay: false,
+		// 	note:  "unit.note"
+		// }]);
+		res.json(rows.map(row => formatUnitForResponse(row)));
 		console.log(rows);
     }catch(err){
         log.error(`Error while performing GET all units query: ${err}`, err);
