@@ -78,9 +78,6 @@ export default class UnitsDetailContainer extends React.Component<UnitsDetailPro
                                     ( <UnitViewContainer key={unitID} id={unitID} /> ))}
                                 <tr>
                                     <td colSpan={11}>
-                                        {/* 
-                                        Need to implement addUnit route later
-                                        */}
                                         <Link to="/addUnit">
                                             <Button style={buttonContainerStyle} color='primary'>
                                                 <FormattedMessage id="create.unit"/>

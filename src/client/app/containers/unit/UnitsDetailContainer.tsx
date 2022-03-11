@@ -31,7 +31,7 @@ function mapStateToProps(state: State){
 function mapDispatchToProps(dispatch: Dispatch){
     return {
         fetchUnitsDetails: () => dispatch(fetchUnitsDetails())
-    }
+    };
 }
 
 export default connect(mapStateToProps, mapDispatchToProps)(UnitsDetailComponent);

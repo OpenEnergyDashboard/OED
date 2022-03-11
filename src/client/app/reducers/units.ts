@@ -23,7 +23,7 @@
              return {
                  ...state,
                  isFetching: false,
-                 byunitID: _.keyBy(action.data, unit => unit.id)
+                 byUnitID: _.keyBy(action.data, unit => unit.id)
              };
          default:
              return state;
