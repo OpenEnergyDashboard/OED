@@ -47,6 +47,14 @@ export default class GroupViewComponent extends React.Component<GroupViewProps, 
 			display: renderEditGroupButton ? 'inline' : 'none',
 			paddingLeft: '5px'
 		};
+		const groupAllMeters: React.CSSProperties = {
+			fontWeight: 'bold',
+			float: 'left'
+		};
+		const deepMeters: React.CSSProperties = {
+			whiteSpace: 'nowrap',
+			float: 'left'
+		};
 		return (
 			<div>
 				<h2 style={nameStyle}>{this.props.name}</h2>
@@ -69,12 +77,14 @@ export default class GroupViewComponent extends React.Component<GroupViewProps, 
 						<FormattedMessage id='edit.a.group' />
 					</Button>
 				</Link>
-				<div className='col-6'>
-						<p style={boldStyle}>
-							<FormattedMessage id='group.all.meters' />:
+					<div>
+						<p style={groupAllMeters}>
+						<FormattedMessage id='group.all.meters' />:
 						</p>
-						<ListDisplayComponent items={this.props.deepMeterNames} />
-				</div>
+						{this.props.deepMeterNames.map(function(item, index) {
+							return <span key={`d_${index}`} style= {deepMeters}> { (index ? ',' : " ") + item } </span>
+						})}
+					</div>
 
 			</div>
 		);
