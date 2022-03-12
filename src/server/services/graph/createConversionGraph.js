@@ -41,7 +41,12 @@ function getPath(graph, sourceId, destinationId) {
 	const pathFinder = path.aStar(graph, {
 		oriented: true
 	});
+	// The path is returned in reversed order so we need to reverse it.
 	const p = pathFinder.find(sourceId, destinationId).reverse();
+	if (p.length <= 1) {
+		// Returns null if the path doesn't exist.
+		return null;
+	}
 	return p;
 }
 
@@ -58,8 +63,8 @@ function getAllPaths(graph, sourceId) {
 		const destinationId = destination.id;
 		// The shortest path from source to destination.
 		const currentPath = getPath(graph, sourceId, destinationId);
-		// The shortest path exists if the number of units on the path is greater than 1.
-		if (currentPath.length > 1) {
+		// Checks if the path exists.
+		if (currentPath !== null) {
 			paths.push(currentPath);
 		}
 	});
