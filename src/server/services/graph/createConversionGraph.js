@@ -5,6 +5,7 @@
 const createGraph = require('ngraph.graph');
 const Unit = require('../../models/Unit');
 const Conversion = require('../../models/Conversion');
+const path = require('ngraph.path');
 
 /**
  * Creates a graph with vertices are units and edges are conversions.
@@ -29,6 +30,45 @@ async function createConversionGraph(conn) {
 	return graph;
 }
 
+/**
+ * Returns the list of units on the shortest path from source to destination.
+ * @param {*} graph The conversion graph.
+ * @param {*} sourceId The source unit's id.
+ * @param {*} destinationId The destination unit's id.
+ * @returns 
+ */
+function getPath(graph, sourceId, destinationId) {
+	const pathFinder = path.aStar(graph, {
+		oriented: true
+	});
+	const p = pathFinder.find(sourceId, destinationId).reverse();
+	return p;
+}
+
+/**
+ * Returns all shortest paths from a unit to others.
+ * @param {*} sourceId The source unit's id.
+ * @param {*} graph The conversion graph.
+ * @returns 
+ */
+function getAllPaths(graph, sourceId) {
+	let paths = [];
+	// Loops through all the unit's ids in the graph.
+	graph.forEachNode(destination => {
+		const destinationId = destination.id;
+		// The shortest path from source to destination.
+		const currentPath = getPath(graph, sourceId, destinationId);
+		// The shortest path exists if the number of units on the path is greater than 1.
+		if (currentPath.length > 1) {
+			paths.push(currentPath);
+		}
+	});
+
+	return paths;
+}
+
 module.exports = {
-	createConversionGraph
+	createConversionGraph,
+	getPath,
+	getAllPaths
 };

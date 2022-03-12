@@ -4,36 +4,8 @@
 
 const Unit = require('../../models/Unit');
 const { pathConversion } = require('./pathConversion');
-const path = require('ngraph.path');
 const Conversion = require('../../models/Conversion');
-const { co } = require('co');
-
-/**
- * Returns all shortest paths from a unit to others.
- * @param {*} sourceId The source unit's id.
- * @param {*} graph The conversion graph.
- * @returns 
- */
-function getAllPaths(sourceId, graph) {
-	let paths = [];
-	const pathFinder = path.aStar(graph, {
-		oriented: true
-	});
-
-	// Loops through all the unit's ids in the graph.
-	graph.forEachNode(destination => {
-		const destinationId = destination.id;
-		// The shortest path from source to destination.
-		// Note that the order of units on the path is from destination to source so we need to reverse the array.
-		const currentPath = pathFinder.find(sourceId, destinationId).reverse();
-		// The shortest path exists if the number of units on the path is greater than 1.
-		if (currentPath.length > 1) {
-			paths.push(currentPath);
-		}
-	});
-
-	return paths;
-}
+const { getAllPaths } = require('./createConversionGraph');
 
 /**
  * Adds the new unit and conversions to the database and the conversion graph.
@@ -116,7 +88,7 @@ async function hideSuffixUnit(unit, paths, graph, conn) {
 async function handleSuffixUnits(graph, conn) {
 	const suffixUnits = await Unit.getSuffix(conn);
 	for (const unit of suffixUnits) {
-		const paths = getAllPaths(unit.id, graph);
+		const paths = getAllPaths(graph, unit.id);
 		for (const p of paths) {
 			const sourceId = p[0].id;
 			const destinationId = p[p.length - 1].id;
@@ -129,11 +101,15 @@ async function handleSuffixUnits(graph, conn) {
 			const neededSuffixUnit = await Unit.getByName(unitName, conn);
 			// See if this unit already exists. Would if this was done before where this path existed.
 			if (neededSuffixUnit === null) {
+				// If not then add the new unit and conversion.
 				await addNewUnitAndConversion(sourceId, destinationId, slope, intercept, unitName, graph, conn);
 			} else {
+				// If it already exists then check if the conversion is correct.
 				await verifyConversion(slope, intercept, sourceId, neededSuffixUnit.id, conn);
 			}
 		}
+		// The unit with suffix is no longer necessary since it has been replaced with new suffix units.
+		// We need to hide it and remove unnecessary conversions.
 		await hideSuffixUnit(unit, paths, graph, conn);
 	}
 }
