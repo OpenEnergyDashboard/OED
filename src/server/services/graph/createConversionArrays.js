@@ -31,7 +31,13 @@ async function assignIndex(units, conn) {
     }
 }
 
-async function createCijArray(graph, conn) {
+/**
+ * Returns the Cik array.
+ * @param {*} graph The conversion graph.
+ * @param {*} conn The connection to use.
+ * @returns 
+ */
+async function createCikArray(graph, conn) {
     // Get the vertices associated with the sources (meters) and destinations (units) that can be displayed
     // to some user. admin covers everyone.
     const sources = await Unit.getTypeMeter(conn);
@@ -62,9 +68,34 @@ async function createCijArray(graph, conn) {
             }
         }
     }
+    // The table in the database for the logical Cik needs to be wiped and these values stored.
+    // This code will be added once the database table for using it to get readings is set.
+    // At the moment, we just return the array.
     return c;
 }
 
+/**
+ * Returns the Pik array.
+ * @param {*} c The Cik array.
+ * @returns
+ */
+function createPikArray(c) {
+    // The number of sources and destinations.
+    const numSources = c.length;
+    const numDestination = c[0].length;
+    let p = new Array(numSources).fill(0).map(() => new Array(numDestination).fill(true));
+    for (let i = 0; i < numSources; ++i) {
+        for (let j = 0; j < numDestination; ++j) {
+            // If the conversion doesn't exist, we do nothing since Pij has been initialized with true.
+            if (isNaN(c[i][j][0])) {
+                p[i][j] = false;
+            }
+        }
+    }
+    return p;
+}
+
 module.exports = {
-    createCijArray
+    createCikArray,
+    createPikArray
 }
