@@ -101,7 +101,6 @@ async function pathConversion(path, conn) {
 			suffix = newSuffix;
 		}
 	}
-
 	return [slope, intercept, suffix];
 }
 

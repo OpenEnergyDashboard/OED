@@ -1,0 +1,70 @@
+/* This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this
+ * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
+
+const Unit = require("../../models/Unit");
+const { getPath } = require("./createConversionGraph");
+const { pathConversion } = require("./pathConversion");
+
+/**
+ * For each unit in the list, assigns its index to the conversion table.
+ * For source units, the index is the row id.
+ * For destination units, the index is the column id.
+ * @param {*} units The list of units.
+ * @param {*} conn The connection to use.
+ */
+async function assignIndex(units, conn) {
+    let id = 0;
+    // The old indices may cause conflicts while we are assigning new ones.
+    // Therefore we need to reset them to null first.
+    for (let unit of units) {
+        if (unit.unitIndex !== null) {
+            unit.unitIndex = null;
+            await unit.update(conn);
+        }
+    }
+    // Assigns new indices.
+    for (let unit of units) {
+        unit.unitIndex = id;
+        id += 1;
+        await unit.update(conn);
+    }
+}
+
+async function createCijArray(graph, conn) {
+    // Get the vertices associated with the sources (meters) and destinations (units) that can be displayed
+    // to some user. admin covers everyone.
+    const sources = await Unit.getTypeMeter(conn);
+    const destinations = await Unit.getVisibleUnitOrSuffix(Unit.displayableType.ADMIN, conn);
+    // Size of each of these.
+    const numSources = sources.length;
+    const numDestination = destinations.length;
+    // Create an array to hold the values. Each entry will have double slope, double intercept, and string suffix.
+    let c = new Array(numSources).fill(0).map(() => new Array(numDestination).fill([NaN, NaN, '']));
+    await assignIndex(sources, conn);
+    await assignIndex(destinations, conn);
+    for (const source of sources) {
+        for (const destination of destinations) {
+            const sourceId = source.id;
+            const destinationId = destination.id;
+            // The shortest path from source to destination.
+            const path = getPath(graph, sourceId, destinationId);
+            // Check if the path exists.
+            // If not, we will do nothing since the array has been initialized with [Nan, Nan, ''].
+            if (path !== null) {
+                const [slope, intercept, suffix] = await pathConversion(path, conn);
+                // All suffix units were dealt in src/server/services/graph/handleSuffixUnits.js
+                // so all units with suffix have displayable of none.
+                // This means this path has a suffix of "" (empty) so it does not matter.
+                // The name of any unit associated with a suffix was already set correctly.
+                // Thus, we can just use the destination identifier as the unit name.
+                c[source.unitIndex][destination.unitIndex] = [slope, intercept, destination.identifier];
+            }
+        }
+    }
+    return c;
+}
+
+module.exports = {
+    createCijArray
+}
