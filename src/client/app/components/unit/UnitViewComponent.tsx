@@ -21,8 +21,6 @@ interface UnitViewProps {
 interface UnitViewState {
 	identifierFocus: boolean;
 	identifierInput: string;
-  secInRateFocus: boolean;
-	secInRateInput: number;
 }
 
 type UnitViewPropsWithIntl = UnitViewProps & WrappedComponentProps;
@@ -31,13 +29,9 @@ class UnitViewComponent extends React.Component<UnitViewPropsWithIntl, UnitViewS
     constructor(props: UnitViewPropsWithIntl){
         super(props); 
         this.state = {
-           secInRateFocus: false,
-	        secInRateInput: this.props.unit.secInRate
-          identifierFocus: false,
-			    identifierInput: this.props.unit.identifier
-        };
-        this.toggleSecInRateInput = this.toggleSecInRateInput.bind(this);
-        this.handleSecInRateChange = this.handleSecInRateChange.bind(this);
+			identifierFocus: false,
+			identifierInput: this.props.unit.identifier
+		};
         this.toggleIdentifierInput = this.toggleIdentifierInput.bind(this);
         this.handleIdentifierChange = this.handleIdentifierChange.bind(this);
     }
@@ -49,8 +43,7 @@ class UnitViewComponent extends React.Component<UnitViewPropsWithIntl, UnitViewS
                 {loggedInAsAdmin && <td> {this.props.unit.name} {this.formatStatus()} </td>}
 				<td> {this.unitIdentifierInput()} </td>
                 {loggedInAsAdmin && <td> {this.props.unit.unitRepresent} {this.formatStatus()} </td>}
-                {/* {loggedInAsAdmin && <td> {this.props.unit.secInRate} {this.formatStatus()} </td>} */}
-                <td> {this.formatSecInRateInput()} </td>
+                {loggedInAsAdmin && <td> {this.props.unit.secInRate} {this.formatStatus()} </td>}
                 {loggedInAsAdmin && <td> {this.props.unit.typeOfUnit} {this.formatStatus()} </td>}
                 {loggedInAsAdmin && <td> {this.props.unit.suffix} {this.formatStatus()} </td>}
                 {loggedInAsAdmin && <td> {this.props.unit.displayable} {this.formatStatus()} </td>}
@@ -60,66 +53,6 @@ class UnitViewComponent extends React.Component<UnitViewPropsWithIntl, UnitViewS
         );
     }
 
-
-    private toggleSecInRateInput(){
-        if(this.state.secInRateFocus){
-            const secInRate = this.state.secInRateInput;
-
-            const editedUnit = {
-                ...this.props.unit,
-                secInRate
-            };
-            //this.props.editUnitDetails(editedUnit) //Needs editUnitDetails function used to dispatch the action to edit unit details (refer to line #24 on MeterViewComponent.tsx)
-        }
-        this.setState({secInRateFocus: !this.state.secInRateFocus});
-    }
-
-    private handleSecInRateChange(event: React.ChangeEvent<HTMLTextAreaElement>){
-        this.setState({ secInRateInput: parseInt(event.target.value)}); //converts string to number
-    }
-
-    private formatSecInRateInput(){
-        let formattedSecInRate;
-        let buttonMessageId;
-        if(this.state.secInRateFocus){
-            formattedSecInRate = <textarea
-                id = {'secInRate'}
-                autoFocus
-                value={this.state.secInRateInput}
-                onChange={event => this.handleSecInRateChange(event)}
-            />;
-            buttonMessageId = 'update';
-        } else {
-            formattedSecInRate = <div>{this.state.secInRateInput}</div>
-            buttonMessageId = 'edit';
-        }
-
-        let toggleButton;
-        const loggedInAsAdmin = this.props.loggedInAsAdmin;
-        if (loggedInAsAdmin) {
-            toggleButton = <Button style={this.styleToggleBtn()} color='primary' onClick={this.toggleSecInRateInput}>
-                <FormattedMessage id={buttonMessageId} />
-            </Button>;
-        } else {
-            toggleButton = <div />;
-        }
-
-        if (loggedInAsAdmin) {
-            return (
-                <div>
-                    {formattedSecInRate}
-                    {toggleButton}
-                </div>
-            );
-        } else {
-            return (
-                <div>
-                    {this.state.secInRateInput}
-                    {toggleButton}
-                </div>
-            );
-        }
-    }
     private removeUnsavedChangesFunction(callback: () => void) {
 		// This function is called to reset all the inputs to the initial state
 		store.dispatch<any>(confirmEditedUnits()).then(() => {
@@ -165,7 +98,7 @@ class UnitViewComponent extends React.Component<UnitViewPropsWithIntl, UnitViewS
 		this.setState({ identifierFocus: !this.state.identifierFocus });
 	}
 
-  private unitIdentifierInput(){
+    private unitIdentifierInput(){
 		let formattedIdentifier;
 		let buttonMessageId;
 		if(this.state.identifierFocus){
@@ -218,18 +151,6 @@ class UnitViewComponent extends React.Component<UnitViewPropsWithIntl, UnitViewS
 		}
 
 		return '';
-	}
-
-    private styleEnabled(): React.CSSProperties {
-		return { color: 'green' };
-	}
-
-	private styleDisabled(): React.CSSProperties {
-		return { color: 'red' };
-	}
-
-	private styleToggleBtn(): React.CSSProperties {
-		return { float: 'right' };
 	}
 }
 export default injectIntl(UnitViewComponent);
