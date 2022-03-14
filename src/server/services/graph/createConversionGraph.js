@@ -68,7 +68,6 @@ function getAllPaths(graph, sourceId) {
 			paths.push(currentPath);
 		}
 	});
-
 	return paths;
 }
 

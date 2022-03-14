@@ -18,7 +18,6 @@ async function conversionValues(sourceUnit, destinationUnit, conn) {
 	let slope;
 	let intercept;
 	let suffix;
-
 	if (desiredConversion === null) {
 		// Did not find the conversion. Since conversion should exist, it must be the other way around and bidirectional.
 		desiredConversion = await Conversion.getBySourceDestination(destinationUnit, sourceUnit, conn);
@@ -36,7 +35,6 @@ async function conversionValues(sourceUnit, destinationUnit, conn) {
 		intercept = desiredConversion.intercept;
 		suffix = (await Unit.getById(sourceUnit, conn)).suffix;
 	}
-
 	return [slope, intercept, suffix];
 }
 
