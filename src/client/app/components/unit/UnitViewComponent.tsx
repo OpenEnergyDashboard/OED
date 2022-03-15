@@ -21,8 +21,10 @@ interface UnitViewProps {
 interface UnitViewState {
 	identifierFocus: boolean;
 	identifierInput: string;
-  secInRateFocus: boolean;
+    secInRateFocus: boolean;
 	secInRateInput: number;
+    unitRepresentFocus: boolean;
+    unitRepresentInput: string;
 }
 
 type UnitViewPropsWithIntl = UnitViewProps & WrappedComponentProps;
@@ -31,15 +33,19 @@ class UnitViewComponent extends React.Component<UnitViewPropsWithIntl, UnitViewS
     constructor(props: UnitViewPropsWithIntl){
         super(props); 
         this.state = {
-           secInRateFocus: false,
+            secInRateFocus: false,
 	        secInRateInput: this.props.unit.secInRate,
-          identifierFocus: false,
-			    identifierInput: this.props.unit.identifier
+            identifierFocus: false,
+            identifierInput: this.props.unit.identifier,
+            unitRepresentFocus: false,
+            unitRepresentInput: this.props.unit.unitRepresent
         };
         this.toggleSecInRateInput = this.toggleSecInRateInput.bind(this);
         this.handleSecInRateChange = this.handleSecInRateChange.bind(this);
         this.toggleIdentifierInput = this.toggleIdentifierInput.bind(this);
         this.handleIdentifierChange = this.handleIdentifierChange.bind(this);
+        this.handleUnitRepresentChange = this.handleUnitRepresentChange.bind(this);
+        this.toggleUnitRepresentInput = this.toggleUnitRepresentInput.bind(this);
     }
     public render() {
         const loggedInAsAdmin = this.props.loggedInAsAdmin;
@@ -48,7 +54,8 @@ class UnitViewComponent extends React.Component<UnitViewPropsWithIntl, UnitViewS
                 {loggedInAsAdmin && <td> {this.props.unit.id} {this.formatStatus()} </td>}
                 {loggedInAsAdmin && <td> {this.props.unit.name} {this.formatStatus()} </td>}
 				<td> {this.unitIdentifierInput()} </td>
-                {loggedInAsAdmin && <td> {this.props.unit.unitRepresent} {this.formatStatus()} </td>}
+                {/* {loggedInAsAdmin && <td> {this.props.unit.unitRepresent} {this.formatStatus()} </td>} */}
+                {loggedInAsAdmin && <td> {this.formatUnitRepresentInput()} </td>}
                 {/* {loggedInAsAdmin && <td> {this.props.unit.secInRate} {this.formatStatus()} </td>} */}
                 <td> {this.formatSecInRateInput()} </td>
                 {loggedInAsAdmin && <td> {this.props.unit.typeOfUnit} {this.formatStatus()} </td>}
@@ -58,6 +65,52 @@ class UnitViewComponent extends React.Component<UnitViewPropsWithIntl, UnitViewS
                 {loggedInAsAdmin && <td> {this.props.unit.note} {this.formatStatus()} </td>}
             </tr>
         );
+    }
+    private handleUnitRepresentChange(event: React.ChangeEvent<HTMLSelectElement>){
+        this.setState({unitRepresentInput: event.target.value});
+    }
+
+    private toggleUnitRepresentInput(){
+        if(this.state.unitRepresentFocus){
+            const unitRepresent = this.state.unitRepresentInput;
+
+            const editedUnit = {
+                ...this.props.unit,
+                unitRepresent
+            };
+            // this.props.editUnitDetails(editedUnit);
+        }
+        this.setState({unitRepresentFocus: !this.state.unitRepresentFocus});
+    }
+
+
+    private formatUnitRepresentInput() {
+        let formattedUnitRepresent;
+        let buttonMessageId;
+        if(this.state.unitRepresentFocus){
+            formattedUnitRepresent = <select 
+            id={'unitRepresent'} 
+            value={this.state.unitRepresentInput}
+            onChange={event => this.handleUnitRepresentChange(event)}>
+            <option value="quantity">Quantity</option>
+            <option value="flow">Flow</option>
+            <option value="raw">Raw</option>
+            <option value="unused">Unused</option>
+            </select>
+            buttonMessageId = 'update';
+        }else{
+            formattedUnitRepresent = <div>{this.state.unitRepresentInput}</div>
+            buttonMessageId = 'edit';
+        }
+
+        let toggleButton;
+        toggleButton = <Button style={this.styleToggleBtn()} color='primary' onClick={this.toggleUnitRepresentInput}>
+            <FormattedMessage id={buttonMessageId} />
+        </Button>
+        return(<div>
+            {formattedUnitRepresent}
+            {toggleButton}
+        </div>)
     }
 
 
