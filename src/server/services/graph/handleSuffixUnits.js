@@ -70,7 +70,10 @@ async function hideSuffixUnit(unit, paths, graph, conn) {
 		unit.displayable = Unit.displayableType.NONE;
 		await unit.update(conn);
 	}
-
+	// Remove the edge from this unit to the next vertex that existed before the new units were added
+	// since it is no longer needed as the new suffix units have the needed edges (conversions). 
+	// The created units have the type_of_unit be suffix so don't delete those. 
+	// There is probably only one edge but remove them all just in case.
 	for (const p of paths) {
 		const secondUnit = await Unit.getById(p[1].id, conn);
 		// The paths to suffix units shouldn't be deleted.

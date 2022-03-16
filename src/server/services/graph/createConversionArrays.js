@@ -32,7 +32,8 @@ async function assignIndex(units, conn) {
 }
 
 /**
- * Returns the Cik array.
+ * Returns the Cik which gives the slope, intercept and suffix name between each meter and unit 
+ * where it is NaN, Nan, '' if no conversion.
  * @param {*} graph The conversion graph.
  * @param {*} conn The connection to use.
  * @returns 
@@ -70,14 +71,14 @@ async function createCikArray(graph, conn) {
 			}
 		}
 	}
-	// The table in the database for the logical Cik needs to be wiped and these values stored.
-	// This code will be added once the database table for using it to get readings is set.
+	// TODO: The table in the database for the logical Cik needs to be wiped and these values stored. This code 
+	// will be added once the database table for using it to get readings is set.
 	// At the moment, we just return the array.
 	return c;
 }
 
 /**
- * Returns the Pik array.
+ * Returns the Pik array which is true if there is a conversion in Cik.
  * @param {*} c The Cik array.
  * @returns
  */
