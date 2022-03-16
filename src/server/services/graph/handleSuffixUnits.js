@@ -19,6 +19,11 @@ const { getAllPaths } = require('./createConversionGraph');
 async function addNewUnitAndConversion(sourceId, destinationId, slope, intercept, unitName, graph, conn) {
 	const sourceUnit = await Unit.getById(sourceId, conn);
 	const destinationUnit = await Unit.getById(destinationId, conn);
+	// Add a new units where: name and identifier is unitName, type_of_unit is Unit.type.suffix,
+	// displayable and preferredDisplay is the same as destination.
+	// Note a type_of_unit of suffix is different than a unit with a suffix string.
+	// Note the admin can later change identifier, displayable and preferredDisplay to something else
+	// since OED does not recreate the unit if it exists so those changes will stay.
 	const newUnit = new Unit(undefined, unitName, unitName, Unit.unitRepresentType.UNUSED, sourceUnit.secInRate,
 		Unit.unitType.SUFFIX, undefined, '', destinationUnit.displayable, destinationUnit.preferredDisplay, 'suffix unit created by OED');
 	await newUnit.insert(conn);
@@ -44,6 +49,7 @@ async function addNewUnitAndConversion(sourceId, destinationId, slope, intercept
 async function verifyConversion(expectedSlope, expectedIntercept, sourceId, destinationId, conn) {
 	const currentConversion = await Conversion.getBySourceDestination(sourceId, destinationId, conn);
 	if (currentConversion.slope !== expectedSlope || currentConversion.intercept !== expectedIntercept) {
+		// While unlikely, the conversion changed so update
 		currentConversion.slope = expectedSlope;
 		currentConversion.intercept = expectedIntercept;
 		await currentConversion.update(conn);
@@ -86,9 +92,13 @@ async function hideSuffixUnit(unit, paths, graph, conn) {
  * @param {*} conn The connection to use.
  */
 async function handleSuffixUnits(graph, conn) {
+	// Get all units that have a suffix.
 	const suffixUnits = await Unit.getSuffix(conn);
+	// Check each unit out.
 	for (const unit of suffixUnits) {
+		// Use the graph to determine all the reachable units from this suffix unit S.
 		const paths = getAllPaths(graph, unit.id);
+		// Analyze each path
 		for (const p of paths) {
 			const sourceId = p[0].id;
 			const destinationId = p[p.length - 1].id;

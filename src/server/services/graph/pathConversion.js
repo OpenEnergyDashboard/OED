@@ -56,13 +56,13 @@ function invertConversion(slope, intercept) {
 
 /**
  * Returns the updated overall conversion given a new conversion to add at the end.
- * @param {*} origSlope The current coversion's slope.
+ * @param {*} origSlope The current conversion's slope.
  * @param {*} origIntercept The current conversion's intercept.
  * @param {*} newSlope The conversion's slope to add.
  * @param {*} newIntercept The conversion's intercept to add.
  * @returns 
  */
-function updatedCoversion(origSlope, origIntercept, newSlope, newIntercept) {
+function updatedConversion(origSlope, origIntercept, newSlope, newIntercept) {
 	// The current conversion is:
 	// conv(unit, origSlope, origIntercept) = origSlope * unit + origIntercept
 	// We need to update unit for the new conversion so compose with that:
@@ -92,7 +92,7 @@ async function pathConversion(path, conn) {
 		const destinationId = path[i + 1].id;
 		const [newSlope, newIntercept, newSuffix] = await conversionValues(sourceId, destinationId, conn);
 		// Updates the path conversion for this new edge.
-		[slope, intercept] = updatedCoversion(slope, intercept, newSlope, newIntercept);
+		[slope, intercept] = updatedConversion(slope, intercept, newSlope, newIntercept);
 		// Updates the suffix for this new edge.
 		if (newSuffix !== '') {
 			// The destination does not have an empty suffix so record it.
