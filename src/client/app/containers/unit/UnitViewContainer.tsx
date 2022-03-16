@@ -6,6 +6,8 @@ import { connect } from 'react-redux';
 import { logToServer } from '../../actions/logs';
 import { UnitMetadata } from 'types/redux/unit';
 import { isRoleAdmin } from '../../utils/hasPermissions';
+import { UnitData } from '../../types/redux/unit';
+import { editUnitDetails } from '../../actions/unit';
 
 function mapStateToProps(state: State, ownProps: {id: number}){
     let unit = JSON.parse(JSON.stringify(state.units.byUnitID[ownProps.id]));
@@ -28,7 +30,7 @@ function mapStateToProps(state: State, ownProps: {id: number}){
 }
 function mapDispatchToProps(dispatch: Dispatch) {
 	return {
-		// editMeterDetails: (meter: UnitMetadata) => dispatch(editUnitDetails(unit)),
+		editUnitDetails: (unit: UnitData) => dispatch(editUnitDetails(unit)),
 		log: (level: string, message: string) => dispatch(logToServer(level, message))
 	};
 }

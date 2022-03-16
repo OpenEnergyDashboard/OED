@@ -6,7 +6,7 @@ import { connect } from 'react-redux';
 import { State } from '../../types/redux/state';
 import {Dispatch} from '../../types/redux/actions';
 import { unitsApi } from '../../utils/api';
-import { fetchUnitsDetails } from '../../actions/unit';
+import { fetchUnitsDetails, submitEditedUnits} from '../../actions/unit';
 import HeaderContainer from '../HeaderContainer';
 import FooterContainer from '../FooterContainer';
 import { isRoleAdmin } from '../../utils/hasPermissions';
@@ -30,7 +30,8 @@ function mapStateToProps(state: State){
 
 function mapDispatchToProps(dispatch: Dispatch){
     return {
-        fetchUnitsDetails: () => dispatch(fetchUnitsDetails())
+        fetchUnitsDetails: () => dispatch(fetchUnitsDetails()),
+        submitEditedUnits: () => dispatch(submitEditedUnits())
     };
 }
 

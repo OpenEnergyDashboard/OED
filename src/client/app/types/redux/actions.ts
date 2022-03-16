@@ -114,7 +114,10 @@ export enum ActionType {
 	IncrementCounter = 'INCREMENT_COUNTER',
 
 	ReceiveUnitsDetails = 'RECEIVE_UNITS_DETAILS',
-	RequestUnitsDetails = 'REQUEST_UNITS_DETAISL'
+	RequestUnitsDetails = 'REQUEST_UNITS_DETAISL',
+	EditUnitDetails = 'EDIT_UNIT_DETAILS',
+	SubmitEditedUnit = 'SUBMIT_EDITED_UNIT',
+	ConfirmEditedUnit = 'CONFIRM_EDITED_UNIT',
 }
 
 /**

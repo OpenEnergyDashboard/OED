@@ -49,6 +49,26 @@ interface UnitDataByID{
     [unitID: number]: UnitData;
 }
 
+export interface EditUnitDetailsAction {
+	type: ActionType.EditUnitDetails;
+	unit: UnitData;
+}
+
+export interface SubmitEditedUnitAction {
+	type: ActionType.SubmitEditedUnit;
+	unit: number;
+}
+
+export interface ConfirmEditedUnitAction {
+	type: ActionType.ConfirmEditedUnit;
+	unit: number;
+}
+
+export interface UnitEditData {
+	id: number;
+	identifier: string;
+}
+
 export interface UnitState {
     isLoading: boolean;
     byUnitID: UnitDataByID;
@@ -60,3 +80,4 @@ export interface UnitState {
 export type UnitsAction = 
     | RequestUnitsDetailsAction
     | ReceiveUnitsDetailsAction
+    | EditUnitDetailsAction;
