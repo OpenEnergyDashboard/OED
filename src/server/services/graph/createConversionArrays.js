@@ -17,6 +17,7 @@ async function assignIndex(units, conn) {
 	let id = 0;
 	// The old indices may cause conflicts while we are assigning new ones.
 	// Therefore, we need to reset them to null first.
+	// TODO: Note that while Cik is being recreated, requests may return null values.
 	for (let unit of units) {
 		if (unit.unitIndex !== null) {
 			unit.unitIndex = null;
