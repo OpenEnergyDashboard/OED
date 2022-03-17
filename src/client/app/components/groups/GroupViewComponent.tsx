@@ -48,12 +48,12 @@ export default class GroupViewComponent extends React.Component<GroupViewProps, 
 			paddingLeft: '5px'
 		};
 		const groupAllMeters: React.CSSProperties = {
-			fontWeight: 'bold',
-			float: 'left'
+			fontWeight: 'bold'
 		};
 		const deepMeters: React.CSSProperties = {
 			whiteSpace: 'nowrap',
-			float: 'left'
+			overflow: 'hidden',
+			display: 'inline-block'
 		};
 		return (
 			<div>
@@ -82,7 +82,7 @@ export default class GroupViewComponent extends React.Component<GroupViewProps, 
 						<FormattedMessage id='group.all.meters' />:
 						</p>
 						{this.props.deepMeterNames.map(function(item, index) {
-							return <span key={`d_${index}`} style= {deepMeters}> { (index ? ',' : " ") + item } </span>
+							return <span key={`d_${index}`} style = {deepMeters}> { (index ? ', ': "") + item } </span>
 						})}
 					</div>
 
