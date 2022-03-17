@@ -6,19 +6,25 @@ import {Link} from 'react-router-dom';
 import HeaderContainer from '../../containers/HeaderContainer';
 import FooterContainer from '../../containers/FooterContainer';
 import UnitViewContainer from '../../containers/unit/UnitViewContainer';
-
+import store from '../../index';
+import TooltipHelpContainerAlternative from '../../containers/TooltipHelpContainerAlternative';
 import UnsavedWarningContainer from '../../containers/UnsavedWarningContainer';
+import { removeUnsavedChanges } from '../../actions/unsavedWarning';
+import TooltipMarkerComponent from '../TooltipMarkerComponent';
 
 interface UnitsDetailProps{
+    loggedInAsAdmin: boolean;
     units: number[];
     unsavedChanges: boolean;
     fetchUnitsDetails(): Promise<any>;
+    submitEditedUnits(): Promise<any>;
 }
 
 
 export default class UnitsDetailContainer extends React.Component<UnitsDetailProps, {}> {
     constructor(props: UnitsDetailProps) {
         super(props);
+        this.handleSubmitClicked = this.handleSubmitClicked.bind(this);
     }
 
     public componentWillMount() {
@@ -27,6 +33,8 @@ export default class UnitsDetailContainer extends React.Component<UnitsDetailPro
 
 
     public render() {
+        const loggedInAsAdmin = this.props.loggedInAsAdmin;
+
         const titleStyle: React.CSSProperties = {
 			textAlign: 'center'
 		};
@@ -45,15 +53,18 @@ export default class UnitsDetailContainer extends React.Component<UnitsDetailPro
 
 		const tooltipStyle = {
 			display: 'inline-block',
-			fontSize: '50%'
+			fontSize: '50%',
+            tooltipUnitView: loggedInAsAdmin? 'help.admin.unitview' : 'help.units.unitview'
 		};
         return (
             <div>
 				<UnsavedWarningContainer />
                 <HeaderContainer />
+                <TooltipHelpContainerAlternative page='units' />
 				<div className='container-fluid'>
 					<h2 style={titleStyle}>
 						<div style={tooltipStyle}>
+                            <TooltipMarkerComponent page='units' helpTextId={tooltipStyle.tooltipUnitView} />
 						</div>
 					</h2>
 					<div style={tableStyle}>
@@ -93,4 +104,14 @@ export default class UnitsDetailContainer extends React.Component<UnitsDetailPro
 			</div>
         );
     }
+
+    private removeUnsavedChanges() {
+		store.dispatch(removeUnsavedChanges());
+	}
+
+	private handleSubmitClicked() {
+		this.props.submitEditedUnits();
+		// Notify that the unsaved changes have been submitted
+		this.removeUnsavedChanges();
+	}
 }

@@ -1,6 +1,6 @@
 import ApiBackend from "./ApiBackend";
 import {UnitData, UnitEditData} from '../../types/redux/unit'
-
+import { NamedIDItem } from '../../types/items';
 
 export default class UnitsApi {
     private readonly backend: ApiBackend;
@@ -9,14 +9,14 @@ export default class UnitsApi {
         this.backend = backend;
     }
 
-    public async details(): Promise<UnitData[]>{
-            return await this.backend.doGetRequest<UnitData[]>('/api/units/');
+    public async details(): Promise<NamedIDItem[]>{
+            return await this.backend.doGetRequest<NamedIDItem[]>('/api/units');
     }
 
 	public async edit(unit: UnitData): Promise<{}> {
 		return await this.backend.doPostRequest<UnitEditData>(
 			'/api/units/edit',
-			{ id: unit.id, identifier: unit.identifier}
+			{ id: unit.id, identifier: unit.identifier, unitRepresent: unit.unitRepresent, secInRate: unit.secInRate}
 		);
 	}
 }

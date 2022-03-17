@@ -25,12 +25,39 @@ export default function units(state = defaultState, action: UnitsAction) {
                 isFetching: false,
                 byUnitID: _.keyBy(action.data, unit => unit.id)
             };
+        case ActionType.ChangeDisplayedUnits:
+            return {
+                ...state,
+                selectedUnits: action.selectedUnits
+            };
         case ActionType.EditUnitDetails:
             editedUnits = state.editedUnits;
             editedUnits[action.unit.id] = action.unit;
             return {
                 ...state,
                 editedUnits
+            };
+        case ActionType.SubmitEditedUnit:
+            submitting = state.submitting;
+            submitting.push(action.unit);
+            return {
+                ...state,
+                submitting
+            };
+        case ActionType.ConfirmEditedUnit:
+            submitting = state.submitting;
+            submitting.splice(submitting.indexOf(action.unit));
+
+            const byUnitID = state.byUnitID;
+            editedUnits = state.editedUnits;
+            byUnitID[action.unit] = editedUnits[action.unit];
+
+            delete editedUnits[action.unit];
+            return {
+                ...state,
+                submitting,
+                editedUnits,
+                byUnitID
             };
         default:
             return state;

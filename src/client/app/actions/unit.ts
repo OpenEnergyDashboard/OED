@@ -16,6 +16,10 @@ function receiveUnitsDetails(data: NamedIDItem[]): t.ReceiveUnitsDetailsAction{
     return {type: ActionType.ReceiveUnitsDetails, data}
 } 
 
+export function changeDisplayedUnits(units: number[]): t.ChangeDisplayedUnitsAction {
+	return { type: ActionType.ChangeDisplayedUnits, selectedUnits: units};
+}
+
 export function editUnitDetails(unit: UnitData):
 	t.EditUnitDetailsAction {
 	return { type: ActionType.EditUnitDetails, unit };
