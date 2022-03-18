@@ -1,12 +1,16 @@
 const express = require('express');
 const Unit = require('../models/Unit');
+const User = require('../models/User');
 const { getConnection } = require('../db');
+const { isTokenAuthorized } = require('../util/userRoles');
 const { log } = require('../log');
 const validate = require('jsonschema').validate;
 const adminAuthenticator = require('./authenticator').adminAuthMiddleware;
+const optionalAuthenticator = require('./authenticator').optionalAuthMiddleware;
 
 
 const router = express.Router();
+router.use(optionalAuthenticator)
 //help
 
 function formatUnitForResponse(unit){
@@ -31,34 +35,15 @@ router.get('/', async(req,res) => {
         const conn = getConnection();
 		let query;
         query = Unit.getAll;
-		const rows = await query(conn);
-		
-		// res.json([{
-		// 	id:  1,
-		// 	name:  "unit.name",
-		// 	identifier:  "unit.identifier",
-		// 	unitRepresent:  "unit.unitRepresent",
-		// 	secInRate:  2,
-		// 	typeOfUnit:  "unit.typeOfUnit",
-		// 	unitIndex:  3,
-		// 	suffix:  "unit.suffix",
-		// 	displayable: "true",
-		// 	preferredDisplay: false,
-		// 	note:  "unit.note"
-		// }, {
-		// 	id:  4,
-		// 	name:  "unit.name",
-		// 	identifier:  "unit.identifier",
-		// 	unitRepresent:  "unit.unitRepresent",
-		// 	secInRate:  5,
-		// 	typeOfUnit:  "unit.typeOfUnit",
-		// 	unitIndex:  6,
-		// 	suffix:  "unit.suffix",
-		// 	displayable: "true",
-		// 	preferredDisplay: false,
-		// 	note:  "unit.note"
-		// }]);
-		res.json(rows.map(row => formatUnitForResponse(row)));
+		const token = req.headers.token || req.body.token || req.query.token;
+		const loggedInAsAdmin = req.hasValidAuthToken && (await isTokenAuthorized(token, User.role.ADMIN));
+		if(loggedInAsAdmin){
+			query = Unit.getAll;
+			const rows = await query(conn);
+			res.json(rows.map(row => formatUnitForResponse(row)));
+		}else{
+			res.json("");
+		}
     }catch(err){
         log.error(`Error while performing GET all units query: ${err}`, err);
     }
