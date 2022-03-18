@@ -152,10 +152,20 @@ mocha.describe('Units', () => {
 			expectArrayOfUnitsToBeEquivalen(expectedUnits, actualUnits);
 		});
 
+		mocha.it('should only get units of type suffix', async () => {
+			const conn = testDB.getConnection();
+			const unitTypeSuffixAll = await Unit.getByName('Suffix All', conn);
+			const unitTypeSuffixNone = await Unit.getByName('Suffix None', conn);
+			const expectedUnits = [unitTypeSuffixAll, unitTypeSuffixNone];
+			const actualUnits = await Unit.getTypeSuffix(conn);
+			expectArrayOfUnitsToBeEquivalen(expectedUnits, actualUnits);
+		})
+
 		mocha.it('should only get units with suffix', async () => {
 			const unitTypeMeterAdmin = await Unit.getByName('Meter Admin', conn);
 			const unitTypeUnitAdmin = await Unit.getByName('Unit Admin', conn);
-			const expectedUnits = [unitTypeMeterAdmin, unitTypeUnitAdmin];
+			const unitTypeSuffixNone = await Unit.getByName('Suffix None', conn);
+			const expectedUnits = [unitTypeMeterAdmin, unitTypeUnitAdmin, unitTypeSuffixNone];			
 			const actualUnits = await Unit.getSuffix(conn);
 			expectArrayOfUnitsToBeEquivalen(expectedUnits, actualUnits);
 		});
