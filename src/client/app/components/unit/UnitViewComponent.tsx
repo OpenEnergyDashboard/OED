@@ -19,19 +19,15 @@ interface UnitViewProps {
 }
 
 interface UnitViewState {
-	
-    editUnitDetails(unit: UnitData): EditUnitDetailsAction; 
-}
-
-interface UnitViewState {
-	  identifierFocus: boolean;
-	  identifierInput: string;
+	identifierFocus: boolean;
+	identifierInput: string;
     secInRateFocus: boolean;
-	  secInRateInput: number;
+	secInRateInput: number;
     unitRepresentFocus: boolean;
     unitRepresentInput: string;
     noteFocus: boolean;
-	  noteInput: string;
+	noteInput: string;
+    // editUnitDetails(unit: UnitData): EditUnitDetailsAction;
 }
 
 type UnitViewPropsWithIntl = UnitViewProps & WrappedComponentProps;
@@ -41,11 +37,11 @@ class UnitViewComponent extends React.Component<UnitViewPropsWithIntl, UnitViewS
         super(props); 
         this.state = {
             secInRateFocus: false,
-	          secInRateInput: this.props.unit.secInRate,
+	        secInRateInput: this.props.unit.secInRate,
             identifierFocus: false,
             identifierInput: this.props.unit.identifier,
             unitRepresentFocus: false,
-            unitRepresentInput: this.props.unit.unitRepresent
+            unitRepresentInput: this.props.unit.unitRepresent,
             noteFocus: false,
             noteInput: this.props.unit.note
         };
@@ -226,7 +222,7 @@ class UnitViewComponent extends React.Component<UnitViewPropsWithIntl, UnitViewS
                 ...this.props.unit,
                 identifier
 			};
-			this.props.editUnitDetails(editedUnit);
+			// this.props.editUnitDetails(editedUnit);
 		}
 		this.setState({ identifierFocus: !this.state.identifierFocus });
 	}
