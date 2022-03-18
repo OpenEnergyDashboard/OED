@@ -59,7 +59,6 @@ router.get('/', async(req,res) => {
 		// 	note:  "unit.note"
 		// }]);
 		res.json(rows.map(row => formatUnitForResponse(row)));
-		console.log(rows);
     }catch(err){
         log.error(`Error while performing GET all units query: ${err}`, err);
     }
