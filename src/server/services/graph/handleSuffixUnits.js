@@ -77,14 +77,9 @@ async function hideSuffixUnit(unit, paths, graph, conn) {
 	for (const p of paths) {
 		const secondUnit = await Unit.getById(p[1].id, conn);
 		// The paths to suffix units shouldn't be deleted.
-		if (secondUnit.unitType !== Unit.unitType.SUFFIX) {
+		if (secondUnit.typeOfUnit !== Unit.unitType.SUFFIX) {
 			// Removes the conversion from the conversion graph.
 			graph.removeLink(p[0].id, p[1].id);
-			// Removes the conversion from the database.
-			const conversion = await Conversion.getBySourceDestination(p[0].id, p[1].id, conn);
-			if (conversion !== null) {
-				await Conversion.delete(p[0].id, p[1].id, conn);
-			}
 		}
 	}
 }
@@ -105,12 +100,16 @@ async function handleSuffixUnits(graph, conn) {
 		for (const p of paths) {
 			const sourceId = p[0].id;
 			const destinationId = p[p.length - 1].id;
+			// The destination unit.
+			const destinationUnit = await Unit.getById(destinationId, conn);
+			// We don't need to create any new units/conversions if the destination unit has the type of suffix.
+			if (destinationUnit.typeOfUnit === Unit.unitType.SUFFIX) {
+				continue;
+			}
 			// Find the conversion from the start to end of path.
 			const [slope, intercept, suffix] = await pathConversion(p, conn);
-			// Vertex's data is currently the unit's name.
-			const destinationName = p[p.length - 1].data;
 			// The name of the needed unit is the last unit name on the path + " of " and the suffix of the path.
-			const unitName = destinationName + ' of ' + suffix;
+			const unitName = destinationUnit.name + ' of ' + suffix;
 			const neededSuffixUnit = await Unit.getByName(unitName, conn);
 			// See if this unit already exists. Would if this was done before where this path existed.
 			if (neededSuffixUnit === null) {
