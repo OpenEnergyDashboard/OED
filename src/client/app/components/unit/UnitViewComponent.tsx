@@ -136,7 +136,7 @@ class UnitViewComponent extends React.Component<UnitViewPropsWithIntl, UnitViewS
         this.setState({secInRateFocus: !this.state.secInRateFocus});
     }
 
-    private handleSecInRateChange(event: React.ChangeEvent<HTMLTextAreaElement>){
+    private handleSecInRateChange(event: React.ChangeEvent<HTMLInputElement>){
         this.setState({ secInRateInput: parseInt(event.target.value)}); //converts string to number
     }
 
@@ -144,8 +144,9 @@ class UnitViewComponent extends React.Component<UnitViewPropsWithIntl, UnitViewS
         let formattedSecInRate;
         let buttonMessageId;
         if(this.state.secInRateFocus){
-            formattedSecInRate = <textarea
+            formattedSecInRate = <input
                 id = {'secInRate'}
+                type = 'number'
                 autoFocus
                 value={this.state.secInRateInput}
                 onChange={event => this.handleSecInRateChange(event)}
