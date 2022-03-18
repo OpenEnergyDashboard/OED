@@ -1,41 +1,16 @@
-# CSV web testing tools
+# Automated pipeline testing files
 
-Here are some sample files for testing the csv pipeline route.
+See the original manual testing files for the script and README that gives more information on these tests.
 
-For instance:
+## Tests with one input file of readings
 
-```bash
-curl localhost:3000/api/csv/readings -X POST \
-	-F 'meterName=solar' \
-	-F 'gzip=false' \
-	-F 'createMeter=true' \
-	-F 'cumulative=false' \
-	-F 'cumulativeReset=false' \
-	-F 'duplications=1' \
-	-F 'headerRow=false' \
-	-F 'timeSort=increasing' \
-	-F 'email=test@example.com' \
-	-F 'password=password' \
-	-F 'csvfile=@src/server/test/web/csvPipeline/sampleReadings.csv'
-```
-
-## Testing the new pipeline and CSV uploads
-
-The following is a description of how the new pipeline was tested during evaluation of the PR. It is planned to convert these tests to automated tests in the future.
-
-The CSV test files are described in the following table. The script pipelineCurl.sh runs the commands for each case and assumes OED is up and running. It creates a new meter for each file. Reading normally go from 6/1/21-6/5/21 (5 points) where get straight line from 1 to 5 so values are 1, 2, 3, 4 & 5 when plotted. In the readings table the values will be 24, 48, 72, 96 & 120 because over 24 hours. With cumulative you lose the first value. With the noon reset/start time you get Get 2.0, 2.5, 3.5, 4.5, 5 as readings since the days other than the first/last average between two readings.
-
-Note get two warning messages if load more than once on many cases because the time of the first reading is before the last time loaded before.
-
-Looked at readings with: select * from readings where meter_id in (select id from meters where name='pipe#'); 
-
-The script also describes how to delete all the meters/readings if you want to rerun from scratch.
+The input file will be pipe#Input.csv and the expected output is in pipe#Expected.csv where that output CSV is empty if the readings are rejected.
 
 <table>
   <tr>
-   <td>File name (.csv)
+   <td>number
    </td>
-   <td>Nominal meter name
+   <td>manual test ID
    </td>
    <td>Descending time
    </td>
@@ -55,7 +30,7 @@ The script also describes how to delete all the meters/readings if you want to r
    </td>
   </tr>
   <tr>
-   <td>regAsc
+   <td>1
    </td>
    <td>pipe1
    </td>
@@ -77,7 +52,7 @@ The script also describes how to delete all the meters/readings if you want to r
    </td>
   </tr>
   <tr>
-   <td>regDsc
+   <td>2
    </td>
    <td>pipe2
    </td>
@@ -99,7 +74,7 @@ The script also describes how to delete all the meters/readings if you want to r
    </td>
   </tr>
   <tr>
-   <td>cumAsc
+   <td>3
    </td>
    <td>pipe3
    </td>
@@ -121,7 +96,7 @@ The script also describes how to delete all the meters/readings if you want to r
    </td>
   </tr>
   <tr>
-   <td>cumDsc
+   <td>4
    </td>
    <td>pipe33
    </td>
@@ -143,7 +118,7 @@ The script also describes how to delete all the meters/readings if you want to r
    </td>
   </tr>
   <tr>
-   <td>cumAscResetMidnight
+   <td>5
    </td>
    <td>pipe4
    </td>
@@ -165,7 +140,7 @@ The script also describes how to delete all the meters/readings if you want to r
    </td>
   </tr>
   <tr>
-   <td>cumAscResetMidnight
+   <td>6
    </td>
    <td>pipe5
    </td>
@@ -187,7 +162,7 @@ The script also describes how to delete all the meters/readings if you want to r
    </td>
   </tr>
   <tr>
-   <td>cumAscResetMidnight
+   <td>7
    </td>
    <td>pipe6
    </td>
@@ -209,7 +184,7 @@ The script also describes how to delete all the meters/readings if you want to r
    </td>
   </tr>
   <tr>
-   <td>cumAscResetMidnight
+   <td>8
    </td>
    <td>pipe7
    </td>
@@ -231,7 +206,7 @@ The script also describes how to delete all the meters/readings if you want to r
    </td>
   </tr>
   <tr>
-   <td>cumAscResetMidnight
+   <td>9
    </td>
    <td>pipe8
    </td>
@@ -253,7 +228,7 @@ The script also describes how to delete all the meters/readings if you want to r
    </td>
   </tr>
   <tr>
-   <td>cumAscResetNoon
+   <td>10
    </td>
    <td>pipe9
    </td>
@@ -275,7 +250,7 @@ The script also describes how to delete all the meters/readings if you want to r
    </td>
   </tr>
   <tr>
-   <td>cumAscResetNoon
+   <td>11
    </td>
    <td>pipe10
    </td>
@@ -297,7 +272,7 @@ The script also describes how to delete all the meters/readings if you want to r
    </td>
   </tr>
   <tr>
-   <td>cumAscResetNoon
+   <td>12
    </td>
    <td>pipe11
    </td>
@@ -319,7 +294,7 @@ The script also describes how to delete all the meters/readings if you want to r
    </td>
   </tr>
   <tr>
-   <td>cumAscResetNoon
+   <td>13
    </td>
    <td>pipe12
    </td>
@@ -341,7 +316,7 @@ The script also describes how to delete all the meters/readings if you want to r
    </td>
   </tr>
   <tr>
-   <td>regAscLen
+   <td>14
    </td>
    <td>pipe13
    </td>
@@ -363,7 +338,7 @@ The script also describes how to delete all the meters/readings if you want to r
    </td>
   </tr>
   <tr>
-   <td>regAscLen
+   <td>15
    </td>
    <td>pipe14
    </td>
@@ -385,7 +360,7 @@ The script also describes how to delete all the meters/readings if you want to r
    </td>
   </tr>
   <tr>
-   <td>regAscLen
+   <td>16
    </td>
    <td>pipe15
    </td>
@@ -407,7 +382,7 @@ The script also describes how to delete all the meters/readings if you want to r
    </td>
   </tr>
   <tr>
-   <td>regAscGap
+   <td>17
    </td>
    <td>pipe16
    </td>
@@ -429,7 +404,7 @@ The script also describes how to delete all the meters/readings if you want to r
    </td>
   </tr>
   <tr>
-   <td>regAscGap
+   <td>18
    </td>
    <td>pipe17
    </td>
@@ -451,7 +426,7 @@ The script also describes how to delete all the meters/readings if you want to r
    </td>
   </tr>
   <tr>
-   <td>regAscGap
+   <td>19
    </td>
    <td>pipe18
    </td>
@@ -473,7 +448,7 @@ The script also describes how to delete all the meters/readings if you want to r
    </td>
   </tr>
   <tr>
-   <td>cumAscHeader
+   <td>20
    </td>
    <td>pipe19
    </td>
@@ -493,31 +468,8 @@ The script also describes how to delete all the meters/readings if you want to r
    </td>
     <td>Check header. Get standard cum values.
    </td>
-  </tr>
-  <tr>
-   <td>CumAscHeader.csv.gz
-   </td>
-   <td>pipe20
-   </td>
-   <td>
-   </td>
-   <td>X
-   </td>
-   <td>
-   </td>
-   <td>
-   </td>
-   <td>
-   </td>
-   <td>
-   </td>
-    <td>
-   </td>
-   <td>Check gzip (with header). Get standard cum values.
-   </td>
-  </tr>
-  <tr>
-   <td>cumAscDuplication3
+ <tr>
+   <td>21
    </td>
    <td>pipe21
    </td>
@@ -539,7 +491,7 @@ The script also describes how to delete all the meters/readings if you want to r
    </td>
   </tr>
   <tr>
-   <td>cumAscNegative
+   <td>22
    </td>
    <td>pipe22
    </td>
@@ -561,7 +513,7 @@ The script also describes how to delete all the meters/readings if you want to r
    </td>
   </tr>
 <tr>
-   <td>regAscEndonly
+   <td>23
    </td>
    <td>pipe35
    </td>
@@ -583,7 +535,7 @@ The script also describes how to delete all the meters/readings if you want to r
    </td>
   </tr>
   <tr>
-   <td>regDscEndonly
+   <td>24
    </td>
    <td>pipe36
    </td>
@@ -605,7 +557,7 @@ The script also describes how to delete all the meters/readings if you want to r
    </td>
   </tr>
   <tr>
-  <td>cumDscEndonly
+  <td>25
   </td>
   <td>pipe37
    </td>
@@ -613,8 +565,7 @@ The script also describes how to delete all the meters/readings if you want to r
    </td>
    <td>X
    </td>
-  <td>
-   </td>
+   <td>
    </td>
    <td>
    </td>
@@ -627,359 +578,8 @@ The script also describes how to delete all the meters/readings if you want to r
    <td>Normal cumulative values but get two message since drop first reading because cumulative & end only.
    </td>
   </tr>
-  <tr>
-   <td>cumAsc & cumAscAdd1 & cumAscAdd2
-   </td>
-   <td>pipe23
-   </td>
-   <td>
-   </td>
-   <td>X
-   </td>
-   <td>
-   </td>
-   <td>
-   </td>
-   <td>
-   </td>
-   <td>
-   </td>
-    <td>
-   </td>
-   <td>Add in cumulative readings via two more uploads of a single value. Expect normal cum readings plus 6 & 7.
-   </td>
-  </tr>
-  <tr>
-   <td>cumAsc & cumAscAddReset
-   </td>
-   <td>pipe24
-   </td>
-   <td>
-   </td>
-   <td>X
-   </td>
-   <td>Default
-   </td>
-   <td>
-   </td>
-   <td>
-   </td>
-   <td>
-   </td>
-    <td>
-   </td>
-   <td>Add two more values via second curl but this time the second one involves a reset. Expect normal cum readings plus 6 & 7.
-   </td>
-  </tr>
-  <tr>
-   <td>cumAsc & meterPipe25 & meterPipe25Update (to create & update meter)
-   </td>
-   <td>pipe25
-   </td>
-   <td>
-   </td>
-   <td>X
-   </td>
-   <td>
-   </td>
-   <td>
-   </td>
-   <td>
-   </td>
-   <td>
-   </td>
-    <td>
-   </td>
-   <td>The meter in DB is set to cumulative via second curl. Also tests update without header. Expect usual cumulative values.
-   </td>
-  </tr>
-  <tr>
-   <td>cumAscResetMidnight & meterPipe26.csv.gz (to create meter) & meterPipe26Update.csv.gz (to update meter)
-   </td>
-   <td>pipe26
-   </td>
-   <td>
-   </td>
-   <td>X
-   </td>
-   <td>
-   </td>
-   <td>
-   </td>
-   <td>
-   </td>
-   <td>
-   </td>
-    <td>
-   </td>
-   <td>The meter in DB is set to cumulative & cumulative_reset but not sent via curl. Checks creating and updating meter with gzip file and header. Expect usual cumulative values.
-   </td>
-  </tr>
-  <tr>
-   <td>cumAscResetMidnight & meterPipe27 (to create meter)
-   </td>
-   <td>pipe27
-   </td>
-   <td>
-   </td>
-   <td>X
-   </td>
-   <td>
-   </td>
-   <td>
-   </td>
-   <td>
-   </td>
-   <td>
-   </td>
-    <td>
-   </td>
-   <td>The meter in DB is set to cumulative, cumulative_reset to true & reset range is 11:45-12:15 but not sent via curl. This and following ones test that you can create a meter with various values set. The reset value should be reject row 4 since negative and no readings for meter.
-   </td>
-  </tr>
-  <tr>
-   <td>cumAscResetMidnight & meterPipe28 (to create meter)
-   </td>
-   <td>pipe28
-   </td>
-   <td>
-   </td>
-   <td>X
-   </td>
-   <td>
-   </td>
-   <td>
-   </td>
-   <td>
-   </td>
-   <td>
-   </td>
-    <td>
-   </td>
-   <td>The meter in DB is set to cumulative, cumulative_reset to true & reset range is 11:45-12:15 but then sent via curl so should reset around midnight. Should get usual cumulative values.
-   </td>
-  </tr>
-  <tr>
-   <td>regAscGapLength & meterPipe29 (to create meter)
-   </td>
-   <td>pipe29
-   </td>
-   <td>
-   </td>
-   <td>
-   </td>
-   <td>
-   </td>
-   <td>
-   </td>
-   <td>
-   </td>
-   <td>
-   </td>
-    <td>
-   </td>
-   <td>The meter in DB is set to reading_gap=60 and reading_variation=120. Should get warning for gap for line 4 and Length variation for line 5. Expect 1, 2+, 3, 4+, 5-, 5- (same as previous point and extra one since last reading goes into next day)
-   </td>
-  </tr>
- <tr>
-   <td>RegAscGapLength & meterPipe30 (to create meter)
-   </td>
-   <td>pipe30
-   </td>
-   <td>
-   </td>
-   <td>
-   </td>
-   <td>
-   </td>
-   <td>
-   </td>
-   <td>
-   </td>
-   <td>
-   </td>
-    <td>
-   </td>
-   <td>The meter in DB is set to reading_gap=60 and reading_variation=120 but then the curl passes 120.1 and 121.2 for gap & variation. Should get Length variation for line 5. Expect 1, 2+, 3, 4+, 5-, 5- (same as previous point and extra one since last reading goes into next day). This also checks that floating point numbers come through correctly by seeing message has correct value.
-   </td>
-  </tr>
-<tr>
-   <td>cumAscDuplication3 & meterPipe31 (to create meter)
-   </td>
-   <td>pipe31
-   </td>
-   <td>
-   </td>
-   <td>X
-   </td>
-   <td>
-   </td>
-   <td>
-   </td>
-   <td>
-   </td>
-   <td>3
-   </td>
-    <td>
-   </td>
-   <td>The meter in DB is set to reading_duplication=3 and no value in curl. Repeat every reading 3x but should only see once.  Get standard cum values.
-   </td>
-  </tr>
-  <tr>
-   <td>regDsc & meterPipe32 (to create meter)
-   </td>
-   <td>pipe32
-   </td>
-   <td>X
-   </td>
-   <td>
-   </td>
-   <td>
-   </td>
-   <td>
-   </td>
-   <td>
-   </td>
-   <td>
-   </td>
-    <td>
-   </td>
-   <td>The meter in DB is set to time_sort='decreasing' and no value in curl. Should get usual values.
-   </td>
-  </tr>
- <tr>
-   <td>regAscEndonly & meterPipe34 (to create meter)
-   </td>
-   <td>pipe34
-   </td>
-   <td>
-   </td>
-   <td>
-   </td>
-   <td>
-   </td>
-   <td>
-   </td>
-   <td>
-   </td>
-   <td>
-   </td>
-    <td>X
-   </td>
-   <td>The meter in DB is set to end_only_time='true' and no value in curl. Should get usual values with first one dropped.
-   </td>
-  </tr>
-  <tr>
-   <td>regAsc & regAscUpdate
-   </td>
-   <td>pipe38
-   </td>
-   <td>
-   </td>
-   <td>
-   <td>
-   </td>
-   </td>
-   <td>
-   </td>
-   <td>
-   </td>
-   <td>
-   </td>
-    <td>
-   </td>
-   <td>Do second insert with update where change value 1 to 1.5 and 5 to 5.5 and insert new value 0 a day earlier and 6 a day later. Should get 0, 1.5, 2, 3, 4, 5.5, 6.
-   </td>
-  </tr>
-  <tr>
-   <td>regAsc & regAscUpdate
-   </td>
-   <td>pipe39
-   </td>
-   <td>
-   </td>
-   <td>
-   <td>
-   </td>
-   </td>
-   <td>
-   </td>
-   <td>
-   </td>
-   <td>
-   </td>
-    <td>
-   </td>
-   <td>Do second insert without update where change value 1 to 1.5 and 5 to 5.5 and insert new value 0 a day earlier and 6 a day later. The updates to 1.5 and 5.5 should not happen but new values should appear. Should get 0-6.
-   </td>
-   </tr>
    <tr>
-    <td>meterPipe40
-   </td>
-  <td>pipe40
-   </td>
-  <td>
-   <td>
-   </td>
-   </td>
-  <td>
-   </td>
-    <td>
-   </td>
-   <td>
-   </td>
-   <td>
-   </td>
-    <td>
-   </td>
-   <td>Give update name as parameter when more than one row in CSV on second one. All updates should be rejected with error. Original meter creation should give meters pipe40 and pipe40b. pipe40 sets note to note40, area to 13, reading to 17, start time to 1111-11-10 11:11:11 and end time to 1111-11-11 11:11:11 to test setting these values since not done before.
-   </td>
-  </tr>
-  <tr>
-   <td>meterPipe41
-   </td>
-  <td>pipe41
-   </td>
-   <td>
-   <td>
-   </td>
-   </td>
-   <td>
-   </td>
-   <td>
-   </td>
-   <td>
-   </td>
-   <td>
-   </td>
-    <td>
-   </td>
-   <td>File has two meters to insert where second is same name so should be rejected. Only see meter pipe41 with same values as last one.
-   </td>
-  </tr>
-  <tr>
-   <td>meterPipe42
-   </td>
-  <td>pipe42
-   </td>
-   <td>
-   <td>
-   </td>
-   </td>
-   <td>
-   </td>
-   <td>
-   </td>
-   <td>
-   </td>
-   <td>
-   </td>
-    <td>
-   </td>
-   <td>Update of meter but name does not exist
-   </td>
-  </tr> <tr>
-   <td>regAscBadStarttime
+   <td>26
    </td>
   <td>pipe43
    </td>
@@ -1000,7 +600,7 @@ The script also describes how to delete all the meters/readings if you want to r
    <td>The second reading start time is invalid so errors on that one and no readings.
    </td>
   </tr> <tr>
-   <td>regAscBadEndtime
+   <td>27
    </td>
   <td>pipe44
    </td>
@@ -1021,7 +621,7 @@ The script also describes how to delete all the meters/readings if you want to r
    <td>The second reading end time is invalid so errors on that one and no readings.
    </td>
   </tr> <tr>
-   <td>regAscVariedFormats
+   <td>28
    </td>
   <td>pipe45
    </td>
@@ -1043,7 +643,7 @@ The script also describes how to delete all the meters/readings if you want to r
    </td>
   </tr>
 <tr>
-   <td>cumAscBadReading
+   <td>29
    </td>
    <td>pipe46
    </td>
@@ -1065,7 +665,7 @@ The script also describes how to delete all the meters/readings if you want to r
    </td>
   </tr>
   tr>
-   <td>regAscBadReading
+   <td>30
    </td>
    <td>pipe47
    </td>
@@ -1087,7 +687,7 @@ The script also describes how to delete all the meters/readings if you want to r
    </td>
   </tr>
   <tr>
-   <td>cumAscGap
+   <td>31
    </td>
    <td>pipe48
    </td>
@@ -1109,7 +709,7 @@ The script also describes how to delete all the meters/readings if you want to r
    </td>
   </tr>
   <tr>
-   <td>cumAscStartBeforePreviousEnd
+   <td>32
    </td>
    <td>pipe49
    </td>
@@ -1130,7 +730,7 @@ The script also describes how to delete all the meters/readings if you want to r
    <td>The second reading has the start time before the first reading's end time so it is rejected. There is also a warning about reading #3 since reading #2 had a different length. Should see readings 3-5.
   </tr>
  <tr>
-   <td>cumAscNeg
+   <td>33
    </td>
    <td>pipe50
    </td>
@@ -1151,7 +751,7 @@ The script also describes how to delete all the meters/readings if you want to r
    <td>The third reading has a negative value so all readings rejected.
   </tr>
 <tr>
-   <td>regAsc
+   <td>34
    </td>
    <td>pipe51
    </td>
@@ -1172,7 +772,7 @@ The script also describes how to delete all the meters/readings if you want to r
    <td>The second reading has start and end time the same so length is zero and the reading is rejected. Also get gap warning on reading three since 2nd was wrong. Expect to have readings 1 & 3-5.
    </td>
    </tr>tr>
-   <td>regAscEndonlyEndSamePreviousEnd
+   <td>35
    </td>
    <td>pipe52
    </td>
@@ -1194,3 +794,582 @@ The script also describes how to delete all the meters/readings if you want to r
    </td>
    </tr>
      </table>
+
+## Tests with one input file that is gzipped of readings
+
+The input file will be pipe#Input.csv.gz and the expected output is in pipe#Expected.csv where that output CSV is empty if the readings are rejected.
+
+<table>
+  <tr>
+   <td>number
+   </td>
+   <td>manual test ID
+   </td>
+   <td>Descending time
+   </td>
+   <td>Cumulative
+   </td>
+   <td>Cumulative reset
+   </td>
+   <td>Reading length variation
+   </td>
+   <td>Reading gap
+   </td>
+   <td>Duplication
+   </td>
+   <td>End only
+   </td>
+   <td>Description
+   </td>
+  </tr>
+  </tr>
+  <tr>
+   <td>40
+   </td>
+   <td>pipe20
+   </td>
+   <td>
+   </td>
+   <td>X
+   </td>
+   <td>
+   </td>
+   <td>
+   </td>
+   <td>
+   </td>
+   <td>
+   </td>
+    <td>
+   </td>
+   <td>Check gzip (with header). Get standard cum values.
+   </td>
+  </tr>
+ </table>
+
+## Tests with two input files of readings
+
+The input neter file will be pipe#AInput.csv & pipe#BInput.csv and the expected output is in pipe#Expected.csv where that output CSV is empty if the readings are rejected.
+
+<table>
+  <tr>
+   <td>number
+   </td>
+   <td>manual test ID
+   </td>
+   <td>Descending time
+   </td>
+   <td>Cumulative
+   </td>
+   <td>Cumulative reset
+   </td>
+   <td>Reading length variation
+   </td>
+   <td>Reading gap
+   </td>
+   <td>Duplication
+   </td>
+   <td>End only
+   </td>
+   <td>Description
+   </td>
+  </tr>
+  <tr>
+   <td>50
+   </td>
+   <td>pipe38
+   </td>
+   <td>
+   </td>
+   <td>
+   <td>
+   </td>
+   </td>
+   <td>
+   </td>
+   <td>
+   </td>
+   <td>
+   </td>
+    <td>
+   </td>
+   <td>Do second insert with update where change value 1 to 1.5 and 5 to 5.5 and insert new value 0 a day earlier and 6 a day later. Should get 0, 1.5, 2, 3, 4, 5.5, 6.
+   </td>
+  </tr>
+  <tr>
+   <td>51
+   </td>
+   <td>pipe39
+   </td>
+   <td>
+   </td>
+   <td>
+   <td>
+   </td>
+   </td>
+   <td>
+   </td>
+   <td>
+   </td>
+   <td>
+   </td>
+    <td>
+   </td>
+   <td>Do second insert without update where change value 1 to 1.5 and 5 to 5.5 and insert new value 0 a day earlier and 6 a day later. The updates to 1.5 and 5.5 should not happen but new values should appear. Should get 0-6.
+   </td>
+   </tr>
+ <tr>
+   <td>52
+   </td>
+   <td>pipe24
+   </td>
+   <td>
+   </td>
+   <td>X
+   </td>
+   <td>Default
+   </td>
+   <td>
+   </td>
+   <td>
+   </td>
+   <td>
+   </td>
+    <td>
+   </td>
+   <td>Add two more values via second curl but this time the second one involves a reset. Expect normal cum readings plus 6 & 7.
+   </td>
+  </tr>
+</table>
+
+## Tests with three input files of readings
+
+The input neter file will be pipe#AInput.csv, pipe#BInput.csv & pipe#CInput.csv and the expected output is in pipe#Expected.csv where that output CSV is empty if the readings are rejected.
+
+<table>
+  <tr>
+   <td>number
+   </td>
+   <td>manual test ID
+   </td>
+   <td>Descending time
+   </td>
+   <td>Cumulative
+   </td>
+   <td>Cumulative reset
+   </td>
+   <td>Reading length variation
+   </td>
+   <td>Reading gap
+   </td>
+   <td>Duplication
+   </td>
+   <td>End only
+   </td>
+   <td>Description
+   </td>
+  </tr>
+  <tr>
+   <td>60
+   </td>
+   <td>pipe23
+   </td>
+   <td>
+   </td>
+   <td>X
+   </td>
+   <td>
+   </td>
+   <td>
+   </td>
+   <td>
+   </td>
+   <td>
+   </td>
+    <td>
+   </td>
+   <td>Add in cumulative readings via two more uploads of a single value. Expect normal cum readings plus 6 & 7.
+   </td>
+  </tr>
+</table>
+
+## Tests with two input files of first meter and then readings
+
+The input neter file will be pipe#AInputMeter.csv, the input readings file will be pipe#BInput.csv and the expected output is in pipe#Expected.csv where that output CSV is empty if the readings are rejected. The meter values should also be tested.
+
+<table>
+  <tr>
+   <td>number
+   </td>
+   <td>manual test ID
+   </td>
+   <td>Descending time
+   </td>
+   <td>Cumulative
+   </td>
+   <td>Cumulative reset
+   </td>
+   <td>Reading length variation
+   </td>
+   <td>Reading gap
+   </td>
+   <td>Duplication
+   </td>
+   <td>End only
+   </td>
+   <td>Description
+   </td>
+  </tr>
+   <tr>
+  <tr>
+   <td>70
+   </td>
+   <td>pipe27
+   </td>
+   <td>
+   </td>
+   <td>X
+   </td>
+   <td>
+   </td>
+   <td>
+   </td>
+   <td>
+   </td>
+   <td>
+   </td>
+    <td>
+   </td>
+   <td>The meter in DB is set to cumulative, cumulative_reset to true & reset range is 11:45-12:15 but not sent via curl. This and following ones test that you can create a meter with various values set. The reset value should be reject row 4 since negative and no readings for meter.
+   </td>
+  </tr>
+  <tr>
+   <td>71
+   </td>
+   <td>pipe28
+   </td>
+   <td>
+   </td>
+   <td>X
+   </td>
+   <td>
+   </td>
+   <td>
+   </td>
+   <td>
+   </td>
+   <td>
+   </td>
+    <td>
+   </td>
+   <td>The meter in DB is set to cumulative, cumulative_reset to true & reset range is 11:45-12:15 but then sent via curl so should reset around midnight. Should get usual cumulative values.
+   </td>
+  </tr>
+  <tr>
+   <td>72
+   </td>
+   <td>pipe29
+   </td>
+   <td>
+   </td>
+   <td>
+   </td>
+   <td>
+   </td>
+   <td>
+   </td>
+   <td>
+   </td>
+   <td>
+   </td>
+    <td>
+   </td>
+   <td>The meter in DB is set to reading_gap=60 and reading_variation=120. Should get warning for gap for line 4 and Length variation for line 5. Expect 1, 2+, 3, 4+, 5-, 5- (same as previous point and extra one since last reading goes into next day)
+   </td>
+  </tr>
+ <tr>
+   <td>73
+   </td>
+   <td>pipe30
+   </td>
+   <td>
+   </td>
+   <td>
+   </td>
+   <td>
+   </td>
+   <td>
+   </td>
+   <td>
+   </td>
+   <td>
+   </td>
+    <td>
+   </td>
+   <td>The meter in DB is set to reading_gap=60 and reading_variation=120 but then the curl passes 120.1 and 121.2 for gap & variation. Should get Length variation for line 5. Expect 1, 2+, 3, 4+, 5-, 5- (same as previous point and extra one since last reading goes into next day). This also checks that floating point numbers come through correctly by seeing message has correct value.
+   </td>
+  </tr>
+<tr>
+   <td>74
+   </td>
+   <td>pipe31
+   </td>
+   <td>
+   </td>
+   <td>X
+   </td>
+   <td>
+   </td>
+   <td>
+   </td>
+   <td>
+   </td>
+   <td>3
+   </td>
+    <td>
+   </td>
+   <td>The meter in DB is set to reading_duplication=3 and no value in curl. Repeat every reading 3x but should only see once.  Get standard cum values.
+   </td>
+  </tr>
+  <tr>
+   <td>75
+   </td>
+   <td>pipe32
+   </td>
+   <td>X
+   </td>
+   <td>
+   </td>
+   <td>
+   </td>
+   <td>
+   </td>
+   <td>
+   </td>
+   <td>
+   </td>
+    <td>
+   </td>
+   <td>The meter in DB is set to time_sort='decreasing' and no value in curl. Should get usual values.
+   </td>
+  </tr>
+ <tr>
+   <td>76
+   </td>
+   <td>pipe34
+   </td>
+   <td>
+   </td>
+   <td>
+   </td>
+   <td>
+   </td>
+   <td>
+   </td>
+   <td>
+   </td>
+   <td>
+   </td>
+    <td>X
+   </td>
+   <td>The meter in DB is set to end_only_time='true' and no value in curl. Should get usual values with first one dropped.
+   </td>
+  </tr>
+</table>
+
+## Tests with multiple input files of first two meter and then readings
+
+The two input neter files will be pipe#AInputMeter.csv & pipe#BInputMeter.csv, the input readings file will be pipe#CInput.csv and the expected output is in pipe#Expected.csv where that output CSV is empty if the readings are rejected. The meter values should also be tested.
+
+<table>
+  <tr>
+   <td>number
+   </td>
+   <td>manual test ID
+   </td>
+   <td>Descending time
+   </td>
+   <td>Cumulative
+   </td>
+   <td>Cumulative reset
+   </td>
+   <td>Reading length variation
+   </td>
+   <td>Reading gap
+   </td>
+   <td>Duplication
+   </td>
+   <td>End only
+   </td>
+   <td>Description
+   </td>
+  </tr>
+   <tr>
+   <td>80
+   </td>
+   <td>pipe25
+   </td>
+   <td>
+   </td>
+   <td>X
+   </td>
+   <td>
+   </td>
+   <td>
+   </td>
+   <td>
+   </td>
+   <td>
+   </td>
+    <td>
+   </td>
+   <td>The meter in DB is set to cumulative via second curl. Also tests update without header. Expect usual cumulative values.
+   </td>
+  </tr>
+</table>
+
+## Tests with two input files of meters that are gzipped meters and then readings
+
+The input meter file will be pipe#AInputMeter.csv.gz & pipe#BInputMeter.csv.gz, the input readings file will be pipe#CInput.csv and the expected output is in pipe#Expected.csv where that output CSV is empty if the readings are rejected. The meter values should also be tested.
+
+<table>
+  <tr>
+   <td>number
+   </td>
+   <td>manual test ID
+   </td>
+   <td>Descending time
+   </td>
+   <td>Cumulative
+   </td>
+   <td>Cumulative reset
+   </td>
+   <td>Reading length variation
+   </td>
+   <td>Reading gap
+   </td>
+   <td>Duplication
+   </td>
+   <td>End only
+   </td>
+   <td>Description
+   </td>
+  </tr>
+  <tr>
+   <td>90
+   </td>
+   <td>pipe26
+   </td>
+   <td>
+   </td>
+   <td>X
+   </td>
+   <td>
+   </td>
+   <td>
+   </td>
+   <td>
+   </td>
+   <td>
+   </td>
+    <td>
+   </td>
+   <td>The meter in DB is set to cumulative & cumulative_reset but not sent via curl. Checks creating and updating meter with gzip file and header. Expect usual cumulative values.
+   </td>
+  </tr>
+ </table>
+
+## Tests with one input file of meters
+
+The input file will be pipe#InputMeter.csv. The meter values must be tested.
+
+<table>
+  <tr>
+   <td>number
+   </td>
+   <td>manual test ID
+   </td>
+   <td>Descending time
+   </td>
+   <td>Cumulative
+   </td>
+   <td>Cumulative reset
+   </td>
+   <td>Reading length variation
+   </td>
+   <td>Reading gap
+   </td>
+   <td>Duplication
+   </td>
+   <td>End only
+   </td>
+   <td>Description
+   </td>
+  </tr>
+   <tr>
+    <td>100
+   </td>
+  <td>pipe40
+   </td>
+  <td>
+   <td>
+   </td>
+   </td>
+  <td>
+   </td>
+    <td>
+   </td>
+   <td>
+   </td>
+   <td>
+   </td>
+    <td>
+   </td>
+   <td>Give update name as parameter when more than one row in CSV on second one. All updates should be rejected with error. Original meter creation should give meters pipe40 and pipe40b. pipe40 sets note to note40, area to 13, reading to 17, start time to 1111-11-10 11:11:11 and end time to 1111-11-11 11:11:11 to test setting these values since not done before.
+   </td>
+  </tr>
+  <tr>
+   <td>101
+   </td>
+  <td>pipe41
+   </td>
+   <td>
+   <td>
+   </td>
+   </td>
+   <td>
+   </td>
+   <td>
+   </td>
+   <td>
+   </td>
+   <td>
+   </td>
+    <td>
+   </td>
+   <td>File has two meters to insert where second is same name so should be rejected. Only see meter pipe41 with same values as last one.
+   </td>
+  </tr>
+  <tr>
+   <td>102
+   </td>
+  <td>pipe42
+   </td>
+   <td>
+   <td>
+   </td>
+   </td>
+   <td>
+   </td>
+   <td>
+   </td>
+   <td>
+   </td>
+   <td>
+   </td>
+    <td>
+   </td>
+   <td>Update of meter but name does not exist
+   </td>
+  </tr>
+</table>
