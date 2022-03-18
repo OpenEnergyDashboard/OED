@@ -165,7 +165,7 @@ mocha.describe('Units', () => {
 			const unitTypeMeterAdmin = await Unit.getByName('Meter Admin', conn);
 			const unitTypeUnitAdmin = await Unit.getByName('Unit Admin', conn);
 			const unitTypeSuffixNone = await Unit.getByName('Suffix None', conn);
-			const expectedUnits = [unitTypeMeterAdmin, unitTypeUnitAdmin, unitTypeSuffixNone];			
+			const expectedUnits = [unitTypeMeterAdmin, unitTypeUnitAdmin, unitTypeSuffixNone];
 			const actualUnits = await Unit.getSuffix(conn);
 			expectArrayOfUnitsToBeEquivalen(expectedUnits, actualUnits);
 		});
