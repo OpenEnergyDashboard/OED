@@ -50,17 +50,17 @@ class UnitViewComponent extends React.Component<UnitViewPropsWithIntl, UnitViewS
         return (
             <tr>
                 {loggedInAsAdmin && <td> {this.props.unit.id} {this.formatStatus()} </td>}
-                {loggedInAsAdmin && <td> {this.props.unit.name} {this.formatStatus()} </td>}
+                {loggedInAsAdmin && <td> {this.props.unit.name}</td>}
 				<td> {this.unitIdentifierInput()} </td>
                 {/* {loggedInAsAdmin && <td> {this.props.unit.unitRepresent} {this.formatStatus()} </td>} */}
                 <td> {this.formatUnitRepresentInput()} </td>
                 {/* {loggedInAsAdmin && <td> {this.props.unit.secInRate} {this.formatStatus()} </td>} */}
                 <td> {this.formatSecInRateInput()} </td>
-                {loggedInAsAdmin && <td> {this.props.unit.typeOfUnit} {this.formatStatus()} </td>}
-                {loggedInAsAdmin && <td> {this.props.unit.suffix} {this.formatStatus()} </td>}
-                {loggedInAsAdmin && <td> {this.props.unit.displayable} {this.formatStatus()} </td>}
-                {loggedInAsAdmin && <td> {this.props.unit.preferredDisplay} {this.formatStatus()} </td>}
-                {loggedInAsAdmin && <td> {this.props.unit.note} {this.formatStatus()} </td>}
+                {loggedInAsAdmin && <td> {this.props.unit.typeOfUnit}</td>}
+                {loggedInAsAdmin && <td> {this.props.unit.suffix}</td>}
+                {loggedInAsAdmin && <td> {this.props.unit.displayable}</td>}
+                {loggedInAsAdmin && <td> {this.props.unit.preferredDisplay}</td>}
+                {loggedInAsAdmin && <td> {this.props.unit.note}</td>}
             </tr>
         );
     }
