@@ -46,8 +46,8 @@ export default class CreateUnitContainter extends React.Component<{}, {}> {
         this.setState({ identifier :  newIdentifier});
     }
 
-    private handleUnitRepresentChange = (newIdentifier: string) => {
-        this.setState({ identifier :  newIdentifier});
+    private handleUnitRepresentChange = (newUnitRepresent: string) => {
+        this.setState({ unitRepresent: newUnitRepresent});
     }
 
 

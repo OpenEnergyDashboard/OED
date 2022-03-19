@@ -65,7 +65,7 @@ export default class CreateUnitComponent extends React.Component<CreateUnitFormP
                         <div style={formInputStyle}>
                             {/* need name formatted message */}
                         <label>Unit Represent</label><br />
-                        <Input type='select' onChange={({target}) => this.props.handleUnitRepresentChange(target.value)} required value={this.props.name}>
+                        <Input type='select' onChange={({target}) => this.props.handleUnitRepresentChange(target.value)} required value={this.props.unitRepresent}>
                             <option value='quantity' key='quantity'>Quantity</option>
                             <option value='flow' key='flow'>Flow</option>
                             <option value='raw' key='raw'>raw</option>
@@ -80,7 +80,7 @@ export default class CreateUnitComponent extends React.Component<CreateUnitFormP
                         <div style={formInputStyle}>
                             {/* need name formatted message */}
                         <label>Type of Unit</label><br />
-                        <Input type='select' onChange={({target}) => this.props.handleTypeOfUnitChange(target.value)} required value={this.props.name}>
+                        <Input type='select' onChange={({target}) => this.props.handleTypeOfUnitChange(target.value)} required value={this.props.typeOfUnit}>
                             <option value='unit' key='unit'>Unit</option>
                             <option value='meter' key='meter'>Meter</option>
                             <option value='suffix' key='suffix'>Suffix</option>
@@ -97,7 +97,7 @@ export default class CreateUnitComponent extends React.Component<CreateUnitFormP
                             <option value='none' key='none'>None</option>
                             <option value='all' key='all'>All</option>
                             <option value='admin' key='admin'>Admin</option>
-                            </Input>
+                        </Input>
                         </div>
                             
                             {/* use JSON.parse to convert from target.value string to boolean; not sure about overhead from using JSON.parse shoudl check with Steve */}
