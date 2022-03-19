@@ -4,7 +4,8 @@ import HeaderContainer from '../HeaderContainer';
 import FooterContainer from '../FooterContainer';
 import CreateUnitComponent from '../../components/unit/CreateUnitComponent';
 import { showSuccessNotification, showErrorNotification } from '../../utils/notifications';
-import { unitsApi } from 'utils/api';
+import { unitsApi } from '../../utils/api';
+import { browserHistory } from '../../utils/history';
 import { UnitData } from 'types/redux/unit';
 
 export default class CreateUnitContainter extends React.Component<{}, {}> {
@@ -29,7 +30,7 @@ export default class CreateUnitContainter extends React.Component<{}, {}> {
         unitRepresent: '',
         secInRate: 3600,
         typeOfUnit: '',
-        unitIndex: null,
+        unitIndex: undefined,
         suffix: '',
         displayable: '',
         preferredDisplay: false,
@@ -71,7 +72,28 @@ export default class CreateUnitContainter extends React.Component<{}, {}> {
     }
 
     private submitNewUnit = async () => {
+        try {
+            await unitsApi.addUnit({
+                id: undefined,
+                name: this.state.name,
+                identifier: this.state.identifier,
+                unitRepresent: this.state.unitRepresent,
+                secInRate: this.state.secInRate,
+                typeOfUnit: this.state.typeOfUnit,
+                unitIndex: this.state.unitIndex,
+                suffix: this.state.suffix,
+                displayable: this.state.displayable,
+                preferredDisplay: this.state.preferredDisplay,
+                note: this.state.note
 
+            });
+            // need to add message into app/translations/data.js
+            // showSuccessNotification(translate('users.successfully.create.user'))
+            browserHistory.push('/units');
+        } catch (error) {
+            // need to add message into app/translations/data.js
+            // showErrorNotification(translate('users.failed.to.create.user'));
+        }
     };
     public render() {
         return (

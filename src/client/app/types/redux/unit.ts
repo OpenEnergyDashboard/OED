@@ -53,13 +53,13 @@ export type UnitsAction =
     | ConfirmEditedUnitAction; 
 
 export interface UnitData{
-    id: number;
+    id?: number;
     name: string;
     identifier: string;
     unitRepresent: string;
     secInRate: number;
     typeOfUnit: string;
-    unitIndex: number;
+    unitIndex?: number;
     suffix: string;
     displayable: string;
     preferredDisplay: boolean;

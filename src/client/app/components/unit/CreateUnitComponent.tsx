@@ -10,7 +10,7 @@ interface CreateUnitFormProps{
     unitRepresent: string,
     secInRate: number,
     typeOfUnit: string,
-    unitIndex: null,
+    unitIndex?: number,
     suffix: string,
     displayable: string,
     preferredDisplay: boolean,
@@ -26,6 +26,7 @@ interface CreateUnitFormProps{
     handlePreferredDisplayChange: (val : boolean) => void;
     handleNoteChange: (val : string) => void;
 }
+
 
 export default class CreateUnitComponent extends React.Component<CreateUnitFormProps, {}>{
     constructor(props: any){
@@ -98,16 +99,21 @@ export default class CreateUnitComponent extends React.Component<CreateUnitFormP
                             <option value='admin' key='admin'>Admin</option>
                             </Input>
                         </div>
-                        <div>
-                            {/* need identfier formatted message */}
-                        <label>Preferred Display</label>
-                        <Input type='checkbox' onChange={({target}) => this.props.handlePreferredDisplayChange(target.value)} required value={this.props.preferredDisplay.toString()} />
-                        </div>
+                            
+                            {/* use JSON.parse to convert from target.value string to boolean; not sure about overhead from using JSON.parse shoudl check with Steve */}
+                            <Input type='checkbox' onChange={({target}) => this.props.handlePreferredDisplayChange(JSON.parse(target.value))} value={this.props.preferredDisplay.toString()} />
+                                {/* need identfier formatted message */}
+                            <label>Preferred Display</label>
+                            
                         <div style={formInputStyle}>
-                            {/* need name formatted message */}
-                        <label>Note (Optional)</label><br />
-                        <Input type='textarea' onChange={({target}) => this.props.handleNoteChange(target.value)} required value={this.props.note} />
+                                {/* need name formatted message */}
+                            <label>Note (Optional)</label><br />
+                            <Input type='textarea' onChange={({target}) => this.props.handleNoteChange(target.value)} required value={this.props.note} />
                         </div>
+                        <div>
+                            {/* need name formatted message */}
+						    <Button> Submit new unit </Button>
+					    </div>
                     </form>
                 </div>
             </div>

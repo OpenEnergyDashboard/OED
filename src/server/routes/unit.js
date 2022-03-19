@@ -91,11 +91,11 @@ router.post('/addUnit', adminAuthenticator('create unit'), async (req,res) => {
 			}
 		}
 	};
-
+	//console.log(req.body)
 	//Could change the function here 
 	const validationResult = validate(req.body, validUnit);
 	if(!validationResult.valid){
-		log.error(`Invalid input for mapAPI. ${validationResult.error}`);
+		log.error(`Invalid input for unitsAPI. ${validationResult.error}`);
 		res.sendStatus(400);
 	}else{
 		const conn = getConnection();

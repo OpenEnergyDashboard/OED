@@ -19,4 +19,8 @@ export default class UnitsApi {
 			{ id: unit.id, identifier: unit.identifier, unitRepresent: unit.unitRepresent, secInRate: unit.secInRate}
 		);
 	}
+
+    public async addUnit(unit: UnitData): Promise<void>{
+        return await this.backend.doPostRequest('/api/units/addUnit',unit);
+    }
 }
