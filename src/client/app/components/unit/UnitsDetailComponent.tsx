@@ -79,7 +79,7 @@ export default class UnitsDetailContainer extends React.Component<UnitsDetailPro
                                 <th><FormattedMessage id="unit.type_of_unit"/></th>
                                 <th><FormattedMessage id="unit.suffix"/></th>
                                 <th><FormattedMessage id="unit.displayable"/></th>
-                                <th><FormattedMessage id="unit.preffered_display"/></th>
+                                <th><FormattedMessage id="unit.preferred_display"/></th>
                                 <th><FormattedMessage id="unit.note"/></th>
                                 <th><FormattedMessage id="unit.remove"/></th>
                             </tr>

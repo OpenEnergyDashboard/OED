@@ -243,7 +243,7 @@ const localeData = {
 		"unit.type_of_unit": "Type of Unit",
 		"unit.suffix": "Suffix",
 		"unit.displayable": "Displayable",
-		"unit.preffered_display": "Preffered Display",
+		"unit.preferred_display": "Preferred Display",
 		"unit.note": "Note",
 		"unit.remove": "Remove",
 		"unused.groups": "Unused Groups",
