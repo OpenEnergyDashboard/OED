@@ -81,9 +81,9 @@ export default class GroupViewComponent extends React.Component<GroupViewProps, 
 						<p style={groupAllMeters}>
 						<FormattedMessage id='group.all.meters' />:
 						</p>
-							{this.props.deepMeterNames.map ((item, index) => {
+							{this.props.deepMeterNames.map ((item, index) => (
 								<span key={`d_${index}`} style={deepMeters}>{(index ? ', ': '') + item}</span>
-							})}
+							))}
 					</div>
 
 			</div>
