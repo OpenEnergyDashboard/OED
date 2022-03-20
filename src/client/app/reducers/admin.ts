@@ -12,7 +12,7 @@ const defaultState: AdminState = {
 	displayTitle: '',
 	defaultChartToRender: ChartTypes.line,
 	defaultBarStacking: false,
-	defaultTimeZone: { label: '', value: '' },
+	defaultTimeZone: '',
 	defaultLanguage: LanguageTypes.en,
 	isFetching: false,
 	submitted: true,

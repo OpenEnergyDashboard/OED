@@ -12,7 +12,6 @@ import { State } from '../types/redux/state';
 import { preferencesApi } from '../utils/api';
 import translate from '../utils/translate';
 import { LanguageTypes } from '../types/redux/i18n';
-import { TimeZoneOption } from '../types/timezone';
 import * as moment from 'moment';
 
 
@@ -24,7 +23,7 @@ export function updateDisplayTitle(displayTitle: string): t.UpdateDisplayTitleAc
 	return { type: ActionType.UpdateDisplayTitle, displayTitle };
 }
 
-export function updateTimeZone(timeZone: TimeZoneOption): t.UpdateDefaultTimeZone {
+export function updateTimeZone(timeZone: string): t.UpdateDefaultTimeZone {
 	return { type: ActionType.UpdateDefaultTimeZone, timeZone };
 }
 

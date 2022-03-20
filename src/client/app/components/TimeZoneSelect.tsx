@@ -8,8 +8,8 @@ import axios from 'axios';
 import { TimeZones, TimeZoneOption } from 'types/timezone';
 
 interface TimeZoneSelectProps {
-	current?: TimeZoneOption;
-	handleClick: (value: TimeZoneOption) => void;
+	current: string;
+	handleClick: (value: string) => void;
 }
 
 let options: null | TimeZoneOption[] = null;
@@ -32,11 +32,13 @@ const TimeZoneSelect: React.FC<TimeZoneSelectProps> = ({ current, handleClick })
 
 	const handleChange = (selectedOption: TimeZoneOption | null) => {
 		if (selectedOption != null) {
-			handleClick(selectedOption);
+			handleClick(selectedOption.label);
 		}
 	};
 
-	return (options !== null ? <Select isClearable={false} value={current} options={options} onChange={handleChange} /> : <span>Please Reload</span>);
+	return (options !== null ?
+	<Select isClearable={false} value={options.filter(({label}) => label === current)} options={options} onChange={handleChange} /> :
+	<span>Please Reload</span>);
 };
 
 export default TimeZoneSelect;

@@ -18,7 +18,6 @@ import { State } from '../../types/redux/state';
 import { Dispatch } from '../../types/redux/actions';
 import { ChartTypes } from '../../types/redux/graph';
 import { LanguageTypes } from '../../types/redux/i18n';
-import { TimeZoneOption } from '../../types/timezone';
 
 function mapStateToProps(state: State) {
 	return {
@@ -37,7 +36,7 @@ function mapDispatchToProps(dispatch: Dispatch) {
 	return {
 		updateDisplayTitle: (displayTitle: string) => dispatch(updateDisplayTitle(displayTitle)),
 		updateDefaultChartType: (defaultChartToRender: ChartTypes) => dispatch(updateDefaultChartToRender(defaultChartToRender)),
-		updateDefaultTimeZone: (timeZone: TimeZoneOption) => dispatch(updateTimeZone(timeZone)),
+		updateDefaultTimeZone: (timeZone: string) => dispatch(updateTimeZone(timeZone)),
 		toggleDefaultBarStacking: () => dispatch(toggleDefaultBarStacking()),
 		updateDefaultLanguage: (defaultLanguage: LanguageTypes) => dispatch(updateDefaultLanguage(defaultLanguage)),
 		submitPreferences: () => dispatch(submitPreferencesIfNeeded()),
