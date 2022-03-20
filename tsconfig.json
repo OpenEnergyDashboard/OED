@@ -16,6 +16,7 @@
         "lib": ["es6", "dom", "es2021"],
         "moduleResolution": "node",
         "rootDir": "src",
+        "allowSyntheticDefaultImports": true,
         "noImplicitReturns": true,
         "noImplicitThis": true,
         "noImplicitAny": true,
