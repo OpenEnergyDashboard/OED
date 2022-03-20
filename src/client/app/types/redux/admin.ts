@@ -6,6 +6,7 @@ import { PreferenceRequestItem } from '../items';
 import { ChartTypes } from './graph';
 import { LanguageTypes } from './i18n';
 import { ActionType } from './actions';
+import { TimeZoneOption } from '../timezone';
 
 export type AdminAction =
 	| UpdateImportMeterAction
@@ -42,7 +43,7 @@ export interface ToggleDefaultBarStackingAction {
 
 export interface UpdateDefaultTimeZone {
 	type: ActionType.UpdateDefaultTimeZone;
-	timeZone: string;
+	timeZone: TimeZoneOption;
 }
 
 export interface UpdateDefaultLanguageAction {
@@ -82,7 +83,7 @@ export interface AdminState {
 	displayTitle: string;
 	defaultChartToRender: ChartTypes;
 	defaultBarStacking: boolean;
-	defaultTimeZone: string;
+	defaultTimeZone: TimeZoneOption;
 	defaultLanguage: LanguageTypes;
 	isFetching: boolean;
 	submitted: boolean;

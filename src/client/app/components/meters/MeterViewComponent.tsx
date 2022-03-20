@@ -11,6 +11,7 @@ import TimeZoneSelect from '../TimeZoneSelect';
 import { updateUnsavedChanges } from '../../actions/unsavedWarning';
 import { fetchMetersDetails, submitEditedMeters, confirmEditedMeters } from '../../actions/meters';
 import store from '../../index';
+import { TimeZoneOption } from '../../types/timezone';
 
 interface MeterViewProps {
 	// The ID of the meter to be displayed
@@ -64,7 +65,7 @@ class MeterViewComponent extends React.Component<MeterViewPropsWithIntl, MeterVi
 				{loggedInAsAdmin && <td> {this.formatGPSInput()} </td>}
 				<td> {this.formatEnabled()} </td>
 				<td> {this.formatDisplayable()} </td>
-				{loggedInAsAdmin && <td> <TimeZoneSelect current={this.props.meter.timeZone || ''} handleClick={this.changeTimeZone} /> </td>}
+				{loggedInAsAdmin && <td> <TimeZoneSelect current={this.props.meter.timeZone || undefined} handleClick={this.changeTimeZone} /> </td>}
 			</tr>
 		);
 	}
@@ -129,7 +130,7 @@ class MeterViewComponent extends React.Component<MeterViewPropsWithIntl, MeterVi
 		this.props.editMeterDetails(editedMeter);
 	}
 
-	private changeTimeZone(value: string): void {
+	private changeTimeZone(value: TimeZoneOption): void {
 		const editedMeter = this.props.meter;
 		editedMeter.timeZone = value;
 		this.props.editMeterDetails(editedMeter);

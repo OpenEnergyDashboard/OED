@@ -5,16 +5,11 @@
 import * as React from 'react';
 import Select from 'react-select';
 import axios from 'axios';
-import { TimeZones } from 'types/timezone';
+import { TimeZones, TimeZoneOption } from 'types/timezone';
 
 interface TimeZoneSelectProps {
-	current: string;
-	handleClick: (value: string) => void;
-}
-
-interface TimeZoneOption {
-	value: string;
-	label: string;
+	current?: TimeZoneOption;
+	handleClick: (value: TimeZoneOption) => void;
 }
 
 let options: null | TimeZoneOption[] = null;
@@ -37,11 +32,11 @@ const TimeZoneSelect: React.FC<TimeZoneSelectProps> = ({ current, handleClick })
 
 	const handleChange = (selectedOption: TimeZoneOption | null) => {
 		if (selectedOption != null) {
-			handleClick(selectedOption.value);
+			handleClick(selectedOption);
 		}
 	};
 
-	return (options !== null ? <Select clearable={false} value={current} options={options} onChange={handleChange} /> : <span>Please Reload</span>);
+	return (options !== null ? <Select isClearable={false} value={current} options={options} onChange={handleChange} /> : <span>Please Reload</span>);
 };
 
 export default TimeZoneSelect;

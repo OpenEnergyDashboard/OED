@@ -14,6 +14,7 @@ import {
 	UpdateDefaultWarningFileSize,
 	UpdateDefaultFileSizeLimit
 } from '../../types/redux/admin';
+import { TimeZoneOption } from '../../types/timezone';
 import { removeUnsavedChanges, updateUnsavedChanges } from '../../actions/unsavedWarning';
 import { defineMessages, FormattedMessage, injectIntl, WrappedComponentProps } from 'react-intl';
 import { LanguageTypes } from '../../types/redux/i18n';
@@ -25,7 +26,7 @@ interface PreferencesProps {
 	displayTitle: string;
 	defaultChartToRender: ChartTypes;
 	defaultBarStacking: boolean;
-	defaultTimeZone: string;
+	defaultTimeZone: TimeZoneOption;
 	defaultLanguage: LanguageTypes;
 	disableSubmitPreferences: boolean;
 	defaultWarningFileSize: number;
@@ -35,7 +36,7 @@ interface PreferencesProps {
 	toggleDefaultBarStacking(): ToggleDefaultBarStackingAction;
 	updateDefaultLanguage(defaultLanguage: LanguageTypes): UpdateDefaultLanguageAction;
 	submitPreferences(): Promise<void>;
-	updateDefaultTimeZone(timeZone: string): UpdateDefaultTimeZone;
+	updateDefaultTimeZone(timeZone: TimeZoneOption): UpdateDefaultTimeZone;
 	updateDefaultWarningFileSize(defaultWarningFileSize: number): UpdateDefaultWarningFileSize;
 	updateDefaultFileSizeLimit(defaultFileSizeLimit: number): UpdateDefaultFileSizeLimit;
 }
@@ -278,7 +279,7 @@ class PreferencesComponent extends React.Component<PreferencesPropsWithIntl, {}>
 		this.updateUnsavedChanges();
 	}
 
-	private handleDefaultTimeZoneChange(value: string) {
+	private handleDefaultTimeZoneChange(value: TimeZoneOption) {
 		this.props.updateDefaultTimeZone(value);
 		this.updateUnsavedChanges();
 	}

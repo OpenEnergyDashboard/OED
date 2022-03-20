@@ -4,6 +4,7 @@
 
 import { ChartTypes } from '../types/redux/graph';
 import { LanguageTypes } from './redux/i18n';
+import { TimeZoneOption } from '../types/timezone';
 
 /**
  * The type of options displayed in Select components.
@@ -30,7 +31,7 @@ export interface PreferenceRequestItem {
 	defaultChartToRender: ChartTypes;
 	defaultBarStacking: boolean;
 	defaultLanguage: LanguageTypes;
-	defaultTimezone: string;
+	defaultTimezone: TimeZoneOption;
 	defaultWarningFileSize: number;
 	defaultFileSizeLimit: number;
 }
