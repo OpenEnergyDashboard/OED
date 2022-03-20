@@ -52,9 +52,9 @@ class UnitViewComponent extends React.Component<UnitViewPropsWithIntl, UnitViewS
                 {loggedInAsAdmin && <td> {this.props.unit.id} {this.formatStatus()} </td>}
                 {loggedInAsAdmin && <td> {this.props.unit.name}</td>}
 				<td> {this.unitIdentifierInput()} </td>
-                {/* {loggedInAsAdmin && <td> {this.props.unit.unitRepresent} {this.formatStatus()} </td>} */}
+                {/* {loggedInAsAdmin && <td> {this.props.unit.unitRepresent}</td>} */}
                 <td> {this.formatUnitRepresentInput()} </td>
-                {/* {loggedInAsAdmin && <td> {this.props.unit.secInRate} {this.formatStatus()} </td>} */}
+                {/* {loggedInAsAdmin && <td> {this.props.unit.secInRate}</td>} */}
                 <td> {this.formatSecInRateInput()} </td>
                 {loggedInAsAdmin && <td> {this.props.unit.typeOfUnit}</td>}
                 {loggedInAsAdmin && <td> {this.props.unit.suffix}</td>}

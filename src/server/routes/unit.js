@@ -91,7 +91,6 @@ router.post('/addUnit', adminAuthenticator('create unit'), async (req,res) => {
 			}
 		}
 	};
-	//console.log(req.body)
 	//Could change the function here 
 	const validationResult = validate(req.body, validUnit);
 	if(!validationResult.valid){
