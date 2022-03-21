@@ -5,8 +5,6 @@
 import * as React from 'react';
 import { SelectOption } from '../types/items';
 import { defineMessages, FormattedMessage, injectIntl, WrappedComponentProps } from 'react-intl';
-import '../styles/react-select-css.css';
-import 'react-select/dist/react-select.css';
 import SingleSelectComponent from './SingleSelectComponent';
 import TooltipMarkerComponent from './TooltipMarkerComponent';
 import { UpdateSelectedMapAction } from '../types/redux/map';
