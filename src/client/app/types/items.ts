@@ -63,3 +63,15 @@ export enum UserRole {
 	EXPORT = 'export',
 	OBVIUS = 'obvius'
 };
+
+/**
+ * A conversion object to be displayed for admin.
+ */
+ export interface Conversion {
+	source_id: number;
+	destination_id: number;
+	bidirectional: boolean;
+	slope: number;
+	intercept: number;
+	note: string;
+}

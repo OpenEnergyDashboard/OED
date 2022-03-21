@@ -34,6 +34,7 @@ import UploadCSVContainer from '../containers/csv/UploadCSVContainer';
 import { UserRole } from '../types/items';
 import { hasPermissions } from '../utils/hasPermissions';
 import * as queryString from 'query-string';
+import AdminConversionContainer from '../containers/conversions/AdminConversionContainer';
 
 interface RouteProps {
 	barStacking: boolean;
@@ -250,6 +251,7 @@ export default class RouteComponent extends React.Component<RouteProps, {}> {
 								<Route path='/editGroup' render={() => this.requireAuth(<EditGroupsContainer/>)}/>
 								<Route path='/users/new' render={() => this.requireAuth(<CreateUserContainer/>)}/>
 								<Route path='/users' render={() => this.requireAuth(<UsersDetailContainer fetchUsers={() => []}/>)}/>
+								<Route path='/conversions' render={() => this.requireAuth(<AdminConversionContainer/>)}/>
 								<Route path='*' component={HomeComponent}/>
 							</Switch>
 						</Router>
