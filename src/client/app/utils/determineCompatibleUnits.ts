@@ -8,8 +8,8 @@
  * @returns
  */
 export function unitsCompatibleWithMeters(meters: Set<number>): Set<number> {
-    let compatibleUnits = new Set<number>();
-    return compatibleUnits;
+	let compatibleUnits = new Set<number>();
+	return compatibleUnits;
 }
 
 /**
@@ -18,8 +18,8 @@ export function unitsCompatibleWithMeters(meters: Set<number>): Set<number> {
  * @returns
  */
 export function unitsCompatibleWithUnit(unit: number): Set<number> {
-    let unitSet = new Set<number>();
-    return unitSet;
+	let unitSet = new Set<number>();
+	return unitSet;
 }
 
 /**
@@ -28,8 +28,8 @@ export function unitsCompatibleWithUnit(unit: number): Set<number> {
  * @returns
  */
 export function unitFromPRow(row: number): number {
-    let unitId = Number();
-    return unitId;
+	let unitId = Number();
+	return unitId;
 }
 
 /**
@@ -38,8 +38,8 @@ export function unitFromPRow(row: number): number {
  * @returns 
  */
 export function unitFromPColumn(column: number): number {
-    let unitId = Number();
-    return unitId;
+	let unitId = Number();
+	return unitId;
 }
 
 /**
@@ -48,6 +48,6 @@ export function unitFromPColumn(column: number): number {
  * @returns 
  */
 export function metersInGroup(groupId: number): Set<number> {
-    let metersSet = new Set<number>();
-    return metersSet;    
+	let metersSet = new Set<number>();
+	return metersSet;    
 }

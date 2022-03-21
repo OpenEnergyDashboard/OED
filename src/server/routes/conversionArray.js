@@ -15,16 +15,20 @@ const router = express.Router();
  * Route for getting the conversion array.
  */
 router.get('/', async (req, res) => {
-    const conn = getConnection();
-    try {
-        const conversionGraph = await createConversionGraph(conn);
-        await handleSuffixUnits(conversionGraph, conn);
-        const cik = await createCikArray(conversionGraph, conn);
-        const pik = createPikArray(cik);
-        res.json(pik);
-    } catch (err) {
-        log.error(`Error while performing GET conversion array query: ${err}`, err);
-    }
+	const conn = getConnection();
+	try {
+		// Creates the conversion graph.
+		const conversionGraph = await createConversionGraph(conn);
+		// Creates new suffix units and conversions.
+		await handleSuffixUnits(conversionGraph, conn);
+		// Creates the Cik array which contains the conversions' information between meters and units.
+		const cik = await createCikArray(conversionGraph, conn);
+		// Creates the Pik array which is true if there is a conversion in Cik.
+		const pik = createPikArray(cik);
+		res.json(pik);
+	} catch (err) {
+		log.error(`Error while performing GET conversion array query: ${err}`, err);
+	}
 });
 
 module.exports = router;

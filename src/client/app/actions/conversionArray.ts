@@ -9,23 +9,23 @@ import * as t from '../types/redux/conversionArray';
 import { ConversionArrayRequestItem } from '../types/redux/conversionArray';
 
 export function requestConversionArray(): t.RequestConversionArrayAction {
-    return { type: ActionType.RequestConversionArray };
+	return { type: ActionType.RequestConversionArray };
 }
 
 export function receiveConversionArray(data: ConversionArrayRequestItem): t.ReceiveConversionArrayAction {
-    return { type: ActionType.ReceiveConversionArray, data };
+	return { type: ActionType.ReceiveConversionArray, data };
 }
 
 export function fetchConversionArray(): Thunk {
-    return async (dispatch: Dispatch) => {
-        dispatch(requestConversionArray());
-        const conversionArray = await conversionArrayApi.getConversionArray();
-        dispatch(receiveConversionArray(conversionArray));
-    }
+	return async (dispatch: Dispatch) => {
+		dispatch(requestConversionArray());
+		const conversionArray = await conversionArrayApi.getConversionArray();
+		dispatch(receiveConversionArray(conversionArray));
+	}
 }
 
 function shouldFetchConversionArray(state: State) {
-    return !state.conversionArray.isFetching;
+	return !state.conversionArray.isFetching;
 }
 
 export function fetchConversionArrayIfNeeded(): Thunk {
