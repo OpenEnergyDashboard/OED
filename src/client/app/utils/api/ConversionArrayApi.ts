@@ -5,7 +5,6 @@
  */
 
 import ApiBackend from './ApiBackend';
-import { ConversionArrayRequestItem } from 'types/redux/conversionArray';
 
 export default class ConversionArrayApi {
 	private readonly backend: ApiBackend;
@@ -14,7 +13,7 @@ export default class ConversionArrayApi {
 		this.backend = backend;
 	}
 
-	public async getConversionArray(): Promise<ConversionArrayRequestItem> {
-		return await this.backend.doGetRequest<ConversionArrayRequestItem>('/api/conversion-array');
+	public async getConversionArray(): Promise<boolean[][]> {
+		return await this.backend.doGetRequest<boolean[][]>('/api/conversion-array');
 	}
 }

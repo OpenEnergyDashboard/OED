@@ -6,13 +6,12 @@ import { State } from '../types/redux/state';
 import { ActionType, Thunk, Dispatch, GetState } from '../types/redux/actions';
 import { conversionArrayApi } from '../utils/api';
 import * as t from '../types/redux/conversionArray';
-import { ConversionArrayRequestItem } from '../types/redux/conversionArray';
 
 export function requestConversionArray(): t.RequestConversionArrayAction {
 	return { type: ActionType.RequestConversionArray };
 }
 
-export function receiveConversionArray(data: ConversionArrayRequestItem): t.ReceiveConversionArrayAction {
+export function receiveConversionArray(data: boolean[][]): t.ReceiveConversionArrayAction {
 	return { type: ActionType.ReceiveConversionArray, data };
 }
 
@@ -24,7 +23,7 @@ export function fetchConversionArray(): Thunk {
 	}
 }
 
-function shouldFetchConversionArray(state: State) {
+function shouldFetchConversionArray(state: State): boolean {
 	return !state.conversionArray.isFetching;
 }
 

@@ -114,7 +114,9 @@ export enum ActionType {
 	IncrementCounter = 'INCREMENT_COUNTER',
 
 	RequestConversionArray = 'REQUEST_CONVERSION_ARRAY',
-	ReceiveConversionArray = 'RECEIVE_CONVERSION_ARRAY'
+	ReceiveConversionArray = 'RECEIVE_CONVERSION_ARRAY',
+	RequestUnitsDetails = 'REQUEST_UNITS_DETAILS',
+	ReceiveUnitsDetails = 'RECEIVE_UNITS_DETAILS'
 }
 
 /**
