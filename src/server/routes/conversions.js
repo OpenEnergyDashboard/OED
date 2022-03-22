@@ -73,7 +73,7 @@ router.get(
  */
 router.post(
 	"/create",
-	adminAuthMiddleware("create a conversion", async (req, res) => {
+	adminAuthMiddleware("create a conversion"), async (req, res) => {
 		const validParams = {
 			type: "object",
 			require: [
@@ -138,7 +138,7 @@ router.post(
 					.json({ message: "Internal Server Error", error: error });
 			}
 		}
-	})
+	}
 );
 
 /**
