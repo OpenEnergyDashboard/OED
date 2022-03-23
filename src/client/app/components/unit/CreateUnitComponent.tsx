@@ -66,6 +66,7 @@ export default class CreateUnitComponent extends React.Component<CreateUnitFormP
                             {/* need name formatted message */}
                         <label>Unit Represent</label><br />
                         <Input type='select' onChange={({target}) => this.props.handleUnitRepresentChange(target.value)} required value={this.props.unitRepresent}>
+                            <option >Select a unit representation</option>
                             <option value='quantity' key='quantity'>Quantity</option>
                             <option value='flow' key='flow'>Flow</option>
                             <option value='raw' key='raw'>raw</option>
@@ -81,6 +82,7 @@ export default class CreateUnitComponent extends React.Component<CreateUnitFormP
                             {/* need name formatted message */}
                         <label>Type of Unit</label><br />
                         <Input type='select' onChange={({target}) => this.props.handleTypeOfUnitChange(target.value)} required value={this.props.typeOfUnit}>
+                            <option >Select a unit</option>
                             <option value='unit' key='unit'>Unit</option>
                             <option value='meter' key='meter'>Meter</option>
                             <option value='suffix' key='suffix'>Suffix</option>
@@ -94,6 +96,7 @@ export default class CreateUnitComponent extends React.Component<CreateUnitFormP
                         <div style={formInputStyle}>
                         <label>Displayable Type</label><br />
                         <Input type='select' onChange={({target}) => this.props.handleDisplayableChange(target.value)} required value={this.props.displayable}>
+                            <option >Select a type</option>
                             <option value='none' key='none'>None</option>
                             <option value='all' key='all'>All</option>
                             <option value='admin' key='admin'>Admin</option>
@@ -108,7 +111,7 @@ export default class CreateUnitComponent extends React.Component<CreateUnitFormP
                         <div style={formInputStyle}>
                                 {/* need name formatted message */}
                             <label>Note (Optional)</label><br />
-                            <Input type='textarea' onChange={({target}) => this.props.handleNoteChange(target.value)} required value={this.props.note} />
+                            <Input type='textarea' onChange={({target}) => this.props.handleNoteChange(target.value)} value={this.props.note} />
                         </div>
                         <div>
                             {/* need name formatted message */}
