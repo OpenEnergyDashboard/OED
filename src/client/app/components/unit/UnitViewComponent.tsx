@@ -72,6 +72,42 @@ class UnitViewComponent extends React.Component<UnitViewPropsWithIntl, UnitViewS
             </tr>
         );
     }
+    private handleUnitRepresentChange(event: React.ChangeEvent<HTMLSelectElement>){
+        this.setState({unitRepresentInput: event.target.value});
+    }
+
+    private toggleUnitRepresentInput(){
+        if(this.state.unitRepresentFocus){
+            const unitRepresent = this.state.unitRepresentInput;
+
+            const editedUnit = {
+                ...this.props.unit,
+                unitRepresent
+            };
+            // this.props.editUnitDetails(editedUnit);
+        }
+        this.setState({unitRepresentFocus: !this.state.unitRepresentFocus});
+    }
+
+
+    private toggleSecInRateInput(){
+        if(this.state.secInRateFocus){
+            const secInRate = this.state.secInRateInput;
+
+            const editedUnit = {
+                ...this.props.unit,
+                secInRate
+            };
+            //this.props.editUnitDetails(editedUnit) //Needs editUnitDetails function used to dispatch the action to edit unit details (refer to line #24 on MeterViewComponent.tsx)
+        }
+        this.setState({secInRateFocus: !this.state.secInRateFocus});
+    }
+
+    private handleSecInRateChange(event: React.ChangeEvent<HTMLInputElement>){
+        this.setState({ secInRateInput: parseInt(event.target.value)}); //converts string to number
+    }
+
+
 
     private removeUnsavedChangesFunction(callback: () => void) {
 		// This function is called to reset all the inputs to the initial state
@@ -125,13 +161,6 @@ class UnitViewComponent extends React.Component<UnitViewPropsWithIntl, UnitViewS
 		this.setState({ identifierInput: event.target.value });
 	}
 
-    private handleUnitRepresentChange(event: React.ChangeEvent<HTMLSelectElement>){
-        this.setState({ unitRepresentInput: event.target.value });
-    }
-
-    private handleSecInRateChange(event: React.ChangeEvent<HTMLTextAreaElement>){
-        this.setState({ secInRateInput: parseInt(event.target.value)}); //converts string to number
-    }
 
     private toggleIdentifierInput() {
 		if (this.state.identifierFocus) {
@@ -146,31 +175,7 @@ class UnitViewComponent extends React.Component<UnitViewPropsWithIntl, UnitViewS
 		this.setState({ identifierFocus: !this.state.identifierFocus });
 	}
 
-    private toggleUnitRepresentInput(){
-        if(this.state.unitRepresentFocus){
-            const unitRepresent = this.state.unitRepresentInput;
-
-            const editedUnit = {
-                ...this.props.unit,
-                unitRepresent
-            };
-            // this.props.editUnitDetails(editedUnit);
-        }
-        this.setState({ unitRepresentFocus: !this.state.unitRepresentFocus });
-    }
-
-    private toggleSecInRateInput(){
-        if(this.state.secInRateFocus){
-            const secInRate = this.state.secInRateInput;
-
-            const editedUnit = {
-                ...this.props.unit,
-                secInRate
-            };
-            // this.props.editUnitDetails(editedUnit) //Needs editUnitDetails function used to dispatch the action to edit unit details (refer to line #24 on MeterViewComponent.tsx)
-        }
-        this.setState({ secInRateFocus: !this.state.secInRateFocus });
-    }
+    
 
     private unitIdentifierInput(){
 		let formattedIdentifier;
@@ -214,6 +219,7 @@ class UnitViewComponent extends React.Component<UnitViewPropsWithIntl, UnitViewS
 			);
 		}
 	}
+
 
 
     private toggleNoteInput() {
@@ -294,6 +300,7 @@ class UnitViewComponent extends React.Component<UnitViewPropsWithIntl, UnitViewS
             formattedUnitRepresent = <div>{this.state.unitRepresentInput}</div>
             buttonMessageId = 'edit';
         }
+
         let toggleButton;
         const loggedInAsAdmin = this.props.loggedInAsAdmin;
         if(loggedInAsAdmin) { 
@@ -325,7 +332,8 @@ class UnitViewComponent extends React.Component<UnitViewPropsWithIntl, UnitViewS
         let formattedSecInRate;
         let buttonMessageId;
         if(this.state.secInRateFocus){
-            formattedSecInRate = <textarea
+            formattedSecInRate = <input
+                type = 'number'
                 id = {'secInRate'}
                 autoFocus
                 value={this.state.secInRateInput}
@@ -363,6 +371,5 @@ class UnitViewComponent extends React.Component<UnitViewPropsWithIntl, UnitViewS
             );
         }
     }
-
 }
 export default injectIntl(UnitViewComponent);
