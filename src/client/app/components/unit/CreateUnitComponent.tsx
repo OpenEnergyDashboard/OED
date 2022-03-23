@@ -10,7 +10,7 @@ interface CreateUnitFormProps{
     unitRepresent: string,
     secInRate: number,
     typeOfUnit: string,
-    unitIndex: null,
+    unitIndex?: number,
     suffix: string,
     displayable: string,
     preferredDisplay: boolean,
@@ -26,6 +26,7 @@ interface CreateUnitFormProps{
     handlePreferredDisplayChange: (val : boolean) => void;
     handleNoteChange: (val : string) => void;
 }
+
 
 export default class CreateUnitComponent extends React.Component<CreateUnitFormProps, {}>{
     constructor(props: any){
@@ -64,7 +65,8 @@ export default class CreateUnitComponent extends React.Component<CreateUnitFormP
                         <div style={formInputStyle}>
                             {/* need name formatted message */}
                         <label>Unit Represent</label><br />
-                        <Input type='select' onChange={({target}) => this.props.handleUnitRepresentChange(target.value)} required value={this.props.name}>
+                        <Input type='select' onChange={({target}) => this.props.handleUnitRepresentChange(target.value)} required value={this.props.unitRepresent}>
+                            <option >Select a unit representation</option>
                             <option value='quantity' key='quantity'>Quantity</option>
                             <option value='flow' key='flow'>Flow</option>
                             <option value='raw' key='raw'>raw</option>
@@ -79,7 +81,8 @@ export default class CreateUnitComponent extends React.Component<CreateUnitFormP
                         <div style={formInputStyle}>
                             {/* need name formatted message */}
                         <label>Type of Unit</label><br />
-                        <Input type='select' onChange={({target}) => this.props.handleTypeOfUnitChange(target.value)} required value={this.props.name}>
+                        <Input type='select' onChange={({target}) => this.props.handleTypeOfUnitChange(target.value)} required value={this.props.typeOfUnit}>
+                            <option >Select a unit</option>
                             <option value='unit' key='unit'>Unit</option>
                             <option value='meter' key='meter'>Meter</option>
                             <option value='suffix' key='suffix'>Suffix</option>
@@ -93,21 +96,27 @@ export default class CreateUnitComponent extends React.Component<CreateUnitFormP
                         <div style={formInputStyle}>
                         <label>Displayable Type</label><br />
                         <Input type='select' onChange={({target}) => this.props.handleDisplayableChange(target.value)} required value={this.props.displayable}>
+                            <option >Select a type</option>
                             <option value='none' key='none'>None</option>
                             <option value='all' key='all'>All</option>
                             <option value='admin' key='admin'>Admin</option>
-                            </Input>
+                        </Input>
+                        </div>
+                            
+                            {/* use JSON.parse to convert from target.value string to boolean; not sure about overhead from using JSON.parse shoudl check with Steve */}
+                            <Input type='checkbox' onChange={({target}) => this.props.handlePreferredDisplayChange(JSON.parse(target.value))} value={this.props.preferredDisplay.toString()} />
+                                {/* need identfier formatted message */}
+                            <label>Preferred Display</label>
+                            
+                        <div style={formInputStyle}>
+                                {/* need name formatted message */}
+                            <label>Note (Optional)</label><br />
+                            <Input type='textarea' onChange={({target}) => this.props.handleNoteChange(target.value)} value={this.props.note} />
                         </div>
                         <div>
-                            {/* need identfier formatted message */}
-                        <label>Preferred Display</label>
-                        <Input type='checkbox' onChange={({target}) => this.props.handlePreferredDisplayChange(target.value)} required value={this.props.preferredDisplay.toString()} />
-                        </div>
-                        <div style={formInputStyle}>
                             {/* need name formatted message */}
-                        <label>Note (Optional)</label><br />
-                        <Input type='textarea' onChange={({target}) => this.props.handleNoteChange(target.value)} required value={this.props.note} />
-                        </div>
+						    <Button> Submit new unit </Button>
+					    </div>
                     </form>
                 </div>
             </div>

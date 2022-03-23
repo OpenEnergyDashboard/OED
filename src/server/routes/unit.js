@@ -7,9 +7,15 @@ const adminAuthenticator = require('./authenticator').adminAuthMiddleware;
 
 
 const router = express.Router();
-//help
+/**
+ * Defines the format in which we want to send meters and controls what information we send to the client, if logged in and an Admin or not.
+ * @param meter
+ * @param loggedInAsAdmin
+ * @returns {{id, name}}
+ */
 
 function formatUnitForResponse(unit){
+	//some of these values should be NULL
     const formattedUnit = {
         id:  unit.id,
 		name:  unit.name,
@@ -32,32 +38,6 @@ router.get('/', async(req,res) => {
 		let query;
         query = Unit.getAll;
 		const rows = await query(conn);
-		
-		// res.json([{
-		// 	id:  1,
-		// 	name:  "unit.name",
-		// 	identifier:  "unit.identifier",
-		// 	unitRepresent:  "unit.unitRepresent",
-		// 	secInRate:  2,
-		// 	typeOfUnit:  "unit.typeOfUnit",
-		// 	unitIndex:  3,
-		// 	suffix:  "unit.suffix",
-		// 	displayable: "true",
-		// 	preferredDisplay: false,
-		// 	note:  "unit.note"
-		// }, {
-		// 	id:  4,
-		// 	name:  "unit.name",
-		// 	identifier:  "unit.identifier",
-		// 	unitRepresent:  "unit.unitRepresent",
-		// 	secInRate:  5,
-		// 	typeOfUnit:  "unit.typeOfUnit",
-		// 	unitIndex:  6,
-		// 	suffix:  "unit.suffix",
-		// 	displayable: "true",
-		// 	preferredDisplay: false,
-		// 	note:  "unit.note"
-		// }]);
 		res.json(rows.map(row => formatUnitForResponse(row)));
     }catch(err){
         log.error(`Error while performing GET all units query: ${err}`, err);
@@ -111,9 +91,11 @@ router.post('/addUnit', adminAuthenticator('create unit'), async (req,res) => {
 			}
 		}
 	};
+	console.log(req.body)
+	//Could change the function here 
 	const validationResult = validate(req.body, validUnit);
 	if(!validationResult.valid){
-		log.error(`Invalid input for mapAPI. ${validationResult.error}`);
+		log.error(`Invalid input for unitsAPI. ${validationResult.error}`);
 		res.sendStatus(400);
 	}else{
 		const conn = getConnection();
