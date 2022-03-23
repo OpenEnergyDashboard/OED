@@ -1,6 +1,6 @@
 import * as React from 'react';
 import { Table, Button } from 'reactstrap';
-import { UnitData } from '../../types/redux/unit'
+import { UnitData } from '../../types/redux/unit';
 import { FormattedMessage } from 'react-intl';
 import {Link} from 'react-router-dom';
 import HeaderContainer from '../../containers/HeaderContainer';
