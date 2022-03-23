@@ -247,6 +247,13 @@ const localeData = {
 		"unit.note": "Note",
 		"unit.remove": "Remove",
 		"units.successfully.create.unit":"Successfully created a unit.",
+		"units.dropdown_displayable": "Select a type",
+		"units.dropdown_displayable_option_none": "None",
+		"units.dropdown_displayable_option_all": "All",
+		"units.dropdown_displayable_option_admin": "admin",
+		"unit.note_optional": "Note (Optional)",
+		"unit.submit_new_unit": "Submit New Unit",
+		"unit.create_new_unit": "Create New Unit",
 		
 		"units.failed.to.create.unit": "Failed to create a unit.",
 		"unused.groups": "Unused Groups",
