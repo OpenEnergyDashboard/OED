@@ -52,6 +52,7 @@ class UnitViewComponent extends React.Component<UnitViewPropsWithIntl, UnitViewS
         this.toggleUnitRepresentInput = this.toggleUnitRepresentInput.bind(this);
         this.toggleNoteInput = this.toggleNoteInput.bind(this);
         this.handleNoteChange = this.handleNoteChange.bind(this);
+        this.checkPreferredDisplay = this.checkPreferredDisplay.bind(this);
     }
     public render() {
         const loggedInAsAdmin = this.props.loggedInAsAdmin;
@@ -67,11 +68,24 @@ class UnitViewComponent extends React.Component<UnitViewPropsWithIntl, UnitViewS
                 {loggedInAsAdmin && <td> {this.props.unit.typeOfUnit}</td>}
                 {loggedInAsAdmin && <td> {this.props.unit.suffix}</td>}
                 {loggedInAsAdmin && <td> {this.props.unit.displayable}</td>}
-                {loggedInAsAdmin && <td> {this.props.unit.preferredDisplay}</td>}
+                {loggedInAsAdmin && <td> {this.checkPreferredDisplay()}</td>}
                 {loggedInAsAdmin && <td> {this.props.unit.note}</td>}
             </tr>
         );
     }
+
+    private checkPreferredDisplay(){
+        if(this.props.unit.preferredDisplay){
+            return(
+                "true"
+            )
+        }else{
+            return(
+                "false"
+            )
+        }
+    }
+
     private handleUnitRepresentChange(event: React.ChangeEvent<HTMLSelectElement>){
         this.setState({unitRepresentInput: event.target.value});
     }

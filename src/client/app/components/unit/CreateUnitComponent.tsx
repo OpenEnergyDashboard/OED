@@ -97,16 +97,16 @@ export default class CreateUnitComponent extends React.Component<CreateUnitFormP
                         <label><FormattedMessage id="unit.displayable"/></label><br />
                         <Input type='select' onChange={({target}) => this.props.handleDisplayableChange(target.value)} required value={this.props.displayable}>
                             <option ><FormattedMessage id="unit.dropdown_displayable"/></option>
-                            <option value='none' key='none'><FormattedMessage id="unit.dropdown_displayable_none"/></option>
-                            <option value='all' key='all'><FormattedMessage id="unit.dropdown_displayable_all"/></option>
-                            <option value='admin' key='admin'><FormattedMessage id="unit.dropdown_displayable_admin"/></option>
+                            <option value='none' key='none'>None</option>
+                            <option value='all' key='all'>All</option>
+                            <option value='admin' key='admin'>Admin</option>
                         </Input>
                         </div>
                             
                             {/* use JSON.parse to convert from target.value string to boolean; not sure about overhead from using JSON.parse shoudl check with Steve */}
                             <Input type='checkbox' onChange={({target}) => this.props.handlePreferredDisplayChange(JSON.parse(target.value))} value={this.props.preferredDisplay.toString()} />
                                 {/* need identfier formatted message */}
-                            <label><FormattedMessage id="unit.preferred_displayable"/></label>
+                            <label><FormattedMessage id="unit.preferred_display"/></label>
                             
                         <div style={formInputStyle}>
                                 {/* need name formatted message */}

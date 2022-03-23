@@ -115,7 +115,6 @@ router.post('/addUnit', adminAuthenticator('create unit'), async (req,res) => {
 		const conn = getConnection();
 		try{
 			await conn.tx(async t => {
-				const note = (req.body.note) ? '' : req.body.note;
 				const newUnit = new Unit(
 					undefined,
 					req.body.name,
@@ -127,7 +126,7 @@ router.post('/addUnit', adminAuthenticator('create unit'), async (req,res) => {
 					req.body.suffix,
 					req.body.displayable,
 					req.body.preferredDisplay,
-					note
+					req.body.note
 				);
 				await newUnit.insert(t);
 			});
