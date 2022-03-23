@@ -10,10 +10,19 @@ const optionalAuthenticator = require('./authenticator').optionalAuthMiddleware;
 
 
 const router = express.Router();
+
+/**
+ * Defines the format in which we want to send meters and controls what information we send to the client, if logged in and an Admin or not.
+ * @param meter
+ * @param loggedInAsAdmin
+ * @returns {{id, name}}
+ */
+=======
 router.use(optionalAuthenticator)
 //help
 
 function formatUnitForResponse(unit){
+	//some of these values should be NULL
     const formattedUnit = {
         id:  unit.id,
 		name:  unit.name,
@@ -35,6 +44,7 @@ router.get('/', async(req,res) => {
         const conn = getConnection();
 		let query;
         query = Unit.getAll;
+
 		const token = req.headers.token || req.body.token || req.query.token;
 		const loggedInAsAdmin = req.hasValidAuthToken && (await isTokenAuthorized(token, User.role.ADMIN));
 		if(loggedInAsAdmin){
@@ -96,6 +106,8 @@ router.post('/addUnit', adminAuthenticator('create unit'), async (req,res) => {
 			}
 		}
 	};
+
+	//Could change the function here 
 	const validationResult = validate(req.body, validUnit);
 	if(!validationResult.valid){
 		log.error(`Invalid input for mapAPI. ${validationResult.error}`);

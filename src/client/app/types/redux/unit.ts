@@ -1,15 +1,6 @@
 import { ActionType } from "./actions";
 import { NamedIDItem } from '../items';
 
-export interface ReceiveUnitsDetailsAction{
-    type: ActionType.ReceiveUnitsDetails;
-    data: NamedIDItem[];
-}
-
-export interface RequestUnitsDetailsAction{
-    type: ActionType.RequestUnitsDetails;
-}
-
 /**
 	 * @param {*} id This unit's ID.
 	 * @param {*} name This unit's name used internally and by the admin.
@@ -23,6 +14,43 @@ export interface RequestUnitsDetailsAction{
 	 * @param {*} preferredDisplay True if this unit is always displayed. If not, the user needs to ask to see (for future enhancement).
 	 * @param {*} note Note about this unit.
 	 */
+
+export interface RequestUnitsDetailsAction{
+    type: ActionType.RequestUnitsDetails;
+}
+
+export interface ReceiveUnitsDetailsAction{
+    type: ActionType.ReceiveUnitsDetails;
+    data: NamedIDItem[];
+}
+
+export interface ChangeDisplayedUnitsAction {
+	type: ActionType.ChangeDisplayedUnits;
+	selectedUnits: number[];
+}
+
+export interface EditUnitDetailsAction {
+	type: ActionType.EditUnitDetails;
+	unit: UnitData;
+}
+
+export interface SubmitEditedUnitAction {
+	type: ActionType.SubmitEditedUnit;
+	unit: number;
+}
+
+export interface ConfirmEditedUnitAction {
+	type: ActionType.ConfirmEditedUnit;
+	unit: number;
+}
+
+export type UnitsAction = 
+    | RequestUnitsDetailsAction
+    | ReceiveUnitsDetailsAction
+    | ChangeDisplayedUnitsAction
+    | EditUnitDetailsAction
+    | SubmitEditedUnitAction
+    | ConfirmEditedUnitAction; 
 
 export interface UnitData{
     id: number;
@@ -49,6 +77,13 @@ interface UnitDataByID{
     [unitID: number]: UnitData;
 }
 
+export interface UnitEditData {
+	id: number;
+	identifier: string;
+    unitRepresent: string; 
+    secInRate: number; 
+}
+
 export interface UnitState {
     isLoading: boolean;
     byUnitID: UnitDataByID;
@@ -56,7 +91,3 @@ export interface UnitState {
     editedUnits: UnitDataByID;
     submitting: number[];
 }
-
-export type UnitsAction = 
-    | RequestUnitsDetailsAction
-    | ReceiveUnitsDetailsAction
