@@ -4,16 +4,13 @@
 
 import * as React from 'react';
 import Select from 'react-select';
-import 'react-select/dist/react-select.css';
 import { SelectOption } from '../types/items';
-import '../styles/react-select-css.css';
 
 interface MultiSelectProps<I> {
 	placeholder: string;
 	/* tslint:disable:array-type */
 	options: Array<SelectOption & I>;
 	selectedOptions: Array<SelectOption & I> | undefined;
-	style?: React.CSSProperties;
 	singleSelect?: boolean;
 	onValuesChange(values: Array<SelectOption & I>): void;
 	/* tslint:enable:array-type */
@@ -33,26 +30,22 @@ export default class MultiSelectComponent<I> extends React.Component<MultiSelect
 		};
 	}
 
-	static getDerivedStateFromProps(cProps: MultiSelectProps<any>, cState: MultiSelectState) {
-		if (cProps.selectedOptions !== cState.selectedOptions) {
-			return {
-				selectedOptions: cProps.selectedOptions
-			};
+	public componentDidUpdate(prevProps: MultiSelectProps<any>) {
+		if (this.props.selectedOptions !== prevProps.selectedOptions) {
+			this.setState({ selectedOptions: this.props.selectedOptions });
 		}
-		return null;
 	}
 
 	public render() {
 		return (
 			<Select
-				multi
+				isMulti
 				options={this.props.options}
 				value={this.state.selectedOptions}
 				placeholder={this.props.placeholder}
-				style={this.props.style}
 				onChange={this.onValuesChangeInternal}
-				clearable={false}
-				closeOnSelect={false}
+				isClearable={false}
+				closeMenuOnSelect={false}
 			/>
 		);
 	}
