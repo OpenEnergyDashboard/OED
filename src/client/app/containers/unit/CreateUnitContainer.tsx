@@ -7,6 +7,7 @@ import { showSuccessNotification, showErrorNotification } from '../../utils/noti
 import { unitsApi } from '../../utils/api';
 import { browserHistory } from '../../utils/history';
 import { UnitData } from 'types/redux/unit';
+import translate from '../../utils/translate';
 
 export default class CreateUnitContainter extends React.Component<{}, {}> {
     constructor(props: {}){
@@ -88,11 +89,11 @@ export default class CreateUnitContainter extends React.Component<{}, {}> {
 
             });
             // need to add message into app/translations/data.js
-            // showSuccessNotification(translate('users.successfully.create.user'))
+            showSuccessNotification(translate('units.successfully.create.unit'))
             browserHistory.push('/units');
         } catch (error) {
             // need to add message into app/translations/data.js
-            // showErrorNotification(translate('users.failed.to.create.user'));
+            showErrorNotification(translate('units.failed.to.create.unit'));
         }
     };
     public render() {

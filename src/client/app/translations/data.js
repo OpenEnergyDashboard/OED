@@ -246,6 +246,9 @@ const localeData = {
 		"unit.preferred_display": "Preferred Display",
 		"unit.note": "Note",
 		"unit.remove": "Remove",
+		"units.successfully.create.unit":"Successfully created a unit.",
+		
+		"units.failed.to.create.unit": "Failed to create a unit.",
 		"unused.groups": "Unused Groups",
 		"unused.meters": "Unused Meters",
 		"unsaved.warning": "You have unsaved change(s). Are you sure you want to leave?",
