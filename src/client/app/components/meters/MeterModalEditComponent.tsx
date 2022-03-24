@@ -18,7 +18,11 @@ const [showModal, setShow] = useState(false);
         <Modal.Header closeButton>
           <Modal.Title>Meter Information</Modal.Title>
         </Modal.Header>
-        <Modal.Body>Meter Information will be displayed here. All the data is here</Modal.Body>
+
+        <Modal.Body>
+          
+        </Modal.Body>
+
         <Modal.Footer>
           <Button variant="secondary" onClick={handleClose}>
             Close
