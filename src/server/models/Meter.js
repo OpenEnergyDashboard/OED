@@ -168,7 +168,7 @@ class Meter {
 
 	/**
 	 * For the given meter id, gets the associated unitId. 
-	 * Then, returns the unitIndex (the row/column id in the Cij/Pij table) of that unitId.
+	 * Then, returns the unitIndex (the row/column id in the Cik/Pik table) of that unitId.
 	 * @param {*} meterId The meter id.
 	 * @param {*} conn The connection to use.
 	 * @return {Promise.<Int>}
