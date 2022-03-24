@@ -183,7 +183,6 @@ const [showModal, setShow] = useState(false);
           <div>
             End Date/Time:<br/> <input type="text" value="Filler Information"/>
           </div>
-          <br/>
           <div>
             ID: <input type="text" readOnly value="00"/>
           </div>
