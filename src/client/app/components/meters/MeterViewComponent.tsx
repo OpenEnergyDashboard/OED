@@ -11,6 +11,7 @@ import TimeZoneSelect from '../TimeZoneSelect';
 import { updateUnsavedChanges } from '../../actions/unsavedWarning';
 import { fetchMetersDetails, submitEditedMeters, confirmEditedMeters } from '../../actions/meters';
 import store from '../../index';
+import ModalCard from './MeterModalEditComponent';
 
 interface MeterViewProps {
 	// The ID of the meter to be displayed
@@ -64,11 +65,13 @@ class MeterViewComponent extends React.Component<MeterViewPropsWithIntl, MeterVi
 				{loggedInAsAdmin && <td> {this.formatGPSInput()} </td>}
 				<td> {this.formatEnabled()} </td>
 				<td> {this.formatDisplayable()} </td>
+				<td> <ModalCard/></td>
 				{loggedInAsAdmin && <td> <TimeZoneSelect current={this.props.meter.timeZone || ''} handleClick={this.changeTimeZone} /> </td>}
 			</tr>
+		
 		);
 	}
-
+	
 	private removeUnsavedChangesFunction(callback: () => void) {
 		// This function is called to reset all the inputs to the initial state
 		store.dispatch<any>(confirmEditedMeters()).then(() => {

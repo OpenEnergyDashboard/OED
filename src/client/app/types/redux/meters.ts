@@ -64,10 +64,6 @@ export interface MeterMetadataByID {
 	[meterID: number]: MeterMetadata;
 }
 
-export interface MeterMetadataByIdentifier {
-	[meterIdentifier: string]: MeterMetadata;
-}
-
 export interface MeterEditData {
 	id: number;
 	enabled: boolean;
@@ -79,7 +75,6 @@ export interface MeterEditData {
 export interface MetersState {
 	isFetching: boolean;
 	byMeterID: MeterMetadataByID;
-	byMeterIdentifier: MeterMetadataByIdentifier;
 	selectedMeters: number[];
 	// Holds all meters that have been edited locally
 	editedMeters: MeterMetadataByID;
