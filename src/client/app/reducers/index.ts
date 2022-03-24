@@ -15,7 +15,6 @@ import admin from './admin';
 import version from './version';
 import currentUser from './currentUser';
 import unsavedWarning from './unsavedWarning';
-import conversionArray from './conversionArray';
 import units from './units'
 
 export default combineReducers({
@@ -33,6 +32,5 @@ export default combineReducers({
 	version,
 	currentUser,
 	unsavedWarning,
-	conversionArray,
 	units
 });
