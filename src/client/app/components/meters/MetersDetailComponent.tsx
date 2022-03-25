@@ -69,7 +69,11 @@ export default class MetersDetailComponent extends React.Component<MetersDetailP
 							<TooltipMarkerComponent page='meters' helpTextId={tooltipStyle.tooltipMeterView} />
 						</div>
 					</h2>
-					<div style={tableStyle}>
+					<div className="card-container">
+					{ this.props.meters.map(meterID =>
+						( <MeterViewContainer key={meterID} id={meterID} /> ))}
+					</div>
+					{/* <div style={tableStyle}>
 					<Table striped bordered hover>
 					<thead>
 						<tr>
@@ -89,15 +93,15 @@ export default class MetersDetailComponent extends React.Component<MetersDetailP
 						( <MeterViewContainer key={meterID} id={meterID} /> ))}
 					</tbody>
 					</Table>
-					</div>
-					{ loggedInAsAdmin && <Button
+					</div> */}
+					{/* { loggedInAsAdmin && <Button
 						color='success'
 						style={buttonContainerStyle}
 						disabled={!this.props.unsavedChanges}
 						onClick={this.handleSubmitClicked}
 					>
 						<FormattedMessage id='save.meter.edits' />
-					</Button> }
+					</Button> } */}
 				</div>
 				<FooterContainer />
 			</div>

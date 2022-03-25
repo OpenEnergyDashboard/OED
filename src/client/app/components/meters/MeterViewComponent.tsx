@@ -12,6 +12,7 @@ import { updateUnsavedChanges } from '../../actions/unsavedWarning';
 import { fetchMetersDetails, submitEditedMeters, confirmEditedMeters } from '../../actions/meters';
 import store from '../../index';
 import ModalCard from './MeterModalEditComponent';
+import '../../styles/meter-card-page.css'
 
 interface MeterViewProps {
 	// The ID of the meter to be displayed
@@ -56,18 +57,48 @@ class MeterViewComponent extends React.Component<MeterViewPropsWithIntl, MeterVi
 	public render() {
 		const loggedInAsAdmin = this.props.loggedInAsAdmin;
 		return (
-			<tr>
-				{loggedInAsAdmin && <td> {this.props.meter.id} {this.formatStatus()} </td>}
-				{loggedInAsAdmin && <td> {this.props.meter.name} </td>}
-				<td> {this.formatIdentifierInput()} </td>
-				{loggedInAsAdmin && <td> {this.props.meter.meterType} </td>}
-				{loggedInAsAdmin && <td> {this.props.meter.ipAddress} </td>}
-				{loggedInAsAdmin && <td> {this.formatGPSInput()} </td>}
-				<td> {this.formatEnabled()} </td>
-				<td> {this.formatDisplayable()} </td>
-				{loggedInAsAdmin && <td> <TimeZoneSelect current={this.props.meter.timeZone || ''} handleClick={this.changeTimeZone} /> </td>}
-				{loggedInAsAdmin && <td> <ModalCard/></td>}
-			</tr>
+
+			<div className="card">
+				<div className="identifier-container">
+					{this.formatIdentifierInput()}
+				</div>
+				<div className="unit-container">
+					Unit
+					<span className="custom-select">
+						select
+					</span>
+				</div>
+				<div className="default-graphic-unit-container">
+					Default Unit Graphic
+					<span className="custom-select">
+						select
+					</span>
+				</div>
+				<div className="toggle-container">
+					<div className="on-off-switch">
+						<span className="on-off-switch-span-on">Enabled</span>
+					</div>
+					<div className="on-off-switch">
+						<span className="on-off-switch-span-on">Displayble</span>
+					</div>
+				</div>
+				<div className="edit-btn">
+					<ModalCard/>
+				</div>
+			</div>
+
+			// <tr>
+			// 	{loggedInAsAdmin && <td> {this.props.meter.id} {this.formatStatus()} </td>}
+			// 	{loggedInAsAdmin && <td> {this.props.meter.name} </td>}
+			// 	<td> {this.formatIdentifierInput()} </td>
+			// 	{loggedInAsAdmin && <td> {this.props.meter.meterType} </td>}
+			// 	{loggedInAsAdmin && <td> {this.props.meter.ipAddress} </td>}
+			// 	{loggedInAsAdmin && <td> {this.formatGPSInput()} </td>}
+			// 	<td> {this.formatEnabled()} </td>
+			// 	<td> {this.formatDisplayable()} </td>
+			// 	{loggedInAsAdmin && <td> <TimeZoneSelect current={this.props.meter.timeZone || ''} handleClick={this.changeTimeZone} /> </td>}
+			// 	{loggedInAsAdmin && <td> <ModalCard/></td>}
+			// </tr>
 		
 		);
 	}
