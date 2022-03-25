@@ -25,7 +25,7 @@ interface LoginProps {
 type LoginPropsWithIntl = LoginProps & WrappedComponentProps;
 
 class LoginComponent extends React.Component<LoginPropsWithIntl, LoginState> {
-	private inputEmail: HTMLInputElement | null;
+	private inputEmail: HTMLInputElement | HTMLTextAreaElement | null;
 
 	constructor(props: LoginPropsWithIntl) {
 		super(props);
