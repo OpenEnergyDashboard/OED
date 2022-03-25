@@ -79,7 +79,7 @@ class MeterViewComponent extends React.Component<MeterViewPropsWithIntl, MeterVi
 						<span className="on-off-switch-span-on">Enabled</span>
 					</div>
 					<div className="on-off-switch">
-						<span className="on-off-switch-span-on">Displayble</span>
+						<span className="on-off-switch-span-off">Displayble</span>
 					</div>
 				</div>
 				<div className="edit-btn">
