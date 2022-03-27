@@ -63,22 +63,22 @@ export function shouldFetchGroupBarReadings(state: State, groupID: number, timeI
 }
 
 export function requestMeterBarReadings(meterIDs: number[], timeInterval: TimeInterval, barDuration: moment.Duration):
-		t.RequestMeterBarReadingsAction {
+t.RequestMeterBarReadingsAction {
 	return { type: ActionType.RequestMeterBarReadings, meterIDs, timeInterval, barDuration };
 }
 
 export function receiveMeterBarReadings(meterIDs: number[], timeInterval: TimeInterval, barDuration: moment.Duration,
-		readings: CompressedBarReadings): t.ReceiveMeterBarReadingsAction {
+	readings: CompressedBarReadings): t.ReceiveMeterBarReadingsAction {
 	return { type: ActionType.ReceiveMeterBarReadings, meterIDs, timeInterval, barDuration, readings };
 }
 
 export function requestGroupBarReadings(groupIDs: number[], timeInterval: TimeInterval, barDuration: moment.Duration):
-		t.RequestGroupBarReadingsAction {
+t.RequestGroupBarReadingsAction {
 	return { type: ActionType.RequestGroupBarReadings, groupIDs, timeInterval, barDuration };
 }
 
 export function receiveGroupBarReadings(groupIDs: number[], timeInterval: TimeInterval, barDuration: moment.Duration,
-		readings: CompressedBarReadings): t.ReceiveGroupBarReadingsAction {
+	readings: CompressedBarReadings): t.ReceiveGroupBarReadingsAction {
 	return { type: ActionType.ReceiveGroupBarReadings, groupIDs, timeInterval, barDuration, readings };
 }
 

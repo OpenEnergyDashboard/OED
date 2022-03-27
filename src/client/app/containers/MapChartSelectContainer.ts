@@ -13,9 +13,7 @@ import {SelectOption} from '../types/items';
 function mapStateToProps(state: State) {
 	const maps = state.maps.byMapID;
 	const sortedMaps = _.sortBy(_.values(maps).map(map => (
-		{
-		value: map.id, label: map.name.trim(), disabled: !(map.origin && map.opposite)
-		} as SelectOption
+		{ value: map.id, label: map.name.trim(), disabled: !(map.origin && map.opposite) } as SelectOption
 	)), 'label');
 
 	// If there is only one map, selectedMap is the id of the only map. ie; display map automatically if only 1 map
@@ -26,7 +24,7 @@ function mapStateToProps(state: State) {
 	const selectedMap = {
 		label: state.maps.byMapID[state.maps.selectedMap] ? state.maps.byMapID[state.maps.selectedMap].name : '',
 		value: state.maps.selectedMap
-		};
+	};
 
 	return {
 		maps: sortedMaps,

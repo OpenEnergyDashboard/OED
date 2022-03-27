@@ -75,7 +75,7 @@ function getMeterName(state: State, meterID: number): string {
 }
 
 function getGroupReadingsData(state: State, groupID: number, timeInterval: TimeInterval, compareShift: moment.Duration):
-	CompareReadingsData | undefined {
+CompareReadingsData | undefined {
 	let readingsData: CompareReadingsData | undefined;
 	const readingsDataByID = state.readings.compare.byGroupID[groupID];
 	if (readingsDataByID !== undefined) {
@@ -91,7 +91,7 @@ function getGroupReadingsData(state: State, groupID: number, timeInterval: TimeI
 }
 
 function getMeterReadingsData(state: State, meterID: number, timeInterval: TimeInterval, compareShift: moment.Duration):
-	CompareReadingsData | undefined {
+CompareReadingsData | undefined {
 	let readingsData: CompareReadingsData | undefined;
 	const readingsDataByID = state.readings.compare.byMeterID[meterID];
 	if (readingsDataByID !== undefined) {

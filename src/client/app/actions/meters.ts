@@ -25,7 +25,7 @@ export function changeDisplayedMeters(meters: number[]): t.ChangeDisplayedMeters
 }
 
 export function editMeterDetails(meter: MeterMetadata):
-	t.EditMeterDetailsAction {
+t.EditMeterDetailsAction {
 	return { type: ActionType.EditMeterDetails, meter };
 }
 

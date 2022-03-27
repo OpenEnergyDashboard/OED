@@ -26,7 +26,12 @@
     "rules": {
         //https://github.com/typescript-eslint/typescript-eslint/issues/1824, indent is therefore turned off and we use typescript-eslint/indent instead
         "indent": ["off"],
-        "@typescript-eslint/indent": ["error", "tab"],
+        "@typescript-eslint/indent": [
+            "error",
+            "tab",
+            { "SwitchCase": 1 }
+        ],
+        "@typescript-eslint/no-explicit-any": "off",
         "linebreak-style": [
             "error",
             "unix"

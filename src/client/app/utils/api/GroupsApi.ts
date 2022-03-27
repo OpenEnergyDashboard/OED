@@ -44,8 +44,7 @@ export default class GroupsApi {
 		);
 	}
 
-	public async compareReadings(groupIDs: number[], timeInterval: TimeInterval, shift: moment.Duration):
-		Promise<CompareReadings> {
+	public async compareReadings(groupIDs: number[], timeInterval: TimeInterval, shift: moment.Duration): Promise<CompareReadings> {
 		const stringifiedIDs = groupIDs.join(',');
 		const currStart: moment.Moment = timeInterval.getStartTimestamp();
 		const currEnd: moment.Moment = timeInterval.getEndTimestamp();
