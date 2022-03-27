@@ -31,7 +31,7 @@ export function fetchUnitsDetailsIfNeeded(): Thunk {
     return (dispatch: Dispatch, getState: GetState) => {
         if (shouldFetchUnitsDetails(getState())) {
             return dispatch(fetchUnitsDetails());
-        }    
+        }
         return Promise.resolve();
     };
 }

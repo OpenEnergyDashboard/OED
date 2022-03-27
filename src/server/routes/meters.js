@@ -46,7 +46,9 @@ function formatMeterForResponse(meter, loggedInAsAdmin) {
 		endOnlyTime : null,
 		reading : null,
 		startTimestamp : null,
-		endTimestamp : null
+		endTimestamp : null,
+		unitId: meter.unitId,
+		defaultGraphicUnit: meter.unitId
 	};
 
 	// Only logged in Admins can see IP addresses, types, timezones, and internal names

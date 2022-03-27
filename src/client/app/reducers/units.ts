@@ -2,6 +2,7 @@
   * License, v. 2.0. If a copy of the MPL was not distributed with this
   * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
 
+import * as _ from 'lodash';
 import { UnitsAction } from "types/redux/units";
 import { ActionType } from "../types/redux/actions";
 
@@ -21,7 +22,7 @@ export default function units(state = defaultState, action: UnitsAction) {
             return {
                 ...state,
                 isFetching: false,
-                units: action.data
+                units: _.keyBy(action.data, unit => unit.id)
             };
         default:
             return state;

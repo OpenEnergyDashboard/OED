@@ -45,10 +45,14 @@ export interface UnitData {
 	suffix: string;
 	displayable: DisplayableType;
 	preferredDisplay: boolean;
-	note: string;
+	note?: string;
+}
+
+export interface UnitDataById {
+	[unitId: number]: UnitData;
 }
 
 export interface UnitsState {
 	isFetching: boolean;
-	units: UnitData[];
+	units: UnitDataById[];
 }
