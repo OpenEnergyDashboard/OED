@@ -11,7 +11,7 @@ import { LanguageTypes } from './redux/i18n';
 export interface SelectOption {
 	label: string;
 	value: number;
-	disabled?: boolean;
+	isDisabled?: boolean;
 }
 
 /**
