@@ -10,7 +10,8 @@ import { State } from '../types/redux/state';
 import { Dispatch } from '../types/redux/actions';
 import { ChartTypes } from '../types/redux/graph';
 import { SelectOption } from '../types/items';
-import { CartesianPoint, Dimensions, normalizeImageDimensions, calculateScaleFromEndpoints, itemDisplayableOnMap, itemMapInfoOk } from '../utils/calibration';
+import { CartesianPoint, Dimensions, normalizeImageDimensions, calculateScaleFromEndpoints,
+	itemDisplayableOnMap, itemMapInfoOk } from '../utils/calibration';
 import { gpsToUserGrid } from './../utils/calibration';
 import { DataType } from '../types/Datasources';
 

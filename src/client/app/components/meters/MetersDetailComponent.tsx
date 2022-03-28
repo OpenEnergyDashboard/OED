@@ -22,7 +22,7 @@ interface MetersDetailProps {
 	submitEditedMeters(): Promise<any>;
 }
 
-export default class MetersDetailComponent extends React.Component<MetersDetailProps, {}> {
+export default class MetersDetailComponent extends React.Component<MetersDetailProps> {
 	constructor(props: MetersDetailProps) {
 		super(props);
 		this.handleSubmitClicked = this.handleSubmitClicked.bind(this);

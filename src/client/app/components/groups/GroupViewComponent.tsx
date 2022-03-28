@@ -20,7 +20,7 @@ interface GroupViewProps {
 	changeDisplayModeToEdit(): ChangeDisplayModeAction;
 }
 
-export default class GroupViewComponent extends React.Component<GroupViewProps, {}> {
+export default class GroupViewComponent extends React.Component<GroupViewProps> {
 	constructor(props: GroupViewProps) {
 		super(props);
 		this.handleEditGroup = this.handleEditGroup.bind(this);

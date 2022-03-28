@@ -16,7 +16,7 @@ interface GroupSidebarProps {
 	selectGroups(groups: number[]): ChangeDisplayedGroupsAction;
 }
 
-export default class GroupSidebarComponent extends React.Component<GroupSidebarProps, {}> {
+export default class GroupSidebarComponent extends React.Component<GroupSidebarProps> {
 	constructor(props: GroupSidebarProps) {
 		super(props);
 		this.handleGroupSelect = this.handleGroupSelect.bind(this);

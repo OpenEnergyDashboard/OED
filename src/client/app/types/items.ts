@@ -62,4 +62,4 @@ export enum UserRole {
 	CSV = 'csv',
 	EXPORT = 'export',
 	OBVIUS = 'obvius'
-};
+}

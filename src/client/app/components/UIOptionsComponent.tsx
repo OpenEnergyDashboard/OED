@@ -231,7 +231,7 @@ class UIOptionsComponent extends React.Component<UIOptionsPropsWithIntl, UIOptio
 									<FormattedMessage id='4.weeks' />
 								</Button>
 							</ButtonGroup>
-						<TooltipMarkerComponent page='home' helpTextId='help.home.map.interval.tip' />
+							<TooltipMarkerComponent page='home' helpTextId='help.home.map.interval.tip' />
 						</div>
 						<MapChartSelectContainer key='chart' />
 					</div>

@@ -24,7 +24,7 @@ interface MapsDetailProps {
 	createNewMap(): any;
 }
 
-export default class MapsDetailComponent extends React.Component<MapsDetailProps, {}> {
+export default class MapsDetailComponent extends React.Component<MapsDetailProps> {
 	constructor(props: MapsDetailProps) {
 		super(props);
 		this.handleSubmitClicked = this.handleSubmitClicked.bind(this);

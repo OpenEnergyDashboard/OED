@@ -24,7 +24,7 @@ type DatasourceBoxPropsWithIntl = DatasourceBoxProps & WrappedComponentProps;
 // tslint:disable max-classes-per-file
 class MultiSelectDatasourceComponent extends MultiSelectComponent<DatasourceID> { }
 
-class DatasourceBoxComponent extends React.Component<DatasourceBoxPropsWithIntl, {}> {
+class DatasourceBoxComponent extends React.Component<DatasourceBoxPropsWithIntl> {
 	constructor(props: DatasourceBoxPropsWithIntl) {
 		super(props);
 		this.handleDatasourceSelect = this.handleDatasourceSelect.bind(this);
