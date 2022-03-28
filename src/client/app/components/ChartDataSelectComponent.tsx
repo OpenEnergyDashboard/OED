@@ -22,7 +22,7 @@ type ChartDataSelectPropsWithIntl = ChartDataSelectProps & WrappedComponentProps
 /**
  * A component which allows the user to select which data should be displayed on the chart.
  */
-class ChartDataSelectComponent extends React.Component<ChartDataSelectPropsWithIntl, {}> {
+class ChartDataSelectComponent extends React.Component<ChartDataSelectPropsWithIntl> {
 	constructor(props: ChartDataSelectPropsWithIntl) {
 		super(props);
 		this.handleMeterSelect = this.handleMeterSelect.bind(this);

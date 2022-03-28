@@ -159,8 +159,9 @@ class MapCalibrationInitiateComponent extends React.Component<MapInitiatePropsWi
 			const file = this.fileInput.current.files[0];
 			const fileReader = new FileReader();
 			fileReader.onloadend = () => {
-				// @ts-ignore
-				resolve(fileReader.result);
+				if (typeof fileReader.result === 'string') {
+					resolve(fileReader.result);
+				}
 			};
 			fileReader.onerror = reject;
 			fileReader.readAsDataURL(file);

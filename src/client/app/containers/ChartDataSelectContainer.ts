@@ -10,7 +10,8 @@ import { State } from '../types/redux/state';
 import { Dispatch } from '../types/redux/actions';
 import { ChartTypes } from '../types/redux/graph';
 import { SelectOption } from '../types/items';
-import { CartesianPoint, Dimensions, normalizeImageDimensions, calculateScaleFromEndpoints, itemDisplayableOnMap, itemMapInfoOk } from '../utils/calibration';
+import { CartesianPoint, Dimensions, normalizeImageDimensions, calculateScaleFromEndpoints,
+	itemDisplayableOnMap, itemMapInfoOk } from '../utils/calibration';
 import { gpsToUserGrid } from './../utils/calibration';
 import { DataType } from '../types/Datasources';
 
@@ -23,9 +24,9 @@ import { DataType } from '../types/Datasources';
 function mapStateToProps(state: State) {
 	// Map information about meters and groups into a format the component can display.
 	const sortedMeters = _.sortBy(_.values(state.meters.byMeterID).map(meter =>
-		({ value: meter.id, label: meter.name.trim(), disabled: false } as SelectOption)), 'label');
+		({ value: meter.id, label: meter.name.trim(), isDisabled: false } as SelectOption)), 'label');
 	const sortedGroups = _.sortBy(_.values(state.groups.byGroupID).map(group =>
-		({ value: group.id, label: group.name.trim(), disabled: false } as SelectOption)), 'label');
+		({ value: group.id, label: group.name.trim(), isDisabled: false } as SelectOption)), 'label');
 
 	/**
 	 * 	Map information about the currently selected meters into a format the component can display.
@@ -72,12 +73,12 @@ function mapStateToProps(state: State) {
 				const meterGPSInUserGrid: CartesianPoint = gpsToUserGrid(imageDimensionNormalized, gps, origin, scaleOfMap, mp.northAngle);
 				if (!(itemMapInfoOk(meter.value, DataType.Meter, state.maps.byMapID[state.maps.selectedMap], gps) &&
 					itemDisplayableOnMap(imageDimensionNormalized, meterGPSInUserGrid))) {
-					meter.disabled = true;
+					meter.isDisabled = true;
 					disableMeters.push(meter.value);
 				}
 			} else {
 				// Lack info on this map so skip. This is mostly done since TS complains about the undefined possibility.
-				meter.disabled = true;
+				meter.isDisabled = true;
 				disableMeters.push(meter.value);
 			}
 		});
@@ -89,11 +90,11 @@ function mapStateToProps(state: State) {
 				const groupGPSInUserGrid: CartesianPoint = gpsToUserGrid(imageDimensionNormalized, gps, origin, scaleOfMap, mp.northAngle);
 				if (!(itemMapInfoOk(group.value, DataType.Group, state.maps.byMapID[state.maps.selectedMap], gps) &&
 					itemDisplayableOnMap(imageDimensionNormalized, groupGPSInUserGrid))) {
-					group.disabled = true;
+					group.isDisabled = true;
 					disableGroups.push(group.value);
 				}
 			} else {
-				group.disabled = true;
+				group.isDisabled = true;
 				disableGroups.push(group.value);
 			}
 		});
@@ -106,7 +107,7 @@ function mapStateToProps(state: State) {
 			return {
 				label: state.meters.byMeterID[meterID] ? state.meters.byMeterID[meterID].name : '',
 				value: meterID,
-				disabled: false
+				isDisabled: false
 			} as SelectOption
 		}
 	});
@@ -119,7 +120,7 @@ function mapStateToProps(state: State) {
 			return {
 				label: state.groups.byGroupID[groupID] ? state.groups.byGroupID[groupID].name : '',
 				value: groupID,
-				disabled: false
+				isDisabled: false
 			} as SelectOption
 		}
 	});

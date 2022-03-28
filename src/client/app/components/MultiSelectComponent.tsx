@@ -8,12 +8,10 @@ import { SelectOption } from '../types/items';
 
 interface MultiSelectProps<I> {
 	placeholder: string;
-	/* tslint:disable:array-type */
 	options: Array<SelectOption & I>;
 	selectedOptions: Array<SelectOption & I> | undefined;
 	singleSelect?: boolean;
 	onValuesChange(values: Array<SelectOption & I>): void;
-	/* tslint:enable:array-type */
 }
 
 interface MultiSelectState {
@@ -50,9 +48,7 @@ export default class MultiSelectComponent<I> extends React.Component<MultiSelect
 		);
 	}
 
-	/* tslint:disable:array-type */
 	private onValuesChangeInternal(items: Array<SelectOption & I>) {
-	/* tslint:enable:array-type */
 		// Defer to the underlying MultiSelect when it has a state change
 		// Note that the MSC state selectedOptions is in fact the canonical source of truth
 		this.setState({ selectedOptions: items });

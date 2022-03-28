@@ -21,7 +21,7 @@ interface GroupViewProps {
 	changeDisplayModeToEdit(): ChangeDisplayModeAction;
 }
 
-export default class GroupViewComponent extends React.Component<GroupViewProps, {}> {
+export default class GroupViewComponent extends React.Component<GroupViewProps> {
 	constructor(props: GroupViewProps) {
 		super(props);
 		this.handleEditGroup = this.handleEditGroup.bind(this);
@@ -72,15 +72,14 @@ export default class GroupViewComponent extends React.Component<GroupViewProps, 
 						<FormattedMessage id='edit.a.group' />
 					</Button>
 				</Link>
-					<div>
-						<p style={groupAllMeters}>
+				<div>
+					<p style={groupAllMeters}>
 						<FormattedMessage id='group.all.meters' />:
-						</p>
-							{this.props.deepMeterNames.map ((item, index) => (
-								<span key={`d_${index}`}>{(index ? ', ': '') + item}</span>
-							))}
-					</div>
-
+					</p>
+					{this.props.deepMeterNames.map ((item, index) => (
+						<span key={`d_${index}`}>{(index ? ', ': '') + item}</span>
+					))}
+				</div>
 			</div>
 		);
 	}

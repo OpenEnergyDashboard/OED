@@ -312,7 +312,6 @@ function calculateScale(p1: CalibratedPoint, p2: CalibratedPoint) {
  * @return Normalized size of map so no more than 500 on either side.
  */
 export function normalizeImageDimensions(dimensions: Dimensions): Dimensions {
-	let res: Dimensions;
 	let width;
 	let height;
 	// Use the larger dimension to be 500 and this makes sure the other dimension
@@ -324,10 +323,10 @@ export function normalizeImageDimensions(dimensions: Dimensions): Dimensions {
 		height = 500;
 		width = 500 * dimensions.width / dimensions.height;
 	}
-	res = {
+	const res: Dimensions = {
 		width,
 		height
-	};
+	}
 	return res;
 }
 

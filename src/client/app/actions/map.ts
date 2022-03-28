@@ -168,8 +168,10 @@ function updateCalibrationSet(calibratedPoint: CalibratedPoint): t.AppendCalibra
  */
 function isReadyForCalculation(state: State): boolean {
 	const calibrationThreshold = 3;
-	// @ts-ignore
-	return state.maps.editedMaps[state.maps.calibratingMap].calibrationSet.length >= calibrationThreshold;
+	// assume calibrationSet is defined, as offerCurrentGPS indicates through point that the map is defined.
+	/* eslint-disable @typescript-eslint/no-non-null-assertion */
+	return state.maps.editedMaps[state.maps.calibratingMap].calibrationSet!.length >= calibrationThreshold;
+	/* eslint-enable @typescript-eslint/no-non-null-assertion */
 }
 
 /**
@@ -182,9 +184,11 @@ function prepareDataToCalculation(state: State): CalibrationResult {
 		width: mp.image.width,
 		height: mp.image.height
 	};
-	// @ts-ignore
-	const result = calibrate(mp.calibrationSet, imageDimensions, mp.northAngle);
+	// Since mp is defined above, calibrationSet is defined.
+	/* eslint-disable @typescript-eslint/no-non-null-assertion */
+	const result = calibrate(mp.calibrationSet!, imageDimensions, mp.northAngle);
 	return result;
+	/* eslint-enable @typescript-eslint/no-non-null-assertion */
 }
 
 function updateResult(result: CalibrationResult): t.UpdateCalibrationResultAction {

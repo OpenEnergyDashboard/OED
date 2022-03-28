@@ -17,7 +17,7 @@ interface MapChartSelectProps {
 
 type MapChartSelectPropsWithIntl = MapChartSelectProps & WrappedComponentProps;
 
-class MapChartSelectComponent extends React.Component<MapChartSelectPropsWithIntl, {}> {
+class MapChartSelectComponent extends React.Component<MapChartSelectPropsWithIntl> {
 	constructor(props: MapChartSelectPropsWithIntl) {
 		super(props);
 		this.handleMapSelect = this.handleMapSelect.bind(this);

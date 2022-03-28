@@ -18,7 +18,7 @@ interface InitializationProps {
 	changeOptionsFromLink(options: LinkOptions): Promise<any>;
 }
 
-export default class InitializationComponent extends React.Component<InitializationProps, {}> {
+export default class InitializationComponent extends React.Component<InitializationProps> {
 	private notificationSystem: NotificationSystem.System;
 
 	public componentDidMount() {

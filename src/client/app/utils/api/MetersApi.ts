@@ -54,7 +54,7 @@ export default class MetersApi {
 		);
 	}
 
-	public async edit(meter: MeterMetadata): Promise<{}> {
+	public async edit(meter: MeterMetadata): Promise<MeterEditData> {
 		return await this.backend.doPostRequest<MeterEditData>(
 			'/api/meters/edit',
 			{ id: meter.id, identifier: meter.identifier, enabled: meter.enabled, displayable: meter.displayable, timeZone: meter.timeZone, gps: meter.gps }
@@ -62,7 +62,7 @@ export default class MetersApi {
 	}
 
 	public async compareReadings(meterIDs: number[], timeInterval: TimeInterval, shift: moment.Duration):
-		Promise<CompareReadings> {
+	Promise<CompareReadings> {
 		const stringifiedIDs = meterIDs.join(',');
 		const currStart: moment.Moment = timeInterval.getStartTimestamp();
 		const currEnd: moment.Moment = timeInterval.getEndTimestamp();
