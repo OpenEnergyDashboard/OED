@@ -12,7 +12,7 @@
 .card {
     border-radius: 15px;
     margin: 5px;
-    width: 200px;
+    width: 300px;
     background-color: #F2F2F2;
     box-shadow: 0px 2px 5px black;
 }
@@ -42,7 +42,7 @@ width: 100%;
     overflow-wrap: break-word; 
 }
 
-.default-graphic-unit-container {
+.type-container {
     width: 100%;
     padding-top: 10px;
     padding-right: 0px;
@@ -59,6 +59,8 @@ width: 100%;
     border-radius: 3px;
     padding-left: 5px;
     padding-right: 5px;
+    margin-left: 7px;
+    margin-right: 7px;
     /*   justify-content: center; */
 }
 
@@ -73,6 +75,7 @@ width: 100%;
     background-color: #BBF777;
     box-shadow: 3px 2px 2px gray;
     padding: 5px;
+    overflow-wrap: "break-word";
 }
 
 .on-off-switch-span-off {
@@ -80,6 +83,7 @@ width: 100%;
     background-color: #AD351D;
     box-shadow: 3px 2px 2px gray;
     padding: 5px;
+    overflow-wrap: "break-word";
 }
 
 .edit-btn {

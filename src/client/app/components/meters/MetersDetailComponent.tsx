@@ -3,7 +3,7 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
 
 import * as React from 'react';
-import { Table, Button } from 'reactstrap';
+// import { Table, Button } from 'reactstrap';
 import { FormattedMessage } from 'react-intl';
 import MeterViewContainer from '../../containers/meters/MeterViewContainer';
 import HeaderContainer from '../../containers/HeaderContainer';
@@ -39,17 +39,17 @@ export default class MetersDetailComponent extends React.Component<MetersDetailP
 			textAlign: 'center'
 		};
 
-		const tableStyle: React.CSSProperties = {
-			marginLeft: '10%',
-			marginRight: '10%'
-		};
+		// const tableStyle: React.CSSProperties = {
+		// 	marginLeft: '10%',
+		// 	marginRight: '10%'
+		// };
 
-		const buttonContainerStyle: React.CSSProperties = {
-			minWidth: '150px',
-			width: '10%',
-			marginLeft: '40%',
-			marginRight: '40%'
-		};
+		// const buttonContainerStyle: React.CSSProperties = {
+		// 	minWidth: '150px',
+		// 	width: '10%',
+		// 	marginLeft: '40%',
+		// 	marginRight: '40%'
+		// };
 
 		const tooltipStyle = {
 			display: 'inline',

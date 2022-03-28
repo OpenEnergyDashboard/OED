@@ -3,11 +3,11 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
 
 import * as React from 'react';
-import { Button } from 'reactstrap';
+// import { Button } from 'reactstrap';
 import { FormattedMessage, injectIntl, WrappedComponentProps } from 'react-intl';
 import { MeterMetadata, EditMeterDetailsAction } from '../../types/redux/meters';
 import { GPSPoint, isValidGPSInput } from '../../utils/calibration';
-import TimeZoneSelect from '../TimeZoneSelect';
+// import TimeZoneSelect from '../TimeZoneSelect';
 import { updateUnsavedChanges } from '../../actions/unsavedWarning';
 import { fetchMetersDetails, submitEditedMeters, confirmEditedMeters } from '../../actions/meters';
 import store from '../../index';
@@ -65,26 +65,30 @@ class MeterViewComponent extends React.Component<MeterViewPropsWithIntl, MeterVi
 				<div className="unit-container">
 					Unit
 					<span className="custom-select">
-						select
+						{/* TODO ---- get data for unit */}
+						________
 					</span>
 				</div>
-				<div className="default-graphic-unit-container">
-					Default Unit Graphic
+				<div className="type-container">
+					Type
 					<span className="custom-select">
-						select
+						{/* TODO ---- get data for type */}
+						________
 					</span>
 				</div>
 				<div className="toggle-container">
 					<div className="on-off-switch">
-						<span className="on-off-switch-span-on">Enabled</span>
+						{/* <span className="on-off-switch-span-on">{this.formatEnabled()}</span> */}
+						{this.formatEnabled()}
 					</div>
-					<div className="on-off-switch">
-						<span className="on-off-switch-span-on">Displayble</span>
-					</div>
+					{loggedInAsAdmin && <div className="on-off-switch">
+						{/* <span className="on-off-switch-span-on">Displayble</span> */}
+						{this.formatDisplayable()}
+					</div>}
 				</div>
-				<div className="edit-btn">
+				{loggedInAsAdmin && <div className="edit-btn">
 					<ModalCard/>
-				</div>
+				</div>}
 			</div>
 
 			// <tr>
@@ -127,29 +131,29 @@ class MeterViewComponent extends React.Component<MeterViewPropsWithIntl, MeterVi
 		}
 	}
 
-	private formatStatus(): string {
-		if (this.props.isSubmitting) {
-			return '(' + this.props.intl.formatMessage({id: 'submitting'}) + ')';
-		}
+	// private formatStatus(): string {
+	// 	if (this.props.isSubmitting) {
+	// 		return '(' + this.props.intl.formatMessage({id: 'submitting'}) + ')';
+	// 	}
 
-		if (this.props.isEdited) {
-			return this.props.intl.formatMessage({id: 'edited'});
-		}
+	// 	if (this.props.isEdited) {
+	// 		return this.props.intl.formatMessage({id: 'edited'});
+	// 	}
 
-		return '';
-	}
+	// 	return '';
+	// }
 
-	private styleEnabled(): React.CSSProperties {
-		return { color: 'green' };
-	}
+	// private styleEnabled(): React.CSSProperties {
+	// 	return { color: 'green' };
+	// }
 
-	private styleDisabled(): React.CSSProperties {
-		return { color: 'red' };
-	}
+	// private styleDisabled(): React.CSSProperties {
+	// 	return { color: 'red' };
+	// }
 
-	private styleToggleBtn(): React.CSSProperties {
-		return { float: 'right' };
-	}
+	// private styleToggleBtn(): React.CSSProperties {
+	// 	return { float: 'right' };
+	// }
 
 	private toggleMeterDisplayable() {
 		const editedMeter = this.props.meter;
@@ -170,72 +174,105 @@ class MeterViewComponent extends React.Component<MeterViewPropsWithIntl, MeterVi
 	}
 
 	private formatDisplayable() {
-		let styleFn;
+		// let styleFn;
 		let messageId;
-		let buttonMessageId;
+		// let buttonMessageId;
+		let displaySwitch;
 
 		if (this.props.meter.displayable) {
-			styleFn = this.styleEnabled;
+			// styleFn = this.styleEnabled;
 			messageId = 'meter.is.displayable';
-			buttonMessageId = 'hide';
+			// buttonMessageId = 'hide';
+			displaySwitch = <span className="on-off-switch-span-on"><FormattedMessage id={messageId} /></span>
 		} else {
-			styleFn = this.styleDisabled;
+			// styleFn = this.styleDisabled;
 			messageId = 'meter.is.not.displayable';
-			buttonMessageId = 'show';
+			// buttonMessageId = 'show';
+			displaySwitch = <span className="on-off-switch-span-off"><FormattedMessage id={messageId} /></span>
 		}
 
-		let toggleButton;
-		const loggedInAsAdmin = this.props.loggedInAsAdmin;
-		if (loggedInAsAdmin) {
-			toggleButton = <Button style={this.styleToggleBtn()} color='primary' onClick={this.toggleMeterDisplayable}>
-				<FormattedMessage id={buttonMessageId} />
-			</Button>;
-		} else {
-			toggleButton = <div />;
-		}
+		// let toggleButton;
+		// const loggedInAsAdmin = this.props.loggedInAsAdmin;
+		// if (loggedInAsAdmin) {
+		// 	toggleButton = <Button style={this.styleToggleBtn()} color='primary' onClick={this.toggleMeterDisplayable}>
+		// 		<FormattedMessage id={buttonMessageId} />
+		// 	</Button>;
+		// } else {
+		// 	toggleButton = <div />;
+		// }
 
 		return (
-			<span>
-				<span style={styleFn()}>
-					<FormattedMessage id={messageId} />
-				</span>
-				{toggleButton}
-			</span>
+			// <span>
+			// 	<span style={styleFn()}>
+			// 		<FormattedMessage id={messageId} />
+			// 	</span>
+			// 	{toggleButton}
+			// </span>
+			// <span style={styleFn}>
+			// 	<FormattedMessage id={messageId} />
+			// </span>
+			displaySwitch
 		);
 	}
 
 	private formatEnabled() {
-		let styleFn;
+		// let styleFn;
 		let messageId;
-		let buttonMessageId;
+		// let buttonMessageId;
+		// let resMessage;
+		let enableSwitch;
 
 		if (this.props.meter.enabled) {
-			styleFn = this.styleEnabled;
+			// styleFn = this.styleEnabled;
+			// styleFn = {
+			// 	color: "black",
+			// 	backgroundColor: '#BBF777',
+			// 	boxShadow: "3px 2px 2px gray",
+			// 	padding: "5px",
+			// 	overflowWrap: "break-word"
+			// };
 			messageId = 'meter.is.enabled';
-			buttonMessageId = 'disable';
+			// buttonMessageId = 'disable';
+			enableSwitch = <span className="on-off-switch-span-on"><FormattedMessage id={messageId} /></span>
+			// resMessage = 'Updates Enabled';
 		} else {
-			styleFn = this.styleDisabled;
+			// styleFn = this.styleDisabled;
+			// styleFn = {
+			// 	color: "white",
+			// 	backgroundColor: '#AD351D',
+			// 	boxShadow: "3px 2px 2px gray",
+			// 	padding: "5px",
+			// 	overflowWrap: "break-word"
+
+			// };
 			messageId = 'meter.is.not.enabled';
-			buttonMessageId = 'enable';
+			// buttonMessageId = 'enable';
+			enableSwitch = <span className="on-off-switch-span-off"><FormattedMessage id={messageId} /></span>
+			// resMessage = 'Updates Disabled';
 		}
 
-		let toggleButton;
-		const loggedInAsAdmin = this.props.loggedInAsAdmin;
-		if (loggedInAsAdmin) {
-			toggleButton = <Button style={this.styleToggleBtn()} color='primary' onClick={this.toggleMeterEnabled}>
-				<FormattedMessage id={buttonMessageId} />
-			</Button>;
-		} else {
-			toggleButton = <div />;
-		}
+		// let toggleButton;
+		// const loggedInAsAdmin = this.props.loggedInAsAdmin;
+		// if (loggedInAsAdmin) {
+		// 	toggleButton = <Button style={this.styleToggleBtn()} color='primary' onClick={this.toggleMeterEnabled}>
+		// 		<FormattedMessage id={buttonMessageId} />
+		// 	</Button>;
+		// } else {
+		// 	toggleButton = <div />;
+		// }
 
 		return (
-			<span>
-				<span style={styleFn()}>
-					<FormattedMessage id={messageId} />
-				</span>
-				{toggleButton}
-			</span>
+			// <span>
+			// 	<span style={styleFn()}>
+			// 		<FormattedMessage id={messageId} />
+			// 	</span>
+			// 	{/* {toggleButton} */}
+			// </span>
+			// <span style={styleFn}>
+			// 	<FormattedMessage id={messageId} />
+			// </span>
+
+			enableSwitch
 		);
 
 	}
@@ -275,44 +312,44 @@ class MeterViewComponent extends React.Component<MeterViewPropsWithIntl, MeterVi
 		this.setState({ gpsInput: event.target.value });
 	}
 
-	private formatGPSInput() {
-		let formattedGPS;
-		let buttonMessageId;
-		if (this.state.gpsFocus) {
-			// default value for autoFocus is true and for all attributes that would be set autoFocus={true}
-			formattedGPS = <textarea id={'gps'} autoFocus value={this.state.gpsInput} onChange={event => this.handleGPSChange(event)} />;
-			buttonMessageId = 'update';
-		} else {
-			formattedGPS = <div>{this.state.gpsInput}</div>;
-			buttonMessageId = 'edit';
-		}
+	// private formatGPSInput() {
+	// 	let formattedGPS;
+	// 	let buttonMessageId;
+	// 	if (this.state.gpsFocus) {
+	// 		// default value for autoFocus is true and for all attributes that would be set autoFocus={true}
+	// 		formattedGPS = <textarea id={'gps'} autoFocus value={this.state.gpsInput} onChange={event => this.handleGPSChange(event)} />;
+	// 		buttonMessageId = 'update';
+	// 	} else {
+	// 		formattedGPS = <div>{this.state.gpsInput}</div>;
+	// 		buttonMessageId = 'edit';
+	// 	}
 
-		let toggleButton;
-		const loggedInAsAdmin = this.props.loggedInAsAdmin;
-		if (loggedInAsAdmin) {
-			toggleButton = <Button style={this.styleToggleBtn()} color='primary' onClick={this.toggleGPSInput}>
-				<FormattedMessage id={buttonMessageId} />
-			</Button>;
-		} else {
-			toggleButton = <div />;
-		}
+	// 	let toggleButton;
+	// 	const loggedInAsAdmin = this.props.loggedInAsAdmin;
+	// 	if (loggedInAsAdmin) {
+	// 		toggleButton = <Button style={this.styleToggleBtn()} color='primary' onClick={this.toggleGPSInput}>
+	// 			<FormattedMessage id={buttonMessageId} />
+	// 		</Button>;
+	// 	} else {
+	// 		toggleButton = <div />;
+	// 	}
 
-		if (loggedInAsAdmin) {
-			return ( // add onClick
-				<div>
-					{formattedGPS}
-					{toggleButton}
-				</div>
-			);
-		} else {
-			return (
-				<div>
-					{this.state.gpsInput}
-					{toggleButton}
-				</div>
-			);
-		}
-	}
+	// 	if (loggedInAsAdmin) {
+	// 		return ( // add onClick
+	// 			<div>
+	// 				{formattedGPS}
+	// 				{toggleButton}
+	// 			</div>
+	// 		);
+	// 	} else {
+	// 		return (
+	// 			<div>
+	// 				{this.state.gpsInput}
+	// 				{toggleButton}
+	// 			</div>
+	// 		);
+	// 	}
+	// }
 
 	private toggleIdentifierInput() {
 		if (this.state.identifierFocus) {
@@ -333,7 +370,7 @@ class MeterViewComponent extends React.Component<MeterViewPropsWithIntl, MeterVi
 
 	private formatIdentifierInput(){
 		let formattedIdentifier;
-		let buttonMessageId;
+		// let buttonMessageId;
 		if(this.state.identifierFocus){
 			formattedIdentifier = <textarea
 				id={'identifier'}
@@ -341,34 +378,34 @@ class MeterViewComponent extends React.Component<MeterViewPropsWithIntl, MeterVi
 				value={this.state.identifierInput}
 				onChange={event => this.handleIdentifierChange(event)}
 			/>;
-			buttonMessageId = 'update';
+			// buttonMessageId = 'update';
 		} else {
 			formattedIdentifier = <div>{this.state.identifierInput}</div>;
-			buttonMessageId = 'edit';
+			// buttonMessageId = 'edit';
 		}
 
-		let toggleButton;
+		// let toggleButton;
 		const loggedInAsAdmin = this.props.loggedInAsAdmin;
-		if (loggedInAsAdmin) {
-			toggleButton = <Button style={this.styleToggleBtn()} color='primary' onClick={this.toggleIdentifierInput}>
-				<FormattedMessage id={buttonMessageId} />
-			</Button>;
-		} else {
-			toggleButton = <div />;
-		}
+		// if (loggedInAsAdmin) {
+		// 	toggleButton = <Button style={this.styleToggleBtn()} color='primary' onClick={this.toggleIdentifierInput}>
+		// 		<FormattedMessage id={buttonMessageId} />
+		// 	</Button>;
+		// } else {
+		// 	toggleButton = <div />;
+		// }
 
 		if (loggedInAsAdmin) {
 			return ( // add onClick
 				<div>
 					{formattedIdentifier}
-					{toggleButton}
+					{/* {toggleButton} */}
 				</div>
 			);
 		} else {
 			return (
 				<div>
 					{this.state.identifierInput}
-					{toggleButton}
+					{/* {toggleButton} */}
 				</div>
 			);
 		}
