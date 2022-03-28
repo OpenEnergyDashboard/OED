@@ -42,7 +42,8 @@ export default function groups(state = defaultState, action: GroupsAction) {
 				childGroups: [],
 				childMeters: [],
 				selectedGroups: [],
-				selectedMeters: []
+				selectedMeters: [],
+				deepMeters: []
 			}));
 			// newGroups is an array: this converts it into a nested object where the key to each group is its ID.
 			// Without this, byGroupID will not be keyed by group ID.
@@ -82,7 +83,8 @@ export default function groups(state = defaultState, action: GroupsAction) {
 						isFetching: false,
 						outdated: false,
 						childGroups: action.data.groups,
-						childMeters: action.data.meters
+						childMeters: action.data.meters,
+						deepMeters: action.data.deepMeters
 					}
 				}
 			};

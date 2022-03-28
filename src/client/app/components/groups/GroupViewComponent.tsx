@@ -14,6 +14,7 @@ interface GroupViewProps {
 	id: number;
 	childMeterNames: string[];
 	childGroupNames: string[];
+	deepMeterNames: string[];
 	loggedInAsAdmin: boolean;
 	fetchGroupChildren(id: number): Promise<any>;
 	beginEditingIfPossible(id: number): Promise<any>;
@@ -46,6 +47,9 @@ export default class GroupViewComponent extends React.Component<GroupViewProps, 
 			display: renderEditGroupButton ? 'inline' : 'none',
 			paddingLeft: '5px'
 		};
+		const groupAllMeters: React.CSSProperties = {
+			fontWeight: 'bold'
+		};
 		return (
 			<div>
 				<h2 style={nameStyle}>{this.props.name}</h2>
@@ -68,6 +72,15 @@ export default class GroupViewComponent extends React.Component<GroupViewProps, 
 						<FormattedMessage id='edit.a.group' />
 					</Button>
 				</Link>
+					<div>
+						<p style={groupAllMeters}>
+						<FormattedMessage id='group.all.meters' />:
+						</p>
+							{this.props.deepMeterNames.map ((item, index) => (
+								<span key={`d_${index}`}>{(index ? ', ': '') + item}</span>
+							))}
+					</div>
+
 			</div>
 		);
 	}
