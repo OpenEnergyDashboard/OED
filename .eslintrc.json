@@ -32,6 +32,7 @@
             { "SwitchCase": 1 }
         ],
         "@typescript-eslint/no-explicit-any": "off",
+        "@typescript-eslint/no-inferrable-types": "off",
         "linebreak-style": [
             "error",
             "unix"
@@ -89,6 +90,36 @@
                             "{}": false
                         }
                     }
+                ],
+                // same rules need to be added.
+                "indent": ["off"],
+                "@typescript-eslint/indent": [
+                    "error",
+                    "tab",
+                    { "SwitchCase": 1 }
+                ],
+                "@typescript-eslint/no-explicit-any": "off",
+                "@typescript-eslint/no-inferrable-types": "off",
+                "linebreak-style": [
+                    "error",
+                    "unix"
+                ],
+                "quotes": [
+                    "error",
+                    "single",
+                    { "avoidEscape": true }
+                ],
+                "max-len": [
+                    "error",
+                    { "code": 150, "tabWidth": 0 }
+                ],
+                "comma-dangle": [
+                    "error",
+                    "never"
+                ],
+                "arrow-parens": [
+                    "error",
+                    "as-needed"
                 ]
             }
         }

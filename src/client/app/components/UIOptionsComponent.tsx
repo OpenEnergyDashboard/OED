@@ -269,7 +269,7 @@ class UIOptionsComponent extends React.Component<UIOptionsPropsWithIntl, UIOptio
 		);
 	}
 
-	private handleBarDurationChangeComplete(e: any) {
+	private handleBarDurationChangeComplete() {
 		this.props.changeDuration(moment.duration(this.state.barDurationDays, 'days'));
 	}
 

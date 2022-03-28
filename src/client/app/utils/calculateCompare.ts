@@ -45,7 +45,6 @@ export function validateSortingOrder(sortingOrder: string): SortingOrder {
 }
 
 export function calculateCompareTimeInterval(comparePeriod: ComparePeriod, currentTime: moment.Moment): TimeInterval {
-	let compareTimeInterval;
 	// Moment changes the times by shifting to local (client/browser) timezone. To fix this up, we need
 	// to know the shift between UTC and local timezone. The value below is the time in minutes that
 	// must be added to go from UTC to local time. For example, for CST it is -360 (Central U.S.A.
@@ -82,8 +81,7 @@ export function calculateCompareTimeInterval(comparePeriod: ComparePeriod, curre
 		default:
 			throw new Error(`Unknown period value: ${comparePeriod}`);
 	}
-	compareTimeInterval = new TimeInterval(begin, end);
-	return compareTimeInterval;
+	return new TimeInterval(begin, end);
 }
 
 export function calculateCompareDuration(comparePeriod: ComparePeriod): moment.Duration {
