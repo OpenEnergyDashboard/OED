@@ -81,7 +81,8 @@ export function calculateCompareTimeInterval(comparePeriod: ComparePeriod, curre
 		default:
 			throw new Error(`Unknown period value: ${comparePeriod}`);
 	}
-	return new TimeInterval(begin, end);
+	const compareTimeInterval = new TimeInterval(begin, end);
+	return compareTimeInterval;
 }
 
 export function calculateCompareDuration(comparePeriod: ComparePeriod): moment.Duration {

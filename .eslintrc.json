@@ -33,6 +33,7 @@
         ],
         "@typescript-eslint/no-explicit-any": "off",
         "@typescript-eslint/no-inferrable-types": "off",
+        "no-trailing-spaces": [2],
         "linebreak-style": [
             "error",
             "unix"
@@ -100,6 +101,7 @@
                 ],
                 "@typescript-eslint/no-explicit-any": "off",
                 "@typescript-eslint/no-inferrable-types": "off",
+                "no-trailing-spaces": [2],
                 "linebreak-style": [
                     "error",
                     "unix"

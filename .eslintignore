@@ -6,4 +6,5 @@
 
 /src/*
 !/src/client*
+# ignores all src files, except for src/client*, same result as below
 # src/{server,bin,scripts,common}/**/*.{ts,tsx,js,jsx}

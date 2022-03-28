@@ -323,10 +323,11 @@ export function normalizeImageDimensions(dimensions: Dimensions): Dimensions {
 		height = 500;
 		width = 500 * dimensions.width / dimensions.height;
 	}
-	return {
+	const res: Dimensions = {
 		width,
 		height
-	};
+	}
+	return res;
 }
 
 /**
