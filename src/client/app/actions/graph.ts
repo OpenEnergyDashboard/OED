@@ -184,7 +184,6 @@ export interface LinkOptions {
  */
 export function changeOptionsFromLink(options: LinkOptions) {
 	const dispatchFirst: Thunk[] = [setHotlinkedAsync(true)];
-	/* tslint:disable:array-type */
 	const dispatchSecond: Array<Thunk | t.ChangeChartToRenderAction | t.ChangeBarStackingAction
 	| t.ChangeGraphZoomAction |t.ChangeCompareSortingOrderAction | t.SetOptionsVisibility
 	| m.UpdateSelectedMapAction > = [];

@@ -9,10 +9,8 @@ import { ChangeDisplayedGroupsAction } from '../../types/redux/groups';
 import { Link } from 'react-router-dom';
 
 interface GroupSidebarProps {
-	/* tslint:disable:array-type */
 	groups: Array<{ id: number, name: string }>;
 	loggedInAsAdmin: boolean;
-	/* tslint:enable:array-type */
 	selectGroups(groups: number[]): ChangeDisplayedGroupsAction;
 }
 
@@ -58,7 +56,7 @@ export default class GroupSidebarComponent extends React.Component<GroupSidebarP
 		const options = e.target.options;
 		const selectedGroups: number[] = [];
 		// We can't map or for-of here because this is a collection of DOM elements, not an array.
-		for (let i = 0; i < options.length; i++) { // tslint:disable-line prefer-for-of
+		for (let i = 0; i < options.length; i++) {
 			if (options[i].selected) {
 				selectedGroups.push(parseInt(options[i].value));
 			}

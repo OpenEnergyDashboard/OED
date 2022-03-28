@@ -120,9 +120,7 @@ function fetchGroupBarReadings(groupIDs: number[], timeInterval: TimeInterval): 
 export function fetchNeededBarReadings(timeInterval: TimeInterval): Thunk {
 	return (dispatch: Dispatch, getState: GetState) => {
 		const state = getState();
-		/* tslint:disable:array-type */
 		const promises: Array<Promise<any>> = [];
-		/* tslint:enable:array-type */
 
 		// Determine which meters are missing data for this time interval
 		const meterIDsToFetchForBar = state.graph.selectedMeters.filter(
