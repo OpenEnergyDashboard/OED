@@ -8,30 +8,30 @@ import * as t from '../types/redux/units';
 import { unitsApi } from '../utils/api';
 
 export function requestUnitsDetails(): t.RequestUnitsDetailsAction {
-    return { type: ActionType.RequestUnitsDetails };
+	return { type: ActionType.RequestUnitsDetails };
 }
 
 export function receiveUnitsDetails(data: t.UnitData[]): t.ReceiveUnitsDetailsAction {
-    return { type: ActionType.ReceiveUnitsDetails, data };
+	return { type: ActionType.ReceiveUnitsDetails, data };
 }
 
 export function fetchUnitsDetails(): Thunk {
-    return async (dispatch: Dispatch) => {
-        dispatch(requestUnitsDetails());
-        const units = await unitsApi.getUnitsDetails();
-        dispatch(receiveUnitsDetails(units));
-    }
+	return async (dispatch: Dispatch) => {
+		dispatch(requestUnitsDetails());
+		const units = await unitsApi.getUnitsDetails();
+		dispatch(receiveUnitsDetails(units));
+	}
 }
 
 function shouldFetchUnitsDetails(state: State): boolean {
-    return !state.units.isFetching;
+	return !state.units.isFetching;
 }
 
 export function fetchUnitsDetailsIfNeeded(): Thunk {
-    return (dispatch: Dispatch, getState: GetState) => {
-        if (shouldFetchUnitsDetails(getState())) {
-            return dispatch(fetchUnitsDetails());
-        }
-        return Promise.resolve();
-    };
+	return (dispatch: Dispatch, getState: GetState) => {
+		if (shouldFetchUnitsDetails(getState())) {
+			return dispatch(fetchUnitsDetails());
+		}
+		return Promise.resolve();
+	};
 }

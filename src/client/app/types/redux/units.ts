@@ -2,7 +2,7 @@
 * License, v. 2.0. If a copy of the MPL was not distributed with this
 * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
 
-import { ActionType } from "./actions";
+import { ActionType } from './actions';
 
 export interface RequestUnitsDetailsAction {
 	type: ActionType.RequestUnitsDetails;
@@ -17,21 +17,21 @@ export type UnitsAction = RequestUnitsDetailsAction | ReceiveUnitsDetailsAction;
 
 export enum UnitType {
 	unit = 'unit',
-    meter = 'meter',
-    suffix = 'suffix'
+	meter = 'meter',
+	suffix = 'suffix'
 }
 
 export enum DisplayableType {
-    none = 'none',
-    all = 'all',
-    admin = 'admin'
+	none = 'none',
+	all = 'all',
+	admin = 'admin'
 }
 
 export enum UnitRepresentType {
-    quantity = 'quantity',
-    flow = 'flow',
-    raw = 'raw',
-    unused = 'unused'
+	quantity = 'quantity',
+	flow = 'flow',
+	raw = 'raw',
+	unused = 'unused'
 }
 
 export interface UnitData {

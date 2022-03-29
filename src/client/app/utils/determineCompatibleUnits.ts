@@ -7,12 +7,14 @@ import * as _ from 'lodash';
 import { MeterMetadata } from '../types/redux/meters';
 import { ConversionArray } from '../types/conversionArray';
 import { UnitData, UnitType } from '../types/redux/units';
+import { fetchGroupChildrenIfNeeded } from '../actions/groups'
+import { GroupDefinition } from 'types/redux/groups';
 
 /**
  * The intersect operation of two sets.
- * @param setA 
- * @param setB 
- * @returns 
+ * @param setA
+ * @param setB
+ * @returns
  */
 function intersect(setA: Set<number>, setB: Set<number>): Set<number> {
 	return new Set(Array.from(setA).filter(i => setB.has(i)));
@@ -25,9 +27,6 @@ function intersect(setA: Set<number>, setB: Set<number>): Set<number> {
  */
 export function unitsCompatibleWithMeters(meters: Set<number>): Set<number> {
 	const state = store.getState();
-
-	console.log(ConversionArray.pik);
-
 	// The first meter processed is different since intersection with empty set is empty.
 	let first = true;
 	// Holds current set of compatible units.
@@ -65,20 +64,20 @@ export function unitsCompatibleWithMeters(meters: Set<number>): Set<number> {
  */
 export function unitsCompatibleWithUnit(unitId: number): Set<number> {
 	// unitSet starts as an empty set.
-	let unitSet = new Set<number>();
+	const unitSet = new Set<number>();
 	// If unit was null in the database then -99. This means there is no unit
-  	// so nothing is compatible with it. Skip processing and return empty set at end.
+	// so nothing is compatible with it. Skip processing and return empty set at end.
 	if (unitId != -99) {
 		// The Pik array.
 		const pik = ConversionArray.pik;
 		// Get the row index in Pik of this unit.
 		const row = pRowFromUnit(unitId);
 		// The compatible units are all columns with true for Pik where i = row.
-    	// Loops over all columns of Pik in row.
+		// Loops over all columns of Pik in row.
 		for (let k = 0; k < pik[0].length; ++k) {
 			if (pik[row][k]) {
 				// unit at index k is compatible with meter unit so add to set.
-        		// Convert index in Pik to unit id.
+				// Convert index in Pik to unit id.
 				unitSet.add(unitFromPColumn(k));
 			}
 		}
@@ -89,15 +88,15 @@ export function unitsCompatibleWithUnit(unitId: number): Set<number> {
 /**
  * Returns the row index in Pik for a meter unit.
  * @param unitId The unit id.
- * @returns 
+ * @returns
  */
- export function pRowFromUnit(unitId: number): number {
-    const state = store.getState();
-    const unit = _.find(state.units.units, function (o: UnitData) {
-        // Since this is the row index, type of unit must be meter.
-        return o.id == unitId && o.typeOfUnit == UnitType.meter;
-    }) as UnitData;
-    return unit.unitIndex;
+export function pRowFromUnit(unitId: number): number {
+	const state = store.getState();
+	const unit = _.find(state.units.units, function (o: UnitData) {
+		// Since this is the row index, type of unit must be meter.
+		return o.id == unitId && o.typeOfUnit == UnitType.meter;
+	}) as UnitData;
+	return unit.unitIndex;
 }
 
 /**
@@ -117,7 +116,7 @@ export function unitFromPRow(row: number): number {
 /**
  * Returns the unit id given the column in Pik.
  * @param column The column to find the associated unit.
- * @returns 
+ * @returns
  */
 export function unitFromPColumn(column: number): number {
 	const state = store.getState();
@@ -131,9 +130,17 @@ export function unitFromPColumn(column: number): number {
 /**
  * Returns the set of meters's ids associated with the groupId used.
  * @param groupId The groupId.
- * @returns 
+ * @returns
  */
-export function metersInGroup(groupId: number): Set<number> {
-	let metersSet = new Set<number>();
-	return metersSet;
+export async function metersInGroup(groupId: number): Promise<Set<number>> {
+	// Fetch group children if needed.
+	await store.dispatch<any>(fetchGroupChildrenIfNeeded(groupId));
+
+	const state = store.getState();
+	// Gets the group associated with groupId.
+	const group = _.find(state.groups.byGroupID, function (o: UnitData) {
+		return o.id == groupId;
+	}) as GroupDefinition;
+
+	return new Set(group.deepMeters);
 }

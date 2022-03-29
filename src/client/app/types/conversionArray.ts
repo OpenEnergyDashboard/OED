@@ -6,7 +6,7 @@ import { conversionArrayApi } from '../utils/api';
 
 export class ConversionArray {
 	static pik: boolean[][];
-	
+
 	static async fetchPik() {
 		this.pik = await conversionArrayApi.getConversionArray();
 	}

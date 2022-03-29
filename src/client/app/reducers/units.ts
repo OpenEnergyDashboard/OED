@@ -3,28 +3,28 @@
   * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
 
 import * as _ from 'lodash';
-import { UnitsAction } from "types/redux/units";
-import { ActionType } from "../types/redux/actions";
+import { UnitsAction } from 'types/redux/units';
+import { ActionType } from '../types/redux/actions';
 
 const defaultState = {
-    isFetching: false,
-    units: []
+	isFetching: false,
+	units: []
 };
 
 export default function units(state = defaultState, action: UnitsAction) {
-    switch (action.type) {
-        case ActionType.RequestUnitsDetails:
-            return {
-                ...state,
-                isFetching: true
-            };
-        case ActionType.ReceiveUnitsDetails:
-            return {
-                ...state,
-                isFetching: false,
-                units: _.keyBy(action.data, unit => unit.id)
-            };
-        default:
-            return state;
-    }
-} 
+	switch (action.type) {
+		case ActionType.RequestUnitsDetails:
+			return {
+				...state,
+				isFetching: true
+			};
+		case ActionType.ReceiveUnitsDetails:
+			return {
+				...state,
+				isFetching: false,
+				units: _.keyBy(action.data, unit => unit.id)
+			};
+		default:
+			return state;
+	}
+}

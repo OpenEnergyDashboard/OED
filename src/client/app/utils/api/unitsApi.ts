@@ -8,13 +8,13 @@ import ApiBackend from './ApiBackend';
 import { UnitData } from '../../types/redux/units';
 
 export default class UnitsApi {
-    private readonly backend: ApiBackend;
+	private readonly backend: ApiBackend;
 
-    constructor(backend: ApiBackend) {
-        this.backend = backend;
-    }
+	constructor(backend: ApiBackend) {
+		this.backend = backend;
+	}
 
-    public async getUnitsDetails(): Promise<UnitData[]> {
-        return await this.backend.doGetRequest<UnitData[]>('/api/units');
-    }
+	public async getUnitsDetails(): Promise<UnitData[]> {
+		return await this.backend.doGetRequest<UnitData[]>('/api/units');
+	}
 }
