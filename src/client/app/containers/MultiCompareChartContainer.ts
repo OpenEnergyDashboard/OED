@@ -50,11 +50,13 @@ function getDataForIDs(ids: number[], isGroup: boolean, state: State): CompareEn
 			readingsData = getMeterReadingsData(state, id, timeInterval, compareShift);
 		}
 		if (isReadingsDataValid(readingsData)) {
+			/* eslint-disable @typescript-eslint/no-non-null-assertion */
 			const currUsage = readingsData!.curr_use!;
 			const prevUsage = readingsData!.prev_use!;
 			const change = calculateChange(currUsage, prevUsage);
 			const entity: CompareEntity = {id, isGroup, name, change, currUsage, prevUsage};
 			entities.push(entity);
+			/* eslint-enable @typescript-eslint/no-non-null-assertion */
 		}
 	}
 	return entities;
@@ -75,7 +77,7 @@ function getMeterName(state: State, meterID: number): string {
 }
 
 function getGroupReadingsData(state: State, groupID: number, timeInterval: TimeInterval, compareShift: moment.Duration):
-	CompareReadingsData | undefined {
+CompareReadingsData | undefined {
 	let readingsData: CompareReadingsData | undefined;
 	const readingsDataByID = state.readings.compare.byGroupID[groupID];
 	if (readingsDataByID !== undefined) {
@@ -91,7 +93,7 @@ function getGroupReadingsData(state: State, groupID: number, timeInterval: TimeI
 }
 
 function getMeterReadingsData(state: State, meterID: number, timeInterval: TimeInterval, compareShift: moment.Duration):
-	CompareReadingsData | undefined {
+CompareReadingsData | undefined {
 	let readingsData: CompareReadingsData | undefined;
 	const readingsDataByID = state.readings.compare.byMeterID[meterID];
 	if (readingsDataByID !== undefined) {

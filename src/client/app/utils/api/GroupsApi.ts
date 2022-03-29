@@ -22,8 +22,8 @@ export default class GroupsApi {
 		return await this.backend.doGetRequest<NamedIDItem[]>('/api/groups');
 	}
 
-	public async children(groupID: number): Promise<{meters: number[], groups: number[]}> {
-		return await this.backend.doGetRequest<{meters: number[], groups: number[]}>(`api/groups/children/${groupID}`);
+	public async children(groupID: number): Promise<{meters: number[], groups: number[], deepMeters: number[]}> {
+		return await this.backend.doGetRequest<{meters: number[], groups: number[], deepMeters: number[]}>(`api/groups/children/${groupID}`);
 	}
 
 
@@ -44,8 +44,7 @@ export default class GroupsApi {
 		);
 	}
 
-	public async compareReadings(groupIDs: number[], timeInterval: TimeInterval, shift: moment.Duration):
-		Promise<CompareReadings> {
+	public async compareReadings(groupIDs: number[], timeInterval: TimeInterval, shift: moment.Duration): Promise<CompareReadings> {
 		const stringifiedIDs = groupIDs.join(',');
 		const currStart: moment.Moment = timeInterval.getStartTimestamp();
 		const currEnd: moment.Moment = timeInterval.getEndTimestamp();

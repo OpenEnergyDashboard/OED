@@ -16,7 +16,7 @@ interface MapCalibrationProps {
 	mapID: number;
 }
 
-export default class MapCalibrationComponent extends React.Component<MapCalibrationProps, {}> {
+export default class MapCalibrationComponent extends React.Component<MapCalibrationProps> {
 	constructor(props: any) {
 		super(props);
 	}

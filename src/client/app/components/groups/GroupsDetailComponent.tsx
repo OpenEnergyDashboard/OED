@@ -18,7 +18,7 @@ interface GroupsDetailProps {
 	fetchMetersDetailsIfNeeded(): Promise<any>;
 }
 
-export default class GroupsDetailComponent extends React.Component<GroupsDetailProps, {}> {
+export default class GroupsDetailComponent extends React.Component<GroupsDetailProps> {
 	public componentDidMount() {
 		this.props.fetchGroupsDetailsIfNeeded();
 		this.props.fetchMetersDetailsIfNeeded();

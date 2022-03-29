@@ -6,15 +6,12 @@
 
 import * as React from 'react';
 import Select from 'react-select';
-import 'react-select/dist/react-select.css';
 import { SelectOption } from '../types/items';
-import '../styles/react-select-css.css';
 
 interface SingleSelectProps {
 	placeholder: string;
 	options: SelectOption[];
 	selectedOption?: SelectOption | undefined;
-	style?: React.CSSProperties;
 	onValueChange(value: SelectOption): void;
 }
 
@@ -43,10 +40,9 @@ export default class SingleSelectComponent extends React.Component<SingleSelectP
 				options={this.props.options}
 				value={this.state.selectedOption}
 				placeholder={this.props.placeholder}
-				style={this.props.style}
 				onChange={this.onValuesChangeInternal}
-				clearable={false}
-				closeOnSelect={false}
+				isClearable={false}
+				closeMenuOnSelect={false}
 			/>
 		);
 	}

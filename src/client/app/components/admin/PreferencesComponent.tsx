@@ -42,7 +42,7 @@ interface PreferencesProps {
 
 type PreferencesPropsWithIntl = PreferencesProps & WrappedComponentProps;
 
-class PreferencesComponent extends React.Component<PreferencesPropsWithIntl, {}> {
+class PreferencesComponent extends React.Component<PreferencesPropsWithIntl> {
 	constructor(props: PreferencesPropsWithIntl) {
 		super(props);
 		this.handleDisplayTitleChange = this.handleDisplayTitleChange.bind(this);

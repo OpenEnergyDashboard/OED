@@ -21,7 +21,7 @@ export default class UsersApi {
 
 	public async getCurrentUser(): Promise<User> {
 		return await this.backend.doGetRequest<User>('/api/users/token');
-	};
+	}
 
 	public async hasRolePermissions(role: UserRole): Promise<boolean> {
 		try {
@@ -30,7 +30,7 @@ export default class UsersApi {
 		} catch (error) {
 			return false;
 		}
-	};
+	}
 
 	public async getUsers(): Promise<User[]> {
 		return await this.backend.doGetRequest<User[]>('/api/users');

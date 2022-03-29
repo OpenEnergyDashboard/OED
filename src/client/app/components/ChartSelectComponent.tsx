@@ -24,7 +24,7 @@ interface DropdownState {
 /**
  * A component that allows users to select which chart should be displayed.
  */
-export default class ChartSelectComponent extends React.Component<ChartSelectProps, DropdownState, {}> {
+export default class ChartSelectComponent extends React.Component<ChartSelectProps, DropdownState> {
 	constructor(props: ChartSelectProps) {
 		super(props);
 		this.handleChangeChartType = this.handleChangeChartType.bind(this);

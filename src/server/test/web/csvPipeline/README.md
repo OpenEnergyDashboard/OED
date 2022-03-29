@@ -62,8 +62,8 @@ The script also describes how to delete all the meters/readings if you want to r
    <td>
    </td>
    <td>
-   <td>
    </td>
+   <td>
    </td>
    <td>
    </td>
@@ -605,13 +605,13 @@ The script also describes how to delete all the meters/readings if you want to r
    </td>
   </tr>
   <tr>
+  <td>cumDscEndonly
+  </td>
   <td>pipe37
    </td>
    <td>X
    </td>
    <td>X
-   </td>
-   <td>
    </td>
   <td>
    </td>
@@ -630,7 +630,6 @@ The script also describes how to delete all the meters/readings if you want to r
   <tr>
    <td>cumAsc & cumAscAdd1 & cumAscAdd2
    </td>
-   regAscEndonly
    <td>pipe23
    </td>
    <td>
@@ -673,7 +672,7 @@ The script also describes how to delete all the meters/readings if you want to r
    </td>
   </tr>
   <tr>
-   <td>CumAsc & meterPipe25 (to create meter)
+   <td>cumAsc & meterPipe25 & meterPipe25Update (to create & update meter)
    </td>
    <td>pipe25
    </td>
@@ -691,7 +690,7 @@ The script also describes how to delete all the meters/readings if you want to r
    </td>
     <td>
    </td>
-   <td>The meter in DB is set to cumulative but not sent via curl. Also tests update without header. Expect usual cumulative values.
+   <td>The meter in DB is set to cumulative via second curl. Also tests update without header. Expect usual cumulative values.
    </td>
   </tr>
   <tr>
@@ -761,7 +760,7 @@ The script also describes how to delete all the meters/readings if you want to r
    </td>
   </tr>
   <tr>
-   <td>RegAscGapLength & meterPipe29 (to create meter)
+   <td>regAscGapLength & meterPipe29 (to create meter)
    </td>
    <td>pipe29
    </td>
@@ -1088,7 +1087,7 @@ The script also describes how to delete all the meters/readings if you want to r
    </td>
   </tr>
   <tr>
-   <td>regCumGap
+   <td>cumAscGap
    </td>
    <td>pipe48
    </td>
