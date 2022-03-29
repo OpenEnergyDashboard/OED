@@ -25,6 +25,9 @@ function intersect(setA: Set<number>, setB: Set<number>): Set<number> {
  */
 export function unitsCompatibleWithMeters(meters: Set<number>): Set<number> {
 	const state = store.getState();
+
+	console.log(ConversionArray.pik);
+
 	// The first meter processed is different since intersection with empty set is empty.
 	let first = true;
 	// Holds current set of compatible units.
@@ -69,7 +72,7 @@ export function unitsCompatibleWithUnit(unitId: number): Set<number> {
 		// The Pik array.
 		const pik = ConversionArray.pik;
 		// Get the row index in Pik of this unit.
-		const row = getUnitIndexRow(unitId);
+		const row = pRowFromUnit(unitId);
 		// The compatible units are all columns with true for Pik where i = row.
     	// Loops over all columns of Pik in row.
 		for (let k = 0; k < pik[0].length; ++k) {
@@ -88,7 +91,7 @@ export function unitsCompatibleWithUnit(unitId: number): Set<number> {
  * @param unitId The unit id.
  * @returns 
  */
- export function getUnitIndexRow(unitId: number): number {
+ export function pRowFromUnit(unitId: number): number {
     const state = store.getState();
     const unit = _.find(state.units.units, function (o: UnitData) {
         // Since this is the row index, type of unit must be meter.
