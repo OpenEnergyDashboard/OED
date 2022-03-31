@@ -93,7 +93,9 @@ class Reading {
 	 */
 	static refreshCompressedReadings(conn) {
 		// This can't be a function because you can't call REFRESH inside a function
+		// TODO This will be removed once we completely transition to the unit version.
 		return conn.none('REFRESH MATERIALIZED VIEW daily_readings');
+		return conn.none('REFRESH MATERIALIZED VIEW daily_readings_unit');
 	}
 
 	/**
@@ -108,7 +110,9 @@ class Reading {
 	 */
 	static refreshCompressedHourlyReadings(conn) {
 		// This can't be a function because you can't call REFRESH inside a function
+		// TODO This will be removed once we completely transition to the unit version.
 		return conn.none('REFRESH MATERIALIZED VIEW hourly_readings');
+		return conn.none('REFRESH MATERIALIZED VIEW hourly_readings_unit');
 	}
 
 	/**
