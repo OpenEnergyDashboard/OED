@@ -16,7 +16,7 @@ function formatUnitForResponse(item) {
 }
 
 /**
- * Route for getting the conversion array.
+ * Route for getting all units.
  */
 router.get('/', async (req, res) => {
     const conn = getConnection();
