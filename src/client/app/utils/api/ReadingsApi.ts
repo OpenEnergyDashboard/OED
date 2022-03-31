@@ -7,20 +7,20 @@
 import * as _ from 'lodash';
 import ApiBackend from './ApiBackend';
 import {TimeInterval} from '../../../../common/TimeInterval';
-import {CompressedBarReadings, CompressedLineReading, CompressedLineReadings} from '../../types/compressed-readings';
+import {CompressedBarReadings, CompressedLineReading, LineReadings} from '../../types/compressed-readings';
 
-export default class CompressedReadingsApi {
+export default class ReadingsApi {
 	private readonly backend: ApiBackend;
 
 	constructor(backend: ApiBackend) {
 		this.backend = backend;
 	}
 
-	public async meterLineReadings(meterIDs: number[], timeInterval: TimeInterval): Promise<CompressedLineReadings> {
+	public async meterLineReadings(meterIDs: number[], timeInterval: TimeInterval, unitID: number): Promise<LineReadings> {
 		const stringifiedIDs = meterIDs.join(',');
-		const readings = await this.backend.doGetRequest<CompressedLineReadings>(
-			`/api/compressedReadings/line/meters/${stringifiedIDs}`,
-			{ timeInterval: timeInterval.toString() }
+		const readings = await this.backend.doGetRequest<LineReadings>(
+			`/api/unitReadings/line/meters/${stringifiedIDs}`,
+			{ timeInterval: timeInterval.toString(), graphicUnitId: unitID.toString() }
 		);
 		// Ensure everything is sorted
 		_.values(readings)
@@ -28,11 +28,11 @@ export default class CompressedReadingsApi {
 		return readings;
 	}
 
-	public async groupLineReadings(groupIDs: number[], timeInterval: TimeInterval): Promise<CompressedLineReadings> {
+	public async groupLineReadings(groupIDs: number[], timeInterval: TimeInterval, unitID: number): Promise<LineReadings> {
 		const stringifiedIDs = groupIDs.join(',');
-		const readings = await this.backend.doGetRequest<CompressedLineReadings>(
-			`/api/compressedReadings/line/groups/${stringifiedIDs}`,
-			{ timeInterval: timeInterval.toString() }
+		const readings = await this.backend.doGetRequest<LineReadings>(
+			`/api/unitReadings/line/groups/${stringifiedIDs}`,
+			{ timeInterval: timeInterval.toString(), graphicUnitId: unitID.toString() }
 		);
 		// Ensure everything is sorted
 		_.values(readings)
@@ -43,7 +43,7 @@ export default class CompressedReadingsApi {
 	public async meterBarReadings(meterIDs: number[], timeInterval: TimeInterval, barWidthDays: number): Promise<CompressedBarReadings> {
 		const stringifiedIDs = meterIDs.join(',');
 		return await this.backend.doGetRequest<CompressedBarReadings>(
-			`/api/compressedReadings/bar/meters/${stringifiedIDs}`,
+			`/api/unitReadings/bar/meters/${stringifiedIDs}`,
 			{ timeInterval: timeInterval.toString(), barWidthDays: barWidthDays.toString() }
 		);
 	}
@@ -51,7 +51,7 @@ export default class CompressedReadingsApi {
 	public async groupBarReadings(groupIDs: number[], timeInterval: TimeInterval, barWidthDays: number): Promise<CompressedBarReadings> {
 		const stringifiedIDs = groupIDs.join(',');
 		return await this.backend.doGetRequest<CompressedBarReadings>(
-			`/api/compressedReadings/bar/groups/${stringifiedIDs}`,
+			`/api/unitReadings/bar/groups/${stringifiedIDs}`,
 			{ timeInterval: timeInterval.toString(), barWidthDays: barWidthDays.toString() }
 		);
 	}

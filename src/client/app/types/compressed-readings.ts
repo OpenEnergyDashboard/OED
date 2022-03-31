@@ -10,7 +10,7 @@ export interface CompressedLineReading {
 	endTimestamp: number;
 }
 
-export interface CompressedLineReadings {
+export interface LineReadings {
 	[id: number]: CompressedLineReading[];
 }
 

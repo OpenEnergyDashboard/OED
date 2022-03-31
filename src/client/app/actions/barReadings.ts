@@ -7,7 +7,7 @@ import { TimeInterval } from '../../../common/TimeInterval';
 import { Dispatch, GetState, Thunk, ActionType } from '../types/redux/actions';
 import { State } from '../types/redux/state';
 import * as t from '../types/redux/barReadings';
-import { compressedReadingsApi } from '../utils/api';
+import { readingsApi } from '../utils/api';
 import { CompressedBarReadings } from '../types/compressed-readings';
 
 /**
@@ -92,7 +92,7 @@ function fetchMeterBarReadings(meterIDs: number[], timeInterval: TimeInterval): 
 	return async (dispatch: Dispatch, getState: GetState) => {
 		const barDuration = getState().graph.barDuration;
 		dispatch(requestMeterBarReadings(meterIDs, timeInterval, barDuration));
-		const readings = await compressedReadingsApi.meterBarReadings(meterIDs, timeInterval, Math.round(barDuration.asDays()));
+		const readings = await readingsApi.meterBarReadings(meterIDs, timeInterval, Math.round(barDuration.asDays()));
 		dispatch(receiveMeterBarReadings(meterIDs, timeInterval, barDuration, readings));
 	};
 }
@@ -107,7 +107,7 @@ function fetchGroupBarReadings(groupIDs: number[], timeInterval: TimeInterval): 
 	return async (dispatch: Dispatch, getState: GetState) => {
 		const barDuration = getState().graph.barDuration;
 		dispatch(requestGroupBarReadings(groupIDs, timeInterval, barDuration));
-		const readings = await compressedReadingsApi.groupBarReadings(groupIDs, timeInterval, Math.round(barDuration.asDays()));
+		const readings = await readingsApi.groupBarReadings(groupIDs, timeInterval, Math.round(barDuration.asDays()));
 		dispatch(receiveGroupBarReadings(groupIDs, timeInterval, barDuration, readings));
 	};
 }

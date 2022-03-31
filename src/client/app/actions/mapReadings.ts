@@ -13,7 +13,7 @@ import {
 	shouldFetchGroupBarReadings,
 	shouldFetchMeterBarReadings
 } from './barReadings';
-import {compressedReadingsApi} from '../utils/api';
+import {readingsApi} from '../utils/api';
 
 export function fetchNeededMapReadings(timeInterval: TimeInterval): Thunk {
 	return (dispatch: Dispatch, getState: GetState) => {
@@ -52,7 +52,7 @@ export function fetchNeededMapReadings(timeInterval: TimeInterval): Thunk {
 function fetchMeterMapReadings(meterIDs: number[], timeInterval: TimeInterval, duration: moment.Duration): Thunk {
 	return async (dispatch: Dispatch) => {
 		dispatch(requestMeterBarReadings(meterIDs, timeInterval, duration));
-		const readings = await compressedReadingsApi.meterBarReadings(meterIDs, timeInterval, Math.round(duration.asDays()));
+		const readings = await readingsApi.meterBarReadings(meterIDs, timeInterval, Math.round(duration.asDays()));
 		dispatch(receiveMeterBarReadings(meterIDs, timeInterval, duration, readings));
 	};
 }
@@ -68,7 +68,7 @@ function fetchMeterMapReadings(meterIDs: number[], timeInterval: TimeInterval, d
 function fetchGroupMapReadings(groupIDs: number[], timeInterval: TimeInterval, duration: moment.Duration): Thunk {
 	return async (dispatch: Dispatch) => {
 		dispatch(requestGroupBarReadings(groupIDs, timeInterval, duration));
-		const readings = await compressedReadingsApi.groupBarReadings(groupIDs, timeInterval, Math.round(duration.asDays()));
+		const readings = await readingsApi.groupBarReadings(groupIDs, timeInterval, Math.round(duration.asDays()));
 		dispatch(receiveGroupBarReadings(groupIDs, timeInterval, duration, readings));
 	};
 }

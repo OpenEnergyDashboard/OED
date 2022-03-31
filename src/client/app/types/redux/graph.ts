@@ -90,6 +90,7 @@ export type GraphAction =
 export interface GraphState {
 	selectedMeters: number[];
 	selectedGroups: number[];
+	selectedUnit: number;
 	timeInterval: TimeInterval;
 	rangeSliderInterval: TimeInterval;
 	barDuration: moment.Duration;

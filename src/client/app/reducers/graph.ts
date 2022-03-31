@@ -11,6 +11,8 @@ import { calculateCompareTimeInterval, ComparePeriod, SortingOrder } from '../ut
 const defaultState: GraphState = {
 	selectedMeters: [],
 	selectedGroups: [],
+	// -99 is value used for an unset unit id.
+	selectedUnit: -99,
 	timeInterval: TimeInterval.unbounded(),
 	rangeSliderInterval: TimeInterval.unbounded(),
 	barDuration: moment.duration(4, 'weeks'),

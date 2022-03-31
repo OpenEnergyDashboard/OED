@@ -91,7 +91,7 @@ export function changeSelectedMeters(meterIDs: number[]): Thunk {
 		dispatch(updateSelectedMeters(meterIDs));
 		// Nesting dispatches to preserve that updateSelectedMeters() is called before fetching readings
 		dispatch((dispatch2: Dispatch) => {
-			dispatch2(fetchNeededLineReadings(getState().graph.timeInterval));
+			dispatch2(fetchNeededLineReadings(getState().graph.timeInterval, getState().graph.selectedUnit));
 			dispatch2(fetchNeededBarReadings(getState().graph.timeInterval));
 			dispatch2(fetchNeededCompareReadings(getState().graph.comparePeriod));
 			dispatch2(fetchNeededMapReadings(getState().graph.timeInterval));
@@ -105,7 +105,7 @@ export function changeSelectedGroups(groupIDs: number[]): Thunk {
 		dispatch(updateSelectedGroups(groupIDs));
 		// Nesting dispatches to preserve that updateSelectedGroups() is called before fetching readings
 		dispatch((dispatch2: Dispatch) => {
-			dispatch2(fetchNeededLineReadings(getState().graph.timeInterval));
+			dispatch2(fetchNeededLineReadings(getState().graph.timeInterval, getState().graph.selectedUnit));
 			dispatch2(fetchNeededBarReadings(getState().graph.timeInterval));
 			dispatch2(fetchNeededCompareReadings(getState().graph.comparePeriod));
 			dispatch2(fetchNeededMapReadings(getState().graph.timeInterval));
@@ -114,9 +114,9 @@ export function changeSelectedGroups(groupIDs: number[]): Thunk {
 	};
 }
 
-function fetchNeededReadingsForGraph(timeInterval: TimeInterval): Thunk {
+function fetchNeededReadingsForGraph(timeInterval: TimeInterval, unitID: number): Thunk {
 	return (dispatch: Dispatch) => {
-		dispatch(fetchNeededLineReadings(timeInterval));
+		dispatch(fetchNeededLineReadings(timeInterval, unitID));
 		dispatch(fetchNeededBarReadings(timeInterval));
 		dispatch(fetchNeededMapReadings(timeInterval));
 		return Promise.resolve();
@@ -132,7 +132,7 @@ export function changeGraphZoomIfNeeded(timeInterval: TimeInterval): Thunk {
 		if (shouldChangeGraphZoom(getState(), timeInterval)) {
 			dispatch(resetRangeSliderStack());
 			dispatch(changeGraphZoom(timeInterval));
-			dispatch(fetchNeededReadingsForGraph(timeInterval));
+			dispatch(fetchNeededReadingsForGraph(timeInterval, getState().graph.selectedUnit));
 		}
 		return Promise.resolve();
 	};

@@ -19,6 +19,10 @@ import { TimeInterval } from '../../../common/TimeInterval';
 
 
 function mapStateToProps(state: State) {
+	// TODO this is a hack to get the unit state set up correctly.
+	// It is not really safe to set to an arbitrary value but
+	// the Unit route is not done yet.
+	state.graph.selectedUnit = 1;
 	return {
 		chartToRender: state.graph.chartToRender,
 		lineLoading: state.readings.line.isFetching,
