@@ -382,7 +382,7 @@ class Reading {
 	 * @param conn the connection to use.
 	 * @return {Promise<object<int, array<{reading_rate: number, start_timestamp: }>>>}
 	 */
-	 static async getLineGroupReadings(groupIDs, graphicUnitId, fromTimestamp, toTimestamp, conn) {
+	static async getLineGroupReadings(groupIDs, graphicUnitId, fromTimestamp, toTimestamp, conn) {
 		const [minHourPoints, minDayPoints] = determineMinPoints();
 		/**
 		 * @type {array<{group_id: int, reading_rate: Number, start_timestamp: Moment, end_timestamp: Moment}>}

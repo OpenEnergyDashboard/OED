@@ -92,7 +92,7 @@ function validateGroupLineReadingsParams(params) {
  * @param timeInterval The range of time to get readings for
  * @return {Promise<object<int, array<{reading_rate: number, start_timestamp: }>>>}
  */
- async function groupLineReadings(groupIDs, graphicUnitId, timeInterval) {
+async function groupLineReadings(groupIDs, graphicUnitId, timeInterval) {
 	const conn = getConnection();
 	const rawReadings = await Reading.getLineGroupReadings(groupIDs, graphicUnitId, timeInterval.startTimestamp, timeInterval.endTimestamp, conn);
 	return _.mapValues(rawReadings, readingsForGroup => readingsForGroup.map(formatCompressedReadingRow));
