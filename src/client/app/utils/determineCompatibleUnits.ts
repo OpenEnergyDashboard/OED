@@ -12,11 +12,11 @@ import { GroupDefinition } from 'types/redux/groups';
 
 /**
  * The intersect operation of two sets.
- * @param setA
- * @param setB
- * @returns
+ * @param setA The first set.
+ * @param setB The second set.
+ * @returns The intersection of two sets.
  */
-function intersect(setA: Set<number>, setB: Set<number>): Set<number> {
+export function setIntersect(setA: Set<number>, setB: Set<number>): Set<number> {
 	return new Set(Array.from(setA).filter(i => setB.has(i)));
 }
 
@@ -31,10 +31,10 @@ export function unitsCompatibleWithMeters(meters: Set<number>): Set<number> {
 	let first = true;
 	// Holds current set of compatible units.
 	let compatibleUnits = new Set<number>();
-	// Loops over all emters.
+	// Loops over all meters.
 	meters.forEach(function (meterId: number) {
 		// Gets the meter associated with the meterId.
-		const meter = _.find(state.meters.byMeterID, function (o: MeterMetadata) { return o.id == meterId; }) as MeterMetadata;
+		const meter = _.get(state.meters.byMeterID, meterId) as MeterMetadata;
 		let meterUnits = new Set<number>();
 		// If meter had no unit then nothing compatible with it.
 		// This probably won't happen but be safe. Note once you have one of these then
@@ -50,7 +50,7 @@ export function unitsCompatibleWithMeters(meters: Set<number>): Set<number> {
 			first = false;
 		} else {
 			// Do intersection of compatible units so far with ones for this meters.
-			compatibleUnits = intersect(compatibleUnits, meterUnits);
+			compatibleUnits = setIntersect(compatibleUnits, meterUnits);
 		}
 	});
 	// Now have final compatible units for the provided set of meter
@@ -59,7 +59,7 @@ export function unitsCompatibleWithMeters(meters: Set<number>): Set<number> {
 
 /**
  * Returns a set of units ids that are compatible with a specific unit id.
- * @param unit The unit id.
+ * @param unitId The unit id.
  * @returns
  */
 export function unitsCompatibleWithUnit(unitId: number): Set<number> {
@@ -135,12 +135,8 @@ export function unitFromPColumn(column: number): number {
 export async function metersInGroup(groupId: number): Promise<Set<number>> {
 	// Fetch group children if needed.
 	await store.dispatch<any>(fetchGroupChildrenIfNeeded(groupId));
-
 	const state = store.getState();
 	// Gets the group associated with groupId.
-	const group = _.find(state.groups.byGroupID, function (o: UnitData) {
-		return o.id == groupId;
-	}) as GroupDefinition;
-
+	const group = _.get(state.groups.byGroupID, groupId) as GroupDefinition;
 	return new Set(group.deepMeters);
 }
