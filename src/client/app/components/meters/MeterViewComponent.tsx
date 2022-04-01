@@ -69,13 +69,6 @@ class MeterViewComponent extends React.Component<MeterViewPropsWithIntl, MeterVi
 						________
 					</span>
 				</div>
-				<div className="type-container">
-					Type
-					<span className="custom-select">
-						{/* TODO ---- get data for type */}
-						________
-					</span>
-				</div>
 				<div className="toggle-container">
 					<div className="on-off-switch">
 						{/* <span className="on-off-switch-span-on">{this.formatEnabled()}</span> */}

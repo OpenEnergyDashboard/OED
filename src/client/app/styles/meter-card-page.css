@@ -99,4 +99,5 @@ width: 100%;
 .toggle-container {
     display: flex;
     justify-content: center;
+    flex-direction: column;
 }
