@@ -18,7 +18,7 @@ function mapStateToProps(state: State) {
 		`x: ${map.calibrationResult.maxError.x}%, y: ${map.calibrationResult.maxError.y}%`
 		: translate('need.more.points');
 	const currentCartesianDisplay = (map.currentPoint) ?
-	`x: ${map.currentPoint.cartesian.x}, y: ${map.currentPoint.cartesian.y}` : translate('undefined');
+		`x: ${map.currentPoint.cartesian.x}, y: ${map.currentPoint.cartesian.y}` : translate('undefined');
 	return {
 		showGrid: state.maps.calibrationSettings.showGrid,
 		currentCartesianDisplay,

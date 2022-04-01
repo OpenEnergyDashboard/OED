@@ -12,7 +12,7 @@ import { browserHistory } from '../../utils/history';
 import { showSuccessNotification, showErrorNotification } from '../../utils/notifications';
 import translate from '../../utils/translate';
 
-export default class CreateUserFormContainer extends React.Component<{}, {}>{
+export default class CreateUserFormContainer extends React.Component<{}>{
 	constructor(props: {}) {
 		super(props);
 		this.handleEmailChange = this.handleEmailChange.bind(this);
