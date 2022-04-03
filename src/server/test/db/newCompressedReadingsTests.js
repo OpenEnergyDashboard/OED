@@ -13,6 +13,8 @@ const Point = require('../../models/Point');
 const { generateSineData } = require('../../data/generateTestingData');
 const gps = new Point(90, 45);
 
+// TODO The name of this file should be updated to remove compressed when it is updated
+
 mocha.describe('Compressed Readings 2', () => {
 	// Set reading rate in case changed at site.
 	process.env.OED_SITE_READING_RATE = process.env.OED_TEST_SITE_READING_RATE;

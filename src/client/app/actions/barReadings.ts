@@ -8,7 +8,7 @@ import { Dispatch, GetState, Thunk, ActionType } from '../types/redux/actions';
 import { State } from '../types/redux/state';
 import * as t from '../types/redux/barReadings';
 import { readingsApi } from '../utils/api';
-import { CompressedBarReadings } from '../types/compressed-readings';
+import { CompressedBarReadings } from '../types/readings';
 
 /**
  * @param {State} state the Redux state

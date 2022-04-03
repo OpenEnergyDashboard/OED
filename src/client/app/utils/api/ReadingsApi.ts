@@ -7,7 +7,7 @@
 import * as _ from 'lodash';
 import ApiBackend from './ApiBackend';
 import {TimeInterval} from '../../../../common/TimeInterval';
-import {CompressedBarReadings, CompressedLineReading, LineReadings} from '../../types/compressed-readings';
+import {CompressedBarReadings, CompressedLineReading, LineReadings} from '../../types/readings';
 
 export default class ReadingsApi {
 	private readonly backend: ApiBackend;

@@ -4,7 +4,7 @@
 
 import { TimeInterval } from '../../../../common/TimeInterval';
 import { ActionType } from './actions';
-import {CompressedLineReading, LineReadings} from '../compressed-readings';
+import {CompressedLineReading, LineReadings} from '../readings';
 
 export interface RequestMeterLineReadingsAction {
 	type: ActionType.RequestMeterLineReadings;

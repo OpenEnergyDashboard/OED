@@ -10,6 +10,6 @@ module.exports = {
 	toVersion: '1.0.0',
 	up: async db => {
 		await db.none(sqlFile('../migrations/0.8.0-1.0.0/sql/create_cik_table.sql'));
-		await db.none(sqlFile('../migrations/0.8.0-1.0.0/sql/create_compressed_reading_views.sql'));
+		await db.none(sqlFile('../migrations/0.8.0-1.0.0/sql/create_reading_views.sql'));
 	}
 };

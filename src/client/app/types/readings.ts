@@ -28,3 +28,23 @@ export interface RawReadings {
 	startTimestamp: string,
 	endTimestamp: string
 }
+
+export interface CompressedLineReading {
+	reading: number;
+	startTimestamp: number;
+	endTimestamp: number;
+}
+
+export interface LineReadings {
+	[id: number]: CompressedLineReading[];
+}
+
+export interface CompressedBarReading {
+	reading: number;
+	startTimestamp: number;
+	endTimestamp: number;
+}
+
+export interface CompressedBarReadings {
+	[id: number]: CompressedBarReading[];
+}

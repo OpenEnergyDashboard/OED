@@ -5,7 +5,7 @@
 import * as moment from 'moment';
 import { TimeInterval } from '../../../../common/TimeInterval';
 import { ActionType } from './actions';
-import { CompressedBarReading, CompressedBarReadings } from '../compressed-readings';
+import { CompressedBarReading, CompressedBarReadings } from '../readings';
 
 export interface RequestMeterBarReadingsAction {
 	type: ActionType.RequestMeterBarReadings;

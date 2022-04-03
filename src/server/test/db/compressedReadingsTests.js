@@ -12,7 +12,11 @@ const Group = require('../../models/Group');
 const Meter = require('../../models/Meter');
 const Reading = require('../../models/Reading');
 const Point = require('../../models/Point');
+const { updateDecorator } = require('typescript');
+const { removeData } = require('jquery');
 const gps = new Point(90, 45);
+
+//  TODO When this is updated, the name of the file should have compressed removed.
 
 /**
  * Tests for compressed meter readings.

@@ -25,6 +25,8 @@ const { compressedLineReadings,
 
 const { TimeInterval } = require('../../../common/TimeInterval');
 
+//  TODO When this is updated, the name of the file should have compressed removed.
+
 function mockResponse() {
 	return {
 		sendStatus: sinon.spy(),
