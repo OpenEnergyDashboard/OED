@@ -39,11 +39,11 @@ mocha.describe('Compressed Readings 2', () => {
 				new Reading(meter.id, 300, timestamp3, timestamp4),
 				new Reading(meter.id, 400, timestamp4, timestamp5)
 			], conn);
-			await Reading.refreshCompressedReadings(conn);
+			await Reading.refreshDailyReadings(conn);
 
 			// We need to refresh the hourly readings view because it is materialized.
-			await Reading.refreshCompressedHourlyReadings(conn);
-			const { meter_id, reading_rate } = await conn.one('SELECT * FROM hourly_readings WHERE lower(time_interval)=${start_timestamp};',
+			await Reading.refreshHourlyReadings(conn);
+			const { meter_id, reading_rate } = await conn.one('SELECT * FROM hourly_readings_unit WHERE lower(time_interval)=${start_timestamp};',
 				{ start_timestamp: timestamp1 });
 			expect(meter_id).to.equal(meter.id);
 			expect(reading_rate).to.equal(100);
@@ -57,9 +57,9 @@ mocha.describe('Compressed Readings 2', () => {
 				new Reading(meter.id, 300, timestamp3, timestamp4),
 				new Reading(meter.id, 400, timestamp4, timestamp5)
 			], conn);
-			await Reading.refreshCompressedReadings(conn);
+			await Reading.refreshDailyReadings(conn);
 			const { meter_id, reading_rate } = await conn.one(
-				'SELECT * FROM daily_readings WHERE time_interval && tsrange(${start_timestamp}, ${end_timestamp});',
+				'SELECT * FROM daily_readings_unit WHERE time_interval && tsrange(${start_timestamp}, ${end_timestamp});',
 				{ start_timestamp: timestamp1, end_timestamp: timestamp2 });
 			expect(meter_id).to.equal(meter.id);
 			expect(reading_rate).to.equal((100 + 200 + 300 + 400) / 4);
@@ -74,8 +74,8 @@ mocha.describe('Compressed Readings 2', () => {
 				new Reading(meter.id, 100, halfHourBefore, halfHourAfter)
 			], conn);
 
-			await Reading.refreshCompressedReadings(conn);
-			const rows = await conn.many('SELECT * FROM daily_readings;');
+			await Reading.refreshDailyReadings(conn);
+			const rows = await conn.many('SELECT * FROM daily_readings_unit;');
 			expect(rows).to.have.length(2);
 			expect(rows[0].meter_id).to.equal(meter.id);
 			expect(rows[1].meter_id).to.equal(meter.id);
@@ -100,9 +100,9 @@ mocha.describe('Compressed Readings 2', () => {
 			// Expected compressed reading:
 			// ((50 kW * 1 hr) + (100 kW * 2 hr)) / (1 hr + 2 hr)
 
-			await Reading.refreshCompressedReadings(conn);
+			await Reading.refreshDailyReadings(conn);
 
-			const { meter_id, reading_rate } = await conn.one('SELECT * FROM daily_readings WHERE lower(time_interval) = ${start_timestamp};',
+			const { meter_id, reading_rate } = await conn.one('SELECT * FROM daily_readings_unit WHERE lower(time_interval) = ${start_timestamp};',
 				{ start_timestamp: day1Start });
 
 			expect(meter_id).to.equal(meter.id);
@@ -118,7 +118,7 @@ mocha.describe('Compressed Readings 2', () => {
 				new Reading(meter.id, 100, dayStart, dayEnd)
 			], conn);
 
-			await Reading.refreshCompressedReadings(conn);
+			await Reading.refreshDailyReadings(conn);
 
 			const meterReadings = await Reading.getNewCompressedReadings([meter.id], dayStart, dayEnd, conn);
 
@@ -146,10 +146,10 @@ mocha.describe('Compressed Readings 2', () => {
 				new Reading(meter.id, 100, dayStart, dayEnd)
 			], conn);
 
-			await Reading.refreshCompressedReadings(conn);
+			await Reading.refreshDailyReadings(conn);
 
 			// We need to refresh the hourly readings view because it is materialized.
-			await Reading.refreshCompressedHourlyReadings(conn);
+			await Reading.refreshHourlyReadings(conn);
 
 			const meterReadings = await Reading.getNewCompressedReadings([meter.id], dayStart, dayStart.clone().add(15, 'minute'), conn);
 
@@ -166,10 +166,10 @@ mocha.describe('Compressed Readings 2', () => {
 				new Reading(meter.id, 100, dayStart, dayEnd)
 			], conn);
 
-			await Reading.refreshCompressedReadings(conn);
+			await Reading.refreshDailyReadings(conn);
 
 			// We need to refresh the hourly readings view because it is materialized.
-			await Reading.refreshCompressedHourlyReadings(conn);
+			await Reading.refreshHourlyReadings(conn);
 
 			const meterReadings = await Reading.getNewCompressedReadings([meter.id], dayStart, dayStart.clone().add(1, 'hours').toString(), conn);
 			expect(meterReadings[meter.id].length).to.equal(1);
@@ -185,9 +185,9 @@ mocha.describe('Compressed Readings 2', () => {
 				new Reading(meter.id, 100, yearStart, yearEnd)
 			], conn);
 
-			await Reading.refreshCompressedReadings(conn);
+			await Reading.refreshDailyReadings(conn);
 			// We need to refresh the hourly readings view because it is materialized.
-			await Reading.refreshCompressedHourlyReadings(conn);
+			await Reading.refreshHourlyReadings(conn);
 
 			const allReadings = await Reading.getNewCompressedReadings([meter.id], yearStart, yearStart.clone().add(60, 'hours'), conn);
 			const meterReadings = allReadings[meter.id];
@@ -204,7 +204,7 @@ mocha.describe('Compressed Readings 2', () => {
 				new Reading(meter.id, 100, yearStart, yearEnd)
 			], conn);
 
-			await Reading.refreshCompressedReadings(conn);
+			await Reading.refreshDailyReadings(conn);
 			const allReadings = await Reading.getNewCompressedReadings([meter.id], yearStart, yearStart.clone().add(60, 'days'), conn);
 			const meterReadings = allReadings[meter.id];
 			expect(meterReadings.length).to.equal(1);
@@ -222,10 +222,10 @@ mocha.describe('Compressed Readings 2', () => {
 				meter1 = await Meter.getByName('Meter1', conn);
 				const data = generateSineData(startDate, endDate, { timeStep: { minute: 15 }}).map(row => new Reading(meter1.id, row[0], row[1], row[2]));
 				await Reading.insertAll(data, conn);
-				await Reading.refreshCompressedReadings(conn);
+				await Reading.refreshDailyReadings(conn);
 
 				// We need to refresh the hourly readings view because it is materialized.
-				await Reading.refreshCompressedHourlyReadings(conn);
+				await Reading.refreshHourlyReadings(conn);
 			});
 
 			mocha.it('Daily resolution:', async () => {
@@ -265,10 +265,10 @@ mocha.describe('Compressed Readings 2', () => {
 				meter1 = await Meter.getByName('Meter1', conn);
 				const data = generateSineData(startDate, endDate, { timeStep: { minute: 23 }}).map(row => new Reading(meter1.id, row[0], row[1], row[2]));
 				await Reading.insertAll(data, conn);
-				await Reading.refreshCompressedReadings(conn);
+				await Reading.refreshDailyReadings(conn);
 
 				// We need to refresh the hourly readings view because it is materialized.
-				await Reading.refreshCompressedHourlyReadings(conn);
+				await Reading.refreshHourlyReadings(conn);
 			});
 
 			mocha.it('Daily resolution:', async () => {
@@ -307,7 +307,7 @@ mocha.describe('Compressed Readings 2', () => {
 				new Reading(meter.id, 100, yearStart, yearEnd)
 			], conn);
 
-			await Reading.refreshCompressedReadings(conn);
+			await Reading.refreshDailyReadings(conn);
 			const allReadings = await Reading.getNewCompressedReadings([meter.id], null, null, conn);
 			const meterReadings = allReadings[meter.id];
 			expect(meterReadings.length).to.equal(365); // 365 days in a year
@@ -418,7 +418,7 @@ mocha.describe('Compressed Readings 2', () => {
 				new Reading(meter.id, 300, timestamp3, timestamp4),
 				new Reading(meter.id, 400, timestamp4, timestamp5)
 			], conn);
-			await Reading.refreshCompressedReadings(conn);
+			await Reading.refreshDailyReadings(conn);
 
 			const barReadings = await Reading.getNewCompressedBarchartReadings([meter.id], timestamp1, timestamp5, 1, conn);
 			expect(barReadings).to.have.keys([meter.id.toString()]);
@@ -443,7 +443,7 @@ mocha.describe('Compressed Readings 2', () => {
 				new Reading(meter.id, 300, timestamp3, timestamp4),
 				new Reading(meter.id, 400, timestamp4, timestamp5)
 			], conn);
-			await Reading.refreshCompressedReadings(conn);
+			await Reading.refreshDailyReadings(conn);
 
 			const barReadings = await Reading.getNewCompressedBarchartReadings([meter.id], timestamp1, timestamp5, 2, conn);
 			expect(barReadings).to.have.keys([meter.id.toString()]);
@@ -463,7 +463,7 @@ mocha.describe('Compressed Readings 2', () => {
 				new Reading(meter.id, 100, timestamp1, timestamp2),
 				new Reading(meter2.id, 1, timestamp1, timestamp2)
 			], conn);
-			await Reading.refreshCompressedReadings(conn);
+			await Reading.refreshDailyReadings(conn);
 			const barReadings = await Reading.getNewCompressedBarchartReadings([meter.id, meter2.id], timestamp1, timestamp2, 1, conn);
 			expect(barReadings).to.have.keys([meter.id.toString(), meter2.id.toString()]);
 			const readingsForMeterComparable = barReadings[meter.id].map(

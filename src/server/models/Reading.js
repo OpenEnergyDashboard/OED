@@ -91,10 +91,8 @@ class Reading {
 	 * @param conn The connection to use
 	 * @return {Promise<void>}
 	 */
-	static refreshCompressedReadings(conn) {
+	static refreshDailyReadings(conn) {
 		// This can't be a function because you can't call REFRESH inside a function
-		// TODO This will be removed once we completely transition to the unit version.
-		return conn.none('REFRESH MATERIALIZED VIEW daily_readings');
 		return conn.none('REFRESH MATERIALIZED VIEW daily_readings_unit');
 	}
 
@@ -108,10 +106,9 @@ class Reading {
 	 * @param conn The connection to use
 	 * @return {Promise<void>}
 	 */
-	static refreshCompressedHourlyReadings(conn) {
+	static refreshHourlyReadings(conn) {
 		// This can't be a function because you can't call REFRESH inside a function
 		// TODO This will be removed once we completely transition to the unit version.
-		return conn.none('REFRESH MATERIALIZED VIEW hourly_readings');
 		return conn.none('REFRESH MATERIALIZED VIEW hourly_readings_unit');
 	}
 

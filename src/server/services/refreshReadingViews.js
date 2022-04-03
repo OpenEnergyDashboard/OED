@@ -20,7 +20,7 @@ async function refreshReadingViews() {
 	const conn = getConnection();
 
 	log.info('Refreshing Materialized Daily Reading Views');
-	await Reading.refreshCompressedReadings(conn);
+	await Reading.refreshDailyReadings(conn);
 	log.info('Views Refreshed');
 }
 

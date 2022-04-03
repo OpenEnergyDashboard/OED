@@ -14,11 +14,11 @@ const { log } = require('../../log');
  */
 function determineMinPoints(){
 	// Minimum daily points is set such that when the interval requested is under 60 days or 
-	// about two months then the compressed_readings_2 algorithm should go to the hourly view.
+	// about two months then the line_meters_readings_unit algorithm should go to the hourly view.
 	const minimumDailyPoints = 61;
 
 	// Minimum daily points is set such that when the raw reading rate is every 15 minutes and
-	// then the compressed_readings_2 algorithm should go to the raw data view when the interval
+	// then the line_meters_readings_unit algorithm should go to the raw data view when the interval
 	// is under 15 days (or a little over two weeks).
 	// For other rates we have:
 	// 1 minute -> interval under 24 hours or 1 day
