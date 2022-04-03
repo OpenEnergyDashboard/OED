@@ -58,23 +58,23 @@ function shouldFetchGroupCompareReadings(state: State, groupID: number, timeInte
 }
 
 function requestMeterCompareReadings(meterIDs: number[], timeInterval: TimeInterval, compareShift: moment.Duration):
-	t.RequestMeterCompareReadingAction {
-	return { type: ActionType.RequestMeterCompareReading, meterIDs, timeInterval, compareShift };
+	t.RequestMeterCompareReadingsAction {
+	return { type: ActionType.RequestMeterCompareReadings, meterIDs, timeInterval, compareShift };
 }
 
 function receiveMeterCompareReadings(meterIDs: number[], timeInterval: TimeInterval, compareShift: moment.Duration, readings: CompareReadings):
-	t.ReceiveMeterCompareReadingAction {
-	return { type: ActionType.ReceiveMeterCompareReading, meterIDs, timeInterval, compareShift, readings };
+	t.ReceiveMeterCompareReadingsAction {
+	return { type: ActionType.ReceiveMeterCompareReadings, meterIDs, timeInterval, compareShift, readings };
 }
 
 function requestGroupCompareReadings(groupIDs: number[], timeInterval: TimeInterval, compareShift: moment.Duration):
-	t.RequestGroupCompareReadingAction {
-	return { type: ActionType.RequestGroupCompareReading, groupIDs, timeInterval, compareShift };
+	t.RequestGroupCompareReadingsAction {
+	return { type: ActionType.RequestGroupCompareReadings, groupIDs, timeInterval, compareShift };
 }
 
 function receiveGroupCompareReadings(groupIDs: number[], timeInterval: TimeInterval, compareShift: moment.Duration, readings: CompareReadings):
-	t.ReceiveGroupCompareReadingAction {
-	return { type: ActionType.ReceiveGroupCompareReading, groupIDs, timeInterval, compareShift, readings };
+	t.ReceiveGroupCompareReadingsAction {
+	return { type: ActionType.ReceiveGroupCompareReadings, groupIDs, timeInterval, compareShift, readings };
 }
 
 /**

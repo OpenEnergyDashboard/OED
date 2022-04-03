@@ -4,24 +4,6 @@
 
 import { ChartTypes } from './redux/graph';
 
-/**
- * The type of line readings in actions.
- */
-export interface LineReadings {
-	[id: number]: {
-		[point: number]: [number, number];
-	};
-}
-
-/**
- * The type of bar readings in actions.
- */
-export interface BarReadings {
-	/* tslint:disable:array-type */
-	[id: number]: Array<[number, number]>;
-	/* tslint:enable:array-type */
-}
-
 export interface CompareReading {
 	curr_use: number;
 	prev_use: number;
