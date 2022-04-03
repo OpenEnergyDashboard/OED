@@ -15,7 +15,7 @@ const moment = require('moment');
 const Meter = require('../../models/Meter');
 const Reading = require('../../models/Reading');
 
-const { compressedLineReadings,
+const { lineReadings,
 	validateLineReadingsParams,
 	validateLineReadingsQueryParams,
 	compressedMeterBarReadings,
@@ -61,7 +61,7 @@ mocha.describe('Compressed readings routes', () => {
 					{reading_rate: 1, start_timestamp: timeInterval.startTimestamp, end_timestamp: timeInterval.endTimestamp}
 				]
 			});
-			const response = await compressedLineReadings([1], timeInterval);
+			const response = await lineReadings([1], timeInterval);
 
 			const expectedResponse = {
 				1: [

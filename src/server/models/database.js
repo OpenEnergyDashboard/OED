@@ -101,7 +101,7 @@ async function createSchema(conn) {
 	await Group.createTables(conn);
 	await Migration.createTable(conn);
 	await LogEmail.createTable(conn);
-	await Reading.createCompressedReadingsMaterializedViews(conn);
+	await Reading.createReadingsMaterializedViews(conn);
 	await Reading.createCompareReadingsFunction(conn);
 	await Baseline.createTable(conn);
 	await Map.createTable(conn);

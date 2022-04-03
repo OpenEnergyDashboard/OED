@@ -29,7 +29,7 @@ function mapStateToProps(state: State) {
 					throw new Error('Unacceptable condition: readingsData.readings is undefined.');
 				}
 
-				// Create two arrays for the x and y values. Fill the array with the data from the compressed readings
+				// Create two arrays for the x and y values. Fill the array with the data from the line readings
 				const xData: string[] = [];
 				const yData: number[] = [];
 				const hoverText: string[] = [];
@@ -89,7 +89,7 @@ function mapStateToProps(state: State) {
 					throw new Error('Unacceptable condition: readingsData.readings is undefined.');
 				}
 
-				// Create two arrays for the x and y values. Fill the array with the data from the compressed readings
+				// Create two arrays for the x and y values. Fill the array with the data from the line readings
 				const xData: string[] = [];
 				const yData: number[] = [];
 				const hoverText: string[] = [];

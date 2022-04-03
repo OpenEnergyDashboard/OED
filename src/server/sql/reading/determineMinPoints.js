@@ -9,7 +9,7 @@ const { log } = require('../../log');
  * Calculates the minimum number of hour and daily points to be displayed.
  * This function is a work around since we do not know how to access environment
  * variables from the database level. It is also a temporary solution that will
- * be replaced when we later implement meter-by-meter logic for compressed readings.
+ * be replaced when we later implement meter-by-meter logic for averaged readings.
  * @returns [minimumHourPoints, minimumDailyPoints]
  */
 function determineMinPoints(){

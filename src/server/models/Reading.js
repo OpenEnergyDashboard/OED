@@ -38,7 +38,7 @@ class Reading {
 	 * @param conn the database connection to use
 	 * @return {Promise<void>}
 	 */
-	static createCompressedReadingsMaterializedViews(conn) {
+	static createReadingsMaterializedViews(conn) {
 		return conn.none(sqlFile('reading/create_reading_views.sql'));
 	}
 
@@ -62,7 +62,7 @@ class Reading {
 	}
 
 	/**
-	 * Refreshes the compressed hourly readings view.
+	 * Refreshes the hourly readings view.
 	 * Should be called at least once a day but need to do hourly if the site wants zooming in
 	 * to see hourly data as it is available. This function can take more time than refreshing
 	 * the daily readings so be sure calling it more frequently does not impact the

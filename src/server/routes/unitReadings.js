@@ -48,7 +48,7 @@ function validateLineReadingsQueryParams(queryParams) {
 	return queryValidationResult.valid;
 }
 
-function formatCompressedReadingRow(readingRow) {
+function formatReadingRow(readingRow) {
 	return {
 		reading: readingRow.reading_rate,
 		startTimestamp: readingRow.start_timestamp.valueOf(),
@@ -66,7 +66,7 @@ function formatCompressedReadingRow(readingRow) {
 async function meterLineReadings(meterIDs, graphicUnitId, timeInterval) {
 	const conn = getConnection();
 	const rawReadings = await Reading.getLineMeterReadings(meterIDs, graphicUnitId, timeInterval.startTimestamp, timeInterval.endTimestamp, conn);
-	return _.mapValues(rawReadings, readingsForMeter => readingsForMeter.map(formatCompressedReadingRow));
+	return _.mapValues(rawReadings, readingsForMeter => readingsForMeter.map(formatReadingRow));
 }
 
 function validateGroupLineReadingsParams(params) {
@@ -95,7 +95,7 @@ function validateGroupLineReadingsParams(params) {
 async function groupLineReadings(groupIDs, graphicUnitId, timeInterval) {
 	const conn = getConnection();
 	const rawReadings = await Reading.getLineGroupReadings(groupIDs, graphicUnitId, timeInterval.startTimestamp, timeInterval.endTimestamp, conn);
-	return _.mapValues(rawReadings, readingsForGroup => readingsForGroup.map(formatCompressedReadingRow));
+	return _.mapValues(rawReadings, readingsForGroup => readingsForGroup.map(formatReadingRow));
 }
 
 function validateMeterBarReadingsParams(params) {
@@ -133,7 +133,7 @@ function validateBarReadingsQueryParams(queryParams) {
 	return queryValidationResult.valid;
 }
 
-function formatCompressedBarReadingRow(readingRow) {
+function formatBarReadingRow(readingRow) {
 	return {
 		reading: readingRow.reading,
 		startTimestamp: readingRow.start_timestamp.valueOf(),
@@ -145,7 +145,7 @@ async function compressedMeterBarReadings(meterIDs, barWidthDays, timeInterval) 
 	const conn = getConnection();
 	const rawReadings = await Reading.getNewCompressedBarchartReadings(
 		meterIDs, timeInterval.startTimestamp, timeInterval.endTimestamp, barWidthDays, conn);
-	return _.mapValues(rawReadings, readingsForMeter => readingsForMeter.map(formatCompressedBarReadingRow));
+	return _.mapValues(rawReadings, readingsForMeter => readingsForMeter.map(formatBarReadingRow));
 }
 
 function validateGroupBarReadingsParams(params) {
@@ -168,7 +168,7 @@ async function compressedGroupBarReadings(groupIDs, barWidthDays, timeInterval) 
 	const conn = getConnection();
 	const rawReadings = await Reading.getNewCompressedBarchartGroupReadings(
 		groupIDs, timeInterval.startTimestamp, timeInterval.endTimestamp, barWidthDays, conn);
-	return _.mapValues(rawReadings, readingsForMeter => readingsForMeter.map(formatCompressedBarReadingRow));
+	return _.mapValues(rawReadings, readingsForMeter => readingsForMeter.map(formatBarReadingRow));
 }
 
 function createRouter() {

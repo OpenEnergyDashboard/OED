@@ -123,7 +123,7 @@ hourly_readings_unit
 
 
 /*
-The following function determines the correct duration view to query from, and returns compressed data from it.
+The following function determines the correct duration view to query from, and returns averged or raw readings from it.
 It is designed to return data for plotting line graphs. It works on meters.
 It is the new version of compressed_readings_2 that works with units. It takes these parameters:
 meter_ids: A array of meter ids to query.
@@ -213,7 +213,7 @@ $$ LANGUAGE 'plpgsql';
 
 
 /*
-The following function determines the correct duration view to query from, and returns compressed data from it.
+The following function determines the correct duration view to query from, and returns averaged or raw reading from it.
 It is designed to return data for plotting line graphs. It works on groups.
 It is the new version of compressed_group_readings_2 that works with units. It takes these parameters:
 group_ids: A array of group ids to query.
@@ -230,7 +230,7 @@ AS $$
 	DECLARE
 		meter_ids INTEGER[];
 	BEGIN
-		-- First get all the meter ids that will be included in one or more groups being queried
+		-- First get all the meter ids that will be included in one or more groups being queried.
 		SELECT array_agg(gdm.meter_id) INTO meter_ids
 		FROM groups_deep_meters gdm
 		INNER JOIN unnest(group_ids) gids(id) ON gdm.group_id = gids.id;
@@ -238,12 +238,12 @@ AS $$
 		RETURN QUERY
 			SELECT
 				gdm.group_id AS group_id,
-				SUM(compressed.reading_rate) AS reading_rate,
-				compressed.start_timestamp,
-				compressed.end_timestamp
-			FROM line_meters_readings_unit(meter_ids, graphic_unit_id, start_stamp, end_stamp, min_day_points, min_hour_points) compressed
-			INNER JOIN groups_deep_meters gdm ON compressed.meter_id = gdm.meter_id
+				SUM(readings.reading_rate) AS reading_rate,
+				readings.start_timestamp,
+				readings.end_timestamp
+			FROM line_meters_readings_unit(meter_ids, graphic_unit_id, start_stamp, end_stamp, min_day_points, min_hour_points) readings
+			INNER JOIN groups_deep_meters gdm ON readings.meter_id = gdm.meter_id
 			INNER JOIN unnest(group_ids) gids(id) on gdm.group_id = gids.id
-			GROUP BY gdm.group_id, compressed.start_timestamp, compressed.end_timestamp;
+			GROUP BY gdm.group_id, readings.start_timestamp, readings.end_timestamp;
 	END;
 $$ LANGUAGE 'plpgsql';
