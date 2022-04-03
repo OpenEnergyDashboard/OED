@@ -65,7 +65,7 @@ function formatReadingRow(readingRow) {
  */
 async function meterLineReadings(meterIDs, graphicUnitId, timeInterval) {
 	const conn = getConnection();
-	const rawReadings = await Reading.getLineMeterReadings(meterIDs, graphicUnitId, timeInterval.startTimestamp, timeInterval.endTimestamp, conn);
+	const rawReadings = await Reading.getMeterLineReadings(meterIDs, graphicUnitId, timeInterval.startTimestamp, timeInterval.endTimestamp, conn);
 	return _.mapValues(rawReadings, readingsForMeter => readingsForMeter.map(formatReadingRow));
 }
 
@@ -94,7 +94,7 @@ function validateGroupLineReadingsParams(params) {
  */
 async function groupLineReadings(groupIDs, graphicUnitId, timeInterval) {
 	const conn = getConnection();
-	const rawReadings = await Reading.getLineGroupReadings(groupIDs, graphicUnitId, timeInterval.startTimestamp, timeInterval.endTimestamp, conn);
+	const rawReadings = await Reading.getGroupLineReadings(groupIDs, graphicUnitId, timeInterval.startTimestamp, timeInterval.endTimestamp, conn);
 	return _.mapValues(rawReadings, readingsForGroup => readingsForGroup.map(formatReadingRow));
 }
 

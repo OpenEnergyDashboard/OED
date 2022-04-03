@@ -200,7 +200,7 @@ min_data_points: The minimum number of data points to return if using the day vi
 min_hour_points: The minimum number of data points to return if using the hour view.
 Details on how this function works can be found in the devDocs in the resource generalization document.
  */
-CREATE OR REPLACE FUNCTION line_meters_readings_unit(meter_ids INTEGER[], graphic_unit_id INTEGER, start_stamp TIMESTAMP, end_stamp TIMESTAMP, min_day_points INTEGER, min_hour_points INTEGER)
+CREATE OR REPLACE FUNCTION meter_line_readings_unit(meter_ids INTEGER[], graphic_unit_id INTEGER, start_stamp TIMESTAMP, end_stamp TIMESTAMP, min_day_points INTEGER, min_hour_points INTEGER)
 	RETURNS TABLE(meter_id INTEGER, reading_rate FLOAT, start_timestamp TIMESTAMP, end_timestamp TIMESTAMP)
 AS $$
 DECLARE
@@ -293,7 +293,7 @@ min_hour_points: The minimum number of data points to return if using the hour v
 Details on how this function works can be found in the devDocs in the resource generalization document and above
 in the meter function that is equivalent.
  */
-CREATE OR REPLACE FUNCTION line_groups_readings_unit(group_ids INTEGER[], graphic_unit_id INTEGER, start_stamp TIMESTAMP, end_stamp TIMESTAMP, min_day_points INTEGER, min_hour_points INTEGER)
+CREATE OR REPLACE FUNCTION group_line_readings_unit(group_ids INTEGER[], graphic_unit_id INTEGER, start_stamp TIMESTAMP, end_stamp TIMESTAMP, min_day_points INTEGER, min_hour_points INTEGER)
 	RETURNS TABLE(group_id INTEGER, reading_rate FLOAT, start_timestamp TIMESTAMP, end_timestamp TIMESTAMP)
 AS $$
 	DECLARE
@@ -310,7 +310,7 @@ AS $$
 				SUM(readings.reading_rate) AS reading_rate,
 				readings.start_timestamp,
 				readings.end_timestamp
-			FROM line_meters_readings_unit(meter_ids, graphic_unit_id, start_stamp, end_stamp, min_day_points, min_hour_points) readings
+			FROM meter_line_readings_unit(meter_ids, graphic_unit_id, start_stamp, end_stamp, min_day_points, min_hour_points) readings
 			INNER JOIN groups_deep_meters gdm ON readings.meter_id = gdm.meter_id
 			INNER JOIN unnest(group_ids) gids(id) on gdm.group_id = gids.id
 			GROUP BY gdm.group_id, readings.start_timestamp, readings.end_timestamp;

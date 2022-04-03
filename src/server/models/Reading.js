@@ -215,17 +215,17 @@ class Reading {
 	 * @param conn the connection to use.
 	 * @return {Promise<object<int, array<{reading_rate: number, start_timestamp: }>>>}
 	 */
-	static async getLineMeterReadings(meterIDs, graphicUnitId, fromTimestamp = null, toTimestamp = null, conn) {
+	static async getMeterLineReadings(meterIDs, graphicUnitId, fromTimestamp = null, toTimestamp = null, conn) {
 		const [minHourPoints, minDayPoints] = determineMinPoints();
 		/**
 		 * @type {array<{meter_id: int, reading_rate: Number, start_timestamp: Moment, end_timestamp: Moment}>}
 		 */
-		const allLineMeterReadings = await conn.func('line_meters_readings_unit',
+		const allMeterLineReadings = await conn.func('meter_line_readings_unit',
 			[meterIDs, graphicUnitId, fromTimestamp || '-infinity', toTimestamp || 'infinity', minDayPoints, minHourPoints]
 			);
 
 		const readingsByMeterID = mapToObject(meterIDs, () => []);
-		for (const row of allLineMeterReadings) {
+		for (const row of allMeterLineReadings) {
 			readingsByMeterID[row.meter_id].push(
 				{ reading_rate: row.reading_rate, start_timestamp: row.start_timestamp, end_timestamp: row.end_timestamp }
 			);
@@ -242,17 +242,17 @@ class Reading {
 	 * @param conn the connection to use.
 	 * @return {Promise<object<int, array<{reading_rate: number, start_timestamp: }>>>}
 	 */
-	static async getLineGroupReadings(groupIDs, graphicUnitId, fromTimestamp, toTimestamp, conn) {
+	static async getGroupLineReadings(groupIDs, graphicUnitId, fromTimestamp, toTimestamp, conn) {
 		const [minHourPoints, minDayPoints] = determineMinPoints();
 		/**
 		 * @type {array<{group_id: int, reading_rate: Number, start_timestamp: Moment, end_timestamp: Moment}>}
 		 */
-		const allLineGroupReadings = await conn.func('line_groups_readings_unit',
+		const allGroupLineReadings = await conn.func('group_line_readings_unit',
 			[groupIDs, graphicUnitId, fromTimestamp, toTimestamp, minDayPoints, minHourPoints]
 			);
 
 		const readingsByGroupID = mapToObject(groupIDs, () => []);
-		for (const row of allLineGroupReadings) {
+		for (const row of allGroupLineReadings) {
 			readingsByGroupID[row.group_id].push(
 				{ reading_rate: row.reading_rate, start_timestamp: row.start_timestamp, end_timestamp: row.end_timestamp }
 			);
