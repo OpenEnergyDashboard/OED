@@ -48,7 +48,8 @@ export default class GroupViewComponent extends React.Component<GroupViewProps> 
 			paddingLeft: '5px'
 		};
 		const groupAllMeters: React.CSSProperties = {
-			fontWeight: 'bold'
+			fontWeight: 'bold',
+			marginBottom: 0
 		};
 		return (
 			<div>
@@ -76,9 +77,23 @@ export default class GroupViewComponent extends React.Component<GroupViewProps> 
 					<p style={groupAllMeters}>
 						<FormattedMessage id='group.all.meters' />:
 					</p>
-					{this.props.deepMeterNames.map ((item, index) => (
-						<span key={`d_${index}`}>{(index ? ', ': '') + item}</span>
-					))}
+					{this.props.deepMeterNames.map((item, index) => {
+						// If meter name is length 0, return nothing.
+						if (item.length !== 0) {
+							// Because we sort the names, the empty strings will always be first and so the comma will always apply.
+							if (index !== this.props.deepMeterNames.length - 1) {
+								return <span key={`d_${index}`}>{item + ', '}</span>
+							}
+							else {
+								return <span key={`d_${index}`}>{item}</span>
+							}
+						}
+						else return; // satisfy map always returning a value (in a function).
+					})}
+					{
+						this.props.childMeterNames.includes('') || this.props.childGroupNames.includes('') ?
+							<div><i>This group contains non-displayable meters/groups denoted as hidden.</i></div> : <></>
+					}
 				</div>
 			</div>
 		);

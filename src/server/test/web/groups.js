@@ -141,7 +141,7 @@ mocha.describe('groups API', () => {
 				expect(res).to.have.status(200);
 
 				// Get the results of the API call.
-				const res2 = await chai.request(app).get('/api/groups');
+				const res2 = await chai.request(app).get('/api/groups').set('token', token);
 				expect(res2).to.have.status(200);
 				expect(res2).to.be.json;
 				expect(res2.body).to.have.lengthOf(4);
