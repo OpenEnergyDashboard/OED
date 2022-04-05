@@ -13,7 +13,9 @@ interface GroupViewProps {
 	name: string;
 	id: number;
 	childMeterNames: string[];
+	trueMeterSize: number;
 	childGroupNames: string[];
+	trueGroupSize: number;
 	deepMeterNames: string[];
 	loggedInAsAdmin: boolean;
 	fetchGroupChildren(id: number): Promise<any>;
@@ -59,13 +61,13 @@ export default class GroupViewComponent extends React.Component<GroupViewProps> 
 						<p style={boldStyle}>
 							<FormattedMessage id='child.meters' />:
 						</p>
-						<ListDisplayComponent items={this.props.childMeterNames} />
+						<ListDisplayComponent trueSize={this.props.trueMeterSize} items={this.props.childMeterNames} />
 					</div>
 					<div className='col-6'>
 						<p style={boldStyle}>
 							<FormattedMessage id='child.groups' />:
 						</p>
-						<ListDisplayComponent items={this.props.childGroupNames} />
+						<ListDisplayComponent trueSize={this.props.trueGroupSize} items={this.props.childGroupNames} />
 					</div>
 				</div>
 				<Link style={editGroupStyle} to='/editGroup'>
@@ -77,21 +79,12 @@ export default class GroupViewComponent extends React.Component<GroupViewProps> 
 					<p style={groupAllMeters}>
 						<FormattedMessage id='group.all.meters' />:
 					</p>
-					{this.props.deepMeterNames.map((item, index) => {
-						// If meter name is length 0, return nothing.
-						if (item.length !== 0) {
-							// Because we sort the names, the empty strings will always be first and so the comma will always apply.
-							if (index !== this.props.deepMeterNames.length - 1) {
-								return <span key={`d_${index}`}>{item + ', '}</span>
-							}
-							else {
-								return <span key={`d_${index}`}>{item}</span>
-							}
-						}
-						else return; // satisfy map always returning a value (in a function).
-					})}
+					{this.props.deepMeterNames.map((item, index) => (
+						<span key={`d_${index}`}>{(index ? ', ': '') + item}</span>
+					))}
 					{
-						this.props.childMeterNames.includes('') || this.props.childGroupNames.includes('') ?
+						this.props.childMeterNames.length !== this.props.trueMeterSize ||
+						this.props.childGroupNames.length !== this.props.trueGroupSize ?
 							<div><i>This group contains non-displayable meters/groups denoted as hidden.</i></div> : <></>
 					}
 				</div>
