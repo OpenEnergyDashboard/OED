@@ -6,6 +6,7 @@ import * as React from 'react';
 
 interface ListDisplayProps {
 	height?: number;
+	trueSize?: number;
 	items: any[];
 }
 
@@ -40,16 +41,14 @@ export default function ListDisplayComponent(props: ListDisplayProps) {
 	return (
 		<div className='list-wrapper' style={listWrapperStyle} >
 			<ul id='meterList' style={listStyle} >
-				{props.items.map((item: any, index: number) => {
-					// If the item, ie; meter/group had a name of length 0, this meant it was a hidden name.
-					if (item.toString().length !== 0) {
-						return <li key={item.toString()}>{item.toString()}</li>
-					}
-					else {
-						// Each list item needs a unique key, so we use index to differentiate hidden elements.
-						return <li style={hiddenStyle} key={`hidden${index.toString()}`}><i>(hidden)</i></li>
-					}
-				})}
+				{props.items.map((item: any) => (
+					<li key={item.toString()}>{item.toString()}</li>
+				))}
+				{
+					// One hidden field if there are any hidden meters/groups to disguise total number.
+					props.trueSize !== undefined && props.trueSize !== props.items.length ?
+						<li style={hiddenStyle} key={'hidden'}><i>(hidden)</i></li> : <></>
+				}
 			</ul>
 		</div>
 	);

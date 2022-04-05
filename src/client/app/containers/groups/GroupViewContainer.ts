@@ -11,31 +11,29 @@ import { DisplayMode } from '../../types/redux/groups';
 import { isRoleAdmin } from '../../utils/hasPermissions';
 function mapStateToProps(state: State, ownProps: {id: number}) {
 	const id = ownProps.id;
-	const childMeterNames = state.groups.byGroupID[id].childMeters.map((meterID: number) => {
+	const childMeterNames: string[] = [];
+	state.groups.byGroupID[id].childMeters.forEach((meterID: number) => {
 		if (state.meters.byMeterID[meterID] !== undefined) {
-			return state.meters.byMeterID[meterID].name.trim();
+			childMeterNames.push(state.meters.byMeterID[meterID].name.trim());
 		}
-		else {
-			// No meter/group can have name with length of 0, so empty strings indicate a hidden meter/group.
-			return '';
-		}
-	}).sort();
-	const childGroupNames = state.groups.byGroupID[id].childGroups.map((groupID: number) => {
+	});
+	childMeterNames.sort();
+	const trueMeterSize = state.groups.byGroupID[id].childMeters.length;
+	const childGroupNames: string[] = [];
+	state.groups.byGroupID[id].childGroups.forEach((groupID: number) => {
 		if (state.groups.byGroupID[groupID] !== undefined) {
-			return state.groups.byGroupID[groupID].name.trim();
+			childGroupNames.push(state.groups.byGroupID[groupID].name.trim());
 		}
-		else {
-			return '';
-		}
-	}).sort();
-	const deepMeterNames = state.groups.byGroupID[id].deepMeters.map((meterID: number) => {
+	});
+	childGroupNames.sort();
+	const trueGroupSize = state.groups.byGroupID[id].childGroups.length;
+	const deepMeterNames: string[] = [];
+	state.groups.byGroupID[id].deepMeters.forEach((meterID: number) => {
 		if (state.meters.byMeterID[meterID] !== undefined) {
-			return state.meters.byMeterID[meterID].name.trim();
+			deepMeterNames.push(state.meters.byMeterID[meterID].name.trim());
 		}
-		else {
-			return '';
-		}
-	}).sort();
+	});
+	deepMeterNames.sort();
 	const currentUser = state.currentUser.profile;
 	let loggedInAsAdmin = false;
 	if(currentUser !== null){
@@ -48,7 +46,9 @@ function mapStateToProps(state: State, ownProps: {id: number}) {
 		name: state.groups.byGroupID[id].name,
 		childMeterNames,
 		childGroupNames,
-		deepMeterNames
+		deepMeterNames,
+		trueMeterSize,
+		trueGroupSize
 	};
 }
 
