@@ -10,6 +10,7 @@ import { BarReading, BarReadings } from '../readings';
 export interface RequestMeterBarReadingsAction {
 	type: ActionType.RequestMeterBarReadings;
 	meterIDs: number[];
+	unitID: number;
 	timeInterval: TimeInterval;
 	barDuration: moment.Duration;
 }
@@ -17,6 +18,7 @@ export interface RequestMeterBarReadingsAction {
 export interface RequestGroupBarReadingsAction {
 	type: ActionType.RequestGroupBarReadings;
 	groupIDs: number[];
+	unitID: number;
 	timeInterval: TimeInterval;
 	barDuration: moment.Duration;
 }
@@ -24,6 +26,7 @@ export interface RequestGroupBarReadingsAction {
 export interface ReceiveMeterBarReadingsAction {
 	type: ActionType.ReceiveMeterBarReadings;
 	meterIDs: number[];
+	unitID: number;
 	timeInterval: TimeInterval;
 	barDuration: moment.Duration;
 	readings: BarReadings;
@@ -32,6 +35,7 @@ export interface ReceiveMeterBarReadingsAction {
 export interface ReceiveGroupBarReadingsAction {
 	type: ActionType.ReceiveGroupBarReadings;
 	groupIDs: number[];
+	unitID: number;
 	timeInterval: TimeInterval;
 	barDuration: moment.Duration;
 	readings: BarReadings;
@@ -48,8 +52,10 @@ export interface BarReadingsState {
 		[meterID: number]: {
 			[timeInterval: string]: {
 				[barDuration: string]: {
-					isFetching: boolean;
-					readings?: BarReading[];
+					[unitID: number]: {
+						isFetching: boolean;
+						readings?: BarReading[];
+					}
 				}
 			}
 		}
@@ -58,8 +64,10 @@ export interface BarReadingsState {
 		[groupID: number]: {
 			[timeInterval: string]: {
 				[barDuration: string]: {
-					isFetching: boolean;
-					readings?: BarReading[];
+					[unitID: number]: {
+						isFetching: boolean;
+						readings?: BarReading[];
+					}
 				}
 			}
 		}

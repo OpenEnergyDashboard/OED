@@ -40,19 +40,19 @@ export default class ReadingsApi {
 		return readings;
 	}
 
-	public async meterBarReadings(meterIDs: number[], timeInterval: TimeInterval, barWidthDays: number): Promise<BarReadings> {
+	public async meterBarReadings(meterIDs: number[], timeInterval: TimeInterval, barWidthDays: number, unitID: number): Promise<BarReadings> {
 		const stringifiedIDs = meterIDs.join(',');
 		return await this.backend.doGetRequest<BarReadings>(
 			`/api/unitReadings/bar/meters/${stringifiedIDs}`,
-			{ timeInterval: timeInterval.toString(), barWidthDays: barWidthDays.toString() }
+			{ timeInterval: timeInterval.toString(), barWidthDays: barWidthDays.toString(), graphicUnitId: unitID.toString() }
 		);
 	}
 
-	public async groupBarReadings(groupIDs: number[], timeInterval: TimeInterval, barWidthDays: number): Promise<BarReadings> {
+	public async groupBarReadings(groupIDs: number[], timeInterval: TimeInterval, barWidthDays: number, unitID: number): Promise<BarReadings> {
 		const stringifiedIDs = groupIDs.join(',');
 		return await this.backend.doGetRequest<BarReadings>(
 			`/api/unitReadings/bar/groups/${stringifiedIDs}`,
-			{ timeInterval: timeInterval.toString(), barWidthDays: barWidthDays.toString() }
+			{ timeInterval: timeInterval.toString(), barWidthDays: barWidthDays.toString(), graphicUnitId: unitID.toString() }
 		);
 	}
 }

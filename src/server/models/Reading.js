@@ -263,14 +263,15 @@ class Reading {
 	/**
 	 * Gets barchart readings for the given time range for the given meters
 	 * @param meterIDs The meters to get barchart readings for
+	 * @param graphicUnitId The unit id that the reading should be returned in, i.e., the graphic unit
 	 * @param fromTimestamp The start of the barchart interval
 	 * @param toTimestamp the end of the barchart interval
 	 * @param barWidthDays the width of each bar in days
 	 * @param conn the connection to use.
 	 * @return {Promise<object<int, array<{reading: number, start_timestamp: Moment, end_timestamp: Moment}>>>}
 	 */
-	static async getNewCompressedBarchartReadings(meterIDs, fromTimestamp, toTimestamp, barWidthDays, conn) {
-		const allBarReadings = await conn.func('compressed_barchart_readings_2', [meterIDs, barWidthDays, fromTimestamp, toTimestamp]);
+	static async getMeterBarReadings(meterIDs, graphicUnitId, fromTimestamp, toTimestamp, barWidthDays, conn) {
+		const allBarReadings = await conn.func('meter_bar_readings_unit', [meterIDs, graphicUnitId, barWidthDays, fromTimestamp, toTimestamp]);
 		const barReadingsByMeterID = mapToObject(meterIDs, () => []);
 		for (const row of allBarReadings) {
 			barReadingsByMeterID[row.meter_id].push(
@@ -283,14 +284,15 @@ class Reading {
 	/**
 	 * Gets barchart readings for the given time range for the given groups
 	 * @param groupIDs The groups to get barchart readings for
+	 * @param graphicUnitId The unit id that the reading should be returned in, i.e., the graphic unit
 	 * @param fromTimestamp The start of the barchart interval
 	 * @param toTimestamp the end of the barchart interval
 	 * @param barWidthDays the width of each bar in days
 	 * @param conn the connection to use.
 	 * @return {Promise<object<int, array<{reading: number, start_timestamp: Moment, end_timestamp: Moment}>>>}
 	 */
-	static async getNewCompressedBarchartGroupReadings(groupIDs, fromTimestamp, toTimestamp, barWidthDays, conn) {
-		const allBarReadings = await conn.func('compressed_barchart_group_readings_2', [groupIDs, barWidthDays, fromTimestamp, toTimestamp]);
+	static async getGroupBarReadings(groupIDs, graphicUnitId, fromTimestamp, toTimestamp, barWidthDays, conn) {
+		const allBarReadings = await conn.func('group_bar_readings_unit', [groupIDs, graphicUnitId, barWidthDays, fromTimestamp, toTimestamp]);
 		const barReadingsByGroupID = mapToObject(groupIDs, () => []);
 		for (const row of allBarReadings) {
 			barReadingsByGroupID[row.group_id].push(

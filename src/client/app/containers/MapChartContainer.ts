@@ -16,6 +16,7 @@ import Locales from '../types/locales';
 import { DataType } from '../types/Datasources';
 
 function mapStateToProps(state: State) {
+	const unitID = state.graph.selectedUnit;
 	// Map to use.
 	let map;
 	// Holds Plotly mapping info.
@@ -83,7 +84,7 @@ function mapStateToProps(state: State) {
 						x.push(meterGPSInUserGrid.x);
 						y.push(meterGPSInUserGrid.y);
 						// Get the bar data to use for the map circle.
-						const readingsData = byMeterID[timeInterval.toString()][barDuration.toISOString()];
+						const readingsData = byMeterID[timeInterval.toString()][barDuration.toISOString()][unitID];
 						if (readingsData !== undefined && !readingsData.isFetching) {
 							// Meter name to include in hover on graph.
 							const label = state.meters.byMeterID[meterID].name;
@@ -140,7 +141,7 @@ function mapStateToProps(state: State) {
 						x.push(groupGPSInUserGrid.x);
 						y.push(groupGPSInUserGrid.y);
 						// Get the bar data to use for the map circle.
-						const readingsData = byGroupID[timeInterval.toString()][barDuration.toISOString()];
+						const readingsData = byGroupID[timeInterval.toString()][barDuration.toISOString()][unitID];
 						if (readingsData !== undefined && !readingsData.isFetching) {
 							// Group name to include in hover on graph.
 							const label = state.groups.byGroupID[groupID].name;

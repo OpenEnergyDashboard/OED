@@ -59,7 +59,7 @@ function changeGraphZoom(timeInterval: TimeInterval): t.ChangeGraphZoomAction {
 export function changeBarDuration(barDuration: moment.Duration): Thunk {
 	return (dispatch: Dispatch, getState: GetState) => {
 		dispatch(updateBarDuration(barDuration));
-		dispatch(fetchNeededBarReadings(getState().graph.timeInterval));
+		dispatch(fetchNeededBarReadings(getState().graph.timeInterval, getState().graph.selectedUnit));
 		return Promise.resolve();
 	};
 }
@@ -92,9 +92,9 @@ export function changeSelectedMeters(meterIDs: number[]): Thunk {
 		// Nesting dispatches to preserve that updateSelectedMeters() is called before fetching readings
 		dispatch((dispatch2: Dispatch) => {
 			dispatch2(fetchNeededLineReadings(getState().graph.timeInterval, getState().graph.selectedUnit));
-			dispatch2(fetchNeededBarReadings(getState().graph.timeInterval));
+			dispatch2(fetchNeededBarReadings(getState().graph.timeInterval, getState().graph.selectedUnit));
 			dispatch2(fetchNeededCompareReadings(getState().graph.comparePeriod));
-			dispatch2(fetchNeededMapReadings(getState().graph.timeInterval));
+			dispatch2(fetchNeededMapReadings(getState().graph.timeInterval, getState().graph.selectedUnit));
 		});
 		return Promise.resolve();
 	};
@@ -106,9 +106,9 @@ export function changeSelectedGroups(groupIDs: number[]): Thunk {
 		// Nesting dispatches to preserve that updateSelectedGroups() is called before fetching readings
 		dispatch((dispatch2: Dispatch) => {
 			dispatch2(fetchNeededLineReadings(getState().graph.timeInterval, getState().graph.selectedUnit));
-			dispatch2(fetchNeededBarReadings(getState().graph.timeInterval));
+			dispatch2(fetchNeededBarReadings(getState().graph.timeInterval, getState().graph.selectedUnit));
 			dispatch2(fetchNeededCompareReadings(getState().graph.comparePeriod));
-			dispatch2(fetchNeededMapReadings(getState().graph.timeInterval));
+			dispatch2(fetchNeededMapReadings(getState().graph.timeInterval, getState().graph.selectedUnit));
 		});
 		return Promise.resolve();
 	};
@@ -117,8 +117,8 @@ export function changeSelectedGroups(groupIDs: number[]): Thunk {
 function fetchNeededReadingsForGraph(timeInterval: TimeInterval, unitID: number): Thunk {
 	return (dispatch: Dispatch) => {
 		dispatch(fetchNeededLineReadings(timeInterval, unitID));
-		dispatch(fetchNeededBarReadings(timeInterval));
-		dispatch(fetchNeededMapReadings(timeInterval));
+		dispatch(fetchNeededBarReadings(timeInterval, unitID));
+		dispatch(fetchNeededMapReadings(timeInterval, unitID));
 		return Promise.resolve();
 	};
 }

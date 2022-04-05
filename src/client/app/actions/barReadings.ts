@@ -15,25 +15,34 @@ import { BarReadings } from '../types/readings';
  * @param {number} meterID the ID of the meter to check
  * @param {TimeInterval} timeInterval the interval over which to check
  * @param {Moment.Duration} barDuration the duration of each bar for which to check
- * @returns {boolean} True if the readings for the given meter, time, and duration are missing; false otherwise.
+ * @param {number} unitID the ID of the unit for which to check
+ * @returns {boolean} True if the readings for the given meter, time duration, bar length and unit are missing; false otherwise.
  */
-export function shouldFetchMeterBarReadings(state: State, meterID: number, timeInterval: TimeInterval, barDuration: moment.Duration): boolean {
+export function shouldFetchMeterBarReadings(state: State, meterID: number, timeInterval: TimeInterval, barDuration: moment.Duration, unitID: number): boolean {
+	const timeIntervalIndex = timeInterval.toString();
+	const barDurationIndex = barDuration.toISOString();
+
 	const readingsForID = state.readings.bar.byMeterID[meterID];
 	if (readingsForID === undefined) {
 		return true;
 	}
 
-	const readingsForTimeInterval = readingsForID[timeInterval.toString()];
+	const readingsForTimeInterval = readingsForID[timeIntervalIndex];
 	if (readingsForTimeInterval === undefined) {
 		return true;
 	}
 
-	const readingsForBarDuration = readingsForTimeInterval[barDuration.toISOString()];
+	const readingsForBarDuration = readingsForTimeInterval[barDurationIndex];
 	if (readingsForBarDuration === undefined) {
 		return true;
 	}
 
-	return !readingsForBarDuration.isFetching;
+	const readingsForUnit = readingsForBarDuration[unitID];
+	if (readingsForUnit === undefined) {
+		return true;
+	}
+
+	return !readingsForUnit.isFetching;
 }
 
 /**
@@ -41,105 +50,139 @@ export function shouldFetchMeterBarReadings(state: State, meterID: number, timeI
  * @param {number} groupID the ID of the group to check
  * @param {TimeInterval} timeInterval the interval over which to check
  * @param {Moment.Duration} barDuration the duration of each bar for which to check
- * @returns {boolean} True if the readings for the given group, time, and duration are missing; false otherwise.
+ * @param {number} unitID the ID of the unit for which to check
+ * @returns {boolean} True if the readings for the given group, time duration, bar length and unit are missing; false otherwise.
  */
-export function shouldFetchGroupBarReadings(state: State, groupID: number, timeInterval: TimeInterval, barDuration: moment.Duration): boolean {
+export function shouldFetchGroupBarReadings(state: State, groupID: number, timeInterval: TimeInterval, barDuration: moment.Duration, unitID: number): boolean {
+	const timeIntervalIndex = timeInterval.toString();
+	const barDurationIndex = barDuration.toISOString();
+
 	const readingsForID = state.readings.bar.byGroupID[groupID];
 	if (readingsForID === undefined) {
 		return true;
 	}
 
-	const readingsForTimeInterval = readingsForID[timeInterval.toString()];
+	const readingsForTimeInterval = readingsForID[timeIntervalIndex];
 	if (readingsForTimeInterval === undefined) {
 		return true;
 	}
 
-	const readingsForBarDuration = readingsForTimeInterval[barDuration.toISOString()];
+	const readingsForBarDuration = readingsForTimeInterval[barDurationIndex];
 	if (readingsForBarDuration === undefined) {
 		return true;
 	}
 
-	return !readingsForBarDuration.isFetching;
+	const readingsForUnit = readingsForBarDuration[unitID];
+	if (readingsForUnit === undefined) {
+		return true;
+	}
+
+	return !readingsForUnit.isFetching;
 }
 
-export function requestMeterBarReadings(meterIDs: number[], timeInterval: TimeInterval, barDuration: moment.Duration):
+/**
+ * @param {number} meterIDs the IDs of the meters to get readings
+ * @param {TimeInterval} timeInterval the interval over which to check
+ * @param {Moment.Duration} barDuration the duration of each bar for which to check
+ * @param {number} unitID the ID of the unit for which to check
+ */
+ export function requestMeterBarReadings(meterIDs: number[], timeInterval: TimeInterval, barDuration: moment.Duration, unitID: number):
 		t.RequestMeterBarReadingsAction {
-	return { type: ActionType.RequestMeterBarReadings, meterIDs, timeInterval, barDuration };
+	return { type: ActionType.RequestMeterBarReadings, meterIDs, timeInterval, barDuration, unitID };
 }
 
-export function receiveMeterBarReadings(meterIDs: number[], timeInterval: TimeInterval, barDuration: moment.Duration,
-		readings: BarReadings): t.ReceiveMeterBarReadingsAction {
-	return { type: ActionType.ReceiveMeterBarReadings, meterIDs, timeInterval, barDuration, readings };
-}
-
-export function requestGroupBarReadings(groupIDs: number[], timeInterval: TimeInterval, barDuration: moment.Duration):
+/**
+ * @param {number} groupIDs the IDs of the groups to get readings
+ * @param {TimeInterval} timeInterval the interval over which to check
+ * @param {Moment.Duration} barDuration the duration of each bar for which to check
+ * @param {number} unitID the ID of the unit for which to check
+ */
+ export function requestGroupBarReadings(groupIDs: number[], timeInterval: TimeInterval, barDuration: moment.Duration, unitID: number):
 		t.RequestGroupBarReadingsAction {
-	return { type: ActionType.RequestGroupBarReadings, groupIDs, timeInterval, barDuration };
-}
-
-export function receiveGroupBarReadings(groupIDs: number[], timeInterval: TimeInterval, barDuration: moment.Duration,
-		readings: BarReadings): t.ReceiveGroupBarReadingsAction {
-	return { type: ActionType.ReceiveGroupBarReadings, groupIDs, timeInterval, barDuration, readings };
+	return { type: ActionType.RequestGroupBarReadings, groupIDs, timeInterval, barDuration, unitID };
 }
 
 /**
- * Fetch the data for the given meters over the given interval. Fully manages the Redux lifecycle.
- * Reads bar duration from the state.
- * @param {[number]} meterIDs The IDs of the meters whose data should be fetched
- * @param {TimeInterval} timeInterval The time interval over which data should be fetched
+ * @param {number} meterIDs the IDs of the meters to get readings
+ * @param {TimeInterval} timeInterval the interval over which to check
+ * @param {Moment.Duration} barDuration the duration of each bar for which to check
+ * @param {number} unitID the ID of the unit for which to check
+ * @param {BarReadings} readings the readings for the given meters
  */
-function fetchMeterBarReadings(meterIDs: number[], timeInterval: TimeInterval): Thunk {
+ export function receiveMeterBarReadings(meterIDs: number[], timeInterval: TimeInterval, barDuration: moment.Duration,
+	unitID: number, readings: BarReadings): t.ReceiveMeterBarReadingsAction {
+	return { type: ActionType.ReceiveMeterBarReadings, meterIDs, timeInterval, unitID, barDuration, readings };
+}
+
+/**
+ * @param {number} groupIDs the IDs of the groups to get readings
+ * @param {TimeInterval} timeInterval the interval over which to check
+ * @param {Moment.Duration} barDuration the duration of each bar for which to check
+ * @param {number} unitID the ID of the unit for which to check
+ * @param {BarReadings} readings the readings for the given groups
+ */
+ export function receiveGroupBarReadings(groupIDs: number[], timeInterval: TimeInterval, barDuration: moment.Duration,
+	unitID: number, readings: BarReadings): t.ReceiveGroupBarReadingsAction {
+	return { type: ActionType.ReceiveGroupBarReadings, groupIDs, timeInterval, barDuration, unitID, readings };
+}
+
+/**
+ * @param {number} meterIDs the IDs of the meters to get readings
+ * @param {TimeInterval} timeInterval the interval over which to check
+ * @param {number} unitID the ID of the unit for which to check
+ */
+ function fetchMeterBarReadings(meterIDs: number[], timeInterval: TimeInterval, unitID: number): Thunk {
 	return async (dispatch: Dispatch, getState: GetState) => {
 		const barDuration = getState().graph.barDuration;
-		dispatch(requestMeterBarReadings(meterIDs, timeInterval, barDuration));
-		const readings = await readingsApi.meterBarReadings(meterIDs, timeInterval, Math.round(barDuration.asDays()));
-		dispatch(receiveMeterBarReadings(meterIDs, timeInterval, barDuration, readings));
+		dispatch(requestMeterBarReadings(meterIDs, timeInterval, barDuration, unitID));
+		const meterBarReadings = await readingsApi.meterBarReadings(meterIDs, timeInterval, Math.round(barDuration.asDays()), unitID);
+		dispatch(receiveMeterBarReadings(meterIDs, timeInterval, barDuration, unitID, meterBarReadings));
 	};
 }
 
 /**
- * Fetch the data for the given groups over the given interval. Fully manages the Redux lifecycle.
- * Reads bar duration from the state.
- * @param {[number]} groupIDs The IDs of the groups whose data should be fetched
- * @param {TimeInterval} timeInterval The time interval over which data should be fetched
+ * @param {number} groupIDs the IDs of the groups to get readings
+ * @param {TimeInterval} timeInterval the interval over which to check
+ * @param {number} unitID the ID of the unit for which to check
  */
-function fetchGroupBarReadings(groupIDs: number[], timeInterval: TimeInterval): Thunk {
+ function fetchGroupBarReadings(groupIDs: number[], timeInterval: TimeInterval, unitID: number): Thunk {
 	return async (dispatch: Dispatch, getState: GetState) => {
 		const barDuration = getState().graph.barDuration;
-		dispatch(requestGroupBarReadings(groupIDs, timeInterval, barDuration));
-		const readings = await readingsApi.groupBarReadings(groupIDs, timeInterval, Math.round(barDuration.asDays()));
-		dispatch(receiveGroupBarReadings(groupIDs, timeInterval, barDuration, readings));
+		dispatch(requestGroupBarReadings(groupIDs, timeInterval, barDuration, unitID));
+		const groupBarReadings = await readingsApi.groupBarReadings(groupIDs, timeInterval, Math.round(barDuration.asDays()), unitID);
+		dispatch(receiveGroupBarReadings(groupIDs, timeInterval, barDuration, unitID, groupBarReadings));
 	};
 }
 
 /**
- * Fetches readings for the bar chart of all selected meterIDs if they are not already fetched or being fetched
- * @param {TimeInterval} timeInterval The time interval to fetch readings for on the bar chart
- * @return {*} An action to fetch the needed readings
- */
-export function fetchNeededBarReadings(timeInterval: TimeInterval): Thunk {
+* Fetches readings for the bar chart of all selected meters and groups, if needed.
+* @param {TimeInterval} timeInterval the interval over which to check
+* @param {number} unitID the ID of the unit for which to check
+*/
+export function fetchNeededBarReadings(timeInterval: TimeInterval, unitID: number): Thunk {
 	return (dispatch: Dispatch, getState: GetState) => {
 		const state = getState();
 		/* tslint:disable:array-type */
 		const promises: Array<Promise<any>> = [];
 		/* tslint:enable:array-type */
+		const barDuration = state.graph.barDuration;
 
 		// Determine which meters are missing data for this time interval
 		const meterIDsToFetchForBar = state.graph.selectedMeters.filter(
-			id => shouldFetchMeterBarReadings(state, id, timeInterval, state.graph.barDuration)
+			id => shouldFetchMeterBarReadings(state, id, timeInterval, barDuration, unitID)
 		);
 		// Fetch data for any missing meters
 		if (meterIDsToFetchForBar.length > 0) {
-			promises.push(dispatch(fetchMeterBarReadings(meterIDsToFetchForBar, timeInterval)));
+			promises.push(dispatch(fetchMeterBarReadings(meterIDsToFetchForBar, timeInterval, unitID)));
 		}
 
 		// Determine which groups are missing data for this time interval
 		const groupIDsToFetchForBar = state.graph.selectedGroups.filter(
-			id => shouldFetchGroupBarReadings(state, id, timeInterval, state.graph.barDuration)
+			id => shouldFetchGroupBarReadings(state, id, timeInterval, barDuration, unitID)
 		);
 		// Fetch data for any missing groups
 		if (groupIDsToFetchForBar.length > 0) {
-			promises.push(dispatch(fetchGroupBarReadings(groupIDsToFetchForBar, timeInterval)));
+			promises.push(dispatch(fetchGroupBarReadings(groupIDsToFetchForBar, timeInterval, unitID)));
 		}
 		return Promise.all(promises);
 	};

@@ -19,13 +19,15 @@ import { DataType } from '../types/Datasources';
 function mapStateToProps(state: State) {
 	const timeInterval = state.graph.timeInterval;
 	const barDuration = state.graph.barDuration;
+	const unitID = state.graph.selectedUnit;
 	const datasets: any[] = [];
 
 	// Add all valid data from existing meters to the bar chart
 	for (const meterID of state.graph.selectedMeters) {
 		const byMeterID = state.readings.bar.byMeterID[meterID];
-		if (byMeterID !== undefined) {
-			const readingsData = byMeterID[timeInterval.toString()][barDuration.toISOString()];
+		if (byMeterID !== undefined && byMeterID[timeInterval.toString()] !== undefined &&
+			byMeterID[timeInterval.toString()][barDuration.toISOString()] !== undefined) {
+			const readingsData = byMeterID[timeInterval.toString()][barDuration.toISOString()][unitID];
 			if (readingsData !== undefined && !readingsData.isFetching) {
 				const label = state.meters.byMeterID[meterID].name;
 				const colorID = meterID;
@@ -62,8 +64,9 @@ function mapStateToProps(state: State) {
 
 	for (const groupID of state.graph.selectedGroups) {
 		const byGroupID = state.readings.bar.byGroupID[groupID];
-		if (byGroupID !== undefined) {
-			const readingsData = byGroupID[timeInterval.toString()][barDuration.toISOString()];
+		if (byGroupID !== undefined && byGroupID[timeInterval.toString()] !== undefined &&
+			byGroupID[timeInterval.toString()][barDuration.toISOString()] !== undefined) {
+			const readingsData = byGroupID[timeInterval.toString()][barDuration.toISOString()][unitID];
 			if (readingsData !== undefined && !readingsData.isFetching) {
 				const label = state.groups.byGroupID[groupID].name;
 				const colorID = groupID;
