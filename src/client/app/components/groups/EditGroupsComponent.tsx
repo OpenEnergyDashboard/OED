@@ -301,11 +301,10 @@ class EditGroupsComponent extends React.Component<EditGroupsPropsWithIntl, EditG
 
 	private handleNameChange(e: React.ChangeEvent<HTMLInputElement>) {
 		const name = e.currentTarget.value;
-		if (name) {
-			this.setState({ name: name as string });
-			this.props.editGroupName(name as string);
-			this.updateUnsavedChanges();
-		}
+		// No error checking here, we check upon submit if string is empty.
+		this.setState({ name: name as string });
+		this.props.editGroupName(name as string);
+		this.updateUnsavedChanges();
 	}
 
 	private handleGPSChange(e: React.ChangeEvent<HTMLInputElement>) {
@@ -372,41 +371,47 @@ class EditGroupsComponent extends React.Component<EditGroupsPropsWithIntl, EditG
 	}
 
 	private handleEditGroup(successCallback: any, failureCallback: any) {
-		// The callbacks are used for displaying unsaved warning
-		const gpsProxy = this.state.gpsInput.replace('(','').replace(')','').replace(' ', '');
-		const pattern2 = /^\d+(\.\d+)?$/;
-		// need to check gps and area
-		// gps and area are still optional so check if blank
-		if (this.state.groupArea.match(pattern2) || this.state.groupArea === '') {
-			if (this.state.groupArea !== '') {
-				this.props.editGroupArea(parseFloat(this.state.groupArea));
-			}
-			if (this.state.gpsInput === '' || isValidGPSInput(gpsProxy)) {
-				if (this.state.gpsInput !== '') {
-					// if it satisfies if condition, and defined, then set GPSPoint
-					const parseGPS = gpsProxy.split(',');
-					// should only have 1 comma
-					const gPoint: GPSPoint = {
-						longitude: parseFloat(parseGPS[1]),
-						latitude: parseFloat(parseGPS[0])
-					};
-					this.props.editGroupGPS(gPoint);
-				}
-				// Notify that there are no unsaved changes after clicking the submit button
-				this.removeUnsavedChanges();
-				if (successCallback != null) {
-					// This function is call in displaying unsaved warning process
-					this.props.submitGroupInEditingIfNeeded().then(successCallback, failureCallback);
-				} else {
-					this.props.submitGroupInEditingIfNeeded().then(() => {
-						// Redirect users to /groups when they click the submit button.
-						browserHistory.push('/groups');
-					});
-				}
-			}
+		// Taken from CreateGroupComponent
+		if (this.props.currentGroup.name.trim().length === 0) {
+			window.alert(translate('group.name.error'));
 		}
 		else {
-			window.alert(translate('area.error'));
+			// The callbacks are used for displaying unsaved warning
+			const gpsProxy = this.state.gpsInput.replace('(','').replace(')','').replace(' ', '');
+			const pattern2 = /^\d+(\.\d+)?$/;
+			// need to check gps and area
+			// gps and area are still optional so check if blank
+			if (this.state.groupArea.match(pattern2) || this.state.groupArea === '') {
+				if (this.state.groupArea !== '') {
+					this.props.editGroupArea(parseFloat(this.state.groupArea));
+				}
+				if (this.state.gpsInput === '' || isValidGPSInput(gpsProxy)) {
+					if (this.state.gpsInput !== '') {
+						// if it satisfies if condition, and defined, then set GPSPoint
+						const parseGPS = gpsProxy.split(',');
+						// should only have 1 comma
+						const gPoint: GPSPoint = {
+							longitude: parseFloat(parseGPS[1]),
+							latitude: parseFloat(parseGPS[0])
+						};
+						this.props.editGroupGPS(gPoint);
+					}
+					// Notify that there are no unsaved changes after clicking the submit button
+					this.removeUnsavedChanges();
+					if (successCallback != null) {
+						// This function is call in displaying unsaved warning process
+						this.props.submitGroupInEditingIfNeeded().then(successCallback, failureCallback);
+					} else {
+						this.props.submitGroupInEditingIfNeeded().then(() => {
+							// Redirect users to /groups when they click the submit button.
+							browserHistory.push('/groups');
+						});
+					}
+				}
+			}
+			else {
+				window.alert(translate('area.error'));
+			}
 		}
 	}
 
