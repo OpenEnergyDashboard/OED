@@ -13,7 +13,32 @@ export interface ReceiveUnitsDetailsAction {
 	data: UnitData[];
 }
 
-export type UnitsAction = RequestUnitsDetailsAction | ReceiveUnitsDetailsAction;
+export interface ChangeDisplayedUnitsAction {
+	type: ActionType.ChangeDisplayedUnits;
+	selectedUnits: number[];
+}
+
+export interface EditUnitDetailsAction {
+	type: ActionType.EditUnitDetails;
+	unit: UnitData;
+}
+
+export interface ConfirmEditedUnitAction {
+	type: ActionType.ConfirmEditedUnit;
+	unit: number;
+}
+
+export interface SubmitEditedUnitAction {
+	type: ActionType.SubmitEditedUnit;
+	unit: number;
+}
+
+export type UnitsAction = RequestUnitsDetailsAction 
+	| ReceiveUnitsDetailsAction
+	| ChangeDisplayedUnitsAction
+    | EditUnitDetailsAction
+    | SubmitEditedUnitAction
+    | ConfirmEditedUnitAction;
 
 export enum UnitType {
 	unit = 'unit',
@@ -48,11 +73,28 @@ export interface UnitData {
 	note?: string;
 }
 
+export interface UnitEditData {
+	id: number;
+	name: string;
+	identifier: string;
+    unitRepresent: string; 
+    secInRate: number;
+	typeOfUnit: UnitType;
+	unitIndex: number;
+	suffix: string;
+	displayable: DisplayableType;
+	preferredDisplay: boolean;
+	note?: string;
+}
+
 export interface UnitDataById {
 	[unitId: number]: UnitData;
 }
 
 export interface UnitsState {
 	isFetching: boolean;
-	units: UnitDataById[];
+	byUnitID: UnitDataById;
+	selectedUnits: number[];
+	editedUnits: UnitDataById;
+	submitting: number[];
 }

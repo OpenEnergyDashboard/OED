@@ -1,10 +1,10 @@
 import * as _ from 'lodash';
-import { UnitsAction, UnitState } from '../types/redux/unit';
+import { UnitsAction, UnitsState } from '../types/redux/units';
 import { ActionType } from '../types/redux/actions';
 
-const defaultState: UnitState = {
-    isLoading: false,
-    byUnitID: {},
+const defaultState: UnitsState = {
+    isFetching: false,
+    byUnitID: [],
     selectedUnits: [],
     editedUnits: {},
     submitting: []

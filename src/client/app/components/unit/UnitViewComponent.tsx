@@ -1,9 +1,8 @@
 import * as React from 'react'; 
 import {Button} from 'reactstrap'; 
-import { UnitData, EditUnitDetailsAction} from '../../types/redux/unit';
+import { UnitData, EditUnitDetailsAction} from '../../types/redux/units';
 import { FormattedMessage, injectIntl, WrappedComponentProps } from 'react-intl';
-import { UnitMetadata, UnitsAction } from '../../types/redux/unit';
-import { confirmEditedUnits, fetchUnitsDetails, submitEditedUnits } from '../../actions/unit';
+import { confirmEditedUnits, fetchUnitsDetails, submitEditedUnits } from '../../actions/units';
 import { updateUnsavedChanges } from '../../actions/unsavedWarning';
 import store from '../../index';
 
@@ -25,7 +24,7 @@ interface UnitViewState {
     unitRepresentFocus: boolean;
     unitRepresentInput: string;
     noteFocus: boolean;
-	noteInput: string;
+	noteInput?: string;
     // editUnitDetails(unit: UnitData): EditUnitDetailsAction;
 }
 

@@ -1,13 +1,11 @@
-import * as React from 'react';
 import {State} from '../../types/redux/state';
 import UnitViewComponent from '../../components/unit/UnitViewComponent';
 import {Dispatch} from '../../types/redux/actions';
 import { connect } from 'react-redux';
 import { logToServer } from '../../actions/logs';
-import { UnitMetadata } from 'types/redux/unit';
 import { isRoleAdmin } from '../../utils/hasPermissions';
-import { UnitData } from '../../types/redux/unit';
-import { editUnitDetails } from '../../actions/unit';
+import { UnitData } from '../../types/redux/units';
+import { editUnitDetails } from '../../actions/units';
 
 function mapStateToProps(state: State, ownProps: {id: number}){
     let unit = JSON.parse(JSON.stringify(state.units.byUnitID[ownProps.id]));
