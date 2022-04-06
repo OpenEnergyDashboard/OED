@@ -106,8 +106,8 @@ function mapStateToProps(state: State) {
  */
 function createBackgroundTrace(imageDimensions: Dimensions, settings: CalibrationSettings) {
 	// define the grid of heatmap
-	const x = [];
-	const y = [];
+	const x: number[] = [];
+	const y: number[] = [];
 	// bound the grid to image dimensions to avoid clicking outside of the map
 	for (let i = 0; i <= Math.ceil(imageDimensions.width); i = i + 1) {
 		x.push(i);
@@ -116,10 +116,10 @@ function createBackgroundTrace(imageDimensions: Dimensions, settings: Calibratio
 		y.push(j);
 	}
 	// define the actual points of the graph, numbers in the array are used to designate different colors;
-	const z = [];
-	for (const {} of y) {
+	const z: number[][] = [];
+	for (let ind1 = 0; ind1 < y.length; ++ind1) {
 		const temp = [];
-		for (const {} of x) {
+		for (let ind2 = 0; ind2 < x.length; ++ind2) {
 			temp.push(0);
 		}
 		z.push(temp);

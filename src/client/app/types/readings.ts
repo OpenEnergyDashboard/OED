@@ -17,9 +17,7 @@ export interface LineReadings {
  * The type of bar readings in actions.
  */
 export interface BarReadings {
-	/* tslint:disable:array-type */
 	[id: number]: Array<[number, number]>;
-	/* tslint:enable:array-type */
 }
 
 export interface CompareReading {
@@ -35,9 +33,7 @@ export interface ExportDataSet {
 	label: string;
 	id: number;
 	currentChart: ChartTypes;
-	/* tslint:disable:array-type */
 	exportVals: Array<{ x: number, y: number, z: number }>;
-	/* tslint:enable:array-type */
 }
 
 export interface RawReadings {

@@ -13,7 +13,7 @@ interface FooterProps {
 /*
 * Footer loaded at the bottom of every webpage, which loads the site version from the redux store
 */
-export default class FooterComponent extends React.Component<FooterProps, {}> {
+export default class FooterComponent extends React.Component<FooterProps> {
 	constructor(props: FooterProps) {
 		super(props);
 		this.props.fetchVersionIfNeeded();

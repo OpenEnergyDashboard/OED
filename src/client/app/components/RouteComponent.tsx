@@ -46,7 +46,7 @@ interface RouteProps {
 	clearCurrentUser(): any;
 }
 
-export default class RouteComponent extends React.Component<RouteProps, {}> {
+export default class RouteComponent extends React.Component<RouteProps> {
 	constructor(props: RouteProps) {
 		super(props);
 		this.requireAuth = this.requireAuth.bind(this);
@@ -194,6 +194,7 @@ export default class RouteComponent extends React.Component<RouteProps, {}> {
 							break;
 						case 'mapID':
 							options.mapID = (parseInt(info));
+							break;
 						case 'serverRange':
 							options.serverRange = TimeInterval.fromString(info);
 							/**

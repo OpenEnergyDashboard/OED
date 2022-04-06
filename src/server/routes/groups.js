@@ -73,11 +73,12 @@ router.get('/idname', async (req, res) => {
 router.get('/children/:group_id', async (req, res) => {
 	const conn = getConnection();
 	try {
-		const [meters, groups] = await Promise.all([
+		const [meters, groups, deepMeters] = await Promise.all([
 			Group.getImmediateMetersByGroupID(req.params.group_id, conn),
-			Group.getImmediateGroupsByGroupID(req.params.group_id, conn)
+			Group.getImmediateGroupsByGroupID(req.params.group_id, conn),
+			Group.getDeepMetersByGroupID(req.params.group_id, conn)
 		]);
-		res.json({ meters, groups });
+		res.json({ meters, groups, deepMeters });
 	} catch (err) {
 		log.error(`Error while preforming GET on all immediate children (meters and groups) of specific group: ${err}`, err);
 	}

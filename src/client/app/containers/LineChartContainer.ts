@@ -46,10 +46,8 @@ function mapStateToProps(state: State) {
 				let minTimestamp: string = '';
 				let maxTimestamp: string = '';
 				if (readings.length > 0) {
-					/* tslint:disable:no-string-literal */
 					minTimestamp = readings[0]['startTimestamp'].toString();
 					maxTimestamp = readings[readings.length - 1]['startTimestamp'].toString();
-					/* tslint:enable:no-string-literal */
 				}
 				const root: any = document.getElementById('root');
 				root.setAttribute('min-timestamp', minTimestamp);
