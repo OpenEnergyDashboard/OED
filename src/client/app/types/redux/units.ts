@@ -97,4 +97,5 @@ export interface UnitsState {
 	selectedUnits: number[];
 	editedUnits: UnitDataById;
 	submitting: number[];
+	units: UnitDataById[];
 }

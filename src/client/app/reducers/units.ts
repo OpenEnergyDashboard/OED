@@ -7,7 +7,8 @@ const defaultState: UnitsState = {
     byUnitID: [],
     selectedUnits: [],
     editedUnits: {},
-    submitting: []
+    submitting: [],
+    units: [],
 };
 
 export default function units(state = defaultState, action: UnitsAction) {
