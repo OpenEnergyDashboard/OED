@@ -83,40 +83,45 @@ function mapStateToProps(state: State) {
 						// The x, y value for Plotly to use that are on the user map.
 						x.push(meterGPSInUserGrid.x);
 						y.push(meterGPSInUserGrid.y);
-						// Get the bar data to use for the map circle.
-						const readingsData = byMeterID[timeInterval.toString()][barDuration.toISOString()][unitID];
-						if (readingsData !== undefined && !readingsData.isFetching) {
-							// Meter name to include in hover on graph.
-							const label = state.meters.byMeterID[meterID].name;
-							// The usual color for this meter.
-							colors.push(getGraphColor(meterID, DataType.Meter));
-							if (readingsData.readings === undefined) {
-								throw new Error('Unacceptable condition: readingsData.readings is undefined.');
+						// Make sure the bar reading data is available. The timeInterval should be fine (but checked) but the barDuration might have changed
+						// and be fetching. The unit could change from that menu so also need to check.
+						if (byMeterID[timeInterval.toString()] !== undefined && byMeterID[timeInterval.toString()][barDuration.toISOString()] !== undefined) {
+							// Get the bar data to use for the map circle.
+							const readingsData = byMeterID[timeInterval.toString()][barDuration.toISOString()][unitID];
+							// This protects against there being no readings or that the data is being updated.
+							if (readingsData !== undefined && !readingsData.isFetching) {
+								// Meter name to include in hover on graph.
+								const label = state.meters.byMeterID[meterID].name;
+								// The usual color for this meter.
+								colors.push(getGraphColor(meterID, DataType.Meter));
+								if (readingsData.readings === undefined) {
+									throw new Error('Unacceptable condition: readingsData.readings is undefined.');
+								}
+								// Use the most recent time reading for the circle on the map.
+								// This has the limitations of the bar value where the last one can include ranges without
+								// data (GitHub issue on this).
+								// TODO: It might be better to do this similarly to compare. (See GitHub issue)
+								const readings = _.orderBy(readingsData.readings, ['startTimestamp'], ['desc']);
+								const mapReading = readings[0];
+								let timeReading: string;
+								let averagedReading = 0;
+								if (readings.length === 0) {
+									// No data. The next lines causes an issue so set specially.
+									// There may be a better overall fix for no data.
+									timeReading = 'no data to display';
+									size.push(0);
+								} else {
+									// Shift to UTC since want database time not local/browser time which is what moment does.
+									timeReading =
+										`${moment(mapReading.startTimestamp).utc().format('ll')} - ${moment(mapReading.endTimestamp).subtract(1, 'days').utc().format('ll')}`;
+									// The value for the circle is the average daily usage.
+									averagedReading = mapReading.reading / barDuration.asDays();
+									// The size is the reading value. It will be scaled later.
+									size.push(averagedReading);
+								}
+								// The hover text.
+								texts.push(`<b> ${timeReading} </b> <br> ${label}: ${averagedReading.toPrecision(6)} kWh/day`);
 							}
-							// Use the most recent time reading for the circle on the map.
-							// This has the limitations of the bar value where the last one can include ranges without
-							// data (GitHub issue on this).
-							// TODO: It might be better to do this similarly to compare. (See GitHub issue)
-							const readings = _.orderBy(readingsData.readings, ['startTimestamp'], ['desc']);
-							const mapReading = readings[0];
-							let timeReading: string;
-							let averagedReading = 0;
-							if (readings.length === 0) {
-								// No data. The next lines causes an issue so set specially.
-								// There may be a better overall fix for no data.
-								timeReading = 'no data to display';
-								size.push(0);
-							} else {
-								// Shift to UTC since want database time not local/browser time which is what moment does.
-								timeReading =
-								`${moment(mapReading.startTimestamp).utc().format('ll')} - ${moment(mapReading.endTimestamp).subtract(1, 'days').utc().format('ll')}`;
-								// The value for the circle is the average daily usage.
-								averagedReading = mapReading.reading / barDuration.asDays();
-								// The size is the reading value. It will be scaled later.
-								size.push(averagedReading);
-							}
-							// The hover text.
-							texts.push(`<b> ${timeReading} </b> <br> ${label}: ${averagedReading.toPrecision(6)} kWh/day`);
 						}
 					}
 				}
@@ -140,40 +145,45 @@ function mapStateToProps(state: State) {
 						// The x, y value for Plotly to use that are on the user map.
 						x.push(groupGPSInUserGrid.x);
 						y.push(groupGPSInUserGrid.y);
-						// Get the bar data to use for the map circle.
-						const readingsData = byGroupID[timeInterval.toString()][barDuration.toISOString()][unitID];
-						if (readingsData !== undefined && !readingsData.isFetching) {
-							// Group name to include in hover on graph.
-							const label = state.groups.byGroupID[groupID].name;
-							// The usual color for this group.
-							colors.push(getGraphColor(groupID, DataType.Group));
-							if (readingsData.readings === undefined) {
-								throw new Error('Unacceptable condition: readingsData.readings is undefined.');
+						// Make sure the bar reading data is available. The timeInterval should be fine (but checked) but the barDuration might have changed
+						// and be fetching. The unit could change from that menu so also need to check.
+						if (byGroupID[timeInterval.toString()] !== undefined && byGroupID[timeInterval.toString()][barDuration.toISOString()] !== undefined) {
+							// Get the bar data to use for the map circle.
+							const readingsData = byGroupID[timeInterval.toString()][barDuration.toISOString()][unitID];
+							// This protects against there being no readings or that the data is being updated.
+							if (readingsData !== undefined && !readingsData.isFetching) {
+								// Group name to include in hover on graph.
+								const label = state.groups.byGroupID[groupID].name;
+								// The usual color for this group.
+								colors.push(getGraphColor(groupID, DataType.Group));
+								if (readingsData.readings === undefined) {
+									throw new Error('Unacceptable condition: readingsData.readings is undefined.');
+								}
+								// Use the most recent time reading for the circle on the map.
+								// This has the limitations of the bar value where the last one can include ranges without
+								// data (GitHub issue on this).
+								// TODO: It might be better to do this similarly to compare. (See GitHub issue)
+								const readings = _.orderBy(readingsData.readings, ['startTimestamp'], ['desc']);
+								const mapReading = readings[0];
+								let timeReading: string;
+								let averagedReading = 0;
+								if (readings.length === 0) {
+									// No data. The next lines causes an issue so set specially.
+									// There may be a better overall fix for no data.
+									timeReading = 'no data to display';
+									size.push(0);
+								} else {
+									// Shift to UTC since want database time not local/browser time which is what moment does.
+									timeReading =
+										`${moment(mapReading.startTimestamp).utc().format('ll')} - ${moment(mapReading.endTimestamp).subtract(1, 'days').utc().format('ll')}`;
+									// The value for the circle is the average daily usage.
+									averagedReading = mapReading.reading / barDuration.asDays();
+									// The size is the reading value. It will be scaled later.
+									size.push(averagedReading);
+								}
+								// The hover text.
+								texts.push(`<b> ${timeReading} </b> <br> ${label}: ${averagedReading.toPrecision(6)} kWh/day`);
 							}
-							// Use the most recent time reading for the circle on the map.
-							// This has the limitations of the bar value where the last one can include ranges without
-							// data (GitHub issue on this).
-							// TODO: It might be better to do this similarly to compare. (See GitHub issue)
-							const readings = _.orderBy(readingsData.readings, ['startTimestamp'], ['desc']);
-							const mapReading = readings[0];
-							let timeReading: string;
-							let averagedReading = 0;
-							if (readings.length === 0) {
-								// No data. The next lines causes an issue so set specially.
-								// There may be a better overall fix for no data.
-								timeReading = 'no data to display';
-								size.push(0);
-							} else {
-								// Shift to UTC since want database time not local/browser time which is what moment does.
-								timeReading =
-								`${moment(mapReading.startTimestamp).utc().format('ll')} - ${moment(mapReading.endTimestamp).subtract(1, 'days').utc().format('ll')}`;
-								// The value for the circle is the average daily usage.
-								averagedReading = mapReading.reading / barDuration.asDays();
-								// The size is the reading value. It will be scaled later.
-								size.push(averagedReading);
-							}
-							// The hover text.
-							texts.push(`<b> ${timeReading} </b> <br> ${label}: ${averagedReading.toPrecision(6)} kWh/day`);
 						}
 					}
 				}
