@@ -50,11 +50,13 @@ function getDataForIDs(ids: number[], isGroup: boolean, state: State): CompareEn
 			readingsData = getMeterReadingsData(state, id, timeInterval, compareShift);
 		}
 		if (isReadingsDataValid(readingsData)) {
+			/* eslint-disable @typescript-eslint/no-non-null-assertion */
 			const currUsage = readingsData!.curr_use!;
 			const prevUsage = readingsData!.prev_use!;
 			const change = calculateChange(currUsage, prevUsage);
 			const entity: CompareEntity = { id, isGroup, name, change, currUsage, prevUsage };
 			entities.push(entity);
+			/* eslint-enable @typescript-eslint/no-non-null-assertion */
 		}
 	}
 	return entities;

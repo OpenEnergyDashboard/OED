@@ -39,12 +39,10 @@ function mapStateToProps(state: State) {
 						throw new Error('Unacceptable condition: readingsData.readings is undefined.');
 					}
 
-					/* tslint:disable:array-type */
 					const dataPoints: Array<{ x: number, y: number, z: number }> = _.values(readingsData.readings)
 						.map(transformLineReadingToLegacy)
 						.map((v: [number, number, number]) => ({ x: v[0], y: v[1], z: v[2] })
 						);
-					/* tslint:enable:array-type */
 					datasets.push({
 						label,
 						id: state.groups.byGroupID[groupID].id,
@@ -64,13 +62,11 @@ function mapStateToProps(state: State) {
 						throw new Error('Unacceptable condition: readingsData.readings is undefined.');
 					}
 
-					/* tslint:disable:array-type */
 					const dataPoints: Array<{ x: number, y: number, z: number }> = _.values(readingsData.readings)
 						.map(transformLineReadingToLegacy)
 						.map(
 							(v: [number, number, number]) => ({ x: v[0], y: v[1], z: v[2] })
 						);
-					/* tslint:enable:array-type */
 					datasets.push({
 						label,
 						id: state.meters.byMeterID[meterID].id,

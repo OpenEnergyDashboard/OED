@@ -35,22 +35,22 @@ function mapStateToProps(state: State, ownProps: DatasourceBoxContainerProps) {
 			datasource = Object.keys(state.meters.byMeterID)
 				.map((meterIDString: string) => parseInt(meterIDString))
 				.map(meterID => {
-				const meter = state.meters.byMeterID[meterID];
-				return {
-					id: meter.id,
-					name: meter.name
-				};
-			});
+					const meter = state.meters.byMeterID[meterID];
+					return {
+						id: meter.id,
+						name: meter.name
+					};
+				});
 		} else {
 			datasource = Object.keys(state.groups.byGroupID)
 				.map((groupIDString: string) => parseInt(groupIDString))
 				.map(groupID => {
-				const group = state.groups.byGroupID[groupID];
-				return {
-					id: group.id,
-					name: group.name
-				};
-			});
+					const group = state.groups.byGroupID[groupID];
+					return {
+						id: group.id,
+						name: group.name
+					};
+				});
 		}
 	} else if (ownProps.selection === 'children') {
 		if (ownProps.parentID) {

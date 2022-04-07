@@ -13,6 +13,7 @@ const { generateSine, generateCosine } = require('./generateTestingData');
 const Unit = require('../models/Unit');
 const Conversion = require('../models/Conversion');
 const { getConnection } = require('../db');
+const { redoCik } = require('../services/graph/redoCik');
 
 // Define the start and end date for data generation.
 const DEFAULT_OPTIONS = {
@@ -373,6 +374,7 @@ async function insertSpecialConversions() {
 async function insertSpecialUnitsAndConversions() {
 	await insertSpecialUnits();
 	await insertSpecialConversions();
+	await redoCik();
 }
 
 module.exports = {
