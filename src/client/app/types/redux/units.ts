@@ -54,5 +54,5 @@ export interface UnitDataById {
 
 export interface UnitsState {
 	isFetching: boolean;
-	units: UnitDataById[];
+	units: UnitDataById;
 }
