@@ -314,7 +314,7 @@ DECLARE
 	meter_ids INTEGER[];
 BEGIN
 	-- First get all the meter ids that will be included in one or more groups being queried.
-	SELECT array_agg(gdm.meter_id) INTO meter_ids
+	SELECT array_agg(DISTINCT gdm.meter_id) INTO meter_ids
 	FROM groups_deep_meters gdm
 	INNER JOIN unnest(group_ids) gids(id) ON gdm.group_id = gids.id;
 
@@ -414,7 +414,6 @@ DECLARE
 	real_tsrange TSRANGE;
 	real_start_stamp TIMESTAMP;
 	real_end_stamp TIMESTAMP;
-	unit_column INTEGER;
 	meter_ids INTEGER[];
 BEGIN
 	real_tsrange := shrink_tsrange_to_real_readings(tsrange(date_trunc_up('day', start_stamp), date_trunc('day', end_stamp)));
@@ -422,7 +421,7 @@ BEGIN
 	real_end_stamp := date_trunc('day', upper(real_tsrange));
 
 	-- First get all the meter ids that will be included in one or more groups being queried.
-	SELECT array_agg(gdm.meter_id) INTO meter_ids
+	SELECT array_agg(DISTINCT gdm.meter_id) INTO meter_ids
 	FROM groups_deep_meters gdm
 	INNER JOIN unnest(group_ids) gids(id) ON gdm.group_id = gids.id;
 
