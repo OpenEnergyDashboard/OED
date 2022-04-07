@@ -303,18 +303,19 @@ class Reading {
 	}
 
 	/**
-	 *
-	 * @param meterIDs
-	 * @param {Moment} currStartTimestamp
-	 * @param {Moment} currEndTimestamp
-	 * @param {Duration} compareShift
+	 * Gets compare chart readings for the given time range and shift for the given meters
+	 * @param meterIDs The meters to get compare chart readings for
+	 * @param graphicUnitId The unit id that the reading should be returned in, i.e., the graphic unit
+	 * @param {Moment} currStartTimestamp start of current/this compare period
+	 * @param {Moment} currEndTimestamp end of current/this compare period
+	 * @param {Duration} compareShift how far to shift back in time from current period to previous period
 	 * @param conn the connection to use.
 	 * @return {Promise<void>}
 	 */
-	static async getCompareReadings(meterIDs, currStartTimestamp, currEndTimestamp, compareShift, conn) {
+	static async getMeterCompareReadings(meterIDs, graphicUnitId, currStartTimestamp, currEndTimestamp, compareShift, conn) {
 		const allCompareReadings = await conn.func(
-			'compare_readings',
-			[meterIDs, currStartTimestamp, currEndTimestamp, compareShift.toISOString()]);
+			'meter_compare_readings_unit',
+			[meterIDs, graphicUnitId, currStartTimestamp, currEndTimestamp, compareShift.toISOString()]);
 		const compareReadingsByMeterID = {};
 		for (const row of allCompareReadings) {
 			compareReadingsByMeterID[row.meter_id] = {
@@ -326,18 +327,19 @@ class Reading {
 	}
 
 	/**
-	 *
-	 * @param groupIDs
-	 * @param {Moment} currStartTimestamp
-	 * @param {Moment} currEndTimestamp
-	 * @param {Duration} compareShift
-	 * @param conn the connection to use
+	 * Gets compare chart readings for the given time range and shift for the given groups
+	 * @param groupIDs The groups to get compare chart readings for
+	 * @param graphicUnitId The unit id that the reading should be returned in, i.e., the graphic unit
+	 * @param {Moment} currStartTimestamp start of current/this compare period
+	 * @param {Moment} currEndTimestamp end of current/this compare period
+	 * @param {Duration} compareShift how far to shift back in time from current period to previous period
+	 * @param conn the connection to use.
 	 * @return {Promise<void>}
 	 */
-	static async getGroupCompareReadings(groupIDs, currStartTimestamp, currEndTimestamp, compareShift, conn) {
+	 static async getGroupCompareReadings(groupIDs, graphicUnitId, currStartTimestamp, currEndTimestamp, compareShift, conn) {
 		const allCompareReadings = await conn.func(
-			'group_compare_readings',
-			[groupIDs, currStartTimestamp, currEndTimestamp, compareShift.toISOString()]);
+			'group_compare_readings_unit',
+			[groupIDs, graphicUnitId, currStartTimestamp, currEndTimestamp, compareShift.toISOString()]);
 		const compareReadingsByGroupID = {};
 		for (const row of allCompareReadings) {
 			compareReadingsByGroupID[row.group_id] = {

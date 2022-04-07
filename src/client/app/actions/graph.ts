@@ -73,10 +73,10 @@ function updateComparePeriod(comparePeriod: ComparePeriod, currentTime: moment.M
 }
 
 export function changeCompareGraph(comparePeriod: ComparePeriod): Thunk {
-	return (dispatch: Dispatch) => {
+	return (dispatch: Dispatch, getState: GetState) => {
 		dispatch(updateComparePeriod(comparePeriod, moment()));
 		dispatch((dispatch2: Dispatch) => {
-			dispatch2(fetchNeededCompareReadings(comparePeriod));
+			dispatch2(fetchNeededCompareReadings(comparePeriod, getState().graph.selectedUnit));
 		});
 		return Promise.resolve();
 	};
@@ -93,7 +93,7 @@ export function changeSelectedMeters(meterIDs: number[]): Thunk {
 		dispatch((dispatch2: Dispatch) => {
 			dispatch2(fetchNeededLineReadings(getState().graph.timeInterval, getState().graph.selectedUnit));
 			dispatch2(fetchNeededBarReadings(getState().graph.timeInterval, getState().graph.selectedUnit));
-			dispatch2(fetchNeededCompareReadings(getState().graph.comparePeriod));
+			dispatch2(fetchNeededCompareReadings(getState().graph.comparePeriod, getState().graph.selectedUnit));
 			dispatch2(fetchNeededMapReadings(getState().graph.timeInterval, getState().graph.selectedUnit));
 		});
 		return Promise.resolve();
@@ -107,7 +107,7 @@ export function changeSelectedGroups(groupIDs: number[]): Thunk {
 		dispatch((dispatch2: Dispatch) => {
 			dispatch2(fetchNeededLineReadings(getState().graph.timeInterval, getState().graph.selectedUnit));
 			dispatch2(fetchNeededBarReadings(getState().graph.timeInterval, getState().graph.selectedUnit));
-			dispatch2(fetchNeededCompareReadings(getState().graph.comparePeriod));
+			dispatch2(fetchNeededCompareReadings(getState().graph.comparePeriod, getState().graph.selectedUnit));
 			dispatch2(fetchNeededMapReadings(getState().graph.timeInterval, getState().graph.selectedUnit));
 		});
 		return Promise.resolve();

@@ -5,7 +5,7 @@
 import { connect } from 'react-redux';
 import MultiCompareChartComponent from '../components/MultiCompareChartComponent';
 import { State } from '../types/redux/state';
-import { calculateCompareShift, SortingOrder} from '../utils/calculateCompare';
+import { calculateCompareShift, SortingOrder } from '../utils/calculateCompare';
 import { CompareReadingsData } from '../types/redux/compareReadings';
 import { TimeInterval } from '../../../common/TimeInterval';
 import * as moment from 'moment';
@@ -53,7 +53,7 @@ function getDataForIDs(ids: number[], isGroup: boolean, state: State): CompareEn
 			const currUsage = readingsData!.curr_use!;
 			const prevUsage = readingsData!.prev_use!;
 			const change = calculateChange(currUsage, prevUsage);
-			const entity: CompareEntity = {id, isGroup, name, change, currUsage, prevUsage};
+			const entity: CompareEntity = { id, isGroup, name, change, currUsage, prevUsage };
 			entities.push(entity);
 		}
 	}
@@ -76,6 +76,7 @@ function getMeterName(state: State, meterID: number): string {
 
 function getGroupReadingsData(state: State, groupID: number, timeInterval: TimeInterval, compareShift: moment.Duration):
 	CompareReadingsData | undefined {
+	const unitID = state.graph.selectedUnit;
 	let readingsData: CompareReadingsData | undefined;
 	const readingsDataByID = state.readings.compare.byGroupID[groupID];
 	if (readingsDataByID !== undefined) {
@@ -83,7 +84,10 @@ function getGroupReadingsData(state: State, groupID: number, timeInterval: TimeI
 		if (readingsDataByTimeInterval !== undefined) {
 			const readingsDataByCompareShift = readingsDataByTimeInterval[compareShift.toISOString()];
 			if (readingsDataByCompareShift !== undefined) {
-				readingsData = readingsDataByCompareShift;
+				const readingsDataByUnitID = readingsDataByCompareShift[unitID];
+				if (readingsDataByUnitID !== undefined) {
+					readingsData = readingsDataByUnitID;
+				}
 			}
 		}
 	}
@@ -92,6 +96,7 @@ function getGroupReadingsData(state: State, groupID: number, timeInterval: TimeI
 
 function getMeterReadingsData(state: State, meterID: number, timeInterval: TimeInterval, compareShift: moment.Duration):
 	CompareReadingsData | undefined {
+	const unitID = state.graph.selectedUnit;
 	let readingsData: CompareReadingsData | undefined;
 	const readingsDataByID = state.readings.compare.byMeterID[meterID];
 	if (readingsDataByID !== undefined) {
@@ -99,7 +104,10 @@ function getMeterReadingsData(state: State, meterID: number, timeInterval: TimeI
 		if (readingsDataByTimeInterval !== undefined) {
 			const readingsDataByCompareShift = readingsDataByTimeInterval[compareShift.toISOString()];
 			if (readingsDataByCompareShift !== undefined) {
-				readingsData = readingsDataByCompareShift;
+				const readingsDataByUnitID = readingsDataByCompareShift[unitID];
+				if (readingsDataByUnitID !== undefined) {
+					readingsData = readingsDataByUnitID;
+				}
 			}
 		}
 	}
@@ -141,7 +149,7 @@ function sortIDs(ids: CompareEntity[], sortingOrder: SortingOrder): CompareEntit
 			});
 			break;
 		case SortingOrder.Descending:
-			ids.sort((a, b) =>  {
+			ids.sort((a, b) => {
 				if (a.change > b.change) {
 					return -1;
 				}

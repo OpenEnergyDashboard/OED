@@ -45,7 +45,15 @@ export default class MetersApi {
 		);
 	}
 
-	public async compareReadings(meterIDs: number[], timeInterval: TimeInterval, shift: moment.Duration):
+	/**
+	 * Gets compare readings for meters for the given current time range and a shift for previous time range
+	 * @param meterIDs The meter IDs to get readings for
+	 * @param timeInterval  start and end of current/this compare period
+	 * @param shift how far to shift back in time from current period to previous period
+	 * @param unitId The unit id that the reading should be returned in, i.e., the graphic unit
+	 * @return {Promise<object<int, array<{reading_rate: number, start_timestamp: }>>>}
+	 */
+	public async meterCompareReadings(meterIDs: number[], timeInterval: TimeInterval, shift: moment.Duration, unitID: number):
 		Promise<CompareReadings> {
 		const stringifiedIDs = meterIDs.join(',');
 		const currStart: moment.Moment = timeInterval.getStartTimestamp();
@@ -55,7 +63,8 @@ export default class MetersApi {
 			{
 				curr_start: currStart.toISOString(),
 				curr_end: currEnd.toISOString(),
-				shift: shift.toISOString()
+				shift: shift.toISOString(),
+				graphicUnitId: unitID.toString()
 			}
 		);
 	}

@@ -6,5 +6,7 @@ drop function compressed_readings;
 drop function compressed_group_readings;
 drop function barchart_readings;
 drop function barchart_group_readings;
-drop function compressed_barchart_readings_2
-drop function compressed_barchart_group_readings_2
+drop function compressed_barchart_readings_2;
+drop function compressed_barchart_group_readings_2;
+drop function compare_readings;
+drop function group_compare_readings;

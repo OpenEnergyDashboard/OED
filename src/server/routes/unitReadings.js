@@ -145,10 +145,18 @@ function formatBarReadingRow(readingRow) {
 	};
 }
 
+/**
+ * Gets bar readings for meters for the given time range
+ * @param meterIDs The meter IDs to get readings for
+ * @param graphicUnitId The unit id that the reading should be returned in, i.e., the graphic unit
+ * @param barWidthDays The width of the bar in days
+ * @param timeInterval The range of time to get readings for
+ * @return {Promise<object<int, array<{reading_rate: number: number. end_timestamp: number} in sorted order
+ */
 async function meterBarReadings(meterIDs, graphicUnitId, barWidthDays, timeInterval) {
 	const conn = getConnection();
 	const rawReadings = await Reading.getMeterBarReadings(
-		meterIDs, graphicUnitId, timeInterval.startTimestamp, timeInterval.endTimestamp, barWidthDays, conn);
+	meterIDs, graphicUnitId, timeInterval.startTimestamp, timeInterval.endTimestamp, barWidthDays, conn);
 	return _.mapValues(rawReadings, readingsForMeter => readingsForMeter.map(formatBarReadingRow));
 }
 
@@ -168,7 +176,15 @@ function validateGroupBarReadingsParams(params) {
 	return paramsValidationResult.valid;
 }
 
-async function groupBarReadings(groupIDs, graphicUnitId, barWidthDays, timeInterval) {
+/**
+ * Gets bar readings for groups for the given time range
+ * @param groupIDs The group IDs to get readings for
+ * @param graphicUnitId The unit id that the reading should be returned in, i.e., the graphic unit
+ * @param barWidthDays The width of the bar in days
+ * @param timeInterval The range of time to get readings for
+ * @return {Promise<object<int, array<{reading_rate: number: number. end_timestamp: number} in sorted order
+ */
+ async function groupBarReadings(groupIDs, graphicUnitId, barWidthDays, timeInterval) {
 	const conn = getConnection();
 	const rawReadings = await Reading.getGroupBarReadings(
 		groupIDs, graphicUnitId, timeInterval.startTimestamp, timeInterval.endTimestamp, barWidthDays, conn);

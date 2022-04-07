@@ -30,7 +30,7 @@ mocha.describe('Compare calculation', () => {
 	});
 	mocha.it('Works for meters', async () => {
 		const conn = testDB.getConnection();
-		const result = await Reading.getCompareReadings([meter.id], currStart, currEnd, shift, conn);
+		const result = await Reading.getMeterCompareReadings([meter.id], currStart, currEnd, shift, conn);
 		expect(result).to.deep.equal({[meter.id]: {curr_use: 10, prev_use: 1}});
 	});
 
