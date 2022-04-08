@@ -18,7 +18,8 @@ import { BarReadings } from '../types/readings';
  * @param {number} unitID the ID of the unit for which to check
  * @returns {boolean} True if the readings for the given meter, time duration, bar length and unit are missing; false otherwise.
  */
-export function shouldFetchMeterBarReadings(state: State, meterID: number, timeInterval: TimeInterval, barDuration: moment.Duration, unitID: number): boolean {
+export function shouldFetchMeterBarReadings(state: State, meterID: number, timeInterval: TimeInterval,
+	barDuration: moment.Duration, unitID: number): boolean {
 	const timeIntervalIndex = timeInterval.toString();
 	const barDurationIndex = barDuration.toISOString();
 
@@ -53,7 +54,8 @@ export function shouldFetchMeterBarReadings(state: State, meterID: number, timeI
  * @param {number} unitID the ID of the unit for which to check
  * @returns {boolean} True if the readings for the given group, time duration, bar length and unit are missing; false otherwise.
  */
-export function shouldFetchGroupBarReadings(state: State, groupID: number, timeInterval: TimeInterval, barDuration: moment.Duration, unitID: number): boolean {
+export function shouldFetchGroupBarReadings(state: State, groupID: number, timeInterval: TimeInterval,
+	barDuration: moment.Duration, unitID: number): boolean {
 	const timeIntervalIndex = timeInterval.toString();
 	const barDurationIndex = barDuration.toISOString();
 
@@ -86,8 +88,8 @@ export function shouldFetchGroupBarReadings(state: State, groupID: number, timeI
  * @param {Moment.Duration} barDuration the duration of each bar for which to check
  * @param {number} unitID the ID of the unit for which to check
  */
- export function requestMeterBarReadings(meterIDs: number[], timeInterval: TimeInterval, barDuration: moment.Duration, unitID: number):
-		t.RequestMeterBarReadingsAction {
+export function requestMeterBarReadings(meterIDs: number[], timeInterval: TimeInterval, barDuration: moment.Duration,
+	unitID: number): t.RequestMeterBarReadingsAction {
 	return { type: ActionType.RequestMeterBarReadings, meterIDs, timeInterval, barDuration, unitID };
 }
 
@@ -97,8 +99,8 @@ export function shouldFetchGroupBarReadings(state: State, groupID: number, timeI
  * @param {Moment.Duration} barDuration the duration of each bar for which to check
  * @param {number} unitID the ID of the unit for which to check
  */
- export function requestGroupBarReadings(groupIDs: number[], timeInterval: TimeInterval, barDuration: moment.Duration, unitID: number):
-		t.RequestGroupBarReadingsAction {
+export function requestGroupBarReadings(groupIDs: number[], timeInterval: TimeInterval, barDuration: moment.Duration,
+	unitID: number): t.RequestGroupBarReadingsAction {
 	return { type: ActionType.RequestGroupBarReadings, groupIDs, timeInterval, barDuration, unitID };
 }
 
@@ -109,7 +111,7 @@ export function shouldFetchGroupBarReadings(state: State, groupID: number, timeI
  * @param {number} unitID the ID of the unit for which to check
  * @param {BarReadings} readings the readings for the given meters
  */
- export function receiveMeterBarReadings(meterIDs: number[], timeInterval: TimeInterval, barDuration: moment.Duration,
+export function receiveMeterBarReadings(meterIDs: number[], timeInterval: TimeInterval, barDuration: moment.Duration,
 	unitID: number, readings: BarReadings): t.ReceiveMeterBarReadingsAction {
 	return { type: ActionType.ReceiveMeterBarReadings, meterIDs, timeInterval, unitID, barDuration, readings };
 }
@@ -121,7 +123,7 @@ export function shouldFetchGroupBarReadings(state: State, groupID: number, timeI
  * @param {number} unitID the ID of the unit for which to check
  * @param {BarReadings} readings the readings for the given groups
  */
- export function receiveGroupBarReadings(groupIDs: number[], timeInterval: TimeInterval, barDuration: moment.Duration,
+export function receiveGroupBarReadings(groupIDs: number[], timeInterval: TimeInterval, barDuration: moment.Duration,
 	unitID: number, readings: BarReadings): t.ReceiveGroupBarReadingsAction {
 	return { type: ActionType.ReceiveGroupBarReadings, groupIDs, timeInterval, barDuration, unitID, readings };
 }
@@ -131,7 +133,7 @@ export function shouldFetchGroupBarReadings(state: State, groupID: number, timeI
  * @param {TimeInterval} timeInterval the interval over which to check
  * @param {number} unitID the ID of the unit for which to check
  */
- function fetchMeterBarReadings(meterIDs: number[], timeInterval: TimeInterval, unitID: number): Thunk {
+function fetchMeterBarReadings(meterIDs: number[], timeInterval: TimeInterval, unitID: number): Thunk {
 	return async (dispatch: Dispatch, getState: GetState) => {
 		const barDuration = getState().graph.barDuration;
 		dispatch(requestMeterBarReadings(meterIDs, timeInterval, barDuration, unitID));
@@ -145,7 +147,7 @@ export function shouldFetchGroupBarReadings(state: State, groupID: number, timeI
  * @param {TimeInterval} timeInterval the interval over which to check
  * @param {number} unitID the ID of the unit for which to check
  */
- function fetchGroupBarReadings(groupIDs: number[], timeInterval: TimeInterval, unitID: number): Thunk {
+function fetchGroupBarReadings(groupIDs: number[], timeInterval: TimeInterval, unitID: number): Thunk {
 	return async (dispatch: Dispatch, getState: GetState) => {
 		const barDuration = getState().graph.barDuration;
 		dispatch(requestGroupBarReadings(groupIDs, timeInterval, barDuration, unitID));

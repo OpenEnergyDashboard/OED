@@ -43,7 +43,8 @@ export default function readings(state = defaultState, action: CompareReadingsAc
 				if (newState.byMeterID[meterID][timeInterval][compareShift][unitID] === undefined) {
 					newState.byMeterID[meterID][timeInterval][compareShift][unitID] = { isFetching: true };
 				} else {
-					newState.byMeterID[meterID][timeInterval][compareShift][unitID] = { ...newState.byMeterID[meterID][timeInterval][compareShift][unitID], isFetching: true };
+					newState.byMeterID[meterID][timeInterval][compareShift][unitID] =
+						{ ...newState.byMeterID[meterID][timeInterval][compareShift][unitID], isFetching: true };
 				}
 			}
 			return newState;
@@ -76,7 +77,8 @@ export default function readings(state = defaultState, action: CompareReadingsAc
 				if (newState.byGroupID[groupID][timeInterval][compareShift][unitID] === undefined) {
 					newState.byGroupID[groupID][timeInterval][compareShift][unitID] = { isFetching: true };
 				} else {
-					newState.byGroupID[groupID][timeInterval][compareShift][unitID] = { ...newState.byGroupID[groupID][timeInterval][compareShift][unitID], isFetching: true };
+					newState.byGroupID[groupID][timeInterval][compareShift][unitID] =
+						{ ...newState.byGroupID[groupID][timeInterval][compareShift][unitID], isFetching: true };
 				}
 			}
 			return newState;

@@ -22,7 +22,7 @@ export default class MetersApi {
 		return await this.backend.doGetRequest<NamedIDItem[]>('/api/meters');
 	}
 
-	public async lineReadingsCount(meterIDs:number[], timeInterval: TimeInterval):Promise<number> {
+	public async lineReadingsCount(meterIDs: number[], timeInterval: TimeInterval): Promise<number> {
 		const stringifiedIDs = meterIDs.join(',');
 		return await this.backend.doGetRequest<number>(
 			`/api/readings/line/count/meters/${stringifiedIDs}`,
@@ -53,8 +53,8 @@ export default class MetersApi {
 	 * @param unitId The unit id that the reading should be returned in, i.e., the graphic unit
 	 * @return {Promise<object<int, array<{reading_rate: number, start_timestamp: }>>>}
 	 */
-	public async meterCompareReadings(meterIDs: number[], timeInterval: TimeInterval, shift: moment.Duration, unitID: number):
-		Promise<CompareReadings> {
+	public async meterCompareReadings(meterIDs: number[], timeInterval: TimeInterval, shift: moment.Duration,
+		unitID: number): Promise<CompareReadings> {
 		const stringifiedIDs = meterIDs.join(',');
 		const currStart: moment.Moment = timeInterval.getStartTimestamp();
 		const currEnd: moment.Moment = timeInterval.getEndTimestamp();

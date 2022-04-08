@@ -44,7 +44,8 @@ export default function readings(state = defaultState, action: BarReadingsAction
 				if (newState.byMeterID[meterID][timeInterval][barDuration][unitID] === undefined) {
 					newState.byMeterID[meterID][timeInterval][barDuration][unitID] = { isFetching: true };
 				} else {
-					newState.byMeterID[meterID][timeInterval][barDuration][unitID] = { ...newState.byMeterID[meterID][timeInterval][barDuration][unitID], isFetching: true };
+					newState.byMeterID[meterID][timeInterval][barDuration][unitID] =
+						{ ...newState.byMeterID[meterID][timeInterval][barDuration][unitID], isFetching: true };
 				}
 			}
 
@@ -79,7 +80,8 @@ export default function readings(state = defaultState, action: BarReadingsAction
 				if (newState.byGroupID[groupID][timeInterval][barDuration][unitID] === undefined) {
 					newState.byGroupID[groupID][timeInterval][barDuration][unitID] = { isFetching: true };
 				} else {
-					newState.byGroupID[groupID][timeInterval][barDuration][unitID] = { ...newState.byGroupID[groupID][timeInterval][barDuration][unitID], isFetching: true };
+					newState.byGroupID[groupID][timeInterval][barDuration][unitID] =
+						{ ...newState.byGroupID[groupID][timeInterval][barDuration][unitID], isFetching: true };
 				}
 			}
 

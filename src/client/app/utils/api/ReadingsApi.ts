@@ -42,7 +42,7 @@ export default class ReadingsApi {
 	 * @param unitId The unit id that the reading should be returned in, i.e., the graphic unit
 	 * @return {Promise<object<int, array<{reading_rate: number: number. end_timestamp: number} in sorted order
 	 */
-	 public async groupLineReadings(groupIDs: number[], timeInterval: TimeInterval, unitID: number): Promise<LineReadings> {
+	public async groupLineReadings(groupIDs: number[], timeInterval: TimeInterval, unitID: number): Promise<LineReadings> {
 		const stringifiedIDs = groupIDs.join(',');
 		const readings = await this.backend.doGetRequest<LineReadings>(
 			`/api/unitReadings/line/groups/${stringifiedIDs}`,
@@ -62,7 +62,7 @@ export default class ReadingsApi {
 	 * @param unitId The unit id that the reading should be returned in, i.e., the graphic unit
 	 * @return {Promise<object<int, array<{reading_rate: number: number. end_timestamp: number} in sorted order
 	 */
-	 public async meterBarReadings(meterIDs: number[], timeInterval: TimeInterval, barWidthDays: number, unitID: number): Promise<BarReadings> {
+	public async meterBarReadings(meterIDs: number[], timeInterval: TimeInterval, barWidthDays: number, unitID: number): Promise<BarReadings> {
 		const stringifiedIDs = meterIDs.join(',');
 		return await this.backend.doGetRequest<BarReadings>(
 			`/api/unitReadings/bar/meters/${stringifiedIDs}`,
@@ -78,7 +78,7 @@ export default class ReadingsApi {
 	 * @param unitId The unit id that the reading should be returned in, i.e., the graphic unit
 	 * @return {Promise<object<int, array<{reading_rate: number: number. end_timestamp: number} in sorted order
 	 */
-	 public async groupBarReadings(groupIDs: number[], timeInterval: TimeInterval, barWidthDays: number, unitID: number): Promise<BarReadings> {
+	public async groupBarReadings(groupIDs: number[], timeInterval: TimeInterval, barWidthDays: number, unitID: number): Promise<BarReadings> {
 		const stringifiedIDs = groupIDs.join(',');
 		return await this.backend.doGetRequest<BarReadings>(
 			`/api/unitReadings/bar/groups/${stringifiedIDs}`,

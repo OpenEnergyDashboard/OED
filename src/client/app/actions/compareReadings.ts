@@ -19,7 +19,8 @@ import { ComparePeriod, calculateCompareShift } from '../utils/calculateCompare'
  * @param {number} unitID the ID of the unit for which to check
  * @returns {boolean} True if the readings for the given meter, time and unit are missing; false otherwise.
  */
-function shouldFetchMeterCompareReadings(state: State, meterID: number, timeInterval: TimeInterval, compareShift: moment.Duration, unitID: number): boolean {
+function shouldFetchMeterCompareReadings(state: State, meterID: number, timeInterval: TimeInterval,
+	compareShift: moment.Duration, unitID: number): boolean {
 	const readingsForID = state.readings.compare.byMeterID[meterID];
 	if (readingsForID === undefined) {
 		return true;
@@ -49,7 +50,8 @@ function shouldFetchMeterCompareReadings(state: State, meterID: number, timeInte
  * @param {number} unitID the ID of the unit for which to check
  * @returns {boolean} True if the readings for the given group, and time are missing; false otherwise.
  */
-function shouldFetchGroupCompareReadings(state: State, groupID: number, timeInterval: TimeInterval, compareShift: moment.Duration, unitID: number): boolean {
+function shouldFetchGroupCompareReadings(state: State, groupID: number, timeInterval: TimeInterval,
+	compareShift: moment.Duration, unitID: number): boolean {
 	const readingsForID = state.readings.compare.byGroupID[groupID];
 	if (readingsForID === undefined) {
 		return true;
@@ -77,7 +79,8 @@ function shouldFetchGroupCompareReadings(state: State, groupID: number, timeInte
  * @param {Moment.Duration} compareShift time to shift the timeInterval to get previous interval
  * @param {number} unitID the ID of the unit for which to check
  */
-function requestMeterCompareReadings(meterIDs: number[], timeInterval: TimeInterval, compareShift: moment.Duration, unitID: number):
+function requestMeterCompareReadings(meterIDs: number[], timeInterval: TimeInterval,
+	compareShift: moment.Duration, unitID: number):
 	t.RequestMeterCompareReadingsAction {
 	return { type: ActionType.RequestMeterCompareReadings, meterIDs, timeInterval, compareShift, unitID };
 }
@@ -88,7 +91,8 @@ function requestMeterCompareReadings(meterIDs: number[], timeInterval: TimeInter
  * @param {Moment.Duration} compareShift time to shift the timeInterval to get previous interval
  * @param {number} unitID the ID of the unit for which to check
  */
-function requestGroupCompareReadings(groupIDs: number[], timeInterval: TimeInterval, compareShift: moment.Duration, unitID: number):
+function requestGroupCompareReadings(groupIDs: number[], timeInterval: TimeInterval,
+	compareShift: moment.Duration, unitID: number):
 	t.RequestGroupCompareReadingsAction {
 	return { type: ActionType.RequestGroupCompareReadings, groupIDs, timeInterval, compareShift, unitID };
 }

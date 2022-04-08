@@ -22,8 +22,8 @@ export default class GroupsApi {
 		return await this.backend.doGetRequest<NamedIDItem[]>('/api/groups');
 	}
 
-	public async children(groupID: number): Promise<{meters: number[], groups: number[], deepMeters: number[]}> {
-		return await this.backend.doGetRequest<{meters: number[], groups: number[], deepMeters: number[]}>(`api/groups/children/${groupID}`);
+	public async children(groupID: number): Promise<{ meters: number[], groups: number[], deepMeters: number[] }> {
+		return await this.backend.doGetRequest<{ meters: number[], groups: number[], deepMeters: number[] }>(`api/groups/children/${groupID}`);
 	}
 
 	public async create(groupData: GroupData): Promise<void> {
@@ -35,7 +35,7 @@ export default class GroupsApi {
 	}
 
 	public async delete(groupID: number) {
-		return await this.backend.doPostRequest('api/groups/delete', {id: groupID});
+		return await this.backend.doPostRequest('api/groups/delete', { id: groupID });
 	}
 
 	/**
@@ -46,8 +46,8 @@ export default class GroupsApi {
 	 * @param unitId The unit id that the reading should be returned in, i.e., the graphic unit
 	 * @return {Promise<object<int, array<{reading_rate: number, start_timestamp: }>>>}
 	 */
-	 public async groupCompareReadings(groupIDs: number[], timeInterval: TimeInterval, shift: moment.Duration, unitID: number):
-		Promise<CompareReadings> {
+	public async groupCompareReadings(groupIDs: number[], timeInterval: TimeInterval, shift: moment.Duration,
+		unitID: number): Promise<CompareReadings> {
 		const stringifiedIDs = groupIDs.join(',');
 		const currStart: moment.Moment = timeInterval.getStartTimestamp();
 		const currEnd: moment.Moment = timeInterval.getEndTimestamp();

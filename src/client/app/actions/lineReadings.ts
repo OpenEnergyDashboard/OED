@@ -16,7 +16,7 @@ import { LineReadings } from '../types/readings';
  * @param {number} unitID the ID of the unit for which to check
  * @returns {boolean} True if the readings for the given meter, time duration and unit are missing; false otherwise.
  */
- function shouldFetchMeterLineReadings(state: State, meterID: number, timeInterval: TimeInterval, unitID: number): boolean {
+function shouldFetchMeterLineReadings(state: State, meterID: number, timeInterval: TimeInterval, unitID: number): boolean {
 	const timeIntervalIndex = timeInterval.toString();
 
 	const readingsForID = state.readings.line.byMeterID[meterID];
@@ -44,7 +44,7 @@ import { LineReadings } from '../types/readings';
  * @param {number} unitID the ID of the unit for which to check
  * @returns {boolean} True if the readings for the given group, time duration and unit are missing; false otherwise.
  */
- function shouldFetchGroupLineReadings(state: State, groupID: number, timeInterval: TimeInterval, unitID: number): boolean {
+function shouldFetchGroupLineReadings(state: State, groupID: number, timeInterval: TimeInterval, unitID: number): boolean {
 	const timeIntervalIndex = timeInterval.toString();
 
 	const readingsForID = state.readings.line.byGroupID[groupID];
@@ -79,7 +79,7 @@ function requestMeterLineReadings(meterIDs: number[], timeInterval: TimeInterval
  * @param {TimeInterval} timeInterval the interval over which to check
  * @param {number} unitID the ID of the unit for which to check
  */
- function requestGroupLineReadings(groupIDs: number[], timeInterval: TimeInterval, unitID: number): t.RequestGroupLineReadingsAction {
+function requestGroupLineReadings(groupIDs: number[], timeInterval: TimeInterval, unitID: number): t.RequestGroupLineReadingsAction {
 	return { type: ActionType.RequestGroupLineReadings, groupIDs, timeInterval, unitID };
 }
 
@@ -89,7 +89,7 @@ function requestMeterLineReadings(meterIDs: number[], timeInterval: TimeInterval
  * @param {number} unitID the ID of the unit for which to check
  * @param {LineReadings} readings the readings for the given meters
  */
- function receiveMeterLineReadings(
+function receiveMeterLineReadings(
 	meterIDs: number[], timeInterval: TimeInterval, unitID: number, readings: LineReadings): t.ReceiveMeterLineReadingsAction {
 	return { type: ActionType.ReceiveMeterLineReadings, meterIDs, timeInterval, unitID, readings };
 }
@@ -100,7 +100,7 @@ function requestMeterLineReadings(meterIDs: number[], timeInterval: TimeInterval
  * @param {number} unitID the ID of the unit for which to check
  * @param {LineReadings} readings the readings for the given groups
  */
- function receiveGroupLineReadings(
+function receiveGroupLineReadings(
 	groupIDs: number[], timeInterval: TimeInterval, unitID: number, readings: LineReadings): t.ReceiveGroupLineReadingsAction {
 	return { type: ActionType.ReceiveGroupLineReadings, groupIDs, timeInterval, unitID, readings };
 }
@@ -136,7 +136,7 @@ function fetchGroupLineReadings(groupIDs: number[], timeInterval: TimeInterval, 
  * @param {TimeInterval} timeInterval the interval over which to check
  * @param {number} unitID the ID of the unit for which to check
  */
- export function fetchNeededLineReadings(timeInterval: TimeInterval, unitID: number): Thunk {
+export function fetchNeededLineReadings(timeInterval: TimeInterval, unitID: number): Thunk {
 	return (dispatch: Dispatch, getState: GetState) => {
 		const state = getState();
 		const promises: Array<Promise<any>> = [];

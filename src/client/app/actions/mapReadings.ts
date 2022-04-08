@@ -52,7 +52,7 @@ function fetchGroupMapReadings(groupIDs: number[], timeInterval: TimeInterval, d
  * @param {TimeInterval} timeInterval the interval over which to check
  * @param {number} unitID the ID of the unit for which to check
  */
- export function fetchNeededMapReadings(timeInterval: TimeInterval, unitID: number): Thunk {
+export function fetchNeededMapReadings(timeInterval: TimeInterval, unitID: number): Thunk {
 	return (dispatch: Dispatch, getState: GetState) => {
 		const state = getState();
 		const promises: Promise<any>[] = [];
