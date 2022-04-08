@@ -248,7 +248,7 @@ AS $$
 		meter_ids INTEGER[];
 	BEGIN
 		-- First get all the meter ids that will be included in one or more groups being queried
-		SELECT array_agg(gdm.meter_id) INTO meter_ids
+		SELECT array_agg(DISTINCT gdm.meter_id) INTO meter_ids
 		FROM groups_deep_meters gdm
 		INNER JOIN unnest(group_ids) gids(id) ON gdm.group_id = gids.id;
 
