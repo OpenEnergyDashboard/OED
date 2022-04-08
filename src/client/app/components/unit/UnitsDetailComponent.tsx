@@ -11,6 +11,7 @@ import TooltipHelpContainerAlternative from '../../containers/TooltipHelpContain
 import UnsavedWarningContainer from '../../containers/UnsavedWarningContainer';
 import { removeUnsavedChanges } from '../../actions/unsavedWarning';
 import TooltipMarkerComponent from '../TooltipMarkerComponent';
+import ModalCard from './CreateUnitModalComponent';
 
 interface UnitsDetailProps{
     loggedInAsAdmin: boolean;
@@ -89,11 +90,14 @@ export default class UnitsDetailContainer extends React.Component<UnitsDetailPro
                                     ( <UnitViewContainer key={unitID} id={unitID} /> ))}
                                 <tr>
                                     <td colSpan={11}>
-                                        <Link to="/addUnit">
+                                        {/* <Link to="/addUnit">
                                             <Button style={buttonContainerStyle} color='primary'>
                                                 <FormattedMessage id="create.unit"/>
                                             </Button>
-                                        </Link>
+                                        </Link> */}
+                                        {loggedInAsAdmin && <div className="edit-btn">
+                                            <ModalCard/>
+                                        </div>}
                                     </td>
                                 </tr>
                             </tbody>
