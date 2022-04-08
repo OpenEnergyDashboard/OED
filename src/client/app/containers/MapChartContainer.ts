@@ -14,6 +14,7 @@ import * as _ from 'lodash';
 import getGraphColor from '../utils/getGraphColor';
 import Locales from '../types/locales';
 import { DataType } from '../types/Datasources';
+import { UnitRepresentType } from '../types/redux/units';
 
 function mapStateToProps(state: State) {
 	const unitID = state.graph.selectedUnit;
@@ -65,6 +66,33 @@ function mapStateToProps(state: State) {
 			// change in x or y which is the map's width & height in this case.
 			const scaleOfMap = calculateScaleFromEndpoints(origin, opposite, imageDimensionNormalized, map.northAngle);
 			// Loop over all selected meters. Maps only work for meters at this time.
+			// The y-axis label depends on the unit which is in selectUnit state.
+			const graphingUnit = state.graph.selectedUnit;
+			let unitLabel: string = '';
+			// If graphingUnit is -99 then none selected and nothing to graph so label is empty.
+			// This will probably happen when the page is first loaded.
+			if (graphingUnit !== -99) {
+				const selectUnitState = state.units.units[state.graph.selectedUnit];
+				if (selectUnitState !== undefined) {
+					// Quantity and flow units have different unit labels.
+					// Look up the type of unit if it is for quantity/flow (should not be raw) and decide what to do.
+					// Bar graphics are always quantities.
+					if (selectUnitState.unitRepresent === UnitRepresentType.quantity) {
+						// If it is a quantity unit then that is the unit you are graphing but it is normalized to per day.
+						unitLabel = selectUnitState.identifier + ' / day';
+					} else if (selectUnitState.unitRepresent === UnitRepresentType.flow) {
+						// If it is a flow meter then you need to multiply by time to get the quantity unit then show as per day.
+						// The quantity/time for flow has varying time so label by multiplying by time.
+						// To make sure it is clear, also indicate it is a quantity.
+						// Note this should not be used for raw data.
+						// It might not be usual to take a flow and make it into a quantity so this label is a little different to
+						// catch people's attention. If sites/users don't like OED doing this then we can eliminate flow for these types
+						// of graphics as we are doing for rate.
+						unitLabel = selectUnitState.identifier + ' * time / day ≡ quantity / day';
+					}
+				}
+			}
+
 			for (const meterID of state.graph.selectedMeters) {
 				// Get meter id number.
 				const byMeterID = state.readings.bar.byMeterID[meterID];
@@ -120,7 +148,7 @@ function mapStateToProps(state: State) {
 									size.push(averagedReading);
 								}
 								// The hover text.
-								texts.push(`<b> ${timeReading} </b> <br> ${label}: ${averagedReading.toPrecision(6)} kWh/day`);
+								texts.push(`<b> ${timeReading} </b> <br> ${label}: ${averagedReading.toPrecision(6)} ${unitLabel}`);
 							}
 						}
 					}
@@ -182,7 +210,7 @@ function mapStateToProps(state: State) {
 									size.push(averagedReading);
 								}
 								// The hover text.
-								texts.push(`<b> ${timeReading} </b> <br> ${label}: ${averagedReading.toPrecision(6)} kWh/day`);
+								texts.push(`<b> ${timeReading} </b> <br> ${label}: ${averagedReading.toPrecision(6)} ${unitLabel}`);
 							}
 						}
 					}
