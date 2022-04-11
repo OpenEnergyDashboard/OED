@@ -9,87 +9,62 @@ const { chai, mocha, expect, app } = require('../common');
 const { TimeInterval } = require('../../../common/TimeInterval');
 
 const ETERNITY = TimeInterval.unbounded();
-const DAY = moment.duration({'days': 1});
+const DAY = moment.duration({ 'days': 1 });
 
 mocha.describe('readings API', () => {
 	mocha.describe('for line charts', () => {
 		mocha.describe('for meters', () => {
 			mocha.it('rejects requests without a timeInterval', async () => {
-				const res = await chai.request(app).get('/api/readings/line/meters/1');
+				const res = await chai.request(app).get('/api/unitReadings/line/meters/1');
 				expect(res).to.have.status(400);
 			});
-			mocha.it('returns nothing for meters that do not exist', async () => {
-				const res = await chai.request(app).get('/api/readings/line/meters/1')
-					.query({timeInterval: ETERNITY.toString()});
-				expect(res).to.have.status(200);
-				expect(res).to.be.json;
-				expect(res.body).to.have.property('1');
-				expect(res.body['1']).to.have.length(0);
-			});
+			// TODO check if request does not have graphicUnitID
 		});
+
 		mocha.describe('for groups', () => {
 			mocha.it('rejects requests without a timeInterval', async () => {
-				const res = await chai.request(app).get('/api/readings/line/groups/1');
+				const res = await chai.request(app).get('/api/unitReadings/line/groups/1');
 				expect(res).to.have.status(400);
 			});
-			mocha.it('returns nothing for groups that do not exist', async () => {
-				const res = await chai.request(app).get('/api/readings/line/groups/1')
-					.query({timeInterval: ETERNITY.toString()});
-				expect(res).to.have.status(200);
-				expect(res).to.be.json;
-				expect(res.body).to.have.property('1');
-				expect(res.body['1']).to.have.length(0);
-			});
+			// TODO check if does not have graphicUnitID
 		});
 	});
+
 	mocha.describe('for bar charts', () => {
 		mocha.describe('for meters', () => {
 			mocha.it('rejects requests without a timeInterval or barDuration', async () => {
-				const res = await chai.request(app).get('/api/readings/bar/meters/1');
+				const res = await chai.request(app).get('/api/unitReadings/bar/meters/1');
 				expect(res).to.have.status(400);
 			});
 			mocha.it('rejects requests without a barDuration', async () => {
-				const res = await chai.request(app).get('/api/readings/bar/meters/1')
-					.query({timeInterval: ETERNITY.toString()});
+				const res = await chai.request(app).get('/api/unitReadings/bar/meters/1')
+					.query({ timeInterval: ETERNITY.toString() });
 				expect(res).to.have.status(400);
 			});
 			mocha.it('rejects requests without a timeInterval', async () => {
-				const res = await chai.request(app).get('/api/readings/bar/meters/1')
-					.query({barDuration: DAY.toISOString()});
+				const res = await chai.request(app).get('/api/unitReadings/bar/meters/1')
+					.query({ barDuration: DAY.toISOString() });
 				expect(res).to.have.status(400);
 			});
-			mocha.it('returns nothing for meters that do not exist', async () => {
-				const res = await chai.request(app).get('/api/readings/bar/meters/1')
-					.query({barDuration: DAY.toISOString(), timeInterval: ETERNITY.toString()});
-				expect(res).to.have.status(200);
-				expect(res).to.be.json;
-				expect(res.body).to.have.property('1');
-				expect(res.body['1']).to.have.length(0);
-			});
+			// TODO check if request does not have graphicUnitID
 		});
+
 		mocha.describe('for groups', () => {
 			mocha.it('rejects requests without a timeInterval or barDuration', async () => {
-				const res = await chai.request(app).get('/api/readings/bar/groups/1');
+				const res = await chai.request(app).get('/api/unitReadings/bar/groups/1');
 				expect(res).to.have.status(400);
 			});
 			mocha.it('rejects requests without a barDuration', async () => {
-				const res = await chai.request(app).get('/api/readings/bar/groups/1')
-					.query({timeInterval: ETERNITY.toString()});
+				const res = await chai.request(app).get('/api/unitReadings/bar/groups/1')
+					.query({ timeInterval: ETERNITY.toString() });
 				expect(res).to.have.status(400);
 			});
 			mocha.it('rejects requests without a timeInterval', async () => {
-				const res = await chai.request(app).get('/api/readings/bar/groups/1')
-					.query({barDuration: DAY.toISOString()});
+				const res = await chai.request(app).get('/api/unitReadings/bar/groups/1')
+					.query({ barDuration: DAY.toISOString() });
 				expect(res).to.have.status(400);
 			});
-			mocha.it('returns nothing for groups that do not exist', async () => {
-				const res = await chai.request(app).get('/api/readings/bar/groups/1')
-					.query({barDuration: DAY.toISOString(), timeInterval: ETERNITY.toString()});
-				expect(res).to.have.status(200);
-				expect(res).to.be.json;
-				expect(res.body).to.have.property('1');
-				expect(res.body['1']).to.have.length(0);
-			});
+			// TODO check if request does not have graphicUnitID
 		});
 	});
 });
