@@ -224,7 +224,7 @@ BEGIN
 	-- For each frequency of points, verify that you will get the minimum graphing points to use.
 	-- Start with the lowest frequency (daily), then hourly and then use raw/meter data if others
 	-- will not work.
-	IF extract(DAY FROM requested_interval) > min_day_points THEN
+	IF extract(DAY FROM requested_interval) >= min_day_points THEN
 		-- Get daily points to graph
 		RETURN QUERY
 			SELECT
@@ -246,7 +246,7 @@ BEGIN
 			INNER JOIN cik c on c.row_index = u.unit_index AND c.column_index = unit_column)
 			WHERE requested_range @> time_interval;
 	-- There's no quick way to get the number of hours in an interval. extract(HOURS FROM '1 day, 3 hours') gives 3.
-	ELSIF extract(EPOCH FROM requested_interval)/3600 > min_hour_points THEN
+	ELSIF extract(EPOCH FROM requested_interval)/3600 >= min_hour_points THEN
 		-- Get hourly points to graph. See daily for more comments.
 		RETURN QUERY
 			SELECT hourly.meter_id AS meter_id,

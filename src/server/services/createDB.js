@@ -15,7 +15,7 @@ const { redoCik } = require('../services/graph/redoCik');
 		await createSchema(conn);
 		await Unit.insertStandardUnits(conn);
 		await Conversion.insertStandardConversions(conn);
-		await redoCik();
+		await redoCik(conn);
 		log.info('Schema created', null, true);
 		process.exitCode = 0;
 	} catch (err) {
