@@ -1,12 +1,12 @@
 import * as React from 'react';
-import { fetchUnitsDetails } from '../../actions/unit';
+import { fetchUnitsDetails } from '../../actions/units';
 import HeaderContainer from '../HeaderContainer';
 import FooterContainer from '../FooterContainer';
 import CreateUnitComponent from '../../components/unit/CreateUnitComponent';
 import { showSuccessNotification, showErrorNotification } from '../../utils/notifications';
 import { unitsApi } from '../../utils/api';
 import { browserHistory } from '../../utils/history';
-import { UnitData } from 'types/redux/unit';
+import { UnitData } from '../../types/redux/units';
 import translate from '../../utils/translate';
 
 export default class CreateUnitContainter extends React.Component<{}, {}> {
