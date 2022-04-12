@@ -1,32 +1,48 @@
-import  { useState } from "react";
+import { Console } from "core-js/core/log";
 import * as React from "react";
 import { Modal, Button, Dropdown } from "react-bootstrap";
 import '../../styles/meter-edit-modal.css';
 
-function ModalCard() {
-const [showModal, setShow] = useState(false);
+interface MetaDataProps {
+  onhide: () => void;
+  show: boolean;
+  id: number;
+  identifier: string;
+  name: string;
+  units: number;
+  meterType: string;
+  gps: string;
+  Area: number;
+  displayable: boolean;
+  enabled: boolean;
+  meterAdress: string;
 
-  const handleClose = () => setShow(false);
-  const handleShow = () => setShow(true);
+}
 
-  return (
-    <>
-        <Button variant="Secondary" onClick={handleShow}>
-          Edit Meter
-        </Button>
-      
-      <Modal show={showModal} onHide={handleClose}>
+ type MeterViewPropsWithIntl = MetaDataProps;
+
+ class MeterModalEditComponent extends React.Component<MeterViewPropsWithIntl, {show: boolean}>{
+   constructor(props: MeterViewPropsWithIntl){
+     super(props);
+     this.state = {
+       show: this.props.show
+     };
+   }
+   render() {
+    return (
+       <>
+      <Modal show={this.props.show} onHide={this.props.onhide}>
         <Modal.Header closeButton>
           <Modal.Title> Edit Meter Information</Modal.Title>
         </Modal.Header>
-
+  
         <Modal.Body className="show-grid">
           <div id="container">
             <div id="modalChild">
               <div>
-              Identifier: <span><br/><input type="text" value="filled in info" autoFocus /></span>
+              Identifier: <span><br/><input type="text" defaultValue={this.props.identifier} placeholder="Identifier" readOnly={true} /></span>
               </div>
-
+  
               <div>
                 Units: <span> 
                   <Dropdown>
@@ -45,7 +61,7 @@ const [showModal, setShow] = useState(false);
                   </Dropdown>
                   </span>
               </div>
-
+  
               <div>
                 Meter-Type: <span>
                   <Dropdown>
@@ -64,7 +80,7 @@ const [showModal, setShow] = useState(false);
                   </Dropdown>
                   </span>
               </div>
-
+  
               <div>
               Graphic Units: 
                   <Dropdown>
@@ -82,27 +98,27 @@ const [showModal, setShow] = useState(false);
                     </Dropdown.Menu>
                   </Dropdown>
               </div>
-
+  
               <div>
                 GPS: <span><br/><input type="text" value="Filler Information" autoFocus/></span>
               </div>
-
+  
               <div>
                 Area: <span><br/><input type="text" value="Filler Information" autoFocus/></span>
               </div>
-
+  
               <div>
                 Displayable: <span><input type="checkbox"/></span>
               </div>
-
+  
               <div>
                 Enabled: <span><input type="checkbox"/></span>
               </div>
-
+  
               <div>
                 Meter Address: <span><br/><input type="text" value="Filler Information" autoFocus/></span>
               </div>
-
+  
               <div>
                 Timezones:
                 <span> 
@@ -125,17 +141,17 @@ const [showModal, setShow] = useState(false);
               <div>
                 Notes:<br/> <input type="text" value="Filler Information" autoFocus/>
               </div>
-
+  
             </div>
               <div id="modalChild">
                 <div>
                   Cumulative: <input type="checkbox"/>
                 </div>
-
+  
                 <div>
                   Cumulative Reset: <input type="checkbox"/>
                 </div>
-
+  
                 <div>
                   Reset Start-Time: <br/> <input type="text" value="00:00:00" autoFocus/>
                 </div>
@@ -146,11 +162,11 @@ const [showModal, setShow] = useState(false);
                 <div>
                   End Only: <input type="checkbox"/>
                 </div>
-
+  
                 <div>
                   Read Gap: <br/> <input type="text" value="Filler Information"/>
                 </div>
-
+  
                 <div>
                   Reading Variation: <br/> <input type="text" value="Filler Information"/>
                 </div>
@@ -174,41 +190,41 @@ const [showModal, setShow] = useState(false);
                     </Dropdown>
                     </span>
                 </div>
-
+  
                 <div>
                   Reading:
                 </div>
-
+  
                 <div>
                   Start Date/Time:<br/> <input type="text" value="Filler Information"/>
                 </div>
-
+  
                 <div>
                   End Date/Time:<br/> <input type="text" value="Filler Information"/>
                 </div>
                 <div>
                   ID: <br/><input type="text" readOnly value="00"/>
                 </div>
-
+  
                 <div>
-                  Name of Meter: <br/> <input type="text" value="Filler Meter Name"/> 
+                  Name of Meter: <br/> <input type="text" defaultValue={this.props.name} placeholder="Name" readOnly={true}/> 
                 </div>
               </div>
           </div>
         </Modal.Body>
-
+  
         <Modal.Footer>
-          <Button variant="secondary" onClick={handleClose}>
+          <Button variant="secondary" onClick={this.props.onhide}>
             Close
           </Button>
-          <Button variant="primary" onClick={handleClose}>
+          <Button variant="primary" onClick={() => this.props.onhide}>
             Save Changes
           </Button>
         </Modal.Footer>
       </Modal>
-    </>
-  );
+  </>
+    );
+   }
 }
 
-
-export default ModalCard;
+export default MeterModalEditComponent;

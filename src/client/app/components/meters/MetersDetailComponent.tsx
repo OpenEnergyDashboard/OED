@@ -71,7 +71,7 @@ export default class MetersDetailComponent extends React.Component<MetersDetailP
 					</h2>
 					<div className="card-container">
 					{ this.props.meters.map(meterID =>
-						( <MeterViewContainer key={meterID} id={meterID} /> ))}
+						( <MeterViewContainer key={meterID} id={meterID} show={false} onHide={false} /> ))}
 					</div>
 					{/* <div style={tableStyle}>
 					<Table striped bordered hover>
