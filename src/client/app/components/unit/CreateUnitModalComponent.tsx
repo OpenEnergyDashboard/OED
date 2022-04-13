@@ -2,7 +2,7 @@ import  { useState } from "react";
 import * as React from "react";
 import { Modal, Button, Dropdown} from "react-bootstrap";
 import {Input} from "reactstrap";
-import { FormattedMessage } from 'react-intl';
+import {useIntl, FormattedMessage } from 'react-intl';
 import '../../styles/unit-add-modal.css';
 
 interface CreateUnitFormProps{
@@ -32,10 +32,15 @@ function clicked(){
     console.log("clicked")
 }
 
-function ModalCard(props: CreateUnitFormProps) {
+const ModalCard = (props: CreateUnitFormProps) => {
+    const handleNameChange = props.handleNameChange
     const [showModal, setShow] = useState(false);
-
+    const intl = useIntl()
     const handleClose = () => setShow(false);
+    const handleSubmit = () => {
+        setShow(false)
+        props.submitNewUnit()
+    };
     const handleShow = () => setShow(true);
 
     const formInputStyle: React.CSSProperties = {
@@ -72,23 +77,20 @@ function ModalCard(props: CreateUnitFormProps) {
                     <div style={tableStyle}>
                         <form onSubmit={e => { e.preventDefault();  props.submitNewUnit(); }}>
                             <div style={formInputStyle}>
-                                {/* need name formatted message */}
+
                             <label><FormattedMessage id="unit.name"/></label><br />
-                            <Input type='text' onChange={({target}) =>  props.handleNameChange(target.value)} required value={ props.name} />
+                            <Input type='text' onChange={({target}) =>  handleNameChange(target.value)} required value={props.name} />
                             </div>
                             <div style={formInputStyle}>
-                                {/* need identfier formatted message */}
                             <label><FormattedMessage id="unit.identifier"/></label><br />
                             <Input type='text' onChange={({target}) =>  props.handleIdentifierChange(target.value)} required value={ props.identifier} />
                             </div>
                             <div style={formInputStyle}>
-                                {/* need name formatted message */}
                             <label><FormattedMessage id="unit.represent"/></label><br />
                             <Input type='select' onChange={({target}) =>  props.handleUnitRepresentChange(target.value)} required value={ props.unitRepresent}>
-                                <option >Select a unit representation</option>
+                                <option value='raw' key='raw'>raw</option>
                                 <option value='quantity' key='quantity'>Quantity</option>
                                 <option value='flow' key='flow'>Flow</option>
-                                <option value='raw' key='raw'>raw</option>
                                 <option value='unused' key='unused'>Unused</option>
                             </Input>
                             </div>
@@ -99,7 +101,7 @@ function ModalCard(props: CreateUnitFormProps) {
                             <div style={formInputStyle}>
                             <label><FormattedMessage id="unit.type_of_unit"/></label><br />
                             <Input type='select' onChange={({target}) =>  props.handleTypeOfUnitChange(target.value)} required value={ props.typeOfUnit}>
-                                <option >Select a unit</option>
+
                                 <option value='unit' key='unit'>Unit</option>
                                 <option value='meter' key='meter'>Meter</option>
                                 <option value='suffix' key='suffix'>Suffix</option>
@@ -111,28 +113,24 @@ function ModalCard(props: CreateUnitFormProps) {
                             </div>
                             <div style={formInputStyle}>
                             <label><FormattedMessage id="unit.displayable"/></label><br />
-                            <Input type='select' onChange={({target}) =>  props.handleDisplayableChange(target.value)} required value={ props.displayable}>
-                                <option ><FormattedMessage id="unit.dropdown_displayable"/></option>
-                                <option value='none' key='none'>None</option>
+                            <Input type='select' onChange={({target}) =>  props.handleDisplayableChange(target.value)} required value={ props.displayable} >
+                                
+
                                 <option value='all' key='all'>All</option>
+                                <option value='none' key='none'>None</option>
+                                
                                 <option value='admin' key='admin'>Admin</option>
                             </Input>
                             </div>
                                 
                                 {/* SOMETHING WRONG HERE */}
                                 {/* use JSON.parse to convert from target.value string to boolean; not sure about overhead from using JSON.parse shoudl check with Steve */}
-                                {/* <Input type='checkbox' onChange={({target}) =>  props.handlePreferredDisplayChange(JSON.parse(target.value))} value={ props.preferredDisplay.toString()} />
-                                <label><FormattedMessage id="unit.preferred_display"/></label> */}
-
-                                <Input type='checkbox' onChange={({target}) =>  props.handlePreferredDisplayChange(true)} value={} />
+                                <Input type='checkbox' onChange={({target}) =>  props.handlePreferredDisplayChange(JSON.parse(target.value))} value={ props.preferredDisplay.toString()} />
                                 <label><FormattedMessage id="unit.preferred_display"/></label>
                                 
                             <div style={formInputStyle}>
                                 <label><FormattedMessage id="unit.note_optional"/></label><br />
                                 <Input type='textarea' onChange={({target}) =>  props.handleNoteChange(target.value)} value={ props.note} />
-                            </div>
-                            <div>
-                                <Button onClick={clicked}><FormattedMessage id="unit.submit_new_unit"/></Button>
                             </div>
                         </form>
                     </div>
@@ -145,7 +143,7 @@ function ModalCard(props: CreateUnitFormProps) {
           <Button variant="secondary" onClick={handleClose}>
             Close
           </Button>
-          <Button variant="primary" onClick={handleClose}>
+          <Button variant="primary" onClick={handleSubmit}>
             Save Changes
           </Button>
         </Modal.Footer>

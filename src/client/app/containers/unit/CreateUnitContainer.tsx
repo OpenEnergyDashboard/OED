@@ -2,14 +2,15 @@ import * as React from 'react';
 import { fetchUnitsDetails } from '../../actions/units';
 import HeaderContainer from '../HeaderContainer';
 import FooterContainer from '../FooterContainer';
-import CreateUnitComponent from '../../components/unit/CreateUnitComponent';
+// import CreateUnitComponent from '../../components/unit/CreateUnitComponent';
+import CreateUnitModalComponent from '../../components/unit/CreateUnitModalComponent';
 import { showSuccessNotification, showErrorNotification } from '../../utils/notifications';
 import { unitsApi } from '../../utils/api';
 import { browserHistory } from '../../utils/history';
 import { UnitData } from '../../types/redux/units';
 import translate from '../../utils/translate';
 
-export default class CreateUnitContainter extends React.Component<{}, {}> {
+export default class CreateUnitContainer extends React.Component<{}, {}> {
     constructor(props: {}){
         super(props);
         //TODO: create rest of hanlder functions, bind them, and pass to CreateUnitComponent
@@ -28,12 +29,12 @@ export default class CreateUnitContainter extends React.Component<{}, {}> {
     state = {
         name: '',
         identifier: '',
-        unitRepresent: '',
+        unitRepresent: 'raw',
         secInRate: 3600,
-        typeOfUnit: '',
+        typeOfUnit: 'unit',
         unitIndex: undefined,
         suffix: '',
-        displayable: '',
+        displayable: 'all',
         preferredDisplay: false,
         note: ''
     }
@@ -99,8 +100,7 @@ export default class CreateUnitContainter extends React.Component<{}, {}> {
     public render() {
         return (
             <div>
-                <HeaderContainer />
-                <CreateUnitComponent
+                <CreateUnitModalComponent
                     //TODO: create rest of hanlder functions, bind them, and pass to CreateUnitComponent
                     name= {this.state.name}
                     identifier= {this.state.identifier}
@@ -123,7 +123,6 @@ export default class CreateUnitContainter extends React.Component<{}, {}> {
                     handlePreferredDisplayChange = {this.handlePreferredDisplayChange}
                     handleNoteChange = {this.handleNoteChange}
                 />
-                <FooterContainer />
             </div>
         );
     }
