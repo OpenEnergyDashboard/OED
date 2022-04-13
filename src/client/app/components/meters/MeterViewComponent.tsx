@@ -14,6 +14,7 @@ import store from '../../index';
 import ModalCard from './MeterModalEditComponent';
 import '../../styles/meter-card-page.css'
 import { stubFalse } from 'lodash';
+import { throws } from 'assert';
 
 interface MeterViewProps {
 	// The ID of the meter to be displayed
@@ -70,6 +71,8 @@ class MeterViewComponent extends React.Component<MeterViewPropsWithIntl, MeterVi
 	}
 
 	public render() {
+		console.log(this.props.meter.gps?.longitude);
+		console.log(this.props.meter.ipAddress);
 		const loggedInAsAdmin = this.props.loggedInAsAdmin;
 		return (
 
@@ -111,17 +114,29 @@ class MeterViewComponent extends React.Component<MeterViewPropsWithIntl, MeterVi
 					<ModalCard
 						show={this.state.show}
 						onhide={this.handleClose} 
-						id={0} 
+						id={this.props.meter.id} 
 						identifier={this.props.meter.identifier} 
-						units={0} 
+						units={this.props.meter.meterType} 
 						name={this.props.meter.name}
-						meterType={''} 
-						gps={''} 
-						Area={0} 
+						meterType={this.props.meter.meterType} 
+						gps={this.props.meter.gps} 
+						Area={this.props.meter.area} 
 						displayable={this.props.meter.displayable} 
 						enabled={this.props.meter.enabled} 
-						meterAdress={''}/>
-					
+						graphicUnit={this.props.meter.graphicUnit}
+						meterAddress={this.props.meter.ipAddress}
+						notes={this.props.meter.note}
+						cumulative={this.props.meter.cumulative}
+						cumulativeReset={this.props.meter.cumulativeReset}
+						cumulativeResetStart={this.props.meter.cumulativeResetStart}
+						cumulativeResetEnd={this.props.meter.cumulativeResetEnd}
+						endOnlyTime={this.props.meter.endOnlyTime}
+						readingGap={this.props.meter.readingGap}
+						readingVariation={this.props.meter.readingVariation}
+						readingDuplication={this.props.meter.readingDuplication}
+						timesort={this.props.meter.timesort}
+						startTimeStamp={this.props.meter.startTimeStamp}
+						endTimeStamp={this.props.meter.endTimeStamp}/>
 				</div>
 			</div>
 

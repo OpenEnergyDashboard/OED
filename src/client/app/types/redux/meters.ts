@@ -46,13 +46,28 @@ export type MetersAction =
 export interface MeterMetadata {
 	id: number;
 	name: string;
-	identifier: string;
+	ipAddress?: string;
 	enabled: boolean;
 	displayable: boolean;
 	meterType?: string;
-	ipAddress?: string;
 	timeZone?: string;
 	gps?: GPSPoint;
+	identifier: string;
+	graphicUnit: number
+	note: string;
+	area: number;
+	cumulative: boolean;
+	cumulativeReset: boolean;
+	cumulativeResetStart: string;
+	cumulativeResetEnd: string;
+	readingGap: string;
+	readingVariation: number;
+	readingDuplication: number;
+	timesort: boolean;
+	endOnlyTime: boolean;
+	reading: number;
+	startTimeStamp: string;
+	endTimeStamp: string;
 }
 
 export interface MeterSortedByIdentifier {
