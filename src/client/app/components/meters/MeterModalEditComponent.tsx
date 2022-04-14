@@ -171,7 +171,7 @@ function isUnits(unit?: string){
         Units: <span> 
           <Dropdown>
           <Dropdown.Toggle id="dropdown-button-dark-example1" size="sm" variant="secondary">
-          Dropdown Button
+          Kilowatts
         </Dropdown.Toggle>
             <Dropdown.Menu variant="dark">
               <Dropdown.Item active>
@@ -297,7 +297,7 @@ function isGraphicUnits(gUnit: number){
     Graphic Units: 
       <Dropdown>
       <Dropdown.Toggle id="dropdown-button-dark-example1" size="sm"variant="secondary">
-        Dropdown Button
+        Units
       </Dropdown.Toggle>
         <Dropdown.Menu variant="dark">
           <Dropdown.Item active>

@@ -71,8 +71,6 @@ class MeterViewComponent extends React.Component<MeterViewPropsWithIntl, MeterVi
 	}
 
 	public render() {
-		console.log(this.props.meter.gps?.longitude);
-		console.log(this.props.meter.ipAddress);
 		const loggedInAsAdmin = this.props.loggedInAsAdmin;
 		return (
 
@@ -107,7 +105,29 @@ class MeterViewComponent extends React.Component<MeterViewPropsWithIntl, MeterVi
 						<span className="on-off-switch-span-off">Displayble</span>
 					</div>
 				</div>
-				<div className="edit-btn">
+				{this.isAdmin()}
+			</div>
+
+			// <tr>
+			// 	{loggedInAsAdmin && <td> {this.props.meter.id} {this.formatStatus()} </td>}
+			// 	{loggedInAsAdmin && <td> {this.props.meter.name} </td>}
+			// 	<td> {this.formatIdentifierInput()} </td>
+			// 	{loggedInAsAdmin && <td> {this.props.meter.meterType} </td>}
+			// 	{loggedInAsAdmin && <td> {this.props.meter.ipAddress} </td>}
+			// 	{loggedInAsAdmin && <td> {this.formatGPSInput()} </td>}
+			// 	<td> {this.formatEnabled()} </td>
+			// 	<td> {this.formatDisplayable()} </td>
+			// 	{loggedInAsAdmin && <td> <TimeZoneSelect current={this.props.meter.timeZone || ''} handleClick={this.changeTimeZone} /> </td>}
+			// 	{loggedInAsAdmin && <td> <ModalCard/></td>}
+			// </tr>
+		
+		);
+	}
+	private isAdmin(){
+		const loggedInAsAdmin = this.props.loggedInAsAdmin;
+		if(loggedInAsAdmin){
+			return(
+			<div className="edit-btn">
 				<Button variant="Secondary" onClick={this.handleShow}>
         			Edit Meter
      			 </Button>
@@ -138,24 +158,10 @@ class MeterViewComponent extends React.Component<MeterViewPropsWithIntl, MeterVi
 						startTimeStamp={this.props.meter.startTimeStamp}
 						endTimeStamp={this.props.meter.endTimeStamp}/>
 				</div>
-			</div>
-
-			// <tr>
-			// 	{loggedInAsAdmin && <td> {this.props.meter.id} {this.formatStatus()} </td>}
-			// 	{loggedInAsAdmin && <td> {this.props.meter.name} </td>}
-			// 	<td> {this.formatIdentifierInput()} </td>
-			// 	{loggedInAsAdmin && <td> {this.props.meter.meterType} </td>}
-			// 	{loggedInAsAdmin && <td> {this.props.meter.ipAddress} </td>}
-			// 	{loggedInAsAdmin && <td> {this.formatGPSInput()} </td>}
-			// 	<td> {this.formatEnabled()} </td>
-			// 	<td> {this.formatDisplayable()} </td>
-			// 	{loggedInAsAdmin && <td> <TimeZoneSelect current={this.props.meter.timeZone || ''} handleClick={this.changeTimeZone} /> </td>}
-			// 	{loggedInAsAdmin && <td> <ModalCard/></td>}
-			// </tr>
-		
-		);
+			)
+		}
 	}
-	
+
 	private removeUnsavedChangesFunction(callback: () => void) {
 		// This function is called to reset all the inputs to the initial state
 		store.dispatch<any>(confirmEditedMeters()).then(() => {
@@ -240,9 +246,9 @@ class MeterViewComponent extends React.Component<MeterViewPropsWithIntl, MeterVi
 		let toggleButton;
 		const loggedInAsAdmin = this.props.loggedInAsAdmin;
 		if (loggedInAsAdmin) {
-			toggleButton = <Button style={this.styleToggleBtn()} color='primary' onClick={this.toggleMeterDisplayable}>
+			{/*toggleButton = <Button style={this.styleToggleBtn()} color='primary' onClick={this.toggleMeterDisplayable}>
 				<FormattedMessage id={buttonMessageId} />
-			</Button>;
+			</Button>;*/}
 		} else {
 			toggleButton = <div />;
 		}
@@ -403,9 +409,9 @@ class MeterViewComponent extends React.Component<MeterViewPropsWithIntl, MeterVi
 		let toggleButton;
 		const loggedInAsAdmin = this.props.loggedInAsAdmin;
 		if (loggedInAsAdmin) {
-			toggleButton = <Button style={this.styleToggleBtn()} color='primary' onClick={this.toggleIdentifierInput}>
+			{/*toggleButton = <Button style={this.styleToggleBtn()} color='primary' onClick={this.toggleMeterDisplayable}>
 				<FormattedMessage id={buttonMessageId} />
-			</Button>;
+			</Button>;*/}
 		} else {
 			toggleButton = <div />;
 		}
