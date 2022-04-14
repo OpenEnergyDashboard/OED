@@ -33,6 +33,10 @@ export function updateSelectedGroups(groupIDs: number[]): t.UpdateSelectedGroups
 	return { type: ActionType.UpdateSelectedGroups, groupIDs };
 }
 
+export function updateSelectedUnit(unitID: number): t.UpdateSelectedUnitAction {
+	return { type: ActionType.UpdateSelectedUnit, unitID };
+}
+
 export function updateBarDuration(barDuration: moment.Duration): t.UpdateBarDurationAction {
 	return { type: ActionType.UpdateBarDuration, barDuration };
 }
@@ -112,6 +116,19 @@ export function changeSelectedGroups(groupIDs: number[]): Thunk {
 		});
 		return Promise.resolve();
 	};
+}
+
+export function changeSelectedUnit(unitID: number): Thunk {
+	return (dispatch: Dispatch, getState: GetState) => {
+		dispatch(updateSelectedUnit(unitID));
+		dispatch((dispatch2: Dispatch) => {
+			dispatch2(fetchNeededLineReadings(getState().graph.timeInterval));
+			dispatch2(fetchNeededBarReadings(getState().graph.timeInterval));
+			dispatch2(fetchNeededCompareReadings(getState().graph.comparePeriod));
+			dispatch2(fetchNeededMapReadings(getState().graph.timeInterval));
+		});
+		return Promise.resolve();
+	}
 }
 
 function fetchNeededReadingsForGraph(timeInterval: TimeInterval): Thunk {
