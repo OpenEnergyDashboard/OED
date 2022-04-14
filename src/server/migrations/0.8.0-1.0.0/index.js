@@ -9,7 +9,9 @@ module.exports = {
 	fromVersion: '0.8.0',
 	toVersion: '1.0.0',
 	up: async db => {
-		await db.none(sqlFile('../migrations/0.8.0-1.0.0/sql/create_cik_table.sql'));
-		await db.none(sqlFile('../migrations/0.8.0-1.0.0/sql/create_reading_views.sql'));
+		await db.none(sqlFile('../migrations/0.8.0-1.0.0/sql/cik/create_cik_table.sql'));
+		await db.none(sqlFile('../migrations/0.8.0-1.0.0/sql/readings/create_reading_views.sql'));
+		await db.none(sqlFile('../migrations/0.8.0-1.0.0/sql/readings/drop_old_functions.sql'));
+		await db.none(sqlFile('../migrations/0.8.0-1.0.0/sql/readings/drop_old_views.sql'));
 	}
 };
