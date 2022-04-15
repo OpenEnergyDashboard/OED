@@ -157,6 +157,11 @@ function mapDispatchToProps(dispatch: Dispatch) {
 // function that connects the React container to the Redux store of states
 export default connect(mapStateToProps, mapDispatchToProps)(ChartDataSelectComponent);
 
+/**
+ * Determines the compatibility of units in the redux state for display in dropdown
+ * @param {State} state - current redux state
+ * @return {SelectOption[]} an array of SelectOption
+ */
 export function getUnitCompatibilityForDropdown(state: State) {
 	// Holds all units that are compatible with selected meters/groups
 	const compatibleUnits = new Set<number>();
@@ -216,15 +221,15 @@ export function getUnitCompatibilityForDropdown(state: State) {
 			}
 		})
 	}
-
-
-
-
-
 	const finalUnits = getUnitCompatibility(compatibleUnits, incompatibleUnits, state);
 	return finalUnits;
 }
 
+/**
+ * Creates an array from the state filled with all units that are not meter or not displayable
+ * @param {State} state - current redux state
+ * @return {UnitData[]} an array of UnitData
+ */
 export function getVisibleUnitOrSuffixState(state: State) {
 	const visibleUnitsOrSuffixs = _.filter(state.units.units, function (o: UnitData) {
 		return o.typeOfUnit != UnitType.meter && o.displayable != DisplayableType.none;
@@ -232,6 +237,13 @@ export function getVisibleUnitOrSuffixState(state: State) {
 	return visibleUnitsOrSuffixs;
 }
 
+/**
+ * Converts two sets of unitIDs into one sorted array of SelectOptions for the dropdown
+ * @param {State} state - current redux state
+ * @param {Set<number>} compatibleUnits - units that are compatible with current selected unit
+ * @param {Set<number>} incompatibleUnits - units that are not compatible with current selected unit
+ * @return {SelectOption[]} an array of SelectOption
+ */
 export function getUnitCompatibility(compatibleUnits: Set<number>, incompatibleUnits: Set<number>, state: State) {
 	const finalUnits: SelectOption[] = [];
 	compatibleUnits.forEach(unit => {

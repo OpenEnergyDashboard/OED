@@ -81,7 +81,9 @@ class ChartDataSelectComponent extends React.Component<ChartDataSelectPropsWithI
 					<Select
 						options={this.props.units}
 						value={this.props.selectedUnit}
-						placeholder={this.props.intl.formatMessage(messages.selectUnit)}
+						placeholder='unit'
+						isClearable={false}
+						closeMenuOnSelect={false}
 						onChange={this.handleUnitSelect}
 					/>
 				</div>
