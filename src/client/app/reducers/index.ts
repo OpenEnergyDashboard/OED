@@ -15,7 +15,7 @@ import admin from './admin';
 import version from './version';
 import currentUser from './currentUser';
 import unsavedWarning from './unsavedWarning';
-import units from './units'
+import units from './units';
 
 export default combineReducers({
 	meters,

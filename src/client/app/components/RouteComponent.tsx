@@ -33,6 +33,8 @@ import MapCalibrationContainer from '../containers/maps/MapCalibrationContainer'
 import UploadCSVContainer from '../containers/csv/UploadCSVContainer';
 import { UserRole } from '../types/items';
 import { hasPermissions } from '../utils/hasPermissions';
+import UnitsDetailContainer from '../containers/unit/UnitsDetailContainer';
+import CreateUnitContainter from '../containers/unit/CreateUnitContainer';
 import * as queryString from 'query-string';
 
 interface RouteProps {
@@ -251,6 +253,8 @@ export default class RouteComponent extends React.Component<RouteProps> {
 								<Route path='/editGroup' render={() => this.requireAuth(<EditGroupsContainer/>)}/>
 								<Route path='/users/new' render={() => this.requireAuth(<CreateUserContainer/>)}/>
 								<Route path='/users' render={() => this.requireAuth(<UsersDetailContainer fetchUsers={() => []}/>)}/>
+								<Route path='/units'render={() => this.requireAuth(<UnitsDetailContainer />)}/>
+								<Route path="/addUnit" render={() => this.requireAuth(<CreateUnitContainter />)}/>
 								<Route path='*' component={HomeComponent}/>
 							</Switch>
 						</Router>

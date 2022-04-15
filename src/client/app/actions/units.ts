@@ -3,6 +3,8 @@
   * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
 
 import { ActionType, Thunk, Dispatch, GetState } from '../types/redux/actions';
+import { showErrorNotification } from '../utils/notifications';
+import translate from '../utils/translate';
 import { State } from '../types/redux/state';
 import * as t from '../types/redux/units';
 import { unitsApi } from '../utils/api';
@@ -23,6 +25,24 @@ export function fetchUnitsDetails(): Thunk {
 	}
 }
 
+export function changeDisplayedUnits(units: number[]): t.ChangeDisplayedUnitsAction {
+	return { type: ActionType.ChangeDisplayedUnits, selectedUnits: units};
+}
+
+export function editUnitDetails(unit: t.UnitData):
+	t.EditUnitDetailsAction {
+	return { type: ActionType.EditUnitDetails, unit };
+}
+
+export function submitUnitEdits(unit: number): t.SubmitEditedUnitAction {
+	return { type: ActionType.SubmitEditedUnit, unit };
+}
+
+export function confirmUnitEdits(unit: number): t.ConfirmEditedUnitAction {
+	return { type: ActionType.ConfirmEditedUnit, unit};
+}
+
+
 function shouldFetchUnitsDetails(state: State): boolean {
 	return !state.units.isFetching;
 }
@@ -34,4 +54,40 @@ export function fetchUnitsDetailsIfNeeded(): Thunk {
 		}
 		return Promise.resolve();
 	};
+}
+
+export function submitEditedUnits(): Thunk {
+	return async (dispatch: Dispatch, getState: GetState) => {
+		Object.keys(getState().units.editedUnits).forEach(unitIdS => {
+			const unitId = parseInt(unitIdS);
+			if (getState().units.submitting.indexOf(unitId) === -1) {
+				dispatch(submitEditedUnit(unitId));
+			}
+		});
+	};
+}
+
+export function submitEditedUnit(unitId: number): Thunk {
+	return async (dispatch: Dispatch, getState: GetState) => {
+		const submittingUnit = getState().units.editedUnits[unitId];
+		dispatch(submitUnitEdits(unitId));
+		try {
+			await unitsApi.edit(submittingUnit);
+			dispatch(confirmUnitEdits(unitId));
+		} catch (err) {
+			showErrorNotification(translate('failed.to.edit.unit'));
+		}
+	};
+}
+
+/**
+ * Remove all the unit in editing without submitting them
+ */
+ export function confirmEditedUnits(): Thunk {
+	return async (dispatch: Dispatch, getState: GetState) => {
+		Object.keys(getState().units.editedUnits).forEach(unitIdS => {
+			const unitId = parseInt(unitIdS);
+			dispatch(confirmUnitEdits(unitId));
+		});
+	}
 }

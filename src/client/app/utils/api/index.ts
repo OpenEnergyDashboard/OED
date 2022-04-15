@@ -15,8 +15,8 @@ import UsersApi from './UsersApi';
 import VersionApi from './VersionApi';
 import MapsApi from './MapsApi';
 import LogsApi from './LogsApi';
-import ConversionArrayApi from './ConversionArrayApi';
 import UnitsApi from './unitsApi';
+import ConversionArrayApi from './ConversionArrayApi';
 
 const apiBackend = new ApiBackend();
 

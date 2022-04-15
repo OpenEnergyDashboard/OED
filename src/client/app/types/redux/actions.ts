@@ -113,8 +113,12 @@ export enum ActionType {
 	ResetCalibration = 'RESET_CALIBRATION',
 	IncrementCounter = 'INCREMENT_COUNTER',
 
+	ReceiveUnitsDetails = 'RECEIVE_UNITS_DETAILS',
 	RequestUnitsDetails = 'REQUEST_UNITS_DETAILS',
-	ReceiveUnitsDetails = 'RECEIVE_UNITS_DETAILS'
+	ChangeDisplayedUnits = "CHANGE_DISPLAYED_UNITS", 
+	EditUnitDetails = 'EDIT_UNIT_DETAILS',
+	SubmitEditedUnit = 'SUBMIT_EDITED_UNIT',
+	ConfirmEditedUnit = 'CONFIRM_EDITED_UNIT',
 }
 
 /**
