@@ -93,7 +93,6 @@ export interface UnitDataById {
 
 export interface UnitsState {
 	isFetching: boolean;
-	byUnitID: UnitDataById;
 	selectedUnits: number[];
 	editedUnits: UnitDataById;
 	submitting: number[];

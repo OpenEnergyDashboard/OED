@@ -16,7 +16,7 @@ function mapStateToProps(state: State){
 
     return {
         loggedInAsAdmin, 
-		units: Object.keys(state.units.byUnitID)
+		units: Object.keys(state.units.units)
 			.map(key => parseInt(key))
 			.filter(key => !isNaN(key)),
 		unsavedChanges: Object.keys(state.units.editedUnits).length > 0
