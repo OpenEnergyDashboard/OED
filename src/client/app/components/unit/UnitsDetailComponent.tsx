@@ -1,8 +1,8 @@
 import * as React from 'react';
-import { Table, Button } from 'reactstrap';
-import { UnitData } from '../../types/redux/unit';
+//import { Table, Button } from 'reactstrap';
+//import { UnitData } from '../../types/redux/unit';
 import { FormattedMessage } from 'react-intl';
-import {Link} from 'react-router-dom';
+//import {Link} from 'react-router-dom';
 import HeaderContainer from '../../containers/HeaderContainer';
 import FooterContainer from '../../containers/FooterContainer';
 import UnitViewContainer from '../../containers/unit/UnitViewContainer';
@@ -39,17 +39,17 @@ export default class UnitsDetailContainer extends React.Component<UnitsDetailPro
 			textAlign: 'center'
 		};
 
-		const tableStyle: React.CSSProperties = {
-			marginLeft: '5%',
-			marginRight: '5%'
-		};
+		// const tableStyle: React.CSSProperties = {
+		// 	marginLeft: '5%',
+		// 	marginRight: '5%'
+		// };
 
-		const buttonContainerStyle: React.CSSProperties = {
-			minWidth: '150px',
-			width: '10%',
-			marginLeft: '40%',
-			marginRight: '40%'
-		};
+		// const buttonContainerStyle: React.CSSProperties = {
+		// 	minWidth: '150px',
+		// 	width: '10%',
+		// 	marginLeft: '40%',
+		// 	marginRight: '40%'
+		// };
 
 		const tooltipStyle = {
 			display: 'inline-block',
@@ -63,12 +63,16 @@ export default class UnitsDetailContainer extends React.Component<UnitsDetailPro
                 <TooltipHelpContainerAlternative page='units' />
 				<div className='container-fluid'>
 					<h2 style={titleStyle}>
+                        <FormattedMessage id='units' />
 						<div style={tooltipStyle}>
                             <TooltipMarkerComponent page='units' helpTextId={tooltipStyle.tooltipUnitView} />
 						</div>
 					</h2>
-					<div style={tableStyle}>
-					<Table striped bordered hover>
+					<div className="card-container">
+					{ this.props.units.map(unitID =>
+						( <UnitViewContainer key={unitID} id={unitID} /> ))}
+                    </div>
+					{/* <Table striped bordered hover>
                         <thead>
                             <tr>
                                 <th><FormattedMessage id="unit.id"/></th>
@@ -97,8 +101,7 @@ export default class UnitsDetailContainer extends React.Component<UnitsDetailPro
                                     </td>
                                 </tr>
                             </tbody>
-					</Table>
-					</div>
+					</Table> */}
 				</div>
                 <FooterContainer />
 			</div>

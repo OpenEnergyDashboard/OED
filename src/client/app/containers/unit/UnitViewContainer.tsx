@@ -10,7 +10,7 @@ import { editUnitDetails } from '../../actions/units';
 function mapStateToProps(state: State, ownProps: {id: number}){
     let unit = JSON.parse(JSON.stringify(state.units.byUnitID[ownProps.id]));
     if(state.units.editedUnits[ownProps.id]){
-        unit = JSON.parse(JSON.stringify(state.units.editedUnits[ownProps.id]));
+        unit = JSON.parse(JSON.stringify(state.units.byUnitID[ownProps.id]));
     }
 
     const currentUser = state.currentUser.profile;

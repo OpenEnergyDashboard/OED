@@ -14,7 +14,7 @@ import { VersionState } from './version';
 import {MapState} from './map';
 import { CurrentUserState } from './currentUser';
 import { UnsavedWarningState } from './unsavedWarning';
-import { UnitState } from './unit';
+import { UnitsState } from './units';
 
 export interface State {
 	meters: MetersState;
@@ -31,5 +31,5 @@ export interface State {
 	version: VersionState;
 	currentUser: CurrentUserState;
 	unsavedWarning: UnsavedWarningState;
-	units: UnitState;
+	units: UnitsState;
 }
