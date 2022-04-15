@@ -10,8 +10,10 @@ import { State } from '../types/redux/state';
 import { Dispatch } from '../types/redux/actions';
 import { ChartTypes } from '../types/redux/graph';
 import { SelectOption } from '../types/items';
-import { CartesianPoint, Dimensions, normalizeImageDimensions, calculateScaleFromEndpoints,
-	itemDisplayableOnMap, itemMapInfoOk } from '../utils/calibration';
+import {
+	CartesianPoint, Dimensions, normalizeImageDimensions, calculateScaleFromEndpoints,
+	itemDisplayableOnMap, itemMapInfoOk
+} from '../utils/calibration';
 import { gpsToUserGrid } from './../utils/calibration';
 import { DisplayableType, UnitData, UnitType } from '../types/redux/units'
 import { metersInGroup, setIntersect, unitsCompatibleWithMeters } from '../utils/determineCompatibleUnits';
@@ -148,7 +150,7 @@ function mapDispatchToProps(dispatch: Dispatch) {
 	return {
 		selectMeters: (newSelectedMeterIDs: number[]) => dispatch(changeSelectedMeters(newSelectedMeterIDs)),
 		selectGroups: (newSelectedGroupIDs: number[]) => dispatch(changeSelectedGroups(newSelectedGroupIDs)),
-		selectUnit: (newSelectUnitID : number) => dispatch(changeSelectedUnit(newSelectUnitID))
+		selectUnit: (newSelectUnitID: number) => dispatch(changeSelectedUnit(newSelectUnitID))
 	};
 }
 

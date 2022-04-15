@@ -45,10 +45,10 @@ class ChartDataSelectComponent extends React.Component<ChartDataSelectPropsWithI
 		const messages = defineMessages({
 			selectGroups: { id: 'select.groups' },
 			selectMeters: { id: 'select.meters' },
-			selectUnit: {id: 'select.unit'},
+			selectUnit: { id: 'select.unit' },
 			helpSelectGroups: { id: 'help.home.select.groups' },
 			helpSelectMeters: { id: 'help.home.select.meters' },
-			helpSelectUnit: {id: 'help.home.select.unit'}
+			helpSelectUnit: { id: 'help.home.select.unit' }
 		});
 
 		return (
@@ -78,13 +78,13 @@ class ChartDataSelectComponent extends React.Component<ChartDataSelectPropsWithI
 					<TooltipMarkerComponent page='home' helpTextId='help.home.select.meters' />
 				</div>
 				<div>
-				<Select
-					options={this.props.units}
-					value={this.props.selectedUnit}
-					placeholder={this.props.intl.formatMessage(messages.selectUnit)}
-					onChange={this.handleUnitSelect}
-				/>
-				</div>	
+					<Select
+						options={this.props.units}
+						value={this.props.selectedUnit}
+						placeholder={this.props.intl.formatMessage(messages.selectUnit)}
+						onChange={this.handleUnitSelect}
+					/>
+				</div>
 			</div>
 		);
 	}
@@ -109,7 +109,7 @@ class ChartDataSelectComponent extends React.Component<ChartDataSelectPropsWithI
 	 * Handles a change in unit selection
 	 * @param {Object[]} selection An array of items representing the current selection
 	 */
-	 private handleUnitSelect(selection: SelectOption) {
+	private handleUnitSelect(selection: SelectOption) {
 		this.props.selectUnit(selection.value);
 	}
 }

@@ -14,8 +14,8 @@ import { State } from '../types/redux/state';
 import * as t from '../types/redux/graph';
 import * as m from '../types/redux/map';
 import { ComparePeriod, SortingOrder } from '../utils/calculateCompare';
-import {fetchNeededMapReadings} from './mapReadings';
-import {changeSelectedMap} from './map';
+import { fetchNeededMapReadings } from './mapReadings';
+import { changeSelectedMap } from './map';
 
 export function changeChartToRender(chartType: t.ChartTypes): t.ChangeChartToRenderAction {
 	return { type: ActionType.ChangeChartToRender, chartType };
@@ -202,8 +202,8 @@ export interface LinkOptions {
 export function changeOptionsFromLink(options: LinkOptions) {
 	const dispatchFirst: Thunk[] = [setHotlinkedAsync(true)];
 	const dispatchSecond: Array<Thunk | t.ChangeChartToRenderAction | t.ChangeBarStackingAction
-	| t.ChangeGraphZoomAction |t.ChangeCompareSortingOrderAction | t.SetOptionsVisibility
-	| m.UpdateSelectedMapAction > = [];
+		| t.ChangeGraphZoomAction | t.ChangeCompareSortingOrderAction | t.SetOptionsVisibility
+		| m.UpdateSelectedMapAction> = [];
 
 	if (options.meterIDs) {
 		dispatchFirst.push(fetchMetersDetailsIfNeeded());

@@ -24,7 +24,7 @@ export interface UpdateSelectedGroupsAction {
 	groupIDs: number[];
 }
 
-export interface UpdateSelectedUnitAction{
+export interface UpdateSelectedUnitAction {
 	type: ActionType.UpdateSelectedUnit;
 	unitID: number;
 }
