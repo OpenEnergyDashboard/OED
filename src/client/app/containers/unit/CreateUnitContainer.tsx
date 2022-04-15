@@ -1,8 +1,10 @@
+/* This Source Code Form is subject to the terms of the Mozilla Public
+* License, v. 2.0. If a copy of the MPL was not distributed with this
+* file, You can obtain one at http://mozilla.org/MPL/2.0/. */
 import * as React from 'react';
 import { fetchUnitsDetails } from '../../actions/units';
 import HeaderContainer from '../HeaderContainer';
 import FooterContainer from '../FooterContainer';
-// import CreateUnitComponent from '../../components/unit/CreateUnitComponent';
 import CreateUnitModalComponent from '../../components/unit/CreateUnitModalComponent';
 import { showSuccessNotification, showErrorNotification } from '../../utils/notifications';
 import { unitsApi } from '../../utils/api';
@@ -13,7 +15,6 @@ import translate from '../../utils/translate';
 export default class CreateUnitContainer extends React.Component<{}, {}> {
     constructor(props: {}){
         super(props);
-        //TODO: create rest of hanlder functions, bind them, and pass to CreateUnitComponent
         this.handleNameChange = this.handleNameChange.bind(this);
         this.submitNewUnit = this.submitNewUnit.bind(this);
         this.handleIdentifierChange = this.handleIdentifierChange.bind(this);
@@ -26,6 +27,7 @@ export default class CreateUnitContainer extends React.Component<{}, {}> {
         this.handleNoteChange = this.handleNoteChange.bind(this);
     }
 
+    //default values
     state = {
         name: '',
         identifier: '',
@@ -39,7 +41,6 @@ export default class CreateUnitContainer extends React.Component<{}, {}> {
         note: ''
     }
 
-    //TODO: create rest of hanlder functions, bind them, and pass to CreateUnitComponent
     private handleNameChange = (newName: string) => {
         this.setState({ name :  newName});
     }
@@ -89,11 +90,9 @@ export default class CreateUnitContainer extends React.Component<{}, {}> {
                 note: this.state.note
 
             });
-            // need to add message into app/translations/data.js
             showSuccessNotification(translate('units.successfully.create.unit'))
             browserHistory.push('/units');
         } catch (error) {
-            // need to add message into app/translations/data.js
             showErrorNotification(translate('units.failed.to.create.unit'));
         }
     };
@@ -101,7 +100,6 @@ export default class CreateUnitContainer extends React.Component<{}, {}> {
         return (
             <div>
                 <CreateUnitModalComponent
-                    //TODO: create rest of hanlder functions, bind them, and pass to CreateUnitComponent
                     name= {this.state.name}
                     identifier= {this.state.identifier}
                     unitRepresent= {this.state.unitRepresent}
