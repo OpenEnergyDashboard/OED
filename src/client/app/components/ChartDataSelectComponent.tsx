@@ -77,11 +77,14 @@ class ChartDataSelectComponent extends React.Component<ChartDataSelectPropsWithI
 					/>
 					<TooltipMarkerComponent page='home' helpTextId='help.home.select.meters' />
 				</div>
-				<div>
+				<p style={labelStyle}>
+					<FormattedMessage id='unit' />:
+				</p>
+				<div style={divBottomPadding}>
 					<Select
 						options={this.props.units}
-						value={this.props.selectedUnit}
-						placeholder='unit'
+						value={this.props.selectedUnit.value == -99 ? undefined : this.props.selectedUnit}
+						placeholder={this.props.intl.formatMessage(messages.selectUnit)}
 						isClearable={false}
 						closeMenuOnSelect={false}
 						onChange={this.handleUnitSelect}
