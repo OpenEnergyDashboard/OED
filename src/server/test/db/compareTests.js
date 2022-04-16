@@ -14,7 +14,8 @@ const gps = new Point(90, 45);
 
 mocha.describe('Compare calculation', () => {
 	let meter;
-	const prevStart = moment('2018-01-01');
+	// The tests work if utc or not.
+	const prevStart = moment.utc('2018-01-01');
 	const prevEnd = prevStart.clone().add(1, 'day'); // 2018-01-02
 	const currStart = prevStart.clone().add(5, 'day'); // 2018-01-06
 	const currEnd = currStart.clone().add(1, 'day'); // 2018-01-07

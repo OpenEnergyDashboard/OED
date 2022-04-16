@@ -44,6 +44,10 @@ services:
             - OED_MAIL_ORG=My Organization Name # Org name for mail that is included in the subject
             - OED_SITE_READING_RATE=00:15:00 # Set the reading rate (i.e. granularity) of meters here. This should be formatted hh:mm:ss. DEFAULT 15 minutes.
             - OED_TEST_SITE_READING_RATE=00:15:00
+            # Changing this value does not impact what OED displays.
+            # What it will change is the date/time stamp on logs, notes and change dates that place the current date/time.
+            # It can also impact the interpretation of readings sent to OED such as Unix timestamps.
+            - TZ=Etc/UTC # Set the timezone of the Docker container where OED runs the web services.
             # If in a subdirectory, set it here
             # - OED_SUBDIR=/subdir/
         # Set the correct build environment.

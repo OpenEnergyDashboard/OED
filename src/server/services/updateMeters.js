@@ -16,8 +16,7 @@ const { log } = require('../log');
  * @return {Promise.<void>}
  */
 async function updateAllMeters(dataReader, metersToUpdate, conn) {
-	const time = new Date();
-	log.info(`Getting meter data ${time.toISOString()}`);
+	log.info(`Getting meter data`);
 	try {
 		// Do all the network requests in parallel and log errors.
 		// Ignoring that loadArrayInput is called in this sequence and returns values

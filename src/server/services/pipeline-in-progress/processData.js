@@ -12,7 +12,9 @@ const Reading = require('../../models/Reading');
 const handleCumulativeReset = require('./handleCumulativeReset');
 const { validateReadings } = require('./validateReadings');
 const { TimeSortTypesJS } = require('../csvPipeline/validateCsvUploadParams');
-const E0 = moment(0);
+	// The default start/end timestamps that are set to the first
+	// day of time in moment. As always, we want to use UTC.
+const E0 = moment(0).utc()
 
 /**
  * Handle all data, assume that the first row is the first reading if increasing and last is first reading if decreasing.
@@ -137,13 +139,24 @@ async function processData(rows, meterID, timeSort = TimeSortTypesJS.increasing,
 		// cannot have the day first (month okay). Thus, we just use the default parsing.
 		// Set moment to strict mode so will give Invalid date if any issues.
 		if (isEndTime) {
-			// The startTimestamp of this reading is the endTimestamp of the previous reading
+			// The startTimestamp of this reading is the endTimestamp of the previous reading.
+			// See else clause for why formatted this way.
 			startTimestamp = prevReading.endTimestamp;
-			endTimestamp = moment(rows[index][1], undefined, true);
+			const endDateTimeUTC = moment.parseZone(rows[index][1], undefined, true).format('YYYY-MM-DD HH:mm:ss') + '+00:00';
+			endTimestamp =  moment.parseZone(endDateTimeUTC, undefined, true);
 		}
 		else {
-			startTimestamp = moment(rows[index][1], undefined, true);
-			endTimestamp = moment(rows[index][2], undefined, true);
+			// If the reading has a timezone offset associated with it then we want to honor it by using parseZone.
+			// However the database uses UTC and has no timezone offset so we need to get the reading into UTC.
+			// OED plots readings as the date/time it was acquired independent of the timezone. For example, it the reading is
+			// 2021-06-01 00:00:00-05:00 then the database should store it as 2021-06-01 00:00:00.
+			// Thus, we take the date/time from the reading timezone and set the offset to 00:00 for UTC. Next, we put it back
+			// into moment in a timezone aware way so the UTC sticks and there is no shift of time.
+			// This setup should work no matter want the timezone is on the server.
+			const startDateTimeUTC = moment.parseZone(rows[index][1], undefined, true).format('YYYY-MM-DD HH:mm:ss') + '+00:00';
+			const endDateTimeUTC = moment.parseZone(rows[index][2], undefined, true).format('YYYY-MM-DD HH:mm:ss') + '+00:00';
+			startTimestamp = moment.parseZone(startDateTimeUTC, undefined, true);
+			endTimestamp = moment.parseZone(endDateTimeUTC, undefined, true);
 		}
 		if (startTimestamp.format() === 'Invalid date' || endTimestamp.format() === 'Invalid date') {
 			errMsg += 'For meter ' + meterName + ': Error parsing Reading #' + row(index, isAscending, rows.length) +

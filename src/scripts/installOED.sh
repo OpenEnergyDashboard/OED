@@ -62,16 +62,16 @@ fi
 
 # Install NPM dependencies
 if [ "$keep_node_modules" == "yes" ]; then
-	printf "%s\n" "skipping NPM install as requested or because node_modules seems up to date"
+	printf "\n%s\n\n" "skipping NPM install as requested or because node_modules seems up to date"
 else
-	printf "%s\n" "NPM install..."
+	printf "\n%s\n\n" "NPM install..."
 	npm ci --loglevel=warn
 	if [ $? == 0 ]; then
-		printf "%s\n" "NPM install finished."
+		printf "\n%s\n\n" "NPM install finished."
 	else
 		# npm reported an error. Sometimes it does so can skip steps.
 		# Using printf since it is more reliable.
-		printf "\n%s\n" "NPM reported an error so stopping"
+		printf "\n%s\n\n" "NPM reported an error so stopping"
 		exit 2
 	fi
 fi

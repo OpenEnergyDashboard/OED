@@ -3,7 +3,7 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
 
 import * as _ from 'lodash';
-import * as moment from 'moment-timezone';
+import * as moment from 'moment';
 import { connect } from 'react-redux';
 import getGraphColor from '../utils/getGraphColor';
 import { State } from '../types/redux/state';
@@ -34,10 +34,12 @@ function mapStateToProps(state: State) {
 				const hoverText: string[] = [];
 				const readings = _.values(readingsData.readings);
 				readings.forEach(reading => {
-					const st = moment(reading.startTimestamp);
+					// As usual, we want to interpret the readings in UTC. We lose the timezone as this as the start/endTimestamp
+					// are equivalent to Unix timestamp in milliseconds.
+					const st = moment.utc(reading.startTimestamp);
 					// Time reading is in the middle of the start and end timestamp
-					const timeReading = st.add(moment(reading.endTimestamp).diff(st) / 2);
-					xData.push(timeReading.utc().format('YYYY-MM-DD HH:mm:ss'));
+					const timeReading = st.add(moment.utc(reading.endTimestamp).diff(st) / 2);
+					xData.push(timeReading.format('YYYY-MM-DD HH:mm:ss'));
 					yData.push(reading.reading);
 					hoverText.push(`<b> ${timeReading.format('ddd, ll LTS')} </b> <br> ${label}: ${reading.reading.toPrecision(6)} kW`);
 				});
@@ -92,9 +94,11 @@ function mapStateToProps(state: State) {
 				const hoverText: string[] = [];
 				const readings = _.values(readingsData.readings);
 				readings.forEach(reading => {
-					const st = moment(reading.startTimestamp);
+					// As usual, we want to interpret the readings in UTC. We lose the timezone as this as the start/endTimestamp
+					// are equivalent to Unix timestamp in milliseconds.
+					const st = moment.utc(reading.startTimestamp);
 					// Time reading is in the middle of the start and end timestamp
-					const timeReading = st.add(moment(reading.endTimestamp).diff(st) / 2);
+					const timeReading = st.add(moment.utc(reading.endTimestamp).diff(st) / 2);
 					xData.push(timeReading.utc().format('YYYY-MM-DD HH:mm:ss'));
 					yData.push(reading.reading);
 					hoverText.push(`<b> ${timeReading.format('ddd, ll LTS'	)} </b> <br> ${label}: ${reading.reading.toPrecision(6)} kW`);
@@ -121,8 +125,9 @@ function mapStateToProps(state: State) {
 
 	// Calculate slider interval if rangeSliderInterval is specified;
 	const sliderInterval = state.graph.rangeSliderInterval.equals(TimeInterval.unbounded()) ? timeInterval : state.graph.rangeSliderInterval;
-	const start = Date.parse(moment(sliderInterval.getStartTimestamp()).toISOString());
-	const end = Date.parse(moment(sliderInterval.getEndTimestamp()).toISOString());
+	// Avoid pesky shifting timezones with utc.
+	const start = moment.utc(sliderInterval.getStartTimestamp()).toISOString();
+	const end = moment.utc(sliderInterval.getEndTimestamp()).toISOString();
 
 	// Customize the layout of the plot
 	const layout: any = {

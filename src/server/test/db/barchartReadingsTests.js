@@ -11,6 +11,7 @@ const gps = new Point(90, 45);
 
 mocha.describe('Barchart Readings', () => {
 	let meter;
+	// These moment objects are local timezone but they still work for the tests.
 	const timestamp1 = moment('2017-01-01');
 	const timestamp2 = timestamp1.clone().add(1, 'hour');
 	const timestamp3 = timestamp2.clone().add(1, 'hour');

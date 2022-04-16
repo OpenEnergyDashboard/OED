@@ -20,7 +20,9 @@ const gps = new Point(90, 45);
  */
 mocha.describe('Compressed Readings', () => {
 	let meter;
-	const timestamp1 = moment('2017-01-01');
+	// Use UTC since that is what will come back from the DB. A clone retains the same timezone.
+	// Same for all moment objects used in theses tests.
+	const timestamp1 = moment.utc('2017-01-01');
 	const timestamp2 = timestamp1.clone().add(1, 'hour');
 	const timestamp3 = timestamp2.clone().add(1, 'hour');
 	const timestamp4 = timestamp3.clone().add(1, 'hour');
@@ -107,8 +109,8 @@ mocha.describe('Compressed Readings', () => {
 
 	mocha.describe('With groups, meters, and readings set up', async () => {
 		let meter2;
-		const startTimestamp = moment('2017-01-01');
-		const endTimestamp = moment('2017-01-01').add(1, 'hour');
+		const startTimestamp = moment.utc('2017-01-01');
+		const endTimestamp = moment.utc('2017-01-01').add(1, 'hour');
 		const readingValue = 10;
 		mocha.beforeEach(async () => {
 			conn = testDB.getConnection();

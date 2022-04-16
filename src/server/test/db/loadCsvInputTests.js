@@ -16,8 +16,10 @@ mocha.describe('PIPELINE: Load data from csv file', () => {
 	const testFilePath = path.join(__dirname, 'data', 'test-readings.csv');
 	function mapRowsToModel(row) {
 		const reading = row[0];
-		const endTimestamp = moment(row[1], 'HH:mm:ss MM/DD/YYYY');
-		const startTimestamp = moment(endTimestamp).subtract(30, 'minute');
+		// Need to work in UTC time since that is what the database returns and comparing
+		// to database values. Done in all moment objects in this test.
+		const endTimestamp = moment.utc(row[1], 'HH:mm:ss MM/DD/YYYY');
+		const startTimestamp = moment.utc(endTimestamp).subtract(30, 'minute');
 		return [reading, startTimestamp, endTimestamp];
 	}
 	mocha.it('as array', async () => {
@@ -34,8 +36,8 @@ mocha.describe('PIPELINE: Load data from csv file', () => {
 		result.map(reading => {
 			expect(reading.meterID).to.equal(arrayMeter.id);
 			expect(reading.reading).to.equal(parseInt(arrayInput[i][0]));
-			expect(reading.endTimestamp.format()).to.equal(moment(arrayInput[i][1], 'HH:mm:ss MM/DD/YYYY').format());
-			expect(reading.startTimestamp.format()).to.equal((moment(arrayInput[i][1], 'HH:mm:ss MM/DD/YYYY').subtract(30, 'minute')).format());
+			expect(reading.endTimestamp.format()).to.equal(moment.utc(arrayInput[i][1], 'HH:mm:ss MM/DD/YYYY').format());
+			expect(reading.startTimestamp.format()).to.equal((moment.utc(arrayInput[i][1], 'HH:mm:ss MM/DD/YYYY').subtract(30, 'minute')).format());
 			++i;
 		});
 	});

@@ -22,12 +22,6 @@ const _ = require('lodash');
 const moment = require('moment');
 const promisify = require('es6-promisify');
 const { log } = require('../log');
-// import { promises as fs } from 'fs';
-// import * as stringify from 'csv-stringify';
-// import * as _ from 'lodash';
-// import * as moment from 'moment';
-// import * as promisify from 'es6-promisify';
-// import { log } from '../log';
 
 const stringifyCSV = promisify(stringify);
 /* Our main export is the generateSine function. We break this into several parts:
@@ -38,8 +32,10 @@ const stringifyCSV = promisify(stringify);
  * 		use is a function of radians and sin(x) = sin(x/P * P * 2 * PI)
  * 4. We zip the array of moments and their corresponding sine values into a matrix,
  * which we will use write into a csv file.
+ * 
+ * It is believed this is okay with moment and local time shifts because it is all done here and the dates/times
+ * are stored as strings without timezones that OED can correctly import.
  */
-
 /**
  * Generates an array of dates of the form 'YYYY-MM-DD HH:MM:SS' with the upper bound at endDate, which may be excluded if it does not lie exactly
  * timeStep (i.e. there is no integer value n such that endDate = startDate + n * timeStep). Because of the date format, the timeStep should also
