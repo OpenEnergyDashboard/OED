@@ -88,21 +88,21 @@ class Unit {
 		// The table contains units' data. 
 		// Each row contains: name, identifier, typeOfUnit, suffix, displayable, preferredDisplay.
 		const standardUnits = [
-			['kWh', 'kWh', Unit.unitType.UNIT, '', Unit.displayableType.ALL, true],
-			['MJ', 'MegaJoules', Unit.unitType.UNIT, '', Unit.displayableType.ADMIN, false],
-			['BTU', 'BTU', Unit.unitType.UNIT, '', Unit.displayableType.ALL, true],
-			['M3_gas', 'cubic meters of gas', Unit.unitType.UNIT, '', Unit.displayableType.ALL, false],
-			['kg', 'kg', Unit.unitType.UNIT, '', Unit.displayableType.ALL, false],
-			['Metric_ton', 'Metric ton', Unit.unitType.UNIT, '', Unit.displayableType.ALL, false],
-			['Fahrenheit', 'Fahrenheit', Unit.unitType.UNIT, '', Unit.displayableType.ALL, false],
-			['Celsius', 'Celsius', Unit.unitType.UNIT, '', Unit.displayableType.ALL, false]
+			['kWh', 'kWh', Unit.unitRepresentType.QUANTITY, Unit.unitType.UNIT, '', Unit.displayableType.ALL, true],
+			['MJ', 'MegaJoules', Unit.unitRepresentType.QUANTITY, Unit.unitType.UNIT, '', Unit.displayableType.ADMIN, false],
+			['BTU', 'BTU', Unit.unitRepresentType.QUANTITY, Unit.unitType.UNIT, '', Unit.displayableType.ALL, true],
+			['M3_gas', 'cubic meters of gas', Unit.unitRepresentType.QUANTITY, Unit.unitType.UNIT, '', Unit.displayableType.ALL, false],
+			['kg', 'kg', Unit.unitRepresentType.QUANTITY, Unit.unitType.UNIT, '', Unit.displayableType.ALL, false],
+			['Metric_ton', 'Metric ton', Unit.unitRepresentType.QUANTITY, Unit.unitType.UNIT, '', Unit.displayableType.ALL, false],
+			['Fahrenheit', 'Fahrenheit', Unit.unitRepresentType.FLOW, Unit.unitType.UNIT, '', Unit.displayableType.ALL, false],
+			['Celsius', 'Celsius', Unit.unitRepresentType.FLOW, Unit.unitType.UNIT, '', Unit.displayableType.ALL, false]
 		];
 
 		for (let i = 0; i < standardUnits.length; ++i) {
 			const unitData = standardUnits[i];
 			if (await Unit.getByName(unitData[0], conn) === null) {
-				await new Unit(undefined, unitData[0], unitData[1], Unit.unitRepresentType.UNUSED, undefined,
-					unitData[2], null, unitData[3], unitData[4], unitData[5], 'standard unit').insert(conn);
+				await new Unit(undefined, unitData[0], unitData[1], unitData[2], undefined,
+					unitData[3], null, unitData[4], unitData[5], unitData[6], 'standard unit').insert(conn);
 			}
 		}
 	}
