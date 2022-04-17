@@ -94,8 +94,8 @@ class Unit {
 			['M3_gas', 'cubic meters of gas', Unit.unitRepresentType.QUANTITY, Unit.unitType.UNIT, '', Unit.displayableType.ALL, false],
 			['kg', 'kg', Unit.unitRepresentType.QUANTITY, Unit.unitType.UNIT, '', Unit.displayableType.ALL, false],
 			['Metric_ton', 'Metric ton', Unit.unitRepresentType.QUANTITY, Unit.unitType.UNIT, '', Unit.displayableType.ALL, false],
-			['Fahrenheit', 'Fahrenheit', Unit.unitRepresentType.FLOW, Unit.unitType.UNIT, '', Unit.displayableType.ALL, false],
-			['Celsius', 'Celsius', Unit.unitRepresentType.FLOW, Unit.unitType.UNIT, '', Unit.displayableType.ALL, false]
+			['Fahrenheit', 'Fahrenheit', Unit.unitRepresentType.RAW, Unit.unitType.UNIT, '', Unit.displayableType.ALL, false],
+			['Celsius', 'Celsius', Unit.unitRepresentType.RAW, Unit.unitType.UNIT, '', Unit.displayableType.ALL, false]
 		];
 
 		for (let i = 0; i < standardUnits.length; ++i) {
