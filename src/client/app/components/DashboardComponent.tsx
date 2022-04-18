@@ -39,8 +39,8 @@ export default class DashboardComponent extends React.Component<DashboardProps> 
 	}
 
 	public componentDidUpdate(prev: DashboardProps) {
-		if (prev.chartToRender !== this.props.chartToRender) {
-			ReactTooltip.rebuild(); // This rebuilds the tooltip so that it detects the marker that disappear because the chart type changes.
+		if ((prev.optionsVisibility !== this.props.optionsVisibility)){
+			ReactTooltip.rebuild(); // This rebuilds the tooltip so that it detects the marker that disappear because the hiding and showing options.
 		}
 	}
 
@@ -71,7 +71,7 @@ export default class DashboardComponent extends React.Component<DashboardProps> 
 			throw new Error('unrecognized type of chart');
 		}
 
-		const optionsClassName = this.props.optionsVisibility ? 'col-2 d-none d-lg-block' : 'd-none';
+		const optionsClassName = 'col-2 d-none d-lg-block';
 		const chartClassName = this.props.optionsVisibility ? 'col-12 col-lg-10' : 'col-12';
 
 		const buttonMargin: React.CSSProperties = {
@@ -81,9 +81,12 @@ export default class DashboardComponent extends React.Component<DashboardProps> 
 		return (
 			<div className='container-fluid'>
 				<div className='row'>
-					<div className={optionsClassName}>
-						<UIOptionsContainer />
-					</div>
+					{this.props.optionsVisibility &&
+						<div className={optionsClassName}>
+							<UIOptionsContainer />
+						</div>
+					}
+
 					<div className={`${chartClassName} align-self-auto text-center`}>
 						{ showSpinner ? (
 							<SpinnerComponent loading width={50} height={50} />
