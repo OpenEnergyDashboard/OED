@@ -183,15 +183,15 @@ export function getUnitCompatibilityForDropdown(state: State) {
 		// The first meter or group processed is different since intersection with empty set is empty.
 		let first = true;
 		let units = new Set<number>();
-		let M = new Set<number>();
+		const M = new Set<number>();
 
 		state.graph.selectedMeters.forEach(meter => {
 			M.add(meter);
 		})
 		// Get for all meters
-		M.forEach(meter => {
+		M.forEach( () => {
 
-			let newUnits = unitsCompatibleWithMeters(M)
+			const newUnits = unitsCompatibleWithMeters(M)
 			if (first) {
 				// First meter/group so all its units are acceptable at this point
 				units = newUnits;
@@ -203,7 +203,7 @@ export function getUnitCompatibilityForDropdown(state: State) {
 		})
 		// Get for all groups
 		state.graph.selectedGroups.forEach(async group => {
-			let newUnits = unitsCompatibleWithMeters(await metersInGroup(group));
+			const newUnits = unitsCompatibleWithMeters(await metersInGroup(group));
 			if (first) {
 				// First meter/group so all its units are acceptable at this point
 				units = newUnits;
