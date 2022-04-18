@@ -18,6 +18,7 @@ import { gpsToUserGrid } from './../utils/calibration';
 import { DisplayableType, UnitData, UnitType } from '../types/redux/units'
 import { metersInGroup, setIntersect, unitsCompatibleWithMeters } from '../utils/determineCompatibleUnits';
 import { DataType } from '../types/Datasources';
+import e from 'express';
 
 
 /* Passes the current redux state of the chart select container, and turns it into props for the React
@@ -29,8 +30,7 @@ function mapStateToProps(state: State) {
 	// Map information about meters and groups into a format the component can display.
 	const sortedMeters = _.sortBy(_.values(state.meters.byMeterID).map(meter =>
 		({ value: meter.id, label: meter.name.trim(), isDisabled: false } as SelectOption)), 'label');
-	const sortedGroups = _.sortBy(_.values(state.groups.byGroupID).map(group =>
-		({ value: group.id, label: group.name.trim(), isDisabled: false } as SelectOption)), 'label');
+	const sortedGroups = getGroupCompatibilityForDropdown(state);
 	const sortedUnits = getUnitCompatibilityForDropdown(state);
 	/**
 	 * 	Map information about the currently selected meters into a format the component can display.
@@ -189,7 +189,7 @@ export function getUnitCompatibilityForDropdown(state: State) {
 			M.add(meter);
 		})
 		// Get for all meters
-		M.forEach( () => {
+		M.forEach(() => {
 
 			const newUnits = unitsCompatibleWithMeters(M)
 			if (first) {
@@ -267,4 +267,63 @@ export function getUnitCompatibility(compatibleUnits: Set<number>, incompatibleU
 
 
 	return _.orderBy(finalUnits, ['isDisabled', 'label'], ['asc', 'asc']);
+}
+
+export function getGroupCompatibilityForDropdown(state: State) {
+	const visibleGroups = new Set<number>();
+
+	if (state.currentUser.profile?.role == 'admin') {
+		_.forEach(state.groups.byGroupID, (group) => {
+			visibleGroups.add(group.id);
+		})
+	} else {
+		_.forEach(state.groups.byGroupID, (group) => {
+			if (group.displayable) {
+				visibleGroups.add(group.id);
+			}
+		})
+	}
+
+	const compatibleGroups = new Set<number>();
+	const incompatibleGroups = new Set<number>();
+
+	if (state.graph.selectedUnit == -99) {
+		visibleGroups.forEach(group => {
+			if (state.groups.byGroupID[group].defaultGraphicUnit == -99) {
+				incompatibleGroups.add(group);
+			} else {
+				compatibleGroups.add(group)
+			}
+
+		})
+	} else {
+		visibleGroups.forEach(async group => {
+			const meters = await metersInGroup(group)
+			const units = unitsCompatibleWithMeters(meters);
+			if (units.has(state.groups.byGroupID[group].defaultGraphicUnit)) {
+				compatibleGroups.add(group);
+			} else {
+				incompatibleGroups.add(group);
+			}
+		})
+	}
+
+	const finalGroup: SelectOption[] = [];
+	visibleGroups.forEach(group => {
+		if (compatibleGroups.has(group)) {
+			finalGroup.push({
+				label: state.groups.byGroupID[group].name,
+				value: group,
+				isDisabled: false
+			} as SelectOption)
+		} else if (incompatibleGroups.has(group)) {
+			finalGroup.push({
+				label: state.groups.byGroupID[group].name,
+				value: group,
+				isDisabled: true
+			} as SelectOption)
+		}
+	})
+
+	return _.sortBy(_.values(finalGroup), 'label');
 }
