@@ -202,8 +202,8 @@ export interface LinkOptions {
 export function changeOptionsFromLink(options: LinkOptions) {
 	const dispatchFirst: Thunk[] = [setHotlinkedAsync(true)];
 	const dispatchSecond: Array<Thunk | t.ChangeChartToRenderAction | t.ChangeBarStackingAction
-		| t.ChangeGraphZoomAction | t.ChangeCompareSortingOrderAction | t.SetOptionsVisibility
-		| m.UpdateSelectedMapAction> = [];
+	| t.ChangeGraphZoomAction | t.ChangeCompareSortingOrderAction | t.SetOptionsVisibility
+	| m.UpdateSelectedMapAction> = [];
 
 	if (options.meterIDs) {
 		dispatchFirst.push(fetchMetersDetailsIfNeeded());
