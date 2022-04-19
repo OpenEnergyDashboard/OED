@@ -66,8 +66,8 @@ export interface MeterMetadata {
 	timesort: boolean;
 	endOnlyTime: boolean;
 	reading: number;
-	startTimeStamp: string;
-	endTimeStamp: string;
+	startTimestamp: string;
+	endTimestamp: string;
 }
 
 export interface MeterSortedByIdentifier {

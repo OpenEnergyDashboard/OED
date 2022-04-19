@@ -5,22 +5,20 @@
 import * as React from 'react';
 import { Button } from 'reactstrap';
 import { FormattedMessage, injectIntl, WrappedComponentProps } from 'react-intl';
-import { MeterMetadata, EditMeterDetailsAction } from '../../types/redux/meters';
+import { MeterMetadata, EditMeterDetailsAction, SubmitEditedMeterAction } from '../../types/redux/meters';
 import { GPSPoint, isValidGPSInput } from '../../utils/calibration';
-import TimeZoneSelect from '../TimeZoneSelect';
 import { updateUnsavedChanges } from '../../actions/unsavedWarning';
 import { fetchMetersDetails, submitEditedMeters, confirmEditedMeters } from '../../actions/meters';
 import store from '../../index';
 import ModalCard from './MeterModalEditComponent';
 import '../../styles/meter-card-page.css'
-import { stubFalse } from 'lodash';
-import { throws } from 'assert';
 
 interface MeterViewProps {
 	// The ID of the meter to be displayed
 	id: number;
 	// The meter metadata being displayed by this row
 	meter: MeterMetadata;
+	onSubmitClicked: () => void;
 	isEdited: boolean;
 	isSubmitting: boolean;
 	loggedInAsAdmin: boolean;
@@ -29,6 +27,7 @@ interface MeterViewProps {
 	// The function used to dispatch the action to edit meter details
 	editMeterDetails(meter: MeterMetadata): EditMeterDetailsAction;
 	log(level: string, message: string): any;
+	//submitEditMeters(meter: MeterMetadata): SubmitEditedMeterAction;
 }
 
 interface MeterViewState {
@@ -51,7 +50,7 @@ class MeterViewComponent extends React.Component<MeterViewPropsWithIntl, MeterVi
 			identifierFocus: false,
 			identifierInput: this.props.meter.identifier,
 			show: false,
-			onHide: true
+			onHide: true,
 		};
 		this.toggleMeterDisplayable = this.toggleMeterDisplayable.bind(this);
 		this.toggleMeterEnabled = this.toggleMeterEnabled.bind(this);
@@ -71,7 +70,6 @@ class MeterViewComponent extends React.Component<MeterViewPropsWithIntl, MeterVi
 	}
 
 	public render() {
-		const loggedInAsAdmin = this.props.loggedInAsAdmin;
 		return (
 
 			<div className="card">
@@ -98,12 +96,8 @@ class MeterViewComponent extends React.Component<MeterViewPropsWithIntl, MeterVi
 					</span>
 				</div>
 				<div className="toggle-container">
-					<div className="on-off-switch">
-						<span className="on-off-switch-span-on">Enabled</span>
-					</div>
-					<div className="on-off-switch">
-						<span className="on-off-switch-span-off">Displayble</span>
-					</div>
+					{this.enabledCheck(this.props.meter.enabled)}
+					{this.displayableCheck(this.props.meter.displayable)}
 				</div>
 				{this.isAdmin()}
 			</div>
@@ -155,11 +149,53 @@ class MeterViewComponent extends React.Component<MeterViewPropsWithIntl, MeterVi
 						readingVariation={this.props.meter.readingVariation}
 						readingDuplication={this.props.meter.readingDuplication}
 						timesort={this.props.meter.timesort}
-						startTimeStamp={this.props.meter.startTimeStamp}
-						endTimeStamp={this.props.meter.endTimeStamp}/>
+						startTimestamp={this.props.meter.startTimestamp}
+						endTimestamp={this.props.meter.endTimestamp}
+						onSaveChanges={this.onSaveChanges}/>
 				</div>
 			)
 		}
+		return null;
+	}
+
+	private enabledCheck(enabled: boolean) {
+		if(enabled){
+			return(
+				<div className="on-off-switch">
+					<span className="on-off-switch-span-on">Enabled</span>
+				</div>
+			)
+		}
+		return(
+			<div className="on-off-switch">
+				<span className="on-off-switch-span-off">Enabled</span>
+			</div>
+		)
+	}
+	private displayableCheck(display: boolean) {
+		if(display){
+			return(
+				<div className="on-off-switch">
+					<span className="on-off-switch-span-on">Displayble</span>
+				</div>
+			)
+		}
+		return(
+			<div className="on-off-switch">
+				<span className="on-off-switch-span-off">Displayble</span>
+			</div>
+		)
+	}
+	//on save handler in progress ( Meter Detail Component)
+	 onSaveChanges = (identifier: string) => {
+		this.setState({identifierInput: identifier});
+		console.log("1." + this.state.identifierInput);
+		this.setState({identifierFocus: !this.state.identifierFocus});
+		console.log(this.state.identifierFocus);
+		this.toggleIdentifierInput();
+		this.updateUnsavedChanges();
+		console.log(this.props.meter.identifier);
+		this.props.onSubmitClicked();
 	}
 
 	private removeUnsavedChangesFunction(callback: () => void) {
@@ -394,12 +430,7 @@ class MeterViewComponent extends React.Component<MeterViewPropsWithIntl, MeterVi
 		let formattedIdentifier;
 		let buttonMessageId;
 		if(this.state.identifierFocus){
-			formattedIdentifier = <textarea
-				id={'identifier'}
-				autoFocus
-				value={this.state.identifierInput}
-				onChange={event => this.handleIdentifierChange(event)}
-			/>;
+			formattedIdentifier = <div>{this.state.identifierInput}</div>;
 			buttonMessageId = 'update';
 		} else {
 			formattedIdentifier = <div>{this.state.identifierInput}</div>;

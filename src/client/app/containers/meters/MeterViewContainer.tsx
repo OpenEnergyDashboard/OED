@@ -56,7 +56,7 @@ function mapStateToProps(state: State, ownProps: { id: number }) {
 function mapDispatchToProps(dispatch: Dispatch) {
 	return {
 		editMeterDetails: (meter: MeterMetadata) => dispatch(editMeterDetails(meter)),
-		log: (level: string, message: string) => dispatch(logToServer(level, message))
+		log: (level: string, message: string) => dispatch(logToServer(level, message)),
 	};
 }
 
