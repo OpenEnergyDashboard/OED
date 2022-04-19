@@ -115,13 +115,8 @@ mocha.describe('Line & bar Readings', () => {
 
 	mocha.describe('Check intervals', () => {
 		let meter, graphicUnitId, conn;
-		const startDate = '2020-01-01 00:00:00';
-		// Do 61 days which is what is needed.
-		const endDate = '2020-03-02 00:00:00';
 
 		mocha.beforeEach(async function () {
-			// Extend timeout because a longer time with more data being created. The value is somewhat
-			// arbitrary and can be made larger if you get timeouts.
 			conn = testDB.getConnection();
 			// Insert the standard and special units and conversions. Really only need 1-2 but this is easy.
 			await Unit.insertStandardUnits(conn);
@@ -211,16 +206,17 @@ mocha.describe('Line & bar Readings', () => {
 			expect(allReadings[meter.id].length).to.equal(numDays * 24);
 		});
 
-		mocha.it('Us raw readings when 13 days', async () => {
+		mocha.it('Use raw readings when 14 days', async () => {
 			const start = moment(startDate);
 			const end = moment(startDate).clone();
-			const numDays = 13;
+			const numDays = 14;
 			end.add(numDays, 'days');
 			const allReadings = await Reading.getMeterLineReadings([meter.id], graphicUnitId, start, end, conn);
-			// The min days is 14 for hourly so should get numDays days of 15-minute readings.
-			// This is four since there are four 15-minute intervals in one hour.
-			const hourToRawScaleFactor = 4;
-			expect(allReadings[meter.id].length).to.equal(numDays * 24 * hourToRawScaleFactor);
+			// Min hourly points is 1440 * reading frequency in hours so 1440 * 0.25 = 360 hours or 15 days.
+			// 14 days so expect 14 days * 24 hours/day * 60 min/hour / 15 min/reading = 1344 readings.
+			// The formula below is equivalent.
+			const hourToRawScaleFactor = 60 / 15;
+			expect(allReadings[meter.id].length).to.equal(Math.floor(numDays * 24 * hourToRawScaleFactor));
 		});
 	});
 
@@ -250,7 +246,7 @@ mocha.describe('Line & bar Readings', () => {
 			meter = await Meter.getByName('Meter', conn);
 			// Make the graphic unit be MegaJoules.
 			graphicUnitId = (await Unit.getByName('MJ', conn)).id;
-			const data = generateSineData(startDate, endDate, { timeStep: { minute: 15 } }).map(row => new Reading(meter.id, row[0], row[1], row[2]));
+			const data = generateSineData(startDate, endDate, { timeStep: { minute: 23 } }).map(row => new Reading(meter.id, row[0], row[1], row[2]));
 			await Reading.insertAll(data, conn);
 			// Refresh daily and hourly reading views.
 			await Reading.refreshDailyReadings(conn);
@@ -277,15 +273,21 @@ mocha.describe('Line & bar Readings', () => {
 			expect(allReadings[meter.id].length).to.equal(numDays * 24);
 		});
 
-		mocha.it('Us raw readings when 13 days', async () => {
+		mocha.it('Use raw readings when 22 days', async () => {
 			const start = moment(startDate);
 			const end = moment(startDate).clone();
-			const numDays = 13;
+			const numDays = 22;
 			end.add(numDays, 'days');
+			// The crossover point for when to go to raw depends on the reading rate. Thus, it is reset to
+			// 23 minutes before getting the data and then set back to the original value.
+			process.env.OED_SITE_READING_RATE = "00:23:00";
 			const allReadings = await Reading.getMeterLineReadings([meter.id], graphicUnitId, start, end, conn);
-			// The min days is 14 for hourly so should get numDays days of 15-minute readings.
-			// This is four since there are four 15-minute intervals in one hour.
-			const hourToRawScaleFactor = 4;
+			process.env.OED_SITE_READING_RATE = process.env.OED_TEST_SITE_READING_RATE;
+			// Min hourly points is 1440 * reading frequency in hours so 1440 * 23/60 = 552 hours or 23 days.
+			// 22 days so expect 22 days * 24 hours/day * 60 min/hour / 23 min/reading = 1377.39 readings
+			// rounded down to 1377.
+			// The formula below is equivalent.
+			const hourToRawScaleFactor = 60 / 23;
 			expect(allReadings[meter.id].length).to.equal(Math.floor(numDays * 24 * hourToRawScaleFactor));
 		});
 	});
