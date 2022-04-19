@@ -93,7 +93,7 @@ router.post('/addUnit', async (req,res) => {
 					req.body.unitRepresent,
 					req.body.secInRate,
 					req.body.typeOfUnit,
-					req.body.unitIndex,
+					undefined,
 					req.body.suffix,
 					req.body.displayable,
 					req.body.preferredDisplay,

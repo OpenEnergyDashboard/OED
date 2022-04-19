@@ -9,7 +9,7 @@ import CreateUnitModalComponent from '../../components/unit/CreateUnitModalCompo
 import { showSuccessNotification, showErrorNotification } from '../../utils/notifications';
 import { unitsApi } from '../../utils/api';
 import { browserHistory } from '../../utils/history';
-import { UnitData } from '../../types/redux/units';
+import { UnitData, UnitType, UnitRepresentType, DisplayableType } from '../../types/redux/units';
 import translate from '../../utils/translate';
 
 export default class CreateUnitContainer extends React.Component<{}, {}> {
@@ -31,12 +31,12 @@ export default class CreateUnitContainer extends React.Component<{}, {}> {
     state = {
         name: '',
         identifier: '',
-        unitRepresent: 'raw',
+        unitRepresent: UnitRepresentType.raw,
         secInRate: 3600,
-        typeOfUnit: 'unit',
+        typeOfUnit: UnitType.unit,
         unitIndex: undefined,
         suffix: '',
-        displayable: 'all',
+        displayable: DisplayableType.all,
         preferredDisplay: false,
         note: ''
     }
@@ -77,13 +77,13 @@ export default class CreateUnitContainer extends React.Component<{}, {}> {
     private submitNewUnit = async () => {
         try {
             await unitsApi.addUnit({
-                id: undefined,
+                id: -99,
                 name: this.state.name,
                 identifier: this.state.identifier,
                 unitRepresent: this.state.unitRepresent,
                 secInRate: this.state.secInRate,
                 typeOfUnit: this.state.typeOfUnit,
-                unitIndex: this.state.unitIndex,
+                unitIndex: -99,
                 suffix: this.state.suffix,
                 displayable: this.state.displayable,
                 preferredDisplay: this.state.preferredDisplay,
