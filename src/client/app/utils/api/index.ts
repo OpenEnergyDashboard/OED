@@ -15,6 +15,8 @@ import UsersApi from './UsersApi';
 import VersionApi from './VersionApi';
 import MapsApi from './MapsApi';
 import LogsApi from './LogsApi';
+import ConversionArrayApi from './ConversionArrayApi';
+import UnitsApi from './unitsApi';
 
 const apiBackend = new ApiBackend();
 
@@ -29,6 +31,8 @@ const usersApi = new UsersApi(apiBackend);
 const mapsApi = new MapsApi(apiBackend);
 const logsApi = new LogsApi(apiBackend);
 const versionApi = new VersionApi(apiBackend);
+const conversionArrayApi = new ConversionArrayApi(apiBackend);
+const unitsApi = new UnitsApi(apiBackend);
 
 export {
 	groupsApi,
@@ -40,5 +44,7 @@ export {
 	logsApi,
 	usersApi,
 	versionApi,
-	uploadCSVApi
+	uploadCSVApi,
+	conversionArrayApi,
+	unitsApi
 };

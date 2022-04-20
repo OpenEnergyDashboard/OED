@@ -62,6 +62,8 @@ export default function graphExport(dataSets: ExportDataSet[], name: string) {
  * @param items list of readings directly from the database
  * @param defaultLanguage the preferred localization to use for date/time formatting
  */
+// below comment should be removed when we either remove defaultLanguage or implement it into the following function
+/* eslint-disable @typescript-eslint/no-unused-vars */
 export function downloadRawCSV(items: RawReadings[], defaultLanguage: string) {
 	// note that utc() is not needed
 	let csvOutput = 'Label,Readings,Start Timestamp,End Timestamp\n';
@@ -76,6 +78,8 @@ export function downloadRawCSV(items: RawReadings[], defaultLanguage: string) {
 	const filename = `oedRawExport_line_${startTime}_to_${endTime}.csv`;
 	downloadCSV(csvOutput, filename);
 }
+/* eslint-enable @typescript-eslint/no-unused-vars */
+// as well as above comment
 
 /**
  * Function that adds a div to handle exporting raw data

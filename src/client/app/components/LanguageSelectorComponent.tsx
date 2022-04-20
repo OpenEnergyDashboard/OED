@@ -34,7 +34,7 @@ enum LanguageNames {
 /**
  * A component that allows users to select which language the page should be displayed in.
  */
-export default class LanguageSelectorComponent extends React.Component<LanguageSelectProps, DropdownState, {}> {
+export default class LanguageSelectorComponent extends React.Component<LanguageSelectProps, DropdownState> {
 	constructor(props: LanguageSelectProps) {
 		super(props);
 		this.handleChangeLanguage = this.handleChangeLanguage.bind(this);

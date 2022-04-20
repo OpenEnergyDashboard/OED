@@ -11,7 +11,6 @@ import { calculateCompareTimeInterval, ComparePeriod, SortingOrder } from '../ut
 const defaultState: GraphState = {
 	selectedMeters: [],
 	selectedGroups: [],
-	// -99 is value used for an unset unit id.
 	selectedUnit: -99,
 	timeInterval: TimeInterval.unbounded(),
 	rangeSliderInterval: TimeInterval.unbounded(),
@@ -37,6 +36,11 @@ export default function graph(state = defaultState, action: GraphAction) {
 				...state,
 				selectedGroups: action.groupIDs
 			};
+		case ActionType.UpdateSelectedUnit:
+			return {
+				...state,
+				selectedUnit: action.unitID
+			}
 		case ActionType.UpdateBarDuration:
 			return {
 				...state,

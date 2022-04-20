@@ -11,7 +11,7 @@ export interface MeterDropDownProps {
 	updateSelectedMeter(meterID: number): UpdateImportMeterAction;
 }
 
-export default class MeterDropDownComponent extends React.Component<MeterDropDownProps, {}> {
+export default class MeterDropDownComponent extends React.Component<MeterDropDownProps> {
 	constructor(props: MeterDropDownProps) {
 		super(props);
 		this.handleMeterSelect = this.handleMeterSelect.bind(this);

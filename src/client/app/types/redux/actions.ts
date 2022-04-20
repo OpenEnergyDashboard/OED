@@ -46,6 +46,7 @@ export enum ActionType {
 
 	UpdateSelectedMeters = 'UPDATE_SELECTED_METERS',
 	UpdateSelectedGroups = 'UPDATE_SELECTED_GROUPS',
+	UpdateSelectedUnit = 'UPDATE_SELECTED_UNIT',
 	UpdateBarDuration = 'UPDATE_BAR_DURATION',
 	ChangeChartToRender = 'CHANGE_CHART_TO_RENDER',
 	ChangeBarStacking = 'CHANGE_BAR_STACKING',
@@ -111,7 +112,10 @@ export enum ActionType {
 	ConfirmEditedMap = 'CONFIRM_EDITED_MAP',
 	SetCalibration = 'SET_CALIBRATION',
 	ResetCalibration = 'RESET_CALIBRATION',
-	IncrementCounter = 'INCREMENT_COUNTER'
+	IncrementCounter = 'INCREMENT_COUNTER',
+
+	RequestUnitsDetails = 'REQUEST_UNITS_DETAILS',
+	ReceiveUnitsDetails = 'RECEIVE_UNITS_DETAILS'
 }
 
 /**

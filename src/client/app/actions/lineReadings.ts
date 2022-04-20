@@ -96,9 +96,7 @@ function fetchGroupLineReadings(groupIDs: number[], timeInterval: TimeInterval, 
 export function fetchNeededLineReadings(timeInterval: TimeInterval, unitID: number): Thunk {
 	return (dispatch: Dispatch, getState: GetState) => {
 		const state = getState();
-		/* tslint:disable:array-type */
 		const promises: Array<Promise<any>> = [];
-		/* tslint:enable:array-type */
 
 		// Determine which meters are missing data for this time interval
 		const meterIDsToFetchForLine = state.graph.selectedMeters.filter(
