@@ -63,22 +63,22 @@ export function shouldFetchGroupBarReadings(state: State, groupID: number, timeI
 }
 
 export function requestMeterBarReadings(meterIDs: number[], timeInterval: TimeInterval, barDuration: moment.Duration):
-		t.RequestMeterBarReadingsAction {
+t.RequestMeterBarReadingsAction {
 	return { type: ActionType.RequestMeterBarReadings, meterIDs, timeInterval, barDuration };
 }
 
 export function receiveMeterBarReadings(meterIDs: number[], timeInterval: TimeInterval, barDuration: moment.Duration,
-		readings: BarReadings): t.ReceiveMeterBarReadingsAction {
+	readings: BarReadings): t.ReceiveMeterBarReadingsAction {
 	return { type: ActionType.ReceiveMeterBarReadings, meterIDs, timeInterval, barDuration, readings };
 }
 
 export function requestGroupBarReadings(groupIDs: number[], timeInterval: TimeInterval, barDuration: moment.Duration):
-		t.RequestGroupBarReadingsAction {
+t.RequestGroupBarReadingsAction {
 	return { type: ActionType.RequestGroupBarReadings, groupIDs, timeInterval, barDuration };
 }
 
 export function receiveGroupBarReadings(groupIDs: number[], timeInterval: TimeInterval, barDuration: moment.Duration,
-		readings: BarReadings): t.ReceiveGroupBarReadingsAction {
+	readings: BarReadings): t.ReceiveGroupBarReadingsAction {
 	return { type: ActionType.ReceiveGroupBarReadings, groupIDs, timeInterval, barDuration, readings };
 }
 
@@ -120,9 +120,7 @@ function fetchGroupBarReadings(groupIDs: number[], timeInterval: TimeInterval): 
 export function fetchNeededBarReadings(timeInterval: TimeInterval): Thunk {
 	return (dispatch: Dispatch, getState: GetState) => {
 		const state = getState();
-		/* tslint:disable:array-type */
 		const promises: Array<Promise<any>> = [];
-		/* tslint:enable:array-type */
 
 		// Determine which meters are missing data for this time interval
 		const meterIDsToFetchForBar = state.graph.selectedMeters.filter(

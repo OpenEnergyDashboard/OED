@@ -21,10 +21,9 @@ type DatasourceBoxPropsWithIntl = DatasourceBoxProps & WrappedComponentProps;
 
 // This is just an alias, so it's ok to have it in this file.
 // Aliasing this specialization is required because the meaning of < and > conflict in TypeScript and JSX.
-// tslint:disable max-classes-per-file
 class MultiSelectDatasourceComponent extends MultiSelectComponent<DatasourceID> { }
 
-class DatasourceBoxComponent extends React.Component<DatasourceBoxPropsWithIntl, {}> {
+class DatasourceBoxComponent extends React.Component<DatasourceBoxPropsWithIntl> {
 	constructor(props: DatasourceBoxPropsWithIntl) {
 		super(props);
 		this.handleDatasourceSelect = this.handleDatasourceSelect.bind(this);
@@ -36,18 +35,14 @@ class DatasourceBoxComponent extends React.Component<DatasourceBoxPropsWithIntl,
 			type = DataType.Meter;
 		}
 
-		/* tslint:disable:array-type */
 		const options: Array<SelectOption & DatasourceID> = this.props.datasource.map((element: NamedIDItem) => (
-			/* tslint:enable:array-type */
 			{
 				label: element.name,
 				type,
 				value: element.id
 			}
 		));
-		/* tslint:disable:array-type */
 		let selectedOptions: Array<SelectOption & DatasourceID> | undefined;
-		/* tslint:enable:array-type */
 		if (this.props.selectedOptions) {
 			selectedOptions = this.props.selectedOptions.map((element: NamedIDItem) => (
 				{
@@ -69,7 +64,7 @@ class DatasourceBoxComponent extends React.Component<DatasourceBoxPropsWithIntl,
 				options={options}
 				selectedOptions={selectedOptions}
 				placeholder={this.props.type === 'meter' ? this.props.intl.formatMessage(messages.selectMeters) :
-															this.props.intl.formatMessage(messages.selectGroups)}
+					this.props.intl.formatMessage(messages.selectGroups)}
 				onValuesChange={this.handleDatasourceSelect}
 			/>
 		);

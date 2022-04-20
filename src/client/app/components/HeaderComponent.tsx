@@ -17,7 +17,7 @@ interface HeaderProps {
 /**
  * React component that controls the header strip at the top of all pages
  */
-class HeaderComponent extends React.Component<HeaderProps, {}> {
+class HeaderComponent extends React.Component<HeaderProps> {
 	public render() {
 		const divStyle = {
 			marginTop: '5px',

@@ -5,13 +5,18 @@
 import * as _ from 'lodash';
 import { connect } from 'react-redux';
 import ChartDataSelectComponent from '../components/ChartDataSelectComponent';
-import { changeSelectedGroups, changeSelectedMeters } from '../actions/graph';
+import { changeSelectedGroups, changeSelectedMeters, changeSelectedUnit } from '../actions/graph';
 import { State } from '../types/redux/state';
 import { Dispatch } from '../types/redux/actions';
 import { ChartTypes } from '../types/redux/graph';
 import { SelectOption } from '../types/items';
-import { CartesianPoint, Dimensions, normalizeImageDimensions, calculateScaleFromEndpoints, itemDisplayableOnMap, itemMapInfoOk } from '../utils/calibration';
+import {
+	CartesianPoint, Dimensions, normalizeImageDimensions, calculateScaleFromEndpoints,
+	itemDisplayableOnMap, itemMapInfoOk
+} from '../utils/calibration';
 import { gpsToUserGrid } from './../utils/calibration';
+import { DisplayableType, UnitData, UnitType } from '../types/redux/units'
+import { metersInGroup, setIntersect, unitsCompatibleWithMeters } from '../utils/determineCompatibleUnits';
 import { DataType } from '../types/Datasources';
 
 
@@ -23,10 +28,10 @@ import { DataType } from '../types/Datasources';
 function mapStateToProps(state: State) {
 	// Map information about meters and groups into a format the component can display.
 	const sortedMeters = _.sortBy(_.values(state.meters.byMeterID).map(meter =>
-		({ value: meter.id, label: meter.name.trim(), disabled: false } as SelectOption)), 'label');
+		({ value: meter.id, label: meter.name.trim(), isDisabled: false } as SelectOption)), 'label');
 	const sortedGroups = _.sortBy(_.values(state.groups.byGroupID).map(group =>
-		({ value: group.id, label: group.name.trim(), disabled: false } as SelectOption)), 'label');
-
+		({ value: group.id, label: group.name.trim(), isDisabled: false } as SelectOption)), 'label');
+	const sortedUnits = getUnitCompatibilityForDropdown(state);
 	/**
 	 * 	Map information about the currently selected meters into a format the component can display.
 	 */
@@ -72,12 +77,12 @@ function mapStateToProps(state: State) {
 				const meterGPSInUserGrid: CartesianPoint = gpsToUserGrid(imageDimensionNormalized, gps, origin, scaleOfMap, mp.northAngle);
 				if (!(itemMapInfoOk(meter.value, DataType.Meter, state.maps.byMapID[state.maps.selectedMap], gps) &&
 					itemDisplayableOnMap(imageDimensionNormalized, meterGPSInUserGrid))) {
-					meter.disabled = true;
+					meter.isDisabled = true;
 					disableMeters.push(meter.value);
 				}
 			} else {
 				// Lack info on this map so skip. This is mostly done since TS complains about the undefined possibility.
-				meter.disabled = true;
+				meter.isDisabled = true;
 				disableMeters.push(meter.value);
 			}
 		});
@@ -89,11 +94,11 @@ function mapStateToProps(state: State) {
 				const groupGPSInUserGrid: CartesianPoint = gpsToUserGrid(imageDimensionNormalized, gps, origin, scaleOfMap, mp.northAngle);
 				if (!(itemMapInfoOk(group.value, DataType.Group, state.maps.byMapID[state.maps.selectedMap], gps) &&
 					itemDisplayableOnMap(imageDimensionNormalized, groupGPSInUserGrid))) {
-					group.disabled = true;
+					group.isDisabled = true;
 					disableGroups.push(group.value);
 				}
 			} else {
-				group.disabled = true;
+				group.isDisabled = true;
 				disableGroups.push(group.value);
 			}
 		});
@@ -106,7 +111,7 @@ function mapStateToProps(state: State) {
 			return {
 				label: state.meters.byMeterID[meterID] ? state.meters.byMeterID[meterID].name : '',
 				value: meterID,
-				disabled: false
+				isDisabled: false
 			} as SelectOption
 		}
 	});
@@ -119,16 +124,24 @@ function mapStateToProps(state: State) {
 			return {
 				label: state.groups.byGroupID[groupID] ? state.groups.byGroupID[groupID].name : '',
 				value: groupID,
-				disabled: false
+				isDisabled: false
 			} as SelectOption
 		}
 	});
 
+	const selectedUnit = {
+		label: state.units.units[state.graph.selectedUnit] ? state.units.units[state.graph.selectedUnit].name : '',
+		value: state.graph.selectedUnit,
+		isDisabled: false
+	} as SelectOption
+
 	return {
 		meters: sortedMeters,
 		groups: sortedGroups,
+		units: sortedUnits,
 		selectedMeters,
-		selectedGroups
+		selectedGroups,
+		selectedUnit
 	};
 }
 
@@ -136,9 +149,116 @@ function mapStateToProps(state: State) {
 function mapDispatchToProps(dispatch: Dispatch) {
 	return {
 		selectMeters: (newSelectedMeterIDs: number[]) => dispatch(changeSelectedMeters(newSelectedMeterIDs)),
-		selectGroups: (newSelectedGroupIDs: number[]) => dispatch(changeSelectedGroups(newSelectedGroupIDs))
+		selectGroups: (newSelectedGroupIDs: number[]) => dispatch(changeSelectedGroups(newSelectedGroupIDs)),
+		selectUnit: (newSelectUnitID: number) => dispatch(changeSelectedUnit(newSelectUnitID))
 	};
 }
 
 // function that connects the React container to the Redux store of states
 export default connect(mapStateToProps, mapDispatchToProps)(ChartDataSelectComponent);
+
+/**
+ * Determines the compatibility of units in the redux state for display in dropdown
+ * @param {State} state - current redux state
+ * @return {SelectOption[]} an array of SelectOption
+ */
+export function getUnitCompatibilityForDropdown(state: State) {
+	// Holds all units that are compatible with selected meters/groups
+	const compatibleUnits = new Set<number>();
+	// Holds all units that are not compatible with selected meters/groups
+	const incompatibleUnits = new Set<number>();
+	if (state.graph.selectedUnit === -99) {
+		// Every unit is okay/compatible in this case so skip the work needed below.
+		// Can only show unit types (not meters) and only displayable ones.
+		// <current user type> is either all (not logged in as admin) or admin
+		getVisibleUnitOrSuffixState(state).forEach(unit => {
+			compatibleUnits.add(unit.id);
+		})
+	} else {
+		// Some meter or group is selected
+		// Holds the units compatible with the meters/groups selected.
+		// The first meter or group processed is different since intersection with empty set is empty.
+		let first = true;
+		let units = new Set<number>();
+		const M = new Set<number>();
+		// Get for all meters
+		state.graph.selectedMeters.forEach(meter => {
+			M.add(meter);
+			const newUnits = unitsCompatibleWithMeters(M)
+			if (first) {
+				// First meter/group so all its units are acceptable at this point
+				units = newUnits;
+				first = false;
+			} else {
+				// Do intersection of compatible units so far with ones for this meters
+				units = setIntersect(units, newUnits);
+			}
+		})
+		// Get for all groups
+		state.graph.selectedGroups.forEach(async group => {
+			const newUnits = unitsCompatibleWithMeters(await metersInGroup(group));
+			if (first) {
+				// First meter/group so all its units are acceptable at this point
+				units = newUnits;
+				first = false;
+			} else {
+				// Do intersection of compatible units so far with ones for this meters
+				units = setIntersect(newUnits, units);
+			}
+		})
+		// Loop over all units (they must be of type unit or suffix - case 1)
+		getVisibleUnitOrSuffixState(state).forEach(o => {
+			// Control displayable ones (case 2)
+			if (units.has(o.id)) {
+				// Should show as compatible (case 3)
+				compatibleUnits.add(o.id);
+			} else {
+				// Should show as incompatible (case 4)
+				incompatibleUnits.add(o.id);
+			}
+		})
+	}
+	// Ready to display unit. Put selectable ones before unselectable ones.
+	const finalUnits = getUnitCompatibility(compatibleUnits, incompatibleUnits, state);
+	return finalUnits;
+}
+
+/**
+ * Filters all units that are of type meter or displayable type none from the redux state.
+ * @param {State} state - current redux state
+ * @return {UnitData[]} an array of UnitData
+ */
+export function getVisibleUnitOrSuffixState(state: State) {
+	const visibleUnitsOrSuffixes = _.filter(state.units.units, function (o: UnitData) {
+		return o.typeOfUnit != UnitType.meter && o.displayable != DisplayableType.none;
+	})
+	return visibleUnitsOrSuffixes;
+}
+
+/**
+ *  Sets visibility of SelectOptions for dropdown. Determined by which set they are contained in
+ * @param {State} state - current redux state
+ * @param {Set<number>} compatibleUnits - units that are compatible with current selected unit
+ * @param {Set<number>} incompatibleUnits - units that are not compatible with current selected unit
+ * @return {SelectOption[]} an array of SelectOption
+ */
+function getUnitCompatibility(compatibleUnits: Set<number>, incompatibleUnits: Set<number>, state: State) {
+	const finalUnits: SelectOption[] = [];
+	compatibleUnits.forEach(unit => {
+		finalUnits.push({
+			label: state.units.units[unit].identifier,
+			value: unit,
+			isDisabled: false
+		} as SelectOption
+		)
+	})
+	incompatibleUnits.forEach(unit => {
+		finalUnits.push({
+			label: state.units.units[unit].identifier,
+			value: unit,
+			isDisabled: true
+		} as SelectOption
+		)
+	})
+	return _.sortBy(_.sortBy(finalUnits, unit => unit.label.toLowerCase(), 'asc'), unit => unit.isDisabled, 'asc');
+}

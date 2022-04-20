@@ -57,23 +57,23 @@ function shouldFetchGroupCompareReadings(state: State, groupID: number, timeInte
 	return !readingsForCompareShift.isFetching;
 }
 
-function requestMeterCompareReadings(meterIDs: number[], timeInterval: TimeInterval, compareShift: moment.Duration):
-	t.RequestMeterCompareReadingsAction {
+function requestMeterCompareReadings(meterIDs: number[], timeInterval: TimeInterval,
+	compareShift: moment.Duration): t.RequestMeterCompareReadingsAction {
 	return { type: ActionType.RequestMeterCompareReadings, meterIDs, timeInterval, compareShift };
 }
 
-function receiveMeterCompareReadings(meterIDs: number[], timeInterval: TimeInterval, compareShift: moment.Duration, readings: CompareReadings):
-	t.ReceiveMeterCompareReadingsAction {
+function receiveMeterCompareReadings(meterIDs: number[], timeInterval: TimeInterval, compareShift: moment.Duration,
+	readings: CompareReadings): t.ReceiveMeterCompareReadingsAction {
 	return { type: ActionType.ReceiveMeterCompareReadings, meterIDs, timeInterval, compareShift, readings };
 }
 
-function requestGroupCompareReadings(groupIDs: number[], timeInterval: TimeInterval, compareShift: moment.Duration):
-	t.RequestGroupCompareReadingsAction {
+function requestGroupCompareReadings(groupIDs: number[], timeInterval: TimeInterval,
+	compareShift: moment.Duration): t.RequestGroupCompareReadingsAction {
 	return { type: ActionType.RequestGroupCompareReadings, groupIDs, timeInterval, compareShift };
 }
 
-function receiveGroupCompareReadings(groupIDs: number[], timeInterval: TimeInterval, compareShift: moment.Duration, readings: CompareReadings):
-	t.ReceiveGroupCompareReadingsAction {
+function receiveGroupCompareReadings(groupIDs: number[], timeInterval: TimeInterval, compareShift: moment.Duration,
+	readings: CompareReadings): t.ReceiveGroupCompareReadingsAction {
 	return { type: ActionType.ReceiveGroupCompareReadings, groupIDs, timeInterval, compareShift, readings };
 }
 
@@ -118,9 +118,7 @@ export function fetchNeededCompareReadings(comparePeriod: ComparePeriod): Thunk 
 		const state = getState();
 		const compareShift = calculateCompareShift(comparePeriod);
 		const timeInterval = state.graph.compareTimeInterval;
-		/* tslint:disable:array-type */
 		const promises: Array<Promise<any>> = [];
-		/* tslint:enable:array-type */
 
 		// Determine which meters are missing data for this time interval
 		const meterIDsToFetchForCompare = state.graph.selectedMeters.filter(

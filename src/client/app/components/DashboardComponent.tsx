@@ -32,7 +32,7 @@ interface DashboardProps {
 /**
  * React component that controls the dashboard
  */
-export default class DashboardComponent extends React.Component<DashboardProps, {}> {
+export default class DashboardComponent extends React.Component<DashboardProps> {
 	constructor(props: DashboardProps) {
 		super(props);
 		this.handleTimeIntervalChange = this.handleTimeIntervalChange.bind(this);

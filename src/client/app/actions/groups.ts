@@ -24,7 +24,7 @@ function requestGroupChildren(groupID: number): t.RequestGroupChildrenAction {
 	return { type: ActionType.RequestGroupChildren, groupID };
 }
 
-function receiveGroupChildren(groupID: number, data: {meters: number[], groups: number[]}): t.ReceiveGroupChildrenAction {
+function receiveGroupChildren(groupID: number, data: {meters: number[], groups: number[], deepMeters: number[]}): t.ReceiveGroupChildrenAction {
 	return { type: ActionType.ReceiveGroupChildren, groupID, data };
 }
 
