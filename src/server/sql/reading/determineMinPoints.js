@@ -15,6 +15,7 @@ const { log } = require('../../log');
 function determineMinPoints(){
 	// Minimum daily points is set such that when the interval requested is under 60 days or 
 	// about two months then the meter_line_readings_unit algorithm should go to the hourly view.
+	// At 60 days, you get 60 * 24 = 1440 hourly points so that should be the most every needed.
 	const minimumDailyPoints = 61;
 
 	// Minimum daily points is set such that when the raw reading rate is every 15 minutes and
