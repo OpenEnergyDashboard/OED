@@ -16,6 +16,13 @@ export default class ReadingsApi {
 		this.backend = backend;
 	}
 
+	/**
+	 * Gets line readings for meters for the given time range
+	 * @param meterIDs The meter IDs to get readings for
+	 * @param timeInterval The range of time to get readings for
+	 * @param unitId The unit id that the reading should be returned in, i.e., the graphic unit
+	 * @return {Promise<object<int, array<{reading_rate: number, start_timestamp: number. end_timestamp: number} in sorted order
+	 */
 	public async meterLineReadings(meterIDs: number[], timeInterval: TimeInterval, unitID: number): Promise<LineReadings> {
 		const stringifiedIDs = meterIDs.join(',');
 		const readings = await this.backend.doGetRequest<LineReadings>(
@@ -28,6 +35,13 @@ export default class ReadingsApi {
 		return readings;
 	}
 
+	/**
+	 * Gets line readings for groups for the given time range
+	 * @param groupIDs The group IDs to get readings for
+	 * @param timeInterval The range of time to get readings for
+	 * @param unitId The unit id that the reading should be returned in, i.e., the graphic unit
+	 * @return {Promise<object<int, array<{reading_rate: number: number. end_timestamp: number} in sorted order
+	 */
 	public async groupLineReadings(groupIDs: number[], timeInterval: TimeInterval, unitID: number): Promise<LineReadings> {
 		const stringifiedIDs = groupIDs.join(',');
 		const readings = await this.backend.doGetRequest<LineReadings>(
@@ -40,19 +54,35 @@ export default class ReadingsApi {
 		return readings;
 	}
 
-	public async meterBarReadings(meterIDs: number[], timeInterval: TimeInterval, barWidthDays: number): Promise<BarReadings> {
+	/**
+	 * Gets bar readings for meters for the given time range
+	 * @param meterIDs The meter IDs to get readings for
+	 * @param timeInterval The range of time to get readings for
+	 * @param barWidthDays The width of the bar in days
+	 * @param unitId The unit id that the reading should be returned in, i.e., the graphic unit
+	 * @return {Promise<object<int, array<{reading_rate: number: number. end_timestamp: number} in sorted order
+	 */
+	public async meterBarReadings(meterIDs: number[], timeInterval: TimeInterval, barWidthDays: number, unitID: number): Promise<BarReadings> {
 		const stringifiedIDs = meterIDs.join(',');
 		return await this.backend.doGetRequest<BarReadings>(
 			`/api/unitReadings/bar/meters/${stringifiedIDs}`,
-			{ timeInterval: timeInterval.toString(), barWidthDays: barWidthDays.toString() }
+			{ timeInterval: timeInterval.toString(), barWidthDays: barWidthDays.toString(), graphicUnitId: unitID.toString() }
 		);
 	}
 
-	public async groupBarReadings(groupIDs: number[], timeInterval: TimeInterval, barWidthDays: number): Promise<BarReadings> {
+	/**
+	 * Gets bar readings for groups for the given time range
+	 * @param groupIDs The group IDs to get readings for
+	 * @param timeInterval The range of time to get readings for
+	 * @param barWidthDays The width of the bar in days
+	 * @param unitId The unit id that the reading should be returned in, i.e., the graphic unit
+	 * @return {Promise<object<int, array<{reading_rate: number: number. end_timestamp: number} in sorted order
+	 */
+	public async groupBarReadings(groupIDs: number[], timeInterval: TimeInterval, barWidthDays: number, unitID: number): Promise<BarReadings> {
 		const stringifiedIDs = groupIDs.join(',');
 		return await this.backend.doGetRequest<BarReadings>(
 			`/api/unitReadings/bar/groups/${stringifiedIDs}`,
-			{ timeInterval: timeInterval.toString(), barWidthDays: barWidthDays.toString() }
+			{ timeInterval: timeInterval.toString(), barWidthDays: barWidthDays.toString(), graphicUnitId: unitID.toString() }
 		);
 	}
 }

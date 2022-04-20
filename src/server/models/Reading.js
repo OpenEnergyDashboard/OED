@@ -263,14 +263,15 @@ class Reading {
 	/**
 	 * Gets barchart readings for the given time range for the given meters
 	 * @param meterIDs The meters to get barchart readings for
+	 * @param graphicUnitId The unit id that the reading should be returned in, i.e., the graphic unit
 	 * @param fromTimestamp The start of the barchart interval
 	 * @param toTimestamp the end of the barchart interval
 	 * @param barWidthDays the width of each bar in days
 	 * @param conn the connection to use.
 	 * @return {Promise<object<int, array<{reading: number, start_timestamp: Moment, end_timestamp: Moment}>>>}
 	 */
-	static async getNewCompressedBarchartReadings(meterIDs, fromTimestamp, toTimestamp, barWidthDays, conn) {
-		const allBarReadings = await conn.func('compressed_barchart_readings_2', [meterIDs, barWidthDays, fromTimestamp, toTimestamp]);
+	static async getMeterBarReadings(meterIDs, graphicUnitId, fromTimestamp, toTimestamp, barWidthDays, conn) {
+		const allBarReadings = await conn.func('meter_bar_readings_unit', [meterIDs, graphicUnitId, barWidthDays, fromTimestamp, toTimestamp]);
 		const barReadingsByMeterID = mapToObject(meterIDs, () => []);
 		for (const row of allBarReadings) {
 			barReadingsByMeterID[row.meter_id].push(
@@ -283,14 +284,15 @@ class Reading {
 	/**
 	 * Gets barchart readings for the given time range for the given groups
 	 * @param groupIDs The groups to get barchart readings for
+	 * @param graphicUnitId The unit id that the reading should be returned in, i.e., the graphic unit
 	 * @param fromTimestamp The start of the barchart interval
 	 * @param toTimestamp the end of the barchart interval
 	 * @param barWidthDays the width of each bar in days
 	 * @param conn the connection to use.
 	 * @return {Promise<object<int, array<{reading: number, start_timestamp: Moment, end_timestamp: Moment}>>>}
 	 */
-	static async getNewCompressedBarchartGroupReadings(groupIDs, fromTimestamp, toTimestamp, barWidthDays, conn) {
-		const allBarReadings = await conn.func('compressed_barchart_group_readings_2', [groupIDs, barWidthDays, fromTimestamp, toTimestamp]);
+	static async getGroupBarReadings(groupIDs, graphicUnitId, fromTimestamp, toTimestamp, barWidthDays, conn) {
+		const allBarReadings = await conn.func('group_bar_readings_unit', [groupIDs, graphicUnitId, barWidthDays, fromTimestamp, toTimestamp]);
 		const barReadingsByGroupID = mapToObject(groupIDs, () => []);
 		for (const row of allBarReadings) {
 			barReadingsByGroupID[row.group_id].push(
@@ -301,18 +303,19 @@ class Reading {
 	}
 
 	/**
-	 *
-	 * @param meterIDs
-	 * @param {Moment} currStartTimestamp
-	 * @param {Moment} currEndTimestamp
-	 * @param {Duration} compareShift
+	 * Gets compare chart readings for the given time range and shift for the given meters
+	 * @param meterIDs The meters to get compare chart readings for
+	 * @param graphicUnitId The unit id that the reading should be returned in, i.e., the graphic unit
+	 * @param {Moment} currStartTimestamp start of current/this compare period
+	 * @param {Moment} currEndTimestamp end of current/this compare period
+	 * @param {Duration} compareShift how far to shift back in time from current period to previous period
 	 * @param conn the connection to use.
 	 * @return {Promise<void>}
 	 */
-	static async getCompareReadings(meterIDs, currStartTimestamp, currEndTimestamp, compareShift, conn) {
+	static async getMeterCompareReadings(meterIDs, graphicUnitId, currStartTimestamp, currEndTimestamp, compareShift, conn) {
 		const allCompareReadings = await conn.func(
-			'compare_readings',
-			[meterIDs, currStartTimestamp, currEndTimestamp, compareShift.toISOString()]);
+			'meter_compare_readings_unit',
+			[meterIDs, graphicUnitId, currStartTimestamp, currEndTimestamp, compareShift.toISOString()]);
 		const compareReadingsByMeterID = {};
 		for (const row of allCompareReadings) {
 			compareReadingsByMeterID[row.meter_id] = {
@@ -324,18 +327,19 @@ class Reading {
 	}
 
 	/**
-	 *
-	 * @param groupIDs
-	 * @param {Moment} currStartTimestamp
-	 * @param {Moment} currEndTimestamp
-	 * @param {Duration} compareShift
-	 * @param conn the connection to use
+	 * Gets compare chart readings for the given time range and shift for the given groups
+	 * @param groupIDs The groups to get compare chart readings for
+	 * @param graphicUnitId The unit id that the reading should be returned in, i.e., the graphic unit
+	 * @param {Moment} currStartTimestamp start of current/this compare period
+	 * @param {Moment} currEndTimestamp end of current/this compare period
+	 * @param {Duration} compareShift how far to shift back in time from current period to previous period
+	 * @param conn the connection to use.
 	 * @return {Promise<void>}
 	 */
-	static async getGroupCompareReadings(groupIDs, currStartTimestamp, currEndTimestamp, compareShift, conn) {
+	 static async getGroupCompareReadings(groupIDs, graphicUnitId, currStartTimestamp, currEndTimestamp, compareShift, conn) {
 		const allCompareReadings = await conn.func(
-			'group_compare_readings',
-			[groupIDs, currStartTimestamp, currEndTimestamp, compareShift.toISOString()]);
+			'group_compare_readings_unit',
+			[groupIDs, graphicUnitId, currStartTimestamp, currEndTimestamp, compareShift.toISOString()]);
 		const compareReadingsByGroupID = {};
 		for (const row of allCompareReadings) {
 			compareReadingsByGroupID[row.group_id] = {

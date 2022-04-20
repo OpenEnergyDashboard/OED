@@ -10,6 +10,7 @@ import { CompareReadings } from '../readings';
 export interface RequestMeterCompareReadingsAction {
 	type: ActionType.RequestMeterCompareReadings;
 	meterIDs: number[];
+	unitID: number;
 	timeInterval: TimeInterval;
 	compareShift: moment.Duration;
 }
@@ -17,6 +18,7 @@ export interface RequestMeterCompareReadingsAction {
 export interface RequestGroupCompareReadingsAction {
 	type: ActionType.RequestGroupCompareReadings;
 	groupIDs: number[];
+	unitID: number;
 	timeInterval: TimeInterval;
 	compareShift: moment.Duration;
 }
@@ -24,6 +26,7 @@ export interface RequestGroupCompareReadingsAction {
 export interface ReceiveMeterCompareReadingsAction {
 	type: ActionType.ReceiveMeterCompareReadings;
 	meterIDs: number[];
+	unitID: number;
 	timeInterval: TimeInterval;
 	compareShift: moment.Duration;
 	readings: CompareReadings;
@@ -32,6 +35,7 @@ export interface ReceiveMeterCompareReadingsAction {
 export interface ReceiveGroupCompareReadingsAction {
 	type: ActionType.ReceiveGroupCompareReadings;
 	groupIDs: number[];
+	unitID: number;
 	timeInterval: TimeInterval;
 	compareShift: moment.Duration;
 	readings: CompareReadings;
@@ -53,14 +57,18 @@ export interface CompareReadingsState {
 	byMeterID: {
 		[meterID: number]: {
 			[timeInterval: string]: {
-				[compareShift: string]: CompareReadingsData;
+				[compareShift: string]: {
+					[unitID: number]: CompareReadingsData;
+				}
 			}
 		}
 	};
 	byGroupID: {
 		[groupID: number]: {
 			[timeInterval: string]: {
-				[compareShift: string]: CompareReadingsData;
+				[compareShift: string]: {
+					[unitID: number]: CompareReadingsData;
+				}
 			}
 		}
 	};

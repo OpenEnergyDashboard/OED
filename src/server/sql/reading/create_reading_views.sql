@@ -17,9 +17,9 @@ CREATE OR REPLACE FUNCTION date_trunc_up(interval_precision TEXT, ts TIMESTAMP)
 IMMUTABLE
 AS $$
 SELECT CASE
-			 WHEN ts = date_trunc(interval_precision, ts) THEN ts
-			 ELSE date_trunc(interval_precision, ts + ('1 ' || interval_precision)::INTERVAL)
-			 END
+	 WHEN ts = date_trunc(interval_precision, ts) THEN ts
+	 ELSE date_trunc(interval_precision, ts + ('1 ' || interval_precision)::INTERVAL)
+	 END
 $$;
 
 /*
@@ -200,7 +200,14 @@ min_data_points: The minimum number of data points to return if using the day vi
 min_hour_points: The minimum number of data points to return if using the hour view.
 Details on how this function works can be found in the devDocs in the resource generalization document.
  */
-CREATE OR REPLACE FUNCTION meter_line_readings_unit(meter_ids INTEGER[], graphic_unit_id INTEGER, start_stamp TIMESTAMP, end_stamp TIMESTAMP, min_day_points INTEGER, min_hour_points INTEGER)
+CREATE OR REPLACE FUNCTION meter_line_readings_unit (
+	meter_ids INTEGER[],
+	graphic_unit_id INTEGER,
+	start_stamp TIMESTAMP,
+	end_stamp TIMESTAMP,
+	min_day_points INTEGER,
+	min_hour_points INTEGER
+)
 	RETURNS TABLE(meter_id INTEGER, reading_rate FLOAT, start_timestamp TIMESTAMP, end_timestamp TIMESTAMP)
 AS $$
 DECLARE
@@ -253,7 +260,7 @@ BEGIN
 			INNER JOIN meters m ON m.id = meters.id)
 			INNER JOIN units u ON m.unit_id = u.id)
 			INNER JOIN cik c on c.row_index = u.unit_index AND c.column_index = unit_column)
-		WHERE requested_range @> time_interval;
+			WHERE requested_range @> time_interval;
 	 ELSE
 		-- Default to raw/meter data to graph. See daily for more comments.
 		RETURN QUERY
@@ -274,7 +281,7 @@ BEGIN
 			INNER JOIN meters m ON m.id = meters.id)
 			INNER JOIN units u ON m.unit_id = u.id)
 			INNER JOIN cik c on c.row_index = u.unit_index AND c.column_index = unit_column)
-		WHERE lower(requested_range) <= r.start_timestamp AND r.end_timestamp <= upper(requested_range);
+			WHERE lower(requested_range) <= r.start_timestamp AND r.end_timestamp <= upper(requested_range);
 	 END IF;
 END;
 $$ LANGUAGE 'plpgsql';
@@ -293,34 +300,51 @@ min_hour_points: The minimum number of data points to return if using the hour v
 Details on how this function works can be found in the devDocs in the resource generalization document and above
 in the meter function that is equivalent.
  */
-CREATE OR REPLACE FUNCTION group_line_readings_unit(group_ids INTEGER[], graphic_unit_id INTEGER, start_stamp TIMESTAMP, end_stamp TIMESTAMP, min_day_points INTEGER, min_hour_points INTEGER)
+CREATE OR REPLACE FUNCTION group_line_readings_unit (
+	group_ids INTEGER[],
+	graphic_unit_id INTEGER,
+	start_stamp TIMESTAMP,
+	end_stamp TIMESTAMP,
+	min_day_points INTEGER,
+	min_hour_points INTEGER
+)
 	RETURNS TABLE(group_id INTEGER, reading_rate FLOAT, start_timestamp TIMESTAMP, end_timestamp TIMESTAMP)
 AS $$
-	DECLARE
-		meter_ids INTEGER[];
-	BEGIN
-		-- First get all the meter ids that will be included in one or more groups being queried.
-		SELECT array_agg(gdm.meter_id) INTO meter_ids
-		FROM groups_deep_meters gdm
-		INNER JOIN unnest(group_ids) gids(id) ON gdm.group_id = gids.id;
+DECLARE
+	meter_ids INTEGER[];
+BEGIN
+	-- First get all the meter ids that will be included in one or more groups being queried.
+	SELECT array_agg(DISTINCT gdm.meter_id) INTO meter_ids
+	FROM groups_deep_meters gdm
+	INNER JOIN unnest(group_ids) gids(id) ON gdm.group_id = gids.id;
 
-		RETURN QUERY
-			SELECT
-				gdm.group_id AS group_id,
-				SUM(readings.reading_rate) AS reading_rate,
-				readings.start_timestamp,
-				readings.end_timestamp
-			FROM meter_line_readings_unit(meter_ids, graphic_unit_id, start_stamp, end_stamp, min_day_points, min_hour_points) readings
-			INNER JOIN groups_deep_meters gdm ON readings.meter_id = gdm.meter_id
-			INNER JOIN unnest(group_ids) gids(id) on gdm.group_id = gids.id
-			GROUP BY gdm.group_id, readings.start_timestamp, readings.end_timestamp;
-	END;
+	RETURN QUERY
+		SELECT
+			gdm.group_id AS group_id,
+			SUM(readings.reading_rate) AS reading_rate,
+			readings.start_timestamp,
+			readings.end_timestamp
+		FROM meter_line_readings_unit(meter_ids, graphic_unit_id, start_stamp, end_stamp, min_day_points, min_hour_points) readings
+		INNER JOIN groups_deep_meters gdm ON readings.meter_id = gdm.meter_id
+		INNER JOIN unnest(group_ids) gids(id) on gdm.group_id = gids.id
+		GROUP BY gdm.group_id, readings.start_timestamp, readings.end_timestamp;
+END;
 $$ LANGUAGE 'plpgsql';
 
 
--- TODO need to update meter/group bar for units and meter types.
-CREATE OR REPLACE FUNCTION compressed_barchart_readings_2(
+/*
+The following function returns data for plotting bar graphs. It works on meters.
+It should not be used on raw readings.
+It is the new version of compressed_barchart_readings_2 that works with units. It takes these parameters:
+meter_ids: A array of meter ids to query.
+graphic_unit_id: The unit id of the unit to use for the graph.
+bar_width_days: The number of days to use for the bar width.
+start_timestamp: The start timestamp of the data to return.
+end_timestamp: The end timestamp of the data to return.
+ */
+CREATE OR REPLACE FUNCTION meter_bar_readings_unit (
 	meter_ids INTEGER[],
+	graphic_unit_id INTEGER,
 	bar_width_days INTEGER,
 	start_stamp TIMESTAMP,
 	end_stamp TIMESTAMP
@@ -332,30 +356,53 @@ DECLARE
 	real_tsrange TSRANGE;
 	real_start_stamp TIMESTAMP;
 	real_end_stamp TIMESTAMP;
+	unit_column INTEGER;
 BEGIN
 	bar_width := INTERVAL '1 day' * bar_width_days;
 	real_tsrange := shrink_tsrange_to_real_readings(tsrange(date_trunc_up('day', start_stamp), date_trunc('day', end_stamp)));
 	real_start_stamp := date_trunc_up('day', lower(real_tsrange));
 	real_end_stamp := date_trunc('day', upper(real_tsrange));
+	-- unit_column holds the column index into the cik table. This is the unit that was requested for graphing.
+	SELECT unit_index INTO unit_column FROM units WHERE id = graphic_unit_id;
+
 	RETURN QUERY
 		SELECT dr.meter_id AS meter_id,
-			--  dr.reading_rate is the weighted average reading rate over the day, in kW. To convert it to kW * h,
-			-- we do reading_rate (kw) * time (1 day) * (24 hr / 1 day) to get kW H.
-			SUM(dr.reading_rate * 24) AS reading,
-			bars.interval_start AS start_timestamp,
-			bars.interval_start + bar_width AS end_timestamp
-	FROM daily_readings_unit dr
-	INNER JOIN generate_series(real_start_stamp, real_end_stamp, bar_width) bars(interval_start)
-			ON tsrange(bars.interval_start, bars.interval_start + bar_width, '[]') @> dr.time_interval
-	INNER JOIN unnest(meter_ids) meters(id) ON dr.meter_id = meters.id
-	GROUP BY dr.meter_id, bars.interval_start;
-
+		--  dr.reading_rate is the weighted average reading rate per hour over the day.
+		-- Convert to a quantity by multiplying by the time in hours which is 24 since daily values.
+		-- Then convert the reading based on the conversion found below.
+		SUM(dr.reading_rate * 24) * c.slope + c.intercept AS reading,
+		bars.interval_start AS start_timestamp,
+		bars.interval_start + bar_width AS end_timestamp
+		FROM (((((daily_readings_unit dr
+		INNER JOIN generate_series(real_start_stamp, real_end_stamp, bar_width) bars(interval_start)
+				ON tsrange(bars.interval_start, bars.interval_start + bar_width, '[]') @> dr.time_interval)
+		-- Get all the meter_ids in the passed array of meters.
+		INNER JOIN unnest(meter_ids) meters(id) ON dr.meter_id = meters.id)
+		-- This sequence of joins takes the meter id to its unit and in the final join
+		-- it then uses the unit_index for this unit.
+		INNER JOIN meters m ON m.id = meters.id)
+		INNER JOIN units u ON m.unit_id = u.id)
+		-- This is getting the conversion for the meter (row_index) and unit to graph (column_index).
+		-- The slope and intercept are used above the transform the reading to the desired unit.
+		INNER JOIN cik c on c.row_index = u.unit_index AND c.column_index = unit_column)
+		GROUP BY dr.meter_id, bars.interval_start, c.slope, c.intercept;
 END;
 $$ LANGUAGE 'plpgsql';
 
 
-CREATE OR REPLACE FUNCTION compressed_barchart_group_readings_2(
+/*
+The following function returns data for plotting bar graphs. It works on groups.
+It should not be used on raw readings.
+It is the new version of compressed_barchart_group_readings_2 that works with units. It takes these parameters:
+group_ids: A array of group ids to query.
+graphic_unit_id: The unit id of the unit to use for the graph.
+bar_width_days: The number of days to use for the bar width.
+start_timestamp: The start timestamp of the data to return.
+end_timestamp: The end timestamp of the data to return.
+ */
+CREATE OR REPLACE FUNCTION group_bar_readings_unit (
 	group_ids INTEGER[],
+	graphic_unit_id INTEGER,
 	bar_width_days INTEGER,
 	start_stamp TIMESTAMP,
 	end_stamp TIMESTAMP
@@ -367,21 +414,26 @@ DECLARE
 	real_tsrange TSRANGE;
 	real_start_stamp TIMESTAMP;
 	real_end_stamp TIMESTAMP;
+	meter_ids INTEGER[];
 BEGIN
-	bar_width := INTERVAL '1 day' * bar_width_days;
 	real_tsrange := shrink_tsrange_to_real_readings(tsrange(date_trunc_up('day', start_stamp), date_trunc('day', end_stamp)));
 	real_start_stamp := date_trunc_up('day', lower(real_tsrange));
 	real_end_stamp := date_trunc('day', upper(real_tsrange));
+
+	-- First get all the meter ids that will be included in one or more groups being queried.
+	SELECT array_agg(DISTINCT gdm.meter_id) INTO meter_ids
+	FROM groups_deep_meters gdm
+	INNER JOIN unnest(group_ids) gids(id) ON gdm.group_id = gids.id;
+
 	RETURN QUERY
-	SELECT gdm.group_id AS group_id,
-				 SUM(dr.reading_rate * 24) AS reading, -- 24 hours in a day
-				 bars.interval_start AS start_timestamp,
-				 bars.interval_start + bar_width AS end_timestamp
-	FROM daily_readings_unit dr
-		INNER JOIN generate_series(real_start_stamp, real_end_stamp, bar_width) bars(interval_start)
-			ON tsrange(bars.interval_start, bars.interval_start + bar_width, '[]') @> dr.time_interval
-		INNER JOIN groups_deep_meters gdm ON dr.meter_id = gdm.meter_id
-		INNER JOIN unnest(group_ids) groups(id) ON gdm.group_id = groups.id
-	GROUP BY gdm.group_id, bars.interval_start;
+		SELECT
+			gdm.group_id AS group_id,
+			SUM(readings.reading) AS reading,
+			readings.start_timestamp,
+			readings.end_timestamp
+		FROM meter_bar_readings_unit(meter_ids, graphic_unit_id, bar_width_days, real_start_stamp, real_end_stamp) readings
+		INNER JOIN groups_deep_meters gdm ON readings.meter_id = gdm.meter_id
+		INNER JOIN unnest(group_ids) gids(id) on gdm.group_id = gids.id
+		GROUP BY gdm.group_id, readings.start_timestamp, readings.end_timestamp;
 END;
 $$ LANGUAGE 'plpgsql';

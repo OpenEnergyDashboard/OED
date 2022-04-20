@@ -82,23 +82,28 @@ function mapStateToProps(state: State) {
 			if (byGroupID !== undefined) {
 				const byTimeInterval = byGroupID[timeInterval.toString()];
 				if (byTimeInterval !== undefined) {
-					const readingsData = byTimeInterval[barDuration.toISOString()];
-					if (readingsData !== undefined && !readingsData.isFetching) {
-						const label = state.groups.byGroupID[groupID].name;
-						if (readingsData.readings === undefined) {
-							throw new Error('Unacceptable condition: readingsData.readings is undefined.');
-						}
+					const byBarDuration = byTimeInterval[barDuration.toISOString()];
+					if (byBarDuration !== undefined) {
+						const readingsData = byBarDuration[unitID];
+						if (readingsData !== undefined && !readingsData.isFetching) {
+							const label = state.groups.byGroupID[groupID].name;
+							if (readingsData.readings === undefined) {
+								throw new Error('Unacceptable condition: readingsData.readings is undefined.');
+							}
 
-						const dataPoints: Array<{ x: number, y: number, z: number }> = _.values(readingsData.readings)
-							.map(transformBarReadingToLegacy)
-							.map((v: [number, number, number]) => ({ x: v[0], y: v[1], z: v[2] })
-							);
-						datasets.push({
-							label,
-							id: state.groups.byGroupID[groupID].id,
-							currentChart: chart,
-							exportVals: dataPoints
-						});
+							/* tslint:disable:array-type */
+							const dataPoints: Array<{ x: number, y: number, z: number }> = _.values(readingsData.readings)
+								.map(transformBarReadingToLegacy)
+								.map((v: [number, number, number]) => ({ x: v[0], y: v[1], z: v[2] })
+								);
+							/* tslint:enable:array-type */
+							datasets.push({
+								label,
+								id: state.groups.byGroupID[groupID].id,
+								currentChart: chart,
+								exportVals: dataPoints
+							});
+						}
 					}
 				}
 			}
@@ -108,23 +113,28 @@ function mapStateToProps(state: State) {
 			if (byMeterID !== undefined) {
 				const byTimeInterval = byMeterID[timeInterval.toString()];
 				if (byTimeInterval !== undefined) {
-					const readingsData = byTimeInterval[barDuration.toISOString()];
-					if (readingsData !== undefined && !readingsData.isFetching) {
-						const label = state.meters.byMeterID[meterID].name;
-						if (readingsData.readings === undefined) {
-							throw new Error('Unacceptable condition: readingsData.readings is undefined.');
-						}
+					const byBarDuration = byTimeInterval[barDuration.toISOString()];
+					if (byBarDuration !== undefined) {
+						const readingsData = byBarDuration[unitID];
+						if (readingsData !== undefined && !readingsData.isFetching) {
+							const label = state.meters.byMeterID[meterID].name;
+							if (readingsData.readings === undefined) {
+								throw new Error('Unacceptable condition: readingsData.readings is undefined.');
+							}
 
-						const dataPoints: Array<{ x: number, y: number, z: number }> = _.values(readingsData.readings)
-							.map(transformBarReadingToLegacy)
-							.map((v: [number, number, number]) => ({ x: v[0], y: v[1], z: v[2] })
-							);
-						datasets.push({
-							label,
-							id: state.meters.byMeterID[meterID].id,
-							currentChart: chart,
-							exportVals: dataPoints
-						});
+							/* tslint:disable:array-type */
+							const dataPoints: Array<{ x: number, y: number, z: number }> = _.values(readingsData.readings)
+								.map(transformBarReadingToLegacy)
+								.map((v: [number, number, number]) => ({ x: v[0], y: v[1], z: v[2] })
+								);
+							/* tslint:enable:array-type */
+							datasets.push({
+								label,
+								id: state.meters.byMeterID[meterID].id,
+								currentChart: chart,
+								exportVals: dataPoints
+							});
+						}
 					}
 				}
 			}
