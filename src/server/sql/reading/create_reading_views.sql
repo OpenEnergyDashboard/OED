@@ -2,9 +2,69 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
 
+/*
+There were issues (possibly with syntax) in where a case and an if statement
+could be used. They are very similar where case seems more general.
+Trying to only use case statements led to issues so the following functions
+mix case and if statements.
+*/
+
+/*
+Rounds a timestamp up to the next interval
+ */
+CREATE OR REPLACE FUNCTION date_trunc_up(interval_precision TEXT, ts TIMESTAMP)
+	RETURNS TIMESTAMP LANGUAGE SQL
+IMMUTABLE
+AS $$
+SELECT CASE
+			 WHEN ts = date_trunc(interval_precision, ts) THEN ts
+			 ELSE date_trunc(interval_precision, ts + ('1 ' || interval_precision)::INTERVAL)
+			 END
+$$;
+
+/*
+This takes tsrange_to_shrink which is the requested time range to plot and makes sure it does
+not exceed the start/end times for all the readings. This can be an issue, in particular,
+because infinity is used to indicate to graph all readings.
+ */
+CREATE OR REPLACE FUNCTION shrink_tsrange_to_real_readings(tsrange_to_shrink TSRANGE)
+	RETURNS TSRANGE
+AS $$
+DECLARE
+	readings_max_tsrange TSRANGE;
+BEGIN
+	SELECT tsrange(min(start_timestamp), max(end_timestamp)) INTO readings_max_tsrange
+	FROM readings;
+	RETURN tsrange_to_shrink * readings_max_tsrange;
+END;
+$$ LANGUAGE 'plpgsql';
+
+/*
+	The following views are all generated in src/server/models/Reading.js in createReadingsMaterializedViews.
+	This is necessary because they can't be wrapped in a function (otherwise predicates would not be pushed down).
+*/
+
+/*
+The query shared by all of these views gets slow when one of two things happen:
+	1) It has to scan a large percentage of the readings table
+	2) It has to generate a large number of rows (by compressing to a small interval)
+We pick the best of both worlds by only materializing the large duration tables (day+ and then hour+).
+These produce fewer rows, making them acceptable to store,
+but they benefit from materialization because they require a scan of a large percentage of
+the readings table (to aggregate data over a large time range). The hourly table may not be that much smaller than
+the meter data but it can make it much faster for meters that read at sub-hour intervals so it's worth the
+extra disk space.
+
+The daily and hourly views are used when they give a minimum number of points as specified by the supplied
+parameter. It first tries daily since this is fastest, then hourly and finally uses raw/meter data if necessary.
+The goal is that the number of readings touched is never that large and when doing raw/meter readings the
+time range should be small so the number of readings retrieved is not large. It is assumed that the indices/optimizations
+allow for getting a subset of the raw/meter readings quickly.
+ */
+
 /**
 The next two create a view/table that takes the raw/meter readings and averages them for each day or hour.
-This is used by the two line graph functions below to make them faster since the values
+This is used by the line graph function below to make them faster since the values
 are already averaged. There are two types of readings: quantity and flow/raw. The quantity
 readings must be normalized by their time length. The flow/raw readings are already by time
 so they are just averaged. The one table contains both types of readings but are now equivalent
@@ -122,8 +182,14 @@ hourly_readings_unit
 		ORDER BY gen.interval_start, r.meter_id;
 
 
+-- TODO Check if needed and when to use as not done for hourly.
+CREATE EXTENSION IF NOT EXISTS btree_gist;
+-- We need a gist index to support the @> operation.
+CREATE INDEX if not exists idx_daily_readings_unit ON daily_readings_unit USING GIST(time_interval, meter_id);
+
+
 /*
-The following function determines the correct duration view to query from, and returns compressed data from it.
+The following function determines the correct duration view to query from, and returns averaged or raw reading from it.
 It is designed to return data for plotting line graphs. It works on meters.
 It is the new version of compressed_readings_2 that works with units. It takes these parameters:
 meter_ids: A array of meter ids to query.
@@ -134,7 +200,7 @@ min_data_points: The minimum number of data points to return if using the day vi
 min_hour_points: The minimum number of data points to return if using the hour view.
 Details on how this function works can be found in the devDocs in the resource generalization document.
  */
-CREATE OR REPLACE FUNCTION line_meters_readings_unit(meter_ids INTEGER[], graphic_unit_id INTEGER, start_stamp TIMESTAMP, end_stamp TIMESTAMP, min_day_points INTEGER, min_hour_points INTEGER)
+CREATE OR REPLACE FUNCTION meter_line_readings_unit(meter_ids INTEGER[], graphic_unit_id INTEGER, start_stamp TIMESTAMP, end_stamp TIMESTAMP, min_day_points INTEGER, min_hour_points INTEGER)
 	RETURNS TABLE(meter_id INTEGER, reading_rate FLOAT, start_timestamp TIMESTAMP, end_timestamp TIMESTAMP)
 AS $$
 DECLARE
@@ -142,6 +208,7 @@ DECLARE
 	requested_range TSRANGE;
 	unit_column INTEGER;
 BEGIN
+	-- Make sure the time range is withing the reading values.
 	requested_range := shrink_tsrange_to_real_readings(tsrange(start_stamp, end_stamp, '[]'));
 	requested_interval := upper(requested_range) - lower(requested_range);
 	-- unit_column holds the column index into the cik table. This is the unit that was requested for graphing.
@@ -196,7 +263,8 @@ BEGIN
 				-- the 3600 is needed since EPOCH is in seconds.
 				((r.reading / (extract(EPOCH FROM (r.end_timestamp - r.start_timestamp)) / 3600)) * c.slope + c.intercept) 
 			WHEN (u.unit_represent = 'flow'::unit_represent_type OR u.unit_represent = 'raw'::unit_represent_type) THEN
-				-- If it is flow or raw readings then it is already a rate so just convert it.
+				-- If it is flow or raw readings then it is already a rate so just convert it but also need to normalize
+				-- to per hour.
 				((r.reading * 3600 / u.sec_in_rate) * c.slope + c.intercept)
 			END AS reading_rate,
 			r.start_timestamp,
@@ -213,7 +281,7 @@ $$ LANGUAGE 'plpgsql';
 
 
 /*
-The following function determines the correct duration view to query from, and returns compressed data from it.
+The following function determines the correct duration view to query from, and returns averaged or raw readings from it.
 It is designed to return data for plotting line graphs. It works on groups.
 It is the new version of compressed_group_readings_2 that works with units. It takes these parameters:
 group_ids: A array of group ids to query.
@@ -222,15 +290,16 @@ start_timestamp: The start timestamp of the data to return.
 end_timestamp: The end timestamp of the data to return.
 min_data_points: The minimum number of data points to return if using the day view.
 min_hour_points: The minimum number of data points to return if using the hour view.
-Details on how this function works can be found in the devDocs in the resource generalization document.
+Details on how this function works can be found in the devDocs in the resource generalization document and above
+in the meter function that is equivalent.
  */
-CREATE OR REPLACE FUNCTION line_groups_readings_unit(group_ids INTEGER[], graphic_unit_id INTEGER, start_stamp TIMESTAMP, end_stamp TIMESTAMP, min_day_points INTEGER, min_hour_points INTEGER)
+CREATE OR REPLACE FUNCTION group_line_readings_unit(group_ids INTEGER[], graphic_unit_id INTEGER, start_stamp TIMESTAMP, end_stamp TIMESTAMP, min_day_points INTEGER, min_hour_points INTEGER)
 	RETURNS TABLE(group_id INTEGER, reading_rate FLOAT, start_timestamp TIMESTAMP, end_timestamp TIMESTAMP)
 AS $$
 	DECLARE
 		meter_ids INTEGER[];
 	BEGIN
-		-- First get all the meter ids that will be included in one or more groups being queried
+		-- First get all the meter ids that will be included in one or more groups being queried.
 		SELECT array_agg(gdm.meter_id) INTO meter_ids
 		FROM groups_deep_meters gdm
 		INNER JOIN unnest(group_ids) gids(id) ON gdm.group_id = gids.id;
@@ -238,12 +307,81 @@ AS $$
 		RETURN QUERY
 			SELECT
 				gdm.group_id AS group_id,
-				SUM(compressed.reading_rate) AS reading_rate,
-				compressed.start_timestamp,
-				compressed.end_timestamp
-			FROM line_meters_readings_unit(meter_ids, graphic_unit_id, start_stamp, end_stamp, min_day_points, min_hour_points) compressed
-			INNER JOIN groups_deep_meters gdm ON compressed.meter_id = gdm.meter_id
+				SUM(readings.reading_rate) AS reading_rate,
+				readings.start_timestamp,
+				readings.end_timestamp
+			FROM meter_line_readings_unit(meter_ids, graphic_unit_id, start_stamp, end_stamp, min_day_points, min_hour_points) readings
+			INNER JOIN groups_deep_meters gdm ON readings.meter_id = gdm.meter_id
 			INNER JOIN unnest(group_ids) gids(id) on gdm.group_id = gids.id
-			GROUP BY gdm.group_id, compressed.start_timestamp, compressed.end_timestamp;
+			GROUP BY gdm.group_id, readings.start_timestamp, readings.end_timestamp;
 	END;
+$$ LANGUAGE 'plpgsql';
+
+
+-- TODO need to update meter/group bar for units and meter types.
+CREATE OR REPLACE FUNCTION compressed_barchart_readings_2(
+	meter_ids INTEGER[],
+	bar_width_days INTEGER,
+	start_stamp TIMESTAMP,
+	end_stamp TIMESTAMP
+)
+	RETURNS TABLE(meter_id INTEGER, reading FLOAT, start_timestamp TIMESTAMP, end_timestamp TIMESTAMP)
+AS $$
+DECLARE
+	bar_width INTERVAL;
+	real_tsrange TSRANGE;
+	real_start_stamp TIMESTAMP;
+	real_end_stamp TIMESTAMP;
+BEGIN
+	bar_width := INTERVAL '1 day' * bar_width_days;
+	real_tsrange := shrink_tsrange_to_real_readings(tsrange(date_trunc_up('day', start_stamp), date_trunc('day', end_stamp)));
+	real_start_stamp := date_trunc_up('day', lower(real_tsrange));
+	real_end_stamp := date_trunc('day', upper(real_tsrange));
+	RETURN QUERY
+		SELECT dr.meter_id AS meter_id,
+			--  dr.reading_rate is the weighted average reading rate over the day, in kW. To convert it to kW * h,
+			-- we do reading_rate (kw) * time (1 day) * (24 hr / 1 day) to get kW H.
+			SUM(dr.reading_rate * 24) AS reading,
+			bars.interval_start AS start_timestamp,
+			bars.interval_start + bar_width AS end_timestamp
+	FROM daily_readings_unit dr
+	INNER JOIN generate_series(real_start_stamp, real_end_stamp, bar_width) bars(interval_start)
+			ON tsrange(bars.interval_start, bars.interval_start + bar_width, '[]') @> dr.time_interval
+	INNER JOIN unnest(meter_ids) meters(id) ON dr.meter_id = meters.id
+	GROUP BY dr.meter_id, bars.interval_start;
+
+END;
+$$ LANGUAGE 'plpgsql';
+
+
+CREATE OR REPLACE FUNCTION compressed_barchart_group_readings_2(
+	group_ids INTEGER[],
+	bar_width_days INTEGER,
+	start_stamp TIMESTAMP,
+	end_stamp TIMESTAMP
+)
+	RETURNS TABLE(group_id INTEGER, reading FLOAT, start_timestamp TIMESTAMP, end_timestamp TIMESTAMP)
+AS $$
+DECLARE
+	bar_width INTERVAL;
+	real_tsrange TSRANGE;
+	real_start_stamp TIMESTAMP;
+	real_end_stamp TIMESTAMP;
+BEGIN
+	bar_width := INTERVAL '1 day' * bar_width_days;
+	real_tsrange := shrink_tsrange_to_real_readings(tsrange(date_trunc_up('day', start_stamp), date_trunc('day', end_stamp)));
+	real_start_stamp := date_trunc_up('day', lower(real_tsrange));
+	real_end_stamp := date_trunc('day', upper(real_tsrange));
+	RETURN QUERY
+	SELECT gdm.group_id AS group_id,
+				 SUM(dr.reading_rate * 24) AS reading, -- 24 hours in a day
+				 bars.interval_start AS start_timestamp,
+				 bars.interval_start + bar_width AS end_timestamp
+	FROM daily_readings_unit dr
+		INNER JOIN generate_series(real_start_stamp, real_end_stamp, bar_width) bars(interval_start)
+			ON tsrange(bars.interval_start, bars.interval_start + bar_width, '[]') @> dr.time_interval
+		INNER JOIN groups_deep_meters gdm ON dr.meter_id = gdm.meter_id
+		INNER JOIN unnest(group_ids) groups(id) ON gdm.group_id = groups.id
+	GROUP BY gdm.group_id, bars.interval_start;
+END;
 $$ LANGUAGE 'plpgsql';

@@ -6,7 +6,7 @@
 
 import ApiBackend from './ApiBackend';
 import * as moment from 'moment';
-import { BarReadings, CompareReadings, LineReadings } from '../../types/readings';
+import { CompareReadings } from '../../types/readings';
 import { NamedIDItem } from '../../types/items';
 import { TimeInterval } from '../../../../common/TimeInterval';
 import { GroupData, GroupID } from '../../types/redux/groups';
@@ -26,25 +26,8 @@ export default class GroupsApi {
 		return await this.backend.doGetRequest<{meters: number[], groups: number[], deepMeters: number[]}>(`api/groups/children/${groupID}`);
 	}
 
-
-	public async lineReadings(groupIDs: number[], timeInterval: TimeInterval): Promise<LineReadings> {
-		const stringifiedIDs = groupIDs.join(',');
-		return await this.backend.doGetRequest<LineReadings>(
-			`/api/readings/line/groups/${stringifiedIDs}`,
-			{ timeInterval: timeInterval.toString() }
-		);
-	}
-
-
-	public async barReadings(groupIDs: number[], timeInterval: TimeInterval, barDuration: moment.Duration): Promise<BarReadings> {
-		const stringifiedIDs = groupIDs.join(',');
-		return await this.backend.doGetRequest<BarReadings>(
-			`/api/readings/bar/groups/${stringifiedIDs}`,
-			{ timeInterval: timeInterval.toString(), barDuration: barDuration.toISOString() }
-		);
-	}
-
-	public async compareReadings(groupIDs: number[], timeInterval: TimeInterval, shift: moment.Duration): Promise<CompareReadings> {
+	public async compareReadings(groupIDs: number[], timeInterval: TimeInterval, shift: moment.Duration):
+	Promise<CompareReadings> {
 		const stringifiedIDs = groupIDs.join(',');
 		const currStart: moment.Moment = timeInterval.getStartTimestamp();
 		const currEnd: moment.Moment = timeInterval.getEndTimestamp();

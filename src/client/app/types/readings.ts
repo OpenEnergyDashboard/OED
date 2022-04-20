@@ -4,22 +4,6 @@
 
 import { ChartTypes } from './redux/graph';
 
-/**
- * The type of line readings in actions.
- */
-export interface LineReadings {
-	[id: number]: {
-		[point: number]: [number, number];
-	};
-}
-
-/**
- * The type of bar readings in actions.
- */
-export interface BarReadings {
-	[id: number]: Array<[number, number]>;
-}
-
 export interface CompareReading {
 	curr_use: number;
 	prev_use: number;
@@ -41,4 +25,24 @@ export interface RawReadings {
 	reading: number,
 	startTimestamp: string,
 	endTimestamp: string
+}
+
+export interface LineReading {
+	reading: number;
+	startTimestamp: number;
+	endTimestamp: number;
+}
+
+export interface LineReadings {
+	[id: number]: LineReading[];
+}
+
+export interface BarReading {
+	reading: number;
+	startTimestamp: number;
+	endTimestamp: number;
+}
+
+export interface BarReadings {
+	[id: number]: BarReading[];
 }

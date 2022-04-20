@@ -6,16 +6,14 @@ import { connect } from 'react-redux';
 import * as _ from 'lodash';
 import ExportComponent from '../components/ExportComponent';
 import { ChartTypes } from '../types/redux/graph';
-import { ExportDataSet } from '../types/readings';
+import { BarReading, LineReading, ExportDataSet } from '../types/readings';
 import { State } from '../types/redux/state';
-import { CompressedBarReading, CompressedLineReading } from '../types/compressed-readings';
 
-
-function transformLineReadingToLegacy(reading: CompressedLineReading): [number, number, number] {
+function transformLineReadingToLegacy(reading: LineReading): [number, number, number] {
 	return [reading.startTimestamp, reading.reading, reading.endTimestamp];
 }
 
-function transformBarReadingToLegacy(reading: CompressedBarReading): [number, number, number] {
+function transformBarReadingToLegacy(reading: BarReading): [number, number, number] {
 	return [reading.startTimestamp, reading.reading, reading.endTimestamp];
 }
 

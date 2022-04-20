@@ -8,7 +8,7 @@ import { Dispatch, GetState, Thunk, ActionType } from '../types/redux/actions';
 import { State } from '../types/redux/state';
 import * as t from '../types/redux/barReadings';
 import { readingsApi } from '../utils/api';
-import { CompressedBarReadings } from '../types/compressed-readings';
+import { BarReadings } from '../types/readings';
 
 /**
  * @param {State} state the Redux state
@@ -68,7 +68,7 @@ t.RequestMeterBarReadingsAction {
 }
 
 export function receiveMeterBarReadings(meterIDs: number[], timeInterval: TimeInterval, barDuration: moment.Duration,
-	readings: CompressedBarReadings): t.ReceiveMeterBarReadingsAction {
+	readings: BarReadings): t.ReceiveMeterBarReadingsAction {
 	return { type: ActionType.ReceiveMeterBarReadings, meterIDs, timeInterval, barDuration, readings };
 }
 
@@ -78,7 +78,7 @@ t.RequestGroupBarReadingsAction {
 }
 
 export function receiveGroupBarReadings(groupIDs: number[], timeInterval: TimeInterval, barDuration: moment.Duration,
-	readings: CompressedBarReadings): t.ReceiveGroupBarReadingsAction {
+	readings: BarReadings): t.ReceiveGroupBarReadingsAction {
 	return { type: ActionType.ReceiveGroupBarReadings, groupIDs, timeInterval, barDuration, readings };
 }
 

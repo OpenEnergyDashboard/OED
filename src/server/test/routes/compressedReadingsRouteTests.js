@@ -15,7 +15,7 @@ const moment = require('moment');
 const Meter = require('../../models/Meter');
 const Reading = require('../../models/Reading');
 
-const { compressedLineReadings,
+const { lineReadings,
 	validateLineReadingsParams,
 	validateLineReadingsQueryParams,
 	compressedMeterBarReadings,
@@ -24,6 +24,8 @@ const { compressedLineReadings,
 } = require('../../routes/compressedReadings');
 
 const { TimeInterval } = require('../../../common/TimeInterval');
+
+//  TODO When this is updated, the name of the file should have compressed removed.
 
 function mockResponse() {
 	return {
@@ -59,7 +61,7 @@ mocha.describe('Compressed readings routes', () => {
 					{reading_rate: 1, start_timestamp: timeInterval.startTimestamp, end_timestamp: timeInterval.endTimestamp}
 				]
 			});
-			const response = await compressedLineReadings([1], timeInterval);
+			const response = await lineReadings([1], timeInterval);
 
 			const expectedResponse = {
 				1: [

@@ -2,7 +2,7 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at http://mozilla.org/MPL/2.0/.
  */
-import { CompareReadingAction, CompareReadingsState } from '../types/redux/compareReadings';
+import { CompareReadingsAction, CompareReadingsState } from '../types/redux/compareReadings';
 import { ActionType } from '../types/redux/actions';
 
 const defaultState: CompareReadingsState = {
@@ -13,9 +13,9 @@ const defaultState: CompareReadingsState = {
 	groupsFetching: false
 };
 
-export default function readings(state = defaultState, action: CompareReadingAction) {
+export default function readings(state = defaultState, action: CompareReadingsAction) {
 	switch (action.type) {
-		case ActionType.RequestMeterCompareReading: {
+		case ActionType.RequestMeterCompareReadings: {
 			const newState = {
 				...state,
 				byMeterID: {
@@ -43,7 +43,7 @@ export default function readings(state = defaultState, action: CompareReadingAct
 			}
 			return newState;
 		}
-		case ActionType.RequestGroupCompareReading: {
+		case ActionType.RequestGroupCompareReadings: {
 			const newState = {
 				...state,
 				byGroupID: {
@@ -71,7 +71,7 @@ export default function readings(state = defaultState, action: CompareReadingAct
 			}
 			return newState;
 		}
-		case ActionType.ReceiveMeterCompareReading: {
+		case ActionType.ReceiveMeterCompareReadings: {
 			const newState = {
 				...state,
 				byMeterID: {
@@ -94,7 +94,7 @@ export default function readings(state = defaultState, action: CompareReadingAct
 			}
 			return newState;
 		}
-		case ActionType.ReceiveGroupCompareReading: {
+		case ActionType.ReceiveGroupCompareReadings: {
 			const newState = {
 				...state,
 				byGroupID: {

@@ -7,7 +7,7 @@
 import * as _ from 'lodash';
 import ApiBackend from './ApiBackend';
 import {TimeInterval} from '../../../../common/TimeInterval';
-import {CompressedBarReadings, CompressedLineReading, LineReadings} from '../../types/compressed-readings';
+import {BarReadings, LineReading, LineReadings} from '../../types/readings';
 
 export default class ReadingsApi {
 	private readonly backend: ApiBackend;
@@ -24,7 +24,7 @@ export default class ReadingsApi {
 		);
 		// Ensure everything is sorted
 		_.values(readings)
-			.forEach( (value: CompressedLineReading[]) => value.sort((a, b) => a.startTimestamp - b.startTimestamp));
+			.forEach( (value: LineReading[]) => value.sort((a, b) => a.startTimestamp - b.startTimestamp));
 		return readings;
 	}
 
@@ -36,21 +36,21 @@ export default class ReadingsApi {
 		);
 		// Ensure everything is sorted
 		_.values(readings)
-			.forEach( (value: CompressedLineReading[]) => value.sort((a, b) => a.startTimestamp - b.startTimestamp));
+			.forEach( (value: LineReading[]) => value.sort((a, b) => a.startTimestamp - b.startTimestamp));
 		return readings;
 	}
 
-	public async meterBarReadings(meterIDs: number[], timeInterval: TimeInterval, barWidthDays: number): Promise<CompressedBarReadings> {
+	public async meterBarReadings(meterIDs: number[], timeInterval: TimeInterval, barWidthDays: number): Promise<BarReadings> {
 		const stringifiedIDs = meterIDs.join(',');
-		return await this.backend.doGetRequest<CompressedBarReadings>(
+		return await this.backend.doGetRequest<BarReadings>(
 			`/api/unitReadings/bar/meters/${stringifiedIDs}`,
 			{ timeInterval: timeInterval.toString(), barWidthDays: barWidthDays.toString() }
 		);
 	}
 
-	public async groupBarReadings(groupIDs: number[], timeInterval: TimeInterval, barWidthDays: number): Promise<CompressedBarReadings> {
+	public async groupBarReadings(groupIDs: number[], timeInterval: TimeInterval, barWidthDays: number): Promise<BarReadings> {
 		const stringifiedIDs = groupIDs.join(',');
-		return await this.backend.doGetRequest<CompressedBarReadings>(
+		return await this.backend.doGetRequest<BarReadings>(
 			`/api/unitReadings/bar/groups/${stringifiedIDs}`,
 			{ timeInterval: timeInterval.toString(), barWidthDays: barWidthDays.toString() }
 		);

@@ -5,7 +5,7 @@
 import * as moment from 'moment';
 import { TimeInterval } from '../../../../common/TimeInterval';
 import { ActionType } from './actions';
-import { CompressedBarReading, CompressedBarReadings } from '../compressed-readings';
+import { BarReading, BarReadings } from '../readings';
 
 export interface RequestMeterBarReadingsAction {
 	type: ActionType.RequestMeterBarReadings;
@@ -26,7 +26,7 @@ export interface ReceiveMeterBarReadingsAction {
 	meterIDs: number[];
 	timeInterval: TimeInterval;
 	barDuration: moment.Duration;
-	readings: CompressedBarReadings;
+	readings: BarReadings;
 }
 
 export interface ReceiveGroupBarReadingsAction {
@@ -34,7 +34,7 @@ export interface ReceiveGroupBarReadingsAction {
 	groupIDs: number[];
 	timeInterval: TimeInterval;
 	barDuration: moment.Duration;
-	readings: CompressedBarReadings;
+	readings: BarReadings;
 }
 
 export type BarReadingsAction =
@@ -49,7 +49,7 @@ export interface BarReadingsState {
 			[timeInterval: string]: {
 				[barDuration: string]: {
 					isFetching: boolean;
-					readings?: CompressedBarReading[];
+					readings?: BarReading[];
 				}
 			}
 		}
@@ -59,7 +59,7 @@ export interface BarReadingsState {
 			[timeInterval: string]: {
 				[barDuration: string]: {
 					isFetching: boolean;
-					readings?: CompressedBarReading[];
+					readings?: BarReading[];
 				}
 			}
 		}
