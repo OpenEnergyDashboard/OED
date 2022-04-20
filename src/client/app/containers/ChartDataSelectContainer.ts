@@ -182,7 +182,7 @@ export function getUnitCompatibilityForDropdown(state: State) {
 		let units = new Set<number>();
 		const M = new Set<number>();
 		// Get for all meters
-		state.graph.selectedMeters.forEach( (meter) => {
+		state.graph.selectedMeters.forEach((meter) => {
 			M.add(meter);
 			const newUnits = unitsCompatibleWithMeters(M)
 			if (first) {
@@ -206,7 +206,7 @@ export function getUnitCompatibilityForDropdown(state: State) {
 				units = setIntersect(newUnits, units);
 			}
 		})
-		 // Loop over all units (they must be of type unit or suffix - case 1)
+		// Loop over all units (they must be of type unit or suffix - case 1)
 		getVisibleUnitOrSuffixState(state).forEach(o => {
 			// Control displayable ones (case 2)
 			if (units.has(o.id)) {
