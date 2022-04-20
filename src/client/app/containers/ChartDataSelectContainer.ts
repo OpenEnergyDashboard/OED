@@ -182,7 +182,7 @@ export function getUnitCompatibilityForDropdown(state: State) {
 		let units = new Set<number>();
 		const M = new Set<number>();
 		// Get for all meters
-		state.graph.selectedMeters.forEach((meter) => {
+		state.graph.selectedMeters.forEach(meter => {
 			M.add(meter);
 			const newUnits = unitsCompatibleWithMeters(M)
 			if (first) {
@@ -224,7 +224,7 @@ export function getUnitCompatibilityForDropdown(state: State) {
 }
 
 /**
- * Filters all units that are of type meter or displayable type none from the redux state. 
+ * Filters all units that are of type meter or displayable type none from the redux state.
  * @param {State} state - current redux state
  * @return {UnitData[]} an array of UnitData
  */
