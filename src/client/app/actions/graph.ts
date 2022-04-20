@@ -123,9 +123,9 @@ export function changeSelectedUnit(unitID: number): Thunk {
 		dispatch(updateSelectedUnit(unitID));
 		dispatch((dispatch2: Dispatch) => {
 			dispatch(fetchNeededLineReadings(getState().graph.timeInterval, unitID));
-			dispatch2(fetchNeededBarReadings(getState().graph.timeInterval));
-			dispatch2(fetchNeededCompareReadings(getState().graph.comparePeriod));
-			dispatch2(fetchNeededMapReadings(getState().graph.timeInterval));
+			dispatch2(fetchNeededBarReadings(getState().graph.timeInterval, unitID));
+			dispatch2(fetchNeededCompareReadings(getState().graph.comparePeriod, unitID));
+			dispatch2(fetchNeededMapReadings(getState().graph.timeInterval, unitID));
 		});
 		return Promise.resolve();
 	}
