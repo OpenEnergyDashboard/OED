@@ -347,56 +347,57 @@ class Reading {
 	}
 
 	/**
-	 * Gets compressed readings for the given time range
-	 * @param meterIDs
-	 * @param fromTimestamp
-	 * @param toTimestamp
+	 * Gets line readings for meters for the given time range
+	 * @param meterIDs The meter IDs to get readings for
+	 * @param graphicUnitId The unit id that the reading should be returned in, i.e., the graphic unit
+	 * @param fromTimestamp An optional start point for the time range of readings returned
+	 * @param toTimestamp An optional end point for the time range of readings returned
 	 * @param conn the connection to use.
 	 * @return {Promise<object<int, array<{reading_rate: number, start_timestamp: }>>>}
 	 */
-	static async getNewCompressedReadings(meterIDs, fromTimestamp = null, toTimestamp = null, conn) {
+	static async getLineMeterReadings(meterIDs, graphicUnitId, fromTimestamp = null, toTimestamp = null, conn) {
 		const [minHourPoints, minDayPoints] = determineMinPoints();
 		/**
 		 * @type {array<{meter_id: int, reading_rate: Number, start_timestamp: Moment, end_timestamp: Moment}>}
 		 */
-		const allCompressedReadings = await conn.func('compressed_readings_2',
-			[meterIDs, fromTimestamp || '-infinity', toTimestamp || 'infinity', minDayPoints, minHourPoints]
+		const allLineMeterReadings = await conn.func('line_meters_readings_unit',
+			[meterIDs, graphicUnitId, fromTimestamp || '-infinity', toTimestamp || 'infinity', minDayPoints, minHourPoints]
 			);
 
-		const compressedReadingsByMeterID = mapToObject(meterIDs, () => []);
-		for (const row of allCompressedReadings) {
-			compressedReadingsByMeterID[row.meter_id].push(
+		const readingsByMeterID = mapToObject(meterIDs, () => []);
+		for (const row of allLineMeterReadings) {
+			readingsByMeterID[row.meter_id].push(
 				{ reading_rate: row.reading_rate, start_timestamp: row.start_timestamp, end_timestamp: row.end_timestamp }
 			);
 		}
-		return compressedReadingsByMeterID;
+		return readingsByMeterID;
 	}
 
-
 	/**
-	 * Gets compressed readings for the given time range
-	 * @param groupIDs
-	 * @param fromTimestamp
-	 * @param toTimestamp
+	 * Gets line readings for groups for the given time range
+	 * @param groupIDs The group IDs to get readings for
+	 * @param graphicUnitId The unit id that the reading should be returned in, i.e., the graphic unit
+	 * @param fromTimestamp An optional start point for the time range of readings returned
+	 * @param toTimestamp An optional end point for the time range of readings returned
 	 * @param conn the connection to use.
-	 * @return {Promise<object<int, array<{reading_rate: number, start_timestamp: Moment, end_timestamp: Moment}>>>}
+	 * @return {Promise<object<int, array<{reading_rate: number, start_timestamp: }>>>}
 	 */
-	static async getNewCompressedGroupReadings(groupIDs, fromTimestamp, toTimestamp, conn) {
+	static async getLineGroupReadings(groupIDs, graphicUnitId, fromTimestamp, toTimestamp, conn) {
 		const [minHourPoints, minDayPoints] = determineMinPoints();
 		/**
 		 * @type {array<{group_id: int, reading_rate: Number, start_timestamp: Moment, end_timestamp: Moment}>}
 		 */
-		const allCompressedGroupReadings = await conn.func('compressed_group_readings_2',
-			[groupIDs, fromTimestamp, toTimestamp, minDayPoints, minHourPoints]
+		const allLineGroupReadings = await conn.func('line_groups_readings_unit',
+			[groupIDs, graphicUnitId, fromTimestamp, toTimestamp, minDayPoints, minHourPoints]
 			);
 
-		const compressedReadingsByGroupID = mapToObject(groupIDs, () => []);
-		for (const row of allCompressedGroupReadings) {
-			compressedReadingsByGroupID[row.group_id].push(
+		const readingsByGroupID = mapToObject(groupIDs, () => []);
+		for (const row of allLineGroupReadings) {
+			readingsByGroupID[row.group_id].push(
 				{ reading_rate: row.reading_rate, start_timestamp: row.start_timestamp, end_timestamp: row.end_timestamp }
 			);
 		}
-		return compressedReadingsByGroupID;
+		return readingsByGroupID;
 	}
 
 	/**

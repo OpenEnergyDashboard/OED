@@ -14,13 +14,14 @@ import { DataType } from '../types/Datasources';
 
 function mapStateToProps(state: State) {
 	const timeInterval = state.graph.timeInterval;
+	const unitID = state.graph.selectedUnit;
 	const datasets: any[] = [];
 
 	// Add all valid data from existing meters to the line plot
 	for (const meterID of state.graph.selectedMeters) {
 		const byMeterID = state.readings.line.byMeterID[meterID];
 		if (byMeterID !== undefined) {
-			const readingsData = byMeterID[timeInterval.toString()];
+			const readingsData = byMeterID[timeInterval.toString()][unitID];
 			if (readingsData !== undefined && !readingsData.isFetching) {
 				const label = state.meters.byMeterID[meterID].name;
 				const colorID = meterID;
@@ -78,7 +79,7 @@ function mapStateToProps(state: State) {
 	for (const groupID of state.graph.selectedGroups) {
 		const byGroupID = state.readings.line.byGroupID[groupID];
 		if (byGroupID !== undefined) {
-			const readingsData = byGroupID[timeInterval.toString()];
+			const readingsData = byGroupID[timeInterval.toString()][unitID];
 			if (readingsData !== undefined && !readingsData.isFetching) {
 				const label = state.groups.byGroupID[groupID].name;
 				const colorID = groupID;
