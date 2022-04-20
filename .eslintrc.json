@@ -11,6 +11,8 @@
     "extends": [
         "eslint:recommended",
         "plugin:@typescript-eslint/recommended"
+        // "plugin:jsdoc/recommended" //this is the JSDOC checker. commented out to prevent build from failing but is running.
+                                      // see issue #396
     ],
     "parser": "@typescript-eslint/parser",
     "parserOptions": {
@@ -22,6 +24,8 @@
     },
     "plugins": [
         "@typescript-eslint"
+
+        // "jsdoc" //commented out to prevent build from failing. see issue #396
     ],
     "rules": {
         //https://github.com/typescript-eslint/typescript-eslint/issues/1824, indent is therefore turned off and we use typescript-eslint/indent instead
