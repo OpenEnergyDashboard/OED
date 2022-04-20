@@ -46,6 +46,7 @@ export enum ActionType {
 
 	UpdateSelectedMeters = 'UPDATE_SELECTED_METERS',
 	UpdateSelectedGroups = 'UPDATE_SELECTED_GROUPS',
+	UpdateSelectedUnit = 'UPDATE_SELECTED_UNIT',
 	UpdateBarDuration = 'UPDATE_BAR_DURATION',
 	ChangeChartToRender = 'CHANGE_CHART_TO_RENDER',
 	ChangeBarStacking = 'CHANGE_BAR_STACKING',
