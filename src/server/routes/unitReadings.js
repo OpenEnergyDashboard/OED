@@ -197,7 +197,6 @@ function createRouter() {
 		if (!(validateMeterLineReadingsParams(req.params) && validateLineReadingsQueryParams(req.query))) {
 			res.sendStatus(400);
 		} else {
-			const conn = getConnection();
 			const meterIDs = req.params.meter_ids.split(',').map(idStr => Number(idStr));
 			const graphicUnitID = req.query.graphicUnitId;
 			const timeInterval = TimeInterval.fromString(req.query.timeInterval);
@@ -210,7 +209,6 @@ function createRouter() {
 		if (!(validateGroupLineReadingsParams(req.params) && validateLineReadingsQueryParams(req.query))) {
 			res.sendStatus(400);
 		} else {
-			const conn = getConnection();
 			const groupIDs = req.params.group_ids.split(',').map(idStr => Number(idStr));
 			const graphicUnitID = req.query.graphicUnitId;
 			const timeInterval = TimeInterval.fromString(req.query.timeInterval);
@@ -223,7 +221,6 @@ function createRouter() {
 		if (!(validateMeterBarReadingsParams(req.params) && validateBarReadingsQueryParams(req.query))) {
 			res.sendStatus(400);
 		} else {
-			const conn = getConnection();
 			const meterIDs = req.params.meter_ids.split(',').map(idStr => Number(idStr));
 			const timeInterval = TimeInterval.fromString(req.query.timeInterval);
 			const barWidthDays = Number(req.query.barWidthDays);
@@ -237,7 +234,6 @@ function createRouter() {
 		if (!(validateGroupBarReadingsParams(req.params) && validateBarReadingsQueryParams(req.query))) {
 			res.sendStatus(400);
 		} else {
-			const conn = getConnection();
 			const groupIDs = req.params.group_ids.split(',').map(idStr => Number(idStr));
 			const timeInterval = TimeInterval.fromString(req.query.timeInterval);
 			const barWidthDays = Number(req.query.barWidthDays);

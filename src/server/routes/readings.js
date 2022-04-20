@@ -14,24 +14,6 @@ const { getConnection } = require('../db');
 
 const router = express.Router();
 
-/**
- * Takes in an array of row objects and reformats the timestamp from ISO 8601 format to the number
- * of milliseconds since January 1st, 1970 and groups each reading with each timestamp.
- * @param {Array<Reading>} rows
- */
-function formatLineReadings(rows) {
-	return rows.map(row => [row.start_timestamp.valueOf(), row.reading_rate]);
-}
-
-/**
- * Takes in an array of row objects and reformats the timestamp from ISO 8601 format to the number
- * of milliseconds since January 1st, 1970 and groups each reading with each timestamp.
- * @param {Array<Reading>} rows
- */
-function formatBarReadings(rows) {
-	return rows.map(row => [row.start_timestamp.valueOf(), row.reading_sum]);
-}
-
 router.get('/line/count/meters/:meter_ids', async (req, res) => {
 	const validParams = {
 		type: 'object',
