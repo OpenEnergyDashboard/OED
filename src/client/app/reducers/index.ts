@@ -14,6 +14,7 @@ import notifications from './notifications';
 import admin from './admin';
 import version from './version';
 import currentUser from './currentUser';
+import conversions from './conversions';
 import unsavedWarning from './unsavedWarning';
 
 export default combineReducers({
@@ -23,6 +24,7 @@ export default combineReducers({
 		bar: barReadings,
 		compare: compareReadings
 	}),
+	conversions,
 	graph,
 	maps,
 	groups,

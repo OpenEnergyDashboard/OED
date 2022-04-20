@@ -14,8 +14,10 @@ import { VersionState } from './version';
 import {MapState} from './map';
 import { CurrentUserState } from './currentUser';
 import { UnsavedWarningState } from './unsavedWarning';
+import { ConversionsState } from './conversions';
 
 export interface State {
+	conversions: ConversionsState;
 	meters: MetersState;
 	readings: {
 		line: LineReadingsState;

@@ -67,11 +67,18 @@ export enum UserRole {
 /**
  * A conversion object to be displayed for admin.
  */
- export interface Conversion {
-	source_id: number;
-	destination_id: number;
-	bidirectional: boolean;
+export interface Conversion {
+	sourceId: number;
+	destinationId: number;
+	bidirectional: ConversionBidirectional;
 	slope: number;
 	intercept: number;
 	note: string;
 }
+/**
+ * enum values for the biderectional choice
+ */
+export enum ConversionBidirectional {
+	TRUE = 'true',
+	FALSE = 'false',
+};

@@ -111,7 +111,14 @@ export enum ActionType {
 	ConfirmEditedMap = 'CONFIRM_EDITED_MAP',
 	SetCalibration = 'SET_CALIBRATION',
 	ResetCalibration = 'RESET_CALIBRATION',
-	IncrementCounter = 'INCREMENT_COUNTER'
+	IncrementCounter = 'INCREMENT_COUNTER',
+
+	RequestConversionDetails = 'REQUEST_CONVERSION_DETAILS',
+	ReceiveConversionDetails = 'RECEIVE_CONVERSION_DETAILS',
+	EditConversionDetails = 'EDIT_CONVERSION_DETAILS',
+	SubmitEditedConversion = 'SUBMIT_EDITED_CONVERSION',
+	ConfirmEditedConversion = 'CONFIRM_EDITED_CONVERSION',
+	DeleteConversion = 'DELETE_CONVERSION'
 }
 
 /**

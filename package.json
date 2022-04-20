@@ -110,6 +110,7 @@
     "query-string": "~7.0.1",
     "rc-slider": "~8.6.6",
     "react": "~16.14.0",
+    "react-bootstrap": "~2.2.1",
     "react-dom": "~16.14.0",
     "react-dropzone": "~11.4.0",
     "react-intl": "~5.21.0",
