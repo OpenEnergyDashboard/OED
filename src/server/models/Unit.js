@@ -40,8 +40,8 @@ class Unit {
 	 * @returns The new unit object.
 	 */
 	static mapRow(row) {
-		return new Unit(row.id, row.name, row.identifier, row.unit_represent, row.sec_in_rate, 
-						row.type_of_unit, row.unit_index, row.suffix, row.displayable, row.preferred_display, row.note);
+		return new Unit(row.id, row.name, row.identifier, row.unit_represent, row.sec_in_rate,
+			row.type_of_unit, row.unit_index, row.suffix, row.displayable, row.preferred_display, row.note);
 	}
 
 	/**
@@ -101,7 +101,7 @@ class Unit {
 		for (let i = 0; i < standardUnits.length; ++i) {
 			const unitData = standardUnits[i];
 			if (await Unit.getByName(unitData[0], conn) === null) {
-				await new Unit(undefined, unitData[0], unitData[1], Unit.unitRepresentType.UNUSED, undefined, 
+				await new Unit(undefined, unitData[0], unitData[1], Unit.unitRepresentType.UNUSED, undefined,
 					unitData[2], null, unitData[3], unitData[4], unitData[5], 'standard unit').insert(conn);
 			}
 		}
@@ -158,7 +158,17 @@ class Unit {
 		const rows = await conn.any(sqlFile('unit/get_type_unit.sql'));
 		return rows.map(Unit.mapRow);
 	}
-	
+
+	/**
+	 * Returns a promise to get all suffix-type units.
+	 * @param {*} conn The connection to use.
+	 * @returns {Promise.<Array.<Unit>>}
+	 */
+	static async getTypeSuffix(conn) {
+		const rows = await conn.any(sqlFile('unit/get_type_suffix.sql'));
+		return rows.map(Unit.mapRow);
+	}
+
 	/**
 	 * Returns all units that have a suffix.
 	 * @param {*} conn The connection to use.
