@@ -25,6 +25,7 @@ FILES=$(echo "$FILES" | grep -v "src\/server\/test\/db\/data\/.*")
 # Filter out outside scripts
 FILES=$(echo "$FILES" | grep -v "src\/scripts\/oed\.service")
 FILES=$(echo "$FILES" | grep -v "src\/scripts\/updateMamacMetersOEDCron\.bash")
+FILES=$(echo "$FILES" | grep -v "src\/scripts\/updateEgaugeMetersOEDCron\.bash")
 FILES=$(echo "$FILES" | grep -v "src\/scripts\/sendLogEmailCron\.bash")
 FILES=$(echo "$FILES" | grep -v "src\/scripts\/refreshReadingViewsCron\.bash")
 FILES=$(echo "$FILES" | grep -v "src\/scripts\/refreshHourlyReadingViewsCron\.bash")

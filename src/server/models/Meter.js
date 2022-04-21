@@ -235,6 +235,7 @@ class Meter {
 
 // Enum of meter types
 Meter.type = {
+	EGAUGE: 'egauge',
 	MAMAC: 'mamac',
 	METASYS: 'metasys',
 	OBVIUS: 'obvius',
