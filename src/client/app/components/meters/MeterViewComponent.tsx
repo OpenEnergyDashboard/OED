@@ -12,6 +12,8 @@ import { fetchMetersDetails, submitEditedMeters, confirmEditedMeters } from '../
 import store from '../../index';
 import ModalCard from './MeterModalEditComponent';
 import '../../styles/meter-card-page.css'
+import { SelectionType } from 'containers/groups/DatasourceBoxContainer';
+import { time } from 'core-js/library/fn/log';
 
 interface MeterViewProps {
 	// The ID of the meter to be displayed
@@ -62,11 +64,11 @@ class MeterViewComponent extends React.Component<MeterViewPropsWithIntl, MeterVi
 	}
 
 	handleShow = () => {
-		this.setState({show:true});
+		this.setState({ show: true });
 	}
 
 	handleClose = () => {
-		this.setState({show: false});
+		this.setState({ show: false });
 	}
 
 	public render() {
@@ -102,6 +104,7 @@ class MeterViewComponent extends React.Component<MeterViewPropsWithIntl, MeterVi
 				{this.isAdmin()}
 			</div>
 
+
 			// <tr>
 			// 	{loggedInAsAdmin && <td> {this.props.meter.id} {this.formatStatus()} </td>}
 			// 	{loggedInAsAdmin && <td> {this.props.meter.name} </td>}
@@ -114,29 +117,30 @@ class MeterViewComponent extends React.Component<MeterViewPropsWithIntl, MeterVi
 			// 	{loggedInAsAdmin && <td> <TimeZoneSelect current={this.props.meter.timeZone || ''} handleClick={this.changeTimeZone} /> </td>}
 			// 	{loggedInAsAdmin && <td> <ModalCard/></td>}
 			// </tr>
-		
+
 		);
 	}
-	private isAdmin(){
+
+	private isAdmin() {
 		const loggedInAsAdmin = this.props.loggedInAsAdmin;
-		if(loggedInAsAdmin){
-			return(
-			<div className="edit-btn">
-				<Button variant="Secondary" onClick={this.handleShow}>
-        			Edit Meter
-     			 </Button>
+		if (loggedInAsAdmin) {
+			return (
+				<div className="edit-btn">
+					<Button variant="Secondary" onClick={this.handleShow}>
+						Edit Meter
+					</Button>
 					<ModalCard
 						show={this.state.show}
-						onhide={this.handleClose} 
-						id={this.props.meter.id} 
-						identifier={this.props.meter.identifier} 
-						units={this.props.meter.meterType} 
+						onhide={this.handleClose}
+						id={this.props.meter.id}
+						identifier={this.props.meter.identifier}
+						units={this.props.meter.meterType}
 						name={this.props.meter.name}
-						meterType={this.props.meter.meterType} 
-						gps={this.props.meter.gps} 
-						Area={this.props.meter.area} 
-						displayable={this.props.meter.displayable} 
-						enabled={this.props.meter.enabled} 
+						meterType={this.props.meter.meterType}
+						gps={this.props.meter.gps}
+						Area={this.props.meter.area}
+						displayable={this.props.meter.displayable}
+						enabled={this.props.meter.enabled}
 						graphicUnit={this.props.meter.graphicUnit}
 						meterAddress={this.props.meter.ipAddress}
 						notes={this.props.meter.note}
@@ -151,7 +155,8 @@ class MeterViewComponent extends React.Component<MeterViewPropsWithIntl, MeterVi
 						timesort={this.props.meter.timesort}
 						startTimestamp={this.props.meter.startTimestamp}
 						endTimestamp={this.props.meter.endTimestamp}
-						onSaveChanges={this.onSaveChanges}/>
+						onSaveChanges={this.onSaveChanges} 
+						handleIdentifierChange={this.handleIdentifierChange}/>
 				</div>
 			)
 		}
@@ -159,44 +164,43 @@ class MeterViewComponent extends React.Component<MeterViewPropsWithIntl, MeterVi
 	}
 
 	private enabledCheck(enabled: boolean) {
-		if(enabled){
-			return(
+		if (enabled) {
+			return (
 				<div className="on-off-switch">
 					<span className="on-off-switch-span-on">Enabled</span>
 				</div>
 			)
 		}
-		return(
+		return (
 			<div className="on-off-switch">
 				<span className="on-off-switch-span-off">Enabled</span>
 			</div>
 		)
 	}
 	private displayableCheck(display: boolean) {
-		if(display){
-			return(
+		if (display) {
+			return (
 				<div className="on-off-switch">
 					<span className="on-off-switch-span-on">Displayble</span>
 				</div>
 			)
 		}
-		return(
+		return (
 			<div className="on-off-switch">
 				<span className="on-off-switch-span-off">Displayble</span>
 			</div>
 		)
 	}
-	//on save handler in progress ( Meter Detail Component)
-	 onSaveChanges = (identifier: string) => {
-		this.setState({identifierInput: identifier});
-		console.log("1." + this.state.identifierInput);
-		this.setState({identifierFocus: !this.state.identifierFocus});
-		console.log(this.state.identifierFocus);
+	// on save handler in progress ( Meter Detail Component)
+	// if double clicked then the save changes take affect otherwise a single click will cause
+	// all conditions to be false. Is there a second check it goes through?
+	public onSaveChanges = (identifier: string, condition: boolean) => {
+		console.log(this.state.identifierInput);
 		this.toggleIdentifierInput();
 		this.updateUnsavedChanges();
-		console.log(this.props.meter.identifier);
 		this.props.onSubmitClicked();
 	}
+
 
 	private removeUnsavedChangesFunction(callback: () => void) {
 		// This function is called to reset all the inputs to the initial state
@@ -224,11 +228,11 @@ class MeterViewComponent extends React.Component<MeterViewPropsWithIntl, MeterVi
 
 	private formatStatus(): string {
 		if (this.props.isSubmitting) {
-			return '(' + this.props.intl.formatMessage({id: 'submitting'}) + ')';
+			return '(' + this.props.intl.formatMessage({ id: 'submitting' }) + ')';
 		}
 
 		if (this.props.isEdited) {
-			return this.props.intl.formatMessage({id: 'edited'});
+			return this.props.intl.formatMessage({ id: 'edited' });
 		}
 
 		return '';
@@ -370,6 +374,10 @@ class MeterViewComponent extends React.Component<MeterViewPropsWithIntl, MeterVi
 		this.setState({ gpsInput: event.target.value });
 	}
 
+	private changeSaveToTrue (){
+		this.setState({ identifierFocus: true });
+	}
+
 	private formatGPSInput() {
 		let formattedGPS;
 		let buttonMessageId;
@@ -422,14 +430,15 @@ class MeterViewComponent extends React.Component<MeterViewPropsWithIntl, MeterVi
 		this.setState({ identifierFocus: !this.state.identifierFocus });
 	}
 
-	private handleIdentifierChange(event: React.ChangeEvent<HTMLTextAreaElement>) {
+	private handleIdentifierChange(event: React.ChangeEvent<HTMLInputElement>) {
 		this.setState({ identifierInput: event.target.value });
+		console.log(this.state.identifierInput);
 	}
 
-	private formatIdentifierInput(){
+	private formatIdentifierInput() {
 		let formattedIdentifier;
 		let buttonMessageId;
-		if(this.state.identifierFocus){
+		if (this.state.identifierFocus) {
 			formattedIdentifier = <div>{this.state.identifierInput}</div>;
 			buttonMessageId = 'update';
 		} else {
