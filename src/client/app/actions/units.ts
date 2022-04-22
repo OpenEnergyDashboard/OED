@@ -69,7 +69,11 @@ export function submitEditedUnits(): Thunk {
 
 export function submitEditedUnit(unitId: number): Thunk {
 	return async (dispatch: Dispatch, getState: GetState) => {
-		const submittingUnit = getState().units.editedUnits[unitId];
+		//const submittingUnit = getState().units.editedUnits[unitId];
+		let submittingUnit = getState().units.editedUnits[unitId];
+		console.log("submit edited unit submitting unit ", submittingUnit);
+		//submittingUnit.identifier = 'fixme';
+		console.log("700 ", submittingUnit.identifier);
 		dispatch(submitUnitEdits(unitId));
 		try {
 			await unitsApi.edit(submittingUnit);

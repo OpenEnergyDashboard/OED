@@ -7,6 +7,10 @@ import { updateUnsavedChanges } from '../../actions/unsavedWarning';
 import store from '../../index';
 import ModalCard from './UnitModalEditComponent'
 import '../../styles/unit-card-page.css'
+import { unitsApi } from '../../utils/api';
+import { showSuccessNotification, showErrorNotification } from '../../utils/notifications';
+import translate from '../../utils/translate';
+import { browserHistory } from '../../utils/history';
 
 interface UnitViewProps {
     id: number;
@@ -14,6 +18,9 @@ interface UnitViewProps {
     isEdited: boolean;
     isSubmitting: boolean;
     loggedInAsAdmin: boolean;
+    onSubmitClicked: () => void;
+    show: boolean;
+    onHide: boolean;
 
     editUnitDetails(unit: UnitData): EditUnitDetailsAction;
     log(level: string, message: string): any;
@@ -28,6 +35,8 @@ interface UnitViewState {
     unitRepresentInput: string;
     noteFocus: boolean;
     noteInput?: string;
+    show: boolean;
+    onHide: boolean;
     // editUnitDetails(unit: UnitData): EditUnitDetailsAction;
 }
 
@@ -45,36 +54,60 @@ class UnitViewComponent extends React.Component<UnitViewPropsWithIntl, UnitViewS
             unitRepresentInput: this.props.unit.unitRepresent,
             noteFocus: false,
             noteInput: this.props.unit.note,
+            show: false,
+            onHide: true,
         };
+        //this.submitEditUnit = this.submitEditUnit.bind(this);
         this.toggleSecInRateInput = this.toggleSecInRateInput.bind(this);
         this.handleSecInRateChange = this.handleSecInRateChange.bind(this);
         this.toggleIdentifierInput = this.toggleIdentifierInput.bind(this);
-        this.handleIdentifierChange = this.handleIdentifierChange.bind(this);
         this.handleUnitRepresentChange = this.handleUnitRepresentChange.bind(this);
         this.toggleUnitRepresentInput = this.toggleUnitRepresentInput.bind(this);
         this.toggleNoteInput = this.toggleNoteInput.bind(this);
         this.handleNoteChange = this.handleNoteChange.bind(this);
         this.checkPreferredDisplay = this.checkPreferredDisplay.bind(this);
     }
+    handleShow = () => {
+        this.setState({ show: true });
+    }
+
+    handleClose = () => {
+        this.setState({ show: false });
+    }
+    onSubmitClicked() {
+        console.log("on submit clicked 100");
+		// this.props.submitEditedUnits();
+        //this.submitUnsavedChangesFunction();
+		// Notify that the unsaved changes have been submitted
+		//this.removeUnsavedChanges();
+	}
     public render() {
         const loggedInAsAdmin = this.props.loggedInAsAdmin;
         return (
             <div className="card">
                 <div className="identifier-container">
-                    {this.props.unit.name} 
+                    {this.props.unit.name}
                 </div>
                 <div className="unit-container">
                     <b>Unit Identifer:</b> {this.formatIdentifierUnitInput()}
-				</div>
-                <div className="unit-container">
+                </div>
+                {/* <div className="unit-container">
                     <b>Unit Represent:</b> {this.formatUnitRepresentInput()}
-				</div>
+                </div>
                 <div className="unit-container">
                     <b>Sec In Rate:</b> {this.formatSecInRateInput()}
-				</div>
-                {loggedInAsAdmin && <div className="edit-btn">
-                    <ModalCard /> 
-                </div>}
+                </div> */}
+
+                {this.isAdmin()}
+                {/* {loggedInAsAdmin && <div className="edit-btn">
+                    <ModalCard name={this.props.unit.name} identifier={this.props.unit.identifier}
+                        unitRepresent={this.props.unit.unitRepresent} secInRate={this.props.unit.secInRate}
+                        typeOfUnit={this.props.unit.typeOfUnit} unitIndex={this.props.unit.unitIndex}
+                        suffix={this.props.unit.suffix} displayable={this.props.unit.displayable}
+                        preferredDisplay={this.props.unit.preferredDisplay} note={this.props.unit.note}
+                        handleUnitIdentifierChange={this.handleUnitIdentifierChange} 
+                        submitEditUnit={this.submitEditUnit}/>
+                </div>} */}
             </div>
             // <tr>
             //     {loggedInAsAdmin && <td> {this.props.unit.id} {this.formatStatus()} </td>}
@@ -91,6 +124,46 @@ class UnitViewComponent extends React.Component<UnitViewPropsWithIntl, UnitViewS
             //     {loggedInAsAdmin && <td> {this.props.unit.note}</td>}
             // </tr>
         );
+    }
+
+    private isAdmin() {
+        const loggedInAsAdmin = this.props.loggedInAsAdmin;
+        if (loggedInAsAdmin) {
+            return (
+                <div className="edit-btn">
+                    <Button variant="Secondary" onClick={this.handleShow}>
+                        Edit Unit
+                    </Button>
+                    <ModalCard
+                        show={this.state.show}
+                        onhide={this.handleClose}
+                        identifier={this.props.unit.identifier}
+                        name={this.props.unit.name}
+                        unitRepresent={this.props.unit.unitRepresent}
+                        secInRate={this.props.unit.secInRate}
+                        typeOfUnit={this.props.unit.typeOfUnit}
+                        unitIndex={this.props.unit.unitIndex}
+                        suffix={this.props.unit.suffix}
+                        displayable={this.props.unit.displayable}
+                        preferredDisplay={this.props.unit.preferredDisplay}
+                        note={this.props.unit.note}
+                        onSaveChanges={this.onSaveChanges} />
+                </div>
+            )
+        }
+        return null;
+    }
+    onSaveChanges = (newIdentifer: string) => {
+        console.log(newIdentifer);
+        this.setState({ identifierInput: newIdentifer });
+        console.log("1. " + this.state.identifierInput);
+        console.log(this.state.identifierFocus);
+        this.setState({ identifierFocus: !this.state.identifierFocus });
+        console.log(this.state.identifierFocus);
+        this.toggleIdentifierInput();
+        //this.updateUnsavedChanges();
+        console.log("100. " + this.props.unit.identifier);
+        this.props.onSubmitClicked();
     }
 
     private formatIdentifierUnitInput() {
@@ -141,11 +214,11 @@ class UnitViewComponent extends React.Component<UnitViewPropsWithIntl, UnitViewS
         //let buttonMessageId;
         if (this.state.unitRepresentFocus) {
             formattedUnitRepresent = <textarea
-            id={'unitRepresent'}
-            autoFocus
-            value={this.state.unitRepresentInput}
-            onChange={event => this.handleIdentifierChange(event)}
-        />
+                id={'unitRepresent'}
+                autoFocus
+                value={this.state.unitRepresentInput}
+                onChange={event => this.handleIdentifierChange(event)}
+            />
             // formattedUnitRepresent = <select
             //     id={'unitRepresent'}
             //     value={this.state.unitRepresentInput}
@@ -293,21 +366,21 @@ class UnitViewComponent extends React.Component<UnitViewPropsWithIntl, UnitViewS
         }
     }
 
-	private formatDisplayable() {
-		let messageId;
-		let displaySwitch;
+    private formatDisplayable() {
+        let messageId;
+        let displaySwitch;
 
-		if (this.props.unit.displayable) {
-			messageId = 'unit.is.displayable';
-			displaySwitch = <span className="on-off-switch-span-on"><FormattedMessage id={messageId} /></span>
-		} else {
-			messageId = 'unit.is.not.displayable';
-			displaySwitch = <span className="on-off-switch-span-off"><FormattedMessage id={messageId} /></span>
-		}
-		return (
-			displaySwitch
-		);
-	}
+        if (this.props.unit.displayable) {
+            messageId = 'unit.is.displayable';
+            displaySwitch = <span className="on-off-switch-span-on"><FormattedMessage id={messageId} /></span>
+        } else {
+            messageId = 'unit.is.not.displayable';
+            displaySwitch = <span className="on-off-switch-span-off"><FormattedMessage id={messageId} /></span>
+        }
+        return (
+            displaySwitch
+        );
+    }
 
     private checkPreferredDisplay() {
         if (this.props.unit.preferredDisplay) {
@@ -367,7 +440,7 @@ class UnitViewComponent extends React.Component<UnitViewPropsWithIntl, UnitViewS
                 ...this.props.unit,
                 identifier
             };
-            //this.props.editUnitDetails(editedUnit);
+            this.props.editUnitDetails(editedUnit);
         }
         this.setState({ identifierFocus: !this.state.identifierFocus });
     }
@@ -391,6 +464,7 @@ class UnitViewComponent extends React.Component<UnitViewPropsWithIntl, UnitViewS
 
     private removeUnsavedChangesFunction(callback: () => void) {
         // This function is called to reset all the inputs to the initial state
+        console.log("remove unsaved changes function");
         store.dispatch<any>(confirmEditedUnits()).then(() => {
             store.dispatch<any>(fetchUnitsDetails()).then(callback);
         });
@@ -398,11 +472,13 @@ class UnitViewComponent extends React.Component<UnitViewPropsWithIntl, UnitViewS
 
     private submitUnsavedChangesFunction(successCallback: () => void, failureCallback: () => void) {
         // This function is called to submit the unsaved changes
+        console.log("submit unsaved changes function");
         store.dispatch<any>(submitEditedUnits()).then(successCallback, failureCallback);
     }
 
     private updateUnsavedChanges() {
         // Notify that there are unsaved changes
+        console.log("update unsaved changes");
         store.dispatch(updateUnsavedChanges(this.removeUnsavedChangesFunction, this.submitUnsavedChangesFunction));
     }
 
@@ -437,4 +513,6 @@ class UnitViewComponent extends React.Component<UnitViewPropsWithIntl, UnitViewS
         return '';
     }
 }
+
+
 export default injectIntl(UnitViewComponent);

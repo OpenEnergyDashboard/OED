@@ -70,7 +70,7 @@ export default class UnitsDetailContainer extends React.Component<UnitsDetailPro
 					</h2>
 					<div className="card-container">
 					{ this.props.units.map(unitID =>
-						( <UnitViewContainer key={unitID} id={unitID} /> ))}
+						( <UnitViewContainer key={unitID} id={unitID} show={false} onHide={false} onSubmitClicked={this.handleSubmitClicked}/> ))}
                     </div>
 					{/* <Table striped bordered hover>
                         <thead>
