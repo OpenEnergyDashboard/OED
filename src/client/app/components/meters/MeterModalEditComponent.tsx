@@ -11,8 +11,9 @@ interface meterTypes {
 }
 interface MetaDataProps {
   onhide: () => void;
-  onSaveChanges: (identifier: string, condition: boolean) => void;
+  onSaveChanges: () => void;
   handleIdentifierChange: (event: React.ChangeEvent<HTMLInputElement>) => void;
+  changeTrue: () => void;
   show: boolean;
   id: number;
   identifier: string;
@@ -55,7 +56,6 @@ class MeterModalEditComponent extends React.Component<MeterViewPropsWithIntl,
   }
 
   identifierInput() {
-    this.props.onhide();
     const identifier = this.state.identifierinput;
     return identifier;
   }
@@ -131,7 +131,7 @@ class MeterModalEditComponent extends React.Component<MeterViewPropsWithIntl,
             <Button variant="secondary" onClick={this.props.onhide}>
               Close
             </Button>
-            <Button variant="primary" onClick={() => this.props.onSaveChanges(this.identifierInput(),true)}>
+            <Button variant="primary" onClick={() => this.props.onSaveChanges()}>
               Save Changes
             </Button>
           </Modal.Footer>

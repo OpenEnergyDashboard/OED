@@ -14,6 +14,7 @@ import ModalCard from './MeterModalEditComponent';
 import '../../styles/meter-card-page.css'
 import { SelectionType } from 'containers/groups/DatasourceBoxContainer';
 import { time } from 'core-js/library/fn/log';
+import { ThemeProvider } from 'react-bootstrap';
 
 interface MeterViewProps {
 	// The ID of the meter to be displayed
@@ -55,6 +56,7 @@ class MeterViewComponent extends React.Component<MeterViewPropsWithIntl, MeterVi
 			onHide: true,
 		};
 		this.toggleMeterDisplayable = this.toggleMeterDisplayable.bind(this);
+		this.changeSaveToTrue = this.changeSaveToTrue.bind(this);
 		this.toggleMeterEnabled = this.toggleMeterEnabled.bind(this);
 		this.toggleGPSInput = this.toggleGPSInput.bind(this);
 		this.handleGPSChange = this.handleGPSChange.bind(this);
@@ -148,8 +150,9 @@ class MeterViewComponent extends React.Component<MeterViewPropsWithIntl, MeterVi
 						timesort={this.props.meter.timesort}
 						startTimestamp={this.props.meter.startTimestamp}
 						endTimestamp={this.props.meter.endTimestamp}
-						onSaveChanges={this.onSaveChanges} 
-						handleIdentifierChange={this.handleIdentifierChange}/>
+						onSaveChanges={this.onSaveChanges}
+						handleIdentifierChange={this.handleIdentifierChange}
+						changeTrue={this.changeSaveToTrue} />
 				</div>
 			)
 		}
@@ -187,8 +190,7 @@ class MeterViewComponent extends React.Component<MeterViewPropsWithIntl, MeterVi
 	// on save handler in progress ( Meter Detail Component)
 	// if double clicked then the save changes take affect otherwise a single click will cause
 	// all conditions to be false. Is there a second check it goes through?
-	public onSaveChanges = (identifier: string, condition: boolean) => {
-		console.log(this.state.identifierInput);
+	public onSaveChanges = () => {
 		this.toggleIdentifierInput();
 		this.updateUnsavedChanges();
 		this.props.onSubmitClicked();
@@ -367,8 +369,11 @@ class MeterViewComponent extends React.Component<MeterViewPropsWithIntl, MeterVi
 		this.setState({ gpsInput: event.target.value });
 	}
 
-	private changeSaveToTrue (){
+	private changeSaveToTrue() {
+		console.log(this.state.identifierFocus);
 		this.setState({ identifierFocus: true });
+		console.log(this.state.identifierFocus);
+		return null;
 	}
 
 	private formatGPSInput() {
@@ -420,12 +425,12 @@ class MeterViewComponent extends React.Component<MeterViewPropsWithIntl, MeterVi
 			};
 			this.props.editMeterDetails(editedMeter);
 		}
-		this.setState({ identifierFocus: !this.state.identifierFocus });
+		this.setState({ identifierFocus: false });
 	}
 
 	private handleIdentifierChange(event: React.ChangeEvent<HTMLInputElement>) {
 		this.setState({ identifierInput: event.target.value });
-		console.log(this.state.identifierInput);
+		this.setState({ identifierFocus: true});
 	}
 
 	private formatIdentifierInput() {
