@@ -7,6 +7,7 @@ import { hasToken } from './token';
 import { usersApi } from '../utils/api'
 import * as moment from 'moment-timezone';
 import { UserRole } from '../types/items';
+import translate from './translate';
 
 /**
  * Function to converts the compressed meter data into a CSV formatted string.
@@ -119,7 +120,7 @@ export async function graphRawExport(count: number, warningFileSize: number, fil
 
 	// fileSizeLimit is limit for an admin without checking they really want to download,
 	if (fileSize > fileSizeLimit && (!hasToken() || !(await usersApi.hasRolePermissions(UserRole.EXPORT)))) {
-		innerContainer.innerHTML = "<p>Sorry you don't have permissions to download due to large number of points.</p>";
+		innerContainer.innerHTML = '<p>' + translate('permissionError') + '</p>';
 		const okButton = document.createElement('button');
 		okButton.innerHTML = 'ok';
 		okButton.addEventListener('click', () => {
