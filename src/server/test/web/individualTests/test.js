@@ -57,11 +57,11 @@ const { assert } = require('console');
                 mocha.it('should be able to ...', async () => {
                     // Here is where we run our logic for that specifc loop
 					
-					const res = await chai.request(app).post(UPLOAD_METERS_ROUTE)
-					.field('email', testUser.email)
-					.field('password', testUser.password)
-					.field('gzip', 'false')
-					.attach('csvfile', metersBuffer, `${cumAscRestNoon}`)
+				const res = await chai.request(app).post(UPLOAD_METERS_ROUTE)
+				.field('email', testUser.email)
+				.field('password', testUser.password)
+				.field('gzip', 'false')
+				.attach('csvfile', metersBuffer, `${cumAscRestNoon}`)
 
 				expect(res).to.have.status(200);
 				const csvMeters = (await parseCsv(metersBuffer)).map(row =>
@@ -78,7 +78,7 @@ const { assert } = require('console');
 				expect(dbMeters).to.deep.equal(csvMeters);
 				expect((await Meter.getAll(con)).length).to.equal(3);
 			});
-			mocha.it('should be able to accept a post request to upload unzipped meter data with header row.', async () => {
+		mocha.it('should be able to accept a post request to upload unzipped meter data with header row.', async () => {
 			const res = await chai.request(app).post(UPLOAD_METERS_ROUTE)
 				.field('email', testUser.email)
 				.field('password', testUser.password)
@@ -99,7 +99,7 @@ const { assert } = require('console');
 			}));
 			expect(dbMeters).to.deep.equal(csvMeters);
 			expect((await Meter.getAll(conn)).length).to.equal(3);
-		});
+			});
 		mocha.it('should be able to load unzipped readings data for an existing meter.', async () => {
 			const conn = testDB.getConnection();
 			const meter = new Meter(undefined, 'XXX', undefined, false, false, Meter.type.MAMAC, 'XXX')
@@ -119,7 +119,7 @@ const { assert } = require('console');
 			});
 			const fileReadings = await parseCsv(readingsBuffer);
 			expect(extractedReadings).to.deep.equals(fileReadings);
-		});
+			});
 		mocha.it('should be able to load unzipped readings data for a non existing meter.', async () => {
 			const conn = testDB.getConnection();
 			const res = await chai.request(app).post(UPLOAD_READINGS_ROUTE) // make request to api to upload readings data for this meter
@@ -148,6 +148,8 @@ const { assert } = require('console');
             mocha.describe('testing ...', () => {
                 mocha.it('should be able to ...', async () => {
                     // Here is where we run our logic for that specifc loop
+			
+		
                 })
             })
         }
