@@ -243,7 +243,7 @@ const { assert } = require('console');
 				.field('email', testUser.email)
 				.field('password', testUser.password)
 				.field('gzip', 'false')
-				.attach('csvfile', metersBuffer, `${meterpipe40}`)
+				.attach('csvfile', metersBuffer, `${pipe40}`)
 
 				expect(res).to.have.status(200);
 				const csvMeters = (await parseCsv(metersBuffer)).map(row =>
@@ -292,7 +292,7 @@ const { assert } = require('console');
 				.field('meterName', 'XXX')
 				.field('timeSort', 'increasing')
 				.field('gzip', 'false')
-				.attach('csvfile', readingsBuff, `${meterPipe40}`)
+				.attach('csvfile', readingsBuff, `${pipe40}`)
 
 			expect(res).to.have.status(200);
 			const readings = await Reading.getAllByMeterID(meter.id, conn);
@@ -311,7 +311,7 @@ const { assert } = require('console');
 				.field('meterName', 'ABG')
 				.field('timeSort', 'increasing')
 				.field('gzip', 'false')
-				.attach('csvfile', readingsBuffer, `${meterPipe40}`)
+				.attach('csvfile', readingsBuffer, `${pipe40}`)
 
 			const meter = await Meter.getByName('ABG', conn);
 			const readings = await Reading.getAllByMeterID(meter.id, conn);
@@ -333,7 +333,7 @@ const { assert } = require('console');
 				.field('email', testUser.email)
 				.field('password', testUser.password)
 				.field('gzip', 'false')
-				.attach('csvfile', metersBuffer, `${regAscEndonlyEndSamePreviousEnd}`)
+				.attach('csvfile', metersBuffer, `${pipe52}`)
 
 				expect(res).to.have.status(200);
 				const csvMeters = (await parseCsv(metersBuffer)).map(row =>
@@ -382,7 +382,7 @@ const { assert } = require('console');
 				.field('meterName', 'XXX')
 				.field('timeSort', 'increasing')
 				.field('gzip', 'false')
-				.attach('csvfile', readingsBuff, `${regAscEndonlyEndSamePreviousEnd}`)
+				.attach('csvfile', readingsBuff, `${pipe52}`)
 
 			expect(res).to.have.status(200);
 			const readings = await Reading.getAllByMeterID(meter.id, conn);
@@ -401,7 +401,7 @@ const { assert } = require('console');
 				.field('meterName', 'ABG')
 				.field('timeSort', 'increasing')
 				.field('gzip', 'false')
-				.attach('csvfile', readingsBuffer, `${regAscEndonlyEndSamePreviousEnd}`)
+				.attach('csvfile', readingsBuffer, `${pipe52}`)
 
 			const meter = await Meter.getByName('ABG', conn);
 			const readings = await Reading.getAllByMeterID(meter.id, conn);
