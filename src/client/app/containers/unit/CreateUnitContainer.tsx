@@ -74,16 +74,18 @@ export default class CreateUnitContainer extends React.Component {
 		this.setState({ note: newNote });
 	}
 
+	//Direct call to the API, this does not use the Redux state and goes around it to go directly to the API
+
 	private submitNewUnit = async () => {
 		try {
 			await unitsApi.addUnit({
-				id: -99,
+				id: -99, //-99 new unit does not have a database assigned id so use -99, database will handle creating one when inserted
 				name: this.state.name,
 				identifier: this.state.identifier,
 				unitRepresent: this.state.unitRepresent,
 				secInRate: this.state.secInRate,
 				typeOfUnit: this.state.typeOfUnit,
-				unitIndex: -99,
+				unitIndex: -99, //-99 new unit does not have a database assigned id so use -99, database will handle creating one when inserted
 				suffix: this.state.suffix,
 				displayable: this.state.displayable,
 				preferredDisplay: this.state.preferredDisplay,

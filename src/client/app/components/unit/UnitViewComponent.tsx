@@ -150,6 +150,7 @@ class UnitViewComponent extends React.Component<UnitViewPropsWithIntl, UnitViewS
 		return { float: 'right' };
 	}
 
+
 	private formatStatus(): string {
 		if (this.props.isSubmitting) {
 			return '(' + this.props.intl.formatMessage({id: 'submitting'}) + ')';

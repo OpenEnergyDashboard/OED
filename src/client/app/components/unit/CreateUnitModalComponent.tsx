@@ -76,6 +76,7 @@ const ModalCard = (props: CreateUnitFormProps) => {
 							<div className="containter-fluid">
 								<h1 style={titleStyle}><FormattedMessage id="unit.create_new_unit"/></h1>
 								<div style={tableStyle}>
+									{/*HTML form to accept new unit information*/}
 									<form onSubmit={e => { e.preventDefault();  props.submitNewUnit(); }}>
 										<div style={formInputStyle}>
 											<label><FormattedMessage id="unit.name"/></label><br />
