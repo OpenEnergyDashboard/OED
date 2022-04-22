@@ -6,22 +6,20 @@
 
 const chai = require('chai');
 
-const expect = chai.expect;
-const mocha = require('mocha');
+const { mocha, expect, testDB } = require('../common');
 const sinon = require('sinon');
 
 const moment = require('moment');
 
-const Meter = require('../../models/Meter');
 const Reading = require('../../models/Reading');
 
-const { compressedLineReadings,
+const { meterLineReadings,
 	validateLineReadingsParams,
 	validateLineReadingsQueryParams,
-	compressedMeterBarReadings,
+	meterBarReadings,
 	validateMeterBarReadingsParams,
 	validateBarReadingsQueryParams
-} = require('../../routes/compressedReadings');
+} = require('../../routes/unitReadings');
 
 const { TimeInterval } = require('../../../common/TimeInterval');
 
@@ -32,8 +30,8 @@ function mockResponse() {
 	};
 }
 
-mocha.describe('Compressed readings routes', () => {
-	mocha.describe('the compressed line readings route', () => {
+mocha.describe('unit readings routes', () => {
+	mocha.describe('the line readings route', () => {
 
 		mocha.describe('validation', () => {
 			mocha.it('fails to validate when the meter_ids param is wrong', () => {
@@ -45,32 +43,35 @@ mocha.describe('Compressed readings routes', () => {
 				expect(validationResult).to.equal(true);
 			});
 			mocha.it('validates when the time interval is valid', () => {
-				const validationResult = validateLineReadingsQueryParams({timeInterval: TimeInterval.unbounded().toString()});
+				const validationResult = validateLineReadingsQueryParams({ timeInterval: TimeInterval.unbounded().toString(), graphicUnitId: '99' });
 				expect(validationResult).to.equal(true);
 			});
+
+			// TODO Maybe check for invalid for each value in validateLineReadingsQueryParams (also in Bar below).
 		});
 
 		mocha.it('returns line readings correctly when called correctly', async () => {
 			const timeInterval = new TimeInterval(moment('2017-01-01'), moment('2017-01-02'));
 
-			const compressedReadingsStub = sinon.stub(Reading, 'getNewCompressedReadings');
-			compressedReadingsStub.resolves({
+			// getMeterLineReadings is called by meterLineReadings. This makes it appear the result is what is given here.
+			const readingsStub = sinon.stub(Reading, 'getMeterLineReadings');
+			readingsStub.resolves({
 				1: [
-					{reading_rate: 1, start_timestamp: timeInterval.startTimestamp, end_timestamp: timeInterval.endTimestamp}
+					{ reading_rate: 1, start_timestamp: timeInterval.startTimestamp, end_timestamp: timeInterval.endTimestamp }
 				]
 			});
-			const response = await compressedLineReadings([1], timeInterval);
+			const response = await meterLineReadings([1], 99, timeInterval);
 
 			const expectedResponse = {
 				1: [
-					{reading: 1, startTimestamp: timeInterval.startTimestamp.valueOf(), endTimestamp: timeInterval.endTimestamp.valueOf()}
+					{ reading: 1, startTimestamp: timeInterval.startTimestamp.valueOf(), endTimestamp: timeInterval.endTimestamp.valueOf() }
 				]
 			};
 
 			expect(response).to.deep.equal(expectedResponse);
 		});
 	});
-	mocha.describe('the compressed bar readings route', () => {
+	mocha.describe('the bar readings route', () => {
 
 		mocha.describe('validation', () => {
 			mocha.it('fails to validate when the meter_ids param is wrong', () => {
@@ -83,8 +84,8 @@ mocha.describe('Compressed readings routes', () => {
 			});
 			mocha.it('validates when the time interval is valid', () => {
 				const validationResult = validateBarReadingsQueryParams(
-					{timeInterval: TimeInterval.unbounded().toString(), barWidthDays: '28' }
-					);
+					{ timeInterval: TimeInterval.unbounded().toString(), barWidthDays: '28', graphicUnitId: '99' }
+				);
 				expect(validationResult).to.equal(true);
 			});
 		});
@@ -92,16 +93,17 @@ mocha.describe('Compressed readings routes', () => {
 		mocha.it('returns bar readings correctly when called correctly', async () => {
 			const timeInterval = new TimeInterval(moment('2017-01-01'), moment('2017-01-02'));
 
-			const compressedReadingsStub = sinon.stub(Reading, 'getNewCompressedBarchartReadings');
-			compressedReadingsStub.resolves({
+			// getMeterBarReadings is called by meterBarReadings. This makes it appear the result is what is given here.
+			const readingsStub = sinon.stub(Reading, 'getMeterBarReadings');
+			readingsStub.resolves({
 				1: [
-					{reading: 1, start_timestamp: timeInterval.startTimestamp, end_timestamp: timeInterval.endTimestamp}
+					{ reading: 1, start_timestamp: timeInterval.startTimestamp, end_timestamp: timeInterval.endTimestamp }
 				]
 			});
-			const response = await compressedMeterBarReadings([1], 1, timeInterval);
+			const response = await meterBarReadings([1], 99, 1, timeInterval);
 			const expectedResponse = {
 				1: [
-					{reading: 1, startTimestamp: timeInterval.startTimestamp.valueOf(), endTimestamp: timeInterval.endTimestamp.valueOf()}
+					{ reading: 1, startTimestamp: timeInterval.startTimestamp.valueOf(), endTimestamp: timeInterval.endTimestamp.valueOf() }
 				]
 			};
 

@@ -309,8 +309,7 @@ function generateVariableAmplitudeTestingData() {
 /**
  * Inserts special units into the database.
  */
-async function insertSpecialUnits() {
-	const conn = getConnection();
+async function insertSpecialUnits(conn) {
 	// The table contains special units' data.
 	// Each row contains: name, identifier, unitRepresentType, typeOfUnit, suffix, displayable, preferredDisplay.
 	const specialUnits = [
@@ -337,8 +336,7 @@ async function insertSpecialUnits() {
 /**
  * Insert special conversions into the database.
  */
-async function insertSpecialConversions() {
-	const conn = getConnection();
+async function insertSpecialConversions(conn) {
 	// The table contains special conversions' data.
 	// Each row contains: sourceName, destinationName, bidirectional, slope, intercept, note.
 	const specialConversions = [
@@ -372,9 +370,10 @@ async function insertSpecialConversions() {
  * Call the functions to insert special units and conversions.
  */
 async function insertSpecialUnitsAndConversions() {
-	await insertSpecialUnits();
-	await insertSpecialConversions();
-	await redoCik();
+	const conn = getConnection();
+	await insertSpecialUnits(conn);
+	await insertSpecialConversions(conn);
+	await redoCik(conn);
 }
 
 module.exports = {
@@ -389,5 +388,7 @@ module.exports = {
 	generateOneMinuteTestingData,
 	generateTestingData,
 	generateVariableAmplitudeTestingData,
-	insertSpecialUnitsAndConversions
+	insertSpecialUnitsAndConversions,
+	insertSpecialUnits,
+	insertSpecialConversions
 };

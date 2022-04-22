@@ -4,32 +4,36 @@
 
 import { TimeInterval } from '../../../../common/TimeInterval';
 import { ActionType } from './actions';
-import {CompressedLineReading, CompressedLineReadings} from '../compressed-readings';
+import {LineReading, LineReadings} from '../readings';
 
 export interface RequestMeterLineReadingsAction {
 	type: ActionType.RequestMeterLineReadings;
 	meterIDs: number[];
+	unitID: number;
 	timeInterval: TimeInterval;
 }
 
 export interface RequestGroupLineReadingsAction {
 	type: ActionType.RequestGroupLineReadings;
 	groupIDs: number[];
+	unitID: number;
 	timeInterval: TimeInterval;
 }
 
 export interface ReceiveMeterLineReadingsAction {
 	type: ActionType.ReceiveMeterLineReadings;
 	meterIDs: number[];
+	unitID: number;
 	timeInterval: TimeInterval;
-	readings: CompressedLineReadings;
+	readings: LineReadings;
 }
 
 export interface ReceiveGroupLineReadingsAction {
 	type: ActionType.ReceiveGroupLineReadings;
 	groupIDs: number[];
+	unitID: number;
 	timeInterval: TimeInterval;
-	readings: CompressedLineReadings;
+	readings: LineReadings;
 }
 
 export type LineReadingsAction =
@@ -42,16 +46,20 @@ export interface LineReadingsState {
 	byMeterID: {
 		[meterID: number]: {
 			[timeInterval: string]: {
-				isFetching: boolean;
-				readings?: CompressedLineReading[];
+				[unitID: number]: {
+					isFetching: boolean;
+					readings?: LineReading[];
+				}
 			}
 		}
 	};
 	byGroupID: {
 		[groupID: number]: {
 			[timeInterval: string]: {
-				isFetching: boolean;
-				readings?: CompressedLineReading[];
+				[unitID: number]: {
+					isFetching: boolean;
+					readings?: LineReading[];
+				}
 			}
 		}
 	};
