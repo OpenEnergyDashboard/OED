@@ -5,16 +5,13 @@
 import * as React from 'react';
 import { Button } from 'reactstrap';
 import { FormattedMessage, injectIntl, WrappedComponentProps } from 'react-intl';
-import { MeterMetadata, EditMeterDetailsAction, SubmitEditedMeterAction } from '../../types/redux/meters';
+import { MeterMetadata, EditMeterDetailsAction } from '../../types/redux/meters';
 import { GPSPoint, isValidGPSInput } from '../../utils/calibration';
 import { updateUnsavedChanges } from '../../actions/unsavedWarning';
 import { fetchMetersDetails, submitEditedMeters, confirmEditedMeters } from '../../actions/meters';
 import store from '../../index';
 import ModalCard from './MeterModalEditComponent';
 import '../../styles/meter-card-page.css'
-import { SelectionType } from 'containers/groups/DatasourceBoxContainer';
-import { time } from 'core-js/library/fn/log';
-import { ThemeProvider } from 'react-bootstrap';
 
 interface MeterViewProps {
 	// The ID of the meter to be displayed
@@ -56,12 +53,12 @@ class MeterViewComponent extends React.Component<MeterViewPropsWithIntl, MeterVi
 			onHide: true,
 		};
 		this.toggleMeterDisplayable = this.toggleMeterDisplayable.bind(this);
-		this.changeSaveToTrue = this.changeSaveToTrue.bind(this);
 		this.toggleMeterEnabled = this.toggleMeterEnabled.bind(this);
 		this.toggleGPSInput = this.toggleGPSInput.bind(this);
 		this.handleGPSChange = this.handleGPSChange.bind(this);
 		this.changeTimeZone = this.changeTimeZone.bind(this);
 		this.toggleIdentifierInput = this.toggleIdentifierInput.bind(this);
+		this.onCancel = this.onCancel.bind(this);
 		this.handleIdentifierChange = this.handleIdentifierChange.bind(this);
 	}
 
@@ -90,31 +87,14 @@ class MeterViewComponent extends React.Component<MeterViewPropsWithIntl, MeterVi
 				</div>
 				<div className="toggle-container">
 					<div className="on-off-switch">
-						{/* <span className="on-off-switch-span-on">{this.formatEnabled()}</span> */}
 						{this.formatEnabled()}
 					</div>
 					{loggedInAsAdmin && <div className="on-off-switch">
-						{/* <span className="on-off-switch-span-on">Displayble</span> */}
 						{this.formatDisplayable()}
 					</div>}
 				</div>
 				{this.isAdmin()}
 			</div>
-
-
-			// <tr>
-			// 	{loggedInAsAdmin && <td> {this.props.meter.id} {this.formatStatus()} </td>}
-			// 	{loggedInAsAdmin && <td> {this.props.meter.name} </td>}
-			// 	<td> {this.formatIdentifierInput()} </td>
-			// 	{loggedInAsAdmin && <td> {this.props.meter.meterType} </td>}
-			// 	{loggedInAsAdmin && <td> {this.props.meter.ipAddress} </td>}
-			// 	{loggedInAsAdmin && <td> {this.formatGPSInput()} </td>}
-			// 	<td> {this.formatEnabled()} </td>
-			// 	<td> {this.formatDisplayable()} </td>
-			// 	{loggedInAsAdmin && <td> <TimeZoneSelect current={this.props.meter.timeZone || ''} handleClick={this.changeTimeZone} /> </td>}
-			// 	{loggedInAsAdmin && <td> <ModalCard/></td>}
-			// </tr>
-
 		);
 	}
 
@@ -154,41 +134,13 @@ class MeterViewComponent extends React.Component<MeterViewPropsWithIntl, MeterVi
 						endTimestamp={this.props.meter.endTimestamp}
 						onSaveChanges={this.onSaveChanges}
 						handleIdentifierChange={this.handleIdentifierChange}
-						changeTrue={this.changeSaveToTrue} />
+						onCancel={this.onCancel} />
 				</div>
 			)
 		}
 		return null;
 	}
 
-	private enabledCheck(enabled: boolean) {
-		if (enabled) {
-			return (
-				<div className="on-off-switch">
-					<span className="on-off-switch-span-on">Enabled</span>
-				</div>
-			)
-		}
-		return (
-			<div className="on-off-switch">
-				<span className="on-off-switch-span-off">Enabled</span>
-			</div>
-		)
-	}
-	private displayableCheck(display: boolean) {
-		if (display) {
-			return (
-				<div className="on-off-switch">
-					<span className="on-off-switch-span-on">Displayble</span>
-				</div>
-			)
-		}
-		return (
-			<div className="on-off-switch">
-				<span className="on-off-switch-span-off">Displayble</span>
-			</div>
-		)
-	}
 	// on save handler in progress ( Meter Detail Component)
 	// if double clicked then the save changes take affect otherwise a single click will cause
 	// all conditions to be false. Is there a second check it goes through?
@@ -196,6 +148,12 @@ class MeterViewComponent extends React.Component<MeterViewPropsWithIntl, MeterVi
 		this.toggleIdentifierInput();
 		this.updateUnsavedChanges();
 		this.props.onSubmitClicked();
+		this.handleClose();
+	}
+
+	onCancel() {
+		this.setState({ identifierFocus: false });
+		this.handleClose();
 	}
 
 
@@ -222,29 +180,17 @@ class MeterViewComponent extends React.Component<MeterViewPropsWithIntl, MeterVi
 			this.updateUnsavedChanges();
 		}
 	}
+	/** Will be used in future when submitting */
+	// private formatStatus(): string {
+	// 	if (this.props.isSubmitting) {
+	// 		return '(' + this.props.intl.formatMessage({ id: 'submitting' }) + ')';
+	// 	}
 
-	private formatStatus(): string {
-		if (this.props.isSubmitting) {
-			return '(' + this.props.intl.formatMessage({ id: 'submitting' }) + ')';
-		}
+	// 	if (this.props.isEdited) {
+	// 		return this.props.intl.formatMessage({ id: 'edited' });
+	// 	}
 
-		if (this.props.isEdited) {
-			return this.props.intl.formatMessage({ id: 'edited' });
-		}
-
-		return '';
-	}
-
-	// private styleEnabled(): React.CSSProperties {
-	// 	return { color: 'green' };
-	// }
-
-	// private styleDisabled(): React.CSSProperties {
-	// 	return { color: 'red' };
-	// }
-
-	// private styleToggleBtn(): React.CSSProperties {
-	// 	return { float: 'right' };
+	// 	return '';
 	// }
 
 	private toggleMeterDisplayable() {
@@ -266,79 +212,39 @@ class MeterViewComponent extends React.Component<MeterViewPropsWithIntl, MeterVi
 	}
 
 	private formatDisplayable() {
-		// let styleFn;
+
 		let messageId;
 		let displaySwitch;
-		// let buttonMessageId;
 
 		if (this.props.meter.displayable) {
-			// styleFn = this.styleEnabled;
+
 			messageId = 'meter.is.displayable';
 			displaySwitch = <span className="on-off-switch-span-on"><FormattedMessage id={messageId} /></span>
-			// buttonMessageId = 'hide';
+
 		} else {
-			// styleFn = this.styleDisabled;
+
 			messageId = 'meter.is.not.displayable';
 			displaySwitch = <span className="on-off-switch-span-off"><FormattedMessage id={messageId} /></span>
-			// buttonMessageId = 'show';
+
 		}
 
-		// let toggleButton;
-		// const loggedInAsAdmin = this.props.loggedInAsAdmin;
-		// if (loggedInAsAdmin) {
-		// 	{/*toggleButton = <Button style={this.styleToggleBtn()} color='primary' onClick={this.toggleMeterDisplayable}>
-		// 		<FormattedMessage id={buttonMessageId} />
-		// 	</Button>;*/}
-		// } else {
-		// 	toggleButton = <div />;
-		// }
-
 		return (
-			// <span>
-			// 	<span style={styleFn()}>
-			// 		<FormattedMessage id={messageId} />
-			// 	</span>
-			// 	{toggleButton}
-			// </span>
 			displaySwitch
 		);
 	}
 
 	private formatEnabled() {
-		// let styleFn;
 		let messageId;
 		let enableSwitch;
-		// let buttonMessageId;
 
 		if (this.props.meter.enabled) {
-			// styleFn = this.styleEnabled;
 			messageId = 'meter.is.enabled';
 			enableSwitch = <span className="on-off-switch-span-on"><FormattedMessage id={messageId} /></span>
-			// buttonMessageId = 'disable';
 		} else {
-			// styleFn = this.styleDisabled;
 			messageId = 'meter.is.not.enabled';
 			enableSwitch = <span className="on-off-switch-span-off"><FormattedMessage id={messageId} /></span>
-			// buttonMessageId = 'enable';
 		}
-
-		// let toggleButton;
-		// const loggedInAsAdmin = this.props.loggedInAsAdmin;
-		// if (loggedInAsAdmin) {
-		// 	toggleButton = <Button style={this.styleToggleBtn()} color='primary' onClick={this.toggleMeterEnabled}>
-		// 		<FormattedMessage id={buttonMessageId} />
-		// 	</Button>;
-		// } else {
-		// 	toggleButton = <div />;
-		// }
-
 		return (
-			// <span>
-			// 	<span style={styleFn()}>
-			// 		<FormattedMessage id={messageId} />
-			// 	</span>
-			// 	{toggleButton}
-			// </span>
 			enableSwitch
 		);
 
@@ -379,13 +285,7 @@ class MeterViewComponent extends React.Component<MeterViewPropsWithIntl, MeterVi
 		this.setState({ gpsInput: event.target.value });
 	}
 
-	private changeSaveToTrue() {
-		console.log(this.state.identifierFocus);
-		this.setState({ identifierFocus: true });
-		console.log(this.state.identifierFocus);
-		return null;
-	}
-
+	/** This function will be utilized in the future when GPS changes are implemented */
 	// private formatGPSInput() {
 	// 	let formattedGPS;
 	// 	let buttonMessageId;
@@ -440,42 +340,28 @@ class MeterViewComponent extends React.Component<MeterViewPropsWithIntl, MeterVi
 
 	private handleIdentifierChange(event: React.ChangeEvent<HTMLInputElement>) {
 		this.setState({ identifierInput: event.target.value });
-		this.setState({ identifierFocus: true});
+		this.setState({ identifierFocus: true });
 	}
 
 	private formatIdentifierInput() {
 		let formattedIdentifier;
-		// let buttonMessageId;
 		if (this.state.identifierFocus) {
 			formattedIdentifier = <div>{this.state.identifierInput}</div>;
-			// buttonMessageId = 'update';
 		} else {
-			formattedIdentifier = <div>{this.state.identifierInput}</div>;
-			// buttonMessageId = 'edit';
+			formattedIdentifier = <div>{this.props.meter.identifier}</div>;
 		}
-
-		// let toggleButton;
 		const loggedInAsAdmin = this.props.loggedInAsAdmin;
-		// if (loggedInAsAdmin) {
-		// 	{/*toggleButton = <Button style={this.styleToggleBtn()} color='primary' onClick={this.toggleMeterDisplayable}>
-		// 		<FormattedMessage id={buttonMessageId} />
-		// 	</Button>;*/}
-		// } else {
-		// 	toggleButton = <div />;
-		// }
 
 		if (loggedInAsAdmin) {
-			return ( // add onClick
+			return (
 				<div>
 					{formattedIdentifier}
-					{/* {toggleButton} */}
 				</div>
 			);
 		} else {
 			return (
 				<div>
 					{this.state.identifierInput}
-					{/* {toggleButton} */}
 				</div>
 			);
 		}

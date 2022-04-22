@@ -13,7 +13,7 @@ interface MetaDataProps {
   onhide: () => void;
   onSaveChanges: () => void;
   handleIdentifierChange: (event: React.ChangeEvent<HTMLInputElement>) => void;
-  changeTrue: () => void;
+  onCancel: () => void;
   show: boolean;
   id: number;
   identifier: string;
@@ -128,7 +128,7 @@ class MeterModalEditComponent extends React.Component<MeterViewPropsWithIntl,
           </Modal.Body>
 
           <Modal.Footer>
-            <Button variant="secondary" onClick={this.props.onhide}>
+            <Button variant="secondary" onClick={() => this.props.onCancel()}>
               Close
             </Button>
             <Button variant="primary" onClick={() => this.props.onSaveChanges()}>
@@ -142,12 +142,6 @@ class MeterModalEditComponent extends React.Component<MeterViewPropsWithIntl,
 
   private handleNameChange(event: React.ChangeEvent<HTMLInputElement>) {
     this.setState({ nameinput: event.target.value });
-    console.log(this.state.nameinput);
-  }
-
-  private handleIdentifier(event: React.ChangeEvent<HTMLInputElement>) {
-    this.setState({ identifierinput: event.target.value });
-    console.log(this.state.identifierinput);
   }
 
   private isIdentifier(identifier: string) {
@@ -161,7 +155,7 @@ class MeterModalEditComponent extends React.Component<MeterViewPropsWithIntl,
   private isID(id: number) {
     return (
       <div>
-        ID: <br /><input type="text" defaultValue={id} placeholder="ID" readOnly />
+        ID: <br /><input type="text" defaultValue={id} placeholder="ID" onChange={(event => console.log(event))} />
       </div>
     )
   }
@@ -177,13 +171,13 @@ class MeterModalEditComponent extends React.Component<MeterViewPropsWithIntl,
     if (gps != null) {
       return (
         <div>
-          GPS: <span><br /><input type="text" value={"Latitude:" + gps.latitude + " Longitude: " + gps.longitude} /></span>
+          GPS: <span><br /><input type="text" value={"Latitude:" + gps.latitude + " Longitude: " + gps.longitude} onChange={(event => console.log(event))} /></span>
         </div>
       )
     }
     return (
       <div>
-        GPS: <span><br /><input type="text" value="Filler Information" autoFocus /></span>
+        GPS: <span><br /><input type="text" value="Filler Information" onChange={(event => console.log(event))} /></span>
       </div>
     );
   }
@@ -216,7 +210,6 @@ class MeterModalEditComponent extends React.Component<MeterViewPropsWithIntl,
     );
   }
 
-
   private isMeterType(type?: string) {
     const types: meterTypes = {
       MAMAC: 'MAMAC',
@@ -224,7 +217,8 @@ class MeterModalEditComponent extends React.Component<MeterViewPropsWithIntl,
       OBVIUS: 'OBVIUS',
       OTHER: 'other'
     }
-    for (var property in types) {
+
+    for (var i = 0; i < 1; i++) {
       if (type == types['MAMAC']) {
         delete types['MAMAC']
         break
@@ -314,6 +308,7 @@ class MeterModalEditComponent extends React.Component<MeterViewPropsWithIntl,
         </div>
       )
     }
+    return null;
   }
   /** TODO ADD GRAPHICAL UNITS FROM RESOURCE GENERALIZATION
    * 
@@ -347,7 +342,7 @@ class MeterModalEditComponent extends React.Component<MeterViewPropsWithIntl,
   private isDisplaying(display: boolean) {
     return (
       <div>
-        Displayable: <span><input type="checkbox" checked={display} /></span>
+        Displayable: <span><input type="checkbox" checked={display} onChange={(event => console.log(event))} /></span>
       </div>
     );
   }
@@ -356,12 +351,12 @@ class MeterModalEditComponent extends React.Component<MeterViewPropsWithIntl,
   private isEnabled(enabled: boolean) {
     if (!enabled) {
       <div>
-        Enabled: <span><input type="checkbox" /></span>
+        Enabled: <span><input type="checkbox" onChange={(event => console.log(event))} /></span>
       </div>
     }
     return (
       <div>
-        Enabled: <span><input type="checkbox" checked /></span>
+        Enabled: <span><input type="checkbox" checked onChange={(event => console.log(event))} /></span>
       </div>
     )
   }
@@ -371,13 +366,13 @@ class MeterModalEditComponent extends React.Component<MeterViewPropsWithIntl,
     if (area != null) {
       return (
         <div>
-          Area: <span><br /><input type="text" defaultValue={area} placeholder="Identifier" /></span>
+          Area: <span><br /><input type="text" defaultValue={area} placeholder="Identifier" onChange={(event => console.log(event))} /></span>
         </div>
       )
     }
     return (
       <div>
-        Area: <span><br /><input type="text" defaultValue="" /></span>
+        Area: <span><br /><input type="text" defaultValue="" onChange={(event => console.log(event))} /></span>
       </div>
     )
   }
@@ -386,7 +381,7 @@ class MeterModalEditComponent extends React.Component<MeterViewPropsWithIntl,
   private isMeterIP(address?: string) {
     return (
       <div>
-        Meter Address: <span><br /><input type="text" defaultValue={address} placeholder="MeterAddress" /></span>
+        Meter Address: <span><br /><input type="text" defaultValue={address} placeholder="MeterAddress" onChange={(event => console.log(event))} /></span>
       </div>
     )
   }
@@ -395,7 +390,7 @@ class MeterModalEditComponent extends React.Component<MeterViewPropsWithIntl,
   private isNotes(note: string) {
     return (
       <div>
-        Notes:<br /> <input type="text" defaultValue={note} placeholder="" />
+        Notes:<br /> <input type="text" defaultValue={note} placeholder="" onChange={(event => console.log(event))} />
       </div>
     )
   }
@@ -404,7 +399,7 @@ class MeterModalEditComponent extends React.Component<MeterViewPropsWithIntl,
   private isCumulative(cumulative: boolean) {
     return (
       <div>
-        Cumulative: <input type="checkbox" checked={cumulative} />
+        Cumulative: <input type="checkbox" checked={cumulative} onChange={(event => console.log(event))} />
       </div>
     )
   }
@@ -413,7 +408,7 @@ class MeterModalEditComponent extends React.Component<MeterViewPropsWithIntl,
   private isCumulativeReset(cumulativeReset: boolean) {
     return (
       <div>
-        CumulativeReset: <input type="checkbox" checked={cumulativeReset} />
+        CumulativeReset: <input type="checkbox" checked={cumulativeReset} onChange={(event => console.log(event))} />
       </div>
     )
   }
@@ -422,7 +417,7 @@ class MeterModalEditComponent extends React.Component<MeterViewPropsWithIntl,
   private isResetStartTime(time: string) {
     return (
       <div>
-        Reset Start-Time: <input type="text" defaultValue={time} placeholder="" />
+        Reset Start-Time: <input type="text" defaultValue={time} placeholder="" onChange={(event => console.log(event))} />
       </div>
     )
   }
@@ -431,7 +426,7 @@ class MeterModalEditComponent extends React.Component<MeterViewPropsWithIntl,
   private isResetEndTime(time: string) {
     return (
       <div>
-        Reset End-Time: <input type="text" defaultValue={time} placeholder="" />
+        Reset End-Time: <input type="text" defaultValue={time} placeholder="" onChange={(event => console.log(event))} />
       </div>
     )
   }
@@ -440,7 +435,7 @@ class MeterModalEditComponent extends React.Component<MeterViewPropsWithIntl,
   private isTimeSort(sort: boolean) {
     return (
       <div>
-        Time Sort: <input type="checkbox" checked={sort} />
+        Time Sort: <input type="checkbox" checked={sort} onChange={(event => console.log(event))} />
       </div>
     )
   }
@@ -449,7 +444,7 @@ class MeterModalEditComponent extends React.Component<MeterViewPropsWithIntl,
   private isEndOnly(end: boolean) {
     return (
       <div>
-        End Only: <input type="checkbox" checked={end} />
+        End Only: <input type="checkbox" checked={end} onChange={(event => console.log(event))} />
       </div>
     )
   }
@@ -458,7 +453,7 @@ class MeterModalEditComponent extends React.Component<MeterViewPropsWithIntl,
   private isReadGap(readGap: string) {
     return (
       <div>
-        Read Gap: <br /> <input type="text" defaultValue={readGap} placeholder="" />
+        Read Gap: <br /> <input type="text" defaultValue={readGap} placeholder="" onChange={(event => console.log(event))} />
       </div>
     )
   }
@@ -467,7 +462,7 @@ class MeterModalEditComponent extends React.Component<MeterViewPropsWithIntl,
   private isReadingVariation(readingVariation: number) {
     return (
       <div>
-        Reading Variation: <br /> <input type="text" defaultValue={readingVariation} />
+        Reading Variation: <br /> <input type="text" defaultValue={readingVariation} onChange={(event => console.log(event))} />
       </div>
     )
   }
@@ -532,7 +527,7 @@ class MeterModalEditComponent extends React.Component<MeterViewPropsWithIntl,
   private isReading() {
     return (
       <div>
-        Reading:<br /> <input type="text" value="Filler Information" />
+        Reading:<br /> <input type="text" value="Filler Information" onChange={(event => console.log(event))} />
       </div>
     )
   }
@@ -541,7 +536,7 @@ class MeterModalEditComponent extends React.Component<MeterViewPropsWithIntl,
   private isStartDateTime(startTime: string) {
     return (
       <div>
-        Start Date/Time:<br /> <input type="text" defaultValue={startTime} />
+        Start Date/Time:<br /> <input type="text" defaultValue={startTime} onChange={(event => console.log(event))} />
       </div>
     )
   }
@@ -550,7 +545,7 @@ class MeterModalEditComponent extends React.Component<MeterViewPropsWithIntl,
   private isEndDateTime(endTime: string) {
     return (
       <div>
-        End Date/Time:<br /> <input type="text" defaultValue={endTime} />
+        End Date/Time:<br /> <input type="text" defaultValue={endTime} onChange={(event => console.log(event))} />
       </div>
     )
   }
