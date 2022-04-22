@@ -61,7 +61,7 @@ const { assert } = require('console');
 				.field('email', testUser.email)
 				.field('password', testUser.password)
 				.field('gzip', 'false')
-				.attach('csvfile', metersBuffer, `${cumAscRestNoon}`)
+				.attach('csvfile', metersBuffer, `${pipe11}`)
 
 				expect(res).to.have.status(200);
 				const csvMeters = (await parseCsv(metersBuffer)).map(row =>
