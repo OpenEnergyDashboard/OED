@@ -90,13 +90,6 @@ class MeterViewComponent extends React.Component<MeterViewPropsWithIntl, MeterVi
 						select
 					</span>
 				</div>
-				<div className="type-container">
-					Type
-					<span className="custom-select">
-						{/* TODO ---- get data for type */}
-						________
-					</span>
-				</div>
 				<div className="toggle-container">
 					{this.enabledCheck(this.props.meter.enabled)}
 					{this.displayableCheck(this.props.meter.displayable)}
