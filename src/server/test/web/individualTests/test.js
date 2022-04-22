@@ -110,7 +110,7 @@ const { assert } = require('console');
 				.field('meterName', 'XXX')
 				.field('timeSort', 'increasing')
 				.field('gzip', 'false')
-				.attach('csvfile', readingsBuff, `${cumAscRestNoon}`)
+				.attach('csvfile', readingsBuff, `${pipe11}`)
 
 			expect(res).to.have.status(200);
 			const readings = await Reading.getAllByMeterID(meter.id, conn);
@@ -129,7 +129,7 @@ const { assert } = require('console');
 				.field('meterName', 'ABG')
 				.field('timeSort', 'increasing')
 				.field('gzip', 'false')
-				.attach('csvfile', readingsBuffer, `${cumAscRestNoon}`)
+				.attach('csvfile', readingsBuffer, `${pipe11}`)
 
 			const meter = await Meter.getByName('ABG', conn);
 			const readings = await Reading.getAllByMeterID(meter.id, conn);
