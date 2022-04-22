@@ -30,7 +30,7 @@ export function changeDisplayedUnits(units: number[]): t.ChangeDisplayedUnitsAct
 }
 
 export function editUnitDetails(unit: t.UnitData):
-	t.EditUnitDetailsAction {
+t.EditUnitDetailsAction {
 	return { type: ActionType.EditUnitDetails, unit };
 }
 
@@ -83,7 +83,7 @@ export function submitEditedUnit(unitId: number): Thunk {
 /**
  * Remove all the unit in editing without submitting them
  */
- export function confirmEditedUnits(): Thunk {
+export function confirmEditedUnits(): Thunk {
 	return async (dispatch: Dispatch, getState: GetState) => {
 		Object.keys(getState().units.editedUnits).forEach(unitIdS => {
 			const unitId = parseInt(unitIdS);

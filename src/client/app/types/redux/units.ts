@@ -33,12 +33,12 @@ export interface SubmitEditedUnitAction {
 	unit: number;
 }
 
-export type UnitsAction = RequestUnitsDetailsAction 
-	| ReceiveUnitsDetailsAction
-	| ChangeDisplayedUnitsAction
-    | EditUnitDetailsAction
-    | SubmitEditedUnitAction
-    | ConfirmEditedUnitAction;
+export type UnitsAction = RequestUnitsDetailsAction
+| ReceiveUnitsDetailsAction
+| ChangeDisplayedUnitsAction
+| EditUnitDetailsAction
+| SubmitEditedUnitAction
+| ConfirmEditedUnitAction;
 
 export enum UnitType {
 	unit = 'unit',
@@ -77,8 +77,8 @@ export interface UnitEditData {
 	id: number;
 	name: string;
 	identifier: string;
-    unitRepresent: string; 
-    secInRate: number;
+	unitRepresent: string;
+	secInRate: number;
 	typeOfUnit: UnitType;
 	unitIndex: number;
 	suffix: string;

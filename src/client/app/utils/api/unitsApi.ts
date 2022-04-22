@@ -10,24 +10,24 @@ import { NamedIDItem } from '../../types/items';
 export default class UnitsApi {
 	private readonly backend: ApiBackend;
 
-    constructor(backend: ApiBackend){
-        this.backend = backend;
-    }
+	constructor(backend: ApiBackend) {
+		this.backend = backend;
+	}
 
-    public async details(): Promise<NamedIDItem[]>{
-            return await this.backend.doGetRequest<NamedIDItem[]>('/api/units');
-    }
+	public async details(): Promise<NamedIDItem[]> {
+		return await this.backend.doGetRequest<NamedIDItem[]>('/api/units');
+	}
 
-	public async edit(unit: UnitData): Promise<{}> {
+	public async edit(unit: UnitData): Promise<UnitEditData> {
 		return await this.backend.doPostRequest<UnitEditData>(
 			'/api/units/edit',
-			{ id: unit.id, identifier: unit.identifier, unitRepresent: unit.unitRepresent, secInRate: unit.secInRate}
+			{ id: unit.id, identifier: unit.identifier, unitRepresent: unit.unitRepresent, secInRate: unit.secInRate }
 		);
 	}
 
-    public async addUnit(unit: UnitData): Promise<void>{
-        return await this.backend.doPostRequest('/api/units/addUnit',unit);
-    }
+	public async addUnit(unit: UnitData): Promise<void> {
+		return await this.backend.doPostRequest('/api/units/addUnit', unit);
+	}
 
 	public async getUnitsDetails(): Promise<UnitData[]> {
 		return await this.backend.doGetRequest<UnitData[]>('/api/units');

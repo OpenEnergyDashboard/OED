@@ -116,7 +116,7 @@ export enum ActionType {
 
 	ReceiveUnitsDetails = 'RECEIVE_UNITS_DETAILS',
 	RequestUnitsDetails = 'REQUEST_UNITS_DETAILS',
-	ChangeDisplayedUnits = "CHANGE_DISPLAYED_UNITS", 
+	ChangeDisplayedUnits = 'CHANGE_DISPLAYED_UNITS',
 	EditUnitDetails = 'EDIT_UNIT_DETAILS',
 	SubmitEditedUnit = 'SUBMIT_EDITED_UNIT',
 	ConfirmEditedUnit = 'CONFIRM_EDITED_UNIT',
