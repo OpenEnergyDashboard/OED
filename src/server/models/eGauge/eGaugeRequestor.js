@@ -15,7 +15,7 @@ class EgaugeRequestor {
 	 * @param {Meter} meter 
 	 */
 	constructor(meter) {
-		const url = new URL(`https://${meter.ipAddress}`);
+		const url = new URL(`https://${meter.url}`);
 		this.apiUrl = `${url.origin}/api`; // can we add an ending slash??
 		this.username = url.searchParams.get('username');
 		this.password = url.searchParams.get('password');

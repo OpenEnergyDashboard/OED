@@ -4,3 +4,6 @@
 
 ALTER TABLE meters
 ALTER COLUMN ipAddress TYPE VARCHAR(400);
+
+ALTER TABLE meters
+RENAME COLUMN ipAddress TO url;

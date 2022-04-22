@@ -50,7 +50,7 @@ export interface MeterMetadata {
 	enabled: boolean;
 	displayable: boolean;
 	meterType?: string;
-	ipAddress?: string;
+	url?: string;
 	timeZone?: string;
 	gps?: GPSPoint;
 }

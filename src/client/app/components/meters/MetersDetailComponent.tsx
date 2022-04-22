@@ -77,10 +77,10 @@ export default class MetersDetailComponent extends React.Component<MetersDetailP
 									{loggedInAsAdmin && <th> <FormattedMessage id='meter.name' /> </th>}
 									<th> <FormattedMessage id='meter.identifier' /> </th>
 									{loggedInAsAdmin && <th> <FormattedMessage id='meter.type' /> </th>}
-									{loggedInAsAdmin && <th> <FormattedMessage id='meter.ip'/> </th>}
+									{loggedInAsAdmin && <th> <FormattedMessage id='meter.url'/> </th>}
 									{loggedInAsAdmin && <th> <FormattedMessage id='meter.gps'/> </th>}
 									<th> <FormattedMessage id='meter.enabled' /> </th>
-									<th> <FormattedMessage id='meter.displayable' /> </th>
+									{loggedInAsAdmin && <th> <FormattedMessage id='meter.displayable' /> </th>}
 									{loggedInAsAdmin && <th> <FormattedMessage id='meter.time.zone' /> </th>}
 								</tr>
 							</thead>

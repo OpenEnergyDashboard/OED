@@ -28,7 +28,7 @@ function formatMeterForResponse(meter, loggedInAsAdmin) {
 		name: null,
 		enabled: meter.enabled,
 		displayable: meter.displayable,
-		ipAddress: null,
+		url: null,
 		meterType: null,
 		timeZone: null,
 		gps: meter.gps,
@@ -49,10 +49,10 @@ function formatMeterForResponse(meter, loggedInAsAdmin) {
 		endTimestamp : null
 	};
 
-	// Only logged in Admins can see IP addresses, types, timezones, and internal names
+	// Only logged in Admins can see url, types, timezones, and internal names
 	// and lots of other items now.
 	if (loggedInAsAdmin) {
-		formattedMeter.ipAddress = meter.ipAddress;
+		formattedMeter.url = meter.url;
 		formattedMeter.meterType = meter.type;
 		formattedMeter.timeZone = meter.meterTimezone;
 		formattedMeter.name = meter.name;
