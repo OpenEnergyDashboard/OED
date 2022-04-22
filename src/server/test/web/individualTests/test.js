@@ -152,7 +152,7 @@ const { assert } = require('console');
 				.field('email', testUser.email)
 				.field('password', testUser.password)
 				.field('gzip', 'false')
-				.attach('csvfile', metersBuffer, `${cumAscNegative}`)
+				.attach('csvfile', metersBuffer, `${pipe22}`)
 
 				expect(res).to.have.status(200);
 				const csvMeters = (await parseCsv(metersBuffer)).map(row =>
@@ -201,7 +201,7 @@ const { assert } = require('console');
 				.field('meterName', 'XXX')
 				.field('timeSort', 'increasing')
 				.field('gzip', 'false')
-				.attach('csvfile', readingsBuff, `${cumAscNegative}`)
+				.attach('csvfile', readingsBuff, `${pipe22}`)
 
 			expect(res).to.have.status(200);
 			const readings = await Reading.getAllByMeterID(meter.id, conn);
@@ -220,7 +220,7 @@ const { assert } = require('console');
 				.field('meterName', 'ABG')
 				.field('timeSort', 'increasing')
 				.field('gzip', 'false')
-				.attach('csvfile', readingsBuffer, `${cumAscNegative}`)
+				.attach('csvfile', readingsBuffer, `${pipe22}`)
 
 			const meter = await Meter.getByName('ABG', conn);
 			const readings = await Reading.getAllByMeterID(meter.id, conn);
