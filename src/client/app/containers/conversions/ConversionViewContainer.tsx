@@ -7,7 +7,7 @@
  import { Dispatch } from '../../types/redux/actions';
  import { isRoleAdmin } from '../../utils/hasPermissions';
  import ConversionViewComponent from '../../components/conversions/ConversionViewComponent';
- import { editConversionDetails } from '../../actions/conversions';
+ import { editConversionDetails, removeConversion } from '../../actions/conversions';
  import { logToServer } from '../../actions/logs';
  import { Conversion } from '../../types/items';
 
@@ -32,6 +32,7 @@
 
  function mapDispatchToProps(dispatch: Dispatch) {
      return {
+         removeConversion: (conversion: Conversion) => dispatch(removeConversion(conversion)),
          editConversionDetails: (conversion: Conversion) => dispatch(editConversionDetails(conversion)),
          log: (level: string, message: string) => dispatch(logToServer(level,message))
      };

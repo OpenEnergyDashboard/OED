@@ -15,8 +15,8 @@
  import store from '../../index'
  import { Card, Row, Modal } from 'react-bootstrap'
  import { useState } from "react";
-import ConversionViewComponent from './ConversionViewComponent';
-import { title } from 'process';
+ import ConversionViewComponent from './ConversionViewComponent';
+ import { title } from 'process';
 
  interface ConversionDetailProps {
      loggedInAsAdmin: boolean;

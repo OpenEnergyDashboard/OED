@@ -13,7 +13,7 @@
  import store from '../../index'
  import { Card, Row, Modal } from 'react-bootstrap'
  import { useState } from "react";
-import { EditConversionDetailsAction } from '../../types/redux/conversions';
+ import { DeleteConversionAction, EditConversionDetailsAction } from '../../types/redux/conversions';
 
  
  interface ConversionViewProps {
@@ -21,7 +21,9 @@ import { EditConversionDetailsAction } from '../../types/redux/conversions';
      isEdited: boolean;
      isSubmitting: boolean;
      loggedInAsAdmin: boolean;
+     //actions for removing a conversion
      //functions used to dispatch the edit actions
+     removeConversion(conversion: Conversion): DeleteConversionAction;
      editConversionDetails(conversion: Conversion): EditConversionDetailsAction;
      log(level: string, message: string): any;
  }
@@ -73,7 +75,7 @@ import { EditConversionDetailsAction } from '../../types/redux/conversions';
                 <Card.Text>
                     Note: {this.props.conversion.note}
                 </Card.Text>
-                <Button> Placer </Button>
+                <Button> Edit Conversion </Button>
             </Card>
             
         )

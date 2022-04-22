@@ -78,7 +78,7 @@ export function fetchConversionDetailsIfNeeded(alwaysFetch?: boolean): Thunk {
     }
 }
 
-function deleteConversion(conversion: Conversion): t.DeleteConversionAction {
+export function deleteConversion(conversion: Conversion): t.DeleteConversionAction {
     return { type: ActionType.DeleteConversion, conversion};
 }
 
