@@ -69,7 +69,7 @@ class UnitViewComponent extends React.Component<UnitViewPropsWithIntl, UnitViewS
 				{loggedInAsAdmin && <td> {this.props.unit.suffix}</td>}
 				{loggedInAsAdmin && <td> {this.props.unit.displayable}</td>}
 				{loggedInAsAdmin && <td> {this.checkPreferredDisplay()}</td>}
-				{loggedInAsAdmin && <td> {this.props.unit.note}</td>}
+				<td> {this.formatNoteInput()} </td>
 			</tr>
 		);
 	}
