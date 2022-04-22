@@ -8,7 +8,7 @@ import axios from 'axios';
 import { TimeZones, TimeZoneOption } from 'types/timezone';
 
 interface TimeZoneSelectProps {
-	current: string;
+	current: string | undefined;
 	handleClick: (value: string | null) => void;
 }
 
@@ -33,9 +33,11 @@ const TimeZoneSelect: React.FC<TimeZoneSelectProps> = ({ current, handleClick })
 	}, []);
 
 	const handleChange = (selectedOption: TimeZoneOption | null) => {
-		if (selectedOption != null) {
+		if (selectedOption != null ) {
 			handleClick(selectedOption.value);
-		}
+		} 
+		
+
 	};
 
 	return (options !== null ?
