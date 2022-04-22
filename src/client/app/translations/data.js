@@ -139,7 +139,7 @@ const localeData = {
 		"input.gps.coords.first": "input GPS coordinate that corresponds to the point: ",
 		"input.gps.coords.second": "in this format -> latitude,longitude",
 		"input.gps.range": "Invalid GPS coordinate, latitude must be an integer between -90 and 90, longitude must be an integer between -180 and 180",
-		"insuffhent.readings": "Insufficient readings data to process comparison for ",
+		"insufficient.readings": "Insufficient readings data to process comparison for ",
 		"invalid.email.password": "Invalid email/password combination",
 		"invalid.number": "Please submit a valid number (between 0 and 2.0)",
 		"invalid.token.login.or.logout": "Token has expired. Either log in again, or log out.",
