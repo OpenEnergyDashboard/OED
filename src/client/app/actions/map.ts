@@ -17,7 +17,7 @@ import {State} from '../types/redux/state';
 import {mapsApi} from '../utils/api';
 import {showErrorNotification, showSuccessNotification} from '../utils/notifications';
 import translate from '../utils/translate';
-import * as moment from 'moment';
+import * as day from 'day';
 import {browserHistory} from '../utils/history';
 import {logToServer} from './logs';
 
@@ -233,7 +233,7 @@ export function submitNewMap(): Thunk {
 				...map,
 				mapSource: map.image.src,
 				displayable: false,
-				modifiedDate: moment().toISOString(),
+				modifiedDate: day().toISOString(),
 				origin: (map.calibrationResult) ? map.calibrationResult.origin : undefined,
 				opposite: (map.calibrationResult) ? map.calibrationResult.opposite : undefined
 			};
@@ -266,7 +266,7 @@ export function submitEditedMap(mapID: number): Thunk {
 			const acceptableMap: MapData = {
 				...map,
 				mapSource: map.image.src,
-				modifiedDate: moment().toISOString(),
+				modifiedDate: day().toISOString(),
 				origin: (map.calibrationResult) ? map.calibrationResult.origin : map.origin,
 				opposite: (map.calibrationResult) ? map.calibrationResult.opposite : map.opposite,
 				circleSize: map.circleSize

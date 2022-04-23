@@ -4,7 +4,7 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/.
  */
 
-const moment = require('moment');
+const day = require('day');
 const { log } = require('../../log');
 
 /**
@@ -24,8 +24,8 @@ const { log } = require('../../log');
 function handleCumulative(rows, readingRepetition, cumulativeReset, meterID) {
 	const result = [];
 	// Initialize timestamps and other variables
-	let startTimestamp = moment(0);
-	let endTimestamp = moment(0);
+	let startTimestamp = day(0);
+	let endTimestamp = day(0);
 	let meterReading = 0;
 	let meterReading1 = 0;
 	let meterReading2 = 0;
@@ -33,8 +33,8 @@ function handleCumulative(rows, readingRepetition, cumulativeReset, meterID) {
 	for (let index = readingRepetition; index < rows.length; ++index) {
 		// To read data where same reading is repeated. Like E-mon D-mon meters
 		if ((index - readingRepetition) % readingRepetition === 0) {
-			startTimestamp = moment(rows[index][1], 'MM/DD/YY HH:mm');
-			endTimestamp = moment(rows[index - readingRepetition][2], 'MM/DD/YY HH:mm');
+			startTimestamp = day(rows[index][1], 'MM/DD/YY HH:mm');
+			endTimestamp = day(rows[index - readingRepetition][2], 'MM/DD/YY HH:mm');
 			// meterReading
 			meterReading1 = rows[index - readingRepetition][0];
 			meterReading2 = rows[index][0];

@@ -8,7 +8,7 @@ import { Link } from 'react-router-dom';
 import { hasToken } from '../../utils/token';
 import { FormattedMessage, injectIntl, WrappedComponentProps } from 'react-intl';
 import { CalibrationModeTypes, MapMetadata } from '../../types/redux/map';
-import * as moment from 'moment';
+import * as day from 'day';
 import store from '../../index';
 import { updateUnsavedChanges } from '../../actions/unsavedWarning';
 import { fetchMapsDetails, submitEditedMaps, confirmEditedMaps } from '../../actions/map';
@@ -68,7 +68,7 @@ class MapViewComponent extends React.Component<MapViewPropsWithIntl, MapViewStat
 				<td> {this.formatName()} </td>
 				{hasToken() && <td> {this.formatDisplayable()} </td>}
 				{hasToken() && <td> {this.formatCircleSize()} </td>}
-				{hasToken() && <td> {moment(this.props.map.modifiedDate).format('dddd, MMM DD, YYYY hh:mm a')} </td>}
+				{hasToken() && <td> {day(this.props.map.modifiedDate).format('dddd, MMM DD, YYYY hh:mm a')} </td>}
 				{hasToken() && <td> {this.formatFilename()} </td>}
 				{hasToken() && <td> {this.formatNote()} </td>}
 				{hasToken() && <td> {this.formatCalibrationStatus()} </td>}

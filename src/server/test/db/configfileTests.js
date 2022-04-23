@@ -4,7 +4,7 @@
 
 const { mocha, expect, testDB } = require('../common');
 const md5 = require('md5');
-const moment = require('moment');
+const momdayent = require('day');
 const Configfile = require('../../models/obvius/Configfile');
 const listConfigfiles = require('../../services/obvius/listConfigfiles');
 
@@ -28,15 +28,15 @@ mocha.describe('Configfiles', () => {
 	mocha.it('can be saved and retrieved', async () => {
 		const contents = 'Some test contents for the log file.';
 		const chash = md5(contents);
-		const configfilePreInsert = new Configfile(undefined, '0', 'md1', moment(), chash, contents, false);
+		const configfilePreInsert = new Configfile(undefined, '0', 'md1', day(), chash, contents, false);
 		await configfilePreInsert.insert(conn);
 		const configfilePostInsertByID = await Configfile.getByID(1, conn);
 		expectConfigfilesToBeEquivalent(configfilePreInsert, configfilePostInsertByID);
 	});
 	mocha.it('can be retrieved by serial ID', async () => {
-		const configfile1 = new Configfile(undefined, '0', 'md1', moment().subtract(1, 'd'), md5('contents'), 'contents', true);
-		const configfile2 = new Configfile(undefined, '0', 'md1', moment(), md5('contents'), 'contents', true);
-		const configfile3 = new Configfile(undefined, '1', 'md2', moment(), md5('contents'), 'contents', true);
+		const configfile1 = new Configfile(undefined, '0', 'md1', day().subtract(1, 'd'), md5('contents'), 'contents', true);
+		const configfile2 = new Configfile(undefined, '0', 'md1', day(), md5('contents'), 'contents', true);
+		const configfile3 = new Configfile(undefined, '1', 'md2', day(), md5('contents'), 'contents', true);
 		await configfile1.insert(conn);
 		await configfile2.insert(conn);
 		await configfile3.insert(conn);
@@ -52,9 +52,9 @@ mocha.describe('Configfiles', () => {
 		expectConfigfilesToBeEquivalent(configfilesForAllZeroes[1], configfile2);
 	});
 	mocha.it('can generate an Obvius config manifest', async () => {
-		const configfile1 = new Configfile(undefined, '0', 'md1', moment('1970-01-01'), md5('contents1'), 'contents1', true);
-		const configfile2 = new Configfile(undefined, '0', 'md1', moment('1970-01-02'), md5('contents2'), 'contents2', true);
-		const configfile3 = new Configfile(undefined, '0', 'md1', moment('1970-01-03'), md5('contents3'), 'contents3', true);
+		const configfile1 = new Configfile(undefined, '0', 'md1', day('1970-01-01'), md5('contents1'), 'contents1', true);
+		const configfile2 = new Configfile(undefined, '0', 'md1', day('1970-01-02'), md5('contents2'), 'contents2', true);
+		const configfile3 = new Configfile(undefined, '0', 'md1', day('1970-01-03'), md5('contents3'), 'contents3', true);
 
 		await configfile1.insert(conn);
 		await configfile2.insert(conn);

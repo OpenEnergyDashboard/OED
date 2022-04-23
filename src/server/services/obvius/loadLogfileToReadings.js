@@ -2,7 +2,7 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
 
-const moment = require('moment');
+const day = require('day');
 const Meter = require('../../models/Meter');
 const Reading = require('../../models/Reading');
 const loadArrayInput = require('../pipeline-in-progress/loadArrayInput');
@@ -24,7 +24,7 @@ async function loadLogfileToReadings(serialNumber, ipAddress, logfile, conn) {
 			// end only time is true for Obvius meters.
 			meter = new Meter(undefined, `${serialNumber}.${i}`, ipAddress, true, false, Meter.type.OBVIUS,
 				null, undefined, `OBVIUS ${serialNumber} COLUMN ${i}`, 'created via obvious log upload on ' +
-				moment().format(), undefined, undefined, undefined, undefined, undefined, undefined, undefined,
+				day().format(), undefined, undefined, undefined, undefined, undefined, undefined, undefined,
 				undefined, undefined, true, undefined, undefined, undefined);
 			await meter.insert(conn);
 			log.warn('WARNING: Created a meter (' + `${serialNumber}.${i}` +
@@ -47,7 +47,7 @@ async function loadLogfileToReadings(serialNumber, ipAddress, logfile, conn) {
 			// const endTimestamp = moment(rawReading[0], 'YYYY-MM-DD HH:mm:ss', true);
 			// TODO For reasons I do not understand, strict mode causes Invalid date even though debugging seems
 			// to indicate it is correct. I thought it worked before but it does not. Thus, removing strict mode for now.
-			const endTimestamp = moment(rawReading[0], 'YYYY-MM-DD HH:mm:ss');
+			const endTimestamp = day(rawReading[0], 'YYYY-MM-DD HH:mm:ss');
 			reading[index] = [rawReading[1], endTimestamp];
 			index++;
 		}

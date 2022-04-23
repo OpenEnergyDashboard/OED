@@ -5,14 +5,14 @@
  */
 
 const { is } = require('core-js/core/object');
-const moment = require('moment');
+const day = require('day');
 const { log } = require('../../log');
 const Meter = require('../../models/Meter');
 const Reading = require('../../models/Reading');
 const handleCumulativeReset = require('./handleCumulativeReset');
 const { validateReadings } = require('./validateReadings');
 const { TimeSortTypesJS } = require('../csvPipeline/validateCsvUploadParams');
-const E0 = moment(0);
+const E0 = day(0);
 
 /**
  * Handle all data, assume that the first row is the first reading if increasing and last is first reading if decreasing.
@@ -139,11 +139,11 @@ async function processData(rows, meterID, timeSort = TimeSortTypesJS.increasing,
 		if (isEndTime) {
 			// The startTimestamp of this reading is the endTimestamp of the previous reading
 			startTimestamp = prevReading.endTimestamp;
-			endTimestamp = moment(rows[index][1], undefined, true);
+			endTimestamp = day(rows[index][1], undefined, true);
 		}
 		else {
-			startTimestamp = moment(rows[index][1], undefined, true);
-			endTimestamp = moment(rows[index][2], undefined, true);
+			startTimestamp = day(rows[index][1], undefined, true);
+			endTimestamp = day(rows[index][2], undefined, true);
 		}
 		if (startTimestamp.format() === 'Invalid date' || endTimestamp.format() === 'Invalid date') {
 			errMsg += 'For meter ' + meterName + ': Error parsing Reading #' + row(index, isAscending, rows.length) +
@@ -405,7 +405,7 @@ async function processData(rows, meterID, timeSort = TimeSortTypesJS.increasing,
 /**
  * Generally used to see if a reading is the initial value stored in the DB for date/time to know if you are
  * working with this special reading.
- * @param {moment} t moment date/time to compare against the first ever possible moment date/time which may exist
+ * @param {day} t moment date/time to compare against the first ever possible moment date/time which may exist
  */
 function isFirst(t) {
 	return t.isSame(E0);

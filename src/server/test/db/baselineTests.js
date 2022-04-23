@@ -6,7 +6,7 @@ const { mocha, expect, testDB } = require('../common');
 const Baseline = require('../../models/Baseline');
 const Meter = require('../../models/Meter');
 const Reading = require('../../models/Reading');
-const moment = require('moment');
+const day = require('day');
 const Point = require('../../models/Point');
 const gps = new Point(90, 45);
 
@@ -19,14 +19,14 @@ mocha.describe('Baselines', () => {
 		const reading = new Reading(
 			meter.id,
 			1,
-			moment('1950-01-01'),
-			moment('1950-02-01')
+			day('1950-01-01'),
+			day('1950-02-01')
 		);
 		await reading.insert(conn);
-		const applyStart = moment('1970-01-01 00:01:00');
-		const applyEnd = moment('2069-12-31 00:01:00');
-		const calcStart = moment('1950-01-01 00:01:00');
-		const calcEnd = moment('1950-12-31 00:01:00');
+		const applyStart = day('1970-01-01 00:01:00');
+		const applyEnd = day('2069-12-31 00:01:00');
+		const calcStart = day('1950-01-01 00:01:00');
+		const calcEnd = day('1950-12-31 00:01:00');
 		const baseline = new Baseline(
 			meter.id,
 			applyStart,

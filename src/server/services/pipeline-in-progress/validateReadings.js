@@ -24,8 +24,8 @@ function validateReadings(arrayToValidate, conditionSet) {
 /**
  * Check and report any out-of-bound date. Can be ignored by passing null minDate and maxDate
  * @param {Reading[]} arrayToValidate
- * @param {Moment} minDate inclusive earliest acceptable date (won't be rejected)
- * @param {Moment} maxDate inclusive latest acceptable date (won't be rejected)
+ * @param {Day} minDate inclusive earliest acceptable date (won't be rejected)
+ * @param {Day} maxDate inclusive latest acceptable date (won't be rejected)
  * @param {number} maxError maximum number of errors to be reported, ignore the rest
  */
 function checkDate(arrayToValidate, minDate, maxDate, maxError) {

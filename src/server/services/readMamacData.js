@@ -5,7 +5,7 @@
 const reqPromise = require('request-promise-native');
 const promisify = require('es6-promisify');
 const csv = require('csv');
-const moment = require('moment');
+const day = require('day');
 const Reading = require('../models/Reading');
 const loadArrayInput = require('./pipeline-in-progress/loadArrayInput');
 
@@ -18,7 +18,7 @@ function parseTimestamp(raw, line) {
 		throw new Error(`CSV line ${line}: Raw timestamp ${raw} does not pass regex validation`);
 	}
 	// Set moment to strict mode so bad values are noticed.
-	const ts = moment(raw, 'HH:mm:ss MM/DD/YY', true);
+	const ts = day(raw, 'HH:mm:ss MM/DD/YY', true);
 	// This check should be done in pipeline but leave here for now/historical reasons. Note in pipeline check if
 	// format() value is Invalid date.
 	if (!ts.isValid()) {

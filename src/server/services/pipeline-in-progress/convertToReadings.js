@@ -7,7 +7,7 @@
 const Reading = require('../../models/Reading');
 const { log } = require('../../log');
 const { validateReadings } = require('./validateReadings');
-const moment = require('moment');
+const day = require('day');
 
 /**
  * Convert an matrix of number values to an array of Readings

@@ -12,7 +12,7 @@ const chai = require('chai');
 const mocha = require('mocha');
 const expect = chai.expect;
 const fs = require('fs').promises;
-const moment = require('moment');
+const day = require('day');
 const promisify = require('es6-promisify');
 const csv = require('csv');
 const parseCsv = promisify(csv.parse);
@@ -37,8 +37,8 @@ mocha.describe('The generateDates function', () => {
 		const startTimeStamp = '2020-10-01 21:00:00';
 		const endTimeStamp = '2020-10-02 21:00:00';
 		const timeStep = { second: 13 };
-		const startMoment = moment(startTimeStamp);
-		const endMoment = moment(endTimeStamp);
+		const startMoment = day(startTimeStamp);
+		const endMoment = day(endTimeStamp);
 		const result = [];
 		while (!startMoment.isAfter(endMoment)) {
 			result.push(startMoment.format('YYYY-MM-DD HH:mm:ss'));
@@ -54,7 +54,7 @@ mocha.describe('momenting', () => {
 	const momenting = generateData.momenting;
 	mocha.it('should cover the simple singleton case', () => {
 		const date = '2019-09-10 00:00:15';
-		const periodOfMoments = [moment(date)];
+		const periodOfMoments = [day(date)];
 		expect(momenting(periodOfMoments, undefined)).to.deep.equals([1]);
 	});
 	mocha.it('should be able to partition an array with just two elements', () => {
@@ -66,13 +66,13 @@ mocha.describe('momenting', () => {
 		const test = ['2019-09-10T00:00:15',
 			'2019-09-10T00:00:30', '2019-09-10T00:01:00'];
 		const timeStepMs = 15000;
-		expect(momenting(test.map(timeStamp => moment(timeStamp)), timeStepMs)).to.deep.equals([0, 1, 1]);
+		expect(momenting(test.map(timeStamp => day(timeStamp)), timeStepMs)).to.deep.equals([0, 1, 1]);
 	});
 	mocha.it('should work on irregular time steps', () => {
 		const test = ['2019-09-10T00:00:15',
 			'2019-09-10T00:00:30', '2019-09-10T00:00:50'];
 		const timeStepMs = 15000;
-		expect(momenting(test.map(timeStamp => moment(timeStamp)), timeStepMs)).to.deep.equals([0, 1, 5 / 15]);
+		expect(momenting(test.map(timeStamp => day(timeStamp)), timeStepMs)).to.deep.equals([0, 1, 5 / 15]);
 	});
 });
 

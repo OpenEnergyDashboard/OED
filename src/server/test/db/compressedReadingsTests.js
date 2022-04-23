@@ -7,7 +7,7 @@
  */
 
 const { mocha, expect, testDB } = require('../common');
-const moment = require('moment');
+const day = require('day');
 const Group = require('../../models/Group');
 const Meter = require('../../models/Meter');
 const Reading = require('../../models/Reading');
@@ -20,7 +20,7 @@ const gps = new Point(90, 45);
  */
 mocha.describe('Compressed Readings', () => {
 	let meter;
-	const timestamp1 = moment('2017-01-01');
+	const timestamp1 = day('2017-01-01');
 	const timestamp2 = timestamp1.clone().add(1, 'hour');
 	const timestamp3 = timestamp2.clone().add(1, 'hour');
 	const timestamp4 = timestamp3.clone().add(1, 'hour');
@@ -107,8 +107,8 @@ mocha.describe('Compressed Readings', () => {
 
 	mocha.describe('With groups, meters, and readings set up', async () => {
 		let meter2;
-		const startTimestamp = moment('2017-01-01');
-		const endTimestamp = moment('2017-01-01').add(1, 'hour');
+		const startTimestamp = day('2017-01-01');
+		const endTimestamp = day('2017-01-01').add(1, 'hour');
 		const readingValue = 10;
 		mocha.beforeEach(async () => {
 			conn = testDB.getConnection();

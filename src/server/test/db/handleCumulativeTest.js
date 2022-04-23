@@ -6,11 +6,11 @@
 const { mocha, expect } = require('../common');
 const handleCumulative = require('../../services/pipeline-in-progress/handleCumulative');
 const Reading = require('../../models/Reading');
-const moment = require('moment');
+const day = require('day');
 
 mocha.describe('PIPELINE: Handle cumulative', () => {
-	let sampleArray = [[10000, moment('1970-01-01 00:00:00'), moment('1970-01-01 00:00:30')]];
-	let sampleNegativeArray = [[10, moment('1970-01-01 00:00:00'), moment('1970-01-01 00:00:30')]];
+	let sampleArray = [[10000, day('1970-01-01 00:00:00'), day('1970-01-01 00:00:30')]];
+	let sampleNegativeArray = [[10, day('1970-01-01 00:00:00'), day('1970-01-01 00:00:30')]];
 	const valGap = 2;
 	const timeGap = 30;
 	for (let i = 1; i < 12; ++i) {

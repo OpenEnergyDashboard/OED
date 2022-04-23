@@ -9,7 +9,7 @@
 const { mocha, expect, testDB } = require('../common');
 const Meter = require('../../models/Meter');
 const Point = require('../../models/Point');
-const moment = require('moment');
+const day = require('day');
 const gps = new Point(90, 45);
 
 /**
@@ -39,8 +39,8 @@ function expectMetersToBeEquivalent(expected, actual) {
 	expect(actual).to.have.property('timeSort', expected.timeSort);
 	expect(actual).to.have.property('endOnlyTime', expected.endOnlyTime);
 	expect(actual).to.have.property('reading', expected.reading);
-	expect(actual.startTimestamp.isSame(moment(expected.startTimestamp))).to.equal(true);
-	expect(actual.endTimestamp.isSame(moment(expected.endTimestamp))).to.equal(true);
+	expect(actual.startTimestamp.isSame(day(expected.startTimestamp))).to.equal(true);
+	expect(actual.endTimestamp.isSame(day(expected.endTimestamp))).to.equal(true);
 }
 
 mocha.describe('Meters', () => {

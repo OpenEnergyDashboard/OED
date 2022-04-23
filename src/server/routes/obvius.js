@@ -16,7 +16,7 @@
 const express = require('express');
 const config = require('../config');
 const multer = require('multer');
-const moment = require('moment');
+const day = require('day');
 const md5 = require('md5');
 const zlib = require('zlib');
 const { log } = require('../log');
@@ -200,7 +200,7 @@ router.all('/', obviusLog, verifyObviusUser, async (req, res) => {
 				data = fx.buffer.toString('utf-8');
 			}
 
-			const cf = new Configfile(undefined, req.param('serialnumber'), req.param('modbusdevice'), moment(), md5(data), data, true);
+			const cf = new Configfile(undefined, req.param('serialnumber'), req.param('modbusdevice'), day(), md5(data), data, true);
 			await cf.insert(conn);
 			success(req, res, `Acquired config log with (pseudo)filename ${cf.makeFilename()}.`);
 		}

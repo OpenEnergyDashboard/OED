@@ -7,7 +7,7 @@
 const { mocha, expect, testDB } = require('../common');
 const { Map } = require('../../models/Map');
 const Point = require('../../models/Point');
-const moment = require('moment');
+const day = require('day');
 
 function expectPointsToBeEquivalent(expected, actual) {
 	expect(actual).to.have.property('longitude', expected.longitude);
@@ -37,7 +37,7 @@ mocha.describe('Maps', () => {
 		const conn = testDB.getConnection();
 		const origin = new Point(0.000001, 0.000001);
 		const opposite = new Point(100.000001, 100.000001);
-		const mapPreInsert = new Map(undefined, 'Map', false, null, 'default', moment('2000-10-10'), origin, opposite, 'placeholder', 22.5, 0.2);
+		const mapPreInsert = new Map(undefined, 'Map', false, null, 'default', day('2000-10-10'), origin, opposite, 'placeholder', 22.5, 0.2);
 		await mapPreInsert.insert(conn);
 		const mapPostInsertByName = await Map.getByName(mapPreInsert.name, conn);
 		expectMapsToBeEquivalent(mapPreInsert, mapPostInsertByName);
