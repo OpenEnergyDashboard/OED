@@ -10,12 +10,12 @@ module.exports = {
 	fromVersion: '0.8.0',
 	toVersion: '1.0.0',
 	up: async db => {
-		console.log("YES");
 		await db.none(sqlFile('../migrations/0.8.0-1.0.0/sql/unit/add_displayable_types.sql'));
 		await db.none(sqlFile('../migrations/0.8.0-1.0.0/sql/unit/add_unit_represent_types.sql'));
 		await db.none(sqlFile('../migrations/0.8.0-1.0.0/sql/unit/add_unit_types.sql'));
 		await db.none(sqlFile('../migrations/0.8.0-1.0.0/sql/unit/create_units_table.sql'));
 		await db.none(sqlFile('../migrations/0.8.0-1.0.0/sql/conversion/create_conversions_table.sql'));
+		await db.none(sqlFile('../migrations/0.8.0-1.0.0/sql/meter/add_default_units_and_conversions.sql'));
 		await db.none(sqlFile('../migrations/0.8.0-1.0.0/sql/meter/add_unit_id_default_graphic_unit.sql'));
 		await db.none(sqlFile('../migrations/0.8.0-1.0.0/sql/group/add_default_graphic_unit.sql'));
 		await db.none(sqlFile('../migrations/0.8.0-1.0.0/sql/cik/create_cik_table.sql'));
