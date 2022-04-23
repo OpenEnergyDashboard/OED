@@ -4,7 +4,6 @@
 
 const database = require('../../models/database');
 const sqlFile = database.sqlFile;
-const Unit = require('../../models/Unit');
 
 module.exports = {
 	fromVersion: '0.8.0',
