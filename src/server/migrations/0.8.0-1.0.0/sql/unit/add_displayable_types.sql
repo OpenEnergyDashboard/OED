@@ -2,8 +2,6 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
 
--- This should avoid an error when the type already exists. This is an issue since
--- OED install stops the creation of database items after this.
 DO $$ BEGIN 
 	CREATE TYPE displayable_type AS ENUM('none', 'all', 'admin');
 EXCEPTION
