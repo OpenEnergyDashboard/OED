@@ -24,7 +24,7 @@ async function loadLogfileToReadings(serialNumber, ipAddress, logfile, conn) {
 			meter = new Meter(undefined, `${serialNumber}.${i}`, ipAddress, true, false, Meter.type.OBVIUS,
 				null, undefined, `OBVIUS ${serialNumber} COLUMN ${i}`, 'created via obvious log upload on ' +
 				moment().format(), undefined, undefined, undefined, undefined, undefined, undefined, undefined,
-				undefined, undefined, true, undefined, undefined, undefined);
+				undefined, undefined, true, undefined, undefined, undefined, undefined, undefined);
 			await meter.insert(conn);
 			log.warn('WARNING: Created a meter (' + `${serialNumber}.${i}` +
 				') that does not already exist. Normally obvius meters created by an uploaded ConfigFile.');

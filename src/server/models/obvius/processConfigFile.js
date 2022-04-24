@@ -26,6 +26,8 @@ function processConfigFile(configFile) {
 		const meter = metersHash[internalMeterName];
 		metersHash[internalMeterName] = { ...meter, [characteristic]: config[key] };
 	}
+	// TODO: the unit name needs to come from the config file
+	const unitName = 'kWh';
 	for (internalMeterName of Object.keys(metersHash)) {
 		metersArray.push(new Meter(
 			undefined,
@@ -53,7 +55,9 @@ function processConfigFile(configFile) {
 			true,
 			undefined,
 			undefined,
-			undefined
+			undefined,
+			unitId=1,
+			defaultGraphicUnit=1
 			)
 		);
 	}

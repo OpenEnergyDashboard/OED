@@ -80,6 +80,8 @@ function expectMetersToBeEquivalent(meters, length, offset) {
 			expect(meter).to.have.property('reading', null);
 			expect(meter).to.have.property('startTimestamp', null);
 			expect(meter).to.have.property('endTimestamp', null);
+			expect(meter).to.have.property('unitId', 1);
+			expect(meter).to.have.property('defaultGraphicUnit', 1);
 		}
 	}
 }
