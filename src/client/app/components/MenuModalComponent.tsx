@@ -66,6 +66,6 @@ export default class MenuModalComponent extends React.Component<MenuModalProps, 
 	}
 
 	private toggle() {
-		this.setState({ showModal: !this.state.showModal });
+		this.setState(prevState => ({ showModal: !prevState.showModal }));
 	}
 }

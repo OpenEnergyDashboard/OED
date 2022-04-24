@@ -15,7 +15,6 @@ import {TimeInterval} from '../../../common/TimeInterval';
 import Button from 'reactstrap/lib/Button';
 import { FormattedMessage } from 'react-intl';
 import TooltipMarkerComponent from './TooltipMarkerComponent';
-import ReactTooltip from 'react-tooltip';
 
 interface DashboardProps {
 	chartToRender: ChartTypes;
@@ -36,12 +35,6 @@ export default class DashboardComponent extends React.Component<DashboardProps> 
 	constructor(props: DashboardProps) {
 		super(props);
 		this.handleTimeIntervalChange = this.handleTimeIntervalChange.bind(this);
-	}
-
-	public componentDidUpdate(prev: DashboardProps) {
-		if ((prev.optionsVisibility !== this.props.optionsVisibility)){
-			ReactTooltip.rebuild(); // This rebuilds the tooltip so that it detects the marker that disappear because the hiding and showing options.
-		}
 	}
 
 	public render() {
@@ -71,7 +64,7 @@ export default class DashboardComponent extends React.Component<DashboardProps> 
 			throw new Error('unrecognized type of chart');
 		}
 
-		const optionsClassName = 'col-2 d-none d-lg-block';
+		const optionsClassName = this.props.optionsVisibility ? 'col-2 d-none d-lg-block' : 'd-none';
 		const chartClassName = this.props.optionsVisibility ? 'col-12 col-lg-10' : 'col-12';
 
 		const buttonMargin: React.CSSProperties = {
@@ -81,12 +74,9 @@ export default class DashboardComponent extends React.Component<DashboardProps> 
 		return (
 			<div className='container-fluid'>
 				<div className='row'>
-					{this.props.optionsVisibility &&
-						<div className={optionsClassName}>
-							<UIOptionsContainer />
-						</div>
-					}
-
+					<div className={optionsClassName}>
+						<UIOptionsContainer />
+					</div>
 					<div className={`${chartClassName} align-self-auto text-center`}>
 						{ showSpinner ? (
 							<SpinnerComponent loading width={50} height={50} />
