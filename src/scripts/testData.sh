@@ -7,9 +7,8 @@
 
 echo "This script assumes you have OED running."
 echo "This script is normally run for the main OED directory (where package.json is located)"
-echo "This script should not be run with a different container meaning don't user docker-compose."
 echo "Time estimates will vary depending on your machine and what it is doing."
-echo "The terminal where you started OED will show any errors and some of the activity going on"
+echo "The OED output will show any errors and some of the activity going on"
 echo "  but normally only once the loading of data into OED begins."
 echo "Comments inside this script tell you how to delete all current readings and meters from the"
 echo "  database if you already ran this before and need to remove that data. You will likley get "
@@ -22,8 +21,8 @@ echo "  if you rerun without doing this but the result is normally fine."
 # meters and readings already exist.
 # NOTE this removes the meters and readings. You may need to remove dependent groups
 # before doing this in the web groups page in OED.
-# Get into postgres in the terminal.
-# docker-compose exec database psql -U oed
+# Get into postgres terminal inside the database Docker container and then do:
+# psql -U oed
 # Remove all the readings. Normally gives "DELETE 575218"
 # > delete from readings where meter_id in (select id from meters where name in ('test4DaySin', 'test4HourSin', 'test23MinSin', 'test15MinSin', 'test23MinCos', 'testSqSin', 'testSqCos', 'testAmp1Sin', 'testAmp2Sin', 'testAmp3Sin', 'testAmp4Sin', 'testAmp5Sin', 'testAmp6Sin', 'testAmp7Sin'));
 # Remove all the meters. Normally gives "DELETE 14"
@@ -59,10 +58,10 @@ echo "  This normally takes less than a minute:"
 # This assumes you have a newer version (as of 2021) docker that has compose built in.
 # In the past it was docker-compose.
 # Don't use --rm since this seems to cause the newer docker to terminate any other running OED (which is needed for the CSV upload).
-docker compose run web npm run generateTestingData
+npm run generateTestingData
 echo -e "\nStart generating second set of test data (varying amplitudes)"
 echo "  This normally takes about a minute:"
-docker compose run web npm run generateVariableAmplitudeTestingData
+npm run generateVariableAmplitudeTestingData
 
 # Go to directory with test data
 cd $testdatadir
