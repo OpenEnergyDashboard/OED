@@ -4,7 +4,7 @@
 
 import { connect } from 'react-redux';
 import { fetchVersionIfNeeded } from '../actions/version'
-import TooltipHelpComponentAlternative from '../components/TooltipHelpComponentAlternative';
+import TooltipHelpComponent from '../components/TooltipHelpComponent';
 import { State } from '../types/redux/state';
 import { Dispatch } from '../types/redux/actions';
 
@@ -23,4 +23,4 @@ function mapDispatchToProps(dispatch: Dispatch) {
 	};
 }
 
-export default connect(mapStateToProps, mapDispatchToProps)(TooltipHelpComponentAlternative);
+export default connect(mapStateToProps, mapDispatchToProps)(TooltipHelpComponent);
