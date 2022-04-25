@@ -18,10 +18,6 @@ import { gpsToUserGrid } from './../utils/calibration';
 import { DisplayableType, UnitData, UnitType } from '../types/redux/units'
 import { metersInGroup, setIntersect, unitsCompatibleWithMeters } from '../utils/determineCompatibleUnits';
 import { DataType } from '../types/Datasources';
-import { GroupData } from '../types/redux/groups'
-import e from 'express';
-import { isRoleAdmin } from 'utils/hasPermissions';
-import groups from 'reducers/groups';
 
 
 /* Passes the current redux state of the chart select container, and turns it into props for the React
@@ -272,96 +268,55 @@ export function getUnitCompatibility(compatibleUnits: Set<number>, incompatibleU
 	return _.orderBy(finalUnits, ['isDisabled', 'label'], ['asc', 'asc']);
 }
 
+/**
+ * Determines the compatibility of group in the redux state for display in dropdown
+ * @param {State} state - current redux state
+ * @return {SelectOption[]} an array of SelectOption
+ */
 export function getGroupCompatibilityForDropdown(state: State) {
-	const visibleGroups = new Set<number>();
-
+	const visibleGroup: number[] = [];
+	// Get all the groups that this user can see.
 	if (state.currentUser.profile?.role == 'admin') {
-		_.forEach(state.groups.byGroupID, (group) => {
-			visibleGroups.add(group.id);
-		})
-	} else {
-		_.forEach(state.groups.byGroupID, (group) => {
-			if (group.displayable) {
-				visibleGroups.add(group.id);
-			}
-		})
-	}
-
-	const compatibleGroups = new Set<number>();
-	const incompatibleGroups = new Set<number>();
-
-	if (state.graph.selectedUnit == -99) {
-		visibleGroups.forEach(group => {
-			if (state.groups.byGroupID[group].defaultGraphicUnit == -99) {
-				incompatibleGroups.add(group);
-			} else {
-				compatibleGroups.add(group)
-			}
-
-		})
-	} else {
-		visibleGroups.forEach(async group => {
-			const meters = await metersInGroup(group)
-			const units = unitsCompatibleWithMeters(meters);
-			if (units.has(state.groups.byGroupID[group].defaultGraphicUnit)) {
-				compatibleGroups.add(group);
-			} else {
-				incompatibleGroups.add(group);
-			}
-		})
-	}
-
-	const finalGroup: SelectOption[] = [];
-	visibleGroups.forEach(group => {
-		if (compatibleGroups.has(group)) {
-			finalGroup.push({
-				label: state.groups.byGroupID[group].name,
-				value: group,
-				isDisabled: false
-			} as SelectOption)
-		} else if (incompatibleGroups.has(group)) {
-			finalGroup.push({
-				label: state.groups.byGroupID[group].name,
-				value: group,
-				isDisabled: true
-			} as SelectOption)
-		}
-	})
-
-	return _.sortBy(_.values(finalGroup), 'label');
-}
-
-export function getGroupsCompatibiltyForDropDown(state: State) {
-	let visibleGroup: number[] = [];
-	if (state.currentUser.profile?.role == 'admin') {
-		_.forEach(state.groups.byGroupID, (group) => {
+		// Can see all groups
+		_.forEach(state.groups.byGroupID, group => {
 			visibleGroup.push(group.id);
 		})
 	} else {
-		_.forEach(state.groups.byGroupID, (group) => {
+		// regular user or not logged in so only displayable ones
+		_.forEach(state.groups.byGroupID, group => {
 			if (group.displayable) {
 				visibleGroup.push(group.id);
 			}
 		})
 	}
-	let compatibleGroups = new Set<number>();
-	let incompatibleGroups = new Set<number>();
+	// groups that can graph
+	const compatibleGroups = new Set<number>();
+	// groups that cannot graph.
+	const incompatibleGroups = new Set<number>();
 	if (state.graph.selectedUnit === -99) {
+		// If there is no graphic unit then no meters/groups are displayed and you can display all groups
+		// that have a default graphic unit that user can see (if displayable is false then only admin)
 		_.forEach(visibleGroup, group => {
-			if(state.groups.byGroupID[group].defaultGraphicUnit === -99){
-              incompatibleGroups.add(group)
+			if (state.groups.byGroupID[group].defaultGraphicUnit === -99) {
+				// If the graphic unit is no unit and group has no default graphic unit then cannot graph
+				incompatibleGroups.add(group)
 			} else {
 				compatibleGroups.add(group)
 			}
-			
+
 		})
 	} else {
-		_.forEach(visibleGroup, async group => { 
-			let meters = await metersInGroup(group)
-			let units = unitsCompatibleWithMeters(meters)
-			if(units.has(group)){
+		_.forEach(visibleGroup, async group => {
+			// Get the meters associated with this group.
+			const meters = await metersInGroup(group)
+			// Get compatible units for all these meters.
+			// While a group should not have a meter without a unit (e.g., null) this will return an empty
+			// set so nothing is compatible with it.
+			const units = unitsCompatibleWithMeters(meters)
+			if (units.has(group)) {
+				// The compatible units of the group have graphic unit so can graph
 				compatibleGroups.add(group)
-			} else{
+			} else {
 				incompatibleGroups.add(group)
 			}
 
@@ -369,22 +324,22 @@ export function getGroupsCompatibiltyForDropDown(state: State) {
 		})
 
 	}
-	let finalGroups: SelectOption[] = [];
-	visibleGroup.forEach( group => {
-		if(compatibleGroups.has(group)){
+	const finalGroups: SelectOption[] = [];
+	visibleGroup.forEach(group => {
+		if (compatibleGroups.has(group)) {
 			finalGroups.push({
 				label: state.groups.byGroupID[group].name,
-				value: group, 
+				value: group,
 				isDisabled: false
-			} as SelectOption )
-		} else if(incompatibleGroups.has(group)) {
+			} as SelectOption)
+		} else if (incompatibleGroups.has(group)) {
 			finalGroups.push({
 				label: state.groups.byGroupID[group].name,
-				value: group, 
+				value: group,
 				isDisabled: true
-			} as SelectOption )
+			} as SelectOption)
 
 		}
 	})
-	return _.sortBy(_.sortBy(finalGroups,group => group.label.toLowerCase(), 'asc'), group => group.isDisabled, 'asc')
+	return _.sortBy(_.sortBy(finalGroups, group => group.label.toLowerCase(), 'asc'), group => group.isDisabled, 'asc')
 }
