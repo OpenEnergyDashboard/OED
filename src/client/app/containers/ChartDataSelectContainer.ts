@@ -259,8 +259,6 @@ function getUnitCompatibility(compatibleUnits: Set<number>, incompatibleUnits: S
 		} as SelectOption
 		)
 	})
-
-
 	return _.orderBy(finalUnits, ['isDisabled', 'label'], ['asc', 'asc']);
 }
 
