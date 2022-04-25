@@ -9,7 +9,7 @@ import GroupsApi from './GroupsApi';
 import MetersApi from './MetersApi';
 import PreferencesApi from './PreferencesApi';
 import VerificationApi from './VerificationApi';
-import CompressedReadingsApi from './CompressedReadingsApi';
+import ReadingsApi from './ReadingsApi';
 import UploadCSVApi from './UploadCSVApi';
 import UsersApi from './UsersApi';
 import VersionApi from './VersionApi';
@@ -25,7 +25,7 @@ const groupsApi = new GroupsApi(apiBackend);
 const metersApi = new MetersApi(apiBackend);
 const preferencesApi = new PreferencesApi(apiBackend);
 const verificationApi = new VerificationApi(apiBackend);
-const compressedReadingsApi = new CompressedReadingsApi(apiBackend);
+const readingsApi = new ReadingsApi(apiBackend);
 const uploadCSVApi = new UploadCSVApi(apiBackend);
 const usersApi = new UsersApi(apiBackend);
 const mapsApi = new MapsApi(apiBackend);
@@ -39,7 +39,7 @@ export {
 	metersApi,
 	preferencesApi,
 	verificationApi,
-	compressedReadingsApi,
+	readingsApi,
 	mapsApi,
 	logsApi,
 	usersApi,

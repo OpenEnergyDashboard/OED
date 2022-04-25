@@ -166,9 +166,6 @@ export function getUnitCompatibilityForDropdown(state: State) {
 	const compatibleUnits = new Set<number>();
 	// Holds all units that are not compatible with selected meters/groups
 	const incompatibleUnits = new Set<number>();
-
-
-
 	if (state.graph.selectedUnit === -99) {
 		// Every unit is okay/compatible in this case so skip the work needed below.
 		// Can only show unit types (not meters) and only displayable ones.
@@ -183,13 +180,9 @@ export function getUnitCompatibilityForDropdown(state: State) {
 		let first = true;
 		let units = new Set<number>();
 		const M = new Set<number>();
-
+		// Get for all meters
 		state.graph.selectedMeters.forEach(meter => {
 			M.add(meter);
-		})
-		// Get for all meters
-		M.forEach(() => {
-
 			const newUnits = unitsCompatibleWithMeters(M)
 			if (first) {
 				// First meter/group so all its units are acceptable at this point
@@ -212,38 +205,43 @@ export function getUnitCompatibilityForDropdown(state: State) {
 				units = setIntersect(newUnits, units);
 			}
 		})
+		// Loop over all units (they must be of type unit or suffix - case 1)
 		getVisibleUnitOrSuffixState(state).forEach(o => {
+			// Control displayable ones (case 2)
 			if (units.has(o.id)) {
+				// Should show as compatible (case 3)
 				compatibleUnits.add(o.id);
 			} else {
+				// Should show as incompatible (case 4)
 				incompatibleUnits.add(o.id);
 			}
 		})
 	}
+	// Ready to display unit. Put selectable ones before unselectable ones.
 	const finalUnits = getUnitCompatibility(compatibleUnits, incompatibleUnits, state);
 	return finalUnits;
 }
 
 /**
- * Creates an array from the state filled with all units that are not meter or not displayable
+ * Filters all units that are of type meter or displayable type none from the redux state.
  * @param {State} state - current redux state
  * @return {UnitData[]} an array of UnitData
  */
 export function getVisibleUnitOrSuffixState(state: State) {
-	const visibleUnitsOrSuffixs = _.filter(state.units.units, function (o: UnitData) {
+	const visibleUnitsOrSuffixes = _.filter(state.units.units, function (o: UnitData) {
 		return o.typeOfUnit != UnitType.meter && o.displayable != DisplayableType.none;
 	})
-	return visibleUnitsOrSuffixs;
+	return visibleUnitsOrSuffixes;
 }
 
 /**
- * Converts two sets of unitIDs into one sorted array of SelectOptions for the dropdown
+ *  Sets visibility of SelectOptions for dropdown. Determined by which set they are contained in
  * @param {State} state - current redux state
  * @param {Set<number>} compatibleUnits - units that are compatible with current selected unit
  * @param {Set<number>} incompatibleUnits - units that are not compatible with current selected unit
  * @return {SelectOption[]} an array of SelectOption
  */
-export function getUnitCompatibility(compatibleUnits: Set<number>, incompatibleUnits: Set<number>, state: State) {
+function getUnitCompatibility(compatibleUnits: Set<number>, incompatibleUnits: Set<number>, state: State) {
 	const finalUnits: SelectOption[] = [];
 	compatibleUnits.forEach(unit => {
 		finalUnits.push({
@@ -253,8 +251,6 @@ export function getUnitCompatibility(compatibleUnits: Set<number>, incompatibleU
 		} as SelectOption
 		)
 	})
-
-
 	incompatibleUnits.forEach(unit => {
 		finalUnits.push({
 			label: state.units.units[unit].identifier,

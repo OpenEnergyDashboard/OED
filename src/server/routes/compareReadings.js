@@ -46,8 +46,8 @@ function validateGroupCompareReadingsParams(params) {
 function validateQueryParams(queryParams) {
 	const validParams = {
 		type: 'object',
-		maxProperties: 3,
-		required: ['curr_start', 'curr_end', 'shift'],
+		maxProperties: 4,
+		required: ['curr_start', 'curr_end', 'shift', 'graphicUnitId'],
 		properties: {
 			curr_start: {
 				type: 'string' // iso 8601
@@ -57,6 +57,10 @@ function validateQueryParams(queryParams) {
 			},
 			shift: {
 				type: 'string' // iso 8601 duration
+			},
+			graphicUnitId: {
+				type: 'string',
+				pattern: '^\\d+$'
 			}
 		}
 	};
@@ -64,14 +68,32 @@ function validateQueryParams(queryParams) {
 	return paramsValidationResult.valid;
 }
 
-async function meterCompareReadings(meterIDs, currStart, currEnd, shift) {
+/**
+ * Gets compare readings for meters for the given current time range and a shift for previous time range
+ * @param meterIDs The meter IDs to get readings for
+ * @param graphicUnitId The unit id that the reading should be returned in, i.e., the graphic unit
+ * @param currStart  start of current/this compare period
+ * @param currEnd  end of current/this compare period
+ * @param shift how far to shift back in time from current period to previous period
+ * @return {Promise<object<int, array<{reading_rate: number, start_timestamp: }>>>}
+ */
+ async function meterCompareReadings(meterIDs, graphicUnitId, currStart, currEnd, shift) {
 	const conn = getConnection();
-	return await Reading.getCompareReadings(meterIDs, currStart, currEnd, shift, conn);
+	return await Reading.getMeterCompareReadings(meterIDs, graphicUnitId, currStart, currEnd, shift, conn);
 }
 
-async function groupCompareReadings(groupIDs, currStart, currEnd, shift) {
+/**
+ * Gets compare readings for groups for the given current time range and a shift for previous time range
+ * @param groupIDs The group IDs to get readings for
+ * @param graphicUnitId The unit id that the reading should be returned in, i.e., the graphic unit
+ * @param currStart  start of current/this compare period
+ * @param currEnd  end of current/this compare period
+ * @param shift how far to shift back in time from current period to previous period
+ * @return {Promise<object<int, array<{reading_rate: number, start_timestamp: }>>>}
+ */
+ async function groupCompareReadings(groupIDs, graphicUnitId, currStart, currEnd, shift) {
 	const conn = getConnection();
-	return await Reading.getGroupCompareReadings(groupIDs, currStart, currEnd, shift, conn);
+	return await Reading.getGroupCompareReadings(groupIDs, graphicUnitId, currStart, currEnd, shift, conn);
 }
 
 function createRouter() {
@@ -83,10 +105,11 @@ function createRouter() {
 			return;
 		}
 		const meterIDs = req.params.meter_ids.split(',').map(id => parseInt(id));
+		const graphicUnitID = req.query.graphicUnitId;
 		const currStart = moment(req.query.curr_start);
 		const currEnd = moment(req.query.curr_end);
 		const shift = moment.duration(req.query.shift);
-		res.json(await meterCompareReadings(meterIDs, currStart, currEnd, shift));
+		res.json(await meterCompareReadings(meterIDs, graphicUnitID, currStart, currEnd, shift));
 	});
 
 	router.get('/groups/:group_ids', async (req, res) => {
@@ -96,10 +119,11 @@ function createRouter() {
 		}
 		const conn = getConnection();
 		const groupIDs = req.params.group_ids.split(',').map(id => parseInt(id));
+		const graphicUnitID = req.query.graphicUnitId;
 		const currStart = moment(req.query.curr_start);
 		const currEnd = moment(req.query.curr_end);
 		const shift = moment.duration(req.query.shift);
-		res.json(await groupCompareReadings(groupIDs, currStart, currEnd, shift, conn));
+		res.json(await groupCompareReadings(groupIDs, graphicUnitID, currStart, currEnd, shift, conn));
 	});
 
 	return router;

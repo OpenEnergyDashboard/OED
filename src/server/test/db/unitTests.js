@@ -29,7 +29,7 @@ function expectUnitToBeEquivalent(expected, actual) {
  * @param {*} expected The expected list of unit.
  * @param {*} actual The actual list of unit.
  */
-function expectArrayOfUnitsToBeEquivalen(expected, actual) {
+function expectArrayOfUnitsToBeEquivalent(expected, actual) {
 	expect(expected.length).to.be.equal(actual.length);
 	// Need to sort before comparing.
 	expected.sort((a, b) => a.id - b.id);
@@ -111,11 +111,11 @@ mocha.describe('Units', () => {
 			// If user is admin then return units with displayableType.admin or displayableType.all
 			const expectedUnitsForAdmin = [unitTypeMeterAll, unitTypeMeterAdmin];
 			const actualUnitsForAdmin = await Unit.getVisibleMeter('admin', conn);
-			expectArrayOfUnitsToBeEquivalen(expectedUnitsForAdmin, actualUnitsForAdmin)
+			expectArrayOfUnitsToBeEquivalent(expectedUnitsForAdmin, actualUnitsForAdmin)
 			// If user is all then return units with displayableType.all
 			const expectedUnitsForAll = [unitTypeMeterAll];
 			const actualUnitsForAll = await Unit.getVisibleMeter('all', conn);
-			expectArrayOfUnitsToBeEquivalen(expectedUnitsForAll, actualUnitsForAll);
+			expectArrayOfUnitsToBeEquivalent(expectedUnitsForAll, actualUnitsForAll);
 		});
 
 		mocha.it('can get visible unit of type unit or suffix', async () => {
@@ -127,11 +127,11 @@ mocha.describe('Units', () => {
 			// If user is admin then return units with displayableType.admin or displayableType.all
 			const expectedUnitForAdmin = [unitTypeUnitAdmin, unitTypeSuffixAll, unitTypeUnitAll];
 			const actualUnitsForAdmin = await Unit.getVisibleUnitOrSuffix('admin', conn);
-			expectArrayOfUnitsToBeEquivalen(expectedUnitForAdmin, actualUnitsForAdmin);
+			expectArrayOfUnitsToBeEquivalent(expectedUnitForAdmin, actualUnitsForAdmin);
 			// If user is all then return units with displayableType.all
 			const expectedUnitsForAll = [unitTypeSuffixAll, unitTypeUnitAll];
 			const actualUnitsForAll = await Unit.getVisibleUnitOrSuffix('all', conn);
-			expectArrayOfUnitsToBeEquivalen(expectedUnitsForAll, actualUnitsForAll);
+			expectArrayOfUnitsToBeEquivalent(expectedUnitsForAll, actualUnitsForAll);
 		});
 
 		mocha.it('should only get units of type meter', async () => {
@@ -140,7 +140,7 @@ mocha.describe('Units', () => {
 			const unitTypeMeterAdmin = await Unit.getByName('Meter Admin', conn);
 			const expectedUnits = [unitTypeMeterAll, unitTypeMeterAdmin];
 			const actualUnits = await Unit.getTypeMeter(conn);
-			expectArrayOfUnitsToBeEquivalen(expectedUnits, actualUnits);
+			expectArrayOfUnitsToBeEquivalent(expectedUnits, actualUnits);
 		});
 
 		mocha.it('should only get units of type unit', async () => {
@@ -149,7 +149,7 @@ mocha.describe('Units', () => {
 			const unitTypeUnitAdmin = await Unit.getByName('Unit Admin', conn);
 			const expectedUnits = [unitTypeUnitAll, unitTypeUnitAdmin];
 			const actualUnits = await Unit.getTypeUnit(conn);
-			expectArrayOfUnitsToBeEquivalen(expectedUnits, actualUnits);
+			expectArrayOfUnitsToBeEquivalent(expectedUnits, actualUnits);
 		});
 
 		mocha.it('should only get units of type suffix', async () => {
@@ -158,7 +158,7 @@ mocha.describe('Units', () => {
 			const unitTypeSuffixNone = await Unit.getByName('Suffix None', conn);
 			const expectedUnits = [unitTypeSuffixAll, unitTypeSuffixNone];
 			const actualUnits = await Unit.getTypeSuffix(conn);
-			expectArrayOfUnitsToBeEquivalen(expectedUnits, actualUnits);
+			expectArrayOfUnitsToBeEquivalent(expectedUnits, actualUnits);
 		})
 
 		mocha.it('should only get units with suffix', async () => {
@@ -167,7 +167,7 @@ mocha.describe('Units', () => {
 			const unitTypeSuffixNone = await Unit.getByName('Suffix None', conn);
 			const expectedUnits = [unitTypeMeterAdmin, unitTypeUnitAdmin, unitTypeSuffixNone];
 			const actualUnits = await Unit.getSuffix(conn);
-			expectArrayOfUnitsToBeEquivalen(expectedUnits, actualUnits);
+			expectArrayOfUnitsToBeEquivalent(expectedUnits, actualUnits);
 		});
 	});
 });

@@ -48,7 +48,7 @@ class ChartDataSelectComponent extends React.Component<ChartDataSelectPropsWithI
 			selectUnit: { id: 'select.unit' },
 			helpSelectGroups: { id: 'help.home.select.groups' },
 			helpSelectMeters: { id: 'help.home.select.meters' },
-			helpSelectUnit: { id: 'help.home.select.unit' }
+			helpSelectUnit: { id: 'help.home.select.units' }
 		});
 
 		return (
@@ -89,6 +89,7 @@ class ChartDataSelectComponent extends React.Component<ChartDataSelectPropsWithI
 						closeMenuOnSelect={false}
 						onChange={this.handleUnitSelect}
 					/>
+					<TooltipMarkerComponent page='home' helpTextId='help.home.select.units' />
 				</div>
 			</div>
 		);
