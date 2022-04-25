@@ -17,5 +17,5 @@ ON CONFLICT DO NOTHING;
 
 -- Insert the conversion from Electric_utility to kWh. The conversion's slope is 1 since all existing data is in kWh.
 INSERT INTO conversions(source_id, destination_id, bidirectional, slope, intercept, note)
-VALUES (id_of_units('Electric_utility'), id_of_units('kWh'), FALSE, 1, 0, 'Electric Utility → kWh')
+VALUES ((SELECT id FROM units WHERE name = 'Electric_utility'), (SELECT id FROM units WHERE name = 'kWh'), FALSE, 1, 0, 'Electric Utility → kWh')
 ON CONFLICT DO NOTHING;
