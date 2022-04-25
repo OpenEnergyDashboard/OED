@@ -18,7 +18,10 @@ import { gpsToUserGrid } from './../utils/calibration';
 import { DisplayableType, UnitData, UnitType } from '../types/redux/units'
 import { metersInGroup, setIntersect, unitsCompatibleWithMeters } from '../utils/determineCompatibleUnits';
 import { DataType } from '../types/Datasources';
+import { GroupData } from '../types/redux/groups'
 import e from 'express';
+import { isRoleAdmin } from 'utils/hasPermissions';
+import groups from 'reducers/groups';
 
 
 /* Passes the current redux state of the chart select container, and turns it into props for the React
@@ -326,4 +329,62 @@ export function getGroupCompatibilityForDropdown(state: State) {
 	})
 
 	return _.sortBy(_.values(finalGroup), 'label');
+}
+
+export function getGroupsCompatibiltyForDropDown(state: State) {
+	let visibleGroup: number[] = [];
+	if (state.currentUser.profile?.role == 'admin') {
+		_.forEach(state.groups.byGroupID, (group) => {
+			visibleGroup.push(group.id);
+		})
+	} else {
+		_.forEach(state.groups.byGroupID, (group) => {
+			if (group.displayable) {
+				visibleGroup.push(group.id);
+			}
+		})
+	}
+	let compatibleGroups = new Set<number>();
+	let incompatibleGroups = new Set<number>();
+	if (state.graph.selectedUnit === -99) {
+		_.forEach(visibleGroup, group => {
+			if(state.groups.byGroupID[group].defaultGraphicUnit === -99){
+              incompatibleGroups.add(group)
+			} else {
+				compatibleGroups.add(group)
+			}
+			
+		})
+	} else {
+		_.forEach(visibleGroup, async group => { 
+			let meters = await metersInGroup(group)
+			let units = unitsCompatibleWithMeters(meters)
+			if(units.has(group)){
+				compatibleGroups.add(group)
+			} else{
+				incompatibleGroups.add(group)
+			}
+
+
+		})
+
+	}
+	let finalGroups: SelectOption[] = [];
+	visibleGroup.forEach( group => {
+		if(compatibleGroups.has(group)){
+			finalGroups.push({
+				label: state.groups.byGroupID[group].name,
+				value: group, 
+				isDisabled: false
+			} as SelectOption )
+		} else if(incompatibleGroups.has(group)) {
+			finalGroups.push({
+				label: state.groups.byGroupID[group].name,
+				value: group, 
+				isDisabled: true
+			} as SelectOption )
+
+		}
+	})
+	return _.sortBy(_.sortBy(finalGroups,group => group.label.toLowerCase(), 'asc'), group => group.isDisabled, 'asc')
 }
