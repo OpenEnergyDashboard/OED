@@ -7,9 +7,9 @@ const sqlFile = database.sqlFile;
 
 module.exports = {
 	fromVersion: '0.8.0',
-	toVersion: '0.8.1',
+	toVersion: '1.0.0',
 	up: async db => {
-		await db.none(sqlFile('../migrations/0.8.0-0.8.1/sql/meters/add_meter_type.sql'));
-		await db.none(sqlFile('../migrations/0.8.0-0.8.1/sql/meters/alter_meter_ipdAddress.sql'));
+		await db.none(sqlFile('../migrations/0.8.0-1.0.0/sql/meters/add_meter_type.sql'));
+		await db.none(sqlFile('../migrations/0.8.0-1.0.0/sql/meters/alter_meter_ipdAddress.sql'));
 	}
 };
