@@ -9,7 +9,7 @@ import PreferencesContainer from '../../containers/admin/PreferencesContainer';
 import ManageUsersLinkButtonComponent from './users/ManageUsersLinkButtonComponent';
 import TooltipMarkerComponent from '../TooltipMarkerComponent';
 import { FormattedMessage } from 'react-intl';
-import TooltipHelpContainerAlternative from '../../containers/TooltipHelpContainerAlternative';
+import TooltipHelpContainer from '../../containers/TooltipHelpContainer';
 import UnsavedWarningContainer from '../../containers/UnsavedWarningContainer';
 
 /**
@@ -39,7 +39,7 @@ export default function AdminComponent() {
 		<div>
 			<UnsavedWarningContainer />
 			<HeaderContainer />
-			<TooltipHelpContainerAlternative page='admin' />
+			<TooltipHelpContainer page='admin' />
 			<div className='container-fluid'>
 				<h2 style={titleStyle}>
 					<FormattedMessage id='admin.panel' />

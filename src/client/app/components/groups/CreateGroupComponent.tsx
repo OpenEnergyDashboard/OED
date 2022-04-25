@@ -14,7 +14,7 @@ import HeaderContainer from '../../containers/HeaderContainer';
 import FooterContainer from '../../containers/FooterContainer';
 import { browserHistory } from '../../utils/history';
 import { FormattedMessage, defineMessages, injectIntl, WrappedComponentProps } from 'react-intl';
-import TooltipHelpContainerAlternative from '../../containers/TooltipHelpContainerAlternative';
+import TooltipHelpContainer from '../../containers/TooltipHelpContainer';
 import { GPSPoint, isValidGPSInput } from '../../utils/calibration';
 import store from '../../index';
 import { removeUnsavedChanges, updateUnsavedChanges } from '../../actions/unsavedWarning';
@@ -88,7 +88,7 @@ class CreateGroupComponent extends React.Component<CreateGroupPropsWithIntl, Cre
 			<div>
 				<UnsavedWarningContainer />
 				<HeaderContainer />
-				<TooltipHelpContainerAlternative page='meters' />
+				<TooltipHelpContainer page='meters' />
 				<div className='container-fluid'>
 					<div style={divStyle} className='col-6'>
 						<h3 style={centerTextStyle}>

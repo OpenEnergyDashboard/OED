@@ -18,6 +18,7 @@ import { ComparePeriod, SortingOrder } from '../utils/calculateCompare';
 import TooltipMarkerComponent from './TooltipMarkerComponent';
 import 'rc-slider/assets/index.css';
 import MapChartSelectContainer from '../containers/MapChartSelectContainer';
+import ReactTooltip from 'react-tooltip';
 
 const Slider = createSliderWithTooltip(sliderWithoutTooltips);
 
@@ -61,6 +62,12 @@ class UIOptionsComponent extends React.Component<UIOptionsPropsWithIntl, UIOptio
 			showSlider: false,
 			compareSortingDropdownOpen: false
 		};
+	}
+
+	public componentDidUpdate(prev: UIOptionsProps) {
+		if (prev.chartToRender !== this.props.chartToRender) {
+			ReactTooltip.rebuild(); // This rebuilds the tooltip so that it detects the marker that disappear because the chart type changes.
+		}
 	}
 
 	public render() {
@@ -175,7 +182,7 @@ class UIOptionsComponent extends React.Component<UIOptionsPropsWithIntl, UIOptio
 								<FormattedMessage id='4.weeks' />
 							</Button>
 						</ButtonGroup>
-						<TooltipMarkerComponent page='home' helpTextId='help.home.compare.interval.tip' />
+						<TooltipMarkerComponent page='home' helpTextId='help.home.compare.interval.tip'/>
 						<Dropdown isOpen={this.state.compareSortingDropdownOpen} toggle={this.toggleDropdown}>
 							<DropdownToggle caret>
 								<FormattedMessage id='sort' />
