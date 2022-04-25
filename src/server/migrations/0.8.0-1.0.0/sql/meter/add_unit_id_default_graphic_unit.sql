@@ -4,5 +4,5 @@
 
 -- Add unit_id and default_graphic_unit to the meters table.
 ALTER TABLE meters
-    ADD COLUMN IF NOT EXISTS unit_id INTEGER REFERENCES units(id) DEFAULT id_of_units('Electric_utility'),
-    ADD COLUMN IF NOT EXISTS default_graphic_unit INTEGER REFERENCES units(id) DEFAULT id_of_units('Electric_utility');
+    ADD COLUMN IF NOT EXISTS unit_id INTEGER REFERENCES units(id),
+    ADD COLUMN IF NOT EXISTS default_graphic_unit INTEGER REFERENCES units(id);
