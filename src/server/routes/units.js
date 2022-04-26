@@ -47,7 +47,6 @@ router.post('/edit', async (req, res) => {
 				type: 'string',
 				minLength: 1
 			},
-			// not sure if you need to check based on enum
 			unitRepresent: {
 				type: 'string',
 				minLength: 1,
@@ -57,12 +56,9 @@ router.post('/edit', async (req, res) => {
 				type: 'number',
 			},
 			typeOfUnit: {
-				oneOf: [
-					{type: 'null'}, 
-					{type: 'string',
-					minLength: 1,
-					enum: Object.values(Unit.unitType)}
-				]
+				type: 'string',
+				minLength: 1,
+				enum: Object.values(Unit.unitType)
 			},
 			suffix: {
 				type: 'string',

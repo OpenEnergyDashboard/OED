@@ -113,6 +113,7 @@ export default class UnitsDetailContainer extends React.Component<UnitsDetailPro
 	}
 
 	private handleSubmitClicked() {
+        console.log("Yes I am here")
 		this.props.submitEditedUnits();
 		// Notify that the unsaved changes have been submitted
 		this.removeUnsavedChanges();
