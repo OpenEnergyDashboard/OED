@@ -70,7 +70,7 @@ export interface UnitData {
 	suffix: string;
 	displayable: DisplayableType;
 	preferredDisplay: boolean;
-	note?: string;
+	note: string;
 }
 
 export interface UnitEditData {
@@ -84,7 +84,7 @@ export interface UnitEditData {
 	suffix: string;
 	displayable: DisplayableType;
 	preferredDisplay: boolean;
-	note?: string;
+	note: string;
 }
 
 export interface UnitDataById {

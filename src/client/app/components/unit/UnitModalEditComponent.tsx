@@ -18,7 +18,7 @@ interface EditUnitProps {
   suffix: string;
   displayable: DisplayableType;
   preferredDisplay: boolean;
-  note?: string;
+  note: string;
 }
 
 type UnitViewPropsWithIntl = EditUnitProps;
@@ -28,7 +28,7 @@ class UnitModelEditComponent extends React.Component<UnitViewPropsWithIntl,
     show: boolean, nameInput: string, identifierInput: string,
     identifier: string, identifierFocus: boolean, unitRepresent: UnitRepresentType,
     typeOfUnit: UnitType, displayable: DisplayableType, secInRate: number, preferredDisplay: boolean,
-    suffix: string, note: string | undefined
+    suffix: string, note: string
   }>{
 
   constructor(props: UnitViewPropsWithIntl) {
@@ -90,16 +90,17 @@ class UnitModelEditComponent extends React.Component<UnitViewPropsWithIntl,
   }
 
   private onSaveChanges() {
-    const oldIdentifer = this.props.unit.identifier;
-    const oldunitRepresentType = this.props.unit.unitRepresent;
+    const oldIdentifer = this.props.unit.identifier; 
+    const oldunitRepresentType = this.props.unit.unitRepresent; 
     const oldTypeOfUnit = this.props.unit.typeOfUnit;
     const oldDisplayable = this.props.unit.displayable;
     const oldPreferredDisplay = this.props.unit.preferredDisplay;
-    const oldSuffix = this.props.unit.suffix;
+    const oldSuffix = this.props.unit.suffix.toString();
     const oldNote = this.props.unit.note;
-
-    if (oldIdentifer != this.state.identifierInput || oldunitRepresentType != this.state.unitRepresent ||
-      oldTypeOfUnit != this.state.typeOfUnit || oldDisplayable != this.state.displayable ||
+    console.log(oldNote);
+    console.log(this.state.note);
+    if (oldIdentifer != this.state.identifierInput || oldunitRepresentType != this.state.unitRepresent || 
+      oldTypeOfUnit != this.state.typeOfUnit || oldDisplayable != this.state.displayable || 
       oldPreferredDisplay != this.state.preferredDisplay || oldSuffix != this.state.suffix ||
       oldNote != this.state.note) {
       console.log("hold on")
@@ -116,9 +117,9 @@ class UnitModelEditComponent extends React.Component<UnitViewPropsWithIntl,
         identifier, unitRepresent, typeOfUnit,
         displayable, preferredDisplay, suffix, note
       };
-      console.log(editedUnit);
+      console.log(editedUnit); 
       this.props.editUnitDetails(editedUnit);
-      this.props.onhide();
+      this.props.onhide(); 
     }
   }
 
@@ -142,15 +143,19 @@ class UnitModelEditComponent extends React.Component<UnitViewPropsWithIntl,
   }
 
   private handlePreferredDisplayableChange(event: React.ChangeEvent<HTMLInputElement>) {
-    const preferredDisplayable = event.target.value as unknown as boolean;
+    const preferredDisplayable = JSON.parse(event.target.value);
+    console.log(preferredDisplayable); 
+    console.log(typeof(preferredDisplayable)); 
     this.setState({ preferredDisplay: preferredDisplayable });
   }
 
   private handleSuffixChange(event: React.ChangeEvent<HTMLInputElement>) {
+    console.log(event.target.value);
     this.setState({ suffix: event.target.value });
   }
 
   private handleNoteChange(event: React.ChangeEvent<HTMLInputElement>) {
+    console.log(event.target.value); 
     this.setState({ note: event.target.value });
   }
 
@@ -167,8 +172,8 @@ class UnitModelEditComponent extends React.Component<UnitViewPropsWithIntl,
     return (
       <div>
         <label>Type of Unit: </label>
-        <Input type='select' defaultValue={typeOfUnit}
-          onChange={event => this.handleTypeOfUnitChange(event)}>
+        <Input type='select' defaultValue = {typeOfUnit} 
+        onChange={event => this.handleTypeOfUnitChange(event)}>
           <option value="unit"> unit </option>
           <option value="meter">meter</option>
           <option value="suffix">suffix</option>
@@ -181,8 +186,8 @@ class UnitModelEditComponent extends React.Component<UnitViewPropsWithIntl,
     return (
       <div>
         <label>Unit Represent: </label>
-        <Input type='select' defaultValue={unitRepresent}
-          onChange={event => this.handleUnitRepresentChange(event)}>
+        <Input type='select' defaultValue = {unitRepresent} 
+        onChange={event => this.handleUnitRepresentChange(event)}>
           <option value="quantity"> quantity </option>
           <option value="flow">flow</option>
           <option value="raw">raw</option>
@@ -196,8 +201,8 @@ class UnitModelEditComponent extends React.Component<UnitViewPropsWithIntl,
     return (
       <div>
         <label>Displayable: </label>
-        <Input type='select' defaultValue={displayable}
-          onChange={event => this.handleDisplayableChange(event)}>
+        <Input type='select' defaultValue = {displayable} 
+        onChange={event => this.handleDisplayableChange(event)}>
           <option value="none"> none </option>
           <option value="all">all</option>
           <option value="admin">admin</option>
@@ -219,9 +224,10 @@ class UnitModelEditComponent extends React.Component<UnitViewPropsWithIntl,
     return (
       <div>
         <label>Preferred Displayable: </label>
-        <Input type='select' onChange={event => this.handlePreferredDisplayableChange(event)}>
-          <option value="Yes"> Yes </option>
-          <option value="No"> No </option>
+        <Input type='select' defaultValue={preferredDisplay.toString()} 
+        onChange={event => this.handlePreferredDisplayableChange(event)}>
+          <option value="true"> Yes </option>
+          <option value="false"> No </option>
         </Input>
       </div>
     )
@@ -231,17 +237,17 @@ class UnitModelEditComponent extends React.Component<UnitViewPropsWithIntl,
     return (
       <div>
         <label>Suffix: </label>
-        <input type="textarea" defaultValue={suffix} placeholder="Suffix"
+        <input type="text" defaultValue = {suffix} placeholder="Suffix"
           onChange={event => this.handleSuffixChange(event)} />
       </div>
     )
   }
 
-  private isNote(note: string | undefined) {
+  private isNote(note: string) {
     return (
       <div>
         <label>Note: </label>
-        <input type="textarea" defaultValue={note} placeholder="Note"
+        <input type="text" defaultValue = {note} placeholder="Note"
           onChange={event => this.handleNoteChange(event)} />
       </div>
     )

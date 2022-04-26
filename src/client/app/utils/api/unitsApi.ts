@@ -23,7 +23,8 @@ export default class UnitsApi {
 			'/api/units/edit',
 			{id: unit.id, identifier: unit.identifier, typeOfUnit: unit.typeOfUnit, 
                 unitRepresent: unit.unitRepresent, secInRate: unit.secInRate,
-                displayable: unit.displayable, preferredDisplay: unit.preferredDisplay}
+                displayable: unit.displayable, preferredDisplay: unit.preferredDisplay, 
+                suffix: unit.suffix, note: unit.note}
 		);
 	}
 
