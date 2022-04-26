@@ -21,7 +21,9 @@ export default class UnitsApi {
 	public async edit(unit: UnitData): Promise<UnitEditData> {
 		return await this.backend.doPostRequest<UnitEditData>(
 			'/api/units/edit',
-			{ id: unit.id, identifier: unit.identifier, unitRepresent: unit.unitRepresent, secInRate: unit.secInRate }
+			{id: unit.id, identifier: unit.identifier, typeOfUnit: unit.typeOfUnit,
+				unitRepresent: unit.unitRepresent, secInRate: unit.secInRate,
+				displayable: unit.displayable, preferredDisplay: unit.preferredDisplay}
 		);
 	}
 

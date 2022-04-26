@@ -10,9 +10,9 @@ import { isRoleAdmin } from '../../utils/hasPermissions';
 import { UnitData } from '../../types/redux/units';
 import { editUnitDetails } from '../../actions/units';
 
-function mapStateToProps(state: State, ownProps: { id: number }) {
+function mapStateToProps(state: State, ownProps: {id: number}){
 	let unit = JSON.parse(JSON.stringify(state.units.units[ownProps.id]));
-	if (state.units.editedUnits[ownProps.id]) {
+	if(state.units.editedUnits[ownProps.id]){
 		unit = JSON.parse(JSON.stringify(state.units.editedUnits[ownProps.id]));
 	}
 

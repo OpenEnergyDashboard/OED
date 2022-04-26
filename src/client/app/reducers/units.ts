@@ -47,7 +47,8 @@ export default function units(state = defaultState, action: UnitsAction) {
 				...state,
 				submitting
 			};
-		case ActionType.ConfirmEditedUnit:{
+		case ActionType.ConfirmEditedUnit:
+		{
 			submitting = state.submitting;
 			submitting.splice(submitting.indexOf(action.unit));
 
