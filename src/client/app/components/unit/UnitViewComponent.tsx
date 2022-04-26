@@ -37,7 +37,7 @@ interface UnitViewState {
 	suffixFocus: boolean;
 	suffixInput: string;
 	noteFocus: boolean;
-	noteInput?: string;
+	noteInput: string;
 	show: boolean;
 	onHide: boolean;
 }
@@ -86,6 +86,12 @@ class UnitViewComponent extends React.Component<UnitViewPropsWithIntl, UnitViewS
 				</div>
 				<div className="unit-container">
 					<b>Displayable:</b> {this.props.unit.displayable}
+				</div>
+				<div className="unit-container">
+					<b>Preferred Display:</b> {this.props.unit.preferredDisplay.toString()}
+				</div>
+				<div className="unit-container">
+					<b>Suffix:</b> {this.props.unit.suffix}
 				</div>
 				<div className="unit-container">
 					<b>Note:</b> {this.props.unit.note}

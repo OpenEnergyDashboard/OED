@@ -61,8 +61,7 @@ router.post('/edit', async (req, res) => {
 				enum: Object.values(Unit.unitType)
 			},
 			suffix: {
-				type: 'string',
-				minLength: 1
+				type: 'string'
 			},
 			displayable: {
 				type: 'string',
@@ -73,10 +72,7 @@ router.post('/edit', async (req, res) => {
 				type: 'bool'
 			},
 			note: {
-				oneOf: [
-					{ type: 'string' },
-					{ type: 'null' }
-				]
+				type: 'string'
 			}
 		}
 	};
@@ -94,6 +90,8 @@ router.post('/edit', async (req, res) => {
 			unit.unitRepresent = req.body.unitRepresent;
 			unit.typeOfUnit = req.body.typeOfUnit;
 			unit.preferredDisplay = req.body.preferredDisplay;
+			unit.suffix = req.body.suffix;
+			unit.note = req.body.note;
 			await unit.update(conn);
 		} catch (err) {
 			log.error('Failed to edit unit', err);
