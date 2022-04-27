@@ -2,9 +2,6 @@
 * License, v. 2.0. If a copy of the MPL was not distributed with this
 * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
 import * as React from 'react';
-// import { fetchUnitsDetails } from '../../actions/units';
-// import HeaderContainer from '../HeaderContainer';
-// import FooterContainer from '../FooterContainer';
 import CreateUnitModalComponent from '../../components/unit/CreateUnitModalComponent';
 import { showSuccessNotification, showErrorNotification } from '../../utils/notifications';
 import { unitsApi } from '../../utils/api';
@@ -53,7 +50,6 @@ export default class CreateUnitContainer extends React.Component {
 		this.setState({ unitRepresent: newUnitRepresent });
 	}
 
-
 	private handleSecInRateChange = (newUnitRepresent: number) => {
 		this.setState({ unitRepresent: newUnitRepresent });
 	}
@@ -75,7 +71,7 @@ export default class CreateUnitContainer extends React.Component {
 	}
 
 	//Direct call to the API, this does not use the Redux state and goes around it to go directly to the API
-
+	//TODO: Current implementation requires page refresh to show new unit; Ideally we would refresh the redux state when the submitNewUnit runs.
 	private submitNewUnit = async () => {
 		try {
 			await unitsApi.addUnit({
@@ -90,7 +86,6 @@ export default class CreateUnitContainer extends React.Component {
 				displayable: this.state.displayable,
 				preferredDisplay: this.state.preferredDisplay,
 				note: this.state.note
-
 			});
 			showSuccessNotification(translate('units.successfully.create.unit'))
 			browserHistory.push('/units');
