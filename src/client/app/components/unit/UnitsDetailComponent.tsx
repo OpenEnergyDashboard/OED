@@ -58,7 +58,7 @@ export default class UnitsDetailContainer extends React.Component<UnitsDetailPro
 					</h2>
 					{loggedInAsAdmin && <div className="edit-btn">
 						<CreateUnitContainer/>
-						{/* @TODO: 
+						{/* @TODO:
 							Currently, when a new unit is added, you will need to referesh the unit page in order to see the new unit
 							It would great to implements a function that would auto referesh the page when a new unit is added.*/}
 					</div>}

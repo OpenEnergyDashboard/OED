@@ -88,7 +88,7 @@ class UnitViewComponent extends React.Component<UnitViewPropsWithIntl, UnitViewS
 		);
 	}
 
-	//This checks if the current user is an admin and create the model for editing a unit. 
+	//This checks if the current user is an admin and create the model for editing a unit.
 	private isAdmin() {
 		const loggedInAsAdmin = this.props.loggedInAsAdmin;
 		if (loggedInAsAdmin) {
@@ -120,12 +120,12 @@ class UnitViewComponent extends React.Component<UnitViewPropsWithIntl, UnitViewS
 		return null;
 	}
 
-	//This will show the modal 
+	//This will show the modal
 	private handleShow = () => {
 		this.setState({ show: true });
 	}
 
-	//This will close the modal and will trigger the onSubmitClick handler.  
+	//This will close the modal and will trigger the onSubmitClick handler.
 	private handleClose = () => {
 		this.props.onSubmitClicked();
 		this.setState({ show: false });

@@ -43,7 +43,7 @@ type UnitViewPropsWithIntl = EditUnitProps;
 
 class UnitModelEditComponent extends React.Component<UnitViewPropsWithIntl, UnitViewState>{
 
-	//Creates a constructor and sets the set to the prop for each unit data. 
+	//Creates a constructor and sets the set to the prop for each unit data.
 	constructor(props: UnitViewPropsWithIntl) {
 		super(props);
 		this.state = {
@@ -98,8 +98,8 @@ class UnitModelEditComponent extends React.Component<UnitViewPropsWithIntl, Unit
 		);
 	}
 
-	/** This function (1) checks if the unit state value is different from the unit prop value. 
-	 * (2) If the value is different, add all the changed values to editedUnit and call the prop editUnitDeatils(editedUnit). 
+	/** This function (1) checks if the unit state value is different from the unit prop value.
+	 * (2) If the value is different, add all the changed values to editedUnit and call the prop editUnitDeatils(editedUnit).
 	 * (3) Call the function onHide() -> this will hide the modal and call function handleClose on UnitViewComponent.tsx */
 
 	private onSaveChanges() {
@@ -136,7 +136,7 @@ class UnitModelEditComponent extends React.Component<UnitViewPropsWithIntl, Unit
 	}
 
 	/**
-	 * The following handlers will change the state to the corresponding unit 
+	 * The following handlers will change the state to the corresponding unit
 	 */
 	private handleIdentifier(event: React.ChangeEvent<HTMLInputElement>) {
 		this.setState({ identifierInput: event.target.value });
@@ -176,7 +176,7 @@ class UnitModelEditComponent extends React.Component<UnitViewPropsWithIntl, Unit
 	}
 
 	/**
-	 * The following functions will append each unit deatil to the modal card. 
+	 * The following functions will append each unit deatil to the modal card.
 	 */
 	private isIdentifier(identifier: string) {
 		return (
