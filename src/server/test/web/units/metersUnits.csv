@@ -1,0 +1,7 @@
+name,url,enabled,displayable,meter_type,default_timezone_meter,gps,identifier,note,area,cumulative,cumulative_reset,cumulative_reset_start,cumulative_reset_end,reading_gap,reading_variation,reading_duplication,time_sort,end_only_time,reading,start_timestamp,end_timestamp,unit_id,default_graphic_unit
+testkWh1-5,,FALSE,TRUE,other,,,testkWh1-5Id,testUnitData created,,,,,,,75000,,,,,,,,
+testBTU1-5,,FALSE,TRUE,other,,,testBTU1-5Id,testUnitData created,,,,,,,75000,,,,,,,,
+testkWh2-10,,FALSE,TRUE,other,,,testkWh2-10Id,testUnitData created,,,,,,,,,,,,,,,
+testkW1-5,,FALSE,TRUE,other,,,testkW1-5Id,testUnitData created,,,,,,,75000,,,,,,,,
+testkW1-5CrossDay,,FALSE,TRUE,other,,,testkW1-5CrossDayId,testUnitData created,,,,,,,75000,,,,,,,,
+testF212-111-167-77-212,,FALSE,TRUE,other,,,testF212-111-167-77-212Id,testUnitData created,,,,,,,75000,,,,,,,,
