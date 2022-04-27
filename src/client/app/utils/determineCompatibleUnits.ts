@@ -7,7 +7,6 @@ import * as _ from 'lodash';
 import { MeterMetadata } from '../types/redux/meters';
 import { ConversionArray } from '../types/conversionArray';
 import { UnitData, UnitType } from '../types/redux/units';
-import { fetchGroupChildrenIfNeeded } from '../actions/groups'
 import { GroupDefinition } from 'types/redux/groups';
 
 /**
@@ -130,13 +129,13 @@ export function unitFromPColumn(column: number): number {
 /**
  * Returns the set of meters's ids associated with the groupId used.
  * @param groupId The groupId.
- * @returns
+ * @returns the set of deep children of this group
  */
-export async function metersInGroup(groupId: number): Promise<Set<number>> {
-	// Fetch group children if needed.
-	await store.dispatch<any>(fetchGroupChildrenIfNeeded(groupId));
+export function metersInGroup(groupId: number): Set<number> {
 	const state = store.getState();
 	// Gets the group associated with groupId.
+	// The deep children are automatically fetched with group state so should exist.
 	const group = _.get(state.groups.byGroupID, groupId) as GroupDefinition;
+	// Create a set of the deep meters of this group and return it.
 	return new Set(group.deepMeters);
 }

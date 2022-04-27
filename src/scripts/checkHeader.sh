@@ -32,6 +32,8 @@ FILES=$(echo "$FILES" | grep -v "src\/scripts\/refreshHourlyReadingViewsCron\.ba
 FILES=$(echo "$FILES" | grep -v "src\/server\/test\/web\/obvius\/.*")
 # Filter out test data for CSV Pipeline
 FILES=$(echo "$FILES" | grep -v "src\/server\/test\/web\/csvPipeline\/.*")
+# Filter out test data for units Pipeline
+FILES=$(echo "$FILES" | grep -v "src\/server\/test\/web\/units\/.*")
 # Filter out .github files
 FILES=$(echo "$FILES" | grep -v ".github\/**")
 

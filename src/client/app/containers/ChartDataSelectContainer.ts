@@ -195,7 +195,8 @@ export function getUnitCompatibilityForDropdown(state: State) {
 		})
 		// Get for all groups
 		state.graph.selectedGroups.forEach(async group => {
-			const newUnits = unitsCompatibleWithMeters(await metersInGroup(group));
+			const newUnits = unitsCompatibleWithMeters(metersInGroup(group));
+
 			if (first) {
 				// First meter/group so all its units are acceptable at this point
 				units = newUnits;
@@ -242,24 +243,29 @@ export function getVisibleUnitOrSuffixState(state: State) {
  * @return {SelectOption[]} an array of SelectOption
  */
 function getUnitCompatibility(compatibleUnits: Set<number>, incompatibleUnits: Set<number>, state: State) {
-	const finalUnits: SelectOption[] = [];
+	// Put selectable ones before unselectable ones.
+	// Sort each group alphabetically ignoring case.
+	const shownGroups: SelectOption[] = [];
 	compatibleUnits.forEach(unit => {
-		finalUnits.push({
+		shownGroups.push({
 			label: state.units.units[unit].identifier,
 			value: unit,
 			isDisabled: false
-		} as SelectOption
-		)
+		} as SelectOption)
 	})
+	const shownSortedGroups = _.sortBy(shownGroups, group => group.label.toLowerCase(), 'asc');
+
+	const unshownGroups: SelectOption[] = [];
 	incompatibleUnits.forEach(unit => {
-		finalUnits.push({
+		unshownGroups.push({
 			label: state.units.units[unit].identifier,
 			value: unit,
 			isDisabled: true
-		} as SelectOption
-		)
+		} as SelectOption)
 	})
-	return _.orderBy(finalUnits, ['isDisabled', 'label'], ['asc', 'asc']);
+	const unshownSortedGroups = _.sortBy(unshownGroups, group => group.label.toLowerCase(), 'asc');
+
+	return [...shownSortedGroups, ...unshownSortedGroups];
 }
 
 /**
@@ -283,6 +289,7 @@ export function getGroupCompatibilityForDropdown(state: State) {
 			}
 		})
 	}
+
 	// groups that can graph
 	const compatibleGroups = new Set<number>();
 	// groups that cannot graph.
@@ -297,43 +304,43 @@ export function getGroupCompatibilityForDropdown(state: State) {
 			} else {
 				compatibleGroups.add(group)
 			}
-
 		})
 	} else {
-		_.forEach(visibleGroup, async group => {
-			// Get the meters associated with this group.
-			const meters = await metersInGroup(group)
-			// Get compatible units for all these meters.
+		_.forEach(visibleGroup, group => {
+			// Get the meters associated with this group and then the compatible units for all these meters.
 			// While a group should not have a meter without a unit (e.g., null) this will return an empty
 			// set so nothing is compatible with it.
-			const units = unitsCompatibleWithMeters(meters)
-			if (units.has(group)) {
+			const units = unitsCompatibleWithMeters(metersInGroup(group))
+			if (units.has(state.graph.selectedUnit)) {
 				// The compatible units of the group have graphic unit so can graph
 				compatibleGroups.add(group)
 			} else {
 				incompatibleGroups.add(group)
 			}
-
-
-		})
-
+		});
 	}
-	const finalGroups: SelectOption[] = [];
-	visibleGroup.forEach(group => {
-		if (compatibleGroups.has(group)) {
-			finalGroups.push({
-				label: state.groups.byGroupID[group].name,
-				value: group,
-				isDisabled: false
-			} as SelectOption)
-		} else if (incompatibleGroups.has(group)) {
-			finalGroups.push({
-				label: state.groups.byGroupID[group].name,
-				value: group,
-				isDisabled: true
-			} as SelectOption)
 
-		}
+	// Ready to display group. Put selectable ones before unselectable ones.
+	// Sort each group alphabetically ignoring case.
+	const shownGroups: SelectOption[] = [];
+	compatibleGroups.forEach(group => {
+		shownGroups.push({
+			label: state.groups.byGroupID[group].name,
+			value: group,
+			isDisabled: false
+		} as SelectOption)
 	})
-	return _.sortBy(_.sortBy(finalGroups, group => group.label.toLowerCase(), 'asc'), group => group.isDisabled, 'asc')
+	const shownSortedGroups = _.sortBy(shownGroups, group => group.label.toLowerCase(), 'asc');
+
+	const unshownGroups: SelectOption[] = [];
+	incompatibleGroups.forEach(group => {
+		unshownGroups.push({
+			label: state.groups.byGroupID[group].name,
+			value: group,
+			isDisabled: true
+		} as SelectOption)
+	})
+	const unshownSortedGroups = _.sortBy(unshownGroups, group => group.label.toLowerCase(), 'asc');
+
+	return [...shownSortedGroups, ...unshownSortedGroups];
 }

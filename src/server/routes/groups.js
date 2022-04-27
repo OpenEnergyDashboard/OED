@@ -25,8 +25,11 @@ const router = express.Router();
  * @returns {{id, name, gps, displayable, note, area}}
  */
 function formatGroupForResponse(item) {
-	return { id: item.id, name: item.name, gps: item.gps, displayable: item.displayable,
-	note: item.note, area: item.area, defaultGraphicUnit: item.defaultGraphicUnit };
+	return {
+		id: item.id, name: item.name, gps: item.gps, displayable: item.displayable,
+		note: item.note, area: item.area, defaultGraphicUnit: item.defaultGraphicUnit,
+		deepMeters: item.children
+	};
 }
 
 /**
@@ -40,13 +43,21 @@ function formatToOnlyNameID(item) {
 }
 
 /**
- * GET IDs and names of all groups
+ * GET info of all groups
  */
 router.get('/', async (req, res) => {
 	const conn = getConnection();
 	try {
 		const rows = await Group.getAll(conn);
-		res.json(rows.map(formatGroupForResponse));
+		// TODO??? currently have a separate route to get all children that should be removed or modified including uses.
+		deepChildren = [];
+		promises = await rows.map(async (row) => {
+			const deepChildren = await Group.getDeepMetersByGroupID(row.id, conn);
+			return { ...row, children: deepChildren };
+		})
+		Promise.all(promises).then(function (values) {
+			res.json(values.map(formatGroupForResponse));
+		})
 	} catch (err) {
 		log.error(`Error while preforming GET all groups query: ${err}`, err);
 	}
@@ -215,7 +226,7 @@ router.post('/create', adminAuthenticator('create groups'), async (req, res) => 
 			res.sendStatus(200);
 		} catch (err) {
 			if (err.toString() === 'error: duplicate key value violates unique constraint "groups_name_key"') {
-				res.status(400).json({error: `Group "${req.body.name}" is already in use.`});
+				res.status(400).json({ error: `Group "${req.body.name}" is already in use.` });
 			} else {
 				log.error(`Error while inserting new group ${err}`, err);
 				res.sendStatus(500);
