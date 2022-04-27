@@ -36,8 +36,6 @@ const TimeZoneSelect: React.FC<TimeZoneSelectProps> = ({ current, handleClick })
 		if (selectedOption != null ) {
 			handleClick(selectedOption.value);
 		} 
-		
-
 	};
 
 	return (options !== null ?
