@@ -270,7 +270,7 @@ function getUnitCompatibility(compatibleUnits: Set<number>, incompatibleUnits: S
 export function getGroupCompatibilityForDropdown(state: State) {
 	const visibleGroup: number[] = [];
 	// Get all the groups that this user can see.
-	if (state.currentUser.profile?.role == 'admin') {
+	if (state.currentUser.profile?.role === 'admin') {
 		// Can see all groups
 		_.forEach(state.groups.byGroupID, group => {
 			visibleGroup.push(group.id);
