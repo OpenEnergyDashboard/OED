@@ -22,21 +22,13 @@ interface UnitViewProps {
 }
 
 interface UnitViewState {
-	identifierFocus: boolean;
 	identifierInput: string;
-	secInRateFocus: boolean;
 	secInRateInput: number;
-	unitRepresentFocus: boolean;
 	unitRepresentInput: string;
-	typeOfUnitFocus: boolean;
 	typeOfUnitInput: string;
-	displayableFocus: boolean;
 	displayableInput: string;
-	preferredDisplayableFocus: boolean;
 	preferredDisplayableInput: boolean;
-	suffixFocus: boolean;
 	suffixInput: string;
-	noteFocus: boolean;
 	noteInput: string;
 	show: boolean;
 	onHide: boolean;
@@ -48,21 +40,13 @@ class UnitViewComponent extends React.Component<UnitViewPropsWithIntl, UnitViewS
 	constructor(props: UnitViewPropsWithIntl) {
 		super(props);
 		this.state = {
-			identifierFocus: false,
 			identifierInput: this.props.unit.identifier,
-			unitRepresentFocus: false,
 			unitRepresentInput: this.props.unit.unitRepresent,
-			typeOfUnitFocus: false,
 			typeOfUnitInput: this.props.unit.typeOfUnit,
-			secInRateFocus: false,
 			secInRateInput: this.props.unit.secInRate,
-			displayableFocus: false,
 			displayableInput: this.props.unit.displayable,
-			preferredDisplayableFocus: false,
 			preferredDisplayableInput: this.props.unit.preferredDisplay,
-			suffixFocus: false,
 			suffixInput: this.props.unit.suffix,
-			noteFocus: false,
 			noteInput: this.props.unit.note,
 			show: false,
 			onHide: true
@@ -91,6 +75,9 @@ class UnitViewComponent extends React.Component<UnitViewPropsWithIntl, UnitViewS
 					<b>Preferred Display:</b> {this.props.unit.preferredDisplay.toString()}
 				</div>
 				<div className="unit-container">
+					<b>Sec In Rate:</b> {this.props.unit.secInRate}
+				</div>
+				<div className="unit-container">
 					<b>Suffix:</b> {this.props.unit.suffix}
 				</div>
 				<div className="unit-container">
@@ -101,6 +88,7 @@ class UnitViewComponent extends React.Component<UnitViewPropsWithIntl, UnitViewS
 		);
 	}
 
+	//This checks if the current user is an admin and create the model for editing a unit. 
 	private isAdmin() {
 		const loggedInAsAdmin = this.props.loggedInAsAdmin;
 		if (loggedInAsAdmin) {
@@ -109,6 +97,7 @@ class UnitViewComponent extends React.Component<UnitViewPropsWithIntl, UnitViewS
 					<Button variant="Secondary" onClick={this.handleShow}>
                         Edit Unit
 					</Button>
+					{/* this will direct to the createUnitModalComponent.tsx */}
 					<ModalCard
 						show={this.state.show}
 						onhide={this.handleClose}
@@ -131,10 +120,12 @@ class UnitViewComponent extends React.Component<UnitViewPropsWithIntl, UnitViewS
 		return null;
 	}
 
+	//This will show the modal 
 	private handleShow = () => {
 		this.setState({ show: true });
 	}
 
+	//This will close the modal and will trigger the onSubmitClick handler.  
 	private handleClose = () => {
 		this.props.onSubmitClicked();
 		this.setState({ show: false });
