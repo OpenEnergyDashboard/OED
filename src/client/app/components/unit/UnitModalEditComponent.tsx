@@ -78,11 +78,6 @@ class UnitModelEditComponent extends React.Component<UnitViewPropsWithIntl,
 						<Button variant="secondary" onClick={this.props.onhide}>
               Close
 						</Button>
-						{/* <Button variant="primary" onClick={() => this.props.onSaveChanges(this.state.identifierInput,
-              this.state.unitRepresent, this.state.typeOfUnit, this.state.displayable, this.state.secInRate,
-              this.state.preferredDisplay, this.state.suffix, this.state.note)}>
-             Save Changes
-            </Button> */}
 						<Button variant="primary" onClick={() => this.onSaveChanges()}>
               Save Changes
 						</Button>

@@ -115,7 +115,6 @@ router.post('/addUnit', async (req, res) => {
 				type: 'string',
 				minLength: 1
 			},
-			// not sure if you need to check based on enum
 			unitRepresent: {
 				type: 'string',
 				minLength: 1,
@@ -149,8 +148,6 @@ router.post('/addUnit', async (req, res) => {
 			}
 		}
 	};
-	console.log(req.body)
-	//Could change the function here 
 	const validationResult = validate(req.body, validUnit);
 	if (!validationResult.valid) {
 		log.error(`Invalid input for unitsAPI. ${validationResult.error}`);

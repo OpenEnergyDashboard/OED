@@ -61,14 +61,14 @@ const ModalCard = (props: CreateUnitFormProps) => {
 		<>
 			{/* Show modal button */}
 			<Button variant="Secondary" onClick={handleShow}>
-          Create Unit
+				Create Unit
 			</Button>
 
 			<Modal show={showModal} onHide={handleClose}>
 				<Modal.Header closeButton>
 					<Modal.Title> Create Unit</Modal.Title>
 				</Modal.Header>
-
+				{/* TODO: Styling of the form could use some work to make textboxes bigger, etc */}
 				<Modal.Body className="show-grid">
 					<div id="container">
 						<div id="modalChild">
@@ -78,14 +78,17 @@ const ModalCard = (props: CreateUnitFormProps) => {
 								<div style={tableStyle}>
 									{/*HTML form to accept new unit information*/}
 									<form onSubmit={e => { e.preventDefault();  props.submitNewUnit(); }}>
+										{/* Name input*/}
 										<div style={formInputStyle}>
 											<label><FormattedMessage id="unit.name"/></label><br />
 											<Input type='text' onChange={({target}) =>  handleNameChange(target.value)} required value={props.name} />
 										</div>
+										{/* Identifier input*/}
 										<div style={formInputStyle}>
 											<label><FormattedMessage id="unit.identifier"/></label><br />
 											<Input type='text' onChange={({target}) =>  props.handleIdentifierChange(target.value)} required value={ props.identifier} />
 										</div>
+										{/* Unit represent input*/}
 										<div style={formInputStyle}>
 											<label><FormattedMessage id="unit.represent"/></label><br />
 											<Input type='select' onChange={({target}) =>  props.handleUnitRepresentChange(target.value)} required value={ props.unitRepresent}>
@@ -95,10 +98,12 @@ const ModalCard = (props: CreateUnitFormProps) => {
 												<option value='unused' key='unused'>Unused</option>
 											</Input>
 										</div>
+										{/* Seconds in rate input*/}
 										<div style={formInputStyle}>
 											<label><FormattedMessage id="unit.sec_in_rate"/></label><br />
 											<Input type='number' onChange={({target}) =>  props.handleSecInRateChange(parseInt(target.value))} required value={ props.secInRate} />
 										</div>
+										{/* Type of input input*/}
 										<div style={formInputStyle}>
 											<label><FormattedMessage id="unit.type_of_unit"/></label><br />
 											<Input type='select' onChange={({target}) =>  props.handleTypeOfUnitChange(target.value)} required value={ props.typeOfUnit}>
@@ -108,10 +113,12 @@ const ModalCard = (props: CreateUnitFormProps) => {
 												<option value='suffix' key='suffix'>Suffix</option>
 											</Input>
 										</div>
+										{/* Suffix input*/}
 										<div style={formInputStyle}>
 											<label><FormattedMessage id="unit.suffix"/></label><br />
 											<Input type='text' onChange={({target}) =>  props.handleSuffixChange(target.value)} required value={ props.suffix} />
 										</div>
+										{/* Displayable type input*/}
 										<div style={formInputStyle}>
 											<label><FormattedMessage id="unit.displayable"/></label><br />
 											<Input type='select' onChange={({target}) =>  props.handleDisplayableChange(target.value)} required value={ props.displayable} >
@@ -120,9 +127,11 @@ const ModalCard = (props: CreateUnitFormProps) => {
 												<option value='admin' key='admin'>Admin</option>
 											</Input>
 										</div>
+										{/* Prefered display input*/}
 										<Input type='checkbox' onChange={({target}) => props.handlePreferredDisplayChange(JSON.parse(target.value))}
 											value={ props.preferredDisplay.toString()} />
 										<label><FormattedMessage id="unit.preferred_display"/></label>
+										{/* Note input*/}
 										<div style={formInputStyle}>
 											<label><FormattedMessage id="unit.note_optional"/></label><br />
 											<Input type='textarea' onChange={({target}) =>  props.handleNoteChange(target.value)} value={ props.note} />
