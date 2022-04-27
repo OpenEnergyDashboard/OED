@@ -10,7 +10,9 @@
     },
     "extends": [
         "eslint:recommended",
-        "plugin:@typescript-eslint/recommended"
+        "plugin:@typescript-eslint/recommended" //, add a comment here when implementing/adding another plugin
+	// "plugin:jsdoc/recommended" uncomment this to enforce eslint-plugin-jsdoc rules 
+	//the line of code above is in regards to https://github.com/OpenEnergyDashboard/OED/issues/396 
     ],
     "parser": "@typescript-eslint/parser",
     "parserOptions": {
@@ -21,7 +23,8 @@
         "sourceType": "module"
     },
     "plugins": [
-        "@typescript-eslint"
+        "@typescript-eslint",
+	"jsdoc" //this section of code is for running jsdoc checker (eslint-plugin-jsdoc) https://github.com/OpenEnergyDashboard/OED/issues/396
     ],
     "rules": {
         //https://github.com/typescript-eslint/typescript-eslint/issues/1824, indent is therefore turned off and we use typescript-eslint/indent instead
