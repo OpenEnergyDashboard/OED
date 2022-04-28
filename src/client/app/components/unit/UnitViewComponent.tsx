@@ -81,7 +81,8 @@ class UnitViewComponent extends React.Component<UnitViewPropsWithIntl, UnitViewS
 					<b>Suffix:</b> {this.props.unit.suffix}
 				</div>
 				<div className="unit-container">
-					<b>Note:</b> {this.props.unit.note}
+					{/* Only show first 30 characters so card does not get too big. Should limit to one line */}
+					<b>Note:</b> {this.props.unit.note.slice(0, 29)}
 				</div>
 				{this.isAdmin()}
 			</div>

@@ -34,10 +34,10 @@ router.get('/', async (req, res) => {
 router.post('/edit', async (req, res) => {
 	const validUnit = {
 		type: 'object',
-		required: ['id','identifier'],
+		required: ['id', 'identifier'],
 		properties: {
-			id: { 
-				type: 'integer' 
+			id: {
+				type: 'integer'
 			},
 			name: {
 				type: 'string',
@@ -90,7 +90,7 @@ router.post('/edit', async (req, res) => {
 			unit.unitRepresent = req.body.unitRepresent;
 			unit.typeOfUnit = req.body.typeOfUnit;
 			unit.preferredDisplay = req.body.preferredDisplay;
-			unit.secInRate = req.body.secInRate; 
+			unit.secInRate = req.body.secInRate;
 			unit.suffix = req.body.suffix;
 			unit.note = req.body.note;
 			await unit.update(conn);

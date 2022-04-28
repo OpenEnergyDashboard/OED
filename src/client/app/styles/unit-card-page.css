@@ -21,9 +21,9 @@
 width: 100%;
     /*   border: 1px solid black; */
     border-radius: 15px 15px 5px 5px;
-    padding-top: 10px;
+    padding-top: 5px;
     padding-right: 0px;
-    padding-bottom: 10px;
+    padding-bottom: 5px;
     padding-left: 0px;
     text-align: center;
     overflow-wrap: break-word; 
@@ -34,9 +34,9 @@ width: 100%;
 .unit-container {
 width: 100%;
     /*   border: 1px solid black; */
-    padding-top: 10px;
+    padding-top: 2px;
     padding-right: 0px;
-    padding-bottom: 10px;
+    padding-bottom: 1px;
     padding-left: 0px;
     text-align: center;
     overflow-wrap: break-word; 
@@ -44,9 +44,9 @@ width: 100%;
 
 .type-container {
     width: 100%;
-    padding-top: 10px;
+    padding-top: 2px;
     padding-right: 0px;
-    padding-bottom: 10px;
+    padding-bottom: 1px;
     padding-left: 0px;
     text-align: center;
     overflow-wrap: break-word; 

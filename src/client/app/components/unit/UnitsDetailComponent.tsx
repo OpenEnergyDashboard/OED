@@ -41,6 +41,7 @@ export default class UnitsDetailContainer extends React.Component<UnitsDetailPro
 		const tooltipStyle = {
 			display: 'inline-block',
 			fontSize: '50%',
+			// TODO add text for tooltips.
 			tooltipUnitView: loggedInAsAdmin? 'help.admin.unitview' : 'help.units.unitview'
 		};
 		return (
@@ -59,8 +60,9 @@ export default class UnitsDetailContainer extends React.Component<UnitsDetailPro
 					{loggedInAsAdmin && <div className="edit-btn">
 						<CreateUnitContainer/>
 						{/* @TODO:
-							Currently, when a new unit is added, you will need to referesh the unit page in order to see the new unit
-							It would great to implements a function that would auto referesh the page when a new unit is added.*/}
+							Currently, when a new unit is added, you will need to refresh the unit page in order to see the new unit
+							It would great to implements a function that would auto refresh the page when a new unit is added.
+							A possible alternative is to update the state on units. */}
 					</div>}
 					<div className="card-container">
 						{ this.props.units.map(unitID =>

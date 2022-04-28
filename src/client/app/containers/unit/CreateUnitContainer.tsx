@@ -28,7 +28,7 @@ export default class CreateUnitContainer extends React.Component {
 	state = {
 		name: '',
 		identifier: '',
-		unitRepresent: UnitRepresentType.raw,
+		unitRepresent: UnitRepresentType.quantity,
 		secInRate: 3600,
 		typeOfUnit: UnitType.unit,
 		unitIndex: undefined,
@@ -50,15 +50,15 @@ export default class CreateUnitContainer extends React.Component {
 		this.setState({ unitRepresent: newUnitRepresent });
 	}
 
-	private handleSecInRateChange = (newUnitRepresent: number) => {
-		this.setState({ unitRepresent: newUnitRepresent });
+	private handleSecInRateChange = (newSecInRate: number) => {
+		this.setState({ secInRate: newSecInRate });
 	}
 
 	private handleTypeOfUnitChange = (newTypeOfUnit: string) => {
 		this.setState({ typeOfUnit: newTypeOfUnit });
 	}
-	private handleSuffixChange = (newsuffix: string) => {
-		this.setState({ suffix: newsuffix })
+	private handleSuffixChange = (newSuffix: string) => {
+		this.setState({ suffix: newSuffix })
 	}
 	private handleDisplayableChange = (newDisplayable: string) => {
 		this.setState({ displayable: newDisplayable });
@@ -70,18 +70,20 @@ export default class CreateUnitContainer extends React.Component {
 		this.setState({ note: newNote });
 	}
 
-	//Direct call to the API, this does not use the Redux state and goes around it to go directly to the API
-	//TODO: Current implementation requires page refresh to show new unit; Ideally we would refresh the redux state when the submitNewUnit runs.
+	// Direct call to the API, this does not use the Redux state and goes around it to go directly to the API
+	// TODO: Current implementation requires page refresh to show new unit; Ideally we would refresh the redux state when the submitNewUnit runs.
 	private submitNewUnit = async () => {
 		try {
 			await unitsApi.addUnit({
-				id: -99, //-99 new unit does not have a database assigned id so use -99, database will handle creating one when inserted
+				// This value is not used but must be assigned so -99 is used.
+				id: -99,
 				name: this.state.name,
 				identifier: this.state.identifier,
 				unitRepresent: this.state.unitRepresent,
 				secInRate: this.state.secInRate,
 				typeOfUnit: this.state.typeOfUnit,
-				unitIndex: -99, //-99 new unit does not have a database assigned id so use -99, database will handle creating one when inserted
+				// This value is not used but must be assigned so -99 is used.
+				unitIndex: -99,
 				suffix: this.state.suffix,
 				displayable: this.state.displayable,
 				preferredDisplay: this.state.preferredDisplay,

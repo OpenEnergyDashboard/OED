@@ -68,7 +68,7 @@ class UnitModelEditComponent extends React.Component<UnitViewPropsWithIntl, Unit
 						<Modal.Title> Edit Unit Information</Modal.Title>
 					</Modal.Header>
 
-					{/* when any of the unit's is changed call one of the repected functions.  */}
+					{/* when any of the unit are changed call one of the functions.  */}
 					<Modal.Body className="show-grid">
 						<div id="container">
 							<div id="modalChild">
@@ -176,7 +176,7 @@ class UnitModelEditComponent extends React.Component<UnitViewPropsWithIntl, Unit
 	}
 
 	/**
-	 * The following functions will append each unit deatil to the modal card.
+	 * The following functions will append each unit detail to the modal card.
 	 */
 	private isIdentifier(identifier: string) {
 		return (

@@ -14,8 +14,6 @@ const defaultState: UnitsState = {
 };
 
 export default function units(state = defaultState, action: UnitsAction) {
-	let submitting;
-	let editedUnits;
 	switch (action.type) {
 		case ActionType.RequestUnitsDetails:
 			return {
@@ -34,26 +32,30 @@ export default function units(state = defaultState, action: UnitsAction) {
 				selectedUnits: action.selectedUnits
 			};
 		case ActionType.EditUnitDetails:
-			editedUnits = state.editedUnits;
+		{
+			const editedUnits = state.editedUnits;
 			editedUnits[action.unit.id] = action.unit;
 			return {
 				...state,
 				editedUnits
 			};
+		}
 		case ActionType.SubmitEditedUnit:
-			submitting = state.submitting;
+		{
+			const submitting = state.submitting;
 			submitting.push(action.unit);
 			return {
 				...state,
 				submitting
 			};
+		}
 		case ActionType.ConfirmEditedUnit:
 		{
-			submitting = state.submitting;
+			const submitting = state.submitting;
 			submitting.splice(submitting.indexOf(action.unit));
 
 			const units = state.units;
-			editedUnits = state.editedUnits;
+			const editedUnits = state.editedUnits;
 			units[action.unit] = editedUnits[action.unit];
 
 			delete editedUnits[action.unit];

@@ -37,8 +37,8 @@ export type UnitsAction = RequestUnitsDetailsAction
 | ReceiveUnitsDetailsAction
 | ChangeDisplayedUnitsAction
 | EditUnitDetailsAction
-| SubmitEditedUnitAction
-| ConfirmEditedUnitAction;
+| ConfirmEditedUnitAction
+| SubmitEditedUnitAction;
 
 export enum UnitType {
 	unit = 'unit',
