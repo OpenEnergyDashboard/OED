@@ -8,6 +8,7 @@ import { State } from '../../types/redux/state';
 import { fetchMetersDetails, submitEditedMeters } from '../../actions/meters';
 import {Dispatch} from '../../types/redux/actions';
 import { isRoleAdmin } from '../../utils/hasPermissions';
+import _ = require('lodash');
 
 
 function mapStateToProps(state: State) {
@@ -18,9 +19,13 @@ function mapStateToProps(state: State) {
 	}
 	return {
 		loggedInAsAdmin,
-		meters: Object.keys(state.meters.byMeterID)
-			.map(key => parseInt(key))
-			.filter(key => !isNaN(key)),
+		// The state has all the meter info so map to get the id and identifier then sort that by
+		// identifier and finally map so only have id as expected. This causes
+		// MetersDetailComponent.tsx to process them in this sorted order
+		// and pass them on to MeterViewContainer as desired.
+		meters: _.sortBy(_.values(state.meters.byMeterID)
+			.map(meter => ({ value: meter.id, label: meter.identifier.trim() })), 'label')
+			.map(meter => meter.value),
 		unsavedChanges: Object.keys(state.meters.editedMeters).length > 0
 	};
 }
