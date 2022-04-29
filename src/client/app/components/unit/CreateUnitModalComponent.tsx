@@ -47,9 +47,6 @@ const ModalCard = (props: CreateUnitFormProps) => {
 	const formInputStyle: React.CSSProperties = {
 		paddingBottom: '5px'
 	}
-	const titleStyle: React.CSSProperties = {
-		textAlign: 'center'
-	};
 
 	const tableStyle: React.CSSProperties = {
 		marginLeft: '25%',
@@ -66,7 +63,7 @@ const ModalCard = (props: CreateUnitFormProps) => {
 
 			<Modal show={showModal} onHide={handleClose}>
 				<Modal.Header closeButton>
-					<Modal.Title> Create Unit</Modal.Title>
+					<Modal.Title> <FormattedMessage id="create.unit" /></Modal.Title>
 				</Modal.Header>
 				{/* TODO: Styling of the form could use some work to make textboxes bigger, etc */}
 				<Modal.Body className="show-grid">
@@ -74,7 +71,6 @@ const ModalCard = (props: CreateUnitFormProps) => {
 						<div id="modalChild">
 							{/* Modal content */}
 							<div className="containter-fluid">
-								<h1 style={titleStyle}><FormattedMessage id="unit.create.new.unit" /></h1>
 								<div style={tableStyle}>
 									{/*HTML form to accept new unit information*/}
 									<form onSubmit={e => { e.preventDefault(); props.submitNewUnit(); }}>
