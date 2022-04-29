@@ -7,7 +7,7 @@ import { ActionType, Dispatch, GetState, Thunk } from '../types/redux/actions';
 import { ConversionMetaData } from '../types/redux/conversions';
 import { State } from '../types/redux/state';
 import * as t from '../types/redux/conversions';
-import { Conversion } from '../types/items'
+import { Conversion, ConversionBidirectional } from '../types/items'
 import { conversionsApi } from '../utils/api';
 import { showErrorNotification, showSuccessNotification } from '../utils/notifications';
 import translate from '../utils/translate';
@@ -57,8 +57,15 @@ export function submitConversionEdit(conversions: Conversion): Thunk {
         const submittingConversion = conversions;
         dispatch(submitEditedConversion(submittingConversion));
         try{
-            await conversionsApi.editConversion(submittingConversion.sourceId,submittingConversion.destinationId,Boolean(String(submittingConversion.bidirectional)),submittingConversion.slope,submittingConversion.intercept,submittingConversion.note);
-            dispatch(confirmEditedConversion(submittingConversion));
+            if (submittingConversion.bidirectional == ConversionBidirectional.TRUE){
+                await conversionsApi.editConversion(submittingConversion.sourceId,submittingConversion.destinationId,true,submittingConversion.slope,submittingConversion.intercept,submittingConversion.note);
+                dispatch(confirmEditedConversion(submittingConversion));
+            } else {
+                await conversionsApi.editConversion(submittingConversion.sourceId,submittingConversion.destinationId,false,submittingConversion.slope,submittingConversion.intercept,submittingConversion.note);
+                dispatch(confirmEditedConversion(submittingConversion));
+            }
+            
+            
         } catch (err) {
             showErrorNotification(translate('failed.to.edit.conversion'));
         }
