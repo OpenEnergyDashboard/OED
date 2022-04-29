@@ -13,7 +13,7 @@ CREATE TABLE IF NOT EXISTS units (
 	suffix VARCHAR(50) DEFAULT '',
 	displayable displayable_type NOT NULL,
 	preferred_display BOOLEAN NOT NULL,
-	note TEXT,
+	note TEXT
 	-- We previously had the following unique constraint. It was difficult to make sure it
 	-- was met during changes to units so it was removed. See the design document for more
 	-- details.
