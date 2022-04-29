@@ -61,7 +61,9 @@ class MeterViewComponent extends React.Component<MeterViewPropsWithIntl, MeterVi
 		this.onCancel = this.onCancel.bind(this);
 		this.handleIdentifierChange = this.handleIdentifierChange.bind(this);
 	}
-
+	/**
+	 * 
+	 */
 	handleShow = () => {
 		this.setState({ show: true });
 	}
@@ -141,16 +143,20 @@ class MeterViewComponent extends React.Component<MeterViewPropsWithIntl, MeterVi
 		return null;
 	}
 
-	// on save handler in progress ( Meter Detail Component)
-	// if double clicked then the save changes take affect otherwise a single click will cause
-	// all conditions to be false. Is there a second check it goes through?
+	 /**
+	  * on save handler in progress ( Meter Detail Component)
+	  *	if double clicked then the save changes take affect otherwise a single click will cause
+	  *	all conditions to be false.
+	  */
 	public onSaveChanges = () => {
 		this.toggleIdentifierInput();
 		this.updateUnsavedChanges();
 		this.props.onSubmitClicked();
 		this.handleClose();
 	}
-
+	/**
+	 * Handles the Prop Hide for modal and resets any variable changes that had occured
+	 */
 	onCancel() {
 		this.setState({ identifierFocus: false });
 		this.handleClose();

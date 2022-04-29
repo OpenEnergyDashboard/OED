@@ -52,12 +52,6 @@ class MeterModalEditComponent extends React.Component<MeterViewPropsWithIntl,
       identifier: this.props.identifier,
       identifierinput: this.props.identifier
     };
-    this.identifierInput = this.identifierInput.bind(this);
-  }
-
-  identifierInput() {
-    const identifier = this.state.identifierinput;
-    return identifier;
   }
 
   render() {
