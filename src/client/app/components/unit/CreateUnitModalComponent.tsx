@@ -74,7 +74,7 @@ const ModalCard = (props: CreateUnitFormProps) => {
 						<div id="modalChild">
 							{/* Modal content */}
 							<div className="containter-fluid">
-								<h1 style={titleStyle}><FormattedMessage id="unit.create_new_unit" /></h1>
+								<h1 style={titleStyle}><FormattedMessage id="unit.create.new.unit" /></h1>
 								<div style={tableStyle}>
 									{/*HTML form to accept new unit information*/}
 									<form onSubmit={e => { e.preventDefault(); props.submitNewUnit(); }}>
@@ -92,7 +92,7 @@ const ModalCard = (props: CreateUnitFormProps) => {
 										<div style={formInputStyle}>
 											<label><FormattedMessage id="unit.represent" /></label><br />
 											<Input type='select' onChange={({ target }) => props.handleUnitRepresentChange(target.value)} required value={props.unitRepresent}>
-												<option value='raw' key='raw'>raw</option>
+												<option value='raw' key='raw'>Raw</option>
 												<option value='quantity' key='quantity'>Quantity</option>
 												<option value='flow' key='flow'>Flow</option>
 												<option value='unused' key='unused'>Unused</option>
@@ -100,12 +100,12 @@ const ModalCard = (props: CreateUnitFormProps) => {
 										</div>
 										{/* Seconds in rate input*/}
 										<div style={formInputStyle}>
-											<label><FormattedMessage id="unit.sec_in_rate" /></label><br />
+											<label><FormattedMessage id="unit.sec.in.rate" /></label><br />
 											<Input type='number' onChange={({ target }) => props.handleSecInRateChange(parseInt(target.value))} required value={props.secInRate} />
 										</div>
 										{/* Type of input input*/}
 										<div style={formInputStyle}>
-											<label><FormattedMessage id="unit.type_of_unit" /></label><br />
+											<label><FormattedMessage id="unit.type.of.unit" /></label><br />
 											<Input type='select' onChange={({ target }) => props.handleTypeOfUnitChange(target.value)} required value={props.typeOfUnit}>
 
 												<option value='unit' key='unit'>Unit</option>
@@ -120,20 +120,29 @@ const ModalCard = (props: CreateUnitFormProps) => {
 										</div>
 										{/* Displayable type input*/}
 										<div style={formInputStyle}>
-											<label><FormattedMessage id="unit.displayable" /></label><br />
+											<label><FormattedMessage id="unit.dropdown.displayable" /></label><br />
 											<Input type='select' onChange={({ target }) => props.handleDisplayableChange(target.value)} required value={props.displayable} >
-												<option value='all' key='all'>All</option>
-												<option value='none' key='none'>None</option>
-												<option value='admin' key='admin'>Admin</option>
+												<option value='all' key='all'><FormattedMessage id="unit.dropdown.displayable.option.all" /></option>
+												<option value='none' key='none'><FormattedMessage id="unit.dropdown.displayable.option.none" /></option>
+												<option value='admin' key='admin'><FormattedMessage id="unit.dropdown.displayable.option.admin" /></option>
 											</Input>
 										</div>
 										{/* Preferred display input*/}
-										<Input type='checkbox' onChange={({ target }) => props.handlePreferredDisplayChange(JSON.parse(target.value))}
-											value={props.preferredDisplay.toString()} />
-										<label><FormattedMessage id="unit.preferred_display" /></label>
+										<div style={formInputStyle}>
+											<label><FormattedMessage id="unit.preferred.display" /></label>
+											{/* <Input type='checkbox' onChange={({ target }) => props.handlePreferredDisplayChange(JSON.parse(target.value))}
+												value={props.preferredDisplay.toString()} /> */}
+											<Input type='select' onChange={({ target }) => props.handlePreferredDisplayChange(JSON.parse(target.value))}>
+												<option value="true"> Yes </option>
+												<option value="false"> No </option>
+											</Input>
+
+										</div>
+
+
 										{/* Note input*/}
 										<div style={formInputStyle}>
-											<label><FormattedMessage id="unit.note_optional" /></label><br />
+											<label><FormattedMessage id="unit.note.optional" /></label><br />
 											<Input type='textarea' onChange={({ target }) => props.handleNoteChange(target.value)} value={props.note} />
 										</div>
 									</form>

@@ -4,9 +4,9 @@
 import * as React from 'react';
 import { Button } from 'reactstrap';
 import { UnitData, EditUnitDetailsAction } from '../../types/redux/units';
-import { injectIntl, WrappedComponentProps } from 'react-intl';
-import ModalCard from './UnitModalEditComponent'
-import '../../styles/unit-card-page.css'
+import { FormattedMessage, injectIntl, WrappedComponentProps } from 'react-intl';
+import ModalCard from './UnitModalEditComponent';
+import '../../styles/unit-card-page.css';
 
 interface UnitViewProps {
 	id: number;
@@ -60,29 +60,29 @@ class UnitViewComponent extends React.Component<UnitViewPropsWithIntl, UnitViewS
 					{this.props.unit.name}
 				</div>
 				<div className="unit-container">
-					<b>Unit Identifier:</b> {this.props.unit.identifier}
+					<b><FormattedMessage id="unit.identifier"/></b> {this.props.unit.identifier}
 				</div>
 				<div className="unit-container">
-					<b>Type of Unit:</b> {this.props.unit.typeOfUnit}
+					<b><FormattedMessage id="unit.type.of.unit"/></b> {this.props.unit.typeOfUnit}
 				</div>
 				<div className="unit-container">
-					<b>Unit Represent:</b> {this.props.unit.unitRepresent}
+					<b><FormattedMessage id="unit.represent"/></b> {this.props.unit.unitRepresent}
 				</div>
 				<div className="unit-container">
-					<b>Displayable:</b> {this.props.unit.displayable}
+					<b><FormattedMessage id="unit.displayable"/></b> {this.props.unit.displayable}
 				</div>
 				<div className="unit-container">
-					<b>Preferred Display:</b> {this.props.unit.preferredDisplay.toString()}
+					<b><FormattedMessage id="unit.preferred.display"/></b> {this.props.unit.preferredDisplay.toString()}
 				</div>
 				<div className="unit-container">
-					<b>Sec In Rate:</b> {this.props.unit.secInRate}
+					<b><FormattedMessage id="unit.sec.in.rate"/></b> {this.props.unit.secInRate}
 				</div>
 				<div className="unit-container">
-					<b>Suffix:</b> {this.props.unit.suffix}
+					<b><FormattedMessage id="unit.suffix"/></b> {this.props.unit.suffix}
 				</div>
 				<div className="unit-container">
 					{/* Only show first 30 characters so card does not get too big. Should limit to one line */}
-					<b>Note:</b> {this.props.unit.note.slice(0, 29)}
+					<b><FormattedMessage id="unit.note"/></b> {this.props.unit.note.slice(0, 29)}
 				</div>
 				{this.isAdmin()}
 			</div>

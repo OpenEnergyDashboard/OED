@@ -6,6 +6,7 @@ import { Modal, Button } from 'react-bootstrap';
 import '../../styles/unit-edit-modal.css';
 import { UnitData, EditUnitDetailsAction, DisplayableType, UnitRepresentType, UnitType } from '../../types/redux/units';
 import { Input } from 'reactstrap';
+import { FormattedMessage } from 'react-intl';
 
 //Interface for edited units props
 interface EditUnitProps {
@@ -65,7 +66,7 @@ class UnitModelEditComponent extends React.Component<UnitViewPropsWithIntl, Unit
 			<>
 				<Modal show={this.props.show} onHide={this.props.onhide}>
 					<Modal.Header closeButton>
-						<Modal.Title> Edit Unit Information</Modal.Title>
+						<Modal.Title> <FormattedMessage id="edit.unit"/></Modal.Title>
 					</Modal.Header>
 
 					{/* when any of the unit are changed call one of the functions.  */}
@@ -181,7 +182,7 @@ class UnitModelEditComponent extends React.Component<UnitViewPropsWithIntl, Unit
 	private isIdentifier(identifier: string) {
 		return (
 			<div>
-				Identifier: <span><br /><input type="text" defaultValue={identifier}
+				<FormattedMessage id="unit.identifier" /> <span><br /><input type="text" defaultValue={identifier}
 					placeholder="Identifier" onChange={event => this.handleIdentifier(event)} /></span>
 			</div>
 		)
@@ -190,7 +191,7 @@ class UnitModelEditComponent extends React.Component<UnitViewPropsWithIntl, Unit
 	private isTypeOfUnit(typeOfUnit: UnitType) {
 		return (
 			<div>
-				<label>Type of Unit: </label>
+				<label><FormattedMessage id="unit.type.of.unit" /> </label>
 				<Input type='select' defaultValue={typeOfUnit}
 					onChange={event => this.handleTypeOfUnitChange(event)}>
 					<option value="unit"> unit </option>
@@ -204,7 +205,7 @@ class UnitModelEditComponent extends React.Component<UnitViewPropsWithIntl, Unit
 	private isUnitRepresent(unitRepresent: UnitRepresentType) {
 		return (
 			<div>
-				<label>Unit Represent: </label>
+				<label><FormattedMessage id="unit.represent" /> </label>
 				<Input type='select' defaultValue={unitRepresent}
 					onChange={event => this.handleUnitRepresentChange(event)}>
 					<option value="quantity"> quantity </option>
@@ -219,7 +220,7 @@ class UnitModelEditComponent extends React.Component<UnitViewPropsWithIntl, Unit
 	private isDisplayableType(displayable: DisplayableType) {
 		return (
 			<div>
-				<label>Displayable: </label>
+				<label><FormattedMessage id="unit.displayable" /> </label>
 				<Input type='select' defaultValue={displayable}
 					onChange={event => this.handleDisplayableChange(event)}>
 					<option value="none"> none </option>
@@ -233,7 +234,7 @@ class UnitModelEditComponent extends React.Component<UnitViewPropsWithIntl, Unit
 	private isSecInRate(secInRate: number) {
 		return (
 			<div>
-				Sec In Rate: <span><br /><input type="number" defaultValue={secInRate}
+				<FormattedMessage id="unit.sec.in.rate" /> <span><br /><input type="number" defaultValue={secInRate}
 					onChange={event => this.handleSecInRateChange(event)}
 					placeholder="Sec In Rate" /></span>
 			</div>
@@ -243,7 +244,7 @@ class UnitModelEditComponent extends React.Component<UnitViewPropsWithIntl, Unit
 	private isPreferredDisplayable(preferredDisplay: boolean) {
 		return (
 			<div>
-				<label>Preferred Displayable: </label>
+				<label><FormattedMessage id="unit.preferred.display" /> </label>
 				<Input type='select' defaultValue={preferredDisplay.toString()}
 					onChange={event => this.handlePreferredDisplayableChange(event)}>
 					<option value="true"> Yes </option>
@@ -256,7 +257,7 @@ class UnitModelEditComponent extends React.Component<UnitViewPropsWithIntl, Unit
 	private isSuffix(suffix: string) {
 		return (
 			<div>
-				<label>Suffix: </label>
+				<label><FormattedMessage id="unit.suffix" /> </label>
 				<input type="text" defaultValue={suffix} placeholder="Suffix"
 					onChange={event => this.handleSuffixChange(event)} />
 			</div>
@@ -266,7 +267,7 @@ class UnitModelEditComponent extends React.Component<UnitViewPropsWithIntl, Unit
 	private isNote(note: string) {
 		return (
 			<div>
-				<label>Note: </label>
+				<label><FormattedMessage id="unit.note" /> </label>
 				<input type="text" defaultValue={note} placeholder="Note"
 					onChange={event => this.handleNoteChange(event)} />
 			</div>

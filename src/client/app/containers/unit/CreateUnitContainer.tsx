@@ -89,10 +89,10 @@ export default class CreateUnitContainer extends React.Component {
 				preferredDisplay: this.state.preferredDisplay,
 				note: this.state.note
 			});
-			showSuccessNotification(translate('units.successfully.create.unit'))
+			showSuccessNotification(translate('unit.successfully.create.unit'))
 			browserHistory.push('/units');
 		} catch (error) {
-			showErrorNotification(translate('units.failed.to.create.unit'));
+			showErrorNotification(translate('unit.failed.to.create.unit'));
 		}
 	};
 	public render() {
