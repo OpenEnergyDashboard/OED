@@ -14,5 +14,8 @@ CREATE TABLE IF NOT EXISTS units (
 	displayable displayable_type NOT NULL,
 	preferred_display BOOLEAN NOT NULL,
 	note TEXT,
-	UNIQUE (type_of_unit, unit_index)
+	-- We previously had the following unique constraint. It was difficult to make sure it
+	-- was met during changes to units so it was removed. See the design document for more
+	-- details.
+	-- UNIQUE (type_of_unit, unit_index)
 );
