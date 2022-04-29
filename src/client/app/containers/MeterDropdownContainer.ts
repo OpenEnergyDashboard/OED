@@ -10,7 +10,8 @@ import { State } from '../types/redux/state';
 import { Dispatch } from '../types/redux/actions';
 import { unitsCompatibleWithMeters } from '../utils/determineCompatibleUnits';
 import { SelectOption } from '../types/items';
-import Meter from '/home/ubermensch/OED/src/server/models/Meter';
+import Meter from '../../../../src/server/models/Meter';
+
 
 /**
  * @param {State} state
