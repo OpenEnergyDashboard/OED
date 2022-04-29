@@ -27,7 +27,7 @@ interface HeaderButtonsProps {
 /**
  * React component that controls the buttons in the Header
  */
-export default class HeaderButtonsComponent extends React.Component<HeaderButtonsProps, {}> {
+export default class HeaderButtonsComponent extends React.Component<HeaderButtonsProps> {
 	constructor(props: HeaderButtonsProps) {
 		super(props);
 		this.handleLogOut = this.handleLogOut.bind(this);

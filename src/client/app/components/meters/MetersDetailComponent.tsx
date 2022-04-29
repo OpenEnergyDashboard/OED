@@ -22,7 +22,7 @@ interface MetersDetailProps {
 	submitEditedMeters(): Promise<any>;
 }
 
-export default class MetersDetailComponent extends React.Component<MetersDetailProps, {}> {
+export default class MetersDetailComponent extends React.Component<MetersDetailProps> {
 	constructor(props: MetersDetailProps) {
 		super(props);
 		this.handleSubmitClicked = this.handleSubmitClicked.bind(this);
@@ -70,25 +70,25 @@ export default class MetersDetailComponent extends React.Component<MetersDetailP
 						</div>
 					</h2>
 					<div style={tableStyle}>
-					<Table striped bordered hover>
-					<thead>
-						<tr>
-						{loggedInAsAdmin && <th> <FormattedMessage id='meter.id' /> </th>}
-						{loggedInAsAdmin && <th> <FormattedMessage id='meter.name' /> </th>}
-						<th> <FormattedMessage id='meter.identifier' /> </th>
-						{loggedInAsAdmin && <th> <FormattedMessage id='meter.type' /> </th>}
-						{loggedInAsAdmin && <th> <FormattedMessage id='meter.ip'/> </th>}
-						{loggedInAsAdmin && <th> <FormattedMessage id='meter.gps'/> </th>}
-						<th> <FormattedMessage id='meter.enabled' /> </th>
-						<th> <FormattedMessage id='meter.displayable' /> </th>
-						{loggedInAsAdmin && <th> <FormattedMessage id='meter.time.zone' /> </th>}
-						</tr>
-					</thead>
-					<tbody>
-					{ this.props.meters.map(meterID =>
-						( <MeterViewContainer key={meterID} id={meterID} /> ))}
-					</tbody>
-					</Table>
+						<Table striped bordered hover>
+							<thead>
+								<tr>
+									{loggedInAsAdmin && <th> <FormattedMessage id='meter.id' /> </th>}
+									{loggedInAsAdmin && <th> <FormattedMessage id='meter.name' /> </th>}
+									<th> <FormattedMessage id='meter.identifier' /> </th>
+									{loggedInAsAdmin && <th> <FormattedMessage id='meter.type' /> </th>}
+									{loggedInAsAdmin && <th> <FormattedMessage id='meter.ip'/> </th>}
+									{loggedInAsAdmin && <th> <FormattedMessage id='meter.gps'/> </th>}
+									<th> <FormattedMessage id='meter.enabled' /> </th>
+									<th> <FormattedMessage id='meter.displayable' /> </th>
+									{loggedInAsAdmin && <th> <FormattedMessage id='meter.time.zone' /> </th>}
+								</tr>
+							</thead>
+							<tbody>
+								{ this.props.meters.map(meterID =>
+									( <MeterViewContainer key={meterID} id={meterID} /> ))}
+							</tbody>
+						</Table>
 					</div>
 					{ loggedInAsAdmin && <Button
 						color='success'

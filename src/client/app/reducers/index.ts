@@ -16,6 +16,7 @@ import version from './version';
 import currentUser from './currentUser';
 import conversions from './conversions';
 import unsavedWarning from './unsavedWarning';
+import units from './units'
 
 export default combineReducers({
 	meters,
@@ -32,5 +33,6 @@ export default combineReducers({
 	admin,
 	version,
 	currentUser,
-	unsavedWarning
+	unsavedWarning,
+	units
 });

@@ -48,7 +48,7 @@ export default function meters(state = defaultState, action: MetersAction) {
 				...state,
 				submitting
 			};
-		case ActionType.ConfirmEditedMeter:
+		case ActionType.ConfirmEditedMeter: {
 			submitting = state.submitting;
 			submitting.splice(submitting.indexOf(action.meter));
 
@@ -63,6 +63,7 @@ export default function meters(state = defaultState, action: MetersAction) {
 				editedMeters,
 				byMeterID
 			};
+		}
 		default:
 			return state;
 	}

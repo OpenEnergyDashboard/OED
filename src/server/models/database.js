@@ -83,6 +83,7 @@ async function createSchema(conn) {
 	const { Map } = require('./Map');
 	const Unit = require('./Unit');
 	const Conversion = require('./Conversion');
+	const Cik = require('./Cik');
 
 	/* eslint-enable global-require */
 	await Unit.createUnitTypesEnum(conn);
@@ -90,21 +91,17 @@ async function createSchema(conn) {
 	await Unit.createUnitRepresentTypesEnum(conn);
 	await Unit.createTable(conn);
 	await Conversion.createTable(conn);
+	await Cik.createTable(conn);
 	await Meter.createMeterTypesEnum(conn);
 	await Meter.createTable(conn);
 	await Reading.createTable(conn);
-	await Reading.createCompressedReadingsFunction(conn);
-	await Reading.createCompressedGroupsReadingsFunction(conn);
-	await Reading.createBarchartReadingsFunction(conn);
-	await Reading.createCompressedGroupsBarchartReadingsFunction(conn);
 	await User.createUserTypesEnum(conn);
 	await User.createTable(conn);
 	await Preferences.createTable(conn);
 	await Group.createTables(conn);
 	await Migration.createTable(conn);
 	await LogEmail.createTable(conn);
-	await conn.none(sqlFile('reading/create_function_get_compressed_readings.sql'));
-	await Reading.createCompressedReadingsMaterializedViews(conn);
+	await Reading.createReadingsMaterializedViews(conn);
 	await Reading.createCompareReadingsFunction(conn);
 	await Baseline.createTable(conn);
 	await Map.createTable(conn);

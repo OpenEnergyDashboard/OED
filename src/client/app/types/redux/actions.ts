@@ -39,13 +39,14 @@ export enum ActionType {
 	RequestMeterLineReadings = 'REQUEST_METER_LINE_READINGS',
 	ReceiveMeterLineReadings = 'RECEIVE_METER_LINE_READINGS',
 
-	RequestGroupCompareReading = 'REQUEST_GROUP_COMPARE_READINGS',
-	ReceiveGroupCompareReading = 'RECEIVE_GROUP_COMPARE_READINGS',
-	RequestMeterCompareReading = 'REQUEST_METER_COMPARE_READINGS',
-	ReceiveMeterCompareReading = 'RECEIVE_METER_COMPARE_READINGS',
+	RequestGroupCompareReadings = 'REQUEST_GROUP_COMPARE_READINGS',
+	ReceiveGroupCompareReadings = 'RECEIVE_GROUP_COMPARE_READINGS',
+	RequestMeterCompareReadings = 'REQUEST_METER_COMPARE_READINGS',
+	ReceiveMeterCompareReadings = 'RECEIVE_METER_COMPARE_READINGS',
 
 	UpdateSelectedMeters = 'UPDATE_SELECTED_METERS',
 	UpdateSelectedGroups = 'UPDATE_SELECTED_GROUPS',
+	UpdateSelectedUnit = 'UPDATE_SELECTED_UNIT',
 	UpdateBarDuration = 'UPDATE_BAR_DURATION',
 	ChangeChartToRender = 'CHANGE_CHART_TO_RENDER',
 	ChangeBarStacking = 'CHANGE_BAR_STACKING',
@@ -118,7 +119,9 @@ export enum ActionType {
 	EditConversionDetails = 'EDIT_CONVERSION_DETAILS',
 	SubmitEditedConversion = 'SUBMIT_EDITED_CONVERSION',
 	ConfirmEditedConversion = 'CONFIRM_EDITED_CONVERSION',
-	DeleteConversion = 'DELETE_CONVERSION'
+	DeleteConversion = 'DELETE_CONVERSION',
+	RequestUnitsDetails = 'REQUEST_UNITS_DETAILS'
+	
 }
 
 /**

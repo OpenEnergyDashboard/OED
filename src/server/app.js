@@ -14,25 +14,25 @@ const config = require("./config");
 
 const { log, LogLevel } = require("./log");
 
-const users = require("./routes/users");
-const readings = require("./routes/readings");
-const meters = require("./routes/meters");
-const preferences = require("./routes/preferences");
-const login = require("./routes/login");
-const verification = require("./routes/verification");
-const groups = require("./routes/groups");
-const version = require("./routes/version");
-const timezones = require("./routes/timezones");
-const createRouterForNewCompressedReadings =
-	require("./routes/compressedReadings").createRouter;
-const createRouterForCompareReadings =
-	require("./routes/compareReadings").createRouter;
-const baseline = require("./routes/baseline");
-const maps = require("./routes/maps");
-const logs = require("./routes/logs");
-const obvius = require("./routes/obvius");
-const csv = require("./routes/csv");
+const users = require('./routes/users');
+const readings = require('./routes/readings');
+const meters = require('./routes/meters');
+const preferences = require('./routes/preferences');
+const login = require('./routes/login');
+const verification = require('./routes/verification');
+const groups = require('./routes/groups');
+const version = require('./routes/version');
+const timezones = require('./routes/timezones');
+const createRouterForReadings = require('./routes/unitReadings').createRouter;
+const createRouterForCompareReadings = require('./routes/compareReadings').createRouter;
+const baseline = require('./routes/baseline');
+const maps = require('./routes/maps');
+const logs = require('./routes/logs');
+const obvius = require('./routes/obvius');
+const csv = require('./routes/csv');
+const conversionArray = require('./routes/conversionArray');
 const conversions = require("./routes/conversions");
+const units = require('./routes/units')
 
 // Limit the rate of overall requests to OED
 // Note that the rate limit may make the automatic test return the value of 429. In that case, the limiters below need to be increased.
@@ -63,24 +63,26 @@ app.use(bodyParser.json({ limit: "50mb" }));
 app.use(bodyParser.urlencoded({ extended: false, limit: "50mb" }));
 app.use(cookieParser());
 
-app.use("/api/users", users);
-app.use("/api/meters", meters);
-app.use("/api/readings", readings);
-app.use("/api/preferences", preferences);
-app.use("/api/login", login);
-app.use("/api/groups", groups);
-app.use("/api/verification", verification);
-app.use("/api/version", version);
-app.use("/api/compressedReadings", createRouterForNewCompressedReadings());
-app.use("/api/compareReadings", createRouterForCompareReadings());
-app.use("/api/baselines", baseline);
-app.use("/api/maps", maps);
-app.use("/api/logs", logs);
-app.use("/api/timezones", timezones);
-app.use("/api/obvius", obvius);
-app.use("/api/csv", csv);
+app.use('/api/users', users);
+app.use('/api/meters', meters);
+app.use('/api/readings', readings);
+app.use('/api/preferences', preferences);
+app.use('/api/login', login);
+app.use('/api/groups', groups);
+app.use('/api/verification', verification);
+app.use('/api/version', version);
+app.use('/api/unitReadings', createRouterForReadings());
+app.use('/api/compareReadings', createRouterForCompareReadings());
+app.use('/api/baselines', baseline);
+app.use('/api/maps', maps);
+app.use('/api/logs', logs);
+app.use('/api/timezones', timezones);
+app.use('/api/obvius', obvius);
+app.use('/api/csv', csv);
+app.use('/api/conversion-array', conversionArray);
+app.use('/api/units', units);
 app.use("/api/conversions", conversions);
-app.use(express.static(path.join(__dirname, "..", "client", "public")));
+app.use(express.static(path.join(__dirname, '..', 'client', 'public')));
 
 const router = express.Router();
 

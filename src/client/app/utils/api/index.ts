@@ -9,13 +9,15 @@ import GroupsApi from './GroupsApi';
 import MetersApi from './MetersApi';
 import PreferencesApi from './PreferencesApi';
 import VerificationApi from './VerificationApi';
-import CompressedReadingsApi from './CompressedReadingsApi';
+import ReadingsApi from './ReadingsApi';
 import UploadCSVApi from './UploadCSVApi';
 import UsersApi from './UsersApi';
 import VersionApi from './VersionApi';
 import MapsApi from './MapsApi';
 import LogsApi from './LogsApi';
 import ConversionsApi from './ConversionsApi';
+import ConversionArrayApi from './ConversionArrayApi';
+import UnitsApi from './unitsApi';
 
 const apiBackend = new ApiBackend();
 
@@ -24,24 +26,28 @@ const groupsApi = new GroupsApi(apiBackend);
 const metersApi = new MetersApi(apiBackend);
 const preferencesApi = new PreferencesApi(apiBackend);
 const verificationApi = new VerificationApi(apiBackend);
-const compressedReadingsApi = new CompressedReadingsApi(apiBackend);
+const readingsApi = new ReadingsApi(apiBackend);
 const uploadCSVApi = new UploadCSVApi(apiBackend);
 const usersApi = new UsersApi(apiBackend);
 const mapsApi = new MapsApi(apiBackend);
 const logsApi = new LogsApi(apiBackend);
 const versionApi = new VersionApi(apiBackend);
 const conversionsApi = new ConversionsApi(apiBackend);
+const conversionArrayApi = new ConversionArrayApi(apiBackend);
+const unitsApi = new UnitsApi(apiBackend);
 
 export {
 	groupsApi,
 	metersApi,
 	preferencesApi,
 	verificationApi,
-	compressedReadingsApi,
+	readingsApi,
 	mapsApi,
 	logsApi,
 	usersApi,
 	versionApi,
 	uploadCSVApi,
 	conversionsApi,
+	conversionArrayApi,
+	unitsApi
 };

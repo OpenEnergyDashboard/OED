@@ -9,16 +9,17 @@ const { log } = require('../../log');
  * Calculates the minimum number of hour and daily points to be displayed.
  * This function is a work around since we do not know how to access environment
  * variables from the database level. It is also a temporary solution that will
- * be replaced when we later implement meter-by-meter logic for compressed readings.
+ * be replaced when we later implement meter-by-meter logic for averaged readings.
  * @returns [minimumHourPoints, minimumDailyPoints]
  */
 function determineMinPoints(){
 	// Minimum daily points is set such that when the interval requested is under 60 days or 
-	// about two months then the compressed_readings_2 algorithm should go to the hourly view.
+	// about two months then the meter_line_readings_unit algorithm should go to the hourly view.
+	// At 60 days, you get 60 * 24 = 1440 hourly points so that should be the most every needed.
 	const minimumDailyPoints = 61;
 
 	// Minimum daily points is set such that when the raw reading rate is every 15 minutes and
-	// then the compressed_readings_2 algorithm should go to the raw data view when the interval
+	// then the meter_line_readings_unit algorithm should go to the raw data view when the interval
 	// is under 15 days (or a little over two weeks).
 	// For other rates we have:
 	// 1 minute -> interval under 24 hours or 1 day

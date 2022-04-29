@@ -11,16 +11,43 @@ import Plot from 'react-plotly.js';
 import { TimeInterval } from '../../../common/TimeInterval';
 import Locales from '../types/locales';
 import { DataType } from '../types/Datasources';
+import { UnitRepresentType } from '../types/redux/units';
 
 function mapStateToProps(state: State) {
 	const timeInterval = state.graph.timeInterval;
+	const unitID = state.graph.selectedUnit;
 	const datasets: any[] = [];
+	// The unit label depends on the unit which is in selectUnit state.
+	const graphingUnit = state.graph.selectedUnit;
+	let unitLabel: string = '';
+	// If graphingUnit is -99 then none selected and nothing to graph so label is empty.
+	// This will probably happen when the page is first loaded.
+	if (graphingUnit !== -99) {
+		const selectUnitState = state.units.units[state.graph.selectedUnit];
+		if (selectUnitState !== undefined) {
+			// Quantity and flow units have different unit labels.
+			// Look up the type of unit if it is for quantity/flow/raw and decide what to do.
+			// Bar graphics are always quantities.
+			if (selectUnitState.unitRepresent === UnitRepresentType.quantity) {
+				// If it is a quantity unit then it is a rate so indicate by dividing by the time interval
+				// which is always one hour for OED.
+				unitLabel = selectUnitState.identifier + ' / hour';
+				// This is a special case where the automatic labeling is not the common usage so note usual in parentheses.
+				if (unitLabel === 'kWh / hour') {
+					unitLabel += ' (kW)';
+				}
+			} else if (selectUnitState.unitRepresent === UnitRepresentType.flow || selectUnitState.unitRepresent === UnitRepresentType.raw) {
+				// If it is a flow meter then you are graphing the original rate unit.
+				unitLabel = selectUnitState.identifier;
+			}
+		}
+	}
 
 	// Add all valid data from existing meters to the line plot
 	for (const meterID of state.graph.selectedMeters) {
 		const byMeterID = state.readings.line.byMeterID[meterID];
 		if (byMeterID !== undefined) {
-			const readingsData = byMeterID[timeInterval.toString()];
+			const readingsData = byMeterID[timeInterval.toString()][unitID];
 			if (readingsData !== undefined && !readingsData.isFetching) {
 				const label = state.meters.byMeterID[meterID].name;
 				const colorID = meterID;
@@ -28,7 +55,7 @@ function mapStateToProps(state: State) {
 					throw new Error('Unacceptable condition: readingsData.readings is undefined.');
 				}
 
-				// Create two arrays for the x and y values. Fill the array with the data from the compressed readings
+				// Create two arrays for the x and y values. Fill the array with the data from the line readings
 				const xData: string[] = [];
 				const yData: number[] = [];
 				const hoverText: string[] = [];
@@ -39,7 +66,7 @@ function mapStateToProps(state: State) {
 					const timeReading = st.add(moment(reading.endTimestamp).diff(st) / 2);
 					xData.push(timeReading.utc().format('YYYY-MM-DD HH:mm:ss'));
 					yData.push(reading.reading);
-					hoverText.push(`<b> ${timeReading.format('ddd, ll LTS')} </b> <br> ${label}: ${reading.reading.toPrecision(6)} kW`);
+					hoverText.push(`<b> ${timeReading.format('ddd, ll LTS')} </b> <br> ${label}: ${reading.reading.toPrecision(6)} ${unitLabel}`);
 				});
 
 				// Save the timestamp range of the plot
@@ -80,7 +107,7 @@ function mapStateToProps(state: State) {
 	for (const groupID of state.graph.selectedGroups) {
 		const byGroupID = state.readings.line.byGroupID[groupID];
 		if (byGroupID !== undefined) {
-			const readingsData = byGroupID[timeInterval.toString()];
+			const readingsData = byGroupID[timeInterval.toString()][unitID];
 			if (readingsData !== undefined && !readingsData.isFetching) {
 				const label = state.groups.byGroupID[groupID].name;
 				const colorID = groupID;
@@ -88,7 +115,7 @@ function mapStateToProps(state: State) {
 					throw new Error('Unacceptable condition: readingsData.readings is undefined.');
 				}
 
-				// Create two arrays for the x and y values. Fill the array with the data from the compressed readings
+				// Create two arrays for the x and y values. Fill the array with the data from the line readings
 				const xData: string[] = [];
 				const yData: number[] = [];
 				const hoverText: string[] = [];
@@ -99,7 +126,7 @@ function mapStateToProps(state: State) {
 					const timeReading = st.add(moment(reading.endTimestamp).diff(st) / 2);
 					xData.push(timeReading.utc().format('YYYY-MM-DD HH:mm:ss'));
 					yData.push(reading.reading);
-					hoverText.push(`<b> ${timeReading.format('ddd, ll LTS'	)} </b> <br> ${label}: ${reading.reading.toPrecision(6)} kW`);
+					hoverText.push(`<b> ${timeReading.format('ddd, ll LTS')} </b> <br> ${label}: ${reading.reading.toPrecision(6)} ${unitLabel}`);
 				});
 
 				// This variable contains all the elements (x and y values, line type, etc.) assigned to the data parameter of the Plotly object
@@ -137,7 +164,7 @@ function mapStateToProps(state: State) {
 			orientation: 'h'
 		},
 		yaxis: {
-			title: 'kW',
+			title: unitLabel,
 			gridcolor: '#ddd'
 		},
 

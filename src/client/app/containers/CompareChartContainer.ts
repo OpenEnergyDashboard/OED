@@ -12,6 +12,7 @@ import translate from '../utils/translate';
 import Plot from 'react-plotly.js';
 import Locales from '../types/locales';
 import * as moment from 'moment';
+import { UnitRepresentType } from '../types/redux/units';
 
 interface CompareChartContainerProps {
 	entity: CompareEntity;
@@ -26,6 +27,32 @@ function mapStateToProps(state: State, ownProps: CompareChartContainerProps): an
 	const comparePeriod = state.graph.comparePeriod;
 	const datasets: any[] = [];
 	const periodLabels = getComparePeriodLabels(comparePeriod);
+	// The unit label depends on the unit which is in selectUnit state.
+	const graphingUnit = state.graph.selectedUnit;
+	let unitLabel: string = '';
+	// If graphingUnit is -99 then none selected and nothing to graph so label is empty.
+	// This will probably happen when the page is first loaded.
+	if (graphingUnit !== -99) {
+		const selectUnitState = state.units.units[state.graph.selectedUnit];
+		if (selectUnitState !== undefined) {
+			// Quantity and flow units have different unit labels.
+			// Look up the type of unit if it is for quantity/flow (should not be raw) and decide what to do.
+			// Bar graphics are always quantities.
+			if (selectUnitState.unitRepresent === UnitRepresentType.quantity) {
+				// If it is a quantity unit then that is the unit you are graphing.
+				unitLabel = selectUnitState.identifier;
+			} else if (selectUnitState.unitRepresent === UnitRepresentType.flow) {
+				// If it is a flow meter then you need to multiply by time to get the quantity unit.
+				// The quantity/time for flow has varying time so label by multiplying by time.
+				// To make sure it is clear, also indicate it is a quantity.
+				// Note this should not be used for raw data.
+				// It might not be usual to take a flow and make it into a quantity so this label is a little different to
+				// catch people's attention. If sites/users don't like OED doing this then we can eliminate flow for these types
+				// of graphics as we are doing for rate.
+				unitLabel = selectUnitState.identifier + ' * time ≡ quantity';
+			}
+		}
+	}
 
 	// Get the time shift for this comparison as a moment duration
 	const compareShift = calculateCompareShift(comparePeriod);
@@ -68,13 +95,13 @@ function mapStateToProps(state: State, ownProps: CompareChartContainerProps): an
 			x: [`${periodLabels.prev} (A)`, `${periodLabels.current} (B)`],
 			y: [previousPeriod, currentPeriod],
 			hovertext: [
-				`<b>${previousPeriod} KWh</b> ${translate('used.this.time')}<br>${periodLabels.prev.toLowerCase()}`,
-				`<b>${currentPeriod} KWh</b> ${translate('used.so.far')}<br>${periodLabels.current.toLowerCase()}`
+				`<b>${previousPeriod} ${unitLabel}</b> ${translate('used.this.time')}<br>${periodLabels.prev.toLowerCase()}`,
+				`<b>${currentPeriod} ${unitLabel}</b> ${translate('used.so.far')}<br>${periodLabels.current.toLowerCase()}`
 			],
 			hoverinfo: 'text',
 			type: 'bar',
-			marker: {color: barColor},
-			text: [ `<b>${previousPeriod} kWh</b>`, `<b>${currentPeriod} kWh</b>`],
+			marker: { color: barColor },
+			text: [`<b>${previousPeriod} ${unitLabel}</b>`, `<b>${currentPeriod} ${unitLabel}</b>`],
 			textposition: 'auto',
 			textfont: {
 				color: 'rgba(0,0,0,1)'
@@ -96,7 +123,7 @@ function mapStateToProps(state: State, ownProps: CompareChartContainerProps): an
 		legend: {
 		},
 		yaxis: {
-			title: 'kWh',
+			title: unitLabel,
 			showgrid: true,
 			gridcolor: '#ddd'
 		},
