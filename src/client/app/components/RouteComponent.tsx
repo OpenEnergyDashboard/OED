@@ -33,7 +33,6 @@ import MapCalibrationContainer from '../containers/maps/MapCalibrationContainer'
 import UploadCSVContainer from '../containers/csv/UploadCSVContainer';
 import { UserRole } from '../types/items';
 import { hasPermissions } from '../utils/hasPermissions';
-import AdminConversionsContainer from '../containers/conversions/AdminConversionsContainer';
 import ConversionDetailContainer from '../containers/conversions/ConversionDetailContainer';
 import * as queryString from 'query-string';
 

@@ -2,32 +2,33 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
 
+ 
  import { connect } from 'react-redux';
  import { State } from '../../types/redux/state';
  import { Dispatch } from '../../types/redux/actions';
  import { isRoleAdmin } from '../../utils/hasPermissions';
- import ConversionViewComponent from '../../components/conversions/ConversionViewComponent';
- import { editConversionDetails, removeConversion } from '../../actions/conversions';
- import { logToServer } from '../../actions/logs';
+ import { editConversionDetails, submitConversionsEdits, removeConversion } from '../../actions/conversions';
  import { Conversion } from '../../types/items';
+ import ConversionEditDetailComponent from '../../components/conversions/ConversionEditDetailComponent';
+ //import UnsavedWarningContainer from '../../containers/UnsavedWarningContainer';
+ //import { updateUnsavedChanges, removeUnsavedChanges } from '../../actions/unsavedWarning';
+ //import store from '../../index';
 
- function mapStateToProps(state: State, ownProps: { conversion: Conversion }) {
+
+ function mapStateToProps(state: State, ownProps: { conversion: Conversion, onHide: () => void,
+    show: boolean}) {
      let conversion = JSON.parse(JSON.stringify(ownProps.conversion));
-     const finder = (element: Conversion) => element.sourceId === ownProps.conversion.sourceId && element.destinationId === ownProps.conversion.destinationId;
-     if (state.conversions.editedConversions.length !== 0){
-        if (state.conversions.editedConversions.find(finder)) {
-            conversion = JSON.parse(JSON.stringify(state.conversions.editedConversions.find(finder)))
-        }
-     }
      const currentUser = state.currentUser.profile;
      let loggedInAsAdmin = false;
+     let show = ownProps.show;
+     let onHide = ownProps.onHide;
      if (currentUser !== null) {
         loggedInAsAdmin = isRoleAdmin(currentUser.role);
      }
      return {
          conversion,
-         isEdited: state.conversions.editedConversions.find(finder) !== undefined,
-         isSubmitting: state.conversions.submitting.findIndex(finder) !== -1,
+         show,
+         onHide,
          loggedInAsAdmin
      }
  }
@@ -36,7 +37,8 @@
      return {
          removeConversion: (conversion: Conversion) => dispatch(removeConversion(conversion)),
          editConversionDetails: (conversion: Conversion) => dispatch(editConversionDetails(conversion)),
-         log: (level: string, message: string) => dispatch(logToServer(level,message))
+         submitConversionsEdits: () => dispatch(submitConversionsEdits())
      };
  }
- export default connect(mapStateToProps,mapDispatchToProps)(ConversionViewComponent);
+
+ export default connect(mapStateToProps,mapDispatchToProps)(ConversionEditDetailComponent);

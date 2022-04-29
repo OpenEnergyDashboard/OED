@@ -3,19 +3,18 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
  
  import * as React from 'react';
- import { Conversion, ConversionBidirectional } from '../../types/items';
- import { Button, Input } from 'reactstrap';
- import TooltipHelpContainerAlternative from '../../containers/TooltipHelpContainerAlternative';
- import TooltipMarkerComponent from '../TooltipMarkerComponent';
- import { FormattedMessage, injectIntl, WrappedComponentProps } from 'react-intl';
- import UnsavedWarningContainer from '../../containers/UnsavedWarningContainer';
- import { updateUnsavedChanges, removeUnsavedChanges } from '../../actions/unsavedWarning';
- import store from '../../index'
- import { Card, Row, Modal } from 'react-bootstrap'
- import { useState } from "react";
- import { DeleteConversionAction, EditConversionDetailsAction } from '../../types/redux/conversions';
+ import { Conversion } from '../../types/items';
+ import { Button } from 'reactstrap';
+ //import TooltipHelpContainerAlternative from '../../containers/TooltipHelpContainerAlternative';
+ //import TooltipMarkerComponent from '../TooltipMarkerComponent';
+ import {  injectIntl, WrappedComponentProps } from 'react-intl';
+ //import UnsavedWarningContainer from '../../containers/UnsavedWarningContainer';
+ //import { updateUnsavedChanges, removeUnsavedChanges } from '../../actions/unsavedWarning';
+ import { Card} from 'react-bootstrap';
+ import ConversionEditDetailContainer from '../../containers/conversions/ConversionEditDetailContainer';
 
- 
+ // TODO: implement tooltips
+ // TODO: implement unsaved warnings
  interface ConversionViewProps {
      conversion: Conversion;
      isEdited: boolean;
@@ -23,12 +22,14 @@
      loggedInAsAdmin: boolean;
      //actions for removing a conversion
      //functions used to dispatch the edit actions
-     removeConversion(conversion: Conversion): DeleteConversionAction;
-     editConversionDetails(conversion: Conversion): EditConversionDetailsAction;
+     removeConversion(conversion: Conversion): any;
+     editConversionDetails(conversion: Conversion): any;
      log(level: string, message: string): any;
  }
 
  interface ConversionViewState {
+     show: boolean,
+     onHide: boolean
 
  }
 
@@ -37,7 +38,20 @@
  class ConversionViewComponent extends React.Component<ConversionViewPropsWithIntl, ConversionViewState> {
      constructor(props: ConversionViewPropsWithIntl) {
          super(props);
+         this.state = {
+            show: false,
+			onHide: true
+        };
+        this.handleClose
      }
+
+    handleShow = () => {
+		this.setState({ show: true });
+	}
+
+	handleClose = () => {
+		this.setState({ show: false });
+	}
 
      public render(){
         const cardStyle: React.CSSProperties = {
@@ -46,15 +60,10 @@
             textAlign: 'center',
         };
 
-        const tableStyle: React.CSSProperties = {
-            marginLeft: '10%',
-            marginRight: '10%'
-        };
-
         return (
             
 
-            <Card style={cardStyle}>
+            <Card key= {this.props.conversion.note} style={cardStyle}>
                 <Card.Title style={{ margin: '5px 0px 5px 0px'}}>
                     <span style={{ padding: '0px 0px 5px 0px'}}>
                         Source: {this.props.conversion.sourceId} <br/>
@@ -75,7 +84,8 @@
                 <Card.Text>
                     Note: {this.props.conversion.note}
                 </Card.Text>
-                <Button> Edit Conversion </Button>
+                <Button onClick={this.handleShow}> Edit Conversion </Button>
+                <ConversionEditDetailContainer conversion= {this.props.conversion} show= {this.state.show} onHide = {this.handleClose} />
             </Card>
             
         )

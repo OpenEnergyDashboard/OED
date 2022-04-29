@@ -34,8 +34,7 @@
              };
          case ActionType.EditConversionDetails:
              editedConversions = state.editedConversions;
-             const finder = (element: Conversion) => element.sourceId === action.conversion.sourceId && element.destinationId === action.conversion.destinationId;
-             editedConversions[state.conversion.findIndex(finder)] = action.conversion;
+             editedConversions.push(action.conversion);
              return {
                  ...state,
                  editedConversions
@@ -53,8 +52,12 @@
              conversion = state.conversion;
              editedConversions = state.editedConversions;
              const finder3 = (element: Conversion) => element.sourceId === action.conversion.sourceId && element.destinationId === action.conversion.destinationId;
-             conversion[conversion.findIndex(finder3)] = editedConversions[editedConversions.findIndex(finder3)];
-             delete editedConversions[editedConversions.findIndex(finder3)];
+             let index1 = conversion.findIndex(finder3);
+             let index2 = editedConversions.findIndex(finder3);
+             conversion[index1] = editedConversions[index2];
+             const finder5 = (element: Conversion) => element.sourceId !== action.conversion.sourceId && element.destinationId !== action.conversion.destinationId;
+             editedConversions = editedConversions.filter(finder5);
+             //delete editedConversions[editedConversions.findIndex(finder3)];
 
              return {
                  ...state,
@@ -65,9 +68,12 @@
          case ActionType.DeleteConversion:
               editedConversions = state.editedConversions;
               const finder2 = (element: Conversion) => element.sourceId === action.conversion.sourceId && element.destinationId === action.conversion.destinationId;
-              delete editedConversions[editedConversions.findIndex(finder2)];
+              editedConversions = editedConversions.filter(finder2);
+              //delete editedConversions[editedConversions.findIndex(finder2)];
+              const finder4 = (element: Conversion) => element.sourceId !== action.conversion.sourceId && element.destinationId !== action.conversion.destinationId;
               conversion = state.conversion;
-              delete conversion[conversion.findIndex(finder2)];
+              conversion = conversion.filter(finder4)
+              //delete conversion[conversion.findIndex(finder2)];
               return {
                   ...state,
                   editedConversions,

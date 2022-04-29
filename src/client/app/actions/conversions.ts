@@ -57,7 +57,7 @@ export function submitConversionEdit(conversions: Conversion): Thunk {
         const submittingConversion = conversions;
         dispatch(submitEditedConversion(submittingConversion));
         try{
-            await conversionsApi.editConversion(String(submittingConversion.sourceId),String(submittingConversion.destinationId),submittingConversion.bidirectional,submittingConversion.slope,submittingConversion.intercept,submittingConversion.note);
+            await conversionsApi.editConversion(submittingConversion.sourceId,submittingConversion.destinationId,Boolean(String(submittingConversion.bidirectional)),submittingConversion.slope,submittingConversion.intercept,submittingConversion.note);
             dispatch(confirmEditedConversion(submittingConversion));
         } catch (err) {
             showErrorNotification(translate('failed.to.edit.conversion'));

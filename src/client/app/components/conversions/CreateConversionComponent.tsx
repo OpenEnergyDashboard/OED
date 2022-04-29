@@ -3,14 +3,14 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
  
  import * as React from 'react';
- import { Conversion, ConversionBidirectional } from '../../types/items';
- import { Alert, Button, Input } from 'reactstrap';
+ import { ConversionBidirectional } from '../../types/items';
+ import {  Button } from 'reactstrap';
  import TooltipHelpContainerAlternative from '../../containers/TooltipHelpContainerAlternative';
  import TooltipMarkerComponent from '../TooltipMarkerComponent';
  import { FormattedMessage } from 'react-intl';
  import UnsavedWarningContainer from '../../containers/UnsavedWarningContainer';
- import { updateUnsavedChanges, removeUnsavedChanges } from '../../actions/unsavedWarning';
- import store from '../../index'
+ //import { updateUnsavedChanges, removeUnsavedChanges } from '../../actions/unsavedWarning';
+ 
  
  interface CreateConversionsComponentProps {
     sourceId: string;

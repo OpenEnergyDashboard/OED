@@ -3,27 +3,23 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
  
  import * as React from 'react';
- import { Conversion, ConversionBidirectional } from '../../types/items';
- import { Button, Input } from 'reactstrap';
+ import { Conversion } from '../../types/items';
+ import { Button } from 'reactstrap';
  import TooltipHelpContainerAlternative from '../../containers/TooltipHelpContainerAlternative';
  import TooltipMarkerComponent from '../TooltipMarkerComponent';
  import { FormattedMessage } from 'react-intl';
  import UnsavedWarningContainer from '../../containers/UnsavedWarningContainer';
  import HeaderContainer from '../../containers/HeaderContainer';
  import ConversionViewContainer from '../../containers/conversions/ConversionViewContainer';
- import { updateUnsavedChanges, removeUnsavedChanges } from '../../actions/unsavedWarning';
- import store from '../../index'
- import { Card, Row, Modal } from 'react-bootstrap'
- import { useState } from "react";
- import ConversionViewComponent from './ConversionViewComponent';
- import { title } from 'process';
+ //import { updateUnsavedChanges, removeUnsavedChanges } from '../../actions/unsavedWarning';
+ import { Card, Row } from 'react-bootstrap'
 
  interface ConversionDetailProps {
      loggedInAsAdmin: boolean;
      conversions: Conversion[];
      unsavedChanges: boolean;
-     fetchConversionDetails(): Promise<any>;
-     submitConversionsEdits(): Promise<any>;
+     fetchConversionDetails(): any;
+     submitConversionsEdits(): any;
  }
 
  class ConversionDetailComponent extends React.Component<ConversionDetailProps, {}> {

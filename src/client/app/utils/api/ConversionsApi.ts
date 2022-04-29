@@ -23,7 +23,7 @@ export default class ConversionsApi {
 	{
 		return await this.backend.doPostRequest('/api/conversions/delete', {sourceId, destinationId})
 	};
-	public async editConversion(sourceId:string, destinationId: string, bidirectional:ConversionBidirectional, slope:number, intercept:number, note:string):Promise<Conversion>
+	public async editConversion(sourceId:number, destinationId: number, bidirectional:boolean, slope:number, intercept:number, note:string):Promise<Conversion>
 	{
 		return await this.backend.doPostRequest<Conversion>('/api/conversions/edit',{sourceId,destinationId,bidirectional,slope,intercept,note})
 	}

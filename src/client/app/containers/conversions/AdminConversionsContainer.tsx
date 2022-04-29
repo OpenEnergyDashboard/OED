@@ -10,7 +10,7 @@ import HeaderContainer from '../HeaderContainer';
 import FooterContainer from '../FooterContainer';
 // import { showSuccessNotification, showErrorNotification } from '../../utils/notifications';
 import { conversionsApi } from '../../utils/api';
-import { showErrorNotification, showSuccessNotification } from '../../utils/notifications';
+import { showSuccessNotification } from '../../utils/notifications';
 import translate from '../../utils/translate';
 // import translate from '../../utils/translate';
 
