@@ -66,7 +66,7 @@ class UnitModelEditComponent extends React.Component<UnitViewPropsWithIntl, Unit
 			<>
 				<Modal show={this.props.show} onHide={this.props.onhide}>
 					<Modal.Header closeButton>
-						<Modal.Title> <FormattedMessage id="edit.unit"/></Modal.Title>
+						<Modal.Title> <FormattedMessage id="edit.unit" /></Modal.Title>
 					</Modal.Header>
 
 					{/* when any of the unit are changed call one of the functions.  */}
@@ -194,9 +194,9 @@ class UnitModelEditComponent extends React.Component<UnitViewPropsWithIntl, Unit
 				<label><FormattedMessage id="unit.type.of.unit" /> </label>
 				<Input type='select' defaultValue={typeOfUnit}
 					onChange={event => this.handleTypeOfUnitChange(event)}>
-					<option value="unit"> unit </option>
-					<option value="meter">meter</option>
-					<option value="suffix">suffix</option>
+					{Object.keys(UnitType).map(key => {
+						return (<option value={key} key={key}>{key}</option>)
+					})}
 				</Input>
 			</div>
 		)
@@ -208,10 +208,9 @@ class UnitModelEditComponent extends React.Component<UnitViewPropsWithIntl, Unit
 				<label><FormattedMessage id="unit.represent" /> </label>
 				<Input type='select' defaultValue={unitRepresent}
 					onChange={event => this.handleUnitRepresentChange(event)}>
-					<option value="quantity"> quantity </option>
-					<option value="flow">flow</option>
-					<option value="raw">raw</option>
-					<option value="unused">unused</option>
+					{Object.keys(UnitRepresentType).map(key => {
+						return (<option value={key} key={key}>{key}</option>)
+					})}
 				</Input>
 			</div>
 		)
@@ -223,9 +222,9 @@ class UnitModelEditComponent extends React.Component<UnitViewPropsWithIntl, Unit
 				<label><FormattedMessage id="unit.displayable" /> </label>
 				<Input type='select' defaultValue={displayable}
 					onChange={event => this.handleDisplayableChange(event)}>
-					<option value="none"> none </option>
-					<option value="all">all</option>
-					<option value="admin">admin</option>
+					{Object.keys(DisplayableType).map(key => {
+						return (<option value={key} key={key}>{key}</option>)
+					})}
 				</Input>
 			</div>
 		)

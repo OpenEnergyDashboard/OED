@@ -3,20 +3,22 @@
 * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
 import { useState } from 'react';
 import * as React from 'react';
+import * as _ from 'lodash';
 import { Modal, Button } from 'react-bootstrap';
 import { Input } from 'reactstrap';
 import { FormattedMessage } from 'react-intl';
 import '../../styles/unit-add-modal.css';
+import { UnitRepresentType, DisplayableType, UnitType } from '../../types/redux/units';
 
 interface CreateUnitFormProps {
 	name: string,
 	identifier: string,
-	unitRepresent: string,
+	unitRepresent: UnitRepresentType,
 	secInRate: number,
-	typeOfUnit: string,
+	typeOfUnit: UnitType,
 	unitIndex?: number,
 	suffix: string,
-	displayable: string,
+	displayable: DisplayableType,
 	preferredDisplay: boolean,
 	note: string,
 	submitNewUnit: () => void;
@@ -87,11 +89,11 @@ const ModalCard = (props: CreateUnitFormProps) => {
 										{/* Unit represent input*/}
 										<div style={formInputStyle}>
 											<label><FormattedMessage id="unit.represent" /></label><br />
-											<Input type='select' onChange={({ target }) => props.handleUnitRepresentChange(target.value)} required value={props.unitRepresent}>
-												<option value='raw' key='raw'>Raw</option>
-												<option value='quantity' key='quantity'>Quantity</option>
-												<option value='flow' key='flow'>Flow</option>
-												<option value='unused' key='unused'>Unused</option>
+											<Input type='select' onChange={({ target }) => props.handleUnitRepresentChange(target.value)}
+												required value={props.unitRepresent}>
+												{Object.keys(UnitRepresentType).map( key => {
+													return (<option value={key} key={key}>{key}</option>)
+												})}
 											</Input>
 										</div>
 										{/* Seconds in rate input*/}
@@ -103,10 +105,9 @@ const ModalCard = (props: CreateUnitFormProps) => {
 										<div style={formInputStyle}>
 											<label><FormattedMessage id="unit.type.of.unit" /></label><br />
 											<Input type='select' onChange={({ target }) => props.handleTypeOfUnitChange(target.value)} required value={props.typeOfUnit}>
-
-												<option value='unit' key='unit'>Unit</option>
-												<option value='meter' key='meter'>Meter</option>
-												<option value='suffix' key='suffix'>Suffix</option>
+												{Object.keys(UnitType).map( key => {
+													return (<option value={key} key={key}>{key}</option>)
+												})}
 											</Input>
 										</div>
 										{/* Suffix input*/}
@@ -118,9 +119,9 @@ const ModalCard = (props: CreateUnitFormProps) => {
 										<div style={formInputStyle}>
 											<label><FormattedMessage id="unit.dropdown.displayable" /></label><br />
 											<Input type='select' onChange={({ target }) => props.handleDisplayableChange(target.value)} required value={props.displayable} >
-												<option value='all' key='all'><FormattedMessage id="unit.dropdown.displayable.option.all" /></option>
-												<option value='none' key='none'><FormattedMessage id="unit.dropdown.displayable.option.none" /></option>
-												<option value='admin' key='admin'><FormattedMessage id="unit.dropdown.displayable.option.admin" /></option>
+												{Object.keys(DisplayableType).map( key => {
+													return (<option value={key} key={key}>{key}</option>)
+												})}
 											</Input>
 										</div>
 										{/* Preferred display input*/}
