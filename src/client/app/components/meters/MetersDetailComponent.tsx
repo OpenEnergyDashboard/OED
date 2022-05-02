@@ -9,7 +9,7 @@ import MeterViewContainer from '../../containers/meters/MeterViewContainer';
 import HeaderContainer from '../../containers/HeaderContainer';
 import FooterContainer from '../../containers/FooterContainer';
 import TooltipMarkerComponent from '../TooltipMarkerComponent';
-import TooltipHelpContainerAlternative from '../../containers/TooltipHelpContainerAlternative';
+import TooltipHelpContainer from '../../containers/TooltipHelpContainer';
 import UnsavedWarningContainer from '../../containers/UnsavedWarningContainer';
 import { removeUnsavedChanges } from '../../actions/unsavedWarning';
 import store from '../../index';
@@ -22,7 +22,7 @@ interface MetersDetailProps {
 	submitEditedMeters(): Promise<any>;
 }
 
-export default class MetersDetailComponent extends React.Component<MetersDetailProps, {}> {
+export default class MetersDetailComponent extends React.Component<MetersDetailProps> {
 	constructor(props: MetersDetailProps) {
 		super(props);
 		this.handleSubmitClicked = this.handleSubmitClicked.bind(this);
@@ -34,7 +34,7 @@ export default class MetersDetailComponent extends React.Component<MetersDetailP
 
 	public render() {
 		const loggedInAsAdmin = this.props.loggedInAsAdmin;
-		
+
 		const titleStyle: React.CSSProperties = {
 			textAlign: 'center'
 		};
@@ -54,14 +54,14 @@ export default class MetersDetailComponent extends React.Component<MetersDetailP
 		const tooltipStyle = {
 			display: 'inline',
 			fontSize: '50%',
-			tooltipMeterView: loggedInAsAdmin? 'help.admin.meterview' : 'help.meters.meterview'
+			tooltipMeterView: loggedInAsAdmin ? 'help.admin.meterview' : 'help.meters.meterview'
 		};
 
 		return (
 			<div>
 				<UnsavedWarningContainer />
 				<HeaderContainer />
-				<TooltipHelpContainerAlternative page='meters' />
+				<TooltipHelpContainer page='meters' />
 				<div className='container-fluid'>
 					<h2 style={titleStyle}>
 						<FormattedMessage id='meters' />
@@ -70,8 +70,8 @@ export default class MetersDetailComponent extends React.Component<MetersDetailP
 						</div>
 					</h2>
 					<div className="card-container">
-					{ this.props.meters.map(meterID =>
-						( <MeterViewContainer key={meterID} id={meterID} show={false} onHide={false} onSubmitClicked={this.handleSubmitClicked} /> ))}
+						{this.props.meters.map(meterID =>
+							(<MeterViewContainer key={meterID} id={meterID} show={false} onHide={false} onSubmitClicked={this.handleSubmitClicked} />))}
 					</div>
 					{/* <div style={tableStyle}>
 					<Table striped bordered hover>

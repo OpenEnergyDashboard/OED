@@ -1,0 +1,158 @@
+/*
+ * This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this
+ * file, You can obtain one at http://mozilla.org/MPL/2.0/.
+ */
+{
+    "env": {
+        "browser": true,
+        "es2021": true
+    },
+    "extends": [
+        "eslint:recommended",
+        "plugin:@typescript-eslint/recommended"
+        // uncomment this to enforce eslint-plugin-jsdoc rules (and add comma above)
+        // along with the plugings below for jsdoc.
+        //the line of code below is in regards to https://github.com/OpenEnergyDashboard/OED/issues/396 
+        // "plugin:jsdoc/recommended"
+    ],
+    "parser": "@typescript-eslint/parser",
+    "parserOptions": {
+        "ecmaFeatures": {
+            "jsx": true
+        },
+        "ecmaVersion": "latest",
+        "sourceType": "module"
+    },
+    "plugins": [
+        "@typescript-eslint"
+        //this section of code is for running jsdoc checker (eslint-plugin-jsdoc) https://github.com/OpenEnergyDashboard/OED/issues/396.
+        // It needs to be uncommented if using jsdoc plugin and add a comma above.
+        // "jsdoc"
+    ],
+    "rules": {
+        //https://github.com/typescript-eslint/typescript-eslint/issues/1824, indent is therefore turned off and we use typescript-eslint/indent instead
+        "indent": [
+            "off"
+        ],
+        "@typescript-eslint/indent": [
+            "error",
+            "tab",
+            {
+                "SwitchCase": 1
+            }
+        ],
+        "@typescript-eslint/no-explicit-any": "off",
+        "@typescript-eslint/no-inferrable-types": "off",
+        "no-trailing-spaces": [
+            2
+        ],
+        "linebreak-style": [
+            "error",
+            "unix"
+        ],
+        "quotes": [
+            "error",
+            "single",
+            {
+                "avoidEscape": true
+            }
+        ],
+        "max-len": [
+            "error",
+            {
+                "code": 150,
+                "tabWidth": 0
+            }
+        ],
+        "comma-dangle": [
+            "error",
+            "never"
+        ],
+        "arrow-parens": [
+            "error",
+            "as-needed"
+        ]
+    },
+    "overrides": [
+        {
+            // also possible in the future to limit to src/client/app/components/**/*.tsx files, where we make sure {} is only used for props.
+            "files": [
+                "src/client/app/components/UIModalComponent.tsx",
+                "src/client/app/containers/admin/CreateUserContainer.tsx",
+                "src/client/app/containers/csv/UploadCSVContainer.tsx"
+            ],
+            "extends": [
+                "eslint:recommended",
+                "plugin:@typescript-eslint/recommended"
+            ],
+            "parser": "@typescript-eslint/parser",
+            "parserOptions": {
+                "ecmaFeatures": {
+                    "jsx": true
+                },
+                "ecmaVersion": "latest",
+                "sourceType": "module"
+            },
+            "plugins": [
+                "@typescript-eslint"
+            ],
+            "rules": {
+                // only to be used when declaring props as {}. Example is in UIModalComponent, ie; extends React.Component<{}>
+                // is used in conjunction with overrides
+                // https://eslint.org/docs/user-guide/configuring/configuration-files#configuration-based-on-glob-patterns
+                "@typescript-eslint/ban-types": [
+                    "error",
+                    {
+                        "extendDefaults": true,
+                        "types": {
+                            "{}": false
+                        }
+                    }
+                ],
+                // same rules need to be added.
+                "indent": [
+                    "off"
+                ],
+                "@typescript-eslint/indent": [
+                    "error",
+                    "tab",
+                    {
+                        "SwitchCase": 1
+                    }
+                ],
+                "@typescript-eslint/no-explicit-any": "off",
+                "@typescript-eslint/no-inferrable-types": "off",
+                "no-trailing-spaces": [
+                    2
+                ],
+                "linebreak-style": [
+                    "error",
+                    "unix"
+                ],
+                "quotes": [
+                    "error",
+                    "single",
+                    {
+                        "avoidEscape": true
+                    }
+                ],
+                "max-len": [
+                    "error",
+                    {
+                        "code": 150,
+                        "tabWidth": 0
+                    }
+                ],
+                "comma-dangle": [
+                    "error",
+                    "never"
+                ],
+                "arrow-parens": [
+                    "error",
+                    "as-needed"
+                ]
+            }
+        }
+    ]
+}

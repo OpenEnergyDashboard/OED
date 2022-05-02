@@ -84,10 +84,20 @@ class Group {
 	/**
 	 * returns a promise to retrieve all groups in the database
 	 * @param conn the connection to be used.
-	 * @returns {Promise.<void>}
+	 * @returns {Promise.<array.<Group>>}
 	 */
 	static async getAll(conn) {
 		const rows = await conn.any(sqlFile('group/get_all_groups.sql'));
+		return rows.map(Group.mapRow);
+	}
+
+	/**
+	 * Returns a promise to get all of the displayable groups from the database
+	 * @param conn the connection to use. Defaults to the default database connection.
+	 * @returns {Promise.<array.<Group>>}
+	 */
+	static async getDisplayable(conn) {
+		const rows = await conn.any(sqlFile('group/get_displayable_groups.sql'));
 		return rows.map(Group.mapRow);
 	}
 
@@ -211,3 +221,4 @@ class Group {
 	}
 }
 module.exports = Group;
+

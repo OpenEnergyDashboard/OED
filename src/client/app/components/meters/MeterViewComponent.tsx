@@ -97,6 +97,7 @@ class MeterViewComponent extends React.Component<MeterViewPropsWithIntl, MeterVi
 				</div>
 				{this.isAdmin()}
 			</div>
+			// TODO move this ????? {loggedInAsAdmin && <td> <TimeZoneSelect current={this.props.meter.timeZone} handleClick={this.changeTimeZone} /> </td>}
 		);
 	}
 
@@ -143,11 +144,11 @@ class MeterViewComponent extends React.Component<MeterViewPropsWithIntl, MeterVi
 		return null;
 	}
 
-	 /**
-	  * on save handler in progress ( Meter Detail Component)
-	  *	if double clicked then the save changes take affect otherwise a single click will cause
-	  *	all conditions to be false.
-	  */
+	/**
+	 * on save handler in progress ( Meter Detail Component)
+	 *	if double clicked then the save changes take affect otherwise a single click will cause
+	 *	all conditions to be false.
+	 */
 	public onSaveChanges = () => {
 		this.toggleIdentifierInput();
 		this.updateUnsavedChanges();

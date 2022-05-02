@@ -5,14 +5,17 @@
 const express = require('express');
 const _ = require('lodash');
 const validate = require('jsonschema').validate;
-
+const User = require('../models/User');
+const { isTokenAuthorized } = require('../util/userRoles');
 const { getConnection } = require('../db');
 const Group = require('../models/Group');
 const adminAuthenticator = require('./authenticator').adminAuthMiddleware;
+const optionalAuthenticator = require('./authenticator').optionalAuthMiddleware;
 const { log } = require('../log');
 const Point = require('../models/Point');
 
 const router = express.Router();
+router.use(optionalAuthenticator);
 
 /**
  * Given a meter or group, return id, name, displayable, gps, note, area.
@@ -45,7 +48,16 @@ function formatToOnlyNameID(item) {
 router.get('/', async (req, res) => {
 	const conn = getConnection();
 	try {
-		const rows = await Group.getAll(conn);
+		let query;
+		const token = req.headers.token || req.body.token || req.query.token;
+		const loggedInAsAdmin = req.hasValidAuthToken && (await isTokenAuthorized(token, User.role.ADMIN));
+		if (loggedInAsAdmin) {
+			query = Group.getAll;
+		}
+		else {
+			query = Group.getDisplayable;
+		}
+		const rows = await query(conn);
 		res.json(rows.map(formatGroupForResponse));
 	} catch (err) {
 		log.error(`Error while preforming GET all groups query: ${err}`, err);
@@ -73,11 +85,12 @@ router.get('/idname', async (req, res) => {
 router.get('/children/:group_id', async (req, res) => {
 	const conn = getConnection();
 	try {
-		const [meters, groups] = await Promise.all([
+		const [meters, groups, deepMeters] = await Promise.all([
 			Group.getImmediateMetersByGroupID(req.params.group_id, conn),
-			Group.getImmediateGroupsByGroupID(req.params.group_id, conn)
+			Group.getImmediateGroupsByGroupID(req.params.group_id, conn),
+			Group.getDeepMetersByGroupID(req.params.group_id, conn)
 		]);
-		res.json({ meters, groups });
+		res.json({ meters, groups, deepMeters });
 	} catch (err) {
 		log.error(`Error while preforming GET on all immediate children (meters and groups) of specific group: ${err}`, err);
 	}

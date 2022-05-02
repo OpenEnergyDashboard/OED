@@ -45,7 +45,7 @@ export default function maps(state = defaultState, action: MapsAction) {
 				...state,
 				isLoading: true
 			};
-		case ActionType.ReceiveMapsDetails:
+		case ActionType.ReceiveMapsDetails: {
 			const data: MapMetadata[] = action.data.map(mapData => {
 				// parse JSON format to MapMetadata object
 				const parsedData = JSON.parse(JSON.stringify(mapData));
@@ -58,12 +58,14 @@ export default function maps(state = defaultState, action: MapsAction) {
 				isLoading: false,
 				byMapID: _.keyBy(data, map => map.id)
 			};
-		case ActionType.IncrementCounter:
+		}
+		case ActionType.IncrementCounter: {
 			const counter = state.newMapCounter;
 			return {
 				...state,
 				newMapCounter: counter + 1
 			};
+		}
 		case ActionType.SetCalibration:
 			byMapID = state.byMapID;
 			// if the map is freshly created, just add a new instance into editedMaps
@@ -113,7 +115,7 @@ export default function maps(state = defaultState, action: MapsAction) {
 					showGrid: !state.calibrationSettings.showGrid
 				}
 			};
-		case ActionType.ResetCalibration:
+		case ActionType.ResetCalibration: {
 			editedMaps = state.editedMaps;
 			const mapToReset = {...editedMaps[action.mapID]};
 			delete mapToReset.currentPoint;
@@ -126,6 +128,7 @@ export default function maps(state = defaultState, action: MapsAction) {
 					[calibrated]: mapToReset
 				}
 			};
+		}
 		case ActionType.UpdateMapSource:
 			return {
 				...state,
@@ -176,7 +179,7 @@ export default function maps(state = defaultState, action: MapsAction) {
 				editedMaps,
 				byMapID
 			};
-		case ActionType.UpdateCurrentCartesian:
+		case ActionType.UpdateCurrentCartesian: {
 			const newDataPoint: CalibratedPoint = {
 				cartesian: action.currentCartesian,
 				gps: {longitude: -1, latitude: -1}
@@ -191,6 +194,7 @@ export default function maps(state = defaultState, action: MapsAction) {
 					}
 				}
 			};
+		}
 		case ActionType.ResetCurrentPoint:
 			return {
 				...state,
@@ -202,7 +206,7 @@ export default function maps(state = defaultState, action: MapsAction) {
 					}
 				}
 			};
-		case ActionType.AppendCalibrationSet:
+		case ActionType.AppendCalibrationSet: {
 			const originalSet = state.editedMaps[calibrated].calibrationSet;
 			let copiedSet;
 			if (originalSet) {
@@ -221,6 +225,7 @@ export default function maps(state = defaultState, action: MapsAction) {
 					}
 				}
 			};
+		}
 		case ActionType.UpdateCalibrationResults:
 			return {
 				...state,

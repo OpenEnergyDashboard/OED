@@ -8,7 +8,6 @@ import { LanguageTypes } from '../types/redux/i18n';
 import { UpdateDefaultLanguageAction } from '../types/redux/admin';
 import { FormattedMessage } from 'react-intl';
 import TooltipMarkerComponent from './TooltipMarkerComponent';
-import TooltipHelpContainerAlternative from '../containers/TooltipHelpContainerAlternative';
 import Dropdown from 'reactstrap/lib/Dropdown';
 import DropdownItem from 'reactstrap/lib/DropdownItem';
 import DropdownToggle from 'reactstrap/lib/DropdownToggle';
@@ -34,7 +33,7 @@ enum LanguageNames {
 /**
  * A component that allows users to select which language the page should be displayed in.
  */
-export default class LanguageSelectorComponent extends React.Component<LanguageSelectProps, DropdownState, {}> {
+export default class LanguageSelectorComponent extends React.Component<LanguageSelectProps, DropdownState> {
 	constructor(props: LanguageSelectProps) {
 		super(props);
 		this.handleChangeLanguage = this.handleChangeLanguage.bind(this);
@@ -57,7 +56,6 @@ export default class LanguageSelectorComponent extends React.Component<LanguageS
 
 		return (
 			<div style={divBottomPadding}>
-				<TooltipHelpContainerAlternative page='home' />
 				<p style={labelStyle}>
 					<FormattedMessage id='language' />:
 				</p>

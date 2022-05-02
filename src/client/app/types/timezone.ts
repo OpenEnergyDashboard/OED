@@ -7,3 +7,8 @@ export interface TimeZones {
 	abbrev: string;
 	offset: string;
 }
+
+export interface TimeZoneOption {
+	value: null | string;
+	label: string;
+}

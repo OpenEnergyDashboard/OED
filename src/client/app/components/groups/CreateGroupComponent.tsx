@@ -9,12 +9,12 @@ import { SelectionType } from '../../containers/groups/DatasourceBoxContainer';
 import { NamedIDItem } from '../../types/items';
 import { CreateNewBlankGroupAction, EditGroupNameAction,
 	EditGroupGPSAction, EditGroupDisplayableAction, EditGroupNoteAction,
-	EditGroupAreaAction, ChangeDisplayModeAction } from '../../types/redux/groups';
+	EditGroupAreaAction, ChangeDisplayModeAction, GroupDefinition, StatefulEditable } from '../../types/redux/groups';
 import HeaderContainer from '../../containers/HeaderContainer';
 import FooterContainer from '../../containers/FooterContainer';
 import { browserHistory } from '../../utils/history';
 import { FormattedMessage, defineMessages, injectIntl, WrappedComponentProps } from 'react-intl';
-import TooltipHelpContainerAlternative from '../../containers/TooltipHelpContainerAlternative';
+import TooltipHelpContainer from '../../containers/TooltipHelpContainer';
 import { GPSPoint, isValidGPSInput } from '../../utils/calibration';
 import store from '../../index';
 import { removeUnsavedChanges, updateUnsavedChanges } from '../../actions/unsavedWarning';
@@ -24,6 +24,7 @@ import translate from '../../utils/translate';
 interface CreateGroupProps {
 	meters: NamedIDItem[];
 	groups: NamedIDItem[];
+	currentGroup: GroupDefinition & StatefulEditable;
 	createNewBlankGroup(): CreateNewBlankGroupAction;
 	editGroupName(name: string): EditGroupNameAction;
 	editGroupGPS(gps: GPSPoint): EditGroupGPSAction;
@@ -87,7 +88,7 @@ class CreateGroupComponent extends React.Component<CreateGroupPropsWithIntl, Cre
 			<div>
 				<UnsavedWarningContainer />
 				<HeaderContainer />
-				<TooltipHelpContainerAlternative page='meters' />
+				<TooltipHelpContainer page='meters' />
 				<div className='container-fluid'>
 					<div style={divStyle} className='col-6'>
 						<h3 style={centerTextStyle}>
@@ -114,8 +115,8 @@ class CreateGroupComponent extends React.Component<CreateGroupPropsWithIntl, Cre
 								<FormattedMessage id='displayable' />:
 							</p>
 							<Input type='select' name='displayselect' onChange={this.handleDisplayChange}>
-								<option value='true'> True </option>
-								<option value='false'> False </option>
+								<option value='true'> { translate('True') } </option>
+								<option value='false'> { translate('False')} </option>
 							</Input>
 						</div>
 						<div style={divBottomStyle} className='col-4'>
@@ -210,40 +211,47 @@ class CreateGroupComponent extends React.Component<CreateGroupPropsWithIntl, Cre
 	}
 
 	private handleCreateGroup(successCallback: any, failureCallback: any) {
-		// The callback is used for displaying unsaved warning.
-		const gpsProxy = this.state.gpsInput.replace('(','').replace(')','').replace(' ', '');
-		const pattern2 = /^\d+(\.\d+)?$/;
-		// need to check gps and area
-		// gps and area are still optional so check if blank
-		if (this.state.groupArea.match(pattern2) || this.state.groupArea === '') {
-			if (this.state.groupArea !== '') {
-				this.props.editGroupArea(parseFloat(this.state.groupArea));
-			}
-			if (this.state.gpsInput === '' || isValidGPSInput(gpsProxy)) {
-				if (this.state.gpsInput !== '') {
-					// if it satisfies if condition, and defined, then set GPSPoint
-					const parseGPS = gpsProxy.split(',');
-					// should only have 1 comma
-					const gPoint: GPSPoint = {
-						longitude: parseFloat(parseGPS[1]),
-						latitude: parseFloat(parseGPS[0])
-					};
-					this.props.editGroupGPS(gPoint);
-				}
-				// Notify that there are no unsaved changes after clicking the create button
-				this.removeUnsavedChanges();
-				if (successCallback != null) {
-					this.props.submitGroupInEditingIfNeeded().then(successCallback, failureCallback);
-				} else {
-					this.props.submitGroupInEditingIfNeeded().then(() => {
-						// Redirect users to /groups when they click the create group button.
-						browserHistory.push('/groups');
-					});
-				}
-			}
+		// We assume the component mounted which created a GroupDefinition
+		// This lets us check for the name
+		if (this.props.currentGroup.name.trim().length === 0) {
+			window.alert(translate('group.name.error'));
 		}
 		else {
-			window.alert(translate('area.error'));
+			// The callback is used for displaying unsaved warning.
+			const gpsProxy = this.state.gpsInput.replace('(','').replace(')','').replace(' ', '');
+			const pattern2 = /^\d+(\.\d+)?$/;
+			// need to check gps and area
+			// gps and area are still optional so check if blank
+			if (this.state.groupArea.match(pattern2) || this.state.groupArea === '') {
+				if (this.state.groupArea !== '') {
+					this.props.editGroupArea(parseFloat(this.state.groupArea));
+				}
+				if (this.state.gpsInput === '' || isValidGPSInput(gpsProxy)) {
+					if (this.state.gpsInput !== '') {
+						// if it satisfies if condition, and defined, then set GPSPoint
+						const parseGPS = gpsProxy.split(',');
+						// should only have 1 comma
+						const gPoint: GPSPoint = {
+							longitude: parseFloat(parseGPS[1]),
+							latitude: parseFloat(parseGPS[0])
+						};
+						this.props.editGroupGPS(gPoint);
+					}
+					// Notify that there are no unsaved changes after clicking the create button
+					this.removeUnsavedChanges();
+					if (successCallback != null) {
+						this.props.submitGroupInEditingIfNeeded().then(successCallback, failureCallback);
+					} else {
+						this.props.submitGroupInEditingIfNeeded().then(() => {
+							// Redirect users to /groups when they click the create group button.
+							browserHistory.push('/groups');
+						});
+					}
+				}
+			}
+			else {
+				window.alert(translate('area.error'));
+			}
 		}
 	}
 

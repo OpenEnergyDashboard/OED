@@ -11,7 +11,7 @@ import { LanguageTypes } from './redux/i18n';
 export interface SelectOption {
 	label: string;
 	value: number;
-	disabled?: boolean;
+	isDisabled?: boolean;
 }
 
 /**
@@ -62,7 +62,7 @@ export enum UserRole {
 	CSV = 'csv',
 	EXPORT = 'export',
 	OBVIUS = 'obvius'
-};
+}
 
 /**
  * The values of this enum that needs to match the keys of Meter.type in src/server/models/Meter
@@ -74,4 +74,4 @@ export enum MeterType {
 	// Other is used when set by OED due to automatic creation and unknown.
 	// Can also be used by others when needed.
 	OTHER = 'other'
-};
+}

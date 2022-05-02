@@ -9,22 +9,46 @@ import { Dispatch } from '../../types/redux/actions';
 import { State } from '../../types/redux/state';
 import { DisplayMode } from '../../types/redux/groups';
 import { isRoleAdmin } from '../../utils/hasPermissions';
-
 function mapStateToProps(state: State, ownProps: {id: number}) {
 	const id = ownProps.id;
-	const childMeterNames = state.groups.byGroupID[id].childMeters.map((meterID: number) => state.meters.byMeterID[meterID].name.trim()).sort();
-	const childGroupNames = state.groups.byGroupID[id].childGroups.map((groupID: number) => state.groups.byGroupID[groupID].name.trim()).sort();
+	const childMeterNames: string[] = [];
+	state.groups.byGroupID[id].childMeters.forEach((meterID: number) => {
+		if (state.meters.byMeterID[meterID] !== undefined) {
+			childMeterNames.push(state.meters.byMeterID[meterID].name.trim());
+		}
+	});
+	childMeterNames.sort();
+	const trueMeterSize = state.groups.byGroupID[id].childMeters.length;
+	const childGroupNames: string[] = [];
+	state.groups.byGroupID[id].childGroups.forEach((groupID: number) => {
+		if (state.groups.byGroupID[groupID] !== undefined) {
+			childGroupNames.push(state.groups.byGroupID[groupID].name.trim());
+		}
+	});
+	childGroupNames.sort();
+	const trueGroupSize = state.groups.byGroupID[id].childGroups.length;
+	const deepMeterNames: string[] = [];
+	state.groups.byGroupID[id].deepMeters.forEach((meterID: number) => {
+		if (state.meters.byMeterID[meterID] !== undefined) {
+			deepMeterNames.push(state.meters.byMeterID[meterID].name.trim());
+		}
+	});
+	deepMeterNames.sort();
 	const currentUser = state.currentUser.profile;
 	let loggedInAsAdmin = false;
 	if(currentUser !== null){
 		loggedInAsAdmin = isRoleAdmin(currentUser.role);
 	}
+
 	return {
 		id,
 		loggedInAsAdmin,
 		name: state.groups.byGroupID[id].name,
 		childMeterNames,
-		childGroupNames
+		childGroupNames,
+		deepMeterNames,
+		trueMeterSize,
+		trueGroupSize
 	};
 }
 
@@ -33,6 +57,7 @@ function mapDispatchToProps(dispatch: Dispatch) {
 		fetchGroupChildren: (id: number) => dispatch(fetchGroupChildrenIfNeeded(id)),
 		changeDisplayModeToEdit: () => dispatch(changeDisplayMode(DisplayMode.Edit)),
 		beginEditingIfPossible: (id: number) => dispatch(beginEditingIfPossible(id))
+
 	};
 }
 
