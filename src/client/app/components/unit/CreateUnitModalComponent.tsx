@@ -3,7 +3,6 @@
 * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
 import { useState } from 'react';
 import * as React from 'react';
-import * as _ from 'lodash';
 import { Modal, Button } from 'react-bootstrap';
 import { Input } from 'reactstrap';
 import { FormattedMessage } from 'react-intl';
