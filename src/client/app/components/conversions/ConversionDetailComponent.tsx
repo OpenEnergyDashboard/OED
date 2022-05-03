@@ -13,6 +13,7 @@
  import ConversionViewContainer from '../../containers/conversions/ConversionViewContainer';
  //import { updateUnsavedChanges, removeUnsavedChanges } from '../../actions/unsavedWarning';
  import { Card, Row } from 'react-bootstrap'
+ import CreateConversionContainer from '../../containers/conversions/CreateConversionContainer';
 
  interface ConversionDetailProps {
      loggedInAsAdmin: boolean;
@@ -72,9 +73,10 @@
                     <div style={tableStyle}>
                         <Row xs={1} sm={3} md={4} lg={5} xl={5} className="g-4" style={{ justifyContent: 'center' }}>
                             <Card style={cardStyle} className='align-items-center justify-content-center'>
-                                <Button style={{ backgroundColor: 'blue', margin: '0px 5px 5px 5px'}}>
+                                <CreateConversionContainer/>
+                                {/* <Button style={{ backgroundColor: 'blue', margin: '0px 5px 5px 5px'}}>
                                     Create New Conversion
-                                </Button>
+                                </Button> */}
                             </Card>
                             {this.props.conversions.map(
                                 conversion => ( <ConversionViewContainer conversion={conversion} />)
