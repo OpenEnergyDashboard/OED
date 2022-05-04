@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/indent */
 /* This Source Code Form is subject to the terms of the Mozilla Public
 * License, v. 2.0. If a copy of the MPL was not distributed with this
 * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
@@ -141,11 +142,11 @@ class MeterModalEditComponent extends React.Component<MeterViewPropsWithIntl,
   }
 
   /** TODO - Add save functionality to all variables other than Identifier
-  *  Currently - Identifier is the only value to have a save attached to it. 
+  *  Currently - Identifier is the only value to have a save attached to it.
   *  The function to save is provided with the identifier change and save button
-  *  To implement: Pass prop handlers from MeterViewComponent to this file and attached them to 
+  *  To implement: Pass prop handlers from MeterViewComponent to this file and attached them to
   *  each onChange event for the corresponding values
-  * 
+  *
   * TODO - add proper onChange event handlers for the rest of the values other than identifier
   */
   private isIdentifier(identifier: string) {
@@ -188,9 +189,9 @@ class MeterModalEditComponent extends React.Component<MeterViewPropsWithIntl,
     );
   }
   /**
-  * TODO ADD METER UNITS FROM RESOURCE GENERALIZATION 
-  * @param unit 
-  * @returns 
+  * TODO ADD METER UNITS FROM RESOURCE GENERALIZATION
+  * @param unit
+  * @returns
   */
 
   private isUnits(unit?: string) {
@@ -218,8 +219,8 @@ class MeterModalEditComponent extends React.Component<MeterViewPropsWithIntl,
 
   /**
   * Due to the enum type of meterTypes not being passable between classes, we must make
-  * an instance of the enums that are currently existing. We then compare the current "meterType" to the list 
-  * and if it exists we remove it from the list to be displayed for that modal. 
+  * an instance of the enums that are currently existing. We then compare the current "meterType" to the list
+  * and if it exists we remove it from the list to be displayed for that modal.
   */
   private isMeterType(type?: string) {
     const types: meterTypes = {
@@ -322,9 +323,9 @@ class MeterModalEditComponent extends React.Component<MeterViewPropsWithIntl,
     return null;
   }
   /** TODO ADD GRAPHICAL UNITS FROM RESOURCE GENERALIZATION
-  * 
+  *
   * @param gUnit graphical unit
-  * @returns 
+  * @returns
   */
 
   private isGraphicUnits(gUnit: number) {
@@ -481,8 +482,8 @@ class MeterModalEditComponent extends React.Component<MeterViewPropsWithIntl,
   }
   /**
   * TODO ADD READING VARIATIONS FROM RESOURCE GENERALIZATION
-  * @param variation 
-  * @returns 
+  * @param variation
+  * @returns
   */
 
   private isReadingDuplication(variation: number) {
@@ -506,7 +507,7 @@ class MeterModalEditComponent extends React.Component<MeterViewPropsWithIntl,
   }
   /**
   * TODO ADD TIMEZONE IMPLEMENTATION
-  * @returns 
+  * @returns
   */
 
   private isTimeZone() {
@@ -534,7 +535,7 @@ class MeterModalEditComponent extends React.Component<MeterViewPropsWithIntl,
   }
   /**
   * TODO RESOURCE GENERALIZATION TO IMPLEMENT READING
-  * @returns 
+  * @returns
   */
 
   private isReading() {
