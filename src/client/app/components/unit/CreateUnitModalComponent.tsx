@@ -9,7 +9,7 @@ import { FormattedMessage } from 'react-intl';
 import '../../styles/unit-add-modal.css';
 import { UnitRepresentType, DisplayableType, UnitType } from '../../types/redux/units';
 
-interface CreateUnitFormProps {
+interface UnitFormProps {
 	name: string,
 	identifier: string,
 	unitRepresent: UnitRepresentType,
@@ -32,7 +32,7 @@ interface CreateUnitFormProps {
 	handleNoteChange: (val: string) => void;
 }
 
-const ModalCard = (props: CreateUnitFormProps) => {
+const ModalCard = (props: UnitFormProps) => {
 	const handleNameChange = props.handleNameChange
 
 	const [showModal, setShow] = useState(false);
