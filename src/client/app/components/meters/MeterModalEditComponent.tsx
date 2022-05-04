@@ -151,8 +151,8 @@ class MeterModalEditComponent extends React.Component<MeterViewPropsWithIntl,
   private isIdentifier(identifier: string) {
     return (
       <div>
-        Identifier: <span><br /><input type="textarea" defaultValue={identifier} 
-        placeholder="Identifier" onChange={event => this.props.handleIdentifierChange(event)} /></span>
+        Identifier: <span><br /><input type="textarea" defaultValue={identifier}
+          placeholder="Identifier" onChange={event => this.props.handleIdentifierChange(event)} /></span>
       </div>
     )
   }
@@ -176,8 +176,8 @@ class MeterModalEditComponent extends React.Component<MeterViewPropsWithIntl,
     if (gps != null) {
       return (
         <div>
-          GPS: <span><br /> <input type="text" value={'Latitude: ' + gps.latitude + ' Longitude: ' + gps.longitude} 
-          onChange={(event => console.log(event))} /></span>
+          GPS: <span><br /> <input type="text" value={'Latitude: ' + gps.latitude + ' Longitude: ' + gps.longitude}
+            onChange={(event => console.log(event))} /></span>
         </div>
       )
     }
@@ -377,8 +377,8 @@ class MeterModalEditComponent extends React.Component<MeterViewPropsWithIntl,
     if (area != null) {
       return (
         <div>
-          Area: <span><br /><input type="text" defaultValue={area} 
-          placeholder="Identifier" onChange={(event => console.log(event))} /></span>
+          Area: <span><br /><input type="text" defaultValue={area}
+            placeholder="Identifier" onChange={(event => console.log(event))} /></span>
         </div>
       )
     }
@@ -393,8 +393,8 @@ class MeterModalEditComponent extends React.Component<MeterViewPropsWithIntl,
   private isMeterIP(address?: string) {
     return (
       <div>
-        Meter Address: <span><br /><input type="text" defaultValue={address} 
-        placeholder="MeterAddress" onChange={(event => console.log(event))} /></span>
+        Meter Address: <span><br /><input type="text" defaultValue={address}
+          placeholder="MeterAddress" onChange={(event => console.log(event))} /></span>
       </div>
     )
   }
