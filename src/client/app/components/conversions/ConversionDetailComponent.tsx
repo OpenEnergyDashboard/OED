@@ -1,22 +1,6 @@
 /* This Source Code Form is subject to the terms of the Mozilla Public
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
-<<<<<<< HEAD
-=======
- 
- import * as React from 'react';
- import { Conversion } from '../../types/items';
- import { Button } from 'reactstrap';
- import TooltipHelpContainerAlternative from '../../containers/TooltipHelpContainerAlternative';
- import TooltipMarkerComponent from '../TooltipMarkerComponent';
- import { FormattedMessage } from 'react-intl';
- import UnsavedWarningContainer from '../../containers/UnsavedWarningContainer';
- import HeaderContainer from '../../containers/HeaderContainer';
- import ConversionViewContainer from '../../containers/conversions/ConversionViewContainer';
- //import { updateUnsavedChanges, removeUnsavedChanges } from '../../actions/unsavedWarning';
- import { Card, Row } from 'react-bootstrap'
- import CreateConversionContainer from '../../containers/conversions/CreateConversionContainer';
->>>>>>> origin/createConversion
 
 import * as React from 'react';
 import { Conversion } from '../../types/items';
@@ -28,7 +12,8 @@ import UnsavedWarningContainer from '../../containers/UnsavedWarningContainer';
 import HeaderContainer from '../../containers/HeaderContainer';
 import ConversionViewContainer from '../../containers/conversions/ConversionViewContainer';
 //import { updateUnsavedChanges, removeUnsavedChanges } from '../../actions/unsavedWarning';
-import { Card, Row } from 'react-bootstrap'
+import { Card, Row } from 'react-bootstrap';
+import CreateConversionContainer from '../../containers/conversions/CreateConversionContainer';
 
 interface ConversionDetailProps {
 	loggedInAsAdmin: boolean;
@@ -71,11 +56,10 @@ class ConversionDetailComponent extends React.Component<ConversionDetailProps, u
 		};
 
 
-<<<<<<< HEAD
 		return (
 			<div>
 				<UnsavedWarningContainer />
-				<HeaderContainer />
+			    <HeaderContainer />
 				<TooltipHelpContainerAlternative page='converions' />
 				<div className='container-fluid'>
 					<h2 style={titleStyle}>
@@ -87,9 +71,10 @@ class ConversionDetailComponent extends React.Component<ConversionDetailProps, u
 					<div style={tableStyle}>
 						<Row xs={1} sm={3} md={4} lg={5} xl={5} className="g-4" style={{ justifyContent: 'center' }}>
 							<Card style={cardStyle} className='align-items-center justify-content-center'>
-								<Button style={{ backgroundColor: 'blue', margin: '0px 5px 5px 5px'}}>
+								<CreateConversionContainer/>
+								{/* <Button style={{ backgroundColor: 'blue', margin: '0px 5px 5px 5px'}}>
                                     Create New Conversion
-								</Button>
+                                </Button> */}
 							</Card>
 							{this.props.conversions.map(
 								conversion => ( <ConversionViewContainer conversion={conversion} />)
@@ -97,34 +82,6 @@ class ConversionDetailComponent extends React.Component<ConversionDetailProps, u
 						</Row>
 					</div>
 
-=======
-        return (
-            <div>
-                <UnsavedWarningContainer />
-			    <HeaderContainer />
-                <TooltipHelpContainerAlternative page='converions' />
-                <div className='container-fluid'>
-                    <h2 style={titleStyle}>
-                        <FormattedMessage id='conversions' />
-                        <div style={tooltipStyle}>
-                            <TooltipMarkerComponent page='conversions' helpTextId={tooltipStyle.tooltipMeterView}></TooltipMarkerComponent>
-                        </div>
-                    </h2>
-                    <div style={tableStyle}>
-                        <Row xs={1} sm={3} md={4} lg={5} xl={5} className="g-4" style={{ justifyContent: 'center' }}>
-                            <Card style={cardStyle} className='align-items-center justify-content-center'>
-                                <CreateConversionContainer/>
-                                {/* <Button style={{ backgroundColor: 'blue', margin: '0px 5px 5px 5px'}}>
-                                    Create New Conversion
-                                </Button> */}
-                            </Card>
-                            {this.props.conversions.map(
-                                conversion => ( <ConversionViewContainer conversion={conversion} />)
-                            )}
-                        </Row>
-                    </div>
-                    
->>>>>>> origin/createConversion
 
 				</div>
 			</div>
