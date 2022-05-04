@@ -284,38 +284,38 @@ class MeterViewComponent extends React.Component<MeterViewPropsWithIntl, MeterVi
 	/** This function and toggleGPSInput will be utilized in the future when GPS changes are to be saved
 	 * See toggleIdentifierInput and formatIdentifierInput for Example
 	 */
-	private formatGPSInput() {
-		let formattedGPS;
-		let buttonMessageId;
-		if (this.state.gpsFocus) {
-		} else {
-			formattedGPS = <div>{this.state.gpsInput}</div>;
-		}
+	// private formatGPSInput() {
+	// 	let formattedGPS;
+	// 	let buttonMessageId;
+	// 	if (this.state.gpsFocus) {
+	// 	} else {
+	// 		formattedGPS = <div>{this.state.gpsInput}</div>;
+	// 	}
 
-		let toggleButton;
-		const loggedInAsAdmin = this.props.loggedInAsAdmin;
-		if (loggedInAsAdmin) {
+	// 	let toggleButton;
+	// 	const loggedInAsAdmin = this.props.loggedInAsAdmin;
+	// 	if (loggedInAsAdmin) {
 
-		} else {
-			toggleButton = <div />;
-		}
+	// 	} else {
+	// 		toggleButton = <div />;
+	// 	}
 
-		if (loggedInAsAdmin) {
-			return ( // add onClick
-				<div>
-					{formattedGPS}
-					{toggleButton}
-				</div>
-			);
-		} else {
-			return (
-				<div>
-					{this.state.gpsInput}
-					{toggleButton}
-				</div>
-			);
-		}
-	}
+	// 	if (loggedInAsAdmin) {
+	// 		return ( // add onClick
+	// 			<div>
+	// 				{formattedGPS}
+	// 				{toggleButton}
+	// 			</div>
+	// 		);
+	// 	} else {
+	// 		return (
+	// 			<div>
+	// 				{this.state.gpsInput}
+	// 				{toggleButton}
+	// 			</div>
+	// 		);
+	// 	}
+	// }
 
 	private handleIdentifierChange(event: React.ChangeEvent<HTMLInputElement>) {
 		this.setState({ identifierInput: event.target.value });
