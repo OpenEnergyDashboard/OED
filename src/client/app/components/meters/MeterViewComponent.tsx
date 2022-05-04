@@ -50,7 +50,7 @@ class MeterViewComponent extends React.Component<MeterViewPropsWithIntl, MeterVi
 			identifierFocus: false,
 			identifierInput: this.props.meter.identifier,
 			show: false,
-			onHide: true,
+			onHide: true
 		};
 		this.toggleMeterDisplayable = this.toggleMeterDisplayable.bind(this);
 		this.toggleMeterEnabled = this.toggleMeterEnabled.bind(this);

@@ -13,7 +13,7 @@ import { isRoleAdmin } from '../../utils/hasPermissions';
 
 
 function mapStateToProps(state: State, ownProps: { id: number }) {
-	
+
 	let meter = JSON.parse(JSON.stringify(state.meters.byMeterID[ownProps.id]));
 	if (state.meters.editedMeters[ownProps.id]) {
 		meter = JSON.parse(JSON.stringify(state.meters.byMeterID[ownProps.id]));
@@ -28,14 +28,14 @@ function mapStateToProps(state: State, ownProps: { id: number }) {
 		meter,
 		isEdited: state.meters.editedMeters[ownProps.id] !== undefined,
 		isSubmitting: state.meters.submitting.indexOf(ownProps.id) !== -1,
-		loggedInAsAdmin,
+		loggedInAsAdmin
 	};
 }
 
 function mapDispatchToProps(dispatch: Dispatch) {
 	return {
 		editMeterDetails: (meter: MeterMetadata) => dispatch(editMeterDetails(meter)),
-		log: (level: string, message: string) => dispatch(logToServer(level, message)),
+		log: (level: string, message: string) => dispatch(logToServer(level, message))
 	};
 }
 

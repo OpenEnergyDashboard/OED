@@ -1,10 +1,10 @@
 /* This Source Code Form is subject to the terms of the Mozilla Public
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
- 
-import * as React from "react";
-import { Modal, Button, Dropdown } from "react-bootstrap";
-import { GPSPoint } from "utils/calibration";
+
+import * as React from 'react';
+import { Modal, Button, Dropdown } from 'react-bootstrap';
+import { GPSPoint } from 'utils/calibration';
 import '../../styles/meter-edit-modal.css';
 
 interface meterTypes {
@@ -151,7 +151,8 @@ class MeterModalEditComponent extends React.Component<MeterViewPropsWithIntl,
   private isIdentifier(identifier: string) {
     return (
       <div>
-        Identifier: <span><br /><input type="textarea" defaultValue={identifier} placeholder="Identifier" onChange={event => this.props.handleIdentifierChange(event)} /></span>
+        Identifier: <span><br /><input type="textarea" defaultValue={identifier} 
+        placeholder="Identifier" onChange={event => this.props.handleIdentifierChange(event)} /></span>
       </div>
     )
   }
@@ -175,7 +176,8 @@ class MeterModalEditComponent extends React.Component<MeterViewPropsWithIntl,
     if (gps != null) {
       return (
         <div>
-          GPS: <span><br /><input type="text" value={"Latitude:" + gps.latitude + " Longitude: " + gps.longitude} onChange={(event => console.log(event))} /></span>
+          GPS: <span><br /> <input type="text" value={'Latitude: ' + gps.latitude + ' Longitude: ' + gps.longitude} 
+          onChange={(event => console.log(event))} /></span>
         </div>
       )
     }
@@ -201,7 +203,7 @@ class MeterModalEditComponent extends React.Component<MeterViewPropsWithIntl,
             </Dropdown.Toggle>
             <Dropdown.Menu variant="dark">
               <Dropdown.Item active>
-                Action
+                {unit}
               </Dropdown.Item>
               <Dropdown.Item >option1</Dropdown.Item>
               <Dropdown.Item >Something else</Dropdown.Item>
@@ -227,7 +229,7 @@ class MeterModalEditComponent extends React.Component<MeterViewPropsWithIntl,
       OTHER: 'other'
     }
 
-    for (var i = 0; i < 1; i++) {
+    for (let i = 0; i < 1; i++) {
       if (type == types['MAMAC']) {
         delete types['MAMAC']
         break
@@ -321,7 +323,7 @@ class MeterModalEditComponent extends React.Component<MeterViewPropsWithIntl,
   }
   /** TODO ADD GRAPHICAL UNITS FROM RESOURCE GENERALIZATION
    * 
-   * @param gUnit 
+   * @param gUnit graphical unit
    * @returns 
    */
 
@@ -337,7 +339,7 @@ class MeterModalEditComponent extends React.Component<MeterViewPropsWithIntl,
             <Dropdown.Item active>
               Action
             </Dropdown.Item>
-            <Dropdown.Item >option1</Dropdown.Item>
+            <Dropdown.Item >{gUnit}</Dropdown.Item>
             <Dropdown.Item >Something else</Dropdown.Item>
             <Dropdown.Divider />
             <Dropdown.Item >other option </Dropdown.Item>
@@ -375,7 +377,8 @@ class MeterModalEditComponent extends React.Component<MeterViewPropsWithIntl,
     if (area != null) {
       return (
         <div>
-          Area: <span><br /><input type="text" defaultValue={area} placeholder="Identifier" onChange={(event => console.log(event))} /></span>
+          Area: <span><br /><input type="text" defaultValue={area} 
+          placeholder="Identifier" onChange={(event => console.log(event))} /></span>
         </div>
       )
     }
@@ -390,7 +393,8 @@ class MeterModalEditComponent extends React.Component<MeterViewPropsWithIntl,
   private isMeterIP(address?: string) {
     return (
       <div>
-        Meter Address: <span><br /><input type="text" defaultValue={address} placeholder="MeterAddress" onChange={(event => console.log(event))} /></span>
+        Meter Address: <span><br /><input type="text" defaultValue={address} 
+        placeholder="MeterAddress" onChange={(event => console.log(event))} /></span>
       </div>
     )
   }
