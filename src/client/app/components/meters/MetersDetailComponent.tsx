@@ -39,18 +39,6 @@ export default class MetersDetailComponent extends React.Component<MetersDetailP
 			textAlign: 'center'
 		};
 
-		// const tableStyle: React.CSSProperties = {
-		// 	marginLeft: '10%',
-		// 	marginRight: '10%'
-		// };
-
-		// const buttonContainerStyle: React.CSSProperties = {
-		// 	minWidth: '150px',
-		// 	width: '10%',
-		// 	marginLeft: '40%',
-		// 	marginRight: '40%'
-		// };
-
 		const tooltipStyle = {
 			display: 'inline',
 			fontSize: '50%',
@@ -73,35 +61,6 @@ export default class MetersDetailComponent extends React.Component<MetersDetailP
 						{this.props.meters.map(meterID =>
 							(<MeterViewContainer key={meterID} id={meterID} show={false} onHide={false} onSubmitClicked={this.handleSubmitClicked} />))}
 					</div>
-					{/* <div style={tableStyle}>
-					<Table striped bordered hover>
-					<thead>
-						<tr>
-						{loggedInAsAdmin && <th> <FormattedMessage id='meter.id' /> </th>}
-						{loggedInAsAdmin && <th> <FormattedMessage id='meter.name' /> </th>}
-						<th> <FormattedMessage id='meter.identifier' /> </th>
-						{loggedInAsAdmin && <th> <FormattedMessage id='meter.type' /> </th>}
-						{loggedInAsAdmin && <th> <FormattedMessage id='meter.ip'/> </th>}
-						{loggedInAsAdmin && <th> <FormattedMessage id='meter.gps'/> </th>}
-						<th> <FormattedMessage id='meter.enabled' /> </th>
-						<th> <FormattedMessage id='meter.displayable' /> </th>
-						{loggedInAsAdmin && <th> <FormattedMessage id='meter.time.zone' /> </th>}
-						</tr>
-					</thead>
-					<tbody>
-					{ this.props.meters.map(meterID =>
-						( <MeterViewContainer key={meterID} id={meterID} /> ))}
-					</tbody>
-					</Table>
-					</div> */}
-					{/* { loggedInAsAdmin && <Button
-						color='success'
-						style={buttonContainerStyle}
-						disabled={!this.props.unsavedChanges}
-						onClick={this.handleSubmitClicked}
-					>
-						<FormattedMessage id='save.meter.edits' />
-					</Button> } */}
 				</div>
 				<FooterContainer />
 			</div>

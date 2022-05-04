@@ -62,7 +62,7 @@ class MeterViewComponent extends React.Component<MeterViewPropsWithIntl, MeterVi
 		this.handleIdentifierChange = this.handleIdentifierChange.bind(this);
 	}
 	/**
-	 * 
+	 *  handles modalState for both Show and Close
 	 */
 	handleShow = () => {
 		this.setState({ show: true });
@@ -83,7 +83,7 @@ class MeterViewComponent extends React.Component<MeterViewPropsWithIntl, MeterVi
 				<div className="unit-container">
 					Unit
 					<span className="custom-select">
-						{/* TODO --- get data for unit */}
+						{/* TODO --- get data for unit from resource generalization*/}
 						_______
 					</span>
 				</div>
@@ -97,7 +97,8 @@ class MeterViewComponent extends React.Component<MeterViewPropsWithIntl, MeterVi
 				</div>
 				{this.isAdmin()}
 			</div>
-			// TODO move this ????? {loggedInAsAdmin && <td> <TimeZoneSelect current={this.props.meter.timeZone} handleClick={this.changeTimeZone} /> </td>}
+			// TODO move this and implement on MeterModalEditComponent; Time zone being null
+			// {loggedInAsAdmin && <td> <TimeZoneSelect current={this.props.meter.timeZone} handleClick={this.changeTimeZone} /> </td>}
 		);
 	}
 
@@ -145,7 +146,7 @@ class MeterViewComponent extends React.Component<MeterViewPropsWithIntl, MeterVi
 	}
 
 	/**
-	 * on save handler in progress ( Meter Detail Component)
+	 *  Nn save handler in progress ( Meter Detail Component)
 	 *	if double clicked then the save changes take affect otherwise a single click will cause
 	 *	all conditions to be false.
 	 */
@@ -187,18 +188,6 @@ class MeterViewComponent extends React.Component<MeterViewPropsWithIntl, MeterVi
 			this.updateUnsavedChanges();
 		}
 	}
-	/** Will be used in future when submitting */
-	// private formatStatus(): string {
-	// 	if (this.props.isSubmitting) {
-	// 		return '(' + this.props.intl.formatMessage({ id: 'submitting' }) + ')';
-	// 	}
-
-	// 	if (this.props.isEdited) {
-	// 		return this.props.intl.formatMessage({ id: 'edited' });
-	// 	}
-
-	// 	return '';
-	// }
 
 	private toggleMeterDisplayable() {
 		const editedMeter = this.props.meter;
@@ -292,45 +281,46 @@ class MeterViewComponent extends React.Component<MeterViewPropsWithIntl, MeterVi
 		this.setState({ gpsInput: event.target.value });
 	}
 
-	/** This function will be utilized in the future when GPS changes are implemented */
-	// private formatGPSInput() {
-	// 	let formattedGPS;
-	// 	let buttonMessageId;
-	// 	if (this.state.gpsFocus) {
-	// 		// default value for autoFocus is true and for all attributes that would be set autoFocus={true}
-	// 		formattedGPS = <textarea id={'gps'} autoFocus value={this.state.gpsInput} onChange={event => this.handleGPSChange(event)} />;
-	// 		buttonMessageId = 'update';
-	// 	} else {
-	// 		formattedGPS = <div>{this.state.gpsInput}</div>;
-	// 		buttonMessageId = 'edit';
-	// 	}
+	/** This function and toggleGPSInput will be utilized in the future when GPS changes are to be saved
+	 * See toggleIdentifierInput and formatIdentifierInput for Example
+	 */
+	private formatGPSInput() {
+		let formattedGPS;
+		let buttonMessageId;
+		if (this.state.gpsFocus) {
+		} else {
+			formattedGPS = <div>{this.state.gpsInput}</div>;
+		}
 
-	// 	let toggleButton;
-	// 	const loggedInAsAdmin = this.props.loggedInAsAdmin;
-	// 	if (loggedInAsAdmin) {
-	// 		toggleButton = <Button style={this.styleToggleBtn()} color='primary' onClick={this.toggleGPSInput}>
-	// 			<FormattedMessage id={buttonMessageId} />
-	// 		</Button>;
-	// 	} else {
-	// 		toggleButton = <div />;
-	// 	}
+		let toggleButton;
+		const loggedInAsAdmin = this.props.loggedInAsAdmin;
+		if (loggedInAsAdmin) {
 
-	// 	if (loggedInAsAdmin) {
-	// 		return ( // add onClick
-	// 			<div>
-	// 				{formattedGPS}
-	// 				{toggleButton}
-	// 			</div>
-	// 		);
-	// 	} else {
-	// 		return (
-	// 			<div>
-	// 				{this.state.gpsInput}
-	// 				{toggleButton}
-	// 			</div>
-	// 		);
-	// 	}
-	// }
+		} else {
+			toggleButton = <div />;
+		}
+
+		if (loggedInAsAdmin) {
+			return ( // add onClick
+				<div>
+					{formattedGPS}
+					{toggleButton}
+				</div>
+			);
+		} else {
+			return (
+				<div>
+					{this.state.gpsInput}
+					{toggleButton}
+				</div>
+			);
+		}
+	}
+
+	private handleIdentifierChange(event: React.ChangeEvent<HTMLInputElement>) {
+		this.setState({ identifierInput: event.target.value });
+		this.setState({ identifierFocus: true });
+	}
 
 	private toggleIdentifierInput() {
 		if (this.state.identifierFocus) {
@@ -343,11 +333,6 @@ class MeterViewComponent extends React.Component<MeterViewPropsWithIntl, MeterVi
 			this.props.editMeterDetails(editedMeter);
 		}
 		this.setState({ identifierFocus: false });
-	}
-
-	private handleIdentifierChange(event: React.ChangeEvent<HTMLInputElement>) {
-		this.setState({ identifierInput: event.target.value });
-		this.setState({ identifierFocus: true });
 	}
 
 	private formatIdentifierInput() {

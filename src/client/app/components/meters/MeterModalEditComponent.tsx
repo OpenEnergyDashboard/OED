@@ -84,16 +84,14 @@ class MeterModalEditComponent extends React.Component<MeterViewPropsWithIntl,
                 {this.isMeterIP(this.props.meterAddress)}
 
                 {this.isTimeZone()}
+
                 {this.isNotes(this.props.notes)}
 
                 {this.isCumulative(this.props.cumulative)}
 
                 {this.isCumulativeReset(this.props.cumulativeReset)}
-
               </div>
               <div id="modalChild">
-
-
                 {this.isResetStartTime(this.props.cumulativeResetStart)}
 
                 {this.isResetEndTime(this.props.cumulativeResetEnd)}
@@ -138,6 +136,14 @@ class MeterModalEditComponent extends React.Component<MeterViewPropsWithIntl,
     this.setState({ nameinput: event.target.value });
   }
 
+  /** TODO - Add save functionality to all variables other than Identifier
+   *  Currently - Identifier is the only value to have a save attached to it. 
+   *  The function to save is provided with the identifier change and save button
+   *  To implement: Pass prop handlers from MeterViewComponent to this file and attached them to 
+   *  each onChange event for the corresponding values
+   * 
+   * TODO - add proper onChange event handlers for the rest of the values other than identifier
+   */
   private isIdentifier(identifier: string) {
     return (
       <div>
@@ -204,6 +210,11 @@ class MeterModalEditComponent extends React.Component<MeterViewPropsWithIntl,
     );
   }
 
+  /**
+   * Due to the enum type of meterTypes not being passable between classes, we must make
+   * an instance of the enums that are currently existing. We then compare the current "meterType" to the list 
+   * and if it exists we remove it from the list to be displayed for that modal. 
+   */
   private isMeterType(type?: string) {
     const types: meterTypes = {
       MAMAC: 'MAMAC',
