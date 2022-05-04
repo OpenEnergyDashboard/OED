@@ -48,14 +48,14 @@ export function getvisibleMeters(state: State) {
 	if (state.graph.selectedUnit == -99) {
 		// If there is no graphic unit then no meters/groups are displayed and you can display all meters.
 		//  Also, if not admin, then meters not displayable are not viewable.
-		// admin can see all except if unit is null (not included in ones gotten above). 
+		// admin can see all except if unit is null (not included in ones gotten above).
 		visibleMeters.forEach(meter => {
 			compatibleMeters.add(meter.displayable);
 		})
 	}
 	// If displayable is false then only admin.
 	else {
-		state.graph.selectedMeters.forEach(meter => {//for each visibleMeters M 
+		state.graph.selectedMeters.forEach(meter => {//for each visibleMeters M
 			M.add(meter)
 			const newUnits = unitsCompatibleWithMeters(M)
 			if (newUnits.has(state.meters.byMeterID[meter].defaultGraphicUnit))//graphicUnit is in units
