@@ -62,7 +62,7 @@ export enum UserRole {
 	CSV = 'csv',
 	EXPORT = 'export',
 	OBVIUS = 'obvius'
-};
+}
 
 /**
  * A conversion object to be displayed for admin.
@@ -81,4 +81,4 @@ export interface Conversion {
 export enum ConversionBidirectional {
 	TRUE = 'true',
 	FALSE = 'false',
-};
+}

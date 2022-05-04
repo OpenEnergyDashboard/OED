@@ -121,7 +121,6 @@ export enum ActionType {
 	ConfirmEditedConversion = 'CONFIRM_EDITED_CONVERSION',
 	DeleteConversion = 'DELETE_CONVERSION',
 	RequestUnitsDetails = 'REQUEST_UNITS_DETAILS'
-	
 }
 
 /**
