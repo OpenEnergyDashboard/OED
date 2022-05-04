@@ -118,6 +118,8 @@ class UnitViewComponent extends React.Component<UnitViewPropsWithIntl, UnitViewS
 				</div>
 			)
 		}
+		// returns null because the user is not logged in
+		// mostly here to avoid compiler errors referencing return values
 		return null;
 	}
 

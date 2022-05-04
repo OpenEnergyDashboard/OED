@@ -104,15 +104,15 @@ class UnitModelEditComponent extends React.Component<UnitViewPropsWithIntl, Unit
 	 * (3) Call the function onHide() -> this will hide the modal and call function handleClose on UnitViewComponent.tsx */
 
 	private onSaveChanges() {
-		const oldIdentifer = this.props.unit.identifier;
-		const oldunitRepresentType = this.props.unit.unitRepresent;
+		const oldIdentifier = this.props.unit.identifier;
+		const oldUnitRepresentType = this.props.unit.unitRepresent;
 		const oldTypeOfUnit = this.props.unit.typeOfUnit;
 		const oldDisplayable = this.props.unit.displayable;
 		const oldPreferredDisplay = this.props.unit.preferredDisplay;
 		const oldSecInRate = this.props.unit.secInRate;
 		const oldSuffix = this.props.unit.suffix.toString();
 		const oldNote = this.props.unit.note;
-		if (oldIdentifer != this.state.identifierInput || oldunitRepresentType != this.state.unitRepresentInput ||
+		if (oldIdentifier != this.state.identifierInput || oldUnitRepresentType != this.state.unitRepresentInput ||
 			oldTypeOfUnit != this.state.typeOfUnitInput || oldDisplayable != this.state.displayableInput ||
 			oldPreferredDisplay != this.state.preferredDisplayableInput || oldSecInRate != this.state.secInRateInput ||
 			oldSuffix != this.state.suffixInput || oldNote != this.state.noteInput) {
@@ -139,7 +139,7 @@ class UnitModelEditComponent extends React.Component<UnitViewPropsWithIntl, Unit
 	/**
 	 * The following handlers will change the state to the corresponding unit
 	 */
-	private handleIdentifier(event: React.ChangeEvent<HTMLInputElement>) {
+	private handleIdentifierChange(event: React.ChangeEvent<HTMLInputElement>) {
 		this.setState({ identifierInput: event.target.value });
 	}
 
@@ -183,7 +183,7 @@ class UnitModelEditComponent extends React.Component<UnitViewPropsWithIntl, Unit
 		return (
 			<div>
 				<FormattedMessage id="unit.identifier" /> <span><br /><input type="text" defaultValue={identifier}
-					placeholder="Identifier" onChange={event => this.handleIdentifier(event)} /></span>
+					placeholder="Identifier" onChange={event => this.handleIdentifierChange(event)} /></span>
 			</div>
 		)
 	}

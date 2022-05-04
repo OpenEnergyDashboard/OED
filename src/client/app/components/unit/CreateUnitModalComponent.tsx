@@ -71,7 +71,7 @@ const ModalCard = (props: UnitFormProps) => {
 					<div id="container">
 						<div id="modalChild">
 							{/* Modal content */}
-							<div className="containter-fluid">
+							<div className="container-fluid">
 								<div style={tableStyle}>
 									{/*HTML form to accept new unit information*/}
 									<form onSubmit={e => { e.preventDefault(); props.submitNewUnit(); }}>
