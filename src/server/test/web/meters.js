@@ -14,7 +14,8 @@ const gps = new Point(90, 45);
 const moment = require('moment');
 const Unit = require('../../models/Unit');
 
-function expectMetersToBeEquivalent(meters, length, offset) {
+async function expectMetersToBeEquivalent(meters, length, offset) {
+	const unitId = (await Unit.getByName('Unit', conn)).id;
 	for (let i = 0; i < length; i++) {
 		// If length is 1 then it is not an array.
 		let meter;
@@ -63,6 +64,8 @@ function expectMetersToBeEquivalent(meters, length, offset) {
 			expect(meter).to.have.property('endOnlyTime', false);
 			expect(meter).to.have.property('startTimestamp', '0001-01-01T23:59:59.000Z');
 			expect(meter).to.have.property('endTimestamp', '2020-07-02T01:00:10.000Z');
+			expect(meter).to.have.property('unitId', unitId);
+			expect(meter).to.have.property('defaultGraphicUnit', unitId);
 		} else {
 			expect(meter).to.have.property('ipAddress', null);
 			expect(meter).to.have.property('meterType', null);
@@ -80,8 +83,8 @@ function expectMetersToBeEquivalent(meters, length, offset) {
 			expect(meter).to.have.property('reading', null);
 			expect(meter).to.have.property('startTimestamp', null);
 			expect(meter).to.have.property('endTimestamp', null);
-			expect(meter).to.have.property('unitId', 1);
-			expect(meter).to.have.property('defaultGraphicUnit', 1);
+			expect(meter).to.have.property('unitId', null);
+			expect(meter).to.have.property('defaultGraphicUnit', null);
 		}
 	}
 }
@@ -120,7 +123,7 @@ mocha.describe('meters API', () => {
 		expect(res).to.have.status(200);
 		expect(res).to.be.json;
 		expect(res.body).to.have.lengthOf(3);
-		expectMetersToBeEquivalent(res.body, 3, 1);
+		await expectMetersToBeEquivalent(res.body, 3, 1);
 	});
 	mocha.describe('Admin role:', () => {
 		let token;
@@ -149,7 +152,7 @@ mocha.describe('meters API', () => {
 			expect(res).to.have.status(200);
 			expect(res).to.be.json;
 			expect(res.body).to.have.lengthOf(4);
-			expectMetersToBeEquivalent(res.body, 4, 1);
+			await expectMetersToBeEquivalent(res.body, 4, 1);
 		});
 	});
 
@@ -192,7 +195,7 @@ mocha.describe('meters API', () => {
 					expect(res).to.have.status(200);
 					expect(res).to.be.json;
 					expect(res.body).to.have.lengthOf(3);
-					expectMetersToBeEquivalent(res.body, 3, 1);
+					await expectMetersToBeEquivalent(res.body, 3, 1);
 				});
 
 				mocha.it(`should reject requests from ${role} to edit meters`, async () => {
@@ -217,7 +220,7 @@ mocha.describe('meters API', () => {
 		const res = await chai.request(app).get(`/api/meters/${meter2.id}`);
 		expect(res).to.have.status(200);
 		expect(res).to.be.json;
-		expectMetersToBeEquivalent(res.body, 1, 2);
+		await expectMetersToBeEquivalent(res.body, 1, 2);
 	});
 
 	mocha.it('responds appropriately when the meter in question does not exist', async () => {
