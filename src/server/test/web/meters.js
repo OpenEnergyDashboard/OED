@@ -14,7 +14,14 @@ const gps = new Point(90, 45);
 const moment = require('moment');
 const Unit = require('../../models/Unit');
 
-function expectMetersToBeEquivalent(meters, length, offset) {
+/**
+ * Verifies the values in the meter are the ones expected.
+ * @param {*} meters If # meters > 1 then array of meters, else single meter
+ * @param {*} length # meters to check and in meters
+ * @param {*} offset How much to add to values expected to relate to meter index
+ * @param {*} unit The unit id to check
+ */
+function expectMetersToBeEquivalent(meters, length, offset, unit) {
 	for (let i = 0; i < length; i++) {
 		// If length is 1 then it is not an array.
 		let meter;
@@ -36,7 +43,10 @@ function expectMetersToBeEquivalent(meters, length, offset) {
 		// name to a user if they are not logged in.
 		expect(meter).to.have.property('identifier', 'Identified ' + (i + offset));
 		expect(meter).to.have.property('area', (i + offset) * 10.0);
+		expect(meter).to.have.property('unitId', unit);
+		expect(meter).to.have.property('defaultGraphicUnit', unit);
 		// A couple of properties differ if displayable or not.
+		// The first 3 are visible but the 4th is not visible where its name is special.
 		if (i < 3) {
 			expect(meter).to.have.property('name', `Meter ${i + offset}`);
 			expect(meter).to.have.property('displayable', true);
@@ -46,7 +56,7 @@ function expectMetersToBeEquivalent(meters, length, offset) {
 			expect(meter).to.have.property('displayable', false);
 		}
 		if (length === 4) {
-			// Admin so see more values
+			// This is the test where you are an admin and should see all attributes of the meter.
 			expect(meter).to.have.property('ipAddress', '1.1.1.1');
 			expect(meter).to.have.property('meterType', Meter.type.MAMAC);
 			expect(meter).to.have.property('timeZone', 'TZ' + (i + offset));
@@ -64,6 +74,7 @@ function expectMetersToBeEquivalent(meters, length, offset) {
 			expect(meter).to.have.property('startTimestamp', '0001-01-01T23:59:59.000Z');
 			expect(meter).to.have.property('endTimestamp', '2020-07-02T01:00:10.000Z');
 		} else {
+			// If not an admin then many attributes are not visible and set to null.
 			expect(meter).to.have.property('ipAddress', null);
 			expect(meter).to.have.property('meterType', null);
 			expect(meter).to.have.property('timeZone', null);
@@ -118,7 +129,7 @@ mocha.describe('meters API', () => {
 		expect(res).to.have.status(200);
 		expect(res).to.be.json;
 		expect(res.body).to.have.lengthOf(3);
-		expectMetersToBeEquivalent(res.body, 3, 1);
+		expectMetersToBeEquivalent(res.body, 3, 1, unitId);
 	});
 	mocha.describe('Admin role:', () => {
 		let token;
@@ -147,7 +158,7 @@ mocha.describe('meters API', () => {
 			expect(res).to.have.status(200);
 			expect(res).to.be.json;
 			expect(res.body).to.have.lengthOf(4);
-			expectMetersToBeEquivalent(res.body, 4, 1);
+			expectMetersToBeEquivalent(res.body, 4, 1, unitId);
 		});
 	});
 
@@ -190,7 +201,7 @@ mocha.describe('meters API', () => {
 					expect(res).to.have.status(200);
 					expect(res).to.be.json;
 					expect(res.body).to.have.lengthOf(3);
-					expectMetersToBeEquivalent(res.body, 3, 1);
+					expectMetersToBeEquivalent(res.body, 3, 1, unitId);
 				});
 
 				mocha.it(`should reject requests from ${role} to edit meters`, async () => {
@@ -215,7 +226,7 @@ mocha.describe('meters API', () => {
 		const res = await chai.request(app).get(`/api/meters/${meter2.id}`);
 		expect(res).to.have.status(200);
 		expect(res).to.be.json;
-		expectMetersToBeEquivalent(res.body, 1, 2);
+		expectMetersToBeEquivalent(res.body, 1, 2, unitId);
 	});
 
 	mocha.it('responds appropriately when the meter in question does not exist', async () => {
