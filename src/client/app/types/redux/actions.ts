@@ -120,6 +120,7 @@ export enum ActionType {
 	SubmitEditedConversion = 'SUBMIT_EDITED_CONVERSION',
 	ConfirmEditedConversion = 'CONFIRM_EDITED_CONVERSION',
 	DeleteConversion = 'DELETE_CONVERSION',
+	NewConversion = 'NEW_CONVERSION',
 	RequestUnitsDetails = 'REQUEST_UNITS_DETAILS'
 }
 

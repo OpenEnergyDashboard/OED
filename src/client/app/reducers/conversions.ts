@@ -2,7 +2,6 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
 
-import * as _ from 'lodash';
 import { ConversionActions, ConversionsState} from '../types/redux/conversions'
 import { ActionType } from '../types/redux/actions';
 
@@ -20,6 +19,9 @@ export default function conversions(state = defaultState, action: ConversionActi
 	let submitting;
 	let editedConversions;
 	let conversion;
+	let finder;
+	let index1;
+	let index2;
 	switch (action.type) {
 		case ActionType.RequestConversionDetails:
 			return {
@@ -51,13 +53,12 @@ export default function conversions(state = defaultState, action: ConversionActi
 			submitting.splice(submitting.indexOf(action.conversion));
 			conversion = state.conversion;
 			editedConversions = state.editedConversions;
-			const finder3 = (element: Conversion) => element.sourceId === action.conversion.sourceId && element.destinationId === action.conversion.destinationId;
-			const index1 = conversion.findIndex(finder3);
-			const index2 = editedConversions.findIndex(finder3);
+			finder = (element: Conversion) => element.sourceId === action.conversion.sourceId && element.destinationId === action.conversion.destinationId;
+			index1 = conversion.findIndex(finder);
+			index2 = editedConversions.findIndex(finder);
 			conversion[index1] = editedConversions[index2];
-			const finder5 = (element: Conversion) => element.sourceId !== action.conversion.sourceId && element.destinationId !== action.conversion.destinationId;
-			editedConversions = editedConversions.filter(finder5);
-			//delete editedConversions[editedConversions.findIndex(finder3)];
+			finder = (element: Conversion) => element.sourceId !== action.conversion.sourceId && element.destinationId !== action.conversion.destinationId;
+			editedConversions = editedConversions.filter(finder);
 
 			return {
 				...state,
@@ -66,14 +67,25 @@ export default function conversions(state = defaultState, action: ConversionActi
 				conversion
 			};
 		case ActionType.DeleteConversion:
-			const finder4 = (element: Conversion) => (!((element.sourceId === action.conversion.sourceId) && (element.destinationId === action.conversion.destinationId)));
+			finder = (element: Conversion) => (
+				!((element.sourceId === action.conversion.sourceId) && (element.destinationId === action.conversion.destinationId))
+			);
 			conversion = state.conversion;
-			conversion = conversion.filter(finder4)
-			//delete conversion[conversion.findIndex(finder2)];
+			conversion = conversion.filter(finder)
 			return {
 				...state,
 				conversion
 			};
+		case ActionType.NewConversion:
+			conversion = state.conversion;
+			conversion = [
+				...conversion,
+				action.conversion
+			]
+			return {
+				...state,
+				conversion
+			}
 
 		default:
 			return state;

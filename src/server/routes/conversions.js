@@ -8,7 +8,6 @@ const { log } = require("../log");
 const validate = require("jsonschema").validate;
 const { getConnection } = require("../db");
 const { adminAuthMiddleware } = require("./authenticator");
-//  const { Console } = require("core-js/core/log");
 const router = express.Router();
 
 /**
@@ -118,23 +117,16 @@ router.post(
 		} else {
 			try {
 				const conn = getConnection();
-				const {
-					sourcId,
-					destinationId,
-					bidirectional,
-					slope,
-					intercept,
-					note,
-				} = req.body;
+				const incomingConv = req.body;
 				const convs = new Conversion(
-					sourcId,
-					destinationId,
-					bidirectional,
-					slope,
-					intercept,
-					note
+					incomingConv.sourceId,
+					incomingConv.destinationId,
+					incomingConv.bidirectional,
+					incomingConv.slope,
+					incomingConv.intercept,
+					incomingConv.note
 				);
-				conv.insert(conn);
+				convs.insert(conn);
 				res.sendStatus(200);
 			} catch (error) {
 				log.error(

@@ -6,51 +6,57 @@ import { ActionType } from './actions';
 import { Conversion, ConversionBidirectional } from '../items';
 
 export interface RequestConversionDetailsAction {
-    type: ActionType.RequestConversionDetails;
+	type: ActionType.RequestConversionDetails;
 }
 
 export interface ReceiveConversionDetailsAction {
-    type: ActionType.ReceiveConversionDetails;
-    data: Conversion[];
+	type: ActionType.ReceiveConversionDetails;
+	data: Conversion[];
 }
 
 export interface EditConversionDetailsAction {
-    type: ActionType.EditConversionDetails;
-    conversion: Conversion;
+	type: ActionType.EditConversionDetails;
+	conversion: Conversion;
 }
 
 export interface SubmitEditedConversionAction {
-    type: ActionType.SubmitEditedConversion;
-    conversion: Conversion;
+	type: ActionType.SubmitEditedConversion;
+	conversion: Conversion;
 }
 
 export interface ConfirmEditedConversionAction {
-    type: ActionType.ConfirmEditedConversion;
-    conversion: Conversion;
+	type: ActionType.ConfirmEditedConversion;
+	conversion: Conversion;
 }
 
 export interface DeleteConversionAction {
-    type: ActionType.DeleteConversion;
-    conversion: Conversion
+	type: ActionType.DeleteConversion;
+	conversion: Conversion
 }
 
-export type ConversionActions = 
+export interface NewConversionAction {
+	type: ActionType.NewConversion;
+	conversion: ConversionMetaData2
+}
+
+export type ConversionActions =
         | RequestConversionDetailsAction
         | ReceiveConversionDetailsAction
         | EditConversionDetailsAction
         | ConfirmEditedConversionAction
         | SubmitEditedConversionAction
-        | DeleteConversionAction;
+        | DeleteConversionAction
+        | NewConversionAction;
 
 export interface ConversionEditData {
-    bidirectional: ConversionBidirectional;
+	bidirectional: ConversionBidirectional;
 	slope: number;
 	intercept: number;
 	note: string;
 }
 
 export interface ConversionMetaData {
-    sourceId: number;
+	sourceId: number;
 	destinationId: number;
 	bidirectional: ConversionBidirectional;
 	slope: number;
@@ -58,9 +64,18 @@ export interface ConversionMetaData {
 	note: string;
 }
 
+export interface ConversionMetaData2 {
+	sourceId: number;
+	destinationId: number;
+	bidirectional: boolean;
+	slope: number;
+	intercept: number;
+	note: string;
+}
+
 export interface ConversionsState {
-    isFetching: boolean;
-    conversion: Conversion[];
-    editedConversions: Conversion[];
-    submitting: Conversion[];
+	isFetching: boolean;
+	conversion: Conversion[];
+	editedConversions: Conversion[];
+	submitting: Conversion[];
 }

@@ -99,7 +99,7 @@ export default class HeaderButtonsComponent extends React.Component<HeaderButton
 					<Link style={homeLinkStyle} to='/'><Button outline><FormattedMessage id='home'/></Button></Link>
 					<Link style={loginLinkStyle} to='/login'><Button outline><FormattedMessage id='log.in'/></Button></Link>
 					<Link style={logoutButtonStyle} to='/'><Button outline onClick={this.handleLogOut}><FormattedMessage id='log.out'/></Button></Link>
-					<Link style={metersLinkStyle} to='/conversions'><Button outline><FormattedMessage id='conversions'/></Button></Link>
+					<Link style={metersLinkStyle} to='/conversions'><Button outline><FormattedMessage id='conversions.title.main'/></Button></Link>
 				</div>
 			</div>
 		);

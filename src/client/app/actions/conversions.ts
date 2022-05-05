@@ -4,7 +4,7 @@
 
 import * as _ from 'lodash';
 import { ActionType, Dispatch, GetState, Thunk } from '../types/redux/actions';
-import { ConversionMetaData } from '../types/redux/conversions';
+import { ConversionMetaData, ConversionMetaData2 } from '../types/redux/conversions';
 import { State } from '../types/redux/state';
 import * as t from '../types/redux/conversions';
 import { Conversion, ConversionBidirectional } from '../types/items'
@@ -14,91 +14,140 @@ import translate from '../utils/translate';
 import { logToServer } from './logs';
 
 function requestConversionDetails(): t.RequestConversionDetailsAction {
-    return { type: ActionType.RequestConversionDetails };
+	return { type: ActionType.RequestConversionDetails };
 }
 
 function receiveConversionDetails(data: Conversion[]): t.ReceiveConversionDetailsAction {
-    return { type: ActionType.ReceiveConversionDetails, data }
+	return { type: ActionType.ReceiveConversionDetails, data }
 }
 
 export function editConversionDetails(conversion: Conversion): t.EditConversionDetailsAction {
-    return { type: ActionType.EditConversionDetails, conversion};
+	return { type: ActionType.EditConversionDetails, conversion};
 }
 
 function submitEditedConversion(conversion: ConversionMetaData): t.SubmitEditedConversionAction {
-    return{ type: ActionType.SubmitEditedConversion, conversion}
+	return{ type: ActionType.SubmitEditedConversion, conversion}
 }
 
 function confirmEditedConversion(conversion: ConversionMetaData): t.ConfirmEditedConversionAction {
-    return { type: ActionType.ConfirmEditedConversion, conversion}
+	return { type: ActionType.ConfirmEditedConversion, conversion}
 }
 
 export function fetchConversionDetails(): Thunk {
-    return async (dispatch: Dispatch) => {
-        dispatch(requestConversionDetails());
-        const conversionDetails = await conversionsApi.getAll();
-        dispatch(receiveConversionDetails(conversionDetails));
-    };
+	return async (dispatch: Dispatch) => {
+		dispatch(requestConversionDetails());
+		const conversionDetails = await conversionsApi.getAll();
+		dispatch(receiveConversionDetails(conversionDetails));
+	};
 }
 
 export function submitConversionsEdits(): Thunk {
-    return async (dispatch: Dispatch, getState: GetState) => {
-        getState().conversions.editedConversions.forEach(conversion => {
-            const conver = conversion;
-            if (getState().conversions.submitting.indexOf(conver) === -1) {
-                dispatch(submitConversionEdit(conver));
-            }
-        });
-    };
+	return async (dispatch: Dispatch, getState: GetState) => {
+		getState().conversions.editedConversions.forEach(conversion => {
+			const conver = conversion;
+			if (getState().conversions.submitting.indexOf(conver) === -1) {
+				dispatch(submitConversionEdit(conver));
+			}
+		});
+	};
 }
 
 export function submitConversionEdit(conversions: Conversion): Thunk {
-    return async (dispatch: Dispatch, getState: GetState) => {
-        const submittingConversion = conversions;
-        dispatch(submitEditedConversion(submittingConversion));
-        try{
-            if (submittingConversion.bidirectional == ConversionBidirectional.TRUE){
-                await conversionsApi.editConversion(submittingConversion.sourceId,submittingConversion.destinationId,true,submittingConversion.slope,submittingConversion.intercept,submittingConversion.note);
-                dispatch(confirmEditedConversion(submittingConversion));
-            } else {
-                await conversionsApi.editConversion(submittingConversion.sourceId,submittingConversion.destinationId,false,submittingConversion.slope,submittingConversion.intercept,submittingConversion.note);
-                dispatch(confirmEditedConversion(submittingConversion));
-            }
-            
-            
-        } catch (err) {
-            showErrorNotification(translate('failed.to.edit.conversion'));
-        }
-    };
+	return async (dispatch: Dispatch) => {
+		const submittingConversion = conversions;
+		dispatch(submitEditedConversion(submittingConversion));
+		try{
+			if (submittingConversion.bidirectional == ConversionBidirectional.TRUE){
+				await conversionsApi.editConversion(
+					submittingConversion.sourceId,
+					submittingConversion.destinationId,
+					true,
+					submittingConversion.slope,
+					submittingConversion.intercept,
+					submittingConversion.note);
+				dispatch(confirmEditedConversion(submittingConversion));
+			} else {
+				await conversionsApi.editConversion(
+					submittingConversion.sourceId,
+					submittingConversion.destinationId,
+					false,
+					submittingConversion.slope,
+					submittingConversion.intercept,
+					submittingConversion.note);
+				dispatch(confirmEditedConversion(submittingConversion));
+			}
+
+
+		} catch (err) {
+			showErrorNotification(translate('conversion.failed.to.edit.conversion'));
+		}
+	};
 }
 
 function shouldFetchConversionDetails(state: State): boolean {
-    return !state.conversions.isFetching && _.size(state.conversions.conversion) === 0;
+	return !state.conversions.isFetching && _.size(state.conversions.conversion) === 0;
 }
 
 export function fetchConversionDetailsIfNeeded(alwaysFetch?: boolean): Thunk {
-    return (dispatch: Dispatch, getState: GetState) => {
-        if (alwaysFetch || shouldFetchConversionDetails(getState())) {
-            return dispatch(fetchConversionDetails());
-        }
-        return Promise.resolve();
-    }
+	return (dispatch: Dispatch, getState: GetState) => {
+		if (alwaysFetch || shouldFetchConversionDetails(getState())) {
+			return dispatch(fetchConversionDetails());
+		}
+		return Promise.resolve();
+	}
 }
 
 export function deleteConversion(conversion: Conversion): t.DeleteConversionAction {
-    return { type: ActionType.DeleteConversion, conversion};
+	return { type: ActionType.DeleteConversion, conversion};
+}
+
+export function newConversion(conversion: ConversionMetaData2): t.NewConversionAction {
+	return { type: ActionType.NewConversion, conversion};
 }
 
 export function removeConversion(conversion: Conversion): Thunk {
-    return async (dispatch: Dispatch) => {
-        try { 
-            await conversionsApi.deleteConversion(String(conversion.sourceId),String(conversion.destinationId));
-            dispatch(deleteConversion(conversion));
-            dispatch(logToServer('info',`Delete conversion, note = ${conversion.note}`));
-            showSuccessNotification(translate('conversion.is.deleted'));
-        } catch (err) {
-            showErrorNotification(translate('conversion.failed.to.delete'));
-            dispatch(logToServer('error',`Failed to delete conversion note = ${conversion.note}`));
-        }
-    }
+	return async (dispatch: Dispatch) => {
+		try {
+			await conversionsApi.deleteConversion(String(conversion.sourceId),String(conversion.destinationId));
+			dispatch(deleteConversion(conversion));
+			dispatch(logToServer('info',`Delete conversion, note = ${conversion.note}`));
+			showSuccessNotification(translate('conversion.is.deleted'));
+		} catch (err) {
+			showErrorNotification(translate('conversion.failed.to.delete'));
+			dispatch(logToServer('error',`Failed to delete conversion note = ${conversion.note}`));
+		}
+	}
+}
+
+export function createConversion(sourceId: number,
+	destinationId: number,
+	bidirectional: boolean,
+	slope: number,
+	intercept: number,
+	note: string): Thunk {
+	return async (dispatch: Dispatch) => {
+		try{
+			await conversionsApi.createConversion(
+				sourceId,
+				destinationId,
+				bidirectional,
+				slope,
+				intercept,
+				note
+			);
+			const newConv = {} as ConversionMetaData2;
+			newConv.sourceId = sourceId;
+			newConv.destinationId = destinationId;
+			newConv.intercept = intercept;
+			newConv.slope = slope;
+			newConv.note = note;
+			newConv.bidirectional = bidirectional;
+			dispatch(newConversion(newConv));
+			dispatch(logToServer('info',`New Conversion, note = ${note}`))
+			showSuccessNotification(translate('conversion.is.created'));
+		} catch (err) {
+			showErrorNotification(translate('conversion.failed.to.create'));
+			dispatch(logToServer('error',`Failed to create conversion note = ${note}`));
+		}
+	}
 }

@@ -4,14 +4,12 @@
 
 import * as React from 'react';
 import { Conversion } from '../../types/items';
-import { Button } from 'reactstrap';
 import TooltipHelpContainerAlternative from '../../containers/TooltipHelpContainerAlternative';
 import TooltipMarkerComponent from '../TooltipMarkerComponent';
 import { FormattedMessage } from 'react-intl';
 import UnsavedWarningContainer from '../../containers/UnsavedWarningContainer';
 import HeaderContainer from '../../containers/HeaderContainer';
 import ConversionViewContainer from '../../containers/conversions/ConversionViewContainer';
-//import { updateUnsavedChanges, removeUnsavedChanges } from '../../actions/unsavedWarning';
 import { Card, Row } from 'react-bootstrap';
 import CreateConversionContainer from '../../containers/conversions/CreateConversionContainer';
 
@@ -21,6 +19,12 @@ interface ConversionDetailProps {
 	unsavedChanges: boolean;
 	fetchConversionDetails(): any;
 	submitConversionsEdits(): any;
+	createConversion(sourceId: number,
+		destinationId: number,
+		bidirectional: boolean,
+		slope: number,
+		intercept: number,
+		note: string): any;
 }
 
 class ConversionDetailComponent extends React.Component<ConversionDetailProps, unknown> {
@@ -41,7 +45,7 @@ class ConversionDetailComponent extends React.Component<ConversionDetailProps, u
 		const tooltipStyle = {
 			display: 'inline',
 			fontSize: '50%',
-			tooltipMeterView: loggedInAsAdmin? 'help.admin.meterview' : 'help.meters.meterview'
+			tooltipConversionView: loggedInAsAdmin? 'help.admin.conversions' : 'help.conversions.conversionview'
 		};
 
 		const tableStyle: React.CSSProperties = {
@@ -59,25 +63,22 @@ class ConversionDetailComponent extends React.Component<ConversionDetailProps, u
 		return (
 			<div>
 				<UnsavedWarningContainer />
-			    <HeaderContainer />
+				<HeaderContainer />
 				<TooltipHelpContainerAlternative page='converions' />
 				<div className='container-fluid'>
 					<h2 style={titleStyle}>
-						<FormattedMessage id='conversions' />
+						<FormattedMessage id='conversions.title.main' />
 						<div style={tooltipStyle}>
-							<TooltipMarkerComponent page='conversions' helpTextId={tooltipStyle.tooltipMeterView}></TooltipMarkerComponent>
+							<TooltipMarkerComponent page='conversions' helpTextId={tooltipStyle.tooltipConversionView}/>
 						</div>
 					</h2>
 					<div style={tableStyle}>
 						<Row xs={1} sm={3} md={4} lg={5} xl={5} className="g-4" style={{ justifyContent: 'center' }}>
 							<Card style={cardStyle} className='align-items-center justify-content-center'>
-								<CreateConversionContainer/>
-								{/* <Button style={{ backgroundColor: 'blue', margin: '0px 5px 5px 5px'}}>
-                                    Create New Conversion
-                                </Button> */}
+								<CreateConversionContainer createConversion={this.props.createConversion} conversions={this.props.conversions}/>
 							</Card>
 							{this.props.conversions.map(
-								conversion => ( <ConversionViewContainer conversion={conversion} />)
+								conversion => ( <ConversionViewContainer key={conversion.sourceId+conversion.note+conversion.destinationId} conversion={conversion} />)
 							)}
 						</Row>
 					</div>

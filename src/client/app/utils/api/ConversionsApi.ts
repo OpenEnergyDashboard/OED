@@ -4,7 +4,7 @@
 
 //connecting the front end and back end
 import ApiBackend from './ApiBackend';
-import {Conversion, ConversionBidirectional} from '../../types/items'
+import { Conversion } from '../../types/items'
 
 export default class ConversionsApi {
 
@@ -13,21 +13,33 @@ export default class ConversionsApi {
 	constructor(backend: ApiBackend) {
 		this.backend = backend;
 	}
-    public async getAll(): Promise<Conversion []> {
+	public async getAll(): Promise<Conversion []> {
 		return await this.backend.doGetRequest<Conversion[]>('/api/conversions');
-	};
+	}
 	public async getSource(sourceId: string, destinationId: string): Promise<Conversion> {
-		return await this.backend.doGetRequest<Conversion>("/api/conversions/:sourceId&:destinationId",{sourceId, destinationId} );
-	};
+		return await this.backend.doGetRequest<Conversion>('/api/conversions/:sourceId&:destinationId',{sourceId, destinationId} );
+	}
 	public async deleteConversion(sourceId: string, destinationId: string)
 	{
 		return await this.backend.doPostRequest('/api/conversions/delete', {sourceId, destinationId})
-	};
-	public async editConversion(sourceId:number, destinationId: number, bidirectional:boolean, slope:number, intercept:number, note:string):Promise<Conversion>
+	}
+	public async editConversion(
+		sourceId:number,
+		destinationId: number,
+		bidirectional:boolean,
+		slope:number,
+		intercept:number,
+		note:string):Promise<Conversion>
 	{
 		return await this.backend.doPostRequest<Conversion>('/api/conversions/edit',{sourceId,destinationId,bidirectional,slope,intercept,note})
 	}
-	public async createConversion(sourceId:string, destinationId: string, bidirectional:ConversionBidirectional, slope:number, intercept:number, note:string):Promise<Conversion>
+	public async createConversion(
+		sourceId: number,
+		destinationId: number,
+		bidirectional:boolean,
+		slope:number,
+		intercept:number,
+		note:string):Promise<Conversion>
 	{
 		return await this.backend.doPostRequest<Conversion>('/api/conversions/create', {sourceId,destinationId,bidirectional,slope,intercept,note})
 	}
