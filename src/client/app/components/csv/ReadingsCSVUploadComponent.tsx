@@ -142,9 +142,9 @@ export default class ReadingsCSVUploadComponent extends React.Component<Readings
 						</Label>
 						<Col sm={8}>
 							<Input type='select' name='timeSort' onChange={this.handleSetTimeSort}>
-								<option value={TimeSortTypes.meter}> {translate('TimeSortTypes.meter')} </option>
-								<option value={TimeSortTypes.increasing}> {translate('TimeSortTypes.increasing')} </option>
-								<option value={TimeSortTypes.decreasing}> {translate('TimeSortTypes.decreasing')} </option>
+								<option value={TimeSortTypes.meter}> {translate("TimeSortTypes.meter")} </option>
+								<option value={TimeSortTypes.increasing}> {translate("TimeSortTypes.increasing")} </option>
+								<option value={TimeSortTypes.decreasing}> {translate("TimeSortTypes.decreasing")} </option>
 							</Input>
 						</Col>
 					</FormGroup>
@@ -172,9 +172,9 @@ export default class ReadingsCSVUploadComponent extends React.Component<Readings
 								</Label>
 								<Col sm={12}>
 									<Input type='select' name='cumulative' onChange={this.handleSetCumulative}>
-										<option value={BooleanTypes.meter}> {translate('BooleanTypes.meter')} </option>
-										<option value={BooleanTypes.true}> {translate('BooleanTypes.true')} </option>
-										<option value={BooleanTypes.false}> {translate('BooleanTypes.false')} </option>
+										<option value={BooleanTypes.meter}> {translate("BooleanTypes.meter")} </option>
+										<option value={BooleanTypes.true}> {translate("BooleanTypes.true")} </option>
+										<option value={BooleanTypes.false}> {translate("BooleanTypes.false")} </option>
 									</Input>
 								</Col>
 							</FormGroup>
@@ -184,9 +184,9 @@ export default class ReadingsCSVUploadComponent extends React.Component<Readings
 								</Label>
 								<Col sm={12}>
 									<Input type='select' name='cumulativeReset' onChange={this.handleSetCumulativeReset}>
-										<option value={BooleanTypes.meter}> {translate('BooleanTypes.meter')} </option>
-										<option value={BooleanTypes.true}> {translate('BooleanTypes.true')} </option>
-										<option value={BooleanTypes.false}> {translate('BooleanTypes.false')} </option>
+										<option value={BooleanTypes.meter}> {translate("BooleanTypes.meter")} </option>
+										<option value={BooleanTypes.true}> {translate("BooleanTypes.true")} </option>
+										<option value={BooleanTypes.false}> {translate("BooleanTypes.false")} </option>
 									</Input>
 								</Col>
 							</FormGroup>
@@ -247,9 +247,9 @@ export default class ReadingsCSVUploadComponent extends React.Component<Readings
 						</Label>
 						<Col sm={8}>
 							<Input type='select' name='endOnly' onChange={this.handleSetEndOnly}>
-								<option value={BooleanTypes.meter}> {translate('BooleanTypes.meter')} </option>
-								<option value={BooleanTypes.true}> {translate('BooleanTypes.true')} </option>
-								<option value={BooleanTypes.false}> {translate('BooleanTypes.false') } </option>
+								<option value={BooleanTypes.meter}> {translate("BooleanTypes.meter")} </option>
+								<option value={BooleanTypes.true}> {translate("BooleanTypes.true")} </option>
+								<option value={BooleanTypes.false}> {translate("BooleanTypes.false") } </option>
 							</Input>
 						</Col>
 					</FormGroup>
