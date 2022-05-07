@@ -115,8 +115,8 @@ class CreateGroupComponent extends React.Component<CreateGroupPropsWithIntl, Cre
 								<FormattedMessage id='displayable' />:
 							</p>
 							<Input type='select' name='displayselect' onChange={this.handleDisplayChange}>
-								<option value='true'> { translate('True') } </option>
-								<option value='false'> { translate('False')} </option>
+								<option value='true'> {translate('true') } </option>
+								<option value='false'> { translate('false') } </option>
 							</Input>
 						</div>
 						<div style={divBottomStyle} className='col-4'>
