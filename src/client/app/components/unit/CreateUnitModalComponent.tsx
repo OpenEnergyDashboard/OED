@@ -6,6 +6,7 @@ import * as React from 'react';
 import { Modal, Button } from 'react-bootstrap';
 import { Input } from 'reactstrap';
 import { FormattedMessage } from 'react-intl';
+import translate from '../../utils/translate';
 import '../../styles/unit-add-modal.css';
 import { UnitRepresentType, DisplayableType, UnitType } from '../../types/redux/units';
 
@@ -59,7 +60,7 @@ const ModalCard = (props: UnitFormProps) => {
 		<>
 			{/* Show modal button */}
 			<Button variant="Secondary" onClick={handleShow}>
-				Create Unit
+				<FormattedMessage id="create.unit" />
 			</Button>
 
 			<Modal show={showModal} onHide={handleClose}>
@@ -90,8 +91,8 @@ const ModalCard = (props: UnitFormProps) => {
 											<label><FormattedMessage id="unit.represent" /></label><br />
 											<Input type='select' onChange={({ target }) => props.handleUnitRepresentChange(target.value)}
 												required value={props.unitRepresent}>
-												{Object.keys(UnitRepresentType).map( key => {
-													return (<option value={key} key={key}>{key}</option>)
+												{Object.keys(UnitRepresentType).map(key => {
+													return (<option value={key} key={key}>{translate(`UnitRepresentType.${key}`)}</option>)
 												})}
 											</Input>
 										</div>
@@ -104,8 +105,8 @@ const ModalCard = (props: UnitFormProps) => {
 										<div style={formInputStyle}>
 											<label><FormattedMessage id="unit.type.of.unit" /></label><br />
 											<Input type='select' onChange={({ target }) => props.handleTypeOfUnitChange(target.value)} required value={props.typeOfUnit}>
-												{Object.keys(UnitType).map( key => {
-													return (<option value={key} key={key}>{key}</option>)
+												{Object.keys(UnitType).map(key => {
+													return (<option value={key} key={key}>{translate(`UnitType.${key}`)}</option>)
 												})}
 											</Input>
 										</div>
@@ -118,8 +119,8 @@ const ModalCard = (props: UnitFormProps) => {
 										<div style={formInputStyle}>
 											<label><FormattedMessage id="unit.dropdown.displayable" /></label><br />
 											<Input type='select' onChange={({ target }) => props.handleDisplayableChange(target.value)} required value={props.displayable} >
-												{Object.keys(DisplayableType).map( key => {
-													return (<option value={key} key={key}>{key}</option>)
+												{Object.keys(DisplayableType).map(key => {
+													return (<option value={key} key={key}>{translate(`DisplayableType.${key}`)}</option>)
 												})}
 											</Input>
 										</div>
@@ -129,8 +130,8 @@ const ModalCard = (props: UnitFormProps) => {
 											{/* <Input type='checkbox' onChange={({ target }) => props.handlePreferredDisplayChange(JSON.parse(target.value))}
 												value={props.preferredDisplay.toString()} /> */}
 											<Input type='select' onChange={({ target }) => props.handlePreferredDisplayChange(JSON.parse(target.value))}>
-												<option value="true"> Yes </option>
-												<option value="false"> No </option>
+												<option value="true"> {translate('yes')} </option>
+												<option value="false"> {translate('no')} </option>
 											</Input>
 
 										</div>
@@ -150,10 +151,10 @@ const ModalCard = (props: UnitFormProps) => {
 
 				<Modal.Footer>
 					<Button variant="secondary" onClick={handleClose}>
-						Close
+						<FormattedMessage id="close" />
 					</Button>
 					<Button variant="primary" onClick={handleSubmit}>
-						Save Changes
+						<FormattedMessage id="save.all" />
 					</Button>
 				</Modal.Footer>
 			</Modal>

@@ -60,29 +60,29 @@ class UnitViewComponent extends React.Component<UnitViewPropsWithIntl, UnitViewS
 					{this.props.unit.name}
 				</div>
 				<div className="unit-container">
-					<b><FormattedMessage id="unit.identifier"/></b> {this.props.unit.identifier}
+					<b><FormattedMessage id="unit.identifier" /></b> {this.props.unit.identifier}
 				</div>
 				<div className="unit-container">
-					<b><FormattedMessage id="unit.type.of.unit"/></b> {this.props.unit.typeOfUnit}
+					<b><FormattedMessage id="unit.type.of.unit" /></b> {this.props.unit.typeOfUnit}
 				</div>
 				<div className="unit-container">
-					<b><FormattedMessage id="unit.represent"/></b> {this.props.unit.unitRepresent}
+					<b><FormattedMessage id="unit.represent" /></b> {this.props.unit.unitRepresent}
 				</div>
 				<div className="unit-container">
-					<b><FormattedMessage id="unit.displayable"/></b> {this.props.unit.displayable}
+					<b><FormattedMessage id="unit.displayable" /></b> {this.props.unit.displayable}
 				</div>
 				<div className="unit-container">
-					<b><FormattedMessage id="unit.preferred.display"/></b> {this.props.unit.preferredDisplay.toString()}
+					<b><FormattedMessage id="unit.preferred.display" /></b> {this.props.unit.preferredDisplay.toString()}
 				</div>
 				<div className="unit-container">
-					<b><FormattedMessage id="unit.sec.in.rate"/></b> {this.props.unit.secInRate}
+					<b><FormattedMessage id="unit.sec.in.rate" /></b> {this.props.unit.secInRate}
 				</div>
 				<div className="unit-container">
-					<b><FormattedMessage id="unit.suffix"/></b> {this.props.unit.suffix}
+					<b><FormattedMessage id="unit.suffix" /></b> {this.props.unit.suffix}
 				</div>
 				<div className="unit-container">
 					{/* Only show first 30 characters so card does not get too big. Should limit to one line */}
-					<b><FormattedMessage id="unit.note"/></b> {this.props.unit.note.slice(0, 29)}
+					<b><FormattedMessage id="unit.note" /></b> {this.props.unit.note.slice(0, 29)}
 				</div>
 				{this.isAdmin()}
 			</div>
@@ -96,7 +96,7 @@ class UnitViewComponent extends React.Component<UnitViewPropsWithIntl, UnitViewS
 			return (
 				<div className="edit-btn">
 					<Button variant="Secondary" onClick={this.handleShow}>
-                        Edit Unit
+						<FormattedMessage id="edit.unit" />
 					</Button>
 					{/* this will direct to the createUnitModalComponent.tsx */}
 					<ModalCard

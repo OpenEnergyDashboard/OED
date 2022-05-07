@@ -7,6 +7,7 @@ import '../../styles/unit-edit-modal.css';
 import { UnitData, EditUnitDetailsAction, DisplayableType, UnitRepresentType, UnitType } from '../../types/redux/units';
 import { Input } from 'reactstrap';
 import { FormattedMessage } from 'react-intl';
+import translate from '../../utils/translate';
 
 //Interface for edited units props
 interface EditUnitProps {
@@ -87,11 +88,11 @@ class UnitModelEditComponent extends React.Component<UnitViewPropsWithIntl, Unit
 					<Modal.Footer>
 						{/* Hides the modal */}
 						<Button variant="secondary" onClick={this.props.onhide}>
-							Close
+							<FormattedMessage id="close" />
 						</Button>
 						{/* On click calls the function onSaveChanges in this componenet */}
 						<Button variant="primary" onClick={() => this.onSaveChanges()}>
-							Save Changes
+							<FormattedMessage id="save.all" />
 						</Button>
 					</Modal.Footer>
 				</Modal>
@@ -188,20 +189,6 @@ class UnitModelEditComponent extends React.Component<UnitViewPropsWithIntl, Unit
 		)
 	}
 
-	private isTypeOfUnit(typeOfUnit: UnitType) {
-		return (
-			<div>
-				<label><FormattedMessage id="unit.type.of.unit" /> </label>
-				<Input type='select' defaultValue={typeOfUnit}
-					onChange={event => this.handleTypeOfUnitChange(event)}>
-					{Object.keys(UnitType).map(key => {
-						return (<option value={key} key={key}>{key}</option>)
-					})}
-				</Input>
-			</div>
-		)
-	}
-
 	private isUnitRepresent(unitRepresent: UnitRepresentType) {
 		return (
 			<div>
@@ -209,21 +196,7 @@ class UnitModelEditComponent extends React.Component<UnitViewPropsWithIntl, Unit
 				<Input type='select' defaultValue={unitRepresent}
 					onChange={event => this.handleUnitRepresentChange(event)}>
 					{Object.keys(UnitRepresentType).map(key => {
-						return (<option value={key} key={key}>{key}</option>)
-					})}
-				</Input>
-			</div>
-		)
-	}
-
-	private isDisplayableType(displayable: DisplayableType) {
-		return (
-			<div>
-				<label><FormattedMessage id="unit.displayable" /> </label>
-				<Input type='select' defaultValue={displayable}
-					onChange={event => this.handleDisplayableChange(event)}>
-					{Object.keys(DisplayableType).map(key => {
-						return (<option value={key} key={key}>{key}</option>)
+						return (<option value={key} key={key}>{translate(`UnitRepresentType.${key}`)}</option>)
 					})}
 				</Input>
 			</div>
@@ -240,14 +213,15 @@ class UnitModelEditComponent extends React.Component<UnitViewPropsWithIntl, Unit
 		)
 	}
 
-	private isPreferredDisplayable(preferredDisplay: boolean) {
+	private isTypeOfUnit(typeOfUnit: UnitType) {
 		return (
 			<div>
-				<label><FormattedMessage id="unit.preferred.display" /> </label>
-				<Input type='select' defaultValue={preferredDisplay.toString()}
-					onChange={event => this.handlePreferredDisplayableChange(event)}>
-					<option value="true"> Yes </option>
-					<option value="false"> No </option>
+				<label><FormattedMessage id="unit.type.of.unit" /> </label>
+				<Input type='select' defaultValue={typeOfUnit}
+					onChange={event => this.handleTypeOfUnitChange(event)}>
+					{Object.keys(UnitType).map(key => {
+						return (<option value={key} key={key}>{translate(`UnitType.${key}`)}</option>)
+					})}
 				</Input>
 			</div>
 		)
@@ -259,6 +233,33 @@ class UnitModelEditComponent extends React.Component<UnitViewPropsWithIntl, Unit
 				<label><FormattedMessage id="unit.suffix" /> </label>
 				<input type="text" defaultValue={suffix} placeholder="Suffix"
 					onChange={event => this.handleSuffixChange(event)} />
+			</div>
+		)
+	}
+
+	private isDisplayableType(displayable: DisplayableType) {
+		return (
+			<div>
+				<label><FormattedMessage id="unit.displayable" /> </label>
+				<Input type='select' defaultValue={displayable}
+					onChange={event => this.handleDisplayableChange(event)}>
+					{Object.keys(DisplayableType).map(key => {
+						return (<option value={key} key={key}>{translate(`DisplayableType.${key}`)}</option>)
+					})}
+				</Input>
+			</div>
+		)
+	}
+
+	private isPreferredDisplayable(preferredDisplay: boolean) {
+		return (
+			<div>
+				<label><FormattedMessage id="unit.preferred.display" /> </label>
+				<Input type='select' defaultValue={preferredDisplay.toString()}
+					onChange={event => this.handlePreferredDisplayableChange(event)}>
+					<option value="true"> {translate('yes')} </option>
+					<option value="false"> {translate('no')} </option>
+				</Input>
 			</div>
 		)
 	}
