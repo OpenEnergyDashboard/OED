@@ -247,9 +247,9 @@ export default class ReadingsCSVUploadComponent extends React.Component<Readings
 						</Label>
 						<Col sm={8}>
 							<Input type='select' name='endOnly' onChange={this.handleSetEndOnly}>
-								<option value={BooleanTypes.meter}> {translate("BooleanTypes.meter")} </option>
-								<option value={BooleanTypes.true}> {translate("BooleanTypes.true")} </option>
-								<option value={BooleanTypes.false}> {translate("BooleanTypes.false") } </option>
+								<option value={BooleanTypes.meter}> {translate('BooleanTypes.meter')} </option>
+								<option value={BooleanTypes.true}> {translate('BooleanTypes.true')} </option>
+								<option value={BooleanTypes.false}> {translate('BooleanTypes.false') } </option>
 							</Input>
 						</Col>
 					</FormGroup>
