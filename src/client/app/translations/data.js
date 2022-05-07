@@ -25,7 +25,7 @@ const localeData = {
 		"bar.stacking": "Bar Stacking",
 		"BooleanTypes.meter": "meter or default value",
 		"BooleanTypes.true": "true",
-		"calibration.display": "result: ",
+		"calibration.display": "result:",
 		"calibration.reset.button": "Reset",
 		"calibration.save.database": "Save changes to database",
 		"calibration.submit.button": "Submit",
