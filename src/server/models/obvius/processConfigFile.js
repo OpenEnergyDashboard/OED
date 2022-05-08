@@ -6,6 +6,7 @@ const ini = require('ini');
 const Meter = require('../../models/Meter');
 const ConfigFile = require('../../models/obvius/Configfile');
 const moment = require('moment');
+const Unit = require('../../models/Unit');
 
 /**
  * Creates array of meters from a config file
