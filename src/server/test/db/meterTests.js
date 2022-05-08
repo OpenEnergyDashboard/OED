@@ -13,6 +13,8 @@ const moment = require('moment');
 const Unit = require('../../models/Unit');
 const gps = new Point(90, 45);
 
+//  TODO add 2 new unit parameters for meters.
+
 /**
  * Checks if the expected meter properties have the actual properties.
  * @param expected expected meter properties

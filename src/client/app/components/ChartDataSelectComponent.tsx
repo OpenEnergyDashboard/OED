@@ -7,14 +7,18 @@ import MultiSelectComponent from './MultiSelectComponent';
 import { SelectOption } from '../types/items';
 import { defineMessages, FormattedMessage, injectIntl, WrappedComponentProps } from 'react-intl';
 import TooltipMarkerComponent from './TooltipMarkerComponent';
+import Select from 'react-select';
 
 interface ChartDataSelectProps {
 	meters: SelectOption[];
 	groups: SelectOption[];
+	units: SelectOption[];
 	selectedMeters: SelectOption[];
 	selectedGroups: SelectOption[];
+	selectedUnit: SelectOption;
 	selectMeters(meterIDs: number[]): Promise<any>;
 	selectGroups(groupIDs: number[]): Promise<any>;
+	selectUnit(unitID: number): Promise<any>;
 }
 
 type ChartDataSelectPropsWithIntl = ChartDataSelectProps & WrappedComponentProps;
@@ -27,6 +31,7 @@ class ChartDataSelectComponent extends React.Component<ChartDataSelectPropsWithI
 		super(props);
 		this.handleMeterSelect = this.handleMeterSelect.bind(this);
 		this.handleGroupSelect = this.handleGroupSelect.bind(this);
+		this.handleUnitSelect = this.handleUnitSelect.bind(this);
 	}
 
 	public render() {
@@ -40,8 +45,10 @@ class ChartDataSelectComponent extends React.Component<ChartDataSelectPropsWithI
 		const messages = defineMessages({
 			selectGroups: { id: 'select.groups' },
 			selectMeters: { id: 'select.meters' },
+			selectUnit: { id: 'select.unit' },
 			helpSelectGroups: { id: 'help.home.select.groups' },
-			helpSelectMeters: { id: 'help.home.select.meters' }
+			helpSelectMeters: { id: 'help.home.select.meters' },
+			helpSelectUnit: { id: 'help.home.select.units' }
 		});
 
 		return (
@@ -70,6 +77,20 @@ class ChartDataSelectComponent extends React.Component<ChartDataSelectPropsWithI
 					/>
 					<TooltipMarkerComponent page='home' helpTextId='help.home.select.meters' />
 				</div>
+				<p style={labelStyle}>
+					<FormattedMessage id='unit' />:
+				</p>
+				<div style={divBottomPadding}>
+					<Select
+						options={this.props.units}
+						value={this.props.selectedUnit.value == -99 ? undefined : this.props.selectedUnit}
+						placeholder={this.props.intl.formatMessage(messages.selectUnit)}
+						isClearable={false}
+						closeMenuOnSelect={false}
+						onChange={this.handleUnitSelect}
+					/>
+					<TooltipMarkerComponent page='home' helpTextId='help.home.select.units' />
+				</div>
 			</div>
 		);
 	}
@@ -88,6 +109,14 @@ class ChartDataSelectComponent extends React.Component<ChartDataSelectPropsWithI
 	 */
 	private handleGroupSelect(selection: SelectOption[]) {
 		this.props.selectGroups(selection.map(s => s.value));
+	}
+
+	/**
+	 * Handles a change in unit selection
+	 * @param {Object[]} selection An array of items representing the current selection
+	 */
+	private handleUnitSelect(selection: SelectOption) {
+		this.props.selectUnit(selection.value);
 	}
 }
 

@@ -17,6 +17,7 @@ export default function readings(state = defaultState, action: LineReadingsActio
 	switch (action.type) {
 		case ActionType.RequestMeterLineReadings: {
 			const timeInterval = action.timeInterval.toString();
+			const unitID = action.unitID;
 			const newState = {
 				...state,
 				byMeterID: {
@@ -31,18 +32,22 @@ export default function readings(state = defaultState, action: LineReadingsActio
 				if (newState.byMeterID[meterID] === undefined) {
 					newState.byMeterID[meterID] = {};
 				}
+				if (newState.byMeterID[meterID][timeInterval] === undefined) {
+					newState.byMeterID[meterID][timeInterval] = {};
+				}
 
 				// Preserve existing data
-				if (newState.byMeterID[meterID][timeInterval] === undefined) {
-					newState.byMeterID[meterID][timeInterval] = { isFetching: true };
+				if (newState.byMeterID[meterID][timeInterval][unitID] === undefined) {
+					newState.byMeterID[meterID][timeInterval][unitID] = { isFetching: true };
 				} else {
-					newState.byMeterID[meterID][timeInterval] = { ...newState.byMeterID[meterID][timeInterval], isFetching: true };
+					newState.byMeterID[meterID][timeInterval][unitID] = { ...newState.byMeterID[meterID][timeInterval][unitID], isFetching: true };
 				}
 			}
 			return newState;
 		}
 		case ActionType.RequestGroupLineReadings: {
 			const timeInterval = action.timeInterval.toString();
+			const unitID = action.unitID;
 			const newState = {
 				...state,
 				byGroupID: {
@@ -57,18 +62,22 @@ export default function readings(state = defaultState, action: LineReadingsActio
 				if (newState.byGroupID[groupID] === undefined) {
 					newState.byGroupID[groupID] = {};
 				}
+				if (newState.byGroupID[groupID][timeInterval] === undefined) {
+					newState.byGroupID[groupID][timeInterval] = {};
+				}
 
 				// Preserve existing data
-				if (newState.byGroupID[groupID][timeInterval] === undefined) {
-					newState.byGroupID[groupID][timeInterval] = { isFetching: true };
+				if (newState.byGroupID[groupID][timeInterval][unitID] === undefined) {
+					newState.byGroupID[groupID][timeInterval][unitID] = { isFetching: true };
 				} else {
-					newState.byGroupID[groupID][timeInterval] = { ...newState.byGroupID[groupID][timeInterval], isFetching: true };
+					newState.byGroupID[groupID][timeInterval][unitID] = { ...newState.byGroupID[groupID][timeInterval][unitID], isFetching: true };
 				}
 			}
 			return newState;
 		}
 		case ActionType.ReceiveMeterLineReadings: {
 			const timeInterval = action.timeInterval.toString();
+			const unitID = action.unitID;
 			const newState: LineReadingsState = {
 				...state,
 				byMeterID: {
@@ -79,7 +88,7 @@ export default function readings(state = defaultState, action: LineReadingsActio
 
 			for (const meterID of action.meterIDs) {
 				const readingsForMeter = action.readings[meterID];
-				newState.byMeterID[meterID][timeInterval] = { isFetching: false, readings: readingsForMeter };
+				newState.byMeterID[meterID][timeInterval][unitID] = { isFetching: false, readings: readingsForMeter };
 			}
 			if (!state.groupsFetching) {
 				newState.isFetching = false;
@@ -89,6 +98,7 @@ export default function readings(state = defaultState, action: LineReadingsActio
 		}
 		case ActionType.ReceiveGroupLineReadings: {
 			const timeInterval = action.timeInterval.toString();
+			const unitID = action.unitID;
 			const newState: LineReadingsState = {
 				...state,
 				byGroupID: {
@@ -99,7 +109,7 @@ export default function readings(state = defaultState, action: LineReadingsActio
 
 			for (const groupID of action.groupIDs) {
 				const readingsForGroup = action.readings[groupID];
-				newState.byGroupID[groupID][timeInterval] = { isFetching: false, readings: readingsForGroup };
+				newState.byGroupID[groupID][timeInterval][unitID] = { isFetching: false, readings: readingsForGroup };
 			}
 			if (!state.metersFetching) {
 				newState.isFetching = false;

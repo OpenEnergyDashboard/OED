@@ -12,8 +12,7 @@ const { handleSuffixUnits} = require('./handleSuffixUnits');
  * Creates Cik based on units and conversions and then inserts these values
  * in the cik table in the database.
  */
-async function redoCik() {
-	const conn = getConnection();
+async function redoCik(conn) {
 	// Create graph based on units and conversions.
 	const graph = await createConversionGraph(conn);
 	// Processes suffix units to update graph and database.
@@ -27,8 +26,7 @@ async function redoCik() {
 /**
  * Uses the cik table to create a Pik array and return it.
  */
-async function createPik() {
-	const conn = getConnection();
+async function createPik(conn) {
 	pik = await Cik.getPik(conn);
 	return pik;
 }
@@ -37,4 +35,3 @@ module.exports = {
 	redoCik,
 	createPik
 };
-// redoCik();
