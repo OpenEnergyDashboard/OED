@@ -14,7 +14,7 @@ import { Conversion } from '../../types/items';
 function mapStateToProps(state: State) {
 	const currentUser = state.currentUser.profile;
 	let loggedInAsAdmin =  false;
-	if (currentUser !== null){
+	if (currentUser !== null) {
 		loggedInAsAdmin = isRoleAdmin(currentUser.role);
 	}
 	return {

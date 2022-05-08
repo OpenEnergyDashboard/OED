@@ -33,7 +33,7 @@ const ModalCard = (props: CreateUnitFormProps) => {
 	const handleClose = () => setShow(false);
 
 	//This functino will be used to submit the new conversions
-	//!!!!! The Connection to the backend to actually submit the new conversion needs to be set up.
+	// TODO The Connection to the backend to actually submit the new conversion needs to be set up.
 	const handleSubmit = () => {
 		setShow(false)
 		props.submitNewConversion()

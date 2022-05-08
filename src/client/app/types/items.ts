@@ -76,7 +76,7 @@ export interface Conversion {
 	note: string;
 }
 /**
- * enum values for the biderectional choice
+ * enum values for the bidirectional choice
  */
 export enum ConversionBidirectional {
 	TRUE = 'true',

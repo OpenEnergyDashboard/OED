@@ -65,7 +65,7 @@ export default class CreateConversionContainer extends React.Component<CreateCon
 	private handleBidirectionalChange = (newBidirectionalChange: string) => {
 		if (newBidirectionalChange == 'true') {
 			this.setState({ trueBidirectional: true });
-		}else {
+		} else {
 			this.setState({ trueBidirectional: false });
 		}
 	}
@@ -73,7 +73,7 @@ export default class CreateConversionContainer extends React.Component<CreateCon
 	private handleSlopeChange = (newSlopeChange: string) => {
 		if (newSlopeChange == '') {
 			const newSlopeChanges = 0;
-			this.setState({ slope: newSlopeChanges})
+			this.setState({ slope: newSlopeChanges })
 		} else {
 			this.setState({ slope: Number(newSlopeChange) });
 		}
@@ -83,7 +83,7 @@ export default class CreateConversionContainer extends React.Component<CreateCon
 	private handleInterceptChange = (newInterceptChange: string) => {
 		if (newInterceptChange == '') {
 			const newInterceptChanges = 0;
-			this.setState({ intercept: newInterceptChanges});
+			this.setState({ intercept: newInterceptChanges });
 		} else {
 			this.setState({ intercept: Number(newInterceptChange) });
 		}
@@ -98,10 +98,10 @@ export default class CreateConversionContainer extends React.Component<CreateCon
 		const sourceId = this.state.sourceId;
 		const destinationId = this.state.destinationId;
 		if (sourceId != '' && destinationId != '') {
-			if (sourceId === destinationId){
+			if (sourceId === destinationId) {
 				showErrorNotification(translate('conversion.failed.to.create.conversion'));
 			} else {
-				const exist = this.doesExist(Number(this.state.sourceId),Number(this.state.destinationId));
+				const exist = this.doesExist(Number(this.state.sourceId), Number(this.state.destinationId));
 				if (exist) {
 					showErrorNotification(translate('conversion.failed.to.create.conversion'));
 				} else {
