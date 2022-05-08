@@ -21,7 +21,9 @@ async function loadLogfileToReadings(serialNumber, ipAddress, logfile, conn) {
 			// For now, new Obvius meters collect data (enabled) but do not display (not displayable).
 			// Also, the identifier is similar to the meter name for now.
 			// end only time is true for Obvius meters.
-			// non-displayable meter has no unit yet so set unit to undefined
+			// Data was sent for a meter that did not have a config file sent before this.
+			// As a result, we cannot know the unit so make unknown for now.
+			// The admin need to set the unit before making it displayable or it cannot be graphed.
 			meter = new Meter(undefined, `${serialNumber}.${i}`, ipAddress, true, false, Meter.type.OBVIUS,
 				null, undefined, `OBVIUS ${serialNumber} COLUMN ${i}`, 'created via obvius log upload on ' +
 				moment().format(), undefined, undefined, undefined, undefined, undefined, undefined, undefined,

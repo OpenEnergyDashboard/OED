@@ -49,12 +49,14 @@ async function reqWithTimeout(url, timeout, csvLine) {
  * @returns {Promise.<Meter>}
  */
 async function getMeterInfo(url, ip, csvLine) {
-	// TODO: get the unit name from the file
+	// TODO: get the unit when the MAMAC meter is first probed and created.
+	// For now, we assume they are kWh as before resource generalization.
+	let displayable = true;
 	const kWhUnit = await Unit.getByName( 'kWh', conn );
 	let unitId; 
 	if (kWhUnit === null) {
-		console.log("kWh not found while processing Obvius data");
-		// need a warning log
+		log.warn("kWh not found while creating MAMAC meter so units set to undefined and not displayable");
+		displayable = false;
 		unitId = undefined;
 	} else {
 		unitId = kWhUnit.id;
@@ -63,7 +65,7 @@ async function getMeterInfo(url, ip, csvLine) {
 		.then(raw => parseXMLPromisified(raw))
 		.then(xml => {
 			const name = xml.Maverick.NodeID[0];
-			return new Meter(undefined, name, ip, true, true, Meter.type.MAMAC, null, undefined, undefined,
+			return new Meter(undefined, name, ip, true, displayable, Meter.type.MAMAC, null, undefined, undefined,
 				'created via MAMAC meter upload on ' + moment().format(), unitId, unitId);
 		});
 }
