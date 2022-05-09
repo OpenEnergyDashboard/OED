@@ -95,7 +95,7 @@ class Configfile {
 		this.id = resp.id;
 
 		// insert meters from file contents
-		const obviusMeters = processConfigFile(configFile);
+		const obviusMeters = await processConfigFile(configFile);
 		await Configfile.insertNewMeters(obviusMeters, conn)
 	}
 

@@ -96,10 +96,13 @@ function expectMetersToBeEquivalent(meters, length, offset, unit) {
 }
 
 mocha.describe('meters API', () => {
+	let unitId;
 	mocha.beforeEach(async () => {
 		conn = testDB.getConnection();
-		await new Unit(undefined, 'Unit', 'Unit', Unit.unitRepresentType.UNUSED, 1000, Unit.unitType.UNIT, 
-						1, 'Unit Suffix', Unit.displayableType.ALL, true, 'Unit Note').insert(conn);
+		const unit = new Unit(undefined, 'Unit', 'Unit', Unit.unitRepresentType.UNUSED, 1000, Unit.unitType.UNIT,
+			1, 'Unit Suffix', Unit.displayableType.ALL, true, 'Unit Note');
+		await unit.insert(conn);
+		unitId = unit.id;
 	});
 
 	mocha.it('returns nothing with no meters present', async () => {
@@ -111,7 +114,6 @@ mocha.describe('meters API', () => {
 
 	mocha.it('returns all visible meters', async () => {
 		const conn = testDB.getConnection();
-		const unitId = (await Unit.getByName('Unit', conn)).id;
 		await new Meter(undefined, 'Meter 1', '1.1.1.1', true, true, Meter.type.MAMAC, 'TZ1', gps,
 			'Identified 1', 'notes 1', 10.0, true, true, '01:01:25', '05:05:05', 5.1, 7.3, 1, 'increasing', false,
 			1.0, '0001-01-01 23:59:59', '2020-07-02 01:00:10', unitId, unitId).insert(conn);
@@ -140,7 +142,6 @@ mocha.describe('meters API', () => {
 		});
 		mocha.it('returns all meters', async () => {
 			const conn = testDB.getConnection();
-			const unitId = (await Unit.getByName('Unit', conn)).id;
 			await new Meter(undefined, 'Meter 1', '1.1.1.1', true, true, Meter.type.MAMAC, 'TZ1', gps,
 				'Identified 1', 'notes 1', 10.0, true, true, '01:01:25', '05:05:05', 5.1, 7.3, 1, 'increasing', false,
 				1.0, '0001-01-01 23:59:59', '2020-07-02 01:00:10', unitId, unitId).insert(conn);
@@ -183,7 +184,6 @@ mocha.describe('meters API', () => {
 
 				mocha.it('should only return visible meters and visible data', async () => {
 					const conn = testDB.getConnection();
-					const unitId = (await Unit.getByName('Unit', conn)).id;
 					await new Meter(undefined, 'Meter 1', '1.1.1.1', true, true, Meter.type.MAMAC, 'TZ1', gps,
 						'Identified 1', 'notes 1', 10.0, true, true, '01:01:25', '05:05:05', 5.1, 7.3, 1, 'increasing', false,
 						1.0, '0001-01-01 23:59:59', '2020-07-02 01:00:10', unitId, unitId).insert(conn);
@@ -214,7 +214,6 @@ mocha.describe('meters API', () => {
 
 	mocha.it('returns details on a single meter by ID', async () => {
 		const conn = testDB.getConnection();
-		const unitId = (await Unit.getByName('Unit', conn)).id;
 		await new Meter(undefined, 'Meter 1', '1.1.1.1', true, true, Meter.type.MAMAC, 'TZ1', gps,
 			'Identified 1', 'notes 1', 10.0, true, true, '01:01:25', '05:05:05', 5.1, 7.3, 1, 'increasing', false,
 			1.0, '0001-01-01 23:59:59', '2020-07-02 01:00:10', unitId, unitId).insert(conn);
@@ -231,8 +230,7 @@ mocha.describe('meters API', () => {
 
 	mocha.it('responds appropriately when the meter in question does not exist', async () => {
 		const conn = testDB.getConnection();
-		const unitId = (await Unit.getByName('Unit', conn)).id;
-		const meter =  new Meter(undefined, 'Meter 1', '1.1.1.1', true, true, Meter.type.MAMAC, 'TZ1', gps,
+		const meter = new Meter(undefined, 'Meter 1', '1.1.1.1', true, true, Meter.type.MAMAC, 'TZ1', gps,
 			'Identified 1', 'notes 1', 10.0, true, true, '01:01:25', '05:05:05', 5.1, 7.3, 1, 'increasing', false,
 			1.0, '0001-01-01 23:59:59', '2020-07-02 01:00:10', unitId, unitId);
 		await meter.insert(conn);

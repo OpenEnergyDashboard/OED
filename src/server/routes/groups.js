@@ -198,6 +198,7 @@ router.post('/create', adminAuthenticator('create groups'), async (req, res) => 
 		try {
 			await conn.tx(async t => {
 				const newGPS = (req.body.gps) ? new Point(req.body.gps.longitude, req.body.gps.latitude) : null;
+				// TODO: pass arguments for units
 				const newGroup = new Group(
 					undefined,
 					req.body.name,
@@ -291,6 +292,7 @@ router.put('/edit', adminAuthenticator('edit groups'), async (req, res) => {
 
 			await conn.tx(async t => {
 				const newGPS = (req.body.gps) ? new Point(req.body.gps.longitude, req.body.gps.latitude) : null;
+				// TODO: pass arguments for units
 				const newGroup = new Group(
 					req.body.id,
 					req.body.name,
