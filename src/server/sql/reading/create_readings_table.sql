@@ -5,7 +5,7 @@
 -- create readings table
 CREATE TABLE IF NOT EXISTS readings (
   meter_id INT NOT NULL REFERENCES meters(id),
-  reading REAL NOT NULL,
+  reading FLOAT NOT NULL,
   start_timestamp TIMESTAMP NOT NULL,
 	end_timestamp TIMESTAMP NOT NULL,
 	CHECK (start_timestamp < readings.end_timestamp),
