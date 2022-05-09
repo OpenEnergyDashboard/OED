@@ -12,7 +12,7 @@ interface TooltipHelpProps {
 	version: string;
 	fetchVersionIfNeeded(): Promise<any>;
 }
-export default class TooltipHelpComponentAlternative extends React.Component<TooltipHelpProps> {
+export default class TooltipHelpComponent extends React.Component<TooltipHelpProps> {
 	constructor(props: TooltipHelpProps) {
 		super(props);
 		this.props.fetchVersionIfNeeded();

@@ -9,7 +9,7 @@ import { State } from '../types/redux/state';
 import { Dispatch } from '../types/redux/actions';
 
 /*
-* A container that does data fetching for TooltipHelpComponentAlternative and connects it to the redux store.
+* A container that does data fetching for TooltipHelpComponent and connects it to the redux store.
 */
 function mapStateToProps(state: State) {
 	return {
