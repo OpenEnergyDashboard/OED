@@ -28,6 +28,12 @@ export default class MenuModalComponent extends React.Component<MenuModalProps, 
 		this.state = { showModal: false };
 	}
 
+	public componentDidUpdate(){
+		if(!this.state.showModal){
+			ReactTooltip.hide();
+		}
+	}
+
 	public render(): React.ReactNode {
 		const inlineStyle: React.CSSProperties = {
 			display: 'inline',
@@ -45,7 +51,7 @@ export default class MenuModalComponent extends React.Component<MenuModalProps, 
 				<Button outline onClick={this.toggle}>
 					<FormattedMessage id='menu'/>
 				</Button>
-				<Modal isOpen={this.state.showModal} toggle={this.toggle} onOpened={ReactTooltip.rebuild}>
+				<Modal isOpen={this.state.showModal} toggle={this.toggle} onOpened={ReactTooltip.rebuild} onClick={() => ReactTooltip.hide()}>
 					<ModalHeader toggle={this.toggle}>
 						<FormattedMessage id='options' />
 					</ModalHeader>
@@ -66,6 +72,6 @@ export default class MenuModalComponent extends React.Component<MenuModalProps, 
 	}
 
 	private toggle() {
-		this.setState({ showModal: !this.state.showModal });
+		this.setState(prevState => ({ showModal: !prevState.showModal }));
 	}
 }

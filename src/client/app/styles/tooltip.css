@@ -3,5 +3,5 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
 
 .tip {
-   z-index:2001; /* This allows the tooltip to render on top of the modal whose z-index is by default 1000 ;*/
+   z-index:10000 !important; /* This allows the tooltip to render on top of the modal whose z-index is by default 1000 ;*/
 }
