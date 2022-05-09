@@ -174,8 +174,8 @@ class EditGroupsComponent extends React.Component<EditGroupsPropsWithIntl, EditG
 								<FormattedMessage id='displayable' />:
 							</p>
 							<Input type='select' value={this.state.groupDisplay.toString()} onChange={this.handleDisplayChange}>
-								<option value='true'> True </option>
-								<option value='false'> False </option>
+								<option value='true'> {translate('true') } </option>
+								<option value='false'> {translate('false') } </option>
 							</Input>
 						</div>
 						<div style={divBottomStyle} className='col-4'>
