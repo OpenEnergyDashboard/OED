@@ -26,6 +26,8 @@ module.exports = {
 		await db.none(sqlFile('../migrations/0.8.0-1.0.0/sql/cik/create_cik_table.sql'));
 		await db.none(sqlFile('../migrations/0.8.0-1.0.0/sql/readings/drop_old_views.sql'));
 		// Note that old views should be dropped before the reading's type is changed to float.
+		// It is also important that the creation of new views below is done after this because
+		// you cannot alter a type that is used in a view.
 		await db.none(sqlFile('../migrations/0.8.0-1.0.0/sql/readings/set_reading_to_float.sql'));
 		await db.none(sqlFile('../migrations/0.8.0-1.0.0/sql/readings/set_function_get_compare_readings_to_float.sql'));
 		await db.none(sqlFile('../migrations/0.8.0-1.0.0/sql/readings/create_reading_views.sql'));
