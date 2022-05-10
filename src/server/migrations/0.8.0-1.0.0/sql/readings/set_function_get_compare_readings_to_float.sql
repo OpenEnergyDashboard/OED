@@ -3,32 +3,6 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
 
 /*
-This shouldn't ever be looking at more than a few weeks of data, so we don't need to deal with compression.
- */
-
-/*
-TODO This functioin can probably be improved for two reasons:
-1) While it was noted that you don't look at too many days, it does limit its usage to modest time lengths.
-There has been thought to allowing comparisons, for example, or a whole year. It also assumes that the
-frequency of readings is not too high so the number of readings looked at could be large even over
-modest time frames.
-2) Readings are only included if they are within the current time period. This means that if you have
-a reading that crosses the timeframe they are excluded. This can be viewed as either a good thing or
-a bad thing. However, if the frequency of readings is high, then large segements of time can be excluded.
-For example, monthly readings would not be includes in either day, week or four week comparisons that
-OED currently does. Also note that the daily and hourly views do include readings that span a time frame
-so including them would be consistent.
-
-We need to think about how best to deal with this but one option is to use the daily and hourly tables
-to get the reading values as in done with bar graphs. This needs to be a little different since partial
-days can be invovled. However, getting the full days from the daily table and then the hours from the
-hourly table to be combined would solve this. (One could get the subhour from the raw readings but it is
-unclear users would want that.) Another consider is that the current system, as is the case for bar graphs,
-does not take into account missing times in readings which can lead to lower than expected values. The
-daily and hourly readings would help fix this.
-*/
-
-/*
 The following function returns data for plotting bacompare graphs. It works on meters.
 It should not be used on raw readings.
 It is the new version of compare_readings that works with units. It takes these parameters:
@@ -39,6 +13,11 @@ curr_end: When the current/this time period ends for the compare.
 shift: How far back in time to shift the curr_start and curr_end date/time to get the previous
 	times to compare.
  */
+
+-- This changes the signature of the function. It did not exist before version 1.0 but if
+-- someone has it then you have to drop before replace so doing to be safe.
+DROP FUNCTION meter_compare_readings_unit;
+ 
 CREATE OR REPLACE FUNCTION meter_compare_readings_unit (
 	meter_ids INTEGER[],
 	graphic_unit_id INTEGER,
@@ -118,6 +97,11 @@ curr_end: When the current/this time period ends for the compare.
 shift: How far back in time to shift the curr_start and curr_end date/time to get the previous
 	times to compare.
  */
+
+-- This changes the signature of the function. It did not exist before version 1.0 but if
+-- someone has it then you have to drop before replace so doing to be safe.
+DROP FUNCTION group_compare_readings_unit;
+
 CREATE OR REPLACE FUNCTION group_compare_readings_unit (
 	group_ids INTEGER[],
 	graphic_unit_id INTEGER,
