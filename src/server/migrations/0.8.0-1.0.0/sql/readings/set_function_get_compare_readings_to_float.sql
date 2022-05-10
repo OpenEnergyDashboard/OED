@@ -2,6 +2,17 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
 
+/*
+The following function returns data for plotting bacompare graphs. It works on meters.
+It should not be used on raw readings.
+It is the new version of compare_readings that works with units. It takes these parameters:
+meter_ids: A array of meter ids to query.
+graphic_unit_id: The unit id of the unit to use for the graph.
+curr_start: When the current/this time period begins for the compare.
+curr_end: When the current/this time period ends for the compare.
+shift: How far back in time to shift the curr_start and curr_end date/time to get the previous
+	times to compare.
+ */
 CREATE OR REPLACE FUNCTION meter_compare_readings_unit (
 	meter_ids INTEGER[],
 	graphic_unit_id INTEGER,
