@@ -11,7 +11,6 @@ const User = require('../../models/User');
 const bcrypt = require('bcryptjs');
 const Point = require('../../models/Point');
 const gps = new Point(90, 45);
-const moment = require('moment');
 
 function expectMetersToBeEquivalent(meters, length, offset) {
 	for (let i = 0; i < length; i++) {

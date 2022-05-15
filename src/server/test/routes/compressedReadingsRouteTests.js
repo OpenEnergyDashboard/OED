@@ -51,6 +51,8 @@ mocha.describe('Compressed readings routes', () => {
 		});
 
 		mocha.it('returns line readings correctly when called correctly', async () => {
+			// The moments in these tests all involve TimeInterval that converts to UTC
+			// and not the DB so okay to use local timezone.
 			const timeInterval = new TimeInterval(moment('2017-01-01'), moment('2017-01-02'));
 
 			const compressedReadingsStub = sinon.stub(Reading, 'getNewCompressedReadings');

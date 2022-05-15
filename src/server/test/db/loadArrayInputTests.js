@@ -26,8 +26,10 @@ mocha.describe('PIPELINE: Load data from array', () => {
 			meter.id,
 			row => {
 				const reading = row[0];
-				const endTimestamp = moment(row[1], 'HH:mm:ss MM/DD/YYYY');
-				const startTimestamp = moment(endTimestamp).subtract(readingDuration, 'minute');
+				// Need to work in UTC time since that is what the database returns and comparing
+				// to database values. Done in all moment objects in this test.
+				const endTimestamp = moment.utc(row[1], 'HH:mm:ss MM/DD/YYYY');
+				const startTimestamp = moment.utc(endTimestamp).subtract(readingDuration, 'minute');
 				return [reading, startTimestamp, endTimestamp];
 			},
 			'increasing',
@@ -48,8 +50,8 @@ mocha.describe('PIPELINE: Load data from array', () => {
 		result.map(reading => {
 			expect(reading.meterID).to.equal(meter.id);
 			expect(reading.reading).to.equal(arrayInput[i][0]);
-			expect(reading.endTimestamp.format()).to.equal(moment(arrayInput[i][1], 'HH:mm:ss MM/DD/YYYY').format());
-			expect(reading.startTimestamp.format()).to.equal((moment(arrayInput[i][1], 'HH:mm:ss MM/DD/YYYY').subtract(readingDuration, 'minute')).format());
+			expect(reading.endTimestamp.format()).to.equal(moment.utc(arrayInput[i][1], 'HH:mm:ss MM/DD/YYYY').format());
+			expect(reading.startTimestamp.format()).to.equal((moment.utc(arrayInput[i][1], 'HH:mm:ss MM/DD/YYYY').subtract(readingDuration, 'minute')).format());
 			++i;
 		});
 	});

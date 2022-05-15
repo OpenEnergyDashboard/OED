@@ -13,6 +13,7 @@ const { TimeInterval } = require('../../common/TimeInterval');
 
 mocha.describe('Time Intervals', () => {
 	mocha.it('can be created', async () => {
+		// moment okay since set to UTC.
 		const start = moment('1970-01-01T00:01:00Z');
 		const end = moment('2069-12-31T00:01:00Z');
 		const ti = new TimeInterval(start, end);

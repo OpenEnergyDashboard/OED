@@ -107,8 +107,9 @@ function mapStateToProps(state: State) {
 								size.push(0);
 							} else {
 								// Shift to UTC since want database time not local/browser time which is what moment does.
+								// We need to subtract one day from the end since it is midnight of the next day.
 								timeReading =
-								`${moment(mapReading.startTimestamp).utc().format('ll')} - ${moment(mapReading.endTimestamp).subtract(1, 'days').utc().format('ll')}`;
+								`${moment.utc(mapReading.startTimestamp).format('ll')} - ${moment.utc(mapReading.endTimestamp).subtract(1, 'days').format('ll')}`;
 								// The value for the circle is the average daily usage.
 								averagedReading = mapReading.reading / barDuration.asDays();
 								// The size is the reading value. It will be scaled later.
@@ -164,8 +165,9 @@ function mapStateToProps(state: State) {
 								size.push(0);
 							} else {
 								// Shift to UTC since want database time not local/browser time which is what moment does.
+								// We need to subtract one day from the end since it is midnight of the next day.
 								timeReading =
-								`${moment(mapReading.startTimestamp).utc().format('ll')} - ${moment(mapReading.endTimestamp).subtract(1, 'days').utc().format('ll')}`;
+								`${moment.utc(mapReading.startTimestamp).format('ll')} - ${moment.utc(mapReading.endTimestamp).subtract(1, 'days').format('ll')}`;
 								// The value for the circle is the average daily usage.
 								averagedReading = mapReading.reading / barDuration.asDays();
 								// The size is the reading value. It will be scaled later.

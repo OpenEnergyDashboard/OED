@@ -34,10 +34,12 @@ class Meter {
 	 * @param startTimestamp Start timestamp of last reading input for this meter, default '1970-01-01 00:00:00'
 	 * @param endTimestamp  End timestamp of last reading input for this meter, '1970-01-01 00:00:00' 
 	 */
+	// The start/end timestamps are the default start/end timestamps that are set to the first
+	// day of time in moment. As always, we want to use UTC.
 	constructor(id, name, ipAddress, enabled, displayable, type, meterTimezone, gps = undefined, identifier = name, note, area,
 		cumulative = false, cumulativeReset = false, cumulativeResetStart = '00:00:00', cumulativeResetEnd = '23:59:59.999999',
 		readingGap = 0, readingVariation = 0, readingDuplication = 1, timeSort = 'increasing', endOnlyTime = false,
-		reading = 0.0, startTimestamp = moment(0), endTimestamp = moment(0)) {
+		reading = 0.0, startTimestamp = moment(0).utc(), endTimestamp = moment(0).utc()) {
 		// In order for the CSV pipeline to work, the order of the parameters needs to match the order that the fields are declared.
 		// In addition, each new parameter has to be added at the very end.
 		this.id = id;

@@ -13,7 +13,9 @@ function expectConfigfilesToBeEquivalent(expected, actual) {
 	expect(actual).to.have.property('serialId', expected.serialId);
 	expect(actual).to.have.property('modbusId', expected.modbusId);
 	expect(actual).to.have.property('created');
-	expect(actual.created.toISOString()).to.equal(expected.created.toISOString());
+	// For reasons that are not understood, toISOString returns different values for the seemingly same time
+	// so use moment.format instead.
+	expect(actual.created.format('YYYY-MM-DD HH:mm:ss.sssZ')).to.equal(expected.created.format('YYYY-MM-DD HH:mm:ss.sssZ'));
 	expect(actual).to.have.property('hash', expected.hash);
 	expect(actual).to.have.property('contents', expected.contents);
 	expect(actual).to.have.property('processed', expected.processed);

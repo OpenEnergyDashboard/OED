@@ -30,13 +30,24 @@ function mapStateToProps(state: State, ownProps: CompareChartContainerProps): an
 	// Get the time shift for this comparison as a moment duration
 	const compareShift = calculateCompareShift(comparePeriod);
 	// The start and end of this time period. Need to create new moment objects since subtraction mutates the original.
+	// Only do to start of the hour since OED is using hourly data so fractions of an hour are not given.
+	// The start time is always midnight so this is not really needed but do to be safe.
 	// It isn't known why you must start from a string to get timezone aware dates but it seems needed.
-	// There might be a better way to do this.
-	// Use UTC timezone to avoid timezone issues.
-	const thisStartTime = moment(state.graph.compareTimeInterval.getStartTimestamp().toString()).utc();
+	// There might be a better way to do this. This is similar to the code used elsewhere where we get the
+	// date and time followed by an offset of +00:00 so it is UTC. We then create moment in UTC so it preserves
+	// the correct time.
+	// If you don't use the string then if you have a meter, add a group and then change the compare interval, it will
+	// shift the dates backward by full week(s). One possible explanation is that moment stores the moment used when creating
+	// a new moment and this same included moment is used for both the meter and group. Since moment allows modification of a
+	// moment object, it may be that they are interacting. Having said this, I could not pin this down and fix it by avoiding it.
+	// Thus, this may not be the reason but for now it is fixed as indicated.
+	// getStartTimestamp() and getEndTimestamp() should return a moment object in UTC so it is fine to use. It could only be
+	// null if it is unbounded but that should never happen with a compare interval.
+	const thisStartTime = moment.utc(state.graph.compareTimeInterval.getStartTimestamp().format('YYYY-MM-DD HH:mm:ss') + '+00:00');
 	// Only do to start of the hour since OED is using hourly data so fractions of an hour are not given.
 	// The start time is always midnight so this is not needed.
-	const thisEndTime = moment(state.graph.compareTimeInterval.getEndTimestamp().startOf('hour').toString()).utc();
+	const thisEndTime = moment.utc(state.graph.compareTimeInterval.getEndTimestamp().startOf('hour').format('YYYY-MM-DD HH:mm:ss') + '+00:00');
+
 	// The desired label times for this interval that is internationalized and shows day of week, date and time with hours.
 	const thisStartTimeLabel: string = thisStartTime.format('llll');
 	const thisEndTimeLabel: string = thisEndTime.format('llll');
@@ -73,8 +84,8 @@ function mapStateToProps(state: State, ownProps: CompareChartContainerProps): an
 			],
 			hoverinfo: 'text',
 			type: 'bar',
-			marker: {color: barColor},
-			text: [ `<b>${previousPeriod} kWh</b>`, `<b>${currentPeriod} kWh</b>`],
+			marker: { color: barColor },
+			text: [`<b>${previousPeriod} kWh</b>`, `<b>${currentPeriod} kWh</b>`],
 			textposition: 'auto',
 			textfont: {
 				color: 'rgba(0,0,0,1)'
