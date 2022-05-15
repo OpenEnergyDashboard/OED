@@ -14,6 +14,7 @@ import * as _ from 'lodash';
 import getGraphColor from '../utils/getGraphColor';
 import Locales from '../types/locales';
 import { DataType } from '../types/Datasources';
+import translate from '../utils/translate'
 
 function mapStateToProps(state: State) {
 	// Map to use.
@@ -229,7 +230,7 @@ function mapStateToProps(state: State) {
 	const layout: any = {
 		// Either the actual map name or text to say it is not available.
 		title: {
-			text: (map) ? map.name : 'There\'s not an available map'
+			text: (map) ? map.name : `<b> ${translate('no.available.map')} </b>`
 		},
 		width: 1000,
 		height: 1000,

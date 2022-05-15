@@ -48,7 +48,7 @@ export default function MultiCompareChartComponent(props: MultiCompareChartProps
 			</div>
 			{props.selectedCompareEntities.length === 0 &&
 				<div className='text-center' style={centeredStyle}>
-					<FormattedMessage id='empty.compare' />
+					<b><FormattedMessage id='empty.compare' /> </b>
 				</div>
 			}
 		</div>
