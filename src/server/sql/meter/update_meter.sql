@@ -24,5 +24,6 @@ UPDATE meters
 		end_only_time = ${endOnlyTime},
 		reading = ${reading},
 		start_timestamp = ${startTimestamp},
-		end_timestamp = ${endTimestamp}
+		end_timestamp = ${endTimestamp},
+		previous_end = ${previousEnd}
 	WHERE id = ${id};

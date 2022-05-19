@@ -13,7 +13,7 @@ function expectConfigfilesToBeEquivalent(expected, actual) {
 	expect(actual).to.have.property('serialId', expected.serialId);
 	expect(actual).to.have.property('modbusId', expected.modbusId);
 	expect(actual).to.have.property('created');
-	expect(actual.created.toISOString()).to.equal(expected.created.toISOString());
+	expect(actual.created.format('YYYY-MM-DD HH:mm:ssZ')).to.equal(expected.created.format('YYYY-MM-DD HH:mm:ssZ'));
 	expect(actual).to.have.property('hash', expected.hash);
 	expect(actual).to.have.property('contents', expected.contents);
 	expect(actual).to.have.property('processed', expected.processed);

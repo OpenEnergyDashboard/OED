@@ -46,7 +46,8 @@ function formatMeterForResponse(meter, loggedInAsAdmin) {
 		endOnlyTime : null,
 		reading : null,
 		startTimestamp : null,
-		endTimestamp : null
+		endTimestamp : null,
+		previousEnd : null
 	};
 
 	// Only logged in Admins can see url, types, timezones, and internal names
@@ -69,9 +70,10 @@ function formatMeterForResponse(meter, loggedInAsAdmin) {
 		formattedMeter.reading = meter.reading;
 		formattedMeter.startTimestamp = meter.startTimestamp;
 		formattedMeter.endTimestamp = meter.endTimestamp;
+		formattedMeter.previousEnd = meter.previousEnd;
 	}
 
-	// TODO: remove this line when usages of meter.name are replaced with meter.identifer
+	// TODO: remove this line when usages of meter.name are replaced with meter.identifier
 	// Without this, things will break for non-logged in users because we currently rely on
 	// the internal name being available. As noted in #605, the intent is to not send the
 	// name to a user if they are not logged in.

@@ -88,7 +88,7 @@ mocha.describe('csv API', () => {
 			expect(res).to.have.status(200);
 			const readings = await Reading.getAllByMeterID(meter.id, conn);
 			const extractedReadings = readings.map(reading => {
-				return [`${reading.reading}`, reading.startTimestamp._i, reading.endTimestamp._i];
+				return [`${reading.reading}`, reading.startTimestamp.format('YYYY-MM-DD HH:mm:ss'), reading.endTimestamp.format('YYYY-MM-DD HH:mm:ss')];
 			});
 			const fileReadings = await parseCsv(readingsBuffer);
 			expect(extractedReadings).to.deep.equals(fileReadings);
@@ -107,7 +107,7 @@ mocha.describe('csv API', () => {
 			const meter = await Meter.getByName('ABG', conn);
 			const readings = await Reading.getAllByMeterID(meter.id, conn);
 			const extractedReadings = readings.map(reading => {
-				return [`${reading.reading}`, reading.startTimestamp._i, reading.endTimestamp._i];
+				return [`${reading.reading}`, reading.startTimestamp.format('YYYY-MM-DD HH:mm:ss'), reading.endTimestamp.format('YYYY-MM-DD HH:mm:ss')];
 			});
 			const fileReadings = await parseCsv(readingsBuffer);
 			expect(extractedReadings).to.deep.equals(fileReadings);
@@ -169,7 +169,7 @@ mocha.describe('csv API', () => {
 			expect(res).to.have.status(200);
 			const readings = await Reading.getAllByMeterID(meter.id, conn);
 			const extractedReadings = readings.map(reading => {
-				return [`${reading.reading}`, reading.startTimestamp._i, reading.endTimestamp._i];
+				return [`${reading.reading}`, reading.startTimestamp.format('YYYY-MM-DD HH:mm:ss'), reading.endTimestamp.format('YYYY-MM-DD HH:mm:ss')];
 			});
 			const fileReadings = await parseCsv(readingsBuffer);
 			expect(extractedReadings).to.deep.equals(fileReadings);
@@ -186,7 +186,7 @@ mocha.describe('csv API', () => {
 			const meter = await Meter.getByName('ABG', conn);
 			const readings = await Reading.getAllByMeterID(meter.id, conn);
 			const extractedReadings = readings.map(reading => {
-				return [`${reading.reading}`, reading.startTimestamp._i, reading.endTimestamp._i];
+				return [`${reading.reading}`, reading.startTimestamp.format('YYYY-MM-DD HH:mm:ss'), reading.endTimestamp.format('YYYY-MM-DD HH:mm:ss')];
 			});
 			const fileReadings = await parseCsv(readingsBuffer);
 			expect(extractedReadings).to.deep.equals(fileReadings);
