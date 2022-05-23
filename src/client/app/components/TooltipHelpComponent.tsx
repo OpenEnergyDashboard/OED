@@ -6,6 +6,7 @@ import * as React from 'react';
 import { FormattedMessage } from 'react-intl';
 import ReactTooltip from 'react-tooltip';
 import '../styles/tooltip.css';
+import translate from '../utils/translate';
 
 interface TooltipHelpProps {
 	page: string; // Specifies which page the tip is in.
@@ -89,7 +90,7 @@ export default class TooltipHelpComponent extends React.Component<TooltipHelpPro
 						Object.keys(values).forEach(key => {
 							const link = values[key];
 							links[key] = version ? (<a target='_blank' rel='noopener noreferrer' href={link}>
-								here
+								{translate('here')}
 							</a>
 							) : <>...</>;
 							// TODO: Provide default link when there are issues fetching version number
