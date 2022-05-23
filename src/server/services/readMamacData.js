@@ -17,8 +17,11 @@ function parseTimestamp(raw, line) {
 	if (!timestampRegExp.test(raw)) {
 		throw new Error(`CSV line ${line}: Raw timestamp ${raw} does not pass regex validation`);
 	}
-	// Set moment to strict mode so bad values are noticed.
-	const ts = moment(raw, 'HH:mm:ss MM/DD/YY', true);
+	// moment cannot be set to strict mode since it fails. However, the expected format is given so
+	// it should do a good test.
+	// MAMAC meters do not send a timezone so we parse the string directly and it is interpreted
+	// as UTC which is what we want and parseZone does not shift the time.
+	const ts = moment.parseZone(raw, 'HH:mm:ss MM/DD/YY')
 	// This check should be done in pipeline but leave here for now/historical reasons. Note in pipeline check if
 	// format() value is Invalid date.
 	if (!ts.isValid()) {

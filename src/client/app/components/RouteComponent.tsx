@@ -267,6 +267,7 @@ export default class RouteComponent extends React.Component<RouteProps> {
 	// private getNewIntervalFromMessage(message: string) {
 	// 	const numDays = parseInt(message);
 	//
+	// If we ever use this code we might need to fix up moment for UTC as elsewhere in the code.
 	// 	const current = moment();
 	// 	const newMinTimeStamp = current.clone();
 	// 	newMinTimeStamp.subtract(numDays, 'days');

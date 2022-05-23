@@ -83,8 +83,9 @@ function createRouter() {
 			return;
 		}
 		const meterIDs = req.params.meter_ids.split(',').map(id => parseInt(id));
-		const currStart = moment(req.query.curr_start);
-		const currEnd = moment(req.query.curr_end);
+		// The string sent should set the timezone to UTC so honor that as OED uses UTC.
+		const currStart = moment.parseZone(req.query.curr_start, undefined, true);
+		const currEnd = moment.parseZone(req.query.curr_end, undefined, true);
 		const shift = moment.duration(req.query.shift);
 		res.json(await meterCompareReadings(meterIDs, currStart, currEnd, shift));
 	});
@@ -96,8 +97,9 @@ function createRouter() {
 		}
 		const conn = getConnection();
 		const groupIDs = req.params.group_ids.split(',').map(id => parseInt(id));
-		const currStart = moment(req.query.curr_start);
-		const currEnd = moment(req.query.curr_end);
+		// The string sent should set the timezone to UTC so honor that as OED uses UTC.
+		const currStart = moment.parseZone(req.query.curr_start, undefined, true);
+		const currEnd = moment.parseZone(req.query.curr_end, undefined, true);
 		const shift = moment.duration(req.query.shift);
 		res.json(await groupCompareReadings(groupIDs, currStart, currEnd, shift, conn));
 	});

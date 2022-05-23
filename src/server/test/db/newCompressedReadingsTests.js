@@ -19,7 +19,9 @@ mocha.describe('Compressed Readings 2', () => {
 
 	mocha.describe('Compressed meter readings', () => {
 		let meter;
-		const timestamp1 = moment('2017-01-01');
+		// Need to work in UTC time since that is what the database returns and comparing
+		// to database values. Done in all moment objects in this test.
+		const timestamp1 = moment.utc('2017-01-01');
 		const timestamp2 = timestamp1.clone().add(1, 'hour');
 		const timestamp3 = timestamp2.clone().add(1, 'hour');
 		const timestamp4 = timestamp3.clone().add(1, 'hour');
@@ -67,7 +69,7 @@ mocha.describe('Compressed Readings 2', () => {
 
 		mocha.it('Compresses when raw data overlaps compressed ranges badly', async () => {
 			const conn = testDB.getConnection();
-			const startOfDay = moment('2018-01-01');
+			const startOfDay = moment.utc('2018-01-01');
 			const halfHourBefore = startOfDay.clone().subtract(30, 'minutes');
 			const halfHourAfter = startOfDay.clone().add(30, 'minutes');
 			await Reading.insertAll([
@@ -85,8 +87,8 @@ mocha.describe('Compressed Readings 2', () => {
 		});
 
 		mocha.it('Compresses two readings of unequal length that are not fully contained in an interval', async () => {
-			const day1Start = moment('2018-01-01');
-			const day2Start = moment('2018-01-02');
+			const day1Start = moment.utc('2018-01-01');
+			const day2Start = moment.utc('2018-01-02');
 
 			const conn = testDB.getConnection();
 			await Reading.insertAll([
@@ -110,7 +112,7 @@ mocha.describe('Compressed Readings 2', () => {
 		});
 
 		mocha.it('Works correctly in Reading.getNewCompressedReadings()', async () => {
-			const dayStart = moment('2018-01-01');
+			const dayStart = moment.utc('2018-01-01');
 			const dayEnd = dayStart.clone().add(1, 'day');
 
 			const conn = testDB.getConnection();
@@ -138,7 +140,7 @@ mocha.describe('Compressed Readings 2', () => {
 		});
 
 		mocha.it('Retrieves the correct number of readings when asked for a short interval', async () => {
-			const dayStart = moment('2018-01-01');
+			const dayStart = moment.utc('2018-01-01');
 			const dayEnd = dayStart.clone().add(15, 'minute');
 
 			const conn = testDB.getConnection();
@@ -154,11 +156,11 @@ mocha.describe('Compressed Readings 2', () => {
 			const meterReadings = await Reading.getNewCompressedReadings([meter.id], dayStart, dayStart.clone().add(15, 'minute'), conn);
 
 			expect(meterReadings[meter.id].length).to.equal(1);
-			expect(meterReadings[meter.id][0].reading_rate).to.equal(100 / (15/60));
+			expect(meterReadings[meter.id][0].reading_rate).to.equal(100 / (15 / 60));
 		});
 
 		mocha.it('Retrieves the correct number of readings when asked for a long interval', async () => {
-			const dayStart = moment('2018-01-01');
+			const dayStart = moment.utc('2018-01-01');
 			const dayEnd = dayStart.clone().add(15, 'minute');
 
 			const conn = testDB.getConnection();
@@ -173,11 +175,11 @@ mocha.describe('Compressed Readings 2', () => {
 
 			const meterReadings = await Reading.getNewCompressedReadings([meter.id], dayStart, dayStart.clone().add(1, 'hours').toString(), conn);
 			expect(meterReadings[meter.id].length).to.equal(1);
-			expect(meterReadings[meter.id][0].reading_rate).to.equal(100 / (15/60));
+			expect(meterReadings[meter.id][0].reading_rate).to.equal(100 / (15 / 60));
 		});
 
 		mocha.it('Retrieves the correct type of readings when asked for an hour-resolution interval', async () => {
-			const yearStart = moment('2018-01-01');
+			const yearStart = moment.utc('2018-01-01');
 			const yearEnd = yearStart.clone().add(15, 'minute');
 
 			const conn = testDB.getConnection();
@@ -193,10 +195,10 @@ mocha.describe('Compressed Readings 2', () => {
 			const meterReadings = allReadings[meter.id];
 
 			expect(meterReadings.length).to.equal(1);
-			expect(meterReadings[0].reading_rate).to.equal(100 / (15/60));
+			expect(meterReadings[0].reading_rate).to.equal(100 / (15 / 60));
 		});
 		mocha.it('Retrieves the correct type of readings when asked for a day-resolution interval', async () => {
-			const yearStart = moment('2018-01-01');
+			const yearStart = moment.utc('2018-01-01');
 			const yearEnd = yearStart.clone().add(15, 'minute');
 
 			const conn = testDB.getConnection();
@@ -208,7 +210,7 @@ mocha.describe('Compressed Readings 2', () => {
 			const allReadings = await Reading.getNewCompressedReadings([meter.id], yearStart, yearStart.clone().add(60, 'days'), conn);
 			const meterReadings = allReadings[meter.id];
 			expect(meterReadings.length).to.equal(1);
-			expect(meterReadings[0].reading_rate).to.equal(100 / (15/60));
+			expect(meterReadings[0].reading_rate).to.equal(100 / (15 / 60));
 		});
 
 		mocha.describe('Compression for underlying 15-minute data:', () => {
@@ -216,11 +218,11 @@ mocha.describe('Compressed Readings 2', () => {
 			const startDate = '2020-01-01 00:00:00';
 			const endDate = '2020-04-01 00:00:00';
 			mocha.beforeEach(async function () {
-				this.timeout(10000); // extend timeout because refreshes take a longer time.
+				this.timeout(20000); // extend timeout because refreshes take a longer time.
 				const conn = testDB.getConnection();
 				await new Meter(undefined, 'Meter1', null, false, true, Meter.type.MAMAC, null, gps).insert(conn);
 				meter1 = await Meter.getByName('Meter1', conn);
-				const data = generateSineData(startDate, endDate, { timeStep: { minute: 15 }}).map(row => new Reading(meter1.id, row[0], row[1], row[2]));
+				const data = generateSineData(startDate, endDate, { timeStep: { minute: 15 } }).map(row => new Reading(meter1.id, row[0], row[1], row[2]));
 				await Reading.insertAll(data, conn);
 				await Reading.refreshCompressedReadings(conn);
 
@@ -229,24 +231,24 @@ mocha.describe('Compressed Readings 2', () => {
 			});
 
 			mocha.it('Daily resolution:', async () => {
-				const start = moment(startDate);
-				const end = moment(startDate).clone();
+				const start = moment.utc(startDate);
+				const end = moment.utc(startDate).clone();
 				end.add(61, 'days');
 				const allReadings = await Reading.getNewCompressedReadings([meter1.id], start, end, conn);
 				expect(allReadings['2'].length).to.greaterThan(61); // more data will be returned because of shift down to the hour view.
-			}) //.timeout(10000);
+			})
 
 			mocha.it('Hour resolution', async () => {
-				const start = moment(startDate);
-				const end = moment(startDate).clone();
+				const start = moment.utc(startDate);
+				const end = moment.utc(startDate).clone();
 				end.add(61, 'days');
 				const allReadings = await Reading.getNewCompressedReadings([meter1.id], start, end, conn);
 				expect(allReadings['2'].length).to.equal(24 * 61);
 			});
 
 			mocha.it('Raw resolution', async () => {
-				const start = moment(startDate);
-				const end = moment(startDate).clone();
+				const start = moment.utc(startDate);
+				const end = moment.utc(startDate).clone();
 				end.add(14, 'days');
 				const allReadings = await Reading.getNewCompressedReadings([meter1.id], start, end, conn);
 				const hourToRawScaleFactor = 4; // This is four since there are four 15-minute intervals in one hour.
@@ -259,11 +261,11 @@ mocha.describe('Compressed Readings 2', () => {
 			const startDate = '2020-01-01 00:00:00';
 			const endDate = '2020-04-01 00:00:00';
 			mocha.beforeEach(async function () {
-				this.timeout(5000); // extend timeout because refreshes take a longer time.
+				this.timeout(20000); // extend timeout because refreshes take a longer time.
 				const conn = testDB.getConnection();
 				await new Meter(undefined, 'Meter1', null, false, true, Meter.type.MAMAC, null, gps).insert(conn);
 				meter1 = await Meter.getByName('Meter1', conn);
-				const data = generateSineData(startDate, endDate, { timeStep: { minute: 23 }}).map(row => new Reading(meter1.id, row[0], row[1], row[2]));
+				const data = generateSineData(startDate, endDate, { timeStep: { minute: 23 } }).map(row => new Reading(meter1.id, row[0], row[1], row[2]));
 				await Reading.insertAll(data, conn);
 				await Reading.refreshCompressedReadings(conn);
 
@@ -272,24 +274,24 @@ mocha.describe('Compressed Readings 2', () => {
 			});
 
 			mocha.it('Daily resolution:', async () => {
-				const start = moment(startDate);
-				const end = moment(startDate).clone();
+				const start = moment.utc(startDate);
+				const end = moment.utc(startDate).clone();
 				end.add(61, 'days');
 				const allReadings = await Reading.getNewCompressedReadings([meter1.id], start, end, conn);
 				expect(allReadings['2'].length).to.greaterThan(61); // more data will be returned because of shift down to the hour view.
 			});
 
 			mocha.it('Hour resolution', async () => {
-				const start = moment(startDate);
-				const end = moment(startDate).clone();
+				const start = moment.utc(startDate);
+				const end = moment.utc(startDate).clone();
 				end.add(61, 'days');
 				const allReadings = await Reading.getNewCompressedReadings([meter1.id], start, end, conn);
 				expect(allReadings['2'].length).to.equal(24 * 61);
 			});
 
 			mocha.it('Raw resolution', async () => {
-				const start = moment(startDate);
-				const end = moment(startDate).clone();
+				const start = moment.utc(startDate);
+				const end = moment.utc(startDate).clone();
 				end.add(14, 'days');
 				const allReadings = await Reading.getNewCompressedReadings([meter1.id], start, end, conn);
 				const hourToRawScaleFactor = 1 / (moment.duration('00:23:00').asHours()); // The number of 23-minute intervals in one hour.
@@ -299,7 +301,7 @@ mocha.describe('Compressed Readings 2', () => {
 
 		mocha.it('Correctly shrinks infinite intervals', async () => {
 			// TODO: Test infinite range with bounded timestamp to ensure proper shrink
-			const yearStart = moment('2018-01-01');
+			const yearStart = moment.utc('2018-01-01');
 			const yearEnd = yearStart.clone().add(1, 'year');
 
 			const conn = testDB.getConnection();
@@ -338,7 +340,7 @@ mocha.describe('Compressed Readings 2', () => {
 		});
 
 		mocha.it('Compresses readings across meters for the same group', async () => {
-			const startOfDay = moment('2018-01-01');
+			const startOfDay = moment.utc('2018-01-01');
 
 			const conn = testDB.getConnection();
 			// Each meter gets a reading. Meter1 is at 100 kw, Meter2 is at 200.
@@ -365,7 +367,7 @@ mocha.describe('Compressed Readings 2', () => {
 		});
 
 		mocha.it('Compresses when two groups have different meters', async () => {
-			const startOfDay = moment('2018-01-01');
+			const startOfDay = moment.utc('2018-01-01');
 
 			const conn = testDB.getConnection();
 			// Each meter gets a reading. Meter1 is at 100 kw, Meter2 is at 200.
@@ -397,7 +399,7 @@ mocha.describe('Compressed Readings 2', () => {
 	mocha.describe('Compressed meter barchart readings', () => {
 		let meter;
 		let meter2;
-		const timestamp1 = moment('2017-01-01');
+		const timestamp1 = moment.utc('2017-01-01');
 		const timestamp2 = timestamp1.clone().add(1, 'day');
 		const timestamp3 = timestamp2.clone().add(1, 'day');
 		const timestamp4 = timestamp3.clone().add(1, 'day');
@@ -424,14 +426,14 @@ mocha.describe('Compressed Readings 2', () => {
 			expect(barReadings).to.have.keys([meter.id.toString()]);
 			const readingsForMeter = barReadings[meter.id];
 			const readingsForMeterComparable = readingsForMeter.map(
-				({reading, start_timestamp, end_timestamp}) => ({ reading, start_timestamp: start_timestamp.valueOf(), end_timestamp: end_timestamp.valueOf()})
+				({ reading, start_timestamp, end_timestamp }) => ({ reading, start_timestamp: start_timestamp.valueOf(), end_timestamp: end_timestamp.valueOf() })
 			);
 
 			expect(readingsForMeterComparable).to.deep.equal([
-				{reading: 100, start_timestamp: timestamp1.valueOf(), end_timestamp: timestamp2.valueOf()},
-				{reading: 200, start_timestamp: timestamp2.valueOf(), end_timestamp: timestamp3.valueOf()},
-				{reading: 300, start_timestamp: timestamp3.valueOf(), end_timestamp: timestamp4.valueOf()},
-				{reading: 400, start_timestamp: timestamp4.valueOf(), end_timestamp: timestamp5.valueOf()}
+				{ reading: 100, start_timestamp: timestamp1.valueOf(), end_timestamp: timestamp2.valueOf() },
+				{ reading: 200, start_timestamp: timestamp2.valueOf(), end_timestamp: timestamp3.valueOf() },
+				{ reading: 300, start_timestamp: timestamp3.valueOf(), end_timestamp: timestamp4.valueOf() },
+				{ reading: 400, start_timestamp: timestamp4.valueOf(), end_timestamp: timestamp5.valueOf() }
 			]);
 		});
 
@@ -449,11 +451,11 @@ mocha.describe('Compressed Readings 2', () => {
 			expect(barReadings).to.have.keys([meter.id.toString()]);
 			const readingsForMeter = barReadings[meter.id];
 			const readingsForMeterComparable = readingsForMeter.map(
-				({reading, start_timestamp, end_timestamp}) => ({ reading, start_timestamp: start_timestamp.valueOf(), end_timestamp: end_timestamp.valueOf()})
+				({ reading, start_timestamp, end_timestamp }) => ({ reading, start_timestamp: start_timestamp.valueOf(), end_timestamp: end_timestamp.valueOf() })
 			);
 			expect(readingsForMeterComparable).to.deep.equal([
-				{reading: 300, start_timestamp: timestamp1.valueOf(), end_timestamp: timestamp3.valueOf()},
-				{reading: 700, start_timestamp: timestamp3.valueOf(), end_timestamp: timestamp5.valueOf()}
+				{ reading: 300, start_timestamp: timestamp1.valueOf(), end_timestamp: timestamp3.valueOf() },
+				{ reading: 700, start_timestamp: timestamp3.valueOf(), end_timestamp: timestamp5.valueOf() }
 			]);
 		});
 
@@ -467,16 +469,16 @@ mocha.describe('Compressed Readings 2', () => {
 			const barReadings = await Reading.getNewCompressedBarchartReadings([meter.id, meter2.id], timestamp1, timestamp2, 1, conn);
 			expect(barReadings).to.have.keys([meter.id.toString(), meter2.id.toString()]);
 			const readingsForMeterComparable = barReadings[meter.id].map(
-				({reading, start_timestamp, end_timestamp}) => ({ reading, start_timestamp: start_timestamp.valueOf(), end_timestamp: end_timestamp.valueOf()})
+				({ reading, start_timestamp, end_timestamp }) => ({ reading, start_timestamp: start_timestamp.valueOf(), end_timestamp: end_timestamp.valueOf() })
 			);
 			const readingsForMeter2Comparable = barReadings[meter2.id].map(
-				({reading, start_timestamp, end_timestamp}) => ({ reading, start_timestamp: start_timestamp.valueOf(), end_timestamp: end_timestamp.valueOf()})
+				({ reading, start_timestamp, end_timestamp }) => ({ reading, start_timestamp: start_timestamp.valueOf(), end_timestamp: end_timestamp.valueOf() })
 			);
 			expect(readingsForMeterComparable).to.deep.equal([
-				{reading: 100, start_timestamp: timestamp1.valueOf(), end_timestamp: timestamp2.valueOf()}
+				{ reading: 100, start_timestamp: timestamp1.valueOf(), end_timestamp: timestamp2.valueOf() }
 			]);
 			expect(readingsForMeter2Comparable).to.deep.equal([
-				{reading: 1, start_timestamp: timestamp1.valueOf(), end_timestamp: timestamp2.valueOf()}
+				{ reading: 1, start_timestamp: timestamp1.valueOf(), end_timestamp: timestamp2.valueOf() }
 			]);
 		});
 	});

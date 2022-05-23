@@ -158,6 +158,7 @@ router.get('/line/raw/meters/:meter_ids', async (req, res) => {
 				rawReadings.map(ele => {
 					delete ele.meterID;
 					ele.label = meterLabel;
+					// The Reading function to get items from the databases returns the moment in UTC so this is okay without forcing it.
 					ele.startTimestamp = moment(ele.startTimestamp).format('dddd LL LTS').replace(/,/g, ''); // use regex to omit pesky commas
 					ele.endTimestamp = moment(ele.endTimestamp).format('dddd LL LTS').replace(/,/g, ''); // use regex to omit pesky commas
 					toReturn.push(ele);

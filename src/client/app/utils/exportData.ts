@@ -5,8 +5,9 @@
 import { ExportDataSet, RawReadings } from '../types/readings';
 import { hasToken } from './token';
 import { usersApi } from '../utils/api'
-import * as moment from 'moment-timezone';
+import * as moment from 'moment';
 import { UserRole } from '../types/items';
+import translate from './translate';
 
 /**
  * Function to converts the compressed meter data into a CSV formatted string.
@@ -21,8 +22,9 @@ function convertToCSV(items: ExportDataSet[]) {
 		const label = set.label;
 		data.forEach(reading => {
 			const info = reading.y;
-			const startTimeStamp = moment(reading.x).utc().format('dddd LL LTS').replace(/,/g, ''); // use regex to omit pesky commas
-			const endTimeStamp = moment(reading.z).utc().format('dddd LL LTS').replace(/,/g, '');
+			// Why UTC is needed here has not been carefully analyzed.
+			const startTimeStamp = moment.utc(reading.x).format('dddd LL LTS').replace(/,/g, ''); // use regex to omit pesky commas
+			const endTimeStamp = moment.utc(reading.z).format('dddd LL LTS').replace(/,/g, '');
 			csvOutput += `"${label}",${info},${startTimeStamp},${endTimeStamp}\n`; // TODO: add column for units
 		});
 	});
@@ -65,9 +67,14 @@ export default function graphExport(dataSets: ExportDataSet[], name: string) {
 // below comment should be removed when we either remove defaultLanguage or implement it into the following function
 /* eslint-disable @typescript-eslint/no-unused-vars */
 export function downloadRawCSV(items: RawReadings[], defaultLanguage: string) {
-	// note that utc() is not needed
 	let csvOutput = 'Label,Readings,Start Timestamp,End Timestamp\n';
 	items.forEach(ele => {
+		//.utc is not needed because this uses a different route than the way line graphs work. It returns a string that represents the
+		// start/endTimestamp.
+		// TODO The new line readings route for graphs allows one to get the raw data. We should try to switch to that and then modify
+		// this code to use the unix timestamp that is returned. It is believed that the unix timestamp will be smaller than this string.
+		// TODO This is causing a deprecated format warning. I believe it is because it is in the format "Tuesday June 1 2021 12:00:00 AM".
+		// If we switch to the new route, we should remove this warning if we do the formatting here.
 		const startTimestamp = moment(ele.startTimestamp).format('dddd LL LTS').replace(/,/g, ''); // use regex to omit pesky commas
 		const endTimestamp = moment(ele.endTimestamp).format('dddd LL LTS').replace(/,/g, ''); // use regex to omit pesky commas
 		csvOutput += `"${ele.label}",${ele.reading},${startTimestamp},${endTimestamp}\n`; // TODO: add column for units
@@ -112,14 +119,14 @@ export async function graphRawExport(count: number, warningFileSize: number, fil
 	innerContainer.style.borderRadius = '10px';
 	innerContainer.style.textAlign = 'center';
 
-	innerContainer.innerHTML = `
-		<p>File size will be about ${fileSize.toFixed(2)}MB.</p>
-		<p>Are you sure you want to download</p>
-	`;
+	innerContainer.innerHTML =
+		'<p>' + translate('csv.download.size.warning.size') + ` ${fileSize.toFixed(2)}MB.</p>
+		<p>` + translate('csv.download.size.warning.verify') + '</p>'
+	;
 
 	// fileSizeLimit is limit for an admin without checking they really want to download,
 	if (fileSize > fileSizeLimit && (!hasToken() || !(await usersApi.hasRolePermissions(UserRole.EXPORT)))) {
-		innerContainer.innerHTML = "<p>Sorry you don't have permissions to download due to large number of points.</p>";
+		innerContainer.innerHTML = '<p>' + translate('csv.download.size.limit') + '</p>';
 		const okButton = document.createElement('button');
 		okButton.innerHTML = 'ok';
 		okButton.addEventListener('click', () => {
@@ -130,9 +137,9 @@ export async function graphRawExport(count: number, warningFileSize: number, fil
 	}
 
 	const noButton = document.createElement('button');
-	noButton.innerHTML = 'No';
+	noButton.innerHTML = translate('no');
 	const yesButton = document.createElement('button');
-	yesButton.innerHTML = 'Yes';
+	yesButton.innerHTML = translate('yes');
 
 	innerContainer.appendChild(yesButton);
 	innerContainer.appendChild(noButton);

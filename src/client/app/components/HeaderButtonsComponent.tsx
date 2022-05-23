@@ -10,7 +10,7 @@ import MenuModalComponent from './MenuModalComponent';
 import { hasToken } from '../utils/token';
 import getPage from '../utils/getPage';
 import TooltipMarkerComponent from './TooltipMarkerComponent';
-import TooltipHelpContainerAlternative from '../containers/TooltipHelpContainerAlternative';
+import TooltipHelpContainer from '../containers/TooltipHelpContainer';
 import { UserRole } from '../types/items';
 import { hasPermissions } from '../utils/hasPermissions';
 import { FlipLogOutStateAction } from '../types/redux/unsavedWarning';
@@ -89,7 +89,7 @@ export default class HeaderButtonsComponent extends React.Component<HeaderButton
 					}
 				</div>
 				<div className={this.props.showCollapsedMenuButton ? 'd-none d-lg-block' : ''}>
-					<TooltipHelpContainerAlternative page='all' />
+					<TooltipHelpContainer page='all' />
 					<TooltipMarkerComponent page='all' helpTextId='help.home.header' />
 					<Link style={adminLinkStyle} to='/admin'><Button outline><FormattedMessage id='admin.panel'/></Button></Link>
 					<Link style={groupsLinkStyle} to='/groups'><Button outline><FormattedMessage id='groups' /></Button></Link>
