@@ -107,7 +107,9 @@ async function readMamacData(meter, conn) {
 		// Previous Mamac values should not change.
 		shouldUpdate = false,
 		conditionSet = undefined,
-		conn = conn
+		conn = conn,
+		honorDst = false,
+		relaxedParsing = false
 	);
 }
 

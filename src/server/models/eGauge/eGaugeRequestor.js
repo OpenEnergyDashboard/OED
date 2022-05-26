@@ -117,7 +117,10 @@ class EgaugeRequestor {
 	 * @returns {Promise<[[number, moment]]>} a matrix whose rows consists of the reading value and the end timestamp as a moment.
 	 */
 	async getMeterReadings() {
-		const lastTimestamp = this.meter.endTimestamp;
+		// The meter endTimestamp is stored as a string so we need to parse and then convert to UTC.
+		const endTimestampTz = moment.parseZone(this.meter.endTimestamp, true);
+		// Note this modifies the endTimestampTz object.
+		const lastTimestamp = moment.parseZone(endTimestampTz.tz('UTC', true));
 		let startTimestamp;
 		// The timezone we interpret the readings in.
 		const timezoneUse = await meterTimezone(this.meter);

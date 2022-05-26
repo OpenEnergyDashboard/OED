@@ -54,9 +54,6 @@ const E0 = moment(0).utc()
 async function processData(rows, meterID, timeSort = TimeSortTypesJS.increasing, readingRepetition, isCumulative, cumulativeReset,
 	resetStart = '00:00:00.000', resetEnd = '23:59:99.999', readingGap = 0, readingLengthVariation = 0, isEndTime = false,
 	conditionSet, conn, honorDst = false, relaxedParsing = false) {
-	// TODO need to get so passed here including with CSV for next two
-	honorDst = true; // TODO debug
-	relaxedParsing = true; // TODO debug
 	// Holds all the warning message to pass back to inform user.
 	// Note they use basic HTML because the messages can be long/complex and it was felt it would be easy to put it into a web browser
 	// to make them easier to read.
@@ -305,7 +302,7 @@ async function processData(rows, meterID, timeSort = TimeSortTypesJS.increasing,
 		if (readingOK && honorDst) {
 			// We need to worry about DST.
 			// Get the shift in timezone for the start and end of this reading to see if crossed DST.
-			// Must do in the meter timezone.
+			// Must do in the meter timezone and the reading must have an offset for this to work.
 			shift = dstShift(startTimestampTz, endTimestampTz);
 			if (shift < 0) {
 				// These are the examples on the left in the example diagram in the developer docs.

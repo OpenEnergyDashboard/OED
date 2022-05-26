@@ -19,10 +19,12 @@ const moment = require('moment');
  * @returns 
  */
 async function uploadReadings(req, res, filepath, conn) {
-	const { meterName, createMeter, headerRow, update } = req.body; // extract query parameters
-	// headerRow has no value in the DB for a meter so always use the value passed.
+	const { meterName, createMeter, headerRow, update, honorDst, relaxedParsing } = req.body; // extract query parameters
+	// The next few have no value in the DB for a meter so always use the value passed.
 	const hasHeaderRow = (headerRow === 'true');
 	const shouldUpdate = (update === 'true');
+	let shouldHonorDst = (honorDst === 'true');
+	let shouldRelaxedParsing = (relaxedParsing === 'true');
 	let meterCreated = false;
 	let meter = await Meter.getByName(meterName, conn)
 		.catch(async err => {
@@ -205,7 +207,9 @@ async function uploadReadings(req, res, filepath, conn) {
 		hasHeaderRow,
 		shouldUpdate,
 		undefined,
-		conn
+		conn,
+		shouldHonorDst,
+		shouldRelaxedParsing
 	); // load csv data
 }
 

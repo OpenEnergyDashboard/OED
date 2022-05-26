@@ -16,7 +16,6 @@ async function updateEgaugeMeters() {
 	log.info('Fetching new eGauge meter data');
 	try {
 		const allMeters = await Meter.getEnabled(conn);
-		// console.log(allMeters);
 		const metersToUpdate = allMeters.filter(m => m.type === Meter.type.EGAUGE);
 		// Ignoring that loadArrayInput is called in this sequence and returns values
 		// since this is only called by an automated process at this time.
