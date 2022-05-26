@@ -137,7 +137,7 @@ curl localhost:3000/api/csv/readings -X POST -F 'meterName=pipe43' -F 'createMet
 echo -e "\n\n<h3>starting pipe44</h3>"
 curl localhost:3000/api/csv/readings -X POST -F 'meterName=pipe44' -F 'createMeter=true' -F 'gzip=false' -F 'email=test@example.com' -F 'password=password' -F 'csvfile=@regAscBadEndtime.csv'
 echo -e "\n\n<h3>starting pipe45</h3>"
-curl localhost:3000/api/csv/readings -X POST -F 'meterName=pipe45' -F 'createMeter=true' -F 'gzip=false' -F 'email=test@example.com' -F 'password=password' -F 'csvfile=@regAscVariedFormats.csv'
+curl localhost:3000/api/csv/readings -X POST -F 'meterName=pipe45' -F 'relaxedParsing=true' -F 'createMeter=true' -F 'gzip=false' -F 'email=test@example.com' -F 'password=password' -F 'csvfile=@regAscVariedFormats.csv'
 echo -e "\n\n<h3>starting pipe46</h3>"
 curl localhost:3000/api/csv/readings -X POST -F 'cumulative=true' -F 'meterName=pipe46' -F 'createMeter=true' -F 'gzip=false' -F 'email=test@example.com' -F 'password=password' -F 'csvfile=@cumAscBadReading.csv'
 echo -e "\n\n<h3>starting pipe47</h3>"
@@ -150,9 +150,50 @@ echo -e "\n\n<h3>starting pipe50</h3>"
 curl localhost:3000/api/csv/readings -X POST -F 'meterName=pipe50' -F 'cumulative=true' -F 'createMeter=true' -F 'gzip=false' -F 'email=test@example.com' -F 'password=password' -F 'csvfile=@cumAscNeg.csv'
 echo -e "\n\n<h3>starting pipe51</h3>"
 curl localhost:3000/api/csv/readings -X POST -F 'meterName=pipe51' -F 'createMeter=true' -F 'gzip=false' -F 'email=test@example.com' -F 'password=password' -F 'csvfile=@regAscZeroTime.csv'
-# refresh on last upload of readings and all will be available for graphing
 echo -e "\n\n<h3>starting pipe52</h3>"
-curl localhost:3000/api/csv/readings -X POST -F 'refreshReadings=true' -F 'meterName=pipe52' -F 'endOnly=true' -F 'createMeter=true' -F 'gzip=false' -F 'email=test@example.com' -F 'password=password' -F 'csvfile=@regAscEndonlyEndSamePreviousEnd.csv'
+curl localhost:3000/api/csv/readings -X POST -F 'meterName=pipe52' -F 'endOnly=true' -F 'createMeter=true' -F 'gzip=false' -F 'email=test@example.com' -F 'password=password' -F 'csvfile=@regAscEndonlyEndSamePreviousEnd.csv'
+# The following need to create meter separately since needs to have timezone.
+echo -e "\n\n<h3>starting pipe53</h3>"
+curl localhost:3000/api/csv/meters -X POST -F 'headerRow=true' -F 'gzip=false' -F 'email=test@example.com' -F 'password=password' -F 'csvfile=@meterPipe53.csv'
+curl localhost:3000/api/csv/readings -X POST -F 'meterName=pipe53' -F 'honorDst=true' -F 'gzip=false' -F 'email=test@example.com' -F 'password=password' -F 'csvfile=@daylightForwardHourlyCT.csv'
+echo -e "\n\n<h3>starting pipe54</h3>"
+curl localhost:3000/api/csv/meters -X POST -F 'headerRow=true' -F 'gzip=false' -F 'email=test@example.com' -F 'password=password' -F 'csvfile=@meterPipe54.csv'
+curl localhost:3000/api/csv/readings -X POST -F 'meterName=pipe54' -F 'honorDst=true' -F 'gzip=false' -F 'email=test@example.com' -F 'password=password' -F 'csvfile=@daylightForwardDailyCT.csv'
+echo -e "\n\n<h3>starting pipe55</h3>"
+curl localhost:3000/api/csv/meters -X POST -F 'headerRow=true' -F 'gzip=false' -F 'email=test@example.com' -F 'password=password' -F 'csvfile=@meterPipe55.csv'
+curl localhost:3000/api/csv/readings -X POST -F 'meterName=pipe55' -F 'honorDst=true' -F 'gzip=false' -F 'email=test@example.com' -F 'password=password' -F 'csvfile=@daylightForward15MinCT.csv'
+echo -e "\n\n<h3>starting pipe56</h3>"
+curl localhost:3000/api/csv/meters -X POST -F 'headerRow=true' -F 'gzip=false' -F 'email=test@example.com' -F 'password=password' -F 'csvfile=@meterPipe56.csv'
+curl localhost:3000/api/csv/readings -X POST -F 'meterName=pipe56' -F 'honorDst=true' -F 'gzip=false' -F 'email=test@example.com' -F 'password=password' -F 'csvfile=@daylightForward23MinCT.csv'
+echo -e "\n\n<h3>starting pipe57</h3>"
+curl localhost:3000/api/csv/meters -X POST -F 'headerRow=true' -F 'gzip=false' -F 'email=test@example.com' -F 'password=password' -F 'csvfile=@meterPipe57.csv'
+curl localhost:3000/api/csv/readings -X POST -F 'meterName=pipe57' -F 'honorDst=true' -F 'cumulative=true' -F 'gzip=false' -F 'email=test@example.com' -F 'password=password' -F 'csvfile=@daylightForward23MinCumulativeCT.csv'
+echo -e "\n\n<h3>starting pipe58</h3>"
+curl localhost:3000/api/csv/meters -X POST -F 'headerRow=true' -F 'gzip=false' -F 'email=test@example.com' -F 'password=password' -F 'csvfile=@meterPipe58.csv'
+curl localhost:3000/api/csv/readings -X POST -F 'meterName=pipe58' -F 'honorDst=true' -F 'endOnly=true' -F 'gzip=false' -F 'email=test@example.com' -F 'password=password' -F 'csvfile=@daylightForward23MinEndCT.csv'
+echo -e "\n\n<h3>starting pipe59</h3>"
+curl localhost:3000/api/csv/meters -X POST -F 'headerRow=true' -F 'gzip=false' -F 'email=test@example.com' -F 'password=password' -F 'csvfile=@meterPipe59.csv'
+curl localhost:3000/api/csv/readings -X POST -F 'meterName=pipe59' -F 'honorDst=true' -F 'gzip=false' -F 'email=test@example.com' -F 'password=password' -F 'csvfile=@daylightBackwardHourlyCT.csv'
+echo -e "\n\n<h3>starting pipe60</h3>"
+curl localhost:3000/api/csv/meters -X POST -F 'headerRow=true' -F 'gzip=false' -F 'email=test@example.com' -F 'password=password' -F 'csvfile=@meterPipe60.csv'
+curl localhost:3000/api/csv/readings -X POST -F 'meterName=pipe60' -F 'honorDst=true' -F 'gzip=false' -F 'email=test@example.com' -F 'password=password' -F 'csvfile=@daylightBackwardDailyCT.csv'
+echo -e "\n\n<h3>starting pipe61</h3>"
+curl localhost:3000/api/csv/meters -X POST -F 'headerRow=true' -F 'gzip=false' -F 'email=test@example.com' -F 'password=password' -F 'csvfile=@meterPipe61.csv'
+curl localhost:3000/api/csv/readings -X POST -F 'meterName=pipe61' -F 'honorDst=true' -F 'gzip=false' -F 'email=test@example.com' -F 'password=password' -F 'csvfile=@daylightBackward15MinCT.csv'
+echo -e "\n\n<h3>starting pipe62</h3>"
+curl localhost:3000/api/csv/meters -X POST -F 'headerRow=true' -F 'gzip=false' -F 'email=test@example.com' -F 'password=password' -F 'csvfile=@meterPipe62.csv'
+curl localhost:3000/api/csv/readings -X POST -F 'meterName=pipe62' -F 'honorDst=true' -F 'gzip=false' -F 'email=test@example.com' -F 'password=password' -F 'csvfile=@daylightBackward23MinCT.csv'
+echo -e "\n\n<h3>starting pipe63</h3>"
+curl localhost:3000/api/csv/meters -X POST -F 'headerRow=true' -F 'gzip=false' -F 'email=test@example.com' -F 'password=password' -F 'csvfile=@meterPipe63.csv'
+curl localhost:3000/api/csv/readings -X POST -F 'meterName=pipe63' -F 'honorDst=true' -F 'cumulative=true' -F 'gzip=false' -F 'email=test@example.com' -F 'password=password' -F 'csvfile=@daylightBackward23MinCumulativeCT.csv'
+echo -e "\n\n<h3>starting pipe64</h3>"
+curl localhost:3000/api/csv/meters -X POST -F 'headerRow=true' -F 'gzip=false' -F 'email=test@example.com' -F 'password=password' -F 'csvfile=@meterPipe64.csv'
+curl localhost:3000/api/csv/readings -X POST -F 'meterName=pipe64' -F 'honorDst=true' -F 'endOnly=true' -F 'gzip=false' -F 'email=test@example.com' -F 'password=password' -F 'csvfile=@daylightBackward23MinEndCT.csv'
+echo -e "\n\n<h3>starting pipe65</h3>"
+curl localhost:3000/api/csv/meters -X POST -F 'headerRow=true' -F 'gzip=false' -F 'email=test@example.com' -F 'password=password' -F 'csvfile=@meterPipe65.csv'
+curl localhost:3000/api/csv/readings -X POST -F 'meterName=pipe65' -F 'honorDst=true' -F 'endOnly=true' -F 'gzip=false' -F 'email=test@example.com' -F 'password=password' -F 'csvfile=@daylightBackward23MinEndACT.csv'
+# refresh on last upload of readings and all will be available for graphing
+curl localhost:3000/api/csv/readings -X POST -F 'refreshReadings=true' -F 'meterName=pipe65' -F 'honorDst=true' -F 'endOnly=true' -F 'gzip=false' -F 'email=test@example.com' -F 'password=password' -F 'csvfile=@daylightBackward23MinEndBCT.csv'
 
 # final blank line so easier to see in terminal.
 echo -e ""
