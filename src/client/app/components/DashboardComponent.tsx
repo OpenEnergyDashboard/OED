@@ -15,7 +15,6 @@ import {TimeInterval} from '../../../common/TimeInterval';
 import Button from 'reactstrap/lib/Button';
 import { FormattedMessage } from 'react-intl';
 import TooltipMarkerComponent from './TooltipMarkerComponent';
-import ReactTooltip from 'react-tooltip';
 
 interface DashboardProps {
 	chartToRender: ChartTypes;
@@ -36,12 +35,6 @@ export default class DashboardComponent extends React.Component<DashboardProps> 
 	constructor(props: DashboardProps) {
 		super(props);
 		this.handleTimeIntervalChange = this.handleTimeIntervalChange.bind(this);
-	}
-
-	public componentDidUpdate(prev: DashboardProps) {
-		if (prev.chartToRender !== this.props.chartToRender) {
-			ReactTooltip.rebuild(); // This rebuilds the tooltip so that it detects the marker that disappear because the chart type changes.
-		}
 	}
 
 	public render() {

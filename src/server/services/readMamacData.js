@@ -19,15 +19,14 @@ function parseTimestamp(raw, line) {
 	}
 	// moment cannot be set to strict mode since it fails. However, the expected format is given so
 	// it should do a good test.
-	// See src/server/services/pipeline-in-progress/processData.js for more info on why it is set up this way.
-	const ts = moment.parseZone(moment(raw, 'HH:mm:ss MM/DD/YY').format('YYYY-MM-DD HH:mm:ss') + '+00:00', undefined, true);
+	// MAMAC meters do not send a timezone so we parse the string directly and it is interpreted
+	// as UTC which is what we want and parseZone does not shift the time.
+	const ts = moment.parseZone(raw, 'HH:mm:ss MM/DD/YY')
 	// This check should be done in pipeline but leave here for now/historical reasons. Note in pipeline check if
 	// format() value is Invalid date.
 	if (!ts.isValid()) {
 		throw new Error(`CSV line ${line}: Raw timestamp ${raw} does not parse to a valid moment object`);
 	}
-	// The pipeline can take strings as dates. It deals with timezone issues so just sent the original string.
-	// If there is likely to be an issue, the above code should have already noted the error.
 	return ts;
 }
 

@@ -12,7 +12,7 @@ import { ReadingsCSVUploadPreferencesItem, MetersCSVUploadPreferencesItem, TimeS
 import { ReadingsCSVUploadDefaults, MetersCSVUploadDefaults } from '../../utils/csvUploadDefaults';
 import { TabContent, TabPane, Nav, NavItem, NavLink } from 'reactstrap';
 import { FormattedMessage } from 'react-intl';
-import TooltipHelpContainerAlternative from '../../containers/TooltipHelpContainerAlternative';
+import TooltipHelpContainer from '../TooltipHelpContainer';
 import TooltipMarkerComponent from '../../components/TooltipMarkerComponent';
 
 export const enum MODE {
@@ -269,7 +269,7 @@ export default class UploadCSVContainer extends React.Component<{}, UploadCSVCon
 		}
 		return (
 			<div>
-				<TooltipHelpContainerAlternative page='csv' />
+				<TooltipHelpContainer page='csv' />
 				<HeaderContainer />
 				<Nav tabs style={{ display: 'flex', justifyContent: 'center' }}>
 					<NavItem style={navStyle}>

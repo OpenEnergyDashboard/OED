@@ -191,10 +191,10 @@ async function processData(rows, meterID, timeSort = TimeSortTypesJS.increasing,
 			startTimestampTz = prevEndTimestampTz;
 			endTimestampTz = moment.parseZone(rows[index][1], undefined, true);
 			if (!endTimestampTz.isValid() && relaxedParsing) {
-				errMsg += 'The end date/time of ' + rows[index][2] + ' did not parse to a date/time using the normal format so'
+				errMsg += 'The end date/time of ' + rows[index][1] + ' did not parse to a date/time using the normal format so'
 					+ ' a less restrictive method is being tried. This is a warning since it can lead to wrong results but often okay.<br>'
 				// If this fails it is caught below.
-				endTimestampTz = moment.parseZone(rows[index][2], undefined);
+				endTimestampTz = moment.parseZone(rows[index][1], undefined);
 			}
 			// Get the reading into UTC where clone so don't change the Tz one in case use later if honorDst. The date/time is
 			// the same but in UTC.
@@ -203,7 +203,7 @@ async function processData(rows, meterID, timeSort = TimeSortTypesJS.increasing,
 		else {
 			// If the reading has a timezone offset associated with it then we want to honor it by using parseZone.
 			// However the database uses UTC and has no timezone offset so we need to get the reading into UTC.
-			// OED plots readings as the date/time it was acquired independent of the timezone. For example, it the reading is
+			// OED plots readings as the date/time it was acquired independent of the timezone. For example, if the reading is
 			// 2021-06-01 00:00:00-05:00 then the database should store it as 2021-06-01 00:00:00.
 			// Thus, we take the date/time from the reading's timezone. Next, we put it
 			// into a moment in a timezone aware way so the UTC sticks and there is no shift of time.
