@@ -193,7 +193,7 @@ async function processData(rows, meterID, timeSort = TimeSortTypesJS.increasing,
 			if (!endTimestampTz.isValid() && relaxedParsing) {
 				errMsg += 'The end date/time of ' + rows[index][2] + ' did not parse to a date/time using the normal format so'
 					+ ' a less restrictive method is being tried. This is a warning since it can lead to wrong results but often okay.<br>'
-					// If this fails it is caught below.
+				// If this fails it is caught below.
 				endTimestampTz = moment.parseZone(rows[index][2], undefined);
 			}
 			// Get the reading into UTC where clone so don't change the Tz one in case use later if honorDst. The date/time is
@@ -215,15 +215,15 @@ async function processData(rows, meterID, timeSort = TimeSortTypesJS.increasing,
 				//07-06-2021. This is why the user must ask for doing relaxed parsing.
 				errMsg += 'The start date/time of ' + rows[index][1] + ' did not parse to a date/time using the normal format so'
 					+ ' a less restrictive method is being tried. This is a warning since it can lead to wrong results but often okay.<br>'
-					// If this fails it is caught below.
-					startTimestampTz = moment.parseZone(rows[index][1], undefined);
+				// If this fails it is caught below.
+				startTimestampTz = moment.parseZone(rows[index][1], undefined);
 			}
 			endTimestampTz = moment.parseZone(rows[index][2], undefined, true);
 			if (!endTimestampTz.isValid() && relaxedParsing) {
 				errMsg += 'The end date/time of ' + rows[index][2] + ' did not parse to a date/time using the normal format so'
 					+ ' a less restrictive method is being tried. This is a warning since it can lead to wrong results but often okay.<br>'
-					// If this fails it is caught below.
-					endTimestampTz = moment.parseZone(rows[index][2], undefined);
+				// If this fails it is caught below.
+				endTimestampTz = moment.parseZone(rows[index][2], undefined);
 			}
 			// Get the reading into UTC where clone so don't change the Tz one in case use later if honorDst. The date/time is
 			// the same but in UTC.
@@ -401,6 +401,18 @@ async function processData(rows, meterID, timeSort = TimeSortTypesJS.increasing,
 					readingOK = false;
 					errMsg += 'The reading start time is before the previous end time and the data is cumulative so OED cannot use this reading.<br>';
 				} else if (!isFirst(prevReading.endTimestamp)) {
+					// Only a potential issue if not the first ever seen reading where previous end time is arbitrary.
+					if (honorDst) {
+						// It is possible that the gap means we missed the DST crossing. To check, we see if the start time is within the DST shift.
+						const startTimestampMeterZone = startTimestamp.clone().tz(meterZone, true);
+						// Need the actual data/time that the DST shift occurs since what we do changes based on whether the reading is
+						// within the shift or not. Note we do this inside the if since it takes a little time and not done if shift = 0
+						// which is the most common case.
+						if (inZone(meterZone, startTimestampMeterZone)) {
+							// Reading starts within DST shift so it might be an issue. Warn the user.
+							errMsg += 'The reading start time is shifted and within the DST shift so it is possible that the crossing to standard time was missed and readings overlap. ';
+						}
+					}
 					//Only treat this as a warning since the readings may be sent in a different order.
 					errMsg += 'The current reading startTime is not after the previous reading\'s end time. Note this is treated only as a warning since readings may be sent out of order.<br>';
 				}
@@ -793,6 +805,38 @@ function getZoneUntil(meterZone, pastCrossingTimestamp) {
 			// We just went past the desired one so back up one index.
 			// We first want to know in the meter timezone and then we want that date/time in UTC without a shift.
 			return moment.tz(zone.untils[i - 1], meterZone).utc(true);
+		}
+	}
+	// We really don't expect to not find the date desired. If this happens then throw an error.
+	throw new Error('Could not find DST crossing date in pipeline so giving up.');
+}
+
+/**
+* Returns true if timestamp is within a DST crossing and false otherwise.
+* It is designed to check for going backward in time with a gap.
+* @param meterZone A string representing the timezone of the meter.
+* @param timestamp A timestamp
+* @returns true if timestamp is within a DST crossing and false otherwise.
+*/
+function inZone(meterZone, timestamp) {
+	// Get the zone structure from moment for the meter's timezone.
+	zone = moment.tz.zone(meterZone);
+	// moment returns an array that holds the shifts for many years in the past and future.
+	// Loop over array until find the one needed.
+	for (let i = 0; i < zone.untils.length; i++) {
+		if (moment.tz(zone.untils[i], meterZone).isSameOrAfter(timestamp)) {
+			// We just went past the the one for timestamp.
+			// We see if the timestamp is within the shift of this one.
+			const shift = zone.offsets[i - 1] - zone.offsets[i];
+			const timestampUTC = timestamp.clone().tz('UTC', true);
+			const zoneUntil = moment.parseZone(moment.tz(zone.untils[i], meterZone)).tz('UTC', true);
+			if (timestampUTC.isSameOrAfter(zoneUntil) && timestampUTC.isBefore(zoneUntil.clone().add(shift, 'minutes'))) {
+				// The timestamp lies within the DST shift so may be an issue.
+				return true;
+			} else {
+				// The timestamp is not within the DST shift so it is OK.
+				return false;
+			}
 		}
 	}
 	// We really don't expect to not find the date desired. If this happens then throw an error.

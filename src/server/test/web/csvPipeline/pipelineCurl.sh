@@ -192,8 +192,11 @@ curl localhost:3000/api/csv/readings -X POST -F 'meterName=pipe64' -F 'honorDst=
 echo -e "\n\n<h3>starting pipe65</h3>"
 curl localhost:3000/api/csv/meters -X POST -F 'headerRow=true' -F 'gzip=false' -F 'email=test@example.com' -F 'password=password' -F 'csvfile=@meterPipe65.csv'
 curl localhost:3000/api/csv/readings -X POST -F 'meterName=pipe65' -F 'honorDst=true' -F 'endOnly=true' -F 'gzip=false' -F 'email=test@example.com' -F 'password=password' -F 'csvfile=@daylightBackward23MinEndACT.csv'
+curl localhost:3000/api/csv/readings -X POST -F 'meterName=pipe65' -F 'honorDst=true' -F 'endOnly=true' -F 'gzip=false' -F 'email=test@example.com' -F 'password=password' -F 'csvfile=@daylightBackward23MinEndBCT.csv'
+echo -e "\n\n<h3>starting pipe66</h3>"
+curl localhost:3000/api/csv/meters -X POST -F 'headerRow=true' -F 'gzip=false' -F 'email=test@example.com' -F 'password=password' -F 'csvfile=@meterPipe66.csv'
 # refresh on last upload of readings and all will be available for graphing
-curl localhost:3000/api/csv/readings -X POST -F 'refreshReadings=true' -F 'meterName=pipe65' -F 'honorDst=true' -F 'endOnly=true' -F 'gzip=false' -F 'email=test@example.com' -F 'password=password' -F 'csvfile=@daylightBackward23MinEndBCT.csv'
+curl localhost:3000/api/csv/readings -X POST -F 'refreshReadings=true' -F 'meterName=pipe66' -F 'honorDst=true' -F 'gzip=false' -F 'email=test@example.com' -F 'password=password' -F 'csvfile=@daylightBackwardGapCT.csv'
 
 # final blank line so easier to see in terminal.
 echo -e ""
