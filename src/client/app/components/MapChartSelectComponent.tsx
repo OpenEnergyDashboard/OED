@@ -2,63 +2,62 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
 
- import * as React from 'react';
- import * as _ from 'lodash';
- import { useDispatch, useSelector } from 'react-redux';
- import { State } from '../types/redux/state';
- import { SelectOption } from '../types/items';
- import { defineMessages, FormattedMessage, useIntl } from 'react-intl';
- import SingleSelectComponent from './SingleSelectComponent';
- import TooltipMarkerComponent from './TooltipMarkerComponent';
- 
- export default function MapChartSelectComponent() {
-	 const divBottomPadding: React.CSSProperties = {
-		 paddingBottom: '15px'
-	 };
-	 const labelStyle: React.CSSProperties = {
-		 fontWeight: 'bold',
-		 margin: 0
-	 };
-	 const messages = defineMessages({
-		 selectMap: {id: 'select.map'}
-	 });
- 
-	 //Utilizes useDispatch and useSelector hooks
-	 const dispatch = useDispatch();
-	 const sortedMaps = _.sortBy(_.values(useSelector((state: State) => state.maps.byMapID)).map(map => (
-		 { value: map.id, label: map.name.trim(), isDisabled: !(map.origin && map.opposite) } as SelectOption
-	 )), 'label');
- 
-	 // If there is only one map, selectedMap is the id of the only map. ie; display map automatically if only 1 map
-	 if (Object.keys(sortedMaps).length === 1) {
-		 dispatch({type: 'UPDATE_SELECTED_MAPS', mapID: sortedMaps[0].value});
-		 //When we specify stuff in actions files, we also specify other variables, in this case mapID.
-		 //This is where we specify values instead of triggering the action by itself.
-	 }
- 
-	 const selectedMap = {
-		 label: useSelector((state: State) => state.maps.byMapID[state.maps.selectedMap] ? state.maps.byMapID[state.maps.selectedMap].name : ''),
-		 value: useSelector((state: State) => state.maps.selectedMap)
-	 };
- 
-	 //useIntl instead of injectIntl and WrappedComponentProps
-	 const intl = useIntl();
- 
-	 return (
-		 <div>
-			 <p style={labelStyle}>
-				 <FormattedMessage id='maps' />:
-			 </p>
-			 <div style={divBottomPadding}>
-				 <SingleSelectComponent
-					 options={sortedMaps}
-					 selectedOption={(selectedMap.value === 0) ? undefined : selectedMap}
-					 placeholder={intl.formatMessage(messages.selectMap)}
-					 onValueChange={(selected) => dispatch({type: 'UPDATE_SELECTED_MAPS', mapID: selected.value})}
-				 />
-				 <TooltipMarkerComponent page='home' helpTextId='help.home.select.maps'/>
-			 </div>
-		 </div>
-	 );
- }
- 
+import * as React from 'react';
+import * as _ from 'lodash';
+import { useDispatch, useSelector } from 'react-redux';
+import { State } from '../types/redux/state';
+import { SelectOption } from '../types/items';
+import { defineMessages, FormattedMessage, useIntl } from 'react-intl';
+import SingleSelectComponent from './SingleSelectComponent';
+import TooltipMarkerComponent from './TooltipMarkerComponent';
+
+export default function MapChartSelectComponent() {
+	const divBottomPadding: React.CSSProperties = {
+		paddingBottom: '15px'
+	};
+	const labelStyle: React.CSSProperties = {
+		fontWeight: 'bold',
+		margin: 0
+	};
+	const messages = defineMessages({
+		selectMap: {id: 'select.map'}
+	});
+
+	//Utilizes useDispatch and useSelector hooks
+	const dispatch = useDispatch();
+	const sortedMaps = _.sortBy(_.values(useSelector((state: State) => state.maps.byMapID)).map(map => (
+		{ value: map.id, label: map.name.trim(), isDisabled: !(map.origin && map.opposite) } as SelectOption
+	)), 'label');
+
+	// If there is only one map, selectedMap is the id of the only map. ie; display map automatically if only 1 map
+	if (Object.keys(sortedMaps).length === 1) {
+		dispatch({type: 'UPDATE_SELECTED_MAPS', mapID: sortedMaps[0].value});
+		//When we specify stuff in actions files, we also specify other variables, in this case mapID.
+		//This is where we specify values instead of triggering the action by itself.
+	}
+
+	const selectedMap = {
+		label: useSelector((state: State) => state.maps.byMapID[state.maps.selectedMap] ? state.maps.byMapID[state.maps.selectedMap].name : ''),
+		value: useSelector((state: State) => state.maps.selectedMap)
+	};
+
+	//useIntl instead of injectIntl and WrappedComponentProps
+	const intl = useIntl();
+
+	return (
+		<div>
+			<p style={labelStyle}>
+				<FormattedMessage id='maps' />:
+			</p>
+			<div style={divBottomPadding}>
+				<SingleSelectComponent
+					options={sortedMaps}
+					selectedOption={(selectedMap.value === 0) ? undefined : selectedMap}
+					placeholder={intl.formatMessage(messages.selectMap)}
+					onValueChange={(selected) => dispatch({type: 'UPDATE_SELECTED_MAPS', mapID: selected.value})}
+				/>
+				<TooltipMarkerComponent page='home' helpTextId='help.home.select.maps'/>
+			</div>
+		</div>
+	);
+}
