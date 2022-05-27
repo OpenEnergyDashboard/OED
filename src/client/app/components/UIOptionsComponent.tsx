@@ -17,7 +17,7 @@ import { ChartTypes } from '../types/redux/graph';
 import { ComparePeriod, SortingOrder } from '../utils/calculateCompare';
 import TooltipMarkerComponent from './TooltipMarkerComponent';
 import 'rc-slider/assets/index.css';
-import MapChartSelectContainer from '../containers/MapChartSelectContainer';
+import MapChartSelectComponent from './MapChartSelectComponent';
 import ReactTooltip from 'react-tooltip';
 
 const Slider = createSliderWithTooltip(sliderWithoutTooltips);
@@ -240,7 +240,7 @@ class UIOptionsComponent extends React.Component<UIOptionsPropsWithIntl, UIOptio
 							</ButtonGroup>
 							<TooltipMarkerComponent page='home' helpTextId='help.home.map.interval.tip' />
 						</div>
-						<MapChartSelectContainer key='chart' />
+						<MapChartSelectComponent key='chart' />
 					</div>
 				}
 

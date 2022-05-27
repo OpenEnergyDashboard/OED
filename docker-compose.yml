@@ -4,7 +4,7 @@
 # * file, You can obtain one at http://mozilla.org/MPL/2.0/.
 # *
 
-version: "2.1"
+version: "3.8"
 services:
     # Database service. It's PostgreSQL, see the
     # Dockerfile in ./database
