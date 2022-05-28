@@ -29,13 +29,6 @@ export default function MapChartSelectComponent() {
 		{ value: map.id, label: map.name.trim(), isDisabled: !(map.origin && map.opposite) } as SelectOption
 	)), 'label');
 
-	// If there is only one map, selectedMap is the id of the only map. ie; display map automatically if only 1 map
-	if (Object.keys(sortedMaps).length === 1) {
-		dispatch({type: 'UPDATE_SELECTED_MAPS', mapID: sortedMaps[0].value});
-		//When we specify stuff in actions files, we also specify other variables, in this case mapID.
-		//This is where we specify values instead of triggering the action by itself.
-	}
-
 	const selectedMap = {
 		label: useSelector((state: State) => state.maps.byMapID[state.maps.selectedMap] ? state.maps.byMapID[state.maps.selectedMap].name : ''),
 		value: useSelector((state: State) => state.maps.selectedMap)
@@ -55,6 +48,8 @@ export default function MapChartSelectComponent() {
 					selectedOption={(selectedMap.value === 0) ? undefined : selectedMap}
 					placeholder={intl.formatMessage(messages.selectMap)}
 					onValueChange={selected => dispatch({type: 'UPDATE_SELECTED_MAPS', mapID: selected.value})}
+					//When we specify stuff in actions files, we also specify other variables, in this case mapID.
+					//This is where we specify values instead of triggering the action by itself.
 				/>
 				<TooltipMarkerComponent page='home' helpTextId='help.home.select.maps'/>
 			</div>

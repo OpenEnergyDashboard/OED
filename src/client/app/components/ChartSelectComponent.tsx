@@ -3,7 +3,7 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
 
 import * as React from 'react';
-
+import * as _ from 'lodash';
 import { ChartTypes } from '../types/redux/graph';
 import { FormattedMessage } from 'react-intl';
 import TooltipMarkerComponent from './TooltipMarkerComponent';
@@ -14,6 +14,7 @@ import DropdownMenu from 'reactstrap/lib/DropdownMenu';
 import { useDispatch, useSelector } from 'react-redux';
 import { State } from '../types/redux/state';
 import { useState } from 'react';
+import { SelectOption } from '../types/items';
 
 /**
  *  A component that allows users to select which chart should be displayed.
@@ -29,6 +30,10 @@ export default function ChartSelectComponent() {
 
 	const dispatch = useDispatch();
 	const [expand, setExpand] = useState(false);
+	const sortedMaps = _.sortBy(_.values(useSelector((state: State) => state.maps.byMapID)).map(map => (
+		{ value: map.id, label: map.name.trim(), isDisabled: !(map.origin && map.opposite) } as SelectOption
+	)), 'label');
+
 	return (
 		<div style={divBottomPadding}>
 			<p style={labelStyle}>
@@ -55,7 +60,13 @@ export default function ChartSelectComponent() {
 						<FormattedMessage id='compare' />
 					</DropdownItem>
 					<DropdownItem
-						onClick={() => dispatch({type: 'CHANGE_CHART_TO_RENDER', chartType: ChartTypes.map})}
+						onClick={() => {
+							dispatch({type: 'CHANGE_CHART_TO_RENDER', chartType: ChartTypes.map});
+							if (Object.keys(sortedMaps).length === 1) {
+								// If there is only one map, selectedMap is the id of the only map. ie; display map automatically if only 1 map
+								dispatch({type: 'UPDATE_SELECTED_MAPS', mapID: sortedMaps[0].value});
+							}
+						}}
 					>
 						<FormattedMessage id='map' />
 					</DropdownItem>
