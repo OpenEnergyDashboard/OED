@@ -8,7 +8,7 @@ import sliderWithoutTooltips, { createSliderWithTooltip } from 'rc-slider';
 import * as moment from 'moment';
 import { Button, ButtonGroup, Dropdown, DropdownToggle, DropdownMenu, DropdownItem } from 'reactstrap';
 import ExportContainer from '../containers/ExportContainer';
-import ChartSelectContainer from '../containers/ChartSelectContainer';
+import ChartSelectComponent from './ChartSelectComponent';
 import ChartDataSelectContainer from '../containers/ChartDataSelectContainer';
 import { ChangeBarStackingAction, ChangeCompareSortingOrderAction, SetOptionsVisibility } from '../types/redux/graph';
 import ChartLinkContainer from '../containers/ChartLinkContainer';
@@ -84,7 +84,7 @@ class UIOptionsComponent extends React.Component<UIOptionsPropsWithIntl, UIOptio
 
 		return (
 			<div>
-				<ChartSelectContainer />
+				<ChartSelectComponent />
 				<ChartDataSelectContainer />
 
 				{/* Controls specific to the bar chart. */}

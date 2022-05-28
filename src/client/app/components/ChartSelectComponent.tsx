@@ -5,90 +5,65 @@
 import * as React from 'react';
 
 import { ChartTypes } from '../types/redux/graph';
-import { ChangeChartToRenderAction } from '../types/redux/graph';
 import { FormattedMessage } from 'react-intl';
 import TooltipMarkerComponent from './TooltipMarkerComponent';
 import Dropdown from 'reactstrap/lib/Dropdown';
 import DropdownItem from 'reactstrap/lib/DropdownItem';
 import DropdownToggle from 'reactstrap/lib/DropdownToggle';
 import DropdownMenu from 'reactstrap/lib/DropdownMenu';
+import { useDispatch, useSelector } from 'react-redux';
+import { State } from '../types/redux/state';
+import { useState } from 'react';
 
-interface ChartSelectProps {
-	selectedChart: ChartTypes;
-	changeChartType(chartType: ChartTypes): ChangeChartToRenderAction;
-}
-interface DropdownState {
-	dropdownOpen: boolean;
-	compareSortingDropdownOpen: boolean;
-}
 /**
- * A component that allows users to select which chart should be displayed.
+ *  A component that allows users to select which chart should be displayed.
  */
-export default class ChartSelectComponent extends React.Component<ChartSelectProps, DropdownState> {
-	constructor(props: ChartSelectProps) {
-		super(props);
-		this.handleChangeChartType = this.handleChangeChartType.bind(this);
-		this.toggleDropdown = this.toggleDropdown.bind(this);
-		this.state = {
-			dropdownOpen: false,
-			compareSortingDropdownOpen: false
-		};
-	}
+export default function ChartSelectComponent() {
+	const divBottomPadding: React.CSSProperties = {
+		paddingBottom: '15px'
+	};
+	const labelStyle: React.CSSProperties = {
+		fontWeight: 'bold',
+		margin: 0
+	};
 
-	public render() {
-		const divBottomPadding: React.CSSProperties = {
-			paddingBottom: '15px'
-		};
-
-		const labelStyle: React.CSSProperties = {
-			fontWeight: 'bold',
-			margin: 0
-		};
-
-		return (
-			<div style={divBottomPadding}>
-				<p style={labelStyle}>
-					<FormattedMessage id='graph.type' />:
-				</p>
-				<Dropdown isOpen={this.state.dropdownOpen} toggle={this.toggleDropdown}>
-					<DropdownToggle outline caret>
-						{/* Show the currently selected chart as its name */}
-						<FormattedMessage id={this.props.selectedChart} />
-					</DropdownToggle>
-					<DropdownMenu>
-						<DropdownItem
-							onClick={() => this.handleChangeChartType(ChartTypes.line)}
-						>
-							<FormattedMessage id='line' />
-						</DropdownItem>
-						<DropdownItem
-							onClick={() => this.handleChangeChartType(ChartTypes.bar)}
-						>
-							<FormattedMessage id='bar' />
-						</DropdownItem>
-						<DropdownItem
-							onClick={() => this.handleChangeChartType(ChartTypes.compare)}
-						>
-							<FormattedMessage id='compare' />
-						</DropdownItem>
-						<DropdownItem
-							onClick={() => this.handleChangeChartType(ChartTypes.map)}
-						>
-							<FormattedMessage id='map' />
-						</DropdownItem>
-					</DropdownMenu>
-				</Dropdown>
-				<div>
-					<TooltipMarkerComponent page='home' helpTextId='help.home.chart.select' />
-				</div>
+	const dispatch = useDispatch();
+	const [expand, setExpand] = useState(false);
+	return (
+		<div style={divBottomPadding}>
+			<p style={labelStyle}>
+				<FormattedMessage id='graph.type' />:
+			</p>
+			<Dropdown isOpen={expand} toggle={() => setExpand(!expand)}>
+				<DropdownToggle outline caret>
+					<FormattedMessage id={useSelector((state: State) => state.graph.chartToRender)} />
+				</DropdownToggle>
+				<DropdownMenu>
+					<DropdownItem
+						onClick={() => dispatch({type: 'CHANGE_CHART_TO_RENDER', chartType: ChartTypes.line})}
+					>
+						<FormattedMessage id='line' />
+					</DropdownItem>
+					<DropdownItem
+						onClick={() => dispatch({type: 'CHANGE_CHART_TO_RENDER', chartType: ChartTypes.bar})}
+					>
+						<FormattedMessage id='bar' />
+					</DropdownItem>
+					<DropdownItem
+						onClick={() => dispatch({type: 'CHANGE_CHART_TO_RENDER', chartType: ChartTypes.compare})}
+					>
+						<FormattedMessage id='compare' />
+					</DropdownItem>
+					<DropdownItem
+						onClick={() => dispatch({type: 'CHANGE_CHART_TO_RENDER', chartType: ChartTypes.map})}
+					>
+						<FormattedMessage id='map' />
+					</DropdownItem>
+				</DropdownMenu>
+			</Dropdown>
+			<div>
+				<TooltipMarkerComponent page='home' helpTextId='help.home.chart.select' />
 			</div>
-		);
-	}
-
-	private handleChangeChartType(value: ChartTypes) {
-		this.props.changeChartType(value);
-	}
-	private toggleDropdown() {
-		this.setState(prevState => ({ dropdownOpen: !prevState.dropdownOpen }));
-	}
+		</div>
+	);
 }
