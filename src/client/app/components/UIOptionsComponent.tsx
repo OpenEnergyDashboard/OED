@@ -9,7 +9,7 @@ import * as moment from 'moment';
 import { Button, ButtonGroup, Dropdown, DropdownToggle, DropdownMenu, DropdownItem } from 'reactstrap';
 import ExportContainer from '../containers/ExportContainer';
 import ChartSelectComponent from './ChartSelectComponent';
-import ChartDataSelectContainer from '../containers/ChartDataSelectContainer';
+import ChartDataSelectComponent from './ChartDataSelectComponent';
 import { ChangeBarStackingAction, ChangeCompareSortingOrderAction, SetOptionsVisibility } from '../types/redux/graph';
 import ChartLinkContainer from '../containers/ChartLinkContainer';
 import LanguageSelectorContainer from '../containers/LanguageSelectorContainer'
@@ -85,7 +85,7 @@ class UIOptionsComponent extends React.Component<UIOptionsPropsWithIntl, UIOptio
 		return (
 			<div>
 				<ChartSelectComponent />
-				<ChartDataSelectContainer />
+				<ChartDataSelectComponent />
 
 				{/* Controls specific to the bar chart. */}
 				{this.props.chartToRender === ChartTypes.bar &&
