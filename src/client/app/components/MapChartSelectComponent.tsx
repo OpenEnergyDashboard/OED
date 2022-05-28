@@ -54,7 +54,7 @@ export default function MapChartSelectComponent() {
 					options={sortedMaps}
 					selectedOption={(selectedMap.value === 0) ? undefined : selectedMap}
 					placeholder={intl.formatMessage(messages.selectMap)}
-					onValueChange={(selected) => dispatch({type: 'UPDATE_SELECTED_MAPS', mapID: selected.value})}
+					onValueChange={selected => dispatch({type: 'UPDATE_SELECTED_MAPS', mapID: selected.value})}
 				/>
 				<TooltipMarkerComponent page='home' helpTextId='help.home.select.maps'/>
 			</div>
