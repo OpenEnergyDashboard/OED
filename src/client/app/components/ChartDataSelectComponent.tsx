@@ -54,7 +54,6 @@ export default function ChartDataSelectComponent() {
 
 		const chartToRender = state.graph.chartToRender;
 		const selectedMap = state.maps.selectedMap;
-		
 		if (chartToRender === ChartTypes.map && selectedMap !== 0) {
 			const mp = state.maps.byMapID[selectedMap];
 			// filter meters;
@@ -130,7 +129,6 @@ export default function ChartDataSelectComponent() {
 				} as SelectOption);
 			}
 		});
-	
 		let selectedGroups: SelectOption[] | undefined;
 		state.graph.selectedGroups.forEach(groupID => {
 			if (!disableGroups.includes(groupID)) {
