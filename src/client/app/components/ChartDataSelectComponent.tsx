@@ -120,7 +120,7 @@ export default function ChartDataSelectComponent() {
 			});
 		}
 
-		let selectedMeters: SelectOption[] = [];
+		const selectedMeters: SelectOption[] = [];
 		state.graph.selectedMeters.forEach(meterID => {
 			if (!(disableMeters.includes(meterID))) {
 				selectedMeters.push( {
@@ -130,7 +130,7 @@ export default function ChartDataSelectComponent() {
 				} as SelectOption);
 			}
 		});
-		let selectedGroups: SelectOption[] = [];
+		const selectedGroups: SelectOption[] = [];
 		state.graph.selectedGroups.forEach(groupID => {
 			if (!(disableGroups.includes(groupID))) {
 				selectedGroups.push( {
