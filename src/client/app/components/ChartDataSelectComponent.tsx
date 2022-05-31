@@ -15,6 +15,7 @@ import { DataType } from '../types/Datasources';
 import { CartesianPoint, Dimensions, normalizeImageDimensions, calculateScaleFromEndpoints,
 	itemDisplayableOnMap, itemMapInfoOk, gpsToUserGrid } from '../utils/calibration';
 import { changeSelectedGroups, changeSelectedMeters } from '../actions/graph';
+import { Dispatch } from '../types/redux/actions';
 
 /**
  * A component which allows the user to select which data should be displayed on the chart.
@@ -119,20 +120,20 @@ export default function ChartDataSelectComponent() {
 			});
 		}
 
-		let selectedMeters: SelectOption[] | undefined;
+		let selectedMeters: SelectOption[] = [];
 		state.graph.selectedMeters.forEach(meterID => {
-			if (!disableMeters.includes(meterID)) {
-				selectedMeters?.push( {
+			if (!(disableMeters.includes(meterID))) {
+				selectedMeters.push( {
 					label: state.meters.byMeterID[meterID] ? state.meters.byMeterID[meterID].name : '',
 					value: meterID,
 					isDisabled: false
 				} as SelectOption);
 			}
 		});
-		let selectedGroups: SelectOption[] | undefined;
+		let selectedGroups: SelectOption[] = [];
 		state.graph.selectedGroups.forEach(groupID => {
-			if (!disableGroups.includes(groupID)) {
-				selectedGroups?.push( {
+			if (!(disableGroups.includes(groupID))) {
+				selectedGroups.push( {
 					label: state.groups.byGroupID[groupID] ? state.groups.byGroupID[groupID].name : '',
 					value: groupID,
 					isDisabled: false
@@ -149,7 +150,8 @@ export default function ChartDataSelectComponent() {
 	}
 	);
 
-	const dispatch = useDispatch();
+	// Must specify type if using ThunkDispatch
+	const dispatch: Dispatch = useDispatch();
 
 	return (
 		<div>
