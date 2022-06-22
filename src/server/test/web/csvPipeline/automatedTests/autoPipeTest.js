@@ -5,9 +5,11 @@
 const { chai, mocha, expect, app, testDB, testUser } = require('../../../common');
 const Meter = require('../../../../models/Meter');
 const Reading = require('../../../../models/Reading');
+const Point = require('../../../../models/Point');
 const fs = require('fs');
 const csv = require('csv');
 const promisify = require('es6-promisify');
+const moment = require('moment');
 
 const parseCsv = promisify(csv.parse);
 
@@ -21,20 +23,20 @@ const CHAI_METERS_REQUEST = `chai.request(app).post('${UPLOAD_METERS_ROUTE}').fi
 // but all other keys are arrays of length number of uploads in test.
 // Note the use of double quotes for strings because some have single quotes within.
 const testCases = {
-	// pipe1: {
-	// 	description: "Ascending time readings",
-	// 	chaiRequest: [CHAI_READINGS_REQUEST + ".field('createMeter', 'true').field('meterName', 'pipe1').field('gzip', 'false')"],
-	// 	fileName: ['pipe1Input.csv'],
-	// 	responseCode: [200],
-	// 	responseString: ["<h1>SUCCESS</h1><h2>It looks like the insert of the readings was a success.</h2>"]
-	// },
-	// pipe2: {
-	// 	description: "Descending time readings",
-	// 	chaiRequest: [CHAI_READINGS_REQUEST + ".field('createMeter', 'true').field('meterName', 'pipe2').field('gzip', 'false').field('timeSort', 'decreasing')"],
-	// 	fileName: ['pipe2Input.csv'],
-	// 	responseCode: [200],
-	// 	responseString: ["<h1>SUCCESS</h1><h2>It looks like the insert of the readings was a success.</h2>"]
-	// },
+	pipe1: {
+		description: "Ascending time readings",
+		chaiRequest: [CHAI_READINGS_REQUEST + ".field('createMeter', 'true').field('meterName', 'pipe1').field('gzip', 'false')"],
+		fileName: ['pipe1Input.csv'],
+		responseCode: [200],
+		responseString: ["<h1>SUCCESS</h1><h2>It looks like the insert of the readings was a success.</h2>"]
+	},
+	pipe2: {
+		description: "Descending time readings",
+		chaiRequest: [CHAI_READINGS_REQUEST + ".field('createMeter', 'true').field('meterName', 'pipe2').field('gzip', 'false').field('timeSort', 'decreasing')"],
+		fileName: ['pipe2Input.csv'],
+		responseCode: [200],
+		responseString: ["<h1>SUCCESS</h1><h2>It looks like the insert of the readings was a success.</h2>"]
+	},
 	// pipe3: {
 	// 	description: "Cumulative time readings",
 	// 	chaiRequest: [CHAI_READINGS_REQUEST + ".field('createMeter', 'true').field('meterName', 'pipe3').field('gzip', 'false').field('cumulative', 'true')"],
@@ -69,14 +71,14 @@ const testCases = {
 	//     responseCode: [400],
 	// 	responseString: ["<h1>FAILURE</h1><h2>It looks like the insert of the readings had issues with some or all of the readings where the processing of the readings returned these warning(s)/error(s):</h2><br>For meter pipe6: Error parsing Reading #1. Reading value gives 24 with error message:<br>The first ever reading must be dropped when dealing with cumulative data.<br>For reading #1 on meter pipe6 in pipeline: previous reading has value 0 start time 1970-01-01T00:00:00Z end time 1970-01-01T00:00:00Z and current reading has value 24 start time 2021-06-01T00:00:00Z end time 2021-06-02T00:00:00Z with timeSort increasing; duplications 1; cumulative true; cumulativeReset true; cumulativeResetStart 11:45; cumulativeResetEnd 12:15; lengthGap 0; lengthVariation 0; onlyEndTime false<br><br>For meter pipe6: Error parsing Reading #4. Reading value of 96 gives -48 with error message:<br>A negative meterReading has been detected but either cumulativeReset is not enabled, or the start time and end time of this reading is out of the reset range. Reject all readings.<br>For reading #4 on meter pipe6 in pipeline: previous reading has value 72 start time 2021-06-03T00:00:00Z end time 2021-06-04T00:00:00Z and current reading has value -48 start time 2021-06-04T00:00:00Z end time 2021-06-05T00:00:00Z with timeSort increasing; duplications 1; cumulative true; cumulativeReset true; cumulativeResetStart 11:45; cumulativeResetEnd 12:15; lengthGap 0; lengthVariation 0; onlyEndTime false<br>"]
 	// },
-	pipe7: {
-		//bad compare
-		description:"",
-	    chaiRequest: [CHAI_READINGS_REQUEST + ".field('createMeter', 'true').field('meterName', 'pipe7').field('gzip', 'false').field('cumulative', 'true').field('cumulativeReset','true').field('cumulativeResetStart','11:45').field('cumulativeResetEnd','12:15')"],
-	    fileName: ['pipe7Input.csv'],
-	    responseCode: [400],
-		responseString: ["<h1>FAILURE</h1><h2>It looks like the insert of the readings had issues with some or all of the readings where the processing of the readings returned these warning(s)/error(s):</h2><br>For meter pipe7: Error parsing Reading #1. Reading value gives 24 with error message:<br>The first ever reading must be dropped when dealing with cumulative data.<br>For reading #1 on meter pipe7 in pipeline: previous reading has value 0 start time 1970-01-01T00:00:00Z end time 1970-01-01T00:00:00Z and current reading has value 24 start time 2021-06-01T00:00:00Z end time 2021-06-02T00:00:00Z with timeSort increasing; duplications 1; cumulative true; cumulativeReset true; cumulativeResetStart 00:00; cumulativeResetEnd 00:00.001; lengthGap 0; lengthVariation 0; onlyEndTime false<br><h2>Readings Dropped and should have previous messages</h2><ol><li>Dropped Reading #1 for meter pipe7</li></ol>"],
-	},
+	// pipe7: {
+	// 	//bad compare
+	// 	description:"",
+	//     chaiRequest: [CHAI_READINGS_REQUEST + ".field('createMeter', 'true').field('meterName', 'pipe7').field('gzip', 'false').field('cumulative', 'true').field('cumulativeReset','true').field('cumulativeResetStart','11:45').field('cumulativeResetEnd','12:15')"],
+	//     fileName: ['pipe7Input.csv'],
+	//     responseCode: [400],
+	// 	responseString: ["<h1>FAILURE</h1><h2>It looks like the insert of the readings had issues with some or all of the readings where the processing of the readings returned these warning(s)/error(s):</h2><br>For meter pipe7: Error parsing Reading #1. Reading value gives 24 with error message:<br>The first ever reading must be dropped when dealing with cumulative data.<br>For reading #1 on meter pipe7 in pipeline: previous reading has value 0 start time 1970-01-01T00:00:00Z end time 1970-01-01T00:00:00Z and current reading has value 24 start time 2021-06-01T00:00:00Z end time 2021-06-02T00:00:00Z with timeSort increasing; duplications 1; cumulative true; cumulativeReset true; cumulativeResetStart 00:00; cumulativeResetEnd 00:00.001; lengthGap 0; lengthVariation 0; onlyEndTime false<br><h2>Readings Dropped and should have previous messages</h2><ol><li>Dropped Reading #1 for meter pipe7</li></ol>"],
+	// },
 	// pipe8: {
 	// 	//bad compare
 	// 	description:"",
@@ -206,22 +208,22 @@ const testCases = {
 	// 	fileName: ['pipe90AInputMeter.csv.gz', 'pipe90BInputMeter.csv.gz', 'pipe90CInput.csv'],
 	// 	responseCode: [200, 200, 400],
 	// 	responseString: ["<h1>SUCCESS</h1>Successfully inserted the meters.", "<h1>SUCCESS</h1>Successfully inserted the meters.", "<h1>FAILURE</h1><h2>It looks like the insert of the readings had issues with some or all of the readings where the processing of the readings returned these warning(s)/error(s):</h2><br>For meter pipe90: Error parsing Reading #1. Reading value gives 24 with error message:<br>The first ever reading must be dropped when dealing with cumulative data.<br>For reading #1 on meter pipe90 in pipeline: previous reading has value 0 start time 1970-01-01T00:00:00Z end time 1970-01-01T00:00:00Z and current reading has value 24 start time 2021-06-01T00:00:00Z end time 2021-06-02T00:00:00Z with timeSort increasing; duplications 1; cumulative true; cumulativeReset true; cumulativeResetStart 00:00:00; cumulativeResetEnd 23:59:59.999999; lengthGap 0; lengthVariation 0; onlyEndTime false<br><h2>Readings Dropped and should have previous messages</h2><ol><li>Dropped Reading #1 for meter pipe90</li></ol>"]
-	// },
+	// }
 }
 
 for (let fileKey in testCases) {
 	const numUploads = testCases[fileKey].chaiRequest.length;
 	mocha.it(`Testing files starting '${fileKey}' doing '${testCases[fileKey]["description"]}' with ${numUploads} requests`, async () => {
+		let expectedFile = `${fileKey}Expected.csv`;
+		let expectedPath = `${__dirname}/${expectedFile}`;
+		let expectedBuffer = fs.readFileSync(expectedPath);
 		for (let index = 0; index < numUploads; index++) {
 			// It would be nice to put a mocha.describe inside the loop to tell the upload starting
 			// but that breaks the tests.
 			// Each set of uploads must be in one mocha because the DB is reset with each test.
 			let inputFile = testCases[fileKey]['fileName'][index];
-			let expectedFile = `${fileKey}Expected.csv`;
 			let inputPath = `${__dirname}/${inputFile}`;
-			let expectedPath = `${__dirname}/${expectedFile}`;
 			let inputBuffer = fs.readFileSync(inputPath);
-			let expectedBuffer = fs.readFileSync(expectedPath);
 			let evalString = `${testCases[fileKey]["chaiRequest"][index]}.attach('csvfile', inputBuffer, '${inputPath}')`;
 			// TODO It would be nice if this was not an eval. Tried a function with closure but could not get it to work as did not find chai.
 			const res = await eval(evalString);
@@ -229,20 +231,195 @@ for (let fileKey in testCases) {
 			expect(res).to.be.html;
 			// OED returns a string with messages that we check it is what was expected.
 			expect(res.text).to.equal(testCases[fileKey]['responseString'][index]);
-			// You do not want to check the database until all the uploads are done.
-			if (index === numUploads - 1) {
-				const conn = testDB.getConnection();
-				// Get every meter to be sure only one with correct name.
-				const meters = await Meter.getAll(conn);
-				expect(meters.length).to.equal(1);
-				expect(meters[0].name).to.equal(fileKey);
-				const readings = await Reading.getAllByMeterID(meters[0].id, conn);
-				const extractedReadings = readings.map(reading => {
-					return [`${reading.reading}`, reading.startTimestamp.format('YYYY-MM-DD HH:mm:ss'), reading.endTimestamp.format('YYYY-MM-DD HH:mm:ss')];
-				});
-				const fileReadings = await parseCsv(expectedBuffer);
-				expect(extractedReadings).to.deep.equals(fileReadings);
-			}
+		}
+		// You do not want to check the database until all the uploads are done.
+		const conn = testDB.getConnection();
+		// Get every meter to be sure only one with correct name.
+		const meters = await Meter.getAll(conn);
+		expect(meters.length).to.equal(1);
+		expect(meters[0].name).to.equal(fileKey);
+		const readings = await Reading.getAllByMeterID(meters[0].id, conn);
+		const extractedReadings = readings.map(reading => {
+			return [`${reading.reading}`, reading.startTimestamp.format('YYYY-MM-DD HH:mm:ss'), reading.endTimestamp.format('YYYY-MM-DD HH:mm:ss')];
+		});
+		const fileReadings = await parseCsv(expectedBuffer);
+		expect(extractedReadings).to.deep.equals(fileReadings);
+	});
+}
+
+// Begin testing of meters.
+
+// The GPS value used when want one.
+// TODO check out why needs to be backward
+// const gps = new Point(25, 50);
+const gps = new Point(50, 25);
+
+const testMeters = {
+	pipe100: {
+		description: "Second meter upload where incorrectly provides meter name so fails",
+		chaiRequest: [CHAI_METERS_REQUEST + ".field('gzip', 'false').field('headerRow','true')", CHAI_METERS_REQUEST + ".field('gzip', 'false').field('update','true').field('meterName', 'pipe100').field('headerRow','true')"],
+		fileName: ['pipe100InputMeter.csv', 'pipe100InputMeter.csv'],
+		responseCode: [200, 400],
+		responseString: ["<h1>SUCCESS</h1>Successfully inserted the meters.", "<h1>FAILURE</h1>CSVPipelineError: Failed to upload meters due to internal OED Error: Meter name provided (pipe100) in request with update for meters but more than one meter in CSV so not processing"],
+		metersUploaded: [
+			new Meter(
+				undefined, // id
+				'pipe100', // name
+				null, // URL
+				false, // enabled
+				false, //displayable
+				'other', //type
+				null, // timezone
+				undefined, // gps
+				undefined, // identifier
+				null, // note
+				null, //area
+				undefined, // cumulative
+				undefined, //cumulativeReset
+				undefined, // cumulativeResetStart
+				undefined, // cumulativeResetEnd
+				undefined, // readingGap
+				undefined, // readingVariation
+				undefined, //readingDuplication
+				undefined, // timeSort
+				undefined, //endOnlyTime
+				undefined, // reading
+				undefined, // startTimestamp
+				undefined // endTimestamp
+			),
+			new Meter(
+				undefined, // id
+				'pipe100b', // name
+				'123.45.6.0', // URL
+				true, // enabled
+				true, //displayable
+				'obvius', //type
+				'US/Central', // timezone
+				// null, // timezone
+				gps, // gps
+				'pipe100b id', // identifier
+				'my Note', // note
+				33, //area
+				true, // cumulative
+				true, //cumulativeReset
+				'14:44:00', // cumulativeResetStart
+				'15:55:00', // cumulativeResetEnd
+				12.34, // readingGap
+				56.78, // readingVariation
+				7, //readingDuplication
+				'decreasing', // timeSort
+				true, //endOnlyTime
+				89.90, // reading
+				moment('1666-07-08 17:13:19'), // startTimestamp
+				moment('1777-08-09 05:07:11') // endTimestamp
+			)
+		]
+	},
+	pipe101: {
+		description: "Second meter with same name so fails but first meter exists",
+		chaiRequest: [CHAI_METERS_REQUEST + ".field('gzip', 'false').field('headerRow','true')"],
+		fileName: ['pipe101InputMeter.csv'],
+		responseCode: [400],
+		responseString: ['<h1>FAILURE</h1>CSVPipelineError: Failed to upload meters due to internal OED Error: Meter name of pipe101 seems to exist when inserting new meters and got DB error of: duplicate key value violates unique constraint "meters_name_key"'],
+		metersUploaded: [
+			new Meter(
+				undefined, // id
+				'pipe101', // name
+				null, // URL
+				false, // enabled
+				false, //displayable
+				'other', //type
+				null, // timezone
+				undefined, // gps
+				undefined, // identifier
+				null, // note
+				null, //area
+				undefined, // cumulative
+				undefined, //cumulativeReset
+				undefined, // cumulativeResetStart
+				undefined, // cumulativeResetEnd
+				undefined, // readingGap
+				undefined, // readingVariation
+				undefined, //readingDuplication
+				undefined, // timeSort
+				undefined, //endOnlyTime
+				undefined, // reading
+				undefined, // startTimestamp
+				undefined // endTimestamp
+			)
+		]
+	},
+	pipe102: {
+		description: "Update meter where name does not exist so fails",
+		chaiRequest: [CHAI_METERS_REQUEST + ".field('gzip', 'false').field('headerRow','true').field('update','true')"],
+		fileName: ['pipe102InputMeter.csv'],
+		responseCode: [400],
+		responseString: ['<h1>FAILURE</h1>CSVPipelineError: Failed to upload meters due to internal OED Error: Meter name of pipe102 does not seem to exist with update for meters and got DB error of: No data returned from the query.'],
+		metersUploaded: []
+	}
+}
+
+for (let fileKey in testMeters) {
+	const numUploads = testMeters[fileKey].chaiRequest.length;
+	mocha.it(`Meter testing files starting '${fileKey}' doing '${testMeters[fileKey]["description"]}' with ${numUploads} requests`, async () => {
+		const conn = testDB.getConnection();
+		for (let index = 0; index < numUploads; index++) {
+			// It would be nice to put a mocha.describe inside the loop to tell the upload starting
+			// but that breaks the tests.
+			// Each set of uploads must be in one mocha because the DB is reset with each test.
+			let inputFile = testMeters[fileKey]['fileName'][index];
+			let inputPath = `${__dirname}/${inputFile}`;
+			let inputBuffer = fs.readFileSync(inputPath);
+			let evalString = `${testMeters[fileKey]["chaiRequest"][index]}.attach('csvfile', inputBuffer, '${inputPath}')`;
+			// TODO It would be nice if this was not an eval. Tried a function with closure but could not get it to work as did not find chai.
+			const res = await eval(evalString);
+			expect(res).to.have.status(testMeters[fileKey]['responseCode'][index]);
+			expect(res).to.be.html;
+			// OED returns a string with messages that we check it is what was expected.
+			expect(res.text).to.equal(testMeters[fileKey]['responseString'][index]);
+		}
+		// You do not want to check the database until all the uploads are done.
+		// Get every meter to be sure only one with correct name.
+		const meters = await Meter.getAll(conn);
+		let numExpected = testMeters[fileKey]['metersUploaded'].length;
+		expect(meters.length).to.equal(numExpected);
+		// Loop over meters to see if correct values.
+		for (let index = 0; index < numExpected; index++) {
+			let meterUse = testMeters[fileKey]['metersUploaded'][index];
+			let meter = await Meter.getByName(meterUse.name, conn);
+			compareMeters(meterUse, meter);
 		}
 	});
+}
+
+function compareMeters(expectMeter, receivedMeter) {
+	expect(receivedMeter).to.have.property('name', expectMeter.name);
+	expect(receivedMeter).to.have.property('ipAddress', expectMeter.ipAddress);
+	expect(receivedMeter).to.have.property('enabled', expectMeter.enabled);
+	expect(receivedMeter).to.have.property('displayable', expectMeter.displayable);
+	expect(receivedMeter).to.have.property('type', expectMeter.type);
+	expect(receivedMeter).to.have.property('meterTimezone', expectMeter.meterTimezone);
+	expect(receivedMeter).to.have.property('gps');
+	// Only check GPS value if it exists.
+	if (receivedMeter.gps !== null) {
+		expect(receivedMeter.gps).to.have.property('latitude', expectMeter.gps.latitude);
+		expect(receivedMeter.gps).to.have.property('longitude', expectMeter.gps.longitude);
+	}
+	expect(receivedMeter).to.have.property('identifier', expectMeter.identifier);
+	expect(receivedMeter).to.have.property('note', expectMeter.note);
+	expect(receivedMeter).to.have.property('area', expectMeter.area);
+	expect(receivedMeter).to.have.property('cumulative', expectMeter.cumulative);
+	expect(receivedMeter).to.have.property('cumulativeReset', expectMeter.cumulativeReset);
+	expect(receivedMeter).to.have.property('cumulativeResetStart', expectMeter.cumulativeResetStart);
+	expect(receivedMeter).to.have.property('cumulativeResetEnd', expectMeter.cumulativeResetEnd);
+	expect(receivedMeter).to.have.property('readingGap', expectMeter.readingGap);
+	expect(receivedMeter).to.have.property('readingVariation', expectMeter.readingVariation);
+	expect(receivedMeter).to.have.property('readingDuplication', expectMeter.readingDuplication);
+	expect(receivedMeter).to.have.property('timeSort', expectMeter.timeSort);
+	expect(receivedMeter).to.have.property('endOnlyTime', expectMeter.endOnlyTime);
+	expect(receivedMeter).to.have.property('reading', expectMeter.reading);
+	expect(receivedMeter).to.have.property('startTimestamp');
+	expect(receivedMeter.startTimestamp.format('YYYY-MM-DD HH:mm:ss')).to.equal(expectMeter.startTimestamp.format('YYYY-MM-DD HH:mm:ss'));
+	expect(receivedMeter).to.have.property('endTimestamp');
+	expect(receivedMeter.endTimestamp.format('YYYY-MM-DD HH:mm:ss')).to.equal(expectMeter.endTimestamp.format('YYYY-MM-DD HH:mm:ss'));
 }
