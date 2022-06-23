@@ -251,11 +251,19 @@ for (let fileKey in testCases) {
 
 // Begin testing of meters.
 
-// The GPS value used when want one.
-// TODO check out why needs to be backward
-// const gps = new Point(25, 50);
+// The GPS value used when want one. Note that OED stores the point as (Longitude, Latitude) so the order is reversed from the CSV file.
 const gps = new Point(50, 25);
 
+/*
+The structure has
+The highest level has the name of the test. Each one is a test to run.
+description: tells what the test is doing. There is one for all uploads so it is not an array.
+chaiRequest: an array of the requests that will be made.
+fileName: an array of the names of the files to use.
+responseCode: an array of the code sent back by OED for each request.
+responseString: an array of the html text sent back by OED for each request.
+metersUpload: an array where each entry is a meter object that is what should be in the database.
+*/
 const testMeters = {
 	pipe100: {
 		description: "Second meter upload where incorrectly provides meter name so fails",
@@ -361,40 +369,59 @@ const testMeters = {
 	}
 }
 
+// Loop over all the meter tests.
 for (let fileKey in testMeters) {
+	// How many uploads will be done.
 	const numUploads = testMeters[fileKey].chaiRequest.length;
 	mocha.it(`Meter testing files starting '${fileKey}' doing '${testMeters[fileKey]["description"]}' with ${numUploads} requests`, async () => {
 		const conn = testDB.getConnection();
+		// Loop over each upload to perform it.
 		for (let index = 0; index < numUploads; index++) {
 			// It would be nice to put a mocha.describe inside the loop to tell the upload starting
 			// but that breaks the tests.
 			// Each set of uploads must be in one mocha because the DB is reset with each test.
+			// The CSV file name with the meter data.
 			let inputFile = testMeters[fileKey]['fileName'][index];
+			// The CSV file with its path.
 			let inputPath = `${__dirname}/${inputFile}`;
+			// The CSV file as an file buffer.
 			let inputBuffer = fs.readFileSync(inputPath);
+			// The Chai request string to do the upload.
 			let evalString = `${testMeters[fileKey]["chaiRequest"][index]}.attach('csvfile', inputBuffer, '${inputPath}')`;
+			// eval the string to perform the upload. res is what is returned from the request.
 			// TODO It would be nice if this was not an eval. Tried a function with closure but could not get it to work as did not find chai.
 			const res = await eval(evalString);
+			// Verify the request response code is what was expected.
 			expect(res).to.have.status(testMeters[fileKey]['responseCode'][index]);
+			// This is a web request that should return html.
 			expect(res).to.be.html;
 			// OED returns a string with messages that we check it is what was expected.
 			expect(res.text).to.equal(testMeters[fileKey]['responseString'][index]);
 		}
 		// You do not want to check the database until all the uploads are done.
-		// Get every meter to be sure only one with correct name.
+		// Get every meter to be sure the correct number is there.
 		const meters = await Meter.getAll(conn);
 		let numExpected = testMeters[fileKey]['metersUploaded'].length;
 		expect(meters.length).to.equal(numExpected);
 		// Loop over meters to see if correct values.
 		for (let index = 0; index < numExpected; index++) {
-			let meterUse = testMeters[fileKey]['metersUploaded'][index];
-			let meter = await Meter.getByName(meterUse.name, conn);
-			compareMeters(meterUse, meter);
+			// The expected value for the meter.
+			let expectMeter = testMeters[fileKey]['metersUploaded'][index];
+			// Get the database value for the meter.
+			let meter = await Meter.getByName(expectMeter.name, conn);
+			// Verify they are the same.
+			compareMeters(expectMeter, meter);
 		}
 	});
 }
 
+/**
+ * Compares the two provided meters to make sure they are the same.
+ * @param {*} expectMeter A meter object that gives the values expected for the meter.
+ * @param {*} receivedMeter A meter object that has the actual values (normally from database).
+ */
 function compareMeters(expectMeter, receivedMeter) {
+	// Make sure it has all the expected properties with the values expected.
 	expect(receivedMeter).to.have.property('name', expectMeter.name);
 	expect(receivedMeter).to.have.property('ipAddress', expectMeter.ipAddress);
 	expect(receivedMeter).to.have.property('enabled', expectMeter.enabled);
@@ -421,7 +448,7 @@ function compareMeters(expectMeter, receivedMeter) {
 	expect(receivedMeter).to.have.property('endOnlyTime', expectMeter.endOnlyTime);
 	expect(receivedMeter).to.have.property('reading', expectMeter.reading);
 	expect(receivedMeter).to.have.property('startTimestamp');
-	expect(receivedMeter.startTimestamp.format('YYYY-MM-DD HH:mm:ss')).to.equal(expectMeter.startTimestamp.format('YYYY-MM-DD HH:mm:ss'));
 	expect(receivedMeter).to.have.property('endTimestamp');
-	expect(receivedMeter.endTimestamp.format('YYYY-MM-DD HH:mm:ss')).to.equal(expectMeter.endTimestamp.format('YYYY-MM-DD HH:mm:ss'));
+	// Use moment to compare.
+	expect(receivedMeter.endTimestamp.isSame(expectMeter.endTimestamp)).to.equal(true);
 }
