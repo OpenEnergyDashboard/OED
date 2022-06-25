@@ -187,7 +187,7 @@ class Meter {
 		reading = this.reading, startTimestamp = this.startTimestamp, endTimestamp = this.endTimestamp) {
 
 		this.name = name;
-		this.url = rul;
+		this.url = url;
 		this.enabled = enabled;
 		this.displayable = displayable;
 		this.type = type;
