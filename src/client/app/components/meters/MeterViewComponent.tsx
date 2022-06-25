@@ -60,10 +60,10 @@ class MeterViewComponent extends React.Component<MeterViewPropsWithIntl, MeterVi
 				{loggedInAsAdmin && <td> {this.props.meter.name} </td>}
 				<td> {this.formatIdentifierInput()} </td>
 				{loggedInAsAdmin && <td> {this.props.meter.meterType} </td>}
-				{loggedInAsAdmin && <td> {this.props.meter.ipAddress} </td>}
+				{loggedInAsAdmin && <td> {this.props.meter.url} </td>}
 				{loggedInAsAdmin && <td> {this.formatGPSInput()} </td>}
 				<td> {this.formatEnabled()} </td>
-				<td> {this.formatDisplayable()} </td>
+				{loggedInAsAdmin && <td> {this.formatDisplayable()} </td>}
 				{loggedInAsAdmin && <td> <TimeZoneSelect current={this.props.meter.timeZone} handleClick={this.changeTimeZone} /> </td>}
 			</tr>
 		);
@@ -95,11 +95,11 @@ class MeterViewComponent extends React.Component<MeterViewPropsWithIntl, MeterVi
 
 	private formatStatus(): string {
 		if (this.props.isSubmitting) {
-			return '(' + this.props.intl.formatMessage({id: 'submitting'}) + ')';
+			return '(' + this.props.intl.formatMessage({ id: 'submitting' }) + ')';
 		}
 
 		if (this.props.isEdited) {
-			return this.props.intl.formatMessage({id: 'edited'});
+			return this.props.intl.formatMessage({ id: 'edited' });
 		}
 
 		return '';
@@ -297,10 +297,10 @@ class MeterViewComponent extends React.Component<MeterViewPropsWithIntl, MeterVi
 		this.setState({ identifierInput: event.target.value });
 	}
 
-	private formatIdentifierInput(){
+	private formatIdentifierInput() {
 		let formattedIdentifier;
 		let buttonMessageId;
-		if(this.state.identifierFocus){
+		if (this.state.identifierFocus) {
 			formattedIdentifier = <textarea
 				id={'identifier'}
 				autoFocus

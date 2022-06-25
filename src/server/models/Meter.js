@@ -12,7 +12,7 @@ class Meter {
 	/**
 	 * @param id This meter's ID. Should be undefined if the meter is being newly created
 	 * @param name This meter's name
-	 * @param ipAddress This meter's IP Address
+	 * @param url This meter's URL Address
 	 * @param enabled This meter is being actively read from
 	 * @param displayable This meters is available to users for charting
 	 * @param type What kind of meter this is
@@ -36,7 +36,7 @@ class Meter {
 	 */
 	// The start/end timestamps are the default start/end timestamps that are set to the first
 	// day of time in moment. As always, we want to use UTC.
-	constructor(id, name, ipAddress, enabled, displayable, type, meterTimezone, gps = undefined, identifier = name, note, area,
+	constructor(id, name, url, enabled, displayable, type, meterTimezone, gps = undefined, identifier = name, note, area,
 		cumulative = false, cumulativeReset = false, cumulativeResetStart = '00:00:00', cumulativeResetEnd = '23:59:59.999999',
 		readingGap = 0, readingVariation = 0, readingDuplication = 1, timeSort = 'increasing', endOnlyTime = false,
 		reading = 0.0, startTimestamp = moment(0).utc(), endTimestamp = moment(0).utc()) {
@@ -44,7 +44,7 @@ class Meter {
 		// In addition, each new parameter has to be added at the very end.
 		this.id = id;
 		this.name = name;
-		this.ipAddress = ipAddress;
+		this.url = url;
 		this.enabled = enabled;
 		this.displayable = displayable;
 		this.type = type;
@@ -113,7 +113,7 @@ class Meter {
 	 * @returns Meter from row
 	 */
 	static mapRow(row) {
-		return new Meter(row.id, row.name, row.ipaddress, row.enabled, row.displayable, row.meter_type,
+		return new Meter(row.id, row.name, row.url, row.enabled, row.displayable, row.meter_type,
 			row.default_timezone_meter, row.gps, row.identifier, row.note, row.area, row.cumulative, row.cumulative_reset,
 			row.cumulative_reset_start, row.cumulative_reset_end, row.reading_gap, row.reading_variation,
 			row.reading_duplication, row.time_sort, row.end_only_time,
@@ -179,7 +179,7 @@ class Meter {
 	 * Updates the meter with values passed if not undefined.
 	 * For parameter info see {@link Meter#constructor}.
 	 */
-	merge(name = this.name, ipAddress = this.ipAddress, enabled = this.enabled, displayable = this.displayable, type = this.type,
+	merge(name = this.name, url = this.url, enabled = this.enabled, displayable = this.displayable, type = this.type,
 		meterTimezone = this.meterTimezone, gps = this.gps, identifier = this.identifier, note = this.note, area = this.area,
 		cumulative = this.cumulative, cumulativeReset = this.cumulativeReset, cumulativeResetStart = this.cumulativeResetStart,
 		cumulativeResetEnd = this.cumulativeResetEnd, readingGap = this.readingGap, readingVariation = this.readingVariation,
@@ -187,7 +187,7 @@ class Meter {
 		reading = this.reading, startTimestamp = this.startTimestamp, endTimestamp = this.endTimestamp) {
 
 		this.name = name;
-		this.ipAddress = ipAddress;
+		this.url = url;
 		this.enabled = enabled;
 		this.displayable = displayable;
 		this.type = type;
@@ -235,6 +235,7 @@ class Meter {
 
 // Enum of meter types
 Meter.type = {
+	EGAUGE: 'egauge',
 	MAMAC: 'mamac',
 	METASYS: 'metasys',
 	OBVIUS: 'obvius',

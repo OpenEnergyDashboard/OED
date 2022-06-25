@@ -45,7 +45,7 @@ function expectMetersToBeEquivalent(meters, length, offset) {
 		}
 		if (length === 4) {
 			// Admin so see more values
-			expect(meter).to.have.property('ipAddress', '1.1.1.1');
+			expect(meter).to.have.property('url', '1.1.1.1');
 			expect(meter).to.have.property('meterType', Meter.type.MAMAC);
 			expect(meter).to.have.property('timeZone', 'TZ' + (i + offset));
 			expect(meter).to.have.property('note', `notes ${i + offset}`);
@@ -62,7 +62,7 @@ function expectMetersToBeEquivalent(meters, length, offset) {
 			expect(meter).to.have.property('startTimestamp', '0001-01-01T23:59:59.000Z');
 			expect(meter).to.have.property('endTimestamp', '2020-07-02T01:00:10.000Z');
 		} else {
-			expect(meter).to.have.property('ipAddress', null);
+			expect(meter).to.have.property('url', null);
 			expect(meter).to.have.property('meterType', null);
 			expect(meter).to.have.property('timeZone', null);
 			expect(meter).to.have.property('note', null);

@@ -381,9 +381,9 @@ async function processData(rows, meterID, timeSort = TimeSortTypesJS.increasing,
 	}
 	// Validate data if conditions given
 	if (conditionSet !== undefined && !validateReadings(result, conditionSet)) {
-		errMsg = `<h2>For meter ' + meterName + ': REJECTED ALL READINGS FROM METER ${ipAddress} DUE TO ERROR WHEN VALIDATING DATA</h2>`;
-		({ msgTotal, msgTotalWarning } = appendMsgTotal(msgTotal, errMsg, msgTotalWarning));
+		errMsg = `<h2>For meter ' + meterName + ': error when validating data so all reading are rejected</h2>`;
 		log.error(errMsg);
+		({ msgTotal, msgTotalWarning } = appendMsgTotal(msgTotal, errMsg, msgTotalWarning));
 		// This empties the result array. Should be fast and okay with const.
 		result.splice(0, result.length);
 		isAllReadingsOk = false;

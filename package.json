@@ -21,6 +21,7 @@
     "migratedb": "node ./src/server/services/migrateDB.js",
     "addMamacMeters": "node ./src/server/services/addMamacMeters.js",
     "updateMamacMeters": "node ./src/server/services/updateMamacMeters.js",
+    "updateEgaugeMeters": "node ./src/server/services/eGauge/updateEgaugeMeters.js",
     "createUser": "node ./src/server/services/user/createUser.js",
     "editUser": "node ./src/server/services/user/editUser.js",
     "sendLogEmail": "node ./src/server/services/sendLogEmail.js",
