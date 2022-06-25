@@ -64,7 +64,7 @@ class MeterViewComponent extends React.Component<MeterViewPropsWithIntl, MeterVi
 				{loggedInAsAdmin && <td> {this.formatGPSInput()} </td>}
 				<td> {this.formatEnabled()} </td>
 				{loggedInAsAdmin && <td> {this.formatDisplayable()} </td>}
-				{loggedInAsAdmin && <td> <TimeZoneSelect current={this.props.meter.timeZone || ''} handleClick={this.changeTimeZone} /> </td>}
+				{loggedInAsAdmin && <td> <TimeZoneSelect current={this.props.meter.timeZone} handleClick={this.changeTimeZone} /> </td>}
 			</tr>
 		);
 	}

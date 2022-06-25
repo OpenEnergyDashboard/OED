@@ -35,3 +35,9 @@ postgres-data
 
 # Test data (normally for developers)
 src/server/test/db/data/automatedTests/*.csv
+
+# nohup.out is created when working inside the remote container with Visual Studio Code.
+nohup.out
+
+# Mac Finder files - do here so avoid in VSC container
+.DS_Store

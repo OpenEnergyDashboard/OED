@@ -7,6 +7,7 @@ import { hasToken } from './token';
 import { usersApi } from '../utils/api'
 import * as moment from 'moment';
 import { UserRole } from '../types/items';
+import translate from './translate';
 
 /**
  * Function to converts the compressed meter data into a CSV formatted string.
@@ -118,14 +119,14 @@ export async function graphRawExport(count: number, warningFileSize: number, fil
 	innerContainer.style.borderRadius = '10px';
 	innerContainer.style.textAlign = 'center';
 
-	innerContainer.innerHTML = `
-		<p>File size will be about ${fileSize.toFixed(2)}MB.</p>
-		<p>Are you sure you want to download</p>
-	`;
+	innerContainer.innerHTML =
+		'<p>' + translate('csv.download.size.warning.size') + ` ${fileSize.toFixed(2)}MB.</p>
+		<p>` + translate('csv.download.size.warning.verify') + '</p>'
+	;
 
 	// fileSizeLimit is limit for an admin without checking they really want to download,
 	if (fileSize > fileSizeLimit && (!hasToken() || !(await usersApi.hasRolePermissions(UserRole.EXPORT)))) {
-		innerContainer.innerHTML = "<p>Sorry you don't have permissions to download due to large number of points.</p>";
+		innerContainer.innerHTML = '<p>' + translate('csv.download.size.limit') + '</p>';
 		const okButton = document.createElement('button');
 		okButton.innerHTML = 'ok';
 		okButton.addEventListener('click', () => {
@@ -136,9 +137,9 @@ export async function graphRawExport(count: number, warningFileSize: number, fil
 	}
 
 	const noButton = document.createElement('button');
-	noButton.innerHTML = 'No';
+	noButton.innerHTML = translate('no');
 	const yesButton = document.createElement('button');
-	yesButton.innerHTML = 'Yes';
+	yesButton.innerHTML = translate('yes');
 
 	innerContainer.appendChild(yesButton);
 	innerContainer.appendChild(noButton);

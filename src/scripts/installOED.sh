@@ -5,6 +5,8 @@
 # * file, You can obtain one at http://mozilla.org/MPL/2.0/.
 # *
 
+printf "\n\n%s\n\n" "***** Starting install of OED at $(date) *****"
+
 USAGE="Usage: $0 [--production] [--nostart] [--keep_node_modules] [--continue_on_db_error]"
 
 production=no

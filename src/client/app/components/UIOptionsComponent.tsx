@@ -8,8 +8,8 @@ import sliderWithoutTooltips, { createSliderWithTooltip } from 'rc-slider';
 import * as moment from 'moment';
 import { Button, ButtonGroup, Dropdown, DropdownToggle, DropdownMenu, DropdownItem } from 'reactstrap';
 import ExportContainer from '../containers/ExportContainer';
-import ChartSelectContainer from '../containers/ChartSelectContainer';
-import ChartDataSelectContainer from '../containers/ChartDataSelectContainer';
+import ChartSelectComponent from './ChartSelectComponent';
+import ChartDataSelectComponent from './ChartDataSelectComponent';
 import { ChangeBarStackingAction, ChangeCompareSortingOrderAction, SetOptionsVisibility } from '../types/redux/graph';
 import ChartLinkContainer from '../containers/ChartLinkContainer';
 import LanguageSelectorContainer from '../containers/LanguageSelectorContainer'
@@ -17,7 +17,8 @@ import { ChartTypes } from '../types/redux/graph';
 import { ComparePeriod, SortingOrder } from '../utils/calculateCompare';
 import TooltipMarkerComponent from './TooltipMarkerComponent';
 import 'rc-slider/assets/index.css';
-import MapChartSelectContainer from '../containers/MapChartSelectContainer';
+import MapChartSelectComponent from './MapChartSelectComponent';
+import ReactTooltip from 'react-tooltip';
 
 const Slider = createSliderWithTooltip(sliderWithoutTooltips);
 
@@ -63,6 +64,12 @@ class UIOptionsComponent extends React.Component<UIOptionsPropsWithIntl, UIOptio
 		};
 	}
 
+	public componentDidUpdate(prev: UIOptionsProps) {
+		if (prev.chartToRender !== this.props.chartToRender) {
+			ReactTooltip.rebuild(); // This rebuilds the tooltip so that it detects the marker that disappear because the chart type changes.
+		}
+	}
+
 	public render() {
 		const labelStyle: React.CSSProperties = {
 			fontWeight: 'bold',
@@ -77,8 +84,8 @@ class UIOptionsComponent extends React.Component<UIOptionsPropsWithIntl, UIOptio
 
 		return (
 			<div>
-				<ChartSelectContainer />
-				<ChartDataSelectContainer />
+				<ChartSelectComponent />
+				<ChartDataSelectComponent />
 
 				{/* Controls specific to the bar chart. */}
 				{this.props.chartToRender === ChartTypes.bar &&
@@ -175,7 +182,7 @@ class UIOptionsComponent extends React.Component<UIOptionsPropsWithIntl, UIOptio
 								<FormattedMessage id='4.weeks' />
 							</Button>
 						</ButtonGroup>
-						<TooltipMarkerComponent page='home' helpTextId='help.home.compare.interval.tip' />
+						<TooltipMarkerComponent page='home' helpTextId='help.home.compare.interval.tip'/>
 						<Dropdown isOpen={this.state.compareSortingDropdownOpen} toggle={this.toggleDropdown}>
 							<DropdownToggle caret>
 								<FormattedMessage id='sort' />
@@ -233,7 +240,7 @@ class UIOptionsComponent extends React.Component<UIOptionsPropsWithIntl, UIOptio
 							</ButtonGroup>
 							<TooltipMarkerComponent page='home' helpTextId='help.home.map.interval.tip' />
 						</div>
-						<MapChartSelectContainer key='chart' />
+						<MapChartSelectComponent key='chart' />
 					</div>
 				}
 

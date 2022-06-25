@@ -9,7 +9,7 @@ import MeterViewContainer from '../../containers/meters/MeterViewContainer';
 import HeaderContainer from '../../containers/HeaderContainer';
 import FooterContainer from '../../containers/FooterContainer';
 import TooltipMarkerComponent from '../TooltipMarkerComponent';
-import TooltipHelpContainerAlternative from '../../containers/TooltipHelpContainerAlternative';
+import TooltipHelpContainer from '../../containers/TooltipHelpContainer';
 import UnsavedWarningContainer from '../../containers/UnsavedWarningContainer';
 import { removeUnsavedChanges } from '../../actions/unsavedWarning';
 import store from '../../index';
@@ -61,7 +61,7 @@ export default class MetersDetailComponent extends React.Component<MetersDetailP
 			<div>
 				<UnsavedWarningContainer />
 				<HeaderContainer />
-				<TooltipHelpContainerAlternative page='meters' />
+				<TooltipHelpContainer page='meters' />
 				<div className='container-fluid'>
 					<h2 style={titleStyle}>
 						<FormattedMessage id='meters' />
