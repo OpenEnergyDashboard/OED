@@ -45,38 +45,32 @@ export function validateSortingOrder(sortingOrder: string): SortingOrder {
 }
 
 export function calculateCompareTimeInterval(comparePeriod: ComparePeriod, currentTime: moment.Moment): TimeInterval {
-	// Moment changes the times by shifting to local (client/browser) timezone. To fix this up, we need
-	// to know the shift between UTC and local timezone. The value below is the time in minutes that
-	// must be added to go from UTC to local time. For example, for CST it is -360 (Central U.S.A.
-	// without daylight savings) since CST is 6 hours behind UTC.
-	const utcShift = moment().utcOffset();
 	// begin will be the start of the compare time and end will be the end of the compare time.
 	let begin;
-	// OED uses hourly/daily view data to get comparisons so it is only accurate to the last hour.
+	// OED uses raw/meter readings to get compare data so it is only accurate to the last reading.
+	// We also limit the comparison to the last hour.
 	// By setting the end time to the hour it works properly and avoids changing with each request
 	// within the same hour. This avoids updating the Redux state so it is faster.
 	// You also get an error with groups at times because the state was not to the hour but the final
 	// time used to get the state was the start of the hour. This fixes that.
-	const end = currentTime.add(utcShift, 'minutes').startOf('hour');
+	// As elsewhere in OED, we take the moment that is the start of the hour, format it so it has that
+	// date/time set to UTC (+00:00) and then create a moment that honors the UTC timezone.
+	const end = moment.parseZone(currentTime.startOf('hour').format('YYYY-MM-DD HH:mm:ss') + '+00:00');
 	switch (comparePeriod) {
 		case ComparePeriod.Day:
-			// We need to shift all the times by utcShift because later on they will be shifted back.
-			// begin is the start of the day (shifted) and end is the current time (shifted).
+			// begin is the start of the day.
 			// The range is one day without any time remaining in this day to the previous hour.
-			begin = moment().startOf('day').add(utcShift, 'minutes');
+			begin = moment.parseZone(currentTime.startOf('day').format('YYYY-MM-DD HH:mm:ss') + '+00:00');
 			break;
 		case ComparePeriod.Week:
-			// We need to shift all the times by utcShift because later on they will be shifted back.
-			// begin is the start of the day on last Sunday (shifted) and end is the current time (shifted).
+			// begin is the start of the day on last Sunday.
 			// The range is one week without any time remaining in this week to the previous hour.
-			begin = moment().startOf('week').add(utcShift, 'minutes');
+			begin = moment.parseZone(currentTime.startOf('week').format('YYYY-MM-DD HH:mm:ss') + '+00:00');
 			break;
 		case ComparePeriod.FourWeeks:
-			// We need to shift all the times by utcShift because later on they will be shifted back.
-			// begin is the start of the day on Sunday three weeks earlier than the Sunday of this week (shifted)
-			// and end is the current time (shifted). The range of time used is or four weeks without any time
-			// remaining in this week  to the previous hour.
-			begin = moment().startOf('week').subtract(3, 'weeks').add(utcShift, 'minutes');
+			// begin is the start of the day on Sunday three weeks earlier than the Sunday of this week.
+			// The range of time used is or four weeks without any time remaining in this week  to the previous hour.
+			begin = moment.parseZone(currentTime.startOf('week').subtract(3, 'weeks').format('YYYY-MM-DD HH:mm:ss') + '+00:00');
 			break;
 		default:
 			throw new Error(`Unknown period value: ${comparePeriod}`);

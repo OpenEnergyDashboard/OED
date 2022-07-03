@@ -4,7 +4,7 @@
 
 UPDATE meters
 	SET name = ${name},
-		ipaddress = ${ipAddress},
+		url = ${url},
 		enabled = ${enabled},
 		displayable = ${displayable},
 		meter_type = ${type},

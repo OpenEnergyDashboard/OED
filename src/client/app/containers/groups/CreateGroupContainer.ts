@@ -21,7 +21,8 @@ function mapStateToProps(state: State) {
 		group => ({ id: group.id, name: group.name.trim() })), 'name');
 	return {
 		meters: sortedMeters,
-		groups: sortedGroups
+		groups: sortedGroups,
+		currentGroup: state.groups.groupInEditing
 	};
 }
 

@@ -25,12 +25,15 @@ function handleCumulativeReset(cumulativeReset, resetStart, resetEnd, startTimes
 		let resetStartDuration = moment.duration(resetStart);
 		let resetEndDuration = moment.duration(resetEnd);
 		// Do by getting the start of the day for testStart and then adding in the time for reset.
+		// The clone is necessary since startOf mutates the moment object.
 		let testResetStart = moment(testStart.clone().startOf('day') + resetStartDuration);
 		if (resetStartDuration.subtract(resetEndDuration) > 0) {
 			// If the start time is after the end time for reset then the start time is for the previous day.
 			testResetStart = testResetStart.subtract(1, 'days');
 		}
 		let testResetEnd = moment(testStart.clone().startOf('day') + moment.duration(resetEnd));
+		// While testResetStart/End is in local timezone and startTimestamp is in UTC timezone,
+		// moment still does the test correctly.
 		if (testStart.isSameOrAfter(testResetStart) && testStart.isSameOrBefore(testResetEnd)) {
 			// The reading is between the reset times so it is okay to use.
 			return true;

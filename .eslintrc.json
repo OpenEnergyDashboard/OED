@@ -11,6 +11,10 @@
     "extends": [
         "eslint:recommended",
         "plugin:@typescript-eslint/recommended"
+        // uncomment this to enforce eslint-plugin-jsdoc rules (and add comma above)
+        // along with the plugings below for jsdoc.
+        //the line of code below is in regards to https://github.com/OpenEnergyDashboard/OED/issues/396 
+        // "plugin:jsdoc/recommended"
     ],
     "parser": "@typescript-eslint/parser",
     "parserOptions": {
@@ -22,18 +26,27 @@
     },
     "plugins": [
         "@typescript-eslint"
+        //this section of code is for running jsdoc checker (eslint-plugin-jsdoc) https://github.com/OpenEnergyDashboard/OED/issues/396.
+        // It needs to be uncommented if using jsdoc plugin and add a comma above.
+        // "jsdoc"
     ],
     "rules": {
         //https://github.com/typescript-eslint/typescript-eslint/issues/1824, indent is therefore turned off and we use typescript-eslint/indent instead
-        "indent": ["off"],
+        "indent": [
+            "off"
+        ],
         "@typescript-eslint/indent": [
             "error",
             "tab",
-            { "SwitchCase": 1 }
+            {
+                "SwitchCase": 1
+            }
         ],
         "@typescript-eslint/no-explicit-any": "off",
         "@typescript-eslint/no-inferrable-types": "off",
-        "no-trailing-spaces": [2],
+        "no-trailing-spaces": [
+            2
+        ],
         "linebreak-style": [
             "error",
             "unix"
@@ -41,11 +54,16 @@
         "quotes": [
             "error",
             "single",
-            { "avoidEscape": true }
+            {
+                "avoidEscape": true
+            }
         ],
         "max-len": [
             "error",
-            { "code": 150, "tabWidth": 0 }
+            {
+                "code": 150,
+                "tabWidth": 0
+            }
         ],
         "comma-dangle": [
             "error",
@@ -93,15 +111,21 @@
                     }
                 ],
                 // same rules need to be added.
-                "indent": ["off"],
+                "indent": [
+                    "off"
+                ],
                 "@typescript-eslint/indent": [
                     "error",
                     "tab",
-                    { "SwitchCase": 1 }
+                    {
+                        "SwitchCase": 1
+                    }
                 ],
                 "@typescript-eslint/no-explicit-any": "off",
                 "@typescript-eslint/no-inferrable-types": "off",
-                "no-trailing-spaces": [2],
+                "no-trailing-spaces": [
+                    2
+                ],
                 "linebreak-style": [
                     "error",
                     "unix"
@@ -109,11 +133,16 @@
                 "quotes": [
                     "error",
                     "single",
-                    { "avoidEscape": true }
+                    {
+                        "avoidEscape": true
+                    }
                 ],
                 "max-len": [
                     "error",
-                    { "code": 150, "tabWidth": 0 }
+                    {
+                        "code": 150,
+                        "tabWidth": 0
+                    }
                 ],
                 "comma-dangle": [
                     "error",

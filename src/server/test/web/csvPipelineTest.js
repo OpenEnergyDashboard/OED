@@ -34,7 +34,9 @@ mocha.describe('csv API', () => {
 				.field('email', testUser.email)
 				.field('password', testUser.password)
 				.field('gzip', 'false')
-				.attach('csvfile', metersBuffer, `${readingsPath}`)
+				// TODO For unknown reasons, when this was readingsPath instead of metersPath, the test still worked.
+				// It may indicate an issue with this test and one for zipped that similar.
+				.attach('csvfile', metersBuffer, `${metersPath}`)
 
 			expect(res).to.have.status(200);
 			const csvMeters = (await parseCsv(metersBuffer)).map(row =>
@@ -118,7 +120,7 @@ mocha.describe('csv API', () => {
 			const res = await chai.request(app).post(UPLOAD_METERS_ROUTE)
 				.field('email', testUser.email)
 				.field('password', testUser.password)
-				.attach('csvfile', zippedMetersBuffer, `${readingsPath}.gz`)
+				.attach('csvfile', zippedMetersBuffer, `${metersPath}.gz`)
 
 			expect(res).to.have.status(200);
 			const csvMeters = (await parseCsv(metersBuffer)).map(row =>

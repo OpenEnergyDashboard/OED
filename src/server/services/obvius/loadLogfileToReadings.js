@@ -43,13 +43,13 @@ async function loadLogfileToReadings(serialNumber, ipAddress, logfile, conn) {
 				continue;
 			}
 			// Otherwise assume it is kWh and proceed.
-			// Switching to assume one reading is end time and can use default moment parsing of date/timestamp.
-			// It is believed that the format from Obvius will always be this way so specify.
-			// Strict mode is used so it will give Invalid date if not correct and should be caught in pipeline.
-			// const endTimestamp = moment(rawReading[0], 'YYYY-MM-DD HH:mm:ss', true);
-			// TODO For reasons I do not understand, strict mode causes Invalid date even though debugging seems
-			// to indicate it is correct. I thought it worked before but it does not. Thus, removing strict mode for now.
-			const endTimestamp = moment(rawReading[0], 'YYYY-MM-DD HH:mm:ss');
+			// Assume one reading is end time.
+			// moment cannot be set to strict mode since it fails. However, the expected format is given so
+			// it should do a good test.
+			// See src/server/services/pipeline-in-progress/processData.js for more info on why it is set up this way.
+			// It would seem you could directly use the rawReading[0] since it is in the right format but doing that leads
+			// to errors so we parse in the usual way.
+			const endTimestamp = moment.parseZone(moment(rawReading[0], 'YYYY-MM-DD HH:mm:ss').format('YYYY-MM-DD HH:mm:ss') + '+00:00', undefined, true);
 			reading[index] = [rawReading[1], endTimestamp];
 			index++;
 		}

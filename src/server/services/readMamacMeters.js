@@ -65,6 +65,7 @@ async function getMeterInfo(url, ip, csvLine) {
 		.then(raw => parseXMLPromisified(raw))
 		.then(xml => {
 			const name = xml.Maverick.NodeID[0];
+			// For historical reasons, MAMAC meters store the IP address and not the URL.
 			return new Meter(undefined, name, ip, true, displayable, Meter.type.MAMAC, null, undefined, undefined,
 				'created via MAMAC meter upload on ' + moment().format(), unitId, unitId);
 		});
@@ -76,7 +77,7 @@ async function getMeterInfo(url, ip, csvLine) {
  * @returns {Array.<Promise.<Meter>>}
  */
 function infoForAllMeters(rows, conn) {
-	return rows.map((row, index) => getMeterInfo(`http://${row.ip}/sm101.xml`, row.ip, index + 2));
+	return rows.map((row, index) => getMeterInfo(`http://${row.url}/sm101.xml`, row.url, index + 2));
 }
 
 /**

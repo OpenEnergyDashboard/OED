@@ -8,6 +8,7 @@ const moment = require('moment');
 
 class TimeInterval {
 	constructor(startTimestamp, endTimestamp) {
+		// utc keeps the moments from changing timezone.
 		this.startTimestamp = startTimestamp && moment.utc(startTimestamp);
 		this.endTimestamp = endTimestamp && moment.utc(endTimestamp);
 		this.isBounded = (this.startTimestamp !== null) && (this.endTimestamp !== null);

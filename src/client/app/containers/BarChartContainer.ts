@@ -68,9 +68,10 @@ function mapStateToProps(state: State) {
 				const hoverText: string[] = [];
 				const readings = _.orderBy(readingsData.readings, ['startTimestamp'], ['asc']);
 				readings.forEach(barReading => {
-					// subtracting one extra day caused by day ending at midnight of the next day
+					// subtracting one extra day caused by day ending at midnight of the next day.
+					// Going from DB unit timestamp that is UTC so force UTC with moment, as usual.
 					const timeReading: string =
-						`${moment(barReading.startTimestamp).utc().format('ll')} - ${moment(barReading.endTimestamp).subtract(1, 'days').utc().format('ll')}`;
+						`${moment.utc(barReading.startTimestamp).format('ll')} - ${moment.utc(barReading.endTimestamp).subtract(1, 'days').format('ll')}`;
 					xData.push(timeReading);
 					yData.push(barReading.reading);
 					hoverText.push(`<b> ${timeReading} </b> <br> ${label}: ${barReading.reading.toPrecision(6)} ${unitLabel}`);
@@ -83,7 +84,7 @@ function mapStateToProps(state: State) {
 					text: hoverText,
 					hoverinfo: 'text',
 					type: 'bar',
-					marker: {color: getGraphColor(colorID, DataType.Meter)}
+					marker: { color: getGraphColor(colorID, DataType.Meter) }
 				});
 			}
 		}
@@ -107,9 +108,10 @@ function mapStateToProps(state: State) {
 				const hoverText: string[] = [];
 				const readings = _.orderBy(readingsData.readings, ['startTimestamp'], ['asc']);
 				readings.forEach(barReading => {
-					// subtracting one extra day caused by day ending at midnight of the next day
+					// subtracting one extra day caused by day ending at midnight of the next day.
+					// Going from DB unit timestamp that is UTC so force UTC with moment, as usual.
 					const timeReading: string =
-						`${moment(barReading.startTimestamp).utc().format('ll')} - ${moment(barReading.endTimestamp).subtract(1, 'days').utc().format('ll')}`;
+						`${moment.utc(barReading.startTimestamp).format('ll')} - ${moment.utc(barReading.endTimestamp).subtract(1, 'days').format('ll')}`;
 					xData.push(timeReading);
 					yData.push(barReading.reading);
 					hoverText.push(`<b> ${timeReading} </b> <br> ${label}: ${barReading.reading.toPrecision(6)} ${unitLabel}`);
@@ -123,7 +125,7 @@ function mapStateToProps(state: State) {
 					text: hoverText,
 					hoverinfo: 'text',
 					type: 'bar',
-					marker: {color: getGraphColor(colorID, DataType.Group)}
+					marker: { color: getGraphColor(colorID, DataType.Group) }
 				});
 			}
 		}

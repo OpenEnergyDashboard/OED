@@ -7,6 +7,7 @@
  * meter and readings data.
  */
 
+const moment = require('moment');
 const crypto = require('crypto');
 const express = require('express');
 const router = express.Router();
@@ -43,7 +44,7 @@ router.use(function (req, res, next) {
 		}(),
 		filename: function (r, file, cb) {
 			// Save file with original name and date time to prevent accidental overwrites.
-			const modifiedFilename = `${(new Date(Date.now()).toISOString())}-${crypto.randomBytes(2).toString('hex')}-${file.originalname}`;
+			const modifiedFilename = `${moment().format('YYYY-MM-DD_HH:mm:ss.SSS')}-${crypto.randomBytes(2).toString('hex')}-${file.originalname}`;
 			cb(null, modifiedFilename);
 		}
 	})
