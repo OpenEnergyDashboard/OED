@@ -25,6 +25,7 @@ private
 # CSV files (except ones needed for database tests)
 *.csv
 !/src/server/test/**/*.csv
+!/src/server/data/unit/*.csv
 
 # Database
 postgres-data
