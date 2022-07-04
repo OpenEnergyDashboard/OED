@@ -9,7 +9,7 @@ import HeaderContainer from '../../containers/HeaderContainer';
 import FooterContainer from '../../containers/FooterContainer';
 import TooltipMarkerComponent from '../TooltipMarkerComponent';
 import { FormattedMessage } from 'react-intl';
-import TooltipHelpContainerAlternative from '../../containers/TooltipHelpContainerAlternative';
+import TooltipHelpContainer from '../../containers/TooltipHelpContainer';
 
 interface GroupsDetailProps {
 	loggedInAsAdmin: boolean;
@@ -44,7 +44,7 @@ export default class GroupsDetailComponent extends React.Component<GroupsDetailP
 		return (
 			<div>
 				<HeaderContainer />
-				<TooltipHelpContainerAlternative page='groups' />
+				<TooltipHelpContainer page='groups' />
 				<div className='container-fluid'>
 					<h2 style={titleStyle}>
 						<FormattedMessage id='groups' />

@@ -14,6 +14,10 @@ const Unit = require('../models/Unit');
 const Conversion = require('../models/Conversion');
 const { getConnection } = require('../db');
 const { redoCik } = require('../services/graph/redoCik');
+const Meter = require('..//models/Meter')
+const loadCsvInput = require('../services/pipeline-in-progress/loadCsvInput');
+const moment = require('moment');
+const { refreshAllReadingViews } = require('../services/refreshAllReadingViews');
 
 // Define the start and end date for data generation.
 const DEFAULT_OPTIONS = {
@@ -315,19 +319,22 @@ async function insertSpecialUnits(conn) {
 	const specialUnits = [
 		['Electric_utility', '', Unit.unitRepresentType.QUANTITY, Unit.unitType.METER, '', Unit.displayableType.NONE, false],
 		['Natural_Gas_BTU', '', Unit.unitRepresentType.QUANTITY, Unit.unitType.METER, '', Unit.displayableType.NONE, false],
-		['100 W bulb', '100 W bulb for 10 hrs', Unit.unitRepresentType.UNUSED, Unit.unitType.UNIT, '', Unit.displayableType.ALL, false],
+		['100 W bulb', '100 W bulb for 10 hrs', Unit.unitRepresentType.QUANTITY, Unit.unitType.UNIT, '', Unit.displayableType.ALL, false],
 		['Natural_Gas_M3', '', Unit.unitRepresentType.QUANTITY, Unit.unitType.METER, '', Unit.displayableType.NONE, false],
 		['Natural_Gas_dollar', '', Unit.unitRepresentType.QUANTITY, Unit.unitType.METER, '', Unit.displayableType.NONE, false],
-		['US_dollar', 'US $', Unit.unitRepresentType.UNUSED, Unit.unitType.UNIT, '', Unit.displayableType.ALL, true],
-		['Euro', '€', Unit.unitRepresentType.UNUSED, Unit.unitType.UNIT, '', Unit.displayableType.ALL, true],
-		['kg CO2', 'kg CO2', Unit.unitRepresentType.UNUSED, Unit.unitType.UNIT, 'CO2', Unit.displayableType.ALL, false],
-		['Trash', '', Unit.unitRepresentType.QUANTITY, Unit.unitType.METER, '', Unit.displayableType.NONE, false]
+		['US_dollar', 'US $', Unit.unitRepresentType.QUANTITY, Unit.unitType.UNIT, '', Unit.displayableType.ALL, true],
+		['Euro', '€', Unit.unitRepresentType.QUANTITY, Unit.unitType.UNIT, '', Unit.displayableType.ALL, true],
+		['kg CO2', 'kg CO2', Unit.unitRepresentType.QUANTITY, Unit.unitType.UNIT, 'CO2', Unit.displayableType.ALL, false],
+		['Trash', '', Unit.unitRepresentType.QUANTITY, Unit.unitType.METER, '', Unit.displayableType.NONE, false],
+		['Temperature_fahrenheit', '', Unit.unitRepresentType.RAW, Unit.unitType.METER, '', Unit.displayableType.NONE, false],
+		['kW', 'kW', Unit.unitRepresentType.FLOW, Unit.unitType.UNIT, '', Unit.displayableType.ALL, true],
+		['Electric_kW', '', Unit.unitRepresentType.FLOW, Unit.unitType.METER, '', Unit.displayableType.NONE, false]
 	];
 
 	for (let i = 0; i < specialUnits.length; ++i) {
 		const unitData = specialUnits[i];
 		if (await Unit.getByName(unitData[0], conn) === null) {
-			await new Unit(undefined, unitData[0], unitData[1], unitData[2], undefined, 
+			await new Unit(undefined, unitData[0], unitData[1], unitData[2], undefined,
 				unitData[3], null, unitData[4], unitData[5], unitData[6], 'special unit').insert(conn);
 		}
 	}
@@ -353,7 +360,9 @@ async function insertSpecialConversions(conn) {
 		['Natural_Gas_dollar', 'US_dollar', false, 1, 0, 'Natural Gas $ → US dollar'],
 		['kg CO2', 'kg', false, 1, 0, 'CO2 → kg'],
 		['Trash', 'kg CO2', false, 3.24e-6, 0, 'Trash → CO2'],
-		['Trash', 'kg', false, 1, 0, 'Trash → kg']
+		['Trash', 'kg', false, 1, 0, 'Trash → kg'],
+		['Temperature_fahrenheit', 'Fahrenheit', false, 1, 0, 'Temperature Fahrenheit → Fahrenheit'],
+		['Electric_kW', 'kW', false, 1, 0, 'Electric kW → kW']
 	];
 
 	for (let i = 0; i < specialConversions.length; ++i) {
@@ -376,6 +385,98 @@ async function insertSpecialUnitsAndConversions() {
 	await redoCik(conn);
 }
 
+/**
+ * Insert special meters into the database.
+ */
+async function insertSpecialMeters() {
+	const conn = getConnection();
+	// The table contains special meters' data.
+	// Each row contains: meter name, unit name, default graphic unit name, CSV reading data filename.
+	const specialMeters = [
+		['Electric Utility kWh', 'Electric_utility', 'kWh', 'quantity1-5.csv'],
+		['Natural Gas BTU', 'Natural_Gas_BTU', 'BTU', 'quantity1-5.csv'],
+		['Natural Gas Dollar', 'Natural_Gas_dollar', 'US_dollar', 'quantity1-5.csv'],
+		['Natural Gas Cubic Meters', 'Natural_Gas_M3', 'M3_gas', 'quantity1-5.csv'],
+		['Trash Kg', 'Trash', 'kg', 'quantity1-5.csv'],
+		['Temp Fahrenheit', 'Temperature_fahrenheit', 'Fahrenheit', 'temp0-212.csv'],
+		['Electric kW', 'Electric_kW', 'kW', 'rate2-10.csv']
+	];
+	// Function used to map values when reading the CSV file.
+	function mapRowsToModel(row) {
+		const reading = row[0];
+		// Need to work in UTC time since that is what the database returns and comparing
+		// to database values. Done in all moment objects in this test.
+		// const startTimestamp = moment.utc(row[1], 'HH:mm:ss MM/DD/YYYY');
+		const startTimestamp = moment.utc(row[1], true);
+		const endTimestamp = moment.utc(row[2], true);
+		return [reading, startTimestamp, endTimestamp];
+	}
+
+	for (let i = 0; i < specialMeters.length; ++i) {
+		// Meter values from above.
+		const meterData = specialMeters[i];
+		const meterName = meterData[0];
+		// We get the needed unit id from the name given.
+		const meterUnit = (await Unit.getByName(meterData[1], conn)).id;
+		const meterGraphicUnit = (await Unit.getByName(meterData[2], conn)).id;
+		const meter = new Meter(
+			undefined, // id
+			meterName, // name
+			null, // URL
+			false, // enabled
+			true, //displayable
+			'other', //type
+			null, // timezone
+			undefined, // gps
+			undefined, // identifier
+			null, // note
+			null, //area
+			undefined, // cumulative
+			undefined, //cumulativeReset
+			undefined, // cumulativeResetStart
+			undefined, // cumulativeResetEnd
+			90000, // readingGap
+			90000, // readingVariation
+			undefined, //readingDuplication
+			undefined, // timeSort
+			undefined, //endOnlyTime
+			undefined, // reading
+			undefined, // startTimestamp
+			undefined, // endTimestamp
+			meterUnit, // unit
+			meterGraphicUnit // default graphic unit
+		);
+		if (await meter.existsByName(conn)) {
+			console.log(`Warning: meter '${meter.name}' existed so not changed.`);
+		} else {
+			// Only insert the meter and its readings if the meter did not already exist.
+			await meter.insert(conn);
+			await loadCsvInput(
+				`src/server/data/unit/${meterData[3]}`, // filePath
+				meter.id, // meterID
+				mapRowsToModel, // mapRowToModel
+				meter.timeSort, //timeSort
+				meter.readingDuplication, //readingRepetition
+				meter.cumulative, // isCumulative
+				meter.cumulativeReset, // cumulativeReset
+				meter.cumulativeResetStart, // cumulativeResetStart
+				meter.cumulativeResetEnd, // cumulativeResetEnd
+				meter.readingGap, // readingGap
+				meter.readingVariation, // readingLengthVariation
+				meter.endOnlyTime, // isEndOnly
+				false, // headerRow
+				false, // shouldUpdate
+				undefined, // conditionSet
+				conn
+			);
+		}
+	}
+	// Recreate the Cik entries since changed meters.
+	await redoCik(conn);
+	// Refresh the readings since added new ones.
+	await refreshAllReadingViews();
+}
+
 module.exports = {
 	generateSineTestingData,
 	generateSineSquaredTestingData,
@@ -390,5 +491,6 @@ module.exports = {
 	generateVariableAmplitudeTestingData,
 	insertSpecialUnitsAndConversions,
 	insertSpecialUnits,
-	insertSpecialConversions
+	insertSpecialConversions,
+	insertSpecialMeters
 };

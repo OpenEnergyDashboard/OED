@@ -8,6 +8,7 @@ const sqlFile = database.sqlFile;
 class Baseline {
 	constructor(meterID, applyStart, applyEnd, calcStart, calcEnd, note = null, baselineValue = null) {
 		this.meterID = meterID;
+		// If this is ever used we may want to make sure that arguments to TimeInterval are moment objects.
 		this.applyRange = new TimeInterval(applyStart, applyEnd);
 		this.calcRange = new TimeInterval(calcStart, calcEnd);
 		this.baselineValue = baselineValue;

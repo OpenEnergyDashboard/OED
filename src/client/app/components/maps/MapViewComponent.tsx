@@ -68,7 +68,9 @@ class MapViewComponent extends React.Component<MapViewPropsWithIntl, MapViewStat
 				<td> {this.formatName()} </td>
 				{hasToken() && <td> {this.formatDisplayable()} </td>}
 				{hasToken() && <td> {this.formatCircleSize()} </td>}
-				{hasToken() && <td> {moment(this.props.map.modifiedDate).format('dddd, MMM DD, YYYY hh:mm a')} </td>}
+				{/* This was stored as UTC but with the local time at that point.
+					Thus, moment will not modify the date/time given when done this way. */}
+				{hasToken() && <td> {moment.parseZone(this.props.map.modifiedDate, undefined, true).format('dddd, MMM DD, YYYY hh:mm a')} </td>}
 				{hasToken() && <td> {this.formatFilename()} </td>}
 				{hasToken() && <td> {this.formatNote()} </td>}
 				{hasToken() && <td> {this.formatCalibrationStatus()} </td>}

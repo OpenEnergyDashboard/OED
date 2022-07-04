@@ -6,6 +6,7 @@ const fs = require('fs');
 const logFile = require('./config').logFile;
 const LogEmail = require('./models/LogEmail');
 const { getConnection } = require('./db');
+const moment = require('moment');
 
 /**
  * Represents the importance of a message to be logged
@@ -49,7 +50,7 @@ class Logger {
 	 * @param {boolean?} skipMail Don't e-mail this message even if we would normally emit an e-mail for this level.
 	 */
 	log(level, message, error = null, skipMail = false) {
-		let messageToLog = `[${level.name}@${new Date(Date.now()).toISOString()}] ${message}\n`;
+		let messageToLog = `[${level.name}@${moment().format('YYYY-MM-DDTHH:mm:ss.SSSZ')}] ${message}\n`;
 
 		const conn = getConnection();
 
@@ -92,7 +93,7 @@ class Logger {
 
 		// Only send an e-mail if given a high enough priority level and the database is connected
 		if (level.priority <= this.emailLevel.priority && conn !== null) {
-			let messageToMail = `At ${new Date(Date.now()).toISOString()}, an ${level.name} event occurred.\n`;
+			let messageToMail = `At ${moment().format('YYYY-MM-DDTHH:mm:ss.SSSZ')}, an ${level.name} event occurred.\n`;
 			messageToMail += `${message}\n`;
 			const logEmail = new LogEmail(undefined, messageToMail);
 			(async () => {

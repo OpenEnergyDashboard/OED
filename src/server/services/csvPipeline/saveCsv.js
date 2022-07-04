@@ -5,10 +5,11 @@
 const crypto = require('crypto');
 const { CSVPipelineError } = require('./CustomErrors');
 const fs = require('fs').promises;
+const moment = require('moment');
 
 async function saveCsv(buffer, filename, dir=__dirname) {
 	// save this buffer into a file
-	const randomFilename = `${filename}-${(new Date(Date.now()).toISOString())}-${crypto.randomBytes(2).toString('hex')}`;
+	const randomFilename = `${filename}-${moment().format('YYYY-MM-DDTHH:mm:ss.SSSZ')}-${crypto.randomBytes(2).toString('hex')}`;
 	const filepath = `${dir}/${randomFilename}.csv`;
 	await fs.writeFile(filepath, buffer)
 		.catch(err => {

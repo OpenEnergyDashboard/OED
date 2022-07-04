@@ -266,7 +266,12 @@ export function submitEditedMap(mapID: number): Thunk {
 			const acceptableMap: MapData = {
 				...map,
 				mapSource: map.image.src,
-				modifiedDate: moment().toISOString(),
+				// As in other place, this take the time, in this case the current time, grabs the
+				// date and time without timezone and then set it to UTC. This allows the software
+				// to recreate it with the same date/time as it is on this web browser when it is
+				// displayed later (without the timezone shown).
+				// It might be better to use the server time but this is good enough.
+				modifiedDate: moment().format('YYYY-MM-DD HH:mm:ss') + '+00:00',
 				origin: (map.calibrationResult) ? map.calibrationResult.origin : map.origin,
 				opposite: (map.calibrationResult) ? map.calibrationResult.opposite : map.opposite,
 				circleSize: map.circleSize

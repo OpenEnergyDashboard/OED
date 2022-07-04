@@ -46,7 +46,7 @@ CREATE OR REPLACE FUNCTION meter_compare_readings_unit (
 	curr_end TIMESTAMP,
 	shift INTERVAL
 )
-	RETURNS TABLE(meter_id INTEGER, curr_use REAL, prev_use REAL)
+	RETURNS TABLE(meter_id INTEGER, curr_use FLOAT, prev_use FLOAT)
 AS $$
 DECLARE
 	prev_start TIMESTAMP;
@@ -96,8 +96,8 @@ BEGIN
 	)
 	SELECT
 		meters.id AS meter_id,
-		curr_period.reading::REAL AS curr_use,
-		prev_period.reading::REAL AS prev_use
+		curr_period.reading::FLOAT AS curr_use,
+		prev_period.reading::FLOAT AS prev_use
 	FROM
 		unnest(meter_ids) meters(id)
 		-- Left joins here so we get nulls instead of missing rows if readings don't exist for some time intervals
@@ -125,7 +125,7 @@ CREATE OR REPLACE FUNCTION group_compare_readings_unit (
 	curr_end TIMESTAMP,
 	shift INTERVAL
 )
-	RETURNS TABLE(group_id INTEGER, curr_use REAL, prev_use REAL)
+	RETURNS TABLE(group_id INTEGER, curr_use FLOAT, prev_use FLOAT)
 AS $$
 DECLARE
 	meter_ids INTEGER[];

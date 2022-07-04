@@ -22,8 +22,10 @@ mocha.describe('Readings', () => {
 
 	mocha.it('can be saved and retrieved', async () => {
 		const conn = testDB.getConnection();
-		const startTimestamp = moment('2017-01-01');
-		const endTimestamp = moment('2017-01-01').add(1, 'hour');
+		// Need to work in UTC time since that is what the database returns and comparing
+		// to database values. Done in all moment objects in these tests.
+		const startTimestamp = moment.utc('2017-01-01');
+		const endTimestamp = moment.utc('2017-01-01').add(1, 'hour');
 		const readingPreInsert = new Reading(meter.id, 10, startTimestamp, endTimestamp);
 		await readingPreInsert.insert(conn);
 		const retrievedReadings = await Reading.getAllByMeterID(meter.id, conn);
@@ -35,8 +37,8 @@ mocha.describe('Readings', () => {
 	});
 	mocha.it('can be saved and retrieved with floating point values', async () => {
 		const conn = testDB.getConnection();
-		const startTimestamp = moment('2017-01-01');
-		const endTimestamp = moment('2017-01-01').add(1, 'hour');
+		const startTimestamp = moment.utc('2017-01-01');
+		const endTimestamp = moment.utc('2017-01-01').add(1, 'hour');
 		const readingPreInsert = new Reading(meter.id, 3.5, startTimestamp, endTimestamp);
 		await readingPreInsert.insert(conn);
 		const retrievedReadings = await Reading.getAllByMeterID(meter.id, conn);
@@ -48,10 +50,10 @@ mocha.describe('Readings', () => {
 	});
 	mocha.it('can be saved in bulk', async () => {
 		const conn = testDB.getConnection();
-		const startTimestamp1 = moment('2017-01-01');
-		const endTimestamp1 = moment(startTimestamp1).add(1, 'hour');
-		const startTimestamp2 = moment(endTimestamp1).add(1, 'hour');
-		const endTimestamp2 = moment(startTimestamp2).add(1, 'hour');
+		const startTimestamp1 = moment.utc('2017-01-01');
+		const endTimestamp1 = moment.utc(startTimestamp1).add(1, 'hour');
+		const startTimestamp2 = moment.utc(endTimestamp1).add(1, 'hour');
+		const endTimestamp2 = moment.utc(startTimestamp2).add(1, 'hour');
 		const reading1 = new Reading(meter.id, 1, startTimestamp1, endTimestamp1);
 		const reading2 = new Reading(meter.id, 1, startTimestamp2, endTimestamp2);
 		await Reading.insertAll([reading1, reading2], conn);
@@ -60,10 +62,10 @@ mocha.describe('Readings', () => {
 	});
 	mocha.it('can be saved/updated in bulk', async () => {
 		const conn = testDB.getConnection();
-		const startTimestamp1 = moment('2017-01-01');
-		const endTimestamp1 = moment(startTimestamp1).add(1, 'hour');
-		const startTimestamp2 = moment(endTimestamp1).add(1, 'hour');
-		const endTimestamp2 = moment(startTimestamp2).add(1, 'hour');
+		const startTimestamp1 = moment.utc('2017-01-01');
+		const endTimestamp1 = moment.utc(startTimestamp1).add(1, 'hour');
+		const startTimestamp2 = moment.utc(endTimestamp1).add(1, 'hour');
+		const endTimestamp2 = moment.utc(startTimestamp2).add(1, 'hour');
 		const reading1 = new Reading(meter.id, 1, startTimestamp1, endTimestamp1);
 		const reading2 = new Reading(meter.id, 1, startTimestamp2, endTimestamp2);
 		// Insert reading 1 (so it will be updated)
@@ -75,8 +77,8 @@ mocha.describe('Readings', () => {
 	});
 	mocha.it('can keep any data already in the DB', async () => {
 		const conn = testDB.getConnection();
-		const startTimestamp = moment('2018-01-01');
-		const endTimestamp = moment(startTimestamp).add(1, 'hour');
+		const startTimestamp = moment.utc('2018-01-01');
+		const endTimestamp = moment.utc(startTimestamp).add(1, 'hour');
 		const reading = new Reading(meter.id, 1, startTimestamp, endTimestamp);
 		await reading.insert(conn);
 		const newReading = new Reading(meter.id, 2, startTimestamp, endTimestamp);

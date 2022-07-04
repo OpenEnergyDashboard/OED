@@ -7,7 +7,7 @@ import HeaderContainer from '../../containers/HeaderContainer';
 import FooterContainer from '../../containers/FooterContainer';
 import UnitViewContainer from '../../containers/unit/UnitViewContainer';
 import store from '../../index';
-import TooltipHelpContainerAlternative from '../../containers/TooltipHelpContainerAlternative';
+import TooltipHelpContainer from '../../containers/TooltipHelpContainer';
 import UnsavedWarningContainer from '../../containers/UnsavedWarningContainer';
 import { removeUnsavedChanges } from '../../actions/unsavedWarning';
 import TooltipMarkerComponent from '../TooltipMarkerComponent';
@@ -48,7 +48,7 @@ export default class UnitsDetailContainer extends React.Component<UnitsDetailPro
 			<div>
 				<UnsavedWarningContainer />
 				<HeaderContainer />
-				<TooltipHelpContainerAlternative page='units' />
+				<TooltipHelpContainer page='units' />
 
 				<div className='container-fluid'>
 					<h2 style={titleStyle}>

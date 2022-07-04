@@ -23,7 +23,9 @@ mocha.describe('Line & bar Readings', () => {
 
 	mocha.describe('Check daily and hourly reading views', () => {
 		let meter, conn;
-		const timestamp1 = moment('2017-01-01');
+		// Need to work in UTC time since that is what the database returns and comparing
+		// to database values. Done in all moment objects in this test.
+		const timestamp1 = moment.utc('2017-01-01');
 		const timestamp2 = timestamp1.clone().add(1, 'hour');
 		const timestamp3 = timestamp2.clone().add(1, 'hour');
 		const timestamp4 = timestamp3.clone().add(1, 'hour');
@@ -71,7 +73,7 @@ mocha.describe('Line & bar Readings', () => {
 		});
 
 		mocha.it('Daily readings when one reading half hour half hour before/after start of day', async () => {
-			const startOfDay = moment('2018-01-01');
+			const startOfDay = moment.utc('2018-01-01');
 			const halfHourBefore = startOfDay.clone().subtract(30, 'minutes');
 			const halfHourAfter = startOfDay.clone().add(30, 'minutes');
 			await Reading.insertAll([
@@ -89,8 +91,8 @@ mocha.describe('Line & bar Readings', () => {
 		});
 
 		mocha.it('Daily readings with two readings of unequal length that overlap start and end of day', async () => {
-			const day1Start = moment('2018-01-01');
-			const day2Start = moment('2018-01-02');
+			const day1Start = moment.utc('2018-01-01');
+			const day2Start = moment.utc('2018-01-02');
 
 			await Reading.insertAll([
 				new Reading(meter.id, 100, day1Start.clone().subtract(1, 'hour'), day1Start.clone().add(1, 'hour')),
@@ -135,7 +137,7 @@ mocha.describe('Line & bar Readings', () => {
 
 		mocha.it('Correctly shrinks infinite intervals', async () => {
 			// TODO: Test infinite range with bounded timestamp to ensure proper shrink
-			const yearStart = moment('2018-01-01');
+			const yearStart = moment.utc('2018-01-01');
 			const yearEnd = yearStart.clone().add(1, 'year');
 
 			await Reading.insertAll([
@@ -187,8 +189,8 @@ mocha.describe('Line & bar Readings', () => {
 		});
 
 		mocha.it('Use Daily resolution when 61 days', async () => {
-			const start = moment(startDate);
-			const end = moment(startDate).clone();
+			const start = moment.utc(startDate);
+			const end = moment.utc(startDate).clone();
 			const numDays = 61;
 			end.add(numDays, 'days');
 			const allReadings = await Reading.getMeterLineReadings([meter.id], graphicUnitId, start, end, conn);
@@ -197,8 +199,8 @@ mocha.describe('Line & bar Readings', () => {
 		})
 
 		mocha.it('Use Daily resolution when 60 days', async () => {
-			const start = moment(startDate);
-			const end = moment(startDate).clone();
+			const start = moment.utc(startDate);
+			const end = moment.utc(startDate).clone();
 			const numDays = 60;
 			end.add(numDays, 'days');
 			const allReadings = await Reading.getMeterLineReadings([meter.id], graphicUnitId, start, end, conn);
@@ -207,8 +209,8 @@ mocha.describe('Line & bar Readings', () => {
 		});
 
 		mocha.it('Use raw readings when 14 days', async () => {
-			const start = moment(startDate);
-			const end = moment(startDate).clone();
+			const start = moment.utc(startDate);
+			const end = moment.utc(startDate).clone();
 			const numDays = 14;
 			end.add(numDays, 'days');
 			const allReadings = await Reading.getMeterLineReadings([meter.id], graphicUnitId, start, end, conn);
@@ -254,8 +256,8 @@ mocha.describe('Line & bar Readings', () => {
 		});
 
 		mocha.it('Use Daily resolution when 61 days', async () => {
-			const start = moment(startDate);
-			const end = moment(startDate).clone();
+			const start = moment.utc(startDate);
+			const end = moment.utc(startDate).clone();
 			const numDays = 61;
 			end.add(numDays, 'days');
 			const allReadings = await Reading.getMeterLineReadings([meter.id], graphicUnitId, start, end, conn);
@@ -264,8 +266,8 @@ mocha.describe('Line & bar Readings', () => {
 		})
 
 		mocha.it('Use Daily resolution when 60 days', async () => {
-			const start = moment(startDate);
-			const end = moment(startDate).clone();
+			const start = moment.utc(startDate);
+			const end = moment.utc(startDate).clone();
 			const numDays = 60;
 			end.add(numDays, 'days');
 			const allReadings = await Reading.getMeterLineReadings([meter.id], graphicUnitId, start, end, conn);
@@ -274,8 +276,8 @@ mocha.describe('Line & bar Readings', () => {
 		});
 
 		mocha.it('Use raw readings when 22 days', async () => {
-			const start = moment(startDate);
-			const end = moment(startDate).clone();
+			const start = moment.utc(startDate);
+			const end = moment.utc(startDate).clone();
 			const numDays = 22;
 			end.add(numDays, 'days');
 			// The crossover point for when to go to raw depends on the reading rate. Thus, it is reset to
@@ -294,7 +296,7 @@ mocha.describe('Line & bar Readings', () => {
 
 	mocha.describe('Meter line readings', () => {
 		let meter, graphicUnitId, conn;
-		const timestamp1 = moment('2017-01-01');
+		const timestamp1 = moment.utc('2017-01-01');
 		const timestamp2 = timestamp1.clone().add(1, 'hour');
 		const timestamp3 = timestamp2.clone().add(1, 'hour');
 		const timestamp4 = timestamp3.clone().add(1, 'hour');
@@ -320,7 +322,7 @@ mocha.describe('Line & bar Readings', () => {
 		});
 
 		mocha.it('Retrieves 1 day reading when asked for 1 day interval so looking at daily readings', async () => {
-			const dayStart = moment('2018-01-01');
+			const dayStart = moment.utc('2018-01-01');
 			const dayEnd = dayStart.clone().add(1, 'day');
 
 			await Reading.insertAll([
@@ -347,7 +349,7 @@ mocha.describe('Line & bar Readings', () => {
 		});
 
 		mocha.it('Retrieves 15 min reading when asked for 15 min interval so looking at raw readings', async () => {
-			const dayStart = moment('2018-01-01');
+			const dayStart = moment.utc('2018-01-01');
 			const dayEnd = dayStart.clone().add(15, 'minute');
 
 			await Reading.insertAll([
@@ -361,7 +363,7 @@ mocha.describe('Line & bar Readings', () => {
 		});
 
 		mocha.it('Retrieves 15 min reading when asked for 1 hour interval so looking at hourly readings', async () => {
-			const dayStart = moment('2018-01-01');
+			const dayStart = moment.utc('2018-01-01');
 			const dayEnd = dayStart.clone().add(15, 'minute');
 
 			await Reading.insertAll([
@@ -379,7 +381,7 @@ mocha.describe('Line & bar Readings', () => {
 		});
 
 		mocha.it('Retrieves 15 min reading when asked for 60 hour interval so looking at hourly readings', async () => {
-			const yearStart = moment('2018-01-01');
+			const yearStart = moment.utc('2018-01-01');
 			const yearEnd = yearStart.clone().add(15, 'minute');
 
 			await Reading.insertAll([
@@ -396,7 +398,7 @@ mocha.describe('Line & bar Readings', () => {
 		});
 
 		mocha.it('Retrieves 15 min reading when asked for 60 day interval so looking at daily readings', async () => {
-			const yearStart = moment('2018-01-01');
+			const yearStart = moment.utc('2018-01-01');
 			const yearEnd = yearStart.clone().add(15, 'minute');
 
 			await Reading.insertAll([
@@ -447,7 +449,7 @@ mocha.describe('Line & bar Readings', () => {
 		});
 
 		mocha.it('Raw readings with two meters in a group', async () => {
-			const startOfDay = moment('2018-01-01');
+			const startOfDay = moment.utc('2018-01-01');
 
 			// Each meter gets a reading. Meter1 is at 100 kw, Meter2 is at 200.
 			await Reading.insertAll([
@@ -472,7 +474,7 @@ mocha.describe('Line & bar Readings', () => {
 		});
 
 		mocha.it('Compresses when two groups have different meters', async () => {
-			const startOfDay = moment('2018-01-01');
+			const startOfDay = moment.utc('2018-01-01');
 
 			// Each meter gets a reading. Meter1 is at 100 kw, Meter2 is at 200.
 			await Reading.insertAll([
@@ -504,7 +506,7 @@ mocha.describe('Line & bar Readings', () => {
 	mocha.describe('meter barchart readings', () => {
 		let graphicUnitId, conversionSlope, conn;
 		let meter, meter2;
-		const timestamp1 = moment('2017-01-01');
+		const timestamp1 = moment.utc('2017-01-01');
 		const timestamp2 = timestamp1.clone().add(1, 'day');
 		const timestamp3 = timestamp2.clone().add(1, 'day');
 		const timestamp4 = timestamp3.clone().add(1, 'day');

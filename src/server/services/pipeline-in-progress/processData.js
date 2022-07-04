@@ -5,14 +5,16 @@
  */
 
 const { is } = require('core-js/core/object');
-const moment = require('moment');
+const moment = require('moment-timezone');
 const { log } = require('../../log');
 const Meter = require('../../models/Meter');
 const Reading = require('../../models/Reading');
 const handleCumulativeReset = require('./handleCumulativeReset');
 const { validateReadings } = require('./validateReadings');
 const { TimeSortTypesJS } = require('../csvPipeline/validateCsvUploadParams');
-const E0 = moment(0);
+// The default start/end timestamps that are set to the first
+// day of time in moment. As always, we want to use UTC.
+const E0 = moment(0).utc()
 
 /**
  * Handle all data, assume that the first row is the first reading if increasing and last is first reading if decreasing.
@@ -137,13 +139,21 @@ async function processData(rows, meterID, timeSort = TimeSortTypesJS.increasing,
 		// cannot have the day first (month okay). Thus, we just use the default parsing.
 		// Set moment to strict mode so will give Invalid date if any issues.
 		if (isEndTime) {
-			// The startTimestamp of this reading is the endTimestamp of the previous reading
+			// The startTimestamp of this reading is the endTimestamp of the previous reading.
+			// See else clause for why formatted this way.
 			startTimestamp = prevReading.endTimestamp;
-			endTimestamp = moment(rows[index][1], undefined, true);
+			endTimestamp = moment.parseZone(rows[index][1], undefined, true).tz('UTC', true);
 		}
 		else {
-			startTimestamp = moment(rows[index][1], undefined, true);
-			endTimestamp = moment(rows[index][2], undefined, true);
+			// If the reading has a timezone offset associated with it then we want to honor it by using parseZone.
+			// However the database uses UTC and has no timezone offset so we need to get the reading into UTC.
+			// OED plots readings as the date/time it was acquired independent of the timezone. For example, if the reading is
+			// 2021-06-01 00:00:00-05:00 then the database should store it as 2021-06-01 00:00:00.
+			// Thus, we take the date/time from the reading timezone and then put it into UTC without
+			// changing the time (the .tz second argument of true stops any change in date/time).
+			// This setup should work no matter want the timezone is on the server.
+			startTimestamp = moment.parseZone(rows[index][1], undefined, true).tz('UTC', true);
+			endTimestamp = moment.parseZone(rows[index][2], undefined, true).tz('UTC', true);
 		}
 		if (startTimestamp.format() === 'Invalid date' || endTimestamp.format() === 'Invalid date') {
 			errMsg += 'For meter ' + meterName + ': Error parsing Reading #' + row(index, isAscending, rows.length) +
@@ -371,9 +381,9 @@ async function processData(rows, meterID, timeSort = TimeSortTypesJS.increasing,
 	}
 	// Validate data if conditions given
 	if (conditionSet !== undefined && !validateReadings(result, conditionSet)) {
-		errMsg = `<h2>For meter ' + meterName + ': REJECTED ALL READINGS FROM METER ${ipAddress} DUE TO ERROR WHEN VALIDATING DATA</h2>`;
-		({ msgTotal, msgTotalWarning } = appendMsgTotal(msgTotal, errMsg, msgTotalWarning));
+		errMsg = `<h2>For meter ' + meterName + ': error when validating data so all reading are rejected</h2>`;
 		log.error(errMsg);
+		({ msgTotal, msgTotalWarning } = appendMsgTotal(msgTotal, errMsg, msgTotalWarning));
 		// This empties the result array. Should be fast and okay with const.
 		result.splice(0, result.length);
 		isAllReadingsOk = false;

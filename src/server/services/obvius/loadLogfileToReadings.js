@@ -21,10 +21,13 @@ async function loadLogfileToReadings(serialNumber, ipAddress, logfile, conn) {
 			// For now, new Obvius meters collect data (enabled) but do not display (not displayable).
 			// Also, the identifier is similar to the meter name for now.
 			// end only time is true for Obvius meters.
+			// Data was sent for a meter that did not have a config file sent before this.
+			// As a result, we cannot know the unit so make unknown for now.
+			// The admin need to set the unit before making it displayable or it cannot be graphed.
 			meter = new Meter(undefined, `${serialNumber}.${i}`, ipAddress, true, false, Meter.type.OBVIUS,
-				null, undefined, `OBVIUS ${serialNumber} COLUMN ${i}`, 'created via obvious log upload on ' +
+				null, undefined, `OBVIUS ${serialNumber} COLUMN ${i}`, 'created via obvius log upload on ' +
 				moment().format(), undefined, undefined, undefined, undefined, undefined, undefined, undefined,
-				undefined, undefined, true, undefined, undefined, undefined);
+				undefined, undefined, true, undefined, undefined, undefined, undefined, undefined);
 			await meter.insert(conn);
 			log.warn('WARNING: Created a meter (' + `${serialNumber}.${i}` +
 				') that does not already exist. Normally obvius meters created by an uploaded ConfigFile.');
@@ -40,13 +43,13 @@ async function loadLogfileToReadings(serialNumber, ipAddress, logfile, conn) {
 				continue;
 			}
 			// Otherwise assume it is kWh and proceed.
-			// Switching to assume one reading is end time and can use default moment parsing of date/timestamp.
-			// It is believed that the format from Obvius will always be this way so specify.
-			// Strict mode is used so it will give Invalid date if not correct and should be caught in pipeline.
-			// const endTimestamp = moment(rawReading[0], 'YYYY-MM-DD HH:mm:ss', true);
-			// TODO For reasons I do not understand, strict mode causes Invalid date even though debugging seems
-			// to indicate it is correct. I thought it worked before but it does not. Thus, removing strict mode for now.
-			const endTimestamp = moment(rawReading[0], 'YYYY-MM-DD HH:mm:ss');
+			// Assume one reading is end time.
+			// moment cannot be set to strict mode since it fails. However, the expected format is given so
+			// it should do a good test.
+			// See src/server/services/pipeline-in-progress/processData.js for more info on why it is set up this way.
+			// It would seem you could directly use the rawReading[0] since it is in the right format but doing that leads
+			// to errors so we parse in the usual way.
+			const endTimestamp = moment.parseZone(moment(rawReading[0], 'YYYY-MM-DD HH:mm:ss').format('YYYY-MM-DD HH:mm:ss') + '+00:00', undefined, true);
 			reading[index] = [rawReading[1], endTimestamp];
 			index++;
 		}

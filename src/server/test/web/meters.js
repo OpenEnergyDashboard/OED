@@ -11,10 +11,16 @@ const User = require('../../models/User');
 const bcrypt = require('bcryptjs');
 const Point = require('../../models/Point');
 const gps = new Point(90, 45);
-const moment = require('moment');
 const Unit = require('../../models/Unit');
 
-function expectMetersToBeEquivalent(meters, length, offset) {
+/**
+ * Verifies the values in the meter are the ones expected.
+ * @param {*} meters If # meters > 1 then array of meters, else single meter
+ * @param {*} length # meters to check and in meters
+ * @param {*} offset How much to add to values expected to relate to meter index
+ * @param {*} unit The unit id to check
+ */
+function expectMetersToBeEquivalent(meters, length, offset, unit) {
 	for (let i = 0; i < length; i++) {
 		// If length is 1 then it is not an array.
 		let meter;
@@ -36,7 +42,10 @@ function expectMetersToBeEquivalent(meters, length, offset) {
 		// name to a user if they are not logged in.
 		expect(meter).to.have.property('identifier', 'Identified ' + (i + offset));
 		expect(meter).to.have.property('area', (i + offset) * 10.0);
+		expect(meter).to.have.property('unitId', unit);
+		expect(meter).to.have.property('defaultGraphicUnit', unit);
 		// A couple of properties differ if displayable or not.
+		// The first 3 are visible but the 4th is not visible where its name is special.
 		if (i < 3) {
 			expect(meter).to.have.property('name', `Meter ${i + offset}`);
 			expect(meter).to.have.property('displayable', true);
@@ -47,7 +56,7 @@ function expectMetersToBeEquivalent(meters, length, offset) {
 		}
 		if (length === 4) {
 			// Admin so see more values
-			expect(meter).to.have.property('ipAddress', '1.1.1.1');
+			expect(meter).to.have.property('url', '1.1.1.1');
 			expect(meter).to.have.property('meterType', Meter.type.MAMAC);
 			expect(meter).to.have.property('timeZone', 'TZ' + (i + offset));
 			expect(meter).to.have.property('note', `notes ${i + offset}`);
@@ -64,7 +73,7 @@ function expectMetersToBeEquivalent(meters, length, offset) {
 			expect(meter).to.have.property('startTimestamp', '0001-01-01T23:59:59.000Z');
 			expect(meter).to.have.property('endTimestamp', '2020-07-02T01:00:10.000Z');
 		} else {
-			expect(meter).to.have.property('ipAddress', null);
+			expect(meter).to.have.property('url', null);
 			expect(meter).to.have.property('meterType', null);
 			expect(meter).to.have.property('timeZone', null);
 			expect(meter).to.have.property('note', null);
@@ -85,10 +94,13 @@ function expectMetersToBeEquivalent(meters, length, offset) {
 }
 
 mocha.describe('meters API', () => {
+	let unitId;
 	mocha.beforeEach(async () => {
 		conn = testDB.getConnection();
-		await new Unit(undefined, 'Unit', 'Unit', Unit.unitRepresentType.UNUSED, 1000, Unit.unitType.UNIT, 
-						1, 'Unit Suffix', Unit.displayableType.ALL, true, 'Unit Note').insert(conn);
+		const unit = new Unit(undefined, 'Unit', 'Unit', Unit.unitRepresentType.UNUSED, 1000, Unit.unitType.UNIT,
+			1, 'Unit Suffix', Unit.displayableType.ALL, true, 'Unit Note');
+		await unit.insert(conn);
+		unitId = unit.id;
 	});
 
 	mocha.it('returns nothing with no meters present', async () => {
@@ -100,7 +112,6 @@ mocha.describe('meters API', () => {
 
 	mocha.it('returns all visible meters', async () => {
 		const conn = testDB.getConnection();
-		const unitId = (await Unit.getByName('Unit', conn)).id;
 		await new Meter(undefined, 'Meter 1', '1.1.1.1', true, true, Meter.type.MAMAC, 'TZ1', gps,
 			'Identified 1', 'notes 1', 10.0, true, true, '01:01:25', '05:05:05', 5.1, 7.3, 1, 'increasing', false,
 			1.0, '0001-01-01 23:59:59', '2020-07-02 01:00:10', unitId, unitId).insert(conn);
@@ -118,7 +129,7 @@ mocha.describe('meters API', () => {
 		expect(res).to.have.status(200);
 		expect(res).to.be.json;
 		expect(res.body).to.have.lengthOf(3);
-		expectMetersToBeEquivalent(res.body, 3, 1);
+		expectMetersToBeEquivalent(res.body, 3, 1, unitId);
 	});
 	mocha.describe('Admin role:', () => {
 		let token;
@@ -129,7 +140,6 @@ mocha.describe('meters API', () => {
 		});
 		mocha.it('returns all meters', async () => {
 			const conn = testDB.getConnection();
-			const unitId = (await Unit.getByName('Unit', conn)).id;
 			await new Meter(undefined, 'Meter 1', '1.1.1.1', true, true, Meter.type.MAMAC, 'TZ1', gps,
 				'Identified 1', 'notes 1', 10.0, true, true, '01:01:25', '05:05:05', 5.1, 7.3, 1, 'increasing', false,
 				1.0, '0001-01-01 23:59:59', '2020-07-02 01:00:10', unitId, unitId).insert(conn);
@@ -147,7 +157,7 @@ mocha.describe('meters API', () => {
 			expect(res).to.have.status(200);
 			expect(res).to.be.json;
 			expect(res.body).to.have.lengthOf(4);
-			expectMetersToBeEquivalent(res.body, 4, 1);
+			expectMetersToBeEquivalent(res.body, 4, 1, unitId);
 		});
 	});
 
@@ -172,7 +182,6 @@ mocha.describe('meters API', () => {
 
 				mocha.it('should only return visible meters and visible data', async () => {
 					const conn = testDB.getConnection();
-					const unitId = (await Unit.getByName('Unit', conn)).id;
 					await new Meter(undefined, 'Meter 1', '1.1.1.1', true, true, Meter.type.MAMAC, 'TZ1', gps,
 						'Identified 1', 'notes 1', 10.0, true, true, '01:01:25', '05:05:05', 5.1, 7.3, 1, 'increasing', false,
 						1.0, '0001-01-01 23:59:59', '2020-07-02 01:00:10', unitId, unitId).insert(conn);
@@ -190,7 +199,7 @@ mocha.describe('meters API', () => {
 					expect(res).to.have.status(200);
 					expect(res).to.be.json;
 					expect(res.body).to.have.lengthOf(3);
-					expectMetersToBeEquivalent(res.body, 3, 1);
+					expectMetersToBeEquivalent(res.body, 3, 1, unitId);
 				});
 
 				mocha.it(`should reject requests from ${role} to edit meters`, async () => {
@@ -203,7 +212,6 @@ mocha.describe('meters API', () => {
 
 	mocha.it('returns details on a single meter by ID', async () => {
 		const conn = testDB.getConnection();
-		const unitId = (await Unit.getByName('Unit', conn)).id;
 		await new Meter(undefined, 'Meter 1', '1.1.1.1', true, true, Meter.type.MAMAC, 'TZ1', gps,
 			'Identified 1', 'notes 1', 10.0, true, true, '01:01:25', '05:05:05', 5.1, 7.3, 1, 'increasing', false,
 			1.0, '0001-01-01 23:59:59', '2020-07-02 01:00:10', unitId, unitId).insert(conn);
@@ -215,13 +223,12 @@ mocha.describe('meters API', () => {
 		const res = await chai.request(app).get(`/api/meters/${meter2.id}`);
 		expect(res).to.have.status(200);
 		expect(res).to.be.json;
-		expectMetersToBeEquivalent(res.body, 1, 2);
+		expectMetersToBeEquivalent(res.body, 1, 2, unitId);
 	});
 
 	mocha.it('responds appropriately when the meter in question does not exist', async () => {
 		const conn = testDB.getConnection();
-		const unitId = (await Unit.getByName('Unit', conn)).id;
-		const meter =  new Meter(undefined, 'Meter 1', '1.1.1.1', true, true, Meter.type.MAMAC, 'TZ1', gps,
+		const meter = new Meter(undefined, 'Meter 1', '1.1.1.1', true, true, Meter.type.MAMAC, 'TZ1', gps,
 			'Identified 1', 'notes 1', 10.0, true, true, '01:01:25', '05:05:05', 5.1, 7.3, 1, 'increasing', false,
 			1.0, '0001-01-01 23:59:59', '2020-07-02 01:00:10', unitId, unitId);
 		await meter.insert(conn);

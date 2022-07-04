@@ -6,7 +6,7 @@ import * as React from 'react';
 import { User, UserRole } from '../../types/items';
 import { Button, Input, Table } from 'reactstrap';
 import CreateUserLinkButtonComponent from './users/CreateUserLinkButtonComponent';
-import TooltipHelpContainerAlternative from '../../containers/TooltipHelpContainerAlternative';
+import TooltipHelpContainer from '../../containers/TooltipHelpContainer';
 import TooltipMarkerComponent from '../TooltipMarkerComponent';
 import { FormattedMessage } from 'react-intl';
 import UnsavedWarningContainer from '../../containers/UnsavedWarningContainer';
@@ -65,7 +65,7 @@ export default function UserDetailComponent(props: UserDisplayComponentProps) {
 	return (
 		<div>
 			<UnsavedWarningContainer />
-			<TooltipHelpContainerAlternative page='users' />
+			<TooltipHelpContainer page='users' />
 			<div className='container-fluid'>
 				<h2 style={titleStyle}>
 					<FormattedMessage id='users'/>

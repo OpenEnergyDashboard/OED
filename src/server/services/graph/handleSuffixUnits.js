@@ -24,13 +24,13 @@ async function addNewUnitAndConversion(sourceId, destinationId, slope, intercept
 	// Note a type_of_unit of suffix is different than a unit with a suffix string.
 	// Note the admin can later change identifier, displayable and preferredDisplay to something else
 	// since OED does not recreate the unit if it exists so those changes will stay.
-	const newUnit = new Unit(undefined, unitName, unitName, Unit.unitRepresentType.UNUSED, sourceUnit.secInRate,
+	const newUnit = new Unit(undefined, unitName, unitName, destinationUnit.unitRepresent, sourceUnit.secInRate,
 		Unit.unitType.SUFFIX, undefined, '', destinationUnit.displayable, destinationUnit.preferredDisplay, 'suffix unit created by OED');
 	await newUnit.insert(conn);
 
 	// Create the conversion from the prefix unit to this new unit.
 	const newConversion = new Conversion(sourceId, newUnit.id, false, slope, intercept,
-		`${sourceUnit.name} → ${newUnit.name} (created by OED for unit with prefix)`);
+		`${sourceUnit.name} → ${newUnit.name} (created by OED for unit with suffix)`);
 	await newConversion.insert(conn);
 
 	// Add the new node and conversion to the graph.
