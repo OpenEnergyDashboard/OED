@@ -132,21 +132,17 @@ export default function ChartDataSelectComponent() {
 				// If the selected unit is -99 then there is not graphic unit yet. In this case you can only select a
 				// meter that has a default graphic unit because that will become the selected unit. This should only
 				// happen if no meter or group is yet selected.
-				// TODO: this logic seems wrong as it stops valid meters from being included. Also, maybe it should be elsewhere for allowed meters to consider???
-				// if (state.graph.selectedUnit == -99) {
-				// 	if (state.meters.byMeterID[meterID] && state.meters.byMeterID[meterID].defaultGraphicUnit == -99) {
 				if (state.graph.selectedUnit == -99) {
-					// If no unit is set then this should always be the first meter selected.
+					// If no unit is set then this should always be the first meter (or group) selected.
 					// The selectedUnit becomes the unit of the meter selected. Note is should always be set (not -99) since
 					// those meters should not have been visible. The only exception is if there are no selected meters but
 					// then this loop does not run. The loop is assumed to only run once in this case.
-					// TODO this really should only be for debugging
+					// TODO this really should only be for debugging??
 					if (state.graph.selectedMeters.length != 1) {
-						console.log('9000 state.graph.selectedMeters is not one but ' + state.graph.selectedMeters.length);
+						console.log('9000 state.graph.selectedMeters length is not one but ' + state.graph.selectedMeters.length);
 					}
 
 					// TODO is it possible the unit of the meter is not set in state? Seems not if can select??
-					// TODO ???? the unit should be the unit not the meter id
 					state.graph.selectedUnit = state.meters.byMeterID[meterID].defaultGraphicUnit;
 				}
 				selectedMeters.push({
@@ -162,7 +158,27 @@ export default function ChartDataSelectComponent() {
 
 		const selectedGroups: SelectOption[] = [];
 		state.graph.selectedGroups.forEach(groupID => {
-			if (!(disableGroups.includes(groupID))) {
+			// TODO For now you cannot graph a group unit you have a graphing unit
+			if (!(disableGroups.includes(groupID)) && state.graph.selectedUnit != -99) {
+				// TODO use this code once group has default graphic unit
+				// if (!(disableGroups.includes(groupID))) {
+				// 	// If the selected unit is -99 then there is not graphic unit yet. In this case you can only select a
+				// 	// group that has a default graphic unit because that will become the selected unit. This should only
+				// 	// happen if no meter or group is yet selected.
+				// 	if (state.graph.selectedUnit == -99) {
+				// 		// If no unit is set then this should always be the first group (or meter) selected.
+				// 		// The selectedUnit becomes the unit of the group selected. Note is should always be set (not -99) since
+				// 		// those groups should not have been visible. The only exception is if there are no selected groups but
+				// 		// then this loop does not run. The loop is assumed to only run once in this case.
+				// 		// TODO this really should only be for debugging??
+				// 		if (state.graph.selectedGroups.length != 1) {
+				// 			console.log('9100 state.graph.selectedGroups length is not one but ' + state.graph.selectedGroups.length);
+				// 		}
+
+				// 		// TODO is it possible the unit of the meter is not set in state? Seems not if can select??
+				// 		// TODO group state does not yet have default graphic unit so must wait to do this.
+				// 		state.graph.selectedUnit = state.groups.byGroupID[groupID].defaultGraphicUnit;
+				// 	}
 				selectedGroups.push({
 					// For groups we display the name since no identifier.
 					label: state.groups.byGroupID[groupID] ? state.groups.byGroupID[groupID].name : '',
@@ -178,8 +194,8 @@ export default function ChartDataSelectComponent() {
 		const selectedUnit: SelectOption[] = [];
 		[state.graph.selectedUnit].forEach(unitID => {
 			if (unitID !== -99) {
+				// Only use if valid/selected unit which means it is not -99.
 				selectedUnit.push({
-					// TODO check out if this is correct/best way???
 					// Units use the identifier to display.
 					label: state.graph.selectedUnit ? state.units.units[state.graph.selectedUnit].identifier : '',
 					value: unitID,
@@ -187,12 +203,6 @@ export default function ChartDataSelectComponent() {
 				} as SelectOption);
 			}
 		});
-		// TODO Remove???
-		// const selectedUnit = {
-		// label: state.units.units[state.graph.selectedUnit] ? state.units.units[state.graph.selectedUnit].name : '',
-		// 		value: state.graph.selectedUnit,
-		// 			isDisabled: false
-		// } as SelectOption
 
 		return {
 			sortedMeters,
@@ -247,7 +257,7 @@ export default function ChartDataSelectComponent() {
 						let newUnit;
 						if (newSelectedUnitOptions.length === 0) {
 							// The unit was unselected so no new one. Thus, set to -99 since no unit.
-							// TODO This causes an error by trying to get data before the value is changed again.??????
+							// TODO This causes an error by trying to get data before the value is changed again.??
 							// TODO need to clear all meters/groups in this case.
 							// TODO nice if warned user about to clear all meters/groups.
 							newUnit = -99;
