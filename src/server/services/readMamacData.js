@@ -17,8 +17,11 @@ function parseTimestamp(raw, line) {
 	if (!timestampRegExp.test(raw)) {
 		throw new Error(`CSV line ${line}: Raw timestamp ${raw} does not pass regex validation`);
 	}
-	// Set moment to strict mode so bad values are noticed.
-	const ts = moment(raw, 'HH:mm:ss MM/DD/YY', true);
+	// moment cannot be set to strict mode since it fails. However, the expected format is given so
+	// it should do a good test.
+	// MAMAC meters do not send a timezone so we parse the string directly and it is interpreted
+	// as UTC which is what we want and parseZone does not shift the time.
+	const ts = moment.parseZone(raw, 'HH:mm:ss MM/DD/YY')
 	// This check should be done in pipeline but leave here for now/historical reasons. Note in pipeline check if
 	// format() value is Invalid date.
 	if (!ts.isValid()) {
@@ -36,13 +39,13 @@ function parseTimestamp(raw, line) {
  */
 async function readMamacData(meter, conn) {
 	// First get a promise that's just the meter itself (or an error if it doesn't have an IP address)
-	if (!meter.ipAddress) {
+	if (!meter.url) {
 		throw new Error(`${meter} doesn't have an IP address to read data from`);
 	}
 	if (!meter.id) {
 		throw new Error(`${meter} doesn't have an id to associate readings with`);
 	}
-	const rawReadings = await reqPromise(`http://${meter.ipAddress}/int2.csv`);
+	const rawReadings = await reqPromise(`http://${meter.url}/int2.csv`);
 	const parsedReadings = await parseCsv(rawReadings);
 	// Hold the end and start date/timestamp for each reading as processed.
 	let endTs;
@@ -53,7 +56,7 @@ async function readMamacData(meter, conn) {
 		// This is now checked in the pipeline but leave here for now/historical reasons.
 		if (isNaN(reading)) {
 			const e = Error(`CSV line ${line}: Meter reading ${reading} parses to NaN for meter named ${meter.name} with id ${meter.id}`);
-			e.options = { ipAddress: meter.ipAddress };
+			e.options = { ipAddress: meter.url };
 			throw e;
 		}
 		try {
@@ -70,7 +73,7 @@ async function readMamacData(meter, conn) {
 			endTs = parseTimestamp(raw[1], line);
 		} catch (re) {
 			const e = Error(re.message);
-			e.options = { ipAddress: meter.ipAddress };
+			e.options = { ipAddress: meter.url };
 			throw e;
 		}
 		return [reading, startTs, endTs]

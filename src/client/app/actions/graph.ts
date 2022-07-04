@@ -78,6 +78,10 @@ function updateComparePeriod(comparePeriod: ComparePeriod, currentTime: moment.M
 
 export function changeCompareGraph(comparePeriod: ComparePeriod): Thunk {
 	return (dispatch: Dispatch, getState: GetState) => {
+		// Here there is no shift since we want to do it in terms of the current time in the browser.
+		// Note this does mean that if someone is in a different time zone then they may be ahead of
+		// reading on the server (so get 0 readings for those times) or behind (so miss recent readings).
+		// TODO At some point we may want to see if we can use the server time to avoid this.
 		dispatch(updateComparePeriod(comparePeriod, moment()));
 		dispatch((dispatch2: Dispatch) => {
 			dispatch2(fetchNeededCompareReadings(comparePeriod, getState().graph.selectedUnit));

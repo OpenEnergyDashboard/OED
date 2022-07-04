@@ -6,7 +6,7 @@
 Creates a table of meters containing 
 primary key (generally set by DB,
 name: The name of a meter used for getting data and currently shown to user,
-IP addresF: for meter data,
+url: for meter data,
 enabled: True if the meter should get data,
 displayable: True if meter visible to non-admin users,
 meter_type: The meter type,
@@ -33,7 +33,7 @@ default_graphic_unit: The foreign key to the unit table represents the preferred
 CREATE TABLE IF NOT EXISTS meters (
     id SERIAL PRIMARY KEY,
     name VARCHAR(50) UNIQUE NOT NULL CHECK (char_length(name) >= 1),
-    ipAddress VARCHAR(20),
+    url VARCHAR(400),
     enabled BOOLEAN NOT NULL,
     displayable BOOLEAN NOT NULL,
     meter_type meter_type NOT NULL,

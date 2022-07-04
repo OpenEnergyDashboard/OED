@@ -13,7 +13,9 @@ interface GroupViewProps {
 	name: string;
 	id: number;
 	childMeterNames: string[];
+	trueMeterSize: number;
 	childGroupNames: string[];
+	trueGroupSize: number;
 	deepMeterNames: string[];
 	loggedInAsAdmin: boolean;
 	fetchGroupChildren(id: number): Promise<any>;
@@ -48,7 +50,8 @@ export default class GroupViewComponent extends React.Component<GroupViewProps> 
 			paddingLeft: '5px'
 		};
 		const groupAllMeters: React.CSSProperties = {
-			fontWeight: 'bold'
+			fontWeight: 'bold',
+			marginBottom: 0
 		};
 		return (
 			<div>
@@ -58,13 +61,13 @@ export default class GroupViewComponent extends React.Component<GroupViewProps> 
 						<p style={boldStyle}>
 							<FormattedMessage id='child.meters' />:
 						</p>
-						<ListDisplayComponent items={this.props.childMeterNames} />
+						<ListDisplayComponent trueSize={this.props.trueMeterSize} items={this.props.childMeterNames} />
 					</div>
 					<div className='col-6'>
 						<p style={boldStyle}>
 							<FormattedMessage id='child.groups' />:
 						</p>
-						<ListDisplayComponent items={this.props.childGroupNames} />
+						<ListDisplayComponent trueSize={this.props.trueGroupSize} items={this.props.childGroupNames} />
 					</div>
 				</div>
 				<Link style={editGroupStyle} to='/editGroup'>
@@ -76,9 +79,14 @@ export default class GroupViewComponent extends React.Component<GroupViewProps> 
 					<p style={groupAllMeters}>
 						<FormattedMessage id='group.all.meters' />:
 					</p>
-					{this.props.deepMeterNames.map ((item, index) => (
+					{this.props.deepMeterNames.map((item, index) => (
 						<span key={`d_${index}`}>{(index ? ', ': '') + item}</span>
 					))}
+					{
+						this.props.childMeterNames.length !== this.props.trueMeterSize ||
+						this.props.childGroupNames.length !== this.props.trueGroupSize ?
+							<div><i>This group contains non-displayable meters/groups denoted as hidden.</i></div> : <></>
+					}
 				</div>
 			</div>
 		);

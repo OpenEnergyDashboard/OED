@@ -8,6 +8,8 @@ const { checkDate, checkValue, checkIntervals, validateReadings} = require('../.
 const Reading = require('../../models/Reading');
 const moment = require('moment');
 
+// All the uses of moment in these tests are for testing against non-DB items so
+// it is okay to use the local timezone.
 mocha.describe('PIPELINE: Validate Readings', () => {
 	mocha.it('detects out-of-bound date', async () => {
 		const minDate = moment('1970-01-01 00:00:00');

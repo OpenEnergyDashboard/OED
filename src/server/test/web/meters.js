@@ -11,7 +11,6 @@ const User = require('../../models/User');
 const bcrypt = require('bcryptjs');
 const Point = require('../../models/Point');
 const gps = new Point(90, 45);
-const moment = require('moment');
 const Unit = require('../../models/Unit');
 
 /**
@@ -56,8 +55,8 @@ function expectMetersToBeEquivalent(meters, length, offset, unit) {
 			expect(meter).to.have.property('displayable', false);
 		}
 		if (length === 4) {
-			// This is the test where you are an admin and should see all attributes of the meter.
-			expect(meter).to.have.property('ipAddress', '1.1.1.1');
+			// Admin so see more values
+			expect(meter).to.have.property('url', '1.1.1.1');
 			expect(meter).to.have.property('meterType', Meter.type.MAMAC);
 			expect(meter).to.have.property('timeZone', 'TZ' + (i + offset));
 			expect(meter).to.have.property('note', `notes ${i + offset}`);
@@ -74,8 +73,7 @@ function expectMetersToBeEquivalent(meters, length, offset, unit) {
 			expect(meter).to.have.property('startTimestamp', '0001-01-01T23:59:59.000Z');
 			expect(meter).to.have.property('endTimestamp', '2020-07-02T01:00:10.000Z');
 		} else {
-			// If not an admin then many attributes are not visible and set to null.
-			expect(meter).to.have.property('ipAddress', null);
+			expect(meter).to.have.property('url', null);
 			expect(meter).to.have.property('meterType', null);
 			expect(meter).to.have.property('timeZone', null);
 			expect(meter).to.have.property('note', null);

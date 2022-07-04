@@ -4,7 +4,6 @@
 
 const { createConversionGraph } = require('./createConversionGraph');
 const { createCikArray } = require('./createConversionArrays');
-const { getConnection } = require('../../db');
 const Cik = require('../../models/Cik');
 const { handleSuffixUnits} = require('./handleSuffixUnits');
 

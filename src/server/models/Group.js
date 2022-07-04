@@ -96,7 +96,7 @@ class Group {
 	/**
 	 * returns a promise to retrieve all groups in the database
 	 * @param conn the connection to be used.
-	 * @returns {Promise.<void>}
+	 * @returns {Promise.<array.<Group>>}
 	 */
 	static async getAll(conn) {
 		const rows = await conn.any(sqlFile('group/get_all_groups.sql'));
@@ -109,7 +109,7 @@ class Group {
 	 * @returns {Promise.<Array.<Group>>}
 	 */
 	static async getDisplayable(conn) {
-		const rows = await conn.any(sqlFile('group/get_displayable.sql'));
+		const rows = await conn.any(sqlFile('group/get_displayable_groups.sql'));
 		return rows.map(Group.mapRow);
 	}
 

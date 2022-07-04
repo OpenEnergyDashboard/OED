@@ -33,7 +33,7 @@ export default function ExportComponent(props: ExportProps) {
 		// Sort the dataset based on the start time
 		data.forEach(reading => {
 			if (reading !== undefined) {
-				reading.exportVals.sort((a,b) =>{
+				reading.exportVals.sort((a, b) => {
 					if (a.x < b.x) {
 						return -1;
 					}
@@ -43,6 +43,7 @@ export default function ExportComponent(props: ExportProps) {
 		})
 
 		// Determine and format the first time in the dataset
+		// These values are already UTC so they are okay. Why has not been tracked down.
 		let startTime = moment(data[0].exportVals[0].x);
 		for (const reading of data) {
 			if (reading !== undefined) {
@@ -64,8 +65,8 @@ export default function ExportComponent(props: ExportProps) {
 			}
 		}
 		// Use regex to remove commas and replace spaces/colons/hyphens with underscores
-		const startTimeString = startTime.utc().format('LL_LTS').replace(/,/g,'').replace(/[\s:-]/g,'_');
-		const endTimeString = endTime.utc().format('LL_LTS').replace(/,/g,'').replace(/[\s:-]/g,'_');
+		const startTimeString = startTime.utc().format('LL_LTS').replace(/,/g, '').replace(/[\s:-]/g, '_');
+		const endTimeString = endTime.utc().format('LL_LTS').replace(/,/g, '').replace(/[\s:-]/g, '_');
 		const chartName = data[0].currentChart;
 		const name = `oedExport_${chartName}_${startTimeString}_to_${endTimeString}.csv`;
 		graphExport(data, name);
@@ -77,7 +78,7 @@ export default function ExportComponent(props: ExportProps) {
 		const count = await metersApi.lineReadingsCount(props.selectedMeters, props.timeInterval);
 		graphRawExport(count, props.defaultWarningFileSize, props.defaultFileSizeLimit, async () => {
 			const lineReading = await metersApi.rawLineReadings(props.selectedMeters, props.timeInterval);
-			downloadRawCSV(lineReading,props.defaultLanguage);
+			downloadRawCSV(lineReading, props.defaultLanguage);
 		});
 	}
 

@@ -12,7 +12,7 @@ const processData = require('./processData');
  * Select and process needed values from a matrix and insert into DB.
  * @param {object[[]]} dataRows where each row is defined by mapRowToModel function
  * @param {number} meterID meter id being input
- * @param {function} mapRowToModel a customized function that map needed values from each row to the Reading model
+ * @param {function} mapRowToModel a customized function that reorders each row into shape [reading_value, startTimeStamp, endTimeStamp]
  * @param {string} timeSort the canonical order sorted by date/time in which the data appears in the data file
  * @param {number} readingRepetition number of times each reading is repeated where 1 means no repetition
  * @param {boolean} isCumulative true if the given data is Cumulative

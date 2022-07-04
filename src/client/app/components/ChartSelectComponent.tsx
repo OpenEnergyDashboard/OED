@@ -3,92 +3,78 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
 
 import * as React from 'react';
-
+import * as _ from 'lodash';
 import { ChartTypes } from '../types/redux/graph';
-import { ChangeChartToRenderAction } from '../types/redux/graph';
 import { FormattedMessage } from 'react-intl';
 import TooltipMarkerComponent from './TooltipMarkerComponent';
 import Dropdown from 'reactstrap/lib/Dropdown';
 import DropdownItem from 'reactstrap/lib/DropdownItem';
 import DropdownToggle from 'reactstrap/lib/DropdownToggle';
 import DropdownMenu from 'reactstrap/lib/DropdownMenu';
+import { useDispatch, useSelector } from 'react-redux';
+import { State } from '../types/redux/state';
+import { useState } from 'react';
+import { SelectOption } from '../types/items';
 
-interface ChartSelectProps {
-	selectedChart: ChartTypes;
-	changeChartType(chartType: ChartTypes): ChangeChartToRenderAction;
-}
-interface DropdownState {
-	dropdownOpen: boolean;
-	compareSortingDropdownOpen: boolean;
-}
 /**
- * A component that allows users to select which chart should be displayed.
+ *  A component that allows users to select which chart should be displayed.
  */
-export default class ChartSelectComponent extends React.Component<ChartSelectProps, DropdownState> {
-	constructor(props: ChartSelectProps) {
-		super(props);
-		this.handleChangeChartType = this.handleChangeChartType.bind(this);
-		this.toggleDropdown = this.toggleDropdown.bind(this);
-		this.state = {
-			dropdownOpen: false,
-			compareSortingDropdownOpen: false
-		};
-	}
+export default function ChartSelectComponent() {
+	const divBottomPadding: React.CSSProperties = {
+		paddingBottom: '15px'
+	};
+	const labelStyle: React.CSSProperties = {
+		fontWeight: 'bold',
+		margin: 0
+	};
 
-	public render() {
-		const divBottomPadding: React.CSSProperties = {
-			paddingBottom: '15px'
-		};
+	const dispatch = useDispatch();
+	const [expand, setExpand] = useState(false);
+	const sortedMaps = _.sortBy(_.values(useSelector((state: State) => state.maps.byMapID)).map(map => (
+		{ value: map.id, label: map.name.trim(), isDisabled: !(map.origin && map.opposite) } as SelectOption
+	)), 'label');
 
-		const labelStyle: React.CSSProperties = {
-			fontWeight: 'bold',
-			margin: 0
-		};
-
-		return (
-			<div style={divBottomPadding}>
-				<p style={labelStyle}>
-					<FormattedMessage id='graph.type' />:
-				</p>
-				<Dropdown isOpen={this.state.dropdownOpen} toggle={this.toggleDropdown}>
-					<DropdownToggle outline caret>
-						{/* Show the currently selected chart as its name */}
-						<FormattedMessage id={this.props.selectedChart} />
-					</DropdownToggle>
-					<DropdownMenu>
-						<DropdownItem
-							onClick={() => this.handleChangeChartType(ChartTypes.line)}
-						>
-							<FormattedMessage id='line' />
-						</DropdownItem>
-						<DropdownItem
-							onClick={() => this.handleChangeChartType(ChartTypes.bar)}
-						>
-							<FormattedMessage id='bar' />
-						</DropdownItem>
-						<DropdownItem
-							onClick={() => this.handleChangeChartType(ChartTypes.compare)}
-						>
-							<FormattedMessage id='compare' />
-						</DropdownItem>
-						<DropdownItem
-							onClick={() => this.handleChangeChartType(ChartTypes.map)}
-						>
-							<FormattedMessage id='map' />
-						</DropdownItem>
-					</DropdownMenu>
-				</Dropdown>
-				<div>
-					<TooltipMarkerComponent page='home' helpTextId='help.home.chart.select' />
-				</div>
+	return (
+		<div style={divBottomPadding}>
+			<p style={labelStyle}>
+				<FormattedMessage id='graph.type' />:
+			</p>
+			<Dropdown isOpen={expand} toggle={() => setExpand(!expand)}>
+				<DropdownToggle outline caret>
+					<FormattedMessage id={useSelector((state: State) => state.graph.chartToRender)} />
+				</DropdownToggle>
+				<DropdownMenu>
+					<DropdownItem
+						onClick={() => dispatch({type: 'CHANGE_CHART_TO_RENDER', chartType: ChartTypes.line})}
+					>
+						<FormattedMessage id='line' />
+					</DropdownItem>
+					<DropdownItem
+						onClick={() => dispatch({type: 'CHANGE_CHART_TO_RENDER', chartType: ChartTypes.bar})}
+					>
+						<FormattedMessage id='bar' />
+					</DropdownItem>
+					<DropdownItem
+						onClick={() => dispatch({type: 'CHANGE_CHART_TO_RENDER', chartType: ChartTypes.compare})}
+					>
+						<FormattedMessage id='compare' />
+					</DropdownItem>
+					<DropdownItem
+						onClick={() => {
+							dispatch({type: 'CHANGE_CHART_TO_RENDER', chartType: ChartTypes.map});
+							if (Object.keys(sortedMaps).length === 1) {
+								// If there is only one map, selectedMap is the id of the only map. ie; display map automatically if only 1 map
+								dispatch({type: 'UPDATE_SELECTED_MAPS', mapID: sortedMaps[0].value});
+							}
+						}}
+					>
+						<FormattedMessage id='map' />
+					</DropdownItem>
+				</DropdownMenu>
+			</Dropdown>
+			<div>
+				<TooltipMarkerComponent page='home' helpTextId='help.home.chart.select' />
 			</div>
-		);
-	}
-
-	private handleChangeChartType(value: ChartTypes) {
-		this.props.changeChartType(value);
-	}
-	private toggleDropdown() {
-		this.setState(prevState => ({ dropdownOpen: !prevState.dropdownOpen }));
-	}
+		</div>
+	);
 }
