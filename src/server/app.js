@@ -57,7 +57,6 @@ if (log.level !== LogLevel.SILENT) {
 
 app.use(favicon(path.join(__dirname, '..', 'client', 'public', 'favicon.ico')));
 app.use(bodyParser.json({ limit: '50mb' }));
-app.use(bodyParser.raw({ limit: '50mb', type: ['application/xml'] }));
 app.use(bodyParser.urlencoded({ extended: false, limit: '50mb' }));
 app.use(cookieParser());
 

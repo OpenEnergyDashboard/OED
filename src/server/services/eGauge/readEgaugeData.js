@@ -3,16 +3,23 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
 
 const loadArrayInput = require('../pipeline-in-progress/loadArrayInput');
-
 const eGaugeRequestor = require('../../models/eGauge/eGaugeRequestor');
 
+/**
+ * Acquires eGauge readings for the OED meter and stores them in the database.
+ * @param {*} meter meter associated with these eGauge readings.
+ * @param {*} conn database connection
+ */
 async function readEgaugeData(meter, conn) {
+	// Set up an eGauge object to get the readings.
 	const requestor = new eGaugeRequestor(meter);
+	// Get the readings.
 	await requestor.login();
 	await requestor.setRegisterId();
 	const meterReadings = await requestor.getMeterReadings();
 	await requestor.logout()
 
+	// Store the readings in the database.
 	await loadArrayInput(dataRows = meterReadings,
 		meterID = meter.id,
 		mapRowToModel = row => {
@@ -21,6 +28,7 @@ async function readEgaugeData(meter, conn) {
 			const endTimestamp = row[2];
 			return [readRate, startTimestamp, endTimestamp];
 		},
+		// eGauge has decreasing timestamp order and is cumulative without reset.
 		timeSort = 'decreasing',
 		readingRepetition = 1,
 		isCumulative = true,

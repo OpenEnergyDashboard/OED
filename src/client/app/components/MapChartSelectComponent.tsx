@@ -3,66 +3,56 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
 
 import * as React from 'react';
+import * as _ from 'lodash';
+import { useDispatch, useSelector } from 'react-redux';
+import { State } from '../types/redux/state';
 import { SelectOption } from '../types/items';
-import { defineMessages, FormattedMessage, injectIntl, WrappedComponentProps } from 'react-intl';
+import { defineMessages, FormattedMessage, useIntl } from 'react-intl';
 import SingleSelectComponent from './SingleSelectComponent';
 import TooltipMarkerComponent from './TooltipMarkerComponent';
-import { UpdateSelectedMapAction } from '../types/redux/map';
 
-interface MapChartSelectProps {
-	maps: SelectOption[];
-	selectedMap: SelectOption;
-	selectMap(mapID: number): UpdateSelectedMapAction;
-}
+export default function MapChartSelectComponent() {
+	const divBottomPadding: React.CSSProperties = {
+		paddingBottom: '15px'
+	};
+	const labelStyle: React.CSSProperties = {
+		fontWeight: 'bold',
+		margin: 0
+	};
+	const messages = defineMessages({
+		selectMap: {id: 'select.map'}
+	});
 
-type MapChartSelectPropsWithIntl = MapChartSelectProps & WrappedComponentProps;
+	//Utilizes useDispatch and useSelector hooks
+	const dispatch = useDispatch();
+	const sortedMaps = _.sortBy(_.values(useSelector((state: State) => state.maps.byMapID)).map(map => (
+		{ value: map.id, label: map.name.trim(), isDisabled: !(map.origin && map.opposite) } as SelectOption
+	)), 'label');
 
-class MapChartSelectComponent extends React.Component<MapChartSelectPropsWithIntl> {
-	constructor(props: MapChartSelectPropsWithIntl) {
-		super(props);
-		this.handleMapSelect = this.handleMapSelect.bind(this);
-		if (this.props.maps.length === 1) {
-			this.props.selectMap(this.props.maps[0].value);
-		}
-	}
+	const selectedMap = {
+		label: useSelector((state: State) => state.maps.byMapID[state.maps.selectedMap] ? state.maps.byMapID[state.maps.selectedMap].name : ''),
+		value: useSelector((state: State) => state.maps.selectedMap)
+	};
 
-	public render() {
-		const divBottomPadding: React.CSSProperties = {
-			paddingBottom: '15px'
-		};
-		const labelStyle: React.CSSProperties = {
-			fontWeight: 'bold',
-			margin: 0
-		};
-		const messages = defineMessages({
-			selectMap: {id: 'select.map'}
-		});
+	//useIntl instead of injectIntl and WrappedComponentProps
+	const intl = useIntl();
 
-		return (
-			<div>
-				<p style={labelStyle}>
-					<FormattedMessage id='maps' />:
-				</p>
-				<div style={divBottomPadding}>
-					<SingleSelectComponent
-						options={this.props.maps}
-						selectedOption={(this.props.selectedMap.value === 0) ? undefined : this.props.selectedMap}
-						placeholder={this.props.intl.formatMessage(messages.selectMap)}
-						onValueChange={this.handleMapSelect}
-					/>
-					<TooltipMarkerComponent page='home' helpTextId='help.home.select.maps'/>
-				</div>
+	return (
+		<div>
+			<p style={labelStyle}>
+				<FormattedMessage id='maps' />:
+			</p>
+			<div style={divBottomPadding}>
+				<SingleSelectComponent
+					options={sortedMaps}
+					selectedOption={(selectedMap.value === 0) ? undefined : selectedMap}
+					placeholder={intl.formatMessage(messages.selectMap)}
+					onValueChange={selected => dispatch({type: 'UPDATE_SELECTED_MAPS', mapID: selected.value})}
+					//When we specify stuff in actions files, we also specify other variables, in this case mapID.
+					//This is where we specify values instead of triggering the action by itself.
+				/>
+				<TooltipMarkerComponent page='home' helpTextId='help.home.select.maps'/>
 			</div>
-		);
-	}
-
-	/**
-	 * handles change in map selection
-	 * @param selection
-	 */
-	private handleMapSelect(selection: SelectOption) {
-		this.props.selectMap(selection.value);
-	}
+		</div>
+	);
 }
-
-export default injectIntl(MapChartSelectComponent);
