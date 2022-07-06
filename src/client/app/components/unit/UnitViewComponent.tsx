@@ -5,7 +5,7 @@ import * as React from 'react';
 import { Button } from 'reactstrap';
 import { UnitData, EditUnitDetailsAction } from '../../types/redux/units';
 import { FormattedMessage, injectIntl, WrappedComponentProps } from 'react-intl';
-import ModalCard from './UnitModalEditComponent';
+import ModalCard from './EditUnitModalComponent';
 import '../../styles/unit-card-page.css';
 
 interface UnitViewProps {

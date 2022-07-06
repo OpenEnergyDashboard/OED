@@ -3,17 +3,15 @@
   * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
 import * as React from 'react';
 import { Modal, Button } from 'react-bootstrap';
-import '../../styles/unit-edit-modal.css';
 import { UnitData, EditUnitDetailsAction, DisplayableType, UnitRepresentType, UnitType } from '../../types/redux/units';
 import { Input } from 'reactstrap';
 import { FormattedMessage } from 'react-intl';
 import translate from '../../utils/translate';
+import '../../styles/Modal.unit.css';
 
 //Interface for edited units props
 interface EditUnitProps {
 	unit: UnitData;
-	onhide: () => void;
-	editUnitDetails(unit: UnitData): EditUnitDetailsAction;
 	show: boolean;
 	name: string;
 	identifier: string;
@@ -25,16 +23,17 @@ interface EditUnitProps {
 	displayable: DisplayableType;
 	preferredDisplay: boolean;
 	note: string;
+	onhide: () => void;
+	editUnitDetails(unit: UnitData): EditUnitDetailsAction;
 }
 
 //Interface for the unit state
 interface UnitViewState {
-	show: boolean;
 	nameInput: string;
 	identifierInput: string;
-	unitRepresentInput: UnitRepresentType;
-	typeOfUnitInput: UnitType;
-	displayableInput: DisplayableType;
+	typeOfUnitInput: string;
+	unitRepresentInput: string;
+	displayableInput: string;
 	preferredDisplayableInput: boolean;
 	secInRateInput: number;
 	suffixInput: string;
@@ -49,7 +48,6 @@ class UnitModelEditComponent extends React.Component<UnitViewPropsWithIntl, Unit
 	constructor(props: UnitViewPropsWithIntl) {
 		super(props);
 		this.state = {
-			show: this.props.show,
 			nameInput: this.props.name,
 			identifierInput: this.props.identifier,
 			typeOfUnitInput: this.props.typeOfUnit,
@@ -74,14 +72,19 @@ class UnitModelEditComponent extends React.Component<UnitViewPropsWithIntl, Unit
 					<Modal.Body className="show-grid">
 						<div id="container">
 							<div id="modalChild">
-								{this.isIdentifier(this.props.identifier)}
-								{this.isTypeOfUnit(this.props.typeOfUnit)}
-								{this.isUnitRepresent(this.props.unitRepresent)}
-								{this.isDisplayableType(this.props.displayable)}
-								{this.isSecInRate(this.props.secInRate)}
-								{this.isPreferredDisplayable(this.props.preferredDisplay)}
-								{this.isSuffix(this.props.suffix)}
-								{this.isNote(this.props.note)}
+								<div className="container-fluid">
+									<form>
+									{this.isName(this.props.name)}
+									{this.isIdentifier(this.props.identifier)}
+									{this.isTypeOfUnit(this.props.typeOfUnit)}
+									{this.isUnitRepresent(this.props.unitRepresent)}
+									{this.isDisplayableType(this.props.displayable)}
+									{this.isSecInRate(this.props.secInRate)}
+									{this.isPreferredDisplayable(this.props.preferredDisplay)}
+									{this.isSuffix(this.props.suffix)}
+									{this.isNote(this.props.note)}
+									</form>
+								</div>
 							</div>
 						</div>
 					</Modal.Body>
@@ -91,7 +94,7 @@ class UnitModelEditComponent extends React.Component<UnitViewPropsWithIntl, Unit
 							<FormattedMessage id="close" />
 						</Button>
 						{/* On click calls the function onSaveChanges in this componenet */}
-						<Button variant="primary" onClick={() => this.onSaveChanges()}>
+						<Button variant="primary" onClick={() => this.onSaveChanges()} disabled={!this.props.name || !this.props.identifier}>
 							<FormattedMessage id="save.all" />
 						</Button>
 					</Modal.Footer>
@@ -100,11 +103,13 @@ class UnitModelEditComponent extends React.Component<UnitViewPropsWithIntl, Unit
 		);
 	}
 
-	/** This function (1) checks if the unit state value is different from the unit prop value.
-	 * (2) If the value is different, add all the changed values to editedUnit and call the prop editUnitDeatils(editedUnit).
+	/** This function
+	 * (1) checks if the unit state value is different from the unit prop value.
+	 * (2) If the values are different, add all the changed values to editedUnit and call the prop editUnitDeatils(editedUnit).
 	 * (3) Call the function onHide() -> this will hide the modal and call function handleClose on UnitViewComponent.tsx */
 
 	private onSaveChanges() {
+		const oldName = this.props.unit.name;
 		const oldIdentifier = this.props.unit.identifier;
 		const oldUnitRepresentType = this.props.unit.unitRepresent;
 		const oldTypeOfUnit = this.props.unit.typeOfUnit;
@@ -113,10 +118,11 @@ class UnitModelEditComponent extends React.Component<UnitViewPropsWithIntl, Unit
 		const oldSecInRate = this.props.unit.secInRate;
 		const oldSuffix = this.props.unit.suffix.toString();
 		const oldNote = this.props.unit.note;
-		if (oldIdentifier != this.state.identifierInput || oldUnitRepresentType != this.state.unitRepresentInput ||
+		if (oldName != this.state.nameInput || oldIdentifier != this.state.identifierInput || oldUnitRepresentType != this.state.unitRepresentInput ||
 			oldTypeOfUnit != this.state.typeOfUnitInput || oldDisplayable != this.state.displayableInput ||
 			oldPreferredDisplay != this.state.preferredDisplayableInput || oldSecInRate != this.state.secInRateInput ||
 			oldSuffix != this.state.suffixInput || oldNote != this.state.noteInput) {
+			const name = this.state.nameInput;
 			const identifier = this.state.identifierInput;
 			const unitRepresent = this.state.unitRepresentInput as UnitRepresentType;
 			const typeOfUnit = this.state.typeOfUnitInput as UnitType;
@@ -128,7 +134,7 @@ class UnitModelEditComponent extends React.Component<UnitViewPropsWithIntl, Unit
 
 			const editedUnit = {
 				...this.props.unit,
-				identifier, unitRepresent, typeOfUnit,
+				name, identifier, unitRepresent, typeOfUnit,
 				displayable, preferredDisplay, secInRate,
 				suffix, note
 			};
@@ -140,6 +146,10 @@ class UnitModelEditComponent extends React.Component<UnitViewPropsWithIntl, Unit
 	/**
 	 * The following handlers will change the state to the corresponding unit
 	 */
+	private handleNameChange(event: React.ChangeEvent<HTMLInputElement>) {
+		this.setState({ nameInput: event.target.value });
+	}
+
 	private handleIdentifierChange(event: React.ChangeEvent<HTMLInputElement>) {
 		this.setState({ identifierInput: event.target.value });
 	}
@@ -173,18 +183,27 @@ class UnitModelEditComponent extends React.Component<UnitViewPropsWithIntl, Unit
 		this.setState({ suffixInput: event.target.value });
 	}
 
-	private handleNoteChange(event: React.ChangeEvent<HTMLInputElement>) {
+	private handleNoteChange(event: React.ChangeEvent<HTMLTextAreaElement>) {
 		this.setState({ noteInput: event.target.value });
 	}
 
 	/**
 	 * The following functions will append each unit detail to the modal card.
 	 */
+
+	 private isName(name: string) {
+		return (
+			<div>
+				<label><FormattedMessage id="unit.name" /></label><br />
+				<input className="form-control" type="text" defaultValue={name} placeholder="Name" onChange={event => this.handleNameChange(event)} />
+			</div>
+		)
+	}
 	private isIdentifier(identifier: string) {
 		return (
 			<div>
-				<FormattedMessage id="unit.identifier" /> <span><br /><input type="text" defaultValue={identifier}
-					placeholder="Identifier" onChange={event => this.handleIdentifierChange(event)} /></span>
+				<label><FormattedMessage id="unit.identifier" /></label><br />
+				<input className="form-control" type="text" defaultValue={identifier} placeholder="Identifier" onChange={event => this.handleIdentifierChange(event)} />
 			</div>
 		)
 	}
@@ -192,7 +211,7 @@ class UnitModelEditComponent extends React.Component<UnitViewPropsWithIntl, Unit
 	private isUnitRepresent(unitRepresent: UnitRepresentType) {
 		return (
 			<div>
-				<label><FormattedMessage id="unit.represent" /> </label>
+				<label><FormattedMessage id="unit.represent" /></label><br />
 				<Input type='select' defaultValue={unitRepresent}
 					onChange={event => this.handleUnitRepresentChange(event)}>
 					{Object.keys(UnitRepresentType).map(key => {
@@ -206,9 +225,8 @@ class UnitModelEditComponent extends React.Component<UnitViewPropsWithIntl, Unit
 	private isSecInRate(secInRate: number) {
 		return (
 			<div>
-				<FormattedMessage id="unit.sec.in.rate" /> <span><br /><input type="number" defaultValue={secInRate}
-					onChange={event => this.handleSecInRateChange(event)}
-					placeholder="Sec In Rate" /></span>
+				<label><FormattedMessage id="unit.sec.in.rate" /></label><br />
+				<input className="form-control" type="number" defaultValue={secInRate} onChange={event => this.handleSecInRateChange(event)} placeholder="Sec In Rate" />
 			</div>
 		)
 	}
@@ -216,7 +234,7 @@ class UnitModelEditComponent extends React.Component<UnitViewPropsWithIntl, Unit
 	private isTypeOfUnit(typeOfUnit: UnitType) {
 		return (
 			<div>
-				<label><FormattedMessage id="unit.type.of.unit" /> </label>
+				<label><FormattedMessage id="unit.type.of.unit" /></label><br />
 				<Input type='select' defaultValue={typeOfUnit}
 					onChange={event => this.handleTypeOfUnitChange(event)}>
 					{Object.keys(UnitType).map(key => {
@@ -230,9 +248,8 @@ class UnitModelEditComponent extends React.Component<UnitViewPropsWithIntl, Unit
 	private isSuffix(suffix: string) {
 		return (
 			<div>
-				<label><FormattedMessage id="unit.suffix" /> </label>
-				<input type="text" defaultValue={suffix} placeholder="Suffix"
-					onChange={event => this.handleSuffixChange(event)} />
+				<label><FormattedMessage id="unit.suffix" /></label><br />
+				<input className="form-control" type="text" defaultValue={suffix} placeholder="Suffix"onChange={event => this.handleSuffixChange(event)} />
 			</div>
 		)
 	}
@@ -240,7 +257,7 @@ class UnitModelEditComponent extends React.Component<UnitViewPropsWithIntl, Unit
 	private isDisplayableType(displayable: DisplayableType) {
 		return (
 			<div>
-				<label><FormattedMessage id="unit.displayable" /> </label>
+				<label><FormattedMessage id="unit.dropdown.displayable" /></label><br />
 				<Input type='select' defaultValue={displayable}
 					onChange={event => this.handleDisplayableChange(event)}>
 					{Object.keys(DisplayableType).map(key => {
@@ -254,11 +271,11 @@ class UnitModelEditComponent extends React.Component<UnitViewPropsWithIntl, Unit
 	private isPreferredDisplayable(preferredDisplay: boolean) {
 		return (
 			<div>
-				<label><FormattedMessage id="unit.preferred.display" /> </label>
+				<label><FormattedMessage id="unit.preferred.display" /></label><br />
 				<Input type='select' defaultValue={preferredDisplay.toString()}
 					onChange={event => this.handlePreferredDisplayableChange(event)}>
-					<option value="true"> {translate('yes')} </option>
-					<option value="false"> {translate('no')} </option>
+					<option value="true"> {translate('true')} </option>
+					<option value="false"> {translate('false')} </option>
 				</Input>
 			</div>
 		)
@@ -267,9 +284,8 @@ class UnitModelEditComponent extends React.Component<UnitViewPropsWithIntl, Unit
 	private isNote(note: string) {
 		return (
 			<div>
-				<label><FormattedMessage id="unit.note" /> </label>
-				<input type="text" defaultValue={note} placeholder="Note"
-					onChange={event => this.handleNoteChange(event)} />
+				<label><FormattedMessage id="unit.note.optional" /></label><br />
+				<textarea className="form-control" defaultValue={note} placeholder="Note" onChange={event => this.handleNoteChange(event)} />
 			</div>
 		)
 	}

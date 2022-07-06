@@ -2,18 +2,16 @@
 * License, v. 2.0. If a copy of the MPL was not distributed with this
 * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
 import * as React from 'react';
-import CreateUnitModalComponent from '../../components/unit/CreateUnitModalComponent';
 import { showSuccessNotification, showErrorNotification } from '../../utils/notifications';
 import { unitsApi } from '../../utils/api';
-import { browserHistory } from '../../utils/history';
 import { UnitType, UnitRepresentType, DisplayableType } from '../../types/redux/units';
 import translate from '../../utils/translate';
+import CreateUnitModalComponent from '../../components/unit/CreateUnitModalComponent';
 
 export default class CreateUnitContainer extends React.Component {
 	constructor(props: any) {
 		super(props);
 		this.handleNameChange = this.handleNameChange.bind(this);
-		this.submitNewUnit = this.submitNewUnit.bind(this);
 		this.handleIdentifierChange = this.handleIdentifierChange.bind(this);
 		this.handleUnitRepresentChange = this.handleUnitRepresentChange.bind(this);
 		this.handleSecInRateChange = this.handleSecInRateChange.bind(this);
@@ -22,6 +20,8 @@ export default class CreateUnitContainer extends React.Component {
 		this.handleDisplayableChange = this.handleDisplayableChange.bind(this);
 		this.handlePreferredDisplayChange = this.handlePreferredDisplayChange.bind(this);
 		this.handleNoteChange = this.handleNoteChange.bind(this);
+		this.handleShowModal = this.handleShowModal.bind(this);
+		this.handleSaveAll = this.handleSaveAll.bind(this);
 	}
 
 	//default values
@@ -35,7 +35,8 @@ export default class CreateUnitContainer extends React.Component {
 		suffix: '',
 		displayable: DisplayableType.all,
 		preferredDisplay: false,
-		note: ''
+		note: '',
+		showModal: false,
 	}
 
 	private handleNameChange = (newName: string) => {
@@ -57,22 +58,44 @@ export default class CreateUnitContainer extends React.Component {
 	private handleTypeOfUnitChange = (newTypeOfUnit: string) => {
 		this.setState({ typeOfUnit: newTypeOfUnit });
 	}
+
 	private handleSuffixChange = (newSuffix: string) => {
 		this.setState({ suffix: newSuffix })
 	}
+
 	private handleDisplayableChange = (newDisplayable: string) => {
 		this.setState({ displayable: newDisplayable });
 	}
+
 	private handlePreferredDisplayChange = (newPreferredDisplay: boolean) => {
 		this.setState({ preferredDisplay: newPreferredDisplay });
 	}
+	
 	private handleNoteChange = (newNote: string) => {
 		this.setState({ note: newNote });
 	}
 
+	private handleShowModal = (newShowModal: boolean) => {
+		// if showModal False
+		if (!newShowModal) {
+			// clear input fields & set to defaults
+			this.state.name = ''
+			this.state.identifier = ''
+			this.state.unitRepresent = UnitRepresentType.quantity
+			this.state.secInRate = 3600
+			this.state.typeOfUnit = UnitType.unit
+			this.state.unitIndex = undefined
+			this.state.suffix = ''
+			this.state.displayable = DisplayableType.all
+			this.state.preferredDisplay = false
+			this.state.note = ''
+		}
+		this.setState({ showModal: newShowModal });
+	}
+
 	// Direct call to the API, this does not use the Redux state and goes around it to go directly to the API
-	// TODO: Current implementation requires page refresh to show new unit; Ideally we would refresh the redux state when the submitNewUnit runs.
-	private submitNewUnit = async () => {
+	// TODO: Current implementation requires page refresh to show new unit; Ideally we would refresh the redux state when the handleSaveAll runs.
+	private handleSaveAll = async () => {
 		try {
 			await unitsApi.addUnit({
 				// This value is not used but must be assigned so -99 is used.
@@ -90,7 +113,7 @@ export default class CreateUnitContainer extends React.Component {
 				note: this.state.note
 			});
 			showSuccessNotification(translate('unit.successfully.create.unit'))
-			browserHistory.push('/units');
+			this.handleShowModal(false);
 		} catch (error) {
 			showErrorNotification(translate('unit.failed.to.create.unit'));
 		}
@@ -109,7 +132,7 @@ export default class CreateUnitContainer extends React.Component {
 					displayable={this.state.displayable}
 					preferredDisplay={this.state.preferredDisplay}
 					note={this.state.note}
-					submitNewUnit={this.submitNewUnit}
+					showModal={this.state.showModal}
 					handleNameChange={this.handleNameChange}
 					handleIdentifierChange={this.handleIdentifierChange}
 					handleUnitRepresentChange={this.handleUnitRepresentChange}
@@ -119,6 +142,8 @@ export default class CreateUnitContainer extends React.Component {
 					handleDisplayableChange={this.handleDisplayableChange}
 					handlePreferredDisplayChange={this.handlePreferredDisplayChange}
 					handleNoteChange={this.handleNoteChange}
+					handleShowModal={this.handleShowModal}
+					handleSaveAll={this.handleSaveAll}
 				/>
 			</div>
 		);

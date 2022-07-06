@@ -5,12 +5,12 @@ import * as React from 'react';
 import { FormattedMessage } from 'react-intl';
 import HeaderContainer from '../../containers/HeaderContainer';
 import FooterContainer from '../../containers/FooterContainer';
-import UnitViewContainer from '../../containers/unit/UnitViewContainer';
 import store from '../../index';
 import TooltipHelpContainer from '../../containers/TooltipHelpContainer';
 import UnsavedWarningContainer from '../../containers/UnsavedWarningContainer';
 import { removeUnsavedChanges } from '../../actions/unsavedWarning';
 import TooltipMarkerComponent from '../TooltipMarkerComponent';
+import UnitViewContainer from '../../containers/unit/UnitViewContainer';
 import CreateUnitContainer from '../../containers/unit/CreateUnitContainer';
 
 interface UnitsDetailProps{
@@ -49,7 +49,6 @@ export default class UnitsDetailContainer extends React.Component<UnitsDetailPro
 				<UnsavedWarningContainer />
 				<HeaderContainer />
 				<TooltipHelpContainer page='units' />
-
 				<div className='container-fluid'>
 					<h2 style={titleStyle}>
 						<FormattedMessage id='units' />
