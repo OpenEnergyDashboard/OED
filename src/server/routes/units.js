@@ -88,6 +88,7 @@ router.post('/edit', async (req, res) => {
 		const conn = getConnection();
 		try {
 			const unit = await Unit.getById(req.body.id, conn);
+			unit.name = req.body.name;
 			unit.displayable = req.body.displayable;
 			unit.identifier = req.body.identifier;
 			unit.unitRepresent = req.body.unitRepresent;

@@ -22,6 +22,7 @@ interface UnitViewProps {
 }
 
 interface UnitViewState {
+	nameInput: string;
 	identifierInput: string;
 	secInRateInput: number;
 	unitRepresentInput: string;
@@ -40,6 +41,7 @@ class UnitViewComponent extends React.Component<UnitViewPropsWithIntl, UnitViewS
 	constructor(props: UnitViewPropsWithIntl) {
 		super(props);
 		this.state = {
+			nameInput: this.props.unit.name,
 			identifierInput: this.props.unit.identifier,
 			unitRepresentInput: this.props.unit.unitRepresent,
 			typeOfUnitInput: this.props.unit.typeOfUnit,
@@ -100,20 +102,20 @@ class UnitViewComponent extends React.Component<UnitViewPropsWithIntl, UnitViewS
 					</Button>
 					{/* this will direct to the createUnitModalComponent.tsx */}
 					<ModalCard
+						name={this.props.unit.name}
+						identifier={this.props.unit.identifier}
+						typeOfUnit={this.props.unit.typeOfUnit}
+						unitRepresent={this.props.unit.unitRepresent}
+						displayable={this.props.unit.displayable}
+						secInRate={this.props.unit.secInRate}
+						preferredDisplay={this.props.unit.preferredDisplay}
+						suffix={this.props.unit.suffix}
+						note={this.props.unit.note}
+						unitIndex={this.props.unit.unitIndex}
 						show={this.state.show}
 						onhide={this.handleClose}
 						editUnitDetails={this.props.editUnitDetails}
 						unit={this.props.unit}
-						identifier={this.props.unit.identifier}
-						name={this.props.unit.name}
-						unitRepresent={this.props.unit.unitRepresent}
-						secInRate={this.props.unit.secInRate}
-						typeOfUnit={this.props.unit.typeOfUnit}
-						unitIndex={this.props.unit.unitIndex}
-						suffix={this.props.unit.suffix}
-						displayable={this.props.unit.displayable}
-						preferredDisplay={this.props.unit.preferredDisplay}
-						note={this.props.unit.note}
 					/>
 				</div>
 			)

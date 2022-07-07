@@ -109,19 +109,17 @@ class UnitModelEditComponent extends React.Component<UnitViewPropsWithIntl, Unit
 	 * (3) Call the function onHide() -> this will hide the modal and call function handleClose on UnitViewComponent.tsx */
 
 	private onSaveChanges() {
-		const oldName = this.props.unit.name;
-		const oldIdentifier = this.props.unit.identifier;
-		const oldUnitRepresentType = this.props.unit.unitRepresent;
-		const oldTypeOfUnit = this.props.unit.typeOfUnit;
-		const oldDisplayable = this.props.unit.displayable;
-		const oldPreferredDisplay = this.props.unit.preferredDisplay;
-		const oldSecInRate = this.props.unit.secInRate;
-		const oldSuffix = this.props.unit.suffix.toString();
-		const oldNote = this.props.unit.note;
-		if (oldName != this.state.nameInput || oldIdentifier != this.state.identifierInput || oldUnitRepresentType != this.state.unitRepresentInput ||
-			oldTypeOfUnit != this.state.typeOfUnitInput || oldDisplayable != this.state.displayableInput ||
-			oldPreferredDisplay != this.state.preferredDisplayableInput || oldSecInRate != this.state.secInRateInput ||
-			oldSuffix != this.state.suffixInput || oldNote != this.state.noteInput) {
+
+		if (this.props.unit.name != this.state.nameInput || 
+			this.props.unit.identifier != this.state.identifierInput ||
+			this.props.unit.unitRepresent != this.state.unitRepresentInput ||
+			this.props.unit.typeOfUnit != this.state.typeOfUnitInput ||
+			this.props.unit.displayable != this.state.displayableInput ||
+			this.props.unit.preferredDisplay != this.state.preferredDisplayableInput ||
+			this.props.unit.secInRate != this.state.secInRateInput ||
+			this.props.unit.suffix.toString() != this.state.suffixInput ||
+			this.props.unit.note != this.state.noteInput) 
+			{
 			const name = this.state.nameInput;
 			const identifier = this.state.identifierInput;
 			const unitRepresent = this.state.unitRepresentInput as UnitRepresentType;
