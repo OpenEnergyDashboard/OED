@@ -9,7 +9,7 @@ import translate from '../../utils/translate';
 import '../../styles/Modal.unit.css';
 import { UnitRepresentType, DisplayableType, UnitType } from '../../types/redux/units';
 
-interface UnitFormProps {
+interface UnitProps {
 	name: string,
 	identifier: string,
 	unitRepresent: UnitRepresentType,
@@ -34,104 +34,121 @@ interface UnitFormProps {
 	handleSaveAll: () => void;
 }
 
-const ModalCard = (props: UnitFormProps) => {
+class CreateUnitModelComponent extends React.Component<UnitProps> {
 
-	return (
-		<>
-			{/* Show modal button */}
-			<Button variant="Secondary" onClick={ () => props.handleShowModal(true) }>
-				<FormattedMessage id="create.unit" />
-			</Button>
-			<Modal show={props.showModal} onHide={ () => props.handleShowModal(false) }>
-				<Modal.Header closeButton>
-					<Modal.Title> <FormattedMessage id="create.unit" /></Modal.Title>
-				</Modal.Header>
-				{/* TODO: Styling of the form could use some work to make textboxes bigger, etc */}
-				<Modal.Body className="show-grid">
-					<div id="container">
-						<div id="modalChild">
-							{/* Modal content */}
-							<div className="container-fluid">
-								<div>
-									{/* Name input*/}
+	//Creates a constructor and sets the set to the prop for each unit data.
+	constructor(props: UnitProps) {
+		super(props);
+		this.state = {
+			name: this.props.name,
+			identifier: this.props.identifier,
+			typeOfUnit: this.props.typeOfUnit,
+			unitRepresent: this.props.unitRepresent,
+			displayable: this.props.displayable,
+			preferredDisplayable: this.props.preferredDisplay,
+			secInRate: this.props.secInRate,
+			suffix: this.props.suffix,
+			note: this.props.note
+		};
+	}
+	render() {
+		return (
+			<>
+				{/* Show modal button */}
+				<Button variant="Secondary" onClick={ () => this.props.handleShowModal(true) }>
+					<FormattedMessage id="create.unit" />
+				</Button>
+				<Modal show={this.props.showModal} onHide={ () => this.props.handleShowModal(false) }>
+					<Modal.Header closeButton>
+						<Modal.Title> <FormattedMessage id="create.unit" /></Modal.Title>
+					</Modal.Header>
+					{/* TODO: Styling of the form could use some work to make textboxes bigger, etc */}
+					<Modal.Body className="show-grid">
+						<div id="container">
+							<div id="modalChild">
+								{/* Modal content */}
+								<div className="container-fluid">
 									<div>
-										<label><FormattedMessage id="unit.name" /></label><br />
-										<Input type='text' onChange={({ target }) => props.handleNameChange(target.value)} required value={props.name} />
-									</div>
-									{/* Identifier input*/}
-									<div>
-										<label><FormattedMessage id="unit.identifier" /></label><br />
-										<Input type='text' onChange={({ target }) => props.handleIdentifierChange(target.value)} required value={props.identifier} />
-									</div>
-									{/* Unit represent input*/}
-									<div>
-										<label><FormattedMessage id="unit.represent" /></label><br />
-										<Input type='select' onChange={({ target }) => props.handleUnitRepresentChange(target.value)}
-											required value={props.unitRepresent}>
-											{Object.keys(UnitRepresentType).map(key => {
-												return (<option value={key} key={key}>{translate(`UnitRepresentType.${key}`)}</option>)
-											})}
-										</Input>
-									</div>
-									{/* Seconds in rate input*/}
-									<div>
-										<label><FormattedMessage id="unit.sec.in.rate" /></label><br />
-										<Input type='number' onChange={({ target }) => props.handleSecInRateChange(parseInt(target.value))} required value={props.secInRate} />
-									</div>
-									{/* Type of input input*/}
-									<div>
-										<label><FormattedMessage id="unit.type.of.unit" /></label><br />
-										<Input type='select' onChange={({ target }) => props.handleTypeOfUnitChange(target.value)} required value={props.typeOfUnit}>
-											{Object.keys(UnitType).map(key => {
-												return (<option value={key} key={key}>{translate(`UnitType.${key}`)}</option>)
-											})}
-										</Input>
-									</div>
-									{/* Suffix input*/}
-									<div>
-										<label><FormattedMessage id="unit.suffix" /></label><br />
-										<Input type='text' onChange={({ target }) => props.handleSuffixChange(target.value)} required value={props.suffix} />
-									</div>
-									{/* Displayable type input*/}
-									<div>
-										<label><FormattedMessage id="unit.dropdown.displayable" /></label><br />
-										<Input type='select' onChange={({ target }) => props.handleDisplayableChange(target.value)} required value={props.displayable} >
-											{Object.keys(DisplayableType).map(key => {
-												return (<option value={key} key={key}>{translate(`DisplayableType.${key}`)}</option>)
-											})}
-										</Input>
-									</div>
-									{/* Preferred display input*/}
-									<div>
-										<label><FormattedMessage id="unit.preferred.display" /></label>
-										{/* <Input type='checkbox' onChange={({ target }) => props.handlePreferredDisplayChange(JSON.parse(target.value))}
-											value={props.preferredDisplay.toString()} /> */}
-											<Input type='select' onChange={({ target }) => props.handlePreferredDisplayChange(JSON.parse(target.value))}>
-											<option value="true"> {translate('yes')} </option>
-											<option value="false"> {translate('no')} </option>
-										</Input>
-									</div>
-									{/* Note input*/}
-									<div>
-										<label><FormattedMessage id="unit.note.optional" /></label><br />
-										<Input type='textarea' onChange={({ target }) => props.handleNoteChange(target.value)} value={props.note} />
+										{/* Name input*/}
+										<div>
+											<label><FormattedMessage id="unit.name" /></label><br />
+											<Input type='text' onChange={({ target }) => this.props.handleNameChange(target.value)} required value={this.props.name} />
+										</div>
+										{/* Identifier input*/}
+										<div>
+											<label><FormattedMessage id="unit.identifier" /></label><br />
+											<Input type='text' onChange={({ target }) => this.props.handleIdentifierChange(target.value)} required value={this.props.identifier} />
+										</div>
+										{/* Unit represent input*/}
+										<div>
+											<label><FormattedMessage id="unit.represent" /></label><br />
+											<Input type='select' onChange={({ target }) => this.props.handleUnitRepresentChange(target.value)}
+												required value={this.props.unitRepresent}>
+												{Object.keys(UnitRepresentType).map(key => {
+													return (<option value={key} key={key}>{translate(`UnitRepresentType.${key}`)}</option>)
+												})}
+											</Input>
+										</div>
+										{/* Seconds in rate input*/}
+										<div>
+											<label><FormattedMessage id="unit.sec.in.rate" /></label><br />
+											<Input type='number' onChange={({ target }) => this.props.handleSecInRateChange(parseInt(target.value))} required value={this.props.secInRate} />
+										</div>
+										{/* Type of input input*/}
+										<div>
+											<label><FormattedMessage id="unit.type.of.unit" /></label><br />
+											<Input type='select' onChange={({ target }) => this.props.handleTypeOfUnitChange(target.value)} required value={this.props.typeOfUnit}>
+												{Object.keys(UnitType).map(key => {
+													return (<option value={key} key={key}>{translate(`UnitType.${key}`)}</option>)
+												})}
+											</Input>
+										</div>
+										{/* Suffix input*/}
+										<div>
+											<label><FormattedMessage id="unit.suffix" /></label><br />
+											<Input type='text' onChange={({ target }) => this.props.handleSuffixChange(target.value)} required value={this.props.suffix} />
+										</div>
+										{/* Displayable type input*/}
+										<div>
+											<label><FormattedMessage id="unit.dropdown.displayable" /></label><br />
+											<Input type='select' onChange={({ target }) => this.props.handleDisplayableChange(target.value)} required value={this.props.displayable} >
+												{Object.keys(DisplayableType).map(key => {
+													return (<option value={key} key={key}>{translate(`DisplayableType.${key}`)}</option>)
+												})}
+											</Input>
+										</div>
+										{/* Preferred display input*/}
+										<div>
+											<label><FormattedMessage id="unit.preferred.display" /></label>
+											{/* <Input type='checkbox' onChange={({ target }) => this.props.handlePreferredDisplayChange(JSON.parse(target.value))}
+												value={this.props.preferredDisplay.toString()} /> */}
+												<Input type='select' onChange={({ target }) => this.props.handlePreferredDisplayChange(JSON.parse(target.value))}>
+												<option value="true"> {translate('yes')} </option>
+												<option value="false"> {translate('no')} </option>
+											</Input>
+										</div>
+										{/* Note input*/}
+										<div>
+											<label><FormattedMessage id="unit.note.optional" /></label><br />
+											<Input type='textarea' onChange={({ target }) => this.props.handleNoteChange(target.value)} value={this.props.note} />
+										</div>
 									</div>
 								</div>
 							</div>
 						</div>
-					</div>
-				</Modal.Body>
-				<Modal.Footer>
-					<Button variant="secondary" onClick={() => props.handleShowModal(false)}>
-						<FormattedMessage id="close" />
-					</Button>
-					<Button variant="primary" onClick={() => props.handleSaveAll()} disabled={!props.name || !props.identifier}>
-						<FormattedMessage id="save.all" />
-					</Button>
-				</Modal.Footer>
-			</Modal>
-		</>
-	);
+					</Modal.Body>
+					<Modal.Footer>
+						<Button variant="secondary" onClick={() => this.props.handleShowModal(false)}>
+							<FormattedMessage id="close" />
+						</Button>
+						<Button variant="primary" onClick={() => this.props.handleSaveAll()} disabled={!this.props.name || !this.props.identifier}>
+							<FormattedMessage id="save.all" />
+						</Button>
+					</Modal.Footer>
+				</Modal>
+			</>
+		);
+	}
 }
 
-export default ModalCard
+export default CreateUnitModelComponent;

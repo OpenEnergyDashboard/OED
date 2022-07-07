@@ -8,7 +8,7 @@ import { UnitType, UnitRepresentType, DisplayableType } from '../../types/redux/
 import translate from '../../utils/translate';
 import CreateUnitModalComponent from '../../components/unit/CreateUnitModalComponent';
 
-export default class CreateUnitContainer extends React.Component {
+class CreateUnitContainer extends React.Component {
 	constructor(props: any) {
 		super(props);
 		this.handleNameChange = this.handleNameChange.bind(this);
@@ -39,6 +39,10 @@ export default class CreateUnitContainer extends React.Component {
 		showModal: false,
 	}
 
+	/**
+	 * The following handlers will change the state to the corresponding unit
+	 */
+	
 	private handleNameChange = (newName: string) => {
 		this.setState({ name: newName });
 	}
@@ -149,3 +153,5 @@ export default class CreateUnitContainer extends React.Component {
 		);
 	}
 }
+
+export default CreateUnitContainer
