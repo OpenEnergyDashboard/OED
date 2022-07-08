@@ -95,7 +95,7 @@ width: 100%;
 
 .true {
     margin: auto;
-    width: 70%;
+    width: 60%;
     color: black;
     background-color: #BBF777;
     box-shadow: 3px 2px 2px gray;
@@ -109,7 +109,7 @@ width: 100%;
 
 .false {
     margin: auto;
-    width: 70%;
+    width: 60%;
     color: white;
     background-color: #AD351D;
     box-shadow: 3px 2px 2px gray;
