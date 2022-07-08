@@ -8,9 +8,43 @@ import { UnitType, UnitRepresentType, DisplayableType } from '../../types/redux/
 import translate from '../../utils/translate';
 import CreateUnitModalComponent from '../../components/unit/CreateUnitModalComponent';
 
-class CreateUnitContainer extends React.Component {
-	constructor(props: any) {
+
+interface CreateUnitContainerProps {
+
+}
+
+interface CreateUnitContainerStates {
+	name: string,
+	identifier: string,
+	unitRepresent: UnitRepresentType,
+	secInRate: number,
+	typeOfUnit: UnitType,
+	unitIndex?: number,
+	suffix: string,
+	displayable: DisplayableType,
+	preferredDisplay: boolean,
+	note: string,
+	showModal: boolean,
+}
+
+class CreateUnitContainer extends React.Component<CreateUnitContainerProps, CreateUnitContainerStates> {
+
+	constructor(props: CreateUnitContainerProps) {
 		super(props);
+		this.state = {
+			name: '',
+			identifier: '',
+			unitRepresent: UnitRepresentType.quantity,
+			secInRate: 3600,
+			typeOfUnit: UnitType.unit,
+			unitIndex: undefined,
+			suffix: '',
+			displayable: DisplayableType.all,
+			preferredDisplay: false,
+			note: '',
+			showModal: false,
+		};
+
 		this.handleNameChange = this.handleNameChange.bind(this);
 		this.handleIdentifierChange = this.handleIdentifierChange.bind(this);
 		this.handleUnitRepresentChange = this.handleUnitRepresentChange.bind(this);
@@ -22,21 +56,6 @@ class CreateUnitContainer extends React.Component {
 		this.handleNoteChange = this.handleNoteChange.bind(this);
 		this.handleShowModal = this.handleShowModal.bind(this);
 		this.handleSaveAll = this.handleSaveAll.bind(this);
-	}
-
-	//default values
-	state = {
-		name: '',
-		identifier: '',
-		unitRepresent: UnitRepresentType.quantity,
-		secInRate: 3600,
-		typeOfUnit: UnitType.unit,
-		unitIndex: undefined,
-		suffix: '',
-		displayable: DisplayableType.all,
-		preferredDisplay: false,
-		note: '',
-		showModal: false,
 	}
 
 	/**
@@ -51,7 +70,7 @@ class CreateUnitContainer extends React.Component {
 		this.setState({ identifier: newIdentifier });
 	}
 
-	private handleUnitRepresentChange = (newUnitRepresent: string) => {
+	private handleUnitRepresentChange = (newUnitRepresent: UnitRepresentType) => {
 		this.setState({ unitRepresent: newUnitRepresent });
 	}
 
@@ -59,7 +78,7 @@ class CreateUnitContainer extends React.Component {
 		this.setState({ secInRate: newSecInRate });
 	}
 
-	private handleTypeOfUnitChange = (newTypeOfUnit: string) => {
+	private handleTypeOfUnitChange = (newTypeOfUnit: UnitType) => {
 		this.setState({ typeOfUnit: newTypeOfUnit });
 	}
 
@@ -67,7 +86,7 @@ class CreateUnitContainer extends React.Component {
 		this.setState({ suffix: newSuffix })
 	}
 
-	private handleDisplayableChange = (newDisplayable: string) => {
+	private handleDisplayableChange = (newDisplayable: DisplayableType) => {
 		this.setState({ displayable: newDisplayable });
 	}
 
@@ -83,16 +102,16 @@ class CreateUnitContainer extends React.Component {
 		// if showModal False
 		if (!newShowModal) {
 			// clear input fields & set to defaults
-			this.state.name = ''
-			this.state.identifier = ''
-			this.state.unitRepresent = UnitRepresentType.quantity
-			this.state.secInRate = 3600
-			this.state.typeOfUnit = UnitType.unit
-			this.state.unitIndex = undefined
-			this.state.suffix = ''
-			this.state.displayable = DisplayableType.all
-			this.state.preferredDisplay = false
-			this.state.note = ''
+			this.setState({ name: '' })
+			this.setState({ identifier: '' })
+			this.setState({ unitRepresent: UnitRepresentType.quantity })
+			this.setState({ secInRate: 3600 })
+			this.setState({ typeOfUnit: UnitType.unit })
+			this.setState({ unitIndex: undefined })
+			this.setState({ suffix: '' })
+			this.setState({ displayable: DisplayableType.all })
+			this.setState({ preferredDisplay: false })
+			this.setState({ note: '' })
 		}
 		this.setState({ showModal: newShowModal });
 	}
