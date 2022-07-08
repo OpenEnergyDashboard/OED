@@ -73,7 +73,7 @@ class UnitViewComponent extends React.Component<UnitViewPropsWithIntl, UnitViewS
 				<div className="unit-container">
 					<b><FormattedMessage id="unit.displayable" /></b> {this.props.unit.displayable}
 				</div>
-				<div className="unit-container">
+				<div className={this.props.unit.preferredDisplay.toString()}>
 					<b><FormattedMessage id="unit.preferred.display" /></b> {this.props.unit.preferredDisplay.toString()}
 				</div>
 				<div className="unit-container">

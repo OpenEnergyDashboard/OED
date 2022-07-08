@@ -92,3 +92,31 @@ width: 100%;
     justify-content: center;
     flex-direction: column;
 }
+
+.true {
+    margin: auto;
+    width: 70%;
+    color: black;
+    background-color: #BBF777;
+    box-shadow: 3px 2px 2px gray;
+    padding-top: 2px;
+    padding-right: 0px;
+    padding-bottom: 1px;
+    padding-left: 0px;
+    text-align: center;
+    overflow-wrap: break-word; 
+}
+
+.false {
+    margin: auto;
+    width: 70%;
+    color: white;
+    background-color: #AD351D;
+    box-shadow: 3px 2px 2px gray;
+    padding-top: 2px;
+    padding-right: 0px;
+    padding-bottom: 1px;
+    padding-left: 0px;
+    text-align: center;
+    overflow-wrap: break-word; 
+}
