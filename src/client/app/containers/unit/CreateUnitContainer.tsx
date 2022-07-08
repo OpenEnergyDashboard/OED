@@ -137,10 +137,12 @@ class CreateUnitContainer extends React.Component<CreateUnitContainerProps, Crea
 			});
 			showSuccessNotification(translate('unit.successfully.create.unit'))
 			this.handleShowModal(false);
+			window.location.reload(); // not the correct way but works
 		} catch (error) {
 			showErrorNotification(translate('unit.failed.to.create.unit'));
 		}
-	};
+	}
+
 	public render() {
 		return (
 			<div>

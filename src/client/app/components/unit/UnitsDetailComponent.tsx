@@ -21,6 +21,7 @@ interface UnitsDetailProps{
 	submitEditedUnits(): Promise<any>;
 }
 
+// name is missleading ---> class=container filename=component
 export default class UnitsDetailContainer extends React.Component<UnitsDetailProps> {
 	constructor(props: UnitsDetailProps) {
 		super(props);
