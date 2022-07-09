@@ -3,7 +3,7 @@
   * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
 
 import { ActionType, Thunk, Dispatch, GetState } from '../types/redux/actions';
-import { showErrorNotification } from '../utils/notifications';
+import { showSuccessNotification, showErrorNotification } from '../utils/notifications';
 import translate from '../utils/translate';
 import { State } from '../types/redux/state';
 import * as t from '../types/redux/units';
@@ -73,6 +73,7 @@ export function submitEditedUnit(unitId: number): Thunk {
 		try {
 			await unitsApi.edit(submittingUnit); //posts the edited unitData to the units API 
 			dispatch(confirmUnitEdits(unitId)); //removes unit from submitting state array, overwrites unitData in units state array with unitData in editedUnits state array, deletes unitData in editedUnits state array
+			showSuccessNotification(translate('successfully.edited.unit'));
 		} catch (err) {
 			showErrorNotification(translate('failed.to.edit.unit'));
 		}
@@ -97,6 +98,7 @@ export function addUnit(unit: t.UnitData): Thunk {
 		try {
 			await unitsApi.addUnit(unit); //Attempt to add unit to database
 			dispatch(fetchUnitsDetails());//Update the units state from the database on a successful call
+			showSuccessNotification(translate('successfully.added.unit'));
 		} catch (err) {
 			showErrorNotification(translate('failed.to.add.unit'));
 		}
