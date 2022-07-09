@@ -95,7 +95,7 @@ export function confirmEditedUnits(): Thunk {
 export function addUnit(unit: t.UnitData): Thunk {
 	return async (dispatch: Dispatch) => {
 		try {
-			await unitsApi.addUnit(unit); //Attempt to add unit to database and retrieve the response code
+			await unitsApi.addUnit(unit); //Attempt to add unit to database
 			dispatch(fetchUnitsDetails());//Update the units state from the database on a successful call
 		} catch (err) {
 			showErrorNotification(translate('failed.to.add.unit'));

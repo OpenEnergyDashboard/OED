@@ -14,14 +14,15 @@ import { removeUnsavedChanges } from '../../actions/unsavedWarning';
 import { useState } from 'react'; //I realize that * is already imported from react
 import { editUnitDetails } from '../../actions/units';
 import { _ } from 'core-js';
-interface UnitModelEditComponentProps{
+
+interface EditUnitModalComponentProps{
 	show: boolean;
 	unit: UnitData;
 	handleClose: () => void; //passed in to handle closing the modal
 }
 
 //Updated to hooks
-export default function UnitModelEditComponent(props: UnitModelEditComponentProps) {
+export default function EditUnitModalComponent(props: EditUnitModalComponentProps) {
 
 		const dispatch = useDispatch();
 
