@@ -5,81 +5,71 @@ import * as React from 'react';
 import { FormattedMessage } from 'react-intl';
 import HeaderContainer from '../../containers/HeaderContainer';
 import FooterContainer from '../../containers/FooterContainer';
-import UnitViewContainer from '../../containers/unit/UnitViewContainer';
-import store from '../../index';
 import TooltipHelpContainer from '../../containers/TooltipHelpContainer';
 import UnsavedWarningContainer from '../../containers/UnsavedWarningContainer';
-import { removeUnsavedChanges } from '../../actions/unsavedWarning';
 import TooltipMarkerComponent from '../TooltipMarkerComponent';
-import CreateUnitContainer from '../../containers/unit/CreateUnitContainer';
+import { useDispatch, useSelector } from 'react-redux';
+import { fetchUnitsDetails } from '../../actions/units';
+import { State } from '../../types/redux/state';
+import { isRoleAdmin } from '../../utils/hasPermissions';
+import { useEffect } from 'react';
+import UnitViewComponent from './UnitViewComponent';
+import CreateUnitModalComponent from './CreateUnitModalComponent';
 
-interface UnitsDetailProps{
-	loggedInAsAdmin: boolean;
-	units: number[];
-	unsavedChanges: boolean;
-	fetchUnitsDetails(): Promise<any>;
-	submitEditedUnits(): Promise<any>;
-}
+//Utilizes useDispatch and useSelector hooks
+export default function UnitsDetailComponent() {
 
-export default class UnitsDetailContainer extends React.Component<UnitsDetailProps> {
-	constructor(props: UnitsDetailProps) {
-		super(props);
-		this.handleSubmitClicked = this.handleSubmitClicked.bind(this);
-	}
+	const dispatch = useDispatch();
 
-	public componentWillMount() {
-		this.props.fetchUnitsDetails();
-	}
+	useEffect(() => {
+		//Makes async call (only once) to units API for units details, stores unit ids in state
+		console.log('Fetching Units Details...');
+		dispatch(fetchUnitsDetails());
+		console.log('Units details fetched!');
+	}, []);
 
-	public render() {
-		const loggedInAsAdmin = this.props.loggedInAsAdmin;
+	//Maps unit id keys from state to const
+	const units = Object.keys(useSelector((state: State) => state.units.units)) //Why are we parsing only the unitId from the unitData here if we are just going to retrieve the unitData from state again in the child UnitViewComponent?
+						.map(key => parseInt(key))
+						.filter(key => !isNaN(key));
 
-		const titleStyle: React.CSSProperties = {
-			textAlign: 'center'
-		};
+	//Check for admin status
+	const currentUser = useSelector((state: State) => state.currentUser.profile);
+	const loggedInAsAdmin = (currentUser !== null) && isRoleAdmin(currentUser.role);
 
-		const tooltipStyle = {
-			display: 'inline-block',
-			fontSize: '50%',
-			// TODO add text for tooltips.
-			tooltipUnitView: loggedInAsAdmin? 'help.admin.unitview' : 'help.units.unitview'
-		};
-		return (
-			<div>
-				<UnsavedWarningContainer />
-				<HeaderContainer />
-				<TooltipHelpContainer page='units' />
+	const titleStyle: React.CSSProperties = {
+		textAlign: 'center'
+	};
 
-				<div className='container-fluid'>
-					<h2 style={titleStyle}>
-						<FormattedMessage id='units' />
-						<div style={tooltipStyle}>
-							<TooltipMarkerComponent page='units' helpTextId={tooltipStyle.tooltipUnitView} />
-						</div>
-					</h2>
-					{loggedInAsAdmin && <div className="edit-btn">
-						<CreateUnitContainer/>
-						{/* @TODO:
-							Currently, when a new unit is added, you will need to refresh the unit page in order to see the new unit
-							It would great to implements a function that would auto refresh the page when a new unit is added.
-							A possible alternative is to update the state on units. */}
-					</div>}
-					<div className="card-container">
-						{ this.props.units.map(unitID =>
-							( <UnitViewContainer key={unitID} id={unitID} show={false} onHide={false} onSubmitClicked={this.handleSubmitClicked}/> ))}
+	const tooltipStyle = {
+		display: 'inline-block',
+		fontSize: '50%',
+		// TODO add text for tooltips.
+		tooltipUnitView: loggedInAsAdmin? 'help.admin.unitview' : 'help.units.unitview'
+	};
+	return (
+		<div>
+			<UnsavedWarningContainer />
+			<HeaderContainer />
+			<TooltipHelpContainer page='units' />
+
+			<div className='container-fluid'>
+				<h2 style={titleStyle}>
+					<FormattedMessage id='units' />
+					<div style={tooltipStyle}>
+						<TooltipMarkerComponent page='units' helpTextId={tooltipStyle.tooltipUnitView} />
 					</div>
+				</h2>
+				{loggedInAsAdmin && 
+				<div className="edit-btn">
+					<CreateUnitModalComponent/>
+				</div>}
+				<div className="card-container">
+					{ units.map(unitID =>
+						( <UnitViewComponent unitId={unitID} key={unitID}/> ))}
 				</div>
-				<FooterContainer />
 			</div>
-		);
-	}
-
-	private removeUnsavedChanges() {
-		store.dispatch(removeUnsavedChanges());
-	}
-
-	private handleSubmitClicked() {
-		this.props.submitEditedUnits();
-		this.removeUnsavedChanges();
-	}
+			<FooterContainer />
+		</div>
+	);
 }

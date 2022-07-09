@@ -11,11 +11,12 @@ import { UnitData } from '../../types/redux/units';
 import { editUnitDetails } from '../../actions/units';
 
 function mapStateToProps(state: State, ownProps: { id: number }) {
-	let unit = JSON.parse(JSON.stringify(state.units.units[ownProps.id]));
-	if (state.units.editedUnits[ownProps.id]) {
+	let unit = JSON.parse(JSON.stringify(state.units.units[ownProps.id])); //grab unitData from passed unitId props
+	if (state.units.editedUnits[ownProps.id]) { //replace unitData with edited unitData if there were any unsubmitted edits
 		unit = JSON.parse(JSON.stringify(state.units.editedUnits[ownProps.id]));
 	}
 
+	//admin check moved to child
 	const currentUser = state.currentUser.profile;
 	let loggedInAsAdmin = false;
 	if (currentUser !== null) {
@@ -24,15 +25,15 @@ function mapStateToProps(state: State, ownProps: { id: number }) {
 
 	return {
 		unit,
-		isEdited: state.units.editedUnits[ownProps.id] !== undefined,
-		isSubmitting: state.units.submitting.indexOf(ownProps.id) !== -1,
-		loggedInAsAdmin
+		isEdited: state.units.editedUnits[ownProps.id] !== undefined, //not used?
+		isSubmitting: state.units.submitting.indexOf(ownProps.id) !== -1, //not used?
+		loggedInAsAdmin 
 	}
 }
 function mapDispatchToProps(dispatch: Dispatch) {
 	return {
-		editUnitDetails: (unit: UnitData) => dispatch(editUnitDetails(unit)),
-		log: (level: string, message: string) => dispatch(logToServer(level, message))
+		editUnitDetails: (unit: UnitData) => dispatch(editUnitDetails(unit)), //can move this to child
+		log: (level: string, message: string) => dispatch(logToServer(level, message)) //can move this to child, but not used?
 	};
 }
 

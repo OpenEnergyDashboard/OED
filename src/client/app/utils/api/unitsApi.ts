@@ -30,6 +30,7 @@ export default class UnitsApi {
 		);
 	}
 
+	//Returns the status code of the response
 	public async addUnit(unit: UnitData): Promise<void> {
 		return await this.backend.doPostRequest('/api/units/addUnit', unit);
 	}

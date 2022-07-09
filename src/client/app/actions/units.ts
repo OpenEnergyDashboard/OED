@@ -42,7 +42,6 @@ export function confirmUnitEdits(unit: number): t.ConfirmEditedUnitAction {
 	return { type: ActionType.ConfirmEditedUnit, unit};
 }
 
-
 function shouldFetchUnitsDetails(state: State): boolean {
 	return !state.units.isFetching;
 }
@@ -58,10 +57,10 @@ export function fetchUnitsDetailsIfNeeded(): Thunk {
 
 export function submitEditedUnits(): Thunk {
 	return async (dispatch: Dispatch, getState: GetState) => {
-		Object.keys(getState().units.editedUnits).forEach(unitIdS => {
-			const unitId = parseInt(unitIdS);
-			if (getState().units.submitting.indexOf(unitId) === -1) {
-				dispatch(submitEditedUnit(unitId));
+		Object.keys(getState().units.editedUnits).forEach(unitIdS => { //dispatches submitEditedUnit for each unitData in editedUnits (by id) if they are not already submitting
+			const unitId = parseInt(unitIdS); //grab the unitId
+			if (getState().units.submitting.indexOf(unitId) === -1) { //check if unitData is already submitting (indexOf returns -1 if item does not exist in array)
+				dispatch(submitEditedUnit(unitId)); //if unit is not submitting, submit it 
 			}
 		});
 	};
@@ -69,11 +68,11 @@ export function submitEditedUnits(): Thunk {
 
 export function submitEditedUnit(unitId: number): Thunk {
 	return async (dispatch: Dispatch, getState: GetState) => {
-		const submittingUnit = getState().units.editedUnits[unitId];
-		dispatch(submitUnitEdits(unitId));
+		const submittingUnit = getState().units.editedUnits[unitId]; //retrieve the unitData by id
+		dispatch(submitUnitEdits(unitId)); //pushes unitId of the unitData to submit onto the submitting state array
 		try {
-			await unitsApi.edit(submittingUnit);
-			dispatch(confirmUnitEdits(unitId));
+			await unitsApi.edit(submittingUnit); //posts the edited unitData to the units API 
+			dispatch(confirmUnitEdits(unitId)); //removes unit from submitting state array, overwrites unitData in units state array with unitData in editedUnits state array, deletes unitData in editedUnits state array
 		} catch (err) {
 			showErrorNotification(translate('failed.to.edit.unit'));
 		}
@@ -89,5 +88,17 @@ export function confirmEditedUnits(): Thunk {
 			const unitId = parseInt(unitIdS);
 			dispatch(confirmUnitEdits(unitId));
 		});
+	}
+}
+
+//Add unit to database
+export function addUnit(unit: t.UnitData): Thunk {
+	return async (dispatch: Dispatch) => {
+		try {
+			await unitsApi.addUnit(unit); //Attempt to add unit to database and retrieve the response code
+			dispatch(fetchUnitsDetails());//Update the units state from the database on a successful call
+		} catch (err) {
+			showErrorNotification(translate('failed.to.add.unit'));
+		}
 	}
 }

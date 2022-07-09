@@ -9,42 +9,131 @@ import { FormattedMessage } from 'react-intl';
 import translate from '../../utils/translate';
 import '../../styles/unit-add-modal.css';
 import { UnitRepresentType, DisplayableType, UnitType } from '../../types/redux/units';
+import { useDispatch } from 'react-redux';
+import { addUnit } from '../../actions/units';
 
-interface UnitFormProps {
-	name: string,
-	identifier: string,
-	unitRepresent: UnitRepresentType,
-	secInRate: number,
-	typeOfUnit: UnitType,
-	unitIndex?: number,
-	suffix: string,
-	displayable: DisplayableType,
-	preferredDisplay: boolean,
-	note: string,
-	submitNewUnit: () => void;
-	handleNameChange: (val: string) => void;
-	handleIdentifierChange: (val: string) => void;
-	handleUnitRepresentChange: (val: string) => void;
-	handleSecInRateChange: (val: number) => void;
-	handleTypeOfUnitChange: (val: string) => void;
-	handleSuffixChange: (val: string) => void;
-	handleDisplayableChange: (val: string) => void;
-	handlePreferredDisplayChange: (val: boolean) => void;
-	handleNoteChange: (val: string) => void;
-}
+export default function ModalCard() {
 
-const ModalCard = (props: UnitFormProps) => {
-	const handleNameChange = props.handleNameChange
+	const dispatch = useDispatch();
 
-	const [showModal, setShow] = useState(false);
-	const handleClose = () => setShow(false);
+	const defaultValues = {
+		name: '',
+		identifier: '',
+		typeOfUnit: UnitType.unit,
+		unitRepresent: UnitRepresentType.quantity,
+		displayable: DisplayableType.all,
+		preferredDisplay: false,
+		secInRate: 3600,
+		suffix: '',
+		note: '', 
+		//According to the previous group, these two values are necessary but are not used. They will be set to -99 as per the previous group's choice.
+		id: -99,
+		unitIndex: -99 
+	}
 
+	/*State*/
+	//We can definitely sacrifice readibility here (and in the render) to consolidate these into a single function if need be
+	//NOTE a lot of this is copied from the UnitModalEditComponent, in the future we could make a single component to handle all edit pages if need be
+
+	//Modal show
+	const [showModal, setShowModal] = useState(false);
+	const handleClose = () => setShowModal(false);
+	const handleShow = () => setShowModal(true);
+
+	//name
+	const [name, setName] = useState(defaultValues.name);
+	const handleNameChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+		setName(e.target.value);
+	}
+
+	//identifier
+	const [identifier, setIdentifier] = useState(defaultValues.identifier);
+	const handleIdentifierChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+		setIdentifier(e.target.value);
+	}
+	
+	//typeOfUnit
+	const [typeOfUnit, setTypeOfUnit] = useState(defaultValues.typeOfUnit);
+	const handleTypeOfUnitChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+		setTypeOfUnit(e.target.value as UnitType);
+	}
+	
+	//unitRepresent
+	const [unitRepresent, setUnitRepresent] = useState(defaultValues.unitRepresent);
+	const handleUnitRepresentChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+		setUnitRepresent(e.target.value as UnitRepresentType)
+	}
+	
+	//displayable
+	const [displayable, setDisplayable] = useState(defaultValues.displayable);
+	const handleDisplayableChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+		setDisplayable(e.target.value as DisplayableType);
+	}
+	
+	//preferredDisplay
+	const [preferredDisplay, setPreferredDisplay] = useState(defaultValues.preferredDisplay);
+	const handlePreferredDisplayChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+		setPreferredDisplay(JSON.parse(e.target.value));
+	}
+	
+	//secInRate
+	const [secInRate, setSecInRate] = useState(defaultValues.secInRate);
+	const handleSecInRateChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+		setSecInRate(Number(e.target.value));
+	}
+	
+	//suffix
+	const [suffix, setSuffix] = useState(defaultValues.suffix);
+	const handleSuffixChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+		setSuffix(e.target.value);
+	}
+
+	//note
+	const [note, setNote] = useState(defaultValues.note);
+	const handleNoteChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+		setNote(e.target.value);
+	}
+	/*End State*/
+
+	//Reset the state to default values
+	//This would also benefit from a single state changing function for all state
+	const resetState = () => {
+		setName(defaultValues.name);
+		setIdentifier(defaultValues.identifier);
+		setTypeOfUnit(defaultValues.typeOfUnit);
+		setUnitRepresent(defaultValues.unitRepresent);
+		setDisplayable(defaultValues.displayable);
+		setPreferredDisplay(defaultValues.preferredDisplay);
+		setSecInRate(defaultValues.secInRate);
+		setSuffix(defaultValues.suffix);
+		setNote(defaultValues.note);
+	}
+
+	//Submit
 	const handleSubmit = () => {
-		setShow(false)
-		props.submitNewUnit()
+
+		//Close modal first to avoid repeat clicks
+		setShowModal(false);
+
+		//New unit object, overwrite all unchanged props with state 
+		const newUnit = {
+			...defaultValues,
+			name,
+			identifier,
+			typeOfUnit, 
+			unitRepresent, 
+			displayable,
+			preferredDisplay,
+			secInRate,
+			suffix,
+			note
+		}
+
+		//Add the new unit and update the store
+		dispatch(addUnit(newUnit));
+		resetState();
 	};
 
-	const handleShow = () => setShow(true);
 
 	const formInputStyle: React.CSSProperties = {
 		paddingBottom: '5px'
@@ -74,75 +163,68 @@ const ModalCard = (props: UnitFormProps) => {
 							{/* Modal content */}
 							<div className="container-fluid">
 								<div style={tableStyle}>
-									{/*HTML form to accept new unit information*/}
-									<form onSubmit={e => { e.preventDefault(); props.submitNewUnit(); }}>
-										{/* Name input*/}
-										<div style={formInputStyle}>
-											<label><FormattedMessage id="unit.name" /></label><br />
-											<Input type='text' onChange={({ target }) => handleNameChange(target.value)} required value={props.name} />
-										</div>
-										{/* Identifier input*/}
-										<div style={formInputStyle}>
-											<label><FormattedMessage id="unit.identifier" /></label><br />
-											<Input type='text' onChange={({ target }) => props.handleIdentifierChange(target.value)} required value={props.identifier} />
-										</div>
-										{/* Unit represent input*/}
-										<div style={formInputStyle}>
-											<label><FormattedMessage id="unit.represent" /></label><br />
-											<Input type='select' onChange={({ target }) => props.handleUnitRepresentChange(target.value)}
-												required value={props.unitRepresent}>
-												{Object.keys(UnitRepresentType).map(key => {
-													return (<option value={key} key={key}>{translate(`UnitRepresentType.${key}`)}</option>)
-												})}
-											</Input>
-										</div>
-										{/* Seconds in rate input*/}
-										<div style={formInputStyle}>
-											<label><FormattedMessage id="unit.sec.in.rate" /></label><br />
-											<Input type='number' onChange={({ target }) => props.handleSecInRateChange(parseInt(target.value))} required value={props.secInRate} />
-										</div>
-										{/* Type of input input*/}
-										<div style={formInputStyle}>
-											<label><FormattedMessage id="unit.type.of.unit" /></label><br />
-											<Input type='select' onChange={({ target }) => props.handleTypeOfUnitChange(target.value)} required value={props.typeOfUnit}>
-												{Object.keys(UnitType).map(key => {
-													return (<option value={key} key={key}>{translate(`UnitType.${key}`)}</option>)
-												})}
-											</Input>
-										</div>
-										{/* Suffix input*/}
-										<div style={formInputStyle}>
-											<label><FormattedMessage id="unit.suffix" /></label><br />
-											<Input type='text' onChange={({ target }) => props.handleSuffixChange(target.value)} required value={props.suffix} />
-										</div>
-										{/* Displayable type input*/}
-										<div style={formInputStyle}>
-											<label><FormattedMessage id="unit.dropdown.displayable" /></label><br />
-											<Input type='select' onChange={({ target }) => props.handleDisplayableChange(target.value)} required value={props.displayable} >
-												{Object.keys(DisplayableType).map(key => {
-													return (<option value={key} key={key}>{translate(`DisplayableType.${key}`)}</option>)
-												})}
-											</Input>
-										</div>
-										{/* Preferred display input*/}
-										<div style={formInputStyle}>
-											<label><FormattedMessage id="unit.preferred.display" /></label>
-											{/* <Input type='checkbox' onChange={({ target }) => props.handlePreferredDisplayChange(JSON.parse(target.value))}
-												value={props.preferredDisplay.toString()} /> */}
-											<Input type='select' onChange={({ target }) => props.handlePreferredDisplayChange(JSON.parse(target.value))}>
-												<option value="true"> {translate('yes')} </option>
-												<option value="false"> {translate('no')} </option>
-											</Input>
-
-										</div>
-
-
-										{/* Note input*/}
-										<div style={formInputStyle}>
-											<label><FormattedMessage id="unit.note.optional" /></label><br />
-											<Input type='textarea' onChange={({ target }) => props.handleNoteChange(target.value)} value={props.note} />
-										</div>
-									</form>
+									{/* Name input*/}
+									<div style={formInputStyle}>
+										<label><FormattedMessage id="unit.name" /></label><br />
+										<Input type='text' onChange={e => handleNameChange(e)} required value={name} />
+									</div>
+									{/* Identifier input*/}
+									<div style={formInputStyle}>
+										<label><FormattedMessage id="unit.identifier" /></label><br />
+										<Input type='text' onChange={e => handleIdentifierChange(e)} required value={identifier} />
+									</div>
+									{/* Type of input input*/}
+									<div style={formInputStyle}>
+										<label><FormattedMessage id="unit.type.of.unit" /></label><br />
+										<Input type='select' onChange={e => handleTypeOfUnitChange(e)} required value={typeOfUnit}>
+											{Object.keys(UnitType).map(key => {
+												return (<option value={key} key={key}>{translate(`UnitType.${key}`)}</option>)
+											})}
+										</Input>
+									</div>
+									{/* Unit represent input*/}
+									<div style={formInputStyle}>
+										<label><FormattedMessage id="unit.represent" /></label><br />
+										<Input type='select' onChange={e => handleUnitRepresentChange(e)} required value={unitRepresent}>
+											{Object.keys(UnitRepresentType).map(key => {
+												return (<option value={key} key={key}>{translate(`UnitRepresentType.${key}`)}</option>)
+											})}
+										</Input>
+									</div>
+									{/* Displayable type input*/}
+									<div style={formInputStyle}>
+										<label><FormattedMessage id="unit.dropdown.displayable" /></label><br />
+										<Input type='select' onChange={e => handleDisplayableChange(e)} required value={displayable} >
+											{Object.keys(DisplayableType).map(key => {
+												return (<option value={key} key={key}>{translate(`DisplayableType.${key}`)}</option>)
+											})}
+										</Input>
+									</div>
+									{/* Preferred display input*/}
+									<div style={formInputStyle}>
+										<label><FormattedMessage id="unit.preferred.display" /></label>
+										{/* <Input type='checkbox' onChange={({ target }) => props.handlePreferredDisplayChange(JSON.parse(target.value))}
+											value={props.preferredDisplay.toString()} /> */}
+										<Input type='select' onChange={e => handlePreferredDisplayChange(e)}>
+											<option value="true"> {translate('yes')} </option>
+											<option value="false"> {translate('no')} </option>
+										</Input>
+									</div>
+									{/* Seconds in rate input*/}
+									<div style={formInputStyle}>
+										<label><FormattedMessage id="unit.sec.in.rate" /></label><br />
+										<Input type='number' onChange={e => handleSecInRateChange(e)} required value={secInRate} />
+									</div>
+									{/* Suffix input*/}
+									<div style={formInputStyle}>
+										<label><FormattedMessage id="unit.suffix" /></label><br />
+										<Input type='text' onChange={e => handleSuffixChange(e)} required value={suffix} />
+									</div>
+									{/* Note input*/}
+									<div style={formInputStyle}>
+										<label><FormattedMessage id="unit.note.optional" /></label><br />
+										<Input type='textarea' onChange={e => handleNoteChange(e)} value={note} />
+									</div>
 								</div>
 							</div>
 						</div>
@@ -161,6 +243,3 @@ const ModalCard = (props: UnitFormProps) => {
 		</>
 	);
 }
-
-
-export default ModalCard

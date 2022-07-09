@@ -89,7 +89,9 @@ export default class CreateUnitContainer extends React.Component {
 				preferredDisplay: this.state.preferredDisplay,
 				note: this.state.note
 			});
-			showSuccessNotification(translate('unit.successfully.create.unit'))
+
+			//The 4 lines below this are going to be removed, not sure why browser history is being pushed but we can always bring it back later.
+			showSuccessNotification(translate('unit.successfully.create.unit'));
 			browserHistory.push('/units');
 		} catch (error) {
 			showErrorNotification(translate('unit.failed.to.create.unit'));

@@ -21,7 +21,7 @@ function mapStateToProps(state: State) {
 		units: Object.keys(state.units.units)
 			.map(key => parseInt(key))
 			.filter(key => !isNaN(key)),
-		unsavedChanges: Object.keys(state.units.editedUnits).length > 0
+		unsavedChanges: Object.keys(state.units.editedUnits).length > 0 //this does not seem to be used anywhere
 	};
 }
 
