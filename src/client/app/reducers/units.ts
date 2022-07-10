@@ -6,6 +6,7 @@ import { UnitsAction, UnitsState } from '../types/redux/units';
 import { ActionType } from '../types/redux/actions';
 
 const defaultState: UnitsState = {
+	hasBeenFetchedOnce: false,
 	isFetching: false,
 	selectedUnits: [],
 	editedUnits: {},
@@ -15,6 +16,11 @@ const defaultState: UnitsState = {
 
 export default function units(state = defaultState, action: UnitsAction) {
 	switch (action.type) {
+		case ActionType.ConfirmUnitsFetchedOnce:
+			return {
+				...state,
+				hasBeenFetchedOnce: true
+			};
 		case ActionType.RequestUnitsDetails:
 			return {
 				...state,

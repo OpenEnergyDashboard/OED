@@ -5,7 +5,6 @@
 import { ActionType, Thunk, Dispatch, GetState } from '../types/redux/actions';
 import { showSuccessNotification, showErrorNotification } from '../utils/notifications';
 import translate from '../utils/translate';
-import { State } from '../types/redux/state';
 import * as t from '../types/redux/units';
 import { unitsApi } from '../utils/api';
 
@@ -18,10 +17,18 @@ export function receiveUnitsDetails(data: t.UnitData[]): t.ReceiveUnitsDetailsAc
 }
 
 export function fetchUnitsDetails(): Thunk {
-	return async (dispatch: Dispatch) => {
-		dispatch(requestUnitsDetails());
-		const units = await unitsApi.getUnitsDetails();
-		dispatch(receiveUnitsDetails(units));
+	return async (dispatch: Dispatch, getState: GetState) => {
+		if (!getState().units.isFetching) //ensure a fetch was not already called
+		{
+			console.log("Calling fetchUnitsDetails"); //TODO remove this
+			dispatch(requestUnitsDetails()); //set isFetching to true
+			const units = await unitsApi.getUnitsDetails(); //attempt to retrieve units details from database
+			dispatch(receiveUnitsDetails(units)); //update the state with the units details and set isFetching to false
+			if (!getState().units.hasBeenFetchedOnce) //If this is the first fetch, inform the store that the first fetch has been made
+			{
+				dispatch(confirmUnitsFetchedOnce());
+			}	
+		}
 	}
 }
 
@@ -42,16 +49,18 @@ export function confirmUnitEdits(unit: number): t.ConfirmEditedUnitAction {
 	return { type: ActionType.ConfirmEditedUnit, unit};
 }
 
-function shouldFetchUnitsDetails(state: State): boolean {
-	return !state.units.isFetching;
+export function confirmUnitsFetchedOnce(): t.ConfirmUnitsFetchedOnceAction {
+	return {type: ActionType.ConfirmUnitsFetchedOnce};
 }
 
-export function fetchUnitsDetailsIfNeeded(): Thunk {
+//Fetch the units details from the database if they have not already been fetched once
+export function fetchUnitsDetailsIfNeeded(): Thunk { 
 	return (dispatch: Dispatch, getState: GetState) => {
-		if (shouldFetchUnitsDetails(getState())) {
+		if (!getState().units.hasBeenFetchedOnce) //If units have not been fetched once, return the fetchUnitDetails function
+		{ 
 			return dispatch(fetchUnitsDetails());
 		}
-		return Promise.resolve();
+		return Promise.resolve(); //If units have already been fetched, return a resolved promise
 	};
 }
 

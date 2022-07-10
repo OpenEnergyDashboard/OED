@@ -9,7 +9,7 @@ import TooltipHelpContainer from '../../containers/TooltipHelpContainer';
 import UnsavedWarningContainer from '../../containers/UnsavedWarningContainer';
 import TooltipMarkerComponent from '../TooltipMarkerComponent';
 import { useDispatch, useSelector } from 'react-redux';
-import { fetchUnitsDetails } from '../../actions/units';
+import {fetchUnitsDetailsIfNeeded } from '../../actions/units';
 import { State } from '../../types/redux/state';
 import { isRoleAdmin } from '../../utils/hasPermissions';
 import { useEffect } from 'react';
@@ -22,17 +22,15 @@ export default function UnitsDetailComponent() {
 	const dispatch = useDispatch();
 
 	useEffect(() => {
-		//Makes async call (only once) to units API for units details, stores unit ids in state
-		console.log('Fetching Units Details...');
-		dispatch(fetchUnitsDetails());
-		console.log('Units details fetched!');
+		//Makes async call to units API for units details if one has not already been made somewhere else, stores unit ids in state
+		dispatch(fetchUnitsDetailsIfNeeded());
 	}, []);
 
 	//Maps unit id keys from state to const
 	const units = Object.keys(useSelector((state: State) => state.units.units)) //Why are we parsing only the unitId from the unitData here if we are just going to retrieve the unitData from state again in the child UnitViewComponent?
 						.map(key => parseInt(key))
 						.filter(key => !isNaN(key));
-
+	
 	//Check for admin status
 	const currentUser = useSelector((state: State) => state.currentUser.profile);
 	const loggedInAsAdmin = (currentUser !== null) && isRoleAdmin(currentUser.role);

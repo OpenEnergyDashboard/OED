@@ -33,12 +33,17 @@ export interface SubmitEditedUnitAction {
 	unit: number;
 }
 
+export interface ConfirmUnitsFetchedOnceAction {
+	type: ActionType.ConfirmUnitsFetchedOnce;
+}
+
 export type UnitsAction = RequestUnitsDetailsAction
 | ReceiveUnitsDetailsAction
 | ChangeDisplayedUnitsAction
 | EditUnitDetailsAction
 | ConfirmEditedUnitAction
-| SubmitEditedUnitAction;
+| SubmitEditedUnitAction
+| ConfirmUnitsFetchedOnceAction;
 
 export enum UnitType {
 	unit = 'unit',
@@ -92,6 +97,7 @@ export interface UnitDataById {
 }
 
 export interface UnitsState {
+	hasBeenFetchedOnce: boolean,
 	isFetching: boolean;
 	selectedUnits: number[];
 	editedUnits: UnitDataById;

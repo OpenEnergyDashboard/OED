@@ -9,7 +9,7 @@ import { Input } from 'reactstrap';
 import { FormattedMessage } from 'react-intl';
 import translate from '../../utils/translate';
 import { useDispatch} from 'react-redux';
-import { submitEditedUnits } from '../../actions/units';
+import { fetchUnitsDetails, submitEditedUnits } from '../../actions/units';
 import { removeUnsavedChanges } from '../../actions/unsavedWarning';
 import { useState } from 'react'; //I realize that * is already imported from react
 import { editUnitDetails } from '../../actions/units';
@@ -79,6 +79,20 @@ export default function EditUnitModalComponent(props: EditUnitModalComponentProp
 		}
 		/*End State*/
 
+		//Reset the state to default values
+		//Different use case from CreateUnitModalComponent's resetState
+		//This allows us to reset our state to match the store in the event of an edit failure
+		//Failure to edit units will not trigger a re-render, as no state has changed. Therefore, we must manually reset the values
+		const resetState = () => {
+			setIdentifier(props.unit.identifier);
+			setTypeOfUnit(props.unit.typeOfUnit);
+			setUnitRepresent(props.unit.unitRepresent);
+			setDisplayable(props.unit.displayable);
+			setPreferredDisplay(props.unit.preferredDisplay);
+			setSecInRate(props.unit.secInRate);
+			setSuffix(props.unit.suffix);
+			setNote(props.unit.note);
+		}
 
 		//Save changes 
 		//Currently using the old functionality which is to compare inherited prop values to state values
@@ -112,9 +126,16 @@ export default function EditUnitModalComponent(props: EditUnitModalComponentProp
 				//Save our changes by:
 				//Adding our changes as a new unit to the edited unit state 
 				//Submitting edited units
-				dispatch(editUnitDetails(editedUnit));
+				dispatch(editUnitDetails(editedUnit)); //This action can fail if the edit api call fails validation (e.g. duplicate unit identifier)
 				dispatch(submitEditedUnits());
 				dispatch(removeUnsavedChanges());
+				//resetState(); //reset the state to match the store on failure
+
+
+				//TODO TODO TODO
+				//Separate deleted edited unit from confirm edited unit reducer into its own action
+				//Call delete edited unit in submitEditedUnit on success and failure 
+				//Try to have submitEditedUnit return something on error that can be used here to reset the state to match props
 			}
 
 		}

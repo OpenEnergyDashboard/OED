@@ -12,7 +12,7 @@ import { UnitRepresentType, DisplayableType, UnitType } from '../../types/redux/
 import { useDispatch } from 'react-redux';
 import { addUnit } from '../../actions/units';
 
-export default function ModalCard() {
+export default function CreateUnitModalComponent() {
 
 	const dispatch = useDispatch();
 
