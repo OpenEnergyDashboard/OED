@@ -74,7 +74,7 @@ class CreateUnitModelComponent extends React.Component<CreateUnitModalProps, Cre
 					<FormattedMessage id="create.unit" />
 				</Button>
 				<Modal show={this.props.showModal} onHide={ () => this.props.handleShowModal(false) }>
-					<Modal.Header closeButton>
+					<Modal.Header /*closeButton*/>
 						<Modal.Title> <FormattedMessage id="create.unit" /></Modal.Title>
 					</Modal.Header>
 					<Modal.Body className="show-grid">
@@ -151,7 +151,7 @@ class CreateUnitModelComponent extends React.Component<CreateUnitModalProps, Cre
 					</Modal.Body>
 					<Modal.Footer>
 						<Button variant="secondary" onClick={() => this.props.handleShowModal(false)}>
-							<FormattedMessage id="close" />
+							<FormattedMessage id="discard.changes" />
 						</Button>
 						<Button variant="primary" onClick={() => this.props.handleSaveAll()} disabled={!this.props.name || !this.props.identifier}>
 							<FormattedMessage id="save.all" />

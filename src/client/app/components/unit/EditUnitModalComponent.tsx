@@ -64,7 +64,7 @@ class UnitModelEditComponent extends React.Component<UnitViewPropsWithIntl, Unit
 		return (
 			<>
 				<Modal show={this.props.show} onHide={this.props.onhide}>
-					<Modal.Header closeButton>
+					<Modal.Header /*closeButton*/>
 						<Modal.Title> <FormattedMessage id="edit.unit" /></Modal.Title>
 					</Modal.Header>
 
@@ -91,7 +91,7 @@ class UnitModelEditComponent extends React.Component<UnitViewPropsWithIntl, Unit
 					<Modal.Footer>
 						{/* Hides the modal */}
 						<Button variant="secondary" onClick={this.props.onhide}>
-							<FormattedMessage id="close" />
+							<FormattedMessage id="discard.changes" />
 						</Button>
 						{/* On click calls the function onSaveChanges in this componenet */}
 						<Button variant="primary" onClick={() => this.onSaveChanges()} disabled={!this.props.name || !this.props.identifier}>
