@@ -94,7 +94,7 @@ class UnitModelEditComponent extends React.Component<UnitViewPropsWithIntl, Unit
 							<FormattedMessage id="discard.changes" />
 						</Button>
 						{/* On click calls the function onSaveChanges in this componenet */}
-						<Button variant="primary" onClick={() => this.onSaveChanges()} disabled={!this.props.name || !this.props.identifier}>
+						<Button variant="primary" onClick={() => this.onSaveChanges()} disabled={!this.state.nameInput || !this.state.identifierInput}>
 							<FormattedMessage id="save.all" />
 						</Button>
 					</Modal.Footer>
