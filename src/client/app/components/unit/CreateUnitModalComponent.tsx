@@ -25,78 +25,81 @@ export default function CreateUnitModalComponent() {
 		preferredDisplay: false,
 		secInRate: 3600,
 		suffix: '',
-		note: '', 
-		//According to the previous group, these two values are necessary but are not used. They will be set to -99 as per the previous group's choice.
+		note: '',
+		// These two values are necessary but are not used.
+		// The client code makes the id for the selected unit and default graphic unit be -99
+		// so it can tell it is not yet assigned and do the correct logic for that case.
+		// The units API expects these values to be undefined on call so that the database can assign their values.
 		id: -99,
-		unitIndex: -99 
+		unitIndex: -99
 	}
 
-	/*State*/
-	//We can definitely sacrifice readibility here (and in the render) to consolidate these into a single function if need be
-	//NOTE a lot of this is copied from the UnitModalEditComponent, in the future we could make a single component to handle all edit pages if need be
+	/* State */
+	// We can definitely sacrifice readibility here (and in the render) to consolidate these into a single function if need be
+	// NOTE a lot of this is copied from the UnitModalEditComponent, in the future we could make a single component to handle all edit pages if need be
 
-	//Modal show
+	// Modal show
 	const [showModal, setShowModal] = useState(false);
 	const handleClose = () => setShowModal(false);
 	const handleShow = () => setShowModal(true);
 
-	//name
+	// name
 	const [name, setName] = useState(defaultValues.name);
 	const handleNameChange = (e: React.ChangeEvent<HTMLInputElement>) => {
 		setName(e.target.value);
 	}
 
-	//identifier
+	// identifier
 	const [identifier, setIdentifier] = useState(defaultValues.identifier);
 	const handleIdentifierChange = (e: React.ChangeEvent<HTMLInputElement>) => {
 		setIdentifier(e.target.value);
 	}
-	
-	//typeOfUnit
+
+	// typeOfUnit
 	const [typeOfUnit, setTypeOfUnit] = useState(defaultValues.typeOfUnit);
 	const handleTypeOfUnitChange = (e: React.ChangeEvent<HTMLInputElement>) => {
 		setTypeOfUnit(e.target.value as UnitType);
 	}
-	
-	//unitRepresent
+
+	// unitRepresent
 	const [unitRepresent, setUnitRepresent] = useState(defaultValues.unitRepresent);
 	const handleUnitRepresentChange = (e: React.ChangeEvent<HTMLInputElement>) => {
 		setUnitRepresent(e.target.value as UnitRepresentType)
 	}
-	
-	//displayable
+
+	// displayable
 	const [displayable, setDisplayable] = useState(defaultValues.displayable);
 	const handleDisplayableChange = (e: React.ChangeEvent<HTMLInputElement>) => {
 		setDisplayable(e.target.value as DisplayableType);
 	}
-	
-	//preferredDisplay
+
+	// preferredDisplay
 	const [preferredDisplay, setPreferredDisplay] = useState(defaultValues.preferredDisplay);
 	const handlePreferredDisplayChange = (e: React.ChangeEvent<HTMLInputElement>) => {
 		setPreferredDisplay(JSON.parse(e.target.value));
 	}
-	
-	//secInRate
+
+	// secInRate
 	const [secInRate, setSecInRate] = useState(defaultValues.secInRate);
 	const handleSecInRateChange = (e: React.ChangeEvent<HTMLInputElement>) => {
 		setSecInRate(Number(e.target.value));
 	}
-	
-	//suffix
+
+	// suffix
 	const [suffix, setSuffix] = useState(defaultValues.suffix);
 	const handleSuffixChange = (e: React.ChangeEvent<HTMLInputElement>) => {
 		setSuffix(e.target.value);
 	}
 
-	//note
+	// note
 	const [note, setNote] = useState(defaultValues.note);
 	const handleNoteChange = (e: React.ChangeEvent<HTMLInputElement>) => {
 		setNote(e.target.value);
 	}
-	/*End State*/
+	/* End State */
 
-	//Reset the state to default values
-	//This would also benefit from a single state changing function for all state
+	// Reset the state to default values
+	// This would also benefit from a single state changing function for all state
 	const resetState = () => {
 		setName(defaultValues.name);
 		setIdentifier(defaultValues.identifier);
@@ -109,19 +112,19 @@ export default function CreateUnitModalComponent() {
 		setNote(defaultValues.note);
 	}
 
-	//Submit
+	// Submit
 	const handleSubmit = () => {
 
-		//Close modal first to avoid repeat clicks
+		// Close modal first to avoid repeat clicks
 		setShowModal(false);
 
-		//New unit object, overwrite all unchanged props with state 
+		// New unit object, overwrite all unchanged props with state
 		const newUnit = {
 			...defaultValues,
 			name,
 			identifier,
-			typeOfUnit, 
-			unitRepresent, 
+			typeOfUnit,
+			unitRepresent,
 			displayable,
 			preferredDisplay,
 			secInRate,
@@ -129,7 +132,7 @@ export default function CreateUnitModalComponent() {
 			note
 		}
 
-		//Add the new unit and update the store
+		// Add the new unit and update the store
 		dispatch(addUnit(newUnit));
 		resetState();
 	};
@@ -203,8 +206,6 @@ export default function CreateUnitModalComponent() {
 									{/* Preferred display input*/}
 									<div style={formInputStyle}>
 										<label><FormattedMessage id="unit.preferred.display" /></label>
-										{/* <Input type='checkbox' onChange={({ target }) => props.handlePreferredDisplayChange(JSON.parse(target.value))}
-											value={props.preferredDisplay.toString()} /> */}
 										<Input type='select' onChange={e => handlePreferredDisplayChange(e)}>
 											<option value="true"> {translate('yes')} </option>
 											<option value="false"> {translate('no')} </option>
@@ -230,7 +231,6 @@ export default function CreateUnitModalComponent() {
 						</div>
 					</div>
 				</Modal.Body>
-
 				<Modal.Footer>
 					<Button variant="secondary" onClick={handleClose}>
 						<FormattedMessage id="close" />

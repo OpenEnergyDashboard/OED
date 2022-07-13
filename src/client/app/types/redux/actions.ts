@@ -120,6 +120,8 @@ export enum ActionType {
 	EditUnitDetails = 'EDIT_UNIT_DETAILS',
 	SubmitEditedUnit = 'SUBMIT_EDITED_UNIT',
 	ConfirmEditedUnit = 'CONFIRM_EDITED_UNIT',
+	DeleteEditedUnit = 'DELETE_EDITED_UNIT',
+	DeleteSubmittedUnit = 'DELETE_SUBMITTED_UNIT',
 	ConfirmUnitsFetchedOnce = 'CONFIRM_UNITS_FETCHED_ONCE',
 }
 

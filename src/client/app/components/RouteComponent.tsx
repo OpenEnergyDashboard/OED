@@ -33,9 +33,7 @@ import MapCalibrationContainer from '../containers/maps/MapCalibrationContainer'
 import UploadCSVContainer from '../containers/csv/UploadCSVContainer';
 import { UserRole } from '../types/items';
 import { hasPermissions } from '../utils/hasPermissions';
-//import UnitsDetailContainer from '../containers/unit/UnitsDetailContainer';
 import UnitsDetailComponent from './unit/UnitsDetailComponent';
-import CreateUnitContainer from '../containers/unit/CreateUnitContainer';
 import * as queryString from 'query-string';
 
 interface RouteProps {
@@ -255,7 +253,7 @@ export default class RouteComponent extends React.Component<RouteProps> {
 								<Route path='/users/new' render={() => this.requireAuth(<CreateUserContainer/>)}/>
 								<Route path='/users' render={() => this.requireAuth(<UsersDetailContainer fetchUsers={() => []}/>)}/>
 								<Route path='/units'render={() => this.requireAuth(<UnitsDetailComponent />)}/>
-								<Route path="/addUnit" render={() => this.requireAuth(<CreateUnitContainer />)}/>
+								{/* <Route path="/addUnit" render={() => this.requireAuth(<CreateUnitContainer />)}/> */}
 								<Route path='*' component={HomeComponent}/>
 							</Switch>
 						</Router>

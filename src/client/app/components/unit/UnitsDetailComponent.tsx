@@ -9,29 +9,28 @@ import TooltipHelpContainer from '../../containers/TooltipHelpContainer';
 import UnsavedWarningContainer from '../../containers/UnsavedWarningContainer';
 import TooltipMarkerComponent from '../TooltipMarkerComponent';
 import { useDispatch, useSelector } from 'react-redux';
-import {fetchUnitsDetailsIfNeeded } from '../../actions/units';
+import { fetchUnitsDetailsIfNeeded } from '../../actions/units';
 import { State } from '../../types/redux/state';
 import { isRoleAdmin } from '../../utils/hasPermissions';
 import { useEffect } from 'react';
 import UnitViewComponent from './UnitViewComponent';
 import CreateUnitModalComponent from './CreateUnitModalComponent';
+import { UnitData } from 'types/redux/units';
 
-//Utilizes useDispatch and useSelector hooks
+// Utilizes useDispatch and useSelector hooks
 export default function UnitsDetailComponent() {
 
 	const dispatch = useDispatch();
 
 	useEffect(() => {
-		//Makes async call to units API for units details if one has not already been made somewhere else, stores unit ids in state
+		// Makes async call to units API for units details if one has not already been made somewhere else, stores unit ids in state
 		dispatch(fetchUnitsDetailsIfNeeded());
 	}, []);
 
-	//Maps unit id keys from state to const
-	const units = Object.keys(useSelector((state: State) => state.units.units)) //Why are we parsing only the unitId from the unitData here if we are just going to retrieve the unitData from state again in the child UnitViewComponent?
-						.map(key => parseInt(key))
-						.filter(key => !isNaN(key));
-	
-	//Check for admin status
+	//Units state
+	const unitsState = useSelector((state: State) => state.units.units);
+
+	// Check for admin status
 	const currentUser = useSelector((state: State) => state.currentUser.profile);
 	const loggedInAsAdmin = (currentUser !== null) && isRoleAdmin(currentUser.role);
 
@@ -43,7 +42,7 @@ export default function UnitsDetailComponent() {
 		display: 'inline-block',
 		fontSize: '50%',
 		// TODO add text for tooltips.
-		tooltipUnitView: loggedInAsAdmin? 'help.admin.unitview' : 'help.units.unitview'
+		tooltipUnitView: loggedInAsAdmin ? 'help.admin.unitview' : 'help.units.unitview'
 	};
 	return (
 		<div>
@@ -58,13 +57,15 @@ export default function UnitsDetailComponent() {
 						<TooltipMarkerComponent page='units' helpTextId={tooltipStyle.tooltipUnitView} />
 					</div>
 				</h2>
-				{loggedInAsAdmin && 
-				<div className="edit-btn">
-					<CreateUnitModalComponent/>
-				</div>}
+				{loggedInAsAdmin &&
+					<div className="edit-btn">
+						<CreateUnitModalComponent />
+					</div>}
 				<div className="card-container">
-					{ units.map(unitID =>
-						( <UnitViewComponent unitId={unitID} key={unitID}/> ))}
+					{/* Create a UnitViewComponent for each UnitData in Units State after sorting by identifier */}
+					{Object.values(unitsState)
+						.sort((unitA: UnitData, unitB: UnitData) => (unitA.identifier > unitB.identifier) ? 1 : (( unitB.identifier > unitA.identifier) ? -1 : 0))
+						.map(unitData => (<UnitViewComponent unit={unitData as UnitData} key={(unitData as UnitData).id} />))}
 				</div>
 			</div>
 			<FooterContainer />

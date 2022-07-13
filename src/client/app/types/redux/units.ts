@@ -25,7 +25,17 @@ export interface EditUnitDetailsAction {
 
 export interface ConfirmEditedUnitAction {
 	type: ActionType.ConfirmEditedUnit;
-	unit: number;
+	unitId: number;
+}
+
+export interface DeleteEditedUnitAction {
+	type: ActionType.DeleteEditedUnit;
+	unitId: number;
+}
+
+export interface DeleteSubmittedUnitAction {
+	type: ActionType.DeleteSubmittedUnit;
+	unitId: number;
 }
 
 export interface SubmitEditedUnitAction {
@@ -42,6 +52,8 @@ export type UnitsAction = RequestUnitsDetailsAction
 | ChangeDisplayedUnitsAction
 | EditUnitDetailsAction
 | ConfirmEditedUnitAction
+| DeleteEditedUnitAction
+| DeleteSubmittedUnitAction
 | SubmitEditedUnitAction
 | ConfirmUnitsFetchedOnceAction;
 
