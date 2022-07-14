@@ -40,7 +40,10 @@ export default function CreateUnitModalComponent() {
 
 	// Modal show
 	const [showModal, setShowModal] = useState(false);
-	const handleClose = () => setShowModal(false);
+	const handleClose = () => {
+		setShowModal(false);
+		resetState();
+	};
 	const handleShow = () => setShowModal(true);
 
 	// name
@@ -134,6 +137,8 @@ export default function CreateUnitModalComponent() {
 
 		// Add the new unit and update the store
 		dispatch(addUnit(newUnit));
+
+		// TODO bring this up in next meeting since the functionality of resetting state does not match editunit
 		resetState();
 	};
 
@@ -142,9 +147,7 @@ export default function CreateUnitModalComponent() {
 	}
 
 	const tableStyle: React.CSSProperties = {
-		marginLeft: '25%',
-		marginRight: '25%',
-		width: '50%'
+		width: '100%'
 	};
 
 	return (
@@ -234,7 +237,7 @@ export default function CreateUnitModalComponent() {
 					<Button variant="secondary" onClick={handleClose}>
 						<FormattedMessage id="discard.changes" />
 					</Button>
-					<Button variant="primary" onClick={handleSubmit}>
+					<Button variant="primary" onClick={handleSubmit} disabled={!name || !identifier}>
 						<FormattedMessage id="save.all" />
 					</Button>
 				</Modal.Footer>

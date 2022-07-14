@@ -1,292 +1,266 @@
 /* This Source Code Form is subject to the terms of the Mozilla Public
-  * License, v. 2.0. If a copy of the MPL was not distributed with this
-  * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
+* License, v. 2.0. If a copy of the MPL was not distributed with this
+* file, You can obtain one at http://mozilla.org/MPL/2.0/. */
 import * as React from 'react';
 import { Modal, Button } from 'react-bootstrap';
-import { UnitData, EditUnitDetailsAction, DisplayableType, UnitRepresentType, UnitType } from '../../types/redux/units';
+import { UnitData, DisplayableType, UnitRepresentType, UnitType } from '../../types/redux/units';
 import { Input } from 'reactstrap';
 import { FormattedMessage } from 'react-intl';
 import translate from '../../utils/translate';
+import { useDispatch } from 'react-redux';
+import { submitEditedUnits } from '../../actions/units';
+import { removeUnsavedChanges } from '../../actions/unsavedWarning';
+// I realize that * is already imported from react
+import { useState } from 'react';
+import { editUnitDetails } from '../../actions/units';
+import { _ } from 'core-js';
 import '../../styles/Modal.unit.css';
 
-//Interface for edited units props
-interface EditUnitProps {
-	unit: UnitData;
+interface EditUnitModalComponentProps {
 	show: boolean;
-	name: string;
-	identifier: string;
-	unitRepresent: UnitRepresentType;
-	secInRate: number;
-	typeOfUnit: UnitType;
-	unitIndex: number;
-	suffix: string;
-	displayable: DisplayableType;
-	preferredDisplay: boolean;
-	note: string;
-	onhide: () => void;
-	editUnitDetails(unit: UnitData): EditUnitDetailsAction;
+	unit: UnitData;
+	// passed in to handle closing the modal
+	handleClose: () => void;
 }
 
-//Interface for the unit state
-interface UnitViewState {
-	nameInput: string;
-	identifierInput: string;
-	typeOfUnitInput: string;
-	unitRepresentInput: string;
-	displayableInput: string;
-	preferredDisplayableInput: boolean;
-	secInRateInput: number;
-	suffixInput: string;
-	noteInput: string;
-}
+// Updated to hooks
+export default function EditUnitModalComponent(props: EditUnitModalComponentProps) {
 
-type UnitViewPropsWithIntl = EditUnitProps;
+	const dispatch = useDispatch();
 
-class UnitModelEditComponent extends React.Component<UnitViewPropsWithIntl, UnitViewState>{
+	/* State */
+	// We can definitely sacrifice readibility here (and in the render) to consolidate these into a single function if need be
 
-	//Creates a constructor and sets the set to the prop for each unit data.
-	constructor(props: UnitViewPropsWithIntl) {
-		super(props);
-		this.state = {
-			nameInput: this.props.name,
-			identifierInput: this.props.identifier,
-			typeOfUnitInput: this.props.typeOfUnit,
-			unitRepresentInput: this.props.unitRepresent,
-			displayableInput: this.props.displayable,
-			preferredDisplayableInput: this.props.preferredDisplay,
-			secInRateInput: this.props.secInRate,
-			suffixInput: this.props.suffix,
-			noteInput: this.props.note
-		};
+	// name
+	const [name, setName] = useState(props.unit.name);
+	const handleNameChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+		setName(e.target.value);
 	}
 
-	render() {
-		return (
-			<>
-				<Modal show={this.props.show} onHide={this.props.onhide}>
-					<Modal.Header /*closeButton*/>
-						<Modal.Title> <FormattedMessage id="edit.unit" /></Modal.Title>
-					</Modal.Header>
+	// identifier
+	const [identifier, setIdentifier] = useState(props.unit.identifier);
+	const handleIdentifierChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+		setIdentifier(e.target.value);
+	}
 
-					{/* when any of the unit are changed call one of the functions.  */}
-					<Modal.Body className="show-grid">
-						<div id="container">
-							<div id="modalChild">
-								<div className="container-fluid">
-									<form>
-									{this.isName(this.props.name)}
-									{this.isIdentifier(this.props.identifier)}
-									{this.isTypeOfUnit(this.props.typeOfUnit)}
-									{this.isUnitRepresent(this.props.unitRepresent)}
-									{this.isDisplayableType(this.props.displayable)}
-									{this.isSecInRate(this.props.secInRate)}
-									{this.isPreferredDisplayable(this.props.preferredDisplay)}
-									{this.isSuffix(this.props.suffix)}
-									{this.isNote(this.props.note)}
-									</form>
-								</div>
+	// typeOfUnit
+	const [typeOfUnit, setTypeOfUnit] = useState(props.unit.typeOfUnit);
+	const handleTypeOfUnitChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+		setTypeOfUnit(e.target.value as UnitType);
+	}
+
+	// unitRepresent
+	const [unitRepresent, setUnitRepresent] = useState(props.unit.unitRepresent);
+	const handleUnitRepresentChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+		setUnitRepresent(e.target.value as UnitRepresentType)
+	}
+
+	// displayable
+	const [displayable, setDisplayable] = useState(props.unit.displayable);
+	const handleDisplayableChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+		setDisplayable(e.target.value as DisplayableType);
+	}
+
+	// preferredDisplay
+	const [preferredDisplay, setPreferredDisplay] = useState(props.unit.preferredDisplay);
+	const handlePreferredDisplayChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+		setPreferredDisplay(JSON.parse(e.target.value));
+	}
+
+	// secInRate
+	const [secInRate, setSecInRate] = useState(props.unit.secInRate);
+	const handleSecInRateChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+		setSecInRate(Number(e.target.value));
+
+	}
+
+	// suffix
+	const [suffix, setSuffix] = useState(props.unit.suffix);
+	const handleSuffixChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+		setSuffix(e.target.value);
+	}
+
+	// note
+	const [note, setNote] = useState(props.unit.note);
+	const handleNoteChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+		setNote(e.target.value);
+	}
+	/* End State */
+
+	// Reset the state to default values
+	// To be used for the discard changes button
+	// Different use case from CreateUnitModalComponent's resetState
+	// This allows us to reset our state to match the store in the event of an edit failure
+	// Failure to edit units will not trigger a re-render, as no state has changed. Therefore, we must manually reset the values
+	const resetState = () => {
+		setName(props.unit.name);
+		setIdentifier(props.unit.identifier);
+		setTypeOfUnit(props.unit.typeOfUnit);
+		setUnitRepresent(props.unit.unitRepresent);
+		setDisplayable(props.unit.displayable);
+		setPreferredDisplay(props.unit.preferredDisplay);
+		setSecInRate(props.unit.secInRate);
+		setSuffix(props.unit.suffix);
+		setNote(props.unit.note);
+	}
+
+	const handleClose = () => {
+		props.handleClose();
+		resetState();
+	}
+
+	// Save changes
+	// Currently using the old functionality which is to compare inherited prop values to state values
+	// If there is a difference between props and state, then a change was made
+	// Side note, we could probably just set a boolean when any input i
+	const handleSaveChanges = () => {
+
+		// Close the modal first to avoid repeat clicks
+		props.handleClose();
+
+		// Check for changes by comparing state to props
+		const unitHasChanges =
+			(
+				props.unit.name != name ||
+				props.unit.identifier != identifier ||
+				props.unit.typeOfUnit != typeOfUnit ||
+				props.unit.unitRepresent != unitRepresent ||
+				props.unit.displayable != displayable ||
+				props.unit.preferredDisplay != preferredDisplay ||
+				props.unit.secInRate != secInRate ||
+				props.unit.suffix != suffix ||
+				props.unit.note != note);
+
+		// Only do work if there are changes
+		if (unitHasChanges) {
+			const editedUnit = {
+				...props.unit,
+				name,
+				identifier,
+				unitRepresent,
+				typeOfUnit,
+				displayable,
+				preferredDisplay,
+				secInRate,
+				suffix,
+				note
+			}
+			// Save our changes by:
+			// Adding our changes as a new unit to the edited unit store state
+			// Submitting our changes to the store state
+			dispatch(editUnitDetails(editedUnit));
+			dispatch(submitEditedUnits());
+			dispatch(removeUnsavedChanges());
+		}
+
+	}
+
+	const formInputStyle: React.CSSProperties = {
+		paddingBottom: '5px'
+	}
+
+	const tableStyle: React.CSSProperties = {
+		width: '100%'
+	};
+
+	return (
+		<>
+			<Modal show={props.show} onHide={props.handleClose} >
+				<Modal.Header>
+					<Modal.Title> <FormattedMessage id="edit.unit" /></Modal.Title>
+				</Modal.Header>
+
+				{/* when any of the unit are changed call one of the functions.  */}
+				<Modal.Body className="show-grid">
+					<div id="container">
+						<div id="modalChild" style={tableStyle}>
+							{/* Name input*/}
+							<div style={formInputStyle}>
+								<label><FormattedMessage id="unit.name" /></label><br />
+								<Input type='text' onChange={e => handleNameChange(e)} required value={name} />
+							</div>
+							<div style={formInputStyle}>
+								<FormattedMessage id="unit.identifier" /> <span><br />
+									<Input
+										name="identifier" type="text"
+										defaultValue={identifier}
+										placeholder="Identifier"
+										onChange={e => handleIdentifierChange(e)}
+									/></span>
+							</div>
+							<div style={formInputStyle}>
+								<label><FormattedMessage id="unit.type.of.unit" /> </label>
+								<Input name="typeOfUnit" type='select' defaultValue={typeOfUnit} onChange={e => handleTypeOfUnitChange(e)} >
+									{Object.keys(UnitType).map(key => {
+										return (<option value={key} key={key}>{translate(`UnitType.${key}`)}</option>)
+									})}
+								</Input>
+							</div>
+							<div style={formInputStyle}>
+								<label><FormattedMessage id="unit.represent" /> </label>
+								<Input name="unitRepresent" type='select' defaultValue={unitRepresent} onChange={e => handleUnitRepresentChange(e)}>
+									{Object.keys(UnitRepresentType).map(key => {
+										return (<option value={key} key={key}>{translate(`UnitRepresentType.${key}`)}</option>)
+									})}
+								</Input>
+							</div>
+							<div style={formInputStyle}>
+								<label><FormattedMessage id="unit.displayable" /> </label>
+								<Input name="displayable" type='select' defaultValue={displayable} onChange={e => handleDisplayableChange(e)}>
+									{Object.keys(DisplayableType).map(key => {
+										return (<option value={key} key={key}>{translate(`DisplayableType.${key}`)}</option>)
+									})}
+								</Input>
+							</div>
+							<div style={formInputStyle}>
+								<label><FormattedMessage id="unit.preferred.display" /> </label>
+								<Input name="preferredDisplay" type='select' defaultValue={preferredDisplay.toString()} onChange={e => handlePreferredDisplayChange(e)}>
+									<option value="true"> {translate('yes')} </option>
+									<option value="false"> {translate('no')} </option>
+								</Input>
+							</div>
+							<div style={formInputStyle}>
+								<FormattedMessage id="unit.sec.in.rate" /> <span><br />
+									<Input
+										name="secInRate"
+										type="number"
+										defaultValue={secInRate}
+										onChange={e => handleSecInRateChange(e)}
+										placeholder="Sec In Rate"
+									/></span>
+							</div>
+							<div style={formInputStyle}>
+								<label><FormattedMessage id="unit.suffix" /> </label>
+								<Input
+									type="text"
+									defaultValue={suffix}
+									placeholder="Suffix"
+									onChange={e => handleSuffixChange(e)}
+								/>
+							</div>
+							<div style={formInputStyle}>
+								<label><FormattedMessage id="unit.note" /> </label>
+								<Input
+									type="textarea"
+									defaultValue={note}
+									placeholder="Note"
+									onChange={e => handleNoteChange(e)}
+								/>
 							</div>
 						</div>
-					</Modal.Body>
-					<Modal.Footer>
-						{/* Hides the modal */}
-						<Button variant="secondary" onClick={this.props.onhide}>
-							<FormattedMessage id="discard.changes" />
-						</Button>
-						{/* On click calls the function onSaveChanges in this componenet */}
-						<Button variant="primary" onClick={() => this.onSaveChanges()} disabled={!this.props.name || !this.props.identifier}>
-							<FormattedMessage id="save.all" />
-						</Button>
-					</Modal.Footer>
-				</Modal>
-			</>
-		);
-	}
-
-	/** This function
-	 * (1) checks if the unit state value is different from the unit prop value.
-	 * (2) If the values are different, add all the changed values to editedUnit and call the prop editUnitDeatils(editedUnit).
-	 * (3) Call the function onHide() -> this will hide the modal and call function handleClose on UnitViewComponent.tsx */
-
-	private onSaveChanges() {
-
-		if (this.props.unit.name != this.state.nameInput || 
-			this.props.unit.identifier != this.state.identifierInput ||
-			this.props.unit.unitRepresent != this.state.unitRepresentInput ||
-			this.props.unit.typeOfUnit != this.state.typeOfUnitInput ||
-			this.props.unit.displayable != this.state.displayableInput ||
-			this.props.unit.preferredDisplay != this.state.preferredDisplayableInput ||
-			this.props.unit.secInRate != this.state.secInRateInput ||
-			this.props.unit.suffix.toString() != this.state.suffixInput ||
-			this.props.unit.note != this.state.noteInput) 
-			{
-			const name = this.state.nameInput;
-			const identifier = this.state.identifierInput;
-			const unitRepresent = this.state.unitRepresentInput as UnitRepresentType;
-			const typeOfUnit = this.state.typeOfUnitInput as UnitType;
-			const displayable = this.state.displayableInput as DisplayableType;
-			const preferredDisplay = this.state.preferredDisplayableInput;
-			const secInRate = this.state.secInRateInput;
-			const suffix = this.state.suffixInput;
-			const note = this.state.noteInput;
-
-			const editedUnit = {
-				...this.props.unit,
-				name, identifier, unitRepresent, typeOfUnit,
-				displayable, preferredDisplay, secInRate,
-				suffix, note
-			};
-			this.props.editUnitDetails(editedUnit);
-			this.props.onhide();
-		}
-	}
-
-	/**
-	 * The following handlers will change the state to the corresponding unit
-	 */
-	private handleNameChange(event: React.ChangeEvent<HTMLInputElement>) {
-		this.setState({ nameInput: event.target.value });
-	}
-
-	private handleIdentifierChange(event: React.ChangeEvent<HTMLInputElement>) {
-		this.setState({ identifierInput: event.target.value });
-	}
-
-	private handleTypeOfUnitChange(event: React.ChangeEvent<HTMLInputElement>) {
-		const TypeOfUnit = event.target.value as UnitType;
-		this.setState({ typeOfUnitInput: TypeOfUnit });
-	}
-
-	private handleUnitRepresentChange(event: React.ChangeEvent<HTMLInputElement>) {
-		const unitRepresent = event.target.value as UnitRepresentType;
-		this.setState({ unitRepresentInput: unitRepresent });
-	}
-
-	private handleDisplayableChange(event: React.ChangeEvent<HTMLInputElement>) {
-		const displayable = event.target.value as DisplayableType;
-		this.setState({ displayableInput: displayable });
-	}
-
-	private handlePreferredDisplayableChange(event: React.ChangeEvent<HTMLInputElement>) {
-		const preferredDisplayable = JSON.parse(event.target.value);
-		this.setState({ preferredDisplayableInput: preferredDisplayable });
-	}
-
-	private handleSecInRateChange(event: React.ChangeEvent<HTMLInputElement>) {
-		const secInRate = Number(event.target.value);
-		this.setState({ secInRateInput: secInRate });
-	}
-
-	private handleSuffixChange(event: React.ChangeEvent<HTMLInputElement>) {
-		this.setState({ suffixInput: event.target.value });
-	}
-
-	private handleNoteChange(event: React.ChangeEvent<HTMLTextAreaElement>) {
-		this.setState({ noteInput: event.target.value });
-	}
-
-	/**
-	 * The following functions will append each unit detail to the modal card.
-	 */
-
-	 private isName(name: string) {
-		return (
-			<div>
-				<label><FormattedMessage id="unit.name" /></label><br />
-				<input className="form-control" type="text" defaultValue={name} placeholder="Name" onChange={event => this.handleNameChange(event)} />
-			</div>
-		)
-	}
-	private isIdentifier(identifier: string) {
-		return (
-			<div>
-				<label><FormattedMessage id="unit.identifier" /></label><br />
-				<input className="form-control" type="text" defaultValue={identifier} placeholder="Identifier" onChange={event => this.handleIdentifierChange(event)} />
-			</div>
-		)
-	}
-
-	private isUnitRepresent(unitRepresent: UnitRepresentType) {
-		return (
-			<div>
-				<label><FormattedMessage id="unit.represent" /></label><br />
-				<Input type='select' defaultValue={unitRepresent}
-					onChange={event => this.handleUnitRepresentChange(event)}>
-					{Object.keys(UnitRepresentType).map(key => {
-						return (<option value={key} key={key}>{translate(`UnitRepresentType.${key}`)}</option>)
-					})}
-				</Input>
-			</div>
-		)
-	}
-
-	private isSecInRate(secInRate: number) {
-		return (
-			<div>
-				<label><FormattedMessage id="unit.sec.in.rate" /></label><br />
-				<input className="form-control" type="number" defaultValue={secInRate} onChange={event => this.handleSecInRateChange(event)} placeholder="Sec In Rate" />
-			</div>
-		)
-	}
-
-	private isTypeOfUnit(typeOfUnit: UnitType) {
-		return (
-			<div>
-				<label><FormattedMessage id="unit.type.of.unit" /></label><br />
-				<Input type='select' defaultValue={typeOfUnit}
-					onChange={event => this.handleTypeOfUnitChange(event)}>
-					{Object.keys(UnitType).map(key => {
-						return (<option value={key} key={key}>{translate(`UnitType.${key}`)}</option>)
-					})}
-				</Input>
-			</div>
-		)
-	}
-
-	private isSuffix(suffix: string) {
-		return (
-			<div>
-				<label><FormattedMessage id="unit.suffix" /></label><br />
-				<input className="form-control" type="text" defaultValue={suffix} placeholder="Suffix"onChange={event => this.handleSuffixChange(event)} />
-			</div>
-		)
-	}
-
-	private isDisplayableType(displayable: DisplayableType) {
-		return (
-			<div>
-				<label><FormattedMessage id="unit.dropdown.displayable" /></label><br />
-				<Input type='select' defaultValue={displayable}
-					onChange={event => this.handleDisplayableChange(event)}>
-					{Object.keys(DisplayableType).map(key => {
-						return (<option value={key} key={key}>{translate(`DisplayableType.${key}`)}</option>)
-					})}
-				</Input>
-			</div>
-		)
-	}
-
-	private isPreferredDisplayable(preferredDisplay: boolean) {
-		return (
-			<div>
-				<label><FormattedMessage id="unit.preferred.display" /></label><br />
-				<Input type='select' defaultValue={preferredDisplay.toString()}
-					onChange={event => this.handlePreferredDisplayableChange(event)}>
-					<option value="true"> {translate('true')} </option>
-					<option value="false"> {translate('false')} </option>
-				</Input>
-			</div>
-		)
-	}
-
-	private isNote(note: string) {
-		return (
-			<div>
-				<label><FormattedMessage id="unit.note.optional" /></label><br />
-				<textarea className="form-control" defaultValue={note} placeholder="Note" onChange={event => this.handleNoteChange(event)} />
-			</div>
-		)
-	}
+					</div>
+				</Modal.Body>
+				<Modal.Footer>
+					{/* Hides the modal */}
+					<Button variant="secondary" onClick={handleClose}>
+						<FormattedMessage id="discard.changes" />
+					</Button>
+					{/* On click calls the function onSaveChanges in this componenet */}
+					<Button variant="primary" onClick={handleSaveChanges} disabled={!name || !identifier}>
+						<FormattedMessage id="save.all" />
+					</Button>
+				</Modal.Footer>
+			</Modal>
+		</>
+	);
 }
-
-export default UnitModelEditComponent;
