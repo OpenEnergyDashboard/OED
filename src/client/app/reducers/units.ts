@@ -6,15 +6,21 @@ import { UnitsAction, UnitsState } from '../types/redux/units';
 import { ActionType } from '../types/redux/actions';
 
 const defaultState: UnitsState = {
+	hasBeenFetchedOnce: false,
 	isFetching: false,
 	selectedUnits: [],
 	editedUnits: {},
 	submitting: [],
-	units: []
+	units: {}
 };
 
 export default function units(state = defaultState, action: UnitsAction) {
 	switch (action.type) {
+		case ActionType.ConfirmUnitsFetchedOnce:
+			return {
+				...state,
+				hasBeenFetchedOnce: true
+			};
 		case ActionType.RequestUnitsDetails:
 			return {
 				...state,
@@ -33,7 +39,7 @@ export default function units(state = defaultState, action: UnitsAction) {
 			};
 		case ActionType.EditUnitDetails:
 		{
-			const editedUnits = state.editedUnits;
+			const editedUnits = {...state.editedUnits};
 			editedUnits[action.unit.id] = action.unit;
 			return {
 				...state,
@@ -51,19 +57,36 @@ export default function units(state = defaultState, action: UnitsAction) {
 		}
 		case ActionType.ConfirmEditedUnit:
 		{
-			const submitting = state.submitting;
-			submitting.splice(submitting.indexOf(action.unit));
+			// React expects us to return an immutable object in order to invoke a rerender, so we must use spread notation here
+			// Copy our UnitData state from the editedUnits state to the units state
+			const units = {...state.units};
+			const editedUnits = {...state.editedUnits};
+			units[action.unitId] = editedUnits[action.unitId];
 
-			const units = state.units;
-			const editedUnits = state.editedUnits;
-			units[action.unit] = editedUnits[action.unit];
-
-			delete editedUnits[action.unit];
 			return {
 				...state,
-				submitting,
-				editedUnits,
 				units
+			};
+		}
+		case ActionType.DeleteEditedUnit:
+		{
+			// Retrieve the editedUnits state
+			const editedUnits = {...state.editedUnits};
+			// Delete the UnitData from the editedUnits state by id
+			delete editedUnits[action.unitId];
+			return {
+				...state,
+				editedUnits
+			};
+		}
+		case ActionType.DeleteSubmittedUnit:
+		{
+			// Remove the current submitting unit from the submitting state
+			const submitting = state.submitting;
+			submitting.splice(submitting.indexOf(action.unitId));
+			return {
+				...state,
+				submitting
 			};
 		}
 		default:

@@ -25,7 +25,17 @@ export interface EditUnitDetailsAction {
 
 export interface ConfirmEditedUnitAction {
 	type: ActionType.ConfirmEditedUnit;
-	unit: number;
+	unitId: number;
+}
+
+export interface DeleteEditedUnitAction {
+	type: ActionType.DeleteEditedUnit;
+	unitId: number;
+}
+
+export interface DeleteSubmittedUnitAction {
+	type: ActionType.DeleteSubmittedUnit;
+	unitId: number;
 }
 
 export interface SubmitEditedUnitAction {
@@ -33,12 +43,19 @@ export interface SubmitEditedUnitAction {
 	unit: number;
 }
 
+export interface ConfirmUnitsFetchedOnceAction {
+	type: ActionType.ConfirmUnitsFetchedOnce;
+}
+
 export type UnitsAction = RequestUnitsDetailsAction
 | ReceiveUnitsDetailsAction
 | ChangeDisplayedUnitsAction
 | EditUnitDetailsAction
 | ConfirmEditedUnitAction
-| SubmitEditedUnitAction;
+| DeleteEditedUnitAction
+| DeleteSubmittedUnitAction
+| SubmitEditedUnitAction
+| ConfirmUnitsFetchedOnceAction;
 
 export enum UnitType {
 	unit = 'unit',
@@ -92,6 +109,7 @@ export interface UnitDataById {
 }
 
 export interface UnitsState {
+	hasBeenFetchedOnce: boolean,
 	isFetching: boolean;
 	selectedUnits: number[];
 	editedUnits: UnitDataById;
