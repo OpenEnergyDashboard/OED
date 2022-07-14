@@ -1,16 +1,16 @@
 /* This Source Code Form is subject to the terms of the Mozilla Public
 * License, v. 2.0. If a copy of the MPL was not distributed with this
 * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
-import { useState } from 'react';
 import * as React from 'react';
 import { Modal, Button } from 'react-bootstrap';
 import { Input } from 'reactstrap';
 import { FormattedMessage } from 'react-intl';
 import translate from '../../utils/translate';
-import '../../styles/unit-add-modal.css';
+import '../../styles/Modal.unit.css';
 import { UnitRepresentType, DisplayableType, UnitType } from '../../types/redux/units';
 import { useDispatch } from 'react-redux';
 import { addUnit } from '../../actions/units';
+import { useState } from 'react';
 
 export default function CreateUnitModalComponent() {
 
@@ -137,7 +137,6 @@ export default function CreateUnitModalComponent() {
 		resetState();
 	};
 
-
 	const formInputStyle: React.CSSProperties = {
 		paddingBottom: '5px'
 	}
@@ -156,7 +155,7 @@ export default function CreateUnitModalComponent() {
 			</Button>
 
 			<Modal show={showModal} onHide={handleClose}>
-				<Modal.Header closeButton>
+				<Modal.Header>
 					<Modal.Title> <FormattedMessage id="create.unit" /></Modal.Title>
 				</Modal.Header>
 				{/* TODO: Styling of the form could use some work to make textboxes bigger, etc */}
@@ -233,7 +232,7 @@ export default function CreateUnitModalComponent() {
 				</Modal.Body>
 				<Modal.Footer>
 					<Button variant="secondary" onClick={handleClose}>
-						<FormattedMessage id="close" />
+						<FormattedMessage id="discard.changes" />
 					</Button>
 					<Button variant="primary" onClick={handleSubmit}>
 						<FormattedMessage id="save.all" />

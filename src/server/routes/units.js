@@ -31,6 +31,9 @@ router.get('/', async (req, res) => {
 	}
 });
 
+/**
+ * Route for POST, edit unit.
+ */
 router.post('/edit', async (req, res) => {
 	const validUnit = {
 		type: 'object',
@@ -85,6 +88,7 @@ router.post('/edit', async (req, res) => {
 		const conn = getConnection();
 		try {
 			const unit = await Unit.getById(req.body.id, conn);
+			unit.name = req.body.name;
 			unit.displayable = req.body.displayable;
 			unit.identifier = req.body.identifier;
 			unit.unitRepresent = req.body.unitRepresent;
@@ -102,12 +106,17 @@ router.post('/edit', async (req, res) => {
 	}
 });
 
-
+/**
+ * Route for POST add unit.
+ */
 router.post('/addUnit', async (req, res) => {
 	const validUnit = {
 		type: 'object',
 		required: ['name', 'identifier', 'unitRepresent', 'typeOfUnit', 'displayable', 'preferredDisplay'],
 		properties: {
+			id: {
+				type: 'nuber',
+			},
 			name: {
 				type: 'string',
 				minLength: 1
@@ -129,9 +138,14 @@ router.post('/addUnit', async (req, res) => {
 				minLength: 1,
 				enum: Object.values(Unit.unitType)
 			},
+			unitIndex: {
+				type: 'nuber',
+			},
 			suffix: {
-				type: 'string',
-				minLength: 1
+				oneOf: [
+					{ type: 'string' },
+					{ type: 'null' }
+				]
 			},
 			displayable: {
 				type: 'string',

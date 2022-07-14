@@ -22,7 +22,7 @@ export default class UnitsApi {
 		return await this.backend.doPostRequest<UnitEditData>(
 			'/api/units/edit',
 			{
-				id: unit.id, identifier: unit.identifier, typeOfUnit: unit.typeOfUnit,
+				id: unit.id, name: unit.name, identifier: unit.identifier, typeOfUnit: unit.typeOfUnit,
 				unitRepresent: unit.unitRepresent, secInRate: unit.secInRate,
 				displayable: unit.displayable, preferredDisplay: unit.preferredDisplay,
 				suffix: unit.suffix, note: unit.note
