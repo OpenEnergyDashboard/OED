@@ -321,7 +321,8 @@ export function submitGroupInEditingIfNeeded() {
 				gps: rawGroup.gps,
 				displayable: rawGroup.displayable,
 				note: rawGroup.note,
-				area: rawGroup.area
+				area: rawGroup.area,
+				defaultGraphicUnit: rawGroup.defaultGraphicUnit
 			};
 			if (creatingNewGroup(getState())) {
 				return dispatch(submitNewGroup(group));

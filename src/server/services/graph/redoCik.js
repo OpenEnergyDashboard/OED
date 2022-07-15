@@ -30,7 +30,20 @@ async function createPik(conn) {
 	return pik;
 }
 
+// These are used during testing where the functions are called directly with npm.
+async function redoCikNoConn() {
+	conn = await getConnection();
+	redoCik(conn);
+}
+
+async function createPikNoConn() {
+	conn = await getConnection();
+	createPik(conn);
+}
+
 module.exports = {
 	redoCik,
-	createPik
+	createPik,
+	redoCikNoConn,
+	createPikNoConn
 };
