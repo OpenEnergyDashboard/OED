@@ -22,7 +22,7 @@ export default function CreateUnitModalComponent() {
 		typeOfUnit: UnitType.unit,
 		unitRepresent: UnitRepresentType.quantity,
 		displayable: DisplayableType.all,
-		preferredDisplay: false,
+		preferredDisplay: true,
 		secInRate: 3600,
 		suffix: '',
 		note: '',
