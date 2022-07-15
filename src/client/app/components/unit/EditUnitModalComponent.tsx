@@ -8,11 +8,10 @@ import { Input } from 'reactstrap';
 import { FormattedMessage } from 'react-intl';
 import translate from '../../utils/translate';
 import { useDispatch } from 'react-redux';
-import { submitEditedUnits } from '../../actions/units';
+import { submitEditedUnit } from '../../actions/units';
 import { removeUnsavedChanges } from '../../actions/unsavedWarning';
 // I realize that * is already imported from react
 import { useState } from 'react';
-import { editUnitDetails } from '../../actions/units';
 import '../../styles/Modal.unit.css';
 
 interface EditUnitModalComponentProps {
@@ -144,11 +143,8 @@ export default function EditUnitModalComponent(props: EditUnitModalComponentProp
 				suffix,
 				note
 			}
-			// Save our changes by:
-			// Adding our changes as a new unit to the edited unit store state
-			// Submitting our changes to the store state
-			dispatch(editUnitDetails(editedUnit));
-			dispatch(submitEditedUnits());
+			// Save our changes by dispatching the submitEditedUnit action
+			dispatch(submitEditedUnit(editedUnit));
 			dispatch(removeUnsavedChanges());
 		}
 

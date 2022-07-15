@@ -9,7 +9,6 @@ const defaultState: UnitsState = {
 	hasBeenFetchedOnce: false,
 	isFetching: false,
 	selectedUnits: [],
-	editedUnits: {},
 	submitting: [],
 	units: {}
 };
@@ -37,19 +36,10 @@ export default function units(state = defaultState, action: UnitsAction) {
 				...state,
 				selectedUnits: action.selectedUnits
 			};
-		case ActionType.EditUnitDetails:
-		{
-			const editedUnits = {...state.editedUnits};
-			editedUnits[action.unit.id] = action.unit;
-			return {
-				...state,
-				editedUnits
-			};
-		}
 		case ActionType.SubmitEditedUnit:
 		{
 			const submitting = state.submitting;
-			submitting.push(action.unit);
+			submitting.push(action.unitId);
 			return {
 				...state,
 				submitting
@@ -58,25 +48,15 @@ export default function units(state = defaultState, action: UnitsAction) {
 		case ActionType.ConfirmEditedUnit:
 		{
 			// React expects us to return an immutable object in order to invoke a rerender, so we must use spread notation here
-			// Copy our UnitData state from the editedUnits state to the units state
+			// Overwrite the unitdata at the edited unit's index with the edited unit's unitdata
+			// The passed in id should be correct as it is inherited from the pre-edited unit
+			// See EditUnitModalComponent line 134 for details (starts with if(unitHasChanges))
 			const units = {...state.units};
-			const editedUnits = {...state.editedUnits};
-			units[action.unitId] = editedUnits[action.unitId];
+			units[action.editedUnit.id] = action.editedUnit;
 
 			return {
 				...state,
 				units
-			};
-		}
-		case ActionType.DeleteEditedUnit:
-		{
-			// Retrieve the editedUnits state
-			const editedUnits = {...state.editedUnits};
-			// Delete the UnitData from the editedUnits state by id
-			delete editedUnits[action.unitId];
-			return {
-				...state,
-				editedUnits
 			};
 		}
 		case ActionType.DeleteSubmittedUnit:

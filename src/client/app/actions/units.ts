@@ -40,20 +40,13 @@ export function changeDisplayedUnits(units: number[]): t.ChangeDisplayedUnitsAct
 	return { type: ActionType.ChangeDisplayedUnits, selectedUnits: units };
 }
 
-export function editUnitDetails(unit: t.UnitData): t.EditUnitDetailsAction {
-	return { type: ActionType.EditUnitDetails, unit };
+// Pushes unitId onto submitting units state array
+export function submitUnitEdits(unitId: number): t.SubmitEditedUnitAction {
+	return { type: ActionType.SubmitEditedUnit, unitId };
 }
 
-export function submitUnitEdits(unit: number): t.SubmitEditedUnitAction {
-	return { type: ActionType.SubmitEditedUnit, unit };
-}
-
-export function confirmUnitEdits(unitId: number): t.ConfirmEditedUnitAction {
-	return { type: ActionType.ConfirmEditedUnit, unitId };
-}
-
-export function deleteEditedUnit(unitId: number): t.DeleteEditedUnitAction {
-	return {type: ActionType.DeleteEditedUnit, unitId }
+export function confirmUnitEdits(editedUnit: t.UnitData): t.ConfirmEditedUnitAction {
+	return { type: ActionType.ConfirmEditedUnit, editedUnit };
 }
 
 export function deleteSubmittedUnit(unitId: number): t.DeleteSubmittedUnitAction {
@@ -77,60 +70,35 @@ export function fetchUnitsDetailsIfNeeded(): Thunk {
 	};
 }
 
-// TODO maybe this can be removed since we're not doing bulk edits
-// I imagine this bulk function exists so that you do not need to pass in a unitId when submit an edited unit
-
-export function submitEditedUnits(): Thunk {
+export function submitEditedUnit(editedUnit: t.UnitData): Thunk {
 	return async (dispatch: Dispatch, getState: GetState) => {
-		// dispatches submitEditedUnit for each unitData in editedUnits (by id) if they are not already submitting
-		Object.keys(getState().units.editedUnits).forEach(unitIdS => {
-			// grab the unitId
-			const unitId = parseInt(unitIdS);
-			// check if unitData is already submitting (indexOf returns -1 if item does not exist in array)
-			if (getState().units.submitting.indexOf(unitId) === -1) {
-				// if unit is not submitting, submit it
-				dispatch(submitEditedUnit(unitId));
+
+		// check if unitData is already submitting (indexOf returns -1 if item does not exist in array)
+		if (getState().units.submitting.indexOf(editedUnit.id) === -1) {
+
+			// Inform the store we are about to edit the passed in unit
+			// Pushes unitId of the unitData to submit onto the submitting state array
+			dispatch(submitUnitEdits(editedUnit.id));
+
+			// Attempt to edit the unit in the database
+			try {
+				// posts the edited unitData to the units API
+				await unitsApi.edit(editedUnit);
+				// Clear unit Id from submitting state array
+				dispatch(deleteSubmittedUnit(editedUnit.id));
+				// Update the store with our new edits
+				dispatch(confirmUnitEdits(editedUnit));
+				// Success!
+				showSuccessNotification(translate('unit.successfully.edited.unit'));
+			} catch (err) {
+				// Failure! ):
+				showErrorNotification(translate('unit.failed.to.edit.unit'));
+				// Clear our changes from to the submitting units state
+				// We must do this in case fetch failed to keep the store in sync with the database
+				dispatch(deleteSubmittedUnit(editedUnit.id));
 			}
-		});
-	};
-}
-
-export function submitEditedUnit(unitId: number): Thunk {
-	return async (dispatch: Dispatch, getState: GetState) => {
-		// retrieve the unitData by id
-		const submittingUnit = getState().units.editedUnits[unitId];
-		// pushes unitId of the unitData to submit onto the submitting state array
-		dispatch(submitUnitEdits(unitId));
-		try {
-			// posts the edited unitData to the units API
-			await unitsApi.edit(submittingUnit);
-			// Clear unit Id from submitting state array
-			dispatch(deleteSubmittedUnit(unitId));
-			// Retrieve our edits from the editedUnits state and overwrite the units state with them
-			dispatch(confirmUnitEdits(unitId));
-			// Clear our edits from the editedUnits state
-			dispatch(deleteEditedUnit(unitId));
-			showSuccessNotification(translate('unit.successfully.edited.unit'));
-		} catch (err) {
-			showErrorNotification(translate('unit.failed.to.edit.unit'));
-			// Clear our changes from to the submitting and editedUnits state
-			// We must do this in case fetch failed to keep the store in sync with the database
-			dispatch(deleteSubmittedUnit(unitId));
-			dispatch(deleteEditedUnit(unitId));
 		}
 	};
-}
-
-/**
- * Remove all the unit in editing without submitting them
- */
-export function confirmEditedUnits(): Thunk {
-	return async (dispatch: Dispatch, getState: GetState) => {
-		Object.keys(getState().units.editedUnits).forEach(unitIdS => {
-			const unitId = parseInt(unitIdS);
-			dispatch(confirmUnitEdits(unitId));
-		});
-	}
 }
 
 // Add unit to database
