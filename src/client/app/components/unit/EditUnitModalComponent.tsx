@@ -13,7 +13,6 @@ import { removeUnsavedChanges } from '../../actions/unsavedWarning';
 // I realize that * is already imported from react
 import { useState } from 'react';
 import { editUnitDetails } from '../../actions/units';
-import { _ } from 'core-js';
 import '../../styles/Modal.unit.css';
 
 interface EditUnitModalComponentProps {
