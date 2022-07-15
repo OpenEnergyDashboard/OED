@@ -110,9 +110,9 @@ export function submitEditedUnit(unitId: number): Thunk {
 			dispatch(confirmUnitEdits(unitId));
 			// Clear our edits from the editedUnits state
 			dispatch(deleteEditedUnit(unitId));
-			showSuccessNotification(translate('successfully.edited.unit'));
+			showSuccessNotification(translate('unit.successfully.edited.unit'));
 		} catch (err) {
-			showErrorNotification(translate('failed.to.edit.unit'));
+			showErrorNotification(translate('unit.failed.to.edit.unit'));
 			// Clear our changes from to the submitting and editedUnits state
 			// We must do this in case fetch failed to keep the store in sync with the database
 			dispatch(deleteSubmittedUnit(unitId));
@@ -143,9 +143,9 @@ export function addUnit(unit: t.UnitData): Thunk {
 			// In the future, getting rid of this database fetch and updating the store on a successful API call would make the page faster
 			// However, since the database currently assigns the id to the UnitData
 			dispatch(fetchUnitsDetails());
-			showSuccessNotification(translate('successfully.added.unit'));
+			showSuccessNotification(translate('unit.successfully.create.unit'));
 		} catch (err) {
-			showErrorNotification(translate('failed.to.add.unit'));
+			showErrorNotification(translate('unit.failed.to.create.unit'));
 		}
 	}
 }
