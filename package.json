@@ -29,6 +29,7 @@
     "refreshAllReadingViews": "node -e 'require(\"./src/server/services/refreshAllReadingViews\").refreshAllReadingViews()'",
     "refreshDailyReadingViews": "node -e 'require(\"./src/server/services/refreshReadingViews\").refreshReadingViews()'",
     "refreshHourlyReadingViews": "node -e 'require(\"./src/server/services/refreshHourlyReadingViews\").refreshHourlyReadingViews()'",
+    "updateCikAndViews": "node -e 'require(\"./src/server/services/graph/redoCik.js\").updateCikAndViews()'",
     "obvius:showConfigfiles": "node ./src/server/services/obvius/showConfigfiles.js",
     "obvius:purgeConfigfiles": "node ./src/server/services/obvius/purgeConfigfiles.js",
     "generateFourDayTestingData": "node -e 'require(\"./src/server/data/automatedTestingData\").generateFourDayTestingData()'",
@@ -40,9 +41,7 @@
     "generateSineSquaredTestingData": "node -e 'require(\"./src/server/data/automatedTestingData\").generateSineSquaredTestingData(2.5)'",
     "generateCosineSquaredTestingData": "node -e 'require(\"./src/server/data/automatedTestingData\").generateCosineSquaredTestingData(2.5)'",
     "generateTestingData": "node -e 'require(\"./src/server/data/automatedTestingData\").generateTestingData()'",
-    "testData": "./src/scripts/testData.sh",
-    "insertSpecialUnitsAndConversions": "node -e 'require(\"./src/server/data/automatedTestingData.js\").insertSpecialUnitsAndConversions()'",
-    "insertSpecialMeters": "node -e 'require(\"./src/server/data/automatedTestingData.js\").insertSpecialMeters()'"
+    "testData": "node -e 'require(\"./src/server/data/automatedTestingData.js\").insertSpecialUnitsConversionsMeters()'"
   },
   "nodemonConfig": {
     "watch": [
