@@ -172,7 +172,10 @@ export default function EditUnitModalComponent(props: EditUnitModalComponentProp
 							{/* Name input*/}
 							<div style={formInputStyle}>
 								<label><FormattedMessage id="unit.name" /></label><br />
-								<Input type='text' onChange={e => handleNameChange(e)} required value={name} />
+								<Input
+									type='text'
+									onChange={e => handleNameChange(e)}
+									required value={name} />
 							</div>
 							<div style={formInputStyle}>
 								<FormattedMessage id="unit.identifier" /> <span><br />
@@ -185,7 +188,11 @@ export default function EditUnitModalComponent(props: EditUnitModalComponentProp
 							</div>
 							<div style={formInputStyle}>
 								<label><FormattedMessage id="unit.type.of.unit" /> </label>
-								<Input name="typeOfUnit" type='select' defaultValue={typeOfUnit} onChange={e => handleTypeOfUnitChange(e)} >
+								<Input
+									name="typeOfUnit"
+									type='select'
+									defaultValue={typeOfUnit}
+									onChange={e => handleTypeOfUnitChange(e)} >
 									{Object.keys(UnitType).map(key => {
 										return (<option value={key} key={key}>{translate(`UnitType.${key}`)}</option>)
 									})}
@@ -193,7 +200,10 @@ export default function EditUnitModalComponent(props: EditUnitModalComponentProp
 							</div>
 							<div style={formInputStyle}>
 								<label><FormattedMessage id="unit.represent" /> </label>
-								<Input name="unitRepresent" type='select' defaultValue={unitRepresent} onChange={e => handleUnitRepresentChange(e)}>
+								<Input
+									name="unitRepresent"
+									type='select' defaultValue={unitRepresent}
+									onChange={e => handleUnitRepresentChange(e)}>
 									{Object.keys(UnitRepresentType).map(key => {
 										return (<option value={key} key={key}>{translate(`UnitRepresentType.${key}`)}</option>)
 									})}
@@ -201,7 +211,11 @@ export default function EditUnitModalComponent(props: EditUnitModalComponentProp
 							</div>
 							<div style={formInputStyle}>
 								<label><FormattedMessage id="unit.displayable" /> </label>
-								<Input name="displayable" type='select' defaultValue={displayable} onChange={e => handleDisplayableChange(e)}>
+								<Input
+									name="displayable"
+									type='select'
+									defaultValue={displayable}
+									onChange={e => handleDisplayableChange(e)}>
 									{Object.keys(DisplayableType).map(key => {
 										return (<option value={key} key={key}>{translate(`DisplayableType.${key}`)}</option>)
 									})}
@@ -209,7 +223,11 @@ export default function EditUnitModalComponent(props: EditUnitModalComponentProp
 							</div>
 							<div style={formInputStyle}>
 								<label><FormattedMessage id="unit.preferred.display" /> </label>
-								<Input name="preferredDisplay" type='select' defaultValue={preferredDisplay.toString()} onChange={e => handlePreferredDisplayChange(e)}>
+								<Input
+									name="preferredDisplay"
+									type='select'
+									defaultValue={preferredDisplay.toString()}
+									onChange={e => handlePreferredDisplayChange(e)}>
 									<option value="true"> {translate('yes')} </option>
 									<option value="false"> {translate('no')} </option>
 								</Input>

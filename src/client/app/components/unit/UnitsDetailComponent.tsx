@@ -6,7 +6,6 @@ import { FormattedMessage } from 'react-intl';
 import HeaderContainer from '../../containers/HeaderContainer';
 import FooterContainer from '../../containers/FooterContainer';
 import TooltipHelpContainer from '../../containers/TooltipHelpContainer';
-import UnsavedWarningContainer from '../../containers/UnsavedWarningContainer';
 import TooltipMarkerComponent from '../TooltipMarkerComponent';
 import { useDispatch, useSelector } from 'react-redux';
 import { fetchUnitsDetailsIfNeeded } from '../../actions/units';
@@ -46,7 +45,6 @@ export default function UnitsDetailComponent() {
 	};
 	return (
 		<div>
-			<UnsavedWarningContainer />
 			<HeaderContainer />
 			<TooltipHelpContainer page='units' />
 
