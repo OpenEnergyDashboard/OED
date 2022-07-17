@@ -18,6 +18,7 @@ const Meter = require('..//models/Meter')
 const loadCsvInput = require('../services/pipeline-in-progress/loadCsvInput');
 const moment = require('moment');
 const { refreshAllReadingViews } = require('../services/refreshAllReadingViews');
+const fs = require('fs').promises;
 
 // Define the start and end date for data generation.
 const DEFAULT_OPTIONS = {
@@ -271,18 +272,18 @@ async function generateOneMinuteTestingData() {
  * Calls the above functions with appropriate parameters to generate all the necessary testing data.
  * Each of the function calls will generate a csv file under '../test/db/data/automatedTests' that is needed for automated testing.
  */
-function generateTestingData() {
+async function generateTestingData() {
 	// Generates 1 year of sinusoidal data with data points at 4-day intervals
-	generateFourDayTestingData();
+	await generateFourDayTestingData();
 
 	// Generates 1 year of sinusoidal data with data points at 4-hour intervals
-	generateFourHourTestingData();
+	await generateFourHourTestingData();
 
 	// Generates 1 year of sinusoidal data with data points at 23-minute intervals
-	generateTwentyThreeMinuteTestingData();
+	await generateTwentyThreeMinuteTestingData();
 
 	// Generates 1 year of sinusoidal data with data points at 15-minute intervals
-	generateFifteenMinuteTestingData();
+	await generateFifteenMinuteTestingData();
 
 	// Generates 1 year of sinusoidal data with data points at 1-minute intervals.
 	// Normally not desired so commented out.
@@ -290,13 +291,13 @@ function generateTestingData() {
 
 	// Generates 1 year of cosinusoidal data with an amplitude of 3 and with data points at 23-minute intervals.
 	// Should be related to 23-minute sinusoidal above.
-	generateCosineTestingData(23, 3);
+	await generateCosineTestingData(23, 3);
 
 	// Generates 2 years of *squared* sinusoidal data with an amplitude of 2.5 and with data points at 1-day intervals.
-	generateSineSquaredTestingData(2.5);
+	await generateSineSquaredTestingData(2.5);
 
 	// Generates 2 years of *squared* cosinusoidal data with an amplitude of 2.5 and with data points at 1-day intervals.
-	generateCosineSquaredTestingData(2.5);
+	await generateCosineSquaredTestingData(2.5);
 }
 
 /**
@@ -304,9 +305,9 @@ function generateTestingData() {
  * the first file contains sine waves with an amplitude of 1, the second contains waves with an amplitude of 2, and so on until
  * the seventh which contains waves an amplitude of 7.
  */
-function generateVariableAmplitudeTestingData() {
+async function generateVariableAmplitudeTestingData() {
 	for (var i = 1; i <= 7; i++) {
-		generateSineTestingData(15, i);
+		await generateSineTestingData(15, i);
 	}
 }
 
@@ -376,30 +377,50 @@ async function insertSpecialConversions(conn) {
 }
 
 /**
- * Call the functions to insert special units and conversions.
+ * Generate mathematical test data.
  */
-async function insertSpecialUnitsAndConversions() {
-	const conn = getConnection();
-	await insertSpecialUnits(conn);
-	await insertSpecialConversions(conn);
-	await redoCik(conn);
+async function testData() {
+	console.log("Start generating first set of test data (square, varying freq of readings: 7 files):");
+	await generateTestingData();
+	console.log("Start generating second set of test data (varying amplitudes: 7 files):")
+	await generateVariableAmplitudeTestingData();
 }
 
 /**
  * Insert special meters into the database.
  */
-async function insertSpecialMeters() {
-	const conn = getConnection();
+async function insertSpecialMeters(conn) {
 	// The table contains special meters' data.
-	// Each row contains: meter name, unit name, default graphic unit name, CSV reading data filename.
+	// Each row contains: meter name, unit name, default graphic unit name, CSV reading data filename, whether to delete csv file.
+	// Should only delete automatically generated ones.
 	const specialMeters = [
-		['Electric Utility kWh', 'Electric_utility', 'kWh', 'quantity1-5.csv'],
-		['Natural Gas BTU', 'Natural_Gas_BTU', 'BTU', 'quantity1-5.csv'],
-		['Natural Gas Dollar', 'Natural_Gas_dollar', 'US_dollar', 'quantity1-5.csv'],
-		['Natural Gas Cubic Meters', 'Natural_Gas_M3', 'M3_gas', 'quantity1-5.csv'],
-		['Trash Kg', 'Trash', 'kg', 'quantity1-5.csv'],
-		['Temp Fahrenheit', 'Temperature_fahrenheit', 'Fahrenheit', 'temp0-212.csv'],
-		['Electric kW', 'Electric_kW', 'kW', 'rate2-10.csv']
+		['Electric Utility kWh', 'Electric_utility', 'kWh', 'data/unit/quantity1-5.csv', false],
+		['Electric Utility kWh 2-6', 'Electric_utility', 'kWh', 'data/unit/quantity2-6.csv', false],
+		['Electric Utility kWh in BTU', 'Electric_utility', 'BTU', 'data/unit/quantity1-5.csv', false],
+		['Electric Utility kWh in MTon CO2', 'Electric_utility', 'Metric_ton of CO2', 'data/unit/quantity1-5.csv', false],
+		['Natural Gas BTU', 'Natural_Gas_BTU', 'BTU', 'data/unit/quantity1-5.csv', false],
+		['Natural Gas BTU in Dollar', 'Natural_Gas_BTU', 'US_dollar', 'data/unit/quantity1-5.csv', false],
+		['Natural Gas Dollar', 'Natural_Gas_dollar', 'US_dollar', 'data/unit/quantity1-5.csv', false],
+		['Natural Gas Cubic Meters', 'Natural_Gas_M3', 'M3_gas', 'data/unit/quantity1-5.csv', false],
+		['Trash Kg', 'Trash', 'kg', 'data/unit/quantity1-5.csv', false],
+		['Temp Fahrenheit 0-212', 'Temperature_fahrenheit', 'Fahrenheit', 'data/unit/temp0-212.csv', false],
+		['Temp Fahrenheit in Celsius', 'Temperature_fahrenheit', 'Celsius', 'data/unit/temp0-212.csv', false],
+		['Electric kW', 'Electric_kW', 'kW', 'data/unit/rate1-5.csv', false],
+		['Electric kW 2-6', 'Electric_kW', 'kW', 'data/unit/rate2-6.csv', false],
+		['test4DaySin kWh', 'Electric_utility', 'kWh', 'test/db/data/automatedTests/fourDayFreqTestData.csv', true],
+		['test4HourSin kWh', 'Electric_utility', 'kWh', 'test/db/data/automatedTests/fourHourFreqTestData.csv', true],
+		['test23MinSin kWh', 'Electric_utility', 'kWh', 'test/db/data/automatedTests/twentyThreeMinuteFreqTestData.csv', true],
+		['test15MinSin kWh', 'Electric_utility', 'kWh', 'test/db/data/automatedTests/fifteenMinuteFreqTestData.csv', true],
+		['test23MinCos kWh', 'Electric_utility', 'kWh', 'test/db/data/automatedTests/23FreqCosineTestData.csv', true],
+		['testSqSin kWh', 'Electric_utility', 'kWh', 'test/db/data/automatedTests/2.5AmpSineSquaredTestData.csv', true],
+		['testSqCos kWh', 'Electric_utility', 'kWh', 'test/db/data/automatedTests/2.5AmpCosineSquaredTestData.csv', true],
+		['testAmp1Sin kWh', 'Electric_utility', 'kWh', 'test/db/data/automatedTests/15Freq1AmpSineTestData.csv', true],
+		['testAmp2Sin kWh', 'Electric_utility', 'kWh', 'test/db/data/automatedTests/15Freq2AmpSineTestData.csv', true],
+		['testAmp3Sin kWh', 'Electric_utility', 'kWh', 'test/db/data/automatedTests/15Freq3AmpSineTestData.csv', true],
+		['testAmp4Sin kWh', 'Electric_utility', 'kWh', 'test/db/data/automatedTests/15Freq4AmpSineTestData.csv', true],
+		['testAmp5Sin kWh', 'Electric_utility', 'kWh', 'test/db/data/automatedTests/15Freq5AmpSineTestData.csv', true],
+		['testAmp6Sin kWh', 'Electric_utility', 'kWh', 'test/db/data/automatedTests/15Freq6AmpSineTestData.csv', true],
+		['testAmp7Sin kWh', 'Electric_utility', 'kWh', 'test/db/data/automatedTests/15Freq7AmpSineTestData.csv', true]
 	];
 	// Function used to map values when reading the CSV file.
 	function mapRowsToModel(row) {
@@ -412,10 +433,16 @@ async function insertSpecialMeters() {
 		return [reading, startTimestamp, endTimestamp];
 	}
 
+	// Generate the mathematical test data needed.
+	// TODO The code could be changed to generate the data and use without writing to a file.
+	await testData();
+
+	console.log(`Start loading each set of test data into OED (${specialMeters.length} files of varying length, may take minutes):`);
 	for (let i = 0; i < specialMeters.length; ++i) {
 		// Meter values from above.
 		const meterData = specialMeters[i];
 		const meterName = meterData[0];
+		console.log(`    loading meter ${meterName} from file ${meterData[3]}`);
 		// We get the needed unit id from the name given.
 		const meterUnit = (await Unit.getByName(meterData[1], conn)).id;
 		const meterGraphicUnit = (await Unit.getByName(meterData[2], conn)).id;
@@ -451,8 +478,9 @@ async function insertSpecialMeters() {
 		} else {
 			// Only insert the meter and its readings if the meter did not already exist.
 			await meter.insert(conn);
+			const filename = `src/server/${meterData[3]}`;
 			await loadCsvInput(
-				`src/server/data/unit/${meterData[3]}`, // filePath
+				filename, // filePath
 				meter.id, // meterID
 				mapRowsToModel, // mapRowToModel
 				meter.timeSort, //timeSort
@@ -464,18 +492,52 @@ async function insertSpecialMeters() {
 				meter.readingGap, // readingGap
 				meter.readingVariation, // readingLengthVariation
 				meter.endOnlyTime, // isEndOnly
-				false, // headerRow
+				true, // headerRow
 				false, // shouldUpdate
 				undefined, // conditionSet
 				conn
 			);
+			// Delete mathematical test data file just uploaded. They have true for delete.
+			if (meterData[4] === true) {
+				await fs.unlink(filename);
+			}
 		}
 	}
+}
+
+/**
+ * Call the functions to insert special units, conversions and meters.
+ */
+async function insertSpecialUnitsConversionsMeters() {
+	console.log("See src/server/data/automatedTestingData.js in insertSpecialUnitsConversionsMeters() to see how to remove the data that is being inserted.\n");
+	const conn = getConnection();
+	await insertSpecialUnits(conn);
+	await insertSpecialConversions(conn);
+	// Recreate the Cik entries since changed units/conversions.
+	// Do now since needed to insert meters with suffix units.
+	await redoCik(conn);
+	await insertSpecialMeters(conn);
 	// Recreate the Cik entries since changed meters.
 	await redoCik(conn);
 	// Refresh the readings since added new ones.
 	await refreshAllReadingViews();
 }
+/*
+The following lines can be used to remove all the readings and meters associated with
+the test data. This is valuable if you want to run the process again and the
+meters and readings already exist. It is okay to run this a second time if some meters
+already exist as those will not be touched (but will not update that meter or readings for that meter).
+NOTE this removes the meters and readings. You may need to remove dependent groups
+before doing this in the web groups page in OED.
+Get into postgres terminal inside the database Docker container and then do:
+psql -U oed
+-- Remove all the readings. Normally gives "DELETE 575295"
+delete from readings where meter_id in (select id from meters where name in ('Electric Utility kWh', 'Electric Utility kWh 2-6', 'Electric Utility kWh in BTU', 'Electric Utility kWh in MTon CO2', 'Natural Gas BTU', 'Natural Gas BTU in Dollar', 'Natural Gas Dollar', 'Natural Gas Cubic Meters', 'Trash Kg', 'Temp Fahrenheit 0-212', 'Temp Fahrenheit in Celsius', 'Electric kW', 'Electric kW 2-6', 'test4DaySin kWh', 'test4HourSin kWh', 'test23MinSin kWh', 'test15MinSin kWh', 'test23MinCos kWh', 'testSqSin kWh', 'testSqCos kWh', 'testAmp1Sin kWh', 'testAmp2Sin kWh', 'testAmp3Sin kWh', 'testAmp4Sin kWh', 'testAmp5Sin kWh', 'testAmp6Sin kWh', 'testAmp7Sin kWh'));
+# Remove all the meters. Normally gives "DELETE 27"
+delete from meters where name in ('Electric Utility kWh', 'Electric Utility kWh 2-6', 'Electric Utility kWh in BTU', 'Electric Utility kWh in MTon CO2', 'Natural Gas BTU', 'Natural Gas BTU in Dollar', 'Natural Gas Dollar', 'Natural Gas Cubic Meters', 'Trash Kg', 'Temp Fahrenheit 0-212', 'Temp Fahrenheit in Celsius', 'Electric kW', 'Electric kW 2-6', 'test4DaySin kWh', 'test4HourSin kWh', 'test23MinSin kWh', 'test15MinSin kWh', 'test23MinCos kWh', 'testSqSin kWh', 'testSqCos kWh', 'testAmp1Sin kWh', 'testAmp2Sin kWh', 'testAmp3Sin kWh', 'testAmp4Sin kWh', 'testAmp5Sin kWh', 'testAmp6Sin kWh', 'testAmp7Sin kWh');
+# Quit postgres.
+\q
+*/
 
 module.exports = {
 	generateSineTestingData,
@@ -489,7 +551,7 @@ module.exports = {
 	generateOneMinuteTestingData,
 	generateTestingData,
 	generateVariableAmplitudeTestingData,
-	insertSpecialUnitsAndConversions,
+	insertSpecialUnitsConversionsMeters,
 	insertSpecialUnits,
 	insertSpecialConversions,
 	insertSpecialMeters

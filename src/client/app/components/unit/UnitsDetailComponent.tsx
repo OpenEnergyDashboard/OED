@@ -41,8 +41,8 @@ export default function UnitsDetailComponent() {
 	const tooltipStyle = {
 		display: 'inline-block',
 		fontSize: '50%',
-		// TODO add text for tooltips.
-		tooltipUnitView: loggedInAsAdmin ? 'help.admin.unitview' : 'help.units.unitview'
+		// For now, only an admin can see the unit page.
+		tooltipUnitView: 'help.admin.unitview'
 	};
 	return (
 		<div>

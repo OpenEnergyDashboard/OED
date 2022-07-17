@@ -6,6 +6,8 @@ const { createConversionGraph } = require('./createConversionGraph');
 const { createCikArray } = require('./createConversionArrays');
 const Cik = require('../../models/Cik');
 const { handleSuffixUnits} = require('./handleSuffixUnits');
+const { getConnection } = require('../../db');
+const { refreshAllReadingViews } = require('../../services/refreshAllReadingViews');
 
 /**
  * Creates Cik based on units and conversions and then inserts these values
@@ -30,20 +32,18 @@ async function createPik(conn) {
 	return pik;
 }
 
-// These are used during testing where the functions are called directly with npm.
-async function redoCikNoConn() {
-	conn = await getConnection();
-	redoCik(conn);
-}
-
-async function createPikNoConn() {
-	conn = await getConnection();
-	createPik(conn);
+/**
+ * Needed to call from npm run. Give new name so hopefully won't use in regular code.
+*/
+async function updateCikAndViews() {
+	const conn = getConnection();
+	await redoCik(conn);
+	// We need to update views if Cik changes.
+	await refreshAllReadingViews();
 }
 
 module.exports = {
 	redoCik,
 	createPik,
-	redoCikNoConn,
-	createPikNoConn
+	updateCikAndViews
 };
