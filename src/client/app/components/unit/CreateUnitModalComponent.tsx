@@ -135,6 +135,10 @@ export default function CreateUnitModalComponent() {
 			note
 		}
 
+		// Set default identifier as name if left blank
+		newUnit.identifier = (!newUnit.identifier || newUnit.identifier.length === 0) ? newUnit.name : newUnit.identifier;
+
+
 		// Add the new unit and update the store
 		dispatch(addUnit(newUnit));
 
@@ -237,7 +241,7 @@ export default function CreateUnitModalComponent() {
 					<Button variant="secondary" onClick={handleClose}>
 						<FormattedMessage id="discard.changes" />
 					</Button>
-					<Button variant="primary" onClick={handleSubmit} disabled={!name || !identifier}>
+					<Button variant="primary" onClick={handleSubmit} disabled={!name}>
 						<FormattedMessage id="save.all" />
 					</Button>
 				</Modal.Footer>
