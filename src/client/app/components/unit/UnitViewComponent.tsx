@@ -6,22 +6,17 @@ import { Button } from 'reactstrap';
 import { FormattedMessage } from 'react-intl';
 import EditUnitModalComponent from './EditUnitModalComponent';
 import '../../styles/unit-card-page.css';
-import { useSelector } from 'react-redux';
-import { State } from '../../types/redux/state';
-import { isRoleAdmin } from '../../utils/hasPermissions';
 // I realize that * is already imported from react
 import { useState } from 'react';
 import { UnitData } from 'types/redux/units';
+import translate from '../../utils/translate';
 
 interface UnitViewComponentProps {
 	unit: UnitData;
 }
 
 export default function UnitViewComponent(props: UnitViewComponentProps) {
-
-	// Check for admin status
-	const currentUser = useSelector((state: State) => state.currentUser.profile);
-	const loggedInAsAdmin = (currentUser !== null) && isRoleAdmin(currentUser.role);
+	// Don't check if admin since only an admin is allow to route to this page.
 
 	// Edit Modal Show
 	const [showEditModal, setShowEditModal] = useState(false);
@@ -37,10 +32,10 @@ export default function UnitViewComponent(props: UnitViewComponentProps) {
 	return (
 		<div className="card">
 			<div className="identifier-container">
-				{props.unit.name}
+				{props.unit.identifier}
 			</div>
 			<div className="unit-container">
-				<b><FormattedMessage id="unit.identifier" /></b> {props.unit.identifier}
+				<b><FormattedMessage id="unit.name" /></b> {props.unit.name}
 			</div>
 			<div className="unit-container">
 				<b><FormattedMessage id="unit.type.of.unit" /></b> {props.unit.typeOfUnit}
@@ -52,7 +47,8 @@ export default function UnitViewComponent(props: UnitViewComponentProps) {
 				<b><FormattedMessage id="unit.displayable" /></b> {props.unit.displayable}
 			</div>
 			<div className={props.unit.preferredDisplay.toString()}>
-				<b><FormattedMessage id="unit.preferred.display" /></b> {props.unit.preferredDisplay.toString()}
+				<b><FormattedMessage id="unit.preferred.display" /></b> {translate(`TrueFalseType.${props.unit.preferredDisplay.toString()}`)}
+				{/* <b><FormattedMessage id="unit.preferred.display" /></b> {props.unit.preferredDisplay.toString()} */}
 			</div>
 			<div className="unit-container">
 				<b><FormattedMessage id="unit.sec.in.rate" /></b> {props.unit.secInRate}
@@ -64,15 +60,13 @@ export default function UnitViewComponent(props: UnitViewComponentProps) {
 				{/* Only show first 30 characters so card does not get too big. Should limit to one line */}
 				<b><FormattedMessage id="unit.note" /></b> {props.unit.note.slice(0, 29)}
 			</div>
-			{loggedInAsAdmin &&
-				<div className="edit-btn">
-					<Button variant="Secondary" onClick={handleShow}>
-						<FormattedMessage id="edit.unit" />
-					</Button>
-					{/* Creates a child UnitModalEditComponent */}
-					<EditUnitModalComponent show={showEditModal} unit={props.unit} handleClose={handleClose} />
-				</div>
-			}
+			<div className="edit-btn">
+				<Button variant="Secondary" onClick={handleShow}>
+					<FormattedMessage id="edit.unit" />
+				</Button>
+				{/* Creates a child UnitModalEditComponent */}
+				<EditUnitModalComponent show={showEditModal} unit={props.unit} handleClose={handleClose} />
+			</div>
 		</div>
 	);
 }

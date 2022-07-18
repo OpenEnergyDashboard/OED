@@ -48,7 +48,7 @@ export default function units(state = defaultState, action: UnitsAction) {
 		case ActionType.ConfirmEditedUnit:
 		{
 			// React expects us to return an immutable object in order to invoke a rerender, so we must use spread notation here
-			// Overwrite the unitdata at the edited unit's index with the edited unit's unitdata
+			// Overwrite the unit data at the edited unit's index with the edited unit's unit data
 			// The passed in id should be correct as it is inherited from the pre-edited unit
 			// See EditUnitModalComponent line 134 for details (starts with if(unitHasChanges))
 			const units = {...state.units};

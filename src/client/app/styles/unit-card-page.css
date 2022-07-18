@@ -95,7 +95,7 @@ width: 100%;
 
 .true {
     margin: auto;
-    width: 60%;
+    width: 65%;
     color: white;
     background-color: #00805a;
     box-shadow: 3px 2px 2px gray;
@@ -104,12 +104,11 @@ width: 100%;
     padding-bottom: 1px;
     padding-left: 0px;
     text-align: center;
-    overflow-wrap: break-word; 
 }
 
 .false {
     margin: auto;
-    width: 60%;
+    width: 65%;
     color: white;
     background-color: #a5172b;
     box-shadow: 3px 2px 2px gray;
@@ -118,5 +117,4 @@ width: 100%;
     padding-bottom: 1px;
     padding-left: 0px;
     text-align: center;
-    overflow-wrap: break-word; 
 }

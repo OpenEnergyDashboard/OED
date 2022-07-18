@@ -63,3 +63,9 @@ export enum UserRole {
 	EXPORT = 'export',
 	OBVIUS = 'obvius'
 }
+
+export enum TrueFalseType {
+	// Normally the values here are not used but the ones in data.js so translated.
+	true = 'yes',
+	false = 'no',
+}
