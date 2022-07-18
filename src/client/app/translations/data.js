@@ -281,7 +281,7 @@ const localeData = {
 		"unit.identifier": "Identifier:",
 		"unit.name": "Unit Name:",
 		"unit.note": "Note:",
-		"unit.note.optional": "Note (Optional)",
+		"unit.note.optional": "Note: (Optional)",
 		"unit.preferred.display": "Preferred Display:",
 		"unit.remove": "Remove",
 		"unit.represent": "Unit Represent:",

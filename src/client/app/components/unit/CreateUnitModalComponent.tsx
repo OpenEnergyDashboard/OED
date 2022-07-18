@@ -169,6 +169,7 @@ export default function CreateUnitModalComponent() {
 				<Modal.Header>
 					<Modal.Title> <FormattedMessage id="create.unit" /></Modal.Title>
 				</Modal.Header>
+				{/* when any of the unit are changed call one of the functions. */}
 				<Modal.Body className="show-grid">
 					<div id="container">
 						<div id="modalChild">
@@ -229,7 +230,7 @@ export default function CreateUnitModalComponent() {
 									</div>
 									{/* Preferred display input*/}
 									<div style={formInputStyle}>
-										<label><FormattedMessage id="unit.preferred.display" /></label>
+										<label><FormattedMessage id="unit.preferred.display" /></label><br />
 										<Input
 											type='select'
 											onChange={e => handlePreferredDisplayChange(e)}>
