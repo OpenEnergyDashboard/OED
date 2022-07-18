@@ -62,8 +62,8 @@ export default function UnitsDetailComponent() {
 				<div className="card-container">
 					{/* Create a UnitViewComponent for each UnitData in Units State after sorting by identifier */}
 					{Object.values(unitsState)
-						.sort((unitA: UnitData, unitB: UnitData) => (unitA.name.toLowerCase() > unitB.name.toLowerCase()) ? 1 :
-							(( unitB.name.toLowerCase() > unitA.name.toLowerCase()) ? -1 : 0))
+						.sort((unitA: UnitData, unitB: UnitData) => (unitA.identifier.toLowerCase() > unitB.identifier.toLowerCase()) ? 1 :
+							(( unitB.identifier.toLowerCase() > unitA.identifier.toLowerCase()) ? -1 : 0))
 						.map(unitData => (<UnitViewComponent unit={unitData as UnitData} key={(unitData as UnitData).id} />))}
 				</div>
 			</div>
