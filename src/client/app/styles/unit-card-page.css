@@ -96,9 +96,10 @@ width: 100%;
 .true {
     margin: auto;
     width: 65%;
-    color: white;
-    background-color: #00805a;
-    box-shadow: 3px 2px 2px gray;
+    /* If want to color preferredDisplay background */
+    /* color: white; */
+    /* background-color: #00805a; */
+    /* box-shadow: 3px 2px 2px gray; */
     padding-top: 2px;
     padding-right: 0px;
     padding-bottom: 1px;
@@ -109,8 +110,48 @@ width: 100%;
 .false {
     margin: auto;
     width: 65%;
+    /* If want to color preferredDisplay background */
+    /* color: white; */
+    /* background-color: #a5172b; */
+    /* box-shadow: 3px 2px 2px gray; */
+    padding-top: 2px;
+    padding-right: 0px;
+    padding-bottom: 1px;
+    padding-left: 0px;
+    text-align: center;
+}
+
+.admin {
+    margin: auto;
+    width: 65%;
+    color: white;
+    background-color: #e2c43f;
+    box-shadow: 3px 2px 2px gray;
+    padding-top: 2px;
+    padding-right: 0px;
+    padding-bottom: 1px;
+    padding-left: 0px;
+    text-align: center;
+}
+
+.none {
+    margin: auto;
+    width: 65%;
     color: white;
     background-color: #a5172b;
+    box-shadow: 3px 2px 2px gray;
+    padding-top: 2px;
+    padding-right: 0px;
+    padding-bottom: 1px;
+    padding-left: 0px;
+    text-align: center;
+}
+
+.all {
+    margin: auto;
+    width: 65%;
+    color: white;
+    background-color: #00805a;
     box-shadow: 3px 2px 2px gray;
     padding-top: 2px;
     padding-right: 0px;
