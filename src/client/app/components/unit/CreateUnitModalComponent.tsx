@@ -175,14 +175,6 @@ export default function CreateUnitModalComponent() {
 							{/* Modal content */}
 							<div className="container-fluid">
 								<div style={tableStyle}>
-									{/* Name input*/}
-									<div style={formInputStyle}>
-										<label><FormattedMessage id="unit.name" /></label><br />
-										<Input
-											type='text'
-											onChange={e => handleNameChange(e)}
-											required value={name} />
-									</div>
 									{/* Identifier input*/}
 									<div style={formInputStyle}>
 										<label><FormattedMessage id="unit.identifier" /></label><br />
@@ -190,6 +182,14 @@ export default function CreateUnitModalComponent() {
 											type='text'
 											onChange={e => handleIdentifierChange(e)}
 											value={identifier} />
+									</div>
+									{/* Name input*/}
+									<div style={formInputStyle}>
+										<label><FormattedMessage id="unit.name" /></label><br />
+										<Input
+											type='text'
+											onChange={e => handleNameChange(e)}
+											required value={name} />
 									</div>
 									{/* Type of input input*/}
 									<div style={formInputStyle}>
@@ -268,9 +268,11 @@ export default function CreateUnitModalComponent() {
 					</div>
 				</Modal.Body>
 				<Modal.Footer>
+					{/* Hides the modal */}
 					<Button variant="secondary" onClick={handleClose}>
 						<FormattedMessage id="discard.changes" />
 					</Button>
+					{/* On click calls the function handleSaveChanges in this component */}
 					<Button variant="primary" onClick={handleSubmit} disabled={!name}>
 						<FormattedMessage id="save.all" />
 					</Button>

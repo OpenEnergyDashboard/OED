@@ -174,14 +174,7 @@ export default function EditUnitModalComponent(props: EditUnitModalComponentProp
 				<Modal.Body className="show-grid">
 					<div id="container">
 						<div id="modalChild" style={tableStyle}>
-							{/* Name input*/}
-							<div style={formInputStyle}>
-								<label><FormattedMessage id="unit.name" /></label><br />
-								<Input
-									type='text'
-									onChange={e => handleNameChange(e)}
-									required value={name}
-								/></div>
+							{/* Identifier input*/}
 							<div style={formInputStyle}>
 								<FormattedMessage id="unit.identifier" /> <span><br />
 									<Input
@@ -191,6 +184,15 @@ export default function EditUnitModalComponent(props: EditUnitModalComponentProp
 										onChange={e => handleIdentifierChange(e)}
 									/></span>
 							</div>
+							{/* Name input*/}
+							<div style={formInputStyle}>
+								<label><FormattedMessage id="unit.name" /></label><br />
+								<Input
+									type='text'
+									onChange={e => handleNameChange(e)}
+									required value={name}
+								/></div>
+							{/* Type of input input*/}
 							<div style={formInputStyle}>
 								<label><FormattedMessage id="unit.type.of.unit" /> </label>
 								<Input
@@ -202,6 +204,7 @@ export default function EditUnitModalComponent(props: EditUnitModalComponentProp
 									})}
 								</Input>
 							</div>
+							{/* Unit represent input*/}
 							<div style={formInputStyle}>
 								<label><FormattedMessage id="unit.represent" /> </label>
 								<Input
@@ -213,6 +216,7 @@ export default function EditUnitModalComponent(props: EditUnitModalComponentProp
 									})}
 								</Input>
 							</div>
+							{/* Displayable type input*/}
 							<div style={formInputStyle}>
 								<label><FormattedMessage id="unit.displayable" /> </label>
 								<Input
@@ -224,6 +228,7 @@ export default function EditUnitModalComponent(props: EditUnitModalComponentProp
 									})}
 								</Input>
 							</div>
+							{/* Preferred display input*/}
 							<div style={formInputStyle}>
 								<label><FormattedMessage id="unit.preferred.display" /> </label>
 								<Input
@@ -235,6 +240,7 @@ export default function EditUnitModalComponent(props: EditUnitModalComponentProp
 									})}
 								</Input>
 							</div>
+							{/* Seconds in rate input*/}
 							<div style={formInputStyle}>
 								<FormattedMessage id="unit.sec.in.rate" /> <span><br />
 									<Input
@@ -244,6 +250,7 @@ export default function EditUnitModalComponent(props: EditUnitModalComponentProp
 										placeholder="Sec In Rate"
 									/></span>
 							</div>
+							{/* Suffix input*/}
 							<div style={formInputStyle}>
 								<label><FormattedMessage id="unit.suffix" /> </label>
 								<Input
@@ -253,6 +260,7 @@ export default function EditUnitModalComponent(props: EditUnitModalComponentProp
 									onChange={e => handleSuffixChange(e)}
 								/>
 							</div>
+							{/* Note input*/}
 							<div style={formInputStyle}>
 								<label><FormattedMessage id="unit.note" /> </label>
 								<Input
