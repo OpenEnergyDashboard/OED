@@ -32,10 +32,10 @@ export default function UnitViewComponent(props: UnitViewComponentProps) {
 	return (
 		<div className="card">
 			<div className="identifier-container">
-				{props.unit.name}
+				{props.unit.identifier}
 			</div>
 			<div className="unit-container">
-				<b><FormattedMessage id="unit.identifier" /></b> {props.unit.identifier}
+				<b><FormattedMessage id="unit.name" /></b> {props.unit.name}
 			</div>
 			<div className="unit-container">
 				<b><FormattedMessage id="unit.type.of.unit" /></b> {props.unit.typeOfUnit}
