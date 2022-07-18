@@ -13,6 +13,7 @@ import { removeUnsavedChanges } from '../../actions/unsavedWarning';
 // I realize that * is already imported from react
 import { useState } from 'react';
 import '../../styles/Modal.unit.css';
+import { TrueFalseType } from '../../types/items';
 
 interface EditUnitModalComponentProps {
 	show: boolean;
@@ -128,7 +129,6 @@ export default function EditUnitModalComponent(props: EditUnitModalComponentProp
 				props.unit.secInRate != secInRate ||
 				props.unit.suffix != suffix ||
 				props.unit.note != note);
-
 		// Only do work if there are changes
 		if (unitHasChanges) {
 			const editedUnit = {
@@ -145,6 +145,11 @@ export default function EditUnitModalComponent(props: EditUnitModalComponentProp
 			}
 			// Save our changes by dispatching the submitEditedUnit action
 			dispatch(submitEditedUnit(editedUnit));
+			// The updated unit is not fetched to save time. However, the identifier might have been
+			// automatically set if it was empty. Mimic that here.
+			if (editedUnit.identifier === '') {
+				editedUnit.identifier = editedUnit.name;
+			}
 			dispatch(removeUnsavedChanges());
 		}
 
@@ -172,12 +177,15 @@ export default function EditUnitModalComponent(props: EditUnitModalComponentProp
 							{/* Name input*/}
 							<div style={formInputStyle}>
 								<label><FormattedMessage id="unit.name" /></label><br />
-								<Input type='text' onChange={e => handleNameChange(e)} required value={name} />
-							</div>
+								<Input
+									type='text'
+									onChange={e => handleNameChange(e)}
+									required value={name}
+								/></div>
 							<div style={formInputStyle}>
 								<FormattedMessage id="unit.identifier" /> <span><br />
 									<Input
-										name="identifier" type="text"
+										type="text"
 										defaultValue={identifier}
 										placeholder="Identifier"
 										onChange={e => handleIdentifierChange(e)}
@@ -185,7 +193,10 @@ export default function EditUnitModalComponent(props: EditUnitModalComponentProp
 							</div>
 							<div style={formInputStyle}>
 								<label><FormattedMessage id="unit.type.of.unit" /> </label>
-								<Input name="typeOfUnit" type='select' defaultValue={typeOfUnit} onChange={e => handleTypeOfUnitChange(e)} >
+								<Input
+									type='select'
+									defaultValue={typeOfUnit}
+									onChange={e => handleTypeOfUnitChange(e)}>
 									{Object.keys(UnitType).map(key => {
 										return (<option value={key} key={key}>{translate(`UnitType.${key}`)}</option>)
 									})}
@@ -193,7 +204,10 @@ export default function EditUnitModalComponent(props: EditUnitModalComponentProp
 							</div>
 							<div style={formInputStyle}>
 								<label><FormattedMessage id="unit.represent" /> </label>
-								<Input name="unitRepresent" type='select' defaultValue={unitRepresent} onChange={e => handleUnitRepresentChange(e)}>
+								<Input
+									type='select'
+									defaultValue={unitRepresent}
+									onChange={e => handleUnitRepresentChange(e)}>
 									{Object.keys(UnitRepresentType).map(key => {
 										return (<option value={key} key={key}>{translate(`UnitRepresentType.${key}`)}</option>)
 									})}
@@ -201,7 +215,10 @@ export default function EditUnitModalComponent(props: EditUnitModalComponentProp
 							</div>
 							<div style={formInputStyle}>
 								<label><FormattedMessage id="unit.displayable" /> </label>
-								<Input name="displayable" type='select' defaultValue={displayable} onChange={e => handleDisplayableChange(e)}>
+								<Input
+									type='select'
+									defaultValue={displayable}
+									onChange={e => handleDisplayableChange(e)}>
 									{Object.keys(DisplayableType).map(key => {
 										return (<option value={key} key={key}>{translate(`DisplayableType.${key}`)}</option>)
 									})}
@@ -209,15 +226,18 @@ export default function EditUnitModalComponent(props: EditUnitModalComponentProp
 							</div>
 							<div style={formInputStyle}>
 								<label><FormattedMessage id="unit.preferred.display" /> </label>
-								<Input name="preferredDisplay" type='select' defaultValue={preferredDisplay.toString()} onChange={e => handlePreferredDisplayChange(e)}>
-									<option value="true"> {translate('yes')} </option>
-									<option value="false"> {translate('no')} </option>
+								<Input
+									type='select'
+									defaultValue={preferredDisplay.toString()}
+									onChange={e => handlePreferredDisplayChange(e)}>
+									{Object.keys(TrueFalseType).map(key => {
+										return (<option value={key} key={key}>{translate(`TrueFalseType.${key}`)}</option>)
+									})}
 								</Input>
 							</div>
 							<div style={formInputStyle}>
 								<FormattedMessage id="unit.sec.in.rate" /> <span><br />
 									<Input
-										name="secInRate"
 										type="number"
 										defaultValue={secInRate}
 										onChange={e => handleSecInRateChange(e)}
@@ -250,8 +270,8 @@ export default function EditUnitModalComponent(props: EditUnitModalComponentProp
 					<Button variant="secondary" onClick={handleClose}>
 						<FormattedMessage id="discard.changes" />
 					</Button>
-					{/* On click calls the function onSaveChanges in this componenet */}
-					<Button variant="primary" onClick={handleSaveChanges} disabled={!name || !identifier}>
+					{/* On click calls the function handleSaveChanges in this component */}
+					<Button variant="primary" onClick={handleSaveChanges} disabled={!name}>
 						<FormattedMessage id="save.all" />
 					</Button>
 				</Modal.Footer>

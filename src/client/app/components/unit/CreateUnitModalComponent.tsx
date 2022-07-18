@@ -11,6 +11,7 @@ import { UnitRepresentType, DisplayableType, UnitType } from '../../types/redux/
 import { useDispatch } from 'react-redux';
 import { addUnit } from '../../actions/units';
 import { useState } from 'react';
+import { TrueFalseType } from '../../types/items';
 
 export default function CreateUnitModalComponent() {
 
@@ -35,8 +36,9 @@ export default function CreateUnitModalComponent() {
 	}
 
 	/* State */
-	// We can definitely sacrifice readibility here (and in the render) to consolidate these into a single function if need be
+	// We can definitely sacrifice readability here (and in the render) to consolidate these into a single function if need be
 	// NOTE a lot of this is copied from the UnitModalEditComponent, in the future we could make a single component to handle all edit pages if need be
+	// TODO Katherine with Delaney help are going to try to consolidate to create reusable functions.
 
 	// Modal show
 	const [showModal, setShowModal] = useState(false);
@@ -115,6 +117,9 @@ export default function CreateUnitModalComponent() {
 		setNote(defaultValues.note);
 	}
 
+	// Unlike edit, we decided to discard and inputs when you choose to leave the page. The reasoning is
+	// that create starts from an empty template.
+
 	// Submit
 	const handleSubmit = () => {
 
@@ -142,7 +147,6 @@ export default function CreateUnitModalComponent() {
 		// Add the new unit and update the store
 		dispatch(addUnit(newUnit));
 
-		// TODO bring this up in next meeting since the functionality of resetting state does not match editunit
 		resetState();
 	};
 
@@ -165,7 +169,6 @@ export default function CreateUnitModalComponent() {
 				<Modal.Header>
 					<Modal.Title> <FormattedMessage id="create.unit" /></Modal.Title>
 				</Modal.Header>
-				{/* TODO: Styling of the form could use some work to make textboxes bigger, etc */}
 				<Modal.Body className="show-grid">
 					<div id="container">
 						<div id="modalChild">
@@ -175,17 +178,26 @@ export default function CreateUnitModalComponent() {
 									{/* Name input*/}
 									<div style={formInputStyle}>
 										<label><FormattedMessage id="unit.name" /></label><br />
-										<Input type='text' onChange={e => handleNameChange(e)} required value={name} />
+										<Input
+											type='text'
+											onChange={e => handleNameChange(e)}
+											required value={name} />
 									</div>
 									{/* Identifier input*/}
 									<div style={formInputStyle}>
 										<label><FormattedMessage id="unit.identifier" /></label><br />
-										<Input type='text' onChange={e => handleIdentifierChange(e)} required value={identifier} />
+										<Input
+											type='text'
+											onChange={e => handleIdentifierChange(e)}
+											value={identifier} />
 									</div>
 									{/* Type of input input*/}
 									<div style={formInputStyle}>
 										<label><FormattedMessage id="unit.type.of.unit" /></label><br />
-										<Input type='select' onChange={e => handleTypeOfUnitChange(e)} required value={typeOfUnit}>
+										<Input
+											type='select'
+											onChange={e => handleTypeOfUnitChange(e)}
+											required value={typeOfUnit}>
 											{Object.keys(UnitType).map(key => {
 												return (<option value={key} key={key}>{translate(`UnitType.${key}`)}</option>)
 											})}
@@ -194,7 +206,10 @@ export default function CreateUnitModalComponent() {
 									{/* Unit represent input*/}
 									<div style={formInputStyle}>
 										<label><FormattedMessage id="unit.represent" /></label><br />
-										<Input type='select' onChange={e => handleUnitRepresentChange(e)} required value={unitRepresent}>
+										<Input
+											type='select'
+											onChange={e => handleUnitRepresentChange(e)}
+											required value={unitRepresent}>
 											{Object.keys(UnitRepresentType).map(key => {
 												return (<option value={key} key={key}>{translate(`UnitRepresentType.${key}`)}</option>)
 											})}
@@ -203,7 +218,10 @@ export default function CreateUnitModalComponent() {
 									{/* Displayable type input*/}
 									<div style={formInputStyle}>
 										<label><FormattedMessage id="unit.dropdown.displayable" /></label><br />
-										<Input type='select' onChange={e => handleDisplayableChange(e)} required value={displayable} >
+										<Input
+											type='select'
+											onChange={e => handleDisplayableChange(e)}
+											required value={displayable} >
 											{Object.keys(DisplayableType).map(key => {
 												return (<option value={key} key={key}>{translate(`DisplayableType.${key}`)}</option>)
 											})}
@@ -212,25 +230,37 @@ export default function CreateUnitModalComponent() {
 									{/* Preferred display input*/}
 									<div style={formInputStyle}>
 										<label><FormattedMessage id="unit.preferred.display" /></label>
-										<Input type='select' onChange={e => handlePreferredDisplayChange(e)}>
-											<option value="true"> {translate('yes')} </option>
-											<option value="false"> {translate('no')} </option>
+										<Input
+											type='select'
+											onChange={e => handlePreferredDisplayChange(e)}>
+											{Object.keys(TrueFalseType).map(key => {
+												return (<option value={key} key={key}>{translate(`TrueFalseType.${key}`)}</option>)
+											})}
 										</Input>
 									</div>
 									{/* Seconds in rate input*/}
 									<div style={formInputStyle}>
 										<label><FormattedMessage id="unit.sec.in.rate" /></label><br />
-										<Input type='number' onChange={e => handleSecInRateChange(e)} required value={secInRate} />
+										<Input
+											type='number'
+											onChange={e => handleSecInRateChange(e)}
+											required value={secInRate} />
 									</div>
 									{/* Suffix input*/}
 									<div style={formInputStyle}>
 										<label><FormattedMessage id="unit.suffix" /></label><br />
-										<Input type='text' onChange={e => handleSuffixChange(e)} required value={suffix} />
+										<Input
+											type='text'
+											onChange={e => handleSuffixChange(e)}
+											required value={suffix} />
 									</div>
 									{/* Note input*/}
 									<div style={formInputStyle}>
 										<label><FormattedMessage id="unit.note.optional" /></label><br />
-										<Input type='textarea' onChange={e => handleNoteChange(e)} value={note} />
+										<Input
+											type='textarea'
+											onChange={e => handleNoteChange(e)}
+											value={note} />
 									</div>
 								</div>
 							</div>

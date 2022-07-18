@@ -72,10 +72,8 @@ export function fetchUnitsDetailsIfNeeded(): Thunk {
 
 export function submitEditedUnit(editedUnit: t.UnitData): Thunk {
 	return async (dispatch: Dispatch, getState: GetState) => {
-
 		// check if unitData is already submitting (indexOf returns -1 if item does not exist in array)
 		if (getState().units.submitting.indexOf(editedUnit.id) === -1) {
-
 			// Inform the store we are about to edit the passed in unit
 			// Pushes unitId of the unitData to submit onto the submitting state array
 			dispatch(submitUnitEdits(editedUnit.id));

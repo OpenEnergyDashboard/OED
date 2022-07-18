@@ -47,8 +47,7 @@ router.post('/edit', async (req, res) => {
 				minLength: 1
 			},
 			identifier: {
-				type: 'string',
-				minLength: 1
+				type: 'string'
 			},
 			unitRepresent: {
 				type: 'string',
@@ -115,7 +114,7 @@ router.post('/addUnit', async (req, res) => {
 		required: ['name', 'identifier', 'unitRepresent', 'typeOfUnit', 'displayable', 'preferredDisplay'],
 		properties: {
 			id: {
-				type: 'nuber',
+				type: 'number',
 			},
 			name: {
 				type: 'string',
