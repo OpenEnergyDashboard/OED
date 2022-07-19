@@ -10,6 +10,8 @@ import translate from '../../utils/translate';
 import { useDispatch } from 'react-redux';
 import { submitEditedUnit } from '../../actions/units';
 import { removeUnsavedChanges } from '../../actions/unsavedWarning';
+import TooltipMarkerComponent from '../TooltipMarkerComponent';
+import TooltipHelpContainer from '../../containers/TooltipHelpContainer';
 // I realize that * is already imported from react
 import { useState } from 'react';
 import '../../styles/Modal.unit.css';
@@ -155,6 +157,13 @@ export default function EditUnitModalComponent(props: EditUnitModalComponentProp
 
 	}
 
+	const tooltipStyle = {
+		display: 'inline-block',
+		fontSize: '60%',
+		// For now, it uses the same help text from unit view page.
+		tooltipEditUnitView: 'help.admin.unitview'
+	};
+
 	const formInputStyle: React.CSSProperties = {
 		paddingBottom: '5px'
 	}
@@ -168,7 +177,12 @@ export default function EditUnitModalComponent(props: EditUnitModalComponentProp
 
 			<Modal show={props.show} onHide={props.handleClose}>
 				<Modal.Header>
-					<Modal.Title> <FormattedMessage id="edit.unit" /></Modal.Title>
+					<Modal.Title> <FormattedMessage id="edit.unit" />
+						<TooltipHelpContainer page='units' />
+						<div style={tooltipStyle}>
+							<TooltipMarkerComponent page='units' helpTextId={tooltipStyle.tooltipEditUnitView} />
+						</div>
+					</Modal.Title>
 				</Modal.Header>
 				{/* when any of the unit are changed call one of the functions. */}
 				<Modal.Body className="show-grid">
