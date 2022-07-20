@@ -29,63 +29,91 @@ export default function EditUnitModalComponent(props: EditUnitModalComponentProp
 
 	const dispatch = useDispatch();
 
+	const values = {
+		name: props.unit.name,
+		identifier: props.unit.identifier,
+		typeOfUnit: props.unit.typeOfUnit,
+		unitRepresent: props.unit.unitRepresent,
+		displayable: props.unit.displayable,
+		preferredDisplay: props.unit.preferredDisplay,
+		secInRate: props.unit.secInRate,
+		suffix: props.unit.suffix,
+		note: props.unit.note,
+		id: props.unit.id,
+		unitIndex: props.unit.unitIndex
+	}
+
 	/* State */
 	// We can definitely sacrifice readibility here (and in the render) to consolidate these into a single function if need be
 
+	const [state, setState] = useState(values);
+
+	const handleStringChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+		setState({ ...state, [e.target.name]: e.target.value });
+	}
+
+	const handleBooleanChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+		setState({ ...state, [e.target.name]: JSON.parse(e.target.value) });
+	}
+
+	const handleNumberChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+		setState({ ...state, [e.target.name]: Number(e.target.value) });
+	}
+
 	// name
-	const [name, setName] = useState(props.unit.name);
-	const handleNameChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-		setName(e.target.value);
-	}
+	// const [name, setName] = useState(props.unit.name);
+	// const handleNameChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+	// 	setName(e.target.value);
+	// }
 
-	// identifier
-	const [identifier, setIdentifier] = useState(props.unit.identifier);
-	const handleIdentifierChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-		setIdentifier(e.target.value);
-	}
+	// // identifier
+	// const [identifier, setIdentifier] = useState(props.unit.identifier);
+	// const handleIdentifierChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+	// 	setIdentifier(e.target.value);
+	// }
 
-	// typeOfUnit
-	const [typeOfUnit, setTypeOfUnit] = useState(props.unit.typeOfUnit);
-	const handleTypeOfUnitChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-		setTypeOfUnit(e.target.value as UnitType);
-	}
+	// // typeOfUnit
+	// const [typeOfUnit, setTypeOfUnit] = useState(props.unit.typeOfUnit);
+	// const handleTypeOfUnitChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+	// 	setTypeOfUnit(e.target.value as UnitType);
+	// }
 
-	// unitRepresent
-	const [unitRepresent, setUnitRepresent] = useState(props.unit.unitRepresent);
-	const handleUnitRepresentChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-		setUnitRepresent(e.target.value as UnitRepresentType)
-	}
+	// // unitRepresent
+	// const [unitRepresent, setUnitRepresent] = useState(props.unit.unitRepresent);
+	// const handleUnitRepresentChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+	// 	setUnitRepresent(e.target.value as UnitRepresentType)
+	// }
 
-	// displayable
-	const [displayable, setDisplayable] = useState(props.unit.displayable);
-	const handleDisplayableChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-		setDisplayable(e.target.value as DisplayableType);
-	}
+	// // displayable
+	// const [displayable, setDisplayable] = useState(props.unit.displayable);
+	// const handleDisplayableChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+	// 	setDisplayable(e.target.value as DisplayableType);
+	// }
 
-	// preferredDisplay
-	const [preferredDisplay, setPreferredDisplay] = useState(props.unit.preferredDisplay);
-	const handlePreferredDisplayChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-		setPreferredDisplay(JSON.parse(e.target.value));
-	}
+	// // preferredDisplay
+	// const [preferredDisplay, setPreferredDisplay] = useState(props.unit.preferredDisplay);
+	// const handlePreferredDisplayChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+	// 	setPreferredDisplay(JSON.parse(e.target.value));
+	// }
 
-	// secInRate
-	const [secInRate, setSecInRate] = useState(props.unit.secInRate);
-	const handleSecInRateChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-		setSecInRate(Number(e.target.value));
+	// // secInRate
+	// const [secInRate, setSecInRate] = useState(props.unit.secInRate);
+	// const handleSecInRateChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+	// 	setSecInRate(Number(e.target.value));
 
-	}
+	// }
 
-	// suffix
-	const [suffix, setSuffix] = useState(props.unit.suffix);
-	const handleSuffixChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-		setSuffix(e.target.value);
-	}
+	// // suffix
+	// const [suffix, setSuffix] = useState(props.unit.suffix);
+	// const handleSuffixChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+	// 	setSuffix(e.target.value);
+	// }
 
-	// note
-	const [note, setNote] = useState(props.unit.note);
-	const handleNoteChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-		setNote(e.target.value);
-	}
+	// // note
+	// const [note, setNote] = useState(props.unit.note);
+	// const handleNoteChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+	// 	setNote(e.target.value);
+	// }
 	/* End State */
 
 	// Reset the state to default values
@@ -94,15 +122,7 @@ export default function EditUnitModalComponent(props: EditUnitModalComponentProp
 	// This allows us to reset our state to match the store in the event of an edit failure
 	// Failure to edit units will not trigger a re-render, as no state has changed. Therefore, we must manually reset the values
 	const resetState = () => {
-		setName(props.unit.name);
-		setIdentifier(props.unit.identifier);
-		setTypeOfUnit(props.unit.typeOfUnit);
-		setUnitRepresent(props.unit.unitRepresent);
-		setDisplayable(props.unit.displayable);
-		setPreferredDisplay(props.unit.preferredDisplay);
-		setSecInRate(props.unit.secInRate);
-		setSuffix(props.unit.suffix);
-		setNote(props.unit.note);
+		setState(values);
 	}
 
 	const handleClose = () => {
@@ -122,35 +142,27 @@ export default function EditUnitModalComponent(props: EditUnitModalComponentProp
 		// Check for changes by comparing state to props
 		const unitHasChanges =
 			(
-				props.unit.name != name ||
-				props.unit.identifier != identifier ||
-				props.unit.typeOfUnit != typeOfUnit ||
-				props.unit.unitRepresent != unitRepresent ||
-				props.unit.displayable != displayable ||
-				props.unit.preferredDisplay != preferredDisplay ||
-				props.unit.secInRate != secInRate ||
-				props.unit.suffix != suffix ||
-				props.unit.note != note);
+				props.unit.name != state.name ||
+				props.unit.identifier != state.identifier ||
+				props.unit.typeOfUnit != state.typeOfUnit ||
+				props.unit.unitRepresent != state.unitRepresent ||
+				props.unit.displayable != state.displayable ||
+				props.unit.preferredDisplay != state.preferredDisplay ||
+				props.unit.secInRate != state.secInRate ||
+				props.unit.suffix != state.suffix ||
+				props.unit.note != state.note);
 		// Only do work if there are changes
 		if (unitHasChanges) {
-			const editedUnit = {
-				...props.unit,
-				name,
-				identifier,
-				unitRepresent,
-				typeOfUnit,
-				displayable,
-				preferredDisplay,
-				secInRate,
-				suffix,
-				note
-			}
+			// const editedUnit = {
+			// 	...props.unit,
+			// 	state
+			// }
 			// Save our changes by dispatching the submitEditedUnit action
-			dispatch(submitEditedUnit(editedUnit));
+			dispatch(submitEditedUnit(state));
 			// The updated unit is not fetched to save time. However, the identifier might have been
 			// automatically set if it was empty. Mimic that here.
-			if (editedUnit.identifier === '') {
-				editedUnit.identifier = editedUnit.name;
+			if (state.identifier === '') {
+				state.identifier = state.name;
 			}
 			dispatch(removeUnsavedChanges());
 		}
@@ -195,26 +207,29 @@ export default function EditUnitModalComponent(props: EditUnitModalComponentProp
 									<div style={formInputStyle}>
 										<label><FormattedMessage id="unit.identifier" /></label><br />
 										<Input
+											name="identifier"
 											type="text"
-											onChange={e => handleIdentifierChange(e)}
-											defaultValue={identifier}
+											onChange={e => handleStringChange(e)}
+											defaultValue={state.identifier}
 											placeholder="Identifier" />
 										<div />
 										{/* Name input*/}
 										<div style={formInputStyle}>
 											<label><FormattedMessage id="unit.name" /></label><br />
 											<Input
+												name='name'
 												type='text'
-												onChange={e => handleNameChange(e)}
-												required value={name} />
+												onChange={e => handleStringChange(e)}
+												required value={state.name} />
 										</div>
 										{/* Type of input input*/}
 										<div style={formInputStyle}>
 											<label><FormattedMessage id="unit.type.of.unit" /></label><br />
 											<Input
+												name='typeOfUnit'
 												type='select'
-												onChange={e => handleTypeOfUnitChange(e)}>
-										defaultValue={typeOfUnit}
+												onChange={e => handleStringChange(e)}>
+												defaultValue={state.typeOfUnit}
 												{Object.keys(UnitType).map(key => {
 													return (<option value={key} key={key}>{translate(`UnitType.${key}`)}</option>)
 												})}
@@ -224,9 +239,10 @@ export default function EditUnitModalComponent(props: EditUnitModalComponentProp
 										<div style={formInputStyle}>
 											<label><FormattedMessage id="unit.represent" /></label><br />
 											<Input
+												name='unitRepresent'
 												type='select'
-												defaultValue={unitRepresent}
-												onChange={e => handleUnitRepresentChange(e)}>
+												defaultValue={state.unitRepresent}
+												onChange={e => handleStringChange(e)}>
 												{Object.keys(UnitRepresentType).map(key => {
 													return (<option value={key} key={key}>{translate(`UnitRepresentType.${key}`)}</option>)
 												})}
@@ -236,9 +252,10 @@ export default function EditUnitModalComponent(props: EditUnitModalComponentProp
 										<div style={formInputStyle}>
 											<label><FormattedMessage id="unit.displayable" /></label><br />
 											<Input
+												name='displayable'
 												type='select'
-												defaultValue={displayable}
-												onChange={e => handleDisplayableChange(e)}>
+												defaultValue={state.displayable}
+												onChange={e => handleStringChange(e)}>
 												{Object.keys(DisplayableType).map(key => {
 													return (<option value={key} key={key}>{translate(`DisplayableType.${key}`)}</option>)
 												})}
@@ -248,9 +265,10 @@ export default function EditUnitModalComponent(props: EditUnitModalComponentProp
 										<div style={formInputStyle}>
 											<label><FormattedMessage id="unit.preferred.display" /></label><br />
 											<Input
+												name='preferredDisplay'
 												type='select'
-												defaultValue={preferredDisplay.toString()}
-												onChange={e => handlePreferredDisplayChange(e)}>
+												defaultValue={state.preferredDisplay.toString()}
+												onChange={e => handleBooleanChange(e)}>
 												{Object.keys(TrueFalseType).map(key => {
 													return (<option value={key} key={key}>{translate(`TrueFalseType.${key}`)}</option>)
 												})}
@@ -260,6 +278,7 @@ export default function EditUnitModalComponent(props: EditUnitModalComponentProp
 										<div style={formInputStyle}>
 											<label><FormattedMessage id="unit.sec.in.rate" /></label><br />
 											<Input
+<<<<<<< Updated upstream
 												type="number"												
 												defaultValue={secInRate}
 												onChange={e => handleSecInRateChange(e)}
@@ -267,24 +286,33 @@ export default function EditUnitModalComponent(props: EditUnitModalComponentProp
 												min="1"
 												//TODO validate negative input for rate
 												oninput="validity.valid||(value='');"/>
+=======
+												name='secInRate'
+												type="number"
+												defaultValue={state.secInRate}
+												onChange={e => handleNumberChange(e)}
+												placeholder="Sec In Rate" />
+>>>>>>> Stashed changes
 										</div>
 										{/* Suffix input*/}
 										<div style={formInputStyle}>
 											<label><FormattedMessage id="unit.suffix" /></label><br />
 											<Input
+												name="suffix"
 												type="text"
-												defaultValue={suffix}
+												defaultValue={state.suffix}
 												placeholder="Suffix"
-												onChange={e => handleSuffixChange(e)} />
+												onChange={e => handleStringChange(e)} />
 										</div>
 										{/* Note input*/}
 										<div style={formInputStyle}>
 											<label><FormattedMessage id="unit.note" /></label><br />
 											<Input
+												name="note"
 												type="textarea"
-												defaultValue={note}
+												defaultValue={state.note}
 												placeholder="Note"
-												onChange={e => handleNoteChange(e)} />
+												onChange={e => handleStringChange(e)} />
 										</div>
 									</div>
 								</div>
@@ -298,7 +326,7 @@ export default function EditUnitModalComponent(props: EditUnitModalComponentProp
 						<FormattedMessage id="discard.changes" />
 					</Button>
 					{/* On click calls the function handleSaveChanges in this component */}
-					<Button variant="primary" onClick={handleSaveChanges} disabled={!name}>
+					<Button variant="primary" onClick={handleSaveChanges} disabled={!state.name}>
 						<FormattedMessage id="save.all" />
 					</Button>
 				</Modal.Footer>
