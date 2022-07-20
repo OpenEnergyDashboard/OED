@@ -260,10 +260,13 @@ export default function EditUnitModalComponent(props: EditUnitModalComponentProp
 										<div style={formInputStyle}>
 											<label><FormattedMessage id="unit.sec.in.rate" /></label><br />
 											<Input
-												type="number"
+												type="number"												
 												defaultValue={secInRate}
 												onChange={e => handleSecInRateChange(e)}
-												placeholder="Sec In Rate" />
+												placeholder="Sec In Rate" 
+												min="1"
+												//TODO validate negative input for rate
+												oninput="validity.valid||(value='');"/>
 										</div>
 										{/* Suffix input*/}
 										<div style={formInputStyle}>
