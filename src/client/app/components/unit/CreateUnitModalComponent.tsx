@@ -185,7 +185,10 @@ export default function CreateUnitModalComponent() {
 											name='secInRate'
 											type='number'
 											onChange={e => handleNumberChange(e)}
-											required value={state.secInRate} />
+											required value={state.secInRate}
+											// TODO validate negative input by typing for rate but database stops it.
+											// This stops negative input by use of arrows to change value.
+											min="1" />
 									</div>
 									{/* Suffix input*/}
 									<div style={formInputStyle}>

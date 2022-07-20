@@ -224,9 +224,9 @@ export default function EditUnitModalComponent(props: EditUnitModalComponentProp
 												defaultValue={state.secInRate}
 												onChange={e => handleNumberChange(e)}
 												placeholder="Sec In Rate"
-												min="1"
-												//TODO validate negative input for rate
-												oninput="validity.valid||(value='');"/>
+												// TODO validate negative input by typing for rate but database stops it.
+												// This stops negative input by use of arrows to change value.
+												min="1" />
 										</div>
 										{/* Suffix input*/}
 										<div style={formInputStyle}>
