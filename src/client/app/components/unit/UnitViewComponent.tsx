@@ -43,7 +43,7 @@ export default function UnitViewComponent(props: UnitViewComponentProps) {
 			<div className="unit-container">
 				<b><FormattedMessage id="unit.represent" /></b> {props.unit.unitRepresent}
 			</div>
-			<div className="unit-container">
+			<div className={props.unit.displayable.toString()}>
 				<b><FormattedMessage id="unit.displayable" /></b> {props.unit.displayable}
 			</div>
 			<div className={props.unit.preferredDisplay.toString()}>
