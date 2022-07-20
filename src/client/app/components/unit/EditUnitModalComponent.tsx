@@ -29,6 +29,7 @@ export default function EditUnitModalComponent(props: EditUnitModalComponentProp
 
 	const dispatch = useDispatch();
 
+	// Set existing unit values
 	const values = {
 		name: props.unit.name,
 		identifier: props.unit.identifier,
@@ -44,8 +45,7 @@ export default function EditUnitModalComponent(props: EditUnitModalComponentProp
 	}
 
 	/* State */
-	// We can definitely sacrifice readibility here (and in the render) to consolidate these into a single function if need be
-
+	// Handlers for each type of input change
 	const [state, setState] = useState(values);
 
 	const handleStringChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -59,61 +59,6 @@ export default function EditUnitModalComponent(props: EditUnitModalComponentProp
 	const handleNumberChange = (e: React.ChangeEvent<HTMLInputElement>) => {
 		setState({ ...state, [e.target.name]: Number(e.target.value) });
 	}
-
-	// name
-	// const [name, setName] = useState(props.unit.name);
-	// const handleNameChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-	// 	setName(e.target.value);
-	// }
-
-	// // identifier
-	// const [identifier, setIdentifier] = useState(props.unit.identifier);
-	// const handleIdentifierChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-	// 	setIdentifier(e.target.value);
-	// }
-
-	// // typeOfUnit
-	// const [typeOfUnit, setTypeOfUnit] = useState(props.unit.typeOfUnit);
-	// const handleTypeOfUnitChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-	// 	setTypeOfUnit(e.target.value as UnitType);
-	// }
-
-	// // unitRepresent
-	// const [unitRepresent, setUnitRepresent] = useState(props.unit.unitRepresent);
-	// const handleUnitRepresentChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-	// 	setUnitRepresent(e.target.value as UnitRepresentType)
-	// }
-
-	// // displayable
-	// const [displayable, setDisplayable] = useState(props.unit.displayable);
-	// const handleDisplayableChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-	// 	setDisplayable(e.target.value as DisplayableType);
-	// }
-
-	// // preferredDisplay
-	// const [preferredDisplay, setPreferredDisplay] = useState(props.unit.preferredDisplay);
-	// const handlePreferredDisplayChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-	// 	setPreferredDisplay(JSON.parse(e.target.value));
-	// }
-
-	// // secInRate
-	// const [secInRate, setSecInRate] = useState(props.unit.secInRate);
-	// const handleSecInRateChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-	// 	setSecInRate(Number(e.target.value));
-
-	// }
-
-	// // suffix
-	// const [suffix, setSuffix] = useState(props.unit.suffix);
-	// const handleSuffixChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-	// 	setSuffix(e.target.value);
-	// }
-
-	// // note
-	// const [note, setNote] = useState(props.unit.note);
-	// const handleNoteChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-	// 	setNote(e.target.value);
-	// }
 	/* End State */
 
 	// Reset the state to default values
@@ -153,10 +98,6 @@ export default function EditUnitModalComponent(props: EditUnitModalComponentProp
 				props.unit.note != state.note);
 		// Only do work if there are changes
 		if (unitHasChanges) {
-			// const editedUnit = {
-			// 	...props.unit,
-			// 	state
-			// }
 			// Save our changes by dispatching the submitEditedUnit action
 			dispatch(submitEditedUnit(state));
 			// The updated unit is not fetched to save time. However, the identifier might have been
@@ -278,21 +219,14 @@ export default function EditUnitModalComponent(props: EditUnitModalComponentProp
 										<div style={formInputStyle}>
 											<label><FormattedMessage id="unit.sec.in.rate" /></label><br />
 											<Input
-<<<<<<< Updated upstream
-												type="number"												
-												defaultValue={secInRate}
-												onChange={e => handleSecInRateChange(e)}
-												placeholder="Sec In Rate" 
-												min="1"
-												//TODO validate negative input for rate
-												oninput="validity.valid||(value='');"/>
-=======
 												name='secInRate'
 												type="number"
 												defaultValue={state.secInRate}
 												onChange={e => handleNumberChange(e)}
-												placeholder="Sec In Rate" />
->>>>>>> Stashed changes
+												placeholder="Sec In Rate"
+												min="1"
+												//TODO validate negative input for rate
+												oninput="validity.valid||(value='');"/>
 										</div>
 										{/* Suffix input*/}
 										<div style={formInputStyle}>
