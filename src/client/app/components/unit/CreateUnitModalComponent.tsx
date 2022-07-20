@@ -12,6 +12,8 @@ import { useDispatch } from 'react-redux';
 import { addUnit } from '../../actions/units';
 import { useState } from 'react';
 import { TrueFalseType } from '../../types/items';
+import TooltipMarkerComponent from '../TooltipMarkerComponent';
+import TooltipHelpContainer from '../../containers/TooltipHelpContainer';
 
 export default function CreateUnitModalComponent() {
 
@@ -83,6 +85,13 @@ export default function CreateUnitModalComponent() {
 		resetState();
 	};
 
+	const tooltipStyle = {
+		display: 'inline-block',
+		fontSize: '60%',
+		// For now, it uses the same help text from unit view page.
+		tooltipCreateUnitView: 'help.admin.unitview'
+	};
+
 	const formInputStyle: React.CSSProperties = {
 		paddingBottom: '5px'
 	}
@@ -100,7 +109,12 @@ export default function CreateUnitModalComponent() {
 
 			<Modal show={showModal} onHide={handleClose}>
 				<Modal.Header>
-					<Modal.Title> <FormattedMessage id="create.unit" /></Modal.Title>
+					<Modal.Title> <FormattedMessage id="create.unit" />
+						<TooltipHelpContainer page='units' />
+						<div style={tooltipStyle}>
+							<TooltipMarkerComponent page='units' helpTextId={tooltipStyle.tooltipCreateUnitView} />
+						</div>
+					</Modal.Title>
 				</Modal.Header>
 				{/* when any of the unit are changed call one of the functions. */}
 				<Modal.Body className="show-grid">
