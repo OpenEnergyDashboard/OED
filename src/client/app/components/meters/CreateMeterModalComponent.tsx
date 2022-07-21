@@ -282,12 +282,12 @@ export default function CreateMeterModalComponent() {
 		<>
 			{/* Show modal button */}
 			<Button variant="Secondary" onClick={handleShow}>
-				<FormattedMessage id="create.Meter" />
+				<FormattedMessage id="meter.create" />
 			</Button>
 
 			<Modal show={showModal} onHide={handleClose}>
 				<Modal.Header>
-					<Modal.Title> <FormattedMessage id="create.Meter" /></Modal.Title>
+					<Modal.Title> <FormattedMessage id="meter.create" /></Modal.Title>
 				</Modal.Header>
 				{/* when any of the Meter are changed call one of the functions. */}
 				<Modal.Body className="show-grid">
@@ -488,7 +488,7 @@ export default function CreateMeterModalComponent() {
 										</div>
 										{/* startTimestamp input*/}
 										<div style={formInputStyle}>
-											<label><FormattedMessage id="meter.startTimestamp" /></label><br />
+											<label><FormattedMessage id="meter.startTimeStamp" /></label><br />
 											<Input
 												type='text'
 												onChange={e => handleStartTimestampChange(e)}
@@ -496,7 +496,7 @@ export default function CreateMeterModalComponent() {
 										</div>
 										{/* endTimestamp input*/}
 										<div style={formInputStyle}>
-											<label><FormattedMessage id="meter.endTimestamp" /></label><br />
+											<label><FormattedMessage id="meter.endTimeStamp" /></label><br />
 											<Input
 												type='text'
 												onChange={e => handleEndTimestampChange(e)}

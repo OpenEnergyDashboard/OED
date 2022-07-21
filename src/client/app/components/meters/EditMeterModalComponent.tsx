@@ -505,7 +505,7 @@ export default function EditMeterModalComponent(props: EditMeterModalComponentPr
 										</div>
 										{/* startTimestamp input*/}
 										<div style={formInputStyle}>
-											<label><FormattedMessage id="meter.startTimestamp" /></label><br />
+											<label><FormattedMessage id="meter.startTimeStamp" /></label><br />
 											<Input
 												type='text'
 												onChange={e => handleStartTimestampChange(e)}
@@ -513,7 +513,7 @@ export default function EditMeterModalComponent(props: EditMeterModalComponentPr
 										</div>
 										{/* endTimestamp input*/}
 										<div style={formInputStyle}>
-											<label><FormattedMessage id="meter.endTimestamp" /></label><br />
+											<label><FormattedMessage id="meter.endTimeStamp" /></label><br />
 											<Input
 												type='text'
 												onChange={e => handleEndTimestampChange(e)}
