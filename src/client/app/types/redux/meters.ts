@@ -61,10 +61,10 @@ export interface MeterData {
 	area: number;
 	enabled: boolean;
 	displayable: boolean;
-	meterType?: string;
-	url?: string;
-	timeZone?: TimeZones;
-	gps?: GPSPoint;
+	meterType: string;
+	url: string;
+	timeZone: TimeZones;
+	gps: GPSPoint;
 	unitId: number;
 	defaultGraphicUnit: number;
 	// graphicUnit: number;
@@ -90,7 +90,7 @@ export interface MeterEditData {
 	area: number;
 	enabled: boolean;
 	displayable: boolean;
-	meterType?: string;
+	meterType: string;
 	url: string;
 	timezone: TimeZones;
 	gps: GPSPoint;

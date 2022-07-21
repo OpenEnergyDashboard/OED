@@ -24,7 +24,7 @@ export default function CreateMeterModalComponent() {
 		area : 0,
 		enabled : true,
 		displayable : true,
-		meterType : '',
+		meterType : MeterType.other,
 		url : '',
 		// timezone : '',
 		// gps : '',
@@ -350,9 +350,13 @@ export default function CreateMeterModalComponent() {
 										<div style={formInputStyle}>
 											<label><FormattedMessage id="meter.type" /></label><br />
 											<Input
-												type='text'
-												onChange={e => handleMeterTypeChange(e)}
-												required value={meterType} />
+												type='select'
+												defaultValue={meterType}
+												onChange={e => handleMeterTypeChange(e)}>
+												{Object.keys(MeterType).map(key => {
+													return (<option value={key} key={key}>{`${key}`}</option>)
+												})}
+											</Input>
 										</div>
 										{/* URL input*/}
 										<div style={formInputStyle}>
@@ -399,25 +403,27 @@ export default function CreateMeterModalComponent() {
 										<div style={formInputStyle}>
 											<label><FormattedMessage id="meter.note" /></label><br />
 											<Input
-												type='text'
-												onChange={e => handleNoteChange(e)}
-												required value={note} />
+												name='note'
+												type='textarea'
+												defaultValue={note}
+												placeholder='Note'
+												onChange={e => handleNoteChange(e)} />
 										</div>
 										{/* cumulative input*/}
 										<div style={formInputStyle}>
-											<label><FormattedMessage id="meter.cumulative" /></label><br />
 											<Input
 												type="checkbox"
 												checked={cumulative}
 												onChange={e => handleCumulativeChange(e)} />
+											<label><FormattedMessage id="meter.cumulative" /></label>
 										</div>
 										{/* cumulativeReset input*/}
 										<div style={formInputStyle}>
-											<label><FormattedMessage id="meter.cumulativeReset" /></label><br />
 											<Input
 												type="checkbox"
 												checked={cumulativeReset}
 												onChange={e => handleCumulativeResetChange(e)} />
+											<label><FormattedMessage id="meter.cumulativeReset" /></label>
 										</div>
 										{/* cumulativeResetStart input*/}
 										<div style={formInputStyle}>
@@ -437,11 +443,11 @@ export default function CreateMeterModalComponent() {
 										</div>
 										{/* endOnlyTime input*/}
 										<div style={formInputStyle}>
-											<label><FormattedMessage id="meter.endOnlyTime" /></label><br />
 											<Input
 												type="checkbox"
 												checked={endOnlyTime}
 												onChange={e => handleEndOnlyTimeChange(e)} />
+											<label><FormattedMessage id="meter.endOnlyTime" /></label><br />
 										</div>
 										{/* reading input*/}
 										<div style={formInputStyle}>
@@ -480,11 +486,11 @@ export default function CreateMeterModalComponent() {
 										</div>
 										{/* timeSort input*/}
 										<div style={formInputStyle}>
-											<label><FormattedMessage id="meter.timeSort" /></label><br />
 											<Input
 												type="checkbox"
 												checked={timeSort}
 												onChange={e => handleTimeSortChange(e)} />
+											<label><FormattedMessage id="meter.timeSort" /></label><br />
 										</div>
 										{/* startTimestamp input*/}
 										<div style={formInputStyle}>
