@@ -8,6 +8,7 @@ import EditMeterModalComponent from './EditMeterModalComponent';
 import '../../styles/unit-card-page.css';
 import { useState } from 'react';
 import { MeterData } from 'types/redux/meters';
+import translate from '../../utils/translate';
 
 interface MeterViewComponentProps {
 	meter: MeterData;
@@ -33,10 +34,10 @@ export default function MeterViewComponent(props: MeterViewComponentProps) {
 				<b><FormattedMessage id="meter.name" /></b> {props.meter.name}
 			</div>
 			<div className="meter-container">
-				<b><FormattedMessage id="meter.enabled" /></b> {props.meter.enabled}
+				<b><FormattedMessage id="meter.enabled" /></b> {translate(`TrueFalseType.${props.meter.enabled.toString()}`)}
 			</div>
 			<div className="meter-container">
-				<b><FormattedMessage id="meter.displayable" /></b> {props.meter.displayable}
+				<b><FormattedMessage id="meter.displayable" /></b> {translate(`TrueFalseType.${props.meter.displayable.toString()}`)}
 			</div>
 			<div className="edit-btn">
 				<Button variant="Secondary" onClick={handleShow}>
