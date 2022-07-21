@@ -19,13 +19,6 @@ export enum ActionType {
 	RemoveUnsavedChanges = 'REMOVE_UNSAVED_CHANGES',
 	FlipLogOutState = 'FLIP_LOG_OUT_STATE',
 
-	RequestMetersDetails = 'REQUEST_METERS_DETAILS',
-	ReceiveMetersDetails = 'RECEIVE_METERS_DETAILS',
-	ChangeDisplayedMeters = 'CHANGE_DISPLAYED_METERS',
-	EditMeterDetails = 'EDIT_METER_DETAILS',
-	SubmitEditedMeter = 'SUBMIT_EDITED_METER',
-	ConfirmEditedMeter = 'CONFIRM_EDITED_METER',
-
 	ShowNotification = 'SHOW_NOTIFICATION',
 	ClearNotifications = 'CLEAR_NOTIFICATIONS',
 
@@ -123,6 +116,16 @@ export enum ActionType {
 	DeleteEditedUnit = 'DELETE_EDITED_UNIT',
 	DeleteSubmittedUnit = 'DELETE_SUBMITTED_UNIT',
 	ConfirmUnitsFetchedOnce = 'CONFIRM_UNITS_FETCHED_ONCE',
+
+	ReceiveMetersDetails = 'RECEIVE_METERS_DETAILS',
+	RequestMetersDetails = 'REQUEST_METERS_DETAILS',
+	ChangeDisplayedMeters = 'CHANGE_DISPLAYED_METERS',
+	EditMeterDetails = 'EDIT_METER_DETAILS',
+	SubmitEditedMeter = 'SUBMIT_EDITED_METER',
+	ConfirmEditedMeter = 'CONFIRM_EDITED_METER',
+	DeleteEditedMeter = 'DELETE_EDITED_METER',
+	DeleteSubmittedMeter = 'DELETE_SUBMITTED_METER',
+	ConfirmMetersFetchedOnce = 'CONFIRM_METERS_FETCHED_ONCE',
 }
 
 /**
