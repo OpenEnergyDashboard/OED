@@ -4,11 +4,11 @@
 import * as React from 'react';
 import { Button } from 'reactstrap';
 import { FormattedMessage } from 'react-intl';
-import EditMeterModalComponent from './EditMeterModalComponent';
-import '../../styles/unit-card-page.css';
 import { useState } from 'react';
+import EditMeterModalComponent from './EditMeterModalComponent';
 import { MeterData } from 'types/redux/meters';
 import translate from '../../utils/translate';
+import '../../styles/unit-card-page.css';
 
 interface MeterViewComponentProps {
 	meter: MeterData;

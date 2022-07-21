@@ -39,6 +39,16 @@ width: 100%;
     overflow-wrap: break-word; 
 }
 
+.card-container {
+    width: 100%;
+        padding-top: 2px;
+        padding-right: 0px;
+        padding-bottom: 1px;
+        padding-left: 0px;
+        text-align: center;
+        overflow-wrap: break-word; 
+    }
+
 .type-container {
     width: 100%;
     padding-top: 2px;
