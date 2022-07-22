@@ -33,6 +33,8 @@ const localeData = {
 		"cancel": "Cancel",
 		"child.groups": "Child Groups",
 		"child.meters": "Child Meters",
+		"clear": "Clear",
+		"clear.all": "Clear All",
 		"close": "Close",
 		"compare": "Compare",
 		"contact.us": "Contact us",
