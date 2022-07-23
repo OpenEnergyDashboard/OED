@@ -8,7 +8,7 @@ import ApiBackend from './ApiBackend';
 import { NamedIDItem } from '../../types/items';
 import { CompareReadings, RawReadings } from '../../types/readings';
 import { TimeInterval } from '../../../../common/TimeInterval';
-import { MeterMetadata, MeterEditData } from '../../types/redux/meters';
+import { MeterData, MeterEditData } from '../../types/redux/meters';
 import * as moment from 'moment';
 
 export default class MetersApi {
@@ -38,11 +38,22 @@ export default class MetersApi {
 		);
 	}
 
-	public async edit(meter: MeterMetadata): Promise<MeterEditData> {
+	public async edit(meter: MeterData): Promise<MeterEditData> {
 		return await this.backend.doPostRequest<MeterEditData>(
 			'/api/meters/edit',
-			{ id: meter.id, identifier: meter.identifier, enabled: meter.enabled, displayable: meter.displayable, timeZone: meter.timeZone, gps: meter.gps }
+			{
+				id: meter.id, identifier: meter.identifier, enabled: meter.enabled,
+				displayable: meter.displayable, timeZone: meter.timeZone, gps: meter.gps
+			}
 		);
+	}
+
+	public async addMeter(meter: MeterData): Promise<void> {
+		return await this.backend.doPostRequest('/api/meters/addMeter', meter);
+	}
+
+	public async getMetersDetails(): Promise<MeterData[]> {
+		return await this.backend.doGetRequest<MeterData[]>('/api/meters');
 	}
 
 	/**

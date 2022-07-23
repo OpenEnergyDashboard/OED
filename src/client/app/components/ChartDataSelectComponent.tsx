@@ -26,7 +26,6 @@ import { Dispatch } from '../types/redux/actions';
 import { UnitsState } from '../types/redux/units';
 import { MetersState } from 'types/redux/meters';
 import { GroupsState } from 'types/redux/groups';
-import { Button } from 'react-bootstrap';
 
 /**
  * A component which allows the user to select which data should be displayed on the chart.
@@ -48,14 +47,6 @@ export default function ChartDataSelectComponent() {
 	});
 
 	const intl = useIntl();
-
-	const handleGroupsClear = () => { dispatch(updateSelectedGroups([]))}
-	const handleMetersClear = () => { dispatch(updateSelectedMeters([]))}
-	const handleAllClear = () => {
-		handleGroupsClear();
-		handleMetersClear();
-		dispatch(updateSelectedUnit(-99));
-	}
 
 	const dataProps = useSelector((state: State) => {
 		const allMeters = state.meters.byMeterID;
@@ -245,9 +236,6 @@ export default function ChartDataSelectComponent() {
 						dispatch(changeSelectedGroups(newSelectedGroupOptions.map(s => s.value)))}
 				/>
 				<TooltipMarkerComponent page='home' helpTextId='help.home.select.groups' />
-				<Button size='sm' variant="secondary" onClick={handleGroupsClear}>
-					<FormattedMessage id="clear" />
-				</Button>
 			</div>
 			<p style={labelStyle}>
 				<FormattedMessage id='meters' />:
@@ -261,9 +249,6 @@ export default function ChartDataSelectComponent() {
 						dispatch(changeSelectedMeters(newSelectedMeterOptions.map(s => s.value)))}
 				/>
 				<TooltipMarkerComponent page='home' helpTextId='help.home.select.meters' />
-				<Button  size='sm' variant="secondary" onClick={handleMetersClear}>
-					<FormattedMessage id="clear" />
-				</Button>
 			</div>
 			<p style={labelStyle}>
 				<FormattedMessage id='units' />:
@@ -277,12 +262,6 @@ export default function ChartDataSelectComponent() {
 						// TODO I don't quite understand why the component results in an array of size 2 when updating state
 						// For now I have hardcoded a fix that allows units to be selected over other units without clicking the x button
 						if (newSelectedUnitOptions.length === 0) {
-							// The unit was unselected so no new one. Thus, set to -99 since no unit.
-							// TODO This causes an error by trying to get data before the value is changed again.??
-							// TODO need to clear all meters/groups in this case.
-							// TODO nice if warned user about to clear all meters/groups.
-
-							// TODO Remove the above comments if there are no bugs
 							// Update the selected meters and groups to empty to avoid graphing errors
 							// The update selected meters/groups functions are essentially the same as the change functions
 							// However, they do not attempt to graph.
@@ -299,9 +278,6 @@ export default function ChartDataSelectComponent() {
 				<TooltipMarkerComponent page='home' helpTextId='help.home.select.units' />
 			</div>
 			<div className='d-grid gap-2'>
-				<Button size='sm' style={{width: '100%'}} variant="danger" onClick={handleAllClear}>
-					<FormattedMessage id="clear.all" />
-				</Button>
 			</div>
 		</div>
 	);
@@ -337,14 +313,12 @@ export function getUnitCompatibilityForDropdown(state: State) {
 	// If no meters/groups are selected
 	if (allSelectedMeters.size == 0) {
 		// Every unit is okay/compatible in this case so skip the work needed below.
-		// Can only show unit types (not meters) and only displayable ones.
-		// <current user type> is either all (not logged in as admin) or admin
+		// Filter the units to be displayed by user status and displayable type
 		getVisibleUnitOrSuffixState(state).forEach(unit => {
 			compatibleUnits.add(unit.id);
 		});
+	// Some meter or group is selected
 	} else {
-		// Some meter or group is selected
-
 		// Retrieve set of units compatible with list of selected meters and/or groups
 		const units = unitsCompatibleWithMeters(allSelectedMeters);
 
@@ -443,30 +417,18 @@ export function getMeterCompatibilityForDropdown(state: State) {
  * @return {SelectOption[]} an array of SelectOption
  */
 export function getGroupCompatibilityForDropdown(state: State) {
-	// Holds all meters visible to the user
-	const visibleMeters = new Set<number>();
 	// Holds all groups visible to the user
 	const visibleGroup = new Set<number>();
 
-	// Get all the meters and groups that this user can see.
+	// Get all the groups that this user can see.
 	if (state.currentUser.profile?.role === 'admin') {
-		// Can see all meters
-		Object.values(state.meters.byMeterID).forEach(meter => {
-			visibleMeters.add(meter.id);
-		});
 		// Can see all groups
 		Object.values(state.groups.byGroupID).forEach(group => {
 			visibleGroup.add(group.id);
 		});
 	}
 	else {
-		// Regular user or not logged in so only add displayable meters and groups
-		Object.values(state.meters.byMeterID).forEach(meter => {
-			if (meter.displayable)
-			{
-				visibleMeters.add(meter.id);
-			}
-		});
+		// Regular user or not logged in so only add displayable groups
 		Object.values(state.groups.byGroupID).forEach(group => {
 			if (group.displayable)
 			{
@@ -558,7 +520,7 @@ function getSelectOptionsByItem(compatibleItems: Set<number>, incompatibleItems:
 		// Perhaps in the future this can be done differently
 		// Loop over the state type to see what state was passed in (units, meter, group, etc)
 		// Set the label correctly based on the type of state
-		// If this is converted to a switch statement the instance of checker needs to be called twice
+		// If this is converted to a switch statement the instanceOf function needs to be called twice
 		// Once for the initial state type check, again because the interpreter (for some reason) needs to be sure that the property exists in the object
 		// If else statements do not suffer from this
 		if (instanceOfUnitsState(state)) {
@@ -604,5 +566,3 @@ function getSelectOptionsByItem(compatibleItems: Set<number>, incompatibleItems:
 function instanceOfUnitsState(state: any): state is UnitsState {return 'units' in state;}
 function instanceOfMetersState(state: any): state is MetersState {return 'byMeterID' in state;}
 function instanceOfGroupsState(state: any): state is GroupsState {return 'byGroupID' in state;}
-
-// }
