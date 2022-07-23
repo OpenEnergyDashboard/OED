@@ -401,7 +401,7 @@ async function insertSpecialMeters(conn) {
 		['Electric Utility kWh in BTU', 'Electric_utility', 'BTU', true, 'data/unit/quantity1-5.csv', false],
 		['Electric Utility kWh in MTon CO2', 'Electric_utility', 'Metric_ton of CO2', true, 'data/unit/quantity1-5.csv', false],
 		['Electric Utility no unit', '', '', true, 'data/unit/quantity1-5.csv', false],
-		['Electric Utility kWh not displayable', '', '', false, 'data/unit/quantity1-5.csv', false],
+		['Electric Utility kWh not displayable', 'Electric_utility', 'kWh', false, 'data/unit/quantity1-5.csv', false],
 		['Natural Gas BTU', 'Natural_Gas_BTU', 'BTU', true, 'data/unit/quantity1-5.csv', false],
 		['Natural Gas BTU in Dollar', 'Natural_Gas_BTU', 'US_dollar', true, 'data/unit/quantity1-5.csv', false],
 		['Natural Gas Dollar', 'Natural_Gas_dollar', 'US_dollar', true, 'data/unit/quantity1-5.csv', false],
