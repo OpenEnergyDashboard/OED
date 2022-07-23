@@ -18,7 +18,7 @@ export default function CreateMeterModalComponent() {
 	const dispatch = useDispatch();
 
 	const defaultValues = {
-		id: 0,
+		id: -99,
 		identifier : '',
 		name : '',
 		area : 0,
@@ -26,8 +26,8 @@ export default function CreateMeterModalComponent() {
 		displayable : true,
 		meterType : MeterType.other,
 		url : '',
-		// timezone : '',
-		// gps : '',
+		timeZone : '',
+		gps : 'latitude, longitude',
 		unitId : 0,
 		defaultGraphicUnit : 0,
 		note : '',
@@ -37,7 +37,7 @@ export default function CreateMeterModalComponent() {
 		cumulativeResetEnd : '',
 		endOnlyTime : false,
 		reading : 0,
-		readingGap : '',
+		readingGap : 0,
 		readingVariation : 0,
 		readingDuplication : 0,
 		timeSort : false,
@@ -101,22 +101,22 @@ export default function CreateMeterModalComponent() {
 	}
 
 	// URL
-	const [url, setUrl] = useState(defaultValues.url? `${defaultValues.url}` : '');
+	const [url, setUrl] = useState(defaultValues.url);
 	const handleUrlChange = (e: React.ChangeEvent<HTMLInputElement>) => {
 		setUrl(e.target.value);
 	}
 
 	// timezone
-	/*const [timezone, setTimezone] = useState(defaultValues.timezone? `${defaultValues.timezone}` : '');
-	const handleTimezoneChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-		setTimezone(e.target.value);
-	}*/
+	const [timeZone, setTimeZone] = useState(defaultValues.timeZone);
+	const handleTimeZoneChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+		setTimeZone(e.target.value);
+	}
 
 	// GPS
-	/*const [gps, setGps] = useState(defaultValues.gps? `${defaultValues.gps.latitude},${defaultValues.gps.longitude}` : '');
+	const [gps, setGps] = useState(defaultValues.gps);
 	const handleGpsChange = (e: React.ChangeEvent<HTMLInputElement>) => {
 		setGps(e.target.value);
-	}*/
+	}
 
 	// unitID
 	const [unitId, setUnitID] = useState(defaultValues.unitId);
@@ -175,7 +175,7 @@ export default function CreateMeterModalComponent() {
 	// readingGap
 	const [readingGap, setReadingGap] = useState(defaultValues.readingGap);
 	const handleReadingGapChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-		setReadingGap(e.target.value);
+		setReadingGap(Number(e.target.value));
 	}
 
 	// readingVariation
@@ -238,8 +238,8 @@ export default function CreateMeterModalComponent() {
 			displayable,
 			meterType,
 			url,
-			// timezone,
-			// gps,
+			timeZone,
+			gps,
 			unitId,
 			defaultGraphicUnit,
 			note,
@@ -268,7 +268,6 @@ export default function CreateMeterModalComponent() {
 		resetState();
 	};
 
-
 	const formInputStyle: React.CSSProperties = {
 		paddingBottom: '5px'
 	}
@@ -291,7 +290,7 @@ export default function CreateMeterModalComponent() {
 				</Modal.Header>
 				{/* when any of the Meter are changed call one of the functions. */}
 				<Modal.Body className="show-grid">
-					<div id="container">
+				<div id="container">
 						<div id="modalChild">
 							{/* Modal content */}
 							<div className="container-fluid">
@@ -303,6 +302,7 @@ export default function CreateMeterModalComponent() {
 											type="text"
 											onChange={e => handleIdentifierChange(e)}
 											defaultValue={identifier}
+											required value={identifier}
 											placeholder="Identifier" />
 										<div />
 										{/* Name input*/}
@@ -311,7 +311,9 @@ export default function CreateMeterModalComponent() {
 											<Input
 												type='text'
 												onChange={e => handleNameChange(e)}
-												required value={name} />
+												defaultValue={name}
+												required value={name}
+												placeholder="Name" />
 										</div>
 										{/* Area input*/}
 										<div style={formInputStyle}>
@@ -319,8 +321,7 @@ export default function CreateMeterModalComponent() {
 											<Input
 												type="number"
 												defaultValue={area}
-												onChange={e => handleAreaChange(e)}
-												placeholder="area" />
+												onChange={e => handleAreaChange(e)} />
 										</div>
 										{/* Enabled input*/}
 										<div style={formInputStyle}>
@@ -364,30 +365,34 @@ export default function CreateMeterModalComponent() {
 											<Input
 												type='text'
 												onChange={e => handleUrlChange(e)}
-												required value={url} />
+												defaultValue={url}
+												placeholder="URL" />
 										</div>
 										{/* Timezone input*/}
-										{/*<div style={formInputStyle}>
+										<div style={formInputStyle}>
 											<label><FormattedMessage id="meter.time.zone" /></label><br />
 											<Input
 												type='text'
-												onChange={e => handleTimeZoneChange(e)} />
-											</div>*/}
+												onChange={e => handleTimeZoneChange(e)}
+												defaultValue={timeZone}
+												placeholder="Time Zone" />
+										</div>
 										{/* GPS input*/}
-										{/*<div style={formInputStyle}>
+										<div style={formInputStyle}>
 											<label><FormattedMessage id="meter.gps" /></label><br />
 											<Input
 												type='text'
 												onChange={e => handleGpsChange(e)}
-												required value={gps} />
-										</div>*/}
+												defaultValue={gps}
+												placeholder="latitude, longitude" />
+										</div>
 										{/* UnitId input*/}
 										<div style={formInputStyle}>
 											<label><FormattedMessage id="meter.unitId" /></label><br />
 											<Input
 												type="number"
-												defaultValue={unitId}
 												onChange={e => handleUnitIDChange(e)}
+												defaultValue={unitId}
 												placeholder="unitId" />
 										</div>
 										{/* DefaultGraphicUnit input*/}
@@ -395,35 +400,42 @@ export default function CreateMeterModalComponent() {
 											<label><FormattedMessage id="meter.defaultGraphicUnit" /></label><br />
 											<Input
 												type="number"
-												defaultValue={defaultGraphicUnit}
 												onChange={e => handleDefaultGraphicUnitChange(e)}
+												defaultValue={defaultGraphicUnit}
 												placeholder="defaultGraphicUnit" />
 										</div>
 										{/* note input*/}
 										<div style={formInputStyle}>
 											<label><FormattedMessage id="meter.note" /></label><br />
 											<Input
-												name='note'
 												type='textarea'
+												onChange={e => handleNoteChange(e)}
 												defaultValue={note}
-												placeholder='Note'
-												onChange={e => handleNoteChange(e)} />
+												placeholder='Note' />
 										</div>
 										{/* cumulative input*/}
 										<div style={formInputStyle}>
+											<label><FormattedMessage id="meter.cumulative" /></label><br />
 											<Input
-												type="checkbox"
-												checked={cumulative}
-												onChange={e => handleCumulativeChange(e)} />
-											<label><FormattedMessage id="meter.cumulative" /></label>
+												type='select'
+												defaultValue={cumulative.toString()}
+												onChange={e => handleCumulativeChange(e)}>
+												{Object.keys(TrueFalseType).map(key => {
+													return (<option value={key} key={key}>{translate(`TrueFalseType.${key}`)}</option>)
+												})}
+											</Input>
 										</div>
 										{/* cumulativeReset input*/}
 										<div style={formInputStyle}>
+											<label><FormattedMessage id="meter.cumulativeReset" /></label><br />
 											<Input
-												type="checkbox"
-												checked={cumulativeReset}
-												onChange={e => handleCumulativeResetChange(e)} />
-											<label><FormattedMessage id="meter.cumulativeReset" /></label>
+												type='select'
+												defaultValue={cumulativeReset.toString()}
+												onChange={e => handleCumulativeResetChange(e)}>
+												{Object.keys(TrueFalseType).map(key => {
+													return (<option value={key} key={key}>{translate(`TrueFalseType.${key}`)}</option>)
+												})}
+											</Input>
 										</div>
 										{/* cumulativeResetStart input*/}
 										<div style={formInputStyle}>
@@ -431,7 +443,8 @@ export default function CreateMeterModalComponent() {
 											<Input
 												type='text'
 												onChange={e => handleCumulativeResetStartChange(e)}
-												required value={cumulativeResetStart} />
+												defaultValue={cumulativeResetStart}
+												placeholder="HH:MM:SS" />
 										</div>
 										{/* cumulativeResetEnd input*/}
 										<div style={formInputStyle}>
@@ -439,58 +452,72 @@ export default function CreateMeterModalComponent() {
 											<Input
 												type='text'
 												onChange={e => handleCumulativeResetEndChange(e)}
-												required value={cumulativeResetEnd} />
+												defaultValue={cumulativeResetEnd}
+												placeholder="HH:MM:SS" />
 										</div>
 										{/* endOnlyTime input*/}
 										<div style={formInputStyle}>
-											<Input
-												type="checkbox"
-												checked={endOnlyTime}
-												onChange={e => handleEndOnlyTimeChange(e)} />
 											<label><FormattedMessage id="meter.endOnlyTime" /></label><br />
+											<Input
+												type='select'
+												defaultValue={endOnlyTime.toString()}
+												onChange={e => handleEndOnlyTimeChange(e)}>
+												{Object.keys(TrueFalseType).map(key => {
+													return (<option value={key} key={key}>{translate(`TrueFalseType.${key}`)}</option>)
+												})}
+											</Input>
 										</div>
 										{/* reading input*/}
 										<div style={formInputStyle}>
 											<label><FormattedMessage id="meter.reading" /></label><br />
 											<Input
 												type="number"
-												defaultValue={reading}
 												onChange={e => handleReadingChange(e)}
-												placeholder="reading" />
+												step="0.01"
+												defaultValue={reading} />
 										</div>
 										{/* readingGap input*/}
 										<div style={formInputStyle}>
 											<label><FormattedMessage id="meter.readingGap" /></label><br />
 											<Input
-												type='text'
+												type='number'
 												onChange={e => handleReadingGapChange(e)}
-												required value={readingGap} />
+												step="0.01"
+												min="0"
+												defaultValue={readingGap} />
 										</div>
 										{/* readingVariation input*/}
 										<div style={formInputStyle}>
 											<label><FormattedMessage id="meter.readingVariation" /></label><br />
 											<Input
 												type="number"
-												defaultValue={readingVariation}
 												onChange={e => handleReadingVariationChange(e)}
-												placeholder="readingVariation" />
+												step="0.01"
+												min="0"
+												defaultValue={readingVariation} />
 										</div>
 										{/* readingDuplication input*/}
 										<div style={formInputStyle}>
 											<label><FormattedMessage id="meter.readingDuplication" /></label><br />
 											<Input
 												type="number"
-												defaultValue={readingDuplication}
 												onChange={e => handleReadingDuplicationChange(e)}
-												placeholder="readingDuplication" />
+												step="1"
+												min="1"
+												max="9"
+												defaultValue={readingDuplication} />
 										</div>
 										{/* timeSort input*/}
 										<div style={formInputStyle}>
-											<Input
-												type="checkbox"
-												checked={timeSort}
-												onChange={e => handleTimeSortChange(e)} />
 											<label><FormattedMessage id="meter.timeSort" /></label><br />
+											<Input
+												type='select'
+												defaultValue={timeSort.toString()}
+												onChange={e => handleTimeSortChange(e)}>
+												{Object.keys(TrueFalseType).map(key => {
+													return (<option value={key} key={key}>{translate(`TrueFalseType.${key}`)}</option>)
+												})}
+											</Input>
 										</div>
 										{/* startTimestamp input*/}
 										<div style={formInputStyle}>
@@ -498,7 +525,8 @@ export default function CreateMeterModalComponent() {
 											<Input
 												type='text'
 												onChange={e => handleStartTimestampChange(e)}
-												required value={startTimestamp} />
+												placeholder="YYYY-MM-DD HH:MM:SS"
+												defaultValue={startTimestamp} />
 										</div>
 										{/* endTimestamp input*/}
 										<div style={formInputStyle}>
@@ -506,7 +534,8 @@ export default function CreateMeterModalComponent() {
 											<Input
 												type='text'
 												onChange={e => handleEndTimestampChange(e)}
-												required value={endTimestamp} />
+												placeholder="YYYY-MM-DD HH:MM:SS"
+												defaultValue={endTimestamp} />
 										</div>
 									</div>
 								</div>

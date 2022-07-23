@@ -65,23 +65,26 @@ export default function EditMeterModalComponent(props: EditMeterModalComponentPr
 	}
 
 	// URL
-	const [url, setUrl] = useState(props.meter.url? `${props.meter.url}` : '');
+	const [url, setUrl] = useState(props.meter.url);
 	const handleUrlChange = (e: React.ChangeEvent<HTMLInputElement>) => {
 		setUrl(e.target.value);
 	}
 
 	// timeZone
-	/*const [timeZone, setTimeZone] = useState(props.meter.timeZone? `${props.meter.timeZone.name}, 
-										${props.meter.timeZone.abbrev}, ${props.meter.timeZone.offset}` : '');
+	const [timeZone, setTimeZone] = useState(props.meter.timeZone? `${props.meter.timeZone.abbrev},
+										${props.meter.timeZone.name}, ${props.meter.timeZone.offset}` : '');
 	const handleTimeZoneChange = (e: React.ChangeEvent<HTMLInputElement>) => {
 		setTimeZone(e.target.value);
-	}*/
+	}
 
 	// GPS
-	/*const [gps, setGps] = useState(props.meter.gps? `${props.meter.gps.latitude}, ${props.meter.gps.longitude}` : '');
+	const [gps, setGps] = useState(props.meter.gps? `${props.meter.gps.latitude}, ${props.meter.gps.latitude}` :
+		'' + props.meter.gps + ' , ' + props.meter.gps);
 	const handleGpsChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+		// check input
+		// format input
 		setGps(e.target.value);
-	}*/
+	}
 
 	// unitID
 	const [unitId, setUnitID] = useState(props.meter.unitId);
@@ -140,7 +143,7 @@ export default function EditMeterModalComponent(props: EditMeterModalComponentPr
 	// readingGap
 	const [readingGap, setReadingGap] = useState(props.meter.readingGap);
 	const handleReadingGapChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-		setReadingGap(e.target.value);
+		setReadingGap(Number(e.target.value));
 	}
 
 	// readingVariation
@@ -187,9 +190,9 @@ export default function EditMeterModalComponent(props: EditMeterModalComponentPr
 		setEnabled(props.meter.enabled);
 		setDisplayable(props.meter.displayable);
 		setMeterType(props.meter.meterType? `${props.meter.meterType}` : '');
-		setUrl(props.meter.url? `${props.meter.url}` : '');
-		// setTimeZone(props.meter.timeZone? `${props.meter.timeZone.name}, ${props.meter.timeZone.abbrev}, ${props.meter.timeZone.offset}` : '');
-		// setGps(props.meter.gps? `${props.meter.gps.latitude}, ${props.meter.gps.longitude}` : '');
+		setUrl(props.meter.url);
+		setTimeZone(props.meter.timeZone? `${props.meter.timeZone.abbrev}, ${props.meter.timeZone.name}, ${props.meter.timeZone.offset}` : '');
+		setGps(props.meter.gps? `${props.meter.gps.latitude}, ${props.meter.gps.longitude}` : '');
 		setUnitID(props.meter.unitId);
 		setDefaultGraphicUnit(props.meter.defaultGraphicUnit);
 		setNote(props.meter.note);
@@ -231,8 +234,8 @@ export default function EditMeterModalComponent(props: EditMeterModalComponentPr
 				props.meter.displayable != displayable ||
 				props.meter.meterType != meterType ||
 				props.meter.url != url ||
-				// props.meter.timeZone?.name  != timeZone ||
-				// props.meter.gps ||
+				props.meter.timeZone != timeZone ||
+				props.meter.gps != gps ||
 				props.meter.unitId != unitId ||
 				props.meter.defaultGraphicUnit != defaultGraphicUnit ||
 				props.meter.note != note ||
@@ -260,8 +263,8 @@ export default function EditMeterModalComponent(props: EditMeterModalComponentPr
 				displayable,
 				meterType,
 				url,
-				// timeZone,
-				// gps,
+				timeZone,
+				gps,
 				unitId,
 				defaultGraphicUnit,
 				note,
@@ -320,6 +323,7 @@ export default function EditMeterModalComponent(props: EditMeterModalComponentPr
 											type="text"
 											onChange={e => handleIdentifierChange(e)}
 											defaultValue={identifier}
+											required value={identifier}
 											placeholder="Identifier" />
 										<div />
 										{/* Name input*/}
@@ -328,7 +332,9 @@ export default function EditMeterModalComponent(props: EditMeterModalComponentPr
 											<Input
 												type='text'
 												onChange={e => handleNameChange(e)}
-												required value={name} />
+												defaultValue={name}
+												required value={name}
+												placeholder="Name" />
 										</div>
 										{/* Area input*/}
 										<div style={formInputStyle}>
@@ -336,8 +342,7 @@ export default function EditMeterModalComponent(props: EditMeterModalComponentPr
 											<Input
 												type="number"
 												defaultValue={area}
-												onChange={e => handleAreaChange(e)}
-												placeholder="area" />
+												onChange={e => handleAreaChange(e)} />
 										</div>
 										{/* Enabled input*/}
 										<div style={formInputStyle}>
@@ -381,30 +386,34 @@ export default function EditMeterModalComponent(props: EditMeterModalComponentPr
 											<Input
 												type='text'
 												onChange={e => handleUrlChange(e)}
-												required value={url} />
+												defaultValue={url}
+												placeholder="URL" />
 										</div>
 										{/* Timezone input*/}
-										{/*<div style={formInputStyle}>
+										<div style={formInputStyle}>
 											<label><FormattedMessage id="meter.time.zone" /></label><br />
 											<Input
 												type='text'
-												onChange={e => handleTimeZoneChange(e)} />
-											</div>*/}
+												onChange={e => handleTimeZoneChange(e)}
+												defaultValue={timeZone}
+												placeholder="Time Zone" />
+										</div>
 										{/* GPS input*/}
-										{/*<div style={formInputStyle}>
+										<div style={formInputStyle}>
 											<label><FormattedMessage id="meter.gps" /></label><br />
 											<Input
 												type='text'
 												onChange={e => handleGpsChange(e)}
-												required value={gps} />
-										</div>*/}
+												defaultValue={gps}
+												placeholder="latitude, longitude" />
+										</div>
 										{/* UnitId input*/}
 										<div style={formInputStyle}>
 											<label><FormattedMessage id="meter.unitId" /></label><br />
 											<Input
 												type="number"
-												defaultValue={unitId}
 												onChange={e => handleUnitIDChange(e)}
+												defaultValue={unitId}
 												placeholder="unitId" />
 										</div>
 										{/* DefaultGraphicUnit input*/}
@@ -412,35 +421,42 @@ export default function EditMeterModalComponent(props: EditMeterModalComponentPr
 											<label><FormattedMessage id="meter.defaultGraphicUnit" /></label><br />
 											<Input
 												type="number"
-												defaultValue={defaultGraphicUnit}
 												onChange={e => handleDefaultGraphicUnitChange(e)}
+												defaultValue={defaultGraphicUnit}
 												placeholder="defaultGraphicUnit" />
 										</div>
 										{/* note input*/}
 										<div style={formInputStyle}>
 											<label><FormattedMessage id="meter.note" /></label><br />
 											<Input
-												name='note'
 												type='textarea'
+												onChange={e => handleNoteChange(e)}
 												defaultValue={note}
-												placeholder='Note'
-												onChange={e => handleNoteChange(e)} />
+												placeholder='Note' />
 										</div>
 										{/* cumulative input*/}
 										<div style={formInputStyle}>
+											<label><FormattedMessage id="meter.cumulative" /></label><br />
 											<Input
-												type="checkbox"
-												checked={cumulative}
-												onChange={e => handleCumulativeChange(e)} />
-											<label><FormattedMessage id="meter.cumulative" /></label>
+												type='select'
+												defaultValue={cumulative.toString()}
+												onChange={e => handleCumulativeChange(e)}>
+												{Object.keys(TrueFalseType).map(key => {
+													return (<option value={key} key={key}>{translate(`TrueFalseType.${key}`)}</option>)
+												})}
+											</Input>
 										</div>
 										{/* cumulativeReset input*/}
 										<div style={formInputStyle}>
+											<label><FormattedMessage id="meter.cumulativeReset" /></label><br />
 											<Input
-												type="checkbox"
-												checked={cumulativeReset}
-												onChange={e => handleCumulativeResetChange(e)} />
-											<label><FormattedMessage id="meter.cumulativeReset" /></label>
+												type='select'
+												defaultValue={cumulativeReset.toString()}
+												onChange={e => handleCumulativeResetChange(e)}>
+												{Object.keys(TrueFalseType).map(key => {
+													return (<option value={key} key={key}>{translate(`TrueFalseType.${key}`)}</option>)
+												})}
+											</Input>
 										</div>
 										{/* cumulativeResetStart input*/}
 										<div style={formInputStyle}>
@@ -448,7 +464,8 @@ export default function EditMeterModalComponent(props: EditMeterModalComponentPr
 											<Input
 												type='text'
 												onChange={e => handleCumulativeResetStartChange(e)}
-												required value={cumulativeResetStart} />
+												defaultValue={cumulativeResetStart}
+												placeholder="HH:MM:SS" />
 										</div>
 										{/* cumulativeResetEnd input*/}
 										<div style={formInputStyle}>
@@ -456,58 +473,72 @@ export default function EditMeterModalComponent(props: EditMeterModalComponentPr
 											<Input
 												type='text'
 												onChange={e => handleCumulativeResetEndChange(e)}
-												required value={cumulativeResetEnd} />
+												defaultValue={cumulativeResetEnd}
+												placeholder="HH:MM:SS" />
 										</div>
 										{/* endOnlyTime input*/}
 										<div style={formInputStyle}>
-											<Input
-												type="checkbox"
-												checked={endOnlyTime}
-												onChange={e => handleEndOnlyTimeChange(e)} />
 											<label><FormattedMessage id="meter.endOnlyTime" /></label><br />
+											<Input
+												type='select'
+												defaultValue={endOnlyTime.toString()}
+												onChange={e => handleEndOnlyTimeChange(e)}>
+												{Object.keys(TrueFalseType).map(key => {
+													return (<option value={key} key={key}>{translate(`TrueFalseType.${key}`)}</option>)
+												})}
+											</Input>
 										</div>
 										{/* reading input*/}
 										<div style={formInputStyle}>
 											<label><FormattedMessage id="meter.reading" /></label><br />
 											<Input
 												type="number"
-												defaultValue={reading}
 												onChange={e => handleReadingChange(e)}
-												placeholder="reading" />
+												step="0.01"
+												defaultValue={reading} />
 										</div>
 										{/* readingGap input*/}
 										<div style={formInputStyle}>
 											<label><FormattedMessage id="meter.readingGap" /></label><br />
 											<Input
-												type='text'
+												type='number'
 												onChange={e => handleReadingGapChange(e)}
-												required value={readingGap} />
+												step="0.01"
+												min="0"
+												defaultValue={readingGap} />
 										</div>
 										{/* readingVariation input*/}
 										<div style={formInputStyle}>
 											<label><FormattedMessage id="meter.readingVariation" /></label><br />
 											<Input
 												type="number"
-												defaultValue={readingVariation}
 												onChange={e => handleReadingVariationChange(e)}
-												placeholder="readingVariation" />
+												step="0.01"
+												min="0"
+												defaultValue={readingVariation} />
 										</div>
 										{/* readingDuplication input*/}
 										<div style={formInputStyle}>
 											<label><FormattedMessage id="meter.readingDuplication" /></label><br />
 											<Input
 												type="number"
-												defaultValue={readingDuplication}
 												onChange={e => handleReadingDuplicationChange(e)}
-												placeholder="readingDuplication" />
+												step="1"
+												min="1"
+												max="9"
+												defaultValue={readingDuplication} />
 										</div>
 										{/* timeSort input*/}
 										<div style={formInputStyle}>
-											<Input
-												type="checkbox"
-												checked={timeSort}
-												onChange={e => handleTimeSortChange(e)} />
 											<label><FormattedMessage id="meter.timeSort" /></label><br />
+											<Input
+												type='select'
+												defaultValue={timeSort.toString()}
+												onChange={e => handleTimeSortChange(e)}>
+												{Object.keys(TrueFalseType).map(key => {
+													return (<option value={key} key={key}>{translate(`TrueFalseType.${key}`)}</option>)
+												})}
+											</Input>
 										</div>
 										{/* startTimestamp input*/}
 										<div style={formInputStyle}>
@@ -515,7 +546,8 @@ export default function EditMeterModalComponent(props: EditMeterModalComponentPr
 											<Input
 												type='text'
 												onChange={e => handleStartTimestampChange(e)}
-												required value={startTimestamp} />
+												placeholder="YYYY-MM-DD HH:MM:SS"
+												defaultValue={startTimestamp} />
 										</div>
 										{/* endTimestamp input*/}
 										<div style={formInputStyle}>
@@ -523,7 +555,8 @@ export default function EditMeterModalComponent(props: EditMeterModalComponentPr
 											<Input
 												type='text'
 												onChange={e => handleEndTimestampChange(e)}
-												required value={endTimestamp} />
+												placeholder="YYYY-MM-DD HH:MM:SS"
+												defaultValue={endTimestamp} />
 										</div>
 									</div>
 								</div>

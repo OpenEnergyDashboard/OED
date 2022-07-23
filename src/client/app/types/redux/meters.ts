@@ -67,7 +67,6 @@ export interface MeterData {
 	gps: GPSPoint;
 	unitId: number;
 	defaultGraphicUnit: number;
-	// graphicUnit: number;
 	note: string;
 	cumulative: boolean;
 	cumulativeReset: boolean;
@@ -75,7 +74,7 @@ export interface MeterData {
 	cumulativeResetEnd: string;
 	endOnlyTime: boolean;
 	reading: number;
-	readingGap: string;
+	readingGap: number;
 	readingVariation: number;
 	readingDuplication: number;
 	timeSort: boolean;
@@ -92,11 +91,10 @@ export interface MeterEditData {
 	displayable: boolean;
 	meterType: string;
 	url: string;
-	timezone: TimeZones;
+	timeZone: TimeZones;
 	gps: GPSPoint;
 	unitId: number;
 	defaultGraphicUnit: number;
-	// graphicUnit: number;
 	note: string;
 	cumulative: boolean;
 	cumulativeReset: boolean;
@@ -104,7 +102,7 @@ export interface MeterEditData {
 	cumulativeResetEnd: string;
 	endOnlyTime: boolean;
 	reading: number;
-	readingGap: string;
+	readingGap: number;
 	readingVariation: number;
 	readingDuplication: number;
 	timeSort: boolean;
