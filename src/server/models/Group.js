@@ -83,6 +83,16 @@ class Group {
 	}
 
 	/**
+	 * Check if a group with the same name is already in the database.
+	 * @param conn the connection to be used.
+	 * @returns {boolean} true if group exists.
+	 */
+	 async existsByName(conn) {
+		const row = await conn.oneOrNone(sqlFile('group/get_group_by_name.sql'), { name: this.name });
+		return row !== null;
+	}
+
+	/**
 	 * Returns a promise to retrieve the group with the given id.
 	 * @param id the id of the group
 	 * @param conn the connection to be used.

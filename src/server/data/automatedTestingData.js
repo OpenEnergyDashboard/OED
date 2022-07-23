@@ -14,7 +14,8 @@ const Unit = require('../models/Unit');
 const Conversion = require('../models/Conversion');
 const { getConnection } = require('../db');
 const { redoCik } = require('../services/graph/redoCik');
-const Meter = require('..//models/Meter')
+const Meter = require('../models/Meter');
+const Group = require('../models/Group');
 const loadCsvInput = require('../services/pipeline-in-progress/loadCsvInput');
 const moment = require('moment');
 const { refreshAllReadingViews } = require('../services/refreshAllReadingViews');
@@ -393,6 +394,7 @@ async function insertSpecialMeters(conn) {
 	// The table contains special meters' data.
 	// Each row contains: meter name, unit name, default graphic unit name, CSV reading data filename, whether to delete csv file.
 	// Should only delete automatically generated ones.
+	// Don't check cases of no default graphic unit since it is set to unit_id for meters.
 	const specialMeters = [
 		['Electric Utility kWh', 'Electric_utility', 'kWh', 'data/unit/quantity1-5.csv', false],
 		['Electric Utility kWh 2-6', 'Electric_utility', 'kWh', 'data/unit/quantity2-6.csv', false],
@@ -506,6 +508,76 @@ async function insertSpecialMeters(conn) {
 }
 
 /**
+ * Insert special groups into the database.
+ */
+async function insertSpecialGroups(conn) {
+	// This assumes the insertSpecialMeters has been run.
+	// The table contains special groups' data.
+	// Each row contains: group name, default graphic unit name, array of meter names to add to group, array of group names to add to group.
+	// Don't create groups with of raw type since should not be graphed as a group.
+	const specialGroups = [
+		['Electric Utility 1-5 + 2-6 kWh', 'kWh', ['Electric Utility kWh', 'Electric Utility kWh 2-6'], []],
+		['Electric Utility 1-5 + 2-6 dollar kWh', 'kWh', ['Electric Utility kWh', 'Electric Utility kWh 2-6'], []],
+		['Electric kW + 2-6 kW', 'kW', ['Electric kW', 'Electric kW 2-6'], []],
+		['SqSin + SqCos kWh', 'kWh', ['testSqSin kWh', 'testSqCos kWh'], []],
+		['SqSin + SqCos no unit', '', ['testSqSin kWh', 'testSqCos kWh'], []],
+		['Amp 1 + 5 kWh', 'kWh', ['testAmp1Sin kWh', 'testAmp5Sin kWh'], []],
+		['Amp 2 + 6 kWh', 'kWh', ['testAmp2Sin kWh', 'testAmp6Sin kWh'], []],
+		['Amp 3 + 4 kWh', 'kWh', ['testAmp3Sin kWh', 'testAmp4Sin kWh'], []],
+		['Amp  2 + (1 + 5) kWh', 'kWh', ['testAmp2Sin kWh'], ['Amp 1 + 5 kWh']],
+		['Amp 3 + 6 + (2 + (1 + 5)) + (3 + 4) kWh', 'kWh', ['testAmp3Sin kWh', 'testAmp6Sin kWh'], ['Amp  2 + (1 + 5) kWh', 'Amp 3 + 4 kWh']],
+		['Amp 6 + 7 + (1 + 5) + (2 + 6) + (3 + 4) kWh', 'kWh', ['testAmp6Sin kWh', 'testAmp7Sin kWh'], ['Amp 2 + 6 kWh', 'Amp 3 + 4 kWh', 'Amp 1 + 5 kWh']]
+	];
+	for (let i = 0; i < specialGroups.length; ++i) {
+		// Group values from above.
+		const groupData = specialGroups[i];
+		const groupName = groupData[0];
+		console.log(`    creating group ${groupName}`);
+		// We get the needed unit id from the name given.
+		let groupDefaultGraphicUnit;
+		if (groupData[1] === '') {
+			// No unit so make it -99.
+			groupDefaultGraphicUnit = -99;
+		} else {
+			groupDefaultGraphicUnit = (await Unit.getByName(groupData[1], conn)).id;
+		}
+		const group = new Group(
+			undefined, // id
+			groupName, // name
+			true, //displayable
+			undefined, // gps
+			null, // note
+			null, //area
+			groupDefaultGraphicUnit // default graphic unit
+		);
+		if (await group.existsByName(conn)) {
+			console.log(`Warning: group '${group.name}' existed so not changed.`);
+		} else {
+			// Only insert the group and its children if the group did not already exist.
+			await group.insert(conn);
+			// Get it again so have id.
+			const parent = await Group.getByName(group.name, conn);
+			// Now add the meter children.
+			for (let k = 0; k < groupData[2].length; ++k) {
+				const childMeter = groupData[2][k];
+				console.log(`      adding child meter ${childMeter}`);
+				// Use meter id to add to group.
+				const childId = (await Meter.getByName(childMeter, conn)).id;
+				await parent.adoptMeter(childId, conn);
+			}
+			// Now add the group children.
+			for (let k = 0; k < groupData[3].length; ++k) {
+				const childGroup = groupData[3][k];
+				console.log(`      adding child group ${childGroup}`);
+				// Use group id to add to group.
+				const childId = (await Group.getByName(childGroup, conn)).id;
+				await parent.adoptGroup(childId, conn);
+			}
+		}
+	}
+}
+
+/**
  * Call the functions to insert special units, conversions and meters.
  */
 async function insertSpecialUnitsConversionsMeters() {
@@ -521,6 +593,7 @@ async function insertSpecialUnitsConversionsMeters() {
 	await redoCik(conn);
 	// Refresh the readings since added new ones.
 	await refreshAllReadingViews();
+	insertSpecialGroups(conn);
 }
 /*
 The following lines can be used to remove all the readings and meters associated with
@@ -533,6 +606,8 @@ Get into postgres terminal inside the database Docker container and then do:
 psql -U oed
 -- Remove all the readings. Normally gives "DELETE 575295"
 delete from readings where meter_id in (select id from meters where name in ('Electric Utility kWh', 'Electric Utility kWh 2-6', 'Electric Utility kWh in BTU', 'Electric Utility kWh in MTon CO2', 'Natural Gas BTU', 'Natural Gas BTU in Dollar', 'Natural Gas Dollar', 'Natural Gas Cubic Meters', 'Trash Kg', 'Temp Fahrenheit 0-212', 'Temp Fahrenheit in Celsius', 'Electric kW', 'Electric kW 2-6', 'test4DaySin kWh', 'test4HourSin kWh', 'test23MinSin kWh', 'test15MinSin kWh', 'test23MinCos kWh', 'testSqSin kWh', 'testSqCos kWh', 'testAmp1Sin kWh', 'testAmp2Sin kWh', 'testAmp3Sin kWh', 'testAmp4Sin kWh', 'testAmp5Sin kWh', 'testAmp6Sin kWh', 'testAmp7Sin kWh'));
+# remove all groups. Normally give "DELETE 25 & DELETE 6"
+delete from groups_immediate_meters; delete from groups_immediate_children;
 # Remove all the meters. Normally gives "DELETE 27"
 delete from meters where name in ('Electric Utility kWh', 'Electric Utility kWh 2-6', 'Electric Utility kWh in BTU', 'Electric Utility kWh in MTon CO2', 'Natural Gas BTU', 'Natural Gas BTU in Dollar', 'Natural Gas Dollar', 'Natural Gas Cubic Meters', 'Trash Kg', 'Temp Fahrenheit 0-212', 'Temp Fahrenheit in Celsius', 'Electric kW', 'Electric kW 2-6', 'test4DaySin kWh', 'test4HourSin kWh', 'test23MinSin kWh', 'test15MinSin kWh', 'test23MinCos kWh', 'testSqSin kWh', 'testSqCos kWh', 'testAmp1Sin kWh', 'testAmp2Sin kWh', 'testAmp3Sin kWh', 'testAmp4Sin kWh', 'testAmp5Sin kWh', 'testAmp6Sin kWh', 'testAmp7Sin kWh');
 # Quit postgres.
