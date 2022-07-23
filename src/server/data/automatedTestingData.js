@@ -392,37 +392,39 @@ async function testData() {
  */
 async function insertSpecialMeters(conn) {
 	// The table contains special meters' data.
-	// Each row contains: meter name, unit name, default graphic unit name, CSV reading data filename, whether to delete csv file.
+	// Each row contains: meter name, unit name, default graphic unit name, displayable, CSV reading data filename, whether to delete csv file.
 	// Should only delete automatically generated ones.
 	// Don't check cases of no default graphic unit since it is set to unit_id for meters.
 	const specialMeters = [
-		['Electric Utility kWh', 'Electric_utility', 'kWh', 'data/unit/quantity1-5.csv', false],
-		['Electric Utility kWh 2-6', 'Electric_utility', 'kWh', 'data/unit/quantity2-6.csv', false],
-		['Electric Utility kWh in BTU', 'Electric_utility', 'BTU', 'data/unit/quantity1-5.csv', false],
-		['Electric Utility kWh in MTon CO2', 'Electric_utility', 'Metric_ton of CO2', 'data/unit/quantity1-5.csv', false],
-		['Natural Gas BTU', 'Natural_Gas_BTU', 'BTU', 'data/unit/quantity1-5.csv', false],
-		['Natural Gas BTU in Dollar', 'Natural_Gas_BTU', 'US_dollar', 'data/unit/quantity1-5.csv', false],
-		['Natural Gas Dollar', 'Natural_Gas_dollar', 'US_dollar', 'data/unit/quantity1-5.csv', false],
-		['Natural Gas Cubic Meters', 'Natural_Gas_M3', 'M3_gas', 'data/unit/quantity1-5.csv', false],
-		['Trash Kg', 'Trash', 'kg', 'data/unit/quantity1-5.csv', false],
-		['Temp Fahrenheit 0-212', 'Temperature_fahrenheit', 'Fahrenheit', 'data/unit/temp0-212.csv', false],
-		['Temp Fahrenheit in Celsius', 'Temperature_fahrenheit', 'Celsius', 'data/unit/temp0-212.csv', false],
-		['Electric kW', 'Electric_kW', 'kW', 'data/unit/rate1-5.csv', false],
-		['Electric kW 2-6', 'Electric_kW', 'kW', 'data/unit/rate2-6.csv', false],
-		['test4DaySin kWh', 'Electric_utility', 'kWh', 'test/db/data/automatedTests/fourDayFreqTestData.csv', true],
-		['test4HourSin kWh', 'Electric_utility', 'kWh', 'test/db/data/automatedTests/fourHourFreqTestData.csv', true],
-		['test23MinSin kWh', 'Electric_utility', 'kWh', 'test/db/data/automatedTests/twentyThreeMinuteFreqTestData.csv', true],
-		['test15MinSin kWh', 'Electric_utility', 'kWh', 'test/db/data/automatedTests/fifteenMinuteFreqTestData.csv', true],
-		['test23MinCos kWh', 'Electric_utility', 'kWh', 'test/db/data/automatedTests/23FreqCosineTestData.csv', true],
-		['testSqSin kWh', 'Electric_utility', 'kWh', 'test/db/data/automatedTests/2.5AmpSineSquaredTestData.csv', true],
-		['testSqCos kWh', 'Electric_utility', 'kWh', 'test/db/data/automatedTests/2.5AmpCosineSquaredTestData.csv', true],
-		['testAmp1Sin kWh', 'Electric_utility', 'kWh', 'test/db/data/automatedTests/15Freq1AmpSineTestData.csv', true],
-		['testAmp2Sin kWh', 'Electric_utility', 'kWh', 'test/db/data/automatedTests/15Freq2AmpSineTestData.csv', true],
-		['testAmp3Sin kWh', 'Electric_utility', 'kWh', 'test/db/data/automatedTests/15Freq3AmpSineTestData.csv', true],
-		['testAmp4Sin kWh', 'Electric_utility', 'kWh', 'test/db/data/automatedTests/15Freq4AmpSineTestData.csv', true],
-		['testAmp5Sin kWh', 'Electric_utility', 'kWh', 'test/db/data/automatedTests/15Freq5AmpSineTestData.csv', true],
-		['testAmp6Sin kWh', 'Electric_utility', 'kWh', 'test/db/data/automatedTests/15Freq6AmpSineTestData.csv', true],
-		['testAmp7Sin kWh', 'Electric_utility', 'kWh', 'test/db/data/automatedTests/15Freq7AmpSineTestData.csv', true]
+		['Electric Utility kWh', 'Electric_utility', 'kWh', true, 'data/unit/quantity1-5.csv', false],
+		['Electric Utility kWh 2-6', 'Electric_utility', 'kWh', true, 'data/unit/quantity2-6.csv', false],
+		['Electric Utility kWh in BTU', 'Electric_utility', 'BTU', true, 'data/unit/quantity1-5.csv', false],
+		['Electric Utility kWh in MTon CO2', 'Electric_utility', 'Metric_ton of CO2', true, 'data/unit/quantity1-5.csv', false],
+		['Electric Utility no unit', '', '', true, 'data/unit/quantity1-5.csv', false],
+		['Electric Utility kWh not displayable', '', '', false, 'data/unit/quantity1-5.csv', false],
+		['Natural Gas BTU', 'Natural_Gas_BTU', 'BTU', true, 'data/unit/quantity1-5.csv', false],
+		['Natural Gas BTU in Dollar', 'Natural_Gas_BTU', 'US_dollar', true, 'data/unit/quantity1-5.csv', false],
+		['Natural Gas Dollar', 'Natural_Gas_dollar', 'US_dollar', true, 'data/unit/quantity1-5.csv', false],
+		['Natural Gas Cubic Meters', 'Natural_Gas_M3', 'M3_gas', true, 'data/unit/quantity1-5.csv', false],
+		['Trash Kg', 'Trash', 'kg', true, 'data/unit/quantity1-5.csv', false],
+		['Temp Fahrenheit 0-212', 'Temperature_fahrenheit', 'Fahrenheit', true, 'data/unit/temp0-212.csv', false],
+		['Temp Fahrenheit in Celsius', 'Temperature_fahrenheit', 'Celsius', true, 'data/unit/temp0-212.csv', false],
+		['Electric kW', 'Electric_kW', 'kW', true, 'data/unit/rate1-5.csv', false],
+		['Electric kW 2-6', 'Electric_kW', 'kW', true, 'data/unit/rate2-6.csv', false],
+		['test4DaySin kWh', 'Electric_utility', 'kWh', true, 'test/db/data/automatedTests/fourDayFreqTestData.csv', true],
+		['test4HourSin kWh', 'Electric_utility', 'kWh', true, 'test/db/data/automatedTests/fourHourFreqTestData.csv', true],
+		['test23MinSin kWh', 'Electric_utility', 'kWh', true, 'test/db/data/automatedTests/twentyThreeMinuteFreqTestData.csv', true],
+		['test15MinSin kWh', 'Electric_utility', 'kWh', true, 'test/db/data/automatedTests/fifteenMinuteFreqTestData.csv', true],
+		['test23MinCos kWh', 'Electric_utility', 'kWh', true, 'test/db/data/automatedTests/23FreqCosineTestData.csv', true],
+		['testSqSin kWh', 'Electric_utility', 'kWh', true, 'test/db/data/automatedTests/2.5AmpSineSquaredTestData.csv', true],
+		['testSqCos kWh', 'Electric_utility', 'kWh', true, 'test/db/data/automatedTests/2.5AmpCosineSquaredTestData.csv', true],
+		['testAmp1Sin kWh', 'Electric_utility', 'kWh', true, 'test/db/data/automatedTests/15Freq1AmpSineTestData.csv', true],
+		['testAmp2Sin kWh', 'Electric_utility', 'kWh', true, 'test/db/data/automatedTests/15Freq2AmpSineTestData.csv', true],
+		['testAmp3Sin kWh', 'Electric_utility', 'kWh', true, 'test/db/data/automatedTests/15Freq3AmpSineTestData.csv', true],
+		['testAmp4Sin kWh', 'Electric_utility', 'kWh', true, 'test/db/data/automatedTests/15Freq4AmpSineTestData.csv', true],
+		['testAmp5Sin kWh', 'Electric_utility', 'kWh', true, 'test/db/data/automatedTests/15Freq5AmpSineTestData.csv', true],
+		['testAmp6Sin kWh', 'Electric_utility', 'kWh', true, 'test/db/data/automatedTests/15Freq6AmpSineTestData.csv', true],
+		['testAmp7Sin kWh', 'Electric_utility', 'kWh', true, 'test/db/data/automatedTests/15Freq7AmpSineTestData.csv', true]
 	];
 	// Function used to map values when reading the CSV file.
 	function mapRowsToModel(row) {
@@ -444,16 +446,23 @@ async function insertSpecialMeters(conn) {
 		// Meter values from above.
 		const meterData = specialMeters[i];
 		const meterName = meterData[0];
-		console.log(`    loading meter ${meterName} from file ${meterData[3]}`);
+		console.log(`    loading meter ${meterName} from file ${meterData[4]}`);
 		// We get the needed unit id from the name given.
-		const meterUnit = (await Unit.getByName(meterData[1], conn)).id;
-		const meterGraphicUnit = (await Unit.getByName(meterData[2], conn)).id;
+		let meterUnit, meterGraphicUnit;
+		if (meterData[1] === '') {
+			// No unit so make it -99 for both unit and default graphic unit
+			meterUnit = -99;
+			meterGraphicUnit = -99;
+		} else {
+			meterUnit = (await Unit.getByName(meterData[1], conn)).id;
+			meterGraphicUnit = (await Unit.getByName(meterData[2], conn)).id;
+		}
 		const meter = new Meter(
 			undefined, // id
 			meterName, // name
 			null, // URL
 			false, // enabled
-			true, //displayable
+			meterData[3], //displayable
 			'other', //type
 			null, // timezone
 			undefined, // gps
@@ -480,7 +489,7 @@ async function insertSpecialMeters(conn) {
 		} else {
 			// Only insert the meter and its readings if the meter did not already exist.
 			await meter.insert(conn);
-			const filename = `src/server/${meterData[3]}`;
+			const filename = `src/server/${meterData[4]}`;
 			await loadCsvInput(
 				filename, // filePath
 				meter.id, // meterID
@@ -500,7 +509,7 @@ async function insertSpecialMeters(conn) {
 				conn
 			);
 			// Delete mathematical test data file just uploaded. They have true for delete.
-			if (meterData[4] === true) {
+			if (meterData[5] === true) {
 				await fs.unlink(filename);
 			}
 		}
@@ -513,20 +522,21 @@ async function insertSpecialMeters(conn) {
 async function insertSpecialGroups(conn) {
 	// This assumes the insertSpecialMeters has been run.
 	// The table contains special groups' data.
-	// Each row contains: group name, default graphic unit name, array of meter names to add to group, array of group names to add to group.
+	// Each row contains: group name, default graphic unit name, displayable, array of meter names to add to group, array of group names to add to group.
 	// Don't create groups with of raw type since should not be graphed as a group.
 	const specialGroups = [
-		['Electric Utility 1-5 + 2-6 kWh', 'kWh', ['Electric Utility kWh', 'Electric Utility kWh 2-6'], []],
-		['Electric Utility 1-5 + 2-6 dollar kWh', 'kWh', ['Electric Utility kWh', 'Electric Utility kWh 2-6'], []],
-		['Electric kW + 2-6 kW', 'kW', ['Electric kW', 'Electric kW 2-6'], []],
-		['SqSin + SqCos kWh', 'kWh', ['testSqSin kWh', 'testSqCos kWh'], []],
-		['SqSin + SqCos no unit', '', ['testSqSin kWh', 'testSqCos kWh'], []],
-		['Amp 1 + 5 kWh', 'kWh', ['testAmp1Sin kWh', 'testAmp5Sin kWh'], []],
-		['Amp 2 + 6 kWh', 'kWh', ['testAmp2Sin kWh', 'testAmp6Sin kWh'], []],
-		['Amp 3 + 4 kWh', 'kWh', ['testAmp3Sin kWh', 'testAmp4Sin kWh'], []],
-		['Amp  2 + (1 + 5) kWh', 'kWh', ['testAmp2Sin kWh'], ['Amp 1 + 5 kWh']],
-		['Amp 3 + 6 + (2 + (1 + 5)) + (3 + 4) kWh', 'kWh', ['testAmp3Sin kWh', 'testAmp6Sin kWh'], ['Amp  2 + (1 + 5) kWh', 'Amp 3 + 4 kWh']],
-		['Amp 6 + 7 + (1 + 5) + (2 + 6) + (3 + 4) kWh', 'kWh', ['testAmp6Sin kWh', 'testAmp7Sin kWh'], ['Amp 2 + 6 kWh', 'Amp 3 + 4 kWh', 'Amp 1 + 5 kWh']]
+		['Electric Utility 1-5 + 2-6 kWh', 'kWh', true, ['Electric Utility kWh', 'Electric Utility kWh 2-6'], []],
+		['Electric Utility 1-5 + Natural Gas Dollar Euro', 'Euro', true, ['Electric Utility kWh', 'Natural Gas Dollar'], []],
+		['Electric kW + 2-6 kW', 'kW', true, ['Electric kW', 'Electric kW 2-6'], []],
+		['Electric Utility 1-5 kWh not displayable', 'kWh', false, ['Electric Utility kWh'], []],
+		['SqSin + SqCos kWh', 'kWh', true, ['testSqSin kWh', 'testSqCos kWh'], []],
+		['SqSin + SqCos no unit', '', true, ['testSqSin kWh', 'testSqCos kWh'], []],
+		['Amp 1 + 5 kWh', 'kWh', true, ['testAmp1Sin kWh', 'testAmp5Sin kWh'], []],
+		['Amp 2 + 6 kWh', 'kWh', true, ['testAmp2Sin kWh', 'testAmp6Sin kWh'], []],
+		['Amp 3 + 4 kWh', 'kWh', true, ['testAmp3Sin kWh', 'testAmp4Sin kWh'], []],
+		['Amp  2 + (1 + 5) kWh', 'kWh', true, ['testAmp2Sin kWh'], ['Amp 1 + 5 kWh']],
+		['Amp 3 + 6 + (2 + (1 + 5)) + (3 + 4) kWh', 'kWh', true, ['testAmp3Sin kWh', 'testAmp6Sin kWh'], ['Amp  2 + (1 + 5) kWh', 'Amp 3 + 4 kWh']],
+		['Amp 6 + 7 + (1 + 5) + (2 + 6) + (3 + 4) kWh', 'kWh', true, ['testAmp6Sin kWh', 'testAmp7Sin kWh'], ['Amp 2 + 6 kWh', 'Amp 3 + 4 kWh', 'Amp 1 + 5 kWh']]
 	];
 	for (let i = 0; i < specialGroups.length; ++i) {
 		// Group values from above.
@@ -544,7 +554,7 @@ async function insertSpecialGroups(conn) {
 		const group = new Group(
 			undefined, // id
 			groupName, // name
-			true, //displayable
+			groupData[2], //displayable
 			undefined, // gps
 			null, // note
 			null, //area
@@ -558,16 +568,16 @@ async function insertSpecialGroups(conn) {
 			// Get it again so have id.
 			const parent = await Group.getByName(group.name, conn);
 			// Now add the meter children.
-			for (let k = 0; k < groupData[2].length; ++k) {
-				const childMeter = groupData[2][k];
+			for (let k = 0; k < groupData[3].length; ++k) {
+				const childMeter = groupData[3][k];
 				console.log(`      adding child meter ${childMeter}`);
 				// Use meter id to add to group.
 				const childId = (await Meter.getByName(childMeter, conn)).id;
 				await parent.adoptMeter(childId, conn);
 			}
 			// Now add the group children.
-			for (let k = 0; k < groupData[3].length; ++k) {
-				const childGroup = groupData[3][k];
+			for (let k = 0; k < groupData[4].length; ++k) {
+				const childGroup = groupData[4][k];
 				console.log(`      adding child group ${childGroup}`);
 				// Use group id to add to group.
 				const childId = (await Group.getByName(childGroup, conn)).id;
@@ -604,12 +614,17 @@ NOTE this removes the meters and readings. You may need to remove dependent grou
 before doing this in the web groups page in OED.
 Get into postgres terminal inside the database Docker container and then do:
 psql -U oed
--- Remove all the readings. Normally gives "DELETE 575295"
-delete from readings where meter_id in (select id from meters where name in ('Electric Utility kWh', 'Electric Utility kWh 2-6', 'Electric Utility kWh in BTU', 'Electric Utility kWh in MTon CO2', 'Natural Gas BTU', 'Natural Gas BTU in Dollar', 'Natural Gas Dollar', 'Natural Gas Cubic Meters', 'Trash Kg', 'Temp Fahrenheit 0-212', 'Temp Fahrenheit in Celsius', 'Electric kW', 'Electric kW 2-6', 'test4DaySin kWh', 'test4HourSin kWh', 'test23MinSin kWh', 'test15MinSin kWh', 'test23MinCos kWh', 'testSqSin kWh', 'testSqCos kWh', 'testAmp1Sin kWh', 'testAmp2Sin kWh', 'testAmp3Sin kWh', 'testAmp4Sin kWh', 'testAmp5Sin kWh', 'testAmp6Sin kWh', 'testAmp7Sin kWh'));
-# remove all groups. Normally give "DELETE 25 & DELETE 6"
-delete from groups_immediate_meters; delete from groups_immediate_children;
-# Remove all the meters. Normally gives "DELETE 27"
-delete from meters where name in ('Electric Utility kWh', 'Electric Utility kWh 2-6', 'Electric Utility kWh in BTU', 'Electric Utility kWh in MTon CO2', 'Natural Gas BTU', 'Natural Gas BTU in Dollar', 'Natural Gas Dollar', 'Natural Gas Cubic Meters', 'Trash Kg', 'Temp Fahrenheit 0-212', 'Temp Fahrenheit in Celsius', 'Electric kW', 'Electric kW 2-6', 'test4DaySin kWh', 'test4HourSin kWh', 'test23MinSin kWh', 'test15MinSin kWh', 'test23MinCos kWh', 'testSqSin kWh', 'testSqCos kWh', 'testAmp1Sin kWh', 'testAmp2Sin kWh', 'testAmp3Sin kWh', 'testAmp4Sin kWh', 'testAmp5Sin kWh', 'testAmp6Sin kWh', 'testAmp7Sin kWh');
+-- Remove all the readings. Normally gives "DELETE 575301"
+delete from readings where meter_id in (select id from meters where name in ('Electric Utility kWh', 'Electric Utility kWh 2-6', 'Electric Utility kWh in BTU', 'Electric Utility kWh in MTon CO2', 'Electric Utility no unit', 'Natural Gas BTU', 'Natural Gas BTU in Dollar', 'Natural Gas Dollar', 'Natural Gas Cubic Meters', 'Trash Kg', 'Temp Fahrenheit 0-212', 'Temp Fahrenheit in Celsius', 'Electric kW', 'Electric kW 2-6', 'test4DaySin kWh', 'test4HourSin kWh', 'test23MinSin kWh', 'test15MinSin kWh', 'test23MinCos kWh', 'testSqSin kWh', 'testSqCos kWh', 'testAmp1Sin kWh', 'testAmp2Sin kWh', 'testAmp3Sin kWh', 'testAmp4Sin kWh', 'testAmp5Sin kWh', 'testAmp6Sin kWh', 'testAmp7Sin kWh'));
+# remove all groups.
+# Normally gives "DELETE 21"
+delete from groups_immediate_meters where group_id in (select id from groups where name in ('Electric Utility 1-5 + 2-6 kWh', 'Electric Utility 1-5 + Natural Gas Dollar Euro', 'Electric kW + 2-6 kW', 'SqSin + SqCos kWh', 'SqSin + SqCos no unit', 'Amp 1 + 5 kWh', 'Amp 2 + 6 kWh', 'Amp 3 + 4 kWh', 'Amp  2 + (1 + 5) kWh', 'Amp 3 + 6 + (2 + (1 + 5)) + (3 + 4) kWh', 'Amp 6 + 7 + (1 + 5) + (2 + 6) + (3 + 4) kWh'));
+# Normally gives "DELETE 6"
+delete from groups_immediate_children where parent_id in (select id from groups where name in ('Electric Utility 1-5 + 2-6 kWh', 'Electric Utility 1-5 + Natural Gas Dollar Euro', 'Electric kW + 2-6 kW', 'SqSin + SqCos kWh', 'SqSin + SqCos no unit', 'Amp 1 + 5 kWh', 'Amp 2 + 6 kWh', 'Amp 3 + 4 kWh', 'Amp  2 + (1 + 5) kWh', 'Amp 3 + 6 + (2 + (1 + 5)) + (3 + 4) kWh', 'Amp 6 + 7 + (1 + 5) + (2 + 6) + (3 + 4) kWh'));
+# Normally gives "DELETE 11"
+delete from groups where name in ('Electric Utility 1-5 + 2-6 kWh', 'Electric Utility 1-5 + Natural Gas Dollar Euro', 'Electric kW + 2-6 kW', 'SqSin + SqCos kWh', 'SqSin + SqCos no unit', 'Amp 1 + 5 kWh', 'Amp 2 + 6 kWh', 'Amp 3 + 4 kWh', 'Amp  2 + (1 + 5) kWh', 'Amp 3 + 6 + (2 + (1 + 5)) + (3 + 4) kWh', 'Amp 6 + 7 + (1 + 5) + (2 + 6) + (3 + 4) kWh');
+# Remove all the meters. Normally gives "DELETE 28"
+delete from meters where name in ('Electric Utility kWh', 'Electric Utility kWh 2-6', 'Electric Utility kWh in BTU', 'Electric Utility kWh in MTon CO2', 'Electric Utility no unit', 'Natural Gas BTU', 'Natural Gas BTU in Dollar', 'Natural Gas Dollar', 'Natural Gas Cubic Meters', 'Trash Kg', 'Temp Fahrenheit 0-212', 'Temp Fahrenheit in Celsius', 'Electric kW', 'Electric kW 2-6', 'test4DaySin kWh', 'test4HourSin kWh', 'test23MinSin kWh', 'test15MinSin kWh', 'test23MinCos kWh', 'testSqSin kWh', 'testSqCos kWh', 'testAmp1Sin kWh', 'testAmp2Sin kWh', 'testAmp3Sin kWh', 'testAmp4Sin kWh', 'testAmp5Sin kWh', 'testAmp6Sin kWh', 'testAmp7Sin kWh');
 # Quit postgres.
 \q
 */
