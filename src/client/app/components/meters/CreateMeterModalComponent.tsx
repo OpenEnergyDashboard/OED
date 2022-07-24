@@ -543,7 +543,7 @@ export default function CreateMeterModalComponent() {
 						<FormattedMessage id="discard.changes" />
 					</Button>
 					{/* On click calls the function handleSaveChanges in this component */}
-					<Button variant="primary" onClick={handleSubmit} disabled={!name || !enabled || !displayable || !timeZone}>
+					<Button variant="primary" onClick={handleSubmit} disabled={!name || !enabled || !displayable}>
 						<FormattedMessage id="save.all" />
 					</Button>
 				</Modal.Footer>
