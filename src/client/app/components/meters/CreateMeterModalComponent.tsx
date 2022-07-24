@@ -28,18 +28,18 @@ export default function CreateMeterModalComponent() {
 		url : '',
 		timeZone : '',
 		gps : 'latitude, longitude',
-		unitId : 0,
-		defaultGraphicUnit : 0,
+		unitId : -99,
+		defaultGraphicUnit : -99,
 		note : '',
 		cumulative : false,
 		cumulativeReset : false,
-		cumulativeResetStart : '',
-		cumulativeResetEnd : '',
+		cumulativeResetStart : '00:00:00',
+		cumulativeResetEnd : '23:59:59.999999',
 		endOnlyTime : false,
-		reading : 0,
+		reading : 0.0,
 		readingGap : 0,
 		readingVariation : 0,
-		readingDuplication : 0,
+		readingDuplication : 1,
 		timeSort : false,
 		startTimestamp : '',
 		endTimestamp : ''
@@ -57,12 +57,6 @@ export default function CreateMeterModalComponent() {
 		resetState();
 	};
 	const handleShow = () => setShowModal(true);
-
-	// id
-	const [id, setId] = useState(defaultValues.id);
-	const handleIdChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-		setId(Number(e.target.value));
-	}
 
 	// identifier
 	const [identifier, setIdentifier] = useState(defaultValues.identifier);
@@ -230,7 +224,7 @@ export default function CreateMeterModalComponent() {
 		// New Meter object, overwrite all unchanged props with state
 		const newMeter = {
 			...defaultValues,
-			id,
+			id : undefined,
 			identifier,
 			name,
 			area,
@@ -290,7 +284,7 @@ export default function CreateMeterModalComponent() {
 				</Modal.Header>
 				{/* when any of the Meter are changed call one of the functions. */}
 				<Modal.Body className="show-grid">
-				<div id="container">
+					<div id="container">
 						<div id="modalChild">
 							{/* Modal content */}
 							<div className="container-fluid">
@@ -549,7 +543,7 @@ export default function CreateMeterModalComponent() {
 						<FormattedMessage id="discard.changes" />
 					</Button>
 					{/* On click calls the function handleSaveChanges in this component */}
-					<Button variant="primary" onClick={handleSubmit} disabled={!name}>
+					<Button variant="primary" onClick={handleSubmit} disabled={!name || !enabled || !displayable || !timeZone}>
 						<FormattedMessage id="save.all" />
 					</Button>
 				</Modal.Footer>
