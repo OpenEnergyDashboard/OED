@@ -570,7 +570,7 @@ export default function EditMeterModalComponent(props: EditMeterModalComponentPr
 						<FormattedMessage id="discard.changes" />
 					</Button>
 					{/* On click calls the function handleSaveChanges in this component */}
-					<Button variant="primary" onClick={handleSaveChanges} disabled={!name || !enabled || !displayable}>
+					<Button variant="primary" onClick={handleSaveChanges} disabled={!name}>
 						<FormattedMessage id="save.all" />
 					</Button>
 				</Modal.Footer>
