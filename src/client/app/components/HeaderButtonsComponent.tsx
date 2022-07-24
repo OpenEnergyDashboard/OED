@@ -45,6 +45,7 @@ export default class HeaderButtonsComponent extends React.Component<HeaderButton
 		const renderMapsButton = loggedInAsAdmin && getPage() !== 'maps';
 		const renderCSVButton = role && hasPermissions(role, UserRole.CSV) && getPage() !== 'csv';
 		const renderUnitsButton = loggedInAsAdmin && getPage() !== 'units';
+		const renderConversionsButton = loggedInAsAdmin && getPage() !== 'conversion';
 		const renderLogoutButton = hasToken();
 
 		const loginLinkStyle: React.CSSProperties = {
@@ -78,6 +79,10 @@ export default class HeaderButtonsComponent extends React.Component<HeaderButton
 			display: renderUnitsButton ? 'inline' : 'none',
 			paddingLeft: '5px'
 		};
+		const conversionsLinkStyle: React.CSSProperties = {
+			display: renderConversionsButton ? 'inline' : 'none',
+			paddingLeft: '5px'
+		};
 		const logoutButtonStyle: React.CSSProperties = {
 			display: renderLogoutButton ? 'inline' : 'none',
 			paddingLeft: '5px'
@@ -104,6 +109,7 @@ export default class HeaderButtonsComponent extends React.Component<HeaderButton
 					<Link style={homeLinkStyle} to='/'><Button outline><FormattedMessage id='home'/></Button></Link>
 					<Link style={loginLinkStyle} to='/login'><Button outline><FormattedMessage id='log.in'/></Button></Link>
 					<Link style={unitsLinkStyle} to='/units'><Button outline><FormattedMessage id='units' /></Button></Link>
+					<Link style={conversionsLinkStyle} to='/conversions'><Button outline><FormattedMessage id='conversions' /></Button></Link>
 					<Link style={logoutButtonStyle} to='/'><Button outline onClick={this.handleLogOut}><FormattedMessage id='log.out'/></Button></Link>
 				</div>
 			</div>

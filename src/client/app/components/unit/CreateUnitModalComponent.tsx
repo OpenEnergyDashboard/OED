@@ -14,6 +14,7 @@ import { useState } from 'react';
 import { TrueFalseType } from '../../types/items';
 import TooltipMarkerComponent from '../TooltipMarkerComponent';
 import TooltipHelpContainer from '../../containers/TooltipHelpContainer';
+import { UnitData } from 'types/redux/units';
 
 export default function CreateUnitModalComponent() {
 
