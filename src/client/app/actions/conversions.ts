@@ -41,8 +41,8 @@ export function changeDisplayedConversions(conversions: number[]): t.ChangeDispl
 }
 
 // Pushes conversionId onto submitting conversions state array
-export function submitConversionEdits(conversionId: number): t.SubmitEditedConversionAction {
-	return { type: ActionType.SubmitEditedConversion, conversionId };
+export function submitConversionEdits(conversionSourceId: number, conversionDestinationId: number): t.SubmitEditedConversionAction {
+	return { type: ActionType.SubmitEditedConversion, conversionSourceId, conversionDestinationId };
 }
 
 export function confirmConversionEdits(editedConversion: t.ConversionData): t.ConfirmEditedConversionAction {
@@ -73,29 +73,31 @@ export function fetchConversionsDetailsIfNeeded(): Thunk {
 export function submitEditedConversion(editedConversion: t.ConversionData): Thunk {
 	return async (dispatch: Dispatch, getState: GetState) => {
 		// check if conversionData is already submitting (indexOf returns -1 if item does not exist in array)
-		if (getState().conversions.submitting.indexOf(editedConversion.sourceId) === -1) {
-			// Inform the store we are about to edit the passed in conversion
-			// Pushes conversionId of the conversionData to submit onto the submitting state array
-			dispatch(submitConversionEdits(editedConversion.sourceId));
+		// TODO: change if statement so it checks that combination of source/destination IDs do not already exist
+		// if (getState().conversions.submitting.indexOf(editedConversion.sourceId) === -1 ||
+		// 	getState().conversions.submitting.indexOf(editedConversion.destinationId) === -1) {
+		// 	// Inform the store we are about to edit the passed in conversion
+		// 	// Pushes conversionId of the conversionData to submit onto the submitting state array
+		dispatch(submitConversionEdits(editedConversion.sourceId, editedConversion.destinationId));
 
-			// Attempt to edit the conversion in the database
-			try {
-				// posts the edited conversionData to the conversions API
-				await conversionsApi.edit(editedConversion);
-				// Clear conversion Id from submitting state array
-				dispatch(deleteSubmittedConversion(editedConversion.sourceId));
-				// Update the store with our new edits
-				dispatch(confirmConversionEdits(editedConversion));
-				// Success!
-				showSuccessNotification(translate('conversion.successfully.edited.conversion'));
-			} catch (err) {
-				// Failure! ):
-				showErrorNotification(translate('conversion.failed.to.edit.conversion'));
-				// Clear our changes from to the submitting conversions state
-				// We must do this in case fetch failed to keep the store in sync with the database
-				dispatch(deleteSubmittedConversion(editedConversion.sourceId));
-			}
+		// Attempt to edit the conversion in the database
+		try {
+			// posts the edited conversionData to the conversions API
+			await conversionsApi.edit(editedConversion);
+			// Clear conversion Id from submitting state array
+			dispatch(deleteSubmittedConversion(editedConversion.sourceId));
+			// Update the store with our new edits
+			dispatch(confirmConversionEdits(editedConversion));
+			// Success!
+			showSuccessNotification(translate('conversion.successfully.edited.conversion'));
+		} catch (err) {
+			// Failure! ):
+			showErrorNotification(translate('conversion.failed.to.edit.conversion'));
+			// Clear our changes from to the submitting conversions state
+			// We must do this in case fetch failed to keep the store in sync with the database
+			dispatch(deleteSubmittedConversion(editedConversion.sourceId));
 		}
+		// }
 	};
 }
 

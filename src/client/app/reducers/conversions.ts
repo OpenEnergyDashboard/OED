@@ -39,7 +39,7 @@ export default function conversions(state = defaultState, action: ConversionsAct
 		case ActionType.SubmitEditedConversion:
 		{
 			const submitting = state.submitting;
-			submitting.push(action.conversionId);
+			submitting.push(action.conversionSourceId, action.conversionDestinationId);
 			return {
 				...state,
 				submitting

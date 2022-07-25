@@ -29,7 +29,7 @@ export default function ConversionsDetailComponent() {
 	}, []);
 
 	// Conversions state
-	const conversionsState = useSelector((state: State) => state.conversions);
+	const conversionsState = useSelector((state: State) => state.conversions.conversions);
 
 	// Units state
 	const unitsState = useSelector((state: State) => state.units.units);
@@ -73,7 +73,8 @@ export default function ConversionsDetailComponent() {
 						// 		(( conversionB.identifier.toLowerCase() > conversionA.identifier.toLowerCase()) ? -1 : 0))
 						.map(conversionData => (<ConversionViewComponent conversion={conversionData as ConversionData} key={(conversionData as ConversionData).sourceId}
 							sourceIdentifier = {unitsState[conversionData.sourceId].identifier}
-							destinationIdentifier = {unitsState[conversionData.destinationId].identifier} />))}
+							destinationIdentifier = {unitsState[conversionData.destinationId].identifier}
+							units = {unitsState} />))}
 				</div>
 			</div>
 			<FooterContainer />

@@ -30,7 +30,8 @@ export interface DeleteSubmittedConversionAction {
 
 export interface SubmitEditedConversionAction {
 	type: ActionType.SubmitEditedConversion;
-	conversionId: number;
+	conversionSourceId: number;
+	conversionDestinationId: number;
 }
 
 export interface ConfirmConversionsFetchedOnceAction {

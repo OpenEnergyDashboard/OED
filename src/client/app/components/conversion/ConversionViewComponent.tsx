@@ -10,11 +10,13 @@ import '../../styles/conversion-card-page.css';
 import { useState } from 'react';
 import { ConversionData } from 'types/redux/conversions';
 import translate from '../../utils/translate';
+import { UnitDataById } from 'types/redux/units';
 
 interface ConversionViewComponentProps {
 	conversion: ConversionData;
 	sourceIdentifier: string;
 	destinationIdentifier: string;
+	units: UnitDataById;
 }
 
 export default function ConversionViewComponent(props: ConversionViewComponentProps) {
@@ -31,7 +33,7 @@ export default function ConversionViewComponent(props: ConversionViewComponentPr
 		setShowEditModal(false);
 	}
 
-	// TODO: Get unit identifier values instead of DB IDs for sourceId and destinationId.
+	// Create header from sourceId, destinationId identifiers
 	const header = (props.sourceIdentifier + ' -> ' + props.destinationIdentifier);
 
 	return (
@@ -63,7 +65,7 @@ export default function ConversionViewComponent(props: ConversionViewComponentPr
 					<FormattedMessage id="edit.conversion" />
 				</Button>
 				{/* Creates a child ConversionModalEditComponent */}
-				<EditConversionModalComponent show={showEditModal} conversion={props.conversion} handleClose={handleClose} />
+				<EditConversionModalComponent show={showEditModal} conversion={props.conversion} unitsState={props.units} handleClose={handleClose} />
 			</div>
 		</div>
 	);

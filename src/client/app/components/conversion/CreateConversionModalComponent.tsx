@@ -121,7 +121,7 @@ export default function CreateConversionModalComponent(props: CreateConversionMo
 										<Input
 											name='sourceId'
 											type='select'
-											onChange={e => handleStringChange(e)}>
+											onChange={e => handleNumberChange(e)}>
 											{Object.values(props.unitsState).map(unitData => {
 												return (<option value={unitData.id} key={unitData.id}>{unitData.identifier}</option>)
 											})}
@@ -133,7 +133,7 @@ export default function CreateConversionModalComponent(props: CreateConversionMo
 										<Input
 											name='destinationId'
 											type='select'
-											onChange={e => handleStringChange(e)}>
+											onChange={e => handleNumberChange(e)}>
 											{Object.values(props.unitsState).map(unitData => {
 												return (<option value={unitData.id} key={unitData.id}>{unitData.identifier}</option>)
 											})}
