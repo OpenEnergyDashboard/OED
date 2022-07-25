@@ -60,6 +60,7 @@ export function confirmConversionsFetchedOnce(): t.ConfirmConversionsFetchedOnce
 // Fetch the conversions details from the database if they have not already been fetched once
 export function fetchConversionsDetailsIfNeeded(): Thunk {
 	return (dispatch: Dispatch, getState: GetState) => {
+		const state = getState().conversions;	// TODO: For bug hunting
 		// If conversions have not been fetched once, return the fetchConversionDetails function
 		if (!getState().conversions.hasBeenFetchedOnce)
 		{
