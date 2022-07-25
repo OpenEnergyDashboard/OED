@@ -16,10 +16,12 @@ import TooltipHelpContainer from '../../containers/TooltipHelpContainer';
 import { useState } from 'react';
 import '../../styles/Modal.conversion.css';
 import { TrueFalseType } from '../../types/items';
+import { UnitDataById } from 'types/redux/units';
 
 interface EditConversionModalComponentProps {
 	show: boolean;
 	conversion: ConversionData;
+	unitsState: UnitDataById;
 	// passed in to handle closing the modal
 	handleClose: () => void;
 }
@@ -134,11 +136,13 @@ export default function EditConversionModalComponent(props: EditConversionModalC
 									<div style={formInputStyle}>
 										<label><FormattedMessage id="conversion.sourceId" /></label><br />
 										<Input
-											name="sourceId"
-											type="select"
-											onChange={e => handleStringChange(e)}
-											defaultValue={state.sourceId}
-											placeholder="SourceId" />
+											name='sourceId'
+											type='select'
+											onChange={e => handleStringChange(e)}>
+											{Object.values(props.unitsState).map(unitData => {
+												return (<option value={unitData.id} key={unitData.id}>{unitData.identifier}</option>)
+											})}
+										</Input>
 										<div />
 										{/* DestinationId input*/}
 										<div style={formInputStyle}>
@@ -146,8 +150,11 @@ export default function EditConversionModalComponent(props: EditConversionModalC
 											<Input
 												name='destinationId'
 												type='select'
-												onChange={e => handleStringChange(e)}
-												required value={state.destinationId} />
+												onChange={e => handleStringChange(e)}>
+												{Object.values(props.unitsState).map(unitData => {
+													return (<option value={unitData.id} key={unitData.id}>{unitData.identifier}</option>)
+												})}
+											</Input>
 										</div>
 										{/* Bidirectional Y/N input*/}
 										<div style={formInputStyle}>

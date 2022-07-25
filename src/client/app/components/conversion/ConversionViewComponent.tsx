@@ -40,10 +40,10 @@ export default function ConversionViewComponent(props: ConversionViewComponentPr
 				{header}
 			</div>
 			<div className="conversion-container">
-				<b><FormattedMessage id="conversion.sourceId" /></b> {props.conversion.sourceId}
+				<b><FormattedMessage id="conversion.sourceId" /></b> {props.sourceIdentifier}
 			</div>
 			<div className="conversion-container">
-				<b><FormattedMessage id="conversion.destinationId" /></b> {props.conversion.destinationId}
+				<b><FormattedMessage id="conversion.destinationId" /></b> {props.destinationIdentifier}
 			</div>
 			<div className="conversion-container">
 				<b><FormattedMessage id="conversion.bidirectional" /></b> {props.conversion.bidirectional}

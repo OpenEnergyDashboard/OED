@@ -29,16 +29,10 @@ export default function ConversionsDetailComponent() {
 	}, []);
 
 	// Conversions state
-	const conversionsState = useSelector((state: State) => state.conversions.conversions);
+	const conversionsState = useSelector((state: State) => state.conversions);
 
 	// Units state
 	const unitsState = useSelector((state: State) => state.units.units);
-	// let sourceId = 2;
-	// let x = unitsState[sourceId].identifier;
-	// let header = ;
-
-	// .sort((unitA: UnitData, unitB: UnitData) => (unitA.identifier.toLowerCase() > unitB.identifier.toLowerCase()) ? 1 :
-	// 						(( unitB.identifier.toLowerCase() > unitA.identifier.toLowerCase()) ? -1 : 0))
 
 	// Check for admin status
 	const currentUser = useSelector((state: State) => state.currentUser.profile);

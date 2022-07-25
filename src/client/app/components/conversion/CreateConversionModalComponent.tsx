@@ -24,8 +24,8 @@ export default function CreateConversionModalComponent(props: CreateConversionMo
 	const dispatch = useDispatch();
 
 	const defaultValues = {
-		sourceId: -1,
-		destinationId: -1,
+		sourceId: -99,
+		destinationId: -99,
 		bidirectional: false,
 		slope: 0.0,
 		intercept: 0.0,
