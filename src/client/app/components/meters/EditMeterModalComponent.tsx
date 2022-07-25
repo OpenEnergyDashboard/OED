@@ -60,7 +60,7 @@ export default function EditMeterModalComponent(props: EditMeterModalComponentPr
 	}
 
 	// meterType
-	const [meterType, setMeterType] = useState(props.meter.meterType);
+	const [meterType, setMeterType] = useState(props.meter.meterType? `${props.meter.meterType}` : '');
 	const handleMeterTypeChange = (e: React.ChangeEvent<HTMLInputElement>) => {
 		setMeterType(e.target.value);
 	}
@@ -72,10 +72,9 @@ export default function EditMeterModalComponent(props: EditMeterModalComponentPr
 	}
 
 	// timeZone
-	const [timeZone, setTimeZone] = useState({abbrev : props.meter.timeZone.abbrev,
-		name : props.meter.timeZone.name, offset : props.meter.timeZone.offset});
-	const handleTimeZoneChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-		setTimeZone(JSON.parse(e.target.value));
+	const [timeZone, setTimeZone] = useState(props.meter.timeZone);
+	const handleTimeZoneChange = (timeZone : string ) => {
+		setTimeZone(timeZone);
 	}
 
 	// GPS
@@ -189,9 +188,9 @@ export default function EditMeterModalComponent(props: EditMeterModalComponentPr
 		setName(props.meter.name);
 		setEnabled(props.meter.enabled);
 		setDisplayable(props.meter.displayable);
-		setMeterType(props.meter.meterType);
+		setMeterType(props.meter.meterType? `${props.meter.meterType}` : '');
 		setUrl(props.meter.url);
-		setTimeZone({abbrev : props.meter.timeZone.abbrev, name : props.meter.timeZone.name, offset : props.meter.timeZone.offset});
+		setTimeZone(props.meter.timeZone);
 		//setGps(props.meter.gps? `${props.meter.gps.latitude}, ${props.meter.gps.longitude}` : '');
 		setUnitID(props.meter.unitId);
 		setDefaultGraphicUnit(props.meter.defaultGraphicUnit);
@@ -391,7 +390,8 @@ export default function EditMeterModalComponent(props: EditMeterModalComponentPr
 										</div>
 										{/* Timezone input*/}
 										<div style={formInputStyle}>
-											<TimeZoneSelect current={props.meter.timeZone.name} handleClick={e => handleTimeZoneChange(e)} />
+											<label><FormattedMessage id="meter.time.zone" /></label><br />
+											<TimeZoneSelect current={timeZone} handleClick={timeZone => handleTimeZoneChange(timeZone)} />
 										</div>
 										{/* GPS input*/}
 										{/*<div style={formInputStyle}>

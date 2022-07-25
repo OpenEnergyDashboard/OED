@@ -9,8 +9,8 @@ import { TimeZones, TimeZoneOption } from 'types/timezone';
 import translate from '../utils/translate';
 
 interface TimeZoneSelectProps {
-	current: string | undefined;
-	handleClick: (value: string | null) => void;
+	current: string;
+	handleClick: (value: string) => void;
 }
 
 let options: null | TimeZoneOption[] = null;
@@ -23,7 +23,7 @@ const TimeZoneSelect: React.FC<TimeZoneSelectProps> = ({ current, handleClick })
 		if (!optionsLoaded) {
 			axios.get('/api/timezones').then(res => {
 				const timeZones = res.data;
-				const resetTimeZone = [{value: null, label: translate('timezone.no')}];
+				const resetTimeZone = [{value: '', label: translate('timezone.no')}];
 				const allTimeZones = (timeZones.map((timezone: TimeZones) => {
 					return { value: timezone.name, label: `${timezone.name} (${timezone.abbrev}) ${timezone.offset}` };
 				}));
@@ -33,10 +33,8 @@ const TimeZoneSelect: React.FC<TimeZoneSelectProps> = ({ current, handleClick })
 		}
 	}, []);
 
-	const handleChange = (selectedOption: TimeZoneOption | null) => {
-		if (selectedOption != null ) {
-			handleClick(selectedOption.value);
-		}
+	const handleChange = (selectedOption: TimeZoneOption) => {
+		handleClick(selectedOption.value);
 	};
 
 	return (options !== null ?

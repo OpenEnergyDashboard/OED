@@ -27,7 +27,7 @@ export default function CreateMeterModalComponent() {
 		displayable : true,
 		meterType : MeterType.other,
 		url : '',
-		timeZone : {abbrev : '', name : '', offset : ''},
+		timeZone : '',
 		gps : {latitude : 0, longitude : 0},
 		unitId : -99,
 		defaultGraphicUnit : -99,
@@ -90,7 +90,7 @@ export default function CreateMeterModalComponent() {
 	}
 
 	// meterType
-	const [meterType, setMeterType] = useState(defaultValues.meterType.toString);
+	const [meterType, setMeterType] = useState(defaultValues.meterType? `${defaultValues.meterType}` : '');
 	const handleMeterTypeChange = (e: React.ChangeEvent<HTMLInputElement>) => {
 		setMeterType(e.target.value);
 	}
@@ -102,10 +102,9 @@ export default function CreateMeterModalComponent() {
 	}
 
 	// timeZone
-	const [timeZone, setTimeZone] = useState({abbrev : defaultValues.timeZone.abbrev,
-		name : defaultValues.timeZone.name, offset : defaultValues.timeZone.offset});
-	const handleTimeZoneChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-		setTimeZone(JSON.parse(e.target.value));
+	const [timeZone, setTimeZone] = useState(defaultValues.timeZone);
+	const handleTimeZoneChange = (timeZone : string ) => {
+		setTimeZone(timeZone);
 	}
 
 	// GPS
@@ -365,7 +364,8 @@ export default function CreateMeterModalComponent() {
 										</div>
 										{/* Timezone input*/}
 										<div style={formInputStyle}>
-											<TimeZoneSelect current={defaultValues.timeZone.name} handleClick={e => handleTimeZoneChange(e)} />
+											<label><FormattedMessage id="meter.time.zone" /></label><br />
+											<TimeZoneSelect current={timeZone} handleClick={timeZone => handleTimeZoneChange(timeZone)} />
 										</div>
 										{/* GPS input*/}
 										{/*<div style={formInputStyle}>
