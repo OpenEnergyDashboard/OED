@@ -200,5 +200,90 @@ router.post('/edit', requiredAdmin('edit meters'), async (req, res) => {
 	}
 });
 
+/**
+ * Route for POST add unit.
+ */
+ router.post('/addMeter', async (req, res) => {
+	const validParams = {
+		type: 'object',
+		maxProperties: 6,
+		required: ['id', 'enabled', 'displayable', 'timeZone'],
+		properties: {
+			id: { type: 'integer' },
+			enabled: { type: 'bool' },
+			displayable: { type: 'bool' },
+			timeZone: {
+				oneOf: [
+					{ type: 'string' },
+					{ type: 'null' }
+				]
+			},
+			gps: {
+				oneOf: [
+					{
+						type: 'object',
+						required: ['latitude', 'longitude'],
+						properties: {
+							latitude: { type: 'number', minimum: '-90', maximum: '90' },
+							longitude: { type: 'number', minimum: '-180', maximum: '180' }
+						}
+					},
+					{ type: 'null' }
+				]
+			},
+			identifier: {
+				oneOf: [
+					{ type: 'string' },
+					{ type: 'null' }
+				]
+			}
+		}
+	};
+
+	const validationResult = validate(req.body, validParams);
+	if (!validationResult.valid) {
+		log.error(`Invalid input for meterAPI. ${validationResult.error}`);
+		res.sendStatus(400);
+	} else {
+		const conn = getConnection();
+		try {
+			await conn.tx(async t => {
+				const newMeter = new Meter(
+					undefined,				//id
+					req.body.name,
+					req.body.enabled,
+					req.body.displayable,
+					req.body.url,
+					req.body.meterType,
+					req.body.timeZone,
+					req.body.gps,
+					req.body.identifier,
+					req.body.area,
+					req.body.note,
+					req.body.cumulative,
+					req.body.cumulativeReset,
+					req.body.cumulativeResetStart,
+					req.body.cumulativeResetEnd,
+					req.body.readingGap,
+					req.body.readingVariation,
+					req.body.readingDuplication,
+					req.body.timeSort,
+					req.body.endOnlyTime,
+					req.body.reading,
+					req.body.startTimestamp,
+					req.body.endTimestamp,
+					req.body.unitId,
+					req.body.defaultGraphicUnit
+				);
+				await newMeter.insert(t);
+			});
+			res.sendStatus(200);
+		} catch (err) {
+			log.error(`Error while inserting new meter ${err}`, err);
+			res.sendStatus(500);
+		}
+	}
+});
+
 module.exports = router;
 
