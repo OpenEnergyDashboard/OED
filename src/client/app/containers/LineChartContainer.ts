@@ -37,16 +37,12 @@ function mapStateToProps(state: State) {
 				// which is always one hour for OED.
 				unitLabel = selectUnitState.identifier + ' / ' + translate(currentSelectedRate.label);
 				// This is a special case where the automatic labeling is not the common usage so note usual in parentheses.
-				// TODO ask Steve what this should be changed to with new rates.
-				// e.g. How should kWh / Second, etc. be handled?
-				/*
-				if (unitLabel === 'kWh / Hour') {
+				if (selectUnitState.identifier === 'kWh' && currentSelectedRate.rate == 1) {
 					unitLabel += ' (kW)';
-				} */
+				}
 				// Rate scaling is needed
 				needsRateScaling = true;
-				// TODO discuss how flow should be handled since the document only specifies raw
-			} else if (/* selectUnitState.unitRepresent === UnitRepresentType.flow ||  */selectUnitState.unitRepresent === UnitRepresentType.raw) {
+			} else if (selectUnitState.unitRepresent === UnitRepresentType.raw) {
 				// If it is a flow meter then you are graphing the original rate unit.
 				unitLabel = selectUnitState.identifier;
 			}
@@ -85,7 +81,7 @@ function mapStateToProps(state: State) {
 						const timeReading = st.add(moment.utc(reading.endTimestamp).diff(st) / 2);
 						xData.push(timeReading.format('YYYY-MM-DD HH:mm:ss'));
 						yData.push(reading.reading * rate);
-						hoverText.push(`<b> ${timeReading.format('ddd, ll LTS')} </b> <br> ${label}: ${reading.reading.toPrecision(6)} ${unitLabel}`);
+						hoverText.push(`<b> ${timeReading.format('ddd, ll LTS')} </b> <br> ${label}: ${(reading.reading * rate).toPrecision(6)} ${unitLabel}`);
 					});
 				}
 				else {
