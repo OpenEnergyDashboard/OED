@@ -20,7 +20,7 @@ export default function CreateMeterModalComponent() {
 	const dispatch = useDispatch();
 
 	const gpsDefault: GPSPoint = {
-		longitude: 90,
+		longitude: 0,
 		latitude: 0
 	};
 
@@ -89,13 +89,7 @@ export default function CreateMeterModalComponent() {
 	// GPS
 	const [gps, setGps] = useState(defaultValues.gps);
 	const handleGpsChange = (gps: GPSPoint) => {
-		const editLongitude = gps.longitude
-		const editLatitude = gps.longitude
-		const gpsPoint: GPSPoint = {
-			longitude: editLongitude,
-			latitude: editLatitude
-		};
-		setGps(gpsPoint);
+		setGps(gps);
 	}
 
 	/* End State */
