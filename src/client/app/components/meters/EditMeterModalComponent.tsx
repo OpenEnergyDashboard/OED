@@ -75,7 +75,7 @@ export default function EditMeterModalComponent(props: EditMeterModalComponentPr
 	const [timeZone, setTimeZone] = useState({abbrev : props.meter.timeZone.abbrev,
 		name : props.meter.timeZone.name, offset : props.meter.timeZone.offset});
 	const handleTimeZoneChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-		setTimeZone(e);
+		setTimeZone(JSON.parse(e.target.value));
 	}
 
 	// GPS
