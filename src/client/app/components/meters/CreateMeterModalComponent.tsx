@@ -12,6 +12,7 @@ import { useDispatch } from 'react-redux';
 import { addMeter } from '../../actions/meters';
 import { useState } from 'react';
 import { TrueFalseType } from '../../types/items';
+import TimeZoneSelect from '../TimeZoneSelect';
 
 export default function CreateMeterModalComponent() {
 
@@ -26,8 +27,8 @@ export default function CreateMeterModalComponent() {
 		displayable : true,
 		meterType : MeterType.other,
 		url : '',
-		timeZone : '',
-		gps : 'latitude, longitude',
+		timeZone : {abbrev : '', name : '', offset : ''},
+		gps : {latitude : 0, longitude : 0},
 		unitId : -99,
 		defaultGraphicUnit : -99,
 		note : '',
@@ -89,7 +90,7 @@ export default function CreateMeterModalComponent() {
 	}
 
 	// meterType
-	const [meterType, setMeterType] = useState(defaultValues.meterType? `${defaultValues.meterType}` : '');
+	const [meterType, setMeterType] = useState(defaultValues.meterType.toString);
 	const handleMeterTypeChange = (e: React.ChangeEvent<HTMLInputElement>) => {
 		setMeterType(e.target.value);
 	}
@@ -100,17 +101,18 @@ export default function CreateMeterModalComponent() {
 		setUrl(e.target.value);
 	}
 
-	// timezone
-	const [timeZone, setTimeZone] = useState(defaultValues.timeZone);
+	// timeZone
+	const [timeZone, setTimeZone] = useState({abbrev : defaultValues.timeZone.abbrev,
+		name : defaultValues.timeZone.name, offset : defaultValues.timeZone.offset});
 	const handleTimeZoneChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-		setTimeZone(e.target.value);
+		setTimeZone(e);
 	}
 
 	// GPS
-	const [gps, setGps] = useState(defaultValues.gps);
+	/*const [gps, setGps] = useState(defaultValues.gps);
 	const handleGpsChange = (e: React.ChangeEvent<HTMLInputElement>) => {
 		setGps(e.target.value);
-	}
+	}*/
 
 	// unitID
 	const [unitId, setUnitID] = useState(defaultValues.unitId);
@@ -224,7 +226,6 @@ export default function CreateMeterModalComponent() {
 		// New Meter object, overwrite all unchanged props with state
 		const newMeter = {
 			...defaultValues,
-			id : undefined,
 			identifier,
 			name,
 			area,
@@ -233,7 +234,7 @@ export default function CreateMeterModalComponent() {
 			meterType,
 			url,
 			timeZone,
-			gps,
+			//gps,
 			unitId,
 			defaultGraphicUnit,
 			note,
@@ -364,22 +365,17 @@ export default function CreateMeterModalComponent() {
 										</div>
 										{/* Timezone input*/}
 										<div style={formInputStyle}>
-											<label><FormattedMessage id="meter.time.zone" /></label><br />
-											<Input
-												type='text'
-												onChange={e => handleTimeZoneChange(e)}
-												defaultValue={timeZone}
-												placeholder="Time Zone" />
+											<TimeZoneSelect current={defaultValues.timeZone.name} handleClick={e => handleTimeZoneChange(e)} />
 										</div>
 										{/* GPS input*/}
-										<div style={formInputStyle}>
+										{/*<div style={formInputStyle}>
 											<label><FormattedMessage id="meter.gps" /></label><br />
 											<Input
 												type='text'
 												onChange={e => handleGpsChange(e)}
 												defaultValue={gps}
 												placeholder="latitude, longitude" />
-										</div>
+											</div>*/}
 										{/* UnitId input*/}
 										<div style={formInputStyle}>
 											<label><FormattedMessage id="meter.unitId" /></label><br />

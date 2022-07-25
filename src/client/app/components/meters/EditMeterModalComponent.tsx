@@ -13,6 +13,7 @@ import { removeUnsavedChanges } from '../../actions/unsavedWarning';
 import { useState } from 'react';
 import '../../styles/Modal.unit.css';
 import { TrueFalseType } from '../../types/items';
+import TimeZoneSelect from '../TimeZoneSelect';
 
 interface EditMeterModalComponentProps {
 	show: boolean;
@@ -59,7 +60,7 @@ export default function EditMeterModalComponent(props: EditMeterModalComponentPr
 	}
 
 	// meterType
-	const [meterType, setMeterType] = useState(props.meter.meterType? `${props.meter.meterType}` : '');
+	const [meterType, setMeterType] = useState(props.meter.meterType);
 	const handleMeterTypeChange = (e: React.ChangeEvent<HTMLInputElement>) => {
 		setMeterType(e.target.value);
 	}
@@ -71,20 +72,19 @@ export default function EditMeterModalComponent(props: EditMeterModalComponentPr
 	}
 
 	// timeZone
-	const [timeZone, setTimeZone] = useState(props.meter.timeZone? `${props.meter.timeZone.abbrev},
-										${props.meter.timeZone.name}, ${props.meter.timeZone.offset}` : '');
+	const [timeZone, setTimeZone] = useState({abbrev : props.meter.timeZone.abbrev,
+		name : props.meter.timeZone.name, offset : props.meter.timeZone.offset});
 	const handleTimeZoneChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-		setTimeZone(e.target.value);
+		setTimeZone(e);
 	}
 
 	// GPS
-	const [gps, setGps] = useState(props.meter.gps? `${props.meter.gps.latitude}, ${props.meter.gps.latitude}` :
-		'' + props.meter.gps + ' , ' + props.meter.gps);
+	/*const [gps, setGps] = useState(props.meter.gps? `${props.meter.gps.latitude}, ${props.meter.gps.longitude}` : '');
 	const handleGpsChange = (e: React.ChangeEvent<HTMLInputElement>) => {
 		// check input
 		// format input
 		setGps(e.target.value);
-	}
+	}*/
 
 	// unitID
 	const [unitId, setUnitID] = useState(props.meter.unitId);
@@ -189,10 +189,10 @@ export default function EditMeterModalComponent(props: EditMeterModalComponentPr
 		setName(props.meter.name);
 		setEnabled(props.meter.enabled);
 		setDisplayable(props.meter.displayable);
-		setMeterType(props.meter.meterType? `${props.meter.meterType}` : '');
+		setMeterType(props.meter.meterType);
 		setUrl(props.meter.url);
-		setTimeZone(props.meter.timeZone? `${props.meter.timeZone.abbrev}, ${props.meter.timeZone.name}, ${props.meter.timeZone.offset}` : '');
-		setGps(props.meter.gps? `${props.meter.gps.latitude}, ${props.meter.gps.longitude}` : '');
+		setTimeZone({abbrev : props.meter.timeZone.abbrev, name : props.meter.timeZone.name, offset : props.meter.timeZone.offset});
+		//setGps(props.meter.gps? `${props.meter.gps.latitude}, ${props.meter.gps.longitude}` : '');
 		setUnitID(props.meter.unitId);
 		setDefaultGraphicUnit(props.meter.defaultGraphicUnit);
 		setNote(props.meter.note);
@@ -235,7 +235,7 @@ export default function EditMeterModalComponent(props: EditMeterModalComponentPr
 				props.meter.meterType != meterType ||
 				props.meter.url != url ||
 				props.meter.timeZone != timeZone ||
-				props.meter.gps != gps ||
+				//props.meter.gps != gps ||
 				props.meter.unitId != unitId ||
 				props.meter.defaultGraphicUnit != defaultGraphicUnit ||
 				props.meter.note != note ||
@@ -264,7 +264,7 @@ export default function EditMeterModalComponent(props: EditMeterModalComponentPr
 				meterType,
 				url,
 				timeZone,
-				gps,
+				//gps,
 				unitId,
 				defaultGraphicUnit,
 				note,
@@ -391,22 +391,17 @@ export default function EditMeterModalComponent(props: EditMeterModalComponentPr
 										</div>
 										{/* Timezone input*/}
 										<div style={formInputStyle}>
-											<label><FormattedMessage id="meter.time.zone" /></label><br />
-											<Input
-												type='text'
-												onChange={e => handleTimeZoneChange(e)}
-												defaultValue={timeZone}
-												placeholder="Time Zone" />
+											<TimeZoneSelect current={props.meter.timeZone.name} handleClick={e => handleTimeZoneChange(e)} />
 										</div>
 										{/* GPS input*/}
-										<div style={formInputStyle}>
+										{/*<div style={formInputStyle}>
 											<label><FormattedMessage id="meter.gps" /></label><br />
 											<Input
 												type='text'
 												onChange={e => handleGpsChange(e)}
 												defaultValue={gps}
 												placeholder="latitude, longitude" />
-										</div>
+										</div>*\}
 										{/* UnitId input*/}
 										<div style={formInputStyle}>
 											<label><FormattedMessage id="meter.unitId" /></label><br />
