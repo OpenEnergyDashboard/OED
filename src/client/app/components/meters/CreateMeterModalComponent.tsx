@@ -13,10 +13,16 @@ import { addMeter } from '../../actions/meters';
 import { useState } from 'react';
 import { TrueFalseType } from '../../types/items';
 import TimeZoneSelect from '../TimeZoneSelect';
+import { GPSPoint } from 'utils/calibration';
 
 export default function CreateMeterModalComponent() {
 
 	const dispatch = useDispatch();
+
+	const gpsDefault: GPSPoint = {
+		longitude: 90,
+		latitude: 0
+	};
 
 	const defaultValues = {
 		id: -99,
@@ -28,7 +34,7 @@ export default function CreateMeterModalComponent() {
 		meterType : MeterType.other,
 		url : '',
 		timeZone : '',
-		gps : {latitude : 0, longitude : 0},
+		gps : gpsDefault,
 		unitId : -99,
 		defaultGraphicUnit : -99,
 		note : '',
@@ -78,6 +84,18 @@ export default function CreateMeterModalComponent() {
 	const [timeZone, setTimeZone] = useState(defaultValues.timeZone);
 	const handleTimeZoneChange = (timeZone : string ) => {
 		setTimeZone(timeZone);
+	}
+
+	// GPS
+	const [gps, setGps] = useState(defaultValues.gps);
+	const handleGpsChange = (gps: GPSPoint) => {
+		const editLongitude = gps.longitude
+		const editLatitude = gps.longitude
+		const gpsPoint: GPSPoint = {
+			longitude: editLongitude,
+			latitude: editLatitude
+		};
+		setGps(gpsPoint);
 	}
 
 	/* End State */
@@ -219,15 +237,15 @@ export default function CreateMeterModalComponent() {
 											<TimeZoneSelect current={timeZone} handleClick={timeZone => handleTimeZoneChange(timeZone)} />
 										</div>
 										{/* GPS input*/}
-										{/* <div style={formInputStyle}>
+										<div style={formInputStyle}>
 											<label><FormattedMessage id="meter.gps" /></label><br />
 											<Input
 												name='gps'
 												type='text'
-												onChange={e => handleGPSChange(e)}
-												defaultValue={`${state.gps.latitude}, ${state.gps.longitude}`}
+												onChange={() => handleGpsChange(gps)}
+												defaultValue={`${gps.latitude}, ${gps.longitude}`}
 												placeholder="latitude, longitude" />
-										</div> */}
+										</div>
 										{/* UnitId input*/}
 										<div style={formInputStyle}>
 											<label><FormattedMessage id="meter.unitId" /></label><br />

@@ -23,7 +23,7 @@ const TimeZoneSelect: React.FC<TimeZoneSelectProps> = ({ current, handleClick })
 		if (!optionsLoaded) {
 			axios.get('/api/timezones').then(res => {
 				const timeZones = res.data;
-				const resetTimeZone = [{value: '', label: translate('timezone.no')}];
+				const resetTimeZone = [{value: null, label: translate('timezone.no')}];
 				const allTimeZones = (timeZones.map((timezone: TimeZones) => {
 					return { value: timezone.name, label: `${timezone.name} (${timezone.abbrev}) ${timezone.offset}` };
 				}));
