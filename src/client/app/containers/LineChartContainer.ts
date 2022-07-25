@@ -12,6 +12,7 @@ import { TimeInterval } from '../../../common/TimeInterval';
 import Locales from '../types/locales';
 import { DataType } from '../types/Datasources';
 import { UnitRepresentType } from '../types/redux/units';
+import translate from '../utils/translate';
 
 function mapStateToProps(state: State) {
 	const timeInterval = state.graph.timeInterval;
@@ -19,7 +20,10 @@ function mapStateToProps(state: State) {
 	const datasets: any[] = [];
 	// The unit label depends on the unit which is in selectUnit state.
 	const graphingUnit = state.graph.selectedUnit;
+	// The current selected rate
+	const currentSelectedRate = state.graph.lineGraphRate;
 	let unitLabel: string = '';
+	let needsRateScaling = false;
 	// If graphingUnit is -99 then none selected and nothing to graph so label is empty.
 	// This will probably happen when the page is first loaded.
 	if (graphingUnit !== -99) {
@@ -28,19 +32,27 @@ function mapStateToProps(state: State) {
 			// Quantity and flow units have different unit labels.
 			// Look up the type of unit if it is for quantity/flow/raw and decide what to do.
 			// Bar graphics are always quantities.
-			if (selectUnitState.unitRepresent === UnitRepresentType.quantity) {
+			if (selectUnitState.unitRepresent === UnitRepresentType.quantity || selectUnitState.unitRepresent === UnitRepresentType.flow) {
 				// If it is a quantity unit then it is a rate so indicate by dividing by the time interval
 				// which is always one hour for OED.
-				unitLabel = selectUnitState.identifier + ' / hour';
+				unitLabel = selectUnitState.identifier + ' / ' + translate(currentSelectedRate.label);
 				// This is a special case where the automatic labeling is not the common usage so note usual in parentheses.
-				if (unitLabel === 'kWh / hour') {
+				// TODO ask Steve what this should be changed to with new rates.
+				// e.g. How should kWh / Second, etc. be handled?
+				/*
+				if (unitLabel === 'kWh / Hour') {
 					unitLabel += ' (kW)';
-				}
-			} else if (selectUnitState.unitRepresent === UnitRepresentType.flow || selectUnitState.unitRepresent === UnitRepresentType.raw) {
+				} */
+				// Rate scaling is needed
+				needsRateScaling = true;
+				// TODO discuss how flow should be handled since the document only specifies raw
+			} else if (/* selectUnitState.unitRepresent === UnitRepresentType.flow ||  */selectUnitState.unitRepresent === UnitRepresentType.raw) {
 				// If it is a flow meter then you are graphing the original rate unit.
 				unitLabel = selectUnitState.identifier;
 			}
 		}
+		// If the current rate is per hour (default rate) then don't bother with the extra calculations since we'd be multiplying by 1
+		needsRateScaling = needsRateScaling && (currentSelectedRate.rate != 1);
 	}
 
 	// Add all valid data from existing meters to the line plot
@@ -60,16 +72,34 @@ function mapStateToProps(state: State) {
 				const yData: number[] = [];
 				const hoverText: string[] = [];
 				const readings = _.values(readingsData.readings);
-				readings.forEach(reading => {
-					// As usual, we want to interpret the readings in UTC. We lose the timezone as this as the start/endTimestamp
-					// are equivalent to Unix timestamp in milliseconds.
-					const st = moment.utc(reading.startTimestamp);
-					// Time reading is in the middle of the start and end timestamp
-					const timeReading = st.add(moment.utc(reading.endTimestamp).diff(st) / 2);
-					xData.push(timeReading.format('YYYY-MM-DD HH:mm:ss'));
-					yData.push(reading.reading);
-					hoverText.push(`<b> ${timeReading.format('ddd, ll LTS')} </b> <br> ${label}: ${reading.reading.toPrecision(6)} ${unitLabel}`);
-				});
+				// Check if reading needs scaling outside of the loop so only one check is needed
+				// Results in more code but SLIGHTLY better efficiency :D
+				if (needsRateScaling)
+				{
+					const rate = currentSelectedRate.rate;
+					readings.forEach(reading => {
+						// As usual, we want to interpret the readings in UTC. We lose the timezone as this as the start/endTimestamp
+						// are equivalent to Unix timestamp in milliseconds.
+						const st = moment.utc(reading.startTimestamp);
+						// Time reading is in the middle of the start and end timestamp
+						const timeReading = st.add(moment.utc(reading.endTimestamp).diff(st) / 2);
+						xData.push(timeReading.format('YYYY-MM-DD HH:mm:ss'));
+						yData.push(reading.reading * rate);
+						hoverText.push(`<b> ${timeReading.format('ddd, ll LTS')} </b> <br> ${label}: ${reading.reading.toPrecision(6)} ${unitLabel}`);
+					});
+				}
+				else {
+					readings.forEach(reading => {
+						// As usual, we want to interpret the readings in UTC. We lose the timezone as this as the start/endTimestamp
+						// are equivalent to Unix timestamp in milliseconds.
+						const st = moment.utc(reading.startTimestamp);
+						// Time reading is in the middle of the start and end timestamp
+						const timeReading = st.add(moment.utc(reading.endTimestamp).diff(st) / 2);
+						xData.push(timeReading.format('YYYY-MM-DD HH:mm:ss'));
+						yData.push(reading.reading);
+						hoverText.push(`<b> ${timeReading.format('ddd, ll LTS')} </b> <br> ${label}: ${reading.reading.toPrecision(6)} ${unitLabel}`);
+					});
+				}
 
 				// Save the timestamp range of the plot
 				let minTimestamp: string = '';
@@ -122,16 +152,34 @@ function mapStateToProps(state: State) {
 				const yData: number[] = [];
 				const hoverText: string[] = [];
 				const readings = _.values(readingsData.readings);
-				readings.forEach(reading => {
-					// As usual, we want to interpret the readings in UTC. We lose the timezone as this as the start/endTimestamp
-					// are equivalent to Unix timestamp in milliseconds.
-					const st = moment.utc(reading.startTimestamp);
-					// Time reading is in the middle of the start and end timestamp
-					const timeReading = st.add(moment.utc(reading.endTimestamp).diff(st) / 2);
-					xData.push(timeReading.utc().format('YYYY-MM-DD HH:mm:ss'));
-					yData.push(reading.reading);
-					hoverText.push(`<b> ${timeReading.format('ddd, ll LTS')} </b> <br> ${label}: ${reading.reading.toPrecision(6)} ${unitLabel}`);
-				});
+				// Check if reading needs scaling outside of the loop so only one check is needed
+				// Results in more code but SLIGHTLY better efficiency :D
+				if (needsRateScaling)
+				{
+					const rate = currentSelectedRate.rate;
+					readings.forEach(reading => {
+						// As usual, we want to interpret the readings in UTC. We lose the timezone as this as the start/endTimestamp
+						// are equivalent to Unix timestamp in milliseconds.
+						const st = moment.utc(reading.startTimestamp);
+						// Time reading is in the middle of the start and end timestamp
+						const timeReading = st.add(moment.utc(reading.endTimestamp).diff(st) / 2);
+						xData.push(timeReading.utc().format('YYYY-MM-DD HH:mm:ss'));
+						yData.push(reading.reading * rate);
+						hoverText.push(`<b> ${timeReading.format('ddd, ll LTS')} </b> <br> ${label}: ${reading.reading.toPrecision(6)} ${unitLabel}`);
+					});
+				}
+				else {
+					readings.forEach(reading => {
+						// As usual, we want to interpret the readings in UTC. We lose the timezone as this as the start/endTimestamp
+						// are equivalent to Unix timestamp in milliseconds.
+						const st = moment.utc(reading.startTimestamp);
+						// Time reading is in the middle of the start and end timestamp
+						const timeReading = st.add(moment.utc(reading.endTimestamp).diff(st) / 2);
+						xData.push(timeReading.utc().format('YYYY-MM-DD HH:mm:ss'));
+						yData.push(reading.reading);
+						hoverText.push(`<b> ${timeReading.format('ddd, ll LTS')} </b> <br> ${label}: ${reading.reading.toPrecision(6)} ${unitLabel}`);
+					});
+				}
 
 				// This variable contains all the elements (x and y values, line type, etc.) assigned to the data parameter of the Plotly object
 				datasets.push({

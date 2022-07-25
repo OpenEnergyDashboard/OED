@@ -14,6 +14,14 @@ export enum ChartTypes {
 	map = 'map'
 }
 
+// Rates that can be graphed, only relevant to line graphs.
+export const LineGraphRates = {
+	'second': (1/3600),
+	'minute': (1/60),
+	'hour': 1,
+	'day': 24
+}
+
 export interface UpdateSelectedMetersAction {
 	type: ActionType.UpdateSelectedMeters;
 	meterIDs: number[];
@@ -78,6 +86,11 @@ export interface SetOptionsVisibility {
 	visibility: boolean;
 }
 
+export interface UpdateLineGraphRate {
+	type: ActionType.UpdateLineGraphRate;
+	lineGraphRate: LineGraphRate;
+}
+
 export type GraphAction =
 	| ChangeGraphZoomAction
 	| ChangeSliderRangeAction
@@ -91,7 +104,13 @@ export type GraphAction =
 	| UpdateComparePeriodAction
 	| SetHotlinked
 	| ChangeCompareSortingOrderAction
-	| SetOptionsVisibility;
+	| SetOptionsVisibility
+	| UpdateLineGraphRate;
+
+export interface LineGraphRate {
+	label: string,
+	rate: number
+}
 
 export interface GraphState {
 	selectedMeters: number[];
@@ -107,4 +126,5 @@ export interface GraphState {
 	barStacking: boolean;
 	hotlinked: boolean;
 	optionsVisibility: boolean;
+	lineGraphRate: LineGraphRate;
 }

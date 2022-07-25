@@ -12,6 +12,7 @@ export interface SelectOption {
 	label: string;
 	value: number;
 	isDisabled?: boolean;
+	labelIdForTranslate?: string;
 }
 
 /**

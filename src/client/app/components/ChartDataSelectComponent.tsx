@@ -277,8 +277,6 @@ export default function ChartDataSelectComponent() {
 				/>
 				<TooltipMarkerComponent page='home' helpTextId='help.home.select.units' />
 			</div>
-			<div className='d-grid gap-2'>
-			</div>
 		</div>
 	);
 }
