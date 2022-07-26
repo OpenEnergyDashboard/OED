@@ -29,7 +29,7 @@ export default function ConversionsDetailComponent() {
 	}, []);
 
 	// Conversions state
-	const conversionsState = useSelector((state: State) => {if (state.conversions.conversions) {state.conversions.conversions}});
+	const conversionsState = useSelector((state: State) => state.conversions.conversions);
 
 	// Units state
 	const unitsState = useSelector((state: State) => state.units.units);
