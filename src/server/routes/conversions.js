@@ -36,7 +36,7 @@ router.get('/', async (req, res) => {
 router.post('/edit', async (req, res) => {
 	const validConversion = {
 		type: 'object',
-		required: ['sourceId', 'destinationId', 'slope', 'intercept'], // TODO: Determine if we will only require source and destination IDs
+		required: ['sourceId', 'destinationId', 'bidirectional', 'slope', 'intercept'], // TODO: Determine if we will only require source and destination IDs
 		properties: {
 			sourceId: {
 				type: 'number',
@@ -69,7 +69,7 @@ router.post('/edit', async (req, res) => {
 	} else {
 		const conn = getConnection();
 		try {
-			const conversion = await Conversion.getById(req.body.sourceId, conn);
+			const conversion = await Conversion.getBySourceDestination(req.body.sourceId, req.body.destinationId, conn);
 			conversion.sourceId = req.body.sourceId;
 			conversion.destinationId = req.body.destinationId;
 			conversion.bidirectional = req.body.bidirectional;
@@ -91,7 +91,7 @@ router.post('/edit', async (req, res) => {
 router.post('/addConversion', async (req, res) => {
 	const validConversion = {
 		type: 'object',
-		required: ['sourceId', 'destinationId', 'slope', 'intercept'],	// TODO: Determine if we will only require source and destination IDs
+		required: ['sourceId', 'destinationId', 'bidirectional', 'slope', 'intercept'],
 		properties: {
 			sourceId: {
 				type: 'number',

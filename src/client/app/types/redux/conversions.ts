@@ -27,7 +27,6 @@ export interface DeleteSubmittedConversionAction {
 	type: ActionType.DeleteSubmittedConversion;
 	sourceId: number;
 	destinationId: number;
-
 }
 
 export interface SubmitEditedConversionAction {

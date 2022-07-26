@@ -73,6 +73,7 @@ export function fetchConversionsDetailsIfNeeded(): Thunk {
 export function submitEditedConversion(editedConversion: t.ConversionData): Thunk {
 	return async (dispatch: Dispatch, getState: GetState) => {
 		// check if conversionData is already submitting (indexOf returns -1 if item does not exist in array)
+
 		// TODO: change if statement so it checks that combination of source/destination IDs do not already exist
 		// if (getState().conversions.submitting.indexOf(editedConversion.sourceId) === -1 ||
 		// 	getState().conversions.submitting.indexOf(editedConversion.destinationId) === -1) {
