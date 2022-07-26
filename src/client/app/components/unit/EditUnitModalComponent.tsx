@@ -157,7 +157,7 @@ export default function EditUnitModalComponent(props: EditUnitModalComponentProp
 												name='name'
 												type='text'
 												onChange={e => handleStringChange(e)}
-												required value={state.name} />
+												value={state.name} />
 										</div>
 										{/* Type of unit input*/}
 										<div style={formInputStyle}>

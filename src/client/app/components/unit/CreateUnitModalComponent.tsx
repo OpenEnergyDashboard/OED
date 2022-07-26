@@ -133,7 +133,7 @@ export default function CreateUnitModalComponent() {
 											name='name'
 											type='text'
 											onChange={e => handleStringChange(e)}
-											required value={state.name} />
+											value={state.name} />
 									</div>
 									{/* Type of unit input*/}
 									<div style={formInputStyle}>
@@ -142,7 +142,7 @@ export default function CreateUnitModalComponent() {
 											name='typeOfUnit'
 											type='select'
 											onChange={e => handleStringChange(e)}
-											required value={state.typeOfUnit}>
+											value={state.typeOfUnit}>
 											{Object.keys(UnitType).map(key => {
 												return (<option value={key} key={key}>{translate(`UnitType.${key}`)}</option>)
 											})}
@@ -155,7 +155,7 @@ export default function CreateUnitModalComponent() {
 											name='unitRepresent'
 											type='select'
 											onChange={e => handleStringChange(e)}
-											required value={state.unitRepresent}>
+											value={state.unitRepresent}>
 											{Object.keys(UnitRepresentType).map(key => {
 												return (<option value={key} key={key}>{translate(`UnitRepresentType.${key}`)}</option>)
 											})}
@@ -168,7 +168,7 @@ export default function CreateUnitModalComponent() {
 											name='displayable'
 											type='select'
 											onChange={e => handleStringChange(e)}
-											required value={state.displayable} >
+											value={state.displayable} >
 											{Object.keys(DisplayableType).map(key => {
 												return (<option value={key} key={key}>{translate(`DisplayableType.${key}`)}</option>)
 											})}
@@ -193,7 +193,7 @@ export default function CreateUnitModalComponent() {
 											name='secInRate'
 											type='number'
 											onChange={e => handleNumberChange(e)}
-											required value={state.secInRate}
+											value={state.secInRate}
 											// TODO validate negative input by typing for rate but database stops it.
 											// This stops negative input by use of arrows to change value.
 											min="1" />
@@ -205,7 +205,7 @@ export default function CreateUnitModalComponent() {
 											name='suffix'
 											type='text'
 											onChange={e => handleStringChange(e)}
-											required value={state.suffix} />
+											value={state.suffix} />
 									</div>
 									{/* Note input*/}
 									<div style={formInputStyle}>
