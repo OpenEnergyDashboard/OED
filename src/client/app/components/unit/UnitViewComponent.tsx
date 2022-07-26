@@ -6,7 +6,7 @@ import { Button } from 'reactstrap';
 import { FormattedMessage } from 'react-intl';
 import EditUnitModalComponent from './EditUnitModalComponent';
 import '../../styles/unit-card-page.css';
-// I realize that * is already imported from react
+//Realize that * is already imported from react
 import { useState } from 'react';
 import { UnitData } from 'types/redux/units';
 import translate from '../../utils/translate';
@@ -48,7 +48,6 @@ export default function UnitViewComponent(props: UnitViewComponentProps) {
 			</div>
 			<div className={props.unit.preferredDisplay.toString()}>
 				<b><FormattedMessage id="unit.preferred.display" /></b> {translate(`TrueFalseType.${props.unit.preferredDisplay.toString()}`)}
-				{/* <b><FormattedMessage id="unit.preferred.display" /></b> {props.unit.preferredDisplay.toString()} */}
 			</div>
 			<div className="unit-container">
 				<b><FormattedMessage id="unit.sec.in.rate" /></b> {props.unit.secInRate}

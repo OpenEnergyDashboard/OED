@@ -268,7 +268,7 @@ export default function ChartDataSelectComponent() {
  * @param {State} state - current redux state
  * @return {SelectOption[]} an array of SelectOption
  */
-export function getUnitCompatibilityForDropdown(state: State) {
+function getUnitCompatibilityForDropdown(state: State) {
 
 	// Holds all units that are compatible with selected meters/groups
 	const compatibleUnits = new Set<number>();
@@ -474,7 +474,7 @@ export function getVisibleUnitOrSuffixState(state: State) {
 	else {
 		// User is not an admin, do not allow for admin units to be seen
 		visibleUnitsOrSuffixes = _.filter(state.units.units, (o: UnitData) => {
-			return o.typeOfUnit != UnitType.meter && o.displayable != DisplayableType.none && o.displayable != DisplayableType.admin;
+			return o.typeOfUnit != UnitType.meter && o.displayable == DisplayableType.all;
 		});
 	}
 	return visibleUnitsOrSuffixes;

@@ -12,7 +12,7 @@ import { submitEditedUnit } from '../../actions/units';
 import { removeUnsavedChanges } from '../../actions/unsavedWarning';
 import TooltipMarkerComponent from '../TooltipMarkerComponent';
 import TooltipHelpContainer from '../../containers/TooltipHelpContainer';
-// I realize that * is already imported from react
+//Realize that * is already imported from react
 import { useState } from 'react';
 import '../../styles/Modal.unit.css';
 import { TrueFalseType } from '../../types/items';
