@@ -36,8 +36,7 @@ export default function units(state = defaultState, action: UnitsAction) {
 				...state,
 				selectedUnits: action.selectedUnits
 			};
-		case ActionType.SubmitEditedUnit:
-		{
+		case ActionType.SubmitEditedUnit: {
 			const submitting = state.submitting;
 			submitting.push(action.unitId);
 			return {
@@ -45,13 +44,12 @@ export default function units(state = defaultState, action: UnitsAction) {
 				submitting
 			};
 		}
-		case ActionType.ConfirmEditedUnit:
-		{
+		case ActionType.ConfirmEditedUnit: {
 			// React expects us to return an immutable object in order to invoke a rerender, so we must use spread notation here
 			// Overwrite the unit data at the edited unit's index with the edited unit's unit data
 			// The passed in id should be correct as it is inherited from the pre-edited unit
 			// See EditUnitModalComponent line 134 for details (starts with if(unitHasChanges))
-			const units = {...state.units};
+			const units = { ...state.units };
 			units[action.editedUnit.id] = action.editedUnit;
 
 			return {
@@ -59,8 +57,7 @@ export default function units(state = defaultState, action: UnitsAction) {
 				units
 			};
 		}
-		case ActionType.DeleteSubmittedUnit:
-		{
+		case ActionType.DeleteSubmittedUnit: {
 			// Remove the current submitting unit from the submitting state
 			const submitting = state.submitting;
 			submitting.splice(submitting.indexOf(action.unitId));

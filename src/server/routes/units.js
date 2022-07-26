@@ -171,13 +171,13 @@ router.post('/addUnit', async (req, res) => {
 		try {
 			await conn.tx(async t => {
 				const newUnit = new Unit(
-					undefined,
+					undefined, // id
 					req.body.name,
 					req.body.identifier,
 					req.body.unitRepresent,
 					req.body.secInRate,
 					req.body.typeOfUnit,
-					undefined,
+					undefined, // initIndex
 					req.body.suffix,
 					req.body.displayable,
 					req.body.preferredDisplay,

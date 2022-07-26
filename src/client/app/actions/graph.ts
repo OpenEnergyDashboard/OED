@@ -42,7 +42,7 @@ export function updateBarDuration(barDuration: moment.Duration): t.UpdateBarDura
 }
 
 export function updateLineGraphRate(lineGraphRate: t.LineGraphRate) {
-	return {type: ActionType.UpdateLineGraphRate, lineGraphRate}
+	return { type: ActionType.UpdateLineGraphRate, lineGraphRate }
 }
 
 export function setHotlinked(hotlinked: boolean): t.SetHotlinked {

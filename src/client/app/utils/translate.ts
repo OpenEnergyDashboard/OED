@@ -11,7 +11,7 @@ export type TranslatedString = string & AsTranslated;
 
 export default function translate(messageID: string): TranslatedString {
 
-	// BANDAID FIX
+	// TODO BANDAID FIX
 	// Application wasn't loading due to store.getState() returning undefined after adding call to translation in GraphicRateMenuComponent
 	// My guess is that the call to store.getState() was too early as the store hadn't finished loading completely
 	// For now, set the default language to english and any component subscribed to the language state should properly re-render if the language changes

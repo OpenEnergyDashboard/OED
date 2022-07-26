@@ -32,19 +32,23 @@ function mapStateToProps(state: State) {
 			// Quantity and flow units have different unit labels.
 			// Look up the type of unit if it is for quantity/flow/raw and decide what to do.
 			// Bar graphics are always quantities.
-			if (selectUnitState.unitRepresent === UnitRepresentType.quantity || selectUnitState.unitRepresent === UnitRepresentType.flow) {
-				// If it is a quantity unit then it is a rate so indicate by dividing by the time interval
+			if (selectUnitState.identifier === 'kWh' || selectUnitState.identifier === 'kW' || selectUnitState.unitRepresent == UnitRepresentType.raw) {
+				// This is a special case. kWh has a general meaning and the flow equivalent is kW.
+				// A kW is a Joule/sec. While it is possible to convert to another rate, OED is not
+				// going to allow that. If you want that then the site should add Joule as a unit.
+				// Note the rate is per second which is unusual and not the normal OED of per hour.
+				// Thus, OED will show kW and not allow other rates. To make it consistent, kWh cannot
+				// be shown in another rate. Thus, there is no need to scale.
+				// TODO This isn't a general solution. For example, Wh or W would not be fixed.
+				// A flow unit also just uses the identifier.
+				// The y-axis label is the same as the identifier.
+				unitLabel = selectUnitState.identifier;
+			} else if (selectUnitState.unitRepresent === UnitRepresentType.quantity || selectUnitState.unitRepresent === UnitRepresentType.flow) {
+				// If it is a quantity or flow unit then it is a rate so indicate by dividing by the time interval
 				// which is always one hour for OED.
 				unitLabel = selectUnitState.identifier + ' / ' + translate(currentSelectedRate.label);
-				// This is a special case where the automatic labeling is not the common usage so note usual in parentheses.
-				if (selectUnitState.identifier === 'kWh' && currentSelectedRate.rate == 1) {
-					unitLabel += ' (kW)';
-				}
 				// Rate scaling is needed
 				needsRateScaling = true;
-			} else if (selectUnitState.unitRepresent === UnitRepresentType.raw) {
-				// If it is a flow meter then you are graphing the original rate unit.
-				unitLabel = selectUnitState.identifier;
 			}
 		}
 		// If the current rate is per hour (default rate) then don't bother with the extra calculations since we'd be multiplying by 1
@@ -70,8 +74,7 @@ function mapStateToProps(state: State) {
 				const readings = _.values(readingsData.readings);
 				// Check if reading needs scaling outside of the loop so only one check is needed
 				// Results in more code but SLIGHTLY better efficiency :D
-				if (needsRateScaling)
-				{
+				if (needsRateScaling) {
 					const rate = currentSelectedRate.rate;
 					readings.forEach(reading => {
 						// As usual, we want to interpret the readings in UTC. We lose the timezone as this as the start/endTimestamp
@@ -150,8 +153,7 @@ function mapStateToProps(state: State) {
 				const readings = _.values(readingsData.readings);
 				// Check if reading needs scaling outside of the loop so only one check is needed
 				// Results in more code but SLIGHTLY better efficiency :D
-				if (needsRateScaling)
-				{
+				if (needsRateScaling) {
 					const rate = currentSelectedRate.rate;
 					readings.forEach(reading => {
 						// As usual, we want to interpret the readings in UTC. We lose the timezone as this as the start/endTimestamp
@@ -161,7 +163,7 @@ function mapStateToProps(state: State) {
 						const timeReading = st.add(moment.utc(reading.endTimestamp).diff(st) / 2);
 						xData.push(timeReading.utc().format('YYYY-MM-DD HH:mm:ss'));
 						yData.push(reading.reading * rate);
-						hoverText.push(`<b> ${timeReading.format('ddd, ll LTS')} </b> <br> ${label}: ${reading.reading.toPrecision(6)} ${unitLabel}`);
+						hoverText.push(`<b> ${timeReading.format('ddd, ll LTS')} </b> <br> ${label}: ${(reading.reading * rate).toPrecision(6)} ${unitLabel}`);
 					});
 				}
 				else {

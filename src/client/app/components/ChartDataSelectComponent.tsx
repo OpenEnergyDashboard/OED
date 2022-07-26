@@ -17,7 +17,7 @@ import {
 	itemDisplayableOnMap, itemMapInfoOk, gpsToUserGrid
 } from '../utils/calibration';
 import {
-	changeSelectedGroups, changeSelectedMeters, changeSelectedUnit,updateSelectedMeters,
+	changeSelectedGroups, changeSelectedMeters, changeSelectedUnit, updateSelectedMeters,
 	updateSelectedGroups, updateSelectedUnit
 } from '../actions/graph';
 import { DisplayableType, UnitData, UnitType } from '../types/redux/units'
@@ -141,13 +141,6 @@ export default function ChartDataSelectComponent() {
 					// The selectedUnit becomes the unit of the meter selected. Note is should always be set (not -99) since
 					// those meters should not have been visible. The only exception is if there are no selected meters but
 					// then this loop does not run. The loop is assumed to only run once in this case.
-					// TODO this really should only be for debugging??
-					if (state.graph.selectedMeters.length != 1) {
-						console.log('9000 state.graph.selectedMeters length is not one but ' + state.graph.selectedMeters.length);
-					}
-
-					// TODO is it possible the unit of the meter is not set in state? Seems not if can select??
-					//state.graph.selectedUnit = state.meters.byMeterID[meterID].defaultGraphicUnit;
 					dispatch(changeSelectedUnit(state.meters.byMeterID[meterID].defaultGraphicUnit));
 				}
 				selectedMeters.push({
@@ -157,17 +150,13 @@ export default function ChartDataSelectComponent() {
 					isDisabled: false
 				} as SelectOption)
 			}
-			// 	}
-			// }
 		});
 
 		const selectedGroups: SelectOption[] = [];
 		state.graph.selectedGroups.forEach(groupID => {
-			// TODO For now you cannot graph a group unit you have a graphing unit
-			// if (!(disableGroups.includes(groupID)) && state.graph.selectedUnit != -99) {
-			// TODO use this code once group has default graphic unit
+			// Don't include disabled groups.
 			if (!(disableGroups.includes(groupID))) {
-				// If the selected unit is -99 then there is not graphic unit yet. In this case you can only select a
+				// If the selected unit is -99 then there is no graphic unit yet. In this case you can only select a
 				// group that has a default graphic unit because that will become the selected unit. This should only
 				// happen if no meter or group is yet selected.
 				if (state.graph.selectedUnit == -99) {
@@ -175,13 +164,6 @@ export default function ChartDataSelectComponent() {
 					// The selectedUnit becomes the unit of the group selected. Note is should always be set (not -99) since
 					// those groups should not have been visible. The only exception is if there are no selected groups but
 					// then this loop does not run. The loop is assumed to only run once in this case.
-					// TODO this really should only be for debugging??
-					if (state.graph.selectedGroups.length != 1) {
-						console.log('9100 state.graph.selectedGroups length is not one but ' + state.graph.selectedGroups.length);
-					}
-
-					// TODO is it possible the unit of the meter is not set in state? Seems not if can select??
-					// TODO group state does not yet have default graphic unit so must wait to do this.
 					state.graph.selectedUnit = state.groups.byGroupID[groupID].defaultGraphicUnit;
 				}
 				selectedGroups.push({
@@ -270,7 +252,7 @@ export default function ChartDataSelectComponent() {
 							dispatch(updateSelectedUnit(-99));
 						}
 						else if (newSelectedUnitOptions.length === 1) { dispatch(changeSelectedUnit(newSelectedUnitOptions[0].value)); }
-						else if (newSelectedUnitOptions.length > 1){ dispatch(changeSelectedUnit(newSelectedUnitOptions[1].value)); }
+						else if (newSelectedUnitOptions.length > 1) { dispatch(changeSelectedUnit(newSelectedUnitOptions[1].value)); }
 						// This should not happen
 						else { dispatch(changeSelectedUnit(-99)); }
 					}}
@@ -302,21 +284,21 @@ export function getUnitCompatibilityForDropdown(state: State) {
 	});
 	// Get for all groups
 	state.graph.selectedGroups.forEach(group => {
-		//Get for all deep meters in group
+		// Get for all deep meters in group
 		metersInGroup(group).forEach(meter => {
 			allSelectedMeters.add(meter);
 		});
 	});
 
-	// If no meters/groups are selected
 	if (allSelectedMeters.size == 0) {
+		// No meters/groups are selected. This includes the case where the selectedUnit is -99.
 		// Every unit is okay/compatible in this case so skip the work needed below.
 		// Filter the units to be displayed by user status and displayable type
 		getVisibleUnitOrSuffixState(state).forEach(unit => {
 			compatibleUnits.add(unit.id);
 		});
-	// Some meter or group is selected
 	} else {
+		// Some meter or group is selected
 		// Retrieve set of units compatible with list of selected meters and/or groups
 		const units = unitsCompatibleWithMeters(allSelectedMeters);
 
@@ -359,8 +341,7 @@ export function getMeterCompatibilityForDropdown(state: State) {
 	else {
 		// Regular user or not logged in so only add displayable meters
 		Object.values(state.meters.byMeterID).forEach(meter => {
-			if (meter.displayable)
-			{
+			if (meter.displayable) {
 				visibleMeters.add(meter.id);
 			}
 		});
@@ -371,34 +352,34 @@ export function getMeterCompatibilityForDropdown(state: State) {
 	// meters that cannot graph.
 	const incompatibleMeters = new Set<number>();
 
-	// If no unit is selected
-	// In this case, every meter is valid (provided it has a default graphic unit)
 	if (state.graph.selectedUnit === -99) {
+		// No unit is selected then no meter/group should be selected.
+		// In this case, every meter is valid (provided it has a default graphic unit)
 		// If the meter has a default graphic unit set then it can graph, otherwise it cannot.
 		visibleMeters.forEach(meterId => {
-			//Default graphic unit is not set
 			if (state.meters.byMeterID[meterId].defaultGraphicUnit === -99) {
+				//Default graphic unit is not set
 				incompatibleMeters.add(meterId);
 			}
-			//Default graphic unit is set
 			else {
+				//Default graphic unit is set
 				compatibleMeters.add(meterId);
 			}
 		});
 	}
-	// A unit is selected
-	// For each meter get all of its compatible units
-	// Then, check if the selected unit exists in that set of compatible units
 	else {
+		// A unit is selected
+		// For each meter get all of its compatible units
+		// Then, check if the selected unit exists in that set of compatible units
 		visibleMeters.forEach(meterId => {
 			// Get the set of units compatible with the current meter
 			const compatibleUnits = unitsCompatibleWithMeters(new Set<number>([meterId]));
-			// The selected unit is part of the set of compatible units with this meter
 			if (compatibleUnits.has(state.graph.selectedUnit)) {
+				// The selected unit is part of the set of compatible units with this meter
 				compatibleMeters.add(meterId);
 			}
-			// The selected unit is not part of the compatible units set for this meter
 			else {
+				// The selected unit is not part of the compatible units set for this meter
 				incompatibleMeters.add(meterId);
 			}
 		});
@@ -428,8 +409,7 @@ export function getGroupCompatibilityForDropdown(state: State) {
 	else {
 		// Regular user or not logged in so only add displayable groups
 		Object.values(state.groups.byGroupID).forEach(group => {
-			if (group.displayable)
-			{
+			if (group.displayable) {
 				visibleGroup.add(group.id);
 			}
 		});
@@ -440,34 +420,34 @@ export function getGroupCompatibilityForDropdown(state: State) {
 	// groups that cannot graph.
 	const incompatibleGroups = new Set<number>();
 
-	// If no unit is selected
-	// In this case, every group is valid (provided it has a default graphic unit)
 	if (state.graph.selectedUnit === -99) {
+		// If no unit is selected then no meter/group should be selected.
+		// In this case, every group is valid (provided it has a default graphic unit)
 		// If the group has a default graphic unit set then it can graph, otherwise it cannot.
 		visibleGroup.forEach(groupId => {
-			//Default graphic unit is not set
 			if (state.groups.byGroupID[groupId].defaultGraphicUnit === -99) {
+				//Default graphic unit is not set
 				incompatibleGroups.add(groupId);
 			}
-			//Default graphic unit is set
 			else {
+				//Default graphic unit is set
 				compatibleGroups.add(groupId);
 			}
 		});
 	}
-	// A unit is selected
-	// For each group get all of its compatible units
-	// Then, check if the selected unit exists in that set of compatible units
 	else {
+		// A unit is selected
+		// For each group get all of its compatible units
+		// Then, check if the selected unit exists in that set of compatible units
 		visibleGroup.forEach(groupId => {
 			// Get the set of units compatible with the current group (through its deepMeters attribute)
 			const compatibleUnits = unitsCompatibleWithMeters(metersInGroup(groupId));
-			// The selected unit is part of the set of compatible units with this group
 			if (compatibleUnits.has(state.graph.selectedUnit)) {
+				// The selected unit is part of the set of compatible units with this group
 				compatibleGroups.add(groupId);
 			}
-			// The selected unit is not part of the compatible units set for this group
 			else {
+				// The selected unit is not part of the compatible units set for this group
 				incompatibleGroups.add(groupId);
 			}
 		});
@@ -485,15 +465,17 @@ export function getGroupCompatibilityForDropdown(state: State) {
  */
 export function getVisibleUnitOrSuffixState(state: State) {
 	let visibleUnitsOrSuffixes;
-	// User is an admin, allow all units to be seen
 	if (state.currentUser.profile?.role === 'admin') {
+		// User is an admin, allow all units to be seen
 		visibleUnitsOrSuffixes = _.filter(state.units.units, (o: UnitData) => {
-			return o.typeOfUnit != UnitType.meter && o.displayable != DisplayableType.none;});
+			return o.typeOfUnit != UnitType.meter && o.displayable != DisplayableType.none;
+		});
 	}
-	// User is not an admin, do not allow for admin units to be seen
 	else {
+		// User is not an admin, do not allow for admin units to be seen
 		visibleUnitsOrSuffixes = _.filter(state.units.units, (o: UnitData) => {
-			return o.typeOfUnit != UnitType.meter && o.displayable != DisplayableType.none && o.displayable != DisplayableType.admin;});
+			return o.typeOfUnit != UnitType.meter && o.displayable != DisplayableType.none && o.displayable != DisplayableType.admin;
+		});
 	}
 	return visibleUnitsOrSuffixes;
 }
@@ -530,7 +512,7 @@ function getSelectOptionsByItem(compatibleItems: Set<number>, incompatibleItems:
 		else if (instanceOfGroupsState(state)) {
 			label = state.byGroupID[itemId].name;
 		}
-		else { label = '';}
+		else { label = ''; }
 		finalItems.push({
 			value: itemId,
 			label: label,
@@ -549,7 +531,7 @@ function getSelectOptionsByItem(compatibleItems: Set<number>, incompatibleItems:
 		else if (instanceOfGroupsState(state)) {
 			label = state.byGroupID[itemId].name;
 		}
-		else { label = '';}
+		else { label = ''; }
 		finalItems.push({
 			value: itemId,
 			label: label,
@@ -561,6 +543,6 @@ function getSelectOptionsByItem(compatibleItems: Set<number>, incompatibleItems:
 }
 
 // Helper functions to determine what type of state was passed in
-function instanceOfUnitsState(state: any): state is UnitsState {return 'units' in state;}
-function instanceOfMetersState(state: any): state is MetersState {return 'byMeterID' in state;}
-function instanceOfGroupsState(state: any): state is GroupsState {return 'byGroupID' in state;}
+function instanceOfUnitsState(state: any): state is UnitsState { return 'units' in state; }
+function instanceOfMetersState(state: any): state is MetersState { return 'byMeterID' in state; }
+function instanceOfGroupsState(state: any): state is GroupsState { return 'byGroupID' in state; }

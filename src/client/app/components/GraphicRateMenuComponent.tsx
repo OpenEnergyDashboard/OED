@@ -12,48 +12,49 @@ import { updateLineGraphRate } from '../actions/graph'
 import { LineGraphRate, LineGraphRates } from '../types/redux/graph';
 
 export default function GraphicRateMenuComponent() {
+	const dispatch = useDispatch();
 
-    const dispatch = useDispatch();
+	// Graph state
+	const graphState = useSelector((state: State) => state.graph);
 
-    // Graph state
-    const graphState = useSelector((state: State) => state.graph);
-    
-    // Array of select options created from the rates
-    const rateOptions: SelectOption[] = [];
+	// Array of select options created from the rates
+	const rateOptions: SelectOption[] = [];
 
-    //Loop over our rates object to create the selects for the dropdown
-    Object.entries(LineGraphRates).forEach(([rateKey, rateValue]) => {
-        rateOptions.push({
-            label: translate(rateKey),
-            value: rateValue,
-            labelIdForTranslate: rateKey
-        } as SelectOption);
-    });
+	//Loop over our rates object to create the selects for the dropdown
+	Object.entries(LineGraphRates).forEach(([rateKey, rateValue]) => {
+		rateOptions.push({
+			label: translate(rateKey),
+			value: rateValue,
+			labelIdForTranslate: rateKey
+		} as SelectOption);
+	});
 
-    const labelStyle: React.CSSProperties = {
-        fontWeight: 'bold',
-        margin: 0
-    };
+	const labelStyle: React.CSSProperties = {
+		fontWeight: 'bold',
+		margin: 0
+	};
 
-    return (
-        <div>
-            {
-                graphState.chartToRender == 'line' &&
-                <div>
-                    <p style={labelStyle}><FormattedMessage id='rate' />:</p>
-                    { /* On change update the line graph rate in the store after a null check */ }
-                    <Select
-                        options={rateOptions}
-                        value = {{label: translate(graphState.lineGraphRate.label), value: graphState.lineGraphRate.rate} as SelectOption}
-                        onChange={newSelectedRate =>
-                            {if (newSelectedRate) {
-                                dispatch(updateLineGraphRate({
-                                    label: newSelectedRate.labelIdForTranslate,
-                                    rate: Number(newSelectedRate.value)
-                                } as LineGraphRate))}}}
-                    />
-                </div>
-            }
-        </div>
-    );
+	return (
+		<div>
+			{
+				graphState.chartToRender == 'line' &&
+				<div>
+					<p style={labelStyle}><FormattedMessage id='rate' />:</p>
+					{ /* On change update the line graph rate in the store after a null check */}
+					<Select
+						options={rateOptions}
+						value={{ label: translate(graphState.lineGraphRate.label), value: graphState.lineGraphRate.rate } as SelectOption}
+						onChange={newSelectedRate => {
+							if (newSelectedRate) {
+								dispatch(updateLineGraphRate({
+									label: newSelectedRate.labelIdForTranslate,
+									rate: Number(newSelectedRate.value)
+								} as LineGraphRate))
+							}
+						}}
+					/>
+				</div>
+			}
+		</div>
+	);
 }
