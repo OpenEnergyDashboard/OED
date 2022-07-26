@@ -25,13 +25,15 @@ export interface ConfirmEditedConversionAction {
 
 export interface DeleteSubmittedConversionAction {
 	type: ActionType.DeleteSubmittedConversion;
-	conversionId: number;
+	sourceId: number;
+	destinationId: number;
+
 }
 
 export interface SubmitEditedConversionAction {
 	type: ActionType.SubmitEditedConversion;
-	conversionSourceId: number;
-	conversionDestinationId: number;
+	sourceId: number;
+	destinationId: number;
 }
 
 export interface ConfirmConversionsFetchedOnceAction {

@@ -15,8 +15,6 @@ import { useEffect } from 'react';
 import ConversionViewComponent from './ConversionViewComponent';
 import CreateConversionModalComponent from './CreateConversionModalComponent';
 import { ConversionData } from 'types/redux/conversions';
-import { UnitData } from 'types/redux/units';
-
 
 // Utilizes useDispatch and useSelector hooks
 export default function ConversionsDetailComponent() {

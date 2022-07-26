@@ -34,7 +34,7 @@ export default function ConversionViewComponent(props: ConversionViewComponentPr
 	}
 
 	// Create header from sourceId, destinationId identifiers
-	const header = (props.sourceIdentifier + ' -> ' + props.destinationIdentifier);
+	const header = (props.sourceIdentifier + ' → ' + props.destinationIdentifier);
 
 	return (
 		<div className="card">
