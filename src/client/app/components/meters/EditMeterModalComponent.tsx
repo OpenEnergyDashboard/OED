@@ -28,153 +28,58 @@ export default function EditMeterModalComponent(props: EditMeterModalComponentPr
 
 	const dispatch = useDispatch();
 
+	// Set existing meter values
+	const values = {
+		id: props.meter.id,
+		identifier : props.meter.identifier,
+		name : props.meter.name,
+		area : props.meter.area,
+		enabled : props.meter.enabled,
+		displayable : props.meter.displayable,
+		meterType : props.meter.meterType,
+		url : props.meter.url,
+		timeZone : props.meter.timeZone,
+		gps : props.meter.gps,
+		unitId : props.meter.unitId,
+		defaultGraphicUnit : props.meter.defaultGraphicUnit,
+		note : props.meter.note,
+		cumulative : props.meter.cumulative,
+		cumulativeReset : props.meter.cumulativeReset,
+		cumulativeResetStart : props.meter.cumulativeResetStart,
+		cumulativeResetEnd : props.meter.cumulativeResetEnd,
+		endOnlyTime : props.meter.endOnlyTime,
+		reading : props.meter.reading,
+		readingGap : props.meter.readingGap,
+		readingVariation : props.meter.readingVariation,
+		readingDuplication : props.meter.readingDuplication,
+		timeSort : props.meter.timeSort,
+		startTimestamp : props.meter.startTimestamp,
+		endTimestamp : props.meter.endTimestamp
+	}
+
 	/* State */
+	// Handlers for each type of input change
+	const [state, setState] = useState(values);
 
-	// identifier
-	const [identifier, setIdentifier] = useState(props.meter.identifier);
-	const handleIdentifierChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-		setIdentifier(e.target.value);
+	const handleStringChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+		setState({ ...state, [e.target.name]: e.target.value });
 	}
 
-	// name
-	const [name, setName] = useState(props.meter.name);
-	const handleNameChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-		setName(e.target.value);
+	const handleBooleanChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+		setState({ ...state, [e.target.name]: JSON.parse(e.target.value) });
 	}
 
-	// area
-	const [area, setArea] = useState(props.meter.area);
-	const handleAreaChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-		setArea(Number(e.target.value));
+	const handleNumberChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+		setState({ ...state, [e.target.name]: Number(e.target.value) });
 	}
 
-	// enabled
-	const [enabled, setEnabled] = useState(props.meter.enabled);
-	const handleEnabledChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-		setEnabled(JSON.parse(e.target.value));
-	}
-
-	// displayable
-	const [displayable, setDisplayable] = useState(props.meter.displayable);
-	const handleDisplayableChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-		setDisplayable(JSON.parse(e.target.value));
-	}
-
-	// meterType
-	const [meterType, setMeterType] = useState(props.meter.meterType? `${props.meter.meterType}` : '');
-	const handleMeterTypeChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-		setMeterType(e.target.value);
-	}
-
-	// URL
-	const [url, setUrl] = useState(props.meter.url);
-	const handleUrlChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-		setUrl(e.target.value);
-	}
-
-	// timeZone
-	const [timeZone, setTimeZone] = useState(props.meter.timeZone);
 	const handleTimeZoneChange = (timeZone : string ) => {
-		setTimeZone(timeZone);
+		setState({ ...state, ['timeZone']: timeZone });
 	}
 
-	// GPS
-	const [gps, setGps] = useState(props.meter.gps);
 	const handleGpsChange = (gps: GPSPoint) => {
-		setGps(gps);
+		setState({ ...state, ['gps']: gps });
 	}
-
-	// unitID
-	const [unitId, setUnitID] = useState(props.meter.unitId);
-	const handleUnitIDChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-		setUnitID(Number(e.target.value));
-	}
-
-	// defaultGraphicUnit
-	const [defaultGraphicUnit, setDefaultGraphicUnit] = useState(props.meter.defaultGraphicUnit);
-	const handleDefaultGraphicUnitChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-		setDefaultGraphicUnit(Number(e.target.value));
-	}
-
-	// note
-	const [note, setNote] = useState(props.meter.note);
-	const handleNoteChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-		setNote(e.target.value);
-	}
-
-	// cumulative
-	const [cumulative, setCumulative] = useState(props.meter.cumulative);
-	const handleCumulativeChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-		setCumulative(JSON.parse(e.target.value));
-	}
-
-	// cumulativeReset
-	const [cumulativeReset, setCumulativeReset] = useState(props.meter.cumulativeReset);
-	const handleCumulativeResetChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-		setCumulativeReset(JSON.parse(e.target.value));
-	}
-
-	// cumulativeResetStart
-	const [cumulativeResetStart, setCumulativeResetStart] = useState(props.meter.cumulativeResetStart);
-	const handleCumulativeResetStartChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-		setCumulativeResetStart(e.target.value);
-	}
-
-	// cumulativeResetEnd
-	const [cumulativeResetEnd, setCumulativeResetEnd] = useState(props.meter.cumulativeResetEnd);
-	const handleCumulativeResetEndChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-		setCumulativeResetEnd(e.target.value);
-	}
-
-	// endOnlyTime
-	const [endOnlyTime, setEndOnlyTime] = useState(props.meter.endOnlyTime);
-	const handleEndOnlyTimeChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-		setEndOnlyTime(JSON.parse(e.target.value));
-	}
-
-	// reading
-	const [reading, setReading] = useState(props.meter.reading);
-	const handleReadingChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-		setReading(Number(e.target.value));
-	}
-
-	// readingGap
-	const [readingGap, setReadingGap] = useState(props.meter.readingGap);
-	const handleReadingGapChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-		setReadingGap(Number(e.target.value));
-	}
-
-	// readingVariation
-	const [readingVariation, setReadingVariation] = useState(props.meter.readingVariation);
-	const handleReadingVariationChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-		setReadingVariation(Number(e.target.value));
-	}
-
-	// readingDuplication
-	const [readingDuplication, setReadingDuplication] = useState(props.meter.readingDuplication);
-	const handleReadingDuplicationChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-		setReadingDuplication(Number(e.target.value));
-	}
-
-	// timeSort
-	const [timeSort, setTimeSort] = useState(props.meter.timeSort);
-	const handleTimeSortChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-		setTimeSort(JSON.parse(e.target.value));
-	}
-
-	// startTimestamp
-	const [startTimestamp, setStartTimestamp] = useState(props.meter.startTimestamp);
-	const handleStartTimestampChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-		setStartTimestamp(e.target.value);
-	}
-
-	// endTimestamp
-	const [endTimestamp, setEndTimestamp] = useState(props.meter.endTimestamp);
-	const handleEndTimestampChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-		setEndTimestamp(e.target.value);
-	}
-
-
 	/* End State */
 
 	// Reset the state to default values
@@ -183,29 +88,7 @@ export default function EditMeterModalComponent(props: EditMeterModalComponentPr
 	// This allows us to reset our state to match the store in the event of an edit failure
 	// Failure to edit meters will not trigger a re-render, as no state has changed. Therefore, we must manually reset the values
 	const resetState = () => {
-		setIdentifier(props.meter.identifier);
-		setName(props.meter.name);
-		setEnabled(props.meter.enabled);
-		setDisplayable(props.meter.displayable);
-		setMeterType(props.meter.meterType? `${props.meter.meterType}` : '');
-		setUrl(props.meter.url);
-		setTimeZone(props.meter.timeZone);
-		setGps(props.meter.gps);
-		setUnitID(props.meter.unitId);
-		setDefaultGraphicUnit(props.meter.defaultGraphicUnit);
-		setNote(props.meter.note);
-		setCumulative(props.meter.cumulative);
-		setCumulativeReset(props.meter.cumulativeReset);
-		setCumulativeResetStart(props.meter.cumulativeResetStart);
-		setCumulativeResetEnd(props.meter.cumulativeResetEnd);
-		setEndOnlyTime(props.meter.endOnlyTime);
-		setReading(props.meter.reading);
-		setReadingGap(props.meter.readingGap);
-		setReadingVariation(props.meter.readingVariation);
-		setReadingDuplication(props.meter.readingDuplication);
-		setTimeSort(props.meter.timeSort);
-		setStartTimestamp(props.meter.startTimestamp);
-		setEndTimestamp(props.meter.endTimestamp);
+		setState(values);
 	}
 
 	const handleClose = () => {
@@ -225,67 +108,39 @@ export default function EditMeterModalComponent(props: EditMeterModalComponentPr
 		// Check for changes by comparing state to props
 		const meterHasChanges =
 			(
-				props.meter.identifier != identifier ||
-				props.meter.name != name ||
-				props.meter.area != area ||
-				props.meter.enabled != enabled ||
-				props.meter.displayable != displayable ||
-				props.meter.meterType != meterType ||
-				props.meter.url != url ||
-				props.meter.timeZone != timeZone ||
-				props.meter.gps != gps ||
-				props.meter.unitId != unitId ||
-				props.meter.defaultGraphicUnit != defaultGraphicUnit ||
-				props.meter.note != note ||
-				props.meter.cumulative != cumulative ||
-				props.meter.cumulativeReset != cumulativeReset ||
-				props.meter.cumulativeResetStart != cumulativeResetStart ||
-				props.meter.cumulativeResetEnd != cumulativeResetEnd ||
-				props.meter.endOnlyTime != endOnlyTime ||
-				props.meter.reading != reading ||
-				props.meter.readingGap != readingGap ||
-				props.meter.readingVariation != readingVariation ||
-				props.meter.readingDuplication != readingDuplication ||
-				props.meter.timeSort != timeSort ||
-				props.meter.startTimestamp != startTimestamp ||
-				props.meter.endTimestamp != endTimestamp );
+				props.meter.identifier != state.identifier ||
+				props.meter.name != state.name ||
+				props.meter.area != state.area ||
+				props.meter.enabled != state.enabled ||
+				props.meter.displayable != state.displayable ||
+				props.meter.meterType != state.meterType ||
+				props.meter.url != state.url ||
+				props.meter.timeZone != state.timeZone ||
+				props.meter.gps != state.gps ||
+				props.meter.unitId != state.unitId ||
+				props.meter.defaultGraphicUnit != state.defaultGraphicUnit ||
+				props.meter.note != state.note ||
+				props.meter.cumulative != state.cumulative ||
+				props.meter.cumulativeReset != state.cumulativeReset ||
+				props.meter.cumulativeResetStart != state.cumulativeResetStart ||
+				props.meter.cumulativeResetEnd != state.cumulativeResetEnd ||
+				props.meter.endOnlyTime != state.endOnlyTime ||
+				props.meter.reading != state.reading ||
+				props.meter.readingGap != state.readingGap ||
+				props.meter.readingVariation != state.readingVariation ||
+				props.meter.readingDuplication != state.readingDuplication ||
+				props.meter.timeSort != state.timeSort ||
+				props.meter.startTimestamp != state.startTimestamp ||
+				props.meter.endTimestamp != state.endTimestamp );
 
 		// Only do work if there are changes
 		if (meterHasChanges) {
-			const editedMeter = {
-				...props.meter,
-				identifier,
-				name,
-				area,
-				enabled,
-				displayable,
-				meterType,
-				url,
-				timeZone,
-				gps,
-				unitId,
-				defaultGraphicUnit,
-				note,
-				cumulative,
-				cumulativeReset,
-				cumulativeResetStart,
-				cumulativeResetEnd,
-				endOnlyTime,
-				reading,
-				readingGap,
-				readingVariation,
-				readingDuplication,
-				timeSort,
-				startTimestamp,
-				endTimestamp
-			}
-
 			// Save our changes by dispatching the submitEditedMeter action
-			dispatch(submitEditedMeter(editedMeter));
+			dispatch(submitEditedMeter(state));
 			// The updated meter is not fetched to save time. However, the identifier might have been
 			// automatically set if it was empty. Mimic that here.
-			if (editedMeter.identifier === '') {
-				editedMeter.identifier = editedMeter.name;
+			if (state.identifier === '') {
+				state.identifier = state.name;
 			}
 			dispatch(removeUnsavedChanges());
 		}
@@ -318,37 +173,41 @@ export default function EditMeterModalComponent(props: EditMeterModalComponentPr
 									<div style={formInputStyle}>
 										<label><FormattedMessage id="meter.identifier" /></label><br />
 										<Input
+											name="identifier"
 											type="text"
-											onChange={e => handleIdentifierChange(e)}
-											defaultValue={identifier}
-											required value={identifier}
+											onChange={e => handleStringChange(e)}
+											defaultValue={state.identifier}
+											required value={state.identifier}
 											placeholder="Identifier" />
 										<div />
 										{/* Name input*/}
 										<div style={formInputStyle}>
 											<label><FormattedMessage id="meter.name" /></label><br />
 											<Input
+												name='name'
 												type='text'
-												onChange={e => handleNameChange(e)}
-												defaultValue={name}
-												required value={name}
+												onChange={e => handleStringChange(e)}
+												defaultValue={state.name}
+												required value={state.name}
 												placeholder="Name" />
 										</div>
 										{/* Area input*/}
 										<div style={formInputStyle}>
 											<label><FormattedMessage id="meter.area" /></label><br />
 											<Input
+												name="area"
 												type="number"
-												defaultValue={area}
-												onChange={e => handleAreaChange(e)} />
+												defaultValue={state.area}
+												onChange={e => handleNumberChange(e)} />
 										</div>
 										{/* Enabled input*/}
 										<div style={formInputStyle}>
 											<label><FormattedMessage id="meter.enabled" /></label><br />
 											<Input
+												name='enabled'
 												type='select'
-												defaultValue={enabled.toString()}
-												onChange={e => handleEnabledChange(e)}>
+												defaultValue={state.enabled.toString()}
+												onChange={e => handleBooleanChange(e)}>
 												{Object.keys(TrueFalseType).map(key => {
 													return (<option value={key} key={key}>{translate(`TrueFalseType.${key}`)}</option>)
 												})}
@@ -358,9 +217,10 @@ export default function EditMeterModalComponent(props: EditMeterModalComponentPr
 										<div style={formInputStyle}>
 											<label><FormattedMessage id="meter.displayable" /></label><br />
 											<Input
+												name='displayable'
 												type='select'
-												defaultValue={displayable.toString()}
-												onChange={e => handleDisplayableChange(e)}>
+												defaultValue={state.displayable.toString()}
+												onChange={e => handleBooleanChange(e)}>
 												{Object.keys(TrueFalseType).map(key => {
 													return (<option value={key} key={key}>{translate(`TrueFalseType.${key}`)}</option>)
 												})}
@@ -370,9 +230,10 @@ export default function EditMeterModalComponent(props: EditMeterModalComponentPr
 										<div style={formInputStyle}>
 											<label><FormattedMessage id="meter.type" /></label><br />
 											<Input
+												name='meterType'
 												type='select'
-												defaultValue={meterType}
-												onChange={e => handleMeterTypeChange(e)}>
+												defaultValue={state.meterType}
+												onChange={e => handleStringChange(e)}>
 												{Object.keys(MeterType).map(key => {
 													return (<option value={key} key={key}>{`${key}`}</option>)
 												})}
@@ -382,15 +243,16 @@ export default function EditMeterModalComponent(props: EditMeterModalComponentPr
 										<div style={formInputStyle}>
 											<label><FormattedMessage id="meter.url" /></label><br />
 											<Input
+												name='url'
 												type='text'
-												onChange={e => handleUrlChange(e)}
-												defaultValue={url}
+												onChange={e => handleStringChange(e)}
+												defaultValue={state.url}
 												placeholder="URL" />
 										</div>
 										{/* Timezone input*/}
 										<div style={formInputStyle}>
 											<label><FormattedMessage id="meter.time.zone" /></label><br />
-											<TimeZoneSelect current={timeZone} handleClick={timeZone => handleTimeZoneChange(timeZone)} />
+											<TimeZoneSelect current={state.timeZone} handleClick={timeZone => handleTimeZoneChange(timeZone)} />
 										</div>
 										{/* GPS input*/}
 										<div style={formInputStyle}>
@@ -398,44 +260,48 @@ export default function EditMeterModalComponent(props: EditMeterModalComponentPr
 											<Input
 												name='gps'
 												type='text'
-												onChange={() => handleGpsChange(gps)}
-												//defaultValue={`${gps.latitude}, ${gps.longitude}`}
+												onChange={() => handleGpsChange(state.gps)}
+												//defaultValue={`${state.gps.latitude}, ${state.gps.longitude}`}
 												placeholder="latitude , longitude" />
 										</div>
 										{/* UnitId input*/}
 										<div style={formInputStyle}>
 											<label><FormattedMessage id="meter.unitId" /></label><br />
 											<Input
+												name="unitId"
 												type="number"
-												onChange={e => handleUnitIDChange(e)}
-												defaultValue={unitId}
+												onChange={e => handleNumberChange(e)}
+												defaultValue={state.unitId}
 												placeholder="unitId" />
 										</div>
 										{/* DefaultGraphicUnit input*/}
 										<div style={formInputStyle}>
 											<label><FormattedMessage id="meter.defaultGraphicUnit" /></label><br />
 											<Input
+												name="defaultGraphicUnit"
 												type="number"
-												onChange={e => handleDefaultGraphicUnitChange(e)}
-												defaultValue={defaultGraphicUnit}
+												onChange={e => handleNumberChange(e)}
+												defaultValue={state.defaultGraphicUnit}
 												placeholder="defaultGraphicUnit" />
 										</div>
 										{/* note input*/}
 										<div style={formInputStyle}>
 											<label><FormattedMessage id="meter.note" /></label><br />
 											<Input
+												name='note'
 												type='textarea'
-												onChange={e => handleNoteChange(e)}
-												defaultValue={note}
+												onChange={e => handleStringChange(e)}
+												defaultValue={state.note}
 												placeholder='Note' />
 										</div>
 										{/* cumulative input*/}
 										<div style={formInputStyle}>
 											<label><FormattedMessage id="meter.cumulative" /></label><br />
 											<Input
+												name='cumulative'
 												type='select'
-												defaultValue={cumulative.toString()}
-												onChange={e => handleCumulativeChange(e)}>
+												defaultValue={state.cumulative.toString()}
+												onChange={e => handleBooleanChange(e)}>
 												{Object.keys(TrueFalseType).map(key => {
 													return (<option value={key} key={key}>{translate(`TrueFalseType.${key}`)}</option>)
 												})}
@@ -445,9 +311,10 @@ export default function EditMeterModalComponent(props: EditMeterModalComponentPr
 										<div style={formInputStyle}>
 											<label><FormattedMessage id="meter.cumulativeReset" /></label><br />
 											<Input
+												name='cumulativeReset'
 												type='select'
-												defaultValue={cumulativeReset.toString()}
-												onChange={e => handleCumulativeResetChange(e)}>
+												defaultValue={state.cumulativeReset.toString()}
+												onChange={e => handleBooleanChange(e)}>
 												{Object.keys(TrueFalseType).map(key => {
 													return (<option value={key} key={key}>{translate(`TrueFalseType.${key}`)}</option>)
 												})}
@@ -457,27 +324,30 @@ export default function EditMeterModalComponent(props: EditMeterModalComponentPr
 										<div style={formInputStyle}>
 											<label><FormattedMessage id="meter.cumulativeResetStart" /></label><br />
 											<Input
+												name='cumulativeResetStart'
 												type='text'
-												onChange={e => handleCumulativeResetStartChange(e)}
-												defaultValue={cumulativeResetStart}
+												onChange={e => handleStringChange(e)}
+												defaultValue={state.cumulativeResetStart}
 												placeholder="HH:MM:SS" />
 										</div>
 										{/* cumulativeResetEnd input*/}
 										<div style={formInputStyle}>
 											<label><FormattedMessage id="meter.cumulativeResetEnd" /></label><br />
 											<Input
+												name='cumulativeResetEnd'
 												type='text'
-												onChange={e => handleCumulativeResetEndChange(e)}
-												defaultValue={cumulativeResetEnd}
+												onChange={e => handleStringChange(e)}
+												defaultValue={state.cumulativeResetEnd}
 												placeholder="HH:MM:SS" />
 										</div>
 										{/* endOnlyTime input*/}
 										<div style={formInputStyle}>
 											<label><FormattedMessage id="meter.endOnlyTime" /></label><br />
 											<Input
+												name='endOnlyTime'
 												type='select'
-												defaultValue={endOnlyTime.toString()}
-												onChange={e => handleEndOnlyTimeChange(e)}>
+												defaultValue={state.endOnlyTime.toString()}
+												onChange={e => handleBooleanChange(e)}>
 												{Object.keys(TrueFalseType).map(key => {
 													return (<option value={key} key={key}>{translate(`TrueFalseType.${key}`)}</option>)
 												})}
@@ -487,49 +357,54 @@ export default function EditMeterModalComponent(props: EditMeterModalComponentPr
 										<div style={formInputStyle}>
 											<label><FormattedMessage id="meter.reading" /></label><br />
 											<Input
+												name="reading"
 												type="number"
-												onChange={e => handleReadingChange(e)}
+												onChange={e => handleNumberChange(e)}
 												step="0.01"
-												defaultValue={reading} />
+												defaultValue={state.reading} />
 										</div>
 										{/* readingGap input*/}
 										<div style={formInputStyle}>
 											<label><FormattedMessage id="meter.readingGap" /></label><br />
 											<Input
+												name='readingGap'
 												type='number'
-												onChange={e => handleReadingGapChange(e)}
+												onChange={e => handleNumberChange(e)}
 												step="0.01"
 												min="0"
-												defaultValue={readingGap} />
+												defaultValue={state.readingGap} />
 										</div>
 										{/* readingVariation input*/}
 										<div style={formInputStyle}>
 											<label><FormattedMessage id="meter.readingVariation" /></label><br />
 											<Input
+												name="readingVariation"
 												type="number"
-												onChange={e => handleReadingVariationChange(e)}
+												onChange={e => handleNumberChange(e)}
 												step="0.01"
 												min="0"
-												defaultValue={readingVariation} />
+												defaultValue={state.readingVariation} />
 										</div>
 										{/* readingDuplication input*/}
 										<div style={formInputStyle}>
 											<label><FormattedMessage id="meter.readingDuplication" /></label><br />
 											<Input
+												name="readingDuplication"
 												type="number"
-												onChange={e => handleReadingDuplicationChange(e)}
+												onChange={e => handleNumberChange(e)}
 												step="1"
 												min="1"
 												max="9"
-												defaultValue={readingDuplication} />
+												defaultValue={state.readingDuplication} />
 										</div>
 										{/* timeSort input*/}
 										<div style={formInputStyle}>
 											<label><FormattedMessage id="meter.timeSort" /></label><br />
 											<Input
+												name='timeSort'
 												type='select'
-												defaultValue={timeSort.toString()}
-												onChange={e => handleTimeSortChange(e)}>
+												defaultValue={state.timeSort.toString()}
+												onChange={e => handleBooleanChange(e)}>
 												{Object.keys(TrueFalseType).map(key => {
 													return (<option value={key} key={key}>{translate(`TrueFalseType.${key}`)}</option>)
 												})}
@@ -539,19 +414,21 @@ export default function EditMeterModalComponent(props: EditMeterModalComponentPr
 										<div style={formInputStyle}>
 											<label><FormattedMessage id="meter.startTimeStamp" /></label><br />
 											<Input
+												name='startTimestamp'
 												type='text'
-												onChange={e => handleStartTimestampChange(e)}
+												onChange={e => handleStringChange(e)}
 												placeholder="YYYY-MM-DD HH:MM:SS"
-												defaultValue={startTimestamp} />
+												defaultValue={state.startTimestamp} />
 										</div>
 										{/* endTimestamp input*/}
 										<div style={formInputStyle}>
 											<label><FormattedMessage id="meter.endTimeStamp" /></label><br />
 											<Input
+												name='endTimestamp'
 												type='text'
-												onChange={e => handleEndTimestampChange(e)}
+												onChange={e => handleStringChange(e)}
 												placeholder="YYYY-MM-DD HH:MM:SS"
-												defaultValue={endTimestamp} />
+												defaultValue={state.endTimestamp} />
 										</div>
 									</div>
 								</div>
@@ -565,7 +442,7 @@ export default function EditMeterModalComponent(props: EditMeterModalComponentPr
 						<FormattedMessage id="discard.changes" />
 					</Button>
 					{/* On click calls the function handleSaveChanges in this component */}
-					<Button variant="primary" onClick={handleSaveChanges} disabled={!name}>
+					<Button variant="primary" onClick={handleSaveChanges} disabled={!state.name}>
 						<FormattedMessage id="save.all" />
 					</Button>
 				</Modal.Footer>

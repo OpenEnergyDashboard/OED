@@ -53,10 +53,6 @@ export default function CreateMeterModalComponent() {
 	}
 
 	/* State */
-	// We can definitely sacrifice readability here (and in the render) to consolidate these into a single function if need be
-	// NOTE a lot of this is copied from the MeterModalEditComponent, in the future we could make a single component to handle all edit pages if need be
-	// TODO Katherine with Delaney help are going to try to consolidate to create reusable functions.
-
 	// Modal show
 	const [showModal, setShowModal] = useState(false);
 	const handleClose = () => {
@@ -80,16 +76,12 @@ export default function CreateMeterModalComponent() {
 		setState({ ...state, [e.target.name]: Number(e.target.value) });
 	}
 
-	// timeZone
-	const [timeZone, setTimeZone] = useState(defaultValues.timeZone);
 	const handleTimeZoneChange = (timeZone : string ) => {
-		setTimeZone(timeZone);
+		setState({ ...state, ['timeZone']: timeZone });
 	}
 
-	// GPS
-	const [gps, setGps] = useState(defaultValues.gps);
 	const handleGpsChange = (gps: GPSPoint) => {
-		setGps(gps);
+		setState({ ...state, ['gps']: gps });
 	}
 
 	/* End State */
@@ -228,7 +220,7 @@ export default function CreateMeterModalComponent() {
 										{/* Timezone input*/}
 										<div style={formInputStyle}>
 											<label><FormattedMessage id="meter.time.zone" /></label><br />
-											<TimeZoneSelect current={timeZone} handleClick={timeZone => handleTimeZoneChange(timeZone)} />
+											<TimeZoneSelect current={state.timeZone} handleClick={timeZone => handleTimeZoneChange(timeZone)} />
 										</div>
 										{/* GPS input*/}
 										<div style={formInputStyle}>
@@ -236,8 +228,8 @@ export default function CreateMeterModalComponent() {
 											<Input
 												name='gps'
 												type='text'
-												onChange={() => handleGpsChange(gps)}
-												defaultValue={`${gps.latitude}, ${gps.longitude}`}
+												onChange={() => handleGpsChange(state.gps)}
+												defaultValue={`${state.gps.latitude}, ${state.gps.longitude}`}
 												placeholder="latitude, longitude" />
 										</div>
 										{/* UnitId input*/}
