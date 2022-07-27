@@ -12,8 +12,8 @@ const router = express.Router();
 
 function formatConversionForResponse(item) {
 	return {
-		sourceId: item.sourceId, destinationId: item.destinationId, bidirectional: item.bidirectional,
-		slope: item.slope, intercept: item.intercept, note: item.note
+		sourceId: item.sourceId, destinationId: item.destinationId, bidirectional: item.bidirectional, slope: item.slope, 
+		intercept: item.intercept, note: item.note, sourceDestination: String(item.sourceId + "/" + item.destinationId)
 	};
 }
 
@@ -36,7 +36,7 @@ router.get('/', async (req, res) => {
 router.post('/edit', async (req, res) => {
 	const validConversion = {
 		type: 'object',
-		required: ['sourceId', 'destinationId', 'bidirectional', 'slope', 'intercept'], // TODO: Determine if we will only require source and destination IDs
+		required: ['sourceId', 'destinationId'], 
 		properties: {
 			sourceId: {
 				type: 'number',
@@ -58,11 +58,15 @@ router.post('/edit', async (req, res) => {
 					{ type: 'string' },
 					{ type: 'null' }
 				]
+			},
+			sourceDestination: {
+				type: 'string',
 			}
 		}
 	};
 
 	const validatorResult = validate(req.body, validConversion);
+	console.log(validatorResult); // TODO: Remove after testing
 	if (!validatorResult.valid) {
 		log.warn(`Got request to edit conversions with invalid conversion data, errors:${validatorResult.errors}`);
 		res.status(400);
@@ -70,12 +74,15 @@ router.post('/edit', async (req, res) => {
 		const conn = getConnection();
 		try {
 			const conversion = await Conversion.getBySourceDestination(req.body.sourceId, req.body.destinationId, conn);
+			console.log(conversion);	// TODO: Remove after testing
 			conversion.sourceId = req.body.sourceId;
 			conversion.destinationId = req.body.destinationId;
 			conversion.bidirectional = req.body.bidirectional;
 			conversion.slope = req.body.slope;
 			conversion.intercept = req.body.intercept;
 			conversion.note = req.body.note;
+			conversion.sourceDestination = req.body.sourceDestination;
+
 			await conversion.update(conn);
 		} catch (err) {
 			log.error('Failed to edit conversion', err);
@@ -91,7 +98,7 @@ router.post('/edit', async (req, res) => {
 router.post('/addConversion', async (req, res) => {
 	const validConversion = {
 		type: 'object',
-		required: ['sourceId', 'destinationId', 'bidirectional', 'slope', 'intercept'],
+		required: ['sourceId', 'destinationId'],
 		properties: {
 			sourceId: {
 				type: 'number',
@@ -113,6 +120,9 @@ router.post('/addConversion', async (req, res) => {
 					{ type: 'string' },
 					{ type: 'null' }
 				]
+			},
+			sourceDestination: {
+				type: 'string',
 			}
 		}
 	};
@@ -125,7 +135,6 @@ router.post('/addConversion', async (req, res) => {
 		try {
 			await conn.tx(async t => {
 				const newConversion = new Conversion(
-					undefined,
 					req.body.sourceId,
 					req.body.destinationId,
 					req.body.bidirectional,

@@ -81,7 +81,7 @@ export function submitEditedConversion(editedConversion: t.ConversionData): Thun
 		// TODO: Above 4 lines might need to be uncommented to make sure submissions are not already submitting
 
 		// Inform the store we are about to edit the passed in conversion
-		// Pushes conversionId of the conversionData to submit onto the submitting state array
+		// Pushes source/destinationIDs of the conversionData to submit onto the submitting state array
 		dispatch(submitConversionEdits(editedConversion.sourceId, editedConversion.destinationId));
 
 		// Attempt to edit the conversion in the database

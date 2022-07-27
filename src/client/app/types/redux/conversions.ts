@@ -54,6 +54,7 @@ export interface ConversionData {
 	slope: number;
 	intercept: number;
 	note: string;
+	sourceDestination: string;	// Combines sourceId and destinationId as a delimiter split string.
 }
 
 export interface ConversionEditData {
@@ -63,11 +64,11 @@ export interface ConversionEditData {
 	slope: number;
 	intercept: number;
 	note: string;
+	sourceDestination: string;	// Combines sourceId and destinationId as a delimiter-split string.
 }
 
-// TODO: Check if we also need to include destinationId in this interface. (would need to rename if only sourceId)
-export interface ConversionDataById {
-	[sourceId: number]: ConversionData;
+export interface ConversionDataBySourceDestination {
+	[sourceDestination: string]: ConversionData;
 }
 
 export interface ConversionsState {
@@ -75,5 +76,5 @@ export interface ConversionsState {
 	isFetching: boolean;
 	selectedConversions: number[];
 	submitting: number[];
-	conversions: ConversionDataById;	// See above TODO about potential name change
+	conversions: ConversionDataBySourceDestination;
 }

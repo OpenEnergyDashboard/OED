@@ -29,7 +29,7 @@ export default function conversions(state = defaultState, action: ConversionsAct
 			return {
 				...state,
 				isFetching: false,
-				conversions: _.keyBy(action.data, conversion => conversion.sourceId)
+				conversions: _.keyBy(action.data, conversion => String(conversion.sourceId + '/' + conversion.destinationId))
 			};
 		case ActionType.ChangeDisplayedConversions:
 			return {
@@ -39,7 +39,7 @@ export default function conversions(state = defaultState, action: ConversionsAct
 		case ActionType.SubmitEditedConversion:
 		{
 			const submitting = state.submitting;
-			submitting.push(action.conversionSourceId, action.conversionDestinationId);
+			submitting.push(action.sourceId, action.destinationId);
 			return {
 				...state,
 				submitting
@@ -52,7 +52,8 @@ export default function conversions(state = defaultState, action: ConversionsAct
 			// The passed in id should be correct as it is inherited from the pre-edited conversion
 			// See EditConversionModalComponent line 134 for details (starts with if(conversionHasChanges))
 			const conversions = {...state.conversions};
-			conversions[action.editedConversion.sourceId] = action.editedConversion;
+			console.log(conversions);
+			conversions[action.editedConversion.sourceId] = action.editedConversion;	// TODO: might need to change to reflect source/dest IDs
 
 			return {
 				...state,
@@ -63,7 +64,7 @@ export default function conversions(state = defaultState, action: ConversionsAct
 		{
 			// Remove the current submitting conversion from the submitting state
 			const submitting = state.submitting;
-			submitting.splice(submitting.indexOf(action.conversionId));
+			submitting.splice(submitting.indexOf(action.sourceId));	//TODO: Might need to change to reflect src/destID
 			return {
 				...state,
 				submitting

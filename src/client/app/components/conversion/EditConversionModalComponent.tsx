@@ -38,7 +38,8 @@ export default function EditConversionModalComponent(props: EditConversionModalC
 		bidirectional: props.conversion.bidirectional,
 		slope: props.conversion.slope,
 		intercept: props.conversion.intercept,
-		note: props.conversion.note
+		note: props.conversion.note,
+		sourceDestination: props.conversion.sourceDestination
 	}
 
 	/* State */
@@ -56,6 +57,7 @@ export default function EditConversionModalComponent(props: EditConversionModalC
 	const handleNumberChange = (e: React.ChangeEvent<HTMLInputElement>) => {
 		setState({ ...state, [e.target.name]: Number(e.target.value) });
 	}
+
 	/* End State */
 
 	// Reset the state to default values
@@ -93,6 +95,7 @@ export default function EditConversionModalComponent(props: EditConversionModalC
 		// Only do work if there are changes
 		if (conversionHasChanges) {
 			// Save our changes by dispatching the submitEditedConversion action
+			state.sourceDestination = String(state.sourceId + '/' + state.destinationId);	// Update sourceDestination with new values.
 			dispatch(submitEditedConversion(state));
 			dispatch(removeUnsavedChanges());
 		}
@@ -176,8 +179,8 @@ export default function EditConversionModalComponent(props: EditConversionModalC
 												name='slope'
 												type="number"
 												defaultValue={state.slope}
-												onChange={e => handleNumberChange(e)}
-												placeholder="Slope" />
+												placeholder="Slope"
+												onChange={e => handleNumberChange(e)} />
 										</div>
 										{/* Intercept input*/}
 										<div style={formInputStyle}>
