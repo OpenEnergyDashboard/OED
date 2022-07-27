@@ -77,8 +77,12 @@ export default function EditMeterModalComponent(props: EditMeterModalComponentPr
 		setState({ ...state, ['timeZone']: timeZone });
 	}
 
-	const handleGpsChange = (gps: GPSPoint) => {
-		setState({ ...state, ['gps']: gps });
+	const handleGpsChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+		const coordinates = e.target.value.split(',', 2); //arr of size 2
+		coordinates[0] = coordinates[0].trim();
+		coordinates[1] = coordinates[1].trim();
+		const gps: GPSPoint = {latitude: Number(coordinates[0]), longitude: Number(coordinates[1])}
+		setState({ ...state, gps: gps});
 	}
 	/* End State */
 
@@ -257,12 +261,20 @@ export default function EditMeterModalComponent(props: EditMeterModalComponentPr
 										{/* GPS input*/}
 										<div style={formInputStyle}>
 											<label><FormattedMessage id="meter.gps" /></label><br />
-											<Input
-												name='gps'
-												type='text'
-												onChange={() => handleGpsChange(state.gps)}
-												//defaultValue={`${state.gps.latitude}, ${state.gps.longitude}`}
-												placeholder="latitude , longitude" />
+											{/* If gps is null, pulling the default results in an error.
+												Handling by pulling default only if gps is not null.
+												This could probably be done in an if statement instead */}
+											{state.gps == null
+												? <Input
+													name='gps'
+													type='text'
+													onChange={e => handleGpsChange(e)}
+													placeholder="latitude , longitude" />
+												: <Input
+													name='gps' type='text'
+													onChange={e => handleGpsChange(e)}
+													defaultValue={`${state.gps.latitude}, ${state.gps.longitude}`}/>
+											}
 										</div>
 										{/* UnitId input*/}
 										<div style={formInputStyle}>
