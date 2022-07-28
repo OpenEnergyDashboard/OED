@@ -41,7 +41,7 @@ export default function units(state = defaultState, action: UnitsAction) {
 			submitting.push(action.unitId);
 			return {
 				...state,
-				submitting
+				submitting: [...submitting]
 			};
 		}
 		case ActionType.ConfirmEditedUnit: {
@@ -63,7 +63,7 @@ export default function units(state = defaultState, action: UnitsAction) {
 			submitting.splice(submitting.indexOf(action.unitId));
 			return {
 				...state,
-				submitting
+				submitting: [...submitting]
 			};
 		}
 		default:
