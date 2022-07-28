@@ -52,9 +52,13 @@ export default function conversions(state = defaultState, action: ConversionsAct
 			// The passed in id should be correct as it is inherited from the pre-edited conversion
 			// See EditConversionModalComponent line 134 for details (starts with if(conversionHasChanges))
 			const conversions = {...state.conversions};
-			console.log('confirm edit');
-			console.log(conversions);
-			conversions[action.editedConversion.sourceId] = action.editedConversion;	// TODO: might need to change to reflect source/dest IDs
+
+			// Annoyed programmer's kluge fix to update conversion state with new edited information
+			// TODO: Make this less complicated/more streamlined
+			for (let i = 0; conversions[i]; i++) {
+				if (conversions[i].sourceDestination === action.editedConversion.sourceDestination)
+					conversions[i] = action.editedConversion;
+			}
 
 			return {
 				...state,
@@ -67,7 +71,7 @@ export default function conversions(state = defaultState, action: ConversionsAct
 			const submitting = state.submitting;
 			console.log('submitting');
 			console.log(submitting);
-			submitting.splice(submitting.indexOf(action.sourceId));	//TODO: Might need to change to reflect src/destID
+			submitting.splice(submitting[action.sourceId]);	//TODO: Determine whether this is enough to remove from state or if other info is needed.
 			console.log('after splice');
 			console.log(submitting);
 			return {
