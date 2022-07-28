@@ -6,16 +6,11 @@
 
 import ApiBackend from './ApiBackend';
 import { ConversionData, ConversionEditData } from '../../types/redux/conversions';
-import { NamedIDItem } from '../../types/items';
 export default class ConversionsApi {
 	private readonly backend: ApiBackend;
 
 	constructor(backend: ApiBackend) {
 		this.backend = backend;
-	}
-
-	public async details(): Promise<NamedIDItem[]> {
-		return await this.backend.doGetRequest<NamedIDItem[]>('/api/conversions');
 	}
 
 	public async edit(conversion: ConversionData): Promise<ConversionEditData> {
