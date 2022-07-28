@@ -29,8 +29,7 @@ export default function CreateConversionModalComponent(props: CreateConversionMo
 		bidirectional: false,
 		slope: 0.0,
 		intercept: 0.0,
-		note: '',
-		sourceDestination: ''
+		note: ''
 	}
 
 	/* State */
@@ -72,8 +71,6 @@ export default function CreateConversionModalComponent(props: CreateConversionMo
 		// Close modal first to avoid repeat clicks
 		setShowModal(false);
 
-		// Add the new conversion and update the store
-		state.sourceDestination = String(state.sourceId + '>' + state.destinationId);	// Update sourceDestination with new values.
 		dispatch(addConversion(state));
 
 		resetState();

@@ -10,7 +10,7 @@ const defaultState: ConversionsState = {
 	isFetching: false,
 	selectedConversions: [],
 	submitting: [],
-	conversions: {}
+	conversions: []
 };
 
 export default function conversions(state = defaultState, action: ConversionsAction) {
@@ -29,7 +29,7 @@ export default function conversions(state = defaultState, action: ConversionsAct
 			return {
 				...state,
 				isFetching: false,
-				conversions: _.keyBy(action.data, conversion => String(conversion.sourceId + '/' + conversion.destinationId))
+				conversions: action.data
 			};
 		case ActionType.ChangeDisplayedConversions:
 			return {
@@ -39,10 +39,10 @@ export default function conversions(state = defaultState, action: ConversionsAct
 		case ActionType.SubmitEditedConversion:
 		{
 			const submitting = state.submitting;
-			submitting.push(action.sourceId, action.destinationId);
+			submitting.push(action.conversionData);
 			return {
 				...state,
-				submitting
+				submitting: [...submitting]
 			};
 		}
 		case ActionType.ConfirmEditedConversion:
@@ -51,32 +51,31 @@ export default function conversions(state = defaultState, action: ConversionsAct
 			// Overwrite the conversion data at the edited conversion's index with the edited conversion's conversion data
 			// The passed in id should be correct as it is inherited from the pre-edited conversion
 			// See EditConversionModalComponent line 134 for details (starts with if(conversionHasChanges))
-			const conversions = {...state.conversions};
-
-			// Annoyed programmer's kluge fix to update conversion state with new edited information
-			// TODO: Make this less complicated/more streamlined
-			for (let i = 0; conversions[i]; i++) {
-				if (conversions[i].sourceDestination === action.editedConversion.sourceDestination)
-					conversions[i] = action.editedConversion;
-			}
-
+			const conversions = state.conversions;
+			// Search the array of ConversionData in conversions for an object with source/destination ids matching that of the action payload
+			const conversionDataIndex = conversions.findIndex(conversionData => ((
+				conversionData.sourceId === action.editedConversion.sourceId) &&
+				conversionData.destinationId === action.editedConversion.destinationId));
+			// Overwrite ConversionData at index with edited ConversionData
+			conversions[conversionDataIndex] = action.editedConversion;
 			return {
 				...state,
-				conversions
+				conversions: [...conversions]
 			};
 		}
 		case ActionType.DeleteSubmittedConversion:
 		{
 			// Remove the current submitting conversion from the submitting state
 			const submitting = state.submitting;
-			console.log('submitting');
-			console.log(submitting);
-			submitting.splice(submitting[action.sourceId]);	//TODO: Determine whether this is enough to remove from state or if other info is needed.
-			console.log('after splice');
-			console.log(submitting);
+			// Search the array of ConversionData in submitting for an object with source/destination ids matching that of the action payload
+			const conversionDataIndex = submitting.findIndex(conversionData => ((
+				conversionData.sourceId === action.conversionData.sourceId) &&
+				conversionData.destinationId === action.conversionData.destinationId));
+			// Remove the object from the submitting array
+			submitting.splice(conversionDataIndex);
 			return {
 				...state,
-				submitting
+				submitting: [...submitting]
 			};
 		}
 		default:

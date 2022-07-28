@@ -38,8 +38,7 @@ export default function EditConversionModalComponent(props: EditConversionModalC
 		bidirectional: props.conversion.bidirectional,
 		slope: props.conversion.slope,
 		intercept: props.conversion.intercept,
-		note: props.conversion.note,
-		sourceDestination: props.conversion.sourceDestination
+		note: props.conversion.note
 	}
 
 	/* State */
