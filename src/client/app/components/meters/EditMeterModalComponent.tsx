@@ -271,7 +271,8 @@ export default function EditMeterModalComponent(props: EditMeterModalComponentPr
 													onChange={e => handleGpsChange(e)}
 													placeholder="latitude , longitude" />
 												: <Input
-													name='gps' type='text'
+													name='gps'
+													type='text'
 													onChange={e => handleGpsChange(e)}
 													defaultValue={`${state.gps.latitude}, ${state.gps.longitude}`}/>
 											}
