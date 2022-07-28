@@ -135,6 +135,7 @@ export enum ActionType {
 	ConfirmEditedConversion = 'CONFIRM_EDITED_CONVERSION',
 	DeleteEditedConversion = 'DELETE_EDITED_CONVERSION',
 	DeleteSubmittedConversion = 'DELETE_SUBMITTED_CONVERSION',
+	DeleteConversion = 'DELETE_CONVERSION',
 	ConfirmConversionsFetchedOnce = 'CONFIRM_CONVERSIONS_FETCHED_ONCE',
 }
 

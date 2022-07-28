@@ -13,7 +13,7 @@ const router = express.Router();
 function formatConversionForResponse(item) {
 	return {
 		sourceId: item.sourceId, destinationId: item.destinationId, bidirectional: item.bidirectional, slope: item.slope, 
-		intercept: item.intercept, note: item.note, sourceDestination: String(item.sourceId + "/" + item.destinationId)
+		intercept: item.intercept, note: item.note, sourceDestination: String(item.sourceId + ">" + item.destinationId)
 	};
 }
 
@@ -58,9 +58,6 @@ router.post('/edit', async (req, res) => {
 					{ type: 'string' },
 					{ type: 'null' }
 				]
-			},
-			sourceDestination: {
-				type: 'string',
 			}
 		}
 	};
@@ -73,7 +70,12 @@ router.post('/edit', async (req, res) => {
 	} else {
 		const conn = getConnection();
 		try {
+			console.log('conversion req body');	// TODO: Remove console log after testing
+			console.log(req.body.sourceId, req.body.destinationId);	// TODO: Remove console log after testing
+			console.log('conn');
+			console.log(conn);
 			const conversion = await Conversion.getBySourceDestination(req.body.sourceId, req.body.destinationId, conn);
+			console.log('conversion after await');
 			console.log(conversion);	// TODO: Remove after testing
 			conversion.sourceId = req.body.sourceId;
 			conversion.destinationId = req.body.destinationId;
@@ -81,7 +83,6 @@ router.post('/edit', async (req, res) => {
 			conversion.slope = req.body.slope;
 			conversion.intercept = req.body.intercept;
 			conversion.note = req.body.note;
-			conversion.sourceDestination = req.body.sourceDestination;
 
 			await conversion.update(conn);
 		} catch (err) {
@@ -120,9 +121,6 @@ router.post('/addConversion', async (req, res) => {
 					{ type: 'string' },
 					{ type: 'null' }
 				]
-			},
-			sourceDestination: {
-				type: 'string',
 			}
 		}
 	};

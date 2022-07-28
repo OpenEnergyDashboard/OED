@@ -86,8 +86,6 @@ export default function EditConversionModalComponent(props: EditConversionModalC
 		// Check for changes by comparing state to props
 		const conversionHasChanges =
 			(
-				props.conversion.sourceId != state.sourceId ||
-				props.conversion.destinationId != state.destinationId ||
 				props.conversion.bidirectional != state.bidirectional ||
 				props.conversion.slope != state.slope ||
 				props.conversion.intercept != state.intercept ||
@@ -95,7 +93,6 @@ export default function EditConversionModalComponent(props: EditConversionModalC
 		// Only do work if there are changes
 		if (conversionHasChanges) {
 			// Save our changes by dispatching the submitEditedConversion action
-			state.sourceDestination = String(state.sourceId + '/' + state.destinationId);	// Update sourceDestination with new values.
 			dispatch(submitEditedConversion(state));
 			dispatch(removeUnsavedChanges());
 		}
@@ -140,11 +137,10 @@ export default function EditConversionModalComponent(props: EditConversionModalC
 										<label><FormattedMessage id="conversion.sourceId" /></label><br />
 										<Input
 											name='sourceId'
-											type='select'
-											onChange={e => handleNumberChange(e)}>
-											{Object.values(props.unitsState).map(unitData => {
-												return (<option value={unitData.id} key={unitData.id}>{unitData.identifier}</option>)
-											})}
+											type='text'
+											defaultValue={props.unitsState[state.sourceId].identifier}
+											// Disable input to prevent changing ID value
+											disabled>
 										</Input>
 										<div />
 										{/* DestinationId input*/}
@@ -152,11 +148,10 @@ export default function EditConversionModalComponent(props: EditConversionModalC
 											<label><FormattedMessage id="conversion.destinationId" /></label><br />
 											<Input
 												name='destinationId'
-												type='select'
-												onChange={e => handleNumberChange(e)}>
-												{Object.values(props.unitsState).map(unitData => {
-													return (<option value={unitData.id} key={unitData.id}>{unitData.identifier}</option>)
-												})}
+												type='text'
+												defaultValue={props.unitsState[state.destinationId].identifier}
+												// Disable input to prevent changing ID value
+												disabled>
 											</Input>
 										</div>
 										{/* Bidirectional Y/N input*/}

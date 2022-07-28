@@ -14,8 +14,6 @@ import { UnitDataById } from 'types/redux/units';
 
 interface ConversionViewComponentProps {
 	conversion: ConversionData;
-	sourceIdentifier: string;
-	destinationIdentifier: string;
 	units: UnitDataById;
 }
 
@@ -34,7 +32,7 @@ export default function ConversionViewComponent(props: ConversionViewComponentPr
 	}
 
 	// Create header from sourceId, destinationId identifiers
-	const header = (props.sourceIdentifier + ' → ' + props.destinationIdentifier);
+	const header = String(props.units[props.conversion.sourceId].identifier + ' → ' + props.units[props.conversion.destinationId].identifier);
 
 	return (
 		<div className="card">
@@ -42,10 +40,10 @@ export default function ConversionViewComponent(props: ConversionViewComponentPr
 				{header}
 			</div>
 			<div className="conversion-container">
-				<b><FormattedMessage id="conversion.sourceId" /></b> {props.sourceIdentifier}
+				<b><FormattedMessage id="conversion.sourceId" /></b> {props.units[props.conversion.sourceId].identifier}
 			</div>
 			<div className="conversion-container">
-				<b><FormattedMessage id="conversion.destinationId" /></b> {props.destinationIdentifier}
+				<b><FormattedMessage id="conversion.destinationId" /></b> {props.units[props.conversion.destinationId].identifier}
 			</div>
 			<div className="conversion-container">
 				<b><FormattedMessage id="conversion.bidirectional" /></b> {props.conversion.bidirectional}

@@ -75,34 +75,34 @@ export function submitEditedConversion(editedConversion: t.ConversionData): Thun
 		// check if conversionData is already submitting (indexOf returns -1 if item does not exist in array)
 
 		// TODO: change if statement so it checks that combination of source/destination IDs do not already exist
-		// if (getState().conversions.submitting.indexOf(editedConversion.sourceId) === -1 ||
-		// 	getState().conversions.submitting.indexOf(editedConversion.destinationId) === -1) {
+		if (getState().conversions.submitting.indexOf(editedConversion.sourceId) === -1 ||
+			getState().conversions.submitting.indexOf(editedConversion.destinationId) === -1) {
 
-		// TODO: Above 4 lines might need to be uncommented to make sure submissions are not already submitting
+			// TODO: Above 4 lines might need to be uncommented to make sure submissions are not already submitting
 
-		// Inform the store we are about to edit the passed in conversion
-		// Pushes source/destinationIDs of the conversionData to submit onto the submitting state array
-		dispatch(submitConversionEdits(editedConversion.sourceId, editedConversion.destinationId));
+			// Inform the store we are about to edit the passed in conversion
+			// Pushes source/destinationIDs of the conversionData to submit onto the submitting state array
+			dispatch(submitConversionEdits(editedConversion.sourceId, editedConversion.destinationId));
 
-		// Attempt to edit the conversion in the database
-		try {
-			// posts the edited conversionData to the conversions API
-			await conversionsApi.edit(editedConversion);
-			// Clear conversion Id from submitting state array
-			dispatch(deleteSubmittedConversion(editedConversion.sourceId, editedConversion.destinationId));
-			// Update the store with our new edits
-			dispatch(confirmConversionEdits(editedConversion));
-			// Success!
-			showSuccessNotification(translate('conversion.successfully.edited.conversion'));
-		} catch (err) {
-			// Failure! ):
-			showErrorNotification(translate('conversion.failed.to.edit.conversion'));
-			// Clear our changes from to the submitting conversions state
-			// We must do this in case fetch failed to keep the store in sync with the database
-			dispatch(deleteSubmittedConversion(editedConversion.sourceId, editedConversion.destinationId));
+			// Attempt to edit the conversion in the database
+			try {
+				// posts the edited conversionData to the conversions API
+				await conversionsApi.edit(editedConversion);
+				// Clear conversion Id from submitting state array
+				dispatch(deleteSubmittedConversion(editedConversion.sourceId, editedConversion.destinationId));
+				// Update the store with our new edits
+				dispatch(confirmConversionEdits(editedConversion));
+				// Success!
+				showSuccessNotification(translate('conversion.successfully.edited.conversion'));
+			} catch (err) {
+				// Failure! ):
+				showErrorNotification(translate('conversion.failed.to.edit.conversion'));
+				// Clear our changes from to the submitting conversions state
+				// We must do this in case fetch failed to keep the store in sync with the database
+				dispatch(deleteSubmittedConversion(editedConversion.sourceId, editedConversion.destinationId));
+			}
 		}
-	}
-	// };
+	};
 }
 
 // Add conversion to database
@@ -121,3 +121,7 @@ export function addConversion(conversion: t.ConversionData): Thunk {
 		}
 	}
 }
+
+// function deleteConversion(sourceId: number, destinationId: number): t.DeleteConversionAction {
+// 	return { type: ActionType.DeleteConversion, sourceId, destinationId };
+// }

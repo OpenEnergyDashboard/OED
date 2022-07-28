@@ -28,6 +28,10 @@ export default class ConversionsApi {
 		);
 	}
 
+	public async delete(sourceId: number, destinationId: number): Promise<void> {
+		return await this.backend.doPostRequest<void>('/api/conversion/delete', {sourceId, destinationId});
+	}
+
 	public async addConversion(conversion: ConversionData): Promise<void> {
 		return await this.backend.doPostRequest('/api/conversions/addConversion', conversion);
 	}

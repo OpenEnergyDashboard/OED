@@ -73,7 +73,7 @@ export default function CreateConversionModalComponent(props: CreateConversionMo
 		setShowModal(false);
 
 		// Add the new conversion and update the store
-		state.sourceDestination = String(state.sourceId + '/' + state.destinationId);	// Update sourceDestination with new values.
+		state.sourceDestination = String(state.sourceId + '>' + state.destinationId);	// Update sourceDestination with new values.
 		dispatch(addConversion(state));
 
 		resetState();

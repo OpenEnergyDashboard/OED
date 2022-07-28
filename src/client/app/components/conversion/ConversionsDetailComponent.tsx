@@ -66,13 +66,11 @@ export default function ConversionsDetailComponent() {
 				<div className="card-container">
 					{/* Create a ConversionViewComponent for each ConversionData in Conversions State after sorting by identifier */}
 					{Object.values(conversionsState)
-						.sort((conversionA: ConversionData, conversionB: ConversionData) =>
-							(conversionA.sourceDestination.toLowerCase() > conversionB.sourceDestination.toLowerCase()) ? 1 :
-								(( conversionB.sourceDestination.toLowerCase() > conversionA.sourceDestination.toLowerCase()) ? -1 : 0))
+						// .sort((conversionA: ConversionData, conversionB: ConversionData) =>
+						// 	(conversionA.sourceDestination.toLowerCase() > conversionB.sourceDestination.toLowerCase()) ? 1 :
+						// 		(( conversionB.sourceDestination.toLowerCase() > conversionA.sourceDestination.toLowerCase()) ? -1 : 0))
 						.map(conversionData => (<ConversionViewComponent conversion={conversionData as ConversionData}
 							key={(conversionData as ConversionData).sourceDestination}
-							sourceIdentifier = {unitsState[conversionData.sourceId].identifier}
-							destinationIdentifier = {unitsState[conversionData.destinationId].identifier}
 							units = {unitsState} />))}
 				</div>
 			</div>
