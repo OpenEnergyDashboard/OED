@@ -61,6 +61,7 @@ export default function ConversionsDetailComponent() {
 				{loggedInAsAdmin &&
 					<div className="edit-btn">
 						<CreateConversionModalComponent
+							conversionsState = {conversionsState}
 							unitsState = {unitsState}/>
 					</div>}
 				<div className="card-container">

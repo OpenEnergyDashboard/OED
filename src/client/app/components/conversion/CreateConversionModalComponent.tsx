@@ -14,8 +14,10 @@ import { useState } from 'react';
 import TooltipMarkerComponent from '../TooltipMarkerComponent';
 import TooltipHelpContainer from '../../containers/TooltipHelpContainer';
 import { UnitDataById } from 'types/redux/units';
+import { ConversionData } from 'types/redux/conversions';
 
 interface CreateConversionModalComponentProps {
+	conversionsState: ConversionData[];
 	unitsState: UnitDataById;
 }
 
@@ -192,7 +194,11 @@ export default function CreateConversionModalComponent(props: CreateConversionMo
 						<FormattedMessage id="discard.changes" />
 					</Button>
 					{/* On click calls the function handleSaveChanges in this component */}
-					<Button variant="primary" onClick={handleSubmit} disabled={!state.sourceId || !state.destinationId || state.sourceId === state.destinationId}>
+					<Button variant="primary" onClick={handleSubmit}
+						disabled={!state.sourceId || !state.destinationId || state.sourceId === state.destinationId ||
+						(props.conversionsState.findIndex(conversionData => ((
+							conversionData.sourceId === state.sourceId) &&
+							conversionData.destinationId === state.destinationId))) !== -1}>
 						<FormattedMessage id="save.all" />
 					</Button>
 				</Modal.Footer>
