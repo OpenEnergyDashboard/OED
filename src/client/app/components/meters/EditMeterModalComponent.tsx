@@ -356,6 +356,53 @@ export default function EditMeterModalComponent(props: EditMeterModalComponentPr
 													return (<option value={key} key={key}>{translate(`TrueFalseType.${key}`)}</option>)
 												})}
 											</Input>
+											{/* readingGap input*/}
+											<div style={formInputStyle}>
+												<label><FormattedMessage id="meter.readingGap" /></label><br />
+												<Input
+													name='readingGap'
+													type='number'
+													onChange={e => handleNumberChange(e)}
+													step="0.01"
+													min="0"
+													defaultValue={state.readingGap} />
+											</div>
+											{/* readingVariation input*/}
+											<div style={formInputStyle}>
+												<label><FormattedMessage id="meter.readingVariation" /></label><br />
+												<Input
+													name="readingVariation"
+													type="number"
+													onChange={e => handleNumberChange(e)}
+													step="0.01"
+													min="0"
+													defaultValue={state.readingVariation} />
+											</div>
+											{/* readingDuplication input*/}
+											<div style={formInputStyle}>
+												<label><FormattedMessage id="meter.readingDuplication" /></label><br />
+												<Input
+													name="readingDuplication"
+													type="number"
+													onChange={e => handleNumberChange(e)}
+													step="1"
+													min="1"
+													max="9"
+													defaultValue={state.readingDuplication} />
+											</div>
+											{/* timeSort input*/}
+											<div style={formInputStyle}>
+												<label><FormattedMessage id="meter.timeSort" /></label><br />
+												<Input
+													name='timeSort'
+													type='select'
+													defaultValue={state.timeSort.toString()}
+													onChange={e => handleBooleanChange(e)}>
+													{Object.keys(TrueFalseType).map(key => {
+														return (<option value={key} key={key}>{translate(`TrueFalseType.${key}`)}</option>)
+													})}
+												</Input>
+											</div>
 										</div>
 										{/* reading input*/}
 										<div style={formInputStyle}>
@@ -366,53 +413,6 @@ export default function EditMeterModalComponent(props: EditMeterModalComponentPr
 												onChange={e => handleNumberChange(e)}
 												step="0.01"
 												defaultValue={state.reading} />
-										</div>
-										{/* readingGap input*/}
-										<div style={formInputStyle}>
-											<label><FormattedMessage id="meter.readingGap" /></label><br />
-											<Input
-												name='readingGap'
-												type='number'
-												onChange={e => handleNumberChange(e)}
-												step="0.01"
-												min="0"
-												defaultValue={state.readingGap} />
-										</div>
-										{/* readingVariation input*/}
-										<div style={formInputStyle}>
-											<label><FormattedMessage id="meter.readingVariation" /></label><br />
-											<Input
-												name="readingVariation"
-												type="number"
-												onChange={e => handleNumberChange(e)}
-												step="0.01"
-												min="0"
-												defaultValue={state.readingVariation} />
-										</div>
-										{/* readingDuplication input*/}
-										<div style={formInputStyle}>
-											<label><FormattedMessage id="meter.readingDuplication" /></label><br />
-											<Input
-												name="readingDuplication"
-												type="number"
-												onChange={e => handleNumberChange(e)}
-												step="1"
-												min="1"
-												max="9"
-												defaultValue={state.readingDuplication} />
-										</div>
-										{/* timeSort input*/}
-										<div style={formInputStyle}>
-											<label><FormattedMessage id="meter.timeSort" /></label><br />
-											<Input
-												name='timeSort'
-												type='select'
-												defaultValue={state.timeSort.toString()}
-												onChange={e => handleBooleanChange(e)}>
-												{Object.keys(TrueFalseType).map(key => {
-													return (<option value={key} key={key}>{translate(`TrueFalseType.${key}`)}</option>)
-												})}
-											</Input>
 										</div>
 										{/* startTimestamp input*/}
 										<div style={formInputStyle}>
