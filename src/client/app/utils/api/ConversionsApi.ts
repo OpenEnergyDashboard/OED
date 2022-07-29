@@ -18,7 +18,7 @@ export default class ConversionsApi {
 			'/api/conversions/edit',
 			{
 				sourceId: conversion.sourceId, destinationId: conversion.destinationId, bidirectional: conversion.bidirectional,
-				slope: conversion.slope, intercept: conversion.intercept, note: conversion.note
+				slope: conversion.slope, intercept: conversion.intercept, note: conversion.note, sourceDestination: conversion.sourceDestination
 			}
 		);
 	}

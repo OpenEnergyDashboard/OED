@@ -41,16 +41,16 @@ export function changeDisplayedConversions(conversions: number[]): t.ChangeDispl
 }
 
 // Pushes conversionIds onto submitting conversions state array
-export function submitConversionEdits(conversionData: t.ConversionData): t.SubmitEditedConversionAction {
-	return { type: ActionType.SubmitEditedConversion, conversionData};
+export function submitConversionEdits(sourceId: number, destinationId: number): t.SubmitEditedConversionAction {
+	return { type: ActionType.SubmitEditedConversion, sourceId, destinationId};
 }
 
 export function confirmConversionEdits(editedConversion: t.ConversionData): t.ConfirmEditedConversionAction {
 	return { type: ActionType.ConfirmEditedConversion, editedConversion };
 }
 
-export function deleteSubmittedConversion(conversionData: t.ConversionData): t.DeleteSubmittedConversionAction {
-	return {type: ActionType.DeleteSubmittedConversion, conversionData}
+export function deleteSubmittedConversion(sourceId: number, destinationId: number): t.DeleteSubmittedConversionAction {
+	return {type: ActionType.DeleteSubmittedConversion, sourceId, destinationId}
 }
 
 export function confirmConversionsFetchedOnce(): t.ConfirmConversionsFetchedOnceAction {
@@ -74,23 +74,22 @@ export function submitEditedConversion(editedConversion: t.ConversionData): Thun
 	return async (dispatch: Dispatch, getState: GetState) => {
 		// check if conversionData is already submitting (indexOf returns -1 if item does not exist in array)
 
-		// Search the array of ConversionData in submitting for an object with source/destination ids matching that editedConversion
-		const conversionDataIndex = getState().conversions.submitting.findIndex(conversionData => ((
-			conversionData.sourceId === editedConversion.sourceId) &&
-			conversionData.destinationId === editedConversion.destinationId));
+		// TODO: change if statement so it checks that combination of source/destination IDs do not already exist
+		if (getState().conversions.submitting.indexOf(editedConversion.sourceId) === -1 ||
+			getState().conversions.submitting.indexOf(editedConversion.destinationId) === -1) {
 
-		// If the editedConversion is not already being submitted
-		if (conversionDataIndex === -1) {
+			// TODO: Above 4 lines might need to be uncommented to make sure submissions are not already submitting
 
 			// Inform the store we are about to edit the passed in conversion
-			// Pushes edited conversionData to submit onto the submitting state array
-			dispatch(submitConversionEdits(editedConversion));
+			// Pushes source/destinationIDs of the conversionData to submit onto the submitting state array
+			dispatch(submitConversionEdits(editedConversion.sourceId, editedConversion.destinationId));
+
 			// Attempt to edit the conversion in the database
 			try {
 				// posts the edited conversionData to the conversions API
 				await conversionsApi.edit(editedConversion);
-				// Clear conversionData object from submitting state array
-				dispatch(deleteSubmittedConversion(editedConversion));
+				// Clear conversion Id from submitting state array
+				dispatch(deleteSubmittedConversion(editedConversion.sourceId, editedConversion.destinationId));
 				// Update the store with our new edits
 				dispatch(confirmConversionEdits(editedConversion));
 				// Success!
@@ -98,9 +97,9 @@ export function submitEditedConversion(editedConversion: t.ConversionData): Thun
 			} catch (err) {
 				// Failure! ):
 				showErrorNotification(translate('conversion.failed.to.edit.conversion'));
-				// Clear our changes from the submitting conversions state
+				// Clear our changes from to the submitting conversions state
 				// We must do this in case fetch failed to keep the store in sync with the database
-				dispatch(deleteSubmittedConversion(editedConversion));
+				dispatch(deleteSubmittedConversion(editedConversion.sourceId, editedConversion.destinationId));
 			}
 		}
 	};

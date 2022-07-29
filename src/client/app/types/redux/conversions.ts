@@ -25,12 +25,14 @@ export interface ConfirmEditedConversionAction {
 
 export interface DeleteSubmittedConversionAction {
 	type: ActionType.DeleteSubmittedConversion;
-	conversionData: ConversionData;
+	sourceId: number;
+	destinationId: number;
 }
 
 export interface SubmitEditedConversionAction {
 	type: ActionType.SubmitEditedConversion;
-	conversionData: ConversionData;
+	sourceId: number;
+	destinationId: number;
 }
 
 export interface ConfirmConversionsFetchedOnceAction {
@@ -52,6 +54,7 @@ export interface ConversionData {
 	slope: number;
 	intercept: number;
 	note: string;
+	sourceDestination: string;	// Combines sourceId and destinationId as a delimiter split string.
 }
 
 export interface ConversionEditData {
@@ -61,13 +64,17 @@ export interface ConversionEditData {
 	slope: number;
 	intercept: number;
 	note: string;
+	sourceDestination: string;	// Combines sourceId and destinationId as a delimiter-split string.
+}
+
+export interface ConversionDataBySourceDestination {
+	[sourceDestination: string]: ConversionData;
 }
 
 export interface ConversionsState {
 	hasBeenFetchedOnce: boolean,
 	isFetching: boolean;
 	selectedConversions: number[];
-	// Use an array of ConversionData because we need the combination of source/destination id to give us a unique conversion
-	submitting: ConversionData[];
-	conversions: ConversionData[];
+	submitting: number[];
+	conversions: ConversionDataBySourceDestination;
 }
