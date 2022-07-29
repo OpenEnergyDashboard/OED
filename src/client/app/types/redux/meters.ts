@@ -52,6 +52,11 @@ export enum MeterType {
 	other = 'other'
 }
 
+export enum MeterTimeSortType {
+	increasing = 'increasing',
+	decreasing = 'decreasing',
+}
+
 export interface MeterData {
 	id: number;
 	identifier: string;
@@ -75,7 +80,7 @@ export interface MeterData {
 	readingGap: number;
 	readingVariation: number;
 	readingDuplication: number;
-	timeSort: boolean;
+	timeSort: string;
 	startTimestamp: string;
 	endTimestamp: string;
 }
@@ -103,7 +108,7 @@ export interface MeterEditData {
 	readingGap: number;
 	readingVariation: number;
 	readingDuplication: number;
-	timeSort: boolean;
+	timeSort: string;
 	startTimestamp: string;
 	endTimestamp: string;
 }

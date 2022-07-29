@@ -3,7 +3,7 @@
 * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
 import * as React from 'react';
 import { Modal, Button } from 'react-bootstrap';
-import { MeterData, MeterType } from '../../types/redux/meters';
+import { MeterData, MeterTimeSortType, MeterType } from '../../types/redux/meters';
 import { Input } from 'reactstrap';
 import { FormattedMessage } from 'react-intl';
 import translate from '../../utils/translate';
@@ -202,6 +202,8 @@ export default function EditMeterModalComponent(props: EditMeterModalComponentPr
 											<Input
 												name="area"
 												type="number"
+												step="0.01"
+												min="0"
 												defaultValue={state.area}
 												onChange={e => handleNumberChange(e)} />
 										</div>
