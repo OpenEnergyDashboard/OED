@@ -9,9 +9,14 @@ import EditMeterModalComponent from './EditMeterModalComponent';
 import { MeterData } from 'types/redux/meters';
 import translate from '../../utils/translate';
 import '../../styles/unit-card-page.css';
+import { useSelector } from 'react-redux';
+import { isRoleAdmin } from '../../utils/hasPermissions';
+import { State } from 'types/redux/state';
+import { CurrentUserState } from 'types/redux/currentUser';
 
 interface MeterViewComponentProps {
 	meter: MeterData;
+	currentUser: CurrentUserState;
 }
 
 export default function MeterViewComponent(props: MeterViewComponentProps) {
@@ -24,6 +29,10 @@ export default function MeterViewComponent(props: MeterViewComponentProps) {
 	const handleClose = () => {
 		setShowEditModal(false);
 	}
+
+	// Check for admin status
+	const currentUser = useSelector((state: State) => state.currentUser.profile);
+	const loggedInAsAdmin = (currentUser !== null) && isRoleAdmin(currentUser.role);
 
 	return (
 		<div className="card">
@@ -40,9 +49,10 @@ export default function MeterViewComponent(props: MeterViewComponentProps) {
 				<b><FormattedMessage id="meter.displayable" /></b> {translate(`TrueFalseType.${props.meter.displayable.toString()}`)}
 			</div>
 			<div className="edit-btn">
+				{loggedInAsAdmin &&
 				<Button variant="Secondary" onClick={handleShow}>
 					<FormattedMessage id="edit.meter" />
-				</Button>
+				</Button>}
 				{/* Creates a child MeterModalEditComponent */}
 				<EditMeterModalComponent show={showEditModal} meter={props.meter} handleClose={handleClose} />
 			</div>
