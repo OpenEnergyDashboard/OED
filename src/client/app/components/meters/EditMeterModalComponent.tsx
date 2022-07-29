@@ -7,7 +7,7 @@ import { MeterData, MeterTimeSortType, MeterType } from '../../types/redux/meter
 import { Input } from 'reactstrap';
 import { FormattedMessage } from 'react-intl';
 import translate from '../../utils/translate';
-import { useDispatch } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
 import { submitEditedMeter } from '../../actions/meters';
 import { removeUnsavedChanges } from '../../actions/unsavedWarning';
 import { useState } from 'react';
@@ -15,10 +15,14 @@ import '../../styles/Modal.unit.css';
 import { TrueFalseType } from '../../types/items';
 import TimeZoneSelect from '../TimeZoneSelect';
 import { GPSPoint, isValidGPSInput } from '../../utils/calibration';
+import { CurrentUserState } from 'types/redux/currentUser';
+import { isRoleAdmin } from '../../utils/hasPermissions';
+import { State } from 'types/redux/state';
 
 interface EditMeterModalComponentProps {
 	show: boolean;
 	meter: MeterData;
+	currentUser: CurrentUserState;
 	// passed in to handle closing the modal
 	handleClose: () => void;
 }
@@ -162,6 +166,10 @@ export default function EditMeterModalComponent(props: EditMeterModalComponentPr
 		}
 	}
 
+	// Check for admin status
+	const currentUser = useSelector((state: State) => state.currentUser.profile);
+	const loggedInAsAdmin = (currentUser !== null) && isRoleAdmin(currentUser.role);
+
 	const formInputStyle: React.CSSProperties = {
 		paddingBottom: '5px'
 	}
@@ -196,16 +204,17 @@ export default function EditMeterModalComponent(props: EditMeterModalComponentPr
 											placeholder="Identifier" />
 										<div />
 										{/* Name input*/}
+										{loggedInAsAdmin &&
 										<div style={formInputStyle}>
 											<label><FormattedMessage id="meter.name" /></label><br />
 											<Input
 												name='name'
 												type='text'
 												onChange={e => handleStringChange(e)}
-												defaultValue={state.name}
-												required value={state.name}
+												defaultValue={state?.name}
+												required value={state?.name}
 												placeholder="Name" />
-										</div>
+										</div> }
 										{/* Area input*/}
 										<div style={formInputStyle}>
 											<label><FormattedMessage id="meter.area" /></label><br />
@@ -244,34 +253,38 @@ export default function EditMeterModalComponent(props: EditMeterModalComponentPr
 											</Input>
 										</div>
 										{/* Meter type input*/}
+										{loggedInAsAdmin &&
 										<div style={formInputStyle}>
 											<label><FormattedMessage id="meter.type" /></label><br />
 											<Input
 												name='meterType'
 												type='select'
-												defaultValue={state.meterType}
+												defaultValue={state?.meterType}
 												onChange={e => handleStringChange(e)}>
 												{Object.keys(MeterType).map(key => {
 													return (<option value={key} key={key}>{`${key}`}</option>)
 												})}
 											</Input>
-										</div>
+										</div> }
 										{/* URL input*/}
+										{loggedInAsAdmin &&
 										<div style={formInputStyle}>
 											<label><FormattedMessage id="meter.url" /></label><br />
 											<Input
 												name='url'
 												type='text'
 												onChange={e => handleStringChange(e)}
-												defaultValue={state.url}
+												defaultValue={state?.url}
 												placeholder="URL" />
-										</div>
+										</div> }
 										{/* Timezone input*/}
+										{loggedInAsAdmin &&
 										<div style={formInputStyle}>
 											<label><FormattedMessage id="meter.time.zone" /></label><br />
-											<TimeZoneSelect current={state.timeZone} handleClick={timeZone => handleTimeZoneChange(timeZone)} />
-										</div>
+											<TimeZoneSelect current={state?.timeZone} handleClick={timeZone => handleTimeZoneChange(timeZone)} />
+										</div> }
 										{/* GPS input*/}
+										{loggedInAsAdmin &&
 										<div style={formInputStyle}>
 											<label><FormattedMessage id="meter.gps" /></label><br />
 											<Input
@@ -279,7 +292,7 @@ export default function EditMeterModalComponent(props: EditMeterModalComponentPr
 												type='text'
 												onChange={e => handleGpsChange(e)}
 												defaultValue={`${state.gps?.latitude}, ${state.gps?.longitude}`} />
-										</div>
+										</div> }
 										{/* UnitId input*/}
 										<div style={formInputStyle}>
 											<label><FormattedMessage id="meter.unitId" /></label><br />
@@ -301,16 +314,18 @@ export default function EditMeterModalComponent(props: EditMeterModalComponentPr
 												placeholder="defaultGraphicUnit" />
 										</div>
 										{/* note input*/}
+										{loggedInAsAdmin &&
 										<div style={formInputStyle}>
 											<label><FormattedMessage id="meter.note" /></label><br />
 											<Input
 												name='note'
 												type='textarea'
 												onChange={e => handleStringChange(e)}
-												defaultValue={state.note}
+												defaultValue={state?.note}
 												placeholder='Note' />
-										</div>
+										</div> }
 										{/* cumulative input*/}
+										{loggedInAsAdmin &&
 										<div style={formInputStyle}>
 											<label><FormattedMessage id="meter.cumulative" /></label><br />
 											<Input
@@ -322,54 +337,59 @@ export default function EditMeterModalComponent(props: EditMeterModalComponentPr
 													return (<option value={key} key={key}>{translate(`TrueFalseType.${key}`)}</option>)
 												})}
 											</Input>
-										</div>
+										</div> }
 										{/* cumulativeReset input*/}
+										{loggedInAsAdmin &&
 										<div style={formInputStyle}>
 											<label><FormattedMessage id="meter.cumulativeReset" /></label><br />
 											<Input
 												name='cumulativeReset'
 												type='select'
-												defaultValue={state.cumulativeReset.toString()}
+												defaultValue={state?.cumulativeReset.toString()}
 												onChange={e => handleBooleanChange(e)}>
 												{Object.keys(TrueFalseType).map(key => {
 													return (<option value={key} key={key}>{translate(`TrueFalseType.${key}`)}</option>)
 												})}
 											</Input>
-										</div>
+										</div> }
 										{/* cumulativeResetStart input*/}
+										{loggedInAsAdmin &&
 										<div style={formInputStyle}>
 											<label><FormattedMessage id="meter.cumulativeResetStart" /></label><br />
 											<Input
 												name='cumulativeResetStart'
 												type='text'
 												onChange={e => handleStringChange(e)}
-												defaultValue={state.cumulativeResetStart}
+												defaultValue={state?.cumulativeResetStart}
 												placeholder="HH:MM:SS" />
-										</div>
+										</div> }
 										{/* cumulativeResetEnd input*/}
+										{loggedInAsAdmin &&
 										<div style={formInputStyle}>
 											<label><FormattedMessage id="meter.cumulativeResetEnd" /></label><br />
 											<Input
 												name='cumulativeResetEnd'
 												type='text'
 												onChange={e => handleStringChange(e)}
-												defaultValue={state.cumulativeResetEnd}
+												defaultValue={state?.cumulativeResetEnd}
 												placeholder="HH:MM:SS" />
-										</div>
+										</div> }
 										{/* endOnlyTime input*/}
+										{loggedInAsAdmin &&
 										<div style={formInputStyle}>
 											<label><FormattedMessage id="meter.endOnlyTime" /></label><br />
 											<Input
 												name='endOnlyTime'
 												type='select'
-												defaultValue={state.endOnlyTime.toString()}
+												defaultValue={state?.endOnlyTime.toString()}
 												onChange={e => handleBooleanChange(e)}>
 												{Object.keys(TrueFalseType).map(key => {
 													return (<option value={key} key={key}>{translate(`TrueFalseType.${key}`)}</option>)
 												})}
 											</Input>
-										</div>
+										</div> }
 										{/* readingGap input*/}
+										{loggedInAsAdmin &&
 										<div style={formInputStyle}>
 											<label><FormattedMessage id="meter.readingGap" /></label><br />
 											<Input
@@ -378,9 +398,10 @@ export default function EditMeterModalComponent(props: EditMeterModalComponentPr
 												onChange={e => handleNumberChange(e)}
 												step="0.01"
 												min="0"
-												defaultValue={state.readingGap} />
-										</div>
+												defaultValue={state?.readingGap} />
+										</div> }
 										{/* readingVariation input*/}
+										{loggedInAsAdmin &&
 										<div style={formInputStyle}>
 											<label><FormattedMessage id="meter.readingVariation" /></label><br />
 											<Input
@@ -389,9 +410,10 @@ export default function EditMeterModalComponent(props: EditMeterModalComponentPr
 												onChange={e => handleNumberChange(e)}
 												step="0.01"
 												min="0"
-												defaultValue={state.readingVariation} />
-										</div>
+												defaultValue={state?.readingVariation} />
+										</div> }
 										{/* readingDuplication input*/}
+										{loggedInAsAdmin &&
 										<div style={formInputStyle}>
 											<label><FormattedMessage id="meter.readingDuplication" /></label><br />
 											<Input
@@ -401,22 +423,24 @@ export default function EditMeterModalComponent(props: EditMeterModalComponentPr
 												step="1"
 												min="1"
 												max="9"
-												defaultValue={state.readingDuplication} />
-										</div>
+												defaultValue={state?.readingDuplication} />
+										</div> }
 										{/* timeSort input*/}
+										{loggedInAsAdmin &&
 										<div style={formInputStyle}>
 											<label><FormattedMessage id="meter.timeSort" /></label><br />
 											<Input
 												name='timeSort'
 												type='select'
-												defaultValue={state.timeSort}
+												defaultValue={state?.timeSort}
 												onChange={e => handleBooleanChange(e)}>
 												{Object.keys(MeterTimeSortType).map(key => {
 													return (<option value={key} key={key}>{translate(`${key}`)}</option>)
 												})}
 											</Input>
-										</div>
+										</div> }
 										{/* reading input*/}
+										{loggedInAsAdmin &&
 										<div style={formInputStyle}>
 											<label><FormattedMessage id="meter.reading" /></label><br />
 											<Input
@@ -424,9 +448,10 @@ export default function EditMeterModalComponent(props: EditMeterModalComponentPr
 												type="number"
 												onChange={e => handleNumberChange(e)}
 												step="0.01"
-												defaultValue={state.reading} />
-										</div>
+												defaultValue={state?.reading} />
+										</div> }
 										{/* startTimestamp input*/}
+										{loggedInAsAdmin &&
 										<div style={formInputStyle}>
 											<label><FormattedMessage id="meter.startTimeStamp" /></label><br />
 											<Input
@@ -434,9 +459,10 @@ export default function EditMeterModalComponent(props: EditMeterModalComponentPr
 												type='text'
 												onChange={e => handleStringChange(e)}
 												placeholder="YYYY-MM-DD HH:MM:SS"
-												defaultValue={state.startTimestamp} />
-										</div>
+												defaultValue={state?.startTimestamp} />
+										</div> }
 										{/* endTimestamp input*/}
+										{loggedInAsAdmin &&
 										<div style={formInputStyle}>
 											<label><FormattedMessage id="meter.endTimeStamp" /></label><br />
 											<Input
@@ -444,8 +470,8 @@ export default function EditMeterModalComponent(props: EditMeterModalComponentPr
 												type='text'
 												onChange={e => handleStringChange(e)}
 												placeholder="YYYY-MM-DD HH:MM:SS"
-												defaultValue={state.endTimestamp} />
-										</div>
+												defaultValue={state?.endTimestamp} />
+										</div> }
 									</div>
 								</div>
 							</div>
