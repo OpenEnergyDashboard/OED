@@ -6,6 +6,7 @@
 
 import ApiBackend from './ApiBackend';
 import { ConversionData, ConversionEditData } from '../../types/redux/conversions';
+import { NamedIDItem } from '../../types/items';
 export default class ConversionsApi {
 	private readonly backend: ApiBackend;
 
@@ -13,12 +14,16 @@ export default class ConversionsApi {
 		this.backend = backend;
 	}
 
+	public async details(): Promise<NamedIDItem[]> {
+		return await this.backend.doGetRequest<NamedIDItem[]>('/api/conversions');
+	}
+
 	public async edit(conversion: ConversionData): Promise<ConversionEditData> {
 		return await this.backend.doPostRequest<ConversionEditData>(
 			'/api/conversions/edit',
 			{
 				sourceId: conversion.sourceId, destinationId: conversion.destinationId, bidirectional: conversion.bidirectional,
-				slope: conversion.slope, intercept: conversion.intercept, note: conversion.note, sourceDestination: conversion.sourceDestination
+				slope: conversion.slope, intercept: conversion.intercept, note: conversion.note
 			}
 		);
 	}
@@ -28,6 +33,9 @@ export default class ConversionsApi {
 	}
 
 	public async addConversion(conversion: ConversionData): Promise<void> {
+		// TODO: Remove console logs
+		console.log('api conversion');
+		console.log(conversion);
 		return await this.backend.doPostRequest('/api/conversions/addConversion', conversion);
 	}
 

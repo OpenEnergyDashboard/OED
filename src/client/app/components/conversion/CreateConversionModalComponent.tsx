@@ -24,13 +24,16 @@ export default function CreateConversionModalComponent(props: CreateConversionMo
 	const dispatch = useDispatch();
 
 	const defaultValues = {
-		sourceId: -99,
-		destinationId: -99,
+		// Gets first unit ID from all units in the unit state. The first index of units in unit state = 1, not 0.
+		// The first unit in the unit state will be the default value in the dropdown menu for sourceId and destinationId.
+		// Since not changing the value doesn't call event handler, we must set the default ID values to this first unit
+		// in order to ensure that we are not setting invalid or incorrect unit IDs for source and destination.
+		sourceId: props.unitsState[1].id,       // Set default to ID of first unit in state.
+		destinationId: props.unitsState[1].id,  // Set default to ID of first unit in state.
 		bidirectional: false,
-		slope: 0.0,
-		intercept: 0.0,
-		note: '',
-		sourceDestination: ''
+		slope: 0,
+		intercept: 0,
+		note: ''
 	}
 
 	/* State */
@@ -72,8 +75,6 @@ export default function CreateConversionModalComponent(props: CreateConversionMo
 		// Close modal first to avoid repeat clicks
 		setShowModal(false);
 
-		// Add the new conversion and update the store
-		state.sourceDestination = String(state.sourceId + '>' + state.destinationId);	// Update sourceDestination with new values.
 		dispatch(addConversion(state));
 
 		resetState();

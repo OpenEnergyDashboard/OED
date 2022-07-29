@@ -1,6 +1,6 @@
 /* This Source Code Form is subject to the terms of the Mozilla Public
-  * License, v. 2.0. If a copy of the MPL was not distributed with this
-  * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
+* License, v. 2.0. If a copy of the MPL was not distributed with this
+* file, You can obtain one at http://mozilla.org/MPL/2.0/. */
 import * as React from 'react';
 import { Button } from 'reactstrap';
 import { FormattedMessage } from 'react-intl';
@@ -36,7 +36,7 @@ export default function ConversionViewComponent(props: ConversionViewComponentPr
 
 	return (
 		<div className="card">
-			<div className="header-container">
+			<div className="identifier-container">
 				{header}
 			</div>
 			<div className="conversion-container">
@@ -45,8 +45,8 @@ export default function ConversionViewComponent(props: ConversionViewComponentPr
 			<div className="conversion-container">
 				<b><FormattedMessage id="conversion.destinationId" /></b> {props.units[props.conversion.destinationId].identifier}
 			</div>
-			<div className="conversion-container">
-				<b><FormattedMessage id="conversion.bidirectional" /></b> {props.conversion.bidirectional}
+			<div className={props.conversion.bidirectional.toString()}>
+				<b><FormattedMessage id="conversion.bidirectional" /></b> {translate(`TrueFalseType.${props.conversion.bidirectional.toString()}`)}
 			</div>
 			<div className="conversion-container">
 				<b><FormattedMessage id="conversion.slope" /></b> {props.conversion.slope}
