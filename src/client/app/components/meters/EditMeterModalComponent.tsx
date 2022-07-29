@@ -77,6 +77,16 @@ export default function EditMeterModalComponent(props: EditMeterModalComponentPr
 		setState({ ...state, ['timeZone']: timeZone });
 	}
 
+	const handleReadingDuplicationChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+		if(Number(e.target.value) > 9) {
+			e.target.value = '9'
+		}
+		if(Number(e.target.value) < 1) {
+			e.target.value = '1'
+		}
+		setState({ ...state, [e.target.name]: Number(e.target.value) });
+	}
+
 	const handleGpsChange = (e: React.ChangeEvent<HTMLInputElement>) => {
 		const coordinates = e.target.value.split(',', 2); //arr of size 2
 		coordinates[0] = coordinates[0].trim();
@@ -387,7 +397,7 @@ export default function EditMeterModalComponent(props: EditMeterModalComponentPr
 											<Input
 												name="readingDuplication"
 												type="number"
-												onChange={e => handleNumberChange(e)}
+												onChange={e => handleReadingDuplicationChange(e)}
 												step="1"
 												min="1"
 												max="9"
