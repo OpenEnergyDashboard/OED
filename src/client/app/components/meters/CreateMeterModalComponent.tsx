@@ -7,7 +7,7 @@ import { Input } from 'reactstrap';
 import { FormattedMessage } from 'react-intl';
 import translate from '../../utils/translate';
 import '../../styles/Modal.unit.css';
-import { MeterType } from '../../types/redux/meters';
+import { MeterTimeSortType, MeterType } from '../../types/redux/meters';
 import { useDispatch } from 'react-redux';
 import { addMeter } from '../../actions/meters';
 import { useState } from 'react';
@@ -47,7 +47,7 @@ export default function CreateMeterModalComponent() {
 		readingGap : 0,
 		readingVariation : 0,
 		readingDuplication : 1,
-		timeSort : false,
+		timeSort : '',
 		startTimestamp : '',
 		endTimestamp : ''
 	}
@@ -371,10 +371,10 @@ export default function CreateMeterModalComponent() {
 											<Input
 												name='timeSort'
 												type='select'
-												defaultValue={state.timeSort.toString()}
+												defaultValue={state.timeSort}
 												onChange={e => handleBooleanChange(e)}>
-												{Object.keys(TrueFalseType).map(key => {
-													return (<option value={key} key={key}>{translate(`TrueFalseType.${key}`)}</option>)
+												{Object.keys(MeterTimeSortType).map(key => {
+													return (<option value={key} key={key}>{translate(`${key}`)}</option>)
 												})}
 											</Input>
 										</div>

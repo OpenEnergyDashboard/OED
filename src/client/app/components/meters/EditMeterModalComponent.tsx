@@ -3,7 +3,7 @@
 * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
 import * as React from 'react';
 import { Modal, Button } from 'react-bootstrap';
-import { MeterData, MeterType } from '../../types/redux/meters';
+import { MeterData, MeterTimeSortType, MeterType } from '../../types/redux/meters';
 import { Input } from 'reactstrap';
 import { FormattedMessage } from 'react-intl';
 import translate from '../../utils/translate';
@@ -407,10 +407,10 @@ export default function EditMeterModalComponent(props: EditMeterModalComponentPr
 											<Input
 												name='timeSort'
 												type='select'
-												defaultValue={state.timeSort.toString()}
+												defaultValue={state.timeSort}
 												onChange={e => handleBooleanChange(e)}>
-												{Object.keys(TrueFalseType).map(key => {
-													return (<option value={key} key={key}>{translate(`TrueFalseType.${key}`)}</option>)
+												{Object.keys(MeterTimeSortType).map(key => {
+													return (<option value={key} key={key}>{translate(`${key}`)}</option>)
 												})}
 											</Input>
 										</div>
