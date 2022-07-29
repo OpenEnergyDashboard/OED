@@ -261,21 +261,11 @@ export default function EditMeterModalComponent(props: EditMeterModalComponentPr
 										{/* GPS input*/}
 										<div style={formInputStyle}>
 											<label><FormattedMessage id="meter.gps" /></label><br />
-											{/* If gps is null, pulling the default results in an error.
-												Handling by pulling default only if gps is not null.
-												This could probably be done in an if statement instead */}
-											{state.gps == null
-												? <Input
-													name='gps'
-													type='text'
-													onChange={e => handleGpsChange(e)}
-													placeholder="latitude , longitude" />
-												: <Input
-													name='gps'
-													type='text'
-													onChange={e => handleGpsChange(e)}
-													defaultValue={`${state.gps.latitude}, ${state.gps.longitude}`}/>
-											}
+											<Input
+												name='gps'
+												type='text'
+												onChange={e => handleGpsChange(e)}
+												defaultValue={`${state.gps?.latitude}, ${state.gps?.longitude}`} />
 										</div>
 										{/* UnitId input*/}
 										<div style={formInputStyle}>
