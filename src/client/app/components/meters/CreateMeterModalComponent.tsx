@@ -321,16 +321,6 @@ export default function CreateMeterModalComponent() {
 												})}
 											</Input>
 										</div>
-										{/* reading input*/}
-										<div style={formInputStyle}>
-											<label><FormattedMessage id="meter.reading" /></label><br />
-											<Input
-												name="reading"
-												type="number"
-												onChange={e => handleNumberChange(e)}
-												step="0.01"
-												defaultValue={state.reading} />
-										</div>
 										{/* readingGap input*/}
 										<div style={formInputStyle}>
 											<label><FormattedMessage id="meter.readingGap" /></label><br />
@@ -377,6 +367,16 @@ export default function CreateMeterModalComponent() {
 													return (<option value={key} key={key}>{translate(`${key}`)}</option>)
 												})}
 											</Input>
+										</div>
+										{/* reading input*/}
+										<div style={formInputStyle}>
+											<label><FormattedMessage id="meter.reading" /></label><br />
+											<Input
+												name="reading"
+												type="number"
+												onChange={e => handleNumberChange(e)}
+												step="0.01"
+												defaultValue={state.reading} />
 										</div>
 										{/* startTimestamp input*/}
 										<div style={formInputStyle}>
