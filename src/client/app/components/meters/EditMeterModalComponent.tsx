@@ -14,7 +14,7 @@ import { useState } from 'react';
 import '../../styles/Modal.unit.css';
 import { TrueFalseType } from '../../types/items';
 import TimeZoneSelect from '../TimeZoneSelect';
-import { GPSPoint } from 'utils/calibration';
+import { GPSPoint, isValidGPSInput } from '../../utils/calibration';
 
 interface EditMeterModalComponentProps {
 	show: boolean;
@@ -106,11 +106,12 @@ export default function EditMeterModalComponent(props: EditMeterModalComponentPr
 	// Side note, we could probably just set a boolean when any input i
 	const handleSaveChanges = () => {
 
-		// Close the modal first to avoid repeat clicks
-		props.handleClose();
+		if (isValidGPSInput(`${state.gps.latitude}, ${state.gps.longitude}`)) {
+			// Close the modal first to avoid repeat clicks
+			props.handleClose();
 
-		// Check for changes by comparing state to props
-		const meterHasChanges =
+			// Check for changes by comparing state to props
+			const meterHasChanges =
 			(
 				props.meter.identifier != state.identifier ||
 				props.meter.name != state.name ||
@@ -137,18 +138,18 @@ export default function EditMeterModalComponent(props: EditMeterModalComponentPr
 				props.meter.startTimestamp != state.startTimestamp ||
 				props.meter.endTimestamp != state.endTimestamp );
 
-		// Only do work if there are changes
-		if (meterHasChanges) {
+			// Only do work if there are changes
+			if (meterHasChanges) {
 			// Save our changes by dispatching the submitEditedMeter action
-			dispatch(submitEditedMeter(state));
-			// The updated meter is not fetched to save time. However, the identifier might have been
-			// automatically set if it was empty. Mimic that here.
-			if (state.identifier === '') {
-				state.identifier = state.name;
+				dispatch(submitEditedMeter(state));
+				// The updated meter is not fetched to save time. However, the identifier might have been
+				// automatically set if it was empty. Mimic that here.
+				if (state.identifier === '') {
+					state.identifier = state.name;
+				}
+				dispatch(removeUnsavedChanges());
 			}
-			dispatch(removeUnsavedChanges());
 		}
-
 	}
 
 	const formInputStyle: React.CSSProperties = {
