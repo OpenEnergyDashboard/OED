@@ -165,6 +165,8 @@ export default function CreateMeterModalComponent() {
 											<Input
 												name="area"
 												type="number"
+												step="0.01"
+												min="0"
 												defaultValue={state.area}
 												onChange={e => handleNumberChange(e)} />
 										</div>
