@@ -79,8 +79,6 @@ export function submitEditedUnit(editedUnit: t.UnitData): Thunk {
 			try {
 				// posts the edited unitData to the units API
 				await unitsApi.edit(editedUnit);
-				// Clear unit Id from submitting state array
-				dispatch(deleteSubmittedUnit(editedUnit.id));
 				// Update the store with our new edits
 				dispatch(confirmUnitEdits(editedUnit));
 				// Success!
@@ -88,10 +86,9 @@ export function submitEditedUnit(editedUnit: t.UnitData): Thunk {
 			} catch (err) {
 				// Failure! ):
 				showErrorNotification(translate('unit.failed.to.edit.unit'));
-				// Clear our changes from to the submitting units state
-				// We must do this in case fetch failed to keep the store in sync with the database
-				dispatch(deleteSubmittedUnit(editedUnit.id));
 			}
+			// Clear unit Id from submitting state array
+			dispatch(deleteSubmittedUnit(editedUnit.id));
 		}
 	};
 }
