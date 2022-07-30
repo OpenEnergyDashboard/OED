@@ -55,7 +55,7 @@ export default function ConfirmActionModalComponent(props: ConfirmActionModalCom
 
 	return (
 		<>
-			<Modal show={props.show} onHide={props.handleClose}>
+			<Modal show={props.show} onHide={props.handleClose} centered>
 				<Modal.Header>
 					<Modal.Title>
 						{props.actionTitle ? props.actionTitle : translate('confirm.action')}
