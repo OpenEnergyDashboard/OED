@@ -3,7 +3,6 @@
 * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
 import * as React from 'react';
 import { Modal, Button } from 'react-bootstrap';
-import { FormattedMessage } from 'react-intl';
 //TODO borrowing the conversion card CSS but shouldn't the modal card css all be in one file?
 import '../styles/conversion-card-page.css';
 import translate from '../utils/translate';
