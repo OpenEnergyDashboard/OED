@@ -40,7 +40,7 @@ export function changeDisplayedConversions(conversions: number[]): t.ChangeDispl
 	return { type: ActionType.ChangeDisplayedConversions, selectedConversions: conversions };
 }
 
-// Pushes conversionIds onto submitting conversions state array
+// Pushes ConversionData onto submitting conversions state array
 export function submitConversionEdits(conversionData: t.ConversionData): t.SubmitEditedConversionAction {
 	return { type: ActionType.SubmitEditedConversion, conversionData};
 }
@@ -49,6 +49,7 @@ export function confirmConversionEdits(editedConversion: t.ConversionData): t.Co
 	return { type: ActionType.ConfirmEditedConversion, editedConversion };
 }
 
+// Removes ConversionData from submitting state array
 export function deleteSubmittedConversion(conversionData: t.ConversionData): t.DeleteSubmittedConversionAction {
 	return {type: ActionType.DeleteSubmittedConversion, conversionData}
 }
@@ -56,6 +57,12 @@ export function deleteSubmittedConversion(conversionData: t.ConversionData): t.D
 export function confirmConversionsFetchedOnce(): t.ConfirmConversionsFetchedOnceAction {
 	return { type: ActionType.ConfirmConversionsFetchedOnce };
 }
+
+// Removes the passed ConversionData from the store
+export function confirmDeletedConversion(conversionData: t.ConversionData): t.DeleteConversionAction {
+	return { type: ActionType.DeleteConversion, conversionData }
+}
+
 
 // Fetch the conversions details from the database if they have not already been fetched once
 export function fetchConversionsDetailsIfNeeded(): Thunk {
@@ -89,8 +96,6 @@ export function submitEditedConversion(editedConversion: t.ConversionData): Thun
 			try {
 				// posts the edited conversionData to the conversions API
 				await conversionsApi.edit(editedConversion);
-				// Clear conversionData object from submitting state array
-				dispatch(deleteSubmittedConversion(editedConversion));
 				// Update the store with our new edits
 				dispatch(confirmConversionEdits(editedConversion));
 				// Success!
@@ -98,10 +103,9 @@ export function submitEditedConversion(editedConversion: t.ConversionData): Thun
 			} catch (err) {
 				// Failure! ):
 				showErrorNotification(translate('conversion.failed.to.edit.conversion'));
-				// Clear our changes from the submitting conversions state
-				// We must do this in case fetch failed to keep the store in sync with the database
-				dispatch(deleteSubmittedConversion(editedConversion));
 			}
+			// Clear conversionData object from submitting state array
+			dispatch(deleteSubmittedConversion(editedConversion));
 		}
 	};
 }
@@ -115,10 +119,41 @@ export function addConversion(conversion: t.ConversionData): Thunk {
 			// Update the conversions state from the database on a successful call
 			// In the future, getting rid of this database fetch and updating the store on a successful API call would make the page faster
 			// However, since the database currently assigns the id to the ConversionData
-			dispatch(fetchConversionsDetails());  // TODO: Uncomment this and delete console log version
+			dispatch(fetchConversionsDetails());
 			showSuccessNotification(translate('conversion.successfully.create.conversion'));
 		} catch (err) {
 			showErrorNotification(translate('conversion.failed.to.create.conversion'));
+		}
+	}
+}
+
+// Delete conversion from database
+export function deleteConversion(conversion: t.ConversionData): Thunk {
+	return async (dispatch: Dispatch, getState: GetState) => {
+
+		// Ensure the conversion is not already being worked on
+		// Search the array of ConversionData in submitting for an object with source/destination ids matching that conversion
+		const conversionDataIndex = getState().conversions.submitting.findIndex(conversionData => ((
+			conversionData.sourceId === conversion.sourceId) &&
+			conversionData.destinationId === conversion.destinationId));
+
+		// If the conversion is not already being worked on
+		if (conversionDataIndex === -1) {
+			// Inform the store we are about to work on this conversion
+			// Update the submitting state array
+			dispatch(submitConversionEdits(conversion));
+			try {
+				// Attempt to delete the conversion from the database
+				await conversionsApi.delete(conversion);
+				// Delete was successful
+				// Update the store to match
+				dispatch(confirmDeletedConversion(conversion)); //TODO WRITE THE REDUCER FOR THIS
+				showSuccessNotification(translate('conversion.successfully.delete.conversion'));
+			} catch (err) {
+				showErrorNotification(translate('conversion.failed.to.delete.conversion'));
+			}
+			// Inform the store we are done working with the conversion
+			dispatch(deleteSubmittedConversion(conversion));
 		}
 	}
 }

@@ -2,11 +2,11 @@
 * License, v. 2.0. If a copy of the MPL was not distributed with this
 * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
 import * as React from 'react';
-import { Button } from 'reactstrap';
+import { Button } from 'react-bootstrap';
 import { FormattedMessage } from 'react-intl';
 import EditConversionModalComponent from './EditConversionModalComponent';
 import '../../styles/conversion-card-page.css';
-// I realize that * is already imported from react
+// Realize that * is already imported from react
 import { useState } from 'react';
 import { ConversionData } from 'types/redux/conversions';
 import translate from '../../utils/translate';
@@ -59,11 +59,17 @@ export default function ConversionViewComponent(props: ConversionViewComponentPr
 				<b><FormattedMessage id="conversion.note" /></b> {props.conversion.note.slice(0, 29)}
 			</div>
 			<div className="edit-btn">
-				<Button variant="Secondary" onClick={handleShow}>
+				<Button variant="secondary" onClick={handleShow}>
 					<FormattedMessage id="edit.conversion" />
 				</Button>
 				{/* Creates a child ConversionModalEditComponent */}
-				<EditConversionModalComponent show={showEditModal} conversion={props.conversion} unitsState={props.units} handleClose={handleClose} />
+				<EditConversionModalComponent
+					show={showEditModal}
+					conversion={props.conversion}
+					unitsState={props.units}
+					header={header}
+					handleShow={handleShow}
+					handleClose={handleClose} />
 			</div>
 		</div>
 	);

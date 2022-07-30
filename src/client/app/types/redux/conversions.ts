@@ -2,6 +2,7 @@
 * License, v. 2.0. If a copy of the MPL was not distributed with this
 * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
 
+import { Action } from 'history';
 import { ActionType } from './actions';
 
 export interface RequestConversionsDetailsAction {
@@ -37,13 +38,19 @@ export interface ConfirmConversionsFetchedOnceAction {
 	type: ActionType.ConfirmConversionsFetchedOnce;
 }
 
+export interface DeleteConversionAction {
+	type: ActionType.DeleteConversion;
+	conversionData: ConversionData;
+}
+
 export type ConversionsAction = RequestConversionsDetailsAction
 | ReceiveConversionsDetailsAction
 | ChangeDisplayedConversionsAction
 | ConfirmEditedConversionAction
 | DeleteSubmittedConversionAction
 | SubmitEditedConversionAction
-| ConfirmConversionsFetchedOnceAction;
+| ConfirmConversionsFetchedOnceAction
+| DeleteConversionAction;
 
 export interface ConversionData {
 	sourceId: number;

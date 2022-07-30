@@ -36,22 +36,22 @@ router.get('/', async (req, res) => {
 router.post('/edit', async (req, res) => {
 	const validConversion = {
 		type: 'object',
-		required: ['sourceId', 'destinationId'], 
+		required: ['sourceId', 'destinationId'],
 		properties: {
 			sourceId: {
-				type: 'number',
+				type: 'number'
 			},
 			destinationId: {
-				type: 'number',
+				type: 'number'
 			},
 			bidirectional: {
-				type: 'boolean',
+				type: 'boolean'
 			},
 			slope: {
-				type: 'float',
+				type: 'float'
 			},
 			intercept: {
-				type: 'float',
+				type: 'float'
 			},
 			note: {
 				oneOf: [
@@ -63,20 +63,13 @@ router.post('/edit', async (req, res) => {
 	};
 
 	const validatorResult = validate(req.body, validConversion);
-	console.log(validatorResult); // TODO: Remove after testing
 	if (!validatorResult.valid) {
 		log.warn(`Got request to edit conversions with invalid conversion data, errors:${validatorResult.errors}`);
 		res.status(400);
 	} else {
 		const conn = getConnection();
 		try {
-			console.log('conversion req body');	// TODO: Remove console log after testing
-			console.log(req.body.sourceId, req.body.destinationId);	// TODO: Remove console log after testing
-			console.log('conn');
-			console.log(conn);
 			const conversion = await Conversion.getBySourceDestination(req.body.sourceId, req.body.destinationId, conn);
-			console.log('conversion after await');
-			console.log(conversion);	// TODO: Remove after testing
 			conversion.sourceId = req.body.sourceId;
 			conversion.destinationId = req.body.destinationId;
 			conversion.bidirectional = req.body.bidirectional;
@@ -102,19 +95,19 @@ router.post('/addConversion', async (req, res) => {
 		required: ['sourceId', 'destinationId'],
 		properties: {
 			sourceId: {
-				type: 'number',
+				type: 'number'
 			},
 			destinationId: {
-				type: 'number',
+				type: 'number'
 			},
 			bidirectional: {
-				type: 'boolean',
+				type: 'boolean'
 			},
 			slope: {
-				type: 'float',
+				type: 'float'
 			},
 			intercept: {
-				type: 'float',
+				type: 'float'
 			},
 			note: {
 				oneOf: [
@@ -147,6 +140,43 @@ router.post('/addConversion', async (req, res) => {
 			log.error(`Error while inserting new conversion ${err}`, err);
 			res.sendStatus(500);
 		}
+	}
+});
+
+/**
+ * Route for POST, edlete conversion.
+ */
+router.post('/delete', async (req, res) => {
+	// Only require a source and destination id
+	const validConversion = {
+		type: 'object',
+		required: ['sourceId', 'destinationId'],
+		properties: {
+			sourceId: {
+				type: 'number'
+			},
+			destinationId: {
+				type: 'number'
+			}
+		}
+	};
+
+	// Ensure conversion object is valid
+	const validatorResult = validate(req.body, validConversion);
+	if (!validatorResult.valid) {
+		log.warn(`Got request to delete conversions with invalid conversion data, errors:${validatorResult.errors}`);
+		res.status(400);
+	} else {
+		const conn = getConnection();
+		try {
+			// Don't worry about checking if the conversion already exists
+			// Just try to delete it to save the extra database call, since the database will return an error anyway if the row does not exist
+			await Conversion.delete(req.body.sourceId, req.body.destinationId, conn);
+		} catch (err) {
+			log.error('Failed to delete conversion', err);
+			res.status(500).json({ message: 'Unable to delete conversions.', err });
+		}
+		res.status(200).json({ message: `Successfully deleted conversion ${req.body.sourceId} -> ${req.body.destinationId}` });
 	}
 });
 

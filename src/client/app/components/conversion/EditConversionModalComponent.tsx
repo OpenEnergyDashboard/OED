@@ -8,7 +8,7 @@ import { Input } from 'reactstrap';
 import { FormattedMessage } from 'react-intl';
 import translate from '../../utils/translate';
 import { useDispatch } from 'react-redux';
-import { submitEditedConversion } from '../../actions/conversions';
+import { submitEditedConversion, deleteConversion } from '../../actions/conversions';
 import { removeUnsavedChanges } from '../../actions/unsavedWarning';
 import TooltipMarkerComponent from '../TooltipMarkerComponent';
 import TooltipHelpContainer from '../../containers/TooltipHelpContainer';
@@ -17,11 +17,15 @@ import { useState } from 'react';
 import '../../styles/Modal.conversion.css';
 import { TrueFalseType } from '../../types/items';
 import { UnitDataById } from 'types/redux/units';
+import ConfirmActionModalComponent from '../ConfirmActionModalComponent'
 
 interface EditConversionModalComponentProps {
 	show: boolean;
 	conversion: ConversionData;
 	unitsState: UnitDataById;
+	header: string;
+	// passed in to handle opening the modal
+	handleShow: () => void;
 	// passed in to handle closing the modal
 	handleClose: () => void;
 }
@@ -38,8 +42,7 @@ export default function EditConversionModalComponent(props: EditConversionModalC
 		bidirectional: props.conversion.bidirectional,
 		slope: props.conversion.slope,
 		intercept: props.conversion.intercept,
-		note: props.conversion.note,
-		sourceDestination: props.conversion.sourceDestination
+		note: props.conversion.note
 	}
 
 	/* State */
@@ -57,8 +60,35 @@ export default function EditConversionModalComponent(props: EditConversionModalC
 	const handleNumberChange = (e: React.ChangeEvent<HTMLInputElement>) => {
 		setState({ ...state, [e.target.name]: Number(e.target.value) });
 	}
-
 	/* End State */
+
+	/* Confirm Delete Modal */
+	// Separate from state comment to keep everything related to the warning confirmation modal together
+	const [showDeleteConfirmationModal, setShowDeleteConfirmationModal] = useState(false);
+	const deleteConfirmationMessage = translate('conversion.delete.conversion') + ' [' + props.header + '] ?';
+	const deleteConfirmText = 'Delete'; // TODO
+	const deleteRejectText = 'Cancel'; // TODO
+	// The first two handle functions below are required because only one Modal can be open at a time (properly)
+	const handleDeleteConfirmationModalClose = () => {
+		// Hide the warning modal
+		setShowDeleteConfirmationModal(false);
+		// Show the edit modal
+		handleShow();
+	}
+	const handleDeleteConfirmationModalOpen = () => {
+		// Hide the edit modal
+		handleClose();
+		// Show the warning modal
+		setShowDeleteConfirmationModal(true);
+	}
+	const handleDeleteConversion = () => {
+		// Closes the warning modal
+		// Do not call the handler function because we do not want to open the parent modal
+		setShowDeleteConfirmationModal(false);
+		// Delete the conversion using the state object, it should only require the source and destination ids set
+		dispatch(deleteConversion(state as ConversionData));
+	}
+	/* End Confirm Delete Modal */
 
 	// Reset the state to default values
 	// To be used for the discard changes button
@@ -67,6 +97,10 @@ export default function EditConversionModalComponent(props: EditConversionModalC
 	// Failure to edit conversions will not trigger a re-render, as no state has changed. Therefore, we must manually reset the values
 	const resetState = () => {
 		setState(values);
+	}
+
+	const handleShow = () => {
+		props.handleShow();
 	}
 
 	const handleClose = () => {
@@ -98,6 +132,8 @@ export default function EditConversionModalComponent(props: EditConversionModalC
 		}
 	}
 
+
+
 	const tooltipStyle = {
 		display: 'inline-block',
 		fontSize: '60%',
@@ -115,7 +151,13 @@ export default function EditConversionModalComponent(props: EditConversionModalC
 
 	return (
 		<>
-
+			<ConfirmActionModalComponent
+				show={showDeleteConfirmationModal}
+				actionConfirmMessage={deleteConfirmationMessage}
+				handleClose={handleDeleteConfirmationModalClose}
+				actionFunction={handleDeleteConversion}
+				actionConfirmText={deleteConfirmText}
+				actionRejectText={deleteRejectText}/>
 			<Modal show={props.show} onHide={props.handleClose}>
 				<Modal.Header>
 					<Modal.Title> <FormattedMessage id="edit.conversion" />
@@ -204,6 +246,9 @@ export default function EditConversionModalComponent(props: EditConversionModalC
 					</div>
 				</Modal.Body>
 				<Modal.Footer>
+					<Button variant="danger" onClick={handleDeleteConfirmationModalOpen}>
+						<FormattedMessage id="delete.conversion" />
+					</Button>
 					{/* Hides the modal */}
 					<Button variant="secondary" onClick={handleClose}>
 						<FormattedMessage id="discard.changes" />
