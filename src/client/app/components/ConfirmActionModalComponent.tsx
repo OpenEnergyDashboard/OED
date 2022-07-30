@@ -11,14 +11,13 @@ import translate from '../utils/translate';
 interface ConfirmActionModalComponentProps {
 	// Control this through the parent component to open/close this modal
 	show: boolean;
+	actionTitle?: string;
 	// Message to display when action button is rendered
 	actionConfirmMessage: string;
 	// Overrides the default action confirmation text 'yes'
 	actionConfirmText?: string;
 	// Overrides the default action confirmation text 'no'
 	actionRejectText?: string;
-	// Any additional props the developer might want to pass in
-	optionalProps?: any;
 	// passed in to handle closing the modal
 	// usually alters the show props to control closing the modal
 	handleClose: () => void;
@@ -29,7 +28,18 @@ interface ConfirmActionModalComponentProps {
 	actionFunction: () => void;
 }
 
-// Updated to hooks
+/**
+ * This is a modal component that can be used to confirm/reject any action by executing the actionFunction or handleClose passed in.
+ * @param props
+ * @param props.show Boolean to handle showing/hiding the modal.
+ * @param props.actionTitle (Optional) The title of the modal.
+ * @param props.actionConfirmMessage The message that will display in the center when the modal opens.
+ * @param props.actionConfirmText (Optional) The text of the action confirmation button.
+ * @param props.actionRejectText (Optional) The text of the action rejection button.
+ * @param props.handleClose The function that executes when clicking the action rejection button. Usually used for closing the modal.
+ * @param props.actionFunction The function that is executed when clicking the action confirmation button.
+ * @returns A modal component that executes the actionFunction on confirmation and handleClose on rejection.
+ */
 export default function ConfirmActionModalComponent(props: ConfirmActionModalComponentProps) {
 
 	const handleClose = () => {
@@ -49,7 +59,7 @@ export default function ConfirmActionModalComponent(props: ConfirmActionModalCom
 			<Modal show={props.show} onHide={props.handleClose}>
 				<Modal.Header>
 					<Modal.Title>
-						<FormattedMessage id="confirm.action" />
+						{props.actionTitle ? props.actionTitle : translate('confirm.action')}
 					</Modal.Title>
 				</Modal.Header>
 				{/* when any of the conversion are changed call one of the functions. */}
