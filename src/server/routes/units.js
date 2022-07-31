@@ -113,9 +113,7 @@ router.post('/addUnit', async (req, res) => {
 		type: 'object',
 		required: ['name', 'identifier', 'unitRepresent', 'typeOfUnit', 'displayable', 'preferredDisplay'],
 		properties: {
-			id: {
-				type: 'number',
-			},
+			// Removed id from properties list since it is set to undefined no matter what is passed.
 			name: {
 				type: 'string',
 				minLength: 1
@@ -130,15 +128,12 @@ router.post('/addUnit', async (req, res) => {
 				enum: Object.values(Unit.unitRepresentType)
 			},
 			secInRate: {
-				type: 'number',
+				type: 'number'
 			},
 			typeOfUnit: {
 				type: 'string',
 				minLength: 1,
 				enum: Object.values(Unit.unitType)
-			},
-			unitIndex: {
-				type: 'nuber',
 			},
 			suffix: {
 				oneOf: [
@@ -171,13 +166,13 @@ router.post('/addUnit', async (req, res) => {
 		try {
 			await conn.tx(async t => {
 				const newUnit = new Unit(
-					undefined,
+					undefined, // id
 					req.body.name,
 					req.body.identifier,
 					req.body.unitRepresent,
 					req.body.secInRate,
 					req.body.typeOfUnit,
-					undefined,
+					undefined, // initIndex
 					req.body.suffix,
 					req.body.displayable,
 					req.body.preferredDisplay,

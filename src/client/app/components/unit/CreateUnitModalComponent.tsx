@@ -16,7 +16,6 @@ import TooltipMarkerComponent from '../TooltipMarkerComponent';
 import TooltipHelpContainer from '../../containers/TooltipHelpContainer';
 
 export default function CreateUnitModalComponent() {
-
 	const dispatch = useDispatch();
 
 	const defaultValues = {
@@ -67,29 +66,24 @@ export default function CreateUnitModalComponent() {
 		setState(defaultValues);
 	}
 
-	// Unlike edit, we decided to discard and inputs when you choose to leave the page. The reasoning is
+	// Unlike edit, we decided to discard inputs when you choose to leave the page. The reasoning is
 	// that create starts from an empty template.
 
 	// Submit
 	const handleSubmit = () => {
-
 		// Close modal first to avoid repeat clicks
 		setShowModal(false);
-
 		// Set default identifier as name if left blank
 		state.identifier = (!state.identifier || state.identifier.length === 0) ? state.name : state.identifier;
-
 		// Add the new unit and update the store
 		dispatch(addUnit(state));
-
 		resetState();
 	};
 
 	const tooltipStyle = {
 		display: 'inline-block',
 		fontSize: '60%',
-		// For now, it uses the same help text from unit view page.
-		tooltipCreateUnitView: 'help.admin.unitview'
+		tooltipCreateUnitView: 'help.admin.unitcreate'
 	};
 
 	const formInputStyle: React.CSSProperties = {
@@ -116,7 +110,7 @@ export default function CreateUnitModalComponent() {
 						</div>
 					</Modal.Title>
 				</Modal.Header>
-				{/* when any of the unit are changed call one of the functions. */}
+				{/* when any of the unit properties are changed call one of the functions. */}
 				<Modal.Body className="show-grid">
 					<div id="container">
 						<div id="modalChild">
@@ -139,16 +133,16 @@ export default function CreateUnitModalComponent() {
 											name='name'
 											type='text'
 											onChange={e => handleStringChange(e)}
-											required value={state.name} />
+											value={state.name} />
 									</div>
-									{/* Type of input input*/}
+									{/* Type of unit input*/}
 									<div style={formInputStyle}>
 										<label><FormattedMessage id="unit.type.of.unit" /></label><br />
 										<Input
 											name='typeOfUnit'
 											type='select'
 											onChange={e => handleStringChange(e)}
-											required value={state.typeOfUnit}>
+											value={state.typeOfUnit}>
 											{Object.keys(UnitType).map(key => {
 												return (<option value={key} key={key}>{translate(`UnitType.${key}`)}</option>)
 											})}
@@ -161,7 +155,7 @@ export default function CreateUnitModalComponent() {
 											name='unitRepresent'
 											type='select'
 											onChange={e => handleStringChange(e)}
-											required value={state.unitRepresent}>
+											value={state.unitRepresent}>
 											{Object.keys(UnitRepresentType).map(key => {
 												return (<option value={key} key={key}>{translate(`UnitRepresentType.${key}`)}</option>)
 											})}
@@ -174,7 +168,7 @@ export default function CreateUnitModalComponent() {
 											name='displayable'
 											type='select'
 											onChange={e => handleStringChange(e)}
-											required value={state.displayable} >
+											value={state.displayable} >
 											{Object.keys(DisplayableType).map(key => {
 												return (<option value={key} key={key}>{translate(`DisplayableType.${key}`)}</option>)
 											})}
@@ -199,7 +193,7 @@ export default function CreateUnitModalComponent() {
 											name='secInRate'
 											type='number'
 											onChange={e => handleNumberChange(e)}
-											required value={state.secInRate}
+											value={state.secInRate}
 											// TODO validate negative input by typing for rate but database stops it.
 											// This stops negative input by use of arrows to change value.
 											min="1" />
@@ -211,7 +205,7 @@ export default function CreateUnitModalComponent() {
 											name='suffix'
 											type='text'
 											onChange={e => handleStringChange(e)}
-											required value={state.suffix} />
+											value={state.suffix} />
 									</div>
 									{/* Note input*/}
 									<div style={formInputStyle}>

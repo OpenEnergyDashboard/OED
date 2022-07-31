@@ -18,7 +18,6 @@ import { UnitData } from 'types/redux/units';
 
 // Utilizes useDispatch and useSelector hooks
 export default function UnitsDetailComponent() {
-
 	const dispatch = useDispatch();
 
 	useEffect(() => {

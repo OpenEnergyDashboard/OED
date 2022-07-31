@@ -6,16 +6,11 @@
 
 import ApiBackend from './ApiBackend';
 import { UnitData, UnitEditData } from '../../types/redux/units';
-import { NamedIDItem } from '../../types/items';
 export default class UnitsApi {
 	private readonly backend: ApiBackend;
 
 	constructor(backend: ApiBackend) {
 		this.backend = backend;
-	}
-
-	public async details(): Promise<NamedIDItem[]> {
-		return await this.backend.doGetRequest<NamedIDItem[]>('/api/units');
 	}
 
 	public async edit(unit: UnitData): Promise<UnitEditData> {

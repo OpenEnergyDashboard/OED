@@ -43,6 +43,8 @@ export default class TooltipHelpComponent extends React.Component<TooltipHelpPro
 			'help.admin.metercreate': { link: `${BASE_URL}/adminMeterCreating.html` },
 			'help.admin.meteredit': { link: `${BASE_URL}/adminMeterEditing.html` },
 			'help.admin.meterview': { link: `${BASE_URL}/adminMeterViewing.html` },
+			'help.admin.unitcreate': { link: `${BASE_URL}/adminUnitCreating.html` },
+			'help.admin.unitedit': { link: `${BASE_URL}/adminUnitEditing.html` },
 			'help.admin.unitview': { link: `${BASE_URL}/adminUnitViewing.html` },
 			'help.admin.user': { link: `${BASE_URL}/adminUser.html` },
 			'help.csv.header': { link: `${BASE_URL}/adminDataAcquisition.html` },

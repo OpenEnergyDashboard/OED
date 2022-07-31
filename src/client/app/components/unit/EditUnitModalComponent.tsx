@@ -12,7 +12,7 @@ import { submitEditedUnit } from '../../actions/units';
 import { removeUnsavedChanges } from '../../actions/unsavedWarning';
 import TooltipMarkerComponent from '../TooltipMarkerComponent';
 import TooltipHelpContainer from '../../containers/TooltipHelpContainer';
-// I realize that * is already imported from react
+//Realize that * is already imported from react
 import { useState } from 'react';
 import '../../styles/Modal.unit.css';
 import { TrueFalseType } from '../../types/items';
@@ -77,9 +77,8 @@ export default function EditUnitModalComponent(props: EditUnitModalComponentProp
 	// Save changes
 	// Currently using the old functionality which is to compare inherited prop values to state values
 	// If there is a difference between props and state, then a change was made
-	// Side note, we could probably just set a boolean when any input i
+	// Side note, we could probably just set a boolean when any input
 	const handleSaveChanges = () => {
-
 		// Close the modal first to avoid repeat clicks
 		props.handleClose();
 
@@ -112,8 +111,7 @@ export default function EditUnitModalComponent(props: EditUnitModalComponentProp
 	const tooltipStyle = {
 		display: 'inline-block',
 		fontSize: '60%',
-		// For now, it uses the same help text from unit view page.
-		tooltipEditUnitView: 'help.admin.unitview'
+		tooltipEditUnitView: 'help.admin.unitedit'
 	};
 
 	const formInputStyle: React.CSSProperties = {
@@ -126,7 +124,6 @@ export default function EditUnitModalComponent(props: EditUnitModalComponentProp
 
 	return (
 		<>
-
 			<Modal show={props.show} onHide={props.handleClose}>
 				<Modal.Header>
 					<Modal.Title> <FormattedMessage id="edit.unit" />
@@ -160,9 +157,9 @@ export default function EditUnitModalComponent(props: EditUnitModalComponentProp
 												name='name'
 												type='text'
 												onChange={e => handleStringChange(e)}
-												required value={state.name} />
+												value={state.name} />
 										</div>
-										{/* Type of input input*/}
+										{/* Type of unit input*/}
 										<div style={formInputStyle}>
 											<label><FormattedMessage id="unit.type.of.unit" /></label><br />
 											<Input

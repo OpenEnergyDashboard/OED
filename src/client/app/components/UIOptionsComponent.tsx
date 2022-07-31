@@ -19,6 +19,7 @@ import TooltipMarkerComponent from './TooltipMarkerComponent';
 import 'rc-slider/assets/index.css';
 import MapChartSelectComponent from './MapChartSelectComponent';
 import ReactTooltip from 'react-tooltip';
+import GraphicRateMenuComponent from './GraphicRateMenuComponent';
 
 const Slider = createSliderWithTooltip(sliderWithoutTooltips);
 
@@ -86,6 +87,7 @@ class UIOptionsComponent extends React.Component<UIOptionsPropsWithIntl, UIOptio
 			<div>
 				<ChartSelectComponent />
 				<ChartDataSelectComponent />
+				<GraphicRateMenuComponent/>
 
 				{/* Controls specific to the bar chart. */}
 				{this.props.chartToRender === ChartTypes.bar &&

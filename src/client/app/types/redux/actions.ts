@@ -50,6 +50,7 @@ export enum ActionType {
 	UpdateComparePeriod = 'UPDATE_COMPARE_PERIOD',
 	ChangeCompareSortingOrder = 'CHANGE_COMPARE_SORTING_ORDER',
 	SetHotlinked = 'SET_HOTLINKED',
+	UpdateLineGraphRate = 'UPDATE_LINE_GRAPH_RATE',
 
 	RequestGroupsDetails = 'REQUEST_GROUPS_DETAILS',
 	ReceiveGroupsDetails = 'RECEIVE_GROUPS_DETAILS',
@@ -110,10 +111,8 @@ export enum ActionType {
 	ReceiveUnitsDetails = 'RECEIVE_UNITS_DETAILS',
 	RequestUnitsDetails = 'REQUEST_UNITS_DETAILS',
 	ChangeDisplayedUnits = 'CHANGE_DISPLAYED_UNITS',
-	EditUnitDetails = 'EDIT_UNIT_DETAILS',
 	SubmitEditedUnit = 'SUBMIT_EDITED_UNIT',
 	ConfirmEditedUnit = 'CONFIRM_EDITED_UNIT',
-	DeleteEditedUnit = 'DELETE_EDITED_UNIT',
 	DeleteSubmittedUnit = 'DELETE_SUBMITTED_UNIT',
 	ConfirmUnitsFetchedOnce = 'CONFIRM_UNITS_FETCHED_ONCE',
 
@@ -123,6 +122,7 @@ export enum ActionType {
 	EditMeterDetails = 'EDIT_METER_DETAILS',
 	SubmitEditedMeter = 'SUBMIT_EDITED_METER',
 	ConfirmEditedMeter = 'CONFIRM_EDITED_METER',
+	// TODO This is not currently used but should be when meter page is done.
 	DeleteEditedMeter = 'DELETE_EDITED_METER',
 	DeleteSubmittedMeter = 'DELETE_SUBMITTED_METER',
 	ConfirmMetersFetchedOnce = 'CONFIRM_METERS_FETCHED_ONCE',

@@ -19,8 +19,7 @@ export function receiveUnitsDetails(data: t.UnitData[]): t.ReceiveUnitsDetailsAc
 export function fetchUnitsDetails(): Thunk {
 	return async (dispatch: Dispatch, getState: GetState) => {
 		// ensure a fetch is not currently happening
-		if (!getState().units.isFetching)
-		{
+		if (!getState().units.isFetching) {
 			// set isFetching to true
 			dispatch(requestUnitsDetails());
 			// attempt to retrieve units details from database
@@ -28,8 +27,7 @@ export function fetchUnitsDetails(): Thunk {
 			// update the state with the units details and set isFetching to false
 			dispatch(receiveUnitsDetails(units));
 			// If this is the first fetch, inform the store that the first fetch has been made
-			if (!getState().units.hasBeenFetchedOnce)
-			{
+			if (!getState().units.hasBeenFetchedOnce) {
 				dispatch(confirmUnitsFetchedOnce());
 			}
 		}
@@ -50,7 +48,7 @@ export function confirmUnitEdits(editedUnit: t.UnitData): t.ConfirmEditedUnitAct
 }
 
 export function deleteSubmittedUnit(unitId: number): t.DeleteSubmittedUnitAction {
-	return {type: ActionType.DeleteSubmittedUnit, unitId}
+	return { type: ActionType.DeleteSubmittedUnit, unitId }
 }
 
 export function confirmUnitsFetchedOnce(): t.ConfirmUnitsFetchedOnceAction {
@@ -61,8 +59,7 @@ export function confirmUnitsFetchedOnce(): t.ConfirmUnitsFetchedOnceAction {
 export function fetchUnitsDetailsIfNeeded(): Thunk {
 	return (dispatch: Dispatch, getState: GetState) => {
 		// If units have not been fetched once, return the fetchUnitDetails function
-		if (!getState().units.hasBeenFetchedOnce)
-		{
+		if (!getState().units.hasBeenFetchedOnce) {
 			return dispatch(fetchUnitsDetails());
 		}
 		// If units have already been fetched, return a resolved promise
@@ -82,8 +79,6 @@ export function submitEditedUnit(editedUnit: t.UnitData): Thunk {
 			try {
 				// posts the edited unitData to the units API
 				await unitsApi.edit(editedUnit);
-				// Clear unit Id from submitting state array
-				dispatch(deleteSubmittedUnit(editedUnit.id));
 				// Update the store with our new edits
 				dispatch(confirmUnitEdits(editedUnit));
 				// Success!
@@ -91,10 +86,9 @@ export function submitEditedUnit(editedUnit: t.UnitData): Thunk {
 			} catch (err) {
 				// Failure! ):
 				showErrorNotification(translate('unit.failed.to.edit.unit'));
-				// Clear our changes from to the submitting units state
-				// We must do this in case fetch failed to keep the store in sync with the database
-				dispatch(deleteSubmittedUnit(editedUnit.id));
 			}
+			// Clear unit Id from submitting state array
+			dispatch(deleteSubmittedUnit(editedUnit.id));
 		}
 	};
 }
@@ -107,7 +101,7 @@ export function addUnit(unit: t.UnitData): Thunk {
 			await unitsApi.addUnit(unit);
 			// Update the units state from the database on a successful call
 			// In the future, getting rid of this database fetch and updating the store on a successful API call would make the page faster
-			// However, since the database currently assigns the id to the UnitData
+			// However, since the database currently assigns the id to the UnitData we need to fetch
 			dispatch(fetchUnitsDetails());
 			showSuccessNotification(translate('unit.successfully.create.unit'));
 		} catch (err) {

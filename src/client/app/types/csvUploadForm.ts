@@ -22,7 +22,7 @@ interface CSVUploadProps extends CSVUploadPreferences {
 // This relates to MeterTimeSortTypes in src/client/app/types/redux/meters.ts but also has 'meter value or default'.
 // They should be kept in sync.
 export const enum TimeSortTypes {
-	// Normally the values here are not used but the ones in data.js so translated.
+	// Normally the values here are not used when displayed to user but the ones in data.js so translated.
 	increasing = 'increasing',
 	decreasing = 'decreasing',
 	// meter means to use value stored on meter or the default if not.
@@ -30,7 +30,7 @@ export const enum TimeSortTypes {
 }
 
 export const enum BooleanTypes {
-	// Normally the values here are not used but the ones in data.js so translated.
+	// Normally the values here are not used when displayed to user but the ones in data.js so translated.
 	true = 'yes',
 	false = 'no',
 	// meter means to use value stored on meter or the default if not.
