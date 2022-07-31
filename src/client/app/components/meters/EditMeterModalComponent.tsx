@@ -10,6 +10,8 @@ import translate from '../../utils/translate';
 import { useDispatch, useSelector } from 'react-redux';
 import { submitEditedMeter } from '../../actions/meters';
 import { removeUnsavedChanges } from '../../actions/unsavedWarning';
+import TooltipMarkerComponent from '../TooltipMarkerComponent';
+import TooltipHelpContainer from '../../containers/TooltipHelpContainer';
 import { useState } from 'react';
 import '../../styles/Modal.unit.css';
 import { TrueFalseType } from '../../types/items';
@@ -209,6 +211,13 @@ export default function EditMeterModalComponent(props: EditMeterModalComponentPr
 	// The default graphic unit can also be no unit/-99 but that is not desired so put last in list.
 	sortedPossibleGraphicUnits.push(noUnit);
 
+	const tooltipStyle = {
+		display: 'inline-block',
+		fontSize: '60%',
+		// Only and admin can edit a meter.
+		tooltipEditMeterView: 'help.admin.meteredit'
+	};
+
 	const formInputStyle: React.CSSProperties = {
 		paddingBottom: '5px'
 	}
@@ -222,7 +231,12 @@ export default function EditMeterModalComponent(props: EditMeterModalComponentPr
 
 			<Modal show={props.show} onHide={props.handleClose}>
 				<Modal.Header>
-					<Modal.Title> <FormattedMessage id="edit.meter" /></Modal.Title>
+					<Modal.Title> <FormattedMessage id="edit.meter" />
+						<TooltipHelpContainer page='meters' />
+						<div style={tooltipStyle}>
+							<TooltipMarkerComponent page='meters' helpTextId={tooltipStyle.tooltipEditMeterView} />
+						</div>
+					</Modal.Title>
 				</Modal.Header>
 				{/* when any of the meter are changed call one of the functions. */}
 				<Modal.Body className="show-grid">

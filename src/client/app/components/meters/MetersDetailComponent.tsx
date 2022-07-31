@@ -43,8 +43,8 @@ export default function MetersDetailComponent() {
 	const tooltipStyle = {
 		display: 'inline-block',
 		fontSize: '50%',
-		// For now, only an admin can see the Meter page.
-		tooltipMeterView: 'help.admin.Meterview'
+		// Switch help depending if admin or not.
+		tooltipMeterView: loggedInAsAdmin ? 'help.admin.meterview' : 'help.meters.meterview'
 	};
 	return (
 		<div>
