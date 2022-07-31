@@ -305,7 +305,7 @@ export default function CreateMeterModalComponent(props: CreateMeterModalCompone
 													type='select'
 													value={state.meterType}
 													onChange={e => handleStringChange(e)}>
-													{/* TODO Want to not do a specific selection but request user to do one but this causes an error. Also want it required. 
+													{/* TODO Want to not do a specific selection but request user to do one but this causes an error. Also want it required.
 													 Possible way is how done in src/client/app/components/TimeZoneSelect.tsx. */}
 													{/* Want to do also for unit id and default graphic unit */}
 													{/* <option disabled selected value> -- select an option -- </option> */}
