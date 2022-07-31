@@ -60,7 +60,7 @@ export default function MetersDetailComponent() {
 				</h2>
 				{loggedInAsAdmin &&
 					<div className="edit-btn">
-						<CreateMeterModalComponent currentUser={CurrentUserState} />
+						<CreateMeterModalComponent />
 					</div>}
 				<div className="card-container">
 					{/* Create a MeterViewComponent for each MeterData in Meters State after sorting by identifier */}

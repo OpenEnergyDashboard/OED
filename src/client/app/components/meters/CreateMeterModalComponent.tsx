@@ -16,15 +16,10 @@ import { useState } from 'react';
 import { TrueFalseType } from '../../types/items';
 import TimeZoneSelect from '../TimeZoneSelect';
 import { GPSPoint, isValidGPSInput } from '../../utils/calibration';
-import { CurrentUserState } from 'types/redux/currentUser';
 import { isRoleAdmin } from '../../utils/hasPermissions';
 import { State } from 'types/redux/state';
 import { UnitData, DisplayableType, UnitRepresentType, UnitType } from '../../types/redux/units';
 import * as _ from 'lodash';
-
-interface CreateMeterModalComponentProps {
-	currentUser: CurrentUserState;
-}
 
 // Notifies user of msg.
 // TODO isValidGPSInput uses alert so continue that. Maybe all should be changed but this impacts other parts of the code.
@@ -35,7 +30,7 @@ function notifyUser(msg: string) {
 }
 
 // TODO props not used in this file??
-export default function CreateMeterModalComponent(props: CreateMeterModalComponentProps) {
+export default function CreateMeterModalComponent() {
 
 	const dispatch = useDispatch();
 
