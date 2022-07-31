@@ -60,7 +60,7 @@ export default function MetersDetailComponent() {
 				</h2>
 				{loggedInAsAdmin &&
 					<div className="edit-btn">
-						<CreateMeterModalComponent currentUser={currentUserState} />
+						<CreateMeterModalComponent />
 					</div>
 				}
 				<div className="card-container">
