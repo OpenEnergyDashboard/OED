@@ -12,6 +12,7 @@ const { isTokenAuthorized } = require('../util/userRoles');
 const requiredAdmin = require('./authenticator').adminAuthMiddleware;
 const optionalAuthenticator = require('./authenticator').optionalAuthMiddleware;
 const Point = require('../models/Point');
+const moment = require('moment');
 
 const router = express.Router();
 router.use(optionalAuthenticator);
@@ -36,17 +37,17 @@ function formatMeterForResponse(meter, loggedInAsAdmin) {
 		area: meter.area,
 		note: null,
 		cumulative: null,
-		cumulativeReset : null,
-		cumulativeResetStart : null,
-		cumulativeResetEnd : null,
-		readingGap : null,
-		readingVariation : null,
-		readingDuplication : null,
-		timeSort : null,
-		endOnlyTime : null,
-		reading : null,
-		startTimestamp : null,
-		endTimestamp : null,
+		cumulativeReset: null,
+		cumulativeResetStart: null,
+		cumulativeResetEnd: null,
+		readingGap: null,
+		readingVariation: null,
+		readingDuplication: null,
+		timeSort: null,
+		endOnlyTime: null,
+		reading: null,
+		startTimestamp: null,
+		endTimestamp: null,
 		unitId: meter.unitId,
 		defaultGraphicUnit: meter.defaultGraphicUnit
 	};
@@ -203,13 +204,13 @@ router.post('/edit', requiredAdmin('edit meters'), async (req, res) => {
 /**
  * Route for POST add unit.
  */
- router.post('/addMeter', async (req, res) => {
+router.post('/addMeter', async (req, res) => {
 	const validParams = {
 		type: 'object',
-		maxProperties: 6,
+		// TODO why does this not work?
+		// maxProperties: 25,
 		required: ['id', 'enabled', 'displayable', 'timeZone'],
 		properties: {
-			id: { type: 'integer' },
 			enabled: { type: 'bool' },
 			displayable: { type: 'bool' },
 			timeZone: {
@@ -228,13 +229,14 @@ router.post('/edit', requiredAdmin('edit meters'), async (req, res) => {
 							longitude: { type: 'number', minimum: '-180', maximum: '180' }
 						}
 					},
-					{ type: 'null' }
+					{
+						type: 'null'
+					}
 				]
 			},
 			identifier: {
 				oneOf: [
 					{ type: 'string' },
-					{ type: 'null' }
 				]
 			}
 		}
@@ -245,33 +247,58 @@ router.post('/edit', requiredAdmin('edit meters'), async (req, res) => {
 		log.error(`Invalid input for meterAPI. ${validationResult.error}`);
 		res.sendStatus(400);
 	} else {
+		let gpsUse = req.body.gps;
+		if (gpsUse != null) {
+			// Valid GPS so convert to a point
+			gpsUse = new Point(req.body.gps.longitude, req.body.gps.latitude);
+		}
 		const conn = getConnection();
+		const startTimeReceived = req.body.startTimestamp, endTimeReceived = req.body.endTimestamp;
+		let startTime, endTime;
+		if (startTimeReceived.length === 0) {
+			startTime = undefined;
+		} else {
+			startTime = moment(startTimeReceived)
+		}
+		if (endTimeReceived.length === 0) {
+			endTime = undefined;
+		} else {
+			endTime = moment(endTimeReceived)
+		}
+		let cumulativeStart = req.body.cumulativeResetStart, cumulativeEnd = req.body.cumulativeResetEnd;
+		if (cumulativeStart.length === 0) {
+			cumulativeStart = undefined;
+		}
+		if (cumulativeEnd.length === 0) {
+			cumulativeEnd = undefined;
+		}
+
 		try {
 			await conn.tx(async t => {
 				const newMeter = new Meter(
-					undefined,				//id
+					undefined, //id
 					req.body.name,
+					req.body.url,
 					req.body.enabled,
 					req.body.displayable,
-					req.body.url,
 					req.body.meterType,
 					req.body.timeZone,
-					req.body.gps,
+					gpsUse,
 					req.body.identifier,
-					req.body.area,
 					req.body.note,
+					req.body.area,
 					req.body.cumulative,
 					req.body.cumulativeReset,
-					req.body.cumulativeResetStart,
-					req.body.cumulativeResetEnd,
+					cumulativeStart,
+					cumulativeEnd,
 					req.body.readingGap,
 					req.body.readingVariation,
 					req.body.readingDuplication,
 					req.body.timeSort,
 					req.body.endOnlyTime,
 					req.body.reading,
-					req.body.startTimestamp,
-					req.body.endTimestamp,
+					startTime,
+					endTime,
 					req.body.unitId,
 					req.body.defaultGraphicUnit
 				);

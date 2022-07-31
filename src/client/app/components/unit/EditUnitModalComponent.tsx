@@ -26,7 +26,6 @@ interface EditUnitModalComponentProps {
 
 // Updated to hooks
 export default function EditUnitModalComponent(props: EditUnitModalComponentProps) {
-
 	const dispatch = useDispatch();
 
 	// Set existing unit values
@@ -151,7 +150,7 @@ export default function EditUnitModalComponent(props: EditUnitModalComponentProp
 											name="identifier"
 											type="text"
 											onChange={e => handleStringChange(e)}
-											defaultValue={state.identifier}
+											value={state.identifier}
 											placeholder="Identifier" />
 										<div />
 										{/* Name input*/}
@@ -170,7 +169,7 @@ export default function EditUnitModalComponent(props: EditUnitModalComponentProp
 												name='typeOfUnit'
 												type='select'
 												onChange={e => handleStringChange(e)}>
-												defaultValue={state.typeOfUnit}
+												value={state.typeOfUnit}
 												{Object.keys(UnitType).map(key => {
 													return (<option value={key} key={key}>{translate(`UnitType.${key}`)}</option>)
 												})}
@@ -182,7 +181,7 @@ export default function EditUnitModalComponent(props: EditUnitModalComponentProp
 											<Input
 												name='unitRepresent'
 												type='select'
-												defaultValue={state.unitRepresent}
+												value={state.unitRepresent}
 												onChange={e => handleStringChange(e)}>
 												{Object.keys(UnitRepresentType).map(key => {
 													return (<option value={key} key={key}>{translate(`UnitRepresentType.${key}`)}</option>)
@@ -195,7 +194,7 @@ export default function EditUnitModalComponent(props: EditUnitModalComponentProp
 											<Input
 												name='displayable'
 												type='select'
-												defaultValue={state.displayable}
+												value={state.displayable}
 												onChange={e => handleStringChange(e)}>
 												{Object.keys(DisplayableType).map(key => {
 													return (<option value={key} key={key}>{translate(`DisplayableType.${key}`)}</option>)
@@ -208,7 +207,7 @@ export default function EditUnitModalComponent(props: EditUnitModalComponentProp
 											<Input
 												name='preferredDisplay'
 												type='select'
-												defaultValue={state.preferredDisplay.toString()}
+												value={state.preferredDisplay.toString()}
 												onChange={e => handleBooleanChange(e)}>
 												{Object.keys(TrueFalseType).map(key => {
 													return (<option value={key} key={key}>{translate(`TrueFalseType.${key}`)}</option>)
@@ -221,7 +220,7 @@ export default function EditUnitModalComponent(props: EditUnitModalComponentProp
 											<Input
 												name='secInRate'
 												type="number"
-												defaultValue={state.secInRate}
+												value={state.secInRate}
 												onChange={e => handleNumberChange(e)}
 												placeholder="Sec In Rate"
 												// TODO validate negative input by typing for rate but database stops it.
@@ -234,7 +233,7 @@ export default function EditUnitModalComponent(props: EditUnitModalComponentProp
 											<Input
 												name="suffix"
 												type="text"
-												defaultValue={state.suffix}
+												value={state.suffix}
 												placeholder="Suffix"
 												onChange={e => handleStringChange(e)} />
 										</div>
@@ -244,7 +243,7 @@ export default function EditUnitModalComponent(props: EditUnitModalComponentProp
 											<Input
 												name="note"
 												type="textarea"
-												defaultValue={state.note}
+												value={state.note}
 												placeholder="Note"
 												onChange={e => handleStringChange(e)} />
 										</div>

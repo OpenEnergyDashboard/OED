@@ -1,6 +1,7 @@
 /* This Source Code Form is subject to the terms of the Mozilla Public
 * License, v. 2.0. If a copy of the MPL was not distributed with this
 * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
+// import { GPSPoint } from 'utils/calibration';
 import { GPSPoint } from 'utils/calibration';
 import { ActionType } from './actions';
 
@@ -45,13 +46,18 @@ export type MetersAction = RequestMetersDetailsAction
 | SubmitEditedMeterAction
 | ConfirmMetersFetchedOnceAction;
 
+// The relates to the JS object Meter.types for the same use in src/server/models/Meter.js.
+// They should be kept in sync.
 export enum MeterType {
-	mamac = 'mamac',
-	metasys = 'metasys',
-	obvius = 'obvius',
-	other = 'other'
+	EGAUGE = 'egauge',
+	MAMAC = 'mamac',
+	METASYS = 'metasys',
+	OBVIUS = 'obvius',
+	OTHER = 'other'
 }
 
+// This relates to TimeSortTypes in src/client/app/types/csvUploadForm.ts but does not have 'meter value or default'.
+// They should be kept in sync.
 export enum MeterTimeSortType {
 	increasing = 'increasing',
 	decreasing = 'decreasing',
@@ -95,7 +101,7 @@ export interface MeterEditData {
 	meterType: string;
 	url: string;
 	timeZone: string;
-	gps: GPSPoint;
+	gps: GPSPoint | null;
 	unitId: number;
 	defaultGraphicUnit: number;
 	note: string;
@@ -109,8 +115,8 @@ export interface MeterEditData {
 	readingVariation: number;
 	readingDuplication: number;
 	timeSort: string;
-	startTimestamp: string;
-	endTimestamp: string;
+	startTimestamp: string | undefined;
+	endTimestamp: string | undefined;
 }
 
 export interface MeterDataByID {

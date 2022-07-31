@@ -19,6 +19,8 @@ interface CSVUploadProps extends CSVUploadPreferences {
 	toggleUpdate: () => void;
 }
 
+// This relates to MeterTimeSortTypes in src/client/app/types/redux/meters.ts but also has 'meter value or default'.
+// They should be kept in sync.
 export const enum TimeSortTypes {
 	// Normally the values here are not used but the ones in data.js so translated.
 	increasing = 'increasing',

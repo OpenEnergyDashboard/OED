@@ -308,6 +308,8 @@ class Meter {
 	}
 }
 
+// The relates to the TS object MeterType for the same use in src/client/app/types/redux/meters.ts.
+// They should be kept in sync.
 // Enum of meter types
 Meter.type = {
 	EGAUGE: 'egauge',
