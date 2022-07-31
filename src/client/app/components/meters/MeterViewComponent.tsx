@@ -45,20 +45,25 @@ export default function MeterViewComponent(props: MeterViewComponentProps) {
 			<div className="meter-container">
 				<b><FormattedMessage id="meter.name" /></b> {props.meter.name}
 			</div>
-			<div className="meter-container">
-				<b><FormattedMessage id="meter.enabled" /></b> {translate(`TrueFalseType.${props.meter.enabled.toString()}`)}
-			</div>
-			<div className="meter-container">
-				<b><FormattedMessage id="meter.displayable" /></b> {translate(`TrueFalseType.${props.meter.displayable.toString()}`)}
-			</div>
-			<div className="edit-btn">
-				{loggedInAsAdmin &&
-				<Button variant="Secondary" onClick={handleShow}>
-					<FormattedMessage id="edit.meter" />
-				</Button>}
-				{/* Creates a child MeterModalEditComponent */}
-				<EditMeterModalComponent show={showEditModal} meter={props.meter} handleClose={handleClose} currentUser={CurrentUserState} />
-			</div>
+			{loggedInAsAdmin &&
+				<div className="meter-container">
+					<b><FormattedMessage id="meter.enabled" /></b> {translate(`TrueFalseType.${props.meter.enabled.toString()}`)}
+				</div>
+			}
+			{loggedInAsAdmin &&
+				<div className="meter-container">
+					<b><FormattedMessage id="meter.displayable" /></b> {translate(`TrueFalseType.${props.meter.displayable.toString()}`)}
+				</div>
+			}
+			{loggedInAsAdmin &&
+				<div className="edit-btn">
+					<Button variant="Secondary" onClick={handleShow}>
+						<FormattedMessage id="edit.meter" />
+					</Button>
+					{/* Creates a child MeterModalEditComponent */}
+					<EditMeterModalComponent show={showEditModal} meter={props.meter} handleClose={handleClose} currentUser={CurrentUserState} />
+				</div>
+			}
 		</div>
 	);
 }
