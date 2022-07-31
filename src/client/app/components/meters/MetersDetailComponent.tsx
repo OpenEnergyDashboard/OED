@@ -49,13 +49,13 @@ export default function MetersDetailComponent() {
 	return (
 		<div>
 			<HeaderContainer />
-			<TooltipHelpContainer page='Meters' />
+			<TooltipHelpContainer page='meters' />
 
 			<div className='container-fluid'>
 				<h2 style={titleStyle}>
-					<FormattedMessage id='Meters' />
+					<FormattedMessage id='meters' />
 					<div style={tooltipStyle}>
-						<TooltipMarkerComponent page='Meters' helpTextId={tooltipStyle.tooltipMeterView} />
+						<TooltipMarkerComponent page='meters' helpTextId={tooltipStyle.tooltipMeterView} />
 					</div>
 				</h2>
 				{loggedInAsAdmin &&
