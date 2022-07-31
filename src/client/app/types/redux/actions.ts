@@ -19,13 +19,6 @@ export enum ActionType {
 	RemoveUnsavedChanges = 'REMOVE_UNSAVED_CHANGES',
 	FlipLogOutState = 'FLIP_LOG_OUT_STATE',
 
-	RequestMetersDetails = 'REQUEST_METERS_DETAILS',
-	ReceiveMetersDetails = 'RECEIVE_METERS_DETAILS',
-	ChangeDisplayedMeters = 'CHANGE_DISPLAYED_METERS',
-	EditMeterDetails = 'EDIT_METER_DETAILS',
-	SubmitEditedMeter = 'SUBMIT_EDITED_METER',
-	ConfirmEditedMeter = 'CONFIRM_EDITED_METER',
-
 	ShowNotification = 'SHOW_NOTIFICATION',
 	ClearNotifications = 'CLEAR_NOTIFICATIONS',
 
@@ -57,6 +50,7 @@ export enum ActionType {
 	UpdateComparePeriod = 'UPDATE_COMPARE_PERIOD',
 	ChangeCompareSortingOrder = 'CHANGE_COMPARE_SORTING_ORDER',
 	SetHotlinked = 'SET_HOTLINKED',
+	UpdateLineGraphRate = 'UPDATE_LINE_GRAPH_RATE',
 
 	RequestGroupsDetails = 'REQUEST_GROUPS_DETAILS',
 	ReceiveGroupsDetails = 'RECEIVE_GROUPS_DETAILS',
@@ -114,8 +108,24 @@ export enum ActionType {
 	ResetCalibration = 'RESET_CALIBRATION',
 	IncrementCounter = 'INCREMENT_COUNTER',
 
+	ReceiveUnitsDetails = 'RECEIVE_UNITS_DETAILS',
 	RequestUnitsDetails = 'REQUEST_UNITS_DETAILS',
-	ReceiveUnitsDetails = 'RECEIVE_UNITS_DETAILS'
+	ChangeDisplayedUnits = 'CHANGE_DISPLAYED_UNITS',
+	SubmitEditedUnit = 'SUBMIT_EDITED_UNIT',
+	ConfirmEditedUnit = 'CONFIRM_EDITED_UNIT',
+	DeleteSubmittedUnit = 'DELETE_SUBMITTED_UNIT',
+	ConfirmUnitsFetchedOnce = 'CONFIRM_UNITS_FETCHED_ONCE',
+
+	ReceiveMetersDetails = 'RECEIVE_METERS_DETAILS',
+	RequestMetersDetails = 'REQUEST_METERS_DETAILS',
+	ChangeDisplayedMeters = 'CHANGE_DISPLAYED_METERS',
+	EditMeterDetails = 'EDIT_METER_DETAILS',
+	SubmitEditedMeter = 'SUBMIT_EDITED_METER',
+	ConfirmEditedMeter = 'CONFIRM_EDITED_METER',
+	// TODO This is not currently used but should be when meter page is done.
+	DeleteEditedMeter = 'DELETE_EDITED_METER',
+	DeleteSubmittedMeter = 'DELETE_SUBMITTED_METER',
+	ConfirmMetersFetchedOnce = 'CONFIRM_METERS_FETCHED_ONCE',
 }
 
 /**

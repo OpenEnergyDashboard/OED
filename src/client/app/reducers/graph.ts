@@ -21,7 +21,8 @@ const defaultState: GraphState = {
 	chartToRender: ChartTypes.line,
 	barStacking: false,
 	hotlinked: false,
-	optionsVisibility: true
+	optionsVisibility: true,
+	lineGraphRate: {label: 'hour', rate: 1}
 };
 
 export default function graph(state = defaultState, action: GraphAction) {
@@ -91,6 +92,11 @@ export default function graph(state = defaultState, action: GraphAction) {
 			return {
 				...state,
 				optionsVisibility: action.visibility
+			};
+		case ActionType.UpdateLineGraphRate:
+			return {
+				...state,
+				lineGraphRate: action.lineGraphRate
 			};
 		default:
 			return state;

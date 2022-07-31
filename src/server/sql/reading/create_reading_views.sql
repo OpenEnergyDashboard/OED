@@ -381,7 +381,8 @@ BEGIN
 		-- This sequence of joins takes the meter id to its unit and in the final join
 		-- it then uses the unit_index for this unit.
 		INNER JOIN meters m ON m.id = meters.id)
-		INNER JOIN units u ON m.unit_id = u.id)
+		-- Don't return bar data if raw since cannot sum.
+		INNER JOIN units u ON m.unit_id = u.id AND u.unit_represent != 'raw'::unit_represent_type)
 		-- This is getting the conversion for the meter (row_index) and unit to graph (column_index).
 		-- The slope and intercept are used above the transform the reading to the desired unit.
 		INNER JOIN cik c on c.row_index = u.unit_index AND c.column_index = unit_column)

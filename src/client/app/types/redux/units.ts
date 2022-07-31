@@ -13,7 +13,37 @@ export interface ReceiveUnitsDetailsAction {
 	data: UnitData[];
 }
 
-export type UnitsAction = RequestUnitsDetailsAction | ReceiveUnitsDetailsAction;
+export interface ChangeDisplayedUnitsAction {
+	type: ActionType.ChangeDisplayedUnits;
+	selectedUnits: number[];
+}
+
+export interface ConfirmEditedUnitAction {
+	type: ActionType.ConfirmEditedUnit;
+	editedUnit: UnitData;
+}
+
+export interface DeleteSubmittedUnitAction {
+	type: ActionType.DeleteSubmittedUnit;
+	unitId: number;
+}
+
+export interface SubmitEditedUnitAction {
+	type: ActionType.SubmitEditedUnit;
+	unitId: number;
+}
+
+export interface ConfirmUnitsFetchedOnceAction {
+	type: ActionType.ConfirmUnitsFetchedOnce;
+}
+
+export type UnitsAction = RequestUnitsDetailsAction
+| ReceiveUnitsDetailsAction
+| ChangeDisplayedUnitsAction
+| ConfirmEditedUnitAction
+| DeleteSubmittedUnitAction
+| SubmitEditedUnitAction
+| ConfirmUnitsFetchedOnceAction;
 
 export enum UnitType {
 	unit = 'unit',
@@ -45,7 +75,21 @@ export interface UnitData {
 	suffix: string;
 	displayable: DisplayableType;
 	preferredDisplay: boolean;
-	note?: string;
+	note: string;
+}
+
+export interface UnitEditData {
+	id: number;
+	name: string;
+	identifier: string;
+	unitRepresent: string;
+	secInRate: number;
+	typeOfUnit: UnitType;
+	unitIndex: number;
+	suffix: string;
+	displayable: DisplayableType;
+	preferredDisplay: boolean;
+	note: string;
 }
 
 export interface UnitDataById {
@@ -53,6 +97,9 @@ export interface UnitDataById {
 }
 
 export interface UnitsState {
+	hasBeenFetchedOnce: boolean,
 	isFetching: boolean;
+	selectedUnits: number[];
+	submitting: number[];
 	units: UnitDataById;
 }

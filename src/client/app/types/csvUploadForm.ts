@@ -20,6 +20,7 @@ interface CSVUploadProps extends CSVUploadPreferences {
 }
 
 export const enum TimeSortTypes {
+	// Normally the values here are not used when displayed to user but the ones in data.js so translated.
 	increasing = 'increasing',
 	decreasing = 'decreasing',
 	// meter means to use value stored on meter or the default if not.
@@ -27,8 +28,9 @@ export const enum TimeSortTypes {
 }
 
 export const enum BooleanTypes {
-	true = 'true',
-	false = 'false',
+	// Normally the values here are not used when displayed to user but the ones in data.js so translated.
+	true = 'yes',
+	false = 'no',
 	// meter means to use value stored on meter or the default if not.
 	meter = 'meter value or default'
 }

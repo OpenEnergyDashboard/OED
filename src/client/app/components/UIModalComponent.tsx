@@ -31,7 +31,7 @@ export default class UIModalComponent extends React.Component<{}, UIModalState> 
 					<FormattedMessage id='options' />
 				</Button>
 				<Modal show={this.state.showModal} onHide={this.closeModal}>
-					<ModalHeader closeButton>
+					<ModalHeader>
 						<FormattedMessage id='options' />
 					</ModalHeader>
 					<ModalBody>

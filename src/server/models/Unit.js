@@ -20,7 +20,7 @@ class Unit {
 	 * @param {*} preferredDisplay True if this unit is always displayed. If not, the user needs to ask to see (for future enhancement).
 	 * @param {*} note Note about this unit.
 	 */
-	constructor(id, name, identifier, unitRepresent, secInRate = 3600, typeOfUnit, unitIndex, suffix = '', displayable, preferredDisplay, note) {
+	constructor(id, name, identifier = name, unitRepresent, secInRate = 3600, typeOfUnit, unitIndex, suffix = '', displayable, preferredDisplay, note) {
 		this.id = id;
 		this.name = name;
 		this.identifier = identifier;

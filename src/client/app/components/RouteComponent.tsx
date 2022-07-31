@@ -24,7 +24,6 @@ import { validateComparePeriod, validateSortingOrder } from '../utils/calculateC
 import EditGroupsContainer from '../containers/groups/EditGroupsContainer';
 import CreateGroupContainer from '../containers/groups/CreateGroupContainer';
 import GroupsDetailContainer from '../containers/groups/GroupsDetailContainer';
-import MetersDetailContainer from '../containers/meters/MetersDetailContainer';
 import UsersDetailContainer from '../containers/admin/UsersDetailContainer';
 import CreateUserContainer from '../containers/admin/CreateUserContainer';
 import { TimeInterval } from '../../../common/TimeInterval';
@@ -33,6 +32,8 @@ import MapCalibrationContainer from '../containers/maps/MapCalibrationContainer'
 import UploadCSVContainer from '../containers/csv/UploadCSVContainer';
 import { UserRole } from '../types/items';
 import { hasPermissions } from '../utils/hasPermissions';
+import UnitsDetailComponent from './unit/UnitsDetailComponent';
+import MetersDetailComponent from './meters/MetersDetailComponent';
 import * as queryString from 'query-string';
 
 interface RouteProps {
@@ -243,7 +244,7 @@ export default class RouteComponent extends React.Component<RouteProps> {
 								<Route path='/admin' render={() => this.requireAuth(AdminComponent())}/>
 								<Route path='/csv' render={() => this.requireRole(UserRole.CSV, <UploadCSVContainer/>)}/>
 								<Route path='/groups' render={() => this.checkAuth(<GroupsDetailContainer/>)}/>
-								<Route path='/meters' render={() => this.checkAuth(<MetersDetailContainer/>)}/>
+								<Route path='/meters' render={() => this.checkAuth(<MetersDetailComponent/>)}/>
 								<Route path='/graph' render={({ location }) => this.linkToGraph(<HomeComponent/>, location.search)}/>
 								<Route path='/calibration' render={() => this.requireAuth(<MapCalibrationContainer/>)}/>
 								<Route path='/maps' render={() => this.requireAuth(<MapsDetailContainer/>)}/>
@@ -251,6 +252,7 @@ export default class RouteComponent extends React.Component<RouteProps> {
 								<Route path='/editGroup' render={() => this.requireAuth(<EditGroupsContainer/>)}/>
 								<Route path='/users/new' render={() => this.requireAuth(<CreateUserContainer/>)}/>
 								<Route path='/users' render={() => this.requireAuth(<UsersDetailContainer fetchUsers={() => []}/>)}/>
+								<Route path='/units'render={() => this.requireAuth(<UnitsDetailComponent />)}/>
 								<Route path='*' component={HomeComponent}/>
 							</Switch>
 						</Router>

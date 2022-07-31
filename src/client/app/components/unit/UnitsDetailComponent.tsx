@@ -8,26 +8,25 @@ import FooterContainer from '../../containers/FooterContainer';
 import TooltipHelpContainer from '../../containers/TooltipHelpContainer';
 import TooltipMarkerComponent from '../TooltipMarkerComponent';
 import { useDispatch, useSelector } from 'react-redux';
-import { fetchMetersDetailsIfNeeded } from '../../actions/meters';
+import { fetchUnitsDetailsIfNeeded } from '../../actions/units';
 import { State } from '../../types/redux/state';
 import { isRoleAdmin } from '../../utils/hasPermissions';
 import { useEffect } from 'react';
-import MeterViewComponent from './MeterViewComponent';
-import CreateMeterModalComponent from './CreateMeterModalComponent';
-import { MeterData } from 'types/redux/meters';
+import UnitViewComponent from './UnitViewComponent';
+import CreateUnitModalComponent from './CreateUnitModalComponent';
+import { UnitData } from 'types/redux/units';
 
 // Utilizes useDispatch and useSelector hooks
-export default function MetersDetailComponent() {
-
+export default function UnitsDetailComponent() {
 	const dispatch = useDispatch();
 
 	useEffect(() => {
-		// Makes async call to Meters API for Meters details if one has not already been made somewhere else, stores Meter ids in state
-		dispatch(fetchMetersDetailsIfNeeded());
+		// Makes async call to units API for units details if one has not already been made somewhere else, stores unit ids in state
+		dispatch(fetchUnitsDetailsIfNeeded());
 	}, []);
 
-	//Meters state
-	const MetersState = useSelector((state: State) => state.meters.meters);
+	//Units state
+	const unitsState = useSelector((state: State) => state.units.units);
 
 	// Check for admin status
 	const currentUser = useSelector((state: State) => state.currentUser.profile);
@@ -40,35 +39,34 @@ export default function MetersDetailComponent() {
 	const tooltipStyle = {
 		display: 'inline-block',
 		fontSize: '50%',
-		// For now, only an admin can see the Meter page.
-		tooltipMeterView: 'help.admin.Meterview'
+		// For now, only an admin can see the unit page.
+		tooltipUnitView: 'help.admin.unitview'
 	};
 	return (
 		<div>
 			<HeaderContainer />
-			<TooltipHelpContainer page='Meters' />
+			<TooltipHelpContainer page='units' />
 
 			<div className='container-fluid'>
 				<h2 style={titleStyle}>
-					<FormattedMessage id='Meters' />
+					<FormattedMessage id='units' />
 					<div style={tooltipStyle}>
-						<TooltipMarkerComponent page='Meters' helpTextId={tooltipStyle.tooltipMeterView} />
+						<TooltipMarkerComponent page='units' helpTextId={tooltipStyle.tooltipUnitView} />
 					</div>
 				</h2>
 				{loggedInAsAdmin &&
 					<div className="edit-btn">
-						<CreateMeterModalComponent />
+						<CreateUnitModalComponent />
 					</div>}
 				<div className="card-container">
-					{/* Create a MeterViewComponent for each MeterData in Meters State after sorting by identifier */}
-					{Object.values(MetersState)
-						.sort((MeterA: MeterData, MeterB: MeterData) => (MeterA.identifier.toLowerCase() > MeterB.identifier.toLowerCase()) ? 1 :
-							(( MeterB.identifier.toLowerCase() > MeterA.identifier.toLowerCase()) ? -1 : 0))
-						.map(MeterData => (<MeterViewComponent meter={MeterData as MeterData} key={(MeterData as MeterData).id} />))}
+					{/* Create a UnitViewComponent for each UnitData in Units State after sorting by identifier */}
+					{Object.values(unitsState)
+						.sort((unitA: UnitData, unitB: UnitData) => (unitA.identifier.toLowerCase() > unitB.identifier.toLowerCase()) ? 1 :
+							(( unitB.identifier.toLowerCase() > unitA.identifier.toLowerCase()) ? -1 : 0))
+						.map(unitData => (<UnitViewComponent unit={unitData as UnitData} key={(unitData as UnitData).id} />))}
 				</div>
 			</div>
 			<FooterContainer />
 		</div>
 	);
 }
-

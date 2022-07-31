@@ -4,10 +4,9 @@
 
 import store from '../index';
 import * as _ from 'lodash';
-import { MeterMetadata } from '../types/redux/meters';
+import { MeterData } from '../types/redux/meters';
 import { ConversionArray } from '../types/conversionArray';
 import { UnitData, UnitType } from '../types/redux/units';
-import { fetchGroupChildrenIfNeeded } from '../actions/groups'
 import { GroupDefinition } from 'types/redux/groups';
 
 /**
@@ -34,7 +33,7 @@ export function unitsCompatibleWithMeters(meters: Set<number>): Set<number> {
 	// Loops over all meters.
 	meters.forEach(function (meterId: number) {
 		// Gets the meter associated with the meterId.
-		const meter = _.get(state.meters.byMeterID, meterId) as MeterMetadata;
+		const meter = _.get(state.meters.byMeterID, meterId) as MeterData;
 		let meterUnits = new Set<number>();
 		// If meter had no unit then nothing compatible with it.
 		// This probably won't happen but be safe. Note once you have one of these then
@@ -130,13 +129,13 @@ export function unitFromPColumn(column: number): number {
 /**
  * Returns the set of meters's ids associated with the groupId used.
  * @param groupId The groupId.
- * @returns
+ * @returns the set of deep children of this group
  */
-export async function metersInGroup(groupId: number): Promise<Set<number>> {
-	// Fetch group children if needed.
-	await store.dispatch<any>(fetchGroupChildrenIfNeeded(groupId));
+export function metersInGroup(groupId: number): Set<number> {
 	const state = store.getState();
 	// Gets the group associated with groupId.
+	// The deep children are automatically fetched with group state so should exist.
 	const group = _.get(state.groups.byGroupID, groupId) as GroupDefinition;
+	// Create a set of the deep meters of this group and return it.
 	return new Set(group.deepMeters);
 }
