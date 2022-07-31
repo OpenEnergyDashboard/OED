@@ -31,19 +31,42 @@ export default function MeterViewComponent(props: MeterViewComponentProps) {
 	}
 
 	// current user state
-	const CurrentUserState = useSelector((state: State) => state.currentUser);
+	const currentUserState = useSelector((state: State) => state.currentUser);
 
 	// Check for admin status
 	const currentUser = useSelector((state: State) => state.currentUser.profile);
 	const loggedInAsAdmin = (currentUser !== null) && isRoleAdmin(currentUser.role);
 
+	// Set up to display the units associated with the meter as the unit identifier.
+	// current unit state
+	const currentUnitState = useSelector((state: State) => state.units.units);
+	// This is the unit associated with the meter.
+	// The first test of length is because the state may not yet be set when loading. This should not be seen
+	// since the state should be set and the page redrawn so just use 'no unit'.
+	// The second test of -99 is for meters without units.
+	const unitName = (Object.keys(currentUnitState).length === 0 || props.meter.unitId === -99) ?
+		'no unit' : currentUnitState[props.meter.unitId].identifier;
+	// console.log('unitName ', unitName);
+	// This is the default graphic unit associated with the meter. See above for how code works.
+	const graphicName = (Object.keys(currentUnitState).length === 0 || props.meter.defaultGraphicUnit === -99) ?
+		'no unit' : currentUnitState[props.meter.defaultGraphicUnit].identifier;
+
+	// Only display limited data if not an admin.
 	return (
 		<div className="card">
 			<div className="identifier-container">
 				{props.meter.identifier}
 			</div>
+			{loggedInAsAdmin &&
+				<div className="meter-container">
+					<b><FormattedMessage id="meter.name" /></b> {props.meter.name}
+				</div>
+			}
 			<div className="meter-container">
-				<b><FormattedMessage id="meter.name" /></b> {props.meter.name}
+				<b><FormattedMessage id="meter.unitName" /></b> {unitName}
+			</div>
+			<div className="meter-container">
+				<b><FormattedMessage id="meter.defaultGraphicUnit" /></b> {graphicName}
 			</div>
 			{loggedInAsAdmin &&
 				<div className="meter-container">
@@ -56,12 +79,18 @@ export default function MeterViewComponent(props: MeterViewComponentProps) {
 				</div>
 			}
 			{loggedInAsAdmin &&
+				<div className="meter-container">
+					{/* Only show first 30 characters so card does not get too big. Should limit to one line. Check in case null. */}
+					<b><FormattedMessage id="meter.note" /></b> {props.meter.note?.slice(0, 29)}
+				</div>
+			}
+			{loggedInAsAdmin &&
 				<div className="edit-btn">
 					<Button variant="Secondary" onClick={handleShow}>
 						<FormattedMessage id="edit.meter" />
 					</Button>
 					{/* Creates a child MeterModalEditComponent */}
-					<EditMeterModalComponent show={showEditModal} meter={props.meter} handleClose={handleClose} currentUser={CurrentUserState} />
+					<EditMeterModalComponent show={showEditModal} meter={props.meter} handleClose={handleClose} currentUser={currentUserState} />
 				</div>
 			}
 		</div>

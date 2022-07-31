@@ -30,7 +30,7 @@ export default function MetersDetailComponent() {
 	const MetersState = useSelector((state: State) => state.meters.meters);
 
 	// current user state
-	const CurrentUserState = useSelector((state: State) => state.currentUser);
+	const currentUserState = useSelector((state: State) => state.currentUser);
 
 	// Check for admin status
 	const currentUser = useSelector((state: State) => state.currentUser.profile);
@@ -60,7 +60,7 @@ export default function MetersDetailComponent() {
 				</h2>
 				{loggedInAsAdmin &&
 					<div className="edit-btn">
-						<CreateMeterModalComponent currentUser={CurrentUserState} />
+						<CreateMeterModalComponent currentUser={currentUserState} />
 					</div>
 				}
 				<div className="card-container">
@@ -68,7 +68,7 @@ export default function MetersDetailComponent() {
 					{Object.values(MetersState)
 						.sort((MeterA: MeterData, MeterB: MeterData) => (MeterA.identifier.toLowerCase() > MeterB.identifier.toLowerCase()) ? 1 :
 							((MeterB.identifier.toLowerCase() > MeterA.identifier.toLowerCase()) ? -1 : 0))
-						.map(MeterData => (<MeterViewComponent meter={MeterData as MeterData} key={(MeterData as MeterData).id} currentUser={CurrentUserState} />))}
+						.map(MeterData => (<MeterViewComponent meter={MeterData as MeterData} key={(MeterData as MeterData).id} currentUser={currentUserState} />))}
 				</div>
 			</div>
 			<FooterContainer />

@@ -346,7 +346,7 @@ export default function EditMeterModalComponent(props: EditMeterModalComponentPr
 											</div>}
 										{/* UnitId input*/}
 										<div style={formInputStyle}>
-											<label><FormattedMessage id="meter.unitId" /></label><br />
+											<label><FormattedMessage id="meter.unitName" /></label><br />
 											<Input
 												name="unitId"
 												type='select'
