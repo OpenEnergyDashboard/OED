@@ -31,10 +31,8 @@ export default function MeterViewComponent(props: MeterViewComponentProps) {
 	}
 
 	// current user state
-	const currentUserState = useSelector((state: State) => state.currentUser);
-
-	// Check for admin status
 	const currentUser = useSelector((state: State) => state.currentUser.profile);
+	// Check for admin status
 	const loggedInAsAdmin = (currentUser !== null) && isRoleAdmin(currentUser.role);
 
 	// Set up to display the units associated with the meter as the unit identifier.
@@ -90,7 +88,7 @@ export default function MeterViewComponent(props: MeterViewComponentProps) {
 						<FormattedMessage id="edit.meter" />
 					</Button>
 					{/* Creates a child MeterModalEditComponent */}
-					<EditMeterModalComponent show={showEditModal} meter={props.meter} handleClose={handleClose} currentUser={currentUserState} />
+					<EditMeterModalComponent show={showEditModal} meter={props.meter} handleClose={handleClose} />
 				</div>
 			}
 		</div>

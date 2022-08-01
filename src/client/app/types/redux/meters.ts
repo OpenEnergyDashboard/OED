@@ -73,7 +73,7 @@ export interface MeterData {
 	meterType: string;
 	url: string;
 	timeZone: string;
-	gps: GPSPoint;
+	gps: GPSPoint | null;
 	unitId: number;
 	defaultGraphicUnit: number;
 	note: string;

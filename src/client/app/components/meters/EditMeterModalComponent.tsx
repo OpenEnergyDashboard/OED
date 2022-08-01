@@ -16,17 +16,37 @@ import { useState } from 'react';
 import '../../styles/Modal.unit.css';
 import { TrueFalseType } from '../../types/items';
 import TimeZoneSelect from '../TimeZoneSelect';
-import { GPSPoint } from '../../utils/calibration';
-import { CurrentUserState } from 'types/redux/currentUser';
+import { GPSPoint, isValidGPSInput } from '../../utils/calibration';
 import { isRoleAdmin } from '../../utils/hasPermissions';
 import { State } from 'types/redux/state';
 import { UnitData, DisplayableType, UnitRepresentType, UnitType } from '../../types/redux/units';
 import * as _ from 'lodash';
 
+// Notifies user of msg.
+// TODO isValidGPSInput uses alert so continue that. Maybe all should be changed but this impacts other parts of the code.
+// Note this causes the modal to close but the state is not reset.
+// Use a function so can easily change how it works.
+function notifyUser(msg: string) {
+	window.alert(msg);
+}
+
+// get string value from GPSPoint
+function getGPSString (gps: GPSPoint | null) {
+	//  if gps is null return empty string value
+	if (gps === null) {
+		return '';
+	}
+	// if gps is an object parse GPSPoint and return string value
+	else {
+		const json = JSON.stringify({gps});
+		const obj = JSON.parse(json);
+		return `${obj.gps.latitude}, ${obj.gps.longitude}`;
+	}
+}
+
 interface EditMeterModalComponentProps {
 	show: boolean;
 	meter: MeterData;
-	currentUser: CurrentUserState;
 	// passed in to handle closing the modal
 	handleClose: () => void;
 }
@@ -47,6 +67,7 @@ export default function EditMeterModalComponent(props: EditMeterModalComponentPr
 		url: props.meter.url,
 		timeZone: props.meter.timeZone,
 		gps: props.meter.gps,
+		gpsInput: getGPSString(props.meter.gps),
 		unitId: props.meter.unitId,
 		defaultGraphicUnit: props.meter.defaultGraphicUnit,
 		note: props.meter.note,
@@ -84,23 +105,6 @@ export default function EditMeterModalComponent(props: EditMeterModalComponentPr
 		setState({ ...state, ['timeZone']: timeZone });
 	}
 
-	const handleReadingDuplicationChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-		if (Number(e.target.value) > 9) {
-			e.target.value = '9'
-		}
-		if (Number(e.target.value) < 1) {
-			e.target.value = '1'
-		}
-		setState({ ...state, [e.target.name]: Number(e.target.value) });
-	}
-
-	const handleGpsChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-		const coordinates = e.target.value.split(',', 2); //arr of size 2
-		coordinates[0] = coordinates[0].trim();
-		coordinates[1] = coordinates[1].trim();
-		const gps: GPSPoint = { latitude: Number(coordinates[0]), longitude: Number(coordinates[1]) }
-		setState({ ...state, gps: gps });
-	}
 	/* End State */
 
 	// Reset the state to default values
@@ -128,6 +132,10 @@ export default function EditMeterModalComponent(props: EditMeterModalComponentPr
 		// Close the modal first to avoid repeat clicks
 		props.handleClose();
 
+		let submitState;
+		// true if inputted values are okay. Then can submit.
+		let inputOk = true;
+
 		// Check for changes by comparing state to props
 		const meterHasChanges =
 			(
@@ -140,6 +148,7 @@ export default function EditMeterModalComponent(props: EditMeterModalComponentPr
 				props.meter.url != state.url ||
 				props.meter.timeZone != state.timeZone ||
 				props.meter.gps != state.gps ||
+				getGPSString(props.meter.gps) != state.gpsInput ||
 				props.meter.unitId != state.unitId ||
 				props.meter.defaultGraphicUnit != state.defaultGraphicUnit ||
 				props.meter.note != state.note ||
@@ -154,21 +163,69 @@ export default function EditMeterModalComponent(props: EditMeterModalComponentPr
 				props.meter.readingDuplication != state.readingDuplication ||
 				props.meter.timeSort != state.timeSort ||
 				props.meter.startTimestamp != state.startTimestamp ||
-				props.meter.endTimestamp != state.endTimestamp);
+				props.meter.endTimestamp != state.endTimestamp
+			);
 
-		// Only do work if there are changes
-		if (meterHasChanges) {
-			// Save our changes by dispatching the submitEditedMeter action
-			dispatch(submitEditedMeter(state));
-			// The updated meter is not fetched to save time. However, the identifier might have been
-			// automatically set if it was empty. Mimic that here.
+		// Check area is positive.
+		// TODO For now allow zero so works with default value and DB. We should probably
+		// make this better default than 0 (DB set to not null now).
+		// if (state.area <= 0) {
+		if (state.area < 0) {
+			notifyUser(translate('area.invalid') + state.area + '.');
+			inputOk = false;
+		}
+
+		// Check reading duplication is between 1 and 9.
+		if (state.readingDuplication < 1 || state.readingDuplication > 9) {
+			notifyUser(translate('duplication.invalid') + state.area + '.');
+			inputOk = false;
+		}
+
+		// Check GPS entered.
+		// Validate GPS is okay and take from string to GPSPoint to submit.
+		const gpsInput: string = state.gpsInput;
+		let gps: GPSPoint | null;
+		const latitudeIndex = 0;
+		const longitudeIndex = 1;
+		if (gpsInput.length === 0) {
+			// This is the value to route on an empty value which is stored as null in the DB.
+			gps = null;
+			state.gpsInput = getGPSString(gps);
+		} else if (isValidGPSInput(gpsInput)) {
+			const array = gpsInput.split(',').map((value: string) => parseFloat(value));
+			// It is valid and needs to be in this format for routing.
+			gps = {
+				longitude: array[longitudeIndex],
+				latitude: array[latitudeIndex]
+			};
+			state.gpsInput = getGPSString(gps);
+		} else {
+			// GPS not okay.
+			// TODO isValidGPSInput currently tops up an alert so not doing it here, may change
+			// so leaving code commented out.
+			// notifyUser(translate('input.gps.range') + state.gps + '.');
+			inputOk = false;
+			// TypeScript does not figure out that gps is not used in this case so reports
+			// an error. Set value to avoid.
+			gps = null;
+		}
+
+		if (inputOk && meterHasChanges) {
+			// GPS was updated so create updated state to submit.
+			// TODO need to type submitState?
+			submitState = { ...state, gps: gps };
+			// Submit new meter if checks where ok.
+			dispatch(submitEditedMeter(submitState));
+			resetState();
 			if (state.identifier === '') {
 				state.identifier = state.name;
 			}
 			dispatch(removeUnsavedChanges());
+		} else {
+			// Tell user that not going to update due to input issues.
+			notifyUser(translate('meter.input.error'));
 		}
-		// }
-	}
+	};
 
 	// Check for admin status
 	const currentUser = useSelector((state: State) => state.currentUser.profile);
@@ -179,7 +236,7 @@ export default function EditMeterModalComponent(props: EditMeterModalComponentPr
 	const units = useSelector((state: State) => state.units.units);
 	// A non-unit
 	const noUnit: UnitData = {
-		// Only needs the id and identifier, others are dummy values.
+	// Only needs the id and identifier, others are dummy values.
 		id: -99,
 		name: '',
 		identifier: 'no unit',
@@ -252,8 +309,7 @@ export default function EditMeterModalComponent(props: EditMeterModalComponentPr
 											name="identifier"
 											type="text"
 											onChange={e => handleStringChange(e)}
-											required value={state.identifier}
-											placeholder="Identifier" />
+											value={state.identifier} />
 										<div />
 										{/* Name input*/}
 										{loggedInAsAdmin &&
@@ -263,8 +319,7 @@ export default function EditMeterModalComponent(props: EditMeterModalComponentPr
 													name='name'
 													type='text'
 													onChange={e => handleStringChange(e)}
-													required value={state?.name}
-													placeholder="Name" />
+													required value={state.name} />
 											</div>}
 										{/* Area input*/}
 										<div style={formInputStyle}>
@@ -310,10 +365,15 @@ export default function EditMeterModalComponent(props: EditMeterModalComponentPr
 												<Input
 													name='meterType'
 													type='select'
-													value={state?.meterType}
+													value={state.meterType}
 													onChange={e => handleStringChange(e)}>
+													{/* TODO Want to not do a specific selection but request user to do one but this causes an error. Also want it required.
+													 Possible way is how done in src/client/app/components/TimeZoneSelect.tsx. */}
+													{/* Want to do also for unit id and default graphic unit */}
+													{/* <option disabled selected value> -- select an option -- </option> */}
+													// The dB expects lowercase.
 													{Object.keys(MeterType).map(key => {
-														return (<option value={key} key={key}>{`${key}`}</option>)
+														return (<option value={key.toLowerCase()} key={key.toLowerCase()}>{`${key}`}</option>)
 													})}
 												</Input>
 											</div>}
@@ -325,24 +385,24 @@ export default function EditMeterModalComponent(props: EditMeterModalComponentPr
 													name='url'
 													type='text'
 													onChange={e => handleStringChange(e)}
-													value={state?.url}
-													placeholder="URL" />
+													value={state.url} />
 											</div>}
 										{/* Timezone input*/}
 										{loggedInAsAdmin &&
 											<div style={formInputStyle}>
 												<label><FormattedMessage id="meter.time.zone" /></label><br />
-												<TimeZoneSelect current={state?.timeZone} handleClick={timeZone => handleTimeZoneChange(timeZone)} />
+												{/* TODO This is not correctly choosing the default not timezone choice */}
+												<TimeZoneSelect current={state.timeZone} handleClick={timeZone => handleTimeZoneChange(timeZone)} />
 											</div>}
 										{/* GPS input*/}
 										{loggedInAsAdmin &&
 											<div style={formInputStyle}>
 												<label><FormattedMessage id="meter.gps" /></label><br />
 												<Input
-													name='gps'
+													name='gpsInput'
 													type='text'
-													onChange={e => handleGpsChange(e)}
-													value={`${state.gps?.latitude}, ${state.gps?.longitude}`} />
+													onChange={e => handleStringChange(e)}
+													value={state.gpsInput} />
 											</div>}
 										{/* UnitId input*/}
 										<div style={formInputStyle}>
@@ -351,7 +411,6 @@ export default function EditMeterModalComponent(props: EditMeterModalComponentPr
 												name="unitId"
 												type='select'
 												onChange={e => handleStringChange(e)}>
-												value={state?.unitId}
 												{sortedPossibleMeterUnits.map(unit => {
 													return (<option value={unit.id} key={unit.id}>{unit.identifier}</option>)
 												})}
@@ -364,8 +423,6 @@ export default function EditMeterModalComponent(props: EditMeterModalComponentPr
 												name='defaultGraphicUnit'
 												type='select'
 												onChange={e => handleStringChange(e)}>
-												value={state.defaultGraphicUnit}
-												{/* defaultValue={state.defaultGraphicUnit} */}
 												{sortedPossibleGraphicUnits.map(unit => {
 													return (<option value={unit.id} key={unit.id}>{unit.identifier}</option>)
 												})}
@@ -403,7 +460,7 @@ export default function EditMeterModalComponent(props: EditMeterModalComponentPr
 												<Input
 													name='cumulativeReset'
 													type='select'
-													value={state?.cumulativeReset.toString()}
+													value={state.cumulativeReset.toString()}
 													onChange={e => handleBooleanChange(e)}>
 													{Object.keys(TrueFalseType).map(key => {
 														return (<option value={key} key={key}>{translate(`TrueFalseType.${key}`)}</option>)
@@ -418,7 +475,7 @@ export default function EditMeterModalComponent(props: EditMeterModalComponentPr
 													name='cumulativeResetStart'
 													type='text'
 													onChange={e => handleStringChange(e)}
-													value={state?.cumulativeResetStart}
+													value={state.cumulativeResetStart}
 													placeholder="HH:MM:SS" />
 											</div>}
 										{/* cumulativeResetEnd input*/}
@@ -477,7 +534,7 @@ export default function EditMeterModalComponent(props: EditMeterModalComponentPr
 												<Input
 													name="readingDuplication"
 													type="number"
-													onChange={e => handleReadingDuplicationChange(e)}
+													onChange={e => handleNumberChange(e)}
 													step="1"
 													min="1"
 													max="9"
@@ -491,9 +548,11 @@ export default function EditMeterModalComponent(props: EditMeterModalComponentPr
 													name='timeSort'
 													type='select'
 													value={state?.timeSort}
-													onChange={e => handleBooleanChange(e)}>
+													onChange={e => handleStringChange(e)}>
 													{Object.keys(MeterTimeSortType).map(key => {
-														return (<option value={key} key={key}>{translate(`${key}`)}</option>)
+														// This is a bit of a hack but it should work fine. The TypeSortTypes and MeterTimeSortType should be in sync.
+														// The translation is on the former so we use that enum name there but loop on the other to get the value desired.
+														return (<option value={key} key={key}>{translate(`TimeSortTypes.${key}`)}</option>)
 													})}
 												</Input>
 											</div>}
