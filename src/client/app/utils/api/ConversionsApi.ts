@@ -6,7 +6,6 @@
 
 import ApiBackend from './ApiBackend';
 import { ConversionData, ConversionEditData } from '../../types/redux/conversions';
-import { NamedIDItem } from '../../types/items';
 export default class ConversionsApi {
 	private readonly backend: ApiBackend;
 
