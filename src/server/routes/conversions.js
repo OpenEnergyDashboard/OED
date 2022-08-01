@@ -12,8 +12,7 @@ const router = express.Router();
 
 function formatConversionForResponse(item) {
 	return {
-		sourceId: item.sourceId, destinationId: item.destinationId, bidirectional: item.bidirectional, slope: item.slope, 
-		intercept: item.intercept, note: item.note, sourceDestination: String(item.sourceId + ">" + item.destinationId)
+		sourceId: item.sourceId, destinationId: item.destinationId, bidirectional: item.bidirectional, slope: item.slope, intercept: item.intercept, note: item.note
 	};
 }
 

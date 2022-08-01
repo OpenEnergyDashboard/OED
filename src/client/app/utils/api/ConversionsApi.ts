@@ -14,10 +14,6 @@ export default class ConversionsApi {
 		this.backend = backend;
 	}
 
-	public async details(): Promise<NamedIDItem[]> {
-		return await this.backend.doGetRequest<NamedIDItem[]>('/api/conversions');
-	}
-
 	public async edit(conversion: ConversionData): Promise<ConversionEditData> {
 		return await this.backend.doPostRequest<ConversionEditData>(
 			'/api/conversions/edit',
