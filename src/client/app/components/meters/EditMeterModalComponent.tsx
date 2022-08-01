@@ -37,10 +37,13 @@ function getGPSString (gps: GPSPoint | null) {
 		return '';
 	}
 	// if gps is an object parse GPSPoint and return string value
-	else {
+	else if (typeof gps === 'object') {
 		const json = JSON.stringify({gps});
 		const obj = JSON.parse(json);
 		return `${obj.gps.latitude}, ${obj.gps.longitude}`;
+	}
+	else {
+		return gps
 	}
 }
 
@@ -67,7 +70,6 @@ export default function EditMeterModalComponent(props: EditMeterModalComponentPr
 		url: props.meter.url,
 		timeZone: props.meter.timeZone,
 		gps: props.meter.gps,
-		gpsInput: getGPSString(props.meter.gps),
 		unitId: props.meter.unitId,
 		defaultGraphicUnit: props.meter.defaultGraphicUnit,
 		note: props.meter.note,
@@ -148,7 +150,6 @@ export default function EditMeterModalComponent(props: EditMeterModalComponentPr
 				props.meter.url != state.url ||
 				props.meter.timeZone != state.timeZone ||
 				props.meter.gps != state.gps ||
-				getGPSString(props.meter.gps) != state.gpsInput ||
 				props.meter.unitId != state.unitId ||
 				props.meter.defaultGraphicUnit != state.defaultGraphicUnit ||
 				props.meter.note != state.note ||
@@ -183,14 +184,13 @@ export default function EditMeterModalComponent(props: EditMeterModalComponentPr
 
 		// Check GPS entered.
 		// Validate GPS is okay and take from string to GPSPoint to submit.
-		const gpsInput: string = state.gpsInput;
+		const gpsInput: string = getGPSString(state.gps);
 		let gps: GPSPoint | null;
 		const latitudeIndex = 0;
 		const longitudeIndex = 1;
 		if (gpsInput.length === 0) {
 			// This is the value to route on an empty value which is stored as null in the DB.
 			gps = null;
-			state.gpsInput = getGPSString(gps);
 		} else if (isValidGPSInput(gpsInput)) {
 			const array = gpsInput.split(',').map((value: string) => parseFloat(value));
 			// It is valid and needs to be in this format for routing.
@@ -198,7 +198,6 @@ export default function EditMeterModalComponent(props: EditMeterModalComponentPr
 				longitude: array[longitudeIndex],
 				latitude: array[latitudeIndex]
 			};
-			state.gpsInput = getGPSString(gps);
 		} else {
 			// GPS not okay.
 			// TODO isValidGPSInput currently tops up an alert so not doing it here, may change
@@ -216,7 +215,7 @@ export default function EditMeterModalComponent(props: EditMeterModalComponentPr
 			submitState = { ...state, gps: gps };
 			// Submit new meter if checks where ok.
 			dispatch(submitEditedMeter(submitState));
-			resetState();
+
 			if (state.identifier === '') {
 				state.identifier = state.name;
 			}
@@ -399,10 +398,10 @@ export default function EditMeterModalComponent(props: EditMeterModalComponentPr
 											<div style={formInputStyle}>
 												<label><FormattedMessage id="meter.gps" /></label><br />
 												<Input
-													name='gpsInput'
+													name='gps'
 													type='text'
 													onChange={e => handleStringChange(e)}
-													value={state.gpsInput} />
+													value={getGPSString(state.gps)} />
 											</div>}
 										{/* UnitId input*/}
 										<div style={formInputStyle}>
