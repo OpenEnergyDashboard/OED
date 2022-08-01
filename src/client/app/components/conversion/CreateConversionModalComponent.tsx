@@ -144,7 +144,7 @@ export default function CreateConversionModalComponent(props: CreateConversionMo
 		display: 'inline-block',
 		fontSize: '60%',
 		// For now, it uses the same help text from conversion view page.
-		tooltipCreateConversionView: 'help.admin.conversionview'
+		tooltipCreateConversionView: 'help.admin.conversioncreate'
 	};
 
 	const formInputStyle: React.CSSProperties = {

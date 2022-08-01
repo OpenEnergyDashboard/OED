@@ -138,7 +138,7 @@ export default function EditConversionModalComponent(props: EditConversionModalC
 		display: 'inline-block',
 		fontSize: '60%',
 		// For now, it uses the same help text from conversion view page.
-		tooltipEditConversionView: 'help.admin.conversionview'
+		tooltipEditConversionView: 'help.admin.conversionedit'
 	};
 
 	const formInputStyle: React.CSSProperties = {

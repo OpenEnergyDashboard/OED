@@ -32,7 +32,14 @@ export default function ConversionViewComponent(props: ConversionViewComponentPr
 	}
 
 	// Create header from sourceId, destinationId identifiers
-	const header = String(props.units[props.conversion.sourceId].identifier + ' → ' + props.units[props.conversion.destinationId].identifier);
+	// Arrow is bidirectional if conversion is bidirection and one way if not.
+	let arrowShown: string;
+	if (props.conversion.bidirectional) {
+		arrowShown = ' ↔ ';
+	} else {
+		arrowShown = ' → ';
+	}
+	const header = String(props.units[props.conversion.sourceId].identifier + arrowShown + props.units[props.conversion.destinationId].identifier);
 
 	return (
 		<div className="card">
