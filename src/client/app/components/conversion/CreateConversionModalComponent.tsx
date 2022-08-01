@@ -252,15 +252,7 @@ export default function CreateConversionModalComponent(props: CreateConversionMo
 						<FormattedMessage id="discard.changes" />
 					</Button>
 					{/* On click calls the function handleSaveChanges in this component */}
-					<Button variant="primary" onClick={handleSubmit}
-						disabled={
-							!state.sourceId ||
-							!state.destinationId ||
-							!validConversion ||
-							// Conversion already exists. This should not happen.
-							(props.conversionsState.findIndex(conversionData => ((
-								conversionData.sourceId === state.sourceId) &&
-								conversionData.destinationId === state.destinationId))) !== -1}>
+					<Button variant="primary" onClick={handleSubmit} disabled={!state.sourceId || !state.destinationId || !validConversion}>
 						<FormattedMessage id="save.all" />
 					</Button>
 				</Modal.Footer>
