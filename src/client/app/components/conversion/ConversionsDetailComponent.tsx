@@ -60,7 +60,7 @@ export default function ConversionsDetailComponent() {
 						<TooltipMarkerComponent page='conversions' helpTextId={tooltipStyle.tooltipConversionView} />
 					</div>
 				</h2>
-				{loggedInAsAdmin &&
+				{loggedInAsAdmin && unitsStateLoaded &&
 					<div className="edit-btn">
 						<CreateConversionModalComponent
 							conversionsState = {conversionsState}
