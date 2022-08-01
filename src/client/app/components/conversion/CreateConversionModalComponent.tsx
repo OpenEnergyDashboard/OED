@@ -67,7 +67,7 @@ export default function CreateConversionModalComponent(props: CreateConversionMo
 
 	/* End State */
 
-	//Run update the valid conversion state any time the source id, destination id, or bidirectional status changes
+	//Update the valid conversion state any time the source id, destination id, or bidirectional status changes
 	useEffect(() => {
 		setValidConversion(isValidConversion(state.sourceId, state.destinationId, state.bidirectional));
 	}, [state.sourceId, state.destinationId, state.bidirectional]);
@@ -78,10 +78,10 @@ export default function CreateConversionModalComponent(props: CreateConversionMo
 	}
 
 	/**Checks if conversion is valid
-	 * @param sourceId ConversionData sourceId
-	 * @param destinationId ConversionData destinationId
-	 * @param bidirectional ConversionData bidirectional status
-	 * @returns Boolean representing if conversion is valid or not
+	 * @param sourceId New conversion sourceId
+	 * @param destinationId New conversion destinationId
+	 * @param bidirectional New conversion bidirectional status
+	 * @returns Boolean representing if new conversion is valid or not
 	 */
 	const isValidConversion = (sourceId: number, destinationId: number, bidirectional: boolean) => {
 		/*
