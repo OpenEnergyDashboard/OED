@@ -31,6 +31,8 @@ export default function ConversionsDetailComponent() {
 
 	// Units state
 	const unitsState = useSelector((state: State) => state.units.units);
+	// Check if the units state is fully loaded
+	const unitsStateLoaded = Object.keys(unitsState).length > 0;
 
 	// Check for admin status
 	const currentUser = useSelector((state: State) => state.currentUser.profile);
@@ -65,8 +67,8 @@ export default function ConversionsDetailComponent() {
 							unitsState = {unitsState}/>
 					</div>}
 				<div className="card-container">
-					{/* Create a ConversionViewComponent for each ConversionData in Conversions State after sorting by identifier */}
-					{Object.values(conversionsState)
+					{/* Attempt to create a ConversionViewComponent for each ConversionData in Conversions State after sorting by identifier */}
+					{unitsStateLoaded && Object.values(conversionsState)
 						.sort((conversionA: ConversionData, conversionB: ConversionData) =>
 							((unitsState[conversionA.sourceId].identifier + unitsState[conversionA.destinationId].identifier).toLowerCase() >
 							(unitsState[conversionB.sourceId].identifier + unitsState[conversionB.destinationId].identifier).toLowerCase()) ? 1 :
