@@ -10,7 +10,7 @@ import '../../styles/Modal.conversion.css';
 import { TrueFalseType } from '../../types/items';
 import { useDispatch } from 'react-redux';
 import { addConversion } from '../../actions/conversions';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import TooltipMarkerComponent from '../TooltipMarkerComponent';
 import TooltipHelpContainer from '../../containers/TooltipHelpContainer';
 import { UnitDataById } from 'types/redux/units';
@@ -32,7 +32,7 @@ export default function CreateConversionModalComponent(props: CreateConversionMo
 		// in order to ensure that we are not setting invalid or incorrect unit IDs for source and destination.
 		sourceId: props.unitsState[1].id,       // Set default to ID of first unit in state.
 		destinationId: props.unitsState[1].id,  // Set default to ID of first unit in state.
-		bidirectional: false,
+		bidirectional: true,
 		slope: 0,
 		intercept: 0,
 		note: ''
@@ -61,12 +61,70 @@ export default function CreateConversionModalComponent(props: CreateConversionMo
 	const handleNumberChange = (e: React.ChangeEvent<HTMLInputElement>) => {
 		setState({ ...state, [e.target.name]: Number(e.target.value) });
 	}
+
+	// If the currently selected conversion is valid
+	const [validConversion, setValidConversion] = useState(false);
+
 	/* End State */
+
+	//Run update the valid conversion state any time the source id, destination id, or bidirectional status changes
+	useEffect(() => {
+		setValidConversion(isValidConversion(state.sourceId, state.destinationId, state.bidirectional));
+	}, [state.sourceId, state.destinationId, state.bidirectional]);
 
 	// Reset the state to default values
 	const resetState = () => {
 		setState(defaultValues);
 	}
+
+	/**Checks if conversion is valid
+	 * @param sourceId ConversionData sourceId
+	 * @param destinationId ConversionData destinationId
+	 * @param bidirectional ConversionData bidirectional status
+	 * @returns Boolean representing if conversion is valid or not
+	 */
+	const isValidConversion = (sourceId: number, destinationId: number, bidirectional: boolean) => {
+		/*
+			Source equals destination: invalid conversion
+			Conversion exists: invalid conversion
+			Conversion does not exist:
+				Inverse exists:
+					Conversion is bidirectional: invalid conversion */
+
+		// Source equals destination: invalid conversion
+		if (sourceId === destinationId) {return false}
+
+		// Conversion already exists
+		if ((props.conversionsState.findIndex(conversionData => ((
+			conversionData.sourceId === state.sourceId) &&
+			conversionData.destinationId === state.destinationId))) !== -1) {
+			return false;
+		}
+
+		let isValidConversion = true;
+		// Loop over conversions and check for existence of inverse of conversion passed in
+		// If there exists an inverse that is bidirectional, then there is no point in making a conversion since it is essentially a duplicate.
+		// If there is a non bidirectional inverese, then it is a valid conversion
+		Object.values(props.conversionsState).forEach(conversion => {
+			// Inverse exists
+			if ((conversion.sourceId === destinationId) && (conversion.destinationId === sourceId)) {
+				// Inverse is bidirectional
+				if (conversion.bidirectional) {
+					isValidConversion = false;
+				}
+				// Inverse is not bidirectional
+				else {
+					// Do not allow for a bidirectional conversion with an inverse that is not bidirectional
+					if (bidirectional) {
+						// The new conversion is bidirectional
+						isValidConversion = false;
+					}
+				}
+			}
+		});
+		return isValidConversion;
+	}
+
 
 	// Unlike edit, we decided to discard and inputs when you choose to leave the page. The reasoning is
 	// that create starts from an empty template.
@@ -195,10 +253,14 @@ export default function CreateConversionModalComponent(props: CreateConversionMo
 					</Button>
 					{/* On click calls the function handleSaveChanges in this component */}
 					<Button variant="primary" onClick={handleSubmit}
-						disabled={!state.sourceId || !state.destinationId || state.sourceId === state.destinationId ||
-						(props.conversionsState.findIndex(conversionData => ((
-							conversionData.sourceId === state.sourceId) &&
-							conversionData.destinationId === state.destinationId))) !== -1}>
+						disabled={
+							!state.sourceId ||
+							!state.destinationId ||
+							!validConversion ||
+							// Conversion already exists. This should not happen.
+							(props.conversionsState.findIndex(conversionData => ((
+								conversionData.sourceId === state.sourceId) &&
+								conversionData.destinationId === state.destinationId))) !== -1}>
 						<FormattedMessage id="save.all" />
 					</Button>
 				</Modal.Footer>
