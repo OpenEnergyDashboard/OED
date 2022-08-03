@@ -30,8 +30,8 @@ export default function CreateConversionModalComponent(props: CreateConversionMo
 		// The first unit in the unit state will be the default value in the dropdown menu for sourceId and destinationId.
 		// Since not changing the value doesn't call event handler, we must set the default ID values to this first unit
 		// in order to ensure that we are not setting invalid or incorrect unit IDs for source and destination.
-		sourceId: props.unitsState[1].id,       // Set default to ID of first unit in state.
-		destinationId: props.unitsState[1].id,  // Set default to ID of first unit in state.
+		sourceId: Object.values(props.unitsState)[0],       // Set default to ID of first unit in state.
+		destinationId: Object.values(props.unitsState)[0],  // Set default to ID of first unit in state.
 		bidirectional: true,
 		slope: 0,
 		intercept: 0,
