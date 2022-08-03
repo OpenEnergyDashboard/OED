@@ -189,8 +189,9 @@ export default function CreateConversionModalComponent(props: CreateConversionMo
 												value={-999}
 												key={-999}
 												selected={state.sourceId === -999}
+												hidden={state.sourceId !== -999}
 												disabled>
-													Select a source unit
+													Select a source unit...
 											</option>}
 											{Object.values(props.unitsState).map(unitData => {
 												return (<option value={unitData.id} key={unitData.id}>{unitData.identifier}</option>)
@@ -208,8 +209,9 @@ export default function CreateConversionModalComponent(props: CreateConversionMo
 												value={-999}
 												key={-999}
 												selected={state.destinationId === -999}
+												hidden={state.destinationId !== -999}
 												disabled>
-													Select a destination unit
+													Select a destination unit...
 											</option>}
 											{Object.values(props.unitsState).map(unitData => {
 												return (<option value={unitData.id} key={unitData.id}>{unitData.identifier}</option>)
