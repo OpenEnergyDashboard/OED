@@ -30,19 +30,20 @@ function notifyUser(msg: string) {
 	window.alert(msg);
 }
 
-// get string value from GPSPoint
-function getGPSString (gps: GPSPoint | null) {
-	//  if gps is null return empty string value
+// get string value from GPSPoint or null.
+function getGPSString(gps: GPSPoint | null) {
 	if (gps === null) {
+		//  if gps is null return empty string value
 		return '';
 	}
-	// if gps is an object parse GPSPoint and return string value
 	else if (typeof gps === 'object') {
-		const json = JSON.stringify({gps});
+		// if gps is an object parse GPSPoint and return string value
+		const json = JSON.stringify({ gps });
 		const obj = JSON.parse(json);
 		return `${obj.gps.latitude}, ${obj.gps.longitude}`;
 	}
 	else {
+		// Assume it is a string that was input.
 		return gps
 	}
 }
@@ -209,17 +210,20 @@ export default function EditMeterModalComponent(props: EditMeterModalComponentPr
 			gps = null;
 		}
 
-		if (inputOk && meterHasChanges) {
-			// GPS was updated so create updated state to submit.
-			// TODO need to type submitState?
-			submitState = { ...state, gps: gps };
-			// Submit new meter if checks where ok.
-			dispatch(submitEditedMeter(submitState));
+		if (inputOk) {
+			// The input passed validation but only store if there are changes.
+			if (meterHasChanges) {
+				// GPS was updated so create updated state to submit.
+				// TODO need to type submitState?
+				submitState = { ...state, gps: gps };
+				// Submit new meter if checks where ok.
+				dispatch(submitEditedMeter(submitState));
 
-			if (state.identifier === '') {
-				state.identifier = state.name;
+				if (state.identifier === '') {
+					state.identifier = state.name;
+				}
+				dispatch(removeUnsavedChanges());
 			}
-			dispatch(removeUnsavedChanges());
 		} else {
 			// Tell user that not going to update due to input issues.
 			notifyUser(translate('meter.input.error'));
@@ -235,7 +239,7 @@ export default function EditMeterModalComponent(props: EditMeterModalComponentPr
 	const units = useSelector((state: State) => state.units.units);
 	// A non-unit
 	const noUnit: UnitData = {
-	// Only needs the id and identifier, others are dummy values.
+		// Only needs the id and identifier, others are dummy values.
 		id: -99,
 		name: '',
 		identifier: 'no unit',
