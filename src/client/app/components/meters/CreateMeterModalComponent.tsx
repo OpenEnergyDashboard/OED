@@ -268,16 +268,29 @@ export default function CreateMeterModalComponent() {
 													onChange={e => handleStringChange(e)}
 													required value={state.name} />
 											</div>}
-										{/* Area input*/}
+										{/* UnitId input*/}
 										<div style={formInputStyle}>
-											<label><FormattedMessage id="meter.area" /></label><br />
+											<label><FormattedMessage id="meter.unitName" /></label><br />
 											<Input
-												name="area"
-												type="number"
-												step="0.01"
-												min="0"
-												value={state.area}
-												onChange={e => handleNumberChange(e)} />
+												name="unitId"
+												type='select'
+												onChange={e => handleStringChange(e)}>
+												{sortedPossibleMeterUnits.map(unit => {
+													return (<option value={unit.id} key={unit.id}>{unit.identifier}</option>)
+												})}
+											</Input>
+										</div>
+										{/* default graphic unit input */}
+										<div style={formInputStyle}>
+											<label><FormattedMessage id="meter.defaultGraphicUnit" /></label><br />
+											<Input
+												name='defaultGraphicUnit'
+												type='select'
+												onChange={e => handleStringChange(e)}>
+												{sortedPossibleGraphicUnits.map(unit => {
+													return (<option value={unit.id} key={unit.id}>{unit.identifier}</option>)
+												})}
+											</Input>
 										</div>
 										{/* Enabled input*/}
 										<div style={formInputStyle}>
@@ -334,13 +347,17 @@ export default function CreateMeterModalComponent() {
 													onChange={e => handleStringChange(e)}
 													value={state.url} />
 											</div>}
-										{/* Timezone input*/}
-										{loggedInAsAdmin &&
-											<div style={formInputStyle}>
-												<label><FormattedMessage id="meter.time.zone" /></label><br />
-												{/* TODO This is not correctly choosing the default not timezone choice */}
-												<TimeZoneSelect current={state.timeZone} handleClick={timeZone => handleTimeZoneChange(timeZone)} />
-											</div>}
+										{/* Area input*/}
+										<div style={formInputStyle}>
+											<label><FormattedMessage id="meter.area" /></label><br />
+											<Input
+												name="area"
+												type="number"
+												step="0.01"
+												min="0"
+												value={state.area}
+												onChange={e => handleNumberChange(e)} />
+										</div>
 										{/* GPS input*/}
 										{loggedInAsAdmin &&
 											<div style={formInputStyle}>
@@ -353,30 +370,6 @@ export default function CreateMeterModalComponent() {
 													onChange={e => handleStringChange(e)}
 													value={state.gps} />
 											</div>}
-										{/* UnitId input*/}
-										<div style={formInputStyle}>
-											<label><FormattedMessage id="meter.unitName" /></label><br />
-											<Input
-												name="unitId"
-												type='select'
-												onChange={e => handleStringChange(e)}>
-												{sortedPossibleMeterUnits.map(unit => {
-													return (<option value={unit.id} key={unit.id}>{unit.identifier}</option>)
-												})}
-											</Input>
-										</div>
-										{/* default graphic unit input */}
-										<div style={formInputStyle}>
-											<label><FormattedMessage id="meter.defaultGraphicUnit" /></label><br />
-											<Input
-												name='defaultGraphicUnit'
-												type='select'
-												onChange={e => handleStringChange(e)}>
-												{sortedPossibleGraphicUnits.map(unit => {
-													return (<option value={unit.id} key={unit.id}>{unit.identifier}</option>)
-												})}
-											</Input>
-										</div>
 										{/* note input*/}
 										{loggedInAsAdmin &&
 											<div style={formInputStyle}>
@@ -504,6 +497,13 @@ export default function CreateMeterModalComponent() {
 														return (<option value={key} key={key}>{translate(`TimeSortTypes.${key}`)}</option>)
 													})}
 												</Input>
+											</div>}
+										{/* Timezone input*/}
+										{loggedInAsAdmin &&
+											<div style={formInputStyle}>
+												<label><FormattedMessage id="meter.time.zone" /></label><br />
+												{/* TODO This is not correctly choosing the default not timezone choice */}
+												<TimeZoneSelect current={state.timeZone} handleClick={timeZone => handleTimeZoneChange(timeZone)} />
 											</div>}
 										{/* reading input*/}
 										{loggedInAsAdmin &&
