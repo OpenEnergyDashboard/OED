@@ -48,6 +48,17 @@ function getGPSString(gps: GPSPoint | null) {
 	}
 }
 
+// Checks if the input is null and returns empty string if that is the case. Otherwise return input.
+// This is needed because React does not want values to be of type null for display and null is the
+// state for some of the meter values. This only should change what is displayed and not the state or props.
+function nullToEmptyString(item: any) {
+	if (item === null) {
+		return '';
+	} else {
+		return item;
+	}
+}
+
 interface EditMeterModalComponentProps {
 	show: boolean;
 	meter: MeterData;
@@ -188,27 +199,28 @@ export default function EditMeterModalComponent(props: EditMeterModalComponentPr
 			// Check GPS entered.
 			// Validate GPS is okay and take from string to GPSPoint to submit.
 			const gpsInput = state.gps;
-			let gps: GPSPoint | null;
+			let gps: GPSPoint | null = null;
 			const latitudeIndex = 0;
 			const longitudeIndex = 1;
 			// If the user input a value then gpsInput should be a string.
-			if (typeof gpsInput === 'string' && isValidGPSInput(gpsInput)) {
-				// Clearly gpsInput is a string but TS complains about the split so cast.
-				const array = (gpsInput as string).split(',').map((value: string) => parseFloat(value));
-				// It is valid and needs to be in this format for routing.
-				gps = {
-					longitude: array[longitudeIndex],
-					latitude: array[latitudeIndex]
-				};
-			} else {
-				// GPS not okay.
-				// TODO isValidGPSInput currently tops up an alert so not doing it here, may change
-				// so leaving code commented out.
-				// notifyUser(translate('input.gps.range') + state.gps + '.');
-				inputOk = false;
-				// TypeScript does not figure out that gps is not used in this case so reports
-				// an error. Set value to avoid.
-				gps = null;
+			// null came from the DB and it is okay to just leave it - Not a string.
+			if (typeof gpsInput === 'string') {
+				if (isValidGPSInput(gpsInput)) {
+					// Clearly gpsInput is a string but TS complains about the split so cast.
+					const array = (gpsInput as string).split(',').map((value: string) => parseFloat(value));
+					// It is valid and needs to be in this format for routing.
+					gps = {
+						longitude: array[longitudeIndex],
+						latitude: array[latitudeIndex]
+					};
+					// gpsInput must be of type string but TS does not think so so cast.
+				} else if ((gpsInput as string).length !== 0) {
+					// GPS not okay.
+					// TODO isValidGPSInput currently tops up an alert so not doing it here, may change
+					// so leaving code commented out.
+					// notifyUser(translate('input.gps.range') + state.gps + '.');
+					inputOk = false;
+				}
 			}
 
 			if (inputOk) {
@@ -401,7 +413,8 @@ export default function EditMeterModalComponent(props: EditMeterModalComponentPr
 													name='url'
 													type='text'
 													onChange={e => handleStringChange(e)}
-													value={state.url} />
+													// value={state.url} />
+													value={nullToEmptyString(state.url)} />
 											</div>}
 										{/* Area input*/}
 										<div style={formInputStyle}>
@@ -411,7 +424,8 @@ export default function EditMeterModalComponent(props: EditMeterModalComponentPr
 												type="number"
 												step="0.01"
 												min="0"
-												value={state.area}
+												// value={state.area}
+												value={nullToEmptyString(state.area)}
 												onChange={e => handleNumberChange(e)} />
 										</div>
 										{/* GPS input*/}
@@ -432,7 +446,7 @@ export default function EditMeterModalComponent(props: EditMeterModalComponentPr
 													name='note'
 													type='textarea'
 													onChange={e => handleStringChange(e)}
-													value={state?.note}
+													value={nullToEmptyString(state.note)}
 													placeholder='Note' />
 											</div>}
 										{/* cumulative input*/}

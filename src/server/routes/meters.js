@@ -13,6 +13,7 @@ const requiredAdmin = require('./authenticator').adminAuthMiddleware;
 const optionalAuthenticator = require('./authenticator').optionalAuthMiddleware;
 const Point = require('../models/Point');
 const moment = require('moment');
+const { MeterTimeSortTypesJS } = require('../services/csvPipeline/validateCsvUploadParams');
 
 const router = express.Router();
 router.use(optionalAuthenticator);
@@ -145,12 +146,26 @@ router.get('/:meter_id', async (req, res) => {
 router.post('/edit', requiredAdmin('edit meters'), async (req, res) => {
 	const validParams = {
 		type: 'object',
-		maxProperties: 6,
-		required: ['id', 'enabled', 'displayable', 'timeZone'],
+		maxProperties: 25,
+		required: ['id', 'name', 'url', 'enabled', 'displayable', 'meterType', 'timeZone', 'gps', 'identifier', 'note',
+			'area', 'cumulative', 'cumulativeReset', 'cumulativeResetStart', 'cumulativeResetEnd', 'readingGap',
+			'readingVariation', 'readingDuplication', 'timeSort', 'endOnlyTime', 'reading', 'startTimestamp',
+			'endTimestamp', 'unitId', 'defaultGraphicUnit'],
 		properties: {
 			id: { type: 'integer' },
+			name: { type: 'string' },
+			url: {
+				oneOf: [
+					{ type: 'string' },
+					{ type: 'null' }
+				]
+			},
 			enabled: { type: 'bool' },
 			displayable: { type: 'bool' },
+			meterType: {
+				type: 'string',
+				enum: Object.values(Meter.type)
+			},
 			timeZone: {
 				oneOf: [
 					{ type: 'string' },
@@ -175,9 +190,28 @@ router.post('/edit', requiredAdmin('edit meters'), async (req, res) => {
 					{ type: 'string' },
 					{ type: 'null' }
 				]
-			}
+			},
+			note: { type: 'string' },
+			area: { type: 'number', minimum: 0, },
+			cumulative: { type: 'bool' },
+			cumulativeReset: { type: 'bool' },
+			cumulativeResetStart: { type: 'string' },
+			cumulativeResetEnd: { type: 'string' },
+			readingGap: { type: 'number' },
+			readingVariation: { type: 'number' },
+			readingDuplication: { type: 'integer', minimum: '1', maximum: '9' },
+			timeSort: {
+				type: 'string',
+				enum: Object.values(MeterTimeSortTypesJS)
+			},
+			endOnlyTime: { type: 'bool' },
+			reading: { type: 'number' },
+			startTimestamp: { type: 'string' },
+			endTimestamp: { type: 'string' },
+			unitId: { type: 'integer' },
+			defaultGraphicUnit: { type: 'integer' }
 		}
-	};
+	}
 
 	const validatorResult = validate(req.body, validParams);
 	if (!validatorResult.valid) {
@@ -187,11 +221,30 @@ router.post('/edit', requiredAdmin('edit meters'), async (req, res) => {
 		const conn = getConnection();
 		try {
 			const meter = await Meter.getByID(req.body.id, conn);
+			meter.name = req.body.name;
+			meter.url = req.body.url;
 			meter.enabled = req.body.enabled;
 			meter.displayable = req.body.displayable;
+			meter.type = req.body.meterType;
 			meter.meterTimezone = req.body.timeZone;
 			meter.gps = (req.body.gps) ? new Point(req.body.gps.longitude, req.body.gps.latitude) : null;
 			meter.identifier = req.body.identifier;
+			meter.note = req.body.note;
+			meter.area = req.body.area;
+			meter.cumulative = req.body.cumulative;
+			meter.cumulativeReset = req.body.cumulativeReset;
+			meter.cumulativeResetStart = req.body.cumulativeResetStart;
+			meter.cumulativeResetEnd = req.body.cumulativeResetEnd;
+			meter.readingGap = req.body.readingGap;
+			meter.readingVariation = req.body.readingVariation;
+			meter.readingDuplication = req.body.readingDuplication;
+			meter.timeSort = req.body.timeSort;
+			meter.endOnlyTime = req.body.endOnlyTime;
+			meter.reading = req.body.reading;
+			meter.startTimestamp = req.body.startTimestamp;
+			meter.endTimestamp = req.body.endTimestamp;
+			meter.unitId = req.body.unitId;
+			meter.defaultGraphicUnit = req.body.defaultGraphicUnit;
 			await meter.update(conn);
 		} catch (err) {
 			log.error('Failed to edit meter', err);
