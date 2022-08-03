@@ -26,10 +26,6 @@ export default function CreateConversionModalComponent(props: CreateConversionMo
 	const dispatch = useDispatch();
 
 	const defaultValues = {
-		// Gets first unit ID from all units in the unit state. The first index of units in unit state = 1, not 0.
-		// The first unit in the unit state will be the default value in the dropdown menu for sourceId and destinationId.
-		// Since not changing the value doesn't call event handler, we must set the default ID values to this first unit
-		// in order to ensure that we are not setting invalid or incorrect unit IDs for source and destination.
 		// Invalid source/destination ids arbitrarily set to -999.
 		sourceId: -999,
 		destinationId: -999,
