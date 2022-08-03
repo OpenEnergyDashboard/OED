@@ -275,6 +275,14 @@ export default function CreateMeterModalComponent() {
 												name="unitId"
 												type='select'
 												onChange={e => handleStringChange(e)}>
+												{<option
+													value={-99}
+													key={-99}
+													selected={state.unitId === -99}
+													hidden={state.unitId !== -99}
+													disabled>
+														Select a unit...
+												</option>}
 												{sortedPossibleMeterUnits.map(unit => {
 													return (<option value={unit.id} key={unit.id}>{unit.identifier}</option>)
 												})}
@@ -287,6 +295,14 @@ export default function CreateMeterModalComponent() {
 												name='defaultGraphicUnit'
 												type='select'
 												onChange={e => handleStringChange(e)}>
+												{<option
+													value={-99}
+													key={-99}
+													selected={state.defaultGraphicUnit === -99}
+													hidden={state.defaultGraphicUnit !== -99}
+													disabled>
+														Select a default graphic unit...
+												</option>}
 												{sortedPossibleGraphicUnits.map(unit => {
 													return (<option value={unit.id} key={unit.id}>{unit.identifier}</option>)
 												})}
