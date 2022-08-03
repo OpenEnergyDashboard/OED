@@ -168,51 +168,51 @@ export default function EditMeterModalComponent(props: EditMeterModalComponentPr
 				props.meter.endTimestamp != state.endTimestamp
 			);
 
-		// Check area is positive.
-		// TODO For now allow zero so works with default value and DB. We should probably
-		// make this better default than 0 (DB set to not null now).
-		// if (state.area <= 0) {
-		if (state.area < 0) {
-			notifyUser(translate('area.invalid') + state.area + '.');
-			inputOk = false;
-		}
+		// Only validate and store if any changes.
+		if (meterHasChanges) {
+			// Check area is positive.
+			// TODO For now allow zero so works with default value and DB. We should probably
+			// make this better default than 0 (DB set to not null now).
+			// if (state.area <= 0) {
+			if (state.area < 0) {
+				notifyUser(translate('area.invalid') + state.area + '.');
+				inputOk = false;
+			}
 
-		// Check reading duplication is between 1 and 9.
-		if (state.readingDuplication < 1 || state.readingDuplication > 9) {
-			notifyUser(translate('duplication.invalid') + state.area + '.');
-			inputOk = false;
-		}
+			// Check reading duplication is between 1 and 9.
+			if (state.readingDuplication < 1 || state.readingDuplication > 9) {
+				notifyUser(translate('duplication.invalid') + state.area + '.');
+				inputOk = false;
+			}
 
-		// Check GPS entered.
-		// Validate GPS is okay and take from string to GPSPoint to submit.
-		const gpsInput: string = getGPSString(state.gps);
-		let gps: GPSPoint | null;
-		const latitudeIndex = 0;
-		const longitudeIndex = 1;
-		if (gpsInput.length === 0) {
-			// This is the value to route on an empty value which is stored as null in the DB.
-			gps = null;
-		} else if (isValidGPSInput(gpsInput)) {
-			const array = gpsInput.split(',').map((value: string) => parseFloat(value));
-			// It is valid and needs to be in this format for routing.
-			gps = {
-				longitude: array[longitudeIndex],
-				latitude: array[latitudeIndex]
-			};
-		} else {
-			// GPS not okay.
-			// TODO isValidGPSInput currently tops up an alert so not doing it here, may change
-			// so leaving code commented out.
-			// notifyUser(translate('input.gps.range') + state.gps + '.');
-			inputOk = false;
-			// TypeScript does not figure out that gps is not used in this case so reports
-			// an error. Set value to avoid.
-			gps = null;
-		}
+			// Check GPS entered.
+			// Validate GPS is okay and take from string to GPSPoint to submit.
+			const gpsInput = state.gps;
+			let gps: GPSPoint | null;
+			const latitudeIndex = 0;
+			const longitudeIndex = 1;
+			// If the user input a value then gpsInput should be a string.
+			if (typeof gpsInput === 'string' && isValidGPSInput(gpsInput)) {
+				// Clearly gpsInput is a string but TS complains about the split so cast.
+				const array = (gpsInput as string).split(',').map((value: string) => parseFloat(value));
+				// It is valid and needs to be in this format for routing.
+				gps = {
+					longitude: array[longitudeIndex],
+					latitude: array[latitudeIndex]
+				};
+			} else {
+				// GPS not okay.
+				// TODO isValidGPSInput currently tops up an alert so not doing it here, may change
+				// so leaving code commented out.
+				// notifyUser(translate('input.gps.range') + state.gps + '.');
+				inputOk = false;
+				// TypeScript does not figure out that gps is not used in this case so reports
+				// an error. Set value to avoid.
+				gps = null;
+			}
 
-		if (inputOk) {
-			// The input passed validation but only store if there are changes.
-			if (meterHasChanges) {
+			if (inputOk) {
+				// The input passed validation but only store if there are changes.
 				// GPS was updated so create updated state to submit.
 				// TODO need to type submitState?
 				submitState = { ...state, gps: gps };
@@ -223,10 +223,10 @@ export default function EditMeterModalComponent(props: EditMeterModalComponentPr
 					state.identifier = state.name;
 				}
 				dispatch(removeUnsavedChanges());
+			} else {
+				// Tell user that not going to update due to input issues.
+				notifyUser(translate('meter.input.error'));
 			}
-		} else {
-			// Tell user that not going to update due to input issues.
-			notifyUser(translate('meter.input.error'));
 		}
 	};
 
