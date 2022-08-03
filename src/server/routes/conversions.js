@@ -143,7 +143,7 @@ router.post('/addConversion', async (req, res) => {
 });
 
 /**
- * Route for POST, edlete conversion.
+ * Route for POST, delete conversion.
  */
 router.post('/delete', async (req, res) => {
 	// Only require a source and destination id
