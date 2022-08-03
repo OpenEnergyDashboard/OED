@@ -31,8 +31,9 @@ export default function ConversionsDetailComponent() {
 
 	// Units state
 	const unitsState = useSelector((state: State) => state.units.units);
+	const unitsFetchedOnce = useSelector((state: State) => state.units.hasBeenFetchedOnce);
 	// Check if the units state is fully loaded
-	const unitsStateLoaded = Object.keys(unitsState).length > 0;
+	const unitsStateLoaded = unitsFetchedOnce && Object.keys(unitsState).length > 0;
 
 	// Check for admin status
 	const currentUser = useSelector((state: State) => state.currentUser.profile);
