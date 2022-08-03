@@ -94,10 +94,16 @@ router.post('/addConversion', async (req, res) => {
 		required: ['sourceId', 'destinationId'],
 		properties: {
 			sourceId: {
-				type: 'number'
+				type: 'number',
+				// Do not allow negatives for now
+				// This may need to be updated if -99 is allowed at some point
+				minimum: 0
 			},
 			destinationId: {
-				type: 'number'
+				type: 'number',
+				// Do not allow negatives for now
+				// This may need to be updated if -99 is allowed at some point
+				minimum: 0
 			},
 			bidirectional: {
 				type: 'boolean'

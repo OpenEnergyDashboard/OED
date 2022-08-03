@@ -30,9 +30,9 @@ export default function CreateConversionModalComponent(props: CreateConversionMo
 		// The first unit in the unit state will be the default value in the dropdown menu for sourceId and destinationId.
 		// Since not changing the value doesn't call event handler, we must set the default ID values to this first unit
 		// in order to ensure that we are not setting invalid or incorrect unit IDs for source and destination.
-		// TODO We really want to not select a value for units when creating. Try to figure out way to do this.
-		sourceId: Object.values(props.unitsState)[0],       // Set default to ID of first unit in state.
-		destinationId: Object.values(props.unitsState)[0],  // Set default to ID of first unit in state.
+		// Invalid source/destination ids arbitrarily set to -999.
+		sourceId: -999,
+		destinationId: -999,
 		bidirectional: true,
 		slope: 0,
 		intercept: 0,
@@ -91,6 +91,9 @@ export default function CreateConversionModalComponent(props: CreateConversionMo
 			Conversion does not exist:
 				Inverse exists:
 					Conversion is bidirectional: invalid conversion */
+
+		// Source or destination not set
+		if (sourceId === -999 || destinationId === -999) { return false }
 
 		// Source equals destination: invalid conversion
 		if (sourceId === destinationId) {return false}
@@ -186,6 +189,13 @@ export default function CreateConversionModalComponent(props: CreateConversionMo
 											name='sourceId'
 											type='select'
 											onChange={e => handleNumberChange(e)}>
+											{<option
+												value={-999}
+												key={-999}
+												selected={state.sourceId === -999}
+												disabled>
+													Select a source unit
+											</option>}
 											{Object.values(props.unitsState).map(unitData => {
 												return (<option value={unitData.id} key={unitData.id}>{unitData.identifier}</option>)
 											})}
@@ -198,6 +208,13 @@ export default function CreateConversionModalComponent(props: CreateConversionMo
 											name='destinationId'
 											type='select'
 											onChange={e => handleNumberChange(e)}>
+											{<option
+												value={-999}
+												key={-999}
+												selected={state.destinationId === -999}
+												disabled>
+													Select a destination unit
+											</option>}
 											{Object.values(props.unitsState).map(unitData => {
 												return (<option value={unitData.id} key={unitData.id}>{unitData.identifier}</option>)
 											})}
@@ -253,7 +270,7 @@ export default function CreateConversionModalComponent(props: CreateConversionMo
 						<FormattedMessage id="discard.changes" />
 					</Button>
 					{/* On click calls the function handleSaveChanges in this component */}
-					<Button variant="primary" onClick={handleSubmit} disabled={!state.sourceId || !state.destinationId || !validConversion}>
+					<Button variant="primary" onClick={handleSubmit} disabled={!validConversion}>
 						<FormattedMessage id="save.all" />
 					</Button>
 				</Modal.Footer>
