@@ -1,6 +1,6 @@
 /* This Source Code Form is subject to the terms of the Mozilla Public
- * License, v. 2.0. If a copy of the MPL was not distributed with this
- * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
+* License, v. 2.0. If a copy of the MPL was not distributed with this
+* file, You can obtain one at http://mozilla.org/MPL/2.0/. */
 
 import * as React from 'react';
 import { Link } from 'react-router-dom';
@@ -33,6 +33,7 @@ export default class HeaderButtonsComponent extends React.Component<HeaderButton
 		this.handleLogOut = this.handleLogOut.bind(this);
 	}
 
+	// TODO: Consider removing the getPage() !=== (currentPage) so nav bar is consistent across all pages.
 	public render() {
 		const role = this.props.role;
 		const loggedInAsAdmin = this.props.loggedInAsAdmin;
@@ -45,6 +46,7 @@ export default class HeaderButtonsComponent extends React.Component<HeaderButton
 		const renderMapsButton = loggedInAsAdmin && getPage() !== 'maps';
 		const renderCSVButton = role && hasPermissions(role, UserRole.CSV) && getPage() !== 'csv';
 		const renderUnitsButton = loggedInAsAdmin && getPage() !== 'units';
+		const renderConversionsButton = loggedInAsAdmin && getPage() !== 'conversions';
 		const renderLogoutButton = hasToken();
 
 		const loginLinkStyle: React.CSSProperties = {
@@ -78,6 +80,10 @@ export default class HeaderButtonsComponent extends React.Component<HeaderButton
 			display: renderUnitsButton ? 'inline' : 'none',
 			paddingLeft: '5px'
 		};
+		const conversionsLinkStyle: React.CSSProperties = {
+			display: renderConversionsButton ? 'inline' : 'none',
+			paddingLeft: '5px'
+		};
 		const logoutButtonStyle: React.CSSProperties = {
 			display: renderLogoutButton ? 'inline' : 'none',
 			paddingLeft: '5px'
@@ -104,6 +110,7 @@ export default class HeaderButtonsComponent extends React.Component<HeaderButton
 					<Link style={homeLinkStyle} to='/'><Button outline><FormattedMessage id='home'/></Button></Link>
 					<Link style={loginLinkStyle} to='/login'><Button outline><FormattedMessage id='log.in'/></Button></Link>
 					<Link style={unitsLinkStyle} to='/units'><Button outline><FormattedMessage id='units' /></Button></Link>
+					<Link style={conversionsLinkStyle} to='/conversions'><Button outline><FormattedMessage id='conversions' /></Button></Link>
 					<Link style={logoutButtonStyle} to='/'><Button outline onClick={this.handleLogOut}><FormattedMessage id='log.out'/></Button></Link>
 				</div>
 			</div>

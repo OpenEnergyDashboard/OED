@@ -37,6 +37,9 @@ export default class TooltipHelpComponent extends React.Component<TooltipHelpPro
 		// const BASE_URL = `https://xxx.github.io/OpenEnergyDashboard.github.io/help/${version}`;
 
 		const helpLinks: Record<string, Record<string, string>> = {
+			'help.admin.conversioncreate': { link: `${BASE_URL}/adminConversionCreating.html` },
+			'help.admin.conversionedit': { link: `${BASE_URL}/adminConversionEditing.html` },
+			'help.admin.conversionview': { link: `${BASE_URL}/adminConversionViewing.html` },
 			'help.admin.groupview': { link: `${BASE_URL}/adminGroupViewing.html` },
 			'help.admin.header': { link: `${BASE_URL}/adminPreferences.html` },
 			'help.admin.mapview': { link: `${BASE_URL}/adminMap.html` },

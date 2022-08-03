@@ -16,6 +16,7 @@ import { Dispatch } from '../types/redux/actions';
 import {fetchMapsDetails} from '../actions/map';
 import { fetchUnitsDetailsIfNeeded } from '../actions/units';
 import { ConversionArray } from '../types/conversionArray';
+import { fetchConversionsDetailsIfNeeded } from '../actions/conversions';
 
 
 function mapStateToProps(state: State) {
@@ -32,6 +33,7 @@ function mapDispatchToProps(dispatch: Dispatch) {
 		fetchPreferencesIfNeeded: () => dispatch(fetchPreferencesIfNeeded()),
 		fetchMapDetailsIfNeeded: () => dispatch(fetchMapsDetails()),
 		fetchUnitsDetailsIfNeeded: () => dispatch(fetchUnitsDetailsIfNeeded()),
+		fetchConversionsDetailsIfNeeded: () => dispatch(fetchConversionsDetailsIfNeeded()),
 		fetchPik: () => ConversionArray.fetchPik(),
 		changeOptionsFromLink: (options: LinkOptions) => dispatch(changeOptionsFromLink(options))
 	};
