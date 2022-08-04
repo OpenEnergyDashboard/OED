@@ -46,7 +46,7 @@ export default function UnitViewComponent(props: UnitViewComponentProps) {
 			<div className={props.unit.displayable.toString()}>
 				<b><FormattedMessage id="unit.displayable" /></b> {props.unit.displayable}
 			</div>
-			<div className={props.unit.preferredDisplay.toString()}>
+			<div className="unit-container">
 				<b><FormattedMessage id="unit.preferred.display" /></b> {translate(`TrueFalseType.${props.unit.preferredDisplay.toString()}`)}
 			</div>
 			<div className="unit-container">
