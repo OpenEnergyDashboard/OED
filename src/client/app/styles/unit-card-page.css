@@ -106,10 +106,9 @@
 .true {
 	margin: auto;
 	width: 65%;
-	/* If want to color preferredDisplay background */
-	/* color: white; */
-	/* background-color: #00805a; */
-	/* box-shadow: 3px 2px 2px gray; */
+	color: white;
+	background-color: #00805a;
+	box-shadow: 3px 2px 2px gray;
 	padding-top: 2px;
 	padding-right: 0px;
 	padding-bottom: 1px;
@@ -120,10 +119,9 @@
 .false {
 	margin: auto;
 	width: 65%;
-	/* If want to color preferredDisplay background */
-	/* color: white; */
-	/* background-color: #a5172b; */
-	/* box-shadow: 3px 2px 2px gray; */
+	color: white;
+	background-color: #a5172b;
+	box-shadow: 3px 2px 2px gray;
 	padding-top: 2px;
 	padding-right: 0px;
 	padding-bottom: 1px;
@@ -168,4 +166,14 @@
 	padding-bottom: 1px;
 	padding-left: 0px;
 	text-align: center;
+}
+
+.meter-container {
+	width: 100%;
+	padding-top: 2px;
+	padding-right: 0px;
+	padding-bottom: 1px;
+	padding-left: 0px;
+	text-align: center;
+	overflow-wrap: break-word;
 }

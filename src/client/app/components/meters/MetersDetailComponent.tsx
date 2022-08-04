@@ -15,6 +15,7 @@ import { useEffect } from 'react';
 import MeterViewComponent from './MeterViewComponent';
 import CreateMeterModalComponent from './CreateMeterModalComponent';
 import { MeterData } from 'types/redux/meters';
+import '../../styles/unit-card-page.css';
 
 // Utilizes useDispatch and useSelector hooks
 export default function MetersDetailComponent() {

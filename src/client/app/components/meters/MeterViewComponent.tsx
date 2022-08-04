@@ -8,11 +8,11 @@ import { useState } from 'react';
 import EditMeterModalComponent from './EditMeterModalComponent';
 import { MeterData } from 'types/redux/meters';
 import translate from '../../utils/translate';
-import '../../styles/unit-card-page.css';
 import { useSelector } from 'react-redux';
 import { isRoleAdmin } from '../../utils/hasPermissions';
 import { State } from 'types/redux/state';
 import { CurrentUserState } from 'types/redux/currentUser';
+import '../../styles/unit-card-page.css';
 
 interface MeterViewComponentProps {
 	meter: MeterData;
@@ -72,7 +72,7 @@ export default function MeterViewComponent(props: MeterViewComponentProps) {
 				</div>
 			}
 			{loggedInAsAdmin &&
-				<div className="meter-container">
+				<div className={props.meter.displayable.toString()}>
 					<b><FormattedMessage id="meter.displayable" /></b> {translate(`TrueFalseType.${props.meter.displayable.toString()}`)}
 				</div>
 			}
