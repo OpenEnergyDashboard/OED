@@ -275,11 +275,11 @@ export default function CreateMeterModalComponent() {
 											<Input
 												name="unitId"
 												type='select'
+												value={state.unitId}
 												onChange={e => handleStringChange(e)}>
 												{<option
 													value={-99}
 													key={-99}
-													selected={state.unitId === -99}
 													hidden={state.unitId !== -99}
 													disabled>
 														Select a unit...
@@ -295,11 +295,11 @@ export default function CreateMeterModalComponent() {
 											<Input
 												name='defaultGraphicUnit'
 												type='select'
+												value={state.defaultGraphicUnit}
 												onChange={e => handleStringChange(e)}>
 												{<option
 													value={-99}
 													key={-99}
-													selected={state.defaultGraphicUnit === -99}
 													hidden={state.defaultGraphicUnit !== -99}
 													disabled>
 														Select a default graphic unit...
