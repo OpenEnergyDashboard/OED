@@ -118,10 +118,10 @@ class Meter {
 	 * @returns Meter from row
 	 */
 	static mapRow(row) {
-		var meter = new Meter(row.id, row.name, row.url, row.enabled, row.displayable, row.meter_type, row.default_timezone_meter, 
-						row.gps, row.identifier, row.note, row.area, row.cumulative, row.cumulative_reset, row.cumulative_reset_start, 
-						row.cumulative_reset_end, row.reading_gap, row.reading_variation, row.reading_duplication, row.time_sort, 
-						row.end_only_time, row.reading, row.start_timestamp, row.end_timestamp, row.unit_id, row.default_graphic_unit);
+		var meter = new Meter(row.id, row.name, row.url, row.enabled, row.displayable, row.meter_type, row.default_timezone_meter,
+			row.gps, row.identifier, row.note, row.area, row.cumulative, row.cumulative_reset, row.cumulative_reset_start,
+			row.cumulative_reset_end, row.reading_gap, row.reading_variation, row.reading_duplication, row.time_sort,
+			row.end_only_time, row.reading, row.start_timestamp, row.end_timestamp, row.unit_id, row.default_graphic_unit);
 		meter.unitId = Meter.convertUnitValue(meter.unitId);
 		meter.defaultGraphicUnit = Meter.convertUnitValue(meter.defaultGraphicUnit);
 		return meter;
@@ -199,7 +199,7 @@ class Meter {
 	 */
 	async insert(conn) {
 		Meter.makeMeterDataValid(this);
-		const meter = {...this};
+		const meter = { ...this };
 		if (meter.id !== undefined) {
 			throw new Error('Attempt to insert a meter that already has an ID');
 		}
@@ -218,8 +218,8 @@ class Meter {
 		cumulative = this.cumulative, cumulativeReset = this.cumulativeReset, cumulativeResetStart = this.cumulativeResetStart,
 		cumulativeResetEnd = this.cumulativeResetEnd, readingGap = this.readingGap, readingVariation = this.readingVariation,
 		readingDuplication = this.readingDuplication, timeSort = this.timeSort, endOnlyTime = this.endOnlyTime,
-		reading = this.reading, startTimestamp = this.startTimestamp, endTimestamp = this.endTimestamp) {
-
+		reading = this.reading, startTimestamp = this.startTimestamp, endTimestamp = this.endTimestamp,
+		unitId = this.unitId, defaultGraphicUnit = this.default_graphic_unit) {
 		this.name = name;
 		this.url = url;
 		this.enabled = enabled;
@@ -242,6 +242,8 @@ class Meter {
 		this.reading = reading;
 		this.startTimestamp = startTimestamp;
 		this.endTimestamp = endTimestamp;
+		this.unitId = unitId;
+		this.defaultGraphicUnit = defaultGraphicUnit;
 	}
 
 	/**
@@ -251,7 +253,7 @@ class Meter {
 	 */
 	async update(conn) {
 		Meter.makeMeterDataValid(this);
-		const meter = {...this};
+		const meter = { ...this };
 		if (meter.id === undefined) {
 			throw new Error('Attempt to update a meter with no ID');
 		}

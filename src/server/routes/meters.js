@@ -14,6 +14,7 @@ const optionalAuthenticator = require('./authenticator').optionalAuthMiddleware;
 const Point = require('../models/Point');
 const moment = require('moment');
 const { MeterTimeSortTypesJS } = require('../services/csvPipeline/validateCsvUploadParams');
+const _ = require('lodash');
 
 const router = express.Router();
 router.use(optionalAuthenticator);
@@ -143,14 +144,14 @@ router.get('/:meter_id', async (req, res) => {
 	}
 });
 
-router.post('/edit', requiredAdmin('edit meters'), async (req, res) => {
+// This checks params for both edit and create. In principle they could differ since not all needed for create
+// but they are the same due to current routing for now.
+function validateMeterParams(params) {
 	const validParams = {
 		type: 'object',
 		maxProperties: 25,
-		required: ['id', 'name', 'url', 'enabled', 'displayable', 'meterType', 'timeZone', 'gps', 'identifier', 'note',
-			'area', 'cumulative', 'cumulativeReset', 'cumulativeResetStart', 'cumulativeResetEnd', 'readingGap',
-			'readingVariation', 'readingDuplication', 'timeSort', 'endOnlyTime', 'reading', 'startTimestamp',
-			'endTimestamp', 'unitId', 'defaultGraphicUnit'],
+		// We can get rid of some of these if we defaulted more values in the meter model.
+		required: ['name', 'url', 'enabled', 'displayable', 'meterType', 'timeZone', 'note', 'area'],
 		properties: {
 			id: { type: 'integer' },
 			name: { type: 'string' },
@@ -212,45 +213,55 @@ router.post('/edit', requiredAdmin('edit meters'), async (req, res) => {
 			defaultGraphicUnit: { type: 'integer' }
 		}
 	}
+	const paramsValidationResult = validate(params, validParams);
+	return { valid: paramsValidationResult.valid, errors: paramsValidationResult.errors };
+}
 
-	const validatorResult = validate(req.body, validParams);
-	if (!validatorResult.valid) {
-		log.warn(`Got request to edit meters with invalid meter data, errors:${validatorResult.errors}`);
-		res.status(400);
+router.post('/edit', requiredAdmin('edit meters'), async (req, res) => {
+	const response = validateMeterParams(req.body)
+	if (!response.valid) {
+		log.warn(`Got request to edit a meter with invalid meter data, errors: ${response.errors}`);
+		// TODO Nice if the client displayed the error message - same for create.
+		res.status(400).json({ message: response.errors });
 	} else {
 		const conn = getConnection();
 		try {
 			const meter = await Meter.getByID(req.body.id, conn);
-			meter.name = req.body.name;
-			meter.url = req.body.url;
-			meter.enabled = req.body.enabled;
-			meter.displayable = req.body.displayable;
-			meter.type = req.body.meterType;
-			meter.meterTimezone = req.body.timeZone;
-			meter.gps = (req.body.gps) ? new Point(req.body.gps.longitude, req.body.gps.latitude) : null;
-			meter.identifier = req.body.identifier;
-			meter.note = req.body.note;
-			meter.area = req.body.area;
-			meter.cumulative = req.body.cumulative;
-			meter.cumulativeReset = req.body.cumulativeReset;
-			meter.cumulativeResetStart = req.body.cumulativeResetStart;
-			meter.cumulativeResetEnd = req.body.cumulativeResetEnd;
-			meter.readingGap = req.body.readingGap;
-			meter.readingVariation = req.body.readingVariation;
-			meter.readingDuplication = req.body.readingDuplication;
-			meter.timeSort = req.body.timeSort;
-			meter.endOnlyTime = req.body.endOnlyTime;
-			meter.reading = req.body.reading;
-			meter.startTimestamp = req.body.startTimestamp;
-			meter.endTimestamp = req.body.endTimestamp;
-			meter.unitId = req.body.unitId;
-			meter.defaultGraphicUnit = req.body.defaultGraphicUnit;
+			const updatedMeter = new Meter(
+				undefined, // id
+				req.body.name,
+				req.body.url,
+				req.body.enabled,
+				req.body.displayable,
+				req.body.meterType,
+				req.body.timeZone,
+				(req.body.gps) ? new Point(req.body.gps.longitude, req.body.gps.latitude) : null,
+				req.body.identifier,
+				req.body.note,
+				req.body.area,
+				req.body.cumulative,
+				req.body.cumulativeReset,
+				(req.body.cumulativeResetStart.length) === 0 ? undefined : req.body.cumulativeResetStart,
+				(req.body.cumulativeResetEnd.length) === 0 ? undefined : req.body.cumulativeResetEnd,
+				req.body.readingGap,
+				req.body.readingVariation,
+				req.body.readingDuplication,
+				req.body.timeSort,
+				req.body.endOnlyTime,
+				req.body.reading,
+				(req.body.startTimestamp.length === 0) ? undefined : moment(req.body.startTimestamp),
+				(req.body.endTimestamp.length === 0) ? undefined : moment(req.body.endTimestamp),
+				req.body.unitId,
+				req.body.defaultGraphicUnit
+			);
+			// Put any changed values from updatedMeter into meter.
+			_.merge(meter, updatedMeter);
 			await meter.update(conn);
+			res.status(200).json({ message: `Successfully edited meter ${req.body.id}` });
 		} catch (err) {
 			log.error('Failed to edit meter', err);
 			res.status(500).json({ message: 'Unable to edit meters.', err });
 		}
-		res.status(200).json({ message: `Successfully edited meter ${req.body.id}` });
 	}
 });
 
@@ -258,109 +269,45 @@ router.post('/edit', requiredAdmin('edit meters'), async (req, res) => {
  * Route for POST add unit.
  */
 router.post('/addMeter', async (req, res) => {
-	const validParams = {
-		type: 'object',
-		// TODO why does this not work?
-		// maxProperties: 25,
-		required: ['id', 'enabled', 'displayable', 'timeZone'],
-		properties: {
-			enabled: { type: 'bool' },
-			displayable: { type: 'bool' },
-			timeZone: {
-				oneOf: [
-					{ type: 'string' },
-					{ type: 'null' }
-				]
-			},
-			gps: {
-				oneOf: [
-					{
-						type: 'object',
-						required: ['latitude', 'longitude'],
-						properties: {
-							latitude: { type: 'number', minimum: '-90', maximum: '90' },
-							longitude: { type: 'number', minimum: '-180', maximum: '180' }
-						}
-					},
-					{
-						type: 'null'
-					}
-				]
-			},
-			identifier: {
-				oneOf: [
-					{ type: 'string' },
-				]
-			}
-		}
-	};
-
-	const validationResult = validate(req.body, validParams);
-	if (!validationResult.valid) {
-		log.error(`Invalid input for meterAPI. ${validationResult.error}`);
-		res.sendStatus(400);
-	} else {
-		let gpsUse = req.body.gps;
-		if (gpsUse != null) {
-			// Valid GPS so convert to a point
-			gpsUse = new Point(req.body.gps.longitude, req.body.gps.latitude);
-		}
+		const response = validateMeterParams(req.body)
+		if (!response.valid) {
+			log.warn(`Got request to create a meter with invalid meter data, errors: ${response.errors}`);
+			res.status(400).json({ message: response.errors });
+		} else {
 		const conn = getConnection();
-		const startTimeReceived = req.body.startTimestamp, endTimeReceived = req.body.endTimestamp;
-		let startTime, endTime;
-		if (startTimeReceived.length === 0) {
-			startTime = undefined;
-		} else {
-			startTime = moment(startTimeReceived)
-		}
-		if (endTimeReceived.length === 0) {
-			endTime = undefined;
-		} else {
-			endTime = moment(endTimeReceived)
-		}
-		let cumulativeStart = req.body.cumulativeResetStart, cumulativeEnd = req.body.cumulativeResetEnd;
-		if (cumulativeStart.length === 0) {
-			cumulativeStart = undefined;
-		}
-		if (cumulativeEnd.length === 0) {
-			cumulativeEnd = undefined;
-		}
-
 		try {
-			await conn.tx(async t => {
-				const newMeter = new Meter(
-					undefined, //id
-					req.body.name,
-					req.body.url,
-					req.body.enabled,
-					req.body.displayable,
-					req.body.meterType,
-					req.body.timeZone,
-					gpsUse,
-					req.body.identifier,
-					req.body.note,
-					req.body.area,
-					req.body.cumulative,
-					req.body.cumulativeReset,
-					cumulativeStart,
-					cumulativeEnd,
-					req.body.readingGap,
-					req.body.readingVariation,
-					req.body.readingDuplication,
-					req.body.timeSort,
-					req.body.endOnlyTime,
-					req.body.reading,
-					startTime,
-					endTime,
-					req.body.unitId,
-					req.body.defaultGraphicUnit
-				);
-				await newMeter.insert(t);
-			});
+			const newMeter = new Meter(
+				undefined, //id
+				req.body.name,
+				req.body.url,
+				req.body.enabled,
+				req.body.displayable,
+				req.body.meterType,
+				req.body.timeZone,
+				(req.body.gps) ? new Point(req.body.gps.longitude, req.body.gps.latitude) : null,
+				req.body.identifier,
+				req.body.note,
+				req.body.area,
+				req.body.cumulative,
+				req.body.cumulativeReset,
+				(req.body.cumulativeResetStart.length === 0) ? undefined : req.body.cumulativeResetStart,
+				(req.body.cumulativeResetEnd.length) === 0 ? undefined : req.body.cumulativeResetEnd,
+				req.body.readingGap,
+				req.body.readingVariation,
+				req.body.readingDuplication,
+				req.body.timeSort,
+				req.body.endOnlyTime,
+				req.body.reading,
+				(req.body.startTimestamp.length === 0) ? undefined : moment(req.body.startTimestamp),
+				(req.body.endTimestamp.length === 0) ? undefined : moment(req.body.endTimestamp),
+				req.body.unitId,
+				req.body.defaultGraphicUnit
+			);
+			await newMeter.insert(conn);
 			res.sendStatus(200);
 		} catch (err) {
 			log.error(`Error while inserting new meter ${err}`, err);
-			res.sendStatus(500);
+			res.status(500).json({ message: err });
 		}
 	}
 });
