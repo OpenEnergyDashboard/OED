@@ -5,45 +5,60 @@
 import * as React from 'react';
 import * as _ from 'lodash';
 import * as NotificationSystem from 'react-notification-system';
-import { ClearNotificationAction } from '../types/redux/notifications';
-import { LinkOptions} from '../actions/graph';
+import { useEffect} from 'react';
+import { useDispatch, useSelector} from 'react-redux';
+import { State } from '../types/redux/state';
+import { clearNotifications } from '../actions/notifications';
+import { fetchMetersDetails, fetchMetersDetailsIfNeeded } from '../actions/meters';
+import { fetchGroupsDetailsIfNeeded } from '../actions/groups';
+//import { changeOptionsFromLink, LinkOptions } from '../actions/graph';
+import { ConversionArray } from '../types/conversionArray';
+import { fetchPreferencesIfNeeded } from '../actions/admin';
+import { fetchMapsDetails } from '../actions/map';
+import { fetchUnitsDetailsIfNeeded } from '../actions/units';
 
-interface InitializationProps {
-	notification: Notification;
-	clearNotifications(): ClearNotificationAction;
-	fetchMeterDetailsIfNeeded(): Promise<any>;
-	fetchGroupDetailsIfNeeded(): Promise<any>;
-	fetchPreferencesIfNeeded(): Promise<any>;
-	fetchMapDetailsIfNeeded(): Promise<any>;
-	fetchUnitsDetailsIfNeeded(): Promise<any>;
-	fetchPik(): Promise<any>;
-	changeOptionsFromLink(options: LinkOptions): Promise<any>;
-}
 
-export default class InitializationComponent extends React.Component<InitializationProps> {
-	private notificationSystem: NotificationSystem.System;
+export default function InitializationComponent() {
 
-	public componentDidMount() {
-		this.props.fetchMeterDetailsIfNeeded();
-		this.props.fetchGroupDetailsIfNeeded();
-		this.props.fetchPreferencesIfNeeded();
-		this.props.fetchMapDetailsIfNeeded();
-		this.props.fetchUnitsDetailsIfNeeded();
-		this.props.fetchPik();
-	}
+	const dispatch = useDispatch();
 
-	public componentDidUpdate() {
-		if (!_.isEmpty(this.props.notification)) {
-			this.notificationSystem.addNotification(this.props.notification);
-			this.props.clearNotifications();
+	let notificationSystem: NotificationSystem.System;
+
+	// Only run once
+	useEffect(() => {
+		dispatch(fetchMetersDetailsIfNeeded());
+		dispatch(fetchGroupsDetailsIfNeeded());
+		dispatch(fetchPreferencesIfNeeded());
+		dispatch(fetchMapsDetails());
+		dispatch(fetchUnitsDetailsIfNeeded());
+		ConversionArray.fetchPik();
+	}, []);
+
+	// TODO this was from the initializationcontainer but never called, do not know what it is for
+	//		changeOptionsFromLink: (options: LinkOptions) => dispatch(changeOptionsFromLink(options))
+
+	// Notifications state
+	const notification = useSelector((state: State) => state.notifications.notification);
+	useEffect(() => {
+		// Attempts to add notification on re-render (if there are any)
+		if (!_.isEmpty(notification)) {
+			notificationSystem.addNotification(notification);
+			dispatch(clearNotifications());
 		}
-	}
+	});
 
-	public render() {
-		return (
-			<div>
-				<NotificationSystem ref={(c: NotificationSystem.System) => { this.notificationSystem = c; }} />
-			</div>
-		);
-	}
+	// Rerender the route component if the user state changes
+	// This is necessary because of how the meters route works
+	// If the user is not an admin, the formatMeterForResponse function sets many of the fetched values to null
+	// Because of this must re-fetch the entire meters table if the user changes
+	const currentUser = useSelector((state: State) => state.currentUser.profile);
+	useEffect(() => {
+		dispatch(fetchMetersDetails());
+	}, [currentUser]);
+
+	return (
+		<div>
+			<NotificationSystem ref={(c: NotificationSystem.System) => { notificationSystem = c; }} />
+		</div>
+	);
 }

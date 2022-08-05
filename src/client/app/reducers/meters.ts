@@ -10,8 +10,7 @@ const defaultState: MetersState = {
 	isFetching: false,
 	byMeterID: {},
 	selectedMeters: [],
-	submitting: [],
-	meters: {}
+	submitting: []
 };
 
 export default function meters(state = defaultState, action: MetersAction) {
@@ -30,7 +29,6 @@ export default function meters(state = defaultState, action: MetersAction) {
 			return {
 				...state,
 				isFetching: false,
-				meters: _.keyBy(action.data, meter => meter.id),
 				byMeterID: _.keyBy(action.data, meter => meter.id)
 			};
 		case ActionType.ChangeDisplayedMeters:
@@ -53,7 +51,7 @@ export default function meters(state = defaultState, action: MetersAction) {
 			// Overwrite the meter data at the edited meter's index with the edited meter's meter data
 			// The passed in id should be correct as it is inherited from the pre-edited meter
 			// See EditMeterModalComponent line 134 for details (starts with if(meterHasChanges))
-			const meters = {...state.meters};
+			const meters = {...state.byMeterID};
 			meters[action.editedMeter.id] = action.editedMeter;
 
 			return {

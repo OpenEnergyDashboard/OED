@@ -9,7 +9,6 @@ import localeData from '../translations/data';
 import { browserHistory } from '../utils/history';
 import * as _ from 'lodash';
 import * as moment from 'moment';
-import InitializationContainer from '../containers/InitializationContainer';
 import HomeComponent from './HomeComponent';
 import LoginContainer from '../containers/LoginContainer';
 import AdminComponent from './admin/AdminComponent';
@@ -35,6 +34,7 @@ import { hasPermissions } from '../utils/hasPermissions';
 import UnitsDetailComponent from './unit/UnitsDetailComponent';
 import MetersDetailComponent from './meters/MetersDetailComponent';
 import * as queryString from 'query-string';
+import InitializationComponent from './InitializationComponent';
 
 interface RouteProps {
 	barStacking: boolean;
@@ -235,7 +235,7 @@ export default class RouteComponent extends React.Component<RouteProps> {
 		const messages = (localeData as any)[lang];
 		return (
 			<div>
-				<InitializationContainer />
+				<InitializationComponent />
 				<IntlProvider locale={lang} messages={messages} key={lang}>
 					<>
 						<Router history={browserHistory}>

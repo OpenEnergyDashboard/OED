@@ -98,7 +98,6 @@ export default function EditMeterModalComponent(props: EditMeterModalComponentPr
 		startTimestamp: props.meter.startTimestamp,
 		endTimestamp: props.meter.endTimestamp
 	}
-
 	/* State */
 	// Handlers for each type of input change
 	const [state, setState] = useState(values);
@@ -342,6 +341,7 @@ export default function EditMeterModalComponent(props: EditMeterModalComponentPr
 											<Input
 												name="unitId"
 												type='select'
+												value={state.unitId}
 												onChange={e => handleStringChange(e)}>
 												{sortedPossibleMeterUnits.map(unit => {
 													return (<option value={unit.id} key={unit.id}>{unit.identifier}</option>)
@@ -354,6 +354,7 @@ export default function EditMeterModalComponent(props: EditMeterModalComponentPr
 											<Input
 												name='defaultGraphicUnit'
 												type='select'
+												value={state.defaultGraphicUnit}
 												onChange={e => handleStringChange(e)}>
 												{sortedPossibleGraphicUnits.map(unit => {
 													return (<option value={unit.id} key={unit.id}>{unit.identifier}</option>)
@@ -366,7 +367,7 @@ export default function EditMeterModalComponent(props: EditMeterModalComponentPr
 											<Input
 												name='enabled'
 												type='select'
-												value={state.enabled.toString()}
+												value={state.enabled?.toString()}
 												onChange={e => handleBooleanChange(e)}>
 												{Object.keys(TrueFalseType).map(key => {
 													return (<option value={key} key={key}>{translate(`TrueFalseType.${key}`)}</option>)
@@ -379,7 +380,7 @@ export default function EditMeterModalComponent(props: EditMeterModalComponentPr
 											<Input
 												name='displayable'
 												type='select'
-												value={state.displayable.toString()}
+												value={state.displayable?.toString()}
 												onChange={e => handleBooleanChange(e)}>
 												{Object.keys(TrueFalseType).map(key => {
 													return (<option value={key} key={key}>{translate(`TrueFalseType.${key}`)}</option>)
@@ -451,7 +452,7 @@ export default function EditMeterModalComponent(props: EditMeterModalComponentPr
 											<Input
 												name='cumulative'
 												type='select'
-												value={state.cumulative.toString()}
+												value={state.cumulative?.toString()}
 												onChange={e => handleBooleanChange(e)}>
 												{Object.keys(TrueFalseType).map(key => {
 													return (<option value={key} key={key}>{translate(`TrueFalseType.${key}`)}</option>)
@@ -464,7 +465,7 @@ export default function EditMeterModalComponent(props: EditMeterModalComponentPr
 											<Input
 												name='cumulativeReset'
 												type='select'
-												value={state.cumulativeReset.toString()}
+												value={state.cumulativeReset?.toString()}
 												onChange={e => handleBooleanChange(e)}>
 												{Object.keys(TrueFalseType).map(key => {
 													return (<option value={key} key={key}>{translate(`TrueFalseType.${key}`)}</option>)
@@ -497,7 +498,7 @@ export default function EditMeterModalComponent(props: EditMeterModalComponentPr
 											<Input
 												name='endOnlyTime'
 												type='select'
-												value={state?.endOnlyTime.toString()}
+												value={state.endOnlyTime?.toString()}
 												onChange={e => handleBooleanChange(e)}>
 												{Object.keys(TrueFalseType).map(key => {
 													return (<option value={key} key={key}>{translate(`TrueFalseType.${key}`)}</option>)

@@ -8,7 +8,7 @@ import FooterContainer from '../../containers/FooterContainer';
 import TooltipHelpContainer from '../../containers/TooltipHelpContainer';
 import TooltipMarkerComponent from '../TooltipMarkerComponent';
 import { useDispatch, useSelector } from 'react-redux';
-import { fetchMetersDetailsIfNeeded } from '../../actions/meters';
+import {fetchMetersDetailsIfNeeded } from '../../actions/meters';
 import { State } from '../../types/redux/state';
 import { isRoleAdmin } from '../../utils/hasPermissions';
 import { useEffect } from 'react';
@@ -27,9 +27,10 @@ export default function MetersDetailComponent() {
 		dispatch(fetchMetersDetailsIfNeeded());
 	}, []);
 
-	//Meters state
-	const MetersState = useSelector((state: State) => state.meters.meters);
-
+	// Meters state
+	const MetersState = useSelector((state: State) => state.meters.byMeterID);
+	// Meters state loaded status
+	const metersStateLoaded = useSelector((state: State) => state.meters.hasBeenFetchedOnce);
 	// current user state
 	const currentUserState = useSelector((state: State) => state.currentUser);
 
@@ -59,18 +60,20 @@ export default function MetersDetailComponent() {
 						<TooltipMarkerComponent page='meters' helpTextId={tooltipStyle.tooltipMeterView} />
 					</div>
 				</h2>
-				{loggedInAsAdmin &&
+				{loggedInAsAdmin && metersStateLoaded &&
 					<div className="edit-btn">
 						<CreateMeterModalComponent />
 					</div>
 				}
-				<div className="card-container">
-					{/* Create a MeterViewComponent for each MeterData in Meters State after sorting by identifier */}
-					{Object.values(MetersState)
-						.sort((MeterA: MeterData, MeterB: MeterData) => (MeterA.identifier.toLowerCase() > MeterB.identifier.toLowerCase()) ? 1 :
-							((MeterB.identifier.toLowerCase() > MeterA.identifier.toLowerCase()) ? -1 : 0))
-						.map(MeterData => (<MeterViewComponent meter={MeterData as MeterData} key={(MeterData as MeterData).id} currentUser={currentUserState} />))}
-				</div>
+				{metersStateLoaded &&
+					<div className="card-container">
+						{/* Create a MeterViewComponent for each MeterData in Meters State after sorting by identifier */}
+						{Object.values(MetersState)
+							.sort((MeterA: MeterData, MeterB: MeterData) => (MeterA.identifier.toLowerCase() > MeterB.identifier.toLowerCase()) ? 1 :
+								((MeterB.identifier.toLowerCase() > MeterA.identifier.toLowerCase()) ? -1 : 0))
+							.map(MeterData => (<MeterViewComponent meter={MeterData as MeterData} key={(MeterData as MeterData).id} currentUser={currentUserState} />))}
+					</div>
+				}
 			</div>
 			<FooterContainer />
 		</div>

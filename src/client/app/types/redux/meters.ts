@@ -128,6 +128,5 @@ export interface MetersState {
 	isFetching: boolean;
 	selectedMeters: number[];
 	submitting: number[];
-	byMeterID: MeterDataByID; // @TODO remove when updated, does the same as meters state
-	meters: MeterDataByID;
+	byMeterID: MeterDataByID;
 }

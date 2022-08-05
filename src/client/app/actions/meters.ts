@@ -24,6 +24,7 @@ export function fetchMetersDetails(): Thunk {
 			dispatch(requestMetersDetails());
 			// attempt to retrieve meters details from database
 			const meters = await metersApi.getMetersDetails();
+			console.log(meters);
 			// update the state with the meters details and set isFetching to false
 			dispatch(receiveMetersDetails(meters));
 			// If this is the first fetch, inform the store that the first fetch has been made
