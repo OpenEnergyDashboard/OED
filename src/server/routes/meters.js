@@ -269,11 +269,11 @@ router.post('/edit', requiredAdmin('edit meters'), async (req, res) => {
  * Route for POST add unit.
  */
 router.post('/addMeter', async (req, res) => {
-		const response = validateMeterParams(req.body)
-		if (!response.valid) {
-			log.warn(`Got request to create a meter with invalid meter data, errors: ${response.errors}`);
-			res.status(400).json({ message: response.errors });
-		} else {
+	const response = validateMeterParams(req.body)
+	if (!response.valid) {
+		log.warn(`Got request to create a meter with invalid meter data, errors: ${response.errors}`);
+		res.status(400).json({ message: response.errors });
+	} else {
 		const conn = getConnection();
 		try {
 			const newMeter = new Meter(

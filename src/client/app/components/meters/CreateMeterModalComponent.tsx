@@ -12,14 +12,15 @@ import { useDispatch, useSelector } from 'react-redux';
 import { addMeter } from '../../actions/meters';
 import TooltipMarkerComponent from '../TooltipMarkerComponent';
 import TooltipHelpContainer from '../../containers/TooltipHelpContainer';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { TrueFalseType } from '../../types/items';
 import TimeZoneSelect from '../TimeZoneSelect';
 import { GPSPoint, isValidGPSInput } from '../../utils/calibration';
 import { isRoleAdmin } from '../../utils/hasPermissions';
 import { State } from 'types/redux/state';
-import { UnitData, DisplayableType, UnitRepresentType, UnitType } from '../../types/redux/units';
+import { UnitData} from '../../types/redux/units';
 import * as _ from 'lodash';
+import { unitsCompatibleWithUnit } from '../../utils/determineCompatibleUnits';
 
 // Notifies user of msg.
 // TODO isValidGPSInput uses alert so continue that. Maybe all should be changed but this impacts other parts of the code.
@@ -29,10 +30,21 @@ function notifyUser(msg: string) {
 	window.alert(msg);
 }
 
+// TODO Moved the possible meters/graphic units calculations up to the details component
+// This was to prevent the calculations from being done on every load, but now requires them to be passed as props
+interface CreateMeterModalComponentProps {
+	possibleMeterUnits: Set<UnitData>;
+	possibleGraphicUnits: Set<UnitData>;
+}
+
 // TODO props not used in this file??
-export default function CreateMeterModalComponent() {
+export default function CreateMeterModalComponent(props: CreateMeterModalComponentProps) {
 
 	const dispatch = useDispatch();
+
+	// Check for admin status
+	const currentUser = useSelector((state: State) => state.currentUser.profile);
+	const loggedInAsAdmin = (currentUser !== null) && isRoleAdmin(currentUser.role);
 
 	const defaultValues = {
 		id: -99,
@@ -48,8 +60,10 @@ export default function CreateMeterModalComponent() {
 		// timeZone: String(translate('timezone.no')),
 		timeZone: '',
 		gps: '',
-		unitId: -99,
-		defaultGraphicUnit: -99,
+		// Defaults of -999 (not to be confused with -99 which is no unit)
+		// Purely for allowing the default select to be "select a ..."
+		unitId: -999,
+		defaultGraphicUnit: -999,
 		note: '',
 		cumulative: false,
 		cumulativeReset: false,
@@ -63,6 +77,15 @@ export default function CreateMeterModalComponent() {
 		reading: 0.0,
 		startTimestamp: '',
 		endTimestamp: ''
+	}
+
+	const dropdownsStateDefaults = {
+		possibleMeterUnits: props.possibleMeterUnits,
+		possibleGraphicUnits: props.possibleGraphicUnits,
+		compatibleUnits: props.possibleMeterUnits,
+		incompatibleUnits: new Set<UnitData>(),
+		compatibleGraphicUnits: props.possibleGraphicUnits,
+		incompatibleGraphicUnits: new Set<UnitData>()
 	}
 
 	/* State */
@@ -92,6 +115,8 @@ export default function CreateMeterModalComponent() {
 	const handleTimeZoneChange = (timeZone: string) => {
 		setState({ ...state, ['timeZone']: timeZone });
 	}
+
+	const [dropdownsState, setDropdownsState] = useState(dropdownsStateDefaults);
 	/* End State */
 
 	// Reset the state to default values
@@ -162,6 +187,7 @@ export default function CreateMeterModalComponent() {
 			// TODO need to type submitState?
 			submitState = { ...state, gps: gps };
 			// Submit new meter if checks where ok.
+			console.log(submitState);
 			dispatch(addMeter(submitState));
 			resetState();
 		} else {
@@ -170,46 +196,73 @@ export default function CreateMeterModalComponent() {
 		}
 	};
 
-	// Check for admin status
-	const currentUser = useSelector((state: State) => state.currentUser.profile);
-	const loggedInAsAdmin = (currentUser !== null) && isRoleAdmin(currentUser.role);
+	// Update compatible graphic units set when unitId changes
+	useEffect(() => {
+		// Graphic units compatible with currently selected unit
+		let compatibleGraphicUnits = new Set<UnitData>();
+		// Graphic units incompatible with currently selected unit
+		const incompatibleGraphicUnits = new Set<UnitData>();
+		// If a unit has been selected that is not 'no unit'
+		if (state.unitId != -999 && state.unitId != -99) {
+			// Find all units compatible with the selected unit
+			const unitsCompatibleWithSelectedUnit = unitsCompatibleWithUnit(state.unitId);
+			dropdownsState.possibleGraphicUnits.forEach(unit => {
+				// If current graphic unit exists in the set of compatible graphic units OR if the current graphic unit is 'no unit'
+				if (unitsCompatibleWithSelectedUnit.has(unit.id) || unit.id == -99) {
+					compatibleGraphicUnits.add(unit);
+				}
+				else {
+					incompatibleGraphicUnits.add(unit);
+				}
+			});
+		}
+		// No unit is selected
+		else {
+			// All default graphic units are compatible
+			compatibleGraphicUnits = new Set(dropdownsState.possibleGraphicUnits);
+		}
+		// Update the state
+		setDropdownsState({
+			...dropdownsState,
+			compatibleGraphicUnits: new Set(compatibleGraphicUnits),
+			incompatibleGraphicUnits: new Set(incompatibleGraphicUnits)})
+	}, [state.unitId]);
 
-	// Deal with units.
-	// Get the units in state
-	const units = useSelector((state: State) => state.units.units);
-	// A non-unit
-	const noUnit: UnitData = {
-		// Only needs the id and identifier, others are dummy values.
-		id: -99,
-		name: '',
-		identifier: 'no unit',
-		unitRepresent: UnitRepresentType.unused,
-		secInRate: 99,
-		typeOfUnit: UnitType.unit,
-		unitIndex: -99,
-		suffix: '',
-		displayable: DisplayableType.none,
-		preferredDisplay: false,
-		note: ''
-	}
-
-	// The meter unit can be any unit of type meter.
-	const possibleMeterUnits = _.filter(units, function (o: UnitData) {
-		return o.typeOfUnit == UnitType.meter;
-	});
-	// Put in alphabetical order.
-	const sortedPossibleMeterUnits = _.sortBy(possibleMeterUnits, unit => unit.identifier.toLowerCase(), 'asc');
-	// The default graphic unit can also be no unit/-99 but that is not desired so put last in list.
-	sortedPossibleMeterUnits.push(noUnit);
-
-	// The default graphic unit can be any unit of type unit or suffix.
-	const possibleGraphicUnits = _.filter(units, function (o: UnitData) {
-		return o.typeOfUnit == UnitType.unit || o.typeOfUnit == UnitType.suffix;
-	});
-	// Put in alphabetical order.
-	const sortedPossibleGraphicUnits = _.sortBy(possibleGraphicUnits, unit => unit.identifier.toLowerCase(), 'asc');
-	// The default graphic unit can also be no unit/-99 but that is not desired so put last in list.
-	sortedPossibleGraphicUnits.push(noUnit);
+	// Update compatible units set when defaultGraphicUnitId changes
+	useEffect(() => {
+		// Units compatible with currently selected graphic unit
+		let compatibleUnits = new Set<UnitData>();
+		// Units incompatible with currently selected graphic unit
+		const incompatibleUnits = new Set<UnitData>();
+		// If a default graphic unit has been selected that is not 'no unit'
+		if (state.defaultGraphicUnit != -999 && state.defaultGraphicUnit != -99) {
+			// Find all units compatible with the selected graphic unit
+			dropdownsState.possibleMeterUnits.forEach(unit => {
+				// Graphic units compatible with the current meter unit
+				const compatibleGraphicUnits = unitsCompatibleWithUnit(unit.id);
+				// If the currently selected default graphic unit exists in the set of graphic units compatible with the current meter unit
+				// Also add the 'no unit' unit
+				if (compatibleGraphicUnits.has(state.defaultGraphicUnit) || unit.id == -99) {
+					// add the current meter unit to the list of compatible units
+					compatibleUnits.add(unit);
+				}
+				else {
+					// add the current meter unit to the list of incompatible units
+					incompatibleUnits.add(unit);
+				}
+			});
+		}
+		// No default graphic unit is selected
+		else {
+			// All units are compatible
+			compatibleUnits = new Set(dropdownsState.possibleMeterUnits);
+		}
+		// Update the state
+		setDropdownsState({
+			...dropdownsState,
+			compatibleUnits: new Set(compatibleUnits),
+			incompatibleUnits: new Set(incompatibleUnits)})
+	}, [state.defaultGraphicUnit]);
 
 	const tooltipStyle = {
 		display: 'inline-block',
@@ -276,16 +329,19 @@ export default function CreateMeterModalComponent() {
 												name="unitId"
 												type='select'
 												value={state.unitId}
-												onChange={e => handleStringChange(e)}>
+												onChange={e => handleNumberChange(e)}>
 												{<option
-													value={-99}
-													key={-99}
-													hidden={state.unitId !== -99}
+													value={-999}
+													key={-999}
+													hidden={state.unitId !== -999}
 													disabled>
 														Select a unit...
 												</option>}
-												{sortedPossibleMeterUnits.map(unit => {
+												{Array.from(dropdownsState.compatibleUnits).map(unit => {
 													return (<option value={unit.id} key={unit.id}>{unit.identifier}</option>)
+												})}
+												{Array.from(dropdownsState.incompatibleUnits).map(unit => {
+													return (<option value={unit.id} key={unit.id} disabled>{unit.identifier}</option>)
 												})}
 											</Input>
 										</div>
@@ -296,16 +352,19 @@ export default function CreateMeterModalComponent() {
 												name='defaultGraphicUnit'
 												type='select'
 												value={state.defaultGraphicUnit}
-												onChange={e => handleStringChange(e)}>
+												onChange={e => handleNumberChange(e)}>
 												{<option
-													value={-99}
-													key={-99}
-													hidden={state.defaultGraphicUnit !== -99}
+													value={-999}
+													key={-999}
+													hidden={state.defaultGraphicUnit !== -999}
 													disabled>
 														Select a default graphic unit...
 												</option>}
-												{sortedPossibleGraphicUnits.map(unit => {
+												{Array.from(dropdownsState.compatibleGraphicUnits).map(unit => {
 													return (<option value={unit.id} key={unit.id}>{unit.identifier}</option>)
+												})}
+												{Array.from(dropdownsState.incompatibleGraphicUnits).map(unit => {
+													return (<option value={unit.id} key={unit.id} disabled>{unit.identifier}</option>)
 												})}
 											</Input>
 										</div>

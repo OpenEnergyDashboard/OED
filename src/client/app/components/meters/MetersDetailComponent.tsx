@@ -16,6 +16,8 @@ import MeterViewComponent from './MeterViewComponent';
 import CreateMeterModalComponent from './CreateMeterModalComponent';
 import { MeterData } from 'types/redux/meters';
 import '../../styles/unit-card-page.css';
+import { UnitData, DisplayableType, UnitRepresentType, UnitType } from '../../types/redux/units';
+import * as _ from 'lodash';
 
 // Utilizes useDispatch and useSelector hooks
 export default function MetersDetailComponent() {
@@ -37,6 +39,54 @@ export default function MetersDetailComponent() {
 	// Check for admin status
 	const currentUser = useSelector((state: State) => state.currentUser.profile);
 	const loggedInAsAdmin = (currentUser !== null) && isRoleAdmin(currentUser.role);
+
+
+	// Units state
+	const units = useSelector((state: State) => state.units.units);
+	// Units state loaded status
+	const unitsStateLoaded = useSelector((state: State) => state.units.hasBeenFetchedOnce);
+
+	// A non-unit
+	const noUnit: UnitData = {
+		// Only needs the id and identifier, others are dummy values.
+		id: -99,
+		name: '',
+		identifier: 'no unit',
+		unitRepresent: UnitRepresentType.unused,
+		secInRate: 99,
+		typeOfUnit: UnitType.unit,
+		unitIndex: -99,
+		suffix: '',
+		displayable: DisplayableType.none,
+		preferredDisplay: false,
+		note: ''
+	}
+	// Possible Meter Units
+	let possibleMeterUnits = new Set<UnitData>();
+	let possibleGraphicUnits = new Set<UnitData>();
+
+	// The meter unit can be any unit of type meter.
+	Object.values(units).forEach(unit => {
+		if (unit.typeOfUnit == UnitType.meter) {
+			possibleMeterUnits.add(unit);
+		}
+	});
+	// Put in alphabetical order.
+	possibleMeterUnits = new Set(_.sortBy(Array.from(possibleMeterUnits), unit => unit.identifier.toLowerCase(), 'asc'));
+	// The default graphic unit can also be no unit/-99 but that is not desired so put last in list.
+	possibleMeterUnits.add(noUnit);
+
+	// Possible Graphic Units
+	// The default graphic unit can be any unit of type unit or suffix.
+	Object.values(units).forEach(unit => {
+		if (unit.typeOfUnit == UnitType.unit || unit.typeOfUnit == UnitType.suffix) {
+			possibleGraphicUnits.add(unit);
+		}
+	});
+	// Put in alphabetical order.
+	possibleGraphicUnits = new Set(_.sortBy(Array.from(possibleGraphicUnits), unit => unit.identifier.toLowerCase(), 'asc'));
+	// The default graphic unit can also be no unit/-99 but that is not desired so put last in list.
+	possibleGraphicUnits.add(noUnit);
 
 	const titleStyle: React.CSSProperties = {
 		textAlign: 'center'
@@ -60,9 +110,12 @@ export default function MetersDetailComponent() {
 						<TooltipMarkerComponent page='meters' helpTextId={tooltipStyle.tooltipMeterView} />
 					</div>
 				</h2>
-				{loggedInAsAdmin && metersStateLoaded &&
+				{loggedInAsAdmin && metersStateLoaded && unitsStateLoaded &&
 					<div className="edit-btn">
-						<CreateMeterModalComponent />
+						<CreateMeterModalComponent
+							possibleMeterUnits={possibleMeterUnits}
+							possibleGraphicUnits={possibleGraphicUnits}
+						/>
 					</div>
 				}
 				{metersStateLoaded &&
