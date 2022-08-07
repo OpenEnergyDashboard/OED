@@ -73,11 +73,14 @@ export function unitsCompatibleWithUnit(unitId: number): Set<number> {
 		const row = pRowFromUnit(unitId);
 		// The compatible units are all columns with true for Pik where i = row.
 		// Loops over all columns of Pik in row.
-		for (let k = 0; k < pik[0].length; ++k) {
-			if (pik[row][k]) {
-				// unit at index k is compatible with meter unit so add to set.
-				// Convert index in Pik to unit id.
-				unitSet.add(unitFromPColumn(k));
+		// Since retrieving the pik array is an async call (in the initializationComponent) we must check for undefined
+		if (pik != undefined && pik != null) {
+			for (let k = 0; k < pik[0].length; ++k) {
+				if (pik[row][k]) {
+					// unit at index k is compatible with meter unit so add to set.
+					// Convert index in Pik to unit id.
+					unitSet.add(unitFromPColumn(k));
+				}
 			}
 		}
 	}

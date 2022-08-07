@@ -12,15 +12,16 @@ import { submitEditedMeter } from '../../actions/meters';
 import { removeUnsavedChanges } from '../../actions/unsavedWarning';
 import TooltipMarkerComponent from '../TooltipMarkerComponent';
 import TooltipHelpContainer from '../../containers/TooltipHelpContainer';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import '../../styles/Modal.unit.css';
 import { TrueFalseType } from '../../types/items';
 import TimeZoneSelect from '../TimeZoneSelect';
 import { GPSPoint, isValidGPSInput } from '../../utils/calibration';
 import { isRoleAdmin } from '../../utils/hasPermissions';
 import { State } from 'types/redux/state';
-import { UnitData, DisplayableType, UnitRepresentType, UnitType } from '../../types/redux/units';
+import { UnitData } from '../../types/redux/units';
 import * as _ from 'lodash';
+import { unitsCompatibleWithUnit } from '../../utils/determineCompatibleUnits';
 
 // Notifies user of msg.
 // TODO isValidGPSInput uses alert so continue that. Maybe all should be changed but this impacts other parts of the code.
@@ -62,6 +63,8 @@ function nullToEmptyString(item: any) {
 interface EditMeterModalComponentProps {
 	show: boolean;
 	meter: MeterData;
+	possibleMeterUnits: Set<UnitData>;
+	possibleGraphicUnits: Set<UnitData>;
 	// passed in to handle closing the modal
 	handleClose: () => void;
 }
@@ -69,6 +72,10 @@ interface EditMeterModalComponentProps {
 // Updated to hooks
 export default function EditMeterModalComponent(props: EditMeterModalComponentProps) {
 	const dispatch = useDispatch();
+
+	// Check for admin status
+	const currentUser = useSelector((state: State) => state.currentUser.profile);
+	const loggedInAsAdmin = (currentUser !== null) && isRoleAdmin(currentUser.role);
 
 	// Set existing meter values
 	const values = {
@@ -98,6 +105,16 @@ export default function EditMeterModalComponent(props: EditMeterModalComponentPr
 		startTimestamp: props.meter.startTimestamp,
 		endTimestamp: props.meter.endTimestamp
 	}
+
+	const dropdownsStateDefaults = {
+		possibleMeterUnits: props.possibleMeterUnits,
+		possibleGraphicUnits: props.possibleGraphicUnits,
+		compatibleUnits: props.possibleMeterUnits,
+		incompatibleUnits: new Set<UnitData>(),
+		compatibleGraphicUnits: props.possibleGraphicUnits,
+		incompatibleGraphicUnits: new Set<UnitData>()
+	}
+
 	/* State */
 	// Handlers for each type of input change
 	const [state, setState] = useState(values);
@@ -117,6 +134,12 @@ export default function EditMeterModalComponent(props: EditMeterModalComponentPr
 	const handleTimeZoneChange = (timeZone: string) => {
 		setState({ ...state, ['timeZone']: timeZone });
 	}
+
+	// Dropdowns
+	const [dropdownsState, setDropdownsState] = useState(dropdownsStateDefaults);
+
+	// Track if it is the first load so that we can properly calculate the valid dropdowns for units
+	const [isFirstLoad, setIsFirstLoad] = useState(true);
 
 	/* End State */
 
@@ -240,47 +263,98 @@ export default function EditMeterModalComponent(props: EditMeterModalComponentPr
 			}
 		}
 	};
+	//These two below useEffects can probably be extracted into a single function in the future, as create meter also uses them
 
-	// Check for admin status
-	const currentUser = useSelector((state: State) => state.currentUser.profile);
-	const loggedInAsAdmin = (currentUser !== null) && isRoleAdmin(currentUser.role);
 
-	// Deal with units.
-	// Get the units in state
-	const units = useSelector((state: State) => state.units.units);
-	// A non-unit
-	const noUnit: UnitData = {
-		// Only needs the id and identifier, others are dummy values.
-		id: -99,
-		name: '',
-		identifier: 'no unit',
-		unitRepresent: UnitRepresentType.unused,
-		secInRate: 99,
-		typeOfUnit: UnitType.unit,
-		unitIndex: -99,
-		suffix: '',
-		displayable: DisplayableType.none,
-		preferredDisplay: false,
-		note: ''
-	}
+	// TODO DANGER WILL ROBINSON
+	// This function does not work on the first render and I cannot figure out why
+	// The function properly gets a list of incompatible graphic units but the state will not take them
+	// The useEffect below it works fine and is written the same way
+	// I am leaving it for now because it properly works after changing the unit select and changing it back
+	// and it is better to work on the first render for one dropdown and all subsequent renders for both dropdowns
+	// than to allow any units for both dropdowns always.
+	// Perhaps someone can fix this in the future.
 
-	// The meter unit can be any unit of type meter.
-	const possibleMeterUnits = _.filter(units, function (o: UnitData) {
-		return o.typeOfUnit == UnitType.meter;
+	// Update compatible graphic units set when unitId changes
+	useEffect(() => {
+		console.log(dropdownsStateDefaults == dropdownsState);
+		// Graphic units compatible with currently selected unit
+		let compatibleGraphicUnits = new Set<UnitData>();
+		// Graphic units incompatible with currently selected unit
+		const incompatibleGraphicUnits = new Set<UnitData>();
+		// If a unit has been selected that is not 'no unit'
+		if (state.unitId != -999 && state.unitId != -99) {
+			// Find all units compatible with the selected unit
+			const unitsCompatibleWithSelectedUnit = unitsCompatibleWithUnit(state.unitId);
+			dropdownsState.possibleGraphicUnits.forEach(unit => {
+				// If current graphic unit exists in the set of compatible graphic units OR if the current graphic unit is 'no unit'
+				if (unitsCompatibleWithSelectedUnit.has(unit.id) || unit.id == -99) {
+					compatibleGraphicUnits.add(unit);
+				}
+				else {
+					incompatibleGraphicUnits.add(unit);
+				}
+			});
+		}
+		// No unit is selected
+		else {
+			// All default graphic units are compatible
+			compatibleGraphicUnits = new Set(dropdownsState.possibleGraphicUnits);
+		}
+		// Update the state
+		setDropdownsState({
+			...dropdownsState,
+			compatibleGraphicUnits: new Set(compatibleGraphicUnits),
+			incompatibleGraphicUnits: new Set(incompatibleGraphicUnits)});
+		console.log('second check:', dropdownsStateDefaults == dropdownsState);
+	}, [state.unitId]);
+
+	// Update compatible units set when defaultGraphicUnitId changes
+	useEffect(() => {
+		// Units compatible with currently selected graphic unit
+		let compatibleUnits = new Set<UnitData>();
+		// Units incompatible with currently selected graphic unit
+		const incompatibleUnits = new Set<UnitData>();
+		// If a default graphic unit has been selected that is not 'no unit'
+		if (state.defaultGraphicUnit != -999 && state.defaultGraphicUnit != -99) {
+			// Find all units compatible with the selected graphic unit
+			dropdownsState.possibleMeterUnits.forEach(unit => {
+				// Graphic units compatible with the current meter unit
+				const compatibleGraphicUnits = unitsCompatibleWithUnit(unit.id);
+				// If the currently selected default graphic unit exists in the set of graphic units compatible with the current meter unit
+				// Also add the 'no unit' unit
+				if (compatibleGraphicUnits.has(state.defaultGraphicUnit) || unit.id == -99) {
+					// add the current meter unit to the list of compatible units
+					compatibleUnits.add(unit);
+				}
+				else {
+					// add the current meter unit to the list of incompatible units
+					incompatibleUnits.add(unit);
+				}
+			});
+		}
+		// No default graphic unit is selected
+		else {
+			// All units are compatible
+			compatibleUnits = new Set(dropdownsState.possibleMeterUnits);
+		}
+		// Update the state
+		setDropdownsState({
+			...dropdownsState,
+			compatibleUnits: new Set(compatibleUnits),
+			incompatibleUnits: new Set(incompatibleUnits)});
+	}, [state.defaultGraphicUnit]);
+
+
+	// A bit of a hacky fix to guarantee the two useEffect functions below run on the first load
+	useEffect(() => {
+		if (isFirstLoad) {
+			const unitIdCopy = state.unitId;
+			const defaultGraphicUnitCopy = state.defaultGraphicUnit;
+			setState({...state, unitId: unitIdCopy, defaultGraphicUnit: defaultGraphicUnitCopy});
+			setIsFirstLoad(false);
+		}
 	});
-	// Put in alphabetical order.
-	const sortedPossibleMeterUnits = _.sortBy(possibleMeterUnits, unit => unit.identifier.toLowerCase(), 'asc');
-	// The default graphic unit can also be no unit/-99 but that is not desired so put last in list.
-	sortedPossibleMeterUnits.push(noUnit);
-
-	// The default graphic unit can be any unit of type unit or suffix.
-	const possibleGraphicUnits = _.filter(units, function (o: UnitData) {
-		return o.typeOfUnit == UnitType.unit || o.typeOfUnit == UnitType.suffix;
-	});
-	// Put in alphabetical order.
-	const sortedPossibleGraphicUnits = _.sortBy(possibleGraphicUnits, unit => unit.identifier.toLowerCase(), 'asc');
-	// The default graphic unit can also be no unit/-99 but that is not desired so put last in list.
-	sortedPossibleGraphicUnits.push(noUnit);
 
 	const tooltipStyle = {
 		display: 'inline-block',
@@ -296,7 +370,6 @@ export default function EditMeterModalComponent(props: EditMeterModalComponentPr
 	const tableStyle: React.CSSProperties = {
 		width: '100%'
 	};
-
 	return (
 		<>
 
@@ -342,9 +415,12 @@ export default function EditMeterModalComponent(props: EditMeterModalComponentPr
 												name="unitId"
 												type='select'
 												value={state.unitId}
-												onChange={e => handleStringChange(e)}>
-												{sortedPossibleMeterUnits.map(unit => {
+												onChange={e => handleNumberChange(e)}>
+												{Array.from(dropdownsState.compatibleUnits).map(unit => {
 													return (<option value={unit.id} key={unit.id}>{unit.identifier}</option>)
+												})}
+												{Array.from(dropdownsState.incompatibleUnits).map(unit => {
+													return (<option value={unit.id} key={unit.id} disabled>{unit.identifier}</option>)
 												})}
 											</Input>
 										</div>
@@ -355,9 +431,12 @@ export default function EditMeterModalComponent(props: EditMeterModalComponentPr
 												name='defaultGraphicUnit'
 												type='select'
 												value={state.defaultGraphicUnit}
-												onChange={e => handleStringChange(e)}>
-												{sortedPossibleGraphicUnits.map(unit => {
+												onChange={e => handleNumberChange(e)}>
+												{Array.from(dropdownsState.compatibleGraphicUnits).map(unit => {
 													return (<option value={unit.id} key={unit.id}>{unit.identifier}</option>)
+												})}
+												{Array.from(dropdownsState.incompatibleGraphicUnits).map(unit => {
+													return (<option value={unit.id} key={unit.id} disabled>{unit.identifier}</option>)
 												})}
 											</Input>
 										</div>

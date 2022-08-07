@@ -118,13 +118,20 @@ export default function MetersDetailComponent() {
 						/>
 					</div>
 				}
-				{metersStateLoaded &&
+				{metersStateLoaded && unitsStateLoaded &&
 					<div className="card-container">
 						{/* Create a MeterViewComponent for each MeterData in Meters State after sorting by identifier */}
 						{Object.values(MetersState)
 							.sort((MeterA: MeterData, MeterB: MeterData) => (MeterA.identifier.toLowerCase() > MeterB.identifier.toLowerCase()) ? 1 :
 								((MeterB.identifier.toLowerCase() > MeterA.identifier.toLowerCase()) ? -1 : 0))
-							.map(MeterData => (<MeterViewComponent meter={MeterData as MeterData} key={(MeterData as MeterData).id} currentUser={currentUserState} />))}
+							.map(MeterData =>
+								(<MeterViewComponent
+									meter={MeterData as MeterData}
+									key={(MeterData as MeterData).id}
+									currentUser={currentUserState}
+									// These two props are used in the edit component (child of view component)
+									possibleMeterUnits={possibleMeterUnits}
+									possibleGraphicUnits={possibleGraphicUnits}/>))}
 					</div>
 				}
 			</div>

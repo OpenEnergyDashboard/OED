@@ -187,7 +187,6 @@ export default function CreateMeterModalComponent(props: CreateMeterModalCompone
 			// TODO need to type submitState?
 			submitState = { ...state, gps: gps };
 			// Submit new meter if checks where ok.
-			console.log(submitState);
 			dispatch(addMeter(submitState));
 			resetState();
 		} else {
@@ -225,7 +224,7 @@ export default function CreateMeterModalComponent(props: CreateMeterModalCompone
 		setDropdownsState({
 			...dropdownsState,
 			compatibleGraphicUnits: new Set(compatibleGraphicUnits),
-			incompatibleGraphicUnits: new Set(incompatibleGraphicUnits)})
+			incompatibleGraphicUnits: new Set(incompatibleGraphicUnits)});
 	}, [state.unitId]);
 
 	// Update compatible units set when defaultGraphicUnitId changes
@@ -261,7 +260,7 @@ export default function CreateMeterModalComponent(props: CreateMeterModalCompone
 		setDropdownsState({
 			...dropdownsState,
 			compatibleUnits: new Set(compatibleUnits),
-			incompatibleUnits: new Set(incompatibleUnits)})
+			incompatibleUnits: new Set(incompatibleUnits)});
 	}, [state.defaultGraphicUnit]);
 
 	const tooltipStyle = {

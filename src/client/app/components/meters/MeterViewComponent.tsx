@@ -13,10 +13,15 @@ import { isRoleAdmin } from '../../utils/hasPermissions';
 import { State } from 'types/redux/state';
 import { CurrentUserState } from 'types/redux/currentUser';
 import '../../styles/unit-card-page.css';
+import { UnitData} from '../../types/redux/units';
 
 interface MeterViewComponentProps {
 	meter: MeterData;
 	currentUser: CurrentUserState;
+	// These two aren't used in this component but are passed to the edit component
+	// This is done to avoid having to recalculate the possible units sets in each view component
+	possibleMeterUnits: Set<UnitData>;
+	possibleGraphicUnits: Set<UnitData>;
 }
 
 export default function MeterViewComponent(props: MeterViewComponentProps) {
@@ -88,7 +93,12 @@ export default function MeterViewComponent(props: MeterViewComponentProps) {
 						<FormattedMessage id="edit.meter" />
 					</Button>
 					{/* Creates a child MeterModalEditComponent */}
-					<EditMeterModalComponent show={showEditModal} meter={props.meter} handleClose={handleClose} />
+					<EditMeterModalComponent
+						show={showEditModal}
+						meter={props.meter}
+						handleClose={handleClose}
+						possibleMeterUnits={props.possibleMeterUnits}
+						possibleGraphicUnits={props.possibleGraphicUnits}/>
 				</div>
 			}
 		</div>
