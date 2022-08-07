@@ -20,7 +20,6 @@ import { GPSPoint, isValidGPSInput } from '../../utils/calibration';
 import { isRoleAdmin } from '../../utils/hasPermissions';
 import { State } from 'types/redux/state';
 import { UnitData } from '../../types/redux/units';
-import * as _ from 'lodash';
 import { unitsCompatibleWithUnit } from '../../utils/determineCompatibleUnits';
 
 // Notifies user of msg.
