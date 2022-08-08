@@ -3,7 +3,7 @@
   * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
 
 import { ActionType, Thunk, Dispatch, GetState } from '../types/redux/actions';
-import { showSuccessNotification, showErrorNotification } from '../utils/notifications';
+import { showSuccessNotification } from '../utils/notifications';
 import translate from '../utils/translate';
 import * as t from '../types/redux/meters';
 import { metersApi } from '../utils/api';
@@ -87,7 +87,8 @@ export function submitEditedMeter(editedMeter: t.MeterData): Thunk {
 				showSuccessNotification(translate('meter.successfully.edited.meter'));
 			} catch (err) {
 				// Failure! ):
-				showErrorNotification(translate('meter.failed.to.edit.meter'));
+				// TODO Better way than popup with React but want to stay so user can read/copy.
+				window.alert(translate('meter.failed.to.edit.meter') + '"' + err.response.data as string + '"');
 				// Clear our changes from to the submitting meters state
 				// We must do this in case fetch failed to keep the store in sync with the database
 				dispatch(deleteSubmittedMeter(editedMeter.id));
@@ -109,7 +110,8 @@ export function addMeter(meter: t.MeterEditData): Thunk {
 			dispatch(fetchMetersDetails());
 			showSuccessNotification(translate('meter.successfully.create.meter'));
 		} catch (err) {
-			showErrorNotification(translate('meter.failed.to.create.meter'));
+			// TODO Better way than popup with React but want to stay so user can read/copy.
+			window.alert(translate('meter.failed.to.create.meter') + '"' + err.response.data as string + '"');
 		}
 	}
 }

@@ -15,6 +15,7 @@ const Point = require('../models/Point');
 const moment = require('moment');
 const { MeterTimeSortTypesJS } = require('../services/csvPipeline/validateCsvUploadParams');
 const _ = require('lodash');
+const { failure, success } = require('./response');
 
 const router = express.Router();
 router.use(optionalAuthenticator);
@@ -221,8 +222,7 @@ router.post('/edit', requiredAdmin('edit meters'), async (req, res) => {
 	const response = validateMeterParams(req.body)
 	if (!response.valid) {
 		log.warn(`Got request to edit a meter with invalid meter data, errors: ${response.errors}`);
-		// TODO Nice if the client displayed the error message - same for create.
-		res.status(400).json({ message: response.errors });
+		failure(res, 400, 'validation failed with ' + response.errors.toString());
 	} else {
 		const conn = getConnection();
 		try {
@@ -257,10 +257,10 @@ router.post('/edit', requiredAdmin('edit meters'), async (req, res) => {
 			// Put any changed values from updatedMeter into meter.
 			_.merge(meter, updatedMeter);
 			await meter.update(conn);
-			res.status(200).json({ message: `Successfully edited meter ${req.body.id}` });
+			success(res);
 		} catch (err) {
-			log.error('Failed to edit meter', err);
-			res.status(500).json({ message: 'Unable to edit meters.', err });
+			log.error(`Error while editing a meter with detail "${err['detail']}"`, err);
+			failure(res, 500, err.toString() + ' with detail ' + err['detail']);
 		}
 	}
 });
@@ -272,7 +272,7 @@ router.post('/addMeter', async (req, res) => {
 	const response = validateMeterParams(req.body)
 	if (!response.valid) {
 		log.warn(`Got request to create a meter with invalid meter data, errors: ${response.errors}`);
-		res.status(400).json({ message: response.errors });
+		failure(res, 400, 'validation failed with ' + response.errors.toString());
 	} else {
 		const conn = getConnection();
 		try {
@@ -304,10 +304,10 @@ router.post('/addMeter', async (req, res) => {
 				req.body.defaultGraphicUnit
 			);
 			await newMeter.insert(conn);
-			res.sendStatus(200);
+			success(res);
 		} catch (err) {
-			log.error(`Error while inserting new meter ${err}`, err);
-			res.status(500).json({ message: err });
+			log.error(`Error while inserting new meter with detail "${err['detail']}"`, err);
+			failure(res, 500, err.toString() + ' with detail ' + err['detail']);
 		}
 	}
 });
