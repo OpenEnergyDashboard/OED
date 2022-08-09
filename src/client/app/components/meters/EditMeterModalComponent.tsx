@@ -203,8 +203,15 @@ export default function EditMeterModalComponent(props: EditMeterModalComponentPr
 		// Only validate and store if any changes.
 		if (meterHasChanges) {
 
+			// TODO Maybe should do as a single popup?
+
 			// Set default identifier as name if left blank
 			state.identifier = (!state.identifier || state.identifier.length === 0) ? state.name : state.identifier;
+
+			// TODO There are some issues with the values set in the edit meter units so they do not filter perfectly.
+			// It would be best if this was done via the menus.
+			// If there is no meter unit then there should be no default graphic unit.
+			state.defaultGraphicUnit = (state.unitId === -99) ? -99 : state.defaultGraphicUnit;
 
 			// Check area is positive.
 			// TODO For now allow zero so works with default value and DB. We should probably
