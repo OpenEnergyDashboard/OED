@@ -20,6 +20,7 @@ import { isRoleAdmin } from '../../utils/hasPermissions';
 import { State } from 'types/redux/state';
 import { UnitData } from '../../types/redux/units';
 import { unitsCompatibleWithUnit } from '../../utils/determineCompatibleUnits';
+import { ConversionArray } from '../../types/conversionArray';
 
 // Notifies user of msg.
 // TODO isValidGPSInput uses alert so continue that. Maybe all should be changed but this impacts other parts of the code.
@@ -170,34 +171,34 @@ export default function CreateMeterModalComponent(props: CreateMeterModalCompone
 
 		// Check GPS entered.
 		// Validate GPS is okay and take from string to GPSPoint to submit.
-		const gpsInput: string = state.gps;
-		let gps: GPSPoint | null;
+		const gpsInput = state.gps;
+		let gps: GPSPoint | null = null;
 		const latitudeIndex = 0;
 		const longitudeIndex = 1;
-		if (gpsInput.length === 0) {
-			// This is the value to route on an empty value which is stored as null in the DB.
-			gps = null;
-		} else if (isValidGPSInput(gpsInput)) {
-			const array = gpsInput.split(',').map((value: string) => parseFloat(value));
-			// It is valid and needs to be in this format for routing.
-			gps = {
-				longitude: array[longitudeIndex],
-				latitude: array[latitudeIndex]
-			};
-		} else {
-			// GPS not okay.
-			// TODO isValidGPSInput currently tops up an alert so not doing it here, may change
-			// so leaving code commented out.
-			// notifyUser(translate('input.gps.range') + state.gps + '.');
-			inputOk = false;
-			// TypeScript does not figure out that gps is not used in this case so reports
-			// an error. Set value to avoid.
-			gps = null;
+		// If the user input a value then gpsInput should be a string.
+		// null came from the DB and it is okay to just leave it - Not a string.
+		if (typeof gpsInput === 'string') {
+			if (isValidGPSInput(gpsInput)) {
+				// Clearly gpsInput is a string but TS complains about the split so cast.
+				const array = (gpsInput as string).split(',').map((value: string) => parseFloat(value));
+				// It is valid and needs to be in this format for routing.
+				gps = {
+					longitude: array[longitudeIndex],
+					latitude: array[latitudeIndex]
+				};
+				// gpsInput must be of type string but TS does not think so so cast.
+			} else if ((gpsInput as string).length !== 0) {
+				// GPS not okay.
+				// TODO isValidGPSInput currently tops up an alert so not doing it here, may change
+				// so leaving code commented out.
+				// notifyUser(translate('input.gps.range') + state.gps + '.');
+				inputOk = false;
+			}
 		}
 
 		if (inputOk) {
-			// GPS was updated so create updated state to submit.
-			// TODO need to type submitState?
+			// The input passed validation but only store if there are changes.
+			// GPS may have been updated so create updated state to submit.
 			submitState = { ...state, gps: gps };
 			// Submit new meter if checks where ok.
 			dispatch(addMeter(submitState));
@@ -208,10 +209,12 @@ export default function CreateMeterModalComponent(props: CreateMeterModalCompone
 		}
 	};
 
-	// Update compatible graphic units set when unitId changes
+	// Update compatible units and graphic units set.
+	// This works the same as Edit with a single useEffect. See Edit for an explanation but note
+	// those issues were never seen with create.
 	useEffect(() => {
 		// Graphic units compatible with currently selected unit
-		let compatibleGraphicUnits = new Set<UnitData>();
+		const compatibleGraphicUnits = new Set<UnitData>();
 		// Graphic units incompatible with currently selected unit
 		const incompatibleGraphicUnits = new Set<UnitData>();
 		// If a unit has been selected that is not 'no unit'
@@ -230,19 +233,19 @@ export default function CreateMeterModalComponent(props: CreateMeterModalCompone
 		}
 		// No unit is selected
 		else {
-			// All default graphic units are compatible
-			compatibleGraphicUnits = new Set(dropdownsState.possibleGraphicUnits);
+			// OED does not allow a default graphic unit if there is no unit so it must be -99.
+			state.defaultGraphicUnit = -99;
+			dropdownsState.possibleGraphicUnits.forEach(unit => {
+				// Only -99 is allowed.
+				if (unit.id == -99) {
+					compatibleGraphicUnits.add(unit);
+				}
+				else {
+					incompatibleGraphicUnits.add(unit);
+				}
+			});
 		}
-		// Update the state
-		setDropdownsState({
-			...dropdownsState,
-			compatibleGraphicUnits: new Set(compatibleGraphicUnits),
-			incompatibleGraphicUnits: new Set(incompatibleGraphicUnits)
-		});
-	}, [state.unitId]);
 
-	// Update compatible units set when defaultGraphicUnitId changes
-	useEffect(() => {
 		// Units compatible with currently selected graphic unit
 		let compatibleUnits = new Set<UnitData>();
 		// Units incompatible with currently selected graphic unit
@@ -270,13 +273,17 @@ export default function CreateMeterModalComponent(props: CreateMeterModalCompone
 			// All units are compatible
 			compatibleUnits = new Set(dropdownsState.possibleMeterUnits);
 		}
-		// Update the state
 		setDropdownsState({
 			...dropdownsState,
+			// The new set helps avoid repaints.
+			compatibleGraphicUnits: new Set(compatibleGraphicUnits),
+			incompatibleGraphicUnits: new Set(incompatibleGraphicUnits),
 			compatibleUnits: new Set(compatibleUnits),
 			incompatibleUnits: new Set(incompatibleUnits)
 		});
-	}, [state.defaultGraphicUnit]);
+		// If either unit or the status of pik changes then this needs to be done.
+		// pik is needed since the compatible units is not correct until pik is available.
+	}, [state.unitId, state.defaultGraphicUnit, ConversionArray.pikAvailable()]);
 
 	const tooltipStyle = {
 		display: 'inline-block',

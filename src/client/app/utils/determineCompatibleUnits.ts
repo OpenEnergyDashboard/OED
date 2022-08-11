@@ -66,7 +66,8 @@ export function unitsCompatibleWithUnit(unitId: number): Set<number> {
 	const unitSet = new Set<number>();
 	// If unit was null in the database then -99. This means there is no unit
 	// so nothing is compatible with it. Skip processing and return empty set at end.
-	if (unitId != -99) {
+	// Do same if pik is not yet available.
+	if (unitId != -99 && ConversionArray.pikAvailable()) {
 		// The Pik array.
 		const pik = ConversionArray.pik;
 		// Get the row index in Pik of this unit.
@@ -74,13 +75,11 @@ export function unitsCompatibleWithUnit(unitId: number): Set<number> {
 		// The compatible units are all columns with true for Pik where i = row.
 		// Loops over all columns of Pik in row.
 		// Since retrieving the pik array is an async call (in the initializationComponent) we must check for undefined
-		if (pik != undefined && pik != null) {
-			for (let k = 0; k < pik[0].length; ++k) {
-				if (pik[row][k]) {
-					// unit at index k is compatible with meter unit so add to set.
-					// Convert index in Pik to unit id.
-					unitSet.add(unitFromPColumn(k));
-				}
+		for (let k = 0; k < pik[0].length; ++k) {
+			if (pik[row][k]) {
+				// unit at index k is compatible with meter unit so add to set.
+				// Convert index in Pik to unit id.
+				unitSet.add(unitFromPColumn(k));
 			}
 		}
 	}

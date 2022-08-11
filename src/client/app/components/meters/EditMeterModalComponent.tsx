@@ -21,6 +21,7 @@ import { isRoleAdmin } from '../../utils/hasPermissions';
 import { State } from 'types/redux/state';
 import { UnitData } from '../../types/redux/units';
 import { unitsCompatibleWithUnit } from '../../utils/determineCompatibleUnits';
+import { ConversionArray } from '../../types/conversionArray';
 
 // Notifies user of msg.
 // TODO isValidGPSInput uses alert so continue that. Maybe all should be changed but this impacts other parts of the code.
@@ -137,9 +138,6 @@ export default function EditMeterModalComponent(props: EditMeterModalComponentPr
 	// Dropdowns
 	const [dropdownsState, setDropdownsState] = useState(dropdownsStateDefaults);
 
-	// Track if it is the first load so that we can properly calculate the valid dropdowns for units
-	const [isFirstLoad, setIsFirstLoad] = useState(true);
-
 	/* End State */
 
 	// Reset the state to default values
@@ -161,9 +159,6 @@ export default function EditMeterModalComponent(props: EditMeterModalComponentPr
 	// If there is a difference between props and state, then a change was made
 	// Side note, we could probably just set a boolean when any input i
 	const handleSaveChanges = () => {
-
-		// TODO why is this different than create in how handles GPS issue and also not checking others. Comment out for now.
-		// if (isValidGPSInput(`${state.gps.latitude}, ${state.gps.longitude}`)) {
 		// Close the modal first to avoid repeat clicks
 		props.handleClose();
 
@@ -207,11 +202,6 @@ export default function EditMeterModalComponent(props: EditMeterModalComponentPr
 
 			// Set default identifier as name if left blank
 			state.identifier = (!state.identifier || state.identifier.length === 0) ? state.name : state.identifier;
-
-			// TODO There are some issues with the values set in the edit meter units so they do not filter perfectly.
-			// It would be best if this was done via the menus.
-			// If there is no meter unit then there should be no default graphic unit.
-			state.defaultGraphicUnit = (state.unitId === -99) ? -99 : state.defaultGraphicUnit;
 
 			// Check area is positive.
 			// TODO For now allow zero so works with default value and DB. We should probably
@@ -257,8 +247,7 @@ export default function EditMeterModalComponent(props: EditMeterModalComponentPr
 
 			if (inputOk) {
 				// The input passed validation but only store if there are changes.
-				// GPS was updated so create updated state to submit.
-				// TODO need to type submitState?
+				// GPS may have been updated so create updated state to submit.
 				submitState = { ...state, gps: gps };
 				// Submit new meter if checks where ok.
 				dispatch(submitEditedMeter(submitState));
@@ -269,27 +258,20 @@ export default function EditMeterModalComponent(props: EditMeterModalComponentPr
 			}
 		}
 	};
-	//These two below useEffects can probably be extracted into a single function in the future, as create meter also uses them
 
+	// TODO This useEffect can probably be extracted into a single function in the future, as create meter also uses them.
 
-	// TODO DANGER WILL ROBINSON
-	// This function does not work on the first render and I cannot figure out why
-	// The function properly gets a list of incompatible graphic units but the state will not take them
-	// The useEffect below it works fine and is written the same way
-	// I am leaving it for now because it properly works after changing the unit select and changing it back
-	// and it is better to work on the first render for one dropdown and all subsequent renders for both dropdowns
-	// than to allow any units for both dropdowns always.
-	// Perhaps someone can fix this in the future.
-
-	// Update compatible graphic units set when unitId changes
+	// Update compatible units and graphic units set.
+	// Note an earlier version had two useEffect calls: one for each menu. This lead to an issue because it did separate
+	// setState calls that were asynchronous. As a result, the second one could use state state when doing ...dropdownsState
+	// and lose the first changes. Fusing them fixes this.
 	useEffect(() => {
-		console.log(dropdownsStateDefaults == dropdownsState);
 		// Graphic units compatible with currently selected unit
-		let compatibleGraphicUnits = new Set<UnitData>();
+		const compatibleGraphicUnits = new Set<UnitData>();
 		// Graphic units incompatible with currently selected unit
 		const incompatibleGraphicUnits = new Set<UnitData>();
 		// If a unit has been selected that is not 'no unit'
-		if (state.unitId != -999 && state.unitId != -99) {
+		if (state.unitId != -99) {
 			// Find all units compatible with the selected unit
 			const unitsCompatibleWithSelectedUnit = unitsCompatibleWithUnit(state.unitId);
 			dropdownsState.possibleGraphicUnits.forEach(unit => {
@@ -304,26 +286,25 @@ export default function EditMeterModalComponent(props: EditMeterModalComponentPr
 		}
 		// No unit is selected
 		else {
-			// All default graphic units are compatible
-			compatibleGraphicUnits = new Set(dropdownsState.possibleGraphicUnits);
+			// OED does not allow a default graphic unit if there is no unit so it must be -99.
+			state.defaultGraphicUnit = -99;
+			dropdownsState.possibleGraphicUnits.forEach(unit => {
+				// Only -99 is allowed.
+				if (unit.id == -99) {
+					compatibleGraphicUnits.add(unit);
+				}
+				else {
+					incompatibleGraphicUnits.add(unit);
+				}
+			});
 		}
-		// Update the state
-		setDropdownsState({
-			...dropdownsState,
-			compatibleGraphicUnits: new Set(compatibleGraphicUnits),
-			incompatibleGraphicUnits: new Set(incompatibleGraphicUnits)
-		});
-		console.log('second check:', dropdownsStateDefaults == dropdownsState);
-	}, [state.unitId]);
 
-	// Update compatible units set when defaultGraphicUnitId changes
-	useEffect(() => {
 		// Units compatible with currently selected graphic unit
 		let compatibleUnits = new Set<UnitData>();
 		// Units incompatible with currently selected graphic unit
 		const incompatibleUnits = new Set<UnitData>();
 		// If a default graphic unit has been selected that is not 'no unit'
-		if (state.defaultGraphicUnit != -999 && state.defaultGraphicUnit != -99) {
+		if (state.defaultGraphicUnit != -99) {
 			// Find all units compatible with the selected graphic unit
 			dropdownsState.possibleMeterUnits.forEach(unit => {
 				// Graphic units compatible with the current meter unit
@@ -348,21 +329,15 @@ export default function EditMeterModalComponent(props: EditMeterModalComponentPr
 		// Update the state
 		setDropdownsState({
 			...dropdownsState,
+			// The new set helps avoid repaints.
+			compatibleGraphicUnits: new Set(compatibleGraphicUnits),
+			incompatibleGraphicUnits: new Set(incompatibleGraphicUnits),
 			compatibleUnits: new Set(compatibleUnits),
 			incompatibleUnits: new Set(incompatibleUnits)
 		});
-	}, [state.defaultGraphicUnit]);
-
-
-	// A bit of a hacky fix to guarantee the two useEffect functions below run on the first load
-	useEffect(() => {
-		if (isFirstLoad) {
-			const unitIdCopy = state.unitId;
-			const defaultGraphicUnitCopy = state.defaultGraphicUnit;
-			setState({ ...state, unitId: unitIdCopy, defaultGraphicUnit: defaultGraphicUnitCopy });
-			setIsFirstLoad(false);
-		}
-	});
+		// If either unit or the status of pik changes then this needs to be done.
+		// pik is needed since the compatible units is not correct until pik is available.
+	}, [state.unitId, state.defaultGraphicUnit, ConversionArray.pikAvailable()]);
 
 	const tooltipStyle = {
 		display: 'inline-block',
@@ -378,6 +353,7 @@ export default function EditMeterModalComponent(props: EditMeterModalComponentPr
 	const tableStyle: React.CSSProperties = {
 		width: '100%'
 	};
+
 	return (
 		<>
 
