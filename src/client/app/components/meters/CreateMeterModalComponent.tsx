@@ -54,9 +54,6 @@ export default function CreateMeterModalComponent(props: CreateMeterModalCompone
 		displayable: false,
 		meterType: MeterType.OTHER,
 		url: '',
-		// TODO The default may need changing to match none if we want that but uncertain for create.
-		// translate() returns a TranslatedString of type Never so manually force to String.
-		// timeZone: String(translate('timezone.no')),
 		timeZone: '',
 		gps: '',
 		// Defaults of -999 (not to be confused with -99 which is no unit)
@@ -298,6 +295,13 @@ export default function CreateMeterModalComponent(props: CreateMeterModalCompone
 	const tableStyle: React.CSSProperties = {
 		width: '100%'
 	};
+
+	// This is a bit of a hack. The defaultValues set the time zone to the empty string.
+	// This makes the type a string and no easy way was found to all null too.
+	// The DB stores null for no choice and TimeZoneSelect expects null for no choice.
+	// To get around this, a new variable is used for the menu options so it can have
+	// both values where the empty string is converted to null.
+	const timeZoneValue : string | null = (state.timeZone === '' ? null : state.timeZone);
 
 	return (
 		<>
@@ -582,8 +586,7 @@ export default function CreateMeterModalComponent(props: CreateMeterModalCompone
 											{/* Timezone input*/}
 											<div style={formInputStyle}>
 												<label><FormattedMessage id="meter.time.zone" /></label><br />
-												{/* TODO This is not correctly choosing the default not timezone choice */}
-												<TimeZoneSelect current={state.timeZone} handleClick={timeZone => handleTimeZoneChange(timeZone)} />
+												<TimeZoneSelect current={timeZoneValue} handleClick={timeZone => handleTimeZoneChange(timeZone)} />
 											</div>
 											{/* reading input*/}
 											<div style={formInputStyle}>

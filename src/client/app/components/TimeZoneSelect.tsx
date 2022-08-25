@@ -9,7 +9,8 @@ import { TimeZones, TimeZoneOption } from 'types/timezone';
 import translate from '../utils/translate';
 
 interface TimeZoneSelectProps {
-	current: string;
+	// The timezone is a string and null is stored in DB when there isn't one.
+	current: string | null;
 	handleClick: (value: string) => void;
 }
 
