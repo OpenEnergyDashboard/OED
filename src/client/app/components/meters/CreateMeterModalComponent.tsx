@@ -52,7 +52,7 @@ export default function CreateMeterModalComponent(props: CreateMeterModalCompone
 		area: 0,
 		enabled: false,
 		displayable: false,
-		meterType: MeterType.OTHER,
+		meterType: '',
 		url: '',
 		timeZone: '',
 		gps: '',
@@ -161,6 +161,12 @@ export default function CreateMeterModalComponent(props: CreateMeterModalCompone
 		// A meter default graphic unit must be selected.
 		if (state.defaultGraphicUnit === -999) {
 			notifyUser(translate('meter.graphic.invalid'));
+			inputOk = false;
+		}
+
+		// A meter type must be selected.
+		if (state.meterType === '') {
+			notifyUser(translate('meter.type.invalid'));
 			inputOk = false;
 		}
 
@@ -301,7 +307,7 @@ export default function CreateMeterModalComponent(props: CreateMeterModalCompone
 	// The DB stores null for no choice and TimeZoneSelect expects null for no choice.
 	// To get around this, a new variable is used for the menu options so it can have
 	// both values where the empty string is converted to null.
-	const timeZoneValue : string | null = (state.timeZone === '' ? null : state.timeZone);
+	const timeZoneValue: string | null = (state.timeZone === '' ? null : state.timeZone);
 
 	return (
 		<>
@@ -426,11 +432,15 @@ export default function CreateMeterModalComponent(props: CreateMeterModalCompone
 													type='select'
 													value={state.meterType}
 													onChange={e => handleStringChange(e)}>
-													{/* TODO Want to not do a specific selection but request user to do one but this causes an error. Also want it required.
-													 Possible way is how done in src/client/app/components/TimeZoneSelect.tsx. */}
-													{/* Want to do also for unit id and default graphic unit */}
-													{/* <option disabled selected value> -- select an option -- </option> */}
-													// The dB expects lowercase.
+													{/* The default value is a blank string so then tell user to select one. */}
+													{<option
+														value={''}
+														key={''}
+														hidden={state.meterType !== ''}
+														disabled>
+														{translate('select.meter.type')}
+													</option>}
+													{/* The dB expects lowercase. */}
 													{Object.keys(MeterType).map(key => {
 														return (<option value={key.toLowerCase()} key={key.toLowerCase()}>{`${key}`}</option>)
 													})}
