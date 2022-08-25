@@ -24,7 +24,7 @@ export default function InitializationComponent() {
 
 	let notificationSystem: NotificationSystem.System;
 
-	// Only run once
+	// Only run once by making it depend on an empty array.
 	useEffect(() => {
 		dispatch(fetchMetersDetailsIfNeeded());
 		dispatch(fetchGroupsDetailsIfNeeded());
@@ -35,6 +35,7 @@ export default function InitializationComponent() {
 	}, []);
 
 	// TODO this was from the initializationcontainer but never called, do not know what it is for
+	// The commented out import also relates to this.
 	//		changeOptionsFromLink: (options: LinkOptions) => dispatch(changeOptionsFromLink(options))
 
 	// Notifications state
