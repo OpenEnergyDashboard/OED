@@ -9,15 +9,15 @@ import translate from '../../utils/translate';
 import '../../styles/Modal.unit.css';
 import { MeterTimeSortType, MeterType } from '../../types/redux/meters';
 import { useDispatch, useSelector } from 'react-redux';
+import { useState, useEffect } from 'react';
+import { State } from 'types/redux/state';
 import { addMeter } from '../../actions/meters';
 import TooltipMarkerComponent from '../TooltipMarkerComponent';
 import TooltipHelpContainer from '../../containers/TooltipHelpContainer';
-import { useState, useEffect } from 'react';
 import { TrueFalseType } from '../../types/items';
 import TimeZoneSelect from '../TimeZoneSelect';
 import { GPSPoint, isValidGPSInput } from '../../utils/calibration';
 import { isRoleAdmin } from '../../utils/hasPermissions';
-import { State } from 'types/redux/state';
 import { UnitData } from '../../types/redux/units';
 import { unitsCompatibleWithUnit } from '../../utils/determineCompatibleUnits';
 import { ConversionArray } from '../../types/conversionArray';
@@ -37,7 +37,6 @@ interface CreateMeterModalComponentProps {
 	possibleGraphicUnits: Set<UnitData>;
 }
 
-// TODO props not used in this file??
 export default function CreateMeterModalComponent(props: CreateMeterModalComponentProps) {
 
 	const dispatch = useDispatch();
@@ -130,7 +129,6 @@ export default function CreateMeterModalComponent(props: CreateMeterModalCompone
 
 	// Submit
 	const handleSubmit = () => {
-		let submitState;
 		// true if inputted values are okay. Then can submit.
 		let inputOk = true;
 
@@ -153,7 +151,7 @@ export default function CreateMeterModalComponent(props: CreateMeterModalCompone
 
 		// Check reading duplication is between 1 and 9.
 		if (state.readingDuplication < 1 || state.readingDuplication > 9) {
-			notifyUser(translate('duplication.invalid') + state.area + '.');
+			notifyUser(translate('duplication.invalid') + state.readingDuplication + '.');
 			inputOk = false;
 		}
 
@@ -180,16 +178,16 @@ export default function CreateMeterModalComponent(props: CreateMeterModalCompone
 		if (typeof gpsInput === 'string') {
 			if (isValidGPSInput(gpsInput)) {
 				// Clearly gpsInput is a string but TS complains about the split so cast.
-				const array = (gpsInput as string).split(',').map((value: string) => parseFloat(value));
+				const gpsValues = (gpsInput as string).split(',').map((value: string) => parseFloat(value));
 				// It is valid and needs to be in this format for routing.
 				gps = {
-					longitude: array[longitudeIndex],
-					latitude: array[latitudeIndex]
+					longitude: gpsValues[longitudeIndex],
+					latitude: gpsValues[latitudeIndex]
 				};
 				// gpsInput must be of type string but TS does not think so so cast.
 			} else if ((gpsInput as string).length !== 0) {
-				// GPS not okay.
-				// TODO isValidGPSInput currently tops up an alert so not doing it here, may change
+				// GPS not okay. Only true if some input.
+				// TODO isValidGPSInput currently pops up an alert so not doing it here, may change
 				// so leaving code commented out.
 				// notifyUser(translate('input.gps.range') + state.gps + '.');
 				inputOk = false;
@@ -197,9 +195,9 @@ export default function CreateMeterModalComponent(props: CreateMeterModalCompone
 		}
 
 		if (inputOk) {
-			// The input passed validation but only store if there are changes.
+			// The input passed validation.
 			// GPS may have been updated so create updated state to submit.
-			submitState = { ...state, gps: gps };
+			const submitState = { ...state, gps: gps };
 			// Submit new meter if checks where ok.
 			dispatch(addMeter(submitState));
 			resetState();
@@ -234,7 +232,8 @@ export default function CreateMeterModalComponent(props: CreateMeterModalCompone
 		// No unit is selected
 		else {
 			// OED does not allow a default graphic unit if there is no unit so it must be -99.
-			state.defaultGraphicUnit = -99;
+			// We don't reset if it is currently -999 since want user to select something.
+			state.defaultGraphicUnit = state.defaultGraphicUnit === -999 ? -999 : -99;
 			dropdownsState.possibleGraphicUnits.forEach(unit => {
 				// Only -99 is allowed.
 				if (unit.id == -99) {
@@ -255,10 +254,10 @@ export default function CreateMeterModalComponent(props: CreateMeterModalCompone
 			// Find all units compatible with the selected graphic unit
 			dropdownsState.possibleMeterUnits.forEach(unit => {
 				// Graphic units compatible with the current meter unit
-				const compatibleGraphicUnits = unitsCompatibleWithUnit(unit.id);
+				const compatibleGraphicUnitsForUnit = unitsCompatibleWithUnit(unit.id);
 				// If the currently selected default graphic unit exists in the set of graphic units compatible with the current meter unit
 				// Also add the 'no unit' unit
-				if (compatibleGraphicUnits.has(state.defaultGraphicUnit) || unit.id == -99) {
+				if (compatibleGraphicUnitsForUnit.has(state.defaultGraphicUnit) || unit.id == -99) {
 					// add the current meter unit to the list of compatible units
 					compatibleUnits.add(unit);
 				}
@@ -288,7 +287,7 @@ export default function CreateMeterModalComponent(props: CreateMeterModalCompone
 	const tooltipStyle = {
 		display: 'inline-block',
 		fontSize: '60%',
-		// Only and admin can edit a meter.
+		// Only an admin can create a meter.
 		tooltipCreateMeterView: 'help.admin.metercreate'
 	};
 
@@ -316,7 +315,7 @@ export default function CreateMeterModalComponent(props: CreateMeterModalCompone
 						</div>
 					</Modal.Title>
 				</Modal.Header>
-				{/* when any of the Meter are changed call one of the functions. */}
+				{/* when any of the Meter values are changed call one of the functions. */}
 				{loggedInAsAdmin && // only render when logged in as Admin
 					<Modal.Body className="show-grid">
 						<div id="container">
@@ -343,7 +342,7 @@ export default function CreateMeterModalComponent(props: CreateMeterModalCompone
 														onChange={e => handleStringChange(e)}
 														required value={state.name} />
 												</div>}
-											{/* UnitId input*/}
+											{/* meter unit input */}
 											<div style={formInputStyle}>
 												<label><FormattedMessage id="meter.unitName" /></label><br />
 												<Input
@@ -356,7 +355,7 @@ export default function CreateMeterModalComponent(props: CreateMeterModalCompone
 														key={-999}
 														hidden={state.unitId !== -999}
 														disabled>
-														Select a unit...
+														{translate('select.unit')}
 													</option>}
 													{Array.from(dropdownsState.compatibleUnits).map(unit => {
 														return (<option value={unit.id} key={unit.id}>{unit.identifier}</option>)
@@ -379,7 +378,7 @@ export default function CreateMeterModalComponent(props: CreateMeterModalCompone
 														key={-999}
 														hidden={state.defaultGraphicUnit !== -999}
 														disabled>
-														Select a default graphic unit...
+														{translate('select.unit')}
 													</option>}
 													{Array.from(dropdownsState.compatibleGraphicUnits).map(unit => {
 														return (<option value={unit.id} key={unit.id}>{unit.identifier}</option>)
@@ -459,8 +458,6 @@ export default function CreateMeterModalComponent(props: CreateMeterModalCompone
 												<Input
 													name='gps'
 													type='text'
-													// likley remove
-													// onChange={e => handleGpsChange(e)}
 													onChange={e => handleStringChange(e)}
 													value={state.gps} />
 											</div>
@@ -471,7 +468,7 @@ export default function CreateMeterModalComponent(props: CreateMeterModalCompone
 													name='note'
 													type='textarea'
 													onChange={e => handleStringChange(e)}
-													value={state?.note}
+													value={state.note}
 													placeholder='Note' />
 											</div>
 											{/* cumulative input*/}
@@ -517,7 +514,7 @@ export default function CreateMeterModalComponent(props: CreateMeterModalCompone
 													name='cumulativeResetEnd'
 													type='text'
 													onChange={e => handleStringChange(e)}
-													value={state?.cumulativeResetEnd}
+													value={state.cumulativeResetEnd}
 													placeholder="HH:MM:SS" />
 											</div>
 											{/* endOnlyTime input*/}
@@ -526,7 +523,7 @@ export default function CreateMeterModalComponent(props: CreateMeterModalCompone
 												<Input
 													name='endOnlyTime'
 													type='select'
-													value={state?.endOnlyTime.toString()}
+													value={state.endOnlyTime.toString()}
 													onChange={e => handleBooleanChange(e)}>
 													{Object.keys(TrueFalseType).map(key => {
 														return (<option value={key} key={key}>{translate(`TrueFalseType.${key}`)}</option>)
@@ -542,7 +539,7 @@ export default function CreateMeterModalComponent(props: CreateMeterModalCompone
 													onChange={e => handleNumberChange(e)}
 													step="0.01"
 													min="0"
-													value={state?.readingGap} />
+													value={state.readingGap} />
 											</div>
 											{/* readingVariation input*/}
 											<div style={formInputStyle}>
@@ -553,7 +550,7 @@ export default function CreateMeterModalComponent(props: CreateMeterModalCompone
 													onChange={e => handleNumberChange(e)}
 													step="0.01"
 													min="0"
-													value={state?.readingVariation} />
+													value={state.readingVariation} />
 											</div>
 											{/* readingDuplication input*/}
 											<div style={formInputStyle}>
@@ -565,7 +562,7 @@ export default function CreateMeterModalComponent(props: CreateMeterModalCompone
 													step="1"
 													min="1"
 													max="9"
-													value={state?.readingDuplication} />
+													value={state.readingDuplication} />
 											</div>
 											{/* timeSort input*/}
 											<div style={formInputStyle}>
@@ -573,7 +570,7 @@ export default function CreateMeterModalComponent(props: CreateMeterModalCompone
 												<Input
 													name='timeSort'
 													type='select'
-													value={state?.timeSort}
+													value={state.timeSort}
 													onChange={e => handleStringChange(e)}>
 													{Object.keys(MeterTimeSortType).map(key => {
 														// This is a bit of a hack but it should work fine. The TypeSortTypes and MeterTimeSortType should be in sync.
@@ -596,7 +593,7 @@ export default function CreateMeterModalComponent(props: CreateMeterModalCompone
 													type="number"
 													onChange={e => handleNumberChange(e)}
 													step="0.01"
-													value={state?.reading} />
+													value={state.reading} />
 											</div>
 											{/* startTimestamp input*/}
 											<div style={formInputStyle}>
@@ -606,7 +603,7 @@ export default function CreateMeterModalComponent(props: CreateMeterModalCompone
 													type='text'
 													onChange={e => handleStringChange(e)}
 													placeholder="YYYY-MM-DD HH:MM:SS"
-													value={state?.startTimestamp} />
+													value={state.startTimestamp} />
 											</div>
 											{/* endTimestamp input*/}
 											<div style={formInputStyle}>
@@ -616,7 +613,7 @@ export default function CreateMeterModalComponent(props: CreateMeterModalCompone
 													type='text'
 													onChange={e => handleStringChange(e)}
 													placeholder="YYYY-MM-DD HH:MM:SS"
-													value={state?.endTimestamp} />
+													value={state.endTimestamp} />
 											</div>
 										</div>
 									</div>
