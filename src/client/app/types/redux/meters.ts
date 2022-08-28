@@ -100,7 +100,7 @@ export interface MeterEditData {
 	displayable: boolean;
 	meterType: string;
 	url: string;
-	timeZone: string;
+	timeZone: string | null;
 	gps: GPSPoint | null;
 	unitId: number;
 	defaultGraphicUnit: number;

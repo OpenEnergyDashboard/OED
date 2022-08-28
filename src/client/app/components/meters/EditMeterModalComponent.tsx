@@ -3,22 +3,22 @@
 * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
 import * as React from 'react';
 import { Modal, Button } from 'react-bootstrap';
-import { useDispatch, useSelector } from 'react-redux';
-import { useState, useEffect } from 'react';
-import { MeterData, MeterTimeSortType, MeterType } from '../../types/redux/meters';
 import { Input } from 'reactstrap';
 import { FormattedMessage } from 'react-intl';
 import translate from '../../utils/translate';
+import { useDispatch, useSelector } from 'react-redux';
+import { useState, useEffect } from 'react';
+import { State } from 'types/redux/state';
+import '../../styles/Modal.unit.css';
+import { MeterData, MeterTimeSortType, MeterType } from '../../types/redux/meters';
 import { submitEditedMeter } from '../../actions/meters';
 import { removeUnsavedChanges } from '../../actions/unsavedWarning';
 import TooltipMarkerComponent from '../TooltipMarkerComponent';
 import TooltipHelpContainer from '../../containers/TooltipHelpContainer';
-import '../../styles/Modal.unit.css';
 import { TrueFalseType } from '../../types/items';
 import TimeZoneSelect from '../TimeZoneSelect';
 import { GPSPoint, isValidGPSInput } from '../../utils/calibration';
 import { isRoleAdmin } from '../../utils/hasPermissions';
-import { State } from 'types/redux/state';
 import { UnitData } from '../../types/redux/units';
 import { unitsCompatibleWithUnit } from '../../utils/determineCompatibleUnits';
 import { ConversionArray } from '../../types/conversionArray';
@@ -69,7 +69,6 @@ interface EditMeterModalComponentProps {
 	handleClose: () => void;
 }
 
-// Updated to hooks
 export default function EditMeterModalComponent(props: EditMeterModalComponentProps) {
 	const dispatch = useDispatch();
 
@@ -137,7 +136,6 @@ export default function EditMeterModalComponent(props: EditMeterModalComponentPr
 
 	// Dropdowns
 	const [dropdownsState, setDropdownsState] = useState(dropdownsStateDefaults);
-
 	/* End State */
 
 	// Reset the state to default values
@@ -162,7 +160,6 @@ export default function EditMeterModalComponent(props: EditMeterModalComponentPr
 		// Close the modal first to avoid repeat clicks
 		props.handleClose();
 
-		let submitState;
 		// true if inputted values are okay. Then can submit.
 		let inputOk = true;
 
@@ -229,11 +226,11 @@ export default function EditMeterModalComponent(props: EditMeterModalComponentPr
 			if (typeof gpsInput === 'string') {
 				if (isValidGPSInput(gpsInput)) {
 					// Clearly gpsInput is a string but TS complains about the split so cast.
-					const array = (gpsInput as string).split(',').map((value: string) => parseFloat(value));
+					const gpsValues = (gpsInput as string).split(',').map((value: string) => parseFloat(value));
 					// It is valid and needs to be in this format for routing.
 					gps = {
-						longitude: array[longitudeIndex],
-						latitude: array[latitudeIndex]
+						longitude: gpsValues[longitudeIndex],
+						latitude: gpsValues[latitudeIndex]
 					};
 					// gpsInput must be of type string but TS does not think so so cast.
 				} else if ((gpsInput as string).length !== 0) {
@@ -248,7 +245,7 @@ export default function EditMeterModalComponent(props: EditMeterModalComponentPr
 			if (inputOk) {
 				// The input passed validation but only store if there are changes.
 				// GPS may have been updated so create updated state to submit.
-				submitState = { ...state, gps: gps };
+				const submitState = { ...state, gps: gps };
 				// Submit new meter if checks where ok.
 				dispatch(submitEditedMeter(submitState));
 				dispatch(removeUnsavedChanges());
@@ -260,6 +257,7 @@ export default function EditMeterModalComponent(props: EditMeterModalComponentPr
 	};
 
 	// TODO This useEffect can probably be extracted into a single function in the future, as create meter also uses them.
+	// Note there are now differences, e.g., -999 check.
 
 	// Update compatible units and graphic units set.
 	// Note an earlier version had two useEffect calls: one for each menu. This lead to an issue because it did separate
@@ -270,7 +268,7 @@ export default function EditMeterModalComponent(props: EditMeterModalComponentPr
 		const compatibleGraphicUnits = new Set<UnitData>();
 		// Graphic units incompatible with currently selected unit
 		const incompatibleGraphicUnits = new Set<UnitData>();
-		// If a unit has been selected that is not 'no unit'
+		// If unit is not 'no unit'
 		if (state.unitId != -99) {
 			// Find all units compatible with the selected unit
 			const unitsCompatibleWithSelectedUnit = unitsCompatibleWithUnit(state.unitId);
@@ -303,7 +301,7 @@ export default function EditMeterModalComponent(props: EditMeterModalComponentPr
 		let compatibleUnits = new Set<UnitData>();
 		// Units incompatible with currently selected graphic unit
 		const incompatibleUnits = new Set<UnitData>();
-		// If a default graphic unit has been selected that is not 'no unit'
+		// If a default graphic unit is not 'no unit'
 		if (state.defaultGraphicUnit != -99) {
 			// Find all units compatible with the selected graphic unit
 			dropdownsState.possibleMeterUnits.forEach(unit => {
@@ -356,7 +354,6 @@ export default function EditMeterModalComponent(props: EditMeterModalComponentPr
 
 	return (
 		<>
-
 			<Modal show={props.show} onHide={props.handleClose}>
 				<Modal.Header>
 					<Modal.Title> <FormattedMessage id="edit.meter" />
@@ -392,7 +389,7 @@ export default function EditMeterModalComponent(props: EditMeterModalComponentPr
 												onChange={e => handleStringChange(e)}
 												required value={state.name} />
 										</div>
-										{/* UnitId input*/}
+										{/* meter unit input*/}
 										<div style={formInputStyle}>
 											<label><FormattedMessage id="meter.unitName" /></label><br />
 											<Input
@@ -430,6 +427,12 @@ export default function EditMeterModalComponent(props: EditMeterModalComponentPr
 											<Input
 												name='enabled'
 												type='select'
+												// There is a subtle difference from create. In crete the state is set to
+												// the default values so always is there. In edit, it comes via props so
+												// it may not be set before the meter state is fetched. This probably only
+												// happens when your reload one of these pages but to avoid issues it uses
+												// the ? to avoid access. This only applies to items where you dereference
+												// the state value such as .toString() here.
 												value={state.enabled?.toString()}
 												onChange={e => handleBooleanChange(e)}>
 												{Object.keys(TrueFalseType).map(key => {
@@ -458,11 +461,7 @@ export default function EditMeterModalComponent(props: EditMeterModalComponentPr
 												type='select'
 												value={state.meterType}
 												onChange={e => handleStringChange(e)}>
-												{/* TODO Want to not do a specific selection but request user to do one but this causes an error. Also want it required.
-													 Possible way is how done in src/client/app/components/TimeZoneSelect.tsx. */}
-												{/* Want to do also for unit id and default graphic unit */}
-												{/* <option disabled selected value> -- select an option -- </option> */}
-													// The dB expects lowercase.
+												{/* The dB expects lowercase. */}
 												{Object.keys(MeterType).map(key => {
 													return (<option value={key.toLowerCase()} key={key.toLowerCase()}>{`${key}`}</option>)
 												})}
@@ -618,7 +617,6 @@ export default function EditMeterModalComponent(props: EditMeterModalComponentPr
 										{/* Timezone input*/}
 										<div style={formInputStyle}>
 											<label><FormattedMessage id="meter.time.zone" /></label><br />
-											{/* TODO This is not correctly choosing the default not timezone choice */}
 											<TimeZoneSelect current={state.timeZone} handleClick={timeZone => handleTimeZoneChange(timeZone)} />
 										</div>
 										{/* reading input*/}
