@@ -155,10 +155,9 @@ mocha.describe('Units', () => {
 		mocha.it('should only get units of type suffix', async () => {
 			const conn = testDB.getConnection();
 			const unitTypeSuffixAll = await Unit.getByName('Suffix All', conn);
-			const unitTypeSuffixNone = await Unit.getByName('Suffix None', conn);
-			const expectedUnits = [unitTypeSuffixAll, unitTypeSuffixNone];
 			const actualUnits = await Unit.getTypeSuffix(conn);
-			expectArrayOfUnitsToBeEquivalent(expectedUnits, actualUnits);
+			expect(actualUnits.length).to.equal(1);
+			expectUnitToBeEquivalent(unitTypeSuffixAll, actualUnits[0]);
 		})
 
 		mocha.it('should only get units with suffix', async () => {

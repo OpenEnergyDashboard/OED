@@ -170,7 +170,7 @@ class Unit {
 	}
 
 	/**
-	 * Returns all units that have a suffix.
+	 * Returns all units that have a suffix and can be seen by someone.
 	 * @param {*} conn The connection to use.
 	 * @returns {Promise.<Array.<Unit>>}
 	 */
