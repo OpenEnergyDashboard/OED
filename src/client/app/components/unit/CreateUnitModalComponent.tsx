@@ -117,7 +117,7 @@ export default function CreateUnitModalComponent() {
 							{/* Modal content */}
 							<div className="container-fluid">
 								<div style={tableStyle}>
-									{/* Identifier input*/}
+									{/* Identifier input */}
 									<div style={formInputStyle}>
 										<label><FormattedMessage id="unit.identifier" /></label><br />
 										<Input
@@ -126,7 +126,7 @@ export default function CreateUnitModalComponent() {
 											onChange={e => handleStringChange(e)}
 											value={state.identifier} />
 									</div>
-									{/* Name input*/}
+									{/* Name input */}
 									<div style={formInputStyle}>
 										<label><FormattedMessage id="unit.name" /></label><br />
 										<Input
@@ -135,7 +135,7 @@ export default function CreateUnitModalComponent() {
 											onChange={e => handleStringChange(e)}
 											value={state.name} />
 									</div>
-									{/* Type of unit input*/}
+									{/* Type of unit input */}
 									<div style={formInputStyle}>
 										<label><FormattedMessage id="unit.type.of.unit" /></label><br />
 										<Input
@@ -148,7 +148,7 @@ export default function CreateUnitModalComponent() {
 											})}
 										</Input>
 									</div>
-									{/* Unit represent input*/}
+									{/* Unit represent input */}
 									<div style={formInputStyle}>
 										<label><FormattedMessage id="unit.represent" /></label><br />
 										<Input
@@ -161,7 +161,7 @@ export default function CreateUnitModalComponent() {
 											})}
 										</Input>
 									</div>
-									{/* Displayable type input*/}
+									{/* Displayable type input */}
 									<div style={formInputStyle}>
 										<label><FormattedMessage id="unit.dropdown.displayable" /></label><br />
 										<Input
@@ -174,7 +174,7 @@ export default function CreateUnitModalComponent() {
 											})}
 										</Input>
 									</div>
-									{/* Preferred display input*/}
+									{/* Preferred display input */}
 									<div style={formInputStyle}>
 										<label><FormattedMessage id="unit.preferred.display" /></label><br />
 										<Input
@@ -186,7 +186,7 @@ export default function CreateUnitModalComponent() {
 											})}
 										</Input>
 									</div>
-									{/* Seconds in rate input*/}
+									{/* Seconds in rate input */}
 									<div style={formInputStyle}>
 										<label><FormattedMessage id="unit.sec.in.rate" /></label><br />
 										<Input
@@ -198,7 +198,7 @@ export default function CreateUnitModalComponent() {
 											// This stops negative input by use of arrows to change value.
 											min="1" />
 									</div>
-									{/* Suffix input*/}
+									{/* Suffix input */}
 									<div style={formInputStyle}>
 										<label><FormattedMessage id="unit.suffix" /></label><br />
 										<Input
@@ -207,7 +207,7 @@ export default function CreateUnitModalComponent() {
 											onChange={e => handleStringChange(e)}
 											value={state.suffix} />
 									</div>
-									{/* Note input*/}
+									{/* Note input */}
 									<div style={formInputStyle}>
 										<label><FormattedMessage id="unit.note.optional" /></label><br />
 										<Input

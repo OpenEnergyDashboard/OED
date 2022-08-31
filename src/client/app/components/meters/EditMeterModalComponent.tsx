@@ -371,7 +371,7 @@ export default function EditMeterModalComponent(props: EditMeterModalComponentPr
 								{/* Modal content */}
 								<div className="container-fluid">
 									<div style={tableStyle}>
-										{/* Identifier input*/}
+										{/* Identifier input */}
 										<div style={formInputStyle}>
 											<label><FormattedMessage id="meter.identifier" /></label><br />
 											<Input
@@ -380,7 +380,7 @@ export default function EditMeterModalComponent(props: EditMeterModalComponentPr
 												onChange={e => handleStringChange(e)}
 												value={state.identifier} />
 										</div>
-										{/* Name input*/}
+										{/* Name input */}
 										<div style={formInputStyle}>
 											<label><FormattedMessage id="meter.name" /></label><br />
 											<Input
@@ -389,7 +389,7 @@ export default function EditMeterModalComponent(props: EditMeterModalComponentPr
 												onChange={e => handleStringChange(e)}
 												required value={state.name} />
 										</div>
-										{/* meter unit input*/}
+										{/* meter unit input */}
 										<div style={formInputStyle}>
 											<label><FormattedMessage id="meter.unitName" /></label><br />
 											<Input
@@ -421,7 +421,7 @@ export default function EditMeterModalComponent(props: EditMeterModalComponentPr
 												})}
 											</Input>
 										</div>
-										{/* Enabled input*/}
+										{/* Enabled input */}
 										<div style={formInputStyle}>
 											<label><FormattedMessage id="meter.enabled" /></label><br />
 											<Input
@@ -440,7 +440,7 @@ export default function EditMeterModalComponent(props: EditMeterModalComponentPr
 												})}
 											</Input>
 										</div>
-										{/* Displayable input*/}
+										{/* Displayable input */}
 										<div style={formInputStyle}>
 											<label><FormattedMessage id="meter.displayable" /></label><br />
 											<Input
@@ -453,7 +453,7 @@ export default function EditMeterModalComponent(props: EditMeterModalComponentPr
 												})}
 											</Input>
 										</div>
-										{/* Meter type input*/}
+										{/* Meter type input */}
 										<div style={formInputStyle}>
 											<label><FormattedMessage id="meter.type" /></label><br />
 											<Input
@@ -467,7 +467,7 @@ export default function EditMeterModalComponent(props: EditMeterModalComponentPr
 												})}
 											</Input>
 										</div>
-										{/* URL input*/}
+										{/* URL input */}
 										<div style={formInputStyle}>
 											<label><FormattedMessage id="meter.url" /></label><br />
 											<Input
@@ -476,7 +476,7 @@ export default function EditMeterModalComponent(props: EditMeterModalComponentPr
 												onChange={e => handleStringChange(e)}
 												value={nullToEmptyString(state.url)} />
 										</div>
-										{/* Area input*/}
+										{/* Area input */}
 										<div style={formInputStyle}>
 											<label><FormattedMessage id="meter.area" /></label><br />
 											<Input
@@ -487,7 +487,7 @@ export default function EditMeterModalComponent(props: EditMeterModalComponentPr
 												value={nullToEmptyString(state.area)}
 												onChange={e => handleNumberChange(e)} />
 										</div>
-										{/* GPS input*/}
+										{/* GPS input */}
 										<div style={formInputStyle}>
 											<label><FormattedMessage id="meter.gps" /></label><br />
 											<Input
@@ -496,7 +496,7 @@ export default function EditMeterModalComponent(props: EditMeterModalComponentPr
 												onChange={e => handleStringChange(e)}
 												value={getGPSString(state.gps)} />
 										</div>
-										{/* note input*/}
+										{/* note input */}
 										<div style={formInputStyle}>
 											<label><FormattedMessage id="meter.note" /></label><br />
 											<Input
@@ -506,7 +506,7 @@ export default function EditMeterModalComponent(props: EditMeterModalComponentPr
 												value={nullToEmptyString(state.note)}
 												placeholder='Note' />
 										</div>
-										{/* cumulative input*/}
+										{/* cumulative input */}
 										<div style={formInputStyle}>
 											<label><FormattedMessage id="meter.cumulative" /></label><br />
 											<Input
@@ -519,7 +519,7 @@ export default function EditMeterModalComponent(props: EditMeterModalComponentPr
 												})}
 											</Input>
 										</div>
-										{/* cumulativeReset input*/}
+										{/* cumulativeReset input */}
 										<div style={formInputStyle}>
 											<label><FormattedMessage id="meter.cumulativeReset" /></label><br />
 											<Input
@@ -532,7 +532,7 @@ export default function EditMeterModalComponent(props: EditMeterModalComponentPr
 												})}
 											</Input>
 										</div>
-										{/* cumulativeResetStart input*/}
+										{/* cumulativeResetStart input */}
 										<div style={formInputStyle}>
 											<label><FormattedMessage id="meter.cumulativeResetStart" /></label><br />
 											<Input
@@ -542,7 +542,7 @@ export default function EditMeterModalComponent(props: EditMeterModalComponentPr
 												value={state.cumulativeResetStart}
 												placeholder="HH:MM:SS" />
 										</div>
-										{/* cumulativeResetEnd input*/}
+										{/* cumulativeResetEnd input */}
 										<div style={formInputStyle}>
 											<label><FormattedMessage id="meter.cumulativeResetEnd" /></label><br />
 											<Input
@@ -552,7 +552,7 @@ export default function EditMeterModalComponent(props: EditMeterModalComponentPr
 												value={state?.cumulativeResetEnd}
 												placeholder="HH:MM:SS" />
 										</div>
-										{/* endOnlyTime input*/}
+										{/* endOnlyTime input */}
 										<div style={formInputStyle}>
 											<label><FormattedMessage id="meter.endOnlyTime" /></label><br />
 											<Input
@@ -565,7 +565,7 @@ export default function EditMeterModalComponent(props: EditMeterModalComponentPr
 												})}
 											</Input>
 										</div>
-										{/* readingGap input*/}
+										{/* readingGap input */}
 										<div style={formInputStyle}>
 											<label><FormattedMessage id="meter.readingGap" /></label><br />
 											<Input
@@ -576,7 +576,7 @@ export default function EditMeterModalComponent(props: EditMeterModalComponentPr
 												min="0"
 												value={state?.readingGap} />
 										</div>
-										{/* readingVariation input*/}
+										{/* readingVariation input */}
 										<div style={formInputStyle}>
 											<label><FormattedMessage id="meter.readingVariation" /></label><br />
 											<Input
@@ -587,7 +587,7 @@ export default function EditMeterModalComponent(props: EditMeterModalComponentPr
 												min="0"
 												value={state?.readingVariation} />
 										</div>
-										{/* readingDuplication input*/}
+										{/* readingDuplication input */}
 										<div style={formInputStyle}>
 											<label><FormattedMessage id="meter.readingDuplication" /></label><br />
 											<Input
@@ -599,7 +599,7 @@ export default function EditMeterModalComponent(props: EditMeterModalComponentPr
 												max="9"
 												value={state?.readingDuplication} />
 										</div>
-										{/* timeSort input*/}
+										{/* timeSort input */}
 										<div style={formInputStyle}>
 											<label><FormattedMessage id="meter.timeSort" /></label><br />
 											<Input
@@ -614,12 +614,12 @@ export default function EditMeterModalComponent(props: EditMeterModalComponentPr
 												})}
 											</Input>
 										</div>
-										{/* Timezone input*/}
+										{/* Timezone input */}
 										<div style={formInputStyle}>
 											<label><FormattedMessage id="meter.time.zone" /></label><br />
 											<TimeZoneSelect current={state.timeZone} handleClick={timeZone => handleTimeZoneChange(timeZone)} />
 										</div>
-										{/* reading input*/}
+										{/* reading input */}
 										<div style={formInputStyle}>
 											<label><FormattedMessage id="meter.reading" /></label><br />
 											<Input
@@ -629,7 +629,7 @@ export default function EditMeterModalComponent(props: EditMeterModalComponentPr
 												step="0.01"
 												value={state?.reading} />
 										</div>
-										{/* startTimestamp input*/}
+										{/* startTimestamp input */}
 										<div style={formInputStyle}>
 											<label><FormattedMessage id="meter.startTimeStamp" /></label><br />
 											<Input
@@ -639,7 +639,7 @@ export default function EditMeterModalComponent(props: EditMeterModalComponentPr
 												placeholder="YYYY-MM-DD HH:MM:SS"
 												value={state?.startTimestamp} />
 										</div>
-										{/* endTimestamp input*/}
+										{/* endTimestamp input */}
 										<div style={formInputStyle}>
 											<label><FormattedMessage id="meter.endTimeStamp" /></label><br />
 											<Input
