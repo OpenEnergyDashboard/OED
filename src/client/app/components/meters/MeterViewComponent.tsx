@@ -3,14 +3,14 @@
   * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
 import * as React from 'react';
 import { Button } from 'reactstrap';
-import { FormattedMessage } from 'react-intl';
+import { State } from 'types/redux/state';
 import { useState } from 'react';
+import { useSelector } from 'react-redux';
 import EditMeterModalComponent from './EditMeterModalComponent';
 import { MeterData } from 'types/redux/meters';
 import translate from '../../utils/translate';
-import { useSelector } from 'react-redux';
+import { FormattedMessage } from 'react-intl';
 import { isRoleAdmin } from '../../utils/hasPermissions';
-import { State } from 'types/redux/state';
 import { CurrentUserState } from 'types/redux/currentUser';
 import '../../styles/unit-card-page.css';
 import { UnitData} from '../../types/redux/units';
@@ -25,7 +25,6 @@ interface MeterViewComponentProps {
 }
 
 export default function MeterViewComponent(props: MeterViewComponentProps) {
-	// Don't check if admin since only an admin is allow to route to this page.
 	// Edit Modal Show
 	const [showEditModal, setShowEditModal] = useState(false);
 	const handleShow = () => {
@@ -49,7 +48,6 @@ export default function MeterViewComponent(props: MeterViewComponentProps) {
 	// The second test of -99 is for meters without units.
 	const unitName = (Object.keys(currentUnitState).length === 0 || props.meter.unitId === -99) ?
 		'no unit' : currentUnitState[props.meter.unitId].identifier;
-	// console.log('unitName ', unitName);
 	// This is the default graphic unit associated with the meter. See above for how code works.
 	const graphicName = (Object.keys(currentUnitState).length === 0 || props.meter.defaultGraphicUnit === -99) ?
 		'no unit' : currentUnitState[props.meter.defaultGraphicUnit].identifier;

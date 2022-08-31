@@ -17,7 +17,7 @@
 }
 
 /**
- * Inform the client of a failure (400 OK).
+ * Inform the client of a failure with provided code or 500.
  *
  * @param res The Express response object
  * @param code The code number to send back for request

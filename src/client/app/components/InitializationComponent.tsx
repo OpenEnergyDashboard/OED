@@ -5,8 +5,8 @@
 import * as React from 'react';
 import * as _ from 'lodash';
 import * as NotificationSystem from 'react-notification-system';
-import { useEffect} from 'react';
-import { useDispatch, useSelector} from 'react-redux';
+import { useEffect } from 'react';
+import { useDispatch, useSelector } from 'react-redux';
 import { State } from '../types/redux/state';
 import { clearNotifications } from '../actions/notifications';
 import { fetchMetersDetails, fetchMetersDetailsIfNeeded } from '../actions/meters';

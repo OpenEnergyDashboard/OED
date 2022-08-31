@@ -107,7 +107,7 @@ export function itemDisplayableOnMap(size: Dimensions, point: CartesianPoint): b
  */
 export function isValidGPSInput(input: string): boolean {
 	if (input.indexOf(',') === -1) { // if there is no comma
-		// TODO It would be nice to tell user that comman is missing but need to check all uses to be sure don't get ''.
+		// TODO It would be nice to tell user that comma is missing but need to check all uses to be sure don't get ''.
 		return false;
 	} else if (input.indexOf(',') !== input.lastIndexOf(',')) { // if there are multiple commas
 		return false;

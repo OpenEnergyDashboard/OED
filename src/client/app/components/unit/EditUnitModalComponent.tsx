@@ -8,12 +8,12 @@ import { Input } from 'reactstrap';
 import { FormattedMessage } from 'react-intl';
 import translate from '../../utils/translate';
 import { useDispatch } from 'react-redux';
+//Realize that * is already imported from react
+import { useState } from 'react';
 import { submitEditedUnit } from '../../actions/units';
 import { removeUnsavedChanges } from '../../actions/unsavedWarning';
 import TooltipMarkerComponent from '../TooltipMarkerComponent';
 import TooltipHelpContainer from '../../containers/TooltipHelpContainer';
-//Realize that * is already imported from react
-import { useState } from 'react';
 import '../../styles/Modal.unit.css';
 import { TrueFalseType } from '../../types/items';
 

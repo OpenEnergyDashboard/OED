@@ -266,7 +266,7 @@ router.post('/edit', requiredAdmin('edit meters'), async (req, res) => {
 });
 
 /**
- * Route for POST add unit.
+ * Route for POST add meter.
  */
 router.post('/addMeter', async (req, res) => {
 	const response = validateMeterParams(req.body)

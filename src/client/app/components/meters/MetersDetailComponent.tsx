@@ -7,11 +7,11 @@ import HeaderContainer from '../../containers/HeaderContainer';
 import FooterContainer from '../../containers/FooterContainer';
 import TooltipHelpContainer from '../../containers/TooltipHelpContainer';
 import TooltipMarkerComponent from '../TooltipMarkerComponent';
-import { useDispatch, useSelector } from 'react-redux';
-import {fetchMetersDetailsIfNeeded } from '../../actions/meters';
 import { State } from '../../types/redux/state';
-import { isRoleAdmin } from '../../utils/hasPermissions';
+import { useDispatch, useSelector } from 'react-redux';
 import { useEffect } from 'react';
+import { fetchMetersDetailsIfNeeded } from '../../actions/meters';
+import { isRoleAdmin } from '../../utils/hasPermissions';
 import MeterViewComponent from './MeterViewComponent';
 import CreateMeterModalComponent from './CreateMeterModalComponent';
 import { MeterData } from 'types/redux/meters';
@@ -19,7 +19,6 @@ import '../../styles/unit-card-page.css';
 import { UnitData, DisplayableType, UnitRepresentType, UnitType } from '../../types/redux/units';
 import * as _ from 'lodash';
 
-// Utilizes useDispatch and useSelector hooks
 export default function MetersDetailComponent() {
 
 	const dispatch = useDispatch();
@@ -98,6 +97,7 @@ export default function MetersDetailComponent() {
 		// Switch help depending if admin or not.
 		tooltipMeterView: loggedInAsAdmin ? 'help.admin.meterview' : 'help.meters.meterview'
 	};
+
 	return (
 		<div>
 			<HeaderContainer />
@@ -124,14 +124,13 @@ export default function MetersDetailComponent() {
 						{Object.values(MetersState)
 							.sort((MeterA: MeterData, MeterB: MeterData) => (MeterA.identifier.toLowerCase() > MeterB.identifier.toLowerCase()) ? 1 :
 								((MeterB.identifier.toLowerCase() > MeterA.identifier.toLowerCase()) ? -1 : 0))
-							.map(MeterData =>
-								(<MeterViewComponent
-									meter={MeterData as MeterData}
-									key={(MeterData as MeterData).id}
-									currentUser={currentUserState}
-									// These two props are used in the edit component (child of view component)
-									possibleMeterUnits={possibleMeterUnits}
-									possibleGraphicUnits={possibleGraphicUnits}/>))}
+							.map(MeterData => (<MeterViewComponent
+								meter={MeterData as MeterData}
+								key={(MeterData as MeterData).id}
+								currentUser={currentUserState}
+								// These two props are used in the edit component (child of view component)
+								possibleMeterUnits={possibleMeterUnits}
+								possibleGraphicUnits={possibleGraphicUnits} />))}
 					</div>
 				}
 			</div>
@@ -139,4 +138,3 @@ export default function MetersDetailComponent() {
 		</div>
 	);
 }
-
