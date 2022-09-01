@@ -193,8 +193,21 @@ function validateMeterParams(params) {
 					{ type: 'null' }
 				]
 			},
-			note: { type: 'string' },
-			area: { type: 'number', minimum: 0, },
+			note: {
+				oneOf: [
+					{ type: 'string' },
+					{ type: 'null' }
+				]
+			},
+			area: {
+				oneOf: [
+					{
+						type: 'number',
+						minimum: 0,
+					},
+					{ type: 'null' }
+				]
+			},
 			cumulative: { type: 'bool' },
 			cumulativeReset: { type: 'bool' },
 			cumulativeResetStart: { type: 'string' },

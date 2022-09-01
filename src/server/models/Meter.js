@@ -277,7 +277,7 @@ class Meter {
 	 */
 	static makeMeterDataValid(meter) {
 		if (meter.unitId === -99) {
-			// If there is no unitId, set defaultGraphicUnit to null and displayable to false.
+			// If there is no unitId, set defaultGraphicUnit to -99 and displayable to false.
 			if (meter.defaultGraphicUnit !== -99) {
 				meter.defaultGraphicUnit = -99;
 				log.warn(`defaultGraphicUnit of the meter "${meter.name}" has been removed since there is no unitId.`);
