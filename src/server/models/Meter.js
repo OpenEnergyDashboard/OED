@@ -35,14 +35,14 @@ class Meter {
 	 * @param startTimestamp Start timestamp of last reading input for this meter, default '1970-01-01 00:00:00'
 	 * @param endTimestamp  End timestamp of last reading input for this meter, '1970-01-01 00:00:00' 
 	 * @param unitId The foreign key to the unit table. The meter receives data and points to this unit in the graph, default -99
-	 * @param defaultGraphicUnit The foreign key to the unit table represents the preferred unit to display this meter, default unitId
+	 * @param defaultGraphicUnit The foreign key to the unit table represents the preferred unit to display this meter, default -99
 	 */
 	// The start/end timestamps are the default start/end timestamps that are set to the first
 	// day of time in moment. As always, we want to use UTC.
 	constructor(id, name, url, enabled, displayable, type, meterTimezone, gps = undefined, identifier = name, note, area,
 		cumulative = false, cumulativeReset = false, cumulativeResetStart = '00:00:00', cumulativeResetEnd = '23:59:59.999999',
 		readingGap = 0, readingVariation = 0, readingDuplication = 1, timeSort = 'increasing', endOnlyTime = false,
-		reading = 0.0, startTimestamp = moment(0).utc(), endTimestamp = moment(0).utc(), unitId = -99, defaultGraphicUnit = unitId) {
+		reading = 0.0, startTimestamp = moment(0).utc(), endTimestamp = moment(0).utc(), unitId = -99, defaultGraphicUnit = -99) {
 		// In order for the CSV pipeline to work, the order of the parameters needs to match the order that the fields are declared.
 		// In addition, each new parameter has to be added at the very end.
 		this.id = id;
@@ -118,10 +118,10 @@ class Meter {
 	 * @returns Meter from row
 	 */
 	static mapRow(row) {
-		var meter = new Meter(row.id, row.name, row.url, row.enabled, row.displayable, row.meter_type, row.default_timezone_meter, 
-						row.gps, row.identifier, row.note, row.area, row.cumulative, row.cumulative_reset, row.cumulative_reset_start, 
-						row.cumulative_reset_end, row.reading_gap, row.reading_variation, row.reading_duplication, row.time_sort, 
-						row.end_only_time, row.reading, row.start_timestamp, row.end_timestamp, row.unit_id, row.default_graphic_unit);
+		var meter = new Meter(row.id, row.name, row.url, row.enabled, row.displayable, row.meter_type, row.default_timezone_meter,
+			row.gps, row.identifier, row.note, row.area, row.cumulative, row.cumulative_reset, row.cumulative_reset_start,
+			row.cumulative_reset_end, row.reading_gap, row.reading_variation, row.reading_duplication, row.time_sort,
+			row.end_only_time, row.reading, row.start_timestamp, row.end_timestamp, row.unit_id, row.default_graphic_unit);
 		meter.unitId = Meter.convertUnitValue(meter.unitId);
 		meter.defaultGraphicUnit = Meter.convertUnitValue(meter.defaultGraphicUnit);
 		return meter;
@@ -199,7 +199,7 @@ class Meter {
 	 */
 	async insert(conn) {
 		Meter.makeMeterDataValid(this);
-		const meter = {...this};
+		const meter = { ...this };
 		if (meter.id !== undefined) {
 			throw new Error('Attempt to insert a meter that already has an ID');
 		}
@@ -218,8 +218,8 @@ class Meter {
 		cumulative = this.cumulative, cumulativeReset = this.cumulativeReset, cumulativeResetStart = this.cumulativeResetStart,
 		cumulativeResetEnd = this.cumulativeResetEnd, readingGap = this.readingGap, readingVariation = this.readingVariation,
 		readingDuplication = this.readingDuplication, timeSort = this.timeSort, endOnlyTime = this.endOnlyTime,
-		reading = this.reading, startTimestamp = this.startTimestamp, endTimestamp = this.endTimestamp) {
-
+		reading = this.reading, startTimestamp = this.startTimestamp, endTimestamp = this.endTimestamp,
+		unitId = this.unitId, defaultGraphicUnit = this.default_graphic_unit) {
 		this.name = name;
 		this.url = url;
 		this.enabled = enabled;
@@ -242,6 +242,8 @@ class Meter {
 		this.reading = reading;
 		this.startTimestamp = startTimestamp;
 		this.endTimestamp = endTimestamp;
+		this.unitId = unitId;
+		this.defaultGraphicUnit = defaultGraphicUnit;
 	}
 
 	/**
@@ -251,7 +253,7 @@ class Meter {
 	 */
 	async update(conn) {
 		Meter.makeMeterDataValid(this);
-		const meter = {...this};
+		const meter = { ...this };
 		if (meter.id === undefined) {
 			throw new Error('Attempt to update a meter with no ID');
 		}
@@ -275,7 +277,7 @@ class Meter {
 	 */
 	static makeMeterDataValid(meter) {
 		if (meter.unitId === -99) {
-			// If there is no unitId, set defaultGraphicUnit to null and displayable to false.
+			// If there is no unitId, set defaultGraphicUnit to -99 and displayable to false.
 			if (meter.defaultGraphicUnit !== -99) {
 				meter.defaultGraphicUnit = -99;
 				log.warn(`defaultGraphicUnit of the meter "${meter.name}" has been removed since there is no unitId.`);
@@ -284,10 +286,6 @@ class Meter {
 				meter.displayable = false;
 				log.warn(`displayable of the meter "${meter.name}" has been switched to false since there is no unitId.`);
 			}
-		} else if (meter.defaultGraphicUnit === -99) {
-			// If the defaultGraphicUnit is null then set it to the unitId
-			meter.defaultGraphicUnit = meter.unitId;
-			log.warn(`defaultGraphicUnit of the meter "${meter.name}" has been set to unitId.`);
 		}
 	}
 
@@ -308,6 +306,8 @@ class Meter {
 	}
 }
 
+// The relates to the TS object MeterType for the same use in src/client/app/types/redux/meters.ts.
+// They should be kept in sync.
 // Enum of meter types
 Meter.type = {
 	EGAUGE: 'egauge',

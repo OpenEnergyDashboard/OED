@@ -9,8 +9,9 @@ import { TimeZones, TimeZoneOption } from 'types/timezone';
 import translate from '../utils/translate';
 
 interface TimeZoneSelectProps {
-	current: string | undefined;
-	handleClick: (value: string | null) => void;
+	// The timezone is a string and null is stored in DB when there isn't one.
+	current: string | null;
+	handleClick: (value: string) => void;
 }
 
 let options: null | TimeZoneOption[] = null;
@@ -33,10 +34,8 @@ const TimeZoneSelect: React.FC<TimeZoneSelectProps> = ({ current, handleClick })
 		}
 	}, []);
 
-	const handleChange = (selectedOption: TimeZoneOption | null) => {
-		if (selectedOption != null ) {
-			handleClick(selectedOption.value);
-		}
+	const handleChange = (selectedOption: TimeZoneOption) => {
+		handleClick(selectedOption.value);
 	};
 
 	return (options !== null ?

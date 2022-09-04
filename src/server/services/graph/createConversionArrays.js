@@ -50,13 +50,16 @@ async function createCikArray(graph, conn) {
 	// some units, the number that are not visible to an admin is likely to be small. As with meter units, OED
 	// would need to update Cik if any unit has its visible status changed. Not doing this avoids having to update
 	// Cik on unit changes (only on conversion change because adding a new unit that has no conversion means
-	// all its values in Cik would indicate no conversion).
+	// all its values in Cik would indicate no conversion). Note we do exclude if displayable is none
+	// since those cannot be graphed. The original unit with a suffix string is excluded by OED during
+	// processing of suffix units.
 	// The final consideration is how much including the extra items will cost. The larger array should not impact
 	// the speed of looking up an item in Cik or Pik. Sending Pik to the client will be larger but note that if
 	// there are 30 meter units and 100 unit/suffix units then Pik has 3000 items of type boolean. This will
 	// not be large, esp. compared to the rest of the startup payload of code. Thus, including all the
 	// units should still be very efficient and the bytes saved by doing all the extra work above will be small.
 	const sources = await Unit.getTypeMeter(conn);
+	// This excludes units that have displayable none since cannot be graphed.
 	const destinations = (await Unit.getTypeUnit(conn)).concat(await Unit.getTypeSuffix(conn));
 	// Size of each of these.
 	const numSources = sources.length;

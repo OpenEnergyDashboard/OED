@@ -66,7 +66,8 @@ export function unitsCompatibleWithUnit(unitId: number): Set<number> {
 	const unitSet = new Set<number>();
 	// If unit was null in the database then -99. This means there is no unit
 	// so nothing is compatible with it. Skip processing and return empty set at end.
-	if (unitId != -99) {
+	// Do same if pik is not yet available.
+	if (unitId != -99 && ConversionArray.pikAvailable()) {
 		// The Pik array.
 		const pik = ConversionArray.pik;
 		// Get the row index in Pik of this unit.

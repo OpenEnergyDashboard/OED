@@ -8,12 +8,12 @@ import { Input } from 'reactstrap';
 import { FormattedMessage } from 'react-intl';
 import translate from '../../utils/translate';
 import { useDispatch } from 'react-redux';
+//Realize that * is already imported from react
+import { useState } from 'react';
 import { submitEditedUnit } from '../../actions/units';
 import { removeUnsavedChanges } from '../../actions/unsavedWarning';
 import TooltipMarkerComponent from '../TooltipMarkerComponent';
 import TooltipHelpContainer from '../../containers/TooltipHelpContainer';
-//Realize that * is already imported from react
-import { useState } from 'react';
 import '../../styles/Modal.unit.css';
 import { TrueFalseType } from '../../types/items';
 
@@ -140,17 +140,17 @@ export default function EditUnitModalComponent(props: EditUnitModalComponentProp
 							{/* Modal content */}
 							<div className="container-fluid">
 								<div style={tableStyle}>
-									{/* Identifier input*/}
+									{/* Identifier input */}
 									<div style={formInputStyle}>
 										<label><FormattedMessage id="unit.identifier" /></label><br />
 										<Input
 											name="identifier"
 											type="text"
 											onChange={e => handleStringChange(e)}
-											defaultValue={state.identifier}
+											value={state.identifier}
 											placeholder="Identifier" />
 										<div />
-										{/* Name input*/}
+										{/* Name input */}
 										<div style={formInputStyle}>
 											<label><FormattedMessage id="unit.name" /></label><br />
 											<Input
@@ -159,88 +159,88 @@ export default function EditUnitModalComponent(props: EditUnitModalComponentProp
 												onChange={e => handleStringChange(e)}
 												value={state.name} />
 										</div>
-										{/* Type of unit input*/}
+										{/* Type of unit input */}
 										<div style={formInputStyle}>
 											<label><FormattedMessage id="unit.type.of.unit" /></label><br />
 											<Input
 												name='typeOfUnit'
 												type='select'
 												onChange={e => handleStringChange(e)}>
-												defaultValue={state.typeOfUnit}
+												value={state.typeOfUnit}
 												{Object.keys(UnitType).map(key => {
 													return (<option value={key} key={key}>{translate(`UnitType.${key}`)}</option>)
 												})}
 											</Input>
 										</div>
-										{/* Unit represent input*/}
+										{/* Unit represent input */}
 										<div style={formInputStyle}>
 											<label><FormattedMessage id="unit.represent" /></label><br />
 											<Input
 												name='unitRepresent'
 												type='select'
-												defaultValue={state.unitRepresent}
+												value={state.unitRepresent}
 												onChange={e => handleStringChange(e)}>
 												{Object.keys(UnitRepresentType).map(key => {
 													return (<option value={key} key={key}>{translate(`UnitRepresentType.${key}`)}</option>)
 												})}
 											</Input>
 										</div>
-										{/* Displayable type input*/}
+										{/* Displayable type input */}
 										<div style={formInputStyle}>
 											<label><FormattedMessage id="unit.displayable" /></label><br />
 											<Input
 												name='displayable'
 												type='select'
-												defaultValue={state.displayable}
+												value={state.displayable}
 												onChange={e => handleStringChange(e)}>
 												{Object.keys(DisplayableType).map(key => {
 													return (<option value={key} key={key}>{translate(`DisplayableType.${key}`)}</option>)
 												})}
 											</Input>
 										</div>
-										{/* Preferred display input*/}
+										{/* Preferred display input */}
 										<div style={formInputStyle}>
 											<label><FormattedMessage id="unit.preferred.display" /></label><br />
 											<Input
 												name='preferredDisplay'
 												type='select'
-												defaultValue={state.preferredDisplay.toString()}
+												value={state.preferredDisplay.toString()}
 												onChange={e => handleBooleanChange(e)}>
 												{Object.keys(TrueFalseType).map(key => {
 													return (<option value={key} key={key}>{translate(`TrueFalseType.${key}`)}</option>)
 												})}
 											</Input>
 										</div>
-										{/* Seconds in rate input*/}
+										{/* Seconds in rate input */}
 										<div style={formInputStyle}>
 											<label><FormattedMessage id="unit.sec.in.rate" /></label><br />
 											<Input
 												name='secInRate'
 												type="number"
-												defaultValue={state.secInRate}
+												value={state.secInRate}
 												onChange={e => handleNumberChange(e)}
 												placeholder="Sec In Rate"
 												// TODO validate negative input by typing for rate but database stops it.
 												// This stops negative input by use of arrows to change value.
 												min="1" />
 										</div>
-										{/* Suffix input*/}
+										{/* Suffix input */}
 										<div style={formInputStyle}>
 											<label><FormattedMessage id="unit.suffix" /></label><br />
 											<Input
 												name="suffix"
 												type="text"
-												defaultValue={state.suffix}
+												value={state.suffix}
 												placeholder="Suffix"
 												onChange={e => handleStringChange(e)} />
 										</div>
-										{/* Note input*/}
+										{/* Note input */}
 										<div style={formInputStyle}>
 											<label><FormattedMessage id="unit.note" /></label><br />
 											<Input
 												name="note"
 												type="textarea"
-												defaultValue={state.note}
+												value={state.note}
 												placeholder="Note"
 												onChange={e => handleStringChange(e)} />
 										</div>

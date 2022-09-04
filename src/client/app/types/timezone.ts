@@ -9,6 +9,6 @@ export interface TimeZones {
 }
 
 export interface TimeZoneOption {
-	value: null | string;
+	value: string;
 	label: string;
 }

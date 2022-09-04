@@ -539,6 +539,8 @@ async function insertSpecialGroups(conn) {
 	const specialGroups = [
 		['Electric Utility 1-5 + 2-6 kWh', 'kWh', true, ['Electric Utility kWh', 'Electric Utility kWh 2-6'], []],
 		['Electric Utility 1-5 + Natural Gas Dollar Euro', 'Euro', true, ['Electric Utility kWh', 'Natural Gas Dollar'], []],
+		['Electric Utility 1-5 + 2-6 Dollar', 'US_dollar', true, ['Electric Utility kWh', 'Electric Utility kWh 2-6'], []],
+		['Natural Gas Dollar Euro', 'Euro', true, ['Natural Gas Dollar'], []],
 		['Electric kW + 2-6 kW', 'kW', true, ['Electric kW', 'Electric kW 2-6'], []],
 		['Electric Utility 1-5 kWh not displayable', 'kWh', false, ['Electric Utility kWh'], []],
 		['SqSin + SqCos kWh', 'kWh', true, ['testSqSin kWh', 'testSqCos kWh'], []],
@@ -546,8 +548,8 @@ async function insertSpecialGroups(conn) {
 		['Amp 1 + 5 kWh', 'kWh', true, ['testAmp1Sin kWh', 'testAmp5Sin kWh'], []],
 		['Amp 2 + 6 kWh', 'kWh', true, ['testAmp2Sin kWh', 'testAmp6Sin kWh'], []],
 		['Amp 3 + 4 kWh', 'kWh', true, ['testAmp3Sin kWh', 'testAmp4Sin kWh'], []],
-		['Amp  2 + (1 + 5) kWh', 'kWh', true, ['testAmp2Sin kWh'], ['Amp 1 + 5 kWh']],
-		['Amp 3 + 6 + (2 + (1 + 5)) + (3 + 4) kWh', 'kWh', true, ['testAmp3Sin kWh', 'testAmp6Sin kWh'], ['Amp  2 + (1 + 5) kWh', 'Amp 3 + 4 kWh']],
+		['Amp 2 + (1 + 5) kWh', 'kWh', true, ['testAmp2Sin kWh'], ['Amp 1 + 5 kWh']],
+		['Amp 3 + 6 + (2 + (1 + 5)) + (3 + 4) kWh', 'kWh', true, ['testAmp3Sin kWh', 'testAmp6Sin kWh'], ['Amp 2 + (1 + 5) kWh', 'Amp 3 + 4 kWh']],
 		['Amp 6 + 7 + (1 + 5) + (2 + 6) + (3 + 4) kWh', 'kWh', true, ['testAmp6Sin kWh', 'testAmp7Sin kWh'], ['Amp 2 + 6 kWh', 'Amp 3 + 4 kWh', 'Amp 1 + 5 kWh']]
 	];
 	for (let i = 0; i < specialGroups.length; ++i) {
@@ -636,12 +638,12 @@ psql -U oed
 -- Normally gives "DELETE 575320"
 delete from readings where meter_id in (select id from meters where name in ('Electric Utility kWh', 'Electric Utility kWh 2-6', 'Electric Utility kWh in BTU', 'Electric Utility kWh in MTon CO2', 'Electric Utility no unit', 'Electric Utility kWh not displayable', 'Natural Gas BTU', 'Natural Gas BTU in Dollar', 'Natural Gas Dollar', 'Natural Gas Cubic Meters', 'Water Gallon', 'Trash Kg', 'Temp Fahrenheit 0-212', 'Temp Fahrenheit in Celsius', 'Electric kW', 'Electric kW 2-6', 'Water Gallon flow 1-5 per minute', 'test4DaySin kWh', 'test4HourSin kWh', 'test23MinSin kWh', 'test15MinSin kWh', 'test23MinCos kWh', 'testSqSin kWh', 'testSqCos kWh', 'testAmp1Sin kWh', 'testAmp2Sin kWh', 'testAmp3Sin kWh', 'testAmp4Sin kWh', 'testAmp5Sin kWh', 'testAmp6Sin kWh', 'testAmp7Sin kWh'));
 -- remove all groups.
--- Normally gives "DELETE 22"
-delete from groups_immediate_meters where group_id in (select id from groups where name in ('Electric Utility 1-5 + 2-6 kWh', 'Electric Utility 1-5 + Natural Gas Dollar Euro', 'Electric kW + 2-6 kW', 'Electric Utility 1-5 kWh not displayable', 'SqSin + SqCos kWh', 'SqSin + SqCos no unit', 'Amp 1 + 5 kWh', 'Amp 2 + 6 kWh', 'Amp 3 + 4 kWh', 'Amp  2 + (1 + 5) kWh', 'Amp 3 + 6 + (2 + (1 + 5)) + (3 + 4) kWh', 'Amp 6 + 7 + (1 + 5) + (2 + 6) + (3 + 4) kWh'));
+-- Normally gives "DELETE 25"
+delete from groups_immediate_meters where group_id in (select id from groups where name in ('Electric Utility 1-5 + 2-6 kWh', 'Electric Utility 1-5 + Natural Gas Dollar Euro', 'Electric Utility 1-5 + 2-6 Dollar', 'Natural Gas Dollar Euro', 'Electric kW + 2-6 kW', 'Electric Utility 1-5 kWh not displayable', 'SqSin + SqCos kWh', 'SqSin + SqCos no unit', 'Amp 1 + 5 kWh', 'Amp 2 + 6 kWh', 'Amp 3 + 4 kWh', 'Amp 2 + (1 + 5) kWh', 'Amp 3 + 6 + (2 + (1 + 5)) + (3 + 4) kWh', 'Amp 6 + 7 + (1 + 5) + (2 + 6) + (3 + 4) kWh'));
 -- Normally gives "DELETE 6"
-delete from groups_immediate_children where parent_id in (select id from groups where name in ('Electric Utility 1-5 + 2-6 kWh', 'Electric Utility 1-5 + Natural Gas Dollar Euro', 'Electric kW + 2-6 kW', 'Electric Utility 1-5 kWh not displayable', 'SqSin + SqCos kWh', 'SqSin + SqCos no unit', 'Amp 1 + 5 kWh', 'Amp 2 + 6 kWh', 'Amp 3 + 4 kWh', 'Amp  2 + (1 + 5) kWh', 'Amp 3 + 6 + (2 + (1 + 5)) + (3 + 4) kWh', 'Amp 6 + 7 + (1 + 5) + (2 + 6) + (3 + 4) kWh'));
--- Normally gives "DELETE 12"
-delete from groups where name in ('Electric Utility 1-5 + 2-6 kWh', 'Electric Utility 1-5 + Natural Gas Dollar Euro', 'Electric kW + 2-6 kW', 'Electric Utility 1-5 kWh not displayable', 'SqSin + SqCos kWh', 'SqSin + SqCos no unit', 'Amp 1 + 5 kWh', 'Amp 2 + 6 kWh', 'Amp 3 + 4 kWh', 'Amp  2 + (1 + 5) kWh', 'Amp 3 + 6 + (2 + (1 + 5)) + (3 + 4) kWh', 'Amp 6 + 7 + (1 + 5) + (2 + 6) + (3 + 4) kWh');
+delete from groups_immediate_children where parent_id in (select id from groups where name in ('Electric Utility 1-5 + 2-6 kWh', 'Electric Utility 1-5 + Natural Gas Dollar Euro', 'Electric Utility 1-5 + 2-6 Dollar', 'Natural Gas Dollar Euro', 'Electric kW + 2-6 kW', 'Electric Utility 1-5 kWh not displayable', 'SqSin + SqCos kWh', 'SqSin + SqCos no unit', 'Amp 1 + 5 kWh', 'Amp 2 + 6 kWh', 'Amp 3 + 4 kWh', 'Amp 2 + (1 + 5) kWh', 'Amp 3 + 6 + (2 + (1 + 5)) + (3 + 4) kWh', 'Amp 6 + 7 + (1 + 5) + (2 + 6) + (3 + 4) kWh'));
+-- Normally gives "DELETE 14"
+delete from groups where name in ('Electric Utility 1-5 + 2-6 kWh', 'Electric Utility 1-5 + Natural Gas Dollar Euro', 'Electric Utility 1-5 + 2-6 Dollar', 'Natural Gas Dollar Euro', 'Electric kW + 2-6 kW', 'Electric Utility 1-5 kWh not displayable', 'SqSin + SqCos kWh', 'SqSin + SqCos no unit', 'Amp 1 + 5 kWh', 'Amp 2 + 6 kWh', 'Amp 3 + 4 kWh', 'Amp 2 + (1 + 5) kWh', 'Amp 3 + 6 + (2 + (1 + 5)) + (3 + 4) kWh', 'Amp 6 + 7 + (1 + 5) + (2 + 6) + (3 + 4) kWh');
 -- Remove all the meters. Normally gives "DELETE 31"
 delete from meters where name in ('Electric Utility kWh', 'Electric Utility kWh 2-6', 'Electric Utility kWh in BTU', 'Electric Utility kWh in MTon CO2', 'Electric Utility no unit', 'Electric Utility kWh not displayable', 'Natural Gas BTU', 'Natural Gas BTU in Dollar', 'Natural Gas Dollar', 'Natural Gas Cubic Meters', 'Water Gallon', 'Trash Kg', 'Temp Fahrenheit 0-212', 'Temp Fahrenheit in Celsius', 'Electric kW', 'Electric kW 2-6', 'Water Gallon flow 1-5 per minute', 'test4DaySin kWh', 'test4HourSin kWh', 'test23MinSin kWh', 'test15MinSin kWh', 'test23MinCos kWh', 'testSqSin kWh', 'testSqCos kWh', 'testAmp1Sin kWh', 'testAmp2Sin kWh', 'testAmp3Sin kWh', 'testAmp4Sin kWh', 'testAmp5Sin kWh', 'testAmp6Sin kWh', 'testAmp7Sin kWh');
 -- remove conversions
