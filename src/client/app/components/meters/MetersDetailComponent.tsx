@@ -112,6 +112,7 @@ export default function MetersDetailComponent() {
 				</h2>
 				{loggedInAsAdmin && metersStateLoaded && unitsStateLoaded &&
 					<div className="edit-btn">
+						{/* The actual button for create is inside this component. */}
 						<CreateMeterModalComponent
 							possibleMeterUnits={possibleMeterUnits}
 							possibleGraphicUnits={possibleGraphicUnits}

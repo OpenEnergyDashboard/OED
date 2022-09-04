@@ -85,6 +85,8 @@ export default function CreateMeterModalComponent(props: CreateMeterModalCompone
 	}
 
 	/* State */
+	// To make this consistent with EditUnitModalComponent, we don't pass show and close via props
+	// even this one does have other props.
 	// Modal show
 	const [showModal, setShowModal] = useState(false);
 	const handleShow = () => setShowModal(true);

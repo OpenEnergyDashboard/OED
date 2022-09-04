@@ -37,6 +37,7 @@ export default function CreateUnitModalComponent() {
 	}
 
 	/* State */
+	// Unlike EditUnitModalComponent, there are no props so we don't pass show and close via props.
 	// Modal show
 	const [showModal, setShowModal] = useState(false);
 	const handleClose = () => {
