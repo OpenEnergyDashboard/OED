@@ -1,8 +1,6 @@
 /* This Source Code Form is subject to the terms of the Mozilla Public
 * License, v. 2.0. If a copy of the MPL was not distributed with this
 * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
-
-import { TimeZones } from 'types/timezone';
 import { GPSPoint } from 'utils/calibration';
 import { ActionType } from './actions';
 
@@ -47,11 +45,21 @@ export type MetersAction = RequestMetersDetailsAction
 | SubmitEditedMeterAction
 | ConfirmMetersFetchedOnceAction;
 
+// The relates to the JS object Meter.types for the same use in src/server/models/Meter.js.
+// They should be kept in sync.
 export enum MeterType {
-	mamac = 'mamac',
-	metasys = 'metasys',
-	obvius = 'obvius',
-	other = 'other'
+	EGAUGE = 'egauge',
+	MAMAC = 'mamac',
+	METASYS = 'metasys',
+	OBVIUS = 'obvius',
+	OTHER = 'other'
+}
+
+// This relates to TimeSortTypes in src/client/app/types/csvUploadForm.ts but does not have 'meter value or default'.
+// They should be kept in sync.
+export enum MeterTimeSortType {
+	increasing = 'increasing',
+	decreasing = 'decreasing',
 }
 
 export interface MeterData {
@@ -63,8 +71,8 @@ export interface MeterData {
 	displayable: boolean;
 	meterType: string;
 	url: string;
-	timeZone: TimeZones;
-	gps: GPSPoint;
+	timeZone: string;
+	gps: GPSPoint | null;
 	unitId: number;
 	defaultGraphicUnit: number;
 	note: string;
@@ -77,7 +85,7 @@ export interface MeterData {
 	readingGap: number;
 	readingVariation: number;
 	readingDuplication: number;
-	timeSort: boolean;
+	timeSort: string;
 	startTimestamp: string;
 	endTimestamp: string;
 }
@@ -91,8 +99,8 @@ export interface MeterEditData {
 	displayable: boolean;
 	meterType: string;
 	url: string;
-	timeZone: TimeZones;
-	gps: GPSPoint;
+	timeZone: string | null;
+	gps: GPSPoint | null;
 	unitId: number;
 	defaultGraphicUnit: number;
 	note: string;
@@ -105,9 +113,9 @@ export interface MeterEditData {
 	readingGap: number;
 	readingVariation: number;
 	readingDuplication: number;
-	timeSort: boolean;
-	startTimestamp: string;
-	endTimestamp: string;
+	timeSort: string;
+	startTimestamp: string | undefined;
+	endTimestamp: string | undefined;
 }
 
 export interface MeterDataByID {
@@ -119,6 +127,5 @@ export interface MetersState {
 	isFetching: boolean;
 	selectedMeters: number[];
 	submitting: number[];
-	byMeterID: MeterDataByID; // left in state due to uses count
-	meters: MeterDataByID;
+	byMeterID: MeterDataByID;
 }

@@ -32,7 +32,7 @@ async function processConfigFile(configFile) {
 	let unitId; 
 	if (kWhUnit === null) {
 		console.log("kWh not found while processing Obvius data");
-		// need a warning log
+		// TODO need a warning log
 		unitId = undefined;
 	} else {
 		unitId = kWhUnit.id;

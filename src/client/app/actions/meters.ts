@@ -3,7 +3,7 @@
   * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
 
 import { ActionType, Thunk, Dispatch, GetState } from '../types/redux/actions';
-import { showSuccessNotification, showErrorNotification } from '../utils/notifications';
+import { showSuccessNotification } from '../utils/notifications';
 import translate from '../utils/translate';
 import * as t from '../types/redux/meters';
 import { metersApi } from '../utils/api';
@@ -19,8 +19,7 @@ export function receiveMetersDetails(data: t.MeterData[]): t.ReceiveMetersDetail
 export function fetchMetersDetails(): Thunk {
 	return async (dispatch: Dispatch, getState: GetState) => {
 		// ensure a fetch is not currently happening
-		if (!getState().meters.isFetching)
-		{
+		if (!getState().meters.isFetching) {
 			// set isFetching to true
 			dispatch(requestMetersDetails());
 			// attempt to retrieve meters details from database
@@ -28,8 +27,7 @@ export function fetchMetersDetails(): Thunk {
 			// update the state with the meters details and set isFetching to false
 			dispatch(receiveMetersDetails(meters));
 			// If this is the first fetch, inform the store that the first fetch has been made
-			if (!getState().meters.hasBeenFetchedOnce)
-			{
+			if (!getState().meters.hasBeenFetchedOnce) {
 				dispatch(confirmMetersFetchedOnce());
 			}
 		}
@@ -50,7 +48,7 @@ export function confirmMeterEdits(editedMeter: t.MeterData): t.ConfirmEditedMete
 }
 
 export function deleteSubmittedMeter(meterId: number): t.DeleteSubmittedMeterAction {
-	return {type: ActionType.DeleteSubmittedMeter, meterId}
+	return { type: ActionType.DeleteSubmittedMeter, meterId }
 }
 
 export function confirmMetersFetchedOnce(): t.ConfirmMetersFetchedOnceAction {
@@ -61,8 +59,7 @@ export function confirmMetersFetchedOnce(): t.ConfirmMetersFetchedOnceAction {
 export function fetchMetersDetailsIfNeeded(): Thunk {
 	return (dispatch: Dispatch, getState: GetState) => {
 		// If meters have not been fetched once, return the fetchMeterDetails function
-		if (!getState().meters.hasBeenFetchedOnce)
-		{
+		if (!getState().meters.hasBeenFetchedOnce) {
 			return dispatch(fetchMetersDetails());
 		}
 		// If meters have already been fetched, return a resolved promise
@@ -90,7 +87,8 @@ export function submitEditedMeter(editedMeter: t.MeterData): Thunk {
 				showSuccessNotification(translate('meter.successfully.edited.meter'));
 			} catch (err) {
 				// Failure! ):
-				showErrorNotification(translate('meter.failed.to.edit.meter'));
+				// TODO Better way than popup with React but want to stay so user can read/copy.
+				window.alert(translate('meter.failed.to.edit.meter') + '"' + err.response.data as string + '"');
 				// Clear our changes from to the submitting meters state
 				// We must do this in case fetch failed to keep the store in sync with the database
 				dispatch(deleteSubmittedMeter(editedMeter.id));
@@ -100,7 +98,8 @@ export function submitEditedMeter(editedMeter: t.MeterData): Thunk {
 }
 
 // Add meter to database
-export function addMeter(meter: t.MeterData): Thunk {
+// export function addMeter(meter: t.MeterData): Thunk {
+export function addMeter(meter: t.MeterEditData): Thunk {
 	return async (dispatch: Dispatch) => {
 		try {
 			// Attempt to add meter to database
@@ -111,7 +110,8 @@ export function addMeter(meter: t.MeterData): Thunk {
 			dispatch(fetchMetersDetails());
 			showSuccessNotification(translate('meter.successfully.create.meter'));
 		} catch (err) {
-			showErrorNotification(translate('meter.failed.to.create.meter'));
+			// TODO Better way than popup with React but want to stay so user can read/copy.
+			window.alert(translate('meter.failed.to.create.meter') + '"' + err.response.data as string + '"');
 		}
 	}
 }

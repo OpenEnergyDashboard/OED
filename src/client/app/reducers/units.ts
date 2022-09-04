@@ -15,27 +15,31 @@ const defaultState: UnitsState = {
 
 export default function units(state = defaultState, action: UnitsAction) {
 	switch (action.type) {
-		case ActionType.ConfirmUnitsFetchedOnce:
+		case ActionType.ConfirmUnitsFetchedOnce: {
 			return {
 				...state,
 				hasBeenFetchedOnce: true
 			};
-		case ActionType.RequestUnitsDetails:
+		}
+		case ActionType.RequestUnitsDetails: {
 			return {
 				...state,
 				isFetching: true
 			};
-		case ActionType.ReceiveUnitsDetails:
+		}
+		case ActionType.ReceiveUnitsDetails: {
 			return {
 				...state,
 				isFetching: false,
 				units: _.keyBy(action.data, unit => unit.id)
 			};
-		case ActionType.ChangeDisplayedUnits:
+		}
+		case ActionType.ChangeDisplayedUnits: {
 			return {
 				...state,
 				selectedUnits: action.selectedUnits
 			};
+		}
 		case ActionType.SubmitEditedUnit: {
 			const submitting = state.submitting;
 			submitting.push(action.unitId);
@@ -45,16 +49,15 @@ export default function units(state = defaultState, action: UnitsAction) {
 			};
 		}
 		case ActionType.ConfirmEditedUnit: {
-			// React expects us to return an immutable object in order to invoke a rerender, so we must use spread notation here
-			// Overwrite the unit data at the edited unit's index with the edited unit's unit data
-			// The passed in id should be correct as it is inherited from the pre-edited unit
-			// See EditUnitModalComponent line 134 for details (starts with if(unitHasChanges))
-			const units = { ...state.units };
-			units[action.editedUnit.id] = action.editedUnit;
-
+			// Return new state object with updated edited meter info.
 			return {
 				...state,
-				units
+				units: {
+					...state.units,
+					[action.editedUnit.id]: {
+						...action.editedUnit
+					}
+				}
 			};
 		}
 		case ActionType.DeleteSubmittedUnit: {
@@ -66,7 +69,8 @@ export default function units(state = defaultState, action: UnitsAction) {
 				submitting: [...submitting]
 			};
 		}
-		default:
+		default: {
 			return state;
+		}
 	}
 }

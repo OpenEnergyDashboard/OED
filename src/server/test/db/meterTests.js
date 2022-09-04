@@ -74,6 +74,18 @@ mocha.describe('Meters', () => {
 		expectMetersToBeEquivalent(meterPreInsert, meterPostInsertByID);
 	});
 
+	mocha.it('can be saved and retrieved with no graphic units', async () => {
+		const conn = testDB.getConnection();
+		const meterPreInsert = new Meter(undefined, 'Meter', null, false, true, Meter.type.MAMAC, 'UTC',
+			gps, 'Identified', 'notes', 33.5, true, true, '05:05:09', '09:00:01', 0, 0, 1, 'increasing', false,
+			25.5, '0001-01-01 23:59:59', '2020-07-02 01:00:10', -99, -99);
+		await meterPreInsert.insert(conn);
+		const meterPostInsertByName = await Meter.getByName(meterPreInsert.name, conn);
+		expectMetersToBeEquivalent(meterPreInsert, meterPostInsertByName);
+		const meterPostInsertByID = await Meter.getByID(meterPreInsert.id, conn);
+		expectMetersToBeEquivalent(meterPreInsert, meterPostInsertByID);
+	});
+
 	mocha.it('can be saved, edited, and retrieved', async () => {
 		const conn = testDB.getConnection();
 		const meterPreInsert = new Meter(undefined, 'Meter', null, false, true, Meter.type.MAMAC, 'UTC', gps,
@@ -135,33 +147,6 @@ mocha.describe('Meters', () => {
 		const actualUnitIndex = await Meter.getUnitIndex(1, conn);
 		const expectedUnitIndex = unitA.unitIndex;
 		expect(actualUnitIndex).to.be.equal(expectedUnitIndex);
-	});
-
-	mocha.it('can save and retrieve meters with null unitId', async () => {
-		const conn = testDB.getConnection();
-		const missingUnitIdMeter = new Meter(undefined, 'MissingUnitId', null, true, true, Meter.type.MAMAC, null, gps,
-			'MissingUnitId', 'notes 1', 35.0, true, true, '01:01:25', '00:00:00', 5, 0, 1, 'increasing', false,
-			1.5, '0001-01-01 23:59:59', '2020-07-02 01:00:10', -99, unitA.id);
-		await missingUnitIdMeter.insert(conn);
-
-		const actualMissingUnitIdMeter = await Meter.getByName('MissingUnitId', conn);
-		// displayable is expected to switch to false.
-		expect(actualMissingUnitIdMeter).to.have.property('displayable', false);
-		// defaultGraphicUnit is expected to switch to -99.
-		expect(actualMissingUnitIdMeter).to.have.property('defaultGraphicUnit', -99);
-		// unitId shouldn't change.
-		expect(actualMissingUnitIdMeter).to.have.property('unitId', -99);
-	});
-
-	mocha.it('can save and retrieve meters with null defaultGraphicUnit', async () => {
-		const missingGraphicUnitMeter = new Meter(undefined, 'MissingGraphicUnit', null, true, true, Meter.type.MAMAC, null, gps,
-			'MissingGraphicUnit', 'notes 2', 35.0, true, true, '01:01:25', '00:00:00', 5, 0, 1, 'increasing', false,
-			1.5, '0001-01-01 23:59:59', '2020-07-02 01:00:10', unitA.id, -99);
-		await missingGraphicUnitMeter.insert(conn);
-
-		const actualMissingGraphicUnitMeter = await Meter.getByName('MissingGraphicUnit', conn);
-		// defaultGraphicUnit is expected to automatically set to unitId.
-		expect(actualMissingGraphicUnitMeter).to.have.property('defaultGraphicUnit', unitA.id);
 	});
 
 	mocha.it('can get all meter where unitId is not null', async () => {

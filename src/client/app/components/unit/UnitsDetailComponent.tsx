@@ -56,6 +56,7 @@ export default function UnitsDetailComponent() {
 				</h2>
 				{loggedInAsAdmin &&
 					<div className="edit-btn">
+						{/* The actual button for create is inside this component. */}
 						<CreateUnitModalComponent />
 					</div>}
 				<div className="card-container">
