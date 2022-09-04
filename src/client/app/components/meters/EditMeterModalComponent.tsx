@@ -79,30 +79,30 @@ export default function EditMeterModalComponent(props: EditMeterModalComponentPr
 	// Set existing meter values
 	const values = {
 		id: props.meter.id,
-		identifier: props.meter.identifier,
 		name: props.meter.name,
-		area: props.meter.area,
+		url: props.meter.url,
 		enabled: props.meter.enabled,
 		displayable: props.meter.displayable,
 		meterType: props.meter.meterType,
-		url: props.meter.url,
 		timeZone: props.meter.timeZone,
 		gps: props.meter.gps,
-		unitId: props.meter.unitId,
-		defaultGraphicUnit: props.meter.defaultGraphicUnit,
+		identifier: props.meter.identifier,
 		note: props.meter.note,
+		area: props.meter.area,
 		cumulative: props.meter.cumulative,
 		cumulativeReset: props.meter.cumulativeReset,
 		cumulativeResetStart: props.meter.cumulativeResetStart,
 		cumulativeResetEnd: props.meter.cumulativeResetEnd,
-		endOnlyTime: props.meter.endOnlyTime,
-		reading: props.meter.reading,
 		readingGap: props.meter.readingGap,
 		readingVariation: props.meter.readingVariation,
 		readingDuplication: props.meter.readingDuplication,
 		timeSort: props.meter.timeSort,
+		endOnlyTime: props.meter.endOnlyTime,
+		reading: props.meter.reading,
 		startTimestamp: props.meter.startTimestamp,
-		endTimestamp: props.meter.endTimestamp
+		endTimestamp: props.meter.endTimestamp,
+		unitId: props.meter.unitId,
+		defaultGraphicUnit: props.meter.defaultGraphicUnit
 	}
 
 	const dropdownsStateDefaults = {
