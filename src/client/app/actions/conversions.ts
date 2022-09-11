@@ -19,8 +19,7 @@ export function receiveConversionsDetails(data: t.ConversionData[]): t.ReceiveCo
 export function fetchConversionsDetails(): Thunk {
 	return async (dispatch: Dispatch, getState: GetState) => {
 		// ensure a fetch is not currently happening
-		if (!getState().conversions.isFetching)
-		{
+		if (!getState().conversions.isFetching) {
 			// set isFetching to true
 			dispatch(requestConversionsDetails());
 			// attempt to retrieve conversions details from database
@@ -28,8 +27,7 @@ export function fetchConversionsDetails(): Thunk {
 			// update the state with the conversions details and set isFetching to false
 			dispatch(receiveConversionsDetails(conversions));
 			// If this is the first fetch, inform the store that the first fetch has been made
-			if (!getState().conversions.hasBeenFetchedOnce)
-			{
+			if (!getState().conversions.hasBeenFetchedOnce) {
 				dispatch(confirmConversionsFetchedOnce());
 			}
 		}
@@ -63,13 +61,11 @@ export function confirmDeletedConversion(conversionData: t.ConversionData): t.De
 	return { type: ActionType.DeleteConversion, conversionData }
 }
 
-
 // Fetch the conversions details from the database if they have not already been fetched once
 export function fetchConversionsDetailsIfNeeded(): Thunk {
 	return (dispatch: Dispatch, getState: GetState) => {
 		// If conversions have not been fetched once, return the fetchConversionDetails function
-		if (!getState().conversions.hasBeenFetchedOnce)
-		{
+		if (!getState().conversions.hasBeenFetchedOnce) {
 			return dispatch(fetchConversionsDetails());
 		}
 		// If conversions have already been fetched, return a resolved promise
@@ -88,7 +84,6 @@ export function submitEditedConversion(editedConversion: t.ConversionData): Thun
 
 		// If the editedConversion is not already being submitted
 		if (conversionDataIndex === -1) {
-
 			// Inform the store we are about to edit the passed in conversion
 			// Pushes edited conversionData to submit onto the submitting state array
 			dispatch(submitConversionEdits(editedConversion));
@@ -118,7 +113,7 @@ export function addConversion(conversion: t.ConversionData): Thunk {
 			await conversionsApi.addConversion(conversion);
 			// Update the conversions state from the database on a successful call
 			// In the future, getting rid of this database fetch and updating the store on a successful API call would make the page faster
-			// However, since the database currently assigns the id to the ConversionData
+			// However, since the database currently assigns the id to the ConversionData we fetch from DB.
 			dispatch(fetchConversionsDetails());
 			showSuccessNotification(translate('conversion.successfully.create.conversion'));
 		} catch (err) {
@@ -130,7 +125,6 @@ export function addConversion(conversion: t.ConversionData): Thunk {
 // Delete conversion from database
 export function deleteConversion(conversion: t.ConversionData): Thunk {
 	return async (dispatch: Dispatch, getState: GetState) => {
-
 		// Ensure the conversion is not already being worked on
 		// Search the array of ConversionData in submitting for an object with source/destination ids matching that conversion
 		const conversionDataIndex = getState().conversions.submitting.findIndex(conversionData => ((
@@ -147,7 +141,7 @@ export function deleteConversion(conversion: t.ConversionData): Thunk {
 				await conversionsApi.delete(conversion);
 				// Delete was successful
 				// Update the store to match
-				dispatch(confirmDeletedConversion(conversion)); //TODO WRITE THE REDUCER FOR THIS
+				dispatch(confirmDeletedConversion(conversion));
 				showSuccessNotification(translate('conversion.successfully.delete.conversion'));
 			} catch (err) {
 				showErrorNotification(translate('conversion.failed.to.delete.conversion'));

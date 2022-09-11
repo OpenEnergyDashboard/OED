@@ -160,7 +160,7 @@ export default function EditConversionModalComponent(props: EditConversionModalC
 				actionRejectText={deleteRejectText}/>
 			<Modal show={props.show} onHide={props.handleClose}>
 				<Modal.Header>
-					<Modal.Title> <FormattedMessage id="edit.conversion" />
+					<Modal.Title> <FormattedMessage id="conversion.edit.conversion" />
 						<TooltipHelpContainer page='conversions' />
 						<div style={tooltipStyle}>
 							<TooltipMarkerComponent page='conversions' helpTextId={tooltipStyle.tooltipEditConversionView} />
@@ -247,7 +247,7 @@ export default function EditConversionModalComponent(props: EditConversionModalC
 				</Modal.Body>
 				<Modal.Footer>
 					<Button variant="danger" onClick={handleDeleteConfirmationModalOpen}>
-						<FormattedMessage id="delete.conversion" />
+						<FormattedMessage id="conversion.delete.conversion" />
 					</Button>
 					{/* Hides the modal */}
 					<Button variant="secondary" onClick={handleClose}>

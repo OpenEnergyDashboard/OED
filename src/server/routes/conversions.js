@@ -35,13 +35,17 @@ router.get('/', async (req, res) => {
 router.post('/edit', async (req, res) => {
 	const validConversion = {
 		type: 'object',
-		required: ['sourceId', 'destinationId'],
+		required: ['sourceId', 'destinationId', 'bidirectional', 'slope', 'intercept'],
 		properties: {
 			sourceId: {
-				type: 'number'
+				type: 'number',
+				// Do not allow negatives for now
+				minimum: 0
 			},
 			destinationId: {
-				type: 'number'
+				type: 'number',
+				// Do not allow negatives for now
+				minimum: 0
 			},
 			bidirectional: {
 				type: 'boolean'
@@ -69,6 +73,7 @@ router.post('/edit', async (req, res) => {
 		const conn = getConnection();
 		try {
 			const conversion = await Conversion.getBySourceDestination(req.body.sourceId, req.body.destinationId, conn);
+			// Update conversion with new values, some may be unchanged.
 			conversion.sourceId = req.body.sourceId;
 			conversion.destinationId = req.body.destinationId;
 			conversion.bidirectional = req.body.bidirectional;
@@ -91,18 +96,16 @@ router.post('/edit', async (req, res) => {
 router.post('/addConversion', async (req, res) => {
 	const validConversion = {
 		type: 'object',
-		required: ['sourceId', 'destinationId'],
+		required: ['sourceId', 'destinationId', 'bidirectional', 'slope', 'intercept'],
 		properties: {
 			sourceId: {
 				type: 'number',
 				// Do not allow negatives for now
-				// This may need to be updated if -99 is allowed at some point
 				minimum: 0
 			},
 			destinationId: {
 				type: 'number',
 				// Do not allow negatives for now
-				// This may need to be updated if -99 is allowed at some point
 				minimum: 0
 			},
 			bidirectional: {
@@ -158,10 +161,14 @@ router.post('/delete', async (req, res) => {
 		required: ['sourceId', 'destinationId'],
 		properties: {
 			sourceId: {
-				type: 'number'
+				type: 'number',
+				// Do not allow negatives for now
+				minimum: 0
 			},
 			destinationId: {
-				type: 'number'
+				type: 'number',
+				// Do not allow negatives for now
+				minimum: 0
 			}
 		}
 	};

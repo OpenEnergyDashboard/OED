@@ -1,7 +1,7 @@
 /* This Source Code Form is subject to the terms of the Mozilla Public
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
-import * as _ from 'lodash';
+
 import { ConversionsAction, ConversionsState } from '../types/redux/conversions';
 import { ActionType } from '../types/redux/actions';
 
@@ -36,8 +36,7 @@ export default function conversions(state = defaultState, action: ConversionsAct
 				...state,
 				selectedConversions: action.selectedConversions
 			};
-		case ActionType.SubmitEditedConversion:
-		{
+		case ActionType.SubmitEditedConversion: {
 			const submitting = state.submitting;
 			submitting.push(action.conversionData);
 			return {
@@ -45,8 +44,7 @@ export default function conversions(state = defaultState, action: ConversionsAct
 				submitting: [...submitting]
 			};
 		}
-		case ActionType.ConfirmEditedConversion:
-		{
+		case ActionType.ConfirmEditedConversion: {
 			// Overwrite the conversion data at the edited conversion's index with the edited conversion's conversion data
 			// The passed in id should be correct as it is inherited from the pre-edited conversion
 			// See EditConversionModalComponent line 134 for details (starts with if(conversionHasChanges))
@@ -63,8 +61,7 @@ export default function conversions(state = defaultState, action: ConversionsAct
 				conversions: [...conversions]
 			};
 		}
-		case ActionType.DeleteSubmittedConversion:
-		{
+		case ActionType.DeleteSubmittedConversion: {
 			// Remove the current submitting conversion from the submitting state
 			const submitting = state.submitting;
 			// Search the array of ConversionData in submitting for an object with source/destination ids matching that of the action payload
@@ -78,8 +75,7 @@ export default function conversions(state = defaultState, action: ConversionsAct
 				submitting: [...submitting]
 			};
 		}
-		case ActionType.DeleteConversion:
-		{
+		case ActionType.DeleteConversion: {
 			// Retrieve conversions state
 			const conversions = state.conversions;
 			// Search the array of ConversionData in conversions for an object with source/destination ids matching that of the action payload

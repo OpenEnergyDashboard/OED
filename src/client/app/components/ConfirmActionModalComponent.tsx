@@ -4,7 +4,7 @@
 import * as React from 'react';
 import { Modal, Button } from 'react-bootstrap';
 //TODO borrowing the conversion card CSS but shouldn't the modal card css all be in one file?
-import '../styles/conversion-card-page.css';
+// import '../styles/conversion-card-page.css';
 import translate from '../utils/translate';
 
 interface ConfirmActionModalComponentProps {
@@ -22,7 +22,7 @@ interface ConfirmActionModalComponentProps {
 	handleClose: () => void;
 	// Function to execute if action is confirmed
 	// Be sure to pass into any additional handleClose functions for hiding parent modals
-	// Also be aware that react boostrap does not support nested modals by default
+	// Also be aware that react bootstrap does not support nested modals by default
 	// A good solution to this is to hide the parent modal when this modal is opened
 	actionFunction: () => void;
 }
