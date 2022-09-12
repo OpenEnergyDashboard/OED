@@ -507,7 +507,7 @@ function getSelectOptionsByItem(compatibleItems: Set<number>, incompatibleItems:
 			label = state.units[itemId].identifier;
 		}
 		else if (instanceOfMetersState(state)) {
-			label = state.byMeterID[itemId].name;
+			label = state.byMeterID[itemId].identifier;
 		}
 		else if (instanceOfGroupsState(state)) {
 			label = state.byGroupID[itemId].name;
@@ -526,7 +526,7 @@ function getSelectOptionsByItem(compatibleItems: Set<number>, incompatibleItems:
 			label = state.units[itemId].identifier;
 		}
 		else if (instanceOfMetersState(state)) {
-			label = state.byMeterID[itemId].name;
+			label = state.byMeterID[itemId].identifier;
 		}
 		else if (instanceOfGroupsState(state)) {
 			label = state.byGroupID[itemId].name;
