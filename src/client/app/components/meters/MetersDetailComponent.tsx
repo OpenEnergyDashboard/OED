@@ -15,7 +15,7 @@ import { isRoleAdmin } from '../../utils/hasPermissions';
 import MeterViewComponent from './MeterViewComponent';
 import CreateMeterModalComponent from './CreateMeterModalComponent';
 import { MeterData } from 'types/redux/meters';
-import '../../styles/unit-card-page.css';
+import '../../styles/card-page.css';
 import { UnitData, DisplayableType, UnitRepresentType, UnitType } from '../../types/redux/units';
 import * as _ from 'lodash';
 

@@ -1,11 +1,19 @@
 /* This Source Code Form is subject to the terms of the Mozilla Public
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
+ 
 .card-container {
 	display: grid;
 	grid-template-columns: repeat(auto-fit, minmax(300px, auto));
 	grid-gap: 1em;
 	justify-items: center;
+	width: 100%;
+	padding-top: 2px;
+	padding-right: 0px;
+	padding-bottom: 1px;
+	padding-left: 0px;
+	text-align: center;
+	overflow-wrap: break-word;
 }
 
 .card {
@@ -29,17 +37,7 @@
 	box-shadow: 0px 2px 3px black;
 }
 
-.unit-container {
-	width: 100%;
-	padding-top: 2px;
-	padding-right: 0px;
-	padding-bottom: 1px;
-	padding-left: 0px;
-	text-align: center;
-	overflow-wrap: break-word;
-}
-
-.card-container {
+.item-container {
 	width: 100%;
 	padding-top: 2px;
 	padding-right: 0px;
@@ -166,14 +164,4 @@
 	padding-bottom: 1px;
 	padding-left: 0px;
 	text-align: center;
-}
-
-.meter-container {
-	width: 100%;
-	padding-top: 2px;
-	padding-right: 0px;
-	padding-bottom: 1px;
-	padding-left: 0px;
-	text-align: center;
-	overflow-wrap: break-word;
 }

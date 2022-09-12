@@ -3,8 +3,7 @@
 * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
 import * as React from 'react';
 import { Modal, Button } from 'react-bootstrap';
-//TODO borrowing the conversion card CSS but shouldn't the modal card css all be in one file?
-// import '../styles/conversion-card-page.css';
+import '../styles/modal.css';
 import translate from '../utils/translate';
 
 interface ConfirmActionModalComponentProps {

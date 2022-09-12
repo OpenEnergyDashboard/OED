@@ -1,20 +1,22 @@
 /* This Source Code Form is subject to the terms of the Mozilla Public
 * License, v. 2.0. If a copy of the MPL was not distributed with this
 * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
+
 import * as React from 'react';
+import { useDispatch } from 'react-redux';
+import { useState, useEffect } from 'react';
 import { Modal, Button } from 'react-bootstrap';
 import { Input } from 'reactstrap';
 import { FormattedMessage } from 'react-intl';
 import translate from '../../utils/translate';
-import '../../styles/Modal.conversion.css';
+import '../../styles/modal.css';
 import { TrueFalseType } from '../../types/items';
-import { useDispatch } from 'react-redux';
-import { addConversion } from '../../actions/conversions';
-import { useState, useEffect } from 'react';
 import TooltipMarkerComponent from '../TooltipMarkerComponent';
 import TooltipHelpContainer from '../../containers/TooltipHelpContainer';
+import { addConversion } from '../../actions/conversions';
 import { UnitDataById } from 'types/redux/units';
 import { ConversionData } from 'types/redux/conversions';
+import * as _ from 'lodash';
 
 interface CreateConversionModalComponentProps {
 	conversionsState: ConversionData[];
@@ -61,7 +63,6 @@ export default function CreateConversionModalComponent(props: CreateConversionMo
 
 	// If the currently selected conversion is valid
 	const [validConversion, setValidConversion] = useState(false);
-
 	/* End State */
 
 	//Update the valid conversion state any time the source id, destination id, or bidirectional status changes
@@ -74,11 +75,12 @@ export default function CreateConversionModalComponent(props: CreateConversionMo
 		setState(defaultValues);
 	}
 
-	/**Checks if conversion is valid
+	/**
+	 * Checks if conversion is valid
 	 * @param sourceId New conversion sourceId
 	 * @param destinationId New conversion destinationId
 	 * @param bidirectional New conversion bidirectional status
-	 * @returns Boolean representing if new conversion is valid or not
+	 * @returns boolean representing if new conversion is valid or not
 	 */
 	const isValidConversion = (sourceId: number, destinationId: number, bidirectional: boolean) => {
 		/*
@@ -89,10 +91,14 @@ export default function CreateConversionModalComponent(props: CreateConversionMo
 					Conversion is bidirectional: invalid conversion */
 
 		// Source or destination not set
-		if (sourceId === -999 || destinationId === -999) { return false }
+		if (sourceId === -999 || destinationId === -999) {
+			return false
+		}
 
 		// Source equals destination: invalid conversion
-		if (sourceId === destinationId) {return false}
+		if (sourceId === destinationId) {
+			return false
+		}
 
 		// Conversion already exists
 		if ((props.conversionsState.findIndex(conversionData => ((
@@ -101,42 +107,42 @@ export default function CreateConversionModalComponent(props: CreateConversionMo
 			return false;
 		}
 
-		let isValidConversion = true;
+		let isValid = true;
 		// Loop over conversions and check for existence of inverse of conversion passed in
 		// If there exists an inverse that is bidirectional, then there is no point in making a conversion since it is essentially a duplicate.
-		// If there is a non bidirectional inverese, then it is a valid conversion
+		// If there is a non bidirectional inverse, then it is a valid conversion
 		Object.values(props.conversionsState).forEach(conversion => {
 			// Inverse exists
 			if ((conversion.sourceId === destinationId) && (conversion.destinationId === sourceId)) {
 				// Inverse is bidirectional
 				if (conversion.bidirectional) {
-					isValidConversion = false;
+					isValid = false;
 				}
 				// Inverse is not bidirectional
 				else {
 					// Do not allow for a bidirectional conversion with an inverse that is not bidirectional
 					if (bidirectional) {
 						// The new conversion is bidirectional
-						isValidConversion = false;
+						isValid = false;
 					}
 				}
 			}
 		});
-		return isValidConversion;
+		return isValid;
 	}
 
+	// Want units in sorted order by identifier regardless of case.
+	const unitsSorted = _.sortBy(Object.values(props.unitsState), unit => unit.identifier.toLowerCase(), 'asc');
 
 	// Unlike edit, we decided to discard and inputs when you choose to leave the page. The reasoning is
 	// that create starts from an empty template.
 
 	// Submit
 	const handleSubmit = () => {
-
 		// Close modal first to avoid repeat clicks
 		setShowModal(false);
-
+		// Add the new conversion and update the store
 		dispatch(addConversion(state));
-
 		resetState();
 	};
 
@@ -178,42 +184,42 @@ export default function CreateConversionModalComponent(props: CreateConversionMo
 							{/* Modal content */}
 							<div className="container-fluid">
 								<div style={tableStyle}>
-									{/* SourceId input*/}
+									{/* Source unit input*/}
 									<div style={formInputStyle}>
-										<label><FormattedMessage id="conversion.sourceId" /></label><br />
+										<label><FormattedMessage id="conversion.source" /></label><br />
 										<Input
 											name='sourceId'
 											type='select'
+											defaultValue={-999}
 											onChange={e => handleNumberChange(e)}>
 											{<option
 												value={-999}
 												key={-999}
-												selected={state.sourceId === -999}
 												hidden={state.sourceId !== -999}
 												disabled>
-													Select a source unit...
+												{translate('conversion.select.source') + '...'}
 											</option>}
-											{Object.values(props.unitsState).map(unitData => {
+											{Object.values(unitsSorted).map(unitData => {
 												return (<option value={unitData.id} key={unitData.id}>{unitData.identifier}</option>)
 											})}
 										</Input>
 									</div>
-									{/* DestinationId input*/}
+									{/* Destination unit input*/}
 									<div style={formInputStyle}>
-										<label><FormattedMessage id="conversion.destinationId" /></label><br />
+										<label><FormattedMessage id="conversion.destination" /></label><br />
 										<Input
 											name='destinationId'
 											type='select'
+											defaultValue={-999}
 											onChange={e => handleNumberChange(e)}>
 											{<option
 												value={-999}
 												key={-999}
-												selected={state.destinationId === -999}
 												hidden={state.destinationId !== -999}
 												disabled>
-													Select a destination unit...
+												{translate('conversion.select.destination') + '...'}
 											</option>}
-											{Object.values(props.unitsState).map(unitData => {
+											{Object.values(unitsSorted).map(unitData => {
 												return (<option value={unitData.id} key={unitData.id}>{unitData.identifier}</option>)
 											})}
 										</Input>

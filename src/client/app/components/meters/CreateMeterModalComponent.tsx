@@ -9,7 +9,7 @@ import translate from '../../utils/translate';
 import { useDispatch, useSelector } from 'react-redux';
 import { useState, useEffect } from 'react';
 import { State } from 'types/redux/state';
-import '../../styles/Modal.unit.css';
+import '../../styles/modal.css';
 import { MeterTimeSortType, MeterType } from '../../types/redux/meters';
 import { addMeter } from '../../actions/meters';
 import TooltipMarkerComponent from '../TooltipMarkerComponent';

@@ -2,19 +2,19 @@
 * License, v. 2.0. If a copy of the MPL was not distributed with this
 * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
 import * as React from 'react';
+//Realize that * is already imported from react
+import { useState } from 'react';
+import { useDispatch } from 'react-redux';
 import { Modal, Button } from 'react-bootstrap';
-import { UnitData, DisplayableType, UnitRepresentType, UnitType } from '../../types/redux/units';
 import { Input } from 'reactstrap';
 import { FormattedMessage } from 'react-intl';
 import translate from '../../utils/translate';
-import { useDispatch } from 'react-redux';
-//Realize that * is already imported from react
-import { useState } from 'react';
-import { submitEditedUnit } from '../../actions/units';
-import { removeUnsavedChanges } from '../../actions/unsavedWarning';
 import TooltipMarkerComponent from '../TooltipMarkerComponent';
 import TooltipHelpContainer from '../../containers/TooltipHelpContainer';
-import '../../styles/Modal.unit.css';
+import '../../styles/modal.css';
+import { removeUnsavedChanges } from '../../actions/unsavedWarning';
+import { submitEditedUnit } from '../../actions/units';
+import { UnitData, DisplayableType, UnitRepresentType, UnitType } from '../../types/redux/units';
 import { TrueFalseType } from '../../types/items';
 
 interface EditUnitModalComponentProps {
@@ -24,7 +24,6 @@ interface EditUnitModalComponentProps {
 	handleClose: () => void;
 }
 
-// Updated to hooks
 export default function EditUnitModalComponent(props: EditUnitModalComponentProps) {
 	const dispatch = useDispatch();
 

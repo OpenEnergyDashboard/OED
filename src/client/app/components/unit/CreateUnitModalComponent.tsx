@@ -2,18 +2,18 @@
 * License, v. 2.0. If a copy of the MPL was not distributed with this
 * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
 import * as React from 'react';
+import { useDispatch } from 'react-redux';
+import { useState } from 'react';
 import { Modal, Button } from 'react-bootstrap';
 import { Input } from 'reactstrap';
 import { FormattedMessage } from 'react-intl';
 import translate from '../../utils/translate';
-import '../../styles/Modal.unit.css';
-import { UnitRepresentType, DisplayableType, UnitType } from '../../types/redux/units';
-import { useDispatch } from 'react-redux';
-import { addUnit } from '../../actions/units';
-import { useState } from 'react';
+import '../../styles/modal.css';
 import { TrueFalseType } from '../../types/items';
 import TooltipMarkerComponent from '../TooltipMarkerComponent';
 import TooltipHelpContainer from '../../containers/TooltipHelpContainer';
+import { UnitRepresentType, DisplayableType, UnitType } from '../../types/redux/units';
+import { addUnit } from '../../actions/units';
 
 export default function CreateUnitModalComponent() {
 	const dispatch = useDispatch();

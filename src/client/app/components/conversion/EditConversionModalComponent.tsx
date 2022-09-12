@@ -2,20 +2,20 @@
 * License, v. 2.0. If a copy of the MPL was not distributed with this
 * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
 import * as React from 'react';
+// Realize that * is already imported from react
+import { useState } from 'react';
+import { useDispatch } from 'react-redux';
 import { Modal, Button } from 'react-bootstrap';
-import { ConversionData } from '../../types/redux/conversions';
 import { Input } from 'reactstrap';
 import { FormattedMessage } from 'react-intl';
 import translate from '../../utils/translate';
-import { useDispatch } from 'react-redux';
-import { submitEditedConversion, deleteConversion } from '../../actions/conversions';
-import { removeUnsavedChanges } from '../../actions/unsavedWarning';
 import TooltipMarkerComponent from '../TooltipMarkerComponent';
 import TooltipHelpContainer from '../../containers/TooltipHelpContainer';
-// Realize that * is already imported from react
-import { useState } from 'react';
-import '../../styles/Modal.conversion.css';
+import '../../styles/modal.css';
+import { removeUnsavedChanges } from '../../actions/unsavedWarning';
+import { submitEditedConversion, deleteConversion } from '../../actions/conversions';
 import { TrueFalseType } from '../../types/items';
+import { ConversionData } from '../../types/redux/conversions';
 import { UnitDataById } from 'types/redux/units';
 import ConfirmActionModalComponent from '../ConfirmActionModalComponent'
 
@@ -30,9 +30,7 @@ interface EditConversionModalComponentProps {
 	handleClose: () => void;
 }
 
-// Updated to hooks
 export default function EditConversionModalComponent(props: EditConversionModalComponentProps) {
-
 	const dispatch = useDispatch();
 
 	// Set existing conversion values
@@ -66,8 +64,8 @@ export default function EditConversionModalComponent(props: EditConversionModalC
 	// Separate from state comment to keep everything related to the warning confirmation modal together
 	const [showDeleteConfirmationModal, setShowDeleteConfirmationModal] = useState(false);
 	const deleteConfirmationMessage = translate('conversion.delete.conversion') + ' [' + props.header + '] ?';
-	const deleteConfirmText = 'Delete'; // TODO
-	const deleteRejectText = 'Cancel'; // TODO
+	const deleteConfirmText = translate('conversion.delete.conversion');
+	const deleteRejectText = translate('cancel');
 	// The first two handle functions below are required because only one Modal can be open at a time (properly)
 	const handleDeleteConfirmationModalClose = () => {
 		// Hide the warning modal
@@ -113,7 +111,6 @@ export default function EditConversionModalComponent(props: EditConversionModalC
 	// If there is a difference between props and state, then a change was made
 	// Side note, we could probably just set a boolean when any input i
 	const handleSaveChanges = () => {
-
 		// Close the modal first to avoid repeat clicks
 		props.handleClose();
 
@@ -131,8 +128,6 @@ export default function EditConversionModalComponent(props: EditConversionModalC
 			dispatch(removeUnsavedChanges());
 		}
 	}
-
-
 
 	const tooltipStyle = {
 		display: 'inline-block',
@@ -174,9 +169,9 @@ export default function EditConversionModalComponent(props: EditConversionModalC
 							{/* Modal content */}
 							<div className="container-fluid">
 								<div style={tableStyle}>
-									{/* SourceId input*/}
+									{/* Source unit - display only */}
 									<div style={formInputStyle}>
-										<label><FormattedMessage id="conversion.sourceId" /></label><br />
+										<label><FormattedMessage id="conversion.source" /></label><br />
 										<Input
 											name='sourceId'
 											type='text'
@@ -185,9 +180,9 @@ export default function EditConversionModalComponent(props: EditConversionModalC
 											disabled>
 										</Input>
 										<div />
-										{/* DestinationId input*/}
+										{/* Destination unit - display only */}
 										<div style={formInputStyle}>
-											<label><FormattedMessage id="conversion.destinationId" /></label><br />
+											<label><FormattedMessage id="conversion.destination" /></label><br />
 											<Input
 												name='destinationId'
 												type='text'
@@ -196,7 +191,7 @@ export default function EditConversionModalComponent(props: EditConversionModalC
 												disabled>
 											</Input>
 										</div>
-										{/* Bidirectional Y/N input*/}
+										{/* Bidirectional Y/N input */}
 										<div style={formInputStyle}>
 											<label><FormattedMessage id="conversion.bidirectional" /></label><br />
 											<Input
@@ -209,7 +204,7 @@ export default function EditConversionModalComponent(props: EditConversionModalC
 												})}
 											</Input>
 										</div>
-										{/* Slope input*/}
+										{/* Slope input */}
 										<div style={formInputStyle}>
 											<label><FormattedMessage id="conversion.slope" /></label><br />
 											<Input
@@ -219,7 +214,7 @@ export default function EditConversionModalComponent(props: EditConversionModalC
 												placeholder="Slope"
 												onChange={e => handleNumberChange(e)} />
 										</div>
-										{/* Intercept input*/}
+										{/* Intercept input */}
 										<div style={formInputStyle}>
 											<label><FormattedMessage id="conversion.intercept" /></label><br />
 											<Input
@@ -229,7 +224,7 @@ export default function EditConversionModalComponent(props: EditConversionModalC
 												placeholder="Intercept"
 												onChange={e => handleNumberChange(e)} />
 										</div>
-										{/* Note input*/}
+										{/* Note input */}
 										<div style={formInputStyle}>
 											<label><FormattedMessage id="conversion.note" /></label><br />
 											<Input
