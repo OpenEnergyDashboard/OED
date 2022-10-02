@@ -11,9 +11,12 @@ import { NotificationsState } from './notifications';
 import { AdminState } from './admin';
 import { CompareReadingsState } from './compareReadings';
 import { VersionState } from './version';
-import {MapState} from './map';
+import { MapState } from './map';
 import { CurrentUserState } from './currentUser';
 import { UnsavedWarningState } from './unsavedWarning';
+import { UnitsState } from './units';
+import { ConversionsState } from './conversions';
+
 
 export interface State {
 	meters: MetersState;
@@ -30,4 +33,6 @@ export interface State {
 	version: VersionState;
 	currentUser: CurrentUserState;
 	unsavedWarning: UnsavedWarningState;
+	units: UnitsState;
+	conversions: ConversionsState;
 }

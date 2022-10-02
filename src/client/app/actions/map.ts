@@ -320,7 +320,7 @@ function deleteMap(mapID: number): t.DeleteMapAction {
 }
 
 /**
- * Remove all the maps in editing without submiting them
+ * Remove all the maps in editing without submitting them
  */
 export function confirmEditedMaps() {
 	return async (dispatch: Dispatch, getState: GetState) => {

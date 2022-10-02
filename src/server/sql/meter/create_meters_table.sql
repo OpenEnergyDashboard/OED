@@ -27,17 +27,19 @@ end_only_time: true if only an end time is given for each reading and false by d
 reading: The last reading input for the meter
 start_timestamp: Start timestamp of last reading input for this meter
 end_timestamp: End timestamp of last reading for this meter
+unit_id: The foreign key to the unit table. The meter receives data and points to this unit in the graph
+default_graphic_unit: The foreign key to the unit table represents the preferred unit to display this meter
 */
 CREATE TABLE IF NOT EXISTS meters (
     id SERIAL PRIMARY KEY,
-    name VARCHAR(50) UNIQUE NOT NULL,
+    name VARCHAR(50) UNIQUE NOT NULL CHECK (char_length(name) >= 1),
     url VARCHAR(400),
     enabled BOOLEAN NOT NULL,
     displayable BOOLEAN NOT NULL,
     meter_type meter_type NOT NULL,
     default_timezone_meter TEXT DEFAULT NULL,
     gps POINT DEFAULT NULL,
-    identifier TEXT UNIQUE NOT NULL,
+    identifier TEXT UNIQUE NOT NULL CHECK (char_length(identifier) >= 1),
     note TEXT,
     area REAL DEFAULT NULL,
     cumulative BOOLEAN DEFAULT false,
@@ -51,5 +53,7 @@ CREATE TABLE IF NOT EXISTS meters (
     end_only_time BOOLEAN DEFAULT false,
     reading FLOAT DEFAULT 0.0,
     start_timestamp TIMESTAMP DEFAULT '1970-01-01 00:00:00',
-    end_timestamp TIMESTAMP DEFAULT '1970-01-01 00:00:00'
+    end_timestamp TIMESTAMP DEFAULT '1970-01-01 00:00:00',
+    unit_id INTEGER REFERENCES units(id),
+    default_graphic_unit INTEGER REFERENCES units(id)
 );

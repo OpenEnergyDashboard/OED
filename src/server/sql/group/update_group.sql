@@ -7,5 +7,6 @@ UPDATE groups
 		displayable = ${displayable},
 		gps = ${gps},
 		note = ${note},
-		area = ${area}
+		area = ${area},
+		default_graphic_unit = ${defaultGraphicUnit}
 	WHERE id = ${id};

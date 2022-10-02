@@ -28,10 +28,10 @@ export default function ExportComponent(props: ExportProps) {
 	 * Passes an object containing the selected meter data to a function for export.
 	 */
 	const exportReading = () => {
-		const compressedData = props.exportVals.datasets;
+		const data = props.exportVals.datasets;
 
 		// Sort the dataset based on the start time
-		compressedData.forEach(reading => {
+		data.forEach(reading => {
 			if (reading !== undefined) {
 				reading.exportVals.sort((a, b) => {
 					if (a.x < b.x) {
@@ -44,8 +44,8 @@ export default function ExportComponent(props: ExportProps) {
 
 		// Determine and format the first time in the dataset
 		// These values are already UTC so they are okay. Why has not been tracked down.
-		let startTime = moment(compressedData[0].exportVals[0].x);
-		for (const reading of compressedData) {
+		let startTime = moment(data[0].exportVals[0].x);
+		for (const reading of data) {
 			if (reading !== undefined) {
 				const startTimeOfDataset = moment(reading.exportVals[0].x);
 				if (startTime.isAfter(startTimeOfDataset)) {
@@ -55,8 +55,8 @@ export default function ExportComponent(props: ExportProps) {
 		}
 
 		// Determine and format the last time in the dataset
-		let endTime = moment(compressedData[0].exportVals[compressedData[0].exportVals.length - 1].x);
-		for (const reading of compressedData) {
+		let endTime = moment(data[0].exportVals[data[0].exportVals.length - 1].x);
+		for (const reading of data) {
 			if (reading !== undefined) {
 				const endTimeOfDataset = moment(reading.exportVals[reading.exportVals.length - 1].x);
 				if (endTimeOfDataset.isAfter(endTime)) {
@@ -67,9 +67,9 @@ export default function ExportComponent(props: ExportProps) {
 		// Use regex to remove commas and replace spaces/colons/hyphens with underscores
 		const startTimeString = startTime.utc().format('LL_LTS').replace(/,/g, '').replace(/[\s:-]/g, '_');
 		const endTimeString = endTime.utc().format('LL_LTS').replace(/,/g, '').replace(/[\s:-]/g, '_');
-		const chartName = compressedData[0].currentChart;
+		const chartName = data[0].currentChart;
 		const name = `oedExport_${chartName}_${startTimeString}_to_${endTimeString}.csv`;
-		graphExport(compressedData, name);
+		graphExport(data, name);
 	};
 
 	const exportRawReadings = async () => {

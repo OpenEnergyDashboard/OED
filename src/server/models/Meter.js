@@ -5,7 +5,8 @@
 const moment = require('moment');
 const database = require('./database');
 const Reading = require('./Reading');
-
+const Unit = require('./Unit');
+const { log } = require('../log');
 const sqlFile = database.sqlFile;
 
 class Meter {
@@ -33,13 +34,15 @@ class Meter {
 	 * @param reading The value of reading, default 0.0
 	 * @param startTimestamp Start timestamp of last reading input for this meter, default '1970-01-01 00:00:00'
 	 * @param endTimestamp  End timestamp of last reading input for this meter, '1970-01-01 00:00:00' 
+	 * @param unitId The foreign key to the unit table. The meter receives data and points to this unit in the graph, default -99
+	 * @param defaultGraphicUnit The foreign key to the unit table represents the preferred unit to display this meter, default -99
 	 */
 	// The start/end timestamps are the default start/end timestamps that are set to the first
 	// day of time in moment. As always, we want to use UTC.
 	constructor(id, name, url, enabled, displayable, type, meterTimezone, gps = undefined, identifier = name, note, area,
 		cumulative = false, cumulativeReset = false, cumulativeResetStart = '00:00:00', cumulativeResetEnd = '23:59:59.999999',
 		readingGap = 0, readingVariation = 0, readingDuplication = 1, timeSort = 'increasing', endOnlyTime = false,
-		reading = 0.0, startTimestamp = moment(0).utc(), endTimestamp = moment(0).utc()) {
+		reading = 0.0, startTimestamp = moment(0).utc(), endTimestamp = moment(0).utc(), unitId = -99, defaultGraphicUnit = -99) {
 		// In order for the CSV pipeline to work, the order of the parameters needs to match the order that the fields are declared.
 		// In addition, each new parameter has to be added at the very end.
 		this.id = id;
@@ -65,6 +68,8 @@ class Meter {
 		this.reading = reading;
 		this.startTimestamp = startTimestamp;
 		this.endTimestamp = endTimestamp;
+		this.unitId = unitId;
+		this.defaultGraphicUnit = defaultGraphicUnit;
 	}
 
 	/**
@@ -113,11 +118,13 @@ class Meter {
 	 * @returns Meter from row
 	 */
 	static mapRow(row) {
-		return new Meter(row.id, row.name, row.url, row.enabled, row.displayable, row.meter_type,
-			row.default_timezone_meter, row.gps, row.identifier, row.note, row.area, row.cumulative, row.cumulative_reset,
-			row.cumulative_reset_start, row.cumulative_reset_end, row.reading_gap, row.reading_variation,
-			row.reading_duplication, row.time_sort, row.end_only_time,
-			row.reading, row.start_timestamp, row.end_timestamp);
+		var meter = new Meter(row.id, row.name, row.url, row.enabled, row.displayable, row.meter_type, row.default_timezone_meter,
+			row.gps, row.identifier, row.note, row.area, row.cumulative, row.cumulative_reset, row.cumulative_reset_start,
+			row.cumulative_reset_end, row.reading_gap, row.reading_variation, row.reading_duplication, row.time_sort,
+			row.end_only_time, row.reading, row.start_timestamp, row.end_timestamp, row.unit_id, row.default_graphic_unit);
+		meter.unitId = Meter.convertUnitValue(meter.unitId);
+		meter.defaultGraphicUnit = Meter.convertUnitValue(meter.defaultGraphicUnit);
+		return meter;
 	}
 
 	/**
@@ -162,15 +169,42 @@ class Meter {
 	}
 
 	/**
+	 * For the given meter id, gets the associated unitId. 
+	 * Then, returns the unitIndex (the row/column id in the Cik/Pik table) of that unitId.
+	 * @param {*} meterId The meter id.
+	 * @param {*} conn The connection to use.
+	 * @return {Promise.<Int>}
+	 */
+	static async getUnitIndex(meterId, conn) {
+		const resp = await conn.one(sqlFile('meter/get_unit_id.sql'), { meterId: meterId });
+		const unitId = resp.unit_id;
+		const unit = await Unit.getById(unitId, conn);
+		return unit.unitIndex;
+	}
+
+	/**
+	 * Returns all meters where unitId is not null.
+	 * @param {*} conn The connection to be used.
+	 * @returns {Promise.<Array.<Meter>>}
+	 */
+	static async getUnitNotNull(conn) {
+		const rows = await conn.any(sqlFile('meter/get_unit_not_null.sql'));
+		return rows.map(Meter.mapRow);
+	}
+
+	/**
 	 * Returns a promise to insert this meter into the database
 	 * @param conn the connection to be used.
 	 * @returns {Promise.<>}
 	 */
 	async insert(conn) {
-		const meter = this;
+		Meter.makeMeterDataValid(this);
+		const meter = { ...this };
 		if (meter.id !== undefined) {
 			throw new Error('Attempt to insert a meter that already has an ID');
 		}
+		meter.unitId = Meter.convertUnitValue(meter.unitId);
+		meter.defaultGraphicUnit = Meter.convertUnitValue(meter.defaultGraphicUnit);
 		const resp = await conn.one(sqlFile('meter/insert_new_meter.sql'), meter);
 		this.id = resp.id;
 	}
@@ -184,8 +218,8 @@ class Meter {
 		cumulative = this.cumulative, cumulativeReset = this.cumulativeReset, cumulativeResetStart = this.cumulativeResetStart,
 		cumulativeResetEnd = this.cumulativeResetEnd, readingGap = this.readingGap, readingVariation = this.readingVariation,
 		readingDuplication = this.readingDuplication, timeSort = this.timeSort, endOnlyTime = this.endOnlyTime,
-		reading = this.reading, startTimestamp = this.startTimestamp, endTimestamp = this.endTimestamp) {
-
+		reading = this.reading, startTimestamp = this.startTimestamp, endTimestamp = this.endTimestamp,
+		unitId = this.unitId, defaultGraphicUnit = this.default_graphic_unit) {
 		this.name = name;
 		this.url = url;
 		this.enabled = enabled;
@@ -208,6 +242,8 @@ class Meter {
 		this.reading = reading;
 		this.startTimestamp = startTimestamp;
 		this.endTimestamp = endTimestamp;
+		this.unitId = unitId;
+		this.defaultGraphicUnit = defaultGraphicUnit;
 	}
 
 	/**
@@ -216,10 +252,13 @@ class Meter {
 	 * @returns {Promise.<>}
 	 */
 	async update(conn) {
-		const meter = this;
+		Meter.makeMeterDataValid(this);
+		const meter = { ...this };
 		if (meter.id === undefined) {
 			throw new Error('Attempt to update a meter with no ID');
 		}
+		meter.unitId = Meter.convertUnitValue(meter.unitId);
+		meter.defaultGraphicUnit = Meter.convertUnitValue(meter.defaultGraphicUnit);
 		await conn.none(sqlFile('meter/update_meter.sql'), meter);
 	}
 
@@ -231,8 +270,44 @@ class Meter {
 	readings(conn) {
 		return Reading.getAllByMeterID(this.id, conn);
 	}
+
+	/**
+	 * Makes the given meter valid.
+	 * @param {*} meter The meter.
+	 */
+	static makeMeterDataValid(meter) {
+		if (meter.unitId === -99) {
+			// If there is no unitId, set defaultGraphicUnit to -99 and displayable to false.
+			if (meter.defaultGraphicUnit !== -99) {
+				meter.defaultGraphicUnit = -99;
+				log.warn(`defaultGraphicUnit of the meter "${meter.name}" has been removed since there is no unitId.`);
+			}
+			if (meter.displayable === true) {
+				meter.displayable = false;
+				log.warn(`displayable of the meter "${meter.name}" has been switched to false since there is no unitId.`);
+			}
+		}
+	}
+
+	/**
+	 * Returns null if the unit's id is -99 and vice versa.
+	 * This function is used before inserting into the database or after getting data.
+	 * @param {*} unit The unit's id.
+	 */
+	static convertUnitValue(unit) {
+		if (unit === -99) {
+			// The value of -99 will become null in the database.
+			return null
+		} else if (unit === null) {
+			// The null value in the database will become -99.
+			return -99;
+		}
+		return unit;
+	}
 }
 
+// The relates to the TS object MeterType for the same use in src/client/app/types/redux/meters.ts.
+// They should be kept in sync.
 // Enum of meter types
 Meter.type = {
 	EGAUGE: 'egauge',

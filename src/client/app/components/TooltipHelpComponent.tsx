@@ -37,10 +37,18 @@ export default class TooltipHelpComponent extends React.Component<TooltipHelpPro
 		// const BASE_URL = `https://xxx.github.io/OpenEnergyDashboard.github.io/help/${version}`;
 
 		const helpLinks: Record<string, Record<string, string>> = {
+			'help.admin.conversioncreate': { link: `${BASE_URL}/adminConversionCreating.html` },
+			'help.admin.conversionedit': { link: `${BASE_URL}/adminConversionEditing.html` },
+			'help.admin.conversionview': { link: `${BASE_URL}/adminConversionViewing.html` },
 			'help.admin.groupview': { link: `${BASE_URL}/adminGroupViewing.html` },
 			'help.admin.header': { link: `${BASE_URL}/adminPreferences.html` },
 			'help.admin.mapview': { link: `${BASE_URL}/adminMap.html` },
+			'help.admin.metercreate': { link: `${BASE_URL}/adminMeterCreating.html` },
+			'help.admin.meteredit': { link: `${BASE_URL}/adminMeterEditing.html` },
 			'help.admin.meterview': { link: `${BASE_URL}/adminMeterViewing.html` },
+			'help.admin.unitcreate': { link: `${BASE_URL}/adminUnitCreating.html` },
+			'help.admin.unitedit': { link: `${BASE_URL}/adminUnitEditing.html` },
+			'help.admin.unitview': { link: `${BASE_URL}/adminUnitViewing.html` },
 			'help.admin.user': { link: `${BASE_URL}/adminUser.html` },
 			'help.csv.header': { link: `${BASE_URL}/adminDataAcquisition.html` },
 			'help.home.bar.custom.slider.tip': { link: `${BASE_URL}/barGraphic.html#usage` },
@@ -65,6 +73,7 @@ export default class TooltipHelpComponent extends React.Component<TooltipHelpPro
 			'help.home.select.groups': { link: `${BASE_URL}/graphingGroups.html` },
 			'help.home.select.maps': { link: `${BASE_URL}/mapGraphic.html` },
 			'help.home.select.meters': { link: `${BASE_URL}/graphingMeters.html` },
+			'help.home.select.units': { link: `${BASE_URL}/graphingUnits.html` },
 			'help.home.toggle.chart.link': { link: `${BASE_URL}/chartLink.html` },
 			'help.groups.groupview': { link: `${BASE_URL}/groupViewing.html` },
 			'help.maps.mapview': { link: `${BASE_URL}/mapGraphic.html` },

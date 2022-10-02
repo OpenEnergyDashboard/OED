@@ -7,41 +7,45 @@ import { TimeInterval } from '../../../../common/TimeInterval';
 import { ActionType } from './actions';
 import { CompareReadings } from '../readings';
 
-export interface RequestMeterCompareReadingAction {
-	type: ActionType.RequestMeterCompareReading;
+export interface RequestMeterCompareReadingsAction {
+	type: ActionType.RequestMeterCompareReadings;
 	meterIDs: number[];
+	unitID: number;
 	timeInterval: TimeInterval;
 	compareShift: moment.Duration;
 }
 
-export interface RequestGroupCompareReadingAction {
-	type: ActionType.RequestGroupCompareReading;
+export interface RequestGroupCompareReadingsAction {
+	type: ActionType.RequestGroupCompareReadings;
 	groupIDs: number[];
+	unitID: number;
 	timeInterval: TimeInterval;
 	compareShift: moment.Duration;
 }
 
-export interface ReceiveMeterCompareReadingAction {
-	type: ActionType.ReceiveMeterCompareReading;
+export interface ReceiveMeterCompareReadingsAction {
+	type: ActionType.ReceiveMeterCompareReadings;
 	meterIDs: number[];
+	unitID: number;
 	timeInterval: TimeInterval;
 	compareShift: moment.Duration;
 	readings: CompareReadings;
 }
 
-export interface ReceiveGroupCompareReadingAction {
-	type: ActionType.ReceiveGroupCompareReading;
+export interface ReceiveGroupCompareReadingsAction {
+	type: ActionType.ReceiveGroupCompareReadings;
 	groupIDs: number[];
+	unitID: number;
 	timeInterval: TimeInterval;
 	compareShift: moment.Duration;
 	readings: CompareReadings;
 }
 
-export type CompareReadingAction =
-	ReceiveMeterCompareReadingAction |
-	ReceiveGroupCompareReadingAction |
-	RequestMeterCompareReadingAction |
-	RequestGroupCompareReadingAction;
+export type CompareReadingsAction =
+	ReceiveMeterCompareReadingsAction |
+	ReceiveGroupCompareReadingsAction |
+	RequestMeterCompareReadingsAction |
+	RequestGroupCompareReadingsAction;
 
 export interface CompareReadingsData {
 	isFetching: boolean;
@@ -53,14 +57,18 @@ export interface CompareReadingsState {
 	byMeterID: {
 		[meterID: number]: {
 			[timeInterval: string]: {
-				[compareShift: string]: CompareReadingsData;
+				[compareShift: string]: {
+					[unitID: number]: CompareReadingsData;
+				}
 			}
 		}
 	};
 	byGroupID: {
 		[groupID: number]: {
 			[timeInterval: string]: {
-				[compareShift: string]: CompareReadingsData;
+				[compareShift: string]: {
+					[unitID: number]: CompareReadingsData;
+				}
 			}
 		}
 	};

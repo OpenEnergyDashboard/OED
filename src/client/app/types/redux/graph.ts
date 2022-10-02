@@ -14,6 +14,14 @@ export enum ChartTypes {
 	map = 'map'
 }
 
+// Rates that can be graphed, only relevant to line graphs.
+export const LineGraphRates = {
+	'second': (1/3600),
+	'minute': (1/60),
+	'hour': 1,
+	'day': 24
+}
+
 export interface UpdateSelectedMetersAction {
 	type: ActionType.UpdateSelectedMeters;
 	meterIDs: number[];
@@ -22,6 +30,11 @@ export interface UpdateSelectedMetersAction {
 export interface UpdateSelectedGroupsAction {
 	type: ActionType.UpdateSelectedGroups;
 	groupIDs: number[];
+}
+
+export interface UpdateSelectedUnitAction {
+	type: ActionType.UpdateSelectedUnit;
+	unitID: number;
 }
 
 export interface UpdateBarDurationAction {
@@ -73,6 +86,11 @@ export interface SetOptionsVisibility {
 	visibility: boolean;
 }
 
+export interface UpdateLineGraphRate {
+	type: ActionType.UpdateLineGraphRate;
+	lineGraphRate: LineGraphRate;
+}
+
 export type GraphAction =
 	| ChangeGraphZoomAction
 	| ChangeSliderRangeAction
@@ -82,14 +100,22 @@ export type GraphAction =
 	| UpdateBarDurationAction
 	| UpdateSelectedGroupsAction
 	| UpdateSelectedMetersAction
+	| UpdateSelectedUnitAction
 	| UpdateComparePeriodAction
 	| SetHotlinked
 	| ChangeCompareSortingOrderAction
-	| SetOptionsVisibility;
+	| SetOptionsVisibility
+	| UpdateLineGraphRate;
+
+export interface LineGraphRate {
+	label: string,
+	rate: number
+}
 
 export interface GraphState {
 	selectedMeters: number[];
 	selectedGroups: number[];
+	selectedUnit: number;
 	timeInterval: TimeInterval;
 	rangeSliderInterval: TimeInterval;
 	barDuration: moment.Duration;
@@ -100,4 +126,5 @@ export interface GraphState {
 	barStacking: boolean;
 	hotlinked: boolean;
 	optionsVisibility: boolean;
+	lineGraphRate: LineGraphRate;
 }

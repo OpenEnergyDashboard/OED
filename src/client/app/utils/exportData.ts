@@ -10,9 +10,9 @@ import { UserRole } from '../types/items';
 import translate from './translate';
 
 /**
- * Function to converts the compressed meter data into a CSV formatted string.
- * @param items The compressed meter data.
- * @returns output A string containing the CSV formatted compressed meter data.
+ * Function to converts the meter readings into a CSV formatted string.
+ * @param items The meter reading.
+ * @returns output A string containing the CSV formatted meter readings.
  */
 
 function convertToCSV(items: ExportDataSet[]) {
@@ -50,8 +50,8 @@ function downloadCSV(inputCSV: string, fileName: string) {
 }
 
 /**
- * Function to export compressed data from the graph currently displaying. May be used for routing if more export options are added
- * @param dataSets An Object. The compressed data from each meter currently selected in the graph.
+ * Function to export readings from the graph currently displaying. May be used for routing if more export options are added
+ * @param dataSets An Object. The readings from each meter currently selected in the graph.
  * @param name the name of the file.
  */
 export default function graphExport(dataSets: ExportDataSet[], name: string) {

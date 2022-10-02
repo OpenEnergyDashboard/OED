@@ -6,13 +6,14 @@ const ini = require('ini');
 const Meter = require('../../models/Meter');
 const ConfigFile = require('../../models/obvius/Configfile');
 const moment = require('moment');
+const Unit = require('../../models/Unit');
 
 /**
  * Creates array of meters from a config file
  * @param {ConfigFile} configFile
  * @returns {Meter[]} an array of Meter objects
  */
-function processConfigFile(configFile) {
+async function processConfigFile(configFile) {
 	const config = ini.parse(configFile.contents);
 	const regularExpression = /([0-9][0-9])/;
 	// For the metersHash we assume each key corresponds
@@ -25,6 +26,16 @@ function processConfigFile(configFile) {
 		const internalMeterName = `${configFile.serialId}.${parseInt(meterNumber)}`;
 		const meter = metersHash[internalMeterName];
 		metersHash[internalMeterName] = { ...meter, [characteristic]: config[key] };
+	}
+	// TODO: the unit name needs to come from the config file
+	const kWhUnit = await Unit.getByName( 'kWh', conn );
+	let unitId; 
+	if (kWhUnit === null) {
+		console.log("kWh not found while processing Obvius data");
+		// TODO need a warning log
+		unitId = undefined;
+	} else {
+		unitId = kWhUnit.id;
 	}
 	for (internalMeterName of Object.keys(metersHash)) {
 		metersArray.push(new Meter(
@@ -53,7 +64,9 @@ function processConfigFile(configFile) {
 			true,
 			undefined,
 			undefined,
-			undefined
+			undefined,
+			unitId,
+			unitId
 			)
 		);
 	}

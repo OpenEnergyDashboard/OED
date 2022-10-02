@@ -10,6 +10,7 @@ import { State } from '../types/redux/state';
 import Plot from 'react-plotly.js';
 import Locales from '../types/locales';
 import { DataType } from '../types/Datasources';
+import { UnitRepresentType } from '../types/redux/units';
 
 /* Passes the current redux state of the barchart, and turns it into props for the React
 *  component, which is what will be visible on the page. Makes it possible to access
@@ -19,13 +20,41 @@ import { DataType } from '../types/Datasources';
 function mapStateToProps(state: State) {
 	const timeInterval = state.graph.timeInterval;
 	const barDuration = state.graph.barDuration;
+	const unitID = state.graph.selectedUnit;
 	const datasets: any[] = [];
+	// The unit label depends on the unit which is in selectUnit state.
+	const graphingUnit = state.graph.selectedUnit;
+	let unitLabel: string = '';
+	// If graphingUnit is -99 then none selected and nothing to graph so label is empty.
+	// This will probably happen when the page is first loaded.
+	if (graphingUnit !== -99) {
+		const selectUnitState = state.units.units[state.graph.selectedUnit];
+		if (selectUnitState !== undefined) {
+			// Quantity and flow units have different unit labels.
+			// Look up the type of unit if it is for quantity/flow (should not be raw) and decide what to do.
+			// Bar graphics are always quantities.
+			if (selectUnitState.unitRepresent === UnitRepresentType.quantity) {
+				// If it is a quantity unit then that is the unit you are graphing.
+				unitLabel  = selectUnitState.identifier;
+			} else if (selectUnitState.unitRepresent === UnitRepresentType.flow) {
+				// If it is a flow meter then you need to multiply by time to get the quantity unit.
+				// The quantity/time for flow has varying time so label by multiplying by time.
+				// To make sure it is clear, also indicate it is a quantity.
+				// Note this should not be used for raw data.
+				// It might not be usual to take a flow and make it into a quantity so this label is a little different to
+				// catch people's attention. If sites/users don't like OED doing this then we can eliminate flow for these types
+				// of graphics as we are doing for rate.
+				unitLabel = selectUnitState.identifier + ' * time ≡ quantity';
+			}
+		}
+	}
 
 	// Add all valid data from existing meters to the bar chart
 	for (const meterID of state.graph.selectedMeters) {
 		const byMeterID = state.readings.bar.byMeterID[meterID];
-		if (byMeterID !== undefined) {
-			const readingsData = byMeterID[timeInterval.toString()][barDuration.toISOString()];
+		if (byMeterID !== undefined && byMeterID[timeInterval.toString()] !== undefined &&
+			byMeterID[timeInterval.toString()][barDuration.toISOString()] !== undefined) {
+			const readingsData = byMeterID[timeInterval.toString()][barDuration.toISOString()][unitID];
 			if (readingsData !== undefined && !readingsData.isFetching) {
 				const label = state.meters.byMeterID[meterID].name;
 				const colorID = meterID;
@@ -45,7 +74,7 @@ function mapStateToProps(state: State) {
 						`${moment.utc(barReading.startTimestamp).format('ll')} - ${moment.utc(barReading.endTimestamp).subtract(1, 'days').format('ll')}`;
 					xData.push(timeReading);
 					yData.push(barReading.reading);
-					hoverText.push(`<b> ${timeReading} </b> <br> ${label}: ${barReading.reading.toPrecision(6)} kWh`);
+					hoverText.push(`<b> ${timeReading} </b> <br> ${label}: ${barReading.reading.toPrecision(6)} ${unitLabel}`);
 				});
 				// This variable contains all the elements (x and y values, bar type, etc.) assigned to the data parameter of the Plotly object
 				datasets.push({
@@ -63,8 +92,9 @@ function mapStateToProps(state: State) {
 
 	for (const groupID of state.graph.selectedGroups) {
 		const byGroupID = state.readings.bar.byGroupID[groupID];
-		if (byGroupID !== undefined) {
-			const readingsData = byGroupID[timeInterval.toString()][barDuration.toISOString()];
+		if (byGroupID !== undefined && byGroupID[timeInterval.toString()] !== undefined &&
+			byGroupID[timeInterval.toString()][barDuration.toISOString()] !== undefined) {
+			const readingsData = byGroupID[timeInterval.toString()][barDuration.toISOString()][unitID];
 			if (readingsData !== undefined && !readingsData.isFetching) {
 				const label = state.groups.byGroupID[groupID].name;
 				const colorID = groupID;
@@ -84,7 +114,7 @@ function mapStateToProps(state: State) {
 						`${moment.utc(barReading.startTimestamp).format('ll')} - ${moment.utc(barReading.endTimestamp).subtract(1, 'days').format('ll')}`;
 					xData.push(timeReading);
 					yData.push(barReading.reading);
-					hoverText.push(`<b> ${timeReading} </b> <br> ${label}: ${barReading.reading.toPrecision(6)} kWh`);
+					hoverText.push(`<b> ${timeReading} </b> <br> ${label}: ${barReading.reading.toPrecision(6)} ${unitLabel}`);
 				});
 
 				// This variable contains all the elements (x and y values, bar chart, etc.) assigned to the data parameter of the Plotly object
@@ -115,7 +145,7 @@ function mapStateToProps(state: State) {
 			orientation: 'h'
 		},
 		yaxis: {
-			title: 'kWh',
+			title: unitLabel,
 			showgrid: true,
 			gridcolor: '#ddd'
 		},
