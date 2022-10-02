@@ -72,16 +72,9 @@ router.post('/edit', async (req, res) => {
 	} else {
 		const conn = getConnection();
 		try {
-			const conversion = await Conversion.getBySourceDestination(req.body.sourceId, req.body.destinationId, conn);
-			// Update conversion with new values, some may be unchanged.
-			conversion.sourceId = req.body.sourceId;
-			conversion.destinationId = req.body.destinationId;
-			conversion.bidirectional = req.body.bidirectional;
-			conversion.slope = req.body.slope;
-			conversion.intercept = req.body.intercept;
-			conversion.note = req.body.note;
-
-			await conversion.update(conn);
+			const updatedConversion = new Conversion(req.body.sourceId, req.body.destinationId, req.body.bidirectional,
+				req.body.slope, req.body.intercept, req.body.note);
+			await updatedConversion.update(conn);
 		} catch (err) {
 			log.error('Failed to edit conversion', err);
 			res.status(500).json({ message: 'Unable to edit conversions.', err });
