@@ -26,6 +26,7 @@ interface ConfirmActionModalComponentProps {
 	actionFunction: () => void;
 }
 
+// TODO This is a function that deals with confirm/reject that may be useful in other places.
 /**
  * This is a modal component that can be used to confirm/reject any action by executing the actionFunction or handleClose passed in.
  * @param props
