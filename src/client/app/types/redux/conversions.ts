@@ -60,15 +60,6 @@ export interface ConversionData {
 	note: string;
 }
 
-export interface ConversionEditData {
-	sourceId: number;
-	destinationId: number;
-	bidirectional: boolean;
-	slope: number;
-	intercept: number;
-	note: string;
-}
-
 export interface ConversionsState {
 	hasBeenFetchedOnce: boolean,
 	isFetching: boolean;

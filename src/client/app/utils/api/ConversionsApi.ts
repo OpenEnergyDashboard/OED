@@ -5,7 +5,7 @@
   */
 
 import ApiBackend from './ApiBackend';
-import { ConversionData, ConversionEditData } from '../../types/redux/conversions';
+import { ConversionData } from '../../types/redux/conversions';
 export default class ConversionsApi {
 	private readonly backend: ApiBackend;
 
@@ -13,8 +13,8 @@ export default class ConversionsApi {
 		this.backend = backend;
 	}
 
-	public async edit(conversion: ConversionData): Promise<ConversionEditData> {
-		return await this.backend.doPostRequest<ConversionEditData>(
+	public async edit(conversion: ConversionData): Promise<ConversionData> {
+		return await this.backend.doPostRequest<ConversionData>(
 			'/api/conversions/edit',
 			{
 				sourceId: conversion.sourceId, destinationId: conversion.destinationId, bidirectional: conversion.bidirectional,
