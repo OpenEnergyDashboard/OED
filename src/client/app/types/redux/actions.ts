@@ -40,6 +40,7 @@ export enum ActionType {
 	UpdateSelectedMeters = 'UPDATE_SELECTED_METERS',
 	UpdateSelectedGroups = 'UPDATE_SELECTED_GROUPS',
 	UpdateSelectedUnit = 'UPDATE_SELECTED_UNIT',
+	UpdateSelectedConversion = 'UPDATE_SELECTED_CONVERSION',
 	UpdateBarDuration = 'UPDATE_BAR_DURATION',
 	ChangeChartToRender = 'CHANGE_CHART_TO_RENDER',
 	ChangeBarStacking = 'CHANGE_BAR_STACKING',
@@ -122,10 +123,19 @@ export enum ActionType {
 	EditMeterDetails = 'EDIT_METER_DETAILS',
 	SubmitEditedMeter = 'SUBMIT_EDITED_METER',
 	ConfirmEditedMeter = 'CONFIRM_EDITED_METER',
-	// TODO This is not currently used but should be when meter page is done.
-	DeleteEditedMeter = 'DELETE_EDITED_METER',
 	DeleteSubmittedMeter = 'DELETE_SUBMITTED_METER',
 	ConfirmMetersFetchedOnce = 'CONFIRM_METERS_FETCHED_ONCE',
+
+	ReceiveConversionsDetails = 'RECEIVE_CONVERSIONS_DETAILS',
+	RequestConversionsDetails = 'REQUEST_CONVERSIONS_DETAILS',
+	ChangeDisplayedConversions = 'CHANGE_DISPLAYED_CONVERSIONS',
+	EditConversionDetails = 'EDIT_CONVERSION_DETAILS',
+	SubmitEditedConversion = 'SUBMIT_EDITED_CONVERSION',
+	ConfirmEditedConversion = 'CONFIRM_EDITED_CONVERSION',
+	DeleteEditedConversion = 'DELETE_EDITED_CONVERSION',
+	DeleteSubmittedConversion = 'DELETE_SUBMITTED_CONVERSION',
+	DeleteConversion = 'DELETE_CONVERSION',
+	ConfirmConversionsFetchedOnce = 'CONFIRM_CONVERSIONS_FETCHED_ONCE',
 }
 
 /**

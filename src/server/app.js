@@ -31,7 +31,9 @@ const logs = require('./routes/logs');
 const obvius = require('./routes/obvius');
 const csv = require('./routes/csv');
 const conversionArray = require('./routes/conversionArray');
-const units = require('./routes/units')
+const units = require('./routes/units');
+const conversions = require('./routes/conversions');
+
 
 // Limit the rate of overall requests to OED
 // Note that the rate limit may make the automatic test return the value of 429. In that case, the limiters below need to be increased.
@@ -80,11 +82,12 @@ app.use('/api/obvius', obvius);
 app.use('/api/csv', csv);
 app.use('/api/conversion-array', conversionArray);
 app.use('/api/units', units);
+app.use('/api/conversions', conversions);
 app.use(express.static(path.join(__dirname, '..', 'client', 'public')));
 
 const router = express.Router();
 
-router.get(/^(\/)(login|admin|groups|createGroup|editGroup|graph|meters|maps|calibration|users|csv|units)?$/, (req, res) => {
+router.get(/^(\/)(login|admin|groups|createGroup|editGroup|graph|meters|maps|calibration|users|csv|units|conversions)?$/, (req, res) => {
 	fs.readFile(path.resolve(__dirname, '..', 'client', 'index.html'), (err, html) => {
 		const subdir = config.subdir || '/';
 		let htmlPlusData = html.toString().replace('SUBDIR', subdir);

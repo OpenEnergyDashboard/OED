@@ -16,7 +16,7 @@ import { ConversionArray } from '../types/conversionArray';
 import { fetchPreferencesIfNeeded } from '../actions/admin';
 import { fetchMapsDetails } from '../actions/map';
 import { fetchUnitsDetailsIfNeeded } from '../actions/units';
-
+import { fetchConversionsDetailsIfNeeded } from '../actions/conversions';
 
 export default function InitializationComponent() {
 
@@ -31,6 +31,7 @@ export default function InitializationComponent() {
 		dispatch(fetchPreferencesIfNeeded());
 		dispatch(fetchMapsDetails());
 		dispatch(fetchUnitsDetailsIfNeeded());
+		dispatch(fetchConversionsDetailsIfNeeded());
 		ConversionArray.fetchPik();
 	}, []);
 

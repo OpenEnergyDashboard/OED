@@ -1,13 +1,14 @@
 /* This Source Code Form is subject to the terms of the Mozilla Public
-  * License, v. 2.0. If a copy of the MPL was not distributed with this
-  * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
+* License, v. 2.0. If a copy of the MPL was not distributed with this
+* file, You can obtain one at http://mozilla.org/MPL/2.0/. */
+
 import * as React from 'react';
+//Realize that * is already imported from react
+import { useState } from 'react';
 import { Button } from 'reactstrap';
 import { FormattedMessage } from 'react-intl';
 import EditUnitModalComponent from './EditUnitModalComponent';
-import '../../styles/unit-card-page.css';
-//Realize that * is already imported from react
-import { useState } from 'react';
+import '../../styles/card-page.css';
 import { UnitData } from 'types/redux/units';
 import translate from '../../utils/translate';
 
@@ -34,28 +35,28 @@ export default function UnitViewComponent(props: UnitViewComponentProps) {
 			<div className="identifier-container">
 				{props.unit.identifier}
 			</div>
-			<div className="unit-container">
+			<div className="item-container">
 				<b><FormattedMessage id="unit.name" /></b> {props.unit.name}
 			</div>
-			<div className="unit-container">
+			<div className="item-container">
 				<b><FormattedMessage id="unit.type.of.unit" /></b> {props.unit.typeOfUnit}
 			</div>
-			<div className="unit-container">
+			<div className="item-container">
 				<b><FormattedMessage id="unit.represent" /></b> {props.unit.unitRepresent}
 			</div>
 			<div className={props.unit.displayable.toString()}>
 				<b><FormattedMessage id="unit.displayable" /></b> {props.unit.displayable}
 			</div>
-			<div className="unit-container">
+			<div className="item-container">
 				<b><FormattedMessage id="unit.preferred.display" /></b> {translate(`TrueFalseType.${props.unit.preferredDisplay.toString()}`)}
 			</div>
-			<div className="unit-container">
+			<div className="item-container">
 				<b><FormattedMessage id="unit.sec.in.rate" /></b> {props.unit.secInRate}
 			</div>
-			<div className="unit-container">
+			<div className="item-container">
 				<b><FormattedMessage id="unit.suffix" /></b> {props.unit.suffix}
 			</div>
-			<div className="unit-container">
+			<div className="item-container">
 				{/* Only show first 30 characters so card does not get too big. Should limit to one line */}
 				<b><FormattedMessage id="unit.note" /></b> {props.unit.note.slice(0, 29)}
 			</div>
@@ -64,7 +65,10 @@ export default function UnitViewComponent(props: UnitViewComponentProps) {
 					<FormattedMessage id="edit.unit" />
 				</Button>
 				{/* Creates a child UnitModalEditComponent */}
-				<EditUnitModalComponent show={showEditModal} unit={props.unit} handleClose={handleClose} />
+				<EditUnitModalComponent
+					show={showEditModal}
+					unit={props.unit}
+					handleClose={handleClose} />
 			</div>
 		</div>
 	);

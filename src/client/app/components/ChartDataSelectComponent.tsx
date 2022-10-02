@@ -441,6 +441,7 @@ export function getGroupCompatibilityForDropdown(state: State) {
 		// Then, check if the selected unit exists in that set of compatible units
 		visibleGroup.forEach(groupId => {
 			// Get the set of units compatible with the current group (through its deepMeters attribute)
+			// TODO If a meter in a group is not visible to this user then it is not in Redux state and this fails.
 			const compatibleUnits = unitsCompatibleWithMeters(metersInGroup(groupId));
 			if (compatibleUnits.has(state.graph.selectedUnit)) {
 				// The selected unit is part of the set of compatible units with this group
@@ -507,7 +508,7 @@ function getSelectOptionsByItem(compatibleItems: Set<number>, incompatibleItems:
 			label = state.units[itemId].identifier;
 		}
 		else if (instanceOfMetersState(state)) {
-			label = state.byMeterID[itemId].name;
+			label = state.byMeterID[itemId].identifier;
 		}
 		else if (instanceOfGroupsState(state)) {
 			label = state.byGroupID[itemId].name;
@@ -526,7 +527,7 @@ function getSelectOptionsByItem(compatibleItems: Set<number>, incompatibleItems:
 			label = state.units[itemId].identifier;
 		}
 		else if (instanceOfMetersState(state)) {
-			label = state.byMeterID[itemId].name;
+			label = state.byMeterID[itemId].identifier;
 		}
 		else if (instanceOfGroupsState(state)) {
 			label = state.byGroupID[itemId].name;

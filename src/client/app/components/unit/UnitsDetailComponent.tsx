@@ -1,23 +1,23 @@
 /* This Source Code Form is subject to the terms of the Mozilla Public
 * License, v. 2.0. If a copy of the MPL was not distributed with this
 * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
-import * as React from 'react';
 import { FormattedMessage } from 'react-intl';
 import HeaderContainer from '../../containers/HeaderContainer';
 import FooterContainer from '../../containers/FooterContainer';
 import TooltipHelpContainer from '../../containers/TooltipHelpContainer';
 import TooltipMarkerComponent from '../TooltipMarkerComponent';
+import * as React from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import { fetchUnitsDetailsIfNeeded } from '../../actions/units';
-import { State } from '../../types/redux/state';
-import { isRoleAdmin } from '../../utils/hasPermissions';
 import { useEffect } from 'react';
+import { State } from '../../types/redux/state';
+import { fetchUnitsDetailsIfNeeded } from '../../actions/units';
 import UnitViewComponent from './UnitViewComponent';
 import CreateUnitModalComponent from './CreateUnitModalComponent';
 import { UnitData } from 'types/redux/units';
 
-// Utilizes useDispatch and useSelector hooks
 export default function UnitsDetailComponent() {
+	// The route stops you from getting to this page if not an admin.
+
 	const dispatch = useDispatch();
 
 	useEffect(() => {
@@ -27,10 +27,6 @@ export default function UnitsDetailComponent() {
 
 	//Units state
 	const unitsState = useSelector((state: State) => state.units.units);
-
-	// Check for admin status
-	const currentUser = useSelector((state: State) => state.currentUser.profile);
-	const loggedInAsAdmin = (currentUser !== null) && isRoleAdmin(currentUser.role);
 
 	const titleStyle: React.CSSProperties = {
 		textAlign: 'center'
@@ -42,6 +38,7 @@ export default function UnitsDetailComponent() {
 		// For now, only an admin can see the unit page.
 		tooltipUnitView: 'help.admin.unitview'
 	};
+
 	return (
 		<div>
 			<HeaderContainer />
@@ -54,16 +51,15 @@ export default function UnitsDetailComponent() {
 						<TooltipMarkerComponent page='units' helpTextId={tooltipStyle.tooltipUnitView} />
 					</div>
 				</h2>
-				{loggedInAsAdmin &&
-					<div className="edit-btn">
-						{/* The actual button for create is inside this component. */}
-						<CreateUnitModalComponent />
-					</div>}
+				<div className="edit-btn">
+					{/* The actual button for create is inside this component. */}
+					< CreateUnitModalComponent />
+				</div>
 				<div className="card-container">
 					{/* Create a UnitViewComponent for each UnitData in Units State after sorting by identifier */}
 					{Object.values(unitsState)
 						.sort((unitA: UnitData, unitB: UnitData) => (unitA.identifier.toLowerCase() > unitB.identifier.toLowerCase()) ? 1 :
-							(( unitB.identifier.toLowerCase() > unitA.identifier.toLowerCase()) ? -1 : 0))
+							((unitB.identifier.toLowerCase() > unitA.identifier.toLowerCase()) ? -1 : 0))
 						.map(unitData => (<UnitViewComponent unit={unitData as UnitData} key={(unitData as UnitData).id} />))}
 				</div>
 			</div>

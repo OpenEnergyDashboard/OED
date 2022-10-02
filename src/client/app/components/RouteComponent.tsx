@@ -33,6 +33,7 @@ import { UserRole } from '../types/items';
 import { hasPermissions } from '../utils/hasPermissions';
 import UnitsDetailComponent from './unit/UnitsDetailComponent';
 import MetersDetailComponent from './meters/MetersDetailComponent';
+import ConversionsDetailComponent from './conversion/ConversionsDetailComponent';
 import * as queryString from 'query-string';
 import InitializationComponent from './InitializationComponent';
 
@@ -253,6 +254,7 @@ export default class RouteComponent extends React.Component<RouteProps> {
 								<Route path='/users/new' render={() => this.requireAuth(<CreateUserContainer/>)}/>
 								<Route path='/users' render={() => this.requireAuth(<UsersDetailContainer fetchUsers={() => []}/>)}/>
 								<Route path='/units'render={() => this.requireAuth(<UnitsDetailComponent />)}/>
+								<Route path='/conversions' render={() => this.requireAuth(<ConversionsDetailComponent />)}/>
 								<Route path='*' component={HomeComponent}/>
 							</Switch>
 						</Router>
