@@ -42,3 +42,6 @@ nohup.out
 
 # Mac Finder files - do here so avoid in VSC container
 .DS_Store
+
+# Visual Studio Code settings file
+.vscode/settings.json

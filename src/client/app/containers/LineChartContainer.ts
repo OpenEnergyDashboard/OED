@@ -32,7 +32,7 @@ function mapStateToProps(state: State) {
 			// Quantity and flow units have different unit labels.
 			// Look up the type of unit if it is for quantity/flow/raw and decide what to do.
 			// Bar graphics are always quantities.
-			if (selectUnitState.identifier === 'kWh' || selectUnitState.identifier === 'kW' || selectUnitState.unitRepresent == UnitRepresentType.raw) {
+			if (selectUnitState.identifier === 'kWh' || selectUnitState.identifier === 'kW') {
 				// This is a special case. kWh has a general meaning and the flow equivalent is kW.
 				// A kW is a Joule/sec. While it is possible to convert to another rate, OED is not
 				// going to allow that. If you want that then the site should add Joule as a unit.
@@ -40,7 +40,10 @@ function mapStateToProps(state: State) {
 				// Thus, OED will show kW and not allow other rates. To make it consistent, kWh cannot
 				// be shown in another rate. Thus, there is no need to scale.
 				// TODO This isn't a general solution. For example, Wh or W would not be fixed.
-				// A flow unit also just uses the identifier.
+				// The y-axis label is the kW.
+				unitLabel = 'kW';
+			} else if (selectUnitState.unitRepresent == UnitRepresentType.raw) {
+				// A raw unit just uses the identifier.
 				// The y-axis label is the same as the identifier.
 				unitLabel = selectUnitState.identifier;
 			} else if (selectUnitState.unitRepresent === UnitRepresentType.quantity || selectUnitState.unitRepresent === UnitRepresentType.flow) {
