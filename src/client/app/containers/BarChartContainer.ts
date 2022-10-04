@@ -68,13 +68,19 @@ function mapStateToProps(state: State) {
 				const hoverText: string[] = [];
 				const readings = _.orderBy(readingsData.readings, ['startTimestamp'], ['asc']);
 				readings.forEach(barReading => {
-					// subtracting one extra day caused by day ending at midnight of the next day.
-					// Going from DB unit timestamp that is UTC so force UTC with moment, as usual.
-					const timeReading: string =
-						`${moment.utc(barReading.startTimestamp).format('ll')} - ${moment.utc(barReading.endTimestamp).subtract(1, 'days').format('ll')}`;
-					xData.push(timeReading);
+					const st = moment.utc(barReading.startTimestamp);
+					// Time reading is in the middle of the start and end timestamp (may change this depending on how it looks on the bar graph)\
+					const timeReading = st.add(moment.utc(barReading.endTimestamp).diff(st) / 2);
+					xData.push(timeReading.utc().format('YYYY-MM-DD HH:mm:ss'));
 					yData.push(barReading.reading);
-					hoverText.push(`<b> ${timeReading} </b> <br> ${label}: ${barReading.reading.toPrecision(6)} ${unitLabel}`);
+					// only display a range of dates for the hover text if there is more than one day in the range
+					let timeRange: string = `${moment.utc(barReading.startTimestamp).format('ll')}`;
+					if(barDuration.asDays() != 1) {
+						// subtracting one extra day caused by day ending at midnight of the next day.
+						// Going from DB unit timestamp that is UTC so force UTC with moment, as usual.
+						timeRange += ` - ${moment.utc(barReading.endTimestamp).subtract(1, 'days').format('ll')}`;
+					}
+					hoverText.push(`<b> ${timeRange} </b> <br> ${label}: ${barReading.reading.toPrecision(6)} ${unitLabel}`);
 				});
 				// This variable contains all the elements (x and y values, bar type, etc.) assigned to the data parameter of the Plotly object
 				datasets.push({
@@ -108,13 +114,19 @@ function mapStateToProps(state: State) {
 				const hoverText: string[] = [];
 				const readings = _.orderBy(readingsData.readings, ['startTimestamp'], ['asc']);
 				readings.forEach(barReading => {
-					// subtracting one extra day caused by day ending at midnight of the next day.
-					// Going from DB unit timestamp that is UTC so force UTC with moment, as usual.
-					const timeReading: string =
-						`${moment.utc(barReading.startTimestamp).format('ll')} - ${moment.utc(barReading.endTimestamp).subtract(1, 'days').format('ll')}`;
-					xData.push(timeReading);
+					const st = moment.utc(barReading.startTimestamp);
+					// Time reading is in the middle of the start and end timestamp (may change this depending on how it looks on the bar graph)\
+					const timeReading = st.add(moment.utc(barReading.endTimestamp).diff(st) / 2);
+					xData.push(timeReading.utc().format('YYYY-MM-DD HH:mm:ss'));
 					yData.push(barReading.reading);
-					hoverText.push(`<b> ${timeReading} </b> <br> ${label}: ${barReading.reading.toPrecision(6)} ${unitLabel}`);
+					// only display a range of dates for the hover text if there is more than one day in the range
+					let timeRange: string = `${moment.utc(barReading.startTimestamp).format('ll')}`;
+					if(barDuration.asDays() != 1) {
+						// subtracting one extra day caused by day ending at midnight of the next day.
+						// Going from DB unit timestamp that is UTC so force UTC with moment, as usual.
+						timeRange += ` - ${moment.utc(barReading.endTimestamp).subtract(1, 'days').format('ll')}`;
+					}
+					hoverText.push(`<b> ${timeRange} </b> <br> ${label}: ${barReading.reading.toPrecision(6)} ${unitLabel}`);
 				});
 
 				// This variable contains all the elements (x and y values, bar chart, etc.) assigned to the data parameter of the Plotly object

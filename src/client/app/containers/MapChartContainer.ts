@@ -139,10 +139,13 @@ function mapStateToProps(state: State) {
 									timeReading = 'no data to display';
 									size.push(0);
 								} else {
-									// Shift to UTC since want database time not local/browser time which is what moment does.
-									// We need to subtract one day from the end since it is midnight of the next day.
-									timeReading =
-										`${moment.utc(mapReading.startTimestamp).format('ll')} - ${moment.utc(mapReading.endTimestamp).subtract(1, 'days').format('ll')}`;
+									// only display a range of dates for the hover text if there is more than one day in the range
+									timeReading = `${moment.utc(mapReading.startTimestamp).format('ll')}`;
+									if(barDuration.asDays() != 1) {
+										// subtracting one extra day caused by day ending at midnight of the next day.
+										// Going from DB unit timestamp that is UTC so force UTC with moment, as usual.
+										timeReading += ` - ${moment.utc(mapReading.endTimestamp).subtract(1, 'days').format('ll')}`;
+									}
 									// The value for the circle is the average daily usage.
 									averagedReading = mapReading.reading / barDuration.asDays();
 									// The size is the reading value. It will be scaled later.
@@ -202,10 +205,13 @@ function mapStateToProps(state: State) {
 									timeReading = 'no data to display';
 									size.push(0);
 								} else {
-									// Shift to UTC since want database time not local/browser time which is what moment does.
-									// We need to subtract one day from the end since it is midnight of the next day.
-									timeReading =
-										`${moment.utc(mapReading.startTimestamp).format('ll')} - ${moment.utc(mapReading.endTimestamp).subtract(1, 'days').format('ll')}`;
+									// only display a range of dates for the hover text if there is more than one day in the range
+									timeReading = `${moment.utc(mapReading.startTimestamp).format('ll')}`;
+									if(barDuration.asDays() != 1) {
+										// subtracting one extra day caused by day ending at midnight of the next day.
+										// Going from DB unit timestamp that is UTC so force UTC with moment, as usual.
+										timeReading += ` - ${moment.utc(mapReading.endTimestamp).subtract(1, 'days').format('ll')}`;
+									}
 									// The value for the circle is the average daily usage.
 									averagedReading = mapReading.reading / barDuration.asDays();
 									// The size is the reading value. It will be scaled later.
