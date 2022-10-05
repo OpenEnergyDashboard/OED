@@ -140,6 +140,7 @@ function mapStateToProps(state: State) {
 									size.push(0);
 								} else {
 									// only display a range of dates for the hover text if there is more than one day in the range
+									// Shift to UTC since want database time not local/browser time which is what moment does.
 									timeReading = `${moment.utc(mapReading.startTimestamp).format('ll')}`;
 									if(barDuration.asDays() != 1) {
 										// subtracting one extra day caused by day ending at midnight of the next day.
