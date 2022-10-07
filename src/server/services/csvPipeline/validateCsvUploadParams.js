@@ -20,6 +20,17 @@ TimeSortTypesJS = Object.freeze({
 	meter: 'meter value or default'
 });
 
+// This is only used for meter page inputs but put here so next one above that related to.
+/**
+ * Enum of CSV input type sorting.
+ * This enum needs to be kept in sync with the enum in src/client/app/types/csvUploadForm.ts 
+ * @enum {string}
+ */
+MeterTimeSortTypesJS = Object.freeze({
+	increasing: 'increasing',
+	decreasing: 'decreasing',
+});
+
 /**
  * Enum of Boolean types.
  * This enum needs to be kept in sync with the enum in src/client/app/types/csvUploadForm.ts 
@@ -230,5 +241,6 @@ module.exports = {
 	validateMetersCsvUploadParams,
 	validateReadingsCsvUploadParams,
 	TimeSortTypesJS,
+	MeterTimeSortTypesJS,
 	BooleanTypesJS
 };

@@ -4,7 +4,6 @@
 
 const moment = require('moment');
 const Meter = require('../../models/Meter');
-const Reading = require('../../models/Reading');
 const loadArrayInput = require('../pipeline-in-progress/loadArrayInput');
 const { log } = require('../../log');
 const demuxCsvWithSingleColumnTimestamps = require('./csvDemux');
@@ -22,10 +21,13 @@ async function loadLogfileToReadings(serialNumber, ipAddress, logfile, conn) {
 			// For now, new Obvius meters collect data (enabled) but do not display (not displayable).
 			// Also, the identifier is similar to the meter name for now.
 			// end only time is true for Obvius meters.
+			// Data was sent for a meter that did not have a config file sent before this.
+			// As a result, we cannot know the unit so make unknown for now.
+			// The admin need to set the unit before making it displayable or it cannot be graphed.
 			meter = new Meter(undefined, `${serialNumber}.${i}`, ipAddress, true, false, Meter.type.OBVIUS,
-				null, undefined, `OBVIUS ${serialNumber} COLUMN ${i}`, 'created via obvious log upload on ' +
-			moment().format(), undefined, undefined, undefined, undefined, undefined, undefined, undefined,
-				undefined, undefined, true, undefined, undefined, undefined);
+				null, undefined, `OBVIUS ${serialNumber} COLUMN ${i}`, 'created via obvius log upload on ' +
+				moment().format(), undefined, undefined, undefined, undefined, undefined, undefined, undefined,
+				undefined, undefined, true, undefined, undefined, undefined, undefined, undefined);
 			await meter.insert(conn);
 			log.warn('WARNING: Created a meter (' + `${serialNumber}.${i}` +
 				') that does not already exist. Normally obvius meters created by an uploaded ConfigFile.');

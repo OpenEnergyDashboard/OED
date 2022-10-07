@@ -11,6 +11,7 @@ import { calculateCompareTimeInterval, ComparePeriod, SortingOrder } from '../ut
 const defaultState: GraphState = {
 	selectedMeters: [],
 	selectedGroups: [],
+	selectedUnit: -99,
 	timeInterval: TimeInterval.unbounded(),
 	rangeSliderInterval: TimeInterval.unbounded(),
 	barDuration: moment.duration(4, 'weeks'),
@@ -20,7 +21,8 @@ const defaultState: GraphState = {
 	chartToRender: ChartTypes.line,
 	barStacking: false,
 	hotlinked: false,
-	optionsVisibility: true
+	optionsVisibility: true,
+	lineGraphRate: {label: 'hour', rate: 1}
 };
 
 export default function graph(state = defaultState, action: GraphAction) {
@@ -35,6 +37,11 @@ export default function graph(state = defaultState, action: GraphAction) {
 				...state,
 				selectedGroups: action.groupIDs
 			};
+		case ActionType.UpdateSelectedUnit:
+			return {
+				...state,
+				selectedUnit: action.unitID
+			}
 		case ActionType.UpdateBarDuration:
 			return {
 				...state,
@@ -85,6 +92,11 @@ export default function graph(state = defaultState, action: GraphAction) {
 			return {
 				...state,
 				optionsVisibility: action.visibility
+			};
+		case ActionType.UpdateLineGraphRate:
+			return {
+				...state,
+				lineGraphRate: action.lineGraphRate
 			};
 		default:
 			return state;

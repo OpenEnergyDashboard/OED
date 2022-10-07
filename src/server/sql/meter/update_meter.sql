@@ -25,5 +25,7 @@ UPDATE meters
 		reading = ${reading},
 		start_timestamp = ${startTimestamp},
 		end_timestamp = ${endTimestamp},
-		previous_end = ${previousEnd}
+		previous_end = ${previousEnd},
+		unit_id = ${unitId},
+		default_graphic_unit = ${defaultGraphicUnit}
 	WHERE id = ${id};

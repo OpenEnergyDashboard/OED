@@ -25,6 +25,7 @@ private
 # CSV files (except ones needed for database tests)
 *.csv
 !/src/server/test/**/*.csv
+!/src/server/data/unit/*.csv
 
 # Database
 postgres-data
@@ -41,3 +42,6 @@ nohup.out
 
 # Mac Finder files - do here so avoid in VSC container
 .DS_Store
+
+# Visual Studio Code settings file
+.vscode/settings.json

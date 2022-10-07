@@ -21,4 +21,11 @@ docker compose up --no-start --build
 echo "Doing webpack:build to update the application..."
 npm run webpack:build
 
+# Though generally not needed, it is possible that you need to refresh the reading views after a migration.
+# This is definitely needed for the migration to 1.0.0 because it deletes the old views and creates new ones.
+# It is quite possible this could be commented out in the future but it probably does not do any harm except
+# taking a little time.
+echo "Doing docker compose run web npm run refreshAllReadingViews to refresh the reading views for doing graphics..."
+docker compose run web npm run refreshAllReadingViews
+
 echo "OED upgrade completed"

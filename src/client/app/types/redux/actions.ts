@@ -19,13 +19,6 @@ export enum ActionType {
 	RemoveUnsavedChanges = 'REMOVE_UNSAVED_CHANGES',
 	FlipLogOutState = 'FLIP_LOG_OUT_STATE',
 
-	RequestMetersDetails = 'REQUEST_METERS_DETAILS',
-	ReceiveMetersDetails = 'RECEIVE_METERS_DETAILS',
-	ChangeDisplayedMeters = 'CHANGE_DISPLAYED_METERS',
-	EditMeterDetails = 'EDIT_METER_DETAILS',
-	SubmitEditedMeter = 'SUBMIT_EDITED_METER',
-	ConfirmEditedMeter = 'CONFIRM_EDITED_METER',
-
 	ShowNotification = 'SHOW_NOTIFICATION',
 	ClearNotifications = 'CLEAR_NOTIFICATIONS',
 
@@ -39,13 +32,15 @@ export enum ActionType {
 	RequestMeterLineReadings = 'REQUEST_METER_LINE_READINGS',
 	ReceiveMeterLineReadings = 'RECEIVE_METER_LINE_READINGS',
 
-	RequestGroupCompareReading = 'REQUEST_GROUP_COMPARE_READINGS',
-	ReceiveGroupCompareReading = 'RECEIVE_GROUP_COMPARE_READINGS',
-	RequestMeterCompareReading = 'REQUEST_METER_COMPARE_READINGS',
-	ReceiveMeterCompareReading = 'RECEIVE_METER_COMPARE_READINGS',
+	RequestGroupCompareReadings = 'REQUEST_GROUP_COMPARE_READINGS',
+	ReceiveGroupCompareReadings = 'RECEIVE_GROUP_COMPARE_READINGS',
+	RequestMeterCompareReadings = 'REQUEST_METER_COMPARE_READINGS',
+	ReceiveMeterCompareReadings = 'RECEIVE_METER_COMPARE_READINGS',
 
 	UpdateSelectedMeters = 'UPDATE_SELECTED_METERS',
 	UpdateSelectedGroups = 'UPDATE_SELECTED_GROUPS',
+	UpdateSelectedUnit = 'UPDATE_SELECTED_UNIT',
+	UpdateSelectedConversion = 'UPDATE_SELECTED_CONVERSION',
 	UpdateBarDuration = 'UPDATE_BAR_DURATION',
 	ChangeChartToRender = 'CHANGE_CHART_TO_RENDER',
 	ChangeBarStacking = 'CHANGE_BAR_STACKING',
@@ -56,6 +51,7 @@ export enum ActionType {
 	UpdateComparePeriod = 'UPDATE_COMPARE_PERIOD',
 	ChangeCompareSortingOrder = 'CHANGE_COMPARE_SORTING_ORDER',
 	SetHotlinked = 'SET_HOTLINKED',
+	UpdateLineGraphRate = 'UPDATE_LINE_GRAPH_RATE',
 
 	RequestGroupsDetails = 'REQUEST_GROUPS_DETAILS',
 	ReceiveGroupsDetails = 'RECEIVE_GROUPS_DETAILS',
@@ -111,7 +107,35 @@ export enum ActionType {
 	ConfirmEditedMap = 'CONFIRM_EDITED_MAP',
 	SetCalibration = 'SET_CALIBRATION',
 	ResetCalibration = 'RESET_CALIBRATION',
-	IncrementCounter = 'INCREMENT_COUNTER'
+	IncrementCounter = 'INCREMENT_COUNTER',
+
+	ReceiveUnitsDetails = 'RECEIVE_UNITS_DETAILS',
+	RequestUnitsDetails = 'REQUEST_UNITS_DETAILS',
+	ChangeDisplayedUnits = 'CHANGE_DISPLAYED_UNITS',
+	SubmitEditedUnit = 'SUBMIT_EDITED_UNIT',
+	ConfirmEditedUnit = 'CONFIRM_EDITED_UNIT',
+	DeleteSubmittedUnit = 'DELETE_SUBMITTED_UNIT',
+	ConfirmUnitsFetchedOnce = 'CONFIRM_UNITS_FETCHED_ONCE',
+
+	ReceiveMetersDetails = 'RECEIVE_METERS_DETAILS',
+	RequestMetersDetails = 'REQUEST_METERS_DETAILS',
+	ChangeDisplayedMeters = 'CHANGE_DISPLAYED_METERS',
+	EditMeterDetails = 'EDIT_METER_DETAILS',
+	SubmitEditedMeter = 'SUBMIT_EDITED_METER',
+	ConfirmEditedMeter = 'CONFIRM_EDITED_METER',
+	DeleteSubmittedMeter = 'DELETE_SUBMITTED_METER',
+	ConfirmMetersFetchedOnce = 'CONFIRM_METERS_FETCHED_ONCE',
+
+	ReceiveConversionsDetails = 'RECEIVE_CONVERSIONS_DETAILS',
+	RequestConversionsDetails = 'REQUEST_CONVERSIONS_DETAILS',
+	ChangeDisplayedConversions = 'CHANGE_DISPLAYED_CONVERSIONS',
+	EditConversionDetails = 'EDIT_CONVERSION_DETAILS',
+	SubmitEditedConversion = 'SUBMIT_EDITED_CONVERSION',
+	ConfirmEditedConversion = 'CONFIRM_EDITED_CONVERSION',
+	DeleteEditedConversion = 'DELETE_EDITED_CONVERSION',
+	DeleteSubmittedConversion = 'DELETE_SUBMITTED_CONVERSION',
+	DeleteConversion = 'DELETE_CONVERSION',
+	ConfirmConversionsFetchedOnce = 'CONFIRM_CONVERSIONS_FETCHED_ONCE',
 }
 
 /**

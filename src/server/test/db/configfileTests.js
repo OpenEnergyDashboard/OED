@@ -27,6 +27,12 @@ mocha.describe('Configfiles', () => {
 		conn = testDB.getConnection();
 	});
 
+	// TODO: Each of these tests generate one or more warning that say:
+	// "kWh not found while processing Obvius data"
+	// This is because we are not creating the standard units in the database.
+	// When we modify Obvius to understand about units then this will need to be
+	// done and it should remove these messages.
+
 	mocha.it('can be saved and retrieved', async () => {
 		const contents = 'Some test contents for the log file.';
 		const chash = md5(contents);

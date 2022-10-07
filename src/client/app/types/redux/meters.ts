@@ -1,10 +1,8 @@
 /* This Source Code Form is subject to the terms of the Mozilla Public
- * License, v. 2.0. If a copy of the MPL was not distributed with this
- * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
-
+* License, v. 2.0. If a copy of the MPL was not distributed with this
+* file, You can obtain one at http://mozilla.org/MPL/2.0/. */
+import { GPSPoint } from 'utils/calibration';
 import { ActionType } from './actions';
-import { NamedIDItem } from '../items';
-import { GPSPoint } from '../../utils/calibration';
 
 export interface RequestMetersDetailsAction {
 	type: ActionType.RequestMetersDetails;
@@ -12,7 +10,7 @@ export interface RequestMetersDetailsAction {
 
 export interface ReceiveMetersDetailsAction {
 	type: ActionType.ReceiveMetersDetails;
-	data: NamedIDItem[];
+	data: MeterData[];
 }
 
 export interface ChangeDisplayedMetersAction {
@@ -20,59 +18,114 @@ export interface ChangeDisplayedMetersAction {
 	selectedMeters: number[];
 }
 
-export interface EditMeterDetailsAction {
-	type: ActionType.EditMeterDetails;
-	meter: MeterMetadata;
+export interface ConfirmEditedMeterAction {
+	type: ActionType.ConfirmEditedMeter;
+	editedMeter: MeterData;
+}
+
+export interface DeleteSubmittedMeterAction {
+	type: ActionType.DeleteSubmittedMeter;
+	meterId: number;
 }
 
 export interface SubmitEditedMeterAction {
 	type: ActionType.SubmitEditedMeter;
-	meter: number;
+	meterId: number;
 }
 
-export interface ConfirmEditedMeterAction {
-	type: ActionType.ConfirmEditedMeter;
-	meter: number;
+export interface ConfirmMetersFetchedOnceAction {
+	type: ActionType.ConfirmMetersFetchedOnce;
 }
 
-export type MetersAction =
-		| RequestMetersDetailsAction
-		| ReceiveMetersDetailsAction
-		| ChangeDisplayedMetersAction
-		| EditMeterDetailsAction
-		| SubmitEditedMeterAction
-		| ConfirmEditedMeterAction;
+export type MetersAction = RequestMetersDetailsAction
+| ReceiveMetersDetailsAction
+| ChangeDisplayedMetersAction
+| ConfirmEditedMeterAction
+| DeleteSubmittedMeterAction
+| SubmitEditedMeterAction
+| ConfirmMetersFetchedOnceAction;
 
-export interface MeterMetadata {
+// The relates to the JS object Meter.types for the same use in src/server/models/Meter.js.
+// They should be kept in sync.
+export enum MeterType {
+	EGAUGE = 'egauge',
+	MAMAC = 'mamac',
+	METASYS = 'metasys',
+	OBVIUS = 'obvius',
+	OTHER = 'other'
+}
+
+// This relates to TimeSortTypes in src/client/app/types/csvUploadForm.ts but does not have 'meter value or default'.
+// They should be kept in sync.
+export enum MeterTimeSortType {
+	increasing = 'increasing',
+	decreasing = 'decreasing',
+}
+
+export interface MeterData {
 	id: number;
-	name: string;
 	identifier: string;
+	name: string;
+	area: number;
 	enabled: boolean;
 	displayable: boolean;
-	meterType?: string;
-	url?: string;
-	timeZone?: string;
-	gps?: GPSPoint;
-}
-
-export interface MeterMetadataByID {
-	[meterID: number]: MeterMetadata;
+	meterType: string;
+	url: string;
+	timeZone: string;
+	gps: GPSPoint | null;
+	unitId: number;
+	defaultGraphicUnit: number;
+	note: string;
+	cumulative: boolean;
+	cumulativeReset: boolean;
+	cumulativeResetStart: string;
+	cumulativeResetEnd: string;
+	endOnlyTime: boolean;
+	reading: number;
+	readingGap: number;
+	readingVariation: number;
+	readingDuplication: number;
+	timeSort: string;
+	startTimestamp: string;
+	endTimestamp: string;
 }
 
 export interface MeterEditData {
 	id: number;
+	identifier: string;
+	name: string;
+	area: number;
 	enabled: boolean;
 	displayable: boolean;
-	gps: GPSPoint;
-	identifier: string;
+	meterType: string;
+	url: string;
+	timeZone: string | null;
+	gps: GPSPoint | null;
+	unitId: number;
+	defaultGraphicUnit: number;
+	note: string;
+	cumulative: boolean;
+	cumulativeReset: boolean;
+	cumulativeResetStart: string;
+	cumulativeResetEnd: string;
+	endOnlyTime: boolean;
+	reading: number;
+	readingGap: number;
+	readingVariation: number;
+	readingDuplication: number;
+	timeSort: string;
+	startTimestamp: string | undefined;
+	endTimestamp: string | undefined;
+}
+
+export interface MeterDataByID {
+	[meterID: number]: MeterData;
 }
 
 export interface MetersState {
+	hasBeenFetchedOnce: boolean;
 	isFetching: boolean;
-	byMeterID: MeterMetadataByID;
 	selectedMeters: number[];
-	// Holds all meters that have been edited locally
-	editedMeters: MeterMetadataByID;
-	// Meters the app is currently attempting to upload meter changes
 	submitting: number[];
+	byMeterID: MeterDataByID;
 }

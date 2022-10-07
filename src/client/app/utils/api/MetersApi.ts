@@ -6,9 +6,9 @@
 
 import ApiBackend from './ApiBackend';
 import { NamedIDItem } from '../../types/items';
-import { BarReadings, CompareReadings, LineReadings, RawReadings } from '../../types/readings';
+import { CompareReadings, RawReadings } from '../../types/readings';
 import { TimeInterval } from '../../../../common/TimeInterval';
-import { MeterMetadata, MeterEditData } from '../../types/redux/meters';
+import { MeterData, MeterEditData } from '../../types/redux/meters';
 import * as moment from 'moment';
 
 export default class MetersApi {
@@ -22,18 +22,10 @@ export default class MetersApi {
 		return await this.backend.doGetRequest<NamedIDItem[]>('/api/meters');
 	}
 
-	public async lineReadingsCount(meterIDs:number[], timeInterval: TimeInterval):Promise<number> {
+	public async lineReadingsCount(meterIDs: number[], timeInterval: TimeInterval): Promise<number> {
 		const stringifiedIDs = meterIDs.join(',');
 		return await this.backend.doGetRequest<number>(
 			`/api/readings/line/count/meters/${stringifiedIDs}`,
-			{ timeInterval: timeInterval.toString() }
-		);
-	}
-
-	public async lineReadings(meterIDs: number[], timeInterval: TimeInterval): Promise<LineReadings> {
-		const stringifiedIDs = meterIDs.join(',');
-		return await this.backend.doGetRequest<LineReadings>(
-			`/api/readings/line/meters/${stringifiedIDs}`,
 			{ timeInterval: timeInterval.toString() }
 		);
 	}
@@ -46,23 +38,30 @@ export default class MetersApi {
 		);
 	}
 
-	public async barReadings(meterIDs: number[], timeInterval: TimeInterval, barDuration: moment.Duration): Promise<BarReadings> {
-		const stringifiedIDs = meterIDs.join(',');
-		return await this.backend.doGetRequest<BarReadings>(
-			`/api/readings/bar/meters/${stringifiedIDs}`,
-			{ timeInterval: timeInterval.toString(), barDuration: barDuration.toISOString() }
-		);
-	}
-
-	public async edit(meter: MeterMetadata): Promise<MeterEditData> {
+	public async edit(meter: MeterData): Promise<MeterEditData> {
 		return await this.backend.doPostRequest<MeterEditData>(
-			'/api/meters/edit',
-			{ id: meter.id, identifier: meter.identifier, enabled: meter.enabled, displayable: meter.displayable, timeZone: meter.timeZone, gps: meter.gps }
+			'/api/meters/edit', meter
 		);
 	}
 
-	public async compareReadings(meterIDs: number[], timeInterval: TimeInterval, shift: moment.Duration):
-	Promise<CompareReadings> {
+	public async addMeter(meter: MeterEditData): Promise<void> {
+		return await this.backend.doPostRequest('/api/meters/addMeter', meter);
+	}
+
+	public async getMetersDetails(): Promise<MeterData[]> {
+		return await this.backend.doGetRequest<MeterData[]>('/api/meters');
+	}
+
+	/**
+	 * Gets compare readings for meters for the given current time range and a shift for previous time range
+	 * @param meterIDs The meter IDs to get readings for
+	 * @param timeInterval  start and end of current/this compare period
+	 * @param shift how far to shift back in time from current period to previous period
+	 * @param unitId The unit id that the reading should be returned in, i.e., the graphic unit
+	 * @return {Promise<object<int, array<{reading_rate: number, start_timestamp: }>>>}
+	 */
+	public async meterCompareReadings(meterIDs: number[], timeInterval: TimeInterval, shift: moment.Duration,
+		unitID: number): Promise<CompareReadings> {
 		const stringifiedIDs = meterIDs.join(',');
 		const currStart: moment.Moment = timeInterval.getStartTimestamp();
 		const currEnd: moment.Moment = timeInterval.getEndTimestamp();
@@ -71,7 +70,8 @@ export default class MetersApi {
 			{
 				curr_start: currStart.toISOString(),
 				curr_end: currEnd.toISOString(),
-				shift: shift.toISOString()
+				shift: shift.toISOString(),
+				graphicUnitId: unitID.toString()
 			}
 		);
 	}

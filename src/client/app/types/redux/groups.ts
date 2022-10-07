@@ -159,6 +159,7 @@ export interface GroupData {
 	displayable: boolean;
 	note?: string;
 	area?: number;
+	defaultGraphicUnit: number;
 }
 
 export interface GroupID {

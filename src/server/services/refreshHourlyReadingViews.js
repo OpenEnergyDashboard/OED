@@ -13,7 +13,7 @@ async function refreshHourlyReadingViews() {
 	const conn = getConnection();
 
 	log.info('Refreshing Materialized Hourly Reading Views');
-	await Reading.refreshCompressedHourlyReadings(conn);
+	await Reading.refreshHourlyReadings(conn);
 	log.info('Materialized Hourly Views Refreshed');
 }
 

@@ -12,6 +12,7 @@ export interface SelectOption {
 	label: string;
 	value: number;
 	isDisabled?: boolean;
+	labelIdForTranslate?: string;
 }
 
 /**
@@ -62,4 +63,10 @@ export enum UserRole {
 	CSV = 'csv',
 	EXPORT = 'export',
 	OBVIUS = 'obvius'
+}
+
+export enum TrueFalseType {
+	// Normally the values here are not used but the ones in data.js so translated.
+	true = 'yes',
+	false = 'no',
 }

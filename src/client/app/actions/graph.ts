@@ -14,8 +14,8 @@ import { State } from '../types/redux/state';
 import * as t from '../types/redux/graph';
 import * as m from '../types/redux/map';
 import { ComparePeriod, SortingOrder } from '../utils/calculateCompare';
-import {fetchNeededMapReadings} from './mapReadings';
-import {changeSelectedMap} from './map';
+import { fetchNeededMapReadings } from './mapReadings';
+import { changeSelectedMap } from './map';
 
 export function changeChartToRender(chartType: t.ChartTypes): t.ChangeChartToRenderAction {
 	return { type: ActionType.ChangeChartToRender, chartType };
@@ -33,8 +33,16 @@ export function updateSelectedGroups(groupIDs: number[]): t.UpdateSelectedGroups
 	return { type: ActionType.UpdateSelectedGroups, groupIDs };
 }
 
+export function updateSelectedUnit(unitID: number): t.UpdateSelectedUnitAction {
+	return { type: ActionType.UpdateSelectedUnit, unitID };
+}
+
 export function updateBarDuration(barDuration: moment.Duration): t.UpdateBarDurationAction {
 	return { type: ActionType.UpdateBarDuration, barDuration };
+}
+
+export function updateLineGraphRate(lineGraphRate: t.LineGraphRate) {
+	return { type: ActionType.UpdateLineGraphRate, lineGraphRate }
 }
 
 export function setHotlinked(hotlinked: boolean): t.SetHotlinked {
@@ -59,7 +67,7 @@ function changeGraphZoom(timeInterval: TimeInterval): t.ChangeGraphZoomAction {
 export function changeBarDuration(barDuration: moment.Duration): Thunk {
 	return (dispatch: Dispatch, getState: GetState) => {
 		dispatch(updateBarDuration(barDuration));
-		dispatch(fetchNeededBarReadings(getState().graph.timeInterval));
+		dispatch(fetchNeededBarReadings(getState().graph.timeInterval, getState().graph.selectedUnit));
 		return Promise.resolve();
 	};
 }
@@ -73,14 +81,14 @@ function updateComparePeriod(comparePeriod: ComparePeriod, currentTime: moment.M
 }
 
 export function changeCompareGraph(comparePeriod: ComparePeriod): Thunk {
-	return (dispatch: Dispatch) => {
+	return (dispatch: Dispatch, getState: GetState) => {
 		// Here there is no shift since we want to do it in terms of the current time in the browser.
 		// Note this does mean that if someone is in a different time zone then they may be ahead of
 		// reading on the server (so get 0 readings for those times) or behind (so miss recent readings).
 		// TODO At some point we may want to see if we can use the server time to avoid this.
 		dispatch(updateComparePeriod(comparePeriod, moment()));
 		dispatch((dispatch2: Dispatch) => {
-			dispatch2(fetchNeededCompareReadings(comparePeriod));
+			dispatch2(fetchNeededCompareReadings(comparePeriod, getState().graph.selectedUnit));
 		});
 		return Promise.resolve();
 	};
@@ -95,10 +103,10 @@ export function changeSelectedMeters(meterIDs: number[]): Thunk {
 		dispatch(updateSelectedMeters(meterIDs));
 		// Nesting dispatches to preserve that updateSelectedMeters() is called before fetching readings
 		dispatch((dispatch2: Dispatch) => {
-			dispatch2(fetchNeededLineReadings(getState().graph.timeInterval));
-			dispatch2(fetchNeededBarReadings(getState().graph.timeInterval));
-			dispatch2(fetchNeededCompareReadings(getState().graph.comparePeriod));
-			dispatch2(fetchNeededMapReadings(getState().graph.timeInterval));
+			dispatch2(fetchNeededLineReadings(getState().graph.timeInterval, getState().graph.selectedUnit));
+			dispatch2(fetchNeededBarReadings(getState().graph.timeInterval, getState().graph.selectedUnit));
+			dispatch2(fetchNeededCompareReadings(getState().graph.comparePeriod, getState().graph.selectedUnit));
+			dispatch2(fetchNeededMapReadings(getState().graph.timeInterval, getState().graph.selectedUnit));
 		});
 		return Promise.resolve();
 	};
@@ -109,20 +117,33 @@ export function changeSelectedGroups(groupIDs: number[]): Thunk {
 		dispatch(updateSelectedGroups(groupIDs));
 		// Nesting dispatches to preserve that updateSelectedGroups() is called before fetching readings
 		dispatch((dispatch2: Dispatch) => {
-			dispatch2(fetchNeededLineReadings(getState().graph.timeInterval));
-			dispatch2(fetchNeededBarReadings(getState().graph.timeInterval));
-			dispatch2(fetchNeededCompareReadings(getState().graph.comparePeriod));
-			dispatch2(fetchNeededMapReadings(getState().graph.timeInterval));
+			dispatch2(fetchNeededLineReadings(getState().graph.timeInterval, getState().graph.selectedUnit));
+			dispatch2(fetchNeededBarReadings(getState().graph.timeInterval, getState().graph.selectedUnit));
+			dispatch2(fetchNeededCompareReadings(getState().graph.comparePeriod, getState().graph.selectedUnit));
+			dispatch2(fetchNeededMapReadings(getState().graph.timeInterval, getState().graph.selectedUnit));
 		});
 		return Promise.resolve();
 	};
 }
 
-function fetchNeededReadingsForGraph(timeInterval: TimeInterval): Thunk {
+export function changeSelectedUnit(unitID: number): Thunk {
+	return (dispatch: Dispatch, getState: GetState) => {
+		dispatch(updateSelectedUnit(unitID));
+		dispatch((dispatch2: Dispatch) => {
+			dispatch(fetchNeededLineReadings(getState().graph.timeInterval, unitID));
+			dispatch2(fetchNeededBarReadings(getState().graph.timeInterval, unitID));
+			dispatch2(fetchNeededCompareReadings(getState().graph.comparePeriod, unitID));
+			dispatch2(fetchNeededMapReadings(getState().graph.timeInterval, unitID));
+		});
+		return Promise.resolve();
+	}
+}
+
+function fetchNeededReadingsForGraph(timeInterval: TimeInterval, unitID: number): Thunk {
 	return (dispatch: Dispatch) => {
-		dispatch(fetchNeededLineReadings(timeInterval));
-		dispatch(fetchNeededBarReadings(timeInterval));
-		dispatch(fetchNeededMapReadings(timeInterval));
+		dispatch(fetchNeededLineReadings(timeInterval, unitID));
+		dispatch(fetchNeededBarReadings(timeInterval, unitID));
+		dispatch(fetchNeededMapReadings(timeInterval, unitID));
 		return Promise.resolve();
 	};
 }
@@ -136,7 +157,7 @@ export function changeGraphZoomIfNeeded(timeInterval: TimeInterval): Thunk {
 		if (shouldChangeGraphZoom(getState(), timeInterval)) {
 			dispatch(resetRangeSliderStack());
 			dispatch(changeGraphZoom(timeInterval));
-			dispatch(fetchNeededReadingsForGraph(timeInterval));
+			dispatch(fetchNeededReadingsForGraph(timeInterval, getState().graph.selectedUnit));
 		}
 		return Promise.resolve();
 	};
@@ -189,8 +210,8 @@ export interface LinkOptions {
 export function changeOptionsFromLink(options: LinkOptions) {
 	const dispatchFirst: Thunk[] = [setHotlinkedAsync(true)];
 	const dispatchSecond: Array<Thunk | t.ChangeChartToRenderAction | t.ChangeBarStackingAction
-	| t.ChangeGraphZoomAction |t.ChangeCompareSortingOrderAction | t.SetOptionsVisibility
-	| m.UpdateSelectedMapAction > = [];
+	| t.ChangeGraphZoomAction | t.ChangeCompareSortingOrderAction | t.SetOptionsVisibility
+	| m.UpdateSelectedMapAction> = [];
 
 	if (options.meterIDs) {
 		dispatchFirst.push(fetchMetersDetailsIfNeeded());
