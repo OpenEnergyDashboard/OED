@@ -164,8 +164,8 @@ export default function EditUnitModalComponent(props: EditUnitModalComponentProp
 											<Input
 												name='typeOfUnit'
 												type='select'
-												onChange={e => handleStringChange(e)}>
-												value={state.typeOfUnit}
+												onChange={e => handleStringChange(e)}
+												value={state.typeOfUnit}>
 												{Object.keys(UnitType).map(key => {
 													return (<option value={key} key={key}>{translate(`UnitType.${key}`)}</option>)
 												})}
