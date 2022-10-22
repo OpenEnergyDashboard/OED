@@ -44,51 +44,24 @@ export default class HeaderButtonsComponent extends React.Component<HeaderButton
 		const shouldGroupsButtonDisabled = getPage() === 'groups';
 		const shouldMetersButtonDisabled = getPage() === 'meters';
 		const shouldMapsButtonDisabled = loggedInAsAdmin && getPage() == 'maps';
-		const shouldCSVButtonDisabled = role && hasPermissions(role, UserRole.CSV) && getPage() == 'csv';
+		const shouldCSVButtonDisabled = role ? hasPermissions(role, UserRole.CSV) : getPage() == 'csv';
 		const shouldUnitsButtonDisabled = loggedInAsAdmin && getPage() == 'units';
 		const shouldConversionsButtonDisabled = loggedInAsAdmin && getPage() == 'conversions';
 		const renderLogoutButton = hasToken();
 
+		const linkStyle: React.CSSProperties = {
+			display: 'inline',
+			paddingLeft: '5px'
+		};
 		const loginLinkStyle: React.CSSProperties = {
 			display: renderLoginButton ? 'inline' : 'none',
-			paddingLeft: '5px'
-		};
-		const homeLinkStyle: React.CSSProperties = {
-			display: 'inline',
-			paddingLeft: '5px'
-		};
-		const adminLinkStyle: React.CSSProperties = {
-			display: 'inline',
-			paddingLeft: '5px'
-		};
-		const csvLinkStyle: React.CSSProperties = {
-			display: 'inline',
-			paddingLeft: '5px'
-		};
-		const groupsLinkStyle: React.CSSProperties = {
-			display: 'inline',
-			paddingLeft: '5px'
-		};
-		const metersLinkStyle: React.CSSProperties = {
-			display: 'inline',
-			paddingLeft: '5px'
-		};
-		const mapsLinkStyle: React.CSSProperties = {
-			display: 'inline',
-			paddingLeft: '5px'
-		};
-		const unitsLinkStyle: React.CSSProperties = {
-			display: 'inline',
-			paddingLeft: '5px'
-		};
-		const conversionsLinkStyle: React.CSSProperties = {
-			display: 'inline',
 			paddingLeft: '5px'
 		};
 		const logoutButtonStyle: React.CSSProperties = {
 			display: renderLogoutButton ? 'inline' : 'none',
 			paddingLeft: '5px'
 		};
+
 
 		return (
 			<div>
@@ -103,15 +76,21 @@ export default class HeaderButtonsComponent extends React.Component<HeaderButton
 				<div className={this.props.showCollapsedMenuButton ? 'd-none d-lg-block' : ''}>
 					<TooltipHelpContainer page='all' />
 					<TooltipMarkerComponent page='all' helpTextId='help.home.header' />
-					<Link style={adminLinkStyle} to='/admin'><Button disabled={shouldAdminButtonDisabled} outline><FormattedMessage id='admin.panel' /></Button></Link>
-					<Link style={groupsLinkStyle} to='/groups'><Button disabled={shouldGroupsButtonDisabled} outline><FormattedMessage id='groups' /></Button></Link>
-					<Link style={metersLinkStyle} to='/meters'><Button disabled={shouldMetersButtonDisabled} outline><FormattedMessage id='meters' /></Button></Link>
-					<Link style={mapsLinkStyle} to='/maps'><Button disabled={shouldMapsButtonDisabled} outline><FormattedMessage id='maps' /></Button></Link>
-					<Link style={csvLinkStyle} to='/csv'><Button disabled={shouldCSVButtonDisabled} outline><FormattedMessage id='csv' /></Button></Link>
-					<Link style={homeLinkStyle} to='/'><Button disabled={shouldHomeButtonDisabled} outline><FormattedMessage id='home' /></Button></Link>
+					<Link style={linkStyle} to='/admin'><Button disabled={shouldAdminButtonDisabled} outline><FormattedMessage id='admin.panel' /></Button></Link>
+					<Link style={linkStyle} to='/groups'><Button disabled={shouldGroupsButtonDisabled} outline><FormattedMessage id='groups' /></Button></Link>
+					<Link style={linkStyle} to='/meters'><Button disabled={shouldMetersButtonDisabled} outline><FormattedMessage id='meters' /></Button></Link>
+					<Link style={linkStyle} to='/maps'><Button disabled={shouldMapsButtonDisabled} outline><FormattedMessage id='maps' /></Button></Link>
+					<Link style={linkStyle} to='/csv'><Button disabled={shouldCSVButtonDisabled} outline><FormattedMessage id='csv' /></Button></Link>
+					<Link style={linkStyle} to='/'><Button disabled={shouldHomeButtonDisabled} outline><FormattedMessage id='home' /></Button></Link>
 					<Link style={loginLinkStyle} to='/login'><Button outline><FormattedMessage id='log.in' /></Button></Link>
-					<Link style={unitsLinkStyle} to='/units'><Button disabled={shouldUnitsButtonDisabled} outline><FormattedMessage id='units' /></Button></Link>
-					<Link style={conversionsLinkStyle} to='/conversions'><Button disabled={shouldConversionsButtonDisabled} outline><FormattedMessage id='conversions' /></Button></Link>
+					<Link style={linkStyle} to='/units'><Button disabled={shouldUnitsButtonDisabled} outline><FormattedMessage id='units' /></Button></Link>
+					<Link
+						style={linkStyle}
+						to='/conversions'>
+						<Button disabled={shouldConversionsButtonDisabled} outline>
+							<FormattedMessage id='conversions' />
+						</Button>
+					</Link>
 					<Link style={logoutButtonStyle} to='/'><Button outline onClick={this.handleLogOut}><FormattedMessage id='log.out' /></Button></Link>
 				</div>
 			</div>
