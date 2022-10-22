@@ -33,7 +33,6 @@ export default class HeaderButtonsComponent extends React.Component<HeaderButton
 		this.handleLogOut = this.handleLogOut.bind(this);
 	}
 
-	// TODO: Consider removing the getPage() !=== (currentPage) so nav bar is consistent across all pages.
 	public render() {
 		const role = this.props.role;
 		const loggedInAsAdmin = this.props.loggedInAsAdmin;
@@ -44,7 +43,7 @@ export default class HeaderButtonsComponent extends React.Component<HeaderButton
 		const shouldGroupsButtonDisabled = getPage() === 'groups';
 		const shouldMetersButtonDisabled = getPage() === 'meters';
 		const shouldMapsButtonDisabled = loggedInAsAdmin && getPage() == 'maps';
-		const shouldCSVButtonDisabled = role ? hasPermissions(role, UserRole.CSV) : getPage() == 'csv';
+		const shouldCSVButtonDisabled = Boolean(role && hasPermissions(role, UserRole.CSV) && getPage() == 'csv');
 		const shouldUnitsButtonDisabled = loggedInAsAdmin && getPage() == 'units';
 		const shouldConversionsButtonDisabled = loggedInAsAdmin && getPage() == 'conversions';
 		const renderLogoutButton = hasToken();
@@ -61,7 +60,6 @@ export default class HeaderButtonsComponent extends React.Component<HeaderButton
 			display: renderLogoutButton ? 'inline' : 'none',
 			paddingLeft: '5px'
 		};
-
 
 		return (
 			<div>
