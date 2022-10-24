@@ -224,8 +224,11 @@ BEGIN
 	-- For each frequency of points, verify that you will get the minimum graphing points to use.
 	-- Start with the lowest frequency (daily), then hourly and then use raw/meter data if others
 	-- will not work.
-
-	IF (requested_range / requested_interval >= 1440)  OR (requested_interval >= 1400) THEN
+	--  (extract(EPOCH FROM (r.end_timestamp - r.start_timestamp)))
+	-- Test Command: select meter_line_readings_unit('{1, 2}'::integer[], (select id from units where name = 'kWh'), '-infinity', 'infinity', 200, 200);
+	-- for example, replace infinity with '2022-10-24 17:32:00' as one of the times 
+	-- raise notice 'real_start_stamp: %, real_end_stamp: %', real_start_stamp, real_end_stamp; -- DEBUG 
+	IF ( (requested_range / requested_interval) >= 1440)  OR (requested_interval >= 1400) THEN
 		RETURN QUERY
 			SELECT r.meter_id as meter_id,
 			CASE WHEN u.unit_represent = 'quantity'::unit_represent_type THEN
