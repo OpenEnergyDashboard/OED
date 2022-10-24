@@ -7,6 +7,7 @@ import { showSuccessNotification, showErrorNotification } from '../utils/notific
 import translate from '../utils/translate';
 import * as t from '../types/redux/units';
 import { unitsApi } from '../utils/api';
+import { updateCikAndDBViewsIfNeeded } from './admin';
 
 export function requestUnitsDetails(): t.RequestUnitsDetailsAction {
 	return { type: ActionType.RequestUnitsDetails };
@@ -67,7 +68,7 @@ export function fetchUnitsDetailsIfNeeded(): Thunk {
 	};
 }
 
-export function submitEditedUnit(editedUnit: t.UnitData): Thunk {
+export function submitEditedUnit(editedUnit: t.UnitData, shouldRedoCik: boolean, shouldRefreshReadingViews: boolean): Thunk {
 	return async (dispatch: Dispatch, getState: GetState) => {
 		// check if unitData is already submitting (indexOf returns -1 if item does not exist in array)
 		if (getState().units.submitting.indexOf(editedUnit.id) === -1) {
@@ -79,6 +80,7 @@ export function submitEditedUnit(editedUnit: t.UnitData): Thunk {
 			try {
 				// posts the edited unitData to the units API
 				await unitsApi.edit(editedUnit);
+				dispatch(updateCikAndDBViewsIfNeeded(shouldRedoCik, shouldRefreshReadingViews));
 				// Update the store with our new edits
 				dispatch(confirmUnitEdits(editedUnit));
 				// Success!
@@ -99,9 +101,8 @@ export function addUnit(unit: t.UnitData): Thunk {
 		try {
 			// Attempt to add unit to database
 			await unitsApi.addUnit(unit);
-			// Update the units state from the database on a successful call
-			// In the future, getting rid of this database fetch and updating the store on a successful API call would make the page faster
-			// However, since the database currently assigns the id to the UnitData we need to fetch
+			// Adding a new unit only affects the Cik table
+			dispatch(updateCikAndDBViewsIfNeeded(true, false));
 			dispatch(fetchUnitsDetails());
 			showSuccessNotification(translate('unit.successfully.create.unit'));
 		} catch (err) {

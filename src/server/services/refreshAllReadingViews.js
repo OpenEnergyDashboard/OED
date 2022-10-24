@@ -13,8 +13,7 @@ const { refreshHourlyReadingViews } = require('./refreshHourlyReadingViews');
 async function refreshAllReadingViews() {
 
 	log.info('Refreshing All Reading Views...');
-	await refreshDailyReadingViews();
-	await refreshHourlyReadingViews();
+	await Promise.all([refreshDailyReadingViews(), refreshHourlyReadingViews()]);
 	log.info('...Views Refreshed!');
 }
 

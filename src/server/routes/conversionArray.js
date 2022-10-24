@@ -5,7 +5,8 @@
 const express = require('express');
 const { log } = require('../log');
 const { getConnection } = require('../db');
-const { createPik } = require('../services/graph/redoCik');
+const { createPik, redoCik } = require('../services/graph/redoCik');
+const { refreshAllReadingViews } = require('../services/refreshAllReadingViews');
 
 const router = express.Router();
 
@@ -21,6 +22,20 @@ router.get('/', async (req, res) => {
 	} catch (err) {
 		log.error(`Error while performing GET conversion array query: ${err}`, err);
 	}
+});
+
+/**
+ * Route for redoing Cik and/or refreshing reading views.
+ */
+router.post('/refresh', async (req, res) => {
+	const conn = getConnection();
+	if (req.body.redoCik) {
+		await redoCik(conn);
+	}
+	if (req.body.refreshReadingViews) {
+		await refreshAllReadingViews();
+	}
+	res.sendStatus(200);
 });
 
 module.exports = router;

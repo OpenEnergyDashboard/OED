@@ -121,10 +121,14 @@ export default function EditConversionModalComponent(props: EditConversionModalC
 				props.conversion.slope != state.slope ||
 				props.conversion.intercept != state.intercept ||
 				props.conversion.note != state.note);
+		// Need to redo Cik if slope, intercept, or bidirectional changes.
+		const shouldRedoCik = props.conversion.slope !== state.slope ||
+							props.conversion.intercept !== state.intercept ||
+							props.conversion.bidirectional !== state.bidirectional;
 		// Only do work if there are changes
 		if (conversionHasChanges) {
 			// Save our changes by dispatching the submitEditedConversion action
-			dispatch(submitEditedConversion(state));
+			dispatch(submitEditedConversion(state, shouldRedoCik));
 			dispatch(removeUnsavedChanges());
 		}
 	}

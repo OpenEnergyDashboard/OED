@@ -2,6 +2,7 @@
 * License, v. 2.0. If a copy of the MPL was not distributed with this
 * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
 import * as React from 'react';
+import store from '../../index';
 //Realize that * is already imported from react
 import { useState } from 'react';
 import { useDispatch } from 'react-redux';
@@ -73,6 +74,35 @@ export default function EditUnitModalComponent(props: EditUnitModalComponentProp
 		resetState();
 	}
 
+	// Validate the changes and return true if we should update this unit.
+	// Two reasons for not updating the unit:
+	//	1. typeOfUnit is changed from meter to something else while some meters are still linked with this unit
+	//	2. There are no changes
+	const shouldUpdateUnit = (): boolean => {
+		// Check for case 1
+		if (props.unit.typeOfUnit === UnitType.meter && state.typeOfUnit !== UnitType.meter) {
+			// Get an array of all meters
+			const meters = Object.values(store.getState().meters.byMeterID);
+			const meter = meters.find(m => m.unitId === props.unit.id);
+			if (meter) {
+				// There exists a meter that is still linked with this unit
+				window.alert(`The unit of meter ${meter.name} needs to be changed before changing this unit's type`);
+				return false;
+			}
+		}
+
+		// Check for case 2 by comparing state to props
+		return props.unit.name != state.name ||
+			props.unit.identifier != state.identifier ||
+			props.unit.typeOfUnit != state.typeOfUnit ||
+			props.unit.unitRepresent != state.unitRepresent ||
+			props.unit.displayable != state.displayable ||
+			props.unit.preferredDisplay != state.preferredDisplay ||
+			props.unit.secInRate != state.secInRate ||
+			props.unit.suffix != state.suffix ||
+			props.unit.note != state.note;
+	}
+
 	// Save changes
 	// Currently using the old functionality which is to compare inherited prop values to state values
 	// If there is a difference between props and state, then a change was made
@@ -81,30 +111,20 @@ export default function EditUnitModalComponent(props: EditUnitModalComponentProp
 		// Close the modal first to avoid repeat clicks
 		props.handleClose();
 
-		// Check for changes by comparing state to props
-		const unitHasChanges =
-			(
-				props.unit.name != state.name ||
-				props.unit.identifier != state.identifier ||
-				props.unit.typeOfUnit != state.typeOfUnit ||
-				props.unit.unitRepresent != state.unitRepresent ||
-				props.unit.displayable != state.displayable ||
-				props.unit.preferredDisplay != state.preferredDisplay ||
-				props.unit.secInRate != state.secInRate ||
-				props.unit.suffix != state.suffix ||
-				props.unit.note != state.note);
-		// Only do work if there are changes
-		if (unitHasChanges) {
-			// Save our changes by dispatching the submitEditedUnit action
-			dispatch(submitEditedUnit(state));
-			// The updated unit is not fetched to save time. However, the identifier might have been
-			// automatically set if it was empty. Mimic that here.
-			if (state.identifier === '') {
-				state.identifier = state.name;
-			}
-			dispatch(removeUnsavedChanges());
-		}
+		if (!shouldUpdateUnit()) return;
 
+		// Need to redo Cik if the suffix or type of unit changes.
+		const shouldRedoCik = props.unit.suffix !== state.suffix || props.unit.typeOfUnit !== state.typeOfUnit;
+		// Need to refresh reading views if unitRepresent or secInRate changes.
+		const shouldRefreshReadingViews = props.unit.unitRepresent !== state.unitRepresent || props.unit.secInRate !== state.secInRate;
+		// Save our changes by dispatching the submitEditedUnit action
+		dispatch(submitEditedUnit(state, shouldRedoCik, shouldRefreshReadingViews));
+		// The updated unit is not fetched to save time. However, the identifier might have been
+		// automatically set if it was empty. Mimic that here.
+		if (state.identifier === '') {
+			state.identifier = state.name;
+		}
+		dispatch(removeUnsavedChanges());
 	}
 
 	const tooltipStyle = {

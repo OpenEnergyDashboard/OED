@@ -14,6 +14,7 @@ import { fetchUnitsDetailsIfNeeded } from '../../actions/units';
 import UnitViewComponent from './UnitViewComponent';
 import CreateUnitModalComponent from './CreateUnitModalComponent';
 import { UnitData } from 'types/redux/units';
+import SpinnerComponent from '../../components/SpinnerComponent';
 
 export default function UnitsDetailComponent() {
 	// The route stops you from getting to this page if not an admin.
@@ -24,6 +25,8 @@ export default function UnitsDetailComponent() {
 		// Makes async call to units API for units details if one has not already been made somewhere else, stores unit ids in state
 		dispatch(fetchUnitsDetailsIfNeeded());
 	}, []);
+
+	const isUpdatingCikAndDBViews = useSelector((state: State) => state.admin.isUpdatingCikAndDBViews);
 
 	//Units state
 	const unitsState = useSelector((state: State) => state.units.units);
@@ -41,29 +44,38 @@ export default function UnitsDetailComponent() {
 
 	return (
 		<div>
-			<HeaderContainer />
-			<TooltipHelpContainer page='units' />
+			{ isUpdatingCikAndDBViews ? (
+				<div className='text-center'>
+					<SpinnerComponent loading width={50} height={50} />
+					<FormattedMessage id='redo.cik.and.refresh.db.views'></FormattedMessage>
+				</div>
+			) : (
+				<div>
+					<HeaderContainer />
+					<TooltipHelpContainer page='units' />
 
-			<div className='container-fluid'>
-				<h2 style={titleStyle}>
-					<FormattedMessage id='units' />
-					<div style={tooltipStyle}>
-						<TooltipMarkerComponent page='units' helpTextId={tooltipStyle.tooltipUnitView} />
+					<div className='container-fluid'>
+						<h2 style={titleStyle}>
+							<FormattedMessage id='units' />
+							<div style={tooltipStyle}>
+								<TooltipMarkerComponent page='units' helpTextId={tooltipStyle.tooltipUnitView} />
+							</div>
+						</h2>
+						<div className="edit-btn">
+							{/* The actual button for create is inside this component. */}
+							< CreateUnitModalComponent />
+						</div>
+						<div className="card-container">
+							{/* Create a UnitViewComponent for each UnitData in Units State after sorting by identifier */}
+							{Object.values(unitsState)
+								.sort((unitA: UnitData, unitB: UnitData) => (unitA.identifier.toLowerCase() > unitB.identifier.toLowerCase()) ? 1 :
+									((unitB.identifier.toLowerCase() > unitA.identifier.toLowerCase()) ? -1 : 0))
+								.map(unitData => (<UnitViewComponent unit={unitData as UnitData} key={(unitData as UnitData).id} />))}
+						</div>
 					</div>
-				</h2>
-				<div className="edit-btn">
-					{/* The actual button for create is inside this component. */}
-					< CreateUnitModalComponent />
+					<FooterContainer />
 				</div>
-				<div className="card-container">
-					{/* Create a UnitViewComponent for each UnitData in Units State after sorting by identifier */}
-					{Object.values(unitsState)
-						.sort((unitA: UnitData, unitB: UnitData) => (unitA.identifier.toLowerCase() > unitB.identifier.toLowerCase()) ? 1 :
-							((unitB.identifier.toLowerCase() > unitA.identifier.toLowerCase()) ? -1 : 0))
-						.map(unitData => (<UnitViewComponent unit={unitData as UnitData} key={(unitData as UnitData).id} />))}
-				</div>
-			</div>
-			<FooterContainer />
+			)}
 		</div>
 	);
 }

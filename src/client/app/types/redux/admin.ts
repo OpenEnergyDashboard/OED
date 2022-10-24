@@ -19,7 +19,8 @@ export type AdminAction =
 	| UpdateDefaultTimeZone
 	| UpdateDefaultWarningFileSize
 	| UpdateDefaultFileSizeLimit
-	| MarkPreferencesSubmittedAction;
+	| MarkPreferencesSubmittedAction
+	| UpdateCikAndDBViews;
 
 export interface UpdateImportMeterAction {
 	type: ActionType.UpdateImportMeter;
@@ -77,6 +78,10 @@ export interface UpdateDefaultFileSizeLimit {
 	defaultFileSizeLimit: number;
 }
 
+export interface UpdateCikAndDBViews {
+	type: ActionType.UpdateCikAndDBViews;
+}
+
 export interface AdminState {
 	selectedMeter: number | null;
 	displayTitle: string;
@@ -88,4 +93,5 @@ export interface AdminState {
 	submitted: boolean;
 	defaultWarningFileSize: number;
 	defaultFileSizeLimit: number;
+	isUpdatingCikAndDBViews: boolean;
 }
