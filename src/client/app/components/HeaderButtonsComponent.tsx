@@ -104,14 +104,14 @@ export default class HeaderButtonsComponent extends React.Component<HeaderButton
 					<TooltipHelpContainer page='all' />
 					<TooltipMarkerComponent page='all' helpTextId='help.home.header' />
 					<Link style={adminLinkStyle} to='/admin'><Button outline><FormattedMessage id='admin.panel' /></Button></Link>
-					<Link style={groupsLinkStyle} to='/groups'><Button disabled={shouldGroupsButtonDisabled} outline><FormattedMessage id='groups' /></Button></Link>
-					<Link style={metersLinkStyle} to='/meters'><Button disabled={shouldMetersButtonDisabled} outline><FormattedMessage id='meters' /></Button></Link>
-					<Link style={mapsLinkStyle} to='/maps'><Button outline><FormattedMessage id='maps' /></Button></Link>
-					<Link style={csvLinkStyle} to='/csv'><Button outline><FormattedMessage id='csv' /></Button></Link>
-					<Link style={homeLinkStyle} to='/'><Button disabled={shouldHomeButtonDisabled} outline><FormattedMessage id='home' /></Button></Link>
-					<Link style={loginLinkStyle} to='/login'><Button outline><FormattedMessage id='log.in' /></Button></Link>
-					<Link style={unitsLinkStyle} to='/units'><Button outline><FormattedMessage id='units' /></Button></Link>
 					<Link style={conversionsLinkStyle} to='/conversions'><Button outline><FormattedMessage id='conversions' /></Button></Link>
+					<Link style={csvLinkStyle} to='/csv'><Button outline><FormattedMessage id='csv' /></Button></Link>
+					<Link style={groupsLinkStyle} to='/groups'><Button disabled={shouldGroupsButtonDisabled} outline><FormattedMessage id='groups' /></Button></Link>
+					<Link style={homeLinkStyle} to='/'><Button disabled={shouldHomeButtonDisabled} outline><FormattedMessage id='home' /></Button></Link>
+					<Link style={mapsLinkStyle} to='/maps'><Button outline><FormattedMessage id='maps' /></Button></Link>
+					<Link style={metersLinkStyle} to='/meters'><Button disabled={shouldMetersButtonDisabled} outline><FormattedMessage id='meters' /></Button></Link>
+					<Link style={unitsLinkStyle} to='/units'><Button outline><FormattedMessage id='units' /></Button></Link>
+					<Link style={loginLinkStyle} to='/login'><Button outline><FormattedMessage id='log.in' /></Button></Link>
 					<Link style={logoutButtonStyle} to='/'><Button outline onClick={this.handleLogOut}><FormattedMessage id='log.out' /></Button></Link>
 				</div>
 			</div>
