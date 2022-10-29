@@ -40,13 +40,18 @@ export default class HeaderButtonsComponent extends React.Component<HeaderButton
 		const showOptions = getPage() === '';
 		const renderLoginButton = !hasToken();
 		const shouldHomeButtonDisabled = getPage() === '';
-		const renderAdminButton = loggedInAsAdmin && getPage() == 'admin';
+		const renderAdminButton = loggedInAsAdmin;
+		const shouldAdminButtonDisabled = getPage() === 'admin';
 		const shouldGroupsButtonDisabled = getPage() === 'groups';
 		const shouldMetersButtonDisabled = getPage() === 'meters';
-		const renderMapsButton =loggedInAsAdmin && getPage() == 'maps';
-		const renderCSVButton = Boolean(role && hasPermissions(role, UserRole.CSV) && getPage() == 'csv');
-		const renderUnitsButton = loggedInAsAdmin && getPage() == 'units';
-		const renderConversionsButton = loggedInAsAdmin && getPage() == 'conversions';
+		const renderMapsButton = loggedInAsAdmin;
+		const shouldMapsButtonDisabled = getPage() === 'maps';
+		const renderCSVButton = Boolean(role && hasPermissions(role, UserRole.CSV));
+		const shouldCSVButtonDisabled = getPage() === 'csv';
+		const renderUnitsButton = loggedInAsAdmin;
+		const shouldUnitsButtonDisabled = getPage() === 'units';
+		const renderConversionsButton = loggedInAsAdmin;
+		const shouldConversionsButtonDisabled = getPage() === 'conversions';
 		const renderLogoutButton = hasToken();
 
 		const loginLinkStyle: React.CSSProperties = {
@@ -58,11 +63,11 @@ export default class HeaderButtonsComponent extends React.Component<HeaderButton
 			paddingLeft: '5px'
 		};
 		const adminLinkStyle: React.CSSProperties = {
-			display: renderAdminButton || loggedInAsAdmin ? 'inline' : 'none',
+			display: renderAdminButton ? 'inline' : 'none',
 			paddingLeft: '5px'
 		};
 		const csvLinkStyle: React.CSSProperties = {
-			display: renderCSVButton || loggedInAsAdmin ? 'inline' : 'none',
+			display: renderCSVButton ? 'inline' : 'none',
 			paddingLeft: '5px'
 		};
 		const groupsLinkStyle: React.CSSProperties = {
@@ -74,15 +79,15 @@ export default class HeaderButtonsComponent extends React.Component<HeaderButton
 			paddingLeft: '5px'
 		};
 		const mapsLinkStyle: React.CSSProperties = {
-			display: renderMapsButton || loggedInAsAdmin ? 'inline' : 'none',
+			display: renderMapsButton ? 'inline' : 'none',
 			paddingLeft: '5px'
 		};
 		const unitsLinkStyle: React.CSSProperties = {
-			display: renderUnitsButton || loggedInAsAdmin ? 'inline' : 'none',
+			display: renderUnitsButton ? 'inline' : 'none',
 			paddingLeft: '5px'
 		};
 		const conversionsLinkStyle: React.CSSProperties = {
-			display: renderConversionsButton || loggedInAsAdmin ? 'inline' : 'none',
+			display: renderConversionsButton ? 'inline' : 'none',
 			paddingLeft: '5px'
 		};
 		const logoutButtonStyle: React.CSSProperties = {
@@ -103,20 +108,20 @@ export default class HeaderButtonsComponent extends React.Component<HeaderButton
 				<div className={this.props.showCollapsedMenuButton ? 'd-none d-lg-block' : ''}>
 					<TooltipHelpContainer page='all' />
 					<TooltipMarkerComponent page='all' helpTextId='help.home.header' />
-					<Link style={adminLinkStyle} to='/admin'><Button disabled={renderAdminButton} outline><FormattedMessage id='admin.panel' /></Button></Link>
+					<Link style={adminLinkStyle} to='/admin'><Button disabled={shouldAdminButtonDisabled} outline><FormattedMessage id='admin.panel' /></Button></Link>
 					<Link
 						style={conversionsLinkStyle}
 						to='/conversions'>
-						<Button disabled={renderConversionsButton}
+						<Button disabled={shouldConversionsButtonDisabled}
 							outline><FormattedMessage id='conversions' />
 						</Button>
 					</Link>
-					<Link style={csvLinkStyle} to='/csv'><Button disabled={renderCSVButton} outline><FormattedMessage id='csv' /></Button></Link>
+					<Link style={csvLinkStyle} to='/csv'><Button disabled={shouldCSVButtonDisabled} outline><FormattedMessage id='csv' /></Button></Link>
 					<Link style={groupsLinkStyle} to='/groups'><Button disabled={shouldGroupsButtonDisabled} outline><FormattedMessage id='groups' /></Button></Link>
 					<Link style={homeLinkStyle} to='/'><Button disabled={shouldHomeButtonDisabled} outline><FormattedMessage id='home' /></Button></Link>
-					<Link style={mapsLinkStyle} to='/maps'><Button disabled={renderMapsButton} outline><FormattedMessage id='maps' /></Button></Link>
+					<Link style={mapsLinkStyle} to='/maps'><Button disabled={shouldMapsButtonDisabled} outline><FormattedMessage id='maps' /></Button></Link>
 					<Link style={metersLinkStyle} to='/meters'><Button disabled={shouldMetersButtonDisabled} outline><FormattedMessage id='meters' /></Button></Link>
-					<Link style={unitsLinkStyle} to='/units'><Button disabled={renderUnitsButton} outline><FormattedMessage id='units' /></Button></Link>
+					<Link style={unitsLinkStyle} to='/units'><Button disabled={shouldUnitsButtonDisabled} outline><FormattedMessage id='units' /></Button></Link>
 					<Link style={loginLinkStyle} to='/login'><Button outline><FormattedMessage id='log.in' /></Button></Link>
 					<Link style={logoutButtonStyle} to='/'><Button outline onClick={this.handleLogOut}><FormattedMessage id='log.out' /></Button></Link>
 				</div>
