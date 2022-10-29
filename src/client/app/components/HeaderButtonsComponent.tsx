@@ -33,8 +33,8 @@ export default class HeaderButtonsComponent extends React.Component<HeaderButton
 		this.handleLogOut = this.handleLogOut.bind(this);
 	}
 
-	// TODO: Consider removing the getPage() !=== (currentPage) so nav bar is consistent across all pages.
 	public render() {
+		const role = this.props.role;
 		const loggedInAsAdmin = this.props.loggedInAsAdmin;
 		const showOptions = getPage() === '';
 		const renderLoginButton = !hasToken();
@@ -44,6 +44,7 @@ export default class HeaderButtonsComponent extends React.Component<HeaderButton
 		const shouldMetersButtonDisabled = getPage() === 'meters';
 		const shouldMapsButtonDisabled = getPage() === 'maps';
 		const shouldCSVButtonDisabled = getPage() === 'csv';
+		const renderCSVButton = Boolean(role && hasPermissions(role, UserRole.CSV));
 		const shouldUnitsButtonDisabled = getPage() === 'units';
 		const shouldConversionsButtonDisabled = getPage() === 'conversions';
 
@@ -55,8 +56,12 @@ export default class HeaderButtonsComponent extends React.Component<HeaderButton
 			display: renderLoginButton ? 'inline' : 'none',
 			paddingLeft: '5px'
 		};
-		const adminViewableLinkStyle= {
+		const adminViewableLinkStyle: React.CSSProperties = {
 			display: loggedInAsAdmin ? 'inline' : 'none',
+			paddingLeft: '5px'
+		};
+		const csvLinkStyle: React.CSSProperties = {
+			display: renderCSVButton ? 'inline' : 'none',
 			paddingLeft: '5px'
 		};
 
@@ -87,7 +92,7 @@ export default class HeaderButtonsComponent extends React.Component<HeaderButton
 							outline><FormattedMessage id='conversions' />
 						</Button>
 					</Link>
-					<Link style={adminViewableLinkStyle} to='/csv'><Button disabled={shouldCSVButtonDisabled} outline><FormattedMessage id='csv' /></Button></Link>
+					<Link style={csvLinkStyle} to='/csv'><Button disabled={shouldCSVButtonDisabled} outline><FormattedMessage id='csv' /></Button></Link>
 					<Link style={linkStyle} to='/groups'><Button disabled={shouldGroupsButtonDisabled} outline><FormattedMessage id='groups' /></Button></Link>
 					<Link style={linkStyle} to='/'><Button disabled={shouldHomeButtonDisabled} outline><FormattedMessage id='home' /></Button></Link>
 					<Link style={adminViewableLinkStyle} to='/maps'><Button disabled={shouldMapsButtonDisabled} outline><FormattedMessage id='maps' /></Button></Link>
