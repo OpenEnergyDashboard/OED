@@ -35,63 +35,28 @@ export default class HeaderButtonsComponent extends React.Component<HeaderButton
 
 	// TODO: Consider removing the getPage() !=== (currentPage) so nav bar is consistent across all pages.
 	public render() {
-		const role = this.props.role;
 		const loggedInAsAdmin = this.props.loggedInAsAdmin;
 		const showOptions = getPage() === '';
 		const renderLoginButton = !hasToken();
 		const shouldHomeButtonDisabled = getPage() === '';
-		const renderAdminButton = loggedInAsAdmin;
 		const shouldAdminButtonDisabled = getPage() === 'admin';
 		const shouldGroupsButtonDisabled = getPage() === 'groups';
 		const shouldMetersButtonDisabled = getPage() === 'meters';
-		const renderMapsButton = loggedInAsAdmin;
 		const shouldMapsButtonDisabled = getPage() === 'maps';
-		const renderCSVButton = Boolean(role && hasPermissions(role, UserRole.CSV));
 		const shouldCSVButtonDisabled = getPage() === 'csv';
-		const renderUnitsButton = loggedInAsAdmin;
 		const shouldUnitsButtonDisabled = getPage() === 'units';
-		const renderConversionsButton = loggedInAsAdmin;
 		const shouldConversionsButtonDisabled = getPage() === 'conversions';
-		const renderLogoutButton = hasToken();
 
+		const linkStyle: React.CSSProperties = {
+			display: 'inline',
+			paddingLeft: '5px'
+		};
 		const loginLinkStyle: React.CSSProperties = {
 			display: renderLoginButton ? 'inline' : 'none',
 			paddingLeft: '5px'
 		};
-		const homeLinkStyle: React.CSSProperties = {
-			display: 'inline',
-			paddingLeft: '5px'
-		};
-		const adminLinkStyle: React.CSSProperties = {
-			display: renderAdminButton ? 'inline' : 'none',
-			paddingLeft: '5px'
-		};
-		const csvLinkStyle: React.CSSProperties = {
-			display: renderCSVButton ? 'inline' : 'none',
-			paddingLeft: '5px'
-		};
-		const groupsLinkStyle: React.CSSProperties = {
-			display: 'inline',
-			paddingLeft: '5px'
-		};
-		const metersLinkStyle: React.CSSProperties = {
-			display: 'inline',
-			paddingLeft: '5px'
-		};
-		const mapsLinkStyle: React.CSSProperties = {
-			display: renderMapsButton ? 'inline' : 'none',
-			paddingLeft: '5px'
-		};
-		const unitsLinkStyle: React.CSSProperties = {
-			display: renderUnitsButton ? 'inline' : 'none',
-			paddingLeft: '5px'
-		};
-		const conversionsLinkStyle: React.CSSProperties = {
-			display: renderConversionsButton ? 'inline' : 'none',
-			paddingLeft: '5px'
-		};
-		const logoutButtonStyle: React.CSSProperties = {
-			display: renderLogoutButton ? 'inline' : 'none',
+		const adminViewableLinkStyle= {
+			display: loggedInAsAdmin ? 'inline' : 'none',
 			paddingLeft: '5px'
 		};
 
@@ -108,22 +73,28 @@ export default class HeaderButtonsComponent extends React.Component<HeaderButton
 				<div className={this.props.showCollapsedMenuButton ? 'd-none d-lg-block' : ''}>
 					<TooltipHelpContainer page='all' />
 					<TooltipMarkerComponent page='all' helpTextId='help.home.header' />
-					<Link style={adminLinkStyle} to='/admin'><Button disabled={shouldAdminButtonDisabled} outline><FormattedMessage id='admin.panel' /></Button></Link>
 					<Link
-						style={conversionsLinkStyle}
+						style={adminViewableLinkStyle}
+						to='/admin'>
+						<Button disabled={shouldAdminButtonDisabled}
+							outline><FormattedMessage id='admin.panel' />
+						</Button>
+					</Link>
+					<Link
+						style={adminViewableLinkStyle}
 						to='/conversions'>
 						<Button disabled={shouldConversionsButtonDisabled}
 							outline><FormattedMessage id='conversions' />
 						</Button>
 					</Link>
-					<Link style={csvLinkStyle} to='/csv'><Button disabled={shouldCSVButtonDisabled} outline><FormattedMessage id='csv' /></Button></Link>
-					<Link style={groupsLinkStyle} to='/groups'><Button disabled={shouldGroupsButtonDisabled} outline><FormattedMessage id='groups' /></Button></Link>
-					<Link style={homeLinkStyle} to='/'><Button disabled={shouldHomeButtonDisabled} outline><FormattedMessage id='home' /></Button></Link>
-					<Link style={mapsLinkStyle} to='/maps'><Button disabled={shouldMapsButtonDisabled} outline><FormattedMessage id='maps' /></Button></Link>
-					<Link style={metersLinkStyle} to='/meters'><Button disabled={shouldMetersButtonDisabled} outline><FormattedMessage id='meters' /></Button></Link>
-					<Link style={unitsLinkStyle} to='/units'><Button disabled={shouldUnitsButtonDisabled} outline><FormattedMessage id='units' /></Button></Link>
+					<Link style={adminViewableLinkStyle} to='/csv'><Button disabled={shouldCSVButtonDisabled} outline><FormattedMessage id='csv' /></Button></Link>
+					<Link style={linkStyle} to='/groups'><Button disabled={shouldGroupsButtonDisabled} outline><FormattedMessage id='groups' /></Button></Link>
+					<Link style={linkStyle} to='/'><Button disabled={shouldHomeButtonDisabled} outline><FormattedMessage id='home' /></Button></Link>
+					<Link style={adminViewableLinkStyle} to='/maps'><Button disabled={shouldMapsButtonDisabled} outline><FormattedMessage id='maps' /></Button></Link>
+					<Link style={linkStyle} to='/meters'><Button disabled={shouldMetersButtonDisabled} outline><FormattedMessage id='meters' /></Button></Link>
+					<Link style={adminViewableLinkStyle} to='/units'><Button disabled={shouldUnitsButtonDisabled} outline><FormattedMessage id='units' /></Button></Link>
 					<Link style={loginLinkStyle} to='/login'><Button outline><FormattedMessage id='log.in' /></Button></Link>
-					<Link style={logoutButtonStyle} to='/'><Button outline onClick={this.handleLogOut}><FormattedMessage id='log.out' /></Button></Link>
+					<Link style={adminViewableLinkStyle} to='/'><Button outline onClick={this.handleLogOut}><FormattedMessage id='log.out' /></Button></Link>
 				</div>
 			</div>
 		);
