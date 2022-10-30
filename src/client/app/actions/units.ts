@@ -103,7 +103,6 @@ export function addUnit(unit: t.UnitData): Thunk {
 			await unitsApi.addUnit(unit);
 			// Adding a new unit only affects the Cik table
 			dispatch(updateCikAndDBViewsIfNeeded(true, false));
-			dispatch(fetchUnitsDetails());
 			showSuccessNotification(translate('unit.successfully.create.unit'));
 		} catch (err) {
 			showErrorNotification(translate('unit.failed.to.create.unit'));
