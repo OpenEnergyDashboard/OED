@@ -102,8 +102,8 @@ async function handleSuffixUnits(graph, conn) {
 			const destinationId = p[p.length - 1].id;
 			// The destination unit.
 			const destinationUnit = await Unit.getById(destinationId, conn);
-			// We don't need to create any new units/conversions if the destination unit has the type of suffix.
-			if (destinationUnit.typeOfUnit === Unit.unitType.SUFFIX) {
+			// We don't need to create any new units/conversions if the destination unit has the type of suffix or it's not displayed.
+			if (destinationUnit.typeOfUnit === Unit.unitType.SUFFIX || destinationUnit.displayable === Unit.displayableType.NONE) {
 				continue;
 			}
 			// Find the conversion from the start to end of path.
@@ -126,6 +126,32 @@ async function handleSuffixUnits(graph, conn) {
 	}
 }
 
+/**
+ * OED handles suffix units by adding conversions and units automatically.
+ * When a unit's suffix changes, these additional conversions and units need to be removed.
+ * Since it's complicated to remove units, we just set their displayable to false.
+ * @param {*} suffixUnit Additional conversions/units of this suffixUnit will be removed.
+ * @param {*} conn The connection to use.
+ */
+async function removeAdditionalConversionsAndUnits(suffixUnit, conn) {
+	// Get all conversions from this suffix unit.
+	const conversions = (await Conversion.getAll(conn)).filter((conversion) => conversion.sourceId === suffixUnit.id);
+	conversions.forEach(async (conversion) => {
+		const destinationUnit = await Unit.getById(conversion.destinationId, conn);
+		// The units that OED adds are suffix unit.
+		if (destinationUnit.typeOfUnit === Unit.unitType.SUFFIX) {
+			// Delete the conversion.
+			await Conversion.delete(conversion.sourceId, conversion.destinationId, conn);
+			// Hide the destination unit.
+			destinationUnit.displayable = Unit.displayableType.NONE;
+			await destinationUnit.update(conn);
+		}
+	});
+	suffixUnit.displayable = Unit.displayableType.ALL;
+	await suffixUnit.update(conn);
+}
+
 module.exports = {
-	handleSuffixUnits
+	handleSuffixUnits,
+	removeAdditionalConversionsAndUnits
 };

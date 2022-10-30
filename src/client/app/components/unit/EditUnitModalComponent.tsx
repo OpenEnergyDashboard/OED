@@ -92,15 +92,15 @@ export default function EditUnitModalComponent(props: EditUnitModalComponentProp
 		}
 
 		// Check for case 2 by comparing state to props
-		return props.unit.name != state.name ||
-			props.unit.identifier != state.identifier ||
-			props.unit.typeOfUnit != state.typeOfUnit ||
-			props.unit.unitRepresent != state.unitRepresent ||
-			props.unit.displayable != state.displayable ||
-			props.unit.preferredDisplay != state.preferredDisplay ||
-			props.unit.secInRate != state.secInRate ||
-			props.unit.suffix != state.suffix ||
-			props.unit.note != state.note;
+		return props.unit.name != state.name
+			|| props.unit.identifier != state.identifier
+			|| props.unit.typeOfUnit != state.typeOfUnit
+			|| props.unit.unitRepresent != state.unitRepresent
+			|| props.unit.displayable != state.displayable
+			|| props.unit.preferredDisplay != state.preferredDisplay
+			|| props.unit.secInRate != state.secInRate
+			|| props.unit.suffix != state.suffix
+			|| props.unit.note != state.note;
 	}
 
 	// Save changes
@@ -113,8 +113,10 @@ export default function EditUnitModalComponent(props: EditUnitModalComponentProp
 
 		if (!shouldUpdateUnit()) return;
 
-		// Need to redo Cik if the suffix or type of unit changes.
-		const shouldRedoCik = props.unit.suffix !== state.suffix || props.unit.typeOfUnit !== state.typeOfUnit;
+		// Need to redo Cik if the suffix, displayable, or type of unit changes.
+		const shouldRedoCik = props.unit.suffix !== state.suffix
+			|| props.unit.typeOfUnit !== state.typeOfUnit
+			|| props.unit.displayable !== state.displayable;
 		// Need to refresh reading views if unitRepresent or secInRate changes.
 		const shouldRefreshReadingViews = props.unit.unitRepresent !== state.unitRepresent || props.unit.secInRate !== state.secInRate;
 		// Save our changes by dispatching the submitEditedUnit action
