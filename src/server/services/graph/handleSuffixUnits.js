@@ -42,12 +42,25 @@ async function addNewUnitAndConversion(sourceId, destinationId, slope, intercept
  * Verifies that the conversion from source to destination has not changed. If so, update the conversion.
  * @param {*} expectedSlope The expected slope.
  * @param {*} expectedIntercept The expected intercept.
- * @param {*} sourceId The source unit's id.
- * @param {*} destinationId The destination unit's id.
+ * @param {*} source The source unit.
+ * @param {*} destination The destination unit.
+ * @param {*} graph The conversion graph.
  * @param {*} conn The connection to use.
  */
-async function verifyConversion(expectedSlope, expectedIntercept, sourceId, destinationId, conn) {
+async function verifyConversion(expectedSlope, expectedIntercept, source, destination, graph, conn) {
+	const sourceId = source.id;
+	const destinationId = destination.id;
 	const currentConversion = await Conversion.getBySourceDestination(sourceId, destinationId, conn);
+	if (!currentConversion) {
+		// The destination suffix unit exists but the conversion doesn't.
+		// Create a new conversion with desired values.
+		const newConversion = new Conversion(sourceId, destinationId, false, expectedSlope, expectedIntercept,
+			`${source.name} → ${destination.name} (created by OED for unit with suffix)`);
+		// Insert the new conversion to database and graph.
+		await newConversion.insert(conn);
+		graph.addLink(sourceId, destinationId);
+		return;
+	}
 	if (currentConversion.slope !== expectedSlope || currentConversion.intercept !== expectedIntercept) {
 		// While unlikely, the conversion changed so update
 		currentConversion.slope = expectedSlope;
@@ -117,7 +130,7 @@ async function handleSuffixUnits(graph, conn) {
 				await addNewUnitAndConversion(sourceId, destinationId, slope, intercept, unitName, graph, conn);
 			} else {
 				// If it already exists then check if the conversion is correct.
-				await verifyConversion(slope, intercept, sourceId, neededSuffixUnit.id, conn);
+				await verifyConversion(slope, intercept, unit, neededSuffixUnit, graph, conn);
 			}
 		}
 		// The unit with suffix is no longer necessary since it has been replaced with new suffix units.
