@@ -24,6 +24,9 @@ function mapStateToProps(state: State) {
 	const currentSelectedRate = state.graph.lineGraphRate;
 	let unitLabel: string = '';
 	let needsRateScaling = false;
+	// variables to determine the slider min and max
+	let minTimestamp: string = '';
+	let maxTimestamp: string = '';
 	// If graphingUnit is -99 then none selected and nothing to graph so label is empty.
 	// This will probably happen when the page is first loaded.
 	if (graphingUnit !== -99) {
@@ -80,6 +83,12 @@ function mapStateToProps(state: State) {
 				if (needsRateScaling) {
 					const rate = currentSelectedRate.rate;
 					readings.forEach(reading => {
+						if(minTimestamp == '' || reading.startTimestamp.toString() < minTimestamp) {
+							minTimestamp = reading.startTimestamp.toString();
+						}
+						if(maxTimestamp == '' || reading.startTimestamp.toString() > maxTimestamp) {
+							maxTimestamp = reading.startTimestamp.toString();
+						}
 						// As usual, we want to interpret the readings in UTC. We lose the timezone as this as the start/endTimestamp
 						// are equivalent to Unix timestamp in milliseconds.
 						const st = moment.utc(reading.startTimestamp);
@@ -92,6 +101,12 @@ function mapStateToProps(state: State) {
 				}
 				else {
 					readings.forEach(reading => {
+						if(minTimestamp == '' || reading.startTimestamp.toString() < minTimestamp) {
+							minTimestamp = reading.startTimestamp.toString();
+						}
+						if(maxTimestamp == '' || reading.startTimestamp.toString() > maxTimestamp) {
+							maxTimestamp = reading.startTimestamp.toString();
+						}
 						// As usual, we want to interpret the readings in UTC. We lose the timezone as this as the start/endTimestamp
 						// are equivalent to Unix timestamp in milliseconds.
 						const st = moment.utc(reading.startTimestamp);
@@ -102,19 +117,6 @@ function mapStateToProps(state: State) {
 						hoverText.push(`<b> ${timeReading.format('ddd, ll LTS')} </b> <br> ${label}: ${reading.reading.toPrecision(6)} ${unitLabel}`);
 					});
 				}
-
-				// Save the timestamp range of the plot
-				let minTimestamp: string = '';
-				let maxTimestamp: string = '';
-				if (readings.length > 0) {
-					/* tslint:disable:no-string-literal */
-					minTimestamp = readings[0]['startTimestamp'].toString();
-					maxTimestamp = readings[readings.length - 1]['startTimestamp'].toString();
-					/* tslint:enable:no-string-literal */
-				}
-				const root: any = document.getElementById('root');
-				root.setAttribute('min-timestamp', minTimestamp);
-				root.setAttribute('max-timestamp', maxTimestamp);
 
 				// This variable contains all the elements (x and y values, line type, etc.) assigned to the data parameter of the Plotly object
 				datasets.push({
@@ -159,6 +161,12 @@ function mapStateToProps(state: State) {
 				if (needsRateScaling) {
 					const rate = currentSelectedRate.rate;
 					readings.forEach(reading => {
+						if(minTimestamp == '' || reading.startTimestamp.toString() < minTimestamp) {
+							minTimestamp = reading.startTimestamp.toString();
+						}
+						if(maxTimestamp == '' || reading.startTimestamp.toString() > maxTimestamp) {
+							maxTimestamp = reading.startTimestamp.toString();
+						}
 						// As usual, we want to interpret the readings in UTC. We lose the timezone as this as the start/endTimestamp
 						// are equivalent to Unix timestamp in milliseconds.
 						const st = moment.utc(reading.startTimestamp);
@@ -171,6 +179,12 @@ function mapStateToProps(state: State) {
 				}
 				else {
 					readings.forEach(reading => {
+						if(minTimestamp == '' || reading.startTimestamp.toString() < minTimestamp) {
+							minTimestamp = reading.startTimestamp.toString();
+						}
+						if(maxTimestamp == '' || reading.startTimestamp.toString() > maxTimestamp) {
+							maxTimestamp = reading.startTimestamp.toString();
+						}
 						// As usual, we want to interpret the readings in UTC. We lose the timezone as this as the start/endTimestamp
 						// are equivalent to Unix timestamp in milliseconds.
 						const st = moment.utc(reading.startTimestamp);
@@ -181,6 +195,15 @@ function mapStateToProps(state: State) {
 						hoverText.push(`<b> ${timeReading.format('ddd, ll LTS')} </b> <br> ${label}: ${reading.reading.toPrecision(6)} ${unitLabel}`);
 					});
 				}
+
+				// Possibly more efficient to only check the first and last readings to determine the bounds
+				// this assumes readings are sorted and probably doesn't work for groups
+				// if(minTimestamp == '' || readings[0]['startTimestamp'].toString() < minTimestamp) {
+				// 	minTimestamp = readings[0]['startTimestamp'].toString();
+				// }
+				// if(maxTimestamp == '' || readings[readings.length - 1]['startTimestamp'].toString() > maxTimestamp) {
+				// 	maxTimestamp = readings[readings.length - 1]['startTimestamp'].toString();
+				// }
 
 				// This variable contains all the elements (x and y values, line type, etc.) assigned to the data parameter of the Plotly object
 				datasets.push({
@@ -200,6 +223,11 @@ function mapStateToProps(state: State) {
 			}
 		}
 	}
+
+	// set the bounds for the slider
+	const root: any = document.getElementById('root');
+	root.setAttribute('min-timestamp', minTimestamp);
+	root.setAttribute('max-timestamp', maxTimestamp);
 
 	// Calculate slider interval if rangeSliderInterval is specified;
 	const sliderInterval = state.graph.rangeSliderInterval.equals(TimeInterval.unbounded()) ? timeInterval : state.graph.rangeSliderInterval;
