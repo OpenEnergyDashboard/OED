@@ -51,7 +51,7 @@ function formatMeterForResponse(meter, loggedInAsAdmin) {
 		reading: null,
 		startTimestamp: null,
 		endTimestamp: null,
-		previousEnd : null,
+		previousEnd: null,
 		unitId: meter.unitId,
 		defaultGraphicUnit: meter.defaultGraphicUnit
 	};
@@ -152,7 +152,7 @@ router.get('/:meter_id', async (req, res) => {
 function validateMeterParams(params) {
 	const validParams = {
 		type: 'object',
-		maxProperties: 25,
+		maxProperties: 26,
 		// We can get rid of some of these if we defaulted more values in the meter model.
 		required: ['name', 'url', 'enabled', 'displayable', 'meterType', 'timeZone', 'note', 'area'],
 		properties: {
@@ -225,6 +225,7 @@ function validateMeterParams(params) {
 			reading: { type: 'number' },
 			startTimestamp: { type: 'string' },
 			endTimestamp: { type: 'string' },
+			previousEnd: { type: 'string' },
 			unitId: { type: 'integer' },
 			defaultGraphicUnit: { type: 'integer' }
 		}
@@ -264,8 +265,9 @@ router.post('/edit', requiredAdmin('edit meters'), async (req, res) => {
 				req.body.timeSort,
 				req.body.endOnlyTime,
 				req.body.reading,
-				(req.body.startTimestamp.length === 0) ? undefined : moment(req.body.startTimestamp),
-				(req.body.endTimestamp.length === 0) ? undefined : moment(req.body.endTimestamp),
+				(req.body.startTimestamp.length === 0) ? undefined : req.body.startTimestamp,
+				(req.body.endTimestamp.length === 0) ? undefined : req.body.endTimestamp,
+				(req.body.previousEnd.length === 0) ? undefined : moment(req.body.previousEnd),
 				req.body.unitId,
 				req.body.defaultGraphicUnit
 			);
@@ -313,8 +315,9 @@ router.post('/addMeter', async (req, res) => {
 				req.body.timeSort,
 				req.body.endOnlyTime,
 				req.body.reading,
-				(req.body.startTimestamp.length === 0) ? undefined : moment(req.body.startTimestamp),
-				(req.body.endTimestamp.length === 0) ? undefined : moment(req.body.endTimestamp),
+				(req.body.startTimestamp.length === 0) ? undefined : req.body.startTimestamp,
+				(req.body.endTimestamp.length === 0) ? undefined : req.body.endTimestamp,
+				(req.body.previousEnd.length === 0) ? undefined : moment(req.body.previousEnd),
 				req.body.unitId,
 				req.body.defaultGraphicUnit
 			);
