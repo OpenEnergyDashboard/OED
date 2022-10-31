@@ -92,14 +92,60 @@ export default class HeaderButtonsComponent extends React.Component<HeaderButton
 							outline><FormattedMessage id='conversions' />
 						</Button>
 					</Link>
-					<Link style={csvLinkStyle} to='/csv'><Button disabled={shouldCSVButtonDisabled} outline><FormattedMessage id='csv' /></Button></Link>
-					<Link style={linkStyle} to='/groups'><Button disabled={shouldGroupsButtonDisabled} outline><FormattedMessage id='groups' /></Button></Link>
-					<Link style={linkStyle} to='/'><Button disabled={shouldHomeButtonDisabled} outline><FormattedMessage id='home' /></Button></Link>
-					<Link style={adminViewableLinkStyle} to='/maps'><Button disabled={shouldMapsButtonDisabled} outline><FormattedMessage id='maps' /></Button></Link>
-					<Link style={linkStyle} to='/meters'><Button disabled={shouldMetersButtonDisabled} outline><FormattedMessage id='meters' /></Button></Link>
-					<Link style={adminViewableLinkStyle} to='/units'><Button disabled={shouldUnitsButtonDisabled} outline><FormattedMessage id='units' /></Button></Link>
-					<Link style={loginLinkStyle} to='/login'><Button outline><FormattedMessage id='log.in' /></Button></Link>
-					<Link style={adminViewableLinkStyle} to='/'><Button outline onClick={this.handleLogOut}><FormattedMessage id='log.out' /></Button></Link>
+					<Link
+						style={csvLinkStyle}
+						to='/csv'>
+						<Button disabled={shouldCSVButtonDisabled}
+							outline><FormattedMessage id='csv' />
+						</Button>
+					</Link>
+					<Link
+						style={linkStyle}
+						to='/groups'>
+						<Button disabled={shouldGroupsButtonDisabled}
+							outline><FormattedMessage id='groups' />
+						</Button>
+					</Link>
+					<Link
+						style={linkStyle}
+						to='/'>
+						<Button disabled={shouldHomeButtonDisabled}
+							outline><FormattedMessage id='home' />
+						</Button>
+					</Link>
+					<Link
+						style={adminViewableLinkStyle}
+						to='/maps'>
+						<Button disabled={shouldMapsButtonDisabled}
+							outline><FormattedMessage id='maps' />
+						</Button>
+					</Link>
+					<Link
+						style={linkStyle}
+						to='/meters'>
+						<Button disabled={shouldMetersButtonDisabled}
+							outline><FormattedMessage id='meters' />
+						</Button>
+					</Link>
+					<Link
+						style={adminViewableLinkStyle}
+						to='/units'>
+						<Button disabled={shouldUnitsButtonDisabled}
+							outline><FormattedMessage id='units' />
+						</Button>
+					</Link>
+					<Link
+						style={loginLinkStyle}
+						to='/login'>
+						<Button outline><FormattedMessage id='log.in' />
+						</Button>
+					</Link>
+					<Link
+						style={adminViewableLinkStyle}
+						to='/'>
+						<Button outline onClick={this.handleLogOut}><FormattedMessage id='log.out' />
+						</Button>
+					</Link>
 				</div>
 			</div>
 		);
