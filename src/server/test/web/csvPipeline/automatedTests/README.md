@@ -2,6 +2,8 @@
 
 See the original manual testing files for the script and README that gives more information on these tests.
 
+**Note there are new tests in the manual file that are not in this file. They should be incorporated and the file names modified to fit this scheme.**
+
 ## Tests with one input file of readings
 
 The input file will be pipe#Input.csv and the expected output is in pipe#Expected.csv where that output CSV is empty if the readings are rejected.
