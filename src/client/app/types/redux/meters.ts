@@ -88,6 +88,7 @@ export interface MeterData {
 	timeSort: string;
 	startTimestamp: string;
 	endTimestamp: string;
+	previousEnd: string;
 }
 
 export interface MeterEditData {
@@ -116,6 +117,7 @@ export interface MeterEditData {
 	timeSort: string;
 	startTimestamp: string | undefined;
 	endTimestamp: string | undefined;
+	previousEnd: string | undefined;
 }
 
 export interface MeterDataByID {

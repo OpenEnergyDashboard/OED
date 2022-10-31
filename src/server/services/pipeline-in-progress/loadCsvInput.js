@@ -27,6 +27,8 @@ const { log } = require('../../log');
  * @param {boolean} shouldUpdate true if new values should replace old ones, otherwise false
  * @param {array} conditionSet used to validate readings (minVal, maxVal, minDate, maxDate, threshold, maxError)
  * @param {array} conn connection to database
+ * @param {boolean} honorDst true if this meter's times shift when crossing DST, false otherwise (default false)
+ * @param {boolean} relaxedParsing true if the parsing of readings allows for non-standard formats, default if false since this can give bad dates/times.
  */
 async function loadCsvInput(
 	filePath,
@@ -44,7 +46,9 @@ async function loadCsvInput(
 	headerRow,
 	shouldUpdate,
 	conditionSet,
-	conn
+	conn,
+	honorDst,
+	relaxedParsing
 ) {
 	try {
 		const dataRows = await readCsv(filePath);
@@ -53,7 +57,7 @@ async function loadCsvInput(
 		}
 		return loadArrayInput(dataRows, meterID, mapRowToModel, timeSort, readingRepetition,
 			isCumulative, cumulativeReset, cumulativeResetStart, cumulativeResetEnd,
-			readingGap, readingLengthVariation, isEndOnly, shouldUpdate, conditionSet, conn);
+			readingGap, readingLengthVariation, isEndOnly, shouldUpdate, conditionSet, conn, honorDst, relaxedParsing);
 	} catch (err) {
 		log.error(`Error updating meter ${meterID} with data from ${filePath}: ${err}`, err);
 	}

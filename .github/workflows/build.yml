@@ -47,7 +47,6 @@ jobs:
       - name: git init
         run: |
           git init
-          git remote add origin https://github.com/OpenEnergyDashboard/OED
           git add .
 
       - name: Install dependencies

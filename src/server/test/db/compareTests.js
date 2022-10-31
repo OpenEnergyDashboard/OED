@@ -34,7 +34,7 @@ mocha.describe('Compare readings', () => {
 		// Make the meter be a kWh meter.
 		const meterUnitId = (await Unit.getByName('Electric_utility', conn)).id;
 		await new Meter(undefined, 'Meter', null, false, true, Meter.type.OTHER, 'CST', undefined, undefined, undefined, undefined, undefined, undefined, undefined, undefined, undefined, undefined, undefined, undefined,
-			undefined, undefined, undefined, undefined, meterUnitId, meterUnitId).insert(conn);
+			undefined, undefined, undefined, undefined, undefined, meterUnitId, meterUnitId).insert(conn);
 		meter = await Meter.getByName('Meter', conn);
 		await Reading.insertAll([
 			new Reading(meter.id, 1, prevStart, prevEnd),

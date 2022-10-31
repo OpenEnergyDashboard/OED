@@ -77,7 +77,7 @@ async function getMeterInfo(url, ip, csvLine) {
  * @returns {Array.<Promise.<Meter>>}
  */
 function infoForAllMeters(rows, conn) {
-	return rows.map((row, index) => getMeterInfo(`http://${row.url}/sm101.xml`, row.url, index + 2));
+	return rows.map((row, index) => getMeterInfo(`http://${row.ip}/sm101.xml`, row.ip, index + 2));
 }
 
 /**
