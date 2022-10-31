@@ -107,8 +107,8 @@ async function processData(rows, meterID, timeSort = TimeSortTypesJS.increasing,
 	// See below on why create timestamps this way.
 	let startTimestampTz = moment.parseZone(meter.startTimestamp, true);
 	let endTimestampTz = moment.parseZone(meter.endTimestamp, true);
-	startTimestamp = moment.parseZone(startTimestampTz.clone()).tz('UTC', true);
-	endTimestamp = moment.parseZone(endTimestampTz.clone()).tz('UTC', true);
+	let startTimestamp = moment.parseZone(startTimestampTz.clone()).tz('UTC', true);
+	let endTimestamp = moment.parseZone(endTimestampTz.clone()).tz('UTC', true);
 	let meterName = meter.name;
 	// These only happen if worried about DST.
 	if (honorDst) {
@@ -119,7 +119,7 @@ async function processData(rows, meterID, timeSort = TimeSortTypesJS.increasing,
 		if (!isFirst(prevEndTimestamp)) {
 			// Has other value so reset to start from that point.
 			// Do similar steps to below when starting inDst.
-			endTimestampMeterZone = endTimestamp.clone().tz(meterZone, true);
+			const endTimestampMeterZone = endTimestamp.clone().tz(meterZone, true);
 			zoneUntil = getZoneUntil(meterZone, endTimestampMeterZone);
 			inDst = true;
 		}
@@ -201,12 +201,12 @@ async function processData(rows, meterID, timeSort = TimeSortTypesJS.increasing,
 			endTimestamp = moment.parseZone(endTimestampTz.clone()).tz('UTC', true);
 		}
 		else {
-			// If the reading has a timezone offset associated with it then we want to honor it by using parseZone.
+			// If the start date/time from the reading's timezone. Next, we put it
+			// into a moment reading has a timezone offset associated with it then we want to honor it by using parseZone.
 			// However the database uses UTC and has no timezone offset so we need to get the reading into UTC.
 			// OED plots readings as the date/time it was acquired independent of the timezone. For example, if the reading is
 			// 2021-06-01 00:00:00-05:00 then the database should store it as 2021-06-01 00:00:00.
-			// Thus, we take the date/time from the reading's timezone. Next, we put it
-			// into a moment in a timezone aware way so the UTC sticks and there is no shift of time.
+			// Thus, we want in a timezone aware way so the UTC sticks and there is no shift of time.
 			// This setup should work no matter want the timezone is on the server.
 			// Get the reading into moment in a timezone aware way. Note will assume UTC if no timezone in the string.
 			startTimestampTz = moment.parseZone(rows[index][1], undefined, true);
@@ -312,7 +312,7 @@ async function processData(rows, meterID, timeSort = TimeSortTypesJS.increasing,
 				// Since UTC does not have any DST, we need to use the meter timezone. Since OED stores the same date/time but
 				// in UTC, we want the same date/time but in the local timezone without any timezone shifts so second argument is true.
 				// tz mutates so make a clone.
-				endTimestampMeterZone = endTimestamp.clone().tz(meterZone, true);
+				const endTimestampMeterZone = endTimestamp.clone().tz(meterZone, true);
 				// Need the actual data/time that the DST shift occurs since what we do changes based on whether the reading is
 				// within the shift or not. Note we do this inside the if since it takes a little time and not done if shift = 0
 				// which is the most common case.
@@ -333,7 +333,7 @@ async function processData(rows, meterID, timeSort = TimeSortTypesJS.increasing,
 				// These are the examples on the right in the example diagram in the developer docs.
 				// This reading crossed and left DST so went back in time.
 				// The next two lines are similar use to above.
-				endTimestampMeterZone = endTimestamp.clone().tz(meterZone, true);
+				const endTimestampMeterZone = endTimestamp.clone().tz(meterZone, true);
 				zoneUntil = getZoneUntil(meterZone, endTimestampMeterZone);
 				// We must not accept any reading time until it is after the previous reading end time so there is no overlap.
 				// This may take multiple readings so store the time now.
@@ -563,7 +563,6 @@ async function processData(rows, meterID, timeSort = TimeSortTypesJS.increasing,
 				// Remove that in DST split since done processing this reading and don't want for next one.
 				splitDst = false;
 			} else if (inDstStop) {
-				{
 					// This start timestamp from reading in inDst where it is stopping since just accepted a reading.
 					// We could not reset before now since it would potentially create a gap and different length.
 					currentReading = new Reading(meterID, meterReading, startTimestampUse, endTimestamp);
@@ -575,7 +574,6 @@ async function processData(rows, meterID, timeSort = TimeSortTypesJS.increasing,
 					// Reset back to default so if store into DB know not in DST shift zone.
 					// clone() may not be needed but being safe.
 					prevEndTimestamp = E0.clone();
-				}
 			} else {
 				currentReading = new Reading(meterID, meterReading, startTimestamp, endTimestamp);
 				result.push(currentReading);
