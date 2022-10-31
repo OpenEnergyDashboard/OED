@@ -18,7 +18,7 @@ const moment = require('moment-timezone');
 async function meterTimezone(meter) {
     // The timezone to use.
     let timezoneUse;
-    if (meter.meterTimezone != null) {
+    if (meter.meterTimezone !== null) {
         // The meter has a timezone so that is used.
         timezoneUse = meter.meterTimezone;
     } else {
@@ -26,7 +26,7 @@ async function meterTimezone(meter) {
         // TODO maybe we should cache this somewhere so only do once.
         const conn = getConnection();
         const siteTimezone = (await Preferences.get(conn)).defaultTimezone;
-        if (siteTimezone != null) {
+        if (siteTimezone !== null) {
             // Use the site default timezone.
             timezoneUse = siteTimezone;
         } else {
