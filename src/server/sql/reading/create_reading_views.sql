@@ -263,7 +263,9 @@ BEGIN
 			-- This is getting the conversion for the meter (row_index) and unit to graph (column_index).
 			-- The slope and intercept are used above the transform the reading to the desired unit.
 			INNER JOIN cik c on c.row_index = u.unit_index AND c.column_index = unit_column)
-			WHERE requested_range @> time_interval;
+			WHERE requested_range @> time_interval
+			-- This ensures the data is sorted
+			ORDER BY start_timestamp ASC;
 	-- There's no quick way to get the number of hours in an interval. extract(HOURS FROM '1 day, 3 hours') gives 3.
 	ELSIF extract(EPOCH FROM requested_interval)/3600 >= min_hour_points THEN
 		-- Get hourly points to graph. See daily for more comments.
@@ -279,7 +281,9 @@ BEGIN
 			INNER JOIN meters m ON m.id = meters.id)
 			INNER JOIN units u ON m.unit_id = u.id)
 			INNER JOIN cik c on c.row_index = u.unit_index AND c.column_index = unit_column)
-			WHERE requested_range @> time_interval;
+			WHERE requested_range @> time_interval
+			-- This ensures the data is sorted
+			ORDER BY start_timestamp ASC;
 	 ELSE
 		-- Default to raw/meter data to graph. See daily for more comments.
 		RETURN QUERY
@@ -300,7 +304,9 @@ BEGIN
 			INNER JOIN meters m ON m.id = meters.id)
 			INNER JOIN units u ON m.unit_id = u.id)
 			INNER JOIN cik c on c.row_index = u.unit_index AND c.column_index = unit_column)
-			WHERE lower(requested_range) <= r.start_timestamp AND r.end_timestamp <= upper(requested_range);
+			WHERE lower(requested_range) <= r.start_timestamp AND r.end_timestamp <= upper(requested_range)
+			-- This ensures the data is sorted
+			ORDER BY r.start_timestamp ASC;
 	 END IF;
 END;
 $$ LANGUAGE 'plpgsql';
@@ -346,7 +352,9 @@ BEGIN
 		FROM meter_line_readings_unit(meter_ids, graphic_unit_id, start_stamp, end_stamp, min_day_points, min_hour_points) readings
 		INNER JOIN groups_deep_meters gdm ON readings.meter_id = gdm.meter_id
 		INNER JOIN unnest(group_ids) gids(id) on gdm.group_id = gids.id
-		GROUP BY gdm.group_id, readings.start_timestamp, readings.end_timestamp;
+		GROUP BY gdm.group_id, readings.start_timestamp, readings.end_timestamp
+		-- This ensures the data is sorted
+		ORDER BY readings.start_timestamp ASC;
 END;
 $$ LANGUAGE 'plpgsql';
 
