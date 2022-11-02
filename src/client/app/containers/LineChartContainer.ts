@@ -25,8 +25,8 @@ function mapStateToProps(state: State) {
 	let unitLabel: string = '';
 	let needsRateScaling = false;
 	// variables to determine the slider min and max
-	let minTimestamp: number = 0;
-	let maxTimestamp: number = 0;
+	let minTimestamp: number | undefined;
+	let maxTimestamp: number | undefined;
 	// If graphingUnit is -99 then none selected and nothing to graph so label is empty.
 	// This will probably happen when the page is first loaded.
 	if (graphingUnit !== -99) {
@@ -111,10 +111,10 @@ function mapStateToProps(state: State) {
 				TODO: If we know the interval and frequency of meter data, these calculations should be able to be simplified
 				*/
 				if (readings.length > 0) {
-					if(minTimestamp == 0 || readings[0]['startTimestamp'] < minTimestamp) {
+					if(minTimestamp == undefined || readings[0]['startTimestamp'] < minTimestamp) {
 						minTimestamp = readings[0]['startTimestamp'];
 					}
-					if(maxTimestamp == 0 || readings[readings.length - 1]['endTimestamp'] >= maxTimestamp) {
+					if(maxTimestamp == undefined || readings[readings.length - 1]['endTimestamp'] >= maxTimestamp) {
 						// Need to add one extra reading interval to avoid range truncation. The max bound seems to be treated as non-inclusive
 						maxTimestamp = readings[readings.length - 1]['endTimestamp'] + (readings[0]['endTimestamp'] - readings[0]['startTimestamp']);
 					}
@@ -188,10 +188,10 @@ function mapStateToProps(state: State) {
 
 				// get the min and max timestamp of the meter, and compare it to the global values
 				if (readings.length > 0) {
-					if(minTimestamp == 0 || readings[0]['startTimestamp'] < minTimestamp) {
+					if(minTimestamp == undefined || readings[0]['startTimestamp'] < minTimestamp) {
 						minTimestamp = readings[0]['startTimestamp'];
 					}
-					if(maxTimestamp == 0 || readings[readings.length - 1]['endTimestamp'] >= maxTimestamp) {
+					if(maxTimestamp == undefined || readings[readings.length - 1]['endTimestamp'] >= maxTimestamp) {
 						// Need to add one extra reading interval to avoid range truncation. The max bound seems to be treated as non-inclusive
 						maxTimestamp = readings[readings.length - 1]['endTimestamp'] + (readings[0]['endTimestamp'] - readings[0]['startTimestamp']);
 					}
@@ -217,6 +217,10 @@ function mapStateToProps(state: State) {
 	}
 
 	// set the bounds for the slider
+	if(minTimestamp == undefined) {
+		minTimestamp = 0;
+		maxTimestamp = 0;
+	}
 	const root: any = document.getElementById('root');
 	root.setAttribute('min-timestamp', minTimestamp);
 	root.setAttribute('max-timestamp', maxTimestamp);
