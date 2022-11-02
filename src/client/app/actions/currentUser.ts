@@ -27,8 +27,7 @@ async function shouldFetchCurrentUser(state: State): Promise<boolean> {
 	if (!state.currentUser.isFetching) {
 		if (hasToken()) {
 			// If we have a token, we should check to see if it is valid.
-			const validToken = await verificationApi.checkTokenValid();
-			if (validToken) {
+			if (await verificationApi.checkTokenValid()) {
 				// If the token is valid, we should fetch the current user's data.
 				return true;
 			} else {
