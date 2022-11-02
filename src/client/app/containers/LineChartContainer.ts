@@ -108,17 +108,15 @@ function mapStateToProps(state: State) {
 
 				/*
 				get the min and max timestamp of the meter, and compare it to the global values
-				TODO: Currently, this zoom causes data at the very start or end of the meter to never be displayed.
-				This happens when the data is originally graphed at a lower resolution (ex day), and then goes up to raw.
-				For example, with an original day resolution, no data before 12pm is ever displayed.
-				round to day, hour, or not at all
+				TODO: If we know the interval and frequency of meter data, these calculations should be able to be simplified
 				*/
 				if (readings.length > 0) {
 					if(minTimestamp == 0 || readings[0]['startTimestamp'] < minTimestamp) {
 						minTimestamp = readings[0]['startTimestamp'];
 					}
-					if(maxTimestamp == 0 || readings[readings.length - 1]['endTimestamp'] > maxTimestamp) {
-						maxTimestamp = readings[readings.length - 1]['endTimestamp'];
+					if(maxTimestamp == 0 || readings[readings.length - 1]['endTimestamp'] >= maxTimestamp) {
+						// Need to add one extra reading interval to avoid range truncation. The max bound seems to be treated as non-inclusive
+						maxTimestamp = readings[readings.length - 1]['endTimestamp'] + (readings[0]['endTimestamp'] - readings[0]['startTimestamp']);
 					}
 				}
 
@@ -193,8 +191,9 @@ function mapStateToProps(state: State) {
 					if(minTimestamp == 0 || readings[0]['startTimestamp'] < minTimestamp) {
 						minTimestamp = readings[0]['startTimestamp'];
 					}
-					if(maxTimestamp == 0 || readings[readings.length - 1]['endTimestamp'] > maxTimestamp) {
-						maxTimestamp = readings[readings.length - 1]['endTimestamp'];
+					if(maxTimestamp == 0 || readings[readings.length - 1]['endTimestamp'] >= maxTimestamp) {
+						// Need to add one extra reading interval to avoid range truncation. The max bound seems to be treated as non-inclusive
+						maxTimestamp = readings[readings.length - 1]['endTimestamp'] + (readings[0]['endTimestamp'] - readings[0]['startTimestamp']);
 					}
 				}
 
