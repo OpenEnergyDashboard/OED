@@ -493,6 +493,7 @@ async function insertSpecialMeters(conn) {
 			undefined, // reading
 			undefined, // startTimestamp
 			undefined, // endTimestamp
+			undefined, // previousEnd
 			meterUnit, // unit
 			meterGraphicUnit // default graphic unit
 		);
