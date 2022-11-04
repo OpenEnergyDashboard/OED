@@ -475,7 +475,7 @@ async function insertSpecialMeters(conn) {
 			null, // URL
 			false, // enabled
 			meterData[3], //displayable
-			'other', //type
+			'other', // type
 			null, // timezone
 			undefined, // gps
 			undefined, // identifier
@@ -489,7 +489,7 @@ async function insertSpecialMeters(conn) {
 			90000, // readingVariation
 			undefined, //readingDuplication
 			undefined, // timeSort
-			undefined, //endOnlyTime
+			undefined, // endOnlyTime
 			undefined, // reading
 			undefined, // startTimestamp
 			undefined, // endTimestamp
