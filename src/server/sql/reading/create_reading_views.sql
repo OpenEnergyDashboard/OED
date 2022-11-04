@@ -40,6 +40,25 @@ END;
 $$ LANGUAGE 'plpgsql';
 
 /*
+This takes tsrange_to_shrink which is the requested time range to plot and makes sure it does
+not exceed the start/end times for all the readings. This can be an issue, in particular,
+because infinity is used to indicate to graph all readings. This version does it to the nearest
+day by using the day reading view since bars use to the nearest day and this should be faster.
+This should be fine since bar uses the same view to get data.
+ */
+CREATE OR REPLACE FUNCTION shrink_tsrange_to_real_readings_by_day(tsrange_to_shrink TSRANGE)
+	RETURNS TSRANGE
+AS $$
+DECLARE
+	readings_max_tsrange TSRANGE;
+BEGIN
+	SELECT tsrange(min(lower(time_interval)), max(upper(time_interval))) INTO readings_max_tsrange
+	FROM daily_readings_unit;
+	RETURN tsrange_to_shrink * readings_max_tsrange;
+END;
+$$ LANGUAGE 'plpgsql';
+
+/*
 	The following views are all generated in src/server/models/Reading.js in createReadingsMaterializedViews.
 	This is necessary because they can't be wrapped in a function (otherwise predicates would not be pushed down).
 */
@@ -244,7 +263,9 @@ BEGIN
 			-- This is getting the conversion for the meter (row_index) and unit to graph (column_index).
 			-- The slope and intercept are used above the transform the reading to the desired unit.
 			INNER JOIN cik c on c.row_index = u.unit_index AND c.column_index = unit_column)
-			WHERE requested_range @> time_interval;
+			WHERE requested_range @> time_interval
+			-- This ensures the data is sorted
+			ORDER BY start_timestamp ASC;
 	-- There's no quick way to get the number of hours in an interval. extract(HOURS FROM '1 day, 3 hours') gives 3.
 	ELSIF extract(EPOCH FROM requested_interval)/3600 >= min_hour_points THEN
 		-- Get hourly points to graph. See daily for more comments.
@@ -260,7 +281,9 @@ BEGIN
 			INNER JOIN meters m ON m.id = meters.id)
 			INNER JOIN units u ON m.unit_id = u.id)
 			INNER JOIN cik c on c.row_index = u.unit_index AND c.column_index = unit_column)
-			WHERE requested_range @> time_interval;
+			WHERE requested_range @> time_interval
+			-- This ensures the data is sorted
+			ORDER BY start_timestamp ASC;
 	 ELSE
 		-- Default to raw/meter data to graph. See daily for more comments.
 		RETURN QUERY
@@ -281,7 +304,9 @@ BEGIN
 			INNER JOIN meters m ON m.id = meters.id)
 			INNER JOIN units u ON m.unit_id = u.id)
 			INNER JOIN cik c on c.row_index = u.unit_index AND c.column_index = unit_column)
-			WHERE lower(requested_range) <= r.start_timestamp AND r.end_timestamp <= upper(requested_range);
+			WHERE lower(requested_range) <= r.start_timestamp AND r.end_timestamp <= upper(requested_range)
+			-- This ensures the data is sorted
+			ORDER BY r.start_timestamp ASC;
 	 END IF;
 END;
 $$ LANGUAGE 'plpgsql';
@@ -327,7 +352,9 @@ BEGIN
 		FROM meter_line_readings_unit(meter_ids, graphic_unit_id, start_stamp, end_stamp, min_day_points, min_hour_points) readings
 		INNER JOIN groups_deep_meters gdm ON readings.meter_id = gdm.meter_id
 		INNER JOIN unnest(group_ids) gids(id) on gdm.group_id = gids.id
-		GROUP BY gdm.group_id, readings.start_timestamp, readings.end_timestamp;
+		GROUP BY gdm.group_id, readings.start_timestamp, readings.end_timestamp
+		-- This ensures the data is sorted
+		ORDER BY readings.start_timestamp ASC;
 END;
 $$ LANGUAGE 'plpgsql';
 
@@ -357,11 +384,45 @@ DECLARE
 	real_start_stamp TIMESTAMP;
 	real_end_stamp TIMESTAMP;
 	unit_column INTEGER;
+	num_bars INTEGER;
 BEGIN
+	-- This is how wide (time interval) for each bar.
 	bar_width := INTERVAL '1 day' * bar_width_days;
+	/*
+	This rounds to the day for the start and end times requested. It then shrinks in case the actual readings span
+	less time than the request. This can commonly happen when you get +/-infinity for all readings available.
+	It uses the day reading view because that is faster than using all the readings.
+	This has a few issues associated with it:
+
+	1) If the readings at the start/end have a partial day then it shows up as a day. The original code did:
 	real_tsrange := shrink_tsrange_to_real_readings(tsrange(date_trunc_up('day', start_stamp), date_trunc('day', end_stamp)));
-	real_start_stamp := date_trunc_up('day', lower(real_tsrange));
-	real_end_stamp := date_trunc('day', upper(real_tsrange));
+	and did not have this issue since it used the readings and then truncated up/down.
+	A more general solution would be to change the daily (and hourly) view so it does not include partial ones at start/end.
+	This would fix this case and also impact other uses in what seems a positive way.
+	Note this does not address that missing days in a bar width get no value so the bar will likely read low.
+
+	2) This is using the max/min reading date timestamps for all meters. The issue with doing each meter separatly is that if
+	they have different end times then the bars may not align. For example, if you have 7 day bars and the end time of one meter is two days
+	earlier than the global max then all of its bars will be shifted two days. Since people want to compare among bars in a group, this
+	was undesirable so the global values are used. It means the shifted meters may have missing days that make them smaller than the others.
+	It also is needed for group bars that sum these results so they must align.
+	*/
+	real_tsrange := shrink_tsrange_to_real_readings_by_day(tsrange(date_trunc_up('day', start_stamp), date_trunc('day', end_stamp)));
+	-- Get the actual start/end time rounded to the nearest day from the range.
+	real_start_stamp := lower(real_tsrange);
+	real_end_stamp := upper(real_tsrange);
+	-- This gives the number of whole bars that will fit within the real start/end times. For example, if the number of days
+	-- between start and end is 14 days and the bar width is 3 days then you get 4.
+	num_bars := floor(extract(EPOCH from real_end_stamp - real_start_stamp) / extract(EPOCH from bar_width));
+	-- This makes the full bars go from the end time to as far back in time as possible.
+	-- This means that if some time was dropped to get full bars it is at the start of the interval.
+	-- It was felt that the most recend readings are the most important so drop older ones.
+	-- It also helps with maps since they use the latest bar for their value.
+	real_start_stamp := real_end_stamp - (num_bars *  bar_width);
+	-- Since the inner join on the generate_series adds the bar_width, we need to back up the
+	-- end timestamp by that amount so it stops at the desired end timestamp.
+	real_end_stamp := real_end_stamp - bar_width;
+
 	-- unit_column holds the column index into the cik table. This is the unit that was requested for graphing.
 	SELECT unit_index INTO unit_column FROM units WHERE id = graphic_unit_id;
 
@@ -417,10 +478,6 @@ DECLARE
 	real_end_stamp TIMESTAMP;
 	meter_ids INTEGER[];
 BEGIN
-	real_tsrange := shrink_tsrange_to_real_readings(tsrange(date_trunc_up('day', start_stamp), date_trunc('day', end_stamp)));
-	real_start_stamp := date_trunc_up('day', lower(real_tsrange));
-	real_end_stamp := date_trunc('day', upper(real_tsrange));
-
 	-- First get all the meter ids that will be included in one or more groups being queried.
 	SELECT array_agg(DISTINCT gdm.meter_id) INTO meter_ids
 	FROM groups_deep_meters gdm
@@ -432,7 +489,7 @@ BEGIN
 			SUM(readings.reading) AS reading,
 			readings.start_timestamp,
 			readings.end_timestamp
-		FROM meter_bar_readings_unit(meter_ids, graphic_unit_id, bar_width_days, real_start_stamp, real_end_stamp) readings
+		FROM meter_bar_readings_unit(meter_ids, graphic_unit_id, bar_width_days, start_stamp, end_stamp) readings
 		INNER JOIN groups_deep_meters gdm ON readings.meter_id = gdm.meter_id
 		INNER JOIN unnest(group_ids) gids(id) on gdm.group_id = gids.id
 		GROUP BY gdm.group_id, readings.start_timestamp, readings.end_timestamp;
