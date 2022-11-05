@@ -96,6 +96,18 @@ async function hideSuffixUnit(unit, paths, graph, conn) {
 }
 
 /**
+ * Check if the unit is displayed. If not then set its displayable to ALL.
+ * @param {*} unit The unit.
+ * @param {*} conn The connection to use.
+ */
+async function verifyUnit(unit, conn) {
+	if (unit.displayable === Unit.displayableType.NONE) {
+		unit.displayable = Unit.displayableType.ALL;
+		await unit.update(conn);
+	}
+}
+
+/**
  * Adds new suffix units and conversions to the database and the conversion graph.
  * @param {*} graph The conversion graph. 
  * @param {*} conn The connection to use.
@@ -114,7 +126,7 @@ async function handleSuffixUnits(graph, conn) {
 			// The destination unit.
 			const destinationUnit = await Unit.getById(destinationId, conn);
 			// We don't need to create any new units/conversions if the destination unit has the type of suffix or it's not displayed.
-			if (destinationUnit.typeOfUnit === Unit.unitType.SUFFIX) {
+			if (destinationUnit.typeOfUnit === Unit.unitType.SUFFIX || destinationUnit.displayable === Unit.displayableType.NONE) {
 				continue;
 			}
 			// Find the conversion from the start to end of path.
@@ -127,7 +139,8 @@ async function handleSuffixUnits(graph, conn) {
 				// If not then add the new unit and conversion.
 				await addNewUnitAndConversion(sourceId, destinationId, slope, intercept, unitName, graph, conn);
 			} else {
-				// If it already exists then check if the conversion is correct.
+				// If it already exists then check if the unit and conversion are correct.
+				await verifyUnit(neededSuffixUnit, conn);
 				await verifyConversion(slope, intercept, unit, neededSuffixUnit, graph, conn);
 			}
 		}
