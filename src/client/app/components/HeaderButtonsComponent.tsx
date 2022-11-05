@@ -44,7 +44,7 @@ export default class HeaderButtonsComponent extends React.Component<HeaderButton
 		const shouldMetersButtonDisabled = getPage() === 'meters';
 		const shouldMapsButtonDisabled = getPage() === 'maps';
 		const shouldCSVButtonDisabled = getPage() === 'csv';
-		const renderCSVButton = Boolean(role && hasPermissions(role, UserRole.CSV));
+		const renderCSVButton = hasToken() && Boolean(role && hasPermissions(role, UserRole.CSV));
 		const shouldUnitsButtonDisabled = getPage() === 'units';
 		const shouldConversionsButtonDisabled = getPage() === 'conversions';
 
