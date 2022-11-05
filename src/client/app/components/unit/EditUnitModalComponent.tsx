@@ -117,7 +117,7 @@ export default function EditUnitModalComponent(props: EditUnitModalComponentProp
 				|| props.unit.typeOfUnit !== state.typeOfUnit
 				|| props.unit.displayable !== state.displayable;
 			// Need to refresh reading views if unitRepresent or secInRate (when the unit is flow or raw) changes.
-			const shouldRefreshReadingViews = props.unit.unitRepresent !== state.unitRepresent 
+			const shouldRefreshReadingViews = props.unit.unitRepresent !== state.unitRepresent
 				|| (props.unit.secInRate !== state.secInRate
 					&& (props.unit.unitRepresent === UnitRepresentType.flow || props.unit.unitRepresent === UnitRepresentType.raw));
 			// Save our changes by dispatching the submitEditedUnit action
