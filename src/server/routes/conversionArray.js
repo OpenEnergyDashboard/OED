@@ -28,8 +28,8 @@ router.get('/', async (req, res) => {
  * Route for redoing Cik and/or refreshing reading views.
  */
 router.post('/refresh', async (req, res) => {
-	const conn = getConnection();
 	if (req.body.redoCik) {
+		const conn = getConnection();
 		await redoCik(conn);
 	}
 	if (req.body.refreshReadingViews) {

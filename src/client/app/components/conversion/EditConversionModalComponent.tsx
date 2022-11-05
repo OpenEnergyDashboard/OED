@@ -114,17 +114,12 @@ export default function EditConversionModalComponent(props: EditConversionModalC
 		// Close the modal first to avoid repeat clicks
 		props.handleClose();
 
-		// Check for changes by comparing state to props
-		const conversionHasChanges =
-			(
-				props.conversion.bidirectional != state.bidirectional ||
-				props.conversion.slope != state.slope ||
-				props.conversion.intercept != state.intercept ||
-				props.conversion.note != state.note);
 		// Need to redo Cik if slope, intercept, or bidirectional changes.
-		const shouldRedoCik = props.conversion.slope !== state.slope ||
-							props.conversion.intercept !== state.intercept ||
-							props.conversion.bidirectional !== state.bidirectional;
+		const shouldRedoCik = props.conversion.slope !== state.slope
+			|| props.conversion.intercept !== state.intercept
+			|| props.conversion.bidirectional !== state.bidirectional;
+		// Check for changes by comparing state to props
+		const conversionHasChanges = shouldRedoCik || props.conversion.note != state.note;
 		// Only do work if there are changes
 		if (conversionHasChanges) {
 			// Save our changes by dispatching the submitEditedConversion action

@@ -86,7 +86,7 @@ export default function EditUnitModalComponent(props: EditUnitModalComponentProp
 			const meter = meters.find(m => m.unitId === props.unit.id);
 			if (meter) {
 				// There exists a meter that is still linked with this unit
-				window.alert(`The unit of meter ${meter.name} needs to be changed before changing this unit's type`);
+				window.alert(`${translate('the.unit.of.meter')} ${meter.name} ${translate('meter.unit.change.requires')}`)
 				return false;
 			}
 		}
@@ -111,22 +111,24 @@ export default function EditUnitModalComponent(props: EditUnitModalComponentProp
 		// Close the modal first to avoid repeat clicks
 		props.handleClose();
 
-		if (!shouldUpdateUnit()) return;
-
-		// Need to redo Cik if the suffix, displayable, or type of unit changes.
-		const shouldRedoCik = props.unit.suffix !== state.suffix
-			|| props.unit.typeOfUnit !== state.typeOfUnit
-			|| props.unit.displayable !== state.displayable;
-		// Need to refresh reading views if unitRepresent or secInRate changes.
-		const shouldRefreshReadingViews = props.unit.unitRepresent !== state.unitRepresent || props.unit.secInRate !== state.secInRate;
-		// Save our changes by dispatching the submitEditedUnit action
-		dispatch(submitEditedUnit(state, shouldRedoCik, shouldRefreshReadingViews));
-		// The updated unit is not fetched to save time. However, the identifier might have been
-		// automatically set if it was empty. Mimic that here.
-		if (state.identifier === '') {
-			state.identifier = state.name;
+		if (shouldUpdateUnit()) {
+			// Need to redo Cik if the suffix, displayable, or type of unit changes.
+			const shouldRedoCik = props.unit.suffix !== state.suffix
+				|| props.unit.typeOfUnit !== state.typeOfUnit
+				|| props.unit.displayable !== state.displayable;
+			// Need to refresh reading views if unitRepresent or secInRate (when the unit is flow or raw) changes.
+			const shouldRefreshReadingViews = props.unit.unitRepresent !== state.unitRepresent 
+				|| (props.unit.secInRate !== state.secInRate
+					&& (props.unit.unitRepresent === UnitRepresentType.flow || props.unit.unitRepresent === UnitRepresentType.raw));
+			// Save our changes by dispatching the submitEditedUnit action
+			dispatch(submitEditedUnit(state, shouldRedoCik, shouldRefreshReadingViews));
+			// The updated unit is not fetched to save time. However, the identifier might have been
+			// automatically set if it was empty. Mimic that here.
+			if (state.identifier === '') {
+				state.identifier = state.name;
+			}
+			dispatch(removeUnsavedChanges());
 		}
-		dispatch(removeUnsavedChanges());
 	}
 
 	const tooltipStyle = {

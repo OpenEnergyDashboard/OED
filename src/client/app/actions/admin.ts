@@ -134,15 +134,21 @@ function updateCikAndDBViews(): t.UpdateCikAndDBViews {
 	return { type: ActionType.UpdateCikAndDBViews };
 }
 
+function shouldUpdateCikAndDBViews(state: State): boolean {
+	return !state.admin.isUpdatingCikAndDBViews;
+}
+
 /**
  * Redo Cik and/or refresh reading views.
  * This function is called when some changes in units/conversions affect the Cik table or reading views.
  */
 export function updateCikAndDBViewsIfNeeded(shouldRedoCik: boolean, shouldRefreshReadingViews: boolean): Thunk {
-	return async (dispatch: Dispatch) => {
-		dispatch(updateCikAndDBViews());
-		await conversionArrayApi.refresh(shouldRedoCik, shouldRefreshReadingViews);
-		window.location.reload();
+	return async (dispatch: Dispatch, getState: GetState) => {
+		if (shouldUpdateCikAndDBViews(getState())) {
+			dispatch(updateCikAndDBViews());
+			await conversionArrayApi.refresh(shouldRedoCik, shouldRefreshReadingViews);
+			window.location.reload();
+		}
 		return Promise.resolve();
 	};
 }

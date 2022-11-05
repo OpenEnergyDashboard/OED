@@ -59,9 +59,7 @@ async function verifyConversion(expectedSlope, expectedIntercept, source, destin
 		// Insert the new conversion to database and graph.
 		await newConversion.insert(conn);
 		graph.addLink(sourceId, destinationId);
-		return;
-	}
-	if (currentConversion.slope !== expectedSlope || currentConversion.intercept !== expectedIntercept) {
+	} else if (currentConversion.slope !== expectedSlope || currentConversion.intercept !== expectedIntercept) {
 		// While unlikely, the conversion changed so update
 		currentConversion.slope = expectedSlope;
 		currentConversion.intercept = expectedIntercept;
@@ -116,7 +114,7 @@ async function handleSuffixUnits(graph, conn) {
 			// The destination unit.
 			const destinationUnit = await Unit.getById(destinationId, conn);
 			// We don't need to create any new units/conversions if the destination unit has the type of suffix or it's not displayed.
-			if (destinationUnit.typeOfUnit === Unit.unitType.SUFFIX || destinationUnit.displayable === Unit.displayableType.NONE) {
+			if (destinationUnit.typeOfUnit === Unit.unitType.SUFFIX) {
 				continue;
 			}
 			// Find the conversion from the start to end of path.
@@ -142,7 +140,7 @@ async function handleSuffixUnits(graph, conn) {
 /**
  * OED handles suffix units by adding conversions and units automatically.
  * When a unit's suffix changes, these additional conversions and units need to be removed.
- * Since it's complicated to remove units, we just set their displayable to false.
+ * Since it's complicated to remove units, we just set their displayable to NONE.
  * @param {*} suffixUnit Additional conversions/units of this suffixUnit will be removed.
  * @param {*} conn The connection to use.
  */
