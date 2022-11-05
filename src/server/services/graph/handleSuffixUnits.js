@@ -96,14 +96,16 @@ async function hideSuffixUnit(unit, paths, graph, conn) {
 }
 
 /**
- * Check if the unit is displayed. If not then set its displayable to ALL.
- * @param {*} unit The unit.
+ * Check if the suffix unit's displayable is the same as the destination unit.
+ * @param {*} suffixUnit The suffix unit to check.
+ * @param {*} destinationId The destination unit's id
  * @param {*} conn The connection to use.
  */
-async function verifyUnit(unit, conn) {
-	if (unit.displayable === Unit.displayableType.NONE) {
-		unit.displayable = Unit.displayableType.ALL;
-		await unit.update(conn);
+async function verifyUnit(suffixUnit, destinationId, conn) {
+	const destinationUnit = await Unit.getById(destinationId, conn);
+	if (suffixUnit.displayable !== destinationUnit.displayable) {
+		suffixUnit.displayable = destinationUnit.displayable;
+		await suffixUnit.update(conn);
 	}
 }
 
@@ -140,7 +142,7 @@ async function handleSuffixUnits(graph, conn) {
 				await addNewUnitAndConversion(sourceId, destinationId, slope, intercept, unitName, graph, conn);
 			} else {
 				// If it already exists then check if the unit and conversion are correct.
-				await verifyUnit(neededSuffixUnit, conn);
+				await verifyUnit(neededSuffixUnit, destinationId, conn);
 				await verifyConversion(slope, intercept, unit, neededSuffixUnit, graph, conn);
 			}
 		}
