@@ -74,7 +74,9 @@ const DEFAULTS = {
 		endOnly: undefined,
 		createMeter: 'false',
 		refreshReadings: 'false',
-		refreshHourlyReadings: 'false'
+		refreshHourlyReadings: 'false',
+		honorDst: 'false',
+		relaxedParsing: 'false'
 	}
 }
 
@@ -118,7 +120,13 @@ const VALIDATION = {
 			endOnly: new EnumParam('endOnly', [BooleanTypesJS.true, BooleanTypesJS.false, BooleanTypesJS.meter]),
 			createMeter: new BooleanParam('createMeter'),
 			refreshReadings: new BooleanParam('refreshReadings'),
-			refreshHourlyReadings: new BooleanParam('refreshHourlyReadings')
+			refreshHourlyReadings: new BooleanParam('refreshHourlyReadings'),
+			honorDst: {
+				type: 'string'
+			},
+			relaxedParsing: {
+				type: 'string'
+			}
 		},
 		additionalProperties: false // This protects us from unintended parameters as well as typos.
 	}
@@ -168,8 +176,7 @@ function validateReadingsCsvUploadParams(req, res, next) {
 	}
 
 	const { createMeter, cumulative, duplications,
-		gzip, headerRow, timeSort, update } = req.body; // extract query parameters
-
+		gzip, headerRow, timeSort, update, honorDst, relaxedParsing } = req.body; // extract query parameters
 	// Set default values of not supplied parameters.
 	if (!createMeter) {
 		req.body.createMeter = DEFAULTS.readings.createMeter;
@@ -191,6 +198,12 @@ function validateReadingsCsvUploadParams(req, res, next) {
 	}
 	if (!update) {
 		req.body.update = DEFAULTS.common.update;
+	}
+	if (!honorDst) {
+		req.body.honorDst = DEFAULTS.common.honorDst;
+	}
+	if (!relaxedParsing) {
+		req.body.relaxedParsing = DEFAULTS.common.relaxedParsing;
 	}
 	next();
 }

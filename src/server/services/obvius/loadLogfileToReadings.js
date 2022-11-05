@@ -79,7 +79,9 @@ async function loadLogfileToReadings(serialNumber, ipAddress, logfile, conn) {
 				// Unsure if previous values should not change but going to assume want the latest one sent.
 				shouldUpdate = true,
 				conditionSet = undefined,
-				conn = conn
+				conn = conn,
+				honorDst = false,
+				relaxedParsing = false
 			);
 		} catch (err) {
 			log.error('Could not insert readings from Obvius logfile.', err);

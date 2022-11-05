@@ -8,7 +8,6 @@ import { connect } from 'react-redux';
 import getGraphColor from '../utils/getGraphColor';
 import { State } from '../types/redux/state';
 import Plot from 'react-plotly.js';
-import { TimeInterval } from '../../../common/TimeInterval';
 import Locales from '../types/locales';
 import { DataType } from '../types/Datasources';
 import { UnitRepresentType } from '../types/redux/units';
@@ -24,6 +23,9 @@ function mapStateToProps(state: State) {
 	const currentSelectedRate = state.graph.lineGraphRate;
 	let unitLabel: string = '';
 	let needsRateScaling = false;
+	// variables to determine the slider min and max
+	let minTimestamp: number | undefined;
+	let maxTimestamp: number | undefined;
 	// If graphingUnit is -99 then none selected and nothing to graph so label is empty.
 	// This will probably happen when the page is first loaded.
 	if (graphingUnit !== -99) {
@@ -103,18 +105,19 @@ function mapStateToProps(state: State) {
 					});
 				}
 
-				// Save the timestamp range of the plot
-				let minTimestamp: string = '';
-				let maxTimestamp: string = '';
+				/*
+				get the min and max timestamp of the meter, and compare it to the global values
+				TODO: If we know the interval and frequency of meter data, these calculations should be able to be simplified
+				*/
 				if (readings.length > 0) {
-					/* tslint:disable:no-string-literal */
-					minTimestamp = readings[0]['startTimestamp'].toString();
-					maxTimestamp = readings[readings.length - 1]['startTimestamp'].toString();
-					/* tslint:enable:no-string-literal */
+					if (minTimestamp == undefined || readings[0]['startTimestamp'] < minTimestamp) {
+						minTimestamp = readings[0]['startTimestamp'];
+					}
+					if (maxTimestamp == undefined || readings[readings.length - 1]['endTimestamp'] >= maxTimestamp) {
+						// Need to add one extra reading interval to avoid range truncation. The max bound seems to be treated as non-inclusive
+						maxTimestamp = readings[readings.length - 1]['endTimestamp'] + (readings[0]['endTimestamp'] - readings[0]['startTimestamp']);
+					}
 				}
-				const root: any = document.getElementById('root');
-				root.setAttribute('min-timestamp', minTimestamp);
-				root.setAttribute('max-timestamp', maxTimestamp);
 
 				// This variable contains all the elements (x and y values, line type, etc.) assigned to the data parameter of the Plotly object
 				datasets.push({
@@ -182,6 +185,17 @@ function mapStateToProps(state: State) {
 					});
 				}
 
+				// get the min and max timestamp of the meter, and compare it to the global values
+				if (readings.length > 0) {
+					if (minTimestamp == undefined || readings[0]['startTimestamp'] < minTimestamp) {
+						minTimestamp = readings[0]['startTimestamp'];
+					}
+					if (maxTimestamp == undefined || readings[readings.length - 1]['endTimestamp'] >= maxTimestamp) {
+						// Need to add one extra reading interval to avoid range truncation. The max bound seems to be treated as non-inclusive
+						maxTimestamp = readings[readings.length - 1]['endTimestamp'] + (readings[0]['endTimestamp'] - readings[0]['startTimestamp']);
+					}
+				}
+
 				// This variable contains all the elements (x and y values, line type, etc.) assigned to the data parameter of the Plotly object
 				datasets.push({
 					name: label,
@@ -201,11 +215,20 @@ function mapStateToProps(state: State) {
 		}
 	}
 
-	// Calculate slider interval if rangeSliderInterval is specified;
-	const sliderInterval = state.graph.rangeSliderInterval.equals(TimeInterval.unbounded()) ? timeInterval : state.graph.rangeSliderInterval;
+	// set the bounds for the slider
+	if (minTimestamp == undefined) {
+		minTimestamp = 0;
+		maxTimestamp = 0;
+	}
+	const root: any = document.getElementById('root');
+	root.setAttribute('min-timestamp', minTimestamp);
+	root.setAttribute('max-timestamp', maxTimestamp);
+
+	// Use the min/max time found for the readings (and shifted as desired) as the
+	// x-axis range for the graph.
 	// Avoid pesky shifting timezones with utc.
-	const start = moment.utc(sliderInterval.getStartTimestamp()).toISOString();
-	const end = moment.utc(sliderInterval.getEndTimestamp()).toISOString();
+	const start = moment.utc(minTimestamp).toISOString();
+	const end = moment.utc(maxTimestamp).toISOString();
 
 	// Customize the layout of the plot
 	const layout: any = {
@@ -223,7 +246,7 @@ function mapStateToProps(state: State) {
 		},
 
 		xaxis: {
-			range: [start, end], // Specifies the start and end points of visible part of graph(unshaded region on slider);
+			range: [start, end], // Specifies the start and end points of visible part of graph
 			rangeslider: {
 				thickness: 0.1
 			},
