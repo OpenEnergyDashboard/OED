@@ -38,6 +38,7 @@ async function uploadReadings(req, res, filepath, conn) {
 			} else {
 				// If createMeter is true, we will create the meter for the user.
 				// The meter type is unknown so set to other.
+				// This uses a lot of default values for meter parameters.
 				const tempMeter = new Meter(undefined, meterName, undefined, false, false, Meter.type.OTHER, undefined, undefined, meterName,
 					'created via reading upload on ' + moment().format());
 				await tempMeter.insert(conn);
