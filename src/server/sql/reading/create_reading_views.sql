@@ -214,6 +214,7 @@ DECLARE
 	requested_interval INTERVAL;
 	requested_range TSRANGE;
 	unit_column INTEGER;
+	temp_frequency INTEGER := 15; -- right now we don't have the frequency of each meter
 BEGIN
 	-- Make sure the time range is withing the reading values.
 	requested_range := shrink_tsrange_to_real_readings(tsrange(start_stamp, end_stamp, '[]'));
@@ -227,8 +228,12 @@ BEGIN
 	--  (extract(EPOCH FROM (r.end_timestamp - r.start_timestamp)))
 	-- Test Command: select meter_line_readings_unit('{1, 2}'::integer[], (select id from units where name = 'kWh'), '-infinity', 'infinity', 200, 200);
 	-- for example, replace infinity with '2022-10-24 17:32:00' as one of the times 
-	-- raise notice 'real_start_stamp: %, real_end_stamp: %', real_start_stamp, real_end_stamp; -- DEBUG 
-	IF ( (requested_range / requested_interval) >= 1440)  OR (requested_interval >= 1400) THEN
+	-- raise notice 'real_start_stamp: %, real_end_stamp: %', real_start_stamp, real_end_stamp; -- DEBUG
+
+	-- Epoch is in seconds so we divide by 60 to turn it into minutes
+	-- If there are less than 1440 readings we want to return the raw data
+	-- TODO add the frequency of the meters to the tables so we can add the extra conditionals based on how long the frequency is
+	IF (((EXTRACT (EPOCH FROM requested_interval) / 60) / temp_frequency) <= 1440) THEN
 		RETURN QUERY
 			SELECT r.meter_id as meter_id,
 			CASE WHEN u.unit_represent = 'quantity'::unit_represent_type THEN
@@ -248,7 +253,7 @@ BEGIN
 			INNER JOIN units u ON m.unit_id = u.id)
 			INNER JOIN cik c on c.row_index = u.unit_index AND c.column_index = unit_column)
 			WHERE lower(requested_range) <= r.start_timestamp AND r.end_timestamp <= upper(requested_range);
-	ELSIF (requested_range / 60 <= 1440) AND (requested_interval <= 60) THEN 
+	ELSIF (((EXTRACT (EPOCH FROM requested_interval) / 60) / 60) <= 1440) THEN 
 		-- Get hourly points to graph. See daily for more comments.
 		RETURN QUERY
 			SELECT hourly.meter_id AS meter_id,
