@@ -16,16 +16,26 @@ import translate from './translate';
  */
 
 function convertToCSV(items: ExportDataSet[]) {
-	let csvOutput = 'Label,Readings,Start Timestamp,End Timestamp\n';
+	let csvOutput = 'Readings,Start Timestamp,End Timestamp,Label,Unit,Utility\n';
 	items.forEach(set => {
 		const data = set.exportVals;
 		const label = set.label;
+		const unit = set.unit;
+		const utility = set.utility;
+		let firstLine = true;
 		data.forEach(reading => {
 			const info = reading.y;
 			// Why UTC is needed here has not been carefully analyzed.
 			const startTimeStamp = moment.utc(reading.x).format('dddd LL LTS').replace(/,/g, ''); // use regex to omit pesky commas
 			const endTimeStamp = moment.utc(reading.z).format('dddd LL LTS').replace(/,/g, '');
-			csvOutput += `"${label}",${info},${startTimeStamp},${endTimeStamp}\n`; // TODO: add column for units
+			if (firstLine) {
+				firstLine = false;
+				csvOutput += `${info},${startTimeStamp},${endTimeStamp}`;
+				csvOutput += `"${label}",${unit},${utility}\n`;//null at the moment
+			}
+			else {
+				csvOutput += `${info},${startTimeStamp},${endTimeStamp}\n`;
+			}
 		});
 	});
 	return csvOutput;
@@ -54,6 +64,7 @@ function downloadCSV(inputCSV: string, fileName: string) {
  * @param dataSets An Object. The readings from each meter currently selected in the graph.
  * @param name the name of the file.
  */
+//call this fcn in a loop
 export default function graphExport(dataSets: ExportDataSet[], name: string) {
 	const dataToExport = convertToCSV(dataSets);
 	downloadCSV(dataToExport, name);
@@ -67,7 +78,7 @@ export default function graphExport(dataSets: ExportDataSet[], name: string) {
 // below comment should be removed when we either remove defaultLanguage or implement it into the following function
 /* eslint-disable @typescript-eslint/no-unused-vars */
 export function downloadRawCSV(items: RawReadings[], defaultLanguage: string) {
-	let csvOutput = 'Label,Readings,Start Timestamp,End Timestamp\n';
+	let csvOutput = 'Label,Readings,Start Timestamp,End Timestamp,\n';
 	items.forEach(ele => {
 		//.utc is not needed because this uses a different route than the way line graphs work. It returns a string that represents the
 		// start/endTimestamp.

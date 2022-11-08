@@ -42,6 +42,9 @@ export default function ExportComponent(props: ExportProps) {
 			}
 		})
 
+		//separate the data by meter and call export fcn in a loop
+		//----------------------------------------------------------
+
 		// Determine and format the first time in the dataset
 		// These values are already UTC so they are okay. Why has not been tracked down.
 		let startTime = moment(data[0].exportVals[0].x);
@@ -68,7 +71,10 @@ export default function ExportComponent(props: ExportProps) {
 		const startTimeString = startTime.utc().format('LL_LTS').replace(/,/g, '').replace(/[\s:-]/g, '_');
 		const endTimeString = endTime.utc().format('LL_LTS').replace(/,/g, '').replace(/[\s:-]/g, '_');
 		const chartName = data[0].currentChart;
-		const name = `oedExport_${chartName}_${startTimeString}_to_${endTimeString}.csv`;
+		const meterName = data[0].label;
+		const unit = data[0].unit;
+		const utility = data[0].utility;//remove utility
+		const name = `oedExport_${chartName}_${meterName}_${unit}_${utility}_${startTimeString}_to_${endTimeString}.csv`;
 		graphExport(data, name);
 	};
 

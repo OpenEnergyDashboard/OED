@@ -22,6 +22,8 @@ function mapStateToProps(state: State) {
 	if (state.graph.selectedGroups.length > 0) {
 		linkText += `groupIDs=${state.graph.selectedGroups.toString()}&`;
 	}
+	linkText += `unit=${state.graph.selectedUnit.toString()}&`;
+	linkText += `rate=${state.graph.barDuration.minutes()}&`;
 	linkText += `chartType=${state.graph.chartToRender}`;
 	// weeklyLink = linkText + '&serverRange=7dfp'; // dfp: days from present;
 	linkText += `&serverRange=${state.graph.timeInterval.toString()}`;
