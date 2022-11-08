@@ -42,7 +42,7 @@ First, I attempted to follow the steps as they were written in the article. OED 
 
 Next was bringing up the database container with the new PostgreSQL version. According to Steve, the way to change the version should be to change the FROM line in the Docker file under containers/database. Currently there is an issue with restarting OED where the containers need to be removed before OED starts properly, so I changed the version to 14.5, closed the remote connection, removed the containers, and started OED back up again. However, when the script tried to create the database, it ran into an error: Error: getaddrinfo EAI_AGAIN database. This error seems to happen if it can't connect to the database. I have found one solution to get around this error, which is to delete the postgres-data folder. This is probably not the correct solution, but I wanted tot get to the third step to see if I could restore the database. After deleting the postgres-data folder and restarting OED, everything seemed to start up correctly except when creating the database, it seemed to run into multiple Error while inserting log mail Error: connect ECONNREFUSED 172.18.0.2:5432 (Error: connect ECONNREFUSED 172.18.0.2:5432 at TCPConnectWrap.afterConnect [as oncomplete] (node:net:1161:16)) errors, but eventually it ran properly. I could access the OED site on localhost without the database data. I checked the version of PostgreSQL in the container and it was 14.5.
 
-Finally, I tried to restore the database using the psql command. Running the command as it was in the article didn't work, so I changed it to match the pg_dumpall command: docker compose exec database psql -U oed > dump_$(date +%Y-%m-%d"_"%H_%M_%S.sql). This ran the command, but it ran into multiple errors. Like Steve said, when the database container starts, some data is initialized and the psql command was not able to overwrite the existing data. This is as far as I have gotten with my testing.
+Finally, I tried to restore the database using the psql command. Running the command as it was in the article didn't work, so I changed it to match the pg_dumpall command: docker compose exec database psql -U oed < dump_$(date +%Y-%m-%d"_"%H_%M_%S.sql). This ran the command, but it ran into multiple errors. Like Steve said, when the database container starts, some data is initialized and the psql command was not able to overwrite the existing data. This is as far as I have gotten with my testing.
 
 ## Next Steps
 
@@ -55,3 +55,25 @@ Get the method working
 Make a procedure for migrating the database
 * Theoretically, a script could be made that runs some or all of the commands. While I shut down OED and restarted it, it might be possible to just shut down the database container and bring it back up again, or bring up a new container in parallel.
 * There will need to be a new help page on the OED website detailing how to migrate the database. It might be as simple as telling the user to run the script, but if a script is not possible, it will have to walk the user through what commands to run.
+
+## Update
+
+The migration is mostly working with the following notes:
+
+Step 1.
+
+Added a --clean flag with adds commands to drop the database and roles so the command is now docker compose exec database pg_dumpall --clean -U oed > dump_$(date +%Y-%m-%d"_"%H_%M_%S.sql)
+
+The migration doesn't work if we drop and recreate the roles, so it is needed to go into the dump file and comment out the lines dropping and recreating the roles.
+
+When the dump file was produced for the test, it didn't seem like there was any data from the tables. Need to perform the dump again and see if data is added.
+
+Step 2.
+
+In order to upgrade the PostgreSQL version by editing the dockerfile, either a new clean version of OED needs to be used, or deleting the postgres-data folder is the correct solution if using the same OED installation.
+
+Step 3.
+
+Need to run the restore command as user postgres, not OED as a currently open database can't be dropped, so the command is now docker compose exec database psql -U postgres < dump_$(date +%Y-%m-%d"_"%H_%M_%S.sql)
+
+Between PostgreSQL versions, the default password encryption method changed from md5 to scram-sha-256, so either need to change the ecryption to scram-sha-256 before migrating or change the encryption to md5 after migrating. Changing the encryption after was the method used while testing and it worked, but changing before migrating would be preferred.
