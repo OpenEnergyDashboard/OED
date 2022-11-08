@@ -17,7 +17,8 @@ const defaultState: AdminState = {
 	isFetching: false,
 	submitted: true,
 	defaultWarningFileSize: 5,
-	defaultFileSizeLimit: 25
+	defaultFileSizeLimit: 25,
+	isUpdatingCikAndDBViews: false
 };
 
 export default function admin(state = defaultState, action: AdminAction) {
@@ -95,6 +96,11 @@ export default function admin(state = defaultState, action: AdminAction) {
 				...state,
 				defaultFileSizeLimit: action.defaultFileSizeLimit,
 				submitted: false
+			}
+		case ActionType.UpdateCikAndDBViews:
+			return {
+				...state,
+				isUpdatingCikAndDBViews: true
 			}
 		default:
 			return state;

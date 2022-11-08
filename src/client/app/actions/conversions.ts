@@ -7,6 +7,7 @@ import { showSuccessNotification, showErrorNotification } from '../utils/notific
 import translate from '../utils/translate';
 import * as t from '../types/redux/conversions';
 import { conversionsApi } from '../utils/api';
+import { updateCikAndDBViewsIfNeeded } from './admin';
 
 export function requestConversionsDetails(): t.RequestConversionsDetailsAction {
 	return { type: ActionType.RequestConversionsDetails };
@@ -73,7 +74,7 @@ export function fetchConversionsDetailsIfNeeded(): Thunk {
 	};
 }
 
-export function submitEditedConversion(editedConversion: t.ConversionData): Thunk {
+export function submitEditedConversion(editedConversion: t.ConversionData, shouldRedoCik: boolean): Thunk {
 	return async (dispatch: Dispatch, getState: GetState) => {
 		// check if conversionData is already submitting (indexOf returns -1 if item does not exist in array)
 
@@ -91,6 +92,7 @@ export function submitEditedConversion(editedConversion: t.ConversionData): Thun
 			try {
 				// posts the edited conversionData to the conversions API
 				await conversionsApi.edit(editedConversion);
+				dispatch(updateCikAndDBViewsIfNeeded(shouldRedoCik, false));
 				// Update the store with our new edits
 				dispatch(confirmConversionEdits(editedConversion));
 				// Success!
@@ -111,6 +113,8 @@ export function addConversion(conversion: t.ConversionData): Thunk {
 		try {
 			// Attempt to add conversion to database
 			await conversionsApi.addConversion(conversion);
+			// Adding a new conversion only affects the Cik table
+			dispatch(updateCikAndDBViewsIfNeeded(true, false));
 			// Update the conversions state from the database on a successful call
 			// In the future, getting rid of this database fetch and updating the store on a successful API call would make the page faster
 			// However, since the database currently assigns the id to the ConversionData we fetch from DB.
@@ -139,6 +143,8 @@ export function deleteConversion(conversion: t.ConversionData): Thunk {
 			try {
 				// Attempt to delete the conversion from the database
 				await conversionsApi.delete(conversion);
+				// Deleting a conversion only affects the Cik table
+				dispatch(updateCikAndDBViewsIfNeeded(true, false));
 				// Delete was successful
 				// Update the store to match
 				dispatch(confirmDeletedConversion(conversion));
