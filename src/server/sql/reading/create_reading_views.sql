@@ -233,7 +233,8 @@ BEGIN
 	-- Epoch is in seconds so we divide by 60 to turn it into minutes
 	-- If there are less than 1440 readings we want to return the raw data
 	-- TODO add the frequency of the meters to the tables so we can add the extra conditionals based on how long the frequency is
-	IF (((EXTRACT (EPOCH FROM requested_interval) / 60) / temp_frequency) <= 1440) THEN
+	raise notice '%', (EXTRACT (DAY FROM requested_interval) * 1440);
+	IF (((EXTRACT (DAY FROM requested_interval) * 1440) / temp_frequency) <= 1440) OR (temp_frequency >= 1440) THEN
 		RETURN QUERY
 			SELECT r.meter_id as meter_id,
 			CASE WHEN u.unit_represent = 'quantity'::unit_represent_type THEN
@@ -253,7 +254,7 @@ BEGIN
 			INNER JOIN units u ON m.unit_id = u.id)
 			INNER JOIN cik c on c.row_index = u.unit_index AND c.column_index = unit_column)
 			WHERE lower(requested_range) <= r.start_timestamp AND r.end_timestamp <= upper(requested_range);
-	ELSIF (((EXTRACT (EPOCH FROM requested_interval) / 60) / 60) <= 1440) THEN 
+	ELSIF (((EXTRACT (DAY FROM requested_interval) * 1440) / 60) <= 1440) AND (temp_frequency <= 60) THEN 
 		-- Get hourly points to graph. See daily for more comments.
 		RETURN QUERY
 			SELECT hourly.meter_id AS meter_id,
