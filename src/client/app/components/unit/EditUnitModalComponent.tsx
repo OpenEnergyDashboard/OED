@@ -113,6 +113,7 @@ export default function EditUnitModalComponent(props: EditUnitModalComponentProp
 
 		if (shouldUpdateUnit()) {
 			// Need to redo Cik if the suffix, displayable, or type of unit changes.
+			// For displayable, it only matters if it changes from/to NONE but a more general check is used here for simplification.
 			const shouldRedoCik = props.unit.suffix !== state.suffix
 				|| props.unit.typeOfUnit !== state.typeOfUnit
 				|| props.unit.displayable !== state.displayable;

@@ -155,7 +155,8 @@ async function handleSuffixUnits(graph, conn) {
 /**
  * OED handles suffix units by adding conversions and units automatically.
  * When a unit's suffix changes, these additional conversions and units need to be removed.
- * Since it's complicated to remove units, we just set their displayable to NONE.
+ * Units are complicated to remove so we just set their displayable to NONE.
+ * Since this function makes changes to conversions and units, Cik must be recalculated after calling this function.
  * @param {*} suffixUnit Additional conversions/units of this suffixUnit will be removed.
  * @param {*} conn The connection to use.
  */
