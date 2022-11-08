@@ -12,12 +12,12 @@ import getPage from '../utils/getPage';
 import TooltipMarkerComponent from './TooltipMarkerComponent';
 import TooltipHelpContainer from '../containers/TooltipHelpContainer';
 import { UserRole } from '../types/items';
-import { hasPermissions } from '../utils/hasPermissions';
+import { hasPermissions, isRoleAdmin } from '../utils/hasPermissions';
 import { FlipLogOutStateAction } from '../types/redux/unsavedWarning';
 
 interface HeaderButtonsProps {
 	showCollapsedMenuButton: boolean;
-	loggedInAsAdmin: boolean;
+	loggedInAsAdmin: boolean; // TODO currently not used
 	role: UserRole | null;
 	hasUnsavedChanges: boolean;
 	handleLogOut: () => any;
@@ -35,7 +35,7 @@ export default class HeaderButtonsComponent extends React.Component<HeaderButton
 
 	public render() {
 		const role = this.props.role;
-		const loggedInAsAdmin = hasToken() && this.props.loggedInAsAdmin;
+		const loggedInAsAdmin = (role !== null) && isRoleAdmin(role);
 		const showOptions = getPage() === '';
 		const renderLoginButton = !hasToken();
 		const shouldHomeButtonDisabled = getPage() === '';
@@ -44,7 +44,7 @@ export default class HeaderButtonsComponent extends React.Component<HeaderButton
 		const shouldMetersButtonDisabled = getPage() === 'meters';
 		const shouldMapsButtonDisabled = getPage() === 'maps';
 		const shouldCSVButtonDisabled = getPage() === 'csv';
-		const renderCSVButton = hasToken() && Boolean(role && hasPermissions(role, UserRole.CSV));
+		const renderCSVButton =  Boolean(role && hasPermissions(role, UserRole.CSV)) && hasToken();
 		const shouldUnitsButtonDisabled = getPage() === 'units';
 		const shouldConversionsButtonDisabled = getPage() === 'conversions';
 
