@@ -52,8 +52,8 @@ async function getMeterInfo(url, ip, csvLine) {
 	// TODO: get the unit when the MAMAC meter is first probed and created.
 	// For now, we assume they are kWh as before resource generalization.
 	let displayable = true;
-	const kWhUnit = await Unit.getByName( 'kWh', conn );
-	let unitId; 
+	const kWhUnit = await Unit.getByName('kWh', conn);
+	let unitId;
 	if (kWhUnit === null) {
 		log.warn("kWh not found while creating MAMAC meter so units set to undefined and not displayable");
 		displayable = false;
@@ -66,8 +66,34 @@ async function getMeterInfo(url, ip, csvLine) {
 		.then(xml => {
 			const name = xml.Maverick.NodeID[0];
 			// For historical reasons, MAMAC meters store the IP address and not the URL.
-			return new Meter(undefined, name, ip, true, displayable, Meter.type.MAMAC, null, undefined, undefined,
-				'created via MAMAC meter upload on ' + moment().format(), unitId, unitId);
+			return new Meter(
+				undefined, // id
+				name, // name
+				ip, // URL
+				true, // enabled
+				displayable, // displayable
+				Meter.type.MAMAC, // type
+				null, // timezone
+				undefined, //gps
+				undefined, // identifier
+				'created via MAMAC meter upload on ' + moment().format(), // note
+				null, //area
+				undefined, // cumulative
+				undefined, //cumulativeReset
+				undefined, // cumulativeResetStart
+				undefined, // cumulativeResetEnd
+				90000, // readingGap
+				90000, // readingVariation
+				undefined, //readingDuplication
+				undefined, // timeSort
+				undefined, //endOnlyTime
+				undefined, // reading
+				undefined, // startTimestamp
+				undefined, // endTimestamp
+				undefined, // previousEnd
+				unitId, // unit
+				unitId // default graphic unit
+			);
 		});
 }
 
@@ -89,7 +115,7 @@ function infoForAllMeters(rows, conn) {
 async function insertMeters(rows, conn) {
 	const errors = [];
 	await Promise.all(infoForAllMeters(rows, conn).map(
-			(promise, index) => promise
+		(promise, index) => promise
 			.then(async meter => {
 				if (await meter.existsByName(conn)) {
 					log.info(`CSV line ${index + 2}: Skipping existing meter ${meter.name}`);
@@ -98,7 +124,7 @@ async function insertMeters(rows, conn) {
 				}
 			})
 			.catch(error => errors.push(error))
-		)
+	)
 	);
 	return errors;
 }

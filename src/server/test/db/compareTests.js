@@ -33,8 +33,34 @@ mocha.describe('Compare readings', () => {
 		await redoCik(conn);
 		// Make the meter be a kWh meter.
 		const meterUnitId = (await Unit.getByName('Electric_utility', conn)).id;
-		await new Meter(undefined, 'Meter', null, false, true, Meter.type.OTHER, 'CST', undefined, undefined, undefined, undefined, undefined, undefined, undefined, undefined, undefined, undefined, undefined, undefined,
-			undefined, undefined, undefined, undefined, undefined, meterUnitId, meterUnitId).insert(conn);
+		await new Meter(
+			undefined, // id
+			'Meter', // name
+			null, // URL
+			false, // enabled
+			true, // displayable
+			Meter.type.OTHER, // type
+			'CST', // timezone
+			undefined, // gps
+			undefined, // identifier
+			undefined, // note
+			undefined, // area
+			undefined, // cumulative
+			undefined, //cumulativeReset
+			undefined, // cumulativeResetStart
+			undefined, // cumulativeResetEnd
+			undefined, // readingGap
+			undefined, // readingVariation
+			undefined, //readingDuplication
+			undefined, // timeSort
+			true, // endOnlyTime
+			undefined, // reading
+			undefined, // startTimestamp
+			undefined, // endTimestamp
+			undefined, // previousEnd
+			meterUnitId, // unit
+			meterUnitId // default graphic unit
+		).insert(conn);
 		meter = await Meter.getByName('Meter', conn);
 		await Reading.insertAll([
 			new Reading(meter.id, 1, prevStart, prevEnd),

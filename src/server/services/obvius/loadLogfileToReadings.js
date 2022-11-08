@@ -24,10 +24,34 @@ async function loadLogfileToReadings(serialNumber, ipAddress, logfile, conn) {
 			// Data was sent for a meter that did not have a config file sent before this.
 			// As a result, we cannot know the unit so make unknown for now.
 			// The admin need to set the unit before making it displayable or it cannot be graphed.
-			meter = new Meter(undefined, `${serialNumber}.${i}`, ipAddress, true, false, Meter.type.OBVIUS,
-				null, undefined, `OBVIUS ${serialNumber} COLUMN ${i}`, 'created via obvius log upload on ' +
-				moment().format(), undefined, undefined, undefined, undefined, undefined, undefined, undefined,
-				undefined, undefined, true, undefined, undefined, undefined, undefined, undefined);
+			meter = new Meter(
+				undefined, // id
+				`${serialNumber}.${i}`, // name
+				ipAddress, // URL
+				true, // enabled
+				false, // displayable
+				Meter.type.OBVIUS, // type
+				null, //timezone
+				undefined, // gps
+				`OBVIUS ${serialNumber} COLUMN ${i}`, // identifier
+				'created via obvius log upload on ' + moment().format(), // note
+				undefined, // area
+				undefined, // cumulative
+				undefined, //cumulativeReset
+				undefined, // cumulativeResetStart
+				undefined, // cumulativeResetEnd
+				undefined, // readingGap
+				undefined, // readingVariation
+				undefined, //readingDuplication
+				undefined, // timeSort
+				true, // endOnlyTime
+				undefined, // reading
+				undefined, // startTimestamp
+				undefined, // endTimestamp
+				undefined, // previousEnd
+				undefined, // unit
+				undefined // default graphic unit
+			);
 			await meter.insert(conn);
 			log.warn('WARNING: Created a meter (' + `${serialNumber}.${i}` +
 				') that does not already exist. Normally obvius meters created by an uploaded ConfigFile.');
