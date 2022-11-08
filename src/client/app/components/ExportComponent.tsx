@@ -27,8 +27,15 @@ export default function ExportComponent(props: ExportProps) {
 	 * Called when Export button is clicked.
 	 * Passes an object containing the selected meter data to a function for export.
 	 */
+
 	const exportReading = () => {
 		const data = props.exportVals.datasets;
+		//const labelUnique = props.exportVals.datasets[0].label;
+		
+		// for(const reading of labelUnique ){
+		// 	if(reading !== labelUnique){
+		// 		data.push(labelUnique);
+		// 	}
 
 		// Sort the dataset based on the start time
 		data.forEach(reading => {
@@ -70,6 +77,7 @@ export default function ExportComponent(props: ExportProps) {
 		const chartName = data[0].currentChart;
 		const name = `oedExport_${chartName}_${startTimeString}_to_${endTimeString}.csv`;
 		graphExport(data, name);
+		//} //end of loop
 	};
 
 	const exportRawReadings = async () => {
