@@ -70,6 +70,7 @@ export default class RouteComponent extends React.Component<RouteProps> {
 		// Needs to be async because of the network request
 		(async () => {
 			if (!(await verificationApi.checkTokenValid())) {
+				showErrorNotification(translate('invalid.token.login.admin'));
 				// We should delete the token when we know that it is expired. Ensures that we don't not leave any unwanted tokens around.
 				deleteToken();
 				// This ensures that if there is no token then there is no stale profile in the redux store.
@@ -100,6 +101,7 @@ export default class RouteComponent extends React.Component<RouteProps> {
 		// Needs to be async because of the network request
 		(async () => {
 			if (!(await verificationApi.checkTokenValid())) {
+				showErrorNotification(translate('invalid.token.login.admin'));
 				// We should delete the token when we know that it is expired. Ensures that we don't not leave any unwanted tokens around.
 				deleteToken();
 				// This ensures that if there is no token then there is no stale profile in the redux store.
@@ -126,7 +128,7 @@ export default class RouteComponent extends React.Component<RouteProps> {
 			// Needs to be async because of the network request
 			(async () => {
 				if (!(await verificationApi.checkTokenValid())) {
-					showErrorNotification(translate('invalid.token.login.or.logout'));
+					showErrorNotification(translate('invalid.token.login'));
 					// We should delete the token when we know that it is expired. Ensures that we don't not leave any unwanted tokens around.
 					deleteToken();
 					// This ensures that if there is no token then there is no stale profile in the redux store.
@@ -245,7 +247,7 @@ export default class RouteComponent extends React.Component<RouteProps> {
 								<Route path='/admin' render={() => this.requireAuth(AdminComponent())}/>
 								<Route path='/csv' render={() => this.requireRole(UserRole.CSV, <UploadCSVContainer/>)}/>
 								<Route path='/groups' render={() => this.checkAuth(<GroupsDetailContainer/>)}/>
-								<Route path='/meters' render={() => (<MetersDetailComponent/>)}/>
+								<Route path='/meters' render={() => this.checkAuth(<MetersDetailComponent/>)}/>
 								<Route path='/graph' render={({ location }) => this.linkToGraph(<HomeComponent/>, location.search)}/>
 								<Route path='/calibration' render={() => this.requireAuth(<MapCalibrationContainer/>)}/>
 								<Route path='/maps' render={() => this.requireAuth(<MapsDetailContainer/>)}/>
