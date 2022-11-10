@@ -63,9 +63,8 @@ export default class RouteComponent extends React.Component<RouteProps> {
 	public requireRole(requiredRole: UserRole, component: JSX.Element) {
 		// Redirect route to login page if the auth token does not exist
 		if (!hasToken()) {
-			return <Redirect to='/login'/>;
+			return <Redirect to='/'/>;
 		}
-
 		// Verify that the auth token is valid.
 		// Needs to be async because of the network request
 		(async () => {
@@ -75,8 +74,8 @@ export default class RouteComponent extends React.Component<RouteProps> {
 				deleteToken();
 				// This ensures that if there is no token then there is no stale profile in the redux store.
 				this.props.clearCurrentUser();
-				// Route to login page if the auth token is not valid
-				return <Redirect to='/login'/>;
+				// Route to home page if the auth token is not valid
+				return <Redirect to='/'/>;
 			} else if (!hasPermissions(this.props.role, requiredRole)) {
 				// Even though the auth token is valid, we still need to check that the user is a certain role.
 				return <Redirect to='/'/>;
@@ -92,11 +91,10 @@ export default class RouteComponent extends React.Component<RouteProps> {
 	 * @param component The component of the page redirecting
 	 */
 	public requireAuth(component: JSX.Element) {
-		// Redirect route to login page if the auth token does not exist
+		// Redirect route to home page if the auth token does not exist
 		if (!hasToken()) {
-			return <Redirect to='/login'/>;
+			return <Redirect to='/'/>;
 		}
-
 		// Verify that the auth token is valid.
 		// Needs to be async because of the network request
 		(async () => {
@@ -107,7 +105,7 @@ export default class RouteComponent extends React.Component<RouteProps> {
 				// This ensures that if there is no token then there is no stale profile in the redux store.
 				this.props.clearCurrentUser();
 				// Route to login page since the auth token is not valid
-				return <Redirect to='/login'/>;
+				return <Redirect to='/'/>;
 			} else if (!this.props.loggedInAsAdmin) {
 				// Even though the auth token is valid, we still need to check that the user is an admin.
 				return <Redirect to='/'/>;
@@ -122,7 +120,7 @@ export default class RouteComponent extends React.Component<RouteProps> {
 	 * @param component The component of the page redirecting
 	 */
 	public checkAuth(component: JSX.Element) {
-		// Only check the token if the auth token does not exist
+		// Only check the token if the auth token exists
 		if (hasToken()) {
 			// Verify that the auth token is valid.
 			// Needs to be async because of the network request
@@ -133,11 +131,6 @@ export default class RouteComponent extends React.Component<RouteProps> {
 					deleteToken();
 					// This ensures that if there is no token then there is no stale profile in the redux store.
 					this.props.clearCurrentUser();
-					// Route to login page since the auth token is not valid
-					return <Redirect to='/login'/>;
-				} else if (!this.props.loggedInAsAdmin) {
-					// Even though the auth token is valid, we still need to check that the user is an admin.
-					return <Redirect to='/'/>;
 				}
 				return component;
 			})();

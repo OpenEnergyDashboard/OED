@@ -38,7 +38,6 @@ export default class HeaderButtonsComponent extends React.Component<HeaderButton
 		const loggedInAsAdmin = this.props.loggedInAsAdmin;
 		const showOptions = getPage() === '';
 		const renderLoginButton = !hasToken();
-		// const renderLogoutButton = hasToken();
 		const shouldHomeButtonDisabled = getPage() === '';
 		const shouldAdminButtonDisabled = getPage() === 'admin';
 		const shouldGroupsButtonDisabled = getPage() === 'groups';
