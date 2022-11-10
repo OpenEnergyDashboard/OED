@@ -4,7 +4,6 @@
 
 
 import { UserRole } from '../types/items';
-import { hasToken } from './token';
 
 /**
  * Checks if the role A has the permission of the role B.
@@ -18,18 +17,5 @@ export function hasPermissions(userA: UserRole, userB: UserRole): boolean {
  * Checks if the role A is an Admin.
  */
 export function isRoleAdmin(A: UserRole): boolean {
-	return A === UserRole.ADMIN && hasToken();
+	return A === UserRole.ADMIN;
 }
-
-/*
-export function isRoleAdmin(A: UserRole): boolean {
-	if(A !== UserRole.ADMIN) {
-		return false;
-	} else if (hasToken()) {
-		return true;
-	} else {
-		// TODO delete the user profile from state
-		return false
-	}
-}
-*/

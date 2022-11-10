@@ -58,7 +58,7 @@ export default class RouteComponent extends React.Component<RouteProps> {
 	 * Generates middleware that requires proper role and authentication for a page route
 	 * @param requiredRole The role that is necessary to access a page route
 	 * @param component The component of the page redirecting
-	 * @returns middleware that requires proper role and authentication for a page route
+	 * @returns The page route to continue to (component or home)
 	 */
 	public requireRole(requiredRole: UserRole, component: JSX.Element) {
 		// Redirect route to login page if the auth token does not exist
@@ -77,7 +77,7 @@ export default class RouteComponent extends React.Component<RouteProps> {
 				// Route to home page if the auth token is not valid
 				return <Redirect to='/'/>;
 			} else if (!hasPermissions(this.props.role, requiredRole)) {
-				// Even though the auth token is valid, we still need to check that the user is a certain role.
+				// Even though the auth token is valid, we still need to check that the user is the required role.
 				return <Redirect to='/'/>;
 			}
 			return component;
@@ -89,6 +89,7 @@ export default class RouteComponent extends React.Component<RouteProps> {
 	/**
 	 * Middleware function that requires proper authentication for a page route
 	 * @param component The component of the page redirecting
+	 * @returns The page route to continue to (component or home)
 	 */
 	public requireAuth(component: JSX.Element) {
 		// Redirect route to home page if the auth token does not exist
@@ -118,6 +119,7 @@ export default class RouteComponent extends React.Component<RouteProps> {
 	/**
 	 * Middleware function that checks proper authentication for a page route
 	 * @param component The component of the page redirecting
+	 * @returns component
 	 */
 	public checkAuth(component: JSX.Element) {
 		// Only check the token if the auth token exists
