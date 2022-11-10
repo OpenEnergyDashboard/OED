@@ -38,6 +38,7 @@ export default class HeaderButtonsComponent extends React.Component<HeaderButton
 		const loggedInAsAdmin = this.props.loggedInAsAdmin;
 		const showOptions = getPage() === '';
 		const renderLoginButton = !hasToken();
+		// const renderLogoutButton = hasToken();
 		const shouldHomeButtonDisabled = getPage() === '';
 		const shouldAdminButtonDisabled = getPage() === 'admin';
 		const shouldGroupsButtonDisabled = getPage() === 'groups';
@@ -54,6 +55,10 @@ export default class HeaderButtonsComponent extends React.Component<HeaderButton
 		};
 		const loginLinkStyle: React.CSSProperties = {
 			display: renderLoginButton ? 'inline' : 'none',
+			paddingLeft: '5px'
+		};
+		const logoutLinkStyle: React.CSSProperties = {
+			display: renderLoginButton ? 'none' : 'inline',
 			paddingLeft: '5px'
 		};
 		const adminViewableLinkStyle: React.CSSProperties = {
@@ -141,7 +146,7 @@ export default class HeaderButtonsComponent extends React.Component<HeaderButton
 						</Button>
 					</Link>
 					<Link
-						style={adminViewableLinkStyle}
+						style={logoutLinkStyle}
 						to='/'>
 						<Button outline onClick={this.handleLogOut}><FormattedMessage id='log.out' />
 						</Button>
