@@ -114,6 +114,7 @@ export type MapsAction =
 
 /**
  * data format stored in the database
+ *
  * @param id
  * @param name
  * @param note
@@ -137,7 +138,8 @@ export interface MapData{
 }
 
 /**
- *  Data format used keep track of map's state
+ *  Data format used keep track of map's state //added newLine below issue 769
+ *
  *  @param id {number} id <= -1 means it's a new map;
  *  @param name
  *  @param displayable

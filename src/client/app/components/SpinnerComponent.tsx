@@ -14,6 +14,9 @@ interface SpinnerProps {
 
 /**
  * Spinner/loading React component
+ *
+ * @param {SpinnerProps} props A spinnerProp that will be displayed
+ * @returns {props} xxxxxxxx
  */
 function SpinnerComponent(props: SpinnerProps) {
 	const spinnerStyle = {
