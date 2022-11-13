@@ -14,9 +14,10 @@ const { getAllPaths } = require('./createConversionGraph');
  * @param {*} slope The conversion's slope from source to destination.
  * @param {*} intercept The conversion's intercept from source to destination.
  * @param {*} unitName The new unit's name.
+ * @param {*} unitIdentifier The new unit's identifier.
  * @param {*} conn The connection to use.
  */
-async function addNewUnitAndConversion(sourceId, destinationId, slope, intercept, unitName, graph, conn) {
+async function addNewUnitAndConversion(sourceId, destinationId, slope, intercept, unitName, unitIdentifier, graph, conn) {
 	const sourceUnit = await Unit.getById(sourceId, conn);
 	const destinationUnit = await Unit.getById(destinationId, conn);
 	// Add a new units where: name and identifier is unitName, type_of_unit is Unit.type.suffix,
@@ -24,7 +25,7 @@ async function addNewUnitAndConversion(sourceId, destinationId, slope, intercept
 	// Note a type_of_unit of suffix is different than a unit with a suffix string.
 	// Note the admin can later change identifier, displayable and preferredDisplay to something else
 	// since OED does not recreate the unit if it exists so those changes will stay.
-	const newUnit = new Unit(undefined, unitName, unitName, destinationUnit.unitRepresent, sourceUnit.secInRate,
+	const newUnit = new Unit(undefined, unitName, unitIdentifier, destinationUnit.unitRepresent, sourceUnit.secInRate,
 		Unit.unitType.SUFFIX, undefined, '', destinationUnit.displayable, destinationUnit.preferredDisplay, 'suffix unit created by OED');
 	await newUnit.insert(conn);
 
@@ -48,11 +49,19 @@ async function addNewUnitAndConversion(sourceId, destinationId, slope, intercept
  */
 async function verifyConversion(expectedSlope, expectedIntercept, sourceId, destinationId, conn) {
 	const currentConversion = await Conversion.getBySourceDestination(sourceId, destinationId, conn);
-	if (currentConversion.slope !== expectedSlope || currentConversion.intercept !== expectedIntercept) {
-		// While unlikely, the conversion changed so update
-		currentConversion.slope = expectedSlope;
-		currentConversion.intercept = expectedIntercept;
-		await currentConversion.update(conn);
+	// Though unlikely, someone could have removed the conversion so recreate if not there and also avoid dereferencing if does not exist.
+	if (!currentConversion || currentConversion.slope !== expectedSlope || currentConversion.intercept !== expectedIntercept) {
+		if (currentConversion) {
+			// While unlikely, the conversion changed so update
+			currentConversion.slope = expectedSlope;
+			currentConversion.intercept = expectedIntercept;
+			await currentConversion.update(conn);
+		} else {
+			// While even less likely, the original suffix unit was removed so recreate.
+			const newConversion = new Conversion(sourceId, destinationId, false, expectedSlope, expectedIntercept,
+				`(created by OED for unit with suffix when original lost)`);
+			await newConversion.insert(conn);
+		}
 	}
 }
 
@@ -110,11 +119,12 @@ async function handleSuffixUnits(graph, conn) {
 			const [slope, intercept, suffix] = await pathConversion(p, conn);
 			// The name of the needed unit is the last unit name on the path + " of " and the suffix of the path.
 			const unitName = destinationUnit.name + ' of ' + suffix;
+			const unitIdentifier = destinationUnit.identifier + ' of ' + suffix;
 			const neededSuffixUnit = await Unit.getByName(unitName, conn);
 			// See if this unit already exists. Would if this was done before where this path existed.
 			if (neededSuffixUnit === null) {
 				// If not then add the new unit and conversion.
-				await addNewUnitAndConversion(sourceId, destinationId, slope, intercept, unitName, graph, conn);
+				await addNewUnitAndConversion(sourceId, destinationId, slope, intercept, unitName, unitIdentifier, graph, conn);
 			} else {
 				// If it already exists then check if the conversion is correct.
 				await verifyConversion(slope, intercept, sourceId, neededSuffixUnit.id, conn);

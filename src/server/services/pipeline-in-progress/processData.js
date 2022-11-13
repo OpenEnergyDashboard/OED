@@ -4,7 +4,6 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/.
  */
 
-const { is } = require('core-js/core/object');
 const moment = require('moment-timezone');
 const { log } = require('../../log');
 const Meter = require('../../models/Meter');
@@ -76,8 +75,11 @@ async function processData(rows, meterID, timeSort = TimeSortTypesJS.increasing,
 	// These reading values are needed for cumulative data.
 	let meterReading1 = meter.reading;
 	let meterReading2 = meter.reading;
-	let startTimestamp = meter.startTimestamp;
-	let endTimestamp = meter.endTimestamp;
+	// The value stored on the meter is a string representing the time but we want it to be a
+	// moment object for this function. It is not clear we need to do the parseZone and setting
+	// to UTC since should be that but do to be safe since not carefully analyzed.
+	let startTimestamp = moment.parseZone(meter.startTimestamp, undefined, true).tz('UTC', true);
+	let endTimestamp = moment.parseZone(meter.endTimestamp, undefined, true).tz('UTC', true);
 	let meterName = meter.name;
 	// To avoid mistakes, processing does not happen if cumulative reset is true but cumulative is false.
 	// Note you could have an issue below if allowed this since check for reset if negative value but it

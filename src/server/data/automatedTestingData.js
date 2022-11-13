@@ -7,17 +7,11 @@
  */
 
 const promisify = require('es6-promisify');
-const csv = require('csv');
-const parseCsv = promisify(csv.parse);
 const { generateSine, generateCosine } = require('./generateTestingData');
 const Unit = require('../models/Unit');
-const Conversion = require('../models/Conversion');
+const { insertUnits, insertStandardUnits, insertConversions, insertStandardConversions, insertMeters, insertGroups } = require('../util/insertData');
 const { getConnection } = require('../db');
 const { redoCik } = require('../services/graph/redoCik');
-const Meter = require('../models/Meter');
-const Group = require('../models/Group');
-const loadCsvInput = require('../services/pipeline-in-progress/loadCsvInput');
-const moment = require('moment');
 const { refreshAllReadingViews } = require('../services/refreshAllReadingViews');
 const fs = require('fs').promises;
 
@@ -313,81 +307,6 @@ async function generateVariableAmplitudeTestingData() {
 }
 
 /**
- * Inserts special units into the database.
- */
-async function insertSpecialUnits(conn) {
-	// The table contains special units' data.
-	// Each row contains: name, identifier, unitRepresentType, secInRate, typeOfUnit, suffix, displayable, preferredDisplay.
-	const specialUnits = [
-		['Electric_utility', '', Unit.unitRepresentType.QUANTITY, 3600, Unit.unitType.METER, '', Unit.displayableType.NONE, false],
-		['Natural_Gas_BTU', '', Unit.unitRepresentType.QUANTITY, 3600, Unit.unitType.METER, '', Unit.displayableType.NONE, false],
-		['100 W bulb', '100 W bulb for 10 hrs', Unit.unitRepresentType.QUANTITY, 3600, Unit.unitType.UNIT, '', Unit.displayableType.ALL, false],
-		['Natural_Gas_M3', '', Unit.unitRepresentType.QUANTITY, 3600, Unit.unitType.METER, '', Unit.displayableType.NONE, false],
-		['Natural_Gas_dollar', '', Unit.unitRepresentType.QUANTITY, 3600, Unit.unitType.METER, '', Unit.displayableType.NONE, false],
-		['Water_Gallon', '', Unit.unitRepresentType.QUANTITY,  3600, Unit.unitType.METER, '', Unit.displayableType.NONE, false],
-		['US_dollar', 'US $', Unit.unitRepresentType.QUANTITY, 3600, Unit.unitType.UNIT, '', Unit.displayableType.ALL, true],
-		['Euro', '€', Unit.unitRepresentType.QUANTITY, 3600, Unit.unitType.UNIT, '', Unit.displayableType.ALL, true],
-		['Gallon', '', Unit.unitRepresentType.QUANTITY,  3600, Unit.unitType.UNIT, '', Unit.displayableType.ALL, true],
-		['Liter', '', Unit.unitRepresentType.QUANTITY,  3600, Unit.unitType.UNIT, '', Unit.displayableType.ALL, true],
-		['kg CO2', '', Unit.unitRepresentType.QUANTITY, 3600, Unit.unitType.UNIT, 'CO2', Unit.displayableType.ALL, false],
-		['Trash', '', Unit.unitRepresentType.QUANTITY, 3600, Unit.unitType.METER, '', Unit.displayableType.NONE, false],
-		['Temperature_fahrenheit', '', Unit.unitRepresentType.RAW, 3600, Unit.unitType.METER, '', Unit.displayableType.NONE, false],
-		['kW', '', Unit.unitRepresentType.FLOW, 3600, Unit.unitType.UNIT, '', Unit.displayableType.ALL, true],
-		['Electric_kW', '', Unit.unitRepresentType.FLOW, 3600, Unit.unitType.METER, '', Unit.displayableType.NONE, false],
-		['Gallon per minute', 'Gallon (rate)', Unit.unitRepresentType.FLOW,  60, Unit.unitType.UNIT, '', Unit.displayableType.ALL, true],
-		['Liter per hour', 'Liter (rate)', Unit.unitRepresentType.FLOW,  3600, Unit.unitType.UNIT, '', Unit.displayableType.ALL, true],
-		['Water_Gallon_Per_Minute', '', Unit.unitRepresentType.FLOW,  60, Unit.unitType.METER, '', Unit.displayableType.NONE, false]
-	];
-
-	for (let i = 0; i < specialUnits.length; ++i) {
-		const unitData = specialUnits[i];
-		if (await Unit.getByName(unitData[0], conn) === null) {
-			await new Unit(undefined, unitData[0], unitData[1], unitData[2], unitData[3],
-				unitData[4], null, unitData[5], unitData[6], unitData[7], 'special unit').insert(conn);
-		}
-	}
-}
-
-/**
- * Insert special conversions into the database.
- */
-async function insertSpecialConversions(conn) {
-	// The table contains special conversions' data.
-	// Each row contains: sourceName, destinationName, bidirectional, slope, intercept, note.
-	const specialConversions = [
-		['kWh', '100 W bulb', false, 1, 0, 'kWh → 100 W bulb for 10 hrs'],
-		['Electric_utility', 'kWh', false, 1, 0, 'Electric Utility → kWh'],
-		['Electric_utility', 'US_dollar', false, 0.115, 0, 'Electric Utility → US dollar'],
-		['Electric_utility', 'kg CO2', false, 0.709, 0, 'Electric Utility → CO2'],
-		['Natural_Gas_BTU', 'BTU', false, 1, 0, 'Natural Gas BTU → BTU'],
-		['Natural_Gas_BTU', 'Euro', false, 2.6e-6, 0, 'Natural Gas BTU → Euro'],
-		['Natural_Gas_BTU', 'kg CO2', false, 5.28e-5, 0, 'Natural Gas BTU → CO2'],
-		['Natural_Gas_M3', 'M3_gas', false, 1, 0, 'Natural Gas M3 → M3 of gas'],
-		['Natural_Gas_M3', 'US_dollar', false, 0.11, 0, 'Natural Gas M3 → US dollar'],
-		['Water_Gallon', 'Gallon', false, 1, 0, 'Water_Gallon → Gallon'],
-		['Liter', 'Gallon', true, 0.2641729, 0, 'Liter → Gallon'],
-		['US_dollar', 'Euro', true, 0.88, 0, 'US dollar → Euro'],
-		['Natural_Gas_dollar', 'US_dollar', false, 1, 0, 'Natural Gas $ → US dollar'],
-		['kg CO2', 'kg', false, 1, 0, 'CO2 → kg'],
-		['Trash', 'kg CO2', false, 3.24e-6, 0, 'Trash → CO2'],
-		['Trash', 'kg', false, 1, 0, 'Trash → kg'],
-		['Temperature_fahrenheit', 'Fahrenheit', false, 1, 0, 'Temperature Fahrenheit → Fahrenheit'],
-		['Electric_kW', 'kW', false, 1, 0, 'Electric kW → kW'],
-		['Water_Gallon_Per_Minute', 'Gallon per minute', false, 1, 0, 'Water_Gallon_Per_Minute → Gallon per minute'],
-		['Gallon per minute', 'Liter per hour', true, 227.12398, 0, 'Gallon per minute → Liter per hour']
-	];
-
-	for (let i = 0; i < specialConversions.length; ++i) {
-		const conversionData = specialConversions[i];
-		const sourceId = (await Unit.getByName(conversionData[0], conn)).id;
-		const destinationId = (await Unit.getByName(conversionData[1], conn)).id;
-		if (await Conversion.getBySourceDestination(sourceId, destinationId, conn) === null) {
-			await new Conversion(sourceId, destinationId, conversionData[2], conversionData[3], conversionData[4], conversionData[5]).insert(conn);
-		}
-	}
-}
-
-/**
  * Generate mathematical test data.
  */
 async function testData() {
@@ -398,231 +317,134 @@ async function testData() {
 }
 
 /**
- * Insert special meters into the database.
+ * Call the functions to insert special units, conversions, meters and groups.
  */
-async function insertSpecialMeters(conn) {
+async function insertSpecialUnitsConversionsMetersGroups() {
+
+	// The table contains special units' data.
+	const specialUnits = [
+		['Electric_Utility', '', Unit.unitRepresentType.QUANTITY, 3600, Unit.unitType.METER, '', Unit.displayableType.NONE, false, 'special unit'],
+		['Natural_Gas_BTU', '', Unit.unitRepresentType.QUANTITY, 3600, Unit.unitType.METER, '', Unit.displayableType.NONE, false, 'special unit'],
+		['100 w bulb', '100 w bulb for 10 hrs', Unit.unitRepresentType.QUANTITY, 3600, Unit.unitType.UNIT, '', Unit.displayableType.ALL, false, 'special unit'],
+		['Natural_Gas_M3', '', Unit.unitRepresentType.QUANTITY, 3600, Unit.unitType.METER, '', Unit.displayableType.NONE, false, 'special unit'],
+		['Natural_Gas_Dollar', '', Unit.unitRepresentType.QUANTITY, 3600, Unit.unitType.METER, '', Unit.displayableType.NONE, false, 'special unit'],
+		['Water_Gallon', '', Unit.unitRepresentType.QUANTITY, 3600, Unit.unitType.METER, '', Unit.displayableType.NONE, false, 'special unit'],
+		['US dollar', 'US $', Unit.unitRepresentType.QUANTITY, 3600, Unit.unitType.UNIT, '', Unit.displayableType.ALL, true, 'special unit'],
+		['euro', '€', Unit.unitRepresentType.QUANTITY, 3600, Unit.unitType.UNIT, '', Unit.displayableType.ALL, true, 'special unit'],
+		['gallon', '', Unit.unitRepresentType.QUANTITY, 3600, Unit.unitType.UNIT, '', Unit.displayableType.ALL, true, 'special unit'],
+		['liter', '', Unit.unitRepresentType.QUANTITY, 3600, Unit.unitType.UNIT, '', Unit.displayableType.ALL, true, 'special unit'],
+		['kg CO₂', '', Unit.unitRepresentType.QUANTITY, 3600, Unit.unitType.UNIT, 'CO₂', Unit.displayableType.ALL, false, 'special unit'],
+		['Trash', '', Unit.unitRepresentType.QUANTITY, 3600, Unit.unitType.METER, '', Unit.displayableType.NONE, false, 'special unit'],
+		['Temperature_Fahrenheit', '', Unit.unitRepresentType.RAW, 3600, Unit.unitType.METER, '', Unit.displayableType.NONE, false, 'special unit'],
+		['kW', '', Unit.unitRepresentType.FLOW, 3600, Unit.unitType.UNIT, '', Unit.displayableType.ALL, true, 'special unit'],
+		['Electric_kW', '', Unit.unitRepresentType.FLOW, 3600, Unit.unitType.METER, '', Unit.displayableType.NONE, false, 'special unit'],
+		['gallon per minute', 'Gallon (rate)', Unit.unitRepresentType.FLOW, 60, Unit.unitType.UNIT, '', Unit.displayableType.ALL, true, 'special unit'],
+		['liter per hour', 'Liter (rate)', Unit.unitRepresentType.FLOW, 3600, Unit.unitType.UNIT, '', Unit.displayableType.ALL, true, 'special unit'],
+		['Water_Gallon_Per_Minute', '', Unit.unitRepresentType.FLOW, 60, Unit.unitType.METER, '', Unit.displayableType.NONE, false, 'special unit']
+	];
+
+	// The table contains special conversions' data.
+	const specialConversions = [
+		['kWh', '100 w bulb', false, 1, 0, 'kWh → 100 W bulb'],
+		['Electric_Utility', 'kWh', false, 1, 0, 'Electric_Utility → kWh'],
+		['Electric_Utility', 'US dollar', false, 0.115, 0, 'Electric_Utility → US dollar'],
+		['Electric_Utility', 'kg CO₂', false, 0.709, 0, 'Electric_Utility → CO2'],
+		['Natural_Gas_BTU', 'BTU', false, 1, 0, 'Natural_Gas_BTU → BTU'],
+		['Natural_Gas_BTU', 'euro', false, 2.6e-6, 0, 'Natural_Gas_BTU → euro'],
+		['Natural_Gas_BTU', 'kg CO₂', false, 5.28e-5, 0, 'Natural_Gas_BTU → CO2'],
+		['Natural_Gas_M3', 'm3 gas', false, 1, 0, 'Natural_Gas_M3 → m3 of gas'],
+		['Natural_Gas_M3', 'US dollar', false, 0.11, 0, 'Natural_Gas_M3 → US dollar'],
+		['Water_Gallon', 'gallon', false, 1, 0, 'Water_Gallon → gallon'],
+		['liter', 'gallon', true, 0.2641729, 0, 'liter → gallon'],
+		['US dollar', 'euro', true, 0.88, 0, 'US dollar → euro'],
+		['Natural_Gas_Dollar', 'US dollar', false, 1, 0, 'Natural_Gas_Dollar → US dollar'],
+		['kg CO₂', 'kg', false, 1, 0, 'CO2 → kg'],
+		['Trash', 'kg CO₂', false, 3.24e-6, 0, 'Trash → CO2'],
+		['Trash', 'kg', false, 1, 0, 'Trash → kg'],
+		['Temperature_Fahrenheit', 'Fahrenheit', false, 1, 0, 'Temperature_Fahrenheit → Fahrenheit'],
+		['Electric_kW', 'kW', false, 1, 0, 'Electric_kW → kW'],
+		['Water_Gallon_Per_Minute', 'gallon per minute', false, 1, 0, 'Water_Gallon_Per_Minute → gallon per minute'],
+		['gallon per minute', 'liter per hour', true, 227.12398, 0, 'gallon per minute → liter per hour']
+	];
+
 	// The table contains special meters' data.
-	// Each row contains: meter name, unit name, default graphic unit name, displayable, CSV reading data filename, whether to delete csv file.
 	// Should only delete automatically generated ones.
 	// Don't check cases of no default graphic unit since it is set to unit_id for meters.
 	const specialMeters = [
-		['Electric Utility kWh', 'Electric_utility', 'kWh', true, 'data/unit/quantity1-5.csv', false],
-		['Electric Utility kWh 2-6', 'Electric_utility', 'kWh', true, 'data/unit/quantity2-6.csv', false],
-		['Electric Utility kWh in BTU', 'Electric_utility', 'BTU', true, 'data/unit/quantity1-5.csv', false],
-		['Electric Utility kWh in MTon CO2', 'Electric_utility', 'Metric_ton of CO2', true, 'data/unit/quantity1-5.csv', false],
-		['Electric Utility no unit', '', '', true, 'data/unit/quantity1-5.csv', false],
-		['Electric Utility kWh not displayable', 'Electric_utility', 'kWh', false, 'data/unit/quantity1-5.csv', false],
-		['Natural Gas BTU', 'Natural_Gas_BTU', 'BTU', true, 'data/unit/quantity1-5.csv', false],
-		['Natural Gas BTU in Dollar', 'Natural_Gas_BTU', 'US_dollar', true, 'data/unit/quantity1-5.csv', false],
-		['Natural Gas Dollar', 'Natural_Gas_dollar', 'US_dollar', true, 'data/unit/quantity1-5.csv', false],
-		['Natural Gas Cubic Meters', 'Natural_Gas_M3', 'M3_gas', true, 'data/unit/quantity1-5.csv', false],
-		['Water Gallon', 'Water_Gallon', 'Gallon', true, 'data/unit/quantity1-5.csv', false],
-		['Trash Kg', 'Trash', 'kg', true, 'data/unit/quantity1-5.csv', false],
-		['Temp Fahrenheit 0-212', 'Temperature_fahrenheit', 'Fahrenheit', true, 'data/unit/temp0-212.csv', false],
-		['Temp Fahrenheit in Celsius', 'Temperature_fahrenheit', 'Celsius', true, 'data/unit/temp0-212.csv', false],
-		['Electric kW', 'Electric_kW', 'kW', true, 'data/unit/rate1-5.csv', false],
-		['Electric kW 2-6', 'Electric_kW', 'kW', true, 'data/unit/rate2-6.csv', false],
-		['Water Gallon flow 1-5 per minute', 'Water_Gallon_Per_Minute', 'Gallon per minute', true, 'data/unit/rate1-5.csv', false],
-		['test4DaySin kWh', 'Electric_utility', 'kWh', true, 'test/db/data/automatedTests/fourDayFreqTestData.csv', true],
-		['test4HourSin kWh', 'Electric_utility', 'kWh', true, 'test/db/data/automatedTests/fourHourFreqTestData.csv', true],
-		['test23MinSin kWh', 'Electric_utility', 'kWh', true, 'test/db/data/automatedTests/twentyThreeMinuteFreqTestData.csv', true],
-		['test15MinSin kWh', 'Electric_utility', 'kWh', true, 'test/db/data/automatedTests/fifteenMinuteFreqTestData.csv', true],
-		['test23MinCos kWh', 'Electric_utility', 'kWh', true, 'test/db/data/automatedTests/23FreqCosineTestData.csv', true],
-		['testSqSin kWh', 'Electric_utility', 'kWh', true, 'test/db/data/automatedTests/2.5AmpSineSquaredTestData.csv', true],
-		['testSqCos kWh', 'Electric_utility', 'kWh', true, 'test/db/data/automatedTests/2.5AmpCosineSquaredTestData.csv', true],
-		['testAmp1Sin kWh', 'Electric_utility', 'kWh', true, 'test/db/data/automatedTests/15Freq1AmpSineTestData.csv', true],
-		['testAmp2Sin kWh', 'Electric_utility', 'kWh', true, 'test/db/data/automatedTests/15Freq2AmpSineTestData.csv', true],
-		['testAmp3Sin kWh', 'Electric_utility', 'kWh', true, 'test/db/data/automatedTests/15Freq3AmpSineTestData.csv', true],
-		['testAmp4Sin kWh', 'Electric_utility', 'kWh', true, 'test/db/data/automatedTests/15Freq4AmpSineTestData.csv', true],
-		['testAmp5Sin kWh', 'Electric_utility', 'kWh', true, 'test/db/data/automatedTests/15Freq5AmpSineTestData.csv', true],
-		['testAmp6Sin kWh', 'Electric_utility', 'kWh', true, 'test/db/data/automatedTests/15Freq6AmpSineTestData.csv', true],
-		['testAmp7Sin kWh', 'Electric_utility', 'kWh', true, 'test/db/data/automatedTests/15Freq7AmpSineTestData.csv', true]
+		['Electric Utility kWh', 'Electric_Utility', 'kWh', true, undefined, 'special meter', 'data/unit/quantity1-5.csv', false],
+		['Electric Utility kWh 2-6', 'Electric_Utility', 'kWh', true, undefined, 'special meter', 'data/unit/quantity2-6.csv', false],
+		['Electric Utility kWh in BTU', 'Electric_Utility', 'BTU', true, undefined, 'special meter', 'data/unit/quantity1-5.csv', false],
+		['Electric Utility kWh in MTon CO₂', 'Electric_Utility', 'metric ton of CO₂', true, undefined, 'special meter', 'data/unit/quantity1-5.csv', false],
+		['Electric Utility no unit', '', '', true, undefined, 'special meter', 'data/unit/quantity1-5.csv', false],
+		['Electric Utility kWh not displayable', 'Electric_Utility', 'kWh', false, undefined, 'special meter', 'data/unit/quantity1-5.csv', false],
+		['Natural Gas BTU', 'Natural_Gas_BTU', 'BTU', true, undefined, 'special meter', 'data/unit/quantity1-5.csv', false],
+		['Natural Gas BTU in Dollar', 'Natural_Gas_BTU', 'US dollar', true, undefined, 'special meter', 'data/unit/quantity1-5.csv', false],
+		['Natural Gas Dollar', 'Natural_Gas_Dollar', 'US dollar', true, undefined, 'special meter', 'data/unit/quantity1-5.csv', false],
+		['Natural Gas Cubic Meters', 'Natural_Gas_M3', 'm3 gas', true, undefined, 'special meter', 'data/unit/quantity1-5.csv', false],
+		['Water Gallon', 'Water_Gallon', 'gallon', true, undefined, 'special meter', 'data/unit/quantity1-5.csv', false],
+		['Trash Kg', 'Trash', 'kg', true, undefined, 'special meter', 'data/unit/quantity1-5.csv', false],
+		['Temp Fahrenheit 0-212', 'Temperature_Fahrenheit', 'Fahrenheit', true, undefined, 'special meter', 'data/unit/temp0-212.csv', false],
+		['Temp Fahrenheit in Celsius', 'Temperature_Fahrenheit', 'Celsius', true, undefined, 'special meter', 'data/unit/temp0-212.csv', false],
+		['Electric kW', 'Electric_kW', 'kW', true, undefined, 'special meter', 'data/unit/rate1-5.csv', false],
+		['Electric kW 2-6', 'Electric_kW', 'kW', true, undefined, 'special meter', 'data/unit/rate2-6.csv', false],
+		['Water Gallon flow 1-5 per minute', 'Water_Gallon_Per_Minute', 'gallon per minute', true, undefined, 'special meter', 'data/unit/rate1-5.csv', false],
+		['test4DaySin kWh', 'Electric_Utility', 'kWh', true, undefined, 'special meter', 'test/db/data/automatedTests/fourDayFreqTestData.csv', true],
+		['test4HourSin kWh', 'Electric_Utility', 'kWh', true, undefined, 'special meter', 'test/db/data/automatedTests/fourHourFreqTestData.csv', true],
+		['test23MinSin kWh', 'Electric_Utility', 'kWh', true, undefined, 'special meter', 'test/db/data/automatedTests/twentyThreeMinuteFreqTestData.csv', true],
+		['test15MinSin kWh', 'Electric_Utility', 'kWh', true, undefined, 'special meter', 'test/db/data/automatedTests/fifteenMinuteFreqTestData.csv', true],
+		['test23MinCos kWh', 'Electric_Utility', 'kWh', true, undefined, 'special meter', 'test/db/data/automatedTests/23FreqCosineTestData.csv', true],
+		['testSqSin kWh', 'Electric_Utility', 'kWh', true, undefined, 'special meter', 'test/db/data/automatedTests/2.5AmpSineSquaredTestData.csv', true],
+		['testSqCos kWh', 'Electric_Utility', 'kWh', true, undefined, 'special meter', 'test/db/data/automatedTests/2.5AmpCosineSquaredTestData.csv', true],
+		['testAmp1Sin kWh', 'Electric_Utility', 'kWh', true, undefined, 'special meter', 'test/db/data/automatedTests/15Freq1AmpSineTestData.csv', true],
+		['testAmp2Sin kWh', 'Electric_Utility', 'kWh', true, undefined, 'special meter', 'test/db/data/automatedTests/15Freq2AmpSineTestData.csv', true],
+		['testAmp3Sin kWh', 'Electric_Utility', 'kWh', true, undefined, 'special meter', 'test/db/data/automatedTests/15Freq3AmpSineTestData.csv', true],
+		['testAmp4Sin kWh', 'Electric_Utility', 'kWh', true, undefined, 'special meter', 'test/db/data/automatedTests/15Freq4AmpSineTestData.csv', true],
+		['testAmp5Sin kWh', 'Electric_Utility', 'kWh', true, undefined, 'special meter', 'test/db/data/automatedTests/15Freq5AmpSineTestData.csv', true],
+		['testAmp6Sin kWh', 'Electric_Utility', 'kWh', true, undefined, 'special meter', 'test/db/data/automatedTests/15Freq6AmpSineTestData.csv', true],
+		['testAmp7Sin kWh', 'Electric_Utility', 'kWh', true, undefined, 'special meter', 'test/db/data/automatedTests/15Freq7AmpSineTestData.csv', true]
 	];
-	// Function used to map values when reading the CSV file.
-	function mapRowsToModel(row) {
-		const reading = row[0];
-		// Need to work in UTC time since that is what the database returns and comparing
-		// to database values. Done in all moment objects in this test.
-		// const startTimestamp = moment.utc(row[1], 'HH:mm:ss MM/DD/YYYY');
-		const startTimestamp = moment.utc(row[1], true);
-		const endTimestamp = moment.utc(row[2], true);
-		return [reading, startTimestamp, endTimestamp];
-	}
 
-	// Generate the mathematical test data needed.
-	// TODO The code could be changed to generate the data and use without writing to a file.
-	await testData();
-
-	console.log(`Start loading each set of test data into OED (${specialMeters.length} files of varying length, may take minutes):`);
-	for (let i = 0; i < specialMeters.length; ++i) {
-		// Meter values from above.
-		const meterData = specialMeters[i];
-		const meterName = meterData[0];
-		console.log(`    loading meter ${meterName} from file ${meterData[4]}`);
-		// We get the needed unit id from the name given.
-		let meterUnit, meterGraphicUnit;
-		if (meterData[1] === '') {
-			// No unit so make it -99 for both unit and default graphic unit
-			meterUnit = -99;
-			meterGraphicUnit = -99;
-		} else {
-			meterUnit = (await Unit.getByName(meterData[1], conn)).id;
-			meterGraphicUnit = (await Unit.getByName(meterData[2], conn)).id;
-		}
-		const meter = new Meter(
-			undefined, // id
-			meterName, // name
-			null, // URL
-			false, // enabled
-			meterData[3], //displayable
-			'other', //type
-			null, // timezone
-			undefined, // gps
-			undefined, // identifier
-			null, // note
-			null, //area
-			undefined, // cumulative
-			undefined, //cumulativeReset
-			undefined, // cumulativeResetStart
-			undefined, // cumulativeResetEnd
-			90000, // readingGap
-			90000, // readingVariation
-			undefined, //readingDuplication
-			undefined, // timeSort
-			undefined, //endOnlyTime
-			undefined, // reading
-			undefined, // startTimestamp
-			undefined, // endTimestamp
-			meterUnit, // unit
-			meterGraphicUnit // default graphic unit
-		);
-		if (await meter.existsByName(conn)) {
-			console.log(`Warning: meter '${meter.name}' existed so not changed.`);
-		} else {
-			// Only insert the meter and its readings if the meter did not already exist.
-			await meter.insert(conn);
-			const filename = `src/server/${meterData[4]}`;
-			await loadCsvInput(
-				filename, // filePath
-				meter.id, // meterID
-				mapRowsToModel, // mapRowToModel
-				meter.timeSort, //timeSort
-				meter.readingDuplication, //readingRepetition
-				meter.cumulative, // isCumulative
-				meter.cumulativeReset, // cumulativeReset
-				meter.cumulativeResetStart, // cumulativeResetStart
-				meter.cumulativeResetEnd, // cumulativeResetEnd
-				meter.readingGap, // readingGap
-				meter.readingVariation, // readingLengthVariation
-				meter.endOnlyTime, // isEndOnly
-				true, // headerRow
-				false, // shouldUpdate
-				undefined, // conditionSet
-				conn
-			);
-			// Delete mathematical test data file just uploaded. They have true for delete.
-			if (meterData[5] === true) {
-				await fs.unlink(filename);
-			}
-		}
-	}
-}
-
-/**
- * Insert special groups into the database.
- */
-async function insertSpecialGroups(conn) {
 	// This assumes the insertSpecialMeters has been run.
 	// The table contains special groups' data.
-	// Each row contains: group name, default graphic unit name, displayable, array of meter names to add to group, array of group names to add to group.
 	// Don't create groups with of raw type since should not be graphed as a group.
 	const specialGroups = [
-		['Electric Utility 1-5 + 2-6 kWh', 'kWh', true, ['Electric Utility kWh', 'Electric Utility kWh 2-6'], []],
-		['Electric Utility 1-5 + Natural Gas Dollar Euro', 'Euro', true, ['Electric Utility kWh', 'Natural Gas Dollar'], []],
-		['Electric Utility 1-5 + 2-6 Dollar', 'US_dollar', true, ['Electric Utility kWh', 'Electric Utility kWh 2-6'], []],
-		['Natural Gas Dollar Euro', 'Euro', true, ['Natural Gas Dollar'], []],
-		['Electric kW + 2-6 kW', 'kW', true, ['Electric kW', 'Electric kW 2-6'], []],
-		['Electric Utility 1-5 kWh not displayable', 'kWh', false, ['Electric Utility kWh'], []],
-		['SqSin + SqCos kWh', 'kWh', true, ['testSqSin kWh', 'testSqCos kWh'], []],
-		['SqSin + SqCos no unit', '', true, ['testSqSin kWh', 'testSqCos kWh'], []],
-		['Amp 1 + 5 kWh', 'kWh', true, ['testAmp1Sin kWh', 'testAmp5Sin kWh'], []],
-		['Amp 2 + 6 kWh', 'kWh', true, ['testAmp2Sin kWh', 'testAmp6Sin kWh'], []],
-		['Amp 3 + 4 kWh', 'kWh', true, ['testAmp3Sin kWh', 'testAmp4Sin kWh'], []],
-		['Amp 2 + (1 + 5) kWh', 'kWh', true, ['testAmp2Sin kWh'], ['Amp 1 + 5 kWh']],
-		['Amp 3 + 6 + (2 + (1 + 5)) + (3 + 4) kWh', 'kWh', true, ['testAmp3Sin kWh', 'testAmp6Sin kWh'], ['Amp 2 + (1 + 5) kWh', 'Amp 3 + 4 kWh']],
-		['Amp 6 + 7 + (1 + 5) + (2 + 6) + (3 + 4) kWh', 'kWh', true, ['testAmp6Sin kWh', 'testAmp7Sin kWh'], ['Amp 2 + 6 kWh', 'Amp 3 + 4 kWh', 'Amp 1 + 5 kWh']]
+		['Electric Utility 1-5 + 2-6 kWh', 'kWh', true, undefined, 'special group', ['Electric Utility kWh', 'Electric Utility kWh 2-6'], []],
+		['Electric Utility 1-5 + Natural Gas Dollar Euro', 'euro', true, undefined, 'special group', ['Electric Utility kWh', 'Natural Gas Dollar'], []],
+		['Electric Utility 1-5 + 2-6 Dollar', 'US dollar', true, undefined, 'special group', ['Electric Utility kWh', 'Electric Utility kWh 2-6'], []],
+		['Natural Gas Dollar Euro', 'euro', true, undefined, 'special group', ['Natural Gas Dollar'], []],
+		['Electric kW + 2-6 kW', 'kW', true, undefined, 'special group', ['Electric kW', 'Electric kW 2-6'], []],
+		['Electric Utility 1-5 kWh not displayable', 'kWh', false, undefined, 'special group', ['Electric Utility kWh'], []],
+		['SqSin + SqCos kWh', 'kWh', true, undefined, 'special group', ['testSqSin kWh', 'testSqCos kWh'], []],
+		['SqSin + SqCos no unit', '', true, undefined, 'special group', ['testSqSin kWh', 'testSqCos kWh'], []],
+		['Amp 1 + 5 kWh', 'kWh', true, undefined, 'special group', ['testAmp1Sin kWh', 'testAmp5Sin kWh'], []],
+		['Amp 2 + 6 kWh', 'kWh', true, undefined, 'special group', ['testAmp2Sin kWh', 'testAmp6Sin kWh'], []],
+		['Amp 3 + 4 kWh', 'kWh', true, undefined, 'special group', ['testAmp3Sin kWh', 'testAmp4Sin kWh'], []],
+		['Amp 2 + (1 + 5) kWh', 'kWh', true, undefined, 'special group', ['testAmp2Sin kWh'], ['Amp 1 + 5 kWh']],
+		['Amp 3 + 6 + (2 + (1 + 5)) + (3 + 4) kWh', 'kWh', true, undefined, 'special group', ['testAmp3Sin kWh', 'testAmp6Sin kWh'], ['Amp 2 + (1 + 5) kWh', 'Amp 3 + 4 kWh']],
+		['Amp 6 + 7 + (1 + 5) + (2 + 6) + (3 + 4) kWh', 'kWh', true, undefined, 'special group', ['testAmp6Sin kWh', 'testAmp7Sin kWh'], ['Amp 2 + 6 kWh', 'Amp 3 + 4 kWh', 'Amp 1 + 5 kWh']]
 	];
-	for (let i = 0; i < specialGroups.length; ++i) {
-		// Group values from above.
-		const groupData = specialGroups[i];
-		const groupName = groupData[0];
-		console.log(`    creating group ${groupName}`);
-		// We get the needed unit id from the name given.
-		let groupDefaultGraphicUnit;
-		if (groupData[1] === '') {
-			// No unit so make it -99.
-			groupDefaultGraphicUnit = -99;
-		} else {
-			groupDefaultGraphicUnit = (await Unit.getByName(groupData[1], conn)).id;
-		}
-		const group = new Group(
-			undefined, // id
-			groupName, // name
-			groupData[2], //displayable
-			undefined, // gps
-			null, // note
-			null, //area
-			groupDefaultGraphicUnit // default graphic unit
-		);
-		if (await group.existsByName(conn)) {
-			console.log(`Warning: group '${group.name}' existed so not changed.`);
-		} else {
-			// Only insert the group and its children if the group did not already exist.
-			await group.insert(conn);
-			// Get it again so have id.
-			const parent = await Group.getByName(group.name, conn);
-			// Now add the meter children.
-			for (let k = 0; k < groupData[3].length; ++k) {
-				const childMeter = groupData[3][k];
-				console.log(`      adding child meter ${childMeter}`);
-				// Use meter id to add to group.
-				const childId = (await Meter.getByName(childMeter, conn)).id;
-				await parent.adoptMeter(childId, conn);
-			}
-			// Now add the group children.
-			for (let k = 0; k < groupData[4].length; ++k) {
-				const childGroup = groupData[4][k];
-				console.log(`      adding child group ${childGroup}`);
-				// Use group id to add to group.
-				const childId = (await Group.getByName(childGroup, conn)).id;
-				await parent.adoptGroup(childId, conn);
-			}
-		}
-	}
-}
-
-/**
- * Call the functions to insert special units, conversions and meters.
- */
-async function insertSpecialUnitsConversionsMeters() {
-	console.log("See src/server/data/automatedTestingData.js in insertSpecialUnitsConversionsMeters() to see how to remove the data that is being inserted.\n");
+	console.log("See src/server/data/automatedTestingData.js in insertSpecialUnitsConversionsMetersGroups() to see how to remove the data that is being inserted.\n");
 	const conn = getConnection();
 	// These should be there after createDB but do it to be safe in case they are not present.
 	// It will skip ones that already there.
-	await Unit.insertStandardUnits(conn);
-	await Conversion.insertStandardConversions(conn);
+	await insertStandardUnits(conn);
+	await insertStandardConversions(conn);
 	// Add items for developer testing.
-	await insertSpecialUnits(conn);
-	await insertSpecialConversions(conn);
+	await insertUnits(specialUnits, conn);
+	await insertConversions(specialConversions, conn);
 	// Recreate the Cik entries since changed units/conversions.
 	// Do now since needed to insert meters with suffix units.
 	await redoCik(conn);
-	await insertSpecialMeters(conn);
+	// Generate the mathematical test data needed.
+	// TODO The code could be changed to generate the data and use without writing to a file.
+	await testData();
+	console.log(`Start loading each set of test data into OED meters (${specialMeters.length} files of varying length, may take minutes):`);
+	await insertMeters(specialMeters, conn);
 	// Recreate the Cik entries since changed meters.
 	await redoCik(conn);
 	// Refresh the readings since added new ones.
 	await refreshAllReadingViews();
-	insertSpecialGroups(conn);
+	await insertGroups(specialGroups, conn);
 }
 
 /*
@@ -636,7 +458,7 @@ Get into postgres terminal inside the database Docker container and then do:
 psql -U oed
 -- Remove all the readings.
 -- Normally gives "DELETE 575320"
-delete from readings where meter_id in (select id from meters where name in ('Electric Utility kWh', 'Electric Utility kWh 2-6', 'Electric Utility kWh in BTU', 'Electric Utility kWh in MTon CO2', 'Electric Utility no unit', 'Electric Utility kWh not displayable', 'Natural Gas BTU', 'Natural Gas BTU in Dollar', 'Natural Gas Dollar', 'Natural Gas Cubic Meters', 'Water Gallon', 'Trash Kg', 'Temp Fahrenheit 0-212', 'Temp Fahrenheit in Celsius', 'Electric kW', 'Electric kW 2-6', 'Water Gallon flow 1-5 per minute', 'test4DaySin kWh', 'test4HourSin kWh', 'test23MinSin kWh', 'test15MinSin kWh', 'test23MinCos kWh', 'testSqSin kWh', 'testSqCos kWh', 'testAmp1Sin kWh', 'testAmp2Sin kWh', 'testAmp3Sin kWh', 'testAmp4Sin kWh', 'testAmp5Sin kWh', 'testAmp6Sin kWh', 'testAmp7Sin kWh'));
+delete from readings where meter_id in (select id from meters where name in ('Electric Utility kWh', 'Electric Utility kWh 2-6', 'Electric Utility kWh in BTU', 'Electric Utility kWh in MTon CO₂', 'Electric Utility no unit', 'Electric Utility kWh not displayable', 'Natural Gas BTU', 'Natural Gas BTU in Dollar', 'Natural Gas Dollar', 'Natural Gas Cubic Meters', 'Water Gallon', 'Trash Kg', 'Temp Fahrenheit 0-212', 'Temp Fahrenheit in Celsius', 'Electric kW', 'Electric kW 2-6', 'Water Gallon flow 1-5 per minute', 'test4DaySin kWh', 'test4HourSin kWh', 'test23MinSin kWh', 'test15MinSin kWh', 'test23MinCos kWh', 'testSqSin kWh', 'testSqCos kWh', 'testAmp1Sin kWh', 'testAmp2Sin kWh', 'testAmp3Sin kWh', 'testAmp4Sin kWh', 'testAmp5Sin kWh', 'testAmp6Sin kWh', 'testAmp7Sin kWh'));
 -- remove all groups.
 -- Normally gives "DELETE 25"
 delete from groups_immediate_meters where group_id in (select id from groups where name in ('Electric Utility 1-5 + 2-6 kWh', 'Electric Utility 1-5 + Natural Gas Dollar Euro', 'Electric Utility 1-5 + 2-6 Dollar', 'Natural Gas Dollar Euro', 'Electric kW + 2-6 kW', 'Electric Utility 1-5 kWh not displayable', 'SqSin + SqCos kWh', 'SqSin + SqCos no unit', 'Amp 1 + 5 kWh', 'Amp 2 + 6 kWh', 'Amp 3 + 4 kWh', 'Amp 2 + (1 + 5) kWh', 'Amp 3 + 6 + (2 + (1 + 5)) + (3 + 4) kWh', 'Amp 6 + 7 + (1 + 5) + (2 + 6) + (3 + 4) kWh'));
@@ -645,35 +467,35 @@ delete from groups_immediate_children where parent_id in (select id from groups 
 -- Normally gives "DELETE 14"
 delete from groups where name in ('Electric Utility 1-5 + 2-6 kWh', 'Electric Utility 1-5 + Natural Gas Dollar Euro', 'Electric Utility 1-5 + 2-6 Dollar', 'Natural Gas Dollar Euro', 'Electric kW + 2-6 kW', 'Electric Utility 1-5 kWh not displayable', 'SqSin + SqCos kWh', 'SqSin + SqCos no unit', 'Amp 1 + 5 kWh', 'Amp 2 + 6 kWh', 'Amp 3 + 4 kWh', 'Amp 2 + (1 + 5) kWh', 'Amp 3 + 6 + (2 + (1 + 5)) + (3 + 4) kWh', 'Amp 6 + 7 + (1 + 5) + (2 + 6) + (3 + 4) kWh');
 -- Remove all the meters. Normally gives "DELETE 31"
-delete from meters where name in ('Electric Utility kWh', 'Electric Utility kWh 2-6', 'Electric Utility kWh in BTU', 'Electric Utility kWh in MTon CO2', 'Electric Utility no unit', 'Electric Utility kWh not displayable', 'Natural Gas BTU', 'Natural Gas BTU in Dollar', 'Natural Gas Dollar', 'Natural Gas Cubic Meters', 'Water Gallon', 'Trash Kg', 'Temp Fahrenheit 0-212', 'Temp Fahrenheit in Celsius', 'Electric kW', 'Electric kW 2-6', 'Water Gallon flow 1-5 per minute', 'test4DaySin kWh', 'test4HourSin kWh', 'test23MinSin kWh', 'test15MinSin kWh', 'test23MinCos kWh', 'testSqSin kWh', 'testSqCos kWh', 'testAmp1Sin kWh', 'testAmp2Sin kWh', 'testAmp3Sin kWh', 'testAmp4Sin kWh', 'testAmp5Sin kWh', 'testAmp6Sin kWh', 'testAmp7Sin kWh');
+delete from meters where name in ('Electric Utility kWh', 'Electric Utility kWh 2-6', 'Electric Utility kWh in BTU', 'Electric Utility kWh in MTon CO₂', 'Electric Utility no unit', 'Electric Utility kWh not displayable', 'Natural Gas BTU', 'Natural Gas BTU in Dollar', 'Natural Gas Dollar', 'Natural Gas Cubic Meters', 'Water Gallon', 'Trash Kg', 'Temp Fahrenheit 0-212', 'Temp Fahrenheit in Celsius', 'Electric kW', 'Electric kW 2-6', 'Water Gallon flow 1-5 per minute', 'test4DaySin kWh', 'test4HourSin kWh', 'test23MinSin kWh', 'test15MinSin kWh', 'test23MinCos kWh', 'testSqSin kWh', 'testSqCos kWh', 'testAmp1Sin kWh', 'testAmp2Sin kWh', 'testAmp3Sin kWh', 'testAmp4Sin kWh', 'testAmp5Sin kWh', 'testAmp6Sin kWh', 'testAmp7Sin kWh');
 -- remove conversions
 -- Normally 22 total
 delete from conversions where source_id = (select id from units where name = 'kWh') and destination_id = (select id from units where name = '100 W bulb');
 delete from conversions where source_id = (select id from units where name = 'Electric_utility') and destination_id = (select id from units where name = 'kWh');
 delete from conversions where source_id = (select id from units where name = 'Electric_utility') and destination_id = (select id from units where name = 'US_dollar');
-delete from conversions where source_id = (select id from units where name = 'Electric_utility') and destination_id = (select id from units where name = 'kg CO2');
+delete from conversions where source_id = (select id from units where name = 'Electric_utility') and destination_id = (select id from units where name = 'kg CO₂');
 delete from conversions where source_id = (select id from units where name = 'Natural_Gas_BTU') and destination_id = (select id from units where name = 'BTU');
 delete from conversions where source_id = (select id from units where name = 'Natural_Gas_BTU') and destination_id = (select id from units where name = 'Euro');
-delete from conversions where source_id = (select id from units where name = 'Natural_Gas_BTU') and destination_id = (select id from units where name = 'kg CO2');
+delete from conversions where source_id = (select id from units where name = 'Natural_Gas_BTU') and destination_id = (select id from units where name = 'kg CO₂');
 delete from conversions where source_id = (select id from units where name = 'Natural_Gas_M3') and destination_id = (select id from units where name = 'M3_gas');
 delete from conversions where source_id = (select id from units where name = 'Natural_Gas_M3') and destination_id = (select id from units where name = 'US_dollar');
 delete from conversions where source_id = (select id from units where name = 'Water_Gallon') and destination_id = (select id from units where name = 'Gallon');
 delete from conversions where source_id = (select id from units where name = 'Liter') and destination_id = (select id from units where name = 'Gallon');
 delete from conversions where source_id = (select id from units where name = 'US_dollar') and destination_id = (select id from units where name = 'Euro');
 delete from conversions where source_id = (select id from units where name = 'Natural_Gas_dollar') and destination_id = (select id from units where name = 'US_dollar');
--- next two were auto-created for suffix CO2
-delete from conversions where source_id = (select id from units where name = 'kg CO2') and destination_id = (select id from units where name = 'kg of CO2');
-delete from conversions where source_id = (select id from units where name = 'kg CO2') and destination_id = (select id from units where name = 'Metric_ton of CO2');
-delete from conversions where source_id = (select id from units where name = 'kg CO2') and destination_id = (select id from units where name = 'kg');
-delete from conversions where source_id = (select id from units where name = 'Trash') and destination_id = (select id from units where name = 'kg CO2');
+-- next two were auto-created for suffix CO₂
+delete from conversions where source_id = (select id from units where name = 'kg CO₂') and destination_id = (select id from units where name = 'kg of CO₂');
+delete from conversions where source_id = (select id from units where name = 'kg CO₂') and destination_id = (select id from units where name = 'Metric_ton of CO₂');
+delete from conversions where source_id = (select id from units where name = 'kg CO₂') and destination_id = (select id from units where name = 'kg');
+delete from conversions where source_id = (select id from units where name = 'Trash') and destination_id = (select id from units where name = 'kg CO₂');
 delete from conversions where source_id = (select id from units where name = 'Trash') and destination_id = (select id from units where name = 'kg');
 delete from conversions where source_id = (select id from units where name = 'Temperature_fahrenheit') and destination_id = (select id from units where name = 'Fahrenheit');
 delete from conversions where source_id = (select id from units where name = 'Electric_kW') and destination_id = (select id from units where name = 'kW');
 delete from conversions where source_id = (select id from units where name = 'Water_Gallon_Per_Minute') and destination_id = (select id from units where name = 'Gallon per minute');
 delete from conversions where source_id = (select id from units where name = 'Gallon per minute') and destination_id = (select id from units where name = 'Liter per hour');
--- remove units; last two were created as part of suffix unit on CO2
+-- remove units; last two were created as part of suffix unit on CO₂
 -- normally gives "DELETE 20"
-delete from units where name in ('Electric_utility', 'Natural_Gas_BTU', '100 W bulb', 'Natural_Gas_M3', 'Natural_Gas_dollar', 'Water_Gallon', 'US_dollar', 'US $', 'Euro', 'Gallon', 'Liter', 'kg CO2', 'Trash', 'Temperature_fahrenheit', 'kW', 'Electric_kW', 'Gallon per minute', 'Gallon (rate)', 'Liter per hour', 'Liter (rate)', 'Water_Gallon_Per_Minute', 'kg of CO2', 'Metric_ton of CO2');
+delete from units where name in ('Electric_utility', 'Natural_Gas_BTU', '100 W bulb', 'Natural_Gas_M3', 'Natural_Gas_dollar', 'Water_Gallon', 'US_dollar', 'US $', 'Euro', 'Gallon', 'Liter', 'kg CO₂', 'Trash', 'Temperature_fahrenheit', 'kW', 'Electric_kW', 'Gallon per minute', 'Gallon (rate)', 'Liter per hour', 'Liter (rate)', 'Water_Gallon_Per_Minute', 'kg of CO₂', 'Metric_ton of CO₂');
 -- Quit postgres.
 \q
 */
@@ -690,8 +512,5 @@ module.exports = {
 	generateOneMinuteTestingData,
 	generateTestingData,
 	generateVariableAmplitudeTestingData,
-	insertSpecialUnitsConversionsMeters,
-	insertSpecialUnits,
-	insertSpecialConversions,
-	insertSpecialMeters
+	insertSpecialUnitsConversionsMetersGroups
 };

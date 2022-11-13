@@ -59,5 +59,6 @@ async function loadCsvInput(
 	}
 }
 
-module.exports = loadCsvInput;
-
+module.exports = {
+	loadCsvInput
+};
