@@ -9,7 +9,7 @@ import { PreferenceRequestItem } from '../types/items';
 import * as t from '../types/redux/admin';
 import { ActionType, Dispatch, GetState, Thunk } from '../types/redux/actions';
 import { State } from '../types/redux/state';
-import { preferencesApi } from '../utils/api';
+import { conversionArrayApi, preferencesApi } from '../utils/api';
 import translate from '../utils/translate';
 import { LanguageTypes } from '../types/redux/i18n';
 import * as moment from 'moment';
@@ -125,6 +125,29 @@ export function submitPreferencesIfNeeded(): Thunk {
 	return (dispatch: Dispatch, getState: GetState) => {
 		if (shouldSubmitPreferenceData(getState())) {
 			return dispatch(submitPreferences());
+		}
+		return Promise.resolve();
+	};
+}
+
+function updateCikAndDBViews(): t.UpdateCikAndDBViews {
+	return { type: ActionType.UpdateCikAndDBViews };
+}
+
+function shouldUpdateCikAndDBViews(state: State): boolean {
+	return !state.admin.isUpdatingCikAndDBViews;
+}
+
+/**
+ * Redo Cik and/or refresh reading views.
+ * This function is called when some changes in units/conversions affect the Cik table or reading views.
+ */
+export function updateCikAndDBViewsIfNeeded(shouldRedoCik: boolean, shouldRefreshReadingViews: boolean): Thunk {
+	return async (dispatch: Dispatch, getState: GetState) => {
+		if (shouldUpdateCikAndDBViews(getState())) {
+			dispatch(updateCikAndDBViews());
+			await conversionArrayApi.refresh(shouldRedoCik, shouldRefreshReadingViews);
+			window.location.reload();
 		}
 		return Promise.resolve();
 	};

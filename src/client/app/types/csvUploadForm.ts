@@ -51,6 +51,8 @@ export interface ReadingsCSVUploadPreferencesItem extends CSVUploadPreferences {
 	refreshHourlyReadings: boolean;
 	refreshReadings: boolean;
 	timeSort: TimeSortTypes;
+	honorDst: boolean;
+	relaxedParsing: boolean;
 }
 
 export interface ReadingsCSVUploadProps extends ReadingsCSVUploadPreferencesItem, CSVUploadProps{
@@ -67,6 +69,8 @@ export interface ReadingsCSVUploadProps extends ReadingsCSVUploadPreferencesItem
 	toggleCreateMeter: () => void;
 	toggleRefreshHourlyReadings: () => void;
 	toggleRefreshReadings: () => void;
+	toggleHonorDst: () => void;
+	toggleRelaxedParsing: () => void;
 }
 
 // MetersCSVUpload, MetersCSVUploadPreferencesItem, MetersCSVUploadProps should be interfaces. However, at the moment does not add anything new.

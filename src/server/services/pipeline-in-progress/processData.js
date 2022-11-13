@@ -11,6 +11,8 @@ const Reading = require('../../models/Reading');
 const handleCumulativeReset = require('./handleCumulativeReset');
 const { validateReadings } = require('./validateReadings');
 const { TimeSortTypesJS } = require('../csvPipeline/validateCsvUploadParams');
+const { meterTimezone } = require('../meterTimezone');
+
 // The default start/end timestamps that are set to the first
 // day of time in moment. As always, we want to use UTC.
 const E0 = moment(0).utc()
@@ -44,11 +46,13 @@ const E0 = moment(0).utc()
  * @param {boolean} isEndTime true if the data only has an endTimestamp, default false. If true then each index in row only has start timestamp.
  * @param {dict} conditionSet used to validate readings (minVal, maxVal, minDate, maxDate, interval, maxError)
  * @param {array} conn the connection to the database
+ * @param {boolean} honorDst true if this meter's times shift when crossing DST, false otherwise (default false)
+ * @param {boolean} relaxedParsing true if the parsing of readings allows for non-standard formats, default if false since this can give bad dates/times.
  * @returns {object[]} {array of readings accepted, true if all readings accepted and false otherwise, all messages from processing}
  */
 async function processData(rows, meterID, timeSort = TimeSortTypesJS.increasing, readingRepetition, isCumulative, cumulativeReset,
 	resetStart = '00:00:00.000', resetEnd = '23:59:99.999', readingGap = 0, readingLengthVariation = 0, isEndTime = false,
-	conditionSet, conn) {
+	conditionSet, conn, honorDst = false, relaxedParsing = false) {
 	// Holds all the warning message to pass back to inform user.
 	// Note they use basic HTML because the messages can be long/complex and it was felt it would be easy to put it into a web browser
 	// to make them easier to read.
@@ -68,19 +72,57 @@ async function processData(rows, meterID, timeSort = TimeSortTypesJS.increasing,
 	// Convert readingGap and readingLengthVariation to milliseconds to stay consistent with moment.diff() which returns the difference in milliseconds
 	const msReadingGap = readingGap * 1000;
 	const msReadingLengthVariation = readingLengthVariation * 1000;
-	// Retrieve and set the last reading stored for the meter
-	// TODO: Create a redux state to hold these values with other meter states
+	// The following variables are only used if honorDst is true.
+	// Holds the endTimeStamp of the previous reading when we cross out of DST.
+	let prevEndTimestamp;
+	// Holds the original endTimestamp of readings since it is sometimes shifted.
+	let origEndTimestamp;
+	// Tells if processing DST data across readings.
+	let inDst = false;
+	// Tells if just stopped inDst with this reading.
+	let inDstStop = false;
+	// The start time to use for saved reading if first reading to accept after backward shift out of daylight savings time.
+	let startTimestampUse;
+	// Going to need to know meter timezone if honoring DST
+	let meterZone;
+	// The shift in time when a DST crossing occurs.
+	let shift;
+	// Tells if we need to split this reading.
+	let splitDst = false;
+	// Date/time daylight savings starts/ends when a crossing occurs.
+	// The array holding this in moment-timezone is called untils.
+	let zoneUntil;
+	// The start and end timestamp in the timezone of the provided meter.
+	// Retrieve and set the last reading and info stored for the meter
+	// TODO We have an issue that this will not return all the values unless admin but we have a CSV login.
 	const meter = await Meter.getByID(meterID, conn);
 	let meterReading = meter.reading;
 	// These reading values are needed for cumulative data.
 	let meterReading1 = meter.reading;
 	let meterReading2 = meter.reading;
-	// The value stored on the meter is a string representing the time but we want it to be a
-	// moment object for this function. It is not clear we need to do the parseZone and setting
-	// to UTC since should be that but do to be safe since not carefully analyzed.
-	let startTimestamp = moment.parseZone(meter.startTimestamp, undefined, true).tz('UTC', true);
-	let endTimestamp = moment.parseZone(meter.endTimestamp, undefined, true).tz('UTC', true);
+	// These are the start and end times in the timezone they were saved and in UTC.
+	// Note the meter stores as a string to preserve the shift.
+	// The use of timezone here is a misnomer because this is really the offset.
+	// See below on why create timestamps this way.
+	let startTimestampTz = moment.parseZone(meter.startTimestamp, true);
+	let endTimestampTz = moment.parseZone(meter.endTimestamp, true);
+	let startTimestamp = moment.parseZone(startTimestampTz.clone()).tz('UTC', true);
+	let endTimestamp = moment.parseZone(endTimestampTz.clone()).tz('UTC', true);
 	let meterName = meter.name;
+	// These only happen if worried about DST.
+	if (honorDst) {
+		// Get the meter timezone since the same while processing this data.
+		meterZone = await meterTimezone(meter);
+		// See if were processing a shift from DST (inDst) when last batch of readings ended so need to continue.
+		prevEndTimestamp = moment.parseZone(meter.previousEnd, true);
+		if (!isFirst(prevEndTimestamp)) {
+			// Has other value so reset to start from that point.
+			// Do similar steps to below when starting inDst.
+			const endTimestampMeterZone = endTimestamp.clone().tz(meterZone, true);
+			zoneUntil = getZoneUntil(meterZone, endTimestampMeterZone);
+			inDst = true;
+		}
+	}
 	// To avoid mistakes, processing does not happen if cumulative reset is true but cumulative is false.
 	// Note you could have an issue below if allowed this since check for reset if negative value but it
 	// might be true with regular time sort.
@@ -111,6 +153,9 @@ async function processData(rows, meterID, timeSort = TimeSortTypesJS.increasing,
 	// This current reading should not be used until it is reset later with the desired reading.
 	let currentReading = new Reading(meterID, meterReading, startTimestamp, endTimestamp);
 	let prevReading = currentReading;
+	// For end only times, you need to know the previous start time in timezone.
+	// If coming off the meter then it is UTC.
+	let prevEndTimestampTz = endTimestampTz;
 	// Tracks if a reading is okay to use.
 	let readingOK;
 	// Control values for the loop. By reversing the loop if the readings are decreasing in time they appear
@@ -128,7 +173,7 @@ async function processData(rows, meterID, timeSort = TimeSortTypesJS.increasing,
 		stepLoop = -readingRepetition;
 	}
 	for (let index = startLoop; continueLoop(index, isAscending, rows.length); index += stepLoop) {
-		// Tge reading start okay. To be safe, do it in every case.
+		// The reading starts okay. To be safe, do it in every case.
 		readingOK = true;
 		// The logic generally makes it safe to set rather than accumulate the error messages.
 		// However, warnings could get lost (since readingOK not false). Since accumulating
@@ -136,30 +181,58 @@ async function processData(rows, meterID, timeSort = TimeSortTypesJS.increasing,
 		// the code uses accumulation and starts empty each time through the loop.
 		errMsg = '';
 		// If rows already has a moment (instead of a string) this still works fine.
-		// Moment parses readings with date first, time first, dates separated by / or -,
-		// times with or without seconds. The date can have the year first or last but
-		// cannot have the day first (month okay). Thus, we just use the default parsing.
-		// Set moment to strict mode so will give Invalid date if any issues.
+		// Set moment to strict mode so will give Invalid date if any issues and then decide
+		// if can use more relaxed mode if that was requested.
 		if (isEndTime) {
 			// The startTimestamp of this reading is the endTimestamp of the previous reading.
 			// See else clause for why formatted this way.
 			startTimestamp = prevReading.endTimestamp;
-			endTimestamp = moment.parseZone(rows[index][1], undefined, true).tz('UTC', true);
+			startTimestampTz = prevEndTimestampTz;
+			endTimestampTz = moment.parseZone(rows[index][1], undefined, true);
+			if (!endTimestampTz.isValid() && relaxedParsing) {
+				errMsg += 'The end date/time of ' + rows[index][1] + ' did not parse to a date/time using the normal format so'
+					+ ' a less restrictive method is being tried. This is a warning since it can lead to wrong results but often okay.<br>'
+				// If this fails it is caught below.
+				endTimestampTz = moment.parseZone(rows[index][1], undefined);
+			}
+			// Get the reading into UTC where clone so don't change the Tz one in case use later if honorDst. The date/time is
+			// the same but in UTC.
+			endTimestamp = moment.parseZone(endTimestampTz.clone()).tz('UTC', true);
 		}
 		else {
-			// If the reading has a timezone offset associated with it then we want to honor it by using parseZone.
+			// If the start date/time from the reading's timezone. Next, we put it
+			// into a moment reading has a timezone offset associated with it then we want to honor it by using parseZone.
 			// However the database uses UTC and has no timezone offset so we need to get the reading into UTC.
 			// OED plots readings as the date/time it was acquired independent of the timezone. For example, if the reading is
 			// 2021-06-01 00:00:00-05:00 then the database should store it as 2021-06-01 00:00:00.
-			// Thus, we take the date/time from the reading timezone and then put it into UTC without
-			// changing the time (the .tz second argument of true stops any change in date/time).
+			// Thus, we want in a timezone aware way so the UTC sticks and there is no shift of time.
 			// This setup should work no matter want the timezone is on the server.
-			startTimestamp = moment.parseZone(rows[index][1], undefined, true).tz('UTC', true);
-			endTimestamp = moment.parseZone(rows[index][2], undefined, true).tz('UTC', true);
+			// Get the reading into moment in a timezone aware way. Note will assume UTC if no timezone in the string.
+			startTimestampTz = moment.parseZone(rows[index][1], undefined, true);
+			if (!startTimestampTz.isValid() && relaxedParsing) {
+				// A known example where this will lead to the wrong date is if hyphens are used and it is not yyyy-mm-dd, e.g.,
+				//07-06-2021. This is why the user must ask for doing relaxed parsing.
+				errMsg += 'The start date/time of ' + rows[index][1] + ' did not parse to a date/time using the normal format so'
+					+ ' a less restrictive method is being tried. This is a warning since it can lead to wrong results but often okay.<br>'
+				// If this fails it is caught below.
+				startTimestampTz = moment.parseZone(rows[index][1], undefined);
+			}
+			endTimestampTz = moment.parseZone(rows[index][2], undefined, true);
+			if (!endTimestampTz.isValid() && relaxedParsing) {
+				errMsg += 'The end date/time of ' + rows[index][2] + ' did not parse to a date/time using the normal format so'
+					+ ' a less restrictive method is being tried. This is a warning since it can lead to wrong results but often okay.<br>'
+				// If this fails it is caught below.
+				endTimestampTz = moment.parseZone(rows[index][2], undefined);
+			}
+			// Get the reading into UTC where clone so don't change the Tz one in case use later if honorDst. The date/time is
+			// the same but in UTC.
+			startTimestamp = moment.parseZone(startTimestampTz.clone()).tz('UTC', true);
+			endTimestamp = moment.parseZone(endTimestampTz.clone()).tz('UTC', true);;
 		}
 		if (startTimestamp.format() === 'Invalid date' || endTimestamp.format() === 'Invalid date') {
 			errMsg += 'For meter ' + meterName + ': Error parsing Reading #' + row(index, isAscending, rows.length) +
-				' The start and/or end time provided did not parse into a valid date/time so all reading are rejected.<br>';
+				' The start (' + rows[index][1] + ') and/or end time (' + rows[index][2] +
+				') provided did not parse into a valid date/time so all reading are rejected.<br>';
 			log.error(errMsg);
 			// We use the current reading where provide 'unknown' for reading value since not yet set.
 			// Since only output this is okay.
@@ -222,6 +295,89 @@ async function processData(rows, meterID, timeSort = TimeSortTypesJS.increasing,
 			// You may get this message with the cumulative one above but that desired.
 			errMsg += 'The first ever reading must be dropped when dealing only with endTimestamps.<br>';
 		}
+
+		// This next block deals with meters that use daylight savings time.
+		// Note: all times are UTC except for checking if cross DST.
+		if (readingOK && honorDst) {
+			// We need to worry about DST.
+			// Get the shift in timezone for the start and end of this reading to see if crossed DST.
+			// Must do in the meter timezone and the reading must have an offset for this to work.
+			shift = dstShift(startTimestampTz, endTimestampTz);
+			if (shift < 0) {
+				// These are the examples on the left in the example diagram in the developer docs.
+				// This reading crossed and entered DST so went forward in time.
+				// The startTime must be in the other side since crossed DST.
+				// Find the date/time for this DST shift.
+				// Since UTC does not have any DST, we need to use the meter timezone. Since OED stores the same date/time but
+				// in UTC, we want the same date/time but in the local timezone without any timezone shifts so second argument is true.
+				// tz mutates so make a clone.
+				const endTimestampMeterZone = endTimestamp.clone().tz(meterZone, true);
+				// Need the actual data/time that the DST shift occurs since what we do changes based on whether the reading is
+				// within the shift or not. Note we do this inside the if since it takes a little time and not done if shift = 0
+				// which is the most common case.
+				zoneUntil = getZoneUntil(meterZone, endTimestampMeterZone);
+				// If the end of the readings is within the shift distance of the zoneUntil time then the reading ended in the DST shift
+				// and time was added to the end time of the reading.
+				// In this case, we adjust the end time by the shift so it appears to have the correct amount of time. This helps avoid
+				// warning/errors from the tests that follow. We want the original value to be mutated so no clone.
+				// We keep a copy of the original for use in the shift.
+				origEndTimestamp = endTimestamp.clone();
+				if (endTimestamp.clone().add(shift, 'minutes').isBefore(zoneUntil)) {
+					endTimestamp.add(shift, 'minutes');
+				}
+				// This is algorithm case 1 from the developer docs so we split the reading. That is done later when we add readings
+				// for inclusion. Thus, we mark that a split is needed.
+				splitDst = true;
+			} else if (shift > 0) {
+				// These are the examples on the right in the example diagram in the developer docs.
+				// This reading crossed and left DST so went back in time.
+				// The next two lines are similar use to above.
+				const endTimestampMeterZone = endTimestamp.clone().tz(meterZone, true);
+				zoneUntil = getZoneUntil(meterZone, endTimestampMeterZone);
+				// We must not accept any reading time until it is after the previous reading end time so there is no overlap.
+				// This may take multiple readings so store the time now.
+				prevEndTimestamp = prevReading.endTimestamp;
+				// We note we are in this situation and may need to remove and split readings.
+				inDst = true;
+			}
+			// Note a shift of zero means did not cross DST so just use as usual unless inDst that is
+			// handled next.
+			if (inDst) {
+				if (endTimestamp.isAfter(prevEndTimestamp)) {
+					// This reading has some part of its time past the previous one used so need to use it and stop this process.
+					// This R2 in 1B, Reading in 2B, R5 in 3b and R4 in 4B in the developer docs examples.
+					// Start the reading at the maximum of the previous end time and the start time.
+					// We do this because there might be a gap before this reading so it does not align
+					// with the end of the previous reading.
+					startTimestampUse = moment.max(prevEndTimestamp, startTimestamp);
+					errMsg += 'This or a previous reading crossed from daylight savings time and is the first one that does not entirely overlap a previous reading';
+					errMsg += ' so its reading will be prorated where the original values were:';
+					errMsg += ' startTimestamp of ' + startTimestampTz.format() + ' endTimestamp of ' + endTimestampTz.format() + ' reading value of ' + meterReading;
+					// Prorate the reading value for the fraction of the time of the reading used.
+					// If this is the reading that crossed DST then the original reading is actually one hour longer so need to add the shift.
+					// If not, the shift is zero and all is okay. Use clone to avoid mutating the original.
+					meterReading = prorated(startTimestamp, endTimestamp.clone().add(shift, 'minutes'), startTimestampUse, endTimestamp, meterReading);
+					errMsg += '. The used part has startTimestamp of ' + startTimestampUse.format() + ' and endTimestamp of ' + endTimestamp.format() + ' and value of ' + meterReading;
+					errMsg += '. This is only a notification and should not be an issue.<br>';
+					// We are done processing readings in this way.
+					inDst = false;
+					// We need to know later that we just stopped inDst so mark.
+					inDstStop = true;
+				} else {
+					// This is R1 in 1B, R1 & R2 & R3 & R4 in 3B, R1 & R2 & R3 in 4B in the developer docs examples.
+					// This reading entirely overlaps a previous reading so it is dropped.
+					readingOK = false;
+					errMsg += 'This reading is entirely within the shift time from daylight savings to standard time so it is dropped.';
+					errMsg += ' The dropped reading  had startTimestamp of ' + startTimestampTz.format() + ' and endTimestamp of ' + endTimestampTz.format() + ' and value of ' + meterReading;
+					errMsg += '. This should not be an issue but the reading is lost.<br>';
+					// Even though this reading is not okay, the next one might be the case above and if it went backward in time (the first one)
+					// then the time length is off. This happens in 1B in the examples in the developer docs.
+					// If we shift the end time then there will be a gap. We shift the start in this case even though the time is now off but will be dropped.
+					// clone may not be needed but being careful.
+					startTimestamp = startTimestamp.clone().subtract(shift, 'minutes');
+				}
+			}
+		}
 		if (readingOK && startTimestamp.isSameOrAfter(endTimestamp)) {
 			readingOK = false;
 			errMsg += 'The reading end time is not after the start time so we must drop the reading.';
@@ -244,6 +400,18 @@ async function processData(rows, meterID, timeSort = TimeSortTypesJS.increasing,
 					readingOK = false;
 					errMsg += 'The reading start time is before the previous end time and the data is cumulative so OED cannot use this reading.<br>';
 				} else if (!isFirst(prevReading.endTimestamp)) {
+					// Only a potential issue if not the first ever seen reading where previous end time is arbitrary.
+					if (honorDst) {
+						// It is possible that the gap means we missed the DST crossing. To check, we see if the start time is within the DST shift.
+						const startTimestampMeterZone = startTimestamp.clone().tz(meterZone, true);
+						// Need the actual data/time that the DST shift occurs since what we do changes based on whether the reading is
+						// within the shift or not. Note we do this inside the if since it takes a little time and not done if shift = 0
+						// which is the most common case.
+						if (inZone(meterZone, startTimestampMeterZone)) {
+							// Reading starts within DST shift so it might be an issue. Warn the user.
+							errMsg += 'The reading start time is shifted and within the DST shift so it is possible that the crossing to standard time was missed and readings overlap. ';
+						}
+					}
 					//Only treat this as a warning since the readings may be sent in a different order.
 					errMsg += 'The current reading startTime is not after the previous reading\'s end time. Note this is treated only as a warning since readings may be sent out of order.<br>';
 				}
@@ -262,14 +430,14 @@ async function processData(rows, meterID, timeSort = TimeSortTypesJS.increasing,
 					msReadingGap / 1000 + ' seconds.<br>';
 			}
 		}
-		if (readingOK) {
+		if (readingOK && isCumulative) {
 			// Reject negative readings for cumulative.
 			// Note one can make the case that we should accept them since we don't automatically exclude negative readings.
 			// The conditionSet could be used instead to catch this if desired. However, we decided that cumulative
 			// normally don't go negative so are excluding these values.
 			// This could be changed by commenting out this block of code. Note that the next reading will be larger than
 			// what is received since subtracting the previous negative reading if actually use it.
-			if (isCumulative && meterReading2 < 0) {
+			if (meterReading2 < 0) {
 				// If the value isCumulative and the prior reading is negative reject because OED cannot accept any negative readings.
 				// You go back by readingRepetition since this is the previous reading.
 				let negRow = row(index, isAscending, rows.length) - readingRepetition + 1;
@@ -337,7 +505,78 @@ async function processData(rows, meterID, timeSort = TimeSortTypesJS.increasing,
 				}
 			}
 			// This reading has passed all checks and can be added to result
-			currentReading = new Reading(meterID, meterReading, startTimestamp, endTimestamp);
+
+			// The processing of DST crossing above found that we need to split this reading.
+			// This is part of case 1 of the algorithm in the developer's documentation.
+			if (splitDst) {
+				// When we prorate the value it is always with one less hour due to DST shift.
+				let shiftedEndTimestamp = origEndTimestamp.clone().add(shift, 'minutes');
+				// We need to split the reading into two readings to remove the time in the DST shift.
+				// The first part goes until where the shift starts. Since moment-timezone gives the end of the shift
+				// we need to add the shift (which is negative) to get to that time.
+				// add mutates so clone.
+				let readingOneEndTimestamp = zoneUntil.clone().add(shift, 'minutes');
+				// Check to make sure there is any time in this first part.
+				if (readingOneEndTimestamp.isAfter(startTimestamp)) {
+					// The reading has some time associated with the first split so use.
+					// We need to prorate the value for the fraction of time it uses compared to the full time. This uses the shifted end time.
+					let readingOneValue = prorated(startTimestamp, shiftedEndTimestamp, startTimestamp, readingOneEndTimestamp, meterReading);
+					// startTimestamp is modified below so we clone it here so the value in the array is not impacted.
+					let readingOne = new Reading(meterID, readingOneValue, startTimestamp.clone(), readingOneEndTimestamp);
+					// If we changed the endTimestamp to avoid length issues earlier, we now put it back because we need the actual end time
+					// so the next reading does not see a gap. subtract mutates endTimestamp as desired. This also gets the right value in the messages.
+					// We do this after the proration so it is the correct length.
+					errMsg += 'Reading #' + row(index, isAscending, rows.length) + ' crossed into daylight savings so it needs to be split where the first part is now being used.';
+					errMsg += ' The original reading had ';
+					errMsg += 'startTimestamp of ' + startTimestampTz.format() + ' endTimestamp of ' + endTimestampTz.format() + ' reading value of ' + meterReading;
+					errMsg += ' and the first part has a startTimestamp of ' + startTimestamp.format() + ' endTimestamp of ' + readingOneEndTimestamp.format();
+					errMsg += ' reading value of ' + readingOneValue;
+					errMsg += '. This is only a notification and should not be an issue.<br>';
+					result.push(readingOne);
+				}
+				// The second part starts at the end of the DST shift which is what moment returns. Notice this is shift time later than
+				// the end time of the first part.
+				let readingTwoStartTimestamp = zoneUntil;
+				// Check to make sure there is any time in this first part.
+				if (origEndTimestamp.isAfter(readingTwoStartTimestamp)) {
+					// The reading has some time associated with the second split so use.
+					// We need to prorate the value for the fraction of time it uses compared to the full time. This uses the shifted end time.
+					let readingTwoValue = prorated(startTimestamp, shiftedEndTimestamp, readingTwoStartTimestamp, origEndTimestamp, meterReading);
+					let readingTwo = new Reading(meterID, readingTwoValue, readingTwoStartTimestamp, origEndTimestamp);
+					errMsg += 'Reading #' + row(index, isAscending, rows.length) + ' crossed into daylight savings so it needs to be split where the second part is now being used.';
+					errMsg += ' The original reading had';
+					// Since we added the shift to the end time we now subtract to put back the original value.
+					errMsg += ' startTimestamp of ' + startTimestampTz.format() + ' endTimestamp of ' + endTimestampTz.format() + ' reading value of ' + meterReading;
+					errMsg += ' and the second part has a startTimestamp of ' + readingTwoStartTimestamp.format() + ' endTimestamp of ' + origEndTimestamp.format();
+					errMsg += ' reading value of ' + readingTwoValue;
+					errMsg += '. This is only a notification and should not be an issue.<br>';
+					result.push(readingTwo);
+				}
+				// Since in UTC, the length of the reading is wrong if endTimestamp was shifted by DST shift. This does not happen if the end time was
+				// outside the shift zone. If needed, we shift the start by the shift amount to avoid variation in length warning on the next reading.
+				// This is used for messages and previous and will now use the adjusted values.
+				if (!origEndTimestamp.isSame(endTimestamp)) {
+					startTimestamp.subtract(shift, 'minutes')
+				}
+				currentReading = new Reading(meterID, meterReading, startTimestamp, origEndTimestamp);
+				// Remove that in DST split since done processing this reading and don't want for next one.
+				splitDst = false;
+			} else if (inDstStop) {
+					// This start timestamp from reading in inDst where it is stopping since just accepted a reading.
+					// We could not reset before now since it would potentially create a gap and different length.
+					currentReading = new Reading(meterID, meterReading, startTimestampUse, endTimestamp);
+					result.push(currentReading);
+					// Reset inDstStop
+					inDstStop = false;
+					// We reset the start timestamp for the same issue with next reading.
+					currentReading = new Reading(meterID, meterReading, startTimestamp, endTimestamp);
+					// Reset back to default so if store into DB know not in DST shift zone.
+					// clone() may not be needed but being safe.
+					prevEndTimestamp = E0.clone();
+			} else {
+				currentReading = new Reading(meterID, meterReading, startTimestamp, endTimestamp);
+				result.push(currentReading);
+			}
 			if (!(errMsg === '')) {
 				// There may be warnings to output even if OED accepts the readings so output all warnings which may exist
 				errMsg = '<br>For meter ' + meterName + ': Warning parsing Reading #' + row(index, isAscending, rows.length) + '. Reading value gives ' +
@@ -347,7 +586,6 @@ async function processData(rows, meterID, timeSort = TimeSortTypesJS.increasing,
 					isCumulative, cumulativeReset, resetStart, resetEnd, readingGap, readingLengthVariation, isEndTime) + '<br>';
 				({ msgTotal, msgTotalWarning } = appendMsgTotal(msgTotal, errMsg, msgTotalWarning));
 			}
-			result.push(currentReading);
 		} else {
 			// An error occurred so add it to the readings dropped array and let the client know why before continuing.
 			/* If the data is cumulative then regardless of if it comes with end timestamps only or both end timestamps and start timestamps
@@ -364,9 +602,9 @@ async function processData(rows, meterID, timeSort = TimeSortTypesJS.increasing,
 			*
 			* Below prevReading becomes currentReading so the change will happen.
 			*/
-			if (isCumulative || (!isCumulative && isEndTime)) {
-				currentReading = new Reading(meterID, meterReading, startTimestamp, endTimestamp);
-			}
+			// These cases did not set currentReading so do that now.
+			currentReading = new Reading(meterID, meterReading, startTimestamp, endTimestamp);
+			// }
 			errMsg = '<br>For meter ' + meterName + ': Error parsing Reading #' + row(index, isAscending, rows.length) +
 				'. Reading value gives ' + meterReading + ' with error message:<br>' + errMsg;
 			log.error(errMsg);
@@ -380,6 +618,9 @@ async function processData(rows, meterID, timeSort = TimeSortTypesJS.increasing,
 		// Always use the last reading as the next previous one so even if dropped it won't mess up the time ordering for next reading.
 		// See above where may not have reset current so there actually is no change.
 		prevReading = currentReading;
+		// For daylight savings when end only, we need the previous reading start time in TZ for the next reading.
+		// Not used in many cases but just set since easier.
+		prevEndTimestampTz = endTimestampTz;
 	}
 	// Validate data if conditions given
 	if (conditionSet !== undefined && !validateReadings(result, conditionSet)) {
@@ -397,9 +638,11 @@ async function processData(rows, meterID, timeSort = TimeSortTypesJS.increasing,
 	// possible an undesirable time is saved at points. This will lead to messages on
 	// the next upload. Also note that the update does not happen if all the values
 	// are rejected as a batch (so return before this point).
-	// Note this does not happen if all the values were rejected or an error occurs.
-	meter.startTimestamp = startTimestamp;
-	meter.endTimestamp = endTimestamp;
+	// We need to set this as a string to preserve the time shift info.
+	meter.startTimestamp = startTimestampTz.format('YYYY-MM-DD HH:mm:ssZ');
+	meter.endTimestamp = endTimestampTz.format('YYYY-MM-DD HH:mm:ssZ');
+	// Make sure previousEnd is updated.
+	meter.previousEnd = prevEndTimestamp;
 	await meter.update(conn);
 	// Let the user know exactly which readings were dropped if any before continuing and add to the total messages.
 	if (readingsDropped.length !== 0) {
@@ -506,6 +749,95 @@ function appendMsgTotal(msgTotal, newMsg, msgTotalWarning) {
 		msgTotalWarning = !msgTotalWarning;
 	}
 	return { msgTotal, msgTotalWarning };
+}
+
+/**
+* Determines if a reading crossed daylight savings time by seeing if the offset changes.
+* Returns the minutes of that shift if crossed and zero otherwise. It crosses if the start
+* and end times cross DST. If the return value is positive then the second reading just entered
+* standard time/left DST and it is negative when the second reading just entered DST/left standard time.
+* This assumes there is no valid reason for the offset to change except for DST. It only works if readings
+* have offsets. If not/in UTC then always returns zero.
+* @param {Moment} startTimestamp The start timestamp of the reading to use.
+* @param {Moment} endTimestamp The end timestamp of the reading to use.
+* @returns {number} the time shift between the first and second reading in minutes where it is 0 if none. 
+*/
+function dstShift(startTimestamp, endTimestamp) {
+	const startOffset = startTimestamp.utcOffset();
+	const endOffset = endTimestamp.utcOffset();
+	return startOffset - endOffset;
+}
+
+/**
+* Returns the reading value for the change in time length which is prorated by time length.
+* @param startTimestamp The start of the original reading
+* @param endTimestamp The end of the original reading
+* @param newStartTime The startTimestamp of the adjusted reading time
+* @param newEndTime The endTimestamp of the adjusted reading time
+* @returns prorated reading value
+*/
+function prorated(startTimestamp, endTimestamp, newStartTime, newEndTime, meterReading) {
+	// Scales the meter reading by the ratio of the new time length to the original time length.
+	// For example, if it was originally 30 minutes but you are only using 15 of those minutes
+	// then you scale by 15 / 30 = 0.5.
+	return (newEndTime.diff(newStartTime)) / (endTimestamp.diff(startTimestamp)) * meterReading;
+}
+
+/**
+* Returns a timestamp for a DST crossing that is before the pastCrossingTimestamp.
+* This uses moment-timezone which gives the time after the crossing when going from DST
+* to standard time, e.g., 3:00 in the U.S. on the day standard time begins. For going to
+* DST it also gives the start of the shift time but that is 1:00 in the U.S. when DST begins.
+* @param meterZone A string representing the timezone of the meter.
+* @param pastCrossingTimestamp A timestamp that is after the crossing of DST in the meter's timezone.
+* @returns A timestamp where the DST crossing occurs.
+*/
+function getZoneUntil(meterZone, pastCrossingTimestamp) {
+	// Get the zone structure from moment for the meter's timezone.
+	zone = moment.tz.zone(meterZone);
+	// moment returns an array that holds the shifts for many years in the past and future.
+	// Loop over array until find the one needed.
+	for (let i = 0; i < zone.untils.length; i++) {
+		if (moment.tz(zone.untils[i], meterZone).isAfter(pastCrossingTimestamp)) {
+			// We just went past the desired one so back up one index.
+			// We first want to know in the meter timezone and then we want that date/time in UTC without a shift.
+			return moment.tz(zone.untils[i - 1], meterZone).utc(true);
+		}
+	}
+	// We really don't expect to not find the date desired. If this happens then throw an error.
+	throw new Error('Could not find DST crossing date in pipeline so giving up.');
+}
+
+/**
+* Returns true if timestamp is within a DST crossing and false otherwise.
+* It is designed to check for going backward in time with a gap.
+* @param meterZone A string representing the timezone of the meter.
+* @param timestamp A timestamp
+* @returns true if timestamp is within a DST crossing and false otherwise.
+*/
+function inZone(meterZone, timestamp) {
+	// Get the zone structure from moment for the meter's timezone.
+	zone = moment.tz.zone(meterZone);
+	// moment returns an array that holds the shifts for many years in the past and future.
+	// Loop over array until find the one needed.
+	for (let i = 0; i < zone.untils.length; i++) {
+		if (moment.tz(zone.untils[i], meterZone).isSameOrAfter(timestamp)) {
+			// We just went past the the one for timestamp.
+			// We see if the timestamp is within the shift of this one.
+			const shift = zone.offsets[i - 1] - zone.offsets[i];
+			const timestampUTC = timestamp.clone().tz('UTC', true);
+			const zoneUntil = moment.parseZone(moment.tz(zone.untils[i], meterZone)).tz('UTC', true);
+			if (timestampUTC.isSameOrAfter(zoneUntil) && timestampUTC.isBefore(zoneUntil.clone().add(shift, 'minutes'))) {
+				// The timestamp lies within the DST shift so may be an issue.
+				return true;
+			} else {
+				// The timestamp is not within the DST shift so it is OK.
+				return false;
+			}
+		}
+	}
+	// We really don't expect to not find the date desired. If this happens then throw an error.
+	throw new Error('Could not find DST crossing date in pipeline so giving up.');
 }
 
 module.exports = processData;

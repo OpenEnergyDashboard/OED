@@ -38,6 +38,8 @@ export default class ReadingsCSVUploadComponent extends React.Component<Readings
 		this.handleSetLengthGap = this.handleSetLengthGap.bind(this);
 		this.handleSetLengthVariation = this.handleSetLengthVariation.bind(this);
 		this.handleSetEndOnly = this.handleSetEndOnly.bind(this);
+		this.handleSetHonorDst = this.handleSetHonorDst.bind(this);
+		this.handleSetRelaxedParsing = this.handleSetRelaxedParsing.bind(this);
 		this.handleSubmit = this.handleSubmit.bind(this);
 		this.fileInput = React.createRef();
 	}
@@ -107,6 +109,14 @@ export default class ReadingsCSVUploadComponent extends React.Component<Readings
 	private handleSetEndOnly(e: React.ChangeEvent<HTMLInputElement>) {
 		const target = e.target;
 		this.props.selectEndOnly(target.value as BooleanTypes);
+	}
+
+	private handleSetHonorDst() {
+		this.props.toggleHonorDst();
+	}
+
+	private handleSetRelaxedParsing() {
+		this.props.toggleRelaxedParsing();
 	}
 
 	public render() {
@@ -292,6 +302,18 @@ export default class ReadingsCSVUploadComponent extends React.Component<Readings
 								onChange={this.props.toggleRefreshHourlyReadings}
 							/>
 							<FormattedMessage id='csv.readings.param.refresh.hourlyReadings' />
+						</Label>
+					</FormGroup>
+					<FormGroup check style={checkboxStyle}>
+						<Label check>
+							<Input checked={this.props.honorDst} type='checkbox' name='honorDst' onChange={this.props.toggleHonorDst} />
+							<FormattedMessage id='csv.readings.param.honor.dst' />
+						</Label>
+					</FormGroup>
+					<FormGroup check style={checkboxStyle}>
+						<Label check>
+							<Input checked={this.props.relaxedParsing} type='checkbox' name='relaxedParsing' onChange={this.props.toggleRelaxedParsing} />
+							<FormattedMessage id='csv.readings.param.relaxed.parsing' />
 						</Label>
 					</FormGroup>
 					<Button type='submit'>
