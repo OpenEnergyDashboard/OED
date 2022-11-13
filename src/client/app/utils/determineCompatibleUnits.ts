@@ -151,7 +151,7 @@ export function metersInGroup(groupId: number): Set<number> {
  * group being worked on (current group)
  * @param currentGroup
  */
-function compatibilityOfMetersAndGroups(gid: number) {
+function compatibilityOfMetersAndGroups(gid: any) {
 	//Get the "currentGroup's" compatible units
 	//Current groups default graphic unit (via Redux)
 	let currentUnits = unitsCompatibleWithMeters(metersInGroup(gid))
@@ -160,7 +160,7 @@ function compatibilityOfMetersAndGroups(gid: number) {
 	let currentDefaultGraphicUnit = gid.defaultGraphicUnit
 
 	const conn = testDB.getConnection();
-	let meters = await Meter.getUnitNotNull(conn);
+	let meters = Meter.getUnitNotNull(conn);
 
 	meters.forEach(function (m: number) {
 		let casee = compatibleChanges(currentUnits, m, DataType.Meter, currentDefaultGraphicUnit);
