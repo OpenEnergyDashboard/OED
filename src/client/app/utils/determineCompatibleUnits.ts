@@ -8,6 +8,12 @@ import { MeterData } from '../types/redux/meters';
 import { ConversionArray } from '../types/conversionArray';
 import { UnitData, UnitType } from '../types/redux/units';
 import { GroupDefinition } from 'types/redux/groups';
+import { DataType } from 'types/Datasources';
+import meters from 'reducers/meters';
+
+const Meter = require('../../models/Meter');
+const { mocha, expect, testDB } = require('../common');
+
 
 /**
  * The intersect operation of two sets.
@@ -84,7 +90,6 @@ export function unitsCompatibleWithUnit(unitId: number): Set<number> {
 	}
 	return unitSet;
 }
-
 /**
  * Returns the row index in Pik for a meter unit.
  * @param unitId The unit id.
@@ -139,4 +144,102 @@ export function metersInGroup(groupId: number): Set<number> {
 	const group = _.get(state.groups.byGroupID, groupId) as GroupDefinition;
 	// Create a set of the deep meters of this group and return it.
 	return new Set(group.deepMeters);
+}
+
+/**
+ * Determine the compatibility of meter/group to the current
+ * group being worked on (current group)
+ * @param currentGroup
+ */
+function compatibilityOfMetersAndGroups(gid: number) {
+	//Get the "currentGroup's" compatible units
+	//Current groups default graphic unit (via Redux)
+	let currentUnits = unitsCompatibleWithMeters(metersInGroup(gid))
+
+	// current groups defaulft graphic unit (via redux)
+	let currentDefaultGraphicUnit = gid.defaultGraphicUnit
+
+	const conn = testDB.getConnection();
+	let meters = await Meter.getUnitNotNull(conn);
+
+	meters.forEach(function (m: number) {
+		let casee = compatibleChanges(currentUnits, m, DataType.Meter, currentDefaultGraphicUnit);
+		// if case 3 then cannnot select so need logic for that
+		if (casee = 3) {
+
+		}
+
+	});
+
+
+
+// }
+
+/**
+ * Returns the state (see groupCase function) for meter or group 
+ * provided by id and otherUnits where type is either DataType.Meter or
+ * DataType.group
+ */
+function compatibleChanges(otherUnits: Set<number>, id: number, type: DataType, defaultGraphicUnit: number): number{
+	// determine the compatible unites for meter or group represented by id
+	let newUnits;
+	newUnits = compatibleUnits(id, type);
+
+	//Determine case
+
+	let casee = groupCase(otherUnits, newUnits, defaultGraphicUnit); 
+
+	return casee;
+}
+
+/**
+ * finds all compatible units for this id based on if meter or group. see compatibleChanges
+ * for parameter
+ * @param id
+ * @param type
+ */
+function compatibleUnits(id: number, type: DataType): Set<number> {
+	let newUnits;
+	if(type == DataType.Meter){
+		newUnits = unitsCompatibleWithUnit(id);
+	}else {
+		//its a group
+		//Note we do this once for each time we check all groups so place to 
+		//optimize if needed.
+		//However, this is done with Redux state so it may be fine to just check each
+		//time and do that for now.
+		newUnits = unitsCompatibleWithMeters(metersInGroup(id)); 
+	}
+
+	return newUnits;
+}
+
+/**
+ * Returns case covered above 1, 21, 22 or 3 for cases 1, 2.1, 2.2 or 3.
+ * currentUnits should be the units already in group
+ * newUnits should be the units that will be added
+ * COMPLETED
+ */
+function groupCase(currentUnits: Set<number>, newUnits: Set<number>, defaultGraphicUnit: number): number {
+	//The compatible units of a set of meters or groups is the intersection of the compatible units for each
+	//Thus, we can get the units that will go away with (- is set subtraction/difference): 
+	// lostUnit = currentUnit - ( currentUnit n newUnits)
+	let intersection = setIntersect(currentUnits, newUnits);
+
+	let lostUnits = new Set(Array.from(currentUnits).filter(x => !intersection.has(x)));
+	//do the possible cases
+	if (lostUnits.size == 0){
+		// no change
+		return 1;
+	}else if (lostUnits.size == currentUnits.size){
+		// no compatible units left
+		return 3;
+	}else if (defaultGraphicUnit != -99){
+		return 22;
+	}else{
+		// if the default graphic unit is no unit then you can add any meter/group
+		return 21;
+	}
+
+}
 }
