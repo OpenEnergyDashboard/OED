@@ -146,11 +146,17 @@ export function metersInGroup(groupId: number): Set<number> {
 	return new Set(group.deepMeters);
 }
 
+// TODO I put in comments that should start with TODO. I cannot carefully check the code at this point but a number
+// of thoughts are given.
+
+// TODO All function documentation needs to be correct TSDoc with type and description for each argument and return types.
 /**
  * Determine the compatibility of meter/group to the current
  * group being worked on (current group)
  * @param currentGroup
  */
+// TODO If this returns nothing then should it be void?
+// TODO I think this function needs to be exported to be of use. This is why VSC grays it out.
 function compatibilityOfMetersAndGroups(gid: any) {
 	//Get the "currentGroup's" compatible units
 	//Current groups default graphic unit (via Redux)
@@ -159,20 +165,25 @@ function compatibilityOfMetersAndGroups(gid: any) {
 	// current groups defaulft graphic unit (via redux)
 	let currentDefaultGraphicUnit = gid.defaultGraphicUnit
 
+	// TODO I'm unclear why the comment for this code from the design document is not present.
+	// TODO This can be done via Redux instead of a DB connection. See _.find above for examples.
 	const conn = testDB.getConnection();
 	let meters = Meter.getUnitNotNull(conn);
 
 	meters.forEach(function (m: number) {
+		// TODO I know the design document used case that is not okay but casee if not a good variable name.
 		let casee = compatibleChanges(currentUnits, m, DataType.Meter, currentDefaultGraphicUnit);
+		// TODO cannnot is misspelled.
 		// if case 3 then cannnot select so need logic for that
 		if (casee = 3) {
 
 		}
-
+		// TODO Lost comment on needing to add to meter menu when that is ready. Follow how done in other parts of the code.
+		// TODO The loop for group seems missing.
 	});
 
 
-
+// TODO What is this commented out code for? I think it is needed to end the function.
 // }
 
 /**
@@ -185,6 +196,7 @@ function compatibleChanges(otherUnits: Set<number>, id: number, type: DataType, 
 	let newUnits;
 	newUnits = compatibleUnits(id, type);
 
+		// TODO OED does not leave a blank line between a comment and code.
 	//Determine case
 
 	let casee = groupCase(otherUnits, newUnits, defaultGraphicUnit); 
@@ -200,9 +212,11 @@ function compatibleChanges(otherUnits: Set<number>, id: number, type: DataType, 
  */
 function compatibleUnits(id: number, type: DataType): Set<number> {
 	let newUnits;
+	// TODO The formatting is off. VSC will do this automatically.
 	if(type == DataType.Meter){
 		newUnits = unitsCompatibleWithUnit(id);
 	}else {
+		// TODO It would be nice if comments that are a sentence start with a capital letter and end with a period.
 		//its a group
 		//Note we do this once for each time we check all groups so place to 
 		//optimize if needed.
@@ -229,11 +243,13 @@ function groupCase(currentUnits: Set<number>, newUnits: Set<number>, defaultGrap
 	let lostUnits = new Set(Array.from(currentUnits).filter(x => !intersection.has(x)));
 	//do the possible cases
 	if (lostUnits.size == 0){
+		// TODO It would be best to use an enum for the return value rather than a fixed value.
 		// no change
 		return 1;
 	}else if (lostUnits.size == currentUnits.size){
 		// no compatible units left
 		return 3;
+		// TODO the second part of the if is missing below.
 	}else if (defaultGraphicUnit != -99){
 		return 22;
 	}else{
@@ -242,4 +258,9 @@ function groupCase(currentUnits: Set<number>, newUnits: Set<number>, defaultGrap
 	}
 
 }
+// TODO The code for somethingLikeFont is missing.
+
+// TODO Who is doing the code for when the selected group/meter is changed?
+
+// TODO I think this } is not needed/in the wrong place.
 }
