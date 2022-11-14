@@ -9,9 +9,15 @@ import { ConversionArray } from '../types/conversionArray';
 import { UnitData, UnitType } from '../types/redux/units';
 import { GroupDefinition } from 'types/redux/groups';
 import { DataType } from 'types/Datasources';
+
+// TODO I put in comments that should start with TODO. I cannot carefully check the code at this point but a number
+// of thoughts are given.
+
+// TODO I'm not sure why this is included.
 import meters from 'reducers/meters';
 
 const Meter = require('../../models/Meter');
+// TODO There should not be test code in production code. I think you want to include the regular DB code.
 const { mocha, expect, testDB } = require('../common');
 
 
@@ -145,9 +151,6 @@ export function metersInGroup(groupId: number): Set<number> {
 	// Create a set of the deep meters of this group and return it.
 	return new Set(group.deepMeters);
 }
-
-// TODO I put in comments that should start with TODO. I cannot carefully check the code at this point but a number
-// of thoughts are given.
 
 // TODO All function documentation needs to be correct TSDoc with type and description for each argument and return types.
 /**
