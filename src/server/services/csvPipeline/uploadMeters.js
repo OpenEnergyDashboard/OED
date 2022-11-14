@@ -6,6 +6,7 @@ const express = require('express');
 const { CSVPipelineError } = require('./CustomErrors');
 const Meter = require('../../models/Meter');
 const readCsv = require('../pipeline-in-progress/readCsv');
+const Unit = require('../../models/Unit');
 
 /**
  * Middleware that uploads meters via the pipeline. This should be the final stage of the CSV Pipeline.
@@ -42,6 +43,26 @@ async function uploadMeters(req, res, filepath, conn) {
 			// DB is longitude, latitude.
 			meter[6] = switchGPS(gpsInput);
 		}
+
+		// Process unit.
+		const unitName = meter[23];
+		const unitId = await getUnitId(unitName, Unit.unitType.METER, conn);
+		if (!unitId) {
+			const msg = `For meter ${meter[0]} the unit of ${unitName} is invalid`;
+			throw new CSVPipelineError(msg, undefined, 500);
+		}
+		// Replace the unit's name by its id.
+		meter[23] = unitId;
+
+		// Process default graphic unit.
+		const defaultGraphicUnitName = meter[24];
+		const defaultGraphicUnitId = await getUnitId(defaultGraphicUnitName, Unit.unitType.UNIT, conn);
+		if (!defaultGraphicUnitId) {
+			const msg = `For meter ${meter[0]} the default graphic unit of ${defaultGraphicUnitName} is invalid`;
+			throw new CSVPipelineError(msg, undefined, 500);
+		}
+		// Replace the default grahic unit's name by its id.
+		meter[24] = defaultGraphicUnitId;
 
 		if (req.body.update === 'true') {
 			// Updating the new meters.
@@ -111,6 +132,24 @@ function switchGPS(gpsString) {
 	const array = gpsString.split(',');
 	// return String(array[1] + "," + array[0]);
 	return (array[1] + ',' + array[0]);
+}
+
+/**
+ * Return the id associated with the given unit's name.
+ * If the unit's name is invalid or its type is different from expected type, return null.
+ * @param {string} unitName The given unit's name.
+ * @param {Unit.unitType} expectedUnitType the expected unit's type.
+ * @param {*} conn The connection to use.
+ * @returns 
+ */
+async function getUnitId(unitName, expectedUnitType, conn) {
+	// Case no unit.
+	if (!unitName) return -99;
+	// Get the unit associated with the name.
+	const unit = await Unit.getByName(unitName, conn);
+	// Return null if the unit doesn't exist or its type is different from expectation.
+	if (!unit || unit.typeOfUnit !== expectedUnitType) return null;
+	return unit.id;
 }
 
 module.exports = uploadMeters;
