@@ -337,8 +337,8 @@ async function insertSpecialUnits(conn) {
 		['Temperature_Fahrenheit', '', Unit.unitRepresentType.RAW, 3600, Unit.unitType.METER, '', Unit.displayableType.NONE, false, 'special unit'],
 		['kW', '', Unit.unitRepresentType.FLOW, 3600, Unit.unitType.UNIT, '', Unit.displayableType.ALL, true, 'special unit'],
 		['Electric_kW', '', Unit.unitRepresentType.FLOW, 3600, Unit.unitType.METER, '', Unit.displayableType.NONE, false, 'special unit'],
-		['gallon per minute', 'Gallon (rate)', Unit.unitRepresentType.FLOW, 60, Unit.unitType.UNIT, '', Unit.displayableType.ALL, true, 'special unit'],
-		['liter per hour', 'Liter (rate)', Unit.unitRepresentType.FLOW, 3600, Unit.unitType.UNIT, '', Unit.displayableType.ALL, true, 'special unit'],
+		['gallon per minute', 'gallon (rate)', Unit.unitRepresentType.FLOW, 60, Unit.unitType.UNIT, '', Unit.displayableType.ALL, true, 'special unit'],
+		['liter per hour', 'liter (rate)', Unit.unitRepresentType.FLOW, 3600, Unit.unitType.UNIT, '', Unit.displayableType.ALL, true, 'special unit'],
 		['Water_Gallon_Per_Minute', '', Unit.unitRepresentType.FLOW, 60, Unit.unitType.METER, '', Unit.displayableType.NONE, false, 'special unit']
 	];
 	await insertUnits(specialUnits, conn);
@@ -351,7 +351,7 @@ async function insertSpecialUnits(conn) {
 async function insertSpecialConversions(conn) {
 	// The table contains special conversions' data.
 	const specialConversions = [
-		['kWh', '100 w bulb', false, 1, 0, 'kWh → 100 W bulb'],
+		['kWh', '100 w bulb', false, 1, 0, 'kWh → 100 w bulb'],
 		['Electric_Utility', 'kWh', false, 1, 0, 'Electric_Utility → kWh'],
 		['Electric_Utility', 'US dollar', false, 0.115, 0, 'Electric_Utility → US dollar'],
 		['Electric_Utility', 'kg CO₂', false, 0.709, 0, 'Electric_Utility → CO2'],
@@ -482,32 +482,32 @@ delete from groups where name in ('Electric Utility 1-5 + 2-6 kWh', 'Electric Ut
 delete from meters where name in ('Electric Utility kWh', 'Electric Utility kWh 2-6', 'Electric Utility kWh in BTU', 'Electric Utility kWh in MTon CO₂', 'Electric Utility no unit', 'Electric Utility kWh not displayable', 'Natural Gas BTU', 'Natural Gas BTU in Dollar', 'Natural Gas Dollar', 'Natural Gas Cubic Meters', 'Water Gallon', 'Trash Kg', 'Temp Fahrenheit 0-212', 'Temp Fahrenheit in Celsius', 'Electric kW', 'Electric kW 2-6', 'Water Gallon flow 1-5 per minute', 'test4DaySin kWh', 'test4HourSin kWh', 'test23MinSin kWh', 'test15MinSin kWh', 'test23MinCos kWh', 'testSqSin kWh', 'testSqCos kWh', 'testAmp1Sin kWh', 'testAmp2Sin kWh', 'testAmp3Sin kWh', 'testAmp4Sin kWh', 'testAmp5Sin kWh', 'testAmp6Sin kWh', 'testAmp7Sin kWh');
 -- remove conversions
 -- Normally 22 total
-delete from conversions where source_id = (select id from units where name = 'kWh') and destination_id = (select id from units where name = '100 W bulb');
 delete from conversions where source_id = (select id from units where name = 'Electric_Utility') and destination_id = (select id from units where name = 'kWh');
-delete from conversions where source_id = (select id from units where name = 'Electric_Utility') and destination_id = (select id from units where name = 'US_dollar');
+delete from conversions where source_id = (select id from units where name = 'kWh') and destination_id = (select id from units where name = '100 w bulb');
+delete from conversions where source_id = (select id from units where name = 'Electric_Utility') and destination_id = (select id from units where name = 'US dollar');
+delete from conversions where source_id = (select id from units where name = 'Natural_Gas_BTU') and destination_id = (select id from units where name = 'kg CO₂');
 delete from conversions where source_id = (select id from units where name = 'Electric_Utility') and destination_id = (select id from units where name = 'kg CO₂');
 delete from conversions where source_id = (select id from units where name = 'Natural_Gas_BTU') and destination_id = (select id from units where name = 'BTU');
-delete from conversions where source_id = (select id from units where name = 'Natural_Gas_BTU') and destination_id = (select id from units where name = 'Euro');
-delete from conversions where source_id = (select id from units where name = 'Natural_Gas_BTU') and destination_id = (select id from units where name = 'kg CO₂');
-delete from conversions where source_id = (select id from units where name = 'Natural_Gas_M3') and destination_id = (select id from units where name = 'M3_gas');
-delete from conversions where source_id = (select id from units where name = 'Natural_Gas_M3') and destination_id = (select id from units where name = 'US_dollar');
-delete from conversions where source_id = (select id from units where name = 'Water_Gallon') and destination_id = (select id from units where name = 'Gallon');
-delete from conversions where source_id = (select id from units where name = 'Liter') and destination_id = (select id from units where name = 'Gallon');
-delete from conversions where source_id = (select id from units where name = 'US_dollar') and destination_id = (select id from units where name = 'Euro');
-delete from conversions where source_id = (select id from units where name = 'Natural_Gas_dollar') and destination_id = (select id from units where name = 'US_dollar');
+delete from conversions where source_id = (select id from units where name = 'Natural_Gas_BTU') and destination_id = (select id from units where name = 'euro');
+delete from conversions where source_id = (select id from units where name = 'Natural_Gas_M3') and destination_id = (select id from units where name = 'm³ gas');
+delete from conversions where source_id = (select id from units where name = 'Natural_Gas_M3') and destination_id = (select id from units where name = 'US dollar');
+delete from conversions where source_id = (select id from units where name = 'Water_Gallon') and destination_id = (select id from units where name = 'gallon');
+delete from conversions where source_id = (select id from units where name = 'liter') and destination_id = (select id from units where name = 'gallon');
+delete from conversions where source_id = (select id from units where name = 'US dollar') and destination_id = (select id from units where name = 'euro');
+delete from conversions where source_id = (select id from units where name = 'Natural_Gas_Dollar') and destination_id = (select id from units where name = 'US dollar');
 -- next two were auto-created for suffix CO₂
 delete from conversions where source_id = (select id from units where name = 'kg CO₂') and destination_id = (select id from units where name = 'kg of CO₂');
-delete from conversions where source_id = (select id from units where name = 'kg CO₂') and destination_id = (select id from units where name = 'Metric_ton of CO₂');
+delete from conversions where source_id = (select id from units where name = 'kg CO₂') and destination_id = (select id from units where name = 'metric ton of CO₂');
 delete from conversions where source_id = (select id from units where name = 'kg CO₂') and destination_id = (select id from units where name = 'kg');
 delete from conversions where source_id = (select id from units where name = 'Trash') and destination_id = (select id from units where name = 'kg CO₂');
 delete from conversions where source_id = (select id from units where name = 'Trash') and destination_id = (select id from units where name = 'kg');
-delete from conversions where source_id = (select id from units where name = 'Temperature_fahrenheit') and destination_id = (select id from units where name = 'Fahrenheit');
+delete from conversions where source_id = (select id from units where name = 'Temperature_Fahrenheit') and destination_id = (select id from units where name = 'Fahrenheit');
 delete from conversions where source_id = (select id from units where name = 'Electric_kW') and destination_id = (select id from units where name = 'kW');
-delete from conversions where source_id = (select id from units where name = 'Water_Gallon_Per_Minute') and destination_id = (select id from units where name = 'Gallon per minute');
-delete from conversions where source_id = (select id from units where name = 'Gallon per minute') and destination_id = (select id from units where name = 'Liter per hour');
+delete from conversions where source_id = (select id from units where name = 'Water_Gallon_Per_Minute') and destination_id = (select id from units where name = 'gallon per minute');
+delete from conversions where source_id = (select id from units where name = 'gallon per minute') and destination_id = (select id from units where name = 'liter per hour');
 -- remove units; last two were created as part of suffix unit on CO₂
 -- normally gives "DELETE 20"
-delete from units where name in ('Electric_Utility', 'Natural_Gas_BTU', '100 w bulb', 'Natural_Gas_M3', 'Natural_Gas_dollar', 'Water_Gallon', 'US_dollar', 'US $', 'Euro', 'Gallon', 'Liter', 'kg CO₂', 'Trash', 'Temperature_fahrenheit', 'kW', 'Electric_kW', 'Gallon per minute', 'Gallon (rate)', 'Liter per hour', 'Liter (rate)', 'Water_Gallon_Per_Minute', 'kg of CO₂', 'Metric_ton of CO₂');
+delete from units where name in ('Electric_Utility', 'Natural_Gas_BTU', '100 w bulb', 'Natural_Gas_M3', 'Natural_Gas_Dollar', 'Water_Gallon', 'US dollar', 'US $', 'euro', 'gallon', 'liter', 'kg CO₂', 'Trash', 'Temperature_Fahrenheit', 'kW', 'Electric_kW', 'gallon per minute', 'gallon per minute', 'liter per hour', 'Water_Gallon_Per_Minute', 'kg of CO₂', 'metric ton of CO₂');
 -- Quit postgres.
 \q
 */
