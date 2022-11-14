@@ -29,13 +29,15 @@ export default function ExportComponent(props: ExportProps) {
 	 */
 
 	const exportReading = () => {
-		const data = props.exportVals.datasets;
+		var data = []
+		for(let i = 0; i < props.exportVals.datasets.length; i++){
+			 data.push(props.exportVals.datasets[i]);
+		
+		
+		
+		
 		//const labelUnique = props.exportVals.datasets[0].label;
 		
-		// for(const reading of labelUnique ){
-		// 	if(reading !== labelUnique){
-		// 		data.push(labelUnique);
-		// 	}
 
 		// Sort the dataset based on the start time
 		data.forEach(reading => {
@@ -75,9 +77,11 @@ export default function ExportComponent(props: ExportProps) {
 		const startTimeString = startTime.utc().format('LL_LTS').replace(/,/g, '').replace(/[\s:-]/g, '_');
 		const endTimeString = endTime.utc().format('LL_LTS').replace(/,/g, '').replace(/[\s:-]/g, '_');
 		const chartName = data[0].currentChart;
+		
 		const name = `oedExport_${chartName}_${startTimeString}_to_${endTimeString}.csv`;
 		graphExport(data, name);
-		//} //end of loop
+		data.splice(0,data.length);
+		} //end of loop
 	};
 
 	const exportRawReadings = async () => {

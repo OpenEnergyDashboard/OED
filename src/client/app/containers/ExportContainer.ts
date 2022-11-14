@@ -47,7 +47,8 @@ function mapStateToProps(state: State) {
 						label,
 						id: state.groups.byGroupID[groupID].id,
 						currentChart: chart,
-						exportVals: dataPoints
+						exportVals: dataPoints,
+						unit: state.groups.byGroupID[groupID].id
 					});
 				}
 			}
@@ -71,7 +72,8 @@ function mapStateToProps(state: State) {
 						label,
 						id: state.meters.byMeterID[meterID].id,
 						currentChart: chart,
-						exportVals: dataPoints
+						exportVals: dataPoints,
+						unit: state.meters.byMeterID[meterID].unitId
 					});
 				}
 			}
@@ -101,7 +103,8 @@ function mapStateToProps(state: State) {
 								label,
 								id: state.groups.byGroupID[groupID].id,
 								currentChart: chart,
-								exportVals: dataPoints
+								exportVals: dataPoints,
+								unit: state.groups.byGroupID[unitID].id
 							});
 						}
 					}
@@ -132,7 +135,8 @@ function mapStateToProps(state: State) {
 								label,
 								id: state.meters.byMeterID[meterID].id,
 								currentChart: chart,
-								exportVals: dataPoints
+								exportVals: dataPoints,
+								unit: state.meters.byMeterID[meterID].unitId
 							});
 						}
 					}
@@ -145,6 +149,7 @@ function mapStateToProps(state: State) {
 		showRawExport: state.graph.chartToRender === 'line' ? true : false,
 		selectedMeters: state.graph.selectedMeters,
 		selectedGroups: state.graph.selectedGroups,
+		units: state.graph.selectedUnit,
 		exportVals: { datasets },
 		timeInterval: state.graph.timeInterval,
 		defaultLanguage: state.admin.defaultLanguage,
