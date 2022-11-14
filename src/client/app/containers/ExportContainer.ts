@@ -9,6 +9,7 @@ import { ChartTypes } from '../types/redux/graph';
 import { BarReading, LineReading, ExportDataSet } from '../types/readings';
 import { State } from '../types/redux/state';
 
+
 function transformLineReadingToLegacy(reading: LineReading): [number, number, number] {
 	return [reading.startTimestamp, reading.reading, reading.endTimestamp];
 }
@@ -48,7 +49,8 @@ function mapStateToProps(state: State) {
 						id: state.groups.byGroupID[groupID].id,
 						currentChart: chart,
 						exportVals: dataPoints,
-						unit: state.groups.byGroupID[groupID].id
+						unit: state.groups.byGroupID[unitID].toString()
+						//unit: state.units.units[parseInt(state.meters.byMeterID[meterID].unitId.toString())].name
 					});
 				}
 			}
@@ -73,7 +75,8 @@ function mapStateToProps(state: State) {
 						id: state.meters.byMeterID[meterID].id,
 						currentChart: chart,
 						exportVals: dataPoints,
-						unit: state.meters.byMeterID[meterID].unitId
+						unit: state.units.units[parseInt(state.meters.byMeterID[meterID].unitId.toString())].name
+						// state.meters.byMeterID[meterID].unitId.toString()
 					});
 				}
 			}
@@ -104,7 +107,7 @@ function mapStateToProps(state: State) {
 								id: state.groups.byGroupID[groupID].id,
 								currentChart: chart,
 								exportVals: dataPoints,
-								unit: state.groups.byGroupID[unitID].id
+								unit: state.groups.byGroupID[unitID].toString()
 							});
 						}
 					}
@@ -136,7 +139,8 @@ function mapStateToProps(state: State) {
 								id: state.meters.byMeterID[meterID].id,
 								currentChart: chart,
 								exportVals: dataPoints,
-								unit: state.meters.byMeterID[meterID].unitId
+								unit: state.units.units[parseInt(state.meters.byMeterID[meterID].unitId.toString())].name
+								// state.meters.byMeterID[meterID].unitId.toString()
 							});
 						}
 					}

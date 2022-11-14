@@ -8,7 +8,6 @@ import { usersApi } from '../utils/api'
 import * as moment from 'moment';
 import { UserRole } from '../types/items';
 import translate from './translate';
-import units from 'reducers/units';
 
 /**
  * Function to converts the meter readings into a CSV formatted string.
@@ -17,17 +16,17 @@ import units from 'reducers/units';
  */
 
 function convertToCSV(items: ExportDataSet[]) {
-	let csvOutput = 'Readings,Start Timestamp,End Timestamp\n';
+	let csvOutput = 'Readings,Start Timestamp,End Timestamp,Unit\n';
 	items.forEach(set => {
 		const data = set.exportVals;
 		//const label = set.label;
-		//const unit = set.unit;
+		const unit = set.unit;
 		data.forEach(reading => {
 			const info = reading.y;
 			// Why UTC is needed here has not been carefully analyzed.
 			const startTimeStamp = moment.utc(reading.x).format('dddd LL LTS').replace(/,/g, ''); // use regex to omit pesky commas
 			const endTimeStamp = moment.utc(reading.z).format('dddd LL LTS').replace(/,/g, '');
-			csvOutput += `${info},${startTimeStamp},${endTimeStamp},${units}\n`; // TODO: add column for units
+			csvOutput += `${info},${startTimeStamp},${endTimeStamp},${unit}\n`; // TODO: add column for units
 		});
 	});
 	return csvOutput;

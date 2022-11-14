@@ -16,7 +16,7 @@ export interface CompareReadings {
 export interface ExportDataSet {
 	label: string;
 	id: number;
-	unit: number;
+	unit: string;
 	currentChart: ChartTypes;
 	exportVals: Array<{ x: number, y: number, z: number }>;
 }

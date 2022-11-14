@@ -77,8 +77,9 @@ export default function ExportComponent(props: ExportProps) {
 		const startTimeString = startTime.utc().format('LL_LTS').replace(/,/g, '').replace(/[\s:-]/g, '_');
 		const endTimeString = endTime.utc().format('LL_LTS').replace(/,/g, '').replace(/[\s:-]/g, '_');
 		const chartName = data[0].currentChart;
-		
-		const name = `oedExport_${chartName}_${startTimeString}_to_${endTimeString}.csv`;
+		const meterName = data[0].label;
+		const unit = data[0].unit;
+		const name = `oedExport_${chartName}_${meterName}_${unit}_${startTimeString}_to_${endTimeString}.csv`;
 		graphExport(data, name);
 		data.splice(0,data.length);
 		} //end of loop
