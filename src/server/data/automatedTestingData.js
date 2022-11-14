@@ -317,10 +317,9 @@ async function testData() {
 }
 
 /**
- * Call the functions to insert special units, conversions, meters and groups.
+ * Inserts special units into the database.
  */
-async function insertSpecialUnitsConversionsMetersGroups() {
-
+async function insertSpecialUnits(conn) {
 	// The table contains special units' data.
 	const specialUnits = [
 		['Electric_Utility', '', Unit.unitRepresentType.QUANTITY, 3600, Unit.unitType.METER, '', Unit.displayableType.NONE, false, 'special unit'],
@@ -342,7 +341,14 @@ async function insertSpecialUnitsConversionsMetersGroups() {
 		['liter per hour', 'Liter (rate)', Unit.unitRepresentType.FLOW, 3600, Unit.unitType.UNIT, '', Unit.displayableType.ALL, true, 'special unit'],
 		['Water_Gallon_Per_Minute', '', Unit.unitRepresentType.FLOW, 60, Unit.unitType.METER, '', Unit.displayableType.NONE, false, 'special unit']
 	];
+	await insertUnits(specialUnits, conn);
+}
 
+
+/**
+ * Insert special conversions into the database.
+ */
+async function insertSpecialConversions(conn) {
 	// The table contains special conversions' data.
 	const specialConversions = [
 		['kWh', '100 w bulb', false, 1, 0, 'kWh → 100 W bulb'],
@@ -352,7 +358,7 @@ async function insertSpecialUnitsConversionsMetersGroups() {
 		['Natural_Gas_BTU', 'BTU', false, 1, 0, 'Natural_Gas_BTU → BTU'],
 		['Natural_Gas_BTU', 'euro', false, 2.6e-6, 0, 'Natural_Gas_BTU → euro'],
 		['Natural_Gas_BTU', 'kg CO₂', false, 5.28e-5, 0, 'Natural_Gas_BTU → CO2'],
-		['Natural_Gas_M3', 'm3 gas', false, 1, 0, 'Natural_Gas_M3 → m3 of gas'],
+		['Natural_Gas_M3', 'm³ gas', false, 1, 0, 'Natural_Gas_M3 → m3 of gas'],
 		['Natural_Gas_M3', 'US dollar', false, 0.11, 0, 'Natural_Gas_M3 → US dollar'],
 		['Water_Gallon', 'gallon', false, 1, 0, 'Water_Gallon → gallon'],
 		['liter', 'gallon', true, 0.2641729, 0, 'liter → gallon'],
@@ -366,7 +372,13 @@ async function insertSpecialUnitsConversionsMetersGroups() {
 		['Water_Gallon_Per_Minute', 'gallon per minute', false, 1, 0, 'Water_Gallon_Per_Minute → gallon per minute'],
 		['gallon per minute', 'liter per hour', true, 227.12398, 0, 'gallon per minute → liter per hour']
 	];
+	await insertConversions(specialConversions, conn);
+}
 
+/**
+ * Call the functions to insert special units, conversions, meters and groups.
+ */
+async function insertSpecialUnitsConversionsMetersGroups() {
 	// The table contains special meters' data.
 	// Should only delete automatically generated ones.
 	// Don't check cases of no default graphic unit since it is set to unit_id for meters.
@@ -380,7 +392,7 @@ async function insertSpecialUnitsConversionsMetersGroups() {
 		['Natural Gas BTU', 'Natural_Gas_BTU', 'BTU', true, undefined, 'special meter', 'data/unit/quantity1-5.csv', false],
 		['Natural Gas BTU in Dollar', 'Natural_Gas_BTU', 'US dollar', true, undefined, 'special meter', 'data/unit/quantity1-5.csv', false],
 		['Natural Gas Dollar', 'Natural_Gas_Dollar', 'US dollar', true, undefined, 'special meter', 'data/unit/quantity1-5.csv', false],
-		['Natural Gas Cubic Meters', 'Natural_Gas_M3', 'm3 gas', true, undefined, 'special meter', 'data/unit/quantity1-5.csv', false],
+		['Natural Gas Cubic Meters', 'Natural_Gas_M3', 'm³ gas', true, undefined, 'special meter', 'data/unit/quantity1-5.csv', false],
 		['Water Gallon', 'Water_Gallon', 'gallon', true, undefined, 'special meter', 'data/unit/quantity1-5.csv', false],
 		['Trash Kg', 'Trash', 'kg', true, undefined, 'special meter', 'data/unit/quantity1-5.csv', false],
 		['Temp Fahrenheit 0-212', 'Temperature_Fahrenheit', 'Fahrenheit', true, undefined, 'special meter', 'data/unit/temp0-212.csv', false],
@@ -430,8 +442,8 @@ async function insertSpecialUnitsConversionsMetersGroups() {
 	await insertStandardUnits(conn);
 	await insertStandardConversions(conn);
 	// Add items for developer testing.
-	await insertUnits(specialUnits, conn);
-	await insertConversions(specialConversions, conn);
+	await insertSpecialUnits(conn);
+	await insertSpecialConversions(conn);
 	// Recreate the Cik entries since changed units/conversions.
 	// Do now since needed to insert meters with suffix units.
 	await redoCik(conn);
@@ -471,9 +483,9 @@ delete from meters where name in ('Electric Utility kWh', 'Electric Utility kWh 
 -- remove conversions
 -- Normally 22 total
 delete from conversions where source_id = (select id from units where name = 'kWh') and destination_id = (select id from units where name = '100 W bulb');
-delete from conversions where source_id = (select id from units where name = 'Electric_utility') and destination_id = (select id from units where name = 'kWh');
-delete from conversions where source_id = (select id from units where name = 'Electric_utility') and destination_id = (select id from units where name = 'US_dollar');
-delete from conversions where source_id = (select id from units where name = 'Electric_utility') and destination_id = (select id from units where name = 'kg CO₂');
+delete from conversions where source_id = (select id from units where name = 'Electric_Utility') and destination_id = (select id from units where name = 'kWh');
+delete from conversions where source_id = (select id from units where name = 'Electric_Utility') and destination_id = (select id from units where name = 'US_dollar');
+delete from conversions where source_id = (select id from units where name = 'Electric_Utility') and destination_id = (select id from units where name = 'kg CO₂');
 delete from conversions where source_id = (select id from units where name = 'Natural_Gas_BTU') and destination_id = (select id from units where name = 'BTU');
 delete from conversions where source_id = (select id from units where name = 'Natural_Gas_BTU') and destination_id = (select id from units where name = 'Euro');
 delete from conversions where source_id = (select id from units where name = 'Natural_Gas_BTU') and destination_id = (select id from units where name = 'kg CO₂');
@@ -495,7 +507,7 @@ delete from conversions where source_id = (select id from units where name = 'Wa
 delete from conversions where source_id = (select id from units where name = 'Gallon per minute') and destination_id = (select id from units where name = 'Liter per hour');
 -- remove units; last two were created as part of suffix unit on CO₂
 -- normally gives "DELETE 20"
-delete from units where name in ('Electric_utility', 'Natural_Gas_BTU', '100 W bulb', 'Natural_Gas_M3', 'Natural_Gas_dollar', 'Water_Gallon', 'US_dollar', 'US $', 'Euro', 'Gallon', 'Liter', 'kg CO₂', 'Trash', 'Temperature_fahrenheit', 'kW', 'Electric_kW', 'Gallon per minute', 'Gallon (rate)', 'Liter per hour', 'Liter (rate)', 'Water_Gallon_Per_Minute', 'kg of CO₂', 'Metric_ton of CO₂');
+delete from units where name in ('Electric_Utility', 'Natural_Gas_BTU', '100 w bulb', 'Natural_Gas_M3', 'Natural_Gas_dollar', 'Water_Gallon', 'US_dollar', 'US $', 'Euro', 'Gallon', 'Liter', 'kg CO₂', 'Trash', 'Temperature_fahrenheit', 'kW', 'Electric_kW', 'Gallon per minute', 'Gallon (rate)', 'Liter per hour', 'Liter (rate)', 'Water_Gallon_Per_Minute', 'kg of CO₂', 'Metric_ton of CO₂');
 -- Quit postgres.
 \q
 */
@@ -512,5 +524,7 @@ module.exports = {
 	generateOneMinuteTestingData,
 	generateTestingData,
 	generateVariableAmplitudeTestingData,
+	insertSpecialUnits,
+	insertSpecialConversions,
 	insertSpecialUnitsConversionsMetersGroups
 };
