@@ -55,13 +55,20 @@ export default class RouteComponent extends React.Component<RouteProps> {
 	}
 
 	/**
+	 * TODO The following three functions, requireRole, requireAuth, and checkAuth, do not work exactly as intended.
+	 * Their async blocks evaluate properly, but the returns inside of them are never honored. The end return statement is always what is evaluated.
+	 * Fixing this may require some major changes to how page redirects are done. This is detailed more in issue #817.
+	 * The errors can be obtained by putting breakpoints on all returns and then stepping through a page load in a debugger.
+	*/
+
+	/**
 	 * Generates middleware that requires proper role and authentication for a page route
 	 * @param requiredRole The role that is necessary to access a page route
 	 * @param component The component of the page redirecting
 	 * @returns The page route to continue to (component or home)
 	 */
 	public requireRole(requiredRole: UserRole, component: JSX.Element) {
-		// Redirect route to login page if the auth token does not exist
+		// Redirect route to login page if the auth token does not exist or if the user is not a csv role
 		if (!hasToken() || !hasPermissions(this.props.role, requiredRole)) {
 			return <Redirect to='/' />;
 		}
@@ -75,6 +82,7 @@ export default class RouteComponent extends React.Component<RouteProps> {
 				// This ensures that if there is no token then there is no stale profile in the redux store.
 				this.props.clearCurrentUser();
 				// Route to home page if the auth token is not valid
+				// this is never properly honored
 				return <Redirect to='/' />;
 			}
 			return component;
@@ -89,7 +97,7 @@ export default class RouteComponent extends React.Component<RouteProps> {
 	 * @returns The page route to continue to (component or home)
 	 */
 	public requireAuth(component: JSX.Element) {
-		// Redirect route to home page if the auth token does not exist
+		// Redirect route to home page if the auth token does not exist or if the user is not an admin
 		if (!hasToken() || !this.props.loggedInAsAdmin) {
 			return <Redirect to='/' />;
 		}
@@ -103,6 +111,7 @@ export default class RouteComponent extends React.Component<RouteProps> {
 				// This ensures that if there is no token then there is no stale profile in the redux store.
 				this.props.clearCurrentUser();
 				// Route to login page since the auth token is not valid
+				// this is never properly honored
 				return <Redirect to='/' />;
 			}
 			return component;
@@ -128,6 +137,7 @@ export default class RouteComponent extends React.Component<RouteProps> {
 					// This ensures that if there is no token then there is no stale profile in the redux store.
 					this.props.clearCurrentUser();
 				}
+				// redundant return, not needed even if it did work
 				return component;
 			})();
 		}
