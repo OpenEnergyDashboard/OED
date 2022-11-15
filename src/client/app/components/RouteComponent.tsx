@@ -62,8 +62,8 @@ export default class RouteComponent extends React.Component<RouteProps> {
 	 */
 	public requireRole(requiredRole: UserRole, component: JSX.Element) {
 		// Redirect route to login page if the auth token does not exist
-		if (!hasToken()) {
-			return <Redirect to='/'/>;
+		if (!hasToken() || !hasPermissions(this.props.role, requiredRole)) {
+			return <Redirect to='/' />;
 		}
 		// Verify that the auth token is valid.
 		// Needs to be async because of the network request
@@ -75,10 +75,7 @@ export default class RouteComponent extends React.Component<RouteProps> {
 				// This ensures that if there is no token then there is no stale profile in the redux store.
 				this.props.clearCurrentUser();
 				// Route to home page if the auth token is not valid
-				return <Redirect to='/'/>;
-			} else if (!hasPermissions(this.props.role, requiredRole)) {
-				// Even though the auth token is valid, we still need to check that the user is the required role.
-				return <Redirect to='/'/>;
+				return <Redirect to='/' />;
 			}
 			return component;
 		})();
@@ -93,8 +90,8 @@ export default class RouteComponent extends React.Component<RouteProps> {
 	 */
 	public requireAuth(component: JSX.Element) {
 		// Redirect route to home page if the auth token does not exist
-		if (!hasToken()) {
-			return <Redirect to='/'/>;
+		if (!hasToken() || !this.props.loggedInAsAdmin) {
+			return <Redirect to='/' />;
 		}
 		// Verify that the auth token is valid.
 		// Needs to be async because of the network request
@@ -106,10 +103,7 @@ export default class RouteComponent extends React.Component<RouteProps> {
 				// This ensures that if there is no token then there is no stale profile in the redux store.
 				this.props.clearCurrentUser();
 				// Route to login page since the auth token is not valid
-				return <Redirect to='/'/>;
-			} else if (!this.props.loggedInAsAdmin) {
-				// Even though the auth token is valid, we still need to check that the user is an admin.
-				return <Redirect to='/'/>;
+				return <Redirect to='/' />;
 			}
 			return component;
 		})();
@@ -238,21 +232,21 @@ export default class RouteComponent extends React.Component<RouteProps> {
 					<>
 						<Router history={browserHistory}>
 							<Switch>
-								<Route path='/login' component={LoginContainer}/>
-								<Route path='/admin' render={() => this.requireAuth(AdminComponent())}/>
-								<Route path='/csv' render={() => this.requireRole(UserRole.CSV, <UploadCSVContainer/>)}/>
-								<Route path='/groups' render={() => this.checkAuth(<GroupsDetailContainer/>)}/>
-								<Route path='/meters' render={() => this.checkAuth(<MetersDetailComponent/>)}/>
-								<Route path='/graph' render={({ location }) => this.linkToGraph(<HomeComponent/>, location.search)}/>
-								<Route path='/calibration' render={() => this.requireAuth(<MapCalibrationContainer/>)}/>
-								<Route path='/maps' render={() => this.requireAuth(<MapsDetailContainer/>)}/>
-								<Route path='/createGroup' render={() => this.requireAuth(<CreateGroupContainer/>)}/>
-								<Route path='/editGroup' render={() => this.requireAuth(<EditGroupsContainer/>)}/>
-								<Route path='/users/new' render={() => this.requireAuth(<CreateUserContainer/>)}/>
-								<Route path='/users' render={() => this.requireAuth(<UsersDetailContainer fetchUsers={() => []}/>)}/>
-								<Route path='/units'render={() => this.requireAuth(<UnitsDetailComponent />)}/>
-								<Route path='/conversions' render={() => this.requireAuth(<ConversionsDetailComponent />)}/>
-								<Route path='*' component={HomeComponent}/>
+								<Route path='/login' component={LoginContainer} />
+								<Route path='/admin' render={() => this.requireAuth(AdminComponent())} />
+								<Route path='/csv' render={() => this.requireRole(UserRole.CSV, <UploadCSVContainer />)} />
+								<Route path='/groups' render={() => this.checkAuth(<GroupsDetailContainer />)} />
+								<Route path='/meters' render={() => this.checkAuth(<MetersDetailComponent />)} />
+								<Route path='/graph' render={({ location }) => this.linkToGraph(<HomeComponent />, location.search)} />
+								<Route path='/calibration' render={() => this.requireAuth(<MapCalibrationContainer />)} />
+								<Route path='/maps' render={() => this.requireAuth(<MapsDetailContainer />)} />
+								<Route path='/createGroup' render={() => this.requireAuth(<CreateGroupContainer />)} />
+								<Route path='/editGroup' render={() => this.requireAuth(<EditGroupsContainer />)} />
+								<Route path='/users/new' render={() => this.requireAuth(<CreateUserContainer />)} />
+								<Route path='/users' render={() => this.requireAuth(<UsersDetailContainer fetchUsers={() => []} />)} />
+								<Route path='/units' render={() => this.requireAuth(<UnitsDetailComponent />)} />
+								<Route path='/conversions' render={() => this.requireAuth(<ConversionsDetailComponent />)} />
+								<Route path='*' component={HomeComponent} />
 							</Switch>
 						</Router>
 					</>
