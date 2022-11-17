@@ -2,10 +2,10 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
 
- const database = require('../models/database');
- const sqlFile = database.sqlFile;
- const { getConnection } = require('../db');
- const { refreshAllReadingViews } = require('../services/refreshAllReadingViews');
+const database = require('../models/database');
+const sqlFile = database.sqlFile;
+const { getConnection } = require('../db');
+const { refreshAllReadingViews } = require('../services/refreshAllReadingViews');
 
 // These functions are designed for OED developers.
 
@@ -27,17 +27,20 @@ async function createShiftReadingsFunction() {
  * Also, it returns "The readings were shifted by:  a few seconds" when no shift is really done (why is unknown).
  * @param {*} meterName The name of the meter to shift the readings.
  * @param {*} timezone The timezone to use when shifting to current time.
+ * @param {*} refreshReadings if true (default) then readings are refreshed
  */
- async function shiftReadings(meterName, timezone) {
+async function shiftReadings(meterName, timezone, refreshReadings = true) {
 	console.log(`shifting meter \"${meterName}\" to timezone \"${timezone}\"`);
 	conn = getConnection();
 	const row = await conn.one(sqlFile('developer/shift_readings.sql'), { meter_name: meterName, timezone: timezone });
 	console.log('    The readings were shifted by: ', row.shift_readings.humanize());
-	console.log('refreshing all views since readings changed');
-	await refreshAllReadingViews();
+	if (refreshReadings) {
+		console.log('refreshing all views since readings changed');
+		await refreshAllReadingViews();
+	}
 }
 
- module.exports = {
+module.exports = {
 	createShiftReadingsFunction,
 	shiftReadings
 }
