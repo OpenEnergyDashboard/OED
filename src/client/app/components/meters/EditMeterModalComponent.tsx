@@ -203,21 +203,6 @@ export default function EditMeterModalComponent(props: EditMeterModalComponentPr
 			// Set default identifier as name if left blank
 			state.identifier = (!state.identifier || state.identifier.length === 0) ? state.name : state.identifier;
 
-			// Check area is positive.
-			// TODO For now allow zero so works with default value and DB. We should probably
-			// make this better default than 0 (DB set to not null now).
-			// if (state.area <= 0) {
-			if (state.area < 0) {
-				notifyUser(translate('area.invalid') + state.area + '.');
-				inputOk = false;
-			}
-
-			// Check reading duplication is between 1 and 9.
-			if (state.readingDuplication < 1 || state.readingDuplication > 9) {
-				notifyUser(translate('duplication.invalid') + state.area + '.');
-				inputOk = false;
-			}
-
 			// Check GPS entered.
 			// Validate GPS is okay and take from string to GPSPoint to submit.
 			const gpsInput = state.gps;

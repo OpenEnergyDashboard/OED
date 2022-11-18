@@ -36,7 +36,6 @@ export default class MetersCSVUploadComponent extends React.Component<MetersCSVU
 				fetchMetersDetails();
 			}
 		} catch (error) {
-			console.log(error);
 			// A failed axios request should result in an error.
 			window.alert(error.response.data as string);
 		}

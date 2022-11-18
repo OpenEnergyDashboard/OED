@@ -38,22 +38,22 @@ CREATE TABLE IF NOT EXISTS meters (
     enabled BOOLEAN NOT NULL,
     displayable BOOLEAN NOT NULL,
     meter_type meter_type NOT NULL,
-    default_timezone_meter TEXT DEFAULT NULL,
+    default_timezone_meter TEXT DEFAULT NULL CHECK (check_timezone(default_timezone_meter) = true),
     gps POINT DEFAULT NULL,
     identifier TEXT UNIQUE NOT NULL CHECK (char_length(identifier) >= 1),
     note TEXT,
-    area REAL DEFAULT NULL,
+    area REAL DEFAULT NULL CHECK (area >= 0),
     cumulative BOOLEAN DEFAULT false,
     cumulative_reset BOOLEAN DEFAULT false,
     cumulative_reset_start TIME DEFAULT '00:00:00',
     cumulative_reset_end TIME DEFAULT '23:59:59.999999',
     reading_gap REAL DEFAULT 0,
     reading_variation REAL DEFAULT 0,
-    reading_duplication INTEGER DEFAULT 1,
-    time_sort TEXT DEFAULT 'increasing',
+    reading_duplication INTEGER DEFAULT 1 CHECK (reading_duplication >= 1 AND reading_duplication <= 9),
+    time_sort TEXT DEFAULT 'increasing' CHECK (time_sort = 'increasing' OR time_sort = 'decreasing'),
     end_only_time BOOLEAN DEFAULT false,
     reading FLOAT DEFAULT 0.0,
-   -- The next two are strings because src/server/models/patch-moment-type.js is set up to automatically convert every moment
+    -- The next two are strings because src/server/models/patch-moment-type.js is set up to automatically convert every moment
     -- object back to UTC which removes the needed timezone information. This is the only place we need the timezone
     -- so all others in the DB are moment time objects.
     start_timestamp VARCHAR(50) DEFAULT '1970-01-01 00:00:00+00:00',
