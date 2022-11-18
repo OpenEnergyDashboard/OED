@@ -138,7 +138,7 @@ export interface MapData{
 }
 
 /**
- *  Data format used keep track of map's state //added newLine below issue 769
+ *  Data format used keep track of map's state
  *
  *  @param id {number} id <= -1 means it's a new map;
  *  @param name
