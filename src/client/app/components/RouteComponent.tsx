@@ -68,7 +68,7 @@ export default class RouteComponent extends React.Component<RouteProps> {
 	 * @returns The page route to continue to (component or home)
 	 */
 	public requireRole(requiredRole: UserRole, component: JSX.Element) {
-		// Redirect route to login page if the auth token does not exist or if the user is not a csv role
+		// Redirect route to login page if the auth token does not exist or if the user is not the required role
 		if (!hasToken() || !hasPermissions(this.props.role, requiredRole)) {
 			return <Redirect to='/' />;
 		}
