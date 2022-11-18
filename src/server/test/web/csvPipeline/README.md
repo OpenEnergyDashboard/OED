@@ -1171,7 +1171,8 @@ The script also describes how to delete all the meters/readings if you want to r
    </td>
    <td>The second reading has start and end time the same so length is zero and the reading is rejected. Also get gap warning on reading three since 2nd was wrong. Expect to have readings 1 & 3-5.
    </td>
-   </tr>tr>
+   </tr>
+   <tr>
    <td>regAscEndonlyEndSamePreviousEnd
    </td>
    <td>pipe52
@@ -1193,4 +1194,312 @@ The script also describes how to delete all the meters/readings if you want to r
    <td>The second reading has end time that is same as the first reading's end time and the reading is rejected. In end only data you use the previous to get the current start so the reading spans no time. Also get length warning on reading three since 2nd was wrong. Also get warning length on reading #4 since #3 was messed up. Expect to have readings 3-5.
    </td>
    </tr>
-     </table>
+   <tr>
+   <td>daylightForwardHourlyCT & meterPipe53
+   </td>
+   <td>pipe53
+   </td>
+   <td>
+   </td>
+   <td>
+   <td>
+   </td>
+   </td>
+   <td>
+   </td>
+   <td>
+   </td>
+   <td>
+   </td>
+    <td>
+   </td>
+   <td>The second reading crosses into DST and has time adjusted. The readings are 60/0-1, 120/1-2, 180/3-4.
+   </td>
+   </tr>
+   <tr>
+   <td>daylightForwardDailyCT & meterPipe54
+   </td>
+   <td>pipe54
+   </td>
+   <td>
+   </td>
+   <td>
+   <td>
+   </td>
+   </td>
+   <td>
+   </td>
+   <td>
+   </td>
+   <td>
+   </td>
+    <td>
+   </td>
+   <td>The second reading crosses into DST and must be split. The readings are 1440/03-13 0-0, 240/03-13 0-3, 2520/03-13 3-0, 4320/03-14 0-0.
+   </td>
+   </tr>
+   <tr>
+   <td>daylightForward15MinCT & meterPipe55
+   </td>
+   <td>pipe55
+   </td>
+   <td>
+   </td>
+   <td>
+   <td>
+   </td>
+   </td>
+   <td>
+   </td>
+   <td>
+   </td>
+   <td>
+   </td>
+    <td>
+   </td>
+   <td>The second reading crosses into DST and has time adjusted. The readings are 15/1:30-1:45, 30/1:45-2:00, 45/3:00-3:15.
+   </td>
+   </tr>
+   <tr>
+   <td>daylightForward23MinCT & meterPipe56
+   </td>
+   <td>pipe56
+   </td>
+   <td>
+   </td>
+   <td>
+   <td>
+   </td>
+   </td>
+   <td>
+   </td>
+   <td>
+   </td>
+   <td>
+   </td>
+    <td>
+   </td>
+   <td>The second reading crosses into DST and must be split. The readings are 23/1:23-1:46, 28/1:46-2:00, 18/3:00-3:09, 69/3:09-3:32.
+   </td>
+   </tr>
+   <tr>
+   <td>daylightForward23MinCumulativeCT & meterPipe57
+   </td>
+   <td>pipe57
+   </td>
+   <td>
+   </td>
+   <td>X
+   <td>
+   </td>
+   </td>
+   <td>
+   </td>
+   <td>
+   </td>
+   <td>
+   </td>
+    <td>
+   </td>
+   <td>The second reading crosses into DST and must be split and cumulative. The readings are 23/1:23-1:46, 28/1:46-2:00, 18/3:00-3:09, 69/3:09-3:32.
+   </td>
+   </tr>
+   <tr>
+   <td>daylightForward23MinEndCT & meterPipe58
+   </td>
+   <td>pipe58
+   </td>
+   <td>
+   </td>
+   <td>
+   <td>
+   </td>
+   </td>
+   <td>
+   </td>
+   <td>
+   </td>
+   <td>
+   </td>
+    <td>X
+   </td>
+   <td>The second reading crosses into DST and must be split and end only. The readings are 23/1:23-1:46, 28/1:46-2:00, 18/3:00-3:09, 69/3:09-3:32.
+   </td>
+   </tr>
+   <tr>
+   <td>daylightBackwardHourlyCT & meterPipe59
+   </td>
+   <td>pipe59
+   </td>
+   <td>
+   </td>
+   <td>
+   <td>
+   </td>
+   </td>
+   <td>
+   </td>
+   <td>
+   </td>
+   <td>
+   </td>
+    <td>
+   </td>
+   <td>The second reading crosses from DST and must be dropped. The readings are 60/0-1, 120/1-2.
+   </td>
+   </tr>
+   <tr>
+   <td>daylightBackwardDailyCT & meterPipe60
+   </td>
+   <td>pipe60
+   </td>
+   <td>
+   </td>
+   <td>
+   <td>
+   </td>
+   </td>
+   <td>
+   </td>
+   <td>
+   </td>
+   <td>
+   </td>
+    <td>
+   </td>
+   <td>The second reading crosses from DST and must be prorated. The readings are 1440/11-05, 2880/11-06, 4320/11-07.
+   </td>
+   </tr>
+   <tr>
+   <td>daylightBackward15MinCT & meterPipe61
+   </td>
+   <td>pipe61
+   </td>
+   <td>
+   </td>
+   <td>
+   <td>
+   </td>
+   </td>
+   <td>
+   </td>
+   <td>
+   </td>
+   <td>
+   </td>
+    <td>
+   </td>
+   <td>The second reading crosses from DST and must be dropped. Readings 3-5 are also dropped. The readings are 15/1:30-1:45, 30/1:45-2:00, 45/2:00-2:15.
+   </td>
+   </tr>
+   <tr>
+   <td>daylightBackward23MinCT & meterPipe62
+   </td>
+   <td>pipe62
+   </td>
+   <td>
+   </td>
+   <td>
+   <td>
+   </td>
+   </td>
+   <td>
+   </td>
+   <td>
+   </td>
+   <td>
+   </td>
+    <td>
+   </td>
+   <td>The second reading crosses from DST and must be dropped. Readings 3 is also dropped. Reading 4 must be split. The readings are 23/1:23-1:46, 18/1:46-1:55, 69/1:55-2:18, 92/2:18-2:41.
+   </td>
+   </tr>
+   <tr>
+   <td>daylightBackward23MinCumulativeCT & meterPipe63
+   </td>
+   <td>pipe63
+   </td>
+   <td>
+   </td>
+   <td>X
+   <td>
+   </td>
+   </td>
+   <td>
+   </td>
+   <td>
+   </td>
+   <td>
+   </td>
+    <td>
+   </td>
+   <td>Reading are cumulative. The first reading dropper for cumulate. The second reading crosses from DST and must be dropped. Readings 3 is also dropped. Reading 4 must be split. The readings are 23/1:23-1:46, 18/1:46-1:55, 69/1:55-2:18, 92/2:18-2:41.
+   </td>
+   </tr>
+   <tr>
+   <td>daylightBackward23MinEndCT & meterPipe64
+   </td>
+   <td>pipe64
+   </td>
+   <td>
+   </td>
+   <td>
+   <td>
+   </td>
+   </td>
+   <td>
+   </td>
+   <td>
+   </td>
+   <td>
+   </td>
+    <td>X
+   </td>
+   <td>Reading are end only. The first reading dropped for end only. The second reading crosses from DST and must be dropped. Readings 3 is also dropped. Reading 4 must be split. The readings are 23/1:23-1:46, 18/1:46-1:55, 69/1:55-2:18, 92/2:18-2:41.
+   </td>
+   </tr>
+   <tr>
+   <td>daylightBackward23MinEndACT & daylightBackward23MinEndBCT & meterPipe65
+   </td>
+   <td>pipe65
+   </td>
+   <td>
+   </td>
+   <td>
+   <td>
+   </td>
+   </td>
+   <td>
+   </td>
+   <td>
+   </td>
+   <td>
+   </td>
+    <td>X
+   </td>
+   <td>Reading are end only but split into two files exactly when first hits the DST crossing. The first reading of the first file must be dropped for end only. The third reading of the first file crosses from DST and must be dropped. The first reading of file tow is also dropped. Reading 2 of the second file must be split. The readings are 23/1:23-1:46, 18/1:46-1:55, 69/1:55-2:18, 92/2:18-2:41.
+   </td>
+   </tr>
+   <tr>
+   <td>daylightBackwardGapCT & meterPipe66
+   </td>
+   <td>pipe66
+   </td>
+   <td>
+   </td>
+   <td>
+   <td>
+   </td>
+   </td>
+   <td>
+   </td>
+   <td>
+   </td>
+   <td>
+   </td>
+    <td>
+   </td>
+   <td>The second reading is after crossing but due to a gap the crossing is not seen. A warning is issued and two readings overlap. The readings are 15/1:25-1:55, 30/1:30-2:00, 45/2:00-2:30.
+   </td>
+   </tr>
+</table>

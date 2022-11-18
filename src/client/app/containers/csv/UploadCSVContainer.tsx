@@ -53,6 +53,8 @@ export default class UploadCSVContainer extends React.Component<{}, UploadCSVCon
 		this.toggleRefreshReadings = this.toggleRefreshReadings.bind(this);
 		this.toggleUpdate = this.toggleUpdate.bind(this);
 		this.toggleTab = this.toggleTab.bind(this);
+		this.toggleHonorDst = this.toggleHonorDst.bind(this);
+		this.toggleRelaxedParsing = this.toggleRelaxedParsing.bind(this);
 	}
 
 	state = {
@@ -210,6 +212,26 @@ export default class UploadCSVContainer extends React.Component<{}, UploadCSVCon
 		}))
 	}
 
+	private toggleHonorDst() {
+		this.setState(previousState => ({
+			...previousState,
+			uploadReadingsPreferences: {
+				...previousState.uploadReadingsPreferences,
+				honorDst: !previousState.uploadReadingsPreferences.honorDst
+			}
+		}))
+	}
+
+	private toggleRelaxedParsing() {
+		this.setState(previousState => ({
+			...previousState,
+			uploadReadingsPreferences: {
+				...previousState.uploadReadingsPreferences,
+				relaxedParsing: !previousState.uploadReadingsPreferences.relaxedParsing
+			}
+		}))
+	}
+
 	private toggleUpdate(mode: MODE) {
 		const preference = (mode === MODE.readings) ? 'uploadReadingsPreferences' : 'uploadMetersPreferences';
 		return () => {
@@ -284,6 +306,8 @@ export default class UploadCSVContainer extends React.Component<{}, UploadCSVCon
 							toggleHeaderRow={this.toggleHeaderRow(MODE.readings)}
 							toggleRefreshHourlyReadings={this.toggleRefreshHourlyReadings}
 							toggleRefreshReadings={this.toggleRefreshReadings}
+							toggleHonorDst={this.toggleHonorDst}
+							toggleRelaxedParsing={this.toggleRelaxedParsing}
 							toggleUpdate={this.toggleUpdate(MODE.readings)}
 						/>
 					</TabPane>

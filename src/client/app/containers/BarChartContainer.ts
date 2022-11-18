@@ -66,7 +66,7 @@ function mapStateToProps(state: State) {
 				const xData: string[] = [];
 				const yData: number[] = [];
 				const hoverText: string[] = [];
-				const readings = _.orderBy(readingsData.readings, ['startTimestamp'], ['asc']);
+				const readings = _.values(readingsData.readings);
 				readings.forEach(barReading => {
 					const st = moment.utc(barReading.startTimestamp);
 					// Time reading is in the middle of the start and end timestamp (may change this depending on how it looks on the bar graph)\
@@ -112,7 +112,7 @@ function mapStateToProps(state: State) {
 				const xData: string[] = [];
 				const yData: number[] = [];
 				const hoverText: string[] = [];
-				const readings = _.orderBy(readingsData.readings, ['startTimestamp'], ['asc']);
+				const readings = _.values(readingsData.readings);
 				readings.forEach(barReading => {
 					const st = moment.utc(barReading.startTimestamp);
 					// Time reading is in the middle of the start and end timestamp (may change this depending on how it looks on the bar graph)\

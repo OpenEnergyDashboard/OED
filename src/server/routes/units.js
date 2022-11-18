@@ -6,6 +6,7 @@ const express = require('express');
 const { log } = require('../log');
 const { getConnection } = require('../db');
 const Unit = require('../models/Unit');
+const { removeAdditionalConversionsAndUnits } = require('../services/graph/handleSuffixUnits');
 const validate = require('jsonschema').validate;
 
 const router = express.Router();
@@ -87,6 +88,10 @@ router.post('/edit', async (req, res) => {
 		const conn = getConnection();
 		try {
 			const unit = await Unit.getById(req.body.id, conn);
+			if (unit.suffix !== req.body.suffix) {
+				// Suffix changes so some conversions and units need to be removed.
+				await removeAdditionalConversionsAndUnits(unit, conn);
+			}
 			unit.name = req.body.name;
 			unit.displayable = req.body.displayable;
 			unit.identifier = req.body.identifier;

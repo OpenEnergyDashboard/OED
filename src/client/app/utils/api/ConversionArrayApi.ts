@@ -16,4 +16,8 @@ export default class ConversionArrayApi {
 	public async getConversionArray(): Promise<boolean[][]> {
 		return await this.backend.doGetRequest<boolean[][]>('/api/conversion-array');
 	}
+
+	public async refresh(redoCik: boolean, refreshReadingViews: boolean) {
+		return await this.backend.doPostRequest<void>('/api/conversion-array/refresh', { redoCik, refreshReadingViews });
+	}
 }
