@@ -102,6 +102,7 @@ export default function EditMeterModalComponent(props: EditMeterModalComponentPr
 		reading: props.meter.reading,
 		startTimestamp: props.meter.startTimestamp,
 		endTimestamp: props.meter.endTimestamp,
+		previousEnd: props.meter.previousEnd,
 		unitId: props.meter.unitId,
 		defaultGraphicUnit: props.meter.defaultGraphicUnit
 	}
@@ -190,7 +191,8 @@ export default function EditMeterModalComponent(props: EditMeterModalComponentPr
 				props.meter.readingDuplication != state.readingDuplication ||
 				props.meter.timeSort != state.timeSort ||
 				props.meter.startTimestamp != state.startTimestamp ||
-				props.meter.endTimestamp != state.endTimestamp
+				props.meter.endTimestamp != state.endTimestamp ||
+				props.meter.previousEnd != state.previousEnd
 			);
 
 		// Only validate and store if any changes.
@@ -649,6 +651,16 @@ export default function EditMeterModalComponent(props: EditMeterModalComponentPr
 												onChange={e => handleStringChange(e)}
 												placeholder="YYYY-MM-DD HH:MM:SS"
 												value={state?.endTimestamp} />
+										</div>
+										{/* previousEnd input */}
+										<div style={formInputStyle}>
+											<label><FormattedMessage id="meter.previousEnd" /></label><br />
+											<Input
+												name='previousEnd'
+												type='text'
+												onChange={e => handleStringChange(e)}
+												placeholder="YYYY-MM-DD HH:MM:SS"
+												value={state?.previousEnd} />
 										</div>
 									</div>
 								</div>

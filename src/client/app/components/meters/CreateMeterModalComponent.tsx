@@ -72,7 +72,8 @@ export default function CreateMeterModalComponent(props: CreateMeterModalCompone
 		timeSort: MeterTimeSortType.increasing,
 		reading: 0.0,
 		startTimestamp: '',
-		endTimestamp: ''
+		endTimestamp: '',
+		previousEnd: ''
 	}
 
 	const dropdownsStateDefaults = {
@@ -633,6 +634,16 @@ export default function CreateMeterModalComponent(props: CreateMeterModalCompone
 												onChange={e => handleStringChange(e)}
 												placeholder="YYYY-MM-DD HH:MM:SS"
 												value={state.endTimestamp} />
+										</div>
+										{/* endTimestamp input */}
+										<div style={formInputStyle}>
+											<label><FormattedMessage id="meter.previousEnd" /></label><br />
+											<Input
+												name='previousEnd'
+												type='text'
+												onChange={e => handleStringChange(e)}
+												placeholder="YYYY-MM-DD HH:MM:SS"
+												value={state.previousEnd} />
 										</div>
 									</div>
 								</div>

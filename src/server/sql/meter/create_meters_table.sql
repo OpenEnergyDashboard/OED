@@ -27,6 +27,7 @@ end_only_time: true if only an end time is given for each reading and false by d
 reading: The last reading input for the meter
 start_timestamp: Start timestamp of last reading input for this meter
 end_timestamp: End timestamp of last reading for this meter
+previous_end: This is used if the readings are split during the processing of crossing away from DST. moment(0) if not this case.
 unit_id: The foreign key to the unit table. The meter receives data and points to this unit in the graph
 default_graphic_unit: The foreign key to the unit table represents the preferred unit to display this meter
 */
@@ -52,8 +53,12 @@ CREATE TABLE IF NOT EXISTS meters (
     time_sort TEXT DEFAULT 'increasing',
     end_only_time BOOLEAN DEFAULT false,
     reading FLOAT DEFAULT 0.0,
-    start_timestamp TIMESTAMP DEFAULT '1970-01-01 00:00:00',
-    end_timestamp TIMESTAMP DEFAULT '1970-01-01 00:00:00',
+   -- The next two are strings because src/server/models/patch-moment-type.js is set up to automatically convert every moment
+    -- object back to UTC which removes the needed timezone information. This is the only place we need the timezone
+    -- so all others in the DB are moment time objects.
+    start_timestamp VARCHAR(50) DEFAULT '1970-01-01 00:00:00+00:00',
+    end_timestamp VARCHAR(50) DEFAULT '1970-01-01 00:00:00+00:00',
+    previous_end TIMESTAMP DEFAULT '1970-01-01 00:00:00',
     unit_id INTEGER REFERENCES units(id),
     default_graphic_unit INTEGER REFERENCES units(id)
 );
