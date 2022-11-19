@@ -59,48 +59,48 @@ async function insertWebsiteData() {
 		//  47 to get the color. 10012 gives 0 so starts in first index of the color array. Note groups start at the other
 		//  end of the array so they use the same values.
 		// Dining Hall Electric
-		[compareMeters[0], 'Electric_Utility', 'kWh', true, undefined, undefined, 'data/webData/DiningHallElectric.csv', false, 10012],
+		[compareMeters[0], 'Electric_Utility', 'kWh', true, '-87.99913, 40.002', undefined, 'data/webData/DiningHallElectric.csv', false, 10012],
 		// For comparison meters you get a new name & id and also make the displayable to be false.
-		[compareName(compareMeters[0]), 'Electric_Utility', 'kWh', false, undefined, undefined, 'data/webData/DiningHallElectric.csv', false, compareId(10012)],
-		['Dining Hall Gas', 'Natural_Gas_BTU', 'BTU', true, undefined, undefined, 'data/webData/DiningHallGas.csv', false, 10013],
-		['Dining Hall Water', 'Water_Gallon', 'gallon', true, undefined, undefined, 'data/webData/DiningHallWater.csv', false, 10014],
-		['Dining Hall Electric Power', 'Electric_kW', 'kW', false, undefined, undefined, 'data/webData/DiningHallElectricPower.csv', false, 10015],
+		[compareName(compareMeters[0]), 'Electric_Utility', 'kWh', false, '-87.99913, 40.002', undefined, 'data/webData/DiningHallElectric.csv', false, compareId(10012)],
+		['Dining Hall Gas', 'Natural_Gas_BTU', 'BTU', true, '-87.99913, 40.002', undefined, 'data/webData/DiningHallGas.csv', false, 10013],
+		['Dining Hall Water', 'Water_Gallon', 'gallon', true, '-87.99913, 40.002', undefined, 'data/webData/DiningHallWater.csv', false, 10014],
+		['Dining Hall Electric Power', 'Electric_kW', 'kW', true, '-87.99913, 40.002', undefined, 'data/webData/DiningHallElectricPower.csv', false, 10015],
 		// Theater Electric
-		[compareMeters[1], 'Electric_Utility', 'kWh', true, undefined, undefined, 'data/webData/TheaterElectric.csv', false, 10016],
-		[compareName(compareMeters[1]), 'Electric_Utility', 'kWh', false, undefined, undefined, 'data/webData/TheaterElectric.csv', false, compareId(10016)],
-		['Theater Gas', 'Natural_Gas_M3', 'BTU', true, undefined, undefined, 'data/webData/TheaterGas.csv', false, 10017],
-		['Theater Electric Power', 'Electric_kW', 'kW', false, undefined, undefined, 'data/webData/TheaterElectricPower.csv', false, 10018],
+		[compareMeters[1], 'Electric_Utility', 'kWh', true, '-87.9975, 40.0027', undefined, 'data/webData/TheaterElectric.csv', false, 10016],
+		[compareName(compareMeters[1]), 'Electric_Utility', 'kWh', false, '-87.9975, 40.0027', undefined, 'data/webData/TheaterElectric.csv', false, compareId(10016)],
+		['Theater Gas', 'Natural_Gas_M3', 'BTU', true, '-87.9975, 40.0027', undefined, 'data/webData/TheaterGas.csv', false, 10017],
+		['Theater Electric Power', 'Electric_kW', 'kW', false, '-87.9975, 40.0027', undefined, 'data/webData/TheaterElectricPower.csv', false, 10018],
 		['Theater Temperature', 'Temperature_Celsius', 'Fahrenheit', true, undefined, undefined, 'data/webData/TheaterTemperature.csv', false, 10019],
 		// Library Electric
-		[compareMeters[2], 'Electric_Utility', 'kWh', true, undefined, undefined, 'data/webData/LibraryElectric.csv', false, 10020],
-		[compareName(compareMeters[2]), 'Electric_Utility', 'kWh', false, undefined, undefined, 'data/webData/LibraryElectric.csv', false, compareId(10020)],
+		[compareMeters[2], 'Electric_Utility', 'kWh', true, '-87.99916, 40.00419', undefined, 'data/webData/LibraryElectric.csv', false, 10020],
+		[compareName(compareMeters[2]), 'Electric_Utility', 'kWh', false, '-87.99916, 40.00419', undefined, 'data/webData/LibraryElectric.csv', false, compareId(10020)],
 		['Library Temperature', 'Temperature_Fahrenheit', 'Fahrenheit', true, undefined, undefined, 'data/webData/LibraryTemperature.csv', false, 10021],
 		// Great Dorm 1st Floor Electric
-		[compareMeters[3], 'Electric_Solar', 'kWh', true, undefined, undefined, 'data/webData/GreatDorm1stFloorElectric.csv', false, 10022],
-		[compareName(compareMeters[3]), 'Electric_Solar', 'kWh', false, undefined, undefined, 'data/webData/GreatDorm1stFloorElectric.csv', false, compareId(10022)],
+		[compareMeters[3], 'Electric_Solar', 'kWh', true, '-87.99817, 40.00057', undefined, 'data/webData/GreatDorm1stFloorElectric.csv', false, 10022],
+		[compareName(compareMeters[3]), 'Electric_Solar', 'kWh', false, '-87.99817, 40.00057', undefined, 'data/webData/GreatDorm1stFloorElectric.csv', false, compareId(10022)],
 		// Great Dorm 2nd Floor Electric
-		[compareMeters[4], 'Electric_Solar', 'kWh', true, undefined, undefined, 'data/webData/GreatDorm2ndFloorElectric.csv', false, 10023],
-		[compareName(compareMeters[4]), 'Electric_Solar', 'kWh', false, undefined, undefined, 'data/webData/GreatDorm2ndFloorElectric.csv', false, compareId(10023)],
-		['Great Dorm Gas', 'Natural_Gas_BTU', 'BTU', true, undefined, undefined, 'data/webData/GreatDormGas.csv', false, 10024],
-		['Great Dorm Water', 'Water_Liter', 'gallon', true, undefined, undefined, 'data/webData/GreatDormWater.csv', false, 10025],
-		['Recycling', 'Recycling', 'pound', true, undefined, undefined, 'data/webData/CampusRecycling.csv', false, 10026],
+		[compareMeters[4], 'Electric_Solar', 'kWh', true, '-87.99817, 40.00057', undefined, 'data/webData/GreatDorm2ndFloorElectric.csv', false, 10023],
+		[compareName(compareMeters[4]), 'Electric_Solar', 'kWh', false, '-87.99817, 40.00057', undefined, 'data/webData/GreatDorm2ndFloorElectric.csv', false, compareId(10023)],
+		['Great Dorm Gas', 'Natural_Gas_BTU', 'BTU', true, '-87.99817, 40.00057', undefined, 'data/webData/GreatDormGas.csv', false, 10024],
+		['Great Dorm Water', 'Water_Liter', 'gallon', true, '-87.99817, 40.00057', undefined, 'data/webData/GreatDormWater.csv', false, 10025],
+		['Campus Recycling', 'Recycling', 'pound', true, undefined, undefined, 'data/webData/CampusRecycling.csv', false, 10026],
 	];
 
 	// The table contains groups' data.
 	// The ids start at 10012 for similar reasons to meters but gives different colors
 	// since it goes backward through the color array.
 	const groups = [
-		['Dining Hall Energy', 'kWh', true, undefined, 'Dining Hall Electric and Gas', ['Dining Hall Electric', 'Dining Hall Gas'], [], 10012],
-		['Dining Hall All', 'short ton of CO₂', true, undefined, 'Dining Hall All', ['Dining Hall Water'], ['Dining Hall Energy'], 10013],
-		['Theater Energy', 'kWh', true, undefined, 'Theater Electric and Gas', ['Theater Electric', 'Theater Gas'], [], 10014],
-		['Theater All', 'short ton of CO₂', true, undefined, 'Theater All', [], ['Theater Energy'], 10015],
+		['Dining Hall Energy', 'kWh', true, '-87.99913, 40.002', 'Dining Hall Electric and Gas', ['Dining Hall Electric', 'Dining Hall Gas'], [], 10012],
+		['Dining Hall All', 'short ton of CO₂', true, '-87.99913, 40.002', 'Dining Hall All', ['Dining Hall Water'], ['Dining Hall Energy'], 10013],
+		['Theater Energy', 'kWh', true, ' -87.9975, 40.0027', 'Theater Electric and Gas', ['Theater Electric', 'Theater Gas'], [], 10014],
+		['Theater All', 'short ton of CO₂', true, ' -87.9975, 40.0027', 'Theater All', [], ['Theater Energy'], 10015],
 		['Dining & Theater Electric Power', 'kW', true, undefined, 'Dining & Theater Electric Power', ['Dining Hall Electric Power', 'Theater Electric Power'], [], 10016],
-		['Library Electric', 'kWh', true, undefined, 'Library Electric', ['Library Electric'], [], 10017],
+		['Library Electric', 'kWh', true, '-87.99916, 40.00419', 'Library Electric', ['Library Electric'], [], 10017],
 		// Great Dorm Electric with 1st and 2nd floor Great Dorm Electric
-		[compareGroups[0], 'kWh', true, undefined, 'Great Dorm 1st & 2nd Electric', [compareMeters[3], compareMeters[4]], [], 10018],
-		[compareName(compareGroups[0]), 'kWh', false, undefined, 'Great Dorm 1st & 2nd Electric', [compareName(compareMeters[3]), compareName(compareMeters[4])], [], compareId(10018)],
-		['Great Dorm Energy', 'kWh', true, undefined, 'Great Dorm Electric and Gas', ['Great Dorm Gas'], ['Great Dorm Electric'], 10019],
-		['Great Dorm All', 'short ton of CO₂', true, undefined, 'Great Dorm All', ['Great Dorm Water'], ['Great Dorm Energy'], 10020],
+		[compareGroups[0], 'kWh', true, '-87.99817, 40.00057', 'Great Dorm 1st & 2nd Electric', [compareMeters[3], compareMeters[4]], [], 10018],
+		[compareName(compareGroups[0]), 'kWh', false, '-87.99817, 40.00057', 'Great Dorm 1st & 2nd Electric', [compareName(compareMeters[3]), compareName(compareMeters[4])], [], compareId(10018)],
+		['Great Dorm Energy', 'kWh', true, '-87.99817, 40.00057', 'Great Dorm Electric and Gas', ['Great Dorm Gas'], ['Great Dorm Electric'], 10019],
+		['Great Dorm All', 'short ton of CO₂', true, '-87.99817, 40.00057', 'Great Dorm All', ['Great Dorm Water'], ['Great Dorm Energy'], 10020],
 		['Campus Electric', 'kWh', true, undefined, 'Campus Electric', ['Dining Hall Electric', 'Theater Electric', 'Library Electric'], ['Great Dorm Electric'], 10021],
 		['Campus Gas', 'BTU', true, undefined, 'Campus Gas', ['Dining Hall Gas', 'Theater Gas', 'Great Dorm Gas'], [], 10022],
 		['Campus Energy', 'kWh', true, undefined, 'Campus Energy', [], ['Campus Electric', 'Campus Gas'], 10023],
@@ -196,9 +196,6 @@ async function insertWebsiteData() {
   */
 async function webShift(timezone) {
 	// Do all but the last meter without refreshing the readings.
-	// compareMeters.forEach(async meterName => {
-	// 	await shiftReadings(compareName(meterName), timezone);
-	// });
 	for (let i = 0; i < compareMeters.length - 1; i++){
 		await shiftReadings(compareName(compareMeters[i]), timezone, false);
 	}
