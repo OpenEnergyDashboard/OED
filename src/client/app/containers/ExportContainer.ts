@@ -23,7 +23,7 @@ function transformBarReadingToLegacy(reading: BarReading): [number, number, numb
  */
 function mapStateToProps(state: State) {
 	const timeInterval = state.graph.timeInterval;
-	const unitID = state.graph.selectedUnit;
+	const unitID = state.graph.selectedUnit;//convert ID to name below when you return the unit
 	const datasets: ExportDataSet[] = [];
 	const chart = state.graph.chartToRender;
 	const barDuration = state.graph.barDuration;
@@ -47,7 +47,8 @@ function mapStateToProps(state: State) {
 						label,
 						id: state.groups.byGroupID[groupID].id,
 						currentChart: chart,
-						exportVals: dataPoints
+						exportVals: dataPoints,
+						unit: unitID
 					});
 				}
 			}
@@ -71,7 +72,8 @@ function mapStateToProps(state: State) {
 						label,
 						id: state.meters.byMeterID[meterID].id,
 						currentChart: chart,
-						exportVals: dataPoints
+						exportVals: dataPoints,
+						unit: unitID
 					});
 				}
 			}
@@ -101,7 +103,8 @@ function mapStateToProps(state: State) {
 								label,
 								id: state.groups.byGroupID[groupID].id,
 								currentChart: chart,
-								exportVals: dataPoints
+								exportVals: dataPoints,
+								unit: unitID
 							});
 						}
 					}
@@ -132,7 +135,8 @@ function mapStateToProps(state: State) {
 								label,
 								id: state.meters.byMeterID[meterID].id,
 								currentChart: chart,
-								exportVals: dataPoints
+								exportVals: dataPoints,
+								unit: unitID
 							});
 						}
 					}
@@ -146,7 +150,7 @@ function mapStateToProps(state: State) {
 		selectedMeters: state.graph.selectedMeters,
 		selectedGroups: state.graph.selectedGroups,
 		exportVals: { datasets },
-		//unit,
+		unit: unitID,
 		timeInterval: state.graph.timeInterval,
 		defaultLanguage: state.admin.defaultLanguage,
 		defaultWarningFileSize: state.admin.defaultWarningFileSize,

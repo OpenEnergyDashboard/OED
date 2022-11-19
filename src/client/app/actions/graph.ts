@@ -191,6 +191,7 @@ function changeRangeSliderIfNeeded(interval: TimeInterval): Thunk {
 export interface LinkOptions {
 	meterIDs?: number[];
 	groupIDs?: number[];
+	unit?: number;
 	chartType?: t.ChartTypes;
 	barDuration?: moment.Duration;
 	serverRange?: TimeInterval;

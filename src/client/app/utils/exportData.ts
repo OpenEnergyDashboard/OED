@@ -21,7 +21,6 @@ function convertToCSV(items: ExportDataSet[]) {
 		const data = set.exportVals;
 		const label = set.label;
 		const unit = set.unit;
-		const utility = set.utility;
 		let firstLine = true;
 		data.forEach(reading => {
 			const info = reading.y;
@@ -31,7 +30,7 @@ function convertToCSV(items: ExportDataSet[]) {
 			if (firstLine) {
 				firstLine = false;
 				csvOutput += `${info},${startTimeStamp},${endTimeStamp}`;
-				csvOutput += `"${label}",${unit},${utility}\n`;//null at the moment
+				csvOutput += `"${label}",${unit}\n`;//null at the moment
 			}
 			else {
 				csvOutput += `${info},${startTimeStamp},${endTimeStamp}\n`;

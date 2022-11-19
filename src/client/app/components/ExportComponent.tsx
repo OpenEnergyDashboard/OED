@@ -73,8 +73,7 @@ export default function ExportComponent(props: ExportProps) {
 		const chartName = data[0].currentChart;
 		const meterName = data[0].label;
 		const unit = data[0].unit;
-		const utility = data[0].utility;//remove utility
-		const name = `oedExport_${chartName}_${meterName}_${unit}_${utility}_${startTimeString}_to_${endTimeString}.csv`;
+		const name = `oedExport_${chartName}_${meterName}_${unit}_${startTimeString}_to_${endTimeString}.csv`;
 		graphExport(data, name);
 	};
 

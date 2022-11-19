@@ -18,8 +18,7 @@ export interface ExportDataSet {
 	id: number;
 	currentChart: ChartTypes;
 	exportVals: Array<{ x: number, y: number, z: number }>;
-	unit: string;
-	utility: string;
+	unit: number;
 }
 
 export interface RawReadings {
