@@ -18,6 +18,7 @@
     "test": "./node_modules/.bin/mocha --timeout 15000 \"src/server/test/**/*.js\"",
     "testsome": "./node_modules/.bin/mocha --timeout 15000",
     "createdb": "node ./src/server/services/createDB.js",
+    "developerdb": "node -e 'require(\"./src/server/util/developer.js\").createShiftReadingsFunction()'",
     "migratedb": "node ./src/server/services/migrateDB.js",
     "addMamacMeters": "node ./src/server/services/addMamacMeters.js",
     "updateMamacMeters": "node ./src/server/services/updateMamacMeters.js",
@@ -41,7 +42,8 @@
     "generateSineSquaredTestingData": "node -e 'require(\"./src/server/data/automatedTestingData\").generateSineSquaredTestingData(2.5)'",
     "generateCosineSquaredTestingData": "node -e 'require(\"./src/server/data/automatedTestingData\").generateCosineSquaredTestingData(2.5)'",
     "generateTestingData": "node -e 'require(\"./src/server/data/automatedTestingData\").generateTestingData()'",
-    "testData": "node -e 'require(\"./src/server/data/automatedTestingData.js\").insertSpecialUnitsConversionsMeters()'"
+    "testData": "node -e 'require(\"./src/server/data/automatedTestingData.js\").insertSpecialUnitsConversionsMetersGroups()'",
+    "webData": "node -e 'require(\"./src/server/data/websiteData.js\").insertWebsiteData()'"
   },
   "nodemonConfig": {
     "watch": [

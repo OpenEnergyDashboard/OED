@@ -57,8 +57,8 @@ export default function UnitViewComponent(props: UnitViewComponentProps) {
 				<b><FormattedMessage id="unit.suffix" /></b> {props.unit.suffix}
 			</div>
 			<div className="item-container">
-				{/* Only show first 30 characters so card does not get too big. Should limit to one line */}
-				<b><FormattedMessage id="unit.note" /></b> {props.unit.note.slice(0, 29)}
+				{/* Only show first 30 characters so card does not get too big. Should limit to one line. Protect against null from DB in note. */}
+				<b><FormattedMessage id="unit.note" /></b> {props.unit.note ? props.unit.note.slice(0, 29) : ''}
 			</div>
 			<div className="edit-btn">
 				<Button variant="Secondary" onClick={handleShow}>

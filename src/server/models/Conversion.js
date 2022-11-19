@@ -3,7 +3,6 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
 
 const database = require('./database');
-const Unit = require('./Unit');
 const sqlFile = database.sqlFile;
 
 class Conversion {
@@ -31,31 +30,6 @@ class Conversion {
 	 */
 	static createTable(conn) {
 		return conn.none(sqlFile('conversion/create_conversions_table.sql'));
-	}
-
-	/**
-	 * Inserts standard conversions.
-	 * @param {*} conn The connection to use.
-	 */
-	static async insertStandardConversions(conn) {
-		// The table contains standard conversions' data.
-		// Each row contains: sourceName, destinationName, bidirectional, slope, intercept, note.
-		const standardConversions = [
-			['kWh', 'MJ', true, 3.6, 0, 'kWh → MJ'],
-			['MJ', 'M3_gas', true, 2.6e-2, 0, 'MJ → M3_gas'],
-			['MJ', 'BTU', true, 947.8, 0, 'MJ → BTU'],
-			['kg', 'Metric_ton', true, 1e-3, 0, 'kg → Metric ton'],
-			['Celsius', 'Fahrenheit', true, 1.8, 32, 'Celsius → Fahrenheit']
-		];
-
-		for (let i = 0; i < standardConversions.length; ++i) {
-			const conversionData = standardConversions[i];
-			const sourceId = (await Unit.getByName(conversionData[0], conn)).id;
-			const destinationId = (await Unit.getByName(conversionData[1], conn)).id;
-			if (await Conversion.getBySourceDestination(sourceId, destinationId, conn) === null) {
-				await new Conversion(sourceId, destinationId, conversionData[2], conversionData[3], conversionData[4], conversionData[5]).insert(conn);
-			}
-		}
 	}
 
 	/**
@@ -116,7 +90,7 @@ class Conversion {
 	 * @param {*} destination The destination unit id.
 	 * @param {*} conn The connection to use.
 	 */
-	static async delete(source, destination , conn) {
+	static async delete(source, destination, conn) {
 		await conn.none(sqlFile('conversion/delete_conversion.sql'), {
 			source: source,
 			destination: destination
