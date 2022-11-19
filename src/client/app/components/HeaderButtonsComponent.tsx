@@ -7,7 +7,6 @@ import { Link } from 'react-router-dom';
 import { Button } from 'reactstrap';
 import { FormattedMessage } from 'react-intl';
 import MenuModalComponent from './MenuModalComponent';
-import { hasToken } from '../utils/token';
 import getPage from '../utils/getPage';
 import TooltipMarkerComponent from './TooltipMarkerComponent';
 import TooltipHelpContainer from '../containers/TooltipHelpContainer';
@@ -37,7 +36,8 @@ export default class HeaderButtonsComponent extends React.Component<HeaderButton
 		const role = this.props.role;
 		const loggedInAsAdmin = this.props.loggedInAsAdmin;
 		const showOptions = getPage() === '';
-		const renderLoginButton = !hasToken();
+		const renderLoginButton = role === null;
+		const renderLogoutButton = role !== null;
 		const shouldHomeButtonDisabled = getPage() === '';
 		const shouldAdminButtonDisabled = getPage() === 'admin';
 		const shouldGroupsButtonDisabled = getPage() === 'groups';
@@ -54,6 +54,10 @@ export default class HeaderButtonsComponent extends React.Component<HeaderButton
 		};
 		const loginLinkStyle: React.CSSProperties = {
 			display: renderLoginButton ? 'inline' : 'none',
+			paddingLeft: '5px'
+		};
+		const logoutLinkStyle: React.CSSProperties = {
+			display: renderLogoutButton ? 'inline' : 'none',
 			paddingLeft: '5px'
 		};
 		const adminViewableLinkStyle: React.CSSProperties = {
@@ -141,7 +145,7 @@ export default class HeaderButtonsComponent extends React.Component<HeaderButton
 						</Button>
 					</Link>
 					<Link
-						style={adminViewableLinkStyle}
+						style={logoutLinkStyle}
 						to='/'>
 						<Button outline onClick={this.handleLogOut}><FormattedMessage id='log.out' />
 						</Button>

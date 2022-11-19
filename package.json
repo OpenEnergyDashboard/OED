@@ -169,7 +169,7 @@
     "css-loader": "~6.4.0",
     "eslint": "~8.10.0",
     "eslint-plugin-react": "~7.28.0",
-    "mocha": "~9.2.0",
+    "mocha": "~9.2.2",
     "mock-require": "~2.0.2",
     "nodemon": "~2.0.15",
     "sinon": "~12.0.0",
