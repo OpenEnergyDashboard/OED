@@ -56,7 +56,7 @@ function mapStateToProps(state: State) {
 			byMeterID[timeInterval.toString()][barDuration.toISOString()] !== undefined) {
 			const readingsData = byMeterID[timeInterval.toString()][barDuration.toISOString()][unitID];
 			if (readingsData !== undefined && !readingsData.isFetching) {
-				const label = state.meters.byMeterID[meterID].name;
+				const label = state.meters.byMeterID[meterID].identifier;
 				const colorID = meterID;
 				if (readingsData.readings === undefined) {
 					throw new Error('Unacceptable condition: readingsData.readings is undefined.');
