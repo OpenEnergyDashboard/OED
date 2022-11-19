@@ -8,6 +8,6 @@ CREATE OR REPLACE FUNCTION check_timezone(
     RETURNS BOOLEAN
 AS $$
 BEGIN
-    RETURN EXISTS(SELECT * FROM pg_timezone_names WHERE name = timezone_name);
+    RETURN EXISTS(SELECT * FROM pg_timezone_names WHERE name = timezone_name OR abbrev = timezone_name);
 END;
 $$ LANGUAGE 'plpgsql';
