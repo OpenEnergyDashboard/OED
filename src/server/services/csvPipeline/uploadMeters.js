@@ -73,13 +73,13 @@ async function uploadMeters(req, res, filepath, conn) {
 				nameOfMeter = meter[0];
 			} else if (meters.length !== 1) {
 				// This error could be thrown a number of times, one per meter in CSV, but should only see one of them.
-				throw new CSVPipelineError(`Meter name provided (${nameOfMeter}) in request with update for meters but more than one meter in CSV so not processing`, undefined, 500);
+				throw new CSVPipelineError(`Meter name provided (\"${nameOfMeter}\") in request with update for meters but more than one meter in CSV so not processing`, undefined, 500);
 			}
 			let currentMeter;
 			currentMeter = await Meter.getByName(nameOfMeter, conn)
 				.catch(error => {
 					// Did not find the meter.
-					let msg = `Meter name of ${nameOfMeter} does not seem to exist with update for meters and got DB error of: ${error.message}`;
+					let msg = `Meter name of \"${nameOfMeter}\" does not seem to exist with update for meters and got DB error of: ${error.message}`;
 					throw new CSVPipelineError(msg, undefined, 500);
 				});
 			currentMeter.merge(...meter);
@@ -90,7 +90,7 @@ async function uploadMeters(req, res, filepath, conn) {
 				.catch(error => {
 					// Probably duplicate meter.
 					throw new CSVPipelineError(
-						`Meter name of ${meter[0]} seems to exist when inserting new meters and got DB error of: ${error.message}`, undefined, 500);
+						`Meter name of \"${meter[0]}\" got database error of: ${error.message}`, undefined, 500);
 				});
 		}
 	}))
