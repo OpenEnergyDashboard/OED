@@ -8,6 +8,8 @@ import { MetersCSVUploadProps } from '../../types/csvUploadForm';
 import FormFileUploaderComponent from '../FormFileUploaderComponent';
 import { FormattedMessage } from 'react-intl';
 import { MODE } from '../../containers/csv/UploadCSVContainer';
+import { fetchMetersDetails } from '../../actions/meters';
+import store from '../../index';
 
 export default class MetersCSVUploadComponent extends React.Component<MetersCSVUploadProps> {
 	private fileInput: React.RefObject<HTMLInputElement>;
@@ -34,6 +36,9 @@ export default class MetersCSVUploadComponent extends React.Component<MetersCSVU
 			// A failed axios request should result in an error.
 			window.alert(error.response.data as string);
 		}
+		// Refetch meters details.
+		store.getState().meters.hasBeenFetchedOnce = false;
+		fetchMetersDetails();
 	}
 
 	private handleSetMeterName(e: React.ChangeEvent<HTMLInputElement>) {
