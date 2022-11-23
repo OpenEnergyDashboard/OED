@@ -77,7 +77,7 @@ mocha.describe('csv API', () => {
 		});
 		mocha.it('should be able to load unzipped readings data for an existing meter.', async () => {
 			const conn = testDB.getConnection();
-			const meter = new Meter(undefined, 'XXX', undefined, false, false, Meter.type.MAMAC, 'XXX')
+			const meter = new Meter(undefined, 'XXX', undefined, false, false, Meter.type.MAMAC, 'CST')
 			await meter.insert(conn); // insert meter
 			const res = await chai.request(app).post(UPLOAD_READINGS_ROUTE) // make request to api to upload readings data for this meter
 				.field('email', testUser.email)
@@ -159,7 +159,7 @@ mocha.describe('csv API', () => {
 		});
 		mocha.it('should be able to load zipped readings data for an existing meter.', async () => {
 			const conn = testDB.getConnection();
-			const meter = new Meter(undefined, 'XXX', undefined, false, false, Meter.type.MAMAC, 'XXX')
+			const meter = new Meter(undefined, 'XXX', undefined, false, false, Meter.type.MAMAC, 'CST')
 			await meter.insert(conn); // insert meter
 			const res = await chai.request(app).post(UPLOAD_READINGS_ROUTE) // make request to api to upload readings data for this meter
 				.field('email', testUser.email)

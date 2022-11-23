@@ -94,7 +94,7 @@ function mapStateToProps(state: State, ownProps: CompareChartContainerProps): an
 
 	// Compose the text to display to the user.
 	const entity = ownProps.entity;
-	const changeSummary = getCompareChangeSummary(entity.change, entity.name, periodLabels);
+	const changeSummary = getCompareChangeSummary(entity.change, entity.identifier, periodLabels);
 
 	const barColor = 'rgba(218, 165, 32, 1)';
 
