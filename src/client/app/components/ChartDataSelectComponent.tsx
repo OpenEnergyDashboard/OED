@@ -123,7 +123,14 @@ export default function ChartDataSelectComponent() {
 		}
 
 		const selectedMeters: SelectOption[] = [];
+		const allSelectedMeters: SelectOption[] = [];
 		state.graph.selectedMeters.forEach(meterID => {
+			allSelectedMeters.push({
+				// For meters we display the identifier.
+				label: state.meters.byMeterID[meterID] ? state.meters.byMeterID[meterID].identifier : '',
+				value: meterID,
+				isDisabled: false
+			} as SelectOption)
 			// If the selected unit is -99 then there is not graphic unit yet. In this case you can only select a
 			// meter that has a default graphic unit because that will become the selected unit. This should only
 			// happen if no meter or group is yet selected.
@@ -143,7 +150,14 @@ export default function ChartDataSelectComponent() {
 		});
 
 		const selectedGroups: SelectOption[] = [];
+		const allSelectedGroups: SelectOption[] = [];
 		state.graph.selectedGroups.forEach(groupID => {
+			allSelectedGroups.push({
+				// For groups we display the name since no identifier.
+				label: state.groups.byGroupID[groupID] ? state.groups.byGroupID[groupID].name : '',
+				value: groupID,
+				isDisabled: false
+			} as SelectOption);
 			// If the selected unit is -99 then there is no graphic unit yet. In this case you can only select a
 			// group that has a default graphic unit because that will become the selected unit. This should only
 			// happen if no meter or group is yet selected.
@@ -184,7 +198,9 @@ export default function ChartDataSelectComponent() {
 			sortedUnits,
 			selectedMeters,
 			selectedGroups,
-			selectedUnit
+			selectedUnit,
+			allSelectedMeters,
+			allSelectedGroups
 		}
 	});
 
@@ -214,8 +230,26 @@ export default function ChartDataSelectComponent() {
 					options={dataProps.sortedMeters}
 					selectedOptions={dataProps.selectedMeters}
 					placeholder={intl.formatMessage(messages.selectMeters)}
-					onValuesChange={(newSelectedMeterOptions: SelectOption[]) =>
-						dispatch(changeSelectedMeters(newSelectedMeterOptions.map(s => s.value)))}
+					// change logic for selection: compute diff between dataProps.selectedMeters and newSelectedMeterOptions\
+					// then make change to allSelectedMeters and pass that
+					onValuesChange={(newSelectedMeterOptions: SelectOption[]) => {
+						const allSelectedMeterIDs: number[] = dataProps.allSelectedMeters.map(s => s.value);
+						const oldSelectedMeterIDs: number[] = dataProps.selectedMeters.map(s => s.value);
+						const newSelectedMeterIDs: number[] = newSelectedMeterOptions.map(s => s.value);
+						// It is assumed there can only be one element in this array, because this is triggered every time the selection is changed
+						let difference: number = oldSelectedMeterIDs.filter(x => !newSelectedMeterIDs.includes(x))[0];
+						if(difference === undefined) {
+							// no difference found, so check the other way around
+							difference = newSelectedMeterIDs.filter(x => !oldSelectedMeterIDs.includes(x))[0];
+							allSelectedMeterIDs.push(difference);
+						} else {
+							// deletion
+							allSelectedMeterIDs.forEach((meterId, index) => {
+								if (meterId == difference) allSelectedMeterIDs.splice(index, 1);
+							});
+						}
+						dispatch(changeSelectedMeters(allSelectedMeterIDs));
+					}}
 				/>
 				<TooltipMarkerComponent page='home' helpTextId='help.home.select.meters' />
 			</div>
