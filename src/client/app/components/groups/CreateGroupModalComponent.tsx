@@ -2,46 +2,48 @@
 * License, v. 2.0. If a copy of the MPL was not distributed with this
 * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
 import * as React from 'react';
-import { useDispatch } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
 import { useState } from 'react';
+import { State } from 'types/redux/state';
 import { Modal, Button } from 'react-bootstrap';
 import { Input } from 'reactstrap';
 import { FormattedMessage } from 'react-intl';
 import translate from '../../utils/translate';
 import '../../styles/modal.css';
-import { TrueFalseType } from '../../types/items';
 import TooltipMarkerComponent from '../TooltipMarkerComponent';
 import TooltipHelpContainer from '../../containers/TooltipHelpContainer';
-import { UnitRepresentType, DisplayableType, UnitType } from '../../types/redux/units';
-import { addUnit } from '../../actions/units';
+import { TrueFalseType } from '../../types/items';
+import { GPSPoint, isValidGPSInput } from '../../utils/calibration';
+import { isRoleAdmin } from '../../utils/hasPermissions';
+import { submitNewGroup } from '../../actions/groups';
 
-/************************
- * This is a copy from Unit that is not yet ready
- */
+// Notifies user of msg.
+// TODO isValidGPSInput uses alert so continue that. Maybe all should be changed but this impacts other parts of the code.
+// Note this causes the modal to close but the state is not reset.
+// Use a function so can easily change how it works.
+function notifyUser(msg: string) {
+	window.alert(msg);
+}
 
 export default function CreateUnitModalComponent() {
 	const dispatch = useDispatch();
 
+	// Check for admin status
+	const currentUser = useSelector((state: State) => state.currentUser.profile);
+	const loggedInAsAdmin = (currentUser !== null) && isRoleAdmin(currentUser.role);
+
 	const defaultValues = {
 		name: '',
-		identifier: '',
-		typeOfUnit: UnitType.unit,
-		unitRepresent: UnitRepresentType.quantity,
-		displayable: DisplayableType.all,
-		preferredDisplay: true,
-		secInRate: 3600,
-		suffix: '',
+		displayable: false,
+		gps: '',
 		note: '',
-		// These two values are necessary but are not used.
-		// The client code makes the id for the selected unit and default graphic unit be -99
-		// so it can tell it is not yet assigned and do the correct logic for that case.
-		// The units API expects these values to be undefined on call so that the database can assign their values.
-		id: -99,
-		unitIndex: -99
+		area: 0,
+		defaultGraphicUnit: -999,
+		id: -99
 	}
 
 	/* State */
-	// Unlike EditUnitModalComponent, there are no props so we don't pass show and close via props.
+	// Unlike EditGroupsModalComponent, there are no props so we don't pass show and close via props.
 	// Modal show
 	const [showModal, setShowModal] = useState(false);
 	const handleClose = () => {
@@ -78,17 +80,70 @@ export default function CreateUnitModalComponent() {
 	const handleSubmit = () => {
 		// Close modal first to avoid repeat clicks
 		setShowModal(false);
-		// Set default identifier as name if left blank
-		state.identifier = (!state.identifier || state.identifier.length === 0) ? state.name : state.identifier;
-		// Add the new unit and update the store
-		dispatch(addUnit(state));
-		resetState();
+
+		// true if inputted values are okay. Then can submit.
+		let inputOk = true;
+
+		// Check area is positive.
+		// TODO For now allow zero so works with default value and DB. We should probably
+		// make this better default than 0 (DB set to not null now).
+		// if (state.area <= 0) {
+		if (state.area < 0) {
+			notifyUser(translate('area.invalid') + state.area + '.');
+			inputOk = false;
+		}
+
+		// TODO is -99 okay - do we need to fix
+		// A meter default graphic unit must be selected.
+		if (state.defaultGraphicUnit === -999) {
+			notifyUser(translate('meter.graphic.invalid'));
+			inputOk = false;
+		}
+
+		// Check GPS entered.
+		// Validate GPS is okay and take from string to GPSPoint to submit.
+		const gpsInput = state.gps;
+		let gps: GPSPoint | null = null;
+		const latitudeIndex = 0;
+		const longitudeIndex = 1;
+		// If the user input a value then gpsInput should be a string.
+		// null came from the DB and it is okay to just leave it - Not a string.
+		if (typeof gpsInput === 'string') {
+			if (isValidGPSInput(gpsInput)) {
+				// Clearly gpsInput is a string but TS complains about the split so cast.
+				const gpsValues = (gpsInput as string).split(',').map((value: string) => parseFloat(value));
+				// It is valid and needs to be in this format for routing.
+				gps = {
+					longitude: gpsValues[longitudeIndex],
+					latitude: gpsValues[latitudeIndex]
+				};
+				// gpsInput must be of type string but TS does not think so so cast.
+			} else if ((gpsInput as string).length !== 0) {
+				// GPS not okay. Only true if some input.
+				// TODO isValidGPSInput currently pops up an alert so not doing it here, may change
+				// so leaving code commented out.
+				// notifyUser(translate('input.gps.range') + state.gps + '.');
+				inputOk = false;
+			}
+		}
+
+		if (inputOk) {
+			// The input passed validation.
+			// Submit new group if checks where ok.
+			// GPS may have been updated so create updated state to submit.
+			const submitState = { ...state, gps: gps };
+			//  TODO dispatch(submitNewGroup(submitState)); // TODO
+			resetState();
+		} else {
+			// Tell user that not going to update due to input issues.
+			notifyUser(translate('group.input.error'));
+		}
 	};
 
 	const tooltipStyle = {
 		display: 'inline-block',
 		fontSize: '60%',
-		tooltipCreateUnitView: 'help.admin.unitcreate'
+		tooltipCreateUnitView: 'help.admin.groupcreate'
 	};
 
 	const formInputStyle: React.CSSProperties = {
@@ -103,7 +158,7 @@ export default function CreateUnitModalComponent() {
 		<>
 			{/* Show modal button */}
 			<Button variant="Secondary" onClick={handleShow}>
-				<FormattedMessage id="create.unit" />
+				<FormattedMessage id="create.group" />
 			</Button>
 
 			<Modal show={showModal} onHide={handleClose}>
@@ -116,116 +171,92 @@ export default function CreateUnitModalComponent() {
 					</Modal.Title>
 				</Modal.Header>
 				{/* when any of the unit properties are changed call one of the functions. */}
-				<Modal.Body className="show-grid">
-					<div id="container">
-						<div id="modalChild">
-							{/* Modal content */}
-							<div className="container-fluid">
-								<div style={tableStyle}>
-									{/* Identifier input */}
-									<div style={formInputStyle}>
-										<label><FormattedMessage id="unit.identifier" /></label><br />
-										<Input
-											name='identifier'
-											type='text'
-											onChange={e => handleStringChange(e)}
-											value={state.identifier} />
-									</div>
-									{/* Name input */}
-									<div style={formInputStyle}>
-										<label><FormattedMessage id="unit.name" /></label><br />
-										<Input
-											name='name'
-											type='text'
-											onChange={e => handleStringChange(e)}
-											value={state.name} />
-									</div>
-									{/* Type of unit input */}
-									<div style={formInputStyle}>
-										<label><FormattedMessage id="unit.type.of.unit" /></label><br />
-										<Input
-											name='typeOfUnit'
-											type='select'
-											onChange={e => handleStringChange(e)}
-											value={state.typeOfUnit}>
-											{Object.keys(UnitType).map(key => {
-												return (<option value={key} key={key}>{translate(`UnitType.${key}`)}</option>)
-											})}
-										</Input>
-									</div>
-									{/* Unit represent input */}
-									<div style={formInputStyle}>
-										<label><FormattedMessage id="unit.represent" /></label><br />
-										<Input
-											name='unitRepresent'
-											type='select'
-											onChange={e => handleStringChange(e)}
-											value={state.unitRepresent}>
-											{Object.keys(UnitRepresentType).map(key => {
-												return (<option value={key} key={key}>{translate(`UnitRepresentType.${key}`)}</option>)
-											})}
-										</Input>
-									</div>
-									{/* Displayable type input */}
-									<div style={formInputStyle}>
-										<label><FormattedMessage id="unit.dropdown.displayable" /></label><br />
-										<Input
-											name='displayable'
-											type='select'
-											onChange={e => handleStringChange(e)}
-											value={state.displayable} >
-											{Object.keys(DisplayableType).map(key => {
-												return (<option value={key} key={key}>{translate(`DisplayableType.${key}`)}</option>)
-											})}
-										</Input>
-									</div>
-									{/* Preferred display input */}
-									<div style={formInputStyle}>
-										<label><FormattedMessage id="unit.preferred.display" /></label><br />
-										<Input
-											name='preferredDisplay'
-											type='select'
-											onChange={e => handleBooleanChange(e)}>
-											{Object.keys(TrueFalseType).map(key => {
-												return (<option value={key} key={key}>{translate(`TrueFalseType.${key}`)}</option>)
-											})}
-										</Input>
-									</div>
-									{/* Seconds in rate input */}
-									<div style={formInputStyle}>
-										<label><FormattedMessage id="unit.sec.in.rate" /></label><br />
-										<Input
-											name='secInRate'
-											type='number'
-											onChange={e => handleNumberChange(e)}
-											value={state.secInRate}
-											// TODO validate negative input by typing for rate but database stops it.
-											// This stops negative input by use of arrows to change value.
-											min="1" />
-									</div>
-									{/* Suffix input */}
-									<div style={formInputStyle}>
-										<label><FormattedMessage id="unit.suffix" /></label><br />
-										<Input
-											name='suffix'
-											type='text'
-											onChange={e => handleStringChange(e)}
-											value={state.suffix} />
-									</div>
-									{/* Note input */}
-									<div style={formInputStyle}>
-										<label><FormattedMessage id="unit.note.optional" /></label><br />
-										<Input
-											name='note'
-											type='textarea'
-											onChange={e => handleStringChange(e)}
-											value={state.note} />
+				{loggedInAsAdmin && // only render when logged in as Admin
+					<Modal.Body className="show-grid">
+						<div id="container">
+							<div id="modalChild">
+								{/* Modal content */}
+								<div className="container-fluid">
+									<div style={tableStyle}>
+										{/* Name input */}
+										<div style={formInputStyle}>
+											<label><FormattedMessage id="unit.name" /></label><br />
+											<Input
+												name='name'
+												type='text'
+												onChange={e => handleStringChange(e)}
+												value={state.name} />
+										</div>
+										{/* default graphic unit input */}
+										{/* TODO <div style={formInputStyle}>
+											<label><FormattedMessage id="meter.defaultGraphicUnit" /></label><br />
+											<Input
+												name='defaultGraphicUnit'
+												type='select'
+												value={state.defaultGraphicUnit}
+												onChange={e => handleNumberChange(e)}>
+												{<option
+													value={-999}
+													key={-999}
+													hidden={state.defaultGraphicUnit !== -999}
+													disabled>
+													{translate('select.unit')}
+												</option>}
+												{Array.from(dropdownsState.compatibleGraphicUnits).map(unit => {
+													return (<option value={unit.id} key={unit.id}>{unit.identifier}</option>)
+												})}
+												{Array.from(dropdownsState.incompatibleGraphicUnits).map(unit => {
+													return (<option value={unit.id} key={unit.id} disabled>{unit.identifier}</option>)
+												})}
+											</Input>
+										</div> */}
+										{/* Displayable input */}
+										<div style={formInputStyle}>
+											<label><FormattedMessage id="meter.displayable" /></label><br />
+											<Input
+												name='displayable'
+												type='select'
+												value={state.displayable.toString()}
+												onChange={e => handleBooleanChange(e)}>
+												{Object.keys(TrueFalseType).map(key => {
+													return (<option value={key} key={key}>{translate(`TrueFalseType.${key}`)}</option>)
+												})}
+											</Input>
+										</div>
+										{/* Area input */}
+										<div style={formInputStyle}>
+											<label><FormattedMessage id="meter.area" /></label><br />
+											<Input
+												name="area"
+												type="number"
+												step="0.01"
+												min="0"
+												value={state.area}
+												onChange={e => handleNumberChange(e)} />
+										</div>
+										{/* GPS input */}
+										<div style={formInputStyle}>
+											<label><FormattedMessage id="meter.gps" /></label><br />
+											<Input
+												name='gps'
+												type='text'
+												onChange={e => handleStringChange(e)}
+												value={state.gps} />
+										</div>
+										{/* Note input */}
+										<div style={formInputStyle}>
+											<label><FormattedMessage id="unit.note.optional" /></label><br />
+											<Input
+												name='note'
+												type='textarea'
+												onChange={e => handleStringChange(e)}
+												value={state.note} />
+										</div>
 									</div>
 								</div>
 							</div>
 						</div>
-					</div>
-				</Modal.Body>
+					</Modal.Body>}
 				<Modal.Footer>
 					{/* Hides the modal */}
 					<Button variant="secondary" onClick={handleClose}>

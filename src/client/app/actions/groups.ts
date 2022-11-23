@@ -259,7 +259,7 @@ function creatingNewGroup(state: State): boolean {
  * `submitGroupInEditingIfNeeded` to handle sending the API request
  * and processing the response.
  */
-function submitNewGroup(group: t.GroupData): Thunk {
+export function submitNewGroup(group: t.GroupData): Thunk {
 	return async (dispatch: Dispatch) => {
 		dispatch(markGroupInEditingSubmitted());
 		try {

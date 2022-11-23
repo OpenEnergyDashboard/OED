@@ -1,98 +1,75 @@
 /* This Source Code Form is subject to the terms of the Mozilla Public
- * License, v. 2.0. If a copy of the MPL was not distributed with this
- * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
+* License, v. 2.0. If a copy of the MPL was not distributed with this
+* file, You can obtain one at http://mozilla.org/MPL/2.0/. */
 
 import * as React from 'react';
+//Realize that * is already imported from react
+import { useState } from 'react';
 import { Button } from 'reactstrap';
-import ListDisplayComponent from '../ListDisplayComponent';
-import { Link } from 'react-router-dom';
 import { FormattedMessage } from 'react-intl';
-import { ChangeDisplayModeAction } from '../../types/redux/groups';
+import EditUnitModalComponent from './EditUnitModalComponent';
+import '../../styles/card-page.css';
+import { UnitData } from 'types/redux/units';
+import translate from '../../utils/translate';
 
-interface GroupViewProps {
-	name: string;
-	id: number;
-	childMeterNames: string[];
-	trueMeterSize: number;
-	childGroupNames: string[];
-	trueGroupSize: number;
-	deepMeterNames: string[];
-	loggedInAsAdmin: boolean;
-	fetchGroupChildren(id: number): Promise<any>;
-	beginEditingIfPossible(id: number): Promise<any>;
-	changeDisplayModeToEdit(): ChangeDisplayModeAction;
+interface UnitViewComponentProps {
+	unit: UnitData;
 }
 
-export default class GroupViewComponent extends React.Component<GroupViewProps> {
-	constructor(props: GroupViewProps) {
-		super(props);
-		this.handleEditGroup = this.handleEditGroup.bind(this);
+export default function UnitViewComponent(props: UnitViewComponentProps) {
+	// Don't check if admin since only an admin is allow to route to this page.
+
+	// Edit Modal Show
+	const [showEditModal, setShowEditModal] = useState(false);
+
+	const handleShow = () => {
+		setShowEditModal(true);
 	}
 
-	public componentDidMount() {
-		this.props.fetchGroupChildren(this.props.id);
+	const handleClose = () => {
+		setShowEditModal(false);
 	}
 
-	public render() {
-		const renderEditGroupButton = this.props.loggedInAsAdmin;
-		const nameStyle: React.CSSProperties = {
-			textAlign: 'center'
-		};
-		const buttonPadding: React.CSSProperties = {
-			marginTop: '10px'
-		};
-		const boldStyle: React.CSSProperties = {
-			fontWeight: 'bold',
-			margin: 0
-		};
-		const editGroupStyle: React.CSSProperties = {
-			display: renderEditGroupButton ? 'inline' : 'none',
-			paddingLeft: '5px'
-		};
-		const groupAllMeters: React.CSSProperties = {
-			fontWeight: 'bold',
-			marginBottom: 0
-		};
-		return (
-			<div>
-				<h2 style={nameStyle}>{this.props.name}</h2>
-				<div className='row'>
-					<div className='col-6'>
-						<p style={boldStyle}>
-							<FormattedMessage id='child.meters' />:
-						</p>
-						<ListDisplayComponent trueSize={this.props.trueMeterSize} items={this.props.childMeterNames} />
-					</div>
-					<div className='col-6'>
-						<p style={boldStyle}>
-							<FormattedMessage id='child.groups' />:
-						</p>
-						<ListDisplayComponent trueSize={this.props.trueGroupSize} items={this.props.childGroupNames} />
-					</div>
-				</div>
-				<Link style={editGroupStyle} to='/editGroup'>
-					<Button style={buttonPadding} outline onClick={this.handleEditGroup}>
-						<FormattedMessage id='edit.a.group' />
-					</Button>
-				</Link>
-				<div>
-					<p style={groupAllMeters}>
-						<FormattedMessage id='group.all.meters' />:
-					</p>
-					{this.props.deepMeterNames.map((item, index) => (
-						<span key={`d_${index}`}>{(index ? ', ': '') + item}</span>
-					))}
-					{
-						this.props.childMeterNames.length !== this.props.trueMeterSize ||
-						this.props.childGroupNames.length !== this.props.trueGroupSize ?
-							<div><i>This group contains non-displayable meters/groups denoted as hidden.</i></div> : <></>
-					}
-				</div>
+	return (
+		<div className="card">
+			<div className="identifier-container">
+				{props.unit.identifier}
 			</div>
-		);
-	}
-
-	private handleEditGroup() {
-		this.props.beginEditingIfPossible(this.props.id);
-	}
+			<div className="item-container">
+				<b><FormattedMessage id="unit.name" /></b> {props.unit.name}
+			</div>
+			<div className="item-container">
+				<b><FormattedMessage id="unit.type.of.unit" /></b> {props.unit.typeOfUnit}
+			</div>
+			<div className="item-container">
+				<b><FormattedMessage id="unit.represent" /></b> {props.unit.unitRepresent}
+			</div>
+			<div className={props.unit.displayable.toString()}>
+				<b><FormattedMessage id="unit.displayable" /></b> {props.unit.displayable}
+			</div>
+			<div className="item-container">
+				<b><FormattedMessage id="unit.preferred.display" /></b> {translate(`TrueFalseType.${props.unit.preferredDisplay.toString()}`)}
+			</div>
+			<div className="item-container">
+				<b><FormattedMessage id="unit.sec.in.rate" /></b> {props.unit.secInRate}
+			</div>
+			<div className="item-container">
+				<b><FormattedMessage id="unit.suffix" /></b> {props.unit.suffix}
+			</div>
+			<div className="item-container">
+				{/* Only show first 30 characters so card does not get too big. Should limit to one line */}
+				<b><FormattedMessage id="unit.note" /></b> {props.unit.note.slice(0, 29)}
+			</div>
+			<div className="edit-btn">
+				<Button variant="Secondary" onClick={handleShow}>
+					<FormattedMessage id="edit.unit" />
+				</Button>
+				{/* Creates a child UnitModalEditComponent */}
+				<EditUnitModalComponent
+					show={showEditModal}
+					unit={props.unit}
+					handleClose={handleClose} />
+			</div>
+		</div>
+	);
 }

@@ -40,6 +40,7 @@ export default class TooltipHelpComponent extends React.Component<TooltipHelpPro
 			'help.admin.conversioncreate': { link: `${BASE_URL}/adminConversionCreating.html` },
 			'help.admin.conversionedit': { link: `${BASE_URL}/adminConversionEditing.html` },
 			'help.admin.conversionview': { link: `${BASE_URL}/adminConversionViewing.html` },
+			'help.admin.groupcreate': { link: `${BASE_URL}/adminGroupCreating.html` },
 			'help.admin.groupview': { link: `${BASE_URL}/adminGroupViewing.html` },
 			'help.admin.header': { link: `${BASE_URL}/adminPreferences.html` },
 			'help.admin.mapview': { link: `${BASE_URL}/adminMap.html` },
