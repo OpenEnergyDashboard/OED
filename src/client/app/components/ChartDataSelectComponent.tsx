@@ -58,6 +58,10 @@ export default function ChartDataSelectComponent() {
 		const sortedUnits = getUnitCompatibilityForDropdown(state);
 
 		//Map information about the currently selected meters into a format the component can display.
+		// do extra check for display if using mapChart.
+		const disableMeters: number[] = [];
+		const disableGroups: number[] = [];
+
 		// Don't do this if there is no selected map.
 		const chartToRender = state.graph.chartToRender;
 		const selectedMap = state.maps.selectedMap;
@@ -100,10 +104,12 @@ export default function ChartDataSelectComponent() {
 					if (!(itemMapInfoOk(meter.value, DataType.Meter, mp, gps) &&
 						itemDisplayableOnMap(imageDimensionNormalized, meterGPSInUserGrid))) {
 						meter.isDisabled = true;
+						disableMeters.push(meter.value);
 					}
 				} else {
 					// Lack info on this map so skip. This is mostly done since TS complains about the undefined possibility.
 					meter.isDisabled = true;
+					disableMeters.push(meter.value);
 				}
 			});
 			// The below code follows the logic for meters shown above. See comments above for clarification on the below code.
@@ -115,9 +121,11 @@ export default function ChartDataSelectComponent() {
 					if (!(itemMapInfoOk(group.value, DataType.Group, mp, gps) &&
 						itemDisplayableOnMap(imageDimensionNormalized, groupGPSInUserGrid))) {
 						group.isDisabled = true;
+						disableGroups.push(group.value);
 					}
 				} else {
 					group.isDisabled = true;
+					disableGroups.push(group.value);
 				}
 			});
 		}
@@ -131,22 +139,25 @@ export default function ChartDataSelectComponent() {
 				value: meterID,
 				isDisabled: false
 			} as SelectOption)
-			// If the selected unit is -99 then there is not graphic unit yet. In this case you can only select a
-			// meter that has a default graphic unit because that will become the selected unit. This should only
-			// happen if no meter or group is yet selected.
-			if (state.graph.selectedUnit == -99) {
-				// If no unit is set then this should always be the first meter (or group) selected.
-				// The selectedUnit becomes the unit of the meter selected. Note is should always be set (not -99) since
-				// those meters should not have been visible. The only exception is if there are no selected meters but
-				// then this loop does not run. The loop is assumed to only run once in this case.
-				dispatch(changeSelectedUnit(state.meters.byMeterID[meterID].defaultGraphicUnit));
+			// don't include meters that can't be shown in map
+			if (!(disableMeters.includes(meterID))) {
+				// If the selected unit is -99 then there is not graphic unit yet. In this case you can only select a
+				// meter that has a default graphic unit because that will become the selected unit. This should only
+				// happen if no meter or group is yet selected.
+				if (state.graph.selectedUnit == -99) {
+					// If no unit is set then this should always be the first meter (or group) selected.
+					// The selectedUnit becomes the unit of the meter selected. Note is should always be set (not -99) since
+					// those meters should not have been visible. The only exception is if there are no selected meters but
+					// then this loop does not run. The loop is assumed to only run once in this case.
+					dispatch(changeSelectedUnit(state.meters.byMeterID[meterID].defaultGraphicUnit));
+				}
+				selectedMeters.push({
+					// For meters we display the identifier.
+					label: state.meters.byMeterID[meterID] ? state.meters.byMeterID[meterID].identifier : '',
+					value: meterID,
+					isDisabled: false
+				} as SelectOption)
 			}
-			selectedMeters.push({
-				// For meters we display the identifier.
-				label: state.meters.byMeterID[meterID] ? state.meters.byMeterID[meterID].identifier : '',
-				value: meterID,
-				isDisabled: false
-			} as SelectOption)
 		});
 
 		const selectedGroups: SelectOption[] = [];
@@ -158,22 +169,25 @@ export default function ChartDataSelectComponent() {
 				value: groupID,
 				isDisabled: false
 			} as SelectOption);
-			// If the selected unit is -99 then there is no graphic unit yet. In this case you can only select a
-			// group that has a default graphic unit because that will become the selected unit. This should only
-			// happen if no meter or group is yet selected.
-			if (state.graph.selectedUnit == -99) {
-				// If no unit is set then this should always be the first group (or meter) selected.
-				// The selectedUnit becomes the unit of the group selected. Note is should always be set (not -99) since
-				// those groups should not have been visible. The only exception is if there are no selected groups but
-				// then this loop does not run. The loop is assumed to only run once in this case.
-				state.graph.selectedUnit = state.groups.byGroupID[groupID].defaultGraphicUnit;
+			// don't include groups that can't be shown in map
+			if (!(disableGroups.includes(groupID))) {
+				// If the selected unit is -99 then there is no graphic unit yet. In this case you can only select a
+				// group that has a default graphic unit because that will become the selected unit. This should only
+				// happen if no meter or group is yet selected.
+				if (state.graph.selectedUnit == -99) {
+					// If no unit is set then this should always be the first group (or meter) selected.
+					// The selectedUnit becomes the unit of the group selected. Note is should always be set (not -99) since
+					// those groups should not have been visible. The only exception is if there are no selected groups but
+					// then this loop does not run. The loop is assumed to only run once in this case.
+					state.graph.selectedUnit = state.groups.byGroupID[groupID].defaultGraphicUnit;
+				}
+				selectedGroups.push({
+					// For groups we display the name since no identifier.
+					label: state.groups.byGroupID[groupID] ? state.groups.byGroupID[groupID].name : '',
+					value: groupID,
+					isDisabled: false
+				} as SelectOption);
 			}
-			selectedGroups.push({
-				// For groups we display the name since no identifier.
-				label: state.groups.byGroupID[groupID] ? state.groups.byGroupID[groupID].name : '',
-				value: groupID,
-				isDisabled: false
-			} as SelectOption);
 		});
 
 		// You can only select one unit so variable name is singular.
@@ -238,7 +252,7 @@ export default function ChartDataSelectComponent() {
 						const newSelectedMeterIDs: number[] = newSelectedMeterOptions.map(s => s.value);
 						// It is assumed there can only be one element in this array, because this is triggered every time the selection is changed
 						let difference: number = oldSelectedMeterIDs.filter(x => !newSelectedMeterIDs.includes(x))[0];
-						if(difference === undefined) {
+						if (difference === undefined) {
 							// no difference found, so check the other way around
 							difference = newSelectedMeterIDs.filter(x => !oldSelectedMeterIDs.includes(x))[0];
 							allSelectedMeterIDs.push(difference);
