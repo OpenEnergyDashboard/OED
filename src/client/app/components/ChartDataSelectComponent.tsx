@@ -59,8 +59,8 @@ export default function ChartDataSelectComponent() {
 
 		//Map information about the currently selected meters into a format the component can display.
 		// do extra check for display if using mapChart.
-		const disableMeters: number[] = [];
-		const disableGroups: number[] = [];
+		const nonGpsMeters: number[] = [];
+		const nonGpsGroups: number[] = [];
 
 		// Don't do this if there is no selected map.
 		const chartToRender = state.graph.chartToRender;
@@ -104,12 +104,12 @@ export default function ChartDataSelectComponent() {
 					if (!(itemMapInfoOk(meter.value, DataType.Meter, mp, gps) &&
 						itemDisplayableOnMap(imageDimensionNormalized, meterGPSInUserGrid))) {
 						meter.isDisabled = true;
-						disableMeters.push(meter.value);
+						nonGpsMeters.push(meter.value);
 					}
 				} else {
 					// Lack info on this map so skip. This is mostly done since TS complains about the undefined possibility.
 					meter.isDisabled = true;
-					disableMeters.push(meter.value);
+					nonGpsMeters.push(meter.value);
 				}
 			});
 			// The below code follows the logic for meters shown above. See comments above for clarification on the below code.
@@ -121,16 +121,16 @@ export default function ChartDataSelectComponent() {
 					if (!(itemMapInfoOk(group.value, DataType.Group, mp, gps) &&
 						itemDisplayableOnMap(imageDimensionNormalized, groupGPSInUserGrid))) {
 						group.isDisabled = true;
-						disableGroups.push(group.value);
+						nonGpsGroups.push(group.value);
 					}
 				} else {
 					group.isDisabled = true;
-					disableGroups.push(group.value);
+					nonGpsGroups.push(group.value);
 				}
 			});
 		}
 
-		const selectedMeters: SelectOption[] = [];
+		const displayableSelectedMeters: SelectOption[] = [];
 		const allSelectedMeters: SelectOption[] = [];
 		state.graph.selectedMeters.forEach(meterID => {
 			allSelectedMeters.push({
@@ -140,7 +140,7 @@ export default function ChartDataSelectComponent() {
 				isDisabled: false
 			} as SelectOption)
 			// don't include meters that can't be shown in map
-			if (!(disableMeters.includes(meterID))) {
+			if (!(nonGpsMeters.includes(meterID))) {
 				// If the selected unit is -99 then there is not graphic unit yet. In this case you can only select a
 				// meter that has a default graphic unit because that will become the selected unit. This should only
 				// happen if no meter or group is yet selected.
@@ -151,7 +151,7 @@ export default function ChartDataSelectComponent() {
 					// then this loop does not run. The loop is assumed to only run once in this case.
 					dispatch(changeSelectedUnit(state.meters.byMeterID[meterID].defaultGraphicUnit));
 				}
-				selectedMeters.push({
+				displayableSelectedMeters.push({
 					// For meters we display the identifier.
 					label: state.meters.byMeterID[meterID] ? state.meters.byMeterID[meterID].identifier : '',
 					value: meterID,
@@ -160,7 +160,7 @@ export default function ChartDataSelectComponent() {
 			}
 		});
 
-		const selectedGroups: SelectOption[] = [];
+		const displayableSelectedGroups: SelectOption[] = [];
 		const allSelectedGroups: SelectOption[] = [];
 		state.graph.selectedGroups.forEach(groupID => {
 			allSelectedGroups.push({
@@ -170,7 +170,7 @@ export default function ChartDataSelectComponent() {
 				isDisabled: false
 			} as SelectOption);
 			// don't include groups that can't be shown in map
-			if (!(disableGroups.includes(groupID))) {
+			if (!(nonGpsGroups.includes(groupID))) {
 				// If the selected unit is -99 then there is no graphic unit yet. In this case you can only select a
 				// group that has a default graphic unit because that will become the selected unit. This should only
 				// happen if no meter or group is yet selected.
@@ -181,7 +181,7 @@ export default function ChartDataSelectComponent() {
 					// then this loop does not run. The loop is assumed to only run once in this case.
 					state.graph.selectedUnit = state.groups.byGroupID[groupID].defaultGraphicUnit;
 				}
-				selectedGroups.push({
+				displayableSelectedGroups.push({
 					// For groups we display the name since no identifier.
 					label: state.groups.byGroupID[groupID] ? state.groups.byGroupID[groupID].name : '',
 					value: groupID,
@@ -210,8 +210,8 @@ export default function ChartDataSelectComponent() {
 			sortedMeters,
 			sortedGroups,
 			sortedUnits,
-			selectedMeters,
-			selectedGroups,
+			displayableSelectedMeters,
+			displayableSelectedGroups,
 			selectedUnit,
 			allSelectedMeters,
 			allSelectedGroups
@@ -229,10 +229,22 @@ export default function ChartDataSelectComponent() {
 			<div style={divBottomPadding}>
 				<MultiSelectComponent
 					options={dataProps.sortedGroups}
-					selectedOptions={dataProps.selectedGroups}
+					selectedOptions={dataProps.displayableSelectedGroups}
 					placeholder={intl.formatMessage(messages.selectGroups)}
-					onValuesChange={(newSelectedGroupOptions: SelectOption[]) =>
-						dispatch(changeSelectedGroups(newSelectedGroupOptions.map(s => s.value)))}
+					onValuesChange={(newSelectedGroupOptions: SelectOption[]) => {
+						const allSelectedGroupIDs: number[] = dataProps.allSelectedGroups.map(s => s.value);
+						const oldSelectedGroupIDs: number[] = dataProps.displayableSelectedGroups.map(s => s.value);
+						const newSelectedGroupIDs: number[] = newSelectedGroupOptions.map(s => s.value);
+						// It is assumed there can only be one element in this array, because this is triggered every time the selection is changed
+						const difference: number = oldSelectedGroupIDs.filter(x => !newSelectedGroupIDs.includes(x))[0];
+						if (difference === undefined) {
+							// no deletions found, so check for insertions
+							allSelectedGroupIDs.push(newSelectedGroupIDs.filter(x => !oldSelectedGroupIDs.includes(x))[0]);
+						} else {
+							allSelectedGroupIDs.splice(allSelectedGroupIDs.indexOf(difference), 1);
+						}
+						dispatch(changeSelectedGroups(allSelectedGroupIDs));
+					}}
 				/>
 				<TooltipMarkerComponent page='home' helpTextId='help.home.select.groups' />
 			</div>
@@ -242,25 +254,21 @@ export default function ChartDataSelectComponent() {
 			<div style={divBottomPadding}>
 				<MultiSelectComponent
 					options={dataProps.sortedMeters}
-					selectedOptions={dataProps.selectedMeters}
+					selectedOptions={dataProps.displayableSelectedMeters}
 					placeholder={intl.formatMessage(messages.selectMeters)}
 					// change logic for selection: compute diff between dataProps.selectedMeters and newSelectedMeterOptions\
 					// then make change to allSelectedMeters and pass that
 					onValuesChange={(newSelectedMeterOptions: SelectOption[]) => {
 						const allSelectedMeterIDs: number[] = dataProps.allSelectedMeters.map(s => s.value);
-						const oldSelectedMeterIDs: number[] = dataProps.selectedMeters.map(s => s.value);
+						const oldSelectedMeterIDs: number[] = dataProps.displayableSelectedMeters.map(s => s.value);
 						const newSelectedMeterIDs: number[] = newSelectedMeterOptions.map(s => s.value);
 						// It is assumed there can only be one element in this array, because this is triggered every time the selection is changed
-						let difference: number = oldSelectedMeterIDs.filter(x => !newSelectedMeterIDs.includes(x))[0];
+						const difference: number = oldSelectedMeterIDs.filter(x => !newSelectedMeterIDs.includes(x))[0];
 						if (difference === undefined) {
-							// no difference found, so check the other way around
-							difference = newSelectedMeterIDs.filter(x => !oldSelectedMeterIDs.includes(x))[0];
-							allSelectedMeterIDs.push(difference);
+							// no deletions found, so check for insertions
+							allSelectedMeterIDs.push(newSelectedMeterIDs.filter(x => !oldSelectedMeterIDs.includes(x))[0]);
 						} else {
-							// deletion
-							allSelectedMeterIDs.forEach((meterId, index) => {
-								if (meterId == difference) allSelectedMeterIDs.splice(index, 1);
-							});
+							allSelectedMeterIDs.splice(allSelectedMeterIDs.indexOf(difference), 1);
 						}
 						dispatch(changeSelectedMeters(allSelectedMeterIDs));
 					}}
