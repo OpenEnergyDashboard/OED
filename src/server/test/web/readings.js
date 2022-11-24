@@ -1,14 +1,13 @@
 /* This Source Code Form is subject to the terms of the Mozilla Public
  * License, v. 2.0. If a copy of the MPL was not distributed with this
- * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
+ * file, You can obtain one at http://mozilla.org/MPL/2.0/. 
 
-/*
 	This file tests the readings retrieval API.
 
 	see: https://github.com/OpenEnergyDashboard/DevDocs/blob/main/testing/testing.md for information on loading readings test data
 
 	Directions for creating reading tests (not needed for rejection tests)
-		1) Download csv files from devdocs link above and add to readingsData folder in this directory
+		1) Download csv files from devdocs (link above) and add to a readingsData folder in this directory (src/server/test/web/readingsData)
 		2) define arrays of data for units, conversions, a test meter using testing csv (optionally a second test meter and group for group testing) 
 		3) load these arrays by invoking prepareTest(* defined data arrays *)
 		4) create an array of values using the expected values csv by calling parseExpectedCsv on the file and assigning the return value
@@ -25,7 +24,7 @@ const { refreshAllReadingViews } = require('../../services/refreshAllReadingView
 const readCsv = require('../../services/pipeline-in-progress/readCsv');
 const ETERNITY = TimeInterval.unbounded();
 const DAY = moment.duration({ 'days': 1 });
-const delta = 0.0000001	// Readings should be accurate to many decimal places, but allow some leeway for database and javascript conversions	
+const delta = 0.0000001	// Readings should be accurate to many decimal places, but allow some wiggle room for database and javascript conversions	
 const HTTP_CODE = { // Some common HTTP status response codes
 	OK: 200,
 	FOUND: 302,
@@ -58,18 +57,20 @@ async function prepareTest(unitDataOne, unitDataTwo, conversionData, meterDataOn
 }
 
 /**
+ * Call this function to generate an array of arrays of a csv file.
+ * This function will remove the first 'row' from the csv file (typically the column names)
  * @param {string} fileName path to the 'expected values' csv file to correspond with the readings file
- * @returns an array of arrays similar in format to the expected JSON output of the api
+ * @returns {array} array of arrays similar in format to the expected JSON output of the api
  */
 async function parseExpectedCsv(fileName) {
-	let expected = await readCsv(fileName);
-	let returned = [];
-	expected.shift(); 
-	expected.forEach((reading) => {
+	let expectedCsv = await readCsv(fileName);
+	let expectedReadings = [];
+	expectedCsv.shift(); 
+	expectedCsv.forEach((reading) => {
 		if (reading[0] != '') 
-			returned.push(reading);
+			expectedReadings.push(reading);
 	})
-	return returned;
+	return expectedReadings;
 };
 
 mocha.describe('readings API', () => {
@@ -109,13 +110,59 @@ mocha.describe('readings API', () => {
 					// naming scheme for csv files
 					// Start with 15 minute
 				});
-				mocha.it('should have the expected readings for 15 minute reading intervals', async () => {
+				mocha.it('should have the expected readings for 15 minute reading intervals and quantity units', async () => {
 					const unitDataOne = ['kWh', '', Unit.unitRepresentType.QUANTITY, 3600, Unit.unitType.UNIT,
 						'', Unit.displayableType.ALL, true, 'OED created standard unit'];
 					const unitDataTwo = ['Electric_Utility', '', Unit.unitRepresentType.QUANTITY, 3600, Unit.unitType.METER,
 						'', Unit.displayableType.NONE, false, 	'special unit'];
 					const conversionData = ['Electric_Utility', 'kWh', false, 1, 0, 'Electric_Utility → kWh'];
 					const meterData = ['Electric Utility kWh', 'Electric_Utility', 'kWh', true, undefined,
+						'special meter', 'test/web/readingsData/readings_ri_15_days_75.csv', false];
+
+					await prepareTest(unitDataOne, unitDataTwo, conversionData, meterData);
+					let expected = 
+						await parseExpectedCsv('src/server/test/web/readingsData/expected_ri_15_unit_kWh_st_-inf_et_inf.csv');
+
+					const res = await chai.request(app).get('/api/unitReadings/line/meters/1')
+						.query({ timeInterval: ETERNITY.toString(), graphicUnitId: 1 });
+					expect(res.body).to.have.property('1').to.have.lengthOf(expected.length);
+
+					for(let i = 0; i < expected.length; i++) {
+						let reading = Number(expected[i][0]);
+						expect(res.body).to.have.property('1').to.have.property(`${i}`).to.have.property('reading').to.be.closeTo(reading, delta);
+						// TODO check timestamps too
+					}
+				});
+				mocha.it('should have the expected readings for 15 minute reading intervals and flow units', async () => {
+					const unitDataOne = ['kW', '', Unit.unitRepresentType.FLOW, 3600, Unit.unitType.UNIT,
+					'', Unit.displayableType.ALL, true, 'kilowatts'];
+					const unitDataTwo = ['Electric', '', Unit.unitRepresentType.QUANTITY, 3600, Unit.unitType.METER,
+						'', Unit.displayableType.NONE, false, 'special unit'];
+					const conversionData = ['Electric', 'kW', false, 1, 0, 'Electric → kW'];
+					const meterData = ['Electric kW', 'Electric', 'kW', true, undefined,
+						'special meter', 'test/web/readingsData/readings_ri_15_days_75.csv', false];
+
+					await prepareTest(unitDataOne, unitDataTwo, conversionData, meterData);
+					let expected = 
+						await parseExpectedCsv('src/server/test/web/readingsData/expected_ri_15_unit_kWh_st_-inf_et_inf.csv');
+
+					const res = await chai.request(app).get('/api/unitReadings/line/meters/1')
+						.query({ timeInterval: ETERNITY.toString(), graphicUnitId: 1 });
+					expect(res.body).to.have.property('1').to.have.lengthOf(expected.length);
+
+					for(let i = 0; i < expected.length; i++) {
+						let reading = Number(expected[i][0]);
+						expect(res.body).to.have.property('1').to.have.property(`${i}`).to.have.property('reading').to.be.closeTo(reading, delta);
+						// TODO check timestamps too
+					}
+				});
+				mocha.it('should have the expected readings for 15 minute reading intervals and raw units', async () => {
+					const unitDataOne = ['c', '', Unit.unitRepresentType.RAW, 3600, Unit.unitType.UNIT,
+					'', Unit.displayableType.ALL, true, 'Celsius'];
+					const unitDataTwo = ['Degrees', '', Unit.unitRepresentType.QUANTITY, 3600, Unit.unitType.METER,
+						'', Unit.displayableType.NONE, false, 'special unit'];
+					const conversionData = ['Degrees', 'c', false, 1, 0, 'Degrees → c'];
+					const meterData = ['Degrees Celsius', 'Degrees', 'c', true, undefined,
 						'special meter', 'test/web/readingsData/readings_ri_15_days_75.csv', false];
 
 					await prepareTest(unitDataOne, unitDataTwo, conversionData, meterData);
