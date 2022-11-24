@@ -36,7 +36,7 @@ postgres-data
 
 # Test data (normally for developers)
 src/server/test/db/data/automatedTests/*.csv
-
+src/server/test/web/readingsData/*
 # nohup.out is created when working inside the remote container with Visual Studio Code.
 nohup.out
 
