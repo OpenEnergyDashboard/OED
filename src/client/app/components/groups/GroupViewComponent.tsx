@@ -7,16 +7,42 @@ import * as React from 'react';
 import { useState } from 'react';
 import { Button } from 'reactstrap';
 import { FormattedMessage } from 'react-intl';
-import EditUnitModalComponent from './EditUnitModalComponent';
+// TODO import EditGroupModalComponent from './EditGroupModalComponent';
 import '../../styles/card-page.css';
-import { UnitData } from 'types/redux/units';
+import { GroupDefinition } from 'types/redux/Groups';
 import translate from '../../utils/translate';
+import { GPSPoint } from '../../utils/calibration';
 
-interface UnitViewComponentProps {
-	unit: UnitData;
+// TODO
+// Need to put child meters somewhere
+// Get design document for other items
+
+// TODO This duplicates code in EditMeterModalComponent. Need to put in some other place (utils? or where others are)
+// and then import in both places
+
+// get string value from GPSPoint or null.
+function getGPSString(gps: GPSPoint | null) {
+	if (gps === null) {
+		//  if gps is null return empty string value
+		return '';
+	}
+	else if (typeof gps === 'object') {
+		// if gps is an object parse GPSPoint and return string value
+		const json = JSON.stringify({ gps });
+		const obj = JSON.parse(json);
+		return `${obj.gps.latitude}, ${obj.gps.longitude}`;
+	}
+	else {
+		// Assume it is a string that was input.
+		return gps
+	}
 }
 
-export default function UnitViewComponent(props: UnitViewComponentProps) {
+interface GroupViewComponentProps {
+	group: GroupDefinition;
+}
+
+export default function GroupViewComponent(props: GroupViewComponentProps) {
 	// Don't check if admin since only an admin is allow to route to this page.
 
 	// Edit Modal Show
@@ -32,43 +58,32 @@ export default function UnitViewComponent(props: UnitViewComponentProps) {
 
 	return (
 		<div className="card">
+			{/* Use identifier-container since similar and groups only have name */}
 			<div className="identifier-container">
-				{props.unit.identifier}
+				{props.group.name}
+			</div>
+			<div className={props.group.displayable.toString()}>
+				<b><FormattedMessage id="group.displayable" /></b> {translate(`TrueFalseType.${props.group.displayable.toString()}`)}
 			</div>
 			<div className="item-container">
-				<b><FormattedMessage id="unit.name" /></b> {props.unit.name}
+				<b><FormattedMessage id="group.area" /></b> {props.group.area}
 			</div>
 			<div className="item-container">
-				<b><FormattedMessage id="unit.type.of.unit" /></b> {props.unit.typeOfUnit}
+				<b><FormattedMessage id="group.gps" /></b> {getGPSString(props.group.gps)}
 			</div>
+			{/* Only show first 30 characters so card does not get too big. Should limit to one line */}
 			<div className="item-container">
-				<b><FormattedMessage id="unit.represent" /></b> {props.unit.unitRepresent}
-			</div>
-			<div className={props.unit.displayable.toString()}>
-				<b><FormattedMessage id="unit.displayable" /></b> {props.unit.displayable}
-			</div>
-			<div className="item-container">
-				<b><FormattedMessage id="unit.preferred.display" /></b> {translate(`TrueFalseType.${props.unit.preferredDisplay.toString()}`)}
-			</div>
-			<div className="item-container">
-				<b><FormattedMessage id="unit.sec.in.rate" /></b> {props.unit.secInRate}
-			</div>
-			<div className="item-container">
-				<b><FormattedMessage id="unit.suffix" /></b> {props.unit.suffix}
-			</div>
-			<div className="item-container">
-				{/* Only show first 30 characters so card does not get too big. Should limit to one line */}
-				<b><FormattedMessage id="unit.note" /></b> {props.unit.note.slice(0, 29)}
+				<b><FormattedMessage id="group.note" /></b> {props.group.note?.slice(0, 29)}
 			</div>
 			<div className="edit-btn">
 				<Button variant="Secondary" onClick={handleShow}>
 					<FormattedMessage id="edit.unit" />
 				</Button>
 				{/* Creates a child UnitModalEditComponent */}
-				<EditUnitModalComponent
+				{/* <EditUnitModalComponent
 					show={showEditModal}
 					unit={props.unit}
-					handleClose={handleClose} />
+					handleClose={handleClose} /> */}
 			</div>
 		</div>
 	);

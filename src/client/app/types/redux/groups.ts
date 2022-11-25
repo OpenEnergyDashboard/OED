@@ -155,7 +155,7 @@ export interface GroupData {
 	name: string;
 	childMeters: number[];
 	childGroups: number[];
-	gps?: GPSPoint;
+	gps: GPSPoint | null;
 	displayable: boolean;
 	note?: string;
 	area?: number;
