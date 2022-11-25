@@ -16,6 +16,7 @@ import { GPSPoint } from '../../utils/calibration';
 // TODO
 // Need to put child meters somewhere
 // Get design document for other items
+// protect some items to admin only
 
 // TODO This duplicates code in EditMeterModalComponent. Need to put in some other place (utils? or where others are)
 // and then import in both places

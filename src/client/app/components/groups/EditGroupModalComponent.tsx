@@ -14,33 +14,29 @@ import TooltipMarkerComponent from '../TooltipMarkerComponent';
 import TooltipHelpContainer from '../../containers/TooltipHelpContainer';
 import '../../styles/modal.css';
 import { removeUnsavedChanges } from '../../actions/unsavedWarning';
-import { submitEditedUnit } from '../../actions/units';
-import { UnitData, DisplayableType, UnitRepresentType, UnitType } from '../../types/redux/units';
+import { submitGroupEdits } from '../../actions/groups'; // TODO verify correct action, remove export for action if not used.
+import { GroupDefinition } from '../../types/redux/groups'; // TODO correct one?
 import { TrueFalseType } from '../../types/items';
 
-interface EditUnitModalComponentProps {
+interface EditGroupModalComponentProps {
 	show: boolean;
-	unit: UnitData;
+	group: GroupDefinition;
 	// passed in to handle closing the modal
 	handleClose: () => void;
 }
 
-export default function EditUnitModalComponent(props: EditUnitModalComponentProps) {
+export default function EditUnitModalComponent(props: EditGroupModalComponentProps) {
 	const dispatch = useDispatch();
 
 	// Set existing unit values
 	const values = {
-		name: props.unit.name,
-		identifier: props.unit.identifier,
-		typeOfUnit: props.unit.typeOfUnit,
-		unitRepresent: props.unit.unitRepresent,
-		displayable: props.unit.displayable,
-		preferredDisplay: props.unit.preferredDisplay,
-		secInRate: props.unit.secInRate,
-		suffix: props.unit.suffix,
-		note: props.unit.note,
-		id: props.unit.id,
-		unitIndex: props.unit.unitIndex
+		name: props.group.name,
+		displayable: props.group.displayable,
+		gps: props.group.gps,
+		note: props.group.note,
+		area: props.group.area,
+		defaultGraphicUnit: props.group.defaultGraphicUnit,
+		id: props.group.id
 	}
 
 	/* State */

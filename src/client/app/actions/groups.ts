@@ -279,7 +279,7 @@ export function submitNewGroup(group: t.GroupData): Thunk {
 	};
 }
 
-function submitGroupEdits(group: t.GroupData & t.GroupID): Thunk {
+export function submitGroupEdits(group: t.GroupData & t.GroupID): Thunk {
 	return async (dispatch: Dispatch) => {
 		dispatch(markGroupInEditingSubmitted());
 		try {
