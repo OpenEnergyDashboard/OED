@@ -254,7 +254,7 @@ mocha.describe('readings API', () => {
 							graphicUnitId: 1
 						});
 					expect(res).to.be.json;
-					expect(res).to.not.status(HTTP_CODE.OK);
+					expect(res).to.have.status(HTTP_CODE.OK);
 					expect(res.body).to.have.property('1').to.have.property('0').to.have.property('reading');
 					expect(res.body).to.have.property('1').to.have.property('0').to.have.property('startTimestamp');
 					expect(res.body).to.have.property('1').to.have.property('0').to.have.property('endTimestamp');
