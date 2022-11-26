@@ -25,7 +25,7 @@ const readCsv = require('../../services/pipeline-in-progress/readCsv');
 const ETERNITY = TimeInterval.unbounded();
 const DAY = moment.duration({ 'days': 1 });
 const delta = 0.0000001	// Readings should be accurate to many decimal places, but allow some wiggle room for database and javascript conversions	
-const HTTP_CODE = { // Some common HTTP status response codes
+const HTTP_CODE = { 	// Some common HTTP status response codes
 	OK: 200,
 	FOUND: 302,
 	BAD_REQUEST: 400,
@@ -33,7 +33,7 @@ const HTTP_CODE = { // Some common HTTP status response codes
 };
 
 /**
- * 
+ * Call the functions to insert data into the database with one call, then redoCik and refresh views to ensure everything works.
  * @param {array} unitDataOne parameters for insertUnits
  * @param {array} unitDataTwo parameters for insertUnits
  * @param {array} conversionData parameters for insertConversions
@@ -73,6 +73,11 @@ async function parseExpectedCsv(fileName) {
 	return expectedReadings;
 };
 
+// TODO 
+// Test readings from meters at different rates (15 min, 23 min)
+// Test groups as well
+// Optimize testing to run faster, each test is taking ~4 seconds which is way too slow
+
 mocha.describe('readings API', () => {
 	mocha.describe('readings test, test if data returned by API is as expected', () => {
 		mocha.beforeEach(async () => {
@@ -81,7 +86,7 @@ mocha.describe('readings API', () => {
 		mocha.describe('for line charts', () => {
 			mocha.describe('for meters', () => {
 				// A reading response should have a reading, startTimestamp, and endTimestamp key
- 				mocha.it('response should have valid reading and timestamps,', async () => {
+  				mocha.it('response should have valid reading and timestamps,', async () => {
 					const unitDataOne = ['kWh', '', Unit.unitRepresentType.QUANTITY, 3600, Unit.unitType.UNIT, '', Unit.displayableType.ALL, true, 'OED created standard unit'];
 					const unitDataTwo = ['Electric_Utility', '', Unit.unitRepresentType.QUANTITY, 3600, Unit.unitType.METER, '', Unit.displayableType.NONE, false, 	'special unit'];
 					const conversionData = ['Electric_Utility', 'kWh', false, 1, 0, 'Electric_Utility → kWh'];
@@ -98,18 +103,7 @@ mocha.describe('readings API', () => {
 					expect(res.body).to.have.property('1').to.have.property('0').to.have.property('reading');
 					expect(res.body).to.have.property('1').to.have.property('0').to.have.property('startTimestamp');
 					expect(res.body).to.have.property('1').to.have.property('0').to.have.property('endTimestamp');
-					// TODO test values
-					// Vary unit, what happens?
-					// test invalid unit
-					// Test quantity, flow, raw (eg. temp) units
-					// Test readings from meters at different rates (15 min, 23 min)
-					// Create input and output csv
-					// create test/readings dev doc 
-					// spreadsheet to generate test data
-					// Start with meters
-					// naming scheme for csv files
-					// Start with 15 minute
-				});
+				}); 
 				mocha.it('should have the expected readings for 15 minute reading intervals and quantity units', async () => {
 					const unitDataOne = ['kWh', '', Unit.unitRepresentType.QUANTITY, 3600, Unit.unitType.UNIT,
 						'', Unit.displayableType.ALL, true, 'OED created standard unit'];
@@ -125,12 +119,15 @@ mocha.describe('readings API', () => {
 
 					const res = await chai.request(app).get('/api/unitReadings/line/meters/1')
 						.query({ timeInterval: ETERNITY.toString(), graphicUnitId: 1 });
+					expect(res).to.be.json;
+					expect(res).to.not.have.status(HTTP_CODE.BAD_REQUEST);
 					expect(res.body).to.have.property('1').to.have.lengthOf(expected.length);
 
 					for(let i = 0; i < expected.length; i++) {
 						let reading = Number(expected[i][0]);
 						expect(res.body).to.have.property('1').to.have.property(`${i}`).to.have.property('reading').to.be.closeTo(reading, delta);
-						// TODO check timestamps too
+						//TODO need to figure out a general way to find the start timestamp
+						expect(res.body).to.have.property('1').to.have.property(`${i}`).to.have.property('endTimestamp').to.equal(Date.parse(expected[i][2]));
 					}
 				});
 				mocha.it('should have the expected readings for 15 minute reading intervals and flow units', async () => {
@@ -148,12 +145,15 @@ mocha.describe('readings API', () => {
 
 					const res = await chai.request(app).get('/api/unitReadings/line/meters/1')
 						.query({ timeInterval: ETERNITY.toString(), graphicUnitId: 1 });
+					expect(res).to.be.json;
+					expect(res).to.not.have.status(HTTP_CODE.BAD_REQUEST);
 					expect(res.body).to.have.property('1').to.have.lengthOf(expected.length);
 
 					for(let i = 0; i < expected.length; i++) {
 						let reading = Number(expected[i][0]);
 						expect(res.body).to.have.property('1').to.have.property(`${i}`).to.have.property('reading').to.be.closeTo(reading, delta);
-						// TODO check timestamps too
+						//TODO need to figure out a general way to find the start timestamp
+						expect(res.body).to.have.property('1').to.have.property(`${i}`).to.have.property('endTimestamp').to.equal(Date.parse(expected[i][2]));
 					}
 				});
 				mocha.it('should have the expected readings for 15 minute reading intervals and raw units', async () => {
@@ -171,12 +171,15 @@ mocha.describe('readings API', () => {
 
 					const res = await chai.request(app).get('/api/unitReadings/line/meters/1')
 						.query({ timeInterval: ETERNITY.toString(), graphicUnitId: 1 });
+					expect(res).to.be.json;
+					expect(res).to.not.have.status(HTTP_CODE.BAD_REQUEST);
 					expect(res.body).to.have.property('1').to.have.lengthOf(expected.length);
 
 					for(let i = 0; i < expected.length; i++) {
 						let reading = Number(expected[i][0]);
 						expect(res.body).to.have.property('1').to.have.property(`${i}`).to.have.property('reading').to.be.closeTo(reading, delta);
-						// TODO check timestamps too
+						//TODO need to figure out a general way to find the start timestamp
+						expect(res.body).to.have.property('1').to.have.property(`${i}`).to.have.property('endTimestamp').to.equal(Date.parse(expected[i][2]));
 					}
 				});
 				mocha.it('should return an empty json object for an invalid unit', async () => {
@@ -190,9 +193,11 @@ mocha.describe('readings API', () => {
 					await prepareTest(unitDataOne, unitDataTwo, conversionData, meterData);
 					const res = await chai.request(app).get('/api/unitReadings/line/meters/1')
 						.query({ timeInterval: ETERNITY.toString(), graphicUnitId: 1 });
+					expect(res).to.be.json;
+					expect(res).to.not.have.status(HTTP_CODE.BAD_REQUEST);
 					expect(res.body).to.have.property('1').to.be.empty;
 
-				});
+				}); 
 			});
 			mocha.describe('for groups', () => {
 				// A reading response should have a reading, startTimestamp, and endTimestamp key
@@ -217,9 +222,10 @@ mocha.describe('readings API', () => {
 				});
 			});
 		});
+		
   		mocha.describe('for bar charts', () => {
 			// The logic here is effectively the same as the line charts, however bar charts have an added
-			// barWidthDays parameter that must me accounted for, which adds a few extra steps
+			// barWidthDays parameter that must be accounted for, which adds a few extra steps
 			mocha.describe('for meters', () => {
 				mocha.it('response should have a valid reading, startTimestamp, and endTimestamp', async () => {
 					const unitDataOne = ['kWh', '', Unit.unitRepresentType.QUANTITY, 3600, Unit.unitType.UNIT, '', Unit.displayableType.ALL, true, 'OED created standard unit'];
