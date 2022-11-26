@@ -73,10 +73,25 @@ async function parseExpectedCsv(fileName) {
 	return expectedReadings;
 };
 
+/**
+ * Checks reading generated from csv and compares against the expected readings csv
+ * @param {request.Response} res the response to the HTTP GET request from Chai
+ * @param {array} expected the returned array from parseExpectedCsv
+ */
+function expectReadingToEqualExpected(res, expected) {
+	expect(res).to.be.json;
+	expect(res).to.have.status(HTTP_CODE.OK);
+	expect(res.body).to.have.property('1').to.have.lengthOf(expected.length);
+	for(let i = 0; i < expected.length; i++) {
+		expect(res.body).to.have.property('1').to.have.property(`${i}`).to.have.property('reading').to.be.closeTo(Number(expected[i][0]), delta);
+		//TODO need to figure out a general way to find the start timestamp
+		expect(res.body).to.have.property('1').to.have.property(`${i}`).to.have.property('endTimestamp').to.equal(Date.parse(expected[i][2]));
+	}
+}
 // TODO 
 // Test readings from meters at different rates (15 min, 23 min)
 // Test groups as well
-// Optimize testing to run faster, each test is taking ~4 seconds which is way too slow
+// Optimize testing to run faster, each test is taking ~4 seconds which is way too slow on M1 Macbook
 
 mocha.describe('readings API', () => {
 	mocha.describe('readings test, test if data returned by API is as expected', () => {
@@ -99,7 +114,7 @@ mocha.describe('readings API', () => {
 					// unitReadings should be returning json 
 					expect(res).to.be.json;
 					// the route should not return a bad request
-					expect(res).to.not.have.status(HTTP_CODE.BAD_REQUEST);
+					expect(res).to.have.status(HTTP_CODE.OK);
 					expect(res.body).to.have.property('1').to.have.property('0').to.have.property('reading');
 					expect(res.body).to.have.property('1').to.have.property('0').to.have.property('startTimestamp');
 					expect(res.body).to.have.property('1').to.have.property('0').to.have.property('endTimestamp');
@@ -108,7 +123,7 @@ mocha.describe('readings API', () => {
 					const unitDataOne = ['kWh', '', Unit.unitRepresentType.QUANTITY, 3600, Unit.unitType.UNIT,
 						'', Unit.displayableType.ALL, true, 'OED created standard unit'];
 					const unitDataTwo = ['Electric_Utility', '', Unit.unitRepresentType.QUANTITY, 3600, Unit.unitType.METER,
-						'', Unit.displayableType.NONE, false, 	'special unit'];
+						'', Unit.displayableType.NONE, false, 'special unit'];
 					const conversionData = ['Electric_Utility', 'kWh', false, 1, 0, 'Electric_Utility → kWh'];
 					const meterData = ['Electric Utility kWh', 'Electric_Utility', 'kWh', true, undefined,
 						'special meter', 'test/web/readingsData/readings_ri_15_days_75.csv', false];
@@ -119,16 +134,7 @@ mocha.describe('readings API', () => {
 
 					const res = await chai.request(app).get('/api/unitReadings/line/meters/1')
 						.query({ timeInterval: ETERNITY.toString(), graphicUnitId: 1 });
-					expect(res).to.be.json;
-					expect(res).to.not.have.status(HTTP_CODE.BAD_REQUEST);
-					expect(res.body).to.have.property('1').to.have.lengthOf(expected.length);
-
-					for(let i = 0; i < expected.length; i++) {
-						let reading = Number(expected[i][0]);
-						expect(res.body).to.have.property('1').to.have.property(`${i}`).to.have.property('reading').to.be.closeTo(reading, delta);
-						//TODO need to figure out a general way to find the start timestamp
-						expect(res.body).to.have.property('1').to.have.property(`${i}`).to.have.property('endTimestamp').to.equal(Date.parse(expected[i][2]));
-					}
+					expectReadingToEqualExpected(res, expected);
 				});
 				mocha.it('should have the expected readings for 15 minute reading intervals and flow units', async () => {
 					const unitDataOne = ['kW', '', Unit.unitRepresentType.FLOW, 3600, Unit.unitType.UNIT,
@@ -145,16 +151,8 @@ mocha.describe('readings API', () => {
 
 					const res = await chai.request(app).get('/api/unitReadings/line/meters/1')
 						.query({ timeInterval: ETERNITY.toString(), graphicUnitId: 1 });
-					expect(res).to.be.json;
-					expect(res).to.not.have.status(HTTP_CODE.BAD_REQUEST);
-					expect(res.body).to.have.property('1').to.have.lengthOf(expected.length);
-
-					for(let i = 0; i < expected.length; i++) {
-						let reading = Number(expected[i][0]);
-						expect(res.body).to.have.property('1').to.have.property(`${i}`).to.have.property('reading').to.be.closeTo(reading, delta);
-						//TODO need to figure out a general way to find the start timestamp
-						expect(res.body).to.have.property('1').to.have.property(`${i}`).to.have.property('endTimestamp').to.equal(Date.parse(expected[i][2]));
-					}
+					expectReadingToEqualExpected(res, expected);
+					
 				});
 				mocha.it('should have the expected readings for 15 minute reading intervals and raw units', async () => {
 					const unitDataOne = ['c', '', Unit.unitRepresentType.RAW, 3600, Unit.unitType.UNIT,
@@ -171,16 +169,7 @@ mocha.describe('readings API', () => {
 
 					const res = await chai.request(app).get('/api/unitReadings/line/meters/1')
 						.query({ timeInterval: ETERNITY.toString(), graphicUnitId: 1 });
-					expect(res).to.be.json;
-					expect(res).to.not.have.status(HTTP_CODE.BAD_REQUEST);
-					expect(res.body).to.have.property('1').to.have.lengthOf(expected.length);
-
-					for(let i = 0; i < expected.length; i++) {
-						let reading = Number(expected[i][0]);
-						expect(res.body).to.have.property('1').to.have.property(`${i}`).to.have.property('reading').to.be.closeTo(reading, delta);
-						//TODO need to figure out a general way to find the start timestamp
-						expect(res.body).to.have.property('1').to.have.property(`${i}`).to.have.property('endTimestamp').to.equal(Date.parse(expected[i][2]));
-					}
+					expectReadingToEqualExpected(res, expected)
 				});
 				mocha.it('should return an empty json object for an invalid unit', async () => {
 					const unitDataOne = ['kWh', '', Unit.unitRepresentType.QUANTITY, 3600, Unit.unitType.UNIT,
@@ -194,7 +183,6 @@ mocha.describe('readings API', () => {
 					const res = await chai.request(app).get('/api/unitReadings/line/meters/1')
 						.query({ timeInterval: ETERNITY.toString(), graphicUnitId: 1 });
 					expect(res).to.be.json;
-					expect(res).to.not.have.status(HTTP_CODE.BAD_REQUEST);
 					expect(res.body).to.have.property('1').to.be.empty;
 
 				}); 
@@ -215,7 +203,7 @@ mocha.describe('readings API', () => {
 					// unitReadings should be returning json 
 					expect(res).to.be.json;
 					// the route should not return a bad request
-					expect(res).to.not.have.status(HTTP_CODE.BAD_REQUEST);
+					expect(res).to.have.status(HTTP_CODE.OK);
 					expect(res.body).to.have.property('1').to.have.property('0').to.have.property('reading');
 					expect(res.body).to.have.property('1').to.have.property('0').to.have.property('startTimestamp');
 					expect(res.body).to.have.property('1').to.have.property('0').to.have.property('endTimestamp');
@@ -243,7 +231,7 @@ mocha.describe('readings API', () => {
 							graphicUnitId: 1
 						});
 					expect(res).to.be.json;
-					expect(res).to.not.have.status(HTTP_CODE.BAD_REQUEST);
+					expect(res).to.have.status(HTTP_CODE.OK);
 					expect(res.body).to.have.property('1').to.have.property('0').to.have.property('reading');
 					expect(res.body).to.have.property('1').to.have.property('0').to.have.property('startTimestamp');
 					expect(res.body).to.have.property('1').to.have.property('0').to.have.property('endTimestamp');
@@ -266,7 +254,7 @@ mocha.describe('readings API', () => {
 							graphicUnitId: 1
 						});
 					expect(res).to.be.json;
-					expect(res).to.not.have.status(HTTP_CODE.BAD_REQUEST);
+					expect(res).to.not.status(HTTP_CODE.OK);
 					expect(res.body).to.have.property('1').to.have.property('0').to.have.property('reading');
 					expect(res.body).to.have.property('1').to.have.property('0').to.have.property('startTimestamp');
 					expect(res.body).to.have.property('1').to.have.property('0').to.have.property('endTimestamp');
