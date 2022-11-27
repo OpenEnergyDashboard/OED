@@ -53,8 +53,8 @@ export default function ChartDataSelectComponent() {
 		const allGroups = state.groups.byGroupID;
 
 		// Map information about meters, groups and units into a format the component can display.
-		const sortedMeters = getMeterCompatibilityForDropdown(state);
-		const sortedGroups = getGroupCompatibilityForDropdown(state);
+		let sortedMeters = getMeterCompatibilityForDropdown(state);
+		let sortedGroups = getGroupCompatibilityForDropdown(state);
 		const sortedUnits = getUnitCompatibilityForDropdown(state);
 
 		//Map information about the currently selected meters into a format the component can display.
@@ -160,6 +160,19 @@ export default function ChartDataSelectComponent() {
 			}
 		});
 
+		// re-sort by disabled because that status may have changed (mainly for maps)
+		sortedMeters = _.sortBy(sortedMeters, item => item.isDisabled, 'asc');
+		// push a dummy item as a divider.
+		const firstDisabledMeter: number = sortedMeters.findIndex(item => item.isDisabled);
+		if (firstDisabledMeter != -1) {
+			sortedMeters.splice(firstDisabledMeter, 0, {
+				value: 0,
+				label: '----- Incompatible Meters -----',
+				isDisabled: true
+			} as SelectOption
+			);
+		}
+
 		const displayableSelectedGroups: SelectOption[] = [];
 		const allSelectedGroups: SelectOption[] = [];
 		state.graph.selectedGroups.forEach(groupID => {
@@ -190,6 +203,19 @@ export default function ChartDataSelectComponent() {
 			}
 		});
 
+		// re-sort by disabled because that status may have changed (mainly for maps)
+		sortedGroups = _.sortBy(sortedGroups, item => item.isDisabled, 'asc');
+		// dummy item as a divider
+		const firstDisabledGroup: number = sortedGroups.findIndex(item => item.isDisabled);
+		if (firstDisabledGroup != -1) {
+			sortedGroups.splice(firstDisabledGroup, 0, {
+				value: 0,
+				label: '----- Incompatible Groups -----',
+				isDisabled: true
+			} as SelectOption
+			);
+		}
+
 		// You can only select one unit so variable name is singular.
 		// This does not need to be an array but we make it one for now so works similarly to meters & groups.
 		// TODO Might want to make it work as a single item.
@@ -205,6 +231,17 @@ export default function ChartDataSelectComponent() {
 				} as SelectOption);
 			}
 		});
+
+		// push a dummy item as a divider.
+		const firstDisabledUnit: number = sortedUnits.findIndex(item => item.isDisabled);
+		if (firstDisabledUnit != -1) {
+			sortedUnits.splice(firstDisabledUnit, 0, {
+				value: 0,
+				label: '----- Incompatible Units -----',
+				isDisabled: true
+			} as SelectOption
+			);
+		}
 
 		return {
 			sortedMeters,
