@@ -141,6 +141,8 @@ function shouldUpdateCikAndDBViews(state: State): boolean {
 /**
  * Redo Cik and/or refresh reading views.
  * This function is called when some changes in units/conversions affect the Cik table or reading views.
+ * @param {boolean} shouldRedoCik Whether to refresh Cik.
+ * @param {boolean} shouldRefreshReadingViews Whether to refresh reading views.
  */
 export function updateCikAndDBViewsIfNeeded(shouldRedoCik: boolean, shouldRefreshReadingViews: boolean): Thunk {
 	return async (dispatch: Dispatch, getState: GetState) => {

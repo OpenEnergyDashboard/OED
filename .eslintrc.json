@@ -10,11 +10,11 @@
     },
     "extends": [
         "eslint:recommended",
-        "plugin:@typescript-eslint/recommended"
+        "plugin:@typescript-eslint/recommended",
         // uncomment this to enforce eslint-plugin-jsdoc rules (and add comma above)
-        // along with the plugings below for jsdoc.
+        // along with the plugins below for jsdoc.
         //the line of code below is in regards to https://github.com/OpenEnergyDashboard/OED/issues/396 
-        // "plugin:jsdoc/recommended"
+        "plugin:jsdoc/recommended"
     ],
     "parser": "@typescript-eslint/parser",
     "parserOptions": {
@@ -25,10 +25,10 @@
         "sourceType": "module"
     },
     "plugins": [
-        "@typescript-eslint"
+        "@typescript-eslint",
         //this section of code is for running jsdoc checker (eslint-plugin-jsdoc) https://github.com/OpenEnergyDashboard/OED/issues/396.
         // It needs to be uncommented if using jsdoc plugin and add a comma above.
-        // "jsdoc"
+        "jsdoc"
     ],
     "rules": {
         //https://github.com/typescript-eslint/typescript-eslint/issues/1824, indent is therefore turned off and we use typescript-eslint/indent instead
@@ -72,7 +72,8 @@
         "arrow-parens": [
             "error",
             "as-needed"
-        ]
+        ],
+        "jsdoc/newline-after-description": 0
     },
     "overrides": [
         {
