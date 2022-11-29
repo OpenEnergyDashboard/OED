@@ -598,6 +598,9 @@ function getSelectOptionsByItem(compatibleItems: Set<number>, incompatibleItems:
 			label = state.byGroupID[itemId].name;
 		}
 		else { label = ''; }
+		// TODO This is a bit of a hack. When an admin logs in they may not have the new state so label is null.
+		// This should clear once the state is loaded.
+		label = label === null ? '' : label;
 		finalItems.push({
 			value: itemId,
 			label: label,
@@ -617,6 +620,9 @@ function getSelectOptionsByItem(compatibleItems: Set<number>, incompatibleItems:
 			label = state.byGroupID[itemId].name;
 		}
 		else { label = ''; }
+		// TODO This is a bit of a hack. When an admin logs in they may not have the new state so label is null.
+		// This should clear once the state is loaded.
+		label = label === null ? '' : label;
 		finalItems.push({
 			value: itemId,
 			label: label,

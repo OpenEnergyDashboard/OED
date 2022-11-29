@@ -9,12 +9,13 @@ import { Dispatch } from '../../types/redux/actions';
 import { State } from '../../types/redux/state';
 import { DisplayMode } from '../../types/redux/groups';
 import { isRoleAdmin } from '../../utils/hasPermissions';
-function mapStateToProps(state: State, ownProps: {id: number}) {
+function mapStateToProps(state: State, ownProps: { id: number }) {
 	const id = ownProps.id;
 	const childMeterNames: string[] = [];
 	state.groups.byGroupID[id].childMeters.forEach((meterID: number) => {
-		if (state.meters.byMeterID[meterID] !== undefined) {
-			childMeterNames.push(state.meters.byMeterID[meterID].name.trim());
+		// See below with same logic for why.
+		if (state.meters.byMeterID[meterID] !== undefined && state.meters.byMeterID[meterID].identifier !== null) {
+			childMeterNames.push(state.meters.byMeterID[meterID].identifier.trim());
 		}
 	});
 	childMeterNames.sort();
@@ -29,14 +30,17 @@ function mapStateToProps(state: State, ownProps: {id: number}) {
 	const trueGroupSize = state.groups.byGroupID[id].childGroups.length;
 	const deepMeterNames: string[] = [];
 	state.groups.byGroupID[id].deepMeters.forEach((meterID: number) => {
-		if (state.meters.byMeterID[meterID] !== undefined) {
-			deepMeterNames.push(state.meters.byMeterID[meterID].name.trim());
+		// TODO We need a more general fix for hidden groups and meters but waiting until the major changes for units is done.
+		// Meter state should no longer be undefined but leaving for now.
+		// Also must check for null name since we do that for non-admin. Same above.
+		if (state.meters.byMeterID[meterID] !== undefined && state.meters.byMeterID[meterID].identifier !== null) {
+			deepMeterNames.push(state.meters.byMeterID[meterID].identifier.trim());
 		}
 	});
 	deepMeterNames.sort();
 	const currentUser = state.currentUser.profile;
 	let loggedInAsAdmin = false;
-	if(currentUser !== null){
+	if (currentUser !== null) {
 		loggedInAsAdmin = isRoleAdmin(currentUser.role);
 	}
 
