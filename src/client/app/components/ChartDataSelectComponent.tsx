@@ -130,7 +130,7 @@ export default function ChartDataSelectComponent() {
 			});
 		}
 
-		const displayableSelectedMeters: SelectOption[] = [];
+		const compatibleSelectedMeters: SelectOption[] = [];
 		const allSelectedMeters: SelectOption[] = [];
 		state.graph.selectedMeters.forEach(meterID => {
 			allSelectedMeters.push({
@@ -151,7 +151,7 @@ export default function ChartDataSelectComponent() {
 					// then this loop does not run. The loop is assumed to only run once in this case.
 					dispatch(changeSelectedUnit(state.meters.byMeterID[meterID].defaultGraphicUnit));
 				}
-				displayableSelectedMeters.push({
+				compatibleSelectedMeters.push({
 					// For meters we display the identifier.
 					label: state.meters.byMeterID[meterID] ? state.meters.byMeterID[meterID].identifier : '',
 					value: meterID,
@@ -173,7 +173,7 @@ export default function ChartDataSelectComponent() {
 			);
 		}
 
-		const displayableSelectedGroups: SelectOption[] = [];
+		const compatibleSelectedGroups: SelectOption[] = [];
 		const allSelectedGroups: SelectOption[] = [];
 		state.graph.selectedGroups.forEach(groupID => {
 			allSelectedGroups.push({
@@ -194,7 +194,7 @@ export default function ChartDataSelectComponent() {
 					// then this loop does not run. The loop is assumed to only run once in this case.
 					state.graph.selectedUnit = state.groups.byGroupID[groupID].defaultGraphicUnit;
 				}
-				displayableSelectedGroups.push({
+				compatibleSelectedGroups.push({
 					// For groups we display the name since no identifier.
 					label: state.groups.byGroupID[groupID] ? state.groups.byGroupID[groupID].name : '',
 					value: groupID,
@@ -244,14 +244,18 @@ export default function ChartDataSelectComponent() {
 		}
 
 		return {
+			// all items, sorted alphabetically and by compatibility
 			sortedMeters,
 			sortedGroups,
 			sortedUnits,
-			displayableSelectedMeters,
-			displayableSelectedGroups,
-			selectedUnit,
+			// only selected items which are compatible with the current graph type
+			compatibleSelectedMeters,
+			compatibleSelectedGroups,
+			// all selected items regardless of compatibility
 			allSelectedMeters,
-			allSelectedGroups
+			allSelectedGroups,
+			// currently selected unit
+			selectedUnit
 		}
 	});
 
@@ -266,16 +270,15 @@ export default function ChartDataSelectComponent() {
 			<div style={divBottomPadding}>
 				<MultiSelectComponent
 					options={dataProps.sortedGroups}
-					selectedOptions={dataProps.displayableSelectedGroups}
+					selectedOptions={dataProps.compatibleSelectedGroups}
 					placeholder={intl.formatMessage(messages.selectGroups)}
 					onValuesChange={(newSelectedGroupOptions: SelectOption[]) => {
+						// see meters code below for comments, as the code functions the same
 						const allSelectedGroupIDs: number[] = dataProps.allSelectedGroups.map(s => s.value);
-						const oldSelectedGroupIDs: number[] = dataProps.displayableSelectedGroups.map(s => s.value);
+						const oldSelectedGroupIDs: number[] = dataProps.compatibleSelectedGroups.map(s => s.value);
 						const newSelectedGroupIDs: number[] = newSelectedGroupOptions.map(s => s.value);
-						// It is assumed there can only be one element in this array, because this is triggered every time the selection is changed
 						const difference: number = oldSelectedGroupIDs.filter(x => !newSelectedGroupIDs.includes(x))[0];
 						if (difference === undefined) {
-							// no deletions found, so check for insertions
 							allSelectedGroupIDs.push(newSelectedGroupIDs.filter(x => !oldSelectedGroupIDs.includes(x))[0]);
 						} else {
 							allSelectedGroupIDs.splice(allSelectedGroupIDs.indexOf(difference), 1);
@@ -291,18 +294,19 @@ export default function ChartDataSelectComponent() {
 			<div style={divBottomPadding}>
 				<MultiSelectComponent
 					options={dataProps.sortedMeters}
-					selectedOptions={dataProps.displayableSelectedMeters}
+					selectedOptions={dataProps.compatibleSelectedMeters}
 					placeholder={intl.formatMessage(messages.selectMeters)}
-					// change logic for selection: compute diff between dataProps.selectedMeters and newSelectedMeterOptions\
-					// then make change to allSelectedMeters and pass that
 					onValuesChange={(newSelectedMeterOptions: SelectOption[]) => {
+						//computes difference between previously selected meters and current selected meters,
+						// then makes the change to all selected meters, which includes incompatible selected meters
 						const allSelectedMeterIDs: number[] = dataProps.allSelectedMeters.map(s => s.value);
-						const oldSelectedMeterIDs: number[] = dataProps.displayableSelectedMeters.map(s => s.value);
+						const oldSelectedMeterIDs: number[] = dataProps.compatibleSelectedMeters.map(s => s.value);
 						const newSelectedMeterIDs: number[] = newSelectedMeterOptions.map(s => s.value);
 						// It is assumed there can only be one element in this array, because this is triggered every time the selection is changed
+						// first filter finds items in the old list than are not in the new (deletions)
 						const difference: number = oldSelectedMeterIDs.filter(x => !newSelectedMeterIDs.includes(x))[0];
 						if (difference === undefined) {
-							// no deletions found, so check for insertions
+							// finds items in the new list which are not in the old list (insertions)
 							allSelectedMeterIDs.push(newSelectedMeterIDs.filter(x => !oldSelectedMeterIDs.includes(x))[0]);
 						} else {
 							allSelectedMeterIDs.splice(allSelectedMeterIDs.indexOf(difference), 1);
