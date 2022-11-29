@@ -172,6 +172,9 @@ export default class RouteComponent extends React.Component<RouteProps> {
 						case 'groupIDs':
 							options.groupIDs = info.split(',').map(s => parseInt(s));
 							break;
+						case 'unitID':
+							options.unitID = parseInt(info);
+                            break;
 						case 'chartType':
 							options.chartType = info as ChartTypes;
 							break;

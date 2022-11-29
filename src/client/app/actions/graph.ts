@@ -16,6 +16,7 @@ import * as m from '../types/redux/map';
 import { ComparePeriod, SortingOrder } from '../utils/calculateCompare';
 import { fetchNeededMapReadings } from './mapReadings';
 import { changeSelectedMap } from './map';
+import { fetchUnitsDetailsIfNeeded } from './units';
 
 export function changeChartToRender(chartType: t.ChartTypes): t.ChangeChartToRenderAction {
 	return { type: ActionType.ChangeChartToRender, chartType };
@@ -191,7 +192,7 @@ function changeRangeSliderIfNeeded(interval: TimeInterval): Thunk {
 export interface LinkOptions {
 	meterIDs?: number[];
 	groupIDs?: number[];
-	unit?: number;
+	unitID?: number;
 	chartType?: t.ChartTypes;
 	barDuration?: moment.Duration;
 	serverRange?: TimeInterval;
@@ -222,6 +223,10 @@ export function changeOptionsFromLink(options: LinkOptions) {
 		dispatchFirst.push(fetchGroupsDetailsIfNeeded());
 		dispatchSecond.push(changeSelectedGroups(options.groupIDs));
 	}
+	if (options.unitID) {
+		dispatchFirst.push(fetchUnitsDetailsIfNeeded());
+        dispatchSecond.push(changeSelectedUnit(options.unitID));
+    }
 	if (options.chartType) {
 		dispatchSecond.push(changeChartToRender(options.chartType));
 	}

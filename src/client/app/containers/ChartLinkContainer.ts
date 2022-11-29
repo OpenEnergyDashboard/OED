@@ -23,8 +23,8 @@ function mapStateToProps(state: State) {
 		linkText += `groupIDs=${state.graph.selectedGroups.toString()}&`;
 	}
 	const unitID = state.graph.selectedUnit;
-	linkText += `unit=${unitID.toString()}&`;
-	//linkText += `rate=${state.units.units[unitID]}&`;//fix this
+	linkText += `unitID=${unitID.toString()}&`;
+	//linkText += `rate=${state.units.units[unitID].secInRate}&`;//fix this
 	linkText += `chartType=${state.graph.chartToRender}`;
 	// weeklyLink = linkText + '&serverRange=7dfp'; // dfp: days from present;
 	linkText += `&serverRange=${state.graph.timeInterval.toString()}`;
@@ -36,7 +36,7 @@ function mapStateToProps(state: State) {
 		case 'line':
 			// no code for this case
 			// under construction;
-			linkText += `&displayRange=${state.graph.timeInterval.toString().split('_')}`;
+			// linkText += `&displayRange=${state.graph.timeInterval.toString().split('_')}`;
 			break;
 		case 'compare':
 			linkText += `&comparePeriod=${state.graph.comparePeriod}`;
