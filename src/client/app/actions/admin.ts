@@ -104,10 +104,18 @@ export function submitPreferences() {
 	};
 }
 
+/**
+ * @param {State} state The redux state.
+ * @returns {boolean} Whether the data is fetching
+ */
 function shouldFetchPreferenceData(state: State): boolean {
 	return !state.admin.isFetching;
 }
 
+/**
+ * @param {State} state The redux state.
+ * @returns {boolean}
+ */
 function shouldSubmitPreferenceData(state: State): boolean {
 	return !state.admin.submitted;
 }
@@ -134,6 +142,10 @@ function updateCikAndDBViews(): t.UpdateCikAndDBViews {
 	return { type: ActionType.UpdateCikAndDBViews };
 }
 
+/**
+ * @param {State} state The redux state.
+ * @returns {boolean} Whether or not the views are updating
+ */
 function shouldUpdateCikAndDBViews(state: State): boolean {
 	return !state.admin.isUpdatingCikAndDBViews;
 }
