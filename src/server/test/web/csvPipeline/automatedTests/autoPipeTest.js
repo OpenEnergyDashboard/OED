@@ -54,168 +54,168 @@ const testCases = {
 		responseString: ['<h1>FAILURE</h1><h2>It looks like the insert of the readings had issues with some or all of the readings where the processing of the readings returned these warning(s)/error(s):</h2><br>For meter pipe3: Error parsing Reading #1. Reading value gives 24 with error message:<br>The first ever reading must be dropped when dealing with cumulative data.<br>For reading #1 on meter pipe3 in pipeline: previous reading has value 0 start time 1970-01-01T00:00:00Z end time 1970-01-01T00:00:00Z and current reading has value 24 start time 2021-06-01T00:00:00Z end time 2021-06-02T00:00:00Z with timeSort increasing; duplications 1; cumulative true; cumulativeReset false; cumulativeResetStart 00:00:00; cumulativeResetEnd 23:59:59.999999; lengthGap 0; lengthVariation 0; onlyEndTime false<br><h2>Readings Dropped and should have previous messages</h2><ol><li>Dropped Reading #1 for meter pipe3</li></ol>']
 	},
 	pipe4: {
-		description: "",
+		description: "Cumulative, descending time readings",
 		chaiRequest: [CHAI_READINGS_REQUEST + ".field('timeSort','decreasing').field('cumulative','true').field('meterName','pipe4').field('createMeter','true').field('gzip', 'false')"],
 		fileName: ["pipe4Input.csv"],
 		responseCode: [400],
 		responseString: ['<h1>FAILURE</h1><h2>It looks like the insert of the readings had issues with some or all of the readings where the processing of the readings returned these warning(s)/error(s):</h2><br>For meter pipe4: Error parsing Reading #1. Reading value gives 24 with error message:<br>The first ever reading must be dropped when dealing with cumulative data.<br>For reading #1 on meter pipe4 in pipeline: previous reading has value 0 start time 1970-01-01T00:00:00Z end time 1970-01-01T00:00:00Z and current reading has value 24 start time 2021-06-01T00:00:00Z end time 2021-06-02T00:00:00Z with timeSort decreasing; duplications 1; cumulative true; cumulativeReset false; cumulativeResetStart 00:00:00; cumulativeResetEnd 23:59:59.999999; lengthGap 0; lengthVariation 0; onlyEndTime false<br><h2>Readings Dropped and should have previous messages</h2><ol><li>Dropped Reading #1 for meter pipe4</li></ol>']
 	},
 	pipe5: {
-		description: "",
-		chaiRequest: [CHAI_READINGS_REQUEST + ".field('createMeter', 'true').field('meterName', 'pipe5').field('gzip', 'false').field('cumulative', 'true').field('cumulativeReset','true').field('cumulativeResetStart','23:45').field('cumulativeResetEnd','00:15')"],
+		description: "Cumulative time readings with reset with default cumulative reset",
+		chaiRequest: [CHAI_READINGS_REQUEST + ".field('createMeter', 'true').field('meterName', 'pipe5').field('gzip', 'false').field('cumulative', 'true').field('cumulativeReset','true')"],
 		fileName: ["pipe5Input.csv"],
 		responseCode: [400],
-		responseString: ["<h1>FAILURE</h1><h2>It looks like the insert of the readings had issues with some or all of the readings where the processing of the readings returned these warning(s)/error(s):</h2><br>For meter pipe5: Error parsing Reading #1. Reading value gives 24 with error message:<br>The first ever reading must be dropped when dealing with cumulative data.<br>For reading #1 on meter pipe5 in pipeline: previous reading has value 0 start time 1970-01-01T00:00:00Z end time 1970-01-01T00:00:00Z and current reading has value 24 start time 2021-06-01T00:00:00Z end time 2021-06-02T00:00:00Z with timeSort increasing; duplications 1; cumulative true; cumulativeReset true; cumulativeResetStart 23:45; cumulativeResetEnd 00:15; lengthGap 0; lengthVariation 0; onlyEndTime false<br><h2>Readings Dropped and should have previous messages</h2><ol><li>Dropped Reading #1 for meter pipe5</li></ol>"]
+		responseString: ["<h1>FAILURE</h1><h2>It looks like the insert of the readings had issues with some or all of the readings where the processing of the readings returned these warning(s)/error(s):</h2><br>For meter pipe5: Error parsing Reading #1. Reading value gives 24 with error message:<br>The first ever reading must be dropped when dealing with cumulative data.<br>For reading #1 on meter pipe5 in pipeline: previous reading has value 0 start time 1970-01-01T00:00:00Z end time 1970-01-01T00:00:00Z and current reading has value 24 start time 2021-06-01T00:00:00Z end time 2021-06-02T00:00:00Z with timeSort increasing; duplications 1; cumulative true; cumulativeReset true; cumulativeResetStart 00:00:00; cumulativeResetEnd 23:59:59.999999; lengthGap 0; lengthVariation 0; onlyEndTime false<br><h2>Readings Dropped and should have previous messages</h2><ol><li>Dropped Reading #1 for meter pipe5</li></ol>"]
 	},
 	pipe6: {
-		description: "",
+		description: "Cumulative time readings with reset with cumulative reset around midnight",
 		chaiRequest: [CHAI_READINGS_REQUEST + ".field('cumulative','true').field('cumulativeReset','true').field('cumulativeResetStart','23:45').field('cumulativeResetEnd','00:15').field('meterName','pipe6').field('createMeter','true').field('gzip','false')"],
 		fileName: ["pipe6Input.csv"],
 		responseCode: [400],
 		responseString: ['<h1>FAILURE</h1><h2>It looks like the insert of the readings had issues with some or all of the readings where the processing of the readings returned these warning(s)/error(s):</h2><br>For meter pipe6: Error parsing Reading #1. Reading value gives 24 with error message:<br>The first ever reading must be dropped when dealing with cumulative data.<br>For reading #1 on meter pipe6 in pipeline: previous reading has value 0 start time 1970-01-01T00:00:00Z end time 1970-01-01T00:00:00Z and current reading has value 24 start time 2021-06-01T00:00:00Z end time 2021-06-02T00:00:00Z with timeSort increasing; duplications 1; cumulative true; cumulativeReset true; cumulativeResetStart 23:45; cumulativeResetEnd 00:15; lengthGap 0; lengthVariation 0; onlyEndTime false<br><h2>Readings Dropped and should have previous messages</h2><ol><li>Dropped Reading #1 for meter pipe6</li></ol>']
 	},
 	pipe7: {
-		description: "",
+		description: "Cumulative time readings with reset with cumulative reset around noon which is incorrect",
 		chaiRequest: [CHAI_READINGS_REQUEST + ".field('createMeter', 'true').field('meterName', 'pipe7').field('gzip', 'false').field('cumulative', 'true').field('cumulativeReset','true').field('cumulativeResetStart','11:45').field('cumulativeResetEnd','12:15')"],
 		fileName: ["pipe7Input.csv"],
 		responseCode: [400],
 		responseString: ["<h1>FAILURE</h1><h2>It looks like the insert of the readings had issues with some or all of the readings where the processing of the readings returned these warning(s)/error(s):</h2><br>For meter pipe7: Error parsing Reading #1. Reading value gives 24 with error message:<br>The first ever reading must be dropped when dealing with cumulative data.<br>For reading #1 on meter pipe7 in pipeline: previous reading has value 0 start time 1970-01-01T00:00:00Z end time 1970-01-01T00:00:00Z and current reading has value 24 start time 2021-06-01T00:00:00Z end time 2021-06-02T00:00:00Z with timeSort increasing; duplications 1; cumulative true; cumulativeReset true; cumulativeResetStart 11:45; cumulativeResetEnd 12:15; lengthGap 0; lengthVariation 0; onlyEndTime false<br><br>For meter pipe7: Error parsing Reading #4. Reading value of 96 gives -48 with error message:<br>A negative meterReading has been detected but either cumulativeReset is not enabled, or the start time and end time of this reading is out of the reset range. Reject all readings.<br>For reading #4 on meter pipe7 in pipeline: previous reading has value 72 start time 2021-06-03T00:00:00Z end time 2021-06-04T00:00:00Z and current reading has value -48 start time 2021-06-04T00:00:00Z end time 2021-06-05T00:00:00Z with timeSort increasing; duplications 1; cumulative true; cumulativeReset true; cumulativeResetStart 11:45; cumulativeResetEnd 12:15; lengthGap 0; lengthVariation 0; onlyEndTime false<br>"],
 	},
 	pipe8: {
-		description: "",
+		description: "Cumulative time readings with reset with cumulative reset tight around midnight",
 		chaiRequest: [CHAI_READINGS_REQUEST + ".field('cumulative','true').field('cumulativeReset','true').field('cumulativeResetStart','00:00').field('cumulativeResetEnd','00:00.001').field('meterName','pipe8').field('createMeter','true').field('gzip','false')"],
 		fileName: ["pipe8Input.csv"],
 		responseCode: [400],
 		responseString: ["<h1>FAILURE</h1><h2>It looks like the insert of the readings had issues with some or all of the readings where the processing of the readings returned these warning(s)/error(s):</h2><br>For meter pipe8: Error parsing Reading #1. Reading value gives 24 with error message:<br>The first ever reading must be dropped when dealing with cumulative data.<br>For reading #1 on meter pipe8 in pipeline: previous reading has value 0 start time 1970-01-01T00:00:00Z end time 1970-01-01T00:00:00Z and current reading has value 24 start time 2021-06-01T00:00:00Z end time 2021-06-02T00:00:00Z with timeSort increasing; duplications 1; cumulative true; cumulativeReset true; cumulativeResetStart 00:00; cumulativeResetEnd 00:00.001; lengthGap 0; lengthVariation 0; onlyEndTime false<br><h2>Readings Dropped and should have previous messages</h2><ol><li>Dropped Reading #1 for meter pipe8</li></ol>"]
 	},
 	pipe9: {
-		description: "",
+		description: "Cumulative time readings with reset without cumulative reset which is incorrect",
 		chaiRequest: [CHAI_READINGS_REQUEST + ".field('cumulative','true').field('meterName','pipe9').field('createMeter','true').field('gzip', 'false')"],
 		fileName: ["pipe9Input.csv"],
 		responseCode: [400],
 		responseString: ["<h1>FAILURE</h1><h2>It looks like the insert of the readings had issues with some or all of the readings where the processing of the readings returned these warning(s)/error(s):</h2><br>For meter pipe9: Error parsing Reading #1. Reading value gives 24 with error message:<br>The first ever reading must be dropped when dealing with cumulative data.<br>For reading #1 on meter pipe9 in pipeline: previous reading has value 0 start time 1970-01-01T00:00:00Z end time 1970-01-01T00:00:00Z and current reading has value 24 start time 2021-06-01T00:00:00Z end time 2021-06-02T00:00:00Z with timeSort increasing; duplications 1; cumulative true; cumulativeReset false; cumulativeResetStart 00:00:00; cumulativeResetEnd 23:59:59.999999; lengthGap 0; lengthVariation 0; onlyEndTime false<br><br>For meter pipe9: Error parsing Reading #4. Reading value of 96 gives -48 with error message:<br>A negative meterReading has been detected but either cumulativeReset is not enabled, or the start time and end time of this reading is out of the reset range. Reject all readings.<br>For reading #4 on meter pipe9 in pipeline: previous reading has value 72 start time 2021-06-03T00:00:00Z end time 2021-06-04T00:00:00Z and current reading has value -48 start time 2021-06-04T00:00:00Z end time 2021-06-05T00:00:00Z with timeSort increasing; duplications 1; cumulative true; cumulativeReset false; cumulativeResetStart 00:00:00; cumulativeResetEnd 23:59:59.999999; lengthGap 0; lengthVariation 0; onlyEndTime false<br>"]
 	},
 	pipe10: {
-		description: "",
+		description: "Cumulative time readings changing at noon with default cumulative reset",
 		chaiRequest: [CHAI_READINGS_REQUEST + ".field('cumulative','true').field('cumulativeReset','true').field('meterName','pipe10').field('createMeter','true').field('gzip','false')"],
 		fileName: ["pipe10Input.csv"],
 		responseCode: [400],
 		responseString: ["<h1>FAILURE</h1><h2>It looks like the insert of the readings had issues with some or all of the readings where the processing of the readings returned these warning(s)/error(s):</h2><br>For meter pipe10: Error parsing Reading #1. Reading value gives 24 with error message:<br>The first ever reading must be dropped when dealing with cumulative data.<br>For reading #1 on meter pipe10 in pipeline: previous reading has value 0 start time 1970-01-01T00:00:00Z end time 1970-01-01T00:00:00Z and current reading has value 24 start time 2021-06-01T12:00:00Z end time 2021-06-02T12:00:00Z with timeSort increasing; duplications 1; cumulative true; cumulativeReset true; cumulativeResetStart 00:00:00; cumulativeResetEnd 23:59:59.999999; lengthGap 0; lengthVariation 0; onlyEndTime false<br><h2>Readings Dropped and should have previous messages</h2><ol><li>Dropped Reading #1 for meter pipe10</li></ol>"]
 	},
 	pipe11: {
-		description: "",
+		description: "Cumulative time readings changing at noon without cumulative reset which is incorrect",
 		chaiRequest: [CHAI_READINGS_REQUEST + ".field('cumulative','true').field('meterName','pipe11').field('createMeter','true').field('gzip','false')"],
 		fileName: ["pipe11Input.csv"],
 		responseCode: [400],
 		responseString: ["<h1>FAILURE</h1><h2>It looks like the insert of the readings had issues with some or all of the readings where the processing of the readings returned these warning(s)/error(s):</h2><br>For meter pipe11: Error parsing Reading #1. Reading value gives 24 with error message:<br>The first ever reading must be dropped when dealing with cumulative data.<br>For reading #1 on meter pipe11 in pipeline: previous reading has value 0 start time 1970-01-01T00:00:00Z end time 1970-01-01T00:00:00Z and current reading has value 24 start time 2021-06-01T12:00:00Z end time 2021-06-02T12:00:00Z with timeSort increasing; duplications 1; cumulative true; cumulativeReset false; cumulativeResetStart 00:00:00; cumulativeResetEnd 23:59:59.999999; lengthGap 0; lengthVariation 0; onlyEndTime false<br><br>For meter pipe11: Error parsing Reading #4. Reading value of 96 gives -48 with error message:<br>A negative meterReading has been detected but either cumulativeReset is not enabled, or the start time and end time of this reading is out of the reset range. Reject all readings.<br>For reading #4 on meter pipe11 in pipeline: previous reading has value 72 start time 2021-06-03T12:00:00Z end time 2021-06-04T12:00:00Z and current reading has value -48 start time 2021-06-04T12:00:00Z end time 2021-06-05T12:00:00Z with timeSort increasing; duplications 1; cumulative true; cumulativeReset false; cumulativeResetStart 00:00:00; cumulativeResetEnd 23:59:59.999999; lengthGap 0; lengthVariation 0; onlyEndTime false<br>"]
 	},
 	pipe12: {
-		description: "",
+		description: "Cumulative time readings changing at noon with cumulative reset at noon",
 		chaiRequest: [CHAI_READINGS_REQUEST + ".field('cumulative','true').field('cumulativeReset','true').field('cumulativeResetStart','11:45').field('cumulativeResetEnd','12:15').field('meterName','pipe12').field('createMeter','true').field('gzip','false')"],
 		fileName: ["pipe12Input.csv"],
 		responseCode: [400],
 		responseString: ["<h1>FAILURE</h1><h2>It looks like the insert of the readings had issues with some or all of the readings where the processing of the readings returned these warning(s)/error(s):</h2><br>For meter pipe12: Error parsing Reading #1. Reading value gives 24 with error message:<br>The first ever reading must be dropped when dealing with cumulative data.<br>For reading #1 on meter pipe12 in pipeline: previous reading has value 0 start time 1970-01-01T00:00:00Z end time 1970-01-01T00:00:00Z and current reading has value 24 start time 2021-06-01T12:00:00Z end time 2021-06-02T12:00:00Z with timeSort increasing; duplications 1; cumulative true; cumulativeReset true; cumulativeResetStart 11:45; cumulativeResetEnd 12:15; lengthGap 0; lengthVariation 0; onlyEndTime false<br><h2>Readings Dropped and should have previous messages</h2><ol><li>Dropped Reading #1 for meter pipe12</li></ol>"]
 	},
 	pipe13: {
-		description: "",
+		description: "Cumulative time readings changing at noon with cumulative reset at midnight which is incorrect",
 		chaiRequest: [CHAI_READINGS_REQUEST + ".field('cumulative','true').field('cumulativeReset','true').field('cumulativeResetStart','23:45').field('cumulativeResetEnd','00:15').field('meterName','pipe13').field('createMeter','true').field('gzip','false')"],
 		fileName: ["pipe13Input.csv"],
 		responseCode: [400],
 		responseString: ["<h1>FAILURE</h1><h2>It looks like the insert of the readings had issues with some or all of the readings where the processing of the readings returned these warning(s)/error(s):</h2><br>For meter pipe13: Error parsing Reading #1. Reading value gives 24 with error message:<br>The first ever reading must be dropped when dealing with cumulative data.<br>For reading #1 on meter pipe13 in pipeline: previous reading has value 0 start time 1970-01-01T00:00:00Z end time 1970-01-01T00:00:00Z and current reading has value 24 start time 2021-06-01T12:00:00Z end time 2021-06-02T12:00:00Z with timeSort increasing; duplications 1; cumulative true; cumulativeReset true; cumulativeResetStart 23:45; cumulativeResetEnd 00:15; lengthGap 0; lengthVariation 0; onlyEndTime false<br><br>For meter pipe13: Error parsing Reading #4. Reading value of 96 gives -48 with error message:<br>A negative meterReading has been detected but either cumulativeReset is not enabled, or the start time and end time of this reading is out of the reset range. Reject all readings.<br>For reading #4 on meter pipe13 in pipeline: previous reading has value 72 start time 2021-06-03T12:00:00Z end time 2021-06-04T12:00:00Z and current reading has value -48 start time 2021-06-04T12:00:00Z end time 2021-06-05T12:00:00Z with timeSort increasing; duplications 1; cumulative true; cumulativeReset true; cumulativeResetStart 23:45; cumulativeResetEnd 00:15; lengthGap 0; lengthVariation 0; onlyEndTime false<br>"]
 	},
 	pipe14: {
-		description: "",
+		description: "Ascending time readings with length variation and default time variation",
 		chaiRequest: [CHAI_READINGS_REQUEST + ".field('meterName','pipe14').field('createMeter','true').field('gzip','false')"],
 		fileName: ["pipe14Input.csv"],
 		responseCode: [200],
 		responseString: ["<h1>SUCCESS</h1><h2>It looks like the insert of the readings was a success.</h2><h3>However, note that the processing of the readings returned these warning(s):</h3><br>For meter pipe14: Warning parsing Reading #2. Reading value gives 48 with warning message:<br>The previous reading has a different time length than the current reading and exceeds the tolerance of 0 seconds. Note this is treated only as a warning since this may be expected for certain meters.<br>For reading #2 on meter pipe14 in pipeline: previous reading has value 24 start time 2021-06-01T00:00:00Z end time 2021-06-02T00:00:00Z and current reading has value 48 start time 2021-06-02T00:00:00Z end time 2021-06-03T00:01:00Z with timeSort increasing; duplications 1; cumulative false; cumulativeReset false; cumulativeResetStart 00:00:00; cumulativeResetEnd 23:59:59.999999; lengthGap 0; lengthVariation 0; onlyEndTime false<br><br>For meter pipe14: Warning parsing Reading #3. Reading value gives 72 with warning message:<br>The previous reading has a different time length than the current reading and exceeds the tolerance of 0 seconds. Note this is treated only as a warning since this may be expected for certain meters.<br>For reading #3 on meter pipe14 in pipeline: previous reading has value 48 start time 2021-06-02T00:00:00Z end time 2021-06-03T00:01:00Z and current reading has value 72 start time 2021-06-03T00:01:00Z end time 2021-06-04T00:00:00Z with timeSort increasing; duplications 1; cumulative false; cumulativeReset false; cumulativeResetStart 00:00:00; cumulativeResetEnd 23:59:59.999999; lengthGap 0; lengthVariation 0; onlyEndTime false<br><br>For meter pipe14: Warning parsing Reading #4. Reading value gives 96 with warning message:<br>The previous reading has a different time length than the current reading and exceeds the tolerance of 0 seconds. Note this is treated only as a warning since this may be expected for certain meters.<br>For reading #4 on meter pipe14 in pipeline: previous reading has value 72 start time 2021-06-03T00:01:00Z end time 2021-06-04T00:00:00Z and current reading has value 96 start time 2021-06-04T00:00:00Z end time 2021-06-04T23:58:00Z with timeSort increasing; duplications 1; cumulative false; cumulativeReset false; cumulativeResetStart 00:00:00; cumulativeResetEnd 23:59:59.999999; lengthGap 0; lengthVariation 0; onlyEndTime false<br><br>For meter pipe14: Warning parsing Reading #5. Reading value gives 120 with warning message:<br>The previous reading has a different time length than the current reading and exceeds the tolerance of 0 seconds. Note this is treated only as a warning since this may be expected for certain meters.<br>For reading #5 on meter pipe14 in pipeline: previous reading has value 96 start time 2021-06-04T00:00:00Z end time 2021-06-04T23:58:00Z and current reading has value 120 start time 2021-06-04T23:58:00Z end time 2021-06-06T00:00:00Z with timeSort increasing; duplications 1; cumulative false; cumulativeReset false; cumulativeResetStart 00:00:00; cumulativeResetEnd 23:59:59.999999; lengthGap 0; lengthVariation 0; onlyEndTime false<br>"]
 	},
 	pipe15: {
-		description: "",
+		description: "Ascending time readings with length variation where length variation set small so warns on 2 readings",
 		chaiRequest: [CHAI_READINGS_REQUEST + ".field('meterName','pipe15').field('lengthVariation','60').field('createMeter','true').field('gzip','false')"],
 		fileName: ["pipe15Input.csv"],
 		responseCode: [200],
 		responseString: ["<h1>SUCCESS</h1><h2>It looks like the insert of the readings was a success.</h2><h3>However, note that the processing of the readings returned these warning(s):</h3><br>For meter pipe15: Warning parsing Reading #3. Reading value gives 72 with warning message:<br>The previous reading has a different time length than the current reading and exceeds the tolerance of 60 seconds. Note this is treated only as a warning since this may be expected for certain meters.<br>For reading #3 on meter pipe15 in pipeline: previous reading has value 48 start time 2021-06-02T00:00:00Z end time 2021-06-03T00:01:00Z and current reading has value 72 start time 2021-06-03T00:01:00Z end time 2021-06-04T00:00:00Z with timeSort increasing; duplications 1; cumulative false; cumulativeReset false; cumulativeResetStart 00:00:00; cumulativeResetEnd 23:59:59.999999; lengthGap 0; lengthVariation 60; onlyEndTime false<br><br>For meter pipe15: Warning parsing Reading #5. Reading value gives 120 with warning message:<br>The previous reading has a different time length than the current reading and exceeds the tolerance of 60 seconds. Note this is treated only as a warning since this may be expected for certain meters.<br>For reading #5 on meter pipe15 in pipeline: previous reading has value 96 start time 2021-06-04T00:00:00Z end time 2021-06-04T23:58:00Z and current reading has value 120 start time 2021-06-04T23:58:00Z end time 2021-06-06T00:00:00Z with timeSort increasing; duplications 1; cumulative false; cumulativeReset false; cumulativeResetStart 00:00:00; cumulativeResetEnd 23:59:59.999999; lengthGap 0; lengthVariation 60; onlyEndTime false<br>"]
 	},
 	pipe16: {
-		description: "",
+		description: "Ascending time readings with length variation and length variation set so warns on 1 reading",
 		chaiRequest: [CHAI_READINGS_REQUEST + ".field('meterName','pipe16').field('lengthVariation','120').field('createMeter','true').field('gzip','false')"],
 		fileName: ["pipe16Input.csv"],
 		responseCode: [200],
 		responseString: ["<h1>SUCCESS</h1><h2>It looks like the insert of the readings was a success.</h2><h3>However, note that the processing of the readings returned these warning(s):</h3><br>For meter pipe16: Warning parsing Reading #5. Reading value gives 120 with warning message:<br>The previous reading has a different time length than the current reading and exceeds the tolerance of 120 seconds. Note this is treated only as a warning since this may be expected for certain meters.<br>For reading #5 on meter pipe16 in pipeline: previous reading has value 96 start time 2021-06-04T00:00:00Z end time 2021-06-04T23:58:00Z and current reading has value 120 start time 2021-06-04T23:58:00Z end time 2021-06-06T00:00:00Z with timeSort increasing; duplications 1; cumulative false; cumulativeReset false; cumulativeResetStart 00:00:00; cumulativeResetEnd 23:59:59.999999; lengthGap 0; lengthVariation 120; onlyEndTime false<br>"]
 	},
 	pipe17: {
-		description: "",
+		description: "Ascending time readings with length variation and gap where length variation set so all pass but gap not big enough so warns on 2 reading",
 		chaiRequest: [CHAI_READINGS_REQUEST + ".field('meterName','pipe17').field('lengthVariation','121').field('createMeter','true').field('gzip','false')"],
 		fileName: ["pipe17Input.csv"],
 		responseCode: [200],
 		responseString: ["<h1>SUCCESS</h1><h2>It looks like the insert of the readings was a success.</h2><h3>However, note that the processing of the readings returned these warning(s):</h3><br>For meter pipe17: Warning parsing Reading #2. Reading value gives 48 with warning message:<br>There is a gap in time between this reading and the previous reading that exceeds the allowed amount of 0 seconds.<br>For reading #2 on meter pipe17 in pipeline: previous reading has value 24 start time 2021-06-01T00:00:00Z end time 2021-06-02T00:00:00Z and current reading has value 48 start time 2021-06-02T00:01:00Z end time 2021-06-03T00:00:00Z with timeSort increasing; duplications 1; cumulative false; cumulativeReset false; cumulativeResetStart 00:00:00; cumulativeResetEnd 23:59:59.999999; lengthGap 0; lengthVariation 121; onlyEndTime false<br><br>For meter pipe17: Warning parsing Reading #4. Reading value gives 96 with warning message:<br>There is a gap in time between this reading and the previous reading that exceeds the allowed amount of 0 seconds.<br>For reading #4 on meter pipe17 in pipeline: previous reading has value 72 start time 2021-06-03T00:00:00Z end time 2021-06-04T00:00:00Z and current reading has value 96 start time 2021-06-04T00:02:00Z end time 2021-06-05T00:00:00Z with timeSort increasing; duplications 1; cumulative false; cumulativeReset false; cumulativeResetStart 00:00:00; cumulativeResetEnd 23:59:59.999999; lengthGap 0; lengthVariation 121; onlyEndTime false<br>"]
 	},
 	pipe18: {
-		description: "",
+		description: "Ascending time readings with gaps and small time gap so 1 passes and 1 warns",
 		chaiRequest: [CHAI_READINGS_REQUEST + ".field('meterName','pipe18').field('lengthGap','60').field('lengthVariation','121').field('createMeter','true').field('gzip','false')"],
 		fileName: ["pipe18Input.csv"],
 		responseCode: [200],
 		responseString: ["<h1>SUCCESS</h1><h2>It looks like the insert of the readings was a success.</h2><h3>However, note that the processing of the readings returned these warning(s):</h3><br>For meter pipe18: Warning parsing Reading #4. Reading value gives 96 with warning message:<br>There is a gap in time between this reading and the previous reading that exceeds the allowed amount of 60 seconds.<br>For reading #4 on meter pipe18 in pipeline: previous reading has value 72 start time 2021-06-03T00:00:00Z end time 2021-06-04T00:00:00Z and current reading has value 96 start time 2021-06-04T00:02:00Z end time 2021-06-05T00:00:00Z with timeSort increasing; duplications 1; cumulative false; cumulativeReset false; cumulativeResetStart 00:00:00; cumulativeResetEnd 23:59:59.999999; lengthGap 60; lengthVariation 121; onlyEndTime false<br>"]
 	},
 	pipe19: {
-		description: "",
+		description: "Ascending time readings with gap and just right size time gap",
 		chaiRequest: [CHAI_READINGS_REQUEST + ".field('meterName','pipe19').field('lengthGap','120').field('lengthVariation','121').field('createMeter','true').field('gzip','false')"],
 		fileName: ["pipe19Input.csv"],
 		responseCode: [200],
 		responseString: ["<h1>SUCCESS</h1><h2>It looks like the insert of the readings was a success.</h2>"]
 	},
 	pipe20: {
-		description: "",
+		description: "Cumulative time readings with header",
 		chaiRequest: [CHAI_READINGS_REQUEST + ".field('headerRow','true').field('cumulative','true').field('meterName','pipe20').field('createMeter','true').field('gzip','false')"],
 		fileName: ["pipe20Input.csv"],
 		responseCode: [400],
 		responseString: ["<h1>FAILURE</h1><h2>It looks like the insert of the readings had issues with some or all of the readings where the processing of the readings returned these warning(s)/error(s):</h2><br>For meter pipe20: Error parsing Reading #1. Reading value gives 24 with error message:<br>The first ever reading must be dropped when dealing with cumulative data.<br>For reading #1 on meter pipe20 in pipeline: previous reading has value 0 start time 1970-01-01T00:00:00Z end time 1970-01-01T00:00:00Z and current reading has value 24 start time 2021-06-01T00:00:00Z end time 2021-06-02T00:00:00Z with timeSort increasing; duplications 1; cumulative true; cumulativeReset false; cumulativeResetStart 00:00:00; cumulativeResetEnd 23:59:59.999999; lengthGap 0; lengthVariation 0; onlyEndTime false<br><h2>Readings Dropped and should have previous messages</h2><ol><li>Dropped Reading #1 for meter pipe20</li></ol>"]
 	},
 	pipe21: {
-		description: "",
+		description: "Cumulative time readings with duplication",
 		chaiRequest: [CHAI_READINGS_REQUEST + ".field('duplications','3').field('cumulative','true').field('meterName','pipe21').field('createMeter','true').field('gzip','false')"],
 		fileName: ["pipe21Input.csv"],
 		responseCode: [400],
 		responseString: ["<h1>FAILURE</h1><h2>It looks like the insert of the readings had issues with some or all of the readings where the processing of the readings returned these warning(s)/error(s):</h2><br>For meter pipe21: Error parsing Reading #1. Reading value gives 24 with error message:<br>The first ever reading must be dropped when dealing with cumulative data.<br>For reading #1 on meter pipe21 in pipeline: previous reading has value 0 start time 1970-01-01T00:00:00Z end time 1970-01-01T00:00:00Z and current reading has value 24 start time 2021-06-01T00:00:00Z end time 2021-06-02T00:00:00Z with timeSort increasing; duplications 3; cumulative true; cumulativeReset false; cumulativeResetStart 00:00:00; cumulativeResetEnd 23:59:59.999999; lengthGap 0; lengthVariation 0; onlyEndTime false<br><h2>Readings Dropped and should have previous messages</h2><ol><li>Dropped Reading #1 for meter pipe21</li></ol>"]
 	},
 	pipe22: {
-		description: "",
+		description: "Cumulative time readings with default cumulative reset with negative reading which in incorrect",
 		chaiRequest: [CHAI_READINGS_REQUEST + ".field('cumulative','true').field('cumulativeReset','true').field('meterName','pipe22').field('createMeter','true').field('gzip','false')"],
 		fileName: ["pipe22Input.csv"],
 		responseCode: [400],
 		responseString: ["<h1>FAILURE</h1><h2>It looks like the insert of the readings had issues with some or all of the readings where the processing of the readings returned these warning(s)/error(s):</h2><br>For meter pipe22: Error parsing Reading #1. Reading value gives 24 with error message:<br>The first ever reading must be dropped when dealing with cumulative data.<br>For reading #1 on meter pipe22 in pipeline: previous reading has value 0 start time 1970-01-01T00:00:00Z end time 1970-01-01T00:00:00Z and current reading has value 24 start time 2021-06-01T00:00:00Z end time 2021-06-02T00:00:00Z with timeSort increasing; duplications 1; cumulative true; cumulativeReset true; cumulativeResetStart 00:00:00; cumulativeResetEnd 23:59:59.999999; lengthGap 0; lengthVariation 0; onlyEndTime false<br>For meter pipe22: <br>Error parsing Reading #4. Detected a negative value while handling cumulative readings so all reading are rejected.<br>For reading #4 on meter pipe22 in pipeline: previous reading has value 72 start time 2021-06-03T00:00:00Z end time 2021-06-04T00:00:00Z and current reading has value -145 start time 2021-06-04T00:00:00Z end time 2021-06-05T00:00:00Z with timeSort increasing; duplications 1; cumulative true; cumulativeReset true; cumulativeResetStart 00:00:00; cumulativeResetEnd 23:59:59.999999; lengthGap 0; lengthVariation 0; onlyEndTime false<br>"]
 	},
 	pipe23: {
-		description: "",
+		description: "Ascending time readings that are end only",
 		chaiRequest: [CHAI_READINGS_REQUEST + ".field('endOnly','true').field('meterName','pipe23').field('createMeter','true').field('gzip','false')"],
 		fileName: ["pipe23Input.csv"],
 		responseCode: [400],
 		responseString: ["<h1>FAILURE</h1><h2>It looks like the insert of the readings had issues with some or all of the readings where the processing of the readings returned these warning(s)/error(s):</h2><br>For meter pipe23: Error parsing Reading #1. Reading value gives 24 with error message:<br>The first ever reading must be dropped when dealing only with endTimestamps.<br>For reading #1 on meter pipe23 in pipeline: previous reading has value 0 start time 1970-01-01T00:00:00Z end time 1970-01-01T00:00:00Z and current reading has value 24 start time 1970-01-01T00:00:00Z end time 2021-06-02T00:00:00Z with timeSort increasing; duplications 1; cumulative false; cumulativeReset false; cumulativeResetStart 00:00:00; cumulativeResetEnd 23:59:59.999999; lengthGap 0; lengthVariation 0; onlyEndTime true<br><h2>Readings Dropped and should have previous messages</h2><ol><li>Dropped Reading #1 for meter pipe23</li></ol>"]
 	},
 	pipe24: {
-		description: "",
+		description: "Descending time readings that are end only",
 		chaiRequest: [CHAI_READINGS_REQUEST + ".field('timeSort','decreasing').field('endOnly','true').field('meterName','pipe24').field('createMeter','true').field('gzip','false')"],
 		fileName: ["pipe24Input.csv"],
 		responseCode: [400],
 		responseString: ["<h1>FAILURE</h1><h2>It looks like the insert of the readings had issues with some or all of the readings where the processing of the readings returned these warning(s)/error(s):</h2><br>For meter pipe24: Error parsing Reading #1. Reading value gives 24 with error message:<br>The first ever reading must be dropped when dealing only with endTimestamps.<br>For reading #1 on meter pipe24 in pipeline: previous reading has value 0 start time 1970-01-01T00:00:00Z end time 1970-01-01T00:00:00Z and current reading has value 24 start time 1970-01-01T00:00:00Z end time 2021-06-02T00:00:00Z with timeSort decreasing; duplications 1; cumulative false; cumulativeReset false; cumulativeResetStart 00:00:00; cumulativeResetEnd 23:59:59.999999; lengthGap 0; lengthVariation 0; onlyEndTime true<br><h2>Readings Dropped and should have previous messages</h2><ol><li>Dropped Reading #1 for meter pipe24</li></ol>"]
 	},
 	pipe25: {
-		description: "",
+		description: "Descending, cumulative time readings that are end only",
 		chaiRequest: [CHAI_READINGS_REQUEST + ".field('cumulative','true').field('timeSort','decreasing').field('endOnly','true').field('meterName','pipe25').field('createMeter','true').field('gzip','false')"],
 		fileName: ["pipe25Input.csv"],
 		responseCode: [400],
 		responseString: ["<h1>FAILURE</h1><h2>It looks like the insert of the readings had issues with some or all of the readings where the processing of the readings returned these warning(s)/error(s):</h2><br>For meter pipe25: Error parsing Reading #1. Reading value gives 24 with error message:<br>The first ever reading must be dropped when dealing with cumulative data.<br>The first ever reading must be dropped when dealing only with endTimestamps.<br>For reading #1 on meter pipe25 in pipeline: previous reading has value 0 start time 1970-01-01T00:00:00Z end time 1970-01-01T00:00:00Z and current reading has value 24 start time 1970-01-01T00:00:00Z end time 2021-06-02T00:00:00Z with timeSort decreasing; duplications 1; cumulative true; cumulativeReset false; cumulativeResetStart 00:00:00; cumulativeResetEnd 23:59:59.999999; lengthGap 0; lengthVariation 0; onlyEndTime true<br><h2>Readings Dropped and should have previous messages</h2><ol><li>Dropped Reading #1 for meter pipe25</li></ol>"]
 	},
 	pipe26: {
-		description: "",
+		description: "Ascending time readings with bad start date/time which is incorrect",
 		chaiRequest: [CHAI_READINGS_REQUEST + ".field('meterName','pipe26').field('createMeter','true').field('gzip','false')"],
 		fileName: ["pipe26Input.csv"],
 		responseCode: [400],
 		responseString: ["<h1>FAILURE</h1><h2>It looks like the insert of the readings had issues with some or all of the readings where the processing of the readings returned these warning(s)/error(s):</h2>For meter pipe26: Error parsing Reading #2 The start (2021-06-02 00:00:00 x) and/or end time (2021-06-03 00:00:00) provided did not parse into a valid date/time so all reading are rejected.<br>For reading #2 on meter pipe26 in pipeline: previous reading has value 24 start time 2021-06-01T00:00:00Z end time 2021-06-02T00:00:00Z and current reading has value unknown start time Invalid date end time 2021-06-03T00:00:00Z with timeSort increasing; duplications 1; cumulative false; cumulativeReset false; cumulativeResetStart 00:00:00; cumulativeResetEnd 23:59:59.999999; lengthGap 0; lengthVariation 0; onlyEndTime false<br>"]
 	},
 	pipe27: {
-		description: "",
+		description: "Ascending time readings with bad end date/time which is incorrect",
 		chaiRequest: [CHAI_READINGS_REQUEST + ".field('meterName','pipe27').field('createMeter','true').field('gzip','false')"],
 		fileName: ["pipe27Input.csv"],
 		responseCode: [400],
@@ -232,7 +232,7 @@ const testCases = {
 	// 	responseString: ["<h1>SUCCESS</h1><h2>It looks like the insert of the readings was a success.</h2>"]
 	// },
 	pipe29: {
-		description: "",
+		description: "Cumulative time readings with bad reading value which in incorrect",
 		chaiRequest: [CHAI_READINGS_REQUEST + ".field('cumulative','true').field('meterName','pipe29').field('createMeter','true').field('gzip','false')"],
 		fileName: ["pipe29Input.csv"],
 		responseCode: [400],
@@ -240,42 +240,42 @@ const testCases = {
 	},
 	pipe30: {
 
-		description: "",
+		description: "Ascending time readings with bad reading value which in incorrect",
 		chaiRequest: [CHAI_READINGS_REQUEST + ".field('meterName','pipe30').field('createMeter','true').field('gzip','false')"],
 		fileName: ["pipe30Input.csv"],
 		responseCode: [400],
 		responseString: ["<h1>FAILURE</h1><h2>It looks like the insert of the readings had issues with some or all of the readings where the processing of the readings returned these warning(s)/error(s):</h2>For meter pipe30: Error parsing Reading #4 The reading value provided of 9a is not considered a number so all reading are rejected.<br>"]
 	},
 	pipe31: {
-		description: "",
+		description: "Cumulative time readings with gaps with length variation but still needs to drop 2 readings with gap",
 		chaiRequest: [CHAI_READINGS_REQUEST + ".field('meterName','pipe31').field('cumulative','true').field('lengthVariation','121').field('createMeter','true').field('gzip','false')"],
 		fileName: ["pipe31Input.csv"],
 		responseCode: [400],
 		responseString: ["<h1>FAILURE</h1><h2>It looks like the insert of the readings had issues with some or all of the readings where the processing of the readings returned these warning(s)/error(s):</h2><br>For meter pipe31: Error parsing Reading #1. Reading value gives 24 with error message:<br>The first ever reading must be dropped when dealing with cumulative data.<br>For reading #1 on meter pipe31 in pipeline: previous reading has value 0 start time 1970-01-01T00:00:00Z end time 1970-01-01T00:00:00Z and current reading has value 24 start time 2021-06-01T00:00:00Z end time 2021-06-02T00:00:00Z with timeSort increasing; duplications 1; cumulative true; cumulativeReset false; cumulativeResetStart 00:00:00; cumulativeResetEnd 23:59:59.999999; lengthGap 0; lengthVariation 121; onlyEndTime false<br><br>For meter pipe31: Error parsing Reading #2. Reading value gives 48 with error message:<br>The end of the previous reading is too far from the start of the next readings in cumulative data so drop this reading.<br>For reading #2 on meter pipe31 in pipeline: previous reading has value 24 start time 2021-06-01T00:00:00Z end time 2021-06-02T00:00:00Z and current reading has value 48 start time 2021-06-02T00:01:00Z end time 2021-06-03T00:00:00Z with timeSort increasing; duplications 1; cumulative true; cumulativeReset false; cumulativeResetStart 00:00:00; cumulativeResetEnd 23:59:59.999999; lengthGap 0; lengthVariation 121; onlyEndTime false<br><br>For meter pipe31: Error parsing Reading #4. Reading value gives 96 with error message:<br>The end of the previous reading is too far from the start of the next readings in cumulative data so drop this reading.<br>For reading #4 on meter pipe31 in pipeline: previous reading has value 72 start time 2021-06-03T00:00:00Z end time 2021-06-04T00:00:00Z and current reading has value 96 start time 2021-06-04T00:02:00Z end time 2021-06-05T00:00:00Z with timeSort increasing; duplications 1; cumulative true; cumulativeReset false; cumulativeResetStart 00:00:00; cumulativeResetEnd 23:59:59.999999; lengthGap 0; lengthVariation 121; onlyEndTime false<br><h2>Readings Dropped and should have previous messages</h2><ol><li>Dropped Reading #1 for meter pipe31</li><li>Dropped Reading #2 for meter pipe31</li><li>Dropped Reading #4 for meter pipe31</li></ol>"]
 	},
 	pipe32: {
-		description: "",
+		description: "Cumulative time readings with one reading start before end of previous so dropped",
 		chaiRequest: [CHAI_READINGS_REQUEST + ".field('meterName','pipe32').field('cumulative','true').field('createMeter','true').field('gzip','false')"],
 		fileName: ["pipe32Input.csv"],
 		responseCode: [400],
 		responseString: ["<h1>FAILURE</h1><h2>It looks like the insert of the readings had issues with some or all of the readings where the processing of the readings returned these warning(s)/error(s):</h2><br>For meter pipe32: Error parsing Reading #1. Reading value gives 24 with error message:<br>The first ever reading must be dropped when dealing with cumulative data.<br>For reading #1 on meter pipe32 in pipeline: previous reading has value 0 start time 1970-01-01T00:00:00Z end time 1970-01-01T00:00:00Z and current reading has value 24 start time 2021-06-01T00:00:00Z end time 2021-06-02T00:00:00Z with timeSort increasing; duplications 1; cumulative true; cumulativeReset false; cumulativeResetStart 00:00:00; cumulativeResetEnd 23:59:59.999999; lengthGap 0; lengthVariation 0; onlyEndTime false<br><br>For meter pipe32: Error parsing Reading #2. Reading value gives 48 with error message:<br>The reading start time is before the previous end time and the data is cumulative so OED cannot use this reading.<br>For reading #2 on meter pipe32 in pipeline: previous reading has value 24 start time 2021-06-01T00:00:00Z end time 2021-06-02T00:00:00Z and current reading has value 48 start time 2021-06-01T23:59:59Z end time 2021-06-03T00:00:00Z with timeSort increasing; duplications 1; cumulative true; cumulativeReset false; cumulativeResetStart 00:00:00; cumulativeResetEnd 23:59:59.999999; lengthGap 0; lengthVariation 0; onlyEndTime false<br><br>For meter pipe32: Warning parsing Reading #3. Reading value gives 72 with warning message:<br>The previous reading has a different time length than the current reading and exceeds the tolerance of 0 seconds. Note this is treated only as a warning since this may be expected for certain meters.<br>For reading #3 on meter pipe32 in pipeline: previous reading has value 48 start time 2021-06-01T23:59:59Z end time 2021-06-03T00:00:00Z and current reading has value 72 start time 2021-06-03T00:00:00Z end time 2021-06-04T00:00:00Z with timeSort increasing; duplications 1; cumulative true; cumulativeReset false; cumulativeResetStart 00:00:00; cumulativeResetEnd 23:59:59.999999; lengthGap 0; lengthVariation 0; onlyEndTime false<br><h2>Readings Dropped and should have previous messages</h2><ol><li>Dropped Reading #1 for meter pipe32</li><li>Dropped Reading #2 for meter pipe32</li></ol>"]
 	},
 	pipe33: {
-		description: "",
+		description: "Cumulative time readings with negative reading which is incorrect",
 		chaiRequest: [CHAI_READINGS_REQUEST + ".field('meterName','pipe33').field('cumulative','true').field('createMeter','true').field('gzip','false')"],
 		fileName: ["pipe33Input.csv"],
 		responseCode: [400],
 		responseString: ["<h1>FAILURE</h1><h2>It looks like the insert of the readings had issues with some or all of the readings where the processing of the readings returned these warning(s)/error(s):</h2><br>For meter pipe33: Error parsing Reading #1. Reading value gives 24 with error message:<br>The first ever reading must be dropped when dealing with cumulative data.<br>For reading #1 on meter pipe33 in pipeline: previous reading has value 0 start time 1970-01-01T00:00:00Z end time 1970-01-01T00:00:00Z and current reading has value 24 start time 2021-06-01T00:00:00Z end time 2021-06-02T00:00:00Z with timeSort increasing; duplications 1; cumulative true; cumulativeReset false; cumulativeResetStart 00:00:00; cumulativeResetEnd 23:59:59.999999; lengthGap 0; lengthVariation 0; onlyEndTime false<br>For meter pipe33: <br>Error parsing Reading #3. Detected a negative value while handling cumulative readings so all reading are rejected.<br>For reading #3 on meter pipe33 in pipeline: previous reading has value 48 start time 2021-06-02T00:00:00Z end time 2021-06-03T00:00:00Z and current reading has value -73 start time 2021-06-03T00:00:00Z end time 2021-06-04T00:00:00Z with timeSort increasing; duplications 1; cumulative true; cumulativeReset false; cumulativeResetStart 00:00:00; cumulativeResetEnd 23:59:59.999999; lengthGap 0; lengthVariation 0; onlyEndTime false<br>"]
 	},
 	pipe34: {
-		description: "",
+		description: "Ascending time readings with one reading start/end the same so dropped",
 		chaiRequest: [CHAI_READINGS_REQUEST + ".field('meterName','pipe34').field('createMeter','true').field('gzip','false')"],
 		fileName: ["pipe34Input.csv"],
 		responseCode: [400],
 		responseString: ["<h1>FAILURE</h1><h2>It looks like the insert of the readings had issues with some or all of the readings where the processing of the readings returned these warning(s)/error(s):</h2><br>For meter pipe34: Error parsing Reading #2. Reading value gives 48 with error message:<br>The reading end time is not after the start time so we must drop the reading.<br>For reading #2 on meter pipe34 in pipeline: previous reading has value 24 start time 2021-06-01T00:00:00Z end time 2021-06-02T00:00:00Z and current reading has value 48 start time 2021-06-02T00:00:00Z end time 2021-06-02T00:00:00Z with timeSort increasing; duplications 1; cumulative false; cumulativeReset false; cumulativeResetStart 00:00:00; cumulativeResetEnd 23:59:59.999999; lengthGap 0; lengthVariation 0; onlyEndTime false<br><br>For meter pipe34: Warning parsing Reading #3. Reading value gives 72 with warning message:<br>There is a gap in time between this reading and the previous reading that exceeds the allowed amount of 0 seconds.<br>The previous reading has a different time length than the current reading and exceeds the tolerance of 0 seconds. Note this is treated only as a warning since this may be expected for certain meters.<br>For reading #3 on meter pipe34 in pipeline: previous reading has value 48 start time 2021-06-02T00:00:00Z end time 2021-06-02T00:00:00Z and current reading has value 72 start time 2021-06-03T00:00:00Z end time 2021-06-04T00:00:00Z with timeSort increasing; duplications 1; cumulative false; cumulativeReset false; cumulativeResetStart 00:00:00; cumulativeResetEnd 23:59:59.999999; lengthGap 0; lengthVariation 0; onlyEndTime false<br><h2>Readings Dropped and should have previous messages</h2><ol><li>Dropped Reading #2 for meter pipe34</li></ol>"]
 	},
 	pipe35: {
-		description: "",
+		description: "Ascending time readings that are end only with two readings time the same so dropped",
 		chaiRequest: [CHAI_READINGS_REQUEST + ".field('refreshReadings','true').field('meterName','pipe35').field('endOnly','true').field('createMeter','true').field('gzip','false')"],
 		fileName: ["pipe35Input.csv"],
 		responseCode: [400],
@@ -290,91 +290,91 @@ const testCases = {
 		responseString: ["<h1>FAILURE</h1><h2>It looks like the insert of the readings had issues with some or all of the readings where the processing of the readings returned these warning(s)/error(s):</h2><br>For meter pipe40: Error parsing Reading #1. Reading value gives 24 with error message:<br>The first ever reading must be dropped when dealing with cumulative data.<br>For reading #1 on meter pipe40 in pipeline: previous reading has value 0 start time 1970-01-01T00:00:00Z end time 1970-01-01T00:00:00Z and current reading has value 24 start time 2021-06-01T00:00:00Z end time 2021-06-02T00:00:00Z with timeSort increasing; duplications 1; cumulative true; cumulativeReset false; cumulativeResetStart 00:00:00; cumulativeResetEnd 23:59:59.999999; lengthGap 0; lengthVariation 0; onlyEndTime false<br><h2>Readings Dropped and should have previous messages</h2><ol><li>Dropped Reading #1 for meter pipe40</li></ol>"]
 	},
 	pipe50: {
-		description: "Two readings uploads where update readings",
+		description: "Ascending time readings with two readings uploads where update readings",
 		chaiRequest: [CHAI_READINGS_REQUEST + ".field('gzip', 'false').field('createMeter','true').field('meterName', 'pipe50')", CHAI_READINGS_REQUEST + ".field('gzip', 'false').field('update','true').field('meterName', 'pipe50')"],
 		fileName: ["pipe50AInput.csv", "pipe50BInput.csv"],
 		responseCode: [200, 200],
 		responseString: ["<h1>SUCCESS</h1><h2>It looks like the insert of the readings was a success.</h2>", "<h1>SUCCESS</h1><h2>It looks like the insert of the readings was a success.</h2><h3>However, note that the processing of the readings returned these warning(s):</h3><br>For meter pipe50: Warning parsing Reading #1. Reading value gives 0 with warning message:<br>The current reading startTime is not after the previous reading's end time. Note this is treated only as a warning since readings may be sent out of order.<br>There is a gap in time between this reading and the previous reading that exceeds the allowed amount of 0 seconds.<br>For reading #1 on meter pipe50 in pipeline: previous reading has value 120 start time 2021-06-05T00:00:00Z end time 2021-06-06T00:00:00Z and current reading has value 0 start time 2021-05-31T00:00:00Z end time 2021-06-01T00:00:00Z with timeSort increasing; duplications 1; cumulative false; cumulativeReset false; cumulativeResetStart 00:00:00; cumulativeResetEnd 23:59:59.999999; lengthGap 0; lengthVariation 0; onlyEndTime false<br>"]
 	},
 	pipe51: {
-		description: "",
+		description: "Ascending time readings with two readings uploads without update so no changes",
 		chaiRequest: [CHAI_READINGS_REQUEST + ".field('meterName','pipe51').field('createMeter','true').field('gzip','false')", CHAI_READINGS_REQUEST + ".field('meterName','pipe51').field('gzip','false')"],
 		fileName: ["pipe51AInput.csv", "pipe51BInput.csv"],
 		responseCode: [200, 200],
 		responseString: ["<h1>SUCCESS</h1><h2>It looks like the insert of the readings was a success.</h2>", "<h1>SUCCESS</h1><h2>It looks like the insert of the readings was a success.</h2><h3>However, note that the processing of the readings returned these warning(s):</h3><br>For meter pipe51: Warning parsing Reading #1. Reading value gives 0 with warning message:<br>The current reading startTime is not after the previous reading's end time. Note this is treated only as a warning since readings may be sent out of order.<br>There is a gap in time between this reading and the previous reading that exceeds the allowed amount of 0 seconds.<br>For reading #1 on meter pipe51 in pipeline: previous reading has value 120 start time 2021-06-05T00:00:00Z end time 2021-06-06T00:00:00Z and current reading has value 0 start time 2021-05-31T00:00:00Z end time 2021-06-01T00:00:00Z with timeSort increasing; duplications 1; cumulative false; cumulativeReset false; cumulativeResetStart 00:00:00; cumulativeResetEnd 23:59:59.999999; lengthGap 0; lengthVariation 0; onlyEndTime false<br>"]
 	},
 	pipe52: {
-		description: "",
+		description: "Cumulative time readings with default reset with two uploads to add more readings with a reset",
 		chaiRequest: [CHAI_READINGS_REQUEST + ".field('cumulative','true').field('meterName','pipe52').field('createMeter','true').field('gzip','false')", CHAI_READINGS_REQUEST + ".field('cumulative','true').field('cumulativeReset','true').field('meterName','pipe52').field('gzip','false')"],
 		fileName: ["pipe52AInput.csv", "pipe52BInput.csv"],
 		responseCode: [400, 200],
 		responseString: ["<h1>FAILURE</h1><h2>It looks like the insert of the readings had issues with some or all of the readings where the processing of the readings returned these warning(s)/error(s):</h2><br>For meter pipe52: Error parsing Reading #1. Reading value gives 24 with error message:<br>The first ever reading must be dropped when dealing with cumulative data.<br>For reading #1 on meter pipe52 in pipeline: previous reading has value 0 start time 1970-01-01T00:00:00Z end time 1970-01-01T00:00:00Z and current reading has value 24 start time 2021-06-01T00:00:00Z end time 2021-06-02T00:00:00Z with timeSort increasing; duplications 1; cumulative true; cumulativeReset false; cumulativeResetStart 00:00:00; cumulativeResetEnd 23:59:59.999999; lengthGap 0; lengthVariation 0; onlyEndTime false<br><h2>Readings Dropped and should have previous messages</h2><ol><li>Dropped Reading #1 for meter pipe52</li></ol>", "<h1>SUCCESS</h1><h2>It looks like the insert of the readings was a success.</h2>"]
 	},
 	pipe60: {
-		description: "Three readings uploads with cumulative data",
+		description: "Cumulative time readings with three readings uploads",
 		chaiRequest: [CHAI_READINGS_REQUEST + ".field('gzip', 'false').field('createMeter','true').field('meterName', 'pipe60').field('cumulative', 'true')", CHAI_READINGS_REQUEST + ".field('gzip', 'false').field('meterName', 'pipe60').field('cumulative', 'true')", CHAI_READINGS_REQUEST + ".field('gzip', 'false').field('meterName', 'pipe60').field('cumulative', 'true')"],
 		fileName: ["pipe60AInput.csv", "pipe60BInput.csv", "pipe60CInput.csv"],
 		responseCode: [400, 200, 200],
 		responseString: ["<h1>FAILURE</h1><h2>It looks like the insert of the readings had issues with some or all of the readings where the processing of the readings returned these warning(s)/error(s):</h2><br>For meter pipe60: Error parsing Reading #1. Reading value gives 24 with error message:<br>The first ever reading must be dropped when dealing with cumulative data.<br>For reading #1 on meter pipe60 in pipeline: previous reading has value 0 start time 1970-01-01T00:00:00Z end time 1970-01-01T00:00:00Z and current reading has value 24 start time 2021-06-01T00:00:00Z end time 2021-06-02T00:00:00Z with timeSort increasing; duplications 1; cumulative true; cumulativeReset false; cumulativeResetStart 00:00:00; cumulativeResetEnd 23:59:59.999999; lengthGap 0; lengthVariation 0; onlyEndTime false<br><h2>Readings Dropped and should have previous messages</h2><ol><li>Dropped Reading #1 for meter pipe60</li></ol>", "<h1>SUCCESS</h1><h2>It looks like the insert of the readings was a success.</h2>", "<h1>SUCCESS</h1><h2>It looks like the insert of the readings was a success.</h2>"]
 	},
 	pipe70: {
-		description: "",
+		description: "Create meter cumulative reset around noon with reading upload with reset at midnight which is incorrect",
 		chaiRequest: [CHAI_METERS_REQUEST + ".field('headerRow','true').field('gzip','false')", CHAI_READINGS_REQUEST + ".field('meterName','pipe70').field('gzip','false')"],
 		fileName: ["pipe70AInputMeter.csv", "pipe70BInput.csv"],
 		responseCode: [200, 400],
 		responseString: ["<h1>SUCCESS</h1>Successfully inserted the meters.", "<h1>FAILURE</h1><h2>It looks like the insert of the readings had issues with some or all of the readings where the processing of the readings returned these warning(s)/error(s):</h2><br>For meter pipe70: Error parsing Reading #1. Reading value gives 24 with error message:<br>The first ever reading must be dropped when dealing with cumulative data.<br>For reading #1 on meter pipe70 in pipeline: previous reading has value 0 start time 1970-01-01T00:00:00Z end time 1970-01-01T00:00:00Z and current reading has value 24 start time 2021-06-01T00:00:00Z end time 2021-06-02T00:00:00Z with timeSort increasing; duplications 1; cumulative true; cumulativeReset true; cumulativeResetStart 11:45:00; cumulativeResetEnd 12:15:00; lengthGap 0; lengthVariation 0; onlyEndTime false<br><br>For meter pipe70: Error parsing Reading #4. Reading value of 96 gives -48 with error message:<br>A negative meterReading has been detected but either cumulativeReset is not enabled, or the start time and end time of this reading is out of the reset range. Reject all readings.<br>For reading #4 on meter pipe70 in pipeline: previous reading has value 72 start time 2021-06-03T00:00:00Z end time 2021-06-04T00:00:00Z and current reading has value -48 start time 2021-06-04T00:00:00Z end time 2021-06-05T00:00:00Z with timeSort increasing; duplications 1; cumulative true; cumulativeReset true; cumulativeResetStart 11:45:00; cumulativeResetEnd 12:15:00; lengthGap 0; lengthVariation 0; onlyEndTime false<br>"]
 	},
 	pipe71: {
-		description: "",
+		description: "Create meter cumulative reset around midnight with reading upload with reset at midnight",
 		chaiRequest: [CHAI_METERS_REQUEST + ".field('headerRow','true').field('gzip','false')", CHAI_READINGS_REQUEST + ".field('cumulative','true').field('cumulativeReset','true').field('cumulativeResetStart','23:45').field('cumulativeResetEnd','00:15').field('meterName','pipe71').field('gzip','false')"],
 		fileName: ["pipe71AInputMeter.csv", "pipe71BInput.csv"],
 		responseCode: [200, 400],
 		responseString: ["<h1>SUCCESS</h1>Successfully inserted the meters.", "<h1>FAILURE</h1><h2>It looks like the insert of the readings had issues with some or all of the readings where the processing of the readings returned these warning(s)/error(s):</h2><br>For meter pipe71: Error parsing Reading #1. Reading value gives 24 with error message:<br>The first ever reading must be dropped when dealing with cumulative data.<br>For reading #1 on meter pipe71 in pipeline: previous reading has value 0 start time 1970-01-01T00:00:00Z end time 1970-01-01T00:00:00Z and current reading has value 24 start time 2021-06-01T00:00:00Z end time 2021-06-02T00:00:00Z with timeSort increasing; duplications 1; cumulative true; cumulativeReset true; cumulativeResetStart 23:45; cumulativeResetEnd 00:15; lengthGap 0; lengthVariation 0; onlyEndTime false<br><h2>Readings Dropped and should have previous messages</h2><ol><li>Dropped Reading #1 for meter pipe71</li></ol>"]
 	},
 	pipe72: {
-		description: "",
+		description: "Create meter with modest length variation and gap with reading upload where warn on larger gaps",
 		chaiRequest: [CHAI_METERS_REQUEST + ".field('headerRow','true').field('gzip','false')", CHAI_READINGS_REQUEST + ".field('meterName','pipe72').field('gzip','false')"],
 		fileName: ["pipe72AInputMeter.csv", "pipe72BInput.csv"],
 		responseCode: [200, 200],
 		responseString: ["<h1>SUCCESS</h1>Successfully inserted the meters.", "<h1>SUCCESS</h1><h2>It looks like the insert of the readings was a success.</h2><h3>However, note that the processing of the readings returned these warning(s):</h3><br>For meter pipe72: Warning parsing Reading #4. Reading value gives 96 with warning message:<br>There is a gap in time between this reading and the previous reading that exceeds the allowed amount of 60 seconds.<br>For reading #4 on meter pipe72 in pipeline: previous reading has value 72 start time 2021-06-03T00:00:00Z end time 2021-06-04T00:00:00Z and current reading has value 96 start time 2021-06-04T00:02:00Z end time 2021-06-05T00:00:00Z with timeSort increasing; duplications 1; cumulative false; cumulativeReset false; cumulativeResetStart 00:00:00; cumulativeResetEnd 23:59:59.999999; lengthGap 60; lengthVariation 120; onlyEndTime false<br><br>For meter pipe72: Warning parsing Reading #5. Reading value gives 120 with warning message:<br>The previous reading has a different time length than the current reading and exceeds the tolerance of 120 seconds. Note this is treated only as a warning since this may be expected for certain meters.<br>For reading #5 on meter pipe72 in pipeline: previous reading has value 96 start time 2021-06-04T00:02:00Z end time 2021-06-05T00:00:00Z and current reading has value 120 start time 2021-06-05T00:00:00Z end time 2021-06-06T00:04:00Z with timeSort increasing; duplications 1; cumulative false; cumulativeReset false; cumulativeResetStart 00:00:00; cumulativeResetEnd 23:59:59.999999; lengthGap 60; lengthVariation 120; onlyEndTime false<br>"]
 	},
 	pipe73: {
-		description: "",
+		description: "Create meter with modest length variation and gap with reading upload that changes these values so fewer warnings; also checks floating point values in reading upload",
 		chaiRequest: [CHAI_METERS_REQUEST + ".field('headerRow','true').field('gzip','false')", CHAI_READINGS_REQUEST + ".field('meterName','pipe73').field('lengthGap','120.1').field('lengthVariation','120.2').field('gzip','false')"],
 		fileName: ["pipe73AInputMeter.csv", "pipe73BInput.csv"],
 		responseCode: [200, 200],
 		responseString: ["<h1>SUCCESS</h1>Successfully inserted the meters.", "<h1>SUCCESS</h1><h2>It looks like the insert of the readings was a success.</h2><h3>However, note that the processing of the readings returned these warning(s):</h3><br>For meter pipe73: Warning parsing Reading #5. Reading value gives 120 with warning message:<br>The previous reading has a different time length than the current reading and exceeds the tolerance of 120.2 seconds. Note this is treated only as a warning since this may be expected for certain meters.<br>For reading #5 on meter pipe73 in pipeline: previous reading has value 96 start time 2021-06-04T00:02:00Z end time 2021-06-05T00:00:00Z and current reading has value 120 start time 2021-06-05T00:00:00Z end time 2021-06-06T00:04:00Z with timeSort increasing; duplications 1; cumulative false; cumulativeReset false; cumulativeResetStart 00:00:00; cumulativeResetEnd 23:59:59.999999; lengthGap 120.1; lengthVariation 120.2; onlyEndTime false<br>"]
 	},
 	pipe74: {
-		description: "",
+		description: "Create meter with duplication with reading upload",
 		chaiRequest: [CHAI_METERS_REQUEST + ".field('headerRow','true').field('gzip','false')", CHAI_READINGS_REQUEST + ".field('cumulative','true').field('meterName','pipe74').field('gzip','false')"],
 		fileName: ["pipe74AInputMeter.csv", "pipe74BInput.csv"],
 		responseCode: [200, 400],
 		responseString: ["<h1>SUCCESS</h1>Successfully inserted the meters.", "<h1>FAILURE</h1><h2>It looks like the insert of the readings had issues with some or all of the readings where the processing of the readings returned these warning(s)/error(s):</h2><br>For meter pipe74: Error parsing Reading #1. Reading value gives 24 with error message:<br>The first ever reading must be dropped when dealing with cumulative data.<br>For reading #1 on meter pipe74 in pipeline: previous reading has value 0 start time 1970-01-01T00:00:00Z end time 1970-01-01T00:00:00Z and current reading has value 24 start time 2021-06-01T00:00:00Z end time 2021-06-02T00:00:00Z with timeSort increasing; duplications 3; cumulative true; cumulativeReset false; cumulativeResetStart 00:00:00; cumulativeResetEnd 23:59:59.999999; lengthGap 0; lengthVariation 0; onlyEndTime false<br><h2>Readings Dropped and should have previous messages</h2><ol><li>Dropped Reading #1 for meter pipe74</li></ol>"]
 	},
 	pipe75: {
-		description: "Set to decreasing for meter then without timeSort parameter for readings",
+		description: "Create meter with decreasing with reading upload",
 		chaiRequest: [CHAI_METERS_REQUEST + ".field('headerRow','true').field('gzip', 'false')", CHAI_READINGS_REQUEST + ".field('meterName','pipe75').field('gzip', 'false')"],
 		fileName: ["pipe75AInputMeter.csv", "pipe75BInput.csv"],
 		responseCode: [200, 200],
 		responseString: ["<h1>SUCCESS</h1>Successfully inserted the meters.", "<h1>SUCCESS</h1><h2>It looks like the insert of the readings was a success.</h2>"]
 	},
 	pipe76: {
-		description: "",
+		description: "Create meter with end only with reading upload",
 		chaiRequest: [CHAI_METERS_REQUEST + ".field('headerRow','true').field('gzip','false')", CHAI_READINGS_REQUEST + ".field('meterName','pipe76').field('gzip','false')"],
 		fileName: ["pipe76AInputMeter.csv", "pipe76BInput.csv"],
 		responseCode: [200, 400],
 		responseString: ["<h1>SUCCESS</h1>Successfully inserted the meters.", "<h1>FAILURE</h1><h2>It looks like the insert of the readings had issues with some or all of the readings where the processing of the readings returned these warning(s)/error(s):</h2><br>For meter pipe76: Error parsing Reading #1. Reading value gives 24 with error message:<br>The first ever reading must be dropped when dealing only with endTimestamps.<br>For reading #1 on meter pipe76 in pipeline: previous reading has value 0 start time 1970-01-01T00:00:00Z end time 1970-01-01T00:00:00Z and current reading has value 24 start time 1970-01-01T00:00:00Z end time 2021-06-02T00:00:00Z with timeSort increasing; duplications 1; cumulative false; cumulativeReset false; cumulativeResetStart 00:00:00; cumulativeResetEnd 23:59:59.999999; lengthGap 0; lengthVariation 0; onlyEndTime true<br><h2>Readings Dropped and should have previous messages</h2><ol><li>Dropped Reading #1 for meter pipe76</li></ol>"]
 	},
 	pipe80: {
-		description: "Two meter uploads then reading upload with cumulative",
+		description: "Two meter uploads where second sets cumulative with reading upload; all without headers",
 		chaiRequest: [CHAI_METERS_REQUEST + ".field('gzip', 'false')", CHAI_METERS_REQUEST + ".field('gzip', 'false').field('update','true').field('meterName', 'pipe80')", CHAI_READINGS_REQUEST + ".field('gzip', 'false').field('meterName', 'pipe80')"],
 		fileName: ["pipe80AInputMeter.csv", "pipe80BInputMeter.csv", "pipe80CInput.csv"],
 		responseCode: [200, 200, 400],
 		responseString: ["<h1>SUCCESS</h1>Successfully inserted the meters.", "<h1>SUCCESS</h1>Successfully inserted the meters.", "<h1>FAILURE</h1><h2>It looks like the insert of the readings had issues with some or all of the readings where the processing of the readings returned these warning(s)/error(s):</h2><br>For meter pipe80: Error parsing Reading #1. Reading value gives 24 with error message:<br>The first ever reading must be dropped when dealing with cumulative data.<br>For reading #1 on meter pipe80 in pipeline: previous reading has value 0 start time 1970-01-01T00:00:00Z end time 1970-01-01T00:00:00Z and current reading has value 24 start time 2021-06-01T00:00:00Z end time 2021-06-02T00:00:00Z with timeSort increasing; duplications 1; cumulative true; cumulativeReset false; cumulativeResetStart 00:00:00; cumulativeResetEnd 23:59:59.999999; lengthGap 0; lengthVariation 0; onlyEndTime false<br><h2>Readings Dropped and should have previous messages</h2><ol><li>Dropped Reading #1 for meter pipe80</li></ol>"]
 	},
 	pipe90: {
-		description: "Two meter uploads with header and zipped where second sets cumulative & reset, renames meter then reading upload without cumulative or reset",
+		description: "Two meter uploads with header and zipped where second sets cumulative & reset, renames meter then reading upload",
 		chaiRequest: [CHAI_METERS_REQUEST + ".field('headerRow','true')", CHAI_METERS_REQUEST + ".field('headerRow','true').field('update','true').field('meterName', 'pipe90x')", CHAI_READINGS_REQUEST + ".field('gzip', 'false').field('meterName', 'pipe90')"],
 		fileName: ["pipe90AInputMeter.csv.gz", "pipe90BInputMeter.csv.gz", "pipe90CInput.csv"],
 		responseCode: [200, 200, 400],
