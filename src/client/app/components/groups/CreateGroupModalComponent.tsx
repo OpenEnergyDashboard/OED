@@ -96,7 +96,7 @@ export default function CreateUnitModalComponent() {
 		// TODO is -99 okay - do we need to fix
 		// A meter default graphic unit must be selected.
 		if (state.defaultGraphicUnit === -999) {
-			notifyUser(translate('meter.graphic.invalid'));
+			notifyUser(translate('group.graphic.invalid'));
 			inputOk = false;
 		}
 
@@ -122,7 +122,7 @@ export default function CreateUnitModalComponent() {
 				// GPS not okay. Only true if some input.
 				// TODO isValidGPSInput currently pops up an alert so not doing it here, may change
 				// so leaving code commented out.
-				// notifyUser(translate('input.gps.range') + state.gps + '.');
+				notifyUser(translate('input.gps.range') + state.gps + '.');
 				inputOk = false;
 			}
 		}
