@@ -89,7 +89,7 @@ router.get('/line/raw/meters/:meter_ids', async (req, res) => {
 			for (let i = 0; i < meterIDs.length; i++) {
 				meterID = meterIDs[i];
 				const rawReadings = await Reading.getReadingsByMeterIDAndDateRange(meterID, timeInterval.startTimestamp, timeInterval.endTimestamp, conn)
-				const meterLabel = (await Meter.getByID(meterID, conn)).name;
+				const meterLabel = (await Meter.getByID(meterID, conn)).identifier;
 				rawReadings.map(ele => {
 					delete ele.meterID;
 					ele.label = meterLabel;

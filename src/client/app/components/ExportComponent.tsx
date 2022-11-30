@@ -9,12 +9,18 @@ import graphExport, { graphRawExport, downloadRawCSV } from '../utils/exportData
 import { ExportDataSet } from '../types/readings';
 import { FormattedMessage } from 'react-intl';
 import { TimeInterval } from '../../../common/TimeInterval';
-import { metersApi } from '../utils/api'
+import { metersApi} from '../utils/api'
 import TooltipMarkerComponent from './TooltipMarkerComponent';
+import { State } from '../types/redux/state';
+import { useSelector } from 'react-redux';
+
+
+
 
 interface ExportProps {
 	showRawExport: boolean;
 	selectedMeters: number[];
+	units: string;
 	exportVals: { datasets: ExportDataSet[] };
 	timeInterval: TimeInterval;
 	defaultLanguage: string;
@@ -27,17 +33,16 @@ export default function ExportComponent(props: ExportProps) {
 	 * Called when Export button is clicked.
 	 * Passes an object containing the selected meter data to a function for export.
 	 */
+// Meters state
+const MetersState = useSelector((state: State) => state.meters.byMeterID);
+// Units state
+const units = useSelector((state: State) => state.units.units); 
 
 	const exportReading = () => {
 		var data = []
+		//using a loop to push objects one at a time into data to be organized and formated for export 
 		for(let i = 0; i < props.exportVals.datasets.length; i++){
 			 data.push(props.exportVals.datasets[i]);
-		
-		
-		
-		
-		//const labelUnique = props.exportVals.datasets[0].label;
-		
 
 		// Sort the dataset based on the start time
 		data.forEach(reading => {
@@ -79,20 +84,31 @@ export default function ExportComponent(props: ExportProps) {
 		const chartName = data[0].currentChart;
 		const meterName = data[0].label;
 		const unit = data[0].unit;
-		const name = `oedExport_${chartName}_${meterName}_${unit}_${startTimeString}_to_${endTimeString}.csv`;
+		const name = `oedExport_${chartName}_${startTimeString}_to_${endTimeString}_${meterName}_${unit}.csv`;
 		graphExport(data, name);
+		//clear out exported data so a new object can be pushed in 
 		data.splice(0,data.length);
-		} //end of loop
+		} 
 	};
 
 	const exportRawReadings = async () => {
 		if (props.selectedMeters.length === 0)
 			return;
+		var data: number[] = []
+		
+		for(let i = 0; i < props.selectedMeters.length; i++){
+		data.push(props.selectedMeters[i]);
+			 
+		 const meterID = MetersState[props.selectedMeters[i]].unitId;
+		 const unitName = units[meterID].identifier;
+
 		const count = await metersApi.lineReadingsCount(props.selectedMeters, props.timeInterval);
 		graphRawExport(count, props.defaultWarningFileSize, props.defaultFileSizeLimit, async () => {
-			const lineReading = await metersApi.rawLineReadings(props.selectedMeters, props.timeInterval);
-			downloadRawCSV(lineReading, props.defaultLanguage);
+			const lineReading = await metersApi.rawLineReadings(data, props.timeInterval);
+			downloadRawCSV(lineReading, props.defaultLanguage, unitName);
 		});
+		data.splice(0,data.length);
+		} 
 	}
 
 	return (

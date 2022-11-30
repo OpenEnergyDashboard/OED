@@ -9,6 +9,9 @@ import * as moment from 'moment';
 import { UserRole } from '../types/items';
 import translate from './translate';
 
+
+
+
 /**
  * Function to converts the meter readings into a CSV formatted string.
  * @param items The meter reading.
@@ -16,17 +19,15 @@ import translate from './translate';
  */
 
 function convertToCSV(items: ExportDataSet[]) {
-	let csvOutput = 'Readings,Start Timestamp,End Timestamp,Unit\n';
+	let csvOutput = `Readings,Start Timestamp, End Timestamp, Meter name, ${items[0].label}, Unit, ${items[0].unit}\n`;
 	items.forEach(set => {
 		const data = set.exportVals;
-		//const label = set.label;
-		const unit = set.unit;
 		data.forEach(reading => {
 			const info = reading.y;
 			// Why UTC is needed here has not been carefully analyzed.
 			const startTimeStamp = moment.utc(reading.x).format('dddd LL LTS').replace(/,/g, ''); // use regex to omit pesky commas
 			const endTimeStamp = moment.utc(reading.z).format('dddd LL LTS').replace(/,/g, '');
-			csvOutput += `${info},${startTimeStamp},${endTimeStamp},${unit}\n`; // TODO: add column for units
+			csvOutput += `${info},${startTimeStamp},${endTimeStamp}\n`;
 		});
 	});
 	return csvOutput;
@@ -67,8 +68,8 @@ export default function graphExport(dataSets: ExportDataSet[], name: string) {
  */
 // below comment should be removed when we either remove defaultLanguage or implement it into the following function
 /* eslint-disable @typescript-eslint/no-unused-vars */
-export function downloadRawCSV(items: RawReadings[], defaultLanguage: string) {
-	let csvOutput = 'Readings,Start Timestamp,End Timestamp\n';
+export function downloadRawCSV(items: RawReadings[], defaultLanguage: string, unit: string) {
+	let csvOutput = `Readings, Start Timestamp, End Timestamp, Meter, ${items[0].label}, Unit, ${unit} \n`;
 	items.forEach(ele => {
 		//.utc is not needed because this uses a different route than the way line graphs work. It returns a string that represents the
 		// start/endTimestamp.
@@ -83,7 +84,8 @@ export function downloadRawCSV(items: RawReadings[], defaultLanguage: string) {
 	// Use regex to remove commas and replace spaces/colons/hyphens with underscores
 	const startTime = moment(items[0].startTimestamp).format('LL_LTS').replace(/,/g, '').replace(/[\s:-]/g, '_');
 	const endTime = moment(items[items.length - 1].startTimestamp).format('LL_LTS').replace(/,/g, '').replace(/[\s:-]/g, '_');
-	const filename = `oedRawExport_line_${startTime}_to_${endTime}.csv`;
+	const headingLabel = items[0].label;
+	const filename = `oedRawExport_line_${startTime}_to_${endTime}_for_${headingLabel}.csv`;
 	downloadCSV(csvOutput, filename);
 }
 /* eslint-enable @typescript-eslint/no-unused-vars */
@@ -97,7 +99,7 @@ export function downloadRawCSV(items: RawReadings[], defaultLanguage: string) {
 // NOTE: This function is made with the idea that it will not be called very often
 // Ideally we would have a component that prompts the user and handles all the logic
 export async function graphRawExport(count: number, warningFileSize: number, fileSizeLimit: number, done: () => Promise<void>): Promise<any> {
-	const fileSize = (count * 0.0849 / 1000);
+	const fileSize = (count * 0.0857 / 1000);
 	// Download for anyone without warning
 	if (fileSize <= warningFileSize) {
 		return done();

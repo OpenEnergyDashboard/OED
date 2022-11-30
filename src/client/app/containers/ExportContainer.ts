@@ -49,8 +49,7 @@ function mapStateToProps(state: State) {
 						id: state.groups.byGroupID[groupID].id,
 						currentChart: chart,
 						exportVals: dataPoints,
-						unit: state.groups.byGroupID[unitID].toString()
-						//unit: state.units.units[parseInt(state.meters.byMeterID[meterID].unitId.toString())].name
+						unit:  state.units.units[parseInt(state.graph.selectedUnit.toString())].name
 					});
 				}
 			}
@@ -75,8 +74,7 @@ function mapStateToProps(state: State) {
 						id: state.meters.byMeterID[meterID].id,
 						currentChart: chart,
 						exportVals: dataPoints,
-						unit: state.units.units[parseInt(state.meters.byMeterID[meterID].unitId.toString())].name
-						// state.meters.byMeterID[meterID].unitId.toString()
+						unit: state.units.units[parseInt(state.graph.selectedUnit.toString())].name
 					});
 				}
 			}
@@ -107,7 +105,7 @@ function mapStateToProps(state: State) {
 								id: state.groups.byGroupID[groupID].id,
 								currentChart: chart,
 								exportVals: dataPoints,
-								unit: state.groups.byGroupID[unitID].toString()
+								unit: state.units.units[parseInt(state.graph.selectedUnit.toString())].name
 							});
 						}
 					}
@@ -139,8 +137,7 @@ function mapStateToProps(state: State) {
 								id: state.meters.byMeterID[meterID].id,
 								currentChart: chart,
 								exportVals: dataPoints,
-								unit: state.units.units[parseInt(state.meters.byMeterID[meterID].unitId.toString())].name
-								// state.meters.byMeterID[meterID].unitId.toString()
+								unit: state.units.units[parseInt(state.graph.selectedUnit.toString())].name
 							});
 						}
 					}
@@ -153,7 +150,7 @@ function mapStateToProps(state: State) {
 		showRawExport: state.graph.chartToRender === 'line' ? true : false,
 		selectedMeters: state.graph.selectedMeters,
 		selectedGroups: state.graph.selectedGroups,
-		units: state.graph.selectedUnit,
+		units: state.graph.selectedUnit.toString(),
 		exportVals: { datasets },
 		timeInterval: state.graph.timeInterval,
 		defaultLanguage: state.admin.defaultLanguage,
