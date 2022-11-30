@@ -221,16 +221,7 @@ const testCases = {
 		responseCode: [400],
 		responseString: ["<h1>FAILURE</h1><h2>It looks like the insert of the readings had issues with some or all of the readings where the processing of the readings returned these warning(s)/error(s):</h2>For meter pipe27: Error parsing Reading #2 The start (2021-06-02 00:00:00) and/or end time (2021-06-32 00:00:00) provided did not parse into a valid date/time so all reading are rejected.<br>For reading #2 on meter pipe27 in pipeline: previous reading has value 24 start time 2021-06-01T00:00:00Z end time 2021-06-02T00:00:00Z and current reading has value unknown start time 2021-06-02T00:00:00Z end time Invalid date with timeSort increasing; duplications 1; cumulative false; cumulativeReset false; cumulativeResetStart 00:00:00; cumulativeResetEnd 23:59:59.999999; lengthGap 0; lengthVariation 0; onlyEndTime false<br>"]
 	},
-	// pipe28: {
-	// 	// TODO this probably relates to PR#781
-	// 	// Does not work now
-	// 	// Needs Relaxed Parsing 
-	// 	description: "",
-	//     chaiRequest: [CHAI_READINGS_REQUEST + ".field('meterName','pipe28').field('createMeter','true').field('gzip','false')"],
-	// 	fileName: ["pipe28Input.csv"],
-	// 	responseCode: [200],
-	// 	responseString: ["<h1>SUCCESS</h1><h2>It looks like the insert of the readings was a success.</h2>"]
-	// },
+	// Pipe28 removed since stronger tests on dates cause it to fail.
 	pipe29: {
 		description: "Cumulative time readings with bad reading value which in incorrect",
 		chaiRequest: [CHAI_READINGS_REQUEST + ".field('cumulative','true').field('meterName','pipe29').field('createMeter','true').field('gzip','false')"],
