@@ -10,7 +10,7 @@ const readCsv = require('../../services/pipeline-in-progress/readCsv');
 const Reading = require('../../models/Reading');
 const Meter = require('../../models/Meter');
 const path = require('path');
-const loadCsvInput = require('../../services/pipeline-in-progress/loadCsvInput');
+const { loadCsvInput } = require('../../services/pipeline-in-progress/loadCsvInput');
 
 mocha.describe('PIPELINE: Load data from csv file', () => {
 	const testFilePath = path.join(__dirname, 'data', 'test-readings.csv');
