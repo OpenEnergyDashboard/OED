@@ -55,5 +55,6 @@ CREATE TABLE IF NOT EXISTS meters (
     start_timestamp TIMESTAMP DEFAULT '1970-01-01 00:00:00',
     end_timestamp TIMESTAMP DEFAULT '1970-01-01 00:00:00',
     unit_id INTEGER REFERENCES units(id),
-    default_graphic_unit INTEGER REFERENCES units(id)
+    default_graphic_unit INTEGER REFERENCES units(id),
+    meter_reading_frequency INTERVAL DEFAULT '00:15:00'
 );

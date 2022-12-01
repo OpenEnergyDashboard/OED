@@ -200,6 +200,7 @@ min_data_points: The minimum number of data points to return if using the day vi
 min_hour_points: The minimum number of data points to return if using the hour view.
 Details on how this function works can be found in the devDocs in the resource generalization document.
  */
+
 CREATE OR REPLACE FUNCTION meter_line_readings_unit (
 	meter_ids INTEGER[],
 	graphic_unit_id INTEGER,
@@ -209,13 +210,14 @@ CREATE OR REPLACE FUNCTION meter_line_readings_unit (
 	min_hour_points INTEGER
 )
 	RETURNS TABLE(meter_id INTEGER, reading_rate FLOAT, start_timestamp TIMESTAMP, end_timestamp TIMESTAMP)
-AS $$
+AS $$ 
 DECLARE
 	requested_interval INTERVAL;
 	requested_range TSRANGE;
 	unit_column INTEGER;
-	temp_frequency INTEGER := 15; -- right now we don't have the frequency of each meter
-BEGIN
+	frequency INTERVAL;
+	add INTEGER := 1;
+	BEGIN
 	-- Make sure the time range is withing the reading values.
 	requested_range := shrink_tsrange_to_real_readings(tsrange(start_stamp, end_stamp, '[]'));
 	requested_interval := upper(requested_range) - lower(requested_range);
@@ -223,141 +225,74 @@ BEGIN
 	SELECT unit_index INTO unit_column FROM units WHERE id = graphic_unit_id;
 
 	-- For each frequency of points, verify that you will get the minimum graphing points to use.
-	-- Start with the lowest frequency (daily), then hourly and then use raw/meter data if others
-	-- will not work.
-	--  (extract(EPOCH FROM (r.end_timestamp - r.start_timestamp)))
-	-- Test Command: select meter_line_readings_unit('{1, 2}'::integer[], (select id from units where name = 'kWh'), '-infinity', 'infinity', 200, 200);
-	-- for example, replace infinity with '2022-10-24 17:32:00' as one of the times 
-	-- raise notice 'real_start_stamp: %, real_end_stamp: %', real_start_stamp, real_end_stamp; -- DEBUG
+	-- Start with the raw, then hourly and then daily if others will not work
 
-	-- Epoch is in seconds so we divide by 60 to turn it into minutes
-	-- If there are less than 1440 readings we want to return the raw data
-	-- TODO add the frequency of the meters to the tables so we can add the extra conditionals based on how long the frequency is
-	raise notice '%', (EXTRACT (DAY FROM requested_interval) * 1440);
-	IF (((EXTRACT (DAY FROM requested_interval) * 1440) / temp_frequency) <= 1440) OR (temp_frequency >= 1440) THEN
-		RETURN QUERY
-			SELECT r.meter_id as meter_id,
-			CASE WHEN u.unit_represent = 'quantity'::unit_represent_type THEN
-				-- If it is quantity readings then need to convert to rate per hour by dividing by the time length where
-				-- the 3600 is needed since EPOCH is in seconds.
-				((r.reading / (extract(EPOCH FROM (r.end_timestamp - r.start_timestamp)) / 3600)) * c.slope + c.intercept) 
-			WHEN (u.unit_represent = 'flow'::unit_represent_type OR u.unit_represent = 'raw'::unit_represent_type) THEN
-				-- If it is flow or raw readings then it is already a rate so just convert it but also need to normalize
-				-- to per hour.
-				((r.reading * 3600 / u.sec_in_rate) * c.slope + c.intercept)
-			END AS reading_rate,
-			r.start_timestamp,
-			r.end_timestamp
-			FROM ((((readings r
-			INNER JOIN unnest(meter_ids) meters(id) ON r.meter_id = meters.id)
-			INNER JOIN meters m ON m.id = meters.id)
-			INNER JOIN units u ON m.unit_id = u.id)
-			INNER JOIN cik c on c.row_index = u.unit_index AND c.column_index = unit_column)
-			WHERE lower(requested_range) <= r.start_timestamp AND r.end_timestamp <= upper(requested_range);
-	ELSIF (((EXTRACT (DAY FROM requested_interval) * 1440) / 60) <= 1440) AND (temp_frequency <= 60) THEN 
-		-- Get hourly points to graph. See daily for more comments.
-		RETURN QUERY
-			SELECT hourly.meter_id AS meter_id,
-				-- Convert the reading based on the conversion found below.
-				-- Hourly readings are already averaged correctly into a rate.
-				hourly.reading_rate * c.slope + c.intercept as reading_rate,
-				lower(hourly.time_interval) AS start_timestamp,
-				upper(hourly.time_interval) AS end_timestamp
-			FROM ((((hourly_readings_unit hourly
-			INNER JOIN unnest(meter_ids) meters(id) ON hourly.meter_id = meters.id)
-			INNER JOIN meters m ON m.id = meters.id)
-			INNER JOIN units u ON m.unit_id = u.id)
-			INNER JOIN cik c on c.row_index = u.unit_index AND c.column_index = unit_column)
-			WHERE requested_range @> time_interval;
-	ELSE 
-		-- Get daily points to graph
-		RETURN QUERY
-			SELECT
-				daily.meter_id AS meter_id,
-				-- Convert the reading based on the conversion found below.
-				-- Daily readings are already averaged correctly into a rate.
-				daily.reading_rate * c.slope + c.intercept as reading_rate,
-				lower(daily.time_interval) AS start_timestamp,
-				upper(daily.time_interval) AS end_timestamp
-			FROM ((((daily_readings_unit daily
-			-- Get all the meter_ids in the passed array of meters.
-			INNER JOIN unnest(meter_ids) meters(id) ON daily.meter_id = meters.id)
-			-- This sequence of joins takes the meter id to its unit and in the final join
-			-- it then uses the unit_index for this unit.
-			INNER JOIN meters m ON m.id = meters.id)
-			INNER JOIN units u ON m.unit_id = u.id)
-			-- This is getting the conversion for the meter (row_index) and unit to graph (column_index).
-			-- The slope and intercept are used above the transform the reading to the desired unit.
-			INNER JOIN cik c on c.row_index = u.unit_index AND c.column_index = unit_column)
-			WHERE requested_range @> time_interval;
-	-- There's no quick way to get the number of hours in an interval. extract(HOURS FROM '1 day, 3 hours') gives 3.
-	 END IF;
+	while add <= cardinality(meter_ids) loop
+		select meter_reading_frequency into frequency from meters where id = meter_ids[add];
+		IF (((EXTRACT (DAY FROM requested_interval) * 1440) / (EXTRACT (HOUR FROM frequency) * 60 + EXTRACT (MINUTE FROM frequency))) <= 1440) 
+		OR (EXTRACT (HOUR FROM frequency) * 60 + EXTRACT (MINUTE FROM frequency) >= 1440) THEN
+			raise notice '%', 'raw';
+			RETURN QUERY
+				SELECT r.meter_id as meter_id,
+				CASE WHEN u.unit_represent = 'quantity'::unit_represent_type THEN
+					-- If it is quantity readings then need to convert to rate per hour by dividing by the time length where
+					-- the 3600 is needed since EPOCH is in seconds.
+					((r.reading / (extract(EPOCH FROM (r.end_timestamp - r.start_timestamp)) / 3600)) * c.slope + c.intercept) 
+				WHEN (u.unit_represent = 'flow'::unit_represent_type OR u.unit_represent = 'raw'::unit_represent_type) THEN
+					-- If it is flow or raw readings then it is already a rate so just convert it but also need to normalize
+					-- to per hour.
+					((r.reading * 3600 / u.sec_in_rate) * c.slope + c.intercept)
+				END AS reading_rate,
+				r.start_timestamp,
+				r.end_timestamp
+				FROM (((readings r
+				--INNER JOIN unnest(current_id) meters(id) ON r.meter_id = meters.id)
+				INNER JOIN meters m ON m.id = meter_ids[add])
+				INNER JOIN units u ON m.unit_id = u.id)
+				INNER JOIN cik c on c.row_index = u.unit_index AND c.column_index = unit_column)
+				WHERE lower(requested_range) <= r.start_timestamp AND r.end_timestamp <= upper(requested_range) AND r.meter_id = meter_ids[add];
+		ELSIF (((EXTRACT (DAY FROM requested_interval) * 1440) / 60) <= 1440) AND (EXTRACT (HOUR FROM frequency) * 60 + EXTRACT (MINUTE FROM frequency) >= 1440) THEN 
+			-- Get hourly points to graph. See daily for more comments.
+			raise notice '%', 'hourly';
+			RETURN QUERY
+				SELECT hourly.meter_id AS meter_id,
+					-- Convert the reading based on the conversion found below.
+					-- Hourly readings are already averaged correctly into a rate.
+					hourly.reading_rate * c.slope + c.intercept as reading_rate,
+					lower(hourly.time_interval) AS start_timestamp,
+					upper(hourly.time_interval) AS end_timestamp
+				FROM (((hourly_readings_unit hourly
+				INNER JOIN meters m ON m.id = meters_ids[add])
+				INNER JOIN units u ON m.unit_id = u.id)
+				INNER JOIN cik c on c.row_index = u.unit_index AND c.column_index = unit_column)
+				WHERE requested_range @> time_interval AND hourly.meter_id = meter_ids[add];
+		ELSE 
+			-- Get daily points to graph
+			raise notice '%', 'daily';
+			RETURN QUERY
+				SELECT
+					daily.meter_id AS meter_id,
+					-- Convert the reading based on the conversion found below.
+					-- Daily readings are already averaged correctly into a rate.
+					daily.reading_rate * c.slope + c.intercept as reading_rate,
+					lower(daily.time_interval) AS start_timestamp,
+					upper(daily.time_interval) AS end_timestamp
+				FROM (((daily_readings_unit daily
+				-- Get all the meter_ids in the passed array of meters.
+				-- This sequence of joins takes the meter id to its unit and in the final join
+				-- it then uses the unit_index for this unit.
+				INNER JOIN meters m ON m.id = meter_ids[add])
+				INNER JOIN units u ON m.unit_id = u.id)
+				-- This is getting the conversion for the meter (row_index) and unit to graph (column_index).
+				-- The slope and intercept are used above the transform the reading to the desired unit.
+				INNER JOIN cik c on c.row_index = u.unit_index AND c.column_index = unit_column)
+				WHERE requested_range @> time_interval AND daily.meter_id = meter_ids[add];
+		-- There's no quick way to get the number of hours in an interval. extract(HOURS FROM '1 day, 3 hours') gives 3.
+		END IF;
+		add := add + 1;
+	end loop;
 END;
 $$ LANGUAGE 'plpgsql';
-
-
--- 	IF extract(DAY FROM requested_interval) >= min_day_points THEN
--- 		-- Get daily points to graph
--- 		RETURN QUERY
--- 			SELECT
--- 				daily.meter_id AS meter_id,
--- 				-- Convert the reading based on the conversion found below.
--- 				-- Daily readings are already averaged correctly into a rate.
--- 				daily.reading_rate * c.slope + c.intercept as reading_rate,
--- 				lower(daily.time_interval) AS start_timestamp,
--- 				upper(daily.time_interval) AS end_timestamp
--- 			FROM ((((daily_readings_unit daily
--- 			-- Get all the meter_ids in the passed array of meters.
--- 			INNER JOIN unnest(meter_ids) meters(id) ON daily.meter_id = meters.id)
--- 			-- This sequence of joins takes the meter id to its unit and in the final join
--- 			-- it then uses the unit_index for this unit.
--- 			INNER JOIN meters m ON m.id = meters.id)
--- 			INNER JOIN units u ON m.unit_id = u.id)
--- 			-- This is getting the conversion for the meter (row_index) and unit to graph (column_index).
--- 			-- The slope and intercept are used above the transform the reading to the desired unit.
--- 			INNER JOIN cik c on c.row_index = u.unit_index AND c.column_index = unit_column)
--- 			WHERE requested_range @> time_interval;
--- 	-- There's no quick way to get the number of hours in an interval. extract(HOURS FROM '1 day, 3 hours') gives 3.
--- 	ELSIF extract(EPOCH FROM requested_interval)/3600 >= min_hour_points THEN
--- 		-- Get hourly points to graph. See daily for more comments.
--- 		RETURN QUERY
--- 			SELECT hourly.meter_id AS meter_id,
--- 				-- Convert the reading based on the conversion found below.
--- 				-- Hourly readings are already averaged correctly into a rate.
--- 				hourly.reading_rate * c.slope + c.intercept as reading_rate,
--- 				lower(hourly.time_interval) AS start_timestamp,
--- 				upper(hourly.time_interval) AS end_timestamp
--- 			FROM ((((hourly_readings_unit hourly
--- 			INNER JOIN unnest(meter_ids) meters(id) ON hourly.meter_id = meters.id)
--- 			INNER JOIN meters m ON m.id = meters.id)
--- 			INNER JOIN units u ON m.unit_id = u.id)
--- 			INNER JOIN cik c on c.row_index = u.unit_index AND c.column_index = unit_column)
--- 			WHERE requested_range @> time_interval;
--- 	 ELSE
--- 		-- Default to raw/meter data to graph. See daily for more comments.
--- 		RETURN QUERY
--- 			SELECT r.meter_id as meter_id,
--- 			CASE WHEN u.unit_represent = 'quantity'::unit_represent_type THEN
--- 				-- If it is quantity readings then need to convert to rate per hour by dividing by the time length where
--- 				-- the 3600 is needed since EPOCH is in seconds.
--- 				((r.reading / (extract(EPOCH FROM (r.end_timestamp - r.start_timestamp)) / 3600)) * c.slope + c.intercept) 
--- 			WHEN (u.unit_represent = 'flow'::unit_represent_type OR u.unit_represent = 'raw'::unit_represent_type) THEN
--- 				-- If it is flow or raw readings then it is already a rate so just convert it but also need to normalize
--- 				-- to per hour.
--- 				((r.reading * 3600 / u.sec_in_rate) * c.slope + c.intercept)
--- 			END AS reading_rate,
--- 			r.start_timestamp,
--- 			r.end_timestamp
--- 			FROM ((((readings r
--- 			INNER JOIN unnest(meter_ids) meters(id) ON r.meter_id = meters.id)
--- 			INNER JOIN meters m ON m.id = meters.id)
--- 			INNER JOIN units u ON m.unit_id = u.id)
--- 			INNER JOIN cik c on c.row_index = u.unit_index AND c.column_index = unit_column)
--- 			WHERE lower(requested_range) <= r.start_timestamp AND r.end_timestamp <= upper(requested_range);
--- 	 END IF;
--- END;
--- $$ LANGUAGE 'plpgsql';
-
 
 /*
 The following function determines the correct duration view to query from, and returns averaged or raw readings from it.
@@ -447,7 +382,7 @@ BEGIN
 		bars.interval_start + bar_width AS end_timestamp
 		FROM (((((daily_readings_unit dr
 		INNER JOIN generate_series(real_start_stamp, real_end_stamp, bar_width) bars(interval_start)
-				ON tsrange(bars.interval_start, bars.interval_start + bar_width, '[]') @> dr.time_interval)
+				ON tsrange(bars.interval_start, bars.int	erval_start + bar_width, '[]') @> dr.time_interval)
 		-- Get all the meter_ids in the passed array of meters.
 		INNER JOIN unnest(meter_ids) meters(id) ON dr.meter_id = meters.id)
 		-- This sequence of joins takes the meter id to its unit and in the final join
