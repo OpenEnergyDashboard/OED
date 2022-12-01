@@ -34,5 +34,6 @@ module.exports = {
 		await db.none(sqlFile('../migrations/0.8.0-1.0.0/sql/readings/drop_old_functions.sql'));
 		await db.none(sqlFile('../migrations/0.8.0-1.0.0/sql/meter/add_meter_type.sql'));
 		await db.none(sqlFile('../migrations/0.8.0-1.0.0/sql/meter/alter_meter_ipdAddress.sql'));
+		await db.none(sqlFile('../migrations/0.8.0-1.0.0/sql/meter/add_meter_reading_frequency.sql'));
 	}
 };

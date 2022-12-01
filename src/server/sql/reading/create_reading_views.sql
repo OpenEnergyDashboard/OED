@@ -231,7 +231,6 @@ DECLARE
 		select meter_reading_frequency into frequency from meters where id = meter_ids[add];
 		IF (((EXTRACT (DAY FROM requested_interval) * 1440) / (EXTRACT (HOUR FROM frequency) * 60 + EXTRACT (MINUTE FROM frequency))) <= 1440) 
 		OR (EXTRACT (HOUR FROM frequency) * 60 + EXTRACT (MINUTE FROM frequency) >= 1440) THEN
-			raise notice '%', 'raw';
 			RETURN QUERY
 				SELECT r.meter_id as meter_id,
 				CASE WHEN u.unit_represent = 'quantity'::unit_represent_type THEN
@@ -253,7 +252,6 @@ DECLARE
 				WHERE lower(requested_range) <= r.start_timestamp AND r.end_timestamp <= upper(requested_range) AND r.meter_id = meter_ids[add];
 		ELSIF (((EXTRACT (DAY FROM requested_interval) * 1440) / 60) <= 1440) AND (EXTRACT (HOUR FROM frequency) * 60 + EXTRACT (MINUTE FROM frequency) >= 1440) THEN 
 			-- Get hourly points to graph. See daily for more comments.
-			raise notice '%', 'hourly';
 			RETURN QUERY
 				SELECT hourly.meter_id AS meter_id,
 					-- Convert the reading based on the conversion found below.
@@ -268,7 +266,6 @@ DECLARE
 				WHERE requested_range @> time_interval AND hourly.meter_id = meter_ids[add];
 		ELSE 
 			-- Get daily points to graph
-			raise notice '%', 'daily';
 			RETURN QUERY
 				SELECT
 					daily.meter_id AS meter_id,
