@@ -18,7 +18,7 @@ export enum ComparePeriod {
 /**
  * @enum {SortingOrder} 'Alphabetical', 'Ascending' or 'Descending'
  */
- export enum SortingOrder {
+export enum SortingOrder {
 	Alphabetical = 'Alphabetical',
 	Ascending = 'Ascending',
 	Descending = 'Descending'
