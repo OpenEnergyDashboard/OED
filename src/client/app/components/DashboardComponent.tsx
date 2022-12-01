@@ -121,6 +121,10 @@ export default class DashboardComponent extends React.Component<DashboardProps> 
 	}
 }
 
+/**
+ * Determines the line graph's slider interval based after the slider is moved
+ * @returns {string} The slider interval, either 'all' or a TimeInterval
+ */
 export function getRangeSliderInterval(): string {
 	const sliderContainer: any = document.querySelector('.rangeslider-bg');
 	const sliderBox: any = document.querySelector('.rangeslider-slidebox');

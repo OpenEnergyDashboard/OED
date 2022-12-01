@@ -80,9 +80,9 @@ export function fetchGroupChildrenIfNeeded(groupID: number) {
 /**
  * Change the selected child groups of a group.
  * This is tracked on a per-group basis. (I.e., each group has its own list of selected child groups.)
- * @param parentID The ID of the group whose subgroups are being selected
- * @param groupIDs The IDs of the new set of selected subgroups
- * @return {{type: string, groupIDs: *}}
+ * @param {number} parentID The ID of the group whose subgroups are being selected
+ * @param {number[]} groupIDs The IDs of the new set of selected subgroups
+ * @returns {{type: string, groupIDs: [number]}}
  */
 export function changeSelectedChildGroupsOfGroup(parentID: number, groupIDs: number[]): t.ChangeSelectedChildGroupsPerGroupAction {
 	return { type: ActionType.ChangeSelectedChildGroupsPerGroup, parentID, groupIDs };
@@ -91,9 +91,9 @@ export function changeSelectedChildGroupsOfGroup(parentID: number, groupIDs: num
 /**
  * Change which child meters of a group are selected.
  * This is tracked on a per-group basis.
- * @param parentID The ID of the group whose subgroups are being selected
- * @param meterIDs The IDs of the new set of selected child meters
- * @return {{type: string, parentID: *, meterIDs: *}}
+ * @param {number} parentID The ID of the group whose subgroups are being selected
+ * @param {number[]} meterIDs The IDs of the new set of selected child meters
+ * @returns {{type: string, parentID: number, meterIDs: [number]}}
  */
 export function changeSelectedChildMetersOfGroup(parentID: number, meterIDs: number[]): t.ChangeSelectedChildMetersPerGroupAction {
 	return { type: ActionType.ChangeSelectedChildMetersPerGroup, parentID, meterIDs };
@@ -102,7 +102,7 @@ export function changeSelectedChildMetersOfGroup(parentID: number, meterIDs: num
 /**
  * Change the display mode of the groups page
  * @param newMode Either 'view', 'edit', or 'create'
- * @return {{type: string, newMode: String}}
+ * @returns {{type: string, newMode: string}}
  */
 export function changeDisplayMode(newMode: t.DisplayMode): t.ChangeDisplayModeAction {
 	return { type: ActionType.ChangeGroupsUIDisplayMode, newMode };
@@ -110,26 +110,34 @@ export function changeDisplayMode(newMode: t.DisplayMode): t.ChangeDisplayModeAc
 
 /**
  * Set state.groups.groupInEditing to a blank group
- * @return {{type: string}}
+ * @returns {{type: string}}
  */
 export function createNewBlankGroup(): t.CreateNewBlankGroupAction {
 	return { type: ActionType.CreateNewBlankGroup };
 }
 
-// Fire the action to actually overwrite `groupInEditing`
+/**
+ * Fire the action to actually overwrite `groupInEditing`
+ * @param {number} groupID Group id.
+ * @returns {{type: string, groupID: number}}
+ */
 function beginEditingGroup(groupID: number): t.BeginEditingGroupAction {
 	return { type: ActionType.BeginEditingGroup, groupID };
 }
 
-// Check if `groupInEditing` is clean (can it be overwritten).
+/**
+ * Check if `groupInEditing` is clean (can it be overwritten).
+ * @param {State} state The redux state
+ * @returns {boolean} Result of the check.
+ */
 function canBeginEditing(state: State): boolean {
 	return !state.groups.groupInEditing.dirty;
 }
 
 /**
  * Copy the group with the given ID into `groupInEditing` if allowed.
- * @param groupID The ID of the group to be edited
- * @return {function(*, *)}
+ * @param {number} groupID The ID of the group to be edited
+ * @returns {function(*, *)}
  */
 export function beginEditingIfPossible(groupID: number): Thunk {
 	return (dispatch: Dispatch, getState: GetState) => {
@@ -143,8 +151,8 @@ export function beginEditingIfPossible(groupID: number): Thunk {
 
 /**
  * Change the name of the group in editing
- * @param newName The new name
- * @return {{type: string, newName: String}}
+ * @param {string} newName The new name
+ * @returns {{type: string, newName: string}}
  */
 export function editGroupName(newName: string): t.EditGroupNameAction {
 	return { type: ActionType.EditGroupName, newName };
@@ -152,8 +160,8 @@ export function editGroupName(newName: string): t.EditGroupNameAction {
 
 /**
  * Change the GPS of the group in editing
- * @param newGPS The new GPS
- * @return {{type: string, newGPS: GPSPoint}}
+ * @param {GPSPoint} newGPS The new GPS
+ * @returns {{type: string, newGPS: GPSPoint}}
  */
 export function editGroupGPS(newGPS: GPSPoint): t.EditGroupGPSAction {
 	return { type: ActionType.EditGroupGPS, newGPS };
@@ -161,8 +169,8 @@ export function editGroupGPS(newGPS: GPSPoint): t.EditGroupGPSAction {
 
 /**
  * Change the displayable of the group in editing
- * @param newDisplay The new displayable
- * @return {{type: string, newDisplay: boolean}}
+ * @param {boolean} newDisplay The new displayable
+ * @returns {{type: string, newDisplay: boolean}}
  */
 export function editGroupDisplayable(newDisplay: boolean): t.EditGroupDisplayableAction {
 	return { type: ActionType.EditGroupDisplayable, newDisplay };
@@ -170,8 +178,8 @@ export function editGroupDisplayable(newDisplay: boolean): t.EditGroupDisplayabl
 
 /**
  * Change the note of the group in editing
- * @param newNote The new name
- * @return {{type: string, newNote: String}}
+ * @param {string} newNote The new name
+ * @returns {{type: string, newNote: string}}
  */
 export function editGroupNote(newNote: string): t.EditGroupNoteAction {
 	return { type: ActionType.EditGroupNote, newNote };
@@ -179,8 +187,8 @@ export function editGroupNote(newNote: string): t.EditGroupNoteAction {
 
 /**
  * Change the area of the group in editing
- * @param newArea The new area
- * @return {{type: string, newArea: number}}
+ * @param {number} newArea The new area
+ * @returns {{type: string, newArea: number}}
  */
 export function editGroupArea(newArea: number): t.EditGroupAreaAction {
 	return { type: ActionType.EditGroupArea, newArea };
@@ -188,16 +196,16 @@ export function editGroupArea(newArea: number): t.EditGroupAreaAction {
 
 /**
  * Change the child groups of the group in editing
- * @param groupIDs IDs of the new child groups
- * @return {{type: string, groupIDs: [Int]}}
+ * @param {number[]} groupIDs IDs of the new child groups
+ * @returns {{type: string, groupIDs: [number]}}
  */
 export function changeChildGroups(groupIDs: number[]): t.ChangeChildGroupsAction {
 	return { type: ActionType.ChangeChildGroups, groupIDs };
 }
 /**
  * Change the child meters of the group in editing
- * @param meterIDs IDs of the new set of child meters
- * @return {{type: string, meterIDs: [Int]}}
+ * @param {number[]} meterIDs IDs of the new set of child meters
+ * @returns {{type: string, meterIDs: [number]}}
  */
 export function changeChildMeters(meterIDs: number[]): t.ChangeChildMetersAction {
 	return { type: ActionType.ChangeChildMeters, meterIDs };
@@ -215,7 +223,7 @@ function markGroupInEditingNotSubmitted(): t.MarkGroupInEditingNotSubmittedActio
  * Use this to cancel group editing and allow `groupInEditing` to be overwritten later.
  * `groupInEditing` is dirty when it is storing changes that have not yet been committed to the database.
  * It is not clean until a request to store the changes has received a successful response.
- * @return {{type: string}}
+ * @returns {{type: string}}
  */
 export function markGroupInEditingClean(): t.MarkGroupInEditingCleanAction {
 	return { type: ActionType.MarkGroupInEditingClean };
@@ -305,7 +313,7 @@ function submitGroupEdits(group: t.GroupData & t.GroupID): Thunk {
  * If this is the case, decides whether it is a new group
  * being created, or an old group being edited, and calls the
  * appropriate helper function to handle the request.
- * @return {function(*, *)}
+ * @returns {function(*, *)}
  */
 export function submitGroupInEditingIfNeeded() {
 	return (dispatch: Dispatch, getState: GetState) => {
