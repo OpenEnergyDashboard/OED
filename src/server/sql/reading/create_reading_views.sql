@@ -379,7 +379,7 @@ BEGIN
 		bars.interval_start + bar_width AS end_timestamp
 		FROM (((((daily_readings_unit dr
 		INNER JOIN generate_series(real_start_stamp, real_end_stamp, bar_width) bars(interval_start)
-				ON tsrange(bars.interval_start, bars.int	erval_start + bar_width, '[]') @> dr.time_interval)
+				ON tsrange(bars.interval_start, bars.interval_start + bar_width, '[]') @> dr.time_interval)
 		-- Get all the meter_ids in the passed array of meters.
 		INNER JOIN unnest(meter_ids) meters(id) ON dr.meter_id = meters.id)
 		-- This sequence of joins takes the meter id to its unit and in the final join
