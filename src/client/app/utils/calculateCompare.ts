@@ -7,7 +7,7 @@ import * as moment from 'moment';
 import translate from '../utils/translate';
 
 /**
- * @enum {ComparePeriod} 'Day' or 'Week' or 'FourWeeks'
+ * @enum {ComparePeriod} 'Day', 'Week' or 'FourWeeks'
  */
 export enum ComparePeriod {
 	Day = 'Day',
@@ -15,7 +15,10 @@ export enum ComparePeriod {
 	FourWeeks = 'FourWeeks'
 }
 
-export enum SortingOrder {
+/**
+ * @enum {SortingOrder} 'Alphabetical', 'Ascending' or 'Descending'
+ */
+ export enum SortingOrder {
 	Alphabetical = 'Alphabetical',
 	Ascending = 'Ascending',
 	Descending = 'Descending'
@@ -96,8 +99,9 @@ export function calculateCompareTimeInterval(comparePeriod: ComparePeriod, curre
 	return compareTimeInterval;
 }
 
+// TODO This function does not appear to be used - should it be removed?
 /**
- * Converts a comparePeriod into a moment duration
+ * Converts a comparePeriod into a moment duration for the quality of the readings to use.
  * @param {ComparePeriod} comparePeriod The compare length
  * @returns {moment.Duration} The duration to compare
  */

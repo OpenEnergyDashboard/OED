@@ -133,7 +133,7 @@ export function isValidGPSInput(input: string): boolean {
  * @param {GPSPoint} opposite The GPS value for the opposite that was computed during calibration.
  * 	This is the top, right corner of the user map.
  * @param {Dimensions} size This is the size of the normalized map image.
- * @param {number} northAngle
+ * @param {number} northAngle The angle between true north and straight up on the map image.
  * @returns {MapScale} a pair {deltaX, deltaY} representing the GPS degree per unit (x, y)
  * 	on true north map grid.
  */
@@ -152,7 +152,7 @@ export function calculateScaleFromEndpoints(origin: GPSPoint, opposite: GPSPoint
  * @param {GPSPoint} gps The GPS coordinate to convert
  * @param {GPSPoint} originGPS The GPS value of the origin on the true north map.
  * @param {MapScale} scaleOfMap The GPS degree per unit x, y on the true north map.
- * @param {number} northAngle
+ * @param {number} northAngle The angle between true north and straight up on the map image.
  * @returns {CartesianPoint} x, y value of the gps point on the user map.
  */
 export function gpsToUserGrid(size: Dimensions, gps: GPSPoint, originGPS: GPSPoint, scaleOfMap: MapScale, northAngle: number): CartesianPoint {
@@ -178,7 +178,7 @@ export function gpsToUserGrid(size: Dimensions, gps: GPSPoint, originGPS: GPSPoi
  * one from each pair of calibration points. It returns all three of these values.
  * @param {CalibratedPoint[]} calibrationSet All the points clicked by the user for calibration.
  * @param {Dimensions} imageDimensions The dimensions of the original map to use from the user.
- * @param {number} northAngle
+ * @param {number} northAngle The angle between true north and straight up on the map image.
  * @returns {CalibrationResult} The error and the origin & opposite point in GPS to use for mapping.
  */
 export function calibrate(calibrationSet: CalibratedPoint[], imageDimensions: Dimensions, northAngle: number): CalibrationResult {
@@ -410,7 +410,7 @@ export function rotateShift(size: Dimensions, point: CartesianPoint, direction: 
  * Returns the origin of the user map converted to the true north map. Note that it is in
  * in the bottom, left on the user map but in the center on the true north map.
  * @param {Dimensions} size the normalized map dimensions
- * @param {number} northAngle
+ * @param {number} northAngle The angle between true north and straight up on the map image.
  * @returns {CartesianPoint} The origin coordinates on the true north map
  */
 export function trueNorthOrigin(size: Dimensions, northAngle: number): CartesianPoint {
@@ -425,7 +425,7 @@ export function trueNorthOrigin(size: Dimensions, northAngle: number): Cartesian
  * to the true north map. Note that it is in the top, right of the user map but
  * relative to the center on the true north map.
  * @param {Dimensions} size the normalized map dimensions
- * @param {number} northAngle
+ * @param {number} northAngle The angle between true north and straight up on the map image.
  * @returns {CartesianPoint} The opposite coordinates on the true north map
  */
 export function trueNorthOpposite(size: Dimensions, northAngle: number): CartesianPoint {

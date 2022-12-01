@@ -124,7 +124,7 @@ function receiveGroupCompareReadings(groupIDs: number[], timeInterval: TimeInter
 /**
  * @param {number} meterIDs the IDs of the meters to get readings
  * @param {ComparePeriod} comparePeriod the period over which to check
- * @param {number} unitID the ID of the unit for which to check
+ * @param {number} unitID the ID of the unit to get readings in
  */
 function fetchMeterCompareReadings(meterIDs: number[], comparePeriod: ComparePeriod, unitID: number): Thunk {
 	return async (dispatch: Dispatch, getState: GetState) => {

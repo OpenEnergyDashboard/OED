@@ -93,7 +93,7 @@ export function changeSelectedChildGroupsOfGroup(parentID: number, groupIDs: num
  * This is tracked on a per-group basis.
  * @param {number} parentID The ID of the group whose subgroups are being selected
  * @param {number[]} meterIDs The IDs of the new set of selected child meters
- * @returns {{type: string, parentID: *, meterIDs: *}}
+ * @returns {{type: string, parentID: number, meterIDs: [number]}}
  */
 export function changeSelectedChildMetersOfGroup(parentID: number, meterIDs: number[]): t.ChangeSelectedChildMetersPerGroupAction {
 	return { type: ActionType.ChangeSelectedChildMetersPerGroup, parentID, meterIDs };

@@ -106,7 +106,7 @@ export function submitPreferences() {
 
 /**
  * @param {State} state The redux state.
- * @returns {boolean} Whether the data is fetching
+ * @returns {boolean} Whether preferences are fetching
  */
 function shouldFetchPreferenceData(state: State): boolean {
 	return !state.admin.isFetching;
@@ -114,7 +114,7 @@ function shouldFetchPreferenceData(state: State): boolean {
 
 /**
  * @param {State} state The redux state.
- * @returns {boolean}
+ * @returns {boolean} Whether preferences are submitted
  */
 function shouldSubmitPreferenceData(state: State): boolean {
 	return !state.admin.submitted;
@@ -144,7 +144,7 @@ function updateCikAndDBViews(): t.UpdateCikAndDBViews {
 
 /**
  * @param {State} state The redux state.
- * @returns {boolean} Whether or not the views are updating
+ * @returns {boolean} Whether or not the Cik and views are updating
  */
 function shouldUpdateCikAndDBViews(state: State): boolean {
 	return !state.admin.isUpdatingCikAndDBViews;
