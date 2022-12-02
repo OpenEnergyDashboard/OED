@@ -119,7 +119,7 @@ function mapStateToProps(state: State) {
 							// This protects against there being no readings or that the data is being updated.
 							if (readingsData !== undefined && !readingsData.isFetching) {
 								// Meter name to include in hover on graph.
-								const label = state.meters.byMeterID[meterID].name;
+								const label = state.meters.byMeterID[meterID].identifier;
 								// The usual color for this meter.
 								colors.push(getGraphColor(meterID, DataType.Meter));
 								if (readingsData.readings === undefined) {

@@ -289,6 +289,7 @@ class UIOptionsComponent extends React.Component<UIOptionsPropsWithIntl, UIOptio
 
 	/**
 	 * Stores temporary barDuration until slider is released, used to update the UI of the slider
+	 * @param {number} value Bar duration to be stored
 	 */
 	private handleBarDurationChange(value: number) {
 		this.setState({ barDurationDays: value });

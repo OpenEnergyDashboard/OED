@@ -39,6 +39,16 @@ export default function MetersDetailComponent() {
 	const currentUser = useSelector((state: State) => state.currentUser.profile);
 	const loggedInAsAdmin = (currentUser !== null) && isRoleAdmin(currentUser.role);
 
+	// We only want displayable meters if non-admins because they still have
+	// non-displayable in state.
+	let visibleMeters
+	if (loggedInAsAdmin) {
+		visibleMeters = MetersState;
+	} else {
+		visibleMeters = _.filter(MetersState, (meter: MeterData) => {
+			return meter.displayable === true
+		});
+	}
 
 	// Units state
 	const units = useSelector((state: State) => state.units.units);
@@ -122,7 +132,7 @@ export default function MetersDetailComponent() {
 				{metersStateLoaded && unitsStateLoaded &&
 					<div className="card-container">
 						{/* Create a MeterViewComponent for each MeterData in Meters State after sorting by identifier */}
-						{Object.values(MetersState)
+						{Object.values(visibleMeters)
 							.sort((MeterA: MeterData, MeterB: MeterData) => (MeterA.identifier.toLowerCase() > MeterB.identifier.toLowerCase()) ? 1 :
 								((MeterB.identifier.toLowerCase() > MeterA.identifier.toLowerCase()) ? -1 : 0))
 							.map(MeterData => (<MeterViewComponent

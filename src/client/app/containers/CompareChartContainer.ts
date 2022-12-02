@@ -18,11 +18,14 @@ interface CompareChartContainerProps {
 	entity: CompareEntity;
 }
 
-/* Passes the current redux state of the of the chart container and it's props, and turns it into props for the React
-*  component, which is what will be visible on the page. Makes it possible to access
-*  your reducer state objects from within your React components.
-*
-*  Returns the props object. */
+/**
+ * Passes the current redux state of the of the chart container and it's props, and turns it into props for the React
+ * component, which is what will be visible on the page. Makes it possible to access
+ * your reducer state objects from within your React components.
+ * @param {State} state The redux state
+ * @param {CompareChartContainerProps} ownProps Chart container props
+ * @returns {*} The props object
+ */
 function mapStateToProps(state: State, ownProps: CompareChartContainerProps): any {
 	const comparePeriod = state.graph.comparePeriod;
 	const datasets: any[] = [];
@@ -94,7 +97,7 @@ function mapStateToProps(state: State, ownProps: CompareChartContainerProps): an
 
 	// Compose the text to display to the user.
 	const entity = ownProps.entity;
-	const changeSummary = getCompareChangeSummary(entity.change, entity.name, periodLabels);
+	const changeSummary = getCompareChangeSummary(entity.change, entity.identifier, periodLabels);
 
 	const barColor = 'rgba(218, 165, 32, 1)';
 

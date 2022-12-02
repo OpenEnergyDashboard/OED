@@ -93,6 +93,9 @@ async function createSchema(conn) {
 	await Conversion.createTable(conn);
 	await Cik.createTable(conn);
 	await Meter.createMeterTypesEnum(conn);
+	// This sql code creates a function to check meter's timezone.
+	// It needs to be called before meter table is created.
+	await conn.none(sqlFile('meter/check_timezone.sql'));
 	await Meter.createTable(conn);
 	await Reading.createTable(conn);
 	await User.createUserTypesEnum(conn);
