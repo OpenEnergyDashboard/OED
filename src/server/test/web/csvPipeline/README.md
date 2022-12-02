@@ -1477,7 +1477,7 @@ The script also describes how to delete all the meters/readings if you want to r
    </td>
     <td>X
    </td>
-   <td>Reading are end only but split into two files exactly when first hits the DST crossing. The first reading of the first file must be dropped for end only. The third reading of the first file crosses from DST and must be dropped. The first reading of file tow is also dropped. Reading 2 of the second file must be split. The readings are 23/1:23-1:46, 18/1:46-1:55, 69/1:55-2:18, 92/2:18-2:41.
+   <td>Reading are end only but split into two files exactly when first hits the DST crossing. The first reading of the first file must be dropped for end only. The third reading of the first file crosses from DST and must be dropped. The first reading of file two is also dropped. Reading 2 of the second file must be split. The readings are 23/1:23-1:46, 18/1:46-1:55, 69/1:55-2:18, 92/2:18-2:41.
    </td>
    </tr>
    <tr>
