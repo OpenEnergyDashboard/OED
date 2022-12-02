@@ -26,8 +26,8 @@ const moment = require('moment');
 const ETERNITY = TimeInterval.unbounded();
 // Readings should be accurate to many decimal places, but allow some wiggle room for database and javascript conversions
 const DELTA = 0.0000001;
-const METER_ID = 1;
-const GROUP_ID = 1;
+const METER_ID = 100;
+const GROUP_ID = 100;
 // Some common HTTP status response codes
 const HTTP_CODE = {
 	OK: 200,
