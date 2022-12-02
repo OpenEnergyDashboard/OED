@@ -42,7 +42,7 @@ export function updateBarDuration(barDuration: moment.Duration): t.UpdateBarDura
 	return { type: ActionType.UpdateBarDuration, barDuration };
 }
 
-export function updateLineGraphRate(lineGraphRate: t.LineGraphRate) {
+export function updateLineGraphRate(lineGraphRate: t.LineGraphRate): t.UpdateLineGraphRate {
 	return { type: ActionType.UpdateLineGraphRate, lineGraphRate }
 }
 
@@ -214,7 +214,7 @@ export function changeOptionsFromLink(options: LinkOptions) {
 	const dispatchFirst: Thunk[] = [setHotlinkedAsync(true)];
 	const dispatchSecond: Array<Thunk | t.ChangeChartToRenderAction | t.ChangeBarStackingAction
 	| t.ChangeGraphZoomAction | t.ChangeCompareSortingOrderAction | t.SetOptionsVisibility
-	| m.UpdateSelectedMapAction> = [];
+	| m.UpdateSelectedMapAction | t.UpdateLineGraphRate> = [];
 
 	if (options.meterIDs) {
 		dispatchFirst.push(fetchMetersDetailsIfNeeded());
