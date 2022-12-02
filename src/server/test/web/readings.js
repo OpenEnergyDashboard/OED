@@ -7,11 +7,10 @@
 	see: https://github.com/OpenEnergyDashboard/DevDocs/blob/main/testing/testing.md for information on loading readings test data
 
 	Directions for creating reading tests (not needed for rejection tests)
-		1) Download csv files from DevDocs (link above) and add to a readingsData folder in this directory (src/server/test/web/readingsData)
-		2) define arrays of data for units, conversions, a test meter using testing csv (optionally a second test meter and group for group testing)
-		3) load these arrays by invoking prepareTest(* defined data arrays *)
-		4) create an array of values using the expected values csv by calling parseExpectedCsv on the file and assigning the return value
-		5) write your test using expectReadingToEqualExpected to check the values and createTimeString
+		1) define arrays of data for units, conversions, a test meter using testing csv (optionally a second test meter and group for group testing)
+		2) load these arrays by invoking prepareTest(* defined data arrays *)
+		3) create an array of values using the expected values csv by calling parseExpectedCsv on the file and assigning the return value
+		4) write your test using expectReadingToEqualExpected to check the values and createTimeString
 */
 
 const { chai, mocha, expect, app, testDB, recreateDB } = require('../common');
