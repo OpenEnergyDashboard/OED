@@ -23,8 +23,10 @@ function mapStateToProps(state: State) {
 		linkText += `groupIDs=${state.graph.selectedGroups.toString()}&`;
 	}
 	const unitID = state.graph.selectedUnit;
+	//const rate = state.graph.lineGraphRate.rate.toString();
 	linkText += `unitID=${unitID.toString()}&`;
-	//linkText += `rate=${state.units.units[unitID].secInRate}&`;//fix this
+	linkText += `rate=${state.graph.lineGraphRate.label.toString()},${state.graph.lineGraphRate.rate.toString()}&`;
+	// linkText += `rate=${state.units.units[unitID].secInRate}&`;
 	linkText += `chartType=${state.graph.chartToRender}`;
 	// weeklyLink = linkText + '&serverRange=7dfp'; // dfp: days from present;
 	linkText += `&serverRange=${state.graph.timeInterval.toString()}`;

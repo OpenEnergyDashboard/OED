@@ -193,6 +193,7 @@ export interface LinkOptions {
 	meterIDs?: number[];
 	groupIDs?: number[];
 	unitID?: number;
+	rate?: t.LineGraphRate;
 	chartType?: t.ChartTypes;
 	barDuration?: moment.Duration;
 	serverRange?: TimeInterval;
@@ -227,6 +228,9 @@ export function changeOptionsFromLink(options: LinkOptions) {
 		dispatchFirst.push(fetchUnitsDetailsIfNeeded());
         dispatchSecond.push(changeSelectedUnit(options.unitID));
     }
+	if (options.rate) {
+		dispatchSecond.push(updateLineGraphRate(options.rate));
+	}
 	if (options.chartType) {
 		dispatchSecond.push(changeChartToRender(options.chartType));
 	}
