@@ -85,12 +85,12 @@ function expectReadingToEqualExpected(res, expected) {
 /**
  * Create an ISO standard date range to use as a timeInterval query for the API
  * @param {string} startDay formatted as YYYY-MM-DD
- * @param {string} startTime Optional, defaults to '00:00:00'
+ * @param {string} startTime formatted as HH:MM:SS
  * @param {string} endDay formatted as YYYY-MM-DD
- * @param {string} endTime Optional, defaults to '00:00:00'
+ * @param {string} endTime formatted as HH:MM:SS
  * @returns {string} a string with the format '20XX-XX-XXT00:00:00Z_20XX-XX-XXT00:00:00Z'
  */
-function createTimeString(startDay, startTime = '00:00:00', endDay, endTime = '00:00:00') {
+function createTimeString(startDay, startTime, endDay, endTime) {
 	const dateString = new TimeInterval(moment(startDay + ' ' + startTime), moment(endDay + ' ' + endTime));
 	return dateString.toString();
 }
@@ -180,9 +180,8 @@ mocha.describe('readings API', () => {
 						'special meter', 'test/web/readingsData/readings_ri_15_days_75.csv', false, METER_ID]];
 					await prepareTest(unitData, conversionData, meterData);
 					const expected = await parseExpectedCsv('src/server/test/web/readingsData/expected_ri_15_mu_kWh_gu_kWh_st_2022-08-25%00#00#00_et_2022-10-25%00#00#00.csv');
-					// Note that createTimeString does not require date and time; time can be omitted for 00:00:00
 					const res = await chai.request(app).get(`/api/unitReadings/line/meters/${METER_ID}`)
-						.query({ timeInterval: createTimeString('2022-08-25', '2022-10-25'), graphicUnitId: 1 });
+						.query({ timeInterval: createTimeString('2022-08-25', '00:00:00', '2022-10-25', '00:00:00'), graphicUnitId: 1 });
 					expectReadingToEqualExpected(res, expected);
 				});
 				// 60 days gives hourly points & middle readings
@@ -197,7 +196,7 @@ mocha.describe('readings API', () => {
 					await prepareTest(unitData, conversionData, meterData);
 					const expected = await parseExpectedCsv('src/server/test/web/readingsData/expected_ri_15_mu_kWh_gu_kWh_st_2022-08-25%00#00#00_et_2022-10-24%00#00#00.csv');
 					const res = await chai.request(app).get(`/api/unitReadings/line/meters/${METER_ID}`)
-						.query({ timeInterval: createTimeString('2022-08-25', '2022-10-24'), graphicUnitId: 1 });
+						.query({ timeInterval: createTimeString('2022-08-25', '00:00:00', '2022-10-24', '00:00:00'), graphicUnitId: 1 });
 					expectReadingToEqualExpected(res, expected);
 				});
 				// TODO need the proper csv files for the flow and raw units
