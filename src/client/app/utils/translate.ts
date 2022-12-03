@@ -9,6 +9,12 @@ import store from '../index';
 const enum AsTranslated {}
 export type TranslatedString = string & AsTranslated;
 
+/**
+ * Translate a message
+ *
+ * @param {string} messageID get identifier for a message
+ * @returns {TranslatedString} get translated string from original string
+ */
 export default function translate(messageID: string): TranslatedString {
 
 	// TODO BANDAID FIX
