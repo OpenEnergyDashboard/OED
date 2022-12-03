@@ -20,7 +20,7 @@ export class ConversionArray {
 	}
 
 	/**
-	 * @returns returns true if pik has values and false if not yet filled in.
+	 * @returns {boolean} returns true if pik has values and false if not yet filled in.
 	 */
 	static pikAvailable() {
 		return this.available;

@@ -11,6 +11,9 @@ import translate from '../utils/translate';
 import { updateLineGraphRate } from '../actions/graph'
 import { LineGraphRate, LineGraphRates } from '../types/redux/graph';
 
+/**
+ * React component that controls the line graph rate menu
+ */
 export default function GraphicRateMenuComponent() {
 	const dispatch = useDispatch();
 
