@@ -24,7 +24,7 @@ export function setIntersect(setA: Set<number>, setB: Set<number>): Set<number> 
  * Takes a set of meter ids and returns the set of compatible unit ids.
  *
  * @param {Set<number>} meters The set of meter ids.
- * @returns {Set<number>} set of compatible unit ids
+ * @returns {Set<number>} Set of compatible unit ids.
  */
 export function unitsCompatibleWithMeters(meters: Set<number>): Set<number> {
 	const state = store.getState();
@@ -92,7 +92,7 @@ export function unitsCompatibleWithUnit(unitId: number): Set<number> {
  * Returns the row index in Pik for a meter unit.
  *
  * @param {number} unitId The unit id.
- * @returns {number} the row indix in Pik for given meter unit
+ * @returns {number} The row index in Pik for given meter unit.
  */
 export function pRowFromUnit(unitId: number): number {
 	const state = store.getState();
@@ -107,7 +107,7 @@ export function pRowFromUnit(unitId: number): number {
  * Returns the unit id given the row in Pik.
  *
  * @param {number} row The row to find the associated unit.
- * @returns {number} the unit id given the row in Pik units
+ * @returns {number} The unit id given the row in Pik units.
  */
 export function unitFromPRow(row: number): number {
 	const state = store.getState();
@@ -122,7 +122,7 @@ export function unitFromPRow(row: number): number {
  * Returns the unit id given the column in Pik.
  *
  * @param {number} column The column to find the associated unit.
- * @returns {number} unit id given row in Pik
+ * @returns {number} Unit id.
  */
 export function unitFromPColumn(column: number): number {
 	const state = store.getState();
@@ -137,7 +137,7 @@ export function unitFromPColumn(column: number): number {
  * Returns the set of meters's ids associated with the groupId used.
  *
  * @param {number} groupId The groupId.
- * @returns {Set<number>} the set of deep children of this group
+ * @returns {Set<number>} The set of deep children of this group.
  */
 export function metersInGroup(groupId: number): Set<number> {
 	const state = store.getState();

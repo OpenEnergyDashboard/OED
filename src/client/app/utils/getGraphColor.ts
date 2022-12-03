@@ -32,7 +32,7 @@ const graphColorsReversed = [...graphColors].reverse();
  * @param {number} colorID the number of the meter or group to be graphed. Starts at '1' for both meters and groups
  * and increases as more meters or groups respectively need to be graphed.
  * @param {DataType} type either 'DataType.Meter' or 'DataType.Group' depending on the type of the data to be graphed
- * @returns {string} xxxxxx
+ * @returns {string} Hex color
  */
 export default function getGraphColor(colorID: number, type: DataType): string {
 	// Shifts indices of positive IDs down by 1 since expect IDs to start at 1, and additionally maps unlikely
