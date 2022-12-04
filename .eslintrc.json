@@ -12,7 +12,7 @@
         "eslint:recommended",
         "plugin:@typescript-eslint/recommended"
         // uncomment this to enforce eslint-plugin-jsdoc rules (and add comma above)
-        // along with the plugings below for jsdoc.
+        // along with the plugins below for jsdoc.
         //the line of code below is in regards to https://github.com/OpenEnergyDashboard/OED/issues/396 
         // "plugin:jsdoc/recommended"
     ],
@@ -35,6 +35,8 @@
         "indent": [
             "off"
         ],
+        // TODO: Decide whether this setting should be on or off
+        // "jsdoc/newline-after-description": 0,
         "@typescript-eslint/indent": [
             "error",
             "tab",
