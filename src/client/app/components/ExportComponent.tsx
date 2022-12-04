@@ -33,82 +33,80 @@ export default function ExportComponent(props: ExportProps) {
 	 * Called when Export button is clicked.
 	 * Passes an object containing the selected meter data to a function for export.
 	 */
-// Meters state
-const MetersState = useSelector((state: State) => state.meters.byMeterID);
-// Units state
-const units = useSelector((state: State) => state.units.units); 
+	// Meters state
+	const MetersState = useSelector((state: State) => state.meters.byMeterID);
+	// Units state
+	const units = useSelector((state: State) => state.units.units);
 
 	const exportReading = () => {
-		var data = []
-		//using a loop to push objects one at a time into data to be organized and formated for export 
+		const data = []
+		//using a loop to push objects one at a time into data to be organized and formated for export
 		for(let i = 0; i < props.exportVals.datasets.length; i++){
-			 data.push(props.exportVals.datasets[i]);
+			data.push(props.exportVals.datasets[i]);
 
-		// Sort the dataset based on the start time
-		data.forEach(reading => {
-			if (reading !== undefined) {
-				reading.exportVals.sort((a, b) => {
-					if (a.x < b.x) {
-						return -1;
+			// Sort the dataset based on the start time
+			data.forEach(reading => {
+				if (reading !== undefined) {
+					reading.exportVals.sort((a, b) => {
+						if (a.x < b.x) {
+							return -1;
+						}
+						return 1;
+					})
+				}
+			})
+
+			// Determine and format the first time in the dataset
+			// These values are already UTC so they are okay. Why has not been tracked down.
+			let startTime = moment(data[0].exportVals[0].x);
+			for (const reading of data) {
+				if (reading !== undefined) {
+					const startTimeOfDataset = moment(reading.exportVals[0].x);
+					if (startTime.isAfter(startTimeOfDataset)) {
+						startTime = startTimeOfDataset;
 					}
-					return 1;
-				})
-			}
-		})
-
-		// Determine and format the first time in the dataset
-		// These values are already UTC so they are okay. Why has not been tracked down.
-		let startTime = moment(data[0].exportVals[0].x);
-		for (const reading of data) {
-			if (reading !== undefined) {
-				const startTimeOfDataset = moment(reading.exportVals[0].x);
-				if (startTime.isAfter(startTimeOfDataset)) {
-					startTime = startTimeOfDataset;
 				}
 			}
-		}
 
-		// Determine and format the last time in the dataset
-		let endTime = moment(data[0].exportVals[data[0].exportVals.length - 1].x);
-		for (const reading of data) {
-			if (reading !== undefined) {
-				const endTimeOfDataset = moment(reading.exportVals[reading.exportVals.length - 1].x);
-				if (endTimeOfDataset.isAfter(endTime)) {
-					endTime = endTimeOfDataset;
+			// Determine and format the last time in the dataset
+			let endTime = moment(data[0].exportVals[data[0].exportVals.length - 1].x);
+			for (const reading of data) {
+				if (reading !== undefined) {
+					const endTimeOfDataset = moment(reading.exportVals[reading.exportVals.length - 1].x);
+					if (endTimeOfDataset.isAfter(endTime)) {
+						endTime = endTimeOfDataset;
+					}
 				}
 			}
+			// Use regex to remove commas and replace spaces/colons/hyphens with underscores
+			const startTimeString = startTime.utc().format('LL_LTS').replace(/,/g, '').replace(/[\s:-]/g, '_');
+			const endTimeString = endTime.utc().format('LL_LTS').replace(/,/g, '').replace(/[\s:-]/g, '_');
+			const chartName = data[0].currentChart;
+			const meterName = data[0].label;
+			const unit = data[0].unit;
+			const name = `oedExport_${chartName}_${startTimeString}_to_${endTimeString}_${meterName}_${unit}.csv`;
+			graphExport(data, name);
+			//clear out exported data so a new object can be pushed in
+			data.splice(0,data.length);
 		}
-		// Use regex to remove commas and replace spaces/colons/hyphens with underscores
-		const startTimeString = startTime.utc().format('LL_LTS').replace(/,/g, '').replace(/[\s:-]/g, '_');
-		const endTimeString = endTime.utc().format('LL_LTS').replace(/,/g, '').replace(/[\s:-]/g, '_');
-		const chartName = data[0].currentChart;
-		const meterName = data[0].label;
-		const unit = data[0].unit;
-		const name = `oedExport_${chartName}_${startTimeString}_to_${endTimeString}_${meterName}_${unit}.csv`;
-		graphExport(data, name);
-		//clear out exported data so a new object can be pushed in 
-		data.splice(0,data.length);
-		} 
 	};
 
 	const exportRawReadings = async () => {
 		if (props.selectedMeters.length === 0)
 			return;
-		var data: number[] = []
-		
+		const data: number[] = []
 		for(let i = 0; i < props.selectedMeters.length; i++){
-		data.push(props.selectedMeters[i]);
-			 
-		 const meterID = MetersState[props.selectedMeters[i]].unitId;
-		 const unitName = units[meterID].identifier;
+			data.push(props.selectedMeters[i]);
+			const meterID = MetersState[props.selectedMeters[i]].unitId;
+			const unitName = units[meterID].identifier;
 
-		const count = await metersApi.lineReadingsCount(props.selectedMeters, props.timeInterval);
-		graphRawExport(count, props.defaultWarningFileSize, props.defaultFileSizeLimit, async () => {
-			const lineReading = await metersApi.rawLineReadings(data, props.timeInterval);
-			downloadRawCSV(lineReading, props.defaultLanguage, unitName);
-		});
-		data.splice(0,data.length);
-		} 
+			const count = await metersApi.lineReadingsCount(props.selectedMeters, props.timeInterval);
+			graphRawExport(count, props.defaultWarningFileSize, props.defaultFileSizeLimit, async () => {
+				const lineReading = await metersApi.rawLineReadings(data, props.timeInterval);
+				downloadRawCSV(lineReading, props.defaultLanguage, unitName);
+			});
+			data.splice(0,data.length);
+		}
 	}
 
 	return (
