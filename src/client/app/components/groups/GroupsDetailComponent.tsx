@@ -14,7 +14,7 @@ import { State } from '../../types/redux/state';
 import { fetchGroupsDetailsIfNeeded } from '../../actions/groups';
 import GroupViewComponent from './GroupViewComponent';
 import CreateGroupModalComponent from './CreateGroupModalComponent';
-import { GroupDefinition } from 'types/redux/Groups';
+import { GroupDefinition } from 'types/redux/groups';
 
 export default function GroupsDetailComponent() {
 	// TODO The route stops you from getting to this page if not an admin.

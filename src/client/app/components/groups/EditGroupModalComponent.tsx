@@ -2,7 +2,7 @@
 * License, v. 2.0. If a copy of the MPL was not distributed with this
 * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
 import * as React from 'react';
-import store from '../../index';
+// TODO import store from '../../index';
 //Realize that * is already imported from react
 import { useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
@@ -50,8 +50,8 @@ function getGPSString(gps: GPSPoint | null) {
 interface EditGroupModalComponentProps {
 	show: boolean;
 	group: GroupDefinition;
-	childMeters: NamedIDItem[];
-	childGroups: NamedIDItem[];
+	// TODO childMeters: NamedIDItem[];
+	// TODO childGroups: NamedIDItem[];
 	// passed in to handle closing the modal
 	handleClose: () => void;
 }
@@ -63,11 +63,11 @@ export default function EditGroupModalComponent(props: EditGroupModalComponentPr
 	const currentUser = useSelector((state: State) => state.currentUser.profile);
 	const loggedInAsAdmin = (currentUser !== null) && isRoleAdmin(currentUser.role);
 
-	// Set existing unit values
+	// Set existing group values
 	const values = {
 		name: props.group.name,
-		childMeters: props.group.childMeters,
-		childGroups: props.group.childGroups,
+		// TODO childMeters: props.group.childMeters,
+		// TODO childGroups: props.group.childGroups,
 		displayable: props.group.displayable,
 		gps: props.group.gps,
 		note: props.group.note,
@@ -95,9 +95,9 @@ export default function EditGroupModalComponent(props: EditGroupModalComponentPr
 
 	// Reset the state to default values
 	// To be used for the discard changes button
-	// Different use case from CreateUnitModalComponent's resetState
+	// Different use case from CreateGroupModalComponent's resetState
 	// This allows us to reset our state to match the store in the event of an edit failure
-	// Failure to edit units will not trigger a re-render, as no state has changed. Therefore, we must manually reset the values
+	// Failure to edit groups will not trigger a re-render, as no state has changed. Therefore, we must manually reset the values
 	const resetState = () => {
 		setState(values);
 	}
@@ -137,7 +137,7 @@ export default function EditGroupModalComponent(props: EditGroupModalComponentPr
 
 		//Check if area is positive
 		//TODO object is possibly undefined
-		if (values.area < 0) {
+		if (state.area < 0) {
 			notifyUser(translate('area.invalid') + state.area + '.');
 			inputOk = false;
 		}
@@ -175,7 +175,7 @@ export default function EditGroupModalComponent(props: EditGroupModalComponentPr
 
 
 		if (inputOk) {
-			const submitState = { ...state, gps: gps };
+			// TODO const submitState = { ...state, gps: gps };
 
 			resetState();
 		} else {
@@ -194,7 +194,7 @@ export default function EditGroupModalComponent(props: EditGroupModalComponentPr
 	const tooltipStyle = {
 		display: 'inline-block',
 		fontSize: '60%',
-		tooltipEditUnitView: 'help.admin.groupedit'
+		tooltipEditGroupView: 'help.admin.groupedit'
 	};
 
 	const formInputStyle: React.CSSProperties = {
@@ -209,14 +209,14 @@ export default function EditGroupModalComponent(props: EditGroupModalComponentPr
 		<>
 			<Modal show={props.show} onHide={props.handleClose}>
 				<Modal.Header>
-					<Modal.Title> <FormattedMessage id="edit.unit" />
-						<TooltipHelpContainer page='units' />
+					<Modal.Title> <FormattedMessage id="edit.group" />
+						<TooltipHelpContainer page='groups' />
 						<div style={tooltipStyle}>
-							<TooltipMarkerComponent page='units' helpTextId={tooltipStyle.tooltipEditUnitView} />
+							<TooltipMarkerComponent page='groups' helpTextId={tooltipStyle.tooltipEditGroupView} />
 						</div>
 					</Modal.Title>
 				</Modal.Header>
-				{/* when any of the unit are changed call one of the functions. */}
+				{/* when any of the group are changed call one of the functions. */}
 				{loggedInAsAdmin && // only render when logged in as Admin
 					<Modal.Body className="show-grid">
 						<div id="container">
@@ -226,7 +226,7 @@ export default function EditGroupModalComponent(props: EditGroupModalComponentPr
 									<div style={tableStyle}>
 										{/* Name input */}
 										<div style={formInputStyle}>
-											<label><FormattedMessage id="unit.name" /></label><br />
+											<label><FormattedMessage id="group.name" /></label><br />
 											<Input
 												name='name'
 												type='text'
@@ -235,7 +235,7 @@ export default function EditGroupModalComponent(props: EditGroupModalComponentPr
 										</div>
 										{/* default graphic unit input */}
 										{/* TODO <div style={formInputStyle}>
-											<label><FormattedMessage id="meter.defaultGraphicUnit" /></label><br />
+											<label><FormattedMessage id="group.defaultGraphicUnit" /></label><br />
 											<Input
 												name='defaultGraphicUnit'
 												type='select'
@@ -258,7 +258,7 @@ export default function EditGroupModalComponent(props: EditGroupModalComponentPr
 										</div> */}
 										{/* Displayable input */}
 										<div style={formInputStyle}>
-											<label><FormattedMessage id="meter.displayable" /></label><br />
+											<label><FormattedMessage id="group.displayable" /></label><br />
 											<Input
 												name='displayable'
 												type='select'
@@ -271,7 +271,7 @@ export default function EditGroupModalComponent(props: EditGroupModalComponentPr
 										</div>
 										{/* Area input */}
 										<div style={formInputStyle}>
-											<label><FormattedMessage id="meter.area" /></label><br />
+											<label><FormattedMessage id="group.area" /></label><br />
 											<Input
 												name="area"
 												type="number"
@@ -282,7 +282,7 @@ export default function EditGroupModalComponent(props: EditGroupModalComponentPr
 										</div>
 										{/* GPS input */}
 										<div style={formInputStyle}>
-											<label><FormattedMessage id="meter.gps" /></label><br />
+											<label><FormattedMessage id="group.gps" /></label><br />
 											<Input
 												name='gps'
 												type='text'
@@ -291,7 +291,7 @@ export default function EditGroupModalComponent(props: EditGroupModalComponentPr
 										</div>
 										{/* Note input */}
 										<div style={formInputStyle}>
-											<label><FormattedMessage id="unit.note.optional" /></label><br />
+											<label><FormattedMessage id="group.note" /></label><br />
 											<Input
 												name='note'
 												type='textarea'
