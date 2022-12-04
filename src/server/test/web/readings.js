@@ -13,7 +13,7 @@
 		4) write your test using expectReadingToEqualExpected to check the values and createTimeString
 */
 
-const { chai, mocha, expect, app, testDB, recreateDB } = require('../common');
+const { chai, mocha, expect, app, testDB } = require('../common');
 const { TimeInterval } = require('../../../common/TimeInterval');
 const { insertUnits, insertConversions, insertMeters, insertGroups } = require('../../util/insertData');
 const Unit = require('../../models/Unit');
