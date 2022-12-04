@@ -69,8 +69,9 @@ mocha.describe('unit readings routes', () => {
 					{ reading: 1, startTimestamp: timeInterval.startTimestamp.valueOf(), endTimestamp: timeInterval.endTimestamp.valueOf() }
 				]
 			};
-
 			expect(response).to.deep.equal(expectedResponse);
+			// If the original function isn't restored, It can break other tests in OED
+			readingsStub.restore();
 		});
 	});
 	mocha.describe('the bar readings route', () => {
@@ -110,6 +111,8 @@ mocha.describe('unit readings routes', () => {
 			};
 
 			expect(response).to.deep.equal(expectedResponse);
+			// If the original function isn't restored, It can break other tests in OED
+			readingsStub.restore();
 		});
 	});
 });
