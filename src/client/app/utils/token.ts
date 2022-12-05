@@ -16,9 +16,9 @@ export function getToken(): string {
 }
 
 /**
- * Check if there has Token in local storage
+ * Check if there is a Token in local storage
  *
- * @returns {boolean} If has Token, return True; otherwise, catch the error
+ * @returns {boolean} If there is a Token, return True; otherwise return false
  */
 export function hasToken(): boolean {
 	try {

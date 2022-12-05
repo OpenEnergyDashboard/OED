@@ -64,8 +64,8 @@ export default function graphExport(dataSets: ExportDataSet[], name: string) {
 /**
  * Function to export raw data that we request on button click
  *
- * @param {string} items list of readings directly from the database
- * @param {RawReadings[]} defaultLanguage the preferred localization to use for date/time formatting
+ * @param {RawReadings[]} items list of readings directly from the database
+ * @param {string} defaultLanguage the preferred localization to use for date/time formatting
  */
 // below comment should be removed when we either remove defaultLanguage or implement it into the following function
 /* eslint-disable @typescript-eslint/no-unused-vars */
@@ -95,8 +95,8 @@ export function downloadRawCSV(items: RawReadings[], defaultLanguage: string) {
  * Function that adds a div to handle exporting raw data
  *
  * @param {number} count number of lines in the file
- * @param {number} warningFileSize size of warning file
- * @param {number} fileSizeLimit limit of file size
+ * @param {number} warningFileSize warningFileSize maximum size of file before warning the user before download
+ * @param {number} fileSizeLimit maximum file size that an non-authorized user can download
  * @param {Promise<void>} done async function that does another request to get all data then download it
  */
 // NOTE: This function is made with the idea that it will not be called very often
