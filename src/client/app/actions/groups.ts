@@ -9,6 +9,7 @@ import { showErrorNotification } from '../utils/notifications';
 import * as t from '../types/redux/groups';
 import { groupsApi } from '../utils/api';
 import { browserHistory } from '../utils/history';
+import { showSuccessNotification } from '../utils/notifications';
 import translate from '../utils/translate';
 import { GPSPoint } from 'utils/calibration';
 
@@ -269,20 +270,19 @@ function creatingNewGroup(state: State): boolean {
  */
 export function submitNewGroup(group: t.GroupData): Thunk {
 	return async (dispatch: Dispatch) => {
-		dispatch(markGroupInEditingSubmitted());
 		try {
 			await groupsApi.create(group);
-			dispatch(markGroupsOutdated());
-			dispatch((dispatch2: Dispatch) => {
-				dispatch2(markGroupInEditingClean());
-			});
-		} catch (e) {
-			dispatch(markGroupInEditingNotSubmitted());
-			if (e.response !== undefined && e.response.status === 400) {
-				showErrorNotification(translate('400'));
-			} else {
-				showErrorNotification(translate('failed.to.create.group'));
-			}
+			// Update the groups state from the database on a successful call
+			// In the future, getting rid of this database fetch and updating the store on a successful API call would make the page faster
+			// However, since the database currently assigns the id to the GroupData
+			dispatch(fetchGroupsDetails());
+			showSuccessNotification(translate('group.successfully.create.group'));
+		} catch (err) {
+			// Failure! ):
+			// TODO Better way than popup with React but want to stay so user can read/copy.
+			window.alert(translate('group.failed.to.edit.group') + '"' + err.response.data as string + '"');
+			// Clear our changes from to the submitting meters state
+			// We must do this in case fetch failed to keep the store in sync with the database
 		}
 	};
 }
@@ -297,6 +297,7 @@ export function submitGroupEdits(group: t.GroupData & t.GroupID): Thunk {
 			dispatch((dispatch2: Dispatch) => {
 				dispatch2(markGroupInEditingClean());
 			});
+			// TODO change to new translation names when edit
 		} catch (e) {
 			dispatch(markGroupInEditingNotSubmitted());
 			if (e.response.data.message && e.response.data.message === 'Cyclic group detected') {

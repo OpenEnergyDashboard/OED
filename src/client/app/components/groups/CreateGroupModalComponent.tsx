@@ -15,7 +15,7 @@ import TooltipHelpContainer from '../../containers/TooltipHelpContainer';
 import { TrueFalseType } from '../../types/items';
 import { GPSPoint, isValidGPSInput } from '../../utils/calibration';
 import { isRoleAdmin } from '../../utils/hasPermissions';
-// TODO import { submitNewGroup } from '../../actions/groups';
+import { submitNewGroup } from '../../actions/groups';
 
 // Notifies user of msg.
 // TODO isValidGPSInput uses alert so continue that. Maybe all should be changed but this impacts other parts of the code.
@@ -26,7 +26,7 @@ function notifyUser(msg: string) {
 }
 
 export default function CreateGroupModalComponent() {
-	// TODO const dispatch = useDispatch();
+	const dispatch = useDispatch();
 
 	// Check for admin status
 	const currentUser = useSelector((state: State) => state.currentUser.profile);
@@ -38,7 +38,13 @@ export default function CreateGroupModalComponent() {
 		gps: '',
 		note: '',
 		area: 0,
-		defaultGraphicUnit: -999,
+		// TODO need to get correct once have correct menus to choose
+		// childMeters: [],
+		// childGroups: [],
+		childMeters: [1],
+		childGroups: [1],
+		// TODO defaultGraphicUnit: -999,
+		defaultGraphicUnit: 1,
 		id: -99
 	}
 
@@ -131,8 +137,8 @@ export default function CreateGroupModalComponent() {
 			// The input passed validation.
 			// Submit new group if checks where ok.
 			// GPS may have been updated so create updated state to submit.
-			// TODO const submitState = { ...state, gps: gps };
-			// TODO dispatch(submitNewGroup(submitState)); // TODO
+			const submitState = { ...state, gps: gps };
+			dispatch(submitNewGroup(submitState));
 			resetState();
 		} else {
 			// Tell user that not going to update due to input issues.

@@ -13,6 +13,7 @@ const adminAuthenticator = require('./authenticator').adminAuthMiddleware;
 const optionalAuthenticator = require('./authenticator').optionalAuthMiddleware;
 const { log } = require('../log');
 const Point = require('../models/Point');
+const { failure, success } = require('./response');
 
 const router = express.Router();
 router.use(optionalAuthenticator);
@@ -153,9 +154,10 @@ router.get('/deep/meters/:group_id', async (req, res) => {
 router.post('/create', adminAuthenticator('create groups'), async (req, res) => {
 	const validGroup = {
 		type: 'object',
-		maxProperties: 7,
+		maxProperties: 9,
 		required: ['name', 'childGroups', 'childMeters'],
 		properties: {
+			id: { type: 'integer' },
 			name: {
 				type: 'string',
 				minLength: 1
@@ -201,25 +203,28 @@ router.post('/create', adminAuthenticator('create groups'), async (req, res) => 
 				items: {
 					type: 'integer'
 				}
-			}
+			},
+			defaultGraphicUnit: { type: 'integer' }
 		}
 	};
 
-	if (!validate(req.body, validGroup).valid) {
+	const validationResult = validate(req.body, validGroup);
+	if (!validationResult.valid) {
+		log.error(`Invalid input for groupAPI. ${validationResult.errors}`);
 		res.sendStatus(400);
 	} else {
 		const conn = getConnection();
 		try {
 			await conn.tx(async t => {
 				const newGPS = (req.body.gps) ? new Point(req.body.gps.longitude, req.body.gps.latitude) : null;
-				// TODO: pass arguments for units
 				const newGroup = new Group(
 					undefined,
 					req.body.name,
 					req.body.displayable,
 					newGPS,
 					req.body.note,
-					req.body.area
+					req.body.area,
+					req.body.defaultGraphicUnit
 				);
 
 				await newGroup.insert(t);
@@ -227,13 +232,13 @@ router.post('/create', adminAuthenticator('create groups'), async (req, res) => 
 				const adoptMetersQuery = req.body.childMeters.map(mid => newGroup.adoptMeter(mid, t));
 				return t.batch(_.flatten([adoptGroupsQuery, adoptMetersQuery]));
 			});
-			res.sendStatus(200);
+			success(res);
 		} catch (err) {
 			if (err.toString() === 'error: duplicate key value violates unique constraint "groups_name_key"') {
-				res.status(400).json({ error: `Group "${req.body.name}" is already in use.` });
+				failure(res, 400, err.toString() + ' with detail ' + err['detail']);
 			} else {
 				log.error(`Error while inserting new group ${err}`, err);
-				res.sendStatus(500);
+				failure(res, 500, err.toString() + ' with detail ' + err['detail']);
 			}
 		}
 	}
