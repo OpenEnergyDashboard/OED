@@ -7,9 +7,9 @@ import * as React from 'react';
 import { useState } from 'react';
 import { Button } from 'reactstrap';
 import { FormattedMessage } from 'react-intl';
-// TODO import EditGroupModalComponent from './EditGroupModalComponent';
+import EditGroupModalComponent from './EditGroupModalComponent';
 import '../../styles/card-page.css';
-import { GroupDefinition } from 'types/redux/Groups';
+import { GroupDefinition } from 'types/redux/groups';
 import translate from '../../utils/translate';
 import { GPSPoint } from '../../utils/calibration';
 
@@ -78,13 +78,13 @@ export default function GroupViewComponent(props: GroupViewComponentProps) {
 			</div>
 			<div className="edit-btn">
 				<Button variant="Secondary" onClick={handleShow}>
-					<FormattedMessage id="edit.unit" />
+					<FormattedMessage id="edit.group" />
 				</Button>
 				{/* Creates a child UnitModalEditComponent */}
-				{/* <EditUnitModalComponent
+				<EditGroupModalComponent
 					show={showEditModal}
-					unit={props.unit}
-					handleClose={handleClose} /> */}
+					group={props.group}
+					handleClose={handleClose} />
 			</div>
 		</div>
 	);

@@ -25,7 +25,7 @@ function notifyUser(msg: string) {
 	window.alert(msg);
 }
 
-export default function CreateUnitModalComponent() {
+export default function CreateGroupModalComponent() {
 	const dispatch = useDispatch();
 
 	// Check for admin status
@@ -38,7 +38,13 @@ export default function CreateUnitModalComponent() {
 		gps: '',
 		note: '',
 		area: 0,
-		defaultGraphicUnit: -999,
+		// TODO need to get correct once have correct menus to choose
+		// childMeters: [],
+		// childGroups: [],
+		childMeters: [1],
+		childGroups: [1],
+		// TODO defaultGraphicUnit: -999,
+		defaultGraphicUnit: 1,
 		id: -99
 	}
 
@@ -94,9 +100,9 @@ export default function CreateUnitModalComponent() {
 		}
 
 		// TODO is -99 okay - do we need to fix
-		// A meter default graphic unit must be selected.
+		// A group default graphic unit must be selected.
 		if (state.defaultGraphicUnit === -999) {
-			notifyUser(translate('meter.graphic.invalid'));
+			notifyUser(translate('group.graphic.invalid'));
 			inputOk = false;
 		}
 
@@ -122,7 +128,7 @@ export default function CreateUnitModalComponent() {
 				// GPS not okay. Only true if some input.
 				// TODO isValidGPSInput currently pops up an alert so not doing it here, may change
 				// so leaving code commented out.
-				// notifyUser(translate('input.gps.range') + state.gps + '.');
+				notifyUser(translate('input.gps.range') + state.gps + '.');
 				inputOk = false;
 			}
 		}
@@ -132,7 +138,7 @@ export default function CreateUnitModalComponent() {
 			// Submit new group if checks where ok.
 			// GPS may have been updated so create updated state to submit.
 			const submitState = { ...state, gps: gps };
-			//  TODO dispatch(submitNewGroup(submitState)); // TODO
+			dispatch(submitNewGroup(submitState));
 			resetState();
 		} else {
 			// Tell user that not going to update due to input issues.
@@ -143,7 +149,7 @@ export default function CreateUnitModalComponent() {
 	const tooltipStyle = {
 		display: 'inline-block',
 		fontSize: '60%',
-		tooltipCreateUnitView: 'help.admin.groupcreate'
+		tooltipCreateGroupView: 'help.admin.groupcreate'
 	};
 
 	const formInputStyle: React.CSSProperties = {
@@ -163,14 +169,14 @@ export default function CreateUnitModalComponent() {
 
 			<Modal show={showModal} onHide={handleClose}>
 				<Modal.Header>
-					<Modal.Title> <FormattedMessage id="create.unit" />
-						<TooltipHelpContainer page='units' />
+					<Modal.Title> <FormattedMessage id="create.group" />
+						<TooltipHelpContainer page='groups' />
 						<div style={tooltipStyle}>
-							<TooltipMarkerComponent page='units' helpTextId={tooltipStyle.tooltipCreateUnitView} />
+							<TooltipMarkerComponent page='groups' helpTextId={tooltipStyle.tooltipCreateGroupView} />
 						</div>
 					</Modal.Title>
 				</Modal.Header>
-				{/* when any of the unit properties are changed call one of the functions. */}
+				{/* when any of the group properties are changed call one of the functions. */}
 				{loggedInAsAdmin && // only render when logged in as Admin
 					<Modal.Body className="show-grid">
 						<div id="container">
@@ -180,7 +186,7 @@ export default function CreateUnitModalComponent() {
 									<div style={tableStyle}>
 										{/* Name input */}
 										<div style={formInputStyle}>
-											<label><FormattedMessage id="unit.name" /></label><br />
+											<label><FormattedMessage id="group.name" /></label><br />
 											<Input
 												name='name'
 												type='text'
@@ -189,7 +195,7 @@ export default function CreateUnitModalComponent() {
 										</div>
 										{/* default graphic unit input */}
 										{/* TODO <div style={formInputStyle}>
-											<label><FormattedMessage id="meter.defaultGraphicUnit" /></label><br />
+											<label><FormattedMessage id="group.defaultGraphicUnit" /></label><br />
 											<Input
 												name='defaultGraphicUnit'
 												type='select'
@@ -212,7 +218,7 @@ export default function CreateUnitModalComponent() {
 										</div> */}
 										{/* Displayable input */}
 										<div style={formInputStyle}>
-											<label><FormattedMessage id="meter.displayable" /></label><br />
+											<label><FormattedMessage id="group.displayable" /></label><br />
 											<Input
 												name='displayable'
 												type='select'
@@ -225,7 +231,7 @@ export default function CreateUnitModalComponent() {
 										</div>
 										{/* Area input */}
 										<div style={formInputStyle}>
-											<label><FormattedMessage id="meter.area" /></label><br />
+											<label><FormattedMessage id="group.area" /></label><br />
 											<Input
 												name="area"
 												type="number"
@@ -236,7 +242,7 @@ export default function CreateUnitModalComponent() {
 										</div>
 										{/* GPS input */}
 										<div style={formInputStyle}>
-											<label><FormattedMessage id="meter.gps" /></label><br />
+											<label><FormattedMessage id="group.gps" /></label><br />
 											<Input
 												name='gps'
 												type='text'
@@ -245,7 +251,7 @@ export default function CreateUnitModalComponent() {
 										</div>
 										{/* Note input */}
 										<div style={formInputStyle}>
-											<label><FormattedMessage id="unit.note.optional" /></label><br />
+											<label><FormattedMessage id="group.note" /></label><br />
 											<Input
 												name='note'
 												type='textarea'

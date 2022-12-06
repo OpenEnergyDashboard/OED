@@ -8,6 +8,13 @@ import { TranslatedString } from './translate';
 
 export type NotificationPosition = 'tr' | 'tl' | 'tc' | 'br' | 'bl' | 'bc';
 
+/**
+ * Show user the success notification
+ *
+ * @param {TranslatedString} message translation identifier for message to display
+ * @param {NotificationPosition} position screen position for notification where top, right is the default
+ * @param {number} autoDismiss seconds until notification goes away with default of 3 seconds
+ */
 export function showSuccessNotification(message: TranslatedString, position: NotificationPosition = 'tr', autoDismiss = 3) {
 	store.dispatch(showNotificationAction({
 		message,
@@ -17,6 +24,13 @@ export function showSuccessNotification(message: TranslatedString, position: Not
 	}));
 }
 
+/**
+ * Show user the error notification
+ *
+ * @param {TranslatedString} message translation identifier for message to display
+ * @param {NotificationPosition} position screen position for notification where top, right is the default
+ * @param {number} autoDismiss seconds until notification goes away with default of 3 seconds
+ */
 export function showErrorNotification(message: TranslatedString, position: NotificationPosition = 'tr', autoDismiss = 3) {
 	store.dispatch(showNotificationAction({
 		message,
