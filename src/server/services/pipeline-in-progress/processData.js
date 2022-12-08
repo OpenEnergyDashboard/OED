@@ -4,7 +4,6 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/.
  */
 
-const { is } = require('core-js/core/object');
 const moment = require('moment-timezone');
 const { log } = require('../../log');
 const Meter = require('../../models/Meter');

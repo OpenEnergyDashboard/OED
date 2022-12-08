@@ -4,7 +4,7 @@
 
 const express = require('express');
 const { CSVPipelineError } = require('./CustomErrors');
-const loadCsvInput = require('../pipeline-in-progress/loadCsvInput');
+const { loadCsvInput } = require('../pipeline-in-progress/loadCsvInput');
 const { TimeSortTypesJS, BooleanTypesJS } = require('./validateCsvUploadParams');
 const Meter = require('../../models/Meter');
 const { log } = require('../../log');

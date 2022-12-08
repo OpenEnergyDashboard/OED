@@ -21,7 +21,7 @@ async function refreshReadingViews() {
 
 	log.info('Refreshing Materialized Daily Reading Views');
 	await Reading.refreshDailyReadings(conn);
-	log.info('Views Refreshed');
+	log.info('Daily View Refreshed');
 }
 
 module.exports = { refreshReadingViews };
