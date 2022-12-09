@@ -20,7 +20,7 @@ const { getAllPaths } = require('./createConversionGraph');
 async function addNewUnitAndConversion(sourceId, destinationId, slope, intercept, unitName, unitIdentifier, graph, conn) {
 	const sourceUnit = await Unit.getById(sourceId, conn);
 	const destinationUnit = await Unit.getById(destinationId, conn);
-	// Add a new units where: name and identifier is unitName, type_of_unit is Unit.type.suffix,
+	// Add a new units where: name is unitName, identifier is unitIdentifier, type_of_unit is Unit.type.suffix,
 	// displayable and preferredDisplay is the same as destination.
 	// Note a type_of_unit of suffix is different than a unit with a suffix string.
 	// Note the admin can later change identifier, displayable and preferredDisplay to something else

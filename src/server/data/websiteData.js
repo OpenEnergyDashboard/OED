@@ -3,7 +3,10 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
 
 /**
- * This file creates the data and puts it in the DB for the OED website
+ * This file creates the data and puts it in the DB for the OED website.
+ * The needed CSV files with the meter data are not included in the OED
+ * distribution to save disk space. They are available in the devDocs
+ * for developers.
  */
 
 const Unit = require('../models/Unit');
