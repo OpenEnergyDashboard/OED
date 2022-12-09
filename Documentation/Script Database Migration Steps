@@ -6,7 +6,7 @@ The following steps are meant to migrate OED's Postgres version across multiple 
 
 ## Running the first script
 
-The first script is called ``` migrateDatabase.sh ``` and is located in the ``` src/scripts ``` folder. Run the script in the main OED directory by running the command ``` ./src/sripts/migrateDatabase.sh ``` or ``` bash src/sripts/migrateDatabase.sh ``` if the first command doesn't work.
+The first script is called ``` dumpDatabase.sh ``` and is located in the ``` src/scripts ``` folder. Run the script in the main OED directory by running the command ``` ./src/sripts/dumpDatabase.sh ``` or ``` bash src/sripts/dumpDatabase.sh ``` if the first command doesn't work.
 
 The script will then run the first steps of the manual migration, eventually prompting the user to reset the passwords for the database users oed and postgres. It will display the passwords that it should be reset to based on the enviroment variables, and the user must enter it in twice and make sure that no error messages occur. Afterwards, the script will create a database dump file called ``` script_database_dump.sql ```.
 
@@ -16,6 +16,6 @@ The first script requires OED to be running, but the sceond script requires OED 
 
 ## Running the second script
 
-The second script is called ``` restartDatabase.sh ``` and is also located in the ``` src/scripts ``` folder. Run the script in the main OED directory by running the command ``` ./src/sripts/restartDatabase.sh ``` or ``` bash src/sripts/restartDatabase.sh ``` if the first command doesn't work.
+The second script is called ``` restoreDatabase.sh ``` and is also located in the ``` src/scripts ``` folder. Run the script in the main OED directory by running the command ``` ./src/sripts/restoreDatabase.sh ``` or ``` bash src/sripts/restoreDatabase.sh ``` if the first command doesn't work.
 
 The second script will remove the postgres version 10.13 database container and bring up a container with postgres version 15.1. It will restore the dump to the new database container and bring it back down again, leaving OED in a shut down state. After script finishes running successfully, the migration is complete.
