@@ -141,9 +141,6 @@ mocha.describe('maps API', () => {
 					// Insert user
 					const password = 'password';
 					const hashedPassword = await bcrypt.hash(password, 10);
-					const unauthorizedUser = new User(undefined, `${role}@example.com`, hashedPassword, User.role[role]);
-					await unauthorizedUser.insert(conn);
-					unauthorizedUser.password = password;
 
 					// get maps
 					let res = await chai.request(app).get('/api/maps').set('token', token);
