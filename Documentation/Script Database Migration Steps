@@ -1,0 +1,23 @@
+# OED Script Database Migration Steps
+
+## Introduction
+
+The following steps are meant to migrate OED's Postgres version across multiple major versions, specifically from 10.13 to 15.1 with the help of a script to automate as much of the process as possible. Before starting, make sure OED and its Docker containers are running.
+
+## Running the script
+
+The script is called ``` migrateDatabase.sh ``` and is located in the ``` src/scripts ``` folder. Run the script in the main OED directory by running the command ``` bash src/sripts/migrateDatabase.sh ```
+
+The script will then run the steps of the manual migration, eventually prompting the user to reset the passwords for the database users. It will display the passwords that it should be reset to based on the enviroment variables, and the user must enter it in twice and make sure that no error messages occur. Afterwards, the script will create a database dump file called ``` script_database_dump.sql ```.
+
+## Restarting OED with a new Postgres version
+
+After the script is finished running, OED needs to be restarted to bring the postgres version up to the latest. If using the same installation of OED, first stop OED from running. If in VSCode, close the remote connection. Then, delete the ``` oed_database ``` Docker container and delete the ``` postgres-data ``` folder from the OED directory. The script will have changed the postgres version in the Dockerfile under ``` containers/database ``` from 10.13 to 15.1. Finally, reopen OED in container to bring it back up again.
+
+Alternatively, if using a new installation of OED, simply just change the Postgres version in the Dockerfile.
+
+After OED is running again, the Postgres version should now be 15.1, which can be checked by attaching a shell to the database container.
+
+## Restoring the dump file
+
+To put the contents of the dump into the new database, simply run the command ``` docker compose exec database psql -U postgres < script_database_dump.sql ```. Note that the connection to the database this time is being made with user postgres instead of oed. This is necessary in order to drop the existing databases created when OED initialized the new database. After the command finishes running, the migration is complete.
