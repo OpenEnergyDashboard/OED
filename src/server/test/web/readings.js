@@ -222,7 +222,7 @@ mocha.describe('readings API', () => {
 						.query({ timeInterval: createTimeString('2022-08-25', '00:00:00', '2022-10-24', '00:00:00'), graphicUnitId: unitId });
 					expectReadingToEqualExpected(res, expected);
 				});
-				// TODO need the proper csv files for the flow and raw units
+				// Test 15 minutes over all time for flow unit.
 				mocha.it('should have the expected readings for 15 minute reading intervals and flow units', async () => {
 					const unitData = [
 						['kW', '', Unit.unitRepresentType.FLOW, 3600, Unit.unitType.UNIT, '', Unit.displayableType.ALL, true, 'kilowatts'],
@@ -241,6 +241,7 @@ mocha.describe('readings API', () => {
 						.query({ timeInterval: ETERNITY.toString(), graphicUnitId: unitId });
 					expectReadingToEqualExpected(res, expected);
 				});
+				// Test 15 minutes over all time for raw unit.
 				mocha.it('should have the expected readings for 15 minute reading intervals and raw units', async () => {
 					const unitData = [
 						['C', '', Unit.unitRepresentType.RAW, 3600, Unit.unitType.UNIT, '', Unit.displayableType.ALL, true, 'Celsius'],

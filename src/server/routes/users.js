@@ -121,7 +121,7 @@ router.post('/create', adminAuthMiddleware('create a user.'), async (req, res) =
 			} else {
 				const hashedPassword = await bcrypt.hash(password, 10);
 				const user = new User(undefined, email, hashedPassword, role);
-				user.insert(conn);
+				await user.insert(conn);
 				res.sendStatus(200);
 			}
 		} catch (error) {
