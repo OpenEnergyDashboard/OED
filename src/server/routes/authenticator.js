@@ -80,7 +80,12 @@ function credentialsRequestValidationMiddleware(req, res, next) {
 async function verifyCredentials(email, password, returnUser = false) {
 	const conn = getConnection();
 	const user = await User.getByEmail(email, conn);
-	const isValid = await bcrypt.compare(password, user.passwordHash);
+	if (user === null) {
+		// User did not exist so return false.
+		isValid = false;
+	} else {
+		const isValid = await bcrypt.compare(password, user.passwordHash);
+	}
 	if (returnUser) {
 		return isValid && user;
 	} else {

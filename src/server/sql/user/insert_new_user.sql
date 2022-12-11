@@ -5,6 +5,4 @@
 DO $$ BEGIN
   INSERT INTO users(email, password_hash, role)
     VALUES (${email}, ${passwordHash}, ${role});
-EXCEPTION WHEN unique_violation THEN
-    -- Ignore duplicate inserts.
 END $$;
