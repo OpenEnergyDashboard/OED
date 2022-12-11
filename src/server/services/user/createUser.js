@@ -40,13 +40,15 @@ const { getConnection } = require('../../db');
 	const admin = new User(undefined, email, passwordHash, User.role.ADMIN);
 	const conn = getConnection();
 	try {
-		await admin.insert(conn);
-		// We could select to check if user already there to report separately but not
-		// doing since we don't do for createDB. This might be useful if we have issues
-		// around this insert.
-
-		// Insert did not report an error so user should be there. Return ok error code.
-		terminateReadline('User created or already exists', 0);
+		// Check if user already exists and only create if does not.
+		if (await User.getByEmail(admin.email, conn) === null) {
+			await admin.insert(conn);
+			// Return ok error code and user created.
+			terminateReadline(`User ${admin.email} created`, 0);
+		} else {
+			// Return ok error code and user existed.
+			terminateReadline(`User ${admin.email} existed so not created`, 0);
+		}
 	} catch (err) {
 		// Something went wrong with insertion so return error code.
 		// This assumes the err has a message. This could be done better.

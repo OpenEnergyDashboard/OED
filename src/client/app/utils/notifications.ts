@@ -31,7 +31,7 @@ export function showSuccessNotification(message: TranslatedString, position: Not
  * @param {NotificationPosition} position screen position for notification where top, right is the default
  * @param {number} autoDismiss seconds until notification goes away with default of 3 seconds
  */
-export function showErrorNotification(message: TranslatedString, position: NotificationPosition = 'tr', autoDismiss = 3) {
+export function showErrorNotification(message: TranslatedString, position: NotificationPosition = 'tr', autoDismiss = 15) {
 	store.dispatch(showNotificationAction({
 		message,
 		level: 'error',

@@ -54,7 +54,7 @@ export default class CreateUserFormContainer extends React.Component<{}>{
 				showSuccessNotification(translate('users.successfully.create.user'))
 				browserHistory.push('/users');
 			} catch (error) {
-				showErrorNotification(translate('users.failed.to.create.user'));
+				showErrorNotification(translate('users.failed.to.create.user') + ' with error: ' + error.response.data.message);
 			}
 		}
 	}
