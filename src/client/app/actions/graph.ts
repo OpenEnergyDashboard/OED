@@ -18,6 +18,7 @@ import { fetchNeededMapReadings } from './mapReadings';
 import { changeSelectedMap } from './map';
 import { fetchUnitsDetailsIfNeeded } from './units';
 
+
 export function changeChartToRender(chartType: t.ChartTypes): t.ChangeChartToRenderAction {
 	return { type: ActionType.ChangeChartToRender, chartType };
 }
