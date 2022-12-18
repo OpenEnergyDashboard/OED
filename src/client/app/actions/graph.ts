@@ -227,8 +227,8 @@ export function changeOptionsFromLink(options: LinkOptions) {
 	}
 	if (options.unitID) {
 		dispatchFirst.push(fetchUnitsDetailsIfNeeded());
-        dispatchSecond.push(changeSelectedUnit(options.unitID));
-    }
+		dispatchSecond.push(changeSelectedUnit(options.unitID));
+	}
 	if (options.rate) {
 		dispatchSecond.push(updateLineGraphRate(options.rate));
 	}
