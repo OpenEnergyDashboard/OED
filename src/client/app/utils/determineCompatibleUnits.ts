@@ -122,7 +122,7 @@ export function unitFromPRow(row: number): number {
  * Returns the unit id given the column in Pik.
  *
  * @param {number} column The column to find the associated unit.
- * @returns {number} Unit id.
+ * @returns {number} The unit id given the column in Pik.
  */
 export function unitFromPColumn(column: number): number {
 	const state = store.getState();

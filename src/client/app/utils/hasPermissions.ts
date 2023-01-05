@@ -7,8 +7,8 @@ import { UserRole } from '../types/items';
 /**
  * Checks if the role A has the permission of the role B.
  *
- * @param {UserRole} userA variable for role A
- * @param {UserRole} userB variable for role B
+ * @param {UserRole} userA role for A
+ * @param {UserRole} userB role for B
  * @returns {boolean} Returns true if role A has permissions of role B
  */
 export function hasPermissions(user: UserRole, compareTo: UserRole): boolean {
