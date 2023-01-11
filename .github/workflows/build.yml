@@ -50,6 +50,10 @@ jobs:
           git init
           git add .
 
+      - name: add testing directory
+        run:
+          mkdir src/server/tmp/uploads/csvPipeline
+
       - name: Install dependencies
         run: npm ci
 
