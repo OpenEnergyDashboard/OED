@@ -62,7 +62,7 @@ export function unitsCompatibleWithMeters(meters: Set<number>): Set<number> {
  * Returns a set of units ids that are compatible with a specific unit id.
  *
  * @param {number} unitId The unit id.
- * @returns {Set<number>} set of units ids that are compatible with specified unit id
+ * @returns {Set<number>} Set of units ids that are compatible with specified unit id.
  */
 export function unitsCompatibleWithUnit(unitId: number): Set<number> {
 	// unitSet starts as an empty set.
