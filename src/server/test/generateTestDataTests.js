@@ -118,7 +118,7 @@ mocha.describe('Generate Sine wave', () => {
 		const data = generateSineData(startTimeStamp, endTimeStamp, { ...timeOptions, maxAmplitude: maxAmplitude * timeOptions.timeStep.minute / 60 });
 		await generateSine(startTimeStamp, endTimeStamp, { ...timeOptions, filename: path.join(__dirname, '../tmp/' + filename), maxAmplitude: maxAmplitude });
 		// https://stackabuse.com/reading-and-writing-csv-files-in-nodejs-with-node-csv/
-		const dataFromFile = await fs.readFile(path.join(__dirname, filename));
+		const dataFromFile = await fs.readFilepath.join(__dirname, '../tmp/' + filename);
 		const records = await parseCsv(dataFromFile);
 
 		// The first row is a header
