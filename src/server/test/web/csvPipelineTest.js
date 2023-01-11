@@ -38,6 +38,7 @@ mocha.describe('csv API', () => {
 				// It may indicate an issue with this test and one for zipped that similar.
 				.attach('csvfile', metersBuffer, `${metersPath}`)
 
+			console.log('res: ', res); // DEBUG
 			expect(res).to.have.status(200);
 			const csvMeters = (await parseCsv(metersBuffer)).map(row =>
 				(new Meter(undefined, row[0], row[1], row[2] === 'TRUE', row[3] === 'TRUE', row[4], row[5]))
