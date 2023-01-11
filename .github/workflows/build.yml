@@ -46,7 +46,7 @@ jobs:
 
       # Sets up the git repo so that scripts that depend on it will run
       - name: git init
-        run:
+        run: |
           git init
           git add .
 
