@@ -4,6 +4,8 @@
 
 /**
  * Returns the current page route
+ *
+ * @returns {string} return url
  */
 export default function getPage(): string {
 	const urlArr = window.location.href.split('/');

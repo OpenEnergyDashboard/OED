@@ -11,10 +11,10 @@ import translate from './translate';
 
 /**
  * Function to converts the meter readings into a CSV formatted string.
- * @param items The meter reading.
- * @returns output A string containing the CSV formatted meter readings.
+ *
+ * @param {ExportDataSet[]} items The meter reading.
+ * @returns {string} output A string containing the CSV formatted meter readings.
  */
-
 function convertToCSV(items: ExportDataSet[]) {
 	let csvOutput = 'Label,Readings,Start Timestamp,End Timestamp\n';
 	items.forEach(set => {
@@ -33,8 +33,9 @@ function convertToCSV(items: ExportDataSet[]) {
 
 /**
  * Function to download the formatted CSV file to the users computer.
- * @param inputCSV A String containing the formatted CSV data.
- * @param fileName A string representing the name of the file.
+ *
+ * @param {string} inputCSV A String containing the formatted CSV data.
+ * @param {string} fileName A string representing the name of the file.
  */
 function downloadCSV(inputCSV: string, fileName: string) {
 	const element = document.createElement('a');
@@ -51,8 +52,9 @@ function downloadCSV(inputCSV: string, fileName: string) {
 
 /**
  * Function to export readings from the graph currently displaying. May be used for routing if more export options are added
- * @param dataSets An Object. The readings from each meter currently selected in the graph.
- * @param name the name of the file.
+ *
+ * @param {ExportDataSet[]} dataSets An Object. The readings from each meter currently selected in the graph.
+ * @param {string} name the name of the file.
  */
 export default function graphExport(dataSets: ExportDataSet[], name: string) {
 	const dataToExport = convertToCSV(dataSets);
@@ -61,8 +63,9 @@ export default function graphExport(dataSets: ExportDataSet[], name: string) {
 
 /**
  * Function to export raw data that we request on button click
- * @param items list of readings directly from the database
- * @param defaultLanguage the preferred localization to use for date/time formatting
+ *
+ * @param {RawReadings[]} items list of readings directly from the database
+ * @param {string} defaultLanguage the preferred localization to use for date/time formatting
  */
 // below comment should be removed when we either remove defaultLanguage or implement it into the following function
 /* eslint-disable @typescript-eslint/no-unused-vars */
@@ -90,8 +93,11 @@ export function downloadRawCSV(items: RawReadings[], defaultLanguage: string) {
 
 /**
  * Function that adds a div to handle exporting raw data
- * @param count number of lines in the file
- * @param done async function that does another request to get all data then download it
+ *
+ * @param {number} count number of lines in the file
+ * @param {number} warningFileSize warningFileSize maximum size of file before warning the user before download
+ * @param {number} fileSizeLimit maximum file size that an non-authorized user can download
+ * @param {Promise<void>} done async function that does another request to get all data then download it
  */
 // NOTE: This function is made with the idea that it will not be called very often
 // Ideally we would have a component that prompts the user and handles all the logic

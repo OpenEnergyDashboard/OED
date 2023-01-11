@@ -204,7 +204,7 @@ export interface LinkOptions {
 
 /**
  * Update graph options from a link
- * @param options - Object of possible values to dispatch with keys: meterIDs, groupIDs, chartType, barDuration, toggleBarStacking
+ * @param {LinkOptions} options - Object of possible values to dispatch with keys: meterIDs, groupIDs, chartType, barDuration, toggleBarStacking
  * @returns {function(*)}
  */
 export function changeOptionsFromLink(options: LinkOptions) {

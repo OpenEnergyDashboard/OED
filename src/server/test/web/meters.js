@@ -14,14 +14,17 @@ const moment = require('moment-timezone');
 const gps = new Point(90, 45);
 const Unit = require('../../models/Unit');
 
+// TODO These tests are not as good as they should be now that information on
+// meters is returned to all users. They should be updated.
+
 /**
  * Verifies the values in the meter are the ones expected.
  * @param {*} meters If # meters > 1 then array of meters, else single meter
  * @param {*} length # meters to check and in meters
- * @param {*} offset How much to add to values expected to relate to meter index
+ * @param {*} isAdmin true if user is admin and sees all meter details.
  * @param {*} unit The unit id to check
  */
-function expectMetersToBeEquivalent(meters, length, offset, unit) {
+function expectMetersToBeEquivalent(meters, length, isAdmin, unit) {
 	for (let i = 0; i < length; i++) {
 		// If length is 1 then it is not an array.
 		let meter;
@@ -32,42 +35,36 @@ function expectMetersToBeEquivalent(meters, length, offset, unit) {
 		}
 		// Everyone can see this info on all meters
 		expect(meter).to.have.property('id');
+		expect(meter).to.have.property('enabled', true);
 		expect(meter).to.have.property('gps');
 		expect(meter.gps).to.have.property('latitude', gps.latitude);
 		expect(meter.gps).to.have.property('longitude', gps.longitude);
-		expect(meter).to.have.property('enabled', true);
-		// Copied from /src/server/routes/meters.js
-		// TODO: remove this line when usages of meter.name are replaced with meter.identifer
-		// Without this, things will break for non-logged in users because we currently rely on
-		// the internal name being available. As noted in #605, the intent is to not send the
-		// name to a user if they are not logged in.
-		expect(meter).to.have.property('identifier', 'Identified ' + (i + offset));
-		expect(meter).to.have.property('area', (i + offset) * 10.0);
-		expect(meter).to.have.property('unitId', unit);
-		expect(meter).to.have.property('defaultGraphicUnit', unit);
-		// A couple of properties differ if displayable or not.
 		// The first 3 are visible but the 4th is not visible where its name is special.
 		if (i < 3) {
-			expect(meter).to.have.property('name', `Meter ${i + offset}`);
 			expect(meter).to.have.property('displayable', true);
 		} else {
 			// This is the extra meter visible to admins.
-			expect(meter).to.have.property('name', 'Not Visible');
 			expect(meter).to.have.property('displayable', false);
 		}
-		if (length === 4) {
+		expect(meter).to.have.property('identifier', (isAdmin === true || meter.displayable === true) ? 'Identified ' + (i + 1) : null);
+		expect(meter).to.have.property('area', (i + 1) * 10.0);
+		expect(meter).to.have.property('unitId', unit);
+		expect(meter).to.have.property('defaultGraphicUnit', unit);
+		if (isAdmin) {
 			// Admin so see more values
+			// Last meter name differs since admin only.
+			expect(meter).to.have.property('name', i === 3 ? 'Not Visible' : `Meter ${i + 1}`);
 			expect(meter).to.have.property('url', '1.1.1.1');
 			expect(meter).to.have.property('meterType', Meter.type.MAMAC);
-			expect(meter).to.have.property('timeZone', `+0${i + offset}`);
-			expect(meter).to.have.property('note', `notes ${i + offset}`);
+			expect(meter).to.have.property('timeZone', `+0${i + 1}`);
+			expect(meter).to.have.property('note', `notes ${i + 1}`);
 			expect(meter).to.have.property('cumulative', true);
 			expect(meter).to.have.property('cumulativeReset', true);
 			expect(meter).to.have.property('cumulativeResetStart', '01:01:25');
 			expect(meter).to.have.property('cumulativeResetEnd', '05:05:05');
 			expect(meter).to.have.property('readingGap', 5.1);
 			expect(meter).to.have.property('readingVariation', 7.3);
-			expect(meter).to.have.property('reading', (i + offset) * 1.0);
+			expect(meter).to.have.property('reading', (i + 1) * 1.0);
 			expect(meter).to.have.property('readingDuplication', 1);
 			expect(meter).to.have.property('timeSort', 'increasing');
 			expect(meter).to.have.property('endOnlyTime', false);
@@ -75,6 +72,7 @@ function expectMetersToBeEquivalent(meters, length, offset, unit) {
 			expect(meter).to.have.property('endTimestamp', '2020-07-02 01:00:10');
 			expect(meter).to.have.property('previousEnd', '2020-03-05T13:15:13.000Z');
 		} else {
+			expect(meter).to.have.property('name', null);
 			expect(meter).to.have.property('url', null);
 			expect(meter).to.have.property('meterType', null);
 			expect(meter).to.have.property('timeZone', null);
@@ -113,7 +111,7 @@ mocha.describe('meters API', () => {
 		expect(res.body).to.have.lengthOf(0);
 	});
 
-	mocha.it('returns all visible meters', async () => {
+	mocha.it('returns all meters', async () => {
 		const conn = testDB.getConnection();
 		await new Meter(undefined, 'Meter 1', '1.1.1.1', true, true, Meter.type.MAMAC, '+01', gps,
 			'Identified 1', 'notes 1', 10.0, true, true, '01:01:25', '05:05:05', 5.1, 7.3, 1, 'increasing', false,
@@ -131,11 +129,13 @@ mocha.describe('meters API', () => {
 		const res = await chai.request(app).get('/api/meters');
 		expect(res).to.have.status(200);
 		expect(res).to.be.json;
-		expect(res.body).to.have.lengthOf(3);
-		expectMetersToBeEquivalent(res.body, 3, 1, unitId);
+		expect(res.body).to.have.lengthOf(4);
+		expectMetersToBeEquivalent(res.body, 4, false, unitId);
 	});
 	mocha.describe('Admin role:', () => {
 		let token;
+		// Since this .before is in the middle of tests, it should not have issues as
+		// documented in usersTest.js.
 		mocha.before(async () => {
 			let res = await chai.request(app).post('/api/login')
 				.send({ email: testUser.email, password: testUser.password });
@@ -160,7 +160,7 @@ mocha.describe('meters API', () => {
 			expect(res).to.have.status(200);
 			expect(res).to.be.json;
 			expect(res.body).to.have.lengthOf(4);
-			expectMetersToBeEquivalent(res.body, 4, 1, unitId);
+			expectMetersToBeEquivalent(res.body, 4, true, unitId);
 		});
 	});
 
@@ -183,7 +183,7 @@ mocha.describe('meters API', () => {
 					token = res.body.token;
 				});
 
-				mocha.it('should only return visible meters and visible data', async () => {
+				mocha.it('should only return visible data', async () => {
 					const conn = testDB.getConnection();
 					await new Meter(undefined, 'Meter 1', '1.1.1.1', true, true, Meter.type.MAMAC, '+01', gps,
 						'Identified 1', 'notes 1', 10.0, true, true, '01:01:25', '05:05:05', 5.1, 7.3, 1, 'increasing', false,
@@ -201,8 +201,8 @@ mocha.describe('meters API', () => {
 					const res = await chai.request(app).get('/api/meters').set('token', token);
 					expect(res).to.have.status(200);
 					expect(res).to.be.json;
-					expect(res.body).to.have.lengthOf(3);
-					expectMetersToBeEquivalent(res.body, 3, 1, unitId);
+					expect(res.body).to.have.lengthOf(4);
+					expectMetersToBeEquivalent(res.body, 4, false, unitId);
 				});
 
 				mocha.it(`should reject requests from ${role} to edit meters`, async () => {
@@ -215,18 +215,19 @@ mocha.describe('meters API', () => {
 
 	mocha.it('returns details on a single meter by ID', async () => {
 		const conn = testDB.getConnection();
-		await new Meter(undefined, 'Meter 1', '1.1.1.1', true, true, Meter.type.MAMAC, '+01', gps,
-			'Identified 1', 'notes 1', 10.0, true, true, '01:01:25', '05:05:05', 5.1, 7.3, 1, 'increasing', false,
+		await new Meter(undefined, 'Meter 1', '1.1.1.1', true, true, Meter.type.MAMAC, '+02', gps,
+			'Identified 2', 'notes 1', 20.0, true, true, '01:01:25', '05:05:05', 5.1, 7.3, 1, 'increasing', false,
 			1.0, '0001-01-01 23:59:59', '2020-07-02 01:00:10', '2020-03-05 13:15:13', unitId, unitId).insert(conn);
-		const meter2 = new Meter(undefined, 'Meter 2', '1.1.1.1', true, true, Meter.type.MAMAC, '+02', gps,
-			'Identified 2', 'notes 2', 20.0, true, true, '01:01:25', '05:05:05', 5.1, 7.3, 1, 'increasing', false,
+		// Bit of a hack to set the second meter to Identified 1 so passes test. Same for area and TZ.
+		const meter2 = new Meter(undefined, 'Meter 2', '1.1.1.1', true, true, Meter.type.MAMAC, '+01', gps,
+			'Identified 1', 'notes 2', 10.0, true, true, '01:01:25', '05:05:05', 5.1, 7.3, 1, 'increasing', false,
 			2.0, '0001-01-01 23:59:59', '2020-07-02 01:00:10', '2020-03-05 13:15:13', unitId, unitId);
 		await meter2.insert(conn);
 
 		const res = await chai.request(app).get(`/api/meters/${meter2.id}`);
 		expect(res).to.have.status(200);
 		expect(res).to.be.json;
-		expectMetersToBeEquivalent(res.body, 1, 2, unitId);
+		expectMetersToBeEquivalent(res.body, 1, false, unitId);
 	});
 
 	mocha.it('responds appropriately when the meter in question does not exist', async () => {

@@ -6,9 +6,19 @@ import { defineMessages, createIntl, createIntlCache } from 'react-intl';
 import localeData from '../translations/data';
 import store from '../index';
 
-const enum AsTranslated {}
-export type TranslatedString = string & AsTranslated;
+// TODO This used to be multiple types of:
+// const enum AsTranslated {}
+// export type TranslatedString = string & AsTranslated;
+// but that started to cause problems and string was found to be okay.
+// If this works then maybe we remove TranslatedString and just use string?
+export type TranslatedString = string;
 
+/**
+ * Translate a message
+ *
+ * @param {string} messageID identifier for a message
+ * @returns {TranslatedString} get translated string from original string
+ */
 export default function translate(messageID: string): TranslatedString {
 
 	// TODO BANDAID FIX

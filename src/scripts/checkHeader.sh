@@ -35,6 +35,8 @@ FILES=$(echo "$FILES" | grep -v "src\/server\/test\/web\/obvius\/.*")
 FILES=$(echo "$FILES" | grep -v "src\/server\/test\/web\/csvPipeline\/.*")
 # Filter out test data for units Pipeline
 FILES=$(echo "$FILES" | grep -v "src\/server\/test\/web\/units\/.*")
+# Filter out test data for readings
+FILES=$(echo "$FILES" | grep -v "src\/server\/test\/web\/readingsData\/.*")
 # Filter out .github files
 FILES=$(echo "$FILES" | grep -v ".github\/**")
 # Filter out unit test files
