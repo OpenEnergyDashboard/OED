@@ -95,7 +95,8 @@ jobs:
       POSTGRES_PASSWORD: travisTest
 
     runs-on: ubuntu-latest
-    container: node:14
+    # container: node:14
+    container: node:16.13.2
 
     services:
       postgres:
