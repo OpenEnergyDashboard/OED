@@ -12,7 +12,6 @@ const mocha = require('mocha');
 const { findMaxSemanticVersion, compareSemanticVersion } = require('../../util');
 
 mocha.describe('compareTwoSemanticVersion', () => {
-	// dummy comment
 	mocha.it('should compare two version to determine which one is greater', () => {
 		const a = '0.2.2';
 		const b = '0.2.11';

@@ -42,7 +42,7 @@ jobs:
       # Checkout actions just downloads code, does not git init
       # Find more info on the bug here - https://github.com/actions/checkout/issues/126
       - name: Check out repository code
-      - uses: actions/checkout@v3
+        uses: actions/checkout@v3
 
       - name: Use Node.js
         uses: actions/setup-node@v3
