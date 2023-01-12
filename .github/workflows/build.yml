@@ -118,10 +118,10 @@ jobs:
       - uses: actions/checkout@v3
 
       # Sets up the git repo so that scripts that depend on it will run
-      - name: git init
-        run: |
-          git init
-          git add .
+      # - name: git init
+      #   run: |
+      #     git init
+      #     git add .
 
       - name: Install dependencies
         run: npm ci
