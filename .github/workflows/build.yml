@@ -1,9 +1,10 @@
 name: Build
+
 on:
   pull_request:
+    branches: [ development ]
   push:
-    branches:
-      - development
+    branches: [ development ]
 
 jobs:
   container-job:
@@ -21,8 +22,6 @@ jobs:
       POSTGRES_PASSWORD: travisTest
 
     runs-on: ubuntu-latest
-    # Make sure the node version here matches containers/web/Dockerfile for the standard OED build.
-    # container: node:16.13.2
 
     services:
       postgres:
@@ -48,6 +47,7 @@ jobs:
       - name: Use Node.js
         uses: actions/setup-node@v3
         with:
+          # Make sure the node version here matches containers/web/Dockerfile for the standard OED build.
           node-version: '16.13.2'
 
       # Sets up the git repo so that scripts that depend on it will run
