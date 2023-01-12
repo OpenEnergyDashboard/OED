@@ -81,7 +81,7 @@ class Reading {
 	 * Because moment allows modification of its values, this creates a new Reading where all the timestamps
 	 * are cloned so they cannot change unless you modify this new one.
 	 * 
-	 * @returns a duplicat of the reading where the moment timestamps are cloned so cannot change.
+	 * @returns a duplicate of the reading where the moment timestamps are cloned so cannot change.
 	 */
 	clone() {
 		return new Reading(this.meterID, this.reading, this.startTimestamp.clone(), this.endTimestamp.clone());
