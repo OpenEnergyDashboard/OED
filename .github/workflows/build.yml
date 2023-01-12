@@ -42,6 +42,7 @@ jobs:
     steps:
       # Checkout actions just downloads code, does not git init
       # Find more info on the bug here - https://github.com/actions/checkout/issues/126
+      - name: Check out repository code
       - uses: actions/checkout@v3
 
       - name: Use Node.js
@@ -62,13 +63,13 @@ jobs:
       - name: Install dependencies
         run: npm ci
 
-      # - name: Connect to PostgreSQL
-      #   run: node client.js
-      #   env:
-      #     POSTGRES_HOST: postgres
-      #     POSTGRES_PORT: 5432
-      #     OED_DB_TEST_DATABASE: travis_ci_test
-      #     POSTGRES_PASSWORD: travisTest
+      - name: Connect to PostgreSQL
+        run: node client.js
+        env:
+          POSTGRES_HOST: postgres
+          POSTGRES_PORT: 5432
+          OED_DB_TEST_DATABASE: travis_ci_test
+          POSTGRES_PASSWORD: travisTest
 
       - name: node tests
         run: |
