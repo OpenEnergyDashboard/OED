@@ -22,7 +22,7 @@ jobs:
 
     runs-on: ubuntu-latest
     # Make sure the node version here matches containers/web/Dockerfile for the standard OED build.
-    container: node:16.13.2
+    # container: node:16.13.2
 
     services:
       postgres:
@@ -42,13 +42,18 @@ jobs:
     steps:
       # Checkout actions just downloads code, does not git init
       # Find more info on the bug here - https://github.com/actions/checkout/issues/126
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v3
+
+      - name: Use Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: '16.13.2'
 
       # Sets up the git repo so that scripts that depend on it will run
-      - name: git init
-        run: |
-          git init
-          git add .
+      # - name: git init
+      #   run: |
+      #     git init
+      #     git add .
 
       - name: add testing directory
         run:
