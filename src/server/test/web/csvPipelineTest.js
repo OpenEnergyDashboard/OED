@@ -577,7 +577,10 @@ const testMeters = {
 				undefined, //endOnlyTime
 				undefined, // reading
 				undefined, // startTimestamp
-				undefined // endTimestamp
+				undefined, // endTimestamp
+				undefined, // previousEnd
+				undefined, // unitId
+				undefined // defaultGraphicUnit
 			),
 			new Meter(
 				undefined, // id
@@ -603,7 +606,10 @@ const testMeters = {
 				true, //endOnlyTime
 				89.90, // reading
 				'1666-07-08 17:13:19', // startTimestamp
-				'1777-08-09 05:07:11' // endTimestamp
+				'1777-08-09 05:07:11', // endTimestamp
+				'1888-09-10 11:12:13+00:00', // previousEnd
+				undefined, // unitId
+				undefined // defaultGraphicUnit
 			)
 		]
 	},
@@ -637,7 +643,10 @@ const testMeters = {
 				undefined, //endOnlyTime
 				undefined, // reading
 				undefined, // startTimestamp
-				undefined // endTimestamp
+				undefined, // endTimestamp
+				undefined, // previousEnd
+				undefined, // unitId
+				undefined // defaultGraphicUnit
 			)
 		]
 	},
@@ -653,50 +662,73 @@ const testMeters = {
 
 // Loop over all the meter tests.
 for (let fileKey in testMeters) {
-	// How many uploads will be done.
-	const numUploads = testMeters[fileKey].chaiRequest.length;
-	mocha.it(`Meter testing files starting '${fileKey}' doing '${testMeters[fileKey]["description"]}' with ${numUploads} requests`, async () => {
-		const conn = testDB.getConnection();
-		// Loop over each upload to perform it.
-		for (let index = 0; index < numUploads; index++) {
-			// It would be nice to put a mocha.describe inside the loop to tell the upload starting
-			// but that breaks the tests.
-			// Each set of uploads must be in one mocha because the DB is reset with each test.
-			// The CSV file name with the meter data.
-			let inputFile = testMeters[fileKey]['fileName'][index];
-			// The CSV file with its path.
-			let inputPath = `${__dirname}/csvPipeline/${inputFile}`;
-			// The CSV file as an file buffer.
-			let inputBuffer = fs.readFileSync(inputPath);
-			// The Chai request string to do the upload.
-			let evalString = `${testMeters[fileKey]["chaiRequest"][index]}.attach('csvfile', inputBuffer, '${inputPath}')`;
-			// eval the string to perform the upload. res is what is returned from the request.
-			// TODO It would be nice if this was not an eval. Tried a function with closure but could not get it to work as did not find chai.
-			const res = await eval(evalString);
-			// Verify the request response code is what was expected.
-			expect(res).to.have.status(testMeters[fileKey]['responseCode'][index]);
-			// This is a web request that should return html.
-			expect(res).to.be.html;
-			// OED returns a string with messages that we check it is what was expected.
-			expect(res.text).to.equal(testMeters[fileKey]['responseString'][index]);
-		}
-		// You do not want to check the database until all the uploads are done.
-		// Get every meter to be sure the correct number is there.
-		const meters = await Meter.getAll(conn);
-		let numExpected = testMeters[fileKey]['metersUploaded'].length;
-		expect(meters.length).to.equal(numExpected);
-		// Loop over meters to see if correct values.
-		for (let index = 0; index < numExpected; index++) {
-			// The expected value for the meter.
-			let expectMeter = testMeters[fileKey]['metersUploaded'][index];
-			// Get the database value for the meter.
-			let meter = await Meter.getByName(expectMeter.name, conn);
-			// Verify they are the same.
-			compareMeters(expectMeter, meter);
-		}
+	mocha.describe('Test CSV meter Pipeline', () => {
+		let meterUnit, graphUnit;
+		mocha.beforeEach(async () => {
+			const conn = testDB.getConnection();
+			// Create needed units for meters.
+			const units = [
+				['Electric_Utility', '', Unit.unitRepresentType.QUANTITY, 3600, Unit.unitType.METER, '', Unit.displayableType.NONE, false, 'for teting'],
+				['kWh', '', Unit.unitRepresentType.QUANTITY, 3600, Unit.unitType.UNIT, '', Unit.displayableType.ALL, true, 'for testing']
+			];
+			await insertUnits(units, conn);
+			// Get the value from the DB so can get the id.
+			meterUnit = await Unit.getByName('Electric_Utility', conn);
+			graphUnit = await Unit.getByName('kWh', conn);
+		});
+		// How many uploads will be done.
+		const numUploads = testMeters[fileKey].chaiRequest.length;
+		mocha.it(`Meter testing files starting '${fileKey}' doing '${testMeters[fileKey]["description"]}' with ${numUploads} requests`, async () => {
+			const conn = testDB.getConnection();
+			// The first test, second meter needs to have the ids for units put to what they actually are.
+			// Cannot do above since not inserted into DB until the beforeEach().
+			if (fileKey === 'pipe100') {
+				testMeters[fileKey]['metersUploaded'][1].unitId = meterUnit.id;
+				testMeters[fileKey]['metersUploaded'][1].defaultGraphicUnit = graphUnit.id;
+			}
+			// Loop over each upload to perform it.
+			for (let index = 0; index < numUploads; index++) {
+				// It would be nice to put a mocha.describe inside the loop to tell the upload starting
+				// but that breaks the tests.
+				// Each set of uploads must be in one mocha because the DB is reset with each test.
+				// The CSV file name with the meter data.
+				let inputFile = testMeters[fileKey]['fileName'][index];
+				// The CSV file with its path.
+				let inputPath = `${__dirname}/csvPipeline/${inputFile}`;
+				// The CSV file as an file buffer.
+				let inputBuffer = fs.readFileSync(inputPath);
+				// The Chai request string to do the upload.
+				let evalString = `${testMeters[fileKey]["chaiRequest"][index]}.attach('csvfile', inputBuffer, '${inputPath}')`;
+				// eval the string to perform the upload. res is what is returned from the request.
+				// TODO It would be nice if this was not an eval. Tried a function with closure but could not get it to work as did not find chai.
+				const res = await eval(evalString);
+				// Verify the request response code is what was expected.
+				expect(res).to.have.status(testMeters[fileKey]['responseCode'][index]);
+				// This is a web request that should return html.
+				expect(res).to.be.html;
+				// OED returns a string with messages that we check it is what was expected.
+				expect(res.text).to.equal(testMeters[fileKey]['responseString'][index]);
+			}
+			// You do not want to check the database until all the uploads are done.
+			// Get every meter to be sure the correct number is there.
+			const meters = await Meter.getAll(conn);
+			let numExpected = testMeters[fileKey]['metersUploaded'].length;
+			expect(meters.length).to.equal(numExpected);
+			// Loop over meters to see if correct values.
+			for (let index = 0; index < numExpected; index++) {
+				// The expected value for the meter.
+				let expectMeter = testMeters[fileKey]['metersUploaded'][index];
+				// Get the database value for the meter.
+				let meter = await Meter.getByName(expectMeter.name, conn);
+				// Verify they are the same.
+				compareMeters(expectMeter, meter);
+			}
+		});
 	});
 }
 
+// TODO It would be nice to make this use the code in src/server/test/db/meterTests.js and make
+// all meter tests use one common function fo meter comparison.
 /**
  * Compares the two provided meters to make sure they are the same.
  * @param {*} expectMeter A meter object that gives the values expected for the meter.
@@ -731,5 +763,7 @@ function compareMeters(expectMeter, receivedMeter) {
 	expect(receivedMeter).to.have.property('reading', expectMeter.reading);
 	expect(receivedMeter).to.have.property('startTimestamp', expectMeter.startTimestamp);
 	expect(receivedMeter).to.have.property('endTimestamp', expectMeter.endTimestamp);
-	// TODO add new meter values
+	expect(receivedMeter.previousEnd.isSame(moment.parseZone(expectMeter.previousEnd, true).tz('UTC', true))).to.equal(true);
+	expect(receivedMeter).to.have.property('unitId', expectMeter.unitId);
+	expect(receivedMeter).to.have.property('defaultGraphicUnit', expectMeter.defaultGraphicUnit);
 }
