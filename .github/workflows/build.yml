@@ -18,7 +18,7 @@ jobs:
       OED_TOKEN_SECRET: travis
       OED_SERVER_PORT: 3000
       OED_TEST_SITE_READING_RATE: 00:15:00
-      # DOCKER_COMPOSE_VERSION: 1.27.4
+      DOCKER_COMPOSE_VERSION: 1.27.4
       POSTGRES_PASSWORD: travisTest
 
     runs-on: ubuntu-latest
@@ -34,7 +34,6 @@ jobs:
           --health-interval 10s
           --health-timeout 5s
           --health-retries 5
-
         ports:
           - 5432:5432
 
@@ -48,13 +47,8 @@ jobs:
         uses: actions/setup-node@v3
         with:
           # Make sure the node version here matches containers/web/Dockerfile for the standard OED build.
-          node-version: '16.13.2'
-
-      # Sets up the git repo so that scripts that depend on it will run
-      # - name: git init
-      #   run: |
-      #     git init
-      #     git add .
+          # node-version: '16.13.2'
+          node-version: '14'
 
       - name: add testing directory
         run:
