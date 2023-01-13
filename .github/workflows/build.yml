@@ -124,6 +124,10 @@ jobs:
       #     git init
       #     git add .
 
+      - name: add testing directory
+        run:
+          chmod 777 src/server/tmp
+
       - name: Install dependencies
         run: npm ci
 
