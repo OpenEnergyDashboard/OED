@@ -125,7 +125,7 @@ jobs:
       #     git add .
 
       - name: add testing directory
-        run:
+        run: |
           chmod 777 src/server/tmp
           chmod 777 src/server/tmp/uploads
 
