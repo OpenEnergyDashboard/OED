@@ -127,6 +127,7 @@ jobs:
       - name: add testing directory
         run:
           chmod 777 src/server/tmp
+          chmod 777 src/server/tmp/uploads
 
       - name: Install dependencies
         run: npm ci
