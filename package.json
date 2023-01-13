@@ -76,7 +76,7 @@
     "babel-core": "~7.0.0-bridge.0",
     "babel-plugin-formatjs": "~10.3.12",
     "bcryptjs": "~2.4.3",
-    "body-parser": "~1.18.3",
+    "body-parser": "~1.20.1",
     "bootstrap": "~4.3.1",
     "chokidar": "~3.5.2",
     "co": "~4.6.0",
