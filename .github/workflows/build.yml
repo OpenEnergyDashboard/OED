@@ -5,11 +5,6 @@ on:
     branches: [ development ]
   push:
     branches: [ development ]
-# on:
-#   pull_request:
-#   push:
-#     branches:
-#       - development
 
 jobs:
   run-checks-tests:
@@ -48,7 +43,8 @@ jobs:
         uses: actions/checkout@v3
 
       # It is unclear why this does not work but the container: above for node works fine.
-      # This causes an exception when Postgres starts.
+      # This causes an exception when Postgres starts. One guess is that Postgres is starting
+      # before node is specified.
       # - name: Use Node.js
       #   uses: actions/setup-node@v3
       #   with:
