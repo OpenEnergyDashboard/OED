@@ -113,7 +113,6 @@ mocha.describe('Generate Sine wave', () => {
 		const startTimeStamp = '2019-09-10 00:00:00';
 		const endTimeStamp = '2019-09-11 00:00:00';
 		const filename = 'test1.csv';
-		// const filepath = path.join(__dirname, '../tmp/uploads/csvPipeline');
 		const filepath = path.join(__dirname, '../tmp');
 		const fileComplete =  path.join(filepath, filename);
 		const timeOptions = { timeStep: { minute: 20 }, periodLength: { day: 1 } };
@@ -134,6 +133,8 @@ mocha.describe('Generate Sine wave', () => {
 		const startTimeStamp = '2019-09-10 00:00:00';
 		const endTimeStamp = '2019-09-11 00:00:00';
 		const filename = 'test2.csv';
+		const filepath = path.join(__dirname, '../tmp');
+		const fileComplete =  path.join(filepath, filename);
 		const timeOptions = { timeStep: { minute: 20 }, periodLength: { day: 1 }, normalize: true };
 		const maxAmplitude = 2;
 		const data = generateSineData(startTimeStamp, endTimeStamp, { ...timeOptions, maxAmplitude: maxAmplitude, squared: false })
@@ -142,9 +143,9 @@ mocha.describe('Generate Sine wave', () => {
 				scaledValue = scaledValue.toFixed(8); // we reduce numbers down to 8 decimals places because the rest are insignificant
 				return [scaledValue, row[1], row[2]];
 			});
-		await generateSine(startTimeStamp, endTimeStamp, { ...timeOptions, filename: path.join(__dirname, filename), maxAmplitude: maxAmplitude });
+		await generateSine(startTimeStamp, endTimeStamp, { ...timeOptions, filename: fileComplete, maxAmplitude: maxAmplitude });
 		// https://stackabuse.com/reading-and-writing-csv-files-in-nodejs-with-node-csv/
-		const dataFromFile = await fs.readFile(path.join(__dirname, filename));
+		const dataFromFile = await fs.readFile(fileComplete);
 		const preprocessedRecords = await parseCsv(dataFromFile);
 		// The first row is a header
 		const header = preprocessedRecords.shift();
@@ -153,12 +154,14 @@ mocha.describe('Generate Sine wave', () => {
 		// low significant places.
 		const records = preprocessedRecords.map(row => [parseFloat(row[0]).toFixed(8), row[1], row[2]]);
 		expect(records).to.deep.equal(data);
-		await fs.unlink(path.join(__dirname, filename)); // delete test file created
+		await fs.unlink(fileComplete); // delete test file created
 	});
 	mocha.it('should be able to normalize and square values for OED', async () => {
 		const startTimeStamp = '2019-09-10 00:00:00';
 		const endTimeStamp = '2019-09-11 00:00:00';
 		const filename = 'test2.csv';
+		const filepath = path.join(__dirname, '../tmp');
+		const fileComplete =  path.join(filepath, filename);
 		const timeOptions = { timeStep: { minute: 20 }, periodLength: { day: 1 }, normalize: true };
 		const maxAmplitude = 2;
 		const data = generateSineData(startTimeStamp, endTimeStamp, { ...timeOptions, maxAmplitude: maxAmplitude })
@@ -168,9 +171,9 @@ mocha.describe('Generate Sine wave', () => {
 				return [scaledValue, row[1], row[2]];
 			});
 		await generateSine(startTimeStamp, endTimeStamp,
-			{ ...timeOptions, filename: path.join(__dirname, filename), maxAmplitude: maxAmplitude, squared: true });
+			{ ...timeOptions, filename: fileComplete, maxAmplitude: maxAmplitude, squared: true });
 		// https://stackabuse.com/reading-and-writing-csv-files-in-nodejs-with-node-csv/
-		const dataFromFile = await fs.readFile(path.join(__dirname, filename));
+		const dataFromFile = await fs.readFile(fileComplete);
 		const preprocessedRecords = await parseCsv(dataFromFile);
 		// The first row is a header
 		const header = preprocessedRecords.shift();
@@ -179,7 +182,7 @@ mocha.describe('Generate Sine wave', () => {
 		// low significant places.
 		const records = preprocessedRecords.map(row => [parseFloat(row[0]).toFixed(8), row[1], row[2]]);
 		expect(records).to.deep.equal(data);
-		await fs.unlink(path.join(__dirname, filename)); // delete test file created
+		await fs.unlink(fileComplete); // delete test file created
 	});
 });
 
@@ -190,27 +193,31 @@ mocha.describe('Generate Cosine wave', () => {
 		const startTimeStamp = '2019-09-10 00:00:00';
 		const endTimeStamp = '2019-09-11 00:00:00';
 		const filename = 'test1.csv';
+		const filepath = path.join(__dirname, '../tmp');
+		const fileComplete =  path.join(filepath, filename);
 		const timeOptions = { timeStep: { minute: 20 }, periodLength: { day: 1 } };
 		const maxAmplitude = 2;
 		const data = generateSineData(startTimeStamp, endTimeStamp,
 			{ ...timeOptions, maxAmplitude: maxAmplitude * timeOptions.timeStep.minute / 60, phaseShift: (Math.PI / 2), squared: false });
 		await generateCosine(startTimeStamp, endTimeStamp,
-			{ ...timeOptions, filename: path.join(__dirname, filename), maxAmplitude: maxAmplitude, squared: false });
+			{ ...timeOptions, filename: fileComplete, maxAmplitude: maxAmplitude, squared: false });
 		// https://stackabuse.com/reading-and-writing-csv-files-in-nodejs-with-node-csv/
-		const dataFromFile = await fs.readFile(path.join(__dirname, filename));
+		const dataFromFile = await fs.readFile(fileComplete);
 		const records = await parseCsv(dataFromFile);
 
 		// The first row is a header
 		const header = records.shift();
 		expect(header).to.deep.equal(['reading', 'start_timestamp', 'end_timestamp']);
 		expect(records).to.deep.equal(data);
-		await fs.unlink(path.join(__dirname, filename)); // delete test file created
+		await fs.unlink(fileComplete); // delete test file created
 	});
 
 	mocha.it('should be able to normalize and square values for OED', async () => {
 		const startTimeStamp = '2019-09-10 00:00:00';
 		const endTimeStamp = '2019-09-11 00:00:00';
 		const filename = 'test2.csv';
+		const filepath = path.join(__dirname, '../tmp');
+		const fileComplete =  path.join(filepath, filename);
 		const timeOptions = { timeStep: { minute: 20 }, periodLength: { day: 1 }, normalize: true };
 		const maxAmplitude = 2;
 		const data = generateSineData(startTimeStamp, endTimeStamp,
@@ -221,9 +228,9 @@ mocha.describe('Generate Cosine wave', () => {
 				return [scaledValue, row[1], row[2]];
 			});
 		await generateCosine(startTimeStamp, endTimeStamp,
-			{ ...timeOptions, filename: path.join(__dirname, filename), maxAmplitude: maxAmplitude, squared: true });
+			{ ...timeOptions, filename: fileComplete, maxAmplitude: maxAmplitude, squared: true });
 		// https://stackabuse.com/reading-and-writing-csv-files-in-nodejs-with-node-csv/
-		const dataFromFile = await fs.readFile(path.join(__dirname, filename));
+		const dataFromFile = await fs.readFile(fileComplete);
 		const preprocessedRecords = await parseCsv(dataFromFile);
 		// The first row is a header
 		const header = preprocessedRecords.shift();
@@ -232,6 +239,6 @@ mocha.describe('Generate Cosine wave', () => {
 		// low significant places.
 		const records = preprocessedRecords.map(row => [parseFloat(row[0]).toFixed(8), row[1], row[2]]);
 		expect(records).to.deep.equal(data);
-		await fs.unlink(path.join(__dirname, filename)); // delete test file created
+		await fs.unlink(fileComplete); // delete test file created
 	});
 });
