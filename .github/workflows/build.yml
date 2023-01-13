@@ -1,12 +1,13 @@
 name: Build
+
 on:
   pull_request:
+    branches: [ development ]
   push:
-    branches:
-      - development
+    branches: [ development ]
 
 jobs:
-  container-job:
+  run-checks-tests:
     env:
       OED_DB_USER: test
       OED_DB_PASSWORD: travisTest
@@ -17,11 +18,11 @@ jobs:
       OED_TOKEN_SECRET: travis
       OED_SERVER_PORT: 3000
       OED_TEST_SITE_READING_RATE: 00:15:00
-      DOCKER_COMPOSE_VERSION: 1.27.4
       POSTGRES_PASSWORD: travisTest
 
     runs-on: ubuntu-latest
-    container: node:14
+    # Make sure the node version here matches containers/web/Dockerfile for the standard OED build.
+    container: node:16.13.2
 
     services:
       postgres:
@@ -34,20 +35,28 @@ jobs:
           --health-interval 10s
           --health-timeout 5s
           --health-retries 5
-
         ports:
           - 5432:5432
 
     steps:
-      # Checkout actions just downloads code, does not git init
-      # Find more info on the bug here - https://github.com/actions/checkout/issues/126
-      - uses: actions/checkout@v2
+      - name: Check out repository code
+        uses: actions/checkout@v3
 
-      # Sets up the git repo so that scripts that depend on it will run
-      - name: git init
+      # It is unclear why this does not work but the container: above for node works fine.
+      # This causes an exception when Postgres starts. One guess is that Postgres is starting
+      # before node is specified.
+      # - name: Use Node.js
+      #   uses: actions/setup-node@v3
+      #   with:
+      #     # Make sure the node version here matches containers/web/Dockerfile for the standard OED build.
+      #     node-version: '16.13.2'
+
+      # TODO This seems like a weird hack and there may be a better way to avoid the error that
+      # cannot write onto these directories.
+      - name: make testing directory writeable
         run: |
-          git init
-          git add .
+          chmod 777 src/server/tmp
+          chmod 777 src/server/tmp/uploads
 
       - name: Install dependencies
         run: npm ci
@@ -57,8 +66,6 @@ jobs:
         env:
           POSTGRES_HOST: postgres
           POSTGRES_PORT: 5432
-          OED_DB_TEST_DATABASE: travis_ci_test
-          POSTGRES_PASSWORD: travisTest
 
       - name: node tests
         run: |
