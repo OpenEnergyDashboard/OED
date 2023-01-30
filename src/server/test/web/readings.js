@@ -157,7 +157,7 @@ mocha.describe('readings API', () => {
 					expect(res.body).to.have.property(`${METER_ID}`).to.have.property('0').to.have.property('endTimestamp');
 				});
 				// Test using a date range of infinity, which should return as days
-				mocha.it('should have the expected readings for 15 minute reading intervals and quantity units with +-inf start/end time', async () => {
+				mocha.it('should have daily points for 15 minute reading intervals and quantity units with +-inf start/end time & kWh as kWh', async () => {
 					// Create 2D array for meter to feed into the database
 					// Note the meter ID is set so we know what to expect when a query is made.
 					const meterData = [['Electric Utility kWh', 'Electric_Utility', 'kWh', true, undefined,
@@ -176,7 +176,7 @@ mocha.describe('readings API', () => {
 				});
 				// This test is effectively the same as the last, but we specify the date range
 				// Should return daily point readings
-				mocha.it('should have the expected readings for 15 minute reading intervals and quantity units with explicit start/end time', async () => {
+				mocha.it('should have daily points for 15 minute reading intervals and quantity units with explicit start/end time & kWh as kWh', async () => {
 					// Create 2D array for meter to feed into the database
 					// Note the meter ID is set so we know what to expect when a query is made.
 					const meterData = [['Electric Utility kWh', 'Electric_Utility', 'kWh', true, undefined,
@@ -193,7 +193,7 @@ mocha.describe('readings API', () => {
 					expectReadingToEqualExpected(res, expected);
 				});
 				// This date range is on the threshold of returning daily point readings, 61 days
-				mocha.it('should generate daily points & middle readings for a 61 day period', async () => {
+				mocha.it('should have daily points for middle readings of 15 minute for a 61 day period and quantity units with kWh as kWh', async () => {
 					// Create 2D array for meter to feed into the database
 					// Note the meter ID is set so we know what to expect when a query is made.
 					const meterData = [['Electric Utility kWh', 'Electric_Utility', 'kWh', true, undefined,
@@ -208,7 +208,7 @@ mocha.describe('readings API', () => {
 					expectReadingToEqualExpected(res, expected);
 				});
 				// 60 days gives hourly points & middle readings
-				mocha.it('should generate hourly points & middle readings in a 60 day period', async () => {
+				mocha.it('should have hourly points for middle readings of 15 minute for a 60 day period and quantity units with kWh as kWh', async () => {
 					// Create 2D array for meter to feed into the database
 					// Note the meter ID is set so we know what to expect when a query is made.
 					const meterData = [['Electric Utility kWh', 'Electric_Utility', 'kWh', true, undefined,
@@ -223,7 +223,7 @@ mocha.describe('readings API', () => {
 					expectReadingToEqualExpected(res, expected);
 				});
 				// Test 15 minutes over all time for flow unit.
-				mocha.it('should have the expected readings for 15 minute reading intervals and flow units', async () => {
+				mocha.it('should have daily points for 15 minute reading intervals and flow units with +-inf start/end time & kW as kW', async () => {
 					const unitData = [
 						['kW', '', Unit.unitRepresentType.FLOW, 3600, Unit.unitType.UNIT, '', Unit.displayableType.ALL, true, 'kilowatts'],
 						['Electric', '', Unit.unitRepresentType.FLOW, 3600, Unit.unitType.METER, '', Unit.displayableType.NONE, false, 'special unit']
@@ -242,7 +242,7 @@ mocha.describe('readings API', () => {
 					expectReadingToEqualExpected(res, expected);
 				});
 				// Test 15 minutes over all time for raw unit.
-				mocha.it('should have the expected readings for 15 minute reading intervals and raw units', async () => {
+				mocha.it('should have daily points for 15 minute reading intervals and raw units with +-inf start/end time & Celsius as Celsius', async () => {
 					const unitData = [
 						['C', '', Unit.unitRepresentType.RAW, 3600, Unit.unitType.UNIT, '', Unit.displayableType.ALL, true, 'Celsius'],
 						['Degrees', '', Unit.unitRepresentType.RAW, 3600, Unit.unitType.METER, '', Unit.displayableType.NONE, false, 'special unit']
