@@ -167,7 +167,7 @@ mocha.describe('readings API', () => {
 					// Get the unit ID since the DB could use any value.
 					const unitId = await getUnitId('kWh');
 					// Load the expected response data from the corresponding csv file
-					const expected = await parseExpectedCsv('src/server/test/web/readingsData/expected_ri_15_mu_kWh_gu_kWh_st_-inf_et_inf.csv');
+					const expected = await parseExpectedCsv('src/server/test/web/readingsData/expected_line_ri_15_mu_kWh_gu_kWh_st_-inf_et_inf.csv');
 					// Create a request to the API for unbounded reading times and save the response
 					const res = await chai.request(app).get(`/api/unitReadings/line/meters/${METER_ID}`)
 						.query({ timeInterval: ETERNITY.toString(), graphicUnitId: unitId });
@@ -186,7 +186,7 @@ mocha.describe('readings API', () => {
 					// Get the unit ID since the DB could use any value.
 					const unitId = await getUnitId('kWh');
 					// Load and parse the corresponding expected values from csv
-					const expected = await parseExpectedCsv('src/server/test/web/readingsData/expected_ri_15_mu_kWh_gu_kWh_st_2022-08-18%00#00#00_et_2022-11-01%00#00#00.csv');
+					const expected = await parseExpectedCsv('src/server/test/web/readingsData/expected_line_ri_15_mu_kWh_gu_kWh_st_2022-08-18%00#00#00_et_2022-11-01%00#00#00.csv');
 					// Create a request to the API for the date range specified using createTimeString and save the response
 					const res = await chai.request(app).get(`/api/unitReadings/line/meters/${METER_ID}`)
 						.query({ timeInterval: createTimeString('2022-08-18', '00:00:00', '2022-11-01', '00:00:00'), graphicUnitId: unitId });
@@ -202,7 +202,7 @@ mocha.describe('readings API', () => {
 					await prepareTest(unitDatakWh, conversionDatakWh, meterData);
 					// Get the unit ID since the DB could use any value.
 					const unitId = await getUnitId('kWh');
-					const expected = await parseExpectedCsv('src/server/test/web/readingsData/expected_ri_15_mu_kWh_gu_kWh_st_2022-08-25%00#00#00_et_2022-10-25%00#00#00.csv');
+					const expected = await parseExpectedCsv('src/server/test/web/readingsData/expected_line_ri_15_mu_kWh_gu_kWh_st_2022-08-25%00#00#00_et_2022-10-25%00#00#00.csv');
 					const res = await chai.request(app).get(`/api/unitReadings/line/meters/${METER_ID}`)
 						.query({ timeInterval: createTimeString('2022-08-25', '00:00:00', '2022-10-25', '00:00:00'), graphicUnitId: unitId });
 					expectReadingToEqualExpected(res, expected);
@@ -217,7 +217,7 @@ mocha.describe('readings API', () => {
 					await prepareTest(unitDatakWh, conversionDatakWh, meterData);
 					// Get the unit ID since the DB could use any value.
 					const unitId = await getUnitId('kWh');
-					const expected = await parseExpectedCsv('src/server/test/web/readingsData/expected_ri_15_mu_kWh_gu_kWh_st_2022-08-25%00#00#00_et_2022-10-24%00#00#00.csv');
+					const expected = await parseExpectedCsv('src/server/test/web/readingsData/expected_line_ri_15_mu_kWh_gu_kWh_st_2022-08-25%00#00#00_et_2022-10-24%00#00#00.csv');
 					const res = await chai.request(app).get(`/api/unitReadings/line/meters/${METER_ID}`)
 						.query({ timeInterval: createTimeString('2022-08-25', '00:00:00', '2022-10-24', '00:00:00'), graphicUnitId: unitId });
 					expectReadingToEqualExpected(res, expected);
@@ -235,7 +235,7 @@ mocha.describe('readings API', () => {
 					await prepareTest(unitData, conversionData, meterData);
 					// Get the unit ID since the DB could use any value.
 					const unitId = await getUnitId('kW');
-					const expected = await parseExpectedCsv('src/server/test/web/readingsData/expected_ri_15_mu_kW_gu_kW_st_-inf_et_inf.csv');
+					const expected = await parseExpectedCsv('src/server/test/web/readingsData/expected_line_ri_15_mu_kW_gu_kW_st_-inf_et_inf.csv');
 
 					const res = await chai.request(app).get(`/api/unitReadings/line/meters/${METER_ID}`)
 						.query({ timeInterval: ETERNITY.toString(), graphicUnitId: unitId });
@@ -255,7 +255,7 @@ mocha.describe('readings API', () => {
 					// Get the unit ID since the DB could use any value.
 					const unitId = await getUnitId('C');
 					// Reuse same file as flow since value should be the same values.
-					const expected = await parseExpectedCsv('src/server/test/web/readingsData/expected_ri_15_mu_kW_gu_kW_st_-inf_et_inf.csv');
+					const expected = await parseExpectedCsv('src/server/test/web/readingsData/expected_line_ri_15_mu_kW_gu_kW_st_-inf_et_inf.csv');
 
 					const res = await chai.request(app).get(`/api/unitReadings/line/meters/${METER_ID}`)
 						.query({ timeInterval: ETERNITY.toString(), graphicUnitId: unitId });
