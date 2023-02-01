@@ -247,7 +247,7 @@ mocha.describe('readings API', () => {
 						['C', '', Unit.unitRepresentType.RAW, 3600, Unit.unitType.UNIT, '', Unit.displayableType.ALL, true, 'Celsius'],
 						['Degrees', '', Unit.unitRepresentType.RAW, 3600, Unit.unitType.METER, '', Unit.displayableType.NONE, false, 'special unit']
 					];
-					const conversionData = [['Degrees', 'C', false, 1, 0, 'Degrees → c']];
+					const conversionData = [['Degrees', 'C', false, 1, 0, 'Degrees → C']];
 					const meterData = [['Degrees Celsius', 'Degrees', 'C', true, undefined,
 						'special meter', 'test/web/readingsData/readings_ri_15_days_75.csv', false, METER_ID]];
 
