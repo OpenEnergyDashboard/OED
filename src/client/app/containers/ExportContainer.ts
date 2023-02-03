@@ -48,7 +48,7 @@ function mapStateToProps(state: State) {
 						id: state.groups.byGroupID[groupID].id,
 						currentChart: chart,
 						exportVals: dataPoints,
-						unit:  state.units.units[parseInt(state.graph.selectedUnit.toString())].name
+						unit: state.units.units[parseInt(state.graph.selectedUnit.toString())].name
 					});
 				}
 			}

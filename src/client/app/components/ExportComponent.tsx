@@ -9,7 +9,7 @@ import graphExport, { graphRawExport, downloadRawCSV } from '../utils/exportData
 import { ExportDataSet } from '../types/readings';
 import { FormattedMessage } from 'react-intl';
 import { TimeInterval } from '../../../common/TimeInterval';
-import { metersApi} from '../utils/api'
+import { metersApi } from '../utils/api'
 import TooltipMarkerComponent from './TooltipMarkerComponent';
 import { State } from '../types/redux/state';
 import { useSelector } from 'react-redux';
@@ -38,7 +38,7 @@ export default function ExportComponent(props: ExportProps) {
 	const exportReading = () => {
 		const data = []
 		//using a loop to push objects one at a time into data to be organized and formatted for export
-		for(let i = 0; i < props.exportVals.datasets.length; i++){
+		for (let i = 0; i < props.exportVals.datasets.length; i++) {
 			data.push(props.exportVals.datasets[i]);
 
 			// Sort the dataset based on the start time
@@ -84,7 +84,7 @@ export default function ExportComponent(props: ExportProps) {
 			const name = `oedExport_${chartName}_${startTimeString}_to_${endTimeString}_${meterName}_${unit}.csv`;
 			graphExport(data, name);
 			//clear out exported data so a new object can be pushed in
-			data.splice(0,data.length);
+			data.splice(0, data.length);
 		}
 	};
 
@@ -92,7 +92,7 @@ export default function ExportComponent(props: ExportProps) {
 		if (props.selectedMeters.length === 0)
 			return;
 		const data: number[] = []
-		for(let i = 0; i < props.selectedMeters.length; i++){
+		for (let i = 0; i < props.selectedMeters.length; i++) {
 			data.push(props.selectedMeters[i]);
 			const meterID = metersState[props.selectedMeters[i]].unitId;
 			const unitName = unitsState[meterID].identifier;
@@ -102,7 +102,7 @@ export default function ExportComponent(props: ExportProps) {
 				const lineReading = await metersApi.rawLineReadings(data, props.timeInterval);
 				downloadRawCSV(lineReading, props.defaultLanguage, unitName);
 			});
-			data.splice(0,data.length);
+			data.splice(0, data.length);
 		}
 	}
 

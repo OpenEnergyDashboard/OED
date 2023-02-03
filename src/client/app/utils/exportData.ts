@@ -128,7 +128,7 @@ export async function graphRawExport(count: number, warningFileSize: number, fil
 	innerContainer.innerHTML =
 		'<p>' + translate('csv.download.size.warning.size') + ` ${fileSize.toFixed(2)}MB.</p>
 		<p>` + translate('csv.download.size.warning.verify') + '</p>'
-	;
+		;
 
 	// fileSizeLimit is limit for an admin without checking they really want to download,
 	if (fileSize > fileSizeLimit && (!hasToken() || !(await usersApi.hasRolePermissions(UserRole.EXPORT)))) {
