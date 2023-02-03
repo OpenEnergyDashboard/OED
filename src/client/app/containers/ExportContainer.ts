@@ -9,7 +9,6 @@ import { ChartTypes } from '../types/redux/graph';
 import { BarReading, LineReading, ExportDataSet } from '../types/readings';
 import { State } from '../types/redux/state';
 
-
 function transformLineReadingToLegacy(reading: LineReading): [number, number, number] {
 	return [reading.startTimestamp, reading.reading, reading.endTimestamp];
 }

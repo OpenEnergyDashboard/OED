@@ -14,9 +14,6 @@ import TooltipMarkerComponent from './TooltipMarkerComponent';
 import { State } from '../types/redux/state';
 import { useSelector } from 'react-redux';
 
-
-
-
 interface ExportProps {
 	showRawExport: boolean;
 	selectedMeters: number[];
@@ -34,13 +31,13 @@ export default function ExportComponent(props: ExportProps) {
 	 * Passes an object containing the selected meter data to a function for export.
 	 */
 	// Meters state
-	const MetersState = useSelector((state: State) => state.meters.byMeterID);
+	const metersState = useSelector((state: State) => state.meters.byMeterID);
 	// Units state
-	const units = useSelector((state: State) => state.units.units);
+	const unitsState = useSelector((state: State) => state.units.units);
 
 	const exportReading = () => {
 		const data = []
-		//using a loop to push objects one at a time into data to be organized and formated for export
+		//using a loop to push objects one at a time into data to be organized and formatted for export
 		for(let i = 0; i < props.exportVals.datasets.length; i++){
 			data.push(props.exportVals.datasets[i]);
 
@@ -97,8 +94,8 @@ export default function ExportComponent(props: ExportProps) {
 		const data: number[] = []
 		for(let i = 0; i < props.selectedMeters.length; i++){
 			data.push(props.selectedMeters[i]);
-			const meterID = MetersState[props.selectedMeters[i]].unitId;
-			const unitName = units[meterID].identifier;
+			const meterID = metersState[props.selectedMeters[i]].unitId;
+			const unitName = unitsState[meterID].identifier;
 
 			const count = await metersApi.lineReadingsCount(props.selectedMeters, props.timeInterval);
 			graphRawExport(count, props.defaultWarningFileSize, props.defaultFileSizeLimit, async () => {
