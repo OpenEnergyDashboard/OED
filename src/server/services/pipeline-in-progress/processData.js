@@ -532,7 +532,8 @@ async function processData(rows, meterID, timeSort = TimeSortTypesJS.increasing,
 					errMsg += ' and the first part has a startTimestamp of ' + startTimestamp.format() + ' endTimestamp of ' + readingOneEndTimestamp.format();
 					errMsg += ' reading value of ' + readingOneValue;
 					errMsg += '. This is only a notification and should not be an issue.<br>';
-					result.push(readingOne);
+					// May not always be needed but clone so any changes in the timestamps do not change ones put in result.
+					result.push(readingOne.clone());
 				}
 				// The second part starts at the end of the DST shift which is what moment returns. Notice this is shift time later than
 				// the end time of the first part.
@@ -550,7 +551,8 @@ async function processData(rows, meterID, timeSort = TimeSortTypesJS.increasing,
 					errMsg += ' and the second part has a startTimestamp of ' + readingTwoStartTimestamp.format() + ' endTimestamp of ' + origEndTimestamp.format();
 					errMsg += ' reading value of ' + readingTwoValue;
 					errMsg += '. This is only a notification and should not be an issue.<br>';
-					result.push(readingTwo);
+					// May not always be needed but clone so any changes in the timestamps do not change ones put in result.
+					result.push(readingTwo.clone());
 				}
 				// Since in UTC, the length of the reading is wrong if endTimestamp was shifted by DST shift. This does not happen if the end time was
 				// outside the shift zone. If needed, we shift the start by the shift amount to avoid variation in length warning on the next reading.
@@ -565,7 +567,8 @@ async function processData(rows, meterID, timeSort = TimeSortTypesJS.increasing,
 					// This start timestamp from reading in inDst where it is stopping since just accepted a reading.
 					// We could not reset before now since it would potentially create a gap and different length.
 					currentReading = new Reading(meterID, meterReading, startTimestampUse, endTimestamp);
-					result.push(currentReading);
+					// May not always be needed but clone so any changes in the timestamps do not change ones put in result.
+					result.push(currentReading.clone());
 					// Reset inDstStop
 					inDstStop = false;
 					// We reset the start timestamp for the same issue with next reading.
@@ -575,7 +578,8 @@ async function processData(rows, meterID, timeSort = TimeSortTypesJS.increasing,
 					prevEndTimestamp = E0.clone();
 			} else {
 				currentReading = new Reading(meterID, meterReading, startTimestamp, endTimestamp);
-				result.push(currentReading);
+					// May not always be needed but clone so any changes in the timestamps do not change ones put in result.
+					result.push(currentReading.clone());
 			}
 			if (!(errMsg === '')) {
 				// There may be warnings to output even if OED accepts the readings so output all warnings which may exist
