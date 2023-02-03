@@ -64,76 +64,84 @@ function mapStateToProps(state: State) {
 	for (const meterID of state.graph.selectedMeters) {
 		const byMeterID = state.readings.line.byMeterID[meterID];
 		if (byMeterID !== undefined) {
-			const readingsData = byMeterID[timeInterval.toString()][unitID];
-			if (readingsData !== undefined && !readingsData.isFetching) {
-				const label = state.meters.byMeterID[meterID].identifier;
-				const colorID = meterID;
-				if (readingsData.readings === undefined) {
-					throw new Error('Unacceptable condition: readingsData.readings is undefined.');
-				}
+			const meterArea = state.meters.byMeterID[meterID].area;
+			// we either don't care about area, or we do in which case there needs to be a nonzero area
+			if (!state.graph.normalizeByArea || meterArea > 0) {
+				const readingsData = byMeterID[timeInterval.toString()][unitID];
+				if (readingsData !== undefined && !readingsData.isFetching) {
+					const label = state.meters.byMeterID[meterID].identifier;
+					const colorID = meterID;
+					if (readingsData.readings === undefined) {
+						throw new Error('Unacceptable condition: readingsData.readings is undefined.');
+					}
 
-				// Create two arrays for the x and y values. Fill the array with the data from the line readings
-				const xData: string[] = [];
-				const yData: number[] = [];
-				const hoverText: string[] = [];
-				const readings = _.values(readingsData.readings);
-				// Check if reading needs scaling outside of the loop so only one check is needed
-				// Results in more code but SLIGHTLY better efficiency :D
-				if (needsRateScaling) {
-					const rate = currentSelectedRate.rate;
-					readings.forEach(reading => {
-						// As usual, we want to interpret the readings in UTC. We lose the timezone as this as the start/endTimestamp
-						// are equivalent to Unix timestamp in milliseconds.
-						const st = moment.utc(reading.startTimestamp);
-						// Time reading is in the middle of the start and end timestamp
-						const timeReading = st.add(moment.utc(reading.endTimestamp).diff(st) / 2);
-						xData.push(timeReading.format('YYYY-MM-DD HH:mm:ss'));
-						yData.push(reading.reading * rate);
-						hoverText.push(`<b> ${timeReading.format('ddd, ll LTS')} </b> <br> ${label}: ${(reading.reading * rate).toPrecision(6)} ${unitLabel}`);
+					// Create two arrays for the x and y values. Fill the array with the data from the line readings
+					const xData: string[] = [];
+					const yData: number[] = [];
+					const hoverText: string[] = [];
+					const readings = _.values(readingsData.readings);
+					// Check if reading needs scaling outside of the loop so only one check is needed
+					// Results in more code but SLIGHTLY better efficiency :D
+					if (needsRateScaling) {
+						const rate = currentSelectedRate.rate;
+						readings.forEach(reading => {
+							// As usual, we want to interpret the readings in UTC. We lose the timezone as this as the start/endTimestamp
+							// are equivalent to Unix timestamp in milliseconds.
+							const st = moment.utc(reading.startTimestamp);
+							// Time reading is in the middle of the start and end timestamp
+							const timeReading = st.add(moment.utc(reading.endTimestamp).diff(st) / 2);
+							xData.push(timeReading.format('YYYY-MM-DD HH:mm:ss'));
+							yData.push(reading.reading * rate);
+							hoverText.push(`<b> ${timeReading.format('ddd, ll LTS')} </b> <br> ${label}: ${(reading.reading * rate).toPrecision(6)} ${unitLabel}`);
+						});
+					}
+					else {
+						readings.forEach(reading => {
+							// As usual, we want to interpret the readings in UTC. We lose the timezone as this as the start/endTimestamp
+							// are equivalent to Unix timestamp in milliseconds.
+							const st = moment.utc(reading.startTimestamp);
+							// Time reading is in the middle of the start and end timestamp
+							const timeReading = st.add(moment.utc(reading.endTimestamp).diff(st) / 2);
+							xData.push(timeReading.format('YYYY-MM-DD HH:mm:ss'));
+							let readingValue = reading.reading;
+							if(state.graph.normalizeByArea) {
+								readingValue /= meterArea;
+							}
+							yData.push(readingValue);
+							hoverText.push(`<b> ${timeReading.format('ddd, ll LTS')} </b> <br> ${label}: ${readingValue.toPrecision(6)} ${unitLabel}`);
+						});
+					}
+
+					/*
+					get the min and max timestamp of the meter, and compare it to the global values
+					TODO: If we know the interval and frequency of meter data, these calculations should be able to be simplified
+					*/
+					if (readings.length > 0) {
+						if (minTimestamp == undefined || readings[0]['startTimestamp'] < minTimestamp) {
+							minTimestamp = readings[0]['startTimestamp'];
+						}
+						if (maxTimestamp == undefined || readings[readings.length - 1]['endTimestamp'] >= maxTimestamp) {
+							// Need to add one extra reading interval to avoid range truncation. The max bound seems to be treated as non-inclusive
+							maxTimestamp = readings[readings.length - 1]['endTimestamp'] + (readings[0]['endTimestamp'] - readings[0]['startTimestamp']);
+						}
+					}
+
+					// This variable contains all the elements (x and y values, line type, etc.) assigned to the data parameter of the Plotly object
+					datasets.push({
+						name: label,
+						x: xData,
+						y: yData,
+						text: hoverText,
+						hoverinfo: 'text',
+						type: 'scatter',
+						mode: 'lines',
+						line: {
+							shape: 'spline',
+							width: 2,
+							color: getGraphColor(colorID, DataType.Meter)
+						}
 					});
 				}
-				else {
-					readings.forEach(reading => {
-						// As usual, we want to interpret the readings in UTC. We lose the timezone as this as the start/endTimestamp
-						// are equivalent to Unix timestamp in milliseconds.
-						const st = moment.utc(reading.startTimestamp);
-						// Time reading is in the middle of the start and end timestamp
-						const timeReading = st.add(moment.utc(reading.endTimestamp).diff(st) / 2);
-						xData.push(timeReading.format('YYYY-MM-DD HH:mm:ss'));
-						yData.push(reading.reading);
-						hoverText.push(`<b> ${timeReading.format('ddd, ll LTS')} </b> <br> ${label}: ${reading.reading.toPrecision(6)} ${unitLabel}`);
-					});
-				}
-
-				/*
-				get the min and max timestamp of the meter, and compare it to the global values
-				TODO: If we know the interval and frequency of meter data, these calculations should be able to be simplified
-				*/
-				if (readings.length > 0) {
-					if (minTimestamp == undefined || readings[0]['startTimestamp'] < minTimestamp) {
-						minTimestamp = readings[0]['startTimestamp'];
-					}
-					if (maxTimestamp == undefined || readings[readings.length - 1]['endTimestamp'] >= maxTimestamp) {
-						// Need to add one extra reading interval to avoid range truncation. The max bound seems to be treated as non-inclusive
-						maxTimestamp = readings[readings.length - 1]['endTimestamp'] + (readings[0]['endTimestamp'] - readings[0]['startTimestamp']);
-					}
-				}
-
-				// This variable contains all the elements (x and y values, line type, etc.) assigned to the data parameter of the Plotly object
-				datasets.push({
-					name: label,
-					x: xData,
-					y: yData,
-					text: hoverText,
-					hoverinfo: 'text',
-					type: 'scatter',
-					mode: 'lines',
-					line: {
-						shape: 'spline',
-						width: 2,
-						color: getGraphColor(colorID, DataType.Meter)
-					}
-				});
 			}
 		}
 	}
@@ -144,73 +152,88 @@ function mapStateToProps(state: State) {
 	for (const groupID of state.graph.selectedGroups) {
 		const byGroupID = state.readings.line.byGroupID[groupID];
 		if (byGroupID !== undefined) {
-			const readingsData = byGroupID[timeInterval.toString()][unitID];
-			if (readingsData !== undefined && !readingsData.isFetching) {
-				const label = state.groups.byGroupID[groupID].name;
-				const colorID = groupID;
-				if (readingsData.readings === undefined) {
-					throw new Error('Unacceptable condition: readingsData.readings is undefined.');
-				}
+			let groupArea = state.groups.byGroupID[groupID].area;
+			// TODO Consider changing group area to always be defined
+			if(groupArea === undefined) {
+				groupArea = 0;
+			}
+			if (!state.graph.normalizeByArea || groupArea > 0) {
+				const readingsData = byGroupID[timeInterval.toString()][unitID];
+				if (readingsData !== undefined && !readingsData.isFetching) {
+					const label = state.groups.byGroupID[groupID].name;
+					const colorID = groupID;
+					if (readingsData.readings === undefined) {
+						throw new Error('Unacceptable condition: readingsData.readings is undefined.');
+					}
 
-				// Create two arrays for the x and y values. Fill the array with the data from the line readings
-				const xData: string[] = [];
-				const yData: number[] = [];
-				const hoverText: string[] = [];
-				const readings = _.values(readingsData.readings);
-				// Check if reading needs scaling outside of the loop so only one check is needed
-				// Results in more code but SLIGHTLY better efficiency :D
-				if (needsRateScaling) {
-					const rate = currentSelectedRate.rate;
-					readings.forEach(reading => {
-						// As usual, we want to interpret the readings in UTC. We lose the timezone as this as the start/endTimestamp
-						// are equivalent to Unix timestamp in milliseconds.
-						const st = moment.utc(reading.startTimestamp);
-						// Time reading is in the middle of the start and end timestamp
-						const timeReading = st.add(moment.utc(reading.endTimestamp).diff(st) / 2);
-						xData.push(timeReading.utc().format('YYYY-MM-DD HH:mm:ss'));
-						yData.push(reading.reading * rate);
-						hoverText.push(`<b> ${timeReading.format('ddd, ll LTS')} </b> <br> ${label}: ${(reading.reading * rate).toPrecision(6)} ${unitLabel}`);
+					// Create two arrays for the x and y values. Fill the array with the data from the line readings
+					const xData: string[] = [];
+					const yData: number[] = [];
+					const hoverText: string[] = [];
+					const readings = _.values(readingsData.readings);
+					// Check if reading needs scaling outside of the loop so only one check is needed
+					// Results in more code but SLIGHTLY better efficiency :D
+					if (needsRateScaling) {
+						const rate = currentSelectedRate.rate;
+						readings.forEach(reading => {
+							// As usual, we want to interpret the readings in UTC. We lose the timezone as this as the start/endTimestamp
+							// are equivalent to Unix timestamp in milliseconds.
+							const st = moment.utc(reading.startTimestamp);
+							// Time reading is in the middle of the start and end timestamp
+							const timeReading = st.add(moment.utc(reading.endTimestamp).diff(st) / 2);
+							xData.push(timeReading.utc().format('YYYY-MM-DD HH:mm:ss'));
+							yData.push(reading.reading * rate);
+							hoverText.push(`<b> ${timeReading.format('ddd, ll LTS')} </b> <br> ${label}: ${(reading.reading * rate).toPrecision(6)} ${unitLabel}`);
+						});
+					}
+					else {
+						readings.forEach(reading => {
+							// As usual, we want to interpret the readings in UTC. We lose the timezone as this as the start/endTimestamp
+							// are equivalent to Unix timestamp in milliseconds.
+							const st = moment.utc(reading.startTimestamp);
+							// Time reading is in the middle of the start and end timestamp
+							const timeReading = st.add(moment.utc(reading.endTimestamp).diff(st) / 2);
+							xData.push(timeReading.utc().format('YYYY-MM-DD HH:mm:ss'));
+							let readingValue = reading.reading;
+							if(state.graph.normalizeByArea) {
+								// TODO: Consider changing group area to always be defined
+								if(groupArea === undefined) {
+									groupArea = 0;
+								}
+								readingValue /= groupArea;
+							}
+							yData.push(readingValue);
+							hoverText.push(`<b> ${timeReading.format('ddd, ll LTS')} </b> <br> ${label}: ${readingValue.toPrecision(6)} ${unitLabel}`);
+						});
+					}
+
+					// get the min and max timestamp of the meter, and compare it to the global values
+					if (readings.length > 0) {
+						if (minTimestamp == undefined || readings[0]['startTimestamp'] < minTimestamp) {
+							minTimestamp = readings[0]['startTimestamp'];
+						}
+						if (maxTimestamp == undefined || readings[readings.length - 1]['endTimestamp'] >= maxTimestamp) {
+							// Need to add one extra reading interval to avoid range truncation. The max bound seems to be treated as non-inclusive
+							maxTimestamp = readings[readings.length - 1]['endTimestamp'] + (readings[0]['endTimestamp'] - readings[0]['startTimestamp']);
+						}
+					}
+
+					// This variable contains all the elements (x and y values, line type, etc.) assigned to the data parameter of the Plotly object
+					datasets.push({
+						name: label,
+						x: xData,
+						y: yData,
+						text: hoverText,
+						hoverinfo: 'text',
+						type: 'scatter',
+						mode: 'lines',
+						line: {
+							shape: 'spline',
+							width: 2,
+							color: getGraphColor(colorID, DataType.Group)
+						}
 					});
 				}
-				else {
-					readings.forEach(reading => {
-						// As usual, we want to interpret the readings in UTC. We lose the timezone as this as the start/endTimestamp
-						// are equivalent to Unix timestamp in milliseconds.
-						const st = moment.utc(reading.startTimestamp);
-						// Time reading is in the middle of the start and end timestamp
-						const timeReading = st.add(moment.utc(reading.endTimestamp).diff(st) / 2);
-						xData.push(timeReading.utc().format('YYYY-MM-DD HH:mm:ss'));
-						yData.push(reading.reading);
-						hoverText.push(`<b> ${timeReading.format('ddd, ll LTS')} </b> <br> ${label}: ${reading.reading.toPrecision(6)} ${unitLabel}`);
-					});
-				}
-
-				// get the min and max timestamp of the meter, and compare it to the global values
-				if (readings.length > 0) {
-					if (minTimestamp == undefined || readings[0]['startTimestamp'] < minTimestamp) {
-						minTimestamp = readings[0]['startTimestamp'];
-					}
-					if (maxTimestamp == undefined || readings[readings.length - 1]['endTimestamp'] >= maxTimestamp) {
-						// Need to add one extra reading interval to avoid range truncation. The max bound seems to be treated as non-inclusive
-						maxTimestamp = readings[readings.length - 1]['endTimestamp'] + (readings[0]['endTimestamp'] - readings[0]['startTimestamp']);
-					}
-				}
-
-				// This variable contains all the elements (x and y values, line type, etc.) assigned to the data parameter of the Plotly object
-				datasets.push({
-					name: label,
-					x: xData,
-					y: yData,
-					text: hoverText,
-					hoverinfo: 'text',
-					type: 'scatter',
-					mode: 'lines',
-					line: {
-						shape: 'spline',
-						width: 2,
-						color: getGraphColor(colorID, DataType.Group)
-					}
-				});
 			}
 		}
 	}

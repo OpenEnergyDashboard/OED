@@ -57,6 +57,27 @@ export default function ChartDataSelectComponent() {
 		let sortedGroups = getGroupCompatibilityForDropdown(state);
 		const sortedUnits = getUnitCompatibilityForDropdown(state);
 
+		const nonAreaMeters: number[] = [];
+		const nonAreaGroups: number[] = [];
+
+		// only run this check if area normalization is on
+		if(state.graph.normalizeByArea) {
+			sortedMeters.forEach(meter => {
+				// do not allow meter to be selected if it does not have area
+				if(allMeters[meter.value].area === 0 || allMeters[meter.value].area === null) {
+					meter.isDisabled = true;
+					nonAreaMeters.push(meter.value);
+				}
+			});
+			sortedGroups.forEach(group => {
+				// do not allow group to be selected if it does not have area
+				if(allGroups[group.value].area === 0 || allGroups[group.value].area === null) {
+					group.isDisabled = true;
+					nonAreaGroups.push(group.value);
+				}
+			});
+		}
+
 		//Map information about the currently selected meters into a format the component can display.
 		// do extra check for display if using mapChart.
 		const nonGpsMeters: number[] = [];
@@ -139,8 +160,8 @@ export default function ChartDataSelectComponent() {
 				value: meterID,
 				isDisabled: false
 			} as SelectOption)
-			// don't include meters that can't be shown in map
-			if (!(nonGpsMeters.includes(meterID))) {
+			// don't include meters that can't be graphed with current settings
+			if (!(nonGpsMeters.includes(meterID)) && !(nonAreaMeters.includes(meterID))) {
 				// If the selected unit is -99 then there is not graphic unit yet. In this case you can only select a
 				// meter that has a default graphic unit because that will become the selected unit. This should only
 				// happen if no meter or group is yet selected.
@@ -182,8 +203,8 @@ export default function ChartDataSelectComponent() {
 				value: groupID,
 				isDisabled: false
 			} as SelectOption);
-			// don't include groups that can't be shown in map
-			if (!(nonGpsGroups.includes(groupID))) {
+			// don't include groups that can't be graphed with current settings
+			if (!(nonGpsGroups.includes(groupID)) && !(nonAreaGroups.includes(groupID))) {
 				// If the selected unit is -99 then there is no graphic unit yet. In this case you can only select a
 				// group that has a default graphic unit because that will become the selected unit. This should only
 				// happen if no meter or group is yet selected.

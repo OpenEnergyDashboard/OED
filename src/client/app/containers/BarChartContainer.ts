@@ -54,44 +54,52 @@ function mapStateToProps(state: State) {
 		const byMeterID = state.readings.bar.byMeterID[meterID];
 		if (byMeterID !== undefined && byMeterID[timeInterval.toString()] !== undefined &&
 			byMeterID[timeInterval.toString()][barDuration.toISOString()] !== undefined) {
-			const readingsData = byMeterID[timeInterval.toString()][barDuration.toISOString()][unitID];
-			if (readingsData !== undefined && !readingsData.isFetching) {
-				const label = state.meters.byMeterID[meterID].identifier;
-				const colorID = meterID;
-				if (readingsData.readings === undefined) {
-					throw new Error('Unacceptable condition: readingsData.readings is undefined.');
-				}
-
-				// Create two arrays for the x and y values. Fill the array with the data.
-				const xData: string[] = [];
-				const yData: number[] = [];
-				const hoverText: string[] = [];
-				const readings = _.values(readingsData.readings);
-				readings.forEach(barReading => {
-					const st = moment.utc(barReading.startTimestamp);
-					// Time reading is in the middle of the start and end timestamp (may change this depending on how it looks on the bar graph)\
-					const timeReading = st.add(moment.utc(barReading.endTimestamp).diff(st) / 2);
-					xData.push(timeReading.utc().format('YYYY-MM-DD HH:mm:ss'));
-					yData.push(barReading.reading);
-					// only display a range of dates for the hover text if there is more than one day in the range
-					let timeRange: string = `${moment.utc(barReading.startTimestamp).format('ll')}`;
-					if(barDuration.asDays() != 1) {
-						// subtracting one extra day caused by day ending at midnight of the next day.
-						// Going from DB unit timestamp that is UTC so force UTC with moment, as usual.
-						timeRange += ` - ${moment.utc(barReading.endTimestamp).subtract(1, 'days').format('ll')}`;
+			const meterArea = state.meters.byMeterID[meterID].area;
+			// we either don't care about area, or we do in which case there needs to be a nonzero area
+			if (!state.graph.normalizeByArea || meterArea > 0) {
+				const readingsData = byMeterID[timeInterval.toString()][barDuration.toISOString()][unitID];
+				if (readingsData !== undefined && !readingsData.isFetching) {
+					const label = state.meters.byMeterID[meterID].identifier;
+					const colorID = meterID;
+					if (readingsData.readings === undefined) {
+						throw new Error('Unacceptable condition: readingsData.readings is undefined.');
 					}
-					hoverText.push(`<b> ${timeRange} </b> <br> ${label}: ${barReading.reading.toPrecision(6)} ${unitLabel}`);
-				});
-				// This variable contains all the elements (x and y values, bar type, etc.) assigned to the data parameter of the Plotly object
-				datasets.push({
-					name: label,
-					x: xData,
-					y: yData,
-					text: hoverText,
-					hoverinfo: 'text',
-					type: 'bar',
-					marker: { color: getGraphColor(colorID, DataType.Meter) }
-				});
+
+					// Create two arrays for the x and y values. Fill the array with the data.
+					const xData: string[] = [];
+					const yData: number[] = [];
+					const hoverText: string[] = [];
+					const readings = _.values(readingsData.readings);
+					readings.forEach(barReading => {
+						const st = moment.utc(barReading.startTimestamp);
+						// Time reading is in the middle of the start and end timestamp (may change this depending on how it looks on the bar graph)\
+						const timeReading = st.add(moment.utc(barReading.endTimestamp).diff(st) / 2);
+						xData.push(timeReading.utc().format('YYYY-MM-DD HH:mm:ss'));
+						let readingValue = barReading.reading;
+						if(state.graph.normalizeByArea) {
+							readingValue /= meterArea;
+						}
+						yData.push(readingValue);
+						// only display a range of dates for the hover text if there is more than one day in the range
+						let timeRange: string = `${moment.utc(barReading.startTimestamp).format('ll')}`;
+						if(barDuration.asDays() != 1) {
+							// subtracting one extra day caused by day ending at midnight of the next day.
+							// Going from DB unit timestamp that is UTC so force UTC with moment, as usual.
+							timeRange += ` - ${moment.utc(barReading.endTimestamp).subtract(1, 'days').format('ll')}`;
+						}
+						hoverText.push(`<b> ${timeRange} </b> <br> ${label}: ${readingValue.toPrecision(6)} ${unitLabel}`);
+					});
+					// This variable contains all the elements (x and y values, bar type, etc.) assigned to the data parameter of the Plotly object
+					datasets.push({
+						name: label,
+						x: xData,
+						y: yData,
+						text: hoverText,
+						hoverinfo: 'text',
+						type: 'bar',
+						marker: { color: getGraphColor(colorID, DataType.Meter) }
+					});
+				}
 			}
 		}
 	}
@@ -100,45 +108,60 @@ function mapStateToProps(state: State) {
 		const byGroupID = state.readings.bar.byGroupID[groupID];
 		if (byGroupID !== undefined && byGroupID[timeInterval.toString()] !== undefined &&
 			byGroupID[timeInterval.toString()][barDuration.toISOString()] !== undefined) {
-			const readingsData = byGroupID[timeInterval.toString()][barDuration.toISOString()][unitID];
-			if (readingsData !== undefined && !readingsData.isFetching) {
-				const label = state.groups.byGroupID[groupID].name;
-				const colorID = groupID;
-				if (readingsData.readings === undefined) {
-					throw new Error('Unacceptable condition: readingsData.readings is undefined.');
-				}
-
-				// Create two arrays for the x and y values. Fill the array with the data.
-				const xData: string[] = [];
-				const yData: number[] = [];
-				const hoverText: string[] = [];
-				const readings = _.values(readingsData.readings);
-				readings.forEach(barReading => {
-					const st = moment.utc(barReading.startTimestamp);
-					// Time reading is in the middle of the start and end timestamp (may change this depending on how it looks on the bar graph)\
-					const timeReading = st.add(moment.utc(barReading.endTimestamp).diff(st) / 2);
-					xData.push(timeReading.utc().format('YYYY-MM-DD HH:mm:ss'));
-					yData.push(barReading.reading);
-					// only display a range of dates for the hover text if there is more than one day in the range
-					let timeRange: string = `${moment.utc(barReading.startTimestamp).format('ll')}`;
-					if(barDuration.asDays() != 1) {
-						// subtracting one extra day caused by day ending at midnight of the next day.
-						// Going from DB unit timestamp that is UTC so force UTC with moment, as usual.
-						timeRange += ` - ${moment.utc(barReading.endTimestamp).subtract(1, 'days').format('ll')}`;
+			let groupArea = state.groups.byGroupID[groupID].area;
+			// TODO Consider changing group area to always be defined
+			if(groupArea === undefined) {
+				groupArea = 0;
+			}
+			if (!state.graph.normalizeByArea || groupArea > 0) {
+				const readingsData = byGroupID[timeInterval.toString()][barDuration.toISOString()][unitID];
+				if (readingsData !== undefined && !readingsData.isFetching) {
+					const label = state.groups.byGroupID[groupID].name;
+					const colorID = groupID;
+					if (readingsData.readings === undefined) {
+						throw new Error('Unacceptable condition: readingsData.readings is undefined.');
 					}
-					hoverText.push(`<b> ${timeRange} </b> <br> ${label}: ${barReading.reading.toPrecision(6)} ${unitLabel}`);
-				});
 
-				// This variable contains all the elements (x and y values, bar chart, etc.) assigned to the data parameter of the Plotly object
-				datasets.push({
-					name: label,
-					x: xData,
-					y: yData,
-					text: hoverText,
-					hoverinfo: 'text',
-					type: 'bar',
-					marker: { color: getGraphColor(colorID, DataType.Group) }
-				});
+					// Create two arrays for the x and y values. Fill the array with the data.
+					const xData: string[] = [];
+					const yData: number[] = [];
+					const hoverText: string[] = [];
+					const readings = _.values(readingsData.readings);
+					readings.forEach(barReading => {
+						const st = moment.utc(barReading.startTimestamp);
+						// Time reading is in the middle of the start and end timestamp (may change this depending on how it looks on the bar graph)\
+						const timeReading = st.add(moment.utc(barReading.endTimestamp).diff(st) / 2);
+						xData.push(timeReading.utc().format('YYYY-MM-DD HH:mm:ss'));
+						let readingValue = barReading.reading;
+						if(state.graph.normalizeByArea) {
+							// TODO: Consider changing group area to always be defined
+							if(groupArea === undefined) {
+								groupArea = 0;
+							}
+							readingValue /= groupArea;
+						}
+						yData.push(readingValue);
+						// only display a range of dates for the hover text if there is more than one day in the range
+						let timeRange: string = `${moment.utc(barReading.startTimestamp).format('ll')}`;
+						if(barDuration.asDays() != 1) {
+							// subtracting one extra day caused by day ending at midnight of the next day.
+							// Going from DB unit timestamp that is UTC so force UTC with moment, as usual.
+							timeRange += ` - ${moment.utc(barReading.endTimestamp).subtract(1, 'days').format('ll')}`;
+						}
+						hoverText.push(`<b> ${timeRange} </b> <br> ${label}: ${readingValue.toPrecision(6)} ${unitLabel}`);
+					});
+
+					// This variable contains all the elements (x and y values, bar chart, etc.) assigned to the data parameter of the Plotly object
+					datasets.push({
+						name: label,
+						x: xData,
+						y: yData,
+						text: hoverText,
+						hoverinfo: 'text',
+						type: 'bar',
+						marker: { color: getGraphColor(colorID, DataType.Group) }
+					});
+				}
 			}
 		}
 	}
