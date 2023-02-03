@@ -11,9 +11,10 @@ import { GroupDefinition } from 'types/redux/groups';
 
 /**
  * The intersect operation of two sets.
- * @param setA The first set.
- * @param setB The second set.
- * @returns The intersection of two sets.
+ *
+ * @param {Set<number>} setA The first set.
+ * @param {Set<number>} setB The second set.
+ * @returns {Set<number>} The intersection of two sets.
  */
 export function setIntersect(setA: Set<number>, setB: Set<number>): Set<number> {
 	return new Set(Array.from(setA).filter(i => setB.has(i)));
@@ -21,8 +22,9 @@ export function setIntersect(setA: Set<number>, setB: Set<number>): Set<number> 
 
 /**
  * Takes a set of meter ids and returns the set of compatible unit ids.
- * @param meters The set of meter ids.
- * @returns
+ *
+ * @param {Set<number>} meters The set of meter ids.
+ * @returns {Set<number>} Set of compatible unit ids.
  */
 export function unitsCompatibleWithMeters(meters: Set<number>): Set<number> {
 	const state = store.getState();
@@ -58,8 +60,9 @@ export function unitsCompatibleWithMeters(meters: Set<number>): Set<number> {
 
 /**
  * Returns a set of units ids that are compatible with a specific unit id.
- * @param unitId The unit id.
- * @returns
+ *
+ * @param {number} unitId The unit id.
+ * @returns {Set<number>} Set of units ids that are compatible with specified unit id.
  */
 export function unitsCompatibleWithUnit(unitId: number): Set<number> {
 	// unitSet starts as an empty set.
@@ -87,8 +90,9 @@ export function unitsCompatibleWithUnit(unitId: number): Set<number> {
 
 /**
  * Returns the row index in Pik for a meter unit.
- * @param unitId The unit id.
- * @returns
+ *
+ * @param {number} unitId The unit id.
+ * @returns {number} The row index in Pik for given meter unit.
  */
 export function pRowFromUnit(unitId: number): number {
 	const state = store.getState();
@@ -101,8 +105,9 @@ export function pRowFromUnit(unitId: number): number {
 
 /**
  * Returns the unit id given the row in Pik.
- * @param row The row to find the associated unit.
- * @returns
+ *
+ * @param {number} row The row to find the associated unit.
+ * @returns {number} The unit id given the row in Pik units.
  */
 export function unitFromPRow(row: number): number {
 	const state = store.getState();
@@ -115,8 +120,9 @@ export function unitFromPRow(row: number): number {
 
 /**
  * Returns the unit id given the column in Pik.
- * @param column The column to find the associated unit.
- * @returns
+ *
+ * @param {number} column The column to find the associated unit.
+ * @returns {number} The unit id given the column in Pik.
  */
 export function unitFromPColumn(column: number): number {
 	const state = store.getState();
@@ -129,8 +135,9 @@ export function unitFromPColumn(column: number): number {
 
 /**
  * Returns the set of meters's ids associated with the groupId used.
- * @param groupId The groupId.
- * @returns the set of deep children of this group
+ *
+ * @param {number} groupId The groupId.
+ * @returns {Set<number>} The set of deep children of this group.
  */
 export function metersInGroup(groupId: number): Set<number> {
 	const state = store.getState();

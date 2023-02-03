@@ -14,6 +14,7 @@ export interface CompareEntity {
 	id: number;
 	isGroup: boolean;
 	name: string;
+	identifier: string;
 	change: number;
 	currUsage: number;
 	prevUsage: number;
@@ -41,12 +42,14 @@ function getDataForIDs(ids: number[], isGroup: boolean, state: State): CompareEn
 	const entities: CompareEntity[] = [];
 	for (const id of ids) {
 		let name: string;
+		let identifier: string = 'none';
 		let readingsData: CompareReadingsData | undefined;
 		if (isGroup) {
 			name = getGroupName(state, id);
 			readingsData = getGroupReadingsData(state, id, timeInterval, compareShift);
 		} else {
 			name = getMeterName(state, id);
+			identifier = getMeterIdentifier(state, id);
 			readingsData = getMeterReadingsData(state, id, timeInterval, compareShift);
 		}
 		if (isReadingsDataValid(readingsData)) {
@@ -54,7 +57,7 @@ function getDataForIDs(ids: number[], isGroup: boolean, state: State): CompareEn
 			const currUsage = readingsData!.curr_use!;
 			const prevUsage = readingsData!.prev_use!;
 			const change = calculateChange(currUsage, prevUsage);
-			const entity: CompareEntity = { id, isGroup, name, change, currUsage, prevUsage };
+			const entity: CompareEntity = { id, isGroup, name, identifier, change, currUsage, prevUsage };
 			entities.push(entity);
 			/* eslint-enable @typescript-eslint/no-non-null-assertion */
 		}
@@ -74,6 +77,13 @@ function getMeterName(state: State, meterID: number): string {
 		return '';
 	}
 	return state.meters.byMeterID[meterID].name;
+}
+
+function getMeterIdentifier(state: State, meterID: number): string {
+	if (state.meters.byMeterID[meterID] === undefined) {
+		return '';
+	}
+	return state.meters.byMeterID[meterID].identifier;
 }
 
 function getGroupReadingsData(state: State, groupID: number, timeInterval: TimeInterval,
@@ -128,12 +138,12 @@ function sortIDs(ids: CompareEntity[], sortingOrder: SortingOrder): CompareEntit
 	switch (sortingOrder) {
 		case SortingOrder.Alphabetical:
 			ids.sort((a, b) => {
-				const nameA = a.name.toLowerCase().trim();
-				const nameB = b.name.toLowerCase().trim();
-				if (nameA < nameB) {
+				const identifierA = a.identifier.toLowerCase().trim();
+				const identifierB = b.identifier.toLowerCase().trim();
+				if (identifierA < identifierB) {
 					return -1;
 				}
-				if (nameA > nameB) {
+				if (identifierA > identifierB) {
 					return 1;
 				}
 				return 0;

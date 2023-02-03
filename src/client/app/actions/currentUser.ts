@@ -19,16 +19,15 @@ export function receiveCurrentUser(data: User): t.ReceiveCurrentUser {
 
 /**
  * Check if we should fetch the current user's data. This function has the side effect of deleting an invalid token from local storage.
- * @param state
- * @returns Return true if we should fetch the current user's data. Returns false otherwise.
+ * @param {State} state The redux state
+ * @returns {boolean} Return true if we should fetch the current user's data. Returns false otherwise.
  */
 async function shouldFetchCurrentUser(state: State): Promise<boolean> {
 	// If we are currently fetching the current user, we should not fetch the data again.
 	if (!state.currentUser.isFetching) {
 		if (hasToken()) {
 			// If we have a token, we should check to see if it is valid.
-			const validToken = await verificationApi.checkTokenValid();
-			if (validToken) {
+			if (await verificationApi.checkTokenValid()) {
 				// If the token is valid, we should fetch the current user's data.
 				return true;
 			} else {

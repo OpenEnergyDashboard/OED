@@ -30,15 +30,15 @@ function formatMeterForResponse(meter, loggedInAsAdmin) {
 	const formattedMeter = {
 		id: meter.id,
 		name: null,
+		url: null,
 		enabled: meter.enabled,
 		displayable: meter.displayable,
-		url: null,
 		meterType: null,
 		timeZone: null,
 		gps: meter.gps,
-		identifier: meter.identifier,
-		area: meter.area,
+		identifier: (meter.displayable === true) ? meter.identifier : null,
 		note: null,
+		area: meter.area,
 		cumulative: null,
 		cumulativeReset: null,
 		cumulativeResetStart: null,
@@ -51,6 +51,7 @@ function formatMeterForResponse(meter, loggedInAsAdmin) {
 		reading: null,
 		startTimestamp: null,
 		endTimestamp: null,
+		previousEnd: null,
 		unitId: meter.unitId,
 		defaultGraphicUnit: meter.defaultGraphicUnit
 	};
@@ -58,10 +59,11 @@ function formatMeterForResponse(meter, loggedInAsAdmin) {
 	// Only logged in Admins can see url, types, timezones, and internal names
 	// and lots of other items now.
 	if (loggedInAsAdmin) {
+		formattedMeter.name = meter.name;
 		formattedMeter.url = meter.url;
 		formattedMeter.meterType = meter.type;
 		formattedMeter.timeZone = meter.meterTimezone;
-		formattedMeter.name = meter.name;
+		formattedMeter.identifier = meter.identifier;
 		formattedMeter.note = meter.note;
 		formattedMeter.cumulative = meter.cumulative;
 		formattedMeter.cumulativeReset = meter.cumulativeReset;
@@ -75,13 +77,8 @@ function formatMeterForResponse(meter, loggedInAsAdmin) {
 		formattedMeter.reading = meter.reading;
 		formattedMeter.startTimestamp = meter.startTimestamp;
 		formattedMeter.endTimestamp = meter.endTimestamp;
+		formattedMeter.previousEnd = meter.previousEnd;
 	}
-
-	// TODO: remove this line when usages of meter.name are replaced with meter.identifer
-	// Without this, things will break for non-logged in users because we currently rely on
-	// the internal name being available. As noted in #605, the intent is to not send the
-	// name to a user if they are not logged in.
-	formattedMeter.name = meter.name;
 
 	return formattedMeter;
 }
@@ -95,11 +92,9 @@ router.get('/', async (req, res) => {
 		let query;
 		const token = req.headers.token || req.body.token || req.query.token;
 		const loggedInAsAdmin = req.hasValidAuthToken && (await isTokenAuthorized(token, User.role.ADMIN));
-		if (loggedInAsAdmin) {
-			query = Meter.getAll;
-		} else {
-			query = Meter.getDisplayable;
-		}
+		// Because groups can use hidden meters, everyone gets all meters but we filter the
+		// information given about the meter after getting it.
+		query = Meter.getAll;
 
 		const rows = await query(conn);
 		res.json(rows.map(row => formatMeterForResponse(row, loggedInAsAdmin)));
@@ -150,7 +145,7 @@ router.get('/:meter_id', async (req, res) => {
 function validateMeterParams(params) {
 	const validParams = {
 		type: 'object',
-		maxProperties: 25,
+		maxProperties: 26,
 		// We can get rid of some of these if we defaulted more values in the meter model.
 		required: ['name', 'url', 'enabled', 'displayable', 'meterType', 'timeZone', 'note', 'area'],
 		properties: {
@@ -223,6 +218,7 @@ function validateMeterParams(params) {
 			reading: { type: 'number' },
 			startTimestamp: { type: 'string' },
 			endTimestamp: { type: 'string' },
+			previousEnd: { type: 'string' },
 			unitId: { type: 'integer' },
 			defaultGraphicUnit: { type: 'integer' }
 		}
@@ -262,8 +258,9 @@ router.post('/edit', requiredAdmin('edit meters'), async (req, res) => {
 				req.body.timeSort,
 				req.body.endOnlyTime,
 				req.body.reading,
-				(req.body.startTimestamp.length === 0) ? undefined : moment(req.body.startTimestamp),
-				(req.body.endTimestamp.length === 0) ? undefined : moment(req.body.endTimestamp),
+				(req.body.startTimestamp.length === 0) ? undefined : req.body.startTimestamp,
+				(req.body.endTimestamp.length === 0) ? undefined : req.body.endTimestamp,
+				(req.body.previousEnd.length === 0) ? undefined : moment(req.body.previousEnd),
 				req.body.unitId,
 				req.body.defaultGraphicUnit
 			);
@@ -311,8 +308,9 @@ router.post('/addMeter', async (req, res) => {
 				req.body.timeSort,
 				req.body.endOnlyTime,
 				req.body.reading,
-				(req.body.startTimestamp.length === 0) ? undefined : moment(req.body.startTimestamp),
-				(req.body.endTimestamp.length === 0) ? undefined : moment(req.body.endTimestamp),
+				(req.body.startTimestamp.length === 0) ? undefined : req.body.startTimestamp,
+				(req.body.endTimestamp.length === 0) ? undefined : req.body.endTimestamp,
+				(req.body.previousEnd.length === 0) ? undefined : moment(req.body.previousEnd),
 				req.body.unitId,
 				req.body.defaultGraphicUnit
 			);

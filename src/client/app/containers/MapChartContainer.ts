@@ -33,7 +33,7 @@ function mapStateToProps(state: State) {
 			}
 		}
 		// Holds the hover text for each point for Plotly
-		const texts: string[] = [];
+		const hoverText: string[] = [];
 		// Holds the size of each circle for Plotly.
 		const size: number[] = [];
 		// Holds the color of each circle for Plotly.
@@ -119,7 +119,7 @@ function mapStateToProps(state: State) {
 							// This protects against there being no readings or that the data is being updated.
 							if (readingsData !== undefined && !readingsData.isFetching) {
 								// Meter name to include in hover on graph.
-								const label = state.meters.byMeterID[meterID].name;
+								const label = state.meters.byMeterID[meterID].identifier;
 								// The usual color for this meter.
 								colors.push(getGraphColor(meterID, DataType.Meter));
 								if (readingsData.readings === undefined) {
@@ -153,7 +153,7 @@ function mapStateToProps(state: State) {
 									size.push(averagedReading);
 								}
 								// The hover text.
-								texts.push(`<b> ${timeReading} </b> <br> ${label}: ${averagedReading.toPrecision(6)} ${unitLabel}`);
+								hoverText.push(`<b> ${timeReading} </b> <br> ${label}: ${averagedReading.toPrecision(6)} ${unitLabel}`);
 							}
 						}
 					}
@@ -219,7 +219,7 @@ function mapStateToProps(state: State) {
 									size.push(averagedReading);
 								}
 								// The hover text.
-								texts.push(`<b> ${timeReading} </b> <br> ${label}: ${averagedReading.toPrecision(6)} ${unitLabel}`);
+								hoverText.push(`<b> ${timeReading} </b> <br> ${label}: ${averagedReading.toPrecision(6)} ${unitLabel}`);
 							}
 						}
 					}
@@ -265,7 +265,8 @@ function mapStateToProps(state: State) {
 					sizeref: scaling,
 					sizemode: 'area'
 				},
-				text: texts,
+				text: hoverText,
+				hoverinfo: 'text',
 				opacity: 1,
 				showlegend: false
 			};

@@ -10,7 +10,7 @@ import TooltipHelpContainer from '../containers/TooltipHelpContainer';
 
 /**
  * Top-level React component that controls the home page
- * @return JSX to create the home page
+ * @returns JSX to create the home page
  */
 export default function HomeComponent() {
 	return (

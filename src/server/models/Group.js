@@ -44,7 +44,7 @@ class Group {
 	 */
 	async insert(conn) {
 		// Shallow copies the group object so that the original group's defaultGraphicUnit will not be changed to null.
-		const group = {...this};
+		const group = { ...this };
 		if (group.id !== undefined) {
 			throw new Error('Attempt to insert a group that already has an ID');
 		}
@@ -87,7 +87,7 @@ class Group {
 	 * @param conn the connection to be used.
 	 * @returns {boolean} true if group exists.
 	 */
-	 async existsByName(conn) {
+	async existsByName(conn) {
 		const row = await conn.oneOrNone(sqlFile('group/get_group_by_name.sql'), { name: this.name });
 		return row !== null;
 	}
@@ -197,7 +197,7 @@ class Group {
 	 */
 	async update(conn) {
 		// Shallow copies the group object so that the original group's defaultGraphicUnit will not be changed to null.
-		const group = {...this};
+		const group = { ...this };
 		if (group.id === undefined) {
 			throw new Error('Attempt to update a group with no ID');
 		}
@@ -249,4 +249,3 @@ class Group {
 	}
 }
 module.exports = Group;
-

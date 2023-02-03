@@ -42,7 +42,13 @@ router.post('/', async (req, res) => {
 		const conn = getConnection();
 		try {
 			const user = await User.getByEmail(req.body.email, conn);
-			const isValid = await bcrypt.compare(req.body.password, user.passwordHash);
+			let isValid;
+			if (user === null) {
+				// User did not exist so return false.
+				isValid = false;
+			} else {
+				isValid = await bcrypt.compare(req.body.password, user.passwordHash);
+			}
 			if (isValid) {
 				const token = jwt.sign({ data: user.id }, secretToken, { expiresIn: 86400 });
 				res.json({ token: token, email: user.email, role: user.role });

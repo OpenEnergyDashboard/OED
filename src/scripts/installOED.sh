@@ -154,7 +154,9 @@ if [ "$production" == "no" ] && [ ! "$OED_PRODUCTION" == "yes" ]; then
 		# There was no createdb error so assume database ready for use so stop process
 		printf "%s\n" "User creation had no errors so default user 'test@example.com' with password 'password' should exist"
 	fi
-
+	# Create function to shift readings for compare - developer only
+	printf "%s\n" "Creating developer DB function"
+	npm run developerdb
 fi
 
 # Build webpack if needed

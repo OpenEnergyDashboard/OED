@@ -76,6 +76,8 @@ mocha.describe('maps API', () => {
 	});
 	mocha.describe('Admin role:', () => {
 		let token;
+		// Since this .before is in the middle of tests, it should not have issues as
+		// documented in usersTest.js.
 		mocha.before(async () => {
 			let res = await chai.request(app).post('/api/login')
 				.send({ email: testUser.email, password: testUser.password });
@@ -141,9 +143,6 @@ mocha.describe('maps API', () => {
 					// Insert user
 					const password = 'password';
 					const hashedPassword = await bcrypt.hash(password, 10);
-					const unauthorizedUser = new User(undefined, `${role}@example.com`, hashedPassword, User.role[role]);
-					await unauthorizedUser.insert(conn);
-					unauthorizedUser.password = password;
 
 					// get maps
 					let res = await chai.request(app).get('/api/maps').set('token', token);

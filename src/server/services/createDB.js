@@ -5,16 +5,15 @@
 const { createSchema } = require('../models/database');
 const { log } = require('../log');
 const { getConnection } = require('../db');
-const Unit = require('../models/Unit');
-const Conversion = require('../models/Conversion');
+const { insertStandardUnits, insertStandardConversions } = require('../util/insertData');
 const { redoCik } = require('../services/graph/redoCik');
 
 (async function createSchemaWrapper() {
 	const conn = getConnection();
 	try {
 		await createSchema(conn);
-		await Unit.insertStandardUnits(conn);
-		await Conversion.insertStandardConversions(conn);
+		await insertStandardUnits(conn);
+		await insertStandardConversions(conn);
 		await redoCik(conn);
 		log.info('Schema created', null, true);
 		process.exitCode = 0;
