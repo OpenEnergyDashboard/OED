@@ -38,6 +38,7 @@ import * as queryString from 'query-string';
 import InitializationComponent from './InitializationComponent';
 
 interface RouteProps {
+	normalizeByArea: boolean,
 	barStacking: boolean;
 	defaultLanguage: LanguageTypes;
 	loggedInAsAdmin: boolean;
@@ -178,6 +179,11 @@ export default class RouteComponent extends React.Component<RouteProps> {
 							break;
 						case 'barDuration':
 							options.barDuration = moment.duration(parseInt(info), 'days');
+							break;
+						case 'normalizeByArea':
+							if (this.props.normalizeByArea.toString() !== info) {
+								options.toggleNormalizeByArea = true;
+							}
 							break;
 						case 'barStacking':
 							if (this.props.barStacking.toString() !== info) {
