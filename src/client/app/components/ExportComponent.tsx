@@ -16,7 +16,6 @@ import { useSelector } from 'react-redux';
 
 interface ExportProps {
 	showRawExport: boolean;
-	selectedMeters: number[];
 	units: string;
 	exportVals: { datasets: ExportDataSet[] };
 	timeInterval: TimeInterval;
@@ -34,6 +33,8 @@ export default function ExportComponent(props: ExportProps) {
 	const metersState = useSelector((state: State) => state.meters.byMeterID);
 	// Units state
 	const unitsState = useSelector((state: State) => state.units.units);
+	// graph state
+	const graphState = useSelector((state: State) => state.graph);
 
 	const exportReading = () => {
 		const data = []
@@ -89,15 +90,15 @@ export default function ExportComponent(props: ExportProps) {
 	};
 
 	const exportRawReadings = async () => {
-		if (props.selectedMeters.length === 0)
+		if (graphState.selectedMeters.length === 0)
 			return;
 		const data: number[] = []
-		for (let i = 0; i < props.selectedMeters.length; i++) {
-			data.push(props.selectedMeters[i]);
-			const meterID = metersState[props.selectedMeters[i]].unitId;
+		for (let i = 0; i < graphState.selectedMeters.length; i++) {
+			data.push(graphState.selectedMeters[i]);
+			const meterID = metersState[graphState.selectedMeters[i]].unitId;
 			const unitName = unitsState[meterID].identifier;
 
-			const count = await metersApi.lineReadingsCount(props.selectedMeters, props.timeInterval);
+			const count = await metersApi.lineReadingsCount(graphState.selectedMeters, props.timeInterval);
 			graphRawExport(count, props.defaultWarningFileSize, props.defaultFileSizeLimit, async () => {
 				const lineReading = await metersApi.rawLineReadings(data, props.timeInterval);
 				downloadRawCSV(lineReading, props.defaultLanguage, unitName);

@@ -19,7 +19,8 @@ function transformBarReadingToLegacy(reading: BarReading): [number, number, numb
 
 /**
  * @param {State} state
- * @return {{meterInfo: *, selectedMeters: Array}}
+ * // TODO this comment is out of date
+ * @return {{meterInfo: *}}
  */
 function mapStateToProps(state: State) {
 	const timeInterval = state.graph.timeInterval;
@@ -147,8 +148,6 @@ function mapStateToProps(state: State) {
 
 	return {
 		showRawExport: state.graph.chartToRender === 'line' ? true : false,
-		selectedMeters: state.graph.selectedMeters,
-		selectedGroups: state.graph.selectedGroups,
 		units: state.graph.selectedUnit.toString(),
 		exportVals: { datasets },
 		timeInterval: state.graph.timeInterval,
