@@ -171,7 +171,7 @@ class Reading {
 	}
 
 	/**
-	 * Returns a promise to get all of the readings for this meter within (inclusive) a specified date range from the
+	 * Returns a promise to get all of the readings (so raw) for this meter within (inclusive) a specified date range from the
 	 * database. If no startDate is specified, all readings from the beginning of time to the endDate are returned.
 	 * If no endDate is specified, all readings after and including the startDate are returned.
 	 * @param meterID

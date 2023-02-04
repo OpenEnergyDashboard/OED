@@ -3,11 +3,7 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
 
 import { ExportDataSet, RawReadings } from '../types/readings';
-import { hasToken } from './token';
-import { usersApi } from '../utils/api'
 import * as moment from 'moment';
-import { UserRole } from '../types/items';
-import translate from './translate';
 
 /**
  * Function to converts the meter readings into a CSV formatted string.
@@ -86,75 +82,3 @@ export function downloadRawCSV(items: RawReadings[], unit: string) {
 	downloadCSV(csvOutput, filename);
 }
 /* eslint-enable @typescript-eslint/no-unused-vars */
-// as well as above comment
-
-/**
- * Function that adds a div to handle exporting raw data
- *
- * @param {number} count number of lines in the file
- * @param {number} warningFileSize warningFileSize maximum size of file before warning the user before download
- * @param {number} fileSizeLimit maximum file size that an non-authorized user can download
- * @param {Promise<void>} done async function that does another request to get all data then download it
- */
-// NOTE: This function is made with the idea that it will not be called very often
-// Ideally we would have a component that prompts the user and handles all the logic
-export async function graphRawExport(count: number, warningFileSize: number, fileSizeLimit: number, done: () => Promise<void>): Promise<any> {
-	const fileSize = (count * 0.0857 / 1000);
-	// Download for anyone without warning
-	if (fileSize <= warningFileSize) {
-		return done();
-	}
-
-	const mainContainer = document.createElement('div');
-	const innerContainer = document.createElement('div');
-	mainContainer.appendChild(innerContainer);
-	mainContainer.classList.add('fixed-top');
-	mainContainer.style.width = '100vw';
-	mainContainer.style.height = '100vh';
-	mainContainer.style.display = 'flex';
-	mainContainer.style.background = 'rgba(107,107,107,0.4)';
-	mainContainer.style.justifyContent = 'center';
-	mainContainer.style.alignItems = 'center';
-
-	innerContainer.style.padding = '20px 10px';
-	innerContainer.style.backgroundColor = 'white';
-	innerContainer.style.border = '2px solid black';
-	innerContainer.style.borderRadius = '10px';
-	innerContainer.style.textAlign = 'center';
-
-	innerContainer.innerHTML =
-		'<p>' + translate('csv.download.size.warning.size') + ` ${fileSize.toFixed(2)}MB.</p>
-		<p>` + translate('csv.download.size.warning.verify') + '</p>'
-		;
-
-	// fileSizeLimit is limit for an admin without checking they really want to download,
-	if (fileSize > fileSizeLimit && (!hasToken() || !(await usersApi.hasRolePermissions(UserRole.EXPORT)))) {
-		innerContainer.innerHTML = '<p>' + translate('csv.download.size.limit') + '</p>';
-		const okButton = document.createElement('button');
-		okButton.innerHTML = 'ok';
-		okButton.addEventListener('click', () => {
-			document.body.removeChild(mainContainer);
-		})
-		innerContainer.appendChild(okButton);
-		return document.body.appendChild(mainContainer);
-	}
-
-	const noButton = document.createElement('button');
-	noButton.innerHTML = translate('no');
-	const yesButton = document.createElement('button');
-	yesButton.innerHTML = translate('yes');
-
-	innerContainer.appendChild(yesButton);
-	innerContainer.appendChild(noButton);
-
-	noButton.addEventListener('click', () => {
-		document.body.removeChild(mainContainer);
-	})
-
-	yesButton.addEventListener('click', () => {
-		document.body.removeChild(mainContainer);
-		done();
-	})
-
-	document.body.appendChild(mainContainer);
-}

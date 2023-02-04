@@ -5,13 +5,17 @@
 import * as React from 'react';
 import { Button } from 'reactstrap';
 import * as moment from 'moment';
-import graphExport, { graphRawExport, downloadRawCSV } from '../utils/exportData';
+import graphExport, { downloadRawCSV } from '../utils/exportData';
 import { ExportDataSet } from '../types/readings';
 import { FormattedMessage } from 'react-intl';
 import { metersApi } from '../utils/api'
 import TooltipMarkerComponent from './TooltipMarkerComponent';
 import { State } from '../types/redux/state';
 import { useSelector } from 'react-redux';
+import { hasToken } from '../utils/token';
+import { usersApi } from '../utils/api'
+import { UserRole } from '../types/items';
+import translate from '../utils/translate';
 
 interface ExportProps {
 	exportVals: { datasets: ExportDataSet[] };
@@ -33,7 +37,7 @@ export default function ExportComponent(props: ExportProps) {
 
 	// Function to export the data in a graph.
 	const exportGraphReading = () => {
-		// Look over each graphic item and export one at a time into its own file.
+		// Loop over each graphic item and export one at a time into its own file.
 		for (let i = 0; i < props.exportVals.datasets.length; i++) {
 			// Data for current graphic item to export
 			const currentGraphItem = props.exportVals.datasets[i];
@@ -48,7 +52,7 @@ export default function ExportComponent(props: ExportProps) {
 			// Determine and format the first time in the dataset which is first one in array since just sorted and the start time.
 			// These values are already UTC so they are okay. Why has not been tracked down.
 			let startTime = moment(currentGraphItem.exportVals[0].x);
-	
+
 			// Determine and format the last time in the dataset which is the end time.
 			let endTime = moment(currentGraphItem.exportVals[currentGraphItem.exportVals.length - 1].z);
 
@@ -60,6 +64,7 @@ export default function ExportComponent(props: ExportProps) {
 			// This is the meter identifier
 			const meterName = currentGraphItem.label;
 			// This is the graphic unit
+			// TODO this is the same for all graph exports so fix this and value in datasets.
 			const unit = currentGraphItem.unit;
 			// This is the file name with all the above info so unique
 			const name = `oedExport_${chartName}_${startTimeString}_to_${endTimeString}_${meterName}_${unit}.csv`;
@@ -67,21 +72,59 @@ export default function ExportComponent(props: ExportProps) {
 		}
 	};
 
+	// Function to export raw readings of graphic data shown.
 	const exportRawReadings = async () => {
-		if (graphState.selectedMeters.length === 0)
-			return;
-		const data: number[] = []
-		for (let i = 0; i < graphState.selectedMeters.length; i++) {
-			data.push(graphState.selectedMeters[i]);
-			const meterID = metersState[graphState.selectedMeters[i]].unitId;
-			const unitName = unitsState[meterID].identifier;
+		// Get the total number of readings for all meters so can warn user if large.
+		const count = await metersApi.lineReadingsCount(graphState.selectedMeters, graphState.timeInterval);
+		// Estimated file size in MB
+		const fileSize = (count * 0.0857 / 1000);
+		// TODO const fileSize = 4;
+		// Decides if the readings should be exported, true if should.
+		let shouldDownload = false;
+		if (fileSize <= adminState.defaultWarningFileSize) {
+			// File sizes that anyone can download without prompting so fine
+			shouldDownload = true;
+		} else if (fileSize > adminState.defaultFileSizeLimit) {
+			// Exceeds the size allowed unless admin or export role and must verify want to continue.
+			if (hasToken() || await usersApi.hasRolePermissions(UserRole.EXPORT)) {
+				// A user allowed to do this but need to check okay with them.
+				const msg = translate('csv.download.size.warning.size') + ` ${fileSize.toFixed(2)}MB. ` +
+					translate('csv.download.size.warning.verify') + '?';
+				const consent = window.confirm(msg);
+				if (consent) {
+					shouldDownload = true;
+				}
+			} else {
+				// User not allowed to download.
+				const msg = translate('csv.download.size.warning.size') + ` ${fileSize.toFixed(2)}MB. ` +
+					translate('csv.download.size.limit');
+				window.alert(msg);
+			}
+		} else {
+			// Anyone can download if they approve
+			const msg = translate('csv.download.size.warning.size') + ` ${fileSize.toFixed(2)}MB. ` +
+				translate('csv.download.size.warning.verify') + '?';
+			const consent = window.confirm(msg);
+			if (consent) {
+				shouldDownload = true;
+			}
+		}
 
-			const count = await metersApi.lineReadingsCount(graphState.selectedMeters, graphState.timeInterval);
-			graphRawExport(count, adminState.defaultWarningFileSize, adminState.defaultFileSizeLimit, async () => {
-				const lineReading = await metersApi.rawLineReadings(data, graphState.timeInterval);
+		if (shouldDownload) {
+			// Loop over each selected meter in graphic. Does nothing if no meters selected.
+			for (let i = 0; i < graphState.selectedMeters.length; i++) {
+				// Which selected meter being processed.
+				const currentMeter = graphState.selectedMeters[i];
+				// The unit of the currentMeter.
+				const meterID = metersState[currentMeter].unitId;
+				// The identifier of currentMeter unit.
+				// Note that each meter can have a different unit so look up for each one.
+				const unitName = unitsState[meterID].identifier;
+
+				// 	// TODO ???? Maybe use new data way instead.
+				const lineReading = await metersApi.rawLineReadings(currentMeter, graphState.timeInterval);
 				downloadRawCSV(lineReading, unitName);
-			});
-			data.splice(0, data.length);
+			}
 		}
 	}
 

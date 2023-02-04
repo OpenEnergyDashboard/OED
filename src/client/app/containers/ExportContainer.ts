@@ -147,7 +147,7 @@ function mapStateToProps(state: State) {
 	}
 
 	return {
-		exportVals: { datasets },
+		exportVals: { datasets }
 	};
 }
 
