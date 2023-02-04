@@ -49,7 +49,7 @@ function mapStateToProps(state: State) {
 						id: state.groups.byGroupID[groupID].id,
 						currentChart: chart,
 						exportVals: dataPoints,
-						unit: state.units.units[parseInt(state.graph.selectedUnit.toString())].name
+						unit: state.units.units[parseInt(state.graph.selectedUnit.toString())].identifier
 					});
 				}
 			}
@@ -59,7 +59,7 @@ function mapStateToProps(state: State) {
 			if (byMeterID !== undefined) {
 				const readingsData = byMeterID[timeInterval.toString()][unitID];
 				if (readingsData !== undefined && !readingsData.isFetching) {
-					const label = state.meters.byMeterID[meterID].name;
+					const label = state.meters.byMeterID[meterID].identifier;
 					if (readingsData.readings === undefined) {
 						throw new Error('Unacceptable condition: readingsData.readings is undefined.');
 					}
@@ -74,7 +74,7 @@ function mapStateToProps(state: State) {
 						id: state.meters.byMeterID[meterID].id,
 						currentChart: chart,
 						exportVals: dataPoints,
-						unit: state.units.units[parseInt(state.graph.selectedUnit.toString())].name
+						unit: state.units.units[parseInt(state.graph.selectedUnit.toString())].identifier
 					});
 				}
 			}
@@ -105,7 +105,7 @@ function mapStateToProps(state: State) {
 								id: state.groups.byGroupID[groupID].id,
 								currentChart: chart,
 								exportVals: dataPoints,
-								unit: state.units.units[parseInt(state.graph.selectedUnit.toString())].name
+								unit: state.units.units[parseInt(state.graph.selectedUnit.toString())].identifier
 							});
 						}
 					}
@@ -121,7 +121,7 @@ function mapStateToProps(state: State) {
 					if (byBarDuration !== undefined) {
 						const readingsData = byBarDuration[unitID];
 						if (readingsData !== undefined && !readingsData.isFetching) {
-							const label = state.meters.byMeterID[meterID].name;
+							const label = state.meters.byMeterID[meterID].identifier;
 							if (readingsData.readings === undefined) {
 								throw new Error('Unacceptable condition: readingsData.readings is undefined.');
 							}
@@ -137,7 +137,7 @@ function mapStateToProps(state: State) {
 								id: state.meters.byMeterID[meterID].id,
 								currentChart: chart,
 								exportVals: dataPoints,
-								unit: state.units.units[parseInt(state.graph.selectedUnit.toString())].name
+								unit: state.units.units[parseInt(state.graph.selectedUnit.toString())].identifier
 							});
 						}
 					}
