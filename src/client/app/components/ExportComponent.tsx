@@ -16,7 +16,6 @@ import { useSelector } from 'react-redux';
 
 interface ExportProps {
 	showRawExport: boolean;
-	units: string;
 	exportVals: { datasets: ExportDataSet[] };
 	timeInterval: TimeInterval;
 	defaultLanguage: string;

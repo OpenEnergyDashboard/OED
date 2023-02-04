@@ -148,7 +148,6 @@ function mapStateToProps(state: State) {
 
 	return {
 		showRawExport: state.graph.chartToRender === 'line' ? true : false,
-		units: state.graph.selectedUnit.toString(),
 		exportVals: { datasets },
 		timeInterval: state.graph.timeInterval,
 		defaultLanguage: state.admin.defaultLanguage,
