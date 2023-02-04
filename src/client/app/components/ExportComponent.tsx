@@ -31,22 +31,19 @@ export default function ExportComponent(props: ExportProps) {
 	// admin state
 	const adminState = useSelector((state: State) => state.admin);
 
+	// Function to export the data in a graph.
 	const exportGraphReading = () => {
 		// Look over each graphic item and export one at a time into its own file.
 		for (let i = 0; i < props.exportVals.datasets.length; i++) {
 			// Data for current graphic item to export
 			const currentGraphItem = props.exportVals.datasets[i];
-			// TODO why would this be undefined?
-			if (currentGraphItem !== undefined) {
-				// Sort the dataset based on the start time of each value in item
-				currentGraphItem.exportVals.sort((a, b) => {
-					if (a.x < b.x) {
-						return -1;
-					}
-					return 1;
-				})
-			}
-			// })
+			// Sort the dataset based on the start time of each value in item
+			currentGraphItem.exportVals.sort((a, b) => {
+				if (a.x < b.x) {
+					return -1;
+				}
+				return 1;
+			})
 
 			// Determine and format the first time in the dataset which is first one in array since just sorted.
 			// These values are already UTC so they are okay. Why has not been tracked down.
@@ -66,9 +63,13 @@ export default function ExportComponent(props: ExportProps) {
 			// Use regex to remove commas and replace spaces/colons/hyphens with underscores
 			const startTimeString = startTime.utc().format('LL_LTS').replace(/,/g, '').replace(/[\s:-]/g, '_');
 			const endTimeString = endTime.utc().format('LL_LTS').replace(/,/g, '').replace(/[\s:-]/g, '_');
+			// This is line, bar
 			const chartName = currentGraphItem.currentChart;
+			// This is the meter identifier
 			const meterName = currentGraphItem.label;
+			// This is the graphic unit
 			const unit = currentGraphItem.unit;
+			// This is the file name with all the above info so unique
 			const name = `oedExport_${chartName}_${startTimeString}_to_${endTimeString}_${meterName}_${unit}.csv`;
 			graphExport(currentGraphItem, name);
 		}
