@@ -51,12 +51,10 @@ export default function ExportComponent(props: ExportProps) {
 
 			// Determine and format the first time in the dataset which is first one in array since just sorted and the start time.
 			// These values are already UTC so they are okay. Why has not been tracked down.
-			let startTime = moment(currentGraphItem.exportVals[0].x);
-
+			const startTime = moment(currentGraphItem.exportVals[0].x);
 			// Determine and format the last time in the dataset which is the end time.
-			let endTime = moment(currentGraphItem.exportVals[currentGraphItem.exportVals.length - 1].z);
-
-			// Use regex to remove commas and replace spaces/colons/hyphens with underscores
+			const endTime = moment(currentGraphItem.exportVals[currentGraphItem.exportVals.length - 1].z);
+			// Use regex to remove commas and replace spaces/colons/hyphens with underscores in timestamps
 			const startTimeString = startTime.utc().format('LL_LTS').replace(/,/g, '').replace(/[\s:-]/g, '_');
 			const endTimeString = endTime.utc().format('LL_LTS').replace(/,/g, '').replace(/[\s:-]/g, '_');
 			// This is line, bar
