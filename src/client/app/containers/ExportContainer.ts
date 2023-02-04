@@ -148,7 +148,6 @@ function mapStateToProps(state: State) {
 
 	return {
 		exportVals: { datasets },
-		defaultLanguage: state.admin.defaultLanguage,
 		defaultWarningFileSize: state.admin.defaultWarningFileSize,
 		defaultFileSizeLimit: state.admin.defaultFileSizeLimit
 	};

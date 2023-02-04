@@ -15,7 +15,6 @@ import { useSelector } from 'react-redux';
 
 interface ExportProps {
 	exportVals: { datasets: ExportDataSet[] };
-	defaultLanguage: string;
 	defaultWarningFileSize: number;
 	defaultFileSizeLimit: number;
 }
@@ -97,7 +96,7 @@ export default function ExportComponent(props: ExportProps) {
 			const count = await metersApi.lineReadingsCount(graphState.selectedMeters, graphState.timeInterval);
 			graphRawExport(count, props.defaultWarningFileSize, props.defaultFileSizeLimit, async () => {
 				const lineReading = await metersApi.rawLineReadings(data, graphState.timeInterval);
-				downloadRawCSV(lineReading, props.defaultLanguage, unitName);
+				downloadRawCSV(lineReading, unitName);
 			});
 			data.splice(0, data.length);
 		}

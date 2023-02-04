@@ -64,11 +64,9 @@ export default function graphExport(dataSets: ExportDataSet[], name: string) {
  * Function to export raw data that we request on button click
  *
  * @param {RawReadings[]} items list of readings directly from the database
- * @param {string} defaultLanguage the preferred localization to use for date/time formatting
  */
-// below comment should be removed when we either remove defaultLanguage or implement it into the following function
 /* eslint-disable @typescript-eslint/no-unused-vars */
-export function downloadRawCSV(items: RawReadings[], defaultLanguage: string, unit: string) {
+export function downloadRawCSV(items: RawReadings[], unit: string) {
 	let csvOutput = `Readings, Start Timestamp, End Timestamp, Meter, ${items[0].label}, Unit, ${unit} \n`;
 	items.forEach(ele => {
 		//.utc is not needed because this uses a different route than the way line graphs work. It returns a string that represents the
