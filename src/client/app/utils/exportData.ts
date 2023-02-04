@@ -79,7 +79,7 @@ export function downloadRawCSV(items: RawReadings[], defaultLanguage: string, un
 		// If we switch to the new route, we should remove this warning if we do the formatting here.
 		const startTimestamp = moment(ele.startTimestamp).format('dddd LL LTS').replace(/,/g, ''); // use regex to omit pesky commas
 		const endTimestamp = moment(ele.endTimestamp).format('dddd LL LTS').replace(/,/g, ''); // use regex to omit pesky commas
-		csvOutput += `"${ele.reading},${startTimestamp},${endTimestamp}\n`;
+		csvOutput += `${ele.reading},${startTimestamp},${endTimestamp}\n`;
 	})
 	// Use regex to remove commas and replace spaces/colons/hyphens with underscores
 	const startTime = moment(items[0].startTimestamp).format('LL_LTS').replace(/,/g, '').replace(/[\s:-]/g, '_');
