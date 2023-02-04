@@ -34,6 +34,7 @@ export interface PreferenceRequestItem {
 	defaultTimezone: string;
 	defaultWarningFileSize: number;
 	defaultFileSizeLimit: number;
+	defaultAreaNormalization: boolean;
 }
 
 /**

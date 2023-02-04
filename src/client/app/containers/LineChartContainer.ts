@@ -66,7 +66,7 @@ function mapStateToProps(state: State) {
 		if (byMeterID !== undefined) {
 			const meterArea = state.meters.byMeterID[meterID].area;
 			// we either don't care about area, or we do in which case there needs to be a nonzero area
-			if (!state.graph.normalizeByArea || meterArea > 0) {
+			if (!state.graph.areaNormalization || meterArea > 0) {
 				const readingsData = byMeterID[timeInterval.toString()][unitID];
 				if (readingsData !== undefined && !readingsData.isFetching) {
 					const label = state.meters.byMeterID[meterID].identifier;
@@ -104,7 +104,7 @@ function mapStateToProps(state: State) {
 							const timeReading = st.add(moment.utc(reading.endTimestamp).diff(st) / 2);
 							xData.push(timeReading.format('YYYY-MM-DD HH:mm:ss'));
 							let readingValue = reading.reading;
-							if(state.graph.normalizeByArea) {
+							if(state.graph.areaNormalization) {
 								readingValue /= meterArea;
 							}
 							yData.push(readingValue);
@@ -157,7 +157,7 @@ function mapStateToProps(state: State) {
 			if(groupArea === undefined) {
 				groupArea = 0;
 			}
-			if (!state.graph.normalizeByArea || groupArea > 0) {
+			if (!state.graph.areaNormalization || groupArea > 0) {
 				const readingsData = byGroupID[timeInterval.toString()][unitID];
 				if (readingsData !== undefined && !readingsData.isFetching) {
 					const label = state.groups.byGroupID[groupID].name;
@@ -195,7 +195,7 @@ function mapStateToProps(state: State) {
 							const timeReading = st.add(moment.utc(reading.endTimestamp).diff(st) / 2);
 							xData.push(timeReading.utc().format('YYYY-MM-DD HH:mm:ss'));
 							let readingValue = reading.reading;
-							if(state.graph.normalizeByArea) {
+							if(state.graph.areaNormalization) {
 								// TODO: Consider changing group area to always be defined
 								if(groupArea === undefined) {
 									groupArea = 0;

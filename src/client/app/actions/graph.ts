@@ -21,8 +21,8 @@ export function changeChartToRender(chartType: t.ChartTypes): t.ChangeChartToRen
 	return { type: ActionType.ChangeChartToRender, chartType };
 }
 
-export function changeNormalizeByArea(): t.ChangeNormalizeByAreaAction {
-	return { type: ActionType.ChangeNormalizeByArea };
+export function changeAreaNormalization(): t.ChangeAreaNormalizationAction {
+	return { type: ActionType.ChangeAreaNormalization };
 }
 
 export function changeBarStacking(): t.ChangeBarStackingAction {
@@ -199,7 +199,7 @@ export interface LinkOptions {
 	barDuration?: moment.Duration;
 	serverRange?: TimeInterval;
 	sliderRange?: TimeInterval;
-	toggleNormalizeByArea?: boolean;
+	toggleAreaNormalization?: boolean;
 	toggleBarStacking?: boolean;
 	comparePeriod?: ComparePeriod;
 	compareSortingOrder?: SortingOrder;
@@ -214,7 +214,7 @@ export interface LinkOptions {
  */
 export function changeOptionsFromLink(options: LinkOptions) {
 	const dispatchFirst: Thunk[] = [setHotlinkedAsync(true)];
-	const dispatchSecond: Array<Thunk | t.ChangeChartToRenderAction | t.ChangeNormalizeByAreaAction | t.ChangeBarStackingAction
+	const dispatchSecond: Array<Thunk | t.ChangeChartToRenderAction | t.ChangeAreaNormalizationAction | t.ChangeBarStackingAction
 	| t.ChangeGraphZoomAction | t.ChangeCompareSortingOrderAction | t.SetOptionsVisibility
 	| m.UpdateSelectedMapAction> = [];
 
@@ -238,8 +238,8 @@ export function changeOptionsFromLink(options: LinkOptions) {
 	if (options.sliderRange) {
 		dispatchSecond.push(changeRangeSliderIfNeeded(options.sliderRange));
 	}
-	if (options.toggleNormalizeByArea) {
-		dispatchSecond.push(changeNormalizeByArea());
+	if (options.toggleAreaNormalization) {
+		dispatchSecond.push(changeAreaNormalization());
 	}
 	if (options.toggleBarStacking) {
 		dispatchSecond.push(changeBarStacking());

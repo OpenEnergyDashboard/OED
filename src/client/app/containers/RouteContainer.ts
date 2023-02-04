@@ -24,7 +24,8 @@ function mapStateToProps(state: State) {
 		barStacking: state.graph.barStacking,
 		defaultLanguage: state.admin.defaultLanguage,
 		loggedInAsAdmin,
-		role
+		role,
+		areaNormalization: state.graph.areaNormalization
 	};
 }
 

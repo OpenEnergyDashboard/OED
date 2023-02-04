@@ -18,7 +18,8 @@ const defaultState: AdminState = {
 	submitted: true,
 	defaultWarningFileSize: 5,
 	defaultFileSizeLimit: 25,
-	isUpdatingCikAndDBViews: false
+	isUpdatingCikAndDBViews: false,
+	defaultAreaNormalization: false
 };
 
 export default function admin(state = defaultState, action: AdminAction) {
@@ -46,6 +47,12 @@ export default function admin(state = defaultState, action: AdminAction) {
 				defaultBarStacking: !state.defaultBarStacking,
 				submitted: false
 			};
+		case ActionType.ToggleDefaultAreaNormalization:
+			return {
+				...state,
+				defaultAreaNormalization: !state.defaultAreaNormalization,
+				submitted: false
+			}
 		case ActionType.UpdateDefaultTimeZone:
 			return {
 				...state,
@@ -73,7 +80,8 @@ export default function admin(state = defaultState, action: AdminAction) {
 				defaultLanguage: action.data.defaultLanguage,
 				defaultTimeZone: action.data.defaultTimezone,
 				defaultWarningFileSize: action.data.defaultWarningFileSize,
-				defaultFileSizeLimit: action.data.defaultFileSizeLimit
+				defaultFileSizeLimit: action.data.defaultFileSizeLimit,
+				defaultAreaNormalization: action.data.defaultAreaNormalization
 			};
 		case ActionType.MarkPreferencesNotSubmitted:
 			return {

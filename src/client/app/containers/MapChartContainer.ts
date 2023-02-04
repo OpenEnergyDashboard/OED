@@ -102,7 +102,7 @@ function mapStateToProps(state: State) {
 				if (gps !== undefined && gps !== null && byMeterID !== undefined) {
 					const meterArea = state.meters.byMeterID[meterID].area;
 					// we either don't care about area, or we do in which case there needs to be a nonzero area
-					if (!state.graph.normalizeByArea || meterArea > 0) {
+					if (!state.graph.areaNormalization || meterArea > 0) {
 						// Convert the gps value to the equivalent Plotly grid coordinates on user map.
 						// First, convert from GPS to grid units. Since we are doing a GPS calculation, this happens on the true north map.
 						// It must be on true north map since only there are the GPS axis parallel to the map axis.
@@ -152,7 +152,7 @@ function mapStateToProps(state: State) {
 										}
 										// The value for the circle is the average daily usage.
 										averagedReading = mapReading.reading / barDuration.asDays();
-										if(state.graph.normalizeByArea) {
+										if(state.graph.areaNormalization) {
 											averagedReading /= meterArea;
 										}
 										// The size is the reading value. It will be scaled later.
@@ -179,7 +179,7 @@ function mapStateToProps(state: State) {
 					if(groupArea === undefined) {
 						groupArea = 0;
 					}
-					if (!state.graph.normalizeByArea || groupArea > 0) {
+					if (!state.graph.areaNormalization || groupArea > 0) {
 						// Convert the gps value to the equivalent Plotly grid coordinates on user map.
 						// First, convert from GPS to grid units. Since we are doing a GPS calculation, this happens on the true north map.
 						// It must be on true north map since only there are the GPS axis parallel to the map axis.
@@ -228,7 +228,7 @@ function mapStateToProps(state: State) {
 										}
 										// The value for the circle is the average daily usage.
 										averagedReading = mapReading.reading / barDuration.asDays();
-										if(state.graph.normalizeByArea) {
+										if(state.graph.areaNormalization) {
 											averagedReading /= groupArea;
 										}
 										// The size is the reading value. It will be scaled later.

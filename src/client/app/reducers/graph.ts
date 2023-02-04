@@ -20,7 +20,7 @@ const defaultState: GraphState = {
 	compareSortingOrder: SortingOrder.Descending,
 	chartToRender: ChartTypes.line,
 	barStacking: false,
-	normalizeByArea: false,
+	areaNormalization: false,
 	hotlinked: false,
 	optionsVisibility: true,
 	lineGraphRate: {label: 'hour', rate: 1}
@@ -74,10 +74,10 @@ export default function graph(state = defaultState, action: GraphAction) {
 				...state,
 				chartToRender: action.chartType
 			};
-		case ActionType.ChangeNormalizeByArea:
+		case ActionType.ChangeAreaNormalization:
 			return {
 				...state,
-				normalizeByArea: !state.normalizeByArea
+				areaNormalization: !state.areaNormalization
 			};
 		case ActionType.ChangeBarStacking:
 			return {

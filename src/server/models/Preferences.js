@@ -16,8 +16,9 @@ class Preferences {
 	 * @param {String} defaultTimezone - Option to set the default timezone
 	 * @param {Number} defaultWarningFileSize - Option to set the default warning file size
 	 * @param {Number} defaultFileSizeLimit - Option to set the default file size limit
+	 * @param {Number} defaultAreaNormalization - Option to set the default toggle of area normalization
 	 */
-	constructor(displayTitle, defaultChartToRender, defaultBarStacking, defaultLanguage, defaultTimezone, defaultWarningFileSize, defaultFileSizeLimit) {
+	constructor(displayTitle, defaultChartToRender, defaultBarStacking, defaultLanguage, defaultTimezone, defaultWarningFileSize, defaultFileSizeLimit, defaultAreaNormalization) {
 		this.displayTitle = displayTitle;
 		this.defaultChartToRender = defaultChartToRender;
 		this.defaultBarStacking = defaultBarStacking;
@@ -25,6 +26,7 @@ class Preferences {
 		this.defaultTimezone = defaultTimezone;
 		this.defaultWarningFileSize = defaultWarningFileSize;
 		this.defaultFileSizeLimit = defaultFileSizeLimit;
+		this.defaultAreaNormalization = defaultAreaNormalization;
 	}
 
 	/**
@@ -53,7 +55,8 @@ class Preferences {
 			row.default_language, 
 			row.default_timezone, 
 			row.default_warning_file_size, 
-			row.default_file_size_limit
+			row.default_file_size_limit,
+			row.default_area_normalization
 		);
 	}
 
@@ -82,7 +85,8 @@ class Preferences {
 				defaultLanguage: preferences.defaultLanguage,
 				defaultTimezone: preferences.defaultTimezone,
 				defaultWarningFileSize: preferences.defaultWarningFileSize,
-				defaultFileSizeLimit: preferences.defaultFileSizeLimit
+				defaultFileSizeLimit: preferences.defaultFileSizeLimit,
+				defaultAreaNormalization: preferences.defaultAreaNormalization
 			});
 	}
 }

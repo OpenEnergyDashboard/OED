@@ -10,7 +10,7 @@ import { Button, ButtonGroup, Dropdown, DropdownToggle, DropdownMenu, DropdownIt
 import ExportContainer from '../containers/ExportContainer';
 import ChartSelectComponent from './ChartSelectComponent';
 import ChartDataSelectComponent from './ChartDataSelectComponent';
-import { ChangeBarStackingAction, ChangeCompareSortingOrderAction, ChangeNormalizeByAreaAction, SetOptionsVisibility } from '../types/redux/graph';
+import { ChangeAreaNormalizationAction, ChangeBarStackingAction, ChangeCompareSortingOrderAction, SetOptionsVisibility } from '../types/redux/graph';
 import ChartLinkContainer from '../containers/ChartLinkContainer';
 import LanguageSelectorContainer from '../containers/LanguageSelectorContainer'
 import { ChartTypes } from '../types/redux/graph';
@@ -25,14 +25,14 @@ const Slider = createSliderWithTooltip(sliderWithoutTooltips);
 
 export interface UIOptionsProps {
 	chartToRender: ChartTypes;
-	normalizeByArea: boolean;
+	areaNormalization: boolean;
 	barStacking: boolean;
 	barDuration: moment.Duration;
 	comparePeriod: ComparePeriod;
 	compareSortingOrder: SortingOrder;
 	optionsVisibility: boolean;
 	changeDuration(duration: moment.Duration): Promise<any>;
-	changeNormalizeByArea(): ChangeNormalizeByAreaAction;
+	changeAreaNormalization(): ChangeAreaNormalizationAction;
 	changeBarStacking(): ChangeBarStackingAction;
 	setOptionsVisibility(visibility: boolean): SetOptionsVisibility;
 	changeCompareGraph(comparePeriod: ComparePeriod): Promise<any>;
@@ -50,7 +50,7 @@ interface UIOptionsState {
 class UIOptionsComponent extends React.Component<UIOptionsPropsWithIntl, UIOptionsState> {
 	constructor(props: UIOptionsPropsWithIntl) {
 		super(props);
-		this.handleChangeNormalizeByArea = this.handleChangeNormalizeByArea.bind(this);
+		this.handleChangeAreaNormalization = this.handleChangeAreaNormalization.bind(this);
 		this.handleBarDurationChange = this.handleBarDurationChange.bind(this);
 		this.handleBarDurationChangeComplete = this.handleBarDurationChangeComplete.bind(this);
 		this.handleChangeBarStacking = this.handleChangeBarStacking.bind(this);
@@ -96,7 +96,7 @@ class UIOptionsComponent extends React.Component<UIOptionsPropsWithIntl, UIOptio
 				{this.props.chartToRender === ChartTypes.bar &&
 					<div>
 						<div className='checkbox'>
-							<input type='checkbox' onChange={this.handleChangeBarStacking} checked={this.props.barStacking} id='barStacking' />
+							<input type='checkbox' style={{ marginRight: '10px' }} onChange={this.handleChangeBarStacking} checked={this.props.barStacking} id='barStacking' />
 							<label htmlFor='barStacking'>
 								<FormattedMessage id='bar.stacking' />
 							</label>
@@ -250,11 +250,17 @@ class UIOptionsComponent extends React.Component<UIOptionsPropsWithIntl, UIOptio
 				}
 
 				<div className='checkbox'>
-					<input type='checkbox' onChange={this.handleChangeNormalizeByArea} checked={this.props.normalizeByArea} id='areaNormalize' />
-					<label htmlFor='areaNormalize'>
+					<input
+						type='checkbox'
+						style={{ marginRight: '10px' }}
+						onChange={this.handleChangeAreaNormalization}
+						checked={this.props.areaNormalization}
+						id='areaNormalization'
+					/>
+					<label htmlFor='areaNormalization'>
 						<FormattedMessage id='area.normalize' />
 					</label>
-					<TooltipMarkerComponent page='home' helpTextId='help.home.area.normalize.tip' />
+					<TooltipMarkerComponent page='home' helpTextId='help.home.area.normalize' />
 				</div>
 
 				{/* We can't export compare data or map data */}
@@ -306,8 +312,8 @@ class UIOptionsComponent extends React.Component<UIOptionsPropsWithIntl, UIOptio
 		this.setState({ barDurationDays: value });
 	}
 
-	private handleChangeNormalizeByArea() {
-		this.props.changeNormalizeByArea();
+	private handleChangeAreaNormalization() {
+		this.props.changeAreaNormalization();
 	}
 
 	private handleChangeBarStacking() {

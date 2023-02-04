@@ -13,6 +13,7 @@ export type AdminAction =
 	| UpdateDefaultChartToRenderAction
 	| UpdateDefaultLanguageAction
 	| ToggleDefaultBarStackingAction
+	| ToggleDefaultAreaNormalizationAction
 	| RequestPreferencesAction
 	| ReceivePreferencesAction
 	| MarkPreferencesNotSubmittedAction
@@ -39,6 +40,10 @@ export interface UpdateDefaultChartToRenderAction {
 
 export interface ToggleDefaultBarStackingAction {
 	type: ActionType.ToggleDefaultBarStacking;
+}
+
+export interface ToggleDefaultAreaNormalizationAction {
+	type: ActionType.ToggleDefaultAreaNormalization;
 }
 
 export interface UpdateDefaultTimeZone {
@@ -94,4 +99,5 @@ export interface AdminState {
 	defaultWarningFileSize: number;
 	defaultFileSizeLimit: number;
 	isUpdatingCikAndDBViews: boolean;
+	defaultAreaNormalization: boolean;
 }

@@ -2,7 +2,7 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
 
-import { changeBarStacking, changeChartToRender } from './graph';
+import { changeAreaNormalization, changeBarStacking, changeChartToRender } from './graph';
 import { showErrorNotification, showSuccessNotification } from '../utils/notifications';
 import { ChartTypes } from '../types/redux/graph';
 import { PreferenceRequestItem } from '../types/items';
@@ -33,6 +33,10 @@ export function updateDefaultChartToRender(defaultChartToRender: ChartTypes): t.
 
 export function toggleDefaultBarStacking(): t.ToggleDefaultBarStackingAction {
 	return { type: ActionType.ToggleDefaultBarStacking };
+}
+
+export function toggleDefaultAreaNormalization(): t.ToggleDefaultAreaNormalizationAction {
+	return { type: ActionType.ToggleDefaultAreaNormalization };
 }
 
 export function updateDefaultLanguage(defaultLanguage: LanguageTypes): t.UpdateDefaultLanguageAction {
@@ -77,6 +81,9 @@ function fetchPreferences(): Thunk {
 				if (preferences.defaultBarStacking !== state.graph.barStacking) {
 					dispatch2(changeBarStacking());
 				}
+				if (preferences.defaultAreaNormalization !== state.graph.areaNormalization) {
+					dispatch2(changeAreaNormalization());
+				}
 			});
 		}
 	};
@@ -89,11 +96,12 @@ export function submitPreferences() {
 			await preferencesApi.submitPreferences({
 				displayTitle: state.admin.displayTitle,
 				defaultChartToRender: state.admin.defaultChartToRender,
-				defaultBarStacking: state.admin.defaultBarStacking,
 				defaultLanguage: state.admin.defaultLanguage,
 				defaultTimezone: state.admin.defaultTimeZone,
 				defaultWarningFileSize: state.admin.defaultWarningFileSize,
-				defaultFileSizeLimit: state.admin.defaultFileSizeLimit
+				defaultFileSizeLimit: state.admin.defaultFileSizeLimit,
+				defaultBarStacking: state.admin.defaultBarStacking,
+				defaultAreaNormalization: state.admin.defaultAreaNormalization
 			});
 			dispatch(markPreferencesSubmitted());
 			showSuccessNotification(translate('updated.preferences'));

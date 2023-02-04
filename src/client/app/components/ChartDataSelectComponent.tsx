@@ -61,7 +61,7 @@ export default function ChartDataSelectComponent() {
 		const nonAreaGroups: number[] = [];
 
 		// only run this check if area normalization is on
-		if(state.graph.normalizeByArea) {
+		if(state.graph.areaNormalization) {
 			sortedMeters.forEach(meter => {
 				// do not allow meter to be selected if it does not have area
 				if(allMeters[meter.value].area === 0 || allMeters[meter.value].area === null) {

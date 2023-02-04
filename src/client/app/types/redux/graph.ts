@@ -47,8 +47,8 @@ export interface ChangeChartToRenderAction {
 	chartType: ChartTypes;
 }
 
-export interface ChangeNormalizeByAreaAction {
-	type: ActionType.ChangeNormalizeByArea;
+export interface ChangeAreaNormalizationAction {
+	type: ActionType.ChangeAreaNormalization;
 }
 
 export interface ChangeBarStackingAction {
@@ -100,7 +100,7 @@ export type GraphAction =
 	| ChangeSliderRangeAction
 	| ResetRangeSliderStackAction
 	| ChangeBarStackingAction
-	| ChangeNormalizeByAreaAction
+	| ChangeAreaNormalizationAction
 	| ChangeChartToRenderAction
 	| UpdateBarDurationAction
 	| UpdateSelectedGroupsAction
@@ -118,7 +118,7 @@ export interface LineGraphRate {
 }
 
 export interface GraphState {
-	normalizeByArea: boolean;
+	areaNormalization: boolean;
 	selectedMeters: number[];
 	selectedGroups: number[];
 	selectedUnit: number;

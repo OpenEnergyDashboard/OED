@@ -7,6 +7,7 @@ import { Input, Button } from 'reactstrap';
 import { ChartTypes } from '../../types/redux/graph';
 import {
 	ToggleDefaultBarStackingAction,
+	ToggleDefaultAreaNormalizationAction,
 	UpdateDefaultChartToRenderAction,
 	UpdateDefaultLanguageAction,
 	UpdateDefaultTimeZone,
@@ -25,6 +26,7 @@ interface PreferencesProps {
 	displayTitle: string;
 	defaultChartToRender: ChartTypes;
 	defaultBarStacking: boolean;
+	defaultAreaNormalization: boolean;
 	defaultTimeZone: string;
 	defaultLanguage: LanguageTypes;
 	disableSubmitPreferences: boolean;
@@ -33,6 +35,7 @@ interface PreferencesProps {
 	updateDisplayTitle(title: string): UpdateDisplayTitleAction;
 	updateDefaultChartType(defaultChartToRender: ChartTypes): UpdateDefaultChartToRenderAction;
 	toggleDefaultBarStacking(): ToggleDefaultBarStackingAction;
+	toggleDefaultAreaNormalization(): ToggleDefaultAreaNormalizationAction;
 	updateDefaultLanguage(defaultLanguage: LanguageTypes): UpdateDefaultLanguageAction;
 	submitPreferences(): Promise<void>;
 	updateDefaultTimeZone(timeZone: string): UpdateDefaultTimeZone;
@@ -53,6 +56,7 @@ class PreferencesComponent extends React.Component<PreferencesPropsWithIntl> {
 		this.handleSubmitPreferences = this.handleSubmitPreferences.bind(this);
 		this.handleDefaultWarningFileSizeChange = this.handleDefaultWarningFileSizeChange.bind(this);
 		this.handleDefaultFileSizeLimitChange = this.handleDefaultFileSizeLimitChange.bind(this);
+		this.handleDefaultAreaNormalizationChange = this.handleDefaultAreaNormalizationChange.bind(this);
 	}
 
 	public render() {
@@ -153,6 +157,20 @@ class PreferencesComponent extends React.Component<PreferencesPropsWithIntl> {
 							checked={this.props.defaultBarStacking}
 						/>
 						<FormattedMessage id='bar.stacking' />
+					</label>
+				</div>
+				<div className='checkbox'>
+					<p style={labelStyle}>
+						<FormattedMessage id='default.area.normalize' />:
+					</p>
+					<label>
+						<input
+							type='checkbox'
+							style={{ marginRight: '10px' }}
+							onChange={this.handleDefaultAreaNormalizationChange}
+							checked={this.props.defaultAreaNormalization}
+						/>
+						<FormattedMessage id='area.normalize' />
 					</label>
 				</div>
 				<div>
@@ -270,6 +288,11 @@ class PreferencesComponent extends React.Component<PreferencesPropsWithIntl> {
 
 	private handleDefaultBarStackingChange() {
 		this.props.toggleDefaultBarStacking();
+		this.updateUnsavedChanges();
+	}
+
+	private handleDefaultAreaNormalizationChange() {
+		this.props.toggleDefaultAreaNormalization();
 		this.updateUnsavedChanges();
 	}
 
