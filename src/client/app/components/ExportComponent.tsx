@@ -15,8 +15,6 @@ import { useSelector } from 'react-redux';
 
 interface ExportProps {
 	exportVals: { datasets: ExportDataSet[] };
-	defaultWarningFileSize: number;
-	defaultFileSizeLimit: number;
 }
 
 export default function ExportComponent(props: ExportProps) {
@@ -30,6 +28,8 @@ export default function ExportComponent(props: ExportProps) {
 	const unitsState = useSelector((state: State) => state.units.units);
 	// graph state
 	const graphState = useSelector((state: State) => state.graph);
+	// admin state
+	const adminState = useSelector((state: State) => state.admin);
 
 	const exportReading = () => {
 		const data = []
@@ -94,7 +94,7 @@ export default function ExportComponent(props: ExportProps) {
 			const unitName = unitsState[meterID].identifier;
 
 			const count = await metersApi.lineReadingsCount(graphState.selectedMeters, graphState.timeInterval);
-			graphRawExport(count, props.defaultWarningFileSize, props.defaultFileSizeLimit, async () => {
+			graphRawExport(count, adminState.defaultWarningFileSize, adminState.defaultFileSizeLimit, async () => {
 				const lineReading = await metersApi.rawLineReadings(data, graphState.timeInterval);
 				downloadRawCSV(lineReading, unitName);
 			});
