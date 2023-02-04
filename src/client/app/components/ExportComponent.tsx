@@ -45,20 +45,12 @@ export default function ExportComponent(props: ExportProps) {
 				return 1;
 			})
 
-			// Determine and format the first time in the dataset which is first one in array since just sorted.
+			// Determine and format the first time in the dataset which is first one in array since just sorted and the start time.
 			// These values are already UTC so they are okay. Why has not been tracked down.
 			let startTime = moment(currentGraphItem.exportVals[0].x);
-			const startTimeOfDataset = moment(currentGraphItem.exportVals[0].x);
-			if (startTime.isAfter(startTimeOfDataset)) {
-				startTime = startTimeOfDataset;
-			}
-
-			// Determine and format the last time in the dataset
-			let endTime = moment(currentGraphItem.exportVals[currentGraphItem.exportVals.length - 1].x);
-			const endTimeOfDataset = moment(currentGraphItem.exportVals[currentGraphItem.exportVals.length - 1].x);
-			if (endTimeOfDataset.isAfter(endTime)) {
-				endTime = endTimeOfDataset;
-			}
+	
+			// Determine and format the last time in the dataset which is the end time.
+			let endTime = moment(currentGraphItem.exportVals[currentGraphItem.exportVals.length - 1].z);
 
 			// Use regex to remove commas and replace spaces/colons/hyphens with underscores
 			const startTimeString = startTime.utc().format('LL_LTS').replace(/,/g, '').replace(/[\s:-]/g, '_');
