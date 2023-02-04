@@ -31,56 +31,46 @@ export default function ExportComponent(props: ExportProps) {
 	// admin state
 	const adminState = useSelector((state: State) => state.admin);
 
-	const exportReading = () => {
-		const data = []
-		//using a loop to push objects one at a time into data to be organized and formatted for export
+	const exportGraphReading = () => {
+		// Look over each graphic item and export one at a time into its own file.
 		for (let i = 0; i < props.exportVals.datasets.length; i++) {
-			data.push(props.exportVals.datasets[i]);
-
-			// Sort the dataset based on the start time
-			data.forEach(reading => {
-				if (reading !== undefined) {
-					reading.exportVals.sort((a, b) => {
-						if (a.x < b.x) {
-							return -1;
-						}
-						return 1;
-					})
-				}
-			})
-
-			// Determine and format the first time in the dataset
-			// These values are already UTC so they are okay. Why has not been tracked down.
-			let startTime = moment(data[0].exportVals[0].x);
-			for (const reading of data) {
-				if (reading !== undefined) {
-					const startTimeOfDataset = moment(reading.exportVals[0].x);
-					if (startTime.isAfter(startTimeOfDataset)) {
-						startTime = startTimeOfDataset;
+			// Data for current graphic item to export
+			const currentGraphItem = props.exportVals.datasets[i];
+			// TODO why would this be undefined?
+			if (currentGraphItem !== undefined) {
+				// Sort the dataset based on the start time of each value in item
+				currentGraphItem.exportVals.sort((a, b) => {
+					if (a.x < b.x) {
+						return -1;
 					}
-				}
+					return 1;
+				})
+			}
+			// })
+
+			// Determine and format the first time in the dataset which is first one in array since just sorted.
+			// These values are already UTC so they are okay. Why has not been tracked down.
+			let startTime = moment(currentGraphItem.exportVals[0].x);
+			const startTimeOfDataset = moment(currentGraphItem.exportVals[0].x);
+			if (startTime.isAfter(startTimeOfDataset)) {
+				startTime = startTimeOfDataset;
 			}
 
 			// Determine and format the last time in the dataset
-			let endTime = moment(data[0].exportVals[data[0].exportVals.length - 1].x);
-			for (const reading of data) {
-				if (reading !== undefined) {
-					const endTimeOfDataset = moment(reading.exportVals[reading.exportVals.length - 1].x);
-					if (endTimeOfDataset.isAfter(endTime)) {
-						endTime = endTimeOfDataset;
-					}
-				}
+			let endTime = moment(currentGraphItem.exportVals[currentGraphItem.exportVals.length - 1].x);
+			const endTimeOfDataset = moment(currentGraphItem.exportVals[currentGraphItem.exportVals.length - 1].x);
+			if (endTimeOfDataset.isAfter(endTime)) {
+				endTime = endTimeOfDataset;
 			}
+
 			// Use regex to remove commas and replace spaces/colons/hyphens with underscores
 			const startTimeString = startTime.utc().format('LL_LTS').replace(/,/g, '').replace(/[\s:-]/g, '_');
 			const endTimeString = endTime.utc().format('LL_LTS').replace(/,/g, '').replace(/[\s:-]/g, '_');
-			const chartName = data[0].currentChart;
-			const meterName = data[0].label;
-			const unit = data[0].unit;
+			const chartName = currentGraphItem.currentChart;
+			const meterName = currentGraphItem.label;
+			const unit = currentGraphItem.unit;
 			const name = `oedExport_${chartName}_${startTimeString}_to_${endTimeString}_${meterName}_${unit}.csv`;
-			graphExport(data, name);
-			//clear out exported data so a new object can be pushed in
-			data.splice(0, data.length);
+			graphExport(currentGraphItem, name);
 		}
 	};
 
@@ -105,7 +95,7 @@ export default function ExportComponent(props: ExportProps) {
 	return (
 		<>
 			<div>
-				<Button outline onClick={exportReading}>
+				<Button outline onClick={exportGraphReading}>
 					<FormattedMessage id='export.graph.data' />
 				</Button>
 				<TooltipMarkerComponent page='home' helpTextId='help.home.export.graph.data' />

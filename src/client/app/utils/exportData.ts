@@ -12,20 +12,18 @@ import translate from './translate';
 /**
  * Function to converts the meter readings into a CSV formatted string.
  *
- * @param {ExportDataSet[]} items The meter reading.
+ * @param {ExportDataSet} item The meter reading.
  * @returns {string} output A string containing the CSV formatted meter readings.
  */
-function convertToCSV(items: ExportDataSet[]) {
-	let csvOutput = `Readings,Start Timestamp, End Timestamp, Meter name, ${items[0].label}, Unit, ${items[0].unit}\n`;
-	items.forEach(set => {
-		const data = set.exportVals;
-		data.forEach(reading => {
-			const info = reading.y;
-			// Why UTC is needed here has not been carefully analyzed.
-			const startTimeStamp = moment.utc(reading.x).format('dddd LL LTS').replace(/,/g, ''); // use regex to omit pesky commas
-			const endTimeStamp = moment.utc(reading.z).format('dddd LL LTS').replace(/,/g, '');
-			csvOutput += `${info},${startTimeStamp},${endTimeStamp}\n`;
-		});
+function convertToCSV(item: ExportDataSet) {
+	let csvOutput = `Readings,Start Timestamp, End Timestamp, Meter name, ${item.label}, Unit, ${item.unit}\n`;
+	const data = item.exportVals;
+	data.forEach(reading => {
+		const info = reading.y;
+		// Why UTC is needed here has not been carefully analyzed.
+		const startTimeStamp = moment.utc(reading.x).format('dddd LL LTS').replace(/,/g, ''); // use regex to omit pesky commas
+		const endTimeStamp = moment.utc(reading.z).format('dddd LL LTS').replace(/,/g, '');
+		csvOutput += `${info},${startTimeStamp},${endTimeStamp}\n`;
 	});
 	return csvOutput;
 }
@@ -52,10 +50,10 @@ function downloadCSV(inputCSV: string, fileName: string) {
 /**
  * Function to export readings from the graph currently displaying. May be used for routing if more export options are added
  *
- * @param {ExportDataSet[]} dataSets An Object. The readings from each meter currently selected in the graph.
+ * @param {ExportDataSet} dataSets An Object. The readings from each meter currently selected in the graph.
  * @param {string} name the name of the file.
  */
-export default function graphExport(dataSets: ExportDataSet[], name: string) {
+export default function graphExport(dataSets: ExportDataSet, name: string) {
 	const dataToExport = convertToCSV(dataSets);
 	downloadCSV(dataToExport, name);
 }
