@@ -8,7 +8,6 @@ import * as moment from 'moment';
 import graphExport, { graphRawExport, downloadRawCSV } from '../utils/exportData';
 import { ExportDataSet } from '../types/readings';
 import { FormattedMessage } from 'react-intl';
-import { TimeInterval } from '../../../common/TimeInterval';
 import { metersApi } from '../utils/api'
 import TooltipMarkerComponent from './TooltipMarkerComponent';
 import { State } from '../types/redux/state';
@@ -16,7 +15,6 @@ import { useSelector } from 'react-redux';
 
 interface ExportProps {
 	exportVals: { datasets: ExportDataSet[] };
-	timeInterval: TimeInterval;
 	defaultLanguage: string;
 	defaultWarningFileSize: number;
 	defaultFileSizeLimit: number;
@@ -96,9 +94,9 @@ export default function ExportComponent(props: ExportProps) {
 			const meterID = metersState[graphState.selectedMeters[i]].unitId;
 			const unitName = unitsState[meterID].identifier;
 
-			const count = await metersApi.lineReadingsCount(graphState.selectedMeters, props.timeInterval);
+			const count = await metersApi.lineReadingsCount(graphState.selectedMeters, graphState.timeInterval);
 			graphRawExport(count, props.defaultWarningFileSize, props.defaultFileSizeLimit, async () => {
-				const lineReading = await metersApi.rawLineReadings(data, props.timeInterval);
+				const lineReading = await metersApi.rawLineReadings(data, graphState.timeInterval);
 				downloadRawCSV(lineReading, props.defaultLanguage, unitName);
 			});
 			data.splice(0, data.length);
