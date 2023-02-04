@@ -15,7 +15,6 @@ import { State } from '../types/redux/state';
 import { useSelector } from 'react-redux';
 
 interface ExportProps {
-	showRawExport: boolean;
 	exportVals: { datasets: ExportDataSet[] };
 	timeInterval: TimeInterval;
 	defaultLanguage: string;
@@ -114,7 +113,8 @@ export default function ExportComponent(props: ExportProps) {
 				</Button>
 				<TooltipMarkerComponent page='home' helpTextId='help.home.export.graph.data' />
 			</div>
-			{props.showRawExport ? <div style={{ paddingTop: '10px' }}>
+			{/* Only raw export if a line graph */}
+			{graphState.chartToRender === 'line' ? <div style={{ paddingTop: '10px' }}>
 				<Button outline onClick={exportRawReadings}>
 					<FormattedMessage id='export.raw.graph.data' />
 				</Button>
