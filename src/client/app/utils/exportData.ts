@@ -64,6 +64,7 @@ export default function graphExport(dataSets: ExportDataSet[], name: string) {
  * Function to export raw data that we request on button click
  *
  * @param {RawReadings[]} items list of readings directly from the database
+ * @param {string} unit the unit identifier for data being exported
  */
 /* eslint-disable @typescript-eslint/no-unused-vars */
 export function downloadRawCSV(items: RawReadings[], unit: string) {
