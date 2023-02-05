@@ -74,8 +74,9 @@ export default function ExportComponent(props: ExportProps) {
 	const exportRawReadings = async () => {
 		// Get the total number of readings for all meters so can warn user if large.
 		const count = await metersApi.lineReadingsCount(graphState.selectedMeters, graphState.timeInterval);
-		// Estimated file size in MB
-		const fileSize = (count * 0.0857 / 1000);
+		// Estimated file size in MB. Note that changing the language effects the size about +/- 8%.
+		// This is just a decent estimate for larger files.
+		const fileSize = (count * 0.082 / 1000);
 		// Decides if the readings should be exported, true if should.
 		let shouldDownload = false;
 		if (fileSize <= adminState.defaultWarningFileSize) {
