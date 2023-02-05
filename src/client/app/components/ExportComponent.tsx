@@ -76,7 +76,6 @@ export default function ExportComponent(props: ExportProps) {
 		const count = await metersApi.lineReadingsCount(graphState.selectedMeters, graphState.timeInterval);
 		// Estimated file size in MB
 		const fileSize = (count * 0.0857 / 1000);
-		// TODO const fileSize = 4;
 		// Decides if the readings should be exported, true if should.
 		let shouldDownload = false;
 		if (fileSize <= adminState.defaultWarningFileSize) {
@@ -113,15 +112,23 @@ export default function ExportComponent(props: ExportProps) {
 			for (let i = 0; i < graphState.selectedMeters.length; i++) {
 				// Which selected meter being processed.
 				const currentMeter = graphState.selectedMeters[i];
+				// Identifier for current meter.
+				const currentMeterIdentifier = metersState[currentMeter].identifier;
 				// The unit of the currentMeter.
 				const meterID = metersState[currentMeter].unitId;
 				// The identifier of currentMeter unit.
 				// Note that each meter can have a different unit so look up for each one.
 				const unitName = unitsState[meterID].identifier;
 
-				// 	// TODO ???? Maybe use new data way instead.
-				const lineReading = await metersApi.rawLineReadings(currentMeter, graphState.timeInterval);
-				downloadRawCSV(lineReading, unitName);
+				// TODO The new line readings route for graphs allows one to get the raw data. Maybe we should try to switch to that and then modify
+				// this code to use the unix timestamp that is returned. It is believed that the unix timestamp will be smaller than this string.
+				// The long reading work will modify how you get raw data and probably make this easier. However, it does return the meter id for
+				// each reading so that will add to the size unless we remove it as was done in how this data is gotten.
+
+				// Get the raw readings.
+				const lineReadings = await metersApi.rawLineReadings(currentMeter, graphState.timeInterval);
+				// Get the CSV to to user.
+				downloadRawCSV(lineReadings, currentMeterIdentifier, unitName);
 			}
 		}
 	}

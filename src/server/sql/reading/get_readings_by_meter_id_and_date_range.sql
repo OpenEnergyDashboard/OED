@@ -4,7 +4,9 @@
 
 -- Gets raw meter readings by id and date range. This is then ordered by time ascending.
 SELECT
-  reading, start_timestamp, end_timestamp
+  -- Short column names are used to make the data smaller.
+  -- There is no meter id as usual for readings since special for raw export.
+  reading as r, start_timestamp as s, end_timestamp as e
 FROM readings
 WHERE meter_id = ${meterID}
   AND start_timestamp >= COALESCE(${startDate}, '-infinity'::TIMESTAMP)

@@ -22,10 +22,13 @@ export interface ExportDataSet {
 }
 
 export interface RawReadings {
-	label: string,
-	reading: number,
-	startTimestamp: string,
-	endTimestamp: string
+	// Note that the identifiers are not the usual ones so the route
+	// sends less data since they are one letter long. Testing indicated
+	// up to a 25% reduction in the network traffic. It is done for raw
+	// since the export can send lots of data (unlike graphing).
+	r: number,
+	s: string,
+	e: string
 }
 
 export interface LineReading {

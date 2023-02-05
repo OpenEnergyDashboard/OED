@@ -58,27 +58,23 @@ export default function graphExport(dataSets: ExportDataSet, name: string) {
  * Function to export raw data that we request on button click
  *
  * @param {RawReadings[]} items list of readings directly from the database
+ * @param {string} meter the meter identifier for data being exported
  * @param {string} unit the unit identifier for data being exported
  */
-/* eslint-disable @typescript-eslint/no-unused-vars */
-export function downloadRawCSV(items: RawReadings[], unit: string) {
-	let csvOutput = `Readings, Start Timestamp, End Timestamp, Meter, ${items[0].label}, Unit, ${unit} \n`;
+export function downloadRawCSV(items: RawReadings[], meter: string, unit: string) {
+	let csvOutput = `Readings, Start Timestamp, End Timestamp, Meter, ${meter}, Unit, ${unit} \n`;
 	items.forEach(ele => {
-		//.utc is not needed because this uses a different route than the way line graphs work. It returns a string that represents the
-		// start/endTimestamp.
-		// TODO The new line readings route for graphs allows one to get the raw data. We should try to switch to that and then modify
-		// this code to use the unix timestamp that is returned. It is believed that the unix timestamp will be smaller than this string.
-		// TODO This is causing a deprecated format warning. I believe it is because it is in the format "Tuesday June 1 2021 12:00:00 AM".
-		// If we switch to the new route, we should remove this warning if we do the formatting here.
-		const startTimestamp = moment(ele.startTimestamp).format('dddd LL LTS').replace(/,/g, ''); // use regex to omit pesky commas
-		const endTimestamp = moment(ele.endTimestamp).format('dddd LL LTS').replace(/,/g, ''); // use regex to omit pesky commas
-		csvOutput += `${ele.reading},${startTimestamp},${endTimestamp}\n`;
+		// Use regex to omit pesky commas which are painful in a CSV file.
+		// As elsewhere, preserve the UTC time that comes from the DB.
+		const startTimestamp = moment.utc(ele.s).format('dddd LL LTS').replace(/,/g, '');
+		const endTimestamp = moment.utc(ele.e).format('dddd LL LTS').replace(/,/g, '');
+		csvOutput += `${ele.r},${startTimestamp},${endTimestamp}\n`;
 	})
-	// Use regex to remove commas and replace spaces/colons/hyphens with underscores
-	const startTime = moment(items[0].startTimestamp).format('LL_LTS').replace(/,/g, '').replace(/[\s:-]/g, '_');
-	const endTime = moment(items[items.length - 1].startTimestamp).format('LL_LTS').replace(/,/g, '').replace(/[\s:-]/g, '_');
-	const headingLabel = items[0].label;
-	const filename = `oedRawExport_line_${startTime}_to_${endTime}_for_${headingLabel}.csv`;
+	// Use regex to remove commas and replace spaces/colons/hyphens with underscores.
+	// These are time times for the file name which go from the first reading start time to the last reading end time.
+	// Easy to get since the data is sorted.
+	const startTime = moment.utc(items[0].s).format('LL_LTS').replace(/,/g, '').replace(/[\s:-]/g, '_');
+	const endTime = moment.utc(items[items.length - 1].e).format('LL_LTS').replace(/,/g, '').replace(/[\s:-]/g, '_');
+	const filename = `oedRawExport_line_${startTime}_to_${endTime}_for_${meter}.csv`;
 	downloadCSV(csvOutput, filename);
 }
-/* eslint-enable @typescript-eslint/no-unused-vars */

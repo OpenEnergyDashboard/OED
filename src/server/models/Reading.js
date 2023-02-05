@@ -186,7 +186,9 @@ class Reading {
 			startDate: startDate,
 			endDate: endDate
 		});
-		return rows.map(Reading.mapRow);
+		// This does not do the usual row mapping because the identifiers are not the usual ones and there
+		// is no meter id. All this is to make the data smaller.
+		return rows;
 	}
 
 	/**
