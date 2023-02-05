@@ -2,8 +2,6 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
 
-import { ChartTypes } from './redux/graph';
-
 export interface CompareReading {
 	curr_use: number;
 	prev_use: number;
@@ -11,14 +9,6 @@ export interface CompareReading {
 
 export interface CompareReadings {
 	[id: number]: CompareReading;
-}
-
-export interface ExportDataSet {
-	label: string;
-	id: number;
-	unit: string;
-	currentChart: ChartTypes;
-	exportVals: Array<{ x: number, y: number, z: number }>;
 }
 
 export interface RawReadings {

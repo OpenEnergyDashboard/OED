@@ -4,9 +4,8 @@
 
 import * as React from 'react';
 import { Button } from 'reactstrap';
-import * as moment from 'moment';
+import * as _ from 'lodash';
 import graphExport, { downloadRawCSV } from '../utils/exportData';
-import { ExportDataSet } from '../types/readings';
 import { FormattedMessage } from 'react-intl';
 import { metersApi } from '../utils/api'
 import TooltipMarkerComponent from './TooltipMarkerComponent';
@@ -16,63 +15,162 @@ import { hasToken } from '../utils/token';
 import { usersApi } from '../utils/api'
 import { UserRole } from '../types/items';
 import translate from '../utils/translate';
+import { ChartTypes } from '../types/redux/graph';
+import { lineUnitLabel, barUnitLabel } from '../utils/graphics';
 
-interface ExportProps {
-	exportVals: { datasets: ExportDataSet[] };
-}
-
-export default function ExportComponent(props: ExportProps) {
-	/**
-	 * Called when Export button is clicked.
-	 * Passes an object containing the selected meter data to a function for export.
-	 */
+/**
+ * Creates export buttons and does code for handling export to CSV files.
+ * @returns HTML for export buttons
+ */
+export default function ExportComponent() {
 	// Meters state
 	const metersState = useSelector((state: State) => state.meters.byMeterID);
+	// Groups state
+	const groupsState = useSelector((state: State) => state.groups.byGroupID);
 	// Units state
 	const unitsState = useSelector((state: State) => state.units.units);
 	// graph state
 	const graphState = useSelector((state: State) => state.graph);
 	// admin state
 	const adminState = useSelector((state: State) => state.admin);
+	// readings state
+	const readingsState = useSelector((state: State) => state.readings);
+	// Time range of graphic
+	const timeInterval = graphState.timeInterval;
 
 	// Function to export the data in a graph.
 	const exportGraphReading = () => {
-		// Loop over each graphic item and export one at a time into its own file.
-		for (let i = 0; i < props.exportVals.datasets.length; i++) {
-			// Data for current graphic item to export
-			const currentGraphItem = props.exportVals.datasets[i];
-			// Sort the dataset based on the start time of each value in item
-			currentGraphItem.exportVals.sort((a, b) => {
-				if (a.x < b.x) {
-					return -1;
+		// What unit is being graphed. Unit of all lines to export.
+		const unitId = graphState.selectedUnit;
+		// This is the graphic unit identifier
+		const unitIdentifier = unitsState[unitId].identifier;
+		// What type of chart/graphic is being displayed.
+		const chartName = graphState.chartToRender;
+		if (chartName === ChartTypes.line) {
+			// Exporting a line chart
+			// Get the full y-axis unit label for a line
+			const returned = lineUnitLabel(unitsState[unitId], graphState.lineGraphRate);
+			const unitLabel = returned.unitLabel
+			// Loop over the displayed meters and export one-by-one.  Does nothing if no meters selected.
+			for (const meterId of graphState.selectedMeters) {
+				// Line readings data for this meter.
+				const byMeterID = readingsState.line.byMeterID[meterId];
+				// Make sure it exists in case state is not there yet.
+				if (byMeterID !== undefined) {
+					// Get the readings for the time range and unit graphed
+					const readingsData = byMeterID[timeInterval.toString()][unitId];
+					// Make sure they are there and not being fetched.
+					if (readingsData !== undefined && !readingsData.isFetching) {
+						if (readingsData.readings === undefined) {
+							throw new Error(`Unacceptable condition: readingsData.readings is undefined for meter ${meterId}.`);
+						}
+						// Get the readings from the state.
+						const readings = _.values(readingsData.readings);
+						// Sort by start timestamp.
+						const sortedReadings = _.sortBy(readings, item => item.startTimestamp, 'asc');
+						// Identifier for current meter.
+						const meterIdentifier = metersState[meterId].identifier;
+						graphExport(sortedReadings, meterIdentifier, unitLabel, unitIdentifier, chartName);
+					}
 				}
-				return 1;
-			})
-
-			// Determine and format the first time in the dataset which is first one in array since just sorted and the start time.
-			// These values are already UTC so they are okay. Why has not been tracked down.
-			const startTime = moment(currentGraphItem.exportVals[0].x);
-			// Determine and format the last time in the dataset which is the end time.
-			const endTime = moment(currentGraphItem.exportVals[currentGraphItem.exportVals.length - 1].z);
-			// Use regex to remove commas and replace spaces/colons/hyphens with underscores in timestamps
-			const startTimeString = startTime.utc().format('LL_LTS').replace(/,/g, '').replace(/[\s:-]/g, '_');
-			const endTimeString = endTime.utc().format('LL_LTS').replace(/,/g, '').replace(/[\s:-]/g, '_');
-			// This is line, bar
-			const chartName = currentGraphItem.currentChart;
-			// This is the meter identifier
-			const meterName = currentGraphItem.label;
-			// This is the graphic unit
-			// TODO this is the same for all graph exports so fix this and value in datasets.
-			const unit = currentGraphItem.unit;
-			// This is the file name with all the above info so unique
-			const name = `oedExport_${chartName}_${startTimeString}_to_${endTimeString}_${meterName}_${unit}.csv`;
-			graphExport(currentGraphItem, name);
+			}
+			// Loop over the displayed groups and export one-by-one.  Does nothing if no groups selected.
+			for (const groupId of graphState.selectedGroups) {
+				// Line readings data for this group.
+				const byGroupID = readingsState.line.byGroupID[groupId];
+				// Make sure it exists in case state is not there yet.
+				if (byGroupID !== undefined) {
+					// Get the readings for the time range and unit graphed
+					const readingsData = byGroupID[timeInterval.toString()][unitId];
+					// Make sure they are there and not being fetched.
+					if (readingsData !== undefined && !readingsData.isFetching) {
+						if (readingsData.readings === undefined) {
+							throw new Error(`Unacceptable condition: readingsData.readings is undefined for group ${groupId}.`);
+						}
+						// Get the readings from the state.
+						const readings = _.values(readingsData.readings);
+						// Sort by start timestamp.
+						const sortedReadings = _.sortBy(readings, item => item.startTimestamp, 'asc');
+						// Identifier for current group.
+						const groupName = groupsState[groupId].name;
+						graphExport(sortedReadings, groupName, unitLabel, unitIdentifier, chartName);
+					}
+				}
+			}
+		} else if (chartName === ChartTypes.bar) {
+			// Exporting a bar chart
+			// Get the full y-axis unit label for a bar
+			const unitLabel = barUnitLabel(unitsState[unitId]);
+			// Time width of the bars
+			const barDuration = graphState.barDuration;
+			// Loop over the displayed meters and export one-by-one.  Does nothing if no meters selected.
+			for (const meterId of graphState.selectedMeters) {
+				// Bar readings data for this meter.
+				const byMeterID = readingsState.bar.byMeterID[meterId];
+				// Make sure it exists in case state is not there yet.
+				if (byMeterID !== undefined) {
+					const byTimeInterval = byMeterID[timeInterval.toString()];
+					if (byTimeInterval !== undefined) {
+						const byBarDuration = byTimeInterval[barDuration.toISOString()];
+						if (byBarDuration !== undefined) {
+							// Get the readings for the time range and unit graphed
+							const readingsData = byBarDuration[unitId];
+							// Make sure they are there and not being fetched.
+							if (readingsData !== undefined && !readingsData.isFetching) {
+								if (readingsData.readings === undefined) {
+									throw new Error(`Unacceptable condition: readingsData.readings is undefined for meter ${meterId}.`);
+								}
+								// Get the readings from the state.
+								const readings = _.values(readingsData.readings);
+								// Sort by start timestamp.
+								const sortedReadings = _.sortBy(readings, item => item.startTimestamp, 'asc');
+								// Identifier for current meter.
+								const meterIdentifier = metersState[meterId].identifier;
+								graphExport(sortedReadings, meterIdentifier, unitLabel, unitIdentifier, chartName);
+							}
+						}
+					}
+				}
+			}
+			// Loop over the displayed groups and export one-by-one.  Does nothing if no groups selected.
+			for (const groupId of graphState.selectedGroups) {
+				// Bar readings data for this group.
+				const byGroupID = readingsState.bar.byGroupID[groupId];
+				// Make sure it exists in case state is not there yet.
+				if (byGroupID !== undefined) {
+					const byTimeInterval = byGroupID[timeInterval.toString()];
+					if (byTimeInterval !== undefined) {
+						const byBarDuration = byTimeInterval[barDuration.toISOString()];
+						if (byBarDuration !== undefined) {
+							// Get the readings for the time range and unit graphed
+							const readingsData = byBarDuration[unitId];
+							// Make sure they are there and not being fetched.
+							if (readingsData !== undefined && !readingsData.isFetching) {
+								if (readingsData.readings === undefined) {
+									throw new Error(`Unacceptable condition: readingsData.readings is undefined for group ${groupId}.`);
+								}
+								// Get the readings from the state.
+								const readings = _.values(readingsData.readings);
+								// Sort by start timestamp.
+								const sortedReadings = _.sortBy(readings, item => item.startTimestamp, 'asc');
+								// Identifier for current group.
+								const groupName = groupsState[groupId].name;
+								graphExport(sortedReadings, groupName, unitLabel, unitIdentifier, chartName);
+							}
+						}
+					}
+				}
+			}
 		}
-	};
+	}
 
 	// Function to export raw readings of graphic data shown.
 	const exportRawReadings = async () => {
 		// Get the total number of readings for all meters so can warn user if large.
+		// Soon OED will be able to estimate the number of readings based on reading frequency. However,
+		// we will still get the correct count since this is not done very often and don't want to get
+		// the wrong value. The time to do this is small compared to most raw exports (if file is large
+		// when it matters).
 		const count = await metersApi.lineReadingsCount(graphState.selectedMeters, graphState.timeInterval);
 		// Estimated file size in MB. Note that changing the language effects the size about +/- 8%.
 		// This is just a decent estimate for larger files.
@@ -110,16 +208,17 @@ export default function ExportComponent(props: ExportProps) {
 
 		if (shouldDownload) {
 			// Loop over each selected meter in graphic. Does nothing if no meters selected.
-			for (let i = 0; i < graphState.selectedMeters.length; i++) {
+			// for (let i = 0; i < graphState.selectedMeters.length; i++) {
+			for (const meterId of graphState.selectedMeters) {
 				// Which selected meter being processed.
-				const currentMeter = graphState.selectedMeters[i];
+				// const currentMeter = graphState.selectedMeters[i];
 				// Identifier for current meter.
-				const currentMeterIdentifier = metersState[currentMeter].identifier;
+				const currentMeterIdentifier = metersState[meterId].identifier;
 				// The unit of the currentMeter.
-				const meterID = metersState[currentMeter].unitId;
+				const unitId = metersState[meterId].unitId;
 				// The identifier of currentMeter unit.
 				// Note that each meter can have a different unit so look up for each one.
-				const unitName = unitsState[meterID].identifier;
+				const unitIdentifier = unitsState[unitId].identifier;
 
 				// TODO The new line readings route for graphs allows one to get the raw data. Maybe we should try to switch to that and then modify
 				// this code to use the unix timestamp that is returned. It is believed that the unix timestamp will be smaller than this string.
@@ -127,9 +226,9 @@ export default function ExportComponent(props: ExportProps) {
 				// each reading so that will add to the size unless we remove it as was done in how this data is gotten.
 
 				// Get the raw readings.
-				const lineReadings = await metersApi.rawLineReadings(currentMeter, graphState.timeInterval);
+				const lineReadings = await metersApi.rawLineReadings(meterId, timeInterval);
 				// Get the CSV to to user.
-				downloadRawCSV(lineReadings, currentMeterIdentifier, unitName);
+				downloadRawCSV(lineReadings, currentMeterIdentifier, unitIdentifier);
 			}
 		}
 	}
