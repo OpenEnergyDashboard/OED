@@ -12,12 +12,13 @@ import { ChartTypes } from 'types/redux/graph';
  * @param {LineReading[]} readings The meter readings.
  * @param {string} meter the meter identifier for data being exported
  * @param {string} unitLabel the full y-axis label on the graphic
+ * @param {number} scaling factor to scale readings by, normally the rate factor for line or 1
  * @returns {string} output A string containing the CSV formatted meter readings.
  */
-function convertToCSV(readings: LineReading[], meter: string, unitLabel: string) {
+function convertToCSV(readings: LineReading[], meter: string, unitLabel: string, scaling: number) {
 	let csvOutput = `Readings,Start Timestamp, End Timestamp, Meter name, ${meter}, Unit, ${unitLabel}\n`;
 	readings.forEach(reading => {
-		const value = reading.reading;
+		const value = reading.reading * scaling;
 		// As usual, maintain UTC.
 		// Originally we formatted these in a locale aware way. The problem was that you could
 		// not easily import the CSV into OED due to parsing by moment. Thus, we now use the
@@ -56,9 +57,11 @@ function downloadCSV(inputCSV: string, fileName: string) {
  * @param {string} unitLabel the full y-axis label on the graphic
  * @param {string} unitIdentifier the unit identifier for data being exported
  * @param {ChartTypes} chartName the name of the chart/graphic being exported
+ * @param {number} scaling factor to scale readings by, normally the rate factor for line or 1
  */
-export default function graphExport(readings: LineReading[], meter: string, unitLabel: string, unitIdentifier: string, chartName: ChartTypes) {
-	const dataToExport = convertToCSV(readings, meter, unitLabel);
+export default function graphExport(readings: LineReading[], meter: string, unitLabel: string, unitIdentifier: string,
+	chartName: ChartTypes, scaling: number) {
+	const dataToExport = convertToCSV(readings, meter, unitLabel, scaling);
 
 	// Determine and format the first time in the dataset which is first one in array since just sorted and the start time.
 	// As usual, maintain UTC.

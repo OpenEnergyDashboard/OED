@@ -54,6 +54,8 @@ export default function ExportComponent() {
 			// Get the full y-axis unit label for a line
 			const returned = lineUnitLabel(unitsState[unitId], graphState.lineGraphRate);
 			const unitLabel = returned.unitLabel
+			// The selected rate for scaling
+			const scaling = graphState.lineGraphRate.rate;
 			// Loop over the displayed meters and export one-by-one.  Does nothing if no meters selected.
 			for (const meterId of graphState.selectedMeters) {
 				// Line readings data for this meter.
@@ -73,7 +75,7 @@ export default function ExportComponent() {
 						const sortedReadings = _.sortBy(readings, item => item.startTimestamp, 'asc');
 						// Identifier for current meter.
 						const meterIdentifier = metersState[meterId].identifier;
-						graphExport(sortedReadings, meterIdentifier, unitLabel, unitIdentifier, chartName);
+						graphExport(sortedReadings, meterIdentifier, unitLabel, unitIdentifier, chartName, scaling);
 					}
 				}
 			}
@@ -96,7 +98,7 @@ export default function ExportComponent() {
 						const sortedReadings = _.sortBy(readings, item => item.startTimestamp, 'asc');
 						// Identifier for current group.
 						const groupName = groupsState[groupId].name;
-						graphExport(sortedReadings, groupName, unitLabel, unitIdentifier, chartName);
+						graphExport(sortedReadings, groupName, unitLabel, unitIdentifier, chartName, scaling);
 					}
 				}
 			}
@@ -106,6 +108,8 @@ export default function ExportComponent() {
 			const unitLabel = barUnitLabel(unitsState[unitId]);
 			// Time width of the bars
 			const barDuration = graphState.barDuration;
+			// There is no scaling for bars so make it 1
+			const scaling = 1;
 			// Loop over the displayed meters and export one-by-one.  Does nothing if no meters selected.
 			for (const meterId of graphState.selectedMeters) {
 				// Bar readings data for this meter.
@@ -129,7 +133,7 @@ export default function ExportComponent() {
 								const sortedReadings = _.sortBy(readings, item => item.startTimestamp, 'asc');
 								// Identifier for current meter.
 								const meterIdentifier = metersState[meterId].identifier;
-								graphExport(sortedReadings, meterIdentifier, unitLabel, unitIdentifier, chartName);
+								graphExport(sortedReadings, meterIdentifier, unitLabel, unitIdentifier, chartName, scaling);
 							}
 						}
 					}
@@ -158,7 +162,7 @@ export default function ExportComponent() {
 								const sortedReadings = _.sortBy(readings, item => item.startTimestamp, 'asc');
 								// Identifier for current group.
 								const groupName = groupsState[groupId].name;
-								graphExport(sortedReadings, groupName, unitLabel, unitIdentifier, chartName);
+								graphExport(sortedReadings, groupName, unitLabel, unitIdentifier, chartName, scaling);
 							}
 						}
 					}
