@@ -17,6 +17,7 @@ import { UserRole } from '../types/items';
 import translate from '../utils/translate';
 import { ChartTypes } from '../types/redux/graph';
 import { lineUnitLabel, barUnitLabel } from '../utils/graphics';
+import { ConversionData } from '../types/redux/conversions';
 
 /**
  * Creates export buttons and does code for handling export to CSV files.
@@ -29,6 +30,8 @@ export default function ExportComponent() {
 	const groupsState = useSelector((state: State) => state.groups.byGroupID);
 	// Units state
 	const unitsState = useSelector((state: State) => state.units.units);
+	// Conversion state
+	const conversionState = useSelector((state: State) => state.conversions.conversions);
 	// graph state
 	const graphState = useSelector((state: State) => state.graph);
 	// admin state
@@ -208,17 +211,43 @@ export default function ExportComponent() {
 
 		if (shouldDownload) {
 			// Loop over each selected meter in graphic. Does nothing if no meters selected.
-			// for (let i = 0; i < graphState.selectedMeters.length; i++) {
 			for (const meterId of graphState.selectedMeters) {
 				// Which selected meter being processed.
 				// const currentMeter = graphState.selectedMeters[i];
 				// Identifier for current meter.
 				const currentMeterIdentifier = metersState[meterId].identifier;
 				// The unit of the currentMeter.
-				const unitId = metersState[meterId].unitId;
-				// The identifier of currentMeter unit.
+				const meterUnitId = metersState[meterId].unitId;
 				// Note that each meter can have a different unit so look up for each one.
-				const unitIdentifier = unitsState[unitId].identifier;
+				let unitIdentifier;
+				// A complication is that a unit associated with a meter is not the one the user
+				// sees when graphing. Now try to find the graphing unit.
+				// Try to find expected conversion from meter with slope = 1 and intercept = 0
+				const conversion = _.find(conversionState, function (c: ConversionData) {
+					return c.sourceId === meterUnitId && c.slope === 1 && c.intercept === 0;
+				}) as ConversionData;
+				if (conversion == undefined) {
+					// This is the unusual case where the conversion is not 1, 0.
+					// We find the first conversion and use it.
+					const anyConversion = _.find(conversionState, function (c: ConversionData) {
+						// Conversion has source that is the meter unit.
+						return c.sourceId === meterUnitId;
+					}) as ConversionData;
+					if (anyConversion == undefined) {
+						// Could not find a conversion with this meter. This should never happen.
+						// Use the identifier of currentMeter unit and extra info.
+						unitIdentifier = unitsState[meterUnitId].identifier +
+							' (this is the meter unit which is unusual)';
+						// Nice if logged warning but no easy way so don't.
+					} else {
+						// Use this conversion but give slope/destination since changes values.
+						unitIdentifier = unitsState[anyConversion.destinationId].identifier +
+							` (but conversion from meter values of slope = ${anyConversion.slope} and intercept = ${anyConversion.intercept}`;
+					}
+				} else {
+					// This is the typical case where there was a conversion from the meter of 1, 0.
+					unitIdentifier = unitsState[conversion.destinationId].identifier;
+				}
 
 				// TODO The new line readings route for graphs allows one to get the raw data. Maybe we should try to switch to that and then modify
 				// this code to use the unix timestamp that is returned. It is believed that the unix timestamp will be smaller than this string.
