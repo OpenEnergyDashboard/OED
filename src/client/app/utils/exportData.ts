@@ -18,9 +18,12 @@ function convertToCSV(readings: LineReading[], meter: string, unitLabel: string)
 	let csvOutput = `Readings,Start Timestamp, End Timestamp, Meter name, ${meter}, Unit, ${unitLabel}\n`;
 	readings.forEach(reading => {
 		const value = reading.reading;
-		// Why UTC is needed here has not been carefully analyzed.
-		const startTimeStamp = moment.utc(reading.startTimestamp).format('dddd LL LTS').replace(/,/g, ''); // use regex to omit pesky commas
-		const endTimeStamp = moment.utc(reading.endTimestamp).format('dddd LL LTS').replace(/,/g, '');
+		// As usual, maintain UTC.
+		// Originally we formatted these in a locale aware way. The problem was that you could
+		// not easily import the CSV into OED due to parsing by moment. Thus, we now use the
+		// somewhat universal way of formatting.
+		const startTimeStamp = moment.utc(reading.startTimestamp).format('YYYY-MM-DD HH:mm:ss');
+		const endTimeStamp = moment.utc(reading.endTimestamp).format('YYYY-MM-DD HH:mm:ss');
 		csvOutput += `${value},${startTimeStamp},${endTimeStamp}\n`;
 	});
 	return csvOutput;
@@ -58,13 +61,13 @@ export default function graphExport(readings: LineReading[], meter: string, unit
 	const dataToExport = convertToCSV(readings, meter, unitLabel);
 
 	// Determine and format the first time in the dataset which is first one in array since just sorted and the start time.
-	// These values are already UTC so they are okay. Why has not been tracked down.
-	const startTime = moment(readings[0].startTimestamp);
+	// As usual, maintain UTC.
+	const startTime = moment.utc(readings[0].startTimestamp);
 	// Determine and format the last time in the dataset which is the end time.
-	const endTime = moment(readings[readings.length - 1].endTimestamp);
+	const endTime = moment.utc(readings[readings.length - 1].endTimestamp);
 	// Use regex to remove commas and replace spaces/colons/hyphens with underscores in timestamps
-	const startTimeString = startTime.utc().format('LL_LTS').replace(/,/g, '').replace(/[\s:-]/g, '_');
-	const endTimeString = endTime.utc().format('LL_LTS').replace(/,/g, '').replace(/[\s:-]/g, '_');
+	const startTimeString = startTime.format('LL_LTS').replace(/,/g, '').replace(/[\s:-]/g, '_');
+	const endTimeString = endTime.format('LL_LTS').replace(/,/g, '').replace(/[\s:-]/g, '_');
 
 	// This is the file name with all the above info so unique.
 	// Note it only uses the unit identifier not with the rate because that has funny characters.
@@ -82,10 +85,10 @@ export default function graphExport(readings: LineReading[], meter: string, unit
 export function downloadRawCSV(items: RawReadings[], meter: string, unit: string) {
 	let csvOutput = `Readings, Start Timestamp, End Timestamp, Meter, ${meter}, Unit, ${unit} \n`;
 	items.forEach(ele => {
-		// Use regex to omit pesky commas which are painful in a CSV file.
 		// As elsewhere, preserve the UTC time that comes from the DB.
-		const startTimestamp = moment.utc(ele.s).format('dddd LL LTS').replace(/,/g, '');
-		const endTimestamp = moment.utc(ele.e).format('dddd LL LTS').replace(/,/g, '');
+		// See above for why formatted this way.
+		const startTimestamp = moment.utc(ele.s).format('YYYY-MM-DD HH:mm:ss');
+		const endTimestamp = moment.utc(ele.e).format('YYYY-MM-DD HH:mm:ss');
 		csvOutput += `${ele.r},${startTimestamp},${endTimestamp}\n`;
 	})
 	// Use regex to remove commas and replace spaces/colons/hyphens with underscores.
