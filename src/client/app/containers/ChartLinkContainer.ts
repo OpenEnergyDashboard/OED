@@ -46,10 +46,8 @@ function mapStateToProps(state: State) {
 			break;
 	}
 	const unitID = state.graph.selectedUnit;
-	//const rate = state.graph.lineGraphRate.rate.toString();
-	linkText += `unitID=${unitID.toString()}&`;
-	linkText += `rate=${state.graph.lineGraphRate.label.toString()},${state.graph.lineGraphRate.rate.toString()}&`;
-	// linkText += `rate=${state.units.units[unitID].secInRate}&`;
+	linkText += `&unitID=${unitID.toString()}`;
+	linkText += `&rate=${state.graph.lineGraphRate.label.toString()},${state.graph.lineGraphRate.rate.toString()}`;
 	return {
 		linkText,
 		chartType
