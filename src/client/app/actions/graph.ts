@@ -16,6 +16,7 @@ import * as m from '../types/redux/map';
 import { ComparePeriod, SortingOrder } from '../utils/calculateCompare';
 import { fetchNeededMapReadings } from './mapReadings';
 import { changeSelectedMap } from './map';
+import { fetchUnitsDetailsIfNeeded } from './units';
 
 export function changeChartToRender(chartType: t.ChartTypes): t.ChangeChartToRenderAction {
 	return { type: ActionType.ChangeChartToRender, chartType };
@@ -41,7 +42,7 @@ export function updateBarDuration(barDuration: moment.Duration): t.UpdateBarDura
 	return { type: ActionType.UpdateBarDuration, barDuration };
 }
 
-export function updateLineGraphRate(lineGraphRate: t.LineGraphRate) {
+export function updateLineGraphRate(lineGraphRate: t.LineGraphRate): t.UpdateLineGraphRate {
 	return { type: ActionType.UpdateLineGraphRate, lineGraphRate }
 }
 
@@ -192,6 +193,8 @@ export interface LinkOptions {
 	meterIDs?: number[];
 	groupIDs?: number[];
 	chartType?: t.ChartTypes;
+	unitID?: number;
+	rate?: t.LineGraphRate;
 	barDuration?: moment.Duration;
 	serverRange?: TimeInterval;
 	sliderRange?: TimeInterval;
@@ -204,14 +207,14 @@ export interface LinkOptions {
 
 /**
  * Update graph options from a link
- * @param {LinkOptions} options - Object of possible values to dispatch with keys: meterIDs, groupIDs, chartType, barDuration, toggleBarStacking
+ * @param {LinkOptions} options - Object of possible values to dispatch with keys: meterIDs, groupIDs, chartType, barDuration, toggleBarStacking, ...
  * @returns {function(*)}
  */
 export function changeOptionsFromLink(options: LinkOptions) {
 	const dispatchFirst: Thunk[] = [setHotlinkedAsync(true)];
 	const dispatchSecond: Array<Thunk | t.ChangeChartToRenderAction | t.ChangeBarStackingAction
-	| t.ChangeGraphZoomAction | t.ChangeCompareSortingOrderAction | t.SetOptionsVisibility
-	| m.UpdateSelectedMapAction> = [];
+		| t.ChangeGraphZoomAction | t.ChangeCompareSortingOrderAction | t.SetOptionsVisibility
+		| m.UpdateSelectedMapAction | t.UpdateLineGraphRate> = [];
 
 	if (options.meterIDs) {
 		dispatchFirst.push(fetchMetersDetailsIfNeeded());
@@ -223,6 +226,13 @@ export function changeOptionsFromLink(options: LinkOptions) {
 	}
 	if (options.chartType) {
 		dispatchSecond.push(changeChartToRender(options.chartType));
+	}
+	if (options.unitID) {
+		dispatchFirst.push(fetchUnitsDetailsIfNeeded());
+		dispatchSecond.push(changeSelectedUnit(options.unitID));
+	}
+	if (options.rate) {
+		dispatchSecond.push(updateLineGraphRate(options.rate));
 	}
 	if (options.barDuration) {
 		dispatchSecond.push(changeBarDuration(options.barDuration));
