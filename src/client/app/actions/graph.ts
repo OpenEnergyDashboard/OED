@@ -235,7 +235,7 @@ export function changeOptionsFromLink(options: LinkOptions) {
 		dispatchSecond.push(updateLineGraphRate(options.rate));
 	}
 	if (options.barDuration) {
-		dispatchSecond.push(changeBarDuration(options.barDuration));
+		dispatchFirst.push(changeBarDuration(options.barDuration));
 	}
 	if (options.serverRange) {
 		dispatchSecond.push(changeGraphZoomIfNeeded(options.serverRange));
@@ -256,7 +256,7 @@ export function changeOptionsFromLink(options: LinkOptions) {
 		dispatchSecond.push(setOptionsVisibility(options.optionsVisibility));
 	}
 	if (options.mapID) {
-		// TODO here and elsewhere should be IfNeeded.
+		// TODO here and elsewhere should be IfNeeded but need to check that all state updates are done when edit, etc.
 		dispatchFirst.push(fetchMapsDetails());
 		dispatchSecond.push(changeSelectedMap(options.mapID));
 	}
