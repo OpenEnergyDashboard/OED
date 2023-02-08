@@ -15,7 +15,7 @@ import * as t from '../types/redux/graph';
 import * as m from '../types/redux/map';
 import { ComparePeriod, SortingOrder } from '../utils/calculateCompare';
 import { fetchNeededMapReadings } from './mapReadings';
-import { changeSelectedMap } from './map';
+import { changeSelectedMap, fetchMapsDetails } from './map';
 import { fetchUnitsDetailsIfNeeded } from './units';
 
 export function changeChartToRender(chartType: t.ChartTypes): t.ChangeChartToRenderAction {
@@ -256,6 +256,8 @@ export function changeOptionsFromLink(options: LinkOptions) {
 		dispatchSecond.push(setOptionsVisibility(options.optionsVisibility));
 	}
 	if (options.mapID) {
+		// TODO here and elsewhere should be IfNeeded.
+		dispatchFirst.push(fetchMapsDetails());
 		dispatchSecond.push(changeSelectedMap(options.mapID));
 	}
 	return (dispatch: Dispatch) => Promise.all(dispatchFirst.map(dispatch))
