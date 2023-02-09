@@ -22,11 +22,18 @@ const defaultState: GraphState = {
 	barStacking: false,
 	hotlinked: false,
 	optionsVisibility: true,
-	lineGraphRate: {label: 'hour', rate: 1}
+	lineGraphRate: {label: 'hour', rate: 1},
+	renderOnce: false
 };
 
 export default function graph(state = defaultState, action: GraphAction) {
 	switch (action.type) {
+		case ActionType.ConfirmGraphRenderOnce: {
+			return {
+				...state,
+				renderOnce: true
+			};
+		}
 		case ActionType.UpdateSelectedMeters:
 			return {
 				...state,

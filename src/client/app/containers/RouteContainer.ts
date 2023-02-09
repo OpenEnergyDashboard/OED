@@ -6,7 +6,7 @@ import { connect } from 'react-redux';
 import RouteComponent from '../components/RouteComponent';
 import { Dispatch } from '../types/redux/actions';
 import { State } from '../types/redux/state';
-import { changeOptionsFromLink, LinkOptions } from '../actions/graph';
+import { changeOptionsFromLink, LinkOptions, changeRenderOnce } from '../actions/graph';
 import { clearCurrentUser } from '../actions/currentUser';
 import { isRoleAdmin } from '../utils/hasPermissions';
 import { UserRole } from '../types/items';
@@ -24,14 +24,18 @@ function mapStateToProps(state: State) {
 		barStacking: state.graph.barStacking,
 		defaultLanguage: state.admin.defaultLanguage,
 		loggedInAsAdmin,
-		role
+		role,
+		// true if the chartlink rendering has been done.
+		renderOnce: state.graph.renderOnce,
 	};
 }
 
 function mapDispatchToProps(dispatch: Dispatch) {
 	return {
 		changeOptionsFromLink: (options: LinkOptions) => dispatch(changeOptionsFromLink(options)),
-		clearCurrentUser: () => dispatch(clearCurrentUser())
+		clearCurrentUser: () => dispatch(clearCurrentUser()),
+		// Set the state to indicate chartlinks have been rendered.
+		changeRenderOnce: () => dispatch(changeRenderOnce())
 	};
 }
 
