@@ -14,7 +14,19 @@ import { State } from '../types/redux/state';
 *  Returns the updated link text */
 function mapStateToProps(state: State) {
 	const chartType = state.graph.chartToRender;
-	let linkText = `${window.location.href}graph?`;
+	// Determine the beginning of the URL to add arguments to.
+	// This is the current URL.
+	const winLocHref = window.location.href;
+	// See if graph? is in URL. We add that when it comes in as a chartlink.
+	// Want to remove so we can start without the current arguments.
+	let startOfParams = winLocHref.indexOf('graph?');
+	console.log('winLocHref: ', winLocHref, ' startOfParams: ', startOfParams);
+	// It is -1 if not there. In that case use the full length string.
+	startOfParams = startOfParams === -1 ? winLocHref.length : startOfParams;
+	// Grab the start of URL to what was just determined.
+	const baseURL = winLocHref.substring(0, startOfParams);
+	// Add graph? since we want to route to graph and have a ? before any arguments.
+	let linkText = `${baseURL}graph?`;
 	// let weeklyLink = ''; // reflects graph 7 days from present, with user selected meters and groups;
 	if (state.graph.selectedMeters.length > 0) {
 		linkText += `meterIDs=${state.graph.selectedMeters.toString()}&`;
