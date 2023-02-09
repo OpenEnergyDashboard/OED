@@ -20,7 +20,6 @@ function mapStateToProps(state: State) {
 	// See if graph? is in URL. We add that when it comes in as a chartlink.
 	// Want to remove so we can start without the current arguments.
 	let startOfParams = winLocHref.indexOf('graph?');
-	console.log('winLocHref: ', winLocHref, ' startOfParams: ', startOfParams);
 	// It is -1 if not there. In that case use the full length string.
 	startOfParams = startOfParams === -1 ? winLocHref.length : startOfParams;
 	// Grab the start of URL to what was just determined.
