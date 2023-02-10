@@ -26,7 +26,7 @@ function mapStateToProps(state: State) {
 		loggedInAsAdmin,
 		role,
 		// true if the chartlink rendering has been done.
-		renderOnce: state.graph.renderOnce,
+		renderOnce: state.graph.renderOnce
 	};
 }
 

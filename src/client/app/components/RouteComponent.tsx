@@ -179,6 +179,8 @@ export default class RouteComponent extends React.Component<RouteProps> {
 						// we should look into this typing issue more to see what might be a better fix.
 						const fixTypeIssue: any = infoObj as any;
 						const info: string = fixTypeIssue.toString();
+						// ESLint does not want const params in the one case it is used so put here.
+						let params;
 						switch (key) {
 							case 'meterIDs':
 								options.meterIDs = info.split(',').map(s => parseInt(s));
@@ -193,7 +195,7 @@ export default class RouteComponent extends React.Component<RouteProps> {
 								options.unitID = parseInt(info);
 								break;
 							case 'rate':
-								const params = info.split(',');
+								params = info.split(',');
 								options.rate = { label: params[0], rate: parseFloat(params[1]) } as LineGraphRate;
 								break;
 							case 'barDuration':

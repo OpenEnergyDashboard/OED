@@ -216,9 +216,12 @@ export interface LinkOptions {
  */
 export function changeOptionsFromLink(options: LinkOptions) {
 	const dispatchFirst: Thunk[] = [setHotlinkedAsync(true)];
-	const dispatchSecond: Array<Thunk | t.ChangeChartToRenderAction | t.ChangeBarStackingAction
-		| t.ChangeGraphZoomAction | t.ChangeCompareSortingOrderAction | t.SetOptionsVisibility
-		| m.UpdateSelectedMapAction | t.UpdateLineGraphRate> = [];
+	// Visual Studio indents after the first line in autoformat but ESLint does not like that in this case so override.
+	/* eslint-disable @typescript-eslint/indent */
+	const dispatchSecond: Array<Thunk | t.ChangeChartToRenderAction | t.ChangeBarStackingAction |
+		t.ChangeGraphZoomAction | t.ChangeCompareSortingOrderAction | t.SetOptionsVisibility |
+		m.UpdateSelectedMapAction | t.UpdateLineGraphRate> = [];
+	/* eslint-enable @typescript-eslint/indent */
 
 	if (options.meterIDs) {
 		dispatchFirst.push(fetchMetersDetailsIfNeeded());
