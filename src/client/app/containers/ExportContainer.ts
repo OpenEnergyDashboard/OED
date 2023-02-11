@@ -32,47 +32,53 @@ function mapStateToProps(state: State) {
 		for (const groupID of state.graph.selectedGroups) {
 			const byGroupID = state.readings.line.byGroupID[groupID];
 			if (byGroupID !== undefined) {
-				const readingsData = byGroupID[timeInterval.toString()][unitID];
-				if (readingsData !== undefined && !readingsData.isFetching) {
-					const label = state.groups.byGroupID[groupID].name;
-					if (readingsData.readings === undefined) {
-						throw new Error('Unacceptable condition: readingsData.readings is undefined.');
-					}
+				const byTimeInterval = byGroupID[timeInterval.toString()];
+				if (byTimeInterval !== undefined) {
+					const readingsData = byTimeInterval[unitID];
+					if (readingsData !== undefined && !readingsData.isFetching) {
+						const label = state.groups.byGroupID[groupID].name;
+						if (readingsData.readings === undefined) {
+							throw new Error('Unacceptable condition: readingsData.readings is undefined.');
+						}
 
-					const dataPoints: Array<{ x: number, y: number, z: number }> = _.values(readingsData.readings)
-						.map(transformLineReadingToLegacy)
-						.map((v: [number, number, number]) => ({ x: v[0], y: v[1], z: v[2] })
-						);
-					datasets.push({
-						label,
-						id: state.groups.byGroupID[groupID].id,
-						currentChart: chart,
-						exportVals: dataPoints
-					});
+						const dataPoints: Array<{ x: number, y: number, z: number }> = _.values(readingsData.readings)
+							.map(transformLineReadingToLegacy)
+							.map((v: [number, number, number]) => ({ x: v[0], y: v[1], z: v[2] })
+							);
+						datasets.push({
+							label,
+							id: state.groups.byGroupID[groupID].id,
+							currentChart: chart,
+							exportVals: dataPoints
+						});
+					}
 				}
 			}
 		}
 		for (const meterID of state.graph.selectedMeters) {
 			const byMeterID = state.readings.line.byMeterID[meterID];
 			if (byMeterID !== undefined) {
-				const readingsData = byMeterID[timeInterval.toString()][unitID];
-				if (readingsData !== undefined && !readingsData.isFetching) {
-					const label = state.meters.byMeterID[meterID].name;
-					if (readingsData.readings === undefined) {
-						throw new Error('Unacceptable condition: readingsData.readings is undefined.');
-					}
+				const byTimeInterval = byMeterID[timeInterval.toString()];
+				if (byTimeInterval !== undefined) {
+					const readingsData = byTimeInterval[unitID];
+					if (readingsData !== undefined && !readingsData.isFetching) {
+						const label = state.meters.byMeterID[meterID].name;
+						if (readingsData.readings === undefined) {
+							throw new Error('Unacceptable condition: readingsData.readings is undefined.');
+						}
 
-					const dataPoints: Array<{ x: number, y: number, z: number }> = _.values(readingsData.readings)
-						.map(transformLineReadingToLegacy)
-						.map(
-							(v: [number, number, number]) => ({ x: v[0], y: v[1], z: v[2] })
-						);
-					datasets.push({
-						label,
-						id: state.meters.byMeterID[meterID].id,
-						currentChart: chart,
-						exportVals: dataPoints
-					});
+						const dataPoints: Array<{ x: number, y: number, z: number }> = _.values(readingsData.readings)
+							.map(transformLineReadingToLegacy)
+							.map(
+								(v: [number, number, number]) => ({ x: v[0], y: v[1], z: v[2] })
+							);
+						datasets.push({
+							label,
+							id: state.meters.byMeterID[meterID].id,
+							currentChart: chart,
+							exportVals: dataPoints
+						});
+					}
 				}
 			}
 		}
