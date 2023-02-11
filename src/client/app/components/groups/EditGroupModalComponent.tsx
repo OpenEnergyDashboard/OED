@@ -186,7 +186,7 @@ export default function EditGroupModalComponent(props: EditGroupModalComponentPr
 		props.handleClose();
 
 		if (shouldUpdateGroup()) {
-			dispatch(submitGroupEdits(state));
+			// TODO dispatch(submitGroupEdits(state));
 			dispatch(removeUnsavedChanges());
 		}
 	}
@@ -217,24 +217,24 @@ export default function EditGroupModalComponent(props: EditGroupModalComponentPr
 					</Modal.Title>
 				</Modal.Header>
 				{/* when any of the group are changed call one of the functions. */}
-				{loggedInAsAdmin && // only render when logged in as Admin
-					<Modal.Body className="show-grid">
-						<div id="container">
-							<div id="modalChild">
-								{/* Modal content */}
-								<div className="container-fluid">
-									<div style={tableStyle}>
-										{/* Name input */}
-										<div style={formInputStyle}>
-											<label><FormattedMessage id="group.name" /></label><br />
-											<Input
-												name='name'
-												type='text'
-												onChange={e => handleStringChange(e)}
-												value={state.name} />
-										</div>
-										{/* default graphic unit input */}
-										{/* TODO <div style={formInputStyle}>
+				<Modal.Body className="show-grid">
+					<div id="container">
+						<div id="modalChild">
+							{/* Modal content */}
+							<div className="container-fluid">
+								<div style={tableStyle}>
+									{/* Name input */}
+									<div style={formInputStyle}>
+										<label><FormattedMessage id="group.name" /></label><br />
+										<Input
+											name='name'
+											type='text'
+											onChange={e => handleStringChange(e)}
+											value={state.name} />
+									</div>
+									{/* default graphic unit input */}
+									{loggedInAsAdmin ?
+										< div style={formInputStyle}>
 											<label><FormattedMessage id="group.defaultGraphicUnit" /></label><br />
 											<Input
 												name='defaultGraphicUnit'
@@ -248,15 +248,22 @@ export default function EditGroupModalComponent(props: EditGroupModalComponentPr
 													disabled>
 													{translate('select.unit')}
 												</option>}
-												{Array.from(dropdownsState.compatibleGraphicUnits).map(unit => {
+												{/* TODO {Array.from(dropdownsState.compatibleGraphicUnits).map(unit => {
 													return (<option value={unit.id} key={unit.id}>{unit.identifier}</option>)
 												})}
 												{Array.from(dropdownsState.incompatibleGraphicUnits).map(unit => {
 													return (<option value={unit.id} key={unit.id} disabled>{unit.identifier}</option>)
-												})}
+												})} */}
 											</Input>
-										</div> */}
-										{/* Displayable input */}
+										</div>
+										:
+										<div className="item-container">
+											{/* Use meter translation id string since same one wanted. */}
+											<b><FormattedMessage id="meter.defaultGraphicUnit" /></b> {props.group.defaultGraphicUnit}
+										</div>
+									}
+									{/* Displayable input */}
+									{loggedInAsAdmin && // only render when logged in as Admin
 										<div style={formInputStyle}>
 											<label><FormattedMessage id="group.displayable" /></label><br />
 											<Input
@@ -269,7 +276,9 @@ export default function EditGroupModalComponent(props: EditGroupModalComponentPr
 												})}
 											</Input>
 										</div>
-										{/* Area input */}
+									}
+									{/* Area input */}
+									{loggedInAsAdmin && // only render when logged in as Admin
 										<div style={formInputStyle}>
 											<label><FormattedMessage id="group.area" /></label><br />
 											<Input
@@ -280,7 +289,9 @@ export default function EditGroupModalComponent(props: EditGroupModalComponentPr
 												value={state.area}
 												onChange={e => handleNumberChange(e)} />
 										</div>
-										{/* GPS input */}
+									}
+									{/* GPS input */}
+									{loggedInAsAdmin && // only render when logged in as Admin
 										<div style={formInputStyle}>
 											<label><FormattedMessage id="group.gps" /></label><br />
 											<Input
@@ -289,7 +300,9 @@ export default function EditGroupModalComponent(props: EditGroupModalComponentPr
 												onChange={e => handleStringChange(e)}
 												value={getGPSString(state.gps)} />
 										</div>
-										{/* Note input */}
+									}
+									{/* Note input */}
+									{loggedInAsAdmin && // only render when logged in as Admin
 										<div style={formInputStyle}>
 											<label><FormattedMessage id="group.note" /></label><br />
 											<Input
@@ -298,11 +311,12 @@ export default function EditGroupModalComponent(props: EditGroupModalComponentPr
 												onChange={e => handleStringChange(e)}
 												value={state.note} />
 										</div>
-									</div>
+									}
 								</div>
 							</div>
 						</div>
-					</Modal.Body>}
+					</div>
+				</Modal.Body>
 				<Modal.Footer>
 					{/* Hides the modal */}
 					<Button variant="secondary" onClick={handleClose}>

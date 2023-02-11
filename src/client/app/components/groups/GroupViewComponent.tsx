@@ -4,14 +4,17 @@
 
 import * as React from 'react';
 //Realize that * is already imported from react
+import { State } from 'types/redux/state';
 import { useState } from 'react';
+import { useSelector } from 'react-redux';
 import { Button } from 'reactstrap';
 import { FormattedMessage } from 'react-intl';
 import EditGroupModalComponent from './EditGroupModalComponent';
 import '../../styles/card-page.css';
 import { GroupDefinition } from 'types/redux/groups';
+import { isRoleAdmin } from '../../utils/hasPermissions';
+import { CurrentUserState } from 'types/redux/currentUser';
 import translate from '../../utils/translate';
-import { GPSPoint } from '../../utils/calibration';
 
 // TODO
 // Need to put child meters somewhere
@@ -21,26 +24,9 @@ import { GPSPoint } from '../../utils/calibration';
 // TODO This duplicates code in EditMeterModalComponent. Need to put in some other place (utils? or where others are)
 // and then import in both places
 
-// get string value from GPSPoint or null.
-function getGPSString(gps: GPSPoint | null) {
-	if (gps === null) {
-		//  if gps is null return empty string value
-		return '';
-	}
-	else if (typeof gps === 'object') {
-		// if gps is an object parse GPSPoint and return string value
-		const json = JSON.stringify({ gps });
-		const obj = JSON.parse(json);
-		return `${obj.gps.latitude}, ${obj.gps.longitude}`;
-	}
-	else {
-		// Assume it is a string that was input.
-		return gps
-	}
-}
-
 interface GroupViewComponentProps {
 	group: GroupDefinition;
+	currentUser: CurrentUserState;
 }
 
 export default function GroupViewComponent(props: GroupViewComponentProps) {
@@ -57,28 +43,42 @@ export default function GroupViewComponent(props: GroupViewComponentProps) {
 		setShowEditModal(false);
 	}
 
+	// current user state
+	const currentUser = useSelector((state: State) => state.currentUser.profile);
+	// Check for admin status
+	const loggedInAsAdmin = (currentUser !== null) && isRoleAdmin(currentUser.role);
+
+	// Set up to display the units associated with the meter as the unit identifier.
+	// current unit state
+	const currentUnitState = useSelector((state: State) => state.units.units);
+	// TODO-fix comment This is the default graphic unit associated with the group. See above for how code works.
+	const graphicName = (Object.keys(currentUnitState).length === 0 || props.group.defaultGraphicUnit === -99) ?
+		'no unit' : currentUnitState[props.group.defaultGraphicUnit].identifier;
+
 	return (
 		<div className="card">
 			{/* Use identifier-container since similar and groups only have name */}
 			<div className="identifier-container">
 				{props.group.name}
 			</div>
-			<div className={props.group.displayable.toString()}>
-				<b><FormattedMessage id="group.displayable" /></b> {translate(`TrueFalseType.${props.group.displayable.toString()}`)}
-			</div>
 			<div className="item-container">
-				<b><FormattedMessage id="group.area" /></b> {props.group.area}
+				{/* Use meter translation id string since same one wanted. */}
+				<b><FormattedMessage id="meter.defaultGraphicUnit" /></b> {graphicName}
 			</div>
-			<div className="item-container">
-				<b><FormattedMessage id="group.gps" /></b> {getGPSString(props.group.gps)}
-			</div>
+			{loggedInAsAdmin &&
+				<div className={props.group.displayable.toString()}>
+					<b><FormattedMessage id="group.displayable" /></b> {translate(`TrueFalseType.${props.group.displayable.toString()}`)}
+				</div>
+			}
 			{/* Only show first 30 characters so card does not get too big. Should limit to one line */}
-			<div className="item-container">
-				<b><FormattedMessage id="group.note" /></b> {props.group.note?.slice(0, 29)}
-			</div>
+			{loggedInAsAdmin &&
+				<div className="item-container">
+					<b><FormattedMessage id="group.note" /></b> {props.group.note?.slice(0, 29)}
+				</div>
+			}
 			<div className="edit-btn">
 				<Button variant="Secondary" onClick={handleShow}>
-					<FormattedMessage id="edit.group" />
+				{loggedInAsAdmin ? <FormattedMessage id="edit.group" /> : <FormattedMessage id="group.details" />}
 				</Button>
 				{/* Creates a child UnitModalEditComponent */}
 				<EditGroupModalComponent

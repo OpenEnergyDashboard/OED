@@ -28,6 +28,8 @@ export default function GroupsDetailComponent() {
 
 	// Groups state
 	const groupsState = useSelector((state: State) => state.groups.byGroupID);
+	// current user state
+	const currentUserState = useSelector((state: State) => state.currentUser);
 
 	const titleStyle: React.CSSProperties = {
 		textAlign: 'center'
@@ -57,12 +59,14 @@ export default function GroupsDetailComponent() {
 						< CreateGroupModalComponent />
 					</div>
 					<div className="card-container">
-						{/* Create a GroupViewComponent for each groupData in Groups State after sorting by identifier */}
+						{/* Create a GroupViewComponent for each groupData in Groups State after sorting by name */}
 						{Object.values(groupsState)
 							.sort((groupA: GroupDefinition, groupB: GroupDefinition) => (groupA.name.toLowerCase() > groupB.name.toLowerCase()) ? 1 :
 								((groupB.name.toLowerCase() > groupA.name.toLowerCase()) ? -1 : 0))
 							.map(groupData => (<GroupViewComponent group={groupData as
-								GroupDefinition} key={(groupData as GroupDefinition).id} />))}
+								GroupDefinition} key={(groupData as GroupDefinition).id}
+								currentUser={currentUserState}
+								/>))}
 					</div>
 				</div>
 				<FooterContainer />
