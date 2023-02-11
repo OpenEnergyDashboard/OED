@@ -123,7 +123,7 @@ router.post('/addConversion', async (req, res) => {
 	const validationResult = validate(req.body, validConversion);
 	if (!validationResult.valid) {
 		log.error(`Invalid input for ConversionsAPI. ${validationResult.error}`);
-		res.sendStatus(400);
+        failure(res, 400, `Invalid input: ${validationResult.error}`);
 	} else {
 		const conn = getConnection();
 		try {
@@ -141,7 +141,7 @@ router.post('/addConversion', async (req, res) => {
 			res.sendStatus(200);
 		} catch (err) {
 			log.error(`Error while inserting new conversion ${err}`, err);
-			res.sendStatus(500);
+            failure(res, 500, `Error while inserting new conversion: ${err}`);
 		}
 	}
 });
