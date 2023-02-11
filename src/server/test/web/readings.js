@@ -222,6 +222,22 @@ mocha.describe('readings API', () => {
 						.query({ timeInterval: createTimeString('2022-08-25', '00:00:00', '2022-10-24', '00:00:00'), graphicUnitId: unitId });
 					expectReadingToEqualExpected(res, expected);
 				});
+
+				mocha.it('15 days barely gives hourly points & middle readings', async () => {
+					// Create 2D array for meter to feed into the database
+					// Note the meter ID is set so we know what to expect when a query is made.
+					const meterData = [['Electric Utility kWh', 'Electric_Utility', 'kWh', true, undefined,
+						'special meter', 'test/web/readingsData/readings_ri_15_days_75.csv', false, METER_ID]];
+					// Load the data into the database
+					await prepareTest(unitDatakWh, conversionDatakWh, meterData);
+					// Get the unit ID since the DB could use any value.
+					const unitId = await getUnitId('kWh');
+					const expected = await parseExpectedCsv('src/server/test/web/readingsData/expected_line_ri_15_mu_kWh_gu_kWh_st_2022-09-21%00#00#00_et_2022-10-06%00#00#00.csv');
+					const res = await chai.request(app).get(`/api/unitReadings/line/meters/${METER_ID}`)
+						.query({ timeInterval: createTimeString('2022-09-21', '00:00:00', '2022-10-06', '00:00:00'), graphicUnitId: unitId });
+					expectReadingToEqualExpected(res, expected);
+				});
+
 				// Test 15 minutes over all time for flow unit.
 				mocha.it('should have daily points for 15 minute reading intervals and flow units with +-inf start/end time & kW as kW', async () => {
 					const unitData = [
