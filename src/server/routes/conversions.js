@@ -6,6 +6,8 @@ const express = require('express');
 const { log } = require('../log');
 const { getConnection } = require('../db');
 const Conversion = require('../models/Conversion');
+const { success } = require('./response');
+const failure = require('../services/csvPipeline/failure');
 const validate = require('jsonschema').validate;
 
 const router = express.Router();
@@ -33,6 +35,7 @@ router.get('/', async (req, res) => {
  * Route for POST, edit conversion.
  */
 router.post('/edit', async (req, res) => {
+	console.log("Editing...")
 	const validConversion = {
 		type: 'object',
 		required: ['sourceId', 'destinationId', 'bidirectional', 'slope', 'intercept'],
@@ -68,7 +71,7 @@ router.post('/edit', async (req, res) => {
 	const validatorResult = validate(req.body, validConversion);
 	if (!validatorResult.valid) {
 		log.warn(`Got request to edit conversions with invalid conversion data, errors:${validatorResult.errors}`);
-		res.status(400);
+		failure(res, 400, "Error(s): " + validatorResult.errors.toString());
 	} else {
 		const conn = getConnection();
 		try {
@@ -77,9 +80,9 @@ router.post('/edit', async (req, res) => {
 			await updatedConversion.update(conn);
 		} catch (err) {
 			log.error('Failed to edit conversion', err);
-			res.status(500).json({ message: 'Unable to edit conversions.', err });
+			failure(res, 500, "Unable to edit conversions due to " + err.toString());
 		}
-		res.status(200).json({ message: `Successfully edited conversions ${req.body.sourceId}` });
+		success(res, `Successfully edited conversions ${req.body.sourceId}`);
 	}
 });
 
