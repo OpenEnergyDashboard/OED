@@ -83,7 +83,7 @@ router.post('/edit', async (req, res) => {
 	const validatorResult = validate(req.body, validUnit);
 	if (!validatorResult.valid) {
 		log.warn(`Got request to edit units with invalid unit data, errors:${validatorResult.errors}`);
-		res.status(400);
+		failure (res, 400, 'validation failed with ' + validatorResult.errors.toString());
 	} else {
 		const conn = getConnection();
 		try {
@@ -104,9 +104,9 @@ router.post('/edit', async (req, res) => {
 			await unit.update(conn);
 		} catch (err) {
 			log.error('Failed to edit unit', err);
-			res.status(500).json({ message: 'Unable to edit units.', err });
+			failure (res, 500, 'Unable to edit units ' + err.toString());
 		}
-		res.status(200).json({ message: `Successfully edited units ${req.body.id}` });
+		success (res, 'Successfully edited units ');
 	}
 });
 
@@ -165,7 +165,7 @@ router.post('/addUnit', async (req, res) => {
 	const validationResult = validate(req.body, validUnit);
 	if (!validationResult.valid) {
 		log.error(`Invalid input for unitsAPI. ${validationResult.error}`);
-		res.sendStatus(400);
+		failure(res, 400, 'validation failed with  ' + validationResult.error.toString());
 	} else {
 		const conn = getConnection();
 		try {
@@ -185,10 +185,10 @@ router.post('/addUnit', async (req, res) => {
 				);
 				await newUnit.insert(t);
 			});
-			res.sendStatus(200);
+			success(res)
 		} catch (err) {
 			log.error(`Error while inserting new unit ${err}`, err);
-			res.sendStatus(500);
+			failure(res, 500, err.toString() + ' with detail ' + err['detail']);
 		}
 	}
 });
