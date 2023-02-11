@@ -6,8 +6,7 @@ const express = require('express');
 const { log } = require('../log');
 const { getConnection } = require('../db');
 const Conversion = require('../models/Conversion');
-const { success } = require('./response');
-const failure = require('../services/csvPipeline/failure');
+const { success, failure } = require('./response');
 const validate = require('jsonschema').validate;
 
 const router = express.Router();
