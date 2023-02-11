@@ -18,6 +18,7 @@
     "test": "./node_modules/.bin/mocha --timeout 15000 \"src/server/test/**/*.js\"",
     "testsome": "./node_modules/.bin/mocha --timeout 15000",
     "createdb": "node ./src/server/services/createDB.js",
+    "developerdb": "node -e 'require(\"./src/server/util/developer.js\").createShiftReadingsFunction()'",
     "migratedb": "node ./src/server/services/migrateDB.js",
     "addMamacMeters": "node ./src/server/services/addMamacMeters.js",
     "updateMamacMeters": "node ./src/server/services/updateMamacMeters.js",
@@ -41,7 +42,8 @@
     "generateSineSquaredTestingData": "node -e 'require(\"./src/server/data/automatedTestingData\").generateSineSquaredTestingData(2.5)'",
     "generateCosineSquaredTestingData": "node -e 'require(\"./src/server/data/automatedTestingData\").generateCosineSquaredTestingData(2.5)'",
     "generateTestingData": "node -e 'require(\"./src/server/data/automatedTestingData\").generateTestingData()'",
-    "testData": "node -e 'require(\"./src/server/data/automatedTestingData.js\").insertSpecialUnitsConversionsMeters()'"
+    "testData": "node -e 'require(\"./src/server/data/automatedTestingData.js\").insertSpecialUnitsConversionsMetersGroups()'",
+    "webData": "node -e 'require(\"./src/server/data/websiteData.js\").insertWebsiteData()'"
   },
   "nodemonConfig": {
     "watch": [
@@ -74,7 +76,7 @@
     "babel-core": "~7.0.0-bridge.0",
     "babel-plugin-formatjs": "~10.3.12",
     "bcryptjs": "~2.4.3",
-    "body-parser": "~1.18.3",
+    "body-parser": "~1.20.1",
     "bootstrap": "~4.3.1",
     "chokidar": "~3.5.2",
     "co": "~4.6.0",
@@ -84,14 +86,14 @@
     "dotenv": "~9.0.0",
     "es6-promisify": "~5.0.0",
     "eslint-plugin-jsdoc": "~39.2.9",
-    "express": "~4.16.4",
+    "express": "~4.17.3",
     "express-rate-limit": "~5.5.1",
     "history": "~4.7.2",
     "http-signature": "~1.3.6",
     "jquery": "~3.5.0",
     "json-schema": "~0.4.0",
     "jsonschema": "~1.2.4",
-    "jsonwebtoken": "~8.3.0",
+    "jsonwebtoken": "~9.0.0",
     "jsprim": "~2.0.2",
     "lodash": "~4.17.21",
     "lodash-webpack-plugin": "~0.11.6",

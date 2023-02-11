@@ -10,8 +10,8 @@ const Meter = require('../../models/Meter');
 const Reading = require('../../models/Reading');
 const Group = require('../../models/Group');
 const Unit = require('../../models/Unit');
-const Conversion = require('../../models/Conversion');
-const { insertSpecialUnits, insertSpecialConversions } = require('../../data/automatedTestingData.js');
+const { insertStandardUnits, insertStandardConversions } = require('../../util/insertData');
+const { insertSpecialUnits, insertSpecialConversions } = require('../../data/automatedTestingData');
 const { redoCik } = require('../../services/graph/redoCik');
 
 mocha.describe('Compare readings', () => {
@@ -26,13 +26,13 @@ mocha.describe('Compare readings', () => {
 	mocha.beforeEach(async () => {
 		conn = testDB.getConnection();
 		// Insert the standard and special units and conversions. Really only need 1-2 but this is easy.
-		await Unit.insertStandardUnits(conn);
-		await Conversion.insertStandardConversions(conn);
+		await insertStandardUnits(conn);
+		await insertStandardConversions(conn);
 		await insertSpecialUnits(conn);
 		await insertSpecialConversions(conn);
 		await redoCik(conn);
 		// Make the meter be a kWh meter.
-		const meterUnitId = (await Unit.getByName('Electric_utility', conn)).id;
+		const meterUnitId = (await Unit.getByName('Electric_Utility', conn)).id;
 		await new Meter(
 			undefined, // id
 			'Meter', // name
