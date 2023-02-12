@@ -205,7 +205,7 @@ export default function EditGroupModalComponent(props: EditGroupModalComponentPr
 		<>
 			<Modal show={props.show} onHide={props.handleClose}>
 				<Modal.Header>
-					<Modal.Title> <FormattedMessage id="edit.group" />
+					<Modal.Title> <FormattedMessage id={loggedInAsAdmin ? "edit.group" : "group.details"} />
 						<TooltipHelpContainer page='groups' />
 						<div style={tooltipStyle}>
 							<TooltipMarkerComponent page='groups' helpTextId={tooltipStyle.tooltipEditGroupView} />
