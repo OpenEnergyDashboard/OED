@@ -27,7 +27,7 @@ function notifyUser(msg: string) {
 	window.alert(msg);
 }
 
-//TODO duplicated from EditmMeterModalCoponent
+//TODO duplicated from EditMeterModalComponent
 // get string value from GPSPoint or null.
 function getGPSString(gps: GPSPoint | null) {
 	if (gps === null) {
@@ -45,7 +45,6 @@ function getGPSString(gps: GPSPoint | null) {
 		return gps
 	}
 }
-
 
 interface EditGroupModalComponentProps {
 	show: boolean;
@@ -108,8 +107,8 @@ export default function EditGroupModalComponent(props: EditGroupModalComponentPr
 	}
 
 	//TODO change this comment
-	// Validate the changes and return true if we should update this unit.
-	// Two reasons for not updating the unit:
+	// Validate the changes and return true if we should update this group.
+	// Two reasons for not updating the group:
 	//	1. typeOfUnit is changed from meter to something else while some meters are still linked with this unit
 	//	2. There are no changes
 	//  3. TODO ask Steve about Logic here
@@ -160,7 +159,6 @@ export default function EditGroupModalComponent(props: EditGroupModalComponentPr
 			if (isValidGPSInput(gpsInput)) {
 				//Clearly gpsInput is a string but TS complains about the split so cast.
 				const gpsValues = (gpsInput as string).split(',').map((value: string) => parseFloat(value));
-
 				//It is valid and needs to be in this format for routing
 				gps = {
 					longitude: gpsValues[longitudeIndex],
@@ -169,20 +167,17 @@ export default function EditGroupModalComponent(props: EditGroupModalComponentPr
 			} else if ((gpsInput as string).length !== 0) {
 				notifyUser(translate('input.gps.range') + state.gps + '.');
 				inputOk = false;
-
 			}
 		}
 
-
 		if (inputOk) {
 			// TODO const submitState = { ...state, gps: gps };
-
 			resetState();
 		} else {
 			notifyUser(translate('group.input.error'));
 		}
 
-
+		// TODO should we close if there was an error?
 		props.handleClose();
 
 		if (shouldUpdateGroup()) {

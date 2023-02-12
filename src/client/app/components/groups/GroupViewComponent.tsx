@@ -48,7 +48,7 @@ export default function GroupViewComponent(props: GroupViewComponentProps) {
 	// Check for admin status
 	const loggedInAsAdmin = (currentUser !== null) && isRoleAdmin(currentUser.role);
 
-	// Set up to display the units associated with the meter as the unit identifier.
+	// Set up to display the units associated with the group as the unit identifier.
 	// current unit state
 	const currentUnitState = useSelector((state: State) => state.units.units);
 	// TODO-fix comment This is the default graphic unit associated with the group. See above for how code works.
@@ -78,9 +78,10 @@ export default function GroupViewComponent(props: GroupViewComponentProps) {
 			}
 			<div className="edit-btn">
 				<Button variant="Secondary" onClick={handleShow}>
-				{loggedInAsAdmin ? <FormattedMessage id="edit.group" /> : <FormattedMessage id="group.details" />}
+					{/* admins can edit a group but others can only view the details */}
+					{loggedInAsAdmin ? <FormattedMessage id="edit.group" /> : <FormattedMessage id="group.details" />}
 				</Button>
-				{/* Creates a child UnitModalEditComponent */}
+				{/* Creates a child GroupModalEditComponent */}
 				<EditGroupModalComponent
 					show={showEditModal}
 					group={props.group}
