@@ -59,10 +59,12 @@ export default function GroupsDetailComponent() {
 							<TooltipMarkerComponent page='groups' helpTextId={tooltipStyle.tooltipGroupView} />
 						</div>
 					</h2>
-					<div className="edit-btn">
-						{/* The actual button for create is inside this component. */}
-						< CreateGroupModalComponent />
-					</div>
+					{loggedInAsAdmin &&
+						<div className="edit-btn">
+							{/* The actual button for create is inside this component. */}
+							< CreateGroupModalComponent />
+						</div>
+					}
 					<div className="card-container">
 						{/* Create a GroupViewComponent for each groupData in Groups State after sorting by name */}
 						{Object.values(groupsState)
@@ -71,7 +73,7 @@ export default function GroupsDetailComponent() {
 							.map(groupData => (<GroupViewComponent group={groupData as
 								GroupDefinition} key={(groupData as GroupDefinition).id}
 								currentUser={currentUserState}
-								/>))}
+							/>))}
 					</div>
 				</div>
 				<FooterContainer />
