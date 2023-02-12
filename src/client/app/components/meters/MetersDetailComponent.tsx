@@ -36,7 +36,7 @@ export default function MetersDetailComponent() {
 	const currentUserState = useSelector((state: State) => state.currentUser);
 
 	// Check for admin status
-	const currentUser = useSelector((state: State) => state.currentUser.profile);
+	const currentUser = currentUserState.profile;
 	const loggedInAsAdmin = (currentUser !== null) && isRoleAdmin(currentUser.role);
 
 	// We only want displayable meters if non-admins because they still have

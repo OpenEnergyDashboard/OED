@@ -32,8 +32,7 @@ export default function GroupsDetailComponent() {
 	// current user state
 	const currentUserState = useSelector((state: State) => state.currentUser);
 	// Check for admin status
-	// TODO why can't we use currentUserState.profile? If change then do other files too.
-	const currentUser = useSelector((state: State) => state.currentUser.profile);
+	const currentUser = currentUserState.profile;
 	const loggedInAsAdmin = (currentUser !== null) && isRoleAdmin(currentUser.role);
 
 	const titleStyle: React.CSSProperties = {
