@@ -12,6 +12,7 @@ import { useDispatch, useSelector } from 'react-redux';
 import { useEffect } from 'react';
 import { State } from '../../types/redux/state';
 import { fetchGroupsDetailsIfNeeded } from '../../actions/groups';
+import { isRoleAdmin } from '../../utils/hasPermissions';
 import GroupViewComponent from './GroupViewComponent';
 import CreateGroupModalComponent from './CreateGroupModalComponent';
 import { GroupDefinition } from 'types/redux/groups';
@@ -30,6 +31,10 @@ export default function GroupsDetailComponent() {
 	const groupsState = useSelector((state: State) => state.groups.byGroupID);
 	// current user state
 	const currentUserState = useSelector((state: State) => state.currentUser);
+	// Check for admin status
+	// TODO why can't we use currentUserState.profile? If change then do other files too.
+	const currentUser = useSelector((state: State) => state.currentUser.profile);
+	const loggedInAsAdmin = (currentUser !== null) && isRoleAdmin(currentUser.role);
 
 	const titleStyle: React.CSSProperties = {
 		textAlign: 'center'
@@ -38,7 +43,8 @@ export default function GroupsDetailComponent() {
 	const tooltipStyle = {
 		display: 'inline-block',
 		fontSize: '50%',
-		tooltipGroupView: 'help.admin.groupview'
+		// Switch help depending if admin or not.
+		tooltipGroupView: loggedInAsAdmin ? 'help.admin.groupview' : 'help.groups.groupview'
 	};
 
 	return (

@@ -189,7 +189,8 @@ export default function EditGroupModalComponent(props: EditGroupModalComponentPr
 	const tooltipStyle = {
 		display: 'inline-block',
 		fontSize: '60%',
-		tooltipEditGroupView: 'help.admin.groupedit'
+		// Switch help depending if admin or not.
+		tooltipEditGroupView: loggedInAsAdmin ? 'help.admin.groupedit' : 'help.groups.groupdetails'
 	};
 
 	const formInputStyle: React.CSSProperties = {
