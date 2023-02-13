@@ -63,19 +63,22 @@ export default function ExportComponent() {
 				// Make sure it exists in case state is not there yet.
 				if (byMeterID !== undefined) {
 					// Get the readings for the time range and unit graphed
-					const readingsData = byMeterID[timeInterval.toString()][unitId];
-					// Make sure they are there and not being fetched.
-					if (readingsData !== undefined && !readingsData.isFetching) {
-						if (readingsData.readings === undefined) {
-							throw new Error(`Unacceptable condition: readingsData.readings is undefined for meter ${meterId}.`);
+					const byTimeInterval = byMeterID[timeInterval.toString()];
+					if (byTimeInterval !== undefined) {
+						const readingsData = byTimeInterval[unitId];
+						// Make sure they are there and not being fetched.
+						if (readingsData !== undefined && !readingsData.isFetching) {
+							if (readingsData.readings === undefined) {
+								throw new Error(`Unacceptable condition: readingsData.readings is undefined for meter ${meterId}.`);
+							}
+							// Get the readings from the state.
+							const readings = _.values(readingsData.readings);
+							// Sort by start timestamp.
+							const sortedReadings = _.sortBy(readings, item => item.startTimestamp, 'asc');
+							// Identifier for current meter.
+							const meterIdentifier = metersState[meterId].identifier;
+							graphExport(sortedReadings, meterIdentifier, unitLabel, unitIdentifier, chartName, scaling);
 						}
-						// Get the readings from the state.
-						const readings = _.values(readingsData.readings);
-						// Sort by start timestamp.
-						const sortedReadings = _.sortBy(readings, item => item.startTimestamp, 'asc');
-						// Identifier for current meter.
-						const meterIdentifier = metersState[meterId].identifier;
-						graphExport(sortedReadings, meterIdentifier, unitLabel, unitIdentifier, chartName, scaling);
 					}
 				}
 			}
@@ -86,19 +89,22 @@ export default function ExportComponent() {
 				// Make sure it exists in case state is not there yet.
 				if (byGroupID !== undefined) {
 					// Get the readings for the time range and unit graphed
-					const readingsData = byGroupID[timeInterval.toString()][unitId];
-					// Make sure they are there and not being fetched.
-					if (readingsData !== undefined && !readingsData.isFetching) {
-						if (readingsData.readings === undefined) {
-							throw new Error(`Unacceptable condition: readingsData.readings is undefined for group ${groupId}.`);
+					const byTimeInterval = byGroupID[timeInterval.toString()];
+					if (byTimeInterval !== undefined) {
+						const readingsData = byTimeInterval[unitId];
+						// Make sure they are there and not being fetched.
+						if (readingsData !== undefined && !readingsData.isFetching) {
+							if (readingsData.readings === undefined) {
+								throw new Error(`Unacceptable condition: readingsData.readings is undefined for group ${groupId}.`);
+							}
+							// Get the readings from the state.
+							const readings = _.values(readingsData.readings);
+							// Sort by start timestamp.
+							const sortedReadings = _.sortBy(readings, item => item.startTimestamp, 'asc');
+							// Identifier for current group.
+							const groupName = groupsState[groupId].name;
+							graphExport(sortedReadings, groupName, unitLabel, unitIdentifier, chartName, scaling);
 						}
-						// Get the readings from the state.
-						const readings = _.values(readingsData.readings);
-						// Sort by start timestamp.
-						const sortedReadings = _.sortBy(readings, item => item.startTimestamp, 'asc');
-						// Identifier for current group.
-						const groupName = groupsState[groupId].name;
-						graphExport(sortedReadings, groupName, unitLabel, unitIdentifier, chartName, scaling);
 					}
 				}
 			}

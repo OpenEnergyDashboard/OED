@@ -157,7 +157,7 @@ mocha.describe('readings API', () => {
 					expect(res.body).to.have.property(`${METER_ID}`).to.have.property('0').to.have.property('endTimestamp');
 				});
 				// Test using a date range of infinity, which should return as days
-				mocha.it('should have the expected readings for 15 minute reading intervals and quantity units with +-inf start/end time', async () => {
+				mocha.it('should have daily points for 15 minute reading intervals and quantity units with +-inf start/end time & kWh as kWh', async () => {
 					// Create 2D array for meter to feed into the database
 					// Note the meter ID is set so we know what to expect when a query is made.
 					const meterData = [['Electric Utility kWh', 'Electric_Utility', 'kWh', true, undefined,
@@ -167,7 +167,7 @@ mocha.describe('readings API', () => {
 					// Get the unit ID since the DB could use any value.
 					const unitId = await getUnitId('kWh');
 					// Load the expected response data from the corresponding csv file
-					const expected = await parseExpectedCsv('src/server/test/web/readingsData/expected_ri_15_mu_kWh_gu_kWh_st_-inf_et_inf.csv');
+					const expected = await parseExpectedCsv('src/server/test/web/readingsData/expected_line_ri_15_mu_kWh_gu_kWh_st_-inf_et_inf.csv');
 					// Create a request to the API for unbounded reading times and save the response
 					const res = await chai.request(app).get(`/api/unitReadings/line/meters/${METER_ID}`)
 						.query({ timeInterval: ETERNITY.toString(), graphicUnitId: unitId });
@@ -176,7 +176,7 @@ mocha.describe('readings API', () => {
 				});
 				// This test is effectively the same as the last, but we specify the date range
 				// Should return daily point readings
-				mocha.it('should have the expected readings for 15 minute reading intervals and quantity units with explicit start/end time', async () => {
+				mocha.it('should have daily points for 15 minute reading intervals and quantity units with explicit start/end time & kWh as kWh', async () => {
 					// Create 2D array for meter to feed into the database
 					// Note the meter ID is set so we know what to expect when a query is made.
 					const meterData = [['Electric Utility kWh', 'Electric_Utility', 'kWh', true, undefined,
@@ -186,14 +186,14 @@ mocha.describe('readings API', () => {
 					// Get the unit ID since the DB could use any value.
 					const unitId = await getUnitId('kWh');
 					// Load and parse the corresponding expected values from csv
-					const expected = await parseExpectedCsv('src/server/test/web/readingsData/expected_ri_15_mu_kWh_gu_kWh_st_2022-08-18%00#00#00_et_2022-11-01%00#00#00.csv');
+					const expected = await parseExpectedCsv('src/server/test/web/readingsData/expected_line_ri_15_mu_kWh_gu_kWh_st_2022-08-18%00#00#00_et_2022-11-01%00#00#00.csv');
 					// Create a request to the API for the date range specified using createTimeString and save the response
 					const res = await chai.request(app).get(`/api/unitReadings/line/meters/${METER_ID}`)
 						.query({ timeInterval: createTimeString('2022-08-18', '00:00:00', '2022-11-01', '00:00:00'), graphicUnitId: unitId });
 					expectReadingToEqualExpected(res, expected);
 				});
 				// This date range is on the threshold of returning daily point readings, 61 days
-				mocha.it('should generate daily points & middle readings for a 61 day period', async () => {
+				mocha.it('should have daily points for middle readings of 15 minute for a 61 day period and quantity units with kWh as kWh', async () => {
 					// Create 2D array for meter to feed into the database
 					// Note the meter ID is set so we know what to expect when a query is made.
 					const meterData = [['Electric Utility kWh', 'Electric_Utility', 'kWh', true, undefined,
@@ -202,13 +202,13 @@ mocha.describe('readings API', () => {
 					await prepareTest(unitDatakWh, conversionDatakWh, meterData);
 					// Get the unit ID since the DB could use any value.
 					const unitId = await getUnitId('kWh');
-					const expected = await parseExpectedCsv('src/server/test/web/readingsData/expected_ri_15_mu_kWh_gu_kWh_st_2022-08-25%00#00#00_et_2022-10-25%00#00#00.csv');
+					const expected = await parseExpectedCsv('src/server/test/web/readingsData/expected_line_ri_15_mu_kWh_gu_kWh_st_2022-08-25%00#00#00_et_2022-10-25%00#00#00.csv');
 					const res = await chai.request(app).get(`/api/unitReadings/line/meters/${METER_ID}`)
 						.query({ timeInterval: createTimeString('2022-08-25', '00:00:00', '2022-10-25', '00:00:00'), graphicUnitId: unitId });
 					expectReadingToEqualExpected(res, expected);
 				});
 				// 60 days gives hourly points & middle readings
-				mocha.it('should generate hourly points & middle readings in a 60 day period', async () => {
+				mocha.it('should have hourly points for middle readings of 15 minute for a 60 day period and quantity units with kWh as kWh', async () => {
 					// Create 2D array for meter to feed into the database
 					// Note the meter ID is set so we know what to expect when a query is made.
 					const meterData = [['Electric Utility kWh', 'Electric_Utility', 'kWh', true, undefined,
@@ -217,13 +217,13 @@ mocha.describe('readings API', () => {
 					await prepareTest(unitDatakWh, conversionDatakWh, meterData);
 					// Get the unit ID since the DB could use any value.
 					const unitId = await getUnitId('kWh');
-					const expected = await parseExpectedCsv('src/server/test/web/readingsData/expected_ri_15_mu_kWh_gu_kWh_st_2022-08-25%00#00#00_et_2022-10-24%00#00#00.csv');
+					const expected = await parseExpectedCsv('src/server/test/web/readingsData/expected_line_ri_15_mu_kWh_gu_kWh_st_2022-08-25%00#00#00_et_2022-10-24%00#00#00.csv');
 					const res = await chai.request(app).get(`/api/unitReadings/line/meters/${METER_ID}`)
 						.query({ timeInterval: createTimeString('2022-08-25', '00:00:00', '2022-10-24', '00:00:00'), graphicUnitId: unitId });
 					expectReadingToEqualExpected(res, expected);
 				});
 				// Test 15 minutes over all time for flow unit.
-				mocha.it('should have the expected readings for 15 minute reading intervals and flow units', async () => {
+				mocha.it('should have daily points for 15 minute reading intervals and flow units with +-inf start/end time & kW as kW', async () => {
 					const unitData = [
 						['kW', '', Unit.unitRepresentType.FLOW, 3600, Unit.unitType.UNIT, '', Unit.displayableType.ALL, true, 'kilowatts'],
 						['Electric', '', Unit.unitRepresentType.FLOW, 3600, Unit.unitType.METER, '', Unit.displayableType.NONE, false, 'special unit']
@@ -235,19 +235,19 @@ mocha.describe('readings API', () => {
 					await prepareTest(unitData, conversionData, meterData);
 					// Get the unit ID since the DB could use any value.
 					const unitId = await getUnitId('kW');
-					const expected = await parseExpectedCsv('src/server/test/web/readingsData/expected_ri_15_mu_kW_gu_kW_st_-inf_et_inf.csv');
+					const expected = await parseExpectedCsv('src/server/test/web/readingsData/expected_line_ri_15_mu_kW_gu_kW_st_-inf_et_inf.csv');
 
 					const res = await chai.request(app).get(`/api/unitReadings/line/meters/${METER_ID}`)
 						.query({ timeInterval: ETERNITY.toString(), graphicUnitId: unitId });
 					expectReadingToEqualExpected(res, expected);
 				});
 				// Test 15 minutes over all time for raw unit.
-				mocha.it('should have the expected readings for 15 minute reading intervals and raw units', async () => {
+				mocha.it('should have daily points for 15 minute reading intervals and raw units with +-inf start/end time & Celsius as Celsius', async () => {
 					const unitData = [
 						['C', '', Unit.unitRepresentType.RAW, 3600, Unit.unitType.UNIT, '', Unit.displayableType.ALL, true, 'Celsius'],
 						['Degrees', '', Unit.unitRepresentType.RAW, 3600, Unit.unitType.METER, '', Unit.displayableType.NONE, false, 'special unit']
 					];
-					const conversionData = [['Degrees', 'C', false, 1, 0, 'Degrees → c']];
+					const conversionData = [['Degrees', 'C', false, 1, 0, 'Degrees → C']];
 					const meterData = [['Degrees Celsius', 'Degrees', 'C', true, undefined,
 						'special meter', 'test/web/readingsData/readings_ri_15_days_75.csv', false, METER_ID]];
 
@@ -255,7 +255,7 @@ mocha.describe('readings API', () => {
 					// Get the unit ID since the DB could use any value.
 					const unitId = await getUnitId('C');
 					// Reuse same file as flow since value should be the same values.
-					const expected = await parseExpectedCsv('src/server/test/web/readingsData/expected_ri_15_mu_kW_gu_kW_st_-inf_et_inf.csv');
+					const expected = await parseExpectedCsv('src/server/test/web/readingsData/expected_line_ri_15_mu_kW_gu_kW_st_-inf_et_inf.csv');
 
 					const res = await chai.request(app).get(`/api/unitReadings/line/meters/${METER_ID}`)
 						.query({ timeInterval: ETERNITY.toString(), graphicUnitId: unitId });
