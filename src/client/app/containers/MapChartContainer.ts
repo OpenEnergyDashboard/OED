@@ -90,6 +90,10 @@ function mapStateToProps(state: State) {
 						// of graphics as we are doing for rate.
 						unitLabel = selectUnitState.identifier + ' * time / day ≡ quantity / day';
 					}
+					if(state.graph.areaNormalization) {
+						// TODO add actual unit
+						unitLabel += ' / area';
+					}
 				}
 			}
 

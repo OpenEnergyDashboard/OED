@@ -55,6 +55,10 @@ function mapStateToProps(state: State) {
 				// Rate scaling is needed
 				needsRateScaling = true;
 			}
+			if(state.graph.areaNormalization) {
+				// TODO add actual unit
+				unitLabel += ' / area';
+			}
 		}
 		// If the current rate is per hour (default rate) then don't bother with the extra calculations since we'd be multiplying by 1
 		needsRateScaling = needsRateScaling && (currentSelectedRate.rate != 1);
