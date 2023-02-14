@@ -13,16 +13,16 @@ import { FormattedMessage } from 'react-intl';
 import translate from '../../utils/translate';
 import TooltipMarkerComponent from '../TooltipMarkerComponent';
 import TooltipHelpContainer from '../../containers/TooltipHelpContainer';
+import ListDisplayComponent from '../ListDisplayComponent';
 import '../../styles/modal.css';
 import '../../styles/card-page.css';
 import { removeUnsavedChanges } from '../../actions/unsavedWarning';
-import { submitGroupEdits } from '../../actions/groups'; // TODO verify correct action, remove export for action if not used.
+import { submitGroupEdits, fetchGroupChildrenIfNeeded } from '../../actions/groups'; // TODO verify correct action, remove export for action if not used.
 import { GroupDefinition } from '../../types/redux/groups'; // TODO correct one?
 import { TrueFalseType } from '../../types/items';
 import { NamedIDItem } from '../../types/items';
 import { isRoleAdmin } from '../../utils/hasPermissions';
 import { GPSPoint, isValidGPSInput } from '../../utils/calibration';
-
 
 function notifyUser(msg: string) {
 	window.alert(msg);
@@ -50,14 +50,17 @@ function getGPSString(gps: GPSPoint | null) {
 interface EditGroupModalComponentProps {
 	show: boolean;
 	group: GroupDefinition;
-	// TODO childMeters: NamedIDItem[];
-	// TODO childGroups: NamedIDItem[];
 	// passed in to handle closing the modal
 	handleClose: () => void;
 }
 
 export default function EditGroupModalComponent(props: EditGroupModalComponentProps) {
 	const dispatch = useDispatch();
+
+	// Meter state
+	const metersState = useSelector((state: State) => state.meters.byMeterID);
+	// Group state
+	const groupsState = useSelector((state: State) => state.groups.byGroupID);
 
 	// Check for admin status
 	const currentUser = useSelector((state: State) => state.currentUser.profile);
@@ -66,14 +69,22 @@ export default function EditGroupModalComponent(props: EditGroupModalComponentPr
 	// Set existing group values
 	const values = {
 		name: props.group.name,
-		// TODO childMeters: props.group.childMeters,
+		childMeters: props.group.childMeters,
 		// TODO childGroups: props.group.childGroups,
 		displayable: props.group.displayable,
 		gps: props.group.gps,
 		note: props.group.note,
 		area: props.group.area,
 		defaultGraphicUnit: props.group.defaultGraphicUnit,
-		id: props.group.id
+		id: props.group.id,
+	}
+
+	// The information on the children of this group
+	const groupChildrenDefaults = {
+		// The identifiers of all direct meter children that are visible to this user.
+		childMetersIdentifier: [] as string[],
+		// The original number of direct meter children
+		childMetersTrueSize: 0
 	}
 
 	/* State */
@@ -91,6 +102,8 @@ export default function EditGroupModalComponent(props: EditGroupModalComponentPr
 	const handleNumberChange = (e: React.ChangeEvent<HTMLInputElement>) => {
 		setState({ ...state, [e.target.name]: Number(e.target.value) });
 	}
+
+	const [groupChildrenState, setGroupChildrenState] = useState(groupChildrenDefaults)
 	/* End State */
 
 	// Reset the state to default values
@@ -187,6 +200,40 @@ export default function EditGroupModalComponent(props: EditGroupModalComponentPr
 		}
 	}
 
+	// React.useEffect(() => {
+	// 		
+	// });
+
+	// Determine the names of the child meters/groups.
+	React.useEffect(() => {
+		// Get the children of this meter. This will happen twice on the first load.
+		// TODO Since this is done for each card, it would be better to load them all at once
+		// rather per meter. This means moving this into the GroupsDetailComponent or before.
+		// TODO I think this function will fetch as long as another is not fetching so it could be made better
+		// to avoid redoing when not needed.
+		// TODO Look into outdated on group state to see how used and if needed with new group pages.
+		dispatch(fetchGroupChildrenIfNeeded(state.id));
+		// State for current group
+		const currentGroup = groupsState[state.id];
+		// Holds the names of all direct meter children of this group when visible to this user.
+		const childMetersIdentifier: string[] = [];
+		currentGroup.childMeters.forEach((meterID: number) => {
+				// Make sure meter stat exists. Also, the identifier is missing if not visible (non-admin).
+			if (metersState[meterID] !== undefined && metersState[meterID].identifier !== null) {
+				childMetersIdentifier.push(metersState[meterID].identifier.trim());
+			}
+		});
+		childMetersIdentifier.sort();
+		// Record the total number so later can compare the number in array to see if any missing.
+		const trueMeterSize = currentGroup.childMeters.length;
+		// Update the state
+		setGroupChildrenState({
+			...groupChildrenState,
+			childMetersIdentifier: childMetersIdentifier,
+			childMetersTrueSize: trueMeterSize
+		})
+	}, [metersState, groupsState[state.id].childMeters]);
+
 	const tooltipStyle = {
 		display: 'inline-block',
 		fontSize: '60%',
@@ -213,7 +260,7 @@ export default function EditGroupModalComponent(props: EditGroupModalComponentPr
 						</div>
 					</Modal.Title>
 				</Modal.Header>
-				{/* when any of the group are changed call one of the functions. */}
+				{/* when any of the group are changed call one of the functions (if admin). */}
 				<Modal.Body className="show-grid">
 					<div id="container">
 						<div id="modalChild">
@@ -315,6 +362,11 @@ export default function EditGroupModalComponent(props: EditGroupModalComponentPr
 												value={state.note} />
 										</div>
 									}
+									{/* The child meters in this group */}
+									<div>
+										<b><FormattedMessage id='child.meters' /></b>:
+										<ListDisplayComponent trueSize={groupChildrenState.childMetersTrueSize} items={groupChildrenState.childMetersIdentifier} />
+									</div>
 								</div>
 							</div>
 						</div>

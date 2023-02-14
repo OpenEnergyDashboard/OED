@@ -12,6 +12,7 @@ import { useDispatch, useSelector } from 'react-redux';
 import { useEffect } from 'react';
 import { State } from '../../types/redux/state';
 import { fetchGroupsDetailsIfNeeded } from '../../actions/groups';
+import { fetchMetersDetailsIfNeeded } from '../../actions/meters';
 import { isRoleAdmin } from '../../utils/hasPermissions';
 import GroupViewComponent from './GroupViewComponent';
 import CreateGroupModalComponent from './CreateGroupModalComponent';
@@ -23,8 +24,11 @@ export default function GroupsDetailComponent() {
 	const dispatch = useDispatch();
 
 	useEffect(() => {
+		// Note each modal is created for each group when the details are created so get all state now for all groups.
 		// Makes async call to groups API for groups details if one has not already been made somewhere else, stores group ids in state
 		dispatch(fetchGroupsDetailsIfNeeded());
+		// Get meter details if needed
+		dispatch(fetchMetersDetailsIfNeeded())
 	}, []);
 
 	// Groups state

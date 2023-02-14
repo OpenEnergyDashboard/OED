@@ -153,7 +153,6 @@ export interface GroupMetadata {
 
 export interface GroupData {
 	name: string;
-	// TODO in past, passed the names since need because you have to display to user. Now use identifier. Need to fix up.
 	childMeters: number[];
 	childGroups: number[];
 	gps: GPSPoint | null;
