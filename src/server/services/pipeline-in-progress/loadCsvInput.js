@@ -51,10 +51,7 @@ async function loadCsvInput(
 	relaxedParsing
 ) {
 	try {
-		const dataRows = await readCsv(filePath);
-		if (headerRow) {
-			dataRows.shift();
-		}
+		const dataRows = await readCsv(filePath, headerRow);
 		return loadArrayInput(dataRows, meterID, mapRowToModel, timeSort, readingRepetition,
 			isCumulative, cumulativeReset, cumulativeResetStart, cumulativeResetEnd,
 			readingGap, readingLengthVariation, isEndOnly, shouldUpdate, conditionSet, conn, honorDst, relaxedParsing);

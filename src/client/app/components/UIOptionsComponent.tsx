@@ -7,7 +7,7 @@ import { FormattedMessage, defineMessages, injectIntl, WrappedComponentProps } f
 import sliderWithoutTooltips, { createSliderWithTooltip } from 'rc-slider';
 import * as moment from 'moment';
 import { Button, ButtonGroup, Dropdown, DropdownToggle, DropdownMenu, DropdownItem } from 'reactstrap';
-import ExportContainer from '../containers/ExportContainer';
+import ExportComponent from '../components/ExportComponent';
 import ChartSelectComponent from './ChartSelectComponent';
 import ChartDataSelectComponent from './ChartDataSelectComponent';
 import { ChangeBarStackingAction, ChangeCompareSortingOrderAction, SetOptionsVisibility } from '../types/redux/graph';
@@ -249,7 +249,7 @@ class UIOptionsComponent extends React.Component<UIOptionsPropsWithIntl, UIOptio
 				{/* We can't export compare data or map data */}
 				{this.props.chartToRender !== ChartTypes.compare && this.props.chartToRender !== ChartTypes.map &&
 					<div style={divTopPadding}>
-						<ExportContainer />
+						<ExportComponent />
 					</div>
 				}
 				<div style={divTopPadding}>
