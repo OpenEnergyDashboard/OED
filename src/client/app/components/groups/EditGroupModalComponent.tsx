@@ -85,10 +85,14 @@ export default function EditGroupModalComponent(props: EditGroupModalComponentPr
 		childMetersIdentifier: [] as string[],
 		// The original number of direct meter children
 		childMetersTrueSize: 0,
-		// The identifiers of all direct meter children that are visible to this user.
+		// The names of all direct meter children that are visible to this user.
 		childGroupsName: [] as string[],
 		// The original number of direct group children
-		childGroupsTrueSize: 0
+		childGroupsTrueSize: 0,
+		// The identifiers of all meter children (deep meters) that are visible to this user.
+		deepMetersIdentifier: [] as string[],
+		// The original number of direct meter children
+		deepMetersTrueSize: 0,
 	}
 
 	/* State */
@@ -241,6 +245,19 @@ export default function EditGroupModalComponent(props: EditGroupModalComponentPr
 		childGroupsName.sort();
 		// Record the total number so later can compare the number in array to see if any missing.
 		const trueGroupSize = currentGroup.childGroups.length;
+
+		// Information to display all (deep) children meters.
+		// Holds the names of all (deep) meter children of this group when visible to this user.
+		const deepMetersIdentifier: string[] = [];
+		currentGroup.deepMeters.forEach((meterID: number) => {
+				// Make sure meter state exists. Also, the identifier is missing if not visible (non-admin).
+			if (metersState[meterID] !== undefined && metersState[meterID].identifier !== null) {
+				deepMetersIdentifier.push(metersState[meterID].identifier.trim());
+			}
+		});
+		deepMetersIdentifier.sort();
+		// Record the total number so later can compare the number in array to see if any missing.
+		const trueDeepMeterSize = currentGroup.deepMeters.length;
 		
 		// Update the state
 		setGroupChildrenState({
@@ -248,9 +265,11 @@ export default function EditGroupModalComponent(props: EditGroupModalComponentPr
 			childMetersIdentifier: childMetersIdentifier,
 			childMetersTrueSize: trueMeterSize,
 			childGroupsName: childGroupsName,
-			childGroupsTrueSize: trueGroupSize
+			childGroupsTrueSize: trueGroupSize,
+			deepMetersIdentifier: deepMetersIdentifier,
+			deepMetersTrueSize: trueDeepMeterSize
 		})
-	}, [metersState, groupsState[state.id].childMeters, groupsState[state.id].childGroups]);
+	}, [metersState, groupsState[state.id].childMeters, groupsState[state.id].childGroups, groupsState[state.id].deepMeters]);
 
 	const tooltipStyle = {
 		display: 'inline-block',
@@ -389,6 +408,11 @@ export default function EditGroupModalComponent(props: EditGroupModalComponentPr
 									<div>
 										<b><FormattedMessage id='child.groups' /></b>:
 										<ListDisplayComponent trueSize={groupChildrenState.childGroupsTrueSize} items={groupChildrenState.childGroupsName} />
+									</div>
+										{/* All (deep) meters in this group */}
+										<div>
+										<b><FormattedMessage id='group.all.meters' /></b>:
+										<ListDisplayComponent trueSize={groupChildrenState.deepMetersTrueSize} items={groupChildrenState.deepMetersIdentifier} />
 									</div>
 								</div>
 							</div>
