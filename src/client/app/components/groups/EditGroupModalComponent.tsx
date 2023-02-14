@@ -14,6 +14,7 @@ import translate from '../../utils/translate';
 import TooltipMarkerComponent from '../TooltipMarkerComponent';
 import TooltipHelpContainer from '../../containers/TooltipHelpContainer';
 import '../../styles/modal.css';
+import '../../styles/card-page.css';
 import { removeUnsavedChanges } from '../../actions/unsavedWarning';
 import { submitGroupEdits } from '../../actions/groups'; // TODO verify correct action, remove export for action if not used.
 import { GroupDefinition } from '../../types/redux/groups'; // TODO correct one?
@@ -219,15 +220,21 @@ export default function EditGroupModalComponent(props: EditGroupModalComponentPr
 							{/* Modal content */}
 							<div className="container-fluid">
 								<div style={tableStyle}>
-									{/* Name input */}
-									<div style={formInputStyle}>
-										<label><FormattedMessage id="group.name" /></label><br />
-										<Input
-											name='name'
-											type='text'
-											onChange={e => handleStringChange(e)}
-											value={state.name} />
-									</div>
+									{/* Name where input if admin or shown if now */}
+									{loggedInAsAdmin ?
+										<div style={formInputStyle}>
+											<label><FormattedMessage id="group.name" /></label><br />
+											<Input
+												name='name'
+												type='text'
+												onChange={e => handleStringChange(e)}
+												value={state.name} />
+										</div>
+										:
+										<div className="item-container">
+											<b><FormattedMessage id="group.name" /></b> {state.name}
+										</div>
+									}
 									{/* default graphic unit input */}
 									{loggedInAsAdmin ?
 										< div style={formInputStyle}>
@@ -314,16 +321,25 @@ export default function EditGroupModalComponent(props: EditGroupModalComponentPr
 					</div>
 				</Modal.Body>
 				<Modal.Footer>
-					{/* Hides the modal */}
-					<Button variant="secondary" onClick={handleClose}>
-						<FormattedMessage id="discard.changes" />
-					</Button>
-					{/* On click calls the function handleSaveChanges in this component */}
-					<Button variant="primary" onClick={handleSaveChanges} disabled={!state.name}>
-						<FormattedMessage id="save.all" />
-					</Button>
+					{/* Discard & save buttons if admin and close button if not. */}
+					{loggedInAsAdmin ?
+						// Hides the modal
+						<div>
+							<Button variant="secondary" onClick={handleClose}>
+								<FormattedMessage id="discard.changes" />
+							</Button>
+							{/* On click calls the function handleSaveChanges in this component */}
+							<Button variant="primary" onClick={handleSaveChanges} disabled={!state.name}>
+								<FormattedMessage id="save.all" />
+							</Button>
+						</div>
+						:
+						<Button onClick={handleClose}>
+							<FormattedMessage id="close" />
+						</Button>
+					}
 				</Modal.Footer>
-			</Modal>
+			</Modal >
 		</>
 	);
 }
