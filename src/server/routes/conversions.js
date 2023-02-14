@@ -34,7 +34,6 @@ router.get('/', async (req, res) => {
  * Route for POST, edit conversion.
  */
 router.post('/edit', async (req, res) => {
-	console.log("Editing...")
 	const validConversion = {
 		type: 'object',
 		required: ['sourceId', 'destinationId', 'bidirectional', 'slope', 'intercept'],
