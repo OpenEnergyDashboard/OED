@@ -84,7 +84,11 @@ export default function EditGroupModalComponent(props: EditGroupModalComponentPr
 		// The identifiers of all direct meter children that are visible to this user.
 		childMetersIdentifier: [] as string[],
 		// The original number of direct meter children
-		childMetersTrueSize: 0
+		childMetersTrueSize: 0,
+		// The identifiers of all direct meter children that are visible to this user.
+		childGroupsName: [] as string[],
+		// The original number of direct group children
+		childGroupsTrueSize: 0
 	}
 
 	/* State */
@@ -200,10 +204,6 @@ export default function EditGroupModalComponent(props: EditGroupModalComponentPr
 		}
 	}
 
-	// React.useEffect(() => {
-	// 		
-	// });
-
 	// Determine the names of the child meters/groups.
 	React.useEffect(() => {
 		// Get the children of this meter. This will happen twice on the first load.
@@ -215,10 +215,12 @@ export default function EditGroupModalComponent(props: EditGroupModalComponentPr
 		dispatch(fetchGroupChildrenIfNeeded(state.id));
 		// State for current group
 		const currentGroup = groupsState[state.id];
+
+		// Information to display the direct children meters.
 		// Holds the names of all direct meter children of this group when visible to this user.
 		const childMetersIdentifier: string[] = [];
 		currentGroup.childMeters.forEach((meterID: number) => {
-				// Make sure meter stat exists. Also, the identifier is missing if not visible (non-admin).
+				// Make sure meter state exists. Also, the identifier is missing if not visible (non-admin).
 			if (metersState[meterID] !== undefined && metersState[meterID].identifier !== null) {
 				childMetersIdentifier.push(metersState[meterID].identifier.trim());
 			}
@@ -226,13 +228,29 @@ export default function EditGroupModalComponent(props: EditGroupModalComponentPr
 		childMetersIdentifier.sort();
 		// Record the total number so later can compare the number in array to see if any missing.
 		const trueMeterSize = currentGroup.childMeters.length;
+
+		// Information to display the direct children groups.
+		// Holds the names of all direct group children of this group when visible to this user.
+		const childGroupsName: string[] = [];
+		currentGroup.childGroups.forEach((groupID: number) => {
+				// Make sure group state exists. Also, the name is missing if not visible (non-admin).
+			if (groupsState[groupID] !== undefined && groupsState[groupID].name !== null) {
+				childGroupsName.push(groupsState[groupID].name.trim());
+			}
+		});
+		childGroupsName.sort();
+		// Record the total number so later can compare the number in array to see if any missing.
+		const trueGroupSize = currentGroup.childGroups.length;
+		
 		// Update the state
 		setGroupChildrenState({
 			...groupChildrenState,
 			childMetersIdentifier: childMetersIdentifier,
-			childMetersTrueSize: trueMeterSize
+			childMetersTrueSize: trueMeterSize,
+			childGroupsName: childGroupsName,
+			childGroupsTrueSize: trueGroupSize
 		})
-	}, [metersState, groupsState[state.id].childMeters]);
+	}, [metersState, groupsState[state.id].childMeters, groupsState[state.id].childGroups]);
 
 	const tooltipStyle = {
 		display: 'inline-block',
@@ -366,6 +384,11 @@ export default function EditGroupModalComponent(props: EditGroupModalComponentPr
 									<div>
 										<b><FormattedMessage id='child.meters' /></b>:
 										<ListDisplayComponent trueSize={groupChildrenState.childMetersTrueSize} items={groupChildrenState.childMetersIdentifier} />
+									</div>
+									{/* The child groups in this group */}
+									<div>
+										<b><FormattedMessage id='child.groups' /></b>:
+										<ListDisplayComponent trueSize={groupChildrenState.childGroupsTrueSize} items={groupChildrenState.childGroupsName} />
 									</div>
 								</div>
 							</div>
