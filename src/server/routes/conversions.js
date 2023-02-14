@@ -141,7 +141,7 @@ router.post('/addConversion', async (req, res) => {
 			res.sendStatus(200);
 		} catch (err) {
 			log.error(`Error while inserting new conversion ${err}`, err);
-            failure(res, 500, `Error while inserting new conversion: ${err}`);
+            failure(res, 500, 'Error while inserting new conversion: ' + err.toString());
 		}
 	}
 });
