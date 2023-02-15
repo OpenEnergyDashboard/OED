@@ -210,7 +210,7 @@ export default function EditMeterModalComponent(props: EditMeterModalComponentPr
 			}
 
 			if (inputOk) {
-				// The input passed validation but only store if there are changes.
+				// The input passed validation.
 				// GPS may have been updated so create updated state to submit.
 				const submitState = { ...state, gps: gps };
 				// Submit new meter if checks where ok.

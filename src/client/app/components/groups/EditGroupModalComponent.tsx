@@ -21,7 +21,6 @@ import { removeUnsavedChanges } from '../../actions/unsavedWarning';
 import { submitGroupEdits, fetchGroupChildrenIfNeeded } from '../../actions/groups'; // TODO verify correct action, remove export for action if not used.
 import { GroupDefinition } from '../../types/redux/groups'; // TODO correct one?
 import { TrueFalseType } from '../../types/items';
-import { NamedIDItem } from '../../types/items';
 import { isRoleAdmin } from '../../utils/hasPermissions';
 import { GPSPoint, isValidGPSInput } from '../../utils/calibration';
 import { notifyUser, getGPSString, nullToEmptyString } from '../../utils/input'
@@ -48,8 +47,8 @@ export default function EditGroupModalComponent(props: EditGroupModalComponentPr
 	// Set existing group values
 	const values = {
 		name: props.group.name,
-		// childMeters: props.group.childMeters,
-		// TODO childGroups: props.group.childGroups,
+		childMeters: props.group.childMeters,
+		childGroups: props.group.childGroups,
 		displayable: props.group.displayable,
 		gps: props.group.gps,
 		note: props.group.note,
@@ -107,85 +106,85 @@ export default function EditGroupModalComponent(props: EditGroupModalComponentPr
 		resetState();
 	}
 
-	//TODO change this comment
-	// Validate the changes and return true if we should update this group.
-	// Two reasons for not updating the group:
-	//	1. typeOfUnit is changed from meter to something else while some meters are still linked with this unit
-	//	2. There are no changes
-	//  3. TODO ask Steve about Logic here
-	const shouldUpdateGroup = (): boolean => {
-		//TODO changed to match values in group
-		//TODO need to add children values
-		return props.group.name != state.name
-			|| props.group.displayable != state.displayable
-			|| props.group.gps != state.gps
-			|| props.group.note != state.note
-			|| props.group.area != state.area
-			|| props.group.defaultGraphicUnit != state.defaultGraphicUnit
-			|| props.group.id != state.id;
-	}
-
 	// Save changes
 	// Currently using the old functionality which is to compare inherited prop values to state values
 	// If there is a difference between props and state, then a change was made
 	// Side note, we could probably just set a boolean when any input
 	const handleSaveChanges = () => {
 		// Close the modal first to avoid repeat clicks
-		setState(values);
-
-		let inputOk = true;
-
-		//Check if area is positive
-		//TODO object is possibly undefined
-		if (state.area < 0) {
-			notifyUser(translate('area.invalid') + state.area + '.');
-			inputOk = false;
-		}
-
-		//Check default graphic unit
-		if (state.defaultGraphicUnit === -999) {
-			notifyUser(translate('group.graphic.invalid'));
-			inputOk = false;
-		}
-
-		//Check GPS
-		const gpsInput = state.gps;
-		let gps: GPSPoint | null = null;
-		const latitudeIndex = 0;
-		const longitudeIndex = 1;
-
-		//if the user input a value then gpsInput should be a string
-		// null came from DB and it is okay to just leave it - Not a String.
-		if (typeof gpsInput === 'string') {
-			if (isValidGPSInput(gpsInput)) {
-				//Clearly gpsInput is a string but TS complains about the split so cast.
-				const gpsValues = (gpsInput as string).split(',').map((value: string) => parseFloat(value));
-				//It is valid and needs to be in this format for routing
-				gps = {
-					longitude: gpsValues[longitudeIndex],
-					latitude: gpsValues[latitudeIndex]
-				};
-			} else if ((gpsInput as string).length !== 0) {
-				notifyUser(translate('input.gps.range') + state.gps + '.');
-				inputOk = false;
-			}
-		}
-
-		if (inputOk) {
-			// TODO const submitState = { ...state, gps: gps };
-			resetState();
-		} else {
-			notifyUser(translate('group.input.error'));
-		}
-
-		// TODO should we close if there was an error?
 		props.handleClose();
 
-		if (shouldUpdateGroup()) {
-			// TODO dispatch(submitGroupEdits(state));
-			dispatch(removeUnsavedChanges());
+		// true if inputted values are okay. Then can submit.
+		let inputOk = true;
+
+		// Check for changes by comparing state to props
+		const groupHasChanges =
+			(
+				props.group.name != state.name ||
+				props.group.displayable != state.displayable ||
+				props.group.gps != state.gps ||
+				props.group.note != state.note ||
+				props.group.area != state.area ||
+				props.group.defaultGraphicUnit != state.defaultGraphicUnit
+				// TODO add children value when can edit and any others
+			);
+
+		// Only validate and store if any changes.
+		if (groupHasChanges) {
+
+			//Check if area is positive
+			// TODO object is possibly undefined
+			// TODO For now allow zero so works with default value and DB. We should probably
+			// make this better default than 0 (DB set to not null now).
+			if (state.area < 0) {
+				notifyUser(translate('area.invalid') + state.area + '.');
+				inputOk = false;
+			}
+
+			// TODO - not done on meters; may not need once set value properly
+			//Check default graphic unit
+			if (state.defaultGraphicUnit === -999) {
+				notifyUser(translate('group.graphic.invalid'));
+				inputOk = false;
+			}
+
+			//Check GPS
+			const gpsInput = state.gps;
+			let gps: GPSPoint | null = null;
+			const latitudeIndex = 0;
+			const longitudeIndex = 1;
+			//if the user input a value then gpsInput should be a string
+			// null came from DB and it is okay to just leave it - Not a String.
+			if (typeof gpsInput === 'string') {
+				if (isValidGPSInput(gpsInput)) {
+					//Clearly gpsInput is a string but TS complains about the split so cast.
+					const gpsValues = (gpsInput as string).split(',').map((value: string) => parseFloat(value));
+					//It is valid and needs to be in this format for routing
+					gps = {
+						longitude: gpsValues[longitudeIndex],
+						latitude: gpsValues[latitudeIndex]
+					};
+				} else if ((gpsInput as string).length !== 0) {
+					// GPS not okay.
+					// TODO isValidGPSInput currently tops up an alert so not doing it here, may change
+					// so leaving code commented out.
+					// notifyUser(translate('input.gps.range') + state.gps + '.');
+					notifyUser(translate('input.gps.range') + state.gps + '.');
+					inputOk = false;
+				}
+			}
+
+			if (inputOk) {
+				// The input passed validation.
+				// GPS may have been updated so create updated state to submit.
+				const submitState = { ...state, gps: gps, };
+				dispatch(submitGroupEdits(submitState));
+				dispatch(removeUnsavedChanges());
+			} else {
+				notifyUser(translate('group.input.error'));
+			}
 		}
-	}
+	};
 
 	// Determine the names of the child meters/groups.
 	React.useEffect(() => {
@@ -203,7 +202,7 @@ export default function EditGroupModalComponent(props: EditGroupModalComponentPr
 		// Holds the names of all direct meter children of this group when visible to this user.
 		const childMetersIdentifier: string[] = [];
 		currentGroup.childMeters.forEach((meterID: number) => {
-				// Make sure meter state exists. Also, the identifier is missing if not visible (non-admin).
+			// Make sure meter state exists. Also, the identifier is missing if not visible (non-admin).
 			if (metersState[meterID] !== undefined && metersState[meterID].identifier !== null) {
 				childMetersIdentifier.push(metersState[meterID].identifier.trim());
 			}
@@ -216,7 +215,7 @@ export default function EditGroupModalComponent(props: EditGroupModalComponentPr
 		// Holds the names of all direct group children of this group when visible to this user.
 		const childGroupsName: string[] = [];
 		currentGroup.childGroups.forEach((groupID: number) => {
-				// Make sure group state exists. Also, the name is missing if not visible (non-admin).
+			// Make sure group state exists. Also, the name is missing if not visible (non-admin).
 			if (groupsState[groupID] !== undefined && groupsState[groupID].name !== null) {
 				childGroupsName.push(groupsState[groupID].name.trim());
 			}
@@ -229,7 +228,7 @@ export default function EditGroupModalComponent(props: EditGroupModalComponentPr
 		// Holds the names of all (deep) meter children of this group when visible to this user.
 		const deepMetersIdentifier: string[] = [];
 		currentGroup.deepMeters.forEach((meterID: number) => {
-				// Make sure meter state exists. Also, the identifier is missing if not visible (non-admin).
+			// Make sure meter state exists. Also, the identifier is missing if not visible (non-admin).
 			if (metersState[meterID] !== undefined && metersState[meterID].identifier !== null) {
 				deepMetersIdentifier.push(metersState[meterID].identifier.trim());
 			}
@@ -237,7 +236,7 @@ export default function EditGroupModalComponent(props: EditGroupModalComponentPr
 		deepMetersIdentifier.sort();
 		// Record the total number so later can compare the number in array to see if any missing.
 		const trueDeepMeterSize = currentGroup.deepMeters.length;
-		
+
 		// Update the state
 		setGroupChildrenState({
 			...groupChildrenState,
@@ -388,8 +387,8 @@ export default function EditGroupModalComponent(props: EditGroupModalComponentPr
 										<b><FormattedMessage id='child.groups' /></b>:
 										<ListDisplayComponent trueSize={groupChildrenState.childGroupsTrueSize} items={groupChildrenState.childGroupsName} />
 									</div>
-										{/* All (deep) meters in this group */}
-										<div>
+									{/* All (deep) meters in this group */}
+									<div>
 										<b><FormattedMessage id='group.all.meters' /></b>:
 										<ListDisplayComponent trueSize={groupChildrenState.deepMetersTrueSize} items={groupChildrenState.deepMetersIdentifier} />
 									</div>

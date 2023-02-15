@@ -303,7 +303,7 @@ export function submitGroupEdits(group: t.GroupData & t.GroupID): Thunk {
 			if (e.response.data.message && e.response.data.message === 'Cyclic group detected') {
 				showErrorNotification(translate('you.cannot.create.a.cyclic.group'));
 			} else {
-				showErrorNotification(translate('failed.to.edit.group'));
+				showErrorNotification(translate('group.failed.to.edit.group'));
 			}
 		}
 	};
