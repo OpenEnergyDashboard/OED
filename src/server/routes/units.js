@@ -8,6 +8,8 @@ const { getConnection } = require('../db');
 const Unit = require('../models/Unit');
 const { removeAdditionalConversionsAndUnits } = require('../services/graph/handleSuffixUnits');
 const validate = require('jsonschema').validate;
+const { success, failure } = require('./response');
+
 
 const router = express.Router();
 
@@ -83,7 +85,7 @@ router.post('/edit', async (req, res) => {
 	const validatorResult = validate(req.body, validUnit);
 	if (!validatorResult.valid) {
 		log.warn(`Got request to edit units with invalid unit data, errors:${validatorResult.errors}`);
-		failure (res, 400, 'validation failed with ' + validatorResult.errors.toString());
+		failure(res, 400, 'Validation failed with ' + validatorResult.errors.toString());
 	} else {
 		const conn = getConnection();
 		try {
@@ -104,9 +106,9 @@ router.post('/edit', async (req, res) => {
 			await unit.update(conn);
 		} catch (err) {
 			log.error('Failed to edit unit', err);
-			failure (res, 500, 'Unable to edit units ' + err.toString());
+			failure(res, 500, 'Unable to edit units ' + err.toString());
 		}
-		success (res, 'Successfully edited units ');
+		success(res, `Successfully edited units ${req.body.id}`);
 	}
 });
 
@@ -165,7 +167,7 @@ router.post('/addUnit', async (req, res) => {
 	const validationResult = validate(req.body, validUnit);
 	if (!validationResult.valid) {
 		log.error(`Invalid input for unitsAPI. ${validationResult.error}`);
-		failure(res, 400, 'validation failed with  ' + validationResult.error.toString());
+		failure(res, 400, 'Validation failed with  ' + validationResult.error.toString());
 	} else {
 		const conn = getConnection();
 		try {
@@ -185,7 +187,7 @@ router.post('/addUnit', async (req, res) => {
 				);
 				await newUnit.insert(t);
 			});
-			success(res)
+			success(res);
 		} catch (err) {
 			log.error(`Error while inserting new unit ${err}`, err);
 			failure(res, 500, err.toString() + ' with detail ' + err['detail']);
