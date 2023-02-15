@@ -23,32 +23,7 @@ import { isRoleAdmin } from '../../utils/hasPermissions';
 import { UnitData } from '../../types/redux/units';
 import { unitsCompatibleWithUnit } from '../../utils/determineCompatibleUnits';
 import { ConversionArray } from '../../types/conversionArray';
-
-// Notifies user of msg.
-// TODO isValidGPSInput uses alert so continue that. Maybe all should be changed but this impacts other parts of the code.
-// Note this causes the modal to close but the state is not reset.
-// Use a function so can easily change how it works.
-function notifyUser(msg: string) {
-	window.alert(msg);
-}
-
-// get string value from GPSPoint or null.
-function getGPSString(gps: GPSPoint | null) {
-	if (gps === null) {
-		//  if gps is null return empty string value
-		return '';
-	}
-	else if (typeof gps === 'object') {
-		// if gps is an object parse GPSPoint and return string value
-		const json = JSON.stringify({ gps });
-		const obj = JSON.parse(json);
-		return `${obj.gps.latitude}, ${obj.gps.longitude}`;
-	}
-	else {
-		// Assume it is a string that was input.
-		return gps
-	}
-}
+import { notifyUser, getGPSString } from '../../utils/input'
 
 // Checks if the input is null and returns empty string if that is the case. Otherwise return input.
 // This is needed because React does not want values to be of type null for display and null is the

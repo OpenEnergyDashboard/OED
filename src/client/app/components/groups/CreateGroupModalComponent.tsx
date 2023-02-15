@@ -16,14 +16,7 @@ import { TrueFalseType } from '../../types/items';
 import { GPSPoint, isValidGPSInput } from '../../utils/calibration';
 import { isRoleAdmin } from '../../utils/hasPermissions';
 import { submitNewGroup } from '../../actions/groups';
-
-// Notifies user of msg.
-// TODO isValidGPSInput uses alert so continue that. Maybe all should be changed but this impacts other parts of the code.
-// Note this causes the modal to close but the state is not reset.
-// Use a function so can easily change how it works.
-function notifyUser(msg: string) {
-	window.alert(msg);
-}
+import { notifyUser } from '../../utils/input'
 
 export default function CreateGroupModalComponent() {
 	const dispatch = useDispatch();

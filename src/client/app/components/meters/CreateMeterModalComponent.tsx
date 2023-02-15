@@ -21,14 +21,7 @@ import { isRoleAdmin } from '../../utils/hasPermissions';
 import { UnitData } from '../../types/redux/units';
 import { unitsCompatibleWithUnit } from '../../utils/determineCompatibleUnits';
 import { ConversionArray } from '../../types/conversionArray';
-
-// Notifies user of msg.
-// TODO isValidGPSInput uses alert so continue that. Maybe all should be changed but this impacts other parts of the code.
-// Note this causes the modal to close but the state is not reset.
-// Use a function so can easily change how it works.
-function notifyUser(msg: string) {
-	window.alert(msg);
-}
+import { notifyUser } from '../../utils/input'
 
 // TODO Moved the possible meters/graphic units calculations up to the details component
 // This was to prevent the calculations from being done on every load, but now requires them to be passed as props
