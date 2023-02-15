@@ -23,18 +23,7 @@ import { isRoleAdmin } from '../../utils/hasPermissions';
 import { UnitData } from '../../types/redux/units';
 import { unitsCompatibleWithUnit } from '../../utils/determineCompatibleUnits';
 import { ConversionArray } from '../../types/conversionArray';
-import { notifyUser, getGPSString } from '../../utils/input'
-
-// Checks if the input is null and returns empty string if that is the case. Otherwise return input.
-// This is needed because React does not want values to be of type null for display and null is the
-// state for some of the meter values. This only should change what is displayed and not the state or props.
-function nullToEmptyString(item: any) {
-	if (item === null) {
-		return '';
-	} else {
-		return item;
-	}
-}
+import { notifyUser, getGPSString, nullToEmptyString } from '../../utils/input'
 
 interface EditMeterModalComponentProps {
 	show: boolean;

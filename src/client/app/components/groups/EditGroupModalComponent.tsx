@@ -24,7 +24,7 @@ import { TrueFalseType } from '../../types/items';
 import { NamedIDItem } from '../../types/items';
 import { isRoleAdmin } from '../../utils/hasPermissions';
 import { GPSPoint, isValidGPSInput } from '../../utils/calibration';
-import { notifyUser, getGPSString } from '../../utils/input'
+import { notifyUser, getGPSString, nullToEmptyString } from '../../utils/input'
 
 interface EditGroupModalComponentProps {
 	show: boolean;
@@ -352,7 +352,7 @@ export default function EditGroupModalComponent(props: EditGroupModalComponentPr
 												type="number"
 												step="0.01"
 												min="0"
-												value={state.area}
+												value={nullToEmptyString(state.area)}
 												onChange={e => handleNumberChange(e)} />
 										</div>
 									}
@@ -375,7 +375,7 @@ export default function EditGroupModalComponent(props: EditGroupModalComponentPr
 												name='note'
 												type='textarea'
 												onChange={e => handleStringChange(e)}
-												value={state.note} />
+												value={nullToEmptyString(state.note)} />
 										</div>
 									}
 									{/* The child meters in this group */}

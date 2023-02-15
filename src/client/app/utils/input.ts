@@ -37,3 +37,18 @@ export function getGPSString(gps: GPSPoint | null) {
 		return gps
 	}
 }
+
+/**
+ * Checks if the input is null and returns empty string if that is the case. Otherwise return input.
+ * This is needed because React does not want values to be of type null for display and null is the
+ * state for some of DB values. This only should change what is displayed and not the state or props.
+ * @param item item to check if null and convert to empty string
+ * @returns item if not null or empty string
+ */
+export function nullToEmptyString(item: any) {
+	if (item === null) {
+		return '';
+	} else {
+		return item;
+	}
+}
