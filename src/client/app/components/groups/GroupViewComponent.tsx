@@ -84,7 +84,7 @@ export default function GroupViewComponent(props: GroupViewComponentProps) {
 				{/* Creates a child GroupModalEditComponent */}
 				<EditGroupModalComponent
 					show={showEditModal}
-					group={props.group}
+					groupId={props.group.id}
 					handleClose={handleClose} />
 			</div>
 		</div>

@@ -19,6 +19,7 @@ export type GroupsAction =
 	| ChangeDisplayModeAction
 	| CreateNewBlankGroupAction
 	| BeginEditingGroupAction
+	| ConfirmEditedGroupAction
 	| EditGroupNameAction
 	| EditGroupGPSAction
 	| EditGroupDisplayableAction
@@ -51,6 +52,11 @@ export interface ReceiveGroupChildrenAction {
 	type: ActionType.ReceiveGroupChildren;
 	groupID: number;
 	data: {meters: number[], groups: number[], deepMeters: number[]};
+}
+
+export interface ConfirmEditedGroupAction {
+	type: ActionType.ConfirmEditedGroup;
+	editedGroup: GroupEditData;
 }
 
 export interface ChangeDisplayedGroupsAction {
@@ -152,6 +158,19 @@ export interface GroupMetadata {
 }
 
 export interface GroupData {
+	name: string;
+	childMeters: number[];
+	childGroups: number[];
+	gps: GPSPoint | null;
+	displayable: boolean;
+	note?: string;
+	// TODO with area? you get a TS error but without it lets null through (see web console).
+	area: number;
+	defaultGraphicUnit: number;
+}
+
+export interface GroupEditData {
+	id: number,
 	name: string;
 	childMeters: number[];
 	childGroups: number[];

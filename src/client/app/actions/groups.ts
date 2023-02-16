@@ -287,11 +287,17 @@ export function submitNewGroup(group: t.GroupData): Thunk {
 	};
 }
 
+export function confirmGroupEdits(editedGroup: t.GroupEditData): t.ConfirmEditedGroupAction {
+	return { type: ActionType.ConfirmEditedGroup, editedGroup };
+}
+
 export function submitGroupEdits(group: t.GroupData & t.GroupID): Thunk {
 	return async (dispatch: Dispatch) => {
 		dispatch(markGroupInEditingSubmitted());
 		try {
 			await groupsApi.edit(group);
+			// Update the store with our new edits
+			dispatch(confirmGroupEdits(group));
 			dispatch(markGroupsOutdated());
 			dispatch(markOneGroupOutdated(group.id));
 			dispatch((dispatch2: Dispatch) => {

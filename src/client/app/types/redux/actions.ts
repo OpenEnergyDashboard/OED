@@ -64,6 +64,7 @@ export enum ActionType {
 	ChangeGroupsUIDisplayMode = 'CHANGE_GROUPS_UI_DISPLAY_MODE',
 	CreateNewBlankGroup = 'CREATE_NEW_BLANK_GROUP',
 	BeginEditingGroup = 'BEGIN_EDITING_GROUP',
+	ConfirmEditedGroup = 'CONFIRM_EDITED_GROUP',
 	EditGroupName = 'EDIT_GROUP_NAME',
 	EditGroupGPS = 'EDIT_GROUP_GPS',
 	EditGroupDisplayable = 'EDIT_GROUP_DISPLAYABLE',

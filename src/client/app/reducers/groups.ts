@@ -181,6 +181,18 @@ export default function groups(state = defaultState, action: GroupsAction) {
 			}
 			return state;
 		}
+		case ActionType.ConfirmEditedGroup: {
+			// Return new state object with updated edited meter info.
+			return {
+				...state,
+				byGroupID: {
+					...state.byGroupID,
+					[action.editedGroup.id]: {
+						...action.editedGroup
+					}
+				}
+			};
+		}
 
 		case ActionType.EditGroupName: {
 			return {

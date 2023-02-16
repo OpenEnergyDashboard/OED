@@ -19,7 +19,6 @@ import '../../styles/modal.css';
 import '../../styles/card-page.css';
 import { removeUnsavedChanges } from '../../actions/unsavedWarning';
 import { submitGroupEdits, fetchGroupChildrenIfNeeded } from '../../actions/groups'; // TODO verify correct action, remove export for action if not used.
-import { GroupDefinition } from '../../types/redux/groups'; // TODO correct one?
 import { TrueFalseType } from '../../types/items';
 import { isRoleAdmin } from '../../utils/hasPermissions';
 import { GPSPoint, isValidGPSInput } from '../../utils/calibration';
@@ -27,7 +26,7 @@ import { notifyUser, getGPSString, nullToEmptyString } from '../../utils/input'
 
 interface EditGroupModalComponentProps {
 	show: boolean;
-	group: GroupDefinition;
+	groupId: number;
 	// passed in to handle closing the modal
 	handleClose: () => void;
 }
@@ -39,6 +38,8 @@ export default function EditGroupModalComponent(props: EditGroupModalComponentPr
 	const metersState = useSelector((state: State) => state.meters.byMeterID);
 	// Group state
 	const groupsState = useSelector((state: State) => state.groups.byGroupID);
+	// The current groups state. It should always be valid.
+	const originalGroupState = groupsState[props.groupId];
 
 	// Check for admin status
 	const currentUser = useSelector((state: State) => state.currentUser.profile);
@@ -46,15 +47,15 @@ export default function EditGroupModalComponent(props: EditGroupModalComponentPr
 
 	// Set existing group values
 	const values = {
-		name: props.group.name,
-		childMeters: props.group.childMeters,
-		childGroups: props.group.childGroups,
-		displayable: props.group.displayable,
-		gps: props.group.gps,
-		note: props.group.note,
-		area: props.group.area,
-		defaultGraphicUnit: props.group.defaultGraphicUnit,
-		id: props.group.id,
+		name: originalGroupState.name,
+		childMeters: originalGroupState.childMeters,
+		childGroups: originalGroupState.childGroups,
+		displayable: originalGroupState.displayable,
+		gps: originalGroupState.gps,
+		note: originalGroupState.note,
+		area: originalGroupState.area,
+		defaultGraphicUnit: originalGroupState.defaultGraphicUnit,
+		id: originalGroupState.id,
 	}
 
 	// The information on the children of this group
@@ -120,12 +121,12 @@ export default function EditGroupModalComponent(props: EditGroupModalComponentPr
 		// Check for changes by comparing state to props
 		const groupHasChanges =
 			(
-				props.group.name != state.name ||
-				props.group.displayable != state.displayable ||
-				props.group.gps != state.gps ||
-				props.group.note != state.note ||
-				props.group.area != state.area ||
-				props.group.defaultGraphicUnit != state.defaultGraphicUnit
+				originalGroupState.name != state.name ||
+				originalGroupState.displayable != state.displayable ||
+				originalGroupState.gps != state.gps ||
+				originalGroupState.note != state.note ||
+				originalGroupState.area != state.area ||
+				originalGroupState.defaultGraphicUnit != state.defaultGraphicUnit
 				// TODO add children value when can edit and any others
 			);
 
@@ -201,41 +202,53 @@ export default function EditGroupModalComponent(props: EditGroupModalComponentPr
 		// Information to display the direct children meters.
 		// Holds the names of all direct meter children of this group when visible to this user.
 		const childMetersIdentifier: string[] = [];
-		currentGroup.childMeters.forEach((meterID: number) => {
-			// Make sure meter state exists. Also, the identifier is missing if not visible (non-admin).
-			if (metersState[meterID] !== undefined && metersState[meterID].identifier !== null) {
-				childMetersIdentifier.push(metersState[meterID].identifier.trim());
-			}
-		});
-		childMetersIdentifier.sort();
-		// Record the total number so later can compare the number in array to see if any missing.
-		const trueMeterSize = currentGroup.childMeters.length;
+		let trueMeterSize = 0;
+		// Make sure state exists as the dispatch above may not be done.
+		if (currentGroup.childMeters) {
+			currentGroup.childMeters.forEach((meterID: number) => {
+				// Make sure meter state exists. Also, the identifier is missing if not visible (non-admin).
+				if (metersState[meterID] !== undefined && metersState[meterID].identifier !== null) {
+					childMetersIdentifier.push(metersState[meterID].identifier.trim());
+				}
+			});
+			childMetersIdentifier.sort();
+			// Record the total number so later can compare the number in array to see if any missing.
+			trueMeterSize = currentGroup.childMeters.length;
+		}
 
 		// Information to display the direct children groups.
 		// Holds the names of all direct group children of this group when visible to this user.
 		const childGroupsName: string[] = [];
-		currentGroup.childGroups.forEach((groupID: number) => {
-			// Make sure group state exists. Also, the name is missing if not visible (non-admin).
-			if (groupsState[groupID] !== undefined && groupsState[groupID].name !== null) {
-				childGroupsName.push(groupsState[groupID].name.trim());
-			}
-		});
-		childGroupsName.sort();
-		// Record the total number so later can compare the number in array to see if any missing.
-		const trueGroupSize = currentGroup.childGroups.length;
+		let trueGroupSize = 0;
+		// Make sure state exists as the dispatch above may not be done.
+		if (currentGroup.childGroups) {
+			currentGroup.childGroups.forEach((groupID: number) => {
+				// Make sure group state exists. Also, the name is missing if not visible (non-admin).
+				if (groupsState[groupID] !== undefined && groupsState[groupID].name !== null) {
+					childGroupsName.push(groupsState[groupID].name.trim());
+				}
+			});
+			childGroupsName.sort();
+			// Record the total number so later can compare the number in array to see if any missing.
+			trueGroupSize = currentGroup.childGroups.length;
+		}
 
 		// Information to display all (deep) children meters.
 		// Holds the names of all (deep) meter children of this group when visible to this user.
 		const deepMetersIdentifier: string[] = [];
-		currentGroup.deepMeters.forEach((meterID: number) => {
-			// Make sure meter state exists. Also, the identifier is missing if not visible (non-admin).
-			if (metersState[meterID] !== undefined && metersState[meterID].identifier !== null) {
-				deepMetersIdentifier.push(metersState[meterID].identifier.trim());
-			}
-		});
-		deepMetersIdentifier.sort();
-		// Record the total number so later can compare the number in array to see if any missing.
-		const trueDeepMeterSize = currentGroup.deepMeters.length;
+		let trueDeepMeterSize = 0;
+		// Make sure state exists as the dispatch above may not be done.
+		if (currentGroup.deepMeters) {
+			currentGroup.deepMeters.forEach((meterID: number) => {
+				// Make sure meter state exists. Also, the identifier is missing if not visible (non-admin).
+				if (metersState[meterID] !== undefined && metersState[meterID].identifier !== null) {
+					deepMetersIdentifier.push(metersState[meterID].identifier.trim());
+				}
+			});
+			deepMetersIdentifier.sort();
+			// Record the total number so later can compare the number in array to see if any missing.
+			trueDeepMeterSize = currentGroup.deepMeters.length;
+		}
 
 		// Update the state
 		setGroupChildrenState({
@@ -324,7 +337,7 @@ export default function EditGroupModalComponent(props: EditGroupModalComponentPr
 										:
 										<div className="item-container">
 											{/* Use meter translation id string since same one wanted. */}
-											<b><FormattedMessage id="meter.defaultGraphicUnit" /></b> {props.group.defaultGraphicUnit}
+											<b><FormattedMessage id="meter.defaultGraphicUnit" /></b> {state.defaultGraphicUnit}
 										</div>
 									}
 									{/* Displayable input */}
