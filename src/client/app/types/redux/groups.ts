@@ -115,6 +115,6 @@ export interface GroupsState {
 		[groupID: number]: GroupDefinition;
 	};
 	selectedGroups: number[];
-	groupInEditing: GroupDefinition & StatefulEditable | StatefulEditable;
+	// TODO groupInEditing: GroupDefinition & StatefulEditable | StatefulEditable;
 	displayMode: DisplayMode;
 }

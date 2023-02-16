@@ -8,7 +8,7 @@ import { NamedIDItem } from '../types/items';
 import { showErrorNotification } from '../utils/notifications';
 import * as t from '../types/redux/groups';
 import { groupsApi } from '../utils/api';
-import { browserHistory } from '../utils/history';
+// TODO import { browserHistory } from '../utils/history';
 import { showSuccessNotification } from '../utils/notifications';
 import translate from '../utils/translate';
 
@@ -146,20 +146,21 @@ export function submitGroupEdits(group: t.GroupData & t.GroupID): Thunk {
 	};
 }
 
-export function deleteGroup(): Thunk {
-	return async (dispatch: Dispatch, getState: GetState) => {
-		const groupInEditing = getState().groups.groupInEditing as t.GroupDefinition;
-		if (groupInEditing === undefined) {
-			throw new Error('Unacceptable condition: state.groups.groupInEditing has no data.');
-		}
-		try {
-			await groupsApi.delete(groupInEditing.id);
-			dispatch(changeDisplayedGroups([]));
-			dispatch((dispatch2: Dispatch) => {
-				browserHistory.push('/groups');
-			});
-		} catch (e) {
-			showErrorNotification(translate('failed.to.delete.group'));
-		}
-	};
-}
+// TODO see if can remove this since not yet used but still need to be able to delete a group.
+// export function deleteGroup(): Thunk {
+// 	return async (dispatch: Dispatch, getState: GetState) => {
+// 		const groupInEditing = getState().groups.groupInEditing as t.GroupDefinition;
+// 		if (groupInEditing === undefined) {
+// 			throw new Error('Unacceptable condition: state.groups.groupInEditing has no data.');
+// 		}
+// 		try {
+// 			await groupsApi.delete(groupInEditing.id);
+// 			dispatch(changeDisplayedGroups([]));
+// 			dispatch((dispatch2: Dispatch) => {
+// 				browserHistory.push('/groups');
+// 			});
+// 		} catch (e) {
+// 			showErrorNotification(translate('failed.to.delete.group'));
+// 		}
+// 	};
+// }

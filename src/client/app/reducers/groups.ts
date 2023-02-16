@@ -11,9 +11,9 @@ const defaultState: GroupsState = {
 	outdated: true,
 	byGroupID: {},
 	selectedGroups: [],
-	groupInEditing: {
-		dirty: false
-	},
+	// TODO groupInEditing: {
+	// 	dirty: false
+	// },
 	displayMode: DisplayMode.View
 };
 
