@@ -16,23 +16,8 @@ export type GroupsAction =
 	| ChangeDisplayedGroupsAction
 	| ChangeSelectedChildGroupsPerGroupAction
 	| ChangeSelectedChildMetersPerGroupAction
-	| ChangeDisplayModeAction
-	| CreateNewBlankGroupAction
-	| BeginEditingGroupAction
 	| ConfirmEditedGroupAction
-	| EditGroupNameAction
-	| EditGroupGPSAction
-	| EditGroupDisplayableAction
-	| EditGroupNoteAction
-	| EditGroupAreaAction
-	| ChangeChildGroupsAction
-	| ChangeChildMetersAction
-	| MarkGroupInEditingSubmittedAction
-	| MarkGroupInEditingNotSubmittedAction
-	| MarkGroupInEditingCleanAction
-	| MarkGroupInEditingDirtyAction
-	| MarkGroupsOutdatedAction
-	| MarkOneGroupOutdatedAction;
+	;
 
 export interface RequestGroupsDetailsAction {
 	type: ActionType.RequestGroupsDetails;
@@ -51,7 +36,7 @@ export interface RequestGroupChildrenAction {
 export interface ReceiveGroupChildrenAction {
 	type: ActionType.ReceiveGroupChildren;
 	groupID: number;
-	data: {meters: number[], groups: number[], deepMeters: number[]};
+	data: { meters: number[], groups: number[], deepMeters: number[] };
 }
 
 export interface ConfirmEditedGroupAction {
@@ -74,80 +59,6 @@ export interface ChangeSelectedChildMetersPerGroupAction {
 	type: ActionType.ChangeSelectedChildMetersPerGroup;
 	parentID: number;
 	meterIDs: number[];
-}
-
-export interface ChangeDisplayModeAction {
-	type: ActionType.ChangeGroupsUIDisplayMode;
-	newMode: DisplayMode;
-}
-
-export interface CreateNewBlankGroupAction {
-	type: ActionType.CreateNewBlankGroup;
-}
-
-export interface BeginEditingGroupAction {
-	type: ActionType.BeginEditingGroup;
-	groupID: number;
-}
-
-export interface EditGroupNameAction {
-	type: ActionType.EditGroupName;
-	newName: string;
-}
-
-export interface EditGroupGPSAction {
-	type: ActionType.EditGroupGPS;
-	newGPS: GPSPoint;
-}
-
-export interface EditGroupDisplayableAction {
-	type: ActionType.EditGroupDisplayable;
-	newDisplay: boolean;
-}
-
-export interface EditGroupNoteAction {
-	type: ActionType.EditGroupNote;
-	newNote: string;
-}
-
-export interface EditGroupAreaAction {
-	type: ActionType.EditGroupArea;
-	newArea: number;
-}
-
-export interface ChangeChildGroupsAction {
-	type: ActionType.ChangeChildGroups;
-	groupIDs: number[];
-}
-
-export interface ChangeChildMetersAction {
-	type: ActionType.ChangeChildMeters;
-	meterIDs: number[];
-}
-
-export interface MarkGroupInEditingSubmittedAction {
-	type: ActionType.MarkGroupInEditingSubmitted;
-}
-
-export interface MarkGroupInEditingNotSubmittedAction {
-	type: ActionType.MarkGroupInEditingNotSubmitted;
-}
-
-export interface MarkGroupInEditingCleanAction {
-	type: ActionType.MarkGroupInEditingClean;
-}
-
-export interface MarkGroupInEditingDirtyAction {
-	type: ActionType.MarkGroupInEditingDirty;
-}
-
-export interface MarkGroupsOutdatedAction {
-	type: ActionType.MarkGroupsByIDOutdated;
-}
-
-export interface MarkOneGroupOutdatedAction {
-	type: ActionType.MarkOneGroupOutdated;
-	groupID: number;
 }
 
 export interface GroupMetadata {
