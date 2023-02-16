@@ -4,28 +4,28 @@
 
 import * as _ from 'lodash';
 import * as React from 'react';
-import MultiSelectComponent from './MultiSelectComponent';
-import { SelectOption } from '../types/items';
 import { defineMessages, FormattedMessage, useIntl } from 'react-intl';
-import TooltipMarkerComponent from './TooltipMarkerComponent';
-import { useSelector, useDispatch } from 'react-redux';
-import { State } from '../types/redux/state';
-import { ChartTypes } from '../types/redux/graph';
-import { DataType } from '../types/Datasources';
-import {
-	CartesianPoint, Dimensions, normalizeImageDimensions, calculateScaleFromEndpoints,
-	itemDisplayableOnMap, itemMapInfoOk, gpsToUserGrid
-} from '../utils/calibration';
-import {
-	changeSelectedGroups, changeSelectedMeters, changeSelectedUnit, updateSelectedMeters,
-	updateSelectedGroups, updateSelectedUnit
-} from '../actions/graph';
-import { DisplayableType, UnitData, UnitType } from '../types/redux/units'
-import { metersInGroup, unitsCompatibleWithMeters } from '../utils/determineCompatibleUnits';
-import { Dispatch } from '../types/redux/actions';
-import { UnitsState } from '../types/redux/units';
-import { MetersState } from 'types/redux/meters';
+import { useDispatch, useSelector } from 'react-redux';
 import { GroupsState } from 'types/redux/groups';
+import { MetersState } from 'types/redux/meters';
+import {
+	changeSelectedAreaUnit,
+	changeSelectedGroups, changeSelectedMeters, changeSelectedUnit, updateSelectedAreaUnit, updateSelectedGroups,
+	updateSelectedMeters, updateSelectedUnit
+} from '../actions/graph';
+import { DataType } from '../types/Datasources';
+import { SelectOption } from '../types/items';
+import { Dispatch } from '../types/redux/actions';
+import { ChartTypes } from '../types/redux/graph';
+import { State } from '../types/redux/state';
+import { DisplayableType, UnitData, UnitsState, UnitType } from '../types/redux/units';
+import {
+	calculateScaleFromEndpoints, CartesianPoint, Dimensions, gpsToUserGrid,
+	itemDisplayableOnMap, itemMapInfoOk, normalizeImageDimensions
+} from '../utils/calibration';
+import { metersInGroup, unitsCompatibleWithMeters } from '../utils/determineCompatibleUnits';
+import MultiSelectComponent from './MultiSelectComponent';
+import TooltipMarkerComponent from './TooltipMarkerComponent';
 
 /**
  * A component which allows the user to select which data should be displayed on the chart.
@@ -172,6 +172,13 @@ export default function ChartDataSelectComponent() {
 					// then this loop does not run. The loop is assumed to only run once in this case.
 					dispatch(changeSelectedUnit(state.meters.byMeterID[meterID].defaultGraphicUnit));
 				}
+				// if (state.graph.selectedAreaUnit == -99) {
+				// 	// if no area unit is selected, then this must be the first meter selected
+				// 	if(state.meters.byMeterID[meterID].area != 0) {
+				// 		// dispatch(changeSelectedAreaUnit(state.meters.byMeterID[meterID].areaUnitId));
+				// 		dispatch(updateSelectedAreaUnit(state.meters.byMeterID[meterID].areaUnitId));
+				// 	}
+				// }
 				compatibleSelectedMeters.push({
 					// For meters we display the identifier.
 					label: state.meters.byMeterID[meterID] ? state.meters.byMeterID[meterID].identifier : '',
@@ -355,6 +362,7 @@ export default function ChartDataSelectComponent() {
 							dispatch(updateSelectedGroups([]));
 							dispatch(updateSelectedMeters([]));
 							dispatch(updateSelectedUnit(-99));
+							dispatch(updateSelectedAreaUnit(-99));
 						}
 						else if (newSelectedUnitOptions.length === 1) { dispatch(changeSelectedUnit(newSelectedUnitOptions[0].value)); }
 						else if (newSelectedUnitOptions.length > 1) { dispatch(changeSelectedUnit(newSelectedUnitOptions[1].value)); }
@@ -574,13 +582,13 @@ export function getVisibleUnitOrSuffixState(state: State) {
 	if (state.currentUser.profile?.role === 'admin') {
 		// User is an admin, allow all units to be seen
 		visibleUnitsOrSuffixes = _.filter(state.units.units, (o: UnitData) => {
-			return o.typeOfUnit != UnitType.meter && o.displayable != DisplayableType.none;
+			return (o.typeOfUnit == UnitType.unit || o.typeOfUnit == UnitType.suffix) && o.displayable != DisplayableType.none;
 		});
 	}
 	else {
 		// User is not an admin, do not allow for admin units to be seen
 		visibleUnitsOrSuffixes = _.filter(state.units.units, (o: UnitData) => {
-			return o.typeOfUnit != UnitType.meter && o.displayable == DisplayableType.all;
+			return (o.typeOfUnit == UnitType.unit || o.typeOfUnit == UnitType.suffix) && o.displayable == DisplayableType.all;
 		});
 	}
 	return visibleUnitsOrSuffixes;
@@ -594,7 +602,7 @@ export function getVisibleUnitOrSuffixState(state: State) {
  * @param {UnitsState | MetersState | GroupsState} state - current redux state, must be one of UnitsState, MetersState, or GroupsState
  * @returns {SelectOption[]} an array of SelectOption
  */
-function getSelectOptionsByItem(compatibleItems: Set<number>, incompatibleItems: Set<number>, state: UnitsState | MetersState | GroupsState) {
+export function getSelectOptionsByItem(compatibleItems: Set<number>, incompatibleItems: Set<number>, state: UnitsState | MetersState | GroupsState) {
 	// Holds the label of the select item, set dynamically according to the type of item passed in
 	let label = '';
 

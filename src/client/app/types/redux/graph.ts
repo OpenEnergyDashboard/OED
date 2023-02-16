@@ -37,6 +37,11 @@ export interface UpdateSelectedUnitAction {
 	unitID: number;
 }
 
+export interface UpdateSelectedAreaUnitAction {
+	type: ActionType.UpdateSelectedAreaUnit;
+	unitID: number;
+}
+
 export interface UpdateBarDurationAction {
 	type: ActionType.UpdateBarDuration;
 	barDuration: moment.Duration;
@@ -106,6 +111,7 @@ export type GraphAction =
 	| UpdateSelectedGroupsAction
 	| UpdateSelectedMetersAction
 	| UpdateSelectedUnitAction
+	| UpdateSelectedAreaUnitAction
 	| UpdateComparePeriodAction
 	| SetHotlinked
 	| ChangeCompareSortingOrderAction
@@ -122,6 +128,7 @@ export interface GraphState {
 	selectedMeters: number[];
 	selectedGroups: number[];
 	selectedUnit: number;
+	selectedAreaUnit: number;
 	timeInterval: TimeInterval;
 	rangeSliderInterval: TimeInterval;
 	barDuration: moment.Duration;

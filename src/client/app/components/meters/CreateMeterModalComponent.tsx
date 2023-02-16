@@ -35,6 +35,7 @@ function notifyUser(msg: string) {
 interface CreateMeterModalComponentProps {
 	possibleMeterUnits: Set<UnitData>;
 	possibleGraphicUnits: Set<UnitData>;
+	possibleMeterAreaUnits: Set<UnitData>;
 }
 
 export default function CreateMeterModalComponent(props: CreateMeterModalComponentProps) {
@@ -59,6 +60,7 @@ export default function CreateMeterModalComponent(props: CreateMeterModalCompone
 		// Defaults of -999 (not to be confused with -99 which is no unit)
 		// Purely for allowing the default select to be "select a ..."
 		unitId: -999,
+		areaUnitId: -99,
 		defaultGraphicUnit: -999,
 		note: '',
 		cumulative: false,
@@ -79,6 +81,7 @@ export default function CreateMeterModalComponent(props: CreateMeterModalCompone
 	const dropdownsStateDefaults = {
 		possibleMeterUnits: props.possibleMeterUnits,
 		possibleGraphicUnits: props.possibleGraphicUnits,
+		possibleMeterAreaUnits: props.possibleMeterAreaUnits,
 		compatibleUnits: props.possibleMeterUnits,
 		incompatibleUnits: new Set<UnitData>(),
 		compatibleGraphicUnits: props.possibleGraphicUnits,
@@ -166,6 +169,12 @@ export default function CreateMeterModalComponent(props: CreateMeterModalCompone
 		// A meter default graphic unit must be selected.
 		if (state.defaultGraphicUnit === -999) {
 			notifyUser(translate('meter.graphic.invalid'));
+			inputOk = false;
+		}
+
+		// A meter area unit must be selected if meter has area
+		if (state.area !== 0 && state.areaUnitId === -99) {
+			notifyUser(translate('meter.unit.invalid'));
 			inputOk = false;
 		}
 
@@ -472,6 +481,19 @@ export default function CreateMeterModalComponent(props: CreateMeterModalCompone
 												min="0"
 												value={state.area}
 												onChange={e => handleNumberChange(e)} />
+										</div>
+										{/* meter area unit input */}
+										<div style={formInputStyle}>
+											<label><FormattedMessage id="meter.areaUnitName" /></label><br />
+											<Input
+												name="areaUnitId"
+												type='select'
+												value={state.areaUnitId}
+												onChange={e => handleNumberChange(e)}>
+												{Array.from(dropdownsState.possibleMeterAreaUnits).map(unit => {
+													return (<option value={unit.id} key={unit.id}>{unit.identifier}</option>)
+												})}
+											</Input>
 										</div>
 										{/* GPS input */}
 										<div style={formInputStyle}>

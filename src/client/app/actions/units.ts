@@ -39,6 +39,10 @@ export function changeDisplayedUnits(units: number[]): t.ChangeDisplayedUnitsAct
 	return { type: ActionType.ChangeDisplayedUnits, selectedUnits: units };
 }
 
+export function changeDisplayedAreaUnits(areaUnits: number[]): t.ChangeDisplayedAreaUnitsAction {
+	return { type: ActionType.ChangeDisplayedAreaUnits, selectedAreaUnits: areaUnits };
+}
+
 // Pushes unitId onto submitting units state array
 export function submitUnitEdits(unitId: number): t.SubmitEditedUnitAction {
 	return { type: ActionType.SubmitEditedUnit, unitId };

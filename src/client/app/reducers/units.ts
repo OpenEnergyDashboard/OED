@@ -9,6 +9,7 @@ const defaultState: UnitsState = {
 	hasBeenFetchedOnce: false,
 	isFetching: false,
 	selectedUnits: [],
+	selectedAreaUnits: [],
 	submitting: [],
 	units: {}
 };
@@ -38,6 +39,12 @@ export default function units(state = defaultState, action: UnitsAction) {
 			return {
 				...state,
 				selectedUnits: action.selectedUnits
+			};
+		}
+		case ActionType.ChangeDisplayedAreaUnits: {
+			return {
+				...state,
+				selectedUnits: action.selectedAreaUnits
 			};
 		}
 		case ActionType.SubmitEditedUnit: {

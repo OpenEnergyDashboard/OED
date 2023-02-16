@@ -53,7 +53,8 @@ function formatMeterForResponse(meter, loggedInAsAdmin) {
 		endTimestamp: null,
 		previousEnd: null,
 		unitId: meter.unitId,
-		defaultGraphicUnit: meter.defaultGraphicUnit
+		defaultGraphicUnit: meter.defaultGraphicUnit,
+		areaUnitId: meter.areaUnitId
 	};
 
 	// Only logged in Admins can see url, types, timezones, and internal names
@@ -145,7 +146,7 @@ router.get('/:meter_id', async (req, res) => {
 function validateMeterParams(params) {
 	const validParams = {
 		type: 'object',
-		maxProperties: 26,
+		maxProperties: 27,
 		// We can get rid of some of these if we defaulted more values in the meter model.
 		required: ['name', 'url', 'enabled', 'displayable', 'meterType', 'timeZone', 'note', 'area'],
 		properties: {
@@ -220,7 +221,8 @@ function validateMeterParams(params) {
 			endTimestamp: { type: 'string' },
 			previousEnd: { type: 'string' },
 			unitId: { type: 'integer' },
-			defaultGraphicUnit: { type: 'integer' }
+			defaultGraphicUnit: { type: 'integer' },
+			areaUnitId: { type: 'integer' }
 		}
 	}
 	const paramsValidationResult = validate(params, validParams);
@@ -262,7 +264,8 @@ router.post('/edit', requiredAdmin('edit meters'), async (req, res) => {
 				(req.body.endTimestamp.length === 0) ? undefined : req.body.endTimestamp,
 				(req.body.previousEnd.length === 0) ? undefined : moment(req.body.previousEnd),
 				req.body.unitId,
-				req.body.defaultGraphicUnit
+				req.body.defaultGraphicUnit,
+				req.body.areaUnitId
 			);
 			// Put any changed values from updatedMeter into meter.
 			_.merge(meter, updatedMeter);
@@ -312,7 +315,8 @@ router.post('/addMeter', async (req, res) => {
 				(req.body.endTimestamp.length === 0) ? undefined : req.body.endTimestamp,
 				(req.body.previousEnd.length === 0) ? undefined : moment(req.body.previousEnd),
 				req.body.unitId,
-				req.body.defaultGraphicUnit
+				req.body.defaultGraphicUnit,
+				req.body.areaUnitId
 			);
 			await newMeter.insert(conn);
 			success(res);

@@ -73,6 +73,7 @@ export default function MetersDetailComponent() {
 	// Possible Meter Units
 	let possibleMeterUnits = new Set<UnitData>();
 	let possibleGraphicUnits = new Set<UnitData>();
+	let possibleMeterAreaUnits = new Set<UnitData>();
 
 	// The meter unit can be any unit of type meter.
 	Object.values(units).forEach(unit => {
@@ -96,6 +97,17 @@ export default function MetersDetailComponent() {
 	possibleGraphicUnits = new Set(_.sortBy(Array.from(possibleGraphicUnits), unit => unit.identifier.toLowerCase(), 'asc'));
 	// The default graphic unit can also be no unit/-99 but that is not desired so put last in list.
 	possibleGraphicUnits.add(noUnit);
+
+	// The meter area unit can be any unit of type area.
+	Object.values(units).forEach(unit => {
+		if (unit.typeOfUnit == UnitType.area) {
+			possibleMeterAreaUnits.add(unit);
+		}
+	});
+	// Put in alphabetical order.
+	possibleMeterAreaUnits = new Set(_.sortBy(Array.from(possibleMeterAreaUnits), unit => unit.identifier.toLowerCase(), 'asc'));
+	// The default graphic unit can also be no unit/-99 but that is not desired so put last in list.
+	possibleMeterAreaUnits.add(noUnit);
 
 	const titleStyle: React.CSSProperties = {
 		textAlign: 'center'
@@ -126,6 +138,7 @@ export default function MetersDetailComponent() {
 						<CreateMeterModalComponent
 							possibleMeterUnits={possibleMeterUnits}
 							possibleGraphicUnits={possibleGraphicUnits}
+							possibleMeterAreaUnits={possibleMeterAreaUnits}
 						/>
 					</div>
 				}
@@ -141,7 +154,8 @@ export default function MetersDetailComponent() {
 								currentUser={currentUserState}
 								// These two props are used in the edit component (child of view component)
 								possibleMeterUnits={possibleMeterUnits}
-								possibleGraphicUnits={possibleGraphicUnits} />))}
+								possibleGraphicUnits={possibleGraphicUnits}
+								possibleMeterAreaUnits={possibleMeterAreaUnits} />))}
 					</div>
 				}
 			</div>

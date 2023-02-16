@@ -20,6 +20,7 @@ import 'rc-slider/assets/index.css';
 import MapChartSelectComponent from './MapChartSelectComponent';
 import ReactTooltip from 'react-tooltip';
 import GraphicRateMenuComponent from './GraphicRateMenuComponent';
+import AreaUnitSelectComponent from './AreaUnitSelectComponent';
 
 const Slider = createSliderWithTooltip(sliderWithoutTooltips);
 
@@ -262,6 +263,11 @@ class UIOptionsComponent extends React.Component<UIOptionsPropsWithIntl, UIOptio
 					</label>
 					<TooltipMarkerComponent page='home' helpTextId='help.home.area.normalize' />
 				</div>
+
+				{/* Only show area units if area normalization is enabled */}
+				{this.props.areaNormalization &&
+					<AreaUnitSelectComponent/>
+				}
 
 				{/* We can't export compare data or map data */}
 				{this.props.chartToRender !== ChartTypes.compare && this.props.chartToRender !== ChartTypes.map &&

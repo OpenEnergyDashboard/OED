@@ -41,6 +41,10 @@ export function updateSelectedUnit(unitID: number): t.UpdateSelectedUnitAction {
 	return { type: ActionType.UpdateSelectedUnit, unitID };
 }
 
+export function updateSelectedAreaUnit(unitID: number): t.UpdateSelectedAreaUnitAction {
+	return { type: ActionType.UpdateSelectedAreaUnit, unitID };
+}
+
 export function updateBarDuration(barDuration: moment.Duration): t.UpdateBarDurationAction {
 	return { type: ActionType.UpdateBarDuration, barDuration };
 }
@@ -139,6 +143,20 @@ export function changeSelectedUnit(unitID: number): Thunk {
 			dispatch2(fetchNeededCompareReadings(getState().graph.comparePeriod, unitID));
 			dispatch2(fetchNeededMapReadings(getState().graph.timeInterval, unitID));
 		});
+		return Promise.resolve();
+	}
+}
+
+// TODO: make sure this works right
+export function changeSelectedAreaUnit(unitID: number): Thunk {
+	return (dispatch: Dispatch, getState: GetState) => {
+		dispatch(updateSelectedAreaUnit(unitID));
+		// dispatch((dispatch2: Dispatch) => {
+		// 	dispatch(fetchNeededLineReadings(getState().graph.timeInterval, unitID));
+		// 	dispatch2(fetchNeededBarReadings(getState().graph.timeInterval, unitID));
+		// 	dispatch2(fetchNeededCompareReadings(getState().graph.comparePeriod, unitID));
+		// 	dispatch2(fetchNeededMapReadings(getState().graph.timeInterval, unitID));
+		// });
 		return Promise.resolve();
 	}
 }

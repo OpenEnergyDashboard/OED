@@ -66,6 +66,7 @@ interface EditMeterModalComponentProps {
 	meter: MeterData;
 	possibleMeterUnits: Set<UnitData>;
 	possibleGraphicUnits: Set<UnitData>;
+	possibleMeterAreaUnits: Set<UnitData>;
 	// passed in to handle closing the modal
 	handleClose: () => void;
 }
@@ -104,12 +105,14 @@ export default function EditMeterModalComponent(props: EditMeterModalComponentPr
 		endTimestamp: props.meter.endTimestamp,
 		previousEnd: props.meter.previousEnd,
 		unitId: props.meter.unitId,
-		defaultGraphicUnit: props.meter.defaultGraphicUnit
+		defaultGraphicUnit: props.meter.defaultGraphicUnit,
+		areaUnitId: props.meter.areaUnitId
 	}
 
 	const dropdownsStateDefaults = {
 		possibleMeterUnits: props.possibleMeterUnits,
 		possibleGraphicUnits: props.possibleGraphicUnits,
+		possibleMeterAreaUnits: props.possibleMeterAreaUnits,
 		compatibleUnits: props.possibleMeterUnits,
 		incompatibleUnits: new Set<UnitData>(),
 		compatibleGraphicUnits: props.possibleGraphicUnits,
@@ -192,7 +195,8 @@ export default function EditMeterModalComponent(props: EditMeterModalComponentPr
 				props.meter.timeSort != state.timeSort ||
 				props.meter.startTimestamp != state.startTimestamp ||
 				props.meter.endTimestamp != state.endTimestamp ||
-				props.meter.previousEnd != state.previousEnd
+				props.meter.previousEnd != state.previousEnd ||
+				props.meter.areaUnitId != state.areaUnitId
 			);
 
 		// Only validate and store if any changes.
@@ -327,6 +331,7 @@ export default function EditMeterModalComponent(props: EditMeterModalComponentPr
 			// All units are compatible
 			compatibleUnits = new Set(dropdownsState.possibleMeterUnits);
 		}
+
 		// Update the state
 		setDropdownsState({
 			...dropdownsState,
@@ -489,6 +494,19 @@ export default function EditMeterModalComponent(props: EditMeterModalComponentPr
 												min="0"
 												value={nullToEmptyString(state.area)}
 												onChange={e => handleNumberChange(e)} />
+										</div>
+										{/* meter area unit input */}
+										<div style={formInputStyle}>
+											<label><FormattedMessage id="meter.areaUnitName" /></label><br />
+											<Input
+												name="areaUnitId"
+												type='select'
+												value={state.areaUnitId}
+												onChange={e => handleNumberChange(e)}>
+												{Array.from(dropdownsState.possibleMeterAreaUnits).map(unit => {
+													return (<option value={unit.id} key={unit.id}>{unit.identifier}</option>)
+												})}
+											</Input>
 										</div>
 										{/* GPS input */}
 										<div style={formInputStyle}>

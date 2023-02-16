@@ -91,8 +91,10 @@ function mapStateToProps(state: State) {
 						unitLabel = selectUnitState.identifier + ' * time / day ≡ quantity / day';
 					}
 					if(state.graph.areaNormalization) {
-						// TODO add actual unit
-						unitLabel += ' / area';
+						const selectAreaUnitState = state.units.units[state.graph.selectedAreaUnit];
+						if (selectAreaUnitState !== undefined) {
+							unitLabel += ' / ' + selectAreaUnitState.identifier;
+						}
 					}
 				}
 			}
