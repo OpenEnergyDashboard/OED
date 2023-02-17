@@ -17,14 +17,6 @@ import { CurrentUserState } from 'types/redux/currentUser';
 import translate from '../../utils/translate';
 import { UnitData } from '../../types/redux/units';
 
-// TODO
-// Need to put child meters somewhere
-// Get design document for other items
-// protect some items to admin only
-
-// TODO This duplicates code in EditMeterModalComponent. Need to put in some other place (utils? or where others are)
-// and then import in both places
-
 interface GroupViewComponentProps {
 	group: GroupDefinition;
 	currentUser: CurrentUserState;
@@ -53,11 +45,11 @@ export default function GroupViewComponent(props: GroupViewComponentProps) {
 	const loggedInAsAdmin = (currentUser !== null) && isRoleAdmin(currentUser.role);
 
 	// Set up to display the units associated with the group as the unit identifier.
-	// current unit state
-	const currentUnitState = useSelector((state: State) => state.units.units);
-	// TODO-fix comment This is the default graphic unit associated with the group. See above for how code works.
-	const graphicName = (Object.keys(currentUnitState).length === 0 || props.group.defaultGraphicUnit === -99) ?
-		'no unit' : currentUnitState[props.group.defaultGraphicUnit].identifier;
+	// unit state
+	const unitState = useSelector((state: State) => state.units.units);
+	// This is the default graphic unit associated with the group or no unit if none.
+	const graphicName = props.group.defaultGraphicUnit === -99 ?
+		'no unit' : unitState[props.group.defaultGraphicUnit].identifier;
 
 	return (
 		<div className="card">

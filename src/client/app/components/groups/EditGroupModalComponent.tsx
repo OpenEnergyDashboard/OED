@@ -38,6 +38,8 @@ export default function EditGroupModalComponent(props: EditGroupModalComponentPr
 
 	// Meter state
 	const metersState = useSelector((state: State) => state.meters.byMeterID);
+	// unit state
+	const unitState = useSelector((state: State) => state.units.units);
 	// Group state
 	const groupsState = useSelector((state: State) => state.groups.byGroupID);
 	// The current groups state. It should always be valid.
@@ -364,7 +366,8 @@ export default function EditGroupModalComponent(props: EditGroupModalComponentPr
 										:
 										<div className="item-container">
 											{/* Use meter translation id string since same one wanted. */}
-											<b><FormattedMessage id="meter.defaultGraphicUnit" /></b> {state.defaultGraphicUnit}
+											{/* This is the default graphic unit associated with the group or no unit if none. */}
+											<b><FormattedMessage id="meter.defaultGraphicUnit" /></b> {state.defaultGraphicUnit === -99 ? 'no unit' : unitState[state.defaultGraphicUnit].identifier}
 										</div>
 									}
 									{/* Displayable input */}
