@@ -12,11 +12,12 @@ import { useDispatch, useSelector } from 'react-redux';
 import { useEffect } from 'react';
 import { fetchMetersDetailsIfNeeded } from '../../actions/meters';
 import { isRoleAdmin } from '../../utils/hasPermissions';
+import { potentialGraphicUnits, noUnit } from '../../utils/input';
 import MeterViewComponent from './MeterViewComponent';
 import CreateMeterModalComponent from './CreateMeterModalComponent';
 import { MeterData } from 'types/redux/meters';
 import '../../styles/card-page.css';
-import { UnitData, DisplayableType, UnitRepresentType, UnitType } from '../../types/redux/units';
+import { UnitData, UnitType } from '../../types/redux/units';
 import * as _ from 'lodash';
 
 export default function MetersDetailComponent() {
@@ -55,25 +56,8 @@ export default function MetersDetailComponent() {
 	// Units state loaded status
 	const unitsStateLoaded = useSelector((state: State) => state.units.hasBeenFetchedOnce);
 
-	// A non-unit
-	const noUnit: UnitData = {
-		// Only needs the id and identifier, others are dummy values.
-		id: -99,
-		name: '',
-		identifier: 'no unit',
-		unitRepresent: UnitRepresentType.unused,
-		secInRate: 99,
-		typeOfUnit: UnitType.unit,
-		unitIndex: -99,
-		suffix: '',
-		displayable: DisplayableType.none,
-		preferredDisplay: false,
-		note: ''
-	}
 	// Possible Meter Units
 	let possibleMeterUnits = new Set<UnitData>();
-	let possibleGraphicUnits = new Set<UnitData>();
-
 	// The meter unit can be any unit of type meter.
 	Object.values(units).forEach(unit => {
 		if (unit.typeOfUnit == UnitType.meter) {
@@ -84,18 +68,7 @@ export default function MetersDetailComponent() {
 	possibleMeterUnits = new Set(_.sortBy(Array.from(possibleMeterUnits), unit => unit.identifier.toLowerCase(), 'asc'));
 	// The default graphic unit can also be no unit/-99 but that is not desired so put last in list.
 	possibleMeterUnits.add(noUnit);
-
-	// Possible Graphic Units
-	// The default graphic unit can be any unit of type unit or suffix.
-	Object.values(units).forEach(unit => {
-		if (unit.typeOfUnit == UnitType.unit || unit.typeOfUnit == UnitType.suffix) {
-			possibleGraphicUnits.add(unit);
-		}
-	});
-	// Put in alphabetical order.
-	possibleGraphicUnits = new Set(_.sortBy(Array.from(possibleGraphicUnits), unit => unit.identifier.toLowerCase(), 'asc'));
-	// The default graphic unit can also be no unit/-99 but that is not desired so put last in list.
-	possibleGraphicUnits.add(noUnit);
+	const possibleGraphicUnits = potentialGraphicUnits(units);
 
 	const titleStyle: React.CSSProperties = {
 		textAlign: 'center'

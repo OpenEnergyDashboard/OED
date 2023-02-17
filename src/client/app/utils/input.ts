@@ -3,6 +3,8 @@
 * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
 
 import { GPSPoint } from './calibration';
+import { UnitData, DisplayableType, UnitRepresentType, UnitType, UnitDataById } from '../types/redux/units';
+import * as _ from 'lodash';
 
 // Notifies user of msg.
 // TODO isValidGPSInput uses alert so continue that. Maybe all should be changed but this impacts other parts of the code.
@@ -51,4 +53,43 @@ export function nullToEmptyString(item: any) {
 	} else {
 		return item;
 	}
+}
+
+/**
+ * Calculates the set of all possible graphic units for a meter/group.
+ * This is any unit that is of type unit or suffix.
+ * @returns The set of all possible graphic units for a meter/group
+ */
+export function potentialGraphicUnits(units: UnitDataById) {
+	// Set of possible graphic units
+	let possibleGraphicUnits = new Set<UnitData>();
+
+	// The default graphic unit can be any unit of type unit or suffix.
+	Object.values(units).forEach(unit => {
+		if (unit.typeOfUnit == UnitType.unit || unit.typeOfUnit == UnitType.suffix) {
+			possibleGraphicUnits.add(unit);
+		}
+	});
+	// Put in alphabetical order.
+	possibleGraphicUnits = new Set(_.sortBy(Array.from(possibleGraphicUnits), unit => unit.identifier.toLowerCase(), 'asc'));
+	// The default graphic unit can also be no unit/-99 but that is not desired so put last in list.
+	possibleGraphicUnits.add(noUnit);
+	return possibleGraphicUnits;
+}
+
+
+// A non-unit
+export const noUnit: UnitData = {
+	// Only needs the id and identifier, others are dummy values.
+	id: -99,
+	name: '',
+	identifier: 'no unit',
+	unitRepresent: UnitRepresentType.unused,
+	secInRate: 99,
+	typeOfUnit: UnitType.unit,
+	unitIndex: -99,
+	suffix: '',
+	displayable: DisplayableType.none,
+	preferredDisplay: false,
+	note: ''
 }
